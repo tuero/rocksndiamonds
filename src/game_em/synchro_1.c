@@ -10,8 +10,6 @@
 #include "sample.h"
 
 
-#if defined(TARGET_X11)
-
 static void player(struct PLAYER *);
 static int test(struct PLAYER *);
 static void die(struct PLAYER *);
@@ -1070,5 +1068,3 @@ static void player(struct PLAYER *ply)
     }
   }
 }
-
-#endif

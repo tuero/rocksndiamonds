@@ -8529,8 +8529,8 @@ void AdvanceFrameAndPlayerCounters(int player_nr)
 
 void GameActions()
 {
-  static unsigned long action_delay = 0;
-  unsigned long action_delay_value;
+  static unsigned long game_frame_delay = 0;
+  unsigned long game_frame_delay_value;
   int magic_wall_x = 0, magic_wall_y = 0;
   int i, x, y, element, graphic;
   byte *recorded_player_action;
@@ -8542,15 +8542,15 @@ void GameActions()
   if (game_status != GAME_MODE_PLAYING)
     return;
 
-  action_delay_value =
+  game_frame_delay_value =
     (tape.playing && tape.fast_forward ? FfwdFrameDelay : GameFrameDelay);
 
   if (tape.playing && tape.warp_forward && !tape.pausing)
-    action_delay_value = 0;
+    game_frame_delay_value = 0;
 
   /* ---------- main game synchronization point ---------- */
 
-  WaitUntilDelayReached(&action_delay, action_delay_value);
+  WaitUntilDelayReached(&game_frame_delay, game_frame_delay_value);
 
   if (network_playing && !network_player_action_received)
   {

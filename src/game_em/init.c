@@ -3,23 +3,8 @@
  * open X11 display and sound
  */
 
-#include <X11/Xlib.h>
-#include <X11/Xutil.h>
-#include <X11/Xatom.h>
-#include <X11/Xos.h>
-#include <X11/Intrinsic.h>
-#include <X11/keysymdef.h>
-
-#include <X11/keysym.h>
-
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <stdio.h>
 #include <signal.h>
-#include <string.h>
-#include <errno.h>
+#include <sys/wait.h>
 
 #include "game_em.h"
 
@@ -28,59 +13,32 @@
 #include "sample.h"
 
 
-#if defined(TARGET_X11)
-
-#if 1
 Bitmap *objBitmap;
-Bitmap *botBitmap;
 Bitmap *sprBitmap;
-Bitmap *ttlBitmap;
-#endif
 
-#if 1
 Bitmap *screenBitmap;
-Bitmap *scoreBitmap;
-#endif
 
-Pixmap screenPixmap;
-Pixmap scorePixmap;
+#if 0
 Pixmap spriteBitmap;
+#endif
 
 Pixmap objPixmap;
-Pixmap objmaskBitmap;
-Pixmap botPixmap;
-Pixmap botmaskBitmap;
 Pixmap sprPixmap;
-Pixmap sprmaskBitmap;
-Pixmap ttlPixmap;
-Pixmap ttlmaskBitmap;
 
-GC screenGC;
-GC scoreGC;
+#if 0
+Pixmap objmaskBitmap;
+Pixmap sprmaskBitmap;
+
 GC spriteGC;
+#endif
 
 char play[SAMPLE_MAX];
 
+#if defined(AUDIO_UNIX_NATIVE)
 static int sound_pid = -1;
-int sound_pipe[2] = { -1, -1 }; /* for communication */
-short *sound_data[SAMPLE_MAX]; /* pointer to sound data */
-long sound_length[SAMPLE_MAX]; /* length of sound data */
-
-static Screen *defaultScreen;
-static Visual *defaultVisual;
-static Colormap defaultColourmap;
-static Window defaultRootWindow;
-static unsigned int screenDepth;
-static unsigned int screenWidth;
-static unsigned int screenHeight;
-static unsigned long screenBlackPixel;
-static unsigned long screenWhitePixel;
-
-static XGCValues gcValues;
-
-#if 1
-static Bitmap *pcxBitmapsX2[4];
-#endif
+int sound_pipe[2] = { -1, -1 };		/* for communication */
+short *sound_data[SAMPLE_MAX];		/* pointer to sound data */
+long sound_length[SAMPLE_MAX];		/* length of sound data */
 
 static const char *sound_names[SAMPLE_MAX] =
 {
@@ -99,76 +57,43 @@ static const int sound_volume[SAMPLE_MAX] =
   100,20,100,100,100,100,100,20,100,100,
   100
 };
+#endif
+
+char *progname;
+char *arg_basedir;
+
+extern void tab_generate();
+extern void ulaw_generate();
 
 int open_all(void)
 {
-  char name[MAXNAME+2];
-  int i;
-
-  defaultScreen = DefaultScreenOfDisplay(display);
-  defaultVisual = DefaultVisualOfScreen(defaultScreen);
-  defaultColourmap = DefaultColormapOfScreen(defaultScreen);
-  defaultRootWindow = RootWindowOfScreen(defaultScreen);
-  screenDepth = DefaultDepthOfScreen(defaultScreen);
-  screenWidth = WidthOfScreen(defaultScreen);
-  screenHeight = HeightOfScreen(defaultScreen);
-  screenBlackPixel = BlackPixelOfScreen(defaultScreen);
-  screenWhitePixel = WhitePixelOfScreen(defaultScreen);
+  Bitmap *emc_bitmaps[2];
+#if 0
+  XGCValues gcValues;
+#endif
 
 #if 1
-  SetBitmaps_EM(pcxBitmapsX2);
+  SetBitmaps_EM(emc_bitmaps);
 
-  objBitmap = pcxBitmapsX2[0];
-  botBitmap = pcxBitmapsX2[1];
-  sprBitmap = pcxBitmapsX2[2];
-  ttlBitmap = pcxBitmapsX2[3];
+  objBitmap = emc_bitmaps[0];
+  sprBitmap = emc_bitmaps[1];
 
-  objPixmap = pcxBitmapsX2[0]->drawable;
-  botPixmap = pcxBitmapsX2[1]->drawable;
-  sprPixmap = pcxBitmapsX2[2]->drawable;
-  ttlPixmap = pcxBitmapsX2[3]->drawable;
+#if 0
+  objPixmap = emc_bitmaps[0]->drawable;
+  sprPixmap = emc_bitmaps[1]->drawable;
 
-  objmaskBitmap = pcxBitmapsX2[0]->clip_mask;
-  botmaskBitmap = pcxBitmapsX2[1]->clip_mask;
-  sprmaskBitmap = pcxBitmapsX2[2]->clip_mask;
-  ttlmaskBitmap = pcxBitmapsX2[3]->clip_mask;
+  objmaskBitmap = emc_bitmaps[0]->clip_mask;
+  sprmaskBitmap = emc_bitmaps[1]->clip_mask;
+#endif
 
   screenBitmap = CreateBitmap(MAX_BUF_XSIZE * TILEX, MAX_BUF_YSIZE * TILEY,
 			      DEFAULT_DEPTH);
-  scoreBitmap = CreateBitmap(20 * TILEX, SCOREY, DEFAULT_DEPTH);
-
-  screenPixmap = screenBitmap->drawable;
-  scorePixmap = scoreBitmap->drawable;
 #endif
 
-  spriteBitmap = XCreatePixmap(display, xwindow, TILEX, TILEY, 1);
+#if 0
+  spriteBitmap = XCreatePixmap(display, window->drawable, TILEX, TILEY, 1);
   if (spriteBitmap == 0)
-  {
-    fprintf(stderr, "%s: \"%s\": %s: %s\n", progname,
-	    XDisplayName(arg_display), "failed to create pixmap",
-	    strerror(errno));
-    return(1);
-  }
-
-  gcValues.graphics_exposures = False;
-  screenGC = XCreateGC(display, screenPixmap, GCGraphicsExposures, &gcValues);
-  if (screenGC == 0)
-  {
-    fprintf(stderr, "%s: \"%s\": %s: %s\n", progname,
-	    XDisplayName(arg_display), "failed to create graphics context",
-	    strerror(errno));
-    return(1);
-  }
-
-  gcValues.graphics_exposures = False;
-  scoreGC = XCreateGC(display, scorePixmap, GCGraphicsExposures, &gcValues);
-  if (scoreGC == 0)
-  {
-    fprintf(stderr, "%s: \"%s\": %s: %s\n", progname,
-	    XDisplayName(arg_display), "failed to create graphics context",
-	    strerror(errno));
-    return(1);
-  }
+    Error(ERR_EXIT, "failed to create sprite pixmap for EM engine");
 
   gcValues.function =
     objmaskBitmap ? GXcopyInverted : sprmaskBitmap ? GXcopy : GXset;
@@ -176,24 +101,20 @@ int open_all(void)
   spriteGC = XCreateGC(display, spriteBitmap, GCFunction | GCGraphicsExposures,
 		       &gcValues);
   if (spriteGC == 0)
-  {
-    fprintf(stderr, "%s: \"%s\": %s: %s\n", progname,
-	    XDisplayName(arg_display), "failed to create graphics context",
-	    strerror(errno));
-    return(1);
-  }
+    Error(ERR_EXIT, "failed to create sprite GC for EM engine");
+#endif
 
   /* ----------------------------------------------------------------- */
 
+#if defined(AUDIO_UNIX_NATIVE)
+
 #if defined(PLATFORM_LINUX) || defined(PLATFORM_BSD)
 
-#if 1
-  /* disable sound */
-  arg_silence = 1;
-#endif
-
-  if (arg_silence == 0)
+  if (1)
   {
+    char name[MAXNAME+2];
+    int i;
+
     for (i = 0; i < SAMPLE_MAX; i++)
     {
       name[MAXNAME] = 0;
@@ -208,7 +129,8 @@ int open_all(void)
 	snprintf(name, MAXNAME+2, "%s/%s", EM_SND_DIR, sound_names[i]);
       }
 
-      if (name[MAXNAME]) snprintf_overflow("read sounds/ directory");
+      if (name[MAXNAME])
+	Error(ERR_EXIT, "buffer overflow when reading sounds directory");
 
       if (read_sample(name, &sound_data[i], &sound_length[i]))
 	return(1);
@@ -224,16 +146,16 @@ int open_all(void)
 
     if (pipe(sound_pipe) == -1)
     {
-      fprintf(stderr, "%s: %s: %s\n", progname, "unable to create sound pipe",
-	      strerror(errno));
+      Error(ERR_WARN, "unable to create sound pipe for EM engine -- no sound");
+
       return(1);
     }
 
     sound_pid = fork();
     if (sound_pid == -1)
     {
-      fprintf(stderr, "%s: %s: %s\n", progname, "unable to fork sound thread",
-	      strerror(errno));
+      Error(ERR_WARN, "unable to fork sound thread for EM engine -- no sound");
+
       return(1);
     }
 
@@ -244,13 +166,30 @@ int open_all(void)
     signal(SIGPIPE, SIG_IGN); /* dont crash if sound process dies */
   }
 
-#endif /* defined(PLATFORM_LINUX) || defined(PLATFORM_BSD) */
+#endif	/* defined(PLATFORM_LINUX) || defined(PLATFORM_BSD) */
+
+#endif	/* AUDIO_UNIX_NATIVE */
 
   return(0);
 }
 
-void close_all(void)
+void em_open_all()
 {
+  /* pre-calculate some data */
+  tab_generate();
+  ulaw_generate();
+
+  progname = "emerald mine";
+
+  if (open_all() != 0)
+    Error(ERR_EXIT, "em_open_all(): open_all() failed");
+
+  game_init_vars();
+}
+
+void em_close_all(void)
+{
+#if defined(AUDIO_UNIX_NATIVE)
   int i;
 
   if (sound_pid != -1)
@@ -267,28 +206,27 @@ void close_all(void)
   for (i = 0; i < SAMPLE_MAX; i++)
     if (sound_data[i])
       free(sound_data[i]);
+#endif
 
-  if (screenGC)
-    XFreeGC(display, screenGC);
-  if (scoreGC)
-    XFreeGC(display, scoreGC);
+#if 0
   if (spriteGC)
     XFreeGC(display, spriteGC);
 
   if (spriteBitmap)
     XFreePixmap(display, spriteBitmap);
+#endif
 }
 
 /* ---------------------------------------------------------------------- */
 
 void sound_play(void)
 {
+#if defined(AUDIO_UNIX_NATIVE)
   if (sound_pipe[1] != -1)
   {
     if (write(sound_pipe[1], &play, sizeof(play)) == -1)
     {
-      fprintf(stderr, "%s: %s: %s\n", progname, "write sound",
-	      strerror(errno));
+      Error(ERR_WARN, "cannot write into pipe to child process -- no sounds");
 
       if (sound_pipe[0] != -1)
       {
@@ -305,6 +243,5 @@ void sound_play(void)
   }
 
   memset(play, 0, sizeof(play));
-}
-
 #endif
+}

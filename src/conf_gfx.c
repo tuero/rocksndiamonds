@@ -3774,14 +3774,8 @@ struct ConfigInfo image_config[] =
   { "emc_object",				"emc_object.pcx"	},
   { "emc_object.scale_up",			"2"			},
 
-  { "emc_score",				"emc_score.pcx"		},
-  { "emc_score.scale_up",			"2"			},
-
   { "emc_sprite",				"emc_sprite.pcx"	},
   { "emc_sprite.scale_up",			"2"			},
-
-  { "emc_title",				"emc_title.pcx"		},
-  { "emc_title.scale_up",			"2"			},
 
   /* the following directives are not associated with an image, but
      probably make sense to be defined in "graphicsinfo.conf", too */

@@ -11,11 +11,8 @@
  * modify.
  */
 
-#include <stdio.h>
 #include "tile.h"
 
-
-#if defined(TARGET_X11)
 
 /* ---------------------------------------------------------------------- */
 
@@ -4499,5 +4496,3 @@ void tab_generate()
   create_obj();
   create_spr();
 }
-
-#endif

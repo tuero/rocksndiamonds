@@ -1,8 +1,24 @@
+2004-09-21
+	* added SDL support to graphics functions in native EM engine
+	  (by always using generic libgame interface functions)
+
+2004-09-20
+	* fixed bug in frame synchronization in native EM engine
+
+2004-09-18
+	* added code to convert levels between R'n'D and native EM engine
+
+2004-08-23
+	* new Emerald Mine engine can now play levels selected in main menu
+
 2004-08-16
 	* fixed big memory leak in function "CreateBitmapWithSmallBitmaps()"
 	  (which creates scaled down graphics for level editor and preview);
 	  there's still a memory leak somewhere in the artwork handling code
 	* added "scale image up" functionality to X11 version of zoom function
+
+2004-08-14
+	* first attempts to integrate new, native Emerald Mine Club engine
 
 2004-08-07
 	* fixed bug in gadget code which caused reset of CEs in level editor

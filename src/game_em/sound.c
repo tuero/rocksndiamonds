@@ -6,28 +6,19 @@
 #include "game_em.h"
 
 
-#if defined(TARGET_X11)
+#if defined(AUDIO_UNIX_NATIVE)
 
 #if defined(PLATFORM_LINUX) || defined(PLATFORM_BSD)
 
 #ifdef PLATFORM_LINUX
+#include <sys/ioctl.h>
 #include <sys/soundcard.h>
 #endif
 
 #ifdef PLATFORM_BSD
+#include <ioctl.h>
 #include <soundcard.h>
 #endif
-
-#include <sys/time.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/ioctl.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <errno.h>
 
 #include "global.h"
 #include "sample.h"
@@ -107,8 +98,8 @@ int sound_thread(void)
 
 	if (i == -1)
 	{
-	  fprintf(stderr, "%s: %s: %s\n", progname, "select failed",
-		  strerror(errno));
+	  Error(ERR_WARN, "select() failed in sound thread");
+
 	  goto fail;
 	}
 
@@ -121,20 +112,22 @@ int sound_thread(void)
 
       if (i == -1)
       {
-	fprintf(stderr, "%s: %s: %s\n", progname, "read failed",
-		strerror(errno));
+	Error(ERR_WARN, "read() failed in sound thread");
+
 	goto fail;
       }
 
       if (i == 0)
       {
-	fprintf(stderr, "%s: %s: %s\n", progname, "read sound", "Broken pipe");
+	Error(ERR_WARN, "reading sound failed in sound thread");
+
 	goto fail;
       }
 
       if (i != sizeof(play))
       {
-	fprintf(stderr, "%s: %s\n", progname, "bad message length");
+	Error(ERR_WARN, "bad message length in sound thread");
+
 	goto fail;
       }
 
@@ -161,15 +154,15 @@ int sound_thread(void)
 
       if (ioctl(audio_fd, SNDCTL_DSP_SETFRAGMENT, &i) == -1)
       {
-	fprintf(stderr, "%s: \"%s\": %s (%d): %s\n", progname, audioname,
-		"unable to set fragment size", 512, strerror(errno));
+	Error(ERR_WARN, "unable to set fragment size in sound thread");
+
 	goto reset;
       }
 
       if (ioctl(audio_fd, SNDCTL_DSP_GETFMTS, &i) == -1)
       {
-	fprintf(stderr, "%s: \"%s\": %s: %s\n", progname, audioname,
-		"unable to query audio format", strerror(errno));
+	Error(ERR_WARN, "unable to query audio format in sound thread");
+
 	goto reset;
       }
 
@@ -179,8 +172,8 @@ int sound_thread(void)
       i = audio_format;
       if (ioctl(audio_fd, SNDCTL_DSP_SETFMT, &i) == -1)
       {
-	fprintf(stderr, "%s: \"%s\": %s (%d): %s\n", progname, audioname,
-		"unable to set audio format", audio_format, strerror(errno));
+	Error(ERR_WARN, "unable to set audio format in sound thread");
+
 	goto reset;
       }
 
@@ -194,39 +187,39 @@ int sound_thread(void)
       }
       else
       {
-	fprintf(stderr, "%s: \"%s\": %s (%d)\n", progname, audioname,
-		"audio format required by device not supported", i);
+	Error(ERR_WARN, "audio format required by device not supported");
+
 	goto reset;
       }
 
       i = 1;
       if (ioctl(audio_fd, SNDCTL_DSP_CHANNELS, &i) == -1)
       {
-	fprintf(stderr, "%s: \"%s\": %s: %s\n", progname, audioname,
-		"unable to set channels to mono", strerror(errno));
+	Error(ERR_WARN, "unable to set channels to mono in sound thread");
+
 	goto reset;
       }
 
       if (i != 1)
       {
-	fprintf(stderr, "%s: \"%s\": %s (%d)\n", progname, audioname,
-		"channels required by device not supported", i);
+	Error(ERR_WARN, "channels required by device not supported");
+
 	goto reset;
       }
 
       i = 8000;
       if (ioctl(audio_fd, SNDCTL_DSP_SPEED, &i) == -1)
       {
-	fprintf(stderr, "%s: \"%s\": %s: %s\n", progname, audioname,
-		"unable to set sampling rate", strerror(errno));
+	Error(ERR_WARN, "unable to set sampling rate in sound thread");
+
 	goto reset;
       }
 
       sample_rate = i;
       if (ioctl(audio_fd, SNDCTL_DSP_GETBLKSIZE, &i) == -1)
       {
-	fprintf(stderr, "%s: \"%s\": %s: %s\n", progname, audioname,
-		"unable to get block size", strerror(errno));
+	Error(ERR_WARN, "unable to get block size in sound thread");
+
 	goto reset;
       }
 
@@ -235,8 +228,8 @@ int sound_thread(void)
 #else
       if (fcntl(audio_fd, F_SETFL, O_NONBLOCK) == -1)
       {
-	fprintf(stderr, "%s: \"%s\": %s: %s\n", progname, audioname,
-		"unable to make audio non blocking", strerror(errno));
+	Error(ERR_WARN, "unable to make audio non blocking in sound thread");
+
 	goto reset;
       }
 
@@ -245,18 +238,16 @@ int sound_thread(void)
       audio_buffer = malloc(fragment_size * sizeof(*audio_buffer));
       if (audio_buffer == 0)
       {
-	fprintf(stderr, "%s: %s (%d): %s\n", progname,
-		"unable to malloc audio buffer",
-		fragment_size * sizeof(*audio_buffer), strerror(errno));
+	Error(ERR_WARN, "unable to malloc audio buffer in sound thread");
+
 	goto fail;
       }
 
       mix_buffer = malloc(fragment_size * sizeof(*mix_buffer));
       if (mix_buffer == 0)
       {
-	fprintf(stderr, "%s: %s (%d): %s\n", progname,
-		"unable to malloc mixing buffer",
-		fragment_size * sizeof(*mix_buffer), strerror(errno));
+	Error(ERR_WARN, "unable to malloc mixing buffer in sound thread");
+
 	goto fail;
       }
     }
@@ -326,14 +317,15 @@ int sound_thread(void)
       i = write(audio_fd, audio_buffer, fragment_size);
       if (i == -1)
       {
-	fprintf(stderr, "%s: %s: %s\n", progname, "write error",
-		strerror(errno));
+	Error(ERR_WARN, "cannot write to audio device in sound thread");
+
 	goto reset;
       }
 
       if (i != fragment_size)
       {
-	fprintf(stderr, "%s: %s\n", progname, "bad write length");
+	Error(ERR_WARN, "bad write length to audio device in sound thread");
+
 	goto reset;
       }
     }
@@ -374,8 +366,8 @@ int read_sample(char *name, short **data, long *length)
   file = fopen(name, "rb");
   if (file == 0)
   {
-    fprintf(stderr, "%s: \"%s\": %s: %s\n", progname, name, "open error",
-	    strerror(errno));
+    Error(ERR_WARN, "cannot open file '%s' in sound thread", name);
+
     result = 1;
     goto fail;
   }
@@ -383,15 +375,16 @@ int read_sample(char *name, short **data, long *length)
   actual = fread(buffer, 1, 24, file);
   if (actual == -1)
   {
-    fprintf(stderr, "%s: \"%s\": %s: %s\n", progname, name, "read error",
-	    strerror(errno));
+    Error(ERR_WARN, "cannot read file '%s' in sound thread", name);
+
     result = 1;
     goto fail;
   }
 
   if (actual < 24)
   {
-    fprintf(stderr, "%s: \"%s\": %s\n", progname, name, "premature eof");
+    Error(ERR_WARN, "premature eof of file '%s' in sound thread", name);
+
     result = 1;
     goto fail;
   }
@@ -400,8 +393,8 @@ int read_sample(char *name, short **data, long *length)
   temp = buffer[0] << 24 | buffer[1] << 16 | buffer[2] << 8 | buffer[3];
   if (temp != 0x2e736e64)
   {
-    fprintf(stderr, "%s: \"%s\": %s\n", progname, name,
-	    "unrecognized file format");
+    Error(ERR_WARN, "unrecognized format of file '%s' in sound thread", name);
+
     result = 1;
     goto fail;
   }
@@ -410,7 +403,8 @@ int read_sample(char *name, short **data, long *length)
   temp = buffer[4] << 24 | buffer[5] << 16 | buffer[6] << 8 | buffer[7];
   if (temp < 24)
   {
-    fprintf(stderr, "%s: \"%s\": %s\n", progname, name, "bad header length");
+    Error(ERR_WARN, "bad header length of file '%s' in sound thread", name);
+
     result = 1;
     goto fail;
   }
@@ -461,9 +455,9 @@ int read_sample(char *name, short **data, long *length)
   dataptr = malloc(datalength * sizeof(*dataptr));
   if (dataptr == 0)
   {
-    fprintf(stderr, "%s: \"%s\": %s (%ld): %s\n", progname, name,
-	    "unable to malloc buffer", datalength * sizeof(*dataptr),
-	    strerror(errno));
+    Error(ERR_WARN, "unable to malloc buffer for file '%s' in sound thread",
+	  name);
+
     result = 1;
     goto fail;
   }
@@ -492,4 +486,4 @@ int read_sample(char *name, short **data, long *length)
 
 #endif /* defined(PLATFORM_LINUX) || defined(PLATFORM_BSD) */
 
-#endif
+#endif /* AUDIO_UNIX_NATIVE */

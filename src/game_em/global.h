@@ -10,15 +10,9 @@
 /* arbitrary maximum length of filenames (cos i am lazy) */
 #define MAXNAME 1024
 
-extern void snprintf_overflow(char *);
-
 extern int debug;
 extern char *progname;
 extern char *arg_basedir;
-extern char *arg_display;
-extern char *arg_geometry;
-extern int arg_install;
-extern int arg_silence;
 
 extern unsigned int frame;
 

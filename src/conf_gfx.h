@@ -1421,10 +1421,8 @@
 #define IMG_BACKGROUND_SETUP				1400
 #define IMG_BACKGROUND_DOOR				1401
 #define IMG_EMC_OBJECT					1402
-#define IMG_EMC_SCORE					1403
-#define IMG_EMC_SPRITE					1404
-#define IMG_EMC_TITLE					1405
+#define IMG_EMC_SPRITE					1403
 
-#define NUM_IMAGE_FILES					1406
+#define NUM_IMAGE_FILES					1404
 
 #endif	/* CONF_GFX_H */

@@ -7,11 +7,7 @@
 #include "game_em.h"
 
 
-#if defined(TARGET_X11)
-
 #if defined(PLATFORM_LINUX) || defined(PLATFORM_BSD)
-
-#include <stdio.h>
 
 int calc_ulaw_to_linear(unsigned char);
 unsigned char calc_linear_to_ulaw(int);
@@ -138,5 +134,3 @@ unsigned char calc_linear_to_ulaw(int sample)
 }
 
 #endif /* defined(PLATFORM_LINUX) || defined(PLATFORM_BSD) */
-
-#endif

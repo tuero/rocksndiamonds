@@ -13,8 +13,6 @@
 #include "level.h"
 
 
-#if defined(TARGET_X11)
-
 static unsigned char remap_v6[256] =
 {
   /* filter crap for v6 */
@@ -851,5 +849,3 @@ void prepare_em_level(void)
   ply2.joy_n = ply2.joy_e = ply2.joy_s = ply2.joy_w = ply2.joy_fire = 0;
   ply2.joy_stick = ply2.joy_spin = 0;
 }
-
-#endif

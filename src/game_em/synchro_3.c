@@ -10,8 +10,6 @@
 #include "sample.h"
 
 
-#if defined(TARGET_X11)
-
 void synchro_3(void)
 {
   register unsigned int x;
@@ -119,5 +117,3 @@ void synchro_3(void)
     for (x = 0; x < WIDTH; x++)
       Next[y][x] = Cave[y][x];
 }
-
-#endif

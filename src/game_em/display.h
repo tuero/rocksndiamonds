@@ -1,11 +1,6 @@
 #ifndef DISPLAY_H
 #define DISPLAY_H
 
-#include <X11/Xlib.h>
-#include <X11/Xutil.h>
-#include <X11/Xatom.h>
-#include <X11/keysym.h>
-
 #include "game_em.h"
 
 #define ORIG_TILEX		16
@@ -46,20 +41,6 @@
 #define SXSIZE			(SCR_FIELDX * TILEX)
 #define SYSIZE			(SCR_FIELDY * TILEY)
 
-#if 0
-
-extern Display *display;
-extern Window window;
-#define xwindow window
-
-#else
-
-#define xwindow (window->drawable)
-
-#endif
-
-#if 1
-
 extern Bitmap *screenBitmap;
 extern Bitmap *scoreBitmap;
 
@@ -68,35 +49,13 @@ extern Bitmap *sprBitmap;
 extern Bitmap *ttlBitmap;
 extern Bitmap *botBitmap;
 
-#endif
-
 extern Pixmap screenPixmap;
 extern Pixmap scorePixmap;
 extern Pixmap spriteBitmap;
 
-extern Pixmap objPixmap;
 extern Pixmap objmaskBitmap;
-extern Pixmap sprPixmap;
 extern Pixmap sprmaskBitmap;
-extern Pixmap ttlPixmap;
-extern Pixmap ttlmaskBitmap;
-extern Pixmap botPixmap;
-extern Pixmap botmaskBitmap;
 
-extern GC screenGC;
-extern GC scoreGC;
 extern GC spriteGC;
-extern GC antsGC;
-
-extern Atom deleteAtom;
-
-extern KeySym lastKeySym;
-
-extern KeyCode northKeyCode[];
-extern KeyCode eastKeyCode[];
-extern KeyCode southKeyCode[];
-extern KeyCode westKeyCode[];
-extern KeyCode fireKeyCode[];
-extern KeyCode escKeyCode[];
 
 #endif

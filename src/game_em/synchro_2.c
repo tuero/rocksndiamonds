@@ -14,8 +14,6 @@
 #include "sample.h"
 
 
-#if defined(TARGET_X11)
-
 #define RANDOM (random = random << 31 | random >> 1)
 #define PLAY(sample) { if ((unsigned int)(y - top) <= 12 && (unsigned int)(x - left) <= 20) play[sample] = 1; }
 
@@ -4795,5 +4793,3 @@ void synchro_2(void)
     Draw = temp;
   }
 }
-
-#endif

@@ -2969,3 +2969,9 @@ int el2preimg(int element)
 
   return element_info[element].special_graphic[GFX_SPECIAL_ARG_PREVIEW];
 }
+
+int getGameFrameDelay_EM(int native_em_game_frame_delay)
+{
+  return (GameFrameDelay == GAME_FRAME_DELAY ? native_em_game_frame_delay :
+	  GameFrameDelay);
+}

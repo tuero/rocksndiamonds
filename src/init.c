@@ -265,7 +265,7 @@ void InitElementSmallImages()
 
 #if 1
   /* !!! FIX THIS (CHANGE TO USING NORMAL ELEMENT GRAPHIC DEFINITIONS) !!! */
-  for (i = IMG_EMC_OBJECT; i <= IMG_EMC_TITLE; i++)
+  for (i = IMG_EMC_OBJECT; i <= IMG_EMC_SPRITE; i++)
     InitElementSmallImagesScaledUp(i);
 #endif
 }
@@ -275,9 +275,7 @@ void InitElementSmallImages()
 void SetBitmaps_EM(Bitmap **em_bitmap)
 {
   em_bitmap[0] = graphic_info[IMG_EMC_OBJECT].bitmap;
-  em_bitmap[1] = graphic_info[IMG_EMC_SCORE].bitmap;
-  em_bitmap[2] = graphic_info[IMG_EMC_SPRITE].bitmap;
-  em_bitmap[3] = graphic_info[IMG_EMC_TITLE].bitmap;
+  em_bitmap[1] = graphic_info[IMG_EMC_SPRITE].bitmap;
 }
 #endif
 

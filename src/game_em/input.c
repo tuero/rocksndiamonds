@@ -3,24 +3,10 @@
  * handle input from x11 and keyboard and joystick
  */
 
-#include <X11/Xlib.h>
-#include <X11/Xutil.h>
-#include <X11/Xatom.h>
-#include <X11/keysym.h>
-#include <sys/time.h>
-#include <sys/types.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <errno.h>
-
 #include "global.h"
 #include "display.h"
 #include "level.h"
 
-
-#if defined(TARGET_X11)
 
 unsigned long Random;
 
@@ -82,7 +68,15 @@ void InitGameEngine_EM()
 
 void GameActions_EM(byte action)
 {
-  input_eventloop();
+  static unsigned long game_frame_delay = 0;
+  unsigned long game_frame_delay_value = getGameFrameDelay_EM(25);
+
+#if 0
+  /* this is done in screens.c/HandleGameActions() by calling BackToFront() */
+  XSync(display, False);	/* block until all graphics are drawn */
+#endif
+
+  WaitUntilDelayReached(&game_frame_delay, game_frame_delay_value);
 
   game_animscreen();
 
@@ -139,36 +133,3 @@ void readjoy(byte action)
     ply1.joy_w = west;
   }
 }
-
-
-/* handle events from x windows and block until the next frame */
-
-void input_eventloop(void)
-{
-  static struct timeval tv1 = { 0, 0 };
-  static struct timeval tv2 = { 0, 0 };
-  unsigned long count;
-
-  XSync(display, False); /* block until all graphics are drawn */
-
-  if (gettimeofday(&tv2, 0) == -1)
-    tv2.tv_usec = 0;
-
-  count = tv2.tv_usec + 1000000 - tv1.tv_usec;
-  if (count >= 1000000)
-    count -= 1000000;
-
-  tv1.tv_usec = tv2.tv_usec;
-  if (count < 25000)
-  {
-    tv2.tv_sec = 0;
-    tv2.tv_usec = 25000 - count;
-#if 1
-    select(0, 0, 0, 0, &tv2); /* sleep a bit */
-#else
-    usleep(tv2.tv_usec);
-#endif
-  }
-}
-
-#endif
