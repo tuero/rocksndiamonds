@@ -1,3 +1,11 @@
+2004-03-31
+	* fixed bug with destroyed robot wheel still attracting robots forever
+	* fixed bug with time gate switch deactivating after robot wheel time
+	  (while the time gate itself is not affected by this misbehaviour)
+	* changed behaviour of BD style amoeba to always get blocked by player
+	  (before it was different when there were non-BD elements in level)
+	* fixed bug with player destroying indestructable elements with shield
+
 2004-03-26
 	* added option to make growing elements grow into anything diggable
 	  (for the various amoeba types, biomaze and "game of life")

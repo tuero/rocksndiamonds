@@ -4488,7 +4488,13 @@ inline static void TurnRoundExt(int x, int y)
       }
     }
 
+#if 1
+    if (element == EL_ROBOT && ZX >= 0 && ZY >= 0 &&
+	(Feld[ZX][ZY] == EL_ROBOT_WHEEL_ACTIVE ||
+	 game.engine_version < VERSION_IDENT(3,1,0,0)))
+#else
     if (element == EL_ROBOT && ZX >= 0 && ZY >= 0)
+#endif
     {
       attr_x = ZX;
       attr_y = ZY;
@@ -6517,7 +6523,11 @@ void AmoebeAbleger(int ax, int ay)
 
     if (newax == ax && neway == ay)		/* amoeba cannot grow */
     {
+#if 1
+      if (i == 4 && (!waiting_for_player || element == EL_BD_AMOEBA))
+#else
       if (i == 4 && (!waiting_for_player || game.emulation == EMU_BOULDERDASH))
+#endif
       {
 	Feld[ax][ay] = EL_AMOEBA_DEAD;
 	DrawLevelField(ax, ay);
@@ -6701,7 +6711,12 @@ static void StopRobotWheel(int x, int y)
 
 static void InitTimegateWheel(int x, int y)
 {
+#if 1
+  ChangeDelay[x][y] = level.time_timegate * FRAMES_PER_SECOND;
+#else
+  /* another brainless, "type style" bug ... :-( */
   ChangeDelay[x][y] = level.time_wheel * FRAMES_PER_SECOND;
+#endif
 }
 
 static void RunTimegateWheel(int x, int y)
@@ -9196,8 +9211,12 @@ boolean MovePlayer(struct PlayerInfo *player, int dx, int dy)
     player->is_dropping = FALSE;
 
 
-#if 0
+#if 1
     /* !!! ENABLE THIS FOR OLD VERSIONS !!! */
+
+#if 1
+    if (game.engine_version < VERSION_IDENT(3,1,0,0))
+#endif
     {
       static int trigger_sides[4][2] =
       {
@@ -9347,6 +9366,9 @@ void ScrollPlayer(struct PlayerInfo *player, int mode)
 #if 1
     /* !!! ENABLE THIS FOR NEW VERSIONS !!! */
     /* this breaks one level: "machine", level 000 */
+#if 1
+    if (game.engine_version >= VERSION_IDENT(3,1,0,0))
+#endif
     {
       static int trigger_sides[4][2] =
       {
@@ -9901,6 +9923,7 @@ void TestIfElementSmashesCustomElement(int x, int y, int direction)
 void TestIfGoodThingHitsBadThing(int good_x, int good_y, int good_move_dir)
 {
   int i, kill_x = -1, kill_y = -1;
+  int bad_element = -1;
   static int test_xy[4][2] =
   {
     { 0, -1 },
@@ -9922,6 +9945,7 @@ void TestIfGoodThingHitsBadThing(int good_x, int good_y, int good_move_dir)
 
     test_x = good_x + test_xy[i][0];
     test_y = good_y + test_xy[i][1];
+
     if (!IN_LEV_FIELD(test_x, test_y))
       continue;
 
@@ -9942,6 +9966,8 @@ void TestIfGoodThingHitsBadThing(int good_x, int good_y, int good_move_dir)
     {
       kill_x = test_x;
       kill_y = test_y;
+      bad_element = test_element;
+
       break;
     }
   }
@@ -9952,10 +9978,18 @@ void TestIfGoodThingHitsBadThing(int good_x, int good_y, int good_move_dir)
     {
       struct PlayerInfo *player = PLAYERINFO(good_x, good_y);
 
+#if 1
+      if (player->shield_deadly_time_left > 0 &&
+	  !IS_INDESTRUCTIBLE(bad_element))
+	Bang(kill_x, kill_y);
+      else if (!PLAYER_ENEMY_PROTECTED(good_x, good_y))
+	KillHero(player);
+#else
       if (player->shield_deadly_time_left > 0)
 	Bang(kill_x, kill_y);
       else if (!PLAYER_ENEMY_PROTECTED(good_x, good_y))
 	KillHero(player);
+#endif
     }
     else
       Bang(good_x, good_y);
@@ -10044,10 +10078,18 @@ void TestIfBadThingHitsGoodThing(int bad_x, int bad_y, int bad_move_dir)
     {
       struct PlayerInfo *player = PLAYERINFO(kill_x, kill_y);
 
+#if 1
+      if (player->shield_deadly_time_left > 0 &&
+	  !IS_INDESTRUCTIBLE(bad_element))
+	Bang(bad_x, bad_y);
+      else if (!PLAYER_ENEMY_PROTECTED(kill_x, kill_y))
+	KillHero(player);
+#else
       if (player->shield_deadly_time_left > 0)
 	Bang(bad_x, bad_y);
       else if (!PLAYER_ENEMY_PROTECTED(kill_x, kill_y))
 	KillHero(player);
+#endif
     }
     else
       Bang(kill_x, kill_y);
@@ -10966,8 +11008,8 @@ int DigField(struct PlayerInfo *player,
 #endif
 	}
 
-#if 1
-	/* !!! TEST ONLY !!! */
+#if 0
+	/* !!! TEST ONLY !!! (this breaks "machine", level 000) */
 	CheckElementChangePlayer(x, y, element, CE_PRESSED_BY_PLAYER,
 				 player->index_bit, dig_side);
 	CheckTriggeredElementChangePlayer(x, y, element, CE_OTHER_GETS_PRESSED,
