@@ -54,19 +54,12 @@ static struct SoundControl mixer[NUM_MIXER_CHANNELS];
 static int mixer_active_channels = 0;
 
 /* forward declaration of internal functions */
-static void Mixer_Main(void);
-static void Mixer_InsertNewSound(struct SoundControl);
 static void InitAudioDevice(struct AudioFormatInfo *);
+static void Mixer_Main(void);
 
-#if defined(PLATFORM_UNIX)
-#if !defined(AUDIO_STREAMING_DSP)
+#if defined(PLATFORM_UNIX) && !defined(AUDIO_STREAMING_DSP)
 static unsigned char linear_to_ulaw(int);
 static int ulaw_to_linear(unsigned char);
-#endif
-#elif defined(PLATFORM_MSDOS)
-static void Mixer_InsertNewSound(struct SoundControl);
-static void Mixer_StopSound(struct SoundControl);
-static void Mixer_StopAllSounds();
 #endif
 
 static void ReloadCustomSounds();
@@ -298,7 +291,7 @@ void Mixer_InitChannels()
   mixer_active_channels = 0;
 }
 
-static void Mixer_PlaySound(int channel)
+static void Mixer_PlayChannel(int channel)
 {
 #if defined(PLATFORM_MSDOS)
   mixer[channel].voice = allocate_voice((SAMPLE *)mixer[channel].data_ptr);
@@ -315,7 +308,7 @@ static void Mixer_PlaySound(int channel)
 #endif
 }
 
-static void Mixer_StopSound(int channel)
+static void Mixer_StopChannel(int channel)
 {
 #if defined(PLATFORM_MSDOS)
   voice_set_volume(mixer[channel].voice, 0);
@@ -323,9 +316,15 @@ static void Mixer_StopSound(int channel)
 #endif
 }
 
-static void Mixer_FadeSound(int channel)
+static void Mixer_FadeChannel(int channel)
 {
   mixer[channel].state |= SND_CTRL_FADE;
+
+#if defined(PLATFORM_MSDOS)
+  if (voice_check(mixer[channel].voice))
+    voice_ramp_volume(mixer[channel].voice, 1000, 0);
+  mixer[channel].state &= ~SND_CTRL_IS_LOOP;
+#endif
 }
 
 static void Mixer_RemoveSound(int channel)
@@ -337,7 +336,7 @@ static void Mixer_RemoveSound(int channel)
   printf("REMOVING MIXER SOUND %d\n", channel);
 #endif
 
-  Mixer_StopSound(channel);
+  Mixer_StopChannel(channel);
 
   mixer[channel].active = FALSE;
   mixer_active_channels--;
@@ -507,7 +506,7 @@ static void Mixer_InsertSound(struct SoundControl snd_ctrl)
       printf("NEW SOUND %d ADDED TO MIXER\n", snd_ctrl.nr);
 #endif
 
-      Mixer_PlaySound(i);
+      Mixer_PlayChannel(i);
 
       break;
     }
@@ -536,13 +535,13 @@ static void HandleSoundRequest(struct SoundControl snd_ctrl)
 
     if (IS_MUSIC(snd_ctrl))
     {
-      mixer[audio.music_channel].state |= SND_CTRL_FADE;
+      Mixer_FadeChannel(audio.music_channel);
       return;
     }
 
     for(i=audio.first_sound_channel; i<audio.num_channels; i++)
       if (mixer[i].nr == snd_ctrl.nr || ALL_SOUNDS(snd_ctrl))
-	mixer[i].state |= SND_CTRL_FADE;
+	Mixer_FadeChannel(i);
   }
   else if (IS_STOPPING(snd_ctrl))	/* stop existing sound or music */
   {
@@ -564,7 +563,7 @@ static void HandleSoundRequest(struct SoundControl snd_ctrl)
   }
   else if (snd_ctrl.active)		/* add new sound to mixer */
   {
-    Mixer_InsertNewSound(snd_ctrl);
+    Mixer_InsertSound(snd_ctrl);
   }
 }
 
@@ -905,38 +904,6 @@ void Mixer_Main()
 #if defined(PLATFORM_MSDOS)
 static void sound_handler(struct SoundControl snd_ctrl)
 {
-  int i;
-
-  if (snd_ctrl.fade_sound)
-  {
-    if (!mixer_active_channels)
-      return;
-
-    for (i=0; i<audio.num_channels; i++)
-      if ((snd_ctrl.stop_all_sounds ||
-	   (i != audio.music_channel && mixer[i].nr == snd_ctrl.nr) ||
-	   (i == audio.music_channel && snd_ctrl.music)) &&
-	  !mixer[i].fade_sound)
-      {
-	mixer[i].fade_sound = TRUE;
-	if (voice_check(mixer[i].voice))
-	  voice_ramp_volume(mixer[i].voice, 1000, 0);
-	mixer[i].state &= ~SND_CTRL_IS_LOOP;
-      }
-  }
-  else if (snd_ctrl.stop_all_sounds)
-  {
-    if (!mixer_active_channels)
-      return;
-    Mixer_StopAllSounds();
-  }
-  else if (snd_ctrl.stop_sound)
-  {
-    if (!mixer_active_channels)
-      return;
-    Mixer_StopSound(snd_ctrl);
-  }
-
   for (i=0; i<audio.num_channels; i++)
   {
     if (!mixer[i].active || mixer[i].loop)
@@ -951,90 +918,9 @@ static void sound_handler(struct SoundControl snd_ctrl)
     }
   }
 
-  if (snd_ctrl.active)
-    Mixer_InsertNewSound(snd_ctrl);
+  HandleSoundRequest(snd_ctrl);
 }
 #endif /* PLATFORM_MSDOS */
-
-#if 0
-#if defined(TARGET_SDL)
-static void sound_handler_SDL(struct SoundControl snd_ctrl)
-{
-  /* copy sound_handler() here ... */
-}
-#endif /* TARGET_SDL */
-#endif
-
-#if !defined(PLATFORM_WIN32)
-static void Mixer_InsertNewSound(struct SoundControl snd_ctrl)
-{
-  Mixer_InsertSound(snd_ctrl);
-}
-#endif /* !PLATFORM_WIN32 */
-
-/*
-void Mixer_FadeSound(int nr)
-{
-  int i;
-
-  if (!mixer_active_channels)
-    return;
-
-  for(i=0;i<audio.num_channels;i++)
-    if (snd_ctrl.stop_all_sounds || mixer[i].nr == snd_ctrl.nr)
-      mixer[i].fade_sound = TRUE;
-}
-*/
-
-#if !defined(PLATFORM_WIN32)
-#if defined(PLATFORM_MSDOS)
-static void Mixer_StopSound(struct SoundControl snd_ctrl)
-{
-  int nr = snd_ctrl.nr;
-  int i;
-
-  if (!mixer_active_channels)
-    return;
-
-  for(i=0; i<audio.num_channels; i++)
-  {
-    if ((i == audio.music_channel && snd_ctrl.music) ||
-	(i != audio.music_channel && mixer[i].nr == nr))
-    {
-#if defined(PLATFORM_MSDOS)
-      voice_set_volume(mixer[i].voice, 0);
-      deallocate_voice(mixer[i].voice);
-#endif
-      Mixer_RemoveSound(i);
-    }
-  }
-
-#if !defined(PLATFORM_MSDOS)
-  if (!mixer_active_channels)
-    close(audio.device_fd);
-#endif
-}
-
-static void Mixer_StopAllSounds()
-{
-  int i;
-
-  for(i=0; i<audio.num_channels; i++)
-  {
-#if defined(PLATFORM_MSDOS)
-    voice_set_volume(mixer[i].voice, 0);
-    deallocate_voice(mixer[i].voice);
-#endif
-    Mixer_RemoveSound(i);
-  }
-  mixer_active_channels = 0;
-
-#if !defined(PLATFORM_MSDOS)
-  close(audio.device_fd);
-#endif
-}
-#endif /* PLATFORM_MSDOS */
-#endif /* !PLATFORM_WIN32 */
 
 
 /* ------------------------------------------------------------------------- */
