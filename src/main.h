@@ -60,7 +60,7 @@
 #define IN_SCR_FIELD(x,y) ((x)>=BX1 && (x)<=BX2 && (y)>=BY1 &&(y)<=BY2)
 #define IN_LEV_FIELD(x,y) ((x)>=0 && (x)<lev_fieldx && (y)>=0 &&(y)<lev_fieldy)
 
-/* values for base properties */
+/* values for base properties (storable) */
 #define EP_AMOEBALIVE		0
 #define EP_AMOEBOID		1
 #define EP_CAN_BE_CRUMBLED	2
@@ -94,7 +94,7 @@
 #define EP_PASSABLE_THROUGH	30
 #define EP_PASSABLE_UNDER	31
 
-/* values for runtime properties */
+/* values for runtime properties (non-storable) */
 #define EP_WALKABLE		32
 #define EP_PASSABLE		33
 #define EP_PLAYER_OVER		34
@@ -109,8 +109,9 @@
 #define EP_BELT_SWITCH		43
 #define EP_SP_ELEMENT		44
 #define EP_HAS_CONTENT		45
+#define EP_TUBE			46
 
-#define NUM_ELEMENT_PROPERTIES	46
+#define NUM_ELEMENT_PROPERTIES	47
 
 #define NUM_EP_BITFIELDS	((NUM_ELEMENT_PROPERTIES + 31) / 32)
 #define EP_BITFIELD_BASE	0
@@ -173,6 +174,7 @@
 #define IS_BELT_SWITCH(e)	HAS_PROPERTY(e, EP_BELT_SWITCH)
 #define IS_SP_ELEMENT(e)	HAS_PROPERTY(e, EP_SP_ELEMENT)
 #define HAS_CONTENT(e)		HAS_PROPERTY(e, EP_HAS_CONTENT)
+#define IS_TUBE(e)		HAS_PROPERTY(e, EP_TUBE)
 
 #define IS_CUSTOM_ELEMENT(e)	((e) >= EL_CUSTOM_START &&	\
 	 			 (e) <= EL_CUSTOM_END)

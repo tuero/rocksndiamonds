@@ -2069,24 +2069,24 @@ void InitElementProperties()
     EL_SP_PORT_RIGHT,
     EL_SP_PORT_UP,
     EL_SP_PORT_DOWN,
+    EL_SP_PORT_HORIZONTAL,
+    EL_SP_PORT_VERTICAL,
+    EL_SP_PORT_ANY,
     EL_SP_GRAVITY_PORT_LEFT,
     EL_SP_GRAVITY_PORT_RIGHT,
     EL_SP_GRAVITY_PORT_UP,
     EL_SP_GRAVITY_PORT_DOWN,
-    EL_SP_PORT_HORIZONTAL,
-    EL_SP_PORT_VERTICAL,
-    EL_SP_PORT_ANY,
-    EL_TUBE_ANY,
-    EL_TUBE_VERTICAL,
-    EL_TUBE_HORIZONTAL,
-    EL_TUBE_VERTICAL_LEFT,
-    EL_TUBE_VERTICAL_RIGHT,
-    EL_TUBE_HORIZONTAL_UP,
-    EL_TUBE_HORIZONTAL_DOWN,
     EL_TUBE_LEFT_UP,
     EL_TUBE_LEFT_DOWN,
     EL_TUBE_RIGHT_UP,
     EL_TUBE_RIGHT_DOWN,
+    EL_TUBE_HORIZONTAL,
+    EL_TUBE_HORIZONTAL_UP,
+    EL_TUBE_HORIZONTAL_DOWN,
+    EL_TUBE_VERTICAL,
+    EL_TUBE_VERTICAL_LEFT,
+    EL_TUBE_VERTICAL_RIGHT,
+    EL_TUBE_ANY,
     -1
   };
 
@@ -2212,6 +2212,22 @@ void InitElementProperties()
     -1
   };
 
+  static int ep_tube[] =
+  {
+    EL_TUBE_LEFT_UP,
+    EL_TUBE_LEFT_DOWN,
+    EL_TUBE_RIGHT_UP,
+    EL_TUBE_RIGHT_DOWN,
+    EL_TUBE_HORIZONTAL,
+    EL_TUBE_HORIZONTAL_UP,
+    EL_TUBE_HORIZONTAL_DOWN,
+    EL_TUBE_VERTICAL,
+    EL_TUBE_VERTICAL_LEFT,
+    EL_TUBE_VERTICAL_RIGHT,
+    EL_TUBE_ANY,
+    -1
+  };
+
   static struct
   {
     int *elements;
@@ -2259,6 +2275,7 @@ void InitElementProperties()
     { ep_belt_switch,		EP_BELT_SWITCH		},
     { ep_sp_element,		EP_SP_ELEMENT		},
     { ep_has_content,		EP_HAS_CONTENT		},
+    { ep_tube,			EP_TUBE			},
     { NULL,			-1			}
   };
 

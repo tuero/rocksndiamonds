@@ -5316,7 +5316,7 @@ void ScrollFigure(struct PlayerInfo *player, int mode)
 
   if (player->MovPos == 0)
   {
-    if (IS_WALKABLE_THROUGH(Feld[last_jx][last_jy]))
+    if (IS_PASSABLE(Feld[last_jx][last_jy]))
     {
       /* continue with normal speed after quickly moving through gate */
       HALVE_PLAYER_SPEED(player);
@@ -5706,7 +5706,7 @@ int DigField(struct PlayerInfo *player,
   if (IS_MOVING(x, y) || IS_PLAYER(x, y))
     return MF_NO_ACTION;
 
-  if (IS_WALKABLE_THROUGH(Feld[jx][jy]))
+  if (IS_TUBE(Feld[jx][jy]))
   {
     int i = 0;
     int tube_leave_directions[][2] =
