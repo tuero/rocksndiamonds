@@ -872,7 +872,7 @@ inline void SDLOpenAudio(void)
     return;
   }
 
-  if (Mix_OpenAudio(DEFAULT_AUDIO_SAMPLE_RATE, AUDIO_S16,
+  if (Mix_OpenAudio(DEFAULT_AUDIO_SAMPLE_RATE, MIX_DEFAULT_FORMAT,
 		    AUDIO_NUM_CHANNELS_STEREO,
 		    DEFAULT_AUDIO_FRAGMENT_SIZE) < 0)
   {

@@ -1,5 +1,6 @@
-Release Version 2.1.0 [XX XXX XXXX]
+Release Version 2.1.0 [05 AUG 2002]
 -----------------------------------
+	- native Mac OS X port (finally!)
 	- graphics, sounds and music now fully configurable
 	- added support for TrueColor PCX graphics files
 	- added support for 16 bit WAV sound files
@@ -16,6 +17,13 @@ Release Version 2.1.0 [XX XXX XXXX]
 	- fixed memory leak in image loading code
 	- fixed some "solid" elements that were accidentally destructible
 	- fixed some tape stuff
+	- added new contributed levels from the following players:
+	  + Conor Mancone
+	  + Gavin Davidson
+	  + Jerome Kunegis
+	  + Rüdiger Schäfer
+	  + Flyboy: level group "Cops and Robbers", with own graphics set
+	- added custom graphics set "Animal Kingdom" by Flyboy
 
 Release Version 2.0.1 [19 MAR 2002]
 -----------------------------------

@@ -49,7 +49,6 @@ PLATFORM = unix
 endif
 
 ifeq ($(PLATFORM),macosx)
-# PROGNAME = ../Rocks\'n\'Diamonds.app/Contents/MacOS/$(PROGBASE)
 PLATFORM = unix
 TARGET=sdl
 endif
@@ -103,7 +102,7 @@ CONFIG_GAME_DIR = $(CONFIG_RO_GAME_DIR) $(CONFIG_RW_GAME_DIR)
 
 
 CONFIG = $(CONFIG_GAME_DIR) $(CONFIG_SCORE_ENTRIES) $(JOYSTICK)
-DEBUG = -DDEBUG -g
+# DEBUG = -DDEBUG -g
 # PROFILING = $(PROFILING_FLAGS)
 
 # OPTIONS = $(DEBUG) -Wall			# only for debugging purposes

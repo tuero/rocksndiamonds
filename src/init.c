@@ -1680,10 +1680,11 @@ void Execute_Debug_Command(char *command)
 {
   if (strcmp(command, "create graphicsinfo.conf") == 0)
   {
-    printf("# (Currently only the \"name\" directive is recognized.)\n");
+    printf("# (Currently only \"name\" and \"sort_priority\" recognized.)\n");
     printf("\n");
     printf("%s\n", getFormattedSetupEntry("name", "Classic Graphics"));
     printf("\n");
+    printf("%s\n", getFormattedSetupEntry("sort_priority", "100"));
   }
   else if (strcmp(command, "create soundsinfo.conf") == 0)
   {
@@ -1694,6 +1695,8 @@ void Execute_Debug_Command(char *command)
     printf("\n");
     printf("%s\n", getFormattedSetupEntry("name", "Classic Sounds"));
     printf("\n");
+    printf("%s\n", getFormattedSetupEntry("sort_priority", "100"));
+    printf("\n");
 
     for (i=0; i<NUM_SOUND_EFFECTS; i++)
       printf("# %s\n",
@@ -1702,10 +1705,11 @@ void Execute_Debug_Command(char *command)
   }
   else if (strcmp(command, "create musicinfo.conf") == 0)
   {
-    printf("# (Currently only the \"name\" directive is recognized.)\n");
+    printf("# (Currently only \"name\" and \"sort_priority\" recognized.)\n");
     printf("\n");
     printf("%s\n", getFormattedSetupEntry("name", "Classic Music"));
     printf("\n");
+    printf("%s\n", getFormattedSetupEntry("sort_priority", "100"));
   }
 }
 

@@ -80,6 +80,18 @@ static char *levelclass_desc[NUM_LEVELCLASS_DESC] =
 			 IS_LEVELCLASS_USER(n) ?		7 : \
 			 9)
 
+#define ARTWORKCOLOR(n)	(IS_ARTWORKCLASS_CLASSICS(n) ?		FC_RED : \
+			 IS_ARTWORKCLASS_CONTRIBUTION(n) ?	FC_YELLOW : \
+			 IS_ARTWORKCLASS_LEVEL(n) ?		FC_GREEN : \
+			 IS_ARTWORKCLASS_USER(n) ?		FC_RED : \
+			 FC_BLUE)
+
+#define ARTWORKSORTING(n) (IS_ARTWORKCLASS_CLASSICS(n) ?	0 : \
+			 IS_ARTWORKCLASS_CONTRIBUTION(n) ?	1 : \
+			 IS_ARTWORKCLASS_LEVEL(n) ?		2 : \
+			 IS_ARTWORKCLASS_USER(n) ?		3 : \
+			 9)
+
 #define TOKEN_VALUE_POSITION		40
 #define TOKEN_COMMENT_POSITION		60
 
@@ -669,8 +681,8 @@ void dumpTreeInfo(TreeInfo *node, int depth)
     for (i=0; i<(depth + 1) * 3; i++)
       printf(" ");
 
-    printf("filename == '%s' (%s) [%s]\n",
-	   node->filename, node->name, node->name_short);
+    printf("filename == '%s' (%s) [%s] (%d)\n",
+	   node->filename, node->name, node->name_short, node->sort_priority);
 
     if (node->node_group != NULL)
       dumpTreeInfo(node->node_group, depth + 1);
@@ -1322,7 +1334,19 @@ static int compareTreeInfoEntries(const void *object1, const void *object2)
 {
   const TreeInfo *entry1 = *((TreeInfo **)object1);
   const TreeInfo *entry2 = *((TreeInfo **)object2);
+  int class_sorting1, class_sorting2;
   int compare_result;
+
+  if (entry1->type == TREE_TYPE_LEVEL_DIR)
+  {
+    class_sorting1 = LEVELSORTING(entry1);
+    class_sorting2 = LEVELSORTING(entry2);
+  }
+  else
+  {
+    class_sorting1 = ARTWORKSORTING(entry1);
+    class_sorting2 = ARTWORKSORTING(entry2);
+  }
 
   if (entry1->parent_link || entry2->parent_link)
     compare_result = (entry1->parent_link ? -1 : +1);
@@ -1336,10 +1360,10 @@ static int compareTreeInfoEntries(const void *object1, const void *object2)
     free(name1);
     free(name2);
   }
-  else if (LEVELSORTING(entry1) == LEVELSORTING(entry2))
+  else if (class_sorting1 == class_sorting2)
     compare_result = entry1->sort_priority - entry2->sort_priority;
   else
-    compare_result = LEVELSORTING(entry1) - LEVELSORTING(entry2);
+    compare_result = class_sorting1 - class_sorting2;
 
   return compare_result;
 }
@@ -1660,7 +1684,7 @@ static boolean LoadArtworkInfoFromArtworkConf(TreeInfo **node_first,
     (artwork_new->basepath == OPTIONS_ARTWORK_DIRECTORY(type) ? FALSE : TRUE);
 
   /* (may use ".sort_priority" from "setup_file_list" above) */
-  artwork_new->color = LEVELCOLOR(artwork_new);
+  artwork_new->color = ARTWORKCOLOR(artwork_new);
   artwork_new->class_desc = getLevelClassDescription(artwork_new);
 
   if (setup_file_list == NULL)	/* (after determining ".user_defined") */
@@ -1673,15 +1697,15 @@ static boolean LoadArtworkInfoFromArtworkConf(TreeInfo **node_first,
       if (artwork_new->user_defined)
       {
 	artwork_new->name = getStringCopy("private");
-	artwork_new->sort_priority = LEVELCLASS_USER;
+	artwork_new->sort_priority = ARTWORKCLASS_USER;
       }
       else
       {
 	artwork_new->name = getStringCopy("classic");
-	artwork_new->sort_priority = LEVELCLASS_CLASSICS;
+	artwork_new->sort_priority = ARTWORKCLASS_CLASSICS;
       }
 
-      artwork_new->color = LEVELCOLOR(artwork_new);
+      artwork_new->color = ARTWORKCOLOR(artwork_new);
       artwork_new->class_desc = getLevelClassDescription(artwork_new);
     }
     else
