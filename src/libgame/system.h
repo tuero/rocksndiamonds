@@ -99,12 +99,17 @@
 #define BUTTON_1		4
 #define BUTTON_2		5
 
-/* values for move direction and special "button" key bitmasks */
+/* values for move directions and special "button" key bitmasks */
 #define MV_NO_MOVING		0
 #define MV_LEFT			(1 << MV_BIT_LEFT)
 #define MV_RIGHT		(1 << MV_BIT_RIGHT)
 #define MV_UP			(1 << MV_BIT_UP)
 #define MV_DOWN	       		(1 << MV_BIT_DOWN)
+
+#define MV_HORIZONTAL		(MV_LEFT | MV_RIGHT)
+#define MV_VERTICAL		(MV_UP   | MV_DOWN)
+#define MV_ALL_DIRECTIONS	(MV_LEFT | MV_RIGHT | MV_UP | MV_DOWN)
+#define MV_ANY_DIRECTION	(MV_ALL_DIRECTIONS)
 
 #define KEY_BUTTON_1		(1 << BUTTON_1)
 #define KEY_BUTTON_2		(1 << BUTTON_2)

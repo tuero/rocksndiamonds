@@ -9694,7 +9694,7 @@ boolean MovePlayerOneStep(struct PlayerInfo *player,
 
   /* check if DigField() has caused relocation of the player */
   if (player->jx != jx || player->jy != jy)
-    return MF_NO_ACTION;
+    return MF_NO_ACTION;	/* <-- !!! CHECK THIS [-> MF_ACTION ?] !!! */
 
   StorePlayer[jx][jy] = 0;
   player->last_jx = jx;

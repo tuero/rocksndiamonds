@@ -4046,7 +4046,7 @@ em_object_mapping_list[] =
     EL_AMOEBA_DRY,			ACTION_OTHER, -1
   },
   {
-    Xamoeba_5,				FALSE,	FALSE,
+    Xamoeba_5,				TRUE,	FALSE,
     EL_AMOEBA_WET,			ACTION_OTHER, -1
   },
   {
@@ -5953,7 +5953,7 @@ void InitGraphicInfo_EM(void)
 	int cx = ABS(dx) * TILEX / 8;
 	int cy = ABS(dy) * TILEY / 8;
 
-	if (is_backside)		/* tile where movement starts */
+	if (is_backside)	/* tile where movement starts */
 	{
 	  if (dx < 0 || dy < 0)
 	  {

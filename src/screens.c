@@ -2967,7 +2967,14 @@ void HandleGameActions()
     /* --- game actions --- */
 
     if (tape.pausing)
+    {
+      /* don't use 100% CPU while in pause mode -- this should better be solved
+	 like in the R'n'D game engine! */
+
+      Delay(10);
+
       return;
+    }
 
     recorded_player_action = (tape.playing ? TapePlayAction() : NULL);
 

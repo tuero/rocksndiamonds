@@ -175,5 +175,8 @@ dist-all: dist-build-all dist-unix dist-msdos dist-win32 dist-macosx
 
 upload-all: upload-unix upload-msdos upload-win32 upload-macosx
 
+tags:
+	$(MAKE_CMD) tags
+
 depend dep:
 	$(MAKE_CMD) depend

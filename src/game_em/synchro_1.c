@@ -12,6 +12,7 @@
 
 
 static void player(struct PLAYER *);
+static boolean player_digfield(struct PLAYER *, int, int);
 static int test(struct PLAYER *);
 static void die(struct PLAYER *);
 
@@ -340,79 +341,109 @@ static void die(struct PLAYER *ply)
 
 static void player(struct PLAYER *ply)
 {
-  register unsigned int x = ply->x;
-  register unsigned int y = ply->y;
-  unsigned int anim = 0;	/* initialized to make compilers happy */
+  unsigned int oldx = ply->x;
+  unsigned int oldy = ply->y;
+  register unsigned int x = oldx;
+  register unsigned int y = oldy;
+  unsigned int anim = 0;
   int dx = 0, dy = 0;
+
+#if 0
+  printf("::: up == %d, down == %d, left == %d, right == %d, fire == %d [spin == %d, stick == %d]\n",
+	 ply->joy_n, ply->joy_s, ply->joy_w, ply->joy_e, ply->joy_fire,
+	 ply->joy_spin, ply->joy_stick);
+#endif
+
+#if 1
+  if (ply->joy_w)		/* west */
+  {
+    x--;
+    dx = -1;
+    anim = 3;
+  }
+  else if (ply->joy_e)		/* east */
+  {
+    x++;
+    dx = 1;
+    anim = 1;
+  }
+
+  if (ply->joy_n)		/* north */
+  {
+    y--;
+    dy = -1;
+    anim = 0;
+  }
+  else if (ply->joy_s)		/* south */
+  {
+    y++;
+    dy = 1;
+    anim = 2;
+  }
+
+#else
 
   if ((ply->joy_spin = !ply->joy_spin))
   {
-    if (ply->joy_n)
+    if (ply->joy_n)		/* north */
     {
       y--;
       dy = -1;
       anim = 0;
-      /* north */
     }
-    else if (ply->joy_e)
+    else if (ply->joy_e)	/* east */
     {
       x++;
       dx = 1;
       anim = 1;
-      /* east */
     }
-    else if (ply->joy_s)
+    else if (ply->joy_s)	/* south */
     {
       y++;
       dy = 1;
       anim = 2;
-      /* south */
     }
-    else if (ply->joy_w)
+    else if (ply->joy_w)	/* west */
     {
       x--;
       dx = -1;
       anim = 3;
-      /* west */
     }
   }
   else
   {
-    if (ply->joy_w)
+    if (ply->joy_w)		/* west */
     {
       x--;
       dx = -1;
       anim = 3;
-      /* west */
     }
-    else if (ply->joy_s)
+    else if (ply->joy_s)	/* south */
     {
       y++;
       dy = 1;
       anim = 2;
-      /* south */
     }
-    else if (ply->joy_e)
+    else if (ply->joy_e)	/* east */
     {
       x++;
       dx = 1;
       anim = 1;
-      /* east */
     }
-    else if (ply->joy_n)
+    else if (ply->joy_n)	/* north */
     {
       y--;
       dy = -1;
       anim = 0;
-      /* north */
     }
   }
+#endif
 
   if (dx == 0 && dy == 0)
   {
     ply->joy_stick = 0;
 
-    if (ply->joy_fire)
+    if (ply->joy_drop)
     {
       if (++ply->dynamite_cnt == 5 && ply->dynamite)
       {
@@ -426,7 +457,7 @@ static void player(struct PLAYER *ply)
       ply->dynamite_cnt = 0;
     }
 
-    Random += 7; /* bit more random if we dont move */
+    Random += 7;	/* be a bit more random if the player doesn't move */
 
     return;
   }
@@ -434,8 +465,53 @@ static void player(struct PLAYER *ply)
   ply->joy_stick = 1;
   ply->joy_n = ply->joy_e = ply->joy_s = ply->joy_w = 0;
   ply->dynamite_cnt = 0; /* reset dynamite timer if we move */
+  ply->joy_spin = !ply->joy_spin;
 
-  if (ply->joy_fire == 0)
+  if (ply->joy_snap == 0)		/* player wants to move */
+  {
+    boolean moved = FALSE;
+
+    if (ply->last_move_dir & MV_HORIZONTAL)
+    {
+      if (!(moved = player_digfield(ply, 0, dy)))
+	moved = player_digfield(ply, dx, 0);
+    }
+    else
+    {
+      if (!(moved = player_digfield(ply, dx, 0)))
+	moved = player_digfield(ply, 0, dy);
+    }
+
+    if (moved)
+    {
+      if (oldx != ply->x)
+	ply->last_move_dir = (dx < 0 ? MV_LEFT : MV_RIGHT);
+      else if (oldy != ply->y)
+	ply->last_move_dir = (dy < 0 ? MV_UP : MV_DOWN);
+    }
+  }
+  else					/* player wants to snap */
+  {
+    player_digfield(ply, dx, dy);
+  }
+}
+
+static boolean player_digfield(struct PLAYER *ply, int dx, int dy)
+{
+  int anim = (dx < 0 ? 3 : dx > 0 ? 1 : dy < 0 ? 0 : dy > 0 ? 2 : 2);
+  unsigned int oldx = ply->x;
+  unsigned int oldy = ply->y;
+  register unsigned int x = oldx + dx;
+  register unsigned int y = oldy + dy;
+  boolean result = TRUE;
+
+  if (!dx && !dy)			/* no direction specified */
+    return FALSE;
+
+  if (dx && dy && ply->joy_snap)	/* more than one direction specified */
+    return FALSE;
+
+  if (ply->joy_snap == 0)		/* player wants to move */
   {
     int element = Cave[y][x];
 
@@ -1004,8 +1080,11 @@ static void player(struct PLAYER *ply)
 
 	break;
     }
+
+    if (ply->x == oldx && ply->y == oldy)	/* no movement */
+      result = FALSE;
   }
-  else
+  else					/* player wants to snap */
   {
     int element = Cave[y][x];
 
@@ -1120,6 +1199,11 @@ static void player(struct PLAYER *ply)
 	lev.magnify_cnt = lev.magnify_time;
 	ply->anim = SPR_walk + anim;
 	break;
+
+      default:
+	result = FALSE;
     }
   }
+
+  return result;
 }

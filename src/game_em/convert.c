@@ -825,7 +825,9 @@ void prepare_em_level(void)
   ply1.anim = 0;
   ply1.oldx = ply1.x = ply1.x_initial;
   ply1.oldy = ply1.y = ply1.y_initial;
-  ply1.joy_n = ply1.joy_e = ply1.joy_s = ply1.joy_w = ply1.joy_fire = 0;
+  ply1.last_move_dir = MV_NO_MOVING;
+  ply1.joy_n = ply1.joy_e = ply1.joy_s = ply1.joy_w = 0;
+  ply1.joy_snap = ply1.joy_drop = 0;
   ply1.joy_stick = ply1.joy_spin = 0;
 
   ply2.num = 1;
@@ -836,6 +838,8 @@ void prepare_em_level(void)
   ply2.anim = 0;
   ply2.oldx = ply2.x = ply2.x_initial;
   ply2.oldy = ply2.y = ply2.y_initial;
-  ply2.joy_n = ply2.joy_e = ply2.joy_s = ply2.joy_w = ply2.joy_fire = 0;
+  ply2.last_move_dir = MV_NO_MOVING;
+  ply2.joy_n = ply2.joy_e = ply2.joy_s = ply2.joy_w = 0;
+  ply2.joy_snap = ply1.joy_drop = 0;
   ply2.joy_stick = ply2.joy_spin = 0;
 }

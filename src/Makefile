@@ -27,6 +27,7 @@ endif
 
 AR = ar
 RANLIB = ranlib
+ETAGS = etags
 
 BMP2ICO = bmp2ico
 WINDRES = windres
@@ -278,6 +279,9 @@ clean: clean-obj clean-ico clean-bin
 # -----------------------------------------------------------------------------
 
 dist-clean: clean-obj
+
+tags:
+	$(ETAGS) *.[ch] $(LIBGAME_DIR)/*.[ch] $(GAME_EM_DIR)/*.[ch]
 
 depend:
 	$(MAKE) -C $(LIBGAME_DIR) depend

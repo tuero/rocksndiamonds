@@ -114,7 +114,8 @@ void GameActions_EM(byte action)
 
 void readjoy(byte action)
 {
-  unsigned int north = 0, east = 0, south = 0, west = 0, fire = 0;
+  unsigned int north = 0, east = 0, south = 0, west = 0;
+  unsigned int snap = 0, drop = 0;
 
   if (action & JOY_LEFT)
     west = 1;
@@ -129,10 +130,14 @@ void readjoy(byte action)
     south = 1;
 
   if (action & JOY_BUTTON_1)
-    fire = 1;
+    snap = 1;
+
+  if (action & JOY_BUTTON_2)
+    drop = 1;
 
 #if 1
-  ply1.joy_fire = fire;
+  ply1.joy_snap = snap;
+  ply1.joy_drop = drop;
   if (ply1.joy_stick || (north | east | south | west))
   {
     ply1.joy_n = north;
@@ -140,8 +145,11 @@ void readjoy(byte action)
     ply1.joy_s = south;
     ply1.joy_w = west;
   }
+
 #else
-  ply2.joy_fire = fire;
+
+  ply2.joy_snap = snap;
+  ply2.joy_drop = drop;
   if (ply2.joy_stick || (north | east | south | west))
   {
     ply2.joy_n = north;

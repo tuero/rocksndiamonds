@@ -347,6 +347,7 @@ void HandleFocusEvent(FocusChangeEvent *event)
       Delay(100);
       KeyboardAutoRepeatOffUnlessAutoplay();
     }
+
     if (old_joystick_status != -1)
       joystick.status = old_joystick_status;
   }

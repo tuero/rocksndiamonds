@@ -595,11 +595,14 @@ struct PLAYER
   unsigned int oldx;
   unsigned int oldy;
 
+  unsigned int last_move_dir;
+
   unsigned joy_n:1;
   unsigned joy_e:1;
   unsigned joy_s:1;
   unsigned joy_w:1;
-  unsigned joy_fire:1;
+  unsigned joy_snap:1;
+  unsigned joy_drop:1;
   unsigned joy_stick:1;
   unsigned joy_spin:1;
 };
