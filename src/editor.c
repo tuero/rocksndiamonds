@@ -4402,6 +4402,51 @@ static void DrawPropertiesAdvanced()
   DrawCustomChangedArea();
 }
 
+static void DrawElementName(int x, int y, int element)
+{
+  char *element_name = getElementInfoText(element);
+  int font_nr = FONT_TEXT_1;
+  int font_width = getFontWidth(font_nr);
+  int font_height = getFontHeight(font_nr);
+  int max_text_width = SXSIZE - x - ED_SETTINGS_XPOS(0);
+  int max_chars_per_line = max_text_width / font_width;
+  char buffer[max_chars_per_line + 1];
+
+  if (strlen(element_name) <= max_chars_per_line)
+    DrawTextF(x, y, font_nr, element_name);
+  else
+  {
+    int next_pos = max_chars_per_line;
+
+    strncpy(buffer, element_name, max_chars_per_line);
+    buffer[max_chars_per_line] = '\0';
+
+    if (element_name[max_chars_per_line] == ' ')
+      next_pos++;
+    else
+    {
+      int i;
+
+      for (i = max_chars_per_line - 1; i >= 0; i--)
+	if (buffer[i] == ' ')
+	  break;
+
+      if (strlen(&element_name[i + 1]) <= max_chars_per_line)
+      {
+	buffer[i] = '\0';
+	next_pos = i + 1;
+      }
+    }
+
+    DrawTextF(x, y - font_height / 2, font_nr, buffer);
+
+    strncpy(buffer, &element_name[next_pos], max_chars_per_line);
+    buffer[max_chars_per_line] = '\0';
+
+    DrawTextF(x, y + font_height / 2, font_nr, buffer);
+  }
+}
+
 static void DrawPropertiesWindow()
 {
   int xstart = 2;
@@ -4441,8 +4486,8 @@ static void DrawPropertiesWindow()
 
   FrameCounter = 0;	/* restart animation frame counter */
 
-  DrawTextF((xstart + 3) * MINI_TILEX, (ystart + 1) * MINI_TILEY,
-	    FONT_TEXT_1, getElementInfoText(properties_element));
+  DrawElementName((xstart + 3) * MINI_TILEX, (ystart + 1) * MINI_TILEY,
+		  properties_element);
 
   DrawPropertiesTabulatorGadgets();
 

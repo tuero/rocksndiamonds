@@ -2363,7 +2363,7 @@ void Impact(int x, int y)
     if (object_hit && IS_PLAYER(x, y+1))
       KillHeroUnlessProtected(x, y+1);
     else if (object_hit && smashed == EL_PENGUIN)
-      Bang(x, y+1);
+      Bang(x, y + 1);
     else
     {
       Feld[x][y] = EL_AMOEBA_GROWING;

@@ -888,10 +888,17 @@ void DrawHelpScreenElAction(int start)
     }
     j++;
 
+#if 1
+    ClearRectangleOnBackground(drawto, xstart, ystart + (i - start) * ystep,
+			       TILEX, TILEY);
+    DrawGraphicAnimationExt(drawto, xstart, ystart + (i - start) * ystep,
+			    graphic, sync_frame, USE_MASKING);
+#else
     frame = getGraphicAnimationFrame(graphic, sync_frame);
 
     DrawGraphicExt(drawto, xstart, ystart + (i-start) * ystep,
 		   graphic, frame);
+#endif
 
     i++;
   }
