@@ -199,6 +199,7 @@ static void InitField(int x, int y, boolean init_game)
 	if (!options.network || player->connected)
 	{
 	  player->active = TRUE;
+	  player->gone = FALSE;
 
 	  /* remove potentially duplicate players */
 	  if (StorePlayer[jx][jy] == Feld[x][y])
@@ -384,7 +385,7 @@ void InitGame()
 
     player->snapped = FALSE;
 
-    player->gone = FALSE;
+    player->gone = TRUE;
 
     player->last_jx = player->last_jy = 0;
     player->jx = player->jy = 0;
@@ -471,6 +472,7 @@ void InitGame()
 	{
 	  player->present = TRUE;
 	  player->active = TRUE;
+	  player->gone = FALSE;
 	  some_player->present = FALSE;
 
 	  StorePlayer[jx][jy] = player->element_nr;
@@ -495,6 +497,7 @@ void InitGame()
 	int jx = player->jx, jy = player->jy;
 
 	player->active = FALSE;
+	player->gone = TRUE;
 	StorePlayer[jx][jy] = 0;
 	Feld[jx][jy] = EL_LEERRAUM;
       }
@@ -516,6 +519,7 @@ void InitGame()
 	    int jx = player->jx, jy = player->jy;
 
 	    player->active = FALSE;
+	    player->gone = TRUE;
 	    StorePlayer[jx][jy] = 0;
 	    Feld[jx][jy] = EL_LEERRAUM;
 	  }
