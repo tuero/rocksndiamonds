@@ -1233,6 +1233,7 @@ static SoundInfo *Load_WAV(char *filename)
 static void LoadCustomSound(SoundInfo **snd_info, char *basename)
 {
   char *filename = getCustomSoundFilename(basename);
+  ListNode *node;
 
   if (filename == NULL)		/* (should never happen) */
   {
@@ -1251,11 +1252,15 @@ static void LoadCustomSound(SoundInfo **snd_info, char *basename)
 	 and a fallback to the existing sound is done. */
 
 #if 1
-      printf("[sound '%s' already exists]\n", filename);
+      printf("[sound '%s' already exists (same list entry)]\n", filename);
 #endif
 
       return;
     }
+
+#if 1
+    printf("[decrementing reference counter of sound '%s']\n", filename_old);
+#endif
 
     if (--(*snd_info)->num_references <= 0)
     {
@@ -1268,6 +1273,20 @@ static void LoadCustomSound(SoundInfo **snd_info, char *basename)
       */
       deleteNodeFromList(&SoundFileList, filename_old, FreeSound);
     }
+  }
+
+  /* check if this sound already exists in the list of sounds */
+  node = getNodeFromKey(SoundFileList, filename);
+  if (node)
+  {
+#if 1
+      printf("[sound '%s' already exists (other list entry)]\n", filename);
+#endif
+
+      *snd_info = (SoundInfo *)node->content;
+      (*snd_info)->num_references++;
+
+      return;
   }
 
   *snd_info = Load_WAV(filename);
@@ -1636,7 +1655,8 @@ void dumpList(ListNode *node_first)
 
   while (node)
   {
-    printf("['%s']\n", node->key);
+    printf("['%s' (%d)]\n", node->key,
+	   ((SoundInfo *)node->content)->num_references);
     node = node->next;
   }
 
