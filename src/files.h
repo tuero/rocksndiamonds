@@ -25,8 +25,6 @@ void SaveTape(int);
 void LoadScore(int);
 void SaveScore(int);
 
-struct LevelDirInfo *getLevelDirInfoFromLevelDirName(char *);
-
 void LoadLevelInfo(void);
 void LoadSetup(void);
 void SaveSetup(void);

@@ -287,7 +287,7 @@ static char *getLevelFilename(int nr)
   filename = getPath3((leveldir_current->user_defined ?
 		       getUserLevelDir("") :
 		       options.level_directory),
-		      leveldir_current->filename,
+		      leveldir_current->fullpath,
 		      basename);
 
   return filename;
@@ -1067,7 +1067,8 @@ void SaveScore(int level_nr)
 #define LEVELINFO_TOKEN_LEVELS		34
 #define LEVELINFO_TOKEN_FIRST_LEVEL	35
 #define LEVELINFO_TOKEN_SORT_PRIORITY	36
-#define LEVELINFO_TOKEN_READONLY	37
+#define LEVELINFO_TOKEN_LEVEL_GROUP	37
+#define LEVELINFO_TOKEN_READONLY	38
 
 #define FIRST_GLOBAL_SETUP_TOKEN	SETUP_TOKEN_PLAYER_NAME
 #define LAST_GLOBAL_SETUP_TOKEN		SETUP_TOKEN_TIME_LIMIT
@@ -1142,6 +1143,7 @@ static struct
   { TYPE_INTEGER, &ldi.levels,		"levels"			},
   { TYPE_INTEGER, &ldi.first_level,	"first_level"			},
   { TYPE_INTEGER, &ldi.sort_priority,	"sort_priority"			},
+  { TYPE_BOOLEAN, &ldi.level_group,	"level_group"			},
   { TYPE_BOOLEAN, &ldi.readonly,	"readonly"			}
 };
 
@@ -1403,6 +1405,8 @@ static void checkSetupFileListIdentifier(struct SetupFileList *setup_file_list,
 static void setLevelDirInfoToDefaults(struct LevelDirInfo *ldi)
 {
   ldi->filename = NULL;
+  ldi->fullpath = NULL;
+  ldi->basepath = NULL;
   ldi->name = getStringCopy(ANONYMOUS_NAME);
   ldi->name_short = NULL;
   ldi->name_sorting = NULL;
@@ -1412,11 +1416,19 @@ static void setLevelDirInfoToDefaults(struct LevelDirInfo *ldi)
   ldi->first_level = 0;
   ldi->last_level = 0;
   ldi->sort_priority = LEVELCLASS_UNDEFINED;	/* default: least priority */
-  ldi->readonly = TRUE;
+  ldi->level_group = FALSE;
+  ldi->parent_link = FALSE;
   ldi->user_defined = FALSE;
+  ldi->readonly = TRUE;
   ldi->color = 0;
   ldi->class_desc = NULL;
   ldi->handicap_level = 0;
+  ldi->cl_first = -1;
+  ldi->cl_cursor = -1;
+
+  ldi->node_parent = NULL;
+  ldi->node_group = NULL;
+  ldi->next = NULL;
 }
 
 static void setSetupInfoToDefaults(struct SetupInfo *si)
@@ -1529,31 +1541,15 @@ static void decodeSetupFileList(struct SetupFileList *setup_file_list)
   }
 }
 
-struct LevelDirInfo *getLevelDirInfoFromLevelDirName(char *level_dir_name)
-{
-  struct LevelDirInfo *leveldir_node = leveldir_first;
-
-  if (level_dir_name == NULL)
-    return NULL;
-
-  while (leveldir_node)
-  {
-    if (strcmp(level_dir_name, leveldir_node->name) == 0)
-      return leveldir_node;		/* return success value */
-
-    leveldir_node = leveldir_node->next;
-  }
-
-  return NULL;
-}
-
 static int compareLevelDirInfoEntries(const void *object1, const void *object2)
 {
   const struct LevelDirInfo *entry1 = *((struct LevelDirInfo **)object1);
   const struct LevelDirInfo *entry2 = *((struct LevelDirInfo **)object2);
   int compare_result;
 
-  if (entry1->sort_priority == entry2->sort_priority)
+  if (entry1->parent_link || entry2->parent_link)
+    compare_result = (entry1->parent_link ? -1 : +1);
+  else if (entry1->sort_priority == entry2->sort_priority)
   {
     char *name1 = getStringToLower(entry1->name_sorting);
     char *name2 = getStringToLower(entry2->name_sorting);
@@ -1571,7 +1567,31 @@ static int compareLevelDirInfoEntries(const void *object1, const void *object2)
   return compare_result;
 }
 
-static void LoadLevelInfoFromLevelDir(char *level_directory)
+static void createParentLevelDirNode(struct LevelDirInfo *node_parent)
+{
+  struct LevelDirInfo *leveldir_new = newLevelDirInfo();
+
+  setLevelDirInfoToDefaults(leveldir_new);
+
+  leveldir_new->node_parent = node_parent;
+  leveldir_new->parent_link = TRUE;
+
+  leveldir_new->name = ".. (parent directory)";
+  leveldir_new->name_short = getStringCopy(leveldir_new->name);
+  leveldir_new->name_sorting = getStringCopy(leveldir_new->name);
+
+  leveldir_new->filename = "..";
+  leveldir_new->fullpath = getStringCopy(node_parent->fullpath);
+
+  leveldir_new->sort_priority = node_parent->sort_priority;
+  leveldir_new->class_desc = getLevelClassDescription(leveldir_new);
+
+  pushLevelDirInfo(&node_parent->node_group, leveldir_new);
+}
+
+static void LoadLevelInfoFromLevelDir(struct LevelDirInfo **node_first,
+				      struct LevelDirInfo *node_parent,
+				      char *level_directory)
 {
   DIR *dir;
   struct dirent *dir_entry;
@@ -1585,26 +1605,29 @@ static void LoadLevelInfoFromLevelDir(char *level_directory)
 
   while ((dir_entry = readdir(dir)) != NULL)	/* loop until last dir entry */
   {
-    struct stat file_status;
-    char *directory = NULL;
-    char *filename = NULL;
     struct SetupFileList *setup_file_list = NULL;
+    struct stat file_status;
+    char *directory_name = dir_entry->d_name;
+    char *directory_path = getPath2(level_directory, directory_name);
+    char *filename = NULL;
 
     /* skip entries for current and parent directory */
-    if (strcmp(dir_entry->d_name, ".")  == 0 ||
-	strcmp(dir_entry->d_name, "..") == 0)
-      continue;
-
-    /* find out if directory entry is itself a directory */
-    directory = getPath2(level_directory, dir_entry->d_name);
-    if (stat(directory, &file_status) != 0 ||		/* cannot stat file */
-	(file_status.st_mode & S_IFMT) != S_IFDIR)	/* not a directory */
+    if (strcmp(directory_name, ".")  == 0 ||
+	strcmp(directory_name, "..") == 0)
     {
-      free(directory);
+      free(directory_path);
       continue;
     }
 
-    filename = getPath2(directory, LEVELINFO_FILENAME);
+    /* find out if directory entry is itself a directory */
+    if (stat(directory_path, &file_status) != 0 ||	/* cannot stat file */
+	(file_status.st_mode & S_IFMT) != S_IFDIR)	/* not a directory */
+    {
+      free(directory_path);
+      continue;
+    }
+
+    filename = getPath2(directory_path, LEVELINFO_FILENAME);
     setup_file_list = loadSetupFileList(filename);
 
     if (setup_file_list)
@@ -1615,6 +1638,9 @@ static void LoadLevelInfoFromLevelDir(char *level_directory)
       checkSetupFileListIdentifier(setup_file_list, LEVELINFO_COOKIE);
       setLevelDirInfoToDefaults(leveldir_new);
 
+      leveldir_new->node_parent = node_parent;
+
+      /* set all structure fields according to the token/value pairs */
       ldi = *leveldir_new;
       for (i=FIRST_LEVELINFO_TOKEN; i<=LAST_LEVELINFO_TOKEN; i++)
 	setSetupInfo(i, getTokenValue(setup_file_list, token_info[i].text));
@@ -1628,7 +1654,19 @@ static void LoadLevelInfoFromLevelDir(char *level_directory)
       if (leveldir_new->name_sorting == NULL)
 	leveldir_new->name_sorting = getStringCopy(leveldir_new->name);
 
-      leveldir_new->filename = getStringCopy(dir_entry->d_name);
+      leveldir_new->filename = getStringCopy(directory_name);
+
+      if (node_parent == NULL)		/* top level group */
+      {
+	leveldir_new->basepath = level_directory;
+	leveldir_new->fullpath = leveldir_new->filename;
+      }
+      else				/* sub level group */
+      {
+	leveldir_new->basepath = node_parent->basepath;
+	leveldir_new->fullpath = getPath2(node_parent->fullpath,
+					  directory_name);
+      }
 
       if (leveldir_new->levels < 1)
 	leveldir_new->levels = 1;
@@ -1637,7 +1675,8 @@ static void LoadLevelInfoFromLevelDir(char *level_directory)
 	leveldir_new->first_level + leveldir_new->levels - 1;
 
       leveldir_new->user_defined =
-	(level_directory == options.level_directory ? FALSE : TRUE);
+	(leveldir_new->basepath == options.level_directory ? FALSE : TRUE);
+
       leveldir_new->color = LEVELCOLOR(leveldir_new);
       leveldir_new->class_desc = getLevelClassDescription(leveldir_new);
 
@@ -1646,15 +1685,25 @@ static void LoadLevelInfoFromLevelDir(char *level_directory)
 	 leveldir_new->last_level :
 	 leveldir_new->first_level);
 
-      pushLevelDirInfo(leveldir_new);	/* add new LevelDirInfo to list */
+      pushLevelDirInfo(node_first, leveldir_new);
 
       freeSetupFileList(setup_file_list);
       valid_entry_found = TRUE;
+
+      if (leveldir_new->level_group)
+      {
+	/* create node to link back to current level directory */
+	createParentLevelDirNode(leveldir_new);
+
+	/* step into sub-directory and look for more level series */
+	LoadLevelInfoFromLevelDir(&leveldir_new->node_group,
+				  leveldir_new, directory_path);
+      }
     }
     else
-      Error(ERR_WARN, "ignoring level directory '%s'", directory);
+      Error(ERR_WARN, "ignoring level directory '%s'", directory_path);
 
-    free(directory);
+    free(directory_path);
     free(filename);
   }
 
@@ -1671,22 +1720,18 @@ void LoadLevelInfo()
 
   DrawInitText("Loading level series:", 120, FC_GREEN);
 
-  LoadLevelInfoFromLevelDir(options.level_directory);
-  LoadLevelInfoFromLevelDir(getUserLevelDir(""));
+  LoadLevelInfoFromLevelDir(&leveldir_first, NULL, options.level_directory);
+  LoadLevelInfoFromLevelDir(&leveldir_first, NULL, getUserLevelDir(""));
 
-  num_leveldirs = numLevelDirInfo(leveldir_first);
-  leveldir_current = leveldir_first;
+  leveldir_current = getFirstValidLevelSeries(leveldir_first);
 
-  if (num_leveldirs == 0)
+  if (leveldir_first == NULL)
     Error(ERR_EXIT, "cannot find any valid level series in any directory");
 
+  sortLevelDirInfo(&leveldir_first, compareLevelDirInfoEntries);
+
 #if 0
-  if (num_leveldirs > 1)
-    qsort(leveldir, num_leveldirs, sizeof(struct LevelDirInfo),
-	  compareLevelDirInfoEntries);
-#else
-  if (num_leveldirs > 1)
-    sortLevelDirInfo(&leveldir_first, compareLevelDirInfoEntries);
+  dumpLevelDirInfo(leveldir_first, 0);
 #endif
 }
 
@@ -1902,7 +1947,7 @@ void LoadLevelSetup_LastSeries()
     char *last_level_series =
       getTokenValue(level_setup_list, TOKEN_STR_LAST_LEVEL_SERIES);
 
-    leveldir_current = getLevelDirInfoFromLevelDirName(last_level_series);
+    leveldir_current = getLevelDirInfoFromFilename(last_level_series);
     if (leveldir_current == NULL)
       leveldir_current = leveldir_first;
 

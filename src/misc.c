@@ -1076,10 +1076,11 @@ struct LevelDirInfo *newLevelDirInfo()
   return checked_calloc(sizeof(struct LevelDirInfo));
 }
 
-void pushLevelDirInfo(struct LevelDirInfo *node)
+void pushLevelDirInfo(struct LevelDirInfo **node_first,
+		      struct LevelDirInfo *node_new)
 {
-  node->next = leveldir_first;
-  leveldir_first = node;
+  node_new->next = *node_first;
+  *node_first = node_new;
 }
 
 int numLevelDirInfo(struct LevelDirInfo *node)
@@ -1095,9 +1096,47 @@ int numLevelDirInfo(struct LevelDirInfo *node)
   return num;
 }
 
+boolean validLevelSeries(struct LevelDirInfo *node)
+{
+  return (node != NULL && !node->node_group && !node->parent_link);
+}
+
+struct LevelDirInfo *getFirstValidLevelSeries(struct LevelDirInfo *node)
+{
+  if (node == NULL)		/* start with first level directory entry */
+    return getFirstValidLevelSeries(leveldir_first);
+  else if (node->node_group)	/* enter level group (step down into tree) */
+    return getFirstValidLevelSeries(node->node_group);
+  else if (node->parent_link)	/* skip start entry of level group */
+  {
+    if (node->next)		/* get first real level series entry */
+      return getFirstValidLevelSeries(node->next);
+    else			/* leave empty level group and go on */
+      return getFirstValidLevelSeries(node->node_parent->next);
+  }
+  else				/* this seems to be a regular level series */
+    return node;
+}
+
+struct LevelDirInfo *getLevelDirInfoFirstGroupEntry(struct LevelDirInfo *node)
+{
+  if (node == NULL)
+    return NULL;
+
+  if (node->node_parent == NULL)		/* top level group */
+    return leveldir_first;
+  else						/* sub level group */
+    return node->node_parent->node_group;
+}
+
+int numLevelDirInfoInGroup(struct LevelDirInfo *node)
+{
+  return numLevelDirInfo(getLevelDirInfoFirstGroupEntry(node));
+}
+
 int posLevelDirInfo(struct LevelDirInfo *node)
 {
-  struct LevelDirInfo *node_cmp = leveldir_first;
+  struct LevelDirInfo *node_cmp = getLevelDirInfoFirstGroupEntry(node);
   int pos = 0;
 
   while (node_cmp)
@@ -1129,6 +1168,58 @@ struct LevelDirInfo *getLevelDirInfoFromPos(struct LevelDirInfo *node, int pos)
   return node_default;
 }
 
+struct LevelDirInfo *getLevelDirInfoFromFilenameExt(struct LevelDirInfo *node,
+						    char *filename)
+{
+  if (filename == NULL)
+    return NULL;
+
+  while (node)
+  {
+    if (node->node_group)
+    {
+      struct LevelDirInfo *node_group;
+
+      node_group = getLevelDirInfoFromFilenameExt(node->node_group, filename);
+
+      if (node_group)
+	return node_group;
+    }
+    else if (!node->parent_link)
+    {
+      if (strcmp(filename, node->filename) == 0)
+	return node;
+    }
+
+    node = node->next;
+  }
+
+  return NULL;
+}
+
+struct LevelDirInfo *getLevelDirInfoFromFilename(char *filename)
+{
+  return getLevelDirInfoFromFilenameExt(leveldir_first, filename);
+}
+
+void dumpLevelDirInfo(struct LevelDirInfo *node, int depth)
+{
+  int i;
+
+  while (node)
+  {
+    for (i=0; i<depth * 3; i++)
+      printf(" ");
+
+    printf("filename == '%s'\n", node->filename);
+
+    if (node->node_group != NULL)
+      dumpLevelDirInfo(node->node_group, depth + 1);
+
+    node = node->next;
+  }
+}
+
 void sortLevelDirInfo(struct LevelDirInfo **node_first,
 		      int (*compare_function)(const void *, const void *))
 {
@@ -1137,7 +1228,7 @@ void sortLevelDirInfo(struct LevelDirInfo **node_first,
   struct LevelDirInfo *node = *node_first;
   int i = 0;
 
-  if (num_nodes < 2)	/* a list with only one element is always sorted... */
+  if (num_nodes == 0)
     return;
 
   /* allocate array for sorting structure pointers */
@@ -1165,6 +1256,16 @@ void sortLevelDirInfo(struct LevelDirInfo **node_first,
   *node_first = sort_array[0];
 
   free(sort_array);
+
+  /* now recursively sort the level group structures */
+  node = *node_first;
+  while (node)
+  {
+    if (node->node_group != NULL)
+      sortLevelDirInfo(&node->node_group, compare_function);
+
+    node = node->next;
+  }
 }
 
 

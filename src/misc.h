@@ -79,10 +79,16 @@ int getJoySymbolFromJoyName(char *);
 int getJoystickNrFromDeviceName(char *);
 
 struct LevelDirInfo *newLevelDirInfo();
-void pushLevelDirInfo(struct LevelDirInfo *);
+void pushLevelDirInfo(struct LevelDirInfo **, struct LevelDirInfo *);
 int numLevelDirInfo(struct LevelDirInfo *);
+boolean validLevelSeries(struct LevelDirInfo *);
+struct LevelDirInfo *getFirstValidLevelSeries(struct LevelDirInfo *);
+struct LevelDirInfo *getLevelDirInfoFirstGroupEntry(struct LevelDirInfo *);
+int numLevelDirInfoInGroup(struct LevelDirInfo *);
 int posLevelDirInfo(struct LevelDirInfo *);
 struct LevelDirInfo *getLevelDirInfoFromPos(struct LevelDirInfo *, int);
+struct LevelDirInfo *getLevelDirInfoFromFilename(char *);
+void dumpLevelDirInfo(struct LevelDirInfo *, int);
 void sortLevelDirInfo(struct LevelDirInfo **,
 		      int (*compare_function)(const void *, const void *));
 

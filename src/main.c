@@ -84,7 +84,7 @@ short		AmoebaCnt[MAX_NUM_AMOEBA], AmoebaCnt2[MAX_NUM_AMOEBA];
 unsigned long	Elementeigenschaften1[MAX_ELEMENTS];
 unsigned long	Elementeigenschaften2[MAX_ELEMENTS];
 
-int		level_nr, num_leveldirs;
+int		level_nr;
 int		lev_fieldx,lev_fieldy, scroll_x,scroll_y;
 
 int		FX = SX, FY = SY, ScrollStepSize;

@@ -384,7 +384,9 @@ struct LevelInfo
 
 struct LevelDirInfo
 {
-  char *filename;	/* level series sub-directory inside level directory */
+  char *filename;	/* level series single directory name */
+  char *fullpath;	/* complete path relative to level directory */
+  char *basepath;	/* absolute base path of level directory */
   char *name;		/* level series name, as displayed on main screen */
   char *name_short;	/* optional short name for level selection screen */
   char *name_sorting;	/* optional sorting name for correct level sorting */
@@ -394,13 +396,19 @@ struct LevelDirInfo
   int first_level;	/* first level number (to allow start with 0 or 1) */
   int last_level;	/* last level number (automatically calculated) */
   int sort_priority;	/* sort levels by 'sort_priority' and then by name */
+  boolean level_group;	/* directory contains more level series directories */
+  boolean parent_link;	/* entry links back to parent directory */
   boolean user_defined;	/* user defined levels are stored in home directory */
   boolean readonly;	/* readonly levels can not be changed with editor */
   int color;		/* color to use on selection screen for this level */
   char *class_desc;	/* description of level series class */
   int handicap_level;	/* number of the lowest unsolved level */
+  int cl_first;		/* internal control field for "choose level" screen */
+  int cl_cursor;	/* internal control field for "choose level" screen */
 
-  struct LevelDirInfo *next;
+  struct LevelDirInfo *node_parent;	/* parent level directory info */
+  struct LevelDirInfo *node_group;	/* level group sub-directory info */
+  struct LevelDirInfo *next;		/* next level series structure node */
 };
 
 struct TapeInfo
@@ -496,7 +504,7 @@ extern short		AmoebaCnt[MAX_NUM_AMOEBA], AmoebaCnt2[MAX_NUM_AMOEBA];
 extern unsigned long	Elementeigenschaften1[MAX_ELEMENTS];
 extern unsigned long	Elementeigenschaften2[MAX_ELEMENTS];
 
-extern int		level_nr, num_leveldirs;
+extern int		level_nr;
 extern int		lev_fieldx,lev_fieldy, scroll_x,scroll_y;
 
 extern int		FX,FY, ScrollStepSize;

@@ -69,6 +69,7 @@ void DrawHeadline()
 
 void DrawMainMenu()
 {
+  static struct LevelDirInfo *leveldir_last_valid = NULL;
   int i;
   char *name_text = (!options.network && setup.team_mode ? "Team:" : "Name:");
 
@@ -90,7 +91,14 @@ void DrawMainMenu()
   /* map gadgets for main menu screen */
   MapTapeButtons();
 
-  /* level_nr may have set to value over handicap with level editor */
+  /* leveldir_current may be invalid (level group, parent link) */
+  if (!validLevelSeries(leveldir_current))
+    leveldir_current = getFirstValidLevelSeries(leveldir_last_valid);
+
+  /* store valid level series information */
+  leveldir_last_valid = leveldir_current;
+
+  /* level_nr may have been set to value over handicap with level editor */
   if (setup.handicap && level_nr > leveldir_current->handicap_level)
     level_nr = leveldir_current->handicap_level;
 
@@ -155,6 +163,35 @@ void DrawMainMenu()
   ClearEventQueue();
 #endif
 
+}
+
+static void gotoTopLevelDir()
+{
+  /* move upwards to top level directory */
+  while (leveldir_current->node_parent)
+  {
+    /* write a "path" into level tree for easy navigation to last level */
+    if (leveldir_current->node_parent->node_group->cl_first == -1)
+    {
+      int num_leveldirs = numLevelDirInfoInGroup(leveldir_current);
+      int leveldir_pos = posLevelDirInfo(leveldir_current);
+      int num_page_entries;
+      int cl_first, cl_cursor;
+
+      if (num_leveldirs <= MAX_LEVEL_SERIES_ON_SCREEN)
+	num_page_entries = num_leveldirs;
+      else
+	num_page_entries = MAX_LEVEL_SERIES_ON_SCREEN - 1;
+
+      cl_first = MAX(0, leveldir_pos - num_page_entries + 1);
+      cl_cursor = leveldir_pos - cl_first + 3;
+
+      leveldir_current->node_parent->node_group->cl_first = cl_first;
+      leveldir_current->node_parent->node_group->cl_cursor = cl_cursor;
+    }
+
+    leveldir_current = leveldir_current->node_parent;
+  }
 }
 
 void HandleMainMenu(int mx, int my, int dx, int dy, int button)
@@ -260,11 +297,14 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
       }
       else if (y == 4)
       {
-	if (num_leveldirs)
+	if (leveldir_first)
 	{
 	  game_status = CHOOSELEVEL;
 	  SaveLevelSetup_LastSeries();
 	  SaveLevelSetup_SeriesInfo();
+
+	  gotoTopLevelDir();
+
 	  DrawChooseLevel();
 	}
       }
@@ -824,6 +864,33 @@ void HandleTypeName(int newxpos, KeySym key)
   BackToFront();
 }
 
+static void drawCursorExt(int ypos, int color, int graphic)
+{
+  static int cursor_array[SCR_FIELDY];
+
+  if (graphic)
+    cursor_array[ypos] = graphic;
+
+  graphic = cursor_array[ypos];
+
+  if (color == FC_RED)
+    graphic = (graphic == GFX_ARROW_BLUE_LEFT  ? GFX_ARROW_RED_LEFT  :
+	       graphic == GFX_ARROW_BLUE_RIGHT ? GFX_ARROW_RED_RIGHT :
+	       GFX_KUGEL_ROT);
+
+  DrawGraphic(0, ypos, graphic);
+}
+
+static void initCursor(int ypos, int graphic)
+{
+  drawCursorExt(ypos, FC_BLUE, graphic);
+}
+
+static void drawCursor(int ypos, int color)
+{
+  drawCursorExt(ypos, color, 0);
+}
+
 void DrawChooseLevel()
 {
   UnmapAllGadgets();
@@ -842,7 +909,7 @@ static void AdjustChooseLevelScrollbar(int id, int first_entry)
   struct GadgetInfo *gi = screen_gadget[id];
   int items_max, items_visible, item_position;
 
-  items_max = num_leveldirs;
+  items_max = numLevelDirInfoInGroup(leveldir_current);
   items_visible = MAX_LEVEL_SERIES_ON_SCREEN - 1;
   item_position = first_entry;
 
@@ -858,6 +925,7 @@ static void drawChooseLevelList(int first_entry, int num_page_entries)
   int i;
   char buffer[SCR_FIELDX * 2];
   int max_buffer_len = (SCR_FIELDX - 2) * 2;
+  int num_leveldirs = numLevelDirInfoInGroup(leveldir_current);
 
   XFillRectangle(display, backbuffer, gc, SX, SY, SXSIZE - 32, SYSIZE);
   redraw_mask |= REDRAW_FIELD;
@@ -866,16 +934,24 @@ static void drawChooseLevelList(int first_entry, int num_page_entries)
 
   for(i=0; i<num_page_entries; i++)
   {
-    struct LevelDirInfo *leveldir_node;
+    struct LevelDirInfo *node, *node_first;
     int leveldir_pos = first_entry + i;
+    int ypos = i + 2;
 
-    leveldir_node = getLevelDirInfoFromPos(leveldir_first, leveldir_pos);
-    strncpy(buffer, leveldir_node->name , max_buffer_len);
+    node_first = getLevelDirInfoFirstGroupEntry(leveldir_current);
+    node = getLevelDirInfoFromPos(node_first, leveldir_pos);
+
+    strncpy(buffer, node->name , max_buffer_len);
     buffer[max_buffer_len] = '\0';
 
-    DrawText(SX + 32, SY + (i + 2) * 32, buffer, FS_MEDIUM,
-	     leveldir_node->color);
-    DrawGraphic(0, i + 2, GFX_KUGEL_BLAU);
+    DrawText(SX + 32, SY + ypos * 32, buffer, FS_MEDIUM, node->color);
+
+    if (node->parent_link)
+      initCursor(ypos, GFX_ARROW_BLUE_LEFT);
+    else if (node->level_group)
+      initCursor(ypos, GFX_ARROW_BLUE_RIGHT);
+    else
+      initCursor(ypos, GFX_KUGEL_BLAU);
   }
 
   if (first_entry > 0)
@@ -887,16 +963,21 @@ static void drawChooseLevelList(int first_entry, int num_page_entries)
 
 static void drawChooseLevelInfo(int leveldir_pos)
 {
-  struct LevelDirInfo *leveldir_node;
+  struct LevelDirInfo *node, *node_first;
   int x, last_redraw_mask = redraw_mask;
 
-  leveldir_node = getLevelDirInfoFromPos(leveldir_first, leveldir_pos);
+  node_first = getLevelDirInfoFirstGroupEntry(leveldir_current);
+  node = getLevelDirInfoFromPos(node_first, leveldir_pos);
 
   XFillRectangle(display, drawto, gc, SX + 32, SY + 32, SXSIZE - 64, 32);
 
-  DrawTextFCentered(40, FC_RED, "%3d levels (%s)",
-		    leveldir_node->levels,
-		    leveldir_node->class_desc);
+  if (node->parent_link)
+    DrawTextFCentered(40, FC_RED, "leave group \"%s\"", node->class_desc);
+  else if (node->level_group)
+    DrawTextFCentered(40, FC_RED, "enter group \"%s\"", node->class_desc);
+  else
+    DrawTextFCentered(40, FC_RED, "%3d levels (%s)",
+		      node->levels, node->class_desc);
 
   /* let BackToFront() redraw only what is needed */
   redraw_mask = last_redraw_mask | REDRAW_TILES;
@@ -906,12 +987,11 @@ static void drawChooseLevelInfo(int leveldir_pos)
 
 void HandleChooseLevel(int mx, int my, int dx, int dy, int button)
 {
-  static int choice = 3;
-  static int first_entry = -1;
   static unsigned long choose_delay = 0;
   static int redraw = TRUE;
   int x = (mx + 32 - SX) / 32, y = (my + 32 - SY) / 32;
   int step = (button == 1 ? 1 : button == 2 ? 5 : 10);
+  int num_leveldirs = numLevelDirInfoInGroup(leveldir_current);
   int num_page_entries;
 
   if (num_leveldirs <= MAX_LEVEL_SERIES_ON_SCREEN)
@@ -923,24 +1003,27 @@ void HandleChooseLevel(int mx, int my, int dx, int dy, int button)
   {
     int leveldir_pos = posLevelDirInfo(leveldir_current);
 
-    if (first_entry == -1)
+    if (leveldir_current->cl_first == -1)
     {
-      first_entry = MAX(0, leveldir_pos - num_page_entries + 1);
-      choice = leveldir_pos - first_entry + 3;
-      AdjustChooseLevelScrollbar(SCREEN_CTRL_ID_SCROLL_VERTICAL, first_entry);
+      leveldir_current->cl_first = MAX(0, leveldir_pos - num_page_entries + 1);
+      leveldir_current->cl_cursor =
+	leveldir_pos - leveldir_current->cl_first + 3;
     }
 
-    if (dx == 1)	/* 'first_entry' is set by scrollbar position */
-      first_entry = dy;
+    if (dx == 999)	/* first entry is set by scrollbar position */
+      leveldir_current->cl_first = dy;
+    else
+      AdjustChooseLevelScrollbar(SCREEN_CTRL_ID_SCROLL_VERTICAL,
+				 leveldir_current->cl_first);
 
-    drawChooseLevelList(first_entry, num_page_entries);
+    drawChooseLevelList(leveldir_current->cl_first, num_page_entries);
     drawChooseLevelInfo(leveldir_pos);
     redraw = TRUE;
   }
 
   if (redraw)
   {
-    DrawGraphic(0, choice - 1, GFX_KUGEL_ROT);
+    drawCursor(leveldir_current->cl_cursor - 1, FC_RED);
     redraw = FALSE;
   }
 
@@ -952,7 +1035,7 @@ void HandleChooseLevel(int mx, int my, int dx, int dy, int button)
     if (dy)
     {
       x = 1;
-      y = choice + dy;
+      y = leveldir_current->cl_cursor + dy;
     }
     else
       x = y = 0;	/* no action */
@@ -968,33 +1051,37 @@ void HandleChooseLevel(int mx, int my, int dx, int dy, int button)
 
   if (x == 1 && y == 2)
   {
-    if (first_entry > 0 &&
+    if (leveldir_current->cl_first > 0 &&
 	(dy || DelayReached(&choose_delay, GADGET_FRAME_DELAY)))
     {
-      first_entry -= step;
-      if (first_entry < 0)
-	first_entry = 0;
+      leveldir_current->cl_first -= step;
+      if (leveldir_current->cl_first < 0)
+	leveldir_current->cl_first = 0;
 
-      drawChooseLevelList(first_entry, num_page_entries);
-      drawChooseLevelInfo(first_entry + choice - 3);
-      AdjustChooseLevelScrollbar(SCREEN_CTRL_ID_SCROLL_VERTICAL, first_entry);
-      DrawGraphic(0, choice - 1, GFX_KUGEL_ROT);
+      drawChooseLevelList(leveldir_current->cl_first, num_page_entries);
+      drawChooseLevelInfo(leveldir_current->cl_first +
+			  leveldir_current->cl_cursor - 3);
+      drawCursor(leveldir_current->cl_cursor - 1, FC_RED);
+      AdjustChooseLevelScrollbar(SCREEN_CTRL_ID_SCROLL_VERTICAL,
+				 leveldir_current->cl_first);
       return;
     }
   }
   else if (x == 1 && y > num_page_entries + 2)
   {
-    if (first_entry + num_page_entries < num_leveldirs &&
+    if (leveldir_current->cl_first + num_page_entries < num_leveldirs &&
 	(dy || DelayReached(&choose_delay, GADGET_FRAME_DELAY)))
     {
-      first_entry += step;
-      if (first_entry + num_page_entries > num_leveldirs)
-	first_entry = MAX(0, num_leveldirs - num_page_entries);
+      leveldir_current->cl_first += step;
+      if (leveldir_current->cl_first + num_page_entries > num_leveldirs)
+	leveldir_current->cl_first = MAX(0, num_leveldirs - num_page_entries);
 
-      drawChooseLevelList(first_entry, num_page_entries);
-      drawChooseLevelInfo(first_entry + choice - 3);
-      AdjustChooseLevelScrollbar(SCREEN_CTRL_ID_SCROLL_VERTICAL, first_entry);
-      DrawGraphic(0, choice - 1, GFX_KUGEL_ROT);
+      drawChooseLevelList(leveldir_current->cl_first, num_page_entries);
+      drawChooseLevelInfo(leveldir_current->cl_first +
+			  leveldir_current->cl_cursor - 3);
+      drawCursor(leveldir_current->cl_cursor - 1, FC_RED);
+      AdjustChooseLevelScrollbar(SCREEN_CTRL_ID_SCROLL_VERTICAL,
+				 leveldir_current->cl_first);
       return;
     }
   }
@@ -1002,43 +1089,77 @@ void HandleChooseLevel(int mx, int my, int dx, int dy, int button)
   if (!mx && !my && !dx && !dy)
   {
     x = 1;
-    y = choice;
+    y = leveldir_current->cl_cursor;
+  }
+
+  if (dx == 1)
+  {
+    struct LevelDirInfo *node_first, *node_cursor;
+    int leveldir_pos =
+      leveldir_current->cl_first + leveldir_current->cl_cursor - 3;
+
+    node_first = getLevelDirInfoFirstGroupEntry(leveldir_current);
+    node_cursor = getLevelDirInfoFromPos(node_first, leveldir_pos);
+
+    if (node_cursor->node_group)
+    {
+      node_cursor->cl_first = leveldir_current->cl_first;
+      node_cursor->cl_cursor = leveldir_current->cl_cursor;
+      leveldir_current = node_cursor->node_group;
+      DrawChooseLevel();
+    }
+  }
+  else if (dx == -1 && leveldir_current->node_parent)
+  {
+    leveldir_current = leveldir_current->node_parent;
+    DrawChooseLevel();
   }
 
   if (x == 1 && y >= 3 && y <= num_page_entries + 2)
   {
     if (button)
     {
-      if (y != choice)
+      if (y != leveldir_current->cl_cursor)
       {
-        DrawGraphic(0, y - 1, GFX_KUGEL_ROT);
-        DrawGraphic(0, choice - 1, GFX_KUGEL_BLAU);
-	drawChooseLevelInfo(first_entry + y - 3);
-	choice = y;
+	drawCursor(y - 1, FC_RED);
+	drawCursor(leveldir_current->cl_cursor - 1, FC_BLUE);
+	drawChooseLevelInfo(leveldir_current->cl_first + y - 3);
+	leveldir_current->cl_cursor = y;
       }
     }
     else
     {
-      int leveldir_pos = first_entry + y - 3;
+      struct LevelDirInfo *node_first, *node_cursor;
+      int leveldir_pos = leveldir_current->cl_first + y - 3;
 
-      leveldir_current = getLevelDirInfoFromPos(leveldir_first, leveldir_pos);
+      node_first = getLevelDirInfoFirstGroupEntry(leveldir_current);
+      node_cursor = getLevelDirInfoFromPos(node_first, leveldir_pos);
 
-      LoadLevelSetup_SeriesInfo();
+      if (node_cursor->node_group)
+      {
+	node_cursor->cl_first = leveldir_current->cl_first;
+	node_cursor->cl_cursor = leveldir_current->cl_cursor;
+	leveldir_current = node_cursor->node_group;
+	DrawChooseLevel();
+      }
+      else if (node_cursor->parent_link)
+      {
+	leveldir_current = node_cursor->node_parent;
+	DrawChooseLevel();
+      }
+      else
+      {
+	leveldir_current = node_cursor;
 
-      SaveLevelSetup_LastSeries();
-      SaveLevelSetup_SeriesInfo();
-      TapeErase();
+	LoadLevelSetup_SeriesInfo();
 
+	SaveLevelSetup_LastSeries();
+	SaveLevelSetup_SeriesInfo();
+	TapeErase();
 
-      printf("first_level == %d, last_level == %d, levels == %d\n",
-	     leveldir_current->first_level,
-	     leveldir_current->last_level,
-	     leveldir_current->levels);
-
-
-      game_status = MAINMENU;
-      DrawMainMenu();
-      redraw = TRUE;
+	game_status = MAINMENU;
+	DrawMainMenu();
+      }
     }
   }
 
@@ -1190,8 +1311,12 @@ void DrawSetupScreen()
 
     if (!(i >= SETUP_SCREEN_POS_EMPTY1 && i <= SETUP_SCREEN_POS_EMPTY2))
     {
-      DrawGraphic(0,i,GFX_KUGEL_BLAU);
       DrawText(SX+32,SY+i*32, setup_info[base].text, FS_BIG,FC_GREEN);
+
+      if (strcmp(setup_info[base].text, "Input Devices") == 0)
+	initCursor(i, GFX_ARROW_BLUE_RIGHT);
+      else
+	initCursor(i, GFX_KUGEL_BLAU);
     }
 
     if (setup_info[base].value)
@@ -1223,7 +1348,7 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
 
   if (redraw)
   {
-    DrawGraphic(0,choice-1,GFX_KUGEL_ROT);
+    drawCursor(choice - 1, FC_RED);
     redraw = FALSE;
   }
 
@@ -1255,6 +1380,13 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
     y = choice;
   }
 
+  if (dx == 1 && choice == 14)
+  {
+    game_status = SETUPINPUT;
+    DrawSetupInputScreen();
+    redraw = TRUE;
+  }
+
   if (x==1 && y >= pos_start && y <= pos_end &&
       !(y >= pos_empty1 && y <= pos_empty2))
   {
@@ -1262,8 +1394,8 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
     {
       if (y!=choice)
       {
-	DrawGraphic(0,y-1,GFX_KUGEL_ROT);
-	DrawGraphic(0,choice-1,GFX_KUGEL_BLAU);
+	drawCursor(y - 1, FC_RED);
+	drawCursor(choice - 1, FC_BLUE);
       }
       choice = y;
     }
@@ -1440,10 +1572,11 @@ void DrawSetupInputScreen()
   ClearWindow();
   DrawText(SX+16, SY+16, "SETUP INPUT", FS_BIG, FC_YELLOW);
 
-  DrawGraphic(0, 2, GFX_KUGEL_BLAU);
-  DrawGraphic(0, 3, GFX_KUGEL_BLAU);
-  DrawGraphic(0, 4, GFX_KUGEL_BLAU);
-  DrawGraphic(0, 15, GFX_KUGEL_BLAU);
+  initCursor(2, GFX_KUGEL_BLAU);
+  initCursor(3, GFX_KUGEL_BLAU);
+  initCursor(4, GFX_ARROW_BLUE_RIGHT);
+  initCursor(15, GFX_KUGEL_BLAU);
+
   DrawGraphic(10, 2, GFX_ARROW_BLUE_LEFT);
   DrawGraphic(12, 2, GFX_ARROW_BLUE_RIGHT);
 
@@ -1569,7 +1702,7 @@ void HandleSetupInputScreen(int mx, int my, int dx, int dy, int button)
 
   if (redraw)
   {
-    DrawGraphic(0,choice-1,GFX_KUGEL_ROT);
+    drawCursor(choice - 1, FC_RED);
     redraw = FALSE;
   }
 
@@ -1630,8 +1763,8 @@ void HandleSetupInputScreen(int mx, int my, int dx, int dy, int button)
     {
       if (y != choice)
       {
-	DrawGraphic(0, y-1, GFX_KUGEL_ROT);
-	DrawGraphic(0, choice-1, GFX_KUGEL_BLAU);
+	drawCursor(y - 1, FC_RED);
+	drawCursor(choice - 1, FC_BLUE);
       }
       choice = y;
     }
@@ -2226,8 +2359,9 @@ static void CreateScreenScrollbars()
     struct GadgetInfo *gi;
     int items_max, items_visible, item_position;
     unsigned long event_mask;
-    int num_page_entries;
+    int num_page_entries = MAX_LEVEL_SERIES_ON_SCREEN - 1;
 
+#if 0
     if (num_leveldirs <= MAX_LEVEL_SERIES_ON_SCREEN)
       num_page_entries = num_leveldirs;
     else
@@ -2236,6 +2370,11 @@ static void CreateScreenScrollbars()
     items_max = MAX(num_leveldirs, num_page_entries);
     items_visible = num_page_entries;
     item_position = 0;
+#else
+    items_max = num_page_entries;
+    items_visible = num_page_entries;
+    item_position = 0;
+#endif
 
     event_mask = GD_EVENT_MOVING | GD_EVENT_OFF_BORDERS;
 
@@ -2278,6 +2417,7 @@ void CreateScreenGadgets()
 
 void MapChooseLevelGadgets()
 {
+  int num_leveldirs = numLevelDirInfoInGroup(leveldir_current);
   int i;
 
   if (num_leveldirs <= MAX_LEVEL_SERIES_ON_SCREEN)
@@ -2313,7 +2453,7 @@ static void HandleScreenGadgets(struct GadgetInfo *gi)
       break;
 
     case SCREEN_CTRL_ID_SCROLL_VERTICAL:
-      HandleChooseLevel(0,0, 1,gi->event.item_position, MB_MENU_INITIALIZE);
+      HandleChooseLevel(0,0, 999,gi->event.item_position, MB_MENU_INITIALIZE);
       break;
 
     default:
