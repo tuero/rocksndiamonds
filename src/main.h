@@ -298,6 +298,14 @@ struct PlayerInfo
   byte effective_action;	/* action aknowledged from network server
 				   or summarized over all configured input
 				   devices when in single player mode */
+  byte programmed_action;	/* action forced by game itself (like moving
+				   through doors); overrides other actions */
+
+
+#if 0
+  byte programmed_speed;	/* speed (for only one move) forced by game */
+#endif
+
 
   int joystick_fd;		/* file descriptor of player's joystick */
 

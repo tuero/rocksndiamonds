@@ -339,6 +339,7 @@ void InitGame()
 
     player->action = 0;
     player->effective_action = 0;
+    player->programmed_action = 0;
 
     player->score = 0;
     player->gems_still_needed = level.edelsteine;
@@ -3514,6 +3515,18 @@ void GameActions()
   {
     int actual_player_action = stored_player[i].effective_action;
 
+    if (stored_player[i].programmed_action)
+    {
+      /* this is very bad and need to be fixed!!! */
+      unsigned long move_delay = stored_player[i].move_delay;
+
+      if (FrameReached(&move_delay, MoveSpeed))
+      {
+	actual_player_action = stored_player[i].programmed_action;
+	stored_player[i].programmed_action = 0;
+      }
+    }
+
     if (recorded_player_action)
       actual_player_action = recorded_player_action[i];
 
@@ -4039,6 +4052,33 @@ void ScrollFigure(struct PlayerInfo *player, int mode)
 
   if (!player->MovPos)
   {
+    switch (Feld[last_jx][last_jy])
+    {
+      case EL_SP_PORT1_LEFT:
+      case EL_SP_PORT2_LEFT:
+      case EL_SP_PORT1_RIGHT:
+      case EL_SP_PORT2_RIGHT:
+      case EL_SP_PORT1_UP:
+      case EL_SP_PORT2_UP:
+      case EL_SP_PORT1_DOWN:
+      case EL_SP_PORT2_DOWN:
+      case EL_SP_PORT_X:
+      case EL_SP_PORT_Y:
+      case EL_SP_PORT_XY:
+	/* continue with normal speed after moving through port */
+	/* FIX THIS: what about player already having eaten a speed pill? */
+	MoveSpeed = 8;
+	ScrollStepSize = TILEX / MoveSpeed;
+
+	/* don't wait for the next move -- the whole move delay stuff
+	   is worse at the moment; FIX THIS! ;-) */
+	player->move_delay = 0;
+	break;
+
+      default:
+	break;
+    }
+
     player->last_jx = jx;
     player->last_jy = jy;
 
@@ -4344,7 +4384,7 @@ int DigField(struct PlayerInfo *player,
     case EL_SPEED_PILL:
       RemoveField(x, y);
       MoveSpeed = 4;
-      ScrollStepSize = TILEX/4;
+      ScrollStepSize = TILEX / MoveSpeed;
       PlaySoundLevel(x, y, SND_PONG);
       break;
 
@@ -4531,6 +4571,15 @@ int DigField(struct PlayerInfo *player,
 	  !IN_LEV_FIELD(x + dx, y + dy) ||
 	  !IS_FREE(x + dx, y + dy))
 	return MF_NO_ACTION;
+
+      /* automatically move to field behind the port */
+      player->programmed_action = (dx == -1 ? MV_LEFT :
+				   dx == +1 ? MV_RIGHT :
+				   dy == -1 ? MV_UP :
+				   dy == +1 ? MV_DOWN : MV_NO_MOVING);
+      /* move through port with double speed */
+      MoveSpeed = 4;
+      ScrollStepSize = TILEX / MoveSpeed;
       break;
 
     case EL_AUSGANG_ZU:
