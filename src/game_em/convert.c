@@ -434,10 +434,17 @@ void convert_em_level(unsigned char *src, int file_version)
   };
   unsigned int i, x, y, temp;
 
+#if 1
+  lev.time_seconds = src[0x83E] << 8 | src[0x83F];
+  if (lev.time_seconds > 9999)
+    lev.time_seconds = 9999;
+#else
   temp = ((src[0x83E] << 8 | src[0x83F]) * 25 + 3) / 4;
   if (temp == 0 || temp > 9999)
     temp = 9999;
   lev.time_initial = temp;
+#endif
+
   lev.required_initial = src[0x82F];
 
   temp = src[0x830] << 8 | src[0x831];
@@ -779,7 +786,9 @@ void prepare_em_level(void)
     for (x = 0; x < WIDTH; x++)
       Draw[y][x] = Cave[y][x];
 
+  lev.time_initial = (lev.time_seconds * 50 + 7) / 8;
   lev.time = lev.time_initial;
+
   lev.required = lev.required_initial;
   lev.score = 0;
 

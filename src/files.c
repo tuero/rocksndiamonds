@@ -49,6 +49,23 @@
 #define TAPE_COOKIE_TMPL	"ROCKSNDIAMONDS_TAPE_FILE_VERSION_x.x"
 #define SCORE_COOKIE		"ROCKSNDIAMONDS_SCORE_FILE_VERSION_1.2"
 
+static struct
+{
+  int filetype;
+  char *id;
+}
+filetype_id_list[] =
+{
+  { LEVEL_FILE_TYPE_RND,	"RND"	},
+  { LEVEL_FILE_TYPE_BD,		"BD"	},
+  { LEVEL_FILE_TYPE_EM,		"EM"	},
+  { LEVEL_FILE_TYPE_SP,		"SP"	},
+  { LEVEL_FILE_TYPE_DX,		"DX"	},
+  { LEVEL_FILE_TYPE_SB,		"SB"	},
+  { LEVEL_FILE_TYPE_DC,		"DC"	},
+  { -1,				NULL	},
+};
+
 
 /* ========================================================================= */
 /* level file functions                                                      */
@@ -418,6 +435,8 @@ static char *getSingleLevelBasename(int nr, int type)
 
   if (level_filename == NULL)
     level_filename = getStringCat2("%03d.", LEVELFILE_EXTENSION);
+  else
+    type = LEVEL_FILE_TYPE_UNKNOWN;	/* force specified file name/pattern */
 
   switch (type)
   {
@@ -516,6 +535,35 @@ static void setLevelFileInfo_PackedLevelFilename(struct LevelFileInfo *lfi,
   lfi->filename = getLevelFilenameFromBasename(lfi->basename);
 }
 
+static int getFiletypeFromID(char *filetype_id)
+{
+  char *filetype_id_lower;
+  int filetype = LEVEL_FILE_TYPE_UNKNOWN;
+  int i;
+
+  if (filetype_id == NULL)
+    return LEVEL_FILE_TYPE_UNKNOWN;
+
+  filetype_id_lower = getStringToLower(filetype_id);
+
+  for (i = 0; filetype_id_list[i].id != NULL; i++)
+  {
+    char *id_lower = getStringToLower(filetype_id_list[i].id);
+    
+    if (strcmp(filetype_id_lower, id_lower) == 0)
+      filetype = filetype_id_list[i].filetype;
+
+    free(id_lower);
+
+    if (filetype != LEVEL_FILE_TYPE_UNKNOWN)
+      break;
+  }
+
+  free(filetype_id_lower);
+
+  return filetype;
+}
+
 static void determineLevelFileInfo_Filename(struct LevelFileInfo *lfi)
 {
   /* special case: level number is negative => check for level template file */
@@ -528,8 +576,11 @@ static void determineLevelFileInfo_Filename(struct LevelFileInfo *lfi)
 
   if (leveldir_current->level_filename != NULL)
   {
+    int filetype = getFiletypeFromID(leveldir_current->level_filetype);
+
     /* check for file name/pattern specified in "levelinfo.conf" */
-    setLevelFileInfo_SingleLevelFilename(lfi, LEVEL_FILE_TYPE_UNKNOWN);
+    setLevelFileInfo_SingleLevelFilename(lfi, filetype);
+
     if (fileExists(lfi->filename))
       return;
   }
@@ -1809,7 +1860,7 @@ void CopyNativeLevel_RND_to_EM(struct LevelInfo *level)
   lev->width  = MIN(level->fieldx, EM_MAX_CAVE_WIDTH);
   lev->height = MIN(level->fieldy, EM_MAX_CAVE_HEIGHT);
 
-  lev->time_initial     = level->time * 5;
+  lev->time_seconds     = level->time;
   lev->required_initial = level->gems_needed;
 
   lev->emerald_score	= level->score[SC_EMERALD];
@@ -1918,7 +1969,7 @@ void CopyNativeLevel_EM_to_RND(struct LevelInfo *level)
   level->fieldx = MIN(lev->width,  MAX_LEV_FIELDX);
   level->fieldy = MIN(lev->height, MAX_LEV_FIELDY);
 
-  level->time        = lev->time_initial / 5;
+  level->time        = lev->time_seconds;
   level->gems_needed = lev->required_initial;
 
   sprintf(level->name, "Level %d", level->file_info.nr);

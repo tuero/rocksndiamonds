@@ -471,10 +471,14 @@ struct LEVEL
 
   unsigned int width;                 /* playfield width */
   unsigned int height;                /* playfield height */
-  unsigned int time_initial;          /* time remaining (initial) */
+
+  unsigned int time_seconds;          /* available time (seconds) */
+  unsigned int time_initial;          /* available time (initial) */
   unsigned int time;                  /* time remaining (runtime) */
+
   unsigned int required_initial;      /* emeralds needed (initial) */
   unsigned int required;              /* emeralds needed (runtime) */
+
   unsigned int score;                 /* score */
 
   /* fill in all below /every/ time you read a level */

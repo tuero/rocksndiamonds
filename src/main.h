@@ -1532,7 +1532,7 @@ struct LevelInfo
 
   int fieldx, fieldy;
 
-  int time;
+  int time;				/* available time (seconds) */
   int gems_needed;
 
   char name[MAX_LEVEL_NAME_LEN + 1];

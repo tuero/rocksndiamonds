@@ -232,7 +232,7 @@ void game_initscreen(void)
       screentiles[y][x] = -1;
 
   DrawGameDoorValues_EM(lev.required, ply1.dynamite, lev.score,
-			(lev.time + 4) / 5);
+			DISPLAY_TIME(lev.time + 4));
 }
 
 void game_animscreen(void)

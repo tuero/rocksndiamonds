@@ -41,6 +41,9 @@
 #define SXSIZE			(SCR_FIELDX * TILEX)
 #define SYSIZE			(SCR_FIELDY * TILEY)
 
+#define DISPLAY_TIME(x)		(((x) * 8 + 49) / 50)
+
+
 extern Bitmap *screenBitmap;
 extern Bitmap *scoreBitmap;
 

@@ -70,7 +70,11 @@ void InitGameEngine_EM()
 void GameActions_EM(byte action)
 {
   static unsigned long game_frame_delay = 0;
+#if 1
+  unsigned long game_frame_delay_value = getGameFrameDelay_EM(20);
+#else
   unsigned long game_frame_delay_value = getGameFrameDelay_EM(25);
+#endif
 
 #if 0
   /* this is done in screens.c/HandleGameActions() by calling BackToFront() */
@@ -101,7 +105,7 @@ void GameActions_EM(byte action)
     sound_play();
 
     DrawGameDoorValues_EM(lev.required, ply1.dynamite, lev.score,
-			  (lev.time + 4) / 5);
+			  DISPLAY_TIME(lev.time));
   }
 }
 
