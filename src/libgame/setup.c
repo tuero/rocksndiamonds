@@ -1066,7 +1066,7 @@ SetupFileList *newSetupFileList(char *token, char *value)
   return new;
 }
 
-char *getTokenValue(SetupFileList *list, char *token)
+char *getListEntry(SetupFileList *list, char *token)
 {
   if (list == NULL)
     return NULL;
@@ -1074,10 +1074,10 @@ char *getTokenValue(SetupFileList *list, char *token)
   if (strcmp(list->token, token) == 0)
     return list->value;
   else
-    return getTokenValue(list->next, token);
+    return getListEntry(list->next, token);
 }
 
-void setTokenValue(SetupFileList *list, char *token, char *value)
+void setListEntry(SetupFileList *list, char *token, char *value)
 {
   if (list == NULL)
     return;
@@ -1092,7 +1092,7 @@ void setTokenValue(SetupFileList *list, char *token, char *value)
   else if (list->next == NULL)
     list->next = newSetupFileList(token, value);
   else
-    setTokenValue(list->next, token, value);
+    setListEntry(list->next, token, value);
 }
 
 #ifdef DEBUG
@@ -1221,13 +1221,18 @@ static void printSetupFileHash(SetupFileHash *hash)
 #endif
 #endif
 
-SetupFileHash *loadSetupFileHash(char *filename)
+static void *loadSetupFileData(char *filename, boolean use_hash)
 {
   int line_len;
   char line[MAX_LINE_LEN];
   char *token, *value, *line_ptr;
-  SetupFileHash *setup_file_hash = newSetupFileHash();
+  void *setup_file_data;
   FILE *file;
+
+  if (use_hash)
+    setup_file_data = newSetupFileHash();
+  else
+    setup_file_data = newSetupFileList("", "");
 
   if (!(file = fopen(filename, MODE_READ)))
   {
@@ -1288,15 +1293,46 @@ SetupFileHash *loadSetupFileHash(char *filename)
 	break;
 
     if (*token && *value)
-      setHashEntry(setup_file_hash, token, value);
+    {
+      if (use_hash)
+	setHashEntry((SetupFileHash *)setup_file_data, token, value);
+      else
+	setListEntry((SetupFileList *)setup_file_data, token, value);
+    }
   }
 
   fclose(file);
 
-  if (hashtable_count(setup_file_hash) == 0)
-    Error(ERR_WARN, "configuration file '%s' is empty", filename);
+  if (use_hash)
+  {
+    if (hashtable_count((SetupFileHash *)setup_file_data) == 0)
+      Error(ERR_WARN, "configuration file '%s' is empty", filename);
+  }
+  else
+  {
+    SetupFileList *setup_file_list = (SetupFileList *)setup_file_data;
+    SetupFileList *first_valid_list_entry = setup_file_list->next;
 
-  return setup_file_hash;
+    /* free empty list header */
+    setup_file_list->next = NULL;
+    freeSetupFileList(setup_file_list);
+    setup_file_data = first_valid_list_entry;
+
+    if (first_valid_list_entry == NULL)
+      Error(ERR_WARN, "configuration file '%s' is empty", filename);
+  }
+
+  return setup_file_data;
+}
+
+SetupFileList *loadSetupFileList(char *filename)
+{
+  return (SetupFileList *)loadSetupFileData(filename, FALSE);
+}
+
+SetupFileHash *loadSetupFileHash(char *filename)
+{
+  return (SetupFileHash *)loadSetupFileData(filename, TRUE);
 }
 
 void checkSetupFileHashIdentifier(SetupFileHash *setup_file_hash,

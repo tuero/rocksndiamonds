@@ -231,6 +231,7 @@ void freeSetupFileList(struct SetupFileList *);
 struct SetupFileList *newSetupFileList(char *, char *);
 char *getListEntry(struct SetupFileList *, char *);
 void setListEntry(struct SetupFileList *, char *, char *);
+SetupFileList *loadSetupFileList(char *);
 
 void freeSetupFileHash(SetupFileHash *);
 SetupFileHash *newSetupFileHash();

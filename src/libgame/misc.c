@@ -1884,11 +1884,7 @@ void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
   int num_ext3_suffixes = artwork_info->num_ext3_suffixes;
   int num_ignore_tokens = artwork_info->num_ignore_tokens;
   char *filename = getCustomArtworkConfigFilename(artwork_info->type);
-  SetupFileHash *setup_file_hash;
-  SetupFileHash *extra_file_hash = NULL;
-#if 0
-  SetupFileHash *list;
-#endif
+  SetupFileHash *setup_file_hash, *extra_file_hash;
   char *known_token_value = KNOWN_TOKEN_VALUE;
   int i, j, k, l;
 
@@ -1936,58 +1932,31 @@ void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
   if (filename == NULL)
     return;
 
-  printf("::: THIS 0\n");
-
   if ((setup_file_hash = loadSetupFileHash(filename)) == NULL)
     return;
-
-  printf("::: THIS 1 [%d]\n", num_file_list_entries);
 
   /* read parameters for all known config file tokens */
   for (i=0; i<num_file_list_entries; i++)
     read_token_parameters(setup_file_hash, suffix_list, &file_list[i]);
-
-  printf("::: THIS 2\n");
 
   /* set all tokens that can be ignored here to "known" keyword */
   for (i=0; i < num_ignore_tokens; i++)
     setHashEntry(setup_file_hash, ignore_tokens[i], known_token_value);
 
   /* copy all unknown config file tokens to extra config list */
-#if 0
-  for (list = setup_file_hash; list != NULL; list = list->next)
-  {
-    if (strcmp(list->value, known_token_value) != 0)
-    {
-      if (extra_file_hash == NULL)
-	extra_file_hash = newSetupFileHash(list->token, list->value);
-      else
-	setHashEntry(extra_file_hash, list->token, list->value);
-    }
-  }
-#else
+  extra_file_hash = newSetupFileHash();
   BEGIN_HASH_ITERATION(setup_file_hash, itr)
   {
     if (strcmp(HASH_ITERATION_VALUE(itr), known_token_value) != 0)
-    {
-      if (extra_file_hash == NULL)
-	extra_file_hash = newSetupFileHash();
-
       setHashEntry(extra_file_hash,
 		   HASH_ITERATION_TOKEN(itr), HASH_ITERATION_VALUE(itr));
-    }
   }
   END_HASH_ITERATION(setup_file_hash, itr)
-#endif
 
-  /* at this point, we do not need the config file list anymore -- free it */
+  /* at this point, we do not need the config file hash anymore -- free it */
   freeSetupFileHash(setup_file_hash);
 
   /* now try to determine valid, dynamically defined config tokens */
-
-#if 0
-  for (list = extra_file_hash; list != NULL; list = list->next)
-#endif
 
   BEGIN_HASH_ITERATION(extra_file_hash, itr)
   {
@@ -2204,12 +2173,12 @@ void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
 
   if (extra_file_hash != NULL && options.verbose && IS_PARENT_PROCESS())
   {
+    SetupFileList *setup_file_list, *list;
     boolean dynamic_tokens_found = FALSE;
     boolean unknown_tokens_found = FALSE;
 
-#if 0
-    for (list = extra_file_hash; list != NULL; list = list->next)
-#endif
+    if ((setup_file_list = loadSetupFileList(filename)) == NULL)
+      Error(ERR_EXIT, "loadSetupFileHash works, but loadSetupFileList fails");
 
     BEGIN_HASH_ITERATION(extra_file_hash, itr)
     {
@@ -2226,16 +2195,13 @@ void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
       Error(ERR_RETURN_LINE, "-");
       Error(ERR_RETURN, "dynamic token(s) found:");
 
-#if 0
-      for (list = extra_file_hash; list != NULL; list = list->next)
-#endif
-
-      BEGIN_HASH_ITERATION(extra_file_hash, itr)
+      for (list = setup_file_list; list != NULL; list = list->next)
       {
-	if (strcmp(HASH_ITERATION_VALUE(itr), known_token_value) == 0)
-	  Error(ERR_RETURN, "- dynamic token: '%s'",HASH_ITERATION_TOKEN(itr));
+	char *value = getHashEntry(extra_file_hash, list->token);
+
+	if (value != NULL && strcmp(value, known_token_value) == 0)
+	  Error(ERR_RETURN, "- dynamic token: '%s'", list->token);
       }
-      END_HASH_ITERATION(extra_file_hash, itr)
 
       Error(ERR_RETURN_LINE, "-");
     }
@@ -2247,19 +2213,18 @@ void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
       Error(ERR_RETURN, "warning: unknown token(s) found in config file:");
       Error(ERR_RETURN, "- config file: '%s'", filename);
 
-#if 0
-      for (list = extra_file_hash; list != NULL; list = list->next)
-#endif
-
-      BEGIN_HASH_ITERATION(extra_file_hash, itr)
+      for (list = setup_file_list; list != NULL; list = list->next)
       {
-	if (strcmp(HASH_ITERATION_VALUE(itr), known_token_value) != 0)
-	  Error(ERR_RETURN, "- unknown token: '%s'",HASH_ITERATION_TOKEN(itr));
+	char *value = getHashEntry(extra_file_hash, list->token);
+
+	if (value != NULL && strcmp(value, known_token_value) != 0)
+	  Error(ERR_RETURN, "- dynamic token: '%s'", list->token);
       }
-      END_HASH_ITERATION(extra_file_hash, itr)
 
       Error(ERR_RETURN_LINE, "-");
     }
+
+    freeSetupFileList(setup_file_list);
   }
 
   freeSetupFileHash(extra_file_hash);
