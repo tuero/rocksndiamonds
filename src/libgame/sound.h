@@ -54,6 +54,11 @@
 #define SOUND_MAX_VOLUME			(SDL_MIX_MAXVOLUME / 4)
 #endif
 
+#if defined(AUDIO_STREAMING_DSP)
+#define SOUND_FADING_VOLUME_STEP		(PSND_MAX_VOLUME / 40)
+#define SOUND_FADING_VOLUME_THRESHOLD		(SOUND_FADING_VOLUME_STEP * 2)
+#endif
+
 #define DEFAULT_AUDIO_SAMPLE_RATE		AUDIO_SAMPLE_RATE_22050
 #define DEFAULT_AUDIO_FRAGMENT_SIZE_UNIX	AUDIO_FRAGMENT_SIZE_512
 #define DEFAULT_AUDIO_FRAGMENT_SIZE_WIN32	AUDIO_FRAGMENT_SIZE_2048
@@ -185,6 +190,8 @@ void UnixOpenAudio(void);
 void UnixCloseAudio(void);
 
 /* sound server functions */ 
+void InitPlaylist(void);
+void StartSoundserver(void);
 void SoundServer(void);
 
 /* sound client functions */

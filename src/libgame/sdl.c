@@ -743,6 +743,7 @@ inline void SDLCloseAudio(void)
   Mix_HaltChannel(-1);
 
   Mix_CloseAudio();
+  SDL_QuitSubSystem(SDL_INIT_AUDIO);
 }
 
 #endif /* TARGET_SDL */

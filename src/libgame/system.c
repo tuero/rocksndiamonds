@@ -179,7 +179,7 @@ inline static int GetRealDepth(int depth)
 
 inline void InitVideoDisplay(void)
 {
-#ifdef TARGET_SDL
+#if defined(TARGET_SDL)
   SDLInitVideoDisplay();
 #else
   X11InitVideoDisplay();
@@ -188,7 +188,11 @@ inline void InitVideoDisplay(void)
 
 inline void CloseVideoDisplay(void)
 {
-#if defined(TARGET_X11)
+  KeyboardAutoRepeatOn();
+
+#if defined(TARGET_SDL)
+  SDL_QuitSubSystem(SDL_INIT_VIDEO);
+#else
   if (display)
     XCloseDisplay(display);
 #endif

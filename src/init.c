@@ -11,8 +11,6 @@
 * init.c                                                   *
 ***********************************************************/
 
-#include <signal.h>
-
 #include "libgame/libgame.h"
 
 #include "init.h"
@@ -31,7 +29,6 @@ static void InitPlayerInfo(void);
 static void InitLevelInfo(void);
 static void InitNetworkServer(void);
 static void InitSound(void);
-static void InitSoundServer(void);
 static void InitGfx(void);
 static void InitGfxBackground(void);
 static void InitGadgets(void);
@@ -58,7 +55,6 @@ void OpenAll(void)
 
   InitCounter();
   InitSound();
-  InitSoundServer();
   InitJoysticks();
   InitRND(NEW_RANDOMIZE);
 
@@ -147,46 +143,8 @@ void InitSound()
   }
 
   num_bg_loops = LoadMusic();
-}
 
-void InitSoundServer()
-{
-  if (!audio.sound_available)
-    return;
-
-#if !defined(TARGET_SDL)
-#if defined(PLATFORM_UNIX)
-
-  if (pipe(audio.soundserver_pipe) < 0)
-  {
-    Error(ERR_WARN, "cannot create pipe - no sounds");
-    audio.sound_available = FALSE;
-    return;
-  }
-
-  if ((audio.soundserver_pid = fork()) < 0)
-  {       
-    Error(ERR_WARN, "cannot create sound server process - no sounds");
-    audio.sound_available = FALSE;
-    return;
-  }
-
-  if (audio.soundserver_pid == 0)	/* we are child */
-  {
-    SoundServer();
-
-    /* never reached */
-    exit(0);
-  }
-  else					/* we are parent */
-    close(audio.soundserver_pipe[0]); /* no reading from pipe needed */
-
-#else /* !PLATFORM_UNIX */
-
-  SoundServer();
-
-#endif /* !PLATFORM_UNIX */
-#endif /* !TARGET_SDL */
+  StartSoundserver();
 }
 
 void InitJoysticks()
@@ -1677,17 +1635,10 @@ void CloseAllAndExit(int exit_value)
 
   StopSounds();
   FreeSounds(NUM_SOUNDS);
-
-#if !defined(TARGET_SDL)
-  if (audio.soundserver_pid)
-    kill(audio.soundserver_pid, SIGTERM);
-#endif
+  CloseAudio();
 
   for(i=0; i<NUM_BITMAPS; i++)
     FreeBitmap(pix[i]);
-
-  KeyboardAutoRepeatOn();
-
   CloseVideoDisplay();
 
   ClosePlatformDependantStuff();

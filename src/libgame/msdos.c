@@ -980,6 +980,8 @@ void MSDOSOpenAudio(void)
     audio.loops_available = TRUE;
     audio.sound_enabled = TRUE;
   }
+
+  InitPlaylist();
 }
 
 void MSDOSCloseAudio(void)

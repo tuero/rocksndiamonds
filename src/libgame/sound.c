@@ -16,15 +16,19 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <dirent.h>
+#include <signal.h>
 
 #include "system.h"
 #include "sound.h"
 #include "misc.h"
 
 
-static int num_sounds = 0, num_music = 0, num_mods = 0;
+static int num_sounds = 0, num_music = 0;
 static struct SampleInfo *Sound = NULL;
+#if defined(TARGET_SDL)
+static int num_mods = 0;
 static struct SampleInfo *Mod = NULL;
+#endif
 
 
 /*** THE STUFF BELOW IS ONLY USED BY THE SOUND SERVER CHILD PROCESS ***/
@@ -66,7 +70,7 @@ static void SoundServer_StopAllSounds();
 #endif
 
 #if defined(PLATFORM_UNIX)
-int OpenAudioDevice(char *audio_device_name)
+static int OpenAudioDevice(char *audio_device_name)
 {
   int audio_fd;
 
@@ -85,7 +89,7 @@ int OpenAudioDevice(char *audio_device_name)
   return audio_fd;
 }
 
-void UnixOpenAudio(void)
+static boolean TestAudioDevices(void)
 {
   static char *audio_device_name[] =
   {
@@ -103,12 +107,48 @@ void UnixOpenAudio(void)
   if (audio_fd < 0)
   {
     Error(ERR_WARN, "cannot open audio device - no sound");
-    return;
+    return FALSE;
   }
 
   close(audio_fd);
 
   audio.device_name = audio_device_name[i];
+
+  return TRUE;
+}
+
+static boolean ForkAudioProcess(void)
+{
+  if (pipe(audio.soundserver_pipe) < 0)
+  {
+    Error(ERR_WARN, "cannot create pipe - no sounds");
+    return FALSE;
+  }
+
+  if ((audio.soundserver_pid = fork()) < 0)
+  {       
+    Error(ERR_WARN, "cannot create sound server process - no sounds");
+    return FALSE;
+  }
+
+  if (audio.soundserver_pid == 0)	/* we are child */
+  {
+    SoundServer();
+
+    /* never reached */
+    exit(0);
+  }
+  else					/* we are parent */
+    close(audio.soundserver_pipe[0]); /* no reading from pipe needed */
+
+  return TRUE;
+}
+
+void UnixOpenAudio(void)
+{
+  if (!TestAudioDevices())
+    return;
+
   audio.sound_available = TRUE;
   audio.sound_enabled = TRUE;
 
@@ -122,25 +162,41 @@ void UnixCloseAudio(void)
 {
   if (audio.device_fd)
     close(audio.device_fd);
-}
 
+  if (audio.soundserver_pid)
+    kill(audio.soundserver_pid, SIGTERM);
+}
 #endif	/* PLATFORM_UNIX */
 
-void SoundServer()
+void InitPlaylist(void)
 {
   int i;
-#if defined(PLATFORM_UNIX)
-  struct SoundControl snd_ctrl;
-  fd_set sound_fdset;
-
-  close(audio.soundserver_pipe[1]);	/* no writing into pipe needed */
-#endif
 
   for(i=0;i<MAX_SOUNDS_PLAYING;i++)
     playlist[i] = emptySoundControl;
   playing_sounds = 0;
+}
+
+void StartSoundserver(void)
+{
+#if defined(PLATFORM_UNIX) && !defined(TARGET_SDL)
+  if (!ForkAudioProcess())
+    audio.sound_available = FALSE;
+#endif
+}
 
 #if defined(PLATFORM_UNIX)
+void SoundServer(void)
+{
+  int i;
+
+  struct SoundControl snd_ctrl;
+  fd_set sound_fdset;
+
+  close(audio.soundserver_pipe[1]);	/* no writing into pipe needed */
+
+  InitPlaylist();
+
   stereo_volume[PSND_MAX_LEFT2RIGHT] = 0;
   for(i=0;i<PSND_MAX_LEFT2RIGHT;i++)
     stereo_volume[i] =
@@ -304,8 +360,8 @@ void SoundServer()
 
 	    /* decrease volume if sound is fading out */
 	    if (playlist[i].fade_sound &&
-		playlist[i].volume>=PSND_MAX_VOLUME/10)
-	      playlist[i].volume-=PSND_MAX_VOLUME/20;
+		playlist[i].volume >= SOUND_FADING_VOLUME_THRESHOLD)
+	      playlist[i].volume -= SOUND_FADING_VOLUME_STEP;
 
 	    /* adjust volume of actual sound sample */
 	    if (playlist[i].volume != PSND_MAX_VOLUME)
@@ -350,7 +406,7 @@ void SoundServer()
 		playing_sounds--;
 	      }
 	    }
-	    else if (playlist[i].volume <= PSND_MAX_VOLUME/10)
+	    else if (playlist[i].volume <= SOUND_FADING_VOLUME_THRESHOLD)
 	    {
 	      playlist[i] = emptySoundControl;
 	      playing_sounds--;
@@ -432,14 +488,10 @@ void SoundServer()
 	close(audio.device_fd);
       }
     }
-
 #endif /* !AUDIO_STREAMING_DSP */
-
   }
-
-#endif /* PLATFORM_UNIX */
-
 }
+#endif /* PLATFORM_UNIX */
 
 #if defined(PLATFORM_MSDOS)
 static void sound_handler(struct SoundControl snd_ctrl)
@@ -913,6 +965,7 @@ boolean LoadSound(char *sound_name)
 
 boolean LoadMod(char *mod_name)
 {
+#if defined(TARGET_SDL)
   struct SampleInfo *mod_info;
   char filename[256];
 
@@ -925,17 +978,16 @@ boolean LoadMod(char *mod_name)
   sprintf(filename, "%s/%s/%s", options.ro_base_directory,
 	  MUSIC_DIRECTORY, mod_info->name);
 
-#if defined(TARGET_SDL)
   if ((mod_info->mix_music = Mix_LoadMUS(filename)) == NULL)
   {
-    Error(ERR_WARN, "cannot read music file '%s' - no sounds", filename);
+    Error(ERR_WARN, "cannot read music file '%s' - no music", filename);
     return FALSE;
   }
-#endif
-
-  audio.mods_available = TRUE;
 
   return TRUE;
+#else
+  return FALSE;
+#endif
 }
 
 int LoadMusic(void)
@@ -943,8 +995,8 @@ int LoadMusic(void)
   DIR *dir;
   struct dirent *dir_entry;
   char *music_directory = getPath2(options.ro_base_directory, MUSIC_DIRECTORY);
-
-  num_music = 0;
+  int num_wav_music = 0;
+  int num_mod_music = 0;
 
   if ((dir = opendir(music_directory)) == NULL)
   {
@@ -961,14 +1013,8 @@ int LoadMusic(void)
     if (strlen(filename) > 4 &&
 	strcmp(&filename[strlen(filename) - 4], ".wav") == 0)
     {
-      if (!LoadSoundExt(filename, TRUE))
-      {
-	audio.music_available = FALSE;
-	free(music_directory);
-	return num_music;
-      }
-
-      num_music++;
+      if (LoadSoundExt(filename, TRUE))
+	num_wav_music++;
     }
     else if (strlen(filename) > 4 &&
 	     (strcmp(&filename[strlen(filename) - 4], ".mod") == 0 ||
@@ -976,27 +1022,23 @@ int LoadMusic(void)
 	      strncmp(filename, "mod.", 4) == 0 ||
 	      strncmp(filename, "MOD.", 4) == 0))
     {
-      if (!LoadMod(filename))
-      {
-	audio.music_available = FALSE;
-	free(music_directory);
-	return num_music;
-      }
-
-      num_music++;
+      if (LoadMod(filename))
+	num_mod_music++;
     }
   }
 
   closedir(dir);
 
-  if (num_music == 0)
+  if (num_wav_music == 0 && num_mod_music == 0)
     Error(ERR_WARN, "cannot find any valid music files in directory '%s'",
 	  music_directory);
 
   free(music_directory);
 
-  if (num_mods > 0)
-    num_music = num_mods;
+  num_music = (num_mod_music > 0 ? num_mod_music : num_wav_music);
+
+  audio.mods_available = (num_mod_music > 0);
+  audio.music_available = (num_music > 0);
 
   return num_music;
 }
@@ -1006,16 +1048,16 @@ void PlayMusic(int nr)
   if (!audio.music_available)
     return;
 
-  if (num_mods == 0)
+  if (!audio.mods_available)
     nr = num_sounds - num_music + nr;
 
 #if defined(TARGET_SDL)
-  if (audio.mods_available)
+  if (audio.mods_available)	/* play MOD music */
   {
     Mix_VolumeMusic(SOUND_MAX_VOLUME);
     Mix_PlayMusic(Mod[nr].mix_music, -1);
   }
-  else	/* play music loop */
+  else				/* play WAV music loop */
   {
     Mix_Volume(audio.music_channel, SOUND_MAX_VOLUME);
     Mix_PlayChannel(audio.music_channel, Sound[nr].mix_chunk, -1);
