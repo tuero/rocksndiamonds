@@ -57,8 +57,8 @@ void SaveLevel(int);
 void SaveLevelTemplate();
 void DumpLevel(struct LevelInfo *);
 
-void CopyNativeLevel_RND_to_EM(struct LevelInfo *);
-void CopyNativeLevel_EM_to_RND(struct LevelInfo *);
+void CopyNativeLevel_RND_to_Native(struct LevelInfo *);
+void CopyNativeLevel_Native_to_RND(struct LevelInfo *);
 
 void LoadTapeFromFilename(char *);
 void LoadTape(int);

@@ -9017,6 +9017,8 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 	CopyPlayfield(level.field, FieldBackup);
 	CopyPlayfield(Feld, level.field);
 
+	CopyNativeLevel_RND_to_Native(&level);
+
 	UnmapLevelEditorGadgets();
 	UndrawSpecialEditorDoor();
 

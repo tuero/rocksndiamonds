@@ -1860,28 +1860,28 @@ static int map_element_RND_to_EM(int element_rnd)
     { Xfake_door_6,		EL_EMC_GATE_6_GRAY		},
     { Xfake_door_7,		EL_EMC_GATE_7_GRAY		},
     { Xfake_door_8,		EL_EMC_GATE_8_GRAY		},
-    { Xsteel_1,			EL_UNKNOWN			},
+    { Xsteel_1,			EL_STEELWALL			},
     { Xsteel_2,			EL_UNKNOWN			},
-    { Xsteel_3,			EL_UNKNOWN			},
+    { Xsteel_3,			EL_EMC_STEELWALL_1		},
     { Xsteel_4,			EL_UNKNOWN			},
-    { Xwall_1,			EL_UNKNOWN			},
+    { Xwall_1,			EL_WALL				},
     { Xwall_2,			EL_UNKNOWN			},
     { Xwall_3,			EL_UNKNOWN			},
     { Xwall_4,			EL_UNKNOWN			},
-    { Xround_wall_1,		EL_UNKNOWN			},
+    { Xround_wall_1,		EL_WALL_SLIPPERY		},
     { Xround_wall_2,		EL_UNKNOWN			},
     { Xround_wall_3,		EL_UNKNOWN			},
     { Xround_wall_4,		EL_UNKNOWN			},
     { Xdecor_1,			EL_UNKNOWN			},
-    { Xdecor_2,			EL_UNKNOWN			},
-    { Xdecor_3,			EL_UNKNOWN			},
-    { Xdecor_4,			EL_UNKNOWN			},
-    { Xdecor_5,			EL_UNKNOWN			},
-    { Xdecor_6,			EL_UNKNOWN			},
+    { Xdecor_2,			EL_EMC_WALL_6			},
+    { Xdecor_3,			EL_EMC_WALL_4			},
+    { Xdecor_4,			EL_EMC_WALL_5			},
+    { Xdecor_5,			EL_EMC_WALL_7			},
+    { Xdecor_6,			EL_EMC_WALL_8			},
     { Xdecor_7,			EL_UNKNOWN			},
-    { Xdecor_8,			EL_UNKNOWN			},
-    { Xdecor_9,			EL_UNKNOWN			},
-    { Xdecor_10,		EL_UNKNOWN			},
+    { Xdecor_8,			EL_EMC_WALL_1			},
+    { Xdecor_9,			EL_EMC_WALL_2			},
+    { Xdecor_10,		EL_EMC_WALL_3			},
     { Xdecor_11,		EL_UNKNOWN			},
     { Xdecor_12,		EL_UNKNOWN			},
     { Xalpha_0,			EL_CHAR('0')			},
@@ -2523,11 +2523,21 @@ static void LoadLevelFromFileInfo_EM(struct LevelInfo *level,
 {
   if (!LoadNativeLevel_EM(level_file_info->filename))
     level->no_valid_file = TRUE;
-
-  CopyNativeLevel_EM_to_RND(level);
 }
 
 #endif
+
+void CopyNativeLevel_RND_to_Native(struct LevelInfo *level)
+{
+  if (level->game_engine_type == GAME_ENGINE_TYPE_EM)
+    CopyNativeLevel_RND_to_EM(level);
+}
+
+void CopyNativeLevel_Native_to_RND(struct LevelInfo *level)
+{
+  if (level->game_engine_type == GAME_ENGINE_TYPE_EM)
+    CopyNativeLevel_EM_to_RND(level);
+}
 
 
 /* ------------------------------------------------------------------------- */
@@ -2902,6 +2912,8 @@ void LoadLevelFromFileInfo(struct LevelInfo *level,
 
   if (level->game_engine_type == GAME_ENGINE_TYPE_UNKNOWN)
     level->game_engine_type = GAME_ENGINE_TYPE_RND;
+
+  CopyNativeLevel_Native_to_RND(level);
 }
 
 void LoadLevelFromFilename(struct LevelInfo *level, char *filename)
