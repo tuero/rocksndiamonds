@@ -1098,8 +1098,7 @@ void InitElementProperties()
     EL_EDELSTEIN_GELB,
     EL_EDELSTEIN_ROT,
     EL_EDELSTEIN_LILA,
-    EL_DIAMANT,
-    EL_SP_INFOTRON
+    EL_DIAMANT
   };
   static int ep_gem_num = sizeof(ep_gem)/sizeof(int);
 

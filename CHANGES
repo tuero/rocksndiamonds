@@ -1,3 +1,8 @@
+Release Version 2.0.1 [?? ??? 2001]
+-----------------------------------
+	- bug in explosion code fixed that broke level 24 of "Baby Ghost Mine"
+	- Supaplex "orange disk" emulation bug fixed thanks to Mihail Milushev
+
 Release Version 2.0.0 [01 JAN 2001]
 -----------------------------------
 	- major code redesign to maintain generic game functions in a separate
@@ -5,9 +10,9 @@ Release Version 2.0.0 [01 JAN 2001]
 	- can be compiled with SDL library to build native Windows version
 	- DOS and Windows versions can be compiled with gcc cross-compiler
 	- trying to open already busy audio device does not block the game
-	- fixed network playing bug (patch from web site)
+	- bug in network playing code fixed (patch from web site)
 	- SDL version can load and play music modules
-	- fixed element description in level editor for EM doors and keys
+	- bug in level editor fixed for EM doors and keys element description
 	- sound sample frequency raised from 8 kHz to 22 kHz
 
 Release Version 1.4.0 [27 OCT 1999]

@@ -1107,7 +1107,9 @@ void DrawScreenElementExt(int x, int y, int dx, int dy, int element,
   else if ((element == EL_FELSBROCKEN ||
 	    element == EL_SP_ZONK ||
 	    element == EL_BD_ROCK ||
-	    IS_GEM(element)) && !cut_mode)
+	    element == EL_SP_INFOTRON ||
+	    IS_GEM(element))
+	   && !cut_mode)
   {
     if (uy >= lev_fieldy-1 || !IS_BELT(Feld[ux][uy+1]))
     {

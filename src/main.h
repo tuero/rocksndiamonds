@@ -96,6 +96,7 @@
 #define EP_BIT_BELT		(1 << 0)
 #define EP_BIT_BELT_SWITCH	(1 << 1)
 #define EP_BIT_TUBE		(1 << 2)
+#define EP_BIT_SLIPPERY_GEMS	(1 << 3)
 
 #define IS_AMOEBALIVE(e)	(Elementeigenschaften1[e] & EP_BIT_AMOEBALIVE)
 #define IS_AMOEBOID(e)		(Elementeigenschaften1[e] & EP_BIT_AMOEBOID)
@@ -132,6 +133,7 @@
 #define IS_BELT(e)		(Elementeigenschaften2[e] & EP_BIT_BELT)
 #define IS_BELT_SWITCH(e)	(Elementeigenschaften2[e] & EP_BIT_BELT_SWITCH)
 #define IS_TUBE(e)		(Elementeigenschaften2[e] & EP_BIT_TUBE)
+#define IS_SLIPPERY_GEMS(e)	(Elementeigenschaften2[e] & EP_BIT_SLIPPERY_GEMS)
 
 #define IS_PLAYER(x,y)		(ELEM_IS_PLAYER(StorePlayer[x][y]))
 
@@ -1525,7 +1527,7 @@ extern int		num_element_info;
 #define SETUPINPUT		9
 #define CALIBRATION		10
 
-#define PROGRAM_VERSION_STRING	"2.0.0"
+#define PROGRAM_VERSION_STRING	"2.0.1"
 #define PROGRAM_TITLE_STRING	"Rocks'n'Diamonds"
 #define PROGRAM_AUTHOR_STRING	"Holger Schemel"
 #define PROGRAM_RIGHTS_STRING	"Copyright ^1995-2001 by"

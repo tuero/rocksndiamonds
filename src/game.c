@@ -695,9 +695,9 @@ void InitGame()
     for (i=0; i<ep_slippery_num; i++)
     {
       if (game.version >= GAME_VERSION_2_0)
-	Elementeigenschaften1[ep_slippery[i]] |= EP_BIT_SLIPPERY;
+	Elementeigenschaften2[ep_slippery[i]] |= EP_BIT_SLIPPERY_GEMS;
       else
-	Elementeigenschaften1[ep_slippery[i]] &= ~EP_BIT_SLIPPERY;
+	Elementeigenschaften2[ep_slippery[i]] &= ~EP_BIT_SLIPPERY_GEMS;
     }
   }
 
@@ -2585,9 +2585,10 @@ void StartMoving(int x, int y)
 	     element != EL_DX_SUPABOMB)
 #endif
 #else
-    else if (IS_SLIPPERY(Feld[x][y+1]) &&
+    else if ((IS_SLIPPERY(Feld[x][y+1]) ||
+	      (IS_SLIPPERY_GEMS(Feld[x][y+1]) && IS_GEM(element))) &&
 	     !IS_FALLING(x, y+1) && !JustStopped[x][y+1] &&
-	     element != EL_DX_SUPABOMB)
+	     element != EL_DX_SUPABOMB && element != EL_SP_DISK_ORANGE)
 #endif
     {
       boolean left  = (x>0 && IS_FREE(x-1, y) &&
@@ -4420,15 +4421,17 @@ void GameActions()
     {
       StartMoving(x, y);
 
-      if (IS_GEM(element))
+      if (IS_GEM(element) || element == EL_SP_INFOTRON)
 	EdelsteinFunkeln(x, y);
     }
     else if (IS_MOVING(x, y))
       ContinueMoving(x, y);
     else if (IS_ACTIVE_BOMB(element))
       CheckDynamite(x, y);
+#if 0
     else if (element == EL_EXPLODING && !game.explosions_delayed)
       Explode(x, y, Frame[x][y], EX_NORMAL);
+#endif
     else if (element == EL_AMOEBING)
       AmoebeWaechst(x, y);
     else if (element == EL_DEAMOEBING)
@@ -4518,16 +4521,21 @@ void GameActions()
     }
   }
 
+#if 0
   if (game.explosions_delayed)
+#endif
   {
     game.explosions_delayed = FALSE;
 
     for (y=0; y<lev_fieldy; y++) for (x=0; x<lev_fieldx; x++)
     {
+      element = Feld[x][y];
+
       if (ExplodeField[x][y])
 	Explode(x, y, EX_PHASE_START, ExplodeField[x][y]);
-      else if (Feld[x][y] == EL_EXPLODING)
+      else if (element == EL_EXPLODING)
 	Explode(x, y, Frame[x][y], EX_NORMAL);
+
       ExplodeField[x][y] = EX_NO_EXPLOSION;
     }
 
