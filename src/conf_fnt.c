@@ -44,64 +44,132 @@ font_to_graphic[] =
     IMG_FONT_INITIAL_4
   },
   {
-    FONT_BIG_1,					-1,
-    IMG_FONT_BIG_1
+    FONT_TITLE_1,				-1,
+    IMG_FONT_TITLE_1
   },
   {
-    FONT_BIG_2,					-1,
-    IMG_FONT_BIG_2
+    FONT_TITLE_1,				GFX_SPECIAL_ARG_LEVELS,
+    IMG_FONT_TITLE_1_LEVELS
   },
   {
-    FONT_BIG_3,					-1,
-    IMG_FONT_BIG_3
+    FONT_TITLE_2,				-1,
+    IMG_FONT_TITLE_2
   },
   {
-    FONT_BIG_4,					-1,
-    IMG_FONT_BIG_4
+    FONT_MENU_1,				-1,
+    IMG_FONT_MENU_1
   },
   {
-    FONT_MEDIUM_1,				-1,
-    IMG_FONT_MEDIUM_1
+    FONT_MENU_2,				-1,
+    IMG_FONT_MENU_2
   },
   {
-    FONT_MEDIUM_2,				-1,
-    IMG_FONT_MEDIUM_2
+    FONT_TEXT_1,				-1,
+    IMG_FONT_TEXT_1
   },
   {
-    FONT_MEDIUM_3,				-1,
-    IMG_FONT_MEDIUM_3
+    FONT_TEXT_1,				GFX_SPECIAL_ARG_LEVELS,
+    IMG_FONT_TEXT_1_LEVELS
   },
   {
-    FONT_MEDIUM_4,				-1,
-    IMG_FONT_MEDIUM_4
+    FONT_TEXT_1,				GFX_SPECIAL_ARG_SCORES,
+    IMG_FONT_TEXT_1_SCORES
   },
   {
-    FONT_SMALL_1,				-1,
-    IMG_FONT_SMALL_1
+    FONT_TEXT_1,				GFX_SPECIAL_ARG_PREVIEW,
+    IMG_FONT_TEXT_1_PREVIEW
   },
   {
-    FONT_SMALL_2,				-1,
-    IMG_FONT_SMALL_2
+    FONT_TEXT_2,				-1,
+    IMG_FONT_TEXT_2
   },
   {
-    FONT_SMALL_3,				-1,
-    IMG_FONT_SMALL_3
+    FONT_TEXT_2,				GFX_SPECIAL_ARG_LEVELS,
+    IMG_FONT_TEXT_2_LEVELS
   },
   {
-    FONT_SMALL_4,				-1,
-    IMG_FONT_SMALL_4
+    FONT_TEXT_2,				GFX_SPECIAL_ARG_SCORES,
+    IMG_FONT_TEXT_2_SCORES
   },
   {
-    FONT_TAPE,					-1,
-    IMG_FONT_TAPE
+    FONT_TEXT_2,				GFX_SPECIAL_ARG_PREVIEW,
+    IMG_FONT_TEXT_2_PREVIEW
   },
   {
-    FONT_GAME,					-1,
-    IMG_FONT_GAME
+    FONT_TEXT_3,				-1,
+    IMG_FONT_TEXT_3
   },
   {
-    FONT_NARROW,				-1,
-    IMG_FONT_NARROW
+    FONT_TEXT_3,				GFX_SPECIAL_ARG_LEVELS,
+    IMG_FONT_TEXT_3_LEVELS
+  },
+  {
+    FONT_TEXT_3,				GFX_SPECIAL_ARG_SCORES,
+    IMG_FONT_TEXT_3_SCORES
+  },
+  {
+    FONT_TEXT_3,				GFX_SPECIAL_ARG_PREVIEW,
+    IMG_FONT_TEXT_3_PREVIEW
+  },
+  {
+    FONT_TEXT_4,				-1,
+    IMG_FONT_TEXT_4
+  },
+  {
+    FONT_TEXT_4,				GFX_SPECIAL_ARG_LEVELS,
+    IMG_FONT_TEXT_4_LEVELS
+  },
+  {
+    FONT_TEXT_4,				GFX_SPECIAL_ARG_SCORES,
+    IMG_FONT_TEXT_4_SCORES
+  },
+  {
+    FONT_INPUT,					-1,
+    IMG_FONT_INPUT
+  },
+  {
+    FONT_INPUT,					GFX_SPECIAL_ARG_MAIN,
+    IMG_FONT_INPUT_MAIN
+  },
+  {
+    FONT_INPUT_ACTIVE,				-1,
+    IMG_FONT_INPUT_ACTIVE
+  },
+  {
+    FONT_INPUT_ACTIVE,				GFX_SPECIAL_ARG_MAIN,
+    IMG_FONT_INPUT_ACTIVE_MAIN
+  },
+  {
+    FONT_INPUT_ACTIVE,				GFX_SPECIAL_ARG_SETUP,
+    IMG_FONT_INPUT_ACTIVE_SETUP
+  },
+  {
+    FONT_OPTION_OFF,				-1,
+    IMG_FONT_OPTION_OFF
+  },
+  {
+    FONT_OPTION_ON,				-1,
+    IMG_FONT_OPTION_ON
+  },
+  {
+    FONT_VALUE_1,				-1,
+    IMG_FONT_VALUE_1
+  },
+  {
+    FONT_VALUE_2,				-1,
+    IMG_FONT_VALUE_2
+  },
+  {
+    FONT_VALUE_OLD,				-1,
+    IMG_FONT_VALUE_OLD
+  },
+  {
+    FONT_LEVEL_NUMBER,				-1,
+    IMG_FONT_LEVEL_NUMBER
+  },
+  {
+    FONT_TAPE_RECORDER,				-1,
+    IMG_FONT_TAPE_RECORDER
   },
   {
     -1,						-1,

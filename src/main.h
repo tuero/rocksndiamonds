@@ -752,10 +752,16 @@
 #define NUM_ACTIONS				21
 
 /* values for special image configuration suffixes */
-#define GFX_SPECIAL_ARG_EDITOR			0
-#define GFX_SPECIAL_ARG_PREVIEW			1
+#define GFX_SPECIAL_ARG_MAIN			0
+#define GFX_SPECIAL_ARG_LEVELS			1
+#define GFX_SPECIAL_ARG_SCORES			2
+#define GFX_SPECIAL_ARG_EDITOR			3
+#define GFX_SPECIAL_ARG_INFO			4
+#define GFX_SPECIAL_ARG_SETUP			5
+#define GFX_SPECIAL_ARG_DOOR			6
+#define GFX_SPECIAL_ARG_PREVIEW			7
 
-#define NUM_SPECIAL_GFX_ARGS			2
+#define NUM_SPECIAL_GFX_ARGS			8
 
 
 /* values for image configuration suffixes */
@@ -799,30 +805,26 @@
 #define FONT_INITIAL_2				1
 #define FONT_INITIAL_3				2
 #define FONT_INITIAL_4				3
-#define FONT_BIG_1				4
-#define FONT_BIG_2				5
-#define FONT_BIG_3				6
-#define FONT_BIG_4				7
-#define FONT_MEDIUM_1				8
-#define FONT_MEDIUM_2				9
-#define FONT_MEDIUM_3				10
-#define FONT_MEDIUM_4				11
-#define FONT_SMALL_1				12
-#define FONT_SMALL_2				13
-#define FONT_SMALL_3				14
-#define FONT_SMALL_4				15
-#define FONT_TAPE				16
-#define FONT_GAME				17
-#define FONT_NARROW				18
+#define FONT_TITLE_1				4
+#define FONT_TITLE_2				5
+#define FONT_MENU_1				6
+#define FONT_MENU_2				7
+#define FONT_TEXT_1				8
+#define FONT_TEXT_2				9
+#define FONT_TEXT_3				10
+#define FONT_TEXT_4				11
+#define FONT_INPUT				12
+#define FONT_INPUT_ACTIVE			13
+#define FONT_OPTION_OFF				14
+#define FONT_OPTION_ON				15
+#define FONT_VALUE_1				16
+#define FONT_VALUE_2				17
+#define FONT_VALUE_OLD				18
+#define FONT_TAPE_RECORDER			19
+#define FONT_LEVEL_NUMBER			20
 
-#define NUM_FONTS				19
+#define NUM_FONTS				21
 #define NUM_INITIAL_FONTS			4
-
-#define FIRST_IMG_FONT				IMG_FONT_INITIAL_1
-#define LAST_IMG_FONT				IMG_FONT_NARROW
-
-#define NUM_IMG_FONTS				(LAST_IMG_FONT - \
-						 FIRST_IMG_FONT + 1)
 
 
 /* values for game_status */
@@ -835,6 +837,8 @@
 #define TYPENAME		6
 #define HALLOFFAME		7
 #define SETUP			8
+#define PSEUDO_PREVIEW		9
+#define PSEUDO_DOOR		10
 
 #define PROGRAM_VERSION_MAJOR	2
 #define PROGRAM_VERSION_MINOR	2

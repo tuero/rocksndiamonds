@@ -1611,12 +1611,12 @@ static void ReinitializeElementListButtons()
 
 static int getCounterGadgetWidth()
 {
-  return (DXSIZE + getFontWidth(FONT_DEFAULT_SMALL) - 2 * ED_GADGET_DISTANCE);
+  return (DXSIZE + getFontWidth(FONT_INPUT) - 2 * ED_GADGET_DISTANCE);
 }
 
 static int getMaxInfoTextLength()
 {
-  return (SXSIZE / getFontWidth(FONT_DEFAULT_SMALL));
+  return (SXSIZE / getFontWidth(FONT_TEXT_2));
 }
 
 static char *getElementInfoText(int element)
@@ -1963,7 +1963,7 @@ static void CreateCounterButtons()
 
       if (j == 0)
       {
-	int font_type = FONT_DEFAULT_SMALL;
+	int font_type = FONT_INPUT;
 	int gd_width = ED_WIN_COUNT_XSIZE;
 
 	id = counterbutton_info[i].gadget_id_text;
@@ -1971,7 +1971,7 @@ static void CreateCounterButtons()
 
 	if (i == ED_COUNTER_ID_SELECT_LEVEL)
 	{
-	  font_type = FONT_SPECIAL_NARROW;
+	  font_type = FONT_LEVEL_NUMBER;
 
 	  xpos += 2 * ED_GADGET_DISTANCE;
 	  ypos -= ED_GADGET_DISTANCE;
@@ -2141,7 +2141,7 @@ static void CreateTextInputGadgets()
 		      GDI_TYPE, GD_TYPE_TEXTINPUT_ALPHANUMERIC,
 		      GDI_TEXT_VALUE, textinput_info[i].value,
 		      GDI_TEXT_SIZE, textinput_info[i].size,
-		      GDI_TEXT_FONT, FONT_DEFAULT_SMALL,
+		      GDI_TEXT_FONT, FONT_INPUT,
 		      GDI_DESIGN_UNPRESSED, gd_bitmap, gd_x, gd_y,
 		      GDI_DESIGN_PRESSED, gd_bitmap, gd_x, gd_y,
 		      GDI_BORDER_SIZE, ED_BORDER_SIZE,
@@ -2834,7 +2834,6 @@ static void DrawLevelInfoWindow()
   int yoffset_right = ED_BORDER_SIZE;
   int xoffset_right2 = ED_CHECKBUTTON_XSIZE + 2 * ED_GADGET_DISTANCE;
   int yoffset_right2 = ED_BORDER_SIZE;
-  int font_color = FONT(FS_SMALL, FC_GREEN);
   int i, x, y;
 
   SetMainBackgroundImage(IMG_BACKGROUND_EDITOR);
@@ -2842,9 +2841,9 @@ static void DrawLevelInfoWindow()
   UnmapLevelEditorWindowGadgets();
 
   DrawText(SX + ED_SETTINGS2_XPOS, SY + ED_SETTINGS_YPOS,
-	   "Level Settings", FONT_DEFAULT_BIG);
+	   "Level Settings", FONT_TITLE_1);
   DrawText(SX + ED_SETTINGS2_XPOS, SY + ED_SETTINGS2_YPOS,
-	   "Editor Settings", FONT_DEFAULT_BIG);
+	   "Editor Settings", FONT_TITLE_1);
 
   /* draw counter gadgets */
   for (i=ED_COUNTER_ID_LEVEL_FIRST; i<=ED_COUNTER_ID_LEVEL_LAST; i++)
@@ -2856,7 +2855,7 @@ static void DrawLevelInfoWindow()
 
       sprintf(infotext, "%s:", counterbutton_info[i].infotext_above);
       infotext[max_infotext_len] = '\0';
-      DrawTextF(x, y, font_color, infotext);
+      DrawTextF(x, y, FONT_TEXT_1, infotext);
     }
 
     if (counterbutton_info[i].infotext_right)
@@ -2866,7 +2865,7 @@ static void DrawLevelInfoWindow()
 
       sprintf(infotext, "%s", counterbutton_info[i].infotext_right);
       infotext[max_infotext_len] = '\0';
-      DrawTextF(x, y, font_color, infotext);
+      DrawTextF(x, y, FONT_TEXT_1, infotext);
     }
 
     ModifyEditorCounter(i, *counterbutton_info[i].value);
@@ -2882,7 +2881,7 @@ static void DrawLevelInfoWindow()
     sprintf(infotext, "%s:", textinput_info[i].infotext);
     infotext[max_infotext_len] = '\0';
 
-    DrawTextF(x, y, font_color, infotext);
+    DrawTextF(x, y, FONT_TEXT_1, infotext);
     ModifyEditorTextInput(i, textinput_info[i].value);
     MapTextInputGadget(i);
   }
@@ -2896,7 +2895,7 @@ static void DrawLevelInfoWindow()
     x = radiobutton_info[i].x + xoffset_right2;
     y = radiobutton_info[i].y + yoffset_right2;
 
-    DrawTextF(x, y, font_color, radiobutton_info[i].text);
+    DrawTextF(x, y, FONT_TEXT_1, radiobutton_info[i].text);
     ModifyGadget(level_editor_gadget[radiobutton_info[i].gadget_id],
 		 GDI_CHECKED, checked, GDI_END);
     MapRadiobuttonGadget(i);
@@ -2908,7 +2907,7 @@ static void DrawLevelInfoWindow()
     x = checkbutton_info[i].x + xoffset_right2;
     y = checkbutton_info[i].y + yoffset_right2;
 
-    DrawTextF(x, y, font_color, checkbutton_info[i].text);
+    DrawTextF(x, y, FONT_TEXT_1, checkbutton_info[i].text);
     ModifyGadget(level_editor_gadget[checkbutton_info[i].gadget_id],
 		 GDI_CHECKED, *checkbutton_info[i].value, GDI_END);
     MapCheckbuttonGadget(i);
@@ -2924,14 +2923,13 @@ static void DrawAmoebaContentArea()
   int area_y = ED_AREA_ELEM_CONTENT_YPOS / MINI_TILEY;
   int area_sx = SX + ED_AREA_ELEM_CONTENT_XPOS;
   int area_sy = SY + ED_AREA_ELEM_CONTENT_YPOS;
-  int font_color = FONT(FS_SMALL, FC_GREEN);
 
   ElementContent[0][0][0] = level.amoeba_content;
 
   DrawElementBorder(area_sx, area_sy, MINI_TILEX, MINI_TILEY);
   DrawMiniElement(area_x, area_y, ElementContent[0][0][0]);
 
-  DrawText(area_sx + TILEX, area_sy + 1, "Content of amoeba", font_color);
+  DrawText(area_sx + TILEX, area_sy + 1, "Content of amoeba", FONT_TEXT_1);
 
   MapDrawingArea(GADGET_ID_AMOEBA_CONTENT);
 }
@@ -2945,7 +2943,6 @@ static void DrawElementContentAreas()
   int area_sy = SY + ED_AREA_ELEM_CONTENT_YPOS;
   int xoffset_right = getCounterGadgetWidth();
   int yoffset_right = ED_BORDER_SIZE;
-  int font_color = FONT(FS_SMALL, FC_GREEN);
   int i, x, y;
 
   for (i=0; i<MAX_ELEMENT_CONTENTS; i++)
@@ -2959,7 +2956,7 @@ static void DrawElementContentAreas()
   /* display counter to choose number of element content areas */
   x = counterbutton_info[counter_id].x + xoffset_right;
   y = counterbutton_info[counter_id].y + yoffset_right;
-  DrawTextF(x, y, font_color, "number of content areas");
+  DrawTextF(x, y, FONT_TEXT_1, "number of content areas");
 
   ModifyEditorCounter(counter_id, *counterbutton_info[counter_id].value);
   MapCounterButtons(counter_id);
@@ -2973,11 +2970,11 @@ static void DrawElementContentAreas()
 		      3 * MINI_TILEX, 3 * MINI_TILEY);
 
   DrawText(area_sx + (5 * 4 - 1) * MINI_TILEX, area_sy + 0 * MINI_TILEY + 1,
-	   "Content", font_color);
+	   "Content", FONT_TEXT_1);
   DrawText(area_sx + (5 * 4 - 1) * MINI_TILEX, area_sy + 1 * MINI_TILEY + 1,
-	   "when",    font_color);
+	   "when",    FONT_TEXT_1);
   DrawText(area_sx + (5 * 4 - 1) * MINI_TILEX, area_sy + 2 * MINI_TILEY + 1,
-	   "smashed", font_color);
+	   "smashed", FONT_TEXT_1);
 
   for (i=0; i<level.num_yam_contents; i++)
   {
@@ -2988,7 +2985,7 @@ static void DrawElementContentAreas()
 
     DrawTextF(area_sx - SX + 5 * (i % 4) * MINI_TILEX + MINI_TILEX + 1,
 	      area_sy - SY + 6 * (i / 4) * MINI_TILEY + 4 * MINI_TILEY - 4,
-	      font_color, "%d", i + 1);
+	      FONT_TEXT_1, "%d", i + 1);
   }
 
   for (i=0; i<level.num_yam_contents; i++)
@@ -3012,7 +3009,6 @@ static void DrawPropertiesWindow()
   int yoffset_right2 = ED_BORDER_SIZE;
   int xstart = 2;
   int ystart = 4;
-  int font_color = FONT(FS_SMALL, FC_GREEN);
   int i, x, y;
   static struct
   {
@@ -3074,7 +3070,7 @@ static void DrawPropertiesWindow()
   UnmapLevelEditorWindowGadgets();
 
   DrawText(SX + ED_SETTINGS2_XPOS, SY + ED_SETTINGS_YPOS,
-	   "Element Settings", FONT_DEFAULT_BIG);
+	   "Element Settings", FONT_TITLE_1);
 
   DrawElementBorder(SX + xstart * MINI_TILEX,
 		    SY + ystart * MINI_TILEY + MINI_TILEY / 2,
@@ -3087,7 +3083,7 @@ static void DrawPropertiesWindow()
   FrameCounter = 0;	/* restart animation frame counter */
 
   DrawTextF((xstart + 3) * MINI_TILEX, (ystart + 1) * MINI_TILEY,
-	    font_color, getElementInfoText(properties_element));
+	    FONT_TEXT_1, getElementInfoText(properties_element));
 
   num_elements_in_level = 0;
   for (y=0; y<lev_fieldy; y++) 
@@ -3096,9 +3092,9 @@ static void DrawPropertiesWindow()
 	num_elements_in_level++;
   percentage = num_elements_in_level * 100.0 / (lev_fieldx * lev_fieldy);
 
-  DrawTextF(ED_SETTINGS_XPOS, 5 * TILEY, font_color, "In this level:");
-  DrawTextF(ED_SETTINGS_XPOS + 15 * getFontWidth(font_color), 5 * TILEY,
-	    FONT(FS_SMALL, FC_YELLOW), "%d (%.2f%%)", num_elements_in_level,
+  DrawTextF(ED_SETTINGS_XPOS, 5 * TILEY, FONT_TEXT_1, "In this level:");
+  DrawTextF(ED_SETTINGS_XPOS + 15 * getFontWidth(FONT_TEXT_1), 5 * TILEY,
+	    FONT_TEXT_2, "%d (%.2f%%)", num_elements_in_level,
 	    percentage);
 
   /* check if there are elements where a score can be chosen for */
@@ -3110,7 +3106,7 @@ static void DrawPropertiesWindow()
       int y = counterbutton_info[counter_id].y + yoffset_right;
 
       counterbutton_info[counter_id].value = elements_with_counter[i].value;
-      DrawTextF(x, y, font_color, elements_with_counter[i].text);
+      DrawTextF(x, y, FONT_TEXT_1, elements_with_counter[i].text);
 
       ModifyEditorCounter(counter_id,  *counterbutton_info[counter_id].value);
       MapCounterButtons(counter_id);
@@ -3125,7 +3121,7 @@ static void DrawPropertiesWindow()
     x = checkbutton_info[i].x + xoffset_right2;
     y = checkbutton_info[i].y + yoffset_right2;
 
-    DrawTextF(x, y, font_color, checkbutton_info[i].text);
+    DrawTextF(x, y, FONT_TEXT_1, checkbutton_info[i].text);
     ModifyGadget(level_editor_gadget[checkbutton_info[i].gadget_id],
 		 GDI_CHECKED, *checkbutton_info[i].value, GDI_END);
     MapCheckbuttonGadget(i);
@@ -3143,7 +3139,7 @@ static void DrawPropertiesWindow()
     x = checkbutton_info[i].x + xoffset_right2;
     y = checkbutton_info[i].y + yoffset_right2;
 
-    DrawTextF(x, y, font_color, checkbutton_info[i].text);
+    DrawTextF(x, y, FONT_TEXT_1, checkbutton_info[i].text);
     ModifyGadget(level_editor_gadget[checkbutton_info[i].gadget_id],
 		 GDI_CHECKED, *checkbutton_info[i].value, GDI_END);
     MapCheckbuttonGadget(i);
@@ -3162,7 +3158,7 @@ static void DrawPropertiesWindow()
 
     checkbutton_info[i].value = &custom_element_properties[nr].indestructible;
 
-    DrawTextF(x, y, font_color, checkbutton_info[i].text);
+    DrawTextF(x, y, FONT_TEXT_1, checkbutton_info[i].text);
     ModifyGadget(level_editor_gadget[checkbutton_info[i].gadget_id],
 		 GDI_CHECKED, *checkbutton_info[i].value, GDI_END);
     MapCheckbuttonGadget(i);
@@ -3174,7 +3170,7 @@ static void DrawPropertiesWindow()
 
     checkbutton_info[i].value = &custom_element_properties[nr].can_fall;
 
-    DrawTextF(x, y, font_color, checkbutton_info[i].text);
+    DrawTextF(x, y, FONT_TEXT_1, checkbutton_info[i].text);
     ModifyGadget(level_editor_gadget[checkbutton_info[i].gadget_id],
 		 GDI_CHECKED, *checkbutton_info[i].value, GDI_END);
     MapCheckbuttonGadget(i);
@@ -3186,7 +3182,7 @@ static void DrawPropertiesWindow()
 
     checkbutton_info[i].value = &custom_element_properties[nr].can_smash;
 
-    DrawTextF(x, y, font_color, checkbutton_info[i].text);
+    DrawTextF(x, y, FONT_TEXT_1, checkbutton_info[i].text);
     ModifyGadget(level_editor_gadget[checkbutton_info[i].gadget_id],
 		 GDI_CHECKED, *checkbutton_info[i].value, GDI_END);
     MapCheckbuttonGadget(i);
@@ -3198,7 +3194,7 @@ static void DrawPropertiesWindow()
 
     checkbutton_info[i].value = &custom_element_properties[nr].pushable;
 
-    DrawTextF(x, y, font_color, checkbutton_info[i].text);
+    DrawTextF(x, y, FONT_TEXT_1, checkbutton_info[i].text);
     ModifyGadget(level_editor_gadget[checkbutton_info[i].gadget_id],
 		 GDI_CHECKED, *checkbutton_info[i].value, GDI_END);
     MapCheckbuttonGadget(i);
@@ -3210,7 +3206,7 @@ static void DrawPropertiesWindow()
 
     checkbutton_info[i].value = &custom_element_properties[nr].slippery;
 
-    DrawTextF(x, y, font_color, checkbutton_info[i].text);
+    DrawTextF(x, y, FONT_TEXT_1, checkbutton_info[i].text);
     ModifyGadget(level_editor_gadget[checkbutton_info[i].gadget_id],
 		 GDI_CHECKED, *checkbutton_info[i].value, GDI_END);
     MapCheckbuttonGadget(i);
@@ -4596,7 +4592,7 @@ void HandleEditorGadgetInfoText(void *ptr)
     }
   }
 
-  DrawText(INFOTEXT_XPOS, INFOTEXT_YPOS, infotext, FONT_DEFAULT_SMALL);
+  DrawText(INFOTEXT_XPOS, INFOTEXT_YPOS, infotext, FONT_TEXT_2);
 }
 
 static void HandleDrawingAreaInfo(struct GadgetInfo *gi)
@@ -4690,18 +4686,18 @@ static void HandleDrawingAreaInfo(struct GadgetInfo *gi)
 	}
 
 	if (drawing_function == GADGET_ID_PICK_ELEMENT)
-	  DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_DEFAULT_SMALL,
+	  DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2,
 		    "%s: %d, %d", infotext, lx, ly);
 	else
-	  DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_DEFAULT_SMALL,
+	  DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2,
 		    "%s: %d, %d", infotext,
 		    ABS(lx - start_lx) + 1, ABS(ly - start_ly) + 1);
       }
       else if (drawing_function == GADGET_ID_PICK_ELEMENT)
-	DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_DEFAULT_SMALL,
+	DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2,
 		  "%s", getElementInfoText(Feld[lx][ly]));
       else
-	DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_DEFAULT_SMALL,
+	DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2,
 		  "Level position: %d, %d", lx, ly);
     }
 
@@ -4715,13 +4711,13 @@ static void HandleDrawingAreaInfo(struct GadgetInfo *gi)
     }
   }
   else if (id == GADGET_ID_AMOEBA_CONTENT)
-    DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_DEFAULT_SMALL,
+    DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2,
 	      "Amoeba content");
   else if (id == GADGET_ID_RANDOM_BACKGROUND)
-    DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_DEFAULT_SMALL,
+    DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2,
 	      "Random placement background");
   else
-    DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_DEFAULT_SMALL,
+    DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2,
 	      "Content area %d position: %d, %d",
 	      id - GADGET_ID_ELEM_CONTENT_0 + 1, sx, sy);
 }

@@ -240,11 +240,11 @@ void DrawVideoDisplay(unsigned long state, unsigned long value)
     int jahr = (value/10000);
 
     DrawText(VX + VIDEO_DATE_XPOS, VY + VIDEO_DATE_YPOS,
-	     int2str(tag, 2), FONT_SPECIAL_TAPE);
+	     int2str(tag, 2), FONT_TAPE_RECORDER);
     DrawText(VX + VIDEO_DATE_XPOS + 27, VY + VIDEO_DATE_YPOS,
-	     monatsname[monat], FONT_SPECIAL_TAPE);
+	     monatsname[monat], FONT_TAPE_RECORDER);
     DrawText(VX + VIDEO_DATE_XPOS + 64, VY + VIDEO_DATE_YPOS,
-	     int2str(jahr, 2), FONT_SPECIAL_TAPE);
+	     int2str(jahr, 2), FONT_TAPE_RECORDER);
   }
 
   if (state & VIDEO_STATE_TIME_ON)
@@ -253,9 +253,9 @@ void DrawVideoDisplay(unsigned long state, unsigned long value)
     int sec = value % 60;
 
     DrawText(VX + VIDEO_TIME_XPOS, VY + VIDEO_TIME_YPOS,
-	     int2str(min, 2), FONT_SPECIAL_TAPE);
+	     int2str(min, 2), FONT_TAPE_RECORDER);
     DrawText(VX + VIDEO_TIME_XPOS + 27, VY + VIDEO_TIME_YPOS,
-	     int2str(sec, 2), FONT_SPECIAL_TAPE);
+	     int2str(sec, 2), FONT_TAPE_RECORDER);
   }
 
   if (state & VIDEO_STATE_DATE)

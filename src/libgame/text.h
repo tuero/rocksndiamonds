@@ -17,39 +17,17 @@
 #include "system.h"
 
 
-/* font types */
-#define FS_INITIAL		0
-#define FS_BIG			1
-#define FS_MEDIUM		2
-#define FS_SMALL		3
+/* default fonts */
+#define FONT_INITIAL_1		0
+#define FONT_INITIAL_2		1
+#define FONT_INITIAL_3		2
+#define FONT_INITIAL_4		3
 
 /* font colors */
-#define FC_RED			0
-#define FC_BLUE			1
-#define FC_GREEN		2
-#define FC_YELLOW		3
-
-/* special fonts */
-#define FC_SPECIAL_TAPE		4
-#define FC_SPECIAL_GAME		5
-#define FC_SPECIAL_NARROW	6
-
-#define FONT(fs, fc)		((	(fs) == FS_INITIAL ?		\
-					IMG_FONT_INITIAL_1 + (fc) :	\
-					(fs) == FS_BIG ?		\
-					IMG_FONT_BIG_1 + (fc) :		\
-					(fs) == FS_MEDIUM ?		\
-					IMG_FONT_MEDIUM_1 + (fc) :	\
-					(fs) == FS_SMALL ?		\
-					IMG_FONT_SMALL_1 + (fc)	:	\
-					IMG_FONT_SMALL_1		\
-			         ) - FIRST_IMG_FONT)
-
-#define FONT_DEFAULT_BIG	FONT(FS_BIG,   FC_YELLOW)
-#define FONT_DEFAULT_SMALL	FONT(FS_SMALL, FC_YELLOW)
-#define FONT_SPECIAL_TAPE	FONT(FS_SMALL, FC_SPECIAL_TAPE)
-#define FONT_SPECIAL_GAME	FONT(FS_SMALL, FC_SPECIAL_GAME)
-#define FONT_SPECIAL_NARROW	FONT(FS_SMALL, FC_SPECIAL_NARROW)
+#define FC_RED			FONT_INITIAL_1
+#define FC_BLUE			FONT_INITIAL_2
+#define FC_GREEN		FONT_INITIAL_3
+#define FC_YELLOW		FONT_INITIAL_4
 
 #define FONT_CHARS_PER_LINE	16
 #define FONT_LINES_PER_FONT	4

@@ -476,13 +476,13 @@ void DrawGameDoorValues()
 			   el2edimg(EL_KEY1 + j));
 
   DrawText(DX + XX_EMERALDS, DY + YY_EMERALDS,
-	   int2str(local_player->gems_still_needed, 3), FONT_DEFAULT_SMALL);
+	   int2str(local_player->gems_still_needed, 3), FONT_TEXT_2);
   DrawText(DX + XX_DYNAMITE, DY + YY_DYNAMITE,
-	   int2str(local_player->dynamite, 3), FONT_DEFAULT_SMALL);
+	   int2str(local_player->dynamite, 3), FONT_TEXT_2);
   DrawText(DX + XX_SCORE, DY + YY_SCORE,
-	   int2str(local_player->score, 5), FONT_DEFAULT_SMALL);
+	   int2str(local_player->score, 5), FONT_TEXT_2);
   DrawText(DX + XX_TIME, DY + YY_TIME,
-	   int2str(TimeLeft, 3), FONT_DEFAULT_SMALL);
+	   int2str(TimeLeft, 3), FONT_TEXT_2);
 }
 
 
@@ -909,16 +909,15 @@ void InitGame()
 	     DOOR_GFX_PAGEX5, DOOR_GFX_PAGEY1, DXSIZE, DYSIZE, DX, DY);
 
   if (level_nr < 100)
-    DrawText(DX + XX_LEVEL, DY + YY_LEVEL,
-	     int2str(level_nr, 2), FONT_DEFAULT_SMALL);
+    DrawText(DX + XX_LEVEL, DY + YY_LEVEL, int2str(level_nr, 2), FONT_TEXT_2);
   else
   {
     DrawTextExt(drawto, DX + XX_EMERALDS, DY + YY_EMERALDS,
-		int2str(level_nr, 3), FONT_SPECIAL_NARROW, FONT_OPAQUE);
+		int2str(level_nr, 3), FONT_LEVEL_NUMBER, FONT_OPAQUE);
     BlitBitmap(drawto, drawto,
 	       DX + XX_EMERALDS, DY + YY_EMERALDS + 1,
-	       getFontWidth(FONT_SPECIAL_NARROW) * 3,
-	       getFontHeight(FONT_SPECIAL_NARROW) - 1,
+	       getFontWidth(FONT_LEVEL_NUMBER) * 3,
+	       getFontHeight(FONT_LEVEL_NUMBER) - 1,
 	       DX + XX_LEVEL - 1, DY + YY_LEVEL + 1);
   }
 
@@ -1112,7 +1111,7 @@ void GameWon()
 	TimeLeft -= 10;
       else
 	TimeLeft--;
-      DrawText(DX_TIME, DY_TIME, int2str(TimeLeft, 3), FONT_DEFAULT_SMALL);
+      DrawText(DX_TIME, DY_TIME, int2str(TimeLeft, 3), FONT_TEXT_2);
       BackToFront();
 
       if (!tape.playing)
@@ -1138,7 +1137,7 @@ void GameWon()
 	TimePlayed += 10;
       else
 	TimePlayed++;
-      DrawText(DX_TIME, DY_TIME, int2str(TimePlayed, 3), FONT_DEFAULT_SMALL);
+      DrawText(DX_TIME, DY_TIME, int2str(TimePlayed, 3), FONT_TEXT_2);
       BackToFront();
 
       if (!tape.playing)
@@ -4842,14 +4841,14 @@ void GameActions()
       if (TimeLeft <= 10 && setup.time_limit)
 	PlaySoundStereo(SND_GAME_RUNNING_OUT_OF_TIME, SOUND_MAX_RIGHT);
 
-      DrawText(DX_TIME, DY_TIME, int2str(TimeLeft, 3), FONT_DEFAULT_SMALL);
+      DrawText(DX_TIME, DY_TIME, int2str(TimeLeft, 3), FONT_TEXT_2);
 
       if (!TimeLeft && setup.time_limit)
 	for (i=0; i<MAX_PLAYERS; i++)
 	  KillHero(&stored_player[i]);
     }
     else if (level.time == 0 && !AllPlayersGone) /* level without time limit */
-      DrawText(DX_TIME, DY_TIME, int2str(TimePlayed, 3), FONT_DEFAULT_SMALL);
+      DrawText(DX_TIME, DY_TIME, int2str(TimePlayed, 3), FONT_TEXT_2);
   }
 
   DrawAllPlayers();
@@ -5673,8 +5672,7 @@ int DigField(struct PlayerInfo *player,
 	local_player->gems_still_needed = 0;
       RaiseScoreElement(element);
       DrawText(DX_EMERALDS, DY_EMERALDS,
-	       int2str(local_player->gems_still_needed, 3),
-	       FONT_DEFAULT_SMALL);
+	       int2str(local_player->gems_still_needed, 3), FONT_TEXT_2);
       PlaySoundLevelElementAction(x, y, element, ACTION_COLLECTING);
       break;
 
@@ -5694,7 +5692,7 @@ int DigField(struct PlayerInfo *player,
       if (level.time > 0)
       {
 	TimeLeft += 10;
-	DrawText(DX_TIME, DY_TIME, int2str(TimeLeft, 3), FONT_DEFAULT_SMALL);
+	DrawText(DX_TIME, DY_TIME, int2str(TimeLeft, 3), FONT_TEXT_2);
       }
       PlaySoundStereo(SND_EXTRA_TIME_COLLECTING, SOUND_MAX_RIGHT);
       break;
@@ -5718,8 +5716,8 @@ int DigField(struct PlayerInfo *player,
       player->dynamite++;
       player->use_disk_red_graphic = (element == EL_SP_DISK_RED);
       RaiseScoreElement(EL_DYNAMITE);
-      DrawText(DX_DYNAMITE, DY_DYNAMITE,
-	       int2str(local_player->dynamite, 3), FONT_DEFAULT_SMALL);
+      DrawText(DX_DYNAMITE, DY_DYNAMITE, int2str(local_player->dynamite, 3),
+	       FONT_TEXT_2);
       PlaySoundLevelElementAction(x, y, element, ACTION_COLLECTING);
       break;
 
@@ -6124,7 +6122,7 @@ int DigField(struct PlayerInfo *player,
     case EL_TIME_ORB_FULL:
       Feld[x][y] = EL_TIME_ORB_EMPTY;
       TimeLeft += 10;
-      DrawText(DX_TIME, DY_TIME, int2str(TimeLeft, 3), FONT_DEFAULT_SMALL);
+      DrawText(DX_TIME, DY_TIME, int2str(TimeLeft, 3), FONT_TEXT_2);
       DrawLevelField(x, y);
       PlaySoundStereo(SND_TIME_ORB_FULL_COLLECTING, SOUND_MAX_RIGHT);
       return MF_ACTION;
@@ -6351,7 +6349,7 @@ boolean PlaceBomb(struct PlayerInfo *player)
     player->dynamite--;
 
     DrawText(DX_DYNAMITE, DY_DYNAMITE, int2str(local_player->dynamite, 3),
-	     FONT_DEFAULT_SMALL);
+	     FONT_TEXT_2);
     if (IN_SCR_FIELD(SCREENX(jx), SCREENY(jy)))
     {
 #if 1
@@ -6473,8 +6471,7 @@ static void PlaySoundLevelElementAction(int x, int y, int element,
 void RaiseScore(int value)
 {
   local_player->score += value;
-  DrawText(DX_SCORE, DY_SCORE, int2str(local_player->score, 5),
-	   FONT_DEFAULT_SMALL);
+  DrawText(DX_SCORE, DY_SCORE, int2str(local_player->score, 5), FONT_TEXT_2);
 }
 
 void RaiseScoreElement(int element)

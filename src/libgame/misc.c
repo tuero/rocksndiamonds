@@ -1568,7 +1568,7 @@ int get_parameter_value(char *token, char *value_raw, int type)
 	      string_has_parameter(value, "pingpong")  ? ANIM_PINGPONG :
 	      string_has_parameter(value, "pingpong2") ? ANIM_PINGPONG2 :
 	      string_has_parameter(value, "random")    ? ANIM_RANDOM :
-	      ANIM_NONE);
+	      ANIM_LOOP);
 
     if (string_has_parameter(value, "reverse"))
       result |= ANIM_REVERSE;

@@ -118,6 +118,8 @@ void OpenAll()
     return;
   }
 
+  game_status = MAINMENU;
+
   DrawMainMenu();
 
   InitNetworkServer();
@@ -737,8 +739,27 @@ void InitElementSmallImages()
 
 static int getFontBitmapID(int font_nr)
 {
-  if (game_status == LEVELED)
-    return font_info[font_nr].special_bitmap_id[GFX_SPECIAL_ARG_EDITOR];
+  int special = -1;
+
+  if (game_status == MAINMENU || game_status == TYPENAME)
+    special = GFX_SPECIAL_ARG_MAIN;
+  else if (game_status == CHOOSELEVEL)
+    special = GFX_SPECIAL_ARG_LEVELS;
+  else if (game_status == HALLOFFAME)
+    special = GFX_SPECIAL_ARG_SCORES;
+  else if (game_status == LEVELED)
+    special = GFX_SPECIAL_ARG_EDITOR;
+  else if (game_status == HELPSCREEN)
+    special = GFX_SPECIAL_ARG_INFO;
+  else if (game_status == SETUP)
+    special = GFX_SPECIAL_ARG_SETUP;
+  else if (game_status == PSEUDO_PREVIEW)
+    special = GFX_SPECIAL_ARG_PREVIEW;
+  else if (game_status == PLAYING || game_status == PSEUDO_DOOR)
+    special = GFX_SPECIAL_ARG_DOOR;
+
+  if (special != -1)
+    return font_info[font_nr].special_bitmap_id[special];
   else
     return font_nr;
 }

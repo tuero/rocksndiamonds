@@ -123,12 +123,16 @@ void InitFontInfo(struct FontBitmapInfo *font_bitmap_info, int num_fonts,
 
 int getFontWidth(int font_nr)
 {
-  return gfx.font_bitmap_info[font_nr].width;
+  int font_bitmap_id = gfx.select_font_function(font_nr);
+
+  return gfx.font_bitmap_info[font_bitmap_id].width;
 }
 
 int getFontHeight(int font_nr)
 {
-  return gfx.font_bitmap_info[font_nr].height;
+  int font_bitmap_id = gfx.select_font_function(font_nr);
+
+  return gfx.font_bitmap_info[font_bitmap_id].height;
 }
 
 void DrawInitText(char *text, int ypos, int font_nr)

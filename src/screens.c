@@ -139,13 +139,13 @@ void DrawTextStatic(int x, int y, char *text, int font_nr)
 
 void DrawHeadline()
 {
-  int font1_xsize = getFontWidth(FONT(FS_BIG, FC_YELLOW));
-  int font2_xsize = getFontWidth(FONT(FS_SMALL, FC_RED));
+  int font1_xsize = getFontWidth(FONT_TITLE_1);
+  int font2_xsize = getFontWidth(FONT_TITLE_2);
   int x1 = SX + (SXSIZE - strlen(PROGRAM_TITLE_STRING)   * font1_xsize) / 2;
   int x2 = SX + (SXSIZE - strlen(WINDOW_SUBTITLE_STRING) * font2_xsize) / 2;
 
-  DrawTextStatic(x1, SY + 8,  PROGRAM_TITLE_STRING,   FONT(FS_BIG, FC_YELLOW));
-  DrawTextStatic(x2, SY + 46, WINDOW_SUBTITLE_STRING, FONT(FS_SMALL, FC_RED));
+  DrawTextStatic(x1, SY + 8,  PROGRAM_TITLE_STRING,   FONT_TITLE_1);
+  DrawTextStatic(x2, SY + 46, WINDOW_SUBTITLE_STRING, FONT_TITLE_2);
 }
 
 static void ToggleFullscreenIfNeeded()
@@ -176,7 +176,7 @@ void DrawMainMenu()
 {
   static LevelDirTree *leveldir_last_valid = NULL;
   char *name_text = (!options.network && setup.team_mode ? "Team:" : "Name:");
-  int name_width = getFontWidth(FONT(FS_BIG, FC_GREEN)) * strlen("Name:");
+  int name_width = getFontWidth(FONT_MENU_1) * strlen("Name:");
   int i;
 
   UnmapAllGadgets();
@@ -233,29 +233,27 @@ void DrawMainMenu()
 
   DrawHeadline();
 
-  DrawTextStatic(SX + 32,    SY + 2*32, name_text, FONT(FS_BIG, FC_GREEN));
-  DrawText(SX + 32 + name_width, SY + 2*32, setup.player_name,
-	   FONT(FS_BIG, FC_RED));
-  DrawTextStatic(SX + 32,    SY + 3*32, "Level:", FONT(FS_BIG, FC_GREEN));
-  DrawText(SX + 11 * 32, SY + 3*32, int2str(level_nr,3), FONT(FS_BIG,
-	   (leveldir_current->readonly ? FC_RED : FC_YELLOW)));
-  DrawTextStatic(SX + 32,    SY + 4*32, "Hall Of Fame", FONT(FS_BIG,FC_GREEN));
-  DrawTextStatic(SX + 32,    SY + 5*32, "Level Creator",FONT(FS_BIG,FC_GREEN));
-  DrawTextStatic(SY + 32,    SY + 6*32, "Info Screen", FONT(FS_BIG, FC_GREEN));
-  DrawTextStatic(SX + 32,    SY + 7*32, "Start Game", FONT(FS_BIG, FC_GREEN));
-  DrawTextStatic(SX + 32,    SY + 8*32, "Setup", FONT(FS_BIG, FC_GREEN));
-  DrawTextStatic(SX + 32,    SY + 9*32, "Quit", FONT(FS_BIG, FC_GREEN));
+  DrawTextStatic(SX + 32,    SY + 2*32, name_text, FONT_MENU_1);
+  DrawText(SX + 32 + name_width, SY + 2*32, setup.player_name, FONT_INPUT);
+  DrawTextStatic(SX + 32,    SY + 3*32, "Level:", FONT_MENU_1);
+  DrawText(SX + 11 * 32, SY + 3*32, int2str(level_nr,3), FONT_VALUE_1);
+  DrawTextStatic(SX + 32,    SY + 4*32, "Hall Of Fame", FONT_MENU_1);
+  DrawTextStatic(SX + 32,    SY + 5*32, "Level Creator", FONT_MENU_1);
+  DrawTextStatic(SY + 32,    SY + 6*32, "Info Screen", FONT_MENU_1);
+  DrawTextStatic(SX + 32,    SY + 7*32, "Start Game", FONT_MENU_1);
+  DrawTextStatic(SX + 32,    SY + 8*32, "Setup", FONT_MENU_1);
+  DrawTextStatic(SX + 32,    SY + 9*32, "Quit", FONT_MENU_1);
 
   DrawMicroLevel(MICROLEV_XPOS, MICROLEV_YPOS, TRUE);
 
-  DrawTextF(7*32 + 6, 3*32 + 9, FONT(FS_SMALL, FC_RED), "%d-%d",
+  DrawTextF(7*32 + 6, 3*32 + 9, FONT_TEXT_3, "%d-%d",
 	    leveldir_current->first_level,
 	    leveldir_current->last_level);
 
   if (leveldir_current->readonly)
   {
-    DrawTextF(15*32 + 6, 3*32 + 9 - 7, FONT(FS_SMALL, FC_RED), "READ");
-    DrawTextF(15*32 + 6, 3*32 + 9 + 7, FONT(FS_SMALL, FC_RED), "ONLY");
+    DrawTextF(15*32 + 6, 3*32 + 9 - 7, FONT_TEXT_3, "READ");
+    DrawTextF(15*32 + 6, 3*32 + 9 + 7, FONT_TEXT_3, "ONLY");
   }
 
   for(i=0; i<8; i++)
@@ -270,16 +268,7 @@ void DrawMainMenu()
 #endif
 
   DrawTextStatic(SX + 56, SY + 326, "A Game by Artsoft Entertainment",
-		 FONT(FS_SMALL, FC_RED));
-
-  if (leveldir_current->name)
-  {
-    int len = strlen(leveldir_current->name);
-    int lxpos = SX + (SXSIZE - len * getFontWidth(FONT_SPECIAL_GAME)) / 2;
-    int lypos = SY + 352;
-
-    DrawText(lxpos, lypos, leveldir_current->name, FONT_SPECIAL_GAME);
-  }
+		 FONT_TEXT_3);
 
   FadeToFront();
   InitAnimation();
@@ -358,7 +347,6 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
     static unsigned long level_delay = 0;
     int step = (button == 1 ? 1 : button == 2 ? 5 : 10);
     int new_level_nr, old_level_nr = level_nr;
-    int font_color = (leveldir_current->readonly ? FC_RED : FC_YELLOW);
 
     new_level_nr = level_nr + (x == 10 ? -step : +step);
     if (new_level_nr < leveldir_current->first_level)
@@ -375,8 +363,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 
     level_nr = new_level_nr;
 
-    DrawText(SX + 11 * 32, SY + 3 * 32, int2str(level_nr, 3),
-	     FONT(FS_BIG, font_color));
+    DrawText(SX + 11 * 32, SY + 3 * 32, int2str(level_nr, 3), FONT_VALUE_1);
 
     LoadLevel(level_nr);
     DrawMicroLevel(MICROLEV_XPOS, MICROLEV_YPOS, TRUE);
@@ -1040,18 +1027,18 @@ void DrawHelpScreenElText(int start)
   ClearWindow();
   DrawHeadline();
 
-  DrawTextFCentered(100, FONT(FS_SMALL, FC_GREEN), "The game elements:");
+  DrawTextFCentered(100, FONT_TEXT_1, "The game elements:");
 
   for(i=start; i < start + MAX_HELPSCREEN_ELS && i < num_helpscreen_els; i++)
   {
     DrawText(xstart,
 	     ystart + (i - start) * ystep + (*helpscreen_eltext[i][1] ? 0 : 8),
-	     helpscreen_eltext[i][0], FONT_DEFAULT_SMALL);
+	     helpscreen_eltext[i][0], FONT_TEXT_2);
     DrawText(xstart, ystart + (i - start) * ystep + 16,
-	     helpscreen_eltext[i][1], FONT_DEFAULT_SMALL);
+	     helpscreen_eltext[i][1], FONT_TEXT_2);
   }
 
-  DrawTextFCentered(ybottom, FONT(FS_SMALL, FC_BLUE),
+  DrawTextFCentered(ybottom, FONT_TEXT_4,
 		    "Press any key or button for next page");
 }
 
@@ -1064,23 +1051,19 @@ void DrawHelpScreenMusicText(int num)
   ClearWindow();
   DrawHeadline();
 
-  DrawTextFCentered(100, FONT(FS_SMALL, FC_GREEN),
-		    "The game background music loops:");
+  DrawTextFCentered(100, FONT_TEXT_1, "The game background music loops:");
 
-  DrawTextFCentered(ystart + 0 * ystep, FONT(FS_SMALL, FC_YELLOW),
-		    "Excerpt from");
-  DrawTextFCentered(ystart + 1 * ystep, FONT(FS_SMALL, FC_RED),
+  DrawTextFCentered(ystart + 0 * ystep, FONT_TEXT_2, "Excerpt from");
+  DrawTextFCentered(ystart + 1 * ystep, FONT_TEXT_3,
 		    "\"%s\"", helpscreen_music[num][0]);
-  DrawTextFCentered(ystart + 2 * ystep, FONT(FS_SMALL, FC_YELLOW),
-		    "by");
-  DrawTextFCentered(ystart + 3 * ystep, FONT(FS_SMALL, FC_RED),
+  DrawTextFCentered(ystart + 2 * ystep, FONT_TEXT_2, "by");
+  DrawTextFCentered(ystart + 3 * ystep, FONT_TEXT_3,
 		    "%s", helpscreen_music[num][1]);
-  DrawTextFCentered(ystart + 4 * ystep, FONT(FS_SMALL, FC_YELLOW),
-		    "from the album");
-  DrawTextFCentered(ystart + 5 * ystep, FONT(FS_SMALL, FC_RED),
+  DrawTextFCentered(ystart + 4 * ystep, FONT_TEXT_2, "from the album");
+  DrawTextFCentered(ystart + 5 * ystep, FONT_TEXT_3,
 		    "\"%s\"", helpscreen_music[num][2]);
 
-  DrawTextFCentered(ybottom, FONT(FS_SMALL, FC_BLUE),
+  DrawTextFCentered(ybottom, FONT_TEXT_4,
 		    "Press any key or button for next page");
 
 #if 0
@@ -1097,22 +1080,16 @@ void DrawHelpScreenCreditsText()
   ClearWindow();
   DrawHeadline();
 
-  DrawTextFCentered(100, FONT(FS_SMALL, FC_GREEN),
-		    "Credits:");
-  DrawTextFCentered(ystart + 0 * ystep, FONT(FS_SMALL, FC_YELLOW),
-		    "DOS port of the game:");
-  DrawTextFCentered(ystart + 1 * ystep, FONT(FS_SMALL, FC_RED),
-		    "Guido Schulz");
-  DrawTextFCentered(ystart + 2 * ystep, FONT(FS_SMALL, FC_YELLOW),
-		    "Additional toons:");
-  DrawTextFCentered(ystart + 3 * ystep, FONT(FS_SMALL, FC_RED),
-		    "Karl Hörnell");
-  DrawTextFCentered(ystart + 5 * ystep, FONT(FS_SMALL, FC_YELLOW),
+  DrawTextFCentered(100, FONT_TEXT_1, "Credits:");
+  DrawTextFCentered(ystart + 0 * ystep, FONT_TEXT_2, "DOS port of the game:");
+  DrawTextFCentered(ystart + 1 * ystep, FONT_TEXT_3, "Guido Schulz");
+  DrawTextFCentered(ystart + 2 * ystep, FONT_TEXT_2, "Additional toons:");
+  DrawTextFCentered(ystart + 3 * ystep, FONT_TEXT_3, "Karl Hörnell");
+  DrawTextFCentered(ystart + 5 * ystep, FONT_TEXT_2,
 		    "...and many thanks to all contributors");
-  DrawTextFCentered(ystart + 6 * ystep, FONT(FS_SMALL, FC_YELLOW),
-		    "of new levels!");
+  DrawTextFCentered(ystart + 6 * ystep, FONT_TEXT_2, "of new levels!");
 
-  DrawTextFCentered(ybottom, FONT(FS_SMALL, FC_BLUE),
+  DrawTextFCentered(ybottom, FONT_TEXT_4,
 		    "Press any key or button for next page");
 }
 
@@ -1124,33 +1101,33 @@ void DrawHelpScreenContactText()
   ClearWindow();
   DrawHeadline();
 
-  DrawTextFCentered(100, FONT(FS_SMALL, FC_GREEN), "Program information:");
+  DrawTextFCentered(100, FONT_TEXT_1, "Program information:");
 
-  DrawTextFCentered(ystart + 0 * ystep, FONT(FS_SMALL, FC_YELLOW),
+  DrawTextFCentered(ystart + 0 * ystep, FONT_TEXT_2,
 		    "This game is Freeware!");
-  DrawTextFCentered(ystart + 1 * ystep, FONT(FS_SMALL, FC_YELLOW),
+  DrawTextFCentered(ystart + 1 * ystep, FONT_TEXT_2,
 		    "If you like it, send e-mail to:");
-  DrawTextFCentered(ystart + 2 * ystep, FONT(FS_SMALL, FC_RED),
+  DrawTextFCentered(ystart + 2 * ystep, FONT_TEXT_3,
 		    "info@artsoft.org");
-  DrawTextFCentered(ystart + 3 * ystep, FONT(FS_SMALL, FC_YELLOW),
+  DrawTextFCentered(ystart + 3 * ystep, FONT_TEXT_2,
 		    "or SnailMail to:");
-  DrawTextFCentered(ystart + 4 * ystep + 0, FONT(FS_SMALL, FC_RED),
+  DrawTextFCentered(ystart + 4 * ystep + 0, FONT_TEXT_3,
 		    "Holger Schemel");
-  DrawTextFCentered(ystart + 4 * ystep + 20, FONT(FS_SMALL, FC_RED),
+  DrawTextFCentered(ystart + 4 * ystep + 20, FONT_TEXT_3,
 		    "Detmolder Strasse 189");
-  DrawTextFCentered(ystart + 4 * ystep + 40, FONT(FS_SMALL, FC_RED),
+  DrawTextFCentered(ystart + 4 * ystep + 40, FONT_TEXT_3,
 		    "33604 Bielefeld");
-  DrawTextFCentered(ystart + 4 * ystep + 60, FONT(FS_SMALL, FC_RED),
+  DrawTextFCentered(ystart + 4 * ystep + 60, FONT_TEXT_3,
 		    "Germany");
 
-  DrawTextFCentered(ystart + 7 * ystep, FONT(FS_SMALL, FC_YELLOW),
+  DrawTextFCentered(ystart + 7 * ystep, FONT_TEXT_2,
 		    "If you have created new levels,");
-  DrawTextFCentered(ystart + 8 * ystep, FONT(FS_SMALL, FC_YELLOW),
+  DrawTextFCentered(ystart + 8 * ystep, FONT_TEXT_2,
 		    "send them to me to include them!");
-  DrawTextFCentered(ystart + 9 * ystep, FONT(FS_SMALL, FC_YELLOW),
+  DrawTextFCentered(ystart + 9 * ystep, FONT_TEXT_2,
 		    ":-)");
 
-  DrawTextFCentered(ybottom, FONT(FS_SMALL, FC_BLUE),
+  DrawTextFCentered(ybottom, FONT_TEXT_4,
 		    "Press any key or button for main menu");
 }
 
@@ -1250,8 +1227,8 @@ void HandleHelpScreen(int button)
 void HandleTypeName(int newxpos, Key key)
 {
   static int xpos = 0, ypos = 2;
-  int font_width = getFontWidth(FONT_DEFAULT_BIG);
-  int name_width = getFontWidth(FONT(FS_BIG, FC_GREEN)) * strlen("Name:");
+  int font_width = getFontWidth(FONT_INPUT_ACTIVE);
+  int name_width = getFontWidth(FONT_MENU_1) * strlen("Name:");
   int startx = SX + 32 + name_width;
   int starty = SY + ypos * 32;
 
@@ -1259,8 +1236,8 @@ void HandleTypeName(int newxpos, Key key)
   {
     xpos = newxpos;
 
-    DrawText(startx, starty, setup.player_name, FONT_DEFAULT_BIG);
-    DrawText(startx + xpos * font_width, starty, "_", FONT_DEFAULT_BIG);
+    DrawText(startx, starty, setup.player_name, FONT_INPUT_ACTIVE);
+    DrawText(startx + xpos * font_width, starty, "_", FONT_INPUT_ACTIVE);
 
     return;
   }
@@ -1280,20 +1257,20 @@ void HandleTypeName(int newxpos, Key key)
     setup.player_name[xpos + 1] = 0;
     xpos++;
 
-    DrawText(startx, starty, setup.player_name, FONT_DEFAULT_BIG);
-    DrawText(startx + xpos * font_width, starty, "_", FONT_DEFAULT_BIG);
+    DrawText(startx, starty, setup.player_name, FONT_INPUT_ACTIVE);
+    DrawText(startx + xpos * font_width, starty, "_", FONT_INPUT_ACTIVE);
   }
   else if ((key == KSYM_Delete || key == KSYM_BackSpace) && xpos > 0)
   {
     xpos--;
     setup.player_name[xpos] = 0;
 
-    DrawText(startx + xpos * font_width, starty, "_ ", FONT_DEFAULT_BIG);
+    DrawText(startx + xpos * font_width, starty, "_ ", FONT_INPUT_ACTIVE);
   }
   else if (key == KSYM_Return && xpos > 0)
   {
-    DrawText(startx, starty, setup.player_name, FONT(FS_BIG, FC_RED));
-    DrawText(startx + xpos * font_width, starty, " ", FONT_DEFAULT_BIG);
+    DrawText(startx, starty, setup.player_name, FONT_INPUT);
+    DrawText(startx + xpos * font_width, starty, " ", FONT_INPUT_ACTIVE);
 
     SaveSetup();
     game_status = MAINMENU;
@@ -1341,6 +1318,7 @@ static void drawChooseTreeList(int first_entry, int num_page_entries,
   int num_entries = numTreeInfoInGroup(ti);
   char *title_string = NULL;
   int offset = (ti->type == TREE_TYPE_LEVEL_DIR ? 0 : 16);
+  int last_game_status = game_status;	/* save current game status */
 
   DrawBackground(SX, SY, SXSIZE - 32, SYSIZE);
   redraw_mask |= REDRAW_FIELD;
@@ -1351,8 +1329,9 @@ static void drawChooseTreeList(int first_entry, int num_page_entries,
      ti->type == TREE_TYPE_SOUNDS_DIR ? "Custom Sounds" :
      ti->type == TREE_TYPE_MUSIC_DIR ? "Custom Music" : "");
 
-  DrawText(SX + offset, SY + offset, title_string, FONT(FS_BIG,
-	   (ti->type == TREE_TYPE_LEVEL_DIR ? FC_GREEN : FC_YELLOW)));
+  DrawText(SX + offset, SY + offset, title_string, FONT_TITLE_1);
+
+  game_status = CHOOSELEVEL;	/* force LEVELS font on artwork setup screen */
 
   for(i=0; i<num_page_entries; i++)
   {
@@ -1366,7 +1345,7 @@ static void drawChooseTreeList(int first_entry, int num_page_entries,
     strncpy(buffer, node->name , max_buffer_len);
     buffer[max_buffer_len] = '\0';
 
-    DrawText(SX + 32, SY + ypos * 32, buffer, FONT(FS_MEDIUM, node->color));
+    DrawText(SX + 32, SY + ypos * 32, buffer, FONT_TEXT_1 + node->color);
 
     if (node->parent_link)
       initCursor(i, IMG_MENU_BUTTON_LEFT);
@@ -1391,6 +1370,8 @@ static void drawChooseTreeList(int first_entry, int num_page_entries,
     DrawBackground(SX, SY + ypos * 32, TILEX, TILEY);
     DrawGraphicThruMask(0, ypos, IMG_MENU_BUTTON_DOWN, 0);
   }
+
+  game_status = last_game_status;	/* restore current game status */
 }
 
 static void drawChooseTreeInfo(int entry_pos, TreeInfo *ti)
@@ -1407,13 +1388,13 @@ static void drawChooseTreeInfo(int entry_pos, TreeInfo *ti)
   DrawBackground(SX + 32, SY + 32, SXSIZE - 64, 32);
 
   if (node->parent_link)
-    DrawTextFCentered(40, FONT(FS_SMALL, FC_RED), "leave group \"%s\"",
+    DrawTextFCentered(40, FONT_TITLE_2, "leave group \"%s\"",
 		      node->class_desc);
   else if (node->level_group)
-    DrawTextFCentered(40, FONT(FS_SMALL, FC_RED), "enter group \"%s\"",
+    DrawTextFCentered(40, FONT_TITLE_2, "enter group \"%s\"",
 		      node->class_desc);
   else if (ti->type == TREE_TYPE_LEVEL_DIR)
-    DrawTextFCentered(40, FONT(FS_SMALL, FC_RED), "%3d levels (%s)",
+    DrawTextFCentered(40, FONT_TITLE_2, "%3d levels (%s)",
 		      node->levels, node->class_desc);
 
   /* let BackToFront() redraw only what is needed */
@@ -1663,31 +1644,22 @@ static void drawHallOfFameList(int first_entry, int highlight_position)
   SetMainBackgroundImage(IMG_BACKGROUND_SCORES);
   ClearWindow();
 
-  DrawText(SX + 80, SY + 8, "Hall Of Fame", FONT_DEFAULT_BIG);
-  DrawTextFCentered(46, FONT(FS_SMALL, FC_RED), "HighScores of Level %d",
-		    level_nr);
+  DrawText(SX + 80, SY + 8, "Hall Of Fame", FONT_TITLE_1);
+  DrawTextFCentered(46, FONT_TITLE_2, "HighScores of Level %d", level_nr);
 
   for(i=0; i<MAX_MENU_ENTRIES_ON_SCREEN; i++)
   {
     int entry = first_entry + i;
-    int color = (entry == highlight_position ? FC_RED : FC_GREEN);
 
-#if 0
-    DrawText(SX, SY + 64 + i * 32, ".................", FS_BIG, color);
-    DrawText(SX, SY + 64 + i * 32, highscore[i].Name, FS_BIG, color);
-    DrawText(SX + 12 * 32, SY + 64 + i * 32,
-	     int2str(highscore[i].Score, 5), FS_BIG, color);
-#else
     DrawText(SX, SY + 64 + i * 32, "..................................",
-	     FONT(FS_MEDIUM, FC_YELLOW));
+	     (entry == highlight_position ? FONT_TEXT_4 : FONT_TEXT_2));
     DrawText(SX, SY + 64 + i * 32, int2str(entry + 1, 3),
-	     FONT(FS_MEDIUM, FC_YELLOW));
+	     (entry == highlight_position ? FONT_TEXT_4 : FONT_TEXT_2));
     DrawText(SX + 64, SY + 64 + i * 32, highscore[entry].Name,
-	     FONT(FS_BIG, color));
+	     (entry == highlight_position ? FONT_TEXT_3 : FONT_TEXT_1));
     DrawText(SX + 14 * 32 + 16, SY + 64 + i * 32,
 	     int2str(highscore[entry].Score, 5),
-	     FONT(FS_MEDIUM, color));
-#endif
+	     (entry == highlight_position ? FONT_TEXT_4 : FONT_TEXT_2));
   }
 }
 
@@ -2009,8 +1981,7 @@ static void drawSetupValue(int pos)
 {
   int xpos = MENU_SCREEN_VALUE_XPOS;
   int ypos = MENU_SCREEN_START_YPOS + pos;
-  int font_size = FS_BIG;
-  int font_color = FC_YELLOW;
+  int font_nr = FONT_VALUE_1;
   char *value_string = getSetupValue(setup_info[pos].type & ~TYPE_GHOSTED,
 				     setup_info[pos].value);
 
@@ -2024,7 +1995,7 @@ static void drawSetupValue(int pos)
     if (setup_info[pos].type & TYPE_QUERY)
     {
       value_string = "<press key>";
-      font_color = FC_RED;
+      font_nr = FONT_INPUT_ACTIVE;
     }
   }
   else if (setup_info[pos].type & TYPE_STRING)
@@ -2032,19 +2003,18 @@ static void drawSetupValue(int pos)
     int max_value_len = (SCR_FIELDX - 2) * 2;
 
     xpos = 1;
-    font_size = FS_MEDIUM;
+    font_nr = FONT_VALUE_2;
 
     if (strlen(value_string) > max_value_len)
       value_string[max_value_len] = '\0';
   }
   else if (setup_info[pos].type & TYPE_BOOLEAN_STYLE &&
 	   !*(boolean *)(setup_info[pos].value))
-    font_color = FC_BLUE;
+    font_nr = FONT_OPTION_OFF;
 
   DrawText(SX + xpos * 32, SY + ypos * 32,
-	   (xpos == 3 ? "              " : "   "), FONT_DEFAULT_BIG);
-  DrawText(SX + xpos * 32, SY + ypos * 32, value_string,
-	   FONT(font_size, font_color));
+	   (xpos == 3 ? "              " : "   "), font_nr);
+  DrawText(SX + xpos * 32, SY + ypos * 32, value_string, font_nr);
 }
 
 static void changeSetupValue(int pos)
@@ -2115,14 +2085,14 @@ static void DrawSetupScreen_Generic()
     title_string = "Setup Shortcuts";
   }
 
-  DrawText(SX + 16, SY + 16, title_string, FONT_DEFAULT_BIG);
+  DrawText(SX + 16, SY + 16, title_string, FONT_TITLE_1);
 
   num_setup_info = 0;
   for(i=0; setup_info[i].type != 0 && i < MAX_MENU_ENTRIES_ON_SCREEN; i++)
   {
     void *value_ptr = setup_info[i].value;
     int ypos = MENU_SCREEN_START_YPOS + i;
-    int font_size = FS_BIG;
+    int font_nr = FONT_MENU_1;
 
     /* set some entries to "unchangeable" according to other variables */
     if ((value_ptr == &setup.sound       && !audio.sound_available) ||
@@ -2132,10 +2102,9 @@ static void DrawSetupScreen_Generic()
       setup_info[i].type |= TYPE_GHOSTED;
 
     if (setup_info[i].type & TYPE_STRING)
-      font_size = FS_MEDIUM;
+      font_nr = FONT_MENU_2;
 
-    DrawText(SX + 32, SY + ypos * 32, setup_info[i].text,
-	     FONT(font_size, FC_GREEN));
+    DrawText(SX + 32, SY + ypos * 32, setup_info[i].text, font_nr);
 
     if (setup_info[i].type & TYPE_ENTER_MENU)
       initCursor(i, IMG_MENU_BUTTON_RIGHT);
@@ -2255,7 +2224,7 @@ void DrawSetupScreen_Input()
 {
   ClearWindow();
 
-  DrawText(SX+16, SY+16, "Setup Input", FONT_DEFAULT_BIG);
+  DrawText(SX+16, SY+16, "Setup Input", FONT_TITLE_1);
 
   initCursor(0, IMG_MENU_BUTTON);
   initCursor(1, IMG_MENU_BUTTON);
@@ -2265,13 +2234,13 @@ void DrawSetupScreen_Input()
   drawCursorXY(10, 0, IMG_MENU_BUTTON_LEFT);
   drawCursorXY(12, 0, IMG_MENU_BUTTON_RIGHT);
 
-  DrawText(SX+32, SY+2*32, "Player:", FONT(FS_BIG, FC_GREEN));
-  DrawText(SX+32, SY+3*32, "Device:", FONT(FS_BIG, FC_GREEN));
-  DrawText(SX+32, SY+15*32, "Back",   FONT(FS_BIG, FC_GREEN));
+  DrawText(SX+32, SY+2*32, "Player:", FONT_MENU_1);
+  DrawText(SX+32, SY+3*32, "Device:", FONT_MENU_1);
+  DrawText(SX+32, SY+15*32, "Back",   FONT_MENU_1);
 
 #if 0
   DeactivateJoystickForCalibration();
-  DrawTextFCentered(SYSIZE - 20, FONT(FS_SMALL, FC_BLUE),
+  DrawTextFCentered(SYSIZE - 20, FONT_TEXT_4,
 		    "Joysticks deactivated on this screen");
 #endif
 
@@ -2328,7 +2297,7 @@ static void drawPlayerSetupInputInfo(int player_nr)
 
   custom_key = setup.input[player_nr].key;
 
-  DrawText(SX+11*32, SY+2*32, int2str(player_nr + 1, 1), FONT(FS_BIG, FC_RED));
+  DrawText(SX+11*32, SY+2*32, int2str(player_nr + 1, 1), FONT_INPUT_ACTIVE);
   DrawGraphicThruMask(8, 2, PLAYER_NR_GFX(IMG_PLAYER1, player_nr), 0);
 
   if (setup.input[player_nr].use_joystick)
@@ -2337,37 +2306,37 @@ static void drawPlayerSetupInputInfo(int player_nr)
 
     DrawText(SX+8*32, SY+3*32,
 	     joystick_name[getJoystickNrFromDeviceName(device_name)],
-	     FONT_DEFAULT_BIG);
-    DrawText(SX+32, SY+4*32, "Calibrate", FONT(FS_BIG, FC_GREEN));
+	     FONT_VALUE_1);
+    DrawText(SX+32, SY+4*32, "Calibrate", FONT_MENU_1);
   }
   else
   {
-    DrawText(SX+8*32, SY+3*32, "Keyboard ", FONT(FS_BIG, FC_YELLOW));
-    DrawText(SX+32,   SY+4*32, "Customize", FONT(FS_BIG, FC_GREEN));
+    DrawText(SX+8*32, SY+3*32, "Keyboard ", FONT_VALUE_1);
+    DrawText(SX+32,   SY+4*32, "Customize", FONT_MENU_1);
   }
 
-  DrawText(SX+32, SY+5*32, "Actual Settings:", FONT(FS_BIG, FC_GREEN));
+  DrawText(SX+32, SY+5*32, "Actual Settings:", FONT_MENU_1);
   drawCursorXY(1, 4, IMG_MENU_BUTTON_LEFT);
   drawCursorXY(1, 5, IMG_MENU_BUTTON_RIGHT);
   drawCursorXY(1, 6, IMG_MENU_BUTTON_UP);
   drawCursorXY(1, 7, IMG_MENU_BUTTON_DOWN);
-  DrawText(SX+2*32, SY+6*32, ":", FONT(FS_BIG, FC_BLUE));
-  DrawText(SX+2*32, SY+7*32, ":", FONT(FS_BIG, FC_BLUE));
-  DrawText(SX+2*32, SY+8*32, ":", FONT(FS_BIG, FC_BLUE));
-  DrawText(SX+2*32, SY+9*32, ":", FONT(FS_BIG, FC_BLUE));
-  DrawText(SX+32, SY+10*32, "Snap Field:", FONT(FS_BIG, FC_BLUE));
-  DrawText(SX+32, SY+12*32, "Place Bomb:", FONT(FS_BIG, FC_BLUE));
+  DrawText(SX+2*32, SY+6*32, ":", FONT_VALUE_OLD);
+  DrawText(SX+2*32, SY+7*32, ":", FONT_VALUE_OLD);
+  DrawText(SX+2*32, SY+8*32, ":", FONT_VALUE_OLD);
+  DrawText(SX+2*32, SY+9*32, ":", FONT_VALUE_OLD);
+  DrawText(SX+32, SY+10*32, "Snap Field:", FONT_VALUE_OLD);
+  DrawText(SX+32, SY+12*32, "Place Bomb:", FONT_VALUE_OLD);
 
   for (i=0; i<6; i++)
   {
     int ypos = 6 + i + (i > 3 ? i-3 : 0);
 
     DrawText(SX + 3*32, SY + ypos*32,
-	     "              ", FONT_DEFAULT_BIG);
+	     "              ", FONT_VALUE_1);
     DrawText(SX + 3*32, SY + ypos*32,
 	     (setup.input[player_nr].use_joystick ?
 	      custom[i].text :
-	      getKeyNameFromKey(*custom[i].key)), FONT_DEFAULT_BIG);
+	      getKeyNameFromKey(*custom[i].key)), FONT_VALUE_1);
   }
 }
 
@@ -2516,20 +2485,18 @@ void CustomizeKeyboard(int player_nr)
   custom_key = setup.input[player_nr].key;
 
   ClearWindow();
-  DrawText(SX + 16, SY + 16, "Keyboard Input", FONT_DEFAULT_BIG);
+  DrawText(SX + 16, SY + 16, "Keyboard Input", FONT_TITLE_1);
 
   BackToFront();
   InitAnimation();
 
   step_nr = 0;
   DrawText(SX, SY + (2+2*step_nr)*32,
-	   customize_step[step_nr].text,
-	   FONT(FS_BIG, FC_RED));
+	   customize_step[step_nr].text, FONT_INPUT_ACTIVE);
   DrawText(SX, SY + (2+2*step_nr+1)*32,
-	   "Key:", FONT(FS_BIG, FC_RED));
+	   "Key:", FONT_INPUT_ACTIVE);
   DrawText(SX + 4*32, SY + (2+2*step_nr+1)*32,
-	   getKeyNameFromKey(*customize_step[step_nr].key),
-	   FONT(FS_BIG, FC_BLUE));
+	   getKeyNameFromKey(*customize_step[step_nr].key), FONT_VALUE_OLD);
 
   while(!finished)
   {
@@ -2569,33 +2536,33 @@ void CustomizeKeyboard(int player_nr)
 	    /* got new key binding */
 	    *customize_step[step_nr].key = key;
 	    DrawText(SX + 4*32, SY + (2+2*step_nr+1)*32,
-		     "             ", FONT_DEFAULT_BIG);
+		     "             ", FONT_VALUE_1);
 	    DrawText(SX + 4*32, SY + (2+2*step_nr+1)*32,
-		     getKeyNameFromKey(key), FONT_DEFAULT_BIG);
+		     getKeyNameFromKey(key), FONT_VALUE_1);
 	    step_nr++;
 
 	    /* un-highlight last query */
 	    DrawText(SX, SY+(2+2*(step_nr-1))*32,
-		     customize_step[step_nr-1].text, FONT(FS_BIG, FC_GREEN));
+		     customize_step[step_nr-1].text, FONT_MENU_1);
 	    DrawText(SX, SY+(2+2*(step_nr-1)+1)*32,
-		     "Key:", FONT(FS_BIG, FC_GREEN));
+		     "Key:", FONT_MENU_1);
 
 	    /* press 'Enter' to leave */
 	    if (step_nr == 6)
 	    {
 	      DrawText(SX + 16, SY + 15*32+16,
-		       "Press Enter", FONT_DEFAULT_BIG);
+		       "Press Enter", FONT_TITLE_1);
 	      break;
 	    }
 
 	    /* query next key binding */
 	    DrawText(SX, SY+(2+2*step_nr)*32,
-		     customize_step[step_nr].text, FONT(FS_BIG, FC_RED));
+		     customize_step[step_nr].text, FONT_INPUT_ACTIVE);
 	    DrawText(SX, SY+(2+2*step_nr+1)*32,
-		     "Key:", FONT(FS_BIG, FC_RED));
+		     "Key:", FONT_INPUT_ACTIVE);
 	    DrawText(SX + 4*32, SY+(2+2*step_nr+1)*32,
 		     getKeyNameFromKey(*customize_step[step_nr].key),
-		     FONT(FS_BIG, FC_BLUE));
+		     FONT_VALUE_OLD);
 	  }
 	  break;
 
@@ -2656,13 +2623,13 @@ static boolean CalibrateJoystickMain(int player_nr)
     }
   }
 
-  DrawText(SX,      SY +  6 * 32, " ROTATE JOYSTICK ", FONT(FS_BIG,FC_YELLOW));
-  DrawText(SX,      SY +  7 * 32, "IN ALL DIRECTIONS", FONT(FS_BIG,FC_YELLOW));
-  DrawText(SX + 16, SY +  9 * 32, "  IF ALL BALLS  ",  FONT(FS_BIG,FC_YELLOW));
-  DrawText(SX,      SY + 10 * 32, "   ARE YELLOW,   ", FONT(FS_BIG,FC_YELLOW));
-  DrawText(SX,      SY + 11 * 32, " CENTER JOYSTICK ", FONT(FS_BIG,FC_YELLOW));
-  DrawText(SX,      SY + 12 * 32, "       AND       ", FONT(FS_BIG,FC_YELLOW));
-  DrawText(SX,      SY + 13 * 32, "PRESS ANY BUTTON!", FONT(FS_BIG,FC_YELLOW));
+  DrawText(SX,      SY +  6 * 32, " ROTATE JOYSTICK ", FONT_TITLE_1);
+  DrawText(SX,      SY +  7 * 32, "IN ALL DIRECTIONS", FONT_TITLE_1);
+  DrawText(SX + 16, SY +  9 * 32, "  IF ALL BALLS  ",  FONT_TITLE_1);
+  DrawText(SX,      SY + 10 * 32, "   ARE YELLOW,   ", FONT_TITLE_1);
+  DrawText(SX,      SY + 11 * 32, " CENTER JOYSTICK ", FONT_TITLE_1);
+  DrawText(SX,      SY + 12 * 32, "       AND       ", FONT_TITLE_1);
+  DrawText(SX,      SY + 13 * 32, "PRESS ANY BUTTON!", FONT_TITLE_1);
 
   joy_value = Joystick(player_nr);
   last_x = (joy_value & JOY_LEFT ? -1 : joy_value & JOY_RIGHT ? +1 : 0);
@@ -2813,8 +2780,8 @@ void CalibrateJoystick(int player_nr)
   {
     ClearWindow();
 
-    DrawText(SX + 16, SY + 6*32, "  JOYSTICK NOT  ",  FONT(FS_BIG,FC_YELLOW));
-    DrawText(SX,      SY + 7*32, "    AVAILABLE    ", FONT(FS_BIG,FC_YELLOW));
+    DrawText(SX + 16, SY + 6*32, "  JOYSTICK NOT  ",  FONT_TITLE_1);
+    DrawText(SX,      SY + 7*32, "    AVAILABLE    ", FONT_TITLE_1);
     BackToFront();
     Delay(2000);	/* show error message for two seconds */
   }
@@ -2925,7 +2892,7 @@ static struct
 #if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
     &scrollbar_bitmap[0], &scrollbar_bitmap[1],
 #else
-    IMG_MENU_SCROLLBAR, IMG_SCROLLBAR_RED,
+    IMG_MENU_SCROLLBAR, IMG_MENU_SCROLLBAR_ACTIVE,
 #endif
     SX + SC_SCROLL_VERTICAL_XPOS, SY + SC_SCROLL_VERTICAL_YPOS,
     SC_SCROLL_VERTICAL_XSIZE, SC_SCROLL_VERTICAL_YSIZE,

@@ -29,7 +29,7 @@ Pixmap			tile_clipmask[NUM_TILES];
 DrawBuffer	     *fieldbuffer;
 DrawBuffer	     *drawto_field;
 
-int			game_status = MAINMENU;
+int			game_status = -1;
 boolean			level_editor_test_game = FALSE;
 boolean			network_playing = FALSE;
 
@@ -2977,7 +2977,13 @@ struct ElementDirectionInfo element_direction_info[NUM_DIRECTIONS + 1] =
 
 struct SpecialSuffixInfo special_suffix_info[NUM_SPECIAL_GFX_ARGS + 1] =
 {
+  { ".MAIN",		0,				},
+  { ".LEVELS",		0,				},
+  { ".SCORES",		0,				},
   { ".EDITOR",		0,				},
+  { ".INFO",		0,				},
+  { ".SETUP",		0,				},
+  { ".DOOR",		0,				},
   { ".PREVIEW",		0,				},
 
   { NULL,		0,				}
@@ -2989,25 +2995,27 @@ struct SpecialSuffixInfo special_suffix_info[NUM_SPECIAL_GFX_ARGS + 1] =
 
 struct FontInfo font_info[NUM_FONTS + 1] =
 {
-  { "font.initial_1"	},
-  { "font.initial_2"	},
-  { "font.initial_3"	},
-  { "font.initial_4"	},
-  { "font.big_1"	},
-  { "font.big_2"	},
-  { "font.big_3"	},
-  { "font.big_4"	},
-  { "font.medium_1"	},
-  { "font.medium_2"	},
-  { "font.medium_3"	},
-  { "font.medium_4"	},
-  { "font.small_1"	},
-  { "font.small_2"	},
-  { "font.small_3"	},
-  { "font.small_4"	},
-  { "font.tape"		},
-  { "font.game"		},
-  { "font.narrow"	},
+  { "font.initial_1"		},
+  { "font.initial_2"		},
+  { "font.initial_3"		},
+  { "font.initial_4"		},
+  { "font.title_1"		},
+  { "font.title_2"		},
+  { "font.menu_1"		},
+  { "font.menu_2"		},
+  { "font.text_1"		},
+  { "font.text_2"		},
+  { "font.text_3"		},
+  { "font.text_4"		},
+  { "font.input"		},
+  { "font.input.active"		},
+  { "font.option_off"		},
+  { "font.option_on"		},
+  { "font.value_1"		},
+  { "font.value_2"		},
+  { "font.value_old"		},
+  { "font.tape_recorder"	},
+  { "font.level_number"		},
 };
 
 

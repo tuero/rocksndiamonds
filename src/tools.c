@@ -243,19 +243,18 @@ void BackToFront()
 		     VX+VIDEO_CONTROL_XPOS,VY+VIDEO_CONTROL_YPOS);
       }
     }
+
     if (redraw_mask & REDRAW_DOOR_3)
       BlitBitmap(backbuffer, window, EX, EY, EXSIZE, EYSIZE, EX, EY);
+
     redraw_mask &= ~REDRAW_DOORS;
   }
 
   if (redraw_mask & REDRAW_MICROLEVEL)
   {
-    BlitBitmap(backbuffer, window,
-	       MICROLEV_XPOS, MICROLEV_YPOS, MICROLEV_XSIZE, MICROLEV_YSIZE,
-	       MICROLEV_XPOS, MICROLEV_YPOS);
-    BlitBitmap(backbuffer, window,
-	       SX, MICROLABEL_YPOS, SXSIZE, getFontHeight(FONT_SPECIAL_GAME),
-	       SX, MICROLABEL_YPOS);
+    BlitBitmap(backbuffer, window, SX, SY + 10 * TILEY, SXSIZE, 7 * TILEY,
+	       SX, SY + 10 * TILEY);
+
     redraw_mask &= ~REDRAW_MICROLEVEL;
   }
 
@@ -279,7 +278,7 @@ void BackToFront()
       info1[0] = '\0';
 
     sprintf(text, "%.1f fps%s", global.frames_per_second, info1);
-    DrawTextExt(window, SX, SY, text, FONT_DEFAULT_SMALL, FONT_OPAQUE);
+    DrawTextExt(window, SX, SY, text, FONT_TEXT_2, FONT_OPAQUE);
   }
 
   FlushDisplay();
@@ -1531,9 +1530,15 @@ static void DrawMicroLevelExt(int xpos, int ypos, int from_x, int from_y)
 static void DrawMicroLevelLabelExt(int mode)
 {
   char label_text[MAX_OUTPUT_LINESIZE + 1];
-  int max_len_label_text = SXSIZE / getFontWidth(FONT_SPECIAL_GAME);
+  int max_len_label_text;
+  int font_nr = FONT_TEXT_2;
 
-  DrawBackground(SX, MICROLABEL_YPOS, SXSIZE,getFontHeight(FONT_SPECIAL_GAME));
+  if (mode == MICROLABEL_CREATED_BY || mode == MICROLABEL_IMPORTED_FROM)
+    font_nr = FONT_TEXT_3;
+
+  max_len_label_text = SXSIZE / getFontWidth(font_nr);
+
+  DrawBackground(SX, MICROLABEL_YPOS, SXSIZE, getFontHeight(font_nr));
 
   strncpy(label_text, (mode == MICROLABEL_LEVEL_NAME ? level.name :
 		       mode == MICROLABEL_CREATED_BY ? "created by" :
@@ -1546,11 +1551,11 @@ static void DrawMicroLevelLabelExt(int mode)
 
   if (strlen(label_text) > 0)
   {
-    int text_width = strlen(label_text) * getFontWidth(FONT_SPECIAL_GAME);
+    int text_width = strlen(label_text) * getFontWidth(font_nr);
     int lxpos = SX + (SXSIZE - text_width) / 2;
     int lypos = MICROLABEL_YPOS;
 
-    DrawText(lxpos, lypos, label_text, FONT_SPECIAL_GAME);
+    DrawText(lxpos, lypos, label_text, font_nr);
   }
 
   redraw_mask |= REDRAW_MICROLEVEL;
@@ -1562,6 +1567,9 @@ void DrawMicroLevel(int xpos, int ypos, boolean restart)
   static unsigned long label_delay = 0;
   static int from_x, from_y, scroll_direction;
   static int label_state, label_counter;
+  int last_game_status = game_status;	/* save current game status */
+
+  game_status = PSEUDO_PREVIEW;	/* force PREVIEW font on preview level */
 
   if (restart)
   {
@@ -1576,6 +1584,17 @@ void DrawMicroLevel(int xpos, int ypos, boolean restart)
     /* initialize delay counters */
     DelayReached(&scroll_delay, 0);
     DelayReached(&label_delay, 0);
+
+    if (leveldir_current->name)
+    {
+      int len = strlen(leveldir_current->name);
+      int lxpos = SX + (SXSIZE - len * getFontWidth(FONT_TEXT_1)) / 2;
+      int lypos = SY + 352;
+
+      DrawText(lxpos, lypos, leveldir_current->name, FONT_TEXT_1);
+    }
+
+    game_status = last_game_status;	/* restore current game status */
 
     return;
   }
@@ -1645,6 +1664,8 @@ void DrawMicroLevel(int xpos, int ypos, boolean restart)
 		   MICROLABEL_LEVEL_IMPORT_INFO : MICROLABEL_EMPTY);
     DrawMicroLevelLabelExt(label_state);
   }
+
+  game_status = last_game_status;	/* restore current game status */
 }
 
 int REQ_in_range(int x, int y)
@@ -1666,6 +1687,7 @@ boolean Request(char *text, unsigned int req_state)
 {
   int mx, my, ty, result = -1;
   unsigned int old_door_state;
+  int last_game_status = game_status;	/* save current game status */
 
 #if defined(PLATFORM_UNIX)
   /* pause network game while waiting for request to answer */
@@ -1690,6 +1712,8 @@ boolean Request(char *text, unsigned int req_state)
 
   /* clear door drawing field */
   DrawBackground(DX, DY, DXSIZE, DYSIZE);
+
+  game_status = PSEUDO_DOOR;	/* force DOOR font on preview level */
 
   /* write text for request */
   for(ty=0; ty < MAX_REQUEST_LINES; ty++)
@@ -1717,11 +1741,14 @@ boolean Request(char *text, unsigned int req_state)
     strncpy(text_line, text, tl);
     text_line[tl] = 0;
 
-    DrawText(DX + 50 - (tl * 14)/2, DY + 8 + ty * 16,
-	     text_line, FONT_DEFAULT_SMALL);
+    DrawText(DX + (DXSIZE - tl * getFontWidth(FONT_TEXT_2)) / 2,
+	     DY + 8 + ty * (getFontHeight(FONT_TEXT_2) + 2),
+	     text_line, FONT_TEXT_2);
 
     text += tl + (tc == ' ' ? 1 : 0);
   }
+
+  game_status = last_game_status;	/* restore current game status */
 
   if (req_state & REQ_ASK)
   {
