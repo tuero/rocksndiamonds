@@ -276,6 +276,10 @@ static void InitField(int x, int y, boolean init_game)
 	  Feld[x][y] = EL_SP_MURPHY_CLONE;
 	  break;
 	}
+	else
+	{
+	  stored_player[0].use_murphy_graphic = TRUE;
+	}
 
 	Feld[x][y] = EL_PLAYER1;
       }
@@ -641,12 +645,19 @@ void InitGame()
     player->GfxPos = 0;
     player->Frame = 0;
 
+    player->GfxAction = ACTION_DEFAULT;
+
+    player->use_murphy_graphic = FALSE;
+
     player->actual_frame_counter = 0;
 
     player->frame_reset_delay = 0;
 
     player->last_move_dir = MV_NO_MOVING;
     player->is_moving = FALSE;
+
+    player->is_moving = FALSE;
+    player->is_waiting = FALSE;
 
     player->move_delay       = game.initial_move_delay;
     player->move_delay_value = game.initial_move_delay_value;
@@ -2920,6 +2931,10 @@ void StartMoving(int x, int y)
       started_moving = TRUE;
 
       Store[x][y] = EL_ACID;
+#if 0
+      /* !!! TEST !!! better use "_FALLING" etc. !!! */
+      GfxAction[x][y+1] = ACTION_ACTIVE;
+#endif
     }
     else if (CAN_SMASH(element) && Feld[x][y+1] == EL_BLOCKED &&
 	     JustStopped[x][y])
@@ -5781,6 +5796,8 @@ int DigField(struct PlayerInfo *player,
 			dy == +1 ? MV_DOWN : MV_NO_MOVING);
   int element;
 
+  player->is_digging = FALSE;
+
   if (player->MovPos == 0)
     player->Pushing = FALSE;
 
@@ -6459,6 +6476,9 @@ int DigField(struct PlayerInfo *player,
 
   player->push_delay = 0;
 
+  if (Feld[x][y] != element)		/* really digged something */
+    player->is_digging = TRUE;
+
   return MF_MOVING;
 }
 
@@ -6479,6 +6499,7 @@ boolean SnapField(struct PlayerInfo *player, int dx, int dy)
       player->Pushing = FALSE;
 
     player->snapped = FALSE;
+    player->is_digging = FALSE;
     return FALSE;
   }
 
@@ -6494,6 +6515,7 @@ boolean SnapField(struct PlayerInfo *player, int dx, int dy)
     return FALSE;
 
   player->snapped = TRUE;
+  player->is_digging = FALSE;
   DrawLevelField(x, y);
   BackToFront();
 

@@ -138,28 +138,29 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 	int font_type = gi->text.font_type;
 	int font_width = getFontWidth(font_type);
 	int border = gi->border.size;
+
 	strcpy(text, gi->text.value);
 	strcat(text, " ");
 
 	/* left part of gadget */
-	BlitBitmap(gd->bitmap, drawto,
-		   gd->x, gd->y, border, gi->height, gi->x, gi->y);
+	BlitBitmapOnBackground(gd->bitmap, drawto,
+			       gd->x, gd->y, border, gi->height, gi->x, gi->y);
 
 	/* middle part of gadget */
 	for (i=0; i<=gi->text.size; i++)
-	  BlitBitmap(gd->bitmap, drawto,
-		     gd->x + border, gd->y, font_width, gi->height,
-		     gi->x + border + i * font_width, gi->y);
+	  BlitBitmapOnBackground(gd->bitmap, drawto,
+				 gd->x + border, gd->y, font_width, gi->height,
+				 gi->x + border + i * font_width, gi->y);
 
 	/* right part of gadget */
-	BlitBitmap(gd->bitmap, drawto,
-		   gd->x + gi->border.width - border, gd->y,
-		   border, gi->height, gi->x + gi->width - border, gi->y);
+	BlitBitmapOnBackground(gd->bitmap, drawto,
+			       gd->x + gi->border.width -border, gd->y, border,
+			       gi->height, gi->x + gi->width - border, gi->y);
 
 	/* gadget text value */
 	DrawTextExt(drawto,
 		    gi->x + border, gi->y + border, text,
-		    font_type, FONT_OPAQUE);
+		    font_type, FONT_MASKED);
 
 	cursor_letter = gi->text.value[gi->text.cursor_position];
 	cursor_string[0] = '~';
@@ -171,7 +172,7 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 	  DrawTextExt(drawto,
 		      gi->x + border + gi->text.cursor_position * font_width,
 		      gi->y + border, cursor_string,
-		      font_type, FONT_OPAQUE);
+		      font_type, FONT_MASKED);
       }
       break;
 

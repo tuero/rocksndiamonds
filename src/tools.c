@@ -609,7 +609,7 @@ void DrawPlayer(struct PlayerInfo *player)
 
   /* draw player himself */
 
-  if (game.emulation == EMU_SUPAPLEX)
+  if (player->use_murphy_graphic)
   {
     static int last_dir = MV_LEFT;
     int action = (player->programmed_action ? player->programmed_action :
@@ -666,19 +666,27 @@ void DrawPlayer(struct PlayerInfo *player)
   {
     if (player->MovDir == MV_LEFT)
       graphic = (player->Pushing ? IMG_PLAYER1_PUSHING_LEFT :
+		 player->is_digging ? IMG_PLAYER1_DIGGING_LEFT :
 		 player->is_moving ? IMG_PLAYER1_MOVING_LEFT :
+		 player->snapped ? IMG_PLAYER1_SNAPPING_LEFT :
 		 IMG_PLAYER1_LEFT);
     else if (player->MovDir == MV_RIGHT)
       graphic = (player->Pushing ? IMG_PLAYER1_PUSHING_RIGHT :
+		 player->is_digging ? IMG_PLAYER1_DIGGING_RIGHT :
 		 player->is_moving ? IMG_PLAYER1_MOVING_RIGHT :
+		 player->snapped ? IMG_PLAYER1_SNAPPING_RIGHT :
 		 IMG_PLAYER1_RIGHT);
     else if (player->MovDir == MV_UP)
       graphic = (player->Pushing ? IMG_PLAYER1_PUSHING_UP :
+		 player->is_digging ? IMG_PLAYER1_DIGGING_UP :
 		 player->is_moving ? IMG_PLAYER1_MOVING_UP :
+		 player->snapped ? IMG_PLAYER1_SNAPPING_UP :
 		 IMG_PLAYER1_UP);
     else	/* MV_DOWN || MV_NO_MOVING */
       graphic = (player->Pushing ? IMG_PLAYER1_PUSHING_DOWN :
+		 player->is_digging ? IMG_PLAYER1_DIGGING_DOWN :
 		 player->is_moving ? IMG_PLAYER1_MOVING_DOWN :
+		 player->snapped ? IMG_PLAYER1_SNAPPING_DOWN :
 		 IMG_PLAYER1_DOWN);
 
     graphic = PLAYER_NR_GFX(graphic, player->index_nr);

@@ -894,13 +894,20 @@ struct PlayerInfo
   int MovDir, MovPos, GfxPos;
   int Frame;
 
+  int GfxAction;
+
+  boolean use_murphy_graphic;
+
   boolean Pushing;
   boolean Switching;
   boolean LevelSolved, GameOver;
   boolean snapped;
 
   int last_move_dir;
-  int is_moving;
+  boolean is_moving;
+
+  boolean is_digging;
+  boolean is_waiting;
 
   unsigned long move_delay;
   int move_delay_value;

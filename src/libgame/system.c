@@ -571,7 +571,7 @@ inline void BlitBitmapOnBackground(Bitmap *src_bitmap, Bitmap *dst_bitmap,
 				   int width, int height,
 				   int dst_x, int dst_y)
 {
-  if (DrawingOnBackground(src_x, src_y))
+  if (DrawingOnBackground(dst_x, dst_y))
   {
     /* draw background */
     BlitBitmap(gfx.background_bitmap, dst_bitmap, dst_x, dst_y, width, height,

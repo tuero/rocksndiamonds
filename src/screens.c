@@ -72,7 +72,8 @@ static struct GadgetInfo *screen_gadget[NUM_SCREEN_GADGETS];
 static int setup_mode = SETUP_MODE_MAIN;
 
 #if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
-static Bitmap *scrollbar_bitmap[4];
+#define NUM_SCROLLBAR_BITMAPS		2
+static Bitmap *scrollbar_bitmap[NUM_SCROLLBAR_BITMAPS];
 #endif
 
 
@@ -3061,7 +3062,7 @@ void CreateScreenGadgets()
 #if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
   int i;
 
-  for (i=0; i<2; i++)
+  for (i=0; i < NUM_SCROLLBAR_BITMAPS; i++)
   {
     scrollbar_bitmap[i] = CreateBitmap(TILEX, TILEY, DEFAULT_DEPTH);
 
@@ -3088,7 +3089,7 @@ void FreeScreenGadgets()
   int i;
 
 #if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
-  for (i=0; i<4; i++)
+  for (i=0; i < NUM_SCROLLBAR_BITMAPS; i++)
   {
     /* prevent freeing clip mask and GC twice */
     scrollbar_bitmap[i]->clip_mask = None;
