@@ -289,7 +289,7 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
 
   BorderElement = EL_STEELWALL;
 
-  level->no_level_file = FALSE;
+  level->no_valid_file = FALSE;
 
   if (leveldir_current == NULL)		/* only when dumping level */
     return;
@@ -1182,7 +1182,7 @@ static void LoadLevelFromFileInfo_RND(struct LevelInfo *level,
 
   if (!(file = fopen(filename, MODE_READ)))
   {
-    level->no_level_file = TRUE;
+    level->no_valid_file = TRUE;
 
     if (level != &level_template)
       Error(ERR_WARN, "cannot read level '%s' -- using empty level", filename);
@@ -1198,6 +1198,8 @@ static void LoadLevelFromFileInfo_RND(struct LevelInfo *level,
     getFileChunkBE(file, chunk_name, NULL);
     if (strcmp(chunk_name, "CAVE") != 0)
     {
+      level->no_valid_file = TRUE;
+
       Error(ERR_WARN, "unknown format of level file '%s'", filename);
       fclose(file);
       return;
@@ -1212,6 +1214,8 @@ static void LoadLevelFromFileInfo_RND(struct LevelInfo *level,
 
     if (!checkCookieString(cookie, LEVEL_COOKIE_TMPL))
     {
+      level->no_valid_file = TRUE;
+
       Error(ERR_WARN, "unknown format of level file '%s'", filename);
       fclose(file);
       return;
@@ -1219,6 +1223,8 @@ static void LoadLevelFromFileInfo_RND(struct LevelInfo *level,
 
     if ((level->file_version = getFileVersionFromCookieString(cookie)) == -1)
     {
+      level->no_valid_file = TRUE;
+
       Error(ERR_WARN, "unsupported version of level file '%s'", filename);
       fclose(file);
       return;
@@ -1632,7 +1638,7 @@ static void LoadLevelFromFileInfo_EM(struct LevelInfo *level,
 
   if (!(file = fopen(filename, MODE_READ)))
   {
-    level->no_level_file = TRUE;
+    level->no_valid_file = TRUE;
 
     Error(ERR_WARN, "cannot read level '%s' -- using empty level", filename);
 
@@ -1824,7 +1830,7 @@ static void LoadLevelFromFileInfo_SP(struct LevelInfo *level,
 
   if (!(file = fopen(filename, MODE_READ)))
   {
-    level->no_level_file = TRUE;
+    level->no_valid_file = TRUE;
 
     Error(ERR_WARN, "cannot read level '%s' -- using empty level", filename);
 
@@ -1834,7 +1840,7 @@ static void LoadLevelFromFileInfo_SP(struct LevelInfo *level,
   /* position file stream to the requested level inside the level package */
   if (fseek(file, nr * SP_LEVEL_SIZE, SEEK_SET) != 0)
   {
-    level->no_level_file = TRUE;
+    level->no_valid_file = TRUE;
 
     Error(ERR_WARN, "cannot fseek level '%s' -- using empty level", filename);
 
@@ -2928,6 +2934,13 @@ void SaveLevelTemplate()
 
 void DumpLevel(struct LevelInfo *level)
 {
+  if (level->no_valid_file)
+  {
+    Error(ERR_WARN, "cannot dump -- no valid level file found");
+
+    return;
+  }
+
   printf_line("-", 79);
   printf("Level xxx (file version %08d, game version %08d)\n",
 	 level->file_version, level->game_version);
@@ -2986,6 +2999,8 @@ static void setTapeInfoToDefaults()
   tape.recording = FALSE;
   tape.playing = FALSE;
   tape.pausing = FALSE;
+
+  tape.no_valid_file = FALSE;
 }
 
 static int LoadTape_VERS(FILE *file, int chunk_size, struct TapeInfo *tape)
@@ -3150,7 +3165,13 @@ void LoadTapeFromFilename(char *filename)
   setTapeInfoToDefaults();
 
   if (!(file = fopen(filename, MODE_READ)))
+  {
+    tape.no_valid_file = TRUE;
+
+    Error(ERR_WARN, "cannot read tape '%s' -- using empty tape", filename);
+
     return;
+  }
 
   getFileChunkBE(file, chunk_name, NULL);
   if (strcmp(chunk_name, "RND1") == 0)
@@ -3160,6 +3181,8 @@ void LoadTapeFromFilename(char *filename)
     getFileChunkBE(file, chunk_name, NULL);
     if (strcmp(chunk_name, "TAPE") != 0)
     {
+      tape.no_valid_file = TRUE;
+
       Error(ERR_WARN, "unknown format of tape file '%s'", filename);
       fclose(file);
       return;
@@ -3174,6 +3197,8 @@ void LoadTapeFromFilename(char *filename)
 
     if (!checkCookieString(cookie, TAPE_COOKIE_TMPL))
     {
+      tape.no_valid_file = TRUE;
+
       Error(ERR_WARN, "unknown format of tape file '%s'", filename);
       fclose(file);
       return;
@@ -3181,6 +3206,8 @@ void LoadTapeFromFilename(char *filename)
 
     if ((tape.file_version = getFileVersionFromCookieString(cookie)) == -1)
     {
+      tape.no_valid_file = TRUE;
+
       Error(ERR_WARN, "unsupported version of tape file '%s'", filename);
       fclose(file);
       return;
@@ -3397,11 +3424,21 @@ void DumpTape(struct TapeInfo *tape)
 {
   int i, j;
 
+#if 1
+  if (tape->no_valid_file)
+  {
+    Error(ERR_WARN, "cannot dump -- no valid tape file found");
+
+    return;
+  }
+#else
   if (TAPE_IS_EMPTY(*tape))
   {
     Error(ERR_WARN, "no tape available for level %d", tape->level_nr);
+
     return;
   }
+#endif
 
   printf_line("-", 79);
   printf("Tape of Level %03d (file version %08d, game version %08d)\n",

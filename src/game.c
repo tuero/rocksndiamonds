@@ -8073,20 +8073,25 @@ static void CheckGravityMovement(struct PlayerInfo *player)
 {
   if (game.gravity && !player->programmed_action)
   {
-    int move_dir_vertical = player->action & (MV_UP | MV_DOWN);
-    int move_dir_horizontal = player->action & (MV_LEFT | MV_RIGHT);
+    int move_dir_horizontal = player->action & MV_HORIZONTAL;
+    int move_dir_vertical   = player->action & MV_VERTICAL;
     int move_dir =
-      (player->last_move_dir & (MV_LEFT | MV_RIGHT) ?
+      (player->last_move_dir & MV_HORIZONTAL ?
        (move_dir_vertical ? move_dir_vertical : move_dir_horizontal) :
        (move_dir_horizontal ? move_dir_horizontal : move_dir_vertical));
     int jx = player->jx, jy = player->jy;
     int dx = (move_dir & MV_LEFT ? -1 : move_dir & MV_RIGHT ? +1 : 0);
     int dy = (move_dir & MV_UP ? -1 : move_dir & MV_DOWN ? +1 : 0);
     int new_jx = jx + dx, new_jy = jy + dy;
+    boolean player_is_snapping = player->action & JOY_BUTTON_1;
     boolean field_under_player_is_free =
       (IN_LEV_FIELD(jx, jy + 1) && IS_FREE(jx, jy + 1));
     boolean player_is_moving_to_valid_field =
-      (IN_LEV_FIELD(new_jx, new_jy) &&
+      (
+#if 1
+       !player_is_snapping &&
+#endif
+       IN_LEV_FIELD(new_jx, new_jy) &&
        (Feld[new_jx][new_jy] == EL_SP_BASE ||
 	Feld[new_jx][new_jy] == EL_SAND ||
 	(IS_SP_PORT(Feld[new_jx][new_jy]) &&
@@ -8098,10 +8103,24 @@ static void CheckGravityMovement(struct PlayerInfo *player)
        (IS_WALKABLE(Feld[jx][jy]) &&
 	!(element_info[Feld[jx][jy]].access_direction & MV_DOWN)));
 
+#if 0
+    printf("::: checking gravity NOW [%d, %d, %d] [%d] ...\n",
+	   field_under_player_is_free,
+	   player_is_standing_on_valid_field,
+	   player_is_moving_to_valid_field,
+	   (player_is_moving_to_valid_field ? Feld[new_jx][new_jy] : -1));
+#endif
+
     if (field_under_player_is_free &&
 	!player_is_standing_on_valid_field &&
 	!player_is_moving_to_valid_field)
+    {
+#if 0
+      printf("::: setting programmed_action to MV_DOWN ...\n");
+#endif
+
       player->programmed_action = MV_DOWN;
+    }
   }
 }
 
@@ -8315,7 +8334,7 @@ boolean MovePlayer(struct PlayerInfo *player, int dx, int dy)
     player->move_delay_value = original_move_delay_value;
   }
 
-  if (player->last_move_dir & (MV_LEFT | MV_RIGHT))
+  if (player->last_move_dir & MV_HORIZONTAL)
   {
     if (!(moved |= MovePlayerOneStep(player, 0, dy, dx, dy)))
       moved |= MovePlayerOneStep(player, dx, 0, dx, dy);

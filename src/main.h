@@ -256,8 +256,8 @@
 
 /* values for custom move patterns */
 #define MV_HORIZONTAL		(MV_LEFT | MV_RIGHT)
-#define MV_VERTICAL		(MV_UP | MV_DOWN)
-#define MV_ALL_DIRECTIONS	(MV_HORIZONTAL | MV_VERTICAL)
+#define MV_VERTICAL		(MV_UP   | MV_DOWN)
+#define MV_ALL_DIRECTIONS	(MV_LEFT | MV_RIGHT | MV_UP | MV_DOWN)
 #define MV_ANY_DIRECTION	(MV_ALL_DIRECTIONS)
 #define MV_TOWARDS_PLAYER	(1 << MV_BIT_TOWARDS_PLAYER)
 #define MV_AWAY_FROM_PLAYER	(1 << MV_BIT_AWAY_FROM_PLAYER)
@@ -1438,7 +1438,7 @@ struct LevelInfo
 
   boolean use_custom_template;	/* use custom properties from template file */
 
-  boolean no_level_file;	/* set for currently undefined levels */
+  boolean no_valid_file;	/* set when level file missing or invalid */
 };
 
 struct TapeInfo
@@ -1472,6 +1472,8 @@ struct TapeInfo
     byte action[MAX_PLAYERS];
     byte delay;
   } pos[MAX_TAPELEN];
+
+  boolean no_valid_file;	/* set when tape file missing or invalid */
 };
 
 struct GameInfo

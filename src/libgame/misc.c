@@ -679,6 +679,11 @@ void GetOptions(char *argv[], void (*print_usage_function)(void))
       options.execute_command = option_arg;
       if (option_arg == next_option)
 	options_left++;
+
+#if 1
+      /* when doing batch processing, always enable verbose mode (warnings) */
+      options.verbose = TRUE;
+#endif
     }
     else if (*option == '-')
     {

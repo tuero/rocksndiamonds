@@ -775,14 +775,18 @@ void AutoPlayTape()
     printf("Level %03d: ", level_nr);
 
     LoadLevel(level_nr);
-    if (level.no_level_file)
+    if (level.no_valid_file)
     {
       printf("(no level)\n");
       continue;
     }
 
     LoadSolutionTape(level_nr);
+#if 1
+    if (tape.no_valid_file)
+#else
     if (TAPE_IS_EMPTY(tape))
+#endif
     {
       printf("(no tape)\n");
       continue;
