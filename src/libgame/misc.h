@@ -101,6 +101,10 @@ inline void swap_number_pairs(int *, int *, int *, int *);
 char *getUserDataDir(void);
 void createDirectory(char *, char *);
 void InitUserDataDirectory(void);
+void SetFilePermissions_Level(char *);
+void SetFilePermissions_Tape(char *);
+void SetFilePermissions_Score(char *);
+void SetFilePermissions_Setup(char *);
 
 #if !defined(PLATFORM_UNIX)
 void initErrorFile();

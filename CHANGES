@@ -14,6 +14,7 @@ Release Version 2.0.1 [?? ??? 2002]
 	- nasty tape bugs fixed (completely reworked tape stuff)
 	- fullscreen mode now works with Windows (workaround for bug in SDL)
 	- /dev/dsp support for NetBSD added (thanks to Krister Walfridsson)
+	- file permissions when saving files and creating directories changed
 	- some small sound bugs fixed
 
 Release Version 2.0.0 [01 JAN 2001]

@@ -1213,6 +1213,9 @@ void FadeSounds()
 void StopMusic(void)
 {
 #if defined(TARGET_SDL)
+  if (!audio.sound_available)
+    return;
+
   if (audio.mods_available)
     Mix_HaltMusic();
   else

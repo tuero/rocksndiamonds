@@ -68,6 +68,7 @@
 #define SCOREFILE_EXTENSION	"sco"
 #endif
 
+#if 0
 #if defined(PLATFORM_WIN32)
 #ifndef S_IRGRP
 #define S_IRGRP S_IRUSR
@@ -93,10 +94,12 @@
 #define MODE_R_ALL		(S_IRUSR | S_IRGRP | S_IROTH)
 #define MODE_W_ALL		(S_IWUSR | S_IWGRP | S_IWOTH)
 #define MODE_X_ALL		(S_IXUSR | S_IXGRP | S_IXOTH)
+
 #define LEVEL_PERMS		(MODE_R_ALL | MODE_W_ALL)
 #define SCORE_PERMS		LEVEL_PERMS
 #define TAPE_PERMS		LEVEL_PERMS
 #define SETUP_PERMS		LEVEL_PERMS
+#endif
 
 /* sort priorities of level series (also used as level series classes) */
 #define LEVELCLASS_TUTORIAL_START	10
@@ -1184,7 +1187,7 @@ void OLD_SaveLevel(int level_nr)
 
   fclose(file);
 
-  chmod(filename, LEVEL_PERMS);
+  SetFilePermissions_Level(filename);
 }
 
 static void SaveLevel_HEAD(FILE *file, struct LevelInfo *level)
@@ -1393,7 +1396,7 @@ void SaveLevel(int level_nr)
 
   fclose(file);
 
-  chmod(filename, LEVEL_PERMS);
+  SetFilePermissions_Level(filename);
 }
 
 static void setTapeInfoToDefaults()
@@ -1958,7 +1961,7 @@ void OLD_SaveTape(int level_nr)
 
   fclose(file);
 
-  chmod(filename, TAPE_PERMS);
+  SetFilePermissions_Tape(filename);
 
   tape.changed = FALSE;
 
@@ -2050,7 +2053,7 @@ void SaveTape(int level_nr)
 
   fclose(file);
 
-  chmod(filename, TAPE_PERMS);
+  SetFilePermissions_Tape(filename);
 
   tape.changed = FALSE;
 
@@ -2185,7 +2188,7 @@ void SaveScore(int level_nr)
 
   fclose(file);
 
-  chmod(filename, SCORE_PERMS);
+  SetFilePermissions_Score(filename);
 }
 
 #define TOKEN_STR_FILE_IDENTIFIER	"file_identifier"
@@ -2986,7 +2989,7 @@ static void SaveUserLevelInfo()
   fclose(file);
   free(filename);
 
-  chmod(filename, SETUP_PERMS);
+  SetFilePermissions_Setup(filename);
 }
 
 void LoadSetup()
@@ -3139,7 +3142,7 @@ void SaveSetup()
   fclose(file);
   free(filename);
 
-  chmod(filename, SETUP_PERMS);
+  SetFilePermissions_Setup(filename);
 }
 
 void LoadLevelSetup_LastSeries()
@@ -3204,7 +3207,7 @@ void SaveLevelSetup_LastSeries()
   fclose(file);
   free(filename);
 
-  chmod(filename, SETUP_PERMS);
+  SetFilePermissions_Setup(filename);
 }
 
 static void checkSeriesInfo()
@@ -3351,7 +3354,5 @@ void SaveLevelSetup_SeriesInfo()
   fclose(file);
   free(filename);
 
-  chmod(filename, SETUP_PERMS);
+  SetFilePermissions_Setup(filename);
 }
-/*  LocalWords:  Rocks'n
- */

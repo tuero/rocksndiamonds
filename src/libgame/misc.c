@@ -1275,10 +1275,42 @@ inline void swap_number_pairs(int *x1, int *y1, int *x2, int *y2)
 /* some stuff from "files.c"                                                 */
 /* ========================================================================= */
 
+#if defined(PLATFORM_WIN32)
+#ifndef S_IRGRP
+#define S_IRGRP S_IRUSR
+#endif
+#ifndef S_IROTH
+#define S_IROTH S_IRUSR
+#endif
+#ifndef S_IWGRP
+#define S_IWGRP S_IWUSR
+#endif
+#ifndef S_IWOTH
+#define S_IWOTH S_IWUSR
+#endif
+#ifndef S_IXGRP
+#define S_IXGRP S_IXUSR
+#endif
+#ifndef S_IXOTH
+#define S_IXOTH S_IXUSR
+#endif
+#endif	/* PLATFORM_WIN32 */
+
+/* file permissions for newly written files */
 #define MODE_R_ALL		(S_IRUSR | S_IRGRP | S_IROTH)
 #define MODE_W_ALL		(S_IWUSR | S_IWGRP | S_IWOTH)
 #define MODE_X_ALL		(S_IXUSR | S_IXGRP | S_IXOTH)
-#define USERDATA_DIR_MODE	(MODE_R_ALL | MODE_X_ALL | S_IWUSR)
+#define MODE_W_ALL		(S_IWUSR | S_IWGRP | S_IWOTH)
+
+#define MODE_W_USR_GRP		(S_IWUSR | S_IWGRP)
+#define MODE_W_NEW_DIR		(S_ISGID | MODE_W_USR_GRP)
+
+#define USERDATA_DIR_MODE	(MODE_R_ALL | MODE_X_ALL | MODE_W_NEW_DIR)
+
+#define LEVEL_PERMS		(MODE_R_ALL | MODE_W_USR_GRP)
+#define SCORE_PERMS		LEVEL_PERMS
+#define TAPE_PERMS		LEVEL_PERMS
+#define SETUP_PERMS		LEVEL_PERMS
 
 char *getUserDataDir(void)
 {
@@ -1297,6 +1329,14 @@ char *getUserDataDir(void)
 
 void createDirectory(char *dir, char *text)
 {
+#if defined(PLATFORM_UNIX)
+  /* leave "other" permissions in umask untouched, but ensure group parts
+     of USERDATA_DIR_MODE are not masked */
+  mode_t normal_umask = umask(0);
+  mode_t group_umask = ~(USERDATA_DIR_MODE & S_IRWXG);
+  umask(normal_umask & group_umask);
+#endif
+
   if (access(dir, F_OK) != 0)
 #if defined(PLATFORM_WIN32)
     if (mkdir(dir) != 0)
@@ -1304,11 +1344,35 @@ void createDirectory(char *dir, char *text)
     if (mkdir(dir, USERDATA_DIR_MODE) != 0)
 #endif
       Error(ERR_WARN, "cannot create %s directory '%s'", text, dir);
+
+#if defined(PLATFORM_UNIX)
+  umask(normal_umask);		/* reset normal umask */
+#endif
 }
 
 void InitUserDataDirectory()
 {
   createDirectory(getUserDataDir(), "user data");
+}
+
+void SetFilePermissions_Level(char *filename)
+{
+  chmod(filename, LEVEL_PERMS);
+}
+
+void SetFilePermissions_Tape(char *filename)
+{
+  chmod(filename, TAPE_PERMS);
+}
+
+void SetFilePermissions_Score(char *filename)
+{
+  chmod(filename, SCORE_PERMS);
+}
+
+void SetFilePermissions_Setup(char *filename)
+{
+  chmod(filename, SETUP_PERMS);
 }
 
 
