@@ -176,30 +176,34 @@
 #define UNDO_IMMEDIATE			0
 #define UNDO_ACCUMULATE			1
 
-static char *control_infotext[ED_NUM_CTRL_BUTTONS] =
+static struct
 {
-  "draw single items",
-  "draw connected items",
-  "draw lines",
-  "enter text elements",
-  "draw outline rectangles",
-  "draw filled boxes",
-  "wrap (rotate) level up",
-  "properties of drawing element",
-  "flood fill",
-  "wrap (rotate) level left",
-  "",
-  "wrap (rotate) level right",
-  "random element placement",
-  "grab brush",
-  "wrap (rotate) level down",
-  "pick drawing element from editing area",
-  "undo last operation",
-  "level properties",
-  "save level",
-  "clear level",
-  "test level",
-  "exit level editor",
+  char shortcut;
+  char *text;
+} control_info[ED_NUM_CTRL_BUTTONS] =
+{
+  { 's', "draw single items" },
+  { 'd', "draw connected items" },
+  { 'l', "draw lines" },
+  { 't', "enter text elements" },
+  { 'r', "draw outline rectangles" },
+  { 'R', "draw filled rectangles" },
+  { '\0', "wrap (rotate) level up" },
+  { '?', "properties of drawing element" },
+  { 'f', "flood fill" },
+  { '\0', "wrap (rotate) level left" },
+  { '\0', "" },
+  { '\0', "wrap (rotate) level right" },
+  { '\0', "random element placement" },
+  { 'b', "grab brush" },
+  { '\0', "wrap (rotate) level down" },
+  { ',', "pick drawing element" },
+  { 'U', "undo last operation" },
+  { 'I', "level properties" },
+  { 'S', "save level" },
+  { 'C', "clear level" },
+  { 'T', "test level" },
+  { 'E', "exit level editor" }
 };
 
 static struct
@@ -794,7 +798,7 @@ static void CreateControlButtons()
     gd_y2  = DOOR_GFX_PAGEY1 + ED_CTRL_BUTTONS_ALT_GFX_YPOS + gd_yoffset;
 
     gi = CreateGadget(GDI_CUSTOM_ID, id,
-		      GDI_DESCRIPTION_TEXT, control_infotext[i],
+		      GDI_DESCRIPTION_TEXT, control_info[i].text,
 		      GDI_X, EX + gd_xoffset,
 		      GDI_Y, EY + gd_yoffset,
 		      GDI_WIDTH, width,
@@ -3585,59 +3589,21 @@ void HandleLevelEditorKeyInput(KeySym key)
     }
     else if (button_status == MB_RELEASED)
     {
-      int id;
+      int i, id;
 
-      switch (letter)
+      switch (key)
       {
-        case '.':
-        case 's':
-	  id = ED_CTRL_ID_SINGLE_ITEMS;
+        case XK_Left:
+	  id = ED_CTRL_ID_SCROLL_LEFT;
 	  break;
-        case 'd':
-	  id = ED_CTRL_ID_CONNECTED_ITEMS;
+        case XK_Right:
+	  id = ED_CTRL_ID_SCROLL_RIGHT;
 	  break;
-        case 'l':
-	  id = ED_CTRL_ID_LINE;
+        case XK_Up:
+	  id = ED_CTRL_ID_SCROLL_UP;
 	  break;
-        case 't':
-	  id = ED_CTRL_ID_TEXT;
-	  break;
-        case 'r':
-	  id = ED_CTRL_ID_RECTANGLE;
-	  break;
-        case 'R':
-	  id = ED_CTRL_ID_FILLED_BOX;
-	  break;
-        case '?':
-	  id = ED_CTRL_ID_PROPERTIES;
-	  break;
-        case 'f':
-	  id = ED_CTRL_ID_FLOOD_FILL;
-	  break;
-        case 'b':
-	  id = ED_CTRL_ID_GRAB_BRUSH;
-	  break;
-        case ',':
-	  id = ED_CTRL_ID_PICK_ELEMENT;
-	  break;
-
-        case 'U':
-	  id = ED_CTRL_ID_UNDO;
-	  break;
-        case 'I':
-	  id = ED_CTRL_ID_INFO;
-	  break;
-        case 'S':
-	  id = ED_CTRL_ID_SAVE;
-	  break;
-        case 'C':
-	  id = ED_CTRL_ID_CLEAR;
-	  break;
-        case 'T':
-	  id = ED_CTRL_ID_TEST;
-	  break;
-        case 'E':
-	  id = ED_CTRL_ID_EXIT;
+        case XK_Down:
+	  id = ED_CTRL_ID_SCROLL_DOWN;
 	  break;
 
         default:
@@ -3647,31 +3613,12 @@ void HandleLevelEditorKeyInput(KeySym key)
 
       if (id != ED_CTRL_ID_NONE)
 	ClickOnGadget(level_editor_gadget[id]);
+      else if (letter == '.')
+	ClickOnGadget(level_editor_gadget[ED_CTRL_ID_SINGLE_ITEMS]);
       else
-      {
-	switch (key)
-	{
-          case XK_Left:
-	    id = ED_CTRL_ID_SCROLL_LEFT;
-	    break;
-          case XK_Right:
-	    id = ED_CTRL_ID_SCROLL_RIGHT;
-	    break;
-          case XK_Up:
-	    id = ED_CTRL_ID_SCROLL_UP;
-	    break;
-          case XK_Down:
-	    id = ED_CTRL_ID_SCROLL_DOWN;
-	    break;
-
-          default:
-	    id = ED_CTRL_ID_NONE;
-	    break;
-	}
-
-	if (id != ED_CTRL_ID_NONE)
-	  ClickOnGadget(level_editor_gadget[id]);
-      }
+	for (i=0; i<ED_NUM_CTRL_BUTTONS; i++)
+	  if (letter && letter == control_info[i].shortcut)
+	    ClickOnGadget(level_editor_gadget[i]);
     }
   }
 }
@@ -3709,6 +3656,7 @@ void HandleEditorGadgetInfoText(void *ptr)
 {
   struct GadgetInfo *gi = (struct GadgetInfo *)ptr;
   char infotext[MAX_INFOTEXT_LEN + 1];
+  char shortcut[20];
 
   ClearEditorGadgetInfoText();
 
@@ -3721,6 +3669,20 @@ void HandleEditorGadgetInfoText(void *ptr)
 
   strncpy(infotext, gi->description_text, MAX_INFOTEXT_LEN);
   infotext[MAX_INFOTEXT_LEN] = '\0';
+
+  if (gi->custom_id < ED_NUM_CTRL_BUTTONS)
+  {
+    int key = control_info[gi->custom_id].shortcut;
+
+    if (key)
+    {
+      sprintf(shortcut, " ('%s%c')",
+	      (key >= 'A' && key <= 'Z' ? "Shift-" : ""), key);
+
+      if (strlen(infotext) + strlen(shortcut) <= MAX_INFOTEXT_LEN)
+	strcat(infotext, shortcut);
+    }
+  }
 
   DrawText(INFOTEXT_XPOS, INFOTEXT_YPOS, infotext, FS_SMALL, FC_YELLOW);
 }
