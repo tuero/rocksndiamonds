@@ -307,10 +307,14 @@ unsigned int init_random_number(int nr, long seed)
 {
   if (seed == NEW_RANDOMIZE)
   {
+#if defined(TARGET_SDL)
+    seed = (long)SDL_GetTicks();
+#else
     struct timeval current_time;
 
     gettimeofday(&current_time, NULL);
     seed = (long)current_time.tv_usec;
+#endif
   }
 
   srandom_linux_libc(nr, (unsigned int) seed);
