@@ -1169,7 +1169,9 @@ void PlaySoundExt(int nr, int volume, int stereo, boolean loop)
 {
   struct SoundControl snd_ctrl = emptySoundControl;
 
-  if (!audio.sound_available || !audio.sound_enabled)
+  if (!audio.sound_available ||
+      !audio.sound_enabled ||
+      audio.sound_deactivated)
     return;
 
   if (volume<PSND_MIN_VOLUME)

@@ -1966,7 +1966,7 @@ boolean Request(char *text, unsigned int req_state)
 	  break;
 
 	case EVENT_KEYRELEASE:
-	  key_joystick_mapping = 0;
+	  ClearPlayerAction();
 	  break;
 
 	default:

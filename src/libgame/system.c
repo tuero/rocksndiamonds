@@ -357,6 +357,16 @@ inline boolean DrawingDeactivated(int x, int y, int width, int height)
     if ((gfx.draw_deactivation_mask & REDRAW_FIELD) &&
 	x < gfx.sx + gfx.sxsize)
       return TRUE;
+    else if ((gfx.draw_deactivation_mask & REDRAW_DOORS) &&
+	     x > gfx.dx)
+    {
+      if ((gfx.draw_deactivation_mask & REDRAW_DOOR_1) &&
+	  y < gfx.dy + gfx.dysize)
+	return TRUE;
+      else if ((gfx.draw_deactivation_mask & REDRAW_DOOR_2) &&
+	       y > gfx.vy)
+	return TRUE;
+    }
   }
 
   return FALSE;
@@ -729,6 +739,8 @@ inline void OpenAudio(void)
   audio.loops_available = FALSE;
   audio.mods_available = FALSE;
   audio.sound_enabled = FALSE;
+
+  audio.sound_deactivated = FALSE;
 
   audio.soundserver_pipe[0] = audio.soundserver_pipe[1] = 0;
   audio.soundserver_pid = -1;

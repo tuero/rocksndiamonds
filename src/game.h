@@ -30,6 +30,7 @@
 #define SC_ZEITBONUS		10
 
 void GetPlayerConfig(void);
+void DrawGameDoorValues(void);
 void InitGame(void);
 void InitMovDir(int, int);
 void InitAmoebaNr(int, int);

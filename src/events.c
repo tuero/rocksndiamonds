@@ -176,6 +176,16 @@ void ClearEventQueue()
   }
 }
 
+void ClearPlayerAction()
+{
+  int i;
+
+  /* simulate key release events for still pressed keys */
+  key_joystick_mapping = 0;
+  for (i=0; i<MAX_PLAYERS; i++)
+    stored_player[i].action = 0;
+}
+
 void SleepWhileUnmapped()
 {
   boolean window_unmapped = TRUE;
@@ -269,16 +279,11 @@ void HandleFocusEvent(FocusChangeEvent *event)
 
   if (event->type == EVENT_FOCUSOUT)
   {
-    int i;
-
     KeyboardAutoRepeatOn();
     old_joystick_status = joystick.status;
     joystick.status = JOYSTICK_NOT_AVAILABLE;
 
-    /* simulate key release events for still pressed keys */
-    key_joystick_mapping = 0;
-    for (i=0; i<MAX_PLAYERS; i++)
-      stored_player[i].action = 0;
+    ClearPlayerAction();
   }
   else if (event->type == EVENT_FOCUSIN)
   {
@@ -771,10 +776,8 @@ static int HandleJoystickForAllPlayers()
     joy_action = Joystick(i);
     result |= joy_action;
 
-
     if (!setup.input[i].use_joystick)
       continue;
-
 
     stored_player[i].action = joy_action;
   }

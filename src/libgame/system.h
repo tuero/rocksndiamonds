@@ -229,6 +229,8 @@ struct AudioSystemInfo
   boolean mods_available;
   boolean sound_enabled;
 
+  boolean sound_deactivated;	/* for temporarily disabling sound */
+
   int soundserver_pipe[2];
   int soundserver_pid;
   char *device_name;

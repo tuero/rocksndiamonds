@@ -432,6 +432,18 @@ static void InitField(int x, int y, boolean init_game)
   }
 }
 
+void DrawGameDoorValues()
+{
+  DrawText(DX + XX_EMERALDS, DY + YY_EMERALDS,
+	   int2str(local_player->gems_still_needed, 3), FS_SMALL, FC_YELLOW);
+  DrawText(DX + XX_DYNAMITE, DY + YY_DYNAMITE,
+	   int2str(local_player->dynamite, 3), FS_SMALL, FC_YELLOW);
+  DrawText(DX + XX_SCORE, DY + YY_SCORE,
+	   int2str(local_player->score, 5), FS_SMALL, FC_YELLOW);
+  DrawText(DX + XX_TIME, DY + YY_TIME,
+	   int2str(TimeLeft, 3), FS_SMALL, FC_YELLOW);
+}
+
 void InitGame()
 {
   int i, j, x, y;
@@ -792,6 +804,9 @@ void InitGame()
 	       DX + XX_LEVEL - 1, DY + YY_LEVEL + 1);
   }
 
+#if 1
+  DrawGameDoorValues();
+#else
   DrawText(DX + XX_EMERALDS, DY + YY_EMERALDS,
 	   int2str(local_player->gems_still_needed, 3), FS_SMALL, FC_YELLOW);
   DrawText(DX + XX_DYNAMITE, DY + YY_DYNAMITE,
@@ -800,6 +815,7 @@ void InitGame()
 	   int2str(local_player->score, 5), FS_SMALL, FC_YELLOW);
   DrawText(DX + XX_TIME, DY + YY_TIME,
 	   int2str(TimeLeft, 3), FS_SMALL, FC_YELLOW);
+#endif
 
   UnmapGameButtons();
   UnmapTapeButtons();

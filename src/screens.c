@@ -137,6 +137,7 @@ void DrawMainMenu()
   KeyboardAutoRepeatOn();
   ActivateJoystick();
   SetDrawDeactivationMask(REDRAW_NONE);
+  audio.sound_deactivated = FALSE;
 
   /* needed if last screen was the playing screen, invoked from level editor */
   if (level_editor_test_game)

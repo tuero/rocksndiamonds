@@ -320,6 +320,7 @@ void TapeStartRecording()
   MapTapeIndexButton();
 
   SetDrawDeactivationMask(REDRAW_NONE);
+  audio.sound_deactivated = FALSE;
 }
 
 static void TapeStartGameRecording()
@@ -363,6 +364,8 @@ void TapeHaltRecording()
     return;
 
   tape.counter++;
+  tape.pos[tape.counter].delay = 0;
+
   tape.length = tape.counter;
   tape.length_seconds = GetTapeLength();
 }
@@ -439,16 +442,13 @@ void TapeTogglePause()
 
   if (tape.index_search)
   {
-    SetDrawDeactivationMask(REDRAW_NONE);
-    RedrawPlayfield(TRUE, 0,0,0,0);
-  }
-
-  if (tape.index_search)
-  {
     tape.index_search = FALSE;
 
     SetDrawDeactivationMask(REDRAW_NONE);
+    audio.sound_deactivated = FALSE;
+
     RedrawPlayfield(TRUE, 0,0,0,0);
+    DrawGameDoorValues();
 
     if (tape.quick_resume)
     {
@@ -486,6 +486,7 @@ void TapeStartPlaying()
   MapTapeIndexButton();
 
   SetDrawDeactivationMask(REDRAW_NONE);
+  audio.sound_deactivated = FALSE;
 }
 
 static void TapeStartGamePlaying()
@@ -594,7 +595,10 @@ void TapeIndexSearch()
   tape.index_search = TRUE;
 
   if (!tape.fast_forward || tape.pause_before_death)
-    SetDrawDeactivationMask(REDRAW_FIELD);
+  {
+    SetDrawDeactivationMask(REDRAW_FIELD | REDRAW_DOOR_1);
+    audio.sound_deactivated = TRUE;
+  }
 }
 
 void TapeQuickSave()
