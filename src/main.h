@@ -401,6 +401,12 @@
 #define IS_ENVELOPE(e)		((e) >= EL_ENVELOPE_1 &&		\
 	 			 (e) <= EL_ENVELOPE_4)
 
+#define IS_EM_GATE(e)		((e) >= EL_EM_GATE_1 &&			\
+	 			 (e) <= EL_EM_GATE_4)
+
+#define IS_EM_GATE_GRAY(e)	((e) >= EL_EM_GATE_1_GRAY &&		\
+	 			 (e) <= EL_EM_GATE_4_GRAY)
+
 #define GFX_ELEMENT(e)		(element_info[e].use_gfx_element ?	\
 				 element_info[e].gfx_element : e)
 
@@ -1340,6 +1346,7 @@ struct PlayerInfo
 
   boolean is_waiting;
   boolean is_moving;
+  boolean is_auto_moving;
   boolean is_digging;
   boolean is_snapping;
   boolean is_collecting;
@@ -1453,6 +1460,7 @@ struct LevelInfo
   boolean sp_block_last_field;	/* player blocks previous field while moving */
   boolean use_spring_bug;	/* for compatibility with old levels */
   boolean instant_relocation;	/* no visual delay when relocating player */
+  boolean can_pass_to_walkable;	/* player can pass to empty or walkable tile */
 
   /* ('int' instead of 'boolean' because used as selectbox value in editor) */
   int use_step_counter;		/* count steps instead of seconds for level */

@@ -1486,6 +1486,7 @@ void InitGame()
 
     player->is_waiting = FALSE;
     player->is_moving = FALSE;
+    player->is_auto_moving = FALSE;
     player->is_digging = FALSE;
     player->is_snapping = FALSE;
     player->is_collecting = FALSE;
@@ -5800,6 +5801,7 @@ void StartMoving(int x, int y)
 void ContinueMoving(int x, int y)
 {
   int element = Feld[x][y];
+  int stored = Store[x][y];
   struct ElementInfo *ei = &element_info[element];
   int direction = MovDir[x][y];
   int dx = (direction == MV_LEFT ? -1 : direction == MV_RIGHT ? +1 : 0);
@@ -5904,7 +5906,7 @@ void ContinueMoving(int x, int y)
   {
     element = Feld[newx][newy] = EL_ACID;
   }
-#if 1
+#if 0
   else if (IS_CUSTOM_ELEMENT(element) && !IS_PLAYER(x, y) &&
 	   ei->move_leave_element != EL_EMPTY &&
 	   (ei->move_leave_type == LEAVE_TYPE_UNLIMITED ||
@@ -5947,6 +5949,22 @@ void ContinueMoving(int x, int y)
   Pushed[x][y] = Pushed[newx][newy] = FALSE;
 
   ResetGfxAnimation(x, y);	/* reset animation values for old field */
+
+#if 1
+  if (IS_CUSTOM_ELEMENT(element) && !IS_PLAYER(x, y) &&
+      ei->move_leave_element != EL_EMPTY &&
+      (ei->move_leave_type == LEAVE_TYPE_UNLIMITED ||
+       stored != EL_EMPTY))
+  {
+    /* some elements can leave other elements behind after moving */
+
+    Feld[x][y] = ei->move_leave_element;
+    InitField(x, y, FALSE);
+
+    if (GFX_CRUMBLED(Feld[x][y]))
+      DrawLevelFieldCrumbledSandNeighbours(x, y);
+  }
+#endif
 
 #if 0
   /* some elements can leave other elements behind after moving */
@@ -8617,6 +8635,33 @@ static boolean canEnterSupaplexPort(int x, int y, int dx, int dy)
 }
 #endif
 
+static boolean canFallDown(struct PlayerInfo *player)
+{
+  int jx = player->jx, jy = player->jy;
+
+  return (IN_LEV_FIELD(jx, jy + 1) &&
+	  (IS_FREE(jx, jy + 1) ||
+	   (Feld[jx][jy + 1] == EL_ACID && player->can_fall_into_acid)) &&
+	  IS_WALKABLE_FROM(Feld[jx][jy], MV_DOWN) &&
+	  !IS_WALKABLE_INSIDE(Feld[jx][jy]));
+}
+
+static boolean canPassField(int x, int y, int move_dir)
+{
+  int opposite_dir = MV_DIR_OPPOSITE(move_dir);
+  int dx = (move_dir & MV_LEFT ? -1 : move_dir & MV_RIGHT ? +1 : 0);
+  int dy = (move_dir & MV_UP   ? -1 : move_dir & MV_DOWN  ? +1 : 0);
+  int nextx = x + dx;
+  int nexty = y + dy;
+  int element = Feld[x][y];
+
+  return (IS_PASSABLE_FROM(element, opposite_dir) &&
+	  !CAN_MOVE(element) &&
+	  IN_LEV_FIELD(nextx, nexty) && !IS_PLAYER(nextx, nexty) &&
+	  IS_WALKABLE_FROM(Feld[nextx][nexty], move_dir) &&
+	  (level.can_pass_to_walkable || IS_FREE(nextx, nexty)));
+}
+
 static boolean canMoveToValidFieldWithGravity(int x, int y, int move_dir)
 {
   int opposite_dir = MV_DIR_OPPOSITE(move_dir);
@@ -8624,10 +8669,17 @@ static boolean canMoveToValidFieldWithGravity(int x, int y, int move_dir)
   int dy = (move_dir & MV_UP   ? -1 : move_dir & MV_DOWN  ? +1 : 0);
   int newx = x + dx;
   int newy = y + dy;
+#if 0
   int nextx = newx + dx;
   int nexty = newy + dy;
-  boolean next_field_must_be_free = TRUE;
+#endif
 
+#if 1
+  return (IN_LEV_FIELD(newx, newy) && !IS_FREE_OR_PLAYER(newx, newy) &&
+	  (IS_DIGGABLE(Feld[newx][newy]) ||
+	   IS_WALKABLE_FROM(Feld[newx][newy], opposite_dir) ||
+	   canPassField(newx, newy, move_dir)));
+#else
   return (IN_LEV_FIELD(newx, newy) && !IS_FREE_OR_PLAYER(newx, newy) &&
 	  (IS_DIGGABLE(Feld[newx][newy]) ||
 	   IS_WALKABLE_FROM(Feld[newx][newy], opposite_dir) ||
@@ -8635,7 +8687,8 @@ static boolean canMoveToValidFieldWithGravity(int x, int y, int move_dir)
 	    !CAN_MOVE(Feld[newx][newy]) &&
 	    IN_LEV_FIELD(nextx, nexty) && !IS_PLAYER(nextx, nexty) &&
 	    IS_WALKABLE_FROM(Feld[nextx][nexty], move_dir) &&
-	    !(next_field_must_be_free && !IS_FREE(nextx, nexty)))));
+	    (level.can_pass_to_walkable || IS_FREE(nextx, nexty)))));
+#endif
 }
 
 static void CheckGravityMovement(struct PlayerInfo *player)
@@ -8656,7 +8709,6 @@ static void CheckGravityMovement(struct PlayerInfo *player)
 #endif
 
     int jx = player->jx, jy = player->jy;
-
 
     boolean player_is_moving_to_valid_field =
       (!player_is_snapping &&
@@ -8679,10 +8731,16 @@ static void CheckGravityMovement(struct PlayerInfo *player)
 #endif
 
 #if 1
+
+#if 1
+    boolean player_can_fall_down = canFallDown(player);
+#else
     boolean player_can_fall_down =
       (IN_LEV_FIELD(jx, jy + 1) &&
        (IS_FREE(jx, jy + 1) ||
 	(Feld[jx][jy + 1] == EL_ACID && player->can_fall_into_acid)));
+#endif
+
 #else
     boolean player_can_fall_down =
       (IN_LEV_FIELD(jx, jy + 1) &&
@@ -8713,9 +8771,11 @@ static void CheckGravityMovement(struct PlayerInfo *player)
        );
 #endif
 
+#if 0
     boolean player_is_standing_on_valid_field =
       (IS_WALKABLE_INSIDE(Feld[jx][jy]) ||
        (IS_WALKABLE(Feld[jx][jy]) && !ACCESS_FROM(Feld[jx][jy], MV_DOWN)));
+#endif
 
 #if 0
     printf("::: checking gravity NOW [%d, %d, %d] [%d] [%d / %d] ...\n",
@@ -8728,7 +8788,9 @@ static void CheckGravityMovement(struct PlayerInfo *player)
 #endif
 
     if (player_can_fall_down &&
+#if 0
 	!player_is_standing_on_valid_field &&
+#endif
 	!player_is_moving_to_valid_field)
     {
 #if 0
@@ -8922,6 +8984,9 @@ boolean MovePlayer(struct PlayerInfo *player, int dx, int dy)
 #endif
 
 #endif
+
+  /* store if player is automatically moved to next field */
+  player->is_auto_moving = (player->programmed_action != MV_NO_MOVING);
 
   /* remove the last programmed player action */
   player->programmed_action = 0;
@@ -10308,6 +10373,13 @@ int DigField(struct PlayerInfo *player,
 	if (!ACCESS_FROM(element, opposite_direction))
 	  return MF_NO_ACTION;	/* field not accessible from this direction */
 
+#if 1
+	if (element == EL_EMPTY_SPACE &&
+	    game.gravity && !player->is_auto_moving &&
+	    canFallDown(player) && move_direction != MV_DOWN)
+	  return MF_NO_ACTION;	/* player cannot walk here due to gravity */
+#endif
+
 	if (element >= EL_GATE_1 && element <= EL_GATE_4)
 	{
 	  if (!player->key[element - EL_GATE_1])
@@ -10339,12 +10411,15 @@ int DigField(struct PlayerInfo *player,
       }
       else if (IS_PASSABLE(element))
       {
-	boolean next_field_must_be_free = TRUE;
+#if 1
+	if (!canPassField(x, y, move_direction))
+	  return MF_NO_ACTION;
+#else
 
 #if 1
 	if (!IN_LEV_FIELD(nextx, nexty) || IS_PLAYER(nextx, nexty) ||
 	    !IS_WALKABLE_FROM(Feld[nextx][nexty], move_direction) ||
-	    (next_field_must_be_free && !IS_FREE(nextx, nexty)))
+	    (!level.can_pass_to_walkable && !IS_FREE(nextx, nexty)))
 	  return MF_NO_ACTION;
 #else
 	if (!IN_LEV_FIELD(nextx, nexty) || !IS_FREE(nextx, nexty))
@@ -10365,12 +10440,14 @@ int DigField(struct PlayerInfo *player,
 	  return MF_NO_ACTION;
 #endif
 
-	if (element >= EL_EM_GATE_1 && element <= EL_EM_GATE_4)
+#endif
+
+	if (IS_EM_GATE(element))
 	{
 	  if (!player->key[element - EL_EM_GATE_1])
 	    return MF_NO_ACTION;
 	}
-	else if (element >= EL_EM_GATE_1_GRAY && element <= EL_EM_GATE_4_GRAY)
+	else if (IS_EM_GATE_GRAY(element))
 	{
 	  if (!player->key[element - EL_EM_GATE_1_GRAY])
 	    return MF_NO_ACTION;

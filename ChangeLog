@@ -1,5 +1,8 @@
+2004-03-24
+	* fixed bug with movable elements not moving after left behind by CEs
+
 2004-03-23
-	* bug fixed with movable elements not moving anymore after falling down
+	* fixed bug with movable elements not moving anymore after falling down
 
 2004-03-22
 	* fixed another bug with custom elements digging and leaving elements
