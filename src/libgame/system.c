@@ -272,6 +272,29 @@ inline static int GetRealDepth(int depth)
   return (depth == DEFAULT_DEPTH ? video.default_depth : depth);
 }
 
+inline static void sysFillRectangle(Bitmap *bitmap, int x, int y,
+			       int width, int height, Pixel color)
+{
+#ifdef TARGET_SDL
+  SDLFillRectangle(bitmap, x, y, width, height, color);
+#else
+  X11FillRectangle(bitmap, x, y, width, height, color);
+#endif
+}
+
+inline static void sysCopyArea(Bitmap *src_bitmap, Bitmap *dst_bitmap,
+			       int src_x, int src_y, int width, int height,
+			       int dst_x, int dst_y, int mask_mode)
+{
+#ifdef TARGET_SDL
+  SDLCopyArea(src_bitmap, dst_bitmap,
+	      src_x, src_y, width, height, dst_x, dst_y, mask_mode);
+#else
+  X11CopyArea(src_bitmap, dst_bitmap,
+	      src_x, src_y, width, height, dst_x, dst_y, mask_mode);
+#endif
+}
+
 inline void InitVideoDisplay(void)
 {
 #if defined(TARGET_SDL)
@@ -466,59 +489,29 @@ inline boolean DrawingOnBackground(int x, int y)
 }
 
 inline void BlitBitmap(Bitmap *src_bitmap, Bitmap *dst_bitmap,
-		       int src_x, int src_y,
-		       int width, int height,
+		       int src_x, int src_y, int width, int height,
 		       int dst_x, int dst_y)
 {
   if (DrawingDeactivated(dst_x, dst_y, width, height))
     return;
 
-#ifdef TARGET_SDL
-  SDLCopyArea(src_bitmap, dst_bitmap,
-	      src_x, src_y, width, height, dst_x, dst_y, SDLCOPYAREA_OPAQUE);
-#else
-  XCopyArea(display, src_bitmap->drawable, dst_bitmap->drawable,
-	    dst_bitmap->gc, src_x, src_y, width, height, dst_x, dst_y);
-#endif
+  sysCopyArea(src_bitmap, dst_bitmap, src_x, src_y, width, height,
+	      dst_x, dst_y, BLIT_OPAQUE);
 }
 
-inline void DrawRectangle(Bitmap *bitmap, int x, int y, int width, int height,
+inline void FillRectangle(Bitmap *bitmap, int x, int y, int width, int height,
 			  Pixel color)
 {
   if (DrawingDeactivated(x, y, width, height))
     return;
 
-#ifdef TARGET_SDL
-  SDLFillRectangle(bitmap, x, y, width, height, color);
-#else
-  XSetForeground(display, bitmap->gc, color);
-  XFillRectangle(display, bitmap->drawable, bitmap->gc, x, y, width, height);
-  XSetForeground(display, bitmap->gc, BlackPixel(display, screen));
-#endif
+  sysFillRectangle(bitmap, x, y, width, height, color);
 }
 
-#if 1
 inline void ClearRectangle(Bitmap *bitmap, int x, int y, int width, int height)
 {
-#ifdef TARGET_SDL
-  DrawRectangle(bitmap, x, y, width, height, 0x000000);
-#else
-  DrawRectangle(bitmap, x, y, width, height, 0x000000);
-#endif
+  FillRectangle(bitmap, x, y, width, height, BlackPixel(display, screen));
 }
-#else
-inline void ClearRectangle(Bitmap *bitmap, int x, int y, int width, int height)
-{
-  if (DrawingDeactivated(x, y, width, height))
-    return;
-
-#ifdef TARGET_SDL
-  SDLFillRectangle(bitmap, x, y, width, height, 0x000000);
-#else
-  XFillRectangle(display, bitmap->drawable, bitmap->gc, x, y, width, height);
-#endif
-}
-#endif
 
 inline void ClearRectangleOnBackground(Bitmap *bitmap, int x, int y,
 				       int width, int height)
@@ -571,13 +564,8 @@ inline void BlitBitmapMasked(Bitmap *src_bitmap, Bitmap *dst_bitmap,
   if (DrawingDeactivated(dst_x, dst_y, width, height))
     return;
 
-#ifdef TARGET_SDL
-  SDLCopyArea(src_bitmap, dst_bitmap,
-	      src_x, src_y, width, height, dst_x, dst_y, SDLCOPYAREA_MASKED);
-#else
-  XCopyArea(display, src_bitmap->drawable, dst_bitmap->drawable,
-	    src_bitmap->clip_gc, src_x, src_y, width, height, dst_x, dst_y);
-#endif
+  sysCopyArea(src_bitmap, dst_bitmap, src_x, src_y, width, height,
+	      dst_x, dst_y, BLIT_MASKED);
 }
 
 inline void BlitBitmapOnBackground(Bitmap *src_bitmap, Bitmap *dst_bitmap,
@@ -610,7 +598,6 @@ inline void DrawSimpleWhiteLine(Bitmap *bitmap, int from_x, int from_y,
 #else
   XSetForeground(display, bitmap->gc, WhitePixel(display, screen));
   XDrawLine(display, bitmap->drawable, bitmap->gc, from_x, from_y, to_x, to_y);
-  XSetForeground(display, bitmap->gc, BlackPixel(display, screen));
 #endif
 }
 
@@ -663,9 +650,6 @@ inline void DrawLines(Bitmap *bitmap, struct XY *points, int num_points,
   XSetForeground(display, bitmap->line_gc[1], pixel);
   XDrawLines(display, bitmap->drawable, bitmap->line_gc[1],
 	     (XPoint *)points, num_points, CoordModeOrigin);
-  /*
-  XSetForeground(display, gc, BlackPixel(display, screen));
-  */
 #endif
 }
 
@@ -676,40 +660,20 @@ inline Pixel GetPixel(Bitmap *bitmap, int x, int y)
 #elif defined(TARGET_ALLEGRO)
   return AllegroGetPixel(bitmap->drawable, x, y);
 #else
-  unsigned long pixel_value;
-  XImage *pixel_image;
-
-  pixel_image = XGetImage(display, bitmap->drawable, x, y, 1, 1,
-			  AllPlanes, ZPixmap);
-  pixel_value = XGetPixel(pixel_image, 0, 0);
-
-  XDestroyImage(pixel_image);
-
-  return pixel_value;
+  return X11GetPixel(bitmap, x, y);
 #endif
 }
 
 inline Pixel GetPixelFromRGB(Bitmap *bitmap, unsigned int color_r,
 			     unsigned int color_g, unsigned int color_b)
 {
-  Pixel pixel;
-
 #if defined(TARGET_SDL)
-  pixel = SDL_MapRGB(bitmap->surface->format, color_r, color_g, color_b);
+  return SDL_MapRGB(bitmap->surface->format, color_r, color_g, color_b);
 #elif defined(TARGET_ALLEGRO)
-  pixel = AllegroAllocColorCell(color_r << 8, color_g << 8, color_b << 8);
-#elif defined(TARGET_X11_NATIVE)
-  XColor xcolor;
-
-  xcolor.flags = DoRed | DoGreen | DoBlue;
-  xcolor.red = (color_r << 8);
-  xcolor.green = (color_g << 8);
-  xcolor.blue = (color_b << 8);
-  XAllocColor(display, cmap, &xcolor);
-  pixel = xcolor.pixel;
+  return AllegroAllocColorCell(color_r << 8, color_g << 8, color_b << 8);
+#else
+  return X11GetPixelFromRGB(color_r, color_g, color_b);
 #endif
-
-  return pixel;
 }
 
 inline Pixel GetPixelFromRGBcompact(Bitmap *bitmap, unsigned int color)

@@ -168,7 +168,7 @@ void DrawInitText(char *text, int ypos, int font_nr)
 
     ClearRectangle(window, 0, ypos, video.width, getFontHeight(font_nr));
     DrawTextExt(window, (video.width - text_width) / 2, ypos, text, font_nr,
-		FONT_OPAQUE);
+		BLIT_OPAQUE);
     FlushDisplay();
   }
 }
@@ -206,10 +206,10 @@ void DrawTextF(int x, int y, int font_nr, char *format, ...)
 
 void DrawText(int x, int y, char *text, int font_nr)
 {
-  int mask_mode = FONT_OPAQUE;
+  int mask_mode = BLIT_OPAQUE;
 
   if (DrawingOnBackground(x, y))
-    mask_mode = FONT_MASKED;
+    mask_mode = BLIT_MASKED;
 
   DrawTextExt(drawto, x, y, text, font_nr, mask_mode);
 
@@ -261,22 +261,8 @@ void DrawTextExt(DrawBuffer *dst_bitmap, int dst_x, int dst_y, char *text,
     else if (c == '\\')			/* bad luck ... */
       c = '/';
 
-#if 1
     if (getFontChar(font_nr, c, &src_x, &src_y))
     {
-#else
-    if ((c >= 32 && c <= 95) || c == '°' || c == '´' || c == '|')
-    {
-      int src_x= font->src_x + ((c - 32) % FONT_CHARS_PER_LINE) * font->width;
-      int src_y= font->src_y + ((c - 32) / FONT_CHARS_PER_LINE) * font->height;
-
-      if (c == '°' || c == '´' || c == '|')	/* map '°' and 'TM' signs */
-      {
-	src_x = font->src_x + FONT_CHARS_PER_LINE * font->width;
-	src_y = font->src_y + (c == '°' ? 1 : c == '´' ? 2 : 3) * font->height;
-      }
-#endif
-
       if (print_inverse)	/* special mode for text gadgets */
       {
 	/* first step: draw solid colored rectangle (use "cursor" character) */
@@ -292,7 +278,7 @@ void DrawTextExt(DrawBuffer *dst_bitmap, int dst_x, int dst_y, char *text,
 	BlitBitmapMasked(font->bitmap, dst_bitmap,
 			 0, 0, font->width, font->height, dst_x, dst_y);
       }
-      else if (mask_mode == FONT_MASKED)
+      else if (mask_mode == BLIT_MASKED)
       {
 	/* clear font character background */
 	ClearRectangleOnBackground(dst_bitmap, dst_x, dst_y,

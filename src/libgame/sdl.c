@@ -175,7 +175,7 @@ inline boolean SDLSetVideoMode(DrawBuffer **backbuffer, boolean fullscreen)
 inline void SDLCopyArea(Bitmap *src_bitmap, Bitmap *dst_bitmap,
 			int src_x, int src_y,
 			int width, int height,
-			int dst_x, int dst_y, int copy_mode)
+			int dst_x, int dst_y, int mask_mode)
 {
   Bitmap *real_dst_bitmap = (dst_bitmap == window ? backbuffer : dst_bitmap);
   SDL_Rect src_rect, dst_rect;
@@ -207,7 +207,7 @@ inline void SDLCopyArea(Bitmap *src_bitmap, Bitmap *dst_bitmap,
   dst_rect.h = height;
 
   if (src_bitmap != backbuffer || dst_bitmap != window)
-    SDL_BlitSurface((copy_mode == SDLCOPYAREA_MASKED ?
+    SDL_BlitSurface((mask_mode == BLIT_MASKED ?
 		     src_bitmap->surface_masked : src_bitmap->surface),
 		    &src_rect, real_dst_bitmap->surface, &dst_rect);
 
@@ -216,13 +216,15 @@ inline void SDLCopyArea(Bitmap *src_bitmap, Bitmap *dst_bitmap,
 }
 
 inline void SDLFillRectangle(Bitmap *dst_bitmap, int x, int y,
-			     int width, int height, unsigned int color)
+			     int width, int height, Uint32 color)
 {
   Bitmap *real_dst_bitmap = (dst_bitmap == window ? backbuffer : dst_bitmap);
   SDL_Rect rect;
-  unsigned int color_r = (color >> 16) && 0xff;
-  unsigned int color_g = (color >>  8) && 0xff;
-  unsigned int color_b = (color >>  0) && 0xff;
+#if 0
+  unsigned int color_r = (color >> 16) & 0xff;
+  unsigned int color_g = (color >>  8) & 0xff;
+  unsigned int color_b = (color >>  0) & 0xff;
+#endif
 
 #ifdef FULLSCREEN_BUG
   if (dst_bitmap == backbuffer || dst_bitmap == window)
@@ -237,22 +239,28 @@ inline void SDLFillRectangle(Bitmap *dst_bitmap, int x, int y,
   rect.w = width;
   rect.h = height;
 
+#if 1
+  SDL_FillRect(real_dst_bitmap->surface, &rect, color);
+#else
   SDL_FillRect(real_dst_bitmap->surface, &rect,
 	       SDL_MapRGB(real_dst_bitmap->surface->format,
 			  color_r, color_g, color_b));
+#endif
 
   if (dst_bitmap == window)
     SDL_UpdateRect(backbuffer->surface, x, y, width, height);
 }
 
 inline void SDLDrawSimpleLine(Bitmap *dst_bitmap, int from_x, int from_y,
-			      int to_x, int to_y, unsigned int color)
+			      int to_x, int to_y, Uint32 color)
 {
   SDL_Surface *surface = dst_bitmap->surface;
   SDL_Rect rect;
+#if 0
   unsigned int color_r = (color >> 16) & 0xff;
   unsigned int color_g = (color >>  8) & 0xff;
   unsigned int color_b = (color >>  0) & 0xff;
+#endif
 
   if (from_x > to_x)
     swap_numbers(&from_x, &to_x);
@@ -273,8 +281,12 @@ inline void SDLDrawSimpleLine(Bitmap *dst_bitmap, int from_x, int from_y,
   }
 #endif
 
+#if 1
+  SDL_FillRect(surface, &rect, color);
+#else
   SDL_FillRect(surface, &rect,
                SDL_MapRGB(surface->format, color_r, color_g, color_b));
+#endif
 }
 
 inline void SDLDrawLine(Bitmap *dst_bitmap, int from_x, int from_y,

@@ -306,7 +306,11 @@ inline void X11InitVideoDisplay(void);
 inline void X11InitVideoBuffer(DrawBuffer **, DrawWindow **);
 
 void X11ZoomBitmap(Bitmap *, Bitmap *);
-
 Bitmap *X11LoadImage(char *);
+
+inline void X11CopyArea(Bitmap *, Bitmap *, int, int, int, int, int, int, int);
+inline void X11FillRectangle(Bitmap *, int, int, int, int, Pixel);
+inline Pixel X11GetPixel(Bitmap *, int, int);
+inline Pixel X11GetPixelFromRGB(unsigned int, unsigned int, unsigned int);
 
 #endif /* X11_H */

@@ -919,7 +919,7 @@ void InitGame()
   else
   {
     DrawTextExt(drawto, DX + XX_EMERALDS, DY + YY_EMERALDS,
-		int2str(level_nr, 3), FONT_LEVEL_NUMBER, FONT_OPAQUE);
+		int2str(level_nr, 3), FONT_LEVEL_NUMBER, BLIT_OPAQUE);
     BlitBitmap(drawto, drawto,
 	       DX + XX_EMERALDS, DY + YY_EMERALDS + 1,
 	       getFontWidth(FONT_LEVEL_NUMBER) * 3,

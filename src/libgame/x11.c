@@ -327,4 +327,51 @@ Bitmap *X11LoadImage(char *filename)
   return new_bitmap;
 }
 
+inline void X11CopyArea(Bitmap *src_bitmap, Bitmap *dst_bitmap,
+			int src_x, int src_y, int width, int height,
+			int dst_x, int dst_y, int mask_mode)
+{
+  XCopyArea(display, src_bitmap->drawable, dst_bitmap->drawable,
+	    (mask_mode == BLIT_MASKED ? src_bitmap->clip_gc : dst_bitmap->gc),
+	    src_x, src_y, width, height, dst_x, dst_y);
+}
+
+inline void X11FillRectangle(Bitmap *bitmap, int x, int y,
+			     int width, int height, Pixel color)
+{
+  XSetForeground(display, bitmap->gc, color);
+  XFillRectangle(display, bitmap->drawable, bitmap->gc, x, y, width, height);
+}
+
+inline Pixel X11GetPixel(Bitmap *bitmap, int x, int y)
+{
+  unsigned long pixel_value;
+  XImage *pixel_image;
+
+  pixel_image = XGetImage(display, bitmap->drawable, x, y, 1, 1,
+			  AllPlanes, ZPixmap);
+  pixel_value = XGetPixel(pixel_image, 0, 0);
+
+  XDestroyImage(pixel_image);
+
+  return pixel_value;
+}
+
+inline Pixel X11GetPixelFromRGB(unsigned int color_r, unsigned int color_g,
+				unsigned int color_b)
+{
+  XColor xcolor;
+  Pixel pixel;
+
+  xcolor.flags = DoRed | DoGreen | DoBlue;
+  xcolor.red = (color_r << 8);
+  xcolor.green = (color_g << 8);
+  xcolor.blue = (color_b << 8);
+
+  XAllocColor(display, cmap, &xcolor);
+  pixel = xcolor.pixel;
+
+  return pixel;
+}
+
 #endif /* TARGET_X11 */

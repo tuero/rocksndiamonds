@@ -40,6 +40,9 @@
 
 #define DEFAULT_DEPTH		0
 
+#define BLIT_OPAQUE		0
+#define BLIT_MASKED		1
+
 #define FULLSCREEN_NOT_AVAILABLE FALSE
 #define FULLSCREEN_AVAILABLE	 TRUE
 
@@ -654,7 +657,7 @@ inline Bitmap *CreateBitmapStruct(void);
 inline Bitmap *CreateBitmap(int, int, int);
 inline void FreeBitmap(Bitmap *);
 inline void BlitBitmap(Bitmap *, Bitmap *, int, int, int, int, int, int);
-inline void DrawRectangle(Bitmap *, int, int, int, int, Pixel);
+inline void FillRectangle(Bitmap *, int, int, int, int, Pixel);
 inline void ClearRectangle(Bitmap *, int, int, int, int);
 inline void ClearRectangleOnBackground(Bitmap *, int, int, int, int);
 inline void SetClipMask(Bitmap *, GC, Pixmap);

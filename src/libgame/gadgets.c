@@ -165,7 +165,7 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 	/* gadget text value */
 	DrawTextExt(drawto,
 		    gi->x + border, gi->y + border, text,
-		    font_type, FONT_MASKED);
+		    font_type, BLIT_MASKED);
 
 	cursor_letter = gi->text.value[gi->text.cursor_position];
 	cursor_string[0] = '~';
@@ -177,7 +177,7 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 	  DrawTextExt(drawto,
 		      gi->x + border + gi->text.cursor_position * font_width,
 		      gi->y + border, cursor_string,
-		      font_type, FONT_MASKED);
+		      font_type, BLIT_MASKED);
       }
       break;
 
@@ -222,7 +222,7 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 
 	/* gadget text value */
 	DrawTextExt(drawto, gi->x + border, gi->y + border, text,
-		    font_type, FONT_MASKED);
+		    font_type, BLIT_MASKED);
 
 	if (pressed)
 	{
@@ -324,7 +324,7 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 	  {
 	    if (i == gi->selectbox.current_index)
 	    {
-	      DrawRectangle(drawto,
+	      FillRectangle(drawto,
 			    gi->selectbox.x + border,
 			    gi->selectbox.y + border + i * font_height,
 			    gi->selectbox.width - 2 * border, font_height,
@@ -343,7 +343,7 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 	    DrawTextExt(drawto,
 			gi->selectbox.x + border,
 			gi->selectbox.y + border + i * font_height, text,
-			font_type, FONT_MASKED);
+			font_type, BLIT_MASKED);
 	  }
 
 	  redraw_selectbox = TRUE;
@@ -790,6 +790,8 @@ static void HandleGadgetTags(struct GadgetInfo *gi, int first_tag, va_list ap)
     if (!getFontChar(font_nr, '|', &src_x, &src_y))
       Error(ERR_EXIT, "selectbox gadget incomplete (cannot get cursor)");
 
+    src_x += font_width / 2;
+    src_y += font_height / 2;
     gi->selectbox.reverse_color = GetPixel(font->bitmap, src_x, src_y);
 
     /* always start with closed selectbox */
@@ -1210,6 +1212,24 @@ void HandleGadgets(int mx, int my, int button)
 
       if (last_x != gi->event.x || last_y != gi->event.y)
 	changed_position = TRUE;
+    }
+    else if (gi->type & GD_TYPE_SELECTBOX)
+    {
+      int old_index = gi->selectbox.current_index;
+
+      /* if mouse moving inside activated selectbox, select value */
+      if (my >= gi->selectbox.y && my < gi->selectbox.y + gi->selectbox.height)
+	gi->selectbox.current_index =
+	  (my - gi->selectbox.y - gi->border.size) /
+	  getFontWidth(gi->selectbox.font_type);
+
+      if (gi->selectbox.current_index < 0)
+	gi->selectbox.current_index = 0;
+      else if (gi->selectbox.current_index > gi->selectbox.num_values - 1)
+	gi->selectbox.current_index = gi->selectbox.num_values - 1;
+
+      if (gi->selectbox.current_index != old_index)
+	DrawGadget(gi, DG_PRESSED, DG_DIRECT);
     }
   }
 

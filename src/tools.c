@@ -278,7 +278,7 @@ void BackToFront()
       info1[0] = '\0';
 
     sprintf(text, "%.1f fps%s", global.frames_per_second, info1);
-    DrawTextExt(window, SX, SY, text, FONT_TEXT_2, FONT_OPAQUE);
+    DrawTextExt(window, SX, SY, text, FONT_TEXT_2, BLIT_OPAQUE);
   }
 
   FlushDisplay();

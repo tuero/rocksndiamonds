@@ -23,9 +23,6 @@
 
 #define SURFACE_FLAGS		(SDL_SWSURFACE)
 
-#define SDLCOPYAREA_OPAQUE	0
-#define SDLCOPYAREA_MASKED	1
-
 /* system dependent definitions */
 
 #define TARGET_STRING		"SDL"
@@ -78,6 +75,9 @@ struct XY
 /* SDL symbol definitions */
 
 #define None			0L
+
+#define BlackPixel(d, s)	0x000000
+#define WhitePixel(d, s)	0xffffff
 
 #define EVENT_BUTTONPRESS	SDL_MOUSEBUTTONDOWN
 #define EVENT_BUTTONRELEASE	SDL_MOUSEBUTTONUP
@@ -325,8 +325,8 @@ inline void SDLInitVideoDisplay(void);
 inline void SDLInitVideoBuffer(DrawBuffer **, DrawWindow **, boolean);
 inline boolean SDLSetVideoMode(DrawBuffer **, boolean);
 inline void SDLCopyArea(Bitmap *, Bitmap *, int, int, int, int, int, int, int);
-inline void SDLFillRectangle(Bitmap *, int, int, int, int, unsigned int);
-inline void SDLDrawSimpleLine(Bitmap *, int, int, int, int, unsigned int);
+inline void SDLFillRectangle(Bitmap *, int, int, int, int, Uint32);
+inline void SDLDrawSimpleLine(Bitmap *, int, int, int, int, Uint32);
 inline void SDLDrawLine(Bitmap *, int, int, int, int, Uint32);
 inline Pixel SDLGetPixel(Bitmap *, int, int);
 

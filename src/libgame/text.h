@@ -32,9 +32,6 @@
 #define FONT_CHARS_PER_LINE	16
 #define FONT_LINES_PER_FONT	4
 
-#define FONT_OPAQUE		0
-#define FONT_MASKED		1
-
 /* text output definitions */
 #define MAX_OUTPUT_LINESIZE	1024
 
