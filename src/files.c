@@ -689,6 +689,8 @@ static int LoadLevel_CUS4(FILE *file, int chunk_size, struct LevelInfo *level)
 
   /* read change property values */
 
+  setElementChangePages(ei, ei->num_change_pages);
+
   for (i=0; i < ei->num_change_pages; i++)
   {
     struct ElementChangeInfo *change = &ei->change_page[i];

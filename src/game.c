@@ -5364,9 +5364,12 @@ static void ChangeElementNowExt(int x, int y, int target_element)
     RelocatePlayer(x, y, target_element);
 }
 
-static void ChangeElementNow(int x, int y, int element, int page)
+static boolean ChangeElementNow(int x, int y, int element, int page)
 {
   struct ElementChangeInfo *change = &element_info[element].change_page[page];
+
+  if (Changed[x][y])		/* do not change already changed elements */
+    return FALSE;
 
   Changed[x][y] = TRUE;		/* no more changes in this frame */
 
@@ -5375,7 +5378,8 @@ static void ChangeElementNow(int x, int y, int element, int page)
   if (change->explode)
   {
     Bang(x, y);
-    return;
+
+    return TRUE;
   }
 
   if (change->use_content)
@@ -5433,7 +5437,7 @@ static void ChangeElementNow(int x, int y, int element, int page)
 
       if (change->only_complete && change->use_random_change &&
 	  RND(100) < change->random)
-	return;
+	return FALSE;
 
       for (yy = 0; yy < 3; yy++) for(xx = 0; xx < 3 ; xx++)
       {
@@ -5466,6 +5470,8 @@ static void ChangeElementNow(int x, int y, int element, int page)
 
     PlaySoundLevelElementAction(x, y, element, ACTION_CHANGING);
   }
+
+  return TRUE;
 }
 
 static void ChangeElement(int x, int y, int page)
@@ -5506,10 +5512,11 @@ static void ChangeElement(int x, int y, int page)
       return;
     }
 
-    ChangeElementNow(x, y, element, page);
-
-    if (change->post_change_function)
-      change->post_change_function(x, y);
+    if (ChangeElementNow(x, y, element, page))
+    {
+      if (change->post_change_function)
+	change->post_change_function(x, y);
+    }
   }
 }
 
@@ -5566,8 +5573,10 @@ static boolean CheckTriggeredElementChange(int lx, int ly, int trigger_element,
       if (x == lx && y == ly)	/* do not change trigger element itself */
 	continue;
 
+#if 0
       if (Changed[x][y])	/* do not change already changed elements */
 	continue;
+#endif
 
       if (Feld[x][y] == element)
       {

@@ -1,3 +1,6 @@
+Release Version 3.0.4 [?? ??? ????]
+-----------------------------------
+
 Release Version 3.0.3 [08 SEP 2003]
 -----------------------------------
 	- fixed bug (missing array boundary check) which could crash the game
@@ -8,6 +11,7 @@ Release Version 3.0.3 [08 SEP 2003]
 	- added envelope content which gets displayed when collecting envelope
 	- added multiple change event pages for custom elements
 	- added support for loading various music formats through SDL_mixer
+	- added music to Supaplex classic level set
 
 Release Version 3.0.2 [22 AUG 2003]
 -----------------------------------
