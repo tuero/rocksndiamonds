@@ -88,8 +88,13 @@ static boolean player_killed(struct PLAYER *ply)
   if (!ply->alive)
     return FALSE;
 
-  if (lev.time_initial > 0 && lev.time == 0)
+#if 1
+  if (lev.killed_out_of_time && setup.time_limit)
     return TRUE;
+#else
+  if (lev.time_initial > 0 && lev.time == 0 && setup.time_limit)
+    return TRUE;
+#endif
 
   switch(Cave[y-1][x])
   {
@@ -1126,8 +1131,13 @@ static boolean player_digfield(struct PLAYER *ply, int dx, int dy)
       case Xexit_3:
 	play_element_sound(x, y, SAMPLE_exit_leave, Xexit_1);
 
-	if (--lev.home == 0 && lev.time_initial > 0)	/* game won */
+	lev.home--;
+
+#if 0
+	/* !!! CHECK SCORE CALCULATION !!! */
+	if (lev.home == 0 && lev.time_initial > 0)	/* game won */
 	  lev.score += lev.time * lev.exit_score / 100;
+#endif
 
 	ply->anim = SPR_walk + anim;
 	ply->x = x;

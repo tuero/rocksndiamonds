@@ -3032,6 +3032,29 @@ void HandleGameActions()
       TimeFrames = 0;
       TapeTime++;
 
+      if (!level.use_step_counter)
+      {
+	TimePlayed++;
+
+	if (TimeLeft > 0)
+	{
+	  TimeLeft--;
+
+	  if (TimeLeft <= 10 && setup.time_limit)
+	    PlaySoundStereo(SND_GAME_RUNNING_OUT_OF_TIME, SOUND_MIDDLE);
+
+	  DrawGameValue_Time(TimeLeft);
+
+	  if (!TimeLeft && setup.time_limit)
+	    level.native_em_level->lev->killed_out_of_time = TRUE;
+	}
+	else if (level.time == 0 && level.native_em_level->lev->home > 0)
+	  DrawGameValue_Time(TimePlayed);
+
+	level.native_em_level->lev->time =
+	  (level.time == 0 ? TimePlayed : TimeLeft);
+      }
+
       if (tape.recording || tape.playing)
 	DrawVideoDisplay(VIDEO_STATE_TIME_ON, TapeTime);
     }

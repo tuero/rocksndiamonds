@@ -41,8 +41,23 @@
 #define SXSIZE			(SCR_FIELDX * TILEX)
 #define SYSIZE			(SCR_FIELDY * TILEY)
 
-#define DISPLAY_TIME(x)		(((x) * 8 + 49) / 50)
+#if 1
+#define FRAMES_PER_SECOND	50
 
+#define ROUNDED_DIVIDE(x, y)	(((x) + (y) - 1) / (y))
+
+#define SECONDS_TO_FRAMES(x)	((x) * FRAMES_PER_SECOND)
+#define FRAMES_TO_SECONDS(x)	((x) / FRAMES_PER_SECOND)
+
+#define SECONDS_TO_CYCLES(x)	ROUNDED_DIVIDE((x) * FRAMES_PER_SECOND, 8)
+#define CYCLES_TO_SECONDS(x)	ROUNDED_DIVIDE((x) * 8, FRAMES_PER_SECOND)
+
+#define DISPLAY_TIME(x)		ROUNDED_DIVIDE(x, FRAMES_PER_SECOND)
+
+#else
+
+#define DISPLAY_TIME(x)		(((x) * 8 + 49) / 50)
+#endif
 
 extern Bitmap *screenBitmap;
 extern Bitmap *scoreBitmap;

@@ -2544,6 +2544,37 @@ int NewHiScore()
   return position;
 }
 
+inline static int getElementMoveStepsize(int x, int y)
+{
+  int element = Feld[x][y];
+  int direction = MovDir[x][y];
+  int dx = (direction == MV_LEFT ? -1 : direction == MV_RIGHT ? +1 : 0);
+  int dy = (direction == MV_UP   ? -1 : direction == MV_DOWN  ? +1 : 0);
+  int horiz_move = (dx != 0);
+  int sign = (horiz_move ? dx : dy);
+  int step = sign * element_info[element].move_stepsize;
+
+  /* special values for move stepsize for spring and things on conveyor belt */
+  if (horiz_move)
+  {
+#if 0
+    if (element == EL_SPRING)
+      step = sign * MOVE_STEPSIZE_NORMAL * 2;
+    else if (CAN_FALL(element) && !CAN_MOVE(element) &&
+	     y < lev_fieldy - 1 && IS_BELT_ACTIVE(Feld[x][y + 1]))
+      step = sign * MOVE_STEPSIZE_NORMAL / 2;
+#else
+    if (CAN_FALL(element) &&
+	y < lev_fieldy - 1 && IS_BELT_ACTIVE(Feld[x][y + 1]))
+      step = sign * MOVE_STEPSIZE_NORMAL / 2;
+    else if (element == EL_SPRING)
+      step = sign * MOVE_STEPSIZE_NORMAL * 2;
+#endif
+  }
+
+  return step;
+}
+
 void InitPlayerGfxAnimation(struct PlayerInfo *player, int action, int dir)
 {
   if (player->GfxAction != action || player->GfxDir != dir)
@@ -2583,6 +2614,27 @@ void InitMovingField(int x, int y, int direction)
   if (!WasJustMoving[x][y] || direction != MovDir[x][y])
     ResetGfxAnimation(x, y);
 
+#if 1
+
+  MovDir[x][y] = direction;
+  GfxDir[x][y] = direction;
+  GfxAction[x][y] = (direction == MV_DOWN && CAN_FALL(element) ?
+		     ACTION_FALLING : ACTION_MOVING);
+
+  if (getElementMoveStepsize(x, y) != 0)
+  {
+    if (Feld[newx][newy] == EL_EMPTY)
+      Feld[newx][newy] = EL_BLOCKED;
+
+    MovDir[newx][newy] = MovDir[x][y];
+    GfxFrame[newx][newy] = GfxFrame[x][y];
+    GfxRandom[newx][newy] = GfxRandom[x][y];
+    GfxAction[newx][newy] = GfxAction[x][y];
+    GfxDir[newx][newy] = GfxDir[x][y];
+  }
+
+#else
+
   MovDir[newx][newy] = MovDir[x][y] = direction;
   GfxDir[x][y] = direction;
 
@@ -2598,6 +2650,7 @@ void InitMovingField(int x, int y, int direction)
   GfxRandom[newx][newy] = GfxRandom[x][y];
   GfxAction[newx][newy] = GfxAction[x][y];
   GfxDir[newx][newy] = GfxDir[x][y];
+#endif
 }
 
 void Moving2Blocked(int x, int y, int *goes_to_x, int *goes_to_y)
@@ -4237,37 +4290,6 @@ static void ActivateTimegateSwitch(int x, int y)
   Feld[x][y] = EL_TIMEGATE_SWITCH_ACTIVE;
 }
 
-inline static int getElementMoveStepsize(int x, int y)
-{
-  int element = Feld[x][y];
-  int direction = MovDir[x][y];
-  int dx = (direction == MV_LEFT ? -1 : direction == MV_RIGHT ? +1 : 0);
-  int dy = (direction == MV_UP   ? -1 : direction == MV_DOWN  ? +1 : 0);
-  int horiz_move = (dx != 0);
-  int sign = (horiz_move ? dx : dy);
-  int step = sign * element_info[element].move_stepsize;
-
-  /* special values for move stepsize for spring and things on conveyor belt */
-  if (horiz_move)
-  {
-#if 0
-    if (element == EL_SPRING)
-      step = sign * MOVE_STEPSIZE_NORMAL * 2;
-    else if (CAN_FALL(element) && !CAN_MOVE(element) &&
-	     y < lev_fieldy - 1 && IS_BELT_ACTIVE(Feld[x][y + 1]))
-      step = sign * MOVE_STEPSIZE_NORMAL / 2;
-#else
-    if (CAN_FALL(element) &&
-	y < lev_fieldy - 1 && IS_BELT_ACTIVE(Feld[x][y + 1]))
-      step = sign * MOVE_STEPSIZE_NORMAL / 2;
-    else if (element == EL_SPRING)
-      step = sign * MOVE_STEPSIZE_NORMAL * 2;
-#endif
-  }
-
-  return step;
-}
-
 void Impact(int x, int y)
 {
   boolean lastline = (y == lev_fieldy-1);
@@ -5006,6 +5028,11 @@ inline static void TurnRoundExt(int x, int y)
     boolean can_turn_right =
       CUSTOM_ELEMENT_CAN_ENTER_FIELD(element, right_x,right_y);
 
+#if 1
+    if (getElementMoveStepsize(x, y) == 0)
+      return;
+#endif
+
     if (move_pattern == MV_TURNING_LEFT)
       MovDir[x][y] = left_dir;
     else if (move_pattern == MV_TURNING_RIGHT)
@@ -5115,6 +5142,16 @@ inline static void TurnRoundExt(int x, int y)
     {
       boolean first_horiz = RND(2);
       int new_move_dir = MovDir[x][y];
+
+#if 1
+      if (getElementMoveStepsize(x, y) == 0)
+      {
+	first_horiz = (ABS(attr_x - x) >= ABS(attr_y - y));
+	MovDir[x][y] &= (first_horiz ? MV_HORIZONTAL : MV_VERTICAL);
+
+	return;
+      }
+#endif
 
       MovDir[x][y] =
 	new_move_dir & (first_horiz ? MV_HORIZONTAL : MV_VERTICAL);

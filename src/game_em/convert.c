@@ -134,8 +134,12 @@ int cleanup_em_level(unsigned char *src, int length)
     for (i = 2112; i < 2148; i++)
       src[i] = src[i - 64];
   }
+#if 0
+  else if (length >= 2106)	/* !!! TEST ONLY: SHOW BROKEN LEVELS !!! */
+#else
   else if (length >= 2106 &&
 	   src[1983] == 116)
+#endif
   {
     /* ---------- this cave has V4 file format ---------- */
     file_version = FILE_VERSION_EM_V4;
@@ -897,7 +901,11 @@ void prepare_em_level(void)
     for (x = 0; x < WIDTH; x++)
       Draw[y][x] = Cave[y][x];
 
+#if 1
+  lev.time_initial = lev.time_seconds;
+#else
   lev.time_initial = (lev.time_seconds * 50 + 7) / 8;
+#endif
   lev.time = lev.time_initial;
 
   lev.required = lev.required_initial;
@@ -927,6 +935,8 @@ void prepare_em_level(void)
   lev.wonderwall_time  = lev.wonderwall_time_initial;
 
   lev.home = lev.home_initial;
+
+  lev.killed_out_of_time = FALSE;
 
   ply1.num = 0;
   ply1.alive = ply1.alive_initial;

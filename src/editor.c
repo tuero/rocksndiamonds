@@ -1327,6 +1327,7 @@ static struct ValueTextInfo options_move_direction[] =
 
 static struct ValueTextInfo options_move_stepsize[] =
 {
+  { 0,				"not moving"			},
   { 1,				"very slow"			},
   { 2,				"slow"				},
   { 4,				"normal"			},

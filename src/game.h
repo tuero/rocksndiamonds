@@ -17,7 +17,10 @@
 #include "main.h"
 
 void GetPlayerConfig(void);
+
+void DrawGameValue_Time(int);
 void DrawGameDoorValues(void);
+
 void InitGameSound();
 void InitGame(void);
 

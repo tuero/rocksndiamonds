@@ -379,8 +379,13 @@ void game_initscreen(void)
     }
   }
 
+#if 1
+  DrawAllGameValues(lev.required, ply1.dynamite, lev.score,
+		    lev.time, ply1.keys | ply2.keys);
+#else
   DrawAllGameValues(lev.required, ply1.dynamite, lev.score,
 		    DISPLAY_TIME(lev.time + 4), ply1.keys | ply2.keys);
+#endif
 }
 
 void RedrawPlayfield_EM()
@@ -420,6 +425,11 @@ void game_animscreen(void)
 
 void DrawGameDoorValues_EM()
 {
+#if 1
+  DrawAllGameValues(lev.required, ply1.dynamite, lev.score,
+		    lev.time, ply1.keys | ply2.keys);
+#else
   DrawAllGameValues(lev.required, ply1.dynamite, lev.score,
 		    DISPLAY_TIME(lev.time), ply1.keys | ply2.keys);
+#endif
 }

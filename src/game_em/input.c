@@ -107,6 +107,19 @@ void GameActions_EM(byte action)
     if (game_frame_delay_value > 0)	/* do not redraw values in warp mode */
       DrawGameDoorValues_EM();
   }
+
+#if 0
+  if (lev.time_initial == 0)
+    lev.time++;
+  else if (lev.time > 0)
+    lev.time--;
+#endif
+
+#if 0
+  if (lev.time_initial > 0 &&
+      lev.time > 0 && lev.time <= 50 && lev.time % 5 == 0 && setup.time_limit)
+    play_sound(-1, -1, SAMPLE_time);
+#endif
 }
 
 
