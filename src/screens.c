@@ -62,6 +62,28 @@ void DrawHeadline()
   DrawTextFCentered(46, FC_RED, WINDOW_SUBTITLE_STRING);
 }
 
+static void ToggleFullscreenIfNeeded()
+{
+  if (setup.fullscreen != video.fullscreen_enabled)
+  {
+    /* save old door content */
+    BlitBitmap(backbuffer, pix[PIX_DB_DOOR],
+	       DX, DY, DXSIZE, DYSIZE, DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1);
+
+    /* toggle fullscreen */
+    setup.fullscreen = ChangeVideoModeIfNeeded(setup.fullscreen);
+
+    /* redraw background to newly created backbuffer */
+    BlitBitmap(pix[PIX_BACK], backbuffer, 0,0, WIN_XSIZE,WIN_YSIZE, 0,0);
+
+    /* restore old door content */
+    BlitBitmap(pix[PIX_DB_DOOR], backbuffer,
+	       DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1, DXSIZE, DYSIZE, DX, DY);
+
+    redraw_mask = REDRAW_ALL;
+  }
+}
+
 void DrawMainMenu()
 {
   static struct LevelDirInfo *leveldir_last_valid = NULL;
@@ -84,7 +106,8 @@ void DrawMainMenu()
   UndrawSpecialEditorDoor();
 
   /* needed if last screen was the setup screen and fullscreen state changed */
-  setup.fullscreen = ChangeVideoModeIfNeeded(setup.fullscreen);
+  ToggleFullscreenIfNeeded();
+
 #ifdef TARGET_SDL
   SetDrawtoField(DRAW_BACKBUFFER);
 #endif

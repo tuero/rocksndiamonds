@@ -62,16 +62,18 @@ inline void SDLInitVideoBuffer(DrawBuffer **backbuffer, DrawWindow **window,
 inline boolean SDLSetVideoMode(DrawBuffer **backbuffer, boolean fullscreen)
 {
   boolean success = TRUE;
-  int surface_flags = SDL_HWSURFACE | (fullscreen ? SDL_FULLSCREEN : 0);
+  int surface_flags_fullscreen = SURFACE_FLAGS | SDL_FULLSCREEN;
+  int surface_flags_window = SURFACE_FLAGS;
+  SDL_Surface *new_surface = NULL;
+
+  if (*backbuffer == NULL)
+    *backbuffer = CreateBitmapStruct();
 
   if (fullscreen && !video.fullscreen_enabled && video.fullscreen_available)
   {
     /* switch display to fullscreen mode, if available */
-    DrawWindow *window_old = *backbuffer;
-    DrawWindow *window_new = CreateBitmapStruct();
-
-    if ((window_new->surface = SDL_SetVideoMode(video.width, video.height,
-						video.depth, surface_flags))
+    if ((new_surface = SDL_SetVideoMode(video.width, video.height,
+					video.depth, surface_flags_fullscreen))
 	== NULL)
     {
       /* switching display to fullscreen mode failed */
@@ -83,23 +85,18 @@ inline boolean SDLSetVideoMode(DrawBuffer **backbuffer, boolean fullscreen)
     }
     else
     {
-      if (window_old)
-	FreeBitmap(window_old);
-      *backbuffer = window_new;
+      (*backbuffer)->surface = new_surface;
 
       video.fullscreen_enabled = TRUE;
       success = TRUE;
     }
   }
 
-  if ((!fullscreen && video.fullscreen_enabled) || !*backbuffer)
+  if ((!fullscreen && video.fullscreen_enabled) || new_surface == NULL)
   {
     /* switch display to window mode */
-    DrawWindow *window_old = *backbuffer;
-    DrawWindow *window_new = CreateBitmapStruct();
-
-    if ((window_new->surface = SDL_SetVideoMode(video.width, video.height,
-						video.depth, surface_flags))
+    if ((new_surface = SDL_SetVideoMode(video.width, video.height,
+					video.depth, surface_flags_window))
 	== NULL)
     {
       /* switching display to window mode failed -- should not happen */
@@ -109,9 +106,7 @@ inline boolean SDLSetVideoMode(DrawBuffer **backbuffer, boolean fullscreen)
     }
     else
     {
-      if (window_old)
-	FreeBitmap(window_old);
-      *backbuffer = window_new;
+      (*backbuffer)->surface = new_surface;
 
       video.fullscreen_enabled = FALSE;
       success = TRUE;
