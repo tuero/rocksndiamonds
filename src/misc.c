@@ -391,3 +391,84 @@ void *checked_malloc(unsigned long size)
 
   return ptr;
 }
+
+char *getKeySymName(KeySym key)
+{
+  static char key_name[20];
+  static struct
+  {
+    KeySym keysym;
+    char *name;
+  } translate[] =
+  {
+    { XK_Left,		"cursor left" },
+    { XK_Right,		"cursor right" },
+    { XK_Up,		"cursor up" },
+    { XK_Down,		"cursor down" },
+
+#ifdef XK_KP_Left
+    { XK_KP_Left,	"keypad left" },
+    { XK_KP_Right,	"keypad right" },
+    { XK_KP_Up,		"keypad up" },
+    { XK_KP_Down,	"keypad down" },
+#endif
+
+    { XK_BackSpace,	"backspace" },
+    { XK_Delete,	"delete" },
+    { XK_Insert,	"insert" },
+    { XK_Tab,		"tab" },
+    { XK_Home,		"home" },
+    { XK_End,		"end" },
+    { XK_Page_Up,	"page up" },
+    { XK_Page_Down,	"page down" },
+    { XK_space,		"space" },
+
+    { XK_Shift_L,	"left shift" },
+    { XK_Shift_R,	"right shift" },
+    { XK_Control_L,	"left ctrl" },
+    { XK_Control_R,	"right ctrl" },
+    { XK_Meta_L,	"left meta" },
+    { XK_Meta_R,	"right meta" },
+    { XK_Alt_L,		"left alt" },
+    { XK_Alt_R,		"right alt" },
+    { XK_Mode_switch,	"mode switch" },
+    { XK_Multi_key,	"multi key" },
+
+    { 0,                NULL }
+  };
+
+  if (key >= XK_A && key <= XK_Z)
+  {
+    sprintf(key_name, "%c", 'A' + (char)(key - XK_A));
+    return key_name;
+  }
+  else if (key >= XK_a && key <= XK_z)
+  {
+    sprintf(key_name, "%c", 'a' + (char)(key - XK_a));
+    return key_name;
+  }
+  else if (key >= XK_0 && key <= XK_9)
+  {
+    sprintf(key_name, "%c", '0' + (char)(key - XK_0));
+    return key_name;
+  }
+  else if (key >= XK_KP_0 && key <= XK_KP_9)
+  {
+    sprintf(key_name, "keypad %c", '0' + (char)(key - XK_KP_0));
+    return key_name;
+  }
+  else
+  {
+    int i = 0;
+
+    do
+    {
+      if (key == translate[i].keysym)
+	return translate[i].name;
+    }
+    while (translate[++i].name);
+
+    sprintf(key_name, "(unknown)");
+    return key_name;
+  }
+}

@@ -217,6 +217,24 @@ struct OptionInfo
   boolean verbose;
 };
 
+struct SetupKeyboardInfo
+{
+  KeySym left;
+  KeySym right;
+  KeySym up;
+  KeySym down;
+  KeySym snap;
+  KeySym bomb;
+};
+
+struct SetupJoystickInfo
+{
+  boolean use_joystick;
+  int joystick_nr;
+  int button_snap;
+  int button_bomb;
+};
+
 struct SetupInfo
 {
   boolean sound_on;
@@ -230,7 +248,8 @@ struct SetupInfo
   boolean fading_on;
   boolean autorecord_on;
   boolean quick_doors;
-  int joystick_nr;
+  struct SetupKeyboardInfo key_input[MAX_PLAYERS];
+  struct SetupJoystickInfo joy_input[MAX_PLAYERS];
 };
 
 struct PlayerInfo
@@ -401,14 +420,13 @@ extern int		TestPlayer;
 
 extern struct LevelDirInfo	leveldir[];
 extern struct LevelInfo		level;
-extern struct PlayerInfo	stored_player[];
-extern struct PlayerInfo       *local_player;
+extern struct PlayerInfo	stored_player[], *local_player;
 extern struct HiScore		highscore[];
 extern struct RecordingInfo	tape;
 extern struct SoundInfo		Sound[];
 extern struct JoystickInfo	joystick[];
-struct OptionInfo		options;
-struct SetupInfo		setup;
+extern struct OptionInfo	options;
+extern struct SetupInfo		setup;
 
 extern char		*sound_name[];
 extern int		background_loop[];
@@ -989,6 +1007,13 @@ extern int		num_bg_loops;
 				 (s)==SND_TYGER || (s)==SND_VOYAGER || \
 				 (s)==SND_TWILIGHT)
 
+/* default input keys */
+#define DEFAULT_KEY_LEFT	XK_Left
+#define DEFAULT_KEY_RIGHT	XK_Right
+#define DEFAULT_KEY_UP		XK_Up
+#define DEFAULT_KEY_DOWN	XK_Down
+#define DEFAULT_KEY_SNAP	XK_Shift_L
+#define DEFAULT_KEY_BOMB	XK_Shift_R
 
 /* directions for moving */
 #define MV_NO_MOVING		0

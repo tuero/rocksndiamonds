@@ -1112,7 +1112,12 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
       }
       else if (y==14)
       {
+	/*
 	CalibrateJoystick();
+	*/
+
+	CustomizeKeyboard();
+
 	redraw = TRUE;
       }
       else if (y==pos_end-1 || y==pos_end)
@@ -1135,6 +1140,120 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
     DoAnimation();
 }
 
+void CustomizeKeyboard( /* int player_nr */ )
+{
+  int player_nr = 0;
+
+  int i;
+  boolean finished = FALSE;
+  static struct SetupKeyboardInfo custom_key;
+  static struct
+  {
+    KeySym *keysym;
+    char *text;
+  } customize_step[] =
+  {
+    { &custom_key.left,  "Move Left"  },
+    { &custom_key.right, "Move Right" },
+    { &custom_key.up,    "Move Up"    },
+    { &custom_key.down,  "Move Down"  },
+    { &custom_key.snap,  "Snap Field" },
+    { &custom_key.bomb,  "Place Bomb" }
+  };
+
+  custom_key = setup.key_input[player_nr];
+
+  ClearWindow();
+  DrawText(SX+16, SY+16, "Keyboard Input", FS_BIG, FC_YELLOW);
+
+  BackToFront();
+  InitAnimation();
+
+  i = 0;
+  DrawText(SX, SY+(2+2*i)*32, customize_step[i].text, FS_BIG, FC_GREEN);
+  DrawText(SX, SY+(2+2*i+1)*32, "Key:", FS_BIG, FC_GREEN);
+  DrawText(SX + 5*32, SY+(2+2*i+1)*32,
+	   getKeySymName(*customize_step[i].keysym), FS_BIG, FC_BLUE);
+
+  while(!finished)
+  {
+    if (XPending(display))	/* got event from X server */
+    {
+      XEvent event;
+
+      XNextEvent(display, &event);
+      switch(event.type)
+      {
+	case Expose:
+	  HandleExposeEvent((XExposeEvent *) &event);
+	  break;
+	case UnmapNotify:
+	  SleepWhileUnmapped();
+	  break;
+	case KeyPress:
+	  {
+	    KeySym key = XLookupKeysym((XKeyEvent *)&event,
+				       ((XKeyEvent *)&event)->state);
+
+	    if (key == XK_Escape || (key == XK_Return && i == 6))
+	    {
+	      finished = TRUE;
+	      break;
+	    }
+
+	    if (key == XK_Return || i == 6)
+	      break;
+
+	    /* got new key binding */
+	    *customize_step[i].keysym = key;
+	    DrawText(SX + 5*32, SY+(2+2*i+1)*32,
+		     "            ", FS_BIG, FC_YELLOW);
+	    DrawText(SX + 5*32, SY+(2+2*i+1)*32,
+		     getKeySymName(key), FS_BIG, FC_YELLOW);
+
+	    i++;
+
+	    if (i == 6)
+	    {
+	      DrawText(SX+16, SY+15*32+16, "Press Enter", FS_BIG, FC_YELLOW);
+	      break;
+	    }
+
+	    /* ask for next key binding */
+	    DrawText(SX, SY+(2+2*i)*32,
+		     customize_step[i].text, FS_BIG, FC_GREEN);
+	    DrawText(SX, SY+(2+2*i+1)*32, "Key:", FS_BIG, FC_GREEN);
+	    DrawText(SX + 5*32, SY+(2+2*i+1)*32,
+		     getKeySymName(*customize_step[i].keysym),
+		     FS_BIG, FC_BLUE);
+	  }
+	  break;
+	case KeyRelease:
+	  key_joystick_mapping = 0;
+	  break;
+	case FocusIn:
+	case FocusOut:
+	  HandleFocusEvent((XFocusChangeEvent *) &event);
+	  break;
+        case ClientMessage:
+	  HandleClientMessageEvent((XClientMessageEvent *) &event);
+	  break;
+	default:
+	  break;
+      }
+    }
+
+    BackToFront();
+    DoAnimation();
+
+    /* don't eat all CPU time */
+    Delay(10);
+  }
+
+  StopAnimation();
+  DrawSetupScreen();
+}
+
 void CalibrateJoystick()
 {
 #ifdef __FreeBSD__
@@ -1152,6 +1271,7 @@ void CalibrateJoystick()
   char joy_nr[4];
 #endif
 
+  int joystick_nr = setup.joy_input[0].joystick_nr;
   int new_joystick_xleft = 128, new_joystick_xright = 128;
   int new_joystick_yupper = 128, new_joystick_ylower = 128;
   int new_joystick_xmiddle, new_joystick_ymiddle;
@@ -1256,12 +1376,12 @@ void CalibrateJoystick()
     new_joystick_ymiddle =
       new_joystick_yupper + (new_joystick_ylower - new_joystick_yupper) / 2;
 
-    joystick[setup.joystick_nr].xleft = new_joystick_xleft;
-    joystick[setup.joystick_nr].yupper = new_joystick_yupper;
-    joystick[setup.joystick_nr].xright = new_joystick_xright;
-    joystick[setup.joystick_nr].ylower = new_joystick_ylower;
-    joystick[setup.joystick_nr].xmiddle = new_joystick_xmiddle;
-    joystick[setup.joystick_nr].ymiddle = new_joystick_ymiddle;
+    joystick[joystick_nr].xleft = new_joystick_xleft;
+    joystick[joystick_nr].yupper = new_joystick_yupper;
+    joystick[joystick_nr].xright = new_joystick_xright;
+    joystick[joystick_nr].ylower = new_joystick_ylower;
+    joystick[joystick_nr].xmiddle = new_joystick_xmiddle;
+    joystick[joystick_nr].ymiddle = new_joystick_ymiddle;
 
     CheckJoystickData();
 
@@ -1289,13 +1409,13 @@ void CalibrateJoystick()
 
 #if 0
       printf("LEFT / MIDDLE / RIGHT == %d / %d / %d\n",
-	     joystick[setup.joystick_nr].xleft,
-	     joystick[setup.joystick_nr].xmiddle,
-	     joystick[setup.joystick_nr].xright);
+	     joystick[joystick_nr].xleft,
+	     joystick[joystick_nr].xmiddle,
+	     joystick[joystick_nr].xright);
       printf("UP / MIDDLE / DOWN == %d / %d / %d\n",
-	     joystick[setup.joystick_nr].yupper,
-	     joystick[setup.joystick_nr].ymiddle,
-	     joystick[setup.joystick_nr].ylower);
+	     joystick[joystick_nr].yupper,
+	     joystick[joystick_nr].ymiddle,
+	     joystick[joystick_nr].ylower);
 #endif
     }
 
@@ -1339,6 +1459,7 @@ void CalibrateJoystick_OLD()
   char joy_nr[4];
 #endif
 
+  int joystick_nr = setup.joy_input[0].joystick_nr;
   int new_joystick_xleft, new_joystick_xright, new_joystick_xmiddle;
   int new_joystick_yupper, new_joystick_ylower, new_joystick_ymiddle;
 
@@ -1432,12 +1553,12 @@ void CalibrateJoystick_OLD()
   new_joystick_xmiddle = joy_ctrl.x;
   new_joystick_ymiddle = joy_ctrl.y;
 
-  joystick[setup.joystick_nr].xleft = new_joystick_xleft;
-  joystick[setup.joystick_nr].yupper = new_joystick_yupper;
-  joystick[setup.joystick_nr].xright = new_joystick_xright;
-  joystick[setup.joystick_nr].ylower = new_joystick_ylower;
-  joystick[setup.joystick_nr].xmiddle = new_joystick_xmiddle;
-  joystick[setup.joystick_nr].ymiddle = new_joystick_ymiddle;
+  joystick[joystick_nr].xleft = new_joystick_xleft;
+  joystick[joystick_nr].yupper = new_joystick_yupper;
+  joystick[joystick_nr].xright = new_joystick_xright;
+  joystick[joystick_nr].ylower = new_joystick_ylower;
+  joystick[joystick_nr].xmiddle = new_joystick_xmiddle;
+  joystick[joystick_nr].ymiddle = new_joystick_ymiddle;
 
   CheckJoystickData();
 

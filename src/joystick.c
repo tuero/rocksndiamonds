@@ -74,6 +74,7 @@ int Joystick()
   } joy_ctrl;
 #endif
 
+  int joystick_nr = setup.joy_input[0].joystick_nr;
   int js_x,js_y, js_b1,js_b2;
   int left, right, up, down;
   int result=0;
@@ -99,14 +100,14 @@ int Joystick()
   js_b2 = joy_ctrl.buttons & 2;
 #endif
 
-  left = JoystickPosition(joystick[setup.joystick_nr].xmiddle,
-			  joystick[setup.joystick_nr].xleft,  js_x);
-  right = JoystickPosition(joystick[setup.joystick_nr].xmiddle,
-			   joystick[setup.joystick_nr].xright, js_x);
-  up =    JoystickPosition(joystick[setup.joystick_nr].ymiddle,
-			   joystick[setup.joystick_nr].yupper, js_y);
-  down =  JoystickPosition(joystick[setup.joystick_nr].ymiddle,
-			   joystick[setup.joystick_nr].ylower, js_y);
+  left = JoystickPosition(joystick[joystick_nr].xmiddle,
+			  joystick[joystick_nr].xleft,  js_x);
+  right = JoystickPosition(joystick[joystick_nr].xmiddle,
+			   joystick[joystick_nr].xright, js_x);
+  up =    JoystickPosition(joystick[joystick_nr].ymiddle,
+			   joystick[joystick_nr].yupper, js_y);
+  down =  JoystickPosition(joystick[joystick_nr].ymiddle,
+			   joystick[joystick_nr].ylower, js_y);
 
   if (left>JOYSTICK_PERCENT)
     result |= JOY_LEFT;

@@ -25,7 +25,7 @@
 
 void GetPlayerConfig()
 {
-  int old_joystick_nr = setup.joystick_nr;
+  int old_joystick_nr = setup.joy_input[0].joystick_nr;
 
   if (sound_status==SOUND_OFF)
     local_player->setup &= ~SETUP_SOUND;
@@ -42,13 +42,19 @@ void GetPlayerConfig()
   setup.direct_draw_on = SETUP_DIRECT_DRAW_ON(local_player->setup);
   setup.fading_on = SETUP_FADING_ON(local_player->setup);
   setup.autorecord_on = SETUP_AUTO_RECORD_ON(local_player->setup);
+
+#if 0
   setup.joystick_nr = SETUP_2ND_JOYSTICK_ON(local_player->setup);
+#endif
+
+  setup.joy_input[0].joystick_nr = SETUP_2ND_JOYSTICK_ON(local_player->setup);
+
   setup.quick_doors = SETUP_QUICK_DOORS_ON(local_player->setup);
   setup.scroll_delay_on = SETUP_SCROLL_DELAY_ON(local_player->setup);
   setup.soft_scrolling_on = SETUP_SOFT_SCROLL_ON(local_player->setup);
 
 #ifndef MSDOS
-  if (setup.joystick_nr != old_joystick_nr)
+  if (setup.joy_input[0].joystick_nr != old_joystick_nr)
   {
     if (joystick_device)
       close(joystick_device);

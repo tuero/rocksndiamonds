@@ -100,8 +100,7 @@ int		TestPlayer = 0;
 
 struct LevelDirInfo	leveldir[MAX_LEVDIR_ENTRIES];
 struct LevelInfo	level;
-struct PlayerInfo	stored_player[MAX_PLAYERS+1];
-struct PlayerInfo      *local_player;
+struct PlayerInfo	stored_player[MAX_PLAYERS], *local_player;
 struct HiScore		highscore[MAX_SCORE_ENTRIES];
 struct SoundInfo	Sound[NUM_SOUNDS];
 struct RecordingInfo	tape;

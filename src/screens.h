@@ -37,6 +37,7 @@ void DrawHallOfFame(int);
 void HandleHallOfFame(int);
 void DrawSetupScreen(void);
 void HandleSetupScreen(int, int, int, int, int);
+void CustomizeKeyboard(void);
 void CalibrateJoystick(void);
 void HandleGameActions(byte);
 void HandleVideoButtons(int, int, int);

@@ -94,7 +94,7 @@ void InitLevelAndPlayerInfo()
 {
   int i;
 
-  /* initialize local player's setup */
+  /* initialize local setup */
   setup.sound_on = TRUE;
   setup.sound_loops_on = FALSE;
   setup.sound_music_on = FALSE;
@@ -106,7 +106,19 @@ void InitLevelAndPlayerInfo()
   setup.fading_on = FALSE;
   setup.autorecord_on = FALSE;
   setup.quick_doors = FALSE;
-  setup.joystick_nr = 0;
+  for (i=0; i<MAX_PLAYERS; i++)
+  {
+    setup.joy_input[i].use_joystick = FALSE;
+    setup.joy_input[i].joystick_nr = i;
+    setup.joy_input[i].button_snap = JOY_BUTTON_1;
+    setup.joy_input[i].button_bomb = JOY_BUTTON_2;
+    setup.key_input[i].left = DEFAULT_KEY_LEFT;
+    setup.key_input[i].right = DEFAULT_KEY_RIGHT;
+    setup.key_input[i].up = DEFAULT_KEY_UP;
+    setup.key_input[i].down = DEFAULT_KEY_DOWN;
+    setup.key_input[i].snap = DEFAULT_KEY_SNAP;
+    setup.key_input[i].bomb = DEFAULT_KEY_BOMB;
+  }
 
   /* choose default local player */
   local_player = &stored_player[0];
@@ -230,23 +242,25 @@ void InitSoundServer()
 
 void InitJoystick()
 {
+  int joystick_nr = setup.joy_input[0].joystick_nr;
+
   if (global_joystick_status == JOYSTICK_OFF)
     return;
 
 #ifndef MSDOS
-  if (access(joystick_device_name[setup.joystick_nr], R_OK) < 0)
+  if (access(joystick_device_name[joystick_nr], R_OK) < 0)
   {
     Error(ERR_RETURN, "cannot access joystick device '%s'",
-	  joystick_device_name[setup.joystick_nr]);
+	  joystick_device_name[joystick_nr]);
     joystick_status = JOYSTICK_OFF;
     return;
   }
 
   if ((joystick_device =
-       open(joystick_device_name[setup.joystick_nr], O_RDONLY)) < 0)
+       open(joystick_device_name[joystick_nr], O_RDONLY)) < 0)
   {
     Error(ERR_RETURN, "cannot open joystick device '%s'",
-	  joystick_device_name[setup.joystick_nr]);
+	  joystick_device_name[joystick_nr]);
     joystick_status = JOYSTICK_OFF;
     return;
   }
