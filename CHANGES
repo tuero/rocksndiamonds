@@ -1,6 +1,7 @@
 Release Version 3.0.1 [?? ??? ????]
 -----------------------------------
 	- fixed bug with missing graphic for active red disk bomb
+	- fixed bug which caused a crash at startup under Solaris
 	- added custom element property for dropping collected elements
 	- added another 128 custom elements for those who can't get enough
 
