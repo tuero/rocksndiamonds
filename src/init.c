@@ -134,11 +134,9 @@ void InitSound()
 
   OpenAudio();
 
-  AllocSoundArray(NUM_SOUNDS);
-
   for(i=0; i<NUM_SOUNDS; i++)
   {
-    if (!LoadSound(i, sound_name[i]))
+    if (!LoadSound(sound_name[i]))
     {
       audio.sound_available = FALSE;
       audio.loops_available = FALSE;
@@ -147,6 +145,8 @@ void InitSound()
       return;
     }
   }
+
+  num_bg_loops = LoadMusic();
 }
 
 void InitSoundServer()

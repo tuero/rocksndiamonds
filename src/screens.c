@@ -562,6 +562,7 @@ static char *helpscreen_music[][3] =
   { "Voyager",			"The Alan Parsons Project","Pyramid" },
   { "Twilight Painter",		"Tangerine Dream",	"Heartbreakers" }
 };
+static int num_helpscreen_music = 7;
 static int helpscreen_musicpos;
 
 void DrawHelpScreenElAction(int start)
@@ -780,17 +781,20 @@ void HandleHelpScreen(int button)
       DrawHelpScreenElText(helpscreen_state*MAX_HELPSCREEN_ELS);
       DrawHelpScreenElAction(helpscreen_state*MAX_HELPSCREEN_ELS);
     }
-    else if (helpscreen_state < num_helpscreen_els_pages + num_bg_loops - 1)
+    else if (helpscreen_state <
+	     num_helpscreen_els_pages + num_helpscreen_music - 1)
     {
       helpscreen_state++;
       DrawHelpScreenMusicText(helpscreen_state - num_helpscreen_els_pages);
     }
-    else if (helpscreen_state == num_helpscreen_els_pages + num_bg_loops - 1)
+    else if (helpscreen_state ==
+	     num_helpscreen_els_pages + num_helpscreen_music - 1)
     {
       helpscreen_state++;
       DrawHelpScreenCreditsText();
     }
-    else if (helpscreen_state == num_helpscreen_els_pages + num_bg_loops)
+    else if (helpscreen_state ==
+	     num_helpscreen_els_pages + num_helpscreen_music)
     {
       helpscreen_state++;
       DrawHelpScreenContactText();

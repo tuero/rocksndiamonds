@@ -156,6 +156,7 @@ struct SampleInfo
 
 #if defined(TARGET_SDL)
   Mix_Chunk *mix_chunk;
+  Mix_Music *mix_music;
 #endif
 };
 
@@ -187,8 +188,9 @@ void UnixCloseAudio(void);
 void SoundServer(void);
 
 /* sound client functions */
-void AllocSoundArray(int);
-boolean LoadSound(int, char *);
+boolean LoadSound(char *);
+boolean LoadMod(char *);
+int LoadMusic(void);
 void PlayMusic(int);
 void PlaySound(int);
 void PlaySoundStereo(int, int);

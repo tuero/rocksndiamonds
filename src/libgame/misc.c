@@ -630,6 +630,16 @@ void *checked_calloc(unsigned long size)
   return ptr;
 }
 
+void *checked_realloc(void *ptr, unsigned long size)
+{
+  ptr = realloc(ptr, size);
+
+  if (ptr == NULL)
+    Error(ERR_EXIT, "cannot allocate %d bytes -- out of memory", size);
+
+  return ptr;
+}
+
 short getFile16BitInteger(FILE *file, int byte_order)
 {
   if (byte_order == BYTE_ORDER_BIG_ENDIAN)

@@ -66,6 +66,7 @@ void GetOptions(char **);
 void Error(int, char *, ...);
 void *checked_malloc(unsigned long);
 void *checked_calloc(unsigned long);
+void *checked_realloc(void *, unsigned long);
 short getFile16BitInteger(FILE *, int);
 void putFile16BitInteger(FILE *, short, int);
 int getFile32BitInteger(FILE *, int);

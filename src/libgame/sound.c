@@ -11,17 +11,20 @@
 * sound.c                                                  *
 ***********************************************************/
 
+#include <string.h>
 #include <sys/time.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <dirent.h>
 
 #include "system.h"
 #include "sound.h"
 #include "misc.h"
 
 
-static int num_sounds = 0;
+static int num_sounds = 0, num_music = 0, num_mods = 0;
 static struct SampleInfo *Sound = NULL;
+static struct SampleInfo *Mod = NULL;
 
 
 /*** THE STUFF BELOW IS ONLY USED BY THE SOUND SERVER CHILD PROCESS ***/
@@ -801,48 +804,39 @@ static int ulaw_to_linear(unsigned char ulawbyte)
 
 /*** THE STUFF BELOW IS ONLY USED BY THE MAIN PROCESS ***/
 
-void AllocSoundArray(int num)
-{
-  num_sounds = num;
-  Sound = checked_calloc(num_sounds * sizeof(struct SampleInfo));
-}
-
 #define CHUNK_ID_LEN            4       /* IFF style chunk id length */
 #define WAV_HEADER_SIZE		20	/* size of WAV file header */
 
-boolean LoadSound(int sound_nr, char *sound_name)
+static boolean LoadSoundExt(char *sound_name, boolean is_music)
 {
-  struct SampleInfo *snd_info = &Sound[sound_nr];
+  struct SampleInfo *snd_info;
   char filename[256];
-  char *sound_ext = "wav";
-#if !defined(TARGET_SDL)
-#if !defined(PLATFORM_MSDOS)
+#if !defined(TARGET_SDL) && !defined(PLATFORM_MSDOS)
   byte sound_header_buffer[WAV_HEADER_SIZE];
   char chunk[CHUNK_ID_LEN + 1];
   int chunk_length, dummy;
   FILE *file;
   int i;
 #endif
-#endif
 
+  num_sounds++;
+  Sound = checked_realloc(Sound, num_sounds * sizeof(struct SampleInfo));
+
+  snd_info = &Sound[num_sounds - 1];
   snd_info->name = sound_name;
 
-  sprintf(filename, "%s/%s/%s.%s",
-	  options.ro_base_directory, SOUNDS_DIRECTORY,
-	  snd_info->name, sound_ext);
+  sprintf(filename, "%s/%s/%s", options.ro_base_directory,
+	  (is_music ? MUSIC_DIRECTORY : SOUNDS_DIRECTORY), snd_info->name);
 
 #if defined(TARGET_SDL)
 
-  snd_info->mix_chunk = Mix_LoadWAV(filename);
-  if (snd_info->mix_chunk == NULL)
+  if ((snd_info->mix_chunk = Mix_LoadWAV(filename)) == NULL)
   {
     Error(ERR_WARN, "cannot read sound file '%s' - no sounds", filename);
     return FALSE;
   }
 
-#else /* !TARGET_SDL */
-
-#if !defined(PLATFORM_MSDOS)
+#elif defined(PLATFORM_UNIX)
 
   if ((file = fopen(filename, MODE_READ)) == NULL)
   {
@@ -907,10 +901,104 @@ boolean LoadSound(int sound_nr, char *sound_name)
     return FALSE;
   }
 
-#endif /* PLATFORM_MSDOS */
-#endif /* !TARGET_SDL */
+#endif
 
   return TRUE;
+}
+
+boolean LoadSound(char *sound_name)
+{
+  return LoadSoundExt(sound_name, FALSE);
+}
+
+boolean LoadMod(char *mod_name)
+{
+  struct SampleInfo *mod_info;
+  char filename[256];
+
+  num_mods++;
+  Mod = checked_realloc(Mod, num_mods * sizeof(struct SampleInfo));
+
+  mod_info = &Mod[num_mods - 1];
+  mod_info->name = mod_name;
+
+  sprintf(filename, "%s/%s/%s", options.ro_base_directory,
+	  MUSIC_DIRECTORY, mod_info->name);
+
+#if defined(TARGET_SDL)
+  if ((mod_info->mix_music = Mix_LoadMUS(filename)) == NULL)
+  {
+    Error(ERR_WARN, "cannot read music file '%s' - no sounds", filename);
+    return FALSE;
+  }
+#endif
+
+  audio.mods_available = TRUE;
+
+  return TRUE;
+}
+
+int LoadMusic(void)
+{
+  DIR *dir;
+  struct dirent *dir_entry;
+  char *music_directory = getPath2(options.ro_base_directory, MUSIC_DIRECTORY);
+
+  num_music = 0;
+
+  if ((dir = opendir(music_directory)) == NULL)
+  {
+    Error(ERR_WARN, "cannot read music directory '%s'", music_directory);
+    audio.music_available = FALSE;
+    free(music_directory);
+    return 0;
+  }
+
+  while ((dir_entry = readdir(dir)) != NULL)	/* loop until last dir entry */
+  {
+    char *filename = dir_entry->d_name;
+
+    if (strlen(filename) > 4 &&
+	strcmp(&filename[strlen(filename) - 4], ".wav") == 0)
+    {
+      if (!LoadSoundExt(filename, TRUE))
+      {
+	audio.music_available = FALSE;
+	free(music_directory);
+	return num_music;
+      }
+
+      num_music++;
+    }
+    else if (strlen(filename) > 4 &&
+	     (strcmp(&filename[strlen(filename) - 4], ".mod") == 0 ||
+	      strcmp(&filename[strlen(filename) - 4], ".MOD") == 0 ||
+	      strncmp(filename, "mod.", 4) == 0 ||
+	      strncmp(filename, "MOD.", 4) == 0))
+    {
+      if (!LoadMod(filename))
+      {
+	audio.music_available = FALSE;
+	free(music_directory);
+	return num_music;
+      }
+
+      num_music++;
+    }
+  }
+
+  closedir(dir);
+
+  if (num_music == 0)
+    Error(ERR_WARN, "cannot find any valid music files in directory '%s'",
+	  music_directory);
+
+  free(music_directory);
+
+  if (num_mods > 0)
+    num_music = num_mods;
+
+  return num_music;
 }
 
 void PlayMusic(int nr)
@@ -918,11 +1006,14 @@ void PlayMusic(int nr)
   if (!audio.music_available)
     return;
 
+  if (num_mods == 0)
+    nr = num_sounds - num_music + nr;
+
 #if defined(TARGET_SDL)
   if (audio.mods_available)
   {
     Mix_VolumeMusic(SOUND_MAX_VOLUME);
-    /* start playing module */
+    Mix_PlayMusic(Mod[nr].mix_music, -1);
   }
   else	/* play music loop */
   {
@@ -1097,7 +1188,9 @@ void FreeSounds(int num_sounds)
     return;
 
   for(i=0; i<num_sounds; i++)
-#if !defined(PLATFORM_MSDOS)
+#if defined(TARGET_SDL)
+    free(Sound[i].mix_chunk);
+#elif !defined(PLATFORM_MSDOS)
     free(Sound[i].data_ptr);
 #else
     destroy_sample(Sound[i].sample_ptr);

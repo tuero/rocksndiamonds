@@ -99,6 +99,7 @@
 #define RW_BASE_PATH		RW_GAME_DIR
 
 #define GRAPHICS_DIRECTORY	"graphics"
+#define MUSIC_DIRECTORY		"music"
 #define SOUNDS_DIRECTORY	"sounds"
 #define LEVELS_DIRECTORY	"levels"
 #define TAPES_DIRECTORY		"tapes"
