@@ -1619,7 +1619,27 @@ struct GadgetInfo *CreateGadget(int first_tag, ...)
 	break;
 
       case GDI_NUMBER_VALUE:
-	new_gadget->number_value = va_arg(ap, long);
+	new_gadget->text.number_value = va_arg(ap, long);
+	sprintf(new_gadget->text.value, "%d", new_gadget->text.number_value);
+	new_gadget->text.cursor_position = strlen(new_gadget->text.value);
+	break;
+
+      case GDI_NUMBER_MIN:
+	new_gadget->text.number_min = va_arg(ap, long);
+	if (new_gadget->text.number_value < new_gadget->text.number_min)
+	{
+	  new_gadget->text.number_value = new_gadget->text.number_min;
+	  sprintf(new_gadget->text.value, "%d", new_gadget->text.number_value);
+	}
+	break;
+
+      case GDI_NUMBER_MAX:
+	new_gadget->text.number_max = va_arg(ap, long);
+	if (new_gadget->text.number_value > new_gadget->text.number_max)
+	{
+	  new_gadget->text.number_value = new_gadget->text.number_max;
+	  sprintf(new_gadget->text.value, "%d", new_gadget->text.number_value);
+	}
 	break;
 
       case GDI_TEXT_VALUE:
@@ -1823,6 +1843,26 @@ void FreeGadget(struct GadgetInfo *gi)
 #define DG_BUFFERED	0
 #define DG_DIRECT	1
 
+static void CheckRangeOfNumericInputGadget(struct GadgetInfo *gi)
+{
+  if (gi->type != GD_TYPE_TEXTINPUT_NUMERIC)
+    return;
+
+  gi->text.number_value = atoi(gi->text.value);
+
+  if (gi->text.number_value < gi->text.number_min)
+    gi->text.number_value = gi->text.number_min;
+  if (gi->text.number_value > gi->text.number_max)
+    gi->text.number_value = gi->text.number_max;
+
+  sprintf(gi->text.value, "%d", gi->text.number_value);
+
+  if (gi->text.cursor_position < 0)
+    gi->text.cursor_position = 0;
+  else if (gi->text.cursor_position > strlen(gi->text.value))
+    gi->text.cursor_position = strlen(gi->text.value);
+}
+
 static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 {
   int state = (pressed ? 1 : 0);
@@ -1838,13 +1878,14 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 		gd->x, gd->y, gi->width, gi->height, gi->x, gi->y);
       break;
 
-    case GD_TYPE_TEXTINPUT:
+    case GD_TYPE_TEXTINPUT_ALPHANUMERIC:
+    case GD_TYPE_TEXTINPUT_NUMERIC:
       {
 	int i;
 	char cursor_letter;
 	char cursor_string[3];
 	char text[MAX_GADGET_TEXTSIZE + 1];
-	int font_color = (pressed ? FC_YELLOW : FC_GREEN);
+	int font_color = FC_YELLOW;
 	int border = gi->design_border;
 	strcpy(text, gi->text.value);
 	strcat(text, " ");
@@ -2010,21 +2051,52 @@ void AdjustScrollbar(struct GadgetInfo *gi, int items_max, int item_pos)
     DrawGadget(gi, DG_UNPRESSED, DG_DIRECT);
 }
 
+void ModifyTextInputTextValue(struct GadgetInfo *gi, char *new_text)
+{
+  struct GadgetTextInput *text = &gi->text;
+  int max_textsize = MAX_GADGET_TEXTSIZE;
+
+  if (text->size)
+    max_textsize = MIN(text->size, MAX_GADGET_TEXTSIZE - 1);
+
+  strncpy(text->value, new_text, max_textsize);
+  text->value[max_textsize] = '\0';
+  text->cursor_position = strlen(text->value);
+
+  if (gi->mapped)
+    DrawGadget(gi, DG_UNPRESSED, DG_DIRECT);
+}
+
+void ModifyTextInputNumberValue(struct GadgetInfo *gi, int new_value)
+{
+  struct GadgetTextInput *text = &gi->text;
+
+  text->number_value = (new_value < text->number_min ? text->number_min :
+			new_value > text->number_max ? text->number_max :
+			new_value);
+
+  sprintf(text->value, "%d", text->number_value);
+
+  if (gi->mapped)
+    DrawGadget(gi, DG_UNPRESSED, DG_DIRECT);
+}
+
+/* global pointer to gadget actually in use (when mouse button pressed) */
 static struct GadgetInfo *last_gi = NULL;
 
 void MapGadget(struct GadgetInfo *gi)
 {
-  if (gi == NULL)
+  if (gi == NULL || gi->mapped)
     return;
 
   gi->mapped = TRUE;
 
-  DrawGadget(gi, (gi->state == GD_BUTTON_PRESSED), DG_BUFFERED);
+  DrawGadget(gi, DG_UNPRESSED, DG_BUFFERED);
 }
 
 void UnmapGadget(struct GadgetInfo *gi)
 {
-  if (gi == NULL)
+  if (gi == NULL || !gi->mapped)
     return;
 
   gi->mapped = FALSE;
@@ -2071,8 +2143,8 @@ void HandleGadgets(int mx, int my, int button)
   last_mx = mx;
   last_my = my;
 
-  /* special treatment for text input gadgets */
-  if (last_gi && last_gi->type == GD_TYPE_TEXTINPUT && last_gi->mapped &&
+  /* special treatment for text and number input gadgets */
+  if (last_gi && last_gi->type & GD_TYPE_TEXTINPUT && last_gi->mapped &&
       button != 0 && !motion_status)
   {
     struct GadgetInfo *gi = last_gi;
@@ -2092,6 +2164,7 @@ void HandleGadgets(int mx, int my, int button)
     else
     {
       /* if mouse button pressed outside text input gadget, deactivate it */
+      CheckRangeOfNumericInputGadget(gi);
       DrawGadget(gi, DG_UNPRESSED, DG_DIRECT);
 
       if (gi->event_mask & GD_EVENT_TEXT_LEAVING)
@@ -2127,23 +2200,27 @@ void HandleGadgets(int mx, int my, int button)
       (gi->type == GD_TYPE_SCROLLBAR_HORIZONTAL ? mx - gi->x : my - gi->y);
 
   /* if mouse button released, no gadget needs to be handled anymore */
-  if (button == 0 && last_gi && last_gi->type != GD_TYPE_TEXTINPUT)
+  if (button == 0 && last_gi && !(last_gi->type & GD_TYPE_TEXTINPUT))
     last_gi = NULL;
 
-  if (new_gi)
+  /* modify event position values even if no gadget is pressed */
+  if (button == 0 && !release_event)
+    gi = new_gi;
+
+  if (gi)
   {
-    int last_x = new_gi->event.x;
-    int last_y = new_gi->event.y;
+    int last_x = gi->event.x;
+    int last_y = gi->event.y;
 
-    new_gi->event.x = mx - new_gi->x;
-    new_gi->event.y = my - new_gi->y;
+    gi->event.x = mx - gi->x;
+    gi->event.y = my - gi->y;
 
-    if (new_gi->type == GD_TYPE_DRAWING_AREA)
+    if (gi->type == GD_TYPE_DRAWING_AREA)
     {
-      new_gi->event.x /= new_gi->drawing.item_xsize;
-      new_gi->event.y /= new_gi->drawing.item_ysize;
+      gi->event.x /= gi->drawing.item_xsize;
+      gi->event.y /= gi->drawing.item_ysize;
 
-      if (last_x != new_gi->event.x || last_y != new_gi->event.y)
+      if (last_x != gi->event.x || last_y != gi->event.y)
 	changed_position = TRUE;
     }
   }
@@ -2154,7 +2231,7 @@ void HandleGadgets(int mx, int my, int button)
   {
     last_info_gi = new_gi;
 
-    if (new_gi != NULL)
+    if (new_gi != NULL && (button == 0 || new_gi == last_gi))
     {
       new_gi->event.type = 0;
       new_gi->callback_info(new_gi);
@@ -2313,7 +2390,7 @@ void HandleGadgets(int mx, int my, int button)
 
   if (gadget_released_inside)
   {
-    if (gi->type != GD_TYPE_TEXTINPUT)
+    if (!(gi->type & GD_TYPE_TEXTINPUT))
       DrawGadget(gi, DG_UNPRESSED, DG_DIRECT);
 
     gi->state = GD_BUTTON_UNPRESSED;
@@ -2343,15 +2420,19 @@ void HandleGadgetsKeyInput(KeySym key)
   int text_length;
   int cursor_pos;
   char letter;
+  boolean legal_letter;
 
-  if (gi == NULL || gi->type != GD_TYPE_TEXTINPUT || !gi->mapped)
+  if (gi == NULL || !(gi->type & GD_TYPE_TEXTINPUT) || !gi->mapped)
     return;
 
   text_length = strlen(gi->text.value);
   cursor_pos = gi->text.cursor_position;
   letter = getCharFromKeySym(key);
+  legal_letter = (gi->type == GD_TYPE_TEXTINPUT_NUMERIC ?
+		  letter >= '0' && letter <= '9' :
+		  letter != 0);
 
-  if (letter && text_length < gi->text.size)
+  if (legal_letter && text_length < gi->text.size)
   {
     strcpy(text, gi->text.value);
     strcpy(&gi->text.value[cursor_pos + 1], &text[cursor_pos]);
@@ -2384,6 +2465,7 @@ void HandleGadgetsKeyInput(KeySym key)
   }
   else if (key == XK_Return)
   {
+    CheckRangeOfNumericInputGadget(gi);
     DrawGadget(gi, DG_UNPRESSED, DG_DIRECT);
 
     if (gi->event_mask & GD_EVENT_TEXT_RETURN)

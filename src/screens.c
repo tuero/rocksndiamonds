@@ -58,6 +58,8 @@ void DrawMainMenu()
   int i;
   char *name_text = (!options.network && setup.team_mode ? "Team:" : "Name:");
 
+  XAutoRepeatOn(display);
+
   /* needed if last screen was the playing screen, invoked from level editor */
   if (level_editor_test_game)
   {
@@ -128,7 +130,6 @@ void DrawMainMenu()
   OpenDoor(DOOR_CLOSE_1 | DOOR_OPEN_2);
 
   ClearEventQueue();
-  XAutoRepeatOn(display);
 }
 
 void HandleMainMenu(int mx, int my, int dx, int dy, int button)

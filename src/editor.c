@@ -49,7 +49,12 @@
 #define RANDOM_USE_PERCENTAGE	0
 #define RANDOM_USE_NUM_OBJECTS	1
 
+/* values for elements with score */
+#define MIN_SCORE		0
+#define MAX_SCORE		255
+
 /* values for elements with content */
+#define MIN_ELEMCONT		1
 #define MAX_ELEMCONT		8
 
 /* values for the control window */
@@ -82,6 +87,10 @@
 #define ED_COUNT_SCORE_YPOS	(14 * MINI_TILEY)
 #define ED_COUNT_ELEMCONT_XPOS	ED_PROPERTIES_XPOS
 #define ED_COUNT_ELEMCONT_YPOS	(17 * MINI_TILEY)
+
+/* standard distances */
+#define ED_BORDER_SIZE		3
+#define ED_GADGET_DISTANCE	2
 
 /* values for element content drawing areas */
 #define ED_AREA_ELEMCONT_XPOS	(TILEX)
@@ -141,32 +150,40 @@
 
 /* counter button identifiers */
 #define ED_CTRL_ID_SCORE_DOWN		22
-#define ED_CTRL_ID_SCORE_UP		23
-#define ED_CTRL_ID_ELEMCONT_DOWN	24
-#define ED_CTRL_ID_ELEMCONT_UP		25
+#define ED_CTRL_ID_SCORE_TEXT		23
+#define ED_CTRL_ID_SCORE_UP		24
+#define ED_CTRL_ID_ELEMCONT_DOWN	25
+#define ED_CTRL_ID_ELEMCONT_TEXT	26
+#define ED_CTRL_ID_ELEMCONT_UP		27
 
 /* drawing area identifiers */
-#define ED_CTRL_ID_DRAWING_LEVEL	26
-#define ED_CTRL_ID_ELEMCONT_0		27
-#define ED_CTRL_ID_ELEMCONT_7		34
-#define ED_CTRL_ID_AMOEBA_CONTENT	35
+#define ED_CTRL_ID_DRAWING_LEVEL	28
+#define ED_CTRL_ID_ELEMCONT_0		29
+#define ED_CTRL_ID_ELEMCONT_1		30
+#define ED_CTRL_ID_ELEMCONT_2		31
+#define ED_CTRL_ID_ELEMCONT_3		32
+#define ED_CTRL_ID_ELEMCONT_4		33
+#define ED_CTRL_ID_ELEMCONT_5		34
+#define ED_CTRL_ID_ELEMCONT_6		35
+#define ED_CTRL_ID_ELEMCONT_7		36
+#define ED_CTRL_ID_AMOEBA_CONTENT	37
 
 /* text input identifiers */
-#define ED_CTRL_ID_LEVEL_NAME		36
+#define ED_CTRL_ID_LEVEL_NAME		38
 
 /* gadgets for scrolling of drawing area */
-#define ED_CTRL_ID_SCROLL_UP		37
-#define ED_CTRL_ID_SCROLL_DOWN		38
-#define ED_CTRL_ID_SCROLL_LEFT		39
-#define ED_CTRL_ID_SCROLL_RIGHT		40
-#define ED_CTRL_ID_SCROLL_VERTICAL	41
-#define ED_CTRL_ID_SCROLL_HORIZONTAL	42
+#define ED_CTRL_ID_SCROLL_UP		39
+#define ED_CTRL_ID_SCROLL_DOWN		40
+#define ED_CTRL_ID_SCROLL_LEFT		41
+#define ED_CTRL_ID_SCROLL_RIGHT		42
+#define ED_CTRL_ID_SCROLL_VERTICAL	43
+#define ED_CTRL_ID_SCROLL_HORIZONTAL	44
 
-#define ED_NUM_GADGETS			43
+#define ED_NUM_GADGETS			45
 
 /* values for counter gadgets */
-#define ED_COUNTER_SCORE		0
-#define ED_COUNTER_ELEMCONT		1
+#define ED_COUNTER_ID_SCORE		0
+#define ED_COUNTER_ID_ELEMCONT		1
 
 #define ED_NUM_COUNTERBUTTONS		2
 #define ED_NUM_SCROLLBUTTONS		4
@@ -206,14 +223,29 @@ static struct
   { 'E', "exit level editor" }
 };
 
+/* pointers to counter values */
+static int *gadget_score_value = NULL;
+static int *gadget_areas_value = NULL;
+
 static struct
 {
   int x, y;
-  int gadget_id;
+  int **counter_value;
+  int min_value, max_value;
+  int gadget_id_down, gadget_id_up;
+  int gadget_id_text;
 } counterbutton_info[ED_NUM_COUNTERBUTTONS] =
 {
-  { ED_COUNT_SCORE_XPOS,    ED_COUNT_SCORE_YPOS,    ED_CTRL_ID_SCORE_DOWN },
-  { ED_COUNT_ELEMCONT_XPOS, ED_COUNT_ELEMCONT_YPOS, ED_CTRL_ID_ELEMCONT_DOWN }
+  { ED_COUNT_SCORE_XPOS,	ED_COUNT_SCORE_YPOS,
+    &gadget_score_value,
+    MIN_SCORE,			MAX_SCORE,
+    ED_CTRL_ID_SCORE_DOWN,	ED_CTRL_ID_SCORE_UP,
+    ED_CTRL_ID_SCORE_TEXT },
+  { ED_COUNT_ELEMCONT_XPOS,	ED_COUNT_ELEMCONT_YPOS,
+    &gadget_areas_value,
+    MIN_ELEMCONT,		MAX_ELEMCONT,
+    ED_CTRL_ID_ELEMCONT_DOWN,	ED_CTRL_ID_ELEMCONT_UP,
+    ED_CTRL_ID_ELEMCONT_TEXT }
 };
 
 static struct
@@ -305,10 +337,6 @@ static int random_placement_method = RANDOM_USE_PERCENTAGE;
 #else
 static int random_placement_method = RANDOM_USE_NUM_OBJECTS;
 #endif
-
-/* pointer to score value */
-static int *gadget_score_value;
-static int *gadget_areas_value;
 
 static int level_xpos,level_ypos;
 static int edit_mode;
@@ -856,17 +884,23 @@ static void CreateControlButtons()
 
 static void CreateCounterButtons()
 {
-  int i, j;
+  int i;
 
   for (i=0; i<ED_NUM_COUNTERBUTTONS; i++)
   {
+    int j;
+    int xpos = SX + counterbutton_info[i].x;	/* xpos of down count button */
+    int ypos = SY + counterbutton_info[i].y;
+
     for (j=0; j<2; j++)
     {
       Pixmap gd_pixmap = pix[PIX_DOOR];
       struct GadgetInfo *gi;
-      int id = counterbutton_info[i].gadget_id + j;
+      int id = (j == 0 ?
+		counterbutton_info[i].gadget_id_down :
+		counterbutton_info[i].gadget_id_up);
       int gd_xoffset;
-      int gd_x1, gd_x2, gd_y;
+      int gd_x, gd_x1, gd_x2, gd_y;
       unsigned long event_mask;
 
       event_mask = GD_EVENT_PRESSED | GD_EVENT_REPEATED;
@@ -877,8 +911,8 @@ static void CreateCounterButtons()
       gd_y  = DOOR_GFX_PAGEY1 + ED_BUTTON_COUNT_YPOS;
 
       gi = CreateGadget(GDI_CUSTOM_ID, id,
-			GDI_X, SX + counterbutton_info[i].x + gd_xoffset,
-			GDI_Y, SY + counterbutton_info[i].y,
+			GDI_X, xpos,
+			GDI_Y, ypos,
 			GDI_WIDTH, ED_BUTTON_COUNT_XSIZE,
 			GDI_HEIGHT, ED_BUTTON_COUNT_YSIZE,
 			GDI_TYPE, GD_TYPE_NORMAL_BUTTON,
@@ -893,6 +927,37 @@ static void CreateCounterButtons()
 	Error(ERR_EXIT, "cannot create gadget");
 
       level_editor_gadget[id] = gi;
+      xpos += gi->width + ED_GADGET_DISTANCE;	/* xpos of text count button */
+
+      if (j == 0)
+      {
+	id = counterbutton_info[i].gadget_id_text;
+	event_mask = GD_EVENT_TEXT_RETURN | GD_EVENT_TEXT_LEAVING;
+
+	gd_x = DOOR_GFX_PAGEX4 + ED_WIN_COUNT_XPOS;
+	gd_y = DOOR_GFX_PAGEY1 + ED_WIN_COUNT_YPOS;
+
+	gi = CreateGadget(GDI_CUSTOM_ID, id,
+			  GDI_X, xpos,
+			  GDI_Y, ypos,
+			  GDI_TYPE, GD_TYPE_TEXTINPUT_NUMERIC,
+			  GDI_NUMBER_VALUE, 0,
+			  GDI_NUMBER_MIN, counterbutton_info[i].min_value,
+			  GDI_NUMBER_MAX, counterbutton_info[i].max_value,
+			  GDI_TEXT_SIZE, 3,
+			  GDI_DESIGN_UNPRESSED, gd_pixmap, gd_x, gd_y,
+			  GDI_DESIGN_PRESSED, gd_pixmap, gd_x, gd_y,
+			  GDI_DESIGN_BORDER, ED_BORDER_SIZE,
+			  GDI_EVENT_MASK, event_mask,
+			  GDI_CALLBACK_ACTION, HandleCounterButtons,
+			  GDI_END);
+
+	if (gi == NULL)
+	  Error(ERR_EXIT, "cannot create gadget");
+
+	level_editor_gadget[id] = gi;
+	xpos += gi->width + ED_GADGET_DISTANCE;	/* xpos of up count button */
+      }
     }
   }
 }
@@ -979,21 +1044,22 @@ static void CreateTextInputGadgets()
   unsigned long event_mask;
   int id;
 
+  event_mask = GD_EVENT_TEXT_RETURN | GD_EVENT_TEXT_LEAVING;
+
   gd_x = DOOR_GFX_PAGEX4 + ED_WIN_COUNT_XPOS;
   gd_y = DOOR_GFX_PAGEY1 + ED_WIN_COUNT_YPOS;
-  event_mask = GD_EVENT_TEXT_RETURN | GD_EVENT_TEXT_LEAVING;
 
   /* text input gadget for the level name */
   id = ED_CTRL_ID_LEVEL_NAME;
   gi = CreateGadget(GDI_CUSTOM_ID, id,
 		    GDI_X, SX + ED_COUNT_ELEMCONT_XPOS,
 		    GDI_Y, SY + ED_AREA_ELEMCONT_YPOS + 3 * TILEX,
-		    GDI_TYPE, GD_TYPE_TEXTINPUT,
+		    GDI_TYPE, GD_TYPE_TEXTINPUT_ALPHANUMERIC,
 		    GDI_TEXT_VALUE, level.name,
 		    GDI_TEXT_SIZE, 30,
 		    GDI_DESIGN_UNPRESSED, gd_pixmap, gd_x, gd_y,
 		    GDI_DESIGN_PRESSED, gd_pixmap, gd_x, gd_y,
-		    GDI_DESIGN_BORDER, 3,
+		    GDI_DESIGN_BORDER, ED_BORDER_SIZE,
 		    GDI_EVENT_MASK, event_mask,
 		    GDI_CALLBACK_ACTION, HandleTextInputGadgets,
 		    GDI_END);
@@ -1050,7 +1116,7 @@ static void CreateScrollbarGadgets()
 		      GDI_STATE, GD_BUTTON_UNPRESSED,
 		      GDI_DESIGN_UNPRESSED, gd_pixmap, gd_x1, gd_y1,
 		      GDI_DESIGN_PRESSED, gd_pixmap, gd_x2, gd_y2,
-		      GDI_DESIGN_BORDER, 3,
+		      GDI_DESIGN_BORDER, ED_BORDER_SIZE,
 		      GDI_EVENT_MASK, event_mask,
 		      GDI_CALLBACK_ACTION, HandleControlButtons,
 		      GDI_END);
@@ -1084,12 +1150,11 @@ static void MapControlButtons()
     MapGadget(level_editor_gadget[i]);
 }
 
-static void MapCounterButtons(int id)
+static void MapCounterButtons(int cnt_id)
 {
-  int i;
-
-  for (i=0; i<2; i++)
-    MapGadget(level_editor_gadget[counterbutton_info[id].gadget_id + i]);
+  MapGadget(level_editor_gadget[counterbutton_info[cnt_id].gadget_id_down]);
+  MapGadget(level_editor_gadget[counterbutton_info[cnt_id].gadget_id_text]);
+  MapGadget(level_editor_gadget[counterbutton_info[cnt_id].gadget_id_up]);
 }
 
 static void MapDrawingArea(int id)
@@ -1140,8 +1205,6 @@ void DrawLevelEd()
 {
   int i, x, y, graphic;
 
-  level_xpos = -1;
-  level_ypos = -1;
   edit_mode = ED_MODE_DRAWING;
   name_typing = FALSE;
 
@@ -1163,6 +1226,8 @@ void DrawLevelEd()
   }
   else
   {
+    level_xpos = -1;
+    level_ypos = -1;
     undo_buffer_position = -1;
     undo_buffer_steps = -1;
     CopyLevelToUndoBuffer(UNDO_IMMEDIATE);
@@ -1447,24 +1512,44 @@ void AdjustLevelScrollPosition()
 void AdjustEditorScrollbar(int id)
 {
   struct GadgetInfo *gi = level_editor_gadget[id];
-  struct GadgetScrollbar *gs = &gi->scrollbar;
-  int items_max, items_visible, item_position = gs->item_position;
+  int items_max, items_visible, item_position;
 
   if (id == ED_CTRL_ID_SCROLL_HORIZONTAL)
   {
     items_max = lev_fieldx + 2;
     items_visible = ED_FIELDX;
+    item_position = level_xpos + 1;
   }
   else
   {
     items_max = lev_fieldy + 2;
     items_visible = ED_FIELDY;
+    item_position = level_ypos + 1;
   }
 
   if (item_position > items_max - items_visible)
     item_position = items_max - items_visible;
 
   AdjustScrollbar(gi, items_max, item_position);
+}
+
+void ModifyEditorTextInput(int gadget_id, char *new_text)
+{
+  struct GadgetInfo *gi = level_editor_gadget[gadget_id];
+
+  ModifyTextInputTextValue(gi, new_text);
+}
+
+void ModifyEditorCounter(int counter_id, int new_value)
+{
+  int *counter_value = *counterbutton_info[counter_id].counter_value;
+  int gadget_id = counterbutton_info[counter_id].gadget_id_text;
+  struct GadgetInfo *gi = level_editor_gadget[gadget_id];
+
+  ModifyTextInputNumberValue(gi, new_value);
+
+  if (counter_value != NULL)
+    *counter_value = gi->text.number_value;
 }
 
 static void PickDrawingElement(int button, int element)
@@ -2203,12 +2288,13 @@ static void DrawElementContentAreas()
 
   /* display counter to choose number of element content areas */
   gadget_areas_value = num_areas;
-  DrawCounterValueField(ED_COUNTER_ELEMCONT, *gadget_areas_value);
-  x = counterbutton_info[ED_COUNTER_ELEMCONT].x + DXSIZE;
-  y = counterbutton_info[ED_COUNTER_ELEMCONT].y;
+  DrawCounterValueField(ED_COUNTER_ID_ELEMCONT, *gadget_areas_value);
+  x = counterbutton_info[ED_COUNTER_ID_ELEMCONT].x + DXSIZE;
+  y = counterbutton_info[ED_COUNTER_ID_ELEMCONT].y;
   DrawTextF(x + ED_COUNT_VALUE_XOFFSET, y + ED_COUNT_VALUE_YOFFSET,
 	    FC_YELLOW, "number of content areas");
-  MapCounterButtons(ED_COUNTER_ELEMCONT);
+  ModifyEditorCounter(ED_COUNTER_ID_ELEMCONT, *gadget_areas_value);
+  MapCounterButtons(ED_COUNTER_ID_ELEMCONT);
 
   /* delete content areas in case of reducing number of them */
   XFillRectangle(display, backbuffer, gc,
@@ -2387,14 +2473,19 @@ static void DrawPropertiesWindow()
   {
     if (elements_with_counter[i].element == properties_element)
     {
-      int x = counterbutton_info[ED_COUNTER_SCORE].x + DXSIZE;
-      int y = counterbutton_info[ED_COUNTER_SCORE].y;
+      int x = counterbutton_info[ED_COUNTER_ID_SCORE].x + DXSIZE;
+      int y = counterbutton_info[ED_COUNTER_ID_SCORE].y;
 
       gadget_score_value = elements_with_counter[i].counter_value;
-      DrawCounterValueField(ED_COUNTER_SCORE, *gadget_score_value);
+
+      /*
+      DrawCounterValueField(ED_COUNTER_ID_SCORE, *gadget_score_value);
+      */
+
       DrawTextF(x + ED_COUNT_VALUE_XOFFSET, y + ED_COUNT_VALUE_YOFFSET,
 		FC_YELLOW, elements_with_counter[i].text);
-      MapCounterButtons(ED_COUNTER_SCORE);
+      ModifyEditorCounter(ED_COUNTER_ID_SCORE, *gadget_score_value);
+      MapCounterButtons(ED_COUNTER_ID_SCORE);
       break;
     }
   }
@@ -2633,7 +2724,8 @@ static void CopyBrushExt(int from_x, int from_y, int to_x, int to_y,
     if (mode != CB_DELETE_OLD_CURSOR && delete_old_brush)
       CopyBrushExt(0, 0, 0, 0, 0, CB_DELETE_OLD_CURSOR);
 
-    if (!IN_LEV_FIELD(cursor_x + level_xpos, cursor_y + level_ypos))
+    if (!IN_ED_FIELD(cursor_x, cursor_y) ||
+	!IN_LEV_FIELD(cursor_x + level_xpos, cursor_y + level_ypos))
     {
       delete_old_brush = FALSE;
       return;
@@ -2652,8 +2744,7 @@ static void CopyBrushExt(int from_x, int from_y, int to_x, int to_y,
 		       mode == CB_BRUSH_TO_CURSOR || button == 1 ?
 		       brush_buffer[x][y] : new_element);
 
-	if (IN_LEV_FIELD(lx, ly) &&
-	    sx >=0 && sx < ED_FIELDX && sy >=0 && sy < ED_FIELDY)
+	if (IN_ED_FIELD(sx, sy) && IN_LEV_FIELD(lx, ly))
 	{
 	  if (sx < border_from_x)
 	    border_from_x = sx;
@@ -3017,6 +3108,13 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 		 button == 2 ? new_element2 :
 		 button == 3 ? new_element3 : 0);
 
+
+
+  if (button_release_event)
+    button = 0;
+
+
+
   if (!draw_level && drawing_function != ED_CTRL_ID_SINGLE_ITEMS)
     return;
 
@@ -3026,7 +3124,13 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
       if (draw_level)
       {
 	if (button_release_event)
+	{
 	  CopyLevelToUndoBuffer(UNDO_IMMEDIATE);
+
+	  if (edit_mode == ED_MODE_DRAWING && draw_with_brush &&
+	      !inside_drawing_area)
+	    DeleteBrushFromCursor();
+	}
 
 	if (!button)
 	  break;
@@ -3202,25 +3306,37 @@ static void HandleCounterButtons(struct GadgetInfo *gi)
   {
     case ED_CTRL_ID_SCORE_DOWN:
     case ED_CTRL_ID_SCORE_UP:
-      *gadget_score_value += (id == ED_CTRL_ID_SCORE_DOWN ? -step : step);
-      if (*gadget_score_value < 0)
-	*gadget_score_value = 0;
-      else if (*gadget_score_value > 255)
-	*gadget_score_value = 255;
-
-      DrawCounterValueField(ED_COUNTER_SCORE, *gadget_score_value);
+      step *= (id == ED_CTRL_ID_SCORE_DOWN ? -1 : 1);
+      ModifyEditorCounter(ED_COUNTER_ID_SCORE, *gadget_score_value + step);
+      break;
+    case ED_CTRL_ID_SCORE_TEXT:
+      *gadget_score_value = gi->text.number_value;
       break;
 
     case ED_CTRL_ID_ELEMCONT_DOWN:
     case ED_CTRL_ID_ELEMCONT_UP:
-      *gadget_areas_value += (id == ED_CTRL_ID_ELEMCONT_DOWN ? -step : step);
-      if (*gadget_areas_value < 1)
-	*gadget_areas_value = 1;
-      else if (*gadget_areas_value > MAX_ELEMCONT)
-	*gadget_areas_value = MAX_ELEMCONT;
-
-      DrawCounterValueField(ED_COUNTER_ELEMCONT, *gadget_areas_value);
+      step *= (id == ED_CTRL_ID_ELEMCONT_DOWN ? -1 : 1);
+      ModifyEditorCounter(ED_COUNTER_ID_ELEMCONT, *gadget_areas_value + step);
       DrawElementContentAreas();
+      break;
+    case ED_CTRL_ID_ELEMCONT_TEXT:
+      *gadget_areas_value = gi->text.number_value;
+      DrawElementContentAreas();
+      break;
+
+    default:
+      break;
+  }
+}
+
+static void HandleTextInputGadgets(struct GadgetInfo *gi)
+{
+  int id = gi->custom_id;
+
+  switch (id)
+  {
+    case ED_CTRL_ID_LEVEL_NAME:
+      strcpy(level.name, gi->text.value);
       break;
 
     default:
@@ -3623,21 +3739,6 @@ void HandleLevelEditorKeyInput(KeySym key)
   }
 }
 
-static void HandleTextInputGadgets(struct GadgetInfo *gi)
-{
-  int id = gi->custom_id;
-
-  switch (id)
-  {
-    case ED_CTRL_ID_LEVEL_NAME:
-      strcpy(level.name, gi->text.value);
-      break;
-
-    default:
-      break;
-  }
-}
-
 /* values for ClearEditorGadgetInfoText() and HandleGadgetInfoText() */
 #define INFOTEXT_XPOS		SX
 #define INFOTEXT_YPOS		(SY + SYSIZE - MINI_TILEX + 2)
@@ -3677,7 +3778,9 @@ void HandleEditorGadgetInfoText(void *ptr)
     if (key)
     {
       sprintf(shortcut, " ('%s%c')",
-	      (key >= 'A' && key <= 'Z' ? "Shift-" : ""), key);
+	      (key >= 'A' && key <= 'Z' ? "Shift-" :
+	       gi->custom_id == ED_CTRL_ID_SINGLE_ITEMS ? ".' or '" : ""),
+	      key);
 
       if (strlen(infotext) + strlen(shortcut) <= MAX_INFOTEXT_LEN)
 	strcat(infotext, shortcut);
@@ -3701,9 +3804,34 @@ static void HandleDrawingAreaInfo(struct GadgetInfo *gi)
 
   if (id == ED_CTRL_ID_DRAWING_LEVEL)
   {
-    if (IN_LEV_FIELD(lx, ly))
+    if (button_status)
     {
-      if (gi->state == GD_BUTTON_PRESSED)
+      int min_sx = 0, min_sy = 0;
+      int max_sx = gi->drawing.area_xsize - 1;
+      int max_sy = gi->drawing.area_ysize - 1;
+      int min_lx = 0, min_ly = 0;
+      int max_lx = lev_fieldx - 1, max_ly = lev_fieldy - 1;
+
+      /* make sure to stay inside drawing area boundaries */
+      sx = (sx < min_sx ? min_sx : sx > max_sx ? max_sx : sx);
+      sy = (sy < min_sy ? min_sy : sy > max_sy ? max_sy : sy);
+
+      /* get positions inside level field */
+      lx = sx + level_xpos;
+      ly = sy + level_ypos;
+
+      /* make sure to stay inside level field boundaries */
+      lx = (lx < min_lx ? min_lx : lx > max_lx ? max_lx : lx);
+      ly = (ly < min_ly ? min_ly : ly > max_ly ? max_ly : ly);
+
+      /* correct drawing area positions accordingly */
+      sx = lx - level_xpos;
+      sy = ly - level_ypos;
+    }
+
+    if (IN_ED_FIELD(sx,sy) && IN_LEV_FIELD(lx, ly))
+    {
+      if (button_status)	/* if (gi->state == GD_BUTTON_PRESSED) */
       {
 	if (gi->event.type == GD_EVENT_PRESSED)
 	{
@@ -3757,8 +3885,13 @@ static void HandleDrawingAreaInfo(struct GadgetInfo *gi)
     }
 
     /* misuse this function to draw brush cursor, if needed */
-    if (edit_mode == ED_MODE_DRAWING && draw_with_brush)
-      CopyBrushToCursor(sx, sy);
+    if (edit_mode == ED_MODE_DRAWING && draw_with_brush && !button_status)
+    {
+      if (IN_ED_FIELD(sx,sy) && IN_LEV_FIELD(lx, ly))
+	CopyBrushToCursor(sx, sy);
+      else
+	DeleteBrushFromCursor();
+    }
   }
   else if (id == ED_CTRL_ID_AMOEBA_CONTENT)
     DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FC_YELLOW,

@@ -278,17 +278,17 @@ int CheckCountButtons(int, int, int);
 #define GD_TYPE_NORMAL_BUTTON		(1 << 0)
 #define GD_TYPE_RADIO_BUTTON		(1 << 1)
 #define GD_TYPE_DRAWING_AREA		(1 << 2)
-#define GD_TYPE_TEXTINPUT		(1 << 3)
-#define GD_TYPE_TEXTOUTPUT		(1 << 4)
-#define GD_TYPE_NUMBERINPUT		(1 << 5)
-#define GD_TYPE_NUMBEROUTPUT		(1 << 6)
-#define GD_TYPE_SCROLLBAR_VERTICAL	(1 << 7)
-#define GD_TYPE_SCROLLBAR_HORIZONTAL	(1 << 8)
+#define GD_TYPE_TEXTINPUT_ALPHANUMERIC	(1 << 3)
+#define GD_TYPE_TEXTINPUT_NUMERIC	(1 << 4)
+#define GD_TYPE_SCROLLBAR_VERTICAL	(1 << 5)
+#define GD_TYPE_SCROLLBAR_HORIZONTAL	(1 << 6)
 
 #define GD_TYPE_BUTTON			(GD_TYPE_NORMAL_BUTTON | \
 					 GD_TYPE_RADIO_BUTTON)
 #define GD_TYPE_SCROLLBAR		(GD_TYPE_SCROLLBAR_VERTICAL | \
 					 GD_TYPE_SCROLLBAR_HORIZONTAL)
+#define GD_TYPE_TEXTINPUT		(GD_TYPE_TEXTINPUT_ALPHANUMERIC | \
+					 GD_TYPE_TEXTINPUT_NUMERIC)
 
 /* gadget events */
 #define GD_EVENT_PRESSED		(1 << 0)
@@ -364,6 +364,9 @@ struct GadgetDrawingArea
 struct GadgetTextInput
 {
   char value[MAX_GADGET_TEXTSIZE];	/* text string in input field */
+  int number_value;			/* integer value, if numeric */
+  int number_min;			/* minimal allowed numeric value */
+  int number_max;			/* maximal allowed numeric value */
   int size;				/* maximal size of input text */
   int cursor_position;			/* actual cursor position */
 };
@@ -392,7 +395,6 @@ struct GadgetInfo
   int radio_nr;				/* number of radio button series */
   boolean radio_pressed;		/* radio button state */
   boolean mapped;			/* gadget is active */
-  long number_value;
   struct GadgetDesign design[2];	/* 0: normal; 1: pressed */
   struct GadgetDesign alt_design[2];	/* alternative design */
   int design_border;			/* border size of gadget decoration */
@@ -411,6 +413,8 @@ void FreeGadget(struct GadgetInfo *);
 
 void ClickOnGadget(struct GadgetInfo *);
 void AdjustScrollbar(struct GadgetInfo *, int, int);
+void ModifyTextInputTextValue(struct GadgetInfo *, char *);
+void ModifyTextInputNumberValue(struct GadgetInfo *, int);
 
 void MapGadget(struct GadgetInfo *);
 void UnmapGadget(struct GadgetInfo *);
