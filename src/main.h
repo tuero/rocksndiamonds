@@ -541,7 +541,7 @@ extern char		*sound_name[];
 extern int		background_loop[];
 extern int		num_bg_loops;
 extern char		*element_info[];
-
+extern int		num_element_info;
 
 /* often used screen positions */
 #define SX			8

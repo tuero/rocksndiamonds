@@ -1261,6 +1261,18 @@ int editor_element[] =
 };
 int elements_in_list = sizeof(editor_element)/sizeof(int);
 
+static char *getElementInfoText(int element)
+{
+  char *info_text = "unknown";
+
+  if (element < num_element_info)
+    info_text = element_info[element];
+  else
+    Error(ERR_WARN, "no element description for element %d", element);
+
+  return info_text;
+}
+
 static void ScrollMiniLevel(int from_x, int from_y, int scroll)
 {
   int x,y;
@@ -1475,7 +1487,7 @@ static void CreateControlButtons()
 
     gi = CreateGadget(GDI_CUSTOM_ID, id,
 		      GDI_CUSTOM_TYPE_ID, i,
-		      GDI_INFO_TEXT, element_info[editor_element[i]],
+		      GDI_INFO_TEXT, getElementInfoText(editor_element[i]),
 		      GDI_X, DX + gd_xoffset,
 		      GDI_Y, DY + gd_yoffset,
 		      GDI_WIDTH, ED_ELEMENTLIST_XSIZE,
@@ -2664,7 +2676,7 @@ static void DrawPropertiesWindow()
 	     SY + ystart * MINI_TILEY - MINI_TILEY/2);
 
   DrawTextF((xstart + 3) * MINI_TILEX, (ystart + 1) * MINI_TILEY,
-	    font_color, element_info[properties_element]);
+	    font_color, getElementInfoText(properties_element));
 
   num_elements_in_level = 0;
   for (y=0; y<lev_fieldy; y++) 
@@ -3759,7 +3771,7 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 
 	UnmapGadget(gi);
 	getMiniGraphicSource(el2gfx(element), &gd->bitmap, &gd->x, &gd->y);
-	ModifyGadget(gi, GDI_INFO_TEXT, element_info[element], GDI_END);
+	ModifyGadget(gi, GDI_INFO_TEXT, getElementInfoText(element), GDI_END);
 	MapGadget(gi);
       }
       break;
@@ -4167,7 +4179,7 @@ static void HandleDrawingAreaInfo(struct GadgetInfo *gi)
       }
       else if (drawing_function == GADGET_ID_PICK_ELEMENT)
 	DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FC_YELLOW,
-		  "%s", element_info[Feld[lx][ly]]);
+		  "%s", getElementInfoText(Feld[lx][ly]));
       else
 	DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FC_YELLOW,
 		  "Level position: %d, %d", lx, ly);

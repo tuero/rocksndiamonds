@@ -565,6 +565,7 @@ char *element_info[] =
   "-------------------------------",
   */
 };
+int num_element_info = sizeof(element_info)/sizeof(char *);
 
 
 
