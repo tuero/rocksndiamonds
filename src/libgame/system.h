@@ -216,6 +216,7 @@
 #define MUSIC_SUBDIR		"mus_orig"
 #endif
 
+
 /* areas in bitmap PIX_DOOR */
 /* meaning in PIX_DB_DOOR: (3 PAGEs)
    PAGEX1: 1. buffer for DOOR_1
@@ -235,7 +236,8 @@
 #define DOOR_GFX_PAGEY1		(0)
 #define DOOR_GFX_PAGEY2		(gfx.dysize)
 
-/* functions for version handling */
+
+/* macros for version handling */
 #define VERSION_IDENT(x,y,z)	((x) * 1000000 + (y) * 10000 + (z) * 100)
 #define RELEASE_IDENT(x,y,z,r)	(VERSION_IDENT(x,y,z) + (r))
 #define VERSION_MAJOR(x)	((x) / 1000000)
@@ -243,7 +245,8 @@
 #define VERSION_PATCH(x)	(((x) % 10000) / 100)
 #define VERSION_RELEASE(x)	((x) % 100)
 
-/* functions for parent/child process identification */
+
+/* macros for parent/child process identification */
 #if defined(PLATFORM_UNIX)
 #define IS_PARENT_PROCESS()	(audio.mixer_pid != getpid())
 #define IS_CHILD_PROCESS()	(audio.mixer_pid == getpid())
@@ -253,6 +256,69 @@
 #define IS_CHILD_PROCESS()	FALSE
 #define HAS_CHILD_PROCESS()	FALSE
 #endif
+
+
+/* values for artwork type */
+#define ARTWORK_TYPE_GRAPHICS	0
+#define ARTWORK_TYPE_SOUNDS	1
+#define ARTWORK_TYPE_MUSIC	2
+
+#define NUM_ARTWORK_TYPES	3
+
+
+/* values for tree type (chosen to match artwork type) */
+#define TREE_TYPE_UNDEFINED	-1
+#define TREE_TYPE_GRAPHICS_DIR	ARTWORK_TYPE_GRAPHICS
+#define TREE_TYPE_SOUNDS_DIR	ARTWORK_TYPE_SOUNDS
+#define TREE_TYPE_MUSIC_DIR	ARTWORK_TYPE_MUSIC
+#define TREE_TYPE_LEVEL_DIR	3
+
+#define NUM_TREE_TYPES		4
+
+
+/* values for artwork handling */
+#define LEVELDIR_ARTWORK_SET(leveldir, type)				\
+				((type) == ARTWORK_TYPE_GRAPHICS ?	\
+				 (leveldir)->graphics_set :		\
+				 (type) == ARTWORK_TYPE_SOUNDS ?	\
+				 (leveldir)->sounds_set :		\
+	 			 (leveldir)->music_set)
+
+#define LEVELDIR_ARTWORK_PATH(leveldir, type)				\
+				((type) == ARTWORK_TYPE_GRAPHICS ?	\
+				 (leveldir)->graphics_path :		\
+				 (type) == ARTWORK_TYPE_SOUNDS ?	\
+				 (leveldir)->sounds_path :		\
+				 (leveldir)->music_path)
+
+#define SETUP_ARTWORK_SET(setup, type)					\
+				((type) == ARTWORK_TYPE_GRAPHICS ?	\
+				 (setup).graphics_set :			\
+				 (type) == ARTWORK_TYPE_SOUNDS ?	\
+				 (setup).sounds_set :			\
+				 (setup).music_set)
+
+#define SETUP_OVERRIDE_ARTWORK(setup, type)				\
+				((type) == ARTWORK_TYPE_GRAPHICS ?	\
+				 (setup).override_level_graphics :	\
+				 (type) == ARTWORK_TYPE_SOUNDS ?	\
+				 (setup).override_level_sounds :	\
+				 (setup).override_level_music)
+
+#define ARTWORK_FIRST_NODE(artwork, type)				\
+				((type) == ARTWORK_TYPE_GRAPHICS ?	\
+				 (artwork).gfx_first :	\
+				 (type) == ARTWORK_TYPE_SOUNDS ?	\
+				 (artwork).snd_first :	\
+				 (artwork).mus_first)
+
+#define ARTWORK_CURRENT_IDENTIFIER(artwork, type)			\
+				((type) == ARTWORK_TYPE_GRAPHICS ?	\
+				 (artwork).gfx_current_identifier :	\
+				 (type) == ARTWORK_TYPE_SOUNDS ?	\
+				 (artwork).snd_current_identifier :	\
+				 (artwork).mus_current_identifier)
+
 
 /* type definitions */
 typedef int (*EventFilter)(const Event *);
@@ -468,16 +534,6 @@ struct SetupInfo
   struct SetupSystemInfo system;
   struct OptionInfo options;
 };
-
-#define TREE_TYPE_GENERIC		0
-#define TREE_TYPE_GRAPHICS_DIR		1
-#define TREE_TYPE_SOUNDS_DIR		2
-#define TREE_TYPE_MUSIC_DIR		3
-#define TREE_TYPE_LEVEL_DIR		4
-
-#define ARTWORK_TYPE_GRAPHICS		TREE_TYPE_GRAPHICS_DIR
-#define ARTWORK_TYPE_SOUNDS		TREE_TYPE_SOUNDS_DIR
-#define ARTWORK_TYPE_MUSIC		TREE_TYPE_MUSIC_DIR
 
 struct TreeInfo
 {

@@ -3195,9 +3195,7 @@ void InitLevelArtworkInfo()
 
 static void InitImages()
 {
-#if 1
   setLevelArtworkDir(artwork.gfx_first);
-#endif
 
 #if 0
   printf("::: InitImages for '%s' ['%s', '%s'] ['%s', '%s']\n",
@@ -3216,19 +3214,27 @@ static void InitImages()
   ReinitializeGraphics();
 }
 
-static void InitSound()
+static void InitSound(char *identifier)
 {
+  if (identifier == NULL)
+    identifier = artwork.snd_current->identifier;
+
+  /* set artwork path to send it to the sound server process */
   setLevelArtworkDir(artwork.snd_first);
 
-  InitReloadCustomSounds(artwork.snd_current->identifier);
+  InitReloadCustomSounds(identifier);
   ReinitializeSounds();
 }
 
-static void InitMusic()
+static void InitMusic(char *identifier)
 {
+  if (identifier == NULL)
+    identifier = artwork.mus_current->identifier;
+
+  /* set artwork path to send it to the sound server process */
   setLevelArtworkDir(artwork.mus_first);
 
-  InitReloadCustomMusic(artwork.mus_current->identifier);
+  InitReloadCustomMusic(identifier);
   ReinitializeMusic();
 }
 
@@ -3255,168 +3261,92 @@ void InitNetworkServer()
 #endif
 }
 
-void ReloadCustomArtwork()
+static char *getNewArtworkIdentifier(int type)
 {
-  static char *leveldir_current_identifier = NULL;
-  static boolean last_override_level_graphics = FALSE;
-  static boolean last_override_level_sounds = FALSE;
-  static boolean last_override_level_music = FALSE;
-  static boolean last_own_level_graphics_set = FALSE;
-  static boolean last_own_level_sounds_set = FALSE;
-  static boolean last_own_level_music_set = FALSE;
-  boolean level_graphics_set_changed = FALSE;
-  boolean level_sounds_set_changed = FALSE;
-  boolean level_music_set_changed = FALSE;
-  /* identifier for new artwork; default: artwork configured in setup */
-#if 0
-  char *gfx_new_identifier = artwork.gfx_current->identifier;
-  char *snd_new_identifier = artwork.snd_current->identifier;
-  char *mus_new_identifier = artwork.mus_current->identifier;
-#else
-  char *gfx_new_identifier = artwork.gfx_current_identifier;
-  char *snd_new_identifier = artwork.snd_current_identifier;
-  char *mus_new_identifier = artwork.mus_current_identifier;
-#endif
-  boolean redraw_screen = FALSE;
-
-#if 0
-  if (leveldir_current_identifier == NULL)
-    leveldir_current_identifier = leveldir_current->identifier;
-#endif
-
-#if 0
-  printf("CURRENT GFX: '%s' ['%s']\n", artwork.gfx_current->identifier,
-	 leveldir_current->graphics_set);
-  printf("CURRENT LEV: '%s' / '%s'\n", leveldir_current_identifier,
-	 leveldir_current->identifier);
-#endif
-
-#if 0
-  printf("graphics --> '%s' ('%s')\n",
-	 artwork.gfx_current_identifier, artwork.gfx_current->filename);
-  printf("sounds   --> '%s' ('%s')\n",
-	 artwork.snd_current_identifier, artwork.snd_current->filename);
-  printf("music    --> '%s' ('%s')\n",
-	 artwork.mus_current_identifier, artwork.mus_current->filename);
-#endif
+  static char *leveldir_current_identifier[3] = { NULL, NULL, NULL };
+  static boolean last_override_level_artwork[3] = { FALSE, FALSE, FALSE };
+  static boolean last_has_level_artwork_set[3] = { FALSE, FALSE, FALSE };
+  static boolean initialized[3] = { FALSE, FALSE, FALSE };
+  TreeInfo *artwork_first_node = ARTWORK_FIRST_NODE(artwork, type);
+  boolean setup_override_artwork = SETUP_OVERRIDE_ARTWORK(setup, type);
+  char *setup_artwork_set = SETUP_ARTWORK_SET(setup, type);
+  char *leveldir_identifier = leveldir_current->identifier;
+  char *leveldir_artwork_set = LEVELDIR_ARTWORK_SET(leveldir_current, type);
+  boolean has_level_artwork_set = (leveldir_artwork_set != NULL);
+  char *artwork_current_identifier;
+  char *artwork_new_identifier = NULL;	/* default: nothing has changed */
 
   /* leveldir_current may be invalid (level group, parent link) */
   if (!validLevelSeries(leveldir_current))
-    return;
+    return NULL;
 
-  /* when a new level series was selected, check if there was a change
-     in custom artwork stored in level series directory */
-  if (1 || leveldir_current_identifier != leveldir_current->identifier)
-  {
-#if 0
-    char *identifier_old = leveldir_current_identifier;
-#endif
-    char *identifier_new = leveldir_current->identifier;
 
-#if 0
-    printf("::: 1: ['%s'] '%s', '%s' [%lx, %lx]\n",
-	   gfx_new_identifier, identifier_old, identifier_new,
-	   getTreeInfoFromIdentifier(artwork.gfx_first, identifier_old),
-	   getTreeInfoFromIdentifier(artwork.gfx_first, identifier_new));
-#endif
+  /* 1st step: determine artwork set to be activated in descending order:
+     --------------------------------------------------------------------
+     1. setup artwork (when configured to override everything else)
+     2. artwork set configured in "levelinfo.conf" of current level set
+        (artwork in level directory will have priority when loading later)
+     3. artwork in level directory (stored in artwork sub-directory)
+     4. setup artwork (currently configured in setup menu) */
 
-#if 0
-    if (getTreeInfoFromIdentifier(artwork.gfx_first, identifier_new) == NULL)
-      gfx_new_identifier = GRAPHICS_SUBDIR;
-    else if (getTreeInfoFromIdentifier(artwork.gfx_first, identifier_old) !=
-	     getTreeInfoFromIdentifier(artwork.gfx_first, identifier_new))
-      gfx_new_identifier = identifier_new;
-#else
-    if (getTreeInfoFromIdentifier(artwork.gfx_first, identifier_new))
-      gfx_new_identifier = identifier_new;
-    else
-      gfx_new_identifier = setup.graphics_set;
-#endif
+  if (setup_override_artwork)
+    artwork_current_identifier = setup_artwork_set;
+  else if (leveldir_artwork_set != NULL)
+    artwork_current_identifier = leveldir_artwork_set;
+  else if (getTreeInfoFromIdentifier(artwork_first_node, leveldir_identifier))
+    artwork_current_identifier = leveldir_identifier;
+  else
+    artwork_current_identifier = setup_artwork_set;
 
-#if 0
-    if (getTreeInfoFromIdentifier(artwork.snd_first, identifier_new) == NULL)
-      snd_new_identifier = SOUNDS_SUBDIR;
-    else if (getTreeInfoFromIdentifier(artwork.snd_first, identifier_old) !=
-	     getTreeInfoFromIdentifier(artwork.snd_first, identifier_new))
-      snd_new_identifier = identifier_new;
-#else
-    if (getTreeInfoFromIdentifier(artwork.snd_first, identifier_new))
-      snd_new_identifier = identifier_new;
-    else
-      snd_new_identifier = setup.sounds_set;
-#endif
 
-#if 0
-    if (getTreeInfoFromIdentifier(artwork.mus_first, identifier_new) == NULL)
-      mus_new_identifier = MUSIC_SUBDIR;
-    else if (getTreeInfoFromIdentifier(artwork.mus_first, identifier_new) !=
-	     getTreeInfoFromIdentifier(artwork.mus_first, identifier_new))
-      mus_new_identifier = identifier_new;
-#else
-    if (getTreeInfoFromIdentifier(artwork.mus_first, identifier_new))
-      mus_new_identifier = identifier_new;
-    else
-      mus_new_identifier = setup.music_set;
-#endif
+  /* 2nd step: check if it is really needed to reload artwork set
+     ------------------------------------------------------------ */
+
+  /* ---------- reload if level set and also artwork set has changed ------- */
+  if (leveldir_current_identifier[type] != leveldir_identifier &&
+      (last_has_level_artwork_set[type] || has_level_artwork_set))
+    artwork_new_identifier = artwork_current_identifier;
+
+  leveldir_current_identifier[type] = leveldir_identifier;
+  last_has_level_artwork_set[type] = has_level_artwork_set;
+
+  /* ---------- reload if "override artwork" setting has changed ----------- */
+  if (last_override_level_artwork[type] != setup_override_artwork)
+    artwork_new_identifier = artwork_current_identifier;
+
+  last_override_level_artwork[type] = setup_override_artwork;
+
+  /* ---------- reload if current artwork identifier has changed ----------- */
+  if (strcmp(ARTWORK_CURRENT_IDENTIFIER(artwork, type),
+	     artwork_current_identifier) != 0)
+    artwork_new_identifier = artwork_current_identifier;
+
+  *(&(ARTWORK_CURRENT_IDENTIFIER(artwork, type))) = artwork_current_identifier;
+
+  /* ---------- do not reload directly after starting ---------------------- */
+  if (!initialized[type])
+    artwork_new_identifier = NULL;
+
+  initialized[type] = TRUE;
 
 #if 0
-    printf("::: 2: ['%s'] '%s', '%s'\n",
-	   gfx_new_identifier, identifier_old, identifier_new);
-#endif
-
-#if 0
-    leveldir_current_identifier = leveldir_current->identifier;
-#endif
-  }
-
-  /* custom level artwork configured in level series configuration file
-     always overrides custom level artwork stored in level series directory
-     and (level independent) custom artwork configured in setup menu */
-  if (leveldir_current->graphics_set != NULL)
-    gfx_new_identifier = leveldir_current->graphics_set;
-  if (leveldir_current->sounds_set != NULL)
-    snd_new_identifier = leveldir_current->sounds_set;
-  if (leveldir_current->music_set != NULL)
-    mus_new_identifier = leveldir_current->music_set;
-
-  if (leveldir_current_identifier != leveldir_current->identifier)
-  {
-    if (last_own_level_graphics_set || leveldir_current->graphics_set != NULL)
-      level_graphics_set_changed = TRUE;
-
-    if (last_own_level_sounds_set || leveldir_current->sounds_set != NULL)
-      level_sounds_set_changed = TRUE;
-
-    if (last_own_level_music_set || leveldir_current->music_set != NULL)
-      level_music_set_changed = TRUE;
-
-    last_own_level_graphics_set = (leveldir_current->graphics_set != NULL);
-    last_own_level_sounds_set = (leveldir_current->sounds_set != NULL);
-    last_own_level_music_set = (leveldir_current->music_set != NULL);
-  }
-
-#if 1
-  leveldir_current_identifier = leveldir_current->identifier;
-#endif
-
-  if (setup.override_level_graphics)
-    gfx_new_identifier = artwork.gfx_current->identifier;
-  if (setup.override_level_sounds)
-    snd_new_identifier = artwork.snd_current->identifier;
-  if (setup.override_level_music)
-    mus_new_identifier = artwork.mus_current->identifier;
-
-
-#if 0
-  printf("CHECKING OLD/NEW GFX:\n  OLD: '%s'\n  NEW: '%s' ['%s', '%s'] [%d]\n",
-	 artwork.gfx_current_identifier, gfx_new_identifier,
+  printf("CHECKING OLD/NEW GFX:\n- OLD: %s\n- NEW: %s ['%s', '%s'] ['%s']\n",
+	 artwork.gfx_current_identifier, artwork_current_identifier,
 	 artwork.gfx_current->identifier, leveldir_current->graphics_set,
-	 level_graphics_set_changed);
+	 artwork_new_identifier);
 #endif
 
-  if (strcmp(artwork.gfx_current_identifier, gfx_new_identifier) != 0 ||
-      last_override_level_graphics != setup.override_level_graphics ||
-      level_graphics_set_changed)
+  return artwork_new_identifier;
+}
+
+void ReloadCustomArtwork()
+{
+  char *gfx_new_identifier = getNewArtworkIdentifier(ARTWORK_TYPE_GRAPHICS);
+  char *snd_new_identifier = getNewArtworkIdentifier(ARTWORK_TYPE_SOUNDS);
+  char *mus_new_identifier = getNewArtworkIdentifier(ARTWORK_TYPE_MUSIC);
+  boolean redraw_screen = FALSE;
+
+  if (gfx_new_identifier != NULL)
   {
 #if 0
     printf("RELOADING GRAPHICS '%s' -> '%s' ['%s']\n",
@@ -3425,99 +3355,30 @@ void ReloadCustomArtwork()
 	   artwork.gfx_current->identifier);
 #endif
 
-#if 0
-    artwork.gfx_current =
-      getTreeInfoFromIdentifier(artwork.gfx_first, gfx_new_identifier);
-#endif
-#if 0
-    artwork.gfx_current_identifier = gfx_new_identifier;
-#endif
-
-#if 0
-    setLevelArtworkDir(artwork.gfx_first);
-#endif
-
     ClearRectangle(window, 0, 0, WIN_XSIZE, WIN_YSIZE);
 
     InitImages();
 
-#if 0
-    printf("::: %d\n", menu.list_size[GAME_MODE_LEVELS]);
-#endif
-
     FreeTileClipmasks();
     InitTileClipmasks();
-#if 0
-    artwork.gfx_current =
-      getTreeInfoFromIdentifier(artwork.gfx_first, gfx_new_identifier);
-#endif
-#if 0
-    printf("::: '%s', %lx\n", gfx_new_identifier, artwork.gfx_current);
-#endif
-
-#if 0
-    artwork.gfx_current_identifier = artwork.gfx_current->identifier;
-#endif
-    artwork.gfx_current_identifier = gfx_new_identifier;
-    last_override_level_graphics = setup.override_level_graphics;
-
-#if 0
-    printf("DONE RELOADING GFX: '%s' ['%s']\n",
-	   artwork.gfx_current_identifier, artwork.gfx_current->identifier);
-#endif
 
     redraw_screen = TRUE;
   }
 
-  if (strcmp(artwork.snd_current_identifier, snd_new_identifier) != 0 ||
-      last_override_level_sounds != setup.override_level_sounds ||
-      level_sounds_set_changed)
+  if (snd_new_identifier != NULL)
   {
-#if 0
-    printf("RELOADING SOUNDS '%s' -> '%s' ('%s')\n",
-	   artwork.snd_current_identifier,
-	   artwork.snd_current->identifier,
-	   snd_new_identifier);
-#endif
-
-    /* set artwork path to send it to the sound server process */
-    setLevelArtworkDir(artwork.snd_first);
-
     ClearRectangle(window, 0, 0, WIN_XSIZE, WIN_YSIZE);
 
-    InitReloadCustomSounds(snd_new_identifier);
-    ReinitializeSounds();
-
-#if 0
-    artwork.snd_current =
-      getTreeInfoFromIdentifier(artwork.snd_first, setup.sounds_set);
-    artwork.snd_current_identifier = artwork.snd_current->identifier;
-#endif
-    artwork.snd_current_identifier = snd_new_identifier;
-    last_override_level_sounds = setup.override_level_sounds;
+    InitSound(snd_new_identifier);
 
     redraw_screen = TRUE;
   }
 
-  if (strcmp(artwork.mus_current_identifier, mus_new_identifier) != 0 ||
-      last_override_level_music != setup.override_level_music ||
-      level_music_set_changed)
+  if (mus_new_identifier != NULL)
   {
-    /* set artwork path to send it to the sound server process */
-    setLevelArtworkDir(artwork.mus_first);
-
     ClearRectangle(window, 0, 0, WIN_XSIZE, WIN_YSIZE);
 
-    InitReloadCustomMusic(mus_new_identifier);
-    ReinitializeMusic();
-
-#if 0
-    artwork.mus_current =
-      getTreeInfoFromIdentifier(artwork.mus_first, setup.music_set);
-    artwork.mus_current_identifier = artwork.mus_current->identifier;
-#endif
-    artwork.mus_current_identifier = mus_new_identifier;
-    last_override_level_music = setup.override_level_music;
+    InitMusic(mus_new_identifier);
 
     redraw_screen = TRUE;
   }
@@ -3588,8 +3449,8 @@ void OpenAll()
   InitLevelArtworkInfo();
 
   InitImages();			/* needs to know current level directory */
-  InitSound();			/* needs to know current level directory */
-  InitMusic();			/* needs to know current level directory */
+  InitSound(NULL);		/* needs to know current level directory */
+  InitMusic(NULL);		/* needs to know current level directory */
 
   InitGfxBackground();
 

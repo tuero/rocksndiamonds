@@ -98,25 +98,25 @@ static char *levelclass_desc[NUM_LEVELCLASS_DESC] =
 
 #define MAX_COOKIE_LEN			256
 
-#define ARTWORKINFO_FILENAME(type)	((type) == TREE_TYPE_GRAPHICS_DIR ? \
-					 GRAPHICSINFO_FILENAME :	    \
-					 (type) == TREE_TYPE_SOUNDS_DIR ?   \
-					 SOUNDSINFO_FILENAME :		    \
-					 (type) == TREE_TYPE_MUSIC_DIR ?    \
+#define ARTWORKINFO_FILENAME(type)	((type) == ARTWORK_TYPE_GRAPHICS ? \
+					 GRAPHICSINFO_FILENAME :	   \
+					 (type) == ARTWORK_TYPE_SOUNDS ?   \
+					 SOUNDSINFO_FILENAME :		   \
+					 (type) == ARTWORK_TYPE_MUSIC ?    \
 					 MUSICINFO_FILENAME : "")
 
-#define ARTWORK_DIRECTORY(type)		((type) == TREE_TYPE_GRAPHICS_DIR ? \
-					 GRAPHICS_DIRECTORY :		    \
-					 (type) == TREE_TYPE_SOUNDS_DIR ?   \
-					 SOUNDS_DIRECTORY :		    \
-					 (type) == TREE_TYPE_MUSIC_DIR ?    \
+#define ARTWORK_DIRECTORY(type)		((type) == ARTWORK_TYPE_GRAPHICS ? \
+					 GRAPHICS_DIRECTORY :		   \
+					 (type) == ARTWORK_TYPE_SOUNDS ?   \
+					 SOUNDS_DIRECTORY :		   \
+					 (type) == ARTWORK_TYPE_MUSIC ?    \
 					 MUSIC_DIRECTORY : "")
 
-#define OPTIONS_ARTWORK_DIRECTORY(type)	((type) == TREE_TYPE_GRAPHICS_DIR ? \
-					 options.graphics_directory :	    \
-					 (type) == TREE_TYPE_SOUNDS_DIR ?   \
-					 options.sounds_directory :	    \
-					 (type) == TREE_TYPE_MUSIC_DIR ?    \
+#define OPTIONS_ARTWORK_DIRECTORY(type)	((type) == ARTWORK_TYPE_GRAPHICS ? \
+					 options.graphics_directory :	   \
+					 (type) == ARTWORK_TYPE_SOUNDS ?   \
+					 options.sounds_directory :	   \
+					 (type) == ARTWORK_TYPE_MUSIC ?    \
 					 options.music_directory : "")
 
 
@@ -268,6 +268,13 @@ static char *getDefaultMusicDir(char *music_subdir)
   return music_dir;
 }
 
+static char *getDefaultArtworkSet(int type)
+{
+  return (type == TREE_TYPE_GRAPHICS_DIR ? GRAPHICS_SUBDIR :
+	  type == TREE_TYPE_SOUNDS_DIR   ? SOUNDS_SUBDIR   :
+	  type == TREE_TYPE_MUSIC_DIR    ? MUSIC_SUBDIR    : "");
+}
+
 static char *getDefaultArtworkDir(int type)
 {
   return (type == TREE_TYPE_GRAPHICS_DIR ?
@@ -322,26 +329,19 @@ static char *getSetupArtworkDir(TreeInfo *ti)
 
 void setLevelArtworkDir(TreeInfo *ti)
 {
-  char **artwork_path_ptr, *artwork_set;
+  char **artwork_path_ptr, **artwork_set_ptr;
   TreeInfo *level_artwork;
 
   if (ti == NULL || leveldir_current == NULL)
     return;
 
-  artwork_path_ptr =
-    (ti->type == TREE_TYPE_GRAPHICS_DIR ? &leveldir_current->graphics_path :
-     ti->type == TREE_TYPE_SOUNDS_DIR   ? &leveldir_current->sounds_path :
-     &leveldir_current->music_path);
-
-  artwork_set =
-    (ti->type == TREE_TYPE_GRAPHICS_DIR ? leveldir_current->graphics_set :
-     ti->type == TREE_TYPE_SOUNDS_DIR   ? leveldir_current->sounds_set :
-     leveldir_current->music_set);
+  artwork_path_ptr = &(LEVELDIR_ARTWORK_PATH(leveldir_current, ti->type));
+  artwork_set_ptr  = &(LEVELDIR_ARTWORK_SET( leveldir_current, ti->type));
 
   if (*artwork_path_ptr != NULL)
     free(*artwork_path_ptr);
 
-  if ((level_artwork = getTreeInfoFromIdentifier(ti, artwork_set)))
+  if ((level_artwork = getTreeInfoFromIdentifier(ti, *artwork_set_ptr)))
     *artwork_path_ptr = getStringCopy(getSetupArtworkDir(level_artwork));
   else
   {
@@ -354,29 +354,38 @@ void setLevelArtworkDir(TreeInfo *ti)
 
     char *dir = getPath2(getCurrentLevelDir(), ARTWORK_DIRECTORY(ti->type));
 
+    if (*artwork_set_ptr != NULL)
+      free(*artwork_set_ptr);
+
     if (fileExists(dir))
+    {
       *artwork_path_ptr = getStringCopy(getDefaultArtworkDir(ti->type));
+      *artwork_set_ptr = getStringCopy(getDefaultArtworkSet(ti->type));
+    }
     else
+    {
       *artwork_path_ptr = getStringCopy(UNDEFINED_FILENAME);
+      *artwork_set_ptr = NULL;
+    }
 
     free(dir);
   }
 }
 
-static char *getLevelArtworkDir(int type)
+inline static char *getLevelArtworkSet(int type)
 {
-  char *artwork_path;
+  if (leveldir_current == NULL)
+    return NULL;
 
+  return LEVELDIR_ARTWORK_SET(leveldir_current, type);
+}
+
+inline static char *getLevelArtworkDir(int type)
+{
   if (leveldir_current == NULL)
     return UNDEFINED_FILENAME;
 
-  artwork_path =
-    (type == TREE_TYPE_GRAPHICS_DIR ? leveldir_current->graphics_path :
-     type == TREE_TYPE_SOUNDS_DIR   ? leveldir_current->sounds_path :
-     type == TREE_TYPE_MUSIC_DIR    ? leveldir_current->music_path :
-     UNDEFINED_FILENAME);
-
-  return artwork_path;
+  return LEVELDIR_ARTWORK_PATH(leveldir_current, type);
 }
 
 char *getLevelFilename(int nr)
@@ -471,6 +480,7 @@ static char *getCorrectedImageBasename(char *basename)
 char *getCustomImageFilename(char *basename)
 {
   static char *filename = NULL;
+  boolean skip_setup_artwork = FALSE;
 
   if (filename != NULL)
     free(filename);
@@ -479,67 +489,40 @@ char *getCustomImageFilename(char *basename)
 
   if (!setup.override_level_graphics)
   {
-#if 0
-    /* 1st try: look for special artwork configured in level series config */
-    filename = getPath2(getLevelArtworkDir(TREE_TYPE_GRAPHICS_DIR), basename);
-#if 0
-    if (strcmp(basename, "RocksScreen.pcx") == 0)
-      printf("::: trying 1 '%s' ...\n", filename);
-#endif
-    if (fileExists(filename))
-      return filename;
-
-    free(filename);
-#endif
-
-    /* 2nd try: look for special artwork in current level series directory */
+    /* 1st try: look for special artwork in current level series directory */
     filename = getPath3(getCurrentLevelDir(), GRAPHICS_DIRECTORY, basename);
-#if 0
-    /*
-    if (strcmp(basename, "RocksScreen.pcx") == 0)
-    */
-      printf("::: trying 2 '%s' ...\n", filename);
-#endif
     if (fileExists(filename))
       return filename;
 
     free(filename);
 
-#if 1
-    /* 1st try: look for special artwork configured in level series config */
-    filename = getPath2(getLevelArtworkDir(TREE_TYPE_GRAPHICS_DIR), basename);
-#if 0
-    /*
-    if (strcmp(basename, "RocksScreen.pcx") == 0)
-    */
-      printf("::: trying 2.1 '%s' ...\n", filename);
-#endif
-    if (fileExists(filename))
-      return filename;
+    /* check if there is special artwork configured in level series config */
+    if (getLevelArtworkSet(ARTWORK_TYPE_GRAPHICS) != NULL)
+    {
+      /* 2nd try: look for special artwork configured in level series config */
+      filename = getPath2(getLevelArtworkDir(ARTWORK_TYPE_GRAPHICS), basename);
+      if (fileExists(filename))
+	return filename;
 
-    free(filename);
-#endif
+      free(filename);
+
+      /* take missing artwork configured in level set config from default */
+      skip_setup_artwork = TRUE;
+    }
   }
 
-  /* 3rd try: look for special artwork in configured artwork directory */
-  filename = getPath2(getSetupArtworkDir(artwork.gfx_current), basename);
-#if 0
-  /*
-  if (strcmp(basename, "RocksScreen.pcx") == 0)
-  */
-    printf("::: trying 3 '%s' ...\n", filename);
-#endif
-  if (fileExists(filename))
-    return filename;
+  if (!skip_setup_artwork)
+  {
+    /* 3rd try: look for special artwork in configured artwork directory */
+    filename = getPath2(getSetupArtworkDir(artwork.gfx_current), basename);
+    if (fileExists(filename))
+      return filename;
 
-  free(filename);
+    free(filename);
+  }
 
   /* 4th try: look for default artwork in new default artwork directory */
   filename = getPath2(getDefaultGraphicsDir(GRAPHICS_SUBDIR), basename);
-#if 0
-  if (strcmp(basename, "RocksScreen.pcx") == 0)
-    printf("::: trying 4 '%s' ...\n", filename);
-#endif
   if (fileExists(filename))
     return filename;
 
@@ -547,10 +530,6 @@ char *getCustomImageFilename(char *basename)
 
   /* 5th try: look for default artwork in old default artwork directory */
   filename = getPath2(options.graphics_directory, basename);
-#if 0
-  if (strcmp(basename, "RocksScreen.pcx") == 0)
-    printf("::: trying 5 '%s' ...\n", filename);
-#endif
   if (fileExists(filename))
     return filename;
 
@@ -560,44 +539,44 @@ char *getCustomImageFilename(char *basename)
 char *getCustomSoundFilename(char *basename)
 {
   static char *filename = NULL;
+  boolean skip_setup_artwork = FALSE;
 
   if (filename != NULL)
     free(filename);
 
   if (!setup.override_level_sounds)
   {
-#if 0
-    /* 1st try: look for special artwork configured in level series config */
-    filename = getPath2(getLevelArtworkDir(TREE_TYPE_SOUNDS_DIR), basename);
-    if (fileExists(filename))
-      return filename;
-
-    free(filename);
-#endif
-
-    /* 2nd try: look for special artwork in current level series directory */
+    /* 1st try: look for special artwork in current level series directory */
     filename = getPath3(getCurrentLevelDir(), SOUNDS_DIRECTORY, basename);
     if (fileExists(filename))
       return filename;
 
     free(filename);
 
-#if 1
-    /* 1st try: look for special artwork configured in level series config */
-    filename = getPath2(getLevelArtworkDir(TREE_TYPE_SOUNDS_DIR), basename);
+    /* check if there is special artwork configured in level series config */
+    if (getLevelArtworkSet(ARTWORK_TYPE_SOUNDS) != NULL)
+    {
+      /* 2nd try: look for special artwork configured in level series config */
+      filename = getPath2(getLevelArtworkDir(TREE_TYPE_SOUNDS_DIR), basename);
+      if (fileExists(filename))
+	return filename;
+
+      free(filename);
+
+      /* take missing artwork configured in level set config from default */
+      skip_setup_artwork = TRUE;
+    }
+  }
+
+  if (!skip_setup_artwork)
+  {
+    /* 3rd try: look for special artwork in configured artwork directory */
+    filename = getPath2(getSetupArtworkDir(artwork.snd_current), basename);
     if (fileExists(filename))
       return filename;
 
     free(filename);
-#endif
   }
-
-  /* 3rd try: look for special artwork in configured artwork directory */
-  filename = getPath2(getSetupArtworkDir(artwork.snd_current), basename);
-  if (fileExists(filename))
-    return filename;
-
-  free(filename);
 
   /* 4th try: look for default artwork in new default artwork directory */
   filename = getPath2(getDefaultSoundsDir(SOUNDS_SUBDIR), basename);
@@ -644,44 +623,44 @@ char *getCustomArtworkLevelConfigFilename(int type)
 char *getCustomMusicDirectory(void)
 {
   static char *directory = NULL;
+  boolean skip_setup_artwork = FALSE;
 
   if (directory != NULL)
     free(directory);
 
   if (!setup.override_level_music)
   {
-#if 0
-    /* 1st try: look for special artwork configured in level series config */
-    directory = getStringCopy(getLevelArtworkDir(TREE_TYPE_MUSIC_DIR));
-    if (fileExists(directory))
-      return directory;
-
-    free(directory);
-#endif
-
-    /* 2nd try: look for special artwork in current level series directory */
+    /* 1st try: look for special artwork in current level series directory */
     directory = getPath2(getCurrentLevelDir(), MUSIC_DIRECTORY);
     if (fileExists(directory))
       return directory;
 
     free(directory);
 
-#if 1
-    /* 1st try: look for special artwork configured in level series config */
-    directory = getStringCopy(getLevelArtworkDir(TREE_TYPE_MUSIC_DIR));
+    /* check if there is special artwork configured in level series config */
+    if (getLevelArtworkSet(ARTWORK_TYPE_MUSIC) != NULL)
+    {
+      /* 2nd try: look for special artwork configured in level series config */
+      directory = getStringCopy(getLevelArtworkDir(TREE_TYPE_MUSIC_DIR));
+      if (fileExists(directory))
+	return directory;
+
+      free(directory);
+
+      /* take missing artwork configured in level set config from default */
+      skip_setup_artwork = TRUE;
+    }
+  }
+
+  if (!skip_setup_artwork)
+  {
+    /* 3rd try: look for special artwork in configured artwork directory */
+    directory = getStringCopy(getSetupArtworkDir(artwork.mus_current));
     if (fileExists(directory))
       return directory;
 
     free(directory);
-#endif
   }
-
-  /* 3rd try: look for special artwork in configured artwork directory */
-  directory = getStringCopy(getSetupArtworkDir(artwork.mus_current));
-  if (fileExists(directory))
-    return directory;
-
-  free(directory);
 
   /* 4th try: look for default artwork in new default artwork directory */
   directory = getStringCopy(getDefaultMusicDir(MUSIC_SUBDIR));
@@ -1539,7 +1518,8 @@ static void setTreeInfoToDefaultsFromParent(TreeInfo *ldi, TreeInfo *parent)
   {
     Error(ERR_WARN, "setTreeInfoToDefaultsFromParent(): parent == NULL");
 
-    setTreeInfoToDefaults(ldi, TREE_TYPE_GENERIC);
+    setTreeInfoToDefaults(ldi, TREE_TYPE_UNDEFINED);
+
     return;
   }
 
