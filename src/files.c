@@ -47,6 +47,56 @@
 /* level file functions                                                      */
 /* ========================================================================= */
 
+void setElementChangePages(struct ElementInfo *ei, int change_pages)
+{
+  int change_page_size = sizeof(struct ElementChangeInfo);
+
+  ei->num_change_pages = MAX(1, change_pages);
+
+  ei->change_page =
+    checked_realloc(ei->change_page, ei->num_change_pages * change_page_size);
+
+  if (ei->current_change_page >= ei->num_change_pages)
+    ei->current_change_page = ei->num_change_pages - 1;
+
+  ei->change = &ei->change_page[ei->current_change_page];
+}
+
+void setElementChangeInfoToDefaults(struct ElementChangeInfo *change)
+{
+  int x, y;
+
+  change->can_change = FALSE;
+
+  change->events = CE_BITMASK_DEFAULT;
+  change->target_element = EL_EMPTY_SPACE;
+
+  change->delay_fixed = 0;
+  change->delay_random = 0;
+  change->delay_frames = -1;	/* later set to reliable default value */
+
+  change->trigger_element = EL_EMPTY_SPACE;
+
+  change->explode = FALSE;
+  change->use_content = FALSE;
+  change->only_complete = FALSE;
+  change->use_random_change = FALSE;
+  change->random = 0;
+  change->power = CP_NON_DESTRUCTIVE;
+
+  for(x=0; x<3; x++)
+    for(y=0; y<3; y++)
+      change->content[x][y] = EL_EMPTY_SPACE;
+
+  change->player_action = 0;
+  change->collide_action = 0;
+  change->other_action = 0;
+
+  change->pre_change_function = NULL;
+  change->change_function = NULL;
+  change->post_change_function = NULL;
+}
+
 static void setLevelInfoToDefaults(struct LevelInfo *level)
 {
   int i, j, x, y;
@@ -87,6 +137,10 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
   strcpy(level->name, NAMELESS_LEVEL_NAME);
   strcpy(level->author, ANONYMOUS_NAME);
 
+  level->envelope[0] = '\0';
+  level->envelope_xsize = MAX_ENVELOPE_XSIZE;
+  level->envelope_ysize = MAX_ENVELOPE_YSIZE;
+
   for(i=0; i<LEVEL_SCORE_ELEMENTS; i++)
     level->score[i] = 10;
 
@@ -100,11 +154,17 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
   level->field[0][0] = EL_PLAYER_1;
   level->field[STD_LEV_FIELDX - 1][STD_LEV_FIELDY - 1] = EL_EXIT_CLOSED;
 
+  for (i=0; i < MAX_NUM_ELEMENTS; i++)
+  {
+    setElementChangePages(&element_info[i], 1);
+    setElementChangeInfoToDefaults(element_info[i].change);
+  }
+
   for (i=0; i < NUM_CUSTOM_ELEMENTS; i++)
   {
     int element = EL_CUSTOM_START + i;
 
-    for(j=0; j<MAX_ELEMENT_NAME_LEN + 1; j++)
+    for(j=0; j < MAX_ELEMENT_NAME_LEN + 1; j++)
       element_info[element].description[j] = '\0';
     if (element_info[element].custom_description != NULL)
       strncpy(element_info[element].description,
@@ -134,39 +194,18 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
       for(y=0; y<3; y++)
 	element_info[element].content[x][y] = EL_EMPTY_SPACE;
 
-    element_info[element].change.events = CE_BITMASK_DEFAULT;
-    element_info[element].change.target_element = EL_EMPTY_SPACE;
-
-    element_info[element].change.delay_fixed = 0;
-    element_info[element].change.delay_random = 0;
-    element_info[element].change.delay_frames = -1;	/* use default */
-
-    element_info[element].change.trigger_element = EL_EMPTY_SPACE;
-
-    element_info[element].change.explode = FALSE;
-    element_info[element].change.use_content = FALSE;
-    element_info[element].change.only_complete = FALSE;
-    element_info[element].change.use_random_change = FALSE;
-    element_info[element].change.random = 0;
-    element_info[element].change.power = CP_NON_DESTRUCTIVE;
-
-    for(x=0; x<3; x++)
-      for(y=0; y<3; y++)
-	element_info[element].change.content[x][y] = EL_EMPTY_SPACE;
-
     element_info[element].access_type = 0;
     element_info[element].access_layer = 0;
     element_info[element].walk_to_action = 0;
     element_info[element].smash_targets = 0;
     element_info[element].deadliness = 0;
     element_info[element].consistency = 0;
-    element_info[element].change_player_action = 0;
-    element_info[element].change_collide_action = 0;
-    element_info[element].change_other_action = 0;
 
     element_info[element].can_explode_by_fire = FALSE;
     element_info[element].can_explode_smashed = FALSE;
     element_info[element].can_explode_impact = FALSE;
+
+    element_info[element].current_change_page = 0;
 
     /* start with no properties at all */
     for (j=0; j < NUM_EP_BITFIELDS; j++)
@@ -454,7 +493,7 @@ static int LoadLevel_CUS2(FILE *file, int chunk_size, struct LevelInfo *level)
     int custom_target_element = getFile16BitBE(file);
 
     if (IS_CUSTOM_ELEMENT(element))
-      element_info[element].change.target_element = custom_target_element;
+      element_info[element].change->target_element = custom_target_element;
     else
       Error(ERR_WARN, "invalid custom element number %d", element);
   }
@@ -515,29 +554,29 @@ static int LoadLevel_CUS3(FILE *file, int chunk_size, struct LevelInfo *level)
 	element_info[element].content[x][y] =
 	  checkLevelElement(getFile16BitBE(file));
 
-    element_info[element].change.events = getFile32BitBE(file);
+    element_info[element].change->events = getFile32BitBE(file);
 
-    element_info[element].change.target_element =
+    element_info[element].change->target_element =
       checkLevelElement(getFile16BitBE(file));
 
-    element_info[element].change.delay_fixed = getFile16BitBE(file);
-    element_info[element].change.delay_random = getFile16BitBE(file);
-    element_info[element].change.delay_frames = getFile16BitBE(file);
+    element_info[element].change->delay_fixed = getFile16BitBE(file);
+    element_info[element].change->delay_random = getFile16BitBE(file);
+    element_info[element].change->delay_frames = getFile16BitBE(file);
 
-    element_info[element].change.trigger_element =
+    element_info[element].change->trigger_element =
       checkLevelElement(getFile16BitBE(file));
 
-    element_info[element].change.explode = getFile8Bit(file);
-    element_info[element].change.use_content = getFile8Bit(file);
-    element_info[element].change.only_complete = getFile8Bit(file);
-    element_info[element].change.use_random_change = getFile8Bit(file);
+    element_info[element].change->explode = getFile8Bit(file);
+    element_info[element].change->use_content = getFile8Bit(file);
+    element_info[element].change->only_complete = getFile8Bit(file);
+    element_info[element].change->use_random_change = getFile8Bit(file);
 
-    element_info[element].change.random = getFile8Bit(file);
-    element_info[element].change.power = getFile8Bit(file);
+    element_info[element].change->random = getFile8Bit(file);
+    element_info[element].change->power = getFile8Bit(file);
 
     for(y=0; y<3; y++)
       for(x=0; x<3; x++)
-	element_info[element].change.content[x][y] =
+	element_info[element].change->content[x][y] =
 	  checkLevelElement(getFile16BitBE(file));
 
     element_info[element].slippery_type = getFile8Bit(file);
@@ -680,6 +719,170 @@ void LoadLevelFromFilename(struct LevelInfo *level, char *filename)
   fclose(file);
 }
 
+#if 1
+
+static void LoadLevel_InitVersion(struct LevelInfo *level, char *filename)
+{
+  if (leveldir_current == NULL)		/* only when dumping level */
+    return;
+
+  /* determine correct game engine version of current level */
+  if (IS_LEVELCLASS_CONTRIBUTION(leveldir_current) ||
+      IS_LEVELCLASS_USER(leveldir_current))
+  {
+#if 0
+    printf("\n::: This level is private or contributed: '%s'\n", filename);
+#endif
+
+    /* For user contributed and private levels, use the version of
+       the game engine the levels were created for.
+       Since 2.0.1, the game engine version is now directly stored
+       in the level file (chunk "VERS"), so there is no need anymore
+       to set the game version from the file version (except for old,
+       pre-2.0 levels, where the game version is still taken from the
+       file format version used to store the level -- see above). */
+
+    /* do some special adjustments to support older level versions */
+    if (level->file_version == FILE_VERSION_1_0)
+    {
+      Error(ERR_WARN, "level file '%s'has version number 1.0", filename);
+      Error(ERR_WARN, "using high speed movement for player");
+
+      /* player was faster than monsters in (pre-)1.0 levels */
+      level->double_speed = TRUE;
+    }
+
+    /* Default behaviour for EM style gems was "slippery" only in 2.0.1 */
+    if (level->game_version == VERSION_IDENT(2,0,1))
+      level->em_slippery_gems = TRUE;
+  }
+  else
+  {
+#if 0
+    printf("\n::: ALWAYS USE LATEST ENGINE FOR THIS LEVEL: [%d] '%s'\n",
+	   leveldir_current->sort_priority, filename);
+#endif
+
+    /* Always use the latest version of the game engine for all but
+       user contributed and private levels; this allows for actual
+       corrections in the game engine to take effect for existing,
+       converted levels (from "classic" or other existing games) to
+       make the game emulation more accurate, while (hopefully) not
+       breaking existing levels created from other players. */
+
+    level->game_version = GAME_VERSION_ACTUAL;
+
+    /* Set special EM style gems behaviour: EM style gems slip down from
+       normal, steel and growing wall. As this is a more fundamental change,
+       it seems better to set the default behaviour to "off" (as it is more
+       natural) and make it configurable in the level editor (as a property
+       of gem style elements). Already existing converted levels (neither
+       private nor contributed levels) are changed to the new behaviour. */
+
+    if (level->file_version < FILE_VERSION_2_0)
+      level->em_slippery_gems = TRUE;
+  }
+}
+
+static void LoadLevel_InitElements(struct LevelInfo *level, char *filename)
+{
+  int i, j;
+
+  /* map custom element change events that have changed in newer versions
+     (these following values have accidentally changed in version 3.0.1) */
+  if (level->game_version <= VERSION_IDENT(3,0,0))
+  {
+    for (i=0; i < NUM_CUSTOM_ELEMENTS; i++)
+    {
+      int element = EL_CUSTOM_START + i;
+
+      /* order of checking events to be mapped is important */
+      for (j=CE_BY_OTHER; j >= CE_BY_PLAYER; j--)
+      {
+	if (HAS_CHANGE_EVENT(element, j - 2))
+	{
+	  SET_CHANGE_EVENT(element, j - 2, FALSE);
+	  SET_CHANGE_EVENT(element, j, TRUE);
+	}
+      }
+
+      /* order of checking events to be mapped is important */
+      for (j=CE_OTHER_GETS_COLLECTED; j >= CE_COLLISION; j--)
+      {
+	if (HAS_CHANGE_EVENT(element, j - 1))
+	{
+	  SET_CHANGE_EVENT(element, j - 1, FALSE);
+	  SET_CHANGE_EVENT(element, j, TRUE);
+	}
+      }
+    }
+  }
+
+  /* initialize "can_change" field for old levels with only one change page */
+  if (level->game_version <= VERSION_IDENT(3,0,2))
+  {
+    for (i=0; i < NUM_CUSTOM_ELEMENTS; i++)
+    {
+      int element = EL_CUSTOM_START + i;
+
+      if (CAN_CHANGE(element))
+	element_info[element].change->can_change = TRUE;
+    }
+  }
+
+  /* initialize element properties for level editor etc. */
+  InitElementPropertiesEngine(level->game_version);
+}
+
+static void LoadLevel_InitPlayfield(struct LevelInfo *level, char *filename)
+{
+  int x, y;
+
+  /* map elements that have changed in newer versions */
+  for(y=0; y<level->fieldy; y++)
+  {
+    for(x=0; x<level->fieldx; x++)
+    {
+      int element = level->field[x][y];
+
+      if (level->game_version <= VERSION_IDENT(2,2,0))
+      {
+	/* map game font elements */
+	element = (element == EL_CHAR('[')  ? EL_CHAR_AUMLAUT :
+		   element == EL_CHAR('\\') ? EL_CHAR_OUMLAUT :
+		   element == EL_CHAR(']')  ? EL_CHAR_UUMLAUT :
+		   element == EL_CHAR('^')  ? EL_CHAR_COPYRIGHT : element);
+      }
+
+      if (level->game_version < VERSION_IDENT(3,0,0))
+      {
+	/* map Supaplex gravity tube elements */
+	element = (element == EL_SP_GRAVITY_PORT_LEFT  ? EL_SP_PORT_LEFT  :
+		   element == EL_SP_GRAVITY_PORT_RIGHT ? EL_SP_PORT_RIGHT :
+		   element == EL_SP_GRAVITY_PORT_UP    ? EL_SP_PORT_UP    :
+		   element == EL_SP_GRAVITY_PORT_DOWN  ? EL_SP_PORT_DOWN  :
+		   element);
+      }
+
+      level->field[x][y] = element;
+    }
+  }
+
+  /* copy elements to runtime playfield array */
+  for(x=0; x<MAX_LEV_FIELDX; x++)
+    for(y=0; y<MAX_LEV_FIELDY; y++)
+      Feld[x][y] = level->field[x][y];
+
+  /* initialize level size variables for faster access */
+  lev_fieldx = level->fieldx;
+  lev_fieldy = level->fieldy;
+
+  /* determine border element for this level */
+  SetBorderElement();
+}
+
+#else
+
 static void LoadLevel_InitLevel(struct LevelInfo *level, char *filename)
 {
   int i, j, x, y;
@@ -804,6 +1007,18 @@ static void LoadLevel_InitLevel(struct LevelInfo *level, char *filename)
     }
   }
 
+  /* initialize "can_change" field for old levels with only one change page */
+  if (level->game_version <= VERSION_IDENT(3,0,2))
+  {
+    for (i=0; i < NUM_CUSTOM_ELEMENTS; i++)
+    {
+      int element = EL_CUSTOM_START + i;
+
+      if (CAN_CHANGE(element))
+	element_info[element].change->can_change = TRUE;
+    }
+  }
+
   /* copy elements to runtime playfield array */
   for(x=0; x<MAX_LEV_FIELDX; x++)
     for(y=0; y<MAX_LEV_FIELDY; y++)
@@ -820,11 +1035,16 @@ static void LoadLevel_InitLevel(struct LevelInfo *level, char *filename)
   InitElementPropertiesEngine(level->game_version);
 }
 
+#endif
+
 void LoadLevelTemplate(int level_nr)
 {
   char *filename = getLevelFilename(level_nr);
 
   LoadLevelFromFilename(&level_template, filename);
+
+  LoadLevel_InitVersion(&level, filename);
+  LoadLevel_InitElements(&level, filename);
 
   ActivateLevelTemplate();
 }
@@ -838,7 +1058,13 @@ void LoadLevel(int level_nr)
   if (level.use_custom_template)
     LoadLevelTemplate(-1);
 
+#if 1
+  LoadLevel_InitVersion(&level, filename);
+  LoadLevel_InitElements(&level, filename);
+  LoadLevel_InitPlayfield(&level, filename);
+#else
   LoadLevel_InitLevel(&level, filename);
+#endif
 }
 
 static void SaveLevel_VERS(FILE *file, struct LevelInfo *level)
@@ -1015,12 +1241,12 @@ static void SaveLevel_CUS2(FILE *file, struct LevelInfo *level,
   {
     int element = EL_CUSTOM_START + i;
 
-    if (element_info[element].change.target_element != EL_EMPTY_SPACE)
+    if (element_info[element].change->target_element != EL_EMPTY_SPACE)
     {
       if (check < num_changed_custom_elements)
       {
 	putFile16BitBE(file, element);
-	putFile16BitBE(file, element_info[element].change.target_element);
+	putFile16BitBE(file, element_info[element].change->target_element);
       }
 
       check++;
@@ -1076,27 +1302,27 @@ static void SaveLevel_CUS3(FILE *file, struct LevelInfo *level,
 	  for(x=0; x<3; x++)
 	    putFile16BitBE(file, element_info[element].content[x][y]);
 
-	putFile32BitBE(file, element_info[element].change.events);
+	putFile32BitBE(file, element_info[element].change->events);
 
-	putFile16BitBE(file, element_info[element].change.target_element);
+	putFile16BitBE(file, element_info[element].change->target_element);
 
-	putFile16BitBE(file, element_info[element].change.delay_fixed);
-	putFile16BitBE(file, element_info[element].change.delay_random);
-	putFile16BitBE(file, element_info[element].change.delay_frames);
+	putFile16BitBE(file, element_info[element].change->delay_fixed);
+	putFile16BitBE(file, element_info[element].change->delay_random);
+	putFile16BitBE(file, element_info[element].change->delay_frames);
 
-	putFile16BitBE(file, element_info[element].change.trigger_element);
+	putFile16BitBE(file, element_info[element].change->trigger_element);
 
-	putFile8Bit(file, element_info[element].change.explode);
-	putFile8Bit(file, element_info[element].change.use_content);
-	putFile8Bit(file, element_info[element].change.only_complete);
-	putFile8Bit(file, element_info[element].change.use_random_change);
+	putFile8Bit(file, element_info[element].change->explode);
+	putFile8Bit(file, element_info[element].change->use_content);
+	putFile8Bit(file, element_info[element].change->only_complete);
+	putFile8Bit(file, element_info[element].change->use_random_change);
 
-	putFile8Bit(file, element_info[element].change.random);
-	putFile8Bit(file, element_info[element].change.power);
+	putFile8Bit(file, element_info[element].change->random);
+	putFile8Bit(file, element_info[element].change->power);
 
 	for(y=0; y<3; y++)
 	  for(x=0; x<3; x++)
-	    putFile16BitBE(file, element_info[element].change.content[x][y]);
+	    putFile16BitBE(file, element_info[element].change->content[x][y]);
 
 	putFile8Bit(file, element_info[element].slippery_type);
 
@@ -1839,8 +2065,9 @@ void SaveScore(int level_nr)
 #define SETUP_TOKEN_EDITOR_EL_DX_BOULDERDASH	6
 #define SETUP_TOKEN_EDITOR_EL_CHARS		7
 #define SETUP_TOKEN_EDITOR_EL_CUSTOM		8
+#define SETUP_TOKEN_EDITOR_EL_HEADLINES		9
 
-#define NUM_EDITOR_SETUP_TOKENS			9
+#define NUM_EDITOR_SETUP_TOKENS			10
 
 /* shortcut setup */
 #define SETUP_TOKEN_SHORTCUT_SAVE_GAME		0
@@ -1926,6 +2153,7 @@ static struct TokenInfo editor_setup_tokens[] =
   { TYPE_SWITCH, &sei.el_chars,		"editor.el_chars"		},
   { TYPE_SWITCH, &sei.el_custom,	"editor.el_custom"		},
   { TYPE_SWITCH, &sei.el_custom_more,	"editor.el_custom_more"		},
+  { TYPE_SWITCH, &sei.el_headlines,	"editor.el_headlines"		},
 };
 
 static struct TokenInfo shortcut_setup_tokens[] =
@@ -2022,6 +2250,8 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
   si->editor.el_chars = TRUE;
   si->editor.el_custom = TRUE;
   si->editor.el_custom_more = FALSE;
+
+  si->editor.el_headlines = TRUE;
 
   si->shortcut.save_game = DEFAULT_KEY_SAVE_GAME;
   si->shortcut.load_game = DEFAULT_KEY_LOAD_GAME;

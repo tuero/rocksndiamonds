@@ -2365,9 +2365,10 @@ static void SaveUserLevelInfo()
       fprintf(file, "%s\n", getSetupLine(levelinfo_tokens, "", i));
 
   fclose(file);
-  free(filename);
 
   SetFilePermissions(filename, PERMS_PRIVATE);
+
+  free(filename);
 }
 
 char *getSetupValue(int type, void *value)
@@ -2514,9 +2515,10 @@ void SaveLevelSetup_LastSeries()
 					       level_subdir));
 
   fclose(file);
-  free(filename);
 
   SetFilePermissions(filename, PERMS_PRIVATE);
+
+  free(filename);
 }
 
 static void checkSeriesInfo()
@@ -2663,7 +2665,8 @@ void SaveLevelSetup_SeriesInfo()
 					       handicap_level_str));
 
   fclose(file);
-  free(filename);
 
   SetFilePermissions(filename, PERMS_PRIVATE);
+
+  free(filename);
 }

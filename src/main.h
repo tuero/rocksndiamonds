@@ -184,10 +184,13 @@
 #define CE_BITMASK_DEFAULT	0
 
 #define CH_EVENT_BIT(c)		(1 << (c))
-#define CH_EVENT_VAR(e)		(element_info[e].change.events)
+#define CH_EVENT_VAR(e)		(element_info[e].change->events)
+#define CH_ANY_EVENT_VAR(e)	(element_info[e].change_events)
 
 #define HAS_CHANGE_EVENT(e,c)	(IS_CUSTOM_ELEMENT(e) &&		  \
 				 (CH_EVENT_VAR(e) & CH_EVENT_BIT(c)) != 0)
+#define HAS_ANY_CHANGE_EVENT(e,c) (IS_CUSTOM_ELEMENT(e) &&		  \
+				 (CH_ANY_EVENT_VAR(e) & CH_EVENT_BIT(c)) != 0)
 #define SET_CHANGE_EVENT(e,c,v)	(IS_CUSTOM_ELEMENT(e) ?			  \
 				 ((v) ?					  \
 				  (CH_EVENT_VAR(e) |=  CH_EVENT_BIT(c)) : \
@@ -352,14 +355,28 @@
 #define IS_LOOP_SOUND(s)	(sound_info[s].loop)
 
 
+/* fundamental game speed values */
+#define GAME_FRAME_DELAY	20	/* frame delay in milliseconds */
+#define FFWD_FRAME_DELAY	10	/* 200% speed for fast forward */
+#define FRAMES_PER_SECOND	(1000 / GAME_FRAME_DELAY)
+#define MICROLEVEL_SCROLL_DELAY	50	/* delay for scrolling micro level */
+#define MICROLEVEL_LABEL_DELAY	250	/* delay for micro level label */
+
 /* boundaries of arrays etc. */
 #define MAX_LEVEL_NAME_LEN	32
 #define MAX_LEVEL_AUTHOR_LEN	32
 #define MAX_ELEMENT_NAME_LEN	32
-#define MAX_TAPELEN		(1000 * 50)	/* max. time * framerate */
+#define MAX_TAPELEN		(1000 * FRAMES_PER_SECOND) /* max.time x fps */
 #define MAX_SCORE_ENTRIES	100
 #define MAX_NUM_AMOEBA		100
 #define MAX_INVENTORY_SIZE	1000
+#define MIN_ENVELOPE_XSIZE	1
+#define MIN_ENVELOPE_YSIZE	1
+#define MAX_ENVELOPE_XSIZE	30
+#define MAX_ENVELOPE_YSIZE	20
+#define MAX_ENVELOPE_TEXT_LEN	(MAX_ENVELOPE_XSIZE * MAX_ENVELOPE_YSIZE)
+#define MIN_CHANGE_PAGES	1
+#define MAX_CHANGE_PAGES	10
 
 /* values for elements with content */
 #define MIN_ELEMENT_CONTENTS	1
@@ -367,13 +384,6 @@
 #define MAX_ELEMENT_CONTENTS	8
 
 #define LEVEL_SCORE_ELEMENTS	16	/* level elements with score */
-
-/* fundamental game speed values */
-#define GAME_FRAME_DELAY	20	/* frame delay in milliseconds */
-#define FFWD_FRAME_DELAY	10	/* 200% speed for fast forward */
-#define FRAMES_PER_SECOND	(1000 / GAME_FRAME_DELAY)
-#define MICROLEVEL_SCROLL_DELAY	50	/* delay for scrolling micro level */
-#define MICROLEVEL_LABEL_DELAY	250	/* delay for micro level label */
 
 /* often used screen positions */
 #define SX			8
@@ -1112,12 +1122,13 @@ struct LevelInfo
   boolean encoding_16bit_yamyam;	/* yamyam contains 16-bit elements */
   boolean encoding_16bit_amoeba;	/* amoeba contains 16-bit elements */
 
-  int fieldx;
-  int fieldy;
+  int fieldx, fieldy;
   int time;
   int gems_needed;
   char name[MAX_LEVEL_NAME_LEN + 1];
   char author[MAX_LEVEL_AUTHOR_LEN + 1];
+  char envelope[MAX_ENVELOPE_TEXT_LEN + 1];
+  int envelope_xsize, envelope_ysize;
   int score[LEVEL_SCORE_ELEMENTS];
   int yamyam_content[MAX_ELEMENT_CONTENTS][3][3];
   int num_yamyam_contents;
@@ -1135,7 +1146,7 @@ struct LevelInfo
 
   boolean use_custom_template;	/* use custom properties from template file */
 
-  boolean no_level_file;
+  boolean no_level_file;	/* set for currently undefined levels */
 };
 
 struct TapeInfo
@@ -1225,6 +1236,8 @@ struct DoorInfo
 
 struct ElementChangeInfo
 {
+  boolean can_change;		/* use or ignore this change info */
+
   unsigned long events;		/* bitfield for change events */
 
   short target_element;		/* target element after change */
@@ -1249,6 +1262,12 @@ struct ElementChangeInfo
   void (*pre_change_function)(int x, int y);
   void (*change_function)(int x, int y);
   void (*post_change_function)(int x, int y);
+
+  /* ---------- internal values used in level editor ---------- */
+
+  int player_action;		/* touched/pressed/pushed by player */
+  int collide_action;		/* collision/impact/smashed */
+  int other_action;		/* various change actions */
 };
 
 struct ElementInfo
@@ -1297,7 +1316,18 @@ struct ElementInfo
 
   int content[3][3];		/* new elements after explosion */
 
-  struct ElementChangeInfo change;
+  struct ElementChangeInfo *change_page; /* actual list of change pages */
+  struct ElementChangeInfo *change;	 /* pointer to current change page */
+
+  int num_change_pages;		/* actual number of change pages */
+  int current_change_page;	/* currently edited change page */
+
+  /* ---------- internal values used at runtime when playing ---------- */
+
+  unsigned long change_events;	/* bitfield for combined change events */
+
+  int event_page_num[NUM_CHANGE_EVENTS]; /* page number for each event */
+  struct ElementChangeInfo *event_page[NUM_CHANGE_EVENTS]; /* page for event */
 
   /* ---------- internal values used in level editor ---------- */
 
@@ -1307,9 +1337,6 @@ struct ElementInfo
   int smash_targets;		/* can smash player/enemies/everything */
   int deadliness;		/* deadly when running/colliding/touching */
   int consistency;		/* indestructible/can explode */
-  int change_player_action;	/* touched/pressed/pushed by player */
-  int change_collide_action;	/* collision/impact/smashed */
-  int change_other_action;	/* various change actions */
 
   boolean can_explode_by_fire;	/* element explodes by fire */
   boolean can_explode_smashed;	/* element explodes when smashed */

@@ -485,6 +485,8 @@ struct SetupEditorInfo
   boolean el_chars;
   boolean el_custom;
   boolean el_custom_more;
+
+  boolean el_headlines;
 };
 
 struct SetupShortcutInfo
