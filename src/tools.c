@@ -1371,12 +1371,12 @@ static int getBorderElement(int x, int y)
     { EL_STEELWALL,			EL_INVISIBLE_STEELWALL		   }
   };
   int steel_type = (BorderElement == EL_STEELWALL ? 0 : 1);
-  int steel_position = (x == -1 && y == -1			? 0 :
-			x == lev_fieldx && y == -1		? 1 :
-			x == -1 && y == lev_fieldy		? 2 :
-			x == lev_fieldx && y == lev_fieldy	? 3 :
-			x == -1 || x == lev_fieldx		? 4 :
-			y == -1 || y == lev_fieldy		? 5 : 6);
+  int steel_position = (x == -1		&& y == -1		? 0 :
+			x == lev_fieldx	&& y == -1		? 1 :
+			x == -1		&& y == lev_fieldy	? 2 :
+			x == lev_fieldx	&& y == lev_fieldy	? 3 :
+			x == -1		|| x == lev_fieldx	? 4 :
+			y == -1		|| y == lev_fieldy	? 5 : 6);
 
   return border[steel_position][steel_type];
 }
@@ -1523,6 +1523,31 @@ void DrawMiniElementOrWall(int sx, int sy, int scroll_x, int scroll_y)
     DrawMiniElement(sx, sy, Feld[x][y]);
   else
     DrawMiniGraphic(sx, sy, el2edimg(getBorderElement(x, y)));
+}
+
+void DrawEnvelopeBorder(int sx, int sy, int ex, int ey)
+{
+  int border[8][2] =
+  {
+    { EL_STEELWALL_TOPLEFT,		EL_INVISIBLE_STEELWALL_TOPLEFT     },
+    { EL_STEELWALL_TOPRIGHT,		EL_INVISIBLE_STEELWALL_TOPRIGHT    },
+    { EL_STEELWALL_BOTTOMLEFT,		EL_INVISIBLE_STEELWALL_BOTTOMLEFT  },
+    { EL_STEELWALL_BOTTOMRIGHT,		EL_INVISIBLE_STEELWALL_BOTTOMRIGHT },
+    { EL_STEELWALL_VERTICAL,		EL_INVISIBLE_STEELWALL_VERTICAL    },
+    { EL_STEELWALL_HORIZONTAL,		EL_INVISIBLE_STEELWALL_HORIZONTAL  },
+    { EL_STEELWALL,			EL_INVISIBLE_STEELWALL		   },
+    { EL_EMPTY,				EL_EMPTY			   }
+  };
+  int steel_type = (BorderElement == EL_STEELWALL ? 0 : 1);
+  int steel_position = (ex == -1 && ey == -1 ? 0 :
+			ex == +1 && ey == -1 ? 1 :
+			ex == -1 && ey == +1 ? 2 :
+			ex == +1 && ey == +1 ? 3 :
+			ex == -1 || ex == +1 ? 4 :
+			ey == -1 || ey == +1 ? 5 : 7);
+  int element = border[steel_position][steel_type];
+
+  DrawMiniGraphic(sx, sy, el2edimg(element));
 }
 
 void getMicroGraphicSource(int graphic, Bitmap **bitmap, int *x, int *y)
