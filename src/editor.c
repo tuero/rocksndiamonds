@@ -108,15 +108,15 @@
 #define ED_AREA_ELEM_CONTENT_YPOS	(22 * MINI_TILEY)
 
 #define ED_AREA_ELEM_CONTENT2_XPOS	(20 * MINI_TILEX)
-#define ED_AREA_ELEM_CONTENT2_YPOS	(ED_SETTINGS_YPOS(1) + \
+#define ED_AREA_ELEM_CONTENT2_YPOS	(ED_SETTINGS_YPOS(2) + \
 					 ED_GADGET_DISTANCE)
 
 #define ED_AREA_ELEM_CONTENT3_XPOS	(24 * MINI_TILEX)
-#define ED_AREA_ELEM_CONTENT3_YPOS	(ED_SETTINGS_YPOS(2) + \
+#define ED_AREA_ELEM_CONTENT3_YPOS	(ED_SETTINGS_YPOS(1) + \
 					 ED_GADGET_DISTANCE)
 
 #define ED_AREA_ELEM_CONTENT4_XPOS	(17 * MINI_TILEX)
-#define ED_AREA_ELEM_CONTENT4_YPOS	(ED_SETTINGS_YPOS(10) + \
+#define ED_AREA_ELEM_CONTENT4_YPOS	(ED_SETTINGS_YPOS(11) + \
 					 ED_GADGET_DISTANCE - MINI_TILEY)
 
 /* values for random placement background drawing area */
@@ -351,13 +351,15 @@
 #define GADGET_ID_SELECTBOX_FIRST	(GADGET_ID_TEXT_INPUT_FIRST + 2)
 
 #define GADGET_ID_CUSTOM_WALK_TO_ACTION	(GADGET_ID_SELECTBOX_FIRST + 0)
-#define GADGET_ID_CUSTOM_MOVE_PATTERN	(GADGET_ID_SELECTBOX_FIRST + 1)
-#define GADGET_ID_CUSTOM_WALKABLE_LAYER	(GADGET_ID_SELECTBOX_FIRST + 2)
-#define GADGET_ID_CHANGE_TIME_UNITS	(GADGET_ID_SELECTBOX_FIRST + 3)
-#define GADGET_ID_CHANGE_CAUSE		(GADGET_ID_SELECTBOX_FIRST + 4)
+#define GADGET_ID_CUSTOM_DEADLINESS	(GADGET_ID_SELECTBOX_FIRST + 1)
+#define GADGET_ID_CUSTOM_MOVE_PATTERN	(GADGET_ID_SELECTBOX_FIRST + 2)
+#define GADGET_ID_CUSTOM_MOVE_DIRECTION	(GADGET_ID_SELECTBOX_FIRST + 3)
+#define GADGET_ID_CUSTOM_WALKABLE_LAYER	(GADGET_ID_SELECTBOX_FIRST + 4)
+#define GADGET_ID_CHANGE_TIME_UNITS	(GADGET_ID_SELECTBOX_FIRST + 5)
+#define GADGET_ID_CHANGE_CAUSE		(GADGET_ID_SELECTBOX_FIRST + 6)
 
 /* textbutton identifiers */
-#define GADGET_ID_TEXTBUTTON_FIRST	(GADGET_ID_SELECTBOX_FIRST + 5)
+#define GADGET_ID_TEXTBUTTON_FIRST	(GADGET_ID_SELECTBOX_FIRST + 7)
 
 #define GADGET_ID_PROPERTIES_INFO	(GADGET_ID_TEXTBUTTON_FIRST + 0)
 #define GADGET_ID_PROPERTIES_CONFIG	(GADGET_ID_TEXTBUTTON_FIRST + 1)
@@ -393,19 +395,20 @@
 #define GADGET_ID_EM_SLIPPERY_GEMS	(GADGET_ID_CHECKBUTTON_FIRST + 6)
 #define GADGET_ID_CUSTOM_INDESTRUCTIBLE	(GADGET_ID_CHECKBUTTON_FIRST + 7)
 #define GADGET_ID_CUSTOM_WALK_TO_OBJECT	(GADGET_ID_CHECKBUTTON_FIRST + 8)
-#define GADGET_ID_CUSTOM_CAN_MOVE	(GADGET_ID_CHECKBUTTON_FIRST + 9)
-#define GADGET_ID_CUSTOM_CAN_FALL	(GADGET_ID_CHECKBUTTON_FIRST + 10)
-#define GADGET_ID_CUSTOM_CAN_SMASH	(GADGET_ID_CHECKBUTTON_FIRST + 11)
-#define GADGET_ID_CUSTOM_CAN_EXPLODE	(GADGET_ID_CHECKBUTTON_FIRST + 12)
-#define GADGET_ID_CUSTOM_SLIPPERY	(GADGET_ID_CHECKBUTTON_FIRST + 13)
-#define GADGET_ID_CUSTOM_WALKABLE	(GADGET_ID_CHECKBUTTON_FIRST + 14)
-#define GADGET_ID_CUSTOM_USE_GRAPHIC	(GADGET_ID_CHECKBUTTON_FIRST + 15)
-#define GADGET_ID_CUSTOM_USE_TEMPLATE	(GADGET_ID_CHECKBUTTON_FIRST + 16)
-#define GADGET_ID_CUSTOM_CHANGEABLE	(GADGET_ID_CHECKBUTTON_FIRST + 17)
-#define GADGET_ID_CHANGE_DELAY		(GADGET_ID_CHECKBUTTON_FIRST + 18)
+#define GADGET_ID_CUSTOM_DEADLY		(GADGET_ID_CHECKBUTTON_FIRST + 9)
+#define GADGET_ID_CUSTOM_CAN_MOVE	(GADGET_ID_CHECKBUTTON_FIRST + 10)
+#define GADGET_ID_CUSTOM_CAN_FALL	(GADGET_ID_CHECKBUTTON_FIRST + 11)
+#define GADGET_ID_CUSTOM_CAN_SMASH	(GADGET_ID_CHECKBUTTON_FIRST + 12)
+#define GADGET_ID_CUSTOM_CAN_EXPLODE	(GADGET_ID_CHECKBUTTON_FIRST + 13)
+#define GADGET_ID_CUSTOM_SLIPPERY	(GADGET_ID_CHECKBUTTON_FIRST + 14)
+#define GADGET_ID_CUSTOM_WALKABLE	(GADGET_ID_CHECKBUTTON_FIRST + 15)
+#define GADGET_ID_CUSTOM_USE_GRAPHIC	(GADGET_ID_CHECKBUTTON_FIRST + 16)
+#define GADGET_ID_CUSTOM_USE_TEMPLATE	(GADGET_ID_CHECKBUTTON_FIRST + 17)
+#define GADGET_ID_CUSTOM_CHANGEABLE	(GADGET_ID_CHECKBUTTON_FIRST + 18)
+#define GADGET_ID_CHANGE_DELAY		(GADGET_ID_CHECKBUTTON_FIRST + 19)
 
 /* gadgets for buttons in element list */
-#define GADGET_ID_ELEMENTLIST_FIRST	(GADGET_ID_CHECKBUTTON_FIRST + 19)
+#define GADGET_ID_ELEMENTLIST_FIRST	(GADGET_ID_CHECKBUTTON_FIRST + 20)
 #define GADGET_ID_ELEMENTLIST_LAST	(GADGET_ID_ELEMENTLIST_FIRST +	\
 	 				ED_NUM_ELEMENTLIST_BUTTONS - 1)
 
@@ -479,12 +482,14 @@
 
 /* values for selectbox gadgets */
 #define ED_SELECTBOX_ID_CUSTOM_WALK_TO_ACTION	0
-#define ED_SELECTBOX_ID_CUSTOM_MOVE_PATTERN	1
-#define ED_SELECTBOX_ID_CUSTOM_WALKABLE_LAYER	2
-#define ED_SELECTBOX_ID_CHANGE_TIME_UNITS	3
-#define ED_SELECTBOX_ID_CHANGE_CAUSE		4
+#define ED_SELECTBOX_ID_CUSTOM_DEADLINESS	1
+#define ED_SELECTBOX_ID_CUSTOM_MOVE_PATTERN	2
+#define ED_SELECTBOX_ID_CUSTOM_MOVE_DIRECTION	3
+#define ED_SELECTBOX_ID_CUSTOM_WALKABLE_LAYER	4
+#define ED_SELECTBOX_ID_CHANGE_TIME_UNITS	5
+#define ED_SELECTBOX_ID_CHANGE_CAUSE		6
 
-#define ED_NUM_SELECTBOX			5
+#define ED_NUM_SELECTBOX			7
 
 #define ED_SELECTBOX_ID_CUSTOM_FIRST	ED_SELECTBOX_ID_CUSTOM_WALK_TO_ACTION
 #define ED_SELECTBOX_ID_CUSTOM_LAST	ED_SELECTBOX_ID_CUSTOM_WALKABLE_LAYER
@@ -508,26 +513,27 @@
 #define ED_CHECKBUTTON_ID_EM_SLIPPERY_GEMS	4
 #define ED_CHECKBUTTON_ID_CUSTOM_INDESTRUCTIBLE	5
 #define ED_CHECKBUTTON_ID_CUSTOM_WALK_TO_OBJECT	6
-#define ED_CHECKBUTTON_ID_CUSTOM_CAN_MOVE	7
-#define ED_CHECKBUTTON_ID_CUSTOM_CAN_FALL	8
-#define ED_CHECKBUTTON_ID_CUSTOM_CAN_SMASH	9
-#define ED_CHECKBUTTON_ID_CUSTOM_CAN_EXPLODE	10
-#define ED_CHECKBUTTON_ID_CUSTOM_SLIPPERY	11
-#define ED_CHECKBUTTON_ID_CUSTOM_WALKABLE	12
-#define ED_CHECKBUTTON_ID_CUSTOM_USE_GRAPHIC	13
-#define ED_CHECKBUTTON_ID_CUSTOM_USE_TEMPLATE	14
-#define ED_CHECKBUTTON_ID_CUSTOM_CHANGEABLE	15
-#define ED_CHECKBUTTON_ID_CHANGE_DELAY		16
+#define ED_CHECKBUTTON_ID_CUSTOM_DEADLY		7
+#define ED_CHECKBUTTON_ID_CUSTOM_CAN_MOVE	8
+#define ED_CHECKBUTTON_ID_CUSTOM_CAN_FALL	9
+#define ED_CHECKBUTTON_ID_CUSTOM_CAN_SMASH	10
+#define ED_CHECKBUTTON_ID_CUSTOM_CAN_EXPLODE	11
+#define ED_CHECKBUTTON_ID_CUSTOM_SLIPPERY	12
+#define ED_CHECKBUTTON_ID_CUSTOM_WALKABLE	13
+#define ED_CHECKBUTTON_ID_CUSTOM_USE_GRAPHIC	14
+#define ED_CHECKBUTTON_ID_CUSTOM_USE_TEMPLATE	15
+#define ED_CHECKBUTTON_ID_CUSTOM_CHANGEABLE	16
+#define ED_CHECKBUTTON_ID_CHANGE_DELAY		17
 
-#define ED_NUM_CHECKBUTTONS			17
+#define ED_NUM_CHECKBUTTONS			18
 
 #define ED_CHECKBUTTON_ID_LEVEL_FIRST	ED_CHECKBUTTON_ID_DOUBLE_SPEED
 #define ED_CHECKBUTTON_ID_LEVEL_LAST	ED_CHECKBUTTON_ID_RANDOM_RESTRICTED
 
 #define ED_CHECKBUTTON_ID_CUSTOM_FIRST	ED_CHECKBUTTON_ID_CUSTOM_INDESTRUCTIBLE
-#define ED_CHECKBUTTON_ID_CUSTOM_LAST	ED_CHECKBUTTON_ID_CUSTOM_USE_TEMPLATE
+#define ED_CHECKBUTTON_ID_CUSTOM_LAST	ED_CHECKBUTTON_ID_CUSTOM_WALKABLE
 
-#define ED_CHECKBUTTON_ID_CHANGE_FIRST	ED_CHECKBUTTON_ID_CUSTOM_CHANGEABLE
+#define ED_CHECKBUTTON_ID_CHANGE_FIRST	ED_CHECKBUTTON_ID_CUSTOM_USE_GRAPHIC
 #define ED_CHECKBUTTON_ID_CHANGE_LAST	ED_CHECKBUTTON_ID_CHANGE_DELAY
 
 /* values for radiobutton gadgets */
@@ -735,7 +741,7 @@ static struct
     NULL,				"+random", NULL
   },
   {
-    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(7),
+    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(8),
     0,					999,
     GADGET_ID_MOVE_DELAY_FIX_DOWN,	GADGET_ID_MOVE_DELAY_FIX_UP,
     GADGET_ID_MOVE_DELAY_FIX_TEXT,
@@ -743,7 +749,7 @@ static struct
     NULL,				"move delay", NULL
   },
   {
-    ED_COUNT_MOVE_DELAY_RND_XPOS,	ED_SETTINGS_YPOS(7),
+    ED_COUNT_MOVE_DELAY_RND_XPOS,	ED_SETTINGS_YPOS(8),
     0,					999,
     GADGET_ID_MOVE_DELAY_RND_DOWN,	GADGET_ID_MOVE_DELAY_RND_UP,
     GADGET_ID_MOVE_DELAY_RND_TEXT,
@@ -751,7 +757,7 @@ static struct
     NULL,				"+random", NULL
   },
   {
-    ED_SETTINGS_XPOS(2),		ED_SETTINGS_YPOS(2),
+    ED_SETTINGS_XPOS(2),		ED_SETTINGS_YPOS(3),
     0,					999,
     GADGET_ID_CHANGE_DELAY_FIX_DOWN,	GADGET_ID_CHANGE_DELAY_FIX_UP,
     GADGET_ID_CHANGE_DELAY_FIX_TEXT,
@@ -759,7 +765,7 @@ static struct
     NULL,				"delay", NULL,
   },
   {
-    ED_COUNT_CHANGE_DELAY_RND_XPOS,	ED_SETTINGS_YPOS(2),
+    ED_COUNT_CHANGE_DELAY_RND_XPOS,	ED_SETTINGS_YPOS(3),
     0,					999,
     GADGET_ID_CHANGE_DELAY_RND_DOWN,	GADGET_ID_CHANGE_DELAY_RND_UP,
     GADGET_ID_CHANGE_DELAY_RND_TEXT,
@@ -819,6 +825,26 @@ static struct ValueTextInfo options_move_pattern[] =
 };
 static int index_move_pattern = 0;
 
+static struct ValueTextInfo options_move_direction[] =
+{
+  { MV_NO_MOVING,		"automatic"		},
+  { MV_LEFT,			"left"			},
+  { MV_RIGHT,			"right"			},
+  { MV_UP,			"up"			},
+  { MV_DOWN,			"down"			},
+  { -1,				NULL			}
+};
+static int index_move_direction = 0;
+
+static struct ValueTextInfo options_deadliness[] =
+{
+  { EP_DONT_GO_TO,		"walking to"		},
+  { EP_ENEMY,			"hitting"		},
+  { EP_DONT_TOUCH,		"touching"		},
+  { -1,				NULL			}
+};
+static int index_deadliness = 0;
+
 static struct ValueTextInfo options_walkable_layer[] =
 {
   { EP_WALKABLE_OVER,		"over"			},
@@ -866,6 +892,14 @@ static struct
     NULL, "diggable/collectible/pushable"
   },
   {
+    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(2),
+    GADGET_ID_CUSTOM_DEADLINESS,
+    -1,
+    options_deadliness, &index_deadliness,
+    &custom_element.deadliness,
+    "deadly when", "deadliness of element"
+  },
+  {
     ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(6),
     GADGET_ID_CUSTOM_MOVE_PATTERN,
     -1,
@@ -874,7 +908,15 @@ static struct
     "can move", "element move direction"
   },
   {
-    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(12),
+    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(7),
+    GADGET_ID_CUSTOM_MOVE_DIRECTION,
+    -1,
+    options_move_direction, &index_move_direction,
+    &custom_element.move_direction_initial,
+    "starts moving", "initial element move direction"
+  },
+  {
+    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(13),
     GADGET_ID_CUSTOM_WALKABLE_LAYER,
     -1,
     options_walkable_layer, &index_walkable_layer,
@@ -882,7 +924,7 @@ static struct
     "player can walk", "layer where player can walk"
   },
   {
-    ED_SETTINGS_XPOS(2),		ED_SETTINGS_YPOS(3),
+    ED_SETTINGS_XPOS(2),		ED_SETTINGS_YPOS(4),
     GADGET_ID_CHANGE_TIME_UNITS,
     -1,
     options_time_units, &index_time_units,
@@ -923,7 +965,7 @@ static struct
     11, "Advanced",			"Advanced element configuration"
   },
   {
-    ED_SETTINGS_XPOS(0) + 262,		ED_SETTINGS_YPOS(13),
+    ED_SETTINGS_XPOS(0) + 262,		ED_SETTINGS_YPOS(5),
     GADGET_ID_SAVE_AS_TEMPLATE,
     -1, "Save as template",		"Save current settings as new template"
   },
@@ -1088,61 +1130,67 @@ static struct
     NULL,				"player can dig/collect/push element"
   },
   {
+    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(2),
+    GADGET_ID_CUSTOM_DEADLY,
+    &custom_element_properties[EP_DEADLY],
+    NULL,				"element can kill the player"
+  },
+  {
     ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(6),
     GADGET_ID_CUSTOM_CAN_MOVE,
     &custom_element_properties[EP_CAN_MOVE],
     NULL,				"element can move in some direction"
   },
   {
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(8),
+    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(9),
     GADGET_ID_CUSTOM_CAN_FALL,
     &custom_element_properties[EP_CAN_FALL],
     "can fall",				"element can fall down"
   },
   {
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(9),
+    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(10),
     GADGET_ID_CUSTOM_CAN_SMASH,
     &custom_element_properties[EP_CAN_SMASH],
     "can smash",			"element can smash other elements"
   },
   {
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(10),
+    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(11),
     GADGET_ID_CUSTOM_CAN_EXPLODE,
     &custom_element_properties[EP_CAN_EXPLODE],
     "can explode to:",			"element can explode to other elements"
   },
   {
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(11),
+    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(12),
     GADGET_ID_CUSTOM_SLIPPERY,
     &custom_element_properties[EP_SLIPPERY],
     "slippery",				"other elements can fall down from it"
   },
   {
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(12),
+    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(13),
     GADGET_ID_CUSTOM_WALKABLE,
     &custom_element_properties[EP_WALKABLE],
     NULL,				"player can walk on the same field"
   },
   {
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(2),
+    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(1),
     GADGET_ID_CUSTOM_USE_GRAPHIC,
     &custom_element.use_gfx_element,
     "use graphic of element:",		"use graphic for custom element"
   },
   {
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(13),
+    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(5),
     GADGET_ID_CUSTOM_USE_TEMPLATE,
     &custom_element.use_template,
     "use template",			"use template for custom properties"
   },
   {
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(1),
+    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(2),
     GADGET_ID_CUSTOM_CHANGEABLE,
     &custom_element_properties[EP_CHANGEABLE],
     "element changes to    after:",	"element can change to other element"
   },
   {
-    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(2),
+    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(3),
     GADGET_ID_CHANGE_DELAY,
     &custom_element_change_events[CE_DELAY],
     NULL,				"element changes after delay"
@@ -3258,6 +3306,13 @@ static void CopyCustomElementPropertiesToEditor(int element)
      IS_PUSHABLE(element) ? EP_PUSHABLE :
      EP_DIGGABLE);
 
+  /* set deadliness selectbox help value */
+  custom_element.deadliness =
+    (DONT_TOUCH(element) ? EP_DONT_TOUCH :
+     IS_ENEMY(element) ? EP_ENEMY :
+     DONT_GO_TO(element) ? EP_DONT_GO_TO :
+     EP_DONT_GO_TO);
+
   /* set walkable layer selectbox help value */
   custom_element.walkable_layer =
     (IS_WALKABLE_OVER(element) ? EP_WALKABLE_OVER :
@@ -3278,6 +3333,13 @@ static void CopyCustomElementPropertiesToGame(int element)
   custom_element_properties[EP_PUSHABLE] = FALSE;
   custom_element_properties[custom_element.walk_to_action] =
     custom_element_properties[EP_WALK_TO_OBJECT];
+
+  /* set deadliness property from checkbox and selectbox */
+  custom_element_properties[EP_DONT_GO_TO] = FALSE;
+  custom_element_properties[EP_ENEMY] = FALSE;
+  custom_element_properties[EP_DONT_TOUCH] = FALSE;
+  custom_element_properties[custom_element.deadliness] =
+    custom_element_properties[EP_DEADLY];
 
   /* set walkable property from checkbox and selectbox */
   custom_element_properties[EP_WALKABLE_OVER] = FALSE;
@@ -4230,11 +4292,7 @@ static void DrawPropertiesConfig()
     for (i=ED_SELECTBOX_ID_CUSTOM_FIRST; i <= ED_SELECTBOX_ID_CUSTOM_LAST; i++)
       MapSelectboxGadget(i);
 
-    /* draw textbutton gadgets */
-    MapTextbuttonGadget(ED_TEXTBUTTON_ID_SAVE_AS_TEMPLATE);
-
     /* draw drawing area gadgets */
-    DrawCustomGraphicElementArea();
     DrawCustomContentArea();
   }
 }
@@ -4261,7 +4319,11 @@ static void DrawPropertiesAdvanced()
   for (i=ED_SELECTBOX_ID_CHANGE_FIRST; i<=ED_SELECTBOX_ID_CHANGE_LAST; i++)
     MapSelectboxGadget(i);
 
+  /* draw textbutton gadgets */
+  MapTextbuttonGadget(ED_TEXTBUTTON_ID_SAVE_AS_TEMPLATE);
+
   /* draw drawing area gadgets */
+  DrawCustomGraphicElementArea();
   DrawCustomChangedArea();
 }
 

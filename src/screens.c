@@ -253,14 +253,12 @@ void DrawMainMenu()
   DrawTextF(mSX + 32 + level_width - 2, mSY + 3*32 + 1, FONT_TEXT_3, "%d-%d",
 	    leveldir_current->first_level, leveldir_current->last_level);
 
-  /*
   if (leveldir_current->readonly)
-  */
   {
-    DrawTextF(mSX + level_width + 9*32 - 2,
-	      mSY + 3*32 + 1 - 7, FONT_TEXT_3, "READ");
-    DrawTextF(mSX + level_width + 9*32 - 2,
-	      mSY + 3*32 + 1 + 7, FONT_TEXT_3, "ONLY");
+    DrawTextF(mSX + level_width + 9 * 32 - 2,
+	      mSY + 3 * 32 + 1 - 7, FONT_TEXT_3, "READ");
+    DrawTextF(mSX + level_width + 9 * 32 - 2,
+	      mSY + 3 * 32 + 1 + 7, FONT_TEXT_3, "ONLY");
   }
 
   for(i=0; i<8; i++)

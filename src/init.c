@@ -428,6 +428,19 @@ void InitElementGraphicInfo()
     if (graphic_info[graphic].bitmap == NULL)
       continue;
 
+    if ((action > -1 || direction > -1) && el2img(element) != -1)
+    {
+      boolean base_redefined = getImageListEntry(el2img(element))->redefined;
+      boolean act_dir_redefined = getImageListEntry(graphic)->redefined;
+
+      /* if the base graphic ("emerald", for example) has been redefined,
+      	 but not the action graphic ("emerald.falling", for example), do not
+	 use an existing (in this case considered obsolete) action graphic
+	 anymore, but use the automatically determined default graphic */
+      if (base_redefined && !act_dir_redefined)
+	continue;
+    }
+
     if (action < 0)
       action = ACTION_DEFAULT;
 
@@ -454,6 +467,10 @@ void InitElementGraphicInfo()
 
     if (action < 0)
       action = ACTION_DEFAULT;
+
+    if (direction < 0)
+      for (dir=0; dir<NUM_DIRECTIONS; dir++)
+	element_info[element].direction_graphic[action][dir] = -1;
 
     if (direction > -1)
       element_info[element].direction_graphic[action][direction] = graphic;
@@ -541,6 +558,10 @@ void InitElementSpecialGraphicInfo()
     boolean base_redefined = getImageListEntry(el2img(element))->redefined;
     boolean special_redefined = getImageListEntry(graphic)->redefined;
 
+    /* if the base graphic ("emerald", for example) has been redefined,
+       but not the special graphic ("emerald.EDITOR", for example), do not
+       use an existing (in this case considered obsolete) special graphic
+       anymore, but use the automatically created (down-scaled) graphic */
     if (base_redefined && !special_redefined)
       continue;
 
@@ -1548,6 +1569,7 @@ void InitElementPropertiesStatic()
     EL_SPACESHIP,
     EL_BD_BUTTERFLY,
     EL_BD_FIREFLY,
+
     EL_YAMYAM,
     EL_DARK_YAMYAM,
     EL_ROBOT,
@@ -1563,14 +1585,16 @@ void InitElementPropertiesStatic()
     EL_SPACESHIP,
     EL_BD_BUTTERFLY,
     EL_BD_FIREFLY,
+
     EL_YAMYAM,
     EL_DARK_YAMYAM,
     EL_ROBOT,
     EL_PACMAN,
-    EL_AMOEBA_DROP,
-    EL_ACID,
     EL_SP_SNIKSNAK,
     EL_SP_ELECTRON,
+
+    EL_AMOEBA_DROP,
+    EL_ACID,
 
     /* !!! maybe this should better be handled by 'ep_diggable' !!! */
 #if 1
@@ -2430,6 +2454,14 @@ void InitElementPropertiesEngine(int engine_version)
       SET_PROPERTY(i, EP_EXPLOSION_PROOF, (IS_INDESTRUCTIBLE(i) &&
 					   !IS_WALKABLE_OVER(i) &&
 					   !IS_WALKABLE_UNDER(i)));
+
+    /* ---------- ENEMY ---------------------------------------------------- */
+    if (DONT_TOUCH(i))
+      SET_PROPERTY(i, EP_ENEMY, TRUE);
+
+    /* ---------- DONT_GO_TO ----------------------------------------------- */
+    if (IS_ENEMY(i))
+      SET_PROPERTY(i, EP_DONT_GO_TO, TRUE);
   }
 
 #if 0
@@ -2476,7 +2508,9 @@ void InitElementPropertiesEngine(int engine_version)
   }
 
   /* dynamically adjust element properties according to game engine version */
+#if 0
   if (engine_version < RELEASE_IDENT(2,2,0,7))
+#endif
   {
     for (i=0; i < NUM_CUSTOM_ELEMENTS; i++)
     {

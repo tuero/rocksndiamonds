@@ -483,7 +483,13 @@ void DrawLevelGraphicAnimation(int x, int y, int graphic)
 
 void DrawLevelElementAnimation(int x, int y, int element)
 {
+#if 1
+  int graphic = el_act_dir2img(element, GfxAction[x][y], MovDir[x][y]);
+
+  DrawGraphicAnimation(SCREENX(x), SCREENY(y), graphic);
+#else
   DrawGraphicAnimation(SCREENX(x), SCREENY(y), el2img(element));
+#endif
 }
 
 inline void DrawLevelGraphicAnimationIfNeeded(int x, int y, int graphic)
@@ -925,11 +931,7 @@ void DrawGraphicShifted(int x,int y, int dx,int dy, int graphic, int frame,
 {
   Bitmap *src_bitmap;
   GC drawing_gc;
-  int src_x;
-  int src_y;
-  int offset_x;
-  int offset_y;
-
+  int src_x, src_y;
   int width = TILEX, height = TILEY;
   int cx = 0, cy = 0;
   int dest_x, dest_y;
@@ -1004,16 +1006,20 @@ void DrawGraphicShifted(int x,int y, int dx,int dy, int graphic, int frame,
       MarkTileDirty(x, y + SIGN(dy));
   }
 
+#if 1
+  getGraphicSource(graphic, frame, &src_bitmap, &src_x, &src_y);
+#else
   src_bitmap = graphic_info[graphic].bitmap;
   src_x = graphic_info[graphic].src_x;
   src_y = graphic_info[graphic].src_y;
   offset_x = graphic_info[graphic].offset_x;
   offset_y = graphic_info[graphic].offset_y;
 
-  drawing_gc = src_bitmap->stored_clip_gc;
-
   src_x += frame * offset_x;
   src_y += frame * offset_y;
+#endif
+
+  drawing_gc = src_bitmap->stored_clip_gc;
 
   src_x += cx;
   src_y += cy;
@@ -1456,6 +1462,7 @@ void getMicroGraphicSource(int graphic, Bitmap **bitmap, int *x, int *y)
   int src_x = mini_startx + graphic_info[graphic].src_x / 8;
   int src_y = mini_starty + graphic_info[graphic].src_y / 8;
 
+#if 0
   if (src_x + MICRO_TILEX > src_bitmap->width ||
       src_y + MICRO_TILEY > src_bitmap->height)
   {
@@ -1466,6 +1473,7 @@ void getMicroGraphicSource(int graphic, Bitmap **bitmap, int *x, int *y)
     src_x += (TILEX / 2 - MICRO_TILEX / 2);
     src_y += (TILEY / 2 - MICRO_TILEY / 2);
   }
+#endif
 
   *bitmap = src_bitmap;
   *x = src_x;

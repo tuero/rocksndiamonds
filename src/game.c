@@ -1141,7 +1141,9 @@ void InitMovDir(int x, int y)
     default:
       if (IS_CUSTOM_ELEMENT(element))
       {
-	if (element_info[element].move_pattern == MV_ALL_DIRECTIONS)
+	if (element_info[element].move_direction_initial != MV_NO_MOVING)
+	  MovDir[x][y] = element_info[element].move_direction_initial;
+	else if (element_info[element].move_pattern == MV_ALL_DIRECTIONS)
 	  MovDir[x][y] = 1 << RND(4);
 	else if (element_info[element].move_pattern == MV_HORIZONTAL)
 	  MovDir[x][y] = (RND(2) ? MV_LEFT : MV_RIGHT);
@@ -2510,26 +2512,26 @@ void TurnRound(int x, int y)
     int x, y;
   } move_xy[] =
   {
-    { 0, 0 },
-    {-1, 0 },
-    {+1, 0 },
-    { 0, 0 },
-    { 0, -1 },
-    { 0, 0 }, { 0, 0 }, { 0, 0 },
-    { 0, +1 }
+    {  0,  0 },
+    { -1,  0 },
+    { +1,  0 },
+    {  0,  0 },
+    {  0, -1 },
+    {  0,  0 }, { 0, 0 }, { 0, 0 },
+    {  0, +1 }
   };
   static struct
   {
     int left, right, back;
   } turn[] =
   {
-    { 0,	0,		0 },
+    { 0,	0,		0	 },
     { MV_DOWN,	MV_UP,		MV_RIGHT },
-    { MV_UP,	MV_DOWN,	MV_LEFT },
-    { 0,	0,		0 },
-    { MV_LEFT,	MV_RIGHT,	MV_DOWN },
-    { 0,0,0 },	{ 0,0,0 },	{ 0,0,0 },
-    { MV_RIGHT,	MV_LEFT,	MV_UP }
+    { MV_UP,	MV_DOWN,	MV_LEFT	 },
+    { 0,	0,		0	 },
+    { MV_LEFT,	MV_RIGHT,	MV_DOWN	 },
+    { 0,0,0 },	{ 0,0,0 },	{ 0,0,0	 },
+    { MV_RIGHT,	MV_LEFT,	MV_UP	 }
   };
 
   int element = Feld[x][y];
@@ -2927,9 +2929,13 @@ void TurnRound(int x, int y)
   {
     boolean can_turn_left = FALSE, can_turn_right = FALSE;
 
-    if (IN_LEV_FIELD(left_x, left_y) && IS_FREE(left_x, left_y))
+    if (IN_LEV_FIELD(left_x, left_y) &&
+	(IS_FREE(left_x, left_y) ||
+	 (IS_ENEMY(element) && IS_FREE_OR_PLAYER(left_x, left_y))))
       can_turn_left = TRUE;
-    if (IN_LEV_FIELD(right_x, right_y) && IS_FREE(right_x, right_y))
+    if (IN_LEV_FIELD(right_x, right_y) &&
+	(IS_FREE(right_x, right_y) ||
+	 (IS_ENEMY(element) && IS_FREE_OR_PLAYER(right_x, right_y))))
       can_turn_right = TRUE;
 
     if (can_turn_left && can_turn_right)
@@ -2946,7 +2952,13 @@ void TurnRound(int x, int y)
   else if (element_info[element].move_pattern == MV_HORIZONTAL ||
 	   element_info[element].move_pattern == MV_VERTICAL)
   {
-    MovDir[x][y] = back_dir;
+    if (element_info[element].move_pattern & old_move_dir)
+      MovDir[x][y] = back_dir;
+    else if (element_info[element].move_pattern == MV_HORIZONTAL)
+      MovDir[x][y] = (RND(2) ? MV_LEFT : MV_RIGHT);
+    else if (element_info[element].move_pattern == MV_VERTICAL)
+      MovDir[x][y] = (RND(2) ? MV_UP : MV_DOWN);
+
     MovDelay[x][y] = GET_NEW_MOVE_DELAY(element);
   }
   else if (element_info[element].move_pattern & MV_ANY_DIRECTION)
@@ -2956,21 +2968,31 @@ void TurnRound(int x, int y)
   }
   else if (element_info[element].move_pattern == MV_ALONG_LEFT_SIDE)
   {
-    if (IN_LEV_FIELD(left_x, left_y) && IS_FREE(left_x, left_y))
+    if (IN_LEV_FIELD(left_x, left_y) &&
+	(IS_FREE(left_x, left_y) ||
+	 (IS_ENEMY(element) && IS_FREE_OR_PLAYER(left_x, left_y))))
       MovDir[x][y] = left_dir;
-    else if (!IN_LEV_FIELD(move_x, move_y) || !IS_FREE(move_x, move_y))
+    else if (!IN_LEV_FIELD(move_x, move_y) ||
+	     (!IS_FREE(move_x, move_y) &&
+	      (!IS_ENEMY(element) || !IS_FREE_OR_PLAYER(move_x, move_y))))
       MovDir[x][y] = right_dir;
 
-    MovDelay[x][y] = GET_NEW_MOVE_DELAY(element);
+    if (MovDir[x][y] != old_move_dir)
+      MovDelay[x][y] = GET_NEW_MOVE_DELAY(element);
   }
   else if (element_info[element].move_pattern == MV_ALONG_RIGHT_SIDE)
   {
-    if (IN_LEV_FIELD(right_x, right_y) && IS_FREE(right_x, right_y))
+    if (IN_LEV_FIELD(right_x, right_y) &&
+	(IS_FREE(right_x, right_y) ||
+	 (IS_ENEMY(element) && IS_FREE_OR_PLAYER(right_x, right_y))))
       MovDir[x][y] = right_dir;
-    else if (!IN_LEV_FIELD(move_x, move_y) || !IS_FREE(move_x, move_y))
+    else if (!IN_LEV_FIELD(move_x, move_y) ||
+	     (!IS_FREE(move_x, move_y) &&
+	      (!IS_ENEMY(element) || !IS_FREE_OR_PLAYER(move_x, move_y))))
       MovDir[x][y] = left_dir;
 
-    MovDelay[x][y] = GET_NEW_MOVE_DELAY(element);
+    if (MovDir[x][y] != old_move_dir)
+      MovDelay[x][y] = GET_NEW_MOVE_DELAY(element);
   }
   else if (element_info[element].move_pattern == MV_TOWARDS_PLAYER ||
 	   element_info[element].move_pattern == MV_AWAY_FROM_PLAYER)
@@ -3027,6 +3049,8 @@ void TurnRound(int x, int y)
       Moving2Blocked(x, y, &newx, &newy);
 
       if (IN_LEV_FIELD(newx, newy) && (IS_FREE(newx, newy) ||
+				       (IS_ENEMY(element) &&
+					IS_FREE_OR_PLAYER(newx, newy)) ||
 				       Feld[newx][newy] == EL_ACID))
 	return;
 
@@ -3035,6 +3059,8 @@ void TurnRound(int x, int y)
       Moving2Blocked(x, y, &newx, &newy);
 
       if (IN_LEV_FIELD(newx, newy) && (IS_FREE(newx, newy) ||
+				       (IS_ENEMY(element) &&
+					IS_FREE_OR_PLAYER(newx, newy)) ||
 				       Feld[newx][newy] == EL_ACID))
 	return;
 
@@ -3346,11 +3372,36 @@ void StartMoving(int x, int y)
     {
       MovDelay[x][y]--;
 
+#if 0
+      if (element == EL_YAMYAM)
+      {
+	printf("::: %d\n",
+	       el_act_dir2img(EL_YAMYAM, ACTION_WAITING, MV_LEFT));
+	DrawLevelElementAnimation(x, y, element);
+      }
+#endif
+
+      if (MovDelay[x][y])	/* element still has to wait some time */
+      {
+#if 0
+	/* !!! PLACE THIS SOMEWHERE AFTER "TurnRound()" !!! */
+	ResetGfxAnimation(x, y);
+#endif
+	GfxAction[x][y] = ACTION_WAITING;
+      }
+
       if (element == EL_ROBOT ||
+#if 0
+	  element == EL_PACMAN ||
+#endif
 	  element == EL_YAMYAM ||
 	  element == EL_DARK_YAMYAM)
       {
+#if 0
+	DrawLevelElementAnimation(x, y, element);
+#else
 	DrawLevelElementAnimationIfNeeded(x, y, element);
+#endif
 	PlaySoundLevelAction(x, y, ACTION_WAITING);
       }
       else if (element == EL_SP_ELECTRON)
@@ -3404,6 +3455,8 @@ void StartMoving(int x, int y)
 
 	return;
       }
+
+      GfxAction[x][y] = ACTION_MOVING;
     }
 
     /* now make next step */
@@ -3413,7 +3466,6 @@ void StartMoving(int x, int y)
     if (IS_ENEMY(element) && IS_PLAYER(newx, newy) &&
 	!PLAYER_PROTECTED(newx, newy))
     {
-
 #if 1
       TestIfBadThingRunsIntoHero(x, y, MovDir[x][y]);
       return;
@@ -3425,8 +3477,11 @@ void StartMoving(int x, int y)
 #endif
 
     }
-    else if ((element == EL_PENGUIN || element == EL_ROBOT ||
-	      element == EL_SATELLITE || element == EL_BALLOON) &&
+    else if ((element == EL_PENGUIN ||
+	      element == EL_ROBOT ||
+	      element == EL_SATELLITE ||
+	      element == EL_BALLOON ||
+	      IS_CUSTOM_ELEMENT(element)) &&
 	     IN_LEV_FIELD(newx, newy) &&
 	     MovDir[x][y] == MV_DOWN && Feld[newx][newy] == EL_ACID)
     {
@@ -3604,23 +3659,30 @@ void StartMoving(int x, int y)
 
       TurnRound(x, y);
 
-      if (element == EL_BUG || element == EL_SPACESHIP ||
+#if 1
+      DrawLevelElementAnimation(x, y, element);
+#else
+      if (element == EL_BUG ||
+	  element == EL_SPACESHIP ||
 	  element == EL_SP_SNIKSNAK)
 	DrawLevelField(x, y);
-      else if (element == EL_BUG || element == EL_SPACESHIP ||
-	       element == EL_SP_SNIKSNAK || element == EL_MOLE)
+      else if (element == EL_MOLE)
 	DrawLevelField(x, y);
-      else if (element == EL_BD_BUTTERFLY || element == EL_BD_FIREFLY)
+      else if (element == EL_BD_BUTTERFLY ||
+	       element == EL_BD_FIREFLY)
 	DrawLevelElementAnimationIfNeeded(x, y, element);
       else if (element == EL_SATELLITE)
 	DrawLevelElementAnimationIfNeeded(x, y, element);
       else if (element == EL_SP_ELECTRON)
 	DrawLevelElementAnimationIfNeeded(x, y, element);
+#endif
 
       if (DONT_TOUCH(element))
 	TestIfBadThingTouchesHero(x, y);
 
+#if 0
       PlaySoundLevelAction(x, y, ACTION_WAITING);
+#endif
 
       return;
     }
@@ -3789,7 +3851,7 @@ void ContinueMoving(int x, int y)
       TestIfFriendTouchesBadThing(newx, newy);
 
     if (CAN_SMASH(element) && direction == MV_DOWN &&
-	(newy == lev_fieldy-1 || !IS_FREE(x, newy+1)))
+	(newy == lev_fieldy - 1 || !IS_FREE(x, newy + 1)))
       Impact(x, newy);
   }
   else				/* still moving on */
@@ -4931,7 +4993,11 @@ void GameActions()
   for (y=0; y<lev_fieldy; y++) for (x=0; x<lev_fieldx; x++)
   {
     element = Feld[x][y];
+#if 1
+    graphic = el_act_dir2img(element, GfxAction[x][y], MovDir[x][y]);
+#else
     graphic = el2img(element);
+#endif
 
 #if 0
     if (element == -1)
@@ -4967,10 +5033,31 @@ void GameActions()
     {
       StartMoving(x, y);
 
+#if 1
+      graphic = el_act_dir2img(element, GfxAction[x][y], MovDir[x][y]);
+#if 0
+      if (element == EL_PACMAN)
+	printf("::: %d, %d, %d\n",
+	       IS_ANIMATED(graphic), IS_MOVING(x, y), Stop[x][y]);
+#endif
+#if 0
+      if (element == EL_YAMYAM)
+	printf("::: %d, %d, %d\n",
+	       IS_ANIMATED(graphic), IS_MOVING(x, y), Stop[x][y]);
+#endif
+#endif
+
       if (IS_ANIMATED(graphic) &&
 	  !IS_MOVING(x, y) &&
 	  !Stop[x][y])
+      {
 	DrawLevelGraphicAnimationIfNeeded(x, y, graphic);
+
+#if 0
+	if (element == EL_YAMYAM)
+	  printf("::: %d, %d\n", graphic, GfxFrame[x][y]);
+#endif
+      }
 
       if (IS_GEM(element) || element == EL_SP_INFOTRON)
 	EdelsteinFunkeln(x, y);

@@ -641,6 +641,10 @@ element_to_graphic[] =
     IMG_WALL_DIAMOND
   },
   {
+    EL_BUG,					-1, -1,
+    IMG_BUG
+  },
+  {
     EL_BUG_RIGHT,				-1, -1,
     IMG_BUG_RIGHT
   },
@@ -673,6 +677,26 @@ element_to_graphic[] =
     IMG_BUG_DOWN
   },
   {
+    EL_BUG,					ACTION_MOVING, MV_BIT_RIGHT,
+    IMG_BUG_MOVING_RIGHT
+  },
+  {
+    EL_BUG,					ACTION_MOVING, MV_BIT_UP,
+    IMG_BUG_MOVING_UP
+  },
+  {
+    EL_BUG,					ACTION_MOVING, MV_BIT_LEFT,
+    IMG_BUG_MOVING_LEFT
+  },
+  {
+    EL_BUG,					ACTION_MOVING, MV_BIT_DOWN,
+    IMG_BUG_MOVING_DOWN
+  },
+  {
+    EL_SPACESHIP,				-1, -1,
+    IMG_SPACESHIP
+  },
+  {
     EL_SPACESHIP_RIGHT,				-1, -1,
     IMG_SPACESHIP_RIGHT
   },
@@ -703,6 +727,22 @@ element_to_graphic[] =
   {
     EL_SPACESHIP,				-1, MV_BIT_DOWN,
     IMG_SPACESHIP_DOWN
+  },
+  {
+    EL_SPACESHIP,				ACTION_MOVING, MV_BIT_RIGHT,
+    IMG_SPACESHIP_MOVING_RIGHT
+  },
+  {
+    EL_SPACESHIP,				ACTION_MOVING, MV_BIT_UP,
+    IMG_SPACESHIP_MOVING_UP
+  },
+  {
+    EL_SPACESHIP,				ACTION_MOVING, MV_BIT_LEFT,
+    IMG_SPACESHIP_MOVING_LEFT
+  },
+  {
+    EL_SPACESHIP,				ACTION_MOVING, MV_BIT_DOWN,
+    IMG_SPACESHIP_MOVING_DOWN
   },
   {
     EL_YAMYAM,					-1, -1,
@@ -1473,6 +1513,10 @@ element_to_graphic[] =
     IMG_BIOMAZE
   },
   {
+    EL_PACMAN,					-1, -1,
+    IMG_PACMAN
+  },
+  {
     EL_PACMAN_RIGHT,				-1, -1,
     IMG_PACMAN_RIGHT
   },
@@ -1503,6 +1547,22 @@ element_to_graphic[] =
   {
     EL_PACMAN,					-1, MV_BIT_DOWN,
     IMG_PACMAN_DOWN
+  },
+  {
+    EL_PACMAN,					ACTION_MOVING, MV_BIT_RIGHT,
+    IMG_PACMAN_MOVING_RIGHT
+  },
+  {
+    EL_PACMAN,					ACTION_MOVING, MV_BIT_UP,
+    IMG_PACMAN_MOVING_UP
+  },
+  {
+    EL_PACMAN,					ACTION_MOVING, MV_BIT_LEFT,
+    IMG_PACMAN_MOVING_LEFT
+  },
+  {
+    EL_PACMAN,					ACTION_MOVING, MV_BIT_DOWN,
+    IMG_PACMAN_MOVING_DOWN
   },
   {
     EL_LAMP,					-1, -1,
