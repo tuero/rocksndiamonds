@@ -35,9 +35,9 @@ void TapeStartRecording()
   tape.date = 10000*(zeit2->tm_year%100) + 100*zeit2->tm_mon + zeit2->tm_mday;
   tape.random_seed = InitRND(NEW_RANDOMIZE);
 
-  DrawVideoDisplay(VIDEO_STATE_REC_ON,0);
-  DrawVideoDisplay(VIDEO_STATE_DATE_ON,tape.date);
-  DrawVideoDisplay(VIDEO_STATE_TIME_ON,0);
+  DrawVideoDisplay(VIDEO_STATE_REC_ON, 0);
+  DrawVideoDisplay(VIDEO_STATE_DATE_ON, tape.date);
+  DrawVideoDisplay(VIDEO_STATE_TIME_ON, 0);
 }
 
 void TapeStopRecording()
@@ -55,7 +55,7 @@ void TapeStopRecording()
   tape.length_seconds = GetTapeLength();
   tape.recording = FALSE;
   tape.pausing = FALSE;
-  DrawVideoDisplay(VIDEO_STATE_REC_OFF,0);
+  DrawVideoDisplay(VIDEO_STATE_REC_OFF, 0);
 }
 
 void TapeRecordAction(byte joy[MAX_PLAYERS])
@@ -65,7 +65,7 @@ void TapeRecordAction(byte joy[MAX_PLAYERS])
   if (!tape.recording || tape.pausing)
     return;
 
-  if (tape.counter>=MAX_TAPELEN-1)
+  if (tape.counter >= MAX_TAPELEN-1)
   {
     TapeStopRecording();
     return;
@@ -85,7 +85,7 @@ void TapeRecordDelay()
   if (!tape.recording || tape.pausing)
     return;
 
-  if (tape.counter>=MAX_TAPELEN)
+  if (tape.counter >= MAX_TAPELEN)
   {
     TapeStopRecording();
     return;
@@ -111,9 +111,10 @@ void TapeTogglePause()
   tape.pausing = !tape.pausing;
   tape.fast_forward = FALSE;
   tape.pause_before_death = FALSE;
-  DrawVideoDisplay(tape.pausing ?
-		   VIDEO_STATE_PAUSE_ON :
-		   VIDEO_STATE_PAUSE_OFF,0);
+  DrawVideoDisplay((tape.pausing ?
+		    VIDEO_STATE_PAUSE_ON :
+		    VIDEO_STATE_PAUSE_OFF),
+		   0);
 }
 
 void TapeStartPlaying()
@@ -133,9 +134,9 @@ void TapeStartPlaying()
   tape.fast_forward = FALSE;
   InitRND(tape.random_seed);
 
-  DrawVideoDisplay(VIDEO_STATE_PLAY_ON,0);
-  DrawVideoDisplay(VIDEO_STATE_DATE_ON,tape.date);
-  DrawVideoDisplay(VIDEO_STATE_TIME_ON,0);
+  DrawVideoDisplay(VIDEO_STATE_PLAY_ON, 0);
+  DrawVideoDisplay(VIDEO_STATE_DATE_ON, tape.date);
+  DrawVideoDisplay(VIDEO_STATE_TIME_ON, 0);
 }
 
 void TapeStopPlaying()
@@ -145,18 +146,18 @@ void TapeStopPlaying()
 
   tape.playing = FALSE;
   tape.pausing = FALSE;
-  DrawVideoDisplay(VIDEO_STATE_PLAY_OFF,0);
+  DrawVideoDisplay(VIDEO_STATE_PLAY_OFF, 0);
 }
 
-int *TapePlayAction()
+byte *TapePlayAction()
 {
-  static int joy[MAX_PLAYERS];
+  static byte joy[MAX_PLAYERS];
   int i;
 
   if (!tape.playing || tape.pausing)
     return(NULL);
 
-  if (tape.counter>=tape.length)
+  if (tape.counter >= tape.length)
   {
     TapeStop();
     return(NULL);
@@ -198,7 +199,7 @@ boolean TapePlayDelay()
     }
   }
 
-  if (tape.counter>=tape.length)
+  if (tape.counter >= tape.length)
   {
     TapeStop();
     return(TRUE);
@@ -221,8 +222,8 @@ void TapeStop()
   DrawVideoDisplay(VIDEO_STATE_PAUSE_OFF,0);
   if (tape.date && tape.length)
   {
-    DrawVideoDisplay(VIDEO_STATE_DATE_ON,tape.date);
-    DrawVideoDisplay(VIDEO_STATE_TIME_ON,tape.length_seconds);
+    DrawVideoDisplay(VIDEO_STATE_DATE_ON, tape.date);
+    DrawVideoDisplay(VIDEO_STATE_TIME_ON, tape.length_seconds);
   }
 }
 

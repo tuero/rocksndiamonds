@@ -386,7 +386,9 @@ extern int		lev_fieldx,lev_fieldy, scroll_x,scroll_y;
 
 extern int		FX,FY, ScrollStepSize;
 extern int		ScreenMovDir, ScreenMovPos, ScreenGfxPos;
-extern int		GameFrameDelay, MoveSpeed;
+extern int		GameFrameDelay;
+extern int		FfwdFrameDelay;
+extern int		MoveSpeed;
 extern int		BX1,BY1, BX2,BY2;
 extern int		ZX,ZY, ExitX,ExitY;
 extern int		AllPlayersGone;

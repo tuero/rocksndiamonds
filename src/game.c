@@ -2939,18 +2939,13 @@ void GameActions(byte player_action)
   long action_delay_value;
   int sieb_x = 0, sieb_y = 0;
   int i, x,y, element;
-  int *recorded_player_action;
+  byte *recorded_player_action;
 
   if (game_status != PLAYING)
     return;
 
-#ifdef DEBUG
   action_delay_value =
-    (tape.playing && tape.fast_forward ? FFWD_FRAME_DELAY : GameFrameDelay);
-#else
-  action_delay_value =
-    (tape.playing && tape.fast_forward ? FFWD_FRAME_DELAY : GAME_FRAME_DELAY);
-#endif
+    (tape.playing && tape.fast_forward ? FfwdFrameDelay : GameFrameDelay);
 
   /* main game synchronization point */
   WaitUntilDelayReached(&action_delay, action_delay_value);
@@ -2986,32 +2981,16 @@ void GameActions(byte player_action)
   else if (tape.recording)
     TapeRecordDelay();
 
-
-  if (tape.playing)
-    recorded_player_action = TapePlayAction();
-  else
-    recorded_player_action = NULL;
+  recorded_player_action = (tape.playing ? TapePlayAction() : NULL);
 
   if (network_playing)
     SendToServer_MovePlayer(player_action);
 
   for(i=0; i<MAX_PLAYERS; i++)
   {
-    /*
-    int actual_player_action =
-      (options.network ? network_player_action[i] : player_action);
-      */
-
     int actual_player_action =
       (network_playing ? network_player_action[i] : player_action);
 
-    /*
-    int actual_player_action = network_player_action[i];
-    */
-
-    /*
-    int actual_player_action = player_action;
-    */
 
     /* TEST TEST TEST */
 
@@ -3025,6 +3004,7 @@ void GameActions(byte player_action)
 
     /* TEST TEST TEST */
 
+
     if (recorded_player_action)
       actual_player_action = recorded_player_action[i];
 
@@ -3037,13 +3017,6 @@ void GameActions(byte player_action)
   network_player_action_received = FALSE;
 
   ScrollScreen(NULL, SCROLL_GO_ON);
-
-  /*
-  if (tape.pausing || (tape.playing && !TapePlayDelay()))
-    return;
-  else if (tape.recording)
-    TapeRecordDelay();
-  */
 
   FrameCounter++;
   TimeFrames++;
