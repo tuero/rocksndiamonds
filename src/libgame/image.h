@@ -71,8 +71,8 @@ int Read_PCX_to_Pixmap(Display *, Window, GC, char *, Pixmap *, Pixmap *);
 
 #endif /* TARGET_X11 */
 
-
-struct FileInfo *getCurrentImageList();
+int getImageListSize();
+struct FileInfo *getImageListEntry(int);
 Bitmap *getBitmapFromImageID(int);
 char *getTokenFromImageID(int);
 char *getImageConfigFilename();

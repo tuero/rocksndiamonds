@@ -260,6 +260,8 @@ static void ReinitializeGraphics()
 static void ReinitializeSounds()
 {
   InitSoundInfo();	/* initialize sounds info from config file */
+
+  InitPlaySoundLevel();
 }
 
 static void ReinitializeMusic()
@@ -859,6 +861,7 @@ static void set_graphic_parameters(int graphic, int *parameter)
 static void InitGraphicInfo()
 {
   static boolean clipmasks_initialized = FALSE;
+  int num_images = getImageListSize();
   int i;
 #if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
   Pixmap src_pixmap;
@@ -867,12 +870,15 @@ static void InitGraphicInfo()
   GC copy_clipmask_gc = None;
 #endif
 
-  image_files = getCurrentImageList();
+  if (graphic_info != NULL)
+    free(graphic_info);
+
+  graphic_info = checked_calloc(num_images * sizeof(struct GraphicInfo));
 
 #if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
   if (clipmasks_initialized)
   {
-    for (i=0; i<NUM_IMAGE_FILES; i++)
+    for (i=0; i<num_images; i++)
     {
       if (graphic_info[i].clip_mask)
 	XFreePixmap(display, graphic_info[i].clip_mask);
@@ -885,13 +891,14 @@ static void InitGraphicInfo()
   }
 #endif
 
-  for (i=0; i<NUM_IMAGE_FILES; i++)
+  for (i=0; i<num_images; i++)
   {
+    struct FileInfo *image = getImageListEntry(i);
     Bitmap *src_bitmap;
     int src_x, src_y;
     int first_frame, last_frame;
 
-    set_graphic_parameters(i, image_files[i].parameter);
+    set_graphic_parameters(i, image->parameter);
 
     /* now check if no animation frames are outside of the loaded image */
 
@@ -918,7 +925,7 @@ static void InitGraphicInfo()
       Error(ERR_RETURN, "custom graphic rejected for this element/action");
       Error(ERR_RETURN_LINE, "-");
 
-      set_graphic_parameters(i, image_files[i].default_parameter);
+      set_graphic_parameters(i, image->default_parameter);
     }
 
     last_frame = graphic_info[i].anim_frames - 1;
@@ -941,7 +948,7 @@ static void InitGraphicInfo()
       Error(ERR_RETURN, "custom graphic rejected for this element/action");
       Error(ERR_RETURN_LINE, "-");
 
-      set_graphic_parameters(i, image_files[i].default_parameter);
+      set_graphic_parameters(i, image->default_parameter);
     }
 
 #if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
@@ -988,31 +995,40 @@ static void set_sound_parameters(int sound, int *parameter)
 
 static void InitSoundInfo()
 {
-  int sound_effect_properties[NUM_SOUND_FILES];
+  int *sound_effect_properties;
+  int num_sounds = getSoundListSize();
   int i, j;
 
-  sound_files = getCurrentSoundList();
+  if (sound_info != NULL)
+    free(sound_info);
+
+  sound_effect_properties = checked_calloc(num_sounds * sizeof(int));
+  sound_info = checked_calloc(num_sounds * sizeof(struct SoundInfo));
 
   /* initialize sound effect for all elements to "no sound" */
   for (i=0; i<MAX_NUM_ELEMENTS; i++)
     for (j=0; j<NUM_ACTIONS; j++)
       element_info[i].sound[j] = SND_UNDEFINED;
 
-  for (i=0; i<NUM_SOUND_FILES; i++)
+  for (i=0; i<num_sounds; i++)
   {
-    int len_effect_text = strlen(sound_files[i].token);
+    struct FileInfo *sound = getSoundListEntry(i);
+    int len_effect_text = strlen(sound->token);
 
+#if 1
     sound_effect_properties[i] = ACTION_OTHER;
     sound_info[i].loop = FALSE;
+#endif
 
     /* determine all loop sounds and identify certain sound classes */
 
+#if 1
     for (j=0; element_action_info[j].suffix; j++)
     {
       int len_action_text = strlen(element_action_info[j].suffix);
 
       if (len_action_text < len_effect_text &&
-	  strcmp(&sound_files[i].token[len_effect_text - len_action_text],
+	  strcmp(&sound->token[len_effect_text - len_action_text],
 		 element_action_info[j].suffix) == 0)
       {
 	sound_effect_properties[i] = element_action_info[j].value;
@@ -1021,9 +1037,11 @@ static void InitSoundInfo()
 	  sound_info[i].loop = TRUE;
       }
     }
+#endif
 
     /* associate elements and some selected sound actions */
 
+#if 1
     for (j=0; j<MAX_NUM_ELEMENTS; j++)
     {
       if (element_info[j].sound_class_name)
@@ -1031,9 +1049,9 @@ static void InitSoundInfo()
 	int len_class_text = strlen(element_info[j].sound_class_name);
 
 	if (len_class_text + 1 < len_effect_text &&
-	    strncmp(sound_files[i].token,
+	    strncmp(sound->token,
 		    element_info[j].sound_class_name, len_class_text) == 0 &&
-	    sound_files[i].token[len_class_text] == '.')
+	    sound->token[len_class_text] == '.')
 	{
 	  int sound_action_value = sound_effect_properties[i];
 
@@ -1041,9 +1059,12 @@ static void InitSoundInfo()
 	}
       }
     }
+#endif
 
-    set_sound_parameters(i, sound_files[i].parameter);
+    set_sound_parameters(i, sound->parameter);
   }
+
+  free(sound_effect_properties);
 
 #if 0
   /* TEST ONLY */

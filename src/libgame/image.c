@@ -696,16 +696,30 @@ static void FreeImage(void *ptr)
   free(image);
 }
 
-struct FileInfo *getCurrentImageList()
+int getImageListSize()
 {
-  return image_info->file_list;
+  return (image_info->num_file_list_entries +
+	  image_info->num_dynamic_file_list_entries);
 }
 
-Bitmap *getBitmapFromImageID(int graphic)
+struct FileInfo *getImageListEntry(int pos)
 {
-  ImageInfo **img_info = (ImageInfo **)image_info->artwork_list;
+  int num_list_entries = image_info->num_file_list_entries;
+  int list_pos = (pos < num_list_entries ? pos : pos - num_list_entries);
 
-  return (img_info[graphic] != NULL ? img_info[graphic]->bitmap : NULL);
+  return (pos < num_list_entries ? &image_info->file_list[list_pos] :
+	  &image_info->dynamic_file_list[list_pos]);
+}
+
+Bitmap *getBitmapFromImageID(int pos)
+{
+  int num_list_entries = image_info->num_file_list_entries;
+  int list_pos = (pos < num_list_entries ? pos : pos - num_list_entries);
+  ImageInfo **img_info =
+    (ImageInfo **)(pos < num_list_entries ? image_info->artwork_list :
+		   image_info->dynamic_artwork_list);
+
+  return (img_info[list_pos] != NULL ? img_info[list_pos]->bitmap : NULL);
 }
 
 char *getTokenFromImageID(int graphic)

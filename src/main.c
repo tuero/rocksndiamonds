@@ -89,10 +89,8 @@ struct TapeInfo		tape;
 struct SetupInfo	setup;
 struct GameInfo		game;
 struct GlobalInfo	global;
-struct FileInfo	       *image_files;
-struct FileInfo	       *sound_files;
-struct GraphicInfo	graphic_info[NUM_IMAGE_FILES];
-struct SoundInfo	sound_info[NUM_SOUND_FILES];
+struct GraphicInfo     *graphic_info = NULL;
+struct SoundInfo       *sound_info = NULL;
 
 
 /* ------------------------------------------------------------------------- */

@@ -1765,9 +1765,19 @@ static void *Load_WAV(char *filename)
   return snd_info;
 }
 
-struct FileInfo *getCurrentSoundList()
+int getSoundListSize()
 {
-  return sound_info->file_list;
+  return (sound_info->num_file_list_entries +
+	  sound_info->num_dynamic_file_list_entries);
+}
+
+struct FileInfo *getSoundListEntry(int pos)
+{
+  int num_list_entries = sound_info->num_file_list_entries;
+  int list_pos = (pos < num_list_entries ? pos : pos - num_list_entries);
+
+  return (pos < num_list_entries ? &sound_info->file_list[list_pos] :
+	  &sound_info->dynamic_file_list[list_pos]);
 }
 
 void InitSoundList(struct ConfigInfo *config_list, int num_file_list_entries,

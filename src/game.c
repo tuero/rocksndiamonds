@@ -119,10 +119,10 @@ static struct GadgetInfo *game_gadget[NUM_GAME_BUTTONS];
 #define IS_LOOP_SOUND(s)	(sound_info[s].loop)
 
 
-/* -------------------------------------------------------------------------
-   definition of elements that automatically change to other elements after
-   a specified time, eventually calling a function when changing
-   ------------------------------------------------------------------------- */
+/* ------------------------------------------------------------------------- */
+/* definition of elements that automatically change to other elements after  */
+/* a specified time, eventually calling a function when changing             */
+/* ------------------------------------------------------------------------- */
 
 /* forward declaration for changer functions */
 static void InitBuggyBase(int x, int y);
@@ -6908,10 +6908,29 @@ boolean PlaceBomb(struct PlayerInfo *player)
   return TRUE;
 }
 
+/* ------------------------------------------------------------------------- */
+/* game sound playing functions                                              */
+/* ------------------------------------------------------------------------- */
+
+static int *loop_sound_frame = NULL;
+static int *loop_sound_volume = NULL;
+
+void InitPlaySoundLevel()
+{
+  int num_sounds = getSoundListSize();
+
+  if (loop_sound_frame != NULL)
+    free(loop_sound_frame);
+
+  if (loop_sound_volume != NULL)
+    free(loop_sound_volume);
+
+  loop_sound_frame = checked_calloc(num_sounds * sizeof(int));
+  loop_sound_volume = checked_calloc(num_sounds * sizeof(int));
+}
+
 static void PlaySoundLevel(int x, int y, int nr)
 {
-  static int loop_sound_frame[NUM_SOUND_FILES];
-  static int loop_sound_volume[NUM_SOUND_FILES];
   int sx = SCREENX(x), sy = SCREENY(y);
   int volume, stereo_position;
   int max_distance = 8;

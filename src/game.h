@@ -91,6 +91,9 @@ void RemoveHero(struct PlayerInfo *);
 int DigField(struct PlayerInfo *, int, int, int, int, int);
 boolean SnapField(struct PlayerInfo *, int, int);
 boolean PlaceBomb(struct PlayerInfo *);
+
+void InitPlaySoundLevel();
+
 void RaiseScore(int);
 void RaiseScoreElement(int);
 void RequestQuitGame(boolean);

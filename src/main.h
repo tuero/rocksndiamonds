@@ -1148,10 +1148,9 @@ extern struct GlobalInfo	global;
 extern struct ElementInfo	element_info[];
 extern struct ElementActionInfo	element_action_info[];
 extern struct ElementDirectionInfo element_direction_info[];
-extern struct GraphicInfo	graphic_info[];
-extern struct SoundInfo		sound_info[];
+extern struct GraphicInfo      *graphic_info;
+extern struct SoundInfo	       *sound_info;
 extern struct ConfigInfo	image_config[], sound_config[];
 extern struct ConfigInfo	image_config_suffix[], sound_config_suffix[];
-extern struct FileInfo	       *image_files, *sound_files;
 
 #endif	/* MAIN_H */
