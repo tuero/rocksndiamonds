@@ -98,9 +98,11 @@ struct SoundInfo       *sound_info = NULL;
 /* element definitions                                                       */
 /* ------------------------------------------------------------------------- */
 
-struct ElementInfo element_info[MAX_NUM_ELEMENTS] =
+struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
 {
-  /* "real" level file elements */
+  /* ----------------------------------------------------------------------- */
+  /* "real" level file elements                                              */
+  /* ----------------------------------------------------------------------- */
 
   {
     "empty_space",
@@ -2534,7 +2536,9 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS] =
     "custom element 128"
   },
 
-  /* "real" (and therefore drawable) runtime elements */
+  /* ----------------------------------------------------------------------- */
+  /* "real" (and therefore drawable) runtime elements                        */
+  /* ----------------------------------------------------------------------- */
 
   {
     "em_key1",
@@ -2762,6 +2766,281 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS] =
     "-"
   },
 
+  /* ----------------------------------------------------------------------- */
+  /* "unreal" (and therefore not drawable) runtime elements                  */
+  /* ----------------------------------------------------------------------- */
+
+  {
+    "blocked",
+    "-",
+    "-"
+  },
+  {
+    "explosion",
+    "-",
+    "-"
+  },
+  {
+    "nut_cracking",
+    "-",
+    "-"
+  },
+  {
+    "acid_splash_left",
+    "-",
+    "-"
+  },
+  {
+    "acid_splash_right",
+    "-",
+    "-"
+  },
+  {
+    "amoeba_creating",
+    "-",
+    "-"
+  },
+  {
+    "amoeba_shrinking",
+    "-",
+    "-"
+  },
+  {
+    "wall_growing_active",
+    "-",
+    "-"
+  },
+  {
+    "flames",
+    "-",
+    "-"
+  },
+  {
+    "player_is_leaving",
+    "-",
+    "-"
+  },
+  {
+    "quicksand_filling",
+    "-",
+    "-"
+  },
+  {
+    "magic_wall_filling",
+    "-",
+    "-"
+  },
+  {
+    "bd_magic_wall_filling",
+    "-",
+    "-"
+  },
+
+  /* ----------------------------------------------------------------------- */
+  /* dummy elements (never used as game elements, only used as graphics)     */
+  /* ----------------------------------------------------------------------- */
+
+  {
+    "steelwall_topleft",
+    "-",
+    "-"
+  },
+  {
+    "steelwall_topright",
+    "-",
+    "-"
+  },
+  {
+    "steelwall_bottomleft",
+    "-",
+    "-"
+  },
+  {
+    "steelwall_bottomright",
+    "-",
+    "-"
+  },
+  {
+    "steelwall_horizontal",
+    "-",
+    "-"
+  },
+  {
+    "steelwall_vertical",
+    "-",
+    "-"
+  },
+  {
+    "invisible_steelwall_topleft",
+    "-",
+    "-"
+  },
+  {
+    "invisible_steelwall_topright",
+    "-",
+    "-"
+  },
+  {
+    "invisible_steelwall_bottomleft",
+    "-",
+    "-"
+  },
+  {
+    "invisible_steelwall_bottomright",
+    "-",
+    "-"
+  },
+  {
+    "invisible_steelwall_horizontal",
+    "-",
+    "-"
+  },
+  {
+    "invisible_steelwall_vertical",
+    "-",
+    "-"
+  },
+  {
+    "sand_crumbled",
+    "-",
+    "-"
+  },
+  {
+    "bd_amoeba_part1",
+    "-",
+    "-"
+  },
+  {
+    "bd_amoeba_part2",
+    "-",
+    "-"
+  },
+  {
+    "bd_amoeba_part3",
+    "-",
+    "-"
+  },
+  {
+    "bd_amoeba_part4",
+    "-",
+    "-"
+  },
+  {
+    "amoeba_wet_part1",
+    "-",
+    "-"
+  },
+  {
+    "amoeba_wet_part2",
+    "-",
+    "-"
+  },
+  {
+    "amoeba_wet_part3",
+    "-",
+    "-"
+  },
+  {
+    "amoeba_wet_part4",
+    "-",
+    "-"
+  },
+  {
+    "amoeba_dry_part1",
+    "-",
+    "-"
+  },
+  {
+    "amoeba_dry_part2",
+    "-",
+    "-"
+  },
+  {
+    "amoeba_dry_part3",
+    "-",
+    "-"
+  },
+  {
+    "amoeba_dry_part4",
+    "-",
+    "-"
+  },
+  {
+    "amoeba_full_part1",
+    "-",
+    "-"
+  },
+  {
+    "amoeba_full_part2",
+    "-",
+    "-"
+  },
+  {
+    "amoeba_full_part3",
+    "-",
+    "-"
+  },
+  {
+    "amoeba_full_part4",
+    "-",
+    "-"
+  },
+  {
+    "amoeba_dead_part1",
+    "-",
+    "-"
+  },
+  {
+    "amoeba_dead_part2",
+    "-",
+    "-"
+  },
+  {
+    "amoeba_dead_part3",
+    "-",
+    "-"
+  },
+  {
+    "amoeba_dead_part4",
+    "-",
+    "-"
+  },
+  {
+    "dynabomb_active",
+    "-",
+    "-"
+  },
+  {
+    "shield_normal_active",
+    "-",
+    "-"
+  },
+  {
+    "shield_deadly_active",
+    "-",
+    "-"
+  },
+  {
+    "arrow_red_left",
+    "-",
+    "-"
+  },
+  {
+    "arrow_red_right",
+    "-",
+    "-"
+  },
+  {
+    "arrow_red_up",
+    "-",
+    "-"
+  },
+  {
+    "arrow_red_down",
+    "-",
+    "-"
+  },
+
   {
     NULL,
     NULL,
@@ -2774,7 +3053,7 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS] =
 /* element action and direction definitions                                  */
 /* ------------------------------------------------------------------------- */
 
-struct ElementActionInfo element_action_info[] =
+struct ElementActionInfo element_action_info[NUM_ACTIONS + 1] =
 {
   { ".[DEFAULT]",	ACTION_DEFAULT,		TRUE	},
   { ".waiting",		ACTION_WAITING,		TRUE	},
@@ -2801,7 +3080,7 @@ struct ElementActionInfo element_action_info[] =
   { NULL,		0,			0	}
 };
 
-struct ElementDirectionInfo element_direction_info[] =
+struct ElementDirectionInfo element_direction_info[NUM_DIRECTIONS + 1] =
 {
   { ".left",		MV_BIT_LEFT			},
   { ".right",		MV_BIT_RIGHT			},
@@ -2811,9 +3090,10 @@ struct ElementDirectionInfo element_direction_info[] =
   { NULL,		0				}
 };
 
-struct SpecialSuffixInfo special_suffix_info[] =
+struct SpecialSuffixInfo special_suffix_info[NUM_SPECIAL_GFX_ARGS + 1] =
 {
   { ".EDITOR",		0,				},
+  { ".PREVIEW",		0,				},
 
   { NULL,		0,				}
 };

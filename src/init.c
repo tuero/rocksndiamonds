@@ -73,9 +73,9 @@ static void InitMusic();
 static void InitGfx();
 static void InitGfxBackground();
 static void InitGadgets();
-static void InitElementImages();
+static void InitElementSmallImages();
 static void InitElementGraphicInfo();
-static void InitElementEditorGraphicInfo();
+static void InitElementSpecialGraphicInfo();
 static void InitElementSoundInfo();
 static void InitElementProperties();
 static void InitGraphicInfo();
@@ -248,9 +248,11 @@ static void InitMixer()
 
 static void ReinitializeGraphics()
 {
-  InitElementGraphicInfo();		/* element => game graphic mapping */
-  InitElementEditorGraphicInfo();	/* element => editor graphic mapping */
-  InitGraphicInfo();			/* graphic => properties mapping */
+  InitElementGraphicInfo();		/* element game graphic mapping */
+  InitElementSpecialGraphicInfo();	/* element special graphic mapping */
+  InitGraphicInfo();			/* graphic properties mapping */
+
+  InitElementSmallImages();		/* create editor and preview images */
 
   InitFontInfo(bitmap_font_initial,
 	       graphic_info[IMG_FONT_BIG].bitmap,
@@ -263,41 +265,12 @@ static void ReinitializeGraphics()
 
   InitGadgets();
   InitToons();
-
-
-
-  /* !!! TEST ONLY !!! */
-  if (0)
-  {
-    Bitmap *tst_bitmap = graphic_info[IMG_SAND].bitmap;
-    Bitmap *tmp_bitmap = ZoomBitmap(tst_bitmap,
-				    tst_bitmap->width / 2,
-				    tst_bitmap->height / 2);
-
-    BlitBitmap(tmp_bitmap, tst_bitmap, 0, 0, 256, 224, 0, 448);
-
-    FreeBitmap(tmp_bitmap);
-  }
-
-  if (1)
-  {
-    printf("CREATING SMALL IMAGES...\n");
-
-#if 1
-    InitElementImages();
-#else
-    CreateImageWithSmallImages(IMG_SAND);
-    CreateImageWithSmallImages(IMG_SAND);
-#endif
-
-    printf("DONE!\n");
-  }
 }
 
 static void ReinitializeSounds()
 {
-  InitElementSoundInfo();	/* element => game sound mapping */
-  InitSoundInfo();		/* sound   => properties mapping */
+  InitElementSoundInfo();	/* element game sound mapping */
+  InitSoundInfo();		/* sound properties mapping */
 
   InitPlaySoundLevel();		/* internal game sound settings */
 }
@@ -740,15 +713,19 @@ void InitGadgets()
   gadgets_initialized = TRUE;
 }
 
-void InitElementImages()
+void InitElementSmallImages()
 {
   struct PropertyMapping *property_mapping = getImageListPropertyMapping();
   int num_property_mappings = getImageListPropertyMappingSize();
   int i;
 
-  /* initialize images from static configuration */
+  /* initialize normal images from static configuration */
   for (i=0; element_to_graphic[i].element > -1; i++)
     CreateImageWithSmallImages(element_to_graphic[i].graphic);
+
+  /* initialize special images from static configuration */
+  for (i=0; element_to_special_graphic[i].element > -1; i++)
+    CreateImageWithSmallImages(element_to_special_graphic[i].graphic);
 
   /* initialize images from dynamic configuration */
   for (i=0; i < num_property_mappings; i++)
@@ -859,7 +836,7 @@ void InitElementGraphicInfo()
   }
 }
 
-void InitElementEditorGraphicInfo()
+void InitElementSpecialGraphicInfo()
 {
   struct PropertyMapping *property_mapping = getImageListPropertyMapping();
   int num_property_mappings = getImageListPropertyMappingSize();
@@ -867,7 +844,10 @@ void InitElementEditorGraphicInfo()
 
   /* always start with reliable default values */
   for (i=0; i<MAX_NUM_ELEMENTS; i++)
+  {
     element_info[i].editor_graphic = element_info[i].graphic[ACTION_DEFAULT];
+    element_info[i].preview_graphic = element_info[i].graphic[ACTION_DEFAULT];
+  }
 
   /* initialize special element/graphic mapping from static configuration */
   for (i=0; element_to_special_graphic[i].element > -1; i++)
@@ -876,10 +856,10 @@ void InitElementEditorGraphicInfo()
     int special = element_to_special_graphic[i].special;
     int graphic = element_to_special_graphic[i].graphic;
 
-    if (special != GFX_SPECIAL_ARG_EDITOR)
-      continue;
-
-    element_info[element].editor_graphic = graphic;
+    if (special == GFX_SPECIAL_ARG_EDITOR)
+      element_info[element].editor_graphic = graphic;
+    else if (special == GFX_SPECIAL_ARG_PREVIEW)
+      element_info[element].preview_graphic = graphic;
   }
 
   /* initialize special element/graphic mapping from dynamic configuration */
@@ -889,10 +869,10 @@ void InitElementEditorGraphicInfo()
     int special = property_mapping[i].ext3_index;
     int graphic = property_mapping[i].artwork_index;
 
-    if (special != GFX_SPECIAL_ARG_EDITOR)
-      continue;
-
-    element_info[element].editor_graphic = graphic;
+    if (special == GFX_SPECIAL_ARG_EDITOR)
+      element_info[element].editor_graphic = graphic;
+    else if (special == GFX_SPECIAL_ARG_PREVIEW)
+      element_info[element].preview_graphic = graphic;
   }
 }
 

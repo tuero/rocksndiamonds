@@ -730,7 +730,7 @@
 #define EL_MAGIC_WALL_FILLING		(EL_FIRST_RUNTIME_UNREAL + 11)
 #define EL_BD_MAGIC_WALL_FILLING	(EL_FIRST_RUNTIME_UNREAL + 12)
 
-/* dummy (not drawable) runtime elements (internal use only) */
+/* dummy elements (never used as game elements, only used as graphics) */
 #define EL_FIRST_DUMMY			(EL_FIRST_RUNTIME_UNREAL + 13)
 
 #define EL_STEELWALL_TOPLEFT			(EL_FIRST_DUMMY + 0)
@@ -804,8 +804,9 @@
 
 /* values for special image configuration suffixes */
 #define GFX_SPECIAL_ARG_EDITOR			0
+#define GFX_SPECIAL_ARG_PREVIEW			1
 
-#define NUM_SPECIAL_GFX_ARGS			1
+#define NUM_SPECIAL_GFX_ARGS			2
 
 
 /* values for image configuration suffixes */
@@ -1060,6 +1061,7 @@ struct ElementInfo
   int direction_graphic[NUM_ACTIONS][NUM_DIRECTIONS];
 
   int editor_graphic;		/* graphic displayed in level editor */
+  int preview_graphic;		/* graphic displayed in level preview */
 
   int sound[NUM_ACTIONS];	/* default sounds for several actions */
 };

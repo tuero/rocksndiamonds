@@ -1337,6 +1337,29 @@ void DrawCrumbledSand(int x, int y)
   }
 }
 
+static int getBorderElement(int x, int y)
+{
+  int border[7][2] =
+  {
+    { EL_STEELWALL_TOPLEFT,		EL_INVISIBLE_STEELWALL_TOPLEFT     },
+    { EL_STEELWALL_TOPRIGHT,		EL_INVISIBLE_STEELWALL_TOPRIGHT    },
+    { EL_STEELWALL_BOTTOMLEFT,		EL_INVISIBLE_STEELWALL_BOTTOMLEFT  },
+    { EL_STEELWALL_BOTTOMRIGHT,		EL_INVISIBLE_STEELWALL_BOTTOMRIGHT },
+    { EL_STEELWALL_VERTICAL,		EL_INVISIBLE_STEELWALL_VERTICAL    },
+    { EL_STEELWALL_HORIZONTAL,		EL_INVISIBLE_STEELWALL_HORIZONTAL  },
+    { EL_STEELWALL,			EL_INVISIBLE_STEELWALL		   }
+  };
+  int steel_type = (BorderElement == EL_STEELWALL ? 0 : 1);
+  int steel_position = (x == -1 && y == -1			? 0 :
+			x == lev_fieldx && y == -1		? 1 :
+			x == -1 && y == lev_fieldy		? 2 :
+			x == lev_fieldx && y == lev_fieldy	? 3 :
+			x == -1 || x == lev_fieldx		? 4 :
+			y == -1 || y == lev_fieldy		? 5 : 6);
+
+  return border[steel_position][steel_type];
+}
+
 void DrawScreenElement(int x, int y, int element)
 {
   DrawScreenElementExt(x, y, 0, 0, element, NO_CUTTING, NO_MASKING);
@@ -1359,7 +1382,7 @@ void DrawScreenField(int x, int y)
     if (lx < -1 || lx > lev_fieldx || ly < -1 || ly > lev_fieldy)
       element = EL_EMPTY;
     else
-      element = BorderElement;
+      element = getBorderElement(lx, ly);
 
     DrawScreenElement(x, y, element);
     return;
@@ -1478,29 +1501,7 @@ void DrawMiniElementOrWall(int sx, int sy, int scroll_x, int scroll_y)
   else if (x > -1 && x < lev_fieldx && y > -1 && y < lev_fieldy)
     DrawMiniElement(sx, sy, Feld[x][y]);
   else
-  {
-    int steel_type, steel_position;
-    int border[6][2] =
-    {
-      { IMG_STEELWALL_TOPLEFT,		IMG_INVISIBLE_STEELWALL_TOPLEFT     },
-      { IMG_STEELWALL_TOPRIGHT,		IMG_INVISIBLE_STEELWALL_TOPRIGHT    },
-      { IMG_STEELWALL_BOTTOMLEFT,	IMG_INVISIBLE_STEELWALL_BOTTOMLEFT  },
-      { IMG_STEELWALL_BOTTOMRIGHT,	IMG_INVISIBLE_STEELWALL_BOTTOMRIGHT },
-      { IMG_STEELWALL_VERTICAL,		IMG_INVISIBLE_STEELWALL_VERTICAL    },
-      { IMG_STEELWALL_HORIZONTAL,	IMG_INVISIBLE_STEELWALL_HORIZONTAL  }
-    };
-
-    steel_type = (BorderElement == EL_STEELWALL ? 0 : 1);
-    steel_position = (x == -1 && y == -1			? 0 :
-		      x == lev_fieldx && y == -1		? 1 :
-		      x == -1 && y == lev_fieldy		? 2 :
-		      x == lev_fieldx && y == lev_fieldy	? 3 :
-		      x == -1 || x == lev_fieldx		? 4 :
-		      y == -1 || y == lev_fieldy		? 5 : -1);
-
-    if (steel_position != -1)
-      DrawMiniGraphic(sx, sy, border[steel_position][steel_type]);
-  }
+    DrawMiniGraphic(sx, sy, el2edimg(getBorderElement(x, y)));
 }
 
 void getMicroGraphicSource(int graphic, Bitmap **bitmap, int *x, int *y)
@@ -1531,7 +1532,7 @@ void DrawMicroElement(int xpos, int ypos, int element)
 {
   Bitmap *src_bitmap;
   int src_x, src_y;
-  int graphic = el2img(element);
+  int graphic = el2preimg(element);
 
   getMicroGraphicSource(graphic, &src_bitmap, &src_x, &src_y);
   BlitBitmap(src_bitmap, drawto, src_x, src_y, MICRO_TILEX, MICRO_TILEY,
@@ -1589,7 +1590,7 @@ static void DrawMicroLevelExt(int xpos, int ypos, int from_x, int from_y)
       else if (lx >= -1 && lx < lev_fieldx+1 && ly >= -1 && ly < lev_fieldy+1
 	       && BorderElement != EL_EMPTY)
 	DrawMicroElement(xpos + x * MICRO_TILEX, ypos + y * MICRO_TILEY,
-			 BorderElement);
+			 getBorderElement(lx, ly));
     }
   }
 
@@ -2454,4 +2455,9 @@ int el2img(int element)
 int el2edimg(int element)
 {
   return element_info[element].editor_graphic;
+}
+
+int el2preimg(int element)
+{
+  return element_info[element].preview_graphic;
 }

@@ -138,5 +138,6 @@ int el_act2img(int, int);
 int el_dir2img(int, int);
 int el2img(int);
 int el2edimg(int);
+int el2preimg(int);
 
 #endif	/* TOOLS_H */
