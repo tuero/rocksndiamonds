@@ -395,8 +395,10 @@ void LoadLevel(int level_nr)
 
   fclose(file);
 
+#if 0
   if (level.time <= 10)		/* minimum playing time of each level */
     level.time = 10;
+#endif
 
   if (file_version == FILE_VERSION_1_0)
   {

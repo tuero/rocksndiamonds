@@ -176,6 +176,7 @@ static void InitField(int x, int y, boolean init_game)
   switch (Feld[x][y])
   {
     case EL_SPIELFIGUR:
+    case EL_SP_MURPHY:
       if (init_game)
 	Feld[x][y] = EL_SPIELER1;
       /* no break! */
@@ -296,6 +297,10 @@ static void InitField(int x, int y, boolean init_game)
     case EL_SCHWEIN:
     case EL_DRACHE:
       MovDir[x][y] = 1 << RND(4);
+      break;
+
+    case EL_SP_EMPTY:
+      Feld[x][y] = EL_LEERRAUM;
       break;
 
     default:
@@ -4187,10 +4192,36 @@ int DigField(struct PlayerInfo *player,
       return MF_ACTION;
       break;
 
+    case EL_SP_TERMINAL:
+      {
+	int xx, yy;
+
+	for (yy=0; yy<lev_fieldy; yy++)
+	  for (xx=0; xx<lev_fieldx; xx++)
+	    if (Feld[xx][yy] == EL_SP_DISK_YELLOW)
+	      Bang(xx, yy);
+
+	Feld[x][y] = EL_SP_TERMINAL_ACTIVE;
+	DrawLevelField(x, y);
+	return MF_ACTION;
+      }
+      break;
+
+    case EL_SP_EXIT:
+      if (local_player->gems_still_needed > 0)
+	return MF_NO_ACTION;
+
+      player->LevelSolved = player->GameOver = TRUE;
+      PlaySoundLevel(x, y, SND_BUING);
+      break;
+
     case EL_FELSBROCKEN:
     case EL_BOMBE:
     case EL_KOKOSNUSS:
     case EL_ZEIT_LEER:
+    case EL_SP_ZONK:
+    case EL_SP_DISK_ORANGE:
+    case EL_SP_DISK_YELLOW:
       if (dy || mode == DF_SNAP)
 	return MF_NO_ACTION;
 
