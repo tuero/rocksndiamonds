@@ -288,6 +288,8 @@ int CheckCountButtons(int, int, int);
 #define GD_EVENT_MOVING			(1<<2)
 #define GD_EVENT_REPEATED		(1<<3)
 #define GD_EVENT_OFF_BORDERS		(1<<4)
+#define GD_EVENT_TEXT_RETURN		(1<<5)
+#define GD_EVENT_TEXT_LEAVING		(1<<6)
 
 /* gadget button states */
 #define GD_BUTTON_UNPRESSED		0
@@ -311,15 +313,17 @@ int CheckCountButtons(int, int, int);
 #define GDI_NUMBER_MIN			11
 #define GDI_NUMBER_MAX			12
 #define GDI_TEXT_VALUE			13
-#define GDI_DESIGN_UNPRESSED		14
-#define GDI_DESIGN_PRESSED		15
-#define GDI_ALT_DESIGN_UNPRESSED	16
-#define GDI_ALT_DESIGN_PRESSED		17
-#define GDI_EVENT_MASK			18
-#define GDI_EVENT			19
-#define GDI_CALLBACK			20
-#define GDI_AREA_SIZE			21
-#define GDI_ITEM_SIZE			22
+#define GDI_TEXT_SIZE			14
+#define GDI_TEXT_BORDER			15
+#define GDI_DESIGN_UNPRESSED		16
+#define GDI_DESIGN_PRESSED		17
+#define GDI_ALT_DESIGN_UNPRESSED	18
+#define GDI_ALT_DESIGN_PRESSED		19
+#define GDI_EVENT_MASK			20
+#define GDI_EVENT			21
+#define GDI_CALLBACK			22
+#define GDI_AREA_SIZE			23
+#define GDI_ITEM_SIZE			24
 
 typedef void (*gadget_callback_function)(void *);
 
@@ -356,6 +360,8 @@ struct GadgetInfo
   boolean mapped;			/* gadget is active */
   long number_value;
   char text_value[MAX_GADGET_TEXTSIZE];
+  int text_size;			/* maximal size of input text */
+  int text_border;			/* border size of text input gadget */
   struct GadgetDesign design[2];	/* 0: normal; 1: pressed */
   struct GadgetDesign alt_design[2];	/* alternative design */
   unsigned long event_mask;		/* possible events for this gadget */
@@ -374,5 +380,6 @@ void MapGadget(struct GadgetInfo *);
 void UnmapGadget(struct GadgetInfo *);
 
 void HandleGadgets(int, int, int);
+void HandleGadgetsKeyInput(KeySym);
 
 #endif

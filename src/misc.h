@@ -58,6 +58,7 @@ void *checked_calloc(unsigned long);
 char *getKeyNameFromKeySym(KeySym);
 char *getX11KeyNameFromKeySym(KeySym);
 KeySym getKeySymFromX11KeyName(char *);
+char getCharFromKeySym(KeySym);
 char *getJoyNameFromJoySymbol(int);
 int getJoySymbolFromJoyName(char *);
 int getJoystickNrFromDeviceName(char *);

@@ -819,6 +819,25 @@ KeySym getKeySymFromX11KeyName(char *x11name)
   return keysym;
 }
 
+char getCharFromKeySym(KeySym keysym)
+{
+  char *keyname = getKeyNameFromKeySym(keysym);
+  char letter = 0;
+
+  if (strlen(keyname) == 1)
+    letter = keyname[0];
+  else if (strcmp(keyname, "space") == 0)
+    letter = ' ';
+  else if (strcmp(keyname, "less") == 0)
+    letter = '<';
+  else if (strcmp(keyname, "equal") == 0)
+    letter = '=';
+  else if (strcmp(keyname, "greater") == 0)
+    letter = '>';
+
+  return letter;
+}
+
 #define TRANSLATE_JOYSYMBOL_TO_JOYNAME	0
 #define TRANSLATE_JOYNAME_TO_JOYSYMBOL	1
 

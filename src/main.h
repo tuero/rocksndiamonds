@@ -523,7 +523,7 @@ extern int		num_bg_loops;
 #define MINI_MORE_STARTX	0
 #define MINI_MORE_STARTY	160
 #define MICRO_MORE_STARTX	0
-#define MICRO_MORE_STARTY	208
+#define MICRO_MORE_STARTY	240
 #define MORE_PER_LINE		16
 #define MINI_MORE_PER_LINE	16
 #define MICRO_MORE_PER_LINE	16

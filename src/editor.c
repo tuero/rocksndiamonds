@@ -121,7 +121,10 @@
 #define ED_CTRL_ID_ELEMCONT_7		34
 #define ED_CTRL_ID_AMOEBA_CONTENT	35
 
-#define ED_NUM_GADGETS			36
+/* text input identifiers */
+#define ED_CTRL_ID_LEVEL_NAME		36
+
+#define ED_NUM_GADGETS			37
 
 /* values for counter gadgets */
 #define ED_COUNTER_SCORE		0
@@ -145,9 +148,10 @@ static struct
 static void DrawDrawingWindow();
 static void DrawPropertiesWindow();
 static void CopyLevelToUndoBuffer();
-static void HandleDrawingAreas(struct GadgetInfo *);
-static void HandleCounterButtons(struct GadgetInfo *);
 static void HandleControlButtons(struct GadgetInfo *);
+static void HandleCounterButtons(struct GadgetInfo *);
+static void HandleDrawingAreas(struct GadgetInfo *);
+static void HandleTextInputGadgets(struct GadgetInfo *);
 
 static struct GadgetInfo *level_editor_gadget[ED_NUM_GADGETS];
 static boolean level_editor_gadgets_created = FALSE;
@@ -796,6 +800,39 @@ static void CreateDrawingAreas()
   level_editor_gadget[id] = gi;
 }
 
+static void CreateTextInputGadgets()
+{
+  Pixmap gd_pixmap = pix[PIX_DOOR];
+  int gd_x, gd_y;
+  struct GadgetInfo *gi;
+  unsigned long event_mask;
+  int id;
+
+  gd_x = DOOR_GFX_PAGEX4 + ED_WIN_COUNT_XPOS;
+  gd_y = DOOR_GFX_PAGEY1 + ED_WIN_COUNT_YPOS;
+  event_mask = GD_EVENT_TEXT_RETURN | GD_EVENT_TEXT_LEAVING;
+
+  /* text input gadget for the level name */
+  id = ED_CTRL_ID_LEVEL_NAME;
+  gi = CreateGadget(GDI_CUSTOM_ID, id,
+		    GDI_X, SX + ED_COUNT_ELEMCONT_XPOS,
+		    GDI_Y, SY + ED_AREA_ELEMCONT_YPOS + 3 * TILEX,
+		    GDI_TYPE, GD_TYPE_TEXTINPUT,
+		    GDI_TEXT_VALUE, level.name,
+		    GDI_TEXT_SIZE, 30,
+		    GDI_TEXT_BORDER, 3,
+		    GDI_DESIGN_UNPRESSED, gd_pixmap, gd_x, gd_y,
+		    GDI_DESIGN_PRESSED, gd_pixmap, gd_x, gd_y,
+		    GDI_EVENT_MASK, event_mask,
+		    GDI_CALLBACK, HandleTextInputGadgets,
+		    GDI_END);
+
+  if (gi == NULL)
+    Error(ERR_EXIT, "cannot create gadget");
+
+  level_editor_gadget[id] = gi;
+}
+
 static void CreateLevelEditorGadgets()
 {
   if (level_editor_gadgets_created)
@@ -804,6 +841,7 @@ static void CreateLevelEditorGadgets()
   CreateControlButtons();
   CreateCounterButtons();
   CreateDrawingAreas();
+  CreateTextInputGadgets();
 
   level_editor_gadgets_created = TRUE;
 }
@@ -825,6 +863,11 @@ static void MapCounterButtons(int id)
 }
 
 static void MapDrawingArea(int id)
+{
+  MapGadget(level_editor_gadget[id]);
+}
+
+static void MapTextInputGadget(int id)
 {
   MapGadget(level_editor_gadget[id]);
 }
@@ -2086,6 +2129,9 @@ static void DrawPropertiesWindow()
     else
       DrawElementContentAreas();
   }
+
+  /* TEST ONLY: level name text input gadget */
+  MapTextInputGadget(ED_CTRL_ID_LEVEL_NAME);
 }
 
 static void swap_numbers(int *i1, int *i2)
@@ -2478,7 +2524,11 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
   int new_element;
   int button = gi->event.button;
   int sx = gi->event.x, sy = gi->event.y;
+  int min_sx = 0, min_sy = 0;
+  int max_sx = gi->drawing.area_xsize - 1, max_sy = gi->drawing.area_ysize - 1;
   int lx, ly;
+  int min_lx = 0, min_ly = 0;
+  int max_lx = lev_fieldx - 1, max_ly = lev_fieldy - 1;
   int x, y;
 
   /*
@@ -2489,22 +2539,23 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
   button_press_event = (gi->event.type == GD_EVENT_PRESSED);
   button_release_event = (gi->event.type == GD_EVENT_RELEASED);
 
+  /* make sure to stay inside drawing area boundaries */
+  sx = (sx < min_sx ? min_sx : sx > max_sx ? max_sx : sx);
+  sy = (sy < min_sy ? min_sy : sy > max_sy ? max_sy : sy);
+
   if (draw_level)
   {
-    sx = (sx < 0 ? 0 : sx > 2*SCR_FIELDX - 1 ? 2*SCR_FIELDX - 1 : sx);
-    sy = (sy < 0 ? 0 : sy > 2*SCR_FIELDY - 1 ? 2*SCR_FIELDY - 1 : sy);
+    /* get positions inside level field */
     lx = sx + level_xpos;
     ly = sy + level_ypos;
 
-    lx = (lx < 0 ? 0 : lx > lev_fieldx - 1 ? lev_fieldx - 1 : lx);
-    ly = (ly < 0 ? 0 : ly > lev_fieldy - 1 ? lev_fieldy - 1 : ly);
+    /* make sure to stay inside level field boundaries */
+    lx = (lx < min_lx ? min_lx : lx > max_lx ? max_lx : lx);
+    ly = (ly < min_ly ? min_ly : ly > max_ly ? max_ly : ly);
+
+    /* correct drawing area positions accordingly */
     sx = lx - level_xpos;
     sy = ly - level_ypos;
-  }
-  else
-  {
-    sx = (sx < 0 ? 0 : sx > 2 ? 2 : sx);
-    sy = (sy < 0 ? 0 : sy > 2 ? 2 : sy);
   }
 
   if (button_press_event)
@@ -2971,19 +3022,7 @@ void HandleLevelEditorKeyInput(KeySym key)
 {
   if (edit_mode == ED_MODE_DRAWING && drawing_function == ED_CTRL_ID_TEXT)
   {
-    char *keyname = getKeyNameFromKeySym(key);
-    char letter = 0;
-
-    if (strlen(keyname) == 1)
-      letter = keyname[0];
-    else if (strcmp(keyname, "space") == 0)
-      letter = ' ';
-    else if (strcmp(keyname, "less") == 0)
-      letter = '<';
-    else if (strcmp(keyname, "equal") == 0)
-      letter = '=';
-    else if (strcmp(keyname, "greater") == 0)
-      letter = '>';
+    char letter = getCharFromKeySym(key);
 
     /* map lower case letters to upper case */
     if (letter >= 'a' && letter <= 'z')
@@ -3001,5 +3040,21 @@ void HandleLevelEditorKeyInput(KeySym key)
       DrawLevelText(0, 0, 0, TEXT_BACKSPACE);
     else if (key == XK_Return)
       DrawLevelText(0, 0, 0, TEXT_NEWLINE);
+  }
+}
+
+
+static void HandleTextInputGadgets(struct GadgetInfo *gi)
+{
+  int id = gi->custom_id;
+
+  switch (id)
+  {
+    case ED_CTRL_ID_LEVEL_NAME:
+      strcpy(level.name, gi->text_value);
+      break;
+
+    default:
+      break;
   }
 }

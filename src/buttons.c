@@ -1586,7 +1586,35 @@ struct GadgetInfo *CreateGadget(int first_tag, ...)
 	break;
 
       case GDI_TEXT_VALUE:
-	strcpy(new_gadget->text_value, va_arg(ap, char *));
+	{
+	  int max_textsize = MAX_GADGET_TEXTSIZE;
+
+	  if (new_gadget->text_size)
+	    max_textsize = MIN(new_gadget->text_size, MAX_GADGET_TEXTSIZE - 1);
+
+	  strncpy(new_gadget->text_value, va_arg(ap, char *), max_textsize);
+	  new_gadget->text_value[max_textsize] = '\0';
+	}
+	break;
+
+      case GDI_TEXT_SIZE:
+	{
+	  int tag_value = va_arg(ap, int);
+	  int max_textsize = MIN(tag_value, MAX_GADGET_TEXTSIZE - 1);
+
+	  new_gadget->text_size = max_textsize;
+	  new_gadget->text_value[max_textsize] = '\0';
+
+	  if (new_gadget->width == 0 && new_gadget->height == 0)
+	  {
+	    new_gadget->width = (new_gadget->text_size + 1) * FONT2_XSIZE + 6;
+	    new_gadget->height = ED_WIN_COUNT_YSIZE;
+	  }
+	}
+	break;
+
+      case GDI_TEXT_BORDER:
+	new_gadget->text_border = va_arg(ap, int);
 	break;
 
       case GDI_DESIGN_UNPRESSED:
@@ -1735,12 +1763,52 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 			     &gi->alt_design[state] :
 			     &gi->design[state]);
 
-  if (gi->type != GD_TYPE_NORMAL_BUTTON &&
-      gi->type != GD_TYPE_RADIO_BUTTON)
-    return;
+  switch (gi->type)
+  {
+    case GD_TYPE_NORMAL_BUTTON:
+    case GD_TYPE_RADIO_BUTTON:
+      XCopyArea(display, gd->pixmap, drawto, gc,
+		gd->x, gd->y, gi->width, gi->height, gi->x, gi->y);
+      break;
 
-  XCopyArea(display, gd->pixmap, drawto, gc,
-	    gd->x, gd->y, gi->width, gi->height, gi->x, gi->y);
+    case GD_TYPE_TEXTINPUT:
+      {
+	int i;
+
+	/* left part of gadget */
+	XCopyArea(display, gd->pixmap, drawto, gc,
+		  gd->x, gd->y,
+		  gi->text_border, gi->height,
+		  gi->x, gi->y);
+
+	/* middle part of gadget */
+	for (i=0; i<=gi->text_size; i++)
+	  XCopyArea(display, gd->pixmap, drawto, gc,
+		    gd->x + gi->text_border, gd->y,
+		    FONT2_XSIZE, gi->height,
+		    gi->x + gi->text_border + i * FONT2_XSIZE, gi->y);
+
+	/* right part of gadget */
+	XCopyArea(display, gd->pixmap, drawto, gc,
+		  gd->x + ED_WIN_COUNT_XSIZE - gi->text_border, gd->y,
+		  gi->text_border, gi->height,
+		  gi->x + gi->width - gi->text_border, gi->y);
+
+	/* gadget text value */
+	DrawText(gi->x + gi->text_border, gi->y + gi->text_border,
+		 gi->text_value, FS_SMALL, (pressed ? FC_GREEN : FC_YELLOW));
+
+	/* draw cursor, if active */
+	DrawText(gi->x + gi->text_border + strlen(gi->text_value)*FONT2_XSIZE,
+		 gi->y + gi->text_border,
+		 (pressed ? "<" : " "),
+		 FS_SMALL, FC_RED);
+      }
+      break;
+
+    default:
+      return;
+  }
 
   if (direct)
     XCopyArea(display, drawto, window, gc,
@@ -1780,9 +1848,10 @@ void UnmapGadget(struct GadgetInfo *gi)
   gi->mapped = FALSE;
 }
 
+static struct GadgetInfo *last_gi = NULL;
+
 void HandleGadgets(int mx, int my, int button)
 {
-  static struct GadgetInfo *last_gi = NULL;
   static unsigned long pressed_delay = 0;
 
   struct GadgetInfo *new_gi, *gi;
@@ -1793,10 +1862,24 @@ void HandleGadgets(int mx, int my, int button)
   boolean gadget_released;
   boolean gadget_released_off_borders;
 
-  if (gadget_list_first_entry == NULL)
+  if (gadget_list_first_entry == NULL)	/* no gadgets defined */
     return;
 
   new_gi = getGadgetInfoFromMousePosition(mx, my);
+
+  /* if mouse button pressed outside text input gadget, deactivate it */
+  if (last_gi && last_gi->type == GD_TYPE_TEXTINPUT &&
+      button != 0 && new_gi != last_gi && !motion_status)
+  {
+    struct GadgetInfo *gi = last_gi;
+
+    DrawGadget(gi, DG_UNPRESSED, DG_DIRECT);
+
+    if (gi->event_mask & GD_EVENT_TEXT_LEAVING)
+      gi->callback(gi);
+
+    last_gi = NULL;
+  }
 
   gadget_pressed =
     (button != 0 && last_gi == NULL && new_gi != NULL && !motion_status);
@@ -1811,12 +1894,15 @@ void HandleGadgets(int mx, int my, int button)
   gadget_released_off_borders =
     (button == 0 && last_gi != NULL && new_gi != last_gi);
 
+  /* if new gadget pressed, store this gadget  */
   if (gadget_pressed)
     last_gi = new_gi;
 
+  /* 'gi' is actually handled gadget */
   gi = last_gi;
 
-  if (button == 0)
+  /* if mouse button released, no gadget needs to be handled anymore */
+  if (button == 0 && last_gi && last_gi->type != GD_TYPE_TEXTINPUT)
     last_gi = NULL;
 
   if (gi)
@@ -1890,7 +1976,8 @@ void HandleGadgets(int mx, int my, int button)
 
   if (gadget_moving_off_borders)
   {
-    if (gi->state == GD_BUTTON_PRESSED)
+    if (gi->state == GD_BUTTON_PRESSED &&
+	gi->type != GD_TYPE_TEXTINPUT)
       DrawGadget(gi, DG_UNPRESSED, DG_DIRECT);
 
     gi->state = GD_BUTTON_UNPRESSED;
@@ -1904,7 +1991,8 @@ void HandleGadgets(int mx, int my, int button)
 
   if (gadget_released)
   {
-    DrawGadget(gi, DG_UNPRESSED, DG_DIRECT);
+    if (gi->type != GD_TYPE_TEXTINPUT)
+      DrawGadget(gi, DG_UNPRESSED, DG_DIRECT);
 
     gi->state = GD_BUTTON_UNPRESSED;
     gi->event.type = GD_EVENT_RELEASED;
@@ -1920,5 +2008,39 @@ void HandleGadgets(int mx, int my, int button)
     if (gi->event_mask & GD_EVENT_RELEASED &&
 	gi->event_mask & GD_EVENT_OFF_BORDERS)
       gi->callback(gi);
+  }
+}
+
+void HandleGadgetsKeyInput(KeySym key)
+{
+  struct GadgetInfo *gi = last_gi;
+  int text_length;
+  char letter;
+
+  if (gi == NULL || gi->type != GD_TYPE_TEXTINPUT)
+    return;
+
+  text_length = strlen(gi->text_value);
+  letter = getCharFromKeySym(key);
+
+  if (letter && text_length < gi->text_size)
+  {
+    gi->text_value[text_length] = letter;
+    gi->text_value[text_length + 1] = '\0';
+    DrawGadget(gi, DG_PRESSED, DG_DIRECT);
+  }
+  else if ((key == XK_Delete || key == XK_BackSpace) && text_length > 0)
+  {
+    gi->text_value[text_length - 1] = '\0';
+    DrawGadget(gi, DG_PRESSED, DG_DIRECT);
+  }
+  else if (key == XK_Return)
+  {
+    DrawGadget(gi, DG_UNPRESSED, DG_DIRECT);
+
+    if (gi->event_mask & GD_EVENT_TEXT_RETURN)
+      gi->callback(gi);
+
+    last_gi = NULL;
   }
 }

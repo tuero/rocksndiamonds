@@ -461,6 +461,8 @@ void HandleKey(KeySym key, int key_status)
 
 
 
+  HandleGadgetsKeyInput(key);
+
   switch(game_status)
   {
     case TYPENAME:
