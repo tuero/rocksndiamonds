@@ -85,65 +85,6 @@ struct SetupInfo	setup;
 struct GameInfo		game;
 struct GlobalInfo	global;
 
-/* filenames of sound effects */
-char *sound_name[NUM_SOUNDS] =
-{
-  "amoebe.wav",
-  "antigrav.wav",
-  "autsch.wav",
-  "blurb.wav",
-  "bong.wav",
-  "buing.wav",
-  "deng.wav",
-  "fuel.wav",
-  "gong.wav",
-  "halloffame.wav",
-  "holz.wav",
-  "hui.wav",
-  "kabumm.wav",
-  "kink.wav",
-  "klapper.wav",
-  "kling.wav",
-  "klopf.wav",
-  "klumpf.wav",
-  "knack.wav",
-  "knurk.wav",
-  "krach.wav",
-  "lachen.wav",
-  "laser.wav",
-  "miep.wav",
-  "njam.wav",
-  "oeffnen.wav",
-  "pling.wav",
-  "pong.wav",
-  "pusch.wav",
-  "quiek.wav",
-  "quirk.wav",
-  "rhythmloop.wav",
-  "roaaar.wav",
-  "roehr.wav",
-  "rumms.wav",
-  "schlopp.wav",
-  "schlurf.wav",
-  "schrff.wav",
-  "schwirr.wav",
-  "sirr.wav",
-  "slurp.wav",
-  "sproing.wav",
-  "warnton.wav",
-  "whoosh.wav",
-  "zisch.wav",
-  "base.wav",
-  "infotron.wav",
-  "zonkdown.wav",
-  "zonkpush.wav",
-  "bug.wav",
-  "boom.wav",
-  "booom.wav",
-  "exit.wav",
-  "empty.wav",
-  "gate.wav"
-};
 
 /* this is used to reduce memory usage of the different animation types */
 int graphics_action_mapping[] =
@@ -2846,10 +2787,7 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS] =
   }
 };
 
-#if 0
-struct GraphicInfo graphic_info[MAX_GRAPHICS];
-#endif
-struct NewGraphicInfo new_graphic_info[NUM_IMAGE_FILES];
+struct NewGraphicInfo graphic_info[NUM_IMAGE_FILES];
 
 
 /* ========================================================================= */

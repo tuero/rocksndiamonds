@@ -132,7 +132,6 @@ void CreateToolButtons();
 void FreeToolButtons();
 
 int get_next_element(int);
-int el2gfx(int);
 int el2img(int);
 int el_dir2img(int, int);
 int el_dir_act2img(int, int, int);

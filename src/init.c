@@ -114,7 +114,7 @@ void OpenAll(void)
 
   InitEventFilter(FilterMouseMotionEvents);
 
-  InitElementProperties();	/* initializes IS_CHAR() for el2gfx() */
+  InitElementProperties();
   InitElementInfo();
 
   InitGfx();
@@ -124,9 +124,6 @@ void OpenAll(void)
 
   InitImages();			/* needs to know current level directory */
   InitSound();			/* needs to know current level directory */
-#if 0
-  InitGadgets();		/* needs images + number of level series */
-#endif
 
   InitGfxBackground();
 
@@ -215,10 +212,10 @@ static void ReinitializeGraphics()
   InitGraphicInfo();		/* initialize graphic info from config file */
 
   InitFontInfo(bitmap_font_initial,
-	       new_graphic_info[IMG_FONT_BIG].bitmap,
-	       new_graphic_info[IMG_FONT_MEDIUM].bitmap,
-	       new_graphic_info[IMG_FONT_SMALL].bitmap,
-	       new_graphic_info[IMG_FONT_EM].bitmap);
+	       graphic_info[IMG_FONT_BIG].bitmap,
+	       graphic_info[IMG_FONT_MEDIUM].bitmap,
+	       graphic_info[IMG_FONT_SMALL].bitmap,
+	       graphic_info[IMG_FONT_EM].bitmap);
 
   SetMainBackgroundImage(IMG_BACKGROUND_DEFAULT);
   SetDoorBackgroundImage(IMG_BACKGROUND_DOOR);
@@ -488,7 +485,7 @@ void InitGfxBackground()
   fieldbuffer = bitmap_db_field;
   SetDrawtoField(DRAW_BACKBUFFER);
 
-  BlitBitmap(new_graphic_info[IMG_GLOBAL_BORDER].bitmap, backbuffer,
+  BlitBitmap(graphic_info[IMG_GLOBAL_BORDER].bitmap, backbuffer,
 	     0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
   ClearRectangle(backbuffer, REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE);
   ClearRectangle(bitmap_db_door, 0, 0, 3 * DXSIZE, DYSIZE + VYSIZE);
@@ -817,13 +814,13 @@ static void InitGraphicInfo()
   {
     for (i=0; i<NUM_IMAGE_FILES; i++)
     {
-      if (new_graphic_info[i].clip_mask)
-	XFreePixmap(display, new_graphic_info[i].clip_mask);
-      if (new_graphic_info[i].clip_gc)
-	XFreeGC(display, new_graphic_info[i].clip_gc);
+      if (graphic_info[i].clip_mask)
+	XFreePixmap(display, graphic_info[i].clip_mask);
+      if (graphic_info[i].clip_gc)
+	XFreeGC(display, graphic_info[i].clip_gc);
 
-      new_graphic_info[i].clip_mask = None;
-      new_graphic_info[i].clip_gc = None;
+      graphic_info[i].clip_mask = None;
+      graphic_info[i].clip_gc = None;
     }
   }
 #endif
@@ -835,85 +832,85 @@ static void InitGraphicInfo()
     int num_ytiles = (src_bitmap ? src_bitmap->height * 2 / 3 : TILEY) / TILEY;
     int *parameter = image_files[i].parameter;
 
-    new_graphic_info[i].bitmap = src_bitmap;
+    graphic_info[i].bitmap = src_bitmap;
 
-    new_graphic_info[i].src_x = parameter[GFX_ARG_XPOS] * TILEX;
-    new_graphic_info[i].src_y = parameter[GFX_ARG_YPOS] * TILEY;
-    new_graphic_info[i].offset_x = parameter[GFX_ARG_OFFSET];
-    new_graphic_info[i].offset_y = 0;
+    graphic_info[i].src_x = parameter[GFX_ARG_XPOS] * TILEX;
+    graphic_info[i].src_y = parameter[GFX_ARG_YPOS] * TILEY;
+    graphic_info[i].offset_x = parameter[GFX_ARG_OFFSET];
+    graphic_info[i].offset_y = 0;
 
     /* animation frames are ordered vertically instead of horizontally */
     if (parameter[GFX_ARG_VERTICAL])
     {
-      new_graphic_info[i].offset_x = 0;
-      new_graphic_info[i].offset_y = parameter[GFX_ARG_OFFSET];
+      graphic_info[i].offset_x = 0;
+      graphic_info[i].offset_y = parameter[GFX_ARG_OFFSET];
     }
 
     /* optionally, the x and y offset of frames can be specified directly */
     if (parameter[GFX_ARG_XOFFSET] != GFX_ARG_UNDEFINED_VALUE)
-      new_graphic_info[i].offset_x = parameter[GFX_ARG_XOFFSET];
+      graphic_info[i].offset_x = parameter[GFX_ARG_XOFFSET];
     if (parameter[GFX_ARG_YOFFSET] != GFX_ARG_UNDEFINED_VALUE)
-      new_graphic_info[i].offset_y = parameter[GFX_ARG_YOFFSET];
+      graphic_info[i].offset_y = parameter[GFX_ARG_YOFFSET];
 
     /* automatically determine correct number of frames, if not defined */
     if (parameter[GFX_ARG_FRAMES] != GFX_ARG_UNDEFINED_VALUE)
-      new_graphic_info[i].anim_frames = parameter[GFX_ARG_FRAMES];
+      graphic_info[i].anim_frames = parameter[GFX_ARG_FRAMES];
     else if (parameter[GFX_ARG_XPOS] == 0 && !parameter[GFX_ARG_VERTICAL])
-      new_graphic_info[i].anim_frames =	num_xtiles;
+      graphic_info[i].anim_frames =	num_xtiles;
     else if (parameter[GFX_ARG_YPOS] == 0 && parameter[GFX_ARG_VERTICAL])
-      new_graphic_info[i].anim_frames =	num_ytiles;
+      graphic_info[i].anim_frames =	num_ytiles;
     else
-      new_graphic_info[i].anim_frames = 1;
+      graphic_info[i].anim_frames = 1;
 
-    new_graphic_info[i].anim_delay = parameter[GFX_ARG_DELAY];
-    if (new_graphic_info[i].anim_delay == 0)	/* delay must be at least 1 */
-      new_graphic_info[i].anim_delay = 1;
+    graphic_info[i].anim_delay = parameter[GFX_ARG_DELAY];
+    if (graphic_info[i].anim_delay == 0)	/* delay must be at least 1 */
+      graphic_info[i].anim_delay = 1;
 
     /* set mode for animation frame order */
     if (parameter[GFX_ARG_MODE_LOOP])
-      new_graphic_info[i].anim_mode = ANIM_LOOP;
+      graphic_info[i].anim_mode = ANIM_LOOP;
     else if (parameter[GFX_ARG_MODE_LINEAR])
-      new_graphic_info[i].anim_mode = ANIM_LINEAR;
+      graphic_info[i].anim_mode = ANIM_LINEAR;
     else if (parameter[GFX_ARG_MODE_PINGPONG])
-      new_graphic_info[i].anim_mode = ANIM_PINGPONG;
+      graphic_info[i].anim_mode = ANIM_PINGPONG;
     else if (parameter[GFX_ARG_MODE_PINGPONG2])
-      new_graphic_info[i].anim_mode = ANIM_PINGPONG2;
+      graphic_info[i].anim_mode = ANIM_PINGPONG2;
     else if (parameter[GFX_ARG_MODE_RANDOM])
-      new_graphic_info[i].anim_mode = ANIM_RANDOM;
-    else if (new_graphic_info[i].anim_frames > 1)
-      new_graphic_info[i].anim_mode = ANIM_LOOP;
+      graphic_info[i].anim_mode = ANIM_RANDOM;
+    else if (graphic_info[i].anim_frames > 1)
+      graphic_info[i].anim_mode = ANIM_LOOP;
     else
-      new_graphic_info[i].anim_mode = ANIM_NONE;
+      graphic_info[i].anim_mode = ANIM_NONE;
 
     /* set additional flag to play animation frames in reverse order */
     if (parameter[GFX_ARG_MODE_REVERSE])
-      new_graphic_info[i].anim_mode |= ANIM_REVERSE;
+      graphic_info[i].anim_mode |= ANIM_REVERSE;
 
     /* set first frame of animation after determining animation mode */
-    new_graphic_info[i].anim_start_frame = parameter[GFX_ARG_START_FRAME];
+    graphic_info[i].anim_start_frame = parameter[GFX_ARG_START_FRAME];
 
     /* automatically determine correct start frame, if not defined */
     if (parameter[GFX_ARG_START_FRAME] == GFX_ARG_UNDEFINED_VALUE)
-      new_graphic_info[i].anim_start_frame = 0;
-    else if (new_graphic_info[i].anim_mode & ANIM_REVERSE)
-      new_graphic_info[i].anim_start_frame =
-	new_graphic_info[i].anim_frames - parameter[GFX_ARG_START_FRAME] - 1;
+      graphic_info[i].anim_start_frame = 0;
+    else if (graphic_info[i].anim_mode & ANIM_REVERSE)
+      graphic_info[i].anim_start_frame =
+	graphic_info[i].anim_frames - parameter[GFX_ARG_START_FRAME] - 1;
 
     /* animation synchronized with global frame counter, not move position */
-    new_graphic_info[i].anim_global_sync = parameter[GFX_ARG_GLOBAL_SYNC];
+    graphic_info[i].anim_global_sync = parameter[GFX_ARG_GLOBAL_SYNC];
 
     /* set global_sync for all animations with undefined "animation action" */
     if (parameter[GFX_ARG_GLOBAL_SYNC] == GFX_ARG_UNDEFINED_VALUE)
-      new_graphic_info[i].anim_global_sync =
+      graphic_info[i].anim_global_sync =
 	(gfx_action[i] == GFX_ACTION_DEFAULT ? TRUE : FALSE);
 
     /* "linear" animations are never globally synchronized */
     if (parameter[GFX_ARG_MODE_LINEAR])
-      new_graphic_info[i].anim_global_sync = FALSE;
+      graphic_info[i].anim_global_sync = FALSE;
 
     /* now check if no animation frames are outside of the loaded image */
 
-    if (new_graphic_info[i].bitmap == NULL)
+    if (graphic_info[i].bitmap == NULL)
       continue;		/* skip check for optional images that are undefined */
 
     first_frame = 0;
@@ -933,7 +930,7 @@ static void InitGraphicInfo()
 	    src_x, src_y);
     }
 
-    last_frame = new_graphic_info[i].anim_frames - 1;
+    last_frame = graphic_info[i].anim_frames - 1;
     getGraphicSource(i, last_frame, &src_bitmap, &src_x, &src_y);
     if (src_x < 0 || src_y < 0 ||
 	src_x + TILEX > src_bitmap->width ||
@@ -962,17 +959,17 @@ static void InitGraphicInfo()
 				   clip_gc_valuemask, &clip_gc_values);
     }
 
-    new_graphic_info[i].clip_mask =
+    graphic_info[i].clip_mask =
       XCreatePixmap(display, window->drawable, TILEX, TILEY, 1);
 
     src_pixmap = src_bitmap->clip_mask;
-    XCopyArea(display, src_pixmap, new_graphic_info[i].clip_mask,
+    XCopyArea(display, src_pixmap, graphic_info[i].clip_mask,
 	      copy_clipmask_gc, src_x, src_y, TILEX, TILEY, 0, 0);
 
     clip_gc_values.graphics_exposures = False;
-    clip_gc_values.clip_mask = new_graphic_info[i].clip_mask;
+    clip_gc_values.clip_mask = graphic_info[i].clip_mask;
     clip_gc_valuemask = GCGraphicsExposures | GCClipMask;
-    new_graphic_info[i].clip_gc =
+    graphic_info[i].clip_gc =
       XCreateGC(display, window->drawable, clip_gc_valuemask, &clip_gc_values);
 #endif
   }

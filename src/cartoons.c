@@ -297,17 +297,17 @@ void InitToons()
   {
     int graphic = toons[i].graphic;
 
-    toons[i].bitmap = new_graphic_info[graphic].bitmap;
+    toons[i].bitmap = graphic_info[graphic].bitmap;
 
     if (toons[i].src_x == -1 && toons[i].src_y == -1)
     {
-      int anim_frames = new_graphic_info[graphic].anim_frames;
-      int anim_delay = new_graphic_info[graphic].anim_delay;
-      int anim_mode = new_graphic_info[graphic].anim_mode;
-      int start_frame = new_graphic_info[graphic].anim_start_frame;
+      int anim_frames = graphic_info[graphic].anim_frames;
+      int anim_delay = graphic_info[graphic].anim_delay;
+      int anim_mode = graphic_info[graphic].anim_mode;
+      int start_frame = graphic_info[graphic].anim_start_frame;
 
-      toons[i].src_x = new_graphic_info[graphic].src_x;
-      toons[i].src_y = new_graphic_info[graphic].src_y;
+      toons[i].src_x = graphic_info[graphic].src_x;
+      toons[i].src_y = graphic_info[graphic].src_y;
 
       toons[i].width = TILEX;
       toons[i].height = TILEY;

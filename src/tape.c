@@ -168,7 +168,7 @@ void DrawVideoDisplay(unsigned long state, unsigned long value)
   {
     int cx = DOOR_GFX_PAGEX3, cy = DOOR_GFX_PAGEY2;
 
-    BlitBitmap(new_graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
+    BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
 	       cx + VIDEO_REC_LABEL_XPOS,
 	       cy + VIDEO_REC_LABEL_YPOS,
 	       VIDEO_PBEND_LABEL_XSIZE,
@@ -189,7 +189,7 @@ void DrawVideoDisplay(unsigned long state, unsigned long value)
 	cx = DOOR_GFX_PAGEX3;	/* i gerade => STATE_OFF / PRESS_ON */
 
       if (video_pos[pos][part_label][0] && value != VIDEO_DISPLAY_SYMBOL_ONLY)
-	BlitBitmap(new_graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
+	BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
 		   cx + video_pos[pos][part_label][xpos],
 		   cy + video_pos[pos][part_label][ypos],
 		   video_pos[pos][part_label][xsize],
@@ -197,7 +197,7 @@ void DrawVideoDisplay(unsigned long state, unsigned long value)
 		   VX + video_pos[pos][part_label][xpos],
 		   VY + video_pos[pos][part_label][ypos]);
       if (video_pos[pos][part_symbol][0] && value != VIDEO_DISPLAY_LABEL_ONLY)
-	BlitBitmap(new_graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
+	BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
 		   cx + video_pos[pos][part_symbol][xpos],
 		   cy + video_pos[pos][part_symbol][ypos],
 		   video_pos[pos][part_symbol][xsize],
@@ -211,7 +211,7 @@ void DrawVideoDisplay(unsigned long state, unsigned long value)
   {
     int cx = DOOR_GFX_PAGEX4, cy = DOOR_GFX_PAGEY2;
 
-    BlitBitmap(new_graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
+    BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
 	       cx + VIDEO_PLAY_SYMBOL_XPOS,
 	       cy + VIDEO_PLAY_SYMBOL_YPOS,
 	       VIDEO_PLAY_SYMBOL_XSIZE - 2,
@@ -224,7 +224,7 @@ void DrawVideoDisplay(unsigned long state, unsigned long value)
   {
     int cx = DOOR_GFX_PAGEX6, cy = DOOR_GFX_PAGEY1;
 
-    BlitBitmap(new_graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
+    BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
 	       cx + VIDEO_PBEND_LABEL_XPOS,
 	       cy + VIDEO_PBEND_LABEL_YPOS,
 	       VIDEO_PBEND_LABEL_XSIZE,
@@ -268,10 +268,10 @@ void DrawVideoDisplay(unsigned long state, unsigned long value)
 
 void DrawCompleteVideoDisplay()
 {
-  BlitBitmap(new_graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
+  BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
 	     DOOR_GFX_PAGEX3, DOOR_GFX_PAGEY2,
 	     gfx.vxsize, gfx.vysize, gfx.vx, gfx.vy);
-  BlitBitmap(new_graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
+  BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
 	     DOOR_GFX_PAGEX4 + VIDEO_CONTROL_XPOS,
 	     DOOR_GFX_PAGEY2 + VIDEO_CONTROL_YPOS,
 	     VIDEO_CONTROL_XSIZE, VIDEO_CONTROL_YSIZE,
@@ -857,7 +857,7 @@ void CreateTapeButtons()
 
   for (i=0; i<NUM_TAPE_BUTTONS; i++)
   {
-    Bitmap *gd_bitmap = new_graphic_info[IMG_GLOBAL_DOOR].bitmap;
+    Bitmap *gd_bitmap = graphic_info[IMG_GLOBAL_DOOR].bitmap;
     struct GadgetInfo *gi;
     int gd_xoffset, gd_yoffset;
     int gd_x1, gd_x2, gd_y;

@@ -115,7 +115,7 @@ static void HandleGameButtons(struct GadgetInfo *);
 
 static struct GadgetInfo *game_gadget[NUM_GAME_BUTTONS];
 
-#define IS_ANIMATED(g)	(new_graphic_info[g].anim_frames > 1)
+#define IS_ANIMATED(g)	(graphic_info[g].anim_frames > 1)
 
 
 /* ------------------------------------------------------------------------- */
@@ -1081,7 +1081,7 @@ void InitGame()
   FadeToFront();
 
   /* copy default game door content to main double buffer */
-  BlitBitmap(new_graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
+  BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
 	     DOOR_GFX_PAGEX5, DOOR_GFX_PAGEY1, DXSIZE, DYSIZE, DX, DY);
 
   if (level_nr < 100)
@@ -2018,9 +2018,9 @@ static void InitBeltMovement()
       int graphic = el2img(element);
 
       if (game.belt_dir[i] == MV_LEFT)
-	new_graphic_info[graphic].anim_mode &= ~ANIM_REVERSE;
+	graphic_info[graphic].anim_mode &= ~ANIM_REVERSE;
       else
-	new_graphic_info[graphic].anim_mode |=  ANIM_REVERSE;
+	graphic_info[graphic].anim_mode |=  ANIM_REVERSE;
     }
   }
 
@@ -2102,9 +2102,9 @@ static void ToggleBeltSwitch(int x, int y)
     int graphic = el2img(element);
 
     if (belt_dir == MV_LEFT)
-      new_graphic_info[graphic].anim_mode &= ~ANIM_REVERSE;
+      graphic_info[graphic].anim_mode &= ~ANIM_REVERSE;
     else
-      new_graphic_info[graphic].anim_mode |=  ANIM_REVERSE;
+      graphic_info[graphic].anim_mode |=  ANIM_REVERSE;
   }
 
   for (yy=0; yy<lev_fieldy; yy++)
@@ -7249,7 +7249,7 @@ void CreateGameButtons()
 
   for (i=0; i<NUM_GAME_BUTTONS; i++)
   {
-    Bitmap *gd_bitmap = new_graphic_info[IMG_GLOBAL_DOOR].bitmap;
+    Bitmap *gd_bitmap = graphic_info[IMG_GLOBAL_DOOR].bitmap;
     struct GadgetInfo *gi;
     int button_type;
     boolean checked;

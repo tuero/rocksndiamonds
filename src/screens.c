@@ -135,7 +135,7 @@ static void ToggleFullscreenIfNeeded()
     setup.fullscreen = video.fullscreen_enabled;
 
     /* redraw background to newly created backbuffer */
-    BlitBitmap(new_graphic_info[IMG_GLOBAL_BORDER].bitmap, backbuffer,
+    BlitBitmap(graphic_info[IMG_GLOBAL_BORDER].bitmap, backbuffer,
 	       0,0, WIN_XSIZE,WIN_YSIZE, 0,0);
 
     /* restore old door content */
@@ -2899,12 +2899,12 @@ static void CreateScreenScrollbuttons()
 
     gfx_unpressed = scrollbutton_info[i].gfx_unpressed;
     gfx_pressed   = scrollbutton_info[i].gfx_pressed;
-    gd_bitmap_unpressed = new_graphic_info[gfx_unpressed].bitmap;
-    gd_bitmap_pressed   = new_graphic_info[gfx_pressed].bitmap;
-    gd_x1 = new_graphic_info[gfx_unpressed].src_x;
-    gd_y1 = new_graphic_info[gfx_unpressed].src_y;
-    gd_x2 = new_graphic_info[gfx_pressed].src_x;
-    gd_y2 = new_graphic_info[gfx_pressed].src_y;
+    gd_bitmap_unpressed = graphic_info[gfx_unpressed].bitmap;
+    gd_bitmap_pressed   = graphic_info[gfx_pressed].bitmap;
+    gd_x1 = graphic_info[gfx_unpressed].src_x;
+    gd_y1 = graphic_info[gfx_unpressed].src_y;
+    gd_x2 = graphic_info[gfx_pressed].src_x;
+    gd_y2 = graphic_info[gfx_pressed].src_y;
 
     gi = CreateGadget(GDI_CUSTOM_ID, id,
 		      GDI_CUSTOM_TYPE_ID, i,
@@ -2961,12 +2961,12 @@ static void CreateScreenScrollbars()
 #else
     gfx_unpressed = scrollbar_info[i].gfx_unpressed;
     gfx_pressed   = scrollbar_info[i].gfx_pressed;
-    gd_bitmap_unpressed = new_graphic_info[gfx_unpressed].bitmap;
-    gd_bitmap_pressed   = new_graphic_info[gfx_pressed].bitmap;
-    gd_x1 = new_graphic_info[gfx_unpressed].src_x;
-    gd_y1 = new_graphic_info[gfx_unpressed].src_y;
-    gd_x2 = new_graphic_info[gfx_pressed].src_x;
-    gd_y2 = new_graphic_info[gfx_pressed].src_y;
+    gd_bitmap_unpressed = graphic_info[gfx_unpressed].bitmap;
+    gd_bitmap_pressed   = graphic_info[gfx_pressed].bitmap;
+    gd_x1 = graphic_info[gfx_unpressed].src_x;
+    gd_y1 = graphic_info[gfx_unpressed].src_y;
+    gd_x2 = graphic_info[gfx_pressed].src_x;
+    gd_y2 = graphic_info[gfx_pressed].src_y;
 #endif
 
     gi = CreateGadget(GDI_CUSTOM_ID, id,
@@ -3006,14 +3006,14 @@ void CreateScreenGadgets()
 
     /* copy pointers to clip mask and GC */
     scrollbar_bitmap[i]->clip_mask =
-      new_graphic_info[IMG_SCROLLBAR_BLUE + i].clip_mask;
+      graphic_info[IMG_SCROLLBAR_BLUE + i].clip_mask;
     scrollbar_bitmap[i]->stored_clip_gc =
-      new_graphic_info[IMG_SCROLLBAR_BLUE + i].clip_gc;
+      graphic_info[IMG_SCROLLBAR_BLUE + i].clip_gc;
 
-    BlitBitmap(new_graphic_info[IMG_SCROLLBAR_BLUE + i].bitmap,
+    BlitBitmap(graphic_info[IMG_SCROLLBAR_BLUE + i].bitmap,
 	       scrollbar_bitmap[i],
-	       new_graphic_info[IMG_SCROLLBAR_BLUE + i].src_x,
-	       new_graphic_info[IMG_SCROLLBAR_BLUE + i].src_y,
+	       graphic_info[IMG_SCROLLBAR_BLUE + i].src_x,
+	       graphic_info[IMG_SCROLLBAR_BLUE + i].src_y,
 	       TILEX, TILEY, 0, 0);
   }
 #endif
