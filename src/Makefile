@@ -58,6 +58,15 @@ PLATFORM = unix
 TARGET=sdl
 endif
 
+ifeq ($(PLATFORM),os2)
+RANLIB = echo
+PROGNAME = ../$(PROGBASE).exe
+EXTRA_CFLAGS = -Zbin-files -D__ST_MT_ERRNO__ -Zmtd -fomit-frame-pointer
+EXTRA_LDFLAGS = -lsocket
+PLATFORM = unix
+TARGET=x11
+endif
+
 ifeq ($(PLATFORM),unix)
 PROFILING_FLAGS = -pg
 endif
@@ -76,7 +85,8 @@ endif
 
 ifeq ($(TARGET),x11)
 SYS_CFLAGS  = -DTARGET_X11 $(X11_INCL)
-SYS_LDFLAGS = $(X11_LIBS) -lX11
+# SYS_LDFLAGS = $(X11_LIBS) -lX11
+SYS_LDFLAGS = $(XLIB_PATH)/libX11.a
 endif
 
 ifeq ($(TARGET),sdl)
@@ -128,8 +138,8 @@ ifdef BUILD_DIST				# distribution build
 OPTIONS = -O3 -Wall
 endif
 
-CFLAGS = $(OPTIONS) $(SYS_CFLAGS) $(CONFIG)
-LDFLAGS = $(SYS_LDFLAGS) $(EXTRA_LDFLAGS) -lm
+CFLAGS = $(OPTIONS) $(SYS_CFLAGS)  $(EXTRA_CFLAGS) $(CONFIG)
+LDFLAGS =           $(SYS_LDFLAGS) $(EXTRA_LDFLAGS) -lm
 
 
 SRCS =	main.c		\

@@ -347,6 +347,7 @@ inline void X11FillRectangle(Bitmap *, int, int, int, int, Pixel);
 inline void X11DrawSimpleLine(Bitmap *, int, int, int, int, Pixel);
 inline Pixel X11GetPixel(Bitmap *, int, int);
 inline Pixel X11GetPixelFromRGB(unsigned int, unsigned int, unsigned int);
+inline void X11DestroyImage(XImage *);
 
 #if defined(TARGET_X11_NATIVE)
 void X11SetMouseCursor(struct MouseCursorInfo *);

@@ -2084,6 +2084,11 @@ void InitElementPropertiesStatic()
     -1
   };
 
+  static int ep_protected[] =
+  {
+    -1
+  };
+
   static int ep_player[] =
   {
     EL_PLAYER_1,
@@ -2857,6 +2862,7 @@ void InitElementPropertiesStatic()
     { ep_can_explode_1x1,	EP_CAN_EXPLODE_1X1	},
     { ep_pushable,		EP_PUSHABLE		},
     { ep_can_explode_dyna,	EP_CAN_EXPLODE_DYNA	},
+    { ep_protected,		EP_PROTECTED		},
 
     { ep_player,		EP_PLAYER		},
     { ep_can_pass_magic_wall,	EP_CAN_PASS_MAGIC_WALL	},
@@ -3081,6 +3087,10 @@ void InitElementPropertiesEngine(int engine_version)
       SET_PROPERTY(i, EP_DRAGONFIRE_PROOF, (IS_CUSTOM_ELEMENT(i) &&
 					    IS_INDESTRUCTIBLE(i)));
 
+    /* ---------- PROTECTED ------------------------------------------------ */
+    if (IS_ACCESSIBLE_INSIDE(i))
+      SET_PROPERTY(i, EP_PROTECTED, TRUE);
+
     /* ---------- EXPLOSION_PROOF ------------------------------------------ */
     if (i == EL_FLAMES)
       SET_PROPERTY(i, EP_EXPLOSION_PROOF, TRUE);
@@ -3088,8 +3098,7 @@ void InitElementPropertiesEngine(int engine_version)
       SET_PROPERTY(i, EP_EXPLOSION_PROOF, IS_INDESTRUCTIBLE(i));
     else
       SET_PROPERTY(i, EP_EXPLOSION_PROOF, (IS_INDESTRUCTIBLE(i) &&
-					   !IS_WALKABLE_OVER(i) &&
-					   !IS_WALKABLE_UNDER(i)));
+					   IS_PROTECTED(i)));
 
     if (IS_CUSTOM_ELEMENT(i))
     {

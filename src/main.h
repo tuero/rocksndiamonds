@@ -397,10 +397,21 @@
 
 #define PLAYERINFO(x,y)		(&stored_player[StorePlayer[x][y]-EL_PLAYER_1])
 #define SHIELD_ON(p)		((p)->shield_normal_time_left > 0)
+
+#if 1
+#define ENEMY_PROTECTED_FIELD(x,y)	(IS_PROTECTED(Feld[x][y]) ||       \
+					 IS_PROTECTED(Back[x][y]))
+#define EXPLOSION_PROTECTED_FIELD(x,y)  (IS_EXPLOSION_PROOF(Feld[x][y]))
+#define PLAYER_ENEMY_PROTECTED(x,y)     (SHIELD_ON(PLAYERINFO(x, y)) ||	   \
+					 ENEMY_PROTECTED_FIELD(x, y))
+#define PLAYER_EXPLOSION_PROTECTED(x,y) (SHIELD_ON(PLAYERINFO(x, y)) ||	   \
+					 EXPLOSION_PROTECTED_FIELD(x, y))
+#else
 #define PROTECTED_FIELD(x,y)	(IS_ACCESSIBLE_INSIDE(Feld[x][y]) &&	\
 				 IS_INDESTRUCTIBLE(Feld[x][y]))
 #define PLAYER_PROTECTED(x,y)	(SHIELD_ON(PLAYERINFO(x, y)) ||		\
 				 PROTECTED_FIELD(x, y))
+#endif
 
 #define PLAYER_SWITCHING(p,x,y)	((p)->is_switching &&			\
 				 (p)->switch_x == (x) && (p)->switch_y == (y))
@@ -1562,6 +1573,9 @@ struct ElementInfo
   int slippery_type;		/* how/where other elements slip away */
 
   int content[3][3];		/* new elements after explosion */
+
+  int explosion_delay;		/* duration of explosion of this element */
+  int ignition_delay;		/* delay for explosion by other explosion */
 
   struct ElementChangeInfo *change_page; /* actual list of change pages */
   struct ElementChangeInfo *change;	 /* pointer to current change page */

@@ -116,6 +116,11 @@
 				 (x) == MV_RIGHT ? MV_BIT_RIGHT :	\
 				 (x) == MV_UP    ? MV_BIT_UP    : MV_BIT_DOWN)
 
+#define MV_DIR_OPPOSITE(x)	((x) == MV_LEFT  ? MV_RIGHT :		\
+				 (x) == MV_RIGHT ? MV_LEFT  :		\
+				 (x) == MV_UP    ? MV_DOWN  :		\
+				 (x) == MV_DOWN  ? MV_UP    : MV_NO_MOVING)
+
 
 /* values for animation mode (frame order and direction) */
 #define ANIM_NONE		0

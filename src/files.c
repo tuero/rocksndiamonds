@@ -225,6 +225,9 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
 
       element_info[element].slippery_type = SLIPPERY_ANY_RANDOM;
 
+      element_info[element].explosion_delay = 0;
+      element_info[element].ignition_delay = 0;
+
       for (x = 0; x < 3; x++)
 	for (y = 0; y < 3; y++)
 	  element_info[element].content[x][y] = EL_EMPTY_SPACE;

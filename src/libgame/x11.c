@@ -399,7 +399,7 @@ inline Pixel X11GetPixel(Bitmap *bitmap, int x, int y)
 			  AllPlanes, ZPixmap);
   pixel_value = XGetPixel(pixel_image, 0, 0);
 
-  XDestroyImage(pixel_image);
+  X11DestroyImage(pixel_image);
 
   return pixel_value;
 }
@@ -422,6 +422,18 @@ inline Pixel X11GetPixelFromRGB(unsigned int color_r, unsigned int color_g,
   return pixel;
 }
 #endif	/* TARGET_X11_NATIVE */
+
+inline void X11DestroyImage(XImage *ximage)
+{
+  /* this seems to be needed for OS/2, but does not hurt on other platforms */
+  if (ximage->data != NULL)
+  {
+    free(ximage->data);
+    ximage->data = NULL;
+  }
+
+  XDestroyImage(ximage);
+}
 
 
 /* ------------------------------------------------------------------------- */

@@ -50,8 +50,8 @@ CROSS_PATH_WIN32=/usr/local/cross-tools/i386-mingw32msvc
 SRC_DIR = src
 MAKE_CMD = $(MAKE) -C $(SRC_DIR)
 
-# DEFAULT_TARGET = x11
-DEFAULT_TARGET = sdl
+DEFAULT_TARGET = x11
+# DEFAULT_TARGET = sdl
 
 
 # -----------------------------------------------------------------------------
@@ -78,6 +78,9 @@ mac:
 
 msdos:
 	@$(MAKE_CMD) PLATFORM=msdos
+
+os2:
+	@$(MAKE_CMD) PLATFORM=os2
 
 cross-msdos:
 	@PATH=$(CROSS_PATH_MSDOS)/bin:${PATH} $(MAKE_CMD) PLATFORM=cross-msdos

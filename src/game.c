@@ -107,7 +107,7 @@
 					(condition) ||			\
 					(DONT_COLLIDE_WITH(e) &&	\
 					 IS_PLAYER(x, y) &&		\
-					 !PLAYER_PROTECTED(x, y))))
+					 !PLAYER_ENEMY_PROTECTED(x, y))))
 #else
 #define ELEMENT_CAN_ENTER_FIELD_GENERIC(e, x, y, condition)		\
 		(IN_LEV_FIELD(x, y) && (IS_FREE(x, y) ||		\
@@ -216,7 +216,8 @@ static void ScrollScreen(struct PlayerInfo *, int);
 static void InitBeltMovement(void);
 static void CloseAllOpenTimegates(void);
 static void CheckGravityMovement(struct PlayerInfo *);
-static void KillHeroUnlessProtected(int, int);
+static void KillHeroUnlessEnemyProtected(int, int);
+static void KillHeroUnlessExplosionProtected(int, int);
 
 static void TestIfPlayerTouchesCustomElement(int, int);
 static void TestIfElementTouchesCustomElement(int, int);
@@ -2536,7 +2537,7 @@ void Explode(int ex, int ey, int phase, int mode)
       RemoveField(x, y);
 #endif
 
-      if (IS_PLAYER(ex, ey) && !PLAYER_PROTECTED(ex, ey))
+      if (IS_PLAYER(ex, ey) && !PLAYER_EXPLOSION_PROTECTED(ex, ey))
       {
 	switch(StorePlayer[ex][ey])
 	{
@@ -2679,7 +2680,7 @@ void Explode(int ex, int ey, int phase, int mode)
     int element = Store2[x][y];
 
     if (IS_PLAYER(x, y))
-      KillHeroUnlessProtected(x, y);
+      KillHeroUnlessExplosionProtected(x, y);
     else if (CAN_EXPLODE_BY_FIRE(element))
     {
       Feld[x][y] = Store2[x][y];
@@ -2836,7 +2837,7 @@ void Bang(int x, int y)
 #endif
 
 #if 1
-  if (IS_PLAYER(x, y) && !PLAYER_PROTECTED(x, y))
+  if (IS_PLAYER(x, y) && !PLAYER_EXPLOSION_PROTECTED(x, y))
 #else
   if (IS_PLAYER(x, y))
 #endif
@@ -3327,7 +3328,7 @@ void Impact(int x, int y)
   if (impact && element == EL_AMOEBA_DROP)
   {
     if (object_hit && IS_PLAYER(x, y + 1))
-      KillHeroUnlessProtected(x, y + 1);
+      KillHeroUnlessEnemyProtected(x, y + 1);
     else if (object_hit && smashed == EL_PENGUIN)
       Bang(x, y + 1);
     else
@@ -3369,7 +3370,7 @@ void Impact(int x, int y)
     {
       if (CAN_SMASH_PLAYER(element))
       {
-	KillHeroUnlessProtected(x, y + 1);
+	KillHeroUnlessEnemyProtected(x, y + 1);
 	return;
       }
     }
@@ -4710,7 +4711,7 @@ void StartMoving(int x, int y)
 
     if (DONT_COLLIDE_WITH(element) &&
 	IN_LEV_FIELD(newx, newy) && IS_PLAYER(newx, newy) &&
-	!PLAYER_PROTECTED(newx, newy))
+	!PLAYER_ENEMY_PROTECTED(newx, newy))
     {
 #if 1
       TestIfBadThingRunsIntoHero(x, y, MovDir[x][y]);
@@ -5261,15 +5262,7 @@ void ContinueMoving(int x, int y)
 #if 0
     if (IN_LEV_FIELD(nextx, nexty))
     {
-      static int opposite_directions[] =
-      {
-	MV_RIGHT,
-	MV_LEFT,
-	MV_DOWN,
-	MV_UP
-      };
-      int move_dir_bit = MV_DIR_BIT(direction);
-      int opposite_direction = opposite_directions[move_dir_bit];
+      int opposite_direction = MV_DIR_OPPOSITE(direction);
       int hitting_side = direction;
       int touched_side = opposite_direction;
       int touched_element = MovingOrBlocked2Element(nextx, nexty);
@@ -6232,7 +6225,7 @@ static void ChangeElementNowExt(int x, int y, int target_element)
 
   /* check if element under player changes from accessible to unaccessible
      (needed for special case of dropping element which then changes) */
-  if (IS_PLAYER(x, y) && !PLAYER_PROTECTED(x, y) &&
+  if (IS_PLAYER(x, y) && !PLAYER_EXPLOSION_PROTECTED(x, y) &&
       IS_ACCESSIBLE(Feld[x][y]) && !IS_ACCESSIBLE(target_element))
   {
     Bang(x, y);
@@ -8337,15 +8330,7 @@ void TestIfElementHitsCustomElement(int x, int y, int direction)
 
   if (IN_LEV_FIELD(hitx, hity))
   {
-    static int opposite_directions[] =
-    {
-      MV_RIGHT,
-      MV_LEFT,
-      MV_DOWN,
-      MV_UP
-    };
-    int move_dir_bit = MV_DIR_BIT(direction);
-    int opposite_direction = opposite_directions[move_dir_bit];
+    int opposite_direction = MV_DIR_OPPOSITE(direction);
     int hitting_side = direction;
     int touched_side = opposite_direction;
     int touched_element = MovingOrBlocked2Element(hitx, hity);
@@ -8474,7 +8459,7 @@ void TestIfGoodThingHitsBadThing(int good_x, int good_y, int good_move_dir)
 
       if (player->shield_deadly_time_left > 0)
 	Bang(kill_x, kill_y);
-      else if (!PLAYER_PROTECTED(good_x, good_y))
+      else if (!PLAYER_ENEMY_PROTECTED(good_x, good_y))
 	KillHero(player);
     }
     else
@@ -8566,7 +8551,7 @@ void TestIfBadThingHitsGoodThing(int bad_x, int bad_y, int bad_move_dir)
 
       if (player->shield_deadly_time_left > 0)
 	Bang(bad_x, bad_y);
-      else if (!PLAYER_PROTECTED(kill_x, kill_y))
+      else if (!PLAYER_ENEMY_PROTECTED(kill_x, kill_y))
 	KillHero(player);
     }
     else
@@ -8656,9 +8641,15 @@ void KillHero(struct PlayerInfo *player)
   BuryHero(player);
 }
 
-static void KillHeroUnlessProtected(int x, int y)
+static void KillHeroUnlessEnemyProtected(int x, int y)
 {
-  if (!PLAYER_PROTECTED(x, y))
+  if (!PLAYER_ENEMY_PROTECTED(x, y))
+    KillHero(PLAYERINFO(x, y));
+}
+
+static void KillHeroUnlessExplosionProtected(int x, int y)
+{
+  if (!PLAYER_EXPLOSION_PROTECTED(x, y))
     KillHero(PLAYERINFO(x, y));
 }
 

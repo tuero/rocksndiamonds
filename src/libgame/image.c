@@ -560,7 +560,7 @@ XImageInfo *Image_to_Pixmap(Display *display, int screen, Visual *visual,
   XPutImage(ximageinfo->display, ximageinfo->pixmap, gc,
 	    ximage, 0, 0, 0, 0, ximage->width, ximage->height);
 
-  XDestroyImage(ximage);
+  X11DestroyImage(ximage);
 
   return ximageinfo;
 }
@@ -621,8 +621,8 @@ void ZoomPixmap(Display *display, GC gc, Pixmap src_pixmap, Pixmap dst_pixmap,
 	    dst_width, dst_height);
 
   /* free temporary images */
-  XDestroyImage(src_ximage);
-  XDestroyImage(dst_ximage);
+  X11DestroyImage(src_ximage);
+  X11DestroyImage(dst_ximage);
 }
 
 void freeXImage(Image *image, XImageInfo *ximageinfo)
