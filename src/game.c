@@ -1222,47 +1222,60 @@ void InitGame()
   {
     int start_x = 0, start_y = 0;
     int found_rating = 0;
+    int found_element = EL_UNDEFINED;
 
-    for(y=0; y < lev_fieldy; y++)
+    for(y=0; y < lev_fieldy; y++) for(x=0; x < lev_fieldx; x++)
     {
-      for(x=0; x < lev_fieldx; x++)
+      int element = Feld[x][y];
+      int content;
+      int xx, yy;
+      boolean is_player;
+
+      if (!IS_CUSTOM_ELEMENT(element))
+	continue;
+
+      if (CAN_CHANGE(element))
       {
-	int element = Feld[x][y];
+	content = element_info[element].change.target_element;
+	is_player = (ELEM_IS_PLAYER(content) || content == EL_SP_MURPHY);
 
-	if (IS_CUSTOM_ELEMENT(element))
+	if (is_player && (found_rating < 3 || element < found_element))
 	{
-	  int xx, yy;
+	  start_x = x;
+	  start_y = y;
 
-	  for(yy=0; yy < 3; yy++)
-	  {
-	    for(xx=0; xx < 3; xx++)
-	    {
-	      int content;
-	      boolean is_player;
+	  found_rating = 3;
+	  found_element = element;
+	}
+      }
 
-	      content = element_info[element].content[xx][yy];
-	      is_player = (ELEM_IS_PLAYER(content) || content == EL_SP_MURPHY);
+      for(yy=0; yy < 3; yy++) for(xx=0; xx < 3; xx++)
+      {
+	content = element_info[element].content[xx][yy];
+	is_player = (ELEM_IS_PLAYER(content) || content == EL_SP_MURPHY);
 
-	      if (is_player && found_rating < 2)
-	      {
-		start_x = x + xx - 1;
-		start_y = y + yy - 1;
+	if (is_player && (found_rating < 2 || element < found_element))
+	{
+	  start_x = x + xx - 1;
+	  start_y = y + yy - 1;
 
-		found_rating = 2;
-	      }
+	  found_rating = 2;
+	  found_element = element;
+	}
 
-	      content = element_info[element].change.content[xx][yy];
-	      is_player = (ELEM_IS_PLAYER(content) || content == EL_SP_MURPHY);
+	if (!CAN_CHANGE(element))
+	  continue;
 
-	      if (is_player && found_rating < 1)
-	      {
-		start_x = x + xx - 1;
-		start_y = y + yy - 1;
+	content = element_info[element].change.content[xx][yy];
+	is_player = (ELEM_IS_PLAYER(content) || content == EL_SP_MURPHY);
 
-		found_rating = 1;
-	      }
-	    }
-	  }
+	if (is_player && (found_rating < 1 || element < found_element))
+	{
+	  start_x = x + xx - 1;
+	  start_y = y + yy - 1;
+
+	  found_rating = 1;
+	  found_element = element;
 	}
       }
     }

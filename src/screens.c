@@ -1241,8 +1241,11 @@ static void drawChooseTreeList(int first_entry, int num_page_entries,
   int yoffset = (ti->type == TREE_TYPE_LEVEL_DIR ? 0 : yoffset_setup);
   int last_game_status = game_status;	/* save current game status */
 
+#if 1
+  DrawBackground(mSX, mSY, SXSIZE - 32 + menu.scrollbar_xoffset, SYSIZE);
+#else
   DrawBackground(SX, SY, SXSIZE - 32, SYSIZE);
-  redraw_mask |= REDRAW_FIELD;
+#endif
 
   title_string =
     (ti->type == TREE_TYPE_LEVEL_DIR ? "Level Directories" :
@@ -1278,6 +1281,8 @@ static void drawChooseTreeList(int first_entry, int num_page_entries,
   }
 
   game_status = last_game_status;	/* restore current game status */
+
+  redraw_mask |= REDRAW_FIELD;
 }
 
 static void drawChooseTreeInfo(int entry_pos, TreeInfo *ti)

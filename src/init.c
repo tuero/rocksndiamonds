@@ -3286,6 +3286,7 @@ static char *getNewArtworkIdentifier(int type)
   char *setup_artwork_set = SETUP_ARTWORK_SET(setup, type);
   char *leveldir_identifier = leveldir_current->identifier;
 #if 1
+  /* !!! setLevelArtworkDir() should be moved to an earlier stage !!! */
   char *leveldir_artwork_set = setLevelArtworkDir(artwork_first_node);
 #else
   char *leveldir_artwork_set = LEVELDIR_ARTWORK_SET(leveldir_current, type);
