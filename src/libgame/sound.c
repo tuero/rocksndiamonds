@@ -298,6 +298,31 @@ void Mixer_InitChannels()
   mixer_active_channels = 0;
 }
 
+static void Mixer_PlaySound(int channel)
+{
+#if defined(PLATFORM_MSDOS)
+  mixer[channel].voice = allocate_voice((SAMPLE *)mixer[channel].data_ptr);
+
+  if (mixer[channel].voice < 0)
+    return;
+
+  if (IS_LOOP(mixer[channel]))
+    voice_set_playmode(mixer[channel].voice, PLAYMODE_LOOP);
+
+  voice_set_volume(mixer[channel].voice, snd_ctrl.volume);
+  voice_set_pan(mixer[channel].voice, snd_ctrl.stereo);
+  voice_start(mixer[channel].voice);       
+#endif
+}
+
+static void Mixer_StopSound(int channel)
+{
+#if defined(PLATFORM_MSDOS)
+  voice_set_volume(mixer[channel].voice, 0);
+  deallocate_voice(mixer[channel].voice);
+#endif
+}
+
 static void Mixer_FadeSound(int channel)
 {
   mixer[channel].state |= SND_CTRL_FADE;
@@ -311,6 +336,8 @@ static void Mixer_RemoveSound(int channel)
 #if 0
   printf("REMOVING MIXER SOUND %d\n", channel);
 #endif
+
+  Mixer_StopSound(channel);
 
   mixer[channel].active = FALSE;
   mixer_active_channels--;
@@ -377,10 +404,7 @@ static void Mixer_InsertSound(struct SoundControl snd_ctrl)
 	longest_nr = i;
       }
     }
-#if defined(PLATFORM_MSDOS)
-    voice_set_volume(mixer[longest_nr].voice, 0);
-    deallocate_voice(mixer[longest_nr].voice);
-#endif
+
     Mixer_RemoveSound(longest_nr);
   }
 
@@ -434,10 +458,6 @@ static void Mixer_InsertSound(struct SoundControl snd_ctrl)
       }
     }
 
-#if defined(PLATFORM_MSDOS)
-    voice_set_volume(mixer[longest_nr].voice, 0);
-    deallocate_voice(mixer[longest_nr].voice);
-#endif
     Mixer_RemoveSound(longest_nr);
   }
 
@@ -487,16 +507,8 @@ static void Mixer_InsertSound(struct SoundControl snd_ctrl)
       printf("NEW SOUND %d ADDED TO MIXER\n", snd_ctrl.nr);
 #endif
 
-#if defined(PLATFORM_MSDOS)
-      mixer[i].voice = allocate_voice((SAMPLE *)mixer[i].data_ptr);
+      Mixer_PlaySound(i);
 
-      if (snd_ctrl.loop)
-        voice_set_playmode(mixer[i].voice, PLAYMODE_LOOP);
-
-      voice_set_volume(mixer[i].voice, snd_ctrl.volume);
-      voice_set_pan(mixer[i].voice, snd_ctrl.stereo);
-      voice_start(mixer[i].voice);       
-#endif
       break;
     }
   }
