@@ -29,7 +29,7 @@
 #define CHUNK_SIZE_NONE		-1	/* do not write chunk size    */
 #define FILE_VERS_CHUNK_SIZE	8	/* size of file version chunk */
 #define LEVEL_HEADER_SIZE	80	/* size of level file header  */
-#define LEVEL_HEADER_UNUSED	4	/* unused level header bytes  */
+#define LEVEL_HEADER_UNUSED	3	/* unused level header bytes  */
 #define LEVEL_CHUNK_CNT2_SIZE	160	/* size of level CNT2 chunk   */
 #define LEVEL_CHUNK_CNT2_UNUSED	11	/* unused CNT2 chunk bytes    */
 #define LEVEL_CHUNK_CNT3_HEADER	16	/* size of level CNT3 header  */
@@ -159,6 +159,7 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
   level->em_slippery_gems = FALSE;
   level->block_last_field = FALSE;
   level->sp_block_last_field = TRUE;
+  level->instant_relocation = FALSE;
 
   level->can_move_into_acid_bits = ~0;	/* everything can move into acid */
   level->dont_collide_with_bits = ~0;	/* always deadly when colliding  */
@@ -690,6 +691,8 @@ static int LoadLevel_HEAD(FILE *file, int chunk_size, struct LevelInfo *level)
 
   level->use_spring_bug		= (getFile8Bit(file) == 1 ? TRUE : FALSE);
   level->use_step_counter	= (getFile8Bit(file) == 1 ? TRUE : FALSE);
+
+  level->instant_relocation	= (getFile8Bit(file) == 1 ? TRUE : FALSE);
 
   ReadUnusedBytesFromFile(file, LEVEL_HEADER_UNUSED);
 
@@ -2424,6 +2427,8 @@ static void SaveLevel_HEAD(FILE *file, struct LevelInfo *level)
 
   putFile8Bit(file, (level->use_spring_bug ? 1 : 0));
   putFile8Bit(file, (level->use_step_counter ? 1 : 0));
+
+  putFile8Bit(file, (level->instant_relocation ? 1 : 0));
 
   WriteUnusedBytesToFile(file, LEVEL_HEADER_UNUSED);
 }

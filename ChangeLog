@@ -1,3 +1,6 @@
+2004-03-16
+	* added option "no scrolling when relocating" for instant teleporting
+
 2004-03-15
 	* added trigger element and trigger player to use as target elements
 	* added copy and paste editor functions for custom and group elements
@@ -19,7 +22,7 @@
 2004-03-08
 	* fixed totally broken (every 8th frame skipped) step-by-step recording
 	* fixed bug with requester not displayed when quick-loading interrupted
-	* added option "can fall into acid (with gravity)" for player elements
+	* added option "can fall into acid (with gravity)" for players
 	* fixed bug with player not falling when snapping down with gravity
 
 2004-03-07

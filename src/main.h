@@ -1444,7 +1444,9 @@ struct LevelInfo
   boolean block_last_field;	/* player blocks previous field while moving */
   boolean sp_block_last_field;	/* player blocks previous field while moving */
   boolean use_spring_bug;	/* for compatibility with old levels */
+  boolean instant_relocation;	/* no visual delay when relocating player */
 
+  /* ('int' instead of 'boolean' because used as selectbox value in editor) */
   int use_step_counter;		/* count steps instead of seconds for level */
 
   short field[MAX_LEV_FIELDX][MAX_LEV_FIELDY];

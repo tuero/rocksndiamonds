@@ -2613,17 +2613,13 @@ void RelocatePlayer(int x, int y, int element_raw)
   boolean no_delay = (tape.index_search);
   int frame_delay_value = (ffwd_delay ? FfwdFrameDelay : GameFrameDelay);
   int wait_delay_value = (no_delay ? 0 : frame_delay_value);
-#if 1
   int old_jx, old_jy;
-#endif
 
   if (player->GameOver)		/* do not reanimate dead player */
     return;
 
-#if 1
   RemoveField(x, y);		/* temporarily remove newly placed player */
   DrawLevelField(x, y);
-#endif
 
   if (player->present)
   {
@@ -2645,19 +2641,17 @@ void RelocatePlayer(int x, int y, int element_raw)
     player->is_moving = FALSE;
   }
 
-#if 1
   old_jx = player->jx;
   old_jy = player->jy;
-#endif
 
   Feld[x][y] = element;
   InitPlayerField(x, y, element, TRUE);
 
-#if 0
-  if (player == local_player)
-  {
-#if 1
+  if (player != local_player)	/* do not visually relocate other players */
+    return;
 
+  if (level.instant_relocation)
+  {
     scroll_x += (local_player->jx - old_jx);
     scroll_y += (local_player->jy - old_jy);
 
@@ -2669,28 +2663,13 @@ void RelocatePlayer(int x, int y, int element_raw)
     if (scroll_y < SBY_Upper || scroll_y > SBY_Lower)
       scroll_y = (scroll_y < SBY_Upper ? SBY_Upper : SBY_Lower);
 
-#else
-    scroll_x = (local_player->jx < SBX_Left  + MIDPOSX ? SBX_Left :
-		local_player->jx > SBX_Right + MIDPOSX ? SBX_Right :
-		local_player->jx - MIDPOSX);
-
-    scroll_y = (local_player->jy < SBY_Upper + MIDPOSY ? SBY_Upper :
-		local_player->jy > SBY_Lower + MIDPOSY ? SBY_Lower :
-		local_player->jy - MIDPOSY);
-#endif
-
     RedrawPlayfield(TRUE, 0,0,0,0);
-#if 0
-    DrawAllPlayers();
-    BackToFront();
-#endif
   }
-
-#else
-
-  if (player == local_player)
+  else
   {
     int scroll_xx = -999, scroll_yy = -999;
+
+    ScrollScreen(NULL, SCROLL_GO_ON);	/* scroll last frame to full tile */
 
     while (scroll_xx != scroll_x || scroll_yy != scroll_y)
     {
@@ -2707,6 +2686,14 @@ void RelocatePlayer(int x, int y, int element_raw)
 
       dx = (scroll_xx < scroll_x ? +1 : scroll_xx > scroll_x ? -1 : 0);
       dy = (scroll_yy < scroll_y ? +1 : scroll_yy > scroll_y ? -1 : 0);
+
+#if 1
+      if (dx == 0 && dy == 0)		/* no scrolling needed at all */
+	break;
+#else
+      if (scroll_xx == scroll_x && scroll_yy == scroll_y)
+	break;
+#endif
 
       scroll_x -= dx;
       scroll_y -= dy;
@@ -2727,7 +2714,6 @@ void RelocatePlayer(int x, int y, int element_raw)
       Delay(wait_delay_value);
     }
   }
-#endif
 }
 
 void Explode(int ex, int ey, int phase, int mode)
@@ -8792,7 +8778,8 @@ boolean MovePlayer(struct PlayerInfo *player, int dx, int dy)
     player->is_dropping = FALSE;
 
 
-#if 1
+#if 0
+    /* !!! ENABLE THIS FOR OLD VERSIONS !!! */
     {
       static int trigger_sides[4][2] =
       {
@@ -8941,8 +8928,9 @@ void ScrollPlayer(struct PlayerInfo *player, int mode)
 	player->LevelSolved = player->GameOver = TRUE;
     }
 
-#if 0
+#if 1
     /* !!! ENABLE THIS FOR NEW VERSIONS !!! */
+    /* this breaks one level: "machine", level 000 */
     {
       static int trigger_sides[4][2] =
       {
