@@ -1013,6 +1013,7 @@ extern char		*element_info[];
 #define EL_PEARL_BREAKING	521
 #define EL_TRAP_ACTIVE		522
 #define EL_SPRING_MOVING	523
+#define EL_SP_MURPHY_CLONE	524
 
 /* "unreal" (and therefore not drawable) runtime elements */
 #define EL_BLOCKED		600
@@ -1376,6 +1377,8 @@ extern char		*element_info[];
 #define GFX2_SP_ELECTRON	(GFX_START_ROCKSSP + 10 * SP_PER_LINE +  8)
 #define GFX2_SP_TERMINAL	(GFX_START_ROCKSSP + 11 * SP_PER_LINE +  8)
 #define GFX2_SP_TERMINAL_ACTIVE	(GFX_START_ROCKSSP + 12 * SP_PER_LINE +  8)
+
+#define GFX_SP_MURPHY_CLONE	(GFX_START_ROCKSSP +  0 * SP_PER_LINE +  3)
 
 /* graphics from "RocksDC" */
 #define GFX_BELT1_MIDDLE	(GFX_START_ROCKSDC +  0 * DC_PER_LINE +  0)

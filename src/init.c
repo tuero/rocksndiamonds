@@ -1707,7 +1707,9 @@ void InitElementProperties()
     EL_SP_CHIP_UPPER,
     EL_SP_CHIP_LOWER,
     /* additional elements that appeared in newer Supaplex levels */
-    EL_UNSICHTBAR
+    EL_UNSICHTBAR,
+    /* more than one murphy in a level results in an inactive clone */
+    EL_SP_MURPHY_CLONE
   };
   static int ep_sp_element_num = sizeof(ep_sp_element)/sizeof(int);
 

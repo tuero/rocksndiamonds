@@ -2666,6 +2666,7 @@ int el2gfx(int element)
     case EL_BD_WALL:		return GFX_BD_WALL;
     case EL_BD_ROCK:		return GFX_BD_ROCK;
     case EL_DX_SUPABOMB:	return GFX_DX_SUPABOMB;
+    case EL_SP_MURPHY_CLONE:	return GFX_SP_MURPHY_CLONE;
 
     default:
     {

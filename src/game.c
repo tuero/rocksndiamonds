@@ -229,8 +229,17 @@ static void InitField(int x, int y, boolean init_game)
 {
   switch (Feld[x][y])
   {
-    case EL_SPIELFIGUR:
     case EL_SP_MURPHY:
+      if (init_game)
+      {
+	if (stored_player[0].present)
+	{
+	  Feld[x][y] = EL_SP_MURPHY_CLONE;
+	  break;
+	}
+      }
+      /* no break! */
+    case EL_SPIELFIGUR:
       if (init_game)
 	Feld[x][y] = EL_SPIELER1;
       /* no break! */
