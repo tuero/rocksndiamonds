@@ -28,10 +28,10 @@ void TapeStartRecording()
   tape.length = 0;
   tape.counter = 0;
   tape.pos[tape.counter].delay = 0;
-  tape.changed = TRUE;
   tape.recording = TRUE;
   tape.playing = FALSE;
   tape.pausing = FALSE;
+  tape.changed = TRUE;
   tape.date = 10000*(zeit2->tm_year%100) + 100*zeit2->tm_mon + zeit2->tm_mday;
   tape.random_seed = InitRND(NEW_RANDOMIZE);
 
@@ -146,7 +146,7 @@ int TapePlayAction()
 
   if (tape.counter>=tape.length)
   {
-    TapeStopPlaying();
+    TapeStop();
     return(0);
   }
 
@@ -184,7 +184,7 @@ BOOL TapePlayDelay()
 
   if (tape.counter>=tape.length)
   {
-    TapeStopPlaying();
+    TapeStop();
     return(TRUE);
   }
 

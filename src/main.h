@@ -26,8 +26,6 @@
 
 #ifdef   XPM_INCLUDE_FILE
 #include XPM_INCLUDE_FILE
-#else
-#include "YOU HAVE TO SET 'XPM_INCLUDE_FILE' IN THE 'Makefile'!!!"
 #endif
 
 #include <sys/types.h>
@@ -75,31 +73,32 @@ typedef int BOOL;
 
 #define EP_BIT_AMOEBALIVE	(1<<0)
 #define EP_BIT_AMOEBOID		(1<<1)
-#define EP_BIT_BADEWANNOID	(1<<2)
-#define EP_BIT_SCHLUESSEL	(1<<3)
-#define EP_BIT_PFORTE		(1<<4)
-#define EP_BIT_SOLID		(1<<5)
-#define EP_BIT_MASSIV		(1<<6)
-#define EP_BIT_SLIPPERY		(1<<7)
-#define EP_BIT_ENEMY		(1<<8)
-#define EP_BIT_MAUER		(1<<9)
-#define EP_BIT_CAN_FALL		(1<<10)
-#define EP_BIT_CAN_SMASH	(1<<11)
-#define EP_BIT_CAN_CHANGE	(1<<12)
-#define EP_BIT_CAN_MOVE		(1<<13)
-#define EP_BIT_COULD_MOVE	(1<<14)
-#define EP_BIT_DONT_TOUCH	(1<<15)
-#define EP_BIT_DONT_GO_TO	(1<<16)
-#define EP_BIT_MAMPF2		(1<<17)
-#define EP_BIT_CHAR		(1<<18)
-#define EP_BIT_BD_ELEMENT	(1<<19)
-#define EP_BIT_SB_ELEMENT	(1<<20)
-#define EP_BIT_GEM		(1<<21)
-#define EP_BIT_INACTIVE		(1<<22)
+#define EP_BIT_SCHLUESSEL	(1<<2)
+#define EP_BIT_PFORTE		(1<<3)
+#define EP_BIT_SOLID		(1<<4)
+#define EP_BIT_MASSIV		(1<<5)
+#define EP_BIT_SLIPPERY		(1<<6)
+#define EP_BIT_ENEMY		(1<<7)
+#define EP_BIT_MAUER		(1<<8)
+#define EP_BIT_CAN_FALL		(1<<9)
+#define EP_BIT_CAN_SMASH	(1<<10)
+#define EP_BIT_CAN_CHANGE	(1<<11)
+#define EP_BIT_CAN_MOVE		(1<<12)
+#define EP_BIT_COULD_MOVE	(1<<13)
+#define EP_BIT_DONT_TOUCH	(1<<14)
+#define EP_BIT_DONT_GO_TO	(1<<15)
+#define EP_BIT_MAMPF2		(1<<16)
+#define EP_BIT_CHAR		(1<<17)
+#define EP_BIT_BD_ELEMENT	(1<<18)
+#define EP_BIT_SB_ELEMENT	(1<<19)
+#define EP_BIT_GEM		(1<<20)
+#define EP_BIT_INACTIVE		(1<<21)
+#define EP_BIT_EXPLOSIVE	(1<<22)
+#define EP_BIT_MAMPF3		(1<<23)
+#define EP_BIT_PUSHABLE		(1<<24)
 
 #define IS_AMOEBALIVE(e)	(Elementeigenschaften[e] & EP_BIT_AMOEBALIVE)
 #define IS_AMOEBOID(e)		(Elementeigenschaften[e] & EP_BIT_AMOEBOID)
-#define IS_BADEWANNOID(e)	(Elementeigenschaften[e] & EP_BIT_BADEWANNOID)
 #define IS_SCHLUESSEL(e)	(Elementeigenschaften[e] & EP_BIT_SCHLUESSEL)
 #define IS_PFORTE(e)		(Elementeigenschaften[e] & EP_BIT_PFORTE)
 #define IS_SOLID(e)		(Elementeigenschaften[e] & EP_BIT_SOLID)
@@ -120,6 +119,9 @@ typedef int BOOL;
 #define IS_SB_ELEMENT(e)	(Elementeigenschaften[e] & EP_BIT_SB_ELEMENT)
 #define IS_GEM(e)		(Elementeigenschaften[e] & EP_BIT_GEM)
 #define IS_INACTIVE(e)		(Elementeigenschaften[e] & EP_BIT_INACTIVE)
+#define IS_EXPLOSIVE(e)		(Elementeigenschaften[e] & EP_BIT_EXPLOSIVE)
+#define IS_MAMPF3(e)		(Elementeigenschaften[e] & EP_BIT_MAMPF3)
+#define IS_PUSHABLE(e)		(Elementeigenschaften[e] & EP_BIT_PUSHABLE)
 
 #define EL_CHANGED(e)		((e)==EL_FELSBROCKEN    ? EL_EDELSTEIN :  \
 				 (e)==EL_EDELSTEIN      ? EL_DIAMANT :	  \
@@ -138,15 +140,16 @@ typedef int BOOL;
 /* Pixmaps with Xpm or X11 Bitmap files */
 #define PIX_BACK		0
 #define PIX_DOOR		1
-#define PIX_TOONS		2
-#define	PIX_BIGFONT		3
-#define PIX_SMALLFONT		4
+#define PIX_HEROES		2
+#define PIX_TOONS		3
+#define	PIX_BIGFONT		4
+#define PIX_SMALLFONT		5
 /* Pixmaps without them */
-#define PIX_DB_BACK		5
-#define PIX_DB_DOOR		6
+#define PIX_DB_BACK		6
+#define PIX_DB_DOOR		7
 
-#define NUM_PICTURES		5
-#define NUM_PIXMAPS		7
+#define NUM_PICTURES		6
+#define NUM_PIXMAPS		8
 
 /* boundaries of arrays etc. */
 #define MAX_NAMELEN		(10+1)
@@ -164,12 +167,6 @@ typedef int BOOL;
 #define MAX_FILENAME		256
 #define MAX_NUM_AMOEBA		100
 #define MAX_ELEMENTS		512
-
-struct PictureFile
-{
-  char *picture_filename;
-  char *picturemask_filename;
-};
 
 struct HiScore
 {
@@ -220,9 +217,9 @@ struct RecordingInfo
   unsigned long length_seconds;
   unsigned int delay_played;
   BOOL pause_before_death;
-  BOOL changed;
   BOOL recording, playing, pausing;
   BOOL fast_forward;
+  BOOL changed;
   struct
   {
     unsigned char joystickdata;
@@ -243,7 +240,11 @@ extern GC		gc, clip_gc[];
 extern XImage 	       *image[];
 extern Pixmap		clipmask[];
 extern Pixmap		pix[];
+
+#ifdef XPM_INCLUDE_FILE
 extern XpmAttributes 	xpm_att[];
+#endif
+
 extern Drawable    	drawto, drawto_field, backbuffer;
 extern Colormap		cmap;
 
@@ -294,9 +295,12 @@ extern long		Elementeigenschaften[MAX_ELEMENTS];
 extern int		level_nr, leveldir_nr, num_leveldirs;
 extern int		lev_fieldx,lev_fieldy, scroll_x,scroll_y;
 
-extern int		LevelSolved,GameOver, JX,JY, ZX,ZY;
+extern int		JX,JY, ZX,ZY, ExitX,ExitY;
+extern int		PlayerMovDir, PlayerFrame, PlayerPushing;
+extern int		PlayerGone,LevelSolved,GameOver;
 extern int		FrameCounter,TimeFrames,TimeLeft,Score;
-extern int		Gems,SokobanFields,Lights,Dynamite,Key[4],MampferNr;
+extern int		Gems,SokobanFields,Lights,Friends;
+extern int		Dynamite,Key[4],MampferNr;
 extern int		DynaBombCount, DynaBombSize, DynaBombsLeft, DynaBombXL;
 extern int		SiebAktiv;
 
@@ -305,8 +309,10 @@ extern struct LevelInfo		level;
 extern struct PlayerInfo	player;
 extern struct HiScore		highscore[];
 extern struct RecordingInfo	tape;
+extern struct SoundInfo		Sound[];
 extern struct JoystickInfo	joystick[];
 
+extern char		*sound_name[];
 extern int		background_loop[];
 extern int		num_bg_loops;
 
@@ -361,6 +367,7 @@ extern char		*progname;
 #define GFX_PER_LINE		16
 #define MINI_GFX_PER_LINE	32
 #define MICRO_GFX_PER_LINE	128
+#define HEROES_PER_LINE		16
 #define FONT_CHARS_PER_LINE	16
 #define FONT_LINES_PER_FONT	4
 
@@ -381,7 +388,7 @@ extern char		*progname;
 #define EL_KAEFER		9
 #define EL_FLIEGER		10
 #define EL_MAMPFER		11
-#define EL_ZOMBIE		12
+#define EL_ROBOT		12
 #define EL_BETON		13
 #define EL_DIAMANT		14
 #define EL_AMOEBE_TOT		15
@@ -487,6 +494,17 @@ extern char		*progname;
 #define EL_AUSGANG_AUF		107
 #define EL_SIEB2_TOT		108
 #define EL_AMOEBA2DIAM		109
+#define EL_MAULWURF		110
+#define EL_PINGUIN		111
+#define EL_SONDE		112
+#define EL_PFEIL_L		113
+#define EL_PFEIL_R		114
+#define EL_PFEIL_O		115
+#define EL_PFEIL_U		116
+#define EL_SCHWEIN		117
+#define EL_DRACHE		118
+
+#define EL_UNUSED_119		119
 
 #define EL_CHAR_START		120
 #define EL_CHAR_ASCII0		(EL_CHAR_START-32)
@@ -519,6 +537,10 @@ extern char		*progname;
 #define EL_CHAR_COPY		(EL_CHAR_ASCII0+94)
 #define EL_CHAR_END		(EL_CHAR_START+79)
 
+#define EL_UNUSED_200		200
+/* ... */
+#define EL_UNUSED_255		255
+
 /* "unreal" runtime elements */
 #define EL_BLOCKED		300
 #define EL_EXPLODING		301
@@ -527,8 +549,22 @@ extern char		*progname;
 #define EL_BLURB_RIGHT		304
 #define EL_AMOEBING		305
 #define EL_MAUERND		306
+#define EL_BURNING		307
 
-/* names for the graphic objects */
+/* game graphics:
+**	  0 - 255: graphics from "RocksScreen"
+**	256 - 511: graphics from "RocksFont"
+**	512 - 767: graphics from "RocksHeroes"
+*/
+
+#define GFX_START_ROCKSSCREEN	0
+#define GFX_END_ROCKSSCREEN	255
+#define GFX_START_ROCKSFONT	256
+#define GFX_END_ROCKSFONT	511
+#define GFX_START_ROCKSHEROES	512
+#define GFX_END_ROCKSHEROES	767
+
+/* graphics from "RocksScreen" */
 /* Zeile 0 (0) */
 #define GFX_LEERRAUM		(-1)
 #define	GFX_ERDREICH		0
@@ -560,7 +596,7 @@ extern char		*progname;
 #define GFX_BADEWANNE3		32
 #define GFX_BADEWANNE4		33
 #define GFX_BADEWANNE5		34
-#define	GFX_SPIELFIGUR		35
+#define	GFX_SMILEY		35
 #define GFX_PFORTE1		36
 #define GFX_PFORTE2		37
 #define GFX_PFORTE3		38
@@ -586,7 +622,7 @@ extern char		*progname;
 #define GFX_KAEFER_U		75
 /* Zeile 5 (80) */
 #define GFX_MAMPFER		80
-#define GFX_ZOMBIE		84
+#define GFX_ROBOT		84
 #define GFX_PACMAN		88
 #define GFX_PACMAN_R		88
 #define GFX_PACMAN_O		89
@@ -608,6 +644,10 @@ extern char		*progname;
 #define GFX_BIRNE_EIN		113
 #define GFX_ZEIT_VOLL		114
 #define GFX_ZEIT_LEER		115
+#define GFX_SPIELER1		116
+#define GFX_SPIELER2		117
+#define GFX_SPIELER3		118
+#define GFX_SPIELER4		119
 #define GFX_AMOEBE_VOLL		120
 #define GFX_AMOEBE_BD		GFX_AMOEBE_VOLL
 #define GFX_SOKOBAN_OBJEKT	121
@@ -630,11 +670,14 @@ extern char		*progname;
 #define GFX_KUGEL_GELB		142
 #define GFX_KUGEL_GRAU		143
 /* Zeile 9 (144) */
-#define GFX_BLURB_LEFT		144
-#define GFX_BLURB_RIGHT		148
+#define GFX_PINGUIN		144
+#define GFX_MAULWURF		145
+#define GFX_SCHWEIN		146
+#define GFX_DRACHE		147
 #define GFX_EDELSTEIN_ROT	152
 #define GFX_EDELSTEIN_LILA	154
 #define GFX_DYNABOMB_XL		156
+#define GFX_SONDE		159
 /* Zeile 10 (160) */
 #define GFX_EDELSTEIN_BD	163
 #define GFX_MAUER_R1		165
@@ -669,15 +712,44 @@ extern char		*progname;
 #define GFX_FIREFLY_L		206
 #define GFX_FIREFLY_U		207
 
-#define	GFX_SCHLUESSEL		GFX_SCHLUESSEL1
+#define GFX_SCHLUESSEL		GFX_SCHLUESSEL1
+#define GFX_SPIELFIGUR		GFX_SPIELER1
 
-#define GFX_SPIELER1		116
-#define GFX_SPIELER2		117
-#define GFX_SPIELER3		118
-#define GFX_SPIELER4		119
 
-/* nicht in "RocksScreen" sondern woanders :) */
-#define GFX_CHAR_START		256
+/* graphics from "RocksHeroes" */
+
+#define GFX_SPIELER_DOWN	(GFX_START_ROCKSHEROES + 0*HEROES_PER_LINE + 0)
+#define GFX_SPIELER_UP		(GFX_START_ROCKSHEROES + 0*HEROES_PER_LINE + 4)
+#define GFX_SPIELER_LEFT	(GFX_START_ROCKSHEROES + 1*HEROES_PER_LINE + 0)
+#define GFX_SPIELER_RIGHT	(GFX_START_ROCKSHEROES + 1*HEROES_PER_LINE + 4)
+#define GFX_SPIELER_PUSH_RIGHT	(GFX_START_ROCKSHEROES + 2*HEROES_PER_LINE + 0)
+#define GFX_SPIELER_PUSH_LEFT	(GFX_START_ROCKSHEROES + 2*HEROES_PER_LINE + 4)
+#define GFX_SONDE_START		(GFX_START_ROCKSHEROES + 7*HEROES_PER_LINE + 0)
+#define GFX_SCHWEIN_DOWN	(GFX_START_ROCKSHEROES + 0*HEROES_PER_LINE + 8)
+#define GFX_SCHWEIN_UP		(GFX_START_ROCKSHEROES + 0*HEROES_PER_LINE +12)
+#define GFX_SCHWEIN_LEFT	(GFX_START_ROCKSHEROES + 1*HEROES_PER_LINE + 8)
+#define GFX_SCHWEIN_RIGHT	(GFX_START_ROCKSHEROES + 1*HEROES_PER_LINE +12)
+#define GFX_DRACHE_DOWN		(GFX_START_ROCKSHEROES + 2*HEROES_PER_LINE + 8)
+#define GFX_DRACHE_UP		(GFX_START_ROCKSHEROES + 2*HEROES_PER_LINE +12)
+#define GFX_DRACHE_LEFT		(GFX_START_ROCKSHEROES + 3*HEROES_PER_LINE + 8)
+#define GFX_DRACHE_RIGHT	(GFX_START_ROCKSHEROES + 3*HEROES_PER_LINE +12)
+#define GFX_MAULWURF_DOWN	(GFX_START_ROCKSHEROES + 4*HEROES_PER_LINE + 8)
+#define GFX_MAULWURF_UP		(GFX_START_ROCKSHEROES + 4*HEROES_PER_LINE +12)
+#define GFX_MAULWURF_LEFT	(GFX_START_ROCKSHEROES + 5*HEROES_PER_LINE + 8)
+#define GFX_MAULWURF_RIGHT	(GFX_START_ROCKSHEROES + 5*HEROES_PER_LINE +12)
+#define GFX_PINGUIN_DOWN	(GFX_START_ROCKSHEROES + 7*HEROES_PER_LINE + 8)
+#define GFX_PINGUIN_UP		(GFX_START_ROCKSHEROES + 7*HEROES_PER_LINE +12)
+#define GFX_PINGUIN_LEFT	(GFX_START_ROCKSHEROES + 8*HEROES_PER_LINE + 8)
+#define GFX_PINGUIN_RIGHT	(GFX_START_ROCKSHEROES + 8*HEROES_PER_LINE +12)
+#define GFX_BLURB_LEFT		(GFX_START_ROCKSHEROES + 9*HEROES_PER_LINE + 8)
+#define GFX_BLURB_RIGHT		(GFX_START_ROCKSHEROES + 9*HEROES_PER_LINE +12)
+#define GFX_FLAMMEN_LEFT	(GFX_START_ROCKSHEROES + 8*HEROES_PER_LINE + 0)
+#define GFX_FLAMMEN_RIGHT	(GFX_START_ROCKSHEROES + 9*HEROES_PER_LINE + 0)
+#define GFX_FLAMMEN_UP		(GFX_START_ROCKSHEROES +10*HEROES_PER_LINE + 0)
+#define GFX_FLAMMEN_DOWN	(GFX_START_ROCKSHEROES +11*HEROES_PER_LINE + 0)
+
+/* graphics from "RocksFont" */
+#define GFX_CHAR_START		(GFX_START_ROCKSFONT)
 #define GFX_CHAR_ASCII0		(GFX_CHAR_START-32)
 #define GFX_CHAR_AUSRUF		(GFX_CHAR_ASCII0+33)
 #define GFX_CHAR_ZOLL		(GFX_CHAR_ASCII0+34)
@@ -714,7 +786,7 @@ extern char		*progname;
 #define SC_KAEFER		2
 #define SC_FLIEGER		3
 #define SC_MAMPFER		4
-#define SC_ZOMBIE		5
+#define SC_ROBOT		5
 #define SC_PACMAN		6
 #define SC_KOKOSNUSS		7
 #define SC_DYNAMIT		8
@@ -783,10 +855,7 @@ extern char		*progname;
 				 (s)==SND_NETWORK || (s)==SND_CZARDASZ || \
 				 (s)==SND_TYGER || (s)==SND_VOYAGER || \
 				 (s)==SND_TWILIGHT)
-extern char *sound_name[NUM_SOUNDS];
 
-/* this structure contains the sound data for the sound server */
-extern struct SoundInfo Sound[NUM_SOUNDS];
 
 /* directions for moving */
 #define MV_NO_MOVING		0
@@ -822,44 +891,6 @@ extern struct SoundInfo Sound[NUM_SOUNDS];
 #define EMU_BOULDERDASH		1
 #define EMU_SOKOBAN		2
 
-/* values for the joystick */
-#define JOYSTICK_OFF		0
-#define	JOYSTICK_AVAILABLE	1
-#ifdef __FreeBSD__
-#include <machine/joystick.h>
-#define DEV_JOYSTICK_0		"/dev/joy0"
-#define DEV_JOYSTICK_1		"/dev/joy1"
-#else
-#define DEV_JOYSTICK_0		"/dev/js0"
-#define DEV_JOYSTICK_1		"/dev/js1"
-#endif
-
-/* get these values from the program 'js' from the joystick package, */
-/* set JOYSTICK_PERCENT to a threshold appropriate for your joystick */
-#define JOYSTICK_XLEFT		30
-#define JOYSTICK_XRIGHT		1250
-#define JOYSTICK_XMIDDLE	530
-#define JOYSTICK_YUPPER		40
-#define JOYSTICK_YLOWER		1440
-#define JOYSTICK_YMIDDLE	680
-#define JOYSTICK_PERCENT	25
-#define JOY_LEFT		MV_LEFT
-#define JOY_RIGHT		MV_RIGHT
-#define JOY_UP			MV_UP
-#define JOY_DOWN	       	MV_DOWN
-#define JOY_BUTTON_1		16
-#define JOY_BUTTON_2		32
-#define JOY_BUTTON		(JOY_BUTTON_1 | JOY_BUTTON_2)
-#define JOY_BUTTON_NOT_PRESSED	0
-#define JOY_BUTTON_PRESSED	1
-#define JOY_BUTTON_NEW_PRESSED	2
-#define JOY_BUTTON_NEW_RELEASED	3
-
-#ifdef NO_JOYSTICK
-#define JOYSTICK_STATUS		JOYSTICK_OFF
-#else
-#define JOYSTICK_STATUS		JOYSTICK_AVAILABLE
-#endif
 
 #ifndef GAME_DIR
 #define GAME_DIR		"."
@@ -932,6 +963,7 @@ extern struct SoundInfo Sound[NUM_SOUNDS];
 #define MB_PRESSED		TRUE
 #define MB_MENU_CHOICE		FALSE
 #define MB_MENU_MARK		TRUE
+#define MB_MENU_INITIALIZE	(-1)
 #define MB_LEFT			1
 #define MB_MIDDLE		2
 #define MB_RIGHT		3
@@ -940,10 +972,6 @@ extern struct SoundInfo Sound[NUM_SOUNDS];
 #define KEY_NOT_PRESSED		FALSE
 #define KEY_RELEASED		FALSE
 #define KEY_PRESSED		TRUE
-
-/* values for focus_status */
-#define FOCUS_OUT		FALSE
-#define FOCUS_IN		TRUE
 
 /* values for redraw_mask */
 #define REDRAW_ALL		(1L<<0)
@@ -1002,5 +1030,9 @@ extern struct SoundInfo Sound[NUM_SOUNDS];
 #define DOOR_GFX_PAGEX6		(5*DOOR_GFX_PAGESIZE)
 #define DOOR_GFX_PAGEY1		0
 #define DOOR_GFX_PAGEY2		DYSIZE
+
+/* für DrawGraphicAnimation (tools.c) und AnimateToon (cartoons.c) */
+#define ANIM_NORMAL	0
+#define ANIM_OSCILLATE	1
 
 #endif

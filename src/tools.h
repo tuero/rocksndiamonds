@@ -19,10 +19,6 @@
 
 #include <sys/time.h>
 
-/* für DrawGraphicAnimation */
-#define ANIM_NORMAL	0
-#define ANIM_OSCILLATE	1
-
 /* für DrawElementShifted */
 #define CUT_NO_CUTTING	0
 #define CUT_ABOVE	1
@@ -57,6 +53,7 @@ void FadeToFront();
 void ClearWindow();
 void DrawText(int, int, char *, int, int);
 void DrawTextExt(Drawable, GC, int, int, char *, int, int);
+void DrawPlayerField(void);
 void DrawGraphicAnimation(int, int, int, int, int, int);
 void DrawGraphic(int, int, int);
 void DrawGraphicExt(Drawable, GC, int, int, int);
@@ -85,10 +82,6 @@ unsigned int CloseDoor(unsigned int);
 unsigned int GetDoorState(void);
 unsigned int MoveDoor(unsigned int);
 int ReadPixel(Drawable, int, int);
-void CheckJoystickData(void);
-int JoystickPosition(int, int, int);
-int Joystick(void);
-int JoystickButton(void);
 int el2gfx(int);
 
 #endif

@@ -16,6 +16,7 @@
 #include "tools.h"
 #include "misc.h"
 #include "tape.h"
+#include "joystick.h"
 
 BOOL CreateNewScoreFile()
 {

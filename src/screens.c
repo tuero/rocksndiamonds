@@ -22,6 +22,8 @@
 #include "files.h"
 #include "buttons.h"
 #include "tape.h"
+#include "joystick.h"
+#include "cartoons.h"
 
 void DrawHeadline()
 {
@@ -71,7 +73,7 @@ void DrawMainMenu()
 
   FadeToFront();
   InitAnimation();
-  HandleMainMenu(0,0,0,0,MB_MENU_MARK);
+  HandleMainMenu(0,0,0,0,MB_MENU_INITIALIZE);
 
   TapeStop();
   if (TAPE_IS_EMPTY(tape))
@@ -80,6 +82,7 @@ void DrawMainMenu()
 
   OpenDoor(DOOR_CLOSE_1 | DOOR_OPEN_2);
 
+  ClearEventQueue();
   XAutoRepeatOn(display);
 }
 
@@ -89,11 +92,14 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
   static int redraw = TRUE;
   int x = (mx+32-SX)/32, y = (my+32-SY)/32;
 
-  if (redraw || (!mx && !my && !dx && !dy))
+  if (redraw || button == MB_MENU_INITIALIZE)
   {
     DrawGraphic(0,choice-1,GFX_KUGEL_ROT);
     redraw = FALSE;
   }
+
+  if (button == MB_MENU_INITIALIZE)
+    return;
 
   if (dx || dy)
   {
@@ -223,7 +229,8 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 	  game_status = EXITGAME;
       }
 
-      redraw = TRUE;
+      if (!button)
+	redraw = TRUE;
     }
   }
   BackToFront();
@@ -244,7 +251,12 @@ static int helpscreen_frame[MAX_HELPSCREEN_ELS];
 static int helpscreen_delay[MAX_HELPSCREEN_ELS];
 static int helpscreen_action[] =
 {
-  GFX_SPIELFIGUR,1,100,						HA_NEXT,
+  GFX_SPIELER_DOWN,4,2,
+  GFX_SPIELER_UP,4,2,
+  GFX_SPIELER_LEFT,4,2,
+  GFX_SPIELER_RIGHT,4,2,
+  GFX_SPIELER_PUSH_LEFT,4,2,
+  GFX_SPIELER_PUSH_RIGHT,4,2,					HA_NEXT,
   GFX_ERDREICH,1,100,						HA_NEXT,
   GFX_LEERRAUM,1,100,						HA_NEXT,
   GFX_MORAST_LEER,1,100,					HA_NEXT,
@@ -254,7 +266,7 @@ static int helpscreen_action[] =
   GFX_MAUER_L1,3,4, GFX_MAUERWERK,1,20, GFX_LEERRAUM,1,10,	HA_NEXT,
   GFX_UNSICHTBAR,1,100,						HA_NEXT,
   GFX_FELSBODEN,1,100,						HA_NEXT,
-  GFX_CHAR_A,30,3, GFX_CHAR_AUSRUF,32,3,			HA_NEXT,
+  GFX_CHAR_A,30,4, GFX_CHAR_AUSRUF,32,4,			HA_NEXT,
   GFX_EDELSTEIN,2,5,						HA_NEXT,
   GFX_DIAMANT,2,5,						HA_NEXT,
   GFX_EDELSTEIN_BD,2,5,						HA_NEXT,
@@ -272,9 +284,9 @@ static int helpscreen_action[] =
   GFX_ERZ_EDEL_LILA,1,50, GFX_EXPLOSION,8,1,
   GFX_EDELSTEIN_LILA,1,10,					HA_NEXT,
   GFX_GEBLUBBER,4,4,						HA_NEXT,
-  GFX_SCHLUESSEL1,4,33,						HA_NEXT,
-  GFX_PFORTE1,4,33,						HA_NEXT,
-  GFX_PFORTE1X,4,33,						HA_NEXT,
+  GFX_SCHLUESSEL1,4,25,						HA_NEXT,
+  GFX_PFORTE1,4,25,						HA_NEXT,
+  GFX_PFORTE1X,4,25,						HA_NEXT,
   GFX_DYNAMIT_AUS,1,100,					HA_NEXT,
   GFX_DYNAMIT,7,6, GFX_EXPLOSION,8,1, GFX_LEERRAUM,1,10,	HA_NEXT,
   GFX_DYNABOMB+0,4,3, GFX_DYNABOMB+3,1,3, GFX_DYNABOMB+2,1,3,
@@ -290,36 +302,53 @@ static int helpscreen_action[] =
   GFX_KAEFER+5,1,1, GFX_KAEFER+1,1,1, GFX_KAEFER+5,1,1,
   GFX_KAEFER+6,1,1, GFX_KAEFER+2,1,1, GFX_KAEFER+6,1,1,
   GFX_KAEFER+7,1,1, GFX_KAEFER+3,1,1, GFX_KAEFER+7,1,1,		HA_NEXT,
-  GFX_BUTTERFLY,1,1, GFX_BUTTERFLY+1,1,1,			HA_NEXT,
-  GFX_FIREFLY,1,1, GFX_FIREFLY+1,1,1,				HA_NEXT,
+  GFX_BUTTERFLY,2,2,						HA_NEXT,
+  GFX_FIREFLY,2,2,						HA_NEXT,
   GFX_PACMAN+0,1,3, GFX_PACMAN+4,1,2, GFX_PACMAN+0,1,3,
   GFX_PACMAN+1,1,3, GFX_PACMAN+5,1,2, GFX_PACMAN+1,1,3,
   GFX_PACMAN+2,1,3, GFX_PACMAN+6,1,2, GFX_PACMAN+2,1,3,
   GFX_PACMAN+3,1,3, GFX_PACMAN+7,1,2, GFX_PACMAN+3,1,3,		HA_NEXT,
-  GFX_MAMPFER+0,4,0, GFX_MAMPFER+3,1,0, GFX_MAMPFER+2,1,0,
-  GFX_MAMPFER+1,1,0, GFX_MAMPFER+0,1,0,				HA_NEXT,
-  GFX_MAMPFER2+0,4,0, GFX_MAMPFER2+3,1,0, GFX_MAMPFER2+2,1,0,
-  GFX_MAMPFER2+1,1,0, GFX_MAMPFER2+0,1,0,			HA_NEXT,
-  GFX_ZOMBIE+0,4,0, GFX_ZOMBIE+3,1,0, GFX_ZOMBIE+2,1,0,
-  GFX_ZOMBIE+1,1,0, GFX_ZOMBIE+0,1,0,				HA_NEXT,
+  GFX_MAMPFER+0,4,1, GFX_MAMPFER+3,1,1, GFX_MAMPFER+2,1,1,
+  GFX_MAMPFER+1,1,1, GFX_MAMPFER+0,1,1,				HA_NEXT,
+  GFX_MAMPFER2+0,4,1, GFX_MAMPFER2+3,1,1, GFX_MAMPFER2+2,1,1,
+  GFX_MAMPFER2+1,1,1, GFX_MAMPFER2+0,1,1,			HA_NEXT,
+  GFX_ROBOT+0,4,1, GFX_ROBOT+3,1,1, GFX_ROBOT+2,1,1,
+  GFX_ROBOT+1,1,1, GFX_ROBOT+0,1,1,				HA_NEXT,
+  GFX_MAULWURF_DOWN,4,2,
+  GFX_MAULWURF_UP,4,2,
+  GFX_MAULWURF_LEFT,4,2,
+  GFX_MAULWURF_RIGHT,4,2,					HA_NEXT,
+  GFX_PINGUIN_DOWN,4,2,
+  GFX_PINGUIN_UP,4,2,
+  GFX_PINGUIN_LEFT,4,2,
+  GFX_PINGUIN_RIGHT,4,2,					HA_NEXT,
+  GFX_SCHWEIN_DOWN,4,2,
+  GFX_SCHWEIN_UP,4,2,
+  GFX_SCHWEIN_LEFT,4,2,
+  GFX_SCHWEIN_RIGHT,4,2,					HA_NEXT,
+  GFX_DRACHE_DOWN,4,2,
+  GFX_DRACHE_UP,4,2,
+  GFX_DRACHE_LEFT,4,2,
+  GFX_DRACHE_RIGHT,4,2,						HA_NEXT,
+  GFX_SONDE_START,8,1,						HA_NEXT,
   GFX_ABLENK,4,1,						HA_NEXT,
-  GFX_BIRNE_AUS,1,33, GFX_BIRNE_EIN,1,33,			HA_NEXT,
-  GFX_ZEIT_VOLL,1,33, GFX_ZEIT_LEER,1,33,			HA_NEXT,
-  GFX_TROPFEN,1,33, GFX_AMOEBING,4,1, GFX_AMOEBE_LEBT,1,10,	HA_NEXT,
+  GFX_BIRNE_AUS,1,25, GFX_BIRNE_EIN,1,25,			HA_NEXT,
+  GFX_ZEIT_VOLL,1,25, GFX_ZEIT_LEER,1,25,			HA_NEXT,
+  GFX_TROPFEN,1,25, GFX_AMOEBING,4,1, GFX_AMOEBE_LEBT,1,10,	HA_NEXT,
   GFX_AMOEBE_TOT+2,2,50, GFX_AMOEBE_TOT,2,50,			HA_NEXT,
   GFX_AMOEBE_LEBT,4,40,						HA_NEXT,
   GFX_AMOEBE_LEBT,1,10,	GFX_AMOEBING,4,2,			HA_NEXT,
-  GFX_AMOEBE_LEBT,1,33, GFX_AMOEBE_TOT,1,33, GFX_EXPLOSION,8,1,
+  GFX_AMOEBE_LEBT,1,25, GFX_AMOEBE_TOT,1,25, GFX_EXPLOSION,8,1,
   GFX_DIAMANT,1,10,						HA_NEXT,
   GFX_LIFE,1,100,						HA_NEXT,
   GFX_LIFE_ASYNC,1,100,						HA_NEXT,
   GFX_SIEB_LEER,4,2,						HA_NEXT,
   GFX_SIEB2_LEER,4,2,						HA_NEXT,
   GFX_AUSGANG_ZU,1,100, GFX_AUSGANG_ACT,4,2,
-  GFX_AUSGANG_AUF+0,4,1, GFX_AUSGANG_AUF+3,1,1,
-  GFX_AUSGANG_AUF+2,1,1, GFX_AUSGANG_AUF+1,1,1,			HA_NEXT,
-  GFX_AUSGANG_AUF+0,4,1, GFX_AUSGANG_AUF+3,1,1,
-  GFX_AUSGANG_AUF+2,1,1, GFX_AUSGANG_AUF+1,1,1,			HA_NEXT,
+  GFX_AUSGANG_AUF+0,4,2, GFX_AUSGANG_AUF+3,1,2,
+  GFX_AUSGANG_AUF+2,1,2, GFX_AUSGANG_AUF+1,1,2,			HA_NEXT,
+  GFX_AUSGANG_AUF+0,4,2, GFX_AUSGANG_AUF+3,1,2,
+  GFX_AUSGANG_AUF+2,1,2, GFX_AUSGANG_AUF+1,1,2,			HA_NEXT,
   HA_END
 };
 static char *helpscreen_eltext[][2] =
@@ -362,6 +391,11 @@ static char *helpscreen_eltext[][2] =
  {"Cruncher: Eats diamonds and you,",	"if you're not careful"},
  {"Cruncher (BD style):",		"Eats almost everything"},
  {"Robot: Tries to kill the player",	""},
+ {"The mole: You must guide him savely","to the exit; he will follow you"},
+ {"The penguin: Guide him to the exit,","but keep him away from monsters!"},
+ {"The Pig: Harmless, but eats all",	"gems it can get"},
+ {"The Dragon: Breathes fire,",		"especially to some monsters"},
+ {"Sonde: Follows you everywhere;",	"harmless, but may block your way"},
  {"Magic Wheel: Touch it to get rid of","the robots for some seconds"},
  {"Light Bulb: All of them must be",	"switched on to finish a level"},
  {"Extra Time Orb: Adds some seconds",	"to the time available for the level"},
@@ -394,7 +428,7 @@ static int helpscreen_musicpos;
 void DrawHelpScreenElAction(int start)
 {
   int i = 0, j = 0;
-  int frame, delay, graphic;
+  int frame, graphic;
   int xstart = SX+16, ystart = SY+64+2*32, ystep = TILEY+4;
 
   while(helpscreen_action[j] != HA_END)
@@ -427,8 +461,7 @@ void DrawHelpScreenElAction(int start)
       helpscreen_frame[i-start] = helpscreen_action[j++]-1;
     }
 
-    delay = helpscreen_action[j++];
-    helpscreen_delay[i-start] = delay;
+    helpscreen_delay[i-start] = helpscreen_action[j++] - 1;
 
     if (helpscreen_action[j] == HA_NEXT)
     {
@@ -628,7 +661,7 @@ void HandleHelpScreen(int button)
   }
   else
   {
-    if (DelayReached(&hs_delay,3))
+    if (DelayReached(&hs_delay,GAME_FRAME_DELAY))
     {
       if (helpscreen_state<num_helpscreen_els_pages)
 	DrawHelpScreenElAction(helpscreen_state*MAX_HELPSCREEN_ELS);
@@ -682,7 +715,7 @@ void HandleTypeName(int newxpos, KeySym key)
 		player.alias_name,FS_BIG,FC_YELLOW);
     DrawGraphic(xpos+6,ypos,GFX_KUGEL_ROT);
   }
-  else if (key==XK_Delete && xpos>0)
+  else if ((key==XK_Delete || key==XK_BackSpace) && xpos>0)
   {
     xpos--;
     player.alias_name[xpos] = 0;
@@ -721,7 +754,7 @@ void DrawChooseLevel()
 
   FadeToFront();
   InitAnimation();
-  HandleChooseLevel(0,0,0,0,MB_MENU_MARK);
+  HandleChooseLevel(0,0,0,0,MB_MENU_INITIALIZE);
 }
 
 void HandleChooseLevel(int mx, int my, int dx, int dy, int button)
@@ -730,11 +763,20 @@ void HandleChooseLevel(int mx, int my, int dx, int dy, int button)
   static int redraw = TRUE;
   int x = (mx+32-SX)/32, y = (my+32-SY)/32;
 
+  if (button == MB_MENU_INITIALIZE)
+  {
+    redraw = TRUE;
+    choice = leveldir_nr + 3;
+  }
+
   if (redraw)
   {
     DrawGraphic(0,choice-1,GFX_KUGEL_ROT);
     redraw = FALSE;
   }
+
+  if (button == MB_MENU_INITIALIZE)
+    return;
 
   if (dx || dy)
   {
@@ -885,7 +927,7 @@ void DrawSetupScreen()
 
   FadeToFront();
   InitAnimation();
-  HandleSetupScreen(0,0,0,0,MB_MENU_MARK);
+  HandleSetupScreen(0,0,0,0,MB_MENU_INITIALIZE);
 }
 
 void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
@@ -897,11 +939,17 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
   int pos_empty = SETUP_SCREEN_POS_EMPTY + 1;
   int pos_end   = SETUP_SCREEN_POS_END   + 1;
 
+  if (button == MB_MENU_INITIALIZE)
+    redraw = TRUE;
+
   if (redraw)
   {
     DrawGraphic(0,choice-1,GFX_KUGEL_ROT);
     redraw = FALSE;
   }
+
+  if (button == MB_MENU_INITIALIZE)
+    return;
 
   if (dx || dy)
   {
@@ -1197,7 +1245,7 @@ void HandleGameActions()
   if (LevelSolved)
     GameWon();
 
-  if (GameOver && !TAPE_IS_STOPPED(tape))
+  if (PlayerGone && !TAPE_IS_STOPPED(tape))
     TapeStop();
 
   GameActions();
@@ -1246,6 +1294,7 @@ void HandleVideoButtons(int mx, int my, int button)
 	  tape.pos[tape.counter].delay = tape.delay_played;
 	  tape.playing = FALSE;
 	  tape.recording = TRUE;
+	  tape.changed = TRUE;
 
 	  DrawVideoDisplay(VIDEO_STATE_PLAY_OFF | VIDEO_STATE_REC_ON,0);
 	}

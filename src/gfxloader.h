@@ -9,16 +9,35 @@
 *               aeglos@uni-paderborn.de                    *
 *               q99492@pbhrzx.uni-paderborn.de             *
 *----------------------------------------------------------*
-*  init.h                                                  *
+*  gfxloader.h                                             *
 ***********************************************************/
 
-#ifndef INIT_H
-#define INIT_H
+#ifndef GFXLOADER_H
+#define GFXLOADER_H
 
-#include "main.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>
 
-void OpenAll(int, char **);
-void CloseAll();
-void InitJoystick(void);
+#define GIF_Success		 0
+#define GIF_OpenFailed		-1
+#define GIF_ReadFailed		-2
+#define	GIF_FileInvalid		-3
+#define GIF_NoMemory		-4
+#define GIF_ColorFailed		-5
+
+#define ILBM_Success		 0
+#define ILBM_OpenFailed		-1
+#define ILBM_ReadFailed		-2
+#define	ILBM_FileInvalid	-3
+#define ILBM_NoMemory		-4
+#define ILBM_ColorFailed	-5
+
+int Read_ILBM_to_Bitmap(Display *, char *, Pixmap *);
+int Read_GIF_to_Bitmap(Display *, char *, Pixmap *);
+int Read_GIF_to_Pixmap(Display *, char *, Pixmap *);
+int Read_GIF_to_XImage(Display *, char *, XImage **);
 
 #endif

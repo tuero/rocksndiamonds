@@ -16,6 +16,7 @@
 #include "init.h"
 #include "events.h"
 #include "sound.h"
+#include "joystick.h"
 
 Display        *display;
 int		screen;
@@ -23,7 +24,11 @@ Window  	window;
 GC		gc, clip_gc[NUM_PIXMAPS];
 Pixmap		pix[NUM_PIXMAPS];
 Pixmap		clipmask[NUM_PIXMAPS];
+
+#ifdef XPM_INCLUDE_FILE
 XpmAttributes 	xpm_att[NUM_PICTURES];
+#endif
+
 Drawable        drawto, drawto_field, backbuffer;
 Colormap	cmap;
 
@@ -75,9 +80,12 @@ long		Elementeigenschaften[MAX_ELEMENTS];
 int		level_nr, leveldir_nr, num_leveldirs;
 int		lev_fieldx,lev_fieldy, scroll_x,scroll_y;
 
-int		LevelSolved,GameOver, JX,JY, ZX,ZY;
+int		JX,JY, ZX,ZY, ExitX,ExitY;
+int		PlayerMovDir, PlayerFrame, PlayerPushing;
+int		PlayerGone,LevelSolved,GameOver;
 int		FrameCounter,TimeFrames,TimeLeft,Score;
-int		Gems,SokobanFields,Lights,Dynamite,Key[4],MampferNr;
+int		Gems,SokobanFields,Lights,Friends;
+int		Dynamite,Key[4],MampferNr;
 int		DynaBombCount, DynaBombSize, DynaBombsLeft, DynaBombXL;
 int		SiebAktiv;
 

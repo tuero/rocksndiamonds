@@ -110,8 +110,9 @@ struct SoundHeader_8SVX
 
 struct SoundInfo
 { 
-  char *name;
-  char *file_ptr, *data_ptr;
+  unsigned char *name;
+  unsigned char *file_ptr;
+  char *data_ptr;
   long file_len, data_len;
 };
 
@@ -130,9 +131,6 @@ struct SoundControl
   long data_len;
   char *data_ptr;
 };
-
-/* function from "misc.c" */
-unsigned long be2long(unsigned long *);
 
 /* sound server functions */
 void SoundServer(void);

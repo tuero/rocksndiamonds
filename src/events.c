@@ -19,6 +19,7 @@
 #include "editor.h"
 #include "misc.h"
 #include "tape.h"
+#include "joystick.h"
 
 void EventLoop(void)
 {
@@ -39,8 +40,6 @@ void EventLoop(void)
 	  SleepWhileUnmapped();
 	  break;
 	case ButtonPress:
-	  HandleButtonEvent((XButtonEvent *) &event);
-	  break;
 	case ButtonRelease:
 	  HandleButtonEvent((XButtonEvent *) &event);
 	  break;
@@ -48,16 +47,12 @@ void EventLoop(void)
 	  HandleMotionEvent((XMotionEvent *) &event);
 	  break;
 	case KeyPress:
-	  HandleKeyEvent((XKeyEvent *) &event);
-	  break;
 	case KeyRelease:
 	  HandleKeyEvent((XKeyEvent *) &event);
 	  break;
 	case FocusIn:
-	  HandleFocusEvent(FOCUS_IN);
-	  break;
 	case FocusOut:
-	  HandleFocusEvent(FOCUS_OUT);
+	  HandleFocusEvent((XFocusChangeEvent *) &event);
 	  break;
 	default:
 	  break;
@@ -99,10 +94,8 @@ void ClearEventQueue()
 	key_joystick_mapping = 0;
 	break;
       case FocusIn:
-	HandleFocusEvent(FOCUS_IN);
-	break;
       case FocusOut:
-	HandleFocusEvent(FOCUS_OUT);
+	HandleFocusEvent((XFocusChangeEvent *) &event);
 	break;
       default:
 	break;
@@ -150,20 +143,24 @@ void HandleExposeEvent(XExposeEvent *event)
   int x = event->x, y = event->y;
   int width = event->width, height = event->height;
 
-  XCopyArea(display,drawto,window,gc, x,y, width,height, x,y);
-
   if (direct_draw_on && game_status==PLAYING)
   {
     int xx,yy;
     int x1 = (x-SX)/TILEX, y1 = (y-SY)/TILEY;
     int x2 = (x-SX+width)/TILEX, y2 = (y-SY+height)/TILEY;
 
+    drawto_field = backbuffer;
+
     for(xx=0;xx<SCR_FIELDX;xx++)
       for(yy=0;yy<SCR_FIELDY;yy++)
 	if (xx>=x1 && xx<=x2 && yy>=y1 && yy<=y2)
 	  DrawScreenField(xx,yy);
-    DrawLevelElement(JX,JY,EL_SPIELFIGUR);
+    DrawPlayerField();
+
+    drawto_field = window;
   }
+
+  XCopyArea(display,drawto,window,gc, x,y, width,height, x,y);
 
   XFlush(display);
 }
@@ -196,17 +193,17 @@ void HandleKeyEvent(XKeyEvent *event)
   HandleKey(key, key_status);
 }
 
-void HandleFocusEvent(int focus_status)
+void HandleFocusEvent(XFocusChangeEvent *event)
 {
   static int old_joystick_status = -1;
 
-  if (focus_status==FOCUS_OUT)
+  if (event->type == FocusOut)
   {
     XAutoRepeatOn(display);
     old_joystick_status = joystick_status;
     joystick_status = JOYSTICK_OFF;
   }
-  else
+  else if (event->type == FocusIn)
   {
     if (game_status == PLAYING)
       XAutoRepeatOff(display);
@@ -380,6 +377,14 @@ void HandleKey(KeySym key, int key_status)
 
   if (key_status == KEY_RELEASED)
     return;
+
+  if (key==XK_Return && game_status==PLAYING && GameOver)
+  {
+    CloseDoor(DOOR_CLOSE_1);
+    game_status = MAINMENU;
+    DrawMainMenu();
+    return;
+  }
 
   if (key==XK_Escape && game_status!=MAINMENU)	/* quick quit to MAINMENU */
   {
@@ -568,6 +573,9 @@ void HandleJoystick()
   int dx	= (left ? -1	: right ? 1	: 0);
   int dy	= (up   ? -1	: down  ? 1	: 0);
 
+  if (game_status==PLAYING && (tape.playing || keyboard))
+    newbutton = ((joy & JOY_BUTTON) != 0);
+
   switch(game_status)
   {
     case MAINMENU:
@@ -577,7 +585,7 @@ void HandleJoystick()
       static long joystickmove_delay = 0;
 
       if (joystick && !button && !DelayReached(&joystickmove_delay,15))
-	break;
+	newbutton = dx = dy = 0;
 
       if (game_status==MAINMENU)
 	HandleMainMenu(0,0,dx,dy,newbutton ? MB_MENU_CHOICE : MB_MENU_MARK);
@@ -597,16 +605,6 @@ void HandleJoystick()
     {
       BOOL moved = FALSE, snapped = FALSE, bombed = FALSE;
 
-      if (tape.pausing)
-	joy = 0;
-
-      if (!joy)
-      {
-	DigField(0,0,0,0,DF_NO_PUSH);
-	SnapField(0,0);
-	break;
-      }
-
       if (GameOver && newbutton)
       {
 	CloseDoor(DOOR_CLOSE_1);
@@ -615,23 +613,61 @@ void HandleJoystick()
 	return;
       }
 
-      if (button1)
-	snapped = SnapField(dx,dy);
+      if (tape.pausing || PlayerGone)
+	joy = 0;
+
+      if (joy)
+      {
+	if (button1)
+	  snapped = SnapField(dx,dy);
+	else
+	{
+	  if (button2)
+	    bombed = PlaceBomb();
+	  moved = MoveFigure(dx,dy);
+	}
+
+	if (tape.recording && (moved || snapped || bombed))
+	{
+	  if (bombed && !moved)
+	    joy &= JOY_BUTTON;
+	  TapeRecordAction(joy);
+	}
+	else if (tape.playing && snapped)
+	  SnapField(0,0);			/* stop snapping */
+      }
       else
       {
-	if (button2)
-	  bombed = PlaceBomb();
-	moved = MoveFigure(dx,dy);
+	DigField(0,0,0,0,DF_NO_PUSH);
+	SnapField(0,0);
+	PlayerFrame = 0;
       }
 
-      if (tape.recording && (moved || snapped || bombed))
+      if (tape.playing && !tape.pausing && !joy && tape.counter<tape.length)
       {
-	if (bombed && !moved)
-	  joy &= JOY_BUTTON;
-	TapeRecordAction(joy);
+	int next_joy =
+	  tape.pos[tape.counter].joystickdata & (JOY_LEFT|JOY_RIGHT);
+
+	if (next_joy == JOY_LEFT || next_joy == JOY_RIGHT)
+	{
+	  int dx = (next_joy == JOY_LEFT ? -1 : +1);
+
+	  if (IN_LEV_FIELD(JX+dx,JY) && IS_PUSHABLE(Feld[JX+dx][JY]))
+	  {
+	    int el = Feld[JX+dx][JY];
+	    int push_delay = (IS_SB_ELEMENT(el) || el==EL_SONDE ? 2 : 10);
+
+	    if (tape.delay_played + push_delay >= tape.pos[tape.counter].delay)
+	    {
+	      PlayerMovDir = next_joy;
+	      PlayerFrame = FrameCounter % 4;
+	      PlayerPushing = TRUE;
+	    }
+	  }
+	}
       }
-      else if (tape.playing && snapped)
-	SnapField(0,0);			/* stop snapping */
+
+      DrawPlayerField();
 
       break;
     }

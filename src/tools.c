@@ -22,6 +22,9 @@
 #include "sound.h"
 #include "misc.h"
 #include "buttons.h"
+#include "joystick.h"
+#include "cartoons.h"
+
 #include <math.h>
 
 void BackToFront()
@@ -251,8 +254,95 @@ void DrawTextExt(Drawable d, GC gc, int x, int y,
   }
 }
 
-void DrawGraphicAnimation(int x, int y, int graphic,
-			  int frames, int delay, int mode)
+void DrawPlayerField()
+{
+  int x = JX, y = JY;
+  int sx = SCROLLX(x), sy = SCROLLY(y);
+  int element = Feld[x][y];
+  int graphic, phase;
+  BOOL draw_thru_mask = FALSE;
+
+  if (PlayerGone)
+    return;
+
+#if DEBUG
+  if (!IN_LEV_FIELD(x,y) || !IN_SCR_FIELD(sx,sy))
+  {
+    printf("DrawPlayerField(): x = %d, y = %d\n",x,y);
+    printf("DrawPlayerField(): This should never happen!\n");
+    return;
+  }
+#endif
+
+  if (element == EL_EXPLODING)
+    return;
+
+  if (direct_draw_on)
+    drawto_field = backbuffer;
+
+  /* draw things behind the player (EL_PFORTE* || mole/penguin/pig/dragon) */
+
+  if (Store[x][y])
+  {
+    DrawGraphic(sx,sy, el2gfx(Store[x][y]));
+    draw_thru_mask = TRUE;
+  }
+  else if (element!=EL_LEERRAUM && element!=EL_DYNAMIT && element!=EL_DYNABOMB)
+  {
+    DrawLevelField(x,y);
+    draw_thru_mask = TRUE;
+  }
+
+  /* draw player himself */
+
+  if (PlayerMovDir==MV_LEFT)
+    graphic = (PlayerPushing ? GFX_SPIELER_PUSH_LEFT : GFX_SPIELER_LEFT);
+  else if (PlayerMovDir==MV_RIGHT)
+    graphic = (PlayerPushing ? GFX_SPIELER_PUSH_RIGHT : GFX_SPIELER_RIGHT);
+  else if (PlayerMovDir==MV_UP)
+    graphic = GFX_SPIELER_UP;
+  else	/* MV_DOWN || MV_NO_MOVING */
+    graphic = GFX_SPIELER_DOWN;
+
+  graphic += PlayerFrame;
+
+  if (draw_thru_mask)
+    DrawGraphicThruMask(sx,sy, graphic);
+  else
+    DrawGraphic(sx,sy, graphic);
+
+  /* draw things in front of player (EL_DYNAMIT || EL_DYNABOMB) */
+
+  if (element == EL_DYNAMIT || element == EL_DYNABOMB)
+  {
+    graphic = el2gfx(element);
+
+    if (element == EL_DYNAMIT)
+    {
+      if ((phase = (48-MovDelay[x][y])/6) > 6)
+	phase = 6;
+    }
+    else
+    {
+      if ((phase = ((48-MovDelay[x][y])/3) % 8) > 3)
+	phase = 7-phase;
+    }
+
+    DrawGraphicThruMask(sx,sy, graphic + phase);
+  }
+
+  if (direct_draw_on)
+  {
+    int dest_x = SX+SCROLLX(x)*TILEX;
+    int dest_y = SY+SCROLLY(y)*TILEY;
+
+    XCopyArea(display,backbuffer,window,gc,
+	      dest_x,dest_y, TILEX,TILEY, dest_x,dest_y);
+    drawto_field = window;
+  }
+}
+
+static int getGraphicAnimationPhase(int frames, int delay, int mode)
 {
   int phase;
 
@@ -265,12 +355,43 @@ void DrawGraphicAnimation(int x, int y, int graphic,
   else
     phase = (FrameCounter % (delay * frames)) / delay;
 
+  return(phase);
+}
+
+void DrawGraphicAnimation(int x, int y, int graphic,
+			  int frames, int delay, int mode)
+{
+  int phase = getGraphicAnimationPhase(frames, delay, mode);
+
+/*
+  int phase;
+
+  if (mode == ANIM_OSCILLATE)
+  {
+    int max_anim_frames = frames*2 - 2;
+    phase = (FrameCounter % (delay * max_anim_frames)) / delay;
+    phase = (phase < frames ? phase : max_anim_frames - phase);
+  }
+  else
+    phase = (FrameCounter % (delay * frames)) / delay;
+*/
+
   if (!(FrameCounter % delay) && IN_SCR_FIELD(SCROLLX(x),SCROLLY(y)))
     DrawGraphic(SCROLLX(x),SCROLLY(y), graphic + phase);
 }
 
 void DrawGraphic(int x, int y, int graphic)
 {
+
+#if DEBUG
+  if (!IN_SCR_FIELD(x,y))
+  {
+    printf("DrawGraphic(): x = %d, y = %d, graphic = %d\n",x,y,graphic);
+    printf("DrawGraphic(): This should never happen!\n");
+    return;
+  }
+#endif
+
   DrawGraphicExt(drawto_field, gc, x, y, graphic);
   redraw_tiles++;
   redraw[x][y] = TRUE;
@@ -284,42 +405,77 @@ void DrawGraphicExt(Drawable d, GC gc, int x, int y, int graphic)
 
 void DrawGraphicExtHiRes(Drawable d, GC gc, int x, int y, int graphic)
 {
-  if (graphic<0)
-    XFillRectangle(display,d,gc, x,y, TILEX,TILEY);
-  else if (graphic<256)
+  if (graphic >= GFX_START_ROCKSSCREEN && graphic <= GFX_END_ROCKSSCREEN)
+  {
+    graphic -= GFX_START_ROCKSSCREEN;
     XCopyArea(display,pix[PIX_BACK],d,gc,
 	      SX+(graphic % GFX_PER_LINE)*TILEX,
 	      SY+(graphic / GFX_PER_LINE)*TILEY,
 	      TILEX,TILEY, x,y);
-  else
+  }
+  else if (graphic >= GFX_START_ROCKSHEROES && graphic <= GFX_END_ROCKSHEROES)
   {
-    graphic -= 256;
+    graphic -= GFX_START_ROCKSHEROES;
+    XCopyArea(display,pix[PIX_HEROES],d,gc,
+	      (graphic % HEROES_PER_LINE)*TILEX,
+	      (graphic / HEROES_PER_LINE)*TILEY,
+	      TILEX,TILEY, x,y);
+  }
+  else if (graphic >= GFX_START_ROCKSFONT && graphic <= GFX_END_ROCKSFONT)
+  {
+    graphic -= GFX_START_ROCKSFONT;
     XCopyArea(display,pix[PIX_BIGFONT],d,gc,
 	      (graphic % FONT_CHARS_PER_LINE)*TILEX,
 	      (graphic / FONT_CHARS_PER_LINE)*TILEY +
 	      FC_SPECIAL1*TILEY*FONT_LINES_PER_FONT,
 	      TILEX,TILEY, x,y);
   }
+  else
+    XFillRectangle(display,d,gc, x,y, TILEX,TILEY);
 }
 
 void DrawGraphicThruMask(int x, int y, int graphic)
 {
   int src_x,src_y, dest_x,dest_y;
 
-  if (graphic<0 || graphic>255)
+#if DEBUG
+  if (!IN_SCR_FIELD(x,y))
+  {
+    printf("DrawGraphicThruMask(): x = %d, y = %d\n",x,y);
+    printf("DrawGraphicThruMask(): This should never happen!\n");
+    return;
+  }
+#endif
+
+  if (graphic >= GFX_START_ROCKSSCREEN && graphic <= GFX_END_ROCKSSCREEN)
+  {
+    graphic -= GFX_START_ROCKSSCREEN;
+    src_x  = SX+(graphic % GFX_PER_LINE)*TILEX;
+    src_y  = SY+(graphic / GFX_PER_LINE)*TILEY;
+    dest_x = SX+x*TILEX;
+    dest_y = SY+y*TILEY;
+
+    XSetClipOrigin(display,clip_gc[PIX_BACK],dest_x-src_x,dest_y-src_y);
+    XCopyArea(display,pix[PIX_BACK],drawto_field,clip_gc[PIX_BACK],
+	      src_x,src_y, TILEX,TILEY, dest_x,dest_y);
+  }
+  else if (graphic >= GFX_START_ROCKSHEROES && graphic <= GFX_END_ROCKSHEROES)
+  {
+    graphic -= GFX_START_ROCKSHEROES;
+    src_x  = (graphic % HEROES_PER_LINE)*TILEX;
+    src_y  = (graphic / HEROES_PER_LINE)*TILEY;
+    dest_x = SX+x*TILEX;
+    dest_y = SY+y*TILEY;
+
+    XSetClipOrigin(display,clip_gc[PIX_HEROES],dest_x-src_x,dest_y-src_y);
+    XCopyArea(display,pix[PIX_HEROES],drawto_field,clip_gc[PIX_HEROES],
+	      src_x,src_y, TILEX,TILEY, dest_x,dest_y);
+  }
+  else
   {
     DrawGraphic(x,y,graphic);
     return;
   }
-
-  src_x  = SX+(graphic % GFX_PER_LINE)*TILEX;
-  src_y  = SY+(graphic / GFX_PER_LINE)*TILEY;
-  dest_x = SX+x*TILEX;
-  dest_y = SY+y*TILEY;
-
-  XSetClipOrigin(display,clip_gc[PIX_BACK],dest_x-src_x,dest_y-src_y);
-  XCopyArea(display,pix[PIX_BACK],drawto_field,clip_gc[PIX_BACK], src_x,src_y,
-	    TILEX,TILEY, dest_x,dest_y);
 
   redraw_tiles++;
   redraw[x][y]=TRUE;
@@ -346,22 +502,25 @@ void DrawMiniGraphicExt(Drawable d, GC gc, int x, int y, int graphic)
 
 void DrawMiniGraphicExtHiRes(Drawable d, GC gc, int x, int y, int graphic)
 {
-  if (graphic<0)
-    XFillRectangle(display,d,gc, x,y, MINI_TILEX,MINI_TILEY);
-  else if (graphic<256)
+  if (graphic >= GFX_START_ROCKSSCREEN && graphic <= GFX_END_ROCKSSCREEN)
+  {
+    graphic -= GFX_START_ROCKSSCREEN;
     XCopyArea(display,pix[PIX_BACK],d,gc,
 	      MINI_GFX_STARTX+(graphic % MINI_GFX_PER_LINE)*MINI_TILEX,
 	      MINI_GFX_STARTY+(graphic / MINI_GFX_PER_LINE)*MINI_TILEY,
 	      MINI_TILEX,MINI_TILEY, x,y);
-  else
+  }
+  else if (graphic >= GFX_START_ROCKSFONT && graphic <= GFX_END_ROCKSFONT)
   {
-    graphic -= 256;
+    graphic -= GFX_START_ROCKSFONT;
     XCopyArea(display,pix[PIX_SMALLFONT],d,gc,
 	      (graphic % FONT_CHARS_PER_LINE)*FONT4_XSIZE,
 	      (graphic / FONT_CHARS_PER_LINE)*FONT4_YSIZE +
 	      FC_SPECIAL2*FONT2_YSIZE*FONT_LINES_PER_FONT,
 	      MINI_TILEX,MINI_TILEY, x,y);
   }
+  else
+    XFillRectangle(display,d,gc, x,y, MINI_TILEX,MINI_TILEY);
 }
 
 void DrawGraphicShifted(int x,int y, int dx,int dy, int graphic, int cut_mode)
@@ -439,10 +598,31 @@ void DrawGraphicShifted(int x,int y, int dx,int dy, int graphic, int cut_mode)
       redraw[x][y+SIGN(dy)]=TRUE;
   }
 
-  XCopyArea(display,pix[PIX_BACK],drawto_field,gc,
-	    SX+(graphic % GFX_PER_LINE)*TILEX+cx,
-	    SY+(graphic / GFX_PER_LINE)*TILEY+cy,
-	    width,height, SX+x*TILEX+dx,SY+y*TILEY+dy);
+  if (graphic >= GFX_START_ROCKSSCREEN && graphic <= GFX_END_ROCKSSCREEN)
+  {
+    graphic -= GFX_START_ROCKSSCREEN;
+    XCopyArea(display,pix[PIX_BACK],drawto_field,gc,
+	      SX+(graphic % GFX_PER_LINE)*TILEX+cx,
+	      SY+(graphic / GFX_PER_LINE)*TILEY+cy,
+	      width,height, SX+x*TILEX+dx,SY+y*TILEY+dy);
+  }
+  else if (graphic >= GFX_START_ROCKSHEROES && graphic <= GFX_END_ROCKSHEROES)
+  {
+    graphic -= GFX_START_ROCKSHEROES;
+    XCopyArea(display,pix[PIX_HEROES],drawto_field,gc,
+	      (graphic % HEROES_PER_LINE)*TILEX+cx,
+	      (graphic / HEROES_PER_LINE)*TILEY+cy,
+	      width,height, SX+x*TILEX+dx,SY+y*TILEY+dy);
+  }
+
+#if DEBUG
+  if (!IN_SCR_FIELD(x,y))
+  {
+    printf("DrawGraphicShifted(): x = %d, y = %d, graphic = %d\n",x,y,graphic);
+    printf("DrawGraphicShifted(): This should never happen!\n");
+    return;
+  }
+#endif
 
   redraw_tiles++;
   redraw[x][y]=TRUE;
@@ -453,32 +633,50 @@ void DrawElementShifted(int x, int y, int dx, int dy, int element,int cut_mode)
 {
   int ux = UNSCROLLX(x), uy = UNSCROLLY(y);
   int graphic = el2gfx(element);
-  int phase = ABS(MovPos[ux][uy])/(TILEX/2);
+  int phase4 = ABS(MovPos[ux][uy])/(TILEX/4);
+  int phase  = phase4 / 2;
   int dir = MovDir[ux][uy];
 
-/*
-  int horiz_move = (dir==MV_LEFT || dir==MV_RIGHT);
-*/
-
-  if (element==EL_PACMAN ||
-      element==EL_KAEFER ||
-      element==EL_FLIEGER ||
-      element==EL_BUTTERFLY ||
-      element==EL_FIREFLY)
+  if (element==EL_PACMAN || element==EL_KAEFER || element==EL_FLIEGER)
   {
-    if (element==EL_BUTTERFLY || element==EL_FIREFLY)
-      graphic += !phase;
-    else
-    {
-      graphic += 4*!phase;
+    graphic += 4*!phase;
 
-      if (dir==MV_UP)
-	graphic += 1;
-      else if (dir==MV_LEFT)
-	graphic += 2;
-      else if (dir==MV_DOWN)
-	graphic += 3;
-    }
+    if (dir==MV_UP)
+      graphic += 1;
+    else if (dir==MV_LEFT)
+      graphic += 2;
+    else if (dir==MV_DOWN)
+      graphic += 3;
+  }
+  else if (element==EL_MAULWURF || element==EL_PINGUIN ||
+	   element==EL_SCHWEIN || element==EL_DRACHE)
+  {
+    if (dir==MV_LEFT)
+      graphic = (element==EL_MAULWURF ? GFX_MAULWURF_LEFT :
+		 element==EL_PINGUIN ? GFX_PINGUIN_LEFT :
+		 element==EL_SCHWEIN ? GFX_SCHWEIN_LEFT : GFX_DRACHE_LEFT);
+    else if (dir==MV_RIGHT)
+      graphic = (element==EL_MAULWURF ? GFX_MAULWURF_RIGHT :
+		 element==EL_PINGUIN ? GFX_PINGUIN_RIGHT :
+		 element==EL_SCHWEIN ? GFX_SCHWEIN_RIGHT : GFX_DRACHE_RIGHT);
+    else if (dir==MV_UP)
+      graphic = (element==EL_MAULWURF ? GFX_MAULWURF_UP :
+		 element==EL_PINGUIN ? GFX_PINGUIN_UP :
+		 element==EL_SCHWEIN ? GFX_SCHWEIN_UP : GFX_DRACHE_UP);
+    else
+      graphic = (element==EL_MAULWURF ? GFX_MAULWURF_DOWN :
+		 element==EL_PINGUIN ? GFX_PINGUIN_DOWN :
+		 element==EL_SCHWEIN ? GFX_SCHWEIN_DOWN : GFX_DRACHE_DOWN);
+
+    graphic += phase4;
+  }
+  else if (element==EL_SONDE)
+  {
+    graphic = GFX_SONDE_START + getGraphicAnimationPhase(8, 2, ANIM_NORMAL);
+  }
+  else if (element==EL_BUTTERFLY || element==EL_FIREFLY)
+  {
+    graphic += !phase;
   }
   else if ((element==EL_FELSBROCKEN || IS_GEM(element)) && !cut_mode)
   {
@@ -998,10 +1196,8 @@ BOOL AreYouSure(char *text, unsigned int ays_state)
 	  }
 	  break;
 	case FocusIn:
-	  HandleFocusEvent(FOCUS_IN);
-	  break;
 	case FocusOut:
-	  HandleFocusEvent(FOCUS_OUT);
+	  HandleFocusEvent((XFocusChangeEvent *) &event);
 	  break;
 	default:
 	  break;
@@ -1213,137 +1409,6 @@ int ReadPixel(Drawable d, int x, int y)
   return(XGetPixel(pixelimage,0,0));
 }
 
-void CheckJoystickData()
-{
-  int i;
-  int distance = 100;
-
-  for(i=0;i<2;i++)
-  {
-    if (joystick[i].xmiddle <= distance)
-      joystick[i].xmiddle = distance;
-    if (joystick[i].ymiddle <= distance)
-      joystick[i].ymiddle = distance;
-
-    if (joystick[i].xleft >= joystick[i].xmiddle)
-      joystick[i].xleft = joystick[i].xmiddle-distance;
-    if (joystick[i].xright <= joystick[i].xmiddle)
-      joystick[i].xright = joystick[i].xmiddle+distance;
-
-    if (joystick[i].yupper >= joystick[i].ymiddle)
-      joystick[i].yupper = joystick[i].ymiddle-distance;
-    if (joystick[i].ylower <= joystick[i].ymiddle)
-      joystick[i].ylower = joystick[i].ymiddle+distance;
-  }
-}
-
-int JoystickPosition(int middle, int margin, int actual)
-{
-  long range, pos;
-  int percentage;
-
-  if (margin<middle && actual>middle)
-    return(0);
-  if (margin>middle && actual<middle)
-    return(0);
-
-  range = ABS(margin-middle);
-  pos = ABS(actual-middle);
-  percentage = (int)(pos*100/range);
-  if (percentage>100)
-    percentage = 100;
-
-  return(percentage);
-}
-
-int Joystick()
-{
-#ifdef __FreeBSD__
-  struct joystick joy_ctrl;
-#else
-  struct joystick_control
-  {
-    int buttons;
-    int x;
-    int y;
-  } joy_ctrl;
-#endif
-
-  int js_x,js_y, js_b1,js_b2;
-  int left, right, up, down;
-  int result=0;
-
-  if (joystick_status==JOYSTICK_OFF)
-    return(0);
-
-  if (read(joystick_device, &joy_ctrl, sizeof(joy_ctrl)) != sizeof(joy_ctrl))
-  {
-    fprintf(stderr,"%s: cannot read joystick settings - no joystick support\n",
-	    progname);
-    joystick_status = JOYSTICK_OFF;
-    return(0);
-  }
-
-  js_x  = joy_ctrl.x;
-  js_y  = joy_ctrl.y;
-#ifdef __FreeBSD__
-  js_b1 = joy_ctrl.b1;
-  js_b2 = joy_ctrl.b2;
-#else
-  js_b1 = joy_ctrl.buttons & 1;
-  js_b2 = joy_ctrl.buttons & 2;
-#endif
-
-  left = JoystickPosition(joystick[joystick_nr].xmiddle,
-			  joystick[joystick_nr].xleft,  js_x);
-  right = JoystickPosition(joystick[joystick_nr].xmiddle,
-			   joystick[joystick_nr].xright, js_x);
-  up =    JoystickPosition(joystick[joystick_nr].ymiddle,
-			   joystick[joystick_nr].yupper, js_y);
-  down =  JoystickPosition(joystick[joystick_nr].ymiddle,
-			   joystick[joystick_nr].ylower, js_y);
-
-  if (left>JOYSTICK_PERCENT)
-    result |= JOY_LEFT;
-  else if (right>JOYSTICK_PERCENT)
-    result |= JOY_RIGHT;
-  if (up>JOYSTICK_PERCENT)
-    result |= JOY_UP;
-  else if (down>JOYSTICK_PERCENT)
-    result |= JOY_DOWN;
-  if (js_b1)
-    result |= JOY_BUTTON_1;
-  if (js_b2)
-    result |= JOY_BUTTON_2;
-
-  return(result);
-}
-
-int JoystickButton()
-{
-  static int last_joy_button = 0;
-  int joy_button = (Joystick() & JOY_BUTTON);
-  int result;
-
-  if (joy_button)
-  {
-    if (last_joy_button)
-      result = JOY_BUTTON_PRESSED;
-    else
-      result = JOY_BUTTON_NEW_PRESSED;
-  }
-  else
-  {
-    if (last_joy_button)
-      result = JOY_BUTTON_NEW_RELEASED;
-    else
-      result = JOY_BUTTON_NOT_PRESSED;
-  }
-
-  last_joy_button = joy_button;
-  return(result);
-}
-
 int el2gfx(int element)
 {
   switch(element)
@@ -1384,7 +1449,7 @@ int el2gfx(int element)
     case EL_FIREFLY_L:		return(GFX_FIREFLY_L);
     case EL_FIREFLY_U:		return(GFX_FIREFLY_U);
     case EL_MAMPFER:		return(GFX_MAMPFER);
-    case EL_ZOMBIE:		return(GFX_ZOMBIE);
+    case EL_ROBOT:		return(GFX_ROBOT);
     case EL_BETON:		return(GFX_BETON);
     case EL_DIAMANT:		return(GFX_DIAMANT);
     case EL_MORAST_LEER:	return(GFX_MORAST_LEER);
@@ -1458,6 +1523,15 @@ int el2gfx(int element)
     case EL_SOKOBAN_OBJEKT:	return(GFX_SOKOBAN_OBJEKT);
     case EL_SOKOBAN_FELD_LEER:	return(GFX_SOKOBAN_FELD_LEER);
     case EL_SOKOBAN_FELD_VOLL:	return(GFX_SOKOBAN_FELD_VOLL);
+    case EL_MAULWURF:		return(GFX_MAULWURF);
+    case EL_PINGUIN:		return(GFX_PINGUIN);
+    case EL_SCHWEIN:		return(GFX_SCHWEIN);
+    case EL_DRACHE:		return(GFX_DRACHE);
+    case EL_SONDE:		return(GFX_SONDE);
+    case EL_PFEIL_L:		return(GFX_PFEIL_L);
+    case EL_PFEIL_R:		return(GFX_PFEIL_R);
+    case EL_PFEIL_O:		return(GFX_PFEIL_O);
+    case EL_PFEIL_U:		return(GFX_PFEIL_U);
     default:
     {
       if (IS_CHAR(element))

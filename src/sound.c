@@ -563,12 +563,19 @@ int ulaw_to_linear(unsigned char ulawbyte)
 
 /*** THE STUFF BELOW IS ONLY USED BY THE MAIN PROCESS ***/
 
+static unsigned long be2long(unsigned long *be)	/* big-endian -> longword */
+{
+  unsigned char *ptr = (unsigned char *)be;
+
+  return(ptr[0]<<24 | ptr[1]<<16 | ptr[2]<<8 | ptr[3]);
+}
+
 BOOL LoadSound(struct SoundInfo *snd_info)
 {
   FILE *file;
   char filename[256];
   char *sound_ext = "8svx";
-  struct SoundHeader_8SVX *snd_hdr;
+  struct SoundHeader_8SVX *sound_header;
   unsigned char *ptr;
 
   sprintf(filename,"%s/%s.%s",SND_PATH,snd_info->name,sound_ext);
@@ -609,40 +616,48 @@ BOOL LoadSound(struct SoundInfo *snd_info)
 
   fclose(file);
 
-  snd_hdr = (struct SoundHeader_8SVX *)snd_info->file_ptr;
+  sound_header = (struct SoundHeader_8SVX *)snd_info->file_ptr;
 
-  if (strncmp(snd_hdr->magic_FORM,"FORM",4) ||
-      snd_info->file_len!=be2long(&snd_hdr->chunk_size)+8 ||
-      strncmp(snd_hdr->magic_8SVX,"8SVX",4))
+  if (strncmp(sound_header->magic_FORM,"FORM",4) ||
+      snd_info->file_len != be2long(&sound_header->chunk_size)+8 ||
+      strncmp(sound_header->magic_8SVX,"8SVX",4))
   {
     fprintf(stderr,"%s: '%s' is not an IFF/8SVX file or broken- no sounds\n",
 	    progname,filename);
     return(FALSE);
   }
 
-  ptr = (unsigned char *)snd_info->file_ptr;
+  ptr = snd_info->file_ptr + 12;
 
-  while(ptr<(unsigned char *)snd_info->file_ptr+snd_info->file_len)
+  while(ptr < (unsigned char *)(snd_info->file_ptr + snd_info->file_len))
   {
     if (!strncmp(ptr,"VHDR",4))
     {
-      ptr+=be2long((unsigned long *)(ptr+4));
+      ptr += be2long((unsigned long *)(ptr + 4)) + 8;
+      continue;
     }
-    if (!strncmp(ptr,"ANNO",4))
+    else if (!strncmp(ptr,"ANNO",4))
     {
-      ptr+=be2long((unsigned long *)(ptr+4));
+      ptr += be2long((unsigned long *)(ptr + 4)) + 8;
+      continue;
     }
-    if (!strncmp(ptr,"CHAN",4))
+    else if (!strncmp(ptr,"CHAN",4))
     {
-      ptr+=be2long((unsigned long *)(ptr+4));
+      ptr += be2long((unsigned long *)(ptr + 4)) + 8;
+      continue;
     }
-    if (!strncmp(ptr,"BODY",4))
+    else if (!strncmp(ptr,"BODY",4))
     {
-      snd_info->data_ptr = ptr+8;
-      snd_info->data_len = be2long((unsigned long *)(ptr+4));
+      snd_info->data_ptr = ptr + 8;
+      snd_info->data_len = be2long((unsigned long *)(ptr + 4));
       return(TRUE);
     }
-    ptr++;
+    else
+    {
+      /* other chunk not recognized here */
+      ptr += be2long((unsigned long *)(ptr + 4)) + 8;
+      continue;
+    }
   }
 
   return(FALSE);

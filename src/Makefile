@@ -15,8 +15,12 @@ GAME_DIR = -DGAME_DIR=\".\"		# path of the game and its data
 # SCORE_ENTRIES = -DONE_PER_NAME	# only one score entry per name
 SCORE_ENTRIES = -DMANY_PER_NAME		# many score entries per name
 
-# the XPM-Library is needed to build this program:
-XPM_INCLUDE_FILE = -DXPM_INCLUDE_FILE="<X11/xpm.h>"
+# The XPM-Library is no longer needed to build this program,
+# but is used to load graphics if XPM_INCLUDE_FILE is defined,
+# because the GIF loading routines are still a bit beta.
+# If you use the Xpm library, convert the GIF files to Xpm
+# files (and the mask files ('*Maske.gif') to xbm files).
+# XPM_INCLUDE_FILE = -DXPM_INCLUDE_FILE="<X11/xpm.h>"
 
 CONFIG = $(GAME_DIR) $(SOUNDS) $(JOYSTICK)	\
 	 $(SCORE_ENTRIES) $(XPM_INCLUDE_FILE)
@@ -27,10 +31,15 @@ DEBUG = -DDEBUG -g -Wall
 
 # SYSTEM = -Aa -D_HPUX_SOURCE -Dhpux	# for HP-UX (obsolete)
 # SYSTEM = -DSYSV -Ae			# for HP-UX
-# SYSTEM = -DSYSV			# for systems without 'usleep()'
 # INCL = -I/usr/include/X11R5		# for HP-UX and others
-# LIBS = -L/usr/lib/X11R5 -lXpm -lX11 -lm # for HP-UX and others
-LIBS = -L/usr/X11R6/lib -lXpm -lX11 -lm
+# INCL = -I/usr/local/X11/include	# for SunOS and others
+# LIBS = -L/usr/lib/X11R5 -lXpm -lX11 -lm
+#					# for HP-UX and others
+# LIBS = -L/usr/local/X11/lib -lXpm -lX11 -lm -lsocket -R/usr/local/X11/lib
+#					# for SunOS and others
+
+# LIBS = -L/usr/X11R6/lib -lXpm -lX11 -lm
+LIBS = -L/usr/X11R6/lib -lX11 -lm
 
 # CFLAGS = -O2 $(CONFIG) $(SYSTEM)
 CFLAGS = $(DEBUG) $(CONFIG) $(SYSTEM) $(INCL)
@@ -46,7 +55,11 @@ SRCS =	main.c		\
 	buttons.c	\
 	files.c		\
 	tape.c		\
-	sound.c
+	sound.c		\
+	joystick.c	\
+	cartoons.c	\
+	gfxloader.c	\
+	random.c
 
 OBJS =	main.o		\
 	init.o		\
@@ -59,7 +72,11 @@ OBJS =	main.o		\
 	buttons.o	\
 	files.o		\
 	tape.o		\
-	sound.o
+	sound.o		\
+	joystick.o	\
+	cartoons.o	\
+	gfxloader.o	\
+	random.o
 
 all:	$(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) $(LIBS) -o $(PROGNAME)
@@ -69,3 +86,14 @@ all:	$(OBJS)
 
 clean:
 	$(RM) $(OBJS)
+
+backup:
+	@echo "tar cvzf /usr/AEGLOS/BACKUP/rnd-`date +%Y%m%d | cut -b 3-8`.tgz *.c *.h Makefile"
+	@tar cvzf /usr/AEGLOS/BACKUP/rnd-`date +%Y%m%d | cut -b 3-8`.tgz *.c *.h Makefile
+
+depend:
+	for i in $(SRCS); do $(CPP) $(CFLAGS) -M $$i; done > .depend
+
+ifeq (.depend,$(wildcard .depend))
+include .depend
+endif

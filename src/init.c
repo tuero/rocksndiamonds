@@ -18,9 +18,39 @@
 #include "screens.h"
 #include "tools.h"
 #include "files.h"
+#include "joystick.h"
+#include "gfxloader.h"
+
 #include <signal.h>
 
+#ifdef DEBUG
+/*
+#define DEBUG_TIMING
+*/
+#endif
+
+struct PictureFileInfo
+{
+  char *picture_filename;
+  BOOL picture_with_mask;
+};
+
+struct IconFileInfo
+{
+  char *picture_filename;
+  char *picturemask_filename;
+};
+
 static int sound_process_id = 0;
+
+static void InitLevelAndPlayerInfo(void);
+static void InitDisplay(int, char **);
+static void InitSound(void);
+static void InitSoundProcess(void);
+static void InitWindow(int, char **);
+static void InitGfx(void);
+static void LoadGfx(int, struct PictureFileInfo *);
+static void InitElementProperties(void);
 
 void OpenAll(int argc, char *argv[])
 {
@@ -196,7 +226,7 @@ void InitWindow(int argc, char *argv[])
   char *window_name = WINDOWTITLE_STRING;
   char *icon_name = WINDOWTITLE_STRING;
   long window_event_mask;
-  static struct PictureFile icon_pic =
+  static struct IconFileInfo icon_pic =
   {
     "rocks_icon.xbm",
     "rocks_iconmask.xbm"
@@ -295,14 +325,20 @@ void InitGfx()
   int i,j;
   XGCValues clip_gc_values;
   unsigned long clip_gc_valuemask;
-  static struct PictureFile pic[NUM_PICTURES] =
+  static struct PictureFileInfo pic[NUM_PICTURES] =
   {
-    { "RocksScreen.xpm",	"RocksScreenMaske.xbm" },
-    { "RocksDoor.xpm",		"RocksDoorMaske.xbm" },
-    { "RocksToons.xpm",		"RocksToonsMaske.xbm" },
-    { "RocksFont.xpm",		NULL },
-    { "RocksFont2.xpm",		NULL }
+    { "RocksScreen",	TRUE },
+    { "RocksDoor",	TRUE },
+    { "RocksHeroes",	TRUE },
+    { "RocksToons",	TRUE },
+    { "RocksFont",	FALSE },
+    { "RocksFont2",	FALSE }
   }; 
+
+#ifdef DEBUG_TIMING
+  long count1, count2;
+  count1 = Counter();
+#endif
 
   LoadGfx(PIX_SMALLFONT,&pic[PIX_SMALLFONT]);
   DrawInitText(WINDOWTITLE_STRING,20,FC_YELLOW);
@@ -312,6 +348,12 @@ void InitGfx()
   for(i=0;i<NUM_PICTURES;i++)
     if (i!=PIX_SMALLFONT)
       LoadGfx(i,&pic[i]);
+
+#ifdef DEBUG_TIMING
+  count2 = Counter();
+  printf("SUMMARY: %.2f SECONDS LOADING TIME\n",(float)(count2-count1)/100.0);
+#endif
+
 
   pix[PIX_DB_BACK] = XCreatePixmap(display, window,
 				   WIN_XSIZE,WIN_YSIZE,
@@ -357,19 +399,40 @@ void InitGfx()
   redraw_mask=REDRAW_ALL;
 }
 
-void LoadGfx(int pos, struct PictureFile *pic)
+void LoadGfx(int pos, struct PictureFileInfo *pic)
 {
+  char basefilename[256];
+  char filename[256];
+
+#ifdef XPM_INCLUDE_FILE
   int xpm_err, xbm_err;
   unsigned int width,height;
   int hot_x,hot_y;
-  char filename[256];
   Pixmap shapemask;
+  char *picture_ext = ".xpm";
+  char *picturemask_ext = "Mask.xbm";
+#else
+  int gif_err, ilbm_err;
+  char *picture_ext = ".gif";
+  char *picturemask_ext = "Mask.ilbm";
+#endif
+
+#ifdef DEBUG_TIMING
+  long count1, count2;
+#endif
 
   /* Grafik laden */
   if (pic->picture_filename)
   {
-    DrawInitText(pic->picture_filename,150,FC_YELLOW);
-    sprintf(filename,"%s/%s",GFX_PATH,pic->picture_filename);
+    sprintf(basefilename,"%s%s",pic->picture_filename,picture_ext);
+    DrawInitText(basefilename,150,FC_YELLOW);
+    sprintf(filename,"%s/%s",GFX_PATH,basefilename);
+
+#ifdef DEBUG_TIMING
+    count1 = Counter();
+#endif
+
+#ifdef XPM_INCLUDE_FILE
 
     xpm_att[pos].valuemask = XpmCloseness;
     xpm_att[pos].closeness = 20000;
@@ -378,7 +441,7 @@ void LoadGfx(int pos, struct PictureFile *pic)
     switch(xpm_err)
     {
       case XpmOpenFailed:
-        fprintf(stderr,"Xpm file open failed on '%s' !\n",filename);
+        fprintf(stderr,"Cannot open Xpm file '%s' !\n",filename);
 	CloseAll();
 	exit(-1);
       case XpmFileInvalid:
@@ -386,20 +449,60 @@ void LoadGfx(int pos, struct PictureFile *pic)
 	CloseAll();
 	exit(-1);
       case XpmNoMemory:
-	fprintf(stderr,"Not enough memory !\n");	
+	fprintf(stderr,"Not enough memory for Xpm file '%s'!\n",filename);
 	CloseAll();
 	exit(1);
       case XpmColorFailed:
-	fprintf(stderr,"Can`t get any colors...\n");
+	fprintf(stderr,"Can't get colors for Xpm file '%s'!\n",filename);
 	CloseAll();
 	exit(-1);
       default:
 	break;
     }
 
+#else 
+
+    gif_err = Read_GIF_to_Pixmap(display,filename,&pix[pos]);
+
+    switch(gif_err)
+    {
+      case GIF_Success:
+        break;
+      case GIF_OpenFailed:
+        fprintf(stderr,"Cannot open GIF file '%s' !\n",filename);
+	CloseAll();
+	exit(-1);
+      case GIF_ReadFailed:
+        fprintf(stderr,"Cannot read GIF file '%s' !\n",filename);
+	CloseAll();
+	exit(-1);
+      case GIF_FileInvalid:
+	fprintf(stderr,"Invalid GIF file '%s'!\n",filename);
+	CloseAll();
+	exit(-1);
+      case GIF_NoMemory:
+	fprintf(stderr,"Not enough memory for GIF file '%s'!\n",filename);
+	CloseAll();
+	exit(1);
+      case GIF_ColorFailed:
+	fprintf(stderr,"Can't get colors for GIF file '%s'!\n",filename);
+	CloseAll();
+	exit(-1);
+      default:
+	break;
+    }
+
+#endif
+
+#ifdef DEBUG_TIMING
+    count2 = Counter();
+    printf("LOADING %s IN %.2f SECONDS\n",
+	   filename,(float)(count2-count1)/100.0);
+#endif
+
     if (!pix[pos])
     {
-      fprintf(stderr, "%s: cannot read Xpm file '%s'.\n",
+      fprintf(stderr, "%s: cannot read graphics file '%s'.\n",
 	      progname,filename);
       CloseAll();
       exit(-1);
@@ -407,10 +510,17 @@ void LoadGfx(int pos, struct PictureFile *pic)
   }
 
   /* zugehörige Maske laden (wenn vorhanden) */
-  if (pic->picturemask_filename)
+  if (pic->picture_with_mask)
   {
-    DrawInitText(pic->picturemask_filename,150,FC_YELLOW);
-    sprintf(filename,"%s/%s",GFX_PATH,pic->picturemask_filename);
+    sprintf(basefilename,"%s%s",pic->picture_filename,picturemask_ext);
+    DrawInitText(basefilename,150,FC_YELLOW);
+    sprintf(filename,"%s/%s",GFX_PATH,basefilename);
+
+#ifdef DEBUG_TIMING
+    count1 = Counter();
+#endif
+
+#ifdef XPM_INCLUDE_FILE
 
     xbm_err = XReadBitmapFile(display,window,filename,
 			      &width,&height,&clipmask[pos],&hot_x,&hot_y);
@@ -437,9 +547,45 @@ void LoadGfx(int pos, struct PictureFile *pic)
 	break;
     }
 
+#else
+
+    ilbm_err = Read_ILBM_to_Bitmap(display,filename,&clipmask[pos]);
+
+    switch(ilbm_err)
+    {
+      case ILBM_Success:
+        break;
+      case ILBM_OpenFailed:
+        fprintf(stderr,"Cannot open ILBM file '%s' !\n",filename);
+	CloseAll();
+	exit(-1);
+      case ILBM_ReadFailed:
+        fprintf(stderr,"Cannot read ILBM file '%s' !\n",filename);
+	CloseAll();
+	exit(-1);
+      case ILBM_FileInvalid:
+	fprintf(stderr,"Invalid ILBM file '%s'!\n",filename);
+	CloseAll();
+	exit(-1);
+      case ILBM_NoMemory:
+	fprintf(stderr,"Not enough memory for ILBM file '%s'!\n",filename);
+	CloseAll();
+	exit(1);
+      default:
+	break;
+    }
+
+#endif
+
+#ifdef DEBUG_TIMING
+    count2 = Counter();
+    printf("LOADING %s IN %.2f SECONDS\n",
+	   filename,(float)(count2-count1)/100.0);
+#endif
+
     if (!clipmask[pos])
     {
-      fprintf(stderr, "%s: cannot read X11 bitmap file '%s'.\n",
+      fprintf(stderr, "%s: cannot read graphics file '%s'.\n",
 	      progname,filename);
       CloseAll();
       exit(-1);
@@ -469,16 +615,6 @@ void InitElementProperties()
     EL_AMOEBE_BD
   };
   static int ep_amoeboid_num = sizeof(ep_amoeboid)/sizeof(int);
-
-  static int ep_badewannoid[] =
-  {
-    EL_BADEWANNE1,
-    EL_BADEWANNE2,
-    EL_BADEWANNE3,
-    EL_BADEWANNE4,
-    EL_BADEWANNE5
-  };
-  static int ep_badewannoid_num = sizeof(ep_badewannoid)/sizeof(int);
 
   static int ep_schluessel[] =
   {
@@ -573,7 +709,8 @@ void InitElementProperties()
     EL_BIRNE_EIN,
     EL_BIRNE_AUS,
     EL_BADEWANNE1,
-    EL_BADEWANNE2
+    EL_BADEWANNE2,
+    EL_SONDE
   };
   static int ep_slippery_num = sizeof(ep_slippery)/sizeof(int);
 
@@ -585,7 +722,7 @@ void InitElementProperties()
     EL_FIREFLY,
     EL_MAMPFER,
     EL_MAMPFER2,
-    EL_ZOMBIE,
+    EL_ROBOT,
     EL_PACMAN
   };
   static int ep_enemy_num = sizeof(ep_enemy)/sizeof(int);
@@ -672,8 +809,13 @@ void InitElementProperties()
     EL_FIREFLY,
     EL_MAMPFER,
     EL_MAMPFER2,
-    EL_ZOMBIE,
-    EL_PACMAN
+    EL_ROBOT,
+    EL_PACMAN,
+    EL_MAULWURF,
+    EL_PINGUIN,
+    EL_SCHWEIN,
+    EL_DRACHE,
+    EL_SONDE
   };
   static int ep_can_move_num = sizeof(ep_can_move)/sizeof(int);
 
@@ -719,7 +861,7 @@ void InitElementProperties()
     EL_FIREFLY,
     EL_MAMPFER,
     EL_MAMPFER2,
-    EL_ZOMBIE,
+    EL_ROBOT,
     EL_PACMAN,
     EL_TROPFEN,
     EL_SALZSAEURE
@@ -734,7 +876,7 @@ void InitElementProperties()
     EL_BUTTERFLY,
     EL_FIREFLY,
     EL_MAMPFER,
-    EL_ZOMBIE,
+    EL_ROBOT,
     EL_PACMAN,
     EL_TROPFEN,
     EL_AMOEBE_TOT,
@@ -852,11 +994,51 @@ void InitElementProperties()
   };
   static int ep_inactive_num = sizeof(ep_inactive)/sizeof(int);
 
+  static int ep_explosive[] =
+  {
+    EL_BOMBE,
+    EL_DYNAMIT,
+    EL_DYNAMIT_AUS,
+    EL_DYNABOMB,
+    EL_DYNABOMB_NR,
+    EL_DYNABOMB_SZ,
+    EL_DYNABOMB_XL,
+    EL_KAEFER,
+    EL_MAULWURF,
+    EL_PINGUIN,
+    EL_SCHWEIN,
+    EL_DRACHE,
+    EL_SONDE
+  };
+  static int ep_explosive_num = sizeof(ep_explosive)/sizeof(int);
+
+  static int ep_mampf3[] =
+  {
+    EL_EDELSTEIN,
+    EL_EDELSTEIN_BD,
+    EL_EDELSTEIN_GELB,
+    EL_EDELSTEIN_ROT,
+    EL_EDELSTEIN_LILA,
+    EL_DIAMANT
+  };
+  static int ep_mampf3_num = sizeof(ep_mampf3)/sizeof(int);
+
+  static int ep_pushable[] =
+  {
+    EL_FELSBROCKEN,
+    EL_BOMBE,
+    EL_KOKOSNUSS,
+    EL_ZEIT_LEER,
+    EL_SOKOBAN_FELD_VOLL,
+    EL_SOKOBAN_OBJEKT,
+    EL_SONDE
+  };
+  static int ep_pushable_num = sizeof(ep_pushable)/sizeof(int);
+
   static long ep_bit[] =
   {
     EP_BIT_AMOEBALIVE,
     EP_BIT_AMOEBOID,
-    EP_BIT_BADEWANNOID,
     EP_BIT_SCHLUESSEL,
     EP_BIT_PFORTE,
     EP_BIT_SOLID,
@@ -875,13 +1057,15 @@ void InitElementProperties()
     EP_BIT_BD_ELEMENT,
     EP_BIT_SB_ELEMENT,
     EP_BIT_GEM,
-    EP_BIT_INACTIVE
+    EP_BIT_INACTIVE,
+    EP_BIT_EXPLOSIVE,
+    EP_BIT_MAMPF3,
+    EP_BIT_PUSHABLE
   };
   static int *ep_array[] =
   {
     ep_amoebalive,
     ep_amoeboid,
-    ep_badewannoid,
     ep_schluessel,
     ep_pforte,
     ep_solid,
@@ -900,13 +1084,15 @@ void InitElementProperties()
     ep_bd_element,
     ep_sb_element,
     ep_gem,
-    ep_inactive
+    ep_inactive,
+    ep_explosive,
+    ep_mampf3,
+    ep_pushable
   };
   static int *ep_num[] =
   {
     &ep_amoebalive_num,
     &ep_amoeboid_num,
-    &ep_badewannoid_num,
     &ep_schluessel_num,
     &ep_pforte_num,
     &ep_solid_num,
@@ -925,7 +1111,10 @@ void InitElementProperties()
     &ep_bd_element_num,
     &ep_sb_element_num,
     &ep_gem_num,
-    &ep_inactive_num
+    &ep_inactive_num,
+    &ep_explosive_num,
+    &ep_mampf3_num,
+    &ep_pushable_num
   };
   static int num_properties = sizeof(ep_num)/sizeof(int *);
 
@@ -954,12 +1143,14 @@ void CloseAll()
   {
     if (pix[i])
     {
+#ifdef XPM_INCLUDE_FILE
       if (i<NUM_PICTURES)	/* XPM pictures */
       {
 	XFreeColors(display,DefaultColormap(display,screen),
 		    xpm_att[i].pixels,xpm_att[i].npixels,0);
 	XpmFreeAttributes(&xpm_att[i]);
       }
+#endif
       XFreePixmap(display,pix[i]);
     }
     if (clipmask[i])

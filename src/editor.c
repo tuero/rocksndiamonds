@@ -112,7 +112,7 @@ int editor_element[] =
   EL_MAMPFER,
   EL_KAEFER_O,
   EL_FLIEGER_O,
-  EL_ZOMBIE,
+  EL_ROBOT,
 
   EL_KAEFER_L,
   EL_FLIEGER_L,
@@ -159,6 +159,11 @@ int editor_element[] =
   EL_CHAR_A + ('R' - 'A'),
   EL_CHAR_A + ('E' - 'A'),
 
+  EL_PFEIL_L,
+  EL_PFEIL_R,
+  EL_PFEIL_O,
+  EL_PFEIL_U,
+
   EL_AMOEBE_VOLL,
   EL_EDELSTEIN_GELB,
   EL_EDELSTEIN_ROT,
@@ -188,6 +193,16 @@ int editor_element[] =
   EL_DYNABOMB_SZ,
   EL_DYNABOMB_XL,
   EL_BADEWANNE,
+
+  EL_MAULWURF,
+  EL_PINGUIN,
+  EL_SCHWEIN,
+  EL_DRACHE,
+
+  EL_SONDE,
+  EL_LEERRAUM,
+  EL_LEERRAUM,
+  EL_LEERRAUM,
 
   EL_CHAR_A + ('S' - 'A'),
   EL_CHAR_A + ('O' - 'A'),
@@ -220,6 +235,11 @@ int editor_element[] =
   EL_CHAR_A + ('E' - 'A'),
   EL_CHAR_A + ('R' - 'A'),
 */
+
+  EL_LEERRAUM,
+  EL_LEERRAUM,
+  EL_LEERRAUM,
+  EL_LEERRAUM,
 
   EL_CHAR_AUSRUF,
   EL_CHAR_ZOLL,
@@ -1188,7 +1208,7 @@ void LevelNameTyping(KeySym key)
 		ED_COUNT_TEXT_YPOS+16*ED_COUNT_TEXT_YSIZE,
 		"<",FS_SMALL,FC_RED);
   }
-  else if (key==XK_Delete && len>0)
+  else if ((key==XK_Delete || key==XK_BackSpace) && len>0)
   {
     level.name[len-1] = 0;
     len--;
