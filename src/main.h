@@ -1035,6 +1035,8 @@ struct CustomElementInfo
   boolean use_gfx_element;
   short gfx_element;		/* optional custom graphic element */
 
+  int move_direction;		/* direction movable element moves to */
+
   int walk_to_action;		/* only for level editor; not stored */
   int walkable_layer;		/* only for level editor; not stored */
 
@@ -1059,8 +1061,8 @@ struct LevelInfo
   char name[MAX_LEVEL_NAME_LEN + 1];
   char author[MAX_LEVEL_AUTHOR_LEN + 1];
   int score[LEVEL_SCORE_ELEMENTS];
-  int yam_content[MAX_ELEMENT_CONTENTS][3][3];
-  int num_yam_contents;
+  int yamyam_content[MAX_ELEMENT_CONTENTS][3][3];
+  int num_yamyam_contents;
   int amoeba_speed;
   int amoeba_content;
   int time_magic_wall;
@@ -1118,7 +1120,7 @@ struct GameInfo
   int initial_move_delay_value;
 
   /* variable within running game */
-  int yam_content_nr;
+  int yamyam_content_nr;
   boolean magic_wall_active;
   int magic_wall_time_left;
   int light_time_left;

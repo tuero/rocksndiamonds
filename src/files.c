@@ -84,11 +84,11 @@ static void setLevelInfoToDefaults()
   for(i=0; i<LEVEL_SCORE_ELEMENTS; i++)
     level.score[i] = 10;
 
-  level.num_yam_contents = STD_ELEMENT_CONTENTS;
+  level.num_yamyam_contents = STD_ELEMENT_CONTENTS;
   for(i=0; i<MAX_ELEMENT_CONTENTS; i++)
     for(x=0; x<3; x++)
       for(y=0; y<3; y++)
-	level.yam_content[i][x][y] =
+	level.yamyam_content[i][x][y] =
 	  (i < STD_ELEMENT_CONTENTS ? EL_ROCK : EL_EMPTY);
 
   Feld[0][0] = Ur[0][0] = EL_PLAYER_1;
@@ -101,6 +101,11 @@ static void setLevelInfoToDefaults()
 
     level.custom_element[i].use_gfx_element = FALSE;
     level.custom_element[i].gfx_element = EL_EMPTY_SPACE;
+    level.custom_element[i].move_direction = 0;
+
+    for(x=0; x<3; x++)
+      for(y=0; y<3; y++)
+	level.custom_element[i].content[x][y] = EL_EMPTY_SPACE;
 
     level.custom_element[i].change.events = CE_BITMASK_DEFAULT;
     level.custom_element[i].change.delay_fixed = 0;
@@ -190,11 +195,11 @@ static int LoadLevel_HEAD(FILE *file, int chunk_size, struct LevelInfo *level)
   for(i=0; i<LEVEL_SCORE_ELEMENTS; i++)
     level->score[i] = fgetc(file);
 
-  level->num_yam_contents = STD_ELEMENT_CONTENTS;
+  level->num_yamyam_contents = STD_ELEMENT_CONTENTS;
   for(i=0; i<STD_ELEMENT_CONTENTS; i++)
     for(y=0; y<3; y++)
       for(x=0; x<3; x++)
-	level->yam_content[i][x][y] = checkLevelElement(fgetc(file));
+	level->yamyam_content[i][x][y] = checkLevelElement(fgetc(file));
 
   level->amoeba_speed		= fgetc(file);
   level->time_magic_wall	= fgetc(file);
@@ -270,19 +275,19 @@ static int LoadLevel_CONT(FILE *file, int chunk_size, struct LevelInfo *level)
   }
 
   fgetc(file);
-  level->num_yam_contents = fgetc(file);
+  level->num_yamyam_contents = fgetc(file);
   fgetc(file);
   fgetc(file);
 
   /* correct invalid number of content fields -- should never happen */
-  if (level->num_yam_contents < 1 ||
-      level->num_yam_contents > MAX_ELEMENT_CONTENTS)
-    level->num_yam_contents = STD_ELEMENT_CONTENTS;
+  if (level->num_yamyam_contents < 1 ||
+      level->num_yamyam_contents > MAX_ELEMENT_CONTENTS)
+    level->num_yamyam_contents = STD_ELEMENT_CONTENTS;
 
   for(i=0; i<MAX_ELEMENT_CONTENTS; i++)
     for(y=0; y<3; y++)
       for(x=0; x<3; x++)
-	level->yam_content[i][x][y] =
+	level->yamyam_content[i][x][y] =
 	  checkLevelElement(level->encoding_16bit_field ?
 			    getFile16BitBE(file) : fgetc(file));
   return chunk_size;
@@ -312,12 +317,12 @@ static int LoadLevel_CNT2(FILE *file, int chunk_size, struct LevelInfo *level)
 
   if (element == EL_YAMYAM)
   {
-    level->num_yam_contents = num_contents;
+    level->num_yamyam_contents = num_contents;
 
     for(i=0; i<num_contents; i++)
       for(y=0; y<3; y++)
 	for(x=0; x<3; x++)
-	  level->yam_content[i][x][y] = content_array[i][x][y];
+	  level->yamyam_content[i][x][y] = content_array[i][x][y];
   }
   else if (element == EL_BD_AMOEBA)
   {
@@ -622,7 +627,7 @@ static void SaveLevel_HEAD(FILE *file, struct LevelInfo *level)
     for(y=0; y<3; y++)
       for(x=0; x<3; x++)
 	fputc((level->encoding_16bit_yamyam ? EL_EMPTY :
-	       level->yam_content[i][x][y]),
+	       level->yamyam_content[i][x][y]),
 	      file);
   fputc(level->amoeba_speed, file);
   fputc(level->time_magic_wall, file);
@@ -663,7 +668,7 @@ static void SaveLevel_CONT(FILE *file, struct LevelInfo *level)
   int i, x, y;
 
   fputc(EL_YAMYAM, file);
-  fputc(level->num_yam_contents, file);
+  fputc(level->num_yamyam_contents, file);
   fputc(0, file);
   fputc(0, file);
 
@@ -671,9 +676,9 @@ static void SaveLevel_CONT(FILE *file, struct LevelInfo *level)
     for(y=0; y<3; y++)
       for(x=0; x<3; x++)
 	if (level->encoding_16bit_field)
-	  putFile16BitBE(file, level->yam_content[i][x][y]);
+	  putFile16BitBE(file, level->yamyam_content[i][x][y]);
 	else
-	  fputc(level->yam_content[i][x][y], file);
+	  fputc(level->yamyam_content[i][x][y], file);
 }
 #endif
 
@@ -685,14 +690,14 @@ static void SaveLevel_CNT2(FILE *file, struct LevelInfo *level, int element)
 
   if (element == EL_YAMYAM)
   {
-    num_contents = level->num_yam_contents;
+    num_contents = level->num_yamyam_contents;
     content_xsize = 3;
     content_ysize = 3;
 
     for(i=0; i<MAX_ELEMENT_CONTENTS; i++)
       for(y=0; y<3; y++)
 	for(x=0; x<3; x++)
-	  content_array[i][x][y] = level->yam_content[i][x][y];
+	  content_array[i][x][y] = level->yamyam_content[i][x][y];
   }
   else if (element == EL_BD_AMOEBA)
   {
@@ -809,10 +814,10 @@ void SaveLevel(int level_nr)
 
   /* check yamyam content for 16-bit elements */
   level.encoding_16bit_yamyam = FALSE;
-  for(i=0; i<level.num_yam_contents; i++)
+  for(i=0; i<level.num_yamyam_contents; i++)
     for(y=0; y<3; y++)
       for(x=0; x<3; x++)
-	if (level.yam_content[i][x][y] > 255)
+	if (level.yamyam_content[i][x][y] > 255)
 	  level.encoding_16bit_yamyam = TRUE;
 
   /* check amoeba content for 16-bit elements */
@@ -850,7 +855,7 @@ void SaveLevel(int level_nr)
   SaveLevel_BODY(file, &level);
 
   if (level.encoding_16bit_yamyam ||
-      level.num_yam_contents != STD_ELEMENT_CONTENTS)
+      level.num_yamyam_contents != STD_ELEMENT_CONTENTS)
   {
     putFileChunkBE(file, "CNT2", LEVEL_CHUNK_CNT2_SIZE);
     SaveLevel_CNT2(file, &level, EL_YAMYAM);

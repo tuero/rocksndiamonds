@@ -331,12 +331,13 @@
 #define GADGET_ID_SELECTBOX_FIRST	(GADGET_ID_TEXT_INPUT_FIRST + 2)
 
 #define GADGET_ID_CUSTOM_WALK_TO_ACTION	(GADGET_ID_SELECTBOX_FIRST + 0)
-#define GADGET_ID_CUSTOM_WALKABLE_LAYER	(GADGET_ID_SELECTBOX_FIRST + 1)
-#define GADGET_ID_CHANGE_TIME_UNITS	(GADGET_ID_SELECTBOX_FIRST + 2)
-#define GADGET_ID_CHANGE_CAUSE		(GADGET_ID_SELECTBOX_FIRST + 3)
+#define GADGET_ID_CUSTOM_MOVE_DIRECTION	(GADGET_ID_SELECTBOX_FIRST + 1)
+#define GADGET_ID_CUSTOM_WALKABLE_LAYER	(GADGET_ID_SELECTBOX_FIRST + 2)
+#define GADGET_ID_CHANGE_TIME_UNITS	(GADGET_ID_SELECTBOX_FIRST + 3)
+#define GADGET_ID_CHANGE_CAUSE		(GADGET_ID_SELECTBOX_FIRST + 4)
 
 /* textbutton identifiers */
-#define GADGET_ID_TEXTBUTTON_FIRST	(GADGET_ID_SELECTBOX_FIRST + 4)
+#define GADGET_ID_TEXTBUTTON_FIRST	(GADGET_ID_SELECTBOX_FIRST + 5)
 
 #define GADGET_ID_PROPERTIES_INFO	(GADGET_ID_TEXTBUTTON_FIRST + 0)
 #define GADGET_ID_PROPERTIES_CONFIG	(GADGET_ID_TEXTBUTTON_FIRST + 1)
@@ -448,14 +449,15 @@
 #define ED_TEXTINPUT_ID_LEVEL_LAST	ED_TEXTINPUT_ID_LEVEL_AUTHOR
 
 /* values for selectbox gadgets */
-#define ED_SELECTBOX_ID_CUSTOM_WALK_TO_OBJECT	0
-#define ED_SELECTBOX_ID_CUSTOM_WALKABLE_LAYER	1
-#define ED_SELECTBOX_ID_CHANGE_TIME_UNITS	2
-#define ED_SELECTBOX_ID_CHANGE_CAUSE		3
+#define ED_SELECTBOX_ID_CUSTOM_WALK_TO_ACTION	0
+#define ED_SELECTBOX_ID_CUSTOM_MOVE_DIRECTION	1
+#define ED_SELECTBOX_ID_CUSTOM_WALKABLE_LAYER	2
+#define ED_SELECTBOX_ID_CHANGE_TIME_UNITS	3
+#define ED_SELECTBOX_ID_CHANGE_CAUSE		4
 
-#define ED_NUM_SELECTBOX			4
+#define ED_NUM_SELECTBOX			5
 
-#define ED_SELECTBOX_ID_CUSTOM_FIRST	ED_SELECTBOX_ID_CUSTOM_WALK_TO_OBJECT
+#define ED_SELECTBOX_ID_CUSTOM_FIRST	ED_SELECTBOX_ID_CUSTOM_WALK_TO_ACTION
 #define ED_SELECTBOX_ID_CUSTOM_LAST	ED_SELECTBOX_ID_CUSTOM_WALKABLE_LAYER
 
 #define ED_SELECTBOX_ID_CHANGE_FIRST	ED_SELECTBOX_ID_CHANGE_TIME_UNITS
@@ -675,7 +677,7 @@ static struct
     MIN_ELEMENT_CONTENTS,		MAX_ELEMENT_CONTENTS,
     GADGET_ID_ELEMENT_CONTENT_DOWN,	GADGET_ID_ELEMENT_CONTENT_UP,
     GADGET_ID_ELEMENT_CONTENT_TEXT,
-    &level.num_yam_contents,
+    &level.num_yamyam_contents,
     "element content",			NULL
   },
   {
@@ -730,6 +732,23 @@ static struct ValueTextInfo options_walk_to_action[] =
 };
 static int index_walk_to_action = 0;
 
+static struct ValueTextInfo options_move_direction[] =
+{
+  { EP_DIGGABLE,	"left"			},
+  { EP_COLLECTIBLE,	"right"			},
+  { EP_PUSHABLE,	"up"			},
+  { EP_PUSHABLE,	"down"			},
+  { EP_PUSHABLE,	"horizontal"		},
+  { EP_PUSHABLE,	"vertical"		},
+  { EP_PUSHABLE,	"all directions"	},
+  { EP_PUSHABLE,	"towards player"	},
+  { EP_PUSHABLE,	"away from player"	},
+  { EP_PUSHABLE,	"along left side"	},
+  { EP_PUSHABLE,	"along right side"	},
+  { -1,			NULL			}
+};
+static int index_move_direction = 0;
+
 static struct ValueTextInfo options_walkable_layer[] =
 {
   { EP_WALKABLE_OVER,	"over"			},
@@ -774,7 +793,15 @@ static struct
     0,
     options_walk_to_action, &index_walk_to_action,
     &custom_element.walk_to_action,
-    NULL, "diggable, collectible or pushable"
+    NULL, "diggable/collectible/pushable"
+  },
+  {
+    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(5),
+    GADGET_ID_CUSTOM_MOVE_DIRECTION,
+    0,
+    options_move_direction, &index_move_direction,
+    &custom_element.move_direction,
+    "can move", "element move direction"
   },
   {
     ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(10),
@@ -993,7 +1020,7 @@ static struct
     ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(5),
     GADGET_ID_CUSTOM_CAN_MOVE,
     &custom_element_properties[EP_CAN_MOVE],
-    "can move",				"element can move in some direction"
+    NULL,				"element can move in some direction"
   },
   {
     ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(6),
@@ -1029,7 +1056,7 @@ static struct
     ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(2),
     GADGET_ID_CUSTOM_USE_GRAPHIC,
     &custom_element.use_gfx_element,
-    "use graphic of element:",		"use optional custom graphic element"
+    "use graphic of element:",		"use graphic for custom element"
   },
   {
     ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(1),
@@ -1103,7 +1130,6 @@ static int last_drawing_function = GADGET_ID_SINGLE_ITEMS;
 static boolean draw_with_brush = FALSE;
 static int properties_element = 0;
 
-static short ElementContent[MAX_ELEMENT_CONTENTS][3][3];
 static short FieldBackup[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 static short UndoBuffer[NUM_UNDO_STEPS][MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 static int undo_buffer_position = 0;
@@ -3394,10 +3420,8 @@ static void DrawRandomPlacementBackgroundArea()
   int area_sx = SX + ED_AREA_RANDOM_BACKGROUND_XPOS;
   int area_sy = SY + ED_AREA_RANDOM_BACKGROUND_YPOS;
 
-  ElementContent[0][0][0] = random_placement_background_element;
-
   DrawElementBorder(area_sx, area_sy, MINI_TILEX, MINI_TILEY, TRUE);
-  DrawMiniElement(area_x, area_y, ElementContent[0][0][0]);
+  DrawMiniElement(area_x, area_y, random_placement_background_element);
 
   MapDrawingArea(GADGET_ID_RANDOM_BACKGROUND);
 }
@@ -3502,10 +3526,8 @@ static void DrawAmoebaContentArea()
   int area_sx = SX + ED_AREA_ELEM_CONTENT_XPOS;
   int area_sy = SY + ED_AREA_ELEM_CONTENT_YPOS;
 
-  ElementContent[0][0][0] = level.amoeba_content;
-
   DrawElementBorder(area_sx, area_sy, MINI_TILEX, MINI_TILEY, TRUE);
-  DrawMiniElement(area_x, area_y, ElementContent[0][0][0]);
+  DrawMiniElement(area_x, area_y, level.amoeba_content);
 
   DrawText(area_sx + TILEX, area_sy + 1, "Content of amoeba", FONT_TEXT_1);
 
@@ -3538,21 +3560,9 @@ static void DrawCustomGraphicElementArea()
     return;
   }
 
-  ElementContent[0][0][0] = custom_element.gfx_element;
-
   DrawElementBorder(area_sx, area_sy, MINI_TILEX, MINI_TILEY, TRUE);
-#if 1
-  DrawMiniGraphicExt(drawto,
-		     gi->x,
-		     gi->y,
-		     el2edimg(ElementContent[0][0][0]));
-#else
-  DrawMiniElement(area_x, area_y, ElementContent[0][0][0]);
-#endif
-
-#if 0
-  DrawText(area_sx + TILEX, area_sy + 1, "Element after change", FONT_TEXT_1);
-#endif
+  DrawMiniGraphicExt(drawto, gi->x, gi->y,
+		     el2edimg(custom_element.gfx_element));
 
   MapDrawingArea(GADGET_ID_CUSTOM_GRAPHIC);
 }
@@ -3572,22 +3582,12 @@ static void DrawCustomContentArea()
     return;
   }
 
-  for (y=0; y<3; y++)
-    for (x=0; x<3; x++)
-      ElementContent[0][x][y] = custom_element.content[x][y];
-
   DrawElementBorder(area_sx, area_sy, 3 * MINI_TILEX, 3 * MINI_TILEY, TRUE);
 
   for (y=0; y<3; y++)
     for (x=0; x<3; x++)
-#if 1
-      DrawMiniGraphicExt(drawto,
-			 gi->x + x * MINI_TILEX,
-			 gi->y + y * MINI_TILEY,
-			 el2edimg(ElementContent[0][0][0]));
-#else
-      DrawMiniElement(area_x + x, area_y + y, ElementContent[0][x][y]);
-#endif
+      DrawMiniGraphicExt(drawto, gi->x + x * MINI_TILEX,gi->y + y * MINI_TILEY,
+			 el2edimg(custom_element.content[x][y]));
 
   MapDrawingArea(GADGET_ID_CUSTOM_CONTENT);
 }
@@ -3618,21 +3618,9 @@ static void DrawCustomChangedArea()
     return;
   }
 
-  ElementContent[0][0][0] = custom_element.change.successor;
-
   DrawElementBorder(area_sx, area_sy, MINI_TILEX, MINI_TILEY, TRUE);
-#if 1
-  DrawMiniGraphicExt(drawto,
-		     gi->x,
-		     gi->y,
-		     el2edimg(ElementContent[0][0][0]));
-#else
-  DrawMiniElement(area_x, area_y, ElementContent[0][0][0]);
-#endif
-
-#if 0
-  DrawText(area_sx + TILEX, area_sy + 1, "Element after change", FONT_TEXT_1);
-#endif
+  DrawMiniGraphicExt(drawto, gi->x, gi->y,
+		     el2edimg(custom_element.change.successor));
 
   MapDrawingArea(GADGET_ID_CUSTOM_CHANGED);
 }
@@ -3649,11 +3637,6 @@ static void DrawElementContentAreas()
   int i, x, y;
 
   for (i=0; i<MAX_ELEMENT_CONTENTS; i++)
-    for (y=0; y<3; y++)
-      for (x=0; x<3; x++)
-	ElementContent[i][x][y] = level.yam_content[i][x][y];
-
-  for (i=0; i<MAX_ELEMENT_CONTENTS; i++)
     UnmapDrawingArea(GADGET_ID_ELEMENT_CONTENT_0 + i);
 
   /* display counter to choose number of element content areas */
@@ -3667,7 +3650,7 @@ static void DrawElementContentAreas()
   /* delete content areas in case of reducing number of them */
   DrawBackground(SX, area_sy - MINI_TILEX, SXSIZE, 12 * MINI_TILEY);
 
-  for (i=0; i<level.num_yam_contents; i++)
+  for (i=0; i<level.num_yamyam_contents; i++)
     DrawElementBorder(area_sx + 5 * (i % 4) * MINI_TILEX,
 		      area_sy + 6 * (i / 4) * MINI_TILEY,
 		      3 * MINI_TILEX, 3 * MINI_TILEY, TRUE);
@@ -3679,19 +3662,19 @@ static void DrawElementContentAreas()
   DrawText(area_sx + (5 * 4 - 1) * MINI_TILEX, area_sy + 2 * MINI_TILEY + 1,
 	   "smashed", FONT_TEXT_1);
 
-  for (i=0; i<level.num_yam_contents; i++)
+  for (i=0; i<level.num_yamyam_contents; i++)
   {
     for (y=0; y<3; y++)
       for (x=0; x<3; x++)
 	DrawMiniElement(area_x + 5 * (i % 4) + x, area_y + 6 * (i / 4) + y,
-			ElementContent[i][x][y]);
+			level.yamyam_content[i][x][y]);
 
     DrawTextF(area_sx - SX + 5 * (i % 4) * MINI_TILEX + MINI_TILEX + 1,
 	      area_sy - SY + 6 * (i / 4) * MINI_TILEY + 4 * MINI_TILEY - 4,
 	      FONT_TEXT_1, "%d", i + 1);
   }
 
-  for (i=0; i<level.num_yam_contents; i++)
+  for (i=0; i<level.num_yamyam_contents; i++)
     MapDrawingArea(GADGET_ID_ELEMENT_CONTENT_0 + i);
 }
 
@@ -5072,6 +5055,13 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 
 	  FrameCounter = 0;	/* restart animation frame counter */
 	}
+	else if (id == GADGET_ID_CUSTOM_CONTENT)
+	{
+	  int i = properties_element - EL_CUSTOM_START;
+
+	  custom_element.content[sx][sy] = new_element;
+	  level.custom_element[i] = custom_element;
+	}
 	else if (id == GADGET_ID_CUSTOM_CHANGED)
 	{
 	  int i = properties_element - EL_CUSTOM_START;
@@ -5083,7 +5073,7 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 	  random_placement_background_element = new_element;
 	else if (id >= GADGET_ID_ELEMENT_CONTENT_0 &&
 		 id <= GADGET_ID_ELEMENT_CONTENT_7)
-	  level.yam_content[id - GADGET_ID_ELEMENT_CONTENT_0][sx][sy] =
+	  level.yamyam_content[id - GADGET_ID_ELEMENT_CONTENT_0][sx][sy] =
 	    new_element;
       }
       break;
@@ -5889,7 +5879,10 @@ static void HandleDrawingAreaInfo(struct GadgetInfo *gi)
 	      "Amoeba content");
   else if (id == GADGET_ID_CUSTOM_GRAPHIC)
     DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2,
-	      "Optional custom graphic element");
+	      "Custom graphic element");
+  else if (id == GADGET_ID_CUSTOM_CONTENT)
+    DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2,
+	      "Custom element content position: %d, %d", sx, sy);
   else if (id == GADGET_ID_CUSTOM_CHANGED)
     DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2,
 	      "New element after change");

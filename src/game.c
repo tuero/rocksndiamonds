@@ -836,7 +836,7 @@ void InitGame()
 
   AllPlayersGone = FALSE;
 
-  game.yam_content_nr = 0;
+  game.yamyam_content_nr = 0;
   game.magic_wall_active = FALSE;
   game.magic_wall_time_left = 0;
   game.light_time_left = 0;
@@ -1654,7 +1654,7 @@ void Explode(int ex, int ey, int phase, int mode)
       Feld[ex][ey] = center_element;
     }
 
-    for (y=ey-1; y<=ey+1; y++) for(x=ex-1; x<=ex+1; x++)
+    for (y = ey - 1; y <= ey + 1; y++) for(x = ex - 1; x <= ex + 1; x++)
     {
       int element;
 
@@ -1734,10 +1734,14 @@ void Explode(int ex, int ey, int phase, int mode)
 	Store[x][y] = EL_BD_DIAMOND;
       else if (center_element == EL_SP_ELECTRON)
 	Store[x][y] = EL_SP_INFOTRON;
-      else if (center_element == EL_YAMYAM)
-	Store[x][y] = level.yam_content[game.yam_content_nr][x-ex+1][y-ey+1];
       else if (center_element == EL_AMOEBA_TO_DIAMOND)
 	Store[x][y] = level.amoeba_content;
+      else if (center_element == EL_YAMYAM)
+	Store[x][y] =
+	  level.yamyam_content[game.yamyam_content_nr][x - ex + 1][y - ey + 1];
+      else if (IS_CUSTOM_ELEMENT(center_element))
+	Store[x][y] =
+	  CUSTOM_ELEMENT_INFO(center_element).content[x - ex + 1][y - ey + 1];
       else if (element == EL_WALL_EMERALD)
 	Store[x][y] = EL_EMERALD;
       else if (element == EL_WALL_DIAMOND)
@@ -1779,7 +1783,8 @@ void Explode(int ex, int ey, int phase, int mode)
     }
 
     if (center_element == EL_YAMYAM)
-      game.yam_content_nr = (game.yam_content_nr + 1) % level.num_yam_contents;
+      game.yamyam_content_nr =
+	(game.yamyam_content_nr + 1) % level.num_yamyam_contents;
 
     return;
   }
