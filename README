@@ -1,9 +1,11 @@
+
 Welcome to
 
-   R O C K S   ' N '   D I A M O N D S   ' 9 8
-   -------------------------------------------
+   R O C K S   ' N '   D I A M O N D S   1 . 3 . 0
+   -----------------------------------------------
 
-A game for Unix/X11 by Holger Schemel, (c) 1995-98 by Holger Schemel.
+A game for Unix/X11 by Holger Schemel, (c) 1995-99 by Holger Schemel.
+DOS/Windows port by Guido Schulz.
 
 Introduction
 ============
@@ -12,7 +14,7 @@ Unix system with color X11. You need an 8-Bit color display or better.
 It will not work on black&white systems, and maybe not on gray scale systems.
 
 If you know the game "Boulderdash" (Commodore C64) or "Emerald Mine"
-(Amiga), you know what "ROCKS'N'DIAMONDS" is about.
+(Amiga) or "Supaplex" (PC), you know what "ROCKS'N'DIAMONDS" is about.
 
 
 Getting started
@@ -20,7 +22,7 @@ Getting started
 Just 'cd' to the directory 'rocksndiamonds-*' (Unix) or 'rocks-*' (DOS)
 and type 'rocksndiamonds' (Linux) or 'rocks' (DOS/Windows)!
 This works only on Linux and DOS systems, because the included binary was
-compiled for Linux (i386/libc5) (if you have the Unix package) and DOS
+compiled for Linux (i386/glibc) (if you have the Unix package) and DOS
 (if you have the DOS/Windows package).
 If you have another Unix system like HPUX, NetBSD or SUN, you first have to
 type 'make' to compile it.
@@ -28,7 +30,7 @@ This may be needed on Linux systems, too, depending on your kernel version,
 your libc version, your binary format, your processor, ...
 
 (The included binary was compiled on the following system:
-AMD K6, kernel 2.0.35, libc5, gcc 2.7.2.1, ELF format)
+AMD K6-2, kernel 2.2.1, glibc, gcc 2.7.2.3, ELF format)
 
 
 The Menues
@@ -216,21 +218,58 @@ directory.
 
 To edit a level, you can use all three mouse buttons to draw in the
 level window. Click into the elements field with one of the three buttons
-to remap it to the new element. Use the arrow widgets to scroll around in
-the level. Use the 'flood fill' field to init exactly ony flood fill
-operation in the level field (you will be prompted). Click on 'control
-window' to switch to the control window.
+to remap it to the new element. Use the scrollbars, arrow buttons or
+cursor keys to scroll around in the level. Use the drawing functions by
+selecting them from the toolbox field or pressing the corresponding key
+(the key shortcuts for each gadget are displayed in the status line at
+the bottom of the window when the mouse pointer is over the gadget).
 
-In the control window you can modify different parameters like the size
-of the level playfield, the name of the level, the scores for different
-elements and something like that. The four 3x3 field on the upper left
-can be edited like the level field and indicate the 'contents' of smashed
-crunchers (just try it out with some crunchers in one of your own levels).
+About the drawing functions: If you know the good old "Deluxe Paint" from
+the Amiga, you will have no problems with the drawing functions -- even
+the key shortcuts are mostly the same. If not, just try them out and you
+will see what happens. ;-)
 
-'Undo & Exit' leaves the level editor, throwing away all the changes you
-have done to the level.
-'Save & Exit' leveas the level editor and saves the new level (the old one
-will be deleted).
+Some notes: Most drawing functions have different behaviour when different
+mouse buttons are pressed in the drawing area; normally, the left mouse
+button is the 'foreground button' and the middle and right buttons are
+some sort of 'background buttons', often with relation to the chosen
+element mappings on this buttons.
+
+The '?' button brings you to the 'Element settings' page, where you can
+see some information about the element and how many of them are included
+in the current level. The contents of elements with content (some amoeba
+and the Yam Yam (also know as cruncher) can have content) can be edited
+by 'sticking' the page with the corresponding button on their page.
+Yam Yam's can have up to eight content areas.
+
+The 'undo' button gives you the chance to undo up to 10 drawing operations.
+The 'info' button brings you to the 'Level/Editor settings' page.
+The 'save' button asks you to save the current level.
+The 'clear' button clears the drawing area without asking.
+The 'test' button lets you play your new level directly from the editor.
+The 'exit' button asks you to exit the editor (if there are unsaved changes).
+
+In the 'Editor settings' section, you can give your level a new name
+and type in your name which will be displayed as the level's author.
+(On Unix systems, your login name will be taken as default.)
+Then you can modify the level playfield size there, the available time
+(set this to zero to get unlimited time for this level), the score you
+get for each 10 seconds time that are left when reaching the exit, and
+last but not least you can enter the number of emeralds the player has
+to collect before the exit door opens.
+
+Another new button is the 'double speed' button that lets the player move
+twice as fast as normally from start; the effect is the same as collecting
+a speed pill during the game.
+
+In the 'Editor settings' section, you can make some modifications to the
+behaviour of the 'random element placement' button (the dice): Choose if
+the number you can enter means how many percent of the whole level are
+filled with the element chosen as the random element, or if it should mean
+the exact number of elements to be placed in the level field.
+With the 'restrict' button on the left side you can force the random function
+not to overwrite level elements other than the element chosen in the content
+field on the right side.
 
 
 The Tape Recorder
