@@ -153,6 +153,9 @@
 #define ED_AREA_ELEM_CONTENT6_XPOS	(29 * MINI_TILEX)
 #define ED_AREA_ELEM_CONTENT6_YPOS	(ED_SETTINGS_YPOS(10) + \
 					 ED_GADGET_DISTANCE - MINI_TILEY)
+/* group element content */
+#define ED_AREA_GROUP_CONTENT_XPOS	ED_SETTINGS_XPOS(0)
+#define ED_AREA_GROUP_CONTENT_YPOS	(22 * MINI_TILEY)
 
 /* values for random placement background drawing area */
 #define ED_AREA_RANDOM_BACKGROUND_YPOS	(31 * MINI_TILEY)
@@ -375,9 +378,12 @@
 #define GADGET_ID_CHANGE_CONT_RND_DOWN	(GADGET_ID_COUNTER_FIRST + 57)
 #define GADGET_ID_CHANGE_CONT_RND_TEXT	(GADGET_ID_COUNTER_FIRST + 58)
 #define GADGET_ID_CHANGE_CONT_RND_UP	(GADGET_ID_COUNTER_FIRST + 59)
+#define GADGET_ID_GROUP_CONTENT_DOWN	(GADGET_ID_COUNTER_FIRST + 60)
+#define GADGET_ID_GROUP_CONTENT_TEXT	(GADGET_ID_COUNTER_FIRST + 61)
+#define GADGET_ID_GROUP_CONTENT_UP	(GADGET_ID_COUNTER_FIRST + 62)
 
 /* drawing area identifiers */
-#define GADGET_ID_DRAWING_AREA_FIRST	(GADGET_ID_COUNTER_FIRST + 60)
+#define GADGET_ID_DRAWING_AREA_FIRST	(GADGET_ID_COUNTER_FIRST + 63)
 
 #define GADGET_ID_DRAWING_LEVEL		(GADGET_ID_DRAWING_AREA_FIRST + 0)
 #define GADGET_ID_ELEMENT_CONTENT_0	(GADGET_ID_DRAWING_AREA_FIRST + 1)
@@ -394,10 +400,11 @@
 #define GADGET_ID_CUSTOM_CHANGE_TARGET	(GADGET_ID_DRAWING_AREA_FIRST + 12)
 #define GADGET_ID_CUSTOM_CHANGE_CONTENT	(GADGET_ID_DRAWING_AREA_FIRST + 13)
 #define GADGET_ID_CUSTOM_CHANGE_TRIGGER	(GADGET_ID_DRAWING_AREA_FIRST + 14)
-#define GADGET_ID_RANDOM_BACKGROUND	(GADGET_ID_DRAWING_AREA_FIRST + 15)
+#define GADGET_ID_GROUP_CONTENT		(GADGET_ID_DRAWING_AREA_FIRST + 15)
+#define GADGET_ID_RANDOM_BACKGROUND	(GADGET_ID_DRAWING_AREA_FIRST + 16)
 
 /* text input identifiers */
-#define GADGET_ID_TEXT_INPUT_FIRST	(GADGET_ID_DRAWING_AREA_FIRST + 16)
+#define GADGET_ID_TEXT_INPUT_FIRST	(GADGET_ID_DRAWING_AREA_FIRST + 17)
 
 #define GADGET_ID_LEVEL_NAME		(GADGET_ID_TEXT_INPUT_FIRST + 0)
 #define GADGET_ID_LEVEL_AUTHOR		(GADGET_ID_TEXT_INPUT_FIRST + 1)
@@ -523,11 +530,12 @@
 #define ED_COUNTER_ID_PUSH_DELAY_RND	14
 #define ED_COUNTER_ID_MOVE_DELAY_FIX	15
 #define ED_COUNTER_ID_MOVE_DELAY_RND	16
-#define ED_COUNTER_ID_CHANGE_DELAY_FIX	17
-#define ED_COUNTER_ID_CHANGE_DELAY_RND	18
-#define ED_COUNTER_ID_CHANGE_CONT_RND	19
+#define ED_COUNTER_ID_GROUP_CONTENT	17
+#define ED_COUNTER_ID_CHANGE_DELAY_FIX	18
+#define ED_COUNTER_ID_CHANGE_DELAY_RND	19
+#define ED_COUNTER_ID_CHANGE_CONT_RND	20
 
-#define ED_NUM_COUNTERBUTTONS		20
+#define ED_NUM_COUNTERBUTTONS		21
 
 #define ED_COUNTER_ID_LEVEL_FIRST	ED_COUNTER_ID_LEVEL_XSIZE
 #define ED_COUNTER_ID_LEVEL_LAST	ED_COUNTER_ID_LEVEL_RANDOM
@@ -694,9 +702,10 @@
 #define ED_DRAWING_ID_CUSTOM_CHANGE_TARGET	12
 #define ED_DRAWING_ID_CUSTOM_CHANGE_CONTENT	13
 #define ED_DRAWING_ID_CUSTOM_CHANGE_TRIGGER	14
-#define ED_DRAWING_ID_RANDOM_BACKGROUND		15
+#define ED_DRAWING_ID_GROUP_CONTENT		15
+#define ED_DRAWING_ID_RANDOM_BACKGROUND		16
 
-#define ED_NUM_DRAWING_AREAS			16
+#define ED_NUM_DRAWING_AREAS			17
 
 
 /*
@@ -795,7 +804,9 @@ static boolean stick_element_properties_window = FALSE;
 static boolean custom_element_properties[NUM_ELEMENT_PROPERTIES];
 static boolean custom_element_change_events[NUM_CHANGE_EVENTS];
 static struct ElementChangeInfo custom_element_change;
+static struct ElementGroupInfo group_element_info;
 static struct ElementInfo custom_element;
+static struct ElementInfo group_element;
 
 static struct
 {
@@ -902,7 +913,7 @@ static struct
     NULL,				" ", "height",
   },
 
-  /* ---------- element settings: configure (custom elements) ------------- */
+  /* ---------- element settings: configure (custom elements) -------------- */
 
   {
     ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(3),
@@ -951,6 +962,17 @@ static struct
     GADGET_ID_MOVE_DELAY_RND_TEXT,	GADGET_ID_MOVE_DELAY_FIX_UP,
     &custom_element.move_delay_random,
     NULL,				"+random", NULL
+  },
+
+  /* ---------- element settings: configure (group elements) --------------- */
+
+  {
+    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(6),
+    MIN_ELEMENTS_IN_GROUP,		MAX_ELEMENTS_IN_GROUP,
+    GADGET_ID_GROUP_CONTENT_DOWN,	GADGET_ID_GROUP_CONTENT_UP,
+    GADGET_ID_GROUP_CONTENT_TEXT,	GADGET_ID_NONE,
+    &group_element_info.num_elements,
+    NULL,				NULL, "number of elements in group"
   },
 
   /* ---------- element settings: advanced (custom elements) --------------- */
@@ -1846,6 +1868,15 @@ static struct
     NULL, NULL,				NULL
   },
 
+  /* ---------- group element content -------------------------------------- */
+
+  {
+    ED_AREA_GROUP_CONTENT_XPOS,		ED_AREA_GROUP_CONTENT_YPOS,
+    MAX_ELEMENTS_IN_GROUP, 1,
+    GADGET_ID_GROUP_CONTENT,		GADGET_ID_NONE,
+    "content:", NULL,			NULL
+  },
+
   /* ---------- random background (for random painting) -------------------- */
 
   {
@@ -1885,6 +1916,7 @@ static int new_element3 = EL_SAND;
 static void ModifyEditorCounter(int, int);
 static void ModifyEditorCounterLimits(int, int, int);
 static void ModifyEditorSelectbox(int, int);
+static void ModifyEditorDrawingArea(int, int, int);
 static void ModifyEditorElementList();
 static void RedrawDrawingElements();
 static void DrawDrawingWindow();
@@ -2904,6 +2936,87 @@ static int *editor_el_custom_more_ptr = editor_el_custom_more;
 static int num_editor_hl_custom_more = SIZEOF_ARRAY_INT(editor_hl_custom_more);
 static int num_editor_el_custom_more = SIZEOF_ARRAY_INT(editor_el_custom_more);
 
+static int editor_hl_group[] =
+{
+  EL_CHAR('G'),
+  EL_CHAR('R'),
+  EL_CHAR('O'),
+  EL_CHAR('U'),
+
+  EL_CHAR('P'),
+  EL_CHAR(' '),
+  EL_CHAR(' '),
+  EL_CHAR(' '),
+
+  EL_CHAR('E'),
+  EL_CHAR('L'),
+  EL_CHAR('E'),
+  EL_CHAR('M'),
+
+  EL_CHAR('E'),
+  EL_CHAR('N'),
+  EL_CHAR('T'),
+  EL_CHAR('S'),
+};
+
+static int editor_el_group[] =
+{
+  EL_GROUP_START + 0,
+  EL_GROUP_START + 1,
+  EL_GROUP_START + 2,
+  EL_GROUP_START + 3,
+
+  EL_GROUP_START + 4,
+  EL_GROUP_START + 5,
+  EL_GROUP_START + 6,
+  EL_GROUP_START + 7,
+
+  EL_GROUP_START + 8,
+  EL_GROUP_START + 9,
+  EL_GROUP_START + 10,
+  EL_GROUP_START + 11,
+
+  EL_GROUP_START + 12,
+  EL_GROUP_START + 13,
+  EL_GROUP_START + 14,
+  EL_GROUP_START + 15
+};
+static int *editor_hl_group_ptr = editor_hl_group;
+static int *editor_el_group_ptr = editor_el_group;
+static int num_editor_hl_group = SIZEOF_ARRAY_INT(editor_hl_group);
+static int num_editor_el_group = SIZEOF_ARRAY_INT(editor_el_group);
+
+static int editor_hl_group_more[] =
+{
+};
+
+static int editor_el_group_more[] =
+{
+  EL_GROUP_START + 16,
+  EL_GROUP_START + 17,
+  EL_GROUP_START + 18,
+  EL_GROUP_START + 19,
+
+  EL_GROUP_START + 20,
+  EL_GROUP_START + 21,
+  EL_GROUP_START + 22,
+  EL_GROUP_START + 23,
+
+  EL_GROUP_START + 24,
+  EL_GROUP_START + 25,
+  EL_GROUP_START + 26,
+  EL_GROUP_START + 27,
+
+  EL_GROUP_START + 28,
+  EL_GROUP_START + 29,
+  EL_GROUP_START + 30,
+  EL_GROUP_START + 31
+};
+static int *editor_hl_group_more_ptr = editor_hl_group_more;
+static int *editor_el_group_more_ptr = editor_el_group_more;
+static int num_editor_hl_group_more = SIZEOF_ARRAY_INT(editor_hl_group_more);
+static int num_editor_el_group_more = SIZEOF_ARRAY_INT(editor_el_group_more);
+
 static int editor_hl_user_defined[] =
 {
   EL_CHAR('U'),
@@ -3003,6 +3116,16 @@ editor_elements_info[] =
     &setup.editor.el_custom_more,
     &editor_hl_custom_more_ptr,		&num_editor_hl_custom_more,
     &editor_el_custom_more_ptr,		&num_editor_el_custom_more
+  },
+  {
+    &setup.editor.el_custom,
+    &editor_hl_group_ptr,		&num_editor_hl_group,
+    &editor_el_group_ptr,		&num_editor_el_group
+  },
+  {
+    &setup.editor.el_custom_more,
+    &editor_hl_group_more_ptr,		&num_editor_hl_group_more,
+    &editor_el_group_more_ptr,		&num_editor_el_group_more
   },
   {
     &setup.editor.el_user_defined,
@@ -3225,8 +3348,8 @@ static void DrawElementBorder(int dest_x, int dest_y, int width, int height,
     (input ? IMG_EDITOR_ELEMENT_BORDER_INPUT : IMG_EDITOR_ELEMENT_BORDER);
   Bitmap *src_bitmap;
   int src_x, src_y;
-  int num_mini_tilex = width / MINI_TILEX + 1;
-  int num_mini_tiley = width / MINI_TILEY + 1;
+  int num_mini_tilex = width  / MINI_TILEX + 1;
+  int num_mini_tiley = height / MINI_TILEY + 1;
   int x, y;
 
   getMiniGraphicSource(border_graphic, &src_bitmap, &src_x, &src_y);
@@ -3271,6 +3394,14 @@ static void DrawDrawingArea(int id)
   else if (id == ED_DRAWING_ID_CUSTOM_CHANGE_TRIGGER)
     DrawMiniGraphicExt(drawto, gi->x, gi->y,
 		       el2edimg(custom_element_change.trigger_element));
+  else if (id == ED_DRAWING_ID_GROUP_CONTENT)
+  {
+    int nr = group_element_info.num_elements;
+
+    for (x = 0; x < nr; x++)
+      DrawMiniGraphicExt(drawto, gi->x + x * MINI_TILEX, gi->y,
+			 el2edimg(group_element_info.element[nr]));
+  }
   else if (id >= ED_DRAWING_ID_ELEMENT_CONTENT_0 &&
 	   id <= ED_DRAWING_ID_ELEMENT_CONTENT_7)
   {
@@ -5015,6 +5146,12 @@ static void CopyCustomElementPropertiesToEditor(int element)
      custom_element_change.other_action);
 }
 
+static void CopyGroupElementPropertiesToEditor(int element)
+{
+  group_element = element_info[element];
+  group_element_info = *element_info[element].group;
+}
+
 static void CopyCustomElementPropertiesToGame(int element)
 {
   int i;
@@ -5147,6 +5284,15 @@ static void CopyCustomElementPropertiesToGame(int element)
   /* copy change events also to special level editor variable */
   custom_element = element_info[element];
   custom_element_change = *element_info[element].change;
+}
+
+static void CopyGroupElementPropertiesToGame(int element)
+{
+  /* mark that this group element has been modified */
+  group_element.modified_settings = TRUE;
+
+  element_info[element] = group_element;
+  *element_info[element].group = group_element_info;
 }
 
 void DrawLevelEd()
@@ -5340,6 +5486,14 @@ static void ModifyEditorSelectbox(int selectbox_id, int new_value)
   ModifyGadget(gi, GDI_SELECTBOX_INDEX, new_index_value, GDI_END);
 }
 
+static void ModifyEditorDrawingArea(int drawingarea_id, int xsize, int ysize)
+{
+  int gadget_id = drawingarea_info[drawingarea_id].gadget_id;
+  struct GadgetInfo *gi = level_editor_gadget[gadget_id];
+
+  ModifyGadget(gi, GDI_AREA_SIZE, xsize, ysize, GDI_END);
+}
+
 static void ModifyEditorElementList()
 {
   int i;
@@ -5506,13 +5660,35 @@ static void DrawElementContentAreas()
       DrawBackground(SX + drawingarea_info[id].x - MINI_TILEX / 2,
 		     SY + drawingarea_info[id].y - MINI_TILEY / 2,
 		     4 * MINI_TILEX,
-		     4 * MINI_TILEX + ED_GADGET_TEXT_DISTANCE + font_height);
+		     4 * MINI_TILEY + ED_GADGET_TEXT_DISTANCE + font_height);
     }
   }
 
   DrawText(x, y + 0 * MINI_TILEY, "content", FONT_TEXT_1);
   DrawText(x, y + 1 * MINI_TILEY, "when",    FONT_TEXT_1);
   DrawText(x, y + 2 * MINI_TILEY, "smashed", FONT_TEXT_1);
+}
+
+static void DrawGroupElementArea(int element)
+{
+  int num_elements = group_element_info.num_elements;
+  int id = ED_DRAWING_ID_GROUP_CONTENT;
+  int sx = SX + drawingarea_info[id].x - MINI_TILEX / 2;
+  int sy = SY + drawingarea_info[id].y - MINI_TILEY / 2;
+  int xsize = MAX_ELEMENTS_IN_GROUP;
+  int ysize = 1;
+
+  if (drawingarea_info[id].text_left != NULL)
+    sx += getTextWidthForDrawingArea(drawingarea_info[id].text_left);
+
+  UnmapDrawingArea(id);
+
+  ModifyEditorDrawingArea(id, num_elements, 1);
+
+  /* delete content areas in case of reducing number of them */
+  DrawBackground(sx, sy, (xsize + 1) * MINI_TILEX, (ysize + 1) * MINI_TILEY);
+
+  MapDrawingArea(id);
 }
 
 static void DrawEnvelopeTextArea(int envelope_nr)
@@ -5932,6 +6108,7 @@ static boolean checkPropertiesConfig()
 
   if (IS_GEM(properties_element) ||
       IS_CUSTOM_ELEMENT(properties_element) ||
+      IS_GROUP_ELEMENT(properties_element) ||
       IS_ENVELOPE(properties_element) ||
       HAS_CONTENT(properties_element))
     return TRUE;
@@ -6026,6 +6203,18 @@ static void DrawPropertiesConfig()
 
     /* draw text input gadgets */
     MapTextInputGadget(ED_TEXTINPUT_ID_ELEMENT_NAME);
+  }
+
+  if (IS_GROUP_ELEMENT(properties_element))
+  {
+    /* draw stickybutton gadget */
+    i = ED_CHECKBUTTON_ID_STICK_ELEMENT;
+    checkbutton_info[i].y = ED_SETTINGS_YPOS(0);
+    MapCheckbuttonGadget(i);
+
+    MapCounterButtons(ED_COUNTER_ID_GROUP_CONTENT);
+
+    DrawGroupElementArea(properties_element);
   }
 }
 
@@ -6134,6 +6323,9 @@ static void DrawPropertiesWindow()
 
   if (IS_CUSTOM_ELEMENT(properties_element))
     CopyCustomElementPropertiesToEditor(properties_element);
+
+  if (IS_GROUP_ELEMENT(properties_element))
+    CopyGroupElementPropertiesToEditor(properties_element);
 
   UnmapLevelEditorWindowGadgets();
   UnmapLevelEditorToolboxDrawingGadgets();
@@ -6949,6 +7141,12 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 
 	  CopyCustomElementPropertiesToGame(properties_element);
 	}
+	else if (id == GADGET_ID_GROUP_CONTENT)
+	{
+	  group_element_info.element[sx] = new_element;
+
+	  CopyGroupElementPropertiesToGame(properties_element);
+	}
 	else if (id == GADGET_ID_RANDOM_BACKGROUND)
 	  random_placement_background_element = new_element;
 	else if (id >= GADGET_ID_ELEMENT_CONTENT_0 &&
@@ -7118,6 +7316,10 @@ static void HandleCounterButtons(struct GadgetInfo *gi)
   {
     case ED_COUNTER_ID_ELEMENT_CONTENT:
       DrawElementContentAreas();
+      break;
+
+    case ED_COUNTER_ID_GROUP_CONTENT:
+      DrawGroupElementArea(properties_element);
       break;
 
     case ED_COUNTER_ID_ENVELOPE_XSIZE:

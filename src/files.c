@@ -234,6 +234,20 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
     element_info[element].modified_settings = FALSE;
   }
 
+  for (i = 0; i < NUM_GROUP_ELEMENTS; i++)
+  {
+    int element = EL_GROUP_START + i;
+
+    if (element_info[element].group == NULL)
+      element_info[element].group =
+	checked_malloc(sizeof(struct ElementGroupInfo));
+
+    for (j = 0; j < MAX_ELEMENTS_IN_GROUP; j++)
+      element_info[element].group->element[j] = EL_EMPTY_SPACE;
+
+    element_info[element].group->num_elements = 1;
+  }
+
   BorderElement = EL_STEELWALL;
 
   level->no_level_file = FALSE;

@@ -421,6 +421,8 @@
 #define MAX_ENVELOPE_TEXT_LEN	(MAX_ENVELOPE_XSIZE * MAX_ENVELOPE_YSIZE)
 #define MIN_CHANGE_PAGES	1
 #define MAX_CHANGE_PAGES	16
+#define MIN_ELEMENTS_IN_GROUP	1
+#define MAX_ELEMENTS_IN_GROUP	16
 
 /* values for elements with content */
 #define MIN_ELEMENT_CONTENTS	1
@@ -1459,6 +1461,13 @@ struct ElementChangeInfo
   int other_action;		/* change triggered by other element actions */
 };
 
+struct ElementGroupInfo
+{
+  int num_elements;			/* number of elements in this group */
+
+  short element[MAX_ELEMENTS_IN_GROUP];	/* list of elements in this group */
+};
+
 struct ElementInfo
 {
   /* ---------- token and description strings ---------- */
@@ -1510,6 +1519,8 @@ struct ElementInfo
 
   int num_change_pages;		/* actual number of change pages */
   int current_change_page;	/* currently edited change page */
+
+  struct ElementGroupInfo *group;	/* pointer to element group info */
 
   /* ---------- internal values used at runtime when playing ---------- */
 

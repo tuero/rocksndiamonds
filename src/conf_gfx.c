@@ -3131,6 +3131,7 @@ struct ConfigInfo image_config[] =
 
 #include "conf_chr.c"	/* include auto-generated data structure definitions */
 #include "conf_cus.c"	/* include auto-generated data structure definitions */
+#include "conf_grp.c"	/* include auto-generated data structure definitions */
 
   /* images not associated to game elements (used for menu screens etc.) */
   /* keyword to stop parser: "NO_MORE_ELEMENT_IMAGES" <-- do not change! */

@@ -3890,6 +3890,134 @@ element_to_graphic[] =
     IMG_CUSTOM_256
   },
   {
+    EL_GROUP_1,				-1, -1, FALSE,
+    IMG_GROUP_1
+  },
+  {
+    EL_GROUP_2,				-1, -1, FALSE,
+    IMG_GROUP_2
+  },
+  {
+    EL_GROUP_3,				-1, -1, FALSE,
+    IMG_GROUP_3
+  },
+  {
+    EL_GROUP_4,				-1, -1, FALSE,
+    IMG_GROUP_4
+  },
+  {
+    EL_GROUP_5,				-1, -1, FALSE,
+    IMG_GROUP_5
+  },
+  {
+    EL_GROUP_6,				-1, -1, FALSE,
+    IMG_GROUP_6
+  },
+  {
+    EL_GROUP_7,				-1, -1, FALSE,
+    IMG_GROUP_7
+  },
+  {
+    EL_GROUP_8,				-1, -1, FALSE,
+    IMG_GROUP_8
+  },
+  {
+    EL_GROUP_9,				-1, -1, FALSE,
+    IMG_GROUP_9
+  },
+  {
+    EL_GROUP_10,			-1, -1, FALSE,
+    IMG_GROUP_10
+  },
+  {
+    EL_GROUP_11,			-1, -1, FALSE,
+    IMG_GROUP_11
+  },
+  {
+    EL_GROUP_12,			-1, -1, FALSE,
+    IMG_GROUP_12
+  },
+  {
+    EL_GROUP_13,			-1, -1, FALSE,
+    IMG_GROUP_13
+  },
+  {
+    EL_GROUP_14,			-1, -1, FALSE,
+    IMG_GROUP_14
+  },
+  {
+    EL_GROUP_15,			-1, -1, FALSE,
+    IMG_GROUP_15
+  },
+  {
+    EL_GROUP_16,			-1, -1, FALSE,
+    IMG_GROUP_16
+  },
+  {
+    EL_GROUP_17,			-1, -1, FALSE,
+    IMG_GROUP_17
+  },
+  {
+    EL_GROUP_18,			-1, -1, FALSE,
+    IMG_GROUP_18
+  },
+  {
+    EL_GROUP_19,			-1, -1, FALSE,
+    IMG_GROUP_19
+  },
+  {
+    EL_GROUP_20,			-1, -1, FALSE,
+    IMG_GROUP_20
+  },
+  {
+    EL_GROUP_21,			-1, -1, FALSE,
+    IMG_GROUP_21
+  },
+  {
+    EL_GROUP_22,			-1, -1, FALSE,
+    IMG_GROUP_22
+  },
+  {
+    EL_GROUP_23,			-1, -1, FALSE,
+    IMG_GROUP_23
+  },
+  {
+    EL_GROUP_24,			-1, -1, FALSE,
+    IMG_GROUP_24
+  },
+  {
+    EL_GROUP_25,			-1, -1, FALSE,
+    IMG_GROUP_25
+  },
+  {
+    EL_GROUP_26,			-1, -1, FALSE,
+    IMG_GROUP_26
+  },
+  {
+    EL_GROUP_27,			-1, -1, FALSE,
+    IMG_GROUP_27
+  },
+  {
+    EL_GROUP_28,			-1, -1, FALSE,
+    IMG_GROUP_28
+  },
+  {
+    EL_GROUP_29,			-1, -1, FALSE,
+    IMG_GROUP_29
+  },
+  {
+    EL_GROUP_30,			-1, -1, FALSE,
+    IMG_GROUP_30
+  },
+  {
+    EL_GROUP_31,			-1, -1, FALSE,
+    IMG_GROUP_31
+  },
+  {
+    EL_GROUP_32,			-1, -1, FALSE,
+    IMG_GROUP_32
+  },
+  {
     -1,					-1, -1, FALSE,
     -1
   },
