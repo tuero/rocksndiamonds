@@ -837,7 +837,7 @@ void InitImageList(struct ConfigInfo *config_list, int num_file_list_entries,
   image_info->num_dynamic_file_list_entries = 0;
 
   image_info->file_list =
-    getFileListFromConfigList(config_list, config_suffix_list,
+    getFileListFromConfigList(config_list, config_suffix_list, ignore_tokens,
 			      num_file_list_entries);
   image_info->dynamic_file_list = NULL;
 

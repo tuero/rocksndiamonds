@@ -140,7 +140,7 @@ boolean FileIsArtworkType(char *, int);
 int get_parameter_value(char *, char *, int);
 
 struct FileInfo *getFileListFromConfigList(struct ConfigInfo *,
-					   struct ConfigInfo *, int);
+					   struct ConfigInfo *, char **, int);
 void LoadArtworkConfig(struct ArtworkListInfo *);
 void ReloadCustomArtworkList(struct ArtworkListInfo *);
 void FreeCustomArtworkLists(struct ArtworkListInfo *);

@@ -3092,6 +3092,10 @@ struct ConfigInfo image_config[] =
   { "global.border",				"RocksScreen.pcx"	},
   { "global.door",				"RocksDoor.pcx"		},
 
+  { "editor.element_border",			"RocksElements.pcx"	},
+  { "editor.element_border.xpos",		"0"			},
+  { "editor.element_border.ypos",		"0"			},
+
   { "background",				UNDEFINED_FILENAME	},
   { "background.MAIN",				UNDEFINED_FILENAME	},
   { "background.LEVELS",			UNDEFINED_FILENAME	},
@@ -3131,8 +3135,6 @@ struct ConfigInfo image_config[] =
      but make sense to be defined in "graphicsinfo.conf", too */
 
   { "global.num_toons",				"20"			},
-
-  { "menu.main.hide_static_text",		"false"			},
 
   { NULL,					NULL			}
 };

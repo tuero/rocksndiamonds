@@ -176,7 +176,6 @@ static void InitArtworkConfig()
   {
     "name",
     "sort_priority",
-    "menu.main.hide_static_text",
     "global.num_toons",
     NULL
   };

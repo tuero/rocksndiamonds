@@ -129,14 +129,6 @@ static void PlaySound_Menu_Continue(int sound)
     PlaySoundLoop(sound);
 }
 
-void DrawTextStatic(int x, int y, char *text, int font_nr)
-{
-  if (game_status == MAINMENU && gfx.menu_main_hide_static_text)
-    return;
-
-  DrawText(x, y, text, font_nr);
-}
-
 void DrawHeadline()
 {
   int font1_xsize = getFontWidth(FONT_TITLE_1);
@@ -144,8 +136,8 @@ void DrawHeadline()
   int x1 = SX + (SXSIZE - strlen(PROGRAM_TITLE_STRING)   * font1_xsize) / 2;
   int x2 = SX + (SXSIZE - strlen(WINDOW_SUBTITLE_STRING) * font2_xsize) / 2;
 
-  DrawTextStatic(x1, SY + 8,  PROGRAM_TITLE_STRING,   FONT_TITLE_1);
-  DrawTextStatic(x2, SY + 46, WINDOW_SUBTITLE_STRING, FONT_TITLE_2);
+  DrawText(x1, SY + 8,  PROGRAM_TITLE_STRING,   FONT_TITLE_1);
+  DrawText(x2, SY + 46, WINDOW_SUBTITLE_STRING, FONT_TITLE_2);
 }
 
 static void ToggleFullscreenIfNeeded()
@@ -233,16 +225,16 @@ void DrawMainMenu()
 
   DrawHeadline();
 
-  DrawTextStatic(SX + 32,    SY + 2*32, name_text, FONT_MENU_1);
+  DrawText(SX + 32,    SY + 2*32, name_text, FONT_MENU_1);
   DrawText(SX + 32 + name_width, SY + 2*32, setup.player_name, FONT_INPUT);
-  DrawTextStatic(SX + 32,    SY + 3*32, "Level:", FONT_MENU_1);
+  DrawText(SX + 32,    SY + 3*32, "Level:", FONT_MENU_1);
   DrawText(SX + 11 * 32, SY + 3*32, int2str(level_nr,3), FONT_VALUE_1);
-  DrawTextStatic(SX + 32,    SY + 4*32, "Hall Of Fame", FONT_MENU_1);
-  DrawTextStatic(SX + 32,    SY + 5*32, "Level Creator", FONT_MENU_1);
-  DrawTextStatic(SY + 32,    SY + 6*32, "Info Screen", FONT_MENU_1);
-  DrawTextStatic(SX + 32,    SY + 7*32, "Start Game", FONT_MENU_1);
-  DrawTextStatic(SX + 32,    SY + 8*32, "Setup", FONT_MENU_1);
-  DrawTextStatic(SX + 32,    SY + 9*32, "Quit", FONT_MENU_1);
+  DrawText(SX + 32,    SY + 4*32, "Hall Of Fame", FONT_MENU_1);
+  DrawText(SX + 32,    SY + 5*32, "Level Creator", FONT_MENU_1);
+  DrawText(SY + 32,    SY + 6*32, "Info Screen", FONT_MENU_1);
+  DrawText(SX + 32,    SY + 7*32, "Start Game", FONT_MENU_1);
+  DrawText(SX + 32,    SY + 8*32, "Setup", FONT_MENU_1);
+  DrawText(SX + 32,    SY + 9*32, "Quit", FONT_MENU_1);
 
   DrawMicroLevel(MICROLEV_XPOS, MICROLEV_YPOS, TRUE);
 
@@ -267,8 +259,7 @@ void DrawMainMenu()
   drawCursorXY(14, 1, IMG_MENU_BUTTON_RIGHT);
 #endif
 
-  DrawTextStatic(SX + 56, SY + 326, "A Game by Artsoft Entertainment",
-		 FONT_TEXT_3);
+  DrawText(SX + 56, SY + 326, "A Game by Artsoft Entertainment", FONT_TITLE_2);
 
   FadeToFront();
   InitAnimation();
@@ -1197,8 +1188,9 @@ void HandleHelpScreen(int button)
     else
     {
       FadeSounds();
-      DrawMainMenu();
+
       game_status = MAINMENU;
+      DrawMainMenu();
     }
   }
   else

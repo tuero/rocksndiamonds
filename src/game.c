@@ -3724,6 +3724,7 @@ void AmoebeAbleger(int ax, int ay)
 {
   int i;
   int element = Feld[ax][ay];
+  int graphic = el2img(element);
   int newax = ax, neway = ay;
   static int xy[4][2] =
   {
@@ -3739,6 +3740,9 @@ void AmoebeAbleger(int ax, int ay)
     DrawLevelField(ax, ay);
     return;
   }
+
+  if (IS_ANIMATED(graphic))
+    DrawLevelGraphicAnimationIfNeeded(ax, ay, graphic);
 
   if (!MovDelay[ax][ay])	/* start making new amoeba field */
     MovDelay[ax][ay] = RND(FRAMES_PER_SECOND * 25 / (1 + level.amoeba_speed));
@@ -3871,7 +3875,11 @@ void Life(int ax, int ay)
   static int life[4] = { 2, 3, 3, 3 };	/* parameters for "game of life" */
   int life_time = 40;
   int element = Feld[ax][ay];
+  int graphic = el2img(element);
   boolean changed = FALSE;
+
+  if (IS_ANIMATED(graphic))
+    DrawLevelGraphicAnimationIfNeeded(ax, ay, graphic);
 
   if (Stop[ax][ay])
     return;
@@ -3969,7 +3977,15 @@ void CheckExit(int x, int y)
   if (local_player->gems_still_needed > 0 ||
       local_player->sokobanfields_still_needed > 0 ||
       local_player->lights_still_needed > 0)
+  {
+    int element = Feld[x][y];
+    int graphic = el2img(element);
+
+    if (IS_ANIMATED(graphic))
+      DrawLevelGraphicAnimationIfNeeded(x, y, graphic);
+
     return;
+  }
 
   Feld[x][y] = EL_EXIT_OPENING;
 
@@ -3979,7 +3995,15 @@ void CheckExit(int x, int y)
 void CheckExitSP(int x, int y)
 {
   if (local_player->gems_still_needed > 0)
+  {
+    int element = Feld[x][y];
+    int graphic = el2img(element);
+
+    if (IS_ANIMATED(graphic))
+      DrawLevelGraphicAnimationIfNeeded(x, y, graphic);
+
     return;
+  }
 
   Feld[x][y] = EL_SP_EXIT_OPEN;
 
@@ -4100,11 +4124,15 @@ void MauerWaechst(int x, int y)
 void MauerAbleger(int ax, int ay)
 {
   int element = Feld[ax][ay];
+  int graphic = el2img(element);
   boolean oben_frei = FALSE, unten_frei = FALSE;
   boolean links_frei = FALSE, rechts_frei = FALSE;
   boolean oben_massiv = FALSE, unten_massiv = FALSE;
   boolean links_massiv = FALSE, rechts_massiv = FALSE;
   boolean new_wall = FALSE;
+
+  if (IS_ANIMATED(graphic))
+    DrawLevelGraphicAnimationIfNeeded(ax, ay, graphic);
 
   if (!MovDelay[ax][ay])	/* start building new wall */
     MovDelay[ax][ay] = 6;
@@ -4529,10 +4557,8 @@ void GameActions()
     element = Feld[x][y];
     graphic = el2img(element);
 
-#if 1
     if (graphic_info[graphic].anim_global_sync)
       GfxFrame[x][y] = FrameCounter;
-#endif
 
     if (ANIM_MODE(graphic) == ANIM_RANDOM &&
 	IS_NEXT_FRAME(GfxFrame[x][y], graphic))
@@ -4542,11 +4568,8 @@ void GameActions()
 
     if (IS_INACTIVE(element))
     {
-
-#if 1
       if (IS_ANIMATED(graphic))
 	DrawLevelGraphicAnimationIfNeeded(x, y, graphic);
-#endif
 
       continue;
     }
@@ -4563,8 +4586,6 @@ void GameActions()
       if (IS_GEM(element) || element == EL_SP_INFOTRON)
 	EdelsteinFunkeln(x, y);
     }
-
-#if 1
     else if ((element == EL_ACID ||
 	      element == EL_EXIT_OPEN ||
 	      element == EL_SP_EXIT_OPEN ||
@@ -4575,8 +4596,6 @@ void GameActions()
 	      element == EL_SHIELD_DEADLY) &&
 	     IS_ANIMATED(graphic))
       DrawLevelGraphicAnimationIfNeeded(x, y, graphic);
-#endif
-
     else if (IS_MOVING(x, y))
       ContinueMoving(x, y);
     else if (IS_ACTIVE_BOMB(element))
@@ -4589,39 +4608,16 @@ void GameActions()
       AmoebeWaechst(x, y);
     else if (element == EL_AMOEBA_SHRINKING)
       AmoebaDisappearing(x, y);
-
 #if !USE_NEW_AMOEBA_CODE
     else if (IS_AMOEBALIVE(element))
       AmoebeAbleger(x, y);
 #endif
-
     else if (element == EL_GAMEOFLIFE || element == EL_BIOMAZE)
       Life(x, y);
-#if 0
-    else if (element == EL_ROBOT_WHEEL_ACTIVE)
-      RobotWheel(x, y);
-    else if (element == EL_TIMEGATE_SWITCH_ACTIVE)
-      TimegateWheel(x, y);
-#endif
-#if 0
-    else if (element == EL_ACID_SPLASH_LEFT ||
-	     element == EL_ACID_SPLASH_RIGHT)
-      SplashAcid(x, y);
-#endif
-#if 0
-    else if (element == EL_NUT_CRACKING)
-      NussKnacken(x, y);
-    else if (element == EL_PEARL_BREAKING)
-      BreakingPearl(x, y);
-#endif
     else if (element == EL_EXIT_CLOSED)
       CheckExit(x, y);
     else if (element == EL_SP_EXIT_CLOSED)
       CheckExitSP(x, y);
-#if 0
-    else if (element == EL_EXIT_OPENING)
-      AusgangstuerOeffnen(x, y);
-#endif
     else if (element == EL_WALL_GROWING_ACTIVE)
       MauerWaechst(x, y);
     else if (element == EL_WALL_GROWING ||
@@ -4631,35 +4627,12 @@ void GameActions()
       MauerAbleger(x, y);
     else if (element == EL_FLAMES)
       CheckForDragon(x, y);
-#if 0
-    else if (element == EL_SP_BUGGY_BASE ||
-	     element == EL_SP_BUGGY_BASE_ACTIVATING ||
-	     element == EL_SP_BUGGY_BASE_ACTIVE)
-      CheckBuggyBase(x, y);
-    else if (element == EL_TRAP ||
-	     element == EL_TRAP_ACTIVE)
-      CheckTrap(x, y);
-    else if (IS_BELT_ACTIVE(element))
-      DrawBeltAnimation(x, y, element);
-    else if (element == EL_SWITCHGATE_OPENING)
-      OpenSwitchgate(x, y);
-    else if (element == EL_SWITCHGATE_CLOSING)
-      CloseSwitchgate(x, y);
-    else if (element == EL_TIMEGATE_OPENING)
-      OpenTimegate(x, y);
-    else if (element == EL_TIMEGATE_CLOSING)
-      CloseTimegate(x, y);
-#endif
-
     else if (IS_AUTO_CHANGING(element))
       ChangeElement(x, y);
-
-#if 1
     else if (element == EL_EXPLOSION)
       ;	/* drawing of correct explosion animation is handled separately */
     else if (IS_ANIMATED(graphic))
       DrawLevelGraphicAnimationIfNeeded(x, y, graphic);
-#endif
 
     if (IS_BELT_ACTIVE(element))
       PlaySoundLevelAction(x, y, ACTION_ACTIVE);

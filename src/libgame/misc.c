@@ -1591,6 +1591,7 @@ static void FreeCustomArtworkList(struct ArtworkListInfo *,
 
 struct FileInfo *getFileListFromConfigList(struct ConfigInfo *config_list,
 					   struct ConfigInfo *suffix_list,
+					   char **ignore_tokens,
 					   int num_file_list_entries)
 {
   struct FileInfo *file_list;
@@ -1651,9 +1652,9 @@ struct FileInfo *getFileListFromConfigList(struct ConfigInfo *config_list,
     }
 
     /* the following tokens are no file definitions, but other config tokens */
-    if (strcmp(config_list[i].token, "global.num_toons") == 0 ||
-	strcmp(config_list[i].token, "menu.main.hide_static_text") == 0)
-      is_file_entry = FALSE;
+    for (j=0; ignore_tokens[j] != NULL; j++)
+      if (strcmp(config_list[i].token, ignore_tokens[j]) == 0)
+	is_file_entry = FALSE;
 
     if (is_file_entry)
     {

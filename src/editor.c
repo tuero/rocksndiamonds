@@ -2791,7 +2791,7 @@ static void DrawDrawingWindow()
 
 static void DrawElementBorder(int dest_x, int dest_y, int width, int height)
 {
-  int border_graphic = IMG_SAND;
+  int border_graphic = IMG_EDITOR_ELEMENT_BORDER;
   Bitmap *src_bitmap;
   int src_x, src_y;
   int num_mini_tilex = width / MINI_TILEX + 1;
