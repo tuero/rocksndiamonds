@@ -282,7 +282,7 @@ void InitSoundServer()
 
 void InitJoysticks()
 {
-#ifdef USE_SDL_LIBRARY
+#ifdef USE_SDL_JOYSTICK
   static boolean sdl_joystick_subsystem_initialized = FALSE;
 #endif
 
@@ -293,7 +293,7 @@ void InitJoysticks()
 
   joystick_status = JOYSTICK_OFF;
 
-#ifdef USE_SDL_LIBRARY
+#ifdef USE_SDL_JOYSTICK
 
   if (!sdl_joystick_subsystem_initialized)
   {
@@ -333,7 +333,7 @@ void InitJoysticks()
     joystick_status = JOYSTICK_AVAILABLE;
   }
 
-#else /* !USE_SDL_LIBRARY */
+#else /* !USE_SDL_JOYSTICK */
 
 #ifndef MSDOS
   for (i=0; i<MAX_PLAYERS; i++)

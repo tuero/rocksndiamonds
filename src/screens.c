@@ -2108,7 +2108,7 @@ void CalibrateJoystick(int player_nr)
 
 #ifndef MSDOS
 
-#ifdef USE_SDL_LIBRARY
+#ifdef USE_SDL_JOYSTICK
     joy_ctrl.x = Get_SDL_Joystick_Axis(joystick_fd, 0);
     joy_ctrl.y = Get_SDL_Joystick_Axis(joystick_fd, 1);
 #else

@@ -121,7 +121,7 @@ void HandleOtherEvents(Event *event)
       HandleClientMessageEvent((ClientMessageEvent *) event);
       break;
 
-#ifdef USE_SDL_LIBRARY
+#ifdef USE_SDL_JOYSTICK
     case SDL_JOYAXISMOTION:
     case SDL_JOYBUTTONDOWN:
     case SDL_JOYBUTTONUP:

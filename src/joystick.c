@@ -40,7 +40,7 @@ static int JoystickPosition(int middle, int margin, int actual)
 }
 #endif
 
-#ifdef USE_SDL_LIBRARY
+#ifdef USE_SDL_JOYSTICK
 
 static SDL_Joystick *sdl_joystick[MAX_PLAYERS] = { NULL, NULL, NULL, NULL };
 static int sdl_js_axis[MAX_PLAYERS][2]   = { {0, 0}, {0, 0}, {0, 0}, {0, 0} };
@@ -205,7 +205,7 @@ int Joystick(int player_nr)
   return result;
 }
 
-#else /* !USE_SDL_LIBRARY */
+#else /* !USE_SDL_JOYSTICK */
 
 void CheckJoystickData()
 {
@@ -363,7 +363,7 @@ int Joystick(int player_nr)
 }
 #endif /* MSDOS */
 
-#endif /* !USE_SDL_LIBRARY */
+#endif /* !USE_SDL_JOYSTICK */
 
 int JoystickButton(int player_nr)
 {

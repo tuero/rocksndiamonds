@@ -20,6 +20,7 @@
 #if SDL_MAJOR_VERSION >= 1 && SDL_MINOR_VERSION >= 1
 #include "SDL_image.h"
 #include "SDL_mixer.h"
+#define USE_SDL_JOYSTICK
 #else
 #include "IMG.h"
 #include "mixer.h"

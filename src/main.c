@@ -572,7 +572,7 @@ char *element_info[] =
 /* | SDL TEST STUFF                                                        | */
 /* +-----------------------------------------------------------------------+ */
 
-#ifdef	USE_SDL_LIBRARY
+#ifdef	USE_SDL_JOYSTICK
 
 SDL_Surface *sdl_screen, *sdl_image_tmp, *sdl_image, *sdl_image_masked;
 SDL_Surface *sdl_image2_tmp, *sdl_image2, *sdl_image2_masked;
@@ -936,7 +936,7 @@ void TEST_SDL_JOYSTICK()
   SDL_QuitSubSystem(SDL_INIT_VIDEO|SDL_INIT_JOYSTICK);
 }
 
-#endif	/* USE_SDL_LIBRARY */
+#endif	/* USE_SDL_JOYSTICK */
 
 /* +-----------------------------------------------------------------------+ */
 /* | SDL TEST STUFF                                                        | */
@@ -958,7 +958,7 @@ int main(int argc, char *argv[])
 #endif
 
 #if 0
-#ifdef USE_SDL_LIBRARY
+#ifdef USE_SDL_JOYSTICK
   /*
   TEST_SDL_BLIT_RECT((WIN_XSIZE - TILEX)/2, (WIN_YSIZE - TILEY)/2);
   TEST_SDL_EVENT_LOOP();

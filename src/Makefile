@@ -36,8 +36,8 @@ endif
 
 USE_SDL = true
 # USE_SDL = false
-# USE_SDL_OLD_LIBS = true
-USE_SDL_OLD_LIBS = false
+USE_SDL_OLD_LIBS = true
+# USE_SDL_OLD_LIBS = false
 
 ifeq ($(USE_SDL_OLD_LIBS),true)
 SDL_EXTRA_LIBS = -lIMG -lmixer
