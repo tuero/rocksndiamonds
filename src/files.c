@@ -3040,6 +3040,7 @@ void LoadMusicInfo()
     boolean music_already_used = FALSE;
     int i;
 
+    /* skip all music files that are configured in music config file */
     for (i = 0; i < num_music; i++)
     {
       music = getMusicListEntry(i);

@@ -413,6 +413,9 @@ void InitElementGraphicInfo()
   int num_property_mappings = getImageListPropertyMappingSize();
   int i, act, dir;
 
+  if (graphic_info == NULL)		/* still at startup phase */
+    return;
+
   /* set values to -1 to identify later as "uninitialized" values */
   for (i = 0; i < MAX_NUM_ELEMENTS; i++)
   {
@@ -614,9 +617,9 @@ void InitElementGraphicInfo()
 
     for (act = 0; act < NUM_ACTIONS; act++)
     {
-      boolean act_remove = (act == ACTION_DIGGING ||
-			    act == ACTION_SNAPPING ||
-			    act == ACTION_COLLECTING);
+      boolean act_remove = ((IS_DIGGABLE(i)    && act == ACTION_DIGGING)  ||
+			    (IS_SNAPPABLE(i)   && act == ACTION_SNAPPING) ||
+			    (IS_COLLECTIBLE(i) && act == ACTION_COLLECTING));
       boolean act_turning = (act == ACTION_TURNING_FROM_LEFT ||
 			     act == ACTION_TURNING_FROM_RIGHT ||
 			     act == ACTION_TURNING_FROM_UP ||
@@ -3180,6 +3183,9 @@ void InitElementPropertiesEngine(int engine_version)
       element_info[element].push_delay_random = game.default_push_delay_random;
   }
 #endif
+
+  /* this is needed because some graphics depend on element properties */
+  InitElementGraphicInfo();
 }
 
 static void InitGlobal()

@@ -1,5 +1,11 @@
 
 2003-12-14
+	* fixed bug with wrong penguin graphics (when entering exit)
+
+2003-12-14
+	* fixed bug with wrong "Murphy" graphics (when digging etc.)
+
+2003-12-14
 	* Version number set to 3.0.9.
 
 2003-12-14

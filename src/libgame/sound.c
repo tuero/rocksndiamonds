@@ -1911,6 +1911,7 @@ void LoadCustomMusic_NoConf(void)
     boolean music_already_used = FALSE;
     int i;
 
+    /* skip all music files that are configured in music config file */
     for (i = 0; i < num_music; i++)
     {
       struct FileInfo *music = getMusicListEntry(i);
@@ -1959,10 +1960,6 @@ void LoadCustomMusic_NoConf(void)
   closedir(dir);
 
   draw_init_text = FALSE;
-
-  if (num_music_noconf == 0)
-    Error(ERR_WARN, "cannot find any valid music files in directory '%s'",
-	  music_directory);
 }
 
 int getSoundListSize()

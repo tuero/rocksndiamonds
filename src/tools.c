@@ -857,7 +857,7 @@ void DrawPlayer(struct PlayerInfo *player)
     SetDrawtoField(DRAW_DIRECT);
   }
 
-  MarkTileDirty(sx,sy);
+  MarkTileDirty(sx, sy);
 }
 
 void getGraphicSource(int graphic, int frame, Bitmap **bitmap, int *x, int *y)
@@ -981,7 +981,7 @@ void DrawMiniGraphicExt(DrawBuffer *d, int x, int y, int graphic)
   BlitBitmap(src_bitmap, d, src_x, src_y, MINI_TILEX, MINI_TILEY, x, y);
 }
 
-void DrawGraphicShifted(int x,int y, int dx,int dy, int graphic, int frame,
+void DrawGraphicShifted(int x, int y, int dx, int dy, int graphic, int frame,
 			int cut_mode, int mask_mode)
 {
   Bitmap *src_bitmap;
@@ -1101,13 +1101,13 @@ void DrawGraphicShifted(int x,int y, int dx,int dy, int graphic, int frame,
     BlitBitmap(src_bitmap, drawto_field, src_x, src_y, width, height,
 	       dest_x, dest_y);
 
-  MarkTileDirty(x,y);
+  MarkTileDirty(x, y);
 }
 
 void DrawGraphicShiftedThruMask(int x, int y, int dx, int dy, int graphic,
 				int frame, int cut_mode)
 {
-  DrawGraphicShifted(x,y, dx,dy, graphic, frame, cut_mode, USE_MASKING);
+  DrawGraphicShifted(x, y, dx, dy, graphic, frame, cut_mode, USE_MASKING);
 }
 
 void DrawScreenElementExt(int x, int y, int dx, int dy, int element,

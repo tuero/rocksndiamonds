@@ -4439,8 +4439,13 @@ void StartMoving(int x, int y)
     {
       if (Feld[newx][newy] == EL_EXIT_OPEN)
       {
+#if 1
+	RemoveField(x, y);
+	DrawLevelField(x, y);
+#else
 	Feld[x][y] = EL_EMPTY;
 	DrawLevelField(x, y);
+#endif
 
 	PlayLevelSound(newx, newy, SND_PENGUIN_PASSING);
 	if (IN_SCR_FIELD(SCREENX(newx), SCREENY(newy)))
@@ -6759,6 +6764,7 @@ void GameActions()
       StartMoving(x, y);
 
 #if 1
+      element = Feld[x][y];
       graphic = el_act_dir2img(element, GfxAction[x][y], GfxDir[x][y]);
 #if 0
       if (element == EL_MOLE)
