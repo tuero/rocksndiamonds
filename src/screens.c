@@ -892,9 +892,7 @@ void HandleChooseLevel(int mx, int my, int dx, int dy, int button)
 	getLastPlayedLevelOfLevelSeries(leveldir[leveldir_nr].filename);
 
       SaveLevelSetup();
-
       TapeErase();
-      LoadTape(level_nr);
 
       game_status = MAINMENU;
       DrawMainMenu();

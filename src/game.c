@@ -228,10 +228,13 @@ void InitGame()
 
 	  StorePlayer[x][y] = Feld[x][y];
 
-	  printf("Player %d activated.\n", player->element_nr);
-	  printf("[Local player is %d and currently %s.]\n",
-		 local_player->element_nr,
-		 local_player->active ? "active" : "not active");
+	  if (options.verbose)
+	  {
+	    printf("Player %d activated.\n", player->element_nr);
+	    printf("[Local player is %d and currently %s.]\n",
+		   local_player->element_nr,
+		   local_player->active ? "active" : "not active");
+	  }
 	}
 
 	Feld[x][y] = EL_LEERRAUM;
@@ -367,19 +370,21 @@ void InitGame()
     }
   }
 
-  for (i=0; i<MAX_PLAYERS; i++)
+  if (options.verbose)
   {
-    struct PlayerInfo *player = &stored_player[i];
+    for (i=0; i<MAX_PLAYERS; i++)
+    {
+      struct PlayerInfo *player = &stored_player[i];
 
-    printf("Player %d: present == %d, connected == %d, active == %d.\n",
-	   i+1,
-	   player->present,
-	   player->connected,
-	   player->active);
-    if (local_player == player)
-      printf("Player %d is local player.\n", i+1);
+      printf("Player %d: present == %d, connected == %d, active == %d.\n",
+	     i+1,
+	     player->present,
+	     player->connected,
+	     player->active);
+      if (local_player == player)
+	printf("Player 	%d is local player.\n", i+1);
+    }
   }
-
 
   game_emulation = (emulate_bd ? EMU_BOULDERDASH :
 		    emulate_sb ? EMU_SOKOBAN : EMU_NONE);
@@ -438,11 +443,12 @@ void InitGame()
 
   XAutoRepeatOff(display);
 
-
-  for (i=0; i<4; i++)
-    printf("Spieler %d %saktiv.\n",
-	   i+1, (stored_player[i].active ? "" : "nicht "));
-
+  if (options.verbose)
+  {
+    for (i=0; i<4; i++)
+      printf("Spieler %d %saktiv.\n",
+	     i+1, (stored_player[i].active ? "" : "nicht "));
+  }
 }
 
 void InitMovDir(int x, int y)
@@ -3414,11 +3420,11 @@ boolean MoveFigure(struct PlayerInfo *player, int dx, int dy)
 
   if (player->MovPos)
   {
-    /* should only happen if pre-1.0 tape recordings are played */
+    /* should only happen if pre-1.2 tape recordings are played */
     /* this is only for backward compatibility */
 
 #if DEBUG
-    printf("THIS SHOULD ONLY HAPPEN WITH PRE-1.0 LEVEL TAPES.\n");
+    printf("THIS SHOULD ONLY HAPPEN WITH PRE-1.2 LEVEL TAPES.\n");
 #endif
 
     while (player->MovPos)

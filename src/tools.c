@@ -11,7 +11,6 @@
 *  tools.c                                                 *
 ***********************************************************/
 
-#include <math.h>
 #include <stdarg.h>
 
 #ifdef __FreeBSD__
