@@ -23,10 +23,15 @@ endif
 AR = ar
 RANLIB = ranlib
 
+BMP2ICO = bmp2ico
+WINDRES = windres
+
 ifeq ($(PLATFORM),msdos)	# MS-DOS native compiling
 
 RM = del
-PROGNAME = ../rocks.exe
+
+PROGBASE = rocks
+PROGNAME = ../$(PROGBASE).exe
 
 SYS_CFLAGS = -DTARGET_X11
 SYS_LDFLAGS = -s -lalleg
@@ -34,7 +39,9 @@ SYS_LDFLAGS = -s -lalleg
 else				# Unix or cross-compiling for MS-DOS and Win32
 
 RM = rm -f
-PROGNAME = ../rocksndiamonds
+
+PROGBASE = rocksndiamonds
+PROGNAME = ../$(PROGBASE)
 
 ifeq ($(PLATFORM),solaris)
 EXTRA_LDFLAGS = -lnsl -lsocket -R$(XLIB_PATH)
@@ -46,12 +53,13 @@ PROFILING_FLAGS = -pg
 endif
 
 ifeq ($(PLATFORM),cross-msdos)
-PROGNAME = ../rocks.exe
+PROGBASE = rocks
+PROGNAME = ../$(PROGBASE).exe
 TARGET = allegro
 endif
 
 ifeq ($(PLATFORM),cross-win32)
-PROGNAME = ../rocksndiamonds.exe
+PROGNAME = ../$(PROGBASE).exe
 TARGET = sdl
 endif
 
@@ -135,14 +143,24 @@ OBJS =	main.o		\
 LIBDIR = libgame
 LIBGAME = $(LIBDIR)/libgame.a
 
+ICONBASE = windows_icon
+ifeq ($(PLATFORM),cross-win32)
+ICON32X32 = ../graphics/$(ICONBASE)_32x32.bmp
+ICON = $(ICONBASE).o
+endif
+
 
 all: $(PROGNAME)
 
-$(PROGNAME): $(LIBGAME) $(OBJS)
-	$(CC) $(PROFILING) $(OBJS) $(LIBGAME) $(LDFLAGS) -o $(PROGNAME)
+$(PROGNAME): $(LIBGAME) $(OBJS) $(ICON)
+	$(CC) $(PROFILING) $(OBJS) $(ICON) $(LIBGAME) $(LDFLAGS) -o $(PROGNAME)
 
 $(LIBGAME):
 	$(MAKE) -C $(LIBDIR)
+
+$(ICON):
+	$(BMP2ICO) -transparent $(ICONBASE).ico $(ICON32X32)
+	echo "$(ICONBASE) ICON $(ICONBASE).ico" | $(WINDRES) -o $(ICON)
 
 .c.o:
 	$(CC) $(PROFILING) $(CFLAGS) -c $*.c
@@ -152,11 +170,15 @@ clean-obj:
 	$(RM) $(OBJS)
 	$(RM) $(LIBGAME)
 
+clean-ico:
+	$(RM) $(ICONBASE).ico
+	$(RM) $(ICONBASE).o
+
 clean-bin:
 	$(RM) $(PROGNAME)
 	$(RM) ../*.exe
 
-clean: clean-obj clean-bin
+clean: clean-obj clean-ico clean-bin
 
 
 #-----------------------------------------------------------------------------#
