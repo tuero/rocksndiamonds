@@ -91,6 +91,11 @@
 
 #define	INIT_GFX_RANDOM()	(SimpleRND(1000000))
 
+#define GET_NEW_PUSH_DELAY(e)	(   (element_info[e].push_delay_fixed) + \
+				 RND(element_info[e].push_delay_random))
+#define GET_NEW_MOVE_DELAY(e)	(   (element_info[e].move_delay_fixed) + \
+				 RND(element_info[e].move_delay_random))
+
 /* game button identifiers */
 #define GAME_CTRL_ID_STOP		0
 #define GAME_CTRL_ID_PAUSE		1
@@ -687,25 +692,17 @@ static void InitGameEngine()
   /* add changing elements from custom element configuration */
   for (i=0; i < NUM_CUSTOM_ELEMENTS; i++)
   {
-    struct CustomElementChangeInfo *change = &level.custom_element[i].change;
     int element = EL_CUSTOM_START + i;
+    struct ElementChangeInfo *change = &element_info[element].change;
 
     /* only add custom elements that change after fixed/random frame delay */
-    if (!IS_CHANGEABLE(element) ||
-	(!HAS_CHANGE_EVENT(element, CE_DELAY_FIXED) &&
-	 !HAS_CHANGE_EVENT(element, CE_DELAY_RANDOM)))
+    if (!IS_CHANGEABLE(element) || !HAS_CHANGE_EVENT(element, CE_DELAY))
       continue;
 
     changing_element[element].base_element = element;
     changing_element[element].next_element = change->successor;
-    changing_element[element].change_delay = 0;
-
-    if (HAS_CHANGE_EVENT(element, CE_DELAY_FIXED))
-      changing_element[element].change_delay +=
-	change->delay_fixed * change->delay_frames;
-
-    if (HAS_CHANGE_EVENT(element, CE_DELAY_RANDOM));
-    /* random frame delay added at runtime for each element individually */
+    changing_element[element].change_delay = (change->delay_fixed *
+					      change->delay_frames);
   }
 }
 
@@ -1741,7 +1738,7 @@ void Explode(int ex, int ey, int phase, int mode)
 	  level.yamyam_content[game.yamyam_content_nr][x - ex + 1][y - ey + 1];
       else if (IS_CUSTOM_ELEMENT(center_element))
 	Store[x][y] =
-	  CUSTOM_ELEMENT_INFO(center_element).content[x - ex + 1][y - ey + 1];
+	  element_info[center_element].content[x - ex + 1][y - ey + 1];
       else if (element == EL_WALL_EMERALD)
 	Store[x][y] = EL_EMERALD;
       else if (element == EL_WALL_DIAMOND)
@@ -4565,12 +4562,10 @@ static void ChangeElement(int x, int y)
   {
     MovDelay[x][y] = changing_element[element].change_delay + 1;
 
-    if (IS_CUSTOM_ELEMENT(element) &&
-	HAS_CHANGE_EVENT(element, CE_DELAY_RANDOM))
+    if (IS_CUSTOM_ELEMENT(element) && HAS_CHANGE_EVENT(element, CE_DELAY))
     {
-      int i = element - EL_CUSTOM_START;
-      int max_random_delay = level.custom_element[i].change.delay_random;
-      int delay_frames = level.custom_element[i].change.delay_frames;
+      int max_random_delay = element_info[element].change.delay_random;
+      int delay_frames = element_info[element].change.delay_frames;
 
       MovDelay[x][y] += RND(max_random_delay * delay_frames);
     }
@@ -5915,10 +5910,10 @@ int DigField(struct PlayerInfo *player,
     player->is_collecting = FALSE;
   }
 
-  if (player->MovPos == 0)
+  if (player->MovPos == 0)	/* last pushing move finished */
     player->Pushing = FALSE;
 
-  if (mode == DF_NO_PUSH)
+  if (mode == DF_NO_PUSH)	/* player just stopped pushing */
   {
     player->Switching = FALSE;
     player->push_delay = 0;
@@ -6630,15 +6625,19 @@ int DigField(struct PlayerInfo *player,
 	if (CAN_FALL(element) && dy)
 	  return MF_NO_ACTION;
 
+	if (!player->Pushing &&
+	    game.engine_version >= RELEASE_IDENT(2,2,0,7))
+	  player->push_delay_value = GET_NEW_PUSH_DELAY(element);
+
 	player->Pushing = TRUE;
 
-	if (!IN_LEV_FIELD(x+dx, y+dy) || !IS_FREE(x+dx, y+dy))
+	if (!IN_LEV_FIELD(x + dx, y + dy) || !IS_FREE(x + dx, y + dy))
 	  return MF_NO_ACTION;
 
 	if (!checkDiagonalPushing(player, x, y, real_dx, real_dy))
 	  return MF_NO_ACTION;
 
-	if (player->push_delay == 0)
+	if (player->push_delay == 0)	/* new pushing; restart delay */
 	  player->push_delay = FrameCounter;
 
 	if (!FrameReached(&player->push_delay, player->push_delay_value) &&
@@ -6648,7 +6647,12 @@ int DigField(struct PlayerInfo *player,
 	RemoveField(x, y);
 	Feld[x + dx][y + dy] = element;
 
+#if 1
+	if (game.engine_version < RELEASE_IDENT(2,2,0,7))
+	  player->push_delay_value = GET_NEW_PUSH_DELAY(element);
+#else
 	player->push_delay_value = 2 + RND(8);
+#endif
 
 	DrawLevelField(x + dx, y + dy);
 	PlaySoundLevelElementAction(x, y, element, ACTION_PUSHING);

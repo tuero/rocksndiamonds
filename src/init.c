@@ -1455,19 +1455,19 @@ void InitElementPropertiesStatic()
   static int ep_pushable[] =
   {
     EL_ROCK,
-    EL_BD_ROCK,
     EL_BOMB,
+    EL_DX_SUPABOMB,
     EL_NUT,
     EL_TIME_ORB_EMPTY,
-    EL_SOKOBAN_FIELD_FULL,
-    EL_SOKOBAN_OBJECT,
-    EL_SATELLITE,
     EL_SP_ZONK,
     EL_SP_DISK_ORANGE,
+    EL_SPRING,
+    EL_BD_ROCK,
+    EL_SOKOBAN_OBJECT,
+    EL_SOKOBAN_FIELD_FULL,
+    EL_SATELLITE,
     EL_SP_DISK_YELLOW,
     EL_BALLOON,
-    EL_SPRING,
-    EL_DX_SUPABOMB,
     -1
   };
 

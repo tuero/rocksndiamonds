@@ -152,17 +152,14 @@
 
 
 /* values for change events for custom elements */
-#define CE_DELAY_FIXED		0
-#define CE_DELAY_RANDOM		1
+#define CE_DELAY		0
 
-#define NUM_CHANGE_EVENTS	2
+#define NUM_CHANGE_EVENTS	1
 
 #define CE_BITMASK_DEFAULT	0
 
-#define CUSTOM_ELEMENT_INFO(e)	(level.custom_element[(e) - EL_CUSTOM_START])
-
 #define CH_EVENT_BIT(c)		(1 << (c))
-#define CH_EVENT_VAR(e)		(CUSTOM_ELEMENT_INFO(e).change.events)
+#define CH_EVENT_VAR(e)		(element_info[e].change.events)
 
 #define HAS_CHANGE_EVENT(e,c)	(IS_CUSTOM_ELEMENT(e) &&		  \
 				 (CH_EVENT_VAR(e) & CH_EVENT_BIT(c)) != 0)
@@ -236,12 +233,11 @@
 #define IS_DRAGONFIRE_PROOF(e)	HAS_PROPERTY(e, EP_DRAGONFIRE_PROOF)
 #define IS_EXPLOSION_PROOF(e)	HAS_PROPERTY(e, EP_EXPLOSION_PROOF)
 
-#define IS_CUSTOM_ELEMENT(e)	((e) >= EL_CUSTOM_START &&	\
+#define IS_CUSTOM_ELEMENT(e)	((e) >= EL_CUSTOM_START &&		\
 	 			 (e) <= EL_CUSTOM_END)
 
-#define GFX_ELEMENT(e)		(IS_CUSTOM_ELEMENT(e) &&		  \
-				 CUSTOM_ELEMENT_INFO(e).use_gfx_element ? \
-				 CUSTOM_ELEMENT_INFO(e).gfx_element : e)
+#define GFX_ELEMENT(e)		(element_info[e].use_gfx_element ?	\
+				 element_info[e].gfx_element : e)
 
 #define IS_PLAYER(x,y)		(ELEM_IS_PLAYER(StorePlayer[x][y]))
 
@@ -901,6 +897,7 @@
 #define PROGRAM_VERSION_MAJOR	2
 #define PROGRAM_VERSION_MINOR	2
 #define PROGRAM_VERSION_PATCH	0
+#define PROGRAM_VERSION_RELEASE	7
 #define PROGRAM_VERSION_STRING	"2.2.0rc7"
 
 #define PROGRAM_TITLE_STRING	"Rocks'n'Diamonds"
@@ -948,9 +945,10 @@
 #define GAME_VERSION_1_4	FILE_VERSION_1_4
 #define GAME_VERSION_2_0	FILE_VERSION_2_0
 
-#define GAME_VERSION_ACTUAL	VERSION_IDENT(PROGRAM_VERSION_MAJOR, \
+#define GAME_VERSION_ACTUAL	RELEASE_IDENT(PROGRAM_VERSION_MAJOR, \
 					      PROGRAM_VERSION_MINOR, \
-					      PROGRAM_VERSION_PATCH)
+					      PROGRAM_VERSION_PATCH, \
+					      PROGRAM_VERSION_RELEASE)
 
 /* values for game_emulation */
 #define EMU_NONE		0
@@ -1019,34 +1017,6 @@ struct PlayerInfo
   int shield_deadly_time_left;
 };
 
-struct CustomElementChangeInfo
-{
-  unsigned long events;		/* bitfield for change events */
-
-  int delay_fixed;		/* added frame delay before changed (fixed) */
-  int delay_random;		/* added frame delay before changed (random) */
-  int delay_frames;		/* either 1 (frames) or 50 (seconds; 50 fps) */
-
-  short successor;		/* new custom element after change */
-};
-
-struct CustomElementInfo
-{
-  boolean use_template;		/* use all properties from template file */
-
-  boolean use_gfx_element;
-  short gfx_element;		/* optional custom graphic element */
-
-  int move_direction;		/* direction movable element moves to */
-
-  int walk_to_action;		/* only for level editor; not stored */
-  int walkable_layer;		/* only for level editor; not stored */
-
-  int content[3][3];		/* new elements after explosion */
-
-  struct CustomElementChangeInfo change;
-};
-
 struct LevelInfo
 {
   int file_version;	/* file format version the level is stored with    */
@@ -1074,8 +1044,6 @@ struct LevelInfo
   boolean double_speed;
   boolean gravity;
   boolean em_slippery_gems;	/* EM style "gems slip from wall" behaviour */
-
-  struct CustomElementInfo custom_element[NUM_CUSTOM_ELEMENTS];
 
   boolean no_level_file;
 };
@@ -1160,12 +1128,27 @@ struct DoorInfo
   int step_delay;
 };
 
+struct ElementChangeInfo
+{
+  unsigned long events;		/* bitfield for change events */
+
+  int delay_fixed;		/* added frame delay before changed (fixed) */
+  int delay_random;		/* added frame delay before changed (random) */
+  int delay_frames;		/* either 1 (frames) or 50 (seconds; 50 fps) */
+
+  short successor;		/* new custom element after change */
+};
+
 struct ElementInfo
 {
+  /* ---------- token and description strings ---------- */
+
   char *token_name;		/* element token used in config files */
   char *class_name;		/* element class used in config files */
   char *editor_description;	/* short description for level editor */
   char *custom_description;	/* custom description for level editor */
+
+  /* ---------- graphic and sound definitions ---------- */
 
   int graphic[NUM_ACTIONS];	/* default graphics for several actions */
   int direction_graphic[NUM_ACTIONS][NUM_DIRECTIONS];
@@ -1174,6 +1157,29 @@ struct ElementInfo
   				/* special graphics for certain screens */
 
   int sound[NUM_ACTIONS];	/* default sounds for several actions */
+
+  /* ---------- special element property values ---------- */
+
+  boolean use_template;		/* use all properties from template file */
+
+  boolean use_gfx_element;
+  short gfx_element;		/* optional custom graphic element */
+
+  int score;			/* score for collection, smashing, ... */
+
+  int push_delay_fixed;		/* constant frame delay for pushing */
+  int push_delay_random;	/* additional random frame delay for pushing */
+  int move_delay_fixed;		/* constant frame delay for moving */
+  int move_delay_random;	/* additional random frame delay for moving */
+
+  int move_direction;		/* direction movable element moves to */
+
+  int walk_to_action;		/* only for level editor; not stored */
+  int walkable_layer;		/* only for level editor; not stored */
+
+  int content[3][3];		/* new elements after explosion */
+
+  struct ElementChangeInfo change;
 };
 
 struct FontInfo

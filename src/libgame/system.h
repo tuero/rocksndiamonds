@@ -238,10 +238,12 @@
 #define DOOR_GFX_PAGEY2		(gfx.dysize)
 
 /* functions for version handling */
-#define VERSION_IDENT(x,y,z)	((x) * 10000 + (y) * 100 + (z))
-#define VERSION_MAJOR(x)	((x) / 10000)
-#define VERSION_MINOR(x)	(((x) % 10000) / 100)
-#define VERSION_PATCH(x)	((x) % 100)
+#define VERSION_IDENT(x,y,z)	((x) * 1000000 + (y) * 10000 + (z) * 100)
+#define RELEASE_IDENT(x,y,z,r)	(VERSION_IDENT(x,y,z) + (r))
+#define VERSION_MAJOR(x)	((x) / 1000000)
+#define VERSION_MINOR(x)	(((x) % 1000000) / 10000)
+#define VERSION_PATCH(x)	(((x) % 10000) / 100)
+#define VERSION_RELEASE(x)	((x) % 100)
 
 /* functions for parent/child process identification */
 #if defined(PLATFORM_UNIX)

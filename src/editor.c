@@ -76,8 +76,10 @@
 #define ED_SETTINGS_XSTART		(3 * MINI_TILEX / 2)
 #define ED_SETTINGS_YSTART		(MINI_TILEY * 10)
 
-#define ED_SETTINGS_XOFFSET		(ED_CHECKBUTTON_XSIZE + \
+#define ED_XOFFSET_CHECKBOX		(ED_CHECKBUTTON_XSIZE + \
 					 2 * ED_GADGET_DISTANCE)
+
+#define ED_SETTINGS_XOFFSET		ED_XOFFSET_CHECKBOX
 #define ED_SETTINGS_YOFFSET		(3 * MINI_TILEY / 2)
 
 #define ED_SETTINGS_XPOS(n)		(ED_SETTINGS_XSTART + \
@@ -90,12 +92,9 @@
 #define ED_SETTINGS2_YPOS		(ED_SETTINGS1_YPOS + 12 * TILEY - 2)
 
 /* values for counter gadgets */
-#define ED_COUNT_ELEMENT_SCORE_XPOS	ED_SETTINGS_XPOS(0)
-#define ED_COUNT_ELEMENT_SCORE_YPOS	ED_SETTINGS_YPOS(0)
-#define ED_COUNT_ELEMENT_CONTENT_XPOS	ED_SETTINGS_XPOS(0)
-#define ED_COUNT_ELEMENT_CONTENT_YPOS	ED_SETTINGS_YPOS(6)
-
-#define ED_COUNT_CHANGE_DELAY_XPOS	(ED_SETTINGS_XPOS(1) + 9 * MINI_TILEX)
+#define ED_COUNT_PUSH_DELAY_RND_XPOS	(ED_SETTINGS_XPOS(1) + 16 * MINI_TILEX)
+#define ED_COUNT_MOVE_DELAY_RND_XPOS	ED_COUNT_PUSH_DELAY_RND_XPOS
+#define ED_COUNT_CHANGE_DELAY_RND_XPOS	(ED_SETTINGS_XPOS(1) + 13 * MINI_TILEX)
 
 #define ED_COUNTER_YSTART		(ED_SETTINGS1_YPOS + 2 * TILEY)
 #define ED_COUNTER_YDISTANCE		(3 * MINI_TILEY)
@@ -117,7 +116,7 @@
 					 ED_GADGET_DISTANCE)
 
 #define ED_AREA_ELEM_CONTENT4_XPOS	(17 * MINI_TILEX)
-#define ED_AREA_ELEM_CONTENT4_YPOS	(ED_SETTINGS_YPOS(8) + \
+#define ED_AREA_ELEM_CONTENT4_YPOS	(ED_SETTINGS_YPOS(10) + \
 					 ED_GADGET_DISTANCE - MINI_TILEY)
 
 /* values for random placement background drawing area */
@@ -302,15 +301,30 @@
 #define GADGET_ID_ELEMENT_CONTENT_DOWN	(GADGET_ID_COUNTER_FIRST + 24)
 #define GADGET_ID_ELEMENT_CONTENT_TEXT	(GADGET_ID_COUNTER_FIRST + 25)
 #define GADGET_ID_ELEMENT_CONTENT_UP	(GADGET_ID_COUNTER_FIRST + 26)
-#define GADGET_ID_CHANGE_DELAY_FIX_DOWN	(GADGET_ID_COUNTER_FIRST + 27)
-#define GADGET_ID_CHANGE_DELAY_FIX_TEXT	(GADGET_ID_COUNTER_FIRST + 28)
-#define GADGET_ID_CHANGE_DELAY_FIX_UP	(GADGET_ID_COUNTER_FIRST + 29)
-#define GADGET_ID_CHANGE_DELAY_RND_DOWN	(GADGET_ID_COUNTER_FIRST + 30)
-#define GADGET_ID_CHANGE_DELAY_RND_TEXT	(GADGET_ID_COUNTER_FIRST + 31)
-#define GADGET_ID_CHANGE_DELAY_RND_UP	(GADGET_ID_COUNTER_FIRST + 32)
+#define GADGET_ID_CUSTOM_SCORE_DOWN	(GADGET_ID_COUNTER_FIRST + 27)
+#define GADGET_ID_CUSTOM_SCORE_TEXT	(GADGET_ID_COUNTER_FIRST + 28)
+#define GADGET_ID_CUSTOM_SCORE_UP	(GADGET_ID_COUNTER_FIRST + 29)
+#define GADGET_ID_PUSH_DELAY_FIX_DOWN	(GADGET_ID_COUNTER_FIRST + 30)
+#define GADGET_ID_PUSH_DELAY_FIX_TEXT	(GADGET_ID_COUNTER_FIRST + 31)
+#define GADGET_ID_PUSH_DELAY_FIX_UP	(GADGET_ID_COUNTER_FIRST + 32)
+#define GADGET_ID_PUSH_DELAY_RND_DOWN	(GADGET_ID_COUNTER_FIRST + 33)
+#define GADGET_ID_PUSH_DELAY_RND_TEXT	(GADGET_ID_COUNTER_FIRST + 34)
+#define GADGET_ID_PUSH_DELAY_RND_UP	(GADGET_ID_COUNTER_FIRST + 35)
+#define GADGET_ID_MOVE_DELAY_FIX_DOWN	(GADGET_ID_COUNTER_FIRST + 36)
+#define GADGET_ID_MOVE_DELAY_FIX_TEXT	(GADGET_ID_COUNTER_FIRST + 37)
+#define GADGET_ID_MOVE_DELAY_FIX_UP	(GADGET_ID_COUNTER_FIRST + 38)
+#define GADGET_ID_MOVE_DELAY_RND_DOWN	(GADGET_ID_COUNTER_FIRST + 39)
+#define GADGET_ID_MOVE_DELAY_RND_TEXT	(GADGET_ID_COUNTER_FIRST + 40)
+#define GADGET_ID_MOVE_DELAY_RND_UP	(GADGET_ID_COUNTER_FIRST + 41)
+#define GADGET_ID_CHANGE_DELAY_FIX_DOWN	(GADGET_ID_COUNTER_FIRST + 42)
+#define GADGET_ID_CHANGE_DELAY_FIX_TEXT	(GADGET_ID_COUNTER_FIRST + 43)
+#define GADGET_ID_CHANGE_DELAY_FIX_UP	(GADGET_ID_COUNTER_FIRST + 44)
+#define GADGET_ID_CHANGE_DELAY_RND_DOWN	(GADGET_ID_COUNTER_FIRST + 45)
+#define GADGET_ID_CHANGE_DELAY_RND_TEXT	(GADGET_ID_COUNTER_FIRST + 46)
+#define GADGET_ID_CHANGE_DELAY_RND_UP	(GADGET_ID_COUNTER_FIRST + 47)
 
 /* drawing area identifiers */
-#define GADGET_ID_DRAWING_AREA_FIRST	(GADGET_ID_COUNTER_FIRST + 33)
+#define GADGET_ID_DRAWING_AREA_FIRST	(GADGET_ID_COUNTER_FIRST + 48)
 
 #define GADGET_ID_DRAWING_LEVEL		(GADGET_ID_DRAWING_AREA_FIRST + 0)
 #define GADGET_ID_ELEMENT_CONTENT_0	(GADGET_ID_DRAWING_AREA_FIRST + 1)
@@ -367,7 +381,7 @@
 #define GADGET_ID_SCROLL_LIST_DOWN	(GADGET_ID_SCROLLING_LIST_FIRST + 1)
 #define GADGET_ID_SCROLL_LIST_VERTICAL	(GADGET_ID_SCROLLING_LIST_FIRST + 2)
 
-/* buttons for level/element properties */
+/* checkbuttons for level/element properties */
 #define GADGET_ID_CHECKBUTTON_FIRST	(GADGET_ID_SCROLLING_LIST_FIRST + 3)
 
 #define GADGET_ID_RANDOM_PERCENTAGE	(GADGET_ID_CHECKBUTTON_FIRST + 0)
@@ -388,11 +402,10 @@
 #define GADGET_ID_CUSTOM_USE_GRAPHIC	(GADGET_ID_CHECKBUTTON_FIRST + 15)
 #define GADGET_ID_CUSTOM_USE_TEMPLATE	(GADGET_ID_CHECKBUTTON_FIRST + 16)
 #define GADGET_ID_CUSTOM_CHANGEABLE	(GADGET_ID_CHECKBUTTON_FIRST + 17)
-#define GADGET_ID_CHANGE_DELAY_FIXED	(GADGET_ID_CHECKBUTTON_FIRST + 18)
-#define GADGET_ID_CHANGE_DELAY_RANDOM	(GADGET_ID_CHECKBUTTON_FIRST + 19)
+#define GADGET_ID_CHANGE_DELAY		(GADGET_ID_CHECKBUTTON_FIRST + 18)
 
 /* gadgets for buttons in element list */
-#define GADGET_ID_ELEMENTLIST_FIRST	(GADGET_ID_CHECKBUTTON_FIRST + 20)
+#define GADGET_ID_ELEMENTLIST_FIRST	(GADGET_ID_CHECKBUTTON_FIRST + 19)
 #define GADGET_ID_ELEMENTLIST_LAST	(GADGET_ID_ELEMENTLIST_FIRST +	\
 	 				ED_NUM_ELEMENTLIST_BUTTONS - 1)
 
@@ -413,13 +426,21 @@
 #define ED_COUNTER_ID_LEVEL_RANDOM	6
 #define ED_COUNTER_ID_ELEMENT_SCORE	7
 #define ED_COUNTER_ID_ELEMENT_CONTENT	8
-#define ED_COUNTER_ID_CHANGE_DELAY_FIX	9
-#define ED_COUNTER_ID_CHANGE_DELAY_RND	10
+#define ED_COUNTER_ID_CUSTOM_SCORE	9
+#define ED_COUNTER_ID_PUSH_DELAY_FIX	10
+#define ED_COUNTER_ID_PUSH_DELAY_RND	11
+#define ED_COUNTER_ID_MOVE_DELAY_FIX	12
+#define ED_COUNTER_ID_MOVE_DELAY_RND	13
+#define ED_COUNTER_ID_CHANGE_DELAY_FIX	14
+#define ED_COUNTER_ID_CHANGE_DELAY_RND	15
 
-#define ED_NUM_COUNTERBUTTONS		11
+#define ED_NUM_COUNTERBUTTONS		16
 
 #define ED_COUNTER_ID_LEVEL_FIRST	ED_COUNTER_ID_LEVEL_XSIZE
 #define ED_COUNTER_ID_LEVEL_LAST	ED_COUNTER_ID_LEVEL_RANDOM
+
+#define ED_COUNTER_ID_CUSTOM_FIRST	ED_COUNTER_ID_CUSTOM_SCORE
+#define ED_COUNTER_ID_CUSTOM_LAST	ED_COUNTER_ID_MOVE_DELAY_RND
 
 #define ED_COUNTER_ID_CHANGE_FIRST	ED_COUNTER_ID_CHANGE_DELAY_FIX
 #define ED_COUNTER_ID_CHANGE_LAST	ED_COUNTER_ID_CHANGE_DELAY_RND
@@ -496,10 +517,9 @@
 #define ED_CHECKBUTTON_ID_CUSTOM_USE_GRAPHIC	13
 #define ED_CHECKBUTTON_ID_CUSTOM_USE_TEMPLATE	14
 #define ED_CHECKBUTTON_ID_CUSTOM_CHANGEABLE	15
-#define ED_CHECKBUTTON_ID_CHANGE_DELAY_FIXED	16
-#define ED_CHECKBUTTON_ID_CHANGE_DELAY_RANDOM	17
+#define ED_CHECKBUTTON_ID_CHANGE_DELAY		16
 
-#define ED_NUM_CHECKBUTTONS			18
+#define ED_NUM_CHECKBUTTONS			17
 
 #define ED_CHECKBUTTON_ID_LEVEL_FIRST	ED_CHECKBUTTON_ID_DOUBLE_SPEED
 #define ED_CHECKBUTTON_ID_LEVEL_LAST	ED_CHECKBUTTON_ID_RANDOM_RESTRICTED
@@ -508,7 +528,7 @@
 #define ED_CHECKBUTTON_ID_CUSTOM_LAST	ED_CHECKBUTTON_ID_CUSTOM_USE_TEMPLATE
 
 #define ED_CHECKBUTTON_ID_CHANGE_FIRST	ED_CHECKBUTTON_ID_CUSTOM_CHANGEABLE
-#define ED_CHECKBUTTON_ID_CHANGE_LAST	ED_CHECKBUTTON_ID_CHANGE_DELAY_RANDOM
+#define ED_CHECKBUTTON_ID_CHANGE_LAST	ED_CHECKBUTTON_ID_CHANGE_DELAY
 
 /* values for radiobutton gadgets */
 #define ED_RADIOBUTTON_ID_PERCENTAGE	0
@@ -606,7 +626,7 @@ static boolean random_placement_background_restricted = FALSE;
 static boolean stick_element_properties_window = FALSE;
 static boolean custom_element_properties[NUM_ELEMENT_PROPERTIES];
 static boolean custom_element_change_events[NUM_CHANGE_EVENTS];
-static struct CustomElementInfo custom_element;
+static struct ElementInfo custom_element;
 
 static struct
 {
@@ -615,7 +635,7 @@ static struct
   int gadget_id_down, gadget_id_up;
   int gadget_id_text;
   int *value;
-  char *infotext_above, *infotext_right;
+  char *text_above, *text_left, *text_right;
 } counterbutton_info[ED_NUM_COUNTERBUTTONS] =
 {
   {
@@ -624,7 +644,7 @@ static struct
     GADGET_ID_SELECT_LEVEL_DOWN,	GADGET_ID_SELECT_LEVEL_UP,
     GADGET_ID_SELECT_LEVEL_TEXT,
     &level_nr,
-    NULL,				NULL
+    NULL,				NULL, NULL
   },
   {
     ED_SETTINGS_XPOS(0),		ED_COUNTER_YPOS(2),
@@ -632,7 +652,7 @@ static struct
     GADGET_ID_LEVEL_XSIZE_DOWN,		GADGET_ID_LEVEL_XSIZE_UP,
     GADGET_ID_LEVEL_XSIZE_TEXT,
     &level.fieldx,
-    "playfield size",			"width",
+    "playfield size",			NULL, "width",
   },
   {
     ED_SETTINGS_XPOS(0) + 2 * DXSIZE,	ED_COUNTER_YPOS(2),
@@ -640,7 +660,7 @@ static struct
     GADGET_ID_LEVEL_YSIZE_DOWN,		GADGET_ID_LEVEL_YSIZE_UP,
     GADGET_ID_LEVEL_YSIZE_TEXT,
     &level.fieldy,
-    NULL,				"height",
+    NULL,				NULL, "height",
   },
   {
     ED_SETTINGS_XPOS(0),		ED_COUNTER_YPOS(3),
@@ -648,7 +668,7 @@ static struct
     GADGET_ID_LEVEL_COLLECT_DOWN,	GADGET_ID_LEVEL_COLLECT_UP,
     GADGET_ID_LEVEL_COLLECT_TEXT,
     &level.gems_needed,
-    "number of emeralds to collect",	NULL
+    "number of emeralds to collect",	NULL, NULL
   },
   {
     ED_SETTINGS_XPOS(0),		ED_COUNTER_YPOS(4),
@@ -656,7 +676,7 @@ static struct
     GADGET_ID_LEVEL_TIMELIMIT_DOWN,	GADGET_ID_LEVEL_TIMELIMIT_UP,
     GADGET_ID_LEVEL_TIMELIMIT_TEXT,
     &level.time,
-    "time available to solve level",	"(0 => no time limit)"
+    "time available to solve level",	NULL, "(0 => no time limit)"
   },
   {
     ED_SETTINGS_XPOS(0),		ED_COUNTER_YPOS(5),
@@ -664,7 +684,7 @@ static struct
     GADGET_ID_LEVEL_TIMESCORE_DOWN,	GADGET_ID_LEVEL_TIMESCORE_UP,
     GADGET_ID_LEVEL_TIMESCORE_TEXT,
     &level.score[SC_TIME_BONUS],
-    "score for each 10 seconds left",	NULL
+    "score for each 10 seconds left",	NULL, NULL
   },
   {
     ED_SETTINGS_XPOS(0),		ED_COUNTER2_YPOS(8),
@@ -672,39 +692,79 @@ static struct
     GADGET_ID_LEVEL_RANDOM_DOWN,	GADGET_ID_LEVEL_RANDOM_UP,
     GADGET_ID_LEVEL_RANDOM_TEXT,
     &random_placement_value,
-    "random element placement",		"in"
+    "random element placement",		NULL, "in"
   },
   {
-    ED_COUNT_ELEMENT_SCORE_XPOS,	ED_COUNT_ELEMENT_SCORE_YPOS,
+    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(0),
     MIN_SCORE,				MAX_SCORE,
     GADGET_ID_ELEMENT_SCORE_DOWN,	GADGET_ID_ELEMENT_SCORE_UP,
     GADGET_ID_ELEMENT_SCORE_TEXT,
     NULL,				/* will be set when used */
-    "element score",			NULL
+    NULL,				NULL, NULL
   },
   {
-    ED_COUNT_ELEMENT_CONTENT_XPOS,	ED_COUNT_ELEMENT_CONTENT_YPOS,
+    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(6),
     MIN_ELEMENT_CONTENTS,		MAX_ELEMENT_CONTENTS,
     GADGET_ID_ELEMENT_CONTENT_DOWN,	GADGET_ID_ELEMENT_CONTENT_UP,
     GADGET_ID_ELEMENT_CONTENT_TEXT,
     &level.num_yamyam_contents,
-    "element content",			NULL
+    NULL,				NULL, "number of content areas"
   },
   {
-    ED_COUNT_CHANGE_DELAY_XPOS,		ED_SETTINGS_YPOS(2),
+    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(1),
+    MIN_SCORE,				MAX_SCORE,
+    GADGET_ID_CUSTOM_SCORE_DOWN,	GADGET_ID_CUSTOM_SCORE_UP,
+    GADGET_ID_CUSTOM_SCORE_TEXT,
+    &custom_element.score,
+    NULL,				NULL, "score for certain actions"
+  },
+  {
+    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(5),
+    0,					999,
+    GADGET_ID_PUSH_DELAY_FIX_DOWN,	GADGET_ID_PUSH_DELAY_FIX_UP,
+    GADGET_ID_PUSH_DELAY_FIX_TEXT,
+    &custom_element.push_delay_fixed,
+    NULL,				"push delay", NULL
+  },
+  {
+    ED_COUNT_PUSH_DELAY_RND_XPOS,	ED_SETTINGS_YPOS(5),
+    0,					999,
+    GADGET_ID_PUSH_DELAY_RND_DOWN,	GADGET_ID_PUSH_DELAY_RND_UP,
+    GADGET_ID_PUSH_DELAY_RND_TEXT,
+    &custom_element.push_delay_random,
+    NULL,				"+random", NULL
+  },
+  {
+    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(7),
+    0,					999,
+    GADGET_ID_MOVE_DELAY_FIX_DOWN,	GADGET_ID_MOVE_DELAY_FIX_UP,
+    GADGET_ID_MOVE_DELAY_FIX_TEXT,
+    &custom_element.move_delay_fixed,
+    NULL,				"move delay", NULL
+  },
+  {
+    ED_COUNT_MOVE_DELAY_RND_XPOS,	ED_SETTINGS_YPOS(7),
+    0,					999,
+    GADGET_ID_MOVE_DELAY_RND_DOWN,	GADGET_ID_MOVE_DELAY_RND_UP,
+    GADGET_ID_MOVE_DELAY_RND_TEXT,
+    &custom_element.move_delay_random,
+    NULL,				"+random", NULL
+  },
+  {
+    ED_SETTINGS_XPOS(2),		ED_SETTINGS_YPOS(2),
     0,					999,
     GADGET_ID_CHANGE_DELAY_FIX_DOWN,	GADGET_ID_CHANGE_DELAY_FIX_UP,
     GADGET_ID_CHANGE_DELAY_FIX_TEXT,
     &custom_element.change.delay_fixed,
-    NULL,				"units (fixed)"
+    NULL,				"delay", NULL,
   },
   {
-    ED_COUNT_CHANGE_DELAY_XPOS,		ED_SETTINGS_YPOS(3),
+    ED_COUNT_CHANGE_DELAY_RND_XPOS,	ED_SETTINGS_YPOS(2),
     0,					999,
     GADGET_ID_CHANGE_DELAY_RND_DOWN,	GADGET_ID_CHANGE_DELAY_RND_UP,
     GADGET_ID_CHANGE_DELAY_RND_TEXT,
     &custom_element.change.delay_random,
-    NULL,				"units (random)"
+    NULL,				"+random", NULL
   }
 };
 
@@ -794,7 +854,7 @@ static struct
   int size;	/* char size of selectbox or '-1' (dynamically determined) */
   struct ValueTextInfo *options;
   int *index, *value;
-  char *text, *infotext;
+  char *text_left, *infotext;
 } selectbox_info[ED_NUM_SELECTBOX] =
 {
   {
@@ -806,7 +866,7 @@ static struct
     NULL, "diggable/collectible/pushable"
   },
   {
-    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(5),
+    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(6),
     GADGET_ID_CUSTOM_MOVE_DIRECTION,
     -1,
     options_move_direction, &index_move_direction,
@@ -814,7 +874,7 @@ static struct
     "can move", "element move direction"
   },
   {
-    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(10),
+    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(12),
     GADGET_ID_CUSTOM_WALKABLE_LAYER,
     -1,
     options_walkable_layer, &index_walkable_layer,
@@ -822,7 +882,7 @@ static struct
     "player can walk", "layer where player can walk"
   },
   {
-    ED_SETTINGS_XPOS(2),		ED_SETTINGS_YPOS(4),
+    ED_SETTINGS_XPOS(2),		ED_SETTINGS_YPOS(3),
     GADGET_ID_CHANGE_TIME_UNITS,
     -1,
     options_time_units, &index_time_units,
@@ -863,7 +923,7 @@ static struct
     11, "Advanced",			"Advanced element configuration"
   },
   {
-    ED_SETTINGS_XPOS(0) + 262,		ED_SETTINGS_YPOS(11),
+    ED_SETTINGS_XPOS(0) + 262,		ED_SETTINGS_YPOS(13),
     GADGET_ID_SAVE_AS_TEMPLATE,
     -1, "Save as template",		"Save current settings as new template"
   },
@@ -958,7 +1018,7 @@ static struct
   int radio_button_nr;
   int *value;
   int checked_value;
-  char *text, *infotext;
+  char *text_right, *infotext;
 } radiobutton_info[ED_NUM_RADIOBUTTONS] =
 {
   {
@@ -982,7 +1042,7 @@ static struct
   int x, y;
   int gadget_id;
   boolean *value;
-  char *text, *infotext;
+  char *text_right, *infotext;
 } checkbutton_info[ED_NUM_CHECKBUTTONS] =
 {
   {
@@ -1028,37 +1088,37 @@ static struct
     NULL,				"player can dig/collect/push element"
   },
   {
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(5),
+    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(6),
     GADGET_ID_CUSTOM_CAN_MOVE,
     &custom_element_properties[EP_CAN_MOVE],
     NULL,				"element can move in some direction"
   },
   {
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(6),
+    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(8),
     GADGET_ID_CUSTOM_CAN_FALL,
     &custom_element_properties[EP_CAN_FALL],
     "can fall",				"element can fall down"
   },
   {
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(7),
+    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(9),
     GADGET_ID_CUSTOM_CAN_SMASH,
     &custom_element_properties[EP_CAN_SMASH],
     "can smash",			"element can smash other elements"
   },
   {
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(8),
+    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(10),
     GADGET_ID_CUSTOM_CAN_EXPLODE,
     &custom_element_properties[EP_CAN_EXPLODE],
     "can explode to:",			"element can explode to other elements"
   },
   {
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(9),
+    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(11),
     GADGET_ID_CUSTOM_SLIPPERY,
     &custom_element_properties[EP_SLIPPERY],
     "slippery",				"other elements can fall down from it"
   },
   {
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(10),
+    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(12),
     GADGET_ID_CUSTOM_WALKABLE,
     &custom_element_properties[EP_WALKABLE],
     NULL,				"player can walk on the same field"
@@ -1070,7 +1130,7 @@ static struct
     "use graphic of element:",		"use graphic for custom element"
   },
   {
-    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(11),
+    ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(13),
     GADGET_ID_CUSTOM_USE_TEMPLATE,
     &custom_element.use_template,
     "use template",			"use template for custom properties"
@@ -1083,16 +1143,10 @@ static struct
   },
   {
     ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(2),
-    GADGET_ID_CHANGE_DELAY_FIXED,
-    &custom_element_change_events[CE_DELAY_FIXED],
-    "delay of",				"element changes after fixed delay"
+    GADGET_ID_CHANGE_DELAY,
+    &custom_element_change_events[CE_DELAY],
+    NULL,				"element changes after delay"
   },
-  {
-    ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(3),
-    GADGET_ID_CHANGE_DELAY_RANDOM,
-    &custom_element_change_events[CE_DELAY_RANDOM],
-    "delay of",				"element changes after random delay"
-  }
 };
 
 
@@ -2276,6 +2330,13 @@ static void CreateCounterButtons()
     int j;
     int xpos = SX + counterbutton_info[i].x;	/* xpos of down count button */
     int ypos = SY + counterbutton_info[i].y;
+    int xoffset = 0;
+
+    /* determine horizontal offset for leading counter text */
+    if (counterbutton_info[i].text_left != NULL)
+      xoffset = (getFontWidth(FONT_TEXT_1) *
+		 strlen(counterbutton_info[i].text_left) +
+		 2 * ED_GADGET_DISTANCE);
 
     for (j=0; j<2; j++)
     {
@@ -2326,7 +2387,7 @@ static void CreateCounterButtons()
       gi = CreateGadget(GDI_CUSTOM_ID, id,
 			GDI_CUSTOM_TYPE_ID, i,
 			GDI_INFO_TEXT, infotext,
-			GDI_X, xpos,
+			GDI_X, xpos + xoffset,
 			GDI_Y, ypos,
 			GDI_WIDTH, x_size,
 			GDI_HEIGHT, y_size,
@@ -2375,7 +2436,7 @@ static void CreateCounterButtons()
 	gi = CreateGadget(GDI_CUSTOM_ID, id,
 			  GDI_CUSTOM_TYPE_ID, i,
 			  GDI_INFO_TEXT, "enter counter value",
-			  GDI_X, xpos,
+			  GDI_X, xpos + xoffset,
 			  GDI_Y, ypos,
 			  GDI_TYPE, GD_TYPE_TEXTINPUT_NUMERIC,
 			  GDI_NUMBER_VALUE, 0,
@@ -2640,8 +2701,9 @@ static void CreateSelectboxGadgets()
     gd_y = DOOR_GFX_PAGEY1 + ED_SELECTBOX_YPOS;
 
     /* determine horizontal offset for leading selectbox text */
-    if (selectbox_info[i].text != NULL)
-      xoffset = (getFontWidth(FONT_TEXT_1) * strlen(selectbox_info[i].text) +
+    if (selectbox_info[i].text_left != NULL)
+      xoffset = (getFontWidth(FONT_TEXT_1) *
+		 strlen(selectbox_info[i].text_left) +
 		 2 * ED_GADGET_DISTANCE);
 
     sprintf(infotext, "Select %s", selectbox_info[i].infotext);
@@ -2924,6 +2986,50 @@ void FreeLevelEditorGadgets()
 
 static void MapCounterButtons(int id)
 {
+  char infotext[MAX_OUTPUT_LINESIZE + 1];
+  int max_infotext_len = getMaxInfoTextLength();
+  int xoffset_above = 0;
+  int yoffset_above = -(MINI_TILEX + ED_GADGET_DISTANCE);
+  int xoffset_left = 0;
+  int yoffset_left = ED_BORDER_SIZE;
+  int xoffset_right = getCounterGadgetWidth();
+  int yoffset_right = ED_BORDER_SIZE;
+  int x, y;
+
+  if (counterbutton_info[id].text_above)
+  {
+    x = SX + counterbutton_info[id].x + xoffset_above;
+    y = SY + counterbutton_info[id].y + yoffset_above;
+
+    sprintf(infotext, "%s:", counterbutton_info[id].text_above);
+    infotext[max_infotext_len] = '\0';
+    DrawText(x, y, infotext, FONT_TEXT_1);
+  }
+
+  if (counterbutton_info[id].text_left)
+  {
+    x = SX + counterbutton_info[id].x + xoffset_left;
+    y = SY + counterbutton_info[id].y + yoffset_left;
+
+    sprintf(infotext, "%s", counterbutton_info[id].text_left);
+    infotext[max_infotext_len] = '\0';
+    DrawText(x, y, infotext, FONT_TEXT_1);
+  }
+
+  if (counterbutton_info[id].text_right)
+  {
+    int gadget_id = counterbutton_info[id].gadget_id_down;
+
+    x = level_editor_gadget[gadget_id]->x + xoffset_right;
+    y = SY + counterbutton_info[id].y + yoffset_right;
+
+    sprintf(infotext, "%s", counterbutton_info[id].text_right);
+    infotext[max_infotext_len] = '\0';
+    DrawText(x, y, infotext, FONT_TEXT_1);
+  }
+
+  ModifyEditorCounter(id, *counterbutton_info[id].value);
+
   MapGadget(level_editor_gadget[counterbutton_info[id].gadget_id_down]);
   MapGadget(level_editor_gadget[counterbutton_info[id].gadget_id_text]);
   MapGadget(level_editor_gadget[counterbutton_info[id].gadget_id_up]);
@@ -2950,7 +3056,6 @@ static void MapControlButtons()
   ModifyEditorCounterLimits(counter_id,
 			    leveldir_current->first_level,
 			    leveldir_current->last_level);
-  ModifyEditorCounter(counter_id, *counterbutton_info[counter_id].value);
   MapCounterButtons(counter_id);
 }
 
@@ -2961,11 +3066,33 @@ static void MapDrawingArea(int id)
 
 static void MapTextInputGadget(int id)
 {
+  char infotext[MAX_OUTPUT_LINESIZE + 1];
+  int max_infotext_len = getMaxInfoTextLength();
+  int xoffset_above = 0;
+  int yoffset_above = -(MINI_TILEX + ED_GADGET_DISTANCE);
+  int x = textinput_info[id].x + xoffset_above;
+  int y = textinput_info[id].y + yoffset_above;
+
+  sprintf(infotext, "%s:", textinput_info[id].infotext);
+  infotext[max_infotext_len] = '\0';
+
+  DrawTextF(x, y, FONT_TEXT_1, infotext);
+  ModifyGadget(level_editor_gadget[textinput_info[id].gadget_id],
+	       GDI_TEXT_VALUE, textinput_info[id].value, GDI_END);
+
   MapGadget(level_editor_gadget[textinput_info[id].gadget_id]);
 }
 
 static void MapSelectboxGadget(int id)
 {
+  int xoffset_left = 0;
+  int yoffset_left = ED_BORDER_SIZE;
+  int x = selectbox_info[id].x + xoffset_left;
+  int y = selectbox_info[id].y + yoffset_left;
+
+  DrawTextF(x, y, FONT_TEXT_1, selectbox_info[id].text_left);
+  ModifyEditorSelectbox(id, *selectbox_info[id].value);
+
   MapGadget(level_editor_gadget[selectbox_info[id].gadget_id]);
 }
 
@@ -2976,11 +3103,32 @@ static void MapTextbuttonGadget(int id)
 
 static void MapRadiobuttonGadget(int id)
 {
+  int xoffset_right = ED_XOFFSET_CHECKBOX;
+  int yoffset_right = ED_BORDER_SIZE;
+  int x = radiobutton_info[id].x + xoffset_right;
+  int y = radiobutton_info[id].y + yoffset_right;
+  boolean checked =
+    (*radiobutton_info[id].value == radiobutton_info[id].checked_value);
+
+  DrawTextF(x, y, FONT_TEXT_1, radiobutton_info[id].text_right);
+  ModifyGadget(level_editor_gadget[radiobutton_info[id].gadget_id],
+	       GDI_CHECKED, checked, GDI_END);
+
   MapGadget(level_editor_gadget[radiobutton_info[id].gadget_id]);
 }
 
 static void MapCheckbuttonGadget(int id)
 {
+  int xoffset_right = ED_XOFFSET_CHECKBOX;
+  int yoffset_right = ED_BORDER_SIZE;
+  int x = checkbutton_info[id].x + xoffset_right;
+  int y = checkbutton_info[id].y + yoffset_right;
+
+  DrawTextF(x, y, FONT_TEXT_1, checkbutton_info[id].text_right);
+  ModifyGadget(level_editor_gadget[checkbutton_info[id].gadget_id],
+	       GDI_CHECKED, *checkbutton_info[id].value,
+	       GDI_Y, SY + checkbutton_info[id].y, GDI_END);
+
   MapGadget(level_editor_gadget[checkbutton_info[id].gadget_id]);
 }
 
@@ -3095,8 +3243,7 @@ static void CopyCustomElementPropertiesToEditor(int element)
 {
   int i;
 
-  i = properties_element - EL_CUSTOM_START;
-  custom_element = level.custom_element[i];
+  custom_element = element_info[properties_element];
 
   for (i=0; i < NUM_ELEMENT_PROPERTIES; i++)
     custom_element_properties[i] = HAS_PROPERTY(element, i);
@@ -3123,8 +3270,7 @@ static void CopyCustomElementPropertiesToGame(int element)
 {
   int i;
 
-  i = properties_element - EL_CUSTOM_START;
-  level.custom_element[i] = custom_element;
+  element_info[properties_element] = custom_element;
 
   /* set walk-to-object property from checkbox and selectbox */
   custom_element_properties[EP_DIGGABLE] = FALSE;
@@ -3147,8 +3293,7 @@ static void CopyCustomElementPropertiesToGame(int element)
     SET_CHANGE_EVENT(element, i, custom_element_change_events[i]);
 
   /* copy change events also to special level editor variable */
-  i = properties_element - EL_CUSTOM_START;
-  custom_element = level.custom_element[i];
+  custom_element = element_info[properties_element];
 }
 
 void DrawLevelEd()
@@ -3316,14 +3461,6 @@ static void AdjustEditorScrollbar(int id)
 	       GDI_SCROLLBAR_ITEM_POSITION, item_position, GDI_END);
 }
 
-static void ModifyEditorTextInput(int textinput_id, char *new_text)
-{
-  int gadget_id = textinput_info[textinput_id].gadget_id;
-  struct GadgetInfo *gi = level_editor_gadget[gadget_id];
-
-  ModifyGadget(gi, GDI_TEXT_VALUE, new_text, GDI_END);
-}
-
 static void ModifyEditorCounter(int counter_id, int new_value)
 {
   int *counter_value = counterbutton_info[counter_id].value;
@@ -3470,15 +3607,7 @@ static void DrawRandomPlacementBackgroundArea()
 
 static void DrawLevelInfoWindow()
 {
-  char infotext[MAX_OUTPUT_LINESIZE + 1];
-  int max_infotext_len = getMaxInfoTextLength();
-  int xoffset_above = 0;
-  int yoffset_above = -(MINI_TILEX + ED_GADGET_DISTANCE);
-  int xoffset_right = getCounterGadgetWidth();
-  int yoffset_right = ED_BORDER_SIZE;
-  int xoffset_right2 = ED_SETTINGS_XOFFSET;
-  int yoffset_right2 = ED_BORDER_SIZE;
-  int i, x, y;
+  int i;
 
   stick_element_properties_window = FALSE;
 
@@ -3493,71 +3622,19 @@ static void DrawLevelInfoWindow()
 
   /* draw counter gadgets */
   for (i=ED_COUNTER_ID_LEVEL_FIRST; i<=ED_COUNTER_ID_LEVEL_LAST; i++)
-  {
-    if (counterbutton_info[i].infotext_above)
-    {
-      x = counterbutton_info[i].x + xoffset_above;
-      y = counterbutton_info[i].y + yoffset_above;
-
-      sprintf(infotext, "%s:", counterbutton_info[i].infotext_above);
-      infotext[max_infotext_len] = '\0';
-      DrawTextF(x, y, FONT_TEXT_1, infotext);
-    }
-
-    if (counterbutton_info[i].infotext_right)
-    {
-      x = counterbutton_info[i].x + xoffset_right;
-      y = counterbutton_info[i].y + yoffset_right;
-
-      sprintf(infotext, "%s", counterbutton_info[i].infotext_right);
-      infotext[max_infotext_len] = '\0';
-      DrawTextF(x, y, FONT_TEXT_1, infotext);
-    }
-
-    ModifyEditorCounter(i, *counterbutton_info[i].value);
     MapCounterButtons(i);
-  }
-
-  /* draw text input gadgets */
-  for (i=ED_TEXTINPUT_ID_LEVEL_FIRST; i<=ED_TEXTINPUT_ID_LEVEL_LAST; i++)
-  {
-    x = textinput_info[i].x + xoffset_above;
-    y = textinput_info[i].y + yoffset_above;
-
-    sprintf(infotext, "%s:", textinput_info[i].infotext);
-    infotext[max_infotext_len] = '\0';
-
-    DrawTextF(x, y, FONT_TEXT_1, infotext);
-    ModifyEditorTextInput(i, textinput_info[i].value);
-    MapTextInputGadget(i);
-  }
-
-  /* draw radiobutton gadgets */
-  for (i=ED_RADIOBUTTON_ID_LEVEL_FIRST; i<=ED_RADIOBUTTON_ID_LEVEL_LAST; i++)
-  {
-    boolean checked =
-      (*radiobutton_info[i].value == radiobutton_info[i].checked_value);
-
-    x = radiobutton_info[i].x + xoffset_right2;
-    y = radiobutton_info[i].y + yoffset_right2;
-
-    DrawTextF(x, y, FONT_TEXT_1, radiobutton_info[i].text);
-    ModifyGadget(level_editor_gadget[radiobutton_info[i].gadget_id],
-		 GDI_CHECKED, checked, GDI_END);
-    MapRadiobuttonGadget(i);
-  }
 
   /* draw checkbutton gadgets */
   for (i=ED_CHECKBUTTON_ID_LEVEL_FIRST; i<=ED_CHECKBUTTON_ID_LEVEL_LAST; i++)
-  {
-    x = checkbutton_info[i].x + xoffset_right2;
-    y = checkbutton_info[i].y + yoffset_right2;
-
-    DrawTextF(x, y, FONT_TEXT_1, checkbutton_info[i].text);
-    ModifyGadget(level_editor_gadget[checkbutton_info[i].gadget_id],
-		 GDI_CHECKED, *checkbutton_info[i].value, GDI_END);
     MapCheckbuttonGadget(i);
-  }
+
+  /* draw radiobutton gadgets */
+  for (i=ED_RADIOBUTTON_ID_LEVEL_FIRST; i<=ED_RADIOBUTTON_ID_LEVEL_LAST; i++)
+    MapRadiobuttonGadget(i);
+
+  /* draw text input gadgets */
+  for (i=ED_TEXTINPUT_ID_LEVEL_FIRST; i<=ED_TEXTINPUT_ID_LEVEL_LAST; i++)
+    MapTextInputGadget(i);
 
   /* draw drawing area */
   DrawRandomPlacementBackgroundArea();
@@ -3581,18 +3658,8 @@ static void DrawAmoebaContentArea()
 static void DrawCustomGraphicElementArea()
 {
   struct GadgetInfo *gi = level_editor_gadget[GADGET_ID_CUSTOM_GRAPHIC];
-#if 0
-  int xoffset_right2 = ED_SETTINGS_XOFFSET;
-  int yoffset_right2 = ED_BORDER_SIZE;
-  int i = ED_CHECKBUTTON_ID_CUSTOM_GRAPHIC;
-  int text_len = strlen(checkbutton_info[i].text);
-  int text_width = text_len * getFontWidth(FONT_TEXT_1);
-  int xpos = checkbutton_info[i].x + 2 * xoffset_right2 + text_width;
-  int ypos = checkbutton_info[i].y + yoffset_right2;
-#else
   int xpos = ED_AREA_ELEM_CONTENT3_XPOS;
   int ypos = ED_AREA_ELEM_CONTENT3_YPOS;
-#endif
   int area_sx = SX + xpos;
   int area_sy = SY + ypos;
 
@@ -3639,18 +3706,8 @@ static void DrawCustomContentArea()
 static void DrawCustomChangedArea()
 {
   struct GadgetInfo *gi = level_editor_gadget[GADGET_ID_CUSTOM_CHANGED];
-#if 0
-  int xoffset_right2 = ED_SETTINGS_XOFFSET;
-  int yoffset_right2 = ED_BORDER_SIZE;
-  int i = ED_CHECKBUTTON_ID_CUSTOM_CHANGEABLE;
-  int text_len = strlen(checkbutton_info[i].text);
-  int text_width = text_len * getFontWidth(FONT_TEXT_1);
-  int xpos = checkbutton_info[i].x + 2 * xoffset_right2 + text_width;
-  int ypos = checkbutton_info[i].y + yoffset_right2;
-#else
   int xpos = ED_AREA_ELEM_CONTENT2_XPOS;
   int ypos = ED_AREA_ELEM_CONTENT2_YPOS;
-#endif
   int area_sx = SX + xpos;
   int area_sy = SY + ypos;
 
@@ -3671,25 +3728,17 @@ static void DrawCustomChangedArea()
 
 static void DrawElementContentAreas()
 {
-  int counter_id = ED_COUNTER_ID_ELEMENT_CONTENT;
   int area_x = ED_AREA_ELEM_CONTENT_XPOS / MINI_TILEX;
   int area_y = ED_AREA_ELEM_CONTENT_YPOS / MINI_TILEY;
   int area_sx = SX + ED_AREA_ELEM_CONTENT_XPOS;
   int area_sy = SY + ED_AREA_ELEM_CONTENT_YPOS;
-  int xoffset_right = getCounterGadgetWidth();
-  int yoffset_right = ED_BORDER_SIZE;
   int i, x, y;
 
   for (i=0; i<MAX_ELEMENT_CONTENTS; i++)
     UnmapDrawingArea(GADGET_ID_ELEMENT_CONTENT_0 + i);
 
   /* display counter to choose number of element content areas */
-  x = counterbutton_info[counter_id].x + xoffset_right;
-  y = counterbutton_info[counter_id].y + yoffset_right;
-  DrawTextF(x, y, FONT_TEXT_1, "number of content areas");
-
-  ModifyEditorCounter(counter_id, *counterbutton_info[counter_id].value);
-  MapCounterButtons(counter_id);
+  MapCounterButtons(ED_COUNTER_ID_ELEMENT_CONTENT);
 
   /* delete content areas in case of reducing number of them */
   DrawBackground(SX, area_sy - MINI_TILEX, SXSIZE, 12 * MINI_TILEY);
@@ -4128,197 +4177,91 @@ static boolean checkPropertiesConfig()
 
 static void DrawPropertiesConfig()
 {
-  boolean element_has_score = FALSE;
-  char *element_score_text = NULL;
-  static int temporary_dummy_score = 0;
-  int counter_id = ED_COUNTER_ID_ELEMENT_SCORE;
-  int xoffset_right = getCounterGadgetWidth();
-  int yoffset_right = ED_BORDER_SIZE;
-  int xoffset_right2 = ED_SETTINGS_XOFFSET;
-  int yoffset_right2 = ED_BORDER_SIZE;
-  int i, x, y;
+  int i;
 
   /* check if there are elements where a score can be chosen for */
   for (i=0; elements_with_counter[i].element != -1; i++)
   {
     if (elements_with_counter[i].element == properties_element)
     {
-#if 1
-      counterbutton_info[counter_id].value = elements_with_counter[i].value;
-      element_score_text = elements_with_counter[i].text;
-      element_has_score = TRUE;
-#else
-      int x = counterbutton_info[counter_id].x + xoffset_right;
-      int y = counterbutton_info[counter_id].y + yoffset_right;
+      int counter_id = ED_COUNTER_ID_ELEMENT_SCORE;
 
       counterbutton_info[counter_id].value = elements_with_counter[i].value;
-      DrawTextF(x, y, FONT_TEXT_1, elements_with_counter[i].text);
-
-      ModifyEditorCounter(counter_id,  *counterbutton_info[counter_id].value);
+      counterbutton_info[counter_id].text_right= elements_with_counter[i].text;
       MapCounterButtons(counter_id);
-#endif
+
       break;
     }
   }
 
-  if (IS_CUSTOM_ELEMENT(properties_element))
-  {
-    counterbutton_info[counter_id].value = &temporary_dummy_score;
-    element_score_text = "Score for certain actions";
-    element_has_score = TRUE;
-  }
-
-  if (element_has_score)
-  {
-    int x = counterbutton_info[counter_id].x + xoffset_right;
-    int y = counterbutton_info[counter_id].y + yoffset_right;
-
-    DrawTextF(x, y, FONT_TEXT_1, element_score_text);
-
-    ModifyEditorCounter(counter_id,  *counterbutton_info[counter_id].value);
-    MapCounterButtons(counter_id);
-  }
-
-  if (HAS_CONTENT(properties_element) ||
-      IS_CUSTOM_ELEMENT(properties_element))
+  if (HAS_CONTENT(properties_element))
   {
     /* draw stickybutton gadget */
     i = ED_CHECKBUTTON_ID_STICK_ELEMENT;
-    if (HAS_CONTENT(properties_element))
-      checkbutton_info[i].y = ED_COUNTER_YPOS(4);
-    else
-      checkbutton_info[i].y = ED_SETTINGS_YPOS(1);
-    x = checkbutton_info[i].x + xoffset_right2;
-    y = checkbutton_info[i].y + yoffset_right2;
-
-    DrawTextF(x, y, FONT_TEXT_1, checkbutton_info[i].text);
-    ModifyGadget(level_editor_gadget[checkbutton_info[i].gadget_id],
-		 GDI_CHECKED, *checkbutton_info[i].value,
-		 GDI_Y, SY + checkbutton_info[i].y, GDI_END);
+    checkbutton_info[i].y = ED_COUNTER_YPOS(4);
     MapCheckbuttonGadget(i);
 
-    if (IS_CUSTOM_ELEMENT(properties_element))
-    {
-      DrawCustomGraphicElementArea();
-      DrawCustomContentArea();
-    }
-    else if (IS_AMOEBOID(properties_element))
+    if (IS_AMOEBOID(properties_element))
       DrawAmoebaContentArea();
     else
       DrawElementContentAreas();
   }
 
   if (IS_GEM(properties_element))
-  {
-    /* draw checkbutton gadget */
-    i = ED_CHECKBUTTON_ID_EM_SLIPPERY_GEMS;
-    x = checkbutton_info[i].x + xoffset_right2;
-    y = checkbutton_info[i].y + yoffset_right2;
-
-    DrawTextF(x, y, FONT_TEXT_1, checkbutton_info[i].text);
-    ModifyGadget(level_editor_gadget[checkbutton_info[i].gadget_id],
-		 GDI_CHECKED, *checkbutton_info[i].value, GDI_END);
-    MapCheckbuttonGadget(i);
-  }
+    MapCheckbuttonGadget(ED_CHECKBUTTON_ID_EM_SLIPPERY_GEMS);
 
   if (IS_CUSTOM_ELEMENT(properties_element))
   {
+    /* draw stickybutton gadget */
+    i = ED_CHECKBUTTON_ID_STICK_ELEMENT;
+    checkbutton_info[i].y = ED_SETTINGS_YPOS(0);
+    MapCheckbuttonGadget(i);
+
     /* draw checkbutton gadgets */
     for (i =  ED_CHECKBUTTON_ID_CUSTOM_FIRST;
 	 i <= ED_CHECKBUTTON_ID_CUSTOM_LAST; i++)
-    {
-      x = checkbutton_info[i].x + xoffset_right2;
-      y = checkbutton_info[i].y + yoffset_right2;
-
-      DrawTextF(x, y, FONT_TEXT_1, checkbutton_info[i].text);
-      ModifyGadget(level_editor_gadget[checkbutton_info[i].gadget_id],
-		   GDI_CHECKED, *checkbutton_info[i].value, GDI_END);
       MapCheckbuttonGadget(i);
-    }
+
+    /* draw counter gadgets */
+    for (i=ED_COUNTER_ID_CUSTOM_FIRST; i<=ED_COUNTER_ID_CUSTOM_LAST; i++)
+      MapCounterButtons(i);
 
     /* draw selectbox gadgets */
     for (i=ED_SELECTBOX_ID_CUSTOM_FIRST; i <= ED_SELECTBOX_ID_CUSTOM_LAST; i++)
-    {
-      int yoffset = ED_BORDER_SIZE;
-
-      x = selectbox_info[i].x;
-      y = selectbox_info[i].y + yoffset;
-
-      DrawTextF(x, y, FONT_TEXT_1, selectbox_info[i].text);
-      ModifyEditorSelectbox(i, *selectbox_info[i].value);
       MapSelectboxGadget(i);
-    }
 
     /* draw textbutton gadgets */
     MapTextbuttonGadget(ED_TEXTBUTTON_ID_SAVE_AS_TEMPLATE);
+
+    /* draw drawing area gadgets */
+    DrawCustomGraphicElementArea();
+    DrawCustomContentArea();
   }
 }
 
 static void DrawPropertiesAdvanced()
 {
-  char infotext[MAX_OUTPUT_LINESIZE + 1];
-  int max_infotext_len = getMaxInfoTextLength();
-  int xoffset_right = getCounterGadgetWidth();
-  int yoffset_right = ED_BORDER_SIZE;
-  int xoffset_right2 = ED_SETTINGS_XOFFSET;
-  int yoffset_right2 = ED_BORDER_SIZE;
-  int i, x, y;
+  int i;
 
   /* draw stickybutton gadget */
   i = ED_CHECKBUTTON_ID_STICK_ELEMENT;
   checkbutton_info[i].y = ED_SETTINGS_YPOS(0);
-  x = checkbutton_info[i].x + xoffset_right2;
-  y = checkbutton_info[i].y + yoffset_right2;
-
-  DrawTextF(x, y, FONT_TEXT_1, checkbutton_info[i].text);
-  ModifyGadget(level_editor_gadget[checkbutton_info[i].gadget_id],
-	       GDI_CHECKED, *checkbutton_info[i].value,
-	       GDI_Y, SY + checkbutton_info[i].y, GDI_END);
   MapCheckbuttonGadget(i);
-
-  /* draw counter gadgets */
-  for (i=ED_COUNTER_ID_CHANGE_FIRST; i<=ED_COUNTER_ID_CHANGE_LAST; i++)
-  {
-    if (counterbutton_info[i].infotext_right)
-    {
-      x = counterbutton_info[i].x + xoffset_right;
-      y = counterbutton_info[i].y + yoffset_right;
-
-      sprintf(infotext, "%s", counterbutton_info[i].infotext_right);
-      infotext[max_infotext_len] = '\0';
-      DrawTextF(x, y, FONT_TEXT_1, infotext);
-    }
-
-    ModifyEditorCounter(i, *counterbutton_info[i].value);
-    MapCounterButtons(i);
-  }
 
   /* draw checkbutton gadgets */
   for (i =  ED_CHECKBUTTON_ID_CHANGE_FIRST;
        i <= ED_CHECKBUTTON_ID_CHANGE_LAST; i++)
-  {
-    x = checkbutton_info[i].x + xoffset_right2;
-    y = checkbutton_info[i].y + yoffset_right2;
-
-    DrawTextF(x, y, FONT_TEXT_1, checkbutton_info[i].text);
-    ModifyGadget(level_editor_gadget[checkbutton_info[i].gadget_id],
-		 GDI_CHECKED, *checkbutton_info[i].value, GDI_END);
     MapCheckbuttonGadget(i);
-  }
+
+  /* draw counter gadgets */
+  for (i=ED_COUNTER_ID_CHANGE_FIRST; i<=ED_COUNTER_ID_CHANGE_LAST; i++)
+    MapCounterButtons(i);
 
   /* draw selectbox gadgets */
   for (i=ED_SELECTBOX_ID_CHANGE_FIRST; i<=ED_SELECTBOX_ID_CHANGE_LAST; i++)
-  {
-    int yoffset = ED_BORDER_SIZE;
-
-    x = selectbox_info[i].x;
-    y = selectbox_info[i].y + yoffset;
-
-    DrawTextF(x, y, FONT_TEXT_1, selectbox_info[i].text);
-    ModifyEditorSelectbox(i, *selectbox_info[i].value);
     MapSelectboxGadget(i);
-  }
 
+  /* draw drawing area gadgets */
   DrawCustomChangedArea();
 }
 
@@ -4898,12 +4841,6 @@ static void CopyLevelToUndoBuffer(int mode)
   SetBorderElement();
   if (BorderElement != last_border_element)
     DrawMiniLevel(ed_fieldx, ed_fieldy, level_xpos, level_ypos);
-
-#if 0
-#ifdef DEBUG
-  printf("level saved to undo buffer\n");
-#endif
-#endif
 }
 
 static void RandomPlacement(int new_element)
@@ -5106,11 +5043,9 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 	  level.amoeba_content = new_element;
 	else if (id == GADGET_ID_CUSTOM_GRAPHIC)
 	{
-	  int i = properties_element - EL_CUSTOM_START;
-
 	  new_element = GFX_ELEMENT(new_element);
 	  custom_element.gfx_element = new_element;
-	  level.custom_element[i] = custom_element;
+	  element_info[properties_element] = custom_element;
 
 	  ModifyEditorElementList();
 	  RedrawDrawingElements();
@@ -5119,17 +5054,13 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 	}
 	else if (id == GADGET_ID_CUSTOM_CONTENT)
 	{
-	  int i = properties_element - EL_CUSTOM_START;
-
 	  custom_element.content[sx][sy] = new_element;
-	  level.custom_element[i] = custom_element;
+	  element_info[properties_element] = custom_element;
 	}
 	else if (id == GADGET_ID_CUSTOM_CHANGED)
 	{
-	  int i = properties_element - EL_CUSTOM_START;
-
 	  custom_element.change.successor = new_element;
-	  level.custom_element[i] = custom_element;
+	  element_info[properties_element] = custom_element;
 	}
 	else if (id == GADGET_ID_RANDOM_BACKGROUND)
 	  random_placement_background_element = new_element;
@@ -5315,8 +5246,10 @@ static void HandleCounterButtons(struct GadgetInfo *gi)
       break;
   }
 
-  if (counter_id >= ED_COUNTER_ID_CHANGE_FIRST &&
-      counter_id <= ED_COUNTER_ID_CHANGE_LAST)
+  if ((counter_id >= ED_COUNTER_ID_CUSTOM_FIRST &&
+       counter_id <= ED_COUNTER_ID_CUSTOM_LAST) ||
+      (counter_id >= ED_COUNTER_ID_CHANGE_FIRST &&
+       counter_id <= ED_COUNTER_ID_CHANGE_LAST))
     CopyCustomElementPropertiesToGame(properties_element);
 }
 
@@ -5338,12 +5271,6 @@ static void HandleSelectboxGadgets(struct GadgetInfo *gi)
       (type_id >= ED_SELECTBOX_ID_CHANGE_FIRST &&
        type_id <= ED_SELECTBOX_ID_CHANGE_LAST))
     CopyCustomElementPropertiesToGame(properties_element);
-
-#if 0
-  printf("Selected text value: '%s' [%d]\n",
-	 selectbox_info[type_id].options[gi->selectbox.index].text,
-	 selectbox_info[type_id].options[gi->selectbox.index].value);
-#endif
 }
 
 static void HandleTextbuttonGadgets(struct GadgetInfo *gi)

@@ -99,18 +99,18 @@ static void setLevelInfoToDefaults()
   {
     int element = EL_CUSTOM_START + i;
 
-    level.custom_element[i].use_gfx_element = FALSE;
-    level.custom_element[i].gfx_element = EL_EMPTY_SPACE;
-    level.custom_element[i].move_direction = 0;
+    element_info[element].use_gfx_element = FALSE;
+    element_info[element].gfx_element = EL_EMPTY_SPACE;
+    element_info[element].move_direction = 0;
 
     for(x=0; x<3; x++)
       for(y=0; y<3; y++)
-	level.custom_element[i].content[x][y] = EL_EMPTY_SPACE;
+	element_info[element].content[x][y] = EL_EMPTY_SPACE;
 
-    level.custom_element[i].change.events = CE_BITMASK_DEFAULT;
-    level.custom_element[i].change.delay_fixed = 0;
-    level.custom_element[i].change.delay_random = 0;
-    level.custom_element[i].change.successor = EL_EMPTY_SPACE;
+    element_info[element].change.events = CE_BITMASK_DEFAULT;
+    element_info[element].change.delay_fixed = 0;
+    element_info[element].change.delay_random = 0;
+    element_info[element].change.successor = EL_EMPTY_SPACE;
 
     /* start with no properties at all */
     for (j=0; j < NUM_EP_BITFIELDS; j++)
@@ -378,10 +378,9 @@ static int LoadLevel_CUS2(FILE *file, int chunk_size, struct LevelInfo *level)
   {
     int element = getFile16BitBE(file);
     int custom_element_successor = getFile16BitBE(file);
-    int i = element - EL_CUSTOM_START;
 
     if (IS_CUSTOM_ELEMENT(element))
-      level->custom_element[i].change.successor = custom_element_successor;
+      element_info[element].change.successor = custom_element_successor;
     else
       Error(ERR_WARN, "invalid custom element number %d", element);
   }
@@ -771,12 +770,12 @@ static void SaveLevel_CUS2(FILE *file, struct LevelInfo *level,
   {
     int element = EL_CUSTOM_START + i;
 
-    if (level->custom_element[i].change.successor != EL_EMPTY_SPACE)
+    if (element_info[element].change.successor != EL_EMPTY_SPACE)
     {
       if (check < num_changed_custom_elements)
       {
 	putFile16BitBE(file, element);
-	putFile16BitBE(file, level->custom_element[i].change.successor);
+	putFile16BitBE(file, element_info[element].change.successor);
       }
 
       check++;
@@ -836,7 +835,7 @@ void SaveLevel(int level_nr)
 
   /* check for non-standard custom elements and calculate "CUS2" chunk size */
   for (i=0; i < NUM_CUSTOM_ELEMENTS; i++)
-    if (level.custom_element[i].change.successor != EL_EMPTY_SPACE)
+    if (element_info[EL_CUSTOM_START + i].change.successor != EL_EMPTY_SPACE)
       num_changed_custom_elements2++;
 
   putFileChunkBE(file, "RND1", CHUNK_SIZE_UNDEFINED);
@@ -887,7 +886,7 @@ void SaveLevel(int level_nr)
 void DumpLevel(struct LevelInfo *level)
 {
   printf_line("-", 79);
-  printf("Level xxx (file version %06d, game version %06d)\n",
+  printf("Level xxx (file version %08d, game version %08d)\n",
 	 level->file_version, level->game_version);
   printf_line("-", 79);
 
@@ -1344,7 +1343,7 @@ void DumpTape(struct TapeInfo *tape)
   }
 
   printf_line("-", 79);
-  printf("Tape of Level %03d (file version %06d, game version %06d)\n",
+  printf("Tape of Level %03d (file version %08d, game version %08d)\n",
 	 tape->level_nr, tape->file_version, tape->game_version);
   printf("Level series identifier: '%s'\n", tape->level_identifier);
   printf_line("-", 79);
