@@ -72,9 +72,6 @@
 #define ED_COUNT_VALUE_XOFFSET	5
 #define ED_COUNT_VALUE_YOFFSET	3
 
-/* identifiers for DrawValueField() */
-#define ED_SCORE_FIELD			0
-
 /* control button identifiers */
 #define ED_CTRL_ID_SINGLE_ITEMS		0
 #define ED_CTRL_ID_CONNECTED_ITEMS	1
@@ -103,7 +100,22 @@
 
 #define ED_NUM_GADGETS			24
 
+/* values for counter gadgets */
+#define ED_COUNTER_SCORE		0
+
+#define ED_NUM_COUNTERS			1
+
+static struct
+{
+  int x, y;
+  int gadget_id;
+} counter_info[ED_NUM_COUNTERS] =
+{
+  { ED_SCORE_XPOS,	ED_SCORE_YPOS,		ED_CTRL_ID_SCORE_DOWN }
+};
+
 /* forward declaration for internal use */
+static void DrawPropertiesWindow(int);
 static void CopyLevelToUndoBuffer();
 static void HandleDrawingFunctions(int, int, int);
 static void HandlePressedControlButtons();
@@ -533,7 +545,7 @@ static void CreateControlButtons()
   }
 }
 
-static void CreateCounterButtons(int id)
+static void CreateCounterButtons(int counter_id)
 {
   int i;
 
@@ -549,8 +561,8 @@ static void CreateCounterButtons(int id)
     gd_x2 = DOOR_GFX_PAGEX3 + gd_xoffset;
     gd_y  = DOOR_GFX_PAGEY1 + ED_BUTTON_COUNT_YPOS;
 
-    gi = CreateGadget(GDI_X, SX + ED_SCORE_XPOS + gd_xoffset,
-		      GDI_Y, SY + ED_SCORE_YPOS,
+    gi = CreateGadget(GDI_X, SX + counter_info[counter_id].x + gd_xoffset,
+		      GDI_Y, SY + counter_info[counter_id].y,
 		      GDI_WIDTH, ED_BUTTON_COUNT_XSIZE,
 		      GDI_HEIGHT, ED_BUTTON_COUNT_YSIZE,
 		      GDI_TYPE, GD_TYPE_NORMAL_BUTTON,
@@ -564,7 +576,7 @@ static void CreateCounterButtons(int id)
     if (gi == NULL)
       Error(ERR_EXIT, "cannot create gadget");
 
-    level_editor_gadget[id + i] = gi;
+    level_editor_gadget[counter_info[counter_id].gadget_id + i] = gi;
   }
 }
 
@@ -577,7 +589,7 @@ static void CreateLevelEditorGadgets()
   CreateControlButtons();
 
   /* create element score buttons */
-  CreateCounterButtons(ED_CTRL_ID_SCORE_DOWN);
+  CreateCounterButtons(ED_COUNTER_SCORE);
 
   level_editor_gadgets_created = TRUE;
 }
@@ -590,12 +602,12 @@ static void MapControlButtons()
     MapGadget(level_editor_gadget[i]);
 }
 
-static void MapCounterButtons(int id)
+static void MapCounterButtons(int counter_id)
 {
   int i;
 
   for (i=0; i<2; i++)
-    MapGadget(level_editor_gadget[id + i]);
+    MapGadget(level_editor_gadget[counter_info[counter_id].gadget_id + i]);
 }
 
 void UnmapLevelEditorWindowGadgets()
@@ -1022,6 +1034,9 @@ void LevelEd(int mx, int my, int button)
 			 DY+ED_WIN_MB_RIGHT_YPOS,
 			 el2gfx(new_element3));
       redraw_mask |= REDRAW_DOOR_1;
+
+      if (edit_mode == ED_MODE_PROPERTIES)
+	DrawPropertiesWindow(new_element);
     }
   
     if (edit_mode == ED_MODE_EDIT)	/********** EDIT-FENSTER **********/
@@ -1570,63 +1585,112 @@ void LevelNameTyping(KeySym key)
   }
 }
 
-static void DrawValueField(int field, int value)
+static void DrawCounterValueField(int counter_id, int value)
 {
-  int i = 0;
-  int screen_pos[][3] =
-  {
-    { ED_SCORE_FIELD,
-      ED_SCORE_XPOS + ED_WIN_COUNT_XPOS,	ED_SCORE_YPOS },
-    { -1, 0, 0 }
-  };
+  int x = SX + counter_info[counter_id].x + ED_WIN_COUNT_XPOS;
+  int y = SY + counter_info[counter_id].y;
 
-  while (screen_pos[i][0] != -1)
-  {
-    int x = SX + screen_pos[i][1];
-    int y = SY + screen_pos[i][2];
+  XCopyArea(display, pix[PIX_DOOR], drawto, gc,
+	    DOOR_GFX_PAGEX4 + ED_WIN_COUNT_XPOS,
+	    DOOR_GFX_PAGEY1 + ED_WIN_COUNT_YPOS,
+	    ED_WIN_COUNT_XSIZE, ED_WIN_COUNT_YSIZE,
+	    x, y);
 
-    if (screen_pos[i++][0] != field)
-      continue;
-
-    XCopyArea(display, pix[PIX_DOOR], drawto, gc,
-	      DOOR_GFX_PAGEX4 + ED_WIN_COUNT_XPOS,
-	      DOOR_GFX_PAGEY1 + ED_WIN_COUNT_YPOS,
-	      ED_WIN_COUNT_XSIZE, ED_WIN_COUNT_YSIZE,
-	      x, y);
-
-    DrawText(x + ED_COUNT_VALUE_XOFFSET, y + ED_COUNT_VALUE_YOFFSET,
-	     int2str(value, 3), FS_SMALL, FC_YELLOW);
-  }
+  DrawText(x + ED_COUNT_VALUE_XOFFSET, y + ED_COUNT_VALUE_YOFFSET,
+	   int2str(value, 3), FS_SMALL, FC_YELLOW);
 }
 
-static void DrawPropertiesWindow(int button)
+#define TEXT_COLLECTING		"Score for collecting"
+#define TEXT_SMASHING		"Score for smashing"
+#define TEXT_CRACKING		"Score for cracking"
+#define TEXT_SPEED		"Speed of growth"
+#define TEXT_DURATION		"Duration when activated"
+
+static void DrawPropertiesWindow(int element)
 {
-  int x, y;
-  int new_element;
+  int i, x, y;
   int num_elements_in_level;
+  static struct
+  {
+    int element;
+    int *counter_value;
+    char *text;
+  } elements_with_counter[] =
+  {
+    { EL_EDELSTEIN,	&level.score[0],	TEXT_COLLECTING },
+    { EL_EDELSTEIN_BD,	&level.score[0],	TEXT_COLLECTING },
+    { EL_EDELSTEIN_GELB,&level.score[0],	TEXT_COLLECTING },
+    { EL_EDELSTEIN_ROT,	&level.score[0],	TEXT_COLLECTING },
+    { EL_EDELSTEIN_LILA,&level.score[0],	TEXT_COLLECTING },
+    { EL_DIAMANT,	&level.score[1],	TEXT_COLLECTING },
+    { EL_KAEFER_R,	&level.score[2],	TEXT_SMASHING },
+    { EL_KAEFER_O,	&level.score[2],	TEXT_SMASHING },
+    { EL_KAEFER_L,	&level.score[2],	TEXT_SMASHING },
+    { EL_KAEFER_U,	&level.score[2],	TEXT_SMASHING },
+    { EL_BUTTERFLY_R,	&level.score[2],	TEXT_SMASHING },
+    { EL_BUTTERFLY_O,	&level.score[2],	TEXT_SMASHING },
+    { EL_BUTTERFLY_L,	&level.score[2],	TEXT_SMASHING },
+    { EL_BUTTERFLY_U,	&level.score[2],	TEXT_SMASHING },
+    { EL_FLIEGER_R,	&level.score[3],	TEXT_SMASHING },
+    { EL_FLIEGER_O,	&level.score[3],	TEXT_SMASHING },
+    { EL_FLIEGER_L,	&level.score[3],	TEXT_SMASHING },
+    { EL_FLIEGER_U,	&level.score[3],	TEXT_SMASHING },
+    { EL_FIREFLY_R,	&level.score[3],	TEXT_SMASHING },
+    { EL_FIREFLY_O,	&level.score[3],	TEXT_SMASHING },
+    { EL_FIREFLY_L,	&level.score[3],	TEXT_SMASHING },
+    { EL_FIREFLY_U,	&level.score[3],	TEXT_SMASHING },
+    { EL_MAMPFER,	&level.score[4],	TEXT_SMASHING },
+    { EL_MAMPFER2,	&level.score[4],	TEXT_SMASHING },
+    { EL_ROBOT,		&level.score[5],	TEXT_SMASHING },
+    { EL_PACMAN_R,	&level.score[6],	TEXT_SMASHING },
+    { EL_PACMAN_O,	&level.score[6],	TEXT_SMASHING },
+    { EL_PACMAN_L,	&level.score[6],	TEXT_SMASHING },
+    { EL_PACMAN_U,	&level.score[6],	TEXT_SMASHING },
+    { EL_KOKOSNUSS,	&level.score[7],	TEXT_CRACKING },
+    { EL_DYNAMIT_AUS,	&level.score[8],	TEXT_COLLECTING },
+    { EL_SCHLUESSEL1,	&level.score[9],	TEXT_COLLECTING },
+    { EL_SCHLUESSEL2,	&level.score[9],	TEXT_COLLECTING },
+    { EL_SCHLUESSEL3,	&level.score[9],	TEXT_COLLECTING },
+    { EL_SCHLUESSEL4,	&level.score[9],	TEXT_COLLECTING },
+    { EL_AMOEBE_NASS,	&level.tempo_amoebe,	TEXT_SPEED },
+    { EL_AMOEBE_NORM,	&level.tempo_amoebe,	TEXT_SPEED },
+    { EL_AMOEBE_VOLL,	&level.tempo_amoebe,	TEXT_SPEED },
+    { EL_AMOEBE_BD,	&level.tempo_amoebe,	TEXT_SPEED },
+    { EL_SIEB_LEER,	&level.dauer_sieb,	TEXT_DURATION },
+    { EL_ABLENK_AUS,	&level.dauer_ablenk,	TEXT_DURATION },
+    { -1, NULL, NULL }
+  };
 
   ClearWindow();
 
-  new_element = (button == 1 ? new_element1 :
-		 button == 2 ? new_element2 :
-		 button == 3 ? new_element3 : 0);
-
-  DrawGraphic(1, 1, el2gfx(new_element));
+  DrawGraphic(1, 1, el2gfx(element));
   DrawText(SX + 3*TILEX, SY + 5*TILEY/4, "Element Properties",
 	   FS_SMALL, FC_YELLOW);
 
   num_elements_in_level = 0;
   for(y=0; y<lev_fieldy; y++) 
     for(x=0; x<lev_fieldx; x++)
-      if (Feld[x][y] == new_element)
+      if (Feld[x][y] == element)
 	num_elements_in_level++;
 
   DrawTextF(TILEX, 5*TILEY, FC_YELLOW, "%d x contained in level",
 	    num_elements_in_level);
-	
-  gadget_score_value = &level.score[0];
-  DrawValueField(ED_SCORE_FIELD, *gadget_score_value);
-  MapCounterButtons(ED_CTRL_ID_SCORE_DOWN);
+
+  for (i=0; elements_with_counter[i].element != -1; i++)
+  {
+    if (elements_with_counter[i].element == element)
+    {
+      int x = SX + counter_info[ED_COUNTER_SCORE].x + DXSIZE;
+      int y = SY + counter_info[ED_COUNTER_SCORE].y;
+
+      gadget_score_value = elements_with_counter[i].counter_value;
+      DrawCounterValueField(ED_COUNTER_SCORE, *gadget_score_value);
+      DrawText(x + ED_COUNT_VALUE_XOFFSET, y + ED_COUNT_VALUE_YOFFSET,
+	       elements_with_counter[i].text, FS_SMALL, FC_YELLOW);
+      MapCounterButtons(ED_COUNTER_SCORE);
+      break;
+    }
+  }
 }
 
 static void swap_numbers(int *i1, int *i2)
@@ -1974,7 +2038,7 @@ static void HandleDrawingFunctions(int mx, int my, int button)
 static void HandlePressedControlButtons()
 {
   static unsigned long button_delay = 0;
-  int i = 0;
+  int i;
 
   /* buttons with action when held pressed */
   int gadget_id[] =
@@ -1991,9 +2055,9 @@ static void HandlePressedControlButtons()
   if (!DelayReached(&button_delay, GADGET_FRAME_DELAY))
     return;
 
-  while (gadget_id[i] != -1)
+  for (i=0; gadget_id[i] != -1; i++)
   {
-    int id = gadget_id[i++];
+    int id = gadget_id[i];
     int state = level_editor_gadget[id]->state;
     int button = level_editor_gadget[id]->event.button;
     int step = (button == 1 ? 1 : button == 2 ? 5 : 10);
@@ -2075,7 +2139,7 @@ static void HandlePressedControlButtons()
 	else if (*gadget_score_value > 255)
 	  *gadget_score_value = 255;
 
-	DrawValueField(ED_SCORE_FIELD, *gadget_score_value);
+	DrawCounterValueField(ED_COUNTER_SCORE, *gadget_score_value);
   	break;
   
       default:
@@ -2090,10 +2154,15 @@ static void HandleControlButtons(struct GadgetInfo *gi)
   int event_type = gi->event.type;
   */
   int button = gi->event.button;
+  int new_element;
   int player_present = FALSE;
   int level_changed = FALSE;
   int id = -1;
   int i, x, y;
+
+  new_element = (button == 1 ? new_element1 :
+		 button == 2 ? new_element2 :
+		 button == 3 ? new_element3 : 0);
 
   /* get the button id */
   for (i=0; i<ED_NUM_CTRL_BUTTONS; i++)
@@ -2122,7 +2191,7 @@ static void HandleControlButtons(struct GadgetInfo *gi)
       break;
 
     case ED_CTRL_ID_PROPERTIES:
-      DrawPropertiesWindow(button);
+      DrawPropertiesWindow(new_element);
       edit_mode = ED_MODE_PROPERTIES;
       break;
 
