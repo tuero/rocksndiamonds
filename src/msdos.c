@@ -348,6 +348,11 @@ Window XCreateSimpleWindow(Display *display, Window parent, int x, int y,
   display->screens[display->default_screen].height = YRES;
 
   set_mouse_sprite(display->mouse_ptr);
+
+#if 0
+  set_mouse_sprite_focus(1, 1);
+#endif
+
   set_mouse_speed(1, 1);
   set_mouse_range(display->screens[display->default_screen].x + 1,
 		  display->screens[display->default_screen].y + 1,
@@ -577,11 +582,17 @@ static BITMAP *Read_PCX_to_AllegroBitmap(char *filename)
 
   /* read the graphic file in PCX format to internal image structure */
   if ((image = Read_PCX_to_Image(filename)) == NULL)
+  {
+    Error(ERR_RETURN, "Read_PCX_to_Image failed");
     return NULL;
+  }
 
   /* convert internal image structure to allegro bitmap structure */
   if ((bitmap = Image_to_AllegroBitmap(image)) == NULL)
+  {
+    Error(ERR_RETURN, "Image_to_AllegroBitmap failed");
     return NULL;
+  }
 
   set_palette(global_colormap);
 

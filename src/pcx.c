@@ -139,8 +139,9 @@ Image *Read_PCX_to_Image(char *filename)
   file_length = ftell(file);
   rewind(file);
 
-  if (file_length < PCX_HEADER_SIZE + PCX_COLORMAP_SIZE)
+  if (file_length < PCX_HEADER_SIZE)
   {
+    /* PCX file is too short to contain a valid PCX header */
     fclose(file);
     return NULL;
   }
@@ -185,6 +186,7 @@ Image *Read_PCX_to_Image(char *filename)
 	   filename, pcx.xmax, pcx.ymax,
 	   pcx.color_planes);
     printf("depth: %d\n", pcx.bits_per_pixel);
+    printf("color_planes: %d\n", pcx.color_planes);
     printf("bytes_per_line: %d\n", pcx.bytes_per_line);
     printf("palette type: %s\n",
 	   (pcx.palette_type == 1 ? "color" :
@@ -202,6 +204,13 @@ Image *Read_PCX_to_Image(char *filename)
   {
     free(file_buffer);
     freeImage(image);
+    return NULL;
+  }
+
+  if (file_length < PCX_HEADER_SIZE + PCX_COLORMAP_SIZE)
+  {
+    /* PCX file is too short to contain a valid 256 colors colormap */
+    fclose(file);
     return NULL;
   }
 

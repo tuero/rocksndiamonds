@@ -497,6 +497,21 @@ void InitGfx()
   }; 
 #endif
 
+#ifdef DEBUG
+#if 0
+  static struct PictureFileInfo test_pic1 =
+  {
+    "RocksFont2",
+    FALSE
+  };
+  static struct PictureFileInfo test_pic2 =
+  {
+    "mouse",
+    FALSE
+  };
+#endif
+#endif
+
   static struct
   {
     int start;
@@ -550,6 +565,19 @@ void InitGfx()
 #if DEBUG_TIMING
   debug_print_timestamp(0, NULL);	/* initialize timestamp function */
 #endif
+
+#ifdef DEBUG
+#if 0
+  printf("Test: Loading RocksFont2.pcx ...\n");
+  LoadGfx(PIX_SMALLFONT,&test_pic1);
+  printf("Test: Done.\n");
+  printf("Test: Loading mouse.pcx ...\n");
+  LoadGfx(PIX_SMALLFONT,&test_pic2);
+  printf("Test: Done.\n");
+#endif
+#endif
+
+
 
   LoadGfx(PIX_SMALLFONT,&pic[PIX_SMALLFONT]);
   DrawInitText(WINDOW_TITLE_STRING,20,FC_YELLOW);
