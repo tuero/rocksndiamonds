@@ -527,7 +527,7 @@ static int helpscreen_action[] =
 
   IMG_INVISIBLE_WALL,			-1,			HA_NEXT,
 
-  IMG_WALL_CRUMBLED,			-1,			HA_NEXT,
+  IMG_WALL_SLIPPERY,			-1,			HA_NEXT,
 
   IMG_FONT_GAME_INFO,			-1,			HA_NEXT,
 
@@ -918,11 +918,15 @@ void DrawHelpScreenElAction(int start)
     i++;
   }
 
+#if 1
+  redraw_mask |= REDRAW_FIELD;
+#else
   for(i=2; i<16; i++)
   {
     MarkTileDirty(0, i);
     MarkTileDirty(1, i);
   }
+#endif
 
   FrameCounter++;
 }

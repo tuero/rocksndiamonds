@@ -237,6 +237,8 @@
 #define ED_SELECTBOX_XSIZE		ED_WIN_COUNT_XSIZE
 #define ED_SELECTBOX_YSIZE		ED_WIN_COUNT_YSIZE
 
+#define ED_SELECTBOX_BUTTON_XSIZE	14
+
 #define ED_TEXTBUTTON_XPOS		ED_WIN_COUNT_XPOS
 #define ED_TEXTBUTTON_YPOS		(ED_WIN_COUNT_YPOS + \
 					 4 * (2 + ED_WIN_COUNT_YSIZE))
@@ -1798,7 +1800,7 @@ static int editor_el_emerald_mine[] =
 
   EL_STEELWALL,
   EL_WALL,
-  EL_WALL_CRUMBLED,
+  EL_WALL_SLIPPERY,
   EL_MAGIC_WALL,
 
   EL_EMERALD,
@@ -2119,7 +2121,7 @@ static int editor_el_diamond_caves[] =
 
   EL_LANDMINE,
   EL_INVISIBLE_SAND,
-  EL_STEELWALL_SLANTED,
+  EL_STEELWALL_SLIPPERY,
   EL_EMPTY,
 
   EL_SIGN_EXCLAMATION,
@@ -3156,7 +3158,7 @@ static void CreateSelectboxGadgets()
 		      GDI_DESIGN_UNPRESSED, gd_bitmap, gd_x, gd_y,
 		      GDI_DESIGN_PRESSED, gd_bitmap, gd_x, gd_y,
 		      GDI_BORDER_SIZE, ED_BORDER_SIZE, ED_BORDER_SIZE,
-		      GDI_BORDER_SIZE_SELECTBUTTON, getFontWidth(FONT_INPUT_1),
+		      GDI_BORDER_SIZE_SELECTBUTTON, ED_SELECTBOX_BUTTON_XSIZE,
 		      GDI_DESIGN_WIDTH, ED_WIN_COUNT_XSIZE,
 		      GDI_EVENT_MASK, event_mask,
 		      GDI_CALLBACK_INFO, HandleEditorGadgetInfoText,

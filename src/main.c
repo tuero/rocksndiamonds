@@ -128,9 +128,9 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
     "normal wall"
   },
   {
-    "wall_crumbled",
+    "wall_slippery",
     "wall",
-    "round wall"
+    "slippery wall"
   },
   {
     "rock",
@@ -1221,22 +1221,22 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
   {
     "sp_gravity_port_right",
     "sp_port",
-    "port (leading right)"
+    "gravity port (leading right)"
   },
   {
     "sp_gravity_port_down",
     "sp_port",
-    "port (leading down)"
+    "gravity port (leading down)"
   },
   {
     "sp_gravity_port_left",
     "sp_port",
-    "port (leading left)"
+    "gravity port (leading left)"
   },
   {
     "sp_gravity_port_up",
     "sp_port",
-    "port (leading up)"
+    "gravity port (leading up)"
   },
   {
     "sp_sniksnak",
@@ -1679,9 +1679,9 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
     "mole (starts moving down)"
   },
   {
-    "steelwall_slanted",
+    "steelwall_slippery",
     "wall",
-    "steel wall (slanted)"
+    "slippery steel wall"
   },
   {
     "invisible_sand",
@@ -2915,11 +2915,6 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
   },
   {
     "invisible_steelwall_vertical",
-    "-",
-    "-"
-  },
-  {
-    "sand_crumbled",
     "-",
     "-"
   },

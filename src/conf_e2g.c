@@ -1,3 +1,15 @@
+/***********************************************************
+* Rocks'n'Diamonds -- McDuffin Strikes Back!               *
+*----------------------------------------------------------*
+* (c) 1995-2002 Artsoft Entertainment                      *
+*               Holger Schemel                             *
+*               Detmolder Strasse 189                      *
+*               33604 Bielefeld                            *
+*               Germany                                    *
+*               e-mail: info@artsoft.org                   *
+*----------------------------------------------------------*
+* conf_e2g.c                                               *
+***********************************************************/
 
 /* ----- this file was automatically generated -- do not edit by hand ----- */
 
@@ -478,6 +490,10 @@ element_to_graphic[] =
     IMG_SAND
   },
   {
+    EL_SAND,				-1, -1, TRUE,
+    IMG_SAND_CRUMBLED
+  },
+  {
     EL_SAND,				ACTION_DIGGING, MV_BIT_LEFT, FALSE,
     IMG_SAND_DIGGING_LEFT
   },
@@ -492,14 +508,6 @@ element_to_graphic[] =
   {
     EL_SAND,				ACTION_DIGGING, MV_BIT_DOWN, FALSE,
     IMG_SAND_DIGGING_DOWN
-  },
-  {
-    EL_SAND_CRUMBLED,			-1, -1, TRUE,
-    IMG_SAND_CRUMBLED
-  },
-  {
-    EL_SAND,				-1, -1, TRUE,
-    IMG_SAND_CRUMBLED
   },
   {
     EL_SAND,				ACTION_DIGGING, MV_BIT_LEFT, TRUE,
@@ -522,8 +530,8 @@ element_to_graphic[] =
     IMG_WALL
   },
   {
-    EL_WALL_CRUMBLED,			-1, -1, FALSE,
-    IMG_WALL_CRUMBLED
+    EL_WALL_SLIPPERY,			-1, -1, FALSE,
+    IMG_WALL_SLIPPERY
   },
   {
     EL_STEELWALL,			-1, -1, FALSE,
@@ -1286,8 +1294,8 @@ element_to_graphic[] =
     IMG_LANDMINE
   },
   {
-    EL_STEELWALL_SLANTED,		-1, -1, FALSE,
-    IMG_STEELWALL_SLANTED
+    EL_STEELWALL_SLIPPERY,		-1, -1, FALSE,
+    IMG_STEELWALL_SLIPPERY
   },
   {
     EL_EXTRA_TIME,			-1, -1, FALSE,

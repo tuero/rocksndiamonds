@@ -1,3 +1,15 @@
+/***********************************************************
+* Rocks'n'Diamonds -- McDuffin Strikes Back!               *
+*----------------------------------------------------------*
+* (c) 1995-2002 Artsoft Entertainment                      *
+*               Holger Schemel                             *
+*               Detmolder Strasse 189                      *
+*               33604 Bielefeld                            *
+*               Germany                                    *
+*               e-mail: info@artsoft.org                   *
+*----------------------------------------------------------*
+* conf_gfx.h                                               *
+***********************************************************/
 
 /* ----- this file was automatically generated -- do not edit by hand ----- */
 
@@ -115,17 +127,17 @@
 #define IMG_SOKOBAN_FIELD_FULL				106
 #define IMG_EMPTY_SPACE					107
 #define IMG_SAND					108
-#define IMG_SAND_DIGGING_LEFT				109
-#define IMG_SAND_DIGGING_RIGHT				110
-#define IMG_SAND_DIGGING_UP				111
-#define IMG_SAND_DIGGING_DOWN				112
-#define IMG_SAND_CRUMBLED				113
+#define IMG_SAND_CRUMBLED				109
+#define IMG_SAND_DIGGING_LEFT				110
+#define IMG_SAND_DIGGING_RIGHT				111
+#define IMG_SAND_DIGGING_UP				112
+#define IMG_SAND_DIGGING_DOWN				113
 #define IMG_SAND_DIGGING_LEFT_CRUMBLED			114
 #define IMG_SAND_DIGGING_RIGHT_CRUMBLED			115
 #define IMG_SAND_DIGGING_UP_CRUMBLED			116
 #define IMG_SAND_DIGGING_DOWN_CRUMBLED			117
 #define IMG_WALL					118
-#define IMG_WALL_CRUMBLED				119
+#define IMG_WALL_SLIPPERY				119
 #define IMG_STEELWALL					120
 #define IMG_ROCK					121
 #define IMG_ROCK_MOVING_LEFT				122
@@ -298,7 +310,7 @@
 #define IMG_SIGN_EXCLAMATION				289
 #define IMG_SIGN_STOP					290
 #define IMG_LANDMINE					291
-#define IMG_STEELWALL_SLANTED				292
+#define IMG_STEELWALL_SLIPPERY				292
 #define IMG_EXTRA_TIME					293
 #define IMG_SHIELD_NORMAL				294
 #define IMG_SHIELD_NORMAL_ACTIVE			295

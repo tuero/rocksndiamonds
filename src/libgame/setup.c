@@ -495,7 +495,9 @@ char *getCustomImageFilename(char *basename)
     /* 2nd try: look for special artwork in current level series directory */
     filename = getPath3(getCurrentLevelDir(), GRAPHICS_DIRECTORY, basename);
 #if 0
+    /*
     if (strcmp(basename, "RocksScreen.pcx") == 0)
+    */
       printf("::: trying 2 '%s' ...\n", filename);
 #endif
     if (fileExists(filename))
@@ -507,7 +509,9 @@ char *getCustomImageFilename(char *basename)
     /* 1st try: look for special artwork configured in level series config */
     filename = getPath2(getLevelArtworkDir(TREE_TYPE_GRAPHICS_DIR), basename);
 #if 0
+    /*
     if (strcmp(basename, "RocksScreen.pcx") == 0)
+    */
       printf("::: trying 2.1 '%s' ...\n", filename);
 #endif
     if (fileExists(filename))
@@ -520,7 +524,9 @@ char *getCustomImageFilename(char *basename)
   /* 3rd try: look for special artwork in configured artwork directory */
   filename = getPath2(getSetupArtworkDir(artwork.gfx_current), basename);
 #if 0
+  /*
   if (strcmp(basename, "RocksScreen.pcx") == 0)
+  */
     printf("::: trying 3 '%s' ...\n", filename);
 #endif
   if (fileExists(filename))

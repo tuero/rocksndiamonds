@@ -1470,7 +1470,7 @@ void HandleGadgets(int mx, int my, int button)
       /* if mouse moving inside activated selectbox, select value */
       if (my >= gi->selectbox.y && my < gi->selectbox.y + gi->selectbox.height)
 	gi->selectbox.current_index =
-	  (my - gi->selectbox.y - gi->border.xsize) / getFontWidth(gi->font);
+	  (my - gi->selectbox.y - gi->border.ysize) / getFontHeight(gi->font);
 
       if (gi->selectbox.current_index < 0)
 	gi->selectbox.current_index = 0;

@@ -2215,6 +2215,7 @@ void DynaExplode(int ex, int ey)
 
       Explode(x, y, EX_PHASE_START, EX_BORDER);
 
+      /* !!! extend EL_SAND to anything diggable (but maybe not SP_BASE) !!! */
       if (element != EL_EMPTY &&
 	  element != EL_SAND &&
 	  element != EL_EXPLOSION &&
@@ -2525,14 +2526,16 @@ static int getInvisibleActiveFromInvisibleElement(int element)
 {
   return (element == EL_INVISIBLE_STEELWALL ? EL_INVISIBLE_STEELWALL_ACTIVE :
 	  element == EL_INVISIBLE_WALL      ? EL_INVISIBLE_WALL_ACTIVE :
-	  EL_INVISIBLE_SAND_ACTIVE);
+	  element == EL_INVISIBLE_SAND      ? EL_INVISIBLE_SAND_ACTIVE :
+	  element);
 }
 
 static int getInvisibleFromInvisibleActiveElement(int element)
 {
   return (element == EL_INVISIBLE_STEELWALL_ACTIVE ? EL_INVISIBLE_STEELWALL :
 	  element == EL_INVISIBLE_WALL_ACTIVE      ? EL_INVISIBLE_WALL :
-	  EL_INVISIBLE_SAND);
+	  element == EL_INVISIBLE_SAND_ACTIVE      ? EL_INVISIBLE_SAND :
+	  element);
 }
 
 static void RedrawAllLightSwitchesAndInvisibleElements()
@@ -4058,7 +4061,7 @@ void StartMoving(int x, int y)
       TurnRound(x, y);
 
 #if 1
-      if (GFX_ELEMENT(element) != EL_SAND)
+      if (GFX_ELEMENT(element) != EL_SAND)     /* !!! FIX THIS (crumble) !!! */
 	DrawLevelElementAnimation(x, y, element);
 #else
       if (element == EL_BUG ||
@@ -4553,6 +4556,7 @@ void AmoebeAbleger(int ax, int ay)
     if (!IN_LEV_FIELD(x, y))
       return;
 
+    /* !!! extend EL_SAND to anything diggable (but maybe not SP_BASE) !!! */
     if (IS_FREE(x, y) ||
 	Feld[x][y] == EL_SAND || Feld[x][y] == EL_QUICKSAND_EMPTY)
     {
@@ -4577,6 +4581,7 @@ void AmoebeAbleger(int ax, int ay)
       if (!IN_LEV_FIELD(x, y))
 	continue;
 
+      /* !!! extend EL_SAND to anything diggable (but maybe not SP_BASE) !!! */
       if (IS_FREE(x, y) ||
 	  Feld[x][y] == EL_SAND || Feld[x][y] == EL_QUICKSAND_EMPTY)
       {
@@ -4721,6 +4726,7 @@ void Life(int ax, int ay)
 	changed = TRUE;
       }
     }
+    /* !!! extend EL_SAND to anything diggable (but maybe not SP_BASE) !!! */
     else if (IS_FREE(xx, yy) || Feld[xx][yy] == EL_SAND)
     {					/* free border field */
       if (nachbarn >= life[2] && nachbarn <= life[3])
@@ -5810,6 +5816,7 @@ void GameActions()
 #endif
       element = Feld[x][y];
 
+      /* !!! extend EL_SAND to anything diggable (but maybe not SP_BASE) !!! */
       if (!IS_PLAYER(x,y) &&
 	  (element == EL_EMPTY ||
 	   element == EL_SAND ||
@@ -6097,6 +6104,7 @@ static void CheckGravityMovement(struct PlayerInfo *player)
       (IN_LEV_FIELD(new_jx, new_jy) &&
        (Feld[new_jx][new_jy] == EL_SP_BASE ||
 	Feld[new_jx][new_jy] == EL_SAND));
+    /* !!! extend EL_SAND to anything diggable !!! */
 
     if (field_under_player_is_free &&
 	!player_is_moving_to_valid_field &&
@@ -7071,6 +7079,12 @@ int DigField(struct PlayerInfo *player,
 	  !IN_LEV_FIELD(nextx, nexty) ||
 	  !IS_FREE(nextx, nexty))
 	return MF_NO_ACTION;
+
+      if (element == EL_SP_GRAVITY_PORT_LEFT ||
+	  element == EL_SP_GRAVITY_PORT_RIGHT ||
+	  element == EL_SP_GRAVITY_PORT_UP ||
+	  element == EL_SP_GRAVITY_PORT_DOWN)
+	level.gravity = !level.gravity;
 
       /* automatically move to the next field with double speed */
       player->programmed_action = move_direction;

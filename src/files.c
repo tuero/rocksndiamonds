@@ -730,26 +730,31 @@ static void LoadLevel_InitLevel(struct LevelInfo *level, char *filename)
   }
 
   /* map elements which have changed in newer versions */
-  if (level->game_version <= VERSION_IDENT(2,2,0))
+  for(y=0; y<level->fieldy; y++)
   {
-    /* map game font elements */
-    for(y=0; y<level->fieldy; y++)
+    for(x=0; x<level->fieldx; x++)
     {
-      for(x=0; x<level->fieldx; x++)
+      int element = level->field[x][y];
+
+      if (level->game_version <= VERSION_IDENT(2,2,0))
       {
-	int element = level->field[x][y];
-
-	if (element == EL_CHAR('['))
-	  element = EL_CHAR_AUMLAUT;
-	else if (element == EL_CHAR('\\'))
-	  element = EL_CHAR_OUMLAUT;
-	else if (element == EL_CHAR(']'))
-	  element = EL_CHAR_UUMLAUT;
-	else if (element == EL_CHAR('^'))
-	  element = EL_CHAR_COPYRIGHT;
-
-	level->field[x][y] = element;
+	/* map game font elements */
+	element = (element == EL_CHAR('[')  ? EL_CHAR_AUMLAUT :
+		   element == EL_CHAR('\\') ? EL_CHAR_OUMLAUT :
+		   element == EL_CHAR(']')  ? EL_CHAR_UUMLAUT :
+		   element == EL_CHAR('^')  ? EL_CHAR_COPYRIGHT : element);
       }
+      else if (level->game_version < VERSION_IDENT(3,0,0))
+      {
+	/* map Supaplex gravity tube elements */
+	element = (element == EL_SP_GRAVITY_PORT_LEFT  ? EL_SP_PORT_LEFT  :
+		   element == EL_SP_GRAVITY_PORT_RIGHT ? EL_SP_PORT_RIGHT :
+		   element == EL_SP_GRAVITY_PORT_UP    ? EL_SP_PORT_UP    :
+		   element == EL_SP_GRAVITY_PORT_DOWN  ? EL_SP_PORT_DOWN  :
+		   element);
+      }
+
+      level->field[x][y] = element;
     }
   }
 

@@ -504,6 +504,9 @@ inline void DrawLevelGraphicAnimationIfNeeded(int x, int y, int graphic)
     return;
 
   DrawGraphicAnimation(sx, sy, graphic);
+
+  if (CAN_BE_CRUMBLED(Feld[x][y]))
+    DrawLevelFieldCrumbledSand(x, y);
 }
 
 void DrawLevelElementAnimationIfNeeded(int x, int y, int element)
@@ -520,6 +523,9 @@ void DrawLevelElementAnimationIfNeeded(int x, int y, int element)
     return;
 
   DrawGraphicAnimation(sx, sy, graphic);
+
+  if (CAN_BE_CRUMBLED(element))
+    DrawLevelFieldCrumbledSand(x, y);
 }
 
 void DrawAllPlayers()
