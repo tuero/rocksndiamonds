@@ -615,9 +615,17 @@ void GetOptions(char *argv[], void (*print_usage_function)(void))
       if (option_arg == next_option)
 	options_left++;
 
-      /* adjust path for level directory accordingly */
+      /* adjust paths for sub-directories in base directory accordingly */
       options.level_directory =
 	getPath2(options.ro_base_directory, LEVELS_DIRECTORY);
+      options.graphics_directory =
+	getPath2(options.ro_base_directory, GRAPHICS_DIRECTORY);
+      options.sounds_directory =
+	getPath2(options.ro_base_directory, SOUNDS_DIRECTORY);
+      options.music_directory =
+	getPath2(options.ro_base_directory, MUSIC_DIRECTORY);
+      options.docs_directory =
+	getPath2(options.ro_base_directory, DOCS_DIRECTORY);
     }
     else if (strncmp(option, "-levels", option_len) == 0)
     {

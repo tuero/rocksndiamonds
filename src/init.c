@@ -2271,6 +2271,7 @@ void InitElementPropertiesStatic()
     EL_PLAYER_4,
     EL_SP_MURPHY,
     EL_SOKOBAN_FIELD_PLAYER,
+    EL_TRIGGER_PLAYER,
     -1
   };
 

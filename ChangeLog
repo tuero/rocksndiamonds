@@ -1,3 +1,15 @@
+2004-04-18
+	* fixed graphic bug when player is snapping while moving in old levels
+	* fixed bug when a moving custom element leaves a player element behind
+	* fixed bug with mole not disappearing when moving into acid pool
+	* fixed bug with incomplete path setting when using "--basepath" option
+	* moving CE can now leave walkable elements behind under the player
+	* when relocating, player can be set on walkable element now
+	* fixed another gravity movement bug
+
+2004-04-12
+	* uploaded pre-release (test) version 3.1.0-2 binary and source code
+
 2004-04-10
 	* added "collectible" and "removable" to extended replacement types
 	  (where "removable" replaces "diggable" and "collectible" elements)

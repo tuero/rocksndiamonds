@@ -770,6 +770,7 @@ static void InitPlayerField(int x, int y, int element, boolean init_game)
     }
 
     Feld[x][y] = EL_EMPTY;
+
     player->jx = player->last_jx = x;
     player->jy = player->last_jy = y;
   }
@@ -2653,6 +2654,7 @@ void CheckDynamite(int x, int y)
 
 void RelocatePlayer(int x, int y, int element_raw)
 {
+  int old_element = Feld[x][y];
   int element = (element_raw == EL_SP_MURPHY ? EL_PLAYER_1 : element_raw);
   struct PlayerInfo *player = &stored_player[element - EL_PLAYER_1];
   boolean ffwd_delay = (tape.playing && tape.fast_forward);
@@ -2664,8 +2666,11 @@ void RelocatePlayer(int x, int y, int element_raw)
   if (player->GameOver)		/* do not reanimate dead player */
     return;
 
-  RemoveField(x, y);		/* temporarily remove newly placed player */
-  DrawLevelField(x, y);
+  if (ELEM_IS_PLAYER(old_element))	/* player already set */
+  {
+    RemoveField(x, y);		/* temporarily remove newly placed player */
+    DrawLevelField(x, y);
+  }
 
   if (player->present)
   {
@@ -2692,6 +2697,12 @@ void RelocatePlayer(int x, int y, int element_raw)
 
   Feld[x][y] = element;
   InitPlayerField(x, y, element, TRUE);
+
+  if (!ELEM_IS_PLAYER(old_element))	/* player set on walkable element */
+  {
+    Feld[x][y] = old_element;
+    InitField(x, y, FALSE);
+  }
 
   if (player != local_player)	/* do not visually relocate other players */
     return;
@@ -2849,6 +2860,11 @@ void RelocatePlayer(int x, int y, int element_raw)
     }
 #endif
   }
+
+#if 1
+  TestIfHeroTouchesBadThing(x, y);
+  TestIfPlayerTouchesCustomElement(x, y);
+#endif
 }
 
 void Explode(int ex, int ey, int phase, int mode)
@@ -5931,7 +5947,13 @@ void ContinueMoving(int x, int y)
   Feld[newx][newy] = element;
   MovPos[x][y] = 0;	/* force "not moving" for "crumbled sand" */
 
-  if (element == EL_MOLE)
+#if 1
+  if (Store[x][y] == EL_ACID)	/* element is moving into acid pool */
+  {
+    element = Feld[newx][newy] = EL_ACID;
+  }
+#endif
+  else if (element == EL_MOLE)
   {
     Feld[x][y] = EL_SAND;
 
@@ -5990,10 +6012,12 @@ void ContinueMoving(int x, int y)
 
     Back[x][y] = Back[newx][newy] = 0;
   }
+#if 0
   else if (Store[x][y] == EL_ACID)
   {
     element = Feld[newx][newy] = EL_ACID;
   }
+#endif
 #if 0
   else if (IS_CUSTOM_ELEMENT(element) && !IS_PLAYER(x, y) &&
 	   ei->move_leave_element != EL_EMPTY &&
@@ -6039,18 +6063,27 @@ void ContinueMoving(int x, int y)
   ResetGfxAnimation(x, y);	/* reset animation values for old field */
 
 #if 1
-  if (IS_CUSTOM_ELEMENT(element) && !IS_PLAYER(x, y) &&
-      ei->move_leave_element != EL_EMPTY &&
-      (ei->move_leave_type == LEAVE_TYPE_UNLIMITED ||
-       stored != EL_EMPTY))
+  /* some elements can leave other elements behind after moving */
+#if 1
+  if (IS_CUSTOM_ELEMENT(element) && ei->move_leave_element != EL_EMPTY &&
+      (ei->move_leave_type == LEAVE_TYPE_UNLIMITED || stored != EL_EMPTY) &&
+      (!IS_PLAYER(x, y) || IS_WALKABLE(ei->move_leave_element)))
+#else
+  if (IS_CUSTOM_ELEMENT(element) && ei->move_leave_element != EL_EMPTY &&
+      (ei->move_leave_type == LEAVE_TYPE_UNLIMITED || stored != EL_EMPTY) &&
+      !IS_PLAYER(x, y))
+#endif
   {
-    /* some elements can leave other elements behind after moving */
+    int move_leave_element = ei->move_leave_element;
 
-    Feld[x][y] = ei->move_leave_element;
+    Feld[x][y] = move_leave_element;
     InitField(x, y, FALSE);
 
     if (GFX_CRUMBLED(Feld[x][y]))
       DrawLevelFieldCrumbledSandNeighbours(x, y);
+
+    if (ELEM_IS_PLAYER(move_leave_element))
+      RelocatePlayer(x, y, move_leave_element);
   }
 #endif
 
@@ -7212,6 +7245,9 @@ static void ChangeActiveTrap(int x, int y)
 static void ChangeElementNowExt(int x, int y, int target_element)
 {
   int previous_move_direction = MovDir[x][y];
+  boolean add_player = (ELEM_IS_PLAYER(target_element) &&
+			IS_WALKABLE(Feld[x][y]) &&
+			!IS_MOVING(x, y));
 
   /* check if element under player changes from accessible to unaccessible
      (needed for special case of dropping element which then changes) */
@@ -7222,36 +7258,58 @@ static void ChangeElementNowExt(int x, int y, int target_element)
     return;
   }
 
-  RemoveField(x, y);
-  Feld[x][y] = target_element;
+#if 1
+  if (!add_player)
+#endif
+  {
+#if 1
+    if (IS_MOVING(x, y) || IS_BLOCKED(x, y))
+      RemoveMovingField(x, y);
+    else
+      RemoveField(x, y);
+
+    Feld[x][y] = target_element;
+#else
+    RemoveField(x, y);
+    Feld[x][y] = target_element;
+#endif
+
+    ResetGfxAnimation(x, y);
+    ResetRandomAnimationValue(x, y);
+
+    if (element_info[Feld[x][y]].move_direction_initial == MV_START_PREVIOUS)
+      MovDir[x][y] = previous_move_direction;
+
+#if 1
+    InitField_WithBug1(x, y, FALSE);
+#else
+    InitField(x, y, FALSE);
+    if (CAN_MOVE(Feld[x][y]))
+      InitMovDir(x, y);
+#endif
+
+    DrawLevelField(x, y);
+
+    if (GFX_CRUMBLED(Feld[x][y]))
+      DrawLevelFieldCrumbledSandNeighbours(x, y);
+  }
 
   Changed[x][y] |= ChangeEvent[x][y];	/* ignore same changes in this frame */
 
-  ResetGfxAnimation(x, y);
-  ResetRandomAnimationValue(x, y);
-
-  if (element_info[Feld[x][y]].move_direction_initial == MV_START_PREVIOUS)
-    MovDir[x][y] = previous_move_direction;
-
-#if 1
-  InitField_WithBug1(x, y, FALSE);
-#else
-  InitField(x, y, FALSE);
-  if (CAN_MOVE(Feld[x][y]))
-    InitMovDir(x, y);
-#endif
-
-  DrawLevelField(x, y);
-
-  if (GFX_CRUMBLED(Feld[x][y]))
-    DrawLevelFieldCrumbledSandNeighbours(x, y);
-
+#if 0
   TestIfBadThingTouchesHero(x, y);
   TestIfPlayerTouchesCustomElement(x, y);
   TestIfElementTouchesCustomElement(x, y);
+#endif
 
   if (ELEM_IS_PLAYER(target_element))
     RelocatePlayer(x, y, target_element);
+
+#if 1
+  TestIfBadThingTouchesHero(x, y);
+  TestIfPlayerTouchesCustomElement(x, y);
+  TestIfElementTouchesCustomElement(x, y);
+#endif
 }
 
 static boolean ChangeElementNow(int x, int y, int element, int page)
@@ -7336,8 +7394,10 @@ static boolean ChangeElementNow(int x, int y, int element, int page)
 #if 1
 
 #if 1
-      is_empty = (IS_FREE(ex, ey) || (IS_FREE_OR_PLAYER(ex, ey) &&
-				      IS_WALKABLE(content_element)));
+      is_empty = (IS_FREE(ex, ey) ||
+		  (IS_PLAYER(ex, ey) && IS_WALKABLE(content_element)) ||
+		  (IS_WALKABLE(e) && ELEM_IS_PLAYER(content_element) &&
+		   !IS_MOVING(ex, ey) && !IS_BLOCKED(ex, ey)));
 #else
       is_empty = (IS_FREE(ex, ey) || (IS_PLAYER(ex, ey) &&
 				      IS_WALKABLE(content_element)));
@@ -10494,6 +10554,20 @@ int DigField(struct PlayerInfo *player,
       game.engine_version >= VERSION_IDENT(2,2,0,0))
     return MF_NO_ACTION;
 
+#if 1
+  if (game.gravity && !player->is_auto_moving &&
+      canFallDown(player) && move_direction != MV_DOWN &&
+      !canMoveToValidFieldWithGravity(jx, jy, move_direction))
+    return MF_NO_ACTION;	/* player cannot walk here due to gravity */
+#endif
+
+#if 0
+  if (element == EL_EMPTY_SPACE &&
+      game.gravity && !player->is_auto_moving &&
+      canFallDown(player) && move_direction != MV_DOWN)
+    return MF_NO_ACTION;	/* player cannot walk here due to gravity */
+#endif
+
   switch (element)
   {
 #if 0
@@ -10626,7 +10700,7 @@ int DigField(struct PlayerInfo *player,
 	  return MF_NO_ACTION;	/* field not accessible from this direction */
 #endif
 
-#if 1
+#if 0
 	if (element == EL_EMPTY_SPACE &&
 	    game.gravity && !player->is_auto_moving &&
 	    canFallDown(player) && move_direction != MV_DOWN)
@@ -11185,10 +11259,10 @@ boolean SnapField(struct PlayerInfo *player, int dx, int dy)
 			dy == +1 ? MV_DOWN : MV_NO_MOVING);
 
 #if 0
-  if (player->MovPos)
+  if (player->MovPos != 0)
     return FALSE;
 #else
-  if (player->MovPos && game.engine_version >= VERSION_IDENT(2,2,0,0))
+  if (player->MovPos != 0 && game.engine_version >= VERSION_IDENT(2,2,0,0))
     return FALSE;
 #endif
 
@@ -11245,8 +11319,16 @@ boolean SnapField(struct PlayerInfo *player, int dx, int dy)
     player->is_collecting = FALSE;
   }
 
+#if 1
+  if (player->MovPos != 0)	/* prevent graphic bugs in versions < 2.2.0 */
+    DrawLevelField(player->last_jx, player->last_jy);
+#endif
+
   DrawLevelField(x, y);
+
+#if 0
   BackToFront();
+#endif
 
   return TRUE;
 }
