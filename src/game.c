@@ -102,6 +102,7 @@
 
 /* forward declaration for internal use */
 static void CheckGravityMovement(struct PlayerInfo *);
+static void KillHeroUnlessForceField(struct PlayerInfo *);
 
 static void MapGameButtons();
 static void HandleGameButtons(struct GadgetInfo *);
@@ -474,6 +475,9 @@ void InitGame()
 
     player->last_jx = player->last_jy = 0;
     player->jx = player->jy = 0;
+
+    player->force_field_passive_time_left = 0;
+    player->force_field_active_time_left = 0;
 
     DigField(player, 0, 0, 0, 0, DF_NO_PUSH);
     SnapField(player, 0, 0);
@@ -1240,10 +1244,22 @@ void Explode(int ex, int ey, int phase, int mode)
       if (IS_MASSIVE(element) || element == EL_BURNING)
 	continue;
 
+      if (IS_PLAYER(x, y) && FORCE_FIELD_ON(PLAYERINFO(x, y)))
+      {
+	if (IS_ACTIVE_BOMB(element))
+	{
+	  /* re-activate things under the bomb like gate or penguin */
+	  Feld[x][y] = (Store[x][y] ? Store[x][y] : EL_LEERRAUM);
+	  Store[x][y] = 0;
+	}
+
+	continue;
+      }
+
       if (element == EL_EXPLODING)
 	element = Store2[x][y];
 
-      if (IS_PLAYER(ex, ey))
+      if (IS_PLAYER(ex, ey) && !FORCE_FIELD_ON(PLAYERINFO(ex, ey)))
       {
 	switch(StorePlayer[ex][ey])
 	{
@@ -1344,7 +1360,7 @@ void Explode(int ex, int ey, int phase, int mode)
     int element = Store2[x][y];
 
     if (IS_PLAYER(x, y))
-      KillHero(PLAYERINFO(x, y));
+      KillHeroUnlessForceField(PLAYERINFO(x, y));
     else if (IS_EXPLOSIVE(element))
     {
       Feld[x][y] = Store2[x][y];
@@ -1444,8 +1460,10 @@ void Bang(int x, int y)
   else
     PlaySoundLevel(x, y, SND_ROAAAR);
 
+#if 0
   if (IS_PLAYER(x, y))	/* remove objects that might cause smaller explosion */
     element = EL_LEERRAUM;
+#endif
 
   switch(element)
   {
@@ -1473,7 +1491,10 @@ void Bang(int x, int y)
     case EL_PINGUIN:
     case EL_BIRNE_AUS:
     case EL_BIRNE_EIN:
-      Explode(x, y, EX_PHASE_START, EX_CENTER);
+      if (IS_PLAYER(x, y))
+	Explode(x, y, EX_PHASE_START, EX_NORMAL);
+      else
+	Explode(x, y, EX_PHASE_START, EX_CENTER);
       break;
     default:
       Explode(x, y, EX_PHASE_START, EX_NORMAL);
@@ -1686,7 +1707,7 @@ void Impact(int x, int y)
   if (element == EL_TROPFEN && (lastline || object_hit))	/* acid drop */
   {
     if (object_hit && IS_PLAYER(x, y+1))
-      KillHero(PLAYERINFO(x, y+1));
+      KillHeroUnlessForceField(PLAYERINFO(x, y+1));
     else if (object_hit && (smashed == EL_MAULWURF || smashed == EL_PINGUIN))
       Bang(x, y+1);
     else
@@ -1719,7 +1740,7 @@ void Impact(int x, int y)
 
     if (IS_PLAYER(x, y+1))
     {
-      KillHero(PLAYERINFO(x, y+1));
+      KillHeroUnlessForceField(PLAYERINFO(x, y+1));
       return;
     }
     else if (smashed == EL_MAULWURF || smashed == EL_PINGUIN)
@@ -1889,10 +1910,10 @@ void TurnRound(int x, int y)
     TestIfBadThingHitsOtherBadThing(x, y);
 
     if (IN_LEV_FIELD(right_x, right_y) &&
-	IS_FREE_OR_PLAYER(right_x, right_y))
+	IS_FREE(right_x, right_y))
       MovDir[x][y] = right_dir;
     else if (!IN_LEV_FIELD(move_x, move_y) ||
-	     !IS_FREE_OR_PLAYER(move_x, move_y))
+	     !IS_FREE(move_x, move_y))
       MovDir[x][y] = left_dir;
 
     if (element == EL_KAEFER && MovDir[x][y] != old_move_dir)
@@ -1906,10 +1927,10 @@ void TurnRound(int x, int y)
     TestIfBadThingHitsOtherBadThing(x, y);
 
     if (IN_LEV_FIELD(left_x, left_y) &&
-	IS_FREE_OR_PLAYER(left_x, left_y))
+	IS_FREE(left_x, left_y))
       MovDir[x][y] = left_dir;
     else if (!IN_LEV_FIELD(move_x, move_y) ||
-	     !IS_FREE_OR_PLAYER(move_x, move_y))
+	     !IS_FREE(move_x, move_y))
       MovDir[x][y] = right_dir;
 
     if ((element == EL_FLIEGER ||
@@ -2496,12 +2517,20 @@ void StartMoving(int x, int y)
 
     Moving2Blocked(x, y, &newx, &newy);	/* get next screen position */
 
-    if (IS_ENEMY(element) && IS_PLAYER(newx, newy))
+    if (IS_ENEMY(element) && IS_PLAYER(newx, newy) &&
+	!FORCE_FIELD_ON(PLAYERINFO(newx, newy)))
     {
+
+#if 1
+      TestIfBadThingHitsHero(x, y);
+      return;
+#else
       /* enemy got the player */
       MovDir[x][y] = 0;
       KillHero(PLAYERINFO(newx, newy));
       return;
+#endif
+
     }
     else if ((element == EL_MAULWURF || element == EL_PINGUIN ||
 	      element == EL_ROBOT || element == EL_SONDE) &&
@@ -3977,8 +4006,10 @@ void GameActions()
       CloseSwitchgate(x, y);
     else if (element == EL_EXTRA_TIME)
       DrawGraphicAnimation(x, y, GFX_EXTRA_TIME, 6, 4, ANIM_NORMAL);
-    else if (element == EL_FORCE_FIELD)
-      DrawGraphicAnimation(x, y, GFX_FORCE_FIELD, 6, 4, ANIM_NORMAL);
+    else if (element == EL_FORCE_FIELD_PASSIVE)
+      DrawGraphicAnimation(x, y, GFX_FORCE_FIELD_PASSIVE, 6, 4, ANIM_NORMAL);
+    else if (element == EL_FORCE_FIELD_ACTIVE)
+      DrawGraphicAnimation(x, y, GFX_FORCE_FIELD_ACTIVE, 6, 4, ANIM_NORMAL);
 
     if (game.magic_wall_active)
     {
@@ -4061,10 +4092,21 @@ void GameActions()
     }
   }
 
-  if (TimeFrames >= (1000 / GameFrameDelay) && !tape.pausing)
+  if (TimeFrames >= (1000 / GameFrameDelay))
   {
     TimeFrames = 0;
     TimePlayed++;
+
+    for (i=0; i<MAX_PLAYERS; i++)
+    {
+      if (FORCE_FIELD_ON(&stored_player[i]))
+      {
+	stored_player[i].force_field_passive_time_left--;
+
+	if (stored_player[i].force_field_active_time_left > 0)
+	  stored_player[i].force_field_active_time_left--;
+      }
+    }
 
     if (tape.recording || tape.playing)
       DrawVideoDisplay(VIDEO_STATE_TIME_ON, TimePlayed);
@@ -4223,7 +4265,14 @@ boolean MoveFigureOneStep(struct PlayerInfo *player,
       BuryHero(player);
     }
     else
-      KillHero(player);
+    {
+#if 1
+      TestIfBadThingHitsHero(new_jx, new_jy);
+#else
+      if (player->force_field_time_left == 0)
+	KillHero(player);
+#endif
+    }
 
     return MF_MOVING;
   }
@@ -4537,7 +4586,14 @@ void TestIfGoodThingHitsBadThing(int goodx, int goody)
   if (killx != goodx || killy != goody)
   {
     if (IS_PLAYER(goodx, goody))
-      KillHero(PLAYERINFO(goodx, goody));
+    {
+      struct PlayerInfo *player = PLAYERINFO(goodx, goody);
+
+      if (player->force_field_active_time_left > 0)
+	Bang(killx, killy);
+      else if (player->force_field_passive_time_left == 0)
+	KillHero(player);
+    }
     else
       Bang(goodx, goody);
   }
@@ -4592,7 +4648,14 @@ void TestIfBadThingHitsGoodThing(int badx, int bady)
   if (killx != badx || killy != bady)
   {
     if (IS_PLAYER(killx, killy))
-      KillHero(PLAYERINFO(killx, killy));
+    {
+      struct PlayerInfo *player = PLAYERINFO(killx, killy);
+
+      if (player->force_field_active_time_left > 0)
+	Bang(badx, bady);
+      else if (player->force_field_passive_time_left == 0)
+	KillHero(player);
+    }
     else
       Bang(killx, killy);
   }
@@ -4662,8 +4725,18 @@ void KillHero(struct PlayerInfo *player)
   if (IS_PFORTE(Feld[jx][jy]))
     Feld[jx][jy] = EL_LEERRAUM;
 
+  /* deactivate force field (else Bang()/Explode() would not work right) */
+  player->force_field_passive_time_left = 0;
+  player->force_field_active_time_left = 0;
+
   Bang(jx, jy);
   BuryHero(player);
+}
+
+static void KillHeroUnlessForceField(struct PlayerInfo *player)
+{
+  if (!FORCE_FIELD_ON(player))
+    KillHero(player);
 }
 
 void BuryHero(struct PlayerInfo *player)
@@ -4787,8 +4860,16 @@ int DigField(struct PlayerInfo *player,
       PlaySoundStereo(SND_GONG, PSND_MAX_RIGHT);
       break;
 
-    case EL_FORCE_FIELD:
+    case EL_FORCE_FIELD_PASSIVE:
       RemoveField(x, y);
+      player->force_field_passive_time_left += 10;
+      PlaySoundLevel(x, y, SND_PONG);
+      break;
+
+    case EL_FORCE_FIELD_ACTIVE:
+      RemoveField(x, y);
+      player->force_field_passive_time_left += 10;
+      player->force_field_active_time_left += 10;
       PlaySoundLevel(x, y, SND_PONG);
       break;
 

@@ -463,7 +463,7 @@ char *element_info[] =
   "white door",					/* 260 */
   "gray door (opened by white key)",
   "white key",
-  "force field",
+  "force field (passive)",
   "extra time",
   "switch gate (open)",
   "switch gate (closed)",
@@ -517,10 +517,11 @@ char *element_info[] =
   "mole (starts moving down)",
   "steel wall (slanted)",
   "invisible sand",
-  "-",
-  "-",
-  "-",
-  "-",						/* 320 */
+  "dx unknown 15",
+  "dx unknown 42",
+  "dx unknown 229",
+  "dx unknown 233",				/* 320 */
+  "force field (active, kills enemies)",
   "-",
   "-",
   "-",

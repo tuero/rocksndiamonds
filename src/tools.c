@@ -44,6 +44,8 @@ extern boolean wait_for_vsync;
 
 /* forward declaration for internal use */
 static int getGraphicAnimationPhase(int, int, int);
+static void DrawGraphicAnimationShiftedThruMask(int, int, int, int, int,
+						int, int, int);
 static void UnmapToolButtons();
 static void HandleToolButtons(struct GadgetInfo *);
 
@@ -604,6 +606,10 @@ void DrawPlayer(struct PlayerInfo *player)
 
   DrawGraphicShiftedThruMask(sx, sy, sxx, syy, graphic, NO_CUTTING);
 
+  if (FORCE_FIELD_ON(player))
+    DrawGraphicAnimationShiftedThruMask(sx, sy, sxx, syy, GFX_FUNKELN_BLAU,
+					3, 8, ANIM_OSCILLATE);
+
   if (player->Pushing && player->GfxPos)
   {
     int px = SCREENX(next_jx), py = SCREENY(next_jy);
@@ -730,6 +736,17 @@ void DrawGraphicAnimationThruMask(int x, int y, int graphic,
 				  int frames, int delay, int mode)
 {
   DrawGraphicAnimationExt(x, y, graphic, frames, delay, mode, USE_MASKING);
+}
+
+static void DrawGraphicAnimationShiftedThruMask(int sx, int sy,
+						int sxx, int syy,
+						int graphic,
+						int frames, int delay,
+						int mode)
+{
+  int phase = getGraphicAnimationPhase(frames, delay, mode);
+
+  DrawGraphicShiftedThruMask(sx, sy, sxx, syy, graphic + phase, NO_CUTTING);
 }
 
 void getGraphicSource(int graphic, int *pixmap_nr, int *x, int *y)
@@ -2487,7 +2504,8 @@ int el2gfx(int element)
     case EL_DOOR_WHITE:		return GFX_DOOR_WHITE;
     case EL_DOOR_WHITE_GRAY:	return GFX_DOOR_WHITE_GRAY;
     case EL_KEY_WHITE:		return GFX_KEY_WHITE;
-    case EL_FORCE_FIELD:	return GFX_FORCE_FIELD;
+    case EL_FORCE_FIELD_PASSIVE:return GFX_FORCE_FIELD_PASSIVE;
+    case EL_FORCE_FIELD_ACTIVE:	return GFX_FORCE_FIELD_ACTIVE;
     case EL_EXTRA_TIME:		return GFX_EXTRA_TIME;
     case EL_SWITCHGATE_OPEN:	return GFX_SWITCHGATE_OPEN;
     case EL_SWITCHGATE_CLOSED:	return GFX_SWITCHGATE_CLOSED;
@@ -2541,6 +2559,10 @@ int el2gfx(int element)
     case EL_MOLE_DOWN:		return GFX_MOLE_DOWN;
     case EL_STEEL_SLANTED:	return GFX_STEEL_SLANTED;
     case EL_SAND_INVISIBLE:	return GFX_SAND_INVISIBLE;
+    case EL_DX_UNKNOWN_15:	return GFX_DX_UNKNOWN_15;
+    case EL_DX_UNKNOWN_42:	return GFX_DX_UNKNOWN_42;
+    case EL_DX_UNKNOWN_229:	return GFX_DX_UNKNOWN_229;
+    case EL_DX_UNKNOWN_233:	return GFX_DX_UNKNOWN_233;
 
     default:
     {

@@ -191,6 +191,7 @@ typedef unsigned char byte;
 #define TAPE_IS_STOPPED(x)	(!(x).recording && !(x).playing &&!(x).pausing)
 
 #define PLAYERINFO(x,y)		(&stored_player[StorePlayer[x][y]-EL_SPIELER1])
+#define FORCE_FIELD_ON(p)	((p)->force_field_passive_time_left > 0)
 
 /* Pixmaps with graphic file */
 #define PIX_BACK		0
@@ -353,6 +354,8 @@ struct PlayerInfo
   int key[4];
   int dynamite;
   int dynabomb_count, dynabomb_size, dynabombs_left, dynabomb_xl;
+  int force_field_passive_time_left;
+  int force_field_active_time_left;
 };
 
 struct LevelInfo
@@ -850,7 +853,7 @@ extern char		*element_info[];
 #define EL_DOOR_WHITE		260
 #define EL_DOOR_WHITE_GRAY	261
 #define EL_KEY_WHITE		262
-#define EL_FORCE_FIELD		263
+#define EL_FORCE_FIELD_PASSIVE	263
 #define EL_EXTRA_TIME		264
 #define EL_SWITCHGATE_OPEN	265
 #define EL_SWITCHGATE_CLOSED	266
@@ -904,6 +907,11 @@ extern char		*element_info[];
 #define EL_MOLE_DOWN		314
 #define EL_STEEL_SLANTED	315
 #define EL_SAND_INVISIBLE	316
+#define EL_DX_UNKNOWN_15	317
+#define EL_DX_UNKNOWN_42	318
+#define EL_DX_UNKNOWN_229	319
+#define EL_DX_UNKNOWN_233	320
+#define EL_FORCE_FIELD_ACTIVE	321
 
 /* "real" (and therefore drawable) runtime elements */
 #define EL_SIEB_LEER		500
@@ -1321,7 +1329,8 @@ extern char		*element_info[];
 #define GFX_STEEL_SLANTED	(GFX_START_ROCKSDC + 15 * DC_PER_LINE +  5)
 
 #define GFX_EXTRA_TIME		(GFX_START_ROCKSDC +  0 * DC_PER_LINE +  8)
-#define GFX_FORCE_FIELD		(GFX_START_ROCKSDC +  1 * DC_PER_LINE +  8)
+#define GFX_FORCE_FIELD_PASSIVE	(GFX_START_ROCKSDC +  1 * DC_PER_LINE +  8)
+#define GFX_FORCE_FIELD_ACTIVE	(GFX_START_ROCKSDC +  1 * DC_PER_LINE +  8)
 
 /* graphics from "RocksFont" */
 #define GFX_CHAR_START		(GFX_START_ROCKSFONT)
@@ -1379,6 +1388,10 @@ extern char		*element_info[];
 #define GFX_MOLE_RIGHT		GFX_CHAR_FRAGE
 #define GFX_MOLE_UP		GFX_CHAR_FRAGE
 #define GFX_MOLE_DOWN		GFX_CHAR_FRAGE
+#define GFX_DX_UNKNOWN_15	GFX_CHAR_FRAGE
+#define GFX_DX_UNKNOWN_42	GFX_CHAR_FRAGE
+#define GFX_DX_UNKNOWN_229	GFX_CHAR_FRAGE
+#define GFX_DX_UNKNOWN_233	GFX_CHAR_FRAGE
 
 /* the names of the sounds */
 #define SND_ALCHEMY		0
