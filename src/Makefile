@@ -147,23 +147,17 @@ $(LIBGAME):
 .c.o:
 	$(CC) $(PROFILING) $(CFLAGS) -c $*.c
 
-clean-obj:
+clean:
 	$(MAKE) -C $(LIBDIR) clean
 	$(RM) $(OBJS)
 	$(RM) $(LIBGAME)
-
-clean-bin:
 	$(RM) $(PROGNAME)
 	$(RM) ../*.exe
-
-clean: clean-obj clean-bin
 
 
 #-----------------------------------------------------------------------------#
 # development only stuff                                                      #
 #-----------------------------------------------------------------------------#
-
-dist-clean: clean-obj
 
 depend:
 	$(MAKE) -C $(LIBDIR) depend

@@ -1,17 +1,20 @@
 
 Welcome to
 
-   R O C K S   ' N '   D I A M O N D S   1 . 3 . 0
-   -----------------------------------------------
+   R O C K S   ' N '   D I A M O N D S
+   -----------------------------------
 
-A game for Unix/X11 by Holger Schemel, (c) 1995-99 by Holger Schemel.
-DOS/Windows port by Guido Schulz.
+A game for Unix/X11, DOS and Windows by Holger Schemel.
+DOS port based on code by Guido Schulz.
+(c) 1995-2000 by Holger Schemel.
 
 Introduction
 ============
 This is a nice little game with color graphics and sound for your
-Unix system with color X11. You need an 8-Bit color display or better.
-It will not work on black&white systems, and maybe not on gray scale systems.
+Unix system with color X11, DOS or Windows. You need an 8-bit color
+display or better.
+It will not work on black&white systems, and maybe not on gray scale
+systems.
 
 If you know the game "Boulderdash" (Commodore C64) or "Emerald Mine"
 (Amiga) or "Supaplex" (PC), you know what "ROCKS'N'DIAMONDS" is about.
@@ -19,18 +22,18 @@ If you know the game "Boulderdash" (Commodore C64) or "Emerald Mine"
 
 Getting started
 ===============
-Just 'cd' to the directory 'rocksndiamonds-*' (Unix) or 'rocks-*' (DOS)
-and type 'rocksndiamonds' (Linux) or 'rocks' (DOS/Windows)!
-This works only on Linux and DOS systems, because the included binary was
-compiled for Linux (i386/glibc) (if you have the Unix package) and DOS
-(if you have the DOS/Windows package).
-If you have another Unix system like HPUX, NetBSD or SUN, you first have to
-type 'make' to compile it.
+Just 'cd' to the directory 'rocksndiamonds-*' (Unix, Windows) or 'rocks-*'
+(DOS) and type 'rocksndiamonds' (Linux, Windows) or 'rocks' (DOS)!
+This works only on Linux, DOS and Windows systems, because the included
+binary was compiled for Linux (i386/glibc) (if you have the Unix package)
+and DOS or Windows (if you have the DOS or Windows package).
+If you have another Unix system like HPUX, NetBSD or Solaris, you first have
+to type 'make' to compile it. See the file 'INSTALL' for details.
 This may be needed on Linux systems, too, depending on your kernel version,
-your libc version, your binary format, your processor, ...
+your libc version, your binary format, your processor, your karma, ...
 
-(The included binary was compiled on the following system:
-AMD K6-2, kernel 2.2.1, glibc, gcc 2.7.2.3, ELF format)
+(The included Linux binary was compiled on a glibc 2.x system based on
+a 2.2.x Linux kernel and XFree86 4.0.x libraries.)
 
 
 The Menues
@@ -324,12 +327,12 @@ years like this version... ;-)
 If you have any comments, problems, suggestions, donations, flames,
 send them to
 
-	aeglos@valinor.owl.de
+	info@artsoft.org
 
 or Snail Mail to
 
 	Holger Schemel
-	Oststrasse 11a
+	Detmolder Strasse 189
 	33604 Bielefeld
 	GERMANY
 

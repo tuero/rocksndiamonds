@@ -94,9 +94,6 @@ dist-msdos:
 dist-win32:
 	./Scripts/make_dist.sh win .
 
-dist-clean:
-	@$(MAKE_CMD) dist-clean
-
 dist: dist-unix dist-msdos dist-win32
 
 depend dep:
