@@ -440,14 +440,15 @@ void InitElementGraphicInfo()
     int direction    = element_to_graphic[i].direction;
     boolean crumbled = element_to_graphic[i].crumbled;
     int graphic      = element_to_graphic[i].graphic;
+    int base_graphic = el2baseimg(element);
 
     if (graphic_info[graphic].bitmap == NULL)
       continue;
 
     if ((action > -1 || direction > -1 || crumbled == TRUE) &&
-	el2img(element) != -1)
+	base_graphic != -1)
     {
-      boolean base_redefined = getImageListEntry(el2img(element))->redefined;
+      boolean base_redefined = getImageListEntry(base_graphic)->redefined;
       boolean act_dir_redefined = getImageListEntry(graphic)->redefined;
 
       /* if the base graphic ("emerald", for example) has been redefined,
@@ -759,7 +760,8 @@ void InitElementSpecialGraphicInfo()
     int element = element_to_special_graphic[i].element;
     int special = element_to_special_graphic[i].special;
     int graphic = element_to_special_graphic[i].graphic;
-    boolean base_redefined = getImageListEntry(el2img(element))->redefined;
+    int base_graphic = el2baseimg(element);
+    boolean base_redefined = getImageListEntry(base_graphic)->redefined;
     boolean special_redefined = getImageListEntry(graphic)->redefined;
 
     /* if the base graphic ("emerald", for example) has been redefined,

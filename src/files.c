@@ -2095,6 +2095,11 @@ static void LoadLevel_InitVersion(struct LevelInfo *level, char *filename)
        pre-2.0 levels, where the game version is still taken from the
        file format version used to store the level -- see above). */
 
+#if 1
+    /* player was faster than enemies in 1.0.0 and before */
+    if (level->file_version == FILE_VERSION_1_0)
+      level->double_speed = TRUE;
+#else
     /* do some special adjustments to support older level versions */
     if (level->file_version == FILE_VERSION_1_0)
     {
@@ -2104,8 +2109,9 @@ static void LoadLevel_InitVersion(struct LevelInfo *level, char *filename)
       /* player was faster than monsters in (pre-)1.0 levels */
       level->double_speed = TRUE;
     }
+#endif
 
-    /* Default behaviour for EM style gems was "slippery" only in 2.0.1 */
+    /* default behaviour for EM style gems was "slippery" only in 2.0.1 */
     if (level->game_version == VERSION_IDENT(2,0,1,0))
       level->em_slippery_gems = TRUE;
 

@@ -2889,6 +2889,11 @@ int el_dir2img(int element, int direction)
   return el_act_dir2img(element, ACTION_DEFAULT, direction);
 }
 
+int el2baseimg(int element)
+{
+  return element_info[element].graphic[ACTION_DEFAULT];
+}
+
 int el2img(int element)
 {
   element = GFX_ELEMENT(element);

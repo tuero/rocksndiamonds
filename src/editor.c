@@ -6156,7 +6156,7 @@ void DrawLevelEd()
 
   redraw_mask |= REDRAW_ALL;
 
-  ReinitializeElementListButtons();	/* only needed after setup changes */
+  ReinitializeElementListButtons();	/* custom element may look different */
 #if 0
   ModifyEditorElementList();		/* may be needed for custom elements */
 #endif

@@ -1,3 +1,10 @@
+2004-04-07
+	* fixed bug with incorrectly initialized custom element editor graphics
+
+2004-04-04
+	* corrected set "Contributions_1995-2000/rnd_kjell_kristiansson":
+	  - number of levels corrected from 18 to 17 in "levelinfo.conf"
+
 2004-03-31
 	* fixed bug with destroyed robot wheel still attracting robots forever
 	* fixed bug with time gate switch deactivating after robot wheel time
