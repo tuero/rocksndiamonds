@@ -94,7 +94,6 @@ int		AllPlayersGone;
 int		FrameCounter, TimeFrames, TimeLeft;
 int		MampferNr, SiebAktiv;
 
-byte		network_player_action[MAX_PLAYERS];
 boolean		network_player_action_received = FALSE;
 int		TestPlayer = 0;
 

@@ -25,7 +25,7 @@
 
 void GetPlayerConfig()
 {
-  int old_joystick_nr = setup.joy_input[0].joystick_nr;
+  int old_joystick_nr = setup.input[0].joystick_nr;
 
   if (sound_status==SOUND_OFF)
     local_player->setup &= ~SETUP_SOUND;
@@ -47,14 +47,14 @@ void GetPlayerConfig()
   setup.joystick_nr = SETUP_2ND_JOYSTICK_ON(local_player->setup);
 #endif
 
-  setup.joy_input[0].joystick_nr = SETUP_2ND_JOYSTICK_ON(local_player->setup);
+  setup.input[0].joystick_nr = SETUP_2ND_JOYSTICK_ON(local_player->setup);
 
   setup.quick_doors = SETUP_QUICK_DOORS_ON(local_player->setup);
   setup.scroll_delay_on = SETUP_SCROLL_DELAY_ON(local_player->setup);
   setup.soft_scrolling_on = SETUP_SOFT_SCROLL_ON(local_player->setup);
 
 #ifndef MSDOS
-  if (setup.joy_input[0].joystick_nr != old_joystick_nr)
+  if (setup.input[0].joystick_nr != old_joystick_nr)
   {
     if (joystick_device)
       close(joystick_device);
@@ -81,6 +81,8 @@ void InitGame()
 
     player->present = FALSE;
     player->active = FALSE;
+
+    player->action = 0;
 
     /*
     player->local = FALSE;
@@ -199,7 +201,7 @@ void InitGame()
 	*/
 
 	player->present = TRUE;
-	if (player->connected)
+	if (!network_playing || player->connected)
 	{
 	  player->active = TRUE;
 
@@ -2881,7 +2883,7 @@ void PlayerActions(struct PlayerInfo *player, byte player_action)
   stored_player_action[player->index_nr] = 0;
   num_stored_actions++;
 
-  if (!player->active || player->gone)
+  if (!player->active || player->gone || tape.pausing)
     return;
 
   if (player_action)
@@ -2948,7 +2950,7 @@ void PlayerActions(struct PlayerInfo *player, byte player_action)
   }
 }
 
-void GameActions(byte player_action)
+void GameActions()
 {
   static long action_delay = 0;
   long action_delay_value;
@@ -2999,13 +3001,11 @@ void GameActions(byte player_action)
   recorded_player_action = (tape.playing ? TapePlayAction() : NULL);
 
   if (network_playing)
-    SendToServer_MovePlayer(player_action);
+    SendToServer_MovePlayer(local_player->action);
 
   for(i=0; i<MAX_PLAYERS; i++)
   {
-    int actual_player_action =
-      (network_playing ? network_player_action[i] : player_action);
-
+    int actual_player_action = stored_player[i].action;
 
     /* TEST TEST TEST */
 
@@ -3014,8 +3014,10 @@ void GameActions(byte player_action)
       actual_player_action = 0;
     */
 
+    /*
     if (!options.network && i != TestPlayer)
       actual_player_action = 0;
+    */
 
     /* TEST TEST TEST */
 
@@ -3026,7 +3028,10 @@ void GameActions(byte player_action)
     PlayerActions(&stored_player[i], actual_player_action);
     ScrollFigure(&stored_player[i], SCROLL_GO_ON);
 
-    network_player_action[i] = 0;
+    /*
+    stored_player[i].action = 0;
+    */
+
   }
 
   network_player_action_received = FALSE;
@@ -3366,6 +3371,13 @@ boolean MoveFigure(struct PlayerInfo *player, int dx, int dy)
 
     if (!IN_VIS_FIELD(SCREENX(jx),SCREENY(jy)))
     {
+
+
+      printf("prevent player %d from leaving visible screen\n",
+	     player->index_nr);
+
+
+
       /* actual player has left the screen -- scroll in that direction */
       if (jx != old_jx)		/* player has moved horizontally */
 	scroll_x += (jx - old_jx);
@@ -3376,9 +3388,19 @@ boolean MoveFigure(struct PlayerInfo *player, int dx, int dy)
     {
       if (jx != old_jx)		/* player has moved horizontally */
       {
+	/*
 	if ((scroll_x < jx-MIDPOSX-offset || scroll_x > jx-MIDPOSX+offset) &&
 	    jx >= MIDPOSX-1-offset && jx <= lev_fieldx-(MIDPOSX-offset))
-	  scroll_x = jx-MIDPOSX + (scroll_x < jx-MIDPOSX ? -offset : offset);
+	  scroll_x = jx-MIDPOSX + (scroll_x < jx-MIDPOSX ? -offset : +offset);
+	*/
+
+ 	if ((player->MovDir == MV_LEFT && scroll_x > jx-MIDPOSX+offset) ||
+	    (player->MovDir == MV_RIGHT && scroll_x < jx-MIDPOSX-offset))
+	  scroll_x = jx-MIDPOSX + (scroll_x < jx-MIDPOSX ? -offset : +offset);
+
+	/* don't scroll over playfield boundaries */
+	if (scroll_x < -1 || scroll_x > lev_fieldx - SCR_FIELDX + 2)
+	  scroll_x = (scroll_x < -1 ? -1 : lev_fieldx - SCR_FIELDX + 2);
 
 	/* don't scroll more than one field at a time */
 	scroll_x = old_scroll_x + SIGN(scroll_x - old_scroll_x);
@@ -3390,9 +3412,19 @@ boolean MoveFigure(struct PlayerInfo *player, int dx, int dy)
       }
       else			/* player has moved vertically */
       {
+	/*
 	if ((scroll_y < jy-MIDPOSY-offset || scroll_y > jy-MIDPOSY+offset) &&
 	    jy >= MIDPOSY-1-offset && jy <= lev_fieldy-(MIDPOSY-offset))
-	  scroll_y = jy-MIDPOSY + (scroll_y < jy-MIDPOSY ? -offset : offset);
+	  scroll_y = jy-MIDPOSY + (scroll_y < jy-MIDPOSY ? -offset : +offset);
+	*/
+
+	if ((player->MovDir == MV_UP && scroll_y > jy-MIDPOSY+offset) ||
+	    (player->MovDir == MV_DOWN && scroll_y < jy-MIDPOSY-offset))
+	  scroll_y = jy-MIDPOSY + (scroll_y < jy-MIDPOSY ? -offset : +offset);
+
+	/* don't scroll over playfield boundaries */
+	if (scroll_y < -1 || scroll_y > lev_fieldy - SCR_FIELDY + 2)
+	  scroll_y = (scroll_y < -1 ? -1 : lev_fieldy - SCR_FIELDY + 2);
 
 	/* don't scroll more than one field at a time */
 	scroll_y = old_scroll_y + SIGN(scroll_y - old_scroll_y);
@@ -3424,11 +3456,23 @@ boolean MoveFigure(struct PlayerInfo *player, int dx, int dy)
     {
       if (!options.network && !AllPlayersInVisibleScreen())
       {
+
+
+	printf("oops! not all players visible if we scroll now\n");
+
+
+
 	scroll_x = old_scroll_x;
 	scroll_y = old_scroll_y;
       }
       else
       {
+
+
+	printf("ok, scrolling screen...\n");
+
+
+
 	ScrollScreen(player, SCROLL_INIT);
 	ScrollLevel(old_scroll_x - scroll_x, old_scroll_y - scroll_y);
       }

@@ -74,7 +74,7 @@ int Joystick()
   } joy_ctrl;
 #endif
 
-  int joystick_nr = setup.joy_input[0].joystick_nr;
+  int joystick_nr = setup.input[0].joystick_nr;
   int js_x,js_y, js_b1,js_b2;
   int left, right, up, down;
   int result=0;

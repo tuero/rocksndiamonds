@@ -108,16 +108,16 @@ void InitLevelAndPlayerInfo()
   setup.quick_doors = FALSE;
   for (i=0; i<MAX_PLAYERS; i++)
   {
-    setup.joy_input[i].use_joystick = FALSE;
-    setup.joy_input[i].joystick_nr = i;
-    setup.joy_input[i].button_snap = JOY_BUTTON_1;
-    setup.joy_input[i].button_bomb = JOY_BUTTON_2;
-    setup.key_input[i].left = DEFAULT_KEY_LEFT;
-    setup.key_input[i].right = DEFAULT_KEY_RIGHT;
-    setup.key_input[i].up = DEFAULT_KEY_UP;
-    setup.key_input[i].down = DEFAULT_KEY_DOWN;
-    setup.key_input[i].snap = DEFAULT_KEY_SNAP;
-    setup.key_input[i].bomb = DEFAULT_KEY_BOMB;
+    setup.input[i].use_joystick = FALSE;
+    setup.input[i].joystick_nr = 0;
+    setup.input[i].joy.snap  = (i == 0 ? JOY_BUTTON_1 : 0);
+    setup.input[i].joy.bomb  = (i == 0 ? JOY_BUTTON_2 : 0);
+    setup.input[i].key.left  = (i == 0 ? DEFAULT_KEY_LEFT  : KEY_UNDEFINDED);
+    setup.input[i].key.right = (i == 0 ? DEFAULT_KEY_RIGHT : KEY_UNDEFINDED);
+    setup.input[i].key.up    = (i == 0 ? DEFAULT_KEY_UP    : KEY_UNDEFINDED);
+    setup.input[i].key.down  = (i == 0 ? DEFAULT_KEY_DOWN  : KEY_UNDEFINDED);
+    setup.input[i].key.snap  = (i == 0 ? DEFAULT_KEY_SNAP  : KEY_UNDEFINDED);
+    setup.input[i].key.bomb  = (i == 0 ? DEFAULT_KEY_BOMB  : KEY_UNDEFINDED);
   }
 
   /* choose default local player */
@@ -242,7 +242,7 @@ void InitSoundServer()
 
 void InitJoystick()
 {
-  int joystick_nr = setup.joy_input[0].joystick_nr;
+  int joystick_nr = setup.input[0].joystick_nr;
 
   if (global_joystick_status == JOYSTICK_OFF)
     return;

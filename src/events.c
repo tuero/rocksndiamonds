@@ -372,6 +372,68 @@ void HandleButton(int mx, int my, int button)
 void HandleKey(KeySym key, int key_status)
 {
   int joy = 0;
+  static struct SetupKeyboardInfo custom_key;
+  static struct
+  {
+    KeySym *keysym_custom;
+    KeySym keysym_default;
+    byte action;
+  } key_info[] =
+  {
+    { &custom_key.left,  DEFAULT_KEY_LEFT,  JOY_LEFT     },
+    { &custom_key.right, DEFAULT_KEY_RIGHT, JOY_RIGHT    },
+    { &custom_key.up,    DEFAULT_KEY_UP,    JOY_UP       },
+    { &custom_key.down,  DEFAULT_KEY_DOWN,  JOY_DOWN     },
+    { &custom_key.snap,  DEFAULT_KEY_SNAP,  JOY_BUTTON_1 },
+    { &custom_key.bomb,  DEFAULT_KEY_BOMB,  JOY_BUTTON_2 }
+  };
+
+  if (game_status == PLAYING)
+  {
+    int pnr;
+
+    for (pnr=0; pnr<MAX_PLAYERS; pnr++)
+    {
+      int i;
+      byte key_action = 0;
+
+      if (setup.input[pnr].use_joystick)
+	continue;
+
+      custom_key = setup.input[pnr].key;
+
+      for (i=0; i<6; i++)
+	if (key == *key_info[i].keysym_custom)
+	  key_action |= key_info[i].action;
+
+      if (key_status == KEY_PRESSED)
+      {
+	if (network_playing)
+	  local_player->action |= key_action;
+	else
+	  stored_player[pnr].action |= key_action;
+      }
+      else
+      {
+	if (network_playing)
+	  local_player->action &= ~key_action;
+	else
+	  stored_player[pnr].action &= ~key_action;
+      }
+    }
+  }
+  else
+  {
+    int i;
+
+    for (i=0; i<6; i++)
+      if (key == key_info[i].keysym_default)
+	joy |= key_info[i].action;
+  }
+
+
+#if 0
+
 
   /* Map cursor keys to joystick directions */
 
@@ -507,6 +569,10 @@ void HandleKey(KeySym key, int key_status)
       break;
   }
 
+
+#endif
+
+
   if (joy)
   {
     if (key_status == KEY_PRESSED)
@@ -616,6 +682,8 @@ void HandleKey(KeySym key, int key_status)
 		 GAME_FRAME_DELAY * 100 / GameFrameDelay, GameFrameDelay);
 	  break;
 
+
+#if 0
 	case XK_a:
 	  if (ScrollStepSize == TILEX/8)
 	    ScrollStepSize = TILEX/4;
@@ -623,6 +691,7 @@ void HandleKey(KeySym key, int key_status)
 	    ScrollStepSize = TILEX/8;
 	  printf("ScrollStepSize == %d\n", ScrollStepSize);
 	  break;
+#endif
 
 	case XK_f:
 	  ScrollStepSize = TILEX/8;
@@ -706,6 +775,8 @@ void HandleKey(KeySym key, int key_status)
 
 	  break;
 
+
+#if 0
 	case XK_y:
 	  /*
 	  {
@@ -724,6 +795,8 @@ void HandleKey(KeySym key, int key_status)
 	  printf("direct_draw_on == %d\n", setup.direct_draw_on);
 
 	  break;
+#endif
+
 
 	case XK_z:
 	  {
@@ -861,10 +934,17 @@ void HandleJoystick()
 	return;
       }
 
+      /*
       if (tape.pausing || AllPlayersGone)
-	joy = 0;
+      {
+	int i;
 
-      HandleGameActions((byte)joy);
+	for (i=0; i<MAX_PLAYERS; i++)
+	  stored_player[i].action = 0;
+      }
+      */
+
+      HandleGameActions();
       break;
 
     default:

@@ -74,7 +74,7 @@ void AusgangstuerBlinken(int, int);
 void EdelsteinFunkeln(int, int);
 void MauerWaechst(int, int);
 void MauerAbleger(int, int);
-void GameActions(byte);
+void GameActions(void);
 void ScrollLevel(int, int);
 
 boolean MoveFigureOneStep(struct PlayerInfo *, int, int, int, int);

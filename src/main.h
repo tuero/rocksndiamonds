@@ -229,10 +229,8 @@ struct SetupKeyboardInfo
 
 struct SetupJoystickInfo
 {
-  boolean use_joystick;
-  int joystick_nr;
-  int button_snap;
-  int button_bomb;
+  int snap;
+  int bomb;
 };
 
 struct SetupInfo
@@ -248,8 +246,13 @@ struct SetupInfo
   boolean fading_on;
   boolean autorecord_on;
   boolean quick_doors;
-  struct SetupKeyboardInfo key_input[MAX_PLAYERS];
-  struct SetupJoystickInfo joy_input[MAX_PLAYERS];
+  struct
+  {
+    boolean use_joystick;
+    int joystick_nr;
+    struct SetupJoystickInfo joy;
+    struct SetupKeyboardInfo key;
+  } input[MAX_PLAYERS];
 };
 
 struct PlayerInfo
@@ -260,6 +263,8 @@ struct PlayerInfo
   boolean active;		/* player (present && connected) */
 
   int index_nr, client_nr, element_nr;
+
+  byte action;
 
   char login_name[MAX_NAMELEN];
   char alias_name[MAX_NAMELEN];
@@ -414,7 +419,6 @@ extern int		AllPlayersGone;
 extern int		FrameCounter, TimeFrames, TimeLeft;
 extern int		MampferNr, SiebAktiv;
 
-extern byte		network_player_action[];
 extern boolean		network_player_action_received;
 extern int		TestPlayer;
 
@@ -1008,12 +1012,15 @@ extern int		num_bg_loops;
 				 (s)==SND_TWILIGHT)
 
 /* default input keys */
+#define KEY_UNDEFINDED		0
 #define DEFAULT_KEY_LEFT	XK_Left
 #define DEFAULT_KEY_RIGHT	XK_Right
 #define DEFAULT_KEY_UP		XK_Up
 #define DEFAULT_KEY_DOWN	XK_Down
 #define DEFAULT_KEY_SNAP	XK_Shift_L
 #define DEFAULT_KEY_BOMB	XK_Shift_R
+#define DEFAULT_KEY_OKAY	XK_Return
+#define DEFAULT_KEY_CANCEL	XK_Escape
 
 /* directions for moving */
 #define MV_NO_MOVING		0

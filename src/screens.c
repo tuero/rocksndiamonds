@@ -1157,34 +1157,29 @@ static void drawPlayerSetupInputInfo(int player_nr)
 {
   int i;
   static struct SetupKeyboardInfo custom_key;
-  static KeySym *key[] =
+  static struct
   {
-    &custom_key.left,
-    &custom_key.right,
-    &custom_key.up,
-    &custom_key.down,
-    &custom_key.snap,
-    &custom_key.bomb
-  };
-  static char *joy_text[] =
+    KeySym *keysym;
+    char *text;
+  } custom[] =
   {
-    "Joystick Left",
-    "Joystick Right",
-    "Joystick Up",
-    "Joystick Down",
-    "Button 1",
-    "Button 2",
+    { &custom_key.left,  "Joystick Left"  },
+    { &custom_key.right, "Joystick Right" },
+    { &custom_key.up,    "Joystick Up"    },
+    { &custom_key.down,  "Joystick Down"  },
+    { &custom_key.snap,  "Button 1"       },
+    { &custom_key.bomb,  "Button 2"       }
   };
 
-  custom_key = setup.key_input[player_nr];
+  custom_key = setup.input[player_nr].key;
 
   DrawText(SX+11*32, SY+2*32, int2str(player_nr + 1, 1), FS_BIG, FC_RED);
   DrawGraphic(8, 2, GFX_SPIELER1 + player_nr);
 
-  if (setup.joy_input[player_nr].use_joystick)
+  if (setup.input[player_nr].use_joystick)
   {
     DrawText(SX+8*32, SY+3*32,
-	     (setup.joy_input[player_nr].joystick_nr == 0 ?
+	     (setup.input[player_nr].joystick_nr == 0 ?
 	      "Joystick1" : "Joystick2"),
 	     FS_BIG, FC_YELLOW);
     DrawText(SX+32, SY+4*32, "Calibrate", FS_BIG, FC_GREEN);
@@ -1214,9 +1209,9 @@ static void drawPlayerSetupInputInfo(int player_nr)
     DrawText(SX + 3*32, SY + ypos*32,
 	     "              ", FS_BIG, FC_YELLOW);
     DrawText(SX + 3*32, SY + ypos*32,
-	     (setup.joy_input[player_nr].use_joystick ?
-	      joy_text[i] :
-	      getKeySymName(*key[i])),
+	     (setup.input[player_nr].use_joystick ?
+	      custom[i].text :
+	      getKeySymName(*custom[i].keysym)),
 	     FS_BIG, FC_YELLOW);
   }
 }
@@ -1313,25 +1308,25 @@ void HandleSetupInputScreen(int mx, int my, int dx, int dy, int button)
 	int one_joystick_nr       = (dx >= 0 ? 0 : 1);
 	int the_other_joystick_nr = (dx >= 0 ? 1 : 0);
 
-	if (setup.joy_input[player_nr].use_joystick)
+	if (setup.input[player_nr].use_joystick)
 	{
-	  if (setup.joy_input[player_nr].joystick_nr == one_joystick_nr)
-	    setup.joy_input[player_nr].joystick_nr = the_other_joystick_nr;
+	  if (setup.input[player_nr].joystick_nr == one_joystick_nr)
+	    setup.input[player_nr].joystick_nr = the_other_joystick_nr;
 	  else
-	    setup.joy_input[player_nr].use_joystick = FALSE;
+	    setup.input[player_nr].use_joystick = FALSE;
 	}
 	else
 	{
-	  setup.joy_input[player_nr].use_joystick = TRUE;
-	  setup.joy_input[player_nr].joystick_nr = one_joystick_nr;
+	  setup.input[player_nr].use_joystick = TRUE;
+	  setup.input[player_nr].joystick_nr = one_joystick_nr;
 	}
 
 	drawPlayerSetupInputInfo(player_nr);
       }
       else if (y == 5)
       {
-	if (setup.joy_input[player_nr].use_joystick)
-	  CalibrateJoystick(setup.joy_input[player_nr].joystick_nr);
+	if (setup.input[player_nr].use_joystick)
+	  CalibrateJoystick(setup.input[player_nr].joystick_nr);
 	else
 	  CustomizeKeyboard(player_nr);
 
@@ -1374,7 +1369,7 @@ void CustomizeKeyboard(int player_nr)
   };
 
   /* read existing key bindings from player setup */
-  custom_key = setup.key_input[player_nr];
+  custom_key = setup.input[player_nr].key;
 
   ClearWindow();
   DrawText(SX + 16, SY + 16, "Keyboard Input", FS_BIG, FC_YELLOW);
@@ -1473,7 +1468,7 @@ void CustomizeKeyboard(int player_nr)
   }
 
   /* write new key bindings back to player setup */
-  setup.key_input[player_nr] = custom_key;
+  setup.input[player_nr].key = custom_key;
 
   StopAnimation();
   DrawSetupInputScreen();
@@ -1678,7 +1673,7 @@ void CalibrateJoystick_OLD()
   char joy_nr[4];
 #endif
 
-  int joystick_nr = setup.joy_input[0].joystick_nr;
+  int joystick_nr = setup.input[0].joystick_nr;
   int new_joystick_xleft, new_joystick_xright, new_joystick_xmiddle;
   int new_joystick_yupper, new_joystick_ylower, new_joystick_ymiddle;
 
@@ -1833,7 +1828,7 @@ void CalibrateJoystick_OLD()
   DrawSetupScreen();
 }
 
-void HandleGameActions(byte player_action)
+void HandleGameActions()
 {
   if (game_status != PLAYING)
     return;
@@ -1844,7 +1839,7 @@ void HandleGameActions(byte player_action)
   if (AllPlayersGone && !TAPE_IS_STOPPED(tape))
     TapeStop();
 
-  GameActions(player_action);
+  GameActions();
 
   BackToFront();
 }

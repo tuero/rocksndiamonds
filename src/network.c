@@ -568,7 +568,7 @@ static void Handle_OP_MOVE_FIGURE(unsigned int len)
 
   /* copy valid player actions */
   for (i=0; i<MAX_PLAYERS; i++)
-    network_player_action[i] =
+    stored_player[i].action =
       (i < len - 6 && stored_player[i].active ? buf[6 + i] : 0);
 
   network_player_action_received = TRUE;
