@@ -4828,7 +4828,6 @@ void GameActions()
 
     if (game.magic_wall_active)
     {
-      boolean sieb = FALSE;
       int jx = local_player->jx, jy = local_player->jy;
 
       /* play the element sound at the position nearest to the player */

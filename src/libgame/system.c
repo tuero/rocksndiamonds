@@ -391,7 +391,7 @@ inline static void FreeBitmapPointers(Bitmap *bitmap)
   bitmap->surface_masked = NULL;
 #else
   /* The X11 version seems to have a memory leak here -- although
-     "XFreePixmap()" is called, the correspondig memory seems not
+     "XFreePixmap()" is called, the corresponding memory seems not
      to be freed (according to "ps"). The SDL version apparently
      does not have this problem. */
 
@@ -876,6 +876,49 @@ Bitmap *ZoomBitmap(Bitmap *src_bitmap, int zoom_width, int zoom_height)
 #endif
 
   return dst_bitmap;
+}
+
+void CreateBitmapWithSmallBitmaps(Bitmap *src_bitmap)
+{
+  Bitmap *tmp_bitmap, *tmp_bitmap_2, *tmp_bitmap_4, *tmp_bitmap_8;
+  int src_width, src_height;
+  int tmp_width, tmp_height;
+
+  src_width  = src_bitmap->width;
+  src_height = src_bitmap->height;
+
+  tmp_width  = src_width;
+  tmp_height = src_height + src_height / 2;
+
+  tmp_bitmap = CreateBitmap(tmp_width, tmp_height, DEFAULT_DEPTH);
+
+  tmp_bitmap_2 = ZoomBitmap(src_bitmap, src_width / 2, src_height / 2);
+  tmp_bitmap_4 = ZoomBitmap(src_bitmap, src_width / 4, src_height / 4);
+  tmp_bitmap_8 = ZoomBitmap(src_bitmap, src_width / 8, src_height / 8);
+
+  BlitBitmap(src_bitmap, tmp_bitmap, 0, 0, src_width, src_height, 0, 0);
+  BlitBitmap(tmp_bitmap_2, tmp_bitmap, 0, 0, src_width / 2, src_height / 2,
+	     0, src_height);
+  BlitBitmap(tmp_bitmap_4, tmp_bitmap, 0, 0, src_width / 4, src_height / 4,
+	     src_width / 2, src_height);
+  BlitBitmap(tmp_bitmap_8, tmp_bitmap, 0, 0, src_width / 8, src_height / 8,
+	     3 * src_width / 4, src_height);
+
+  FreeBitmap(tmp_bitmap_2);
+  FreeBitmap(tmp_bitmap_4);
+  FreeBitmap(tmp_bitmap_8);
+
+#ifdef TARGET_SDL
+  src_bitmap->surface = tmp_bitmap->surface;
+  tmp_bitmap->surface = NULL;
+#else
+  src_bitmap->drawable = tmp_bitmap->drawable;
+  tmp_bitmap->drawable = None;
+#endif
+
+  src_bitmap->height = tmp_bitmap->height;
+
+  FreeBitmap(tmp_bitmap);
 }
 
 

@@ -708,6 +708,7 @@ struct ImageInfo
   int num_references;
 
   Bitmap *bitmap;
+  boolean contains_small_images;
 };
 typedef struct ImageInfo ImageInfo;
 
@@ -732,6 +733,8 @@ static void *Load_PCX(char *filename)
   }
 
   img_info->source_filename = getStringCopy(filename);
+
+  img_info->contains_small_images = FALSE;
 
   return img_info;
 }
@@ -767,7 +770,7 @@ struct FileInfo *getImageListEntry(int pos)
 	  &image_info->dynamic_file_list[list_pos]);
 }
 
-Bitmap *getBitmapFromImageID(int pos)
+static ImageInfo *getImageInfoEntryFromImageID(int pos)
 {
   int num_list_entries = image_info->num_file_list_entries;
   int list_pos = (pos < num_list_entries ? pos : pos - num_list_entries);
@@ -775,7 +778,24 @@ Bitmap *getBitmapFromImageID(int pos)
     (ImageInfo **)(pos < num_list_entries ? image_info->artwork_list :
 		   image_info->dynamic_artwork_list);
 
+  return img_info[list_pos];
+}
+
+Bitmap *getBitmapFromImageID(int pos)
+{
+#if 0
+  int num_list_entries = image_info->num_file_list_entries;
+  int list_pos = (pos < num_list_entries ? pos : pos - num_list_entries);
+  ImageInfo **img_info =
+    (ImageInfo **)(pos < num_list_entries ? image_info->artwork_list :
+		   image_info->dynamic_artwork_list);
+
   return (img_info[list_pos] != NULL ? img_info[list_pos]->bitmap : NULL);
+#else
+  ImageInfo *img_info = getImageInfoEntryFromImageID(pos);
+
+  return (img_info != NULL ? img_info->bitmap : NULL);
+#endif
 }
 
 char *getTokenFromImageID(int graphic)
@@ -865,23 +885,6 @@ void InitImageList(struct ConfigInfo *config_list, int num_file_list_entries,
   image_info->free_artwork = FreeImage;
 }
 
-void dumpImages()
-{
-  struct ListNode *node;
-
-  if (image_info->content_list == NULL)
-    return;
-
-  for (node = image_info->content_list; node != NULL; node = node->next)
-  {
-    ImageInfo *img_info = (ImageInfo *)node->content;
-
-    printf("---> '%s' [%d]\n",
-	   img_info->source_filename,
-	   img_info->num_references);
-  }
-}
-
 void ReloadCustomImages()
 {
 #if 0
@@ -890,8 +893,20 @@ void ReloadCustomImages()
 
   LoadArtworkConfig(image_info);
   ReloadCustomArtworkList(image_info);
+}
 
-  dumpImages();
+void CreateImageWithSmallImages(int pos)
+{
+  ImageInfo *img_info = getImageInfoEntryFromImageID(pos);
+
+  if (img_info == NULL || img_info->contains_small_images)
+    return;
+
+  printf("    creating small image for '%s'\n", img_info->source_filename);
+
+  CreateBitmapWithSmallBitmaps(img_info->bitmap);
+
+  img_info->contains_small_images = TRUE;
 }
 
 void FreeAllImages()

@@ -1107,12 +1107,21 @@ SDL_Surface *zoomSurface(SDL_Surface *src, int dst_width, int dst_height)
 
 void SDLZoomBitmap(Bitmap *src_bitmap, Bitmap *dst_bitmap)
 {
+  SDL_Surface *sdl_surface_tmp;
   int dst_width = dst_bitmap->width;
   int dst_height = dst_bitmap->height;
 
+  /* throw away old destination surface */
   SDL_FreeSurface(dst_bitmap->surface);
 
-  dst_bitmap->surface = zoomSurface(src_bitmap->surface, dst_width,dst_height);
+  /* create zoomed temporary surface from source surface */
+  sdl_surface_tmp = zoomSurface(src_bitmap->surface, dst_width, dst_height);
+
+  /* create native format destination surface from zoomed temporary surface */
+  dst_bitmap->surface = SDL_DisplayFormat(sdl_surface_tmp);
+
+  /* free temporary surface */
+  SDL_FreeSurface(sdl_surface_tmp);
 }
 
 

@@ -652,6 +652,7 @@ Bitmap *LoadCustomImage(char *);
 void ReloadCustomImage(Bitmap *, char *);
 
 Bitmap *ZoomBitmap(Bitmap *, int, int);
+void CreateBitmapWithSmallBitmaps(Bitmap *);
 
 inline void OpenAudio(void);
 inline void CloseAudio(void);

@@ -57,29 +57,30 @@ static char *image_filename[NUM_PICTURES] =
 
 static Bitmap *bitmap_font_initial = NULL;
 
-static void InitGlobal(void);
-static void InitSetup(void);
-static void InitPlayerInfo(void);
-static void InitLevelInfo(void);
-static void InitArtworkInfo(void);
-static void InitLevelArtworkInfo(void);
-static void InitNetworkServer(void);
-static void InitArtworkConfig(void);
-static void InitImages(void);
-static void InitMixer(void);
-static void InitSound(void);
-static void InitMusic(void);
-static void InitGfx(void);
-static void InitGfxBackground(void);
-static void InitGadgets(void);
-static void InitElementProperties(void);
-static void InitElementGraphicInfo(void);
-static void InitElementSoundInfo(void);
-static void InitGraphicInfo(void);
+static void InitGlobal();
+static void InitSetup();
+static void InitPlayerInfo();
+static void InitLevelInfo();
+static void InitArtworkInfo();
+static void InitLevelArtworkInfo();
+static void InitNetworkServer();
+static void InitArtworkConfig();
+static void InitImages();
+static void InitMixer();
+static void InitSound();
+static void InitMusic();
+static void InitGfx();
+static void InitGfxBackground();
+static void InitGadgets();
+static void InitElementImages();
+static void InitElementGraphicInfo();
+static void InitElementSoundInfo();
+static void InitElementProperties();
+static void InitGraphicInfo();
 static void InitSoundInfo();
 static void Execute_Command(char *);
 
-void OpenAll(void)
+void OpenAll()
 {
   InitGlobal();		/* initialize some global variables */
 
@@ -263,6 +264,7 @@ static void ReinitializeGraphics()
 
 
   /* !!! TEST ONLY !!! */
+  if (0)
   {
     Bitmap *tst_bitmap = graphic_info[IMG_SAND].bitmap;
     Bitmap *tmp_bitmap = ZoomBitmap(tst_bitmap,
@@ -272,6 +274,20 @@ static void ReinitializeGraphics()
     BlitBitmap(tmp_bitmap, tst_bitmap, 0, 0, 256, 224, 0, 448);
 
     FreeBitmap(tmp_bitmap);
+  }
+
+  if (1)
+  {
+    printf("CREATING SMALL IMAGES...\n");
+
+#if 1
+    InitElementImages();
+#else
+    CreateImageWithSmallImages(IMG_SAND);
+    CreateImageWithSmallImages(IMG_SAND);
+#endif
+
+    printf("DONE!\n");
   }
 }
 
@@ -719,6 +735,21 @@ void InitGadgets()
   CreateScreenGadgets();
 
   gadgets_initialized = TRUE;
+}
+
+void InitElementImages()
+{
+  struct PropertyMapping *property_mapping = getImageListPropertyMapping();
+  int num_property_mappings = getImageListPropertyMappingSize();
+  int i;
+
+  /* initialize images from static configuration */
+  for (i=0; element_to_graphic[i].element > -1; i++)
+    CreateImageWithSmallImages(element_to_graphic[i].graphic);
+
+  /* initialize images from dynamic configuration */
+  for (i=0; i < num_property_mappings; i++)
+    CreateImageWithSmallImages(property_mapping[i].artwork_index);
 }
 
 void InitElementGraphicInfo()
