@@ -74,6 +74,8 @@ void setElementChangeInfoToDefaults(struct ElementChangeInfo *change)
   change->can_change = FALSE;
 
   change->events = CE_BITMASK_DEFAULT;
+  change->sides = CH_SIDE_ANY;
+
   change->target_element = EL_EMPTY_SPACE;
 
   change->delay_fixed = 0;

@@ -169,7 +169,9 @@ static void KillHeroUnlessProtected(int, int);
 static void TestIfPlayerTouchesCustomElement(int, int);
 static void TestIfElementTouchesCustomElement(int, int);
 
+static boolean CheckTriggeredElementSideChange(int, int, int, int, int);
 static boolean CheckTriggeredElementChange(int, int, int, int);
+static boolean CheckElementSideChange(int, int, int, int, int, int);
 static boolean CheckElementChange(int, int, int, int);
 
 static void PlaySoundLevel(int, int, int);
@@ -819,33 +821,6 @@ static void InitGameEngine()
     ei->change->post_change_function = ch_delay->post_change_function;
 
     ei->change_events |= CH_EVENT_BIT(CE_DELAY);
-  }
-
-  /* set summarized change event CE_TOUCHING_ANY_SIDE_OF */
-  for (i=0; i < NUM_CUSTOM_ELEMENTS; i++)
-  {
-    struct ElementInfo *ei = &element_info[EL_CUSTOM_START + i];
-
-    for (j=0; j < ei->num_change_pages; j++)
-    {
-      if (!ei->change_page[j].can_change)
-	continue;
-
-      /* check for change event of touching other element on some side */
-      if (ei->change_page[j].events & (CH_EVENT_BIT(CE_TOUCHING_ANY_SIDE_OF |
-						    CE_TOUCHING_LEFT_OF |
-						    CE_TOUCHING_RIGHT_OF |
-						    CE_TOUCHING_TOP_OF |
-						    CE_TOUCHING_BOTTOM_OF)))
-	ei->change_page[j].events |= CH_EVENT_BIT(CE_TOUCHING_SOME_SIDE);
-
-      /* add change event for each side when event exists for any side */
-      if (ei->change_page[j].events & CH_EVENT_BIT(CE_TOUCHING_ANY_SIDE_OF))
-	ei->change_page[j].events |= (CH_EVENT_BIT(CE_TOUCHING_LEFT_OF) |
-				      CH_EVENT_BIT(CE_TOUCHING_RIGHT_OF) |
-				      CH_EVENT_BIT(CE_TOUCHING_TOP_OF) |
-				      CH_EVENT_BIT(CE_TOUCHING_BOTTOM_OF));
-    }
   }
 
 #if 1
@@ -5611,25 +5586,20 @@ static void ChangeElement(int x, int y, int page)
   }
 }
 
-static boolean CheckTriggeredElementChange(int lx, int ly, int trigger_element,
-					   int trigger_event)
+static boolean CheckTriggeredElementSideChange(int lx, int ly,
+					       int trigger_element,
+					       int trigger_side,
+					       int trigger_event)
 {
   int i, j, x, y;
 
   if (!(trigger_events[trigger_element] & CH_EVENT_BIT(trigger_event)))
     return FALSE;
 
-#if 0
-  /* prevent this function from running into a loop */
-  if (trigger_event == CE_OTHER_IS_CHANGING)
-    Changed[lx][ly] = TRUE;
-#endif
-
   for (i=0; i < NUM_CUSTOM_ELEMENTS; i++)
   {
     int element = EL_CUSTOM_START + i;
 
-#if 1
     boolean change_element = FALSE;
     int page;
 
@@ -5639,8 +5609,10 @@ static boolean CheckTriggeredElementChange(int lx, int ly, int trigger_element,
 
     for (j=0; j < element_info[element].num_change_pages; j++)
     {
-      if (element_info[element].change_page[j].trigger_element ==
-	  trigger_element)
+      struct ElementChangeInfo *change = &element_info[element].change_page[j];
+
+      if (change->sides & trigger_side &&
+	  change->trigger_element == trigger_element)
       {
 	change_element = TRUE;
 	page = j;
@@ -5652,20 +5624,10 @@ static boolean CheckTriggeredElementChange(int lx, int ly, int trigger_element,
     if (!change_element)
       continue;
 
-#else
-    if (!CAN_CHANGE(element) ||
-	!HAS_ANY_CHANGE_EVENT(element, trigger_event) ||
-	element_info[element].change->trigger_element != trigger_element)
-      continue;
-#endif
-
     for (y=0; y<lev_fieldy; y++) for (x=0; x<lev_fieldx; x++)
     {
-      if (x == lx && y == ly)	/* do not change trigger element itself */
-	continue;
-
 #if 0
-      if (Changed[x][y])	/* do not change already changed elements */
+      if (x == lx && y == ly)	/* do not change trigger element itself */
 	continue;
 #endif
 
@@ -5674,31 +5636,37 @@ static boolean CheckTriggeredElementChange(int lx, int ly, int trigger_element,
 	ChangeDelay[x][y] = 1;
 	ChangeEvent[x][y] = CH_EVENT_BIT(trigger_event);
 	ChangeElement(x, y, page);
-
-#if 0
-	Changed[x][y] = TRUE;	/* prevent element from being changed again */
-#endif
       }
     }
   }
 
-#if 0
-  /* reset change prevention array */
-  for (y=0; y<lev_fieldy; y++) for (x=0; x<lev_fieldx; x++)
-    Changed[x][y] = FALSE;
-#endif
-
   return TRUE;
 }
 
-static boolean CheckElementChangeExt(int x, int y, int element,
-				     int trigger_event, int page)
+static boolean CheckTriggeredElementChange(int lx, int ly, int trigger_element,
+					   int trigger_event)
+{
+  return CheckTriggeredElementSideChange(lx, ly, trigger_element, CH_SIDE_ANY,
+					 trigger_event);
+}
+
+static boolean CheckElementSideChange(int x, int y, int element, int side,
+				      int trigger_event, int page)
 {
   if (!CAN_CHANGE(element) || !HAS_ANY_CHANGE_EVENT(element, trigger_event))
     return FALSE;
 
   if (Feld[x][y] == EL_BLOCKED)
+  {
     Blocked2Moving(x, y, &x, &y);
+    element = Feld[x][y];
+  }
+
+  if (page < 0)
+    page = element_info[element].event_page_num[trigger_event];
+
+  if (!(element_info[element].change_page[page].sides & side))
+    return FALSE;
 
   ChangeDelay[x][y] = 1;
   ChangeEvent[x][y] = CH_EVENT_BIT(trigger_event);
@@ -5709,9 +5677,7 @@ static boolean CheckElementChangeExt(int x, int y, int element,
 
 static boolean CheckElementChange(int x, int y, int element, int trigger_event)
 {
-  int page = element_info[element].event_page_num[trigger_event];
-
-  return CheckElementChangeExt(x, y, element, trigger_event, page);
+  return CheckElementSideChange(x, y, element, CH_SIDE_ANY, trigger_event, -1);
 }
 
 static void PlayerActions(struct PlayerInfo *player, byte player_action)
@@ -6435,8 +6401,22 @@ static void CheckGravityMovement(struct PlayerInfo *player)
 boolean MoveFigureOneStep(struct PlayerInfo *player,
 			  int dx, int dy, int real_dx, int real_dy)
 {
+  static int change_sides[4][2] =
+  {
+    /* enter side        leave side */
+    { CH_SIDE_RIGHT,	CH_SIDE_LEFT	},	/* moving left  */
+    { CH_SIDE_LEFT,	CH_SIDE_RIGHT	},	/* moving right */
+    { CH_SIDE_BOTTOM,	CH_SIDE_TOP	},	/* moving up    */
+    { CH_SIDE_TOP,	CH_SIDE_BOTTOM	}	/* moving down  */
+  };
+  int move_direction = (dx == -1 ? MV_LEFT :
+			dx == +1 ? MV_RIGHT :
+			dy == -1 ? MV_UP :
+			dy == +1 ? MV_DOWN : MV_NO_MOVING);
+  int enter_side = change_sides[MV_DIR_BIT(move_direction)][0];
+  int leave_side = change_sides[MV_DIR_BIT(move_direction)][1];
   int jx = player->jx, jy = player->jy;
-  int new_jx = jx+dx, new_jy = jy+dy;
+  int new_jx = jx + dx, new_jy = jy + dy;
   int element;
   int can_move;
 
@@ -6488,14 +6468,32 @@ boolean MoveFigureOneStep(struct PlayerInfo *player,
   StorePlayer[jx][jy] = 0;
   player->last_jx = jx;
   player->last_jy = jy;
-  jx = player->jx = new_jx;
-  jy = player->jy = new_jy;
-  StorePlayer[jx][jy] = player->element_nr;
+  player->jx = new_jx;
+  player->jy = new_jy;
+  StorePlayer[new_jx][new_jy] = player->element_nr;
 
   player->MovPos =
     (dx > 0 || dy > 0 ? -1 : 1) * (TILEX - TILEX / player->move_delay_value);
 
   ScrollFigure(player, SCROLL_INIT);
+
+#if 1
+  if (IS_CUSTOM_ELEMENT(Feld[jx][jy]))
+  {
+    CheckTriggeredElementSideChange(jx, jy, Feld[jx][jy], leave_side,
+				    CE_OTHER_GETS_LEFT);
+    CheckElementSideChange(jx, jy, Feld[jx][jy], leave_side,
+			   CE_LEFT_BY_PLAYER, -1);
+  }
+
+  if (IS_CUSTOM_ELEMENT(Feld[new_jx][new_jy]))
+  {
+    CheckTriggeredElementSideChange(new_jx, new_jy, Feld[new_jx][new_jy],
+				    enter_side, CE_OTHER_GETS_ENTERED);
+    CheckElementSideChange(new_jx, new_jy, Feld[new_jx][new_jy], enter_side,
+			   CE_ENTERED_BY_PLAYER, -1);
+  }
+#endif
 
   return MF_MOVING;
 }
@@ -6835,16 +6833,16 @@ void TestIfElementTouchesCustomElement(int x, int y)
     { +1, 0 },
     { 0, +1 }
   };
-  static int touching_side[4][2] =
+  static int change_sides[4][2] =
   {
-    { CE_TOUCHING_TOP_OF,	CE_TOUCHING_BOTTOM_OF	},
-    { CE_TOUCHING_LEFT_OF,	CE_TOUCHING_RIGHT_OF	},
-    { CE_TOUCHING_RIGHT_OF,	CE_TOUCHING_LEFT_OF	},
-    { CE_TOUCHING_BOTTOM_OF,	CE_TOUCHING_TOP_OF	}
+    /* center side       border side */
+    { CH_SIDE_TOP,	CH_SIDE_BOTTOM	},	/* check top    */
+    { CH_SIDE_LEFT,	CH_SIDE_RIGHT	},	/* check left   */
+    { CH_SIDE_RIGHT,	CH_SIDE_LEFT	},	/* check right  */
+    { CH_SIDE_BOTTOM,	CH_SIDE_TOP	}	/* check bottom */
   };
   boolean change_center_element = FALSE;
   int center_element_change_page = 0;
-  int center_element_change_event = 0;
   int center_element = Feld[x][y];
   int i, j;
 
@@ -6859,8 +6857,8 @@ void TestIfElementTouchesCustomElement(int x, int y)
   {
     int xx = x + xy[i][0];
     int yy = y + xy[i][1];
-    int change_event_center = touching_side[i][0];
-    int change_event_border = touching_side[i][1];
+    int center_side = change_sides[i][0];
+    int border_side = change_sides[i][1];
     int border_element;
 
     if (!IN_LEV_FIELD(xx, yy))
@@ -6870,7 +6868,7 @@ void TestIfElementTouchesCustomElement(int x, int y)
 
     /* check for change of center element (but change it only once) */
     if (IS_CUSTOM_ELEMENT(center_element) &&
-	HAS_ANY_CHANGE_EVENT(center_element, change_event_border) &&
+	HAS_ANY_CHANGE_EVENT(center_element, CE_OTHER_IS_TOUCHING) &&
 	!change_center_element)
     {
       for (j=0; j < element_info[center_element].num_change_pages; j++)
@@ -6878,12 +6876,12 @@ void TestIfElementTouchesCustomElement(int x, int y)
 	struct ElementChangeInfo *change =
 	  &element_info[center_element].change_page[j];
 
-	if (change->events & CH_EVENT_BIT(change_event_border) &&
+	if (change->events & CH_EVENT_BIT(CE_OTHER_IS_TOUCHING) &&
+	    change->sides & border_side &&
 	    change->trigger_element == border_element)
 	{
 	  change_center_element = TRUE;
 	  center_element_change_page = j;
-	  center_element_change_event = change_event_border;
 
 	  break;
 	}
@@ -6892,17 +6890,19 @@ void TestIfElementTouchesCustomElement(int x, int y)
 
     /* check for change of border element */
     if (IS_CUSTOM_ELEMENT(border_element) &&
-	HAS_ANY_CHANGE_EVENT(border_element, change_event_center))
+	HAS_ANY_CHANGE_EVENT(border_element, CE_OTHER_IS_TOUCHING))
     {
       for (j=0; j < element_info[border_element].num_change_pages; j++)
       {
 	struct ElementChangeInfo *change =
 	  &element_info[border_element].change_page[j];
 
-	if (change->events & CH_EVENT_BIT(change_event_center) &&
+	if (change->events & CH_EVENT_BIT(CE_OTHER_IS_TOUCHING) &&
+	    change->sides & center_side &&
 	    change->trigger_element == center_element)
 	{
-	  CheckElementChangeExt(xx,yy, border_element, change_event_center, j);
+	  CheckElementSideChange(xx, yy, border_element, CH_SIDE_ANY,
+				 CE_OTHER_IS_TOUCHING, j);
 	  break;
 	}
       }
@@ -6910,8 +6910,8 @@ void TestIfElementTouchesCustomElement(int x, int y)
   }
 
   if (change_center_element)
-    CheckElementChangeExt(x, y, center_element, center_element_change_event,
-			  center_element_change_page);
+    CheckElementSideChange(x, y, center_element, CH_SIDE_ANY,
+			   CE_OTHER_IS_TOUCHING, center_element_change_page);
 
 #if 0
   check_changing = FALSE;
@@ -7247,6 +7247,16 @@ static boolean checkDiagonalPushing(struct PlayerInfo *player,
 int DigField(struct PlayerInfo *player,
 	     int x, int y, int real_dx, int real_dy, int mode)
 {
+#if 0
+  static int change_sides[4][2] =
+  {
+    /* enter side        leave side */
+    { CH_SIDE_RIGHT,	CH_SIDE_LEFT	},	/* moving left  */
+    { CH_SIDE_LEFT,	CH_SIDE_RIGHT	},	/* moving right */
+    { CH_SIDE_BOTTOM,	CH_SIDE_TOP	},	/* moving up    */
+    { CH_SIDE_TOP,	CH_SIDE_BOTTOM	}	/* moving down  */
+  };
+#endif
   boolean use_spring_bug = (game.engine_version < VERSION_IDENT(2,2,0));
   int jx = player->jx, jy = player->jy;
   int dx = x - jx, dy = y - jy;
@@ -7255,6 +7265,10 @@ int DigField(struct PlayerInfo *player,
 			dx == +1 ? MV_RIGHT :
 			dy == -1 ? MV_UP :
 			dy == +1 ? MV_DOWN : MV_NO_MOVING);
+#if 0
+  int enter_side = change_sides[MV_DIR_BIT(move_direction)][0];
+  int leave_side = change_sides[MV_DIR_BIT(move_direction)][1];
+#endif
   int element;
 
   if (player->MovPos == 0)
@@ -7811,6 +7825,24 @@ int DigField(struct PlayerInfo *player,
 
   if (Feld[x][y] != element)		/* really digged/collected something */
     player->is_collecting = !player->is_digging;
+
+#if 0
+  if (IS_CUSTOM_ELEMENT(Feld[jx][jy]))
+  {
+    CheckTriggeredElementSideChange(jx, jy, Feld[jx][jy], leave_side,
+				    CE_OTHER_GETS_LEFT);
+    CheckElementSideChange(jx, jy, Feld[jx][jy], leave_side,
+			   CE_LEFT_BY_PLAYER, -1);
+  }
+
+  if (IS_CUSTOM_ELEMENT(Feld[x][y]))
+  {
+    CheckTriggeredElementSideChange(x, y, Feld[x][y], enter_side,
+				    CE_OTHER_GETS_ENTERED);
+    CheckElementSideChange(x, y, Feld[x][y], enter_side,
+			   CE_ENTERED_BY_PLAYER, -1);
+  }
+#endif
 
   return MF_MOVING;
 }

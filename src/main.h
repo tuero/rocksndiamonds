@@ -165,7 +165,7 @@
 #define CE_COLLISION		5
 #define CE_IMPACT		6
 #define CE_SMASHED		7
-#define CE_TOUCHING_ANY_SIDE_OF	8
+#define CE_OTHER_IS_TOUCHING	8
 #define CE_OTHER_IS_CHANGING	9
 #define CE_OTHER_IS_EXPLODING	10
 #define CE_OTHER_GETS_TOUCHED	11
@@ -178,10 +178,10 @@
 #define CE_BY_OTHER_ACTION	18	/* activates other element events */
 #define CE_BY_DIRECT_ACTION	19	/* activates direct element events */
 #define CE_OTHER_GETS_DIGGED	20
-#define CE_TOUCHING_LEFT_OF	21
-#define CE_TOUCHING_RIGHT_OF	22
-#define CE_TOUCHING_TOP_OF	23
-#define CE_TOUCHING_BOTTOM_OF	24
+#define CE_ENTERED_BY_PLAYER	21
+#define CE_LEFT_BY_PLAYER	22
+#define CE_OTHER_GETS_ENTERED	23
+#define CE_OTHER_GETS_LEFT	24
 
 /* values for derived change events (determined from properties above) */
 #define CE_TOUCHING_SOME_SIDE	25	/* summarized left/right/up/down/any */
@@ -202,6 +202,15 @@
 				 ((v) ?					  \
 				  (CH_EVENT_VAR(e) |=  CH_EVENT_BIT(c)) : \
 				  (CH_EVENT_VAR(e) &= ~CH_EVENT_BIT(c))) : 0)
+
+/* values for change sides for custom elements */
+#define CH_SIDE_LEFT		MV_LEFT
+#define CH_SIDE_RIGHT		MV_RIGHT
+#define CH_SIDE_TOP		MV_UP
+#define CH_SIDE_BOTTOM		MV_DOWN
+#define CH_SIDE_LEFT_RIGHT	MV_HORIZONTAL
+#define CH_SIDE_TOP_BOTTOM	MV_VERTICAL
+#define CH_SIDE_ANY		MV_ANY_DIRECTION
 
 /* values for change power for custom elements */
 #define CP_NON_DESTRUCTIVE	0
@@ -1251,7 +1260,8 @@ struct ElementChangeInfo
 {
   boolean can_change;		/* use or ignore this change info */
 
-  unsigned long events;		/* bitfield for change events */
+  unsigned long events;		/* change events */
+  int sides;			/* change sides */
 
   short target_element;		/* target element after change */
 
