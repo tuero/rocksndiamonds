@@ -187,6 +187,7 @@ char *getSetupLine(struct TokenInfo *, char *, int);
 
 void LoadLevelInfo(void);
 void LoadArtworkInfo(void);
+void LoadSoundsInfo(void);
 void LoadLevelSetup_LastSeries(void);
 void SaveLevelSetup_LastSeries(void);
 void LoadLevelSetup_SeriesInfo(void);

@@ -1438,6 +1438,15 @@ extern int		num_element_info;
 
 #define NUM_SOUNDS		55
 
+
+/* sound effects */
+#define SND_TEST1		0
+#define SND_TEST2		1
+#define SND_TEST3		2
+
+#define NUM_SOUND_EFFECTS	3
+
+
 /* values for game_status */
 #define EXITGAME		0
 #define MAINMENU		1

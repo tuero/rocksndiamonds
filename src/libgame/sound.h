@@ -192,6 +192,19 @@ struct AudioFormatInfo
   int fragment_size;		/* audio device fragment size in bytes */
 };
 
+#if 0
+struct SoundsInfo
+{
+  int num_sounds;
+  char *sound_name;
+
+#if 0
+  void (*func_reload_sounds)(void);
+  void (*func_reload_music)(void);
+#endif
+}
+#endif
+
 struct SampleInfo
 { 
   int type;
@@ -242,12 +255,6 @@ void StartSoundserver(void);
 void SoundServer(void);
 
 /* sound client functions */
-void ReloadSounds(char *);
-void ReloadMusic(char *);
-SoundInfo *LoadCustomSound(char *);
-void InitSoundList(int);
-void LoadSoundToList(char *, int);
-void LoadCustomMusic(void);
 void PlayMusic(int);
 void PlaySound(int);
 void PlaySoundStereo(int, int);
@@ -261,10 +268,9 @@ void StopMusic(void);
 void StopSound(int);
 void StopSounds(void);
 void StopSoundExt(int, int);
+void InitSoundList(char **, int);
 void InitReloadSounds(char *);
 void InitReloadMusic(char *);
-void FreeSound(SoundInfo *);
-void FreeMusic(MusicInfo *);
 void FreeAllSounds(void);
 void FreeAllMusic(void);
 

@@ -780,12 +780,14 @@ inline void SetAudioMode(boolean enabled)
   audio.sound_enabled = enabled;
 }
 
+#if 0
 inline void SetAudioReloadFunctions(void (*func_reload_sounds)(void),
 				    void (*func_reload_music)(void))
 {
   audio.func_reload_sounds = func_reload_sounds;
   audio.func_reload_music = func_reload_music;
 }
+#endif
 
 
 /* ========================================================================= */

@@ -153,6 +153,7 @@ void InitNetworkServer()
 #endif
 }
 
+#if 0
 static void ReloadCustomSounds()
 {
   int i;
@@ -161,9 +162,8 @@ static void ReloadCustomSounds()
   printf("DEBUG: reloading sounds '%s' ...\n", artwork.sounds_set_current);
 #endif
 
-  FreeAllSounds();
+  LoadSoundsInfo();
 
-  InitSoundList(NUM_SOUNDS);
   for(i=0; i<NUM_SOUNDS; i++)
     LoadSoundToList(sound_name[i], i);
 }
@@ -178,11 +178,15 @@ static void ReloadCustomMusic()
 
   LoadCustomMusic();
 }
+#endif
 
 static void InitSoundServer()
 {
   OpenAudio();
+#if 0
   SetAudioReloadFunctions(ReloadCustomSounds, ReloadCustomMusic);
+#endif
+  InitSoundList(sound_name, NUM_SOUNDS);
 
   StartSoundserver();
 }

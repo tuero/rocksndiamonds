@@ -136,6 +136,19 @@ char *sound_name[NUM_SOUNDS] =
   "gate.wav"
 };
 
+/* sound effects: setup file identifiers and corresponding default filenames */
+struct
+{
+  char *identifier;
+  char *default_filename;
+}
+sound_effect[NUM_SOUND_EFFECTS] =
+{
+  { "collecting_infotron",	"infotron.wav" },
+  { "falling_zonk",		"zonkdown.wav" },
+  { "pushing_zonk",		"zonkpush.wav" }
+};
+
 char *element_info[] =
 {
   "empty space",				/* 0 */

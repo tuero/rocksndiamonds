@@ -27,6 +27,7 @@
 static SoundInfo **Sound = NULL;
 static MusicInfo **Music = NULL;
 static int num_sounds = 0, num_music = 0;
+static char **sound_name;
 
 
 /* ========================================================================= */
@@ -69,6 +70,10 @@ static void SoundServer_InsertNewSound(struct SoundControl);
 static void SoundServer_StopSound(struct SoundControl);
 static void SoundServer_StopAllSounds();
 #endif
+
+static void ReloadCustomSounds();
+static void ReloadCustomMusic();
+static void FreeSound(SoundInfo *);
 
 #if defined(PLATFORM_UNIX)
 static int OpenAudioDevice(char *audio_device_name)
@@ -277,12 +282,18 @@ void SoundServer(void)
       if (snd_ctrl.reload_sounds)
       {
 	artwork.sounds_set_current = set_name;
+	ReloadCustomSounds();
+#if 0
 	audio.func_reload_sounds();
+#endif
       }
       else
       {
 	artwork.music_set_current = set_name;
+	ReloadCustomMusic();
+#if 0
 	audio.func_reload_music();
+#endif
       }
 
       free(set_name);
@@ -1100,6 +1111,10 @@ static SoundInfo *Load_WAV(char *filename)
   if (!audio.sound_available)
     return NULL;
 
+#if 1
+  printf("loading WAV file '%s'\n", filename);
+#endif
+
   snd_info = checked_calloc(sizeof(SoundInfo));
 
 #if defined(TARGET_SDL)
@@ -1203,22 +1218,37 @@ static SoundInfo *Load_WAV(char *filename)
   return snd_info;
 }
 
-SoundInfo *LoadCustomSound(char *basename)
+static void LoadCustomSound(SoundInfo **snd_info, char *basename)
 {
   char *filename = getCustomSoundFilename(basename);
 
-  if (filename == NULL)
+  if (filename == NULL)		/* (should never happen) */
   {
     Error(ERR_WARN, "cannot find sound file '%s'", basename);
-    return FALSE;
+    return;
   }
 
-  return Load_WAV(filename);
+  if (*snd_info && strcmp(filename, (*snd_info)->source_filename) == 0)
+  {
+    /* The old and new sound are the same (have the same filename and path).
+       This usually means that this sound does not exist in this sound set
+       and a fallback to the existing sound is done. */
+
+    return;
+  }
+
+  if (*snd_info)
+    FreeSound(*snd_info);
+
+  *snd_info = Load_WAV(filename);
 }
 
-void InitSoundList(int num_list_entries)
+void InitSoundList(char *sound_name_list[], int num_list_entries)
 {
-  Sound = checked_calloc(num_list_entries * sizeof(SoundInfo *));
+  if (Sound == NULL)
+    Sound = checked_calloc(num_list_entries * sizeof(SoundInfo *));
+
+  sound_name = sound_name_list;
   num_sounds = num_list_entries;
 }
 
@@ -1227,10 +1257,7 @@ void LoadSoundToList(char *basename, int list_pos)
   if (Sound == NULL || list_pos >= num_sounds)
     return;
 
-  if (Sound[list_pos])
-    FreeSound(Sound[list_pos]);
-
-  Sound[list_pos] = LoadCustomSound(basename);
+  LoadCustomSound(&Sound[list_pos], basename);
 }
 
 static MusicInfo *Load_MOD(char *filename)
@@ -1505,6 +1532,31 @@ void StopSoundExt(int nr, int method)
 #else
   sound_handler(snd_ctrl);
 #endif
+}
+
+static void ReloadCustomSounds()
+{
+  int i;
+
+#if 1
+  printf("DEBUG: reloading sounds '%s' ...\n", artwork.sounds_set_current);
+#endif
+
+  LoadSoundsInfo();
+
+  for(i=0; i<num_sounds; i++)
+    LoadSoundToList(sound_name[i], i);
+}
+
+static void ReloadCustomMusic()
+{
+#if 1
+  printf("DEBUG: reloading music '%s' ...\n", artwork.music_set_current);
+#endif
+
+  FreeAllMusic();
+
+  LoadCustomMusic();
 }
 
 static void InitReloadSoundsOrMusic(char *set_name, int type)
