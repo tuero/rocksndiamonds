@@ -172,8 +172,9 @@ void InitSound()
   for(i=0; i<NUM_SOUNDS; i++)
   {
 #ifdef MSDOS
-  sprintf(sound_name[i], "%d", i+1);
+    sprintf(sound_name[i], "%d", i + 1);
 #endif
+
     Sound[i].name = sound_name[i];
     if (!LoadSound(&Sound[i]))
     {
@@ -188,10 +189,7 @@ void InitSoundServer()
   if (sound_status == SOUND_OFF)
     return;
 
-#ifdef MSDOS
-  SoundServer();
-  return;
-#endif
+#ifndef MSDOS
 
   if (pipe(sound_pipe)<0)
   {
@@ -216,6 +214,12 @@ void InitSoundServer()
   }
   else				/* we are parent */
     close(sound_pipe[0]);	/* no reading from pipe needed */
+
+#else /* MSDOS */
+
+  SoundServer();
+
+#endif /* MSDOS */
 }
 
 void InitJoysticks()

@@ -159,16 +159,10 @@ struct SoundControl
 #endif
 };
 
-/* sound server functions */
+/* start sound server */
 void SoundServer(void);
-void SoundServer_InsertNewSound(struct SoundControl);
-void SoundServer_StopSound(int);
-void SoundServer_StopAllSounds(void);
-void HPUX_Audio_Control(void);
-unsigned char linear_to_ulaw(int);
-int ulaw_to_linear(unsigned char);
 
-/* application functions */
+/* client functions */
 boolean LoadSound(struct SoundInfo *);
 void PlaySound(int);
 void PlaySoundStereo(int, int);

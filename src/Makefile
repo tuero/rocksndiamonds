@@ -70,6 +70,7 @@ CONFIG = $(CONFIG_GAME_DIR) $(SOUNDS) $(JOYSTICK)	\
 
 # DEBUG = -DDEBUG -g -Wall -ansi -pedantic
 # DEBUG = -DDEBUG -g -Wall
+# DEBUG = -O3 -Wall -ansi -pedantic
 DEBUG = -O3 -Wall
 # DEBUG = -O3
 

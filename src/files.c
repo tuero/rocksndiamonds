@@ -443,6 +443,17 @@ void LoadTape(int level_nr)
   int file_version = FILE_VERSION_1_2;	/* last version of tape files */
   int chunk_length;
 
+  /* always start with reliable default values (empty tape) */
+  TapeErase();
+
+  /* default values (also for pre-1.2 tapes) with only the first player */
+  tape.player_participates[0] = TRUE;
+  for(i=1; i<MAX_PLAYERS; i++)
+    tape.player_participates[i] = FALSE;
+
+  /* at least one (default: the first) player participates in every tape */
+  num_participating_players = 1;
+
   if (!(file = fopen(filename, "r")))
     return;
 
@@ -491,7 +502,7 @@ void LoadTape(int level_nr)
     for(i=0; i<TAPE_HEADER_UNUSED; i++)		/* skip unused header bytes */
       fgetc(file);
 
-    /* check which players participate in this tape recording */
+    /* since version 1.2, tapes store which players participate in the tape */
     num_participating_players = 0;
     for(i=0; i<MAX_PLAYERS; i++)
     {
@@ -537,10 +548,6 @@ void LoadTape(int level_nr)
     for(j=0; j<MAX_PLAYERS; j++)
     {
       tape.pos[i].action[j] = MV_NO_MOVING;
-
-      /* pre-1.2 tapes store data for only one player */
-      if (file_version == FILE_VERSION_1_0 && j > 0)
-	continue;
 
       if (tape.player_participates[j])
 	tape.pos[i].action[j] = fgetc(file);

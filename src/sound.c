@@ -14,31 +14,41 @@
 #include "sound.h"
 #include "misc.h"
 
-#ifdef MSDOS
-extern void sound_handler(struct SoundControl);
-#endif
-
 /*** THE STUFF BELOW IS ONLY USED BY THE SOUND SERVER CHILD PROCESS ***/
 
-#ifndef MSDOS
+static int playing_sounds = 0;
 static struct SoundControl playlist[MAX_SOUNDS_PLAYING];
 static struct SoundControl emptySoundControl =
 {
   -1,0,0, FALSE,FALSE,FALSE,FALSE,FALSE, 0,0L,0L,NULL
 };
+
+#ifndef MSDOS
 static int stereo_volume[PSND_MAX_LEFT2RIGHT+1];
 static char premix_first_buffer[SND_BLOCKSIZE];
 #ifdef VOXWARE
 static char premix_left_buffer[SND_BLOCKSIZE];
 static char premix_right_buffer[SND_BLOCKSIZE];
 static int premix_last_buffer[SND_BLOCKSIZE];
-#endif
+#endif /* VOXWARE */
 static unsigned char playing_buffer[SND_BLOCKSIZE];
-static int playing_sounds = 0;
-#else
-struct SoundControl playlist[MAX_SOUNDS_PLAYING];
-struct SoundControl emptySoundControl;
-int playing_sounds;
+#endif /* MSDOS */
+
+/* forward declaration of internal functions */
+#ifdef VOXWARE
+static void SoundServer_InsertNewSound(struct SoundControl);
+#endif
+#ifndef VOXWARE
+static unsigned char linear_to_ulaw(int);
+static int ulaw_to_linear(unsigned char);
+#endif
+#ifdef HPUX_AUDIO
+static void HPUX_Audio_Control();
+#endif
+#ifdef MSDOS
+static void SoundServer_InsertNewSound(struct SoundControl);
+static void SoundServer_StopSound(int);
+static void SoundServer_StopAllSounds();
 #endif
 
 void SoundServer()
@@ -68,7 +78,7 @@ void SoundServer()
   FD_ZERO(&sound_fdset); 
   FD_SET(sound_pipe[0], &sound_fdset);
 
-  for(;;)	/* wait for calls from PlaySound(), StopSound(), ... */
+  while(1)	/* wait for sound playing commands from client */
   {
     FD_SET(sound_pipe[0], &sound_fdset);
     select(sound_pipe[0]+1, &sound_fdset, NULL, NULL, NULL);
@@ -120,8 +130,8 @@ void SoundServer()
       struct timeval delay = { 0, 0 };
       byte *sample_ptr;
       long sample_size;
-      long max_sample_size; /* MIGHT BE USED UNINITIALIZED!  TO BE FIXED! */
-      long fragment_size;
+      static long max_sample_size = 0;
+      static long fragment_size = 0;
       boolean stereo;
 
       if (playing_sounds || (sound_device=open(sound_device_name,O_WRONLY))>=0)
@@ -309,14 +319,67 @@ void SoundServer()
 #endif /* !VOXWARE */
 
   }
-#endif
+#endif /* !MSDOS */
 }
 
-void SoundServer_InsertNewSound(struct SoundControl snd_ctrl)
+#ifdef MSDOS
+static void sound_handler(struct SoundControl snd_ctrl)
 {
-  int i,k;
+  int i;
 
-  /* wenn voll, ältesten Sound 'rauswerfen */
+  if (snd_ctrl.fade_sound)
+  {
+    if (!playing_sounds)
+      return;
+
+    for (i=0; i<MAX_SOUNDS_PLAYING; i++)
+      if ((snd_ctrl.stop_all_sounds || playlist[i].nr == snd_ctrl.nr) &&
+	  !playlist[i].fade_sound)
+      {
+	playlist[i].fade_sound = TRUE;
+	if (voice_check(playlist[i].voice))
+	  voice_ramp_volume(playlist[i].voice, 1000, 0);
+	playlist[i].loop = PSND_NO_LOOP;
+      }
+  }
+  else if (snd_ctrl.stop_all_sounds)
+  {
+    if (!playing_sounds)
+      return;
+    SoundServer_StopAllSounds();
+  }
+  else if (snd_ctrl.stop_sound)
+  {
+    if (!playing_sounds)
+      return;
+    SoundServer_StopSound(snd_ctrl.nr);
+  }
+
+  for (i=0; i<MAX_SOUNDS_PLAYING; i++)
+  {
+    if (!playlist[i].active || playlist[i].loop)
+      continue;
+
+    playlist[i].playingpos = voice_get_position(playlist[i].voice);
+    playlist[i].volume = voice_get_volume(playlist[i].voice);
+    if (playlist[i].playingpos == -1 || !playlist[i].volume)
+    {
+      deallocate_voice(playlist[i].voice);
+      playlist[i] = emptySoundControl;
+      playing_sounds--;
+    }
+  }
+
+  if (snd_ctrl.active)
+    SoundServer_InsertNewSound(snd_ctrl);
+}
+#endif /* MSDOS */
+
+static void SoundServer_InsertNewSound(struct SoundControl snd_ctrl)
+{
+  int i, k;
+
+  /* if playlist is full, remove oldest sound */
   if (playing_sounds==MAX_SOUNDS_PLAYING)
   {
     int longest=0, longest_nr=0;
@@ -343,14 +406,14 @@ void SoundServer_InsertNewSound(struct SoundControl snd_ctrl)
     playing_sounds--;
   }
 
-  /* nachsehen, ob (und ggf. wie oft) Sound bereits gespielt wird */
+  /* check if sound is already being played (and how often) */
   for(k=0,i=0;i<MAX_SOUNDS_PLAYING;i++)
   {
     if (playlist[i].nr == snd_ctrl.nr)
       k++;
   }
 
-  /* falls Sound-Loop: nur neu beginnen, wenn Sound gerade ausklingt */
+  /* restart loop sounds only if they are just fading out */
   if (k>=1 && snd_ctrl.loop)
   {
     for(i=0;i<MAX_SOUNDS_PLAYING;i++)
@@ -369,12 +432,12 @@ void SoundServer_InsertNewSound(struct SoundControl snd_ctrl)
     return;
   }
 
-  /* keinen Sound mehr als n mal gleichzeitig spielen (momentan n==2) */
+  /* don't play sound more than n times simultaneously (with n == 2 for now) */
   if (k>=2)
   {
     int longest=0, longest_nr=0;
 
-    /* den bereits am längsten gespielten (gleichen) Sound suchen */
+    /* look for oldest equal sound */
     for(i=0;i<MAX_SOUNDS_PLAYING;i++)
     {
       int actual;
@@ -435,7 +498,7 @@ void SoundServer_FadeSound(int nr)
 }
 */
 
-void SoundServer_StopSound(int nr)
+static void SoundServer_StopSound(int nr)
 {
   int i;
 
@@ -459,7 +522,7 @@ void SoundServer_StopSound(int nr)
 #endif
 }
 
-void SoundServer_StopAllSounds()
+static void SoundServer_StopAllSounds()
 {
   int i;
 
@@ -479,7 +542,7 @@ void SoundServer_StopAllSounds()
 }
 
 #ifdef HPUX_AUDIO
-void HPUX_Audio_Control()
+static void HPUX_Audio_Control()
 {
   struct audio_describe ainfo;
   int audio_ctl;
@@ -528,7 +591,7 @@ void HPUX_Audio_Control()
 #define BIAS 0x84   /* define the add-in bias for 16 bit samples */
 #define CLIP 32635
 
-unsigned char linear_to_ulaw(int sample)
+static unsigned char linear_to_ulaw(int sample)
 {
   static int exp_lut[256] =
   {
@@ -589,7 +652,7 @@ unsigned char linear_to_ulaw(int sample)
 ** Output: signed 16 bit linear sample
 */
 
-int ulaw_to_linear(unsigned char ulawbyte)
+static int ulaw_to_linear(unsigned char ulawbyte)
 {
   static int exp_lut[8] = { 0, 132, 396, 924, 1980, 4092, 8316, 16764 };
   int sign, exponent, mantissa, sample;
@@ -629,11 +692,11 @@ static unsigned long le2long(unsigned long *be)	/* little-endian -> longword */
 
 boolean LoadSound(struct SoundInfo *snd_info)
 {
-  FILE *file;
   char filename[256];
   char *sound_ext = "wav";
 #ifndef MSDOS
   struct SoundHeader_WAV *sound_header;
+  FILE *file;
   int i;
 #endif
 
@@ -641,6 +704,7 @@ boolean LoadSound(struct SoundInfo *snd_info)
 	  options.base_directory, SOUNDS_DIRECTORY, snd_info->name, sound_ext);
 
 #ifndef MSDOS
+
   if ((file = fopen(filename, "r")) == NULL)
   {
     Error(ERR_WARN, "cannot open sound file '%s' - no sounds", filename);
@@ -694,9 +758,9 @@ boolean LoadSound(struct SoundInfo *snd_info)
   if (!snd_info->sample_ptr)
   {
     Error(ERR_WARN, "cannot read sound file '%s' - no sounds", filename);
-    fclose(file);
     return(FALSE);
   }
+
 #endif /* MSDOS */
 
   return(TRUE);
@@ -704,10 +768,10 @@ boolean LoadSound(struct SoundInfo *snd_info)
 
 boolean LoadSound_8SVX(struct SoundInfo *snd_info)
 {
-  FILE *file;
   char filename[256];
 #ifndef MSDOS
   struct SoundHeader_8SVX *sound_header;
+  FILE *file;
   char *ptr;
   char *sound_ext = "8svx";
 #else
@@ -800,7 +864,6 @@ boolean LoadSound_8SVX(struct SoundInfo *snd_info)
   if(!snd_info->sample_ptr)
   {
     Error(ERR_WARN, "cannot read sound file '%s' - no sounds", filename);
-    fclose(file);
     return(FALSE);
   }
   return(TRUE);

@@ -52,9 +52,11 @@ static int global_colormap_entries_used = 0;
 
 boolean wait_for_vsync;
 
+/*
 extern int playing_sounds;
 extern struct SoundControl playlist[MAX_SOUNDS_PLAYING];
 extern struct SoundControl emptySoundControl;
+*/
 
 static BITMAP *Read_PCX_to_AllegroBitmap(char *);
 
@@ -86,7 +88,7 @@ static void allegro_drivers()
   joystick_event = FALSE;
 
   reserve_voices(MAX_SOUNDS_PLAYING, 0);
-  if (install_sound(DIGI_AUTODETECT, MIDI_NONE, "ROCKS.SND") == -1)
+  if (install_sound(DIGI_AUTODETECT, MIDI_NONE, NULL) == -1)
     if (install_sound(DIGI_SB, MIDI_NONE, NULL) == -1)
       sound_status = SOUND_OFF;
 }
@@ -760,57 +762,6 @@ int XPending(Display *display)
 KeySym XLookupKeysym(XKeyEvent *key_event, int index)
 {
   return key_event->state;
-}
-
-void sound_handler(struct SoundControl snd_ctrl)
-{
-  int i;
-
-  if (snd_ctrl.fade_sound)
-  {
-    if (!playing_sounds)
-      return;
-
-    for (i=0; i<MAX_SOUNDS_PLAYING; i++)
-      if ((snd_ctrl.stop_all_sounds || playlist[i].nr == snd_ctrl.nr) &&
-	  !playlist[i].fade_sound)
-      {
-	playlist[i].fade_sound = TRUE;
-	if (voice_check(playlist[i].voice))
-	  voice_ramp_volume(playlist[i].voice, 1000, 0);
-	playlist[i].loop = PSND_NO_LOOP;
-      }
-  }
-  else if (snd_ctrl.stop_all_sounds)
-  {
-    if (!playing_sounds)
-      return;
-    SoundServer_StopAllSounds();
-  }
-  else if (snd_ctrl.stop_sound)
-  {
-    if (!playing_sounds)
-      return;
-    SoundServer_StopSound(snd_ctrl.nr);
-  }
-
-  for (i=0; i<MAX_SOUNDS_PLAYING; i++)
-  {
-    if (!playlist[i].active || playlist[i].loop)
-      continue;
-
-    playlist[i].playingpos = voice_get_position(playlist[i].voice);
-    playlist[i].volume = voice_get_volume(playlist[i].voice);
-    if (playlist[i].playingpos == -1 || !playlist[i].volume)
-    {
-      deallocate_voice(playlist[i].voice);
-      playlist[i] = emptySoundControl;
-      playing_sounds--;
-    }
-  }
-
-  if (snd_ctrl.active)
-    SoundServer_InsertNewSound(snd_ctrl);
 }
 
 void NetworkServer(int port, int serveronly)
