@@ -966,12 +966,12 @@ void GameWon()
     SaveTape(tape.level_nr);		/* Ask to save tape */
   }
 
-  if (level_nr == leveldir[leveldir_nr].handicap_level)
+  if (level_nr == leveldir_current->handicap_level)
   {
-    leveldir[leveldir_nr].handicap_level++;
-    SaveLevelSetup_SeriesInfo(leveldir_nr);
+    leveldir_current->handicap_level++;
+    SaveLevelSetup_SeriesInfo();
 
-    if (level_nr < leveldir[leveldir_nr].last_level)
+    if (level_nr < leveldir_current->last_level)
       raise_level = TRUE;
   }
 

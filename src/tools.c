@@ -1637,7 +1637,7 @@ static void DrawMicroLevelLabelExt(int mode)
 		       mode == MICROLABEL_LEVEL_AUTHOR ? level.author :
 		       mode == MICROLABEL_IMPORTED_FROM ? "imported from" :
 		       mode == MICROLABEL_LEVEL_IMPORT_INFO ?
-		       leveldir[leveldir_nr].imported_from : ""),
+		       leveldir_current->imported_from : ""),
 	  MAX_MICROLABEL_SIZE);
   label_text[MAX_MICROLABEL_SIZE] = '\0';
 
@@ -1720,12 +1720,12 @@ void DrawMicroLevel(int xpos, int ypos, boolean restart)
   /* redraw micro level label, if needed */
   if (strcmp(level.name, NAMELESS_LEVEL_NAME) != 0 &&
       strcmp(level.author, ANONYMOUS_NAME) != 0 &&
-      strcmp(level.author, leveldir[leveldir_nr].name) != 0 &&
+      strcmp(level.author, leveldir_current->name) != 0 &&
       DelayReached(&label_delay, MICROLEVEL_LABEL_DELAY))
   {
     int max_label_counter = 23;
 
-    if (leveldir[leveldir_nr].imported_from != NULL)
+    if (leveldir_current->imported_from != NULL)
       max_label_counter += 14;
 
     label_counter = (label_counter + 1) % max_label_counter;

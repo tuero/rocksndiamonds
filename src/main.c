@@ -84,7 +84,7 @@ short		AmoebaCnt[MAX_NUM_AMOEBA], AmoebaCnt2[MAX_NUM_AMOEBA];
 unsigned long	Elementeigenschaften1[MAX_ELEMENTS];
 unsigned long	Elementeigenschaften2[MAX_ELEMENTS];
 
-int		level_nr, leveldir_nr, num_leveldirs;
+int		level_nr, num_leveldirs;
 int		lev_fieldx,lev_fieldy, scroll_x,scroll_y;
 
 int		FX = SX, FY = SY, ScrollStepSize;
@@ -102,7 +102,7 @@ int		FrameCounter, TimeFrames, TimePlayed, TimeLeft;
 
 boolean		network_player_action_received = FALSE;
 
-struct LevelDirInfo	leveldir[MAX_LEVDIR_ENTRIES];
+struct LevelDirInfo    *leveldir_first = NULL, *leveldir_current = NULL;
 struct LevelInfo	level;
 struct PlayerInfo	stored_player[MAX_PLAYERS], *local_player = NULL;
 struct HiScore		highscore[MAX_SCORE_ENTRIES];

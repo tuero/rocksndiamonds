@@ -223,20 +223,23 @@ void SendToServer_StartPlaying()
 {
   unsigned long new_random_seed = InitRND(NEW_RANDOMIZE);
 
+  int dummy = 0;		/* !!! HAS NO MEANING ANYMORE !!! */
+				/* the name of the level must be enough */
+
   buffer[1] = OP_START_PLAYING;
   buffer[2] = (byte)(level_nr >> 8);
   buffer[3] = (byte)(level_nr & 0xff);
-  buffer[4] = (byte)(leveldir_nr >> 8);
-  buffer[5] = (byte)(leveldir_nr & 0xff);
+  buffer[4] = (byte)(dummy >> 8);
+  buffer[5] = (byte)(dummy & 0xff);
 
   buffer[6] = (unsigned char)((new_random_seed >> 24) & 0xff);
   buffer[7] = (unsigned char)((new_random_seed >> 16) & 0xff);
   buffer[8] = (unsigned char)((new_random_seed >>  8) & 0xff);
   buffer[9] = (unsigned char)((new_random_seed >>  0) & 0xff);
 
-  strcpy((char *)&buffer[10], leveldir[leveldir_nr].name);
+  strcpy((char *)&buffer[10], leveldir_current->name);
 
-  SendBufferToServer(10 + strlen(leveldir[leveldir_nr].name)+1);
+  SendBufferToServer(10 + strlen(leveldir_current->name) + 1);
 }
 
 void SendToServer_PausePlaying()
@@ -409,25 +412,33 @@ static void Handle_OP_PLAYER_DISCONNECTED()
 
 static void Handle_OP_START_PLAYING()
 {
-  int new_level_nr, new_leveldir_nr;
+  struct LevelDirInfo *new_leveldir;
+  int new_level_nr;
+  int dummy;				/* !!! HAS NO MEANING ANYMORE !!! */
   unsigned long new_random_seed;
   char *new_leveldir_name;
 
   new_level_nr = (buffer[2] << 8) + buffer[3];
-  new_leveldir_nr = (buffer[4] << 8) + buffer[5];
+  dummy = (buffer[4] << 8) + buffer[5];
   new_random_seed =
     (buffer[6] << 24) | (buffer[7] << 16) | (buffer[8] << 8) | (buffer[9]);
   new_leveldir_name = (char *)&buffer[10];
 
+  new_leveldir = getLevelDirInfoFromLevelDirName(new_leveldir_name);
+  if (new_leveldir == NULL)
+  {
+    Error(ERR_WARN, "no such level directory: '%s'", new_leveldir_name);
+
+    new_leveldir = leveldir_first;
+    Error(ERR_WARN, "using default level directory: '%s'", new_leveldir->name);
+  }
+
   printf("OP_START_PLAYING: %d\n", buffer[0]);
   Error(ERR_NETWORK_CLIENT,
-	"client %d starts game [level %d from levedir %d (%s)]\n",
-	buffer[0], new_level_nr, new_leveldir_nr, new_leveldir_name);
+	"client %d starts game [level %d from leveldir '%s']\n",
+	buffer[0], new_level_nr, new_leveldir->name);
 
-  if (strcmp(leveldir[new_leveldir_nr].name, new_leveldir_name) != 0)
-    Error(ERR_WARN, "no such level directory: '%s'",new_leveldir_name);
-
-  leveldir_nr = new_leveldir_nr;
+  leveldir_current = new_leveldir;
   level_nr = new_level_nr;
 
   TapeErase();

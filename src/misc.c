@@ -1067,9 +1067,110 @@ int getJoystickNrFromDeviceName(char *device_name)
   return joystick_nr;
 }
 
-/* ----------------------------------------------------------------- */
-/* the following is only for debugging purpose and normally not used */
-/* ----------------------------------------------------------------- */
+/* ------------------------------------------------------------------------- */
+/* some functions to handle lists of level directories                       */
+/* ------------------------------------------------------------------------- */
+
+struct LevelDirInfo *newLevelDirInfo()
+{
+  return checked_calloc(sizeof(struct LevelDirInfo));
+}
+
+void pushLevelDirInfo(struct LevelDirInfo *node)
+{
+  node->next = leveldir_first;
+  leveldir_first = node;
+}
+
+int numLevelDirInfo(struct LevelDirInfo *node)
+{
+  int num = 0;
+
+  while (node)
+  {
+    num++;
+    node = node->next;
+  }
+
+  return num;
+}
+
+int posLevelDirInfo(struct LevelDirInfo *node)
+{
+  struct LevelDirInfo *node_cmp = leveldir_first;
+  int pos = 0;
+
+  while (node_cmp)
+  {
+    if (node_cmp == node)
+      return pos;
+
+    pos++;
+    node_cmp = node_cmp->next;
+  }
+
+  return 0;
+}
+
+struct LevelDirInfo *getLevelDirInfoFromPos(struct LevelDirInfo *node, int pos)
+{
+  struct LevelDirInfo *node_default = node;
+  int pos_cmp = 0;
+
+  while (node)
+  {
+    if (pos_cmp == pos)
+      return node;
+
+    pos_cmp++;
+    node = node->next;
+  }
+
+  return node_default;
+}
+
+void sortLevelDirInfo(struct LevelDirInfo **node_first,
+		      int (*compare_function)(const void *, const void *))
+{
+  int num_nodes = numLevelDirInfo(*node_first);
+  struct LevelDirInfo **sort_array;
+  struct LevelDirInfo *node = *node_first;
+  int i = 0;
+
+  if (num_nodes < 2)	/* a list with only one element is always sorted... */
+    return;
+
+  /* allocate array for sorting structure pointers */
+  sort_array = checked_calloc(num_nodes * sizeof(struct LevelDirInfo *));
+
+  /* writing structure pointers to sorting array */
+  while (i < num_nodes && node)		/* double boundary check... */
+  {
+    sort_array[i] = node;
+
+    i++;
+    node = node->next;
+  }
+
+  /* sorting the structure pointers in the sorting array */
+  qsort(sort_array, num_nodes, sizeof(struct LevelDirInfo *),
+	compare_function);
+
+  /* update the linkage of list elements with the sorted node array */
+  for (i=0; i<num_nodes - 1; i++)
+    sort_array[i]->next = sort_array[i + 1];
+  sort_array[num_nodes - 1]->next = NULL;
+
+  /* update the linkage of the main list anchor pointer */
+  *node_first = sort_array[0];
+
+  free(sort_array);
+}
+
+
+/* ------------------------------------------------------------------------- */
+/* the following is only for debugging purpose and normally not used         */
+/* ------------------------------------------------------------------------- */
 
 #define DEBUG_NUM_TIMESTAMPS	3
 

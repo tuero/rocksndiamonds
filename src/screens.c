@@ -91,8 +91,8 @@ void DrawMainMenu()
   MapTapeButtons();
 
   /* level_nr may have set to value over handicap with level editor */
-  if (setup.handicap && level_nr > leveldir[leveldir_nr].handicap_level)
-    level_nr = leveldir[leveldir_nr].handicap_level;
+  if (setup.handicap && level_nr > leveldir_current->handicap_level)
+    level_nr = leveldir_current->handicap_level;
 
   GetPlayerConfig();
   LoadLevel(level_nr);
@@ -103,7 +103,7 @@ void DrawMainMenu()
   DrawText(SX + 6*32,  SY + 2*32, setup.player_name, FS_BIG, FC_RED);
   DrawText(SX + 32,    SY + 3*32, "Level:", FS_BIG, FC_GREEN);
   DrawText(SX + 11*32, SY + 3*32, int2str(level_nr,3), FS_BIG,
-	   (leveldir[leveldir_nr].readonly ? FC_RED : FC_YELLOW));
+	   (leveldir_current->readonly ? FC_RED : FC_YELLOW));
   DrawText(SX + 32,    SY + 4*32, "Hall Of Fame", FS_BIG, FC_GREEN);
   DrawText(SX + 32,    SY + 5*32, "Level Creator", FS_BIG, FC_GREEN);
   DrawText(SY + 32,    SY + 6*32, "Info Screen", FS_BIG, FC_GREEN);
@@ -114,10 +114,10 @@ void DrawMainMenu()
   DrawMicroLevel(MICROLEV_XPOS, MICROLEV_YPOS, TRUE);
 
   DrawTextF(7*32 + 6, 3*32 + 9, FC_RED, "%d-%d",
-	    leveldir[leveldir_nr].first_level,
-	    leveldir[leveldir_nr].last_level);
+	    leveldir_current->first_level,
+	    leveldir_current->last_level);
 
-  if (leveldir[leveldir_nr].readonly)
+  if (leveldir_current->readonly)
   {
     DrawTextF(15*32 + 6, 3*32 + 9 - 7, FC_RED, "READ");
     DrawTextF(15*32 + 6, 3*32 + 9 + 7, FC_RED, "ONLY");
@@ -131,13 +131,13 @@ void DrawMainMenu()
   DrawText(SX + 56, SY + 326, "A Game by Artsoft Entertainment",
 	   FS_SMALL, FC_RED);
 
-  if (leveldir[leveldir_nr].name)
+  if (leveldir_current->name)
   {
-    int len = strlen(leveldir[leveldir_nr].name);
+    int len = strlen(leveldir_current->name);
     int lxpos = SX + (SXSIZE - len * FONT4_XSIZE) / 2;
     int lypos = SY + 352;
 
-    DrawText(lxpos, lypos, leveldir[leveldir_nr].name, FS_SMALL, FC_SPECIAL2);
+    DrawText(lxpos, lypos, leveldir_current->name, FS_SMALL, FC_SPECIAL2);
   }
 
   FadeToFront();
@@ -199,23 +199,23 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
     y = choice;
   }
 
-  if (y == 4 && ((x == 11 && level_nr > leveldir[leveldir_nr].first_level) ||
-		 (x == 15 && level_nr < leveldir[leveldir_nr].last_level)) &&
+  if (y == 4 && ((x == 11 && level_nr > leveldir_current->first_level) ||
+		 (x == 15 && level_nr < leveldir_current->last_level)) &&
       button)
   {
     static unsigned long level_delay = 0;
     int step = (button == 1 ? 1 : button == 2 ? 5 : 10);
     int new_level_nr, old_level_nr = level_nr;
-    int font_color = (leveldir[leveldir_nr].readonly ? FC_RED : FC_YELLOW);
+    int font_color = (leveldir_current->readonly ? FC_RED : FC_YELLOW);
 
     new_level_nr = level_nr + (x == 11 ? -step : +step);
-    if (new_level_nr < leveldir[leveldir_nr].first_level)
-      new_level_nr = leveldir[leveldir_nr].first_level;
-    if (new_level_nr > leveldir[leveldir_nr].last_level)
-      new_level_nr = leveldir[leveldir_nr].last_level;
+    if (new_level_nr < leveldir_current->first_level)
+      new_level_nr = leveldir_current->first_level;
+    if (new_level_nr > leveldir_current->last_level)
+      new_level_nr = leveldir_current->last_level;
 
-    if (setup.handicap && new_level_nr > leveldir[leveldir_nr].handicap_level)
-      new_level_nr = leveldir[leveldir_nr].handicap_level;
+    if (setup.handicap && new_level_nr > leveldir_current->handicap_level)
+      new_level_nr = leveldir_current->handicap_level;
 
     if (old_level_nr == new_level_nr ||
 	!DelayReached(&level_delay, GADGET_FRAME_DELAY))
@@ -246,7 +246,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
     {
       if (y != choice)
       {
-	DrawGraphic(0, y-1, GFX_KUGEL_ROT);
+	DrawGraphic(0, y - 1, GFX_KUGEL_ROT);
 	DrawGraphic(0, choice - 1, GFX_KUGEL_BLAU);
 	choice = y;
       }
@@ -264,7 +264,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 	{
 	  game_status = CHOOSELEVEL;
 	  SaveLevelSetup_LastSeries();
-	  SaveLevelSetup_SeriesInfo(leveldir_nr);
+	  SaveLevelSetup_SeriesInfo();
 	  DrawChooseLevel();
 	}
       }
@@ -275,7 +275,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
       }
       else if (y == 6)
       {
-	if (leveldir[leveldir_nr].readonly &&
+	if (leveldir_current->readonly &&
 	    strcmp(setup.player_name, "Artsoft") != 0)
 	  Request("This level is read only !", REQ_CONFIRM);
 	game_status = LEVELED;
@@ -310,7 +310,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
       else if (y == 10)
       {
 	SaveLevelSetup_LastSeries();
-	SaveLevelSetup_SeriesInfo(leveldir_nr);
+	SaveLevelSetup_SeriesInfo();
         if (Request("Do you really want to quit ?", REQ_ASK | REQ_STAY_CLOSED))
 	  game_status = EXITGAME;
       }
@@ -866,16 +866,15 @@ static void drawChooseLevelList(int first_entry, int num_page_entries)
 
   for(i=0; i<num_page_entries; i++)
   {
-#if 0
-    strncpy(buffer, leveldir[first_entry + i].name_short , SCR_FIELDX - 1);
-    buffer[SCR_FIELDX - 1] = '\0';
-#else
-    strncpy(buffer, leveldir[first_entry + i].name , max_buffer_len);
-    buffer[max_buffer_len] = '\0';
-#endif
+    struct LevelDirInfo *leveldir_node;
+    int leveldir_pos = first_entry + i;
 
-    DrawText(SX + 32, SY + (i + 2) * 32, buffer,
-	     FS_MEDIUM, leveldir[first_entry + i].color);
+    leveldir_node = getLevelDirInfoFromPos(leveldir_first, leveldir_pos);
+    strncpy(buffer, leveldir_node->name , max_buffer_len);
+    buffer[max_buffer_len] = '\0';
+
+    DrawText(SX + 32, SY + (i + 2) * 32, buffer, FS_MEDIUM,
+	     leveldir_node->color);
     DrawGraphic(0, i + 2, GFX_KUGEL_BLAU);
   }
 
@@ -886,21 +885,18 @@ static void drawChooseLevelList(int first_entry, int num_page_entries)
     DrawGraphic(0, MAX_LEVEL_SERIES_ON_SCREEN + 1, GFX_ARROW_BLUE_DOWN);
 }
 
-static void drawChooseLevelInfo(int leveldir_nr)
+static void drawChooseLevelInfo(int leveldir_pos)
 {
+  struct LevelDirInfo *leveldir_node;
   int x, last_redraw_mask = redraw_mask;
+
+  leveldir_node = getLevelDirInfoFromPos(leveldir_first, leveldir_pos);
 
   XFillRectangle(display, drawto, gc, SX + 32, SY + 32, SXSIZE - 64, 32);
 
-#if 0
   DrawTextFCentered(40, FC_RED, "%3d levels (%s)",
-		    leveldir[leveldir_nr].levels,
-		    leveldir[leveldir_nr].readonly ? "readonly" : "writable");
-#else
-  DrawTextFCentered(40, FC_RED, "%3d levels (%s)",
-		    leveldir[leveldir_nr].levels,
-		    leveldir[leveldir_nr].class_desc);
-#endif
+		    leveldir_node->levels,
+		    leveldir_node->class_desc);
 
   /* let BackToFront() redraw only what is needed */
   redraw_mask = last_redraw_mask | REDRAW_TILES;
@@ -925,10 +921,12 @@ void HandleChooseLevel(int mx, int my, int dx, int dy, int button)
 
   if (button == MB_MENU_INITIALIZE)
   {
+    int leveldir_pos = posLevelDirInfo(leveldir_current);
+
     if (first_entry == -1)
     {
-      first_entry = MAX(0, leveldir_nr - num_page_entries + 1);
-      choice = leveldir_nr - first_entry + 3;
+      first_entry = MAX(0, leveldir_pos - num_page_entries + 1);
+      choice = leveldir_pos - first_entry + 3;
       AdjustChooseLevelScrollbar(SCREEN_CTRL_ID_SCROLL_VERTICAL, first_entry);
     }
 
@@ -936,7 +934,7 @@ void HandleChooseLevel(int mx, int my, int dx, int dy, int button)
       first_entry = dy;
 
     drawChooseLevelList(first_entry, num_page_entries);
-    drawChooseLevelInfo(leveldir_nr);
+    drawChooseLevelInfo(leveldir_pos);
     redraw = TRUE;
   }
 
@@ -1021,12 +1019,22 @@ void HandleChooseLevel(int mx, int my, int dx, int dy, int button)
     }
     else
     {
-      leveldir_nr = first_entry + y - 3;
-      LoadLevelSetup_SeriesInfo(leveldir_nr);
+      int leveldir_pos = first_entry + y - 3;
+
+      leveldir_current = getLevelDirInfoFromPos(leveldir_first, leveldir_pos);
+
+      LoadLevelSetup_SeriesInfo();
 
       SaveLevelSetup_LastSeries();
-      SaveLevelSetup_SeriesInfo(leveldir_nr);
+      SaveLevelSetup_SeriesInfo();
       TapeErase();
+
+
+      printf("first_level == %d, last_level == %d, levels == %d\n",
+	     leveldir_current->first_level,
+	     leveldir_current->last_level,
+	     leveldir_current->levels);
+
 
       game_status = MAINMENU;
       DrawMainMenu();

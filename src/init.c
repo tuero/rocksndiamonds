@@ -111,7 +111,7 @@ void InitLevelAndPlayerInfo()
   LoadLevelInfo();				/* global level info */
   LoadSetup();					/* global setup info */
   LoadLevelSetup_LastSeries();			/* last played series info */
-  LoadLevelSetup_SeriesInfo(leveldir_nr);	/* last played level info */
+  LoadLevelSetup_SeriesInfo();			/* last played level info */
 }
 
 void InitNetworkServer()

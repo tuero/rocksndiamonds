@@ -1911,8 +1911,8 @@ static void MapControlButtons()
   /* map buttons to select level */
   counter_id = ED_COUNTER_ID_SELECT_LEVEL;
   ModifyEditorCounterLimits(counter_id,
-			    leveldir[leveldir_nr].first_level,
-			    leveldir[leveldir_nr].last_level);
+			    leveldir_current->first_level,
+			    leveldir_current->last_level);
   ModifyEditorCounter(counter_id, *counterbutton_info[counter_id].value);
   MapCounterButtons(counter_id);
 }
@@ -3832,7 +3832,7 @@ static void HandleControlButtons(struct GadgetInfo *gi)
       break;
 
     case GADGET_ID_SAVE:
-      if (leveldir[leveldir_nr].readonly)
+      if (leveldir_current->readonly)
       {
 	Request("This level is read only !", REQ_CONFIRM);
 	break;

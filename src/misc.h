@@ -78,7 +78,14 @@ char *getJoyNameFromJoySymbol(int);
 int getJoySymbolFromJoyName(char *);
 int getJoystickNrFromDeviceName(char *);
 
+struct LevelDirInfo *newLevelDirInfo();
+void pushLevelDirInfo(struct LevelDirInfo *);
+int numLevelDirInfo(struct LevelDirInfo *);
+int posLevelDirInfo(struct LevelDirInfo *);
+struct LevelDirInfo *getLevelDirInfoFromPos(struct LevelDirInfo *, int);
+void sortLevelDirInfo(struct LevelDirInfo **,
+		      int (*compare_function)(const void *, const void *));
+
 void debug_print_timestamp(int, char *);
-void print_debug(char *);
 
 #endif /* MISC_H */

@@ -217,7 +217,6 @@ typedef unsigned char byte;
 #define MAX_LEVEL_NAME_LEN	32
 #define MAX_LEVEL_AUTHOR_LEN	32
 #define MAX_TAPELEN		(1000 * 50)	/* max. time * framerate */
-#define MAX_LEVDIR_ENTRIES	250		/* max. level directories */
 #define MAX_SCORE_ENTRIES	100
 #define MAX_ELEMENTS		700		/* 500 static + 200 runtime */
 #define MAX_NUM_AMOEBA		100
@@ -400,6 +399,8 @@ struct LevelDirInfo
   int color;		/* color to use on selection screen for this level */
   char *class_desc;	/* description of level series class */
   int handicap_level;	/* number of the lowest unsolved level */
+
+  struct LevelDirInfo *next;
 };
 
 struct TapeInfo
@@ -495,7 +496,7 @@ extern short		AmoebaCnt[MAX_NUM_AMOEBA], AmoebaCnt2[MAX_NUM_AMOEBA];
 extern unsigned long	Elementeigenschaften1[MAX_ELEMENTS];
 extern unsigned long	Elementeigenschaften2[MAX_ELEMENTS];
 
-extern int		level_nr, leveldir_nr, num_leveldirs;
+extern int		level_nr, num_leveldirs;
 extern int		lev_fieldx,lev_fieldy, scroll_x,scroll_y;
 
 extern int		FX,FY, ScrollStepSize;
@@ -514,7 +515,7 @@ extern int		SiebCount;
 
 extern boolean		network_player_action_received;
 
-extern struct LevelDirInfo	leveldir[];
+extern struct LevelDirInfo     *leveldir_first, *leveldir_current;
 extern struct LevelInfo		level;
 extern struct PlayerInfo	stored_player[], *local_player;
 extern struct HiScore		highscore[];

@@ -25,15 +25,15 @@ void SaveTape(int);
 void LoadScore(int);
 void SaveScore(int);
 
-int getLastPlayedLevelOfLevelSeries(char *);
+struct LevelDirInfo *getLevelDirInfoFromLevelDirName(char *);
 
 void LoadLevelInfo(void);
 void LoadSetup(void);
 void SaveSetup(void);
 void LoadLevelSetup_LastSeries(void);
 void SaveLevelSetup_LastSeries(void);
-void LoadLevelSetup_SeriesInfo(int);
-void SaveLevelSetup_SeriesInfo(int);
+void LoadLevelSetup_SeriesInfo(void);
+void SaveLevelSetup_SeriesInfo(void);
 
 #ifdef MSDOS
 void initErrorFile();
