@@ -319,7 +319,7 @@ void DrawMainMenu()
 	      mSY + 3 * 32 + 1 + 7, FONT_TEXT_3, "ONLY");
   }
 
-  for(i=0; i<8; i++)
+  for (i = 0; i < 8; i++)
     initCursor(i, (i == 1 || i == 6 ? IMG_MENU_BUTTON_RIGHT :IMG_MENU_BUTTON));
 
   drawCursorXY(level_width/32 + 4, 1, IMG_MENU_BUTTON_LEFT);
@@ -608,7 +608,7 @@ void DrawInfoScreenDemoAnim(int start, boolean init)
     {
       if (!infoscreen_frame[i - start])
 	infoscreen_step[i - start]++;
-      while(helpanim_info[j].element != -1)
+      while (helpanim_info[j].element != -1)
 	j++;
     }
 
@@ -768,7 +768,7 @@ void DrawInfoScreen()
   UnmapAllGadgets();
   CloseDoor(DOOR_CLOSE_2);
 
-  for(i=0; i < MAX_INFO_ELEMENTS_ON_SCREEN; i++)
+  for (i = 0; i < MAX_INFO_ELEMENTS_ON_SCREEN; i++)
     infoscreen_step[i] = infoscreen_frame[i] = 0;
   infoscreen_musicpos = 0;
   infoscreen_state = 0;
@@ -778,7 +778,7 @@ void DrawInfoScreen()
   LoadMusicInfo();
 
   num_infoscreen_elements = 0;
-  for (i=0; helpanim_info[i].element != HELPANIM_LIST_END; i++)
+  for (i = 0; helpanim_info[i].element != HELPANIM_LIST_END; i++)
     if (helpanim_info[i].element == HELPANIM_LIST_NEXT)
       num_infoscreen_elements++;
 
@@ -808,7 +808,7 @@ void DrawInfoScreen()
   UnmapAllGadgets();
   CloseDoor(DOOR_CLOSE_2);
 
-  for(i=0; i < MAX_INFO_ELEMENTS_ON_SCREEN; i++)
+  for (i = 0; i < MAX_INFO_ELEMENTS_ON_SCREEN; i++)
     infoscreen_step[i] = infoscreen_frame[i] = 0;
   infoscreen_musicpos = 0;
   infoscreen_state = 0;
@@ -818,7 +818,7 @@ void DrawInfoScreen()
   LoadMusicInfo();
 
   num_infoscreen_elements = 0;
-  for (i=0; helpanim_info[i].element != HELPANIM_LIST_END; i++)
+  for (i = 0; helpanim_info[i].element != HELPANIM_LIST_END; i++)
     if (helpanim_info[i].element == HELPANIM_LIST_NEXT)
       num_infoscreen_elements++;
 
@@ -852,7 +852,7 @@ void HandleInfoScreen(int button)
   {
     if (infoscreen_state < num_infoscreen_element_pages - 1)
     {
-      for(i=0; i < MAX_INFO_ELEMENTS_ON_SCREEN; i++)
+      for (i = 0; i < MAX_INFO_ELEMENTS_ON_SCREEN; i++)
 	infoscreen_step[i] = infoscreen_frame[i] = 0;
       infoscreen_state++;
 
@@ -1024,7 +1024,7 @@ static void drawChooseTreeList(int first_entry, int num_page_entries,
 		 SXSIZE - 32 + menu.scrollbar_xoffset,
 		 MAX_MENU_ENTRIES_ON_SCREEN * 32);
 
-  for(i=0; i<num_page_entries; i++)
+  for (i = 0; i < num_page_entries; i++)
   {
     TreeInfo *node, *node_first;
     int entry_pos = first_entry + i;
@@ -1076,7 +1076,7 @@ static void drawChooseTreeInfo(int entry_pos, TreeInfo *ti)
 
   /* let BackToFront() redraw only what is needed */
   redraw_mask = last_redraw_mask | REDRAW_TILES;
-  for (x=0; x<SCR_FIELDX; x++)
+  for (x = 0; x < SCR_FIELDX; x++)
     MarkTileDirty(x, 1);
 }
 
@@ -1357,7 +1357,7 @@ static void drawHallOfFameList(int first_entry, int highlight_position)
   DrawText(mSX + 80, mSY + 8, "Hall Of Fame", FONT_TITLE_1);
   DrawTextFCentered(46, FONT_TITLE_2, "HighScores of Level %d", level_nr);
 
-  for(i=0; i<NUM_MENU_ENTRIES_ON_SCREEN; i++)
+  for (i = 0; i < NUM_MENU_ENTRIES_ON_SCREEN; i++)
   {
     int entry = first_entry + i;
     boolean active = (entry == highlight_position);
@@ -1804,7 +1804,7 @@ static void DrawSetupScreen_Generic()
   DrawText(mSX + 16, mSY + 16, title_string, FONT_TITLE_1);
 
   num_setup_info = 0;
-  for(i=0; setup_info[i].type != 0 && i < NUM_MENU_ENTRIES_ON_SCREEN; i++)
+  for (i = 0; setup_info[i].type != 0 && i < NUM_MENU_ENTRIES_ON_SCREEN; i++)
   {
     void *value_ptr = setup_info[i].value;
     int ypos = MENU_SCREEN_START_YPOS + i;
@@ -1860,7 +1860,7 @@ void HandleSetupScreen_Generic(int mx, int my, int dx, int dy, int button)
   }
   else if (button == MB_MENU_LEAVE)
   {
-    for (y=0; y<num_setup_info; y++)
+    for (y = 0; y < num_setup_info; y++)
     {
       if (setup_info[y].type & TYPE_LEAVE_MENU)
       {
@@ -2050,7 +2050,7 @@ static void drawPlayerSetupInputInfo(int player_nr)
   DrawText(mSX+32, mSY+10*32, "Snap Field:", FONT_VALUE_OLD);
   DrawText(mSX+32, mSY+12*32, "Place Bomb:", FONT_VALUE_OLD);
 
-  for (i=0; i<6; i++)
+  for (i = 0; i < 6; i++)
   {
     int ypos = 6 + i + (i > 3 ? i-3 : 0);
 
@@ -2214,7 +2214,7 @@ void CustomizeKeyboard(int player_nr)
   DrawText(mSX + 4*32, mSY + (2+2*step_nr+1)*32,
 	   getKeyNameFromKey(*customize_step[step_nr].key), FONT_VALUE_OLD);
 
-  while(!finished)
+  while (!finished)
   {
     if (PendingEvent())		/* got event */
     {
@@ -2243,7 +2243,7 @@ void CustomizeKeyboard(int player_nr)
 	      key = *customize_step[step_nr].key;
 
 	    /* check if key already used */
-	    for (i=0; i<step_nr; i++)
+	    for (i = 0; i < step_nr; i++)
 	      if (*customize_step[i].key == key)
 		break;
 	    if (i < step_nr)
@@ -2330,9 +2330,9 @@ static boolean CalibrateJoystickMain(int player_nr)
 
   ClearWindow();
 
-  for(y=0; y < 3; y++)
+  for (y = 0; y < 3; y++)
   {
-    for(x=0; x < 3; x++)
+    for (x = 0; x < 3; x++)
     {
       DrawGraphic(xpos + x - 1, ypos + y - 1, IMG_MENU_CALIBRATE_BLUE, 0);
       check[x][y] = FALSE;
@@ -2361,10 +2361,10 @@ static boolean CalibrateJoystickMain(int player_nr)
   DrawGraphic(xpos + last_x, ypos + last_y, IMG_MENU_CALIBRATE_RED, 0);
   BackToFront();
 
-  while(Joystick(player_nr) & JOY_BUTTON);	/* wait for released button */
+  while (Joystick(player_nr) & JOY_BUTTON);	/* wait for released button */
   InitAnimation();
 
-  while(result < 0)
+  while (result < 0)
   {
     if (PendingEvent())		/* got event */
     {
@@ -2496,8 +2496,8 @@ void CalibrateJoystick(int player_nr)
   {
     ClearWindow();
 
-    DrawText(mSX + 16, mSY + 6*32, "  JOYSTICK NOT  ",  FONT_TITLE_1);
-    DrawText(mSX,      mSY + 7*32, "    AVAILABLE    ", FONT_TITLE_1);
+    DrawText(mSX + 16, mSY + 6 * 32, "  JOYSTICK NOT  ",  FONT_TITLE_1);
+    DrawText(mSX,      mSY + 7 * 32, "    AVAILABLE    ", FONT_TITLE_1);
     BackToFront();
     Delay(2000);	/* show error message for two seconds */
   }
@@ -2638,7 +2638,7 @@ static void CreateScreenScrollbuttons()
   unsigned long event_mask;
   int i;
 
-  for (i=0; i<NUM_SCREEN_SCROLLBUTTONS; i++)
+  for (i = 0; i < NUM_SCREEN_SCROLLBUTTONS; i++)
   {
     Bitmap *gd_bitmap_unpressed, *gd_bitmap_pressed;
     int gfx_unpressed, gfx_pressed;
@@ -2693,7 +2693,7 @@ static void CreateScreenScrollbars()
 {
   int i;
 
-  for (i=0; i<NUM_SCREEN_SCROLLBARS; i++)
+  for (i = 0; i < NUM_SCREEN_SCROLLBARS; i++)
   {
     Bitmap *gd_bitmap_unpressed, *gd_bitmap_pressed;
 #if !defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
@@ -2773,7 +2773,7 @@ void CreateScreenGadgets()
 #if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
   int i;
 
-  for (i=0; i < NUM_SCROLLBAR_BITMAPS; i++)
+  for (i = 0; i < NUM_SCROLLBAR_BITMAPS; i++)
   {
     scrollbar_bitmap[i] = CreateBitmap(TILEX, TILEY, DEFAULT_DEPTH);
 
@@ -2805,7 +2805,7 @@ void FreeScreenGadgets()
   int i;
 
 #if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
-  for (i=0; i < NUM_SCROLLBAR_BITMAPS; i++)
+  for (i = 0; i < NUM_SCROLLBAR_BITMAPS; i++)
   {
     /* prevent freeing clip mask and GC twice */
     scrollbar_bitmap[i]->clip_mask = None;
@@ -2815,7 +2815,7 @@ void FreeScreenGadgets()
   }
 #endif
 
-  for (i=0; i<NUM_SCREEN_GADGETS; i++)
+  for (i = 0; i < NUM_SCREEN_GADGETS; i++)
     FreeGadget(screen_gadget[i]);
 }
 
@@ -2827,7 +2827,7 @@ void MapChooseTreeGadgets(TreeInfo *ti)
   if (num_entries <= NUM_MENU_ENTRIES_ON_SCREEN)
     return;
 
-  for (i=0; i<NUM_SCREEN_GADGETS; i++)
+  for (i = 0; i < NUM_SCREEN_GADGETS; i++)
     MapGadget(screen_gadget[i]);
 }
 
@@ -2835,7 +2835,7 @@ void UnmapChooseTreeGadgets()
 {
   int i;
 
-  for (i=0; i<NUM_SCREEN_GADGETS; i++)
+  for (i = 0; i < NUM_SCREEN_GADGETS; i++)
     UnmapGadget(screen_gadget[i]);
 }
 

@@ -50,7 +50,7 @@ static void InitFontClipmasks()
 			       clip_gc_valuemask, &clip_gc_values);
 
   /* create only those clipping Pixmaps we really need */
-  for (i=0; i < gfx.num_fonts; i++)
+  for (i = 0; i < gfx.num_fonts; i++)
   {
     if (gfx.font_bitmap_info[i].bitmap == NULL)
       continue;
@@ -58,7 +58,7 @@ static void InitFontClipmasks()
     gfx.font_bitmap_info[i].clip_mask =
       checked_calloc(gfx.font_bitmap_info[i].num_chars * sizeof(Pixmap));
 
-    for (j=0; j < gfx.font_bitmap_info[i].num_chars; j++)
+    for (j = 0; j < gfx.font_bitmap_info[i].num_chars; j++)
     {
       Bitmap *src_bitmap = gfx.font_bitmap_info[i].bitmap;
       Pixmap src_pixmap = src_bitmap->clip_mask;
@@ -87,11 +87,11 @@ static void FreeFontClipmasks()
   if (gfx.num_fonts == 0 || gfx.font_bitmap_info[0].bitmap == NULL)
     return;
 
-  for (i=0; i < gfx.num_fonts; i++)
+  for (i = 0; i < gfx.num_fonts; i++)
   {
     if (gfx.font_bitmap_info[i].clip_mask)
     {
-      for (j=0; j < gfx.font_bitmap_info[i].num_chars; j++)
+      for (j = 0; j < gfx.font_bitmap_info[i].num_chars; j++)
 	XFreePixmap(display, gfx.font_bitmap_info[i].clip_mask[j]);
       free(gfx.font_bitmap_info[i].clip_mask);
     }
@@ -351,7 +351,7 @@ void DrawTextToTextArea(int x, int y, char *text, int font_nr, int line_length,
     char buffer[MAX_OUTPUT_LINESIZE + 1];
     int i;
 
-    for (i=0; i < line_length && *text; i++)
+    for (i = 0; i < line_length && *text; i++)
       if ((buffer[i] = *text++) == '\n')
 	break;
     buffer[MIN(i, area_xsize)] = '\0';

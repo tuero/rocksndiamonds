@@ -220,7 +220,7 @@ static byte *PCX_ReadColormap(Image *image,byte *buffer_ptr, byte *buffer_last)
     return NULL;
 
   /* read 256 colors from PCX colormap */
-  for (i=0; i<PCX_MAXCOLORS; i++)
+  for (i = 0; i < PCX_MAXCOLORS; i++)
   {
     image->rgb.red[i]   = *buffer_ptr++ << 8;
     image->rgb.green[i] = *buffer_ptr++ << 8;
@@ -256,7 +256,7 @@ static boolean PCX_ReadColormap(FILE *file,struct PCX_Header *pcx,Image *image)
     while (value != PCX_256COLORS_MAGIC);
 
     /* read 256 colors from PCX colormap */
-    for(i = 0; i < PCX_MAXCOLORS; i++)
+    for (i = 0; i < PCX_MAXCOLORS; i++)
     {
       image->rgb.red[i]   = (byte)fgetc(file) << 8;
       image->rgb.green[i] = (byte)fgetc(file) << 8;
@@ -265,7 +265,7 @@ static boolean PCX_ReadColormap(FILE *file,struct PCX_Header *pcx,Image *image)
   }
   else
   {
-    for(i = 0; i < num_colors; i++)
+    for (i = 0; i < num_colors; i++)
     {
       image->rgb.red[i]   = pcx->palette[i][0] << 8;
       image->rgb.green[i] = pcx->palette[i][1] << 8;
@@ -375,7 +375,7 @@ Image *Read_PCX_to_Image(char *filename)
   if (pcx_depth == 8)
   {
     /* determine number of used colormap entries for 8-bit PCX images */
-    for (i=0; i<PCX_MAXCOLORS; i++)
+    for (i = 0; i < PCX_MAXCOLORS; i++)
       if (image->rgb.color_used[i])
 	image->rgb.used++;
   }

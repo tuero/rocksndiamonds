@@ -89,8 +89,9 @@ static void broadcast(struct NetworkServerPlayerInfo *except,
 
   realbuffer[0] = realbuffer[1] = realbuffer[2] = 0;
   realbuffer[3] = (unsigned char)len;
-  for (player=first_player; player; player=player->next)
-    if (player != except && (player->active || !activeonly) && player->introduced)
+  for (player = first_player; player; player = player->next)
+    if (player != except && player->introduced &&
+	(player->active || !activeonly))
       addtobuffer(player, realbuffer, 4 + len);
 }
 
@@ -113,7 +114,7 @@ static void RemovePlayer(struct NetworkServerPlayerInfo *player)
     first_player = player->next;
   else
   {
-    for (v=first_player; v; v=v->next)
+    for (v = first_player; v; v = v->next)
     {
       if (v->next && v->next == player)
       {
@@ -149,6 +150,7 @@ static void AddPlayer(int fd)
 {
   struct NetworkServerPlayerInfo *player, *v;
   unsigned char nxn;
+  boolean again = TRUE;
 
   player = checked_malloc(sizeof (struct NetworkServerPlayerInfo));
 
@@ -166,9 +168,28 @@ static void AddPlayer(int fd)
 
   nxn = 1;
 
+#if 1
+  while (again)
+  {
+    again = FALSE;
+    v = player->next;
+
+    while (v)
+    {
+      if (v->number == nxn)
+      {
+	nxn++;
+
+	again = TRUE;
+	break;
+      }
+      v = v->next;
+    }
+  }
+#else
  again:
   v = player->next;
-  while(v)
+  while (v)
   {
     if (v->number == nxn)
     {
@@ -177,6 +198,7 @@ static void AddPlayer(int fd)
     }
     v = v->next;
   }
+#endif
 
   player->number = nxn;
   if (options.verbose)
@@ -233,7 +255,7 @@ static void Handle_OP_NUMBER_WANTED(struct NetworkServerPlayerInfo *player)
       Error(ERR_NETWORK_SERVER, "client %d (%s) wants to switch to # %d",
 	    player->number, player->player_name, nr_wanted);
 
-  for (v=first_player; v; v=v->next)
+  for (v = first_player; v; v = v->next)
   {
     if (v->number == nr_wanted)
     {
@@ -281,7 +303,7 @@ static void Handle_OP_PLAYER_NAME(struct NetworkServerPlayerInfo *player,
     len=16;
   memcpy(player->player_name, &buffer[2], len-2);
   player->player_name[len-2] = 0;
-  for (i=0; i<len-2; i++)
+  for (i = 0; i < len - 2; i++)
   {
     if (player->player_name[i] < ' ' || 
 	((unsigned char)(player->player_name[i]) > 0x7e &&
@@ -307,7 +329,7 @@ static void Handle_OP_PLAYER_NAME(struct NetworkServerPlayerInfo *player,
 
   if (!player->introduced)
   {
-    for (v=first_player; v; v=v->next)
+    for (v = first_player; v; v = v->next)
     {
       if (v != player && v->introduced)
       {
@@ -336,7 +358,7 @@ static void Handle_OP_START_PLAYING(struct NetworkServerPlayerInfo *player)
 	  (buffer[4] << 8) + buffer[5],
 	  &buffer[6]);
 
-  for (w=first_player; w; w=w->next)
+  for (w = first_player; w; w = w->next)
     if (w->introduced)
       w->active = 1;
 
@@ -344,7 +366,7 @@ static void Handle_OP_START_PLAYING(struct NetworkServerPlayerInfo *player)
   ServerFrameCounter = 0;
 
   /* reset player actions */
-  for (v=first_player; v; v=v->next)
+  for (v = first_player; v; v = v->next)
   {
     v->action = 0;
     v->action_received = FALSE;
@@ -384,7 +406,7 @@ static void Handle_OP_MOVE_PLAYER(struct NetworkServerPlayerInfo *player)
   int i;
 
   /* store player action */
-  for (v=first_player; v; v=v->next)
+  for (v = first_player; v; v = v->next)
   {
     if (v->number == player->number)
     {
@@ -394,7 +416,7 @@ static void Handle_OP_MOVE_PLAYER(struct NetworkServerPlayerInfo *player)
   }
 
   /* check if server received action from each player */
-  for (v=first_player; v; v=v->next)
+  for (v = first_player; v; v = v->next)
   {
     if (!v->action_received)
       return;
@@ -404,11 +426,11 @@ static void Handle_OP_MOVE_PLAYER(struct NetworkServerPlayerInfo *player)
   }
 
   /* initialize all player actions to zero */
-  for (i=0; i<last_client_nr; i++)
+  for (i = 0; i < last_client_nr; i++)
     buffer[6 + i] = 0;
 
   /* broadcast actions of all players to all players */
-  for (v=first_player; v; v=v->next)
+  for (v = first_player; v; v = v->next)
   {
     buffer[6 + v->number-1] = v->action;
     v->action = 0;
@@ -478,7 +500,7 @@ void NetworkServer(int port, int serveronly)
   {
     /* become a daemon, breaking all ties with the controlling terminal */
     options.verbose = FALSE;
-    for (i=0; i<255; i++)
+    for (i = 0; i < 255; i++)
     {
       if (i != lfd)
 	close(i);
@@ -504,11 +526,11 @@ void NetworkServer(int port, int serveronly)
 	  PROTOCOL_VERSION_1, PROTOCOL_VERSION_2, PROTOCOL_VERSION_3);
   }
 
-  while(1)
+  while (1)
   {
     interrupt = 0;
 
-    for (player=first_player; player; player=player->next)
+    for (player = first_player; player; player = player->next)
       flushuser(player);
 
     FD_ZERO(&fds);

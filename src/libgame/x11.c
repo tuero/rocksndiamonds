@@ -214,7 +214,7 @@ static DrawWindow *X11InitWindow()
     XCreateGC(display, new_window->drawable, gc_valuemask, &gc_values);
 
   /* create GCs for line drawing (black and white) */
-  for(i=0; i<2; i++)
+  for (i = 0; i < 2; i++)
   {
     gc_values.graphics_exposures = False;
     gc_values.foreground = (i ? pen_fg : pen_bg);

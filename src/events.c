@@ -79,7 +79,7 @@ static boolean NextValidEvent(Event *event)
 
 void EventLoop(void)
 {
-  while(1)
+  while (1)
   {
     if (PendingEvent())		/* got event */
     {
@@ -219,7 +219,7 @@ void ClearPlayerAction()
 
   /* simulate key release events for still pressed keys */
   key_joystick_mapping = 0;
-  for (i=0; i<MAX_PLAYERS; i++)
+  for (i = 0; i < MAX_PLAYERS; i++)
     stored_player[i].action = 0;
 }
 
@@ -229,7 +229,7 @@ void SleepWhileUnmapped()
 
   KeyboardAutoRepeatOn();
 
-  while(window_unmapped)
+  while (window_unmapped)
   {
     Event event;
 
@@ -473,7 +473,7 @@ void HandleKey(Key key, int key_status)
     static boolean bomb_placed[MAX_PLAYERS] = { FALSE,FALSE,FALSE,FALSE };
     int pnr;
 
-    for (pnr=0; pnr<MAX_PLAYERS; pnr++)
+    for (pnr = 0; pnr < MAX_PLAYERS; pnr++)
     {
       int i;
       byte key_action = 0;
@@ -483,7 +483,7 @@ void HandleKey(Key key, int key_status)
 
       custom_key = setup.input[pnr].key;
 
-      for (i=0; i<6; i++)
+      for (i = 0; i < 6; i++)
 	if (key == *key_info[i].key_custom)
 	  key_action |= key_info[i].action;
 
@@ -533,7 +533,7 @@ void HandleKey(Key key, int key_status)
   {
     int i;
 
-    for (i=0; i<6; i++)
+    for (i = 0; i < 6; i++)
       if (key == key_info[i].key_default)
 	joy |= key_info[i].action;
   }
@@ -798,7 +798,7 @@ void HandleKey(Key key, int key_status)
 	  {
 	    int i;
 
-	    for (i=0; i < MAX_INVENTORY_SIZE; i++)
+	    for (i = 0; i < MAX_INVENTORY_SIZE; i++)
 	      if (local_player->inventory_size < MAX_INVENTORY_SIZE)
 		local_player->inventory_element[local_player->inventory_size++] =
 		  EL_DYNAMITE;
@@ -813,7 +813,7 @@ void HandleKey(Key key, int key_status)
 	  {
 	    int i;
 
-	    for(i=0; i<MAX_PLAYERS; i++)
+	    for (i = 0; i < MAX_PLAYERS; i++)
 	    {
 	      printf("Player %d:\n", i);
 	      printf("  jx == %d, jy == %d\n",
@@ -859,7 +859,7 @@ static int HandleJoystickForAllPlayers()
   int i;
   int result = 0;
 
-  for (i=0; i<MAX_PLAYERS; i++)
+  for (i = 0; i < MAX_PLAYERS; i++)
   {
     byte joy_action = 0;
 

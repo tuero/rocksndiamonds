@@ -237,7 +237,7 @@ static boolean TestAudioDevices(void)
   int i;
 
   /* look for available audio devices, starting with preferred ones */
-  for (i=0; i<sizeof(audio_device_name)/sizeof(char *); i++)
+  for (i = 0; i < sizeof(audio_device_name)/sizeof(char *); i++)
     if ((audio_device_fd = OpenAudioDevice(audio_device_name[i])) >= 0)
       break;
 
@@ -645,7 +645,7 @@ void Mixer_InitChannels()
 {
   int i;
 
-  for(i=0; i<audio.num_channels; i++)
+  for (i = 0; i < audio.num_channels; i++)
     mixer[i].active = FALSE;
   mixer_active_channels = 0;
 }
@@ -928,7 +928,7 @@ static void Mixer_InsertSound(SoundControl snd_ctrl)
   }
 
   /* check if (and how often) this sound sample is already playing */
-  for (k=0, i=audio.first_sound_channel; i<audio.num_channels; i++)
+  for (k = 0, i = audio.first_sound_channel; i < audio.num_channels; i++)
     if (mixer[i].active && SAME_SOUND_DATA(mixer[i], snd_ctrl))
       k++;
 
@@ -939,7 +939,7 @@ static void Mixer_InsertSound(SoundControl snd_ctrl)
   /* reset expiration delay for already playing loop sounds */
   if (k > 0 && IS_LOOP(snd_ctrl))
   {
-    for(i=audio.first_sound_channel; i<audio.num_channels; i++)
+    for (i = audio.first_sound_channel; i < audio.num_channels; i++)
     {
       if (mixer[i].active && SAME_SOUND_DATA(mixer[i], snd_ctrl))
       {
@@ -978,7 +978,7 @@ static void Mixer_InsertSound(SoundControl snd_ctrl)
     int longest = 0, longest_nr = audio.first_sound_channel;
 
     /* look for oldest equal sound */
-    for(i=audio.first_sound_channel; i<audio.num_channels; i++)
+    for (i = audio.first_sound_channel; i < audio.num_channels; i++)
     {
       int playing_time = playing_current - mixer[i].playing_starttime;
       int actual;
@@ -1009,7 +1009,7 @@ static void Mixer_InsertSound(SoundControl snd_ctrl)
   if (mixer_active_channels ==
       audio.num_channels - (mixer[audio.music_channel].active ? 0 : 1))
   {
-    for (i=audio.first_sound_channel; i<audio.num_channels; i++)
+    for (i = audio.first_sound_channel; i < audio.num_channels; i++)
     {
       if (!mixer[i].active)
       {
@@ -1031,7 +1031,7 @@ static void Mixer_InsertSound(SoundControl snd_ctrl)
 #if 0
 #if DEBUG
     /* print some debugging information about audio channel usage */
-    for (i=audio.first_sound_channel; i<audio.num_channels; i++)
+    for (i = audio.first_sound_channel; i < audio.num_channels; i++)
     {
       Error(ERR_RETURN, "Mixer_InsertSound: %d [%d]: %ld (%ld)",
 	    i, mixer[i].active, mixer[i].data_len, (long)mixer[i].data_ptr);
@@ -1039,7 +1039,7 @@ static void Mixer_InsertSound(SoundControl snd_ctrl)
 #endif
 #endif
 
-    for (i=audio.first_sound_channel; i<audio.num_channels; i++)
+    for (i = audio.first_sound_channel; i < audio.num_channels; i++)
     {
       int playing_time = playing_current - mixer[i].playing_starttime;
       int actual = 1000 * playing_time / mixer[i].data_len;
@@ -1055,7 +1055,7 @@ static void Mixer_InsertSound(SoundControl snd_ctrl)
   }
 
   /* add the new sound to the mixer */
-  for(i=audio.first_sound_channel; i<audio.num_channels; i++)
+  for (i = audio.first_sound_channel; i < audio.num_channels; i++)
   {
 #if 0
     printf("CHECKING CHANNEL %d FOR SOUND %d ...\n", i, snd_ctrl.nr);
@@ -1095,14 +1095,14 @@ static void HandleSoundRequest(SoundControl snd_ctrl)
 #endif
 
   /* deactivate channels that have expired since the last request */
-  for (i=0; i<audio.num_channels; i++)
+  for (i = 0; i < audio.num_channels; i++)
     if (mixer[i].active && Mixer_ChannelExpired(i))
       Mixer_StopChannel(i);
 
   if (IS_RELOADING(snd_ctrl))		/* load new sound or music files */
   {
     Mixer_StopMusicChannel();
-    for(i=audio.first_sound_channel; i<audio.num_channels; i++)
+    for (i = audio.first_sound_channel; i < audio.num_channels; i++)
       Mixer_StopChannel(i);
 
 #if defined(AUDIO_UNIX_NATIVE)
@@ -1123,7 +1123,7 @@ static void HandleSoundRequest(SoundControl snd_ctrl)
       return;
     }
 
-    for(i=audio.first_sound_channel; i<audio.num_channels; i++)
+    for (i = audio.first_sound_channel; i < audio.num_channels; i++)
       if (SAME_SOUND_NR(mixer[i], snd_ctrl) || ALL_SOUNDS(snd_ctrl))
 	Mixer_FadeChannel(i);
   }
@@ -1135,7 +1135,7 @@ static void HandleSoundRequest(SoundControl snd_ctrl)
       return;
     }
 
-    for(i=audio.first_sound_channel; i<audio.num_channels; i++)
+    for (i = audio.first_sound_channel; i < audio.num_channels; i++)
       if (SAME_SOUND_NR(mixer[i], snd_ctrl) || ALL_SOUNDS(snd_ctrl))
 	Mixer_StopChannel(i);
 
@@ -1173,7 +1173,7 @@ void StartMixer(void)
     return;
 
   /* initialize stereo position conversion information */
-  for(i=0; i<=SOUND_MAX_LEFT2RIGHT; i++)
+  for (i = 0; i <= SOUND_MAX_LEFT2RIGHT; i++)
     stereo_volume[i] =
       (int)sqrt((float)(SOUND_MAX_LEFT2RIGHT * SOUND_MAX_LEFT2RIGHT - i * i));
 
@@ -1200,11 +1200,11 @@ static void CopySampleToMixingBuffer(SoundControl *snd_ctrl,
   {
     byte *sample_ptr = (byte *)snd_ctrl->data_ptr + num_channels * sample_pos;
 
-    for (i=0; i<num_output_channels; i++)
+    for (i = 0; i < num_output_channels; i++)
     {
       int offset = (snd_ctrl->num_channels == 1 ? 0 : i);
 
-      for (j=0; j<sample_size; j++)
+      for (j = 0; j < sample_size; j++)
 	buffer_ptr[output_stepsize * j + i] =
 	  ((short)(sample_ptr[stepsize * j + offset] ^ 0x80)) << 8;
     }
@@ -1213,11 +1213,11 @@ static void CopySampleToMixingBuffer(SoundControl *snd_ctrl,
   {
     short *sample_ptr= (short *)snd_ctrl->data_ptr + num_channels * sample_pos;
 
-    for (i=0; i<num_output_channels; i++)
+    for (i = 0; i < num_output_channels; i++)
     {
       int offset = (snd_ctrl->num_channels == 1 ? 0 : i);
 
-      for (j=0; j<sample_size; j++)
+      for (j = 0; j < sample_size; j++)
 	buffer_ptr[output_stepsize * j + i] =
 	  sample_ptr[stepsize * j + offset];
     }
@@ -1258,7 +1258,7 @@ static void Mixer_Main_DSP()
   memset(premix_last_buffer, 0,
 	 max_sample_size * num_output_channels * sizeof(long));
 
-  for(i=0; i<audio.num_channels; i++)
+  for (i = 0; i < audio.num_channels; i++)
   {
     void *sample_ptr;
     int sample_len;
@@ -1309,7 +1309,7 @@ static void Mixer_Main_DSP()
 
     /* adjust volume of actual sound sample */
     if (mixer[i].volume != SOUND_MAX_VOLUME)
-      for(j=0; j<sample_size * num_output_channels; j++)
+      for (j = 0; j < sample_size * num_output_channels; j++)
 	premix_first_buffer[j] =
 	  mixer[i].volume * (long)premix_first_buffer[j] / SOUND_MAX_VOLUME;
 
@@ -1319,7 +1319,7 @@ static void Mixer_Main_DSP()
       int left_volume  = SOUND_VOLUME_LEFT(mixer[i].stereo_position);
       int right_volume = SOUND_VOLUME_RIGHT(mixer[i].stereo_position);
 
-      for(j=0; j<sample_size; j++)
+      for (j = 0; j < sample_size; j++)
       {
 	premix_first_buffer[2 * j + 0] =
 	  left_volume  * premix_first_buffer[2 * j + 0] / SOUND_MAX_LEFT2RIGHT;
@@ -1329,7 +1329,7 @@ static void Mixer_Main_DSP()
     }
 
     /* fill the last mixing buffer with stereo or mono sound */
-    for(j=0; j<sample_size * num_output_channels; j++)
+    for (j = 0; j < sample_size * num_output_channels; j++)
       premix_last_buffer[j] += premix_first_buffer[j];
 
     /* delete completed sound entries from the mixer */
@@ -1345,7 +1345,7 @@ static void Mixer_Main_DSP()
   }
 
   /* prepare final playing buffer according to system audio format */
-  for(i=0; i<max_sample_size * num_output_channels; i++)
+  for (i = 0; i < max_sample_size * num_output_channels; i++)
   {
     /* cut off at 17 bit value */
     if (premix_last_buffer[i] < -65535)
@@ -1408,13 +1408,13 @@ static int Mixer_Main_SimpleAudio(SoundControl snd_ctrl)
 
   /* adjust volume of actual sound sample */
   if (mixer[i].volume != SOUND_MAX_VOLUME)
-    for(j=0; j<sample_size; j++)
+    for (j = 0; j < sample_size; j++)
       premix_first_buffer[j] =
 	mixer[i].volume * (long)premix_first_buffer[j] / SOUND_MAX_VOLUME;
 
   /* might be needed for u-law /dev/audio */
 #if 1
-  for(j=0; j<sample_size; j++)
+  for (j = 0; j < sample_size; j++)
     playing_buffer[j] =
       linear_to_ulaw(premix_first_buffer[j]);
 #endif
@@ -1423,7 +1423,7 @@ static int Mixer_Main_SimpleAudio(SoundControl snd_ctrl)
   if (mixer[i].playing_pos >= mixer[i].data_len)
     Mixer_StopChannel(i);
 
-  for(i=0; i<sample_size; i++)
+  for (i = 0; i < sample_size; i++)
     playing_buffer[i] = (premix_first_buffer[i] >> 8) ^ 0x80;
 
   /* finally play the sound fragment */
@@ -1449,7 +1449,7 @@ void Mixer_Main()
   FD_ZERO(&mixer_fdset); 
   FD_SET(audio.mixer_pipe[0], &mixer_fdset);
 
-  while(1)	/* wait for sound playing commands from client */
+  while (1)	/* wait for sound playing commands from client */
   {
     struct timeval delay = { 0, 0 };
 
@@ -1822,11 +1822,11 @@ static void *Load_WAV(char *filename)
     int i;
 
     if (snd_ctrl->format == AUDIO_FORMAT_U8)
-      for (i=0; i<sample_size; i++)
+      for (i = 0; i < sample_size; i++)
 	*buffer_ptr++ =
 	  ((short)(((byte *)sample_ptr)[i] ^ 0x80)) << 8;
     else	/* AUDIO_FORMAT_S16 */
-      for (i=0; i<sample_size; i++)
+      for (i = 0; i < sample_size; i++)
 	*buffer_ptr++ =
 	  ((short *)sample_ptr)[i];
   }
@@ -1920,7 +1920,7 @@ void LoadCustomMusic_NoConf(void)
     boolean music_already_used = FALSE;
     int i;
 
-    for (i=0; i < num_music; i++)
+    for (i = 0; i < num_music; i++)
     {
       struct FileInfo *music = getMusicListEntry(i);
 
@@ -2063,7 +2063,7 @@ void InitSoundList(struct ConfigInfo *config_list, int num_file_list_entries,
   sound_info->dynamic_file_list = NULL;
 
   sound_info->num_suffix_list_entries = 0;
-  for (i=0; config_suffix_list[i].token != NULL; i++)
+  for (i = 0; config_suffix_list[i].token != NULL; i++)
     sound_info->num_suffix_list_entries++;
 
   sound_info->suffix_list = config_suffix_list;
@@ -2071,23 +2071,23 @@ void InitSoundList(struct ConfigInfo *config_list, int num_file_list_entries,
   /* ---------- initialize base prefix and suffixes lists ---------- */
 
   sound_info->num_base_prefixes = 0;
-  for (i=0; base_prefixes[i] != NULL; i++)
+  for (i = 0; base_prefixes[i] != NULL; i++)
     sound_info->num_base_prefixes++;
 
   sound_info->num_ext1_suffixes = 0;
-  for (i=0; ext1_suffixes[i] != NULL; i++)
+  for (i = 0; ext1_suffixes[i] != NULL; i++)
     sound_info->num_ext1_suffixes++;
 
   sound_info->num_ext2_suffixes = 0;
-  for (i=0; ext2_suffixes[i] != NULL; i++)
+  for (i = 0; ext2_suffixes[i] != NULL; i++)
     sound_info->num_ext2_suffixes++;
 
   sound_info->num_ext3_suffixes = 0;
-  for (i=0; ext3_suffixes[i] != NULL; i++)
+  for (i = 0; ext3_suffixes[i] != NULL; i++)
     sound_info->num_ext3_suffixes++;
 
   sound_info->num_ignore_tokens = 0;
-  for (i=0; ignore_tokens[i] != NULL; i++)
+  for (i = 0; ignore_tokens[i] != NULL; i++)
     sound_info->num_ignore_tokens++;
 
   sound_info->base_prefixes = base_prefixes;
@@ -2143,7 +2143,7 @@ void InitMusicList(struct ConfigInfo *config_list, int num_file_list_entries,
   music_info->dynamic_file_list = NULL;
 
   music_info->num_suffix_list_entries = 0;
-  for (i=0; config_suffix_list[i].token != NULL; i++)
+  for (i = 0; config_suffix_list[i].token != NULL; i++)
     music_info->num_suffix_list_entries++;
 
   music_info->suffix_list = config_suffix_list;
@@ -2151,23 +2151,23 @@ void InitMusicList(struct ConfigInfo *config_list, int num_file_list_entries,
   /* ---------- initialize base prefix and suffixes lists ---------- */
 
   music_info->num_base_prefixes = 0;
-  for (i=0; base_prefixes[i] != NULL; i++)
+  for (i = 0; base_prefixes[i] != NULL; i++)
     music_info->num_base_prefixes++;
 
   music_info->num_ext1_suffixes = 0;
-  for (i=0; ext1_suffixes[i] != NULL; i++)
+  for (i = 0; ext1_suffixes[i] != NULL; i++)
     music_info->num_ext1_suffixes++;
 
   music_info->num_ext2_suffixes = 0;
-  for (i=0; ext2_suffixes[i] != NULL; i++)
+  for (i = 0; ext2_suffixes[i] != NULL; i++)
     music_info->num_ext2_suffixes++;
 
   music_info->num_ext3_suffixes = 0;
-  for (i=0; ext3_suffixes[i] != NULL; i++)
+  for (i = 0; ext3_suffixes[i] != NULL; i++)
     music_info->num_ext3_suffixes++;
 
   music_info->num_ignore_tokens = 0;
-  for (i=0; ignore_tokens[i] != NULL; i++)
+  for (i = 0; ignore_tokens[i] != NULL; i++)
     music_info->num_ignore_tokens++;
 
   music_info->base_prefixes = base_prefixes;
@@ -2423,7 +2423,7 @@ static void FreeAllMusic_NoConf()
   if (Music_NoConf == NULL)
     return;
 
-  for(i=0; i < num_music_noconf; i++)
+  for (i = 0; i < num_music_noconf; i++)
     FreeMusic(Music_NoConf[i]);
 
   free(Music_NoConf);

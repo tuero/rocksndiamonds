@@ -3068,13 +3068,13 @@ static void ReinitializeElementList()
 				     &num_editor_el_user_defined);
 
     /* initialize list of empty elements (used for padding, if needed) */
-    for (i=0; i < ED_NUM_ELEMENTLIST_BUTTONS; i++)
+    for (i = 0; i < ED_NUM_ELEMENTLIST_BUTTONS; i++)
       editor_el_empty[i] = EL_EMPTY;
 
     /* do some sanity checks for each element from element list */
-    for (i=0; editor_elements_info[i].setup_value != NULL; i++)
+    for (i = 0; editor_elements_info[i].setup_value != NULL; i++)
     {
-      for (j=0; j < *editor_elements_info[i].element_list_size; j++)
+      for (j = 0; j < *editor_elements_info[i].element_list_size; j++)
       {
 	int element = (*editor_elements_info[i].element_list)[j];
 
@@ -3093,7 +3093,7 @@ static void ReinitializeElementList()
   use_el_empty = FALSE;
 
   /* determine size of element list */
-  for (i=0; editor_elements_info[i].setup_value != NULL; i++)
+  for (i = 0; editor_elements_info[i].setup_value != NULL; i++)
   {
     if (*editor_elements_info[i].setup_value)
     {
@@ -3116,15 +3116,15 @@ static void ReinitializeElementList()
   editor_elements = checked_malloc(num_editor_elements * sizeof(int));
 
   /* fill element list */
-  for (i=0; editor_elements_info[i].setup_value != NULL; i++)
+  for (i = 0; editor_elements_info[i].setup_value != NULL; i++)
   {
     if (*editor_elements_info[i].setup_value)
     {
       if (setup.editor.el_headlines)
-	for (j=0; j < *editor_elements_info[i].headline_list_size; j++)
+	for (j = 0; j < *editor_elements_info[i].headline_list_size; j++)
 	  editor_elements[pos++] = (*editor_elements_info[i].headline_list)[j];
 
-      for (j=0; j < *editor_elements_info[i].element_list_size; j++)
+      for (j = 0; j < *editor_elements_info[i].element_list_size; j++)
 	editor_elements[pos++] = (*editor_elements_info[i].element_list)[j];
     }
   }
@@ -3141,9 +3141,9 @@ void PrintEditorElementList()
   boolean *stop = &setup.editor.el_user_defined;
   int i, j;
 
-  for (i=0; editor_elements_info[i].setup_value != stop; i++)
+  for (i = 0; editor_elements_info[i].setup_value != stop; i++)
   {
-    for (j=0; j < *editor_elements_info[i].headline_list_size; j++)
+    for (j = 0; j < *editor_elements_info[i].headline_list_size; j++)
     {
       int element = (*editor_elements_info[i].headline_list)[j];
 
@@ -3153,7 +3153,7 @@ void PrintEditorElementList()
     if (j > 0)
       printf("#\n");
 
-    for (j=0; j < *editor_elements_info[i].element_list_size; j++)
+    for (j = 0; j < *editor_elements_info[i].element_list_size; j++)
     {
       int element = (*editor_elements_info[i].element_list)[j];
 
@@ -3176,7 +3176,7 @@ static void ReinitializeElementListButtons()
     if (last_setup_value_headlines != setup.editor.el_headlines)
       initialization_needed = TRUE;
 
-    for (i=0; editor_elements_info[i].setup_value != NULL; i++)
+    for (i = 0; editor_elements_info[i].setup_value != NULL; i++)
       if (editor_elements_info[i].last_setup_value !=
 	  *editor_elements_info[i].setup_value)
 	initialization_needed = TRUE;
@@ -3190,7 +3190,7 @@ static void ReinitializeElementListButtons()
 
   /* store current setup values for next invocation of this function */
   last_setup_value_headlines = setup.editor.el_headlines;
-  for (i=0; editor_elements_info[i].setup_value != NULL; i++)
+  for (i = 0; editor_elements_info[i].setup_value != NULL; i++)
     editor_elements_info[i].last_setup_value =
       *editor_elements_info[i].setup_value;
 
@@ -3210,8 +3210,8 @@ static void DrawElementBorder(int dest_x, int dest_y, int width, int height,
 
   getMiniGraphicSource(border_graphic, &src_bitmap, &src_x, &src_y);
 
-  for (y=0; y < num_mini_tiley; y++)
-    for (x=0; x < num_mini_tilex; x++)
+  for (y = 0; y < num_mini_tiley; y++)
+    for (x = 0; x < num_mini_tilex; x++)
       BlitBitmap(src_bitmap, drawto, src_x, src_y, MINI_TILEX, MINI_TILEY,
 		 dest_x - MINI_TILEX / 2 + x * MINI_TILEX,
 		 dest_y - MINI_TILEY / 2 + y * MINI_TILEY);
@@ -3233,8 +3233,8 @@ static void DrawDrawingArea(int id)
     DrawMiniGraphicExt(drawto, gi->x, gi->y,
 		       el2edimg(custom_element.gfx_element));
   else if (id == ED_DRAWING_ID_CUSTOM_CONTENT)
-    for (y=0; y<3; y++)
-      for (x=0; x<3; x++)
+    for (y = 0; y < 3; y++)
+      for (x = 0; x < 3; x++)
 	DrawMiniGraphicExt(drawto,
 			   gi->x + x * MINI_TILEX, gi->y + y * MINI_TILEY,
 			   el2edimg(custom_element.content[x][y]));
@@ -3242,8 +3242,8 @@ static void DrawDrawingArea(int id)
     DrawMiniGraphicExt(drawto, gi->x, gi->y,
 		       el2edimg(custom_element_change.target_element));
   else if (id == ED_DRAWING_ID_CUSTOM_CHANGE_CONTENT)
-    for (y=0; y < 3; y++)
-      for (x=0; x < 3; x++)
+    for (y = 0; y < 3; y++)
+      for (x = 0; x < 3; x++)
 	DrawMiniGraphicExt(drawto,
 			   gi->x + x * MINI_TILEX, gi->y + y * MINI_TILEY,
 			   el2edimg(custom_element_change.content[x][y]));
@@ -3255,8 +3255,8 @@ static void DrawDrawingArea(int id)
   {
     int nr = id - ED_DRAWING_ID_ELEMENT_CONTENT_0;
 
-    for (y=0; y < 3; y++)
-      for (x=0; x < 3; x++)
+    for (y = 0; y < 3; y++)
+      for (x = 0; x < 3; x++)
 	DrawMiniGraphicExt(drawto,
 			   gi->x + x * MINI_TILEX, gi->y + y * MINI_TILEY,
 			   el2edimg(level.yamyam_content[nr][x][y]));
@@ -3279,13 +3279,13 @@ static void ScrollMiniLevel(int from_x, int from_y, int scroll)
   if (dx)
   {
     x = (dx == 1 ? 0 : ed_fieldx - 1);
-    for(y=0; y<ed_fieldy; y++)
+    for (y = 0; y < ed_fieldy; y++)
       DrawMiniElementOrWall(x, y, from_x, from_y);
   }
   else if (dy)
   {
     y = (dy == 1 ? 0 : ed_fieldy - 1);
-    for(x=0; x<ed_fieldx; x++)
+    for (x = 0; x < ed_fieldx; x++)
       DrawMiniElementOrWall(x, y, from_x, from_y);
   }
 
@@ -3301,7 +3301,7 @@ static void CreateControlButtons()
   int i;
 
   /* create toolbox buttons */
-  for (i=0; i < ED_NUM_CTRL_BUTTONS; i++)
+  for (i = 0; i < ED_NUM_CTRL_BUTTONS; i++)
   {
     int id = i;
     int width, height;
@@ -3418,7 +3418,7 @@ static void CreateControlButtons()
   }
 
   /* create buttons for scrolling of drawing area and element list */
-  for (i=0; i<ED_NUM_SCROLLBUTTONS; i++)
+  for (i = 0; i < ED_NUM_SCROLLBUTTONS; i++)
   {
     int id = scrollbutton_info[i].gadget_id;
     int x, y, width, height;
@@ -3476,7 +3476,7 @@ static void CreateControlButtons()
   }
 
   /* create buttons for element list */
-  for (i=0; i < ED_NUM_ELEMENTLIST_BUTTONS; i++)
+  for (i = 0; i < ED_NUM_ELEMENTLIST_BUTTONS; i++)
   {
     Bitmap *deco_bitmap;
     int deco_x, deco_y, deco_xpos, deco_ypos;
@@ -3532,7 +3532,7 @@ static void CreateCounterButtons()
   int max_infotext_len = getMaxInfoTextLength();
   int i;
 
-  for (i=0; i<ED_NUM_COUNTERBUTTONS; i++)
+  for (i = 0; i < ED_NUM_COUNTERBUTTONS; i++)
   {
     int j;
     int x = SX + counterbutton_info[i].x;	/* down count button */
@@ -3547,7 +3547,7 @@ static void CreateCounterButtons()
     if (counterbutton_info[i].text_left != NULL)
       x += getTextWidthForGadget(counterbutton_info[i].text_left);
 
-    for (j=0; j<2; j++)
+    for (j = 0; j < 2; j++)
     {
       Bitmap *gd_bitmap = graphic_info[IMG_GLOBAL_DOOR].bitmap;
       struct GadgetInfo *gi;
@@ -3683,7 +3683,7 @@ static void CreateDrawingAreas()
 {
   int i;
 
-  for (i=0; i<ED_NUM_DRAWING_AREAS; i++)
+  for (i = 0; i < ED_NUM_DRAWING_AREAS; i++)
   {
     struct GadgetInfo *gi;
     unsigned long event_mask;
@@ -3732,7 +3732,7 @@ static void CreateTextInputGadgets()
   int max_infotext_len = getMaxInfoTextLength();
   int i;
 
-  for (i=0; i<ED_NUM_TEXTINPUT; i++)
+  for (i = 0; i < ED_NUM_TEXTINPUT; i++)
   {
     Bitmap *gd_bitmap = graphic_info[IMG_GLOBAL_DOOR].bitmap;
     int gd_x, gd_y;
@@ -3780,7 +3780,7 @@ static void CreateTextAreaGadgets()
   int max_infotext_len = getMaxInfoTextLength();
   int i;
 
-  for (i=0; i<ED_NUM_TEXTAREAS; i++)
+  for (i = 0; i < ED_NUM_TEXTAREAS; i++)
   {
     Bitmap *gd_bitmap = graphic_info[IMG_GLOBAL_DOOR].bitmap;
     int gd_x, gd_y;
@@ -3829,7 +3829,7 @@ static void CreateSelectboxGadgets()
   int max_infotext_len = getMaxInfoTextLength();
   int i, j;
 
-  for (i=0; i<ED_NUM_SELECTBOX; i++)
+  for (i = 0; i < ED_NUM_SELECTBOX; i++)
   {
     Bitmap *gd_bitmap = graphic_info[IMG_GLOBAL_DOOR].bitmap;
     int gd_x, gd_y;
@@ -3847,7 +3847,7 @@ static void CreateSelectboxGadgets()
 	 implicitely cast -1 to an unsigned integer value!) */
       selectbox_info[i].size = 0;
 
-      for (j=0; selectbox_info[i].options[j].text != NULL; j++)
+      for (j = 0; selectbox_info[i].options[j].text != NULL; j++)
 	if (strlen(selectbox_info[i].options[j].text) > selectbox_info[i].size)
 	  selectbox_info[i].size = strlen(selectbox_info[i].options[j].text);
 
@@ -3906,7 +3906,7 @@ static void CreateTextbuttonGadgets()
   int max_infotext_len = getMaxInfoTextLength();
   int i;
 
-  for (i=0; i<ED_NUM_TEXTBUTTONS; i++)
+  for (i = 0; i < ED_NUM_TEXTBUTTONS; i++)
   {
     Bitmap *gd_bitmap = graphic_info[IMG_GLOBAL_DOOR].bitmap;
     int gd_x1, gd_x2, gd_y1, gd_y2;
@@ -3987,7 +3987,7 @@ static void CreateGraphicbuttonGadgets()
   int i;
 
   /* create buttons for scrolling of drawing area and element list */
-  for (i=0; i < ED_NUM_GRAPHICBUTTONS; i++)
+  for (i = 0; i < ED_NUM_GRAPHICBUTTONS; i++)
   {
     int id = graphicbutton_info[i].gadget_id;
     int gd_x1, gd_x2, gd_y1, gd_y2;
@@ -4039,7 +4039,7 @@ static void CreateScrollbarGadgets()
 {
   int i;
 
-  for (i=0; i<ED_NUM_SCROLLBARS; i++)
+  for (i = 0; i < ED_NUM_SCROLLBARS; i++)
   {
     int id = scrollbar_info[i].gadget_id;
     Bitmap *gd_bitmap = graphic_info[IMG_GLOBAL_DOOR].bitmap;
@@ -4121,7 +4121,7 @@ static void CreateCheckbuttonGadgets()
   gd_x4 = DOOR_GFX_PAGEX3 + ED_CHECKBUTTON_CHECKED_XPOS;
   gd_y  = DOOR_GFX_PAGEY1 + ED_RADIOBUTTON_YPOS;
 
-  for (i=0; i<ED_NUM_CHECKBUTTONS; i++)
+  for (i = 0; i < ED_NUM_CHECKBUTTONS; i++)
   {
     int id = checkbutton_info[i].gadget_id;
     int x = SX + checkbutton_info[i].x;
@@ -4184,7 +4184,7 @@ static void CreateRadiobuttonGadgets()
   gd_x4 = DOOR_GFX_PAGEX3 + ED_CHECKBUTTON_CHECKED_XPOS;
   gd_y  = DOOR_GFX_PAGEY1 + ED_RADIOBUTTON_YPOS;
 
-  for (i=0; i<ED_NUM_RADIOBUTTONS; i++)
+  for (i = 0; i < ED_NUM_RADIOBUTTONS; i++)
   {
     int id = radiobutton_info[i].gadget_id;
     int x = SX + radiobutton_info[i].x;
@@ -4260,7 +4260,7 @@ void FreeLevelEditorGadgets()
 {
   int i;
 
-  for (i=0; i < NUM_EDITOR_GADGETS; i++)
+  for (i = 0; i < NUM_EDITOR_GADGETS; i++)
     FreeGadget(level_editor_gadget[i]);
 }
 
@@ -4311,11 +4311,11 @@ static void MapControlButtons()
   int i;
 
   /* map toolbox buttons (excluding special CE toolbox buttons) */
-  for (i=0; i < ED_NUM_CTRL1_2_BUTTONS; i++)
+  for (i = 0; i < ED_NUM_CTRL1_2_BUTTONS; i++)
     MapGadget(level_editor_gadget[i]);
 
   /* map buttons to select elements */
-  for (i=0; i < ED_NUM_ELEMENTLIST_BUTTONS; i++)
+  for (i = 0; i < ED_NUM_ELEMENTLIST_BUTTONS; i++)
     MapGadget(level_editor_gadget[GADGET_ID_ELEMENTLIST_FIRST + i]);
   MapGadget(level_editor_gadget[GADGET_ID_SCROLL_LIST_VERTICAL]);
   MapGadget(level_editor_gadget[GADGET_ID_SCROLL_LIST_UP]);
@@ -4511,7 +4511,7 @@ static void MapMainDrawingArea()
   boolean no_vertical_scrollbar = (lev_fieldy + 2 <= ed_fieldy);
   int i;
 
-  for (i=ED_SCROLLBUTTON_ID_AREA_FIRST; i<=ED_SCROLLBUTTON_ID_AREA_LAST; i++)
+  for (i=ED_SCROLLBUTTON_ID_AREA_FIRST; i <= ED_SCROLLBUTTON_ID_AREA_LAST; i++)
   {
     if (((i == ED_SCROLLBUTTON_ID_AREA_LEFT ||
 	  i == ED_SCROLLBUTTON_ID_AREA_RIGHT) &&
@@ -4524,7 +4524,7 @@ static void MapMainDrawingArea()
     MapGadget(level_editor_gadget[scrollbutton_info[i].gadget_id]);
   }
 
-  for (i=ED_SCROLLBAR_ID_AREA_FIRST; i<=ED_SCROLLBAR_ID_AREA_LAST; i++)
+  for (i = ED_SCROLLBAR_ID_AREA_FIRST; i <= ED_SCROLLBAR_ID_AREA_LAST; i++)
   {
     if ((i == ED_SCROLLBAR_ID_AREA_HORIZONTAL && no_horizontal_scrollbar) ||
 	(i == ED_SCROLLBAR_ID_AREA_VERTICAL && no_vertical_scrollbar))
@@ -4540,7 +4540,7 @@ static void MapOrUnmapLevelEditorToolboxCustomGadgets(boolean map)
 {
   int i;
 
-  for (i=0; i < ED_NUM_CTRL_BUTTONS; i++)
+  for (i = 0; i < ED_NUM_CTRL_BUTTONS; i++)
   {
     if (i == GADGET_ID_CUSTOM_COPY_FROM ||
         i == GADGET_ID_CUSTOM_COPY_TO ||
@@ -4569,7 +4569,7 @@ static void MapOrUnmapLevelEditorToolboxDrawingGadgets(boolean map)
   Bitmap *gd_bitmap = graphic_info[IMG_GLOBAL_DOOR].bitmap;
   int i;
 
-  for (i=0; i < ED_NUM_CTRL1_BUTTONS; i++)
+  for (i = 0; i < ED_NUM_CTRL1_BUTTONS; i++)
   {
     if (i != GADGET_ID_SINGLE_ITEMS &&
 	i != GADGET_ID_PROPERTIES &&
@@ -4613,7 +4613,7 @@ static void UnmapLevelEditorWindowGadgets()
 {
   int i;
 
-  for (i=0; i < NUM_EDITOR_GADGETS; i++)
+  for (i = 0; i < NUM_EDITOR_GADGETS; i++)
     if (level_editor_gadget[i]->x < SX + SXSIZE)
       UnmapGadget(level_editor_gadget[i]);
 }
@@ -4622,7 +4622,7 @@ void UnmapLevelEditorGadgets()
 {
   int i;
 
-  for (i=0; i < NUM_EDITOR_GADGETS; i++)
+  for (i = 0; i < NUM_EDITOR_GADGETS; i++)
     UnmapGadget(level_editor_gadget[i]);
 }
 
@@ -4651,8 +4651,8 @@ static boolean LevelChanged()
   boolean level_changed = FALSE;
   int x, y;
 
-  for(y=0; y<lev_fieldy; y++) 
-    for(x=0; x<lev_fieldx; x++)
+  for (y = 0; y < lev_fieldy; y++) 
+    for (x = 0; x < lev_fieldx; x++)
       if (Feld[x][y] != level.field[x][y])
 	level_changed = TRUE;
 
@@ -4664,8 +4664,8 @@ static boolean LevelContainsPlayer()
   boolean player_found = FALSE;
   int x, y;
 
-  for(y=0; y<lev_fieldy; y++) 
-    for(x=0; x<lev_fieldx; x++)
+  for (y = 0; y < lev_fieldy; y++) 
+    for (x = 0; x < lev_fieldx; x++)
       if (Feld[x][y] == EL_PLAYER_1 ||
 	  Feld[x][y] == EL_SP_MURPHY) 
 	player_found = TRUE;
@@ -4678,8 +4678,8 @@ static void CopyPlayfield(short src[MAX_LEV_FIELDX][MAX_LEV_FIELDY],
 {
   int x, y;
 
-  for(x=0; x<lev_fieldx; x++)
-    for(y=0; y<lev_fieldy; y++) 
+  for (x = 0; x < lev_fieldx; x++)
+    for (y = 0; y < lev_fieldy; y++) 
       dst[x][y] = src[x][y];
 }
 
@@ -4688,7 +4688,7 @@ static int setSelectboxValue(int selectbox_id, int new_value)
   int new_index_value = 0;
   int i;
 
-  for(i=0; selectbox_info[selectbox_id].options[i].text != NULL; i++)
+  for (i = 0; selectbox_info[selectbox_id].options[i].text != NULL; i++)
     if (selectbox_info[selectbox_id].options[i].value == new_value)
       new_index_value = i;
 
@@ -4705,7 +4705,7 @@ static void copy_custom_element_settings(int element_from, int element_to)
   int i, x, y;
 
   /* ---------- copy element description ---------- */
-  for (i=0; i < MAX_ELEMENT_NAME_LEN + 1; i++)
+  for (i = 0; i < MAX_ELEMENT_NAME_LEN + 1; i++)
     ei_to->description[i] = ei_from->description[i];
 
   /* ---------- copy element properties ---------- */
@@ -4731,8 +4731,8 @@ static void copy_custom_element_settings(int element_from, int element_to)
 
   ei_to->slippery_type = ei_from->slippery_type;
 
-  for(y=0; y<3; y++)
-    for(x=0; x<3; x++)
+  for (y = 0; y < 3; y++)
+    for (x = 0; x < 3; x++)
       ei_to->content[x][y] = ei_from->content[x][y];
 
   ei_to->num_change_pages = ei_from->num_change_pages;
@@ -4764,8 +4764,8 @@ static void copy_custom_element_settings(int element_from, int element_to)
     change_to->random = change_from->random;
     change_to->power = change_from->power;
 
-    for(y=0; y<3; y++)
-      for(x=0; x<3; x++)
+    for (y = 0; y < 3; y++)
+      for (x = 0; x < 3; x++)
 	change_to->content[x][y] = change_from->content[x][y];
 
     change_to->can_change = change_from->can_change;
@@ -4782,12 +4782,12 @@ static void replace_custom_element_in_settings(int element_from,
 {
   int i, j, x, y;
 
-  for (i=0; i < NUM_FILE_ELEMENTS; i++)
+  for (i = 0; i < NUM_FILE_ELEMENTS; i++)
   {
     struct ElementInfo *ei = &element_info[i];
 
-    for(y=0; y<3; y++)
-      for(x=0; x<3; x++)
+    for (y = 0; y < 3; y++)
+      for (x = 0; x < 3; x++)
 	if (ei->content[x][y] == element_from)
 	  ei->content[x][y] = element_to;
 
@@ -4801,8 +4801,8 @@ static void replace_custom_element_in_settings(int element_from,
       if (change->trigger_element == element_from)
 	change->trigger_element = element_to;
 
-      for(y=0; y<3; y++)
-	for(x=0; x<3; x++)
+      for (y = 0; y < 3; y++)
+	for (x = 0; x < 3; x++)
 	  if (change->content[x][y] == element_from)
 	    change->content[x][y] = element_to;
     }
@@ -4814,8 +4814,8 @@ static void replace_custom_element_in_playfield(int element_from,
 {
   int x, y;
 
-  for(x=0; x < lev_fieldx; x++)
-    for(y=0; y < lev_fieldy; y++)
+  for (x = 0; x < lev_fieldx; x++)
+    for (y = 0; y < lev_fieldy; y++)
       if (Feld[x][y] == element_from)
 	Feld[x][y] = element_to;
 }
@@ -4855,7 +4855,7 @@ static void CopyCustomElementPropertiesToEditor(int element)
   int current_change_page = element_info[element].current_change_page;
 
   /* dynamically (re)build selectbox for selecting change page */
-  for (i=0; i < element_info[element].num_change_pages; i++)
+  for (i = 0; i < element_info[element].num_change_pages; i++)
   {
     sprintf(options_change_page_strings[i], "%d", i + 1);
 
@@ -4876,13 +4876,13 @@ static void CopyCustomElementPropertiesToEditor(int element)
   custom_element_change = *element_info[element].change;
 
   /* needed to initially set selectbox value variables to reliable defaults */
-  for (i=0; i < ED_NUM_SELECTBOX; i++)
+  for (i = 0; i < ED_NUM_SELECTBOX; i++)
     setSelectboxValue(i, *selectbox_info[i].value);
 
-  for (i=0; i < NUM_ELEMENT_PROPERTIES; i++)
+  for (i = 0; i < NUM_ELEMENT_PROPERTIES; i++)
     custom_element_properties[i] = HAS_PROPERTY(element, i);
 
-  for (i=0; i < NUM_CHANGE_EVENTS; i++)
+  for (i = 0; i < NUM_CHANGE_EVENTS; i++)
     custom_element_change_events[i] = HAS_CHANGE_EVENT(element, i);
 
   /* ---------- element settings: configure (custom elements) ------------- */
@@ -5107,10 +5107,10 @@ static void CopyCustomElementPropertiesToGame(int element)
   custom_element_change_events[custom_element_change.other_action] =
     custom_element_change_events[CE_BY_OTHER_ACTION];
 
-  for (i=0; i < NUM_ELEMENT_PROPERTIES; i++)
+  for (i = 0; i < NUM_ELEMENT_PROPERTIES; i++)
     SET_PROPERTY(element, i, custom_element_properties[i]);
 
-  for (i=0; i < NUM_CHANGE_EVENTS; i++)
+  for (i = 0; i < NUM_CHANGE_EVENTS; i++)
     SET_CHANGE_EVENT(element, i, custom_element_change_events[i]);
 
   /* copy change events also to special level editor variable */
@@ -5313,7 +5313,7 @@ static void ModifyEditorElementList()
 {
   int i;
 
-  for (i=0; i<ED_NUM_ELEMENTLIST_BUTTONS; i++)
+  for (i = 0; i < ED_NUM_ELEMENTLIST_BUTTONS; i++)
   {
     int gadget_id = GADGET_ID_ELEMENTLIST_FIRST + i;
     struct GadgetInfo *gi = level_editor_gadget[gadget_id];
@@ -5401,19 +5401,19 @@ static void DrawLevelInfoWindow()
 	   "Editor Settings", FONT_TITLE_1);
 
   /* draw counter gadgets */
-  for (i=ED_COUNTER_ID_LEVEL_FIRST; i<=ED_COUNTER_ID_LEVEL_LAST; i++)
+  for (i = ED_COUNTER_ID_LEVEL_FIRST; i <= ED_COUNTER_ID_LEVEL_LAST; i++)
     MapCounterButtons(i);
 
   /* draw checkbutton gadgets */
-  for (i=ED_CHECKBUTTON_ID_LEVEL_FIRST; i<=ED_CHECKBUTTON_ID_LEVEL_LAST; i++)
+  for (i=ED_CHECKBUTTON_ID_LEVEL_FIRST; i <= ED_CHECKBUTTON_ID_LEVEL_LAST; i++)
     MapCheckbuttonGadget(i);
 
   /* draw radiobutton gadgets */
-  for (i=ED_RADIOBUTTON_ID_LEVEL_FIRST; i<=ED_RADIOBUTTON_ID_LEVEL_LAST; i++)
+  for (i=ED_RADIOBUTTON_ID_LEVEL_FIRST; i <= ED_RADIOBUTTON_ID_LEVEL_LAST; i++)
     MapRadiobuttonGadget(i);
 
   /* draw text input gadgets */
-  for (i=ED_TEXTINPUT_ID_LEVEL_FIRST; i<=ED_TEXTINPUT_ID_LEVEL_LAST; i++)
+  for (i = ED_TEXTINPUT_ID_LEVEL_FIRST; i <= ED_TEXTINPUT_ID_LEVEL_LAST; i++)
     MapTextInputGadget(i);
 
   /* draw drawing area */
@@ -5460,7 +5460,7 @@ static void DrawElementContentAreas()
   /* display counter to choose number of element content areas */
   MapCounterButtons(ED_COUNTER_ID_ELEMENT_CONTENT);
 
-  for (i=0; i < MAX_ELEMENT_CONTENTS; i++)
+  for (i = 0; i < MAX_ELEMENT_CONTENTS; i++)
   {
     int id = ED_DRAWING_ID_ELEMENT_CONTENT_0 + i;
     int font_height = getFontHeight(FONT_TEXT_1);
@@ -5576,7 +5576,7 @@ static int PrintElementDescriptionFromFile(char *filename, int start_line)
   buffer[0] = '\0';
   buffer_len = 0;
 
-  while(!feof(file) && current_line < max_lines_per_screen)
+  while (!feof(file) && current_line < max_lines_per_screen)
   {
     char *line_ptr;
     boolean last_line_was_empty = TRUE;
@@ -5649,7 +5649,7 @@ static void DrawPropertiesTabulatorGadgets()
   if (IS_CUSTOM_ELEMENT(properties_element))
     id_last = ED_TEXTBUTTON_ID_PROPERTIES_ADVANCED;
 
-  for (i=id_first; i <= id_last; i++)
+  for (i = id_first; i <= id_last; i++)
   {
     int gadget_id = textbutton_info[i].gadget_id;
     struct GadgetInfo *gi = level_editor_gadget[gadget_id];
@@ -5753,8 +5753,8 @@ static void DrawPropertiesInfo()
   /* ----- print number of elements / percentage of this element in level */
 
   num_elements_in_level = 0;
-  for (y=0; y<lev_fieldy; y++) 
-    for (x=0; x<lev_fieldx; x++)
+  for (y = 0; y < lev_fieldy; y++) 
+    for (x = 0; x < lev_fieldx; x++)
       if (Feld[x][y] == properties_element)
 	num_elements_in_level++;
   percentage = num_elements_in_level * 100.0 / (lev_fieldx * lev_fieldy);
@@ -5772,7 +5772,7 @@ static void DrawPropertiesInfo()
   DrawTextS(pad_x, pad_y + screen_line++ * font2_height, font1_nr,
 	    properties_text);
 
-  for (i=0; properties[i].value != -1; i++)
+  for (i = 0; properties[i].value != -1; i++)
   {
     if (!HAS_PROPERTY(properties_element, properties[i].value))
       continue;
@@ -5884,7 +5884,7 @@ static boolean checkPropertiesConfig()
       HAS_CONTENT(properties_element))
     return TRUE;
   else
-    for (i=0; elements_with_counter[i].element != -1; i++)
+    for (i = 0; elements_with_counter[i].element != -1; i++)
       if (elements_with_counter[i].element == properties_element)
 	return TRUE;
 
@@ -5903,7 +5903,7 @@ static void DrawPropertiesConfig()
   }
 
   /* check if there are elements where a score can be chosen for */
-  for (i=0; elements_with_counter[i].element != -1; i++)
+  for (i = 0; elements_with_counter[i].element != -1; i++)
   {
     if (elements_with_counter[i].element == properties_element)
     {
@@ -5962,7 +5962,7 @@ static void DrawPropertiesConfig()
       MapCheckbuttonGadget(i);
 
     /* draw counter gadgets */
-    for (i=ED_COUNTER_ID_CUSTOM_FIRST; i<=ED_COUNTER_ID_CUSTOM_LAST; i++)
+    for (i = ED_COUNTER_ID_CUSTOM_FIRST; i <= ED_COUNTER_ID_CUSTOM_LAST; i++)
       MapCounterButtons(i);
 
     /* draw selectbox gadgets */
@@ -6003,15 +6003,15 @@ static void DrawPropertiesAdvanced()
     MapCheckbuttonGadget(i);
 
   /* draw counter gadgets */
-  for (i=ED_COUNTER_ID_CHANGE_FIRST; i<=ED_COUNTER_ID_CHANGE_LAST; i++)
+  for (i = ED_COUNTER_ID_CHANGE_FIRST; i <= ED_COUNTER_ID_CHANGE_LAST; i++)
     MapCounterButtons(i);
 
   /* draw selectbox gadgets */
-  for (i=ED_SELECTBOX_ID_CHANGE_FIRST; i<=ED_SELECTBOX_ID_CHANGE_LAST; i++)
+  for (i = ED_SELECTBOX_ID_CHANGE_FIRST; i <= ED_SELECTBOX_ID_CHANGE_LAST; i++)
     MapSelectboxGadget(i);
 
   /* draw textbutton gadgets */
-  for (i=ED_TEXTBUTTON_ID_CHANGE_FIRST; i<=ED_TEXTBUTTON_ID_CHANGE_LAST; i++)
+  for (i=ED_TEXTBUTTON_ID_CHANGE_FIRST; i <= ED_TEXTBUTTON_ID_CHANGE_LAST; i++)
     MapTextbuttonGadget(i);
 
   /* draw graphicbutton gadgets */
@@ -6151,7 +6151,7 @@ static void DrawLine(int from_x, int from_y, int to_x, int to_y,
     if (from_x > to_x)
       swap_numbers(&from_x, &to_x);
 
-    for (x=from_x; x<=to_x; x++)
+    for (x = from_x; x <= to_x; x++)
       DrawLineElement(x, y, element, change_level);
   }
   else if (from_x == to_x)		/* vertical line */
@@ -6162,7 +6162,7 @@ static void DrawLine(int from_x, int from_y, int to_x, int to_y,
     if (from_y > to_y)
       swap_numbers(&from_y, &to_y);
 
-    for (y=from_y; y<=to_y; y++)
+    for (y = from_y; y <= to_y; y++)
       DrawLineElement(x, y, element, change_level);
   }
   else					/* diagonal line */
@@ -6178,7 +6178,7 @@ static void DrawLine(int from_x, int from_y, int to_x, int to_y,
       if (from_x > to_x)
 	swap_number_pairs(&from_x, &from_y, &to_x, &to_y);
 
-      for (x=0; x<=len_x; x++)
+      for (x = 0; x <= len_x; x++)
       {
 	y = (int)(a * x + 0.5) * (to_y < from_y ? -1 : +1);
 	DrawLineElement(from_x + x, from_y + y, element, change_level);
@@ -6191,7 +6191,7 @@ static void DrawLine(int from_x, int from_y, int to_x, int to_y,
       if (from_y > to_y)
 	swap_number_pairs(&from_x, &from_y, &to_x, &to_y);
 
-      for (y=0; y<=len_y; y++)
+      for (y = 0; y <= len_y; y++)
       {
 	x = (int)(a * y + 0.5) * (to_x < from_x ? -1 : +1);
 	DrawLineElement(from_x + x, from_y + y, element, change_level);
@@ -6217,7 +6217,7 @@ static void DrawFilledBox(int from_x, int from_y, int to_x, int to_y,
   if (from_y > to_y)
     swap_number_pairs(&from_x, &from_y, &to_x, &to_y);
 
-  for (y=from_y; y<=to_y; y++)
+  for (y = from_y; y <= to_y; y++)
     DrawLine(from_x, y, to_x, y, element, change_level);
 }
 
@@ -6235,7 +6235,7 @@ static void DrawArcExt(int from_x, int from_y, int to_x2, int to_y2,
   /* not optimal (some points get drawn twice) but simple,
      and fast enough for the few points we are drawing */
 
-  for (x=0; x<=radius; x++)
+  for (x = 0; x <= radius; x++)
   {
     int sx, sy, lx, ly;
 
@@ -6250,7 +6250,7 @@ static void DrawArcExt(int from_x, int from_y, int to_x2, int to_y2,
       DrawLineElement(sx, sy, element, change_level);
   }
 
-  for (y=0; y<=radius; y++)
+  for (y = 0; y <= radius; y++)
   {
     int sx, sy, lx, ly;
 
@@ -6363,9 +6363,9 @@ static void CopyBrushExt(int from_x, int from_y, int to_x, int to_y,
     from_lx = from_x + level_xpos;
     from_ly = from_y + level_ypos;
 
-    for (y=0; y<brush_height; y++)
+    for (y = 0; y < brush_height; y++)
     {
-      for (x=0; x<brush_width; x++)
+      for (x=0; x < brush_width; x++)
       {
 	brush_buffer[x][y] = Feld[from_lx + x][from_ly + y];
 
@@ -6399,9 +6399,9 @@ static void CopyBrushExt(int from_x, int from_y, int to_x, int to_y,
       return;
     }
 
-    for (y=0; y<brush_height; y++)
+    for (y = 0; y < brush_height; y++)
     {
-      for (x=0; x<brush_width; x++)
+      for (x = 0; x < brush_width; x++)
       {
 	int sx = cursor_from_x + x;
 	int sy = cursor_from_y + y;
@@ -6477,7 +6477,7 @@ static void FloodFill(int from_x, int from_y, int fill_element)
   old_element = Feld[from_x][from_y];
   Feld[from_x][from_y] = fill_element;
 
-  for(i=0;i<4;i++)
+  for (i = 0; i < 4; i++)
   {
     x = from_x + check[i][0];
     y = from_y + check[i][1];
@@ -6646,8 +6646,8 @@ static void CopyLevelToUndoBuffer(int mode)
       undo_buffer_steps++;
   }
 
-  for(x=0; x<lev_fieldx; x++)
-    for(y=0; y<lev_fieldy; y++)
+  for (x = 0; x < lev_fieldx; x++)
+    for (y = 0; y < lev_fieldy; y++)
       UndoBuffer[undo_buffer_position][x][y] = Feld[x][y];
 
   /* check if drawing operation forces change of border style */
@@ -6668,8 +6668,8 @@ static void RandomPlacement(int new_element)
   /* determine number of free positions for the new elements */
   /* (maybe this statement should be formatted a bit more readable...) */
   num_free_positions = 0;
-  for (x=0; x<lev_fieldx; x++)
-    for (y=0; y<lev_fieldy; y++)
+  for (x = 0; x < lev_fieldx; x++)
+    for (y = 0; y < lev_fieldy; y++)
       if ((free_position[x][y] =
 	   ((random_placement_background_restricted &&
 	     Feld[x][y] == random_placement_background_element) ||
@@ -6685,8 +6685,8 @@ static void RandomPlacement(int new_element)
   /* if not more free positions than elements to place, fill whole level */
   if (num_elements >= num_free_positions)
   {
-    for (x=0; x<lev_fieldx; x++)
-      for (y=0; y<lev_fieldy; y++)
+    for (x = 0; x < lev_fieldx; x++)
+      for (y = 0; y < lev_fieldy; y++)
 	Feld[x][y] = new_element;
 
     DrawMiniLevel(ed_fieldx, ed_fieldy, level_xpos, level_ypos);
@@ -6718,12 +6718,12 @@ void WrapLevel(int dx, int dy)
   int wrap_dy = lev_fieldy - dy;
   int x, y;
 
-  for(x=0; x<lev_fieldx; x++)
-    for(y=0; y<lev_fieldy; y++)
+  for (x = 0; x < lev_fieldx; x++)
+    for (y = 0; y < lev_fieldy; y++)
       FieldBackup[x][y] = Feld[x][y];
 
-  for(x=0; x<lev_fieldx; x++)
-    for(y=0; y<lev_fieldy; y++)
+  for (x = 0; x < lev_fieldx; x++)
+    for (y = 0; y < lev_fieldy; y++)
       Feld[x][y] =
 	FieldBackup[(x + wrap_dx) % lev_fieldx][(y + wrap_dy) % lev_fieldy];
 
@@ -6824,9 +6824,9 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 	  if (new_element == EL_PLAYER_1)
 	  {
 	    /* remove player at old position */
-	    for(y=0; y<lev_fieldy; y++)
+	    for (y = 0; y < lev_fieldy; y++)
 	    {
-	      for(x=0; x<lev_fieldx; x++)
+	      for (x = 0; x < lev_fieldx; x++)
 	      {
 		if (Feld[x][y] == EL_PLAYER_1)
 		{
@@ -7472,8 +7472,8 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 	(undo_buffer_position - 1 + NUM_UNDO_STEPS) % NUM_UNDO_STEPS;
       undo_buffer_steps--;
 
-      for(x=0; x<lev_fieldx; x++)
-	for(y=0; y<lev_fieldy; y++)
+      for (x = 0; x < lev_fieldx; x++)
+	for (y = 0; y < lev_fieldy; y++)
 	  Feld[x][y] = UndoBuffer[undo_buffer_position][x][y];
       DrawMiniLevel(ed_fieldx, ed_fieldy, level_xpos,level_ypos);
       break;
@@ -7501,8 +7501,8 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 	edit_mode = ED_MODE_DRAWING;
       }
 
-      for(x=0; x<MAX_LEV_FIELDX; x++) 
-	for(y=0; y<MAX_LEV_FIELDY; y++) 
+      for (x = 0; x < MAX_LEV_FIELDX; x++) 
+	for (y = 0; y < MAX_LEV_FIELDY; y++) 
 	  Feld[x][y] = (button == 1 ? EL_EMPTY : new_element);
       CopyLevelToUndoBuffer(GADGET_ID_CLEAR);
 
@@ -7683,7 +7683,7 @@ void HandleLevelEditorKeyInput(Key key)
     else if (key == KSYM_Return || key == setup.shortcut.toggle_pause)
       ClickOnGadget(level_editor_gadget[GADGET_ID_TEST], button);
     else
-      for (i=0; i<ED_NUM_CTRL_BUTTONS; i++)
+      for (i = 0; i < ED_NUM_CTRL_BUTTONS; i++)
 	if (letter && letter == control_info[i].shortcut)
 	  if (!anyTextGadgetActive())
 	    ClickOnGadget(level_editor_gadget[i], button);

@@ -589,7 +589,7 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 			       xpos, ypos);
 
 	/* middle part of gadget */
-	for (i=0; i<num_steps; i++)
+	for (i=0; i < num_steps; i++)
 	  BlitBitmapOnBackground(gd->bitmap, drawto,
 				 gd->x, gd->y + gi->border.ysize,
 				 gi->width, design_body,
@@ -636,7 +636,7 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 			       xpos, ypos);
 
 	/* middle part of gadget */
-	for (i=0; i<num_steps; i++)
+	for (i=0; i < num_steps; i++)
 	  BlitBitmapOnBackground(gd->bitmap, drawto,
 				 gd->x + gi->border.xsize, gd->y,
 				 design_body, gi->height,

@@ -41,7 +41,7 @@ void fprintf_line(FILE *stream, char *line_string, int line_length)
 {
   int i;
 
-  for (i=0; i<line_length; i++)
+  for (i = 0; i < line_length; i++)
     fprintf(stream, "%s", line_string);
 
   fprintf(stream, "\n");
@@ -243,7 +243,7 @@ void WaitUntilDelayReached(unsigned long *counter_var, unsigned long delay)
 {
   unsigned long actual_counter;
 
-  while(1)
+  while (1)
   {
     actual_counter = Counter();
 
@@ -1383,8 +1383,8 @@ int get_integer_from_string(char *s)
   char *s_lower = getStringToLower(s);
   int result = -1;
 
-  for (i=0; number_text[i][0] != NULL; i++)
-    for (j=0; j < 3; j++)
+  for (i = 0; number_text[i][0] != NULL; i++)
+    for (j = 0; j < 3; j++)
       if (strcmp(s_lower, number_text[i][j]) == 0)
 	result = i;
 
@@ -1711,11 +1711,11 @@ struct FileInfo *getFileListFromConfigList(struct ConfigInfo *config_list,
 
   file_list = checked_calloc(num_file_list_entries * sizeof(struct FileInfo));
 
-  for (i=0; suffix_list[i].token != NULL; i++)
+  for (i = 0; suffix_list[i].token != NULL; i++)
     num_suffix_list_entries++;
 
   /* always start with reliable default values */
-  for (i=0; i<num_file_list_entries; i++)
+  for (i = 0; i < num_file_list_entries; i++)
   {
     file_list[i].token = NULL;
 
@@ -1729,7 +1729,7 @@ struct FileInfo *getFileListFromConfigList(struct ConfigInfo *config_list,
       file_list[i].default_parameter = checked_calloc(parameter_array_size);
       file_list[i].parameter = checked_calloc(parameter_array_size);
 
-      for (j=0; j<num_suffix_list_entries; j++)
+      for (j = 0; j < num_suffix_list_entries; j++)
       {
 	setString(&file_list[i].default_parameter[j], suffix_list[j].value);
 	setString(&file_list[i].parameter[j], suffix_list[j].value);
@@ -1738,13 +1738,13 @@ struct FileInfo *getFileListFromConfigList(struct ConfigInfo *config_list,
   }
 
   list_pos = 0;
-  for (i=0; config_list[i].token != NULL; i++)
+  for (i = 0; config_list[i].token != NULL; i++)
   {
     int len_config_token = strlen(config_list[i].token);
     int len_config_value = strlen(config_list[i].value);
     boolean is_file_entry = TRUE;
 
-    for (j=0; suffix_list[j].token != NULL; j++)
+    for (j = 0; suffix_list[j].token != NULL; j++)
     {
       int len_suffix = strlen(suffix_list[j].token);
 
@@ -1761,7 +1761,7 @@ struct FileInfo *getFileListFromConfigList(struct ConfigInfo *config_list,
     }
 
     /* the following tokens are no file definitions, but other config tokens */
-    for (j=0; ignore_tokens[j] != NULL; j++)
+    for (j = 0; ignore_tokens[j] != NULL; j++)
       if (strcmp(config_list[i].token, ignore_tokens[j]) == 0)
 	is_file_entry = FALSE;
 
@@ -1847,7 +1847,7 @@ static void read_token_parameters(SetupFileHash *setup_file_hash,
     setString(&file_list_entry->filename, filename);
 
     /* when file definition found, set all parameters to default values */
-    for (i=0; suffix_list[i].token != NULL; i++)
+    for (i = 0; suffix_list[i].token != NULL; i++)
       setString(&file_list_entry->parameter[i], suffix_list[i].value);
 
     file_list_entry->redefined = TRUE;
@@ -1867,7 +1867,7 @@ static void read_token_parameters(SetupFileHash *setup_file_hash,
 #endif
 
   /* check for config tokens that can be build by base token and suffixes */
-  for (i=0; suffix_list[i].token != NULL; i++)
+  for (i = 0; suffix_list[i].token != NULL; i++)
   {
     char *token = getStringCat2(file_list_entry->token, suffix_list[i].token);
     char *value = getHashEntry(setup_file_hash, token);
@@ -1963,11 +1963,11 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
     return;
 
   /* read parameters for all known config file tokens */
-  for (i=0; i<num_file_list_entries; i++)
+  for (i = 0; i < num_file_list_entries; i++)
     read_token_parameters(setup_file_hash, suffix_list, &file_list[i]);
 
   /* set all tokens that can be ignored here to "known" keyword */
-  for (i=0; i < num_ignore_tokens; i++)
+  for (i = 0; i < num_ignore_tokens; i++)
     setHashEntry(setup_file_hash, ignore_tokens[i], known_token_value);
 
   /* copy all unknown config file tokens to extra config list */
@@ -2005,7 +2005,7 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
     boolean parameter_suffix_found = FALSE;
 
     /* skip all parameter definitions (handled by read_token_parameters()) */
-    for (i=0; i < num_suffix_list_entries && !parameter_suffix_found; i++)
+    for (i = 0; i < num_suffix_list_entries && !parameter_suffix_found; i++)
     {
       int len_suffix = strlen(suffix_list[i].token);
 
@@ -2029,7 +2029,7 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
     /* ---------- step 0: search for matching base prefix ---------- */
 
     start_pos = 0;
-    for (i=0; i < num_base_prefixes && !base_prefix_found; i++)
+    for (i = 0; i < num_base_prefixes && !base_prefix_found; i++)
     {
       char *base_prefix = base_prefixes[i];
       int len_base_prefix = strlen(base_prefix);
@@ -2074,7 +2074,7 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
       /* ---------- step 1: search for matching first suffix ---------- */
 
       start_pos += len_base_prefix;
-      for (j=0; j < num_ext1_suffixes && !ext1_suffix_found; j++)
+      for (j = 0; j < num_ext1_suffixes && !ext1_suffix_found; j++)
       {
 	char *ext1_suffix = ext1_suffixes[j];
 	int len_ext1_suffix = strlen(ext1_suffix);
@@ -2116,7 +2116,7 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
 
       /* ---------- step 2: search for matching second suffix ---------- */
 
-      for (k=0; k < num_ext2_suffixes && !ext2_suffix_found; k++)
+      for (k = 0; k < num_ext2_suffixes && !ext2_suffix_found; k++)
       {
 	char *ext2_suffix = ext2_suffixes[k];
 	int len_ext2_suffix = strlen(ext2_suffix);
@@ -2158,7 +2158,7 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
 
       /* ---------- step 3: search for matching third suffix ---------- */
 
-      for (l=0; l < num_ext3_suffixes && !ext3_suffix_found; l++)
+      for (l = 0; l < num_ext3_suffixes && !ext3_suffix_found; l++)
       {
 	char *ext3_suffix = ext3_suffixes[l];
 	int len_ext3_suffix = strlen(ext3_suffix);
@@ -2256,7 +2256,7 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
   freeSetupFileHash(extra_file_hash);
 
 #if 0
-  for (i=0; i<num_file_list_entries; i++)
+  for (i = 0; i < num_file_list_entries; i++)
   {
     printf("'%s' ", file_list[i].token);
     if (file_list[i].filename)
@@ -2283,11 +2283,11 @@ void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
   DrawInitText(ARTWORKINFO_FILENAME(artwork_info->type), 150, FC_YELLOW);
 
   /* always start with reliable default values */
-  for (i=0; i<num_file_list_entries; i++)
+  for (i = 0; i < num_file_list_entries; i++)
   {
     setString(&file_list[i].filename, file_list[i].default_filename);
 
-    for (j=0; j<num_suffix_list_entries; j++)
+    for (j = 0; j < num_suffix_list_entries; j++)
       setString(&file_list[i].parameter[j], file_list[i].default_parameter[j]);
 
     file_list[i].redefined = FALSE;
@@ -2296,7 +2296,7 @@ void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
   /* free previous dynamic artwork file array */
   if (artwork_info->dynamic_file_list != NULL)
   {
-    for (i=0; i<artwork_info->num_dynamic_file_list_entries; i++)
+    for (i = 0; i < artwork_info->num_dynamic_file_list_entries; i++)
     {
       free(artwork_info->dynamic_file_list[i].token);
       free(artwork_info->dynamic_file_list[i].filename);
@@ -2508,7 +2508,7 @@ void ReloadCustomArtworkList(struct ArtworkListInfo *artwork_info)
 	 num_file_list_entries);
 #endif
 
-  for(i=0; i<num_file_list_entries; i++)
+  for (i = 0; i < num_file_list_entries; i++)
   {
 #if 0
     if (strcmp(file_list[i].token, "background") == 0)
@@ -2536,7 +2536,7 @@ void ReloadCustomArtworkList(struct ArtworkListInfo *artwork_info)
 	 num_dynamic_file_list_entries);
 #endif
 
-  for(i=0; i<num_dynamic_file_list_entries; i++)
+  for (i = 0; i < num_dynamic_file_list_entries; i++)
     LoadArtworkToList(artwork_info, &artwork_info->dynamic_artwork_list[i],
 		      dynamic_file_list[i].filename, i);
 
@@ -2554,7 +2554,7 @@ static void FreeCustomArtworkList(struct ArtworkListInfo *artwork_info,
   if (*list == NULL)
     return;
 
-  for(i=0; i<*num_list_entries; i++)
+  for (i = 0; i < *num_list_entries; i++)
     deleteArtworkListEntry(artwork_info, &(*list)[i]);
   free(*list);
 

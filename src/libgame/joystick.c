@@ -28,7 +28,7 @@ void UnixInitJoysticks()
 {
   int i;
 
-  for (i=0; i<MAX_PLAYERS; i++)
+  for (i = 0; i < MAX_PLAYERS; i++)
   {
     char *device_name = setup.input[i].joy.device_name;
 
@@ -125,7 +125,7 @@ void translate_joyname(int *joysymbol, char **name, int mode)
   {
     *name = "[undefined]";
 
-    for (i=0; i<6; i++)
+    for (i = 0; i < 6; i++)
     {
       if (*joysymbol == translate_joy[i].joysymbol)
       {
@@ -138,7 +138,7 @@ void translate_joyname(int *joysymbol, char **name, int mode)
   {
     *joysymbol = 0;
 
-    for (i=0; i<6; i++)
+    for (i = 0; i < 6; i++)
     {
       if (strcmp(*name, translate_joy[i].name) == 0)
       {
@@ -224,7 +224,7 @@ void CheckJoystickData()
   int i;
   int distance = 100;
 
-  for(i=0; i<MAX_PLAYERS; i++)
+  for (i = 0; i < MAX_PLAYERS; i++)
   {
     if (setup.input[i].joy.xleft >= setup.input[i].joy.xmiddle)
       setup.input[i].joy.xleft = setup.input[i].joy.xmiddle - distance;
@@ -317,7 +317,7 @@ int AnyJoystick()
   int i;
   int result = 0;
 
-  for (i=0; i<MAX_PLAYERS; i++)
+  for (i = 0; i < MAX_PLAYERS; i++)
     result |= Joystick(i);
 
   return result;
@@ -328,7 +328,7 @@ int AnyJoystickButton()
   int i;
   int result = JOY_BUTTON_NOT_PRESSED;
 
-  for (i=0; i<MAX_PLAYERS; i++)
+  for (i = 0; i < MAX_PLAYERS; i++)
   {
     result = JoystickButton(i);
     if (result != JOY_BUTTON_NOT_PRESSED)

@@ -910,7 +910,7 @@ void dumpTreeInfo(TreeInfo *node, int depth)
 
   while (node)
   {
-    for (i=0; i<(depth + 1) * 3; i++)
+    for (i = 0; i < (depth + 1) * 3; i++)
       printf(" ");
 
 #if 1
@@ -956,7 +956,7 @@ void sortTreeInfo(TreeInfo **node_first,
 	compare_function);
 
   /* update the linkage of list elements with the sorted node array */
-  for (i=0; i<num_nodes - 1; i++)
+  for (i = 0; i < num_nodes - 1; i++)
     sort_array[i]->next = sort_array[i + 1];
   sort_array[num_nodes - 1]->next = NULL;
 
@@ -1180,7 +1180,7 @@ char *getFormattedSetupEntry(char *token, char *value)
 
   /* start with the token and some spaces to format output line */
   sprintf(entry, "%s:", token);
-  for (i=strlen(entry); i<TOKEN_VALUE_POSITION; i++)
+  for (i = strlen(entry); i < TOKEN_VALUE_POSITION; i++)
     strcat(entry, " ");
 
   /* continue with the token's value */
@@ -1393,7 +1393,7 @@ static void *loadSetupFileData(char *filename, boolean use_hash)
     return NULL;
   }
 
-  while(!feof(file))
+  while (!feof(file))
   {
     /* read next line of input file */
     if (!fgets(line, MAX_LINE_LEN, file))
@@ -1931,7 +1931,7 @@ static boolean LoadLevelInfoFromLevelConf(TreeInfo **node_first,
 
   /* set all structure fields according to the token/value pairs */
   ldi = *leveldir_new;
-  for (i=0; i<NUM_LEVELINFO_TOKENS; i++)
+  for (i = 0; i < NUM_LEVELINFO_TOKENS; i++)
     setSetupInfo(levelinfo_tokens, i,
 		 getHashEntry(setup_file_hash, levelinfo_tokens[i].text));
   *leveldir_new = ldi;
@@ -2161,7 +2161,7 @@ static boolean LoadArtworkInfoFromArtworkConf(TreeInfo **node_first,
 
     /* set all structure fields according to the token/value pairs */
     ldi = *artwork_new;
-    for (i=0; i<NUM_LEVELINFO_TOKENS; i++)
+    for (i = 0; i < NUM_LEVELINFO_TOKENS; i++)
       setSetupInfo(levelinfo_tokens, i,
 		   getHashEntry(setup_file_hash, levelinfo_tokens[i].text));
     *artwork_new = ldi;
@@ -2606,7 +2606,7 @@ static void SaveUserLevelInfo()
 						 getCookie("LEVELINFO")));
 
   ldi = *level_info;
-  for (i=0; i<NUM_LEVELINFO_TOKENS; i++)
+  for (i = 0; i < NUM_LEVELINFO_TOKENS; i++)
     if (i != LEVELINFO_TOKEN_IDENTIFIER &&
 	i != LEVELINFO_TOKEN_NAME_SORTING &&
 	i != LEVELINFO_TOKEN_IMPORTED_FROM)
@@ -2692,7 +2692,7 @@ char *getSetupLine(struct TokenInfo *token_info, char *prefix, int token_nr)
     {
       /* add at least one whitespace */
       strcat(line, " ");
-      for (i=strlen(line); i<TOKEN_COMMENT_POSITION; i++)
+      for (i = strlen(line); i < TOKEN_COMMENT_POSITION; i++)
 	strcat(line, " ");
 
       strcat(line, "# ");

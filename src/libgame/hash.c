@@ -58,7 +58,7 @@ create_hashtable(unsigned int minsize, float maxloadfactor,
     h->table = (struct entry **)malloc(sizeof(struct entry*) * size);
     if (NULL == h->table) { free(h); return NULL; } /*oom*/
 
-    for (i=0;i<size;i++) { h->table[i] = NULL; }
+    for (i=0; i < size; i++) { h->table[i] = NULL; }
     h->tablelength  = size;
     h->entrycount   = 0;
     h->hashfn       = hashf;

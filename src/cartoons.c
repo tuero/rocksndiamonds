@@ -26,13 +26,13 @@ static void PrepareBackbuffer()
   /* Fill empty backbuffer for animation functions */
   if (setup.direct_draw && game_status == GAME_MODE_PLAYING)
   {
-    int xx,yy;
+    int xx, yy;
 
     SetDrawtoField(DRAW_BACKBUFFER);
 
-    for(xx=0; xx<SCR_FIELDX; xx++)
-      for(yy=0; yy<SCR_FIELDY; yy++)
-	DrawScreenField(xx,yy);
+    for (xx = 0; xx < SCR_FIELDX; xx++)
+      for (yy = 0; yy < SCR_FIELDY; yy++)
+	DrawScreenField(xx, yy);
     DrawAllPlayers();
 
     SetDrawtoField(DRAW_DIRECT);
@@ -45,7 +45,7 @@ static void PrepareBackbuffer()
     fx += (ScreenMovDir & (MV_LEFT|MV_RIGHT) ? ScreenGfxPos : 0);
     fy += (ScreenMovDir & (MV_UP|MV_DOWN)    ? ScreenGfxPos : 0);
 
-    BlitBitmap(fieldbuffer, backbuffer, fx,fy, SXSIZE,SYSIZE, SX,SY);
+    BlitBitmap(fieldbuffer, backbuffer, fx, fy, SXSIZE, SYSIZE, SX, SY);
   }
 }
 

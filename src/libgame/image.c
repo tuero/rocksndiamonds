@@ -47,7 +47,7 @@ Image *newImage(unsigned int width, unsigned int height, unsigned int depth)
   image->bytes_per_row = width * bytes_per_pixel;
 
   image->rgb.used = 0;
-  for (i=0; i<MAX_COLORS; i++)
+  for (i = 0; i < MAX_COLORS; i++)
     image->rgb.color_used[i] = FALSE;
 
   image->type = (depth < 8 ? IMAGETYPE_BITMAP :
@@ -115,14 +115,14 @@ static Pixmap Image_to_Mask(Image *image, Display *display, Window window)
    * the corresponding image pixmap
    */
 
-  for (y=0; y<image->height; y++)
+  for (y = 0; y < image->height; y++)
   {
     bitmask = 0x01;		/* start with leftmost bit in the byte     */
     dst_ptr2 = dst_ptr;		/* start with leftmost byte in the row     */
 
-    for (x=0; x<image->width; x++)
+    for (x = 0; x < image->width; x++)
     {
-      for (i=0; i<image->bytes_per_pixel; i++)
+      for (i = 0; i < image->bytes_per_pixel; i++)
 	if (*src_ptr++)		/* source pixel solid? (pixel index != 0)  */
 	  *dst_ptr2 |= bitmask;	/* then write a bit into the image mask    */
 
@@ -152,7 +152,7 @@ static int bitsPerPixelAtDepth(Display *display, int screen, int depth)
   pixmap_format = XListPixmapFormats(display, &num_pixmap_formats);
 
   /* find format that matches the given depth */
-  for (i=0; i<num_pixmap_formats; i++)
+  for (i = 0; i < num_pixmap_formats; i++)
     if (pixmap_format[i].depth == depth)
       bits_per_pixel = pixmap_format[i].bits_per_pixel;
 
@@ -229,7 +229,7 @@ XImageInfo *Image_to_Pixmap(Display *display, int screen, Visual *visual,
       /* calculate number of distinct colors in each band */
 
       redcolors = greencolors = bluecolors = 1;
-      for (pixval=1; pixval; pixval <<= 1)
+      for (pixval = 1; pixval; pixval <<= 1)
       {
 	if (pixval & visual->red_mask)
 	  redcolors <<= 1;
@@ -251,7 +251,7 @@ XImageInfo *Image_to_Pixmap(Display *display, int screen, Visual *visual,
       redbottom = greenbottom = bluebottom = 0;
       redtop = greentop = bluetop = 0;
 
-      for (a=0; a<visual->map_entries; a++)
+      for (a = 0; a < visual->map_entries; a++)
       {
 	if (redbottom < 256)
 	  redtop = redbottom + redstep;
@@ -307,7 +307,7 @@ XImageInfo *Image_to_Pixmap(Display *display, int screen, Visual *visual,
 
       ximageinfo->cmap = global_cmap;
 
-      for (a=0; a<MAX_COLORS; a++)
+      for (a = 0; a < MAX_COLORS; a++)
       {
 	XColor xcolor2;
 	unsigned short mask;
@@ -339,7 +339,7 @@ XImageInfo *Image_to_Pixmap(Display *display, int screen, Visual *visual,
 	    /* allocate the rest of the color cells read/write */
 	    global_cmap_index =
 	      (Pixel *)checked_malloc(sizeof(Pixel) * NOFLASH_COLORS);
-	    for (i=0; i<NOFLASH_COLORS; i++)
+	    for (i = 0; i < NOFLASH_COLORS; i++)
 	      if (!XAllocColorCells(display, global_cmap, FALSE, NULL, 0,
 				    global_cmap_index + i, 1))
 		break;
@@ -352,7 +352,7 @@ XImageInfo *Image_to_Pixmap(Display *display, int screen, Visual *visual,
 	    /* to minimize colormap flashing, copy default colors and try
 	       to keep them as near as possible to the old values */
 
-	    for(i=0; i<num_cmap_entries; i++)
+	    for (i = 0; i < num_cmap_entries; i++)
 	    {
 	      xcolor2.pixel = *(global_cmap_index + i);
 	      XQueryColor(display, DefaultColormap(display, screen), &xcolor2);
@@ -377,7 +377,7 @@ XImageInfo *Image_to_Pixmap(Display *display, int screen, Visual *visual,
 
 	  while (!color_found)
 	  {
-	    for (i=num_cmap_entries-1; i>=0; i--)
+	    for (i = num_cmap_entries - 1; i >= 0; i--)
 	    {
 	      xcolor2.pixel = *(global_cmap_index + i);
 	      xcolor2 = xcolor_private[xcolor2.pixel];
@@ -464,9 +464,9 @@ XImageInfo *Image_to_Pixmap(Display *display, int screen, Visual *visual,
       {
         case IMAGETYPE_RGB:
 	{
-	  for (y=0; y<image->height; y++)		/* general case */
+	  for (y = 0; y < image->height; y++)		/* general case */
 	  {
-	    for (x=0; x<image->width; x++)
+	    for (x = 0; x < image->width; x++)
 	    {
 	      pixval = *src_ptr++;
 	      pixval =
@@ -483,9 +483,9 @@ XImageInfo *Image_to_Pixmap(Display *display, int screen, Visual *visual,
 
         case IMAGETYPE_TRUECOLOR:
 	{
-	  for (y=0; y<image->height; y++)		/* general case */
+	  for (y = 0; y < image->height; y++)		/* general case */
 	  {
-	    for (x=0; x<image->width; x++)
+	    for (x = 0; x < image->width; x++)
 	    {
 	      pixval = memory_to_value(src_ptr, image->bytes_per_pixel);
 	      pixval =
@@ -515,15 +515,15 @@ XImageInfo *Image_to_Pixmap(Display *display, int screen, Visual *visual,
     {
       if (display_bytes_per_pixel == 1)		/* special case */
       {
-	for (y=0; y<image->height; y++)
-	  for (x=0; x<image->width; x++)
+	for (y = 0; y < image->height; y++)
+	  for (x = 0; x < image->width; x++)
 	    *dst_ptr++ = ximageinfo->index[c + *src_ptr++];
       }
       else					/* general case */
       {
-	for (y=0; y<image->height; y++)
+	for (y = 0; y < image->height; y++)
 	{
-	  for (x=0; x<image->width; x++)
+	  for (x = 0; x < image->width; x++)
 	  {
 	    value_to_memory(ximageinfo->index[c + *src_ptr++],
 			    dst_ptr, display_bytes_per_pixel);
@@ -611,9 +611,9 @@ void ZoomPixmap(Display *display, GC gc, Pixmap src_pixmap, Pixmap dst_pixmap,
   row_skip = col_skip * src_width;
 
   /* scale image down by scaling factor 'zoom_factor' */
-  for (y=0; y < src_height; y += zoom_factor, src_ptr += row_skip)
-    for (x=0; x < src_width; x += zoom_factor, src_ptr += col_skip)
-      for (i=0; i < bytes_per_pixel; i++)
+  for (y = 0; y < src_height; y += zoom_factor, src_ptr += row_skip)
+    for (x = 0; x < src_width; x += zoom_factor, src_ptr += col_skip)
+      for (i = 0; i < bytes_per_pixel; i++)
 	*dst_ptr++ = *src_ptr++;
 
   /* copy scaled image to destination pixmap */
@@ -822,7 +822,7 @@ int getImageIDFromToken(char *token)
   int num_list_entries = image_info->num_file_list_entries;
   int i;
 
-  for (i=0; i < num_list_entries; i++)
+  for (i = 0; i < num_list_entries; i++)
     if (strcmp(file_list[i].token, token) == 0)
       return i;
 
@@ -866,7 +866,7 @@ void InitImageList(struct ConfigInfo *config_list, int num_file_list_entries,
   image_info->dynamic_file_list = NULL;
 
   image_info->num_suffix_list_entries = 0;
-  for (i=0; config_suffix_list[i].token != NULL; i++)
+  for (i = 0; config_suffix_list[i].token != NULL; i++)
     image_info->num_suffix_list_entries++;
 
   image_info->suffix_list = config_suffix_list;
@@ -874,23 +874,23 @@ void InitImageList(struct ConfigInfo *config_list, int num_file_list_entries,
   /* ---------- initialize base prefix and suffixes lists ---------- */
 
   image_info->num_base_prefixes = 0;
-  for (i=0; base_prefixes[i] != NULL; i++)
+  for (i = 0; base_prefixes[i] != NULL; i++)
     image_info->num_base_prefixes++;
 
   image_info->num_ext1_suffixes = 0;
-  for (i=0; ext1_suffixes[i] != NULL; i++)
+  for (i = 0; ext1_suffixes[i] != NULL; i++)
     image_info->num_ext1_suffixes++;
 
   image_info->num_ext2_suffixes = 0;
-  for (i=0; ext2_suffixes[i] != NULL; i++)
+  for (i = 0; ext2_suffixes[i] != NULL; i++)
     image_info->num_ext2_suffixes++;
 
   image_info->num_ext3_suffixes = 0;
-  for (i=0; ext3_suffixes[i] != NULL; i++)
+  for (i = 0; ext3_suffixes[i] != NULL; i++)
     image_info->num_ext3_suffixes++;
 
   image_info->num_ignore_tokens = 0;
-  for (i=0; ignore_tokens[i] != NULL; i++)
+  for (i = 0; ignore_tokens[i] != NULL; i++)
     image_info->num_ignore_tokens++;
 
   image_info->base_prefixes = base_prefixes;

@@ -100,7 +100,7 @@ char *getNetworkPlayerName(int player_nr)
   else if (player_nr == first_player.nr)
     return("you");
   else
-    for (player=&first_player; player; player=player->next)
+    for (player = &first_player; player; player = player->next)
       if (player->nr == player_nr && player->name && strlen(player->name))
 	return(player->name);
 
@@ -173,7 +173,7 @@ boolean ConnectToServer(char *hostname, int port)
   StartNetworkServer(port);
 
   /* wait for server to start up and try connecting several times */
-  for (i=0; i<6; i++)
+  for (i = 0; i < 6; i++)
   {
     Delay(500);		/* wait 500 ms == 0.5 seconds */
     close(sfd);
@@ -378,7 +378,7 @@ static void Handle_OP_PLAYER_CONNECTED()
   printf("OP_PLAYER_CONNECTED: %d\n", new_client_nr);
   Error(ERR_NETWORK_CLIENT, "new client %d connected", new_client_nr);
 
-  for (player=&first_player; player; player=player->next)
+  for (player = &first_player; player; player = player->next)
   {
     if (player->nr == new_client_nr)
       Error(ERR_EXIT, "multiplayer server sent duplicate player id");
@@ -405,7 +405,7 @@ static void Handle_OP_PLAYER_DISCONNECTED()
   Error(ERR_NETWORK_CLIENT, "client %d (%s) disconnected",
 	player_nr, getNetworkPlayerName(buffer[0]));
 
-  for (player=&first_player; player; player=player->next)
+  for (player = &first_player; player; player = player->next)
     if (player->next == player_disconnected)
       player->next = player_disconnected->next;
   free(player_disconnected);
@@ -506,7 +506,7 @@ static void Handle_OP_MOVE_PLAYER(unsigned int len)
   }
 
   /* copy valid player actions */
-  for (i=0; i<MAX_PLAYERS; i++)
+  for (i = 0; i < MAX_PLAYERS; i++)
     stored_player[i].effective_action =
       (i < len - 6 && stored_player[i].active ? buffer[6 + i] : 0);
 

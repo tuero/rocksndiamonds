@@ -60,10 +60,10 @@ static void allegro_init_drivers()
 {
   int i;
 
-  for (i=0; i<MAX_EVENT_BUFFER; i++)
+  for (i = 0; i < MAX_EVENT_BUFFER; i++)
     event_buffer[i].type = 0;
 
-  for (i=0; i<MAX_SCANCODES; i++)
+  for (i = 0; i < MAX_SCANCODES; i++)
     key_press_state[i] = KeyReleaseMask;
 
   last_mouse_pos = mouse_pos;
@@ -244,7 +244,7 @@ Pixel AllegroAllocColorCell(int r, int g, int b)
   b >>= 10;
 
   /* try to use existing colors from the global colormap */
-  for (i=0; i<global_colormap_entries_used; i++)
+  for (i = 0; i < global_colormap_entries_used; i++)
   {
     if (r == global_colormap[i].r &&
 	g == global_colormap[i].g &&
@@ -516,7 +516,7 @@ static BITMAP *Image_to_AllegroBitmap(Image *image)
   clear(bitmap);
 
   /* try to use existing colors from the global colormap */
-  for (i=0; i<MAX_COLORS; i++)
+  for (i = 0; i < MAX_COLORS; i++)
   {
     if (!image->rgb.color_used[i])
       continue;
@@ -527,8 +527,8 @@ static BITMAP *Image_to_AllegroBitmap(Image *image)
   }
 
   /* copy bitmap data */
-  for (y=0; y<image->height; y++)
-    for (x=0; x<image->width; x++)
+  for (y = 0; y < image->height; y++)
+    for (x = 0; x < image->width; x++)
       putpixel(bitmap, x, y, pixel_mapping[*src_ptr++]);
 
   return bitmap;
@@ -671,7 +671,7 @@ static void HandleKeyboardRaw(int mode)
 {
   int i;
 
-  for (i=0; i<MAX_SCANCODES; i++)
+  for (i = 0; i < MAX_SCANCODES; i++)
   {
     int scancode, new_state, event_type;
     char key_pressed;
@@ -783,7 +783,7 @@ int XPending(Display *display)
   /* mouse button event */
   if (mouse_b != last_mouse_b)
   {
-    for (i=0; i<3; i++)		/* check all three mouse buttons */
+    for (i = 0; i < 3; i++)	/* check all three mouse buttons */
     {
       int bitmask = (1 << i);
 
@@ -969,7 +969,7 @@ void MSDOSInitJoysticks()
       install_joystick(JOY_TYPE_AUTODETECT) == 0)
     joystick.status = JOYSTICK_ACTIVATED;
 
-  for (i=0; i<MAX_PLAYERS; i++)
+  for (i = 0; i < MAX_PLAYERS; i++)
   {
     char *device_name = setup.input[i].joy.device_name;
     int joystick_nr = getJoystickNrFromDeviceName(device_name);

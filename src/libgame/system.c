@@ -194,9 +194,9 @@ static void DrawBitmapFromTile(Bitmap *bitmap, Bitmap *tile,
   int tile_ysteps = (bitmap_ysize + tile_ysize - 1) / tile_ysize;
   int x, y;
 
-  for (y=0; y < tile_ysteps; y++)
+  for (y = 0; y < tile_ysteps; y++)
   {
-    for (x=0; x < tile_xsteps; x++)
+    for (x = 0; x < tile_xsteps; x++)
     {
       int draw_x = dest_x + x * tile_xsize;
       int draw_y = dest_y + y * tile_ysize;
@@ -559,9 +559,9 @@ inline void DrawLine(Bitmap *bitmap, int from_x, int from_y,
 {
   int x, y;
 
-  for (x=0; x<line_width; x++)
+  for (x = 0; x < line_width; x++)
   {
-    for (y=0; y<line_width; y++)
+    for (y = 0; y < line_width; y++)
     {
       int dx = x - line_width / 2;
       int dy = y - line_width / 2;
@@ -591,7 +591,7 @@ inline void DrawLines(Bitmap *bitmap, struct XY *points, int num_points,
   int line_width = 4;
   int i;
 
-  for (i=0; i<num_points - 1; i++)
+  for (i = 0; i < num_points - 1; i++)
     DrawLine(bitmap, points[i].x, points[i].y,
 	     points[i + 1].x, points[i + 1].y, pixel, line_width);
 
@@ -909,9 +909,9 @@ static struct MouseCursorInfo *get_cursor_from_image(const char **image)
   sscanf(image[0], " %d %d ", &cursor->width, &cursor->height);
 
   i = -1;
-  for (y=0; y < cursor->width; y++)
+  for (y = 0; y < cursor->width; y++)
   {
-    for (x=0; x < cursor->height; x++)
+    for (x = 0; x < cursor->height; x++)
     {
       int bit_nr = x % 8;
       int bit_mask = 0x01 << (bit_order_msb ? 7 - bit_nr : bit_nr );
@@ -1165,7 +1165,7 @@ inline void InitJoysticks()
 
   /* always start with reliable default values */
   joystick.status = JOYSTICK_NOT_AVAILABLE;
-  for (i=0; i<MAX_PLAYERS; i++)
+  for (i = 0; i < MAX_PLAYERS; i++)
     joystick.fd[i] = -1;		/* joystick device closed */
 
 #if defined(TARGET_SDL)

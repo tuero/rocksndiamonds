@@ -71,7 +71,7 @@ inline void SDLInitVideoBuffer(DrawBuffer **backbuffer, DrawWindow **window,
   fullscreen_yoffset = 0;
 
 #ifdef FULLSCREEN_BUG
-  for (i=0; screen_xy[i][0] != -1; i++)
+  for (i = 0; screen_xy[i][0] != -1; i++)
   {
     if (video.width <= screen_xy[i][0] && video.height <= screen_xy[i][1])
     {
@@ -340,11 +340,11 @@ inline void SDLDrawLines(SDL_Surface *surface, struct XY *points,
   int i, x, y;
   int line_width = 4;
 
-  for (i=0; i<num_points - 1; i++)
+  for (i = 0; i < num_points - 1; i++)
   {
-    for (x=0; x<line_width; x++)
+    for (x = 0; x < line_width; x++)
     {
-      for (y=0; y<line_width; y++)
+      for (y = 0; y < line_width; y++)
       {
 	int dx = x - line_width / 2;
 	int dy = y - line_width / 2;
@@ -889,9 +889,9 @@ inline void SDLInvertArea(Bitmap *bitmap, int src_x, int src_y,
 {
   int x, y;
 
-  for (y=src_y; y < src_y + height; y++)
+  for (y = src_y; y < src_y + height; y++)
   {
-    for (x=src_x; x < src_x + width; x++)
+    for (x = src_x; x < src_x + width; x++)
     {
       Uint32 pixel = SDLGetPixel(bitmap, x, y);
 
@@ -906,9 +906,9 @@ inline void SDLCopyInverseMasked(Bitmap *src_bitmap, Bitmap *dst_bitmap,
 {
   int x, y;
 
-  for (y=0; y < height; y++)
+  for (y = 0; y < height; y++)
   {
-    for (x=0; x < width; x++)
+    for (x = 0; x < width; x++)
     {
       Uint32 pixel = SDLGetPixel(src_bitmap, src_x + x, src_y + y);
 
@@ -1181,7 +1181,7 @@ SDL_Surface *zoomSurface(SDL_Surface *src, int dst_width, int dst_height)
   else
   {
     /* copy palette */
-    for (i=0; i < zoom_src->format->palette->ncolors; i++)
+    for (i = 0; i < zoom_src->format->palette->ncolors; i++)
       zoom_dst->format->palette->colors[i] =
 	zoom_src->format->palette->colors[i];
     zoom_dst->format->palette->ncolors = zoom_src->format->palette->ncolors;
@@ -1454,7 +1454,7 @@ void SDLInitJoysticks()
     }
   }
 
-  for (i=0; i<MAX_PLAYERS; i++)
+  for (i = 0; i < MAX_PLAYERS; i++)
   {
     char *device_name = setup.input[i].joy.device_name;
     int joystick_nr = getJoystickNrFromDeviceName(device_name);

@@ -177,7 +177,7 @@ void DrawVideoDisplay(unsigned long state, unsigned long value)
 	       VY + VIDEO_REC_LABEL_YPOS);
   }
 
-  for(i=0;i<10;i++)
+  for (i = 0; i < 10; i++)
   {
     if (state & (1<<i))
     {
@@ -321,7 +321,7 @@ void TapeErase()
 	 level.game_version);
 #endif
 
-  for(i=0; i<MAX_PLAYERS; i++)
+  for (i = 0; i < MAX_PLAYERS; i++)
     tape.player_participates[i] = FALSE;
 }
 
@@ -433,7 +433,7 @@ void TapeRecordAction(byte action[MAX_PLAYERS])
   {
     boolean changed_events = FALSE;
 
-    for(i=0; i<MAX_PLAYERS; i++)
+    for (i = 0; i < MAX_PLAYERS; i++)
       if (tape.pos[tape.counter].action[i] != action[i])
 	changed_events = TRUE;
 
@@ -448,7 +448,7 @@ void TapeRecordAction(byte action[MAX_PLAYERS])
 
   if (tape.pos[tape.counter].delay == 0)	/* store new action */
   {
-    for(i=0; i<MAX_PLAYERS; i++)
+    for (i = 0; i < MAX_PLAYERS; i++)
       tape.pos[tape.counter].action[i] = action[i];
 
     tape.pos[tape.counter].delay++;
@@ -571,7 +571,7 @@ byte *TapePlayAction()
     return NULL;
   }
 
-  for(i=0; i<MAX_PLAYERS; i++)
+  for (i = 0; i < MAX_PLAYERS; i++)
     action[i] = tape.pos[tape.counter].action[i];
 
   tape.delay_played++;
@@ -610,7 +610,7 @@ unsigned int GetTapeLength()
   if (TAPE_IS_EMPTY(tape))
     return(0);
 
-  for(i=0;i<tape.length;i++)
+  for (i = 0; i < tape.length; i++)
     tape_length += tape.pos[i].delay;
 
   return(tape_length * GAME_FRAME_DELAY / 1000);
@@ -747,7 +747,7 @@ void AutoPlayTape()
     printf_line("=", 79);
     printf("\n");
 
-    for (i=0; i<MAX_NUM_AUTOPLAY_LEVELS; i++)
+    for (i = 0; i < MAX_NUM_AUTOPLAY_LEVELS; i++)
       levels_failed[i] = FALSE;
 
     autoplay_initialized = TRUE;
@@ -796,7 +796,7 @@ void AutoPlayTape()
   if (num_levels_played != num_levels_solved)
   {
     printf(", FAILED:");
-    for (i=0; i<MAX_NUM_AUTOPLAY_LEVELS; i++)
+    for (i = 0; i < MAX_NUM_AUTOPLAY_LEVELS; i++)
       if (levels_failed[i])
 	printf(" %03d", i);
   }
@@ -865,7 +865,7 @@ void CreateTapeButtons()
 {
   int i;
 
-  for (i=0; i<NUM_TAPE_BUTTONS; i++)
+  for (i = 0; i < NUM_TAPE_BUTTONS; i++)
   {
     Bitmap *gd_bitmap = graphic_info[IMG_GLOBAL_DOOR].bitmap;
     struct GadgetInfo *gi;
@@ -910,7 +910,7 @@ void FreeTapeButtons()
 {
   int i;
 
-  for (i=0; i<NUM_TAPE_BUTTONS; i++)
+  for (i = 0; i < NUM_TAPE_BUTTONS; i++)
     FreeGadget(tape_gadget[i]);
 }
 
@@ -930,7 +930,7 @@ void MapTapeButtons()
 {
   int i;
 
-  for (i=0; i<NUM_TAPE_BUTTONS; i++)
+  for (i = 0; i < NUM_TAPE_BUTTONS; i++)
     if (i != TAPE_CTRL_ID_INDEX)
       MapGadget(tape_gadget[i]);
 
@@ -942,7 +942,7 @@ void UnmapTapeButtons()
 {
   int i;
 
-  for (i=0; i<NUM_TAPE_BUTTONS; i++)
+  for (i = 0; i < NUM_TAPE_BUTTONS; i++)
     UnmapGadget(tape_gadget[i]);
 }
 

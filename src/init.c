@@ -111,7 +111,7 @@ static void InitTileClipmasks()
   int i;
 
   /* initialize pixmap array for special X11 tile clipping to Pixmap 'None' */
-  for (i=0; i<NUM_TILES; i++)
+  for (i = 0; i < NUM_TILES; i++)
     tile_clipmask[i] = None;
 
 #if defined(TARGET_X11)
@@ -126,7 +126,7 @@ static void InitTileClipmasks()
 			   clip_gc_valuemask, &clip_gc_values);
 
 #if 0
-  for (i=0; i<NUM_BITMAPS; i++)
+  for (i = 0; i < NUM_BITMAPS; i++)
   {
     if (pix[i]->clip_mask)
     {
@@ -149,11 +149,11 @@ static void InitTileClipmasks()
 			       clip_gc_valuemask, &clip_gc_values);
 
   /* create only those clipping Pixmaps we really need */
-  for (i=0; tile_needs_clipping[i].start>=0; i++)
+  for (i = 0; tile_needs_clipping[i].start >= 0; i++)
   {
     int j;
 
-    for (j=0; j<tile_needs_clipping[i].count; j++)
+    for (j = 0; j < tile_needs_clipping[i].count; j++)
     {
       int tile = tile_needs_clipping[i].start + j;
       int graphic = tile;
@@ -186,7 +186,7 @@ void FreeTileClipmasks()
 #if defined(TARGET_X11)
   int i;
 
-  for (i=0; i<NUM_TILES; i++)
+  for (i = 0; i < NUM_TILES; i++)
   {
     if (tile_clipmask[i] != None)
     {
@@ -200,7 +200,7 @@ void FreeTileClipmasks()
   tile_clip_gc = None;
 
 #if 0
-  for (i=0; i<NUM_BITMAPS; i++)
+  for (i = 0; i < NUM_BITMAPS; i++)
   {
     if (pix[i] != NULL && pix[i]->stored_clip_gc)
     {
@@ -246,15 +246,15 @@ void InitElementSmallImages()
   int i;
 
   /* initialize normal images from static configuration */
-  for (i=0; element_to_graphic[i].element > -1; i++)
+  for (i = 0; element_to_graphic[i].element > -1; i++)
     CreateImageWithSmallImages(element_to_graphic[i].graphic);
 
   /* initialize special images from static configuration */
-  for (i=0; element_to_special_graphic[i].element > -1; i++)
+  for (i = 0; element_to_special_graphic[i].element > -1; i++)
     CreateImageWithSmallImages(element_to_special_graphic[i].graphic);
 
   /* initialize images from dynamic configuration */
-  for (i=0; i < num_property_mappings; i++)
+  for (i = 0; i < num_property_mappings; i++)
     if (property_mapping[i].artwork_index < MAX_NUM_ELEMENTS)
       CreateImageWithSmallImages(property_mapping[i].artwork_index);
 }
@@ -295,15 +295,15 @@ void InitFontGraphicInfo()
 
   /* always start with reliable default values (normal font graphics) */
 #if 1
-  for (i=0; i < NUM_FONTS; i++)
+  for (i = 0; i < NUM_FONTS; i++)
     font_info[i].graphic = IMG_FONT_INITIAL_1;
 #else
-  for (i=0; i < NUM_FONTS; i++)
+  for (i = 0; i < NUM_FONTS; i++)
     font_info[i].graphic = FONT_INITIAL_1;
 #endif
 
   /* initialize normal font/graphic mapping from static configuration */
-  for (i=0; font_to_graphic[i].font_nr > -1; i++)
+  for (i = 0; font_to_graphic[i].font_nr > -1; i++)
   {
     int font_nr = font_to_graphic[i].font_nr;
     int special = font_to_graphic[i].special;
@@ -316,9 +316,9 @@ void InitFontGraphicInfo()
   }
 
   /* always start with reliable default values (special font graphics) */
-  for (i=0; i < NUM_FONTS; i++)
+  for (i = 0; i < NUM_FONTS; i++)
   {
-    for (j=0; j < NUM_SPECIAL_GFX_ARGS; j++)
+    for (j = 0; j < NUM_SPECIAL_GFX_ARGS; j++)
     {
       font_info[i].special_graphic[j] = font_info[i].graphic;
       font_info[i].special_bitmap_id[j] = i;
@@ -326,7 +326,7 @@ void InitFontGraphicInfo()
   }
 
   /* initialize special font/graphic mapping from static configuration */
-  for (i=0; font_to_graphic[i].font_nr > -1; i++)
+  for (i = 0; font_to_graphic[i].font_nr > -1; i++)
   {
     int font_nr = font_to_graphic[i].font_nr;
     int special = font_to_graphic[i].special;
@@ -341,7 +341,7 @@ void InitFontGraphicInfo()
   }
 
   /* initialize special element/graphic mapping from dynamic configuration */
-  for (i=0; i < num_property_mappings; i++)
+  for (i = 0; i < num_property_mappings; i++)
   {
     int font_nr = property_mapping[i].base_index - MAX_NUM_ELEMENTS;
     int special = property_mapping[i].ext3_index;
@@ -368,7 +368,7 @@ void InitFontGraphicInfo()
 
   /* ---------- initialize font bitmap definitions ---------- */
 
-  for (i=0; i < NUM_FONTS; i++)
+  for (i = 0; i < NUM_FONTS; i++)
   {
     if (i < NUM_INITIAL_FONTS)
     {
@@ -376,7 +376,7 @@ void InitFontGraphicInfo()
       continue;
     }
 
-    for (j=0; j < NUM_SPECIAL_GFX_ARGS; j++)
+    for (j = 0; j < NUM_SPECIAL_GFX_ARGS; j++)
     {
       int font_bitmap_id = font_info[i].special_bitmap_id[j];
       int graphic = font_info[i].special_graphic[j];
@@ -414,14 +414,14 @@ void InitElementGraphicInfo()
   int i, act, dir;
 
   /* set values to -1 to identify later as "uninitialized" values */
-  for (i=0; i<MAX_NUM_ELEMENTS; i++)
+  for (i = 0; i < MAX_NUM_ELEMENTS; i++)
   {
-    for (act=0; act<NUM_ACTIONS; act++)
+    for (act = 0; act < NUM_ACTIONS; act++)
     {
       element_info[i].graphic[act] = -1;
       element_info[i].crumbled[act] = -1;
 
-      for (dir=0; dir<NUM_DIRECTIONS; dir++)
+      for (dir = 0; dir < NUM_DIRECTIONS; dir++)
       {
 	element_info[i].direction_graphic[act][dir] = -1;
 	element_info[i].direction_crumbled[act][dir] = -1;
@@ -430,7 +430,7 @@ void InitElementGraphicInfo()
   }
 
   /* initialize normal element/graphic mapping from static configuration */
-  for (i=0; element_to_graphic[i].element > -1; i++)
+  for (i = 0; element_to_graphic[i].element > -1; i++)
   {
     int element      = element_to_graphic[i].element;
     int action       = element_to_graphic[i].action;
@@ -475,7 +475,7 @@ void InitElementGraphicInfo()
   }
 
   /* initialize normal element/graphic mapping from dynamic configuration */
-  for (i=0; i < num_property_mappings; i++)
+  for (i = 0; i < num_property_mappings; i++)
   {
     int element   = property_mapping[i].base_index;
     int action    = property_mapping[i].ext1_index;
@@ -502,7 +502,7 @@ void InitElementGraphicInfo()
     if (crumbled)
     {
       if (direction < 0)
-	for (dir=0; dir<NUM_DIRECTIONS; dir++)
+	for (dir = 0; dir < NUM_DIRECTIONS; dir++)
 	  element_info[element].direction_crumbled[action][dir] = -1;
 
       if (direction > -1)
@@ -513,7 +513,7 @@ void InitElementGraphicInfo()
     else
     {
       if (direction < 0)
-	for (dir=0; dir<NUM_DIRECTIONS; dir++)
+	for (dir = 0; dir < NUM_DIRECTIONS; dir++)
 	  element_info[element].direction_graphic[action][dir] = -1;
 
       if (direction > -1)
@@ -524,7 +524,7 @@ void InitElementGraphicInfo()
   }
 
   /* now copy all graphics that are defined to be cloned from other graphics */
-  for (i=0; i<MAX_NUM_ELEMENTS; i++)
+  for (i = 0; i < MAX_NUM_ELEMENTS; i++)
   {
     int graphic = element_info[i].graphic[ACTION_DEFAULT];
     int crumbled_like, diggable_like;
@@ -537,11 +537,11 @@ void InitElementGraphicInfo()
 
     if (crumbled_like != -1 && element_info[i].crumbled[ACTION_DEFAULT] == -1)
     {
-      for (act=0; act<NUM_ACTIONS; act++)
+      for (act = 0; act < NUM_ACTIONS; act++)
 	element_info[i].crumbled[act] =
 	  element_info[crumbled_like].crumbled[act];
-      for (act=0; act<NUM_ACTIONS; act++)
-	for (dir=0; dir<NUM_DIRECTIONS; dir++)
+      for (act = 0; act < NUM_ACTIONS; act++)
+	for (dir = 0; dir < NUM_DIRECTIONS; dir++)
 	  element_info[i].direction_crumbled[act][dir] =
 	    element_info[crumbled_like].direction_crumbled[act][dir];
     }
@@ -550,7 +550,7 @@ void InitElementGraphicInfo()
     {
       element_info[i].graphic[ACTION_DIGGING] =
 	element_info[diggable_like].graphic[ACTION_DIGGING];
-      for (dir=0; dir<NUM_DIRECTIONS; dir++)
+      for (dir = 0; dir < NUM_DIRECTIONS; dir++)
 	element_info[i].direction_graphic[ACTION_DIGGING][dir] =
 	  element_info[diggable_like].direction_graphic[ACTION_DIGGING][dir];
     }
@@ -558,9 +558,9 @@ void InitElementGraphicInfo()
 
 #if 1
   /* now set all undefined/invalid graphics to -1 to set to default after it */
-  for (i=0; i<MAX_NUM_ELEMENTS; i++)
+  for (i = 0; i < MAX_NUM_ELEMENTS; i++)
   {
-    for (act=0; act<NUM_ACTIONS; act++)
+    for (act = 0; act < NUM_ACTIONS; act++)
     {
       int graphic;
 
@@ -572,7 +572,7 @@ void InitElementGraphicInfo()
       if (graphic > 0 && graphic_info[graphic].bitmap == NULL)
 	element_info[i].crumbled[act] = -1;
 
-      for (dir=0; dir<NUM_DIRECTIONS; dir++)
+      for (dir = 0; dir < NUM_DIRECTIONS; dir++)
       {
 	graphic = element_info[i].direction_graphic[act][dir];
 	if (graphic > 0 && graphic_info[graphic].bitmap == NULL)
@@ -587,7 +587,7 @@ void InitElementGraphicInfo()
 #endif
 
   /* now set all '-1' values to element specific default values */
-  for (i=0; i<MAX_NUM_ELEMENTS; i++)
+  for (i = 0; i < MAX_NUM_ELEMENTS; i++)
   {
     int default_graphic = element_info[i].graphic[ACTION_DEFAULT];
     int default_crumbled = element_info[i].crumbled[ACTION_DEFAULT];
@@ -599,7 +599,7 @@ void InitElementGraphicInfo()
     if (default_crumbled == -1)
       default_crumbled = IMG_EMPTY;
 
-    for (dir=0; dir<NUM_DIRECTIONS; dir++)
+    for (dir = 0; dir < NUM_DIRECTIONS; dir++)
     {
       default_direction_graphic[dir] =
 	element_info[i].direction_graphic[ACTION_DEFAULT][dir];
@@ -612,7 +612,7 @@ void InitElementGraphicInfo()
 	default_direction_crumbled[dir] = default_crumbled;
     }
 
-    for (act=0; act<NUM_ACTIONS; act++)
+    for (act = 0; act < NUM_ACTIONS; act++)
     {
       boolean act_remove = ((IS_DIGGABLE(i)    && act == ACTION_DIGGING)  ||
 			    (IS_SNAPPABLE(i)   && act == ACTION_SNAPPING) ||
@@ -646,7 +646,7 @@ void InitElementGraphicInfo()
       if (default_action_crumbled == -1)
 	default_action_crumbled = default_crumbled;
 
-      for (dir=0; dir<NUM_DIRECTIONS; dir++)
+      for (dir = 0; dir < NUM_DIRECTIONS; dir++)
       {
 	int default_action_direction_graphic = element_info[i].graphic[act];
 	int default_action_direction_crumbled = element_info[i].crumbled[act];
@@ -689,9 +689,9 @@ void InitElementGraphicInfo()
 
 #if 1
   /* set animation mode to "none" for each graphic with only 1 frame */
-  for (i=0; i<MAX_NUM_ELEMENTS; i++)
+  for (i = 0; i < MAX_NUM_ELEMENTS; i++)
   {
-    for (act=0; act<NUM_ACTIONS; act++)
+    for (act = 0; act < NUM_ACTIONS; act++)
     {
       int graphic = element_info[i].graphic[act];
       int crumbled = element_info[i].crumbled[act];
@@ -701,7 +701,7 @@ void InitElementGraphicInfo()
       if (graphic_info[crumbled].anim_frames == 1)
 	graphic_info[crumbled].anim_mode = ANIM_NONE;
 
-      for (dir=0; dir<NUM_DIRECTIONS; dir++)
+      for (dir = 0; dir < NUM_DIRECTIONS; dir++)
       {
 	graphic = element_info[i].direction_graphic[act][dir];
 	crumbled = element_info[i].direction_crumbled[act][dir];
@@ -719,7 +719,7 @@ void InitElementGraphicInfo()
 #if DEBUG
   if (options.verbose)
   {
-    for (i=0; i<MAX_NUM_ELEMENTS; i++)
+    for (i = 0; i < MAX_NUM_ELEMENTS; i++)
       if (element_info[i].graphic[ACTION_DEFAULT] == IMG_CHAR_QUESTION &&
 	  i != EL_CHAR_QUESTION)
 	Error(ERR_RETURN, "warning: no graphic for element '%s' (%d)",
@@ -736,13 +736,13 @@ void InitElementSpecialGraphicInfo()
   int i, j;
 
   /* always start with reliable default values */
-  for (i=0; i < MAX_NUM_ELEMENTS; i++)
-    for (j=0; j < NUM_SPECIAL_GFX_ARGS; j++)
+  for (i = 0; i < MAX_NUM_ELEMENTS; i++)
+    for (j = 0; j < NUM_SPECIAL_GFX_ARGS; j++)
       element_info[i].special_graphic[j] =
 	element_info[i].graphic[ACTION_DEFAULT];
 
   /* initialize special element/graphic mapping from static configuration */
-  for (i=0; element_to_special_graphic[i].element > -1; i++)
+  for (i = 0; element_to_special_graphic[i].element > -1; i++)
   {
     int element = element_to_special_graphic[i].element;
     int special = element_to_special_graphic[i].special;
@@ -761,7 +761,7 @@ void InitElementSpecialGraphicInfo()
   }
 
   /* initialize special element/graphic mapping from dynamic configuration */
-  for (i=0; i < num_property_mappings; i++)
+  for (i = 0; i < num_property_mappings; i++)
   {
     int element = property_mapping[i].base_index;
     int special = property_mapping[i].ext3_index;
@@ -776,8 +776,8 @@ void InitElementSpecialGraphicInfo()
 
 #if 1
   /* now set all undefined/invalid graphics to default */
-  for (i=0; i < MAX_NUM_ELEMENTS; i++)
-    for (j=0; j < NUM_SPECIAL_GFX_ARGS; j++)
+  for (i = 0; i < MAX_NUM_ELEMENTS; i++)
+    for (j = 0; j < NUM_SPECIAL_GFX_ARGS; j++)
       if (graphic_info[element_info[i].special_graphic[j]].bitmap == NULL)
 	element_info[i].special_graphic[j] =
 	  element_info[i].graphic[ACTION_DEFAULT];
@@ -788,7 +788,7 @@ static int get_element_from_token(char *token)
 {
   int i;
 
-  for (i=0; i < MAX_NUM_ELEMENTS; i++)
+  for (i = 0; i < MAX_NUM_ELEMENTS; i++)
     if (strcmp(element_info[i].token_name, token) == 0)
       return i;
 
@@ -804,7 +804,7 @@ static void set_graphic_parameters(int graphic, char **parameter_raw)
   int i;
 
   /* get integer values from string parameters */
-  for (i=0; i < NUM_GFX_ARGS; i++)
+  for (i = 0; i < NUM_GFX_ARGS; i++)
   {
     parameter[i] =
       get_parameter_value(image_config_suffix[i].token, parameter_raw[i],
@@ -979,7 +979,7 @@ static void InitGraphicInfo()
 #if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
   if (clipmasks_initialized)
   {
-    for (i=0; i<num_images; i++)
+    for (i = 0; i < num_images; i++)
     {
       if (graphic_info[i].clip_mask)
 	XFreePixmap(display, graphic_info[i].clip_mask);
@@ -992,7 +992,7 @@ static void InitGraphicInfo()
   }
 #endif
 
-  for (i=0; i<num_images; i++)
+  for (i = 0; i < num_images; i++)
   {
     struct FileInfo *image = getImageListEntry(i);
     Bitmap *src_bitmap;
@@ -1117,12 +1117,12 @@ static void InitElementSoundInfo()
   int i, j, act;
 
   /* set values to -1 to identify later as "uninitialized" values */
-  for (i=0; i < MAX_NUM_ELEMENTS; i++)
-    for (act=0; act < NUM_ACTIONS; act++)
+  for (i = 0; i < MAX_NUM_ELEMENTS; i++)
+    for (act = 0; act < NUM_ACTIONS; act++)
       element_info[i].sound[act] = -1;
 
   /* initialize element/sound mapping from static configuration */
-  for (i=0; element_to_sound[i].element > -1; i++)
+  for (i = 0; element_to_sound[i].element > -1; i++)
   {
     int element      = element_to_sound[i].element;
     int action       = element_to_sound[i].action;
@@ -1135,14 +1135,14 @@ static void InitElementSoundInfo()
     if (!is_class)
       element_info[element].sound[action] = sound;
     else
-      for (j=0; j < MAX_NUM_ELEMENTS; j++)
+      for (j = 0; j < MAX_NUM_ELEMENTS; j++)
 	if (strcmp(element_info[j].class_name,
 		   element_info[element].class_name) == 0)
 	  element_info[j].sound[action] = sound;
   }
 
   /* initialize element class/sound mapping from dynamic configuration */
-  for (i=0; i < num_property_mappings; i++)
+  for (i = 0; i < num_property_mappings; i++)
   {
     int element_class = property_mapping[i].base_index - MAX_NUM_ELEMENTS;
     int action        = property_mapping[i].ext1_index;
@@ -1154,14 +1154,14 @@ static void InitElementSoundInfo()
     if (action < 0)
       action = ACTION_DEFAULT;
 
-    for (j=0; j < MAX_NUM_ELEMENTS; j++)
+    for (j = 0; j < MAX_NUM_ELEMENTS; j++)
       if (strcmp(element_info[j].class_name,
 		 element_info[element_class].class_name) == 0)
 	element_info[j].sound[action] = sound;
   }
 
   /* initialize element/sound mapping from dynamic configuration */
-  for (i=0; i < num_property_mappings; i++)
+  for (i = 0; i < num_property_mappings; i++)
   {
     int element = property_mapping[i].base_index;
     int action  = property_mapping[i].ext1_index;
@@ -1177,9 +1177,9 @@ static void InitElementSoundInfo()
   }
 
   /* now set all '-1' values to element specific default values */
-  for (i=0; i<MAX_NUM_ELEMENTS; i++)
+  for (i = 0; i < MAX_NUM_ELEMENTS; i++)
   {
-    for (act=0; act < NUM_ACTIONS; act++)
+    for (act = 0; act < NUM_ACTIONS; act++)
     {
       /* generic default action sound (defined by "[default]" directive) */
       int default_action_sound = element_info[EL_DEFAULT].sound[act];
@@ -1208,11 +1208,11 @@ static void InitGameModeSoundInfo()
   int i;
 
   /* set values to -1 to identify later as "uninitialized" values */
-  for (i=0; i < NUM_SPECIAL_GFX_ARGS; i++)
+  for (i = 0; i < NUM_SPECIAL_GFX_ARGS; i++)
     menu.sound[i] = -1;
 
   /* initialize gamemode/sound mapping from static configuration */
-  for (i=0; gamemode_to_sound[i].sound > -1; i++)
+  for (i = 0; gamemode_to_sound[i].sound > -1; i++)
   {
     int gamemode = gamemode_to_sound[i].gamemode;
     int sound    = gamemode_to_sound[i].sound;
@@ -1224,13 +1224,13 @@ static void InitGameModeSoundInfo()
   }
 
   /* now set all '-1' values to levelset specific default values */
-  for (i=0; i < NUM_SPECIAL_GFX_ARGS; i++)
+  for (i = 0; i < NUM_SPECIAL_GFX_ARGS; i++)
     if (menu.sound[i] == -1)
       menu.sound[i] = menu.sound[GAME_MODE_DEFAULT];
 
 #if 0
   /* TEST ONLY */
-  for (i=0; i < NUM_SPECIAL_GFX_ARGS; i++)
+  for (i = 0; i < NUM_SPECIAL_GFX_ARGS; i++)
     if (menu.sound[i] != -1)
       printf("::: menu.sound[%d] == %d\n", i, menu.sound[i]);
 #endif
@@ -1242,7 +1242,7 @@ static void set_sound_parameters(int sound, char **parameter_raw)
   int i;
 
   /* get integer values from string parameters */
-  for (i=0; i < NUM_SND_ARGS; i++)
+  for (i = 0; i < NUM_SND_ARGS; i++)
     parameter[i] =
       get_parameter_value(sound_config_suffix[i].token, parameter_raw[i],
 			  sound_config_suffix[i].type);
@@ -1269,11 +1269,11 @@ static void InitSoundInfo()
   sound_info = checked_calloc(num_sounds * sizeof(struct SoundInfo));
 
   /* initialize sound effect for all elements to "no sound" */
-  for (i=0; i < MAX_NUM_ELEMENTS; i++)
-    for (j=0; j < NUM_ACTIONS; j++)
+  for (i = 0; i < MAX_NUM_ELEMENTS; i++)
+    for (j = 0; j < NUM_ACTIONS; j++)
       element_info[i].sound[j] = SND_UNDEFINED;
 
-  for (i=0; i < num_sounds; i++)
+  for (i = 0; i < num_sounds; i++)
   {
     struct FileInfo *sound = getSoundListEntry(i);
     int len_effect_text = strlen(sound->token);
@@ -1287,7 +1287,7 @@ static void InitSoundInfo()
 
     /* determine all loop sounds and identify certain sound classes */
 
-    for (j=0; element_action_info[j].suffix; j++)
+    for (j = 0; element_action_info[j].suffix; j++)
     {
       int len_action_text = strlen(element_action_info[j].suffix);
 
@@ -1309,7 +1309,7 @@ static void InitSoundInfo()
 
     /* associate elements and some selected sound actions */
 
-    for (j=0; j < MAX_NUM_ELEMENTS; j++)
+    for (j = 0; j < MAX_NUM_ELEMENTS; j++)
     {
       if (element_info[j].class_name)
       {
@@ -1335,7 +1335,7 @@ static void InitSoundInfo()
 #if 0
   /* !!! now handled in InitElementSoundInfo() !!! */
   /* initialize element/sound mapping from dynamic configuration */
-  for (i=0; i < num_property_mappings; i++)
+  for (i = 0; i < num_property_mappings; i++)
   {
     int element   = property_mapping[i].base_index;
     int action    = property_mapping[i].ext1_index;
@@ -1396,13 +1396,13 @@ static void InitGameModeMusicInfo()
   int i;
 
   /* set values to -1 to identify later as "uninitialized" values */
-  for (i=0; i < MAX_LEVELS; i++)
+  for (i = 0; i < MAX_LEVELS; i++)
     levelset.music[i] = -1;
-  for (i=0; i < NUM_SPECIAL_GFX_ARGS; i++)
+  for (i = 0; i < NUM_SPECIAL_GFX_ARGS; i++)
     menu.music[i] = -1;
 
   /* initialize gamemode/music mapping from static configuration */
-  for (i=0; gamemode_to_music[i].music > -1; i++)
+  for (i = 0; gamemode_to_music[i].music > -1; i++)
   {
     int gamemode = gamemode_to_music[i].gamemode;
     int music    = gamemode_to_music[i].music;
@@ -1418,7 +1418,7 @@ static void InitGameModeMusicInfo()
   }
 
   /* initialize gamemode/music mapping from dynamic configuration */
-  for (i=0; i < num_property_mappings; i++)
+  for (i = 0; i < num_property_mappings; i++)
   {
     int prefix   = property_mapping[i].base_index;
     int gamemode = property_mapping[i].ext1_index;
@@ -1455,19 +1455,19 @@ static void InitGameModeMusicInfo()
   /* now set all '-1' values to menu specific default values */
   /* (undefined values of "levelset.music[]" might stay at "-1" to
      allow dynamic selection of music files from music directory!) */
-  for (i=0; i < MAX_LEVELS; i++)
+  for (i = 0; i < MAX_LEVELS; i++)
     if (levelset.music[i] == -1)
       levelset.music[i] = default_levelset_music;
-  for (i=0; i < NUM_SPECIAL_GFX_ARGS; i++)
+  for (i = 0; i < NUM_SPECIAL_GFX_ARGS; i++)
     if (menu.music[i] == -1)
       menu.music[i] = menu.music[GAME_MODE_DEFAULT];
 
 #if 0
   /* TEST ONLY */
-  for (i=0; i < MAX_LEVELS; i++)
+  for (i = 0; i < MAX_LEVELS; i++)
     if (levelset.music[i] != -1)
       printf("::: levelset.music[%d] == %d\n", i, levelset.music[i]);
-  for (i=0; i < NUM_SPECIAL_GFX_ARGS; i++)
+  for (i = 0; i < NUM_SPECIAL_GFX_ARGS; i++)
     if (menu.music[i] != -1)
       printf("::: menu.music[%d] == %d\n", i, menu.music[i]);
 #endif
@@ -1479,7 +1479,7 @@ static void set_music_parameters(int music, char **parameter_raw)
   int i;
 
   /* get integer values from string parameters */
-  for (i=0; i < NUM_MUS_ARGS; i++)
+  for (i = 0; i < NUM_MUS_ARGS; i++)
     parameter[i] =
       get_parameter_value(music_config_suffix[i].token, parameter_raw[i],
 			  music_config_suffix[i].type);
@@ -1499,7 +1499,7 @@ static void InitMusicInfo()
 
   music_info = checked_calloc(num_music * sizeof(struct MusicInfo));
 
-  for (i=0; i < num_music; i++)
+  for (i = 0; i < num_music; i++)
   {
     struct FileInfo *music = getMusicListEntry(i);
     int len_music_text = strlen(music->token);
@@ -1508,7 +1508,7 @@ static void InitMusicInfo()
 
     /* determine all loop music */
 
-    for (j=0; music_prefix_info[j].prefix; j++)
+    for (j = 0; music_prefix_info[j].prefix; j++)
     {
       int len_prefix_text = strlen(music_prefix_info[j].prefix);
 
@@ -2906,21 +2906,21 @@ void InitElementPropertiesStatic()
   int i, j, k;
 
   /* always start with reliable default values (element has no properties) */
-  for (i=0; i < MAX_NUM_ELEMENTS; i++)
-    for (j=0; j < NUM_ELEMENT_PROPERTIES; j++)
+  for (i = 0; i < MAX_NUM_ELEMENTS; i++)
+    for (j = 0; j < NUM_ELEMENT_PROPERTIES; j++)
       SET_PROPERTY(i, j, FALSE);
 
   /* set all base element properties from above array definitions */
-  for (i=0; element_properties[i].elements != NULL; i++)
-    for (j=0; (element_properties[i].elements)[j] != -1; j++)
+  for (i = 0; element_properties[i].elements != NULL; i++)
+    for (j = 0; (element_properties[i].elements)[j] != -1; j++)
       SET_PROPERTY((element_properties[i].elements)[j],
 		   element_properties[i].property, TRUE);
 
   /* copy properties to some elements that are only stored in level file */
-  for (i=0; i < NUM_ELEMENT_PROPERTIES; i++)
-    for (j=0; copy_properties[j][0] != -1; j++)
+  for (i = 0; i < NUM_ELEMENT_PROPERTIES; i++)
+    for (j = 0; copy_properties[j][0] != -1; j++)
       if (HAS_PROPERTY(copy_properties[j][0], i))
-	for (k=1; k<=4; k++)
+	for (k = 1; k <= 4; k++)
 	  SET_PROPERTY(copy_properties[j][k], i, TRUE);
 }
 
@@ -2993,10 +2993,10 @@ void InitElementPropertiesEngine(int engine_version)
 #endif
 
   /* set all special, combined or engine dependent element properties */
-  for (i=0; i < MAX_NUM_ELEMENTS; i++)
+  for (i = 0; i < MAX_NUM_ELEMENTS; i++)
   {
 #if 0
-    for (j=EP_ACCESSIBLE_OVER; j < NUM_ELEMENT_PROPERTIES; j++)
+    for (j = EP_ACCESSIBLE_OVER; j < NUM_ELEMENT_PROPERTIES; j++)
       SET_PROPERTY(i, j, FALSE);
 #endif
 
@@ -3038,7 +3038,7 @@ void InitElementPropertiesEngine(int engine_version)
     /* ---------- WALL ----------------------------------------------------- */
     SET_PROPERTY(i, EP_WALL, TRUE);	/* default: element is wall */
 
-    for (j=0; no_wall_properties[j] != -1; j++)
+    for (j = 0; no_wall_properties[j] != -1; j++)
       if (HAS_PROPERTY(i, no_wall_properties[j]) ||
 	  i >= EL_FIRST_RUNTIME_UNREAL)
 	SET_PROPERTY(i, EP_WALL, FALSE);
@@ -3103,7 +3103,7 @@ void InitElementPropertiesEngine(int engine_version)
 
     /* ---------- CAN_CHANGE ----------------------------------------------- */
     SET_PROPERTY(i, EP_CAN_CHANGE, FALSE);	/* default: cannot change */
-    for (j=0; j < element_info[i].num_change_pages; j++)
+    for (j = 0; j < element_info[i].num_change_pages; j++)
       if (element_info[i].change_page[j].can_change)
 	SET_PROPERTY(i, EP_CAN_CHANGE, TRUE);
 
@@ -3114,11 +3114,11 @@ void InitElementPropertiesEngine(int engine_version)
 
 #if 0
   /* determine inactive elements (used for engine main loop optimization) */
-  for (i=0; i < MAX_NUM_ELEMENTS; i++)
+  for (i = 0; i < MAX_NUM_ELEMENTS; i++)
   {
     boolean active = FALSE;
 
-    for (j=0; i < NUM_ELEMENT_PROPERTIES; j++)
+    for (j = 0; i < NUM_ELEMENT_PROPERTIES; j++)
     {
       if (HAS_PROPERTY(i, j))
 	active = TRUE;
@@ -3145,7 +3145,7 @@ void InitElementPropertiesEngine(int engine_version)
     };
 
     /* special EM style gems behaviour */
-    for (i=0; ep_em_slippery_wall[i] != -1; i++)
+    for (i = 0; ep_em_slippery_wall[i] != -1; i++)
       SET_PROPERTY(ep_em_slippery_wall[i], EP_EM_SLIPPERY_WALL,
 		   level.em_slippery_gems);
 
@@ -3169,7 +3169,7 @@ void InitElementPropertiesEngine(int engine_version)
   }
 
   /* set uninitialized push delay values of custom elements in older levels */
-  for (i=0; i < NUM_CUSTOM_ELEMENTS; i++)
+  for (i = 0; i < NUM_CUSTOM_ELEMENTS; i++)
   {
     int element = EL_CUSTOM_START + i;
 
@@ -3204,7 +3204,7 @@ void Execute_Command(char *command)
     printf("%s\n", getFormattedSetupEntry("sort_priority", "100"));
     printf("\n");
 
-    for (i=0; image_config[i].token != NULL; i++)
+    for (i = 0; image_config[i].token != NULL; i++)
       printf("# %s\n", getFormattedSetupEntry(image_config[i].token,
 					      image_config[i].value));
 
@@ -3220,7 +3220,7 @@ void Execute_Command(char *command)
     printf("%s\n", getFormattedSetupEntry("sort_priority", "100"));
     printf("\n");
 
-    for (i=0; sound_config[i].token != NULL; i++)
+    for (i = 0; sound_config[i].token != NULL; i++)
       printf("# %s\n", getFormattedSetupEntry(sound_config[i].token,
 					      sound_config[i].value));
 
@@ -3236,7 +3236,7 @@ void Execute_Command(char *command)
     printf("%s\n", getFormattedSetupEntry("sort_priority", "100"));
     printf("\n");
 
-    for (i=0; music_config[i].token != NULL; i++)
+    for (i = 0; music_config[i].token != NULL; i++)
       printf("# %s\n", getFormattedSetupEntry(music_config[i].token,
 					      music_config[i].value));
 
@@ -3258,7 +3258,7 @@ void Execute_Command(char *command)
     printf("# (The entries below are default and therefore commented out.)\n");
     printf("\n");
 
-    for (i=0; helpanim_config[i].token != NULL; i++)
+    for (i = 0; helpanim_config[i].token != NULL; i++)
     {
       printf("# %s\n", getFormattedSetupEntry(helpanim_config[i].token,
 					      helpanim_config[i].value));
@@ -3275,7 +3275,7 @@ void Execute_Command(char *command)
     printf("# (The entries below are default and therefore commented out.)\n");
     printf("\n");
 
-    for (i=0; helptext_config[i].token != NULL; i++)
+    for (i = 0; helptext_config[i].token != NULL; i++)
       printf("# %s\n", getFormattedSetupEntry(helptext_config[i].token,
 					      helptext_config[i].value));
 
@@ -3342,7 +3342,7 @@ static void InitPlayerInfo()
   /* choose default local player */
   local_player = &stored_player[0];
 
-  for (i=0; i<MAX_PLAYERS; i++)
+  for (i = 0; i < MAX_PLAYERS; i++)
     stored_player[i].connected = FALSE;
 
   local_player->connected = TRUE;
@@ -3423,18 +3423,18 @@ static void InitArtworkConfig()
 
   /* dynamically determine list of generic tokens to be ignored */
   num_ignore_generic_tokens = 0;
-  for (i=0; ignore_generic_tokens[i] != NULL; i++)
+  for (i = 0; ignore_generic_tokens[i] != NULL; i++)
     num_ignore_generic_tokens++;
 
   /* dynamically determine list of image tokens to be ignored */
   num_ignore_image_tokens = num_ignore_generic_tokens;
-  for (i=0; image_config_vars[i].token != NULL; i++)
+  for (i = 0; image_config_vars[i].token != NULL; i++)
     num_ignore_image_tokens++;
   ignore_image_tokens =
     checked_malloc((num_ignore_image_tokens + 1) * sizeof(char *));
-  for (i=0; i < num_ignore_generic_tokens; i++)
+  for (i = 0; i < num_ignore_generic_tokens; i++)
     ignore_image_tokens[i] = ignore_generic_tokens[i];
-  for (i=0; i < num_ignore_image_tokens - num_ignore_generic_tokens; i++)
+  for (i = 0; i < num_ignore_image_tokens - num_ignore_generic_tokens; i++)
     ignore_image_tokens[num_ignore_generic_tokens + i] =
       image_config_vars[i].token;
   ignore_image_tokens[num_ignore_image_tokens] = NULL;
@@ -3443,7 +3443,7 @@ static void InitArtworkConfig()
   num_ignore_sound_tokens = num_ignore_generic_tokens;
   ignore_sound_tokens =
     checked_malloc((num_ignore_sound_tokens + 1) * sizeof(char *));
-  for (i=0; i < num_ignore_generic_tokens; i++)
+  for (i = 0; i < num_ignore_generic_tokens; i++)
     ignore_sound_tokens[i] = ignore_generic_tokens[i];
   ignore_sound_tokens[num_ignore_sound_tokens] = NULL;
 
@@ -3451,40 +3451,40 @@ static void InitArtworkConfig()
   num_ignore_music_tokens = num_ignore_generic_tokens;
   ignore_music_tokens =
     checked_malloc((num_ignore_music_tokens + 1) * sizeof(char *));
-  for (i=0; i < num_ignore_generic_tokens; i++)
+  for (i = 0; i < num_ignore_generic_tokens; i++)
     ignore_music_tokens[i] = ignore_generic_tokens[i];
   ignore_music_tokens[num_ignore_music_tokens] = NULL;
 
-  for (i=0; i < MAX_NUM_ELEMENTS; i++)
+  for (i = 0; i < MAX_NUM_ELEMENTS; i++)
     image_id_prefix[i] = element_info[i].token_name;
-  for (i=0; i < NUM_FONTS; i++)
+  for (i = 0; i < NUM_FONTS; i++)
     image_id_prefix[MAX_NUM_ELEMENTS + i] = font_info[i].token_name;
   image_id_prefix[MAX_NUM_ELEMENTS + NUM_FONTS] = NULL;
 
-  for (i=0; i < MAX_NUM_ELEMENTS; i++)
+  for (i = 0; i < MAX_NUM_ELEMENTS; i++)
     sound_id_prefix[i] = element_info[i].token_name;
-  for (i=0; i < MAX_NUM_ELEMENTS; i++)
+  for (i = 0; i < MAX_NUM_ELEMENTS; i++)
     sound_id_prefix[MAX_NUM_ELEMENTS + i] =
       get_string_in_brackets(element_info[i].class_name);
   sound_id_prefix[2 * MAX_NUM_ELEMENTS] = NULL;
 
-  for (i=0; i < NUM_MUSIC_PREFIXES; i++)
+  for (i = 0; i < NUM_MUSIC_PREFIXES; i++)
     music_id_prefix[i] = music_prefix_info[i].prefix;
   music_id_prefix[MAX_LEVELS] = NULL;
 
-  for (i=0; i < NUM_ACTIONS; i++)
+  for (i = 0; i < NUM_ACTIONS; i++)
     action_id_suffix[i] = element_action_info[i].suffix;
   action_id_suffix[NUM_ACTIONS] = NULL;
 
-  for (i=0; i < NUM_DIRECTIONS; i++)
+  for (i = 0; i < NUM_DIRECTIONS; i++)
     direction_id_suffix[i] = element_direction_info[i].suffix;
   direction_id_suffix[NUM_DIRECTIONS] = NULL;
 
-  for (i=0; i < NUM_SPECIAL_GFX_ARGS; i++)
+  for (i = 0; i < NUM_SPECIAL_GFX_ARGS; i++)
     special_id_suffix[i] = special_suffix_info[i].suffix;
   special_id_suffix[NUM_SPECIAL_GFX_ARGS] = NULL;
 
-  for (i=0; i < MAX_LEVELS; i++)
+  for (i = 0; i < MAX_LEVELS; i++)
     level_id_suffix[i] = get_level_id_suffix(i);
   level_id_suffix[MAX_LEVELS] = NULL;
 
@@ -3512,9 +3512,9 @@ void InitGfx()
   int i, j;
 
   /* determine settings for initial font (for displaying startup messages) */
-  for (i=0; image_config[i].token != NULL; i++)
+  for (i = 0; image_config[i].token != NULL; i++)
   {
-    for (j=0; j < NUM_INITIAL_FONTS; j++)
+    for (j = 0; j < NUM_INITIAL_FONTS; j++)
     {
       char font_token[128];
       int len_font_token;
@@ -3539,7 +3539,7 @@ void InitGfx()
     }
   }
 
-  for (j=0; j < NUM_INITIAL_FONTS; j++)
+  for (j = 0; j < NUM_INITIAL_FONTS; j++)
   {
     font_initial[j].num_chars = DEFAULT_NUM_CHARS_PER_FONT;
     font_initial[j].num_chars_per_line = DEFAULT_NUM_CHARS_PER_LINE;
@@ -3562,7 +3562,7 @@ void InitGfx()
 
   bitmap_font_initial = LoadCustomImage(filename_font_initial);
 
-  for (j=0; j < NUM_INITIAL_FONTS; j++)
+  for (j = 0; j < NUM_INITIAL_FONTS; j++)
     font_initial[j].bitmap = bitmap_font_initial;
 
   InitFontGraphicInfo();
@@ -3588,8 +3588,8 @@ void InitGfxBackground()
   ClearRectangle(backbuffer, REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE);
   ClearRectangle(bitmap_db_door, 0, 0, 3 * DXSIZE, DYSIZE + VYSIZE);
 
-  for (x=0; x<MAX_BUF_XSIZE; x++)
-    for (y=0; y<MAX_BUF_YSIZE; y++)
+  for (x = 0; x < MAX_BUF_XSIZE; x++)
+    for (y = 0; y < MAX_BUF_YSIZE; y++)
       redraw[x][y] = 0;
   redraw_tiles = 0;
   redraw_mask = REDRAW_ALL;
