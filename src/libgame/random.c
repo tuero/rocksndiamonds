@@ -1,3 +1,16 @@
+/***********************************************************
+* Artsoft Retro-Game Library                               *
+*----------------------------------------------------------*
+* (c) 1994-2000 Artsoft Entertainment                      *
+*               Holger Schemel                             *
+*               Detmolder Strasse 189                      *
+*               33604 Bielefeld                            *
+*               Germany                                    *
+*               e-mail: info@artsoft.org                   *
+*----------------------------------------------------------*
+* random.c                                                 *
+***********************************************************/
+
 /*
  * Copyright (c) 1983 Regents of the University of California.
  * All rights reserved.

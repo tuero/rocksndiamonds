@@ -1,15 +1,14 @@
 /***********************************************************
-*  Rocks'n'Diamonds -- McDuffin Strikes Back!              *
+* Artsoft Retro-Game Library                               *
 *----------------------------------------------------------*
-*  ©1995 Artsoft Development                               *
-*        Holger Schemel                                    *
-*        33659 Bielefeld-Senne                             *
-*        Telefon: (0521) 493245                            *
-*        eMail: aeglos@valinor.owl.de                      *
-*               aeglos@uni-paderborn.de                    *
-*               q99492@pbhrzx.uni-paderborn.de             *
+* (c) 1994-2000 Artsoft Entertainment                      *
+*               Holger Schemel                             *
+*               Detmolder Strasse 189                      *
+*               33604 Bielefeld                            *
+*               Germany                                    *
+*               e-mail: info@artsoft.org                   *
 *----------------------------------------------------------*
-*  x11.h                                                   *
+* x11.h                                                    *
 ***********************************************************/
 
 #ifndef X11_H
