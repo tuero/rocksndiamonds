@@ -426,6 +426,7 @@ void HandleButton(int mx, int my, int button)
 void HandleKey(Key key, int key_status)
 {
   int joy = 0;
+  boolean anyTextGadgetActiveOrJustFinished = anyTextGadgetActive();
   static struct SetupKeyboardInfo custom_key;
   static struct
   {
@@ -589,7 +590,8 @@ void HandleKey(Key key, int key_status)
       break;
 
     case LEVELED:
-      HandleLevelEditorKeyInput(key);
+      if (!anyTextGadgetActiveOrJustFinished)
+	HandleLevelEditorKeyInput(key);
       break;
 
     case PLAYING:

@@ -2204,7 +2204,7 @@ void InitElementProperties()
     for(j=0; j<*(ep2_num[i]); j++)
       Elementeigenschaften2[(ep2_array[i])[j]] |= ep2_bit[i];
 
-  for(i=EL_CHAR_START; i<EL_CHAR_END; i++)
+  for(i=EL_CHAR_START; i<=EL_CHAR_END; i++)
     Elementeigenschaften1[i] |= (EP_BIT_CHAR | EP_BIT_INACTIVE);
 }
 
