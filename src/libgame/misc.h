@@ -61,8 +61,6 @@ char *getPath2(char *, char *);
 char *getPath3(char *, char *, char*);
 char *getStringCopy(char *);
 char *getStringToLower(char *);
-void MarkTileDirty(int, int);
-void SetBorderElement();
 void GetOptions(char **);
 void Error(int, char *, ...);
 void *checked_malloc(unsigned long);
@@ -97,6 +95,16 @@ void sortLevelDirInfo(struct LevelDirInfo **,
 
 inline void swap_numbers(int *, int *);
 inline void swap_number_pairs(int *, int *, int *, int *);
+
+char *getUserDataDir(void);
+void createDirectory(char *, char *);
+void InitUserDataDirectory(void);
+
+#if !defined(PLATFORM_UNIX)
+void initErrorFile();
+FILE *openErrorFile();
+void dumpErrorFile();
+#endif
 
 void debug_print_timestamp(int, char *);
 

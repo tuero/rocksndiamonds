@@ -15,8 +15,8 @@
 #ifndef MSDOS_H
 #define MSDOS_H
 
-#include <allegro.h>
 #include <time.h>
+#include "allegro.h"
 
 /* symbol 'window' is defined in DJGPP cross-compiler in libc.a(conio.o) */
 #define window window_djgpp

@@ -16,7 +16,7 @@
 
 #include "main.h"
 
-void OpenAll(int, char **);
+void OpenAll(void);
 void CloseAllAndExit(int);
 void InitJoysticks(void);
 

@@ -33,10 +33,4 @@ void SaveLevelSetup_LastSeries(void);
 void LoadLevelSetup_SeriesInfo(void);
 void SaveLevelSetup_SeriesInfo(void);
 
-#if !defined(PLATFORM_UNIX)
-void initErrorFile();
-FILE *openErrorFile();
-void dumpErrorFile();
-#endif
-
 #endif	/* FILES_H */

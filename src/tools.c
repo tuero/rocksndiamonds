@@ -494,6 +494,37 @@ void DrawTextExt(DrawBuffer d, GC gc, int x, int y,
 #endif
 
 
+void MarkTileDirty(int x, int y)
+{
+  int xx = redraw_x1 + x;
+  int yy = redraw_y1 + y;
+
+  if (!redraw[xx][yy])
+    redraw_tiles++;
+
+  redraw[xx][yy] = TRUE;
+  redraw_mask |= REDRAW_TILES;
+}
+
+void SetBorderElement()
+{
+  int x, y;
+
+  BorderElement = EL_LEERRAUM;
+
+  for(y=0; y<lev_fieldy && BorderElement == EL_LEERRAUM; y++)
+  {
+    for(x=0; x<lev_fieldx; x++)
+    {
+      if (!IS_MASSIVE(Feld[x][y]))
+	BorderElement = EL_BETON;
+
+      if (y != 0 && y != lev_fieldy - 1 && x != lev_fieldx - 1)
+	x = lev_fieldx - 2;
+    }
+  }
+}
+
 void DrawAllPlayers()
 {
   int i;

@@ -19,8 +19,10 @@
 #include "events.h"
 #include "joystick.h"
 
+#if 0
 #if defined(PLATFORM_MSDOS)
 #include <fcntl.h>
+#endif
 #endif
 
 #if 0
@@ -65,7 +67,9 @@ char	       *joystick_device_name[MAX_PLAYERS] =
   DEV_JOYSTICK_3
 };
 
+#if 0
 char	       *program_name = NULL;
+#endif
 
 int		game_status = MAINMENU;
 boolean		level_editor_test_game = FALSE;
@@ -132,7 +136,9 @@ int		TimeFrames, TimePlayed, TimeLeft;
 
 boolean		network_player_action_received = FALSE;
 
+#if 0
 struct LevelDirInfo    *leveldir_first = NULL, *leveldir_current = NULL;
+#endif
 struct LevelInfo	level;
 struct PlayerInfo	stored_player[MAX_PLAYERS], *local_player = NULL;
 struct HiScore		highscore[MAX_SCORE_ENTRIES];
@@ -988,15 +994,23 @@ void TEST_SDL_JOYSTICK()
 
 int main(int argc, char *argv[])
 {
+#if 0
   program_name = (strrchr(argv[0],'/') ? strrchr(argv[0],'/') + 1 : argv[0]);
+#endif
 
+  InitCommandName(argv[0]);
+  InitExitFunction(CloseAllAndExit);
+  InitPlatformDependantStuff();
+
+#if 0
 #if defined(PLATFORM_MSDOS)
   _fmode = O_BINARY;
+#endif
 #endif
 
 #if 1
   GetOptions(argv);
-  OpenAll(argc,argv);
+  OpenAll();
 #endif
 
 #if 0

@@ -14,8 +14,11 @@
 #include <time.h>
 #include <sys/time.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <stdarg.h>
 #include <ctype.h>
+#include <string.h>
+#include <unistd.h>
 
 #include "platform.h"
 
@@ -25,8 +28,6 @@
 #endif
 
 #include "libgame.h"
-
-#include "main_TMP.h"
 
 #include "misc.h"
 
@@ -417,37 +418,6 @@ char *getStringToLower(char *s)
   return s_copy;
 }
 
-void MarkTileDirty(int x, int y)
-{
-  int xx = redraw_x1 + x;
-  int yy = redraw_y1 + y;
-
-  if (!redraw[xx][yy])
-    redraw_tiles++;
-
-  redraw[xx][yy] = TRUE;
-  redraw_mask |= REDRAW_TILES;
-}
-
-void SetBorderElement()
-{
-  int x, y;
-
-  BorderElement = EL_LEERRAUM;
-
-  for(y=0; y<lev_fieldy && BorderElement == EL_LEERRAUM; y++)
-  {
-    for(x=0; x<lev_fieldx; x++)
-    {
-      if (!IS_MASSIVE(Feld[x][y]))
-	BorderElement = EL_BETON;
-
-      if (y != 0 && y != lev_fieldy - 1 && x != lev_fieldx - 1)
-	x = lev_fieldx - 2;
-    }
-  }
-}
-
 void GetOptions(char *argv[])
 {
   char **options_left = &argv[1];
@@ -463,11 +433,6 @@ void GetOptions(char *argv[])
   options.network = FALSE;
   options.verbose = FALSE;
   options.debug = FALSE;
-
-  /* initialize some more global variables */
-  global.frames_per_second = 0;
-  global.fps_slowdown = FALSE;
-  global.fps_slowdown_factor = 1;
 
   while (*options_left)
   {
@@ -513,7 +478,7 @@ void GetOptions(char *argv[])
 	     "  -s, --serveronly              only start network server\n"
 	     "  -n, --network                 network multiplayer game\n"
 	     "  -v, --verbose                 verbose mode\n",
-	     program_name);
+	     program.command_basename);
       exit(0);
     }
     else if (strncmp(option, "-display", option_len) == 0)
@@ -599,7 +564,7 @@ void Error(int mode, char *format, ...)
   if ((error = openErrorFile()) == NULL)
   {
     printf("Cannot write to error output file!\n");
-    CloseAllAndExit(1);
+    program.exit_function(1);
   }
 #endif
 
@@ -614,7 +579,7 @@ void Error(int mode, char *format, ...)
   {
     va_list ap;
 
-    fprintf(error, "%s%s: ", program_name, process_name);
+    fprintf(error, "%s%s: ", program.command_basename, process_name);
 
     if (mode & ERR_WARN)
       fprintf(error, "warning: ");
@@ -628,10 +593,10 @@ void Error(int mode, char *format, ...)
   
   if (mode & ERR_HELP)
     fprintf(error, "%s: Try option '--help' for more information.\n",
-	    program_name);
+	    program.command_basename);
 
   if (mode & ERR_EXIT)
-    fprintf(error, "%s%s: aborting\n", program_name, process_name);
+    fprintf(error, "%s%s: aborting\n", program.command_basename, process_name);
 
   if (error != stderr)
     fclose(error);
@@ -641,7 +606,7 @@ void Error(int mode, char *format, ...)
     if (mode & ERR_FROM_SERVER)
       exit(1);				/* child process: normal exit */
     else
-      CloseAllAndExit(1);		/* main process: clean up stuff */
+      program.exit_function(1);		/* main process: clean up stuff */
   }
 }
 
@@ -1287,9 +1252,101 @@ inline void swap_number_pairs(int *x1, int *y1, int *x2, int *y2)
 }
 
 
-/* ------------------------------------------------------------------------- */
+/* ========================================================================= */
+/* some stuff from "files.c"                                                 */
+/* ========================================================================= */
+
+#define MODE_R_ALL		(S_IRUSR | S_IRGRP | S_IROTH)
+#define MODE_W_ALL		(S_IWUSR | S_IWGRP | S_IWOTH)
+#define MODE_X_ALL		(S_IXUSR | S_IXGRP | S_IXOTH)
+#define USERDATA_DIR_MODE	(MODE_R_ALL | MODE_X_ALL | S_IWUSR)
+
+char *getUserDataDir(void)
+{
+  static char *userdata_dir = NULL;
+
+  if (!userdata_dir)
+  {
+    char *home_dir = getHomeDir();
+    char *data_dir = program.userdata_directory;
+
+    userdata_dir = getPath2(home_dir, data_dir);
+  }
+
+  return userdata_dir;
+}
+
+void createDirectory(char *dir, char *text)
+{
+  if (access(dir, F_OK) != 0)
+#if defined(PLATFORM_WIN32)
+    if (mkdir(dir) != 0)
+#else
+    if (mkdir(dir, USERDATA_DIR_MODE) != 0)
+#endif
+      Error(ERR_WARN, "cannot create %s directory '%s'", text, dir);
+}
+
+void InitUserDataDirectory()
+{
+  createDirectory(getUserDataDir(), "user data");
+}
+
+
+/* ========================================================================= */
+/* functions only needed for non-Unix (non-command-line) systems */
+/* ========================================================================= */
+
+#if !defined(PLATFORM_UNIX)
+
+#define ERROR_FILENAME		"error.out"
+
+void initErrorFile()
+{
+  char *filename;
+
+  InitUserDataDirectory();
+
+  filename = getPath2(getUserDataDir(), ERROR_FILENAME);
+  unlink(filename);
+  free(filename);
+}
+
+FILE *openErrorFile()
+{
+  char *filename;
+  FILE *error_file;
+
+  filename = getPath2(getUserDataDir(), ERROR_FILENAME);
+  error_file = fopen(filename, "a");
+  free(filename);
+
+  return error_file;
+}
+
+void dumpErrorFile()
+{
+  char *filename;
+  FILE *error_file;
+
+  filename = getPath2(getUserDataDir(), ERROR_FILENAME);
+  error_file = fopen(filename, "r");
+  free(filename);
+
+  if (error_file != NULL)
+  {
+    while (!feof(error_file))
+      fputc(fgetc(error_file), stderr);
+
+    fclose(error_file);
+  }
+}
+#endif
+
+
+/* ========================================================================= */
 /* the following is only for debugging purpose and normally not used         */
-/* ------------------------------------------------------------------------- */
+/* ========================================================================= */
 
 #define DEBUG_NUM_TIMESTAMPS	3
 

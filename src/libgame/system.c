@@ -12,9 +12,17 @@
 *  system.c                                                *
 ***********************************************************/
 
+#include <string.h>
+
+#include "platform.h"
+
+#if defined(PLATFORM_MSDOS)
+#include <fcntl.h>
+#endif
+
 #include "libgame.h"
 
-
+#if 0
 /* ========================================================================= */
 /* exported variables                                                        */
 /* ========================================================================= */
@@ -42,18 +50,48 @@ int		redraw_tiles = 0;
 
 int		FrameCounter = 0;
 
+#endif
 
 /* ========================================================================= */
-/* video functions                                                           */
+/* init functions                                                            */
 /* ========================================================================= */
 
-inline void InitProgramInfo(char *command_name, char *program_title,
-			    char *window_title, char *icon_title,
-			    char *x11_icon_filename,
-			    char *x11_iconmask_filename,
-			    char *msdos_pointer_filename)
+void InitCommandName(char *argv0)
 {
-  program.command_name = command_name;
+  program.command_basename =
+    (strrchr(argv0, '/') ? strrchr(argv0, '/') + 1 : argv0);
+}
+
+void InitExitFunction(void (*exit_function)(int))
+{
+  program.exit_function = exit_function;
+}
+
+void InitPlatformDependantStuff(void)
+{
+#if defined(PLATFORM_MSDOS)
+  _fmode = O_BINARY;
+#endif
+}
+
+void InitProgramInfo(char *unix_userdata_directory, char *program_title,
+		     char *window_title, char *icon_title,
+		     char *x11_icon_basename, char *x11_iconmask_basename,
+		     char *msdos_pointer_basename)
+{
+  char *gfx_dir = getPath2(options.ro_base_directory, GRAPHICS_DIRECTORY);
+  char *x11_icon_filename = getPath2(gfx_dir, x11_icon_basename);
+  char *x11_iconmask_filename = getPath2(gfx_dir, x11_iconmask_basename);
+  char *msdos_pointer_filename = getPath2(gfx_dir, msdos_pointer_basename);
+
+  free(gfx_dir);
+
+#if defined(PLATFORM_UNIX)
+  program.userdata_directory = unix_userdata_directory;
+#else
+  program.userdata_directory = "userdata";
+#endif
+
   program.program_title = program_title;
   program.window_title = window_title;
   program.icon_title = icon_title;
@@ -62,9 +100,9 @@ inline void InitProgramInfo(char *command_name, char *program_title,
   program.msdos_pointer_filename = msdos_pointer_filename;
 }
 
-inline void InitGfxFieldInfo(int sx, int sy, int sxsize, int sysize,
-			     int real_sx, int real_sy,
-			     int full_sxsize, int full_sysize)
+void InitGfxFieldInfo(int sx, int sy, int sxsize, int sysize,
+		      int real_sx, int real_sy,
+		      int full_sxsize, int full_sysize)
 {
   gfx.sx = sx;
   gfx.sy = sy;
@@ -76,7 +114,7 @@ inline void InitGfxFieldInfo(int sx, int sy, int sxsize, int sysize,
   gfx.full_sysize = full_sysize;
 }
 
-inline void InitGfxDoor1Info(int dx, int dy, int dxsize, int dysize)
+void InitGfxDoor1Info(int dx, int dy, int dxsize, int dysize)
 {
   gfx.dx = dx;
   gfx.dy = dy;
@@ -84,7 +122,7 @@ inline void InitGfxDoor1Info(int dx, int dy, int dxsize, int dysize)
   gfx.dysize = dysize;
 }
 
-inline void InitGfxDoor2Info(int vx, int vy, int vxsize, int vysize)
+void InitGfxDoor2Info(int vx, int vy, int vxsize, int vysize)
 {
   gfx.vx = vx;
   gfx.vy = vy;
@@ -92,13 +130,17 @@ inline void InitGfxDoor2Info(int vx, int vy, int vxsize, int vysize)
   gfx.vysize = vysize;
 }
 
-inline void InitGfxScrollbufferInfo(int scrollbuffer_width,
-				    int scrollbuffer_height)
+void InitGfxScrollbufferInfo(int scrollbuffer_width, int scrollbuffer_height)
 {
   /* currently only used by MSDOS code to alloc VRAM buffer, if available */
   gfx.scrollbuffer_width = scrollbuffer_width;
   gfx.scrollbuffer_height = scrollbuffer_height;
 }
+
+
+/* ========================================================================= */
+/* video functions                                                           */
+/* ========================================================================= */
 
 inline static int GetRealDepth(int depth)
 {

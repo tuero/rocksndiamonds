@@ -73,6 +73,9 @@ void DrawText(int, int, char *, int, int);
 void DrawTextExt(DrawBuffer, GC, int, int, char *, int, int);
 #endif
 
+void MarkTileDirty(int, int);
+void SetBorderElement();
+
 void DrawAllPlayers(void);
 void DrawPlayerField(int, int);
 void DrawPlayer(struct PlayerInfo *);

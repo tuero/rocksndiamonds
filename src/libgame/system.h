@@ -82,13 +82,17 @@ typedef int (*EventFilter)(const Event *);
 
 struct ProgramInfo
 {
-  char *command_name;
+  char *command_basename;
+  char *userdata_directory;
+
   char *program_title;
   char *window_title;
   char *icon_title;
   char *x11_icon_filename;
   char *x11_iconmask_filename;
   char *msdos_pointer_filename;
+
+  void (*exit_function)(int);
 };
 
 struct OptionInfo
@@ -139,6 +143,7 @@ struct GfxInfo
 };
 
 
+#if 0
 /* ========================================================================= */
 /* exported variables                                                        */
 /* ========================================================================= */
@@ -166,16 +171,20 @@ extern int		redraw_tiles;
 
 extern int		FrameCounter;
 
+#endif
 
 /* function definitions */
 
-inline void InitProgramInfo(char *, char *, char *, char *, char *, char *,
-			    char *);
+void InitCommandName(char *);
+void InitExitFunction(void (*exit_function)(int));
+void InitPlatformDependantStuff(void);
 
-inline void InitGfxFieldInfo(int, int, int, int, int, int, int, int);
-inline void InitGfxDoor1Info(int, int, int, int);
-inline void InitGfxDoor2Info(int, int, int, int);
-inline void InitGfxScrollbufferInfo(int, int);
+void InitProgramInfo(char *, char *, char *, char *, char *, char *, char *);
+
+void InitGfxFieldInfo(int, int, int, int, int, int, int, int);
+void InitGfxDoor1Info(int, int, int, int);
+void InitGfxDoor2Info(int, int, int, int);
+void InitGfxScrollbufferInfo(int, int);
 
 inline void InitVideoDisplay(void);
 inline void InitVideoBuffer(DrawBuffer *,DrawWindow *, int, int, int, boolean);

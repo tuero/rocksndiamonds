@@ -368,35 +368,6 @@ struct LevelInfo
   boolean gravity;
 };
 
-struct LevelDirInfo
-{
-  char *filename;	/* level series single directory name */
-  char *fullpath;	/* complete path relative to level directory */
-  char *basepath;	/* absolute base path of level directory */
-  char *name;		/* level series name, as displayed on main screen */
-  char *name_short;	/* optional short name for level selection screen */
-  char *name_sorting;	/* optional sorting name for correct level sorting */
-  char *author;		/* level series author name levels without author */
-  char *imported_from;	/* optional comment for imported level series */
-  int levels;		/* number of levels in level series */
-  int first_level;	/* first level number (to allow start with 0 or 1) */
-  int last_level;	/* last level number (automatically calculated) */
-  int sort_priority;	/* sort levels by 'sort_priority' and then by name */
-  boolean level_group;	/* directory contains more level series directories */
-  boolean parent_link;	/* entry links back to parent directory */
-  boolean user_defined;	/* user defined levels are stored in home directory */
-  boolean readonly;	/* readonly levels can not be changed with editor */
-  int color;		/* color to use on selection screen for this level */
-  char *class_desc;	/* description of level series class */
-  int handicap_level;	/* number of the lowest unsolved level */
-  int cl_first;		/* internal control field for "choose level" screen */
-  int cl_cursor;	/* internal control field for "choose level" screen */
-
-  struct LevelDirInfo *node_parent;	/* parent level directory info */
-  struct LevelDirInfo *node_group;	/* level group sub-directory info */
-  struct LevelDirInfo *next;		/* next level series structure node */
-};
-
 struct TapeInfo
 {
   int level_nr;
@@ -474,7 +445,9 @@ extern char	       *sound_device_name;
 extern int		joystick_device;
 extern char	       *joystick_device_name[];
 
+#if 0
 extern char	       *program_name;
+#endif
 
 extern int		game_status;
 extern boolean		level_editor_test_game;
@@ -541,7 +514,9 @@ extern int		SiebCount;
 
 extern boolean		network_player_action_received;
 
+#if 0
 extern struct LevelDirInfo     *leveldir_first, *leveldir_current;
+#endif
 extern struct LevelInfo		level;
 extern struct PlayerInfo	stored_player[], *local_player;
 extern struct HiScore		highscore[];
@@ -1671,6 +1646,7 @@ extern int		num_element_info;
 #define SETUPINPUT		9
 #define CALIBRATION		10
 
+#if 0
 #ifndef RO_GAME_DIR
 #define RO_GAME_DIR		"."
 #endif
@@ -1687,6 +1663,7 @@ extern int		num_element_info;
 #define LEVELS_DIRECTORY	"levels"
 #define TAPES_DIRECTORY		"tapes"
 #define SCORES_DIRECTORY	"scores"
+#endif
 
 #define PROGRAM_VERSION_STRING	"1.5.0"
 #define PROGRAM_TITLE_STRING	"Rocks'n'Diamonds"
@@ -1697,11 +1674,13 @@ extern int		num_element_info;
 #define WINDOW_TITLE_STRING	PROGRAM_TITLE_STRING " " PROGRAM_IDENT_STRING
 #define WINDOW_SUBTITLE_STRING	PROGRAM_RIGHTS_STRING " " PROGRAM_AUTHOR_STRING
 #define ICON_TITLE_STRING	PROGRAM_TITLE_STRING
+#define UNIX_USERDATA_DIRECTORY	".rocksndiamonds"
 
 #define X11_ICON_FILENAME	"rocks_icon.xbm"
 #define X11_ICONMASK_FILENAME	"rocks_iconmask.xbm"
 #define MSDOS_POINTER_FILENAME	"mouse.pcx"
 
+#if 0
 /* default name for empty highscore entry */
 #define EMPTY_PLAYER_NAME	"no name"
 
@@ -1710,6 +1689,7 @@ extern int		num_element_info;
 
 /* default name for new levels */
 #define NAMELESS_LEVEL_NAME	"nameless level"
+#endif
 
 #if 0
 /* values for button_status */

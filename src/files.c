@@ -47,7 +47,6 @@
 
 /* file names and filename extensions */
 #if !defined(PLATFORM_MSDOS)
-#define USERDATA_DIRECTORY	".rocksndiamonds"
 #define LEVELSETUP_DIRECTORY	"levelsetup"
 #define SETUP_FILENAME		"setup.conf"
 #define LEVELSETUP_FILENAME	"levelsetup.conf"
@@ -56,7 +55,6 @@
 #define TAPEFILE_EXTENSION	"tape"
 #define SCOREFILE_EXTENSION	"score"
 #else
-#define USERDATA_DIRECTORY	"userdata"
 #define LEVELSETUP_DIRECTORY	"lvlsetup"
 #define SETUP_FILENAME		"setup.cnf"
 #define LEVELSETUP_FILENAME	"lvlsetup.cnf"
@@ -64,10 +62,6 @@
 #define LEVELFILE_EXTENSION	"lvl"
 #define TAPEFILE_EXTENSION	"tap"
 #define SCOREFILE_EXTENSION	"sco"
-#endif
-
-#if !defined(PLATFORM_UNIX)
-#define ERROR_FILENAME		"error.out"
 #endif
 
 #if defined(PLATFORM_WIN32)
@@ -95,7 +89,6 @@
 #define MODE_R_ALL		(S_IRUSR | S_IRGRP | S_IROTH)
 #define MODE_W_ALL		(S_IWUSR | S_IWGRP | S_IWOTH)
 #define MODE_X_ALL		(S_IXUSR | S_IXGRP | S_IXOTH)
-#define USERDATA_DIR_MODE	(MODE_R_ALL | MODE_X_ALL | S_IWUSR)
 #define LEVEL_PERMS		(MODE_R_ALL | MODE_W_ALL)
 #define SCORE_PERMS		LEVEL_PERMS
 #define TAPE_PERMS		LEVEL_PERMS
@@ -210,21 +203,6 @@ char *getLevelClassDescription(struct LevelDirInfo *ldi)
 
 static void SaveUserLevelInfo();		/* for 'InitUserLevelDir()' */
 static char *getSetupLine(char *, int);		/* for 'SaveUserLevelInfo()' */
-
-char *getUserDataDir()
-{
-  static char *userdata_dir = NULL;
-
-  if (!userdata_dir)
-  {
-    char *home_dir = getHomeDir();
-    char *data_dir = USERDATA_DIRECTORY;
-
-    userdata_dir = getPath2(home_dir, data_dir);
-  }
-
-  return userdata_dir;
-}
 
 static char *getSetupDir()
 {
@@ -343,22 +321,6 @@ static char *getScoreFilename(int nr)
   filename = getPath2(getScoreDir(leveldir_current->filename), basename);
 
   return filename;
-}
-
-static void createDirectory(char *dir, char *text)
-{
-  if (access(dir, F_OK) != 0)
-#if defined(PLATFORM_WIN32)
-    if (mkdir(dir) != 0)
-#else
-    if (mkdir(dir, USERDATA_DIR_MODE) != 0)
-#endif
-      Error(ERR_WARN, "cannot create %s directory '%s'", text, dir);
-}
-
-static void InitUserDataDirectory()
-{
-  createDirectory(getUserDataDir(), "user data");
 }
 
 static void InitTapeDirectory(char *level_subdir)
@@ -2216,46 +2178,3 @@ void SaveLevelSetup_SeriesInfo()
 
   chmod(filename, SETUP_PERMS);
 }
-
-#if !defined(PLATFORM_UNIX)
-void initErrorFile()
-{
-  char *filename;
-
-  InitUserDataDirectory();
-
-  filename = getPath2(getUserDataDir(), ERROR_FILENAME);
-  unlink(filename);
-  free(filename);
-}
-
-FILE *openErrorFile()
-{
-  char *filename;
-  FILE *error_file;
-
-  filename = getPath2(getUserDataDir(), ERROR_FILENAME);
-  error_file = fopen(filename, "a");
-  free(filename);
-
-  return error_file;
-}
-
-void dumpErrorFile()
-{
-  char *filename;
-  FILE *error_file;
-
-  filename = getPath2(getUserDataDir(), ERROR_FILENAME);
-  error_file = fopen(filename, "r");
-  free(filename);
-
-  if (error_file != NULL)
-  {
-    while (!feof(error_file))
-      fputc(fgetc(error_file), stderr);
-
-    fclose(error_file);
-  }
-}
-#endif

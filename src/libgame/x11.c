@@ -185,7 +185,7 @@ static DrawWindow X11InitWindow()
   wm_hints.icon_mask = iconmask_pixmap;
   wm_hints.flags = StateHint | IconPixmapHint | IconMaskHint | InputHint;
 
-  class_hints.res_name = program.command_name;
+  class_hints.res_name = program.command_basename;
   class_hints.res_class = program.program_title;
 
   XSetWMProperties(display, new_window->drawable, &windowName, &iconName, 

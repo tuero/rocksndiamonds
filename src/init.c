@@ -45,7 +45,7 @@ static void LoadGfx(int, struct PictureFileInfo *);
 static void InitGadgets(void);
 static void InitElementProperties(void);
 
-void OpenAll(int argc, char *argv[])
+void OpenAll(void)
 {
 #if !defined(PLATFORM_UNIX)
   initErrorFile();
@@ -62,6 +62,11 @@ void OpenAll(int argc, char *argv[])
     /* never reached */
     exit(0);
   }
+
+  InitProgramInfo(UNIX_USERDATA_DIRECTORY,
+		  PROGRAM_TITLE_STRING, WINDOW_TITLE_STRING,
+		  ICON_TITLE_STRING, X11_ICON_FILENAME, X11_ICONMASK_FILENAME,
+		  MSDOS_POINTER_FILENAME);
 
   InitPlayerInfo();
 
@@ -310,17 +315,6 @@ void InitJoysticks()
 
 void InitDisplay()
 {
-  char *gfx_dir = getPath2(options.ro_base_directory, GRAPHICS_DIRECTORY);
-  char *x11_icon_filename = getPath2(gfx_dir, X11_ICON_FILENAME);
-  char *x11_iconmask_filename = getPath2(gfx_dir, X11_ICONMASK_FILENAME);
-  char *msdos_pointer_filename = getPath2(gfx_dir, MSDOS_POINTER_FILENAME);
-
-  free(gfx_dir);
-
-  InitProgramInfo(program_name, PROGRAM_TITLE_STRING, WINDOW_TITLE_STRING,
-		  ICON_TITLE_STRING, x11_icon_filename, x11_iconmask_filename,
-		  msdos_pointer_filename);
-
   InitVideoDisplay();
   InitVideoBuffer(&backbuffer, &window, WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH,
 		  setup.fullscreen);
@@ -420,8 +414,12 @@ void InitGfx()
   };
 #endif
 
-  /* initialize screen properties */
+  /* initialize some global variables */
+  global.frames_per_second = 0;
+  global.fps_slowdown = FALSE;
+  global.fps_slowdown_factor = 1;
 
+  /* initialize screen properties */
   InitGfxFieldInfo(SX, SY, SXSIZE, SYSIZE,
 		   REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE);
   InitGfxDoor1Info(DX, DY, DXSIZE, DYSIZE);
@@ -429,7 +427,6 @@ void InitGfx()
   InitGfxScrollbufferInfo(FXSIZE, FYSIZE);
 
   /* create additional image buffers for double-buffering */
-
   pix[PIX_DB_DOOR] = CreateBitmap(3 * DXSIZE, DYSIZE + VYSIZE, DEFAULT_DEPTH);
   pix[PIX_DB_FIELD] = CreateBitmap(FXSIZE, FYSIZE, DEFAULT_DEPTH);
 

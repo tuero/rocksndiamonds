@@ -12,12 +12,9 @@
 ***********************************************************/
 
 #include <stdarg.h>
+#include <string.h>
 
 #include "libgame.h"
-
-#if 0
-#include "main_TMP.h"
-#endif
 
 #include "gadgets.h"
 
