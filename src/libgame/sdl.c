@@ -22,6 +22,21 @@
 /* video functions                                                           */
 /* ========================================================================= */
 
+/* functions from SGE library */
+inline void sge_Line(SDL_Surface *, Sint16, Sint16, Sint16, Sint16, Uint32);
+
+#ifdef PLATFORM_WIN32
+#define FULLSCREEN_BUG
+#endif
+
+/* stuff needed to work around SDL/Windows fullscreen drawing bug */
+static int fullscreen_width;
+static int fullscreen_height;
+static int fullscreen_xoffset;
+static int fullscreen_yoffset;
+static int video_xoffset;
+static int video_yoffset;
+
 inline void SDLInitVideoDisplay(void)
 {
   /* initialize SDL video */
@@ -35,6 +50,38 @@ inline void SDLInitVideoDisplay(void)
 inline void SDLInitVideoBuffer(DrawBuffer **backbuffer, DrawWindow **window,
 			       boolean fullscreen)
 {
+#ifdef FULLSCREEN_BUG
+  int i;
+  static int screen_xy[][2] =
+  {
+    {  640, 480 },
+    {  800, 600 },
+    { 1024, 768 },
+    {   -1,  -1 }
+  };
+#endif
+
+  /* default: normal game window size */
+  fullscreen_width = video.width;
+  fullscreen_height = video.height;
+  fullscreen_xoffset = 0;
+  fullscreen_yoffset = 0;
+
+#ifdef FULLSCREEN_BUG
+  for (i=0; screen_xy[i][0] != -1; i++)
+  {
+    if (video.width <= screen_xy[i][0] && video.height <= screen_xy[i][1])
+    {
+      fullscreen_width = screen_xy[i][0];
+      fullscreen_height = screen_xy[i][1];
+      break;
+    }
+  }
+
+  fullscreen_xoffset = (fullscreen_width - video.width) / 2;
+  fullscreen_yoffset = (fullscreen_height - video.height) / 2;
+#endif
+
   /* open SDL video output device (window or fullscreen mode) */
   if (!SDLSetVideoMode(backbuffer, fullscreen))
     Error(ERR_EXIT, "setting video mode failed");
@@ -71,8 +118,11 @@ inline boolean SDLSetVideoMode(DrawBuffer **backbuffer, boolean fullscreen)
 
   if (fullscreen && !video.fullscreen_enabled && video.fullscreen_available)
   {
+    video_xoffset = fullscreen_xoffset;
+    video_yoffset = fullscreen_yoffset;
+
     /* switch display to fullscreen mode, if available */
-    if ((new_surface = SDL_SetVideoMode(video.width, video.height,
+    if ((new_surface = SDL_SetVideoMode(fullscreen_width, fullscreen_height,
 					video.depth, surface_flags_fullscreen))
 	== NULL)
     {
@@ -94,6 +144,9 @@ inline boolean SDLSetVideoMode(DrawBuffer **backbuffer, boolean fullscreen)
 
   if ((!fullscreen && video.fullscreen_enabled) || new_surface == NULL)
   {
+    video_xoffset = 0;
+    video_yoffset = 0;
+
     /* switch display to window mode */
     if ((new_surface = SDL_SetVideoMode(video.width, video.height,
 					video.depth, surface_flags_window))
@@ -124,10 +177,26 @@ inline void SDLCopyArea(Bitmap *src_bitmap, Bitmap *dst_bitmap,
   Bitmap *real_dst_bitmap = (dst_bitmap == window ? backbuffer : dst_bitmap);
   SDL_Rect src_rect, dst_rect;
 
+#ifdef FULLSCREEN_BUG
+  if (src_bitmap == backbuffer)
+  {
+    src_x += video_xoffset;
+    src_y += video_yoffset;
+  }
+#endif
+
   src_rect.x = src_x;
   src_rect.y = src_y;
   src_rect.w = width;
   src_rect.h = height;
+
+#ifdef FULLSCREEN_BUG
+  if (dst_bitmap == backbuffer || dst_bitmap == window)
+  {
+    dst_x += video_xoffset;
+    dst_y += video_yoffset;
+  }
+#endif
 
   dst_rect.x = dst_x;
   dst_rect.y = dst_y;
@@ -152,6 +221,14 @@ inline void SDLFillRectangle(Bitmap *dst_bitmap, int x, int y,
   unsigned int color_g = (color >>  8) && 0xff;
   unsigned int color_b = (color >>  0) && 0xff;
 
+#ifdef FULLSCREEN_BUG
+  if (dst_bitmap == backbuffer || dst_bitmap == window)
+  {
+    x += video_xoffset;
+    y += video_yoffset;
+  }
+#endif
+
   rect.x = x;
   rect.y = y;
   rect.w = width;
@@ -165,9 +242,10 @@ inline void SDLFillRectangle(Bitmap *dst_bitmap, int x, int y,
     SDL_UpdateRect(backbuffer->surface, x, y, width, height);
 }
 
-inline void SDLDrawSimpleLine(SDL_Surface *surface, int from_x, int from_y,
+inline void SDLDrawSimpleLine(Bitmap *dst_bitmap, int from_x, int from_y,
 			      int to_x, int to_y, unsigned int color)
 {
+  SDL_Surface *surface = dst_bitmap->surface;
   SDL_Rect rect;
   unsigned int color_r = (color >> 16) & 0xff;
   unsigned int color_g = (color >>  8) & 0xff;
@@ -184,14 +262,32 @@ inline void SDLDrawSimpleLine(SDL_Surface *surface, int from_x, int from_y,
   rect.w = (to_x - from_x + 1);
   rect.h = (to_y - from_y + 1);
 
+#ifdef FULLSCREEN_BUG
+  if (dst_bitmap == backbuffer || dst_bitmap == window)
+  {
+    rect.x += video_xoffset;
+    rect.y += video_yoffset;
+  }
+#endif
+
   SDL_FillRect(surface, &rect,
                SDL_MapRGB(surface->format, color_r, color_g, color_b));
 }
 
-inline void SDLDrawLine(SDL_Surface *surface, int from_x, int from_y,
+inline void SDLDrawLine(Bitmap *dst_bitmap, int from_x, int from_y,
 			int to_x, int to_y, Uint32 color)
 {
-  sge_Line(surface, from_x, from_y, to_x, to_y, color);
+#ifdef FULLSCREEN_BUG
+  if (dst_bitmap == backbuffer || dst_bitmap == window)
+  {
+    from_x += video_xoffset;
+    from_y += video_yoffset;
+    to_x += video_xoffset;
+    to_y += video_yoffset;
+  }
+#endif
+
+  sge_Line(dst_bitmap->surface, from_x, from_y, to_x, to_y, color);
 }
 
 #if 0
@@ -744,6 +840,42 @@ inline void SDLCloseAudio(void)
 
   Mix_CloseAudio();
   SDL_QuitSubSystem(SDL_INIT_AUDIO);
+}
+
+
+/* ========================================================================= */
+/* event functions                                                           */
+/* ========================================================================= */
+
+inline void SDLNextEvent(Event *event)
+{
+  SDL_WaitEvent(event);
+
+#ifdef FULLSCREEN_BUG
+  if (event->type == EVENT_BUTTONPRESS ||
+      event->type == EVENT_BUTTONRELEASE)
+  {
+    if (((ButtonEvent *)event)->x > video_xoffset)
+      ((ButtonEvent *)event)->x -= video_xoffset;
+    else
+      ((ButtonEvent *)event)->x = 0;
+    if (((ButtonEvent *)event)->y > video_yoffset)
+      ((ButtonEvent *)event)->y -= video_yoffset;
+    else
+      ((ButtonEvent *)event)->y = 0;
+  }
+  else if (event->type == EVENT_MOTIONNOTIFY)
+  {
+    if (((ButtonEvent *)event)->x > video_xoffset)
+      ((ButtonEvent *)event)->x -= video_xoffset;
+    else
+      ((ButtonEvent *)event)->x = 0;
+    if (((ButtonEvent *)event)->y > video_yoffset)
+      ((ButtonEvent *)event)->y -= video_yoffset;
+    else
+      ((ButtonEvent *)event)->y = 0;
+  }
+#endif
 }
 
 #endif /* TARGET_SDL */

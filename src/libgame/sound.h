@@ -51,7 +51,7 @@
 #if defined(TARGET_SDL)
 /* one second fading interval == 1000 ticks (milliseconds) */
 #define SOUND_FADING_INTERVAL			1000
-#define SOUND_MAX_VOLUME			(SDL_MIX_MAXVOLUME / 4)
+#define SOUND_MAX_VOLUME			SDL_MIX_MAXVOLUME
 #endif
 
 #if defined(AUDIO_STREAMING_DSP)

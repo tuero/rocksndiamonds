@@ -375,7 +375,7 @@ inline void DrawSimpleWhiteLine(Bitmap *bitmap, int from_x, int from_y,
 				int to_x, int to_y)
 {
 #ifdef TARGET_SDL
-  SDLDrawSimpleLine(bitmap->surface, from_x, from_y, to_x, to_y, 0xffffff);
+  SDLDrawSimpleLine(bitmap, from_x, from_y, to_x, to_y, 0xffffff);
 #else
   XSetForeground(display, bitmap->gc, WhitePixel(display, screen));
   XDrawLine(display, bitmap->drawable, bitmap->gc, from_x, from_y, to_x, to_y);
@@ -403,8 +403,8 @@ inline void DrawLine(Bitmap *bitmap, int from_x, int from_y,
 	continue;
 
 #if defined(TARGET_SDL)
-      sge_Line(bitmap->surface,
-	       from_x + dx, from_y + dy, to_x + dx, to_y + dy, pixel);
+      SDLDrawLine(bitmap,
+		  from_x + dx, from_y + dy, to_x + dx, to_y + dy, pixel);
 #elif defined(TARGET_ALLEGRO)
       AllegroDrawLine(bitmap->drawable, from_x + dx, from_y + dy,
 		      to_x + dx, to_y + dy, pixel);
@@ -653,7 +653,7 @@ inline boolean PendingEvent(void)
 inline void NextEvent(Event *event)
 {
 #ifdef TARGET_SDL
-  SDL_WaitEvent(event);
+  SDLNextEvent(event);
 #else
   XNextEvent(display, event);
 #endif
