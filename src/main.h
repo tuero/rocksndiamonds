@@ -769,24 +769,21 @@
 #define GFX_ARG_XOFFSET				8
 #define GFX_ARG_YOFFSET				9
 #define GFX_ARG_FRAMES				10
-#define GFX_ARG_START_FRAME			11
-#define GFX_ARG_DELAY				12
-#define GFX_ARG_MODE_LOOP			13
-#define GFX_ARG_MODE_LINEAR			14
-#define GFX_ARG_MODE_PINGPONG			15
-#define GFX_ARG_MODE_PINGPONG2			16
-#define GFX_ARG_MODE_RANDOM			17
-#define GFX_ARG_MODE_REVERSE			18
-#define GFX_ARG_GLOBAL_SYNC			19
-#define GFX_ARG_STEP_OFFSET			20
-#define GFX_ARG_STEP_DELAY			21
-#define GFX_ARG_DIRECTION			22
-#define GFX_ARG_POSITION			23
-#define GFX_ARG_DRAW_XOFFSET			24
-#define GFX_ARG_DRAW_YOFFSET			25
-#define GFX_ARG_NAME				26
+#define GFX_ARG_FRAMES_PER_LINE			11
+#define GFX_ARG_START_FRAME			12
+#define GFX_ARG_DELAY				13
+#define GFX_ARG_ANIM_MODE			14
+#define GFX_ARG_GLOBAL_SYNC			15
+#define GFX_ARG_STEP_OFFSET			16
+#define GFX_ARG_STEP_DELAY			17
+#define GFX_ARG_DIRECTION			18
+#define GFX_ARG_POSITION			19
+#define GFX_ARG_DRAW_XOFFSET			20
+#define GFX_ARG_DRAW_YOFFSET			21
+#define GFX_ARG_FORMAT				22
+#define GFX_ARG_NAME				23
 
-#define NUM_GFX_ARGS				27
+#define NUM_GFX_ARGS				24
 
 
 /* values for sound configuration suffixes */

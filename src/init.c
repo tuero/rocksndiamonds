@@ -1019,7 +1019,8 @@ static void set_graphic_parameters(int graphic, char **parameter_raw)
   /* get integer values from string parameters */
   for (i=0; i < NUM_GFX_ARGS; i++)
     parameter[i] =
-      get_parameter_value(image_config_suffix[i].type, parameter_raw[i]);
+      get_parameter_value(image_config_suffix[i].token, parameter_raw[i],
+			  image_config_suffix[i].type);
 
   graphic_info[graphic].bitmap = src_bitmap;
 
@@ -1085,25 +1086,10 @@ static void set_graphic_parameters(int graphic, char **parameter_raw)
   if (graphic_info[graphic].anim_delay == 0)	/* delay must be at least 1 */
     graphic_info[graphic].anim_delay = 1;
 
-  /* set mode for animation frame order */
-  if (parameter[GFX_ARG_MODE_LOOP])
-    graphic_info[graphic].anim_mode = ANIM_LOOP;
-  else if (parameter[GFX_ARG_MODE_LINEAR])
-    graphic_info[graphic].anim_mode = ANIM_LINEAR;
-  else if (parameter[GFX_ARG_MODE_PINGPONG])
-    graphic_info[graphic].anim_mode = ANIM_PINGPONG;
-  else if (parameter[GFX_ARG_MODE_PINGPONG2])
-    graphic_info[graphic].anim_mode = ANIM_PINGPONG2;
-  else if (parameter[GFX_ARG_MODE_RANDOM])
-    graphic_info[graphic].anim_mode = ANIM_RANDOM;
+  if (parameter[GFX_ARG_ANIM_MODE] != ANIM_NONE)
+    graphic_info[graphic].anim_mode = parameter[GFX_ARG_ANIM_MODE];
   else if (graphic_info[graphic].anim_frames > 1)
     graphic_info[graphic].anim_mode = ANIM_LOOP;
-  else
-    graphic_info[graphic].anim_mode = ANIM_NONE;
-
-  /* set additional flag to play animation frames in reverse order */
-  if (parameter[GFX_ARG_MODE_REVERSE])
-    graphic_info[graphic].anim_mode |= ANIM_REVERSE;
 
   /* automatically determine correct start frame, if not defined */
   if (parameter[GFX_ARG_START_FRAME] == ARG_UNDEFINED_VALUE)
@@ -1284,7 +1270,8 @@ static void set_sound_parameters(int sound, char **parameter_raw)
   /* get integer values from string parameters */
   for (i=0; i < NUM_SND_ARGS; i++)
     parameter[i] =
-      get_parameter_value(sound_config_suffix[i].type, parameter_raw[i]);
+      get_parameter_value(sound_config_suffix[i].token, parameter_raw[i],
+			  sound_config_suffix[i].type);
 
   /* explicit loop mode setting in configuration overrides default value */
   if (parameter[SND_ARG_MODE_LOOP] != ARG_UNDEFINED_VALUE)

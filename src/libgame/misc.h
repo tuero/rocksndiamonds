@@ -137,7 +137,7 @@ boolean FileIsSound(char *);
 boolean FileIsMusic(char *);
 boolean FileIsArtworkType(char *, int);
 
-int get_parameter_value(int, char *);
+int get_parameter_value(char *, char *, int);
 
 struct FileInfo *getFileListFromConfigList(struct ConfigInfo *,
 					   struct ConfigInfo *, int);

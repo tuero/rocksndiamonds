@@ -17,31 +17,6 @@
 #include "system.h"
 
 
-/* values for animation mode (frame order and direction) */
-#define ANIM_NONE		0
-#define ANIM_LOOP		(1 << 0)
-#define ANIM_LINEAR		(1 << 1)
-#define ANIM_PINGPONG		(1 << 2)
-#define ANIM_PINGPONG2		(1 << 3)
-#define ANIM_REVERSE		(1 << 4)
-#define ANIM_RANDOM		(1 << 5)
-
-#if 0
-/* values for toon animation direction */
-#define ANIMDIR_LEFT	1
-#define ANIMDIR_RIGHT	2
-#define ANIMDIR_UP	4
-#define ANIMDIR_DOWN	8
-
-#define ANIMPOS_ANY	0
-#define ANIMPOS_LEFT	1
-#define ANIMPOS_RIGHT	2
-#define ANIMPOS_UP	4
-#define ANIMPOS_DOWN	8
-#define ANIMPOS_UPPER	16
-#endif
-
-
 struct ToonScreenInfo
 {
   Bitmap *save_buffer;

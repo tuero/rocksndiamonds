@@ -101,6 +101,15 @@
 #define MB_MIDDLEBUTTON		2
 #define MB_RIGHTBUTTON		3
 
+/* values for animation mode (frame order and direction) */
+#define ANIM_NONE		0
+#define ANIM_LOOP		(1 << 0)
+#define ANIM_LINEAR		(1 << 1)
+#define ANIM_PINGPONG		(1 << 2)
+#define ANIM_PINGPONG2		(1 << 3)
+#define ANIM_RANDOM		(1 << 4)
+#define ANIM_REVERSE		(1 << 5)
+
 /* values for redraw_mask */
 #define REDRAW_NONE		(0)
 #define REDRAW_ALL		(1 << 0)

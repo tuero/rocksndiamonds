@@ -1512,12 +1512,78 @@ boolean FileIsArtworkType(char *basename, int type)
 /* functions for loading artwork configuration information                   */
 /* ------------------------------------------------------------------------- */
 
-int get_parameter_value(int type, char *value)
+/* This function checks if a string <s> of the format "string1, string2, ..."
+   exactly contains a string <s_contained>. */
+
+static boolean string_has_parameter(char *s, char *s_contained)
 {
-  return (strcmp(value, ARG_UNDEFINED) == 0 ? ARG_UNDEFINED_VALUE :
-	  type == TYPE_INTEGER ? get_integer_from_string(value) :
-	  type == TYPE_BOOLEAN ? get_boolean_from_string(value) :
-	  ARG_UNDEFINED_VALUE);
+  char *substring;
+
+  if (s == NULL || s_contained == NULL)
+    return FALSE;
+
+  if (strlen(s_contained) > strlen(s))
+    return FALSE;
+
+  if (strncmp(s, s_contained, strlen(s_contained)) == 0)
+  {
+    char next_char = s[strlen(s_contained)];
+
+    /* check if next character is delimiter or whitespace */
+    return (next_char == ',' || next_char == '\0' ||
+	    next_char == ' ' || next_char == '\t' ? TRUE : FALSE);
+  }
+
+  /* check if string contains another parameter string after a comma */
+  substring = strchr(s, ',');
+  if (substring == NULL)	/* string does not contain a comma */
+    return FALSE;
+
+  /* advance string pointer to next character after the comma */
+  substring++;
+
+  /* skip potential whitespaces after the comma */
+  while (*substring == ' ' || *substring == '\t')
+    substring++;
+
+  return string_has_parameter(substring, s_contained);
+}
+
+int get_parameter_value(char *token, char *value_raw, int type)
+{
+  char *value = getStringToLower(value_raw);
+  int result = 0;	/* probably a save default value */
+
+  if (strcmp(token, ".direction") == 0)
+  {
+    result = (strcmp(value, "left")  == 0 ? MV_LEFT :
+	      strcmp(value, "right") == 0 ? MV_RIGHT :
+	      strcmp(value, "up")    == 0 ? MV_UP :
+	      strcmp(value, "down")  == 0 ? MV_DOWN : MV_NO_MOVING);
+  }
+  else if (strcmp(token, ".anim_mode") == 0)
+  {
+    result = (string_has_parameter(value, "loop")      ? ANIM_LOOP :
+	      string_has_parameter(value, "linear")    ? ANIM_LINEAR :
+	      string_has_parameter(value, "pingpong")  ? ANIM_PINGPONG :
+	      string_has_parameter(value, "pingpong2") ? ANIM_PINGPONG2 :
+	      string_has_parameter(value, "random")    ? ANIM_RANDOM :
+	      ANIM_NONE);
+
+    if (string_has_parameter(value, "reverse"))
+      result |= ANIM_REVERSE;
+  }
+  else		/* generic parameter of type integer or boolean */
+  {
+    result = (strcmp(value, ARG_UNDEFINED) == 0 ? ARG_UNDEFINED_VALUE :
+	      type == TYPE_INTEGER ? get_integer_from_string(value) :
+	      type == TYPE_BOOLEAN ? get_boolean_from_string(value) :
+	      ARG_UNDEFINED_VALUE);
+  }
+
+  free(value);
+
+  return result;
 }
 
 static void FreeCustomArtworkList(struct ArtworkListInfo *,
