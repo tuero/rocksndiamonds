@@ -1971,9 +1971,9 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
   si->fullscreen = FALSE;
   si->ask_on_escape = TRUE;
 
-  si->graphics_set = getStringCopy(GRAPHICS_SUBDIR);
-  si->sounds_set = getStringCopy(SOUNDS_SUBDIR);
-  si->music_set = getStringCopy(MUSIC_SUBDIR);
+  si->graphics_set = getStringCopy(GFX_CLASSIC_SUBDIR);
+  si->sounds_set = getStringCopy(SND_CLASSIC_SUBDIR);
+  si->music_set = getStringCopy(MUS_CLASSIC_SUBDIR);
   si->override_level_graphics = FALSE;
   si->override_level_sounds = FALSE;
   si->override_level_music = FALSE;

@@ -207,13 +207,13 @@
 #define DOCS_DIRECTORY		"docs"
 
 #if !defined(PLATFORM_MSDOS)
-#define GRAPHICS_SUBDIR		"gfx_classic"
-#define SOUNDS_SUBDIR		"snd_classic"
-#define MUSIC_SUBDIR		"mus_classic"
+#define GFX_CLASSIC_SUBDIR	"gfx_classic"
+#define SND_CLASSIC_SUBDIR	"snd_classic"
+#define MUS_CLASSIC_SUBDIR	"mus_classic"
 #else
-#define GRAPHICS_SUBDIR		"gfx_orig"
-#define SOUNDS_SUBDIR		"snd_orig"
-#define MUSIC_SUBDIR		"mus_orig"
+#define GFX_CLASSIC_SUBDIR	"gfx_orig"
+#define SND_CLASSIC_SUBDIR	"snd_orig"
+#define MUS_CLASSIC_SUBDIR	"mus_orig"
 #endif
 
 

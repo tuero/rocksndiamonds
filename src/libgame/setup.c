@@ -270,19 +270,19 @@ static char *getDefaultMusicDir(char *music_subdir)
 
 static char *getDefaultArtworkSet(int type)
 {
-  return (type == TREE_TYPE_GRAPHICS_DIR ? GRAPHICS_SUBDIR :
-	  type == TREE_TYPE_SOUNDS_DIR   ? SOUNDS_SUBDIR   :
-	  type == TREE_TYPE_MUSIC_DIR    ? MUSIC_SUBDIR    : "");
+  return (type == TREE_TYPE_GRAPHICS_DIR ? GFX_CLASSIC_SUBDIR :
+	  type == TREE_TYPE_SOUNDS_DIR   ? SND_CLASSIC_SUBDIR :
+	  type == TREE_TYPE_MUSIC_DIR    ? MUS_CLASSIC_SUBDIR : "");
 }
 
 static char *getDefaultArtworkDir(int type)
 {
   return (type == TREE_TYPE_GRAPHICS_DIR ?
-	  getDefaultGraphicsDir(GRAPHICS_SUBDIR) :
+	  getDefaultGraphicsDir(GFX_CLASSIC_SUBDIR) :
 	  type == TREE_TYPE_SOUNDS_DIR ?
-	  getDefaultSoundsDir(SOUNDS_SUBDIR) :
+	  getDefaultSoundsDir(SND_CLASSIC_SUBDIR) :
 	  type == TREE_TYPE_MUSIC_DIR ?
-	  getDefaultMusicDir(MUSIC_SUBDIR) : "");
+	  getDefaultMusicDir(MUS_CLASSIC_SUBDIR) : "");
 }
 
 static char *getUserGraphicsDir()
@@ -448,7 +448,7 @@ char *getSetupFilename()
   return filename;
 }
 
-static char *getCorrectedImageBasename(char *basename)
+static char *getCorrectedArtworkBasename(char *basename)
 {
   char *basename_corrected = basename;
 
@@ -463,7 +463,7 @@ static char *getCorrectedImageBasename(char *basename)
     /* if corrected filename is still longer than standard MS-DOS filename
        size (8 characters + 1 dot + 3 characters file extension), shorten
        filename by writing file extension after 8th basename character */
-    if (strlen(basename_corrected) > 8+1+3)
+    if (strlen(basename_corrected) > 8 + 1 + 3)
     {
       static char *msdos_filename = NULL;
 
@@ -471,7 +471,9 @@ static char *getCorrectedImageBasename(char *basename)
 	free(msdos_filename);
 
       msdos_filename = getStringCopy(basename_corrected);
-      strncpy(&msdos_filename[8], &basename[strlen(basename) - 1+3], 1+3 + 1);
+      strncpy(&msdos_filename[8], &basename[strlen(basename) - (1+3)], 1+3 +1);
+
+      basename_corrected = msdos_filename;
     }
   }
 #endif
@@ -487,7 +489,7 @@ char *getCustomImageFilename(char *basename)
   if (filename != NULL)
     free(filename);
 
-  basename = getCorrectedImageBasename(basename);
+  basename = getCorrectedArtworkBasename(basename);
 
   if (!setup.override_level_graphics)
   {
@@ -524,7 +526,7 @@ char *getCustomImageFilename(char *basename)
   }
 
   /* 4th try: look for default artwork in new default artwork directory */
-  filename = getPath2(getDefaultGraphicsDir(GRAPHICS_SUBDIR), basename);
+  filename = getPath2(getDefaultGraphicsDir(GFX_CLASSIC_SUBDIR), basename);
   if (fileExists(filename))
     return filename;
 
@@ -545,6 +547,8 @@ char *getCustomSoundFilename(char *basename)
 
   if (filename != NULL)
     free(filename);
+
+  basename = getCorrectedArtworkBasename(basename);
 
   if (!setup.override_level_sounds)
   {
@@ -581,7 +585,7 @@ char *getCustomSoundFilename(char *basename)
   }
 
   /* 4th try: look for default artwork in new default artwork directory */
-  filename = getPath2(getDefaultSoundsDir(SOUNDS_SUBDIR), basename);
+  filename = getPath2(getDefaultSoundsDir(SND_CLASSIC_SUBDIR), basename);
   if (fileExists(filename))
     return filename;
 
@@ -665,7 +669,7 @@ char *getCustomMusicDirectory(void)
   }
 
   /* 4th try: look for default artwork in new default artwork directory */
-  directory = getStringCopy(getDefaultMusicDir(MUSIC_SUBDIR));
+  directory = getStringCopy(getDefaultMusicDir(MUS_CLASSIC_SUBDIR));
   if (fileExists(directory))
     return directory;
 
@@ -2169,7 +2173,7 @@ void LoadArtworkInfo()
     getTreeInfoFromIdentifier(artwork.gfx_first, setup.graphics_set);
   if (artwork.gfx_current == NULL)
     artwork.gfx_current =
-      getTreeInfoFromIdentifier(artwork.gfx_first, GRAPHICS_SUBDIR);
+      getTreeInfoFromIdentifier(artwork.gfx_first, GFX_CLASSIC_SUBDIR);
   if (artwork.gfx_current == NULL)
     artwork.gfx_current = getFirstValidTreeInfoEntry(artwork.gfx_first);
 
@@ -2177,7 +2181,7 @@ void LoadArtworkInfo()
     getTreeInfoFromIdentifier(artwork.snd_first, setup.sounds_set);
   if (artwork.snd_current == NULL)
     artwork.snd_current =
-      getTreeInfoFromIdentifier(artwork.snd_first, SOUNDS_SUBDIR);
+      getTreeInfoFromIdentifier(artwork.snd_first, SND_CLASSIC_SUBDIR);
   if (artwork.snd_current == NULL)
     artwork.snd_current = getFirstValidTreeInfoEntry(artwork.snd_first);
 
@@ -2185,7 +2189,7 @@ void LoadArtworkInfo()
     getTreeInfoFromIdentifier(artwork.mus_first, setup.music_set);
   if (artwork.mus_current == NULL)
     artwork.mus_current =
-      getTreeInfoFromIdentifier(artwork.mus_first, MUSIC_SUBDIR);
+      getTreeInfoFromIdentifier(artwork.mus_first, MUS_CLASSIC_SUBDIR);
   if (artwork.mus_current == NULL)
     artwork.mus_current = getFirstValidTreeInfoEntry(artwork.mus_first);
 
@@ -2272,7 +2276,7 @@ void LoadLevelArtworkInfo()
       getTreeInfoFromIdentifier(artwork.gfx_first, setup.graphics_set);
     if (artwork.gfx_current == NULL)
       artwork.gfx_current =
-	getTreeInfoFromIdentifier(artwork.gfx_first, GRAPHICS_SUBDIR);
+	getTreeInfoFromIdentifier(artwork.gfx_first, GFX_CLASSIC_SUBDIR);
     if (artwork.gfx_current == NULL)
       artwork.gfx_current = getFirstValidTreeInfoEntry(artwork.gfx_first);
   }
@@ -2283,7 +2287,7 @@ void LoadLevelArtworkInfo()
       getTreeInfoFromIdentifier(artwork.snd_first, setup.sounds_set);
     if (artwork.snd_current == NULL)
       artwork.snd_current =
-	getTreeInfoFromIdentifier(artwork.snd_first, SOUNDS_SUBDIR);
+	getTreeInfoFromIdentifier(artwork.snd_first, SND_CLASSIC_SUBDIR);
     if (artwork.snd_current == NULL)
       artwork.snd_current = getFirstValidTreeInfoEntry(artwork.snd_first);
   }
@@ -2294,7 +2298,7 @@ void LoadLevelArtworkInfo()
       getTreeInfoFromIdentifier(artwork.mus_first, setup.music_set);
     if (artwork.mus_current == NULL)
       artwork.mus_current =
-	getTreeInfoFromIdentifier(artwork.mus_first, MUSIC_SUBDIR);
+	getTreeInfoFromIdentifier(artwork.mus_first, MUS_CLASSIC_SUBDIR);
     if (artwork.mus_current == NULL)
       artwork.mus_current = getFirstValidTreeInfoEntry(artwork.mus_first);
   }
@@ -2336,9 +2340,9 @@ static void SaveUserLevelInfo()
   ldi.first_level = 1;
   ldi.sort_priority = LEVELCLASS_USER_START;
   ldi.readonly = FALSE;
-  setString(&ldi.graphics_set, GRAPHICS_SUBDIR);
-  setString(&ldi.sounds_set, SOUNDS_SUBDIR);
-  setString(&ldi.music_set, MUSIC_SUBDIR);
+  setString(&ldi.graphics_set, GFX_CLASSIC_SUBDIR);
+  setString(&ldi.sounds_set,   SND_CLASSIC_SUBDIR);
+  setString(&ldi.music_set,    MUS_CLASSIC_SUBDIR);
 #else
   ldi.name = getStringCopy(getLoginName());
   ldi.author = getStringCopy(getRealName());
@@ -2346,9 +2350,9 @@ static void SaveUserLevelInfo()
   ldi.first_level = 1;
   ldi.sort_priority = LEVELCLASS_USER_START;
   ldi.readonly = FALSE;
-  ldi.graphics_set = getStringCopy(GRAPHICS_SUBDIR);
-  ldi.sounds_set = getStringCopy(SOUNDS_SUBDIR);
-  ldi.music_set = getStringCopy(MUSIC_SUBDIR);
+  ldi.graphics_set = getStringCopy(GFX_CLASSIC_SUBDIR);
+  ldi.sounds_set = getStringCopy(SND_CLASSIC_SUBDIR);
+  ldi.music_set = getStringCopy(MUS_CLASSIC_SUBDIR);
 #endif
 
   fprintf(file, "%s\n\n", getFormattedSetupEntry(TOKEN_STR_FILE_IDENTIFIER,

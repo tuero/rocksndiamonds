@@ -1882,6 +1882,8 @@ boolean Request(char *text, unsigned int req_state)
 
   SetDrawBackgroundMask(REDRAW_FIELD | REDRAW_DOOR_1);
 
+  SetMouseCursor(CURSOR_DEFAULT);
+
   while(result < 0)
   {
     if (PendingEvent())

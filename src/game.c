@@ -1237,7 +1237,7 @@ void InitGame()
       if (CAN_CHANGE(element))
       {
 	content = element_info[element].change.target_element;
-	is_player = (ELEM_IS_PLAYER(content) || content == EL_SP_MURPHY);
+	is_player = ELEM_IS_PLAYER(content);
 
 	if (is_player && (found_rating < 3 || element < found_element))
 	{
@@ -1252,7 +1252,7 @@ void InitGame()
       for(yy=0; yy < 3; yy++) for(xx=0; xx < 3; xx++)
       {
 	content = element_info[element].content[xx][yy];
-	is_player = (ELEM_IS_PLAYER(content) || content == EL_SP_MURPHY);
+	is_player = ELEM_IS_PLAYER(content);
 
 	if (is_player && (found_rating < 2 || element < found_element))
 	{
@@ -1267,7 +1267,7 @@ void InitGame()
 	  continue;
 
 	content = element_info[element].change.content[xx][yy];
-	is_player = (ELEM_IS_PLAYER(content) || content == EL_SP_MURPHY);
+	is_player = ELEM_IS_PLAYER(content);
 
 	if (is_player && (found_rating < 1 || element < found_element))
 	{
@@ -6586,6 +6586,7 @@ void ScrollFigure(struct PlayerInfo *player, int mode)
     if (Feld[jx][jy] == EL_EXIT_OPEN ||
 	Feld[jx][jy] == EL_SP_EXIT_OPEN)
     {
+      DrawPlayer(player);	/* needed here only to cleanup last field */
       RemoveHero(player);
 
       if (local_player->friends_still_needed == 0 ||

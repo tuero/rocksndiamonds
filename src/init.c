@@ -548,6 +548,34 @@ void InitElementGraphicInfo()
     }
   }
 
+#if 1
+  /* now set all undefined/invalid graphics to -1 to set to default after it */
+  for (i=0; i<MAX_NUM_ELEMENTS; i++)
+  {
+    for (act=0; act<NUM_ACTIONS; act++)
+    {
+      if (graphic_info[element_info[i].graphic[act]].bitmap == NULL)
+	element_info[i].graphic[act] = -1;
+
+      if (graphic_info[element_info[i].crumbled[act]].bitmap == NULL)
+	element_info[i].crumbled[act] = -1;
+
+      for (dir=0; dir<NUM_DIRECTIONS; dir++)
+      {
+	int graphic;
+
+	graphic = element_info[i].direction_graphic[act][dir];
+	if (graphic_info[graphic].bitmap == NULL)
+	  element_info[i].direction_graphic[act][dir] = -1;
+
+	graphic = element_info[i].direction_crumbled[act][dir];
+	if (graphic_info[graphic].bitmap == NULL)
+	  element_info[i].direction_crumbled[act][dir] = -1;
+      }
+    }
+  }
+#endif
+
   /* now set all '-1' values to element specific default values */
   for (i=0; i<MAX_NUM_ELEMENTS; i++)
   {
@@ -576,9 +604,9 @@ void InitElementGraphicInfo()
 
     for (act=0; act<NUM_ACTIONS; act++)
     {
-      boolean act_remove = (act == ACTION_DIGGING ||
-			    act == ACTION_SNAPPING ||
-			    act == ACTION_COLLECTING);
+      boolean act_remove = ((IS_DIGGABLE(i)    && act == ACTION_DIGGING)  ||
+			    (IS_SNAPPABLE(i)   && act == ACTION_SNAPPING) ||
+			    (IS_COLLECTIBLE(i) && act == ACTION_COLLECTING));
 
       /* generic default action graphic (defined by "[default]" directive) */
       int default_action_graphic = element_info[EL_DEFAULT].graphic[act];
@@ -693,6 +721,15 @@ void InitElementSpecialGraphicInfo()
     if (special >= 0 && special < NUM_SPECIAL_GFX_ARGS)
       element_info[element].special_graphic[special] = graphic;
   }
+
+#if 1
+  /* now set all undefined/invalid graphics to default */
+  for (i=0; i < MAX_NUM_ELEMENTS; i++)
+    for (j=0; j < NUM_SPECIAL_GFX_ARGS; j++)
+      if (graphic_info[element_info[i].special_graphic[j]].bitmap == NULL)
+	element_info[i].special_graphic[j] =
+	  element_info[i].graphic[ACTION_DEFAULT];
+#endif
 }
 
 static int get_element_from_token(char *token)
@@ -878,8 +915,9 @@ static void InitGraphicInfo()
     int src_x, src_y;
     int first_frame, last_frame;
 
-#if 0
-    printf("::: image: '%s'\n", image->token);
+#if 1
+    if (strcmp(image->token, "dynamite.EDITOR") == 0)
+      printf("::: image: '%s' [%d]\n", image->token, i);
 #endif
 
 #if 0
@@ -891,6 +929,11 @@ static void InitGraphicInfo()
     set_graphic_parameters(i, image->parameter);
 
     /* now check if no animation frames are outside of the loaded image */
+
+#if 1
+    if (graphic_info[i].bitmap == NULL)
+      printf("::: graphic_info['%s'].bitmap == NULL\n", image->token);
+#endif
 
     if (graphic_info[i].bitmap == NULL)
       continue;		/* skip check for optional images that are undefined */
@@ -1774,6 +1817,7 @@ void InitElementPropertiesStatic()
     EL_PLAYER_2,
     EL_PLAYER_3,
     EL_PLAYER_4,
+    EL_SP_MURPHY,
     -1
   };
 
@@ -3497,6 +3541,7 @@ void OpenAll()
   InitEventFilter(FilterMouseMotionEvents);
 
   InitElementPropertiesStatic();
+  InitElementPropertiesEngine(GAME_VERSION_ACTUAL);
 
   InitGfx();
 
