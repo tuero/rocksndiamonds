@@ -8072,7 +8072,6 @@ void HandleEditorGadgetInfoText(void *ptr)
 static void HandleDrawingAreaInfo(struct GadgetInfo *gi)
 {
   static int start_lx, start_ly;
-  char *infotext;
   int id = gi->custom_id;
   int sx = gi->event.x;
   int sy = gi->event.y;
@@ -8082,6 +8081,11 @@ static void HandleDrawingAreaInfo(struct GadgetInfo *gi)
   int max_sx = gi->drawing.area_xsize - 1;
   int max_sy = gi->drawing.area_ysize - 1;
   int actual_drawing_function = drawing_function;
+  int max_infotext_len = getMaxInfoTextLength();
+  char infotext[MAX_OUTPUT_LINESIZE + 1];
+  char *text;
+
+  infotext[0] = '\0';		/* start with empty info text */
 
   /* pressed Control key: simulate picking element */
   if (GetKeyModState() & KMOD_Control)
@@ -8129,41 +8133,48 @@ static void HandleDrawingAreaInfo(struct GadgetInfo *gi)
 	switch (actual_drawing_function)
 	{
 	  case GADGET_ID_SINGLE_ITEMS:
-	    infotext = "Drawing single items";
+	    text = "Drawing single items";
 	    break;
       	  case GADGET_ID_CONNECTED_ITEMS:
-	    infotext = "Drawing connected items";
+	    text = "Drawing connected items";
 	    break;
       	  case GADGET_ID_LINE:
-	    infotext = "Drawing line";
+	    text = "Drawing line";
 	    break;
       	  case GADGET_ID_ARC:
-	    infotext = "Drawing arc";
+	    text = "Drawing arc";
 	    break;
       	  case GADGET_ID_TEXT:
-	    infotext = "Setting text cursor";
+	    text = "Setting text cursor";
 	    break;
       	  case GADGET_ID_RECTANGLE:
-	    infotext = "Drawing rectangle";
+	    text = "Drawing rectangle";
 	    break;
       	  case GADGET_ID_FILLED_BOX:
-	    infotext = "Drawing filled box";
+	    text = "Drawing filled box";
 	    break;
       	  case GADGET_ID_FLOOD_FILL:
-	    infotext = "Flood fill";
+	    text = "Flood fill";
 	    break;
       	  case GADGET_ID_GRAB_BRUSH:
-	    infotext = "Grabbing brush";
+	    text = "Grabbing brush";
 	    break;
       	  case GADGET_ID_PICK_ELEMENT:
-	    infotext = "Picking element";
+	    text = "Picking element";
 	    break;
 
 	  default:
-	    infotext = "Drawing position";
+	    text = "Drawing position";
 	    break;
 	}
 
+#if 1
+	if (actual_drawing_function == GADGET_ID_PICK_ELEMENT)
+	  sprintf(infotext, "%s: %d, %d", text, lx, ly);
+	else
+	  sprintf(infotext, "%s: %d, %d", text,
+		  ABS(lx - start_lx) + 1, ABS(ly - start_ly) + 1);
+#else
 	if (actual_drawing_function == GADGET_ID_PICK_ELEMENT)
 	  DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2,
 		    "%s: %d, %d", infotext, lx, ly);
@@ -8171,13 +8182,23 @@ static void HandleDrawingAreaInfo(struct GadgetInfo *gi)
 	  DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2,
 		    "%s: %d, %d", infotext,
 		    ABS(lx - start_lx) + 1, ABS(ly - start_ly) + 1);
+#endif
       }
+#if 1
+      else if (actual_drawing_function == GADGET_ID_PICK_ELEMENT)
+	strncpy(infotext, getElementInfoText(Feld[lx][ly]), max_infotext_len);
+      else
+	sprintf(infotext, "Level position: %d, %d", lx, ly);
+
+      infotext[max_infotext_len] = '\0';
+#else
       else if (actual_drawing_function == GADGET_ID_PICK_ELEMENT)
 	DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2,
 		  "%s", getElementInfoText(Feld[lx][ly]));
       else
 	DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2,
 		  "Level position: %d, %d", lx, ly);
+#endif
     }
 
     /* misuse this function to draw brush cursor, if needed */
@@ -8192,70 +8213,58 @@ static void HandleDrawingAreaInfo(struct GadgetInfo *gi)
   else if (actual_drawing_function == GADGET_ID_PICK_ELEMENT)
   {
     if (id == GADGET_ID_AMOEBA_CONTENT)
-      DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2, "%s",
-		getElementInfoText(level.amoeba_content));
+      text = getElementInfoText(level.amoeba_content);
     else if (id == GADGET_ID_CUSTOM_GRAPHIC)
-      DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2, "%s",
-		getElementInfoText(custom_element.gfx_element));
+      text = getElementInfoText(custom_element.gfx_element);
     else if (id == GADGET_ID_CUSTOM_CONTENT)
-      DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2, "%s",
-		getElementInfoText(custom_element.content[sx][sy]));
+      text = getElementInfoText(custom_element.content[sx][sy]);
     else if (id == GADGET_ID_CUSTOM_CHANGE_TARGET)
-      DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2, "%s",
-		getElementInfoText(custom_element_change.target_element));
+      text = getElementInfoText(custom_element_change.target_element);
     else if (id == GADGET_ID_CUSTOM_CHANGE_CONTENT)
-      DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2, "%s",
-		getElementInfoText(custom_element_change.content[sx][sy]));
+      text = getElementInfoText(custom_element_change.content[sx][sy]);
     else if (id == GADGET_ID_CUSTOM_CHANGE_TRIGGER)
-      DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2, "%s",
-		getElementInfoText(custom_element_change.trigger_element));
+      text = getElementInfoText(custom_element_change.trigger_element);
     else if (id == GADGET_ID_GROUP_CONTENT)
-      DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2, "%s",
-		getElementInfoText(group_element_info.element[sx]));
+      text = getElementInfoText(group_element_info.element[sx]);
     else if (id == GADGET_ID_RANDOM_BACKGROUND)
-      DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2, "%s",
-		getElementInfoText(random_placement_background_element));
+      text = getElementInfoText(random_placement_background_element);
     else if (id >= GADGET_ID_ELEMENT_CONTENT_0 &&
 	     id <= GADGET_ID_ELEMENT_CONTENT_7)
     {
       int i = id - GADGET_ID_ELEMENT_CONTENT_0;
 
-      DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2, "%s",
-		getElementInfoText(level.yamyam_content[i][sx][sy]));
+      text = getElementInfoText(level.yamyam_content[i][sx][sy]);
     }
+
+    strncpy(infotext, text, max_infotext_len);
+    infotext[max_infotext_len] = '\0';
   }
   else
   {
     if (id == GADGET_ID_AMOEBA_CONTENT)
-      DrawTextS(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2,
-		"Amoeba content");
+      strcpy(infotext, "Amoeba content");
     else if (id == GADGET_ID_CUSTOM_GRAPHIC)
-      DrawTextS(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2,
-		"Custom graphic element");
+      strcpy(infotext, "Custom graphic element");
     else if (id == GADGET_ID_CUSTOM_CONTENT)
-      DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2,
-		"Custom element content position: %d, %d", sx, sy);
+      sprintf(infotext, "Custom element content position: %d, %d", sx, sy);
     else if (id == GADGET_ID_CUSTOM_CHANGE_TARGET)
-      DrawTextS(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2,
-		"New element after change");
+      strcpy(infotext, "New element after change");
     else if (id == GADGET_ID_CUSTOM_CHANGE_CONTENT)
-      DrawTextS(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2,
-		"New extended elements after change");
+      strcpy(infotext, "New extended elements after change");
     else if (id == GADGET_ID_CUSTOM_CHANGE_TRIGGER)
-      DrawTextS(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2,
-		"Other element triggering change");
+      strcpy(infotext, "Other element triggering change");
     else if (id == GADGET_ID_GROUP_CONTENT)
-      DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2,
-		"Group element position: %d", sx + 1);
+      sprintf(infotext, "Group element position: %d", sx + 1);
     else if (id == GADGET_ID_RANDOM_BACKGROUND)
-      DrawTextS(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2,
-		"Random placement background");
+      strcpy(infotext, "Random placement background");
     else if (id >= GADGET_ID_ELEMENT_CONTENT_0 &&
 	     id <= GADGET_ID_ELEMENT_CONTENT_7)
-      DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2,
-		"Content area %d position: %d, %d",
-		id - GADGET_ID_ELEMENT_CONTENT_0 + 1, sx, sy);
+      sprintf(infotext, "Content area %d position: %d, %d",
+	      id - GADGET_ID_ELEMENT_CONTENT_0 + 1, sx, sy);
   }
+
+  if (strlen(infotext) > 0)
+    DrawTextS(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2, infotext);
 }
 
 void RequestExitLevelEditor(boolean ask_if_level_has_changed)
