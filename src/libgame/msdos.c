@@ -311,13 +311,8 @@ Display *XOpenDisplay(char *display_name)
 
   screen[0].cmap = 0;
   screen[0].root = 0;
-#if 0
-  screen[0].white_pixel = 0xFF;
-  screen[0].black_pixel = 0x00;
-#else
   screen[0].white_pixel = AllegroAllocColorCell(0xFFFF, 0xFFFF, 0xFFFF);
   screen[0].black_pixel = AllegroAllocColorCell(0x0000, 0x0000, 0x0000);
-#endif
   screen[0].video_bitmap = NULL;
 
   display->default_screen = 0;
@@ -510,12 +505,10 @@ static BITMAP *Image_to_AllegroBitmap(Image *image)
   byte *src_ptr = image->data;
   byte pixel_mapping[MAX_COLORS];
   unsigned int depth = 8;
-
-#if 0
-  int i, j, x, y;
-#else
   int i, x, y;
-#endif
+
+  if (image->type == IMAGETYPE_TRUECOLOR && depth == 8)
+    Error(ERR_EXIT, "cannot handle true-color images on 8-bit display");
 
   /* allocate new allegro bitmap structure */
   if ((bitmap = create_bitmap_ex(depth, image->width, image->height)) == NULL)
@@ -529,48 +522,12 @@ static BITMAP *Image_to_AllegroBitmap(Image *image)
   /* try to use existing colors from the global colormap */
   for (i=0; i<MAX_COLORS; i++)
   {
-
-#if 0
-    int r, g, b;
-#endif
-
     if (!image->rgb.color_used[i])
       continue;
 
-
-#if 0
-    r = image->rgb.red[i] >> 10;
-    g = image->rgb.green[i] >> 10;
-    b = image->rgb.blue[i] >> 10;
-
-    for (j=0; j<global_colormap_entries_used; j++)
-    {
-      if (r == global_colormap[j].r &&
-	  g == global_colormap[j].g &&
-	  b == global_colormap[j].b)		/* color found */
-      {
-	pixel_mapping[i] = j;
-	break;
-      }
-    }
-
-    if (j == global_colormap_entries_used)	/* color not found */
-    {
-      if (global_colormap_entries_used < MAX_COLORS)
-	global_colormap_entries_used++;
-
-      global_colormap[j].r = r;
-      global_colormap[j].g = g;
-      global_colormap[j].b = b;
-
-      pixel_mapping[i] = j;
-    }
-#else
     pixel_mapping[i] = AllegroAllocColorCell(image->rgb.red[i],
 					     image->rgb.green[i],
 					     image->rgb.blue[i]);
-#endif
-
   }
 
   /* copy bitmap data */
@@ -608,17 +565,10 @@ int Read_PCX_to_Pixmap(Display *display, Window window, GC gc, char *filename,
     return errno_pcx;
 
   *pixmap = (Pixmap)bitmap;
-#if 0
-  *pixmap_mask = (Pixmap)bitmap;
-  /* !!! two pointers on same bitmap => second free() fails !!! */
-#else
+
   /* pixmap_mask will never be used in Allegro (which uses masked_blit()),
      so use non-NULL dummy pointer to empty Pixmap */
-  /*
-  *pixmap_mask = (Pixmap)checked_calloc(sizeof(Pixmap));
-  */
   *pixmap_mask = (Pixmap)DUMMY_MASK;
-#endif
 
   return PCX_Success;
 }
