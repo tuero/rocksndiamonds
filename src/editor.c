@@ -20,6 +20,7 @@
 #include "tools.h"
 #include "files.h"
 #include "game.h"
+#include "init.h"
 #include "tape.h"
 
 
@@ -1286,6 +1287,10 @@ static struct
   }
 };
 
+static boolean can_explode_by_fire = FALSE;
+static boolean can_explode_smashed = FALSE;
+static boolean can_explode_impact = FALSE;
+
 static struct
 {
   int x, y;
@@ -1383,19 +1388,19 @@ static struct
   {
     ED_SETTINGS_XPOS(1),		ED_SETTINGS_YPOS(13),
     GADGET_ID_CUSTOM_EXPLODE_FIRE,
-    &custom_element_properties[EP_CAN_EXPLODE_BY_FIRE],
+    &can_explode_by_fire,
     "by fire",				"element can explode by fire/explosion"
   },
   {
     ED_SETTINGS_XPOS(7),		ED_SETTINGS_YPOS(13),
     GADGET_ID_CUSTOM_EXPLODE_SMASH,
-    &custom_element_properties[EP_CAN_EXPLODE_SMASHED],
+    &can_explode_smashed,
     "smashed",				"element can explode when smashed"
   },
   {
     ED_SETTINGS_XPOS(13),		ED_SETTINGS_YPOS(13),
     GADGET_ID_CUSTOM_EXPLODE_IMPACT,
-    &custom_element_properties[EP_CAN_EXPLODE_IMPACT],
+    &can_explode_impact,
     "impact",				"element can explode on impact"
   },
 
@@ -1464,7 +1469,7 @@ static struct
   {
     ED_SETTINGS_XPOS(0),		ED_SETTINGS_YPOS(13),
     GADGET_ID_CUSTOM_USE_TEMPLATE,
-    &custom_element.use_template,
+    &level.use_custom_template,
     "use template",			"use template for custom properties"
   },
 };
@@ -3613,6 +3618,9 @@ static void CopyCustomElementPropertiesToEditor(int element)
 {
   int i;
 
+  /* needed here to initialize combined element properties */
+  InitElementPropertiesEngine(level.game_version);
+
   custom_element = element_info[properties_element];
 
   for (i=0; i < NUM_ELEMENT_PROPERTIES; i++)
@@ -3621,76 +3629,88 @@ static void CopyCustomElementPropertiesToEditor(int element)
   for (i=0; i < NUM_CHANGE_EVENTS; i++)
     custom_element_change_events[i] = HAS_CHANGE_EVENT(element, i);
 
+  /* ---------- element settings: configure (custom elements) ------------- */
+
+  /* set accessible layer selectbox help value */
+  value_access_type =
+    (IS_WALKABLE(element) ? EP_WALKABLE :
+     IS_PASSABLE(element) ? EP_PASSABLE :
+     value_access_type);
+  value_access_layer =
+    (IS_ACCESSIBLE_OVER(element) ? EP_ACCESSIBLE_OVER :
+     IS_ACCESSIBLE_INSIDE(element) ? EP_ACCESSIBLE_INSIDE :
+     IS_ACCESSIBLE_UNDER(element) ? EP_ACCESSIBLE_UNDER :
+     value_access_layer);
+  custom_element_properties[EP_ACCESSIBLE] =
+    (IS_ACCESSIBLE_OVER(element) ||
+     IS_ACCESSIBLE_INSIDE(element) ||
+     IS_ACCESSIBLE_UNDER(element));
+
   /* set walk-to-object action selectbox help value */
   value_walk_to_action =
     (IS_DIGGABLE(element) ? EP_DIGGABLE :
      IS_COLLECTIBLE(element) ? EP_COLLECTIBLE :
      IS_PUSHABLE(element) ? EP_PUSHABLE :
-     EP_DIGGABLE);
+     value_walk_to_action);
   custom_element_properties[EP_WALK_TO_OBJECT] =
     (IS_DIGGABLE(element) ||
      IS_COLLECTIBLE(element) ||
      IS_PUSHABLE(element));
-
-  /* set consistency selectbox help value */
-  value_consistency =
-    (CAN_EXPLODE(element) ? EP_CAN_EXPLODE :
-     IS_INDESTRUCTIBLE(element) ? EP_INDESTRUCTIBLE :
-     EP_CAN_EXPLODE);
-  custom_element_properties[EP_EXPLODE_RESULT] =
-    (CAN_EXPLODE(element) ||
-     IS_INDESTRUCTIBLE(element));
-
-  /* set deadliness selectbox help value */
-  value_deadliness =
-    (DONT_TOUCH(element) ? EP_DONT_TOUCH :
-     DONT_COLLIDE_WITH(element) ? EP_DONT_COLLIDE_WITH :
-     DONT_RUN_INTO(element) ? EP_DONT_RUN_INTO :
-     EP_DONT_RUN_INTO);
-  custom_element_properties[EP_DEADLY] =
-    (DONT_TOUCH(element) ||
-     DONT_COLLIDE_WITH(element) ||
-     DONT_RUN_INTO(element));
 
   /* set smash targets selectbox help value */
   value_smash_targets =
     (CAN_SMASH_EVERYTHING(element) ? EP_CAN_SMASH_EVERYTHING :
      CAN_SMASH_ENEMIES(element) ? EP_CAN_SMASH_ENEMIES :
      CAN_SMASH_PLAYER(element) ? EP_CAN_SMASH_PLAYER :
-     EP_CAN_SMASH_PLAYER);
+     value_smash_targets);
   custom_element_properties[EP_CAN_SMASH] =
     (CAN_SMASH_EVERYTHING(element) ||
      CAN_SMASH_ENEMIES(element) ||
      CAN_SMASH_PLAYER(element));
 
-  /* set accessible layer selectbox help value */
-  value_access_type =
-    (IS_WALKABLE(element) ? EP_WALKABLE :
-     IS_PASSABLE(element) ? EP_PASSABLE :
-     EP_WALKABLE);
-  value_access_layer =
-    (IS_ACCESSIBLE_OVER(element) ? EP_ACCESSIBLE_OVER :
-     IS_ACCESSIBLE_INSIDE(element) ? EP_ACCESSIBLE_INSIDE :
-     IS_ACCESSIBLE_UNDER(element) ? EP_ACCESSIBLE_UNDER :
-     EP_ACCESSIBLE_OVER);
-  custom_element_properties[EP_ACCESSIBLE] =
-    (IS_ACCESSIBLE_OVER(element) ||
-     IS_ACCESSIBLE_INSIDE(element) ||
-     IS_ACCESSIBLE_UNDER(element));
+  /* set deadliness selectbox help value */
+  value_deadliness =
+    (DONT_TOUCH(element) ? EP_DONT_TOUCH :
+     DONT_COLLIDE_WITH(element) ? EP_DONT_COLLIDE_WITH :
+     DONT_RUN_INTO(element) ? EP_DONT_RUN_INTO :
+     value_deadliness);
+  custom_element_properties[EP_DEADLY] =
+    (DONT_TOUCH(element) ||
+     DONT_COLLIDE_WITH(element) ||
+     DONT_RUN_INTO(element));
+
+  /* set consistency selectbox help value */
+  value_consistency =
+    (IS_INDESTRUCTIBLE(element) ? EP_INDESTRUCTIBLE :
+     CAN_EXPLODE(element) ? EP_CAN_EXPLODE :
+     value_consistency);
+  custom_element_properties[EP_EXPLODE_RESULT] =
+    (IS_INDESTRUCTIBLE(element) ||
+     CAN_EXPLODE(element));
+
+  /* special case: sub-settings dependent from main setting */
+  if (CAN_EXPLODE(element))
+  {
+    can_explode_by_fire = CAN_EXPLODE_BY_FIRE(element);
+    can_explode_smashed = CAN_EXPLODE_SMASHED(element);
+    can_explode_impact  = CAN_EXPLODE_IMPACT(element);
+  };
+
+  /* ---------- element settings: advanced (custom elements) --------------- */
 
   /* set change by player selectbox help value */
   value_change_player_action =
     (HAS_CHANGE_EVENT(element, CE_PUSHED_BY_PLAYER) ? CE_PUSHED_BY_PLAYER :
      HAS_CHANGE_EVENT(element, CE_PRESSED_BY_PLAYER) ? CE_PRESSED_BY_PLAYER :
      HAS_CHANGE_EVENT(element, CE_TOUCHED_BY_PLAYER) ? CE_TOUCHED_BY_PLAYER :
-     CE_TOUCHED_BY_PLAYER);
+     value_change_player_action);
 
-  /* set change by impact/smash selectbox help value */
+  /* set change by collision selectbox help value */
   value_change_collide_action =
     (HAS_CHANGE_EVENT(element, CE_SMASHED) ? CE_SMASHED :
      HAS_CHANGE_EVENT(element, CE_IMPACT) ? CE_IMPACT :
      HAS_CHANGE_EVENT(element, CE_COLLISION) ? CE_COLLISION :
-     CE_COLLISION);
+     value_change_collide_action);
 
   /* set change by other element action selectbox help value */
   value_change_other_action =
@@ -3701,7 +3721,7 @@ static void CopyCustomElementPropertiesToEditor(int element)
      HAS_CHANGE_EVENT(element, CE_OTHER_IS_EXPLODING) ? CE_OTHER_IS_EXPLODING :
      HAS_CHANGE_EVENT(element, CE_OTHER_IS_CHANGING) ? CE_OTHER_IS_CHANGING :
      HAS_CHANGE_EVENT(element, CE_OTHER_IS_TOUCHING) ? CE_OTHER_IS_TOUCHING :
-     CE_OTHER_IS_TOUCHING);
+     value_change_other_action);
 }
 
 static void CopyCustomElementPropertiesToGame(int element)
@@ -3710,32 +3730,7 @@ static void CopyCustomElementPropertiesToGame(int element)
 
   element_info[properties_element] = custom_element;
 
-  /* set walk-to-object property from checkbox and selectbox */
-  custom_element_properties[EP_DIGGABLE] = FALSE;
-  custom_element_properties[EP_COLLECTIBLE] = FALSE;
-  custom_element_properties[EP_PUSHABLE] = FALSE;
-  custom_element_properties[value_walk_to_action] =
-    custom_element_properties[EP_WALK_TO_OBJECT];
-
-  /* set consistency property from checkbox and selectbox */
-  custom_element_properties[EP_CAN_EXPLODE] = FALSE;
-  custom_element_properties[EP_INDESTRUCTIBLE] = FALSE;
-  custom_element_properties[value_consistency] =
-    custom_element_properties[EP_EXPLODE_RESULT];
-
-  /* set deadliness property from checkbox and selectbox */
-  custom_element_properties[EP_DONT_RUN_INTO] = FALSE;
-  custom_element_properties[EP_DONT_COLLIDE_WITH] = FALSE;
-  custom_element_properties[EP_DONT_TOUCH] = FALSE;
-  custom_element_properties[value_deadliness] =
-    custom_element_properties[EP_DEADLY];
-
-  /* set smash property from checkbox and selectbox */
-  custom_element_properties[EP_CAN_SMASH_PLAYER] = FALSE;
-  custom_element_properties[EP_CAN_SMASH_ENEMIES] = FALSE;
-  custom_element_properties[EP_CAN_SMASH_EVERYTHING] = FALSE;
-  custom_element_properties[value_smash_targets] =
-    custom_element_properties[EP_CAN_SMASH];
+  /* ---------- element settings: configure (custom elements) ------------- */
 
   /* set accessible property from checkbox and selectbox */
   custom_element_properties[EP_WALKABLE_OVER] = FALSE;
@@ -3749,6 +3744,46 @@ static void CopyCustomElementPropertiesToGame(int element)
 			     (value_access_layer - EP_ACCESSIBLE_OVER))] =
     custom_element_properties[EP_ACCESSIBLE];
 
+  /* set walk-to-object property from checkbox and selectbox */
+  custom_element_properties[EP_DIGGABLE] = FALSE;
+  custom_element_properties[EP_COLLECTIBLE] = FALSE;
+  custom_element_properties[EP_PUSHABLE] = FALSE;
+  custom_element_properties[value_walk_to_action] =
+    custom_element_properties[EP_WALK_TO_OBJECT];
+
+  /* set smash property from checkbox and selectbox */
+  custom_element_properties[EP_CAN_SMASH_PLAYER] = FALSE;
+  custom_element_properties[EP_CAN_SMASH_ENEMIES] = FALSE;
+  custom_element_properties[EP_CAN_SMASH_EVERYTHING] = FALSE;
+  custom_element_properties[value_smash_targets] =
+    custom_element_properties[EP_CAN_SMASH];
+
+  /* set deadliness property from checkbox and selectbox */
+  custom_element_properties[EP_DONT_RUN_INTO] = FALSE;
+  custom_element_properties[EP_DONT_COLLIDE_WITH] = FALSE;
+  custom_element_properties[EP_DONT_TOUCH] = FALSE;
+  custom_element_properties[value_deadliness] =
+    custom_element_properties[EP_DEADLY];
+
+  /* set consistency property from checkbox and selectbox */
+  custom_element_properties[EP_INDESTRUCTIBLE] = FALSE;
+  custom_element_properties[EP_CAN_EXPLODE] = FALSE;
+  custom_element_properties[EP_CAN_EXPLODE_BY_FIRE] = FALSE;
+  custom_element_properties[EP_CAN_EXPLODE_SMASHED] = FALSE;
+  custom_element_properties[EP_CAN_EXPLODE_IMPACT] = FALSE;
+  custom_element_properties[value_consistency] =
+    custom_element_properties[EP_EXPLODE_RESULT];
+
+  /* special case: sub-settings dependent from main setting */
+  if (custom_element_properties[EP_CAN_EXPLODE])
+  {
+    custom_element_properties[EP_CAN_EXPLODE_BY_FIRE] = can_explode_by_fire;
+    custom_element_properties[EP_CAN_EXPLODE_SMASHED] = can_explode_smashed;
+    custom_element_properties[EP_CAN_EXPLODE_IMPACT]  = can_explode_impact;
+  }
+
+  /* ---------- element settings: advanced (custom elements) --------------- */
+
   /* set player change event from checkbox and selectbox */
   custom_element_change_events[CE_TOUCHED_BY_PLAYER] = FALSE;
   custom_element_change_events[CE_PRESSED_BY_PLAYER] = FALSE;
@@ -3756,7 +3791,7 @@ static void CopyCustomElementPropertiesToGame(int element)
   custom_element_change_events[value_change_player_action] =
     custom_element_change_events[CE_BY_PLAYER];
 
-  /* set player change event from checkbox and selectbox */
+  /* set collision change event from checkbox and selectbox */
   custom_element_change_events[CE_COLLISION] = FALSE;
   custom_element_change_events[CE_IMPACT] = FALSE;
   custom_element_change_events[CE_SMASHED] = FALSE;
@@ -3832,6 +3867,7 @@ void DrawLevelEd()
   redraw_mask |= REDRAW_ALL;
 
   ReinitializeElementListButtons();	/* only needed after setup changes */
+  ModifyEditorElementList();		/* may be needed for custom elements */
 
   UnmapTapeButtons();
   MapControlButtons();
@@ -4257,7 +4293,7 @@ static void DrawCustomChangeTriggerArea()
 
   DrawElementBorder(area_sx, area_sy, MINI_TILEX, MINI_TILEY, TRUE);
   DrawMiniGraphicExt(drawto, gi->x, gi->y,
-		     el2edimg(custom_element.change.trigger));
+		     el2edimg(custom_element.change.trigger_element));
 
   MapDrawingArea(GADGET_ID_CUSTOM_CHANGE_TRIGGER);
 }
@@ -4796,6 +4832,16 @@ static void DrawPropertiesConfig()
   }
 }
 
+static void DrawPropertiesAdvancedDrawingAreas()
+{
+  DrawCustomGraphicElementArea();
+  DrawCustomChangeTargetArea();
+  DrawCustomChangeTriggerArea();
+  DrawCustomChangeContentArea();
+
+  redraw_mask |= REDRAW_FIELD;
+}
+
 static void DrawPropertiesAdvanced()
 {
   int i;
@@ -4822,10 +4868,7 @@ static void DrawPropertiesAdvanced()
   MapTextbuttonGadget(ED_TEXTBUTTON_ID_SAVE_AS_TEMPLATE);
 
   /* draw drawing area gadgets */
-  DrawCustomGraphicElementArea();
-  DrawCustomChangeTargetArea();
-  DrawCustomChangeContentArea();
-  DrawCustomChangeTriggerArea();
+  DrawPropertiesAdvancedDrawingAreas();
 }
 
 static void DrawElementName(int x, int y, int element)
@@ -5683,7 +5726,7 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 	}
 	else if (id == GADGET_ID_CUSTOM_CHANGE_TRIGGER)
 	{
-	  custom_element.change.trigger = new_element;
+	  custom_element.change.trigger_element = new_element;
 	  element_info[properties_element] = custom_element;
 	}
 	else if (id == GADGET_ID_RANDOM_BACKGROUND)
@@ -5801,7 +5844,7 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
       else if (id == GADGET_ID_CUSTOM_CHANGE_CONTENT)
 	PickDrawingElement(button, custom_element.change.content[sx][sy]);
       else if (id == GADGET_ID_CUSTOM_CHANGE_TRIGGER)
-	PickDrawingElement(button, custom_element.change.trigger);
+	PickDrawingElement(button, custom_element.change.trigger_element);
       else if (id == GADGET_ID_RANDOM_BACKGROUND)
 	PickDrawingElement(button, random_placement_background_element);
       else if (id >= GADGET_ID_ELEMENT_CONTENT_0 &&
@@ -5933,6 +5976,8 @@ static void HandleCheckbuttons(struct GadgetInfo *gi)
   {
     ModifyEditorElementList();
     RedrawDrawingElements();
+
+    DrawPropertiesAdvancedDrawingAreas();
   }
 }
 
@@ -6547,7 +6592,7 @@ static void HandleDrawingAreaInfo(struct GadgetInfo *gi)
 		getElementInfoText(custom_element.change.content[sx][sy]));
     else if (id == GADGET_ID_CUSTOM_CHANGE_TRIGGER)
       DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2, "%s",
-		getElementInfoText(custom_element.change.trigger));
+		getElementInfoText(custom_element.change.trigger_element));
     else if (id == GADGET_ID_RANDOM_BACKGROUND)
       DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2, "%s",
 		getElementInfoText(random_placement_background_element));

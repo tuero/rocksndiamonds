@@ -3114,7 +3114,7 @@ int main(int argc, char *argv[])
 		  COOKIE_PREFIX, FILENAME_PREFIX, GAME_VERSION_ACTUAL);
 
   InitExitFunction(CloseAllAndExit);
-  InitPlatformDependantStuff();
+  InitPlatformDependentStuff();
 
   GetOptions(argv);
   OpenAll();

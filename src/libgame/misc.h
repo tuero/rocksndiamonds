@@ -123,6 +123,8 @@ void putFileVersion(FILE *, int);
 void ReadUnusedBytesFromFile(FILE *, unsigned long);
 void WriteUnusedBytesToFile(FILE *, unsigned long);
 
+#define getFile8Bit(f)        fgetc(f)
+#define putFile8Bit(f,x)      fputc(x, f)
 #define getFile16BitBE(f)     getFile16BitInteger(f,BYTE_ORDER_BIG_ENDIAN)
 #define getFile16BitLE(f)     getFile16BitInteger(f,BYTE_ORDER_LITTLE_ENDIAN)
 #define putFile16BitBE(f,x)   putFile16BitInteger(f,x,BYTE_ORDER_BIG_ENDIAN)

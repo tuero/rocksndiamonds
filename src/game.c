@@ -846,7 +846,7 @@ static void InitGameEngine()
   /* add trigger events from element change event properties */
   for (i=0; i<MAX_NUM_ELEMENTS; i++)
     if (HAS_CHANGE_EVENT(i, CE_BY_OTHER))
-      trigger_events[element_info[i].change.trigger] |=
+      trigger_events[element_info[i].change.trigger_element] |=
 	element_info[i].change.events;
 
   /* ---------- initialize push delay -------------------------------------- */
@@ -5329,7 +5329,7 @@ static boolean CheckTriggeredElementChange(int trigger_element,
   for (i=0; i<MAX_NUM_ELEMENTS; i++)
   {
     if (!CAN_CHANGE(i) || !HAS_CHANGE_EVENT(i, trigger_event) ||
-	element_info[i].change.trigger != trigger_element)
+	element_info[i].change.trigger_element != trigger_element)
       continue;
 
     for (y=0; y<lev_fieldy; y++) for (x=0; x<lev_fieldx; x++)
@@ -6444,13 +6444,13 @@ void TestIfElementTouchesCustomElement(int x, int y)
       continue;
 
     if (center_is_custom &&
-	Feld[xx][yy] == element_info[Feld[x][y]].change.trigger)
+	Feld[xx][yy] == element_info[Feld[x][y]].change.trigger_element)
     {
       CheckElementChange(x, y, Feld[x][y], CE_OTHER_IS_TOUCHING);
     }
 
     if (IS_CUSTOM_ELEMENT(Feld[xx][yy]) &&
-	Feld[x][y] == element_info[Feld[xx][yy]].change.trigger)
+	Feld[x][y] == element_info[Feld[xx][yy]].change.trigger_element)
     {
       CheckElementChange(xx, yy, Feld[xx][yy], CE_OTHER_IS_TOUCHING);
     }

@@ -1085,6 +1085,8 @@ struct LevelInfo
   boolean gravity;
   boolean em_slippery_gems;	/* EM style "gems slip from wall" behaviour */
 
+  boolean use_custom_template;	/* use custom properties from template file */
+
   boolean no_level_file;
 };
 
@@ -1175,13 +1177,13 @@ struct ElementChangeInfo
 {
   unsigned long events;		/* bitfield for change events */
 
+  short target_element;		/* target element after change */
+
   int delay_fixed;		/* added frame delay before changed (fixed) */
   int delay_random;		/* added frame delay before changed (random) */
   int delay_frames;		/* either 1 (frames) or 50 (seconds; 50 fps) */
 
-  short trigger;		/* custom element triggering change */
-
-  short target_element;		/* target element after change */
+  short trigger_element;	/* custom element triggering change */
 
   int content[3][3];		/* new elements after extended change */
   boolean use_content;		/* use extended change content */
@@ -1219,8 +1221,6 @@ struct ElementInfo
   int sound[NUM_ACTIONS];	/* default sounds for several actions */
 
   /* ---------- special element property values ---------- */
-
-  boolean use_template;		/* use all properties from template file */
 
   boolean use_gfx_element;
   short gfx_element;		/* optional custom graphic element */

@@ -107,7 +107,7 @@ void InitExitFunction(void (*exit_function)(int))
 #endif
 }
 
-void InitPlatformDependantStuff(void)
+void InitPlatformDependentStuff(void)
 {
 #if defined(PLATFORM_MSDOS)
   _fmode = O_BINARY;
@@ -120,7 +120,7 @@ void InitPlatformDependantStuff(void)
 #endif
 }
 
-void ClosePlatformDependantStuff(void)
+void ClosePlatformDependentStuff(void)
 {
 #if defined(PLATFORM_MSDOS)
   dumpErrorFile();

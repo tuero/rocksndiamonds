@@ -700,8 +700,8 @@ void InitProgramInfo(char *, char *, char *, char *, char *, char *, char *,
 		     char *, char *, char *, int);
 
 void InitExitFunction(void (*exit_function)(int));
-void InitPlatformDependantStuff(void);
-void ClosePlatformDependantStuff(void);
+void InitPlatformDependentStuff(void);
+void ClosePlatformDependentStuff(void);
 
 void InitGfxFieldInfo(int, int, int, int, int, int, int, int, Bitmap *);
 void InitGfxDoor1Info(int, int, int, int);

@@ -20,7 +20,7 @@
 
 
 /* ========================================================================= */
-/* platform dependant joystick functions                                     */
+/* platform dependent joystick functions                                     */
 /* ========================================================================= */
 
 #if defined(PLATFORM_UNIX) && !defined(TARGET_SDL)
@@ -97,7 +97,7 @@ boolean UnixReadJoystick(int fd, int *x, int *y, boolean *b1, boolean *b2)
 
 
 /* ========================================================================= */
-/* platform independant joystick functions                                   */
+/* platform independent joystick functions                                   */
 /* ========================================================================= */
 
 #define TRANSLATE_JOYSYMBOL_TO_JOYNAME	0

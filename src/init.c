@@ -645,7 +645,7 @@ static void set_graphic_parameters(int graphic, char **parameter_raw)
     anim_frames_per_col = src_bitmap->height / graphic_info[graphic].height;
   }
 
-  /* correct x or y offset dependant of vertical or horizontal frame order */
+  /* correct x or y offset dependent of vertical or horizontal frame order */
   if (parameter[GFX_ARG_VERTICAL])	/* frames are ordered vertically */
   {
     graphic_info[graphic].offset_y =
@@ -2521,7 +2521,7 @@ void InitElementPropertiesEngine(int engine_version)
   InitElementPropertiesStatic();
 #endif
 
-  /* set all special, combined or engine dependant element properties */
+  /* set all special, combined or engine dependent element properties */
   for (i=0; i < MAX_NUM_ELEMENTS; i++)
   {
 #if 0
@@ -3133,7 +3133,7 @@ void ReloadCustomArtwork()
 
   /* custom level artwork configured in level series configuration file
      always overrides custom level artwork stored in level series directory
-     and (level independant) custom artwork configured in setup menue */
+     and (level independent) custom artwork configured in setup menue */
   if (leveldir_current->graphics_set != NULL)
     gfx_new_identifier = leveldir_current->graphics_set;
   if (leveldir_current->sounds_set != NULL)
@@ -3298,7 +3298,7 @@ void CloseAllAndExit(int exit_value)
   FreeTileClipmasks();
 
   CloseVideoDisplay();
-  ClosePlatformDependantStuff();
+  ClosePlatformDependentStuff();
 
   exit(exit_value);
 }

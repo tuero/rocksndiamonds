@@ -27,11 +27,15 @@
 #define CHUNK_SIZE_NONE		-1	/* do not write chunk size    */
 #define FILE_VERS_CHUNK_SIZE	8	/* size of file version chunk */
 #define LEVEL_HEADER_SIZE	80	/* size of level file header  */
-#define LEVEL_HEADER_UNUSED	14	/* unused level header bytes  */
+#define LEVEL_HEADER_UNUSED	13	/* unused level header bytes  */
 #define LEVEL_CHUNK_CNT2_SIZE	160	/* size of level CNT2 chunk   */
 #define LEVEL_CHUNK_CNT2_UNUSED	11	/* unused CNT2 chunk bytes    */
+#define LEVEL_CPART_CUS3_SIZE	102	/* size of CUS3 chunk part    */
+#define LEVEL_CPART_CUS3_UNUSED	16	/* unused CUS3 bytes / part   */
 #define TAPE_HEADER_SIZE	20	/* size of tape file header   */
 #define TAPE_HEADER_UNUSED	3	/* unused tape header bytes   */
+
+#define LEVEL_CHUNK_CUS3_SIZE(x) (2 + x * LEVEL_CPART_CUS3_SIZE)
 
 /* file identifier strings */
 #define LEVEL_COOKIE_TMPL	"ROCKSNDIAMONDS_LEVEL_FILE_VERSION_x.x"
@@ -73,6 +77,8 @@ static void setLevelInfoToDefaults()
   level.gravity = FALSE;
   level.em_slippery_gems = FALSE;
 
+  level.use_custom_template = FALSE;
+
   for(i=0; i<MAX_LEVEL_NAME_LEN; i++)
     level.name[i] = '\0';
   for(i=0; i<MAX_LEVEL_AUTHOR_LEN; i++)
@@ -99,8 +105,6 @@ static void setLevelInfoToDefaults()
   {
     int element = EL_CUSTOM_START + i;
 
-    element_info[element].use_template = FALSE;
-
     element_info[element].use_gfx_element = FALSE;
     element_info[element].gfx_element = EL_EMPTY_SPACE;
 
@@ -121,22 +125,20 @@ static void setLevelInfoToDefaults()
 	element_info[element].content[x][y] = EL_EMPTY_SPACE;
 
     element_info[element].change.events = CE_BITMASK_DEFAULT;
+    element_info[element].change.target_element = EL_EMPTY_SPACE;
 
     element_info[element].change.delay_fixed = 0;
     element_info[element].change.delay_random = 0;
     element_info[element].change.delay_frames = -1;	/* use default */
 
-    element_info[element].change.trigger = EL_EMPTY_SPACE;
+    element_info[element].change.trigger_element = EL_EMPTY_SPACE;
 
-    element_info[element].change.target_element = EL_EMPTY_SPACE;
-
+    element_info[element].change.explode = FALSE;
     element_info[element].change.use_content = FALSE;
     element_info[element].change.only_complete = FALSE;
     element_info[element].change.use_random_change = FALSE;
     element_info[element].change.random = 0;
     element_info[element].change.power = CP_NON_DESTRUCTIVE;
-
-    element_info[element].change.explode = FALSE;
 
     for(x=0; x<3; x++)
       for(y=0; y<3; y++)
@@ -239,6 +241,8 @@ static int LoadLevel_HEAD(FILE *file, int chunk_size, struct LevelInfo *level)
   level->gravity		= (fgetc(file) == 1 ? TRUE : FALSE);
   level->encoding_16bit_field	= (fgetc(file) == 1 ? TRUE : FALSE);
   level->em_slippery_gems	= (fgetc(file) == 1 ? TRUE : FALSE);
+
+  level->use_custom_template	= (fgetc(file) == 1 ? TRUE : FALSE);
 
   ReadUnusedBytesFromFile(file, LEVEL_HEADER_UNUSED);
 
@@ -418,6 +422,87 @@ static int LoadLevel_CUS2(FILE *file, int chunk_size, struct LevelInfo *level)
   return chunk_size;
 }
 
+static int LoadLevel_CUS3(FILE *file, int chunk_size, struct LevelInfo *level)
+{
+  int num_changed_custom_elements = getFile16BitBE(file);
+  int chunk_size_expected = LEVEL_CHUNK_CUS3_SIZE(num_changed_custom_elements);
+  int i, x, y;
+
+  if (chunk_size_expected != chunk_size)
+  {
+    ReadUnusedBytesFromFile(file, chunk_size - 2);
+    return chunk_size_expected;
+  }
+
+  for (i=0; i < num_changed_custom_elements; i++)
+  {
+    int element = getFile16BitBE(file);
+
+    if (!IS_CUSTOM_ELEMENT(element))
+    {
+      Error(ERR_WARN, "invalid custom element number %d", element);
+
+      element = EL_DEFAULT;	/* dummy element used for artwork config */
+    }
+
+    Properties[element][EP_BITFIELD_BASE] = getFile32BitBE(file);
+
+    /* some free bytes for future properties and padding */
+    ReadUnusedBytesFromFile(file, 7);
+
+    element_info[element].use_gfx_element = getFile8Bit(file);
+    element_info[element].gfx_element =
+      checkLevelElement(getFile16BitBE(file));
+
+    element_info[element].score = getFile8Bit(file);
+    element_info[element].gem_count = getFile8Bit(file);
+
+    element_info[element].push_delay_fixed = getFile16BitBE(file);
+    element_info[element].push_delay_random = getFile16BitBE(file);
+    element_info[element].move_delay_fixed = getFile16BitBE(file);
+    element_info[element].move_delay_random = getFile16BitBE(file);
+
+    element_info[element].move_pattern = getFile16BitBE(file);
+    element_info[element].move_direction_initial = getFile8Bit(file);
+    element_info[element].move_stepsize = getFile8Bit(file);
+
+    for(y=0; y<3; y++)
+      for(x=0; x<3; x++)
+	element_info[element].content[x][y] =
+	  checkLevelElement(getFile16BitBE(file));
+
+    element_info[element].change.events = getFile32BitBE(file);
+
+    element_info[element].change.target_element =
+      checkLevelElement(getFile16BitBE(file));
+
+    element_info[element].change.delay_fixed = getFile16BitBE(file);
+    element_info[element].change.delay_random = getFile16BitBE(file);
+    element_info[element].change.delay_frames = getFile16BitBE(file);
+
+    element_info[element].change.trigger_element =
+      checkLevelElement(getFile16BitBE(file));
+
+    element_info[element].change.explode = getFile8Bit(file);
+    element_info[element].change.use_content = getFile8Bit(file);
+    element_info[element].change.only_complete = getFile8Bit(file);
+    element_info[element].change.use_random_change = getFile8Bit(file);
+
+    element_info[element].change.random = getFile8Bit(file);
+    element_info[element].change.power = getFile8Bit(file);
+
+    for(y=0; y<3; y++)
+      for(x=0; x<3; x++)
+	element_info[element].change.content[x][y] =
+	  checkLevelElement(getFile16BitBE(file));
+
+    /* some free bytes for future properties and padding */
+    ReadUnusedBytesFromFile(file, LEVEL_CPART_CUS3_UNUSED);
+  }
+
+  return chunk_size;
+}
+
 void LoadLevelFromFilename(char *filename)
 {
   char cookie[MAX_LINE_LEN];
@@ -498,6 +583,7 @@ void LoadLevelFromFilename(char *filename)
       { "CNT2", LEVEL_CHUNK_CNT2_SIZE,	LoadLevel_CNT2 },
       { "CUS1", -1,			LoadLevel_CUS1 },
       { "CUS2", -1,			LoadLevel_CUS2 },
+      { "CUS3", -1,			LoadLevel_CUS3 },
       {  NULL,  0,			NULL }
     };
 
@@ -668,6 +754,8 @@ static void SaveLevel_HEAD(FILE *file, struct LevelInfo *level)
   fputc((level->encoding_16bit_field ? 1 : 0), file);
   fputc((level->em_slippery_gems ? 1 : 0), file);
 
+  fputc((level->use_custom_template ? 1 : 0), file);
+
   WriteUnusedBytesToFile(file, LEVEL_HEADER_UNUSED);
 }
 
@@ -762,6 +850,7 @@ static void SaveLevel_CNT2(FILE *file, struct LevelInfo *level, int element)
 	putFile16BitBE(file, content_array[i][x][y]);
 }
 
+#if 0
 static void SaveLevel_CUS1(FILE *file, struct LevelInfo *level,
 			   int num_changed_custom_elements)
 {
@@ -788,7 +877,9 @@ static void SaveLevel_CUS1(FILE *file, struct LevelInfo *level,
   if (check != num_changed_custom_elements)	/* should not happen */
     Error(ERR_WARN, "inconsistent number of custom element properties");
 }
+#endif
 
+#if 0
 static void SaveLevel_CUS2(FILE *file, struct LevelInfo *level,
 			   int num_changed_custom_elements)
 {
@@ -815,13 +906,88 @@ static void SaveLevel_CUS2(FILE *file, struct LevelInfo *level,
   if (check != num_changed_custom_elements)	/* should not happen */
     Error(ERR_WARN, "inconsistent number of custom target elements");
 }
+#endif
+
+static void SaveLevel_CUS3(FILE *file, struct LevelInfo *level,
+			   int num_changed_custom_elements)
+{
+  int i, x, y, check = 0;
+
+  putFile16BitBE(file, num_changed_custom_elements);
+
+  for (i=0; i < NUM_CUSTOM_ELEMENTS; i++)
+  {
+    int element = EL_CUSTOM_START + i;
+
+    if (Properties[element][EP_BITFIELD_BASE] != EP_BITMASK_DEFAULT)
+    {
+      if (check < num_changed_custom_elements)
+      {
+	putFile16BitBE(file, element);
+	putFile32BitBE(file, Properties[element][EP_BITFIELD_BASE]);
+
+	/* some free bytes for future properties and padding */
+	WriteUnusedBytesToFile(file, 7);
+
+	putFile8Bit(file, element_info[element].use_gfx_element);
+	putFile16BitBE(file, element_info[element].gfx_element);
+
+	putFile8Bit(file, element_info[element].score);
+	putFile8Bit(file, element_info[element].gem_count);
+
+	putFile16BitBE(file, element_info[element].push_delay_fixed);
+	putFile16BitBE(file, element_info[element].push_delay_random);
+	putFile16BitBE(file, element_info[element].move_delay_fixed);
+	putFile16BitBE(file, element_info[element].move_delay_random);
+
+	putFile16BitBE(file, element_info[element].move_pattern);
+	putFile8Bit(file, element_info[element].move_direction_initial);
+	putFile8Bit(file, element_info[element].move_stepsize);
+
+	for(y=0; y<3; y++)
+	  for(x=0; x<3; x++)
+	    putFile16BitBE(file, element_info[element].content[x][y]);
+
+	putFile32BitBE(file, element_info[element].change.events);
+
+	putFile16BitBE(file, element_info[element].change.target_element);
+
+	putFile16BitBE(file, element_info[element].change.delay_fixed);
+	putFile16BitBE(file, element_info[element].change.delay_random);
+	putFile16BitBE(file, element_info[element].change.delay_frames);
+
+	putFile16BitBE(file, element_info[element].change.trigger_element);
+
+	putFile8Bit(file, element_info[element].change.explode);
+	putFile8Bit(file, element_info[element].change.use_content);
+	putFile8Bit(file, element_info[element].change.only_complete);
+	putFile8Bit(file, element_info[element].change.use_random_change);
+
+	putFile8Bit(file, element_info[element].change.random);
+	putFile8Bit(file, element_info[element].change.power);
+
+	for(y=0; y<3; y++)
+	  for(x=0; x<3; x++)
+	    putFile16BitBE(file, element_info[element].change.content[x][y]);
+
+	/* some free bytes for future properties and padding */
+	WriteUnusedBytesToFile(file, LEVEL_CPART_CUS3_UNUSED);
+      }
+
+      check++;
+    }
+  }
+
+  if (check != num_changed_custom_elements)	/* should not happen */
+    Error(ERR_WARN, "inconsistent number of custom element properties");
+}
 
 void SaveLevel(int level_nr)
 {
   char *filename = getLevelFilename(level_nr);
   int body_chunk_size;
-  int num_changed_custom_elements1 = 0;
-  int num_changed_custom_elements2 = 0;
+  int num_changed_custom_elements = 0;
+  int level_chunk_CUS3_size;
   int i, x, y;
   FILE *file;
 
@@ -858,15 +1024,11 @@ void SaveLevel(int level_nr)
   body_chunk_size =
     level.fieldx * level.fieldy * (level.encoding_16bit_field ? 2 : 1);
 
-  /* check for non-standard custom elements and calculate "CUS1" chunk size */
+  /* check for non-standard custom elements and calculate "CUS3" chunk size */
   for (i=0; i < NUM_CUSTOM_ELEMENTS; i++)
     if (Properties[EL_CUSTOM_START +i][EP_BITFIELD_BASE] != EP_BITMASK_DEFAULT)
-      num_changed_custom_elements1++;
-
-  /* check for non-standard custom elements and calculate "CUS2" chunk size */
-  for (i=0; i < NUM_CUSTOM_ELEMENTS; i++)
-    if (element_info[EL_CUSTOM_START + i].change.target_element != EL_EMPTY)
-      num_changed_custom_elements2++;
+      num_changed_custom_elements++;
+  level_chunk_CUS3_size = LEVEL_CHUNK_CUS3_SIZE(num_changed_custom_elements);
 
   putFileChunkBE(file, "RND1", CHUNK_SIZE_UNDEFINED);
   putFileChunkBE(file, "CAVE", CHUNK_SIZE_NONE);
@@ -896,16 +1058,10 @@ void SaveLevel(int level_nr)
     SaveLevel_CNT2(file, &level, EL_BD_AMOEBA);
   }
 
-  if (num_changed_custom_elements1 > 0)
+  if (num_changed_custom_elements > 0)
   {
-    putFileChunkBE(file, "CUS1", 2 + num_changed_custom_elements1 * 6);
-    SaveLevel_CUS1(file, &level, num_changed_custom_elements1);
-  }
-
-  if (num_changed_custom_elements2 > 0)
-  {
-    putFileChunkBE(file, "CUS2", 2 + num_changed_custom_elements2 * 4);
-    SaveLevel_CUS2(file, &level, num_changed_custom_elements2);
+    putFileChunkBE(file, "CUS3", level_chunk_CUS3_size);
+    SaveLevel_CUS3(file, &level, num_changed_custom_elements);
   }
 
   fclose(file);

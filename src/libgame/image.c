@@ -699,7 +699,7 @@ int Read_PCX_to_Pixmap(Display *display, Window window, GC gc, char *filename,
 
 
 /* ========================================================================= */
-/* PLATFORM INDEPENDANT IMAGE FUNCTIONS                                      */
+/* PLATFORM INDEPENDENT IMAGE FUNCTIONS                                      */
 /* ========================================================================= */
 
 struct ImageInfo
