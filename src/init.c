@@ -3208,7 +3208,8 @@ void InitElementPropertiesEngine(int engine_version)
 #endif
 
   /* this is needed because some graphics depend on element properties */
-  InitElementGraphicInfo();
+  if (game_status == GAME_MODE_PLAYING)
+    InitElementGraphicInfo();
 }
 
 static void InitGlobal()
