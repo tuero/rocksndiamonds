@@ -2118,15 +2118,24 @@ void LoadArtworkInfo()
   artwork.gfx_current =
     getTreeInfoFromIdentifier(artwork.gfx_first, setup.graphics_set);
   if (artwork.gfx_current == NULL)
+    artwork.gfx_current =
+      getTreeInfoFromIdentifier(artwork.gfx_first, GRAPHICS_SUBDIR);
+  if (artwork.gfx_current == NULL)
     artwork.gfx_current = getFirstValidTreeInfoEntry(artwork.gfx_first);
 
   artwork.snd_current =
     getTreeInfoFromIdentifier(artwork.snd_first, setup.sounds_set);
   if (artwork.snd_current == NULL)
+    artwork.snd_current =
+      getTreeInfoFromIdentifier(artwork.snd_first, SOUNDS_SUBDIR);
+  if (artwork.snd_current == NULL)
     artwork.snd_current = getFirstValidTreeInfoEntry(artwork.snd_first);
 
   artwork.mus_current =
     getTreeInfoFromIdentifier(artwork.mus_first, setup.music_set);
+  if (artwork.mus_current == NULL)
+    artwork.mus_current =
+      getTreeInfoFromIdentifier(artwork.mus_first, MUSIC_SUBDIR);
   if (artwork.mus_current == NULL)
     artwork.mus_current = getFirstValidTreeInfoEntry(artwork.mus_first);
 
@@ -2212,6 +2221,9 @@ void LoadLevelArtworkInfo()
     artwork.gfx_current =
       getTreeInfoFromIdentifier(artwork.gfx_first, setup.graphics_set);
     if (artwork.gfx_current == NULL)
+      artwork.gfx_current =
+	getTreeInfoFromIdentifier(artwork.gfx_first, GRAPHICS_SUBDIR);
+    if (artwork.gfx_current == NULL)
       artwork.gfx_current = getFirstValidTreeInfoEntry(artwork.gfx_first);
   }
 
@@ -2220,6 +2232,9 @@ void LoadLevelArtworkInfo()
     artwork.snd_current =
       getTreeInfoFromIdentifier(artwork.snd_first, setup.sounds_set);
     if (artwork.snd_current == NULL)
+      artwork.snd_current =
+	getTreeInfoFromIdentifier(artwork.snd_first, SOUNDS_SUBDIR);
+    if (artwork.snd_current == NULL)
       artwork.snd_current = getFirstValidTreeInfoEntry(artwork.snd_first);
   }
 
@@ -2227,6 +2242,9 @@ void LoadLevelArtworkInfo()
   {
     artwork.mus_current =
       getTreeInfoFromIdentifier(artwork.mus_first, setup.music_set);
+    if (artwork.mus_current == NULL)
+      artwork.mus_current =
+	getTreeInfoFromIdentifier(artwork.mus_first, MUSIC_SUBDIR);
     if (artwork.mus_current == NULL)
       artwork.mus_current = getFirstValidTreeInfoEntry(artwork.mus_first);
   }

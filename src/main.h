@@ -1197,6 +1197,8 @@ struct MenuInfo
   int draw_xoffset[NUM_SPECIAL_GFX_ARGS];
   int draw_yoffset[NUM_SPECIAL_GFX_ARGS];
 
+  int scrollbar_xoffset;
+
   int list_size_default;
   int list_size[NUM_SPECIAL_GFX_ARGS];
 };

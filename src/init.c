@@ -998,7 +998,7 @@ static void InitSoundInfo()
     sound_info[i].loop = FALSE;
 
 #if 0
-    printf("::: sound: '%s'\n", sound->token);
+    printf("::: sound %d: '%s'\n", i, sound->token);
 #endif
 
     /* determine all loop sounds and identify certain sound classes */
@@ -1012,9 +1012,9 @@ static void InitSoundInfo()
 		 element_action_info[j].suffix) == 0)
       {
 	sound_effect_properties[i] = element_action_info[j].value;
+	sound_info[i].loop = element_action_info[j].is_loop_sound;
 
-	if (element_action_info[j].is_loop_sound)
-	  sound_info[i].loop = TRUE;
+	break;
       }
     }
 

@@ -2695,7 +2695,7 @@ void Impact(int x, int y)
     return;
   }
 #if 1
-  else if (impact && CheckElementChange(x, y, element, ACTION_IMPACT))
+  else if (impact && CheckElementChange(x, y, element, CE_IMPACT))
   {
     PlaySoundLevelElementAction(x, y, element, ACTION_IMPACT);
 
@@ -3840,7 +3840,9 @@ void StartMoving(int x, int y)
 	return;
       }
 
+#if 0
       GfxAction[x][y] = ACTION_MOVING;
+#endif
     }
 
     /* now make next step */
@@ -5226,6 +5228,8 @@ static void ChangeElementNow(int x, int y, int element)
 
     if (!change->only_complete || complete_change)
     {
+      boolean something_has_changed = FALSE;
+
       if (change->only_complete && change->use_random_change &&
 	  RND(100) < change->random)
 	return;
@@ -5243,17 +5247,24 @@ static void ChangeElementNow(int x, int y, int element)
 
 	  ChangeElementNowExt(ex, ey, change->content[xx][yy]);
 
+	  something_has_changed = TRUE;
+
 	  /* for symmetry reasons, stop newly created border elements */
 	  if (ex != x || ey != y)
 	    Stop[ex][ey] = TRUE;
 	}
       }
 
-      return;
+      if (something_has_changed)
+	PlaySoundLevelElementAction(x, y, element, ACTION_CHANGING);
     }
   }
+  else
+  {
+    ChangeElementNowExt(x, y, change->target_element);
 
-  ChangeElementNowExt(x, y, change->target_element);
+    PlaySoundLevelElementAction(x, y, element, ACTION_CHANGING);
+  }
 }
 
 static void ChangeElement(int x, int y)

@@ -1193,6 +1193,10 @@ void HandleTypeName(int newxpos, Key key)
 static void DrawChooseTree(TreeInfo **ti_ptr)
 {
   UnmapAllGadgets();
+
+  FreeScreenGadgets();
+  CreateScreenGadgets();
+
   CloseDoor(DOOR_CLOSE_2);
 
   ClearWindow();
@@ -1311,11 +1315,17 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
   int step = (button == 1 ? 1 : button == 2 ? 5 : 10);
   int num_entries = numTreeInfoInGroup(ti);
   int num_page_entries;
+  int last_game_status = game_status;	/* save current game status */
+
+  /* force LEVELS draw offset on choose level and artwork setup screen */
+  game_status = GAME_MODE_LEVELS;
 
   if (num_entries <= NUM_MENU_ENTRIES_ON_SCREEN)
     num_page_entries = num_entries;
   else
     num_page_entries = NUM_MENU_ENTRIES_ON_SCREEN;
+
+  game_status = last_game_status;	/* restore current game status */
 
   if (button == MB_MENU_INITIALIZE)
   {
@@ -2839,7 +2849,7 @@ static struct
 #else
     IMG_MENU_SCROLLBAR, IMG_MENU_SCROLLBAR_ACTIVE,
 #endif
-    SX + SC_SCROLL_VERTICAL_XPOS, SY + SC_SCROLL_VERTICAL_YPOS,
+    SC_SCROLL_VERTICAL_XPOS, SC_SCROLL_VERTICAL_YPOS,
     SC_SCROLL_VERTICAL_XSIZE, SC_SCROLL_VERTICAL_YSIZE,
     GD_TYPE_SCROLLBAR_VERTICAL,
     SCREEN_CTRL_ID_SCROLL_VERTICAL,
@@ -2861,15 +2871,16 @@ static void CreateScreenScrollbuttons()
     int gd_x1, gd_x2, gd_y1, gd_y2;
     int id = scrollbutton_info[i].gadget_id;
 
-    x = scrollbutton_info[i].x;
-    y = scrollbutton_info[i].y;
-
     event_mask = GD_EVENT_PRESSED | GD_EVENT_REPEATED;
 
-    x += SX;
-    y += SY;
+    x = mSX + scrollbutton_info[i].x + menu.scrollbar_xoffset;
+    y = mSY + scrollbutton_info[i].y;
     width = SC_SCROLLBUTTON_XSIZE;
     height = SC_SCROLLBUTTON_YSIZE;
+
+    if (id == SCREEN_CTRL_ID_SCROLL_DOWN)
+      y = mSY + (SC_SCROLL_VERTICAL_YPOS +
+		 (NUM_MENU_ENTRIES_ON_SCREEN - 2) * SC_SCROLLBUTTON_YSIZE);
 
     gfx_unpressed = scrollbutton_info[i].gfx_unpressed;
     gfx_pressed   = scrollbutton_info[i].gfx_pressed;
@@ -2912,6 +2923,7 @@ static void CreateScreenScrollbars()
 #if !defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
     int gfx_unpressed, gfx_pressed;
 #endif
+    int x, y, width, height;
     int gd_x1, gd_x2, gd_y1, gd_y2;
     struct GadgetInfo *gi;
     int items_max, items_visible, item_position;
@@ -2919,11 +2931,19 @@ static void CreateScreenScrollbars()
     int num_page_entries = NUM_MENU_ENTRIES_ON_SCREEN;
     int id = scrollbar_info[i].gadget_id;
 
+    event_mask = GD_EVENT_MOVING | GD_EVENT_OFF_BORDERS;
+
+    x = mSX + scrollbar_info[i].x + menu.scrollbar_xoffset;
+    y = mSY + scrollbar_info[i].y;
+    width  = scrollbar_info[i].width;
+    height = scrollbar_info[i].height;
+
+    if (id == SCREEN_CTRL_ID_SCROLL_VERTICAL)
+      height = (NUM_MENU_ENTRIES_ON_SCREEN - 2) * SC_SCROLLBUTTON_YSIZE;
+
     items_max = num_page_entries;
     items_visible = num_page_entries;
     item_position = 0;
-
-    event_mask = GD_EVENT_MOVING | GD_EVENT_OFF_BORDERS;
 
 #if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
     gd_bitmap_unpressed = *scrollbar_info[i].gfx_unpressed;
@@ -2946,10 +2966,10 @@ static void CreateScreenScrollbars()
     gi = CreateGadget(GDI_CUSTOM_ID, id,
 		      GDI_CUSTOM_TYPE_ID, i,
 		      GDI_INFO_TEXT, scrollbar_info[i].infotext,
-		      GDI_X, scrollbar_info[i].x,
-		      GDI_Y, scrollbar_info[i].y,
-		      GDI_WIDTH, scrollbar_info[i].width,
-		      GDI_HEIGHT, scrollbar_info[i].height,
+		      GDI_X, x,
+		      GDI_Y, y,
+		      GDI_WIDTH, width,
+		      GDI_HEIGHT, height,
 		      GDI_TYPE, scrollbar_info[i].type,
 		      GDI_SCROLLBAR_ITEMS_MAX, items_max,
 		      GDI_SCROLLBAR_ITEMS_VISIBLE, items_visible,
@@ -2971,6 +2991,8 @@ static void CreateScreenScrollbars()
 
 void CreateScreenGadgets()
 {
+  int last_game_status = game_status;	/* save current game status */
+
 #if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
   int i;
 
@@ -2992,8 +3014,13 @@ void CreateScreenGadgets()
   }
 #endif
 
+  /* force LEVELS draw offset for scrollbar / scrollbutton gadgets */
+  game_status = GAME_MODE_LEVELS;
+
   CreateScreenScrollbuttons();
   CreateScreenScrollbars();
+
+  game_status = last_game_status;	/* restore current game status */
 }
 
 void FreeScreenGadgets()

@@ -3454,6 +3454,8 @@ struct ConfigInfo image_config[] =
   { "menu.draw_xoffset.SETUP",			"0"			},
   { "menu.draw_yoffset.SETUP",			"0"			},
 
+  { "menu.scrollbar_xoffset",			"0"			},
+
   { "menu.list_size",				"-1"			},
   { "menu.list_size.LEVELS",			"-1"			},
   { "menu.list_size.SCORES",			"-1"			},

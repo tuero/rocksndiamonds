@@ -2998,7 +2998,7 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1] =
 /* element action and direction definitions                                  */
 /* ------------------------------------------------------------------------- */
 
-struct ElementActionInfo element_action_info[NUM_ACTIONS + 1] =
+struct ElementActionInfo element_action_info[NUM_ACTIONS + 1 + 1] =
 {
   { ".[DEFAULT]",	ACTION_DEFAULT,		TRUE	},
   { ".waiting",		ACTION_WAITING,		TRUE	},
@@ -3076,6 +3076,8 @@ struct TokenIntPtrInfo image_config_vars[] =
   { "menu.draw_yoffset.INFO",	&menu.draw_yoffset[GFX_SPECIAL_ARG_INFO]   },
   { "menu.draw_xoffset.SETUP",	&menu.draw_xoffset[GFX_SPECIAL_ARG_SETUP]  },
   { "menu.draw_yoffset.SETUP",	&menu.draw_yoffset[GFX_SPECIAL_ARG_SETUP]  },
+
+  { "menu.scrollbar_xoffset",	&menu.scrollbar_xoffset			   },
 
   { "menu.list_size",		&menu.list_size_default			   },
   { "menu.list_size.LEVELS",	&menu.list_size[GFX_SPECIAL_ARG_LEVELS]	   },

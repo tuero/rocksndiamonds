@@ -718,7 +718,7 @@ static void *Load_PCX(char *filename)
 {
   ImageInfo *img_info;
 
-#if 0
+#if 1
   printf("loading PCX file '%s'\n", filename);
 #endif
 
