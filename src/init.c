@@ -1526,6 +1526,9 @@ void InitElementPropertiesStatic()
     EL_GATE_2_GRAY,
     EL_GATE_3_GRAY,
     EL_GATE_4_GRAY,
+    EL_PENGUIN,
+    EL_PIG,
+    EL_DRAGON,
     -1
   };
 

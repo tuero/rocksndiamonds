@@ -352,8 +352,47 @@ static struct ChangingElementInfo changing_element_list[] =
   }
 };
 
+struct
+{
+  int element;
+  int push_delay_fixed, push_delay_random;
+}
+push_delay_list[] =
+{
+  { EL_SPRING,			0, 0 },
+  { EL_BALLOON,			0, 0 },
+
+  { EL_SOKOBAN_OBJECT,		2, 0 },
+  { EL_SOKOBAN_FIELD_FULL,	2, 0 },
+  { EL_SATELLITE,		2, 0 },
+  { EL_SP_DISK_YELLOW,		2, 0 },
+
+  { EL_UNDEFINED,		0, 0 },
+};
+
+struct
+{
+  int element;
+  int gem_count;
+}
+gem_count_list[] =
+{
+  { EL_EMERALD,		1 },
+  { EL_BD_DIAMOND,	1 },
+  { EL_EMERALD_YELLOW,	1 },
+  { EL_EMERALD_RED,	1 },
+  { EL_EMERALD_PURPLE,	1 },
+  { EL_DIAMOND,		3 },
+  { EL_SP_INFOTRON,	1 },
+  { EL_PEARL,		5 },
+  { EL_CRYSTAL,		8 },
+
+  { EL_UNDEFINED,	0 },
+};
+
 static struct ChangingElementInfo changing_element[MAX_NUM_ELEMENTS];
 static unsigned long trigger_events[MAX_NUM_ELEMENTS];
+static int gem_count[MAX_NUM_ELEMENTS];
 
 #define IS_AUTO_CHANGING(e)  (changing_element[e].base_element != EL_UNDEFINED)
 #define IS_JUST_CHANGING(x, y)	(ChangeDelay[x][y] != 0)
@@ -688,6 +727,8 @@ static void InitGameEngine()
     printf("       => game.engine_version == %06d\n", game.engine_version);
 #endif
 
+  /* ---------- initialize player's initial move delay --------------------- */
+
   /* dynamically adjust player properties according to game engine version */
   game.initial_move_delay =
     (game.engine_version <= VERSION_IDENT(2,0,1) ? INITIAL_MOVE_DELAY_ON :
@@ -696,6 +737,8 @@ static void InitGameEngine()
   /* dynamically adjust player properties according to level information */
   game.initial_move_delay_value =
     (level.double_speed ? MOVE_DELAY_HIGH_SPEED : MOVE_DELAY_NORMAL_SPEED);
+
+  /* ---------- initialize changing elements ------------------------------- */
 
   /* initialize changing elements information */
   for (i=0; i<MAX_NUM_ELEMENTS; i++)
@@ -709,8 +752,7 @@ static void InitGameEngine()
   }
 
   /* add changing elements from pre-defined list */
-  i = 0;
-  while (changing_element_list[i].base_element != EL_UNDEFINED)
+  for (i=0; changing_element_list[i].base_element != EL_UNDEFINED; i++)
   {
     struct ChangingElementInfo *ce = &changing_element_list[i];
     int element = ce->base_element;
@@ -721,8 +763,6 @@ static void InitGameEngine()
     changing_element[element].pre_change_function  = ce->pre_change_function;
     changing_element[element].change_function      = ce->change_function;
     changing_element[element].post_change_function = ce->post_change_function;
-
-    i++;
   }
 
   /* add changing elements from custom element configuration */
@@ -741,6 +781,8 @@ static void InitGameEngine()
 					      change->delay_frames);
   }
 
+  /* ---------- initialize trigger events ---------------------------------- */
+
   /* initialize trigger events information */
   for (i=0; i<MAX_NUM_ELEMENTS; i++)
     trigger_events[i] = EP_BITMASK_DEFAULT;
@@ -751,32 +793,36 @@ static void InitGameEngine()
       trigger_events[element_info[i].change.trigger] |=
 	element_info[i].change.events;
 
-  /* set push delay value for all non-custom elements */
+  /* ---------- initialize push delay -------------------------------------- */
+
+  /* initialize push delay values to default */
   for (i=0; i<MAX_NUM_ELEMENTS; i++)
   {
     if (!IS_CUSTOM_ELEMENT(i))
     {
-      if (i == EL_SPRING ||
-	  i == EL_BALLOON)
-      {
-	element_info[i].push_delay_fixed = 0;
-	element_info[i].push_delay_random = 0;
-      }
-      else if (i == EL_SOKOBAN_OBJECT ||
-	       i == EL_SOKOBAN_FIELD_FULL ||
-	       i == EL_SATELLITE ||
-	       i == EL_SP_DISK_YELLOW)
-      {
-	element_info[i].push_delay_fixed = 2;
-	element_info[i].push_delay_random = 0;
-      }
-      else
-      {
-	element_info[i].push_delay_fixed = 2;
-	element_info[i].push_delay_random = 8;
-      }
+      element_info[i].push_delay_fixed = 2;
+      element_info[i].push_delay_random = 8;
     }
   }
+
+  /* set push delay value for certain elements from pre-defined list */
+  for (i=0; push_delay_list[i].element != EL_UNDEFINED; i++)
+  {
+    int e = push_delay_list[i].element;
+
+    element_info[e].push_delay_fixed  = push_delay_list[i].push_delay_fixed;
+    element_info[e].push_delay_random = push_delay_list[i].push_delay_random;
+  }
+
+  /* ---------- initialize gem count --------------------------------------- */
+
+  /* initialize gem count values for each element */
+  for (i=0; i<MAX_NUM_ELEMENTS; i++)
+    gem_count[i] = 0;
+
+  /* add gem count values for all elements from pre-defined list */
+  for (i=0; gem_count_list[i].element != EL_UNDEFINED; i++)
+    gem_count[gem_count_list[i].element] = gem_count_list[i].gem_count;
 }
 
 
@@ -3838,11 +3884,15 @@ void ContinueMoving(int x, int y)
   int horiz_move = (dx != 0);
   int newx = x + dx, newy = y + dy;
   int step = (horiz_move ? dx : dy) * TILEX / MOVE_DELAY_NORMAL_SPEED;
+#if 1
+  boolean pushed = Pushed[x][y];
+#else
   struct PlayerInfo *player = (IS_PLAYER(x, y) ? PLAYERINFO(x, y) : NULL);
 #if 0
   boolean pushing = (player != NULL && player->Pushing && player->MovPos != 0);
 #else
   boolean pushing = (player != NULL && player->Pushing && player->is_moving);
+#endif
 #endif
 
 #if 0
@@ -3877,7 +3927,7 @@ void ContinueMoving(int x, int y)
 
 #if 1
 #if 1
-  if (Pushed[x][y])	/* special case: moving object pushed by player */
+  if (pushed)		/* special case: moving object pushed by player */
 #else
   if (pushing)		/* special case: moving object pushed by player */
 #endif
@@ -4039,7 +4089,7 @@ void ContinueMoving(int x, int y)
 #endif
       Stop[newx][newy] = TRUE;	/* ignore this element until the next frame */
 #if 1
-    if (!pushing)
+    if (!pushed)	/* special case: moving object pushed by player */
 #endif
       JustStopped[newx][newy] = 3;
 
@@ -6553,6 +6603,8 @@ int DigField(struct PlayerInfo *player,
       break;
 #endif
 
+#if 0
+
     case EL_EMERALD:
     case EL_BD_DIAMOND:
     case EL_EMERALD_YELLOW:
@@ -6582,6 +6634,10 @@ int DigField(struct PlayerInfo *player,
       CheckTriggeredElementChange(element, CE_OTHER_COLLECTING);
       break;
 
+#endif
+
+#if 0
+
     case EL_SPEED_PILL:
       RemoveField(x, y);
       player->move_delay_value = MOVE_DELAY_HIGH_SPEED;
@@ -6592,6 +6648,9 @@ int DigField(struct PlayerInfo *player,
 #endif
       CheckTriggeredElementChange(element, CE_OTHER_COLLECTING);
       break;
+
+#endif
+
 
 #if 0
     case EL_ENVELOPE:
@@ -6604,6 +6663,8 @@ int DigField(struct PlayerInfo *player,
       CheckTriggeredElementChange(element, CE_OTHER_COLLECTING);
       break;
 #endif
+
+#if 0
 
     case EL_EXTRA_TIME:
       RemoveField(x, y);
@@ -6620,6 +6681,9 @@ int DigField(struct PlayerInfo *player,
       CheckTriggeredElementChange(element, CE_OTHER_COLLECTING);
       break;
 
+#endif
+
+#if 0
     case EL_SHIELD_NORMAL:
       RemoveField(x, y);
       player->shield_normal_time_left += 10;
@@ -6642,7 +6706,9 @@ int DigField(struct PlayerInfo *player,
 #endif
       CheckTriggeredElementChange(element, CE_OTHER_COLLECTING);
       break;
+#endif
 
+#if 0
     case EL_DYNAMITE:
     case EL_SP_DISK_RED:
       RemoveField(x, y);
@@ -6654,7 +6720,9 @@ int DigField(struct PlayerInfo *player,
       PlaySoundLevelElementAction(x, y, element, ACTION_COLLECTING);
       CheckTriggeredElementChange(element, CE_OTHER_COLLECTING);
       break;
+#endif
 
+#if 0
     case EL_DYNABOMB_INCREASE_NUMBER:
       RemoveField(x, y);
       player->dynabomb_count++;
@@ -6691,7 +6759,9 @@ int DigField(struct PlayerInfo *player,
 #endif
       CheckTriggeredElementChange(element, CE_OTHER_COLLECTING);
       break;
+#endif
 
+#if 0
     case EL_KEY_1:
     case EL_KEY_2:
     case EL_KEY_3:
@@ -6739,6 +6809,7 @@ int DigField(struct PlayerInfo *player,
       CheckTriggeredElementChange(element, CE_OTHER_COLLECTING);
       break;
     }
+#endif
 
     case EL_ROBOT_WHEEL:
       Feld[x][y] = EL_ROBOT_WHEEL_ACTIVE;
@@ -6941,6 +7012,7 @@ int DigField(struct PlayerInfo *player,
 
 #endif
 
+#if 0
     case EL_GATE_1:
     case EL_GATE_2:
     case EL_GATE_3:
@@ -6992,7 +7064,9 @@ int DigField(struct PlayerInfo *player,
       PlaySoundLevel(x, y, SND_GATE_PASSING);
 #endif
       break;
+#endif
 
+#if 0
     case EL_SWITCHGATE_OPEN:
     case EL_TIMEGATE_OPEN:
       if (!IN_LEV_FIELD(x + dx, y + dy) || !IS_FREE(x + dx, y + dy))
@@ -7004,6 +7078,7 @@ int DigField(struct PlayerInfo *player,
 
       PlaySoundLevelElementAction(x, y, element, ACTION_PASSING);
       break;
+#endif
 
     case EL_SP_PORT_LEFT:
     case EL_SP_PORT_RIGHT:
@@ -7086,16 +7161,19 @@ int DigField(struct PlayerInfo *player,
 	if (!(tube_enter_directions[i][1] & move_direction))
 	  return MF_NO_ACTION;	/* tube has no opening in this direction */
 
-	PlaySoundLevel(x, y, SND_CLASS_TUBE_PASSING);
+	PlaySoundLevel(x, y, SND_CLASS_TUBE_WALKING);
       }
       break;
 
+#if 0
     case EL_EXIT_CLOSED:
     case EL_SP_EXIT_CLOSED:
     case EL_EXIT_OPENING:
       return MF_NO_ACTION;
       break;
+#endif
 
+#if 0
     case EL_EXIT_OPEN:
     case EL_SP_EXIT_OPEN:
       if (mode == DF_SNAP)
@@ -7107,6 +7185,7 @@ int DigField(struct PlayerInfo *player,
 	PlaySoundLevel(x, y, SND_CLASS_SP_EXIT_PASSING);
 
       break;
+#endif
 
     case EL_LAMP:
       Feld[x][y] = EL_LAMP_ACTIVE;
@@ -7280,16 +7359,68 @@ int DigField(struct PlayerInfo *player,
 
 #endif
 
+#if 0
     case EL_PENGUIN:
     case EL_PIG:
     case EL_DRAGON:
       break;
+#endif
 
     default:
 
       if (IS_WALKABLE(element))
       {
-	PlaySoundLevelElementAction(x, y, player->element_nr, ACTION_MOVING);
+	int sound_action = ACTION_WALKING;
+
+	if (element >= EL_GATE_1 && element <= EL_GATE_4)
+	{
+	  if (!player->key[element - EL_GATE_1])
+	    return MF_NO_ACTION;
+	}
+	else if (element >= EL_GATE_1_GRAY && element <= EL_GATE_4_GRAY)
+	{
+	  if (!player->key[element - EL_GATE_1_GRAY])
+	    return MF_NO_ACTION;
+	}
+	else if (element == EL_EXIT_OPEN || element == EL_SP_EXIT_OPEN)
+	{
+	  sound_action = ACTION_PASSING;	/* player is passing exit */
+	}
+	else if (element == EL_EMPTY)
+	{
+	  sound_action = ACTION_MOVING;		/* nothing to walk on */
+	}
+
+	/* play sound from background or player, whatever is available */
+	if (element_info[element].sound[sound_action] != SND_UNDEFINED)
+	  PlaySoundLevelElementAction(x, y, element, sound_action);
+	else
+	  PlaySoundLevelElementAction(x, y, player->element_nr, sound_action);
+
+	break;
+      }
+      else if (IS_PASSABLE(element))
+      {
+	if (!IN_LEV_FIELD(x + dx, y + dy) || !IS_FREE(x + dx, y + dy))
+	  return MF_NO_ACTION;
+
+	if (element >= EL_EM_GATE_1 && element <= EL_EM_GATE_4)
+	{
+	  if (!player->key[element - EL_EM_GATE_1])
+	    return MF_NO_ACTION;
+	}
+	else if (element >= EL_EM_GATE_1_GRAY && element <= EL_EM_GATE_4_GRAY)
+	{
+	  if (!player->key[element - EL_EM_GATE_1_GRAY])
+	    return MF_NO_ACTION;
+	}
+
+	/* automatically move to the next field with double speed */
+	player->programmed_action = move_direction;
+	DOUBLE_PLAYER_SPEED(player);
+
+	PlaySoundLevelAction(x, y, ACTION_PASSING);
+
 	break;
       }
       else if (IS_DIGGABLE(element))
@@ -7317,8 +7448,63 @@ int DigField(struct PlayerInfo *player,
 	  player->is_collecting = TRUE;
 	}
 
-	RaiseScoreElement(element);
+	if (element == EL_SPEED_PILL)
+	  player->move_delay_value = MOVE_DELAY_HIGH_SPEED;
+	else if (element == EL_EXTRA_TIME && level.time > 0)
+	{
+	  TimeLeft += 10;
+	  DrawText(DX_TIME, DY_TIME, int2str(TimeLeft, 3), FONT_TEXT_2);
+	}
+	else if (element == EL_SHIELD_NORMAL || element == EL_SHIELD_DEADLY)
+	{
+	  player->shield_normal_time_left += 10;
+	  if (element == EL_SHIELD_DEADLY)
+	    player->shield_deadly_time_left += 10;
+	}
+	else if (element == EL_DYNAMITE || element == EL_SP_DISK_RED)
+	{
+	  player->dynamite++;
+	  player->use_disk_red_graphic = (element == EL_SP_DISK_RED);
 
+	  DrawText(DX_DYNAMITE, DY_DYNAMITE,
+		   int2str(local_player->dynamite, 3), FONT_TEXT_2);
+	}
+	else if (element == EL_DYNABOMB_INCREASE_NUMBER)
+	{
+	  player->dynabomb_count++;
+	  player->dynabombs_left++;
+	}
+	else if (element == EL_DYNABOMB_INCREASE_SIZE)
+	{
+	  player->dynabomb_size++;
+	}
+	else if (element == EL_DYNABOMB_INCREASE_POWER)
+	{
+	  player->dynabomb_xl = TRUE;
+	}
+	else if ((element >= EL_KEY_1 && element <= EL_KEY_4) ||
+		 (element >= EL_EM_KEY_1 && element <= EL_EM_KEY_4))
+	{
+	  int key_nr = (element >= EL_KEY_1 && element <= EL_KEY_4 ?
+			element - EL_KEY_1 : element - EL_EM_KEY_1);
+
+	  player->key[key_nr] = TRUE;
+
+	  DrawMiniGraphicExt(drawto, DX_KEYS + key_nr * MINI_TILEX, DY_KEYS,
+			     el2edimg(EL_KEY_1 + key_nr));
+	  redraw_mask |= REDRAW_DOOR_1;
+	}
+	else if (gem_count[element] > 0)
+	{
+	  local_player->gems_still_needed -= gem_count[element];
+	  if (local_player->gems_still_needed < 0)
+	    local_player->gems_still_needed = 0;
+
+	  DrawText(DX_EMERALDS, DY_EMERALDS,
+		   int2str(local_player->gems_still_needed, 3), FONT_TEXT_2);
+	}
+
+	RaiseScoreElement(element);
 	PlaySoundLevelElementAction(x, y, element, ACTION_COLLECTING);
 
 	CheckTriggeredElementChange(element, CE_OTHER_COLLECTING);
@@ -7708,6 +7894,7 @@ void RaiseScoreElement(int element)
       RaiseScore(level.score[SC_NUT]);
       break;
     case EL_DYNAMITE:
+    case EL_SP_DISK_RED:
     case EL_DYNABOMB_INCREASE_NUMBER:
     case EL_DYNABOMB_INCREASE_SIZE:
     case EL_DYNABOMB_INCREASE_POWER:

@@ -34,6 +34,7 @@ struct ConfigInfo sound_config[] =
   { "[default].snapping",		"pong.wav"		},
   { "[default].pushing",		"pusch.wav"		},
   { "[default].impact",			"klopf.wav"		},
+  { "[default].walking",		"empty.wav"		},
   { "[default].passing",		"gate.wav"		},
   { "[default].dying",			"autsch.wav"		},
   { "[default].exploding",		"roaaar.wav"		},
@@ -173,7 +174,7 @@ struct ConfigInfo sound_config[] =
   { "dx_supabomb.pushing",		"pusch.wav"		},
   { "trap.digging",			"schlurf.wav"		},
   { "trap.activating",			UNDEFINED_FILENAME	},
-  { "[tube].passing",			UNDEFINED_FILENAME	},
+  { "[tube].walking",			UNDEFINED_FILENAME	},
 
   /* sounds for Rocks'n'Diamonds style elements and actions */
   { "amoeba.turning_to_gem",		"pling.wav"		},

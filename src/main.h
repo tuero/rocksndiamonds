@@ -808,25 +808,26 @@
 #define ACTION_COLLECTING			6
 #define ACTION_DROPPING				7
 #define ACTION_PUSHING				8
-#define ACTION_PASSING				9
-#define ACTION_IMPACT				10
-#define ACTION_BREAKING				11
-#define ACTION_ACTIVATING			12
-#define ACTION_DEACTIVATING			13
-#define ACTION_OPENING				14
-#define ACTION_CLOSING				15
-#define ACTION_ATTACKING			16
-#define ACTION_GROWING				17
-#define ACTION_SHRINKING			18
-#define ACTION_ACTIVE				19
-#define ACTION_FILLING				20
-#define ACTION_EMPTYING				21
-#define ACTION_CHANGING				22
-#define ACTION_EXPLODING			23
-#define ACTION_DYING				24
-#define ACTION_OTHER				25
+#define ACTION_WALKING				9
+#define ACTION_PASSING				10
+#define ACTION_IMPACT				11
+#define ACTION_BREAKING				12
+#define ACTION_ACTIVATING			13
+#define ACTION_DEACTIVATING			14
+#define ACTION_OPENING				15
+#define ACTION_CLOSING				16
+#define ACTION_ATTACKING			17
+#define ACTION_GROWING				18
+#define ACTION_SHRINKING			19
+#define ACTION_ACTIVE				20
+#define ACTION_FILLING				21
+#define ACTION_EMPTYING				22
+#define ACTION_CHANGING				23
+#define ACTION_EXPLODING			24
+#define ACTION_DYING				25
+#define ACTION_OTHER				26
 
-#define NUM_ACTIONS				26
+#define NUM_ACTIONS				27
 
 /* values for special image configuration suffixes (must match game mode) */
 #define GFX_SPECIAL_ARG_MAIN			0

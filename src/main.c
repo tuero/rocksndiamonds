@@ -2984,6 +2984,7 @@ struct ElementActionInfo element_action_info[NUM_ACTIONS + 1] =
   { ".collecting",	ACTION_COLLECTING,	FALSE	},
   { ".dropping",	ACTION_DROPPING,	FALSE	},
   { ".pushing",		ACTION_PUSHING,		FALSE	},
+  { ".walking",		ACTION_WALKING,		FALSE	},
   { ".passing",		ACTION_PASSING,		FALSE	},
   { ".impact",		ACTION_IMPACT,		FALSE	},
   { ".breaking",	ACTION_BREAKING,	FALSE	},
