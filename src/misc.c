@@ -334,7 +334,12 @@ char *getPath3(char *path1, char *path2, char *path3)
 
 char *getStringCopy(char *s)
 {
-  char *s_copy = checked_malloc(strlen(s) + 1);
+  char *s_copy;
+
+  if (s == NULL)
+    return NULL;
+
+  s_copy = checked_malloc(strlen(s) + 1);
 
   strcpy(s_copy, s);
   return s_copy;

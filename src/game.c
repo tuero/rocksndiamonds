@@ -103,7 +103,7 @@
 /* forward declaration for internal use */
 static void CloseAllOpenTimegates(void);
 static void CheckGravityMovement(struct PlayerInfo *);
-static void KillHeroUnlessShield(struct PlayerInfo *);
+static void KillHeroUnlessProtected(int, int);
 
 static void MapGameButtons();
 static void HandleGameButtons(struct GadgetInfo *);
@@ -1290,7 +1290,7 @@ void Explode(int ex, int ey, int phase, int mode)
       if (element == EL_EXPLODING)
 	element = Store2[x][y];
 
-      if (IS_PLAYER(ex, ey) && !SHIELD_ON(PLAYERINFO(ex, ey)))
+      if (IS_PLAYER(ex, ey) && !PLAYER_PROTECTED(ex, ey))
       {
 	switch(StorePlayer[ex][ey])
 	{
@@ -1338,6 +1338,10 @@ void Explode(int ex, int ey, int phase, int mode)
 	Store[x][y] = EL_EDELSTEIN_ROT;
       else if (element == EL_ERZ_EDEL_LILA)
 	Store[x][y] = EL_EDELSTEIN_LILA;
+      else if (element == EL_WALL_PEARL)
+	Store[x][y] = EL_PEARL;
+      else if (element == EL_WALL_CRYSTAL)
+	Store[x][y] = EL_CRYSTAL;
       else if (!IS_PFORTE(Store[x][y]))
 	Store[x][y] = EL_LEERRAUM;
 
@@ -1391,7 +1395,7 @@ void Explode(int ex, int ey, int phase, int mode)
     int element = Store2[x][y];
 
     if (IS_PLAYER(x, y))
-      KillHeroUnlessShield(PLAYERINFO(x, y));
+      KillHeroUnlessProtected(x, y);
     else if (IS_EXPLOSIVE(element))
     {
       Feld[x][y] = Store2[x][y];
@@ -1774,11 +1778,17 @@ void Impact(int x, int y)
     Bang(x, y);
     return;
   }
+  else if (element == EL_PEARL)
+  {
+    Feld[x][y] = EL_PEARL_BREAKING;
+    PlaySoundLevel(x, y, SND_KNACK);
+    return;
+  }
 
   if (element == EL_TROPFEN && (lastline || object_hit))	/* acid drop */
   {
     if (object_hit && IS_PLAYER(x, y+1))
-      KillHeroUnlessShield(PLAYERINFO(x, y+1));
+      KillHeroUnlessProtected(x, y+1);
     else if (object_hit && smashed == EL_PINGUIN)
       Bang(x, y+1);
     else
@@ -1811,7 +1821,7 @@ void Impact(int x, int y)
 
     if (IS_PLAYER(x, y+1))
     {
-      KillHeroUnlessShield(PLAYERINFO(x, y+1));
+      KillHeroUnlessProtected(x, y+1);
       return;
     }
     else if (smashed == EL_PINGUIN)
@@ -1849,6 +1859,12 @@ void Impact(int x, int y)
 	  Feld[x][y+1] = EL_CRACKINGNUT;
 	  PlaySoundLevel(x, y, SND_KNACK);
 	  RaiseScoreElement(EL_KOKOSNUSS);
+	  return;
+	}
+	else if (smashed == EL_PEARL)
+	{
+	  Feld[x][y+1] = EL_PEARL_BREAKING;
+	  PlaySoundLevel(x, y, SND_KNACK);
 	  return;
 	}
 	else if (smashed == EL_DIAMANT)
@@ -2626,7 +2642,7 @@ void StartMoving(int x, int y)
     Moving2Blocked(x, y, &newx, &newy);	/* get next screen position */
 
     if (IS_ENEMY(element) && IS_PLAYER(newx, newy) &&
-	!SHIELD_ON(PLAYERINFO(newx, newy)))
+	!PLAYER_PROTECTED(newx, newy))
     {
 
 #if 1
@@ -3503,11 +3519,32 @@ void NussKnacken(int x, int y)
   {
     MovDelay[x][y]--;
     if (MovDelay[x][y]/2 && IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
-      DrawGraphic(SCREENX(x), SCREENY(y), GFX_CRACKINGNUT+3-MovDelay[x][y]/2);
+      DrawGraphic(SCREENX(x), SCREENY(y),
+		  GFX_CRACKINGNUT + 3 - MovDelay[x][y]/2);
 
     if (!MovDelay[x][y])
     {
       Feld[x][y] = EL_EDELSTEIN;
+      DrawLevelField(x, y);
+    }
+  }
+}
+
+void BreakingPearl(int x, int y)
+{
+  if (!MovDelay[x][y])		/* next animation frame */
+    MovDelay[x][y] = 9;
+
+  if (MovDelay[x][y])		/* wait some time before next frame */
+  {
+    MovDelay[x][y]--;
+    if (MovDelay[x][y]/2 && IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
+      DrawGraphic(SCREENX(x), SCREENY(y),
+		  GFX_PEARL_BREAKING + 4 - MovDelay[x][y]/2);
+
+    if (!MovDelay[x][y])
+    {
+      Feld[x][y] = EL_LEERRAUM;
       DrawLevelField(x, y);
     }
   }
@@ -3919,10 +3956,10 @@ static void CheckBuggyBase(int x, int y)
 
   if (element == EL_SP_BUG)
   {
-    if (!MovDelay[x][y])	/* start activating buggy base */
+    if (!MovDelay[x][y])	/* wait some time before activating base */
       MovDelay[x][y] = 2 * FRAMES_PER_SECOND + RND(5 * FRAMES_PER_SECOND);
 
-    if (MovDelay[x][y])		/* wait some time before activating base */
+    if (MovDelay[x][y])
     {
       MovDelay[x][y]--;
       if (MovDelay[x][y] < 5 && IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
@@ -3938,7 +3975,7 @@ static void CheckBuggyBase(int x, int y)
     if (!MovDelay[x][y])	/* start activating buggy base */
       MovDelay[x][y] = 1 * FRAMES_PER_SECOND + RND(1 * FRAMES_PER_SECOND);
 
-    if (MovDelay[x][y])		/* wait some time before activating base */
+    if (MovDelay[x][y])
     {
       MovDelay[x][y]--;
       if (MovDelay[x][y])
@@ -3970,6 +4007,61 @@ static void CheckBuggyBase(int x, int y)
       }
 
       Feld[x][y] = EL_SP_BUG;
+      DrawLevelField(x, y);
+    }
+  }
+}
+
+static void CheckTrap(int x, int y)
+{
+  int element = Feld[x][y];
+
+  if (element == EL_TRAP_INACTIVE)
+  {
+    if (!MovDelay[x][y])	/* wait some time before activating trap */
+      MovDelay[x][y] = 2 * FRAMES_PER_SECOND + RND(5 * FRAMES_PER_SECOND);
+
+    if (MovDelay[x][y])
+    {
+      MovDelay[x][y]--;
+      if (MovDelay[x][y])
+	return;
+
+      Feld[x][y] = EL_TRAP_ACTIVE;
+    }
+  }
+  else if (element == EL_TRAP_ACTIVE)
+  {
+    int delay = 4;
+    int num_frames = 8;
+
+    if (!MovDelay[x][y])	/* start activating trap */
+      MovDelay[x][y] = num_frames * delay;
+
+    if (MovDelay[x][y])
+    {
+      MovDelay[x][y]--;
+
+      if (MovDelay[x][y])
+      {
+	if (!(MovDelay[x][y] % delay))
+	{
+	  int phase = MovDelay[x][y]/delay;
+
+	  if (phase >= num_frames/2)
+	    phase = num_frames - phase;
+
+	  if (IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
+	  {
+	    DrawGraphic(SCREENX(x),SCREENY(y), GFX_TRAP_INACTIVE + phase - 1);
+	    ErdreichAnbroeckeln(SCREENX(x), SCREENY(y));
+	  }
+	}
+
+	return;
+      }
+
+      Feld[x][y] = EL_TRAP_INACTIVE;
       DrawLevelField(x, y);
     }
   }
@@ -4260,6 +4352,8 @@ void GameActions()
       Blurb(x, y);
     else if (element == EL_CRACKINGNUT)
       NussKnacken(x, y);
+    else if (element == EL_PEARL_BREAKING)
+      BreakingPearl(x, y);
     else if (element == EL_AUSGANG_ZU)
       AusgangstuerPruefen(x, y);
     else if (element == EL_AUSGANG_ACT)
@@ -4277,6 +4371,8 @@ void GameActions()
       CheckForDragon(x, y);
     else if (element == EL_SP_BUG || element == EL_SP_BUG_ACTIVE)
       CheckBuggyBase(x, y);
+    else if (element == EL_TRAP_INACTIVE || element == EL_TRAP_ACTIVE)
+      CheckTrap(x, y);
     else if (element == EL_SP_TERMINAL)
       DrawGraphicAnimation(x, y, GFX2_SP_TERMINAL, 7, 12, ANIM_NORMAL);
     else if (element == EL_SP_TERMINAL_ACTIVE)
@@ -4560,14 +4656,7 @@ boolean MoveFigureOneStep(struct PlayerInfo *player,
       BuryHero(player);
     }
     else
-    {
-#if 1
       TestIfBadThingHitsHero(new_jx, new_jy);
-#else
-      if (player->shield_time_left == 0)
-	KillHero(player);
-#endif
-    }
 
     return MF_MOVING;
   }
@@ -4886,7 +4975,7 @@ void TestIfGoodThingHitsBadThing(int goodx, int goody)
 
       if (player->shield_active_time_left > 0)
 	Bang(killx, killy);
-      else if (player->shield_passive_time_left == 0)
+      else if (!PLAYER_PROTECTED(goodx, goody))
 	KillHero(player);
     }
     else
@@ -4951,7 +5040,7 @@ void TestIfBadThingHitsGoodThing(int badx, int bady)
 
       if (player->shield_active_time_left > 0)
 	Bang(badx, bady);
-      else if (player->shield_passive_time_left == 0)
+      else if (!PLAYER_PROTECTED(killx, killy))
 	KillHero(player);
     }
     else
@@ -5031,10 +5120,10 @@ void KillHero(struct PlayerInfo *player)
   BuryHero(player);
 }
 
-static void KillHeroUnlessShield(struct PlayerInfo *player)
+static void KillHeroUnlessProtected(int x, int y)
 {
-  if (!SHIELD_ON(player))
-    KillHero(player);
+  if (!PLAYER_PROTECTED(x, y))
+    KillHero(PLAYERINFO(x, y));
 }
 
 void BuryHero(struct PlayerInfo *player)
@@ -5096,6 +5185,36 @@ int DigField(struct PlayerInfo *player,
   if (IS_MOVING(x, y) || IS_PLAYER(x, y))
     return MF_NO_ACTION;
 
+  if (IS_TUBE(Feld[jx][jy]))
+  {
+    int i = 0;
+    int tube_leave_directions[][2] =
+    {
+      { EL_TUBE_CROSS,		MV_LEFT | MV_RIGHT | MV_UP | MV_DOWN },
+      { EL_TUBE_VERTICAL,	                     MV_UP | MV_DOWN },
+      { EL_TUBE_HORIZONTAL,	MV_LEFT | MV_RIGHT                   },
+      { EL_TUBE_VERT_LEFT,	MV_LEFT |            MV_UP | MV_DOWN },
+      { EL_TUBE_VERT_RIGHT,	          MV_RIGHT | MV_UP | MV_DOWN },
+      { EL_TUBE_HORIZ_UP,	MV_LEFT | MV_RIGHT | MV_UP           },
+      { EL_TUBE_HORIZ_DOWN,	MV_LEFT | MV_RIGHT |         MV_DOWN },
+      { EL_TUBE_LEFT_UP,	MV_LEFT |            MV_UP           },
+      { EL_TUBE_LEFT_DOWN,	MV_LEFT |                    MV_DOWN },
+      { EL_TUBE_RIGHT_UP,	          MV_RIGHT | MV_UP           },
+      { EL_TUBE_RIGHT_DOWN,	          MV_RIGHT |         MV_DOWN },
+      { -1,                     MV_LEFT | MV_RIGHT | MV_UP | MV_DOWN }
+    };
+
+    while (tube_leave_directions[i][0] != Feld[jx][jy])
+    {
+      i++;
+      if (tube_leave_directions[i][0] == -1)	/* should not happen */
+	break;
+    }
+
+    if (!(tube_leave_directions[i][1] & move_direction))
+      return MF_NO_ACTION;	/* tube has no opening in this direction */
+  }
+
   element = Feld[x][y];
 
   switch (element)
@@ -5106,6 +5225,7 @@ int DigField(struct PlayerInfo *player,
 
     case EL_ERDREICH:
     case EL_SAND_INVISIBLE:
+    case EL_TRAP_INACTIVE:
       Feld[x][y] = EL_LEERRAUM;
       PlaySoundLevel(x, y, SND_SCHLURF);
       break;
@@ -5123,8 +5243,12 @@ int DigField(struct PlayerInfo *player,
     case EL_EDELSTEIN_LILA:
     case EL_DIAMANT:
     case EL_SP_INFOTRON:
+    case EL_PEARL:
+    case EL_CRYSTAL:
       RemoveField(x, y);
-      local_player->gems_still_needed -= (element == EL_DIAMANT ? 3 : 1);
+      local_player->gems_still_needed -= (element == EL_DIAMANT ? 3 :
+					  element == EL_PEARL ? 5 :
+					  element == EL_CRYSTAL ? 8 : 1);
       if (local_player->gems_still_needed < 0)
 	local_player->gems_still_needed = 0;
       RaiseScoreElement(element);
@@ -5490,7 +5614,47 @@ int DigField(struct PlayerInfo *player,
       DOUBLE_PLAYER_SPEED(player);
 
       PlaySoundLevel(x, y, SND_GATE);
+      break;
 
+    case EL_TUBE_CROSS:
+    case EL_TUBE_VERTICAL:
+    case EL_TUBE_HORIZONTAL:
+    case EL_TUBE_VERT_LEFT:
+    case EL_TUBE_VERT_RIGHT:
+    case EL_TUBE_HORIZ_UP:
+    case EL_TUBE_HORIZ_DOWN:
+    case EL_TUBE_LEFT_UP:
+    case EL_TUBE_LEFT_DOWN:
+    case EL_TUBE_RIGHT_UP:
+    case EL_TUBE_RIGHT_DOWN:
+      {
+	int i = 0;
+	int tube_enter_directions[][2] =
+	{
+	  { EL_TUBE_CROSS,	MV_LEFT | MV_RIGHT | MV_UP | MV_DOWN },
+	  { EL_TUBE_VERTICAL,	                     MV_UP | MV_DOWN },
+	  { EL_TUBE_HORIZONTAL,	MV_LEFT | MV_RIGHT                   },
+	  { EL_TUBE_VERT_LEFT,	          MV_RIGHT | MV_UP | MV_DOWN },
+	  { EL_TUBE_VERT_RIGHT,	MV_LEFT            | MV_UP | MV_DOWN },
+	  { EL_TUBE_HORIZ_UP,	MV_LEFT | MV_RIGHT |         MV_DOWN },
+	  { EL_TUBE_HORIZ_DOWN,	MV_LEFT | MV_RIGHT | MV_UP           },
+	  { EL_TUBE_LEFT_UP,	          MV_RIGHT |         MV_DOWN },
+	  { EL_TUBE_LEFT_DOWN,	          MV_RIGHT | MV_UP           },
+	  { EL_TUBE_RIGHT_UP,	MV_LEFT |                    MV_DOWN },
+	  { EL_TUBE_RIGHT_DOWN,	MV_LEFT |            MV_UP           },
+	  { -1,			MV_NO_MOVING                         }
+	};
+
+	while (tube_enter_directions[i][0] != element)
+	{
+	  i++;
+	  if (tube_enter_directions[i][0] == -1)	/* should not happen */
+	    break;
+	}
+
+	if (!(tube_enter_directions[i][1] & move_direction))
+	  return MF_NO_ACTION;	/* tube has no opening in this direction */
+      }
       break;
 
     case EL_AUSGANG_ZU:
@@ -5532,6 +5696,7 @@ int DigField(struct PlayerInfo *player,
     case EL_SONDE:
     case EL_SP_DISK_YELLOW:
     case EL_BALLOON:
+    case EL_SPRING:
       if (mode == DF_SNAP)
 	return MF_NO_ACTION;
 

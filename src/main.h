@@ -132,6 +132,7 @@ typedef unsigned char byte;
 /* values for 'Elementeigenschaften2' */
 #define EP_BIT_BELT		(1 << 0)
 #define EP_BIT_BELT_SWITCH	(1 << 1)
+#define EP_BIT_TUBE		(1 << 2)
 
 #define IS_AMOEBALIVE(e)	(Elementeigenschaften1[e] & EP_BIT_AMOEBALIVE)
 #define IS_AMOEBOID(e)		(Elementeigenschaften1[e] & EP_BIT_AMOEBOID)
@@ -167,6 +168,7 @@ typedef unsigned char byte;
 #define IS_ACTIVE_BOMB(e)	(Elementeigenschaften1[e] & EP_BIT_ACTIVE_BOMB)
 #define IS_BELT(e)		(Elementeigenschaften2[e] & EP_BIT_BELT)
 #define IS_BELT_SWITCH(e)	(Elementeigenschaften2[e] & EP_BIT_BELT_SWITCH)
+#define IS_TUBE(e)		(Elementeigenschaften2[e] & EP_BIT_TUBE)
 
 #define IS_PLAYER(x,y)		(ELEM_IS_PLAYER(StorePlayer[x][y]))
 
@@ -192,6 +194,9 @@ typedef unsigned char byte;
 
 #define PLAYERINFO(x,y)		(&stored_player[StorePlayer[x][y]-EL_SPIELER1])
 #define SHIELD_ON(p)		((p)->shield_passive_time_left > 0)
+#define PROTECTED_FIELD(x,y)	(IS_TUBE(Feld[x][y]))
+#define PLAYER_PROTECTED(x,y)	(SHIELD_ON(PLAYERINFO(x, y)) ||		\
+				 PROTECTED_FIELD(x, y))
 
 /* Pixmaps with graphic file */
 #define PIX_BACK		0
@@ -968,6 +973,19 @@ extern char		*element_info[];
 #define EL_EMC_WALL_7		342
 #define EL_EMC_WALL_8		343
 
+#define EL_TUBE_CROSS		344
+#define EL_TUBE_VERTICAL	345
+#define EL_TUBE_HORIZONTAL	346
+#define EL_TUBE_VERT_LEFT	347
+#define EL_TUBE_VERT_RIGHT	348
+#define EL_TUBE_HORIZ_UP	349
+#define EL_TUBE_HORIZ_DOWN	350
+#define EL_TUBE_LEFT_UP		351
+#define EL_TUBE_LEFT_DOWN	352
+#define EL_TUBE_RIGHT_UP	353
+#define EL_TUBE_RIGHT_DOWN	354
+#define EL_SPRING		355
+#define EL_TRAP_INACTIVE	356
 
 /* "real" (and therefore drawable) runtime elements */
 #define EL_FIRST_RUNTIME_EL	500
@@ -993,6 +1011,8 @@ extern char		*element_info[];
 #define EL_SWITCHGATE_CLOSING	518
 #define EL_TIMEGATE_OPENING	519
 #define EL_TIMEGATE_CLOSING	520
+#define EL_PEARL_BREAKING	521
+#define EL_TRAP_ACTIVE		522
 
 /* "unreal" (and therefore not drawable) runtime elements */
 #define EL_BLOCKED		600
@@ -1437,6 +1457,26 @@ extern char		*element_info[];
 #define GFX_ARROW_RED_DOWN	(GFX_START_ROCKSMORE +  1 * MORE_PER_LINE +  3)
 #define GFX_SCROLLBAR_BLUE	(GFX_START_ROCKSMORE +  2 * MORE_PER_LINE +  0)
 #define GFX_SCROLLBAR_RED	(GFX_START_ROCKSMORE +  2 * MORE_PER_LINE +  1)
+#define GFX_PEARL		(GFX_START_ROCKSMORE +  3 * MORE_PER_LINE +  0)
+#define GFX_CRYSTAL		(GFX_START_ROCKSMORE +  3 * MORE_PER_LINE +  1)
+#define GFX_WALL_PEARL		(GFX_START_ROCKSMORE +  3 * MORE_PER_LINE +  2)
+#define GFX_WALL_CRYSTAL	(GFX_START_ROCKSMORE +  3 * MORE_PER_LINE +  3)
+#define GFX_PEARL_BREAKING	(GFX_START_ROCKSMORE +  4 * MORE_PER_LINE +  0)
+#define GFX_SPRING		(GFX_START_ROCKSMORE +  5 * MORE_PER_LINE +  0)
+#define GFX_TUBE_RIGHT_DOWN	(GFX_START_ROCKSMORE +  5 * MORE_PER_LINE +  1)
+#define GFX_TUBE_HORIZ_DOWN	(GFX_START_ROCKSMORE +  5 * MORE_PER_LINE +  2)
+#define GFX_TUBE_LEFT_DOWN	(GFX_START_ROCKSMORE +  5 * MORE_PER_LINE +  3)
+#define GFX_TUBE_HORIZONTAL	(GFX_START_ROCKSMORE +  6 * MORE_PER_LINE +  0)
+#define GFX_TUBE_VERT_RIGHT	(GFX_START_ROCKSMORE +  6 * MORE_PER_LINE +  1)
+#define GFX_TUBE_CROSS		(GFX_START_ROCKSMORE +  6 * MORE_PER_LINE +  2)
+#define GFX_TUBE_VERT_LEFT	(GFX_START_ROCKSMORE +  6 * MORE_PER_LINE +  3)
+#define GFX_TUBE_VERTICAL	(GFX_START_ROCKSMORE +  7 * MORE_PER_LINE +  0)
+#define GFX_TUBE_RIGHT_UP	(GFX_START_ROCKSMORE +  7 * MORE_PER_LINE +  1)
+#define GFX_TUBE_HORIZ_UP	(GFX_START_ROCKSMORE +  7 * MORE_PER_LINE +  2)
+#define GFX_TUBE_LEFT_UP	(GFX_START_ROCKSMORE +  7 * MORE_PER_LINE +  3)
+
+#define GFX_TRAP_INACTIVE	(GFX_START_ROCKSMORE +  0 * MORE_PER_LINE +  4)
+#define GFX_TRAP_ACTIVE		(GFX_START_ROCKSMORE +  0 * MORE_PER_LINE +  7)
 
 /* graphics from "RocksFont" */
 #define GFX_CHAR_START		(GFX_START_ROCKSFONT)
@@ -1471,10 +1511,6 @@ extern char		*element_info[];
 #define GFX_CHAR_END		(GFX_CHAR_START + 79)
 
 /* new elements which still have no graphic */
-#define GFX_PEARL		GFX_CHAR_FRAGE
-#define GFX_CRYSTAL		GFX_CHAR_FRAGE
-#define GFX_WALL_PEARL		GFX_CHAR_FRAGE
-#define GFX_WALL_CRYSTAL	GFX_CHAR_FRAGE
 #define GFX_DOOR_WHITE		GFX_CHAR_FRAGE
 #define GFX_DOOR_WHITE_GRAY	GFX_CHAR_FRAGE
 #define GFX_KEY_WHITE		GFX_CHAR_FRAGE

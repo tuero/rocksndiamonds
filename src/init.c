@@ -875,7 +875,18 @@ void InitElementProperties()
     EL_SWITCHGATE_OPEN,
     EL_SWITCHGATE_CLOSED,
     EL_TIMEGATE_OPEN,
-    EL_TIMEGATE_CLOSED
+    EL_TIMEGATE_CLOSED,
+    EL_TUBE_CROSS,
+    EL_TUBE_VERTICAL,
+    EL_TUBE_HORIZONTAL,
+    EL_TUBE_VERT_LEFT,
+    EL_TUBE_VERT_RIGHT,
+    EL_TUBE_HORIZ_UP,
+    EL_TUBE_HORIZ_DOWN,
+    EL_TUBE_LEFT_UP,
+    EL_TUBE_LEFT_DOWN,
+    EL_TUBE_RIGHT_UP,
+    EL_TUBE_RIGHT_DOWN
   };
   static int ep_pforte_num = sizeof(ep_pforte)/sizeof(int);
 
@@ -974,7 +985,21 @@ void InitElementProperties()
     EL_EMC_WALL_5,
     EL_EMC_WALL_6,
     EL_EMC_WALL_7,
-    EL_EMC_WALL_8
+    EL_EMC_WALL_8,
+    EL_CRYSTAL,
+    EL_WALL_PEARL,
+    EL_WALL_CRYSTAL,
+    EL_TUBE_CROSS,
+    EL_TUBE_VERTICAL,
+    EL_TUBE_HORIZONTAL,
+    EL_TUBE_VERT_LEFT,
+    EL_TUBE_VERT_RIGHT,
+    EL_TUBE_HORIZ_UP,
+    EL_TUBE_HORIZ_DOWN,
+    EL_TUBE_LEFT_UP,
+    EL_TUBE_LEFT_DOWN,
+    EL_TUBE_RIGHT_UP,
+    EL_TUBE_RIGHT_DOWN
   };
   static int ep_solid_num = sizeof(ep_solid)/sizeof(int);
 
@@ -1049,7 +1074,19 @@ void InitElementProperties()
     EL_EMC_STEEL_WALL_1,
     EL_EMC_STEEL_WALL_2,
     EL_EMC_STEEL_WALL_3,
-    EL_EMC_STEEL_WALL_4
+    EL_EMC_STEEL_WALL_4,
+    EL_CRYSTAL,
+    EL_TUBE_CROSS,
+    EL_TUBE_VERTICAL,
+    EL_TUBE_HORIZONTAL,
+    EL_TUBE_VERT_LEFT,
+    EL_TUBE_VERT_RIGHT,
+    EL_TUBE_HORIZ_UP,
+    EL_TUBE_HORIZ_DOWN,
+    EL_TUBE_LEFT_UP,
+    EL_TUBE_LEFT_DOWN,
+    EL_TUBE_RIGHT_UP,
+    EL_TUBE_RIGHT_DOWN
   };
   static int ep_massive_num = sizeof(ep_massive)/sizeof(int);
 
@@ -1082,7 +1119,9 @@ void InitElementProperties()
     EL_SP_CHIP_UPPER,
     EL_SP_CHIP_LOWER,
     EL_SPEED_PILL,
-    EL_STEEL_SLANTED
+    EL_STEEL_SLANTED,
+    EL_PEARL,
+    EL_CRYSTAL
   };
   static int ep_slippery_num = sizeof(ep_slippery)/sizeof(int);
 
@@ -1184,7 +1223,10 @@ void InitElementProperties()
     EL_ZEIT_LEER,
     EL_SP_ZONK,
     EL_SP_INFOTRON,
-    EL_SP_DISK_ORANGE
+    EL_SP_DISK_ORANGE,
+    EL_PEARL,
+    EL_CRYSTAL,
+    EL_SPRING
   };
   static int ep_can_fall_num = sizeof(ep_can_fall)/sizeof(int);
 
@@ -1212,7 +1254,9 @@ void InitElementProperties()
     EL_ZEIT_LEER,
     EL_SP_ZONK,
     EL_SP_INFOTRON,
-    EL_SP_DISK_ORANGE
+    EL_SP_DISK_ORANGE,
+    EL_PEARL,
+    EL_CRYSTAL
   };
   static int ep_can_smash_num = sizeof(ep_can_smash)/sizeof(int);
 
@@ -1298,6 +1342,7 @@ void InitElementProperties()
     EL_SP_SNIKSNAK,
     EL_SP_ELECTRON,
     EL_SP_BUG_ACTIVE,
+    EL_TRAP_ACTIVE,
     EL_LANDMINE
   };
   static int ep_dont_go_to_num = sizeof(ep_dont_go_to)/sizeof(int);
@@ -1323,7 +1368,9 @@ void InitElementProperties()
     EL_EDELSTEIN_GELB,
     EL_EDELSTEIN_ROT,
     EL_EDELSTEIN_LILA,
-    EL_DIAMANT
+    EL_DIAMANT,
+    EL_PEARL,
+    EL_CRYSTAL
   };
   static int ep_mampf2_num = sizeof(ep_mampf2)/sizeof(int);
 
@@ -1547,7 +1594,9 @@ void InitElementProperties()
     EL_EDELSTEIN_GELB,
     EL_EDELSTEIN_ROT,
     EL_EDELSTEIN_LILA,
-    EL_DIAMANT
+    EL_DIAMANT,
+    EL_PEARL,
+    EL_CRYSTAL
   };
   static int ep_mampf3_num = sizeof(ep_mampf3)/sizeof(int);
 
@@ -1563,7 +1612,8 @@ void InitElementProperties()
     EL_SP_ZONK,
     EL_SP_DISK_ORANGE,
     EL_SP_DISK_YELLOW,
-    EL_BALLOON
+    EL_BALLOON,
+    EL_SPRING
   };
   static int ep_pushable_num = sizeof(ep_pushable)/sizeof(int);
 
@@ -1592,6 +1642,7 @@ void InitElementProperties()
     EL_ERDREICH,
     EL_SP_BASE,
     EL_SP_BUG,
+    EL_TRAP_INACTIVE,
     EL_SAND_INVISIBLE
   };
   static int ep_eatable_num = sizeof(ep_eatable)/sizeof(int);
@@ -1681,7 +1732,18 @@ void InitElementProperties()
     EL_SP_PORT2_DOWN,
     EL_SP_PORT_X,
     EL_SP_PORT_Y,
-    EL_SP_PORT_XY
+    EL_SP_PORT_XY,
+    EL_TUBE_CROSS,
+    EL_TUBE_VERTICAL,
+    EL_TUBE_HORIZONTAL,
+    EL_TUBE_VERT_LEFT,
+    EL_TUBE_VERT_RIGHT,
+    EL_TUBE_HORIZ_UP,
+    EL_TUBE_HORIZ_DOWN,
+    EL_TUBE_LEFT_UP,
+    EL_TUBE_LEFT_DOWN,
+    EL_TUBE_RIGHT_UP,
+    EL_TUBE_RIGHT_DOWN
   };
   static int ep_over_player_num = sizeof(ep_over_player)/sizeof(int);
 
@@ -1729,6 +1791,22 @@ void InitElementProperties()
   };
   static int ep_belt_switch_num = sizeof(ep_belt_switch)/sizeof(int);
 
+  static int ep_tube[] =
+  {
+    EL_TUBE_CROSS,
+    EL_TUBE_VERTICAL,
+    EL_TUBE_HORIZONTAL,
+    EL_TUBE_VERT_LEFT,
+    EL_TUBE_VERT_RIGHT,
+    EL_TUBE_HORIZ_UP,
+    EL_TUBE_HORIZ_DOWN,
+    EL_TUBE_LEFT_UP,
+    EL_TUBE_LEFT_DOWN,
+    EL_TUBE_RIGHT_UP,
+    EL_TUBE_RIGHT_DOWN
+  };
+  static int ep_tube_num = sizeof(ep_tube)/sizeof(int);
+
   static long ep1_bit[] =
   {
     EP_BIT_AMOEBALIVE,
@@ -1766,7 +1844,8 @@ void InitElementProperties()
   static long ep2_bit[] =
   {
     EP_BIT_BELT,
-    EP_BIT_BELT_SWITCH
+    EP_BIT_BELT_SWITCH,
+    EP_BIT_TUBE
   };
   static int *ep1_array[] =
   {
@@ -1805,7 +1884,8 @@ void InitElementProperties()
   static int *ep2_array[] =
   {
     ep_belt,
-    ep_belt_switch
+    ep_belt_switch,
+    ep_tube
   };
   static int *ep1_num[] =
   {
@@ -1844,7 +1924,8 @@ void InitElementProperties()
   static int *ep2_num[] =
   {
     &ep_belt_num,
-    &ep_belt_switch_num
+    &ep_belt_switch_num,
+    &ep_tube_num
   };
   static int num_properties1 = sizeof(ep1_num)/sizeof(int *);
   static int num_properties2 = sizeof(ep2_num)/sizeof(int *);

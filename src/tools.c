@@ -928,6 +928,13 @@ void getMiniGraphicSource(int graphic, Pixmap *pixmap, int *x, int *y)
     *x = MINI_DC_STARTX + (graphic % MINI_DC_PER_LINE) * MINI_TILEX;
     *y = MINI_DC_STARTY + (graphic / MINI_DC_PER_LINE) * MINI_TILEY;
   }
+  else if (graphic >= GFX_START_ROCKSMORE && graphic <= GFX_END_ROCKSMORE)
+  {
+    graphic -= GFX_START_ROCKSMORE;
+    *pixmap = pix[PIX_MORE];
+    *x = MINI_MORE_STARTX + (graphic % MINI_MORE_PER_LINE) * MINI_TILEX;
+    *y = MINI_MORE_STARTY + (graphic / MINI_MORE_PER_LINE) * MINI_TILEY;
+  }
   else if (graphic >= GFX_START_ROCKSFONT && graphic <= GFX_END_ROCKSFONT)
   {
     graphic -= GFX_START_ROCKSFONT;
@@ -1278,7 +1285,10 @@ void ErdreichAnbroeckeln(int x, int y)
 
   element = Feld[ux][uy];
 
-  if (element == EL_ERDREICH || element == EL_LANDMINE)
+  if (element == EL_ERDREICH ||
+      element == EL_LANDMINE ||
+      element == EL_TRAP_INACTIVE ||
+      element == EL_TRAP_ACTIVE)
   {
     if (!IN_SCR_FIELD(x, y))
       return;
@@ -1296,7 +1306,10 @@ void ErdreichAnbroeckeln(int x, int y)
       else
 	element = Feld[uxx][uyy];
 
-      if (element == EL_ERDREICH || element == EL_LANDMINE)
+      if (element == EL_ERDREICH ||
+	  element == EL_LANDMINE ||
+	  element == EL_TRAP_INACTIVE ||
+	  element == EL_TRAP_ACTIVE)
 	continue;
 
       if (i == 1 || i == 2)
@@ -1336,7 +1349,10 @@ void ErdreichAnbroeckeln(int x, int y)
       uyy = uy + xy[i][1];
 
       if (!IN_LEV_FIELD(uxx, uyy) ||
-	  (Feld[uxx][uyy] != EL_ERDREICH && Feld[uxx][uyy] != EL_LANDMINE) ||
+	  (Feld[uxx][uyy] != EL_ERDREICH &&
+	   Feld[uxx][uyy] != EL_LANDMINE &&
+	   Feld[uxx][uyy] != EL_TRAP_INACTIVE &&
+	   Feld[uxx][uyy] != EL_TRAP_ACTIVE) ||
 	  !IN_SCR_FIELD(xx, yy))
 	continue;
 
@@ -1550,6 +1566,14 @@ void DrawMicroElement(int xpos, int ypos, int element)
     XCopyArea(display, pix[PIX_DC], drawto, gc,
 	      MICRO_DC_STARTX + (graphic % MICRO_DC_PER_LINE) * MICRO_TILEX,
 	      MICRO_DC_STARTY + (graphic / MICRO_DC_PER_LINE) * MICRO_TILEY,
+	      MICRO_TILEX, MICRO_TILEY, xpos, ypos);
+  }
+  else if (graphic >= GFX_START_ROCKSMORE && graphic <= GFX_END_ROCKSMORE)
+  {
+    graphic -= GFX_START_ROCKSMORE;
+    XCopyArea(display, pix[PIX_MORE], drawto, gc,
+	      MICRO_MORE_STARTX + (graphic % MICRO_MORE_PER_LINE) *MICRO_TILEX,
+	      MICRO_MORE_STARTY + (graphic / MICRO_MORE_PER_LINE) *MICRO_TILEY,
 	      MICRO_TILEX, MICRO_TILEY, xpos, ypos);
   }
   else
@@ -2614,6 +2638,20 @@ int el2gfx(int element)
     case EL_EMC_WALL_6:		return GFX_EMC_WALL_6;
     case EL_EMC_WALL_7:		return GFX_EMC_WALL_7;
     case EL_EMC_WALL_8:		return GFX_EMC_WALL_8;
+    case EL_TUBE_CROSS:		return GFX_TUBE_CROSS;
+    case EL_TUBE_VERTICAL:	return GFX_TUBE_VERTICAL;
+    case EL_TUBE_HORIZONTAL:	return GFX_TUBE_HORIZONTAL;
+    case EL_TUBE_VERT_LEFT:	return GFX_TUBE_VERT_LEFT;
+    case EL_TUBE_VERT_RIGHT:	return GFX_TUBE_VERT_RIGHT;
+    case EL_TUBE_HORIZ_UP:	return GFX_TUBE_HORIZ_UP;
+    case EL_TUBE_HORIZ_DOWN:	return GFX_TUBE_HORIZ_DOWN;
+    case EL_TUBE_LEFT_UP:	return GFX_TUBE_LEFT_UP;
+    case EL_TUBE_LEFT_DOWN:	return GFX_TUBE_LEFT_DOWN;
+    case EL_TUBE_RIGHT_UP:	return GFX_TUBE_RIGHT_UP;
+    case EL_TUBE_RIGHT_DOWN:	return GFX_TUBE_RIGHT_DOWN;
+    case EL_SPRING:		return GFX_SPRING;
+    case EL_TRAP_INACTIVE:	return GFX_TRAP_INACTIVE;
+    case EL_TRAP_ACTIVE:	return GFX_TRAP_ACTIVE;
 
     default:
     {

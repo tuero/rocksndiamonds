@@ -395,8 +395,8 @@ char *element_info[] =
   "letter ''",
   "letter ''",
   "letter ''",
-  "growing wall (horizontally)",		/* 200 */
-  "growing wall (vertically)",
+  "growing wall (horizontal)",			/* 200 */
+  "growing wall (vertical)",
   "growing wall (all directions)",
   "unused",
   "unused",
@@ -426,8 +426,8 @@ char *element_info[] =
   "yellow disk",
   "terminal",
   "red disk",					/* 230 */
-  "port (vertically)",
-  "port (horizontally)",
+  "port (vertical)",
+  "port (horizontal)",
   "port (all directions)",
   "electron",
   "buggy base",
@@ -542,6 +542,19 @@ char *element_info[] =
   "normal wall",
   "normal wall",
   "normal wall",
+  "tube (all directions)",
+  "tube (vertical)",
+  "tube (horizontal)",
+  "tube (vertical & left)",
+  "tube (vertical & right)",
+  "tube (horizontal & up)",
+  "tube (horizontal & down)",			/* 350 */
+  "tube (left & up)",
+  "tube (left & down)",
+  "tube (right & up)",
+  "tube (right & down)",
+  "spring",
+  "trap",
   "-"
 
   /*

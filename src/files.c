@@ -421,22 +421,22 @@ static void setLevelInfoToDefaults()
     switch (LEVELCLASS(leveldir_current))
     {
       case LEVELCLASS_TUTORIAL:
-  	strcpy(level.author, PROGRAM_AUTHOR_STRING);
-  	break;
+	strcpy(level.author, PROGRAM_AUTHOR_STRING);
+	break;
 
       case LEVELCLASS_CONTRIBUTION:
-  	strncpy(level.author, leveldir_current->name,MAX_LEVEL_AUTHOR_LEN);
-  	level.author[MAX_LEVEL_AUTHOR_LEN] = '\0';
-  	break;
+	strncpy(level.author, leveldir_current->name,MAX_LEVEL_AUTHOR_LEN);
+	level.author[MAX_LEVEL_AUTHOR_LEN] = '\0';
+	break;
 
       case LEVELCLASS_USER:
-  	strncpy(level.author, getRealName(), MAX_LEVEL_AUTHOR_LEN);
-  	level.author[MAX_LEVEL_AUTHOR_LEN] = '\0';
-  	break;
+	strncpy(level.author, getRealName(), MAX_LEVEL_AUTHOR_LEN);
+	level.author[MAX_LEVEL_AUTHOR_LEN] = '\0';
+	break;
 
       default:
-  	/* keep default value */
-  	break;
+	/* keep default value */
+	break;
     }
   }
 }
@@ -1431,6 +1431,42 @@ static void setLevelDirInfoToDefaults(struct LevelDirInfo *ldi)
   ldi->next = NULL;
 }
 
+static void setLevelDirInfoToDefaultsFromParent(struct LevelDirInfo *ldi,
+						struct LevelDirInfo *parent)
+{
+  if (parent == NULL)
+  {
+    setLevelDirInfoToDefaults(ldi);
+    return;
+  }
+
+  /* first copy all values from the parent structure ... */
+  *ldi = *parent;
+
+  /* ... then set all fields to default that cannot be inherited from parent.
+     This is especially important for all those fields that can be set from
+     the 'levelinfo.conf' config file, because the function 'setSetupInfo()'
+     calls 'free()' for all already set token values which requires that no
+     other structure's pointer may point to them!
+  */
+
+  ldi->filename = NULL;
+  ldi->fullpath = NULL;
+  ldi->basepath = NULL;
+  ldi->name = getStringCopy(ANONYMOUS_NAME);
+  ldi->name_short = NULL;
+  ldi->name_sorting = NULL;
+  ldi->author = getStringCopy(parent->author);
+  ldi->imported_from = getStringCopy(parent->imported_from);
+
+  ldi->level_group = FALSE;
+  ldi->parent_link = FALSE;
+
+  ldi->node_parent = parent;
+  ldi->node_group = NULL;
+  ldi->next = NULL;
+}
+
 static void setSetupInfoToDefaults(struct SetupInfo *si)
 {
   int i;
@@ -1636,9 +1672,7 @@ static void LoadLevelInfoFromLevelDir(struct LevelDirInfo **node_first,
       int i;
 
       checkSetupFileListIdentifier(setup_file_list, LEVELINFO_COOKIE);
-      setLevelDirInfoToDefaults(leveldir_new);
-
-      leveldir_new->node_parent = node_parent;
+      setLevelDirInfoToDefaultsFromParent(leveldir_new, node_parent);
 
       /* set all structure fields according to the token/value pairs */
       ldi = *leveldir_new;
