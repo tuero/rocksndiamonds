@@ -1071,6 +1071,11 @@ int editor_element[] =
   EL_LIGHT_SWITCH_OFF,
   EL_LIGHT_SWITCH_ON,
 
+  EL_FORCE_FIELD,
+  EL_EXTRA_TIME,
+  EL_LEERRAUM,
+  EL_LEERRAUM,
+
   /*
   EL_CHAR('D'),
   EL_CHAR('Y'),

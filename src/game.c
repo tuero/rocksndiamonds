@@ -1523,6 +1523,134 @@ void Blurb(int x, int y)
   }
 }
 
+static void ToggleBeltSwitch(int x, int y)
+{
+  static int belt_base_element[4] =
+  {
+    EL_BELT1_SWITCH_L,
+    EL_BELT2_SWITCH_L,
+    EL_BELT3_SWITCH_L,
+    EL_BELT4_SWITCH_L
+  };
+  static int belt_move_dir[4] =
+  {
+    MV_LEFT,
+    MV_NO_MOVING,
+    MV_RIGHT,
+    MV_NO_MOVING,
+  };
+
+  int element = Feld[x][y];
+  int belt_nr = getBeltNrFromSwitchElement(element);
+  int belt_dir_nr = (game.belt_dir_nr[belt_nr] + 1) % 4;
+  int belt_dir = belt_move_dir[belt_dir_nr];
+  int xx, yy;
+
+  if (!IS_BELT_SWITCH(element))
+    return;
+
+  game.belt_dir_nr[belt_nr] = belt_dir_nr;
+  game.belt_dir[belt_nr] = belt_dir;
+
+  if (belt_dir_nr == 3)
+    belt_dir_nr = 1;
+
+  for (yy=0; yy<lev_fieldy; yy++)
+  {
+    for (xx=0; xx<lev_fieldx; xx++)
+    {
+      int element = Feld[xx][yy];
+
+      if (IS_BELT_SWITCH(element))
+      {
+	int e_belt_nr = getBeltNrFromSwitchElement(element);
+
+	if (e_belt_nr == belt_nr)
+	{
+	  Feld[xx][yy] = belt_base_element[belt_nr] + belt_dir_nr;
+	  DrawLevelField(xx, yy);
+	}
+      }
+      else if (belt_dir == MV_NO_MOVING && IS_BELT(element))
+      {
+	int e_belt_nr = getBeltNrFromElement(element);
+
+	if (e_belt_nr == belt_nr)
+	  DrawLevelField(xx, yy);    /* set belt to parking position */
+      }
+    }
+  }
+}
+
+static void ToggleSwitchgateSwitch(int x, int y)
+{
+  int xx, yy;
+
+  game.switchgate_pos = !game.switchgate_pos;
+
+  for (yy=0; yy<lev_fieldy; yy++)
+  {
+    for (xx=0; xx<lev_fieldx; xx++)
+    {
+      int element = Feld[xx][yy];
+
+      if (element == EL_SWITCHGATE_SWITCH_1 ||
+	  element == EL_SWITCHGATE_SWITCH_2)
+      {
+	Feld[xx][yy] = EL_SWITCHGATE_SWITCH_1 + game.switchgate_pos;
+	DrawLevelField(xx, yy);
+      }
+      else if (element == EL_SWITCHGATE_OPEN ||
+	       element == EL_SWITCHGATE_OPENING)
+      {
+	Feld[xx][yy] = EL_SWITCHGATE_CLOSING;
+	PlaySoundLevel(xx, yy, SND_OEFFNEN);
+      }
+      else if (element == EL_SWITCHGATE_CLOSED ||
+	       element == EL_SWITCHGATE_CLOSING)
+      {
+	Feld[xx][yy] = EL_SWITCHGATE_OPENING;
+	PlaySoundLevel(xx, yy, SND_OEFFNEN);
+      }
+    }
+  }
+}
+
+static void ToggleLightSwitch(int x, int y)
+{
+  int element = Feld[x][y];
+  int xx, yy;
+
+  game.light_time_left =
+    (element == EL_LIGHT_SWITCH_OFF ? 10 * FRAMES_PER_SECOND : 0);
+
+  for (yy=0; yy<lev_fieldy; yy++)
+  {
+    for (xx=0; xx<lev_fieldx; xx++)
+    {
+      int element = Feld[xx][yy];
+
+      if (element == EL_LIGHT_SWITCH_OFF &&
+	  game.light_time_left > 0)
+      {
+	Feld[xx][yy] = EL_LIGHT_SWITCH_ON;
+	DrawLevelField(xx, yy);
+      }
+      else if (element == EL_LIGHT_SWITCH_ON &&
+	       game.light_time_left == 0)
+      {
+	Feld[xx][yy] = EL_LIGHT_SWITCH_OFF;
+	DrawLevelField(xx, yy);
+      }
+
+      if (element == EL_INVISIBLE_STEEL ||
+	  element == EL_UNSICHTBAR ||
+	  element == EL_SAND_INVISIBLE)
+	DrawLevelField(xx, yy);
+    }
+  }
+}
+
 void Impact(int x, int y)
 {
   boolean lastline = (y == lev_fieldy-1);
@@ -1636,6 +1764,20 @@ void Impact(int x, int y)
 	  PlaySoundLevel(x, y, SND_QUIRK);
 	  return;
 	}
+	else if (IS_BELT_SWITCH(smashed))
+	{
+	  ToggleBeltSwitch(x, y+1);
+	}
+	else if (smashed == EL_SWITCHGATE_SWITCH_1 ||
+		 smashed == EL_SWITCHGATE_SWITCH_2)
+	{
+	  ToggleSwitchgateSwitch(x, y+1);
+	}
+	else if (smashed == EL_LIGHT_SWITCH_OFF ||
+		 smashed == EL_LIGHT_SWITCH_ON)
+	{
+	  ToggleLightSwitch(x, y+1);
+	}
       }
     }
   }
@@ -1693,7 +1835,7 @@ void Impact(int x, int y)
         break;
     }
 
-    if (sound>=0)
+    if (sound >= 0)
       PlaySoundLevel(x, y, sound);
   }
 }
@@ -3833,6 +3975,10 @@ void GameActions()
       OpenSwitchgate(x, y);
     else if (element == EL_SWITCHGATE_CLOSING)
       CloseSwitchgate(x, y);
+    else if (element == EL_EXTRA_TIME)
+      DrawGraphicAnimation(x, y, GFX_EXTRA_TIME, 6, 4, ANIM_NORMAL);
+    else if (element == EL_FORCE_FIELD)
+      DrawGraphicAnimation(x, y, GFX_FORCE_FIELD, 6, 4, ANIM_NORMAL);
 
     if (game.magic_wall_active)
     {
@@ -4631,6 +4777,21 @@ int DigField(struct PlayerInfo *player,
       PlaySoundLevel(x, y, SND_PONG);
       break;
 
+    case EL_EXTRA_TIME:
+      RemoveField(x, y);
+      if (level.time > 0)
+      {
+	TimeLeft += 10;
+	DrawText(DX_TIME, DY_TIME, int2str(TimeLeft, 3), FS_SMALL, FC_YELLOW);
+      }
+      PlaySoundStereo(SND_GONG, PSND_MAX_RIGHT);
+      break;
+
+    case EL_FORCE_FIELD:
+      RemoveField(x, y);
+      PlaySoundLevel(x, y, SND_PONG);
+      break;
+
     case EL_DYNAMITE_INACTIVE:
     case EL_SP_DISK_RED:
       RemoveField(x, y);
@@ -4746,152 +4907,32 @@ int DigField(struct PlayerInfo *player,
     case EL_BELT4_SWITCH_L:
     case EL_BELT4_SWITCH_M:
     case EL_BELT4_SWITCH_R:
+      if (!player->Switching)
       {
-	static int belt_base_element[4] =
-	{
-	  EL_BELT1_SWITCH_L,
-	  EL_BELT2_SWITCH_L,
-	  EL_BELT3_SWITCH_L,
-	  EL_BELT4_SWITCH_L
-	};
-	static int belt_move_dir[4] =
-	{
-	  MV_LEFT,
-	  MV_NO_MOVING,
-	  MV_RIGHT,
-	  MV_NO_MOVING,
-	};
-
-	int belt_nr = getBeltNrFromSwitchElement(element);
-	int belt_dir_nr = (game.belt_dir_nr[belt_nr] + 1) % 4;
-	int belt_dir = belt_move_dir[belt_dir_nr];
-	int xx, yy;
-
-	if (player->Switching)
-	  return MF_ACTION;
-
 	player->Switching = TRUE;
-
-	game.belt_dir_nr[belt_nr] = belt_dir_nr;
-	game.belt_dir[belt_nr] = belt_dir;
-
-	if (belt_dir_nr == 3)
-	  belt_dir_nr = 1;
-
-	for (yy=0; yy<lev_fieldy; yy++)
-	{
-	  for (xx=0; xx<lev_fieldx; xx++)
-	  {
-	    int element = Feld[xx][yy];
-
-	    if (IS_BELT_SWITCH(element))
-	    {
-	      int e_belt_nr = getBeltNrFromSwitchElement(element);
-
-	      if (e_belt_nr == belt_nr)
-	      {
-		Feld[xx][yy] = belt_base_element[belt_nr] + belt_dir_nr;
-		DrawLevelField(xx, yy);
-	      }
-	    }
-	    else if (belt_dir == MV_NO_MOVING && IS_BELT(element))
-	    {
-	      int e_belt_nr = getBeltNrFromElement(element);
-
-	      if (e_belt_nr == belt_nr)
-		DrawLevelField(xx, yy);    /* set belt to parking position */
-	    }
-	  }
-	}
-
-	return MF_ACTION;
+	ToggleBeltSwitch(x, y);
       }
+      return MF_ACTION;
       break;
 
     case EL_SWITCHGATE_SWITCH_1:
     case EL_SWITCHGATE_SWITCH_2:
+      if (!player->Switching)
       {
-	int xx, yy;
-
-	if (player->Switching)
-	  return MF_ACTION;
-
 	player->Switching = TRUE;
-
-	game.switchgate_pos = !game.switchgate_pos;
-
-	for (yy=0; yy<lev_fieldy; yy++)
-	{
-	  for (xx=0; xx<lev_fieldx; xx++)
-	  {
-	    int element = Feld[xx][yy];
-
-	    if (element == EL_SWITCHGATE_SWITCH_1 ||
-		element == EL_SWITCHGATE_SWITCH_2)
-	    {
-	      Feld[xx][yy] = EL_SWITCHGATE_SWITCH_1 + game.switchgate_pos;
-	      DrawLevelField(xx, yy);
-	    }
-	    else if (element == EL_SWITCHGATE_OPEN ||
-		     element == EL_SWITCHGATE_OPENING)
-	    {
-	      Feld[xx][yy] = EL_SWITCHGATE_CLOSING;
-	      PlaySoundLevel(xx, yy, SND_OEFFNEN);
-	    }
-	    else if (element == EL_SWITCHGATE_CLOSED ||
-		     element == EL_SWITCHGATE_CLOSING)
-	    {
-	      Feld[xx][yy] = EL_SWITCHGATE_OPENING;
-	      PlaySoundLevel(xx, yy, SND_OEFFNEN);
-	    }
-	  }
-	}
-
-	return MF_ACTION;
+	ToggleSwitchgateSwitch(x, y);
       }
+      return MF_ACTION;
       break;
 
     case EL_LIGHT_SWITCH_OFF:
     case EL_LIGHT_SWITCH_ON:
+      if (!player->Switching)
       {
-	int xx, yy;
-
-	if (player->Switching)
-	  return MF_ACTION;
-
 	player->Switching = TRUE;
-
-	game.light_time_left =
-	  (element == EL_LIGHT_SWITCH_OFF ? 10 * FRAMES_PER_SECOND : 0);
-
-	for (yy=0; yy<lev_fieldy; yy++)
-	{
-	  for (xx=0; xx<lev_fieldx; xx++)
-	  {
-	    int element = Feld[xx][yy];
-
-	    if (element == EL_LIGHT_SWITCH_OFF &&
-		game.light_time_left > 0)
-	    {
-	      Feld[xx][yy] = EL_LIGHT_SWITCH_ON;
-	      DrawLevelField(xx, yy);
-	    }
-	    else if (element == EL_LIGHT_SWITCH_ON &&
-		     game.light_time_left == 0)
-	    {
-	      Feld[xx][yy] = EL_LIGHT_SWITCH_OFF;
-	      DrawLevelField(xx, yy);
-	    }
-
-	    if (element == EL_INVISIBLE_STEEL ||
-		element == EL_UNSICHTBAR ||
-		element == EL_SAND_INVISIBLE)
-	      DrawLevelField(xx, yy);
-	  }
-	}
-
-	return MF_ACTION;
+	ToggleLightSwitch(x, y);
       }
+      return MF_ACTION;
       break;
 
     case EL_SP_EXIT:

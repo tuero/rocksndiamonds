@@ -524,6 +524,16 @@ void LoadLevel(int level_nr)
       fgetc(file);
       fgetc(file);
 
+      if (level.num_yam_contents < 1 ||
+	  level.num_yam_contents > MAX_ELEMENT_CONTENTS)
+      {
+#if DEBUG
+	printf("WARNING: num_yam_contents == %d (corrected)\n",
+	       level.num_yam_contents);
+#endif
+	level.num_yam_contents = STD_ELEMENT_CONTENTS;
+      }
+
       for(i=0; i<MAX_ELEMENT_CONTENTS; i++)
 	for(y=0; y<3; y++)
 	  for(x=0; x<3; x++)
