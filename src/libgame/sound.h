@@ -181,12 +181,11 @@ struct SoundHeader_8SVX
 
 struct SampleInfo
 { 
+  int type;
   char *source_filename;
 
-  int type;
-
-  void *data_ptr;
   long data_len;
+  void *data_ptr;
 };
 
 typedef struct SampleInfo	SoundInfo;
@@ -210,8 +209,8 @@ struct SoundControl
   int playingtime;
   long playingpos;
 
-  unsigned long data_len;
-  byte *data_ptr;
+  long data_len;
+  void *data_ptr;
 
 #if defined(PLATFORM_MSDOS)
   int voice;
