@@ -1607,7 +1607,9 @@ static int LoadLevelInfoFromLevelDir(char *level_directory, int start_entry)
 
     if (setup_file_list)
     {
+#if 0
       DrawInitText(dir_entry->d_name, 150, FC_YELLOW);
+#endif
 
       checkSetupFileListIdentifier(setup_file_list, LEVELINFO_COOKIE);
       setLevelDirInfoToDefaults(&leveldir[current_entry]);
@@ -1616,6 +1618,10 @@ static int LoadLevelInfoFromLevelDir(char *level_directory, int start_entry)
       for (i=FIRST_LEVELINFO_TOKEN; i<=LAST_LEVELINFO_TOKEN; i++)
 	setSetupInfo(i, getTokenValue(setup_file_list, token_info[i].text));
       leveldir[current_entry] = ldi;
+
+#if 1
+      DrawInitText(leveldir[current_entry].name, 150, FC_YELLOW);
+#endif
 
       if (leveldir[current_entry].name_short == NULL)
 	leveldir[current_entry].name_short =
