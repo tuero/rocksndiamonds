@@ -16,8 +16,12 @@
 #define SDL_H
 
 #include "SDL.h"
-#include "SDL_image.h"
 
+#if SDL_MAJOR_VERSION >= 1 && SDL_MINOR_VERSION >= 1
+#include "SDL_image.h"
+#else
+#include "IMG.h"
+#endif
 
 /* SDL type definitions */
 

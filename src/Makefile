@@ -34,15 +34,22 @@ ifeq ($(PLATFORM),solaris)
 EXTRA_LIBS = -lnsl -lsocket -R$(XLIB_PATH)
 endif
 
+USE_SDL = true
+USE_SDL_OLD_LIBS = true
+
+ifeq ($(USE_SDL_OLD_LIBS),true)
+SDL_EXTRA_LIBS = -lIMG
+else
+SDL_EXTRA_LIBS = -lSDL_image
+endif
+
 SDL_CFLAGS := -DUSE_SDL_LIBRARY $(shell sdl-config --cflags)
-SDL_LDFLAGS := -lSDL_image $(shell sdl-config --libs)
+SDL_LDFLAGS := $(SDL_EXTRA_LIBS) $(shell sdl-config --libs)
 
 X11_CFLAGS = $(X11_INCL)
 X11_LDFLAGS = $(X11_LIBS) -lX11
 
-USE_SDL = true
-
-ifdef USE_SDL
+ifeq ($(USE_SDL),true)
 SYS_CFLAGS  = $(SDL_CFLAGS)
 SYS_LDFLAGS = $(SDL_LDFLAGS)
 else
