@@ -576,7 +576,8 @@ static void set_graphic_parameters(int graphic, char **parameter_raw)
 {
   Bitmap *src_bitmap = getBitmapFromImageID(graphic);
   int parameter[NUM_GFX_ARGS];
-  int num_xtiles = 1, num_ytiles = 1;
+  int anim_frames_per_row = 1, anim_frames_per_col = 1;
+  int anim_frames_per_line = 1;
   int i;
 
   /* get integer values from string parameters */
@@ -615,19 +616,25 @@ static void set_graphic_parameters(int graphic, char **parameter_raw)
 
   if (src_bitmap)
   {
-    num_xtiles = src_bitmap->width  / graphic_info[graphic].width;
-    num_ytiles = src_bitmap->height / graphic_info[graphic].height;
+    anim_frames_per_row = src_bitmap->width  / graphic_info[graphic].width;
+    anim_frames_per_col = src_bitmap->height / graphic_info[graphic].height;
   }
 
   /* correct x or y offset dependant of vertical or horizontal frame order */
   if (parameter[GFX_ARG_VERTICAL])	/* frames are ordered vertically */
+  {
     graphic_info[graphic].offset_y =
       (parameter[GFX_ARG_OFFSET] != ARG_UNDEFINED_VALUE ?
        parameter[GFX_ARG_OFFSET] : graphic_info[graphic].height);
+    anim_frames_per_line = anim_frames_per_col;
+  }
   else					/* frames are ordered horizontally */
+  {
     graphic_info[graphic].offset_x =
       (parameter[GFX_ARG_OFFSET] != ARG_UNDEFINED_VALUE ?
        parameter[GFX_ARG_OFFSET] : graphic_info[graphic].width);
+    anim_frames_per_line = anim_frames_per_row;
+  }
 
   /* optionally, the x and y offset of frames can be specified directly */
   if (parameter[GFX_ARG_XOFFSET] != ARG_UNDEFINED_VALUE)
@@ -639,15 +646,15 @@ static void set_graphic_parameters(int graphic, char **parameter_raw)
   if (parameter[GFX_ARG_FRAMES] != ARG_UNDEFINED_VALUE)
     graphic_info[graphic].anim_frames = parameter[GFX_ARG_FRAMES];
   else if (parameter[GFX_ARG_XPOS] == 0 && !parameter[GFX_ARG_VERTICAL])
-    graphic_info[graphic].anim_frames =	num_xtiles;
+    graphic_info[graphic].anim_frames =	anim_frames_per_row;
   else if (parameter[GFX_ARG_YPOS] == 0 && parameter[GFX_ARG_VERTICAL])
-    graphic_info[graphic].anim_frames =	num_ytiles;
+    graphic_info[graphic].anim_frames =	anim_frames_per_col;
   else
     graphic_info[graphic].anim_frames = 1;
 
   graphic_info[graphic].anim_frames_per_line =
     (parameter[GFX_ARG_FRAMES_PER_LINE] != ARG_UNDEFINED_VALUE ?
-     parameter[GFX_ARG_FRAMES_PER_LINE] : graphic_info[graphic].anim_frames);
+     parameter[GFX_ARG_FRAMES_PER_LINE] : anim_frames_per_line);
 
   graphic_info[graphic].anim_delay = parameter[GFX_ARG_DELAY];
   if (graphic_info[graphic].anim_delay == 0)	/* delay must be at least 1 */

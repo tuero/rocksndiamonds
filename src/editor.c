@@ -95,8 +95,11 @@
 #define ED_COUNTER_YDISTANCE		(3 * MINI_TILEY)
 #define ED_COUNTER_YPOS(n)		(ED_COUNTER_YSTART + \
 					 n * ED_COUNTER_YDISTANCE)
+#define ED_COUNTER_YPOS2(n)		(ED_COUNTER_YSTART + \
+					 n * ED_COUNTER_YDISTANCE / 2)
 #define ED_COUNTER2_YPOS(n)		(ED_COUNTER_YSTART + \
 					 n * ED_COUNTER_YDISTANCE - 2)
+
 /* standard distances */
 #define ED_BORDER_SIZE			3
 #define ED_GADGET_DISTANCE		2
@@ -744,31 +747,31 @@ static struct
     "slip down from certain flat walls","use EM style slipping behaviour"
   },
   {
-    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS(4),
+    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS2(10),
     GADGET_ID_CUSTOM_INDESTRUCTIBLE,
     &custom_element_properties[0].indestructible,
     "indestructible",			"element cannot be destroyed"
   },
   {
-    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS(5),
+    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS2(11),
     GADGET_ID_CUSTOM_CAN_FALL,
     &custom_element_properties[0].can_fall,
     "can fall",				"element can fall down"
   },
   {
-    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS(6),
+    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS2(12),
     GADGET_ID_CUSTOM_CAN_SMASH,
     &custom_element_properties[0].can_smash,
     "can smash",			"element can smash other elements"
   },
   {
-    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS(7),
+    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS2(13),
     GADGET_ID_CUSTOM_PUSHABLE,
     &custom_element_properties[0].pushable,
     "pushable",				"element can be pushed"
   },
   {
-    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS(8),
+    ED_SETTINGS_XPOS,			ED_COUNTER_YPOS2(14),
     GADGET_ID_CUSTOM_SLIPPERY,
     &custom_element_properties[0].slippery,
     "slippery",				"other elements can fall down from it"
@@ -3227,7 +3230,8 @@ static void DrawPropertiesWindow()
     }
   }
 
-  if (HAS_CONTENT(properties_element))
+  if (HAS_CONTENT(properties_element) ||
+      IS_CUSTOM_ELEMENT(properties_element))
   {
     /* draw stickybutton gadget */
     i = ED_CHECKBUTTON_ID_STICK_ELEMENT;
@@ -3239,10 +3243,13 @@ static void DrawPropertiesWindow()
 		 GDI_CHECKED, *checkbutton_info[i].value, GDI_END);
     MapCheckbuttonGadget(i);
 
-    if (IS_AMOEBOID(properties_element))
-      DrawAmoebaContentArea();
-    else
-      DrawElementContentAreas();
+    if (HAS_CONTENT(properties_element))
+    {
+      if (IS_AMOEBOID(properties_element))
+	DrawAmoebaContentArea();
+      else
+	DrawElementContentAreas();
+    }
   }
 
   if (IS_GEM(properties_element))
@@ -4555,8 +4562,12 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 
 	PickDrawingElement(button, new_element);
 
+#if 1
+	if (!stick_element_properties_window)
+#else
 	if (!HAS_CONTENT(properties_element) ||
 	    !stick_element_properties_window)
+#endif
 	{
 	  properties_element = new_element;
 	  if (edit_mode == ED_MODE_PROPERTIES)

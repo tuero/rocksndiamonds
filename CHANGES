@@ -1,5 +1,16 @@
-Pre-Release Version 2.2.0rc3 [?? ??? ????]
+Pre-Release Version 2.2.0rc4 [?? ??? ????]
 ------------------------------------------
+	- added generic selectbox gadget
+	- added special mouse cursor for playfield while playing
+	- font handling now more flexible (support for ISO-Latin-1 fonts)
+
+Pre-Release Version 2.2.0rc3 [11 FEB 2003]
+------------------------------------------
+	- first custom element properties
+	- animation configuration for dynamically defined element actions
+	- automatically downscaled graphics (small graphics not needed anymore)
+	- ".EDITOR" and ".PREVIEW" suffixes for special editor/preview graphics
+	- toon animations (and number of toons) now fully configurable
 
 Pre-Release Version 2.2.0rc2 [13 JAN 2003]
 ------------------------------------------

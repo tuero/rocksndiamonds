@@ -515,6 +515,32 @@ void LoadLevelFromFilename(char *filename)
       level.em_slippery_gems = TRUE;
   }
 
+  /* map some elements which have changed in newer versions */
+  if (level.game_version <= VERSION_IDENT(2,2,0))
+  {
+    int x, y;
+
+    /* map game font elements */
+    for(y=0; y<level.fieldy; y++)
+    {
+      for(x=0; x<level.fieldx; x++)
+      {
+	int element = Ur[x][y];
+
+	if (element == EL_CHAR('['))
+	  element = EL_CHAR_AUMLAUT;
+	else if (element == EL_CHAR('\\'))
+	  element = EL_CHAR_OUMLAUT;
+	else if (element == EL_CHAR(']'))
+	  element = EL_CHAR_UUMLAUT;
+	else if (element == EL_CHAR('^'))
+	  element = EL_CHAR_COPYRIGHT;
+
+	Feld[x][y] = Ur[x][y] = element;
+      }
+    }
+  }
+
   /* determine border element for this level */
   SetBorderElement();
 }

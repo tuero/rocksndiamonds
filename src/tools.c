@@ -779,13 +779,17 @@ void getGraphicSource(int graphic, int frame, Bitmap **bitmap, int *x, int *y)
 
   if (g->offset_y == 0)		/* frames are ordered horizontally */
   {
-    *x = g->src_x + (frame % g->anim_frames_per_line) * g->offset_x;
-    *y = g->src_y + (frame / g->anim_frames_per_line) * g->height;
+    int max_width = g->anim_frames_per_line * g->width;
+
+    *x = (g->src_x + frame * g->offset_x) % max_width;
+    *y = g->src_y + (g->src_x + frame * g->offset_x) / max_width * g->height;
   }
   else if (g->offset_x == 0)	/* frames are ordered vertically */
   {
-    *x = g->src_x + (frame / g->anim_frames_per_line) * g->width;
-    *y = g->src_y + (frame % g->anim_frames_per_line) * g->offset_y;
+    int max_height = g->anim_frames_per_line * g->height;
+
+    *x = g->src_x + (g->src_y + frame * g->offset_y) / max_height * g->width;
+    *y = (g->src_y + frame * g->offset_y) % max_height;
   }
   else				/* frames are ordered diagonally */
   {
