@@ -696,6 +696,7 @@ void HandleKey(Key key, int key_status)
 	  break;
 
 	case KEY_Q:
+	case KEY_q:
 	  local_player->dynamite = 1000;
 	  break;
 
