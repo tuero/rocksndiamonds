@@ -26,6 +26,7 @@
 #define	PCX_FileInvalid		-3
 #define PCX_NoMemory		-4
 #define PCX_ColorFailed		-5
+#define PCX_OtherError		-6
 
 /* global PCX error value */
 extern int errno_pcx;

@@ -110,6 +110,7 @@ char *getLevelFilename(int);
 char *getTapeFilename(int);
 char *getScoreFilename(int);
 char *getSetupFilename(void);
+char *getImageFilename(char *);
 
 void InitTapeDirectory(char *);
 void InitScoreDirectory(char *);

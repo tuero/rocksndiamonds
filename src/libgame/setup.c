@@ -218,6 +218,35 @@ char *getSetupFilename()
   return filename;
 }
 
+static char *getImageBasename(char *basename)
+{
+  char *result = basename;
+
+#if defined(PLATFORM_MSDOS)
+  if (program.filename_prefix != NULL)
+  {
+    int prefix_len = strlen(program.filename_prefix);
+
+    if (strncmp(basename, program.filename_prefix, prefix_len) == 0)
+      result = &basename[prefix_len];
+  }
+#endif
+
+  return result;
+}
+
+char *getImageFilename(char *basename)
+{
+  static char *filename = NULL;
+
+  if (filename != NULL)
+    free(filename);
+
+  filename = getPath2(options.graphics_directory, getImageBasename(basename));
+
+  return filename;
+}
+
 void InitTapeDirectory(char *level_subdir)
 {
   createDirectory(getUserDataDir(), "user data", PERMS_PRIVATE);

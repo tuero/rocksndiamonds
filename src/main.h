@@ -337,6 +337,8 @@ struct GlobalInfo
 
 extern GC		tile_clip_gc;
 extern Bitmap	       *pix[];
+extern Bitmap	       *pix_default[];
+extern Bitmap	       *pix_custom[];
 extern Pixmap		tile_clipmask[];
 extern DrawBuffer      *fieldbuffer;
 extern DrawBuffer      *drawto_field;
@@ -1464,6 +1466,7 @@ extern int		num_element_info;
 #define ICON_TITLE_STRING	PROGRAM_TITLE_STRING
 #define UNIX_USERDATA_DIRECTORY	".rocksndiamonds"
 #define COOKIE_PREFIX		"ROCKSNDIAMONDS"
+#define FILENAME_PREFIX		"Rocks"
 
 #define X11_ICON_FILENAME	"rocks_icon.xbm"
 #define X11_ICONMASK_FILENAME	"rocks_iconmask.xbm"

@@ -234,6 +234,7 @@ static DrawWindow *X11InitWindow()
 Bitmap *X11LoadImage(char *filename)
 {
   Bitmap *new_bitmap = CreateBitmapStruct();
+  char *error = "Read_PCX_to_Pixmap(): %s '%s'";
   int pcx_err;
 
 #if defined(PLATFORM_MSDOS)
@@ -247,24 +248,39 @@ Bitmap *X11LoadImage(char *filename)
     case PCX_Success:
       break;
     case PCX_OpenFailed:
-      Error(ERR_EXIT, "cannot open PCX file '%s'", filename);
+      SetError(error, "cannot open PCX file", filename);
+      return NULL;
     case PCX_ReadFailed:
-      Error(ERR_EXIT, "cannot read PCX file '%s'", filename);
+      SetError(error, "cannot read PCX file", filename);
+      return NULL;
     case PCX_FileInvalid:
-      Error(ERR_EXIT, "invalid PCX file '%s'", filename);
+      SetError(error, "invalid PCX file", filename);
+      return NULL;
     case PCX_NoMemory:
-      Error(ERR_EXIT, "not enough memory for PCX file '%s'", filename);
+      SetError(error, "not enough memory for PCX file", filename);
+      return NULL;
     case PCX_ColorFailed:
-      Error(ERR_EXIT, "cannot get colors for PCX file '%s'", filename);
+      SetError(error, "cannot get colors for PCX file", filename);
+      return NULL;
+    case PCX_OtherError:
+      /* this should already have called SetError() */
+      return NULL;
     default:
-      break;
+      SetError(error, "unknown error reading PCX file", filename);
+      return NULL;
   }
 
   if (!new_bitmap->drawable)
-    Error(ERR_EXIT, "cannot get graphics for '%s'", filename);
+  {
+    SetError("X11LoadImage(): cannot get graphics for '%s'", filename);
+    return NULL;
+  }
 
   if (!new_bitmap->clip_mask)
-    Error(ERR_EXIT, "cannot get clipmask for '%s'", filename);
+  {
+    SetError("X11LoadImage(): cannot get clipmask for '%s'", filename);
+    return NULL;
+  }
 
   /* set GraphicContext inheritated from Window */
   new_bitmap->gc = window->gc;

@@ -172,6 +172,7 @@ struct ProgramInfo
   char *msdos_pointer_filename;
 
   char *cookie_prefix;
+  char *filename_prefix;	/* prefix to cut off from DOS filenames */
 
   int version_major;
   int version_minor;
@@ -236,6 +237,14 @@ struct GfxInfo
 
   int vx, vy;
   int vxsize, vysize;
+};
+
+struct ArtworkInfo
+{
+  char *custom_artwork;
+  char *custom_graphics;
+  char *custom_sounds;
+  char *custom_music;
 };
 
 struct JoystickInfo
@@ -334,6 +343,7 @@ extern struct OptionInfo	options;
 extern struct VideoSystemInfo	video;
 extern struct AudioSystemInfo	audio;
 extern struct GfxInfo		gfx;
+extern struct ArtworkInfo	artwork;
 extern struct JoystickInfo	joystick;
 extern struct SetupInfo		setup;
 
@@ -367,7 +377,7 @@ void InitPlatformDependantStuff(void);
 void ClosePlatformDependantStuff(void);
 
 void InitProgramInfo(char *, char *, char *, char *, char *, char *, char *,
-		     char *, int);
+		     char *, char *, int);
 
 void InitGfxFieldInfo(int, int, int, int, int, int, int, int);
 void InitGfxDoor1Info(int, int, int, int);

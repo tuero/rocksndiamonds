@@ -36,6 +36,7 @@ struct OptionInfo	options;
 struct VideoSystemInfo	video;
 struct AudioSystemInfo	audio;
 struct GfxInfo		gfx;
+struct ArtworkInfo	artwork;
 struct JoystickInfo	joystick;
 struct SetupInfo	setup;
 
@@ -113,7 +114,8 @@ void InitProgramInfo(char *unix_userdata_directory, char *program_title,
 		     char *window_title, char *icon_title,
 		     char *x11_icon_basename, char *x11_iconmask_basename,
 		     char *msdos_pointer_basename,
-		     char *cookie_prefix, int program_version)
+		     char *cookie_prefix, char *filename_prefix,
+		     int program_version)
 {
   char *x11_icon_filename =
     getPath2(options.graphics_directory, x11_icon_basename);
@@ -134,7 +136,10 @@ void InitProgramInfo(char *unix_userdata_directory, char *program_title,
   program.x11_icon_filename = x11_icon_filename;
   program.x11_iconmask_filename = x11_iconmask_filename;
   program.msdos_pointer_filename = msdos_pointer_filename;
+
   program.cookie_prefix = cookie_prefix;
+  program.filename_prefix = filename_prefix;
+
   program.version_major = VERSION_MAJOR(program_version);
   program.version_minor = VERSION_MINOR(program_version);
   program.version_patch = VERSION_PATCH(program_version);
@@ -588,18 +593,15 @@ inline boolean ChangeVideoModeIfNeeded(boolean fullscreen)
   return fullscreen;
 }
 
-Bitmap *LoadImage(char *basename)
+Bitmap *LoadImage(char *filename)
 {
   Bitmap *new_bitmap;
-  char *filename = getPath2(options.graphics_directory, basename);
 
 #if defined(TARGET_SDL)
   new_bitmap = SDLLoadImage(filename);
 #else
   new_bitmap = X11LoadImage(filename);
 #endif
-
-  free(filename);
 
   return new_bitmap;
 }

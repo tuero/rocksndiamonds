@@ -829,17 +829,26 @@ Bitmap *SDLLoadImage(char *filename)
 
   /* load image to temporary surface */
   if ((sdl_image_tmp = IMG_Load(filename)) == NULL)
-    Error(ERR_EXIT, "IMG_Load() failed: %s", SDL_GetError());
+  {
+    SetError("IMG_Load(): %s", SDL_GetError());
+    return NULL;
+  }
 
   /* create native non-transparent surface for current image */
   if ((new_bitmap->surface = SDL_DisplayFormat(sdl_image_tmp)) == NULL)
-    Error(ERR_EXIT, "SDL_DisplayFormat() failed: %s", SDL_GetError());
+  {
+    SetError("SDL_DisplayFormat(): %s", SDL_GetError());
+    return NULL;
+  }
 
   /* create native transparent surface for current image */
   SDL_SetColorKey(sdl_image_tmp, SDL_SRCCOLORKEY,
 		  SDL_MapRGB(sdl_image_tmp->format, 0x00, 0x00, 0x00));
   if ((new_bitmap->surface_masked = SDL_DisplayFormat(sdl_image_tmp)) == NULL)
-    Error(ERR_EXIT, "SDL_DisplayFormat() failed: %s", SDL_GetError());
+  {
+    SetError("SDL_DisplayFormat(): %s", SDL_GetError());
+    return NULL;
+  }
 
   /* free temporary surface */
   SDL_FreeSurface(sdl_image_tmp);

@@ -584,6 +584,23 @@ void GetOptions(char *argv[])
   }
 }
 
+/* used by SetError() and GetError() to store internal error messages */
+static char internal_error[1024];	/* this is bad */
+
+void SetError(char *format, ...)
+{
+  va_list ap;
+
+  va_start(ap, format);
+  vsprintf(internal_error, format, ap);
+  va_end(ap);
+}
+
+char *GetError()
+{
+  return internal_error;
+}
+
 void Error(int mode, char *format, ...)
 {
   char *process_name = "";

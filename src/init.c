@@ -24,11 +24,26 @@
 #include "network.h"
 #include "netserv.h"
 
+static char *image_filename[NUM_PICTURES] =
+{
+  "RocksScreen.pcx",
+  "RocksDoor.pcx",
+  "RocksHeroes.pcx",
+  "RocksToons.pcx",
+  "RocksSP.pcx",
+  "RocksDC.pcx",
+  "RocksMore.pcx",
+  "RocksFont.pcx",
+  "RocksFont2.pcx",
+  "RocksFont3.pcx"
+}; 
+
 static void InitPlayerInfo(void);
 static void InitLevelInfo(void);
 static void InitNetworkServer(void);
 static void InitSound(void);
 static void InitGfx(void);
+static void InitCustomGraphics(void);
 static void InitGfxBackground(void);
 static void InitGadgets(void);
 static void InitElementProperties(void);
@@ -49,7 +64,7 @@ void OpenAll(void)
 		  PROGRAM_TITLE_STRING, WINDOW_TITLE_STRING,
 		  ICON_TITLE_STRING, X11_ICON_FILENAME, X11_ICONMASK_FILENAME,
 		  MSDOS_POINTER_FILENAME,
-		  COOKIE_PREFIX, GAME_VERSION_ACTUAL);
+		  COOKIE_PREFIX, FILENAME_PREFIX, GAME_VERSION_ACTUAL);
 
   InitPlayerInfo();
 
@@ -69,6 +84,8 @@ void OpenAll(void)
 
   InitLevelInfo();
   InitGadgets();		/* needs to know number of level series */
+
+  InitCustomGraphics();
 
   InitGfxBackground();
   DrawMainMenu();
@@ -144,44 +161,12 @@ void InitSound()
   StartSoundserver();
 }
 
-void InitGfx()
+void InitTileClipmasks()
 {
-  int i;
-
 #if defined(TARGET_X11)
   GC copy_clipmask_gc;
   XGCValues clip_gc_values;
   unsigned long clip_gc_valuemask;
-#endif
-
-#if !defined(PLATFORM_MSDOS)
-  static char *image_filename[NUM_PICTURES] =
-  {
-    "RocksScreen.pcx",
-    "RocksDoor.pcx",
-    "RocksHeroes.pcx",
-    "RocksToons.pcx",
-    "RocksSP.pcx",
-    "RocksDC.pcx",
-    "RocksMore.pcx",
-    "RocksFont.pcx",
-    "RocksFont2.pcx",
-    "RocksFont3.pcx"
-  }; 
-#else
-  static char *image_filename[NUM_PICTURES] =
-  {
-    "Screen.pcx",
-    "Door.pcx",
-    "Heroes.pcx",
-    "Toons.pcx",
-    "SP.pcx",
-    "DC.pcx",
-    "More.pcx",
-    "Font.pcx",
-    "Font2.pcx",
-    "Font3.pcx"
-  }; 
 #endif
 
 #if defined(TARGET_X11_NATIVE)
@@ -238,43 +223,7 @@ void InitGfx()
   };
 #endif
 
-  /* initialize some global variables */
-  global.frames_per_second = 0;
-  global.fps_slowdown = FALSE;
-  global.fps_slowdown_factor = 1;
-
-  /* initialize screen properties */
-  InitGfxFieldInfo(SX, SY, SXSIZE, SYSIZE,
-		   REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE);
-  InitGfxDoor1Info(DX, DY, DXSIZE, DYSIZE);
-  InitGfxDoor2Info(VX, VY, VXSIZE, VYSIZE);
-  InitGfxScrollbufferInfo(FXSIZE, FYSIZE);
-
-  /* create additional image buffers for double-buffering */
-  pix[PIX_DB_DOOR] = CreateBitmap(3 * DXSIZE, DYSIZE + VYSIZE, DEFAULT_DEPTH);
-  pix[PIX_DB_FIELD] = CreateBitmap(FXSIZE, FYSIZE, DEFAULT_DEPTH);
-
-  pix[PIX_SMALLFONT] = LoadImage(image_filename[PIX_SMALLFONT]);
-  InitFontInfo(NULL, NULL, pix[PIX_SMALLFONT]);
-
-  DrawInitText(WINDOW_TITLE_STRING, 20, FC_YELLOW);
-  DrawInitText(WINDOW_SUBTITLE_STRING, 50, FC_RED);
-#if defined(PLATFORM_MSDOS)
-  DrawInitText(PROGRAM_DOS_PORT_STRING, 210, FC_BLUE);
-  rest(200);
-#endif
-  DrawInitText("Loading graphics:",120,FC_GREEN);
-
-  for(i=0; i<NUM_PICTURES; i++)
-  {
-    if (i != PIX_SMALLFONT)
-    {
-      DrawInitText(image_filename[i], 150, FC_YELLOW);
-      pix[i] = LoadImage(image_filename[i]);
-    }
-  }
-
-  InitFontInfo(pix[PIX_BIGFONT], pix[PIX_MEDIUMFONT], pix[PIX_SMALLFONT]);
+  int i;
 
   /* initialize pixmap array for special X11 tile clipping to Pixmap 'None' */
   for(i=0; i<NUM_TILES; i++)
@@ -336,6 +285,105 @@ void InitGfx()
   }
 #endif /* TARGET_X11_NATIVE */
 #endif /* TARGET_X11 */
+}
+
+void InitGfx()
+{
+  char *filename;
+  int i;
+
+  /* initialize some global variables */
+  global.frames_per_second = 0;
+  global.fps_slowdown = FALSE;
+  global.fps_slowdown_factor = 1;
+
+  /* initialize screen properties */
+  InitGfxFieldInfo(SX, SY, SXSIZE, SYSIZE,
+		   REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE);
+  InitGfxDoor1Info(DX, DY, DXSIZE, DYSIZE);
+  InitGfxDoor2Info(VX, VY, VXSIZE, VYSIZE);
+  InitGfxScrollbufferInfo(FXSIZE, FYSIZE);
+
+  /* create additional image buffers for double-buffering */
+  pix[PIX_DB_DOOR] = CreateBitmap(3 * DXSIZE, DYSIZE + VYSIZE, DEFAULT_DEPTH);
+  pix[PIX_DB_FIELD] = CreateBitmap(FXSIZE, FYSIZE, DEFAULT_DEPTH);
+
+  filename = getImageFilename(image_filename[PIX_SMALLFONT]);
+  if ((pix_default[PIX_SMALLFONT] = LoadImage(filename)) == NULL)
+    Error(ERR_EXIT, "LoadImage() failed: %s", GetError());
+  pix_custom[PIX_SMALLFONT] = NULL;
+  pix[PIX_SMALLFONT] = pix_default[PIX_SMALLFONT];
+
+  InitFontInfo(NULL, NULL, pix[PIX_SMALLFONT]);
+
+  DrawInitText(WINDOW_TITLE_STRING, 20, FC_YELLOW);
+  DrawInitText(WINDOW_SUBTITLE_STRING, 50, FC_RED);
+#if defined(PLATFORM_MSDOS)
+  DrawInitText(PROGRAM_DOS_PORT_STRING, 210, FC_BLUE);
+  rest(200);
+#endif
+  DrawInitText("Loading graphics:",120,FC_GREEN);
+
+  for(i=0; i<NUM_PICTURES; i++)
+  {
+    if (i != PIX_SMALLFONT)
+    {
+      DrawInitText(image_filename[i], 150, FC_YELLOW);
+
+      filename = getImageFilename(image_filename[i]);
+      if ((pix_default[i] = LoadImage(filename)) == NULL)
+	Error(ERR_EXIT, "LoadImage() failed: %s", GetError());
+      pix_custom[i] = NULL;
+      pix[i] = pix_default[i];
+    }
+  }
+
+  InitFontInfo(pix[PIX_BIGFONT], pix[PIX_MEDIUMFONT], pix[PIX_SMALLFONT]);
+
+  InitTileClipmasks();
+}
+
+void LoadCustomGraphics()
+{
+#if 0
+  int i;
+
+  for(i=0; i<NUM_PICTURES; i++)
+  {
+    Bitmap *new_pic = 
+    pix_custom[i] = LoadImage(image_filename[i]);
+  }
+#endif
+}
+
+void InitCustomGraphics()
+{
+#if 0
+  static char *filename = NULL;
+
+  /* look for optional directory ~/.<program>/graphics */
+  filename = getPath2(getUserDataDir(), GRAPHICS_DIRECTORY);
+  if (access(dir, F_OK) == 0)
+  {
+  }
+
+
+
+
+(leveldir_current->user_defined ?
+		       getUserLevelDir("") :
+		       options.level_directory),
+		      leveldir_current->fullpath,
+		      basename);
+
+
+
+  filename = getPath3((leveldir_current->user_defined ?
+		       getUserLevelDir("") :
+		       options.level_directory),
+		      leveldir_current->fullpath,
+		      basename);
+#endif
 }
 
 void InitGfxBackground()
@@ -1524,9 +1572,12 @@ void CloseAllAndExit(int exit_value)
   CloseAudio();
 
   for(i=0; i<NUM_BITMAPS; i++)
-    FreeBitmap(pix[i]);
-  CloseVideoDisplay();
+  {
+    FreeBitmap(pix_default[i]);
+    FreeBitmap(pix_custom[i]);
+  }
 
+  CloseVideoDisplay();
   ClosePlatformDependantStuff();
 
   exit(exit_value);

@@ -175,9 +175,13 @@ XImageInfo *Image_to_Pixmap(Display *display, int screen, Visual *visual,
   XImage *ximage;
   XImageInfo *ximageinfo;
   byte *src_ptr, *dst_ptr;
+  char *error = "Image_to_Pixmap(): %s";
 
   if (image->type == IMAGETYPE_TRUECOLOR && depth == 8)
-    Error(ERR_EXIT, "cannot handle true-color images on 8-bit display");
+  {
+    SetError(error, "cannot handle true-color images on 8-bit display");
+    return NULL;
+  }
 
   if (!global_cmap)
   {
@@ -392,7 +396,10 @@ XImageInfo *Image_to_Pixmap(Display *display, int screen, Visual *visual,
 	  }
 
 	  if (!color_found)		/* no more free color cells */
-	    Error(ERR_EXIT, "cannot allocate enough color cells");
+	  {
+	    SetError(error, "cannot allocate enough color cells");
+	    return NULL;
+	  }
 
 	  xcolor.pixel = xcolor2.pixel;
 	  xcolor_private[xcolor.pixel] = xcolor;
@@ -412,9 +419,9 @@ XImageInfo *Image_to_Pixmap(Display *display, int screen, Visual *visual,
       break;
   
     default:
-      Error(ERR_RETURN, "display class not supported");
-      Error(ERR_EXIT, "DirectColor, TrueColor or PseudoColor display needed");
-      break;
+      Error(ERR_RETURN,"DirectColor, TrueColor or PseudoColor display needed");
+      SetError(error, "display class not supported");
+      return NULL;
   }
 
 #if DEBUG_TIMING
@@ -483,9 +490,9 @@ XImageInfo *Image_to_Pixmap(Display *display, int screen, Visual *visual,
 	}
 
         default:
-	  Error(ERR_RETURN, "image type not supported");
-	  Error(ERR_EXIT, "RGB or TrueColor image needed");
-	  break;
+	  Error(ERR_RETURN, "RGB or TrueColor image needed");
+	  SetError(error, "image type not supported");
+	  return NULL;
       }
       break;
     }
@@ -514,9 +521,9 @@ XImageInfo *Image_to_Pixmap(Display *display, int screen, Visual *visual,
     }
 
     default:
-      Error(ERR_RETURN, "display class not supported");
-      Error(ERR_EXIT, "DirectColor, TrueColor or PseudoColor display needed");
-      break;
+      Error(ERR_RETURN,"DirectColor, TrueColor or PseudoColor display needed");
+      SetError(error, "display class not supported");
+      return NULL;
   }
 
   if (redvalue)
@@ -586,7 +593,7 @@ int Read_PCX_to_Pixmap(Display *display, Window window, GC gc, char *filename,
   /* convert image structure to X11 Pixmap */
   if (!(ximageinfo = Image_to_Pixmap(display, screen, visual,
 				     window, gc, depth, image)))
-    Error(ERR_EXIT, "cannot convert Image to Pixmap");
+    return PCX_OtherError;
 
   /* if a private colormap has been created, install it */
   if (ximageinfo->cmap != DefaultColormap(display, screen))

@@ -20,6 +20,8 @@
 
 GC		tile_clip_gc;
 Bitmap	       *pix[NUM_BITMAPS];
+Bitmap	       *pix_default[NUM_BITMAPS];
+Bitmap	       *pix_custom[NUM_BITMAPS];
 Pixmap		tile_clipmask[NUM_TILES];
 DrawBuffer     *fieldbuffer;
 DrawBuffer     *drawto_field;

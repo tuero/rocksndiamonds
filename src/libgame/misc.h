@@ -70,8 +70,13 @@ char *getPath2(char *, char *);
 char *getPath3(char *, char *, char*);
 char *getStringCopy(char *);
 char *getStringToLower(char *);
+
 void GetOptions(char **);
+
+void SetError(char *, ...);
+char *GetError(void);
 void Error(int, char *, ...);
+
 void *checked_malloc(unsigned long);
 void *checked_calloc(unsigned long);
 void *checked_realloc(void *, unsigned long);
