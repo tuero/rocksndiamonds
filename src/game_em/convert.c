@@ -213,13 +213,13 @@ int cleanup_em_level(unsigned char *src, int length)
   /* fix acid */
   for (i = 64; i < 2048; i++)
   {
-    if (src[i] == 63)
+    if (src[i] == 63)		/* 'Xacid_s' (acid pool, bottom middle) */
     {
       if (file_version == FILE_VERSION_EM_V4 &&
 	  i < 2048 - 64 && src[i + 64] == 63)
-	src[i - 64] = 255;
+	src[i - 64] = 255;	/* replace element above with 'Xfake_acid_1' */
       else
-	src[i - 64] = 101;
+	src[i - 64] = 101;	/* replace element above with 'Xacid_1' */
     }
   }
 #endif
