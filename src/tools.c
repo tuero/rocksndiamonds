@@ -612,12 +612,23 @@ void DrawPlayer(struct PlayerInfo *player)
 
       if (element == EL_FELSBROCKEN && sxx)
       {
-	int phase = (player->GfxPos / (TILEX/4));
+	int phase = (player->GfxPos / (TILEX / 4));
 
 	if (player->MovDir == MV_LEFT)
 	  graphic += phase;
 	else
-	  graphic += (phase+4)%4;
+	  graphic += (phase + 4) % 4;
+      }
+      else if (element == EL_SP_ZONK && sxx)
+      {
+	int phase = (player->GfxPos / (TILEX / 4));
+
+	graphic = GFX2_SP_ZONK;
+
+	if (player->MovDir == MV_LEFT)
+	  graphic += phase;
+	else
+	  graphic += (phase + 4) % 4;
       }
 
       DrawGraphicShifted(px, py, sxx, syy, graphic, NO_CUTTING, NO_MASKING);
@@ -1226,9 +1237,29 @@ void DrawScreenElementExt(int x, int y, int dx, int dy, int element,
   {
     graphic += !phase2;
   }
-  else if ((element == EL_FELSBROCKEN || IS_GEM(element)) && !cut_mode)
+  else if ((element == EL_FELSBROCKEN || element == EL_SP_ZONK ||
+	    IS_GEM(element)) && !cut_mode)
   {
-    if (element != EL_SP_INFOTRON)
+    if (element == EL_SP_ZONK)
+    {
+      /*
+      graphic = GFX2_SP_ZONK + phase2 * 2;
+      */
+
+      /*
+      printf("-> %d\n", phase4);
+      */
+
+      graphic = GFX2_SP_ZONK;
+
+      if (dir == MV_LEFT)
+	graphic += (4 - phase4) % 4;
+      else if (dir == MV_RIGHT)
+	graphic += phase4;
+      else
+	graphic += phase2 * 2;
+    }
+    else if (element != EL_SP_INFOTRON)
       graphic += phase2 * (element == EL_FELSBROCKEN ? 2 : 1);
   }
   else if (element == EL_SIEB_LEER || element == EL_SIEB2_LEER ||
