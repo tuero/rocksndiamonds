@@ -3019,16 +3019,16 @@ void LoadMusicInfo()
 #endif
 }
 
-void add_info_animation(int element, int action, int direction, int delay,
-			int *num_list_entries)
+void add_demo_anim(int element, int action, int direction, int delay,
+		   int *num_list_entries)
 {
-  struct InfoAnimationInfo *new_list_entry;
+  struct DemoAnimInfo *new_list_entry;
   (*num_list_entries)++;
 
-  info_animation_info =
-    checked_realloc(info_animation_info,
-		    *num_list_entries * sizeof(struct InfoAnimationInfo));
-  new_list_entry = &info_animation_info[*num_list_entries - 1];
+  demo_anim_info =
+    checked_realloc(demo_anim_info,
+		    *num_list_entries * sizeof(struct DemoAnimInfo));
+  new_list_entry = &demo_anim_info[*num_list_entries - 1];
 
   new_list_entry->element = element;
   new_list_entry->action = action;
@@ -3054,9 +3054,9 @@ void print_unknown_token_end(int token_nr)
     Error(ERR_RETURN_LINE, "-");
 }
 
-void LoadInfoAnimations()
+void LoadDemoAnimInfo()
 {
-  char *filename = getElementInfoFilename();
+  char *filename = getDemoAnimInfoFilename();
   SetupFileList *setup_file_list, *list;
   SetupFileHash *element_hash, *action_hash, *direction_hash;
   int num_list_entries = 0;
@@ -3069,13 +3069,13 @@ void LoadInfoAnimations()
     SetupFileList *insert_ptr;
 
     insert_ptr = setup_file_list =
-      newSetupFileList(info_animation_config[0].token,
-		       info_animation_config[0].value);
+      newSetupFileList(demo_anim_info_config[0].token,
+		       demo_anim_info_config[0].value);
 
-    for (i=1; info_animation_config[i].token; i++)
-	insert_ptr = addListEntry(insert_ptr,
-				  info_animation_config[i].token,
-				  info_animation_config[i].value);
+    for (i=1; demo_anim_info_config[i].token; i++)
+      insert_ptr = addListEntry(insert_ptr,
+				demo_anim_info_config[i].token,
+				demo_anim_info_config[i].value);
   }
 
   element_hash   = newSetupFileHash();
@@ -3102,7 +3102,7 @@ void LoadInfoAnimations()
 
     if (strcmp(list->token, "end") == 0)
     {
-      add_info_animation(-1, -1, -1, -1, &num_list_entries);
+      add_demo_anim(-1, -1, -1, -1, &num_list_entries);
 
       continue;
     }
@@ -3113,8 +3113,7 @@ void LoadInfoAnimations()
     if (element_value != NULL)
     {
       /* element found */
-      add_info_animation(atoi(element_value), -1, -1,
-			 delay, &num_list_entries);
+      add_demo_anim(atoi(element_value), -1, -1, delay, &num_list_entries);
 
       continue;
     }
@@ -3147,8 +3146,8 @@ void LoadInfoAnimations()
     if (action_value != NULL)
     {
       /* action found */
-      add_info_animation(atoi(element_value), atoi(action_value), -1,
-			 delay, &num_list_entries);
+      add_demo_anim(atoi(element_value), atoi(action_value), -1, delay,
+		    &num_list_entries);
       free(element_token);
 
       continue;
@@ -3160,8 +3159,8 @@ void LoadInfoAnimations()
     if (direction_value != NULL)
     {
       /* direction found */
-      add_info_animation(atoi(element_value), -1, atoi(direction_value),
-			 delay, &num_list_entries);
+      add_demo_anim(atoi(element_value), -1, atoi(direction_value), delay,
+		    &num_list_entries);
       free(element_token);
 
       continue;
@@ -3197,9 +3196,8 @@ void LoadInfoAnimations()
     if (direction_value != NULL)
     {
       /* direction found */
-      add_info_animation(atoi(element_value), atoi(action_value),
-			 atoi(direction_value),
-			 delay, &num_list_entries);
+      add_demo_anim(atoi(element_value), atoi(action_value),
+		    atoi(direction_value), delay, &num_list_entries);
       free(element_token);
       free(action_token);
 
@@ -3214,7 +3212,7 @@ void LoadInfoAnimations()
 
   print_unknown_token_end(num_unknown_tokens);
 
-  add_info_animation(-999, -999, -999, -999, &num_list_entries);
+  add_demo_anim(-999, -999, -999, -999, &num_list_entries);
 
   freeSetupFileList(setup_file_list);
   freeSetupFileHash(element_hash);
@@ -3225,9 +3223,43 @@ void LoadInfoAnimations()
   /* TEST ONLY */
   for (i=0; i < num_list_entries; i++)
     printf("::: %d, %d, %d => %d\n",
-	   info_animation_info[i].element,
-	   info_animation_info[i].action,
-	   info_animation_info[i].direction,
-	   info_animation_info[i].delay);
+	   demo_anim_info[i].element,
+	   demo_anim_info[i].action,
+	   demo_anim_info[i].direction,
+	   demo_anim_info[i].delay);
+#endif
+}
+
+void LoadDemoAnimText()
+{
+  char *filename = getDemoAnimTextFilename();
+  int i;
+
+  if (demo_anim_text != NULL)
+    freeSetupFileList(demo_anim_text);
+
+  if ((demo_anim_text = loadSetupFileList(filename)) == NULL)
+  {
+    /* use reliable default values from static configuration */
+    SetupFileList *insert_ptr;
+
+    insert_ptr = demo_anim_text =
+      newSetupFileList(demo_anim_text_config[0].token,
+		       demo_anim_text_config[0].value);
+
+    for (i=1; demo_anim_text_config[i].token; i++)
+      insert_ptr = addListEntry(insert_ptr,
+				demo_anim_text_config[i].token,
+				demo_anim_text_config[i].value);
+  }
+
+#if 0
+  /* TEST ONLY */
+  {
+    SetupFileList *list;
+
+    for (list = demo_anim_text; list != NULL; list = list->next)
+      printf("::: '%s' => '%s'\n", list->token, list->value);
+  }
 #endif
 }

@@ -136,7 +136,7 @@ SRCS =	main.c		\
 	conf_gfx.c	\
 	conf_snd.c	\
 	conf_mus.c	\
-	conf_inf.c	\
+	conf_dem.c	\
 	init.c		\
 	config.c	\
 	events.c	\
@@ -154,7 +154,7 @@ OBJS =	main.o		\
 	conf_gfx.o	\
 	conf_snd.o	\
 	conf_mus.o	\
-	conf_inf.o	\
+	conf_dem.o	\
 	init.o		\
 	config.o	\
 	events.o	\

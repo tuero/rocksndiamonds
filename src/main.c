@@ -105,7 +105,8 @@ struct GraphicInfo     *graphic_info = NULL;
 struct SoundInfo       *sound_info = NULL;
 struct MusicInfo       *music_info = NULL;
 struct MusicFileInfo   *music_file_info = NULL;
-struct InfoAnimationInfo *info_animation_info = NULL;
+struct DemoAnimInfo    *demo_anim_info = NULL;
+struct SetupFileList   *demo_anim_text = NULL;
 
 
 /* ------------------------------------------------------------------------- */

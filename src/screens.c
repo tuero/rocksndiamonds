@@ -812,7 +812,7 @@ static int num_helpscreen_music = 7;
 static int helpscreen_musicpos;
 
 #if 1
-void DrawHelpScreenElAction(int start)
+void DrawHelpScreenElAction(int start, boolean init)
 {
   int i = 0, j = 0;
   int xstart = mSX + 16;
@@ -823,13 +823,25 @@ void DrawHelpScreenElAction(int start)
   int delay;
   int sync_frame;
 
-  while (info_animation_info[j].element != -999)
+  if (init)
+  {
+    SetMainBackgroundImage(IMG_BACKGROUND_INFO);
+    ClearWindow();
+    DrawHeadline();
+
+    DrawTextSCentered(100, FONT_TEXT_1, "The game elements:");
+
+    DrawTextSCentered(SYSIZE - 20, FONT_TEXT_4,
+		      "Press any key or button for next page");
+  }
+
+  while (demo_anim_info[j].element != -999)
   {
     if (i >= start + MAX_HELPSCREEN_ELS || i >= num_helpscreen_els)
       break;
     else if (i < start)
     {
-      while (info_animation_info[j].element != -1)
+      while (demo_anim_info[j].element != -1)
 	j++;
 
       j++;
@@ -840,9 +852,9 @@ void DrawHelpScreenElAction(int start)
 
     j += helpscreen_step[i - start];
 
-    element = info_animation_info[j].element;
-    action = info_animation_info[j].action;
-    direction = info_animation_info[j].direction;
+    element = demo_anim_info[j].element;
+    action = demo_anim_info[j].action;
+    direction = demo_anim_info[j].direction;
 
     if (action != -1 && direction != -1)
       graphic = el_act_dir2img(element, action, direction);
@@ -853,7 +865,7 @@ void DrawHelpScreenElAction(int start)
     else
       graphic = el2img(element);
 
-    delay = info_animation_info[j++].delay;
+    delay = demo_anim_info[j++].delay;
 
     if (delay == -1)
       delay = 1000000;
@@ -869,7 +881,7 @@ void DrawHelpScreenElAction(int start)
       helpscreen_frame[i - start]--;
     }
 
-    if (info_animation_info[j].element == -1)
+    if (demo_anim_info[j].element == -1)
     {
       if (!helpscreen_frame[i - start])
 	helpscreen_step[i - start] = 0;
@@ -878,7 +890,7 @@ void DrawHelpScreenElAction(int start)
     {
       if (!helpscreen_frame[i - start])
 	helpscreen_step[i - start]++;
-      while(info_animation_info[j].element != -1)
+      while(demo_anim_info[j].element != -1)
 	j++;
     }
 
@@ -888,6 +900,9 @@ void DrawHelpScreenElAction(int start)
 			       TILEX, TILEY);
     DrawGraphicAnimationExt(drawto, xstart, ystart + (i - start) * ystep,
 			    graphic, sync_frame, USE_MASKING);
+
+    if (init)
+      DrawHelpScreenElText(element, action, direction, i - start);
 
     i++;
   }
@@ -984,6 +999,46 @@ void DrawHelpScreenElAction(int start)
 }
 #endif
 
+#if 1
+void DrawHelpScreenElText(int element, int action, int direction, int ypos)
+{
+  int xstart = mSX + 56;
+  int ystart = mSY + 65 + 2 * 32;
+  int ystep = TILEY + 4;
+  char *text;
+
+  text = getListEntry(demo_anim_text, element_info[element].token_name);
+  if (text == NULL)
+  {
+    char token[MAX_LINE_LEN];
+
+    strcpy(token, element_info[element].token_name);
+
+    if (action != -1)
+      strcat(token, element_action_info[action].suffix);
+
+    if (direction != -1)
+      strcat(token, element_direction_info[MV_DIR_BIT(direction)].suffix);
+
+    text = getListEntry(demo_anim_text, token);
+
+    if (text == NULL)
+      text = "[Oops! No Text found!]";
+  }
+
+#if 1
+  DrawTextToTextArea(xstart, ystart + ypos * ystep, text, FONT_TEXT_2, 34,
+		     34, 2, BLIT_ON_BACKGROUND);
+#else
+  if (strlen(text) > 25)
+    text[25] = '\0';
+
+  DrawText(xstart, ystart + ypos * ystep + 8, text, FONT_TEXT_2);
+#endif
+}
+
+#else
+
 void DrawHelpScreenElText(int start)
 {
   int i;
@@ -1008,6 +1063,7 @@ void DrawHelpScreenElText(int start)
   DrawTextSCentered(ybottom, FONT_TEXT_4,
 		    "Press any key or button for next page");
 }
+#endif
 
 void DrawHelpScreenMusicText(int num)
 {
@@ -1125,20 +1181,23 @@ void DrawHelpScreen()
   helpscreen_musicpos = 0;
   helpscreen_state = 0;
 
-  LoadInfoAnimations();
+  LoadDemoAnimInfo();
+  LoadDemoAnimText();
   LoadMusicInfo();
 
   num_helpscreen_els = 0;
-  for (i=0; info_animation_info[i].element != -999; i++)
-    if (info_animation_info[i].element == -1)
+  for (i=0; demo_anim_info[i].element != -999; i++)
+    if (demo_anim_info[i].element == -1)
       num_helpscreen_els++;
 
   num_helpscreen_music = 0;
   for (list = music_file_info; list != NULL; list = list->next)
     num_helpscreen_music++;
 
+  DrawHelpScreenElAction(0, TRUE);
+#if 0
   DrawHelpScreenElText(0);
-  DrawHelpScreenElAction(0);
+#endif
 
   FadeToFront();
   InitAnimation();
@@ -1164,8 +1223,10 @@ void HandleHelpScreen(int button)
       helpscreen_state++;
 
       FrameCounter = 0;
+      DrawHelpScreenElAction(helpscreen_state * MAX_HELPSCREEN_ELS, TRUE);
+#if 0
       DrawHelpScreenElText(helpscreen_state * MAX_HELPSCREEN_ELS);
-      DrawHelpScreenElAction(helpscreen_state * MAX_HELPSCREEN_ELS);
+#endif
     }
     else if (helpscreen_state <
 	     num_helpscreen_els_pages + num_helpscreen_music - 1)
@@ -1198,7 +1259,7 @@ void HandleHelpScreen(int button)
     if (DelayReached(&hs_delay, GAME_FRAME_DELAY))
     {
       if (helpscreen_state < num_helpscreen_els_pages)
-	DrawHelpScreenElAction(helpscreen_state * MAX_HELPSCREEN_ELS);
+	DrawHelpScreenElAction(helpscreen_state * MAX_HELPSCREEN_ELS, FALSE);
     }
 
     PlayMenuSoundIfLoop();

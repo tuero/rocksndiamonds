@@ -19,7 +19,7 @@
    reliable default values. If that value is GFX_ARG_UNDEFINED, it will
    be dynamically determined, using some of the other list values. */
 
-struct ConfigInfo info_animation_config[] =
+struct ConfigInfo demo_anim_info_config[] =
 {
   { "player_1.moving.down",			"16"			},
   { "player_1.moving.up",			"16"			},
@@ -357,4 +357,261 @@ struct ConfigInfo info_animation_config[] =
   { "end",					""			},
 
   { NULL,					NULL			}
+};
+
+struct ConfigInfo demo_anim_text_config[] =
+{
+  {
+    "player_1.moving.down",
+    "THE HERO: (Is _this_ guy good old Rockford?)"
+  },
+  {
+    "sand",
+    "Normal sand: You can dig through it"
+  },
+  {
+    "empty_space",
+    "Empty field: You can walk through it"
+  },
+  {
+    "quicksand_empty",
+    "Quicksand: You cannot pass it, but rocks can fall through it"
+  },
+  {
+    "steelwall",
+    "Massive Wall: Nothing can go through it"
+  },
+  {
+    "wall",
+    "Normal Wall: You can't go through it, but you can bomb it away"
+  },
+  {
+    "expandable_wall.growing.left",
+    "Growing Wall: Grows in several directions if there is an empty field"
+  },
+  {
+    "invisible_wall",
+    "Invisible Wall: Behaves like normal wall, but is invisible"
+  },
+  {
+    "wall_slippery",
+    "Old Wall: Like normal wall, but some things can fall down from it"
+  },
+  {
+    "char_space",
+    "Letter Wall: Looks like a letter, behaves like a normal wall"
+  },
+  {
+    "emerald",
+    "Emerald: You must collect enough of them to finish a level"
+  },
+  {
+    "diamond",
+    "Diamond: Counts as 3 emeralds, but can be destroyed by rocks"
+  },
+  {
+    "bd_diamond",
+    "Diamond (BD style): Counts like one emerald and behaves a bit different"
+  },
+  {
+    "emerald_yellow",
+    "Colorful Gems: Seem to behave like Emeralds"
+  },
+  {
+    "bd_rock",
+    "Rock: Smashes several things; Can be moved by the player"
+  },
+  {
+    "bomb",
+    "Bomb: You can move it, but be careful when dropping it"
+  },
+  {
+    "nut",
+    "Nut: Throw a rock on it to open it; Each nut contains an emerald"
+  },
+  {
+    "wall_emerald",
+    "Wall with an emerald inside: Bomb the wall away to get it"
+  },
+  {
+    "wall_diamond",
+    "Wall with a diamond inside: Bomb the wall away to get it"
+  },
+  {
+    "wall_bd_diamond",
+    "Wall with BD style diamond inside: Bomb the wall away to get it"
+  },
+  {
+    "wall_emerald_yellow",
+    "Wall with colorful gem inside: Bomb the wall away to get it"
+  },
+  {
+    "acid",
+    "Acid: Things that fall in are gone forever (including our hero)"
+  },
+  {
+    "key_1",
+    "Key: Opens the door that has the same color (red/yellow/green/blue)"
+  },
+  {
+    "gate_1",
+    "Door: Can be opened by the key with the same color"
+  },
+  {
+    "gate_1_gray",
+    "Door: You have to find out the right color of the key for it"
+  },
+  {
+    "dynamite",
+    "Dynamite: Collect it and use it to destroy walls or kill enemies"
+  },
+  {
+    "dynamite.active",
+    "Dynamite: This one explodes after a few seconds"
+  },
+  {
+    "dynabomb.active",
+    "Dyna Bomb: Explodes in 4 directions with variable explosion size"
+  },
+  {
+    "dynabomb_increase_number",
+    "Dyna Bomb: Increases the number of dyna bombs available at a time"
+  },
+  {
+    "dynabomb_increase_size",
+    "Dyna Bomb: Increases the size of explosion of dyna bombs"
+  },
+  {
+    "dynabomb_increase_power",
+    "Dyna Bomb: Increases the power of explosion of dyna bombs"
+  },
+  {
+    "spaceship.right",
+    "Spaceship: Moves at the left side of walls; don't touch it!"
+  },
+  {
+    "bug.right",
+    "Bug: Moves at the right side of walls; don't touch it!"
+  },
+  {
+    "bd_butterfly",
+    "Butterfly: Moves at the right side of walls; don't touch it!"
+  },
+  {
+    "bd_firefly",
+    "Firefly: Moves at the left side of walls; don't touch it!"
+  },
+  {
+    "pacman.right",
+    "Pacman: Eats the amoeba and you, if you're not careful"
+  },
+  {
+    "yamyam",
+    "Cruncher: Eats diamonds and you, if you're not careful"
+  },
+  {
+    "dark_yamyam",
+    "Cruncher (BD style): Eats almost everything"
+  },
+  {
+    "robot",
+    "Robot: Tries to kill the player"
+  },
+  {
+    "mole.moving.right",
+    "The mole: Eats the amoeba and turns empty space into normal sand"
+  },
+  {
+    "penguin.moving.right",
+    "The penguin: Guide him to the exit, but keep him away from monsters!"
+  },
+  {
+    "pig.moving.right",
+    "The Pig: Harmless, but eats all gems it can get"
+  },
+  {
+    "dragon.moving.right",
+    "The Dragon: Breathes fire, especially to some monsters"
+  },
+  {
+    "satellite",
+    "Sonde: Follows you everywhere; harmless, but may block your way"
+  },
+  {
+    "robot_wheel",
+    "Magic Wheel: Touch it to get rid of the robots for some seconds"
+  },
+  {
+    "lamp",
+    "Light Bulb: All of them must be switched on to finish a level"
+  },
+  {
+    "time_orb_full",
+    "Extra Time Orb: Adds some seconds to the time available for the level"
+  },
+  {
+    "amoeba_drop",
+    "Amoeba Drop: Grows to an amoeba on the ground - don't touch it"
+  },
+  {
+    "amoeba_dead",
+    "Dead Amoeba: Does not grow, but can still kill bugs and spaceships"
+  },
+  {
+    "amoeba_wet",
+    "Normal Amoeba: Grows through empty fields, sand and quicksand"
+  },
+  {
+    "amoeba_wet",
+    "Dropping Amoeba: This one makes drops that grow to a new amoeba"
+  },
+  {
+    "amoeba_full",
+    "Living Amoeba (BD style): Contains other element, when surrounded"
+  },
+  {
+    "game_of_life",
+    "Game Of Life: Behaves like the well known 'Game Of Life' (2333 style)"
+  },
+  {
+    "biomaze",
+    "Biomaze: A bit like the 'Game Of Life', but builds crazy mazes"
+  },
+  {
+    "magic_wall.active",
+    "Magic Wall: Changes rocks, emeralds and diamonds when they pass it"
+  },
+  {
+    "bd_magic_wall.active",
+    "Magic Wall (BD style): Changes rocks and BD style diamonds"
+  },
+  {
+    "exit_closed",
+    "Exit door: Opens if you have enough emeralds to finish the level"
+  },
+  {
+    "exit_open",
+    "Open exit door: Enter here to leave the level and exit the actual game"
+  },
+  {
+    "sokoban_object",
+    "Sokoban element: Object which must be pushed to an empty field"
+  },
+  {
+    "sokoban_field_empty",
+    "Sokoban element: Empty field where a Sokoban object can be placed on"
+  },
+  {
+    "sokoban_field_full",
+    "Sokoban element: Field with object which can be pushed away"
+  },
+  {
+    "speed_pill",
+    "Speed pill: Lets the player run twice as fast as normally"
+  },
+
+  {
+    NULL,
+    NULL
+  }
 };

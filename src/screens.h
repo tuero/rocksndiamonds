@@ -26,8 +26,8 @@ void DrawHeadline(void);
 void DrawMainMenu(void);
 void HandleMainMenu(int, int, int, int, int);
 
-void DrawHelpScreenElAction(int);
-void DrawHelpScreenElText(int);
+void DrawHelpScreenElAction(int, boolean);
+void DrawHelpScreenElText(int, int, int, int);
 void DrawHelpScreenMusicText(int);
 void DrawHelpScreenCreditsText(void);
 void DrawHelpScreen(void);

@@ -1564,7 +1564,7 @@ struct SpecialSuffixInfo
   int value;
 };
 
-struct InfoAnimationInfo
+struct DemoAnimInfo
 {
   int element;
   int action;
@@ -1667,13 +1667,15 @@ extern struct GraphicInfo      *graphic_info;
 extern struct SoundInfo	       *sound_info;
 extern struct MusicInfo	       *music_info;
 extern struct MusicFileInfo    *music_file_info;
-extern struct InfoAnimationInfo *info_animation_info;
+extern struct DemoAnimInfo     *demo_anim_info;
+extern struct SetupFileList    *demo_anim_text;
 extern struct ConfigInfo	image_config[];
 extern struct ConfigInfo	sound_config[];
 extern struct ConfigInfo	music_config[];
 extern struct ConfigInfo	image_config_suffix[];
 extern struct ConfigInfo	sound_config_suffix[];
 extern struct ConfigInfo	music_config_suffix[];
-extern struct ConfigInfo	info_animation_config[];
+extern struct ConfigInfo	demo_anim_info_config[];
+extern struct ConfigInfo	demo_anim_text_config[];
 
 #endif	/* MAIN_H */

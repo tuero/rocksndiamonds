@@ -1,4 +1,7 @@
 
+2003-11-25
+	* added configurable "bored" and "sleeping" animations for the player
+
 2003-11-22
 	* added "copy" and "exchange" functions for custom elements to editor
 

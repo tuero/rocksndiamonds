@@ -417,14 +417,26 @@ char *getEditorSetupFilename()
   return filename;
 }
 
-char *getElementInfoFilename()
+char *getDemoAnimInfoFilename()
 {
   static char *filename = NULL;
 
   if (filename != NULL)
     free(filename);
 
-  filename = getPath2(getCurrentLevelDir(), ELEMENTINFO_FILENAME);
+  filename = getPath2(getCurrentLevelDir(), DEMOANIMINFO_FILENAME);
+
+  return filename;
+}
+
+char *getDemoAnimTextFilename()
+{
+  static char *filename = NULL;
+
+  if (filename != NULL)
+    free(filename);
+
+  filename = getPath2(getCurrentLevelDir(), DEMOANIMTEXT_FILENAME);
 
   return filename;
 }
@@ -1364,9 +1376,10 @@ static void printSetupFileHash(SetupFileHash *hash)
 static void *loadSetupFileData(char *filename, boolean use_hash)
 {
   int line_len;
-  char line[MAX_LINE_LEN];
+  char line[MAX_LINE_LEN], previous_line[MAX_LINE_LEN];
   char *token, *value, *line_ptr;
   void *setup_file_data, *insert_ptr = NULL;
+  boolean read_continued_line = FALSE;
   FILE *file;
 
   if (use_hash)
@@ -1386,10 +1399,42 @@ static void *loadSetupFileData(char *filename, boolean use_hash)
     if (!fgets(line, MAX_LINE_LEN, file))
       break;
 
-    /* cut trailing comment or whitespace from input line */
+    /* cut trailing newline or carriage return */
+    for (line_ptr = &line[strlen(line)]; line_ptr >= line; line_ptr--)
+      if ((*line_ptr == '\n' || *line_ptr == '\r') && *(line_ptr + 1) == '\0')
+	*line_ptr = '\0';
+
+    if (read_continued_line)
+    {
+      /* cut leading whitespaces from input line */
+      for (line_ptr = line; *line_ptr; line_ptr++)
+	if (*line_ptr != ' ' && *line_ptr != '\t')
+	  break;
+
+      /* append new line to existing line, if there is enough space */
+      if (strlen(previous_line) + strlen(line_ptr) < MAX_LINE_LEN)
+	strcat(previous_line, line_ptr);
+
+      strcpy(line, previous_line);	/* copy storage buffer to line */
+
+      read_continued_line = FALSE;
+    }
+
+    /* if the last character is '\', continue at next line */
+    if (strlen(line) > 0 && line[strlen(line) - 1] == '\\')
+    {
+      line[strlen(line) - 1] = '\0';	/* cut off trailing backslash */
+      strcpy(previous_line, line);	/* copy line to storage buffer */
+
+      read_continued_line = TRUE;
+
+      continue;
+    }
+
+    /* cut trailing comment from input line */
     for (line_ptr = line; *line_ptr; line_ptr++)
     {
-      if (*line_ptr == '#' || *line_ptr == '\n' || *line_ptr == '\r')
+      if (*line_ptr == '#')
       {
 	*line_ptr = '\0';
 	break;
@@ -1397,8 +1442,8 @@ static void *loadSetupFileData(char *filename, boolean use_hash)
     }
 
     /* cut trailing whitespaces from input line */
-    for (line_ptr = &line[strlen(line)]; line_ptr > line; line_ptr--)
-      if ((*line_ptr == ' ' || *line_ptr == '\t') && line_ptr[1] == '\0')
+    for (line_ptr = &line[strlen(line)]; line_ptr >= line; line_ptr--)
+      if ((*line_ptr == ' ' || *line_ptr == '\t') && *(line_ptr + 1) == '\0')
 	*line_ptr = '\0';
 
     /* ignore empty lines */

@@ -42,6 +42,7 @@ void LoadCustomElementDescriptions();
 void LoadSpecialMenuDesignSettings();
 void LoadUserDefinedEditorElementList(int **, int *);
 void LoadMusicInfo();
-void LoadInfoAnimations();
+void LoadDemoAnimInfo();
+void LoadDemoAnimText();
 
 #endif	/* FILES_H */
