@@ -2545,6 +2545,9 @@ void RelocatePlayer(int x, int y, int element_raw)
   boolean no_delay = (tape.index_search);
   int frame_delay_value = (ffwd_delay ? FfwdFrameDelay : GameFrameDelay);
   int wait_delay_value = (no_delay ? 0 : frame_delay_value);
+#if 1
+  int old_jx, old_jy;
+#endif
 
   if (player->GameOver)		/* do not reanimate dead player */
     return;
@@ -2574,8 +2577,48 @@ void RelocatePlayer(int x, int y, int element_raw)
     player->is_moving = FALSE;
   }
 
+#if 1
+  old_jx = player->jx;
+  old_jy = player->jy;
+#endif
+
   Feld[x][y] = element;
   InitPlayerField(x, y, element, TRUE);
+
+#if 0
+  if (player == local_player)
+  {
+#if 1
+
+    scroll_x += (local_player->jx - old_jx);
+    scroll_y += (local_player->jy - old_jy);
+
+    /* don't scroll over playfield boundaries */
+    if (scroll_x < SBX_Left || scroll_x > SBX_Right)
+      scroll_x = (scroll_x < SBX_Left ? SBX_Left : SBX_Right);
+
+    /* don't scroll over playfield boundaries */
+    if (scroll_y < SBY_Upper || scroll_y > SBY_Lower)
+      scroll_y = (scroll_y < SBY_Upper ? SBY_Upper : SBY_Lower);
+
+#else
+    scroll_x = (local_player->jx < SBX_Left  + MIDPOSX ? SBX_Left :
+		local_player->jx > SBX_Right + MIDPOSX ? SBX_Right :
+		local_player->jx - MIDPOSX);
+
+    scroll_y = (local_player->jy < SBY_Upper + MIDPOSY ? SBY_Upper :
+		local_player->jy > SBY_Lower + MIDPOSY ? SBY_Lower :
+		local_player->jy - MIDPOSY);
+#endif
+
+    RedrawPlayfield(TRUE, 0,0,0,0);
+#if 0
+    DrawAllPlayers();
+    BackToFront();
+#endif
+  }
+
+#else
 
   if (player == local_player)
   {
@@ -2616,6 +2659,7 @@ void RelocatePlayer(int x, int y, int element_raw)
       Delay(wait_delay_value);
     }
   }
+#endif
 }
 
 void Explode(int ex, int ey, int phase, int mode)
@@ -7201,7 +7245,8 @@ static byte PlayerActions(struct PlayerInfo *player, byte player_action)
 
 #if 0
     /* !!! TEST !!! */
-    CheckGravityMovement(player);
+    if (player->MovPos == 0)
+      CheckGravityMovement(player);
 #endif
     if (button1)
       snapped = SnapField(player, dx, dy);
@@ -7428,7 +7473,13 @@ void GameActions()
     int actual_player_action = stored_player[i].effective_action;
 
 #if 1
-    /* OLD: overwrite programmed action with tape action (BAD!!!) */
+    /* !!! TEST !!! */
+    if (stored_player[i].MovPos == 0)
+      CheckGravityMovement(&stored_player[i]);
+#endif
+
+#if 1
+    /* overwrite programmed action with tape action */
     if (stored_player[i].programmed_action)
       actual_player_action = stored_player[i].programmed_action;
 #endif
@@ -7448,9 +7499,15 @@ void GameActions()
     }
 
 #if 0
-    /* NEW: overwrite tape action with programmed action */
+    /* overwrite tape action with programmed action */
     if (stored_player[i].programmed_action)
       actual_player_action = stored_player[i].programmed_action;
+#endif
+
+#if 0
+    if (i == 0)
+      printf("::: action: %d: %x [%d]\n",
+	     stored_player[i].MovPos, actual_player_action, FrameCounter);
 #endif
 
     tape_action[i] = PlayerActions(&stored_player[i], actual_player_action);
@@ -8103,13 +8160,13 @@ static void CheckGravityMovement(struct PlayerInfo *player)
     int dy = (move_dir & MV_UP ? -1 : move_dir & MV_DOWN ? +1 : 0);
     int new_jx = jx + dx, new_jy = jy + dy;
     boolean player_is_snapping = player->action & JOY_BUTTON_1;
-#if 0
-    /* !!! MAKE THIS CUSTOMIZABLE !!! */
-    boolean field_under_player_is_free_or_acid =
+#if 1
+    boolean player_can_fall_down =
       (IN_LEV_FIELD(jx, jy + 1) &&
-       (IS_FREE(jx, jy + 1) || Feld[jx][jy + 1] == EL_ACID));
+       (IS_FREE(jx, jy + 1) ||
+	(Feld[jx][jy + 1] == EL_ACID && level.player_can_fall_into_acid)));
 #else
-    boolean field_under_player_is_free_or_acid =
+    boolean player_can_fall_down =
       (IN_LEV_FIELD(jx, jy + 1) &&
        (IS_FREE(jx, jy + 1)));
 #endif
@@ -8132,13 +8189,13 @@ static void CheckGravityMovement(struct PlayerInfo *player)
 
 #if 0
     printf("::: checking gravity NOW [%d, %d, %d] [%d] ...\n",
-	   field_under_player_is_free_or_acid,
+	   player_can_fall_down,
 	   player_is_standing_on_valid_field,
 	   player_is_moving_to_valid_field,
 	   (player_is_moving_to_valid_field ? Feld[new_jx][new_jy] : -1));
 #endif
 
-    if (field_under_player_is_free_or_acid &&
+    if (player_can_fall_down &&
 	!player_is_standing_on_valid_field &&
 	!player_is_moving_to_valid_field)
     {
@@ -8626,6 +8683,47 @@ void ScrollPlayer(struct PlayerInfo *player, int mode)
 	  IS_SP_ELEMENT(Feld[jx][jy]))
 	player->LevelSolved = player->GameOver = TRUE;
     }
+
+#if 0
+    /* !!! ENABLE THIS FOR NEW VERSIONS !!! */
+    {
+      static int trigger_sides[4][2] =
+      {
+	/* enter side           leave side */
+	{ CH_SIDE_RIGHT,	CH_SIDE_LEFT	},	/* moving left  */
+	{ CH_SIDE_LEFT,		CH_SIDE_RIGHT	},	/* moving right */
+	{ CH_SIDE_BOTTOM,	CH_SIDE_TOP	},	/* moving up    */
+	{ CH_SIDE_TOP,		CH_SIDE_BOTTOM	}	/* moving down  */
+      };
+      int move_direction = player->MovDir;
+      int enter_side = trigger_sides[MV_DIR_BIT(move_direction)][0];
+      int leave_side = trigger_sides[MV_DIR_BIT(move_direction)][1];
+      int old_jx = last_jx;
+      int old_jy = last_jy;
+
+#if 1
+      if (IS_CUSTOM_ELEMENT(Feld[old_jx][old_jy]))
+      {
+	CheckTriggeredElementChangePlayer(old_jx, old_jy, Feld[old_jx][old_jy],
+					  CE_OTHER_GETS_LEFT,
+					  player->index_bit, leave_side);
+	CheckElementChangePlayer(old_jx, old_jy, Feld[old_jx][old_jy],
+				 CE_LEFT_BY_PLAYER,
+				 player->index_bit, leave_side);
+      }
+
+      if (IS_CUSTOM_ELEMENT(Feld[jx][jy]))
+      {
+	CheckTriggeredElementChangePlayer(jx, jy, Feld[jx][jy],
+					  CE_OTHER_GETS_ENTERED,
+					  player->index_bit, enter_side);
+	CheckElementChangePlayer(jx, jy, Feld[jx][jy], CE_ENTERED_BY_PLAYER,
+				 player->index_bit, enter_side);
+      }
+#endif
+
+    }
+#endif
 
     if (game.engine_version >= VERSION_IDENT(3,0,7,0))
     {
@@ -10137,8 +10235,13 @@ boolean SnapField(struct PlayerInfo *player, int dx, int dy)
 			dy == -1 ? MV_UP :
 			dy == +1 ? MV_DOWN : MV_NO_MOVING);
 
+#if 0
+  if (player->MovPos)
+    return FALSE;
+#else
   if (player->MovPos && game.engine_version >= VERSION_IDENT(2,2,0,0))
     return FALSE;
+#endif
 
   if (!player->active || !IN_LEV_FIELD(x, y))
     return FALSE;
@@ -10585,7 +10688,25 @@ void RequestQuitGame(boolean ask_if_really_quit)
   }
   else
   {
+
+#if 1
+    if (tape.playing && tape.index_search)
+    {
+      SetDrawDeactivationMask(REDRAW_NONE);
+      audio.sound_deactivated = FALSE;
+    }
+#endif
+
     OpenDoor(DOOR_OPEN_1 | DOOR_COPY_BACK);
+
+#if 1
+    if (tape.playing && tape.index_search)
+    {
+      SetDrawDeactivationMask(REDRAW_FIELD);
+      audio.sound_deactivated = TRUE;
+    }
+#endif
+
   }
 }
 

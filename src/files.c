@@ -29,7 +29,7 @@
 #define CHUNK_SIZE_NONE		-1	/* do not write chunk size    */
 #define FILE_VERS_CHUNK_SIZE	8	/* size of file version chunk */
 #define LEVEL_HEADER_SIZE	80	/* size of level file header  */
-#define LEVEL_HEADER_UNUSED	7	/* unused level header bytes  */
+#define LEVEL_HEADER_UNUSED	6	/* unused level header bytes  */
 #define LEVEL_CHUNK_CNT2_SIZE	160	/* size of level CNT2 chunk   */
 #define LEVEL_CHUNK_CNT2_UNUSED	11	/* unused CNT2 chunk bytes    */
 #define LEVEL_CHUNK_CNT3_HEADER	16	/* size of level CNT3 header  */
@@ -163,6 +163,8 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
   level->use_spring_bug = FALSE;
 
   level->can_move_into_acid_bits = ~0;	/* everything can move into acid */
+
+  level->player_can_fall_into_acid = TRUE;
 
   level->use_step_counter = FALSE;
 
@@ -686,6 +688,8 @@ static int LoadLevel_HEAD(FILE *file, int chunk_size, struct LevelInfo *level)
   level->can_move_into_acid_bits = getFile16BitBE(file);
 
   level->use_step_counter	= (getFile8Bit(file) == 1 ? TRUE : FALSE);
+
+  level->player_can_fall_into_acid = (getFile8Bit(file) == 1 ? TRUE : FALSE);
 
   ReadUnusedBytesFromFile(file, LEVEL_HEADER_UNUSED);
 
@@ -2420,6 +2424,8 @@ static void SaveLevel_HEAD(FILE *file, struct LevelInfo *level)
   putFile16BitBE(file, level->can_move_into_acid_bits);
 
   putFile8Bit(file, (level->use_step_counter ? 1 : 0));
+
+  putFile8Bit(file, (level->player_can_fall_into_acid ? 1 : 0));
 
   WriteUnusedBytesToFile(file, LEVEL_HEADER_UNUSED);
 }

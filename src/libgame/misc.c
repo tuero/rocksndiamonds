@@ -1232,7 +1232,7 @@ void translate_keyname(Key *keysym, char **x11name, char **name, int mode)
       char c = name_ptr[6];
 
       if (c >= '0' && c <= '9')
-	key = KSYM_0 + (Key)(c - '0');
+	key = KSYM_KP_0 + (Key)(c - '0');
     }
     else if (strncmp(name_ptr, "XK_F", 4) == 0 && strlen(name_ptr) <= 6)
     {

@@ -420,8 +420,13 @@ void TapeRecordAction(byte action[MAX_PLAYERS])
 {
   int i;
 
+#if 1
+  if (!tape.recording)		/* record action even when tape is paused! */
+    return;
+#else
   if (!tape.recording || tape.pausing)
     return;
+#endif
 
   if (tape.counter >= MAX_TAPELEN - 1)
   {
@@ -636,8 +641,13 @@ static void TapeStopIndexSearch()
   SetDrawDeactivationMask(REDRAW_NONE);
   audio.sound_deactivated = FALSE;
 
-  RedrawPlayfield(TRUE, 0,0,0,0);
-  DrawGameDoorValues();
+#if 1
+  if (game_status == GAME_MODE_PLAYING)
+#endif
+  {
+    RedrawPlayfield(TRUE, 0,0,0,0);
+    DrawGameDoorValues();
+  }
 }
 
 static void TapeSingleStep()

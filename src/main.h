@@ -1425,6 +1425,8 @@ struct LevelInfo
 
   int can_move_into_acid_bits;	/* bits indicate property for element groups */
 
+  boolean player_can_fall_into_acid;
+
   boolean double_speed;
   boolean initial_gravity;
   boolean em_slippery_gems;	/* EM style "gems slip from wall" behaviour */

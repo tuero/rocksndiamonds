@@ -2051,6 +2051,15 @@ boolean Request(char *text, unsigned int req_state)
   }
 
 #if 1
+  /* disable deactivated drawing when quick-loading level tape recording */
+  if (tape.playing && tape.index_search)
+  {
+    SetDrawDeactivationMask(REDRAW_NONE);
+    audio.sound_deactivated = FALSE;
+  }
+#endif
+
+#if 1
   SetMouseCursor(CURSOR_DEFAULT);
 #endif
 
@@ -2311,6 +2320,15 @@ boolean Request(char *text, unsigned int req_state)
       game_status == GAME_MODE_PLAYING &&
       req_state & REQUEST_WAIT_FOR)
     SendToServer_ContinuePlaying();
+#endif
+
+#if 1
+  /* restore deactivated drawing when quick-loading level tape recording */
+  if (tape.playing && tape.index_search)
+  {
+    SetDrawDeactivationMask(REDRAW_FIELD);
+    audio.sound_deactivated = TRUE;
+  }
 #endif
 
   return result;

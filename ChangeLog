@@ -1,3 +1,10 @@
+2004-03-08
+	* fixed totally broken (every 8th frame skipped) step-by-step recording
+	* fixed bug with requester not displayed when quick-loading interrupted
+
+2004-03-07
+	* fixed bug which messed up key config when using keypad number keys
+
 2004-03-03
 	* fixed bug which allowed moving upwards even when gravity was active
 	* fixed bug with missing error handling when dumping levels or tapes
