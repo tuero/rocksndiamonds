@@ -176,13 +176,14 @@ $(LIBGAME):
 	@$(MAKE) -C $(LIBDIR)
 
 conf_gfx.h: conf_gfx.c
-	../Scripts/create_element_defs.pl --graphics > conf_gfx.h
-	../Scripts/create_element_defs.pl --el2gfx   > conf_e2g.c
-	../Scripts/create_element_defs.pl --chars    > conf_chr.c
-	../Scripts/create_element_defs.pl --custom   > conf_cus.c
+	../Scripts/create_element_defs.pl --gfx > conf_gfx.h
+	../Scripts/create_element_defs.pl --chr > conf_chr.c
+	../Scripts/create_element_defs.pl --cus > conf_cus.c
+	../Scripts/create_element_defs.pl --e2g > conf_e2g.c
+	../Scripts/create_element_defs.pl --esg > conf_esg.c
 
 conf_snd.h: conf_snd.c
-	../Scripts/create_element_defs.pl --sounds   > conf_snd.h
+	../Scripts/create_element_defs.pl --snd > conf_snd.h
 
 $(TIMESTAMP_FILE): $(SRCS) $(LIBGAME)
 	@date '+"[%Y-%m-%d %H:%M]"' \

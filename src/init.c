@@ -27,6 +27,7 @@
 #include "config.h"
 
 #include "conf_e2g.c"	/* include auto-generated data structure definitions */
+#include "conf_esg.c"	/* include auto-generated data structure definitions */
 
 
 static char *image_filename[NUM_PICTURES] =
@@ -780,7 +781,7 @@ void InitElementGraphicInfo()
     element_info[i].graphic[ACTION_DEFAULT] =
       IMG_CUSTOM_START + (i - EL_CUSTOM_START);
 
-  /* initialize element/graphic mapping from static configuration */
+  /* initialize normal element/graphic mapping from static configuration */
   for (i=0; element_to_graphic[i].element > -1; i++)
   {
     int element   = element_to_graphic[i].element;
@@ -797,7 +798,7 @@ void InitElementGraphicInfo()
       element_info[element].graphic[action] = graphic;
   }
 
-  /* initialize element/graphic mapping from dynamic configuration */
+  /* initialize normal element/graphic mapping from dynamic configuration */
   for (i=0; i < num_property_mappings; i++)
   {
     int element   = property_mapping[i].base_index;
@@ -868,27 +869,25 @@ void InitElementEditorGraphicInfo()
   for (i=0; i<MAX_NUM_ELEMENTS; i++)
     element_info[i].editor_graphic = element_info[i].graphic[ACTION_DEFAULT];
 
-#if 0
-  /* initialize element/graphic mapping from static configuration */
-  for (i=0; ... ; i++)
+  /* initialize special element/graphic mapping from static configuration */
+  for (i=0; element_to_special_graphic[i].element > -1; i++)
   {
-    int element   = ... element;
-    int special   = ... special;
-    int graphic   = ... graphic;
+    int element = element_to_special_graphic[i].element;
+    int special = element_to_special_graphic[i].special;
+    int graphic = element_to_special_graphic[i].graphic;
 
     if (special != GFX_SPECIAL_ARG_EDITOR)
       continue;
 
     element_info[element].editor_graphic = graphic;
   }
-#endif
 
-  /* initialize element/graphic mapping from dynamic configuration */
+  /* initialize special element/graphic mapping from dynamic configuration */
   for (i=0; i < num_property_mappings; i++)
   {
-    int element   = property_mapping[i].base_index;
-    int special   = property_mapping[i].ext3_index;
-    int graphic   = property_mapping[i].artwork_index;
+    int element = property_mapping[i].base_index;
+    int special = property_mapping[i].ext3_index;
+    int graphic = property_mapping[i].artwork_index;
 
     if (special != GFX_SPECIAL_ARG_EDITOR)
       continue;

@@ -16,7 +16,7 @@
 #ifndef CONF_E2G_C
 #define CONF_E2G_C
 
-/* values for element/graphics mapping configuration */
+/* values for element/graphics mapping configuration (normal) */
 
 static struct
 {
