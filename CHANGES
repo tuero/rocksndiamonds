@@ -1,6 +1,9 @@
-Version 1.5.0
--------------
+Release Version 2.0.0 [01 JAN 2001]
+-----------------------------------
+	- major code redesign to maintain generic game functions in a separate
+	  library and make it easier to port the game to new targets like SDL
 	- can be compiled with SDL library to build native Windows version
+	- DOS and Windows versions can be compiled with gcc cross-compiler
 	- trying to open already busy audio device does not block the game
 	- fixed network playing bug (patch from web site)
 	- SDL version can load and play music modules
@@ -80,13 +83,13 @@ Release Version 1.2.0 [5 DEC 1998]
 	  level directory, standalone server execution and verbose
 	  execution
 
-Release Version 1.1 [???] [NOT RELEASED]
-----------------------------------------
+Version 1.1 [???] [NOT RELEASED]
+--------------------------------
 	- new (but broken) GIF graphics loader to be independent
 	  from the XPM library and to replace all graphics by GIF files
 
-Release Version 1.0 [9 APR 1997] [NOT RELEASED]
------------------------------------------------
+Version 1.0 [9 APR 1997] [NOT RELEASED]
+---------------------------------------
 	- the game now contains many really playable levels,
 	  not only a few levels for testing
 	- the game is now even better playable by keyboard
@@ -102,8 +105,8 @@ Release Version 1.0 [9 APR 1997] [NOT RELEASED]
 	  to make it possible to go on with a game at any tape
 	  position
 
-Prerelease Version 0.9b2 [21 NOV 1995] [NOT RELEASED]
------------------------------------------------------
+Version 0.9b2 [21 NOV 1995] [NOT RELEASED]
+------------------------------------------
 	- new game elements
 
 Prerelease Version 0.9b [4 NOV 1995]

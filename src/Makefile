@@ -42,7 +42,7 @@ PLATFORM = unix
 endif
 
 ifeq ($(PLATFORM),unix)
-PROFILING = -pg
+PROFILING_FLAGS = -pg
 endif
 
 ifeq ($(PLATFORM),cross-msdos)
@@ -90,12 +90,13 @@ CONFIG_GAME_DIR = $(CONFIG_RO_GAME_DIR) $(CONFIG_RW_GAME_DIR)
 
 CONFIG = $(CONFIG_GAME_DIR) $(CONFIG_SCORE_ENTRIES) $(JOYSTICK)
 DEBUG = -DDEBUG -g
+# PROFILING = $(PROFILING_FLAGS)
 
-OPTIONS = $(DEBUG) -Wall			# only for debugging purposes
+# OPTIONS = $(DEBUG) -Wall			# only for debugging purposes
 # OPTIONS = $(DEBUG) -O3 -Wall			# only for debugging purposes
 # OPTIONS = $(DEBUG) -Wall -ansi -pedantic	# only for debugging purposes
 # OPTIONS = -O3 -Wall -ansi -pedantic
-# OPTIONS = -O3 -Wall
+OPTIONS = -O3 -Wall
 # OPTIONS = -O3
 # OPTIONS = -DSYSV -Ae				# may be needed for HP-UX
 
@@ -146,17 +147,23 @@ $(LIBGAME):
 .c.o:
 	$(CC) $(PROFILING) $(CFLAGS) -c $*.c
 
-clean:
+clean-obj:
 	$(MAKE) -C $(LIBDIR) clean
 	$(RM) $(OBJS)
 	$(RM) $(LIBGAME)
+
+clean-bin:
 	$(RM) $(PROGNAME)
 	$(RM) ../*.exe
+
+clean: clean-obj clean-bin
 
 
 #-----------------------------------------------------------------------------#
 # development only stuff                                                      #
 #-----------------------------------------------------------------------------#
+
+dist-clean: clean-obj
 
 depend:
 	$(MAKE) -C $(LIBDIR) depend

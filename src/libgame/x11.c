@@ -98,7 +98,9 @@ static DrawWindow *X11InitWindow()
   Pixmap icon_pixmap, iconmask_pixmap;
   unsigned int icon_width, icon_height;
   int icon_hot_x, icon_hot_y;
+#if 0
   char icon_filename[256];
+#endif
   XSizeHints size_hints;
   XWMHints wm_hints;
   XClassHint class_hints;
@@ -148,22 +150,24 @@ static DrawWindow *X11InitWindow()
 	  options.ro_base_directory, GRAPHICS_DIRECTORY,
 	  icon_pic.picture_filename);
 #endif
-  XReadBitmapFile(display, new_window->drawable, program.x11_icon_filename,
-		  &icon_width, &icon_height,
-		  &icon_pixmap, &icon_hot_x, &icon_hot_y);
-  if (!icon_pixmap)
-    Error(ERR_EXIT, "cannot read icon bitmap file '%s'", icon_filename);
+  if (XReadBitmapFile(display, new_window->drawable,
+		      program.x11_icon_filename,
+		      &icon_width, &icon_height, &icon_pixmap,
+		      &icon_hot_x, &icon_hot_y) != BitmapSuccess)
+    Error(ERR_EXIT, "cannot read icon bitmap file '%s'",
+	  program.x11_icon_filename);
 
 #if 0
   sprintf(icon_filename, "%s/%s/%s",
 	  options.ro_base_directory, GRAPHICS_DIRECTORY,
 	  icon_pic.picturemask_filename);
 #endif
-  XReadBitmapFile(display, new_window->drawable, program.x11_iconmask_filename,
-		  &icon_width, &icon_height,
-		  &iconmask_pixmap, &icon_hot_x, &icon_hot_y);
-  if (!iconmask_pixmap)
-    Error(ERR_EXIT, "cannot read icon bitmap file '%s'", icon_filename);
+  if (XReadBitmapFile(display, new_window->drawable,
+		      program.x11_iconmask_filename,
+		      &icon_width, &icon_height, &iconmask_pixmap,
+		      &icon_hot_x, &icon_hot_y) != BitmapSuccess)
+    Error(ERR_EXIT, "cannot read icon bitmap file '%s'",
+	  program.x11_iconmask_filename);
 
   size_hints.width  = size_hints.min_width  = size_hints.max_width  = width;
   size_hints.height = size_hints.min_height = size_hints.max_height = height;

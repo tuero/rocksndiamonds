@@ -1,26 +1,31 @@
 
-Installation instructions for Rocks'n'Diamonds 1.2.0
-====================================================
+Installation instructions for Rocks'n'Diamonds
+==============================================
 
 Compilation
 -----------
 
-If your system supports Linux/i386/ELF/libc5 executables (Linux package)
+If your system supports Linux/i386/ELF/glibc executables (Linux package)
 or if you run DOS/Windows (DOS package), you can directly use the included
 precompiled binary.
 
 If you use a different system, just recompile the game:
 
-If you use Linux with gcc or DOS/Windows with djgpp, just try 'make'
+If you use Linux with gcc or DOS or Windows 3.x with djgpp, just try 'make'
 which should work without problems.
 
 If you use SUN/Solaris with gcc and GNU make, try 'make solaris'.
+
+To build the game with SDL support (needed for fullscreen and MOD support),
+type "make sdl". You need at least SDL version 1.1.x and the additional
+SDL libraries SDL_image and SDL_mixer. To get a recent version of the SDL
+library, see http://www.libsdl.org.
 
 If the above doesn't work, edit the Makefile in the top level directory.
 If it doesn't work either, edit the Makefile in the 'src' subdirectory.
 
 If you had to modify any Makefile to compile it, please drop me a note
-about it to 'aeglos@valinor.owl.de'. Thanks!
+about it to 'info@artsoft.org'. Thanks!
 
 
 Customization
@@ -80,6 +85,4 @@ INCL, LIBS	Maybe some more directories for include files and libraries
 
 
 If you have any comments, additions or modifications to the Makefile(s),
-please send me mail: 'aeglos@valinor.owl.de'. Thanks!
-
-05-DEC-1998, Holger Schemel
+please send me mail: 'info@artsoft.org'. Thanks!
