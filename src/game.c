@@ -730,7 +730,7 @@ void InitGame()
 	     int2str(level_nr, 2), FS_SMALL, FC_YELLOW);
   else
   {
-    DrawTextExt(drawto, gc, DX + XX_EMERALDS, DY + YY_EMERALDS,
+    DrawTextExt(drawto, DX + XX_EMERALDS, DY + YY_EMERALDS,
 		int2str(level_nr, 3), FS_SMALL, FC_SPECIAL3);
     BlitBitmap(drawto, drawto,
 	       DX + XX_EMERALDS, DY + YY_EMERALDS + 1,
@@ -5402,12 +5402,10 @@ int DigField(struct PlayerInfo *player,
       RemoveField(x, y);
       player->key[key_nr] = TRUE;
       RaiseScoreElement(EL_SCHLUESSEL);
-      DrawMiniGraphicExt(drawto, gc,
-			 DX_KEYS+key_nr*MINI_TILEX, DY_KEYS,
-			 GFX_SCHLUESSEL1+key_nr);
-      DrawMiniGraphicExt(window, gc,
-			 DX_KEYS+key_nr*MINI_TILEX, DY_KEYS,
-			 GFX_SCHLUESSEL1+key_nr);
+      DrawMiniGraphicExt(drawto, DX_KEYS + key_nr * MINI_TILEX, DY_KEYS,
+			 GFX_SCHLUESSEL1 + key_nr);
+      DrawMiniGraphicExt(window, DX_KEYS + key_nr * MINI_TILEX, DY_KEYS,
+			 GFX_SCHLUESSEL1 + key_nr);
       PlaySoundLevel(x, y, SND_PONG);
       break;
     }
@@ -5422,12 +5420,10 @@ int DigField(struct PlayerInfo *player,
       RemoveField(x, y);
       player->key[key_nr] = TRUE;
       RaiseScoreElement(EL_SCHLUESSEL);
-      DrawMiniGraphicExt(drawto, gc,
-			 DX_KEYS+key_nr*MINI_TILEX, DY_KEYS,
-			 GFX_SCHLUESSEL1+key_nr);
-      DrawMiniGraphicExt(window, gc,
-			 DX_KEYS+key_nr*MINI_TILEX, DY_KEYS,
-			 GFX_SCHLUESSEL1+key_nr);
+      DrawMiniGraphicExt(drawto, DX_KEYS + key_nr * MINI_TILEX, DY_KEYS,
+			 GFX_SCHLUESSEL1 + key_nr);
+      DrawMiniGraphicExt(window, DX_KEYS + key_nr * MINI_TILEX, DY_KEYS,
+			 GFX_SCHLUESSEL1 + key_nr);
       PlaySoundLevel(x, y, SND_PONG);
       break;
     }

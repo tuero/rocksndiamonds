@@ -32,7 +32,7 @@ inline void X11InitVideoBuffer(DrawBuffer *backbuffer, DrawWindow *window)
 {
   *window = X11InitWindow();
 
-  XMapWindow(display, *window);
+  XMapWindow(display, (*window)->drawable);
   FlushDisplay();
 
   /* create additional (off-screen) buffer for double-buffering */
@@ -87,7 +87,7 @@ static void X11InitDisplay()
 
 static DrawWindow X11InitWindow()
 {
-  Window window;
+  DrawWindow new_window = CreateBitmapStruct();
   unsigned int border_width = 4;
   XGCValues gc_values;
   unsigned long gc_valuemask;
@@ -127,15 +127,17 @@ static DrawWindow X11InitWindow()
   win_xpos = (screen_width - width) / 2;
   win_ypos = (screen_height - height) / 2;
 
-  window = XCreateSimpleWindow(display, RootWindow(display, screen),
-			       win_xpos, win_ypos, width, height, border_width,
-			       pen_fg, pen_bg);
+  new_window->drawable = XCreateSimpleWindow(display,
+					     RootWindow(display, screen),
+					     win_xpos, win_ypos,
+					     width, height, border_width,
+					     pen_fg, pen_bg);
 
 #if !defined(PLATFORM_MSDOS)
   proto_atom = XInternAtom(display, "WM_PROTOCOLS", FALSE);
   delete_atom = XInternAtom(display, "WM_DELETE_WINDOW", FALSE);
   if ((proto_atom != None) && (delete_atom != None))
-    XChangeProperty(display, window, proto_atom, XA_ATOM, 32,
+    XChangeProperty(display, new_window->drawable, proto_atom, XA_ATOM, 32,
 		    PropModePrepend, (unsigned char *) &delete_atom, 1);
 
 #if 0
@@ -143,7 +145,7 @@ static DrawWindow X11InitWindow()
 	  options.ro_base_directory, GRAPHICS_DIRECTORY,
 	  icon_pic.picture_filename);
 #endif
-  XReadBitmapFile(display, window, program.x11_icon_filename,
+  XReadBitmapFile(display, new_window->drawable, program.x11_icon_filename,
 		  &icon_width, &icon_height,
 		  &icon_pixmap, &icon_hot_x, &icon_hot_y);
   if (!icon_pixmap)
@@ -154,7 +156,7 @@ static DrawWindow X11InitWindow()
 	  options.ro_base_directory, GRAPHICS_DIRECTORY,
 	  icon_pic.picturemask_filename);
 #endif
-  XReadBitmapFile(display, window, program.x11_iconmask_filename,
+  XReadBitmapFile(display, new_window->drawable, program.x11_iconmask_filename,
 		  &icon_width, &icon_height,
 		  &iconmask_pixmap, &icon_hot_x, &icon_hot_y);
   if (!iconmask_pixmap)
@@ -186,7 +188,7 @@ static DrawWindow X11InitWindow()
   class_hints.res_name = program.command_name;
   class_hints.res_class = program.program_title;
 
-  XSetWMProperties(display, window, &windowName, &iconName, 
+  XSetWMProperties(display, new_window->drawable, &windowName, &iconName, 
 		   NULL, 0, &size_hints, &wm_hints, 
 		   &class_hints);
 
@@ -199,7 +201,7 @@ static DrawWindow X11InitWindow()
     ButtonPressMask | ButtonReleaseMask | PointerMotionMask |
     PointerMotionHintMask | KeyPressMask | KeyReleaseMask;
 
-  XSelectInput(display, window, window_event_mask);
+  XSelectInput(display, new_window->drawable, window_event_mask);
 #endif
 
   /* create GC for drawing with window depth and background color (black) */
@@ -207,9 +209,10 @@ static DrawWindow X11InitWindow()
   gc_values.foreground = pen_bg;
   gc_values.background = pen_bg;
   gc_valuemask = GCGraphicsExposures | GCForeground | GCBackground;
-  gc = XCreateGC(display, window, gc_valuemask, &gc_values);
+  new_window->gc =
+    XCreateGC(display, new_window->drawable, gc_valuemask, &gc_values);
 
-  return window;
+  return new_window;
 }
 
 #endif /* TARGET_X11 */

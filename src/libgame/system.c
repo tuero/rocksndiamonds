@@ -14,40 +14,35 @@
 
 #include "libgame.h"
 
-/* ========================================================================= */
-/* internal variables                                                        */
-/* ========================================================================= */
-
-Display        *display = NULL;
-Visual	       *visual = NULL;
-int		screen = 0;
-Colormap	cmap = None;
-
-DrawWindow  	window = None;
-DrawBuffer	backbuffer = None;
-GC		gc = None;
-
-int		FrameCounter = 0;
-
 
 /* ========================================================================= */
 /* exported variables                                                        */
 /* ========================================================================= */
 
 struct ProgramInfo	program;
+struct OptionInfo	options;
 struct VideoSystemInfo	video;
 struct AudioSystemInfo	audio;
-struct OptionInfo	options;
+struct PlayfieldInfo	playfield;
+
+Display        *display = NULL;
+Visual	       *visual = NULL;
+int		screen = 0;
+Colormap	cmap = None;
+
+DrawWindow	window = NULL;
+DrawBuffer	backbuffer = NULL;
+DrawBuffer	drawto = NULL;
+
+int		redraw_mask;
+int		redraw_tiles;
+
+int		FrameCounter = 0;
 
 
 /* ========================================================================= */
 /* video functions                                                           */
 /* ========================================================================= */
-
-inline static int GetRealDepth(int depth)
-{
-  return (depth == DEFAULT_DEPTH ? video.default_depth : depth);
-}
 
 inline void InitProgramInfo(char *command_name, char *program_title,
 			    char *window_title, char *icon_title,
@@ -64,12 +59,47 @@ inline void InitProgramInfo(char *command_name, char *program_title,
   program.msdos_pointer_filename = msdos_pointer_filename;
 }
 
-inline void InitScrollbufferSize(int scrollbuffer_width,
+inline void InitPlayfieldInfo(int sx, int sy, int sxsize, int sysize,
+			      int real_sx, int real_sy,
+			      int full_sxsize, int full_sysize)
+{
+  playfield.sx = sx;
+  playfield.sy = sy;
+  playfield.sxsize = sxsize;
+  playfield.sysize = sysize;
+  playfield.real_sx = real_sx;
+  playfield.real_sy = real_sy;
+  playfield.full_sxsize = full_sxsize;
+  playfield.full_sysize = full_sysize;
+}
+
+inline void InitDoor1Info(int dx, int dy, int dxsize, int dysize)
+{
+  playfield.dx = dx;
+  playfield.dy = dy;
+  playfield.dxsize = dxsize;
+  playfield.dysize = dysize;
+}
+
+inline void InitDoor2Info(int vx, int vy, int vxsize, int vysize)
+{
+  playfield.vx = vx;
+  playfield.vy = vy;
+  playfield.vxsize = vxsize;
+  playfield.vysize = vysize;
+}
+
+inline void InitScrollbufferInfo(int scrollbuffer_width,
 				 int scrollbuffer_height)
 {
   /* currently only used by MSDOS code to alloc VRAM buffer, if available */
-  video.scrollbuffer_width = scrollbuffer_width;
-  video.scrollbuffer_height = scrollbuffer_height;
+  playfield.scrollbuffer_width = scrollbuffer_width;
+  playfield.scrollbuffer_height = scrollbuffer_height;
+}
+
+inline static int GetRealDepth(int depth)
+{
+  return (depth == DEFAULT_DEPTH ? video.default_depth : depth);
 }
 
 inline void InitVideoDisplay(void)
@@ -98,8 +128,18 @@ inline void InitVideoBuffer(DrawBuffer *backbuffer, DrawWindow *window,
 #endif
 }
 
+inline Bitmap CreateBitmapStruct(void)
+{
+#ifdef TARGET_SDL
+  return checked_calloc(sizeof(struct SDLSurfaceInfo));
+#else
+  return checked_calloc(sizeof(struct X11DrawableInfo));
+#endif
+}
+
 inline Bitmap CreateBitmap(int width, int height, int depth)
 {
+  Bitmap new_bitmap = CreateBitmapStruct();
   int real_depth = GetRealDepth(depth);
 
 #ifdef TARGET_SDL
@@ -115,32 +155,56 @@ inline Bitmap CreateBitmap(int width, int height, int depth)
 
   SDL_FreeSurface(surface_tmp);
 
-  return surface_native;
+  new_bitmap->surface = surface_native;
 #else
   Pixmap pixmap;
 
-  if (!(pixmap = XCreatePixmap(display, window, width, height, real_depth)))
+  if (!(pixmap = XCreatePixmap(display, window->drawable,
+			       width, height, real_depth)))
     Error(ERR_EXIT, "cannot create pixmap");
 
-  return pixmap;
+  new_bitmap->drawable = pixmap;
 #endif
+
+  if (window == NULL)
+    Error(ERR_EXIT, "Window GC needed for Bitmap -- create Window first");
+  new_bitmap->gc = window->gc;
+
+  return new_bitmap;
 }
 
 inline void FreeBitmap(Bitmap bitmap)
 {
+  if (bitmap == NULL)
+    return;
+
 #ifdef TARGET_SDL
-  SDL_FreeSurface(bitmap);
+  if (bitmap->surface)
+    SDL_FreeSurface(bitmap->surface);
+  if (bitmap->surface_masked)
+    SDL_FreeSurface(bitmap->surface_masked);
 #else
-  XFreePixmap(display, bitmap);
+  if (bitmap->drawable)
+    XFreePixmap(display, bitmap->drawable);
+  if (bitmap->clip_mask)
+    XFreePixmap(display, bitmap->clip_mask);
+  if (bitmap->stored_clip_gc)
+    XFreeGC(display, bitmap->stored_clip_gc);
 #endif
+
+  free(bitmap);
 }
 
-inline void ClearRectangle(Bitmap bitmap, int x, int y, int width, int height)
+inline void CloseWindow(DrawWindow window)
 {
-#ifdef TARGET_SDL
-  SDLFillRectangle(bitmap, x, y, width, height, 0x000000);
-#else
-  XFillRectangle(display, bitmap, gc, x, y, width, height);
+#ifdef TARGET_X11
+  if (window->drawable)
+  {
+    XUnmapWindow(display, window->drawable);
+    XDestroyWindow(display, window->drawable);
+  }
+  if (window->gc)
+    XFreeGC(display, window->gc);
 #endif
 }
 
@@ -151,30 +215,53 @@ inline void BlitBitmap(Bitmap src_bitmap, Bitmap dst_bitmap,
 {
 #ifdef TARGET_SDL
   SDLCopyArea(src_bitmap, dst_bitmap,
-	      src_x, src_y, width, height, dst_x, dst_y);
+	      src_x, src_y, width, height, dst_x, dst_y, SDLCOPYAREA_OPAQUE);
 #else
-  XCopyArea(display, src_bitmap, dst_bitmap, gc,
-	    src_x, src_y, width, height, dst_x, dst_y);
+  XCopyArea(display, src_bitmap->drawable, dst_bitmap->drawable,
+	    dst_bitmap->gc, src_x, src_y, width, height, dst_x, dst_y);
 #endif
 }
 
+inline void ClearRectangle(Bitmap bitmap, int x, int y, int width, int height)
+{
+#ifdef TARGET_SDL
+  SDLFillRectangle(bitmap, x, y, width, height, 0x000000);
+#else
+  XFillRectangle(display, bitmap->drawable, bitmap->gc, x, y, width, height);
+#endif
+}
+
+#if 0
 #ifndef TARGET_SDL
 static GC last_clip_gc = 0;	/* needed for XCopyArea() through clip mask */
 #endif
+#endif
 
-inline void SetClipMask(GC clip_gc, Pixmap clip_pixmap)
+inline void SetClipMask(Bitmap bitmap, GC clip_gc, Pixmap clip_pixmap)
 {
-#ifndef TARGET_SDL
-  XSetClipMask(display, clip_gc, clip_pixmap);
+#ifdef TARGET_X11
+  if (clip_gc)
+  {
+    bitmap->clip_gc = clip_gc;
+    XSetClipMask(display, bitmap->clip_gc, clip_pixmap);
+  }
+#if 0
   last_clip_gc = clip_gc;
+#endif
 #endif
 }
 
-inline void SetClipOrigin(GC clip_gc, int clip_x, int clip_y)
+inline void SetClipOrigin(Bitmap bitmap, GC clip_gc, int clip_x, int clip_y)
 {
-#ifndef TARGET_SDL
-  XSetClipOrigin(display, clip_gc, clip_x, clip_y);
+#ifdef TARGET_X11
+  if (clip_gc)
+  {
+    bitmap->clip_gc = clip_gc;
+    XSetClipOrigin(display, bitmap->clip_gc, clip_x, clip_y);
+  }
+#if 0
   last_clip_gc = clip_gc;
+#endif
 #endif
 }
 
@@ -185,10 +272,10 @@ inline void BlitBitmapMasked(Bitmap src_bitmap, Bitmap dst_bitmap,
 {
 #ifdef TARGET_SDL
   SDLCopyArea(src_bitmap, dst_bitmap,
-	      src_x, src_y, width, height, dst_x, dst_y);
+	      src_x, src_y, width, height, dst_x, dst_y, SDLCOPYAREA_MASKED);
 #else
-  XCopyArea(display, src_bitmap, dst_bitmap, last_clip_gc,
-	    src_x, src_y, width, height, dst_x, dst_y);
+  XCopyArea(display, src_bitmap->drawable, dst_bitmap->drawable,
+	    src_bitmap->clip_gc, src_x, src_y, width, height, dst_x, dst_y);
 #endif
 }
 
@@ -196,11 +283,11 @@ inline void DrawSimpleWhiteLine(Bitmap bitmap, int from_x, int from_y,
 				int to_x, int to_y)
 {
 #ifdef TARGET_SDL
-  SDLDrawSimpleLine(bitmap, from_x, from_y, to_x, to_y, 0xffffff);
+  SDLDrawSimpleLine(bitmap->drawable, from_x, from_y, to_x, to_y, 0xffffff);
 #else
-  XSetForeground(display, gc, WhitePixel(display, screen));
-  XDrawLine(display, bitmap, gc, from_x, from_y, to_x, to_y);
-  XSetForeground(display, gc, BlackPixel(display, screen));
+  XSetForeground(display, bitmap->gc, WhitePixel(display, screen));
+  XDrawLine(display, bitmap->drawable, bitmap->gc, from_x, from_y, to_x, to_y);
+  XSetForeground(display, bitmap->gc, BlackPixel(display, screen));
 #endif
 }
 
@@ -246,15 +333,15 @@ inline boolean PointerInWindow(DrawWindow window)
 #ifdef TARGET_SDL
   return TRUE;
 #else
-  DrawWindow root, child;
+  Window root, child;
   int root_x, root_y;
   unsigned int mask;
   int win_x, win_y;
 
   /* if XQueryPointer() returns False, the pointer
      is not on the same screen as the specified window */
-  return XQueryPointer(display, window, &root, &child, &root_x, &root_y,
-		       &win_x, &win_y, &mask);
+  return XQueryPointer(display, window->drawable, &root, &child,
+		       &root_x, &root_y, &win_x, &win_y, &mask);
 #endif
 }
 
@@ -404,7 +491,7 @@ inline boolean CheckCloseWindowEvent(ClientMessageEvent *event)
 #if defined(TARGET_SDL)
   return TRUE;		/* the only possible message here is SDL_QUIT */
 #elif defined(PLATFORM_UNIX)
-  if ((event->window == window) &&
+  if ((event->window == window->drawable) &&
       (event->data.l[0] == XInternAtom(display, "WM_DELETE_WINDOW", FALSE)))
     return TRUE;
 #endif

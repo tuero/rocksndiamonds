@@ -398,8 +398,8 @@ boolean AnimateToon(int toon_nr, boolean restart)
   };
   struct AnimInfo *anim = &toon[toon_nr];
   int anim_bitmap_nr = (toon_nr < 6 ? PIX_TOONS : PIX_HEROES);
-  Bitmap anim_bitmap = pix_masked[anim_bitmap_nr];
-  GC anim_clip_gc = clip_gc[anim_bitmap_nr];
+  Bitmap anim_bitmap = pix[anim_bitmap_nr];
+  GC anim_clip_gc = pix[anim_bitmap_nr]->stored_clip_gc;
 
   if (restart)
   {
@@ -541,7 +541,7 @@ void DrawAnim(Bitmap toon_bitmap, GC toon_clip_gc,
   /* special method to avoid flickering interference with BackToFront() */
   BlitBitmap(backbuffer, pix[PIX_DB_DOOR], dest_x-pad_x, dest_y-pad_y,
 	     width+2*pad_x, height+2*pad_y, buf_x, buf_y);
-  SetClipOrigin(toon_clip_gc, dest_x-src_x, dest_y-src_y);
+  SetClipOrigin(toon_bitmap, toon_clip_gc, dest_x-src_x, dest_y-src_y);
   BlitBitmapMasked(toon_bitmap, backbuffer,
 		   src_x, src_y, width, height, dest_x, dest_y);
   BlitBitmap(backbuffer, window, dest_x-pad_x, dest_y-pad_y,
@@ -553,7 +553,7 @@ void DrawAnim(Bitmap toon_bitmap, GC toon_clip_gc,
   /* normal method, causing flickering interference with BackToFront() */
   BlitBitmap(backbuffer, pix[PIX_DB_DOOR], dest_x-pad_x, dest_y-pad_y,
 	     width+2*pad_x, height+2*pad_y, buf_x, buf_y);
-  SetClipOrigin(toon_clip_gc, buf_x-src_x+pad_x, buf_y-src_y+pad_y);
+  SetClipOrigin(toon_bitmap,toon_clip_gc, buf_x-src_x+pad_x,buf_y-src_y+pad_y);
   BlitBitmapMasked(toon_bitmap, pix[PIX_DB_DOOR],
 		   src_x, src_y, width, height, buf_x+pad_x, buf_y+pad_y);
   BlitBitmap(pix[PIX_DB_DOOR], window, buf_x, buf_y,

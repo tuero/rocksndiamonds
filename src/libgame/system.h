@@ -38,6 +38,30 @@
 #define FULLSCREEN_AVAILABLE		TRUE
 
 
+/* values for redraw_mask */
+#define REDRAW_ALL		(1 << 0)
+#define REDRAW_FIELD		(1 << 1)
+#define REDRAW_TILES		(1 << 2)
+#define REDRAW_DOOR_1		(1 << 3)
+#define REDRAW_VIDEO_1		(1 << 4)
+#define REDRAW_VIDEO_2		(1 << 5)
+#define REDRAW_VIDEO_3		(1 << 6)
+#define REDRAW_MICROLEVEL	(1 << 7)
+#define REDRAW_FROM_BACKBUFFER	(1 << 8)
+#define REDRAW_DOOR_2		(REDRAW_VIDEO_1 | \
+				 REDRAW_VIDEO_2 | \
+				 REDRAW_VIDEO_3)
+#define REDRAW_DOOR_3		(1 << 9)
+#define REDRAW_DOORS		(REDRAW_DOOR_1 | \
+				 REDRAW_DOOR_2 | \
+				 REDRAW_DOOR_3)
+#define REDRAW_MAIN		(REDRAW_FIELD | \
+				 REDRAW_TILES | \
+				 REDRAW_MICROLEVEL)
+#define REDRAW_FPS		(1 << 10)
+#define REDRAWTILES_THRESHOLD	(SCR_FIELDX * SCR_FIELDY / 2)
+
+
 /* type definitions */
 
 typedef int (*EventFilter)(const Event *);
@@ -56,25 +80,6 @@ struct ProgramInfo
   char *msdos_pointer_filename;
 };
 
-struct VideoSystemInfo
-{
-  int default_depth;
-  int width, height, depth;
-  int scrollbuffer_width, scrollbuffer_height;
-  boolean fullscreen_available;
-  boolean fullscreen_enabled;
-};
-
-struct AudioSystemInfo
-{
-  boolean sound_available;
-  boolean loops_available;
-  int soundserver_pipe[2];
-  int soundserver_pid;
-  char *device_name;
-  int device_fd;
-};
-
 struct OptionInfo
 {
   char *display_name;
@@ -89,18 +94,49 @@ struct OptionInfo
   boolean debug;
 };
 
+struct VideoSystemInfo
+{
+  int default_depth;
+  int width, height, depth;
+  boolean fullscreen_available;
+  boolean fullscreen_enabled;
+};
+
+struct AudioSystemInfo
+{
+  boolean sound_available;
+  boolean loops_available;
+  int soundserver_pipe[2];
+  int soundserver_pid;
+  char *device_name;
+  int device_fd;
+};
+
+struct PlayfieldInfo
+{
+  int sx, sy;
+  int sxsize, sysize;
+  int real_sx, real_sy;
+  int full_sxsize, full_sysize;
+  int scrollbuffer_width, scrollbuffer_height;
+
+  int dx, dy;
+  int dxsize, dysize;
+
+  int vx, vy;
+  int vxsize, vysize;
+};
+
 
 /* ========================================================================= */
 /* exported variables                                                        */
 /* ========================================================================= */
 
 extern struct ProgramInfo	program;
+extern struct OptionInfo	options;
 extern struct VideoSystemInfo	video;
 extern struct AudioSystemInfo	audio;
-extern struct OptionInfo	options;
-
-
-/* declarations of internal variables */
+extern struct PlayfieldInfo	playfield;
 
 extern Display	       *display;
 extern Visual	       *visual;
@@ -109,7 +145,10 @@ extern Colormap		cmap;
 
 extern DrawWindow	window;
 extern DrawBuffer	backbuffer;
-extern GC		gc;
+extern DrawBuffer	drawto;
+
+extern int		redraw_mask;
+extern int		redraw_tiles;
 
 extern int		FrameCounter;
 
@@ -118,15 +157,21 @@ extern int		FrameCounter;
 
 inline void InitProgramInfo(char *, char *, char *, char *, char *, char *,
 			    char *);
-inline void InitScrollbufferSize(int, int);
+
+inline void InitPlayfieldInfo(int, int, int, int, int, int, int, int);
+inline void InitDoor1Info(int, int, int, int);
+inline void InitDoor2Info(int, int, int, int);
+inline void InitScrollbufferInfo(int, int);
+
 inline void InitVideoDisplay(void);
 inline void InitVideoBuffer(DrawBuffer *,DrawWindow *, int, int, int, boolean);
+inline Bitmap CreateBitmapStruct(void);
 inline Bitmap CreateBitmap(int, int, int);
 inline void FreeBitmap(Bitmap);
-inline void ClearRectangle(Bitmap, int, int, int, int);
 inline void BlitBitmap(Bitmap, Bitmap, int, int, int, int, int, int);
-inline void SetClipMask(GC, Pixmap);
-inline void SetClipOrigin(GC, int, int);
+inline void ClearRectangle(Bitmap, int, int, int, int);
+inline void SetClipMask(Bitmap, GC, Pixmap);
+inline void SetClipOrigin(Bitmap, GC, int, int);
 inline void BlitBitmapMasked(Bitmap, Bitmap, int, int, int, int, int, int);
 inline void DrawSimpleWhiteLine(Bitmap, int, int, int, int);
 inline void FlushDisplay(void);

@@ -261,9 +261,9 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 
     level_nr = new_level_nr;
 
-    DrawTextExt(drawto, gc, SX + 11 * 32, SY + 3 * 32,
+    DrawTextExt(drawto, SX + 11 * 32, SY + 3 * 32,
 		int2str(level_nr, 3), FS_BIG, font_color);
-    DrawTextExt(window, gc, SX + 11 * 32, SY + 3 * 32,
+    DrawTextExt(window, SX + 11 * 32, SY + 3 * 32,
 		int2str(level_nr, 3), FS_BIG, font_color);
 
     LoadLevel(level_nr);
@@ -616,7 +616,7 @@ void DrawHelpScreenElAction(int start)
     }
     j++;
 
-    DrawGraphicExt(drawto, gc, xstart, ystart+(i-start)*ystep, graphic+frame);
+    DrawGraphicExt(drawto, xstart, ystart+(i-start)*ystep, graphic+frame);
     i++;
   }
 
@@ -841,9 +841,9 @@ void HandleTypeName(int newxpos, Key key)
     setup.player_name[xpos] = ascii;
     setup.player_name[xpos + 1] = 0;
     xpos++;
-    DrawTextExt(drawto, gc, SX + 6*32, SY + ypos*32,
+    DrawTextExt(drawto, SX + 6*32, SY + ypos*32,
 		setup.player_name, FS_BIG, FC_YELLOW);
-    DrawTextExt(window, gc, SX + 6*32, SY + ypos*32,
+    DrawTextExt(window, SX + 6*32, SY + ypos*32,
 		setup.player_name, FS_BIG, FC_YELLOW);
     DrawGraphic(xpos + 6, ypos, GFX_KUGEL_ROT);
   }

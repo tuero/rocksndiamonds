@@ -116,12 +116,12 @@ inline boolean SDLSetVideoMode(DrawBuffer *backbuffer, boolean fullscreen)
   return success;
 }
 
-inline void SDLCopyArea(SDL_Surface *src_surface, SDL_Surface *dst_surface,
+inline void SDLCopyArea(Bitmap src_bitmap, Bitmap dst_bitmap,
 			int src_x, int src_y,
 			int width, int height,
-			int dst_x, int dst_y)
+			int dst_x, int dst_y, int copy_mode)
 {
-  SDL_Surface *surface = (dst_surface == window ? backbuffer : dst_surface);
+  Bitmap real_dst_bitmap = (dst_bitmap == window ? backbuffer : dst_bitmap);
   SDL_Rect src_rect, dst_rect;
 
   src_rect.x = src_x;
@@ -134,17 +134,19 @@ inline void SDLCopyArea(SDL_Surface *src_surface, SDL_Surface *dst_surface,
   dst_rect.w = width;
   dst_rect.h = height;
 
-  if (src_surface != backbuffer || dst_surface != window)
-    SDL_BlitSurface(src_surface, &src_rect, surface, &dst_rect);
+  if (src_bitmap != backbuffer || dst_bitmap != window)
+    SDL_BlitSurface((copy_mode == SDLCOPYAREA_MASKED ?
+		     src_bitmap->surface_masked : src_bitmap->surface),
+		    &src_rect, real_dst_bitmap->surface, &dst_rect);
 
-  if (dst_surface == window)
-    SDL_UpdateRect(backbuffer, dst_x, dst_y, width, height);
+  if (dst_bitmap == window)
+    SDL_UpdateRect(backbuffer->surface, dst_x, dst_y, width, height);
 }
 
-inline void SDLFillRectangle(SDL_Surface *dst_surface, int x, int y,
+inline void SDLFillRectangle(Bitmap dst_bitmap, int x, int y,
 			     int width, int height, unsigned int color)
 {
-  SDL_Surface *surface = (dst_surface == window ? backbuffer : dst_surface);
+  Bitmap real_dst_bitmap = (dst_bitmap == window ? backbuffer : dst_bitmap);
   SDL_Rect rect;
   unsigned int color_r = (color >> 16) && 0xff;
   unsigned int color_g = (color >>  8) && 0xff;
@@ -155,11 +157,12 @@ inline void SDLFillRectangle(SDL_Surface *dst_surface, int x, int y,
   rect.w = width;
   rect.h = height;
 
-  SDL_FillRect(surface, &rect,
-	       SDL_MapRGB(surface->format, color_r, color_g, color_b));
+  SDL_FillRect(real_dst_bitmap->surface, &rect,
+	       SDL_MapRGB(real_dst_bitmap->surface->format,
+			  color_r, color_g, color_b));
 
-  if (dst_surface == window)
-    SDL_UpdateRect(backbuffer, x, y, width, height);
+  if (dst_bitmap == window)
+    SDL_UpdateRect(backbuffer->surface, x, y, width, height);
 }
 
 inline void SDLDrawSimpleLine(SDL_Surface *surface, int from_x, int from_y,

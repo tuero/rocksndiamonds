@@ -29,12 +29,25 @@ DrawBuffer	backbuffer;
 GC		gc;
 #endif
 
-GC		clip_gc[NUM_BITMAPS], tile_clip_gc;
+#if 0
+GC		clip_gc[NUM_BITMAPS];
+#endif
+GC		tile_clip_gc;
 Bitmap		pix[NUM_BITMAPS];
-Bitmap		pix_masked[NUM_BITMAPS], tile_masked[NUM_TILES];
-Pixmap		clipmask[NUM_BITMAPS], tile_clipmask[NUM_TILES];
+#if 0
+Bitmap		pix_masked[NUM_BITMAPS];
+#endif
+Bitmap		tile_masked[NUM_TILES];
+#if 0
+Pixmap		clipmask[NUM_BITMAPS];
+#endif
+Pixmap		tile_clipmask[NUM_TILES];
 
-DrawBuffer	drawto, drawto_field, fieldbuffer;
+#if 0
+DrawBuffer	drawto;
+#endif
+
+DrawBuffer	drawto_field, fieldbuffer;
 #if 0
 Colormap	cmap;
 #endif
@@ -70,8 +83,11 @@ boolean		fullscreen_enabled = FALSE;
 
 boolean		redraw[MAX_BUF_XSIZE][MAX_BUF_YSIZE];
 int		redraw_x1 = 0, redraw_y1 = 0;
+
+#if 0
 int		redraw_mask;
 int		redraw_tiles;
+#endif
 
 short		Feld[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 short		Ur[MAX_LEV_FIELDX][MAX_LEV_FIELDY];

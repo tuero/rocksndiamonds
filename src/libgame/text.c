@@ -15,7 +15,29 @@
 
 #include "libgame.h"
 
+#if 1
 #include "main_TMP.h"
+#endif
+
+
+/* ========================================================================= */
+/* exported variables                                                        */
+/* ========================================================================= */
+
+struct FontInfo		font;
+
+
+/* ========================================================================= */
+/* font functions                                                            */
+/* ========================================================================= */
+
+void InitFontInfo(Bitmap bitmap_big, Bitmap bitmap_medium,
+		  Bitmap bitmap_small)
+{
+  font.bitmap_big = bitmap_big;
+  font.bitmap_medium = bitmap_medium;
+  font.bitmap_small = bitmap_small;
+}
 
 int getFontWidth(int font_size, int font_type)
 {
@@ -39,10 +61,10 @@ int getFontHeight(int font_size, int font_type)
 
 void DrawInitText(char *text, int ypos, int color)
 {
-  if (window && pix[PIX_SMALLFONT])
+  if (window && font.bitmap_small)
   {
-    ClearRectangle(window, 0, ypos, WIN_XSIZE, FONT2_YSIZE);
-    DrawTextExt(window, gc, (WIN_XSIZE - strlen(text) * FONT2_XSIZE)/2,
+    ClearRectangle(window, 0, ypos, video.width, FONT2_YSIZE);
+    DrawTextExt(window, (video.width - strlen(text) * FONT2_XSIZE)/2,
 		ypos, text, FS_SMALL, color);
     FlushDisplay();
   }
@@ -50,7 +72,7 @@ void DrawInitText(char *text, int ypos, int color)
 
 void DrawTextFCentered(int y, int font_type, char *format, ...)
 {
-  char buffer[FULL_SXSIZE / FONT5_XSIZE + 10];
+  char buffer[MAX_OUTPUT_LINESIZE + 1];
   int font_width = getFontWidth(FS_SMALL, font_type);
   va_list ap;
 
@@ -58,37 +80,37 @@ void DrawTextFCentered(int y, int font_type, char *format, ...)
   vsprintf(buffer, format, ap);
   va_end(ap);
 
-  DrawText(SX + (SXSIZE - strlen(buffer) * font_width) / 2, SY + y,
-	   buffer, FS_SMALL, font_type);
+  DrawText(playfield.sx + (playfield.sxsize - strlen(buffer) * font_width) / 2,
+	   playfield.sy + y, buffer, FS_SMALL, font_type);
 }
 
 void DrawTextF(int x, int y, int font_type, char *format, ...)
 {
-  char buffer[FULL_SXSIZE / FONT5_XSIZE + 10];
+  char buffer[MAX_OUTPUT_LINESIZE + 1];
   va_list ap;
 
   va_start(ap, format);
   vsprintf(buffer, format, ap);
   va_end(ap);
 
-  DrawText(SX + x, SY + y, buffer, FS_SMALL, font_type);
+  DrawText(playfield.sx + x, playfield.sy + y, buffer, FS_SMALL, font_type);
 }
 
 void DrawText(int x, int y, char *text, int font_size, int font_type)
 {
-  DrawTextExt(drawto, gc, x, y, text, font_size, font_type);
+  DrawTextExt(drawto, x, y, text, font_size, font_type);
 
-  if (x < DX)
+  if (x < playfield.dx)
     redraw_mask |= REDRAW_FIELD;
-  else if (y < VY)
+  else if (y < playfield.vy)
     redraw_mask |= REDRAW_DOOR_1;
 }
 
-void DrawTextExt(DrawBuffer d, GC gc, int x, int y,
+void DrawTextExt(DrawBuffer bitmap, int x, int y,
 		 char *text, int font_size, int font_type)
 {
+  Bitmap font_bitmap;
   int font_width, font_height, font_start;
-  int font_bitmap;
   boolean print_inverse = FALSE;
 
   if (font_size != FS_SMALL && font_size != FS_BIG && font_size != FS_MEDIUM)
@@ -99,9 +121,9 @@ void DrawTextExt(DrawBuffer d, GC gc, int x, int y,
   font_width = getFontWidth(font_size, font_type);
   font_height = getFontHeight(font_size, font_type);
 
-  font_bitmap = (font_size == FS_BIG ? PIX_BIGFONT :
-		 font_size == FS_MEDIUM ? PIX_MEDIUMFONT :
-		 PIX_SMALLFONT);
+  font_bitmap = (font_size == FS_BIG ? font.bitmap_big :
+		 font_size == FS_MEDIUM ? font.bitmap_medium :
+		 font.bitmap_small);
   font_start = (font_type * (font_size == FS_BIG ? FONT1_YSIZE :
 			     font_size == FS_MEDIUM ? FONT6_YSIZE :
 			     FONT2_YSIZE) *
@@ -137,17 +159,18 @@ void DrawTextExt(DrawBuffer d, GC gc, int x, int y,
 
       if (print_inverse)
       {
-	BlitBitmap(pix[font_bitmap], d,
+	BlitBitmap(font_bitmap, bitmap,
 		   FONT_CHARS_PER_LINE * font_width,
 		   3 * font_height + font_start,
 		   font_width, font_height, x, y);
 
-	SetClipOrigin(clip_gc[font_bitmap], dest_x - src_x, dest_y - src_y);
-	BlitBitmapMasked(pix_masked[font_bitmap], d,
+	SetClipOrigin(font_bitmap, font_bitmap->stored_clip_gc,
+		      dest_x - src_x, dest_y - src_y);
+	BlitBitmapMasked(font_bitmap, bitmap,
 			 0, 0, font_width, font_height, dest_x, dest_y);
       }
       else
-	BlitBitmap(pix[font_bitmap], d,
+	BlitBitmap(font_bitmap, bitmap,
 		   src_x, src_y, font_width, font_height, dest_x, dest_y);
     }
 

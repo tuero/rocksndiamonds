@@ -24,6 +24,8 @@
 
 #define SURFACE_FLAGS		(SDL_SWSURFACE)
 
+#define SDLCOPYAREA_OPAQUE	0
+#define SDLCOPYAREA_MASKED	1
 
 /* system dependent definitions */
 
@@ -31,11 +33,20 @@
 #define FULLSCREEN_STATUS	FULLSCREEN_AVAILABLE
 
 
+/* structure definitions */
+
+struct SDLSurfaceInfo
+{
+  SDL_Surface *surface;
+  SDL_Surface *surface_masked;
+};
+
+
 /* SDL type definitions */
 
-typedef SDL_Surface	       *Bitmap;
-typedef SDL_Surface	       *DrawWindow;
-typedef SDL_Surface	       *DrawBuffer;
+typedef struct SDLSurfaceInfo  *Bitmap;
+typedef struct SDLSurfaceInfo  *DrawBuffer;
+typedef struct SDLSurfaceInfo  *DrawWindow;
 
 typedef SDLKey			Key;
 
@@ -299,9 +310,8 @@ typedef int			Colormap;
 inline void SDLInitVideoDisplay(void);
 inline void SDLInitVideoBuffer(DrawBuffer *, DrawWindow *, boolean);
 inline boolean SDLSetVideoMode(DrawBuffer *, boolean);
-inline void SDLCopyArea(SDL_Surface *, SDL_Surface *,
-                        int, int, int, int, int, int);
-inline void SDLFillRectangle(SDL_Surface *, int, int, int, int, unsigned int);
+inline void SDLCopyArea(Bitmap, Bitmap, int, int, int, int, int, int, int);
+inline void SDLFillRectangle(Bitmap, int, int, int, int, unsigned int);
 inline void SDLDrawSimpleLine(SDL_Surface *, int, int, int, int, unsigned int);
 
 inline boolean SDLOpenAudio(void);

@@ -441,12 +441,24 @@ extern DrawBuffer	backbuffer;
 extern GC		gc;
 #endif
 
-extern GC		clip_gc[], tile_clip_gc;
+#if 0
+extern GC		clip_gc[];
+#endif
+extern GC		tile_clip_gc;
 extern Bitmap		pix[];
-extern Bitmap		pix_masked[], tile_masked[];
-extern Pixmap		clipmask[], tile_clipmask[];
+#if 0
+extern Bitmap		pix_masked[];
+#endif
+extern Bitmap		tile_masked[];
+#if 0
+extern Pixmap		clipmask[];
+#endif
+extern Pixmap		tile_clipmask[];
 
-extern DrawBuffer	drawto, drawto_field, fieldbuffer;
+#if 0
+extern DrawBuffer	drawto;
+#endif
+extern DrawBuffer	drawto_field, fieldbuffer;
 #if 0
 extern Colormap		cmap;
 #endif
@@ -475,8 +487,11 @@ extern boolean		fullscreen_enabled;
 
 extern boolean		redraw[MAX_BUF_XSIZE][MAX_BUF_YSIZE];
 extern int		redraw_x1, redraw_y1;
+
+#if 0
 extern int		redraw_mask;
 extern int		redraw_tiles;
+#endif
 
 extern short		Feld[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short		Ur[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
@@ -582,6 +597,8 @@ extern int		num_element_info;
 #define MICROLEV_XPOS		(SX + (SXSIZE - MICROLEV_XSIZE) / 2)
 #define MICROLEV_YPOS		(SX + 12 * TILEY - MICRO_TILEY)
 #define MICROLABEL_YPOS		(MICROLEV_YPOS + MICROLEV_YSIZE + 7)
+
+#if 0
 #define FONT1_XSIZE		32
 #define FONT1_YSIZE		32
 #define FONT2_XSIZE		14
@@ -594,6 +611,7 @@ extern int		num_element_info;
 #define FONT5_YSIZE		14
 #define FONT6_XSIZE		16
 #define FONT6_YSIZE		32
+#endif
 
 #define GFX_STARTX		SX
 #define GFX_STARTY		SY
@@ -631,8 +649,10 @@ extern int		num_element_info;
 #define MINI_MORE_PER_LINE	16
 #define MICRO_MORE_PER_LINE	16
 
+#if 0
 #define FONT_CHARS_PER_LINE	16
 #define FONT_LINES_PER_FONT	4
+#endif
 
 /* game elements:
 **	  0 - 499: real elements, stored in level file
@@ -1615,6 +1635,7 @@ extern int		num_element_info;
 #define MV_UP			(1 << 2)
 #define MV_DOWN	       		(1 << 3)
 
+#if 0
 /* font types */
 #define FS_SMALL		0
 #define FS_BIG			1
@@ -1627,6 +1648,7 @@ extern int		num_element_info;
 #define FC_SPECIAL1		4
 #define FC_SPECIAL2		5
 #define FC_SPECIAL3		6
+#endif
 
 /* values for game_status */
 #define EXITGAME		0
@@ -1692,6 +1714,7 @@ extern int		num_element_info;
 #define MB_MIDDLEBUTTON		2
 #define MB_RIGHTBUTTON		3
 
+#if 0
 /* values for redraw_mask */
 #define REDRAW_ALL		(1 << 0)
 #define REDRAW_FIELD		(1 << 1)
@@ -1714,6 +1737,7 @@ extern int		num_element_info;
 				 REDRAW_MICROLEVEL)
 #define REDRAW_FPS		(1 << 10)
 #define REDRAWTILES_THRESHOLD	(SCR_FIELDX * SCR_FIELDY / 2)
+#endif
 
 /* areas in bitmap PIX_DOOR */
 /* meaning in PIX_DB_DOOR: (3 PAGEs)

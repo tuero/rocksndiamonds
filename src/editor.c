@@ -2134,13 +2134,13 @@ void DrawLevelEd()
 	     DOOR_GFX_PAGEX6, DOOR_GFX_PAGEY1, DXSIZE, DYSIZE, DX, DY);
 
   /* draw mouse button brush elements */
-  DrawMiniGraphicExt(drawto, gc,
+  DrawMiniGraphicExt(drawto,
 		     DX + ED_WIN_MB_LEFT_XPOS, DY + ED_WIN_MB_LEFT_YPOS,
 		     el2gfx(new_element1));
-  DrawMiniGraphicExt(drawto, gc,
+  DrawMiniGraphicExt(drawto,
 		     DX + ED_WIN_MB_MIDDLE_XPOS, DY + ED_WIN_MB_MIDDLE_YPOS,
 		     el2gfx(new_element2));
-  DrawMiniGraphicExt(drawto, gc,
+  DrawMiniGraphicExt(drawto,
 		     DX + ED_WIN_MB_RIGHT_XPOS, DY + ED_WIN_MB_RIGHT_YPOS,
 		     el2gfx(new_element3));
 
@@ -2313,21 +2313,21 @@ static void PickDrawingElement(int button, int element)
   if (button == 1)
   {
     new_element1 = element;
-    DrawMiniGraphicExt(drawto, gc,
+    DrawMiniGraphicExt(drawto,
 		       DX + ED_WIN_MB_LEFT_XPOS, DY + ED_WIN_MB_LEFT_YPOS,
 		       el2gfx(new_element1));
   }
   else if (button == 2)
   {
     new_element2 = element;
-    DrawMiniGraphicExt(drawto, gc,
+    DrawMiniGraphicExt(drawto,
 		       DX + ED_WIN_MB_MIDDLE_XPOS, DY + ED_WIN_MB_MIDDLE_YPOS,
 		       el2gfx(new_element2));
   }
   else
   {
     new_element3 = element;
-    DrawMiniGraphicExt(drawto, gc,
+    DrawMiniGraphicExt(drawto,
 		       DX + ED_WIN_MB_RIGHT_XPOS, DY + ED_WIN_MB_RIGHT_YPOS,
 		       el2gfx(new_element3));
   }
@@ -3451,11 +3451,11 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
       }
       else
       {
-	DrawMiniGraphicExt(drawto, gc,
+	DrawMiniGraphicExt(drawto,
 			   gi->x + sx * MINI_TILEX,
 			   gi->y + sy * MINI_TILEY,
 			   el2gfx(new_element));
-	DrawMiniGraphicExt(window, gc,
+	DrawMiniGraphicExt(window,
 			   gi->x + sx * MINI_TILEX,
 			   gi->y + sy * MINI_TILEY,
 			   el2gfx(new_element));

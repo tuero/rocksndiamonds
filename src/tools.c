@@ -247,7 +247,7 @@ void BackToFront()
       info1[0] = '\0';
 
     sprintf(text, "%.1f fps%s", global.frames_per_second, info1);
-    DrawTextExt(window, gc, SX, SY, text, FS_SMALL, FC_YELLOW);
+    DrawTextExt(window, SX, SY, text, FS_SMALL, FC_YELLOW);
   }
 
   FlushDisplay();
@@ -378,7 +378,7 @@ void DrawInitText(char *text, int ypos, int color)
   if (window && pix[PIX_SMALLFONT])
   {
     ClearRectangle(window, 0, ypos, WIN_XSIZE, FONT2_YSIZE);
-    DrawTextExt(window, gc, (WIN_XSIZE - strlen(text) * FONT2_XSIZE)/2,
+    DrawTextExt(window, (WIN_XSIZE - strlen(text) * FONT2_XSIZE)/2,
 		ypos, text, FS_SMALL, color);
     FlushDisplay();
   }
@@ -877,17 +877,17 @@ void DrawGraphic(int x, int y, int graphic)
   }
 #endif
 
-  DrawGraphicExt(drawto_field, gc, FX + x*TILEX, FY + y*TILEY, graphic);
+  DrawGraphicExt(drawto_field, FX + x*TILEX, FY + y*TILEY, graphic);
   MarkTileDirty(x,y);
 }
 
-void DrawGraphicExt(DrawBuffer d, GC gc, int x, int y, int graphic)
+void DrawGraphicExt(DrawBuffer bitmap, int x, int y, int graphic)
 {
   int bitmap_nr;
   int src_x, src_y;
 
   getGraphicSource(graphic, &bitmap_nr, &src_x, &src_y);
-  BlitBitmap(pix[bitmap_nr], d, src_x, src_y, TILEX, TILEY, x, y);
+  BlitBitmap(pix[bitmap_nr], bitmap, src_x, src_y, TILEX, TILEY, x, y);
 }
 
 void DrawGraphicThruMask(int x, int y, int graphic)
@@ -917,13 +917,13 @@ void DrawGraphicThruMaskExt(DrawBuffer d, int dest_x, int dest_y, int graphic)
     return;
 
   getGraphicSource(graphic, &bitmap_nr, &src_x, &src_y);
-  src_bitmap = pix_masked[bitmap_nr];
-  drawing_gc = clip_gc[bitmap_nr];
+  src_bitmap = pix[bitmap_nr];
+  drawing_gc = pix[bitmap_nr]->stored_clip_gc;
 
   if (tile_clipmask[tile] != None)
   {
-    SetClipMask(tile_clip_gc, tile_clipmask[tile]);
-    SetClipOrigin(tile_clip_gc, dest_x, dest_y);
+    SetClipMask(src_bitmap, tile_clip_gc, tile_clipmask[tile]);
+    SetClipOrigin(src_bitmap, tile_clip_gc, dest_x, dest_y);
     BlitBitmapMasked(src_bitmap, d,
 		     src_x, src_y, TILEX, TILEY, dest_x, dest_y);
   }
@@ -935,7 +935,7 @@ void DrawGraphicThruMaskExt(DrawBuffer d, int dest_x, int dest_y, int graphic)
 #endif
 #endif
 
-    SetClipOrigin(drawing_gc, dest_x-src_x, dest_y-src_y);
+    SetClipOrigin(src_bitmap, drawing_gc, dest_x-src_x, dest_y-src_y);
     BlitBitmapMasked(src_bitmap, d,
 		     src_x, src_y, TILEX, TILEY, dest_x, dest_y);
   }
@@ -943,7 +943,7 @@ void DrawGraphicThruMaskExt(DrawBuffer d, int dest_x, int dest_y, int graphic)
 
 void DrawMiniGraphic(int x, int y, int graphic)
 {
-  DrawMiniGraphicExt(drawto,gc, SX + x*MINI_TILEX, SY + y*MINI_TILEY, graphic);
+  DrawMiniGraphicExt(drawto, SX + x*MINI_TILEX, SY + y*MINI_TILEY, graphic);
   MarkTileDirty(x/2, y/2);
 }
 
@@ -994,7 +994,7 @@ void getMiniGraphicSource(int graphic, Bitmap *bitmap, int *x, int *y)
   }
 }
 
-void DrawMiniGraphicExt(DrawBuffer d, GC gc, int x, int y, int graphic)
+void DrawMiniGraphicExt(DrawBuffer d, int x, int y, int graphic)
 {
   Bitmap bitmap;
   int src_x, src_y;
@@ -1011,6 +1011,7 @@ void DrawGraphicShifted(int x,int y, int dx,int dy, int graphic,
   int src_x, src_y, dest_x, dest_y;
   int tile = graphic;
   int bitmap_nr;
+  Bitmap src_bitmap;
   GC drawing_gc;
 
   if (graphic < 0)
@@ -1084,7 +1085,8 @@ void DrawGraphicShifted(int x,int y, int dx,int dy, int graphic,
   }
 
   getGraphicSource(graphic, &bitmap_nr, &src_x, &src_y);
-  drawing_gc = clip_gc[bitmap_nr];
+  src_bitmap = pix[bitmap_nr];
+  drawing_gc = pix[bitmap_nr]->stored_clip_gc;
 
   src_x += cx;
   src_y += cy;
@@ -1105,9 +1107,9 @@ void DrawGraphicShifted(int x,int y, int dx,int dy, int graphic,
   {
     if (tile_clipmask[tile] != None)
     {
-      SetClipMask(tile_clip_gc, tile_clipmask[tile]);
-      SetClipOrigin(tile_clip_gc, dest_x, dest_y);
-      BlitBitmapMasked(pix_masked[bitmap_nr], drawto_field,
+      SetClipMask(src_bitmap, tile_clip_gc, tile_clipmask[tile]);
+      SetClipOrigin(src_bitmap, tile_clip_gc, dest_x, dest_y);
+      BlitBitmapMasked(src_bitmap, drawto_field,
 		       src_x, src_y, TILEX, TILEY, dest_x, dest_y);
     }
     else
@@ -1118,8 +1120,8 @@ void DrawGraphicShifted(int x,int y, int dx,int dy, int graphic,
 #endif
 #endif
 
-      SetClipOrigin(drawing_gc, dest_x - src_x, dest_y - src_y);
-      BlitBitmapMasked(pix_masked[bitmap_nr], drawto_field,
+      SetClipOrigin(src_bitmap, drawing_gc, dest_x - src_x, dest_y - src_y);
+      BlitBitmapMasked(src_bitmap, drawto_field,
 		       src_x, src_y, width, height, dest_x, dest_y);
     }
   }
@@ -1875,8 +1877,7 @@ boolean Request(char *text, unsigned int req_state)
     }
     sprintf(txt, text); 
     txt[tl] = 0;
-    DrawTextExt(drawto, gc,
-		DX + 51 - (tl * 14)/2, DY + 8 + ty * 16,
+    DrawTextExt(drawto, DX + 51 - (tl * 14)/2, DY + 8 + ty * 16,
 		txt, FS_SMALL, FC_YELLOW);
     text += tl + (tc == 32 ? 1 : 0);
   }
@@ -2137,6 +2138,9 @@ unsigned int MoveDoor(unsigned int door_state)
 
     for(x=start; x<=DXSIZE; x+=stepsize)
     {
+      Bitmap bitmap = pix[PIX_DOOR];
+      GC gc = bitmap->stored_clip_gc;
+
       WaitUntilDelayReached(&door_delay, door_delay_value);
 
       if (door_state & DOOR_ACTION_1)
@@ -2150,33 +2154,32 @@ unsigned int MoveDoor(unsigned int door_state)
 
 	ClearRectangle(drawto, DX, DY + DYSIZE - i/2, DXSIZE,i/2);
 
-	SetClipOrigin(clip_gc[PIX_DOOR], DX - i, (DY + j) - DOOR_GFX_PAGEY1);
-	BlitBitmapMasked(pix_masked[PIX_DOOR], drawto,
+	SetClipOrigin(bitmap, gc, DX - i, (DY + j) - DOOR_GFX_PAGEY1);
+	BlitBitmapMasked(bitmap, drawto,
 			 DXSIZE, DOOR_GFX_PAGEY1, i, 77,
 			 DX + DXSIZE - i, DY + j);
-	BlitBitmapMasked(pix_masked[PIX_DOOR], drawto,
+	BlitBitmapMasked(bitmap, drawto,
 			 DXSIZE, DOOR_GFX_PAGEY1 + 140, i, 63,
 			 DX + DXSIZE - i, DY + 140 + j);
-	SetClipOrigin(clip_gc[PIX_DOOR],
-		      DX - DXSIZE + i, DY - (DOOR_GFX_PAGEY1 + j));
-	BlitBitmapMasked(pix_masked[PIX_DOOR], drawto,
+	SetClipOrigin(bitmap, gc, DX - DXSIZE + i, DY - (DOOR_GFX_PAGEY1 + j));
+	BlitBitmapMasked(bitmap, drawto,
 			 DXSIZE - i, DOOR_GFX_PAGEY1 + j, i, 77 - j,
 			 DX, DY);
-	BlitBitmapMasked(pix_masked[PIX_DOOR], drawto,
+	BlitBitmapMasked(bitmap, drawto,
 			 DXSIZE-i, DOOR_GFX_PAGEY1 + 140, i, 63,
 			 DX, DY + 140 - j);
 
-	BlitBitmapMasked(pix_masked[PIX_DOOR], drawto,
+	BlitBitmapMasked(bitmap, drawto,
 			 DXSIZE - i, DOOR_GFX_PAGEY1 + 77, i, 63,
 			 DX, DY + 77 - j);
-	BlitBitmapMasked(pix_masked[PIX_DOOR], drawto,
+	BlitBitmapMasked(bitmap, drawto,
 			 DXSIZE - i, DOOR_GFX_PAGEY1 + 203, i, 77,
 			 DX, DY + 203 - j);
-	SetClipOrigin(clip_gc[PIX_DOOR], DX - i, (DY + j) - DOOR_GFX_PAGEY1);
-	BlitBitmapMasked(pix_masked[PIX_DOOR], drawto,
+	SetClipOrigin(bitmap, gc, DX - i, (DY + j) - DOOR_GFX_PAGEY1);
+	BlitBitmapMasked(bitmap, drawto,
 			 DXSIZE, DOOR_GFX_PAGEY1 + 77, i, 63,
 			 DX + DXSIZE - i, DY + 77 + j);
-	BlitBitmapMasked(pix_masked[PIX_DOOR], drawto,
+	BlitBitmapMasked(bitmap, drawto,
 			 DXSIZE, DOOR_GFX_PAGEY1 + 203, i, 77 - j,
 			 DX + DXSIZE - i, DY + 203 + j);
 
@@ -2194,21 +2197,21 @@ unsigned int MoveDoor(unsigned int door_state)
 
 	ClearRectangle(drawto, VX, VY + VYSIZE-i/2, VXSIZE, i/2);
 
-	SetClipOrigin(clip_gc[PIX_DOOR], VX - i, (VY + j) - DOOR_GFX_PAGEY2);
-	BlitBitmapMasked(pix_masked[PIX_DOOR], drawto,
+	SetClipOrigin(bitmap, gc, VX - i, (VY + j) - DOOR_GFX_PAGEY2);
+	BlitBitmapMasked(bitmap, drawto,
 			 VXSIZE, DOOR_GFX_PAGEY2, i, VYSIZE / 2,
 			 VX + VXSIZE-i, VY+j);
-	SetClipOrigin(clip_gc[PIX_DOOR],
+	SetClipOrigin(bitmap, gc,
 		      VX - VXSIZE + i, VY - (DOOR_GFX_PAGEY2 + j));
-	BlitBitmapMasked(pix_masked[PIX_DOOR], drawto,
+	BlitBitmapMasked(bitmap, drawto,
 			 VXSIZE - i, DOOR_GFX_PAGEY2 + j, i, VYSIZE / 2 - j,
 			 VX, VY);
 
-	BlitBitmapMasked(pix_masked[PIX_DOOR], drawto,
+	BlitBitmapMasked(bitmap, drawto,
 			 VXSIZE - i, DOOR_GFX_PAGEY2 + VYSIZE / 2,
 			 i, VYSIZE / 2, VX, VY + VYSIZE / 2 - j);
-	SetClipOrigin(clip_gc[PIX_DOOR], VX - i, (VY + j) - DOOR_GFX_PAGEY2);
-	BlitBitmapMasked(pix_masked[PIX_DOOR], drawto,
+	SetClipOrigin(bitmap, gc, VX - i, (VY + j) - DOOR_GFX_PAGEY2);
+	BlitBitmapMasked(bitmap, drawto,
 			 VXSIZE, DOOR_GFX_PAGEY2 + VYSIZE / 2,
 			 i, VYSIZE / 2 - j,
 			 VX + VXSIZE - i, VY + VYSIZE / 2 + j);
@@ -2253,12 +2256,13 @@ void UndrawSpecialEditorDoor()
 }
 
 #ifndef	TARGET_SDL
-int ReadPixel(DrawBuffer d, int x, int y)
+int ReadPixel(DrawBuffer bitmap, int x, int y)
 {
   XImage *pixel_image;
   unsigned long pixel_value;
 
-  pixel_image = XGetImage(display, d, x, y, 1, 1, AllPlanes, ZPixmap);
+  pixel_image = XGetImage(display, bitmap->drawable,
+			  x, y, 1, 1, AllPlanes, ZPixmap);
   pixel_value = XGetPixel(pixel_image, 0, 0);
 
   XDestroyImage(pixel_image);

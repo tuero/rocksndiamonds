@@ -321,8 +321,6 @@ void InitDisplay()
 		  ICON_TITLE_STRING, x11_icon_filename, x11_iconmask_filename,
 		  msdos_pointer_filename);
 
-  InitScrollbufferSize(FXSIZE, FYSIZE);	/* (only needed for MS-DOS code) */
-
   InitVideoDisplay();
   InitVideoBuffer(&backbuffer, &window, WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH,
 		  setup.fullscreen);
@@ -422,12 +420,22 @@ void InitGfx()
     { -1, 0 }
   };
 
+  /* initialize playfield properties */
+
+  InitPlayfieldInfo(SX, SY, SXSIZE, SYSIZE,
+		    REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE);
+  InitDoor1Info(DX, DY, DXSIZE, DYSIZE);
+  InitDoor2Info(VX, VY, VXSIZE, VYSIZE);
+  InitScrollbufferInfo(FXSIZE, FYSIZE);
+
   /* create additional image buffers for double-buffering */
 
   pix[PIX_DB_DOOR] = CreateBitmap(3 * DXSIZE, DYSIZE + VYSIZE, DEFAULT_DEPTH);
   pix[PIX_DB_FIELD] = CreateBitmap(FXSIZE, FYSIZE, DEFAULT_DEPTH);
 
   LoadGfx(PIX_SMALLFONT, &pic[PIX_SMALLFONT]);
+  InitFontInfo(NULL, NULL, pix[PIX_SMALLFONT]);
+
   DrawInitText(WINDOW_TITLE_STRING, 20, FC_YELLOW);
   DrawInitText(WINDOW_SUBTITLE_STRING, 50, FC_RED);
 #if defined(PLATFORM_MSDOS)
@@ -439,6 +447,8 @@ void InitGfx()
   for(i=0; i<NUM_PICTURES; i++)
     if (i != PIX_SMALLFONT)
       LoadGfx(i,&pic[i]);
+
+  InitFontInfo(pix[PIX_BIGFONT], pix[PIX_MEDIUMFONT], pix[PIX_SMALLFONT]);
 
   /* create additional image buffers for masking of graphics */
 
@@ -486,21 +496,23 @@ void InitGfx()
   clip_gc_values.graphics_exposures = False;
   clip_gc_valuemask = GCGraphicsExposures;
   copy_clipmask_gc =
-    XCreateGC(display, clipmask[PIX_BACK], clip_gc_valuemask, &clip_gc_values);
+    XCreateGC(display, pix[PIX_BACK]->clip_mask,
+	      clip_gc_valuemask, &clip_gc_values);
 
   clip_gc_values.graphics_exposures = False;
   clip_gc_valuemask = GCGraphicsExposures;
   tile_clip_gc =
-    XCreateGC(display, window, clip_gc_valuemask, &clip_gc_values);
+    XCreateGC(display, window->drawable, clip_gc_valuemask, &clip_gc_values);
 
   for(i=0; i<NUM_BITMAPS; i++)
   {
-    if (clipmask[i])
+    if (pix[i]->clip_mask)
     {
       clip_gc_values.graphics_exposures = False;
-      clip_gc_values.clip_mask = clipmask[i];
+      clip_gc_values.clip_mask = pix[i]->clip_mask;
       clip_gc_valuemask = GCGraphicsExposures | GCClipMask;
-      clip_gc[i] = XCreateGC(display,window,clip_gc_valuemask,&clip_gc_values);
+      pix[i]->stored_clip_gc = XCreateGC(display, window->drawable,
+					 clip_gc_valuemask,&clip_gc_values);
     }
   }
 
@@ -520,12 +532,13 @@ void InitGfx()
       Pixmap src_pixmap;
 
       getGraphicSource(graphic, &pixmap_nr, &src_x, &src_y);
-      src_pixmap = clipmask[pixmap_nr];
+      src_pixmap = pix[pixmap_nr]->clip_mask;
 
-      tile_clipmask[tile] = XCreatePixmap(display, window, TILEX,TILEY, 1);
+      tile_clipmask[tile] = XCreatePixmap(display, window->drawable,
+					  TILEX, TILEY, 1);
 
-      XCopyArea(display,src_pixmap,tile_clipmask[tile],copy_clipmask_gc,
-		src_x,src_y, TILEX,TILEY, 0,0);
+      XCopyArea(display, src_pixmap, tile_clipmask[tile], copy_clipmask_gc,
+		src_x, src_y, TILEX, TILEY, 0, 0);
     }
   }
 
@@ -575,6 +588,8 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
     rest(100);
 #endif
 
+    pix[pos] = CreateBitmapStruct();
+
 #if defined(TARGET_SDL)
     /* load image to temporary surface */
     if ((sdl_image_tmp = IMG_Load(filename)) == NULL)
@@ -595,8 +610,9 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
 
 #else /* !TARGET_SDL */
 
-    pcx_err = Read_PCX_to_Pixmap(display, window, gc, filename,
-				 &pix[pos], &clipmask[pos]);
+    pcx_err = Read_PCX_to_Pixmap(display, window->drawable, window->gc,
+				 filename,
+				 &pix[pos]->drawable, &pix[pos]->clip_mask);
     switch(pcx_err)
     {
       case PCX_Success:
@@ -615,19 +631,21 @@ void LoadGfx(int pos, struct PictureFileInfo *pic)
 	break;
     }
 
-    if (!pix[pos])
+    if (!pix[pos]->drawable)
       Error(ERR_EXIT, "cannot get graphics for '%s'", pic->picture_filename);
 
+#if 0
     /* setting pix_masked[] to pix[] allows BlitBitmapMasked() to always
        use pix_masked[], although they are the same when not using SDL */
     pix_masked[pos] = pix[pos];
+#endif
 
 #endif /* !TARGET_SDL */
   }
 
 #if defined(TARGET_X11)
   /* check if clip mask was correctly created */
-  if (pic->picture_with_mask && !clipmask[pos])
+  if (pic->picture_with_mask && !pix[pos]->clip_mask)
     Error(ERR_EXIT, "cannot get clipmask for '%s'", pic->picture_filename);
 #endif
 }
@@ -1806,25 +1824,16 @@ void CloseAllAndExit(int exit_value)
 #endif
 
   for(i=0; i<NUM_BITMAPS; i++)
-  {
-    if (pix[i])
-      FreeBitmap(pix[i]);
-
-#if defined(TARGET_SDL)
-    FreeBitmap(pix_masked[i]);
-#else
-    if (clipmask[i])
-      FreeBitmap(clipmask[i]);
-    if (clip_gc[i])
-      XFreeGC(display, clip_gc[i]);
-#endif
-  }
+    FreeBitmap(pix[i]);
 
 #if defined(TARGET_SDL)
   KeyboardAutoRepeatOn();
 #else
+
+#if 0
   if (gc)
     XFreeGC(display, gc);
+#endif
 
   if (display)
   {

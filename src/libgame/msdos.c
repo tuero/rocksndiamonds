@@ -442,7 +442,8 @@ Pixmap XCreatePixmap(Display *display, Drawable d, unsigned int width,
   BITMAP *bitmap = NULL;
 
   if (gfx_capabilities & GFX_HW_VRAM_BLIT &&
-      width == video.scrollbuffer_width && height == video.scrollbuffer_height)
+      width  == playfield.scrollbuffer_width &&
+      height == playfield.scrollbuffer_height)
     bitmap = create_video_bitmap(width, height);
 
   if (bitmap == NULL)
