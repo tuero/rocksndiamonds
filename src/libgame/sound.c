@@ -38,7 +38,7 @@ static int playing_sounds = 0;
 static struct SoundControl playlist[MAX_SOUNDS_PLAYING];
 static struct SoundControl emptySoundControl =
 {
-  -1,0,0, FALSE,FALSE,FALSE,FALSE,FALSE, 0,0L,0L,NULL
+  -1,0,0, FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE, 0,0L,0L,NULL
 };
 
 #if defined(PLATFORM_UNIX)
@@ -227,6 +227,22 @@ void SoundServer(void)
 	!= sizeof(snd_ctrl))
       Error(ERR_EXIT_SOUND_SERVER, "broken pipe -- no sounds");
 
+    if (snd_ctrl.reload_sounds || snd_ctrl.reload_music)
+    {
+      for(i=0;i<MAX_SOUNDS_PLAYING;i++)
+	playlist[i] = emptySoundControl;
+      playing_sounds = 0;
+
+      close(audio.device_fd);
+
+      if (snd_ctrl.reload_sounds)
+	ReloadSounds();
+      else
+	ReloadMusic();
+
+      continue;
+    }
+
 #if defined(AUDIO_STREAMING_DSP)
 
     if (snd_ctrl.fade_sound)
@@ -244,8 +260,8 @@ void SoundServer(void)
 	continue;
 
       for(i=0;i<MAX_SOUNDS_PLAYING;i++)
-	playlist[i]=emptySoundControl;
-      playing_sounds=0;
+	playlist[i] = emptySoundControl;
+      playing_sounds = 0;
 
       close(audio.device_fd);
     }
@@ -257,7 +273,7 @@ void SoundServer(void)
       for(i=0;i<MAX_SOUNDS_PLAYING;i++)
 	if (playlist[i].nr == snd_ctrl.nr)
 	{
-	  playlist[i]=emptySoundControl;
+	  playlist[i] = emptySoundControl;
 	  playing_sounds--;
 	}
 
@@ -910,6 +926,15 @@ static int ulaw_to_linear(unsigned char ulawbyte)
 /* ========================================================================= */
 /* THE STUFF BELOW IS ONLY USED BY THE MAIN PROCESS                          */
 
+void ReloadSounds()
+{
+  printf("reloading sounds ...\n");
+}
+
+void ReloadMusic()
+{
+  printf("reloading music ...\n");
+}
 
 #define CHUNK_ID_LEN            4       /* IFF style chunk id length */
 #define WAV_HEADER_SIZE		20	/* size of WAV file header */
@@ -1289,6 +1314,58 @@ void StopSoundExt(int nr, int method)
 #else
   sound_handler(snd_ctrl);
 #endif
+#endif
+}
+
+void InitReloadSounds(char *set_name)
+{
+  struct SoundControl snd_ctrl = emptySoundControl;
+
+  if (!audio.sound_available)
+    return;
+
+  snd_ctrl.reload_sounds = TRUE;
+
+#if defined(TARGET_SDL)
+  ReloadSounds();
+#elif defined(PLATFORM_UNIX)
+  if (audio.soundserver_pid == 0)	/* we are child process */
+    return;
+
+  if (write(audio.soundserver_pipe[1], &snd_ctrl, sizeof(snd_ctrl)) < 0)
+  {
+    Error(ERR_WARN, "cannot pipe to child process -- no sounds");
+    audio.sound_available = audio.sound_enabled = FALSE;
+    return;
+  }
+#elif defined(PLATFORM_MSDOS)
+  sound_handler(snd_ctrl);
+#endif
+}
+
+void InitReloadMusic(char *set_name)
+{
+  struct SoundControl snd_ctrl = emptySoundControl;
+
+  if (!audio.sound_available)
+    return;
+
+  snd_ctrl.reload_music = TRUE;
+
+#if defined(TARGET_SDL)
+  ReloadMusic();
+#elif defined(PLATFORM_UNIX)
+  if (audio.soundserver_pid == 0)	/* we are child process */
+    return;
+
+  if (write(audio.soundserver_pipe[1], &snd_ctrl, sizeof(snd_ctrl)) < 0)
+  {
+    Error(ERR_WARN, "cannot pipe to child process -- no sounds");
+    audio.sound_available = audio.sound_enabled = FALSE;
+    return;
+  }
+#elif defined(PLATFORM_MSDOS)
+  sound_handler(snd_ctrl);
 #endif
 }
 

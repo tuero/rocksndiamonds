@@ -424,14 +424,14 @@ void ReloadCustomArtwork()
 
   if (artwork.sounds_set_current != artwork.snd_current->name)
   {
-    printf("reload sounds ...\n");
+    InitReloadSounds(artwork.snd_current->name);
 
     artwork.sounds_set_current = artwork.snd_current->name;
   }
 
   if (artwork.music_set_current != artwork.mus_current->name)
   {
-    printf("reload music ...\n");
+    InitReloadMusic(artwork.mus_current->name);
 
     artwork.music_set_current = artwork.mus_current->name;
   }

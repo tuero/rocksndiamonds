@@ -184,6 +184,8 @@ struct SoundControl
   boolean fade_sound;
   boolean stop_sound;
   boolean stop_all_sounds;
+  boolean reload_sounds;
+  boolean reload_music;
   int playingtime;
   long playingpos;
   long data_len;
@@ -204,6 +206,8 @@ void StartSoundserver(void);
 void SoundServer(void);
 
 /* sound client functions */
+void ReloadSounds(void);
+void ReloadMusic(void);
 boolean LoadSound(char *);
 boolean LoadMod(char *);
 int LoadMusic(void);
@@ -219,6 +223,8 @@ void StopMusic(void);
 void StopSound(int);
 void StopSounds(void);
 void StopSoundExt(int, int);
+void InitReloadSounds(char *);
+void InitReloadMusic(char *);
 void FreeSounds(int);
 
 #endif
