@@ -661,7 +661,7 @@ extern char		*element_info[];
 #define EL_MORAST_VOLL		17
 #define EL_TROPFEN		18
 #define EL_BOMBE		19
-#define EL_SIEB_INAKTIV		20
+#define EL_MAGIC_WALL_OFF	20
 #define EL_SPEED_PILL		21
 #define EL_SALZSAEURE		22
 #define EL_AMOEBE_NASS		23
@@ -702,7 +702,7 @@ extern char		*element_info[];
 #define EL_ERZ_EDEL_BD		58
 #define EL_ERZ_EDEL_GELB	59
 #define EL_MAMPFER2		60
-#define EL_SIEB2_INAKTIV	61
+#define EL_MAGIC_WALL_BD_OFF	61
 #define EL_INVISIBLE_STEEL	62
 
 #define EL_UNUSED_63		63
@@ -989,12 +989,12 @@ extern char		*element_info[];
 /* "real" (and therefore drawable) runtime elements */
 #define EL_FIRST_RUNTIME_EL	500
 
-#define EL_SIEB_LEER		500
-#define EL_SIEB2_LEER		501
-#define EL_SIEB_VOLL		502
-#define EL_SIEB2_VOLL		503
-#define EL_SIEB_TOT		504
-#define EL_SIEB2_TOT		505
+#define EL_MAGIC_WALL_EMPTY	500
+#define EL_MAGIC_WALL_BD_EMPTY	501
+#define EL_MAGIC_WALL_FULL	502
+#define EL_MAGIC_WALL_BD_FULL	503
+#define EL_MAGIC_WALL_DEAD	504
+#define EL_MAGIC_WALL_BD_DEAD	505
 #define EL_AUSGANG_ACT		506
 #define EL_SP_TERMINAL_ACTIVE	507
 #define EL_SP_BUG_ACTIVE	508
@@ -1145,10 +1145,10 @@ extern char		*element_info[];
 #define GFX_SOKOBAN_FELD_VOLL	123
 #define GFX_GEBLUBBER		124
 /* Zeile 8 (128) */
-#define GFX_SIEB_INAKTIV	128
-#define GFX_SIEB_LEER		GFX_SIEB_INAKTIV
-#define GFX_SIEB_VOLL		GFX_SIEB_INAKTIV
-#define GFX_SIEB_TOT		GFX_SIEB_INAKTIV
+#define GFX_MAGIC_WALL_OFF	128
+#define GFX_MAGIC_WALL_EMPTY	GFX_MAGIC_WALL_OFF
+#define GFX_MAGIC_WALL_FULL	GFX_MAGIC_WALL_OFF
+#define GFX_MAGIC_WALL_DEAD	GFX_MAGIC_WALL_OFF
 #define GFX_ERZ_EDEL		132
 #define GFX_ERZ_DIAM		133
 #define GFX_ERZ_EDEL_ROT	134
@@ -1183,10 +1183,10 @@ extern char		*element_info[];
 #define GFX_MAUER_L1		GFX_MAUER_LEFT
 #define GFX_MAUER_L		170
 #define GFX_MAUER_LEBT		171
-#define GFX_SIEB2_INAKTIV	172
-#define GFX_SIEB2_LEER		GFX_SIEB2_INAKTIV
-#define GFX_SIEB2_VOLL		GFX_SIEB2_INAKTIV
-#define GFX_SIEB2_TOT		GFX_SIEB2_INAKTIV
+#define GFX_MAGIC_WALL_BD_OFF	172
+#define GFX_MAGIC_WALL_BD_EMPTY	GFX_MAGIC_WALL_BD_OFF
+#define GFX_MAGIC_WALL_BD_FULL	GFX_MAGIC_WALL_BD_OFF
+#define GFX_MAGIC_WALL_BD_DEAD	GFX_MAGIC_WALL_BD_OFF
 /* Zeile 11 (176) */
 #define	GFX_AUSGANG_ZU		176
 #define	GFX_AUSGANG_ACT		177

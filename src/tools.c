@@ -1196,8 +1196,10 @@ void DrawScreenElementExt(int x, int y, int dx, int dy, int element,
 	graphic += phase2;
     }
   }
-  else if (element == EL_SIEB_LEER || element == EL_SIEB2_LEER ||
-	   element == EL_SIEB_VOLL || element == EL_SIEB2_VOLL)
+  else if (element == EL_MAGIC_WALL_EMPTY ||
+	   element == EL_MAGIC_WALL_BD_EMPTY ||
+	   element == EL_MAGIC_WALL_FULL ||
+	   element == EL_MAGIC_WALL_BD_FULL)
   {
     graphic += 3 + getGraphicAnimationPhase(4, 4, ANIM_REVERSE);
   }
@@ -1425,13 +1427,13 @@ void DrawScreenField(int x, int y)
     boolean cut_mode = NO_CUTTING;
 
     if (Store[ux][uy] == EL_MORAST_LEER ||
-	Store[ux][uy] == EL_SIEB_LEER ||
-	Store[ux][uy] == EL_SIEB2_LEER ||
+	Store[ux][uy] == EL_MAGIC_WALL_EMPTY ||
+	Store[ux][uy] == EL_MAGIC_WALL_BD_EMPTY ||
 	Store[ux][uy] == EL_AMOEBE_NASS)
       cut_mode = CUT_ABOVE;
     else if (Store[ux][uy] == EL_MORAST_VOLL ||
-	     Store[ux][uy] == EL_SIEB_VOLL ||
-	     Store[ux][uy] == EL_SIEB2_VOLL)
+	     Store[ux][uy] == EL_MAGIC_WALL_FULL ||
+	     Store[ux][uy] == EL_MAGIC_WALL_BD_FULL)
       cut_mode = CUT_BELOW;
 
     if (cut_mode == CUT_ABOVE)
@@ -1461,8 +1463,8 @@ void DrawScreenField(int x, int y)
 		  MovDir[oldx][oldy] == MV_RIGHT);
 
     if (Store[oldx][oldy] == EL_MORAST_LEER ||
-	Store[oldx][oldy] == EL_SIEB_LEER ||
-	Store[oldx][oldy] == EL_SIEB2_LEER ||
+	Store[oldx][oldy] == EL_MAGIC_WALL_EMPTY ||
+	Store[oldx][oldy] == EL_MAGIC_WALL_BD_EMPTY ||
 	Store[oldx][oldy] == EL_AMOEBE_NASS)
       cut_mode = CUT_ABOVE;
 
@@ -2455,10 +2457,10 @@ int el2gfx(int element)
     case EL_MORAST_VOLL:	return GFX_MORAST_VOLL;
     case EL_TROPFEN:		return GFX_TROPFEN;
     case EL_BOMBE:		return GFX_BOMBE;
-    case EL_SIEB_INAKTIV:	return GFX_SIEB_INAKTIV;
-    case EL_SIEB_LEER:		return GFX_SIEB_LEER;
-    case EL_SIEB_VOLL:		return GFX_SIEB_VOLL;
-    case EL_SIEB_TOT:		return GFX_SIEB_TOT;
+    case EL_MAGIC_WALL_OFF:	return GFX_MAGIC_WALL_OFF;
+    case EL_MAGIC_WALL_EMPTY:	return GFX_MAGIC_WALL_EMPTY;
+    case EL_MAGIC_WALL_FULL:	return GFX_MAGIC_WALL_FULL;
+    case EL_MAGIC_WALL_DEAD:	return GFX_MAGIC_WALL_DEAD;
     case EL_SALZSAEURE:		return GFX_SALZSAEURE;
     case EL_AMOEBE_TOT:		return GFX_AMOEBE_TOT;
     case EL_AMOEBE_NASS:	return GFX_AMOEBE_NASS;
@@ -2516,10 +2518,10 @@ int el2gfx(int element)
     case EL_ERZ_EDEL_ROT:	return GFX_ERZ_EDEL_ROT;
     case EL_ERZ_EDEL_LILA:	return GFX_ERZ_EDEL_LILA;
     case EL_MAMPFER2:		return GFX_MAMPFER2;
-    case EL_SIEB2_INAKTIV:	return GFX_SIEB2_INAKTIV;
-    case EL_SIEB2_LEER:		return GFX_SIEB2_LEER;
-    case EL_SIEB2_VOLL:		return GFX_SIEB2_VOLL;
-    case EL_SIEB2_TOT:		return GFX_SIEB2_TOT;
+    case EL_MAGIC_WALL_BD_OFF:	return GFX_MAGIC_WALL_BD_OFF;
+    case EL_MAGIC_WALL_BD_EMPTY:return GFX_MAGIC_WALL_BD_EMPTY;
+    case EL_MAGIC_WALL_BD_FULL:	return GFX_MAGIC_WALL_BD_FULL;
+    case EL_MAGIC_WALL_BD_DEAD:	return GFX_MAGIC_WALL_BD_DEAD;
     case EL_DYNABOMB_ACTIVE_1:	return GFX_DYNABOMB;
     case EL_DYNABOMB_ACTIVE_2:	return GFX_DYNABOMB;
     case EL_DYNABOMB_ACTIVE_3:	return GFX_DYNABOMB;

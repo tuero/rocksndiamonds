@@ -1160,8 +1160,8 @@ void RemoveMovingField(int x, int y)
 
   if (Feld[x][y] == EL_BLOCKED &&
       (Store[oldx][oldy] == EL_MORAST_LEER ||
-       Store[oldx][oldy] == EL_SIEB_LEER ||
-       Store[oldx][oldy] == EL_SIEB2_LEER ||
+       Store[oldx][oldy] == EL_MAGIC_WALL_EMPTY ||
+       Store[oldx][oldy] == EL_MAGIC_WALL_BD_EMPTY ||
        Store[oldx][oldy] == EL_AMOEBE_NASS))
   {
     Feld[oldx][oldy] = Store[oldx][oldy];
@@ -1804,11 +1804,12 @@ void Impact(int x, int y)
   if (!lastline && object_hit)		/* check which object was hit */
   {
     if (CAN_CHANGE(element) && 
-	(smashed == EL_SIEB_INAKTIV || smashed == EL_SIEB2_INAKTIV))
+	(smashed == EL_MAGIC_WALL_OFF || smashed == EL_MAGIC_WALL_BD_OFF))
     {
       int x, y;
       int activated_magic_wall =
-	(smashed == EL_SIEB_INAKTIV ? EL_SIEB_LEER : EL_SIEB2_LEER);
+	(smashed == EL_MAGIC_WALL_OFF ? EL_MAGIC_WALL_EMPTY :
+	 EL_MAGIC_WALL_BD_EMPTY);
 
       /* activate magic wall / mill */
 
@@ -1898,7 +1899,8 @@ void Impact(int x, int y)
 
   /* play sound of magic wall / mill */
   if (!lastline &&
-      (Feld[x][y+1] == EL_SIEB_LEER || Feld[x][y+1] == EL_SIEB2_LEER))
+      (Feld[x][y+1] == EL_MAGIC_WALL_EMPTY ||
+       Feld[x][y+1] == EL_MAGIC_WALL_BD_EMPTY))
   {
     PlaySoundLevel(x, y, SND_QUIRK);
     return;
@@ -2440,15 +2442,15 @@ void StartMoving(int x, int y)
       InitMovingField(x, y, MV_DOWN);
       Store[x][y] = EL_MORAST_VOLL;
     }
-    else if (element == EL_SIEB_VOLL)
+    else if (element == EL_MAGIC_WALL_FULL)
     {
       if (IS_FREE(x, y+1))
       {
 	InitMovingField(x, y, MV_DOWN);
 	Feld[x][y] = EL_CHANGED(Store2[x][y]);
-	Store[x][y] = EL_SIEB_LEER;
+	Store[x][y] = EL_MAGIC_WALL_EMPTY;
       }
-      else if (Feld[x][y+1] == EL_SIEB_LEER)
+      else if (Feld[x][y+1] == EL_MAGIC_WALL_EMPTY)
       {
 	if (!MovDelay[x][y])
 	  MovDelay[x][y] = TILEY/4 + 1;
@@ -2460,21 +2462,21 @@ void StartMoving(int x, int y)
 	    return;
 	}
 
-	Feld[x][y] = EL_SIEB_LEER;
-	Feld[x][y+1] = EL_SIEB_VOLL;
+	Feld[x][y] = EL_MAGIC_WALL_EMPTY;
+	Feld[x][y+1] = EL_MAGIC_WALL_FULL;
 	Store2[x][y+1] = EL_CHANGED(Store2[x][y]);
 	Store2[x][y] = 0;
       }
     }
-    else if (element == EL_SIEB2_VOLL)
+    else if (element == EL_MAGIC_WALL_BD_FULL)
     {
       if (IS_FREE(x, y+1))
       {
 	InitMovingField(x, y, MV_DOWN);
 	Feld[x][y] = EL_CHANGED2(Store2[x][y]);
-	Store[x][y] = EL_SIEB2_LEER;
+	Store[x][y] = EL_MAGIC_WALL_BD_EMPTY;
       }
-      else if (Feld[x][y+1] == EL_SIEB2_LEER)
+      else if (Feld[x][y+1] == EL_MAGIC_WALL_BD_EMPTY)
       {
 	if (!MovDelay[x][y])
 	  MovDelay[x][y] = TILEY/4 + 1;
@@ -2486,18 +2488,20 @@ void StartMoving(int x, int y)
 	    return;
 	}
 
-	Feld[x][y] = EL_SIEB2_LEER;
-	Feld[x][y+1] = EL_SIEB2_VOLL;
+	Feld[x][y] = EL_MAGIC_WALL_BD_EMPTY;
+	Feld[x][y+1] = EL_MAGIC_WALL_BD_FULL;
 	Store2[x][y+1] = EL_CHANGED2(Store2[x][y]);
 	Store2[x][y] = 0;
       }
     }
     else if (CAN_CHANGE(element) &&
-	     (Feld[x][y+1] == EL_SIEB_LEER || Feld[x][y+1] == EL_SIEB2_LEER))
+	     (Feld[x][y+1] == EL_MAGIC_WALL_EMPTY ||
+	      Feld[x][y+1] == EL_MAGIC_WALL_BD_EMPTY))
     {
       InitMovingField(x, y, MV_DOWN);
       Store[x][y] =
-	(Feld[x][y+1] == EL_SIEB_LEER ? EL_SIEB_VOLL : EL_SIEB2_VOLL);
+	(Feld[x][y+1] == EL_MAGIC_WALL_EMPTY ? EL_MAGIC_WALL_FULL :
+	 EL_MAGIC_WALL_BD_FULL);
       Store2[x][y+1] = element;
     }
     else if (CAN_SMASH(element) && Feld[x][y+1] == EL_SALZSAEURE)
@@ -2941,27 +2945,30 @@ void ContinueMoving(int x, int y)
       Store[x][y] = 0;
       Feld[x][y] = EL_MORAST_LEER;
     }
-    else if (Store[x][y] == EL_SIEB_VOLL)
+    else if (Store[x][y] == EL_MAGIC_WALL_FULL)
     {
       Store[x][y] = 0;
       element = Feld[newx][newy] =
-	(game.magic_wall_active ? EL_SIEB_VOLL : EL_SIEB_TOT);
+	(game.magic_wall_active ? EL_MAGIC_WALL_FULL : EL_MAGIC_WALL_DEAD);
     }
-    else if (Store[x][y] == EL_SIEB_LEER)
+    else if (Store[x][y] == EL_MAGIC_WALL_EMPTY)
     {
       Store[x][y] = Store2[x][y] = 0;
-      Feld[x][y] = (game.magic_wall_active ? EL_SIEB_LEER : EL_SIEB_TOT);
+      Feld[x][y] = (game.magic_wall_active ? EL_MAGIC_WALL_EMPTY :
+		    EL_MAGIC_WALL_DEAD);
     }
-    else if (Store[x][y] == EL_SIEB2_VOLL)
+    else if (Store[x][y] == EL_MAGIC_WALL_BD_FULL)
     {
       Store[x][y] = 0;
       element = Feld[newx][newy] =
-	(game.magic_wall_active ? EL_SIEB2_VOLL : EL_SIEB2_TOT);
+	(game.magic_wall_active ? EL_MAGIC_WALL_BD_FULL :
+	 EL_MAGIC_WALL_BD_DEAD);
     }
-    else if (Store[x][y] == EL_SIEB2_LEER)
+    else if (Store[x][y] == EL_MAGIC_WALL_BD_EMPTY)
     {
       Store[x][y] = Store2[x][y] = 0;
-      Feld[x][y] = (game.magic_wall_active ? EL_SIEB2_LEER : EL_SIEB2_TOT);
+      Feld[x][y] = (game.magic_wall_active ? EL_MAGIC_WALL_BD_EMPTY :
+		    EL_MAGIC_WALL_BD_DEAD);
     }
     else if (Store[x][y] == EL_SALZSAEURE)
     {
@@ -3575,7 +3582,7 @@ void BreakingPearl(int x, int y)
 
 void SiebAktivieren(int x, int y, int typ)
 {
-  int graphic = (typ == 1 ? GFX_SIEB_VOLL : GFX_SIEB2_VOLL) + 3;
+  int graphic = (typ == 1 ? GFX_MAGIC_WALL_FULL : GFX_MAGIC_WALL_BD_FULL) + 3;
 
   DrawGraphicAnimation(x, y, graphic, 4, 4, ANIM_REVERSE);
 }
@@ -4422,14 +4429,15 @@ void GameActions()
       boolean sieb = FALSE;
       int jx = local_player->jx, jy = local_player->jy;
 
-      if (element == EL_SIEB_LEER || element == EL_SIEB_VOLL ||
-	  Store[x][y] == EL_SIEB_LEER)
+      if (element == EL_MAGIC_WALL_EMPTY || element == EL_MAGIC_WALL_FULL ||
+	  Store[x][y] == EL_MAGIC_WALL_EMPTY)
       {
 	SiebAktivieren(x, y, 1);
 	sieb = TRUE;
       }
-      else if (element == EL_SIEB2_LEER || element == EL_SIEB2_VOLL ||
-	       Store[x][y] == EL_SIEB2_LEER)
+      else if (element == EL_MAGIC_WALL_BD_EMPTY ||
+	       element == EL_MAGIC_WALL_BD_FULL ||
+	       Store[x][y] == EL_MAGIC_WALL_BD_EMPTY)
       {
 	SiebAktivieren(x, y, 2);
 	sieb = TRUE;
@@ -4458,14 +4466,15 @@ void GameActions()
 	{
 	  element = Feld[x][y];
 
-	  if (element == EL_SIEB_LEER || element == EL_SIEB_VOLL)
+	  if (element == EL_MAGIC_WALL_EMPTY || element == EL_MAGIC_WALL_FULL)
 	  {
-	    Feld[x][y] = EL_SIEB_TOT;
+	    Feld[x][y] = EL_MAGIC_WALL_DEAD;
 	    DrawLevelField(x, y);
 	  }
-	  else if (element == EL_SIEB2_LEER || element == EL_SIEB2_VOLL)
+	  else if (element == EL_MAGIC_WALL_BD_EMPTY ||
+		   element == EL_MAGIC_WALL_BD_FULL)
 	  {
-	    Feld[x][y] = EL_SIEB2_TOT;
+	    Feld[x][y] = EL_MAGIC_WALL_BD_DEAD;
 	    DrawLevelField(x, y);
 	  }
 	}

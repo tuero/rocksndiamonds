@@ -752,7 +752,7 @@ int editor_element[] =
   EL_BETON,
 
   EL_BD_WALL,
-  EL_SIEB2_INAKTIV,
+  EL_MAGIC_WALL_BD_OFF,
   EL_AUSGANG_ZU,
   EL_AUSGANG_AUF,
 
@@ -799,7 +799,7 @@ int editor_element[] =
   EL_BETON,
   EL_MAUERWERK,
   EL_FELSBODEN,
-  EL_SIEB_INAKTIV,
+  EL_MAGIC_WALL_OFF,
 
   EL_EDELSTEIN,
   EL_DIAMANT,
@@ -2626,7 +2626,7 @@ static void DrawPropertiesWindow()
     { EL_AMOEBE_NORM,	&level.amoeba_speed,		TEXT_SPEED },
     { EL_AMOEBE_VOLL,	&level.amoeba_speed,		TEXT_SPEED },
     { EL_AMOEBE_BD,	&level.amoeba_speed,		TEXT_SPEED },
-    { EL_SIEB_INAKTIV,	&level.time_magic_wall,		TEXT_DURATION },
+    { EL_MAGIC_WALL_OFF,&level.time_magic_wall,		TEXT_DURATION },
     { EL_ABLENK_AUS,	&level.time_wheel,		TEXT_DURATION },
     { -1, NULL, NULL }
   };
