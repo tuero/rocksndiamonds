@@ -1945,7 +1945,7 @@ void InitElementPropertiesStatic()
     EL_SP_DISK_YELLOW,
     EL_SP_SNIKSNAK,
     EL_SP_ELECTRON,
-#if 1
+#if 0
     EL_BLACK_ORB,
 #endif
     -1
@@ -3082,6 +3082,10 @@ void InitElementPropertiesEngine(int engine_version)
 					     !IS_DIGGABLE(i) &&
 					     !IS_COLLECTIBLE(i)));
 
+    /* ---------- PROTECTED ------------------------------------------------ */
+    if (IS_ACCESSIBLE_INSIDE(i))
+      SET_PROPERTY(i, EP_PROTECTED, TRUE);
+
     /* ---------- DRAGONFIRE_PROOF ----------------------------------------- */
 
     if (IS_HISTORIC_SOLID(i) || i == EL_EXPLOSION)
@@ -3089,10 +3093,6 @@ void InitElementPropertiesEngine(int engine_version)
     else
       SET_PROPERTY(i, EP_DRAGONFIRE_PROOF, (IS_CUSTOM_ELEMENT(i) &&
 					    IS_INDESTRUCTIBLE(i)));
-
-    /* ---------- PROTECTED ------------------------------------------------ */
-    if (IS_ACCESSIBLE_INSIDE(i))
-      SET_PROPERTY(i, EP_PROTECTED, TRUE);
 
     /* ---------- EXPLOSION_PROOF ------------------------------------------ */
     if (i == EL_FLAMES)
@@ -3144,6 +3144,13 @@ void InitElementPropertiesEngine(int engine_version)
     SET_PROPERTY(i, EP_CAN_EXPLODE_3X3, (CAN_EXPLODE(i) &&
 					 !CAN_EXPLODE_1X1(i) &&
 					 !CAN_EXPLODE_DYNA(i)));
+
+    /* ---------- CAN_EXPLODE_BY_DRAGONFIRE -------------------------------- */
+    SET_PROPERTY(i, EP_CAN_EXPLODE_BY_DRAGONFIRE, CAN_EXPLODE_BY_FIRE(i));
+
+    /* ---------- CAN_EXPLODE_BY_EXPLOSION --------------------------------- */
+    SET_PROPERTY(i, EP_CAN_EXPLODE_BY_EXPLOSION, (CAN_EXPLODE_BY_FIRE(i) ||
+						  i == EL_BLACK_ORB));
 
     /* ---------- SP_PORT -------------------------------------------------- */
     SET_PROPERTY(i, EP_SP_PORT, (IS_SP_ELEMENT(i) &&

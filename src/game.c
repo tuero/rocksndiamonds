@@ -2722,7 +2722,7 @@ void Explode(int ex, int ey, int phase, int mode)
       if (phase == last_phase)
 	printf("::: IS_PLAYER\n");
     }
-    else if (CAN_EXPLODE_BY_FIRE(border_element))
+    else if (CAN_EXPLODE_BY_EXPLOSION(border_element))
     {
       Feld[x][y] = Store2[x][y];
       Store2[x][y] = 0;
@@ -2730,18 +2730,25 @@ void Explode(int ex, int ey, int phase, int mode)
       border_explosion = TRUE;
 
       if (phase == last_phase)
-	printf("::: CAN_EXPLODE_BY_FIRE\n");
+	printf("::: CAN_EXPLODE_BY_EXPLOSION\n");
     }
     else if (border_element == EL_AMOEBA_TO_DIAMOND)
     {
       AmoebeUmwandeln(x, y);
+      Store2[x][y] = 0;
       border_explosion = TRUE;
 
       if (phase == last_phase)
-	printf("::: EL_AMOEBA_TO_DIAMOND\n");
+	printf("::: EL_AMOEBA_TO_DIAMOND [%d, %d] [%d]\n",
+	       element_info[border_element].explosion_delay,
+	       element_info[border_element].ignition_delay,
+	       phase);
     }
 
-#if 0
+#if 1
+    /* if an element just explodes due to another explosion (chain-reaction),
+       do not immediately end the new explosion when it was the last frame of
+       the explosion (as it would be done in the following "if"-statement!) */
     if (border_explosion && phase == last_phase)
       return;
 #endif
@@ -2766,7 +2773,7 @@ void Explode(int ex, int ey, int phase, int mode)
 
     if (IS_PLAYER(x, y))
       KillHeroUnlessExplosionProtected(x, y);
-    else if (CAN_EXPLODE_BY_FIRE(element))
+    else if (CAN_EXPLODE_BY_EXPLOSION(element))
     {
       Feld[x][y] = Store2[x][y];
       Store2[x][y] = 0;
@@ -4759,7 +4766,7 @@ void StartMoving(int x, int y)
 	  {
 	    int flamed = MovingOrBlocked2Element(xx, yy);
 
-	    if (IS_CLASSIC_ENEMY(flamed) || CAN_EXPLODE_BY_FIRE(flamed))
+	    if (IS_CLASSIC_ENEMY(flamed) || CAN_EXPLODE_BY_DRAGONFIRE(flamed))
 	      Bang(xx, yy);
 	    else
 	      RemoveMovingField(xx, yy);
