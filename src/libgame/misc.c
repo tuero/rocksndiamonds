@@ -1607,28 +1607,32 @@ struct FileInfo *getFileListFromConfigList(struct ConfigInfo *config_list,
   return file_list;
 }
 
-#define SUFFIX_NO_MATCH		0
-#define SUFFIX_MATCH		(1 << 0)
-#define SUFFIX_MATCH_COMPLETE	(1 << 1)
-
-static int token_suffix_match(char *token, char *suffix, int start_pos)
+static boolean token_suffix_match(char *token, char *suffix, int start_pos)
 {
   int len_token = strlen(token);
   int len_suffix = strlen(suffix);
 
-  if (start_pos + len_suffix > len_token)
-    return SUFFIX_NO_MATCH;
+#if 0
+  if (IS_PARENT_PROCESS(audio.mixer_pid))
+    printf(":::::::::: check '%s' for '%s' ::::::::::\n", token, suffix);
+#endif
+
+  if (start_pos < 0)	/* compare suffix from end of string */
+    start_pos += len_token;
+
+  if (start_pos < 0 || start_pos + len_suffix > len_token)
+    return FALSE;
 
   if (strncmp(&token[start_pos], suffix, len_suffix) != 0)
-    return SUFFIX_NO_MATCH;
+    return FALSE;
 
   if (token[start_pos + len_suffix] == '\0')
-    return SUFFIX_MATCH_COMPLETE;
+    return TRUE;
 
   if (token[start_pos + len_suffix] == '.')
-    return SUFFIX_MATCH;
+    return TRUE;
 
-  return SUFFIX_NO_MATCH;
+  return FALSE;
 }
 
 #define KNOWN_TOKEN_VALUE	"[KNOWN_TOKEN]"
@@ -1677,6 +1681,31 @@ static void read_token_parameters(struct SetupFileList *setup_file_list,
   }
 }
 
+static void add_dynamic_file_list_entry(struct FileInfo **list,
+					int *num_list_entries,
+					struct SetupFileList *extra_file_list,
+					struct ConfigInfo *suffix_list,
+					int num_suffix_list_entries,
+					char *token)
+{
+  struct FileInfo *new_list_entry;
+  int parameter_array_size = num_suffix_list_entries * sizeof(int);
+
+#if 0
+  if (IS_PARENT_PROCESS(audio.mixer_pid))
+    printf("===> found dynamic definition '%s'\n", token);
+#endif
+
+  (*num_list_entries)++;
+  *list = checked_realloc(*list, *num_list_entries * sizeof(struct FileInfo));
+  new_list_entry = &(*list)[*num_list_entries - 1];
+
+  new_list_entry->token = getStringCopy(token);
+  new_list_entry->parameter = checked_calloc(parameter_array_size);
+
+  read_token_parameters(extra_file_list, suffix_list, new_list_entry);
+}
+
 void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
 {
   struct FileInfo *file_list = artwork_info->file_list;
@@ -1711,6 +1740,22 @@ void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
       file_list[i].parameter[j] = file_list[i].default_parameter[j];
   }
 
+  /* free previous dynamic artwork file array */
+  if (artwork_info->dynamic_file_list != NULL)
+  {
+    for (i=0; i<artwork_info->num_dynamic_file_list_entries; i++)
+    {
+      free(artwork_info->dynamic_file_list[i].token);
+      free(artwork_info->dynamic_file_list[i].filename);
+      free(artwork_info->dynamic_file_list[i].parameter);
+    }
+
+    free(artwork_info->dynamic_file_list);
+
+    artwork_info->dynamic_file_list = NULL;
+    artwork_info->num_dynamic_file_list_entries = 0;
+  }
+
   if (filename == NULL)
     return;
 
@@ -1725,7 +1770,7 @@ void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
   setTokenValue(setup_file_list, "name", known_token_value);
   setTokenValue(setup_file_list, "sort_priority", known_token_value);
 
-  /* copy all unknown config file tokens to special config list */
+  /* copy all unknown config file tokens to extra config list */
   for (list = setup_file_list; list != NULL; list = list->next)
   {
     if (strcmp(list->value, known_token_value) != 0)
@@ -1740,69 +1785,168 @@ void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
   /* at this point, we do not need the config file list anymore -- free it */
   freeSetupFileList(setup_file_list);
 
-  if (extra_file_list != NULL)
+  /* now try to determine valid, dynamically defined config tokens */
+
+  for (list = extra_file_list; list != NULL; list = list->next)
   {
-    if (options.verbose && IS_PARENT_PROCESS(audio.mixer_pid))
+    struct FileInfo **dynamic_file_list = &artwork_info->dynamic_file_list;
+    int *num_dynamic_file_list_entries =
+      &artwork_info->num_dynamic_file_list_entries;
+    char *token = list->token;
+    int len_token = strlen(token);
+    int start_pos;
+    boolean base_prefix_found = FALSE;
+    boolean parameter_suffix_found = FALSE;
+
+    /* skip all parameter definitions (handled by read_token_parameters()) */
+    for (i=0; i < num_suffix_list_entries && !parameter_suffix_found; i++)
+    {
+      int len_suffix = strlen(suffix_list[i].token);
+
+      if (token_suffix_match(token, suffix_list[i].token, -len_suffix))
+	parameter_suffix_found = TRUE;
+    }
+
+#if 0
+    if (IS_PARENT_PROCESS(audio.mixer_pid))
+    {
+      if (parameter_suffix_found)
+	printf("---> skipping token '%s' (parameter token)\n", token);
+      else
+	printf("---> examining token '%s': search prefix ...\n", token);
+    }
+#endif
+
+    if (parameter_suffix_found)
+      continue;
+
+    /* ---------- step 1: search for matching base prefix ---------- */
+
+    start_pos = 0;
+    for (i=0; i<num_base_prefixes && !base_prefix_found; i++)
+    {
+      char *base_prefix = base_prefixes[i];
+      int len_base_prefix = strlen(base_prefix);
+      boolean ext1_suffix_found = FALSE;
+
+      base_prefix_found = token_suffix_match(token, base_prefix, start_pos);
+
+      if (!base_prefix_found)
+	continue;
+
+      if (start_pos + len_base_prefix == len_token)	/* exact match */
+      {
+	add_dynamic_file_list_entry(dynamic_file_list,
+				    num_dynamic_file_list_entries,
+				    extra_file_list,
+				    suffix_list,
+				    num_suffix_list_entries,
+				    token);
+	continue;
+      }
+
+#if 0
+      if (IS_PARENT_PROCESS(audio.mixer_pid))
+	printf("---> examining token '%s': search 1st suffix ...\n", token);
+#endif
+
+      /* ---------- step 2: search for matching first suffix ---------- */
+
+      start_pos += len_base_prefix;
+      for (j=0; j<num_ext1_suffixes && !ext1_suffix_found; j++)
+      {
+	char *ext1_suffix = ext1_suffixes[j];
+	int len_ext1_suffix = strlen(ext1_suffix);
+	boolean ext2_suffix_found = FALSE;
+
+	ext1_suffix_found = token_suffix_match(token, ext1_suffix, start_pos);
+
+	if (!ext1_suffix_found)
+	  continue;
+
+	if (start_pos + len_ext1_suffix == len_token)	/* exact match */
+	{
+	  add_dynamic_file_list_entry(dynamic_file_list,
+				      num_dynamic_file_list_entries,
+				      extra_file_list,
+				      suffix_list,
+				      num_suffix_list_entries,
+				      token);
+	  continue;
+	}
+
+#if 0
+	if (IS_PARENT_PROCESS(audio.mixer_pid))
+	  printf("---> examining token '%s': search 2nd suffix ...\n", token);
+#endif
+
+	/* ---------- step 3: search for matching second suffix ---------- */
+
+	start_pos += len_ext1_suffix;
+	for (k=0; k<num_ext2_suffixes && !ext2_suffix_found; k++)
+	{
+	  char *ext2_suffix = ext2_suffixes[k];
+	  int len_ext2_suffix = strlen(ext2_suffix);
+
+	  ext2_suffix_found = token_suffix_match(token, ext2_suffix,start_pos);
+
+	  if (!ext2_suffix_found)
+	    continue;
+
+	  if (start_pos + len_ext2_suffix == len_token)	/* exact match */
+	  {
+	    add_dynamic_file_list_entry(dynamic_file_list,
+					num_dynamic_file_list_entries,
+					extra_file_list,
+					suffix_list,
+					num_suffix_list_entries,
+					token);
+	    continue;
+	  }
+	}
+      }
+    }
+  }
+
+  if (extra_file_list != NULL &&
+      options.verbose && IS_PARENT_PROCESS(audio.mixer_pid))
+  {
+    boolean dynamic_tokens_found = FALSE;
+    boolean unknown_tokens_found = FALSE;
+
+    for (list = extra_file_list; list != NULL; list = list->next)
+    {
+      if (strcmp(list->value, known_token_value) == 0)
+	dynamic_tokens_found = TRUE;
+      else
+	unknown_tokens_found = TRUE;
+    }
+
+#if DEBUG
+    if (dynamic_tokens_found)
+    {
+      Error(ERR_RETURN_LINE, "-");
+      Error(ERR_RETURN, "dynamic token(s) found:");
+
+      for (list = extra_file_list; list != NULL; list = list->next)
+	if (strcmp(list->value, known_token_value) == 0)
+	  Error(ERR_RETURN, "- dynamic token: '%s'", list->token);
+
+      Error(ERR_RETURN_LINE, "-");
+    }
+#endif
+
+    if (unknown_tokens_found)
     {
       Error(ERR_RETURN_LINE, "-");
       Error(ERR_RETURN, "warning: unknown token(s) found in config file:");
       Error(ERR_RETURN, "- config file: '%s'", filename);
 
       for (list = extra_file_list; list != NULL; list = list->next)
-	Error(ERR_RETURN, "- unknown token: '%s'", list->token);
+	if (strcmp(list->value, known_token_value) != 0)
+	  Error(ERR_RETURN, "- unknown token: '%s'", list->token);
 
       Error(ERR_RETURN_LINE, "-");
-    }
-
-    /* now try to determine valid, dynamically defined config tokens */
-
-    for (list = extra_file_list; list != NULL; list = list->next)
-    {
-      char *token = list->token;
-
-      for (i=0; i<num_base_prefixes; i++)
-      {
-	char *base_prefix = base_prefixes[i];
-	int start_pos = 0;
-	int match = token_suffix_match(token, base_prefix, start_pos);
-
-	if (match == SUFFIX_MATCH_COMPLETE)
-	{
-	  printf("--- found complete token '%s'\n", token);
-	}
-	else if (match == SUFFIX_MATCH)
-	{
-	  int len_base_prefix = strlen(base_prefix);
-
-	  for (j=0; j<num_ext1_suffixes; j++)
-	  {
-	    char *ext1_suffix = ext1_suffixes[j];
-	    int start_pos = len_base_prefix;
-	    int match = token_suffix_match(token, ext1_suffix, start_pos);
-
-	    if (match == SUFFIX_MATCH_COMPLETE)
-	    {
-	      printf("--- found complete token '%s'\n", token);
-	    }
-	    else if (match == SUFFIX_MATCH)
-	    {
-	      int len_ext1_suffix = strlen(ext1_suffix);
-
-	      for (k=0; k<num_ext2_suffixes; k++)
-	      {
-		char *ext2_suffix = ext2_suffixes[k];
-		int start_pos = len_base_prefix + len_ext1_suffix;
-		int match = token_suffix_match(token, ext2_suffix, start_pos);
-
-		if (match == SUFFIX_MATCH_COMPLETE)
-		{
-		  printf("--- found complete token '%s'\n", token);
-		}
-	      }
-	    }
-	  }
-	}
-      }
     }
   }
 

@@ -185,6 +185,7 @@ static void InitArtworkInfo()
 static void InitArtworkConfig()
 {
   static char *element_prefix[MAX_NUM_ELEMENTS + 1];
+  static char *sound_class_prefix[MAX_NUM_ELEMENTS + 1];
   static char *action_suffix[NUM_ACTIONS + 1];
   static char *direction_suffix[NUM_DIRECTIONS + 1];
   static char *dummy[1] = { NULL };
@@ -192,6 +193,8 @@ static void InitArtworkConfig()
 
   for (i=0; i<MAX_NUM_ELEMENTS + 1; i++)
     element_prefix[i] = element_info[i].token_name;
+  for (i=0; i<MAX_NUM_ELEMENTS + 1; i++)
+    sound_class_prefix[i] = element_info[i].sound_class_name;
   for (i=0; i<NUM_ACTIONS + 1; i++)
     action_suffix[i] = element_action_info[i].suffix;
   for (i=0; i<NUM_DIRECTIONS + 1; i++)
@@ -200,7 +203,7 @@ static void InitArtworkConfig()
   InitImageList(image_config, NUM_IMAGE_FILES, image_config_suffix,
 		element_prefix, action_suffix, direction_suffix);
   InitSoundList(sound_config, NUM_SOUND_FILES, sound_config_suffix,
-		element_prefix, action_suffix, dummy);
+		sound_class_prefix, action_suffix, dummy);
 }
 
 void InitLevelArtworkInfo()

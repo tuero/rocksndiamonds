@@ -1784,6 +1784,7 @@ void InitSoundList(struct ConfigInfo *config_list, int num_file_list_entries,
   /* ---------- initialize file list and suffix lists ---------- */
 
   sound_info->num_file_list_entries = num_file_list_entries;
+  sound_info->num_dynamic_file_list_entries = 0;
 
   sound_info->num_suffix_list_entries = 0;
   for (i=0; config_suffix_list[i].token != NULL; i++)
@@ -1792,6 +1793,8 @@ void InitSoundList(struct ConfigInfo *config_list, int num_file_list_entries,
   sound_info->file_list =
     getFileListFromConfigList(config_list, config_suffix_list,
 			      num_file_list_entries);
+  sound_info->dynamic_file_list = NULL;
+
   sound_info->suffix_list = config_suffix_list;
 
   /* ---------- initialize base prefix and suffixes lists ---------- */
@@ -1811,7 +1814,6 @@ void InitSoundList(struct ConfigInfo *config_list, int num_file_list_entries,
   sound_info->base_prefixes = base_prefixes;
   sound_info->ext1_suffixes = ext1_suffixes;
   sound_info->ext2_suffixes = ext2_suffixes;
-  sound_info->custom_setup_list = NULL;
 
   /* ---------- initialize artwork reference and content lists ---------- */
 
@@ -1910,7 +1912,7 @@ void LoadCustomMusic(void)
     {
       num_music++;
       Music = checked_realloc(Music, num_music * sizeof(MusicInfo *));
-      Music[num_music -1] = mus_info;
+      Music[num_music - 1] = mus_info;
     }
   }
 

@@ -417,7 +417,7 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS] =
   },
   {
     "unused_63",
-    NULL,
+    "unused",
     "(not used)"
   },
   {
@@ -636,7 +636,7 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS] =
   },
   {
     "black_orb",
-    NULL,
+    "black_orb",
     "black orb bomb"
   },
   {
@@ -661,22 +661,22 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS] =
   },
   {
     "arrow_blue_left",
-    NULL,
+    "arrow",
     "arrow left"
   },
   {
     "arrow_blue_right",
-    NULL,
+    "arrow",
     "arrow right"
   },
   {
     "arrow_blue_up",
-    NULL,
+    "arrow",
     "arrow up"
   },
   {
     "arrow_blue_down",
-    NULL,
+    "arrow",
     "arrow down"
   },
   {
@@ -696,402 +696,402 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS] =
   },
   {
     "char_space",
-    NULL,
+    "char",
     "letter ' '"
   },
   {
     "char_exclam",
-    NULL,
+    "char",
     "letter '!'"
   },
   {
     "char_quotedbl",
-    NULL,
+    "char",
     "letter '\"'"
   },
   {
     "char_numbersign",
-    NULL,
+    "char",
     "letter '#'"
   },
   {
     "char_dollar",
-    NULL,
+    "char",
     "letter '$'"
   },
   {
     "char_procent",
-    NULL,
+    "char",
     "letter '%'"
   },
   {
     "char_ampersand",
-    NULL,
+    "char",
     "letter '&'"
   },
   {
     "char_apostrophe",
-    NULL,
+    "char",
     "letter '''"
   },
   {
     "char_parenleft",
-    NULL,
+    "char",
     "letter '('"
   },
   {
     "char_parenright",
-    NULL,
+    "char",
     "letter ')'"
   },
   {
     "char_asterisk",
-    NULL,
+    "char",
     "letter '*'"
   },
   {
     "char_plus",
-    NULL,
+    "char",
     "letter '+'"
   },
   {
     "char_comma",
-    NULL,
+    "char",
     "letter ','"
   },
   {
     "char_minus",
-    NULL,
+    "char",
     "letter '-'"
   },
   {
     "char_period",
-    NULL,
+    "char",
     "letter '.'"
   },
   {
     "char_slash",
-    NULL,
+    "char",
     "letter '/'"
   },
   {
     "char_0",
-    NULL,
+    "char",
     "letter '0'"
   },
   {
     "char_1",
-    NULL,
+    "char",
     "letter '1'"
   },
   {
     "char_2",
-    NULL,
+    "char",
     "letter '2'"
   },
   {
     "char_3",
-    NULL,
+    "char",
     "letter '3'"
   },
   {
     "char_4",
-    NULL,
+    "char",
     "letter '4'"
   },
   {
     "char_5",
-    NULL,
+    "char",
     "letter '5'"
   },
   {
     "char_6",
-    NULL,
+    "char",
     "letter '6'"
   },
   {
     "char_7",
-    NULL,
+    "char",
     "letter '7'"
   },
   {
     "char_8",
-    NULL,
+    "char",
     "letter '8'"
   },
   {
     "char_9",
-    NULL,
+    "char",
     "letter '9'"
   },
   {
     "char_colon",
-    NULL,
+    "char",
     "letter ':'"
   },
   {
     "char_semicolon",
-    NULL,
+    "char",
     "letter ';'"
   },
   {
     "char_less",
-    NULL,
+    "char",
     "letter '<'"
   },
   {
     "char_equal",
-    NULL,
+    "char",
     "letter '='"
   },
   {
     "char_greater",
-    NULL,
+    "char",
     "letter '>'"
   },
   {
     "char_question",
-    NULL,
+    "char",
     "letter '?'"
   },
   {
     "char_at",
-    NULL,
+    "char",
     "letter '@'"
   },
   {
     "char_a",
-    NULL,
+    "char",
     "letter 'A'"
   },
   {
     "char_b",
-    NULL,
+    "char",
     "letter 'B'"
   },
   {
     "char_c",
-    NULL,
+    "char",
     "letter 'C'"
   },
   {
     "char_d",
-    NULL,
+    "char",
     "letter 'D'"
   },
   {
     "char_e",
-    NULL,
+    "char",
     "letter 'E'"
   },
   {
     "char_f",
-    NULL,
+    "char",
     "letter 'F'"
   },
   {
     "char_g",
-    NULL,
+    "char",
     "letter 'G'"
   },
   {
     "char_h",
-    NULL,
+    "char",
     "letter 'H'"
   },
   {
     "char_i",
-    NULL,
+    "char",
     "letter 'I'"
   },
   {
     "char_j",
-    NULL,
+    "char",
     "letter 'J'"
   },
   {
     "char_k",
-    NULL,
+    "char",
     "letter 'K'"
   },
   {
     "char_l",
-    NULL,
+    "char",
     "letter 'L'"
   },
   {
     "char_m",
-    NULL,
+    "char",
     "letter 'M'"
   },
   {
     "char_n",
-    NULL,
+    "char",
     "letter 'N'"
   },
   {
     "char_o",
-    NULL,
+    "char",
     "letter 'O'"
   },
   {
     "char_p",
-    NULL,
+    "char",
     "letter 'P'"
   },
   {
     "char_q",
-    NULL,
+    "char",
     "letter 'Q'"
   },
   {
     "char_r",
-    NULL,
+    "char",
     "letter 'R'"
   },
   {
     "char_s",
-    NULL,
+    "char",
     "letter 'S'"
   },
   {
     "char_t",
-    NULL,
+    "char",
     "letter 'T'"
   },
   {
     "char_u",
-    NULL,
+    "char",
     "letter 'U'"
   },
   {
     "char_v",
-    NULL,
+    "char",
     "letter 'V'"
   },
   {
     "char_w",
-    NULL,
+    "char",
     "letter 'W'"
   },
   {
     "char_x",
-    NULL,
+    "char",
     "letter 'X'"
   },
   {
     "char_y",
-    NULL,
+    "char",
     "letter 'Y'"
   },
   {
     "char_z",
-    NULL,
+    "char",
     "letter 'Z'"
   },
   {
     "char_ae",
-    NULL,
+    "char",
     "letter 'Ä'"
   },
   {
     "char_oe",
-    NULL,
+    "char",
     "letter 'Ö'"
   },
   {
     "char_ue",
-    NULL,
+    "char",
     "letter 'Ü'"
   },
   {
     "char_copyright",
-    NULL,
+    "char",
     "letter '^'"
   },
   {
     "char_underscore",
-    NULL,
+    "char",
     "letter ''"
   },
   {
     "char_empty",
-    NULL,
+    "char",
     "letter ''"
   },
   {
     "char_degree",
-    NULL,
+    "char",
     "letter ''"
   },
   {
     "char_tm",
-    NULL,
+    "char",
     "letter ''"
   },
   {
     "char_cursor",
-    NULL,
+    "char",
     "letter ''"
   },
   {
-    NULL,
-    NULL,
+    "char_unused",
+    "char",
     "letter ''"
   },
   {
-    NULL,
-    NULL,
+    "char_unused",
+    "char",
     "letter ''"
   },
   {
-    NULL,
-    NULL,
+    "char_unused",
+    "char",
     "letter ''"
   },
   {
-    NULL,
-    NULL,
+    "char_unused",
+    "char",
     "letter ''"
   },
   {
-    NULL,
-    NULL,
+    "char_unused",
+    "char",
     "letter ''"
   },
   {
-    NULL,
-    NULL,
+    "char_unused",
+    "char",
     "letter ''"
   },
   {
-    NULL,
-    NULL,
+    "char_unused",
+    "char",
     "letter ''"
   },
   {
-    NULL,
-    NULL,
+    "char_unused",
+    "char",
     "letter ''"
   },
   {
-    NULL,
-    NULL,
+    "char_unused",
+    "char",
     "letter ''"
   },
   {
-    NULL,
-    NULL,
+    "char_unused",
+    "char",
     "letter ''"
   },
   {
-    NULL,
-    NULL,
+    "char_unused",
+    "char",
     "letter ''"
   },
   {
-    NULL,
-    NULL,
+    "char_unused",
+    "char",
     "letter ''"
   },
   {
@@ -1366,12 +1366,12 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS] =
   },
   {
     "unused_254",
-    NULL,
+    "unused",
     "(not used)"
   },
   {
     "unused_255",
-    NULL,
+    "unused",
     "(not used)"
   },
   {
@@ -1441,12 +1441,12 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS] =
   },
   {
     "unused_269",
-    NULL,
+    "unused",
     "-"
   },
   {
     "unused_270",
-    NULL,
+    "unused",
     "-"
   },
   {
@@ -1681,22 +1681,22 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS] =
   },
   {
     "dx_unknown_15",
-    NULL,
+    "unknown",
     "dx unknown element 15"
   },
   {
     "dx_unknown_42",
-    NULL,
+    "unknown",
     "dx unknown element 42"
   },
   {
     "unused_319",
-    NULL,
+    "unused",
     "(not used)"
   },
   {
     "unused_320",
-    NULL,
+    "unused",
     "(not used)"
   },
   {
@@ -1886,12 +1886,12 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS] =
   },
   {
     "unused_358",
-    NULL,
+    "unused",
     "-"
   },
   {
     "unused_359",
-    NULL,
+    "unused",
     "-"
   },
   {
@@ -2764,7 +2764,7 @@ struct ElementInfo element_info[MAX_NUM_ELEMENTS] =
   },
 
   {
-    "",
+    NULL,
     NULL,
     "-"
   }

@@ -734,6 +734,7 @@ void InitImageList(struct ConfigInfo *config_list, int num_file_list_entries,
   /* ---------- initialize file list and suffix lists ---------- */
 
   image_info->num_file_list_entries = num_file_list_entries;
+  image_info->num_dynamic_file_list_entries = 0;
 
   image_info->num_suffix_list_entries = 0;
   for (i=0; config_suffix_list[i].token != NULL; i++)
@@ -742,6 +743,8 @@ void InitImageList(struct ConfigInfo *config_list, int num_file_list_entries,
   image_info->file_list =
     getFileListFromConfigList(config_list, config_suffix_list,
 			      num_file_list_entries);
+  image_info->dynamic_file_list = NULL;
+
   image_info->suffix_list = config_suffix_list;
 
   /* ---------- initialize base prefix and suffixes lists ---------- */
@@ -761,7 +764,6 @@ void InitImageList(struct ConfigInfo *config_list, int num_file_list_entries,
   image_info->base_prefixes = base_prefixes;
   image_info->ext1_suffixes = ext1_suffixes;
   image_info->ext2_suffixes = ext2_suffixes;
-  image_info->custom_setup_list = NULL;
 
   /* ---------- initialize artwork reference and content lists ---------- */
 
