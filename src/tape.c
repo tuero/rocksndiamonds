@@ -170,11 +170,14 @@ byte *TapePlayAction()
 
     for(i=0; i<MAX_PLAYERS; i++)
       joy[i] = tape.pos[tape.counter-1].action[i];
-
-    return(joy);
+  }
+  else
+  {
+    for(i=0; i<MAX_PLAYERS; i++)
+      joy[i] = 0;
   }
 
-  return(NULL);
+  return(joy);
 }
 
 boolean TapePlayDelay()

@@ -65,26 +65,6 @@ void EventLoop(void)
       Delay(10);
     }
 
-
-
-#if 0
-    else			/* got no event, but don't be lazy... */
-    {
-      HandleNoXEvent();
-
-      /* don't use all CPU time when idle; the main loop while playing
-	 has its own synchronization and is CPU friendly, too */
-
-      if (game_status != PLAYING)
-      {
-	XSync(display, FALSE);
-	Delay(10);
-      }
-    }
-#endif
-
-
-
     if (game_status == EXITGAME)
       return;
   }
@@ -297,29 +277,6 @@ void HandleButton(int mx, int my, int button)
     HandleGameButtons(mx,my,button);
   }
 
-#ifdef DEBUG
-  if (game_status == PLAYING && !button)
-  {
-    int sx = (mx - SX) / TILEX;
-    int sy = (my - SY) / TILEY;
-
-    if (IN_VIS_FIELD(sx,sy))
-    {
-      int x = LEVELX(sx);
-      int y = LEVELY(sy);
-
-      printf("INFO: Feld[%d][%d] == %d\n", x,y, Feld[x][y]);
-      printf("      Store[%d][%d] == %d\n", x,y, Store[x][y]);
-      printf("      Store2[%d][%d] == %d\n", x,y, Store2[x][y]);
-      printf("      StorePlayer[%d][%d] == %d\n", x,y, StorePlayer[x][y]);
-      printf("      MovPos[%d][%d] == %d\n", x,y, MovPos[x][y]);
-      printf("      MovDir[%d][%d] == %d\n", x,y, MovDir[x][y]);
-      printf("      MovDelay[%d][%d] == %d\n", x,y, MovDelay[x][y]);
-      printf("\n");
-    }
-  }
-#endif
-
   switch(game_status)
   {
     case MAINMENU:
@@ -355,13 +312,28 @@ void HandleButton(int mx, int my, int button)
       break;
 
     case PLAYING:
+#ifdef DEBUG
+      if (button == MB_RELEASED)
+      {
+	int sx = (mx - SX) / TILEX;
+	int sy = (my - SY) / TILEY;
 
-      /* --> NoXEvent() will follow */
+	if (IN_VIS_FIELD(sx,sy))
+	{
+	  int x = LEVELX(sx);
+	  int y = LEVELY(sy);
 
-      /*
-      HandleGameActions(0);
-      */
-
+	  printf("INFO: Feld[%d][%d] == %d\n", x,y, Feld[x][y]);
+	  printf("      Store[%d][%d] == %d\n", x,y, Store[x][y]);
+	  printf("      Store2[%d][%d] == %d\n", x,y, Store2[x][y]);
+	  printf("      StorePlayer[%d][%d] == %d\n", x,y, StorePlayer[x][y]);
+	  printf("      MovPos[%d][%d] == %d\n", x,y, MovPos[x][y]);
+	  printf("      MovDir[%d][%d] == %d\n", x,y, MovDir[x][y]);
+	  printf("      MovDelay[%d][%d] == %d\n", x,y, MovDelay[x][y]);
+	  printf("\n");
+	}
+      }
+#endif
       break;
 
     default:
@@ -421,148 +393,6 @@ void HandleKey(KeySym key, int key_status)
 	joy |= key_info[i].action;
   }
 
-
-#if 0
-
-
-  /* Map cursor keys to joystick directions */
-
-  switch(key)
-  {
-    case XK_Left:		/* normale Richtungen */
-#ifdef XK_KP_Left
-    case XK_KP_Left:
-#endif
-    case XK_KP_4:
-#ifndef MSDOS
-    case XK_J:
-#endif
-    case XK_j:
-      joy |= JOY_LEFT;
-      break;
-
-    case XK_Right:
-#ifdef XK_KP_Right
-    case XK_KP_Right:
-#endif
-    case XK_KP_6:
-#ifndef MSDOS
-    case XK_K:
-#endif
-    case XK_k:
-      joy |= JOY_RIGHT;
-      break;
-
-    case XK_Up:
-#ifdef XK_KP_Up
-    case XK_KP_Up:
-#endif
-    case XK_KP_8:
-#ifndef MSDOS
-    case XK_I:
-#endif
-    case XK_i:
-      joy |= JOY_UP;
-      break;
-
-    case XK_Down:
-#ifdef XK_KP_Down
-    case XK_KP_Down:
-#endif
-    case XK_KP_2:
-#ifndef MSDOS
-    case XK_M:
-#endif
-    case XK_m:
-      joy |= JOY_DOWN;
-      break;
-
-#ifdef XK_KP_Home
-    case XK_KP_Home:		/* Diagonalrichtungen */
-#endif
-    case XK_KP_7:
-      joy |= JOY_UP | JOY_LEFT;
-      break;
-
-#ifdef XK_KP_Page_Up
-    case XK_KP_Page_Up:
-#endif
-    case XK_KP_9:
-      joy = JOY_UP | JOY_RIGHT;
-      break;
-
-#ifdef XK_KP_End
-    case XK_KP_End:
-#endif
-    case XK_KP_1:
-      joy |= JOY_DOWN | JOY_LEFT;
-      break;
-
-#ifdef XK_KP_Page_Down
-    case XK_KP_Page_Down:
-#endif
-    case XK_KP_3:
-      joy |= JOY_DOWN | JOY_RIGHT;
-      break;
-
-#ifndef MSDOS
-    case XK_S:			/* Feld entfernen */
-#endif
-    case XK_s:
-      joy |= JOY_BUTTON_1 | JOY_LEFT;
-      break;
-
-#ifndef MSDOS
-    case XK_D:
-#endif
-    case XK_d:
-      joy |= JOY_BUTTON_1 | JOY_RIGHT;
-      break;
-
-#ifndef MSDOS
-    case XK_E:
-#endif
-    case XK_e:
-      joy |= JOY_BUTTON_1 | JOY_UP;
-      break;
-
-#ifndef MSDOS
-    case XK_X:
-#endif
-    case XK_x:
-      joy |= JOY_BUTTON_1 | JOY_DOWN;
-      break;
-
-    case XK_Shift_L:		/* Linker Feuerknopf */
-#ifndef MSDOS
-    case XK_Control_L:
-    case XK_Alt_L:
-    case XK_Meta_L:
-#endif
-      joy |= JOY_BUTTON_1;
-      break;
-
-    case XK_Shift_R:		/* Rechter Feuerknopf */
-#ifndef MSDOS
-    case XK_Control_R:
-    case XK_Alt_R:
-    case XK_Meta_R:
-    case XK_Mode_switch:
-    case XK_Multi_key:
-    case XK_B:			/* (Bombe legen) */
-#endif
-    case XK_b:
-      joy |= JOY_BUTTON_2;
-      break;
-
-    default:
-      break;
-  }
-
-
-#endif
-
-
   if (joy)
   {
     if (key_status == KEY_PRESSED)
@@ -579,7 +409,7 @@ void HandleKey(KeySym key, int key_status)
   if (key_status == KEY_RELEASED)
     return;
 
-  if (key==XK_Return && game_status==PLAYING && AllPlayersGone)
+  if (key == XK_Return && game_status == PLAYING && AllPlayersGone)
   {
     CloseDoor(DOOR_CLOSE_1);
     game_status = MAINMENU;
@@ -587,7 +417,8 @@ void HandleKey(KeySym key, int key_status)
     return;
   }
 
-  if (key==XK_Escape && game_status!=MAINMENU)	/* quick quit to MAINMENU */
+  /* allow quick escape to the main menu with the Escape key */
+  if (key == XK_Escape && game_status != MAINMENU)
   {
     CloseDoor(DOOR_CLOSE_1 | DOOR_NO_DELAY);
     game_status = MAINMENU;
@@ -595,13 +426,13 @@ void HandleKey(KeySym key, int key_status)
     return;
   }
 
-  if (game_status==PLAYING && (tape.playing || tape.pausing))
+  if (game_status == PLAYING && (tape.playing || tape.pausing))
     return;
 
   switch(game_status)
   {
     case TYPENAME:
-      HandleTypeName(0,key);
+      HandleTypeName(0, key);
       break;
 
     case MAINMENU:
@@ -611,14 +442,14 @@ void HandleKey(KeySym key, int key_status)
       switch(key)
       {
 	case XK_Return:
-	  if (game_status==MAINMENU)
-	    HandleMainMenu(0,0,0,0,MB_MENU_CHOICE);
-          else if (game_status==CHOOSELEVEL)
-            HandleChooseLevel(0,0,0,0,MB_MENU_CHOICE);
-	  else if (game_status==SETUP)
-	    HandleSetupScreen(0,0,0,0,MB_MENU_CHOICE);
-	  else if (game_status==SETUPINPUT)
-	    HandleSetupInputScreen(0,0,0,0,MB_MENU_CHOICE);
+	  if (game_status == MAINMENU)
+	    HandleMainMenu(0,0, 0,0, MB_MENU_CHOICE);
+          else if (game_status == CHOOSELEVEL)
+            HandleChooseLevel(0,0, 0,0, MB_MENU_CHOICE);
+	  else if (game_status == SETUP)
+	    HandleSetupScreen(0,0, 0,0, MB_MENU_CHOICE);
+	  else if (game_status == SETUPINPUT)
+	    HandleSetupInputScreen(0,0, 0,0, MB_MENU_CHOICE);
 	  break;
 
 	default:

@@ -64,7 +64,7 @@ void SetDrawtoField(int mode)
 void BackToFront()
 {
   int x,y;
-  Drawable buffer = (drawto_field != window ? drawto_field : backbuffer);
+  Drawable buffer = (drawto_field == window ? backbuffer : drawto_field);
 
   if (setup.direct_draw && game_status == PLAYING)
     redraw_mask &= ~REDRAW_MAIN;
@@ -72,8 +72,14 @@ void BackToFront()
   if (redraw_mask & REDRAW_TILES && redraw_tiles > REDRAWTILES_THRESHOLD)
     redraw_mask |= REDRAW_FIELD;
 
-  if (redraw_mask & REDRAW_FIELD || ScreenGfxPos)
+  if (redraw_mask & REDRAW_FIELD)
     redraw_mask &= ~REDRAW_TILES;
+
+  /*
+  if (redraw_mask & REDRAW_FIELD ||
+      (ScreenGfxPos && setup.soft_scrolling && game_status == PLAYING))
+    redraw_mask &= ~REDRAW_TILES;
+  */
 
   if (!redraw_mask)
     return;

@@ -44,6 +44,7 @@ void DrawHeadline()
 void DrawMainMenu()
 {
   int i;
+  char *name_text = (!options.network && setup.team_mode ? "Team:" : "Name:");
 
   FadeSounds();
   GetPlayerConfig();
@@ -51,7 +52,7 @@ void DrawMainMenu()
 
   ClearWindow();
   DrawHeadline();
-  DrawText(SX + 32,    SY + 2*32, "Name:", FS_BIG, FC_GREEN);
+  DrawText(SX + 32,    SY + 2*32, name_text, FS_BIG, FC_GREEN);
   DrawText(SX + 6*32,  SY + 2*32, setup.alias_name, FS_BIG, FC_RED);
   DrawText(SX + 32,    SY + 3*32, "Level:", FS_BIG, FC_GREEN);
   DrawText(SX + 11*32, SY + 3*32, int2str(level_nr,3), FS_BIG,
@@ -250,8 +251,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 	  game_status = EXITGAME;
       }
 
-      if (!button)
-	redraw = TRUE;
+      redraw = TRUE;
     }
   }
   BackToFront();

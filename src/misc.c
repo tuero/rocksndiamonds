@@ -196,11 +196,10 @@ void MarkTileDirty(int x, int y)
   int yy = redraw_y1 + y;
 
   if (!redraw[xx][yy])
-  {
-    redraw[xx][yy] = TRUE;
     redraw_tiles++;
-    redraw_mask |= REDRAW_TILES;
-  }
+
+  redraw[xx][yy] = TRUE;
+  redraw_mask |= REDRAW_TILES;
 }
 
 void GetOptions(char *argv[])

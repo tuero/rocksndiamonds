@@ -289,10 +289,26 @@ void InitGame()
 
   /* when in single player mode, eliminate all but the first active player */
   if (!options.network && !setup.team_mode)
+  {
     for(i=0; i<MAX_PLAYERS; i++)
+    {
       if (stored_player[i].active)
+      {
 	for(j=i+1; j<MAX_PLAYERS; j++)
-	  stored_player[j].active = FALSE;
+	{
+	  struct PlayerInfo *player = &stored_player[j];
+	  int jx = player->jx, jy = player->jy;
+
+	  if (player->active)
+	  {
+	    player->active = FALSE;
+	    StorePlayer[jx][jy] = 0;
+	    Feld[jx][jy] = EL_LEERRAUM;
+	  }
+	}
+      }
+    }
+  }
 
   for(i=0; i<MAX_PLAYERS; i++)
   {
