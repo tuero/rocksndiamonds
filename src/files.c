@@ -30,7 +30,7 @@
 #define LEVEL_HEADER_UNUSED	13	/* unused level header bytes  */
 #define LEVEL_CHUNK_CNT2_SIZE	160	/* size of level CNT2 chunk   */
 #define LEVEL_CHUNK_CNT2_UNUSED	11	/* unused CNT2 chunk bytes    */
-#define LEVEL_CPART_CUS3_SIZE	102	/* size of CUS3 chunk part    */
+#define LEVEL_CPART_CUS3_SIZE	134	/* size of CUS3 chunk part    */
 #define LEVEL_CPART_CUS3_UNUSED	16	/* unused CUS3 bytes / part   */
 #define TAPE_HEADER_SIZE	20	/* size of tape file header   */
 #define TAPE_HEADER_UNUSED	3	/* unused tape header bytes   */
@@ -104,6 +104,11 @@ static void setLevelInfoToDefaults()
   for (i=0; i < NUM_CUSTOM_ELEMENTS; i++)
   {
     int element = EL_CUSTOM_START + i;
+
+    for(j=0; j<MAX_ELEMENT_NAME_LEN; j++)
+      element_info[element].description[j] = '\0';
+    strcpy(element_info[element].description,
+	   element_info[element].editor_description);
 
     element_info[element].use_gfx_element = FALSE;
     element_info[element].gfx_element = EL_EMPTY_SPACE;
@@ -440,7 +445,7 @@ static int LoadLevel_CUS3(FILE *file, int chunk_size, struct LevelInfo *level)
 {
   int num_changed_custom_elements = getFile16BitBE(file);
   int chunk_size_expected = LEVEL_CHUNK_CUS3_SIZE(num_changed_custom_elements);
-  int i, x, y;
+  int i, j, x, y;
 
   if (chunk_size_expected != chunk_size)
   {
@@ -458,6 +463,10 @@ static int LoadLevel_CUS3(FILE *file, int chunk_size, struct LevelInfo *level)
 
       element = EL_DEFAULT;	/* dummy element used for artwork config */
     }
+
+    for(j=0; j<MAX_ELEMENT_NAME_LEN; j++)
+      element_info[element].description[j] = getFile8Bit(file);
+    element_info[element].description[MAX_ELEMENT_NAME_LEN] = 0;
 
     Properties[element][EP_BITFIELD_BASE] = getFile32BitBE(file);
 
@@ -925,7 +934,7 @@ static void SaveLevel_CUS2(FILE *file, struct LevelInfo *level,
 static void SaveLevel_CUS3(FILE *file, struct LevelInfo *level,
 			   int num_changed_custom_elements)
 {
-  int i, x, y, check = 0;
+  int i, j, x, y, check = 0;
 
   putFile16BitBE(file, num_changed_custom_elements);
 
@@ -938,6 +947,10 @@ static void SaveLevel_CUS3(FILE *file, struct LevelInfo *level,
       if (check < num_changed_custom_elements)
       {
 	putFile16BitBE(file, element);
+
+	for(j=0; j<MAX_ELEMENT_NAME_LEN; j++)
+	  putFile8Bit(file, element_info[element].description[j]);
+
 	putFile32BitBE(file, Properties[element][EP_BITFIELD_BASE]);
 
 	/* some free bytes for future properties and padding */

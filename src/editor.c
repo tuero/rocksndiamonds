@@ -366,9 +366,10 @@
 
 #define GADGET_ID_LEVEL_NAME		(GADGET_ID_TEXT_INPUT_FIRST + 0)
 #define GADGET_ID_LEVEL_AUTHOR		(GADGET_ID_TEXT_INPUT_FIRST + 1)
+#define GADGET_ID_ELEMENT_NAME		(GADGET_ID_TEXT_INPUT_FIRST + 2)
 
 /* selectbox identifiers */
-#define GADGET_ID_SELECTBOX_FIRST	(GADGET_ID_TEXT_INPUT_FIRST + 2)
+#define GADGET_ID_SELECTBOX_FIRST	(GADGET_ID_TEXT_INPUT_FIRST + 3)
 
 #define GADGET_ID_CUSTOM_WALK_TO_ACTION	(GADGET_ID_SELECTBOX_FIRST + 0)
 #define GADGET_ID_CUSTOM_CONSISTENCY	(GADGET_ID_SELECTBOX_FIRST + 1)
@@ -512,8 +513,9 @@
 /* values for text input gadgets */
 #define ED_TEXTINPUT_ID_LEVEL_NAME	0
 #define ED_TEXTINPUT_ID_LEVEL_AUTHOR	1
+#define ED_TEXTINPUT_ID_ELEMENT_NAME	2
 
-#define ED_NUM_TEXTINPUT		2
+#define ED_NUM_TEXTINPUT		3
 
 #define ED_TEXTINPUT_ID_LEVEL_FIRST	ED_TEXTINPUT_ID_LEVEL_NAME
 #define ED_TEXTINPUT_ID_LEVEL_LAST	ED_TEXTINPUT_ID_LEVEL_AUTHOR
@@ -881,6 +883,13 @@ static struct
     MAX_LEVEL_AUTHOR_LEN,
     level.author,
     "Author"
+  },
+  {
+    5 * MINI_TILEX,			5 * MINI_TILEY - ED_BORDER_SIZE,
+    GADGET_ID_ELEMENT_NAME,
+    MAX_ELEMENT_NAME_LEN - 2,		/* currently 2 chars less editable */
+    custom_element.description,
+    NULL
   }
 };
 
@@ -2377,6 +2386,8 @@ static char *getElementInfoText(int element)
   {
     if (element_info[element].custom_description != NULL)
       info_text = element_info[element].custom_description;
+    else if (strlen(element_info[element].description) > 0)
+      info_text = element_info[element].description;
     else if (element_info[element].editor_description != NULL)
       info_text = element_info[element].editor_description;
   }
@@ -3422,9 +3433,12 @@ static void MapTextInputGadget(int id)
   int x = textinput_info[id].x + xoffset_above;
   int y = textinput_info[id].y + yoffset_above;
 
-  sprintf(infotext, "%s:", textinput_info[id].infotext);
-  infotext[max_infotext_len] = '\0';
-  DrawTextF(x, y, FONT_TEXT_1, infotext);
+  if (textinput_info[id].infotext)
+  {
+    sprintf(infotext, "%s:", textinput_info[id].infotext);
+    infotext[max_infotext_len] = '\0';
+    DrawTextF(x, y, FONT_TEXT_1, infotext);
+  }
 
   ModifyGadget(level_editor_gadget[textinput_info[id].gadget_id],
 	       GDI_TEXT_VALUE, textinput_info[id].value, GDI_END);
@@ -4811,6 +4825,9 @@ static void DrawPropertiesConfig()
 
     /* draw drawing area gadgets */
     DrawCustomContentArea();
+
+    /* draw text input gadgets */
+    MapTextInputGadget(ED_TEXTINPUT_ID_ELEMENT_NAME);
   }
 }
 
@@ -5683,6 +5700,8 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 	  ModifyEditorElementList();
 	  RedrawDrawingElements();
 
+	  DrawPropertiesAdvancedDrawingAreas();
+
 	  FrameCounter = 0;	/* restart animation frame counter */
 	}
 	else if (id == GADGET_ID_CUSTOM_CONTENT)
@@ -5902,7 +5921,12 @@ static void HandleCounterButtons(struct GadgetInfo *gi)
 
 static void HandleTextInputGadgets(struct GadgetInfo *gi)
 {
-  strcpy(textinput_info[gi->custom_type_id].value, gi->text.value);
+  int type_id = gi->custom_type_id;
+
+  strcpy(textinput_info[type_id].value, gi->text.value);
+
+  if (type_id == ED_TEXTINPUT_ID_ELEMENT_NAME)
+    CopyCustomElementPropertiesToGame(properties_element);
 }
 
 static void HandleSelectboxGadgets(struct GadgetInfo *gi)

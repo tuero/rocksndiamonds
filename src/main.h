@@ -321,6 +321,7 @@
 /* boundaries of arrays etc. */
 #define MAX_LEVEL_NAME_LEN	32
 #define MAX_LEVEL_AUTHOR_LEN	32
+#define MAX_ELEMENT_NAME_LEN	32
 #define MAX_TAPELEN		(1000 * 50)	/* max. time * framerate */
 #define MAX_SCORE_ENTRIES	100
 #define MAX_NUM_AMOEBA		100
@@ -1207,8 +1208,9 @@ struct ElementInfo
 
   char *token_name;		/* element token used in config files */
   char *class_name;		/* element class used in config files */
-  char *editor_description;	/* short description for level editor */
-  char *custom_description;	/* custom description for level editor */
+  char *editor_description;	/* pre-defined description for level editor */
+  char *custom_description;	/* alternative description from config file */
+  char description[MAX_ELEMENT_NAME_LEN + 1];	/* for custom elements */
 
   /* ---------- graphic and sound definitions ---------- */
 
@@ -1222,7 +1224,7 @@ struct ElementInfo
 
   /* ---------- special element property values ---------- */
 
-  boolean use_gfx_element;
+  boolean use_gfx_element;	/* use custom graphic element */
   short gfx_element;		/* optional custom graphic element */
 
   int score;			/* score value for collecting */
