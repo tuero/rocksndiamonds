@@ -1079,7 +1079,9 @@ void InitElementPropertiesStatic()
     EL_TRAP,
     EL_INVISIBLE_SAND,
     EL_INVISIBLE_SAND_ACTIVE,
-#if 1
+
+    /* !!! currently not diggable, but handled by 'ep_dont_go_to' !!! */
+#if 0
     EL_LANDMINE,
     EL_TRAP_ACTIVE,
     EL_SP_BUGGY_BASE_ACTIVE,
@@ -1510,9 +1512,13 @@ void InitElementPropertiesStatic()
     EL_ACID,
     EL_SP_SNIKSNAK,
     EL_SP_ELECTRON,
+
+    /* !!! maybe this should better be handled by 'ep_diggable' !!! */
+#if 1
     EL_SP_BUGGY_BASE_ACTIVE,
     EL_TRAP_ACTIVE,
     EL_LANDMINE,
+#endif
     -1
   };
 

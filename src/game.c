@@ -6446,6 +6446,7 @@ int DigField(struct PlayerInfo *player,
       break;
 
     default:
+
       if (IS_WALKABLE(element))
       {
 	break;
