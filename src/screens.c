@@ -135,7 +135,7 @@ void DrawMainMenu()
   UnmapAllGadgets();
   FadeSounds();
   KeyboardAutoRepeatOn();
-  ActivateJoystickIfAvailable();
+  ActivateJoystick();
   SetDrawDeactivationMask(REDRAW_NONE);
 
   /* needed if last screen was the playing screen, invoked from level editor */
@@ -1796,9 +1796,11 @@ void DrawSetupScreen_Input()
   DrawText(SX+32, SY+3*32, "Device:", FS_BIG, FC_GREEN);
   DrawText(SX+32, SY+15*32, "Exit", FS_BIG, FC_GREEN);
 
+#if 0
   DeactivateJoystickForCalibration();
   DrawTextFCentered(SYSIZE - 20, FC_BLUE,
 		    "Joysticks deactivated on this screen");
+#endif
 
   HandleSetupScreen_Input(0,0, 0,0, MB_MENU_INITIALIZE);
   FadeToFront();
@@ -2347,6 +2349,8 @@ void CalibrateJoystick(int player_nr)
 
 void DrawSetupScreen()
 {
+  DeactivateJoystick();
+
   if (setup_mode == SETUP_MODE_INPUT)
     DrawSetupScreen_Input();
   else if (setup_mode == SETUP_MODE_CHOOSE_GRAPHICS)

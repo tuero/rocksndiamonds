@@ -291,7 +291,14 @@ inline static void FreeBitmapPointers(Bitmap *bitmap)
     SDL_FreeSurface(bitmap->surface);
   if (bitmap->surface_masked)
     SDL_FreeSurface(bitmap->surface_masked);
+  bitmap->surface = NULL;
+  bitmap->surface_masked = NULL;
 #else
+  /* The X11 version seems to have a memory leak here -- although
+     "XFreePixmap()" is called, the correspondig memory seems not
+     to be freed (according to "ps"). The SDL version apparently
+     does not have this problem. */
+
   if (bitmap->drawable)
     XFreePixmap(display, bitmap->drawable);
   if (bitmap->clip_mask)
@@ -299,13 +306,18 @@ inline static void FreeBitmapPointers(Bitmap *bitmap)
   if (bitmap->stored_clip_gc)
     XFreeGC(display, bitmap->stored_clip_gc);
   /* the other GCs are only pointers to GCs used elsewhere */
+  bitmap->drawable = None;
+  bitmap->clip_mask = None;
+  bitmap->stored_clip_gc = None;
 #endif
 
   if (bitmap->source_filename)
     free(bitmap->source_filename);
+  bitmap->source_filename = NULL;
 }
 
-inline void TransferBitmapPointers(Bitmap *src_bitmap, Bitmap *dst_bitmap)
+inline static void TransferBitmapPointers(Bitmap *src_bitmap,
+					  Bitmap *dst_bitmap)
 {
   if (src_bitmap == NULL || dst_bitmap == NULL)
     return;
@@ -666,57 +678,42 @@ Bitmap *LoadCustomImage(char *basename)
   return new_bitmap;
 }
 
-Bitmap *ReloadCustomImage(Bitmap **bitmap, char *basename)
+void ReloadCustomImage(Bitmap *bitmap, char *basename)
 {
   char *filename = getCustomImageFilename(basename);
-  Bitmap *old_bitmap = *bitmap;
   Bitmap *new_bitmap;
 
   if (filename == NULL)		/* (should never happen) */
   {
     Error(ERR_WARN, "ReloadCustomImage(): cannot find file '%s'", basename);
-    return NULL;
+    return;
   }
 
-  if (strcmp(filename, old_bitmap->source_filename) == 0)
+  if (strcmp(filename, bitmap->source_filename) == 0)
   {
     /* The old and new image are the same (have the same filename and path).
        This usually means that this image does not exist in this graphic set
        and a fallback to the existing image is done. */
 
-    return NULL;
+    return;
   }
 
   if ((new_bitmap = LoadImage(filename)) == NULL)
   {
     Error(ERR_WARN, "LoadImage() failed: %s", GetError());
-    return NULL;
+    return;
   }
 
-  if (old_bitmap->width != new_bitmap->width ||
-      old_bitmap->height != new_bitmap->height)
+  if (bitmap->width != new_bitmap->width ||
+      bitmap->height != new_bitmap->height)
   {
     Error(ERR_WARN, "ReloadCustomImage: new image has wrong dimensions");
     FreeBitmap(new_bitmap);
-    return NULL;
+    return;
   }
 
-#if 0
-  /* copy filename for new image */
-  free(old_bitmap->source_filename);
-  old_bitmap->source_filename = getStringCopy(filename);
-
-  /* copy bitmap data for new image */
-  BlitBitmap(new_bitmap, old_bitmap, 0,0,
-	     old_bitmap->width, old_bitmap->height, 0,0);
-
-  FreeBitmap(new_bitmap);
-#else
-  /*
-  *bitmap = new_bitmap;
-  */
-  return new_bitmap;
-#endif
+  TransferBitmapPointers(new_bitmap, bitmap);
+  free(new_bitmap);
 }
 
 

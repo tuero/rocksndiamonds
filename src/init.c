@@ -180,7 +180,6 @@ void InitTileClipmasks()
   GC copy_clipmask_gc;
   XGCValues clip_gc_values;
   unsigned long clip_gc_valuemask;
-#endif
 
 #if defined(TARGET_X11_NATIVE)
   static struct
@@ -234,7 +233,8 @@ void InitTileClipmasks()
     { GFX2_SHIELD_ACTIVE, 3 },
     { -1, 0 }
   };
-#endif
+#endif /* TARGET_X11_NATIVE */
+#endif /* TARGET_X11 */
 
   int i;
 
@@ -247,13 +247,6 @@ void InitTileClipmasks()
      often very slow when preparing a masked XCopyArea() for big Pixmaps.
      To prevent this, create small (tile-sized) mask Pixmaps which will then
      be set much faster with XSetClipOrigin() and speed things up a lot. */
-
-  /* create graphic context structures needed for clipping */
-  clip_gc_values.graphics_exposures = False;
-  clip_gc_valuemask = GCGraphicsExposures;
-  copy_clipmask_gc =
-    XCreateGC(display, pix[PIX_BACK]->clip_mask,
-	      clip_gc_valuemask, &clip_gc_values);
 
   clip_gc_values.graphics_exposures = False;
   clip_gc_valuemask = GCGraphicsExposures;
@@ -268,11 +261,19 @@ void InitTileClipmasks()
       clip_gc_values.clip_mask = pix[i]->clip_mask;
       clip_gc_valuemask = GCGraphicsExposures | GCClipMask;
       pix[i]->stored_clip_gc = XCreateGC(display, window->drawable,
-					 clip_gc_valuemask,&clip_gc_values);
+					 clip_gc_valuemask, &clip_gc_values);
     }
   }
 
 #if defined(TARGET_X11_NATIVE)
+
+  /* create graphic context structures needed for clipping */
+  clip_gc_values.graphics_exposures = False;
+  clip_gc_valuemask = GCGraphicsExposures;
+  copy_clipmask_gc =
+    XCreateGC(display, pix[PIX_BACK]->clip_mask,
+	      clip_gc_valuemask, &clip_gc_values);
+
   /* create only those clipping Pixmaps we really need */
   for(i=0; tile_needs_clipping[i].start>=0; i++)
   {
@@ -296,10 +297,39 @@ void InitTileClipmasks()
 		src_x, src_y, TILEX, TILEY, 0, 0);
     }
   }
-#endif /* TARGET_X11_NATIVE */
 
   XFreeGC(display, copy_clipmask_gc);
 
+#endif /* TARGET_X11_NATIVE */
+#endif /* TARGET_X11 */
+}
+
+void FreeTileClipmasks()
+{
+#if defined(TARGET_X11)
+  int i;
+
+  for(i=0; i<NUM_TILES; i++)
+  {
+    if (tile_clipmask[i] != None)
+    {
+      XFreePixmap(display, tile_clipmask[i]);
+      tile_clipmask[i] = None;
+    }
+  }
+
+  if (tile_clip_gc)
+    XFreeGC(display, tile_clip_gc);
+  tile_clip_gc = None;
+
+  for(i=0; i<NUM_BITMAPS; i++)
+  {
+    if (pix[i]->stored_clip_gc)
+    {
+      XFreeGC(display, pix[i]->stored_clip_gc);
+      pix[i]->stored_clip_gc = None;
+    }
+  }
 #endif /* TARGET_X11 */
 }
 
@@ -346,6 +376,7 @@ void InitGfx()
   }
 
   InitFontInfo(pix[PIX_BIGFONT], pix[PIX_MEDIUMFONT], pix[PIX_SMALLFONT]);
+
   InitTileClipmasks();
 }
 
@@ -372,46 +403,19 @@ void ReloadCustomArtwork()
 {
   if (artwork.graphics_set_current != artwork.gfx_current->name)
   {
-    Bitmap *pix_new[NUM_PICTURES];
     int i;
 
     ClearRectangle(window, 0, 0, WIN_XSIZE, WIN_YSIZE);
+
     for(i=0; i<NUM_PICTURES; i++)
     {
       DrawInitText(image_filename[i], 150, FC_YELLOW);
-      pix_new[i] = ReloadCustomImage(&pix[i], image_filename[i]);
-
-#if 0
-      if (pix_new[i] != NULL)
-	pix[i] = pix_new[i];
-#endif
+      ReloadCustomImage(pix[i], image_filename[i]);
     }
 
-#if 0
-    InitFontInfo(pix[PIX_BIGFONT], pix[PIX_MEDIUMFONT], pix[PIX_SMALLFONT]);
+    FreeTileClipmasks();
     InitTileClipmasks();
     InitGfxBackground();
-#endif
-
-#if 1
-    for(i=0; i<NUM_PICTURES; i++)
-    {
-      if (pix_new[i] != NULL)
-	TransferBitmapPointers(pix_new[i], pix[i]);
-    }
-#else
-    for(i=0; i<NUM_PICTURES; i++)
-    {
-      if (pix_new[i] != NULL)
-	FreeBitmap(pix_old[i]);
-    }
-#endif
-
-#if 1
-    InitFontInfo(pix[PIX_BIGFONT], pix[PIX_MEDIUMFONT], pix[PIX_SMALLFONT]);
-    InitTileClipmasks();
-    InitGfxBackground();
-#endif
 
     SetDoorState(DOOR_OPEN_1 | DOOR_CLOSE_2);
 
@@ -1599,6 +1603,7 @@ void CloseAllAndExit(int exit_value)
   FreeSounds(NUM_SOUNDS);
   CloseAudio();
 
+  FreeTileClipmasks();
   for(i=0; i<NUM_BITMAPS; i++)
     FreeBitmap(pix[i]);
 

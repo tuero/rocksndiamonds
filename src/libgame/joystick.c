@@ -338,7 +338,7 @@ int AnyJoystickButton()
   return result;
 }
 
-void DeactivateJoystickForCalibration()
+void DeactivateJoystick()
 {
   /* Temporarily deactivate joystick. This is needed for calibration
      screens, where the player has to select a joystick device that
@@ -351,7 +351,7 @@ void DeactivateJoystickForCalibration()
     joystick.status &= ~JOYSTICK_ACTIVE;
 }
 
-void ActivateJoystickIfAvailable()
+void ActivateJoystick()
 {
   /* reactivate temporarily deactivated joystick */
 

@@ -84,7 +84,7 @@ int JoystickButton(int);
 int AnyJoystick(void);
 int AnyJoystickButton(void);
 
-void DeactivateJoystickForCalibration();
-void ActivateJoystickIfAvailable();
+void DeactivateJoystick();
+void ActivateJoystick();
 
 #endif	/* JOYSTICK_H */
