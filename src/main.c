@@ -45,10 +45,12 @@ char	       *joystick_device_name[2] = { DEV_JOYSTICK_0, DEV_JOYSTICK_1 };
 char	       *level_directory = LEVEL_PATH;
 int     	width, height;
 
+char	       *display_name = NULL;
 char	       *server_host = NULL;
 int		server_port = 0;
 int		networking = FALSE;
 int		standalone = TRUE;
+int		verbose = FALSE;
 
 int		game_status = MAINMENU;
 int		game_emulation = EMU_NONE;
@@ -192,9 +194,131 @@ int num_bg_loops = sizeof(background_loop)/sizeof(int);
 
 char 		*progname;
 
+#define MAX_OPTION_LEN	1024
+
+static void fatal_option()
+{
+  fprintf(stderr,"Try '%s --help' for more information.\n",
+	  progname);
+  exit(1);
+}
+
+static void fatal_unrecognized_option(char *option)
+{
+  fprintf(stderr,"%s: unrecognized option '%s'\n",
+	  progname, option);
+  fatal_option();
+}
+
+static void fatal_option_requires_argument(char *option)
+{
+  fprintf(stderr,"%s: option '%s' requires an argument\n",
+	  progname, option);
+  fatal_option();
+}
+
+static void fatal_invalid_argument(char *option)
+{
+  fprintf(stderr,"%s: option '%s' has invalid argument\n",
+	  progname, option);
+  fatal_option();
+}
+
+static void fatal_too_many_arguments()
+{
+  fprintf(stderr,"%s: too many arguments\n",
+	  progname);
+  fatal_option();
+}
+
+extern void fatal(char *);
+
 int main(int argc, char *argv[])
 {
-  progname = argv[0];
+  char **options_left = &argv[1];
+
+  progname = &argv[0][strlen(argv[0])];
+  while (progname != argv[0])
+    if (*progname-- == '/')
+      break;
+
+  while (options_left)
+  {
+    char option_str[MAX_OPTION_LEN];
+    char *option = options_left[0];
+    char *next_option = options_left[1];
+    char *option_arg = NULL;
+    int option_len;
+
+    if (strcmp(option, "--") == 0)		/* end of argument list */
+      break;
+
+    if (strncmp(option, "--", 2))		/* treat '--' like '-' */
+      option++;
+    option_len = strlen(option);
+
+    if (option_len >= MAX_OPTION_LEN)
+      fatal_unrecognized_option(option);
+
+    strcpy(option_str, option);
+    option = option_str;
+
+    option_arg = strchr(option, '=');
+    if (option_arg == NULL)			/* no '=' in option */
+      option_arg = next_option;
+    else
+    {
+      *option_arg++ = '\0';			/* cut argument from option */
+      if (*option_arg == '\0')			/* no argument after '=' */
+	fatal_invalid_argument(option);
+    }
+
+    if (strncmp(option, "-help", option_len) == 0)
+    {
+      printf("Usage: rocksndiamonds [options] [server.name [port]]\n"
+	     "Options:\n"
+	     "  -d, --display machine:0       X server display\n"
+	     "  -l, --levels directory        alternative level directory\n"
+	     "  -v, --verbose                 verbose mode\n");
+      exit(0);
+    }
+    else if (strncmp(option, "-display", option_len) == 0)
+    {
+      if (option_arg == NULL)
+	fatal_option_requires_argument(option);
+
+      display_name = option_arg;
+      if (option_arg == next_option)
+	options_left++;
+    }
+    else if (strncmp(option, "-levels", option_len) == 0)
+    {
+      if (option_arg == NULL)
+	fatal_option_requires_argument(option);
+
+      level_directory = option_arg;
+      if (option_arg == next_option)
+	options_left++;
+    }
+    else if (strncmp(option, "-verbose", option_len) == 0)
+    {
+      verbose = TRUE;
+    }
+    else if (*option == '-')
+      fatal_unrecognized_option(option);
+    else if (server_host == NULL)
+      server_host = *options_left;
+    else if (server_port == 0)
+    {
+      server_port = atoi(*options_left);
+      if (server_port < 1024)
+        fatal("Bad port number");
+    }
+    else
+      fatal_too_many_arguments();
+
+    options_left++;
+  }
 
 
 
@@ -204,13 +328,13 @@ int main(int argc, char *argv[])
     */
 
 
-
+    /*
   if (argc > 1)
     server_host = argv[1];
 
   if (argc > 2)
     server_port = atoi(argv[2]);
-
+    */
 
 
 #ifdef MSDOS

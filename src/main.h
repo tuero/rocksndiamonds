@@ -325,6 +325,7 @@ extern char	       *server_host;
 extern int		server_port;
 extern int		networking;
 extern int		standalone;
+extern int		verbose;
 
 extern int		game_status;
 extern int		game_emulation;
