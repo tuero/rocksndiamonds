@@ -1343,10 +1343,20 @@ void DrawMiniElementOrWall(int sx, int sy, int scroll_x, int scroll_y)
 
   if (x < -1 || x > lev_fieldx || y < -1 || y > lev_fieldy)
     DrawMiniElement(sx, sy, EL_LEERRAUM);
-  else if (x == -1 || x == lev_fieldx || y == -1 || y == lev_fieldy)
-    DrawMiniElement(sx, sy, EL_BETON);
-  else
+  else if (x > -1 && x < lev_fieldx && y > -1 && y < lev_fieldy)
     DrawMiniElement(sx, sy, Feld[x][y]);
+  else if (x == -1 && y == -1)
+    DrawMiniGraphic(sx, sy, GFX_STEEL_UPPER_LEFT);
+  else if (x == lev_fieldx && y == -1)
+    DrawMiniGraphic(sx, sy, GFX_STEEL_UPPER_RIGHT);
+  else if (x == -1 && y == lev_fieldy)
+    DrawMiniGraphic(sx, sy, GFX_STEEL_LOWER_LEFT);
+  else if (x == lev_fieldx && y == lev_fieldy)
+    DrawMiniGraphic(sx, sy, GFX_STEEL_LOWER_RIGHT);
+  else if (x == -1 || x == lev_fieldx)
+    DrawMiniGraphic(sx, sy, GFX_STEEL_VERTICAL);
+  else if (y == -1 || y == lev_fieldy)
+    DrawMiniGraphic(sx, sy, GFX_STEEL_HORIZONTAL);
 }
 
 void DrawMicroElement(int xpos, int ypos, int element)
