@@ -1595,6 +1595,7 @@ struct FileInfo *getFileListFromConfigList(struct ConfigInfo *config_list,
   num_file_list_entries_found = list_pos + 1;
   if (num_file_list_entries_found != num_file_list_entries)
   {
+    Error(ERR_RETURN_LINE, "-");
     Error(ERR_RETURN, "inconsistant config list information:");
     Error(ERR_RETURN, "- should be:   %d (according to 'src/conf_gfx.h')",
 	  num_file_list_entries);
@@ -1606,17 +1607,94 @@ struct FileInfo *getFileListFromConfigList(struct ConfigInfo *config_list,
   return file_list;
 }
 
+#define SUFFIX_NO_MATCH		0
+#define SUFFIX_MATCH		(1 << 0)
+#define SUFFIX_MATCH_COMPLETE	(1 << 1)
+
+static int token_suffix_match(char *token, char *suffix, int start_pos)
+{
+  int len_token = strlen(token);
+  int len_suffix = strlen(suffix);
+
+  if (start_pos + len_suffix > len_token)
+    return SUFFIX_NO_MATCH;
+
+  if (strncmp(&token[start_pos], suffix, len_suffix) != 0)
+    return SUFFIX_NO_MATCH;
+
+  if (token[start_pos + len_suffix] == '\0')
+    return SUFFIX_MATCH_COMPLETE;
+
+  if (token[start_pos + len_suffix] == '.')
+    return SUFFIX_MATCH;
+
+  return SUFFIX_NO_MATCH;
+}
+
+#define KNOWN_TOKEN_VALUE	"[KNOWN_TOKEN]"
+
+static void read_token_parameters(struct SetupFileList *setup_file_list,
+				  struct ConfigInfo *suffix_list,
+				  struct FileInfo *file_list_entry)
+{
+  /* check for config token that is the base token without any suffixes */
+  char *filename = getTokenValue(setup_file_list, file_list_entry->token);
+  char *known_token_value = KNOWN_TOKEN_VALUE;
+  int i;
+
+  if (filename != NULL)
+  {
+    /* when file definition found, set all parameters to default values */
+    for (i=0; suffix_list[i].token != NULL; i++)
+      file_list_entry->parameter[i] =
+	get_parameter_value(suffix_list[i].type, suffix_list[i].value);
+
+    file_list_entry->filename = getStringCopy(filename);
+
+    /* mark config file token as well known from default config */
+    setTokenValue(setup_file_list, file_list_entry->token, known_token_value);
+  }
+  else
+    file_list_entry->filename =
+      getStringCopy(file_list_entry->default_filename);
+
+  /* check for config tokens that can be build by base token and suffixes */
+  for (i=0; suffix_list[i].token != NULL; i++)
+  {
+    char *token = getStringCat2(file_list_entry->token, suffix_list[i].token);
+    char *value = getTokenValue(setup_file_list, token);
+
+    if (value != NULL)
+    {
+      file_list_entry->parameter[i] =
+	get_parameter_value(suffix_list[i].type, value);
+
+      /* mark config file token as well known from default config */
+      setTokenValue(setup_file_list, token, known_token_value);
+    }
+
+    free(token);
+  }
+}
+
 void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
 {
   struct FileInfo *file_list = artwork_info->file_list;
   struct ConfigInfo *suffix_list = artwork_info->suffix_list;
+  char **base_prefixes = artwork_info->base_prefixes;
+  char **ext1_suffixes = artwork_info->ext1_suffixes;
+  char **ext2_suffixes = artwork_info->ext2_suffixes;
   int num_file_list_entries = artwork_info->num_file_list_entries;
   int num_suffix_list_entries = artwork_info->num_suffix_list_entries;
+  int num_base_prefixes = artwork_info->num_base_prefixes;
+  int num_ext1_suffixes = artwork_info->num_ext1_suffixes;
+  int num_ext2_suffixes = artwork_info->num_ext2_suffixes;
   char *filename = getCustomArtworkConfigFilename(artwork_info->type);
   struct SetupFileList *setup_file_list;
   struct SetupFileList *extra_file_list = NULL;
-  char *known_token_value = "[KNOWN_TOKEN]";
-  int i, j;
+  struct SetupFileList *list;
+  char *known_token_value = KNOWN_TOKEN_VALUE;
+  int i, j, k;
 
 #if 0
   printf("GOT CUSTOM ARTWORK CONFIG FILE '%s'\n", filename);
@@ -1639,84 +1717,94 @@ void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
   if ((setup_file_list = loadSetupFileList(filename)) == NULL)
     return;
 
+  /* read parameters for all known config file tokens */
   for (i=0; i<num_file_list_entries; i++)
-  {
-    /* check for config token that is the base token without any suffixes */
-    char *filename = getTokenValue(setup_file_list, file_list[i].token);
-
-    if (filename != NULL)
-    {
-      for (j=0; j<num_suffix_list_entries; j++)
-	file_list[i].parameter[j] =
-	  get_parameter_value(suffix_list[j].type, suffix_list[j].value);
-
-      file_list[i].filename = getStringCopy(filename);
-
-      /* mark token as well known from default config */
-      setTokenValue(setup_file_list, file_list[i].token, known_token_value);
-    }
-    else
-      file_list[i].filename = getStringCopy(file_list[i].default_filename);
-
-    /* check for config tokens that can be build by base token and suffixes */
-    for (j=0; j<num_suffix_list_entries; j++)
-    {
-      char *token = getStringCat2(file_list[i].token, suffix_list[j].token);
-      char *value = getTokenValue(setup_file_list, token);
-
-      if (value != NULL)
-      {
-	file_list[i].parameter[j] =
-	  get_parameter_value(suffix_list[j].type, value);
-
-	/* mark token as well known from default config */
-	setTokenValue(setup_file_list, token, known_token_value);
-      }
-
-      free(token);
-    }
-  }
+    read_token_parameters(setup_file_list, suffix_list, &file_list[i]);
 
   /* set some additional tokens to "known" */
   setTokenValue(setup_file_list, "name", known_token_value);
   setTokenValue(setup_file_list, "sort_priority", known_token_value);
 
-  if (options.verbose && !IS_CHILD_PROCESS(audio.mixer_pid))
+  /* copy all unknown config file tokens to special config list */
+  for (list = setup_file_list; list != NULL; list = list->next)
   {
-    boolean unknown_tokens_found = FALSE;
-
-    /* check each token in config file if it is defined in default config */
-    while (setup_file_list != NULL)
+    if (strcmp(list->value, known_token_value) != 0)
     {
-      if (strcmp(setup_file_list->value, known_token_value) != 0)
-      {
-	if (extra_file_list == NULL)
-	  extra_file_list = newSetupFileList(setup_file_list->token,
-					     setup_file_list->value);
-	else
-	  setTokenValue(extra_file_list, setup_file_list->token,
-			setup_file_list->value);
-
-	if (!unknown_tokens_found)
-	{
-	  Error(ERR_RETURN_LINE, "-");
-	  Error(ERR_RETURN, "warning: unknown token(s) found in config file:");
-	  Error(ERR_RETURN, "- config file: '%s'", filename);
-
-	  unknown_tokens_found = TRUE;
-	}
-
-	Error(ERR_RETURN, "- unknown token: '%s'", setup_file_list->token);
-      }
-
-      setup_file_list = setup_file_list->next;
+      if (extra_file_list == NULL)
+	extra_file_list = newSetupFileList(list->token, list->value);
+      else
+	setTokenValue(extra_file_list, list->token, list->value);
     }
-
-    if (unknown_tokens_found)
-      Error(ERR_RETURN_LINE, "-");
   }
 
+  /* at this point, we do not need the config file list anymore -- free it */
   freeSetupFileList(setup_file_list);
+
+  if (extra_file_list != NULL)
+  {
+    if (options.verbose && IS_PARENT_PROCESS(audio.mixer_pid))
+    {
+      Error(ERR_RETURN_LINE, "-");
+      Error(ERR_RETURN, "warning: unknown token(s) found in config file:");
+      Error(ERR_RETURN, "- config file: '%s'", filename);
+
+      for (list = extra_file_list; list != NULL; list = list->next)
+	Error(ERR_RETURN, "- unknown token: '%s'", list->token);
+
+      Error(ERR_RETURN_LINE, "-");
+    }
+
+    /* now try to determine valid, dynamically defined config tokens */
+
+    for (list = extra_file_list; list != NULL; list = list->next)
+    {
+      char *token = list->token;
+
+      for (i=0; i<num_base_prefixes; i++)
+      {
+	char *base_prefix = base_prefixes[i];
+	int start_pos = 0;
+	int match = token_suffix_match(token, base_prefix, start_pos);
+
+	if (match == SUFFIX_MATCH_COMPLETE)
+	{
+	  printf("--- found complete token '%s'\n", token);
+	}
+	else if (match == SUFFIX_MATCH)
+	{
+	  int len_base_prefix = strlen(base_prefix);
+
+	  for (j=0; j<num_ext1_suffixes; j++)
+	  {
+	    char *ext1_suffix = ext1_suffixes[j];
+	    int start_pos = len_base_prefix;
+	    int match = token_suffix_match(token, ext1_suffix, start_pos);
+
+	    if (match == SUFFIX_MATCH_COMPLETE)
+	    {
+	      printf("--- found complete token '%s'\n", token);
+	    }
+	    else if (match == SUFFIX_MATCH)
+	    {
+	      int len_ext1_suffix = strlen(ext1_suffix);
+
+	      for (k=0; k<num_ext2_suffixes; k++)
+	      {
+		char *ext2_suffix = ext2_suffixes[k];
+		int start_pos = len_base_prefix + len_ext1_suffix;
+		int match = token_suffix_match(token, ext2_suffix, start_pos);
+
+		if (match == SUFFIX_MATCH_COMPLETE)
+		{
+		  printf("--- found complete token '%s'\n", token);
+		}
+	      }
+	    }
+	  }
+	}
+      }
+    }
+  }
 
   freeSetupFileList(extra_file_list);
 

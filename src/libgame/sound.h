@@ -144,7 +144,7 @@ void StopSounds(void);
 void StopSoundExt(int, int);
 struct FileInfo *getCurrentSoundList();
 void InitSoundList(struct ConfigInfo *, int, struct ConfigInfo *,
-		   struct ConfigInfo *, struct ConfigInfo *);
+		   char **, char **, char **);
 void InitReloadCustomSounds(char *);
 void InitReloadCustomMusic(char *);
 void FreeAllSounds(void);

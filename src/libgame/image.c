@@ -722,14 +722,16 @@ char *getImageConfigFilename()
 
 void InitImageList(struct ConfigInfo *config_list, int num_file_list_entries,
 		   struct ConfigInfo *config_suffix_list,
-		   struct ConfigInfo *ext1_suffix_list,
-		   struct ConfigInfo *ext2_suffix_list)
+		   char **base_prefixes,
+		   char **ext1_suffixes,
+		   char **ext2_suffixes)
 {
   int i;
 
   image_info = checked_calloc(sizeof(struct ArtworkListInfo));
-
   image_info->type = ARTWORK_TYPE_GRAPHICS;
+
+  /* ---------- initialize file list and suffix lists ---------- */
 
   image_info->num_file_list_entries = num_file_list_entries;
 
@@ -737,26 +739,38 @@ void InitImageList(struct ConfigInfo *config_list, int num_file_list_entries,
   for (i=0; config_suffix_list[i].token != NULL; i++)
     image_info->num_suffix_list_entries++;
 
-  image_info->num_ext1_suffix_list_entries = 0;
-  for (i=0; ext1_suffix_list[i].token != NULL; i++)
-    image_info->num_ext1_suffix_list_entries++;
-
-  image_info->num_ext2_suffix_list_entries = 0;
-  for (i=0; ext2_suffix_list[i].token != NULL; i++)
-    image_info->num_ext2_suffix_list_entries++;
-
   image_info->file_list =
     getFileListFromConfigList(config_list, config_suffix_list,
 			      num_file_list_entries);
   image_info->suffix_list = config_suffix_list;
-  image_info->ext1_suffix_list = ext1_suffix_list;
-  image_info->ext2_suffix_list = ext2_suffix_list;
+
+  /* ---------- initialize base prefix and suffixes lists ---------- */
+
+  image_info->num_base_prefixes = 0;
+  for (i=0; base_prefixes[i] != NULL; i++)
+    image_info->num_base_prefixes++;
+
+  image_info->num_ext1_suffixes = 0;
+  for (i=0; ext1_suffixes[i] != NULL; i++)
+    image_info->num_ext1_suffixes++;
+
+  image_info->num_ext2_suffixes = 0;
+  for (i=0; ext2_suffixes[i] != NULL; i++)
+    image_info->num_ext2_suffixes++;
+
+  image_info->base_prefixes = base_prefixes;
+  image_info->ext1_suffixes = ext1_suffixes;
+  image_info->ext2_suffixes = ext2_suffixes;
   image_info->custom_setup_list = NULL;
+
+  /* ---------- initialize artwork reference and content lists ---------- */
 
   image_info->artwork_list =
     checked_calloc(num_file_list_entries * sizeof(ImageInfo *));
 
   image_info->content_list = NULL;
+
+  /* ---------- initialize artwork loading/freeing functions ---------- */
 
   image_info->load_artwork = Load_PCX;
   image_info->free_artwork = FreeImage;

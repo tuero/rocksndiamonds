@@ -1772,14 +1772,16 @@ struct FileInfo *getCurrentSoundList()
 
 void InitSoundList(struct ConfigInfo *config_list, int num_file_list_entries,
 		   struct ConfigInfo *config_suffix_list,
-		   struct ConfigInfo *ext1_suffix_list,
-		   struct ConfigInfo *ext2_suffix_list)
+		   char **base_prefixes,
+		   char **ext1_suffixes,
+		   char **ext2_suffixes)
 {
   int i;
 
   sound_info = checked_calloc(sizeof(struct ArtworkListInfo));
-
   sound_info->type = ARTWORK_TYPE_SOUNDS;
+
+  /* ---------- initialize file list and suffix lists ---------- */
 
   sound_info->num_file_list_entries = num_file_list_entries;
 
@@ -1787,26 +1789,38 @@ void InitSoundList(struct ConfigInfo *config_list, int num_file_list_entries,
   for (i=0; config_suffix_list[i].token != NULL; i++)
     sound_info->num_suffix_list_entries++;
 
-  sound_info->num_ext1_suffix_list_entries = 0;
-  for (i=0; ext1_suffix_list[i].token != NULL; i++)
-    sound_info->num_ext1_suffix_list_entries++;
-
-  sound_info->num_ext2_suffix_list_entries = 0;
-  for (i=0; ext2_suffix_list[i].token != NULL; i++)
-    sound_info->num_ext2_suffix_list_entries++;
-
   sound_info->file_list =
     getFileListFromConfigList(config_list, config_suffix_list,
 			      num_file_list_entries);
   sound_info->suffix_list = config_suffix_list;
-  sound_info->ext1_suffix_list = ext1_suffix_list;
-  sound_info->ext2_suffix_list = ext2_suffix_list;
+
+  /* ---------- initialize base prefix and suffixes lists ---------- */
+
+  sound_info->num_base_prefixes = 0;
+  for (i=0; base_prefixes[i] != NULL; i++)
+    sound_info->num_base_prefixes++;
+
+  sound_info->num_ext1_suffixes = 0;
+  for (i=0; ext1_suffixes[i] != NULL; i++)
+    sound_info->num_ext1_suffixes++;
+
+  sound_info->num_ext2_suffixes = 0;
+  for (i=0; ext2_suffixes[i] != NULL; i++)
+    sound_info->num_ext2_suffixes++;
+
+  sound_info->base_prefixes = base_prefixes;
+  sound_info->ext1_suffixes = ext1_suffixes;
+  sound_info->ext2_suffixes = ext2_suffixes;
   sound_info->custom_setup_list = NULL;
+
+  /* ---------- initialize artwork reference and content lists ---------- */
 
   sound_info->artwork_list =
     checked_calloc(num_file_list_entries * sizeof(SoundInfo *));
 
   sound_info->content_list = NULL;
+
+  /* ---------- initialize artwork loading/freeing functions ---------- */
 
   sound_info->load_artwork = Load_WAV;
   sound_info->free_artwork = FreeSound;

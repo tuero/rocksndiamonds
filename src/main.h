@@ -1027,7 +1027,7 @@ struct GlobalInfo
 
 struct ElementInfo
 {
-  char *token_name;		/* element token used in config files */
+  char *token_name;		/* element token prefix used in config files */
   char *sound_class_name;	/* classification for custom sound effects */
   char *editor_description;	/* short description for level editor */
 
