@@ -789,7 +789,7 @@ void DrawInfoScreen_HelpAnim(int start, int max_anims, boolean init)
       infoscreen_frame[i - start]--;
     }
 
-    if (helpanim_info[j].element == -1)
+    if (helpanim_info[j].element == HELPANIM_LIST_NEXT)
     {
       if (!infoscreen_frame[i - start])
 	infoscreen_step[i - start] = 0;
@@ -798,7 +798,7 @@ void DrawInfoScreen_HelpAnim(int start, int max_anims, boolean init)
     {
       if (!infoscreen_frame[i - start])
 	infoscreen_step[i - start]++;
-      while (helpanim_info[j].element != -1)
+      while (helpanim_info[j].element != HELPANIM_LIST_NEXT)
 	j++;
     }
 

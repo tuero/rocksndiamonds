@@ -70,6 +70,7 @@
 void fprintf_line(FILE *, char *, int);
 void printf_line(char *, int);
 char *int2str(int, int);
+char *i_to_a(unsigned int);
 
 void InitCounter(void);
 unsigned long Counter(void);

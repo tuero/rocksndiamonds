@@ -1206,6 +1206,10 @@ char *getFormattedSetupEntry(char *token, char *value)
   int i;
   static char entry[MAX_LINE_LEN];
 
+  /* if value is an empty string, just return token without value */
+  if (*value == '\0')
+    return token;
+
   /* start with the token and some spaces to format output line */
   sprintf(entry, "%s:", token);
   for (i = strlen(entry); i < TOKEN_VALUE_POSITION; i++)
@@ -1403,7 +1407,6 @@ static void printSetupFileHash(SetupFileHash *hash)
 
 static void *loadSetupFileData(char *filename, boolean use_hash)
 {
-  int line_len;
   char line[MAX_LINE_LEN], previous_line[MAX_LINE_LEN];
   char *token, *value, *line_ptr;
   void *setup_file_data, *insert_ptr = NULL;
@@ -1478,36 +1481,33 @@ static void *loadSetupFileData(char *filename, boolean use_hash)
     if (*line == '\0')
       continue;
 
-    line_len = strlen(line);
-
     /* cut leading whitespaces from token */
     for (token = line; *token; token++)
       if (*token != ' ' && *token != '\t')
 	break;
 
-    /* find end of token */
+    /* start with empty value as reliable default */
+    value = "";
+
+    /* find end of token to determine start of value */
     for (line_ptr = token; *line_ptr; line_ptr++)
     {
       if (*line_ptr == ' ' || *line_ptr == '\t' || *line_ptr == ':')
       {
-	*line_ptr = '\0';
+	*line_ptr = '\0';		/* terminate token string */
+	value = line_ptr + 1;		/* set beginning of value */
+
 	break;
       }
     }
-
-    if (line_ptr < line + line_len)
-      value = line_ptr + 1;
-    else
-#if 1
-      value = "true";	/* treat tokens without value as "true" */
-#else
-      value = "\0";
-#endif
 
     /* cut leading whitespaces from value */
     for (; *value; value++)
       if (*value != ' ' && *value != '\t')
 	break;
+
+    if (*value == '\0')
+      value = "true";	/* treat tokens without value as "true" */
 
     if (*token && *value)
     {

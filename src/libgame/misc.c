@@ -82,6 +82,27 @@ char *int2str(int number, int size)
   }
 }
 
+/* something similar to "int2str()" above, but allocates its own memory
+   and has a different interface; we cannot use "itoa()", because this
+   seems to be already defined when cross-compiling to the win32 target */
+
+char *i_to_a(unsigned int i)
+{
+  static char *a = NULL;
+
+  if (a != NULL)
+    free(a);
+
+  if (i > 2147483647)	/* yes, this is a kludge */
+    i = 2147483647;
+
+  a = checked_malloc(10 + 1);
+
+  sprintf(a, "%d", i);
+
+  return a;
+}
+
 
 /* ------------------------------------------------------------------------- */
 /* counter functions                                                         */

@@ -1,8 +1,12 @@
 2003-12-02
+	* added menu entry for level set information to the info screen
+
+2003-12-02
 	* fixed bug with wrong default impact sound for colored emeralds
 
 2003-11-30
 	* added several sub-screens for the info screen
+	* menu text now also clickable (not only blue/red sphere left of it)
 
 2003-11-25
 	* added configurable "bored" and "sleeping" animations for the player
@@ -15,6 +19,9 @@
 
 2003-11-20
 	* added configurable music credits for info screen
+
+2003-11-19
+	* finally fixed tape recording when player is created from CE
 
 2003-11-18
 	* added "editorsetup.conf" for editor element list configuration
@@ -39,6 +46,7 @@
 2003-11-09
 	* fixed reset of player animation frame when, for example,
 	  walking, digging or collecting share the same animation
+	* fixed CE with "deadly when touching" exploding when touching amoeba
 
 2003-11-08
 	* fixed tape recording when player is created from CE element change
