@@ -99,11 +99,13 @@ static void setLevelInfoToDefaults()
   {
     int element = EL_CUSTOM_START + i;
 
+    level.custom_element[i].use_gfx_element = FALSE;
+    level.custom_element[i].gfx_element = EL_EMPTY_SPACE;
+
     level.custom_element[i].change.events = CE_BITMASK_DEFAULT;
-    level.custom_element[i].change.gfx_element = element;
-    level.custom_element[i].change.successor = EL_EMPTY_SPACE;
     level.custom_element[i].change.delay_fixed = 0;
     level.custom_element[i].change.delay_random = 0;
+    level.custom_element[i].change.successor = EL_EMPTY_SPACE;
 
     /* start with no properties at all */
     for (j=0; j < NUM_EP_BITFIELDS; j++)

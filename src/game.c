@@ -6594,7 +6594,8 @@ int DigField(struct PlayerInfo *player,
 #if 1
 	if (mode != DF_SNAP)
 	{
-	  GfxElement[x][y] = element;
+	  GfxElement[x][y] =
+	    (CAN_BE_CRUMBLED(element) ? EL_SAND : GFX_ELEMENT(element));
 	  player->is_digging = TRUE;
 	}
 #endif

@@ -1199,7 +1199,8 @@ static void DrawLevelFieldCrumbledSandExt(int x, int y, int graphic, int frame)
 
       element = (IN_LEV_FIELD(xx, yy) ? Feld[xx][yy] : EL_STEELWALL);
 
-      if (CAN_BE_CRUMBLED(element))	/* neighbour is of same type */
+      /* check if neighbour field is of same type */
+      if (CAN_BE_CRUMBLED(element))
 	continue;
 
       if (i == 1 || i == 2)
@@ -2390,47 +2391,43 @@ int get_next_element(int element)
 
 int el_act_dir2img(int element, int action, int direction)
 {
+  element = GFX_ELEMENT(element);
   direction = MV_DIR_BIT(direction);
-
-  if (IS_CUSTOM_ELEMENT(element))
-    element = CUSTOM_ELEMENT_INFO(element).change.gfx_element;
 
   return element_info[element].direction_graphic[action][direction];
 }
 
 int el_act2img(int element, int action)
 {
-  if (IS_CUSTOM_ELEMENT(element))
-    element = CUSTOM_ELEMENT_INFO(element).change.gfx_element;
+  element = GFX_ELEMENT(element);
 
   return element_info[element].graphic[action];
 }
 
 int el_dir2img(int element, int direction)
 {
+  element = GFX_ELEMENT(element);
+
   return el_act_dir2img(element, ACTION_DEFAULT, direction);
 }
 
 int el2img(int element)
 {
-  if (IS_CUSTOM_ELEMENT(element))
-    element = CUSTOM_ELEMENT_INFO(element).change.gfx_element;
+  element = GFX_ELEMENT(element);
 
   return element_info[element].graphic[ACTION_DEFAULT];
 }
 
 int el2edimg(int element)
 {
-  if (IS_CUSTOM_ELEMENT(element))
-    element = CUSTOM_ELEMENT_INFO(element).change.gfx_element;
+  element = GFX_ELEMENT(element);
 
   return element_info[element].special_graphic[GFX_SPECIAL_ARG_EDITOR];
 }
 
 int el2preimg(int element)
 {
-  if (IS_CUSTOM_ELEMENT(element))
-    element = CUSTOM_ELEMENT_INFO(element).change.gfx_element;
+  element = GFX_ELEMENT(element);
 
   return element_info[element].special_graphic[GFX_SPECIAL_ARG_PREVIEW];
 }

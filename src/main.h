@@ -190,7 +190,8 @@
 
 /* macros for pre-defined properties */
 #define ELEM_IS_PLAYER(e)	HAS_PROPERTY(e, EP_PLAYER)
-#define CAN_BE_CRUMBLED(e)	HAS_PROPERTY(e, EP_CAN_BE_CRUMBLED)
+#define CAN_BE_CRUMBLED_OLD(e)	HAS_PROPERTY(e, EP_CAN_BE_CRUMBLED)
+#define CAN_BE_CRUMBLED(e)	HAS_PROPERTY(GFX_ELEMENT(e),EP_CAN_BE_CRUMBLED)
 #define CAN_MOVE(e)		HAS_PROPERTY(e, EP_CAN_MOVE)
 #define CAN_PASS_MAGIC_WALL(e)	HAS_PROPERTY(e, EP_CAN_PASS_MAGIC_WALL)
 #define IS_SWITCHABLE(e)	HAS_PROPERTY(e, EP_SWITCHABLE)
@@ -233,6 +234,10 @@
 
 #define IS_CUSTOM_ELEMENT(e)	((e) >= EL_CUSTOM_START &&	\
 	 			 (e) <= EL_CUSTOM_END)
+
+#define GFX_ELEMENT(e)		(IS_CUSTOM_ELEMENT(e) &&		  \
+				 CUSTOM_ELEMENT_INFO(e).use_gfx_element ? \
+				 CUSTOM_ELEMENT_INFO(e).gfx_element : e)
 
 #define IS_PLAYER(x,y)		(ELEM_IS_PLAYER(StorePlayer[x][y]))
 
@@ -1012,19 +1017,20 @@ struct PlayerInfo
 
 struct CustomElementChangeInfo
 {
-  unsigned long events;	/* bitfield for change events */
+  unsigned long events;		/* bitfield for change events */
 
-  short gfx_element;	/* optional custom graphic element */
+  int delay_fixed;		/* added frame delay before changed (fixed) */
+  int delay_random;		/* added frame delay before changed (random) */
+  int delay_frames;		/* either 1 (frames) or 50 (seconds; 50 fps) */
 
-  short successor;	/* new custom element after change */
-
-  int delay_fixed;	/* added frame delay before changed (fixed) */
-  int delay_random;	/* added frame delay before changed (random) */
-  int delay_frames;	/* either 1 (frames) or 50 (seconds; 50 fps) */
+  short successor;		/* new custom element after change */
 };
 
 struct CustomElementInfo
 {
+  boolean use_gfx_element;
+  short gfx_element;		/* optional custom graphic element */
+
   struct CustomElementChangeInfo change;
 };
 

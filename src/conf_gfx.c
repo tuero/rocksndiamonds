@@ -959,7 +959,7 @@ struct ConfigInfo image_config[] =
   { "amoeba.shrinking.ypos",			"6"			},
   { "amoeba.shrinking.frames",			"3"			},
   { "amoeba.shrinking.delay",			"2"			},
-  { "amoeba.shrinking.anim_mode",		"loop,linear,reverse"	},
+  { "amoeba.shrinking.anim_mode",		"linear,reverse"	},
   { "amoeba_wet",				"RocksElements.pcx"	},
   { "amoeba_wet.xpos",				"8"			},
   { "amoeba_wet.ypos",				"6"			},
@@ -3344,6 +3344,10 @@ struct ConfigInfo image_config[] =
   { "editor.element_border",			"RocksElements.pcx"	},
   { "editor.element_border.xpos",		"0"			},
   { "editor.element_border.ypos",		"0"			},
+
+  { "editor.element_border_input",		"RocksElements.pcx"	},
+  { "editor.element_border_input.xpos",		"0"			},
+  { "editor.element_border_input.ypos",		"0"			},
 
   { "background",				UNDEFINED_FILENAME	},
   { "background.MAIN",				UNDEFINED_FILENAME	},
