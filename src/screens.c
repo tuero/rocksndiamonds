@@ -69,8 +69,7 @@ void DrawMainMenu()
   }
 
   /* unmap gadgets from last screen, map gadgets for main menu screen */
-  UnmapLevelEditorGadgets();
-  UnmapGameButtons();
+  UnmapAllGadgets();
   MapTapeButtons();
 
   FadeSounds();
@@ -677,6 +676,7 @@ void DrawHelpScreen()
 {
   int i;
 
+  UnmapAllGadgets();
   CloseDoor(DOOR_CLOSE_2);
 
   for(i=0;i<MAX_HELPSCREEN_ELS;i++)
@@ -796,6 +796,7 @@ void HandleTypeName(int newxpos, KeySym key)
 
 void DrawChooseLevel()
 {
+  UnmapAllGadgets();
   CloseDoor(DOOR_CLOSE_2);
 
   FadeToFront();
@@ -964,6 +965,7 @@ void DrawHallOfFame(int highlight_position)
 {
   int i;
 
+  UnmapAllGadgets();
   CloseDoor(DOOR_CLOSE_2);
 
   if (highlight_position < 0) 
@@ -1031,6 +1033,7 @@ void DrawSetupScreen()
     { NULL,			"Save and exit"	}
   };
 
+  UnmapAllGadgets();
   CloseDoor(DOOR_CLOSE_2);
   ClearWindow();
   DrawText(SX+16, SY+16, "SETUP",FS_BIG,FC_YELLOW);

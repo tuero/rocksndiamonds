@@ -31,6 +31,24 @@
 extern boolean wait_for_vsync;
 #endif
 
+/* tool button identifiers */
+#define TOOL_CTRL_ID_YES	0
+#define TOOL_CTRL_ID_NO		1
+#define TOOL_CTRL_ID_CONFIRM	2
+#define TOOL_CTRL_ID_PLAYER_1	3
+#define TOOL_CTRL_ID_PLAYER_2	4
+#define TOOL_CTRL_ID_PLAYER_3	5
+#define TOOL_CTRL_ID_PLAYER_4	6
+
+#define NUM_TOOL_BUTTONS	7
+
+/* forward declaration for internal use */
+static void UnmapToolButtons();
+static void HandleToolButtons(struct GadgetInfo *);
+
+static struct GadgetInfo *tool_gadget[NUM_TOOL_BUTTONS];
+static int request_gadget_id = -1;
+
 void SetDrawtoField(int mode)
 {
   if (mode == DRAW_BUFFERED && setup.soft_scrolling)
@@ -1612,17 +1630,24 @@ boolean Request(char *text, unsigned int req_state)
 
   old_door_state = GetDoorState();
 
+  UnmapAllGadgets();
+
   CloseDoor(DOOR_CLOSE_1);
 
-  /* Alten Türinhalt sichern */
+  /* save old door content */
   XCopyArea(display, pix[PIX_DB_DOOR], pix[PIX_DB_DOOR], gc,
 	    DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1, DXSIZE, DYSIZE,
 	    DOOR_GFX_PAGEX2, DOOR_GFX_PAGEY1);
 
-  /* Fragetext schreiben */
+  /* clear door drawing field */
+#if 0
   XFillRectangle(display, pix[PIX_DB_DOOR], gc,
 		 DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1, DXSIZE, DYSIZE);
+#else
+  XFillRectangle(display, drawto, gc, DX, DY, DXSIZE, DYSIZE);
+#endif
 
+  /* write text for request */
   for(ty=0; ty<13; ty++)
   {
     int tx, tl, tc;
@@ -1645,12 +1670,21 @@ boolean Request(char *text, unsigned int req_state)
     }
     sprintf(txt, text); 
     txt[tl] = 0;
+#if 0
     DrawTextExt(pix[PIX_DB_DOOR], gc,
 		DOOR_GFX_PAGEX1 + 51 - (tl * 14)/2, SY + ty * 16,
 		txt, FS_SMALL, FC_YELLOW);
+#else
+    DrawTextExt(drawto, gc,
+		DX + 51 - (tl * 14)/2, DY + 8 + ty * 16,
+		txt, FS_SMALL, FC_YELLOW);
+#endif
     text += tl + (tc == 32 ? 1 : 0);
   }
 
+
+
+#if 0
   if (req_state & REQ_ASK)
   {
     DrawYesNoButton(BUTTON_OK, DB_INIT);
@@ -1667,6 +1701,33 @@ boolean Request(char *text, unsigned int req_state)
     DrawPlayerButton(BUTTON_PLAYER_3, DB_INIT);
     DrawPlayerButton(BUTTON_PLAYER_4, DB_INIT);
   }
+#else
+
+  if (req_state & REQ_ASK)
+  {
+    MapGadget(tool_gadget[TOOL_CTRL_ID_YES]);
+    MapGadget(tool_gadget[TOOL_CTRL_ID_NO]);
+  }
+  else if (req_state & REQ_CONFIRM)
+  {
+    MapGadget(tool_gadget[TOOL_CTRL_ID_CONFIRM]);
+  }
+  else if (req_state & REQ_PLAYER)
+  {
+    MapGadget(tool_gadget[TOOL_CTRL_ID_PLAYER_1]);
+    MapGadget(tool_gadget[TOOL_CTRL_ID_PLAYER_2]);
+    MapGadget(tool_gadget[TOOL_CTRL_ID_PLAYER_3]);
+    MapGadget(tool_gadget[TOOL_CTRL_ID_PLAYER_4]);
+  }
+
+  /* copy request gadgets to door backbuffer */
+  XCopyArea(display, drawto, pix[PIX_DB_DOOR], gc,
+	    DX, DY, DXSIZE, DYSIZE,
+	    DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1);
+
+#endif
+
+
 
   OpenDoor(DOOR_OPEN_1);
   ClearEventQueue();
@@ -1678,6 +1739,8 @@ boolean Request(char *text, unsigned int req_state)
     InitAnimation();
 
   button_status = MB_RELEASED;
+
+  request_gadget_id = -1;
 
   while(result < 0)
   {
@@ -1697,6 +1760,18 @@ boolean Request(char *text, unsigned int req_state)
 
 	  if (event.type == MotionNotify)
 	  {
+	    Window root, child;
+	    int root_x, root_y;
+	    int win_x, win_y;
+	    unsigned int mask;
+
+	    if (!XQueryPointer(display, window, &root, &child,
+			       &root_x, &root_y, &win_x, &win_y, &mask))
+	      continue;
+
+	    if (!button_status)
+	      continue;
+
 	    motion_status = TRUE;
 	    mx = ((XMotionEvent *) &event)->x;
 	    my = ((XMotionEvent *) &event)->y;
@@ -1712,6 +1787,9 @@ boolean Request(char *text, unsigned int req_state)
 	      button_status = MB_RELEASED;
 	  }
 
+
+
+#if 0
 	  if (req_state & REQ_ASK)
 	    choice = CheckYesNoButtons(mx,my,button_status);
 	  else if (req_state & REQ_CONFIRM)
@@ -1747,6 +1825,41 @@ boolean Request(char *text, unsigned int req_state)
 	    default:
 	      break;
 	  }
+#else
+
+	  /* this sets 'request_gadget_id' */
+	  HandleGadgets(mx, my, button_status);
+
+	  switch(request_gadget_id)
+	  {
+	    case TOOL_CTRL_ID_YES:
+	      result = TRUE;
+	      break;
+	    case TOOL_CTRL_ID_NO:
+	      result = FALSE;
+	      break;
+	    case TOOL_CTRL_ID_CONFIRM:
+	      result = TRUE | FALSE;
+	      break;
+
+	    case TOOL_CTRL_ID_PLAYER_1:
+	      result = 1;
+	      break;
+	    case TOOL_CTRL_ID_PLAYER_2:
+	      result = 2;
+	      break;
+	    case TOOL_CTRL_ID_PLAYER_3:
+	      result = 3;
+	      break;
+	    case TOOL_CTRL_ID_PLAYER_4:
+	      result = 4;
+	      break;
+
+	    default:
+	      break;
+	  }
+#endif
+
 	  break;
 	}
 
@@ -1797,6 +1910,8 @@ boolean Request(char *text, unsigned int req_state)
   if (game_status != MAINMENU)
     StopAnimation();
 
+  UnmapToolButtons();
+
   if (!(req_state & REQ_STAY_OPEN))
   {
     CloseDoor(DOOR_CLOSE_1);
@@ -1809,6 +1924,8 @@ boolean Request(char *text, unsigned int req_state)
       OpenDoor(DOOR_OPEN_1);
     }
   }
+
+  RemapAllGadgets();
 
 #ifndef MSDOS
   /* continue network game after request */
@@ -1999,6 +2116,275 @@ int ReadPixel(Drawable d, int x, int y)
   XDestroyImage(pixel_image);
 
   return pixel_value;
+}
+
+/* ---------- new tool button stuff ---------------------------------------- */
+
+/* graphic position values for tool buttons */
+#define TOOL_BUTTON_YES_XPOS		2
+#define TOOL_BUTTON_YES_YPOS		250
+#define TOOL_BUTTON_YES_GFX_YPOS	0
+#define TOOL_BUTTON_YES_XSIZE		46
+#define TOOL_BUTTON_YES_YSIZE		28
+#define TOOL_BUTTON_NO_XPOS		52
+#define TOOL_BUTTON_NO_YPOS		TOOL_BUTTON_YES_YPOS
+#define TOOL_BUTTON_NO_GFX_YPOS		TOOL_BUTTON_YES_GFX_YPOS
+#define TOOL_BUTTON_NO_XSIZE		TOOL_BUTTON_YES_XSIZE
+#define TOOL_BUTTON_NO_YSIZE		TOOL_BUTTON_YES_YSIZE
+#define TOOL_BUTTON_CONFIRM_XPOS	TOOL_BUTTON_YES_XPOS
+#define TOOL_BUTTON_CONFIRM_YPOS	TOOL_BUTTON_YES_YPOS
+#define TOOL_BUTTON_CONFIRM_GFX_YPOS	30
+#define TOOL_BUTTON_CONFIRM_XSIZE	96
+#define TOOL_BUTTON_CONFIRM_YSIZE	TOOL_BUTTON_YES_YSIZE
+#define TOOL_BUTTON_PLAYER_XSIZE	30
+#define TOOL_BUTTON_PLAYER_YSIZE	30
+#define TOOL_BUTTON_PLAYER_GFX_XPOS	5
+#define TOOL_BUTTON_PLAYER_GFX_YPOS	185
+#define TOOL_BUTTON_PLAYER_XPOS		(5 + TOOL_BUTTON_PLAYER_XSIZE / 2)
+#define TOOL_BUTTON_PLAYER_YPOS		(215 - TOOL_BUTTON_PLAYER_YSIZE / 2)
+#define TOOL_BUTTON_PLAYER1_XPOS	(TOOL_BUTTON_PLAYER_XPOS \
+					 + 0 * TOOL_BUTTON_PLAYER_XSIZE)
+#define TOOL_BUTTON_PLAYER2_XPOS	(TOOL_BUTTON_PLAYER_XPOS \
+					 + 1 * TOOL_BUTTON_PLAYER_XSIZE)
+#define TOOL_BUTTON_PLAYER3_XPOS	(TOOL_BUTTON_PLAYER_XPOS \
+					 + 0 * TOOL_BUTTON_PLAYER_XSIZE)
+#define TOOL_BUTTON_PLAYER4_XPOS	(TOOL_BUTTON_PLAYER_XPOS \
+					 + 1 * TOOL_BUTTON_PLAYER_XSIZE)
+#define TOOL_BUTTON_PLAYER1_YPOS	(TOOL_BUTTON_PLAYER_YPOS \
+					 + 0 * TOOL_BUTTON_PLAYER_YSIZE)
+#define TOOL_BUTTON_PLAYER2_YPOS	(TOOL_BUTTON_PLAYER_YPOS \
+					 + 0 * TOOL_BUTTON_PLAYER_YSIZE)
+#define TOOL_BUTTON_PLAYER3_YPOS	(TOOL_BUTTON_PLAYER_YPOS \
+					 + 1 * TOOL_BUTTON_PLAYER_YSIZE)
+#define TOOL_BUTTON_PLAYER4_YPOS	(TOOL_BUTTON_PLAYER_YPOS \
+					 + 1 * TOOL_BUTTON_PLAYER_YSIZE)
+
+static struct
+{
+  int xpos, ypos;
+  int x, y;
+  int width, height;
+  int gadget_id;
+  char *infotext;
+} toolbutton_info[NUM_TOOL_BUTTONS] =
+{
+  {
+    TOOL_BUTTON_YES_XPOS,	TOOL_BUTTON_YES_GFX_YPOS,
+    TOOL_BUTTON_YES_XPOS,	TOOL_BUTTON_YES_YPOS,
+    TOOL_BUTTON_YES_XSIZE,	TOOL_BUTTON_YES_YSIZE,
+    TOOL_CTRL_ID_YES,
+    "yes"
+  },
+  {
+    TOOL_BUTTON_NO_XPOS,	TOOL_BUTTON_NO_GFX_YPOS,
+    TOOL_BUTTON_NO_XPOS,	TOOL_BUTTON_NO_YPOS,
+    TOOL_BUTTON_NO_XSIZE,	TOOL_BUTTON_NO_YSIZE,
+    TOOL_CTRL_ID_NO,
+    "no"
+  },
+  {
+    TOOL_BUTTON_CONFIRM_XPOS,	TOOL_BUTTON_CONFIRM_GFX_YPOS,
+    TOOL_BUTTON_CONFIRM_XPOS,	TOOL_BUTTON_CONFIRM_YPOS,
+    TOOL_BUTTON_CONFIRM_XSIZE,	TOOL_BUTTON_CONFIRM_YSIZE,
+    TOOL_CTRL_ID_CONFIRM,
+    "confirm"
+  },
+  {
+    TOOL_BUTTON_PLAYER_GFX_XPOS,TOOL_BUTTON_PLAYER_GFX_YPOS,
+    TOOL_BUTTON_PLAYER1_XPOS,	TOOL_BUTTON_PLAYER1_YPOS,
+    TOOL_BUTTON_PLAYER_XSIZE,	TOOL_BUTTON_PLAYER_YSIZE,
+    TOOL_CTRL_ID_PLAYER_1,
+    "player 1"
+  },
+  {
+    TOOL_BUTTON_PLAYER_GFX_XPOS,TOOL_BUTTON_PLAYER_GFX_YPOS,
+    TOOL_BUTTON_PLAYER2_XPOS,	TOOL_BUTTON_PLAYER2_YPOS,
+    TOOL_BUTTON_PLAYER_XSIZE,	TOOL_BUTTON_PLAYER_YSIZE,
+    TOOL_CTRL_ID_PLAYER_2,
+    "player 2"
+  },
+  {
+    TOOL_BUTTON_PLAYER_GFX_XPOS,TOOL_BUTTON_PLAYER_GFX_YPOS,
+    TOOL_BUTTON_PLAYER3_XPOS,	TOOL_BUTTON_PLAYER3_YPOS,
+    TOOL_BUTTON_PLAYER_XSIZE,	TOOL_BUTTON_PLAYER_YSIZE,
+    TOOL_CTRL_ID_PLAYER_3,
+    "player 3"
+  },
+  {
+    TOOL_BUTTON_PLAYER_GFX_XPOS,TOOL_BUTTON_PLAYER_GFX_YPOS,
+    TOOL_BUTTON_PLAYER4_XPOS,	TOOL_BUTTON_PLAYER4_YPOS,
+    TOOL_BUTTON_PLAYER_XSIZE,	TOOL_BUTTON_PLAYER_YSIZE,
+    TOOL_CTRL_ID_PLAYER_4,
+    "player 4"
+  }
+};
+
+void CreateToolButtons()
+{
+  int i;
+
+  for (i=0; i<NUM_TOOL_BUTTONS; i++)
+  {
+    Pixmap gd_pixmap = pix[PIX_DOOR];
+    Pixmap deco_pixmap = 0;
+    int deco_x, deco_y, deco_xpos, deco_ypos;
+    struct GadgetInfo *gi;
+    unsigned long event_mask;
+    int gd_xoffset, gd_yoffset;
+    int gd_x1, gd_x2, gd_y;
+    int id = i;
+
+    event_mask = GD_EVENT_RELEASED;
+
+    gd_xoffset = toolbutton_info[i].xpos;
+    gd_yoffset = toolbutton_info[i].ypos;
+    gd_x1 = DOOR_GFX_PAGEX4 + gd_xoffset;
+    gd_x2 = DOOR_GFX_PAGEX3 + gd_xoffset;
+    gd_y = DOOR_GFX_PAGEY1 + gd_yoffset;
+
+    if (id >= TOOL_CTRL_ID_PLAYER_1 && id <= TOOL_CTRL_ID_PLAYER_4)
+    {
+      getMiniGraphicSource(GFX_SPIELER1 + id - TOOL_CTRL_ID_PLAYER_1,
+			   &deco_pixmap, &deco_x, &deco_y);
+      deco_xpos = (toolbutton_info[i].width - MINI_TILEX) / 2;
+      deco_ypos = (toolbutton_info[i].height - MINI_TILEY) / 2;
+    }
+
+    gi = CreateGadget(GDI_CUSTOM_ID, id,
+		      GDI_INFO_TEXT, toolbutton_info[i].infotext,
+		      GDI_X, DX + toolbutton_info[i].x,
+		      GDI_Y, DY + toolbutton_info[i].y,
+		      GDI_WIDTH, toolbutton_info[i].width,
+		      GDI_HEIGHT, toolbutton_info[i].height,
+		      GDI_TYPE, GD_TYPE_NORMAL_BUTTON,
+		      GDI_STATE, GD_BUTTON_UNPRESSED,
+		      GDI_DESIGN_UNPRESSED, gd_pixmap, gd_x1, gd_y,
+		      GDI_DESIGN_PRESSED, gd_pixmap, gd_x2, gd_y,
+		      GDI_DECORATION_DESIGN, deco_pixmap, deco_x, deco_y,
+		      GDI_DECORATION_POSITION, deco_xpos, deco_ypos,
+		      GDI_DECORATION_SIZE, MINI_TILEX, MINI_TILEY,
+		      GDI_DECORATION_SHIFTING, 1, 1,
+		      GDI_EVENT_MASK, event_mask,
+		      GDI_CALLBACK_ACTION, HandleToolButtons,
+		      GDI_END);
+
+    if (gi == NULL)
+      Error(ERR_EXIT, "cannot create gadget");
+
+    tool_gadget[id] = gi;
+  }
+}
+
+static void UnmapToolButtons()
+{
+  int i;
+
+  for (i=0; i<NUM_TOOL_BUTTONS; i++)
+    UnmapGadget(tool_gadget[i]);
+}
+
+static void HandleToolButtons(struct GadgetInfo *gi)
+{
+  request_gadget_id = gi->custom_id;
+
+
+#if 0
+  int id = gi->custom_id;
+
+  if (game_status != PLAYING)
+    return;
+
+  switch (id)
+  {
+    case GAME_CTRL_ID_STOP:
+      if (AllPlayersGone)
+      {
+	CloseDoor(DOOR_CLOSE_1);
+	game_status = MAINMENU;
+	DrawMainMenu();
+	break;
+      }
+
+      if (Request("Do you really want to quit the game ?",
+		  REQ_ASK | REQ_STAY_CLOSED))
+      { 
+#ifndef MSDOS
+	if (options.network)
+	  SendToServer_StopPlaying();
+	else
+#endif
+	{
+	  game_status = MAINMENU;
+	  DrawMainMenu();
+	}
+      }
+      else
+	OpenDoor(DOOR_OPEN_1 | DOOR_COPY_BACK);
+      break;
+
+    case GAME_CTRL_ID_PAUSE:
+      if (options.network)
+      {
+#ifndef MSDOS
+	if (tape.pausing)
+	  SendToServer_ContinuePlaying();
+	else
+	  SendToServer_PausePlaying();
+#endif
+      }
+      else
+	TapeTogglePause();
+      break;
+
+    case GAME_CTRL_ID_PLAY:
+      if (tape.pausing)
+      {
+#ifndef MSDOS
+	if (options.network)
+	  SendToServer_ContinuePlaying();
+	else
+#endif
+	{
+	  tape.pausing = FALSE;
+	  DrawVideoDisplay(VIDEO_STATE_PAUSE_OFF,0);
+	}
+      }
+      break;
+
+    case SOUND_CTRL_ID_MUSIC:
+      if (setup.sound_music)
+      { 
+	setup.sound_music = FALSE;
+	FadeSound(background_loop[level_nr % num_bg_loops]);
+      }
+      else if (sound_loops_allowed)
+      { 
+	setup.sound = setup.sound_music = TRUE;
+	PlaySoundLoop(background_loop[level_nr % num_bg_loops]);
+      }
+      break;
+
+    case SOUND_CTRL_ID_LOOPS:
+      if (setup.sound_loops)
+	setup.sound_loops = FALSE;
+      else if (sound_loops_allowed)
+	setup.sound = setup.sound_loops = TRUE;
+      break;
+
+    case SOUND_CTRL_ID_SIMPLE:
+      if (setup.sound_simple)
+	setup.sound_simple = FALSE;
+      else if (sound_status==SOUND_AVAILABLE)
+	setup.sound = setup.sound_simple = TRUE;
+      break;
+
+    default:
+      break;
+  }
+#endif
+
+
+
 }
 
 int el2gfx(int element)

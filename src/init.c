@@ -799,6 +799,7 @@ void InitGadgets()
   CreateLevelEditorGadgets();
   CreateGameButtons();
   CreateTapeButtons();
+  CreateToolButtons();
 }
 
 void InitElementProperties()

@@ -2234,14 +2234,20 @@ void ModifyTextInputNumberValue(struct GadgetInfo *gi, int new_value)
 /* global pointer to gadget actually in use (when mouse button pressed) */
 static struct GadgetInfo *last_gi = NULL;
 
-void MapGadget(struct GadgetInfo *gi)
+static void MapGadgetExt(struct GadgetInfo *gi, boolean redraw)
 {
   if (gi == NULL || gi->mapped)
     return;
 
   gi->mapped = TRUE;
 
-  DrawGadget(gi, DG_UNPRESSED, DG_BUFFERED);
+  if (redraw)
+    DrawGadget(gi, DG_UNPRESSED, DG_BUFFERED);
+}
+
+void MapGadget(struct GadgetInfo *gi)
+{
+  MapGadgetExt(gi, TRUE);
 }
 
 void UnmapGadget(struct GadgetInfo *gi)
@@ -2253,6 +2259,55 @@ void UnmapGadget(struct GadgetInfo *gi)
 
   if (gi == last_gi)
     last_gi = NULL;
+}
+
+#define MAX_NUM_GADGETS		1024
+#define MULTIMAP_UNMAP		(1 << 0)
+#define MULTIMAP_REMAP		(1 << 1)
+#define MULTIMAP_REDRAW		(1 << 2)
+#define MULTIMAP_PLAYFIELD	(1 << 3)
+#define MULTIMAP_DOOR_1		(1 << 4)
+#define MULTIMAP_DOOR_2		(1 << 5)
+#define MULTIMAP_ALL		(MULTIMAP_PLAYFIELD | \
+				 MULTIMAP_DOOR_1 | \
+				 MULTIMAP_DOOR_2)
+
+static void MultiMapGadgets(int mode)
+{
+  struct GadgetInfo *gi = gadget_list_first_entry;
+  static boolean map_state[MAX_NUM_GADGETS];
+  int map_count = 0;
+
+  while (gi)
+  {
+    if ((mode & MULTIMAP_PLAYFIELD && gi->x < SX + SXSIZE) ||
+	(mode & MULTIMAP_DOOR_1 && gi->x >= DX && gi->y < DY + DYSIZE) ||
+	(mode & MULTIMAP_DOOR_1 && gi->x >= DX && gi->y > DY + DYSIZE))
+    {
+      if (mode & MULTIMAP_UNMAP)
+      {
+	map_state[map_count++ % MAX_NUM_GADGETS] = gi->mapped;
+	UnmapGadget(gi);
+      }
+      else
+      {
+	if (map_state[map_count++ % MAX_NUM_GADGETS])
+	  MapGadgetExt(gi, (mode & MULTIMAP_REDRAW));
+      }
+    }
+
+    gi = gi->next;
+  }
+}
+
+void UnmapAllGadgets()
+{
+  MultiMapGadgets(MULTIMAP_ALL | MULTIMAP_UNMAP);
+}
+
+void RemapAllGadgets()
+{
+  MultiMapGadgets(MULTIMAP_ALL | MULTIMAP_REMAP);
 }
 
 void HandleGadgets(int mx, int my, int button)

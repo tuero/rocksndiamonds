@@ -434,6 +434,8 @@ void ModifyTextInputNumberValue(struct GadgetInfo *, int);
 
 void MapGadget(struct GadgetInfo *);
 void UnmapGadget(struct GadgetInfo *);
+void UnmapAllGadgets();
+void RemapAllGadgets();
 
 void HandleGadgets(int, int, int);
 void HandleGadgetsKeyInput(KeySym);

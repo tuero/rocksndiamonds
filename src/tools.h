@@ -105,6 +105,9 @@ unsigned int CloseDoor(unsigned int);
 unsigned int GetDoorState(void);
 unsigned int MoveDoor(unsigned int);
 int ReadPixel(Drawable, int, int);
+
+void CreateToolButtons();
+
 int el2gfx(int);
 
 #endif

@@ -151,90 +151,90 @@
 #define ED_SCROLL_HORIZONTAL_YSIZE	ED_SCROLLBUTTON_YSIZE
 
 /* control button identifiers */
-#define ED_CTRL_ID_NONE			-1
+#define GADGET_ID_NONE			-1
 
-#define ED_CTRL_ID_SINGLE_ITEMS		0
-#define ED_CTRL_ID_CONNECTED_ITEMS	1
-#define ED_CTRL_ID_LINE			2
-#define ED_CTRL_ID_ARC			3
-#define ED_CTRL_ID_RECTANGLE		4
-#define ED_CTRL_ID_FILLED_BOX		5
-#define ED_CTRL_ID_WRAP_UP		6
-#define ED_CTRL_ID_TEXT			7
-#define ED_CTRL_ID_FLOOD_FILL		8
-#define ED_CTRL_ID_WRAP_LEFT		9
-#define ED_CTRL_ID_PROPERTIES		10
-#define ED_CTRL_ID_WRAP_RIGHT		11
-#define ED_CTRL_ID_RANDOM_PLACEMENT	12
-#define ED_CTRL_ID_GRAB_BRUSH		13
-#define ED_CTRL_ID_WRAP_DOWN		14
-#define ED_CTRL_ID_PICK_ELEMENT		15
-#define ED_CTRL_ID_UNDO			16
-#define ED_CTRL_ID_INFO			17
-#define ED_CTRL_ID_SAVE			18
-#define ED_CTRL_ID_CLEAR		19
-#define ED_CTRL_ID_TEST			20
-#define ED_CTRL_ID_EXIT			21
+#define GADGET_ID_SINGLE_ITEMS		0
+#define GADGET_ID_CONNECTED_ITEMS	1
+#define GADGET_ID_LINE			2
+#define GADGET_ID_ARC			3
+#define GADGET_ID_RECTANGLE		4
+#define GADGET_ID_FILLED_BOX		5
+#define GADGET_ID_WRAP_UP		6
+#define GADGET_ID_TEXT			7
+#define GADGET_ID_FLOOD_FILL		8
+#define GADGET_ID_WRAP_LEFT		9
+#define GADGET_ID_PROPERTIES		10
+#define GADGET_ID_WRAP_RIGHT		11
+#define GADGET_ID_RANDOM_PLACEMENT	12
+#define GADGET_ID_GRAB_BRUSH		13
+#define GADGET_ID_WRAP_DOWN		14
+#define GADGET_ID_PICK_ELEMENT		15
+#define GADGET_ID_UNDO			16
+#define GADGET_ID_INFO			17
+#define GADGET_ID_SAVE			18
+#define GADGET_ID_CLEAR			19
+#define GADGET_ID_TEST			20
+#define GADGET_ID_EXIT			21
 
 /* counter button identifiers */
-#define ED_CTRL_ID_ELEM_SCORE_DOWN	22
-#define ED_CTRL_ID_ELEM_SCORE_TEXT	23
-#define ED_CTRL_ID_ELEM_SCORE_UP	24
-#define ED_CTRL_ID_ELEM_CONTENT_DOWN	25
-#define ED_CTRL_ID_ELEM_CONTENT_TEXT	26
-#define ED_CTRL_ID_ELEM_CONTENT_UP	27
-#define ED_CTRL_ID_LEVEL_XSIZE_DOWN	28
-#define ED_CTRL_ID_LEVEL_XSIZE_TEXT	29
-#define ED_CTRL_ID_LEVEL_XSIZE_UP	30
-#define ED_CTRL_ID_LEVEL_YSIZE_DOWN	31
-#define ED_CTRL_ID_LEVEL_YSIZE_TEXT	32
-#define ED_CTRL_ID_LEVEL_YSIZE_UP	33
-#define ED_CTRL_ID_LEVEL_RANDOM_DOWN	34
-#define ED_CTRL_ID_LEVEL_RANDOM_TEXT	35
-#define ED_CTRL_ID_LEVEL_RANDOM_UP	36
-#define ED_CTRL_ID_LEVEL_COLLECT_DOWN	37
-#define ED_CTRL_ID_LEVEL_COLLECT_TEXT	38
-#define ED_CTRL_ID_LEVEL_COLLECT_UP	39
-#define ED_CTRL_ID_LEVEL_TIMELIMIT_DOWN	40
-#define ED_CTRL_ID_LEVEL_TIMELIMIT_TEXT	41
-#define ED_CTRL_ID_LEVEL_TIMELIMIT_UP	42
-#define ED_CTRL_ID_LEVEL_TIMESCORE_DOWN	43
-#define ED_CTRL_ID_LEVEL_TIMESCORE_TEXT	44
-#define ED_CTRL_ID_LEVEL_TIMESCORE_UP	45
+#define GADGET_ID_ELEM_SCORE_DOWN	22
+#define GADGET_ID_ELEM_SCORE_TEXT	23
+#define GADGET_ID_ELEM_SCORE_UP		24
+#define GADGET_ID_ELEM_CONTENT_DOWN	25
+#define GADGET_ID_ELEM_CONTENT_TEXT	26
+#define GADGET_ID_ELEM_CONTENT_UP	27
+#define GADGET_ID_LEVEL_XSIZE_DOWN	28
+#define GADGET_ID_LEVEL_XSIZE_TEXT	29
+#define GADGET_ID_LEVEL_XSIZE_UP	30
+#define GADGET_ID_LEVEL_YSIZE_DOWN	31
+#define GADGET_ID_LEVEL_YSIZE_TEXT	32
+#define GADGET_ID_LEVEL_YSIZE_UP	33
+#define GADGET_ID_LEVEL_RANDOM_DOWN	34
+#define GADGET_ID_LEVEL_RANDOM_TEXT	35
+#define GADGET_ID_LEVEL_RANDOM_UP	36
+#define GADGET_ID_LEVEL_COLLECT_DOWN	37
+#define GADGET_ID_LEVEL_COLLECT_TEXT	38
+#define GADGET_ID_LEVEL_COLLECT_UP	39
+#define GADGET_ID_LEVEL_TIMELIMIT_DOWN	40
+#define GADGET_ID_LEVEL_TIMELIMIT_TEXT	41
+#define GADGET_ID_LEVEL_TIMELIMIT_UP	42
+#define GADGET_ID_LEVEL_TIMESCORE_DOWN	43
+#define GADGET_ID_LEVEL_TIMESCORE_TEXT	44
+#define GADGET_ID_LEVEL_TIMESCORE_UP	45
 
 /* drawing area identifiers */
-#define ED_CTRL_ID_DRAWING_LEVEL	46
-#define ED_CTRL_ID_ELEM_CONTENT_0	47
-#define ED_CTRL_ID_ELEM_CONTENT_1	48
-#define ED_CTRL_ID_ELEM_CONTENT_2	49
-#define ED_CTRL_ID_ELEM_CONTENT_3	50
-#define ED_CTRL_ID_ELEM_CONTENT_4	51
-#define ED_CTRL_ID_ELEM_CONTENT_5	52
-#define ED_CTRL_ID_ELEM_CONTENT_6	53
-#define ED_CTRL_ID_ELEM_CONTENT_7	54
-#define ED_CTRL_ID_AMOEBA_CONTENT	55
+#define GADGET_ID_DRAWING_LEVEL	46
+#define GADGET_ID_ELEM_CONTENT_0	47
+#define GADGET_ID_ELEM_CONTENT_1	48
+#define GADGET_ID_ELEM_CONTENT_2	49
+#define GADGET_ID_ELEM_CONTENT_3	50
+#define GADGET_ID_ELEM_CONTENT_4	51
+#define GADGET_ID_ELEM_CONTENT_5	52
+#define GADGET_ID_ELEM_CONTENT_6	53
+#define GADGET_ID_ELEM_CONTENT_7	54
+#define GADGET_ID_AMOEBA_CONTENT	55
 
 /* text input identifiers */
-#define ED_CTRL_ID_LEVEL_NAME		56
-#define ED_CTRL_ID_LEVEL_AUTHOR		57
+#define GADGET_ID_LEVEL_NAME		56
+#define GADGET_ID_LEVEL_AUTHOR		57
 
 /* gadgets for scrolling of drawing area */
-#define ED_CTRL_ID_SCROLL_UP		58
-#define ED_CTRL_ID_SCROLL_DOWN		59
-#define ED_CTRL_ID_SCROLL_LEFT		60
-#define ED_CTRL_ID_SCROLL_RIGHT		61
-#define ED_CTRL_ID_SCROLL_VERTICAL	62
-#define ED_CTRL_ID_SCROLL_HORIZONTAL	63
+#define GADGET_ID_SCROLL_UP		58
+#define GADGET_ID_SCROLL_DOWN		59
+#define GADGET_ID_SCROLL_LEFT		60
+#define GADGET_ID_SCROLL_RIGHT		61
+#define GADGET_ID_SCROLL_VERTICAL	62
+#define GADGET_ID_SCROLL_HORIZONTAL	63
 
 /* gadgets for scrolling element list */
-#define ED_CTRL_ID_ELEMENTLIST_UP	64
-#define ED_CTRL_ID_ELEMENTLIST_DOWN	65
+#define GADGET_ID_ELEMENTLIST_UP	64
+#define GADGET_ID_ELEMENTLIST_DOWN	65
 
 /* gadgets for buttons in element list */
-#define ED_CTRL_ID_ELEMENTLIST_FIRST	66
-#define ED_CTRL_ID_ELEMENTLIST_LAST	105
+#define GADGET_ID_ELEMENTLIST_FIRST	66
+#define GADGET_ID_ELEMENTLIST_LAST	105
 
-#define ED_NUM_GADGETS			106
+#define NUM_EDITOR_GADGETS		106
 
 /* values for counter gadgets */
 #define ED_COUNTER_ID_ELEM_SCORE	0
@@ -319,64 +319,64 @@ static struct
   {
     ED_COUNT_ELEM_SCORE_XPOS,		ED_COUNT_ELEM_SCORE_YPOS,
     MIN_SCORE,				MAX_SCORE,
-    ED_CTRL_ID_ELEM_SCORE_DOWN,		ED_CTRL_ID_ELEM_SCORE_UP,
-    ED_CTRL_ID_ELEM_SCORE_TEXT,
+    GADGET_ID_ELEM_SCORE_DOWN,		GADGET_ID_ELEM_SCORE_UP,
+    GADGET_ID_ELEM_SCORE_TEXT,
     &gadget_elem_score_value,
     "element score"
   },
   {
     ED_COUNT_ELEM_CONTENT_XPOS,		ED_COUNT_ELEM_CONTENT_YPOS,
     MIN_ELEM_CONTENT,			MAX_ELEM_CONTENT,
-    ED_CTRL_ID_ELEM_CONTENT_DOWN,	ED_CTRL_ID_ELEM_CONTENT_UP,
-    ED_CTRL_ID_ELEM_CONTENT_TEXT,
+    GADGET_ID_ELEM_CONTENT_DOWN,	GADGET_ID_ELEM_CONTENT_UP,
+    GADGET_ID_ELEM_CONTENT_TEXT,
     &gadget_elem_content_value,
     "element content"
   },
   {
     ED_LEVELINFO_XPOS,			ED_COUNTER_YPOS(0),
     MIN_LEV_FIELDX,			MAX_LEV_FIELDX,
-    ED_CTRL_ID_LEVEL_XSIZE_DOWN,	ED_CTRL_ID_LEVEL_XSIZE_UP,
-    ED_CTRL_ID_LEVEL_XSIZE_TEXT,
+    GADGET_ID_LEVEL_XSIZE_DOWN,		GADGET_ID_LEVEL_XSIZE_UP,
+    GADGET_ID_LEVEL_XSIZE_TEXT,
     &gadget_level_xsize_value,
     "playfield width"
   },
   {
     ED_LEVELINFO_XPOS,			ED_COUNTER_YPOS(1),
     MIN_LEV_FIELDY,			MAX_LEV_FIELDY,
-    ED_CTRL_ID_LEVEL_YSIZE_DOWN,	ED_CTRL_ID_LEVEL_YSIZE_UP,
-    ED_CTRL_ID_LEVEL_YSIZE_TEXT,
+    GADGET_ID_LEVEL_YSIZE_DOWN,		GADGET_ID_LEVEL_YSIZE_UP,
+    GADGET_ID_LEVEL_YSIZE_TEXT,
     &gadget_level_ysize_value,
     "playfield height"
   },
   {
     ED_LEVELINFO_XPOS,			ED_COUNTER_YPOS(2),
     0,					100,
-    ED_CTRL_ID_LEVEL_RANDOM_DOWN,	ED_CTRL_ID_LEVEL_RANDOM_UP,
-    ED_CTRL_ID_LEVEL_RANDOM_TEXT,
+    GADGET_ID_LEVEL_RANDOM_DOWN,	GADGET_ID_LEVEL_RANDOM_UP,
+    GADGET_ID_LEVEL_RANDOM_TEXT,
     &gadget_level_random_value,
     "number of random elements"
   },
   {
     ED_LEVELINFO_XPOS,			ED_COUNTER_YPOS(3),
     0,					999,
-    ED_CTRL_ID_LEVEL_COLLECT_DOWN,	ED_CTRL_ID_LEVEL_COLLECT_UP,
-    ED_CTRL_ID_LEVEL_COLLECT_TEXT,
+    GADGET_ID_LEVEL_COLLECT_DOWN,	GADGET_ID_LEVEL_COLLECT_UP,
+    GADGET_ID_LEVEL_COLLECT_TEXT,
     &gadget_level_collect_value,
     "number of emeralds to collect"
   },
   {
     ED_LEVELINFO_XPOS,			ED_COUNTER_YPOS(4),
     0,					999,
-    ED_CTRL_ID_LEVEL_TIMELIMIT_DOWN,	ED_CTRL_ID_LEVEL_TIMELIMIT_UP,
-    ED_CTRL_ID_LEVEL_TIMELIMIT_TEXT,
+    GADGET_ID_LEVEL_TIMELIMIT_DOWN,	GADGET_ID_LEVEL_TIMELIMIT_UP,
+    GADGET_ID_LEVEL_TIMELIMIT_TEXT,
     &gadget_level_timelimit_value,
     "time available to solve level"
   },
   {
     ED_LEVELINFO_XPOS,			ED_COUNTER_YPOS(5),
     0,					255,
-    ED_CTRL_ID_LEVEL_TIMESCORE_DOWN,	ED_CTRL_ID_LEVEL_TIMESCORE_UP,
-    ED_CTRL_ID_LEVEL_TIMESCORE_TEXT,
+    GADGET_ID_LEVEL_TIMESCORE_DOWN,	GADGET_ID_LEVEL_TIMESCORE_UP,
+    GADGET_ID_LEVEL_TIMESCORE_TEXT,
     &gadget_level_timescore_value,
     "score for each 10 seconds left"
   },
@@ -392,13 +392,13 @@ static struct
 {
   {
     ED_LEVELINFO_XPOS,			ED_COUNTER_YPOS(6),
-    ED_CTRL_ID_LEVEL_NAME,
+    GADGET_ID_LEVEL_NAME,
     level.name,
     "Level Title"
   },
   {
     ED_LEVELINFO_XPOS,			ED_COUNTER_YPOS(7),
-    ED_CTRL_ID_LEVEL_AUTHOR,
+    GADGET_ID_LEVEL_AUTHOR,
     level.author,
     "Level Author"
   }
@@ -415,37 +415,37 @@ static struct
   {
     ED_SCROLLBUTTON_XPOS,   ED_SCROLLBUTTON_YPOS + 0 * ED_SCROLLBUTTON_YSIZE,
     ED_SCROLL_UP_XPOS,      ED_SCROLL_UP_YPOS,
-    ED_CTRL_ID_SCROLL_UP,
+    GADGET_ID_SCROLL_UP,
     "scroll level editing area up"
   },
   {
     ED_SCROLLBUTTON_XPOS,   ED_SCROLLBUTTON_YPOS + 1 * ED_SCROLLBUTTON_YSIZE,
     ED_SCROLL_DOWN_XPOS,    ED_SCROLL_DOWN_YPOS,
-    ED_CTRL_ID_SCROLL_DOWN,
+    GADGET_ID_SCROLL_DOWN,
     "scroll level editing area down"
   },
   {
     ED_SCROLLBUTTON_XPOS,   ED_SCROLLBUTTON_YPOS + 2 * ED_SCROLLBUTTON_YSIZE,
     ED_SCROLL_LEFT_XPOS,    ED_SCROLL_LEFT_YPOS,
-    ED_CTRL_ID_SCROLL_LEFT,
+    GADGET_ID_SCROLL_LEFT,
     "scroll level editing area left"
   },
   {
     ED_SCROLLBUTTON_XPOS,   ED_SCROLLBUTTON_YPOS + 3 * ED_SCROLLBUTTON_YSIZE,
     ED_SCROLL_RIGHT_XPOS,   ED_SCROLL_RIGHT_YPOS,
-    ED_CTRL_ID_SCROLL_RIGHT,
+    GADGET_ID_SCROLL_RIGHT,
     "scroll level editing area right"
   },
   {
     ED_ELEMENTLIST_UP_XPOS, ED_ELEMENTLIST_UP_ALT_YPOS,
     ED_ELEMENTLIST_UP_XPOS, ED_ELEMENTLIST_UP_YPOS,
-    ED_CTRL_ID_ELEMENTLIST_UP,
+    GADGET_ID_ELEMENTLIST_UP,
     "scroll element list up"
   },
   {
     ED_ELEMENTLIST_DOWN_XPOS, ED_ELEMENTLIST_DOWN_ALT_YPOS,
     ED_ELEMENTLIST_DOWN_XPOS, ED_ELEMENTLIST_DOWN_YPOS,
-    ED_CTRL_ID_ELEMENTLIST_DOWN,
+    GADGET_ID_ELEMENTLIST_DOWN,
     "scroll element list down"
   }
 };
@@ -465,7 +465,7 @@ static struct
     ED_SCROLL_VERTICAL_XPOS,	ED_SCROLL_VERTICAL_YPOS,
     ED_SCROLL_VERTICAL_XSIZE,	ED_SCROLL_VERTICAL_YSIZE,
     GD_TYPE_SCROLLBAR_VERTICAL,
-    ED_CTRL_ID_SCROLL_VERTICAL,
+    GADGET_ID_SCROLL_VERTICAL,
     "scroll level editing area vertically"
   },
   {
@@ -473,7 +473,7 @@ static struct
     ED_SCROLL_HORIZONTAL_XPOS,	ED_SCROLL_HORIZONTAL_YPOS,
     ED_SCROLL_HORIZONTAL_XSIZE,	ED_SCROLL_HORIZONTAL_YSIZE,
     GD_TYPE_SCROLLBAR_HORIZONTAL,
-    ED_CTRL_ID_SCROLL_HORIZONTAL,
+    GADGET_ID_SCROLL_HORIZONTAL,
     "scroll level editing area horizontally"
   },
 };
@@ -489,10 +489,10 @@ static void HandleDrawingAreas(struct GadgetInfo *);
 static void HandleDrawingAreaInfo(struct GadgetInfo *);
 static void HandleTextInputGadgets(struct GadgetInfo *);
 
-static struct GadgetInfo *level_editor_gadget[ED_NUM_GADGETS];
+static struct GadgetInfo *level_editor_gadget[NUM_EDITOR_GADGETS];
 
-static int drawing_function = ED_CTRL_ID_SINGLE_ITEMS;
-static int last_drawing_function = ED_CTRL_ID_SINGLE_ITEMS;
+static int drawing_function = GADGET_ID_SINGLE_ITEMS;
+static int last_drawing_function = GADGET_ID_SINGLE_ITEMS;
 static boolean draw_with_brush = FALSE;
 static int properties_element = 0;
 
@@ -935,16 +935,16 @@ static void CreateControlButtons()
     int radio_button_nr;
     boolean checked;
 
-    if (id == ED_CTRL_ID_SINGLE_ITEMS ||
-	id == ED_CTRL_ID_CONNECTED_ITEMS ||
-	id == ED_CTRL_ID_LINE ||
-	id == ED_CTRL_ID_ARC ||
-	id == ED_CTRL_ID_TEXT ||
-	id == ED_CTRL_ID_RECTANGLE ||
-	id == ED_CTRL_ID_FILLED_BOX ||
-	id == ED_CTRL_ID_FLOOD_FILL ||
-	id == ED_CTRL_ID_GRAB_BRUSH ||
-	id == ED_CTRL_ID_PICK_ELEMENT)
+    if (id == GADGET_ID_SINGLE_ITEMS ||
+	id == GADGET_ID_CONNECTED_ITEMS ||
+	id == GADGET_ID_LINE ||
+	id == GADGET_ID_ARC ||
+	id == GADGET_ID_TEXT ||
+	id == GADGET_ID_RECTANGLE ||
+	id == GADGET_ID_FILLED_BOX ||
+	id == GADGET_ID_FLOOD_FILL ||
+	id == GADGET_ID_GRAB_BRUSH ||
+	id == GADGET_ID_PICK_ELEMENT)
     {
       button_type = GD_TYPE_RADIO_BUTTON;
       radio_button_nr = 1;
@@ -957,10 +957,10 @@ static void CreateControlButtons()
       radio_button_nr = 0;
       checked = FALSE;
 
-      if (id == ED_CTRL_ID_WRAP_LEFT ||
-	  id == ED_CTRL_ID_WRAP_RIGHT ||
-	  id == ED_CTRL_ID_WRAP_UP ||
-	  id == ED_CTRL_ID_WRAP_DOWN)
+      if (id == GADGET_ID_WRAP_LEFT ||
+	  id == GADGET_ID_WRAP_RIGHT ||
+	  id == GADGET_ID_WRAP_UP ||
+	  id == GADGET_ID_WRAP_DOWN)
 	event_mask = GD_EVENT_PRESSED | GD_EVENT_REPEATED;
       else
 	event_mask = GD_EVENT_RELEASED;
@@ -1028,8 +1028,8 @@ static void CreateControlButtons()
 
     event_mask = GD_EVENT_PRESSED | GD_EVENT_REPEATED;
 
-    if (id == ED_CTRL_ID_ELEMENTLIST_UP ||
-	id == ED_CTRL_ID_ELEMENTLIST_DOWN)
+    if (id == GADGET_ID_ELEMENTLIST_UP ||
+	id == GADGET_ID_ELEMENTLIST_DOWN)
     {
       x += DX;
       y += DY;
@@ -1081,7 +1081,7 @@ static void CreateControlButtons()
     int gd_x, gd_y1, gd_y2;
     int x = i % ED_ELEMENTLIST_BUTTONS_HORIZ;
     int y = i / ED_ELEMENTLIST_BUTTONS_HORIZ;
-    int id = ED_CTRL_ID_ELEMENTLIST_FIRST + i;
+    int id = GADGET_ID_ELEMENTLIST_FIRST + i;
 
     event_mask = GD_EVENT_RELEASED;
 
@@ -1220,7 +1220,7 @@ static void CreateDrawingAreas()
     GD_EVENT_OFF_BORDERS;
 
   /* one for the level drawing area ... */
-  id = ED_CTRL_ID_DRAWING_LEVEL;
+  id = GADGET_ID_DRAWING_LEVEL;
   gi = CreateGadget(GDI_CUSTOM_ID, id,
 		    GDI_X, SX,
 		    GDI_Y, SY,
@@ -1243,7 +1243,7 @@ static void CreateDrawingAreas()
     int gx = SX + ED_AREA_ELEM_CONTENT_XPOS + 5 * (i % 4) * MINI_TILEX;
     int gy = SX + ED_AREA_ELEM_CONTENT_YPOS + 6 * (i / 4) * MINI_TILEY;
 
-    id = ED_CTRL_ID_ELEM_CONTENT_0 + i;
+    id = GADGET_ID_ELEM_CONTENT_0 + i;
     gi = CreateGadget(GDI_CUSTOM_ID, id,
 		      GDI_X, gx,
 		      GDI_Y, gy,
@@ -1263,7 +1263,7 @@ static void CreateDrawingAreas()
   }
 
   /* ... and one for the amoeba content */
-  id = ED_CTRL_ID_AMOEBA_CONTENT;
+  id = GADGET_ID_AMOEBA_CONTENT;
   gi = CreateGadget(GDI_CUSTOM_ID, id,
 		    GDI_X, SX + ED_AREA_ELEM_CONTENT_XPOS,
 		    GDI_Y, SY + ED_AREA_ELEM_CONTENT_YPOS,
@@ -1293,7 +1293,7 @@ static void CreateTextInputGadgets()
     struct GadgetInfo *gi;
     unsigned long event_mask;
     char infotext[1024];
-    int id = ED_CTRL_ID_LEVEL_NAME + i;
+    int id = GADGET_ID_LEVEL_NAME + i;
 
     event_mask = GD_EVENT_TEXT_RETURN | GD_EVENT_TEXT_LEAVING;
 
@@ -1398,7 +1398,7 @@ static void MapControlButtons()
   for (i=0; i<ED_NUM_CTRL_BUTTONS; i++)
     MapGadget(level_editor_gadget[i]);
   for (i=0; i<ED_NUM_ELEMENTLIST_BUTTONS; i++)
-    MapGadget(level_editor_gadget[ED_CTRL_ID_ELEMENTLIST_FIRST + i]);
+    MapGadget(level_editor_gadget[GADGET_ID_ELEMENTLIST_FIRST + i]);
 }
 
 static void MapCounterButtons(int id)
@@ -1428,7 +1428,7 @@ static void MapMainDrawingArea()
   for (i=0; i<ED_NUM_SCROLLBARS; i++)
     MapGadget(level_editor_gadget[scrollbar_info[i].gadget_id]);
 
-  MapDrawingArea(ED_CTRL_ID_DRAWING_LEVEL);
+  MapDrawingArea(GADGET_ID_DRAWING_LEVEL);
 }
 
 static void UnmapDrawingArea(int id)
@@ -1440,7 +1440,7 @@ void UnmapLevelEditorWindowGadgets()
 {
   int i;
 
-  for (i=0; i<ED_NUM_GADGETS; i++)
+  for (i=0; i<NUM_EDITOR_GADGETS; i++)
     if (level_editor_gadget[i]->x < DX)
       UnmapGadget(level_editor_gadget[i]);
 }
@@ -1449,7 +1449,7 @@ void UnmapLevelEditorGadgets()
 {
   int i;
 
-  for (i=0; i<ED_NUM_GADGETS; i++)
+  for (i=0; i<NUM_EDITOR_GADGETS; i++)
     UnmapGadget(level_editor_gadget[i]);
 }
 
@@ -1566,7 +1566,7 @@ void DrawLevelEd()
 
   OpenDoor(DOOR_OPEN_1);
 
-  strcpy(level_editor_gadget[ED_CTRL_ID_LEVEL_NAME]->text.value, level.name);
+  strcpy(level_editor_gadget[GADGET_ID_LEVEL_NAME]->text.value, level.name);
 
   MapControlButtons();
 
@@ -1763,7 +1763,7 @@ void AdjustEditorScrollbar(int id)
   struct GadgetInfo *gi = level_editor_gadget[id];
   int items_max, items_visible, item_position;
 
-  if (id == ED_CTRL_ID_SCROLL_HORIZONTAL)
+  if (id == GADGET_ID_SCROLL_HORIZONTAL)
   {
     items_max = MAX(lev_fieldx + 2, ED_FIELDX);
     items_visible = ED_FIELDX;
@@ -2518,8 +2518,8 @@ static void DrawDrawingWindow()
   ClearWindow();
   UnmapLevelEditorWindowGadgets();
   AdjustLevelScrollPosition();
-  AdjustEditorScrollbar(ED_CTRL_ID_SCROLL_HORIZONTAL);
-  AdjustEditorScrollbar(ED_CTRL_ID_SCROLL_VERTICAL);
+  AdjustEditorScrollbar(GADGET_ID_SCROLL_HORIZONTAL);
+  AdjustEditorScrollbar(GADGET_ID_SCROLL_VERTICAL);
   DrawMiniLevel(level_xpos, level_ypos);
   MapMainDrawingArea();
 }
@@ -2587,7 +2587,7 @@ static void DrawElementContentAreas()
 	ElementContent[i][x][y] = level.mampfer_inhalt[i][x][y];
 
   for (i=0; i<MAX_ELEM_CONTENT; i++)
-    UnmapDrawingArea(ED_CTRL_ID_ELEM_CONTENT_0 + i);
+    UnmapDrawingArea(GADGET_ID_ELEM_CONTENT_0 + i);
 
   /* display counter to choose number of element content areas */
   gadget_elem_content_value = num_areas;
@@ -2643,7 +2643,7 @@ static void DrawElementContentAreas()
   }
 
   for (i=0; i<*num_areas; i++)
-    MapDrawingArea(ED_CTRL_ID_ELEM_CONTENT_0 + i);
+    MapDrawingArea(GADGET_ID_ELEM_CONTENT_0 + i);
 }
 
 static void DrawAmoebaContentArea()
@@ -2675,7 +2675,7 @@ static void DrawAmoebaContentArea()
 
   DrawMiniElement(area_x, area_y, ElementContent[0][0][0]);
 
-  MapDrawingArea(ED_CTRL_ID_AMOEBA_CONTENT);
+  MapDrawingArea(GADGET_ID_AMOEBA_CONTENT);
 }
 
 #define TEXT_COLLECTING		"Score for collecting"
@@ -3422,7 +3422,7 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
   boolean inside_drawing_area = !gi->event.off_borders;
   boolean button_press_event;
   boolean button_release_event;
-  boolean draw_level = (id == ED_CTRL_ID_DRAWING_LEVEL);
+  boolean draw_level = (id == GADGET_ID_DRAWING_LEVEL);
   int new_element;
   int button = gi->event.button;
   int sx = gi->event.x, sy = gi->event.y;
@@ -3483,12 +3483,12 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 #endif
 
 
-  if (!draw_level && drawing_function != ED_CTRL_ID_SINGLE_ITEMS)
+  if (!draw_level && drawing_function != GADGET_ID_SINGLE_ITEMS)
     return;
 
   switch (drawing_function)
   {
-    case ED_CTRL_ID_SINGLE_ITEMS:
+    case GADGET_ID_SINGLE_ITEMS:
       if (draw_level)
       {
 	if (button_release_event)
@@ -3544,16 +3544,16 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 			   gi->y + sy * MINI_TILEY,
 			   el2gfx(new_element));
 
-	if (id == ED_CTRL_ID_AMOEBA_CONTENT)
+	if (id == GADGET_ID_AMOEBA_CONTENT)
 	  level.amoebe_inhalt = new_element;
-	else if (id >= ED_CTRL_ID_ELEM_CONTENT_0 &&
-		 id <= ED_CTRL_ID_ELEM_CONTENT_7)
-	  level.mampfer_inhalt[id - ED_CTRL_ID_ELEM_CONTENT_0][sx][sy] =
+	else if (id >= GADGET_ID_ELEM_CONTENT_0 &&
+		 id <= GADGET_ID_ELEM_CONTENT_7)
+	  level.mampfer_inhalt[id - GADGET_ID_ELEM_CONTENT_0][sx][sy] =
 	    new_element;
       }
       break;
 
-    case ED_CTRL_ID_CONNECTED_ITEMS:
+    case GADGET_ID_CONNECTED_ITEMS:
       {
 	static int last_sx = -1;
 	static int last_sy = -1;
@@ -3572,12 +3572,12 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
       }
       break;
 
-    case ED_CTRL_ID_LINE:
-    case ED_CTRL_ID_ARC:
-    case ED_CTRL_ID_RECTANGLE:
-    case ED_CTRL_ID_FILLED_BOX:
-    case ED_CTRL_ID_GRAB_BRUSH:
-    case ED_CTRL_ID_TEXT:
+    case GADGET_ID_LINE:
+    case GADGET_ID_ARC:
+    case GADGET_ID_RECTANGLE:
+    case GADGET_ID_FILLED_BOX:
+    case GADGET_ID_GRAB_BRUSH:
+    case GADGET_ID_TEXT:
       {
 	static int last_sx = -1;
 	static int last_sy = -1;
@@ -3585,17 +3585,17 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 	static int start_sy = -1;
 	void (*draw_func)(int, int, int, int, int, boolean);
 
-	if (drawing_function == ED_CTRL_ID_LINE)
+	if (drawing_function == GADGET_ID_LINE)
 	  draw_func = DrawLine;
-	else if (drawing_function == ED_CTRL_ID_ARC)
+	else if (drawing_function == GADGET_ID_ARC)
 	  draw_func = DrawArc;
-	else if (drawing_function == ED_CTRL_ID_RECTANGLE)
+	else if (drawing_function == GADGET_ID_RECTANGLE)
 	  draw_func = DrawRectangle;
-	else if (drawing_function == ED_CTRL_ID_FILLED_BOX)
+	else if (drawing_function == GADGET_ID_FILLED_BOX)
 	  draw_func = DrawFilledBox;
-	else if (drawing_function == ED_CTRL_ID_GRAB_BRUSH)
+	else if (drawing_function == GADGET_ID_GRAB_BRUSH)
 	  draw_func = SelectArea;
-	else /* (drawing_function == ED_CTRL_ID_TEXT) */
+	else /* (drawing_function == GADGET_ID_TEXT) */
 	  draw_func = SetTextCursor;
 
 	if (button_press_event)
@@ -3604,20 +3604,20 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 	  start_sx = last_sx = sx;
 	  start_sy = last_sy = sy;
 
-	  if (drawing_function == ED_CTRL_ID_TEXT)
+	  if (drawing_function == GADGET_ID_TEXT)
 	    DrawLevelText(0, 0, 0, TEXT_END);
 	}
 	else if (button_release_event)
 	{
 	  draw_func(start_sx, start_sy, sx, sy, new_element, TRUE);
-	  if (drawing_function == ED_CTRL_ID_GRAB_BRUSH)
+	  if (drawing_function == GADGET_ID_GRAB_BRUSH)
 	  {
 	    CopyAreaToBrush(start_sx, start_sy, sx, sy, button);
 	    CopyBrushToCursor(sx, sy);
-	    ClickOnGadget(level_editor_gadget[ED_CTRL_ID_SINGLE_ITEMS]);
+	    ClickOnGadget(level_editor_gadget[GADGET_ID_SINGLE_ITEMS]);
 	    draw_with_brush = TRUE;
 	  }
-	  else if (drawing_function == ED_CTRL_ID_TEXT)
+	  else if (drawing_function == GADGET_ID_TEXT)
 	    DrawLevelText(sx, sy, 0, TEXT_INIT);
 	  else
 	    CopyLevelToUndoBuffer(UNDO_IMMEDIATE);
@@ -3635,7 +3635,7 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 
 
 #if 0
-    case ED_CTRL_ID_TEXT:
+    case GADGET_ID_TEXT:
       /*
       DrawMiniElement(last_sx, last_sy, Feld[lx][ly]);
       DrawAreaBorder(sx, sy, sx, sy);
@@ -3650,7 +3650,7 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 
 
 
-    case ED_CTRL_ID_FLOOD_FILL:
+    case GADGET_ID_FLOOD_FILL:
       if (button_press_event && Feld[lx][ly] != new_element)
       {
 	FloodFill(lx, ly, new_element);
@@ -3659,7 +3659,7 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
       }
       break;
 
-    case ED_CTRL_ID_PICK_ELEMENT:
+    case GADGET_ID_PICK_ELEMENT:
       if (button_press_event)
 	PickDrawingElement(button, Feld[lx][ly]);
       if (button_release_event)
@@ -3679,89 +3679,89 @@ static void HandleCounterButtons(struct GadgetInfo *gi)
 
   switch (id)
   {
-    case ED_CTRL_ID_ELEM_SCORE_DOWN:
-    case ED_CTRL_ID_ELEM_SCORE_UP:
-      step *= (id == ED_CTRL_ID_ELEM_SCORE_DOWN ? -1 : 1);
+    case GADGET_ID_ELEM_SCORE_DOWN:
+    case GADGET_ID_ELEM_SCORE_UP:
+      step *= (id == GADGET_ID_ELEM_SCORE_DOWN ? -1 : 1);
       ModifyEditorCounter(ED_COUNTER_ID_ELEM_SCORE,
 			  *gadget_elem_score_value + step);
       break;
-    case ED_CTRL_ID_ELEM_SCORE_TEXT:
+    case GADGET_ID_ELEM_SCORE_TEXT:
       *gadget_elem_score_value = gi->text.number_value;
       break;
 
-    case ED_CTRL_ID_ELEM_CONTENT_DOWN:
-    case ED_CTRL_ID_ELEM_CONTENT_UP:
-      step *= (id == ED_CTRL_ID_ELEM_CONTENT_DOWN ? -1 : 1);
+    case GADGET_ID_ELEM_CONTENT_DOWN:
+    case GADGET_ID_ELEM_CONTENT_UP:
+      step *= (id == GADGET_ID_ELEM_CONTENT_DOWN ? -1 : 1);
       ModifyEditorCounter(ED_COUNTER_ID_ELEM_CONTENT,
 			  *gadget_elem_content_value + step);
       DrawElementContentAreas();
       break;
-    case ED_CTRL_ID_ELEM_CONTENT_TEXT:
+    case GADGET_ID_ELEM_CONTENT_TEXT:
       *gadget_elem_content_value = gi->text.number_value;
       DrawElementContentAreas();
       break;
 
-    case ED_CTRL_ID_LEVEL_XSIZE_DOWN:
-    case ED_CTRL_ID_LEVEL_XSIZE_UP:
-      step *= (id == ED_CTRL_ID_LEVEL_XSIZE_DOWN ? -1 : 1);
+    case GADGET_ID_LEVEL_XSIZE_DOWN:
+    case GADGET_ID_LEVEL_XSIZE_UP:
+      step *= (id == GADGET_ID_LEVEL_XSIZE_DOWN ? -1 : 1);
       ModifyEditorCounter(ED_COUNTER_ID_LEVEL_XSIZE,
 			  *gadget_level_xsize_value + step);
       level.fieldx = lev_fieldx;
       break;
-    case ED_CTRL_ID_LEVEL_XSIZE_TEXT:
+    case GADGET_ID_LEVEL_XSIZE_TEXT:
       *gadget_level_xsize_value = gi->text.number_value;
       level.fieldx = lev_fieldx;
       break;
 
-    case ED_CTRL_ID_LEVEL_YSIZE_DOWN:
-    case ED_CTRL_ID_LEVEL_YSIZE_UP:
-      step *= (id == ED_CTRL_ID_LEVEL_YSIZE_DOWN ? -1 : 1);
+    case GADGET_ID_LEVEL_YSIZE_DOWN:
+    case GADGET_ID_LEVEL_YSIZE_UP:
+      step *= (id == GADGET_ID_LEVEL_YSIZE_DOWN ? -1 : 1);
       ModifyEditorCounter(ED_COUNTER_ID_LEVEL_YSIZE,
 			  *gadget_level_ysize_value + step);
       level.fieldy = lev_fieldy;
       break;
-    case ED_CTRL_ID_LEVEL_YSIZE_TEXT:
+    case GADGET_ID_LEVEL_YSIZE_TEXT:
       *gadget_level_ysize_value = gi->text.number_value;
       level.fieldy = lev_fieldy;
       break;
 
-    case ED_CTRL_ID_LEVEL_RANDOM_DOWN:
-    case ED_CTRL_ID_LEVEL_RANDOM_UP:
-      step *= (id == ED_CTRL_ID_LEVEL_RANDOM_DOWN ? -1 : 1);
+    case GADGET_ID_LEVEL_RANDOM_DOWN:
+    case GADGET_ID_LEVEL_RANDOM_UP:
+      step *= (id == GADGET_ID_LEVEL_RANDOM_DOWN ? -1 : 1);
       ModifyEditorCounter(ED_COUNTER_ID_LEVEL_RANDOM,
 			  *gadget_level_random_value + step);
       break;
-    case ED_CTRL_ID_LEVEL_RANDOM_TEXT:
+    case GADGET_ID_LEVEL_RANDOM_TEXT:
       *gadget_level_random_value = gi->text.number_value;
       break;
 
-    case ED_CTRL_ID_LEVEL_COLLECT_DOWN:
-    case ED_CTRL_ID_LEVEL_COLLECT_UP:
-      step *= (id == ED_CTRL_ID_LEVEL_COLLECT_DOWN ? -1 : 1);
+    case GADGET_ID_LEVEL_COLLECT_DOWN:
+    case GADGET_ID_LEVEL_COLLECT_UP:
+      step *= (id == GADGET_ID_LEVEL_COLLECT_DOWN ? -1 : 1);
       ModifyEditorCounter(ED_COUNTER_ID_LEVEL_COLLECT,
 			  *gadget_level_collect_value + step);
       break;
-    case ED_CTRL_ID_LEVEL_COLLECT_TEXT:
+    case GADGET_ID_LEVEL_COLLECT_TEXT:
       *gadget_level_collect_value = gi->text.number_value;
       break;
 
-    case ED_CTRL_ID_LEVEL_TIMELIMIT_DOWN:
-    case ED_CTRL_ID_LEVEL_TIMELIMIT_UP:
-      step *= (id == ED_CTRL_ID_LEVEL_TIMELIMIT_DOWN ? -1 : 1);
+    case GADGET_ID_LEVEL_TIMELIMIT_DOWN:
+    case GADGET_ID_LEVEL_TIMELIMIT_UP:
+      step *= (id == GADGET_ID_LEVEL_TIMELIMIT_DOWN ? -1 : 1);
       ModifyEditorCounter(ED_COUNTER_ID_LEVEL_TIMELIMIT,
 			  *gadget_level_timelimit_value + step);
       break;
-    case ED_CTRL_ID_LEVEL_TIMELIMIT_TEXT:
+    case GADGET_ID_LEVEL_TIMELIMIT_TEXT:
       *gadget_level_timelimit_value = gi->text.number_value;
       break;
 
-    case ED_CTRL_ID_LEVEL_TIMESCORE_DOWN:
-    case ED_CTRL_ID_LEVEL_TIMESCORE_UP:
-      step *= (id == ED_CTRL_ID_LEVEL_TIMESCORE_DOWN ? -1 : 1);
+    case GADGET_ID_LEVEL_TIMESCORE_DOWN:
+    case GADGET_ID_LEVEL_TIMESCORE_UP:
+      step *= (id == GADGET_ID_LEVEL_TIMESCORE_DOWN ? -1 : 1);
       ModifyEditorCounter(ED_COUNTER_ID_LEVEL_TIMESCORE,
 			  *gadget_level_timescore_value + step);
       break;
-    case ED_CTRL_ID_LEVEL_TIMESCORE_TEXT:
+    case GADGET_ID_LEVEL_TIMESCORE_TEXT:
       *gadget_level_timescore_value = gi->text.number_value;
       break;
 
@@ -3776,11 +3776,11 @@ static void HandleTextInputGadgets(struct GadgetInfo *gi)
 
   switch (id)
   {
-    case ED_CTRL_ID_LEVEL_NAME:
+    case GADGET_ID_LEVEL_NAME:
       strcpy(level.name, gi->text.value);
       break;
 
-    case ED_CTRL_ID_LEVEL_AUTHOR:
+    case GADGET_ID_LEVEL_AUTHOR:
       strcpy(level.author, gi->text.value);
       break;
 
@@ -3803,10 +3803,10 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 		 button == 2 ? new_element2 :
 		 button == 3 ? new_element3 : 0);
 
-  if (edit_mode == ED_MODE_DRAWING && drawing_function == ED_CTRL_ID_TEXT)
+  if (edit_mode == ED_MODE_DRAWING && drawing_function == GADGET_ID_TEXT)
     DrawLevelText(0, 0, 0, TEXT_END);
 
-  if (id < ED_NUM_CTRL1_BUTTONS && id != ED_CTRL_ID_PROPERTIES &&
+  if (id < ED_NUM_CTRL1_BUTTONS && id != GADGET_ID_PROPERTIES &&
       edit_mode != ED_MODE_DRAWING)
   {
     DrawDrawingWindow();
@@ -3815,10 +3815,10 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 
   switch (id)
   {
-    case ED_CTRL_ID_SCROLL_LEFT:
+    case GADGET_ID_SCROLL_LEFT:
       if (level_xpos >= 0)
       {
-	int gadget_id = ED_CTRL_ID_SCROLL_HORIZONTAL;
+	int gadget_id = GADGET_ID_SCROLL_HORIZONTAL;
 	struct GadgetInfo *gi = level_editor_gadget[gadget_id];
 	struct GadgetScrollbar *gs = &gi->scrollbar;
 
@@ -3837,10 +3837,10 @@ static void HandleControlButtons(struct GadgetInfo *gi)
       }
       break;
 
-    case ED_CTRL_ID_SCROLL_RIGHT:
+    case GADGET_ID_SCROLL_RIGHT:
       if (level_xpos <= lev_fieldx - ED_FIELDX)
       {
-	int gadget_id = ED_CTRL_ID_SCROLL_HORIZONTAL;
+	int gadget_id = GADGET_ID_SCROLL_HORIZONTAL;
 	struct GadgetInfo *gi = level_editor_gadget[gadget_id];
 	struct GadgetScrollbar *gs = &gi->scrollbar;
 
@@ -3859,10 +3859,10 @@ static void HandleControlButtons(struct GadgetInfo *gi)
       }
       break;
 
-    case ED_CTRL_ID_SCROLL_UP:
+    case GADGET_ID_SCROLL_UP:
       if (level_ypos >= 0)
       {
-	int gadget_id = ED_CTRL_ID_SCROLL_VERTICAL;
+	int gadget_id = GADGET_ID_SCROLL_VERTICAL;
 	struct GadgetInfo *gi = level_editor_gadget[gadget_id];
 	struct GadgetScrollbar *gs = &gi->scrollbar;
 
@@ -3881,10 +3881,10 @@ static void HandleControlButtons(struct GadgetInfo *gi)
       }
       break;
 
-    case ED_CTRL_ID_SCROLL_DOWN:
+    case GADGET_ID_SCROLL_DOWN:
       if (level_ypos <= lev_fieldy - ED_FIELDY)
       {
-	int gadget_id = ED_CTRL_ID_SCROLL_VERTICAL;
+	int gadget_id = GADGET_ID_SCROLL_VERTICAL;
 	struct GadgetInfo *gi = level_editor_gadget[gadget_id];
 	struct GadgetScrollbar *gs = &gi->scrollbar;
 
@@ -3903,19 +3903,19 @@ static void HandleControlButtons(struct GadgetInfo *gi)
       }
       break;
 
-    case ED_CTRL_ID_SCROLL_HORIZONTAL:
+    case GADGET_ID_SCROLL_HORIZONTAL:
       level_xpos = gi->event.item_position - 1;
       DrawMiniLevel(level_xpos, level_ypos);
       break;
 
-    case ED_CTRL_ID_SCROLL_VERTICAL:
+    case GADGET_ID_SCROLL_VERTICAL:
       level_ypos = gi->event.item_position - 1;
       DrawMiniLevel(level_xpos, level_ypos);
       break;
 
-    case ED_CTRL_ID_ELEMENTLIST_UP:
-    case ED_CTRL_ID_ELEMENTLIST_DOWN:
-      step *= (id == ED_CTRL_ID_ELEMENTLIST_UP ? -1 : +1);
+    case GADGET_ID_ELEMENTLIST_UP:
+    case GADGET_ID_ELEMENTLIST_DOWN:
+      step *= (id == GADGET_ID_ELEMENTLIST_UP ? -1 : +1);
       element_shift += step * ED_ELEMENTLIST_BUTTONS_HORIZ;
 
       if (element_shift < 0)
@@ -3925,7 +3925,7 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 
       for (i=0; i<ED_NUM_ELEMENTLIST_BUTTONS; i++)
       {
-	int gadget_id = ED_CTRL_ID_ELEMENTLIST_FIRST + i;
+	int gadget_id = GADGET_ID_ELEMENTLIST_FIRST + i;
 	struct GadgetInfo *gi = level_editor_gadget[gadget_id];
 	struct GadgetDesign *design = &gi->deco.design;
 
@@ -3936,42 +3936,42 @@ static void HandleControlButtons(struct GadgetInfo *gi)
       }
       break;
 
-    case ED_CTRL_ID_WRAP_LEFT:
+    case GADGET_ID_WRAP_LEFT:
       WrapLevel(-step, 0);
       break;
 
-    case ED_CTRL_ID_WRAP_RIGHT:
+    case GADGET_ID_WRAP_RIGHT:
       WrapLevel(step, 0);
       break;
 
-    case ED_CTRL_ID_WRAP_UP:
+    case GADGET_ID_WRAP_UP:
       WrapLevel(0, -step);
       break;
 
-    case ED_CTRL_ID_WRAP_DOWN:
+    case GADGET_ID_WRAP_DOWN:
       WrapLevel(0, step);
       break;
 
-    case ED_CTRL_ID_SINGLE_ITEMS:
-    case ED_CTRL_ID_CONNECTED_ITEMS:
-    case ED_CTRL_ID_LINE:
-    case ED_CTRL_ID_ARC:
-    case ED_CTRL_ID_TEXT:
-    case ED_CTRL_ID_RECTANGLE:
-    case ED_CTRL_ID_FILLED_BOX:
-    case ED_CTRL_ID_FLOOD_FILL:
-    case ED_CTRL_ID_GRAB_BRUSH:
-    case ED_CTRL_ID_PICK_ELEMENT:
+    case GADGET_ID_SINGLE_ITEMS:
+    case GADGET_ID_CONNECTED_ITEMS:
+    case GADGET_ID_LINE:
+    case GADGET_ID_ARC:
+    case GADGET_ID_TEXT:
+    case GADGET_ID_RECTANGLE:
+    case GADGET_ID_FILLED_BOX:
+    case GADGET_ID_FLOOD_FILL:
+    case GADGET_ID_GRAB_BRUSH:
+    case GADGET_ID_PICK_ELEMENT:
       last_drawing_function = drawing_function;
       drawing_function = id;
       draw_with_brush = FALSE;
       break;
 
-    case ED_CTRL_ID_RANDOM_PLACEMENT:
+    case GADGET_ID_RANDOM_PLACEMENT:
       RandomPlacement(button);
       break;
 
-    case ED_CTRL_ID_PROPERTIES:
+    case GADGET_ID_PROPERTIES:
       if (edit_mode != ED_MODE_PROPERTIES)
       {
 	properties_element = new_element;
@@ -3985,7 +3985,7 @@ static void HandleControlButtons(struct GadgetInfo *gi)
       }
       break;
 
-    case ED_CTRL_ID_UNDO:
+    case GADGET_ID_UNDO:
       if (undo_buffer_steps == 0)
       {
 	Request("Undo buffer empty !", REQ_CONFIRM);
@@ -4002,7 +4002,7 @@ static void HandleControlButtons(struct GadgetInfo *gi)
       DrawMiniLevel(level_xpos,level_ypos);
       break;
 
-    case ED_CTRL_ID_INFO:
+    case GADGET_ID_INFO:
       if (edit_mode != ED_MODE_INFO)
       {
 	DrawLevelInfoWindow();
@@ -4015,16 +4015,16 @@ static void HandleControlButtons(struct GadgetInfo *gi)
       }
       break;
 
-    case ED_CTRL_ID_CLEAR:
+    case GADGET_ID_CLEAR:
       for(x=0; x<MAX_LEV_FIELDX; x++) 
 	for(y=0; y<MAX_LEV_FIELDY; y++) 
 	  Feld[x][y] = new_element3;
-      CopyLevelToUndoBuffer(ED_CTRL_ID_CLEAR);
+      CopyLevelToUndoBuffer(GADGET_ID_CLEAR);
 
       DrawMiniLevel(level_xpos, level_ypos);
       break;
 
-    case ED_CTRL_ID_SAVE:
+    case GADGET_ID_SAVE:
       if (leveldir[leveldir_nr].readonly)
       {
 	Request("This level is read only !", REQ_CONFIRM);
@@ -4063,7 +4063,7 @@ static void HandleControlButtons(struct GadgetInfo *gi)
       }
       break;
 
-    case ED_CTRL_ID_TEST:
+    case GADGET_ID_TEST:
       for(y=0; y<lev_fieldy; y++) 
 	for(x=0; x<lev_fieldx; x++)
 	  if (Feld[x][y] == EL_SPIELFIGUR ||
@@ -4106,7 +4106,7 @@ static void HandleControlButtons(struct GadgetInfo *gi)
       }
       break;
 
-    case ED_CTRL_ID_EXIT:
+    case GADGET_ID_EXIT:
       for(y=0; y<lev_fieldy; y++) 
 	for(x=0; x<lev_fieldx; x++)
 	  if (Feld[x][y] != Ur[x][y])
@@ -4163,7 +4163,7 @@ void HandleLevelEditorKeyInput(KeySym key)
   {
     char letter = getCharFromKeySym(key);
 
-    if (drawing_function == ED_CTRL_ID_TEXT)
+    if (drawing_function == GADGET_ID_TEXT)
     {
       if (letter)
 	DrawLevelText(0, 0, letter, TEXT_WRITECHAR);
@@ -4179,27 +4179,27 @@ void HandleLevelEditorKeyInput(KeySym key)
       switch (key)
       {
         case XK_Left:
-	  id = ED_CTRL_ID_SCROLL_LEFT;
+	  id = GADGET_ID_SCROLL_LEFT;
 	  break;
         case XK_Right:
-	  id = ED_CTRL_ID_SCROLL_RIGHT;
+	  id = GADGET_ID_SCROLL_RIGHT;
 	  break;
         case XK_Up:
-	  id = ED_CTRL_ID_SCROLL_UP;
+	  id = GADGET_ID_SCROLL_UP;
 	  break;
         case XK_Down:
-	  id = ED_CTRL_ID_SCROLL_DOWN;
+	  id = GADGET_ID_SCROLL_DOWN;
 	  break;
 
         default:
-	  id = ED_CTRL_ID_NONE;
+	  id = GADGET_ID_NONE;
 	  break;
       }
 
-      if (id != ED_CTRL_ID_NONE)
+      if (id != GADGET_ID_NONE)
 	ClickOnGadget(level_editor_gadget[id]);
       else if (letter == '.')
-	ClickOnGadget(level_editor_gadget[ED_CTRL_ID_SINGLE_ITEMS]);
+	ClickOnGadget(level_editor_gadget[GADGET_ID_SINGLE_ITEMS]);
       else
 	for (i=0; i<ED_NUM_CTRL_BUTTONS; i++)
 	  if (letter && letter == control_info[i].shortcut)
@@ -4241,7 +4241,7 @@ void HandleEditorGadgetInfoText(void *ptr)
     {
       sprintf(shortcut, " ('%s%c')",
 	      (key >= 'A' && key <= 'Z' ? "Shift-" :
-	       gi->custom_id == ED_CTRL_ID_SINGLE_ITEMS ? ".' or '" : ""),
+	       gi->custom_id == GADGET_ID_SINGLE_ITEMS ? ".' or '" : ""),
 	      key);
 
       if (strlen(infotext) + strlen(shortcut) <= MAX_INFOTEXT_LEN)
@@ -4264,7 +4264,7 @@ static void HandleDrawingAreaInfo(struct GadgetInfo *gi)
 
   ClearEditorGadgetInfoText();
 
-  if (id == ED_CTRL_ID_DRAWING_LEVEL)
+  if (id == GADGET_ID_DRAWING_LEVEL)
   {
     if (button_status)
     {
@@ -4303,34 +4303,34 @@ static void HandleDrawingAreaInfo(struct GadgetInfo *gi)
 
 	switch (drawing_function)
 	{
-	  case ED_CTRL_ID_SINGLE_ITEMS:
+	  case GADGET_ID_SINGLE_ITEMS:
 	    infotext = "Drawing single items";
 	    break;
-      	  case ED_CTRL_ID_CONNECTED_ITEMS:
+      	  case GADGET_ID_CONNECTED_ITEMS:
 	    infotext = "Drawing connected items";
 	    break;
-      	  case ED_CTRL_ID_LINE:
+      	  case GADGET_ID_LINE:
 	    infotext = "Drawing line";
 	    break;
-      	  case ED_CTRL_ID_ARC:
+      	  case GADGET_ID_ARC:
 	    infotext = "Drawing arc";
 	    break;
-      	  case ED_CTRL_ID_TEXT:
+      	  case GADGET_ID_TEXT:
 	    infotext = "Setting text cursor";
 	    break;
-      	  case ED_CTRL_ID_RECTANGLE:
+      	  case GADGET_ID_RECTANGLE:
 	    infotext = "Drawing rectangle";
 	    break;
-      	  case ED_CTRL_ID_FILLED_BOX:
+      	  case GADGET_ID_FILLED_BOX:
 	    infotext = "Drawing filled box";
 	    break;
-      	  case ED_CTRL_ID_FLOOD_FILL:
+      	  case GADGET_ID_FLOOD_FILL:
 	    infotext = "Flood fill";
 	    break;
-      	  case ED_CTRL_ID_GRAB_BRUSH:
+      	  case GADGET_ID_GRAB_BRUSH:
 	    infotext = "Grabbing brush";
 	    break;
-      	  case ED_CTRL_ID_PICK_ELEMENT:
+      	  case GADGET_ID_PICK_ELEMENT:
 	    infotext = "Picking element";
 	    break;
 
@@ -4358,11 +4358,11 @@ static void HandleDrawingAreaInfo(struct GadgetInfo *gi)
 	DeleteBrushFromCursor();
     }
   }
-  else if (id == ED_CTRL_ID_AMOEBA_CONTENT)
+  else if (id == GADGET_ID_AMOEBA_CONTENT)
     DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FC_YELLOW,
 	      "Amoeba content");
   else
     DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FC_YELLOW,
 	      "Cruncher %d content: %d, %d",
-	      id - ED_CTRL_ID_ELEM_CONTENT_0 + 1, sx, sy);
+	      id - GADGET_ID_ELEM_CONTENT_0 + 1, sx, sy);
 }

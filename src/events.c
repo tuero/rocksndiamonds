@@ -216,7 +216,7 @@ void HandleButtonEvent(XButtonEvent *event)
 {
   motion_status = FALSE;
 
-  if (event->type==ButtonPress)
+  if (event->type == ButtonPress)
     button_status = event->button;
   else
     button_status = MB_RELEASED;
