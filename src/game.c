@@ -302,8 +302,13 @@ static struct ChangingElementInfo changing_element_list[] =
 };
 
 static struct ChangingElementInfo changing_element[MAX_NUM_ELEMENTS];
+static unsigned long trigger_events[MAX_NUM_ELEMENTS];
 
 #define IS_AUTO_CHANGING(e)  (changing_element[e].base_element != EL_UNDEFINED)
+#define IS_JUST_CHANGING(x, y)	(ChangeDelay[x][y] != 0)
+#define IS_CHANGING(x, y)	(IS_AUTO_CHANGING(Feld[x][y]) || \
+				 IS_JUST_CHANGING(x, y))
+#define TRIGGERS_BY_COLLECTING(e) (trigger_events[e] & CE_OTHER_COLLECTING)
 
 
 void GetPlayerConfig()
@@ -684,6 +689,16 @@ static void InitGameEngine()
     changing_element[element].change_delay = (change->delay_fixed *
 					      change->delay_frames);
   }
+
+  /* initialize trigger events information */
+  for (i=0; i<MAX_NUM_ELEMENTS; i++)
+    trigger_events[i] = EP_BITMASK_DEFAULT;
+
+  /* add trigger events from element change event properties */
+  for (i=0; i<MAX_NUM_ELEMENTS; i++)
+    if (HAS_CHANGE_EVENT(i, CE_BY_OTHER))
+      trigger_events[element_info[i].change.trigger] |=
+	element_info[i].change.events;
 }
 
 
@@ -4914,6 +4929,8 @@ static void ChangeElement(int x, int y)
   }
   else					/* finish element change */
   {
+    int next_element = changing_element[element].next_element;
+
     if (IS_MOVING(x, y))		/* never change a running system ;-) */
     {
       ChangeDelay[x][y] = 1;		/* try change after next move step */
@@ -4921,53 +4938,37 @@ static void ChangeElement(int x, int y)
       return;
     }
 
-#if 1
-    ChangeElementDoIt(x, y, changing_element[element].next_element);
-#else
-    RemoveField(x, y);
-    Feld[x][y] = changing_element[element].next_element;
-
-    ResetGfxAnimation(x, y);
-    ResetRandomAnimationValue(x, y);
-
-    InitField(x, y, FALSE);
-    if (CAN_MOVE(Feld[x][y]))
-      InitMovDir(x, y);
-
-    DrawLevelField(x, y);
-
-    if (CAN_BE_CRUMBLED(Feld[x][y]))
-    {
-      int sx = SCREENX(x), sy = SCREENY(y);
-      static int xy[4][2] =
-      {
-	{ 0, -1 },
-	{ -1, 0 },
-	{ +1, 0 },
-	{ 0, +1 }
-      };
-      int i;
-
-      for(i=0; i<4; i++)
-      {
-	int xx = x + xy[i][0];
-	int yy = y + xy[i][1];
-	int sxx = sx + xy[i][0];
-	int syy = sy + xy[i][1];
-
-	if (!IN_LEV_FIELD(xx, yy) ||
-	    !IN_SCR_FIELD(sxx, syy) ||
-	    !CAN_BE_CRUMBLED(Feld[xx][yy]) ||
-	    IS_MOVING(xx, yy))
-	  continue;
-
-	DrawLevelField(xx, yy);
-      }
-    }
-#endif
+    if (next_element != EL_UNDEFINED)
+      ChangeElementDoIt(x, y, next_element);
+    else
+      ChangeElementDoIt(x, y, element_info[element].change.successor);
 
     if (changing_element[element].post_change_function)
       changing_element[element].post_change_function(x, y);
+  }
+}
+
+static void CheckTriggeredElementChange(int trigger_element, int trigger_event)
+{
+  int i, x, y;
+
+  if (!(trigger_events[trigger_element] & CH_EVENT_BIT(trigger_event)))
+    return;
+
+  for (i=0; i<MAX_NUM_ELEMENTS; i++)
+  {
+    if (!HAS_CHANGE_EVENT(i, trigger_event) ||
+	element_info[i].change.trigger != trigger_element)
+      continue;
+
+    for (y=0; y<lev_fieldy; y++) for (x=0; x<lev_fieldx; x++)
+    {
+      if (Feld[x][y] == i)
+      {
+	ChangeDelay[x][y] = 1;
+	ChangeElement(x, y);
+      }
+    }
   }
 }
 
@@ -5203,7 +5204,7 @@ void GameActions()
 
 #if 1
     /* this may take place after moving, so 'element' may have changed */
-    if (IS_AUTO_CHANGING(element))
+    if (IS_CHANGING(x, y))
     {
       ChangeElement(x, y);
       element = Feld[x][y];
@@ -5293,7 +5294,7 @@ void GameActions()
 #endif
     else if (element == EL_EXPLOSION)
       ;	/* drawing of correct explosion animation is handled separately */
-    else if (IS_ANIMATED(graphic) && !IS_AUTO_CHANGING(element))
+    else if (IS_ANIMATED(graphic) && !IS_CHANGING(x, y))
       DrawLevelGraphicAnimationIfNeeded(x, y, graphic);
 
 #if 0
@@ -6419,17 +6420,28 @@ int DigField(struct PlayerInfo *player,
       DrawText(DX_EMERALDS, DY_EMERALDS,
 	       int2str(local_player->gems_still_needed, 3), FONT_TEXT_2);
       PlaySoundLevelElementAction(x, y, element, ACTION_COLLECTING);
+      CheckTriggeredElementChange(element, CE_OTHER_COLLECTING);
       break;
 
     case EL_SPEED_PILL:
       RemoveField(x, y);
       player->move_delay_value = MOVE_DELAY_HIGH_SPEED;
+#if 1
+      PlaySoundLevelElementAction(x, y, element, ACTION_COLLECTING);
+#else
       PlaySoundLevel(x, y, SND_SPEED_PILL_COLLECTING);
+#endif
+      CheckTriggeredElementChange(element, CE_OTHER_COLLECTING);
       break;
 
     case EL_ENVELOPE:
       Feld[x][y] = EL_EMPTY;
+#if 1
+      PlaySoundLevelElementAction(x, y, element, ACTION_COLLECTING);
+#else
       PlaySoundLevel(x, y, SND_ENVELOPE_COLLECTING);
+#endif
+      CheckTriggeredElementChange(element, CE_OTHER_COLLECTING);
       break;
 
     case EL_EXTRA_TIME:
@@ -6439,20 +6451,35 @@ int DigField(struct PlayerInfo *player,
 	TimeLeft += 10;
 	DrawText(DX_TIME, DY_TIME, int2str(TimeLeft, 3), FONT_TEXT_2);
       }
+#if 1
+      PlaySoundLevelElementAction(x, y, element, ACTION_COLLECTING);
+#else
       PlaySoundStereo(SND_EXTRA_TIME_COLLECTING, SOUND_MIDDLE);
+#endif
+      CheckTriggeredElementChange(element, CE_OTHER_COLLECTING);
       break;
 
     case EL_SHIELD_NORMAL:
       RemoveField(x, y);
       player->shield_normal_time_left += 10;
+#if 1
+      PlaySoundLevelElementAction(x, y, element, ACTION_COLLECTING);
+#else
       PlaySoundLevel(x, y, SND_SHIELD_NORMAL_COLLECTING);
+#endif
+      CheckTriggeredElementChange(element, CE_OTHER_COLLECTING);
       break;
 
     case EL_SHIELD_DEADLY:
       RemoveField(x, y);
       player->shield_normal_time_left += 10;
       player->shield_deadly_time_left += 10;
+#if 1
+      PlaySoundLevelElementAction(x, y, element, ACTION_COLLECTING);
+#else
       PlaySoundLevel(x, y, SND_SHIELD_DEADLY_COLLECTING);
+#endif
+      CheckTriggeredElementChange(element, CE_OTHER_COLLECTING);
       break;
 
     case EL_DYNAMITE:
@@ -6464,6 +6491,7 @@ int DigField(struct PlayerInfo *player,
       DrawText(DX_DYNAMITE, DY_DYNAMITE, int2str(local_player->dynamite, 3),
 	       FONT_TEXT_2);
       PlaySoundLevelElementAction(x, y, element, ACTION_COLLECTING);
+      CheckTriggeredElementChange(element, CE_OTHER_COLLECTING);
       break;
 
     case EL_DYNABOMB_INCREASE_NUMBER:
@@ -6471,21 +6499,36 @@ int DigField(struct PlayerInfo *player,
       player->dynabomb_count++;
       player->dynabombs_left++;
       RaiseScoreElement(EL_DYNAMITE);
+#if 1
+      PlaySoundLevelElementAction(x, y, element, ACTION_COLLECTING);
+#else
       PlaySoundLevel(x, y, SND_DYNABOMB_INCREASE_NUMBER_COLLECTING);
+#endif
+      CheckTriggeredElementChange(element, CE_OTHER_COLLECTING);
       break;
 
     case EL_DYNABOMB_INCREASE_SIZE:
       RemoveField(x, y);
       player->dynabomb_size++;
       RaiseScoreElement(EL_DYNAMITE);
+#if 1
+      PlaySoundLevelElementAction(x, y, element, ACTION_COLLECTING);
+#else
       PlaySoundLevel(x, y, SND_DYNABOMB_INCREASE_SIZE_COLLECTING);
+#endif
+      CheckTriggeredElementChange(element, CE_OTHER_COLLECTING);
       break;
 
     case EL_DYNABOMB_INCREASE_POWER:
       RemoveField(x, y);
       player->dynabomb_xl = TRUE;
       RaiseScoreElement(EL_DYNAMITE);
+#if 1
+      PlaySoundLevelElementAction(x, y, element, ACTION_COLLECTING);
+#else
       PlaySoundLevel(x, y, SND_DYNABOMB_INCREASE_POWER_COLLECTING);
+#endif
+      CheckTriggeredElementChange(element, CE_OTHER_COLLECTING);
       break;
 
     case EL_KEY_1:
@@ -6503,7 +6546,12 @@ int DigField(struct PlayerInfo *player,
 			 graphic);
       DrawMiniGraphicExt(window, DX_KEYS + key_nr * MINI_TILEX, DY_KEYS,
 			 graphic);
+#if 1
+      PlaySoundLevelElementAction(x, y, element, ACTION_COLLECTING);
+#else
       PlaySoundLevel(x, y, SND_CLASS_KEY_COLLECTING);
+#endif
+      CheckTriggeredElementChange(element, CE_OTHER_COLLECTING);
       break;
     }
 
@@ -6522,7 +6570,12 @@ int DigField(struct PlayerInfo *player,
 			 graphic);
       DrawMiniGraphicExt(window, DX_KEYS + key_nr * MINI_TILEX, DY_KEYS,
 			 graphic);
+#if 1
+      PlaySoundLevelElementAction(x, y, element, ACTION_COLLECTING);
+#else
       PlaySoundLevel(x, y, SND_CLASS_KEY_COLLECTING);
+#endif
+      CheckTriggeredElementChange(element, CE_OTHER_COLLECTING);
       break;
     }
 
@@ -7018,6 +7071,8 @@ int DigField(struct PlayerInfo *player,
 	}
 #endif
 	PlaySoundLevelElementAction(x, y, element, ACTION_COLLECTING);
+
+	CheckTriggeredElementChange(element, CE_OTHER_COLLECTING);
 
 	break;
       }
