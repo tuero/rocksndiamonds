@@ -219,14 +219,14 @@ struct SoundEffectInfo
 };
 
 struct SampleInfo
-{ 
-  int type;
+{
   char *source_filename;
   int num_references;
 
+  int type;
+  int format;
   long data_len;
   void *data_ptr;
-  int format;
 };
 
 typedef struct SampleInfo	SoundInfo;
@@ -259,7 +259,6 @@ typedef struct SampleInfo	MusicInfo;
 #define IS_STOPPING(x)		((x).state & SND_CTRL_STOP)
 #define IS_RELOADING(x)		((x).state & (SND_CTRL_RELOAD_SOUNDS | \
 					      SND_CTRL_RELOAD_MUSIC))
-#define IS_MUSIC_MODULE(x)	((x).format == AUDIO_FORMAT_UNKNOWN)
 #define ALL_SOUNDS(x)		((x).state & SND_CTRL_ALL_SOUNDS)
 
 struct SoundControl
@@ -275,9 +274,10 @@ struct SoundControl
   int playingtime;
   long playingpos;
 
+  int type;
+  int format;
   long data_len;
   void *data_ptr;
-  int format;
 
 #if defined(PLATFORM_MSDOS)
   int voice;

@@ -52,24 +52,30 @@ static int num_sounds = 0, num_music = 0;
 /* ========================================================================= */
 /* THE STUFF BELOW IS ONLY USED BY THE SOUND SERVER CHILD PROCESS            */
 
-static struct AudioFormatInfo afmt;
 static struct SoundControl mixer[NUM_MIXER_CHANNELS];
 static int mixer_active_channels = 0;
 
-/* forward declaration of internal functions */
-static void InitAudioDevice(struct AudioFormatInfo *);
-static void Mixer_Main(void);
+#if defined(AUDIO_UNIX_NATIVE)
+static struct AudioFormatInfo afmt;
 
-#if defined(PLATFORM_UNIX) && !defined(AUDIO_STREAMING_DSP)
+static void Mixer_Main(void);
+#if !defined(AUDIO_STREAMING_DSP)
 static unsigned char linear_to_ulaw(int);
 static int ulaw_to_linear(unsigned char);
+#endif
 #endif
 
 static void ReloadCustomSounds();
 static void ReloadCustomMusic();
 static void FreeSound(void *);
 
-#if defined(PLATFORM_UNIX)
+
+/* ------------------------------------------------------------------------- */
+/* functions for native (non-SDL) Unix audio/mixer support                   */
+/* ------------------------------------------------------------------------- */
+
+#if defined(AUDIO_UNIX_NATIVE)
+
 static int OpenAudioDevice(char *audio_device_name)
 {
   int audio_device_fd;
@@ -126,7 +132,6 @@ static boolean TestAudioDevices(void)
   return TRUE;
 }
 
-#if !defined(TARGET_SDL)
 static boolean ForkAudioProcess(void)
 {
   if (pipe(audio.mixer_pipe) < 0)
@@ -148,7 +153,6 @@ static boolean ForkAudioProcess(void)
 
   return TRUE;
 }
-#endif
 
 void UnixOpenAudio(void)
 {
@@ -176,6 +180,167 @@ void UnixCloseAudio(void)
   if (IS_PARENT_PROCESS(audio.mixer_pid))
     kill(audio.mixer_pid, SIGTERM);
 }
+
+
+/* ------------------------------------------------------------------------- */
+/* functions for platform specific audio device initialization               */
+/* ------------------------------------------------------------------------- */
+
+#if defined(AUDIO_LINUX_IOCTL)
+static void InitAudioDevice_Linux(struct AudioFormatInfo *afmt)
+{
+  /* "ioctl()" expects pointer to 'int' value for stereo flag
+     (boolean is defined as 'char', which will not work here) */
+  unsigned int fragment_spec = 0;
+  int fragment_size_query;
+  int stereo = TRUE;
+  struct
+  {
+    int format_ioctl;
+    int format_result;
+  }
+  formats[] =
+  {
+    /* supported audio format in preferred order */
+    { AFMT_S16_LE,	AUDIO_FORMAT_S16 | AUDIO_FORMAT_LE },
+    { AFMT_S16_BE,	AUDIO_FORMAT_S16 | AUDIO_FORMAT_BE },
+    { AFMT_U8,		AUDIO_FORMAT_U8                    },
+    { -1,		-1 }
+  };
+  int i;
+
+  /* determine logarithm (log2) of the fragment size */
+  while ((1 << fragment_spec) < afmt->fragment_size)
+    fragment_spec++;
+
+  /* use two fragments (play one fragment, prepare the other);
+     one fragment would result in interrupted audio output, more
+     than two fragments would raise audio output latency to much */
+  fragment_spec |= 0x00020000;
+
+  /* Example for fragment specification:
+     - 2 buffers / 512 bytes (giving 1/16 second resolution for 8 kHz)
+     - (with stereo the effective buffer size will shrink to 256)
+     => fragment_size = 0x00020009 */
+
+  if (ioctl(audio.device_fd, SNDCTL_DSP_SETFRAGMENT, &fragment_spec) < 0)
+    Error(ERR_EXIT_SOUND_SERVER,
+	  "cannot set fragment size of /dev/dsp -- no sounds");
+
+  i = 0;
+  afmt->format = 0;
+  while (formats[i].format_result != -1)
+  {
+    unsigned int audio_format = formats[i].format_ioctl;
+    if (ioctl(audio.device_fd, SNDCTL_DSP_SETFMT, &audio_format) == 0)
+    {
+      afmt->format = formats[i].format_result;
+      break;
+    }
+  }
+
+  if (afmt->format == 0)	/* no supported audio format found */
+    Error(ERR_EXIT_SOUND_SERVER,
+	  "cannot set audio format of /dev/dsp -- no sounds");
+
+  /* try if we can use stereo sound */
+  afmt->stereo = TRUE;
+  if (ioctl(audio.device_fd, SNDCTL_DSP_STEREO, &stereo) < 0)
+    afmt->stereo = FALSE;
+
+  if (ioctl(audio.device_fd, SNDCTL_DSP_SPEED, &afmt->sample_rate) < 0)
+    Error(ERR_EXIT_SOUND_SERVER,
+	  "cannot set sample rate of /dev/dsp -- no sounds");
+
+  /* get the real fragmentation size; this should return 512 */
+  if (ioctl(audio.device_fd, SNDCTL_DSP_GETBLKSIZE, &fragment_size_query) < 0)
+    Error(ERR_EXIT_SOUND_SERVER,
+	  "cannot get fragment size of /dev/dsp -- no sounds");
+  if (fragment_size_query != afmt->fragment_size)
+    Error(ERR_EXIT_SOUND_SERVER,
+	  "cannot set fragment size of /dev/dsp -- no sounds");
+}
+#endif	/* AUDIO_LINUX_IOCTL */
+
+#if defined(PLATFORM_NETBSD)
+static void InitAudioDevice_NetBSD(struct AudioFormatInfo *afmt)
+{
+  audio_info_t a_info;
+  boolean stereo = TRUE;
+
+  AUDIO_INITINFO(&a_info);
+  a_info.play.encoding = AUDIO_ENCODING_LINEAR8;
+  a_info.play.precision = 8;
+  a_info.play.channels = 2;
+  a_info.play.sample_rate = sample_rate;
+  a_info.blocksize = fragment_size;
+
+  afmt->format = AUDIO_FORMAT_U8;
+  afmt->stereo = TRUE;
+
+  if (ioctl(audio.device_fd, AUDIO_SETINFO, &a_info) < 0)
+  {
+    /* try to disable stereo */
+    a_info.play.channels = 1;
+
+    afmt->stereo = FALSE;
+
+    if (ioctl(audio.device_fd, AUDIO_SETINFO, &a_info) < 0)
+      Error(ERR_EXIT_SOUND_SERVER,
+	    "cannot set sample rate of /dev/audio -- no sounds");
+  }
+}
+#endif /* PLATFORM_NETBSD */
+
+#if defined(PLATFORM_HPUX)
+static void InitAudioDevice_HPUX(struct AudioFormatInfo *afmt)
+{
+  struct audio_describe ainfo;
+  int audio_ctl;
+
+  audio_ctl = open("/dev/audioCtl", O_WRONLY | O_NDELAY);
+  if (audio_ctl == -1)
+    Error(ERR_EXIT_SOUND_SERVER, "cannot open /dev/audioCtl -- no sounds");
+
+  if (ioctl(audio_ctl, AUDIO_DESCRIBE, &ainfo) == -1)
+    Error(ERR_EXIT_SOUND_SERVER, "no audio info -- no sounds");
+
+  if (ioctl(audio_ctl, AUDIO_SET_DATA_FORMAT, AUDIO_FORMAT_ULAW) == -1)
+    Error(ERR_EXIT_SOUND_SERVER, "ulaw audio not available -- no sounds");
+
+  ioctl(audio_ctl, AUDIO_SET_CHANNELS, 1);
+  ioctl(audio_ctl, AUDIO_SET_SAMPLE_RATE, 8000);
+
+  afmt->format = AUDIO_FORMAT_U8;
+  afmt->stereo = FALSE;
+  afmt->sample_rate = 8000;
+
+  close(audio_ctl);
+}
+#endif /* PLATFORM_HPUX */
+
+static void InitAudioDevice(struct AudioFormatInfo *afmt)
+{
+  afmt->stereo = TRUE;
+  afmt->format = AUDIO_FORMAT_UNKNOWN;
+  afmt->sample_rate = DEFAULT_AUDIO_SAMPLE_RATE;
+  afmt->fragment_size = DEFAULT_AUDIO_FRAGMENT_SIZE;
+
+#if defined(AUDIO_LINUX_IOCTL)
+  InitAudioDevice_Linux(afmt);
+#elif defined(PLATFORM_NETBSD)
+  InitAudioDevice_NetBSD(afmt);
+#elif defined(PLATFORM_HPUX)
+  InitAudioDevice_HPUX(afmt);
+#else
+  /* generic /dev/audio stuff might be placed here */
+#endif
+}
+
+
+/* ------------------------------------------------------------------------- */
+/* functions for communication between main process and sound mixer process  */
+/* ------------------------------------------------------------------------- */
 
 static void SendSoundControlToMixerProcess(SoundControl *snd_ctrl)
 {
@@ -301,7 +466,13 @@ static void ReadReloadInfoFromPipe(SoundControl *snd_ctrl)
   else
     artwork.music_set_current = set_name;
 }
-#endif	/* PLATFORM_UNIX */
+
+#endif /* AUDIO_UNIX_NATIVE */
+
+
+/* ------------------------------------------------------------------------- */
+/* mixer functions                                                           */
+/* ------------------------------------------------------------------------- */
 
 void Mixer_InitChannels()
 {
@@ -317,7 +488,7 @@ static void Mixer_PlayChannel(int channel)
   /* start with inactive channel in case something goes wrong */
   mixer[channel].active = FALSE;
 
-  if (IS_MUSIC_MODULE(mixer[channel]))
+  if (mixer[channel].type != MUS_TYPE_WAV)
     return;
 
   mixer[channel].playingpos = 0;
@@ -349,7 +520,7 @@ static void Mixer_PlayMusicChannel()
   Mixer_PlayChannel(audio.music_channel);
 
 #if defined(TARGET_SDL)
-  if (IS_MUSIC_MODULE(mixer[audio.music_channel]))
+  if (mixer[audio.music_channel].type != MUS_TYPE_WAV)
   {
     /* Mix_VolumeMusic() must be called _after_ Mix_PlayMusic() --
        this looks like a bug in the SDL_mixer library */
@@ -361,6 +532,12 @@ static void Mixer_PlayMusicChannel()
 
 static void Mixer_StopChannel(int channel)
 {
+#if 0
+#if defined(TARGET_SDL)
+  printf("----------> %d [%d]\n", Mix_Playing(channel), Mix_Playing(0));
+#endif
+#endif
+
   if (!mixer_active_channels || !mixer[channel].active)
     return;
 
@@ -386,10 +563,19 @@ static void Mixer_StopMusicChannel()
 
 static void Mixer_FadeChannel(int channel)
 {
+  if (!mixer_active_channels || !mixer[channel].active)
+    return;
+
   mixer[channel].state |= SND_CTRL_FADE;
 
 #if defined(TARGET_SDL)
+
+#if 1
   Mix_FadeOutChannel(channel, SOUND_FADING_INTERVAL);
+#else
+  Mix_ExpireChannel(channel, SOUND_FADING_INTERVAL);
+#endif
+
 #elif defined(PLATFORM_MSDOS)
   if (voice_check(mixer[channel].voice))
     voice_ramp_volume(mixer[channel].voice, SOUND_FADING_INTERVAL, 0);
@@ -425,28 +611,26 @@ static void Mixer_InsertSound(SoundControl snd_ctrl)
     return;
 
   /* copy sound sample and format information */
+  snd_ctrl.type     = snd_info->type;
+  snd_ctrl.format   = snd_info->format;
   snd_ctrl.data_ptr = snd_info->data_ptr;
   snd_ctrl.data_len = snd_info->data_len;
-  snd_ctrl.format   = snd_info->format;
 
+  /* play music samples on a dedicated music channel */
   if (IS_MUSIC(snd_ctrl))
   {
     mixer[audio.music_channel] = snd_ctrl;
-
-    Mixer_PlayChannel(audio.music_channel);
+    Mixer_PlayMusicChannel();
 
     return;
   }
-
-#if 0
-  printf("-> %d\n", mixer_active_channels);
-#endif
 
   if (mixer_active_channels == audio.num_channels)
   {
     for (i=0; i<audio.num_channels; i++)
     {
-      if (mixer[i].data_ptr == NULL)
+      if (mixer[i].data_ptr == NULL ||
+	  mixer[i].data_len == 0)
       {
 #if 1
 	printf("THIS SHOULD NEVER HAPPEN! [%d]\n", i);
@@ -457,18 +641,18 @@ static void Mixer_InsertSound(SoundControl snd_ctrl)
     }
   }
 
-  /* if mixer is full, remove oldest sound */
+#if 0
+  printf("%d ACTIVE CHANNELS\n", mixer_active_channels);
+#endif
+
+  /* if all channels are active, remove oldest sound sample */
   if (mixer_active_channels == audio.num_channels)
   {
     int longest = 0, longest_nr = audio.first_sound_channel;
 
     for (i=audio.first_sound_channel; i<audio.num_channels; i++)
     {
-#if !defined(PLATFORM_MSDOS)
       int actual = 100 * mixer[i].playingpos / mixer[i].data_len;
-#else
-      int actual = mixer[i].playingpos;
-#endif
 
       if (!IS_LOOP(mixer[i]) && actual > longest)
       {
@@ -518,11 +702,8 @@ static void Mixer_InsertSound(SoundControl snd_ctrl)
       if (!mixer[i].active || mixer[i].nr != snd_ctrl.nr)
 	continue;
 
-#if !defined(PLATFORM_MSDOS)
       actual = 100 * mixer[i].playingpos / mixer[i].data_len;
-#else
-      actual = mixer[i].playingpos;
-#endif
+
       if (actual >= longest)
       {
 	longest = actual;
@@ -552,10 +733,12 @@ static void Mixer_InsertSound(SoundControl snd_ctrl)
 #endif
 
 #if 1
+#if defined(AUDIO_UNIX_NATIVE)
       if (snd_info->data_len == 0)
       {
 	printf("THIS SHOULD NEVER HAPPEN! [snd_info->data_len == 0]\n");
       }
+#endif
 #endif
 
 #if 1
@@ -569,14 +752,7 @@ static void Mixer_InsertSound(SoundControl snd_ctrl)
       }
 #endif
 
-#if 0
-      snd_ctrl.data_ptr = snd_info->data_ptr;
-      snd_ctrl.data_len = snd_info->data_len;
-      snd_ctrl.format   = snd_info->format;
-#endif
-
       mixer[i] = snd_ctrl;
-
       Mixer_PlayChannel(i);
 
       break;
@@ -594,6 +770,10 @@ static void HandleSoundRequest(SoundControl snd_ctrl)
     SendSoundControlToMixerProcess(&snd_ctrl);
     return;
   }
+#elif defined(TARGET_SDL)
+  for (i=0; i<audio.num_channels; i++)
+    if (!Mix_Playing(i))
+      Mixer_StopChannel(i);
 #elif defined(TARGET_ALLEGRO)
   for (i=0; i<audio.num_channels; i++)
   {
@@ -610,9 +790,14 @@ static void HandleSoundRequest(SoundControl snd_ctrl)
 
   if (IS_RELOADING(snd_ctrl))		/* load new sound or music files */
   {
-    ReadReloadInfoFromPipe(&snd_ctrl);
-    Mixer_InitChannels();
+    Mixer_StopMusicChannel();
+    for(i=audio.first_sound_channel; i<audio.num_channels; i++)
+      Mixer_StopChannel(i);
+
+#if defined(AUDIO_UNIX_NATIVE)
     CloseAudioDevice(&audio.device_fd);
+    ReadReloadInfoFromPipe(&snd_ctrl);
+#endif
 
     if (snd_ctrl.state & SND_CTRL_RELOAD_SOUNDS)
       ReloadCustomSounds();
@@ -626,7 +811,7 @@ static void HandleSoundRequest(SoundControl snd_ctrl)
 
     if (IS_MUSIC(snd_ctrl))
     {
-      Mixer_FadeChannel(audio.music_channel);
+      Mixer_FadeMusicChannel();
       return;
     }
 
@@ -641,7 +826,7 @@ static void HandleSoundRequest(SoundControl snd_ctrl)
 
     if (IS_MUSIC(snd_ctrl))
     {
-      Mixer_StopChannel(audio.music_channel);
+      Mixer_StopMusicChannel();
       return;
     }
 
@@ -649,8 +834,10 @@ static void HandleSoundRequest(SoundControl snd_ctrl)
       if (mixer[i].nr == snd_ctrl.nr || ALL_SOUNDS(snd_ctrl))
 	Mixer_StopChannel(i);
 
+#if defined(AUDIO_UNIX_NATIVE)
     if (!mixer_active_channels)
       CloseAudioDevice(&audio.device_fd);
+#endif
   }
   else if (snd_ctrl.active)		/* add new sound to mixer */
   {
@@ -660,16 +847,31 @@ static void HandleSoundRequest(SoundControl snd_ctrl)
 
 void StartMixer(void)
 {
+#if 0
+  SDL_version compile_version;
+  const SDL_version *link_version;
+  MIX_VERSION(&compile_version);
+  printf("compiled with SDL_mixer version: %d.%d.%d\n", 
+	 compile_version.major,
+	 compile_version.minor,
+	 compile_version.patch);
+  link_version = Mix_Linked_Version();
+  printf("running with SDL_mixer version: %d.%d.%d\n", 
+	 link_version->major,
+	 link_version->minor,
+	 link_version->patch);
+#endif
+
   if (!audio.sound_available)
     return;
 
-#if defined(PLATFORM_UNIX) && !defined(TARGET_SDL)
+#if defined(AUDIO_UNIX_NATIVE)
   if (!ForkAudioProcess())
     audio.sound_available = FALSE;
 #endif
 }
 
-#if defined(PLATFORM_UNIX) && !defined(TARGET_SDL)
+#if defined(AUDIO_UNIX_NATIVE)
 
 static void CopySampleToMixingBuffer(SoundControl *snd_ctrl,
 				     int sample_pos, int sample_size,
@@ -989,167 +1191,10 @@ void Mixer_Main()
 #endif /* !AUDIO_STREAMING_DSP */
   }
 }
-#endif /* PLATFORM_UNIX */
+#endif /* AUDIO_UNIX_NATIVE */
 
 
-/* ------------------------------------------------------------------------- */
-/* platform dependant audio initialization code                              */
-/* ------------------------------------------------------------------------- */
-
-#if defined(AUDIO_LINUX_IOCTL)
-static void InitAudioDevice_Linux(struct AudioFormatInfo *afmt)
-{
-  /* "ioctl()" expects pointer to 'int' value for stereo flag
-     (boolean is defined as 'char', which will not work here) */
-  unsigned int fragment_spec = 0;
-  int fragment_size_query;
-  int stereo = TRUE;
-  struct
-  {
-    int format_ioctl;
-    int format_result;
-  }
-  formats[] =
-  {
-    /* supported audio format in preferred order */
-    { AFMT_S16_LE,	AUDIO_FORMAT_S16 | AUDIO_FORMAT_LE },
-    { AFMT_S16_BE,	AUDIO_FORMAT_S16 | AUDIO_FORMAT_BE },
-    { AFMT_U8,		AUDIO_FORMAT_U8                    },
-    { -1,		-1 }
-  };
-  int i;
-
-  /* determine logarithm (log2) of the fragment size */
-  while ((1 << fragment_spec) < afmt->fragment_size)
-    fragment_spec++;
-
-  /* use two fragments (play one fragment, prepare the other);
-     one fragment would result in interrupted audio output, more
-     than two fragments would raise audio output latency to much */
-  fragment_spec |= 0x00020000;
-
-  /* Example for fragment specification:
-     - 2 buffers / 512 bytes (giving 1/16 second resolution for 8 kHz)
-     - (with stereo the effective buffer size will shrink to 256)
-     => fragment_size = 0x00020009 */
-
-  if (ioctl(audio.device_fd, SNDCTL_DSP_SETFRAGMENT, &fragment_spec) < 0)
-    Error(ERR_EXIT_SOUND_SERVER,
-	  "cannot set fragment size of /dev/dsp -- no sounds");
-
-  i = 0;
-  afmt->format = 0;
-  while (formats[i].format_result != -1)
-  {
-    unsigned int audio_format = formats[i].format_ioctl;
-    if (ioctl(audio.device_fd, SNDCTL_DSP_SETFMT, &audio_format) == 0)
-    {
-      afmt->format = formats[i].format_result;
-      break;
-    }
-  }
-
-  if (afmt->format == 0)	/* no supported audio format found */
-    Error(ERR_EXIT_SOUND_SERVER,
-	  "cannot set audio format of /dev/dsp -- no sounds");
-
-  /* try if we can use stereo sound */
-  afmt->stereo = TRUE;
-  if (ioctl(audio.device_fd, SNDCTL_DSP_STEREO, &stereo) < 0)
-    afmt->stereo = FALSE;
-
-  if (ioctl(audio.device_fd, SNDCTL_DSP_SPEED, &afmt->sample_rate) < 0)
-    Error(ERR_EXIT_SOUND_SERVER,
-	  "cannot set sample rate of /dev/dsp -- no sounds");
-
-  /* get the real fragmentation size; this should return 512 */
-  if (ioctl(audio.device_fd, SNDCTL_DSP_GETBLKSIZE, &fragment_size_query) < 0)
-    Error(ERR_EXIT_SOUND_SERVER,
-	  "cannot get fragment size of /dev/dsp -- no sounds");
-  if (fragment_size_query != afmt->fragment_size)
-    Error(ERR_EXIT_SOUND_SERVER,
-	  "cannot set fragment size of /dev/dsp -- no sounds");
-}
-#endif	/* AUDIO_LINUX_IOCTL */
-
-#if defined(PLATFORM_NETBSD)
-static void InitAudioDevice_NetBSD(struct AudioFormatInfo *afmt)
-{
-  audio_info_t a_info;
-  boolean stereo = TRUE;
-
-  AUDIO_INITINFO(&a_info);
-  a_info.play.encoding = AUDIO_ENCODING_LINEAR8;
-  a_info.play.precision = 8;
-  a_info.play.channels = 2;
-  a_info.play.sample_rate = sample_rate;
-  a_info.blocksize = fragment_size;
-
-  afmt->format = AUDIO_FORMAT_U8;
-  afmt->stereo = TRUE;
-
-  if (ioctl(audio.device_fd, AUDIO_SETINFO, &a_info) < 0)
-  {
-    /* try to disable stereo */
-    a_info.play.channels = 1;
-
-    afmt->stereo = FALSE;
-
-    if (ioctl(audio.device_fd, AUDIO_SETINFO, &a_info) < 0)
-      Error(ERR_EXIT_SOUND_SERVER,
-	    "cannot set sample rate of /dev/audio -- no sounds");
-  }
-}
-#endif /* PLATFORM_NETBSD */
-
-#if defined(PLATFORM_HPUX)
-static void InitAudioDevice_HPUX(struct AudioFormatInfo *afmt)
-{
-  struct audio_describe ainfo;
-  int audio_ctl;
-
-  audio_ctl = open("/dev/audioCtl", O_WRONLY | O_NDELAY);
-  if (audio_ctl == -1)
-    Error(ERR_EXIT_SOUND_SERVER, "cannot open /dev/audioCtl -- no sounds");
-
-  if (ioctl(audio_ctl, AUDIO_DESCRIBE, &ainfo) == -1)
-    Error(ERR_EXIT_SOUND_SERVER, "no audio info -- no sounds");
-
-  if (ioctl(audio_ctl, AUDIO_SET_DATA_FORMAT, AUDIO_FORMAT_ULAW) == -1)
-    Error(ERR_EXIT_SOUND_SERVER, "ulaw audio not available -- no sounds");
-
-  ioctl(audio_ctl, AUDIO_SET_CHANNELS, 1);
-  ioctl(audio_ctl, AUDIO_SET_SAMPLE_RATE, 8000);
-
-  afmt->format = AUDIO_FORMAT_U8;
-  afmt->stereo = FALSE;
-  afmt->sample_rate = 8000;
-
-  close(audio_ctl);
-}
-#endif /* PLATFORM_HPUX */
-
-#if defined(PLATFORM_UNIX)
-static void InitAudioDevice(struct AudioFormatInfo *afmt)
-{
-  afmt->stereo = TRUE;
-  afmt->format = AUDIO_FORMAT_UNKNOWN;
-  afmt->sample_rate = DEFAULT_AUDIO_SAMPLE_RATE;
-  afmt->fragment_size = DEFAULT_AUDIO_FRAGMENT_SIZE;
-
-#if defined(AUDIO_LINUX_IOCTL)
-  InitAudioDevice_Linux(afmt);
-#elif defined(PLATFORM_NETBSD)
-  InitAudioDevice_NetBSD(afmt);
-#elif defined(PLATFORM_HPUX)
-  InitAudioDevice_HPUX(afmt);
-#else
-  /* generic /dev/audio stuff might be placed here */
-#endif
-}
-#endif /* PLATFORM_UNIX */
-
-#if defined(PLATFORM_UNIX) && !defined(AUDIO_STREAMING_DSP)
+#if defined(AUDIO_UNIX_NATIVE) && !defined(AUDIO_STREAMING_DSP)
 
 /* these two are stolen from "sox"... :) */
 
@@ -1254,7 +1299,7 @@ static int ulaw_to_linear(unsigned char ulawbyte)
 
   return(sample);
 }
-#endif /* PLATFORM_UNIX && !AUDIO_STREAMING_DSP */
+#endif /* AUDIO_UNIX_NATIVE && !AUDIO_STREAMING_DSP */
 
 
 /* THE STUFF ABOVE IS ONLY USED BY THE SOUND SERVER CHILD PROCESS            */
@@ -1293,6 +1338,8 @@ static SoundInfo *Load_WAV(char *filename)
     return NULL;
   }
 
+  snd_info->data_len = ((Mix_Chunk *)snd_info->data_ptr)->alen;
+
 #elif defined(TARGET_ALLEGRO)
 
   if ((snd_info->data_ptr = load_sample(filename)) == NULL)
@@ -1302,7 +1349,9 @@ static SoundInfo *Load_WAV(char *filename)
     return NULL;
   }
 
-#else	/* PLATFORM_UNIX */
+  snd_info->data_len = ((SAMPLE *)snd_info->data_ptr)->len;
+
+#else /* AUDIO_UNIX_NATIVE */
 
   if ((file = fopen(filename, MODE_READ)) == NULL)
   {
@@ -1377,7 +1426,7 @@ static SoundInfo *Load_WAV(char *filename)
 
   snd_info->format = AUDIO_FORMAT_U8;
 
-#endif	/* PLATFORM_UNIX */
+#endif	/* AUDIO_UNIX_NATIVE */
 
   snd_info->type = SND_TYPE_WAV;
   snd_info->source_filename = getStringCopy(filename);
@@ -1570,26 +1619,7 @@ void PlayMusic(int nr)
   if (!audio.music_available)
     return;
 
-#if defined(TARGET_SDL)
-
-  nr = nr % num_music;
-
-  if (Music[nr]->type == MUS_TYPE_MOD)
-  {
-    Mix_PlayMusic(Music[nr]->data_ptr, -1);
-    Mix_VolumeMusic(SOUND_MAX_VOLUME);	/* must be _after_ Mix_PlayMusic()! */
-  }
-  else				/* play WAV music loop */
-  {
-    Mix_Volume(audio.music_channel, SOUND_MAX_VOLUME);
-    Mix_PlayChannel(audio.music_channel, Music[nr]->data_ptr, -1);
-  }
-
-#else
-
   PlaySoundMusic(nr);
-
-#endif
 }
 
 void PlaySound(int nr)
@@ -1645,12 +1675,7 @@ void FadeMusic(void)
   if (!audio.sound_available)
     return;
 
-#if defined(TARGET_SDL)
-  Mix_FadeOutMusic(SOUND_FADING_INTERVAL);
-  Mix_FadeOutChannel(audio.music_channel, SOUND_FADING_INTERVAL);
-#else
   StopSoundExt(-1, SND_CTRL_FADE_MUSIC);
-#endif
 }
 
 void FadeSound(int nr)
@@ -1666,15 +1691,10 @@ void FadeSounds()
 
 void StopMusic(void)
 {
-#if defined(TARGET_SDL)
-  if (!audio.sound_available)
+  if (!audio.music_available)
     return;
 
-  Mix_HaltMusic();
-  Mix_HaltChannel(audio.music_channel);
-#else
   StopSoundExt(-1, SND_CTRL_STOP_MUSIC);
-#endif
 }
 
 void StopSound(int nr)
@@ -1860,7 +1880,7 @@ void InitReloadSounds(char *set_name)
 
 #if defined(TARGET_SDL) || defined(TARGET_ALLEGRO)
   ReloadCustomSounds();
-#elif defined(PLATFORM_UNIX)
+#elif defined(AUDIO_UNIX_NATIVE)
   WriteReloadInfoToPipe(set_name, SND_CTRL_RELOAD_SOUNDS);
 #endif
 }
@@ -1872,7 +1892,7 @@ void InitReloadMusic(char *set_name)
 
 #if defined(TARGET_SDL) || defined(TARGET_ALLEGRO)
   ReloadCustomMusic();
-#elif defined(PLATFORM_UNIX)
+#elif defined(AUDIO_UNIX_NATIVE)
   WriteReloadInfoToPipe(set_name, SND_CTRL_RELOAD_MUSIC);
 #endif
 }
@@ -1890,7 +1910,7 @@ void FreeSound(void *ptr)
     Mix_FreeChunk(sound->data_ptr);
 #elif defined(TARGET_ALLEGRO)
     destroy_sample(sound->data_ptr);
-#else	/* PLATFORM_UNIX */
+#else /* AUDIO_UNIX_NATIVE */
     free(sound->data_ptr);
 #endif
   }
@@ -1915,7 +1935,7 @@ void FreeMusic(MusicInfo *music)
       Mix_FreeChunk(music->data_ptr);
 #elif defined(TARGET_ALLEGRO)
     destroy_sample(music->data_ptr);
-#else	/* PLATFORM_UNIX */
+#else /* AUDIO_UNIX_NATIVE */
     free(music->data_ptr);
 #endif
   }
