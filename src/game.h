@@ -20,6 +20,9 @@ void GetPlayerConfig(void);
 void DrawGameDoorValues(void);
 void InitGameSound();
 void InitGame(void);
+
+void UpdateEngineValues(int, int);
+
 void InitMovDir(int, int);
 void InitAmoebaNr(int, int);
 void GameWon(void);

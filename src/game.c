@@ -2121,6 +2121,15 @@ void InitGame()
 #endif
 }
 
+void UpdateEngineValues(int actual_scroll_x, int actual_scroll_y)
+{
+  /* this is used for non-R'n'D game engines to update certain engine values */
+
+  /* needed to determine if sounds are played within the visible screen area */
+  scroll_x = actual_scroll_x;
+  scroll_y = actual_scroll_y;
+}
+
 void InitMovDir(int x, int y)
 {
   int i, element = Feld[x][y];
@@ -12394,9 +12403,149 @@ static void PlayLevelMusic()
     PlayMusic(MAP_NOCONF_MUSIC(level_nr));	/* from music dir */
 }
 
-void PlayLevelSound_EM(int x, int y, int element, int action)
+void PlayLevelSound_EM(int x, int y, int element_em, int sample)
 {
-  PlayLevelSoundElementAction(x, y, element, action);
+  int element = (element_em > -1 ? map_element_EM_to_RND(element_em) : 0);
+
+#if 0
+  if (sample == SAMPLE_bug)
+    printf("::: PlayLevelSound_EM: %d, %d: %d\n", x, y, sample);
+#endif
+
+  switch (sample)
+  {
+    case SAMPLE_blank:
+      PlayLevelSoundElementAction(x, y, element, ACTION_WALKING);
+      break;
+
+    case SAMPLE_roll:
+      PlayLevelSoundElementAction(x, y, element, ACTION_PUSHING);
+      break;
+
+    case SAMPLE_stone:
+      PlayLevelSoundElementAction(x, y, element, ACTION_IMPACT);
+      break;
+
+    case SAMPLE_nut:
+      PlayLevelSoundElementAction(x, y, element, ACTION_IMPACT);
+      break;
+
+    case SAMPLE_crack:
+      PlayLevelSoundElementAction(x, y, element, ACTION_BREAKING);
+      break;
+
+    case SAMPLE_bug:
+      PlayLevelSoundElementAction(x, y, EL_BUG, ACTION_MOVING);
+      break;
+
+    case SAMPLE_tank:
+      PlayLevelSoundElementAction(x, y, EL_SPACESHIP, ACTION_MOVING);
+      break;
+
+    case SAMPLE_android:
+      PlayLevelSoundElementAction(x, y, element, ACTION_DROPPING);
+      break;
+
+    case SAMPLE_spring:
+      PlayLevelSoundElementAction(x, y, element, ACTION_IMPACT);
+      break;
+
+    case SAMPLE_slurp:
+      PlayLevelSoundElementAction(x, y, element, ACTION_DYING);
+      break;
+
+    case SAMPLE_eater:
+      PlayLevelSoundElementAction(x, y, EL_YAMYAM, ACTION_WAITING);
+      break;
+
+    case SAMPLE_alien:
+      PlayLevelSoundElementAction(x, y, element, ACTION_MOVING);
+      break;
+
+    case SAMPLE_collect:
+      PlayLevelSoundElementAction(x, y, element, ACTION_COLLECTING);
+      break;
+
+    case SAMPLE_diamond:
+      PlayLevelSoundElementAction(x, y, element, ACTION_IMPACT);
+      break;
+
+    case SAMPLE_squash:
+      PlayLevelSoundElementAction(x, y, element, ACTION_BREAKING);
+      break;
+
+    case SAMPLE_wonderfall:
+      PlayLevelSoundElementAction(x, y, EL_MAGIC_WALL, ACTION_FILLING);
+      break;
+
+    case SAMPLE_drip:
+      PlayLevelSoundElementAction(x, y, element, ACTION_IMPACT);
+      break;
+
+    case SAMPLE_push:
+      PlayLevelSoundElementAction(x, y, element, ACTION_PUSHING);
+      break;
+
+    case SAMPLE_dirt:
+      PlayLevelSoundElementAction(x, y, element, ACTION_DIGGING);
+      break;
+
+    case SAMPLE_acid:
+      PlayLevelSound(x, y, SND_ACID_SPLASHING);
+      break;
+
+    case SAMPLE_ball:
+      PlayLevelSoundElementAction(x, y, element, ACTION_DROPPING);
+      break;
+
+    case SAMPLE_grow:
+      PlayLevelSoundElementAction(x, y, element, ACTION_GROWING);
+      break;
+
+    case SAMPLE_wonder:
+      PlayLevelSoundElementAction(x, y, element, ACTION_ACTIVE);
+      break;
+
+    case SAMPLE_door:
+      PlayLevelSoundElementAction(x, y, element, ACTION_PASSING);
+      break;
+
+    case SAMPLE_exit:
+      PlayLevelSoundElementAction(x, y, element, ACTION_PASSING);
+      break;
+
+    case SAMPLE_dynamite:
+      PlayLevelSoundElementAction(x, y, element, ACTION_DROPPING);
+      break;
+
+    case SAMPLE_tick:
+      PlayLevelSoundElementAction(x, y, element, ACTION_ACTIVE);
+      break;
+
+    case SAMPLE_press:
+      PlayLevelSoundElementAction(x, y, element, ACTION_ACTIVATING);
+      break;
+
+    case SAMPLE_wheel:
+      PlaySoundStereo(SND_MAGIC_WALL_ACTIVE, SOUND_MIDDLE);
+      break;
+
+    case SAMPLE_boom:
+      PlayLevelSoundElementAction(x, y, element, ACTION_EXPLODING);
+      break;
+
+    case SAMPLE_time:
+      PlaySoundStereo(SND_GAME_RUNNING_OUT_OF_TIME, SOUND_MIDDLE);
+      break;
+
+    case SAMPLE_die:
+      PlayLevelSoundElementAction(x, y, element, ACTION_DYING);
+      break;
+
+    default:
+      PlayLevelSoundElementAction(x, y, element, ACTION_DEFAULT);
+      break;
+  }
 }
 
 void RaiseScore(int value)

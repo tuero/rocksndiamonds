@@ -33,12 +33,17 @@ GC spriteGC;
 #endif
 
 char play[SAMPLE_MAX];
+int play_x[SAMPLE_MAX];
+int play_y[SAMPLE_MAX];
+int play_element[SAMPLE_MAX];
 
 #if defined(AUDIO_UNIX_NATIVE)
 static int sound_pid = -1;
 int sound_pipe[2] = { -1, -1 };		/* for communication */
 short *sound_data[SAMPLE_MAX];		/* pointer to sound data */
 long sound_length[SAMPLE_MAX];		/* length of sound data */
+
+static boolean use_native_em_sound = 0;
 
 static const char *sound_names[SAMPLE_MAX] =
 {
@@ -163,7 +168,7 @@ int open_all(void)
 
 #if defined(PLATFORM_LINUX) || defined(PLATFORM_BSD)
 
-  if (1)
+  if (use_native_em_sound)
   {
     char name[MAXNAME+2];
     int i;
@@ -276,43 +281,52 @@ void em_close_all(void)
 extern unsigned int screen_x;
 extern unsigned int screen_y;
 
-void play_sound(int x, int y, int sample)
+void play_element_sound(int x, int y, int sample, int element)
 {
+#if 0
   unsigned int left = screen_x / TILEX;
   unsigned int top  = screen_y / TILEY;
 
-#if 0
-  if (x == -1 && y == -1)	/* play sound in the middle of the screen */
-    play[sample] = 0xffff;
-  else if ((unsigned int)(y - top)  <= SCR_FIELDY &&
-	   (unsigned int)(x - left) <= SCR_FIELDX)
-    play[sample] = (y << 8) | (x & 0xff);
-#else
   if ((x == -1 && y == -1) ||	/* play sound in the middle of the screen */
       ((unsigned int)(y - top)  <= SCR_FIELDY &&
        (unsigned int)(x - left) <= SCR_FIELDX))
-    play[sample] = 1;
 #endif
+  {
+#if 1
+    PlayLevelSound_EM(x, y, element, sample);
+#else
+    play[sample] = 1;
+    play_x[sample] = x;
+    play_y[sample] = y;
+    play_element[sample] = element;
+#endif
+  }
 }
 
-void play_element_sound(int x, int y, int sample, int element)
+void play_sound(int x, int y, int sample)
 {
-  play_sound(x, y, sample);
+  play_element_sound(x, y, sample, -1);
 }
 
 void sound_play(void)
 {
+  if (!use_native_em_sound)
+  {
+    int i;
+
 #if 0
-  int i;
+    UpdateEngineValues(screen_x / TILEX, screen_y / TILEY);
+#endif
 
-  for (i = 0; i < SAMPLE_MAX; i++)
-    if (play[i])
-      PlayLevelSound_EM(0,0,0,0);
+    return;
 
-#else
+    for (i = 0; i < SAMPLE_MAX; i++)
+      if (play[i])
+	PlayLevelSound_EM(play_x[i], play_y[i], play_element[i], i);
+  }
 
 #if defined(AUDIO_UNIX_NATIVE)
-  if (sound_pipe[1] != -1)
+  if (use_native_em_sound && sound_pipe[1] != -1)
   {
     if (write(sound_pipe[1], &play, sizeof(play)) == -1)
     {
@@ -331,7 +345,7 @@ void sound_play(void)
       }
     }
   }
-#endif
+
 #endif
 
   memset(play, 0, sizeof(play));

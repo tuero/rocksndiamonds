@@ -208,6 +208,9 @@ static void die(struct PLAYER *ply)
     case Xbug_gos:
     case Xbug_gow:
       Cave[y-1][x] = Xboom_bug;
+#if 0
+      play_element_sound(x, y, SAMPLE_boom, Zplayer);
+#endif
       break;
 
     case Xtank_n:
@@ -219,6 +222,9 @@ static void die(struct PLAYER *ply)
     case Xtank_gos:
     case Xtank_gow:
       Cave[y-1][x] = Xboom_bomb;
+#if 0
+      play_element_sound(x, y, SAMPLE_boom, Zplayer);
+#endif
       break;
   }
 
@@ -233,6 +239,9 @@ static void die(struct PLAYER *ply)
     case Xbug_gos:
     case Xbug_gow:
       Cave[y][x+1] = Xboom_bug;
+#if 0
+      play_element_sound(x, y, SAMPLE_boom, Zplayer);
+#endif
       break;
 
     case Xtank_n:
@@ -244,6 +253,9 @@ static void die(struct PLAYER *ply)
     case Xtank_gos:
     case Xtank_gow:
       Cave[y][x+1] = Xboom_bomb;
+#if 0
+      play_element_sound(x, y, SAMPLE_boom, Zplayer);
+#endif
       break;
   }
 
@@ -258,6 +270,9 @@ static void die(struct PLAYER *ply)
     case Xbug_gos:
     case Xbug_gow:
       Cave[y+1][x] = Xboom_bug;
+#if 0
+      play_element_sound(x, y, SAMPLE_boom, Zplayer);
+#endif
       break;
 
     case Xtank_n:
@@ -269,6 +284,9 @@ static void die(struct PLAYER *ply)
     case Xtank_gos:
     case Xtank_gow:
       Cave[y+1][x] = Xboom_bomb;
+#if 0
+      play_element_sound(x, y, SAMPLE_boom, Zplayer);
+#endif
       break;
   }
 
@@ -283,6 +301,9 @@ static void die(struct PLAYER *ply)
     case Xbug_gos:
     case Xbug_gow:
       Cave[y][x-1] = Xboom_bug;
+#if 0
+      play_element_sound(x, y, SAMPLE_boom, Zplayer);
+#endif
       break;
 
     case Xtank_n:
@@ -294,6 +315,9 @@ static void die(struct PLAYER *ply)
     case Xtank_gos:
     case Xtank_gow:
       Cave[y][x-1] = Xboom_bomb;
+#if 0
+      play_element_sound(x, y, SAMPLE_boom, Zplayer);
+#endif
       break;
   }
 
@@ -302,11 +326,11 @@ static void die(struct PLAYER *ply)
     case Xexit_1:
     case Xexit_2:
     case Xexit_3:
-      play_sound(x, y, SAMPLE_exit);
+      play_element_sound(x, y, SAMPLE_exit, Xexit_1);
       break;
 
     default:
-      play_sound(x, y, SAMPLE_die);
+      play_element_sound(x, y, SAMPLE_die, Zplayer);
       break;
   }
 
@@ -393,7 +417,7 @@ static void player(struct PLAYER *ply)
       if (++ply->dynamite_cnt == 5 && ply->dynamite)
       {
 	Cave[y][x] = Xdynamite_1;
-	play_sound(x, y, SAMPLE_dynamite);
+	play_element_sound(x, y, SAMPLE_dynamite, Xdynamite_1);
 	ply->dynamite--;
       }
     }
@@ -423,7 +447,7 @@ static void player(struct PLAYER *ply)
       case Yacid_splash_wB:
 	Cave[y][x] = Zplayer;
 	Next[y][x] = Zplayer;
-	play_sound(x, y, SAMPLE_blank);
+	play_element_sound(x, y, SAMPLE_blank, Xblank);
 	ply->anim = SPR_walk + anim;
 	ply->x = x;
 	ply->y = y;
@@ -706,7 +730,7 @@ static void player(struct PLAYER *ply)
 	    Cave[y][x+dx] = dx > 0 ? Yspring_kill_e : Yspring_kill_w;
 	    Next[y][x] = Zplayer;
 	    Next[y][x+dx] = dx > 0 ? Xspring_e : Xspring_w;
-	    play_sound(x, y, SAMPLE_slurp);
+	    play_element_sound(x, y, SAMPLE_slurp, Xalien);
 	    lev.score += lev.slurp_score;
 	    ply->x = x;
 	    break;
@@ -962,7 +986,7 @@ static void player(struct PLAYER *ply)
       case Xexit_1:
       case Xexit_2:
       case Xexit_3:
-	play_sound(x, y, SAMPLE_exit);
+	play_element_sound(x, y, SAMPLE_exit, Xexit_1);
 	if (--lev.home == 0)
 	  lev.score += lev.time * lev.exit_score / 100;
 	ply->anim = SPR_walk + anim;

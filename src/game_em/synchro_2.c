@@ -534,7 +534,7 @@ void synchro_2(void)
   	  Cave[y+1][x] = Yemerald_stone;
   	  Next[y][x] = Xstone;
   	  Next[y+1][x] = Xemerald;
-  	  play_sound(x, y, SAMPLE_crack);
+  	  play_element_sound(x, y, SAMPLE_crack, Xnut);
   	  score += lev.nut_score;
   	  goto loop;
 
@@ -558,6 +558,9 @@ void synchro_2(void)
   	  Boom[y+2][x-1] = Xemerald;
   	  Boom[y+2][x] = Xemerald;
   	  Boom[y+2][x+1] = Xemerald;
+#if 0
+	  play_element_sound(x, y, SAMPLE_boom, element);
+#endif
   	  score += lev.bug_score;
   	  goto loop;
 
@@ -581,6 +584,9 @@ void synchro_2(void)
   	  Boom[y+2][x-1] = Xblank;
   	  Boom[y+2][x] = Xblank;
   	  Boom[y+2][x+1] = Xblank;
+#if 0
+	  play_element_sound(x, y, SAMPLE_boom, element);
+#endif
   	  score += lev.tank_score;
   	  goto loop;
 
@@ -638,6 +644,9 @@ void synchro_2(void)
   	  Boom[y+2][x-1] = lev.eater_array[lev.eater_pos][6];
   	  Boom[y+2][x] = lev.eater_array[lev.eater_pos][7];
   	  Boom[y+2][x+1] = lev.eater_array[lev.eater_pos][8];
+#if 0
+	  play_element_sound(x, y, SAMPLE_boom, element);
+#endif
   	  lev.eater_pos = (lev.eater_pos + 1) & 7;
   	  score += lev.eater_score;
   	  goto loop;
@@ -656,6 +665,9 @@ void synchro_2(void)
   	  Boom[y+2][x-1] = Xblank;
   	  Boom[y+2][x] = Xblank;
   	  Boom[y+2][x+1] = Xblank;
+#if 0
+	  play_element_sound(x, y, SAMPLE_boom, element);
+#endif
   	  score += lev.alien_score;
   	  goto loop;
 
@@ -710,7 +722,7 @@ void synchro_2(void)
   	    case Xplant:
   	    case Yplant:
   	      Next[y][x] = Xstone;
-  	      play_sound(x, y, SAMPLE_stone);
+  	      play_element_sound(x, y, SAMPLE_stone, Xstone);
   	      goto loop;
   	  }
 
@@ -718,7 +730,7 @@ void synchro_2(void)
   	  Cave[y+1][x] = Ydiamond_stone;
   	  Next[y][x] = Xblank;
   	  Next[y+1][x] = Xstone_pause;
-  	  play_sound(x, y, SAMPLE_squash);
+  	  play_element_sound(x, y, SAMPLE_squash, Xdiamond);
   	  goto loop;
 
   	case Xbomb:
@@ -734,6 +746,9 @@ void synchro_2(void)
   	  Boom[y+2][x-1] = Xblank;
   	  Boom[y+2][x] = Xblank;
   	  Boom[y+2][x+1] = Xblank;
+#if 0
+	  play_element_sound(x, y, SAMPLE_boom, element);
+#endif
   	  goto loop;
 
   	case Xwonderwall:
@@ -756,7 +771,7 @@ void synchro_2(void)
   	default:
   	  Cave[y][x] = Xstone;
   	  Next[y][x] = Xstone;
-  	  play_sound(x, y, SAMPLE_stone);
+  	  play_element_sound(x, y, SAMPLE_stone, Xstone);
   	  goto loop;
       }
 
@@ -953,7 +968,7 @@ void synchro_2(void)
   	default:
   	  Cave[y][x] = Xnut;
   	  Next[y][x] = Xnut;
-  	  play_sound(x, y, SAMPLE_nut);
+  	  play_element_sound(x, y, SAMPLE_nut, Xnut);
   	  goto loop;
       }
 
@@ -1725,7 +1740,7 @@ void synchro_2(void)
   	}
 
   	Next[y][x] = temp; /* the item we chose to clone */
-  	play_sound(x, y, SAMPLE_android);
+  	play_element_sound(x, y, SAMPLE_android, temp);
 
   	switch (RANDOM & 7)
 	{
@@ -2604,7 +2619,7 @@ void synchro_2(void)
   	  Cave[y][x+1] = Yspring_kill_e;
   	  Next[y][x] = Xblank;
   	  Next[y][x+1] = Xspring_e;
-  	  play_sound(x, y, SAMPLE_slurp);
+  	  play_element_sound(x, y, SAMPLE_slurp, Xalien);
   	  score += lev.slurp_score;
   	  goto loop;
 
@@ -2612,13 +2627,13 @@ void synchro_2(void)
   	case XbumperB:
   	  Cave[y][x+1] = XbumperB;
   	  Next[y][x] = Xspring_w;
-  	  play_sound(x, y, SAMPLE_spring);
+  	  play_element_sound(x, y, SAMPLE_spring, Xspring);
   	  goto loop;
 
   	default:
   	  Cave[y][x] = Xspring;
   	  Next[y][x] = Xspring;
-  	  play_sound(x, y, SAMPLE_spring);
+  	  play_element_sound(x, y, SAMPLE_spring, Xspring);
   	  goto loop;
       }
 
@@ -2699,7 +2714,7 @@ void synchro_2(void)
   	  Cave[y][x-1] = Yspring_kill_w;
   	  Next[y][x] = Xblank;
   	  Next[y][x-1] = Xspring_w;
-  	  play_sound(x, y, SAMPLE_slurp);
+  	  play_element_sound(x, y, SAMPLE_slurp, Xalien);
   	  score += lev.slurp_score;
   	  goto loop;
 
@@ -2707,13 +2722,13 @@ void synchro_2(void)
   	case XbumperB:
   	  Cave[y][x-1] = XbumperB;
   	  Next[y][x] = Xspring_e;
-  	  play_sound(x, y, SAMPLE_spring);
+  	  play_element_sound(x, y, SAMPLE_spring, Xspring);
   	  goto loop;
 
   	default:
   	  Cave[y][x] = Xspring;
   	  Next[y][x] = Xspring;
-  	  play_sound(x, y, SAMPLE_spring);
+  	  play_element_sound(x, y, SAMPLE_spring, Xspring);
   	  goto loop;
       }
 
@@ -2762,6 +2777,9 @@ void synchro_2(void)
   	  Boom[y+2][x-1] = Xblank;
   	  Boom[y+2][x] = Xblank;
   	  Boom[y+2][x+1] = Xblank;
+#if 0
+	  play_element_sound(x, y, SAMPLE_boom, element);
+#endif
   	  goto loop;
 
   	case Xbug_n:
@@ -2784,6 +2802,9 @@ void synchro_2(void)
   	  Boom[y+2][x-1] = Xemerald;
   	  Boom[y+2][x] = Xemerald;
   	  Boom[y+2][x+1] = Xemerald;
+#if 0
+	  play_element_sound(x, y, SAMPLE_boom, element);
+#endif
   	  score += lev.bug_score;
   	  goto loop;
 
@@ -2807,6 +2828,9 @@ void synchro_2(void)
   	  Boom[y+2][x-1] = Xblank;
   	  Boom[y+2][x] = Xblank;
   	  Boom[y+2][x+1] = Xblank;
+#if 0
+	  play_element_sound(x, y, SAMPLE_boom, element);
+#endif
   	  score += lev.tank_score;
   	  goto loop;
 
@@ -2826,6 +2850,9 @@ void synchro_2(void)
   	  Boom[y+2][x-1] = lev.eater_array[lev.eater_pos][6];
   	  Boom[y+2][x] = lev.eater_array[lev.eater_pos][7];
   	  Boom[y+2][x+1] = lev.eater_array[lev.eater_pos][8];
+#if 0
+	  play_element_sound(x, y, SAMPLE_boom, element);
+#endif
   	  lev.eater_pos = (lev.eater_pos + 1) & 7;
   	  score += lev.eater_score;
   	  goto loop;
@@ -2844,13 +2871,16 @@ void synchro_2(void)
   	  Boom[y+2][x-1] = Xblank;
   	  Boom[y+2][x] = Xblank;
   	  Boom[y+2][x+1] = Xblank;
+#if 0
+	  play_element_sound(x, y, SAMPLE_boom, element);
+#endif
   	  score += lev.alien_score;
   	  goto loop;
 
   	default:
   	  Cave[y][x] = Xspring;
   	  Next[y][x] = Xspring;
-  	  play_sound(x, y, SAMPLE_spring);
+  	  play_element_sound(x, y, SAMPLE_spring, Xspring);
   	  goto loop;
       }
 
@@ -3215,7 +3245,7 @@ void synchro_2(void)
   	      Cave[y-1][x] = Yalien_n;
   	      Next[y][x] = Xblank;
   	      Next[y-1][x] = Xalien_pause;
-  	      play_sound(x, y, SAMPLE_alien);
+  	      play_element_sound(x, y, SAMPLE_alien, Xalien);
   	      goto loop;
 	  }
 	}
@@ -3250,7 +3280,7 @@ void synchro_2(void)
   	      Cave[y+1][x] = Yalien_s;
   	      Next[y][x] = Xblank;
   	      Next[y+1][x] = Xalien_pause;
-  	      play_sound(x, y, SAMPLE_alien);
+  	      play_element_sound(x, y, SAMPLE_alien, Xalien);
   	      goto loop;
 	  }
 	}
@@ -3288,7 +3318,7 @@ void synchro_2(void)
   	      Cave[y][x+1] = Yalien_e;
   	      Next[y][x] = Xblank;
   	      Next[y][x+1] = Xalien_pause;
-  	      play_sound(x, y, SAMPLE_alien);
+  	      play_element_sound(x, y, SAMPLE_alien, Xalien);
   	      goto loop;
 	  }
 	}
@@ -3323,7 +3353,7 @@ void synchro_2(void)
   	      Cave[y][x-1] = Yalien_w;
   	      Next[y][x] = Xblank;
   	      Next[y][x-1] = Xalien_pause;
-  	      play_sound(x, y, SAMPLE_alien);
+  	      play_element_sound(x, y, SAMPLE_alien, Xalien);
   	      goto loop;
 	  }
 	}
@@ -3861,7 +3891,7 @@ void synchro_2(void)
 
   	  Cave[y][x] = temp;
   	  Next[y][x] = temp;
-  	  play_sound(x, y, SAMPLE_drip);
+  	  play_element_sound(x, y, SAMPLE_drip, Xdrip_fall);
   	  goto loop;
       }
 
@@ -4081,6 +4111,9 @@ void synchro_2(void)
   	  Boom[y+1][x-1] = Xblank;
   	  Boom[y+1][x] = Xblank;
   	  Boom[y+1][x+1] = Xblank;
+#if 0
+	  play_element_sound(x, y, SAMPLE_boom, element);
+#endif
   	  goto loop;
       }
 
@@ -4432,14 +4465,14 @@ void synchro_2(void)
       {
 	Cave[y-1][x] = Ygrow_ns_eat;
 	Next[y-1][x] = Xgrow_ns;
-	play_sound(x, y, SAMPLE_grow);
+	play_element_sound(x, y, SAMPLE_grow, Xgrow_ns);
       }
 
       if (tab_blank[Cave[y+1][x]])
       {
 	Cave[y+1][x] = Ygrow_ns_eat;
 	Next[y+1][x] = Xgrow_ns;
-	play_sound(x, y, SAMPLE_grow);
+	play_element_sound(x, y, SAMPLE_grow, Xgrow_ns);
       }
 
       goto loop;
@@ -4449,14 +4482,14 @@ void synchro_2(void)
       {
 	Cave[y][x+1] = Ygrow_ew_eat;
 	Next[y][x+1] = Xgrow_ew;
-	play_sound(x, y, SAMPLE_grow);
+	play_element_sound(x, y, SAMPLE_grow, Xgrow_ew);
       }
 
       if (tab_blank[Cave[y][x-1]])
       {
 	Cave[y][x-1] = Ygrow_ew_eat;
 	Next[y][x-1] = Xgrow_ew;
-	play_sound(x, y, SAMPLE_grow);
+	play_element_sound(x, y, SAMPLE_grow, Xgrow_ew);
       }
 
       goto loop;
@@ -4467,7 +4500,7 @@ void synchro_2(void)
       if (lev.wonderwall_time && lev.wonderwall_state)
       {
 	Cave[y][x] = XwonderwallB;
-	play_sound(x, y, SAMPLE_wonder);
+	play_element_sound(x, y, SAMPLE_wonder, Xwonderwall);
       }
 
       goto loop;
@@ -4512,22 +4545,22 @@ void synchro_2(void)
     /* --------------------------------------------------------------------- */
 
     case Xdynamite_1:
-      play_sound(x, y, SAMPLE_tick);
+      play_element_sound(x, y, SAMPLE_tick, Xdynamite_1);
       Next[y][x] = Xdynamite_2;
       goto loop;
 
     case Xdynamite_2:
-      play_sound(x, y, SAMPLE_tick);
+      play_element_sound(x, y, SAMPLE_tick, Xdynamite_2);
       Next[y][x] = Xdynamite_3;
       goto loop;
 
     case Xdynamite_3:
-      play_sound(x, y, SAMPLE_tick);
+      play_element_sound(x, y, SAMPLE_tick, Xdynamite_3);
       Next[y][x] = Xdynamite_4;
       goto loop;
 
     case Xdynamite_4:
-      play_sound(x, y, SAMPLE_tick);
+      play_element_sound(x, y, SAMPLE_tick, Xdynamite_4);
       Next[y][x] = Zdynamite;
       Boom[y-1][x-1] = Xblank;
       Boom[y-1][x] = Xblank;
@@ -4729,6 +4762,9 @@ void synchro_2(void)
       Boom[y+1][x-1] = Xemerald;
       Boom[y+1][x] = Xemerald;
       Boom[y+1][x+1] = Xemerald;
+#if 0
+      play_element_sound(x, y, SAMPLE_boom, element);
+#endif
       goto loop;
 
     case Xboom_bomb:
@@ -4745,12 +4781,20 @@ void synchro_2(void)
       Boom[y+1][x-1] = Xblank;
       Boom[y+1][x] = Xblank;
       Boom[y+1][x+1] = Xblank;
+#if 0
+      play_element_sound(x, y, SAMPLE_boom, element);
+#endif
       goto loop;
 
     case Xboom_android:
+#if 0
+      play_element_sound(x, y, SAMPLE_boom, Xandroid);
+#endif
     case Xboom_1:
       Next[y][x] = Xboom_2;
+#if 1
       play_sound(x, y, SAMPLE_boom);
+#endif
       goto loop;
 
     case Xboom_2:

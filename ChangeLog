@@ -1,3 +1,6 @@
+2004-09-27
+	* modified native EM engine to use integrated R'n'D sound system
+
 2004-09-21
 	* added SDL support to graphics functions in native EM engine
 	  (by always using generic libgame interface functions)

@@ -1260,6 +1260,13 @@ static void InitElementSoundInfo()
 	default_action_sound = element_info[i].sound[ACTION_DEFAULT];
 #endif
 
+#if 1
+      /* !!! needed because EL_EMPTY_SPACE treated as IS_SP_ELEMENT !!! */
+      /* !!! make this better !!! */
+      if (i == EL_EMPTY_SPACE)
+	default_action_sound = element_info[EL_DEFAULT].sound[act];
+#endif
+
       /* no sound for this specific action -- use default action sound */
       if (element_info[i].sound[act] == -1)
 	element_info[i].sound[act] = default_action_sound;

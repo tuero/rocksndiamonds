@@ -24,6 +24,9 @@ unsigned short **Draw;
 static unsigned short *Index[4][HEIGHT];
 static unsigned short Array[4][HEIGHT][WIDTH];
 
+extern unsigned int screen_x;
+extern unsigned int screen_y;
+
 void game_init_vars(void)
 {
   int x, y;
@@ -85,6 +88,8 @@ void GameActions_EM(byte action)
   frame = (frame - 1) & 7;
 
   readjoy(action);
+
+  UpdateEngineValues(screen_x / TILEX, screen_y / TILEY);
 
   if (frame == 7)
   {

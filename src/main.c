@@ -3525,11 +3525,6 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
     "generator ball",
   },
   {
-    "emc_grow",
-    "emc_grow",
-    "grow",
-  },
-  {
     "emc_gate_1",
     "gate",
     "door 1 (EMC style)",

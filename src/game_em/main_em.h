@@ -449,9 +449,9 @@ enum
   SAMPLE_acid,		/* acid splashes */
   SAMPLE_ball,		/* ball places something */
   SAMPLE_grow,		/* growing wall grows */
-  SAMPLE_wonder,	/* wonderwall moves (is active) */
-  SAMPLE_door,		/* player goes thru door */
-  SAMPLE_exit,		/* player goes in exit */
+  SAMPLE_wonder,	/* wonderwall is active */
+  SAMPLE_door,		/* player goes thru door (gate) */
+  SAMPLE_exit,		/* player goes into exit */
   SAMPLE_dynamite,	/* player places dynamite */
   SAMPLE_tick,		/* dynamite ticks */
   SAMPLE_press,		/* player presses wheel/wind/switch */
