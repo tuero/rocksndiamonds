@@ -477,10 +477,6 @@ void ReloadCustomImage(Bitmap *, char *);
 inline void OpenAudio(void);
 inline void CloseAudio(void);
 inline void SetAudioMode(boolean);
-#if 0
-inline void SetAudioReloadFunctions(void (*func_reload_sounds)(void),
-				    void (*func_reload_music)(void));
-#endif
 
 inline void InitEventFilter(EventFilter);
 inline boolean PendingEvent(void);

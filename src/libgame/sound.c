@@ -24,10 +24,26 @@
 #include "setup.h"
 
 
+struct ListNode
+{
+  char *key;
+  void *content;
+  struct ListNode *next;
+};
+typedef struct ListNode ListNode;
+
+static ListNode *newListNode(void);
+static void addNodeToList(ListNode **, char *, void *);
+static void deleteNodeFromList(ListNode **, char *, void (*function)(void *));
+static ListNode *getNodeFromKey(ListNode *, char *);
+static int getNumNodes(ListNode *);
+
+
+static struct SoundEffectInfo *sound_effect;
+static ListNode *SoundFileList = NULL;
 static SoundInfo **Sound = NULL;
 static MusicInfo **Music = NULL;
 static int num_sounds = 0, num_music = 0;
-static char **sound_name;
 
 
 /* ========================================================================= */
@@ -283,17 +299,11 @@ void SoundServer(void)
       {
 	artwork.sounds_set_current = set_name;
 	ReloadCustomSounds();
-#if 0
-	audio.func_reload_sounds();
-#endif
       }
       else
       {
 	artwork.music_set_current = set_name;
 	ReloadCustomMusic();
-#if 0
-	audio.func_reload_music();
-#endif
       }
 
       free(set_name);
@@ -645,6 +655,8 @@ static void SoundServer_InsertNewSound(struct SoundControl snd_ctrl)
 
   if (snd_ctrl.music)
     snd_ctrl.nr = snd_ctrl.nr % num_music;
+  else if (snd_ctrl.nr >= num_sounds)
+    return;
 
   /* if playlist is full, remove oldest sound */
   if (playing_sounds == MAX_SOUNDS_PLAYING)
@@ -1228,27 +1240,48 @@ static void LoadCustomSound(SoundInfo **snd_info, char *basename)
     return;
   }
 
-  if (*snd_info && strcmp(filename, (*snd_info)->source_filename) == 0)
+  if (*snd_info)
   {
-    /* The old and new sound are the same (have the same filename and path).
-       This usually means that this sound does not exist in this sound set
-       and a fallback to the existing sound is done. */
+    char *filename_old = (*snd_info)->source_filename;
 
-    return;
+    if (strcmp(filename, filename_old) == 0)
+    {
+      /* The old and new sound are the same (have the same filename and path).
+      	 This usually means that this sound does not exist in this sound set
+	 and a fallback to the existing sound is done. */
+
+#if 1
+      printf("[sound '%s' already exists]\n", filename);
+#endif
+
+      return;
+    }
+
+    if (--(*snd_info)->num_references <= 0)
+    {
+#if 1
+      printf("[deleting sound '%s']\n", filename_old);
+#endif
+
+      /*
+      FreeSound(*snd_info);
+      */
+      deleteNodeFromList(&SoundFileList, filename_old, FreeSound);
+    }
   }
 
-  if (*snd_info)
-    FreeSound(*snd_info);
-
   *snd_info = Load_WAV(filename);
+  (*snd_info)->num_references = 1;
+
+  addNodeToList(&SoundFileList, (*snd_info)->source_filename, *snd_info);
 }
 
-void InitSoundList(char *sound_name_list[], int num_list_entries)
+void InitSoundList(struct SoundEffectInfo *sounds_list, int num_list_entries)
 {
   if (Sound == NULL)
     Sound = checked_calloc(num_list_entries * sizeof(SoundInfo *));
 
-  sound_name = sound_name_list;
+  sound_effect = sounds_list;
   num_sounds = num_list_entries;
 }
 
@@ -1257,7 +1290,13 @@ void LoadSoundToList(char *basename, int list_pos)
   if (Sound == NULL || list_pos >= num_sounds)
     return;
 
+  printf("loading sound '%s' ...  [%d]\n",
+	 basename, getNumNodes(SoundFileList));
+
   LoadCustomSound(&Sound[list_pos], basename);
+
+  printf("loading sound '%s' done [%d]\n",
+	 basename, getNumNodes(SoundFileList));
 }
 
 static MusicInfo *Load_MOD(char *filename)
@@ -1534,6 +1573,104 @@ void StopSoundExt(int nr, int method)
 #endif
 }
 
+ListNode *newListNode()
+{
+  return checked_calloc(sizeof(ListNode));
+}
+
+void addNodeToList(ListNode **node_first, char *key, void *content)
+{
+  ListNode *node_new = newListNode();
+
+#if 0
+  printf("LIST: adding node with key '%s'\n", key);
+#endif
+
+  node_new->key = getStringCopy(key);
+  node_new->content = content;
+  node_new->next = *node_first;
+  *node_first = node_new;
+}
+
+void deleteNodeFromList(ListNode **node_first, char *key,
+			void (*destructor_function)(void *))
+{
+  if (node_first == NULL || *node_first == NULL)
+    return;
+
+  printf("[CHECKING LIST KEY '%s' == '%s']\n",
+	 (*node_first)->key, key);
+
+  if (strcmp((*node_first)->key, key) == 0)
+  {
+    printf("[DELETING LIST ENTRY]\n");
+
+    free((*node_first)->key);
+    if (destructor_function)
+      destructor_function((*node_first)->content);
+    *node_first = (*node_first)->next;
+  }
+  else
+    deleteNodeFromList(&(*node_first)->next, key, destructor_function);
+}
+
+ListNode *getNodeFromKey(ListNode *node_first, char *key)
+{
+  if (node_first == NULL)
+    return NULL;
+
+  if (strcmp(node_first->key, key) == 0)
+    return node_first;
+  else
+    return getNodeFromKey(node_first->next, key);
+}
+
+int getNumNodes(ListNode *node_first)
+{
+  return (node_first ? 1 + getNumNodes(node_first->next) : 0);
+}
+
+void dumpList(ListNode *node_first)
+{
+  ListNode *node = node_first;
+
+  while (node)
+  {
+    printf("['%s']\n", node->key);
+    node = node->next;
+  }
+
+  printf("[%d nodes]\n", getNumNodes(node_first));
+}
+
+static void LoadSoundsInfo()
+{
+  char *filename = getCustomSoundConfigFilename();
+  struct SetupFileList *setup_file_list;
+  int i;
+
+  /* always start with reliable default values */
+  for (i=0; i<num_sounds; i++)
+    sound_effect[i].filename = NULL;
+
+  if (filename == NULL)
+    return;
+
+  if ((setup_file_list = loadSetupFileList(filename)))
+  {
+    for (i=0; i<num_sounds; i++)
+      sound_effect[i].filename =
+	getStringCopy(getTokenValue(setup_file_list, sound_effect[i].text));
+
+    freeSetupFileList(setup_file_list);
+
+#if 1
+    for (i=0; i<num_sounds; i++)
+      printf("'%s' -> '%s'\n", sound_effect[i].text, sound_effect[i].filename);
+#endif
+  }
+}
+
 static void ReloadCustomSounds()
 {
   int i;
@@ -1545,7 +1682,17 @@ static void ReloadCustomSounds()
   LoadSoundsInfo();
 
   for(i=0; i<num_sounds; i++)
-    LoadSoundToList(sound_name[i], i);
+  {
+    if (sound_effect[i].filename)
+      LoadSoundToList(sound_effect[i].filename, i);
+    else
+      LoadSoundToList(sound_effect[i].default_filename, i);
+  }
+
+  /*
+  printf("list size == %d\n", getNumNodes(SoundFileList));
+  */
+  dumpList(SoundFileList);
 }
 
 static void ReloadCustomMusic()
@@ -1642,6 +1789,9 @@ void FreeSound(SoundInfo *sound)
     free(sound->data_ptr);
 #endif
   }
+
+  if (sound->source_filename)
+    free(sound->source_filename);
 
   free(sound);
 }

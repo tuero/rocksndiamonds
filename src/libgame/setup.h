@@ -142,6 +142,7 @@ char *getSetupFilename(void);
 char *getImageFilename(char *);
 char *getCustomImageFilename(char *);
 char *getCustomSoundFilename(char *);
+char *getCustomSoundConfigFilename(void);
 char *getCustomMusicDirectory(void);
 
 void InitTapeDirectory(char *);
@@ -187,7 +188,6 @@ char *getSetupLine(struct TokenInfo *, char *, int);
 
 void LoadLevelInfo(void);
 void LoadArtworkInfo(void);
-void LoadSoundsInfo(void);
 void LoadLevelSetup_LastSeries(void);
 void SaveLevelSetup_LastSeries(void);
 void LoadLevelSetup_SeriesInfo(void);

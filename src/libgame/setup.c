@@ -422,6 +422,11 @@ char *getCustomSoundFilename(char *basename)
   return NULL;					/* cannot find image file */
 }
 
+char *getCustomSoundConfigFilename()
+{
+  return getCustomSoundFilename(SOUNDSINFO_FILENAME);
+}
+
 char *getCustomMusicDirectory(void)
 {
   static char *directory = NULL;
@@ -1811,25 +1816,6 @@ void LoadArtworkInfo()
   dumpTreeInfo(artwork.gfx_first, 0);
   dumpTreeInfo(artwork.snd_first, 0);
   dumpTreeInfo(artwork.mus_first, 0);
-#endif
-}
-
-void LoadSoundsInfo()
-{
-#if 0
-  char *filename = getCustomSoundFilename(SOUNDSINFO_FILENAME);
-  struct SetupFileList *setup_file_list = loadSetupFileList(filename);
-
-  if (setup_file_list)
-  {
-#if 0
-    for (i=0; i<NUM_LEVELINFO_TOKENS; i++)
-      setSetupInfo(levelinfo_tokens, i,
-		   getTokenValue(setup_file_list, levelinfo_tokens[i].text));
-#endif
-
-    freeSetupFileList(setup_file_list);
-  }
 #endif
 }
 

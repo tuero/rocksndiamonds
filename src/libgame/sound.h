@@ -192,23 +192,18 @@ struct AudioFormatInfo
   int fragment_size;		/* audio device fragment size in bytes */
 };
 
-#if 0
-struct SoundsInfo
+struct SoundEffectInfo
 {
-  int num_sounds;
-  char *sound_name;
-
-#if 0
-  void (*func_reload_sounds)(void);
-  void (*func_reload_music)(void);
-#endif
-}
-#endif
+  char *text;
+  char *default_filename;
+  char *filename;
+};
 
 struct SampleInfo
 { 
   int type;
   char *source_filename;
+  int num_references;
 
   long data_len;
   void *data_ptr;
@@ -268,7 +263,7 @@ void StopMusic(void);
 void StopSound(int);
 void StopSounds(void);
 void StopSoundExt(int, int);
-void InitSoundList(char **, int);
+void InitSoundList(struct SoundEffectInfo *, int);
 void InitReloadSounds(char *);
 void InitReloadMusic(char *);
 void FreeAllSounds(void);
