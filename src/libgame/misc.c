@@ -2165,8 +2165,7 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
     }
     END_HASH_ITERATION(extra_file_hash, itr)
 
-#if DEBUG
-    if (dynamic_tokens_found)
+    if (options.debug && dynamic_tokens_found)
     {
       Error(ERR_RETURN_LINE, "-");
       Error(ERR_RETURN, "dynamic token(s) found in config file:");
@@ -2182,7 +2181,6 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
 
       Error(ERR_RETURN_LINE, "-");
     }
-#endif
 
     if (unknown_tokens_found)
     {

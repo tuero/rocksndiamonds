@@ -185,7 +185,7 @@ typedef struct hashtable SetupFileHash;
 			 ARTWORKCLASS_UNDEFINED)
 
 
-void setLevelArtworkDir(TreeInfo *);
+char *setLevelArtworkDir(TreeInfo *);
 char *getLevelFilename(int);
 char *getTapeFilename(int);
 char *getScoreFilename(int);

@@ -327,13 +327,13 @@ static char *getSetupArtworkDir(TreeInfo *ti)
   return artwork_dir;
 }
 
-void setLevelArtworkDir(TreeInfo *ti)
+char *setLevelArtworkDir(TreeInfo *ti)
 {
   char **artwork_path_ptr, **artwork_set_ptr;
   TreeInfo *level_artwork;
 
   if (ti == NULL || leveldir_current == NULL)
-    return;
+    return NULL;
 
   artwork_path_ptr = &(LEVELDIR_ARTWORK_PATH(leveldir_current, ti->type));
   artwork_set_ptr  = &(LEVELDIR_ARTWORK_SET( leveldir_current, ti->type));
@@ -370,6 +370,8 @@ void setLevelArtworkDir(TreeInfo *ti)
 
     free(dir);
   }
+
+  return *artwork_set_ptr;
 }
 
 inline static char *getLevelArtworkSet(int type)

@@ -1830,8 +1830,6 @@ static struct TokenInfo setup_info_graphics[] =
 
 static struct TokenInfo setup_info_sound[] =
 {
-  { TYPE_SWITCH,	&setup.sound,		"Sound:",		},
-  { TYPE_EMPTY,		NULL,			""			},
   { TYPE_SWITCH,	&setup.sound_simple,	"Simple Sound:"		},
   { TYPE_SWITCH,	&setup.sound_loops,	"Sound Loops:"		},
   { TYPE_SWITCH,	&setup.sound_music,	"Game Music:"		},
@@ -2040,10 +2038,10 @@ static void DrawSetupScreen_Generic()
     int font_nr = FONT_MENU_1;
 
     /* set some entries to "unchangeable" according to other variables */
-    if ((value_ptr == &setup.sound       && !audio.sound_available) ||
-	(value_ptr == &setup.sound_loops && !audio.loops_available) ||
-	(value_ptr == &setup.sound_music && !audio.music_available) ||
-	(value_ptr == &setup.fullscreen  && !video.fullscreen_available))
+    if ((value_ptr == &setup.sound_simple && !audio.sound_available) ||
+	(value_ptr == &setup.sound_loops  && !audio.loops_available) ||
+	(value_ptr == &setup.sound_music  && !audio.music_available) ||
+	(value_ptr == &setup.fullscreen   && !video.fullscreen_available))
       setup_info[i].type |= TYPE_GHOSTED;
 
     if (setup_info[i].type & TYPE_STRING)

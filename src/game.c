@@ -427,7 +427,7 @@ static unsigned long trigger_events[MAX_NUM_ELEMENTS];
 void GetPlayerConfig()
 {
   if (!audio.sound_available)
-    setup.sound = FALSE;
+    setup.sound_simple = FALSE;
 
   if (!audio.loops_available)
     setup.sound_loops = FALSE;
@@ -438,7 +438,7 @@ void GetPlayerConfig()
   if (!video.fullscreen_available)
     setup.fullscreen = FALSE;
 
-  setup.sound_simple = setup.sound;
+  setup.sound = (setup.sound_simple || setup.sound_loops || setup.sound_music);
 
   SetAudioMode(setup.sound);
   InitJoysticks();

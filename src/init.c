@@ -3203,7 +3203,9 @@ void InitLevelArtworkInfo()
 
 static void InitImages()
 {
+#if 0
   setLevelArtworkDir(artwork.gfx_first);
+#endif
 
 #if 0
   printf("::: InitImages for '%s' ['%s', '%s'] ['%s', '%s']\n",
@@ -3227,8 +3229,10 @@ static void InitSound(char *identifier)
   if (identifier == NULL)
     identifier = artwork.snd_current->identifier;
 
+#if 0
   /* set artwork path to send it to the sound server process */
   setLevelArtworkDir(artwork.snd_first);
+#endif
 
   InitReloadCustomSounds(identifier);
   ReinitializeSounds();
@@ -3239,8 +3243,10 @@ static void InitMusic(char *identifier)
   if (identifier == NULL)
     identifier = artwork.mus_current->identifier;
 
+#if 0
   /* set artwork path to send it to the sound server process */
   setLevelArtworkDir(artwork.mus_first);
+#endif
 
   InitReloadCustomMusic(identifier);
   ReinitializeMusic();
@@ -3279,7 +3285,11 @@ static char *getNewArtworkIdentifier(int type)
   boolean setup_override_artwork = SETUP_OVERRIDE_ARTWORK(setup, type);
   char *setup_artwork_set = SETUP_ARTWORK_SET(setup, type);
   char *leveldir_identifier = leveldir_current->identifier;
+#if 1
+  char *leveldir_artwork_set = setLevelArtworkDir(artwork_first_node);
+#else
   char *leveldir_artwork_set = LEVELDIR_ARTWORK_SET(leveldir_current, type);
+#endif
   boolean has_level_artwork_set = (leveldir_artwork_set != NULL);
   char *artwork_current_identifier;
   char *artwork_new_identifier = NULL;	/* default: nothing has changed */
@@ -3287,7 +3297,6 @@ static char *getNewArtworkIdentifier(int type)
   /* leveldir_current may be invalid (level group, parent link) */
   if (!validLevelSeries(leveldir_current))
     return NULL;
-
 
   /* 1st step: determine artwork set to be activated in descending order:
      --------------------------------------------------------------------
@@ -3310,6 +3319,16 @@ static char *getNewArtworkIdentifier(int type)
   /* 2nd step: check if it is really needed to reload artwork set
      ------------------------------------------------------------ */
 
+#if 0
+  if (type == ARTWORK_TYPE_GRAPHICS)
+    printf("::: 0: '%s' ['%s', '%s'] ['%s' ('%s')]\n",
+	   artwork_new_identifier,
+	   ARTWORK_CURRENT_IDENTIFIER(artwork, type),
+	   artwork_current_identifier,
+	   leveldir_current->graphics_set,
+	   leveldir_current->identifier);
+#endif
+
   /* ---------- reload if level set and also artwork set has changed ------- */
   if (leveldir_current_identifier[type] != leveldir_identifier &&
       (last_has_level_artwork_set[type] || has_level_artwork_set))
@@ -3318,11 +3337,21 @@ static char *getNewArtworkIdentifier(int type)
   leveldir_current_identifier[type] = leveldir_identifier;
   last_has_level_artwork_set[type] = has_level_artwork_set;
 
+#if 0
+  if (type == ARTWORK_TYPE_GRAPHICS)
+    printf("::: 1: '%s'\n", artwork_new_identifier);
+#endif
+
   /* ---------- reload if "override artwork" setting has changed ----------- */
   if (last_override_level_artwork[type] != setup_override_artwork)
     artwork_new_identifier = artwork_current_identifier;
 
   last_override_level_artwork[type] = setup_override_artwork;
+
+#if 0
+  if (type == ARTWORK_TYPE_GRAPHICS)
+    printf("::: 2: '%s'\n", artwork_new_identifier);
+#endif
 
   /* ---------- reload if current artwork identifier has changed ----------- */
   if (strcmp(ARTWORK_CURRENT_IDENTIFIER(artwork, type),
@@ -3331,6 +3360,11 @@ static char *getNewArtworkIdentifier(int type)
 
   *(&(ARTWORK_CURRENT_IDENTIFIER(artwork, type))) = artwork_current_identifier;
 
+#if 0
+  if (type == ARTWORK_TYPE_GRAPHICS)
+    printf("::: 3: '%s'\n", artwork_new_identifier);
+#endif
+
   /* ---------- do not reload directly after starting ---------------------- */
   if (!initialized[type])
     artwork_new_identifier = NULL;
@@ -3338,10 +3372,16 @@ static char *getNewArtworkIdentifier(int type)
   initialized[type] = TRUE;
 
 #if 0
-  printf("CHECKING OLD/NEW GFX:\n- OLD: %s\n- NEW: %s ['%s', '%s'] ['%s']\n",
-	 artwork.gfx_current_identifier, artwork_current_identifier,
-	 artwork.gfx_current->identifier, leveldir_current->graphics_set,
-	 artwork_new_identifier);
+  if (type == ARTWORK_TYPE_GRAPHICS)
+    printf("::: 4: '%s'\n", artwork_new_identifier);
+#endif
+
+#if 0
+  if (type == ARTWORK_TYPE_GRAPHICS)
+    printf("CHECKING OLD/NEW GFX:\n- OLD: %s\n- NEW: %s ['%s', '%s'] ['%s']\n",
+	   artwork.gfx_current_identifier, artwork_current_identifier,
+	   artwork.gfx_current->identifier, leveldir_current->graphics_set,
+	   artwork_new_identifier);
 #endif
 
   return artwork_new_identifier;
@@ -3357,15 +3397,21 @@ void ReloadCustomArtwork()
   if (gfx_new_identifier != NULL)
   {
 #if 0
-    printf("RELOADING GRAPHICS '%s' -> '%s' ['%s']\n",
+    printf("RELOADING GRAPHICS '%s' -> '%s' ['%s', '%s']\n",
 	   artwork.gfx_current_identifier,
 	   gfx_new_identifier,
-	   artwork.gfx_current->identifier);
+	   artwork.gfx_current->identifier,
+	   leveldir_current->graphics_set);
 #endif
 
     ClearRectangle(window, 0, 0, WIN_XSIZE, WIN_YSIZE);
 
     InitImages();
+
+#if 0
+    printf("... '%s'\n",
+	   leveldir_current->graphics_set);
+#endif
 
     FreeTileClipmasks();
     InitTileClipmasks();
