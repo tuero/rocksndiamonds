@@ -767,8 +767,11 @@ void InitImageList(struct ConfigInfo *config_list, int num_file_list_entries,
 
   /* ---------- initialize artwork reference and content lists ---------- */
 
+  image_info->sizeof_artwork_list_entry = sizeof(ImageInfo *);
+
   image_info->artwork_list =
     checked_calloc(num_file_list_entries * sizeof(ImageInfo *));
+  image_info->dynamic_artwork_list = NULL;
 
   image_info->content_list = NULL;
 
@@ -790,5 +793,5 @@ void ReloadCustomImages()
 
 void FreeAllImages()
 {
-  FreeCustomArtworkList(image_info);
+  FreeCustomArtworkLists(image_info);
 }

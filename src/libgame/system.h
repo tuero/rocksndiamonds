@@ -533,7 +533,10 @@ struct ArtworkListInfo
   char **ext1_suffixes;				/* property suffixes array 1 */
   char **ext2_suffixes;				/* property suffixes array 2 */
 
+  int sizeof_artwork_list_entry;
+
   struct ListNodeInfo **artwork_list;		/* static artwork node array */
+  struct ListNodeInfo **dynamic_artwork_list;	/* dynamic artwrk node array */
   struct ListNode *content_list;		/* dynamic artwork node list */
 
   void *(*load_artwork)(char *);		/* constructor function */

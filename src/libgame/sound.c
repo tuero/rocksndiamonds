@@ -1817,8 +1817,11 @@ void InitSoundList(struct ConfigInfo *config_list, int num_file_list_entries,
 
   /* ---------- initialize artwork reference and content lists ---------- */
 
+  sound_info->sizeof_artwork_list_entry = sizeof(SoundInfo *);
+
   sound_info->artwork_list =
     checked_calloc(num_file_list_entries * sizeof(SoundInfo *));
+  sound_info->dynamic_artwork_list = NULL;
 
   sound_info->content_list = NULL;
 
@@ -2125,7 +2128,7 @@ void FreeMusic(MusicInfo *music)
 
 void FreeAllSounds()
 {
-  FreeCustomArtworkList(sound_info);
+  FreeCustomArtworkLists(sound_info);
 }
 
 void FreeAllMusic()

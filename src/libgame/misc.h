@@ -139,7 +139,7 @@ struct FileInfo *getFileListFromConfigList(struct ConfigInfo *,
 					   struct ConfigInfo *, int);
 void LoadArtworkConfig(struct ArtworkListInfo *);
 void ReloadCustomArtworkList(struct ArtworkListInfo *);
-void FreeCustomArtworkList(struct ArtworkListInfo *);
+void FreeCustomArtworkLists(struct ArtworkListInfo *);
 
 #if !defined(PLATFORM_UNIX)
 void initErrorFile();

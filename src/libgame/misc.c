@@ -1499,6 +1499,9 @@ boolean FileIsArtworkType(char *basename, int type)
 /* functions for loading artwork configuration information                   */
 /* ------------------------------------------------------------------------- */
 
+static void FreeCustomArtworkList(struct ArtworkListInfo *,
+				  struct ListNodeInfo ***, int *);
+
 static int get_parameter_value(int type, char *value)
 {
   return (strcmp(value, ARG_UNDEFINED) == 0 ? ARG_UNDEFINED_VALUE :
@@ -1754,6 +1757,9 @@ void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
 
     artwork_info->dynamic_file_list = NULL;
     artwork_info->num_dynamic_file_list_entries = 0;
+
+    FreeCustomArtworkList(artwork_info, &artwork_info->dynamic_artwork_list,
+			  &artwork_info->num_dynamic_file_list_entries);
   }
 
   if (filename == NULL)
@@ -1906,6 +1912,13 @@ void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
 	}
       }
     }
+  }
+
+  if (artwork_info->num_dynamic_file_list_entries > 0)
+  {
+    artwork_info->dynamic_artwork_list =
+      checked_calloc(artwork_info->num_dynamic_file_list_entries *
+		     artwork_info->sizeof_artwork_list_entry);
   }
 
   if (extra_file_list != NULL &&
@@ -2076,10 +2089,6 @@ static void LoadCustomArtwork(struct ArtworkListInfo *artwork_info,
 			      char *basename)
 {
 #if 0
-  char *filename = getCustomArtworkFilename(basename, artwork_info->type);
-#endif
-
-#if 0
   printf("GOT CUSTOM ARTWORK FILE '%s'\n", filename);
 #endif
 
@@ -2089,33 +2098,30 @@ static void LoadCustomArtwork(struct ArtworkListInfo *artwork_info,
     return;
   }
 
-#if 0
-  if (filename == NULL)
-  {
-    Error(ERR_WARN, "cannot find artwork file '%s'", basename);
-    return;
-  }
-
-  replaceArtworkListEntry(artwork_info, listnode, filename);
-#else
   replaceArtworkListEntry(artwork_info, listnode, basename);
-#endif
 }
 
 static void LoadArtworkToList(struct ArtworkListInfo *artwork_info,
+			      struct ListNodeInfo **listnode,
 			      char *basename, int list_pos)
 {
+#if 0
   if (artwork_info->artwork_list == NULL ||
       list_pos >= artwork_info->num_file_list_entries)
     return;
+#endif
 
 #if 0
   printf("loading artwork '%s' ...  [%d]\n",
 	 basename, getNumNodes(artwork_info->content_list));
 #endif
 
+#if 1
+  LoadCustomArtwork(artwork_info, listnode, basename);
+#else
   LoadCustomArtwork(artwork_info, &artwork_info->artwork_list[list_pos],
 		    basename);
+#endif
 
 #if 0
   printf("loading artwork '%s' done [%d]\n",
@@ -2125,70 +2131,53 @@ static void LoadArtworkToList(struct ArtworkListInfo *artwork_info,
 
 void ReloadCustomArtworkList(struct ArtworkListInfo *artwork_info)
 {
-#if 0
-  static struct
-  {
-    char *text;
-    boolean do_it;
-  }
-  draw_init[] =
-  {
-    { "",			FALSE },
-    { "Loading graphics:",	TRUE },
-    { "Loading sounds:",	TRUE },
-    { "Loading music:",		TRUE }
-  };
-#endif
-
-  int num_file_list_entries = artwork_info->num_file_list_entries;
   struct FileInfo *file_list = artwork_info->file_list;
+  struct FileInfo *dynamic_file_list = artwork_info->dynamic_file_list;
+  int num_file_list_entries = artwork_info->num_file_list_entries;
+  int num_dynamic_file_list_entries =
+    artwork_info->num_dynamic_file_list_entries;
   int i;
 
 #if 0
-  LoadArtworkConfig(artwork_info);
-#endif
-
-#if 0
-  if (draw_init[artwork_info->type].do_it)
-    DrawInitText(draw_init[artwork_info->type].text, 120, FC_GREEN);
-#endif
-
-#if 0
-  printf("DEBUG: reloading %d artwork files ...\n", num_file_list_entries);
+  printf("DEBUG: reloading %d static artwork files ...\n",
+	 num_file_list_entries);
+  printf("DEBUG: reloading %d dynamic artwork files ...\n",
+	 num_dynamic_file_list_entries);
 #endif
 
   for(i=0; i<num_file_list_entries; i++)
-  {
-#if 0
-    if (draw_init[artwork_info->type].do_it)
-      DrawInitText(file_list[i].token, 150, FC_YELLOW);
-#endif
+    LoadArtworkToList(artwork_info, &artwork_info->artwork_list[i],
+		      file_list[i].filename, i);
 
-    LoadArtworkToList(artwork_info, file_list[i].filename, i);
-
-#if 0
-    printf("DEBUG:   loading artwork file '%s'...\n", file_list[i].filename);
-#endif
-  }
-
-#if 0
-  draw_init[artwork_info->type].do_it = FALSE;
-#endif
-
-  /*
-  printf("list size == %d\n", getNumNodes(artwork_info->content_list));
-  */
+  for(i=0; i<num_dynamic_file_list_entries; i++)
+    LoadArtworkToList(artwork_info, &artwork_info->dynamic_artwork_list[i],
+		      dynamic_file_list[i].filename, i);
 
 #if 0
   dumpList(artwork_info->content_list);
 #endif
 }
 
-void FreeCustomArtworkList(struct ArtworkListInfo *artwork_info)
+static void FreeCustomArtworkList(struct ArtworkListInfo *artwork_info,
+				  struct ListNodeInfo ***list,
+				  int *num_list_entries)
 {
   int i;
 
-  if (artwork_info == NULL || artwork_info->artwork_list == NULL)
+  if (*list == NULL)
+    return;
+
+  for(i=0; i<*num_list_entries; i++)
+    deleteArtworkListEntry(artwork_info, &(*list)[i]);
+  free(*list);
+
+  *list = NULL;
+  *num_list_entries = 0;
+}
+
+void FreeCustomArtworkLists(struct ArtworkListInfo *artwork_info)
+{
+  if (artwork_info == NULL)
     return;
 
 #if 0
@@ -2196,18 +2185,16 @@ void FreeCustomArtworkList(struct ArtworkListInfo *artwork_info)
 	 IS_CHILD_PROCESS(audio.mixer_pid) ? "CHILD" : "PARENT");
 #endif
 
-  for(i=0; i<artwork_info->num_file_list_entries; i++)
-    deleteArtworkListEntry(artwork_info, &artwork_info->artwork_list[i]);
+  FreeCustomArtworkList(artwork_info, &artwork_info->artwork_list,
+			&artwork_info->num_file_list_entries);
+
+  FreeCustomArtworkList(artwork_info, &artwork_info->dynamic_artwork_list,
+			&artwork_info->num_dynamic_file_list_entries);
 
 #if 0
   printf("%s: FREEING ARTWORK -- DONE\n",
 	 IS_CHILD_PROCESS(audio.mixer_pid) ? "CHILD" : "PARENT");
 #endif
-
-  free(artwork_info->artwork_list);
-
-  artwork_info->artwork_list = NULL;
-  artwork_info->num_file_list_entries = 0;
 }
 
 
