@@ -58,10 +58,10 @@ CONFIG_GAME_DIR = $(CONFIG_RO_GAME_DIR) $(CONFIG_RW_GAME_DIR)
 CONFIG = $(CONFIG_GAME_DIR) $(CONFIG_SCORE_ENTRIES) $(SOUNDS) $(JOYSTICK)
 
 # OPTIONS = -DDEBUG -g -Wall -ansi -pedantic	# only for debugging purposes
-OPTIONS = -DDEBUG -g -Wall			# only for debugging purposes
+# OPTIONS = -DDEBUG -g -Wall			# only for debugging purposes
 # OPTIONS = -O3 -Wall -ansi -pedantic
 # OPTIONS = -O3 -Wall
-# OPTIONS = -O3
+OPTIONS = -O3
 
 # SYSTEM = -DSYSV -Ae		# may be needed for HP-UX
 
@@ -120,15 +120,3 @@ $(PROGNAME):	$(OBJS)
 clean:
 	$(RM) *.o
 	$(RM) $(PROGNAME)
-
-
-#-----------------------------------------------------------------------------#
-# development only stuff                                                      #
-#-----------------------------------------------------------------------------#
-
-depend:
-	for i in $(SRCS); do $(CPP) $(CFLAGS) -M $$i; done > .depend
-
-ifeq (.depend,$(wildcard .depend))
-include .depend
-endif

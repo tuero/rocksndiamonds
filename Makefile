@@ -18,7 +18,7 @@ CC = gcc
 
 # specify path to X11 on your system
 # if undefined, use system defaults (works with Linux/gcc/libc5)
-# X11_PATH = /usr/X11
+X11_PATH = /usr/X11
 
 # specify directory for read-only game data (like graphics, sounds, levels)
 # default is '.', so you can play without installing game data somewhere
@@ -60,28 +60,3 @@ solaris:
 
 clean:
 	$(MAKE_CMD) clean
-
-
-#-----------------------------------------------------------------------------#
-# development only stuff                                                      #
-#-----------------------------------------------------------------------------#
-
-backup:
-	./Scripts/make_backup.sh src
-
-backup_lev:
-	./Scripts/make_backup.sh lev
-
-backup_gfx:
-	./Scripts/make_backup.sh gfx
-
-dist-unix:
-	./Scripts/make_dist.sh unix .
-
-dist-dos:
-	./Scripts/make_dist.sh dos .
-
-dist: dist-unix dist-dos
-
-depend:
-	$(MAKE_CMD) depend
