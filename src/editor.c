@@ -5301,7 +5301,7 @@ static void DrawPropertiesInfo()
     { EP_DONT_COLLIDE_WITH,	"- deadly when colliding with"		},
     { EP_DONT_TOUCH,		"- deadly when touching"		},
 
-    { EP_INDESTRUCTIBLE,	"- undestructible"			},
+    { EP_INDESTRUCTIBLE,	"- indestructible"			},
 
     { EP_CAN_EXPLODE_BY_FIRE,	"- can explode by fire or explosions"	},
     { EP_CAN_EXPLODE_SMASHED,	"- can explode when smashed"		},

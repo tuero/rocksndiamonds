@@ -695,6 +695,9 @@ static int LoadLevel_CUS4(FILE *file, int chunk_size, struct LevelInfo *level)
   {
     struct ElementChangeInfo *change = &ei->change_page[i];
 
+    /* always start with reliable default values */
+    setElementChangeInfoToDefaults(change);
+
     change->events = getFile32BitBE(file);
 
     change->target_element = checkLevelElement(getFile16BitBE(file));

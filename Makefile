@@ -96,6 +96,9 @@ run:
 gdb:
 	@$(MAKE_CMD) TARGET=$(DEFAULT_TARGET) && gdb ./rocksndiamonds
 
+valgrind:
+	valgrind -v --leak-check=yes ./rocksndiamonds 2> valgrind.out
+
 enginetest:
 	./Scripts/make_enginetest.sh
 
