@@ -1054,6 +1054,7 @@ void InitGame()
       JustStopped[x][y] = 0;
       Stop[x][y] = FALSE;
       Pushed[x][y] = FALSE;
+      Changing[x][y] = FALSE;
       ExplodePhase[x][y] = 0;
       ExplodeField[x][y] = EX_NO_EXPLOSION;
 
@@ -1880,6 +1881,17 @@ void Explode(int ex, int ey, int phase, int mode)
   {
     int center_element = Feld[ex][ey];
 
+#if 0
+    /* --- This is only really needed (and now handled) in "Impact()". --- */
+    /* do not explode moving elements that left the explode field in time */
+    if (game.engine_version >= RELEASE_IDENT(2,2,0,7) &&
+	center_element == EL_EMPTY && (mode == EX_NORMAL || mode == EX_CENTER))
+      return;
+#endif
+
+    if (mode == EX_NORMAL || mode == EX_CENTER)
+      PlaySoundLevelAction(ex, ey, ACTION_EXPLODING);
+
     /* remove things displayed in background while burning dynamite */
     if (!IS_INDESTRUCTIBLE(Back[ex][ey]))
       Back[ex][ey] = 0;
@@ -2206,6 +2218,7 @@ void Bang(int x, int y)
 			    player->element_nr);
   }
 
+#if 0
 #if 1
   PlaySoundLevelAction(x, y, ACTION_EXPLODING);
 #else
@@ -2213,6 +2226,7 @@ void Bang(int x, int y)
     PlaySoundLevel(x, y, SND_SP_ELEMENT_EXPLODING);
   else
     PlaySoundLevel(x, y, SND_ELEMENT_EXPLODING);
+#endif
 #endif
 
 #if 0
@@ -2587,6 +2601,29 @@ static void ActivateTimegateSwitch(int x, int y)
   Feld[x][y] = EL_TIMEGATE_SWITCH_ACTIVE;
 }
 
+inline static int getElementMoveStepsize(int x, int y)
+{
+  int element = Feld[x][y];
+  int direction = MovDir[x][y];
+  int dx = (direction == MV_LEFT ? -1 : direction == MV_RIGHT ? +1 : 0);
+  int dy = (direction == MV_UP   ? -1 : direction == MV_DOWN  ? +1 : 0);
+  int horiz_move = (dx != 0);
+  int sign = (horiz_move ? dx : dy);
+  int step = sign * element_info[element].move_stepsize;
+
+  /* special values for move stepsize for spring and things on conveyor belt */
+  if (horiz_move)
+  {
+    if (CAN_FALL(element) &&
+	y < lev_fieldy - 1 && IS_BELT_ACTIVE(Feld[x][y + 1]))
+      step = sign * MOVE_STEPSIZE_NORMAL / 2;
+    else if (element == EL_SPRING)
+      step = sign * MOVE_STEPSIZE_NORMAL * 2;
+  }
+
+  return step;
+}
+
 void Impact(int x, int y)
 {
   boolean lastline = (y == lev_fieldy-1);
@@ -2603,6 +2640,12 @@ void Impact(int x, int y)
     object_hit = (!IS_FREE(x, y + 1) && (!IS_MOVING(x, y + 1) ||
 					 MovDir[x][y + 1] != MV_DOWN ||
 					 MovPos[x][y + 1] <= TILEY / 2));
+
+    /* do not smash moving elements that left the smashed field in time */
+    if (game.engine_version >= RELEASE_IDENT(2,2,0,7) && IS_MOVING(x, y + 1) &&
+	ABS(MovPos[x][y + 1] + getElementMoveStepsize(x, y + 1)) >= TILEX)
+      object_hit = FALSE;
+
     if (object_hit)
       smashed = MovingOrBlocked2Element(x, y + 1);
 
@@ -4021,22 +4064,9 @@ void ContinueMoving(int x, int y)
   int dy = (direction == MV_UP   ? -1 : direction == MV_DOWN  ? +1 : 0);
   int newx = x + dx, newy = y + dy;
   int nextx = newx + dx, nexty = newy + dy;
-  int horiz_move = (dx != 0);
-  int sign = (horiz_move ? dx : dy);
-  int step = sign * element_info[element].move_stepsize;
   boolean pushed = Pushed[x][y];
 
-  /* special values for move stepsize for spring and things on conveyor belt */
-  if (horiz_move)
-  {
-    if (CAN_FALL(element) &&
-	y < lev_fieldy - 1 && IS_BELT_ACTIVE(Feld[x][y + 1]))
-      step = sign * MOVE_STEPSIZE_NORMAL / 2;
-    else if (element == EL_SPRING)
-      step = sign * MOVE_STEPSIZE_NORMAL * 2;
-  }
-
-  MovPos[x][y] += step;
+  MovPos[x][y] += getElementMoveStepsize(x, y);
 
   if (pushed)		/* special case: moving object pushed by player */
     MovPos[x][y] = SIGN(MovPos[x][y]) * (TILEX - ABS(PLAYERINFO(x,y)->MovPos));
@@ -5095,7 +5125,12 @@ static void ChangeElementNow(int x, int y, int element)
 {
   struct ElementChangeInfo *change = &element_info[element].change;
 
+  /* prevent CheckTriggeredElementChange() from looping */
+  Changing[x][y] = TRUE;
+
   CheckTriggeredElementChange(x, y, Feld[x][y], CE_OTHER_IS_CHANGING);
+
+  Changing[x][y] = FALSE;
 
   if (change->explode)
   {
@@ -5280,6 +5315,9 @@ static boolean CheckTriggeredElementChange(int lx, int ly, int trigger_element,
     for (y=0; y<lev_fieldy; y++) for (x=0; x<lev_fieldx; x++)
     {
       if (x == lx && y == ly)	/* do not change trigger element itself */
+	continue;
+
+      if (Changing[x][y])	/* do not change just changing elements */
 	continue;
 
       if (Feld[x][y] == i)
