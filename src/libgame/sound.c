@@ -37,14 +37,16 @@
 #include "sound.h"
 #include "misc.h"
 #include "setup.h"
+#include "text.h"
 
 
 /* expiration time (in milliseconds) for sound loops */
 #define SOUND_LOOP_EXPIRATION_TIME	200
 
-#if defined(TARGET_SDL)
 /* one second fading interval == 1000 ticks (milliseconds) */
 #define SOUND_FADING_INTERVAL		1000
+
+#if defined(TARGET_SDL)
 #define SOUND_MAX_VOLUME		SDL_MIX_MAXVOLUME
 #endif
 
@@ -1643,6 +1645,10 @@ static void LoadCustomSound(SoundInfo **snd_info, char *basename)
 {
   char *filename = getCustomSoundFilename(basename);
 
+#if 0
+  printf("GOT CUSTOM SOUND FILE '%s'\n", filename);
+#endif
+
   if (strcmp(basename, SND_FILE_UNDEFINED) == 0)
   {
     deleteSoundEntry(snd_info);
@@ -1713,6 +1719,7 @@ static MusicInfo *Load_MOD(char *filename)
 
 void LoadCustomMusic(void)
 {
+  static boolean draw_init_text = TRUE;		/* only draw at startup */
   char *music_directory = getCustomMusicDirectory();
   DIR *dir;
   struct dirent *dir_entry;
@@ -1727,11 +1734,17 @@ void LoadCustomMusic(void)
     return;
   }
 
+  if (draw_init_text)
+    DrawInitText("Loading music:", 120, FC_GREEN);
+
   while ((dir_entry = readdir(dir)) != NULL)	/* loop until last dir entry */
   {
     char *basename = dir_entry->d_name;
     char *filename = getPath2(music_directory, basename);
     MusicInfo *mus_info = NULL;
+
+    if (draw_init_text)
+      DrawInitText(basename, 150, FC_YELLOW);
 
     if (FileIsSound(basename))
       mus_info = Load_WAV(filename);
@@ -1749,6 +1762,8 @@ void LoadCustomMusic(void)
   }
 
   closedir(dir);
+
+  draw_init_text = FALSE;
 
   if (num_music == 0)
     Error(ERR_WARN, "cannot find any valid music files in directory '%s'",
@@ -1944,6 +1959,10 @@ static void LoadSoundsInfo()
   struct SetupFileList *setup_file_list;
   int i;
 
+#if 0
+  printf("GOT CUSTOM SOUND CONFIG FILE '%s'\n", filename);
+#endif
+
   /* always start with reliable default values */
   for (i=0; i<num_sounds; i++)
     sound_effect[i].filename = NULL;
@@ -1959,7 +1978,7 @@ static void LoadSoundsInfo()
 
     freeSetupFileList(setup_file_list);
 
-#if 1
+#if 0
     for (i=0; i<num_sounds; i++)
     {
       printf("'%s' ", sound_effect[i].text);
@@ -1974,6 +1993,7 @@ static void LoadSoundsInfo()
 
 static void ReloadCustomSounds()
 {
+  static boolean draw_init_text = TRUE;		/* only draw at startup */
   int i;
 
 #if 0
@@ -1982,17 +2002,25 @@ static void ReloadCustomSounds()
 
   LoadSoundsInfo();
 
+  if (draw_init_text)
+    DrawInitText("Loading sounds:", 120, FC_GREEN);
+
 #if 0
   printf("DEBUG: reloading %d sounds ...\n", num_sounds);
 #endif
 
   for(i=0; i<num_sounds; i++)
   {
+    if (draw_init_text)
+      DrawInitText(sound_effect[i].text, 150, FC_YELLOW);
+
     if (sound_effect[i].filename)
       LoadSoundToList(sound_effect[i].filename, i);
     else
       LoadSoundToList(sound_effect[i].default_filename, i);
   }
+
+  draw_init_text = FALSE;
 
   /*
   printf("list size == %d\n", getNumNodes(SoundFileList));

@@ -14,9 +14,6 @@
 #include <time.h>
 #include <sys/time.h>
 #include <sys/types.h>
-/*
-#include <sys/stat.h>
-*/
 #include <stdarg.h>
 #include <ctype.h>
 #include <string.h>
@@ -437,6 +434,7 @@ void GetOptions(char *argv[])
   options.network = FALSE;
   options.verbose = FALSE;
   options.debug = FALSE;
+  options.debug_command = NULL;
 
   while (*options_left)
   {
@@ -474,19 +472,23 @@ void GetOptions(char *argv[])
       Error(ERR_EXIT_HELP, "unrecognized option '%s'", option);
     else if (strncmp(option, "-help", option_len) == 0)
     {
-      printf("Usage: %s [options] [server.name [port]]\n"
+      printf("Usage: %s [options] [<server host> [<server port>]]\n"
 	     "Options:\n"
 	     "  -d, --display <host>[:<scr>]  X server display\n"
 	     "  -b, --basepath <directory>    alternative base directory\n"
 	     "  -l, --level <directory>       alternative level directory\n"
 	     "  -g, --graphics <directory>    alternative graphics directory\n"
-	     "  -s, --sounds <directory>      alternative graphics directory\n"
-	     "  -m, --music <directory>       alternative graphics directory\n"
+	     "  -s, --sounds <directory>      alternative sounds directory\n"
+	     "  -m, --music <directory>       alternative music directory\n"
 	     "  -n, --network                 network multiplayer game\n"
 	     "      --serveronly              only start network server\n"
 	     "  -v, --verbose                 verbose mode\n"
 	     "      --debug                   display debugging information\n",
 	     program.command_basename);
+
+      if (options.debug)
+	printf("      --debug-command <command> execute special command\n");
+
       exit(0);
     }
     else if (strncmp(option, "-display", option_len) == 0)
@@ -564,6 +566,15 @@ void GetOptions(char *argv[])
     else if (strncmp(option, "-debug", option_len) == 0)
     {
       options.debug = TRUE;
+    }
+    else if (strncmp(option, "-debug-command", option_len) == 0)
+    {
+      if (option_arg == NULL)
+	Error(ERR_EXIT_HELP, "option '%s' requires an argument", option_str);
+
+      options.debug_command = option_arg;
+      if (option_arg == next_option)
+	options_left++;
     }
     else if (*option == '-')
     {

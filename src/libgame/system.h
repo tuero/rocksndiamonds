@@ -221,6 +221,7 @@ struct OptionInfo
   boolean network;
   boolean verbose;
   boolean debug;
+  char *debug_command;
 };
 
 struct VideoSystemInfo

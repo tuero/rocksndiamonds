@@ -168,7 +168,7 @@ struct SoundEffectInfo sound_effects[] =
   { "sp_disk_orange.pushing",		"zonkpush.wav"		},
   { "sp_disk_yellow.pushing",		"pusch.wav"		},
   { "sp_port.passing",			"gate.wav"		},
-  { "sp_exit.entering",			"buing.wav"		},
+  { "sp_exit.entering",			"exit.wav"		},
   { "sp_element.exploding",		"booom.wav"		},
   { "sp_sniksnak.moving",		SND_FILE_UNDEFINED	},
   { "sp_electron.moving",		SND_FILE_UNDEFINED	},
@@ -330,7 +330,6 @@ struct SoundEffectInfo sound_effects[] =
   { "[not used]",			"warnton.wav"		},
   { "[not used]",			"whoosh.wav"		},
   { "[not used]",			"boom.wav"		},
-  { "[not used]",			"exit.wav"		},
 #endif
 };
 

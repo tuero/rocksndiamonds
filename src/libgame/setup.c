@@ -984,11 +984,12 @@ char *getFormattedSetupEntry(char *token, char *value)
   int i;
   static char entry[MAX_LINE_LEN];
 
+  /* start with the token and some spaces to format output line */
   sprintf(entry, "%s:", token);
   for (i=strlen(entry); i<TOKEN_VALUE_POSITION; i++)
-    entry[i] = ' ';
-  entry[i] = '\0';
+    strcat(entry, " ");
 
+  /* continue with the token's value */
   strcat(entry, value);
 
   return entry;
@@ -1809,6 +1810,12 @@ void LoadArtworkInfo()
   artwork.sounds_set_current = artwork.snd_current->name;
   artwork.music_set_current = artwork.mus_current->name;
 
+#if 0
+  printf("graphics set == %s\n\n", artwork.graphics_set_current);
+  printf("sounds set == %s\n\n", artwork.sounds_set_current);
+  printf("music set == %s\n\n", artwork.music_set_current);
+#endif
+
   sortTreeInfo(&artwork.gfx_first, compareTreeInfoEntries);
   sortTreeInfo(&artwork.snd_first, compareTreeInfoEntries);
   sortTreeInfo(&artwork.mus_first, compareTreeInfoEntries);
@@ -1905,19 +1912,18 @@ char *getSetupValue(int type, void *value)
 char *getSetupLine(struct TokenInfo *token_info, char *prefix, int token_nr)
 {
   int i;
-  static char entry[MAX_LINE_LEN];
+  char *line;
+  static char token_string[MAX_LINE_LEN];
   int token_type = token_info[token_nr].type;
   void *setup_value = token_info[token_nr].value;
   char *token_text = token_info[token_nr].text;
   char *value_string = getSetupValue(token_type, setup_value);
 
-  /* start with the prefix, token and some spaces to format output line */
-  sprintf(entry, "%s%s:", prefix, token_text);
-  for (i=strlen(entry); i<TOKEN_VALUE_POSITION; i++)
-    strcat(entry, " ");
+  /* build complete token string */
+  sprintf(token_string, "%s%s", prefix, token_text);
 
-  /* continue with the token's value (which can have different types) */
-  strcat(entry, value_string);
+  /* build setup entry line */
+  line = getFormattedSetupEntry(token_string, value_string);
 
   if (token_type == TYPE_KEY_X11)
   {
@@ -1929,16 +1935,16 @@ char *getSetupLine(struct TokenInfo *token_info, char *prefix, int token_nr)
 	strcmp(keyname, "(unknown)") != 0)
     {
       /* add at least one whitespace */
-      strcat(entry, " ");
-      for (i=strlen(entry); i<TOKEN_COMMENT_POSITION; i++)
-	strcat(entry, " ");
+      strcat(line, " ");
+      for (i=strlen(line); i<TOKEN_COMMENT_POSITION; i++)
+	strcat(line, " ");
 
-      strcat(entry, "# ");
-      strcat(entry, keyname);
+      strcat(line, "# ");
+      strcat(line, keyname);
     }
   }
 
-  return entry;
+  return line;
 }
 
 void LoadLevelSetup_LastSeries()

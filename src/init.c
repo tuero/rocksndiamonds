@@ -51,9 +51,17 @@ static void InitGfx(void);
 static void InitGfxBackground(void);
 static void InitGadgets(void);
 static void InitElementProperties(void);
+static void Execute_Debug_Command(char *);
 
 void OpenAll(void)
 {
+  if (options.debug_command)
+  {
+    Execute_Debug_Command(options.debug_command);
+
+    exit(0);
+  }
+
   if (options.serveronly)
   {
 #if defined(PLATFORM_UNIX)
@@ -318,7 +326,7 @@ void FreeTileClipmasks()
 
   for(i=0; i<NUM_BITMAPS; i++)
   {
-    if (pix[i]->stored_clip_gc)
+    if (pix[i] != NULL && pix[i]->stored_clip_gc)
     {
       XFreeGC(display, pix[i]->stored_clip_gc);
       pix[i]->stored_clip_gc = None;
@@ -357,7 +365,7 @@ void InitGfx()
   DrawInitText(PROGRAM_DOS_PORT_STRING, 210, FC_BLUE);
   rest(200);
 #endif
-  DrawInitText("Loading graphics:",120,FC_GREEN);
+  DrawInitText("Loading graphics:", 120, FC_GREEN);
 
   for(i=0; i<NUM_PICTURES; i++)
   {
@@ -1587,6 +1595,23 @@ void InitElementProperties()
 
   for(i=EL_CHAR_START; i<=EL_CHAR_END; i++)
     Elementeigenschaften1[i] |= (EP_BIT_CHAR | EP_BIT_INACTIVE);
+}
+
+void Execute_Debug_Command(char *command)
+{
+  if (strcmp(command, "create soundinfo.conf") == 0)
+  {
+    int i;
+
+    printf("# You can configure additional/alternative sound effects here\n");
+    printf("# (The sounds below are default and therefore commented out.)\n");
+    printf("\n");
+
+    for (i=0; i<NUM_SOUND_EFFECTS; i++)
+      printf("# %s\n",
+	     getFormattedSetupEntry(sound_effects[i].text,
+				    sound_effects[i].default_filename));
+  }
 }
 
 void CloseAllAndExit(int exit_value)

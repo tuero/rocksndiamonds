@@ -76,31 +76,6 @@
 #define DX_TIME			(DX + XX_TIME)
 #define DY_TIME			(DY + YY_TIME)
 
-#if 0
-#define IS_LOOP_SOUND(s)	((s) == SND_BD_MAGIC_WALL_RUNNING ||	\
-	 			 (s) == SND_BD_BUTTERFLY_MOVING ||	\
-				 (s) == SND_BD_FIREFLY_MOVING ||	\
-	 			 (s) == SND_SP_SNIKSNAK_MOVING ||	\
-				 (s) == SND_SP_ELECTRON_MOVING ||	\
-	 			 (s) == SND_DYNAMITE_BURNING ||	\
-				 (s) == SND_BUG_MOVING ||	\
-	 			 (s) == SND_SPACESHIP_MOVING ||	\
-				 (s) == SND_YAMYAM_MOVING ||	\
-	 			 (s) == SND_YAMYAM_WAITING ||	\
-				 (s) == SND_ROBOT_WHEEL_RUNNING ||	\
-	 			 (s) == SND_MAGIC_WALL_RUNNING ||	\
-				 (s) == SND_BALLOON_MOVING ||	\
-	 			 (s) == SND_MOLE_MOVING ||	\
-				 (s) == SND_TIMEGATE_WHEEL_RUNNING ||	\
-	 			 (s) == SND_CONVEYOR_BELT_RUNNING ||	\
-				 (s) == SND_DYNABOMB_BURNING ||	\
-	 			 (s) == SND_PACMAN_MOVING ||	\
-				 (s) == SND_PENGUIN_MOVING ||	\
-	 			 (s) == SND_PIG_MOVING ||	\
-				 (s) == SND_DRAGON_MOVING ||	\
-	 			 (s) == SND_DRAGON_BREATHING_FIRE)
-#endif
-
 /* values for player movement speed (which is in fact a delay value) */
 #define MOVE_DELAY_NORMAL_SPEED	8
 #define MOVE_DELAY_HIGH_SPEED	4
@@ -4404,6 +4379,9 @@ static void DrawBeltAnimation(int x, int y, int element)
     int graphic = el2gfx(element) + (belt_dir == MV_LEFT ? 0 : 7);
 
     DrawGraphicAnimation(x, y, graphic, 8, delay, mode);
+
+    if (!(FrameCounter % 2))
+      PlaySoundLevel(x, y, SND_CONVEYOR_BELT_RUNNING);
   }
 }
 
@@ -4754,11 +4732,7 @@ void GameActions()
     else if (element == EL_SP_TERMINAL_ACTIVE)
       DrawGraphicAnimation(x, y, GFX2_SP_TERMINAL_ACTIVE, 7, 4, ANIM_NORMAL);
     else if (IS_BELT(element))
-    {
       DrawBeltAnimation(x, y, element);
-      if (!(FrameCounter % 2))
-	PlaySoundLevel(x, y, SND_CONVEYOR_BELT_RUNNING);
-    }
     else if (element == EL_SWITCHGATE_OPENING)
       OpenSwitchgate(x, y);
     else if (element == EL_SWITCHGATE_CLOSING)
