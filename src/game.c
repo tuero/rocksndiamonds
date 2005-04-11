@@ -28,16 +28,20 @@
 #define USE_NEW_AMOEBA_CODE	FALSE
 
 /* EXPERIMENTAL STUFF */
-#define USE_NEW_STUFF		TRUE				* 1
+#define USE_NEW_STUFF		(TRUE				* 1)
 
-#define USE_NEW_MOVE_STYLE	TRUE	* USE_NEW_STUFF		* 1
-#define USE_NEW_MOVE_DELAY	TRUE	* USE_NEW_STUFF		* 1
-#define USE_NEW_PUSH_DELAY	TRUE	* USE_NEW_STUFF		* 1
-#define USE_NEW_BLOCK_STYLE	TRUE	* USE_NEW_STUFF		* 1 * 1
-#define USE_NEW_SP_SLIPPERY	TRUE	* USE_NEW_STUFF		* 1
-#define USE_NEW_RANDOMIZE	TRUE	* USE_NEW_STUFF		* 1
+#define USE_NEW_MOVE_STYLE	(TRUE	* USE_NEW_STUFF		* 1)
+#define USE_NEW_MOVE_DELAY	(TRUE	* USE_NEW_STUFF		* 1)
+#define USE_NEW_PUSH_DELAY	(TRUE	* USE_NEW_STUFF		* 1)
+#define USE_NEW_BLOCK_STYLE	(TRUE	* USE_NEW_STUFF		* 1)
+#define USE_NEW_SP_SLIPPERY	(TRUE	* USE_NEW_STUFF		* 1)
+#define USE_NEW_RANDOMIZE	(TRUE	* USE_NEW_STUFF		* 1)
 
-#define USE_PUSH_BUGFIX		TRUE	* USE_NEW_STUFF		* 1
+#define USE_PUSH_BUGFIX		(TRUE	* USE_NEW_STUFF		* 1)
+
+#define USE_CAN_MOVE_NOT_MOVING	(TRUE	* USE_NEW_STUFF		* 1)
+#define USE_PREVIOUS_MOVE_DIR	(TRUE	* USE_NEW_STUFF		* 1)
+
 
 /* for DigField() */
 #define DF_NO_PUSH		0
@@ -2614,14 +2618,14 @@ void InitMovingField(int x, int y, int direction)
   if (!WasJustMoving[x][y] || direction != MovDir[x][y])
     ResetGfxAnimation(x, y);
 
-#if 1
+#if USE_CAN_MOVE_NOT_MOVING
 
   MovDir[x][y] = direction;
   GfxDir[x][y] = direction;
   GfxAction[x][y] = (direction == MV_DOWN && CAN_FALL(element) ?
 		     ACTION_FALLING : ACTION_MOVING);
 
-  if (getElementMoveStepsize(x, y) != 0)
+  if (getElementMoveStepsize(x, y) != 0)	/* moving or being moved */
   {
     if (Feld[newx][newy] == EL_EMPTY)
       Feld[newx][newy] = EL_BLOCKED;
@@ -5028,8 +5032,8 @@ inline static void TurnRoundExt(int x, int y)
     boolean can_turn_right =
       CUSTOM_ELEMENT_CAN_ENTER_FIELD(element, right_x,right_y);
 
-#if 1
-    if (getElementMoveStepsize(x, y) == 0)
+#if USE_CAN_MOVE_NOT_MOVING
+    if (element_info[element].move_stepsize == 0)	/* not moving */
       return;
 #endif
 
@@ -5143,8 +5147,8 @@ inline static void TurnRoundExt(int x, int y)
       boolean first_horiz = RND(2);
       int new_move_dir = MovDir[x][y];
 
-#if 1
-      if (getElementMoveStepsize(x, y) == 0)
+#if USE_CAN_MOVE_NOT_MOVING
+      if (element_info[element].move_stepsize == 0)	/* not moving */
       {
 	first_horiz = (ABS(attr_x - x) >= ABS(attr_y - y));
 	MovDir[x][y] &= (first_horiz ? MV_HORIZONTAL : MV_VERTICAL);
@@ -6459,7 +6463,9 @@ void ContinueMoving(int x, int y)
 #endif
 
   Store[x][y] = EL_EMPTY;
-  MovPos[x][y] = MovDir[x][y] = MovDelay[x][y] = 0;
+  MovPos[x][y] = 0;
+  MovDir[x][y] = 0;
+  MovDelay[x][y] = 0;
   MovDelay[newx][newy] = 0;
 
   if (CAN_CHANGE(element))
@@ -6484,7 +6490,10 @@ void ContinueMoving(int x, int y)
 
   Pushed[x][y] = Pushed[newx][newy] = FALSE;
 
+#if 0
+  /* do this after checking for left-behind element */
   ResetGfxAnimation(x, y);	/* reset animation values for old field */
+#endif
 
 #if 1
   /* some elements can leave other elements behind after moving */
@@ -6501,6 +6510,12 @@ void ContinueMoving(int x, int y)
     int move_leave_element = ei->move_leave_element;
 
     Feld[x][y] = move_leave_element;
+
+#if USE_PREVIOUS_MOVE_DIR
+    if (element_info[Feld[x][y]].move_direction_initial == MV_START_PREVIOUS)
+      MovDir[x][y] = direction;
+#endif
+
     InitField(x, y, FALSE);
 
     if (GFX_CRUMBLED(Feld[x][y]))
@@ -6527,6 +6542,11 @@ void ContinueMoving(int x, int y)
 
   ei->can_leave_element_last = ei->can_leave_element;
   ei->can_leave_element = FALSE;
+#endif
+
+#if 1
+  /* do this after checking for left-behind element */
+  ResetGfxAnimation(x, y);	/* reset animation values for old field */
 #endif
 
 #if 0
