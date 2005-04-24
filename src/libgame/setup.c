@@ -150,7 +150,7 @@ static char *getLevelDirFromTreeInfo(TreeInfo *node)
 
   checked_free(level_dir);
 
-  level_dir = getPath2((node->user_defined ? getUserLevelDir(NULL) :
+  level_dir = getPath2((node->in_user_dir ? getUserLevelDir(NULL) :
 			options.level_directory), node->fullpath);
 
   return level_dir;
@@ -936,7 +936,7 @@ void dumpTreeInfo(TreeInfo *node, int depth)
 
 #if 1
     printf("subdir == '%s' ['%s', '%s'] [%d])\n",
-	   node->subdir, node->fullpath, node->basepath, node->user_defined);
+	   node->subdir, node->fullpath, node->basepath, node->in_user_dir);
 #else
     printf("subdir == '%s' (%s) [%s] (%d)\n",
 	   node->subdir, node->name, node->identifier, node->sort_priority);
@@ -1593,8 +1593,9 @@ void checkSetupFileHashIdentifier(SetupFileHash *setup_file_hash,
 #define LEVELINFO_TOKEN_FILENAME	15
 #define LEVELINFO_TOKEN_FILETYPE	16
 #define LEVELINFO_TOKEN_HANDICAP	17
+#define LEVELINFO_TOKEN_SKIP_LEVELS	18
 
-#define NUM_LEVELINFO_TOKENS		18
+#define NUM_LEVELINFO_TOKENS		19
 
 static LevelDirTree ldi;
 
@@ -1618,7 +1619,8 @@ static struct TokenInfo levelinfo_tokens[] =
   { TYPE_STRING,	&ldi.music_set,		"music_set"	},
   { TYPE_STRING,	&ldi.level_filename,	"filename"	},
   { TYPE_STRING,	&ldi.level_filetype,	"filetype"	},
-  { TYPE_BOOLEAN,	&ldi.handicap,		"handicap"	}
+  { TYPE_BOOLEAN,	&ldi.handicap,		"handicap"	},
+  { TYPE_BOOLEAN,	&ldi.skip_levels,	"skip_levels"	}
 };
 
 static void setTreeInfoToDefaults(TreeInfo *ldi, int type)
@@ -1649,6 +1651,7 @@ static void setTreeInfoToDefaults(TreeInfo *ldi, int type)
   ldi->sort_priority = LEVELCLASS_UNDEFINED;	/* default: least priority */
   ldi->latest_engine = FALSE;			/* default: get from level */
   ldi->parent_link = FALSE;
+  ldi->in_user_dir = FALSE;
   ldi->user_defined = FALSE;
   ldi->color = 0;
   ldi->class_desc = NULL;
@@ -1675,6 +1678,7 @@ static void setTreeInfoToDefaults(TreeInfo *ldi, int type)
     ldi->handicap_level = 0;
     ldi->readonly = TRUE;
     ldi->handicap = TRUE;
+    ldi->skip_levels = FALSE;
   }
 }
 
@@ -1713,6 +1717,7 @@ static void setTreeInfoToDefaultsFromParent(TreeInfo *ldi, TreeInfo *parent)
   ldi->sort_priority = parent->sort_priority;
   ldi->latest_engine = parent->latest_engine;
   ldi->parent_link = FALSE;
+  ldi->in_user_dir = parent->in_user_dir;
   ldi->user_defined = parent->user_defined;
   ldi->color = parent->color;
   ldi->class_desc = getStringCopy(parent->class_desc);
@@ -1739,6 +1744,7 @@ static void setTreeInfoToDefaultsFromParent(TreeInfo *ldi, TreeInfo *parent)
     ldi->handicap_level = 0;
     ldi->readonly = TRUE;
     ldi->handicap = TRUE;
+    ldi->skip_levels = FALSE;
   }
 
 #else
@@ -2012,12 +2018,15 @@ static boolean LoadLevelInfoFromLevelConf(TreeInfo **node_first,
     leveldir_new->first_level + leveldir_new->levels - 1;
 
 #if 1
-  leveldir_new->user_defined =
+  leveldir_new->in_user_dir =
     (strcmp(leveldir_new->basepath, options.level_directory) != 0);
 #else
-  leveldir_new->user_defined =
+  leveldir_new->in_user_dir =
     (leveldir_new->basepath == options.level_directory ? FALSE : TRUE);
 #endif
+
+  leveldir_new->user_defined =
+    (leveldir_new->in_user_dir && IS_LEVELCLASS_PRIVATE(leveldir_new));
 
   leveldir_new->color = LEVELCOLOR(leveldir_new);
 #if 1
@@ -2238,10 +2247,10 @@ static boolean LoadArtworkInfoFromArtworkConf(TreeInfo **node_first,
   }
 
 #if 1
-  artwork_new->user_defined =
+  artwork_new->in_user_dir =
     (strcmp(artwork_new->basepath, OPTIONS_ARTWORK_DIRECTORY(type)) != 0);
 #else
-  artwork_new->user_defined =
+  artwork_new->in_user_dir =
     (artwork_new->basepath == OPTIONS_ARTWORK_DIRECTORY(type) ? FALSE : TRUE);
 #endif
 
@@ -2814,7 +2823,7 @@ static void checkSeriesInfo()
 
   /* check for more levels besides the 'levels' field of 'levelinfo.conf' */
 
-  level_directory = getPath2((leveldir_current->user_defined ?
+  level_directory = getPath2((leveldir_current->in_user_dir ?
 			      getUserLevelDir(NULL) :
 			      options.level_directory),
 			     leveldir_current->fullpath);

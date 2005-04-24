@@ -600,6 +600,7 @@ struct SetupInfo
   boolean quick_doors;
   boolean team_mode;
   boolean handicap;
+  boolean skip_levels;
   boolean time_limit;
   boolean fullscreen;
   boolean ask_on_escape;
@@ -661,9 +662,11 @@ struct TreeInfo
 
   boolean level_group;	/* directory contains more level series directories */
   boolean parent_link;	/* entry links back to parent directory */
-  boolean user_defined;	/* user defined levels are stored in home directory */
+  boolean in_user_dir;	/* user defined levels are stored in home directory */
+  boolean user_defined;	/* levels in user directory and marked as "private" */
   boolean readonly;	/* readonly levels can not be changed with editor */
   boolean handicap;	/* level set has no handicap when set to "false" */
+  boolean skip_levels;	/* levels can be skipped when set to "true" */
 
   int color;		/* color to use on selection screen for this level */
   char *class_desc;	/* description of level series class */
@@ -892,6 +895,7 @@ inline void SetAudioMode(boolean);
 inline void InitEventFilter(EventFilter);
 inline boolean PendingEvent(void);
 inline void NextEvent(Event *event);
+inline void PeekEvent(Event *event);
 inline Key GetEventKey(KeyEvent *, boolean);
 inline KeyMod HandleKeyModState(Key, int);
 inline KeyMod GetKeyModState();

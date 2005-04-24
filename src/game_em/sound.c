@@ -97,7 +97,9 @@ int sound_thread(void)
     {
 
       /* pick sounds to play, if any */
-      if (sound_play[SAMPLE_exit] || sound_play[SAMPLE_die])
+      if (sound_play[SAMPLE_exit_open] ||
+	  sound_play[SAMPLE_exit_leave] ||
+	  sound_play[SAMPLE_die])
 	sound_play[SAMPLE_boom] = 0; /* no explosions if player goes home */
 
       mix_count = 0;

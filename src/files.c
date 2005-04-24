@@ -4169,17 +4169,18 @@ void SaveScore(int nr)
 #define SETUP_TOKEN_QUICK_DOORS			10
 #define SETUP_TOKEN_TEAM_MODE			11
 #define SETUP_TOKEN_HANDICAP			12
-#define SETUP_TOKEN_TIME_LIMIT			13
-#define SETUP_TOKEN_FULLSCREEN			14
-#define SETUP_TOKEN_ASK_ON_ESCAPE		15
-#define SETUP_TOKEN_GRAPHICS_SET		16
-#define SETUP_TOKEN_SOUNDS_SET			17
-#define SETUP_TOKEN_MUSIC_SET			18
-#define SETUP_TOKEN_OVERRIDE_LEVEL_GRAPHICS	19
-#define SETUP_TOKEN_OVERRIDE_LEVEL_SOUNDS	20
-#define SETUP_TOKEN_OVERRIDE_LEVEL_MUSIC	21
+#define SETUP_TOKEN_SKIP_LEVELS			13
+#define SETUP_TOKEN_TIME_LIMIT			14
+#define SETUP_TOKEN_FULLSCREEN			15
+#define SETUP_TOKEN_ASK_ON_ESCAPE		16
+#define SETUP_TOKEN_GRAPHICS_SET		17
+#define SETUP_TOKEN_SOUNDS_SET			18
+#define SETUP_TOKEN_MUSIC_SET			19
+#define SETUP_TOKEN_OVERRIDE_LEVEL_GRAPHICS	20
+#define SETUP_TOKEN_OVERRIDE_LEVEL_SOUNDS	21
+#define SETUP_TOKEN_OVERRIDE_LEVEL_MUSIC	22
 
-#define NUM_GLOBAL_SETUP_TOKENS			22
+#define NUM_GLOBAL_SETUP_TOKENS			23
 
 /* editor setup */
 #define SETUP_TOKEN_EDITOR_EL_BOULDERDASH	0
@@ -4259,6 +4260,7 @@ static struct TokenInfo global_setup_tokens[] =
   { TYPE_SWITCH, &si.quick_doors,	"quick_doors"			},
   { TYPE_SWITCH, &si.team_mode,		"team_mode"			},
   { TYPE_SWITCH, &si.handicap,		"handicap"			},
+  { TYPE_SWITCH, &si.skip_levels,	"skip_levels"			},
   { TYPE_SWITCH, &si.time_limit,	"time_limit"			},
   { TYPE_SWITCH, &si.fullscreen,	"fullscreen"			},
   { TYPE_SWITCH, &si.ask_on_escape,	"ask_on_escape"			},
@@ -4360,6 +4362,7 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
   si->quick_doors = FALSE;
   si->team_mode = FALSE;
   si->handicap = TRUE;
+  si->skip_levels = TRUE;
   si->time_limit = TRUE;
   si->fullscreen = FALSE;
   si->ask_on_escape = TRUE;

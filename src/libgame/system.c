@@ -1143,6 +1143,15 @@ inline void NextEvent(Event *event)
 #endif
 }
 
+inline void PeekEvent(Event *event)
+{
+#if defined(TARGET_SDL)
+  SDL_PeepEvents(event, 1, SDL_PEEKEVENT, SDL_ALLEVENTS);
+#else
+  XPeekEvent(display, event);
+#endif
+}
+
 inline Key GetEventKey(KeyEvent *event, boolean with_modifiers)
 {
 #if defined(TARGET_SDL)

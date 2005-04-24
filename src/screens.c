@@ -417,8 +417,26 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
     if (new_level_nr > leveldir_current->last_level)
       new_level_nr = leveldir_current->last_level;
 
+#if 1
+    if (setup.handicap && new_level_nr > leveldir_current->handicap_level + 1)
+      new_level_nr = leveldir_current->handicap_level;
+
+    if (setup.handicap && new_level_nr > leveldir_current->handicap_level &&
+	leveldir_current->handicap_level < leveldir_current->last_level)
+    {
+      if (setup.skip_levels &&
+	  Request("Level still unsolved ! Skip despite handicap ?", REQ_ASK))
+      {
+	leveldir_current->handicap_level++;
+	SaveLevelSetup_SeriesInfo();
+      }
+
+      new_level_nr = leveldir_current->handicap_level;
+    }
+#else
     if (setup.handicap && new_level_nr > leveldir_current->handicap_level)
       new_level_nr = leveldir_current->handicap_level;
+#endif
 
     if (new_level_nr != old_level_nr &&
 	DelayReached(&level_delay, GADGET_FRAME_DELAY))
@@ -1948,6 +1966,7 @@ static struct TokenInfo setup_info_game[] =
 {
   { TYPE_SWITCH,	&setup.team_mode,	"Team-Mode:"		},
   { TYPE_SWITCH,	&setup.handicap,	"Handicap:"		},
+  { TYPE_SWITCH,	&setup.skip_levels,	"Skip Levels:"		},
   { TYPE_SWITCH,	&setup.time_limit,	"Timelimit:"		},
   { TYPE_SWITCH,	&setup.autorecord,	"Auto-Record:"		},
   { TYPE_EMPTY,		NULL,			""			},

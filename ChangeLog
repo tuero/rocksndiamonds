@@ -1,3 +1,7 @@
+2005-04-24
+	* fixed a delay problem with SDL and too many mouse motion events
+	* added setup option "skip levels" and level skipping functionality
+
 2005-03-06
 	* fixed mapping of obsolete element token names in "editorsetup.conf"
 	* fixed bug with sound "acid.splashing" treated as a loop sound
