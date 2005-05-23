@@ -4005,7 +4005,7 @@ void SaveTape(int nr)
   tape.changed = FALSE;
 
   if (new_tape)
-    Request("tape saved !", REQ_CONFIRM);
+    Request("Tape saved !", REQ_CONFIRM);
 }
 
 void DumpTape(struct TapeInfo *tape)

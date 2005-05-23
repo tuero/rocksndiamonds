@@ -1552,6 +1552,7 @@ static void DrawMicroLevelLabelExt(int mode)
   char label_text[MAX_OUTPUT_LINESIZE + 1];
   int max_len_label_text;
   int font_nr = FONT_TEXT_2;
+  int i;
 
   if (mode == MICROLABEL_LEVEL_AUTHOR_HEAD ||
       mode == MICROLABEL_IMPORTED_FROM_HEAD ||
@@ -1560,7 +1561,25 @@ static void DrawMicroLevelLabelExt(int mode)
 
   max_len_label_text = SXSIZE / getFontWidth(font_nr);
 
+#if 1
+
+  for (i = 0; i < max_len_label_text; i++)
+    label_text[i] = ' ';
+  label_text[max_len_label_text] = '\0';
+
+  if (strlen(label_text) > 0)
+  {
+    int lxpos = SX + (SXSIZE - getTextWidth(label_text, font_nr)) / 2;
+    int lypos = MICROLABEL2_YPOS;
+
+    DrawText(lxpos, lypos, label_text, font_nr);
+  }
+
+#else
+
   DrawBackground(SX, MICROLABEL2_YPOS, SXSIZE, getFontHeight(font_nr));
+
+#endif
 
   strncpy(label_text,
 	  (mode == MICROLABEL_LEVEL_NAME ? level.name :
@@ -1680,9 +1699,11 @@ void DrawMicroLevel(int xpos, int ypos, boolean restart)
   {
     int max_label_counter = 23;
 
-    if (leveldir_current->imported_from != NULL)
+    if (leveldir_current->imported_from != NULL &&
+	strlen(leveldir_current->imported_from) > 0)
       max_label_counter += 14;
-    if (leveldir_current->imported_by != NULL)
+    if (leveldir_current->imported_by != NULL &&
+	strlen(leveldir_current->imported_by) > 0)
       max_label_counter += 14;
 
     label_counter = (label_counter + 1) % max_label_counter;

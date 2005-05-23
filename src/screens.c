@@ -379,6 +379,7 @@ static void gotoTopLevelDir()
 
 void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 {
+  static unsigned long level_delay = 0;
   static int choice = 5;
   int x = 0;
   int y = choice;
@@ -404,9 +405,8 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 
   if (y == 1 && ((x == 10 && level_nr > leveldir_current->first_level) ||
 		 (x == 14 && level_nr < leveldir_current->last_level)) &&
-      button)
+      button && DelayReached(&level_delay, GADGET_FRAME_DELAY))
   {
-    static unsigned long level_delay = 0;
     int step = (button == 1 ? 1 : button == 2 ? 5 : 10);
     int old_level_nr = level_nr;
     int new_level_nr;
@@ -418,13 +418,10 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
       new_level_nr = leveldir_current->last_level;
 
 #if 1
-    if (setup.handicap && new_level_nr > leveldir_current->handicap_level + 1)
-      new_level_nr = leveldir_current->handicap_level;
-
-    if (setup.handicap && new_level_nr > leveldir_current->handicap_level &&
-	leveldir_current->handicap_level < leveldir_current->last_level)
+    if (setup.handicap && new_level_nr > leveldir_current->handicap_level)
     {
-      if (setup.skip_levels &&
+      /* skipping levels is only allowed when trying to skip single level */
+      if (setup.skip_levels && step == 1 &&
 	  Request("Level still unsolved ! Skip despite handicap ?", REQ_ASK))
       {
 	leveldir_current->handicap_level++;
@@ -438,8 +435,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
       new_level_nr = leveldir_current->handicap_level;
 #endif
 
-    if (new_level_nr != old_level_nr &&
-	DelayReached(&level_delay, GADGET_FRAME_DELAY))
+    if (new_level_nr != old_level_nr)
     {
       level_nr = new_level_nr;
 

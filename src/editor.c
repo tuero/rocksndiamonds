@@ -8713,7 +8713,7 @@ static void HandleCounterButtons(struct GadgetInfo *gi)
     if ((level_changed && pressed) || (!level_changed && released))
       return;
 
-    if (level_changed && !Request("Level has changed! Discard changes ?",
+    if (level_changed && !Request("Level has changed ! Discard changes ?",
 				  REQ_ASK))
     {
       if (gadget_id == counterbutton_info[counter_id].gadget_id_text)
@@ -9729,7 +9729,7 @@ void RequestExitLevelEditor(boolean ask_if_level_has_changed)
 {
   if (!ask_if_level_has_changed ||
       !LevelChanged() ||
-      Request("Level has changed! Exit without saving ?",
+      Request("Level has changed ! Exit without saving ?",
 	      REQ_ASK | REQ_STAY_OPEN))
   {
 #if 1
