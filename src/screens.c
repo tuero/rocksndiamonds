@@ -97,12 +97,13 @@ static struct GadgetInfo *screen_gadget[NUM_SCREEN_GADGETS];
 static int setup_mode = SETUP_MODE_MAIN;
 static int info_mode = INFO_MODE_MAIN;
 
-#define mSX (SX + (game_status >= GAME_MODE_MAIN &&	\
-		   game_status <= GAME_MODE_SETUP ?	\
-		   menu.draw_xoffset[game_status] : menu.draw_xoffset_default))
-#define mSY (SY + (game_status >= GAME_MODE_MAIN &&	\
-		   game_status <= GAME_MODE_SETUP ?	\
-		   menu.draw_yoffset[game_status] : menu.draw_yoffset_default))
+#define DRAW_OFFSET_MODE(x)	(x >= GAME_MODE_MAIN &&			\
+				 x <= GAME_MODE_SETUP ? x :		\
+				 x == GAME_MODE_PSEUDO_TYPENAME ?	\
+				 GAME_MODE_MAIN : GAME_MODE_DEFAULT)
+
+#define mSX (SX + menu.draw_xoffset[DRAW_OFFSET_MODE(game_status)])
+#define mSY (SY + menu.draw_yoffset[DRAW_OFFSET_MODE(game_status)])
 
 #define NUM_MENU_ENTRIES_ON_SCREEN (menu.list_size[game_status] > 2 ?	\
 				    menu.list_size[game_status] :	\

@@ -4235,8 +4235,8 @@ struct TokenIntPtrInfo image_config_vars[] =
 {
   { "global.num_toons",		&global.num_toons			   },
 
-  { "menu.draw_xoffset",	&menu.draw_xoffset_default		   },
-  { "menu.draw_yoffset",	&menu.draw_yoffset_default		   },
+  { "menu.draw_xoffset",	&menu.draw_xoffset[GFX_SPECIAL_ARG_DEFAULT]},
+  { "menu.draw_yoffset",	&menu.draw_yoffset[GFX_SPECIAL_ARG_DEFAULT]},
   { "menu.draw_xoffset.MAIN",	&menu.draw_xoffset[GFX_SPECIAL_ARG_MAIN]   },
   { "menu.draw_yoffset.MAIN",	&menu.draw_yoffset[GFX_SPECIAL_ARG_MAIN]   },
   { "menu.draw_xoffset.LEVELS",	&menu.draw_xoffset[GFX_SPECIAL_ARG_LEVELS] },
@@ -4252,7 +4252,7 @@ struct TokenIntPtrInfo image_config_vars[] =
 
   { "menu.scrollbar_xoffset",	&menu.scrollbar_xoffset			   },
 
-  { "menu.list_size",		&menu.list_size_default			   },
+  { "menu.list_size",		&menu.list_size[GFX_SPECIAL_ARG_DEFAULT]   },
   { "menu.list_size.LEVELS",	&menu.list_size[GFX_SPECIAL_ARG_LEVELS]	   },
   { "menu.list_size.SCORES",	&menu.list_size[GFX_SPECIAL_ARG_SCORES]	   },
   { "menu.list_size.INFO",	&menu.list_size[GFX_SPECIAL_ARG_INFO]	   },

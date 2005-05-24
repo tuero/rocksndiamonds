@@ -73,10 +73,14 @@ static char *levelclass_desc[NUM_LEVELCLASS_DESC] =
 			   IS_ARTWORKCLASS_PRIVATE(n) ?		3 :	\
 			   9)
 
-#define TOKEN_VALUE_POSITION		40
-#define TOKEN_COMMENT_POSITION		60
+#define TOKEN_VALUE_POSITION_SHORT		32
+#define TOKEN_VALUE_POSITION_DEFAULT		40
+#define TOKEN_COMMENT_POSITION_DEFAULT		60
 
-#define MAX_COOKIE_LEN			256
+#define MAX_COOKIE_LEN				256
+
+static int token_value_position   = TOKEN_VALUE_POSITION_DEFAULT;
+static int token_comment_position = TOKEN_COMMENT_POSITION_DEFAULT;
 
 
 /* ------------------------------------------------------------------------- */
@@ -1205,7 +1209,7 @@ char *getFormattedSetupEntry(char *token, char *value)
 
   /* start with the token and some spaces to format output line */
   sprintf(entry, "%s:", token);
-  for (i = strlen(entry); i < TOKEN_VALUE_POSITION; i++)
+  for (i = strlen(entry); i < token_value_position; i++)
     strcat(entry, " ");
 
   /* continue with the token's value */
@@ -2025,6 +2029,14 @@ static boolean LoadLevelInfoFromLevelConf(TreeInfo **node_first,
     (leveldir_new->basepath == options.level_directory ? FALSE : TRUE);
 #endif
 
+#if 1
+  /* adjust sort priority if user's private level directory was detected */
+  if (leveldir_new->sort_priority == LEVELCLASS_UNDEFINED &&
+      leveldir_new->in_user_dir &&
+      strcmp(leveldir_new->subdir, getLoginName()) == 0)
+    leveldir_new->sort_priority = LEVELCLASS_PRIVATE_START;
+#endif
+
   leveldir_new->user_defined =
     (leveldir_new->in_user_dir && IS_LEVELCLASS_PRIVATE(leveldir_new));
 
@@ -2631,11 +2643,13 @@ static void SaveUserLevelInfo()
   setString(&level_info->author, getRealName());
   level_info->levels = 100;
   level_info->first_level = 1;
+#if 0
   level_info->sort_priority = LEVELCLASS_PRIVATE_START;
   level_info->readonly = FALSE;
   setString(&level_info->graphics_set, GFX_CLASSIC_SUBDIR);
   setString(&level_info->sounds_set,   SND_CLASSIC_SUBDIR);
   setString(&level_info->music_set,    MUS_CLASSIC_SUBDIR);
+#endif
 #else
   ldi.name = getStringCopy(getLoginName());
   ldi.author = getStringCopy(getRealName());
@@ -2648,11 +2662,25 @@ static void SaveUserLevelInfo()
   ldi.music_set = getStringCopy(MUS_CLASSIC_SUBDIR);
 #endif
 
+  token_value_position = TOKEN_VALUE_POSITION_SHORT;
+
   fprintf(file, "%s\n\n", getFormattedSetupEntry(TOKEN_STR_FILE_IDENTIFIER,
 						 getCookie("LEVELINFO")));
 
   ldi = *level_info;
   for (i = 0; i < NUM_LEVELINFO_TOKENS; i++)
+  {
+#if 1
+    if (i == LEVELINFO_TOKEN_NAME ||
+	i == LEVELINFO_TOKEN_AUTHOR ||
+	i == LEVELINFO_TOKEN_LEVELS ||
+	i == LEVELINFO_TOKEN_FIRST_LEVEL)
+      fprintf(file, "%s\n", getSetupLine(levelinfo_tokens, "", i));
+
+    /* just to make things nicer :) */
+    if (i == LEVELINFO_TOKEN_AUTHOR)
+      fprintf(file, "\n");	
+#else
     if (i != LEVELINFO_TOKEN_IDENTIFIER &&
 	i != LEVELINFO_TOKEN_NAME_SORTING &&
 	i != LEVELINFO_TOKEN_IMPORTED_FROM &&
@@ -2660,6 +2688,10 @@ static void SaveUserLevelInfo()
 	i != LEVELINFO_TOKEN_FILENAME &&
 	i != LEVELINFO_TOKEN_FILETYPE)
       fprintf(file, "%s\n", getSetupLine(levelinfo_tokens, "", i));
+#endif
+  }
+
+  token_value_position = TOKEN_VALUE_POSITION_DEFAULT;
 
   fclose(file);
 
@@ -2741,7 +2773,7 @@ char *getSetupLine(struct TokenInfo *token_info, char *prefix, int token_nr)
     {
       /* add at least one whitespace */
       strcat(line, " ");
-      for (i = strlen(line); i < TOKEN_COMMENT_POSITION; i++)
+      for (i = strlen(line); i < token_comment_position; i++)
 	strcat(line, " ");
 
       strcat(line, "# ");

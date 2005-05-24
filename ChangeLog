@@ -1,3 +1,9 @@
+2005-05-24
+	* fixed bug with moving up despite gravity due to "block last field"
+	* fixed small bug with wrong draw offset when typing name in main menu
+	* when reading user names from "passwd", ignore data after first comma
+	* when creating new "levelinfo.conf", only write some selected entries
+
 2005-05-15
 	* added setup option "skip levels" and possibility to skip levels
 

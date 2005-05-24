@@ -2529,6 +2529,7 @@ void InitElementPropertiesStatic()
     EL_PENGUIN,
     EL_PIG,
     EL_DRAGON,
+    EL_PLAYER_IS_LEAVING,	/* needed for gravity + "block last field" */
     -1
   };
 

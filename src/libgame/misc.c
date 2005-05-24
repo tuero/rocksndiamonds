@@ -337,26 +337,24 @@ static char *get_corrected_real_name(char *real_name)
   char *from_ptr = real_name;
   char *to_ptr   = real_name_new;
 
-  if (strchr(real_name, 'ß') == NULL)	/* name does not contain 'ß' */
-  {
-    strncpy(real_name_new, real_name, MAX_USERNAME_LEN);
-    real_name_new[MAX_USERNAME_LEN] = '\0';
-
-    return real_name_new;
-  }
-
-  /* the user's real name may contain a 'ß' character (german sharp s),
-     which has no equivalent in upper case letters (which our fonts use) */
+  /* copy the name string, but not more than MAX_USERNAME_LEN characters */
   while (*from_ptr && (long)(to_ptr - real_name_new) < MAX_USERNAME_LEN - 1)
   {
-    if (*from_ptr != 'ß')
-      *to_ptr++ = *from_ptr++;
-    else
+    /* the name field read from "passwd" file may also contain additional
+       user information, separated by commas, which will be removed here */
+    if (*from_ptr == ',')
+      break;
+
+    /* the user's real name may contain 'ß' characters (german sharp s),
+       which have no equivalent in upper case letters (used by our fonts) */
+    if (*from_ptr == 'ß')
     {
       from_ptr++;
       *to_ptr++ = 's';
       *to_ptr++ = 's';
     }
+    else
+      *to_ptr++ = *from_ptr++;
   }
 
   *to_ptr = '\0';

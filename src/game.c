@@ -9484,6 +9484,9 @@ static boolean canFallDown(struct PlayerInfo *player)
 
   return (IN_LEV_FIELD(jx, jy + 1) &&
 	  (IS_FREE(jx, jy + 1) ||
+#if USE_NEW_BLOCK_STYLE
+	   Feld[jx][jy + 1] == EL_PLAYER_IS_LEAVING ||
+#endif
 	   (Feld[jx][jy + 1] == EL_ACID && player->can_fall_into_acid)) &&
 	  IS_WALKABLE_FROM(Feld[jx][jy], MV_DOWN) &&
 	  !IS_WALKABLE_INSIDE(Feld[jx][jy]));
