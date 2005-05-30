@@ -11993,6 +11993,7 @@ int DigField(struct PlayerInfo *player,
 	  Feld[x][y] = EL_LAMP_ACTIVE;
 	  local_player->lights_still_needed--;
 
+	  ResetGfxAnimation(x, y);
 	  DrawLevelField(x, y);
 	}
 	else if (element == EL_TIME_ORB_FULL)
@@ -12001,6 +12002,7 @@ int DigField(struct PlayerInfo *player,
 	  TimeLeft += 10;
 	  DrawGameValue_Time(TimeLeft);
 
+	  ResetGfxAnimation(x, y);
 	  DrawLevelField(x, y);
 
 #if 0

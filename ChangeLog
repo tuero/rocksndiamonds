@@ -1,11 +1,14 @@
+2005-05-31
+	* uploaded pre-release (test) version 3.2.0-2 binary and source code
+
+2005-05-27
+	* fixed small bug with "linear" animation not working for active lamp
+
 2005-05-24
 	* fixed bug with moving up despite gravity due to "block last field"
 	* fixed small bug with wrong draw offset when typing name in main menu
 	* when reading user names from "passwd", ignore data after first comma
 	* when creating new "levelinfo.conf", only write some selected entries
-
-2005-05-15
-	* added setup option "skip levels" and possibility to skip levels
 
 2005-04-28
 	* fixed displaying "imported from/by" on preview with empty string
@@ -14,6 +17,9 @@
 2005-04-24
 	* fixed a delay problem with SDL and too many mouse motion events
 	* added setup option "skip levels" and level skipping functionality
+
+2005-03-19
+	* added move speed "not moving" for non-moving CEs, but with direction
 
 2005-03-06
 	* fixed mapping of obsolete element token names in "editorsetup.conf"
