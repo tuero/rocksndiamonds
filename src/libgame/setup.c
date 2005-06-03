@@ -780,7 +780,7 @@ static void SaveUserLevelInfo();
 
 void InitUserLevelDirectory(char *level_subdir)
 {
-  if (access(getUserLevelDir(level_subdir), F_OK) != 0)
+  if (!fileExists(getUserLevelDir(level_subdir)))
   {
     createDirectory(getUserDataDir(), "user data", PERMS_PRIVATE);
     createDirectory(getUserLevelDir(NULL), "main user level", PERMS_PRIVATE);
@@ -1114,7 +1114,7 @@ void createDirectory(char *dir, char *text, int permission_class)
   mode_t group_umask = ~(dir_mode & S_IRWXG);
   posix_umask(normal_umask & group_umask);
 
-  if (access(dir, F_OK) != 0)
+  if (!fileExists(dir))
     if (posix_mkdir(dir, dir_mode) != 0)
       Error(ERR_WARN, "cannot create %s directory '%s'", text, dir);
 
@@ -1417,16 +1417,17 @@ static void *loadSetupFileData(char *filename, boolean use_hash)
   boolean read_continued_line = FALSE;
   FILE *file;
 
+  if (!(file = fopen(filename, MODE_READ)))
+  {
+    Error(ERR_WARN, "cannot open configuration file '%s'", filename);
+
+    return NULL;
+  }
+
   if (use_hash)
     setup_file_data = newSetupFileHash();
   else
     insert_ptr = setup_file_data = newSetupFileList("", "");
-
-  if (!(file = fopen(filename, MODE_READ)))
-  {
-    Error(ERR_WARN, "cannot open configuration file '%s'", filename);
-    return NULL;
-  }
 
   while (!feof(file))
   {
@@ -1953,9 +1954,20 @@ static boolean LoadLevelInfoFromLevelConf(TreeInfo **node_first,
 {
   char *directory_path = getPath2(level_directory, directory_name);
   char *filename = getPath2(directory_path, LEVELINFO_FILENAME);
-  SetupFileHash *setup_file_hash = loadSetupFileHash(filename);
+  SetupFileHash *setup_file_hash;
   LevelDirTree *leveldir_new = NULL;
   int i;
+
+  /* unless debugging, silently ignore directories without "levelinfo.conf" */
+  if (!options.debug && !fileExists(filename))
+  {
+    free(directory_path);
+    free(filename);
+
+    return FALSE;
+  }
+
+  setup_file_hash = loadSetupFileHash(filename);
 
   if (setup_file_hash == NULL)
   {
@@ -2166,7 +2178,7 @@ static boolean LoadArtworkInfoFromArtworkConf(TreeInfo **node_first,
   TreeInfo *artwork_new = NULL;
   int i;
 
-  if (access(filename, F_OK) == 0)		/* file exists */
+  if (fileExists(filename))
     setup_file_hash = loadSetupFileHash(filename);
 
   if (setup_file_hash == NULL)	/* no config file -- look for artwork files */

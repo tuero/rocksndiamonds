@@ -38,6 +38,9 @@
 #define USE_NEW_RANDOMIZE	(TRUE	* USE_NEW_STUFF		* 1)
 
 #define USE_PUSH_BUGFIX		(TRUE	* USE_NEW_STUFF		* 1)
+#define USE_BLOCK_DELAY_BUGFIX	(TRUE	* USE_NEW_STUFF		* 1)
+#define USE_GRAVITY_BUGFIX	(TRUE	* USE_NEW_STUFF		* 0)
+#define USE_GRAVITY_BUGFIX_2	(TRUE	* USE_NEW_STUFF		* 1)
 
 #define USE_CAN_MOVE_NOT_MOVING	(TRUE	* USE_NEW_STUFF		* 1)
 #define USE_PREVIOUS_MOVE_DIR	(TRUE	* USE_NEW_STUFF		* 1)
@@ -9485,7 +9488,9 @@ static boolean canFallDown(struct PlayerInfo *player)
   return (IN_LEV_FIELD(jx, jy + 1) &&
 	  (IS_FREE(jx, jy + 1) ||
 #if USE_NEW_BLOCK_STYLE
+#if USE_GRAVITY_BUGFIX
 	   Feld[jx][jy + 1] == EL_PLAYER_IS_LEAVING ||
+#endif
 #endif
 	   (Feld[jx][jy + 1] == EL_ACID && player->can_fall_into_acid)) &&
 	  IS_WALKABLE_FROM(Feld[jx][jy], MV_DOWN) &&
@@ -10154,8 +10159,24 @@ void ScrollPlayer(struct PlayerInfo *player, int mode)
     if (player->block_delay > 0 &&
 	Feld[last_jx][last_jy] == EL_EMPTY)
     {
+      int last_field_block_delay = player->block_delay;
+
+#if USE_BLOCK_DELAY_BUGFIX
+      /* when blocking enabled, correct block delay for fast movement */
+      if (player->block_delay > 1 &&
+	  player->move_delay_value < MOVE_DELAY_NORMAL_SPEED)
+	last_field_block_delay = player->move_delay_value;
+#endif
+
+#if USE_GRAVITY_BUGFIX_2
+      /* when blocking enabled, correct block delay for gravity movement */
+      if (player->block_delay > 1 &&
+	  game.gravity && player->MovDir == MV_UP)
+	last_field_block_delay = player->move_delay_value - 1;
+#endif
+
       Feld[last_jx][last_jy] = EL_PLAYER_IS_LEAVING;
-      MovDelay[last_jx][last_jy] = player->block_delay + 1;
+      MovDelay[last_jx][last_jy] = last_field_block_delay + 1;
     }
 #else
 #if USE_NEW_MOVE_STYLE

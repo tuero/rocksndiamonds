@@ -3959,7 +3959,7 @@ void SaveTape(int nr)
   InitTapeDirectory(leveldir_current->subdir);
 
   /* if a tape still exists, ask to overwrite it */
-  if (access(filename, F_OK) == 0)
+  if (fileExists(filename))
   {
     new_tape = FALSE;
     if (!Request("Replace old tape ?", REQ_ASK))

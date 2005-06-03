@@ -2529,7 +2529,9 @@ void InitElementPropertiesStatic()
     EL_PENGUIN,
     EL_PIG,
     EL_DRAGON,
+#if 0	/* USE_GRAVITY_BUGFIX */
     EL_PLAYER_IS_LEAVING,	/* needed for gravity + "block last field" */
+#endif
     -1
   };
 
@@ -4172,7 +4174,7 @@ void Execute_Command(char *command)
   {
     char *filename = &command[11];
 
-    if (access(filename, F_OK) != 0)
+    if (!fileExists(filename))
       Error(ERR_EXIT, "cannot open file '%s'", filename);
 
     LoadLevelFromFilename(&level, filename);
@@ -4184,7 +4186,7 @@ void Execute_Command(char *command)
   {
     char *filename = &command[10];
 
-    if (access(filename, F_OK) != 0)
+    if (!fileExists(filename))
       Error(ERR_EXIT, "cannot open file '%s'", filename);
 
     LoadTapeFromFilename(filename);
