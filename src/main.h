@@ -1492,7 +1492,7 @@ struct PlayerInfo
   boolean use_murphy_graphic;
 
   boolean block_last_field;
-  int block_delay;
+  int block_delay_adjustment;	/* needed for different engine versions */
 
   boolean can_fall_into_acid;
 
@@ -1651,8 +1651,11 @@ struct LevelInfo
 
   boolean block_last_field;	/* player blocks previous field while moving */
   boolean sp_block_last_field;	/* player blocks previous field while moving */
+
+#if 0	/* !!! THIS IS NOT A LEVEL SETTING => LOGIC MOVED TO "game.c" !!! */
   int block_delay;		/* delay for blocking previous field */
   int sp_block_delay;		/* delay for blocking previous field */
+#endif
 
   /* ('int' instead of 'boolean' because used as selectbox value in editor) */
   int use_step_counter;		/* count steps instead of seconds for level */
@@ -1717,7 +1720,8 @@ struct GameInfo
 
   /* flags to handle bugs in and changes between different engine versions */
   /* (for the latest engine version, these flags should always be "FALSE") */
-  boolean use_bug_change_when_pushing;
+  boolean use_change_when_pushing_bug;
+  boolean use_block_last_field_bug;
 
   /* variable within running game */
   int yamyam_content_nr;

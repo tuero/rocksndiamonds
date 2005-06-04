@@ -171,8 +171,11 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
 
   level->block_last_field = FALSE;	/* EM does not block by default */
   level->sp_block_last_field = TRUE;	/* SP blocks the last field */
+
+#if 0	/* !!! THIS IS NOT A LEVEL SETTING => LOGIC MOVED TO "game.c" !!! */
   level->block_delay = 8;		/* when blocking, block 8 frames */
   level->sp_block_delay = 9;		/* SP indeed blocks 9 frames, not 8 */
+#endif
 
   level->can_move_into_acid_bits = ~0;	/* everything can move into acid */
   level->dont_collide_with_bits = ~0;	/* always deadly when colliding */
@@ -2589,9 +2592,12 @@ static void LoadLevel_InitVersion(struct LevelInfo *level, char *filename)
       level->use_spring_bug = TRUE;
 
     /* only few elements were able to actively move into acid before 3.1.0 */
+    /* trigger settings did not exist before 3.1.0; set to default "any" */
     if (level->game_version < VERSION_IDENT(3,1,0,0))
     {
       int i, j;
+
+      /* correct "can move into acid" settings (all zero in old levels) */
 
       level->can_move_into_acid_bits = 0; /* nothing can move into acid */
       level->dont_collide_with_bits = 0; /* nothing is deadly when colliding */
@@ -2603,6 +2609,8 @@ static void LoadLevel_InitVersion(struct LevelInfo *level, char *filename)
 
       for (i = 0; i < NUM_CUSTOM_ELEMENTS; i++)
 	SET_PROPERTY(EL_CUSTOM_START + i, EP_CAN_MOVE_INTO_ACID, TRUE);
+
+      /* correct trigger settings (stored as zero == "none" in old levels) */
 
       for (i = 0; i < NUM_CUSTOM_ELEMENTS; i++)
       {
@@ -2619,6 +2627,7 @@ static void LoadLevel_InitVersion(struct LevelInfo *level, char *filename)
       }
     }
 
+#if 0	/* !!! MOVED TO "game.c", BECAUSE CAN CHANGE INSIDE LEVEL EDITOR !!! */
 #if 1	/* USE_NEW_BLOCK_STYLE */
     /* blocking the last field when moving was corrected in version 3.1.1 */
     if (level->game_version < VERSION_IDENT(3,1,1,0))
@@ -2635,6 +2644,8 @@ static void LoadLevel_InitVersion(struct LevelInfo *level, char *filename)
       level->sp_block_last_field = TRUE;
     }
 #endif
+#endif
+
   }
   else		/* always use the latest game engine version */
   {

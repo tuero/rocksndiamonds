@@ -37,13 +37,15 @@
 #define USE_NEW_SP_SLIPPERY	(TRUE	* USE_NEW_STUFF		* 1)
 #define USE_NEW_RANDOMIZE	(TRUE	* USE_NEW_STUFF		* 1)
 
-#define USE_PUSH_BUGFIX		(TRUE	* USE_NEW_STUFF		* 1)
-#define USE_BLOCK_DELAY_BUGFIX	(TRUE	* USE_NEW_STUFF		* 1)
-#define USE_GRAVITY_BUGFIX	(TRUE	* USE_NEW_STUFF		* 0)
-#define USE_GRAVITY_BUGFIX_2	(TRUE	* USE_NEW_STUFF		* 1)
-
 #define USE_CAN_MOVE_NOT_MOVING	(TRUE	* USE_NEW_STUFF		* 1)
 #define USE_PREVIOUS_MOVE_DIR	(TRUE	* USE_NEW_STUFF		* 1)
+
+#define USE_PUSH_BUGFIX		(TRUE	* USE_NEW_STUFF		* 1)
+#if 0
+#define USE_BLOCK_DELAY_BUGFIX	(TRUE	* USE_NEW_STUFF		* 1)
+#endif
+#define USE_GRAVITY_BUGFIX_NEW	(TRUE	* USE_NEW_STUFF		* 1)
+#define USE_GRAVITY_BUGFIX_OLD	(TRUE	* USE_NEW_STUFF		* 0)
 
 
 /* for DigField() */
@@ -784,6 +786,45 @@ static void InitPlayerField(int x, int y, int element, boolean init_game)
 
 #if USE_NEW_BLOCK_STYLE
 #if 1
+
+    /* ---------- initialize player's last field block delay --------------- */
+
+    /* always start with reliable default value (no adjustment needed) */
+    player->block_delay_adjustment = 0;
+
+    /* special case 1: in Supaplex, Murphy blocks last field one more frame */
+    if (player->block_last_field && element == EL_SP_MURPHY)
+      player->block_delay_adjustment = 1;
+
+    /* special case 2: in game engines before 3.1.1, blocking was different */
+    if (game.use_block_last_field_bug)
+      player->block_delay_adjustment = (player->block_last_field ? -1 : 1);
+
+#if 0
+    /* blocking the last field when moving was corrected in version 3.1.1 */
+    if (game.use_block_last_field_bug)
+    {
+      /* even "not blocking" was blocking the last field for one frame */
+      level.block_delay    = (level.block_last_field    ? 7 : 1);
+      level.sp_block_delay = (level.sp_block_last_field ? 7 : 1);
+
+      level.block_last_field = TRUE;
+      level.sp_block_last_field = TRUE;
+    }
+#endif
+
+#if 0	/* !!! THIS IS NOT A LEVEL SETTING => REMOVED !!! */
+    level.block_delay = 8;		/* when blocking, block 8 frames */
+    level.sp_block_delay = 9;		/* SP indeed blocks 9 frames, not 8 */
+#endif
+
+#if 0
+    printf("::: %d, %d\n", level.block_delay, level.sp_block_delay);
+#endif
+
+#else
+
+#if 1
     player->block_delay = (player->block_last_field ?
 			   (element == EL_SP_MURPHY ?
 			    level.sp_block_delay :
@@ -792,6 +833,8 @@ static void InitPlayerField(int x, int y, int element, boolean init_game)
     player->block_delay = (element == EL_SP_MURPHY ?
 			   (player->block_last_field ? 7 : 1) :
 			   (player->block_last_field ? 7 : 1));
+#endif
+
 #endif
 
 #if 0
@@ -1235,7 +1278,13 @@ static void InitGameEngine()
   /* ---------------------------------------------------------------------- */
 
   /*
-    Type of bug/change:
+    Summary of bugfix/change:
+    Fixed handling for custom elements that change when pushed by the player.
+
+    Fixed/changed in version:
+    3.1.0
+
+    Description:
     Before 3.1.0, custom elements that "change when pushing" changed directly
     after the player started pushing them (until then handled in "DigField()").
     Since 3.1.0, these custom elements are not changed until the "pushing"
@@ -1256,11 +1305,39 @@ static void InitGameEngine()
     Machine" by Juergen Bonhagen.
   */
 
-  game.use_bug_change_when_pushing =
+  game.use_change_when_pushing_bug =
     (game.engine_version < VERSION_IDENT(3,1,0,0) &&
      !(tape.playing &&
        tape.game_version >= VERSION_IDENT(3,1,0,0) &&
        tape.game_version <  VERSION_IDENT(3,1,1,0)));
+
+  /*
+    Summary of bugfix/change:
+    Fixed handling for blocking the field the player leaves when moving.
+
+    Fixed/changed in version:
+    3.1.1
+
+    Description:
+    Before 3.1.1, when "block last field when moving" was enabled, the field
+    the player is leaving when moving was blocked for the time of the move,
+    and was directly unblocked afterwards. This resulted in the last field
+    being blocked for exactly one less than the number of frames of one player
+    move. Additionally, even when blocking was disabled, the last field was
+    blocked for exactly one frame.
+    Since 3.1.1, due to changes in player movement handling, the last field
+    is not blocked at all when blocking is disabled. When blocking is enabled,
+    the last field is blocked for exactly the number of frames of one player
+    move. Additionally, if the player is Murphy, the hero of Supaplex, the
+    last field is blocked for exactly one more than the number of frames of
+    one player move.
+
+    Affected levels/tapes:
+    (!!! yet to be determined -- probably many !!!)
+  */
+
+  game.use_block_last_field_bug =
+    (game.engine_version < VERSION_IDENT(3,1,1,0));
 
   /* ---------------------------------------------------------------------- */
 
@@ -1613,7 +1690,7 @@ void InitGame()
     player->use_murphy_graphic = FALSE;
 
     player->block_last_field = FALSE;	/* initialized in InitPlayerField() */
-    player->block_delay = -1;		/* initialized in InitPlayerField() */
+    player->block_delay_adjustment = 0;	/* initialized in InitPlayerField() */
 
     player->can_fall_into_acid = CAN_MOVE_INTO_ACID(player->element_nr);
 
@@ -1881,8 +1958,8 @@ void InitGame()
 #endif
 
 #if USE_NEW_BLOCK_STYLE
-	  player->block_last_field = some_player->block_last_field;
-	  player->block_delay = some_player->block_delay;
+	  player->block_last_field       = some_player->block_last_field;
+	  player->block_delay_adjustment = some_player->block_delay_adjustment;
 #endif
 
 	  StorePlayer[jx][jy] = player->element_nr;
@@ -6661,7 +6738,7 @@ void ContinueMoving(int x, int y)
 
 #if USE_PUSH_BUGFIX
 #if 1
-  if (pushed_by_player && !game.use_bug_change_when_pushing)
+  if (pushed_by_player && !game.use_change_when_pushing_bug)
 #else
   if (pushed_by_player && game.engine_version >= VERSION_IDENT(3,1,0,0))
 #endif
@@ -9488,7 +9565,7 @@ static boolean canFallDown(struct PlayerInfo *player)
   return (IN_LEV_FIELD(jx, jy + 1) &&
 	  (IS_FREE(jx, jy + 1) ||
 #if USE_NEW_BLOCK_STYLE
-#if USE_GRAVITY_BUGFIX
+#if USE_GRAVITY_BUGFIX_OLD
 	   Feld[jx][jy + 1] == EL_PLAYER_IS_LEAVING ||
 #endif
 #endif
@@ -10156,23 +10233,44 @@ void ScrollPlayer(struct PlayerInfo *player, int mode)
       printf("::: ALERT! block_delay == %d\n", player->block_delay);
 #endif
 
-    if (player->block_delay > 0 &&
+    if ((player->block_last_field || player->block_delay_adjustment > 0) &&
 	Feld[last_jx][last_jy] == EL_EMPTY)
     {
-      int last_field_block_delay = player->block_delay;
+      int last_field_block_delay = 0;	/* start with no blocking at all */
+      int block_delay_adjustment = player->block_delay_adjustment;
 
+      /* if player blocks last field, add delay for exactly one move */
+      if (player->block_last_field)
+      {
+	last_field_block_delay += player->move_delay_value;
+
+#if USE_GRAVITY_BUGFIX_NEW
+	/* when blocking enabled, prevent moving up despite gravity */
+	if (game.gravity && player->MovDir == MV_UP)
+	  block_delay_adjustment = -1;
+#endif
+      }
+
+      /* add block delay adjustment (also possible when not blocking) */
+      last_field_block_delay += block_delay_adjustment;
+
+#if 0
 #if USE_BLOCK_DELAY_BUGFIX
       /* when blocking enabled, correct block delay for fast movement */
-      if (player->block_delay > 1 &&
+      if (player->block_last_field &&
 	  player->move_delay_value < MOVE_DELAY_NORMAL_SPEED)
-	last_field_block_delay = player->move_delay_value;
+	last_field_block_delay =
+	  player->move_delay_value + player->block_delay_adjustment;
+#endif
 #endif
 
-#if USE_GRAVITY_BUGFIX_2
+#if 0
+#if USE_GRAVITY_BUGFIX_NEW
       /* when blocking enabled, correct block delay for gravity movement */
-      if (player->block_delay > 1 &&
+      if (player->block_last_field &&
 	  game.gravity && player->MovDir == MV_UP)
 	last_field_block_delay = player->move_delay_value - 1;
+#endif
 #endif
 
       Feld[last_jx][last_jy] = EL_PLAYER_IS_LEAVING;
@@ -11898,7 +11996,7 @@ int DigField(struct PlayerInfo *player,
 #if USE_PUSH_BUGFIX
 	/* now: check for element change _after_ element has been pushed! */
 #if 1
-	if (game.use_bug_change_when_pushing)
+	if (game.use_change_when_pushing_bug)
 #else
 	if (game.engine_version < VERSION_IDENT(3,1,0,0))
 #endif
