@@ -553,7 +553,8 @@
 #define MAX_LEVEL_NAME_LEN	32
 #define MAX_LEVEL_AUTHOR_LEN	32
 #define MAX_ELEMENT_NAME_LEN	32
-#define MAX_TAPELEN		(1000 * FRAMES_PER_SECOND) /* max.time x fps */
+#define MAX_TAPE_LEN		(1000 * FRAMES_PER_SECOND) /* max.time x fps */
+#define MAX_TAPES_PER_SET	1024
 #define MAX_SCORE_ENTRIES	100
 #define MAX_NUM_AMOEBA		100
 #define MAX_INVENTORY_SIZE	1000
@@ -1700,7 +1701,7 @@ struct TapeInfo
   {
     byte action[MAX_PLAYERS];
     byte delay;
-  } pos[MAX_TAPELEN];
+  } pos[MAX_TAPE_LEN];
 
   boolean no_valid_file;	/* set when tape file missing or invalid */
 };
@@ -1747,7 +1748,8 @@ struct GameInfo
 struct GlobalInfo
 {
   char *autoplay_leveldir;
-  int autoplay_level_nr;
+  int autoplay_level[MAX_TAPES_PER_SET];
+  boolean autoplay_all;
 
   char *convert_leveldir;
   int convert_level_nr;

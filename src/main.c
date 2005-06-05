@@ -4360,7 +4360,7 @@ static void print_usage()
 	 "  \"print helptext.conf\"            print default helptext config\n"
 	 "  \"dump level FILE\"                dump level data from FILE\n"
 	 "  \"dump tape FILE\"                 dump tape data from FILE\n"
-	 "  \"autoplay LEVELDIR [NR]\"         play level tapes for LEVELDIR\n"
+	 "  \"autoplay LEVELDIR [NR ...]\"     play level tapes for LEVELDIR\n"
 	 "  \"convert LEVELDIR [NR]\"          convert levels in LEVELDIR\n"
 	 "\n",
 	 program.command_basename);

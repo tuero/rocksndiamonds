@@ -802,7 +802,7 @@ void TapeRecordAction(byte action[MAX_PLAYERS])
     return;
 #endif
 
-  if (tape.counter >= MAX_TAPELEN - 1)
+  if (tape.counter >= MAX_TAPE_LEN - 1)
   {
     TapeStopRecording();
     return;
@@ -1215,8 +1215,6 @@ void InsertSolutionTape()
  * tape autoplay functions
  * ------------------------------------------------------------------------- */
 
-#define MAX_NUM_AUTOPLAY_LEVELS		1000
-
 void AutoPlayTape()
 {
   static LevelDirTree *autoplay_leveldir = NULL;
@@ -1224,7 +1222,9 @@ void AutoPlayTape()
   static int autoplay_level_nr = -1;
   static int num_levels_played = 0;
   static int num_levels_solved = 0;
-  static boolean levels_failed[MAX_NUM_AUTOPLAY_LEVELS];
+  static int num_tape_missing = 0;
+  static boolean level_failed[MAX_TAPES_PER_SET];
+  static boolean tape_missing[MAX_TAPES_PER_SET];
   int i;
 
   if (autoplay_initialized)
@@ -1233,10 +1233,11 @@ void AutoPlayTape()
     printf("%s.\n", tape.auto_play_level_solved ? "solved" : "NOT SOLVED");
 
     num_levels_played++;
+
     if (tape.auto_play_level_solved)
       num_levels_solved++;
-    else if (level_nr >= 0 && level_nr < MAX_NUM_AUTOPLAY_LEVELS)
-      levels_failed[level_nr] = TRUE;
+    else if (level_nr >= 0 && level_nr < MAX_TAPES_PER_SET)
+      level_failed[level_nr] = TRUE;
   }
   else
   {
@@ -1252,11 +1253,10 @@ void AutoPlayTape()
 
     leveldir_current = autoplay_leveldir;
 
-    if (global.autoplay_level_nr != -1)
-    {
-      autoplay_leveldir->first_level = global.autoplay_level_nr;
-      autoplay_leveldir->last_level  = global.autoplay_level_nr;
-    }
+    if (autoplay_leveldir->first_level < 0)
+      autoplay_leveldir->first_level = 0;
+    if (autoplay_leveldir->last_level >= MAX_TAPES_PER_SET)
+      autoplay_leveldir->last_level = MAX_TAPES_PER_SET - 1;
 
     autoplay_level_nr = autoplay_leveldir->first_level;
 
@@ -1270,8 +1270,11 @@ void AutoPlayTape()
     printf_line("=", 79);
     printf("\n");
 
-    for (i = 0; i < MAX_NUM_AUTOPLAY_LEVELS; i++)
-      levels_failed[i] = FALSE;
+    for (i = 0; i < MAX_TAPES_PER_SET; i++)
+    {
+      level_failed[i] = FALSE;
+      tape_missing[i] = FALSE;
+    }
 
     autoplay_initialized = TRUE;
   }
@@ -1279,6 +1282,9 @@ void AutoPlayTape()
   while (autoplay_level_nr <= autoplay_leveldir->last_level)
   {
     level_nr = autoplay_level_nr++;
+
+    if (!global.autoplay_all && !global.autoplay_level[level_nr])
+      continue;
 
     TapeErase();
 
@@ -1298,6 +1304,10 @@ void AutoPlayTape()
     if (TAPE_IS_EMPTY(tape))
 #endif
     {
+      num_tape_missing++;
+      if (level_nr >= 0 && level_nr < MAX_TAPES_PER_SET)
+	tape_missing[level_nr] = TRUE;
+
       printf("(no tape)\n");
       continue;
     }
@@ -1324,8 +1334,16 @@ void AutoPlayTape()
   if (num_levels_played != num_levels_solved)
   {
     printf(", FAILED:");
-    for (i = 0; i < MAX_NUM_AUTOPLAY_LEVELS; i++)
-      if (levels_failed[i])
+    for (i = 0; i < MAX_TAPES_PER_SET; i++)
+      if (level_failed[i])
+	printf(" %03d", i);
+  }
+
+  if (num_tape_missing > 0)
+  {
+    printf(", NO TAPE:");
+    for (i = 0; i < MAX_TAPES_PER_SET; i++)
+      if (tape_missing[i])
 	printf(" %03d", i);
   }
 

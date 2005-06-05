@@ -1,3 +1,9 @@
+2005-06-06
+	* fixed bug with exploding bomb using R'n'D graphics in EM engine
+
+2005-06-05
+	* enhanced tape autoplay to accept "autoplay <set> [<nr> ...]" format
+
 2005-05-31
 	* uploaded pre-release (test) version 3.2.0-2 binary and source code
 

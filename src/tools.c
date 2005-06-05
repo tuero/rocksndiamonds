@@ -3855,7 +3855,7 @@ em_object_mapping_list[] =
   },
   {
     Ybomb_eat,				FALSE,	FALSE,
-    EL_BOMB,				ACTION_SMASHED_BY_ROCK, -1
+    EL_BOMB,				ACTION_ACTIVATING, -1
   },
   {
     Xballoon,				TRUE,	FALSE,

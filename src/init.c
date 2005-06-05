@@ -2529,9 +2529,11 @@ void InitElementPropertiesStatic()
     EL_PENGUIN,
     EL_PIG,
     EL_DRAGON,
-#if 0	/* USE_GRAVITY_BUGFIX */
+
+#if 0	/* USE_GRAVITY_BUGFIX_OLD */
     EL_PLAYER_IS_LEAVING,	/* needed for gravity + "block last field" */
 #endif
+
     -1
   };
 
@@ -4196,17 +4198,57 @@ void Execute_Command(char *command)
   }
   else if (strncmp(command, "autoplay ", 9) == 0)
   {
-    char *str_copy = getStringCopy(&command[9]);
-    char *str_ptr = strchr(str_copy, ' ');
+    char *str_ptr = getStringCopy(&command[9]);	/* read command parameters */
 
-    global.autoplay_leveldir = str_copy;
-    global.autoplay_level_nr = -1;
-
-    if (str_ptr != NULL)
+    while (*str_ptr != '\0')			/* continue parsing string */
     {
-      *str_ptr++ = '\0';			/* terminate leveldir string */
-      global.autoplay_level_nr = atoi(str_ptr);	/* get level_nr value */
+      /* cut leading whitespace from string, replace it by string terminator */
+      while (*str_ptr == ' ' || *str_ptr == '\t')
+	*str_ptr++ = '\0';
+
+      if (*str_ptr == '\0')			/* end of string reached */
+	break;
+
+      if (global.autoplay_leveldir == NULL)	/* read level set string */
+      {
+	global.autoplay_leveldir = str_ptr;
+	global.autoplay_all = TRUE;		/* default: play all tapes */
+
+	for (i = 0; i < MAX_TAPES_PER_SET; i++)
+	  global.autoplay_level[i] = FALSE;
+      }
+      else					/* read level number string */
+      {
+	int level_nr = atoi(str_ptr);		/* get level_nr value */
+
+	if (level_nr >= 0 && level_nr < MAX_TAPES_PER_SET)
+	  global.autoplay_level[level_nr] = TRUE;
+
+	global.autoplay_all = FALSE;
+      }
+
+      /* advance string pointer to the next whitespace (or end of string) */
+      while (*str_ptr != ' ' && *str_ptr != '\t' && *str_ptr != '\0')
+	str_ptr++;
     }
+
+#if 0
+    printf("level set == '%s'\n", global.autoplay_leveldir);
+
+    if (global.autoplay_all)
+      printf("play all levels\n");
+    else
+    {
+      printf("play the following levels:");
+
+      for (i = 0; i < MAX_TAPES_PER_SET; i++)
+	if (global.autoplay_level[i])
+	  printf(" %03d", i);
+
+      printf("\n");
+    }
+#endif
+
   }
   else if (strncmp(command, "convert ", 8) == 0)
   {
@@ -4216,7 +4258,7 @@ void Execute_Command(char *command)
     global.convert_leveldir = str_copy;
     global.convert_level_nr = -1;
 
-    if (str_ptr != NULL)
+    if (str_ptr != NULL)			/* level number follows */
     {
       *str_ptr++ = '\0';			/* terminate leveldir string */
       global.convert_level_nr = atoi(str_ptr);	/* get level_nr value */

@@ -20,10 +20,6 @@
 #define MAX_ELEM_X		4
 #define MAX_ELEM_Y		10
 
-extern int element_shift;
-extern int editor_element[];
-extern int elements_in_list;
-
 void CreateLevelEditorGadgets();
 void FreeLevelEditorGadgets();
 void UnmapLevelEditorGadgets();

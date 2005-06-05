@@ -3681,7 +3681,7 @@ static int LoadTape_BODY(FILE *file, int chunk_size, struct TapeInfo *tape)
 
   for (i = 0; i < tape->length; i++)
   {
-    if (i >= MAX_TAPELEN)
+    if (i >= MAX_TAPE_LEN)
       break;
 
     for (j = 0; j < MAX_PLAYERS; j++)
@@ -4049,7 +4049,7 @@ void DumpTape(struct TapeInfo *tape)
 
   for (i = 0; i < tape->length; i++)
   {
-    if (i >= MAX_TAPELEN)
+    if (i >= MAX_TAPE_LEN)
       break;
 
     printf("%03d: ", i);
