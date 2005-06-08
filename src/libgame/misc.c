@@ -2472,6 +2472,12 @@ static void replaceArtworkListEntry(struct ArtworkListInfo *artwork_info,
   char *basename = file_list_entry->filename;
   char *filename = getCustomArtworkFilename(basename, artwork_info->type);
 
+#if 0
+  if (strcmp(file_list_entry->token, "background.DOOR") == 0)
+    printf("::: replaceArtworkListEntry: '%s' => '%s'\n",
+	   basename, filename);
+#endif
+
   if (filename == NULL)
   {
     Error(ERR_WARN, "cannot find artwork file '%s'", basename);
@@ -2531,6 +2537,11 @@ static void replaceArtworkListEntry(struct ArtworkListInfo *artwork_info,
 
       return;
   }
+
+#if 0
+  if (strcmp(file_list_entry->token, "background.DOOR") == 0)
+    printf("::: replaceArtworkListEntry: LOAD IT'\n");
+#endif
 
 #if 0
   printf("::: %s: '%s'\n", init_text[artwork_info->type], basename);
@@ -2669,6 +2680,12 @@ static void LoadCustomArtwork(struct ArtworkListInfo *artwork_info,
   printf("GOT CUSTOM ARTWORK FILE '%s'\n", filename);
 #endif
 
+#if 0
+  if (strcmp(file_list_entry->token, "background.DOOR") == 0)
+    printf("::: -> '%s' -> '%s'\n",
+	   file_list_entry->token, file_list_entry->filename);
+#endif
+
   if (strcmp(file_list_entry->filename, UNDEFINED_FILENAME) == 0)
   {
     deleteArtworkListEntry(artwork_info, listnode);
@@ -2711,7 +2728,7 @@ static void LoadArtworkToList(struct ArtworkListInfo *artwork_info,
 
 #if 0
   printf("loading artwork '%s' ...  [%d]\n",
-	 basename, getNumNodes(artwork_info->content_list));
+	 file_list_entry->filename, getNumNodes(artwork_info->content_list));
 #endif
 
 #if 1
@@ -2775,7 +2792,7 @@ void ReloadCustomArtworkList(struct ArtworkListInfo *artwork_info)
   for (i = 0; i < num_file_list_entries; i++)
   {
 #if 0
-    if (strcmp(file_list[i].token, "background") == 0)
+    if (strcmp(file_list[i].token, "background.DOOR") == 0)
       printf("::: '%s' -> '%s'\n", file_list[i].token, file_list[i].filename);
 #endif
 
@@ -2785,6 +2802,19 @@ void ReloadCustomArtworkList(struct ArtworkListInfo *artwork_info)
 #else
     LoadArtworkToList(artwork_info, &artwork_info->artwork_list[i],
 		      file_list[i].filename, i);
+#endif
+
+#if 0
+    if (strcmp(file_list[i].token, "background.DOOR") == 0)
+    {
+      Bitmap *bitmap = getBitmapFromImageID(i);
+
+      printf("::: BITMAP: %08lx\n", bitmap);
+
+#if 0
+      BlitBitmap(bitmap, window, 0, 0, 100, 280, 0, 0);
+#endif
+    }
 #endif
 
 #if 0

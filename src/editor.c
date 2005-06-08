@@ -1256,6 +1256,7 @@ static struct ValueTextInfo options_access_protected[] =
 
 static struct ValueTextInfo options_access_direction[] =
 {
+  { MV_NO_DIRECTIONS,		"no direction"			},
   { MV_LEFT,			"left"				},
   { MV_RIGHT,			"right"				},
   { MV_UP,			"up"				},

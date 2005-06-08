@@ -213,6 +213,8 @@ static void DrawBitmapFromTile(Bitmap *bitmap, Bitmap *tile,
 
 void SetBackgroundBitmap(Bitmap *background_bitmap_tile, int mask)
 {
+  /* !!! THIS DOES NOT WORK !!! REPLACED BITMAPS MAY HAVE SAME ADDRESS !!! */
+#if 0
   static Bitmap *main_bitmap_tile = NULL;
   static Bitmap *door_bitmap_tile = NULL;
 
@@ -226,14 +228,15 @@ void SetBackgroundBitmap(Bitmap *background_bitmap_tile, int mask)
   else if (mask == REDRAW_DOOR_1)
   {
     if (background_bitmap_tile == door_bitmap_tile)
-      return;	/* main background tile has not changed */
+      return;		/* main background tile has not changed */
 
     door_bitmap_tile = background_bitmap_tile;
   }
-  else		/* should not happen */
+  else			/* should not happen */
     return;
+#endif
 
-  if (background_bitmap_tile)
+  if (background_bitmap_tile != NULL)
     gfx.background_bitmap_mask |= mask;
   else
     gfx.background_bitmap_mask &= ~mask;
@@ -249,10 +252,12 @@ void SetBackgroundBitmap(Bitmap *background_bitmap_tile, int mask)
     DrawBitmapFromTile(gfx.background_bitmap, background_bitmap_tile,
 		       gfx.real_sx, gfx.real_sy,
 		       gfx.full_sxsize, gfx.full_sysize);
-  else
+  else if (mask == REDRAW_DOOR_1)
+  {
     DrawBitmapFromTile(gfx.background_bitmap, background_bitmap_tile,
 		       gfx.dx, gfx.dy,
 		       gfx.dxsize, gfx.dysize);
+  }
 }
 
 void SetMainBackgroundBitmap(Bitmap *background_bitmap_tile)
@@ -439,8 +444,13 @@ inline boolean DrawingDeactivated(int x, int y, int width, int height)
 
 inline boolean DrawingOnBackground(int x, int y)
 {
+#if 1
+  return (CheckDrawingArea(x, y, 1, 1, gfx.background_bitmap_mask) &&
+	  CheckDrawingArea(x, y, 1, 1, gfx.draw_background_mask));
+#else
   return ((gfx.draw_background_mask & gfx.background_bitmap_mask) &&
 	  CheckDrawingArea(x, y, 1, 1, gfx.draw_background_mask));
+#endif
 }
 
 inline void BlitBitmap(Bitmap *src_bitmap, Bitmap *dst_bitmap,
