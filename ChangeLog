@@ -1,3 +1,7 @@
+2005-06-08
+	* fixed two bugs causing wrong door background graphics in system.c
+	  (in functions "SetBackgroundBitmap()" and "DrawingOnBackground()")
+
 2005-06-06
 	* fixed graphic bug with exploding bomb and R'n'D graphics in EM engine
 	* added "no direction" to "walkable/passable from" selectbox options
