@@ -1,3 +1,7 @@
+2005-06-14
+	* fixed graphical bug which caused the player (being Murphy) to show
+	  collecting animations although the element was collected by penguin
+
 2005-06-08
 	* fixed two bugs causing wrong door background graphics in system.c
 	  (in functions "SetBackgroundBitmap()" and "DrawingOnBackground()")

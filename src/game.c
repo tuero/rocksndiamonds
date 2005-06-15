@@ -47,6 +47,8 @@
 #define USE_GRAVITY_BUGFIX_NEW	(TRUE	* USE_NEW_STUFF		* 1)
 #define USE_GRAVITY_BUGFIX_OLD	(TRUE	* USE_NEW_STUFF		* 0)
 
+#define USE_PENGUIN_COLLECT_BUG	(TRUE	* USE_NEW_STUFF		* 1)
+
 
 /* for DigField() */
 #define DF_NO_PUSH		0
@@ -12185,8 +12187,13 @@ int DigField(struct PlayerInfo *player,
   player->push_delay = 0;
 #endif
 
-  if (Feld[x][y] != element)		/* really digged/collected something */
-    player->is_collecting = !player->is_digging;
+#if USE_PENGUIN_COLLECT_BUG
+  if (is_player)		/* function can also be called by EL_PENGUIN */
+#endif
+  {
+    if (Feld[x][y] != element)		/* really digged/collected something */
+      player->is_collecting = !player->is_digging;
+  }
 
   return MF_MOVING;
 }
