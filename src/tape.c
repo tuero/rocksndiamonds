@@ -1339,6 +1339,7 @@ void AutoPlayTape()
 	printf(" %03d", i);
   }
 
+#if 0
   if (num_tape_missing > 0)
   {
     printf(", NO TAPE:");
@@ -1346,6 +1347,7 @@ void AutoPlayTape()
       if (tape_missing[i])
 	printf(" %03d", i);
   }
+#endif
 
   printf("\n");
   printf_line("=", 79);

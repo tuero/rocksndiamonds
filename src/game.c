@@ -3393,7 +3393,11 @@ void Explode(int ex, int ey, int phase, int mode)
 	continue;
 #endif
 
-#if 1
+      /* no idea why this was changed from 3.0.8 to 3.1.0 -- this causes buggy
+	 behaviour, for example when touching a yamyam that explodes to rocks
+	 with active deadly shield, a rock is created under the player !!! */
+      /* (case 1 (surely buggy): >= 3.1.0, case 2 (maybe buggy): <= 3.0.8) */
+#if 0
       if (IS_PLAYER(x, y) && SHIELD_ON(PLAYERINFO(x, y)) &&
 	  (game.engine_version < VERSION_IDENT(3,1,0,0) ||
 	   (x == ex && y == ey && mode != EX_TYPE_BORDER)))
