@@ -207,6 +207,24 @@
 
 #define CE_BITMASK_DEFAULT	0
 
+#if 1
+
+#define CH_EVENT_VAR(e,c)	(element_info[e].change->has_event[c])
+#define CH_ANY_EVENT_VAR(e,c)	(element_info[e].has_change_event[c])
+
+#define PAGE_HAS_CHANGE_EVENT(p,c)  ((p)->has_event[c])
+#define HAS_CHANGE_EVENT(e,c)	    (IS_CUSTOM_ELEMENT(e) &&		\
+				     CH_EVENT_VAR(e,c))
+#define HAS_ANY_CHANGE_EVENT(e,c)   (IS_CUSTOM_ELEMENT(e) &&		\
+				     CH_ANY_EVENT_VAR(e,c))
+
+#define SET_CHANGE_EVENT(e,c,v)     (IS_CUSTOM_ELEMENT(e) ?		\
+				     CH_EVENT_VAR(e,c) = (v) : 0)
+#define SET_ANY_CHANGE_EVENT(e,c,v) (IS_CUSTOM_ELEMENT(e) ?		\
+				     CH_ANY_EVENT_VAR(e,c) = (v) : 0)
+
+#else
+
 #define CH_EVENT_BIT(c)		(1 << (c))
 #define CH_EVENT_VAR(e)		(element_info[e].change->events)
 #define CH_ANY_EVENT_VAR(e)	(element_info[e].change_events)
@@ -219,6 +237,11 @@
 				 ((v) ?					  \
 				  (CH_EVENT_VAR(e) |=  CH_EVENT_BIT(c)) : \
 				  (CH_EVENT_VAR(e) &= ~CH_EVENT_BIT(c))) : 0)
+#define SET_ANY_CHANGE_EVENT(e,c,v) (IS_CUSTOM_ELEMENT(e) ?		  \
+			       ((v) ?					  \
+			        (CH_ANY_EVENT_VAR(e) |=  CH_EVENT_BIT(c)) : \
+			        (CH_ANY_EVENT_VAR(e) &= ~CH_EVENT_BIT(c))) : 0)
+#endif
 
 /* values for change side for custom elements */
 #define CH_SIDE_NONE		MV_NO_MOVING
@@ -1765,7 +1788,11 @@ struct ElementChangeInfo
 {
   boolean can_change;		/* use or ignore this change info */
 
+#if 1
+  boolean has_event[NUM_CHANGE_EVENTS];		/* change events */
+#else
   unsigned long events;		/* change events */
+#endif
 
   int trigger_player;		/* player triggering change */
   int trigger_side;		/* side triggering change */
@@ -1899,7 +1926,11 @@ struct ElementInfo
 
   /* ---------- internal values used at runtime when playing ---------- */
 
+#if 1
+  boolean has_change_event[NUM_CHANGE_EVENTS];
+#else
   unsigned long change_events;	/* bitfield for combined change events */
+#endif
 
   int event_page_nr[NUM_CHANGE_EVENTS]; /* page number for each event */
   struct ElementChangeInfo *event_page[NUM_CHANGE_EVENTS]; /* page for event */
@@ -2079,8 +2110,8 @@ extern short			StorePlayer[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short			Back[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern boolean			Stop[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern boolean			Pushed[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-extern unsigned long		Changed[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-extern unsigned long		ChangeEvent[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern boolean			Changed[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern short			ChangeEvent[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short			WasJustMoving[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short			WasJustFalling[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short			CheckCollision[MAX_LEV_FIELDX][MAX_LEV_FIELDY];

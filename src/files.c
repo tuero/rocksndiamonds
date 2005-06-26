@@ -88,11 +88,12 @@ void setElementChangePages(struct ElementInfo *ei, int change_pages)
 
 void setElementChangeInfoToDefaults(struct ElementChangeInfo *change)
 {
-  int x, y;
+  int i, x, y;
 
   change->can_change = FALSE;
 
-  change->events = CE_BITMASK_DEFAULT;
+  for (i = 0; i < NUM_CHANGE_EVENTS; i++)
+    change->has_event[i] = FALSE;
 
   change->trigger_player = CH_PLAYER_ANY;
   change->trigger_side = CH_SIDE_ANY;
@@ -1090,6 +1091,7 @@ static int LoadLevel_CUS3(FILE *file, int chunk_size, struct LevelInfo *level)
   for (i = 0; i < num_changed_custom_elements; i++)
   {
     int element = getFile16BitBE(file);
+    unsigned long event_bits;
 
     if (!IS_CUSTOM_ELEMENT(element))
     {
@@ -1128,7 +1130,10 @@ static int LoadLevel_CUS3(FILE *file, int chunk_size, struct LevelInfo *level)
 	element_info[element].content[x][y] =
 	  getMappedElement(getFile16BitBE(file));
 
-    element_info[element].change->events = getFile32BitBE(file);
+    event_bits = getFile32BitBE(file);
+    for (j = 0; j < NUM_CHANGE_EVENTS; j++)
+      if (event_bits & (1 << j))
+	element_info[element].change->has_event[j] = TRUE;
 
     element_info[element].change->target_element =
       getMappedElement(getFile16BitBE(file));
@@ -1170,7 +1175,7 @@ static int LoadLevel_CUS4(FILE *file, int chunk_size, struct LevelInfo *level)
   struct ElementInfo *ei;
   int chunk_size_expected;
   int element;
-  int i, x, y;
+  int i, j, x, y;
 
   element = getFile16BitBE(file);
 
@@ -1252,11 +1257,15 @@ static int LoadLevel_CUS4(FILE *file, int chunk_size, struct LevelInfo *level)
   for (i = 0; i < ei->num_change_pages; i++)
   {
     struct ElementChangeInfo *change = &ei->change_page[i];
+    unsigned long event_bits;
 
     /* always start with reliable default values */
     setElementChangeInfoToDefaults(change);
 
-    change->events = getFile32BitBE(file);
+    event_bits = getFile32BitBE(file);
+    for (j = 0; j < NUM_CHANGE_EVENTS; j++)
+      if (event_bits & (1 << j))
+	change->has_event[j] = TRUE;
 
     change->target_element = getMappedElement(getFile16BitBE(file));
 
@@ -3269,7 +3278,7 @@ static void SaveLevel_CUS3(FILE *file, struct LevelInfo *level,
 static void SaveLevel_CUS4(FILE *file, struct LevelInfo *level, int element)
 {
   struct ElementInfo *ei = &element_info[element];
-  int i, x, y;
+  int i, j, x, y;
 
   putFile16BitBE(file, element);
 
@@ -3331,8 +3340,13 @@ static void SaveLevel_CUS4(FILE *file, struct LevelInfo *level, int element)
   for (i = 0; i < ei->num_change_pages; i++)
   {
     struct ElementChangeInfo *change = &ei->change_page[i];
+    unsigned long event_bits = 0;
 
-    putFile32BitBE(file, change->events);
+    for (j = 0; j < NUM_CHANGE_EVENTS; j++)
+      if (change->has_event[j])
+	event_bits |= (1 << j);
+
+    putFile32BitBE(file, event_bits);
 
     putFile16BitBE(file, change->target_element);
 
