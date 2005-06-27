@@ -412,8 +412,9 @@ typedef int (*EventFilter)(const Event *);
 
 struct ProgramInfo
 {
-  char *command_basename;
-  char *userdata_directory;
+  char *command_basepath;	/* directory that contains the program */
+  char *command_basename;	/* base filename of the program binary */
+  char *userdata_directory;	/* personal user data directory */
 
   char *program_title;
   char *window_title;

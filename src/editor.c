@@ -1428,22 +1428,22 @@ static struct ValueTextInfo options_change_direct_action[] =
 
 static struct ValueTextInfo options_change_other_action[] =
 {
-  { CE_OTHER_GETS_TOUCHED,	"player touches"		},
-  { CE_OTHER_GETS_PRESSED,	"player presses"		},
-  { CE_OTHER_GETS_PUSHED,	"player pushes"			},
-  { CE_OTHER_GETS_ENTERED,	"player enters"			},
-  { CE_OTHER_GETS_LEFT,		"player leaves"			},
-  { CE_OTHER_GETS_DIGGED,	"player digs"			},
-  { CE_OTHER_GETS_COLLECTED,	"player collects"		},
-  { CE_OTHER_GETS_DROPPED,	"player drops/throws"		},
-  { CE_OTHER_IS_TOUCHING,	"touching"			},
+  { CE_PLAYER_TOUCHES_X,	"player touches"		},
+  { CE_PLAYER_PRESSES_X,	"player presses"		},
+  { CE_PLAYER_PUSHES_X,		"player pushes"			},
+  { CE_PLAYER_ENTERS_X,		"player enters"			},
+  { CE_PLAYER_LEAVES_X,		"player leaves"			},
+  { CE_PLAYER_DIGS_X,		"player digs"			},
+  { CE_PLAYER_COLLECTS_X,	"player collects"		},
+  { CE_PLAYER_DROPS_X,		"player drops/throws"		},
+  { CE_TOUCHING_X,		"touching"			},
 #if 1
-  { CE_OTHER_IS_HITTING,	"hitting"			},
-  { CE_OTHER_GETS_HIT,		"hit by"			},
+  { CE_HITTING_X,		"hitting"			},
+  { CE_HIT_BY_X,		"hit by"			},
 #endif
-  { CE_OTHER_IS_SWITCHING,	"switch of"			},
-  { CE_OTHER_IS_CHANGING,	"change by page of"		},
-  { CE_OTHER_IS_EXPLODING,	"explosion of"			},
+  { CE_SWITCH_OF_X,		"switch of"			},
+  { CE_CHANGE_OF_X,		"change by page of"		},
+  { CE_EXPLOSION_OF_X,		"explosion of"			},
 
   { -1,				NULL				}
 };
@@ -6174,20 +6174,20 @@ static void CopyCustomElementPropertiesToEditor(int element)
 
   /* set "change by other element action" selectbox help value */
   custom_element_change.other_action =
-    (HAS_CHANGE_EVENT(element, CE_OTHER_GETS_TOUCHED) ? CE_OTHER_GETS_TOUCHED :
-     HAS_CHANGE_EVENT(element, CE_OTHER_GETS_PRESSED) ? CE_OTHER_GETS_PRESSED :
-     HAS_CHANGE_EVENT(element, CE_OTHER_GETS_PUSHED) ? CE_OTHER_GETS_PUSHED :
-     HAS_CHANGE_EVENT(element, CE_OTHER_GETS_ENTERED) ? CE_OTHER_GETS_ENTERED :
-     HAS_CHANGE_EVENT(element, CE_OTHER_GETS_LEFT) ? CE_OTHER_GETS_LEFT :
-     HAS_CHANGE_EVENT(element, CE_OTHER_GETS_DIGGED) ? CE_OTHER_GETS_DIGGED :
-     HAS_CHANGE_EVENT(element, CE_OTHER_GETS_COLLECTED) ? CE_OTHER_GETS_COLLECTED :
-     HAS_CHANGE_EVENT(element, CE_OTHER_GETS_DROPPED) ? CE_OTHER_GETS_DROPPED :
-     HAS_CHANGE_EVENT(element, CE_OTHER_IS_TOUCHING) ? CE_OTHER_IS_TOUCHING :
-     HAS_CHANGE_EVENT(element, CE_OTHER_IS_HITTING) ? CE_OTHER_IS_HITTING :
-     HAS_CHANGE_EVENT(element, CE_OTHER_GETS_HIT) ? CE_OTHER_GETS_HIT :
-     HAS_CHANGE_EVENT(element, CE_OTHER_IS_SWITCHING) ? CE_OTHER_IS_SWITCHING :
-     HAS_CHANGE_EVENT(element, CE_OTHER_IS_CHANGING) ? CE_OTHER_IS_CHANGING :
-     HAS_CHANGE_EVENT(element, CE_OTHER_IS_EXPLODING) ? CE_OTHER_IS_EXPLODING :
+    (HAS_CHANGE_EVENT(element, CE_PLAYER_TOUCHES_X) ? CE_PLAYER_TOUCHES_X :
+     HAS_CHANGE_EVENT(element, CE_PLAYER_PRESSES_X) ? CE_PLAYER_PRESSES_X :
+     HAS_CHANGE_EVENT(element, CE_PLAYER_PUSHES_X) ? CE_PLAYER_PUSHES_X :
+     HAS_CHANGE_EVENT(element, CE_PLAYER_ENTERS_X) ? CE_PLAYER_ENTERS_X :
+     HAS_CHANGE_EVENT(element, CE_PLAYER_LEAVES_X) ? CE_PLAYER_LEAVES_X :
+     HAS_CHANGE_EVENT(element, CE_PLAYER_DIGS_X) ? CE_PLAYER_DIGS_X :
+     HAS_CHANGE_EVENT(element, CE_PLAYER_COLLECTS_X) ? CE_PLAYER_COLLECTS_X :
+     HAS_CHANGE_EVENT(element, CE_PLAYER_DROPS_X) ? CE_PLAYER_DROPS_X :
+     HAS_CHANGE_EVENT(element, CE_TOUCHING_X) ? CE_TOUCHING_X :
+     HAS_CHANGE_EVENT(element, CE_HITTING_X) ? CE_HITTING_X :
+     HAS_CHANGE_EVENT(element, CE_HIT_BY_X) ? CE_HIT_BY_X :
+     HAS_CHANGE_EVENT(element, CE_SWITCH_OF_X) ? CE_SWITCH_OF_X :
+     HAS_CHANGE_EVENT(element, CE_CHANGE_OF_X) ? CE_CHANGE_OF_X :
+     HAS_CHANGE_EVENT(element, CE_EXPLOSION_OF_X) ? CE_EXPLOSION_OF_X :
      custom_element_change.other_action);
 }
 
@@ -6363,20 +6363,20 @@ static void CopyCustomElementPropertiesToGame(int element)
     custom_element_change_events[CE_BY_DIRECT_ACTION];
 
   /* set other element action change event from checkbox and selectbox */
-  custom_element_change_events[CE_OTHER_GETS_TOUCHED] = FALSE;
-  custom_element_change_events[CE_OTHER_GETS_PRESSED] = FALSE;
-  custom_element_change_events[CE_OTHER_GETS_PUSHED] = FALSE;
-  custom_element_change_events[CE_OTHER_GETS_ENTERED] = FALSE;
-  custom_element_change_events[CE_OTHER_GETS_LEFT] = FALSE;
-  custom_element_change_events[CE_OTHER_GETS_DIGGED] = FALSE;
-  custom_element_change_events[CE_OTHER_GETS_COLLECTED] = FALSE;
-  custom_element_change_events[CE_OTHER_GETS_DROPPED] = FALSE;
-  custom_element_change_events[CE_OTHER_IS_TOUCHING] = FALSE;
-  custom_element_change_events[CE_OTHER_IS_HITTING] = FALSE;
-  custom_element_change_events[CE_OTHER_GETS_HIT] = FALSE;
-  custom_element_change_events[CE_OTHER_IS_SWITCHING] = FALSE;
-  custom_element_change_events[CE_OTHER_IS_CHANGING] = FALSE;
-  custom_element_change_events[CE_OTHER_IS_EXPLODING] = FALSE;
+  custom_element_change_events[CE_PLAYER_TOUCHES_X] = FALSE;
+  custom_element_change_events[CE_PLAYER_PRESSES_X] = FALSE;
+  custom_element_change_events[CE_PLAYER_PUSHES_X] = FALSE;
+  custom_element_change_events[CE_PLAYER_ENTERS_X] = FALSE;
+  custom_element_change_events[CE_PLAYER_LEAVES_X] = FALSE;
+  custom_element_change_events[CE_PLAYER_DIGS_X] = FALSE;
+  custom_element_change_events[CE_PLAYER_COLLECTS_X] = FALSE;
+  custom_element_change_events[CE_PLAYER_DROPS_X] = FALSE;
+  custom_element_change_events[CE_TOUCHING_X] = FALSE;
+  custom_element_change_events[CE_HITTING_X] = FALSE;
+  custom_element_change_events[CE_HIT_BY_X] = FALSE;
+  custom_element_change_events[CE_SWITCH_OF_X] = FALSE;
+  custom_element_change_events[CE_CHANGE_OF_X] = FALSE;
+  custom_element_change_events[CE_EXPLOSION_OF_X] = FALSE;
   custom_element_change_events[custom_element_change.other_action] =
     custom_element_change_events[CE_BY_OTHER_ACTION];
 

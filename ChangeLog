@@ -1,3 +1,8 @@
+2005-06-26
+	* fixed bug causing "change when impact" on player not working
+	* fixed wrong priority of "hitting something" over "hitting <element>"
+	* fixed wrong priority of "hit by something" over "hit by <element>"
+
 2005-06-14
 	* fixed graphical bug which caused the player (being Murphy) to show
 	  collecting animations although the element was collected by penguin

@@ -2721,7 +2721,7 @@ static void LoadLevel_InitElements(struct LevelInfo *level, char *filename)
       }
 
       /* order of checking and copying events to be mapped is important */
-      for (j = CE_OTHER_GETS_COLLECTED; j >= CE_HITTING_SOMETHING; j--)
+      for (j = CE_PLAYER_COLLECTS_X; j >= CE_HITTING_SOMETHING; j--)
       {
 	if (HAS_CHANGE_EVENT(element, j - 1))
 	{

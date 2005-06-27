@@ -75,8 +75,23 @@ void InitProgramInfo(char *argv0,
 		     char *cookie_prefix, char *filename_prefix,
 		     int program_version)
 {
-  program.command_basename =
-    (strrchr(argv0, '/') ? strrchr(argv0, '/') + 1 : argv0);
+  char *argv0_copy = getStringCopy(argv0);
+  char *argv0_copy_last_slash = strrchr(argv0_copy, '/');
+
+  if (argv0_copy_last_slash != NULL)
+  {
+    program.command_basename = argv0_copy_last_slash + 1;
+    program.command_basepath = argv0_copy;
+    *argv0_copy_last_slash = '\0';
+  }
+  else
+  {
+    program.command_basename = argv0_copy;
+    program.command_basepath = ".";
+  }
+
+  printf("::: command_basepath == '%s'\n", program.command_basepath);
+  printf("::: command_basename == '%s'\n", program.command_basename);
 
   program.userdata_directory = userdata_directory;
   program.program_title = program_title;
