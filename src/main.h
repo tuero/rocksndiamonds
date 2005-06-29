@@ -550,6 +550,9 @@
 #define PLAYER_SWITCHING(p,x,y)	((p)->is_switching &&			\
 				 (p)->switch_x == (x) && (p)->switch_y == (y))
 
+#define PLAYER_DROPPING(p,x,y)	((p)->is_dropping &&			\
+				 (p)->drop_x == (x) && (p)->drop_y == (y))
+
 #define PLAYER_NR_GFX(g,i)	((g) + i * (IMG_PLAYER_2 - IMG_PLAYER_1))
 
 #define ANIM_FRAMES(g)		(graphic_info[g].anim_frames)
@@ -1385,10 +1388,17 @@
 
 /* program information and versioning definitions */
 
+#if 1
+#define PROGRAM_VERSION_MAJOR		3
+#define PROGRAM_VERSION_MINOR		1
+#define PROGRAM_VERSION_PATCH		1
+#define PROGRAM_VERSION_BUILD		0
+#else
 #define PROGRAM_VERSION_MAJOR		3
 #define PROGRAM_VERSION_MINOR		2
 #define PROGRAM_VERSION_PATCH		0
 #define PROGRAM_VERSION_BUILD		3
+#endif
 
 #define PROGRAM_TITLE_STRING		"Rocks'n'Diamonds"
 #define PROGRAM_AUTHOR_STRING		"Holger Schemel"
@@ -1551,6 +1561,7 @@ struct PlayerInfo
   int num_special_action_sleeping;
 
   int switch_x, switch_y;
+  int drop_x, drop_y;
 
   int show_envelope;
 

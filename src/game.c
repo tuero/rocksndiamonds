@@ -54,6 +54,8 @@
 #define USE_HITTING_SOMETHING_BUGFIX	(TRUE	* USE_NEW_STUFF		* 1)
 #define USE_HIT_BY_SOMETHING_BUGFIX	(TRUE	* USE_NEW_STUFF		* 1)
 
+#define USE_DROP_BUGFIX			(TRUE	* USE_NEW_STUFF		* 1)
+
 
 /* for DigField() */
 #define DF_NO_PUSH		0
@@ -1774,6 +1776,11 @@ void InitGame()
 
     player->switch_x = -1;
     player->switch_y = -1;
+
+#if USE_DROP_BUGFIX
+    player->drop_x = -1;
+    player->drop_y = -1;
+#endif
 
     player->show_envelope = 0;
 
@@ -12361,6 +12368,15 @@ boolean DropElement(struct PlayerInfo *player)
 		      EL_DYNABOMB_PLAYER_1_ACTIVE + player->index_nr :
 		      EL_UNDEFINED);
 
+#if USE_DROP_BUGFIX
+  /* do not drop an element on top of another element; when holding drop key
+     pressed without moving, dropped element must move away before the next
+     element can be dropped (this is especially important if the next element
+     is dynamite, which can be placed on background for historical reasons) */
+  if (PLAYER_DROPPING(player, dropx, dropy) && Feld[dropx][dropy] != EL_EMPTY)
+    return MF_ACTION;
+#endif
+
   if (IS_THROWABLE(drop_element))
   {
     dropx += GET_DX_FROM_DIR(drop_direction);
@@ -12557,6 +12573,10 @@ boolean DropElement(struct PlayerInfo *player)
 
   player->is_dropping = TRUE;
 
+#if USE_DROP_BUGFIX
+  player->drop_x = dropx;
+  player->drop_y = dropy;
+#endif
 
   return TRUE;
 }

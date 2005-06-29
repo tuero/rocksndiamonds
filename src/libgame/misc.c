@@ -457,6 +457,51 @@ char *getHomeDir()
 
 
 /* ------------------------------------------------------------------------- */
+/* path manipulation functions                                               */
+/* ------------------------------------------------------------------------- */
+
+static char *getLastPathSeparatorPtr(char *filename)
+{
+  char *last_separator = strrchr(filename, '/');
+
+#if !defined(PLATFORM_UNIX)
+  if (last_separator == NULL)	/* also try DOS/Windows variant */
+    last_separator = strrchr(filename, '\\');
+#endif
+
+  return last_separator;
+}
+
+static char *getBaseNamePtr(char *filename)
+{
+  char *last_separator = getLastPathSeparatorPtr(filename);
+
+  if (last_separator != NULL)
+    return last_separator + 1;	/* separator found: strip base path */
+  else
+    return filename;		/* no separator found: filename has no path */
+}
+
+char *getBaseName(char *filename)
+{
+  return getStringCopy(getBaseNamePtr(filename));
+}
+
+char *getBasePath(char *filename)
+{
+  char *basepath = getStringCopy(filename);
+  char *last_separator = getLastPathSeparatorPtr(basepath);
+
+  if (last_separator != NULL)
+    *last_separator = '\0';	/* separator found: strip basename */
+  else
+    basepath = ".";		/* no separator found: use current path */
+
+  return basepath;
+}
+
+
+/* ------------------------------------------------------------------------- */
 /* various string functions                                                  */
 /* ------------------------------------------------------------------------- */
 
@@ -529,19 +574,26 @@ void setString(char **old_value, char *new_value)
 
 void GetOptions(char *argv[], void (*print_usage_function)(void))
 {
+  char *ro_base_path = RO_BASE_PATH;
+  char *rw_base_path = RW_BASE_PATH;
   char **options_left = &argv[1];
+
+  if (strcmp(ro_base_path, ".") == 0)
+    ro_base_path = program.command_basepath;
+  if (strcmp(rw_base_path, ".") == 0)
+    rw_base_path = program.command_basepath;
 
   /* initialize global program options */
   options.display_name = NULL;
   options.server_host = NULL;
   options.server_port = 0;
-  options.ro_base_directory = RO_BASE_PATH;
-  options.rw_base_directory = RW_BASE_PATH;
-  options.level_directory = RO_BASE_PATH "/" LEVELS_DIRECTORY;
-  options.graphics_directory = RO_BASE_PATH "/" GRAPHICS_DIRECTORY;
-  options.sounds_directory = RO_BASE_PATH "/" SOUNDS_DIRECTORY;
-  options.music_directory = RO_BASE_PATH "/" MUSIC_DIRECTORY;
-  options.docs_directory = RO_BASE_PATH "/" DOCS_DIRECTORY;
+  options.ro_base_directory = ro_base_path;
+  options.rw_base_directory = rw_base_path;
+  options.level_directory    = getPath2(ro_base_path, LEVELS_DIRECTORY);
+  options.graphics_directory = getPath2(ro_base_path, GRAPHICS_DIRECTORY);
+  options.sounds_directory   = getPath2(ro_base_path, SOUNDS_DIRECTORY);
+  options.music_directory    = getPath2(ro_base_path, MUSIC_DIRECTORY);
+  options.docs_directory     = getPath2(ro_base_path, DOCS_DIRECTORY);
   options.execute_command = NULL;
   options.serveronly = FALSE;
   options.network = FALSE;
@@ -608,22 +660,17 @@ void GetOptions(char *argv[], void (*print_usage_function)(void))
 	Error(ERR_EXIT_HELP, "option '%s' requires an argument", option_str);
 
       /* this should be extended to separate options for ro and rw data */
-      options.ro_base_directory = option_arg;
-      options.rw_base_directory = option_arg;
+      options.ro_base_directory = ro_base_path = option_arg;
+      options.rw_base_directory = rw_base_path = option_arg;
       if (option_arg == next_option)
 	options_left++;
 
       /* adjust paths for sub-directories in base directory accordingly */
-      options.level_directory =
-	getPath2(options.ro_base_directory, LEVELS_DIRECTORY);
-      options.graphics_directory =
-	getPath2(options.ro_base_directory, GRAPHICS_DIRECTORY);
-      options.sounds_directory =
-	getPath2(options.ro_base_directory, SOUNDS_DIRECTORY);
-      options.music_directory =
-	getPath2(options.ro_base_directory, MUSIC_DIRECTORY);
-      options.docs_directory =
-	getPath2(options.ro_base_directory, DOCS_DIRECTORY);
+      options.level_directory    = getPath2(ro_base_path, LEVELS_DIRECTORY);
+      options.graphics_directory = getPath2(ro_base_path, GRAPHICS_DIRECTORY);
+      options.sounds_directory   = getPath2(ro_base_path, SOUNDS_DIRECTORY);
+      options.music_directory    = getPath2(ro_base_path, MUSIC_DIRECTORY);
+      options.docs_directory     = getPath2(ro_base_path, DOCS_DIRECTORY);
     }
     else if (strncmp(option, "-levels", option_len) == 0)
     {
@@ -1558,27 +1605,21 @@ boolean fileHasSuffix(char *basename, char *suffix)
 
 boolean FileIsGraphic(char *filename)
 {
-  char *basename = strrchr(filename, '/');
-
-  basename = (basename != NULL ? basename + 1 : filename);
+  char *basename = getBaseNamePtr(filename);
 
   return fileHasSuffix(basename, "pcx");
 }
 
 boolean FileIsSound(char *filename)
 {
-  char *basename = strrchr(filename, '/');
-
-  basename = (basename != NULL ? basename + 1 : filename);
+  char *basename = getBaseNamePtr(filename);
 
   return fileHasSuffix(basename, "wav");
 }
 
 boolean FileIsMusic(char *filename)
 {
-  char *basename = strrchr(filename, '/');
-
-  basename = (basename != NULL ? basename + 1 : filename);
+  char *basename = getBaseNamePtr(filename);
 
   if (FileIsSound(basename))
     return TRUE;

@@ -1,3 +1,12 @@
+2005-06-27
+	* fixed bug with dynamite dropped on top of just dropped custom element
+	  (collect dynamite, collect CE, drop CE => dynamite was also dropped);
+	  dynamite can still be dropped, but drop key must be released before
+
+2005-06-27
+	* fixed bug with wrong start directory when started from file browser
+	  (due to this bug, R'n'D could not be started from KDE's Konqueror)
+
 2005-06-26
 	* fixed bug causing "change when impact" on player not working
 	* fixed wrong priority of "hitting something" over "hitting <element>"
