@@ -1,3 +1,11 @@
+2005-07-24
+	* added recognition of "trigger element" for "change digged element to"
+	  (this is not really what the "trigger element" was made for, but its
+	  use may seem obvious for leaving back digged elements unchanged)
+
+2005-07-23
+	* fixed multiple warnings about failed joystick device initialization
+
 2005-06-27
 	* fixed bug with dynamite dropped on top of just dropped custom element
 	  (collect dynamite, collect CE, drop CE => dynamite was also dropped);

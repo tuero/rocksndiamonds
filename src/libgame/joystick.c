@@ -26,6 +26,8 @@
 #if defined(PLATFORM_UNIX) && !defined(TARGET_SDL)
 void UnixInitJoysticks()
 {
+  static boolean unix_joystick_subsystem_initialized = FALSE;
+  boolean print_warning = !unix_joystick_subsystem_initialized;
   int i;
 
   for (i = 0; i < MAX_PLAYERS; i++)
@@ -44,18 +46,24 @@ void UnixInitJoysticks()
 
     if (access(device_name, R_OK) != 0)
     {
-      Error(ERR_WARN, "cannot access joystick device '%s'", device_name);
+      if (print_warning)
+	Error(ERR_WARN, "cannot access joystick device '%s'", device_name);
+
       continue;
     }
 
     if ((joystick.fd[i] = open(device_name, O_RDONLY)) < 0)
     {
-      Error(ERR_WARN, "cannot open joystick device '%s'", device_name);
+      if (print_warning)
+	Error(ERR_WARN, "cannot open joystick device '%s'", device_name);
+
       continue;
     }
 
     joystick.status = JOYSTICK_ACTIVATED;
   }
+
+  unix_joystick_subsystem_initialized = TRUE;
 }
 
 boolean UnixReadJoystick(int fd, int *x, int *y, boolean *b1, boolean *b2)

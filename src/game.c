@@ -56,6 +56,8 @@
 
 #define USE_DROP_BUGFIX			(TRUE	* USE_NEW_STUFF		* 1)
 
+#define USE_CHANGE_TO_TRIGGERED		(TRUE	* USE_NEW_STUFF		* 1)
+
 
 /* for DigField() */
 #define DF_NO_PUSH		0
@@ -6219,7 +6221,16 @@ void StartMoving(int x, int y)
 #if 1
       Store[newx][newy] = EL_EMPTY;
       if (IS_EQUAL_OR_IN_GROUP(new_element, MOVE_ENTER_EL(element)))
+      {
+#if USE_CHANGE_TO_TRIGGERED
+	int move_leave_element = element_info[element].move_leave_element;
+
+	Store[newx][newy] = (move_leave_element == EL_TRIGGER_ELEMENT ?
+			     new_element : move_leave_element);
+#else
 	Store[newx][newy] = element_info[element].move_leave_element;
+#endif
+      }
 #else
       Store[newx][newy] = EL_EMPTY;
       if (IS_EQUAL_OR_IN_GROUP(new_element, MOVE_ENTER_EL(element)) ||
@@ -6628,6 +6639,12 @@ void ContinueMoving(int x, int y)
 #endif
   {
     int move_leave_element = ei->move_leave_element;
+
+#if USE_CHANGE_TO_TRIGGERED
+    if (ei->move_leave_type == LEAVE_TYPE_LIMITED &&
+        ei->move_leave_element == EL_TRIGGER_ELEMENT)
+      move_leave_element = stored;
+#endif
 
     Feld[x][y] = move_leave_element;
 

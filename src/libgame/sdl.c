@@ -1440,6 +1440,7 @@ void HandleJoystickEvent(Event *event)
 void SDLInitJoysticks()
 {
   static boolean sdl_joystick_subsystem_initialized = FALSE;
+  boolean print_warning = !sdl_joystick_subsystem_initialized;
   int i;
 
   if (!sdl_joystick_subsystem_initialized)
@@ -1459,10 +1460,18 @@ void SDLInitJoysticks()
     int joystick_nr = getJoystickNrFromDeviceName(device_name);
 
     if (joystick_nr >= SDL_NumJoysticks())
+    {
+      if (setup.input[i].use_joystick && print_warning)
+	Error(ERR_WARN, "cannot find joystick %d", joystick_nr);
+
       joystick_nr = -1;
+    }
 
     /* misuse joystick file descriptor variable to store joystick number */
     joystick.fd[i] = joystick_nr;
+
+    if (joystick_nr == -1)
+      continue;
 
     /* this allows subsequent calls to 'InitJoysticks' for re-initialization */
     if (SDLCheckJoystickOpened(joystick_nr))
@@ -1473,7 +1482,9 @@ void SDLInitJoysticks()
 
     if (!SDLOpenJoystick(joystick_nr))
     {
-      Error(ERR_WARN, "cannot open joystick %d", joystick_nr);
+      if (print_warning)
+	Error(ERR_WARN, "cannot open joystick %d", joystick_nr);
+
       continue;
     }
 
