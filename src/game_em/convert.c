@@ -382,7 +382,8 @@ int cleanup_em_level(unsigned char *src, int length)
   length = 2172;
 
 #if 1
-  printf("::: EM level file version: %d\n", file_version);
+  if (options.debug)
+    printf("::: EM level file version: %d\n", file_version);
 #endif
 
   return file_version;

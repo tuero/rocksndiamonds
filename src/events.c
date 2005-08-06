@@ -569,6 +569,10 @@ static void HandleKeysSpecial(Key key)
     {
       DumpBrush();
     }
+    else if (is_string_suffix(cheat_input, ":DDB"))
+    {
+      DumpBrush_Small();
+    }
   }
 }
 

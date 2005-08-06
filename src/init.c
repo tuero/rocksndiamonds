@@ -4710,7 +4710,12 @@ static char *getNewArtworkIdentifier(int type)
 	     artwork_current_identifier) != 0)
     artwork_new_identifier = artwork_current_identifier;
 
+#if 1
+  *(ARTWORK_CURRENT_IDENTIFIER_PTR(artwork, type))= artwork_current_identifier;
+#else
+  /* newer versions of gcc do not like this anymore :-/ */
   *(&(ARTWORK_CURRENT_IDENTIFIER(artwork, type))) = artwork_current_identifier;
+#endif
 
 #if 0
   if (type == ARTWORK_TYPE_GRAPHICS)

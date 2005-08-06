@@ -879,6 +879,9 @@ static struct
   char *text;
 } control_info[ED_NUM_CTRL_BUTTONS] =
 {
+  /* note: some additional characters are already reserved for "cheat mode"
+     shortcuts (":XYZ" style) -- for details, see "events.c" */
+
   { 's',	"draw single items"			},
   { 'd',	"draw connected items"			},
   { 'l',	"draw lines"				},
@@ -2765,10 +2768,18 @@ static int editor_el_emerald_mine_club[] =
   EL_EMC_WALL_11,
   EL_EMC_WALL_12,
 
+#if RELEASE_311
+  EL_EMPTY,
+#else
   EL_EMC_ANDROID,
+#endif
   EL_BALLOON,
   EL_BALLOON_SWITCH_ANY,
+#if RELEASE_311
+  EL_EMPTY,
+#else
   EL_BALLOON_SWITCH_NONE,
+#endif
 
   EL_BALLOON_SWITCH_LEFT,
   EL_BALLOON_SWITCH_RIGHT,
@@ -2777,15 +2788,33 @@ static int editor_el_emerald_mine_club[] =
 
   EL_EMC_GRASS,
   EL_EMC_PLANT,
+#if RELEASE_311
+  EL_EMPTY,
+  EL_EMPTY,
+#else
   EL_EMC_LENSES,
   EL_EMC_MAGNIFIER,
+#endif
 
+#if RELEASE_311
+  EL_EMPTY,
+  EL_EMPTY,
+#else
   EL_EMC_MAGIC_BALL,
   EL_EMC_MAGIC_BALL_SWITCH,
+#endif
   EL_SPRING,
+#if RELEASE_311
+  EL_EMPTY,
+#else
   EL_EMC_SPRING_BUMPER,
+#endif
 
+#if RELEASE_311
+  EL_EMPTY,
+#else
   EL_EMC_DRIPPER,
+#endif
   EL_EMC_FAKE_GRASS,
   EL_EMPTY,
   EL_EMPTY,
@@ -7897,6 +7926,7 @@ static void SelectArea(int from_x, int from_y, int to_x, int to_y,
 #define CB_BRUSH_TO_LEVEL	2
 #define CB_DELETE_OLD_CURSOR	3
 #define CB_DUMP_BRUSH		4
+#define CB_DUMP_BRUSH_SMALL	5
 
 static void CopyBrushExt(int from_x, int from_y, int to_x, int to_y,
 			 int button, int mode)
@@ -7908,7 +7938,8 @@ static void CopyBrushExt(int from_x, int from_y, int to_x, int to_y,
   int new_element = BUTTON_ELEMENT(button);
   int x, y;
 
-  if (mode == CB_DUMP_BRUSH)
+  if (mode == CB_DUMP_BRUSH ||
+      mode == CB_DUMP_BRUSH_SMALL)
   {
     if (!draw_with_brush)
     {
@@ -7955,10 +7986,12 @@ static void CopyBrushExt(int from_x, int from_y, int to_x, int to_y,
 
 	if (IS_CUSTOM_ELEMENT(element))
 	  element_mapped = EL_CUSTOM_START;
-	else if (element > EL_ENVELOPE_4)
-	  element_mapped = EL_CHAR_QUESTION;	/* change to EL_UNKNOWN ... */
+	else if (IS_GROUP_ELEMENT(element))
+	  element_mapped = EL_GROUP_START;
+	else if (element >= NUM_FILE_ELEMENTS)
+	  element_mapped = EL_UNKNOWN;
 
-	printf("`%03d", element_mapped);
+	printf("%c%03d", (mode == CB_DUMP_BRUSH ? '`' : '¸'), element_mapped);
 #endif
       }
 
@@ -8085,6 +8118,11 @@ static void DeleteBrushFromCursor()
 void DumpBrush()
 {
   CopyBrushExt(0, 0, 0, 0, 0, CB_DUMP_BRUSH);
+}
+
+void DumpBrush_Small()
+{
+  CopyBrushExt(0, 0, 0, 0, 0, CB_DUMP_BRUSH_SMALL);
 }
 
 static void FloodFill(int from_x, int from_y, int fill_element)

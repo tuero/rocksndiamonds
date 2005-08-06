@@ -1,3 +1,14 @@
+2005-08-07
+	* changed some va_arg() arguments from 'long' to 'int', fixing problems
+	  on 64-bit architecture systems with LP64 data model
+
+2005-08-06
+	* fixed bug with bombs not exploding when hitting the last level line
+	  (introduced after the release of 3.1.0)
+
+2005-08-06
+	* added support for dumping small-sized level sketches from editor
+
 2005-07-24
 	* added recognition of "trigger element" for "change digged element to"
 	  (this is not really what the "trigger element" was made for, but its

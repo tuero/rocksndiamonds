@@ -2122,6 +2122,10 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
     boolean base_prefix_found = FALSE;
     boolean parameter_suffix_found = FALSE;
 
+#if 0
+    printf("::: examining '%s' -> '%s'\n", token, HASH_ITERATION_VALUE(itr));
+#endif
+
     /* skip all parameter definitions (handled by read_token_parameters()) */
     for (i = 0; i < num_suffix_list_entries && !parameter_suffix_found; i++)
     {

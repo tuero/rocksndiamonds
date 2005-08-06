@@ -302,8 +302,8 @@ char *setLevelArtworkDir(TreeInfo *ti)
   if (ti == NULL || leveldir_current == NULL)
     return NULL;
 
-  artwork_path_ptr = &(LEVELDIR_ARTWORK_PATH(leveldir_current, ti->type));
-  artwork_set_ptr  = &(LEVELDIR_ARTWORK_SET( leveldir_current, ti->type));
+  artwork_path_ptr = LEVELDIR_ARTWORK_PATH_PTR(leveldir_current, ti->type);
+  artwork_set_ptr  = LEVELDIR_ARTWORK_SET_PTR( leveldir_current, ti->type);
 
   checked_free(*artwork_path_ptr);
 

@@ -31,5 +31,6 @@ void RequestExitLevelEditor(boolean);
 void PrintEditorElementList();
 
 void DumpBrush();
+void DumpBrush_Small();
 
 #endif

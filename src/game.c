@@ -4404,9 +4404,9 @@ static void ActivateTimegateSwitch(int x, int y)
 
 void Impact(int x, int y)
 {
-  boolean lastline = (y == lev_fieldy-1);
+  boolean last_line = (y == lev_fieldy - 1);
   boolean object_hit = FALSE;
-  boolean impact = (lastline || object_hit);
+  boolean impact = (last_line || object_hit);
   int element = Feld[x][y];
   int smashed = EL_STEELWALL;
 
@@ -4414,7 +4414,7 @@ void Impact(int x, int y)
   printf("IMPACT!\n");
 #endif
 
-  if (!lastline)	/* check if element below was hit */
+  if (!last_line)	/* check if element below was hit */
   {
     if (Feld[x][y + 1] == EL_PLAYER_IS_LEAVING)
       return;
@@ -4435,10 +4435,10 @@ void Impact(int x, int y)
     if (object_hit)
       smashed = MovingOrBlocked2Element(x, y + 1);
 
-    impact = (lastline || object_hit);
+    impact = (last_line || object_hit);
   }
 
-  if (!lastline && smashed == EL_ACID)	/* element falls into acid */
+  if (!last_line && smashed == EL_ACID)	/* element falls into acid */
   {
     SplashAcid(x, y + 1);
     return;
@@ -4637,7 +4637,7 @@ void Impact(int x, int y)
   }
 
   /* play sound of magic wall / mill */
-  if (!lastline &&
+  if (!last_line &&
       (Feld[x][y + 1] == EL_MAGIC_WALL_ACTIVE ||
        Feld[x][y + 1] == EL_BD_MAGIC_WALL_ACTIVE))
   {
@@ -4650,7 +4650,7 @@ void Impact(int x, int y)
   }
 
   /* play sound of object that hits the ground */
-  if (lastline || object_hit)
+  if (last_line || object_hit)
     PlayLevelSoundElementAction(x, y, element, ACTION_IMPACT);
 }
 
@@ -6461,6 +6461,10 @@ void StartMoving(int x, int y)
     ContinueMoving(x, y);
 }
 
+void dummy()
+{
+}
+
 void ContinueMoving(int x, int y)
 {
   int element = Feld[x][y];
@@ -6479,6 +6483,7 @@ void ContinueMoving(int x, int y)
 #else
   boolean pushed_by_player = Pushed[x][y];
 #endif
+  boolean last_line = (newy == lev_fieldy - 1);
 
   MovPos[x][y] += getElementMoveStepsize(x, y);
 
@@ -6774,20 +6779,19 @@ void ContinueMoving(int x, int y)
 #if USE_NEW_MOVE_STYLE
 #if 0
   if (CAN_FALL(element) && direction == MV_DOWN &&
-      (newy == lev_fieldy - 1 || !IS_FREE(x, newy + 1)) &&
-      IS_PLAYER(x, newy + 1))
+      !last_line && IS_PLAYER(x, newy + 1))
     printf("::: we would now kill the player [%d]\n", FrameCounter);
 #endif
 
   /* give the player one last chance (one more frame) to move away */
   if (CAN_FALL(element) && direction == MV_DOWN &&
-      (newy == lev_fieldy - 1 || !IS_FREE(x, newy + 1)) &&
-      ((newy < lev_fieldy - 1 && !IS_PLAYER(x, newy + 1)) ||
-       game.engine_version < VERSION_IDENT(3,1,1,0)))
+      (last_line || (!IS_FREE(x, newy + 1) &&
+		     (!IS_PLAYER(x, newy + 1) ||
+		      game.engine_version < VERSION_IDENT(3,1,1,0)))))
     Impact(x, newy);
 #else
   if (CAN_FALL(element) && direction == MV_DOWN &&
-      (newy == lev_fieldy - 1 || !IS_FREE(x, newy + 1)))
+      (last_line || !IS_FREE(x, newy + 1)))
     Impact(x, newy);
 #endif
 

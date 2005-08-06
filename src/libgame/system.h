@@ -337,12 +337,26 @@
 
 
 /* values for artwork handling */
+#define LEVELDIR_ARTWORK_SET_PTR(leveldir, type)			\
+				((type) == ARTWORK_TYPE_GRAPHICS ?	\
+				 &(leveldir)->graphics_set :		\
+				 (type) == ARTWORK_TYPE_SOUNDS ?	\
+				 &(leveldir)->sounds_set :		\
+	 			 &(leveldir)->music_set)
+
 #define LEVELDIR_ARTWORK_SET(leveldir, type)				\
 				((type) == ARTWORK_TYPE_GRAPHICS ?	\
 				 (leveldir)->graphics_set :		\
 				 (type) == ARTWORK_TYPE_SOUNDS ?	\
 				 (leveldir)->sounds_set :		\
 	 			 (leveldir)->music_set)
+
+#define LEVELDIR_ARTWORK_PATH_PTR(leveldir, type)			\
+				((type) == ARTWORK_TYPE_GRAPHICS ?	\
+				 &(leveldir)->graphics_path :		\
+				 (type) == ARTWORK_TYPE_SOUNDS ?	\
+				 &(leveldir)->sounds_path :		\
+				 &(leveldir)->music_path)
 
 #define LEVELDIR_ARTWORK_PATH(leveldir, type)				\
 				((type) == ARTWORK_TYPE_GRAPHICS ?	\
@@ -371,6 +385,13 @@
 				 (type) == ARTWORK_TYPE_SOUNDS ?	\
 				 (artwork).snd_first :	\
 				 (artwork).mus_first)
+
+#define ARTWORK_CURRENT_IDENTIFIER_PTR(artwork, type)			\
+				((type) == ARTWORK_TYPE_GRAPHICS ?	\
+				 &(artwork).gfx_current_identifier :	\
+				 (type) == ARTWORK_TYPE_SOUNDS ?	\
+				 &(artwork).snd_current_identifier :	\
+				 &(artwork).mus_current_identifier)
 
 #define ARTWORK_CURRENT_IDENTIFIER(artwork, type)			\
 				((type) == ARTWORK_TYPE_GRAPHICS ?	\

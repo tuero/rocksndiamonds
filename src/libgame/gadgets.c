@@ -744,11 +744,11 @@ static void HandleGadgetTags(struct GadgetInfo *gi, int first_tag, va_list ap)
 	break;
 
       case GDI_TYPE:
-	gi->type = va_arg(ap, unsigned long);
+	gi->type = va_arg(ap, unsigned int);
 	break;
 
       case GDI_STATE:
-	gi->state = va_arg(ap, unsigned long);
+	gi->state = va_arg(ap, unsigned int);
 	break;
 
       case GDI_ACTIVE:
@@ -770,18 +770,18 @@ static void HandleGadgetTags(struct GadgetInfo *gi, int first_tag, va_list ap)
 	break;
 
       case GDI_RADIO_NR:
-	gi->radio_nr = va_arg(ap, unsigned long);
+	gi->radio_nr = va_arg(ap, unsigned int);
 	break;
 
       case GDI_NUMBER_VALUE:
-	gi->textinput.number_value = va_arg(ap, long);
+	gi->textinput.number_value = va_arg(ap, int);
 	sprintf(gi->textinput.value, "%d", gi->textinput.number_value);
 	strcpy(gi->textinput.last_value, gi->textinput.value);
 	gi->textinput.cursor_position = strlen(gi->textinput.value);
 	break;
 
       case GDI_NUMBER_MIN:
-	gi->textinput.number_min = va_arg(ap, long);
+	gi->textinput.number_min = va_arg(ap, int);
 	if (gi->textinput.number_value < gi->textinput.number_min)
 	{
 	  gi->textinput.number_value = gi->textinput.number_min;
@@ -791,7 +791,7 @@ static void HandleGadgetTags(struct GadgetInfo *gi, int first_tag, va_list ap)
 	break;
 
       case GDI_NUMBER_MAX:
-	gi->textinput.number_max = va_arg(ap, long);
+	gi->textinput.number_max = va_arg(ap, int);
 	if (gi->textinput.number_value > gi->textinput.number_max)
 	{
 	  gi->textinput.number_value = gi->textinput.number_max;
@@ -919,7 +919,7 @@ static void HandleGadgetTags(struct GadgetInfo *gi, int first_tag, va_list ap)
 	break;
 
       case GDI_EVENT_MASK:
-	gi->event_mask = va_arg(ap, unsigned long);
+	gi->event_mask = va_arg(ap, unsigned int);
 	break;
 
       case GDI_AREA_SIZE:

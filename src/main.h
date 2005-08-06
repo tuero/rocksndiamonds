@@ -1388,21 +1388,24 @@
 
 /* program information and versioning definitions */
 
-#if 1
+#define RELEASE_311			TRUE
+
+#if RELEASE_311
 #define PROGRAM_VERSION_MAJOR		3
 #define PROGRAM_VERSION_MINOR		1
 #define PROGRAM_VERSION_PATCH		1
 #define PROGRAM_VERSION_BUILD		0
 #else
-#define PROGRAM_VERSION_MAJOR		3
-#define PROGRAM_VERSION_MINOR		2
-#define PROGRAM_VERSION_PATCH		0
-#define PROGRAM_VERSION_BUILD		3
+/* !!! make sure that packaging script can find unique version number !!! */
+#define X_PROGRAM_VERSION_MAJOR		3
+#define X_PROGRAM_VERSION_MINOR		2
+#define X_PROGRAM_VERSION_PATCH		0
+#define X_PROGRAM_VERSION_BUILD		3
 #endif
 
 #define PROGRAM_TITLE_STRING		"Rocks'n'Diamonds"
 #define PROGRAM_AUTHOR_STRING		"Holger Schemel"
-#define PROGRAM_COPYRIGHT_STRING       "Copyright ©1995-2004 by Holger Schemel"
+#define PROGRAM_COPYRIGHT_STRING       "Copyright ©1995-2005 by Holger Schemel"
 
 #define ICON_TITLE_STRING		PROGRAM_TITLE_STRING
 #define COOKIE_PREFIX			"ROCKSNDIAMONDS"

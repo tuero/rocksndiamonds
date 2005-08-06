@@ -718,7 +718,7 @@ void ZoomPixmap(Display *display, GC gc, Pixmap src_pixmap, Pixmap dst_pixmap,
 	    for (i = 0; i < bytes_per_pixel; i++)
 	      *dst_ptr++ = *(src_ptr + i);
 
-	  src_ptr += i;
+	  src_ptr += bytes_per_pixel;
 	}
       }
     }

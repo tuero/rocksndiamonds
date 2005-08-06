@@ -213,8 +213,8 @@ struct GadgetInfo
   char info_text[MAX_INFO_TEXTSIZE];	/* short popup info text */
   int x, y;				/* gadget position */
   int width, height;			/* gadget size */
-  unsigned long type;			/* type (button, text input, ...) */
-  unsigned long state;			/* state (pressed, released, ...) */
+  unsigned int type;			/* type (button, text input, ...) */
+  unsigned int state;			/* state (pressed, released, ...) */
   boolean checked;			/* check/radio button state */
   int radio_nr;				/* number of radio button series */
   boolean mapped;			/* gadget is mapped on the screen */
@@ -226,7 +226,7 @@ struct GadgetInfo
   struct GadgetDesign design[2];	/* 0: normal; 1: pressed */
   struct GadgetDesign alt_design[2];	/* alternative design */
   struct GadgetDecoration deco;		/* decoration on top of gadget */
-  unsigned long event_mask;		/* possible events for this gadget */
+  unsigned int event_mask;		/* possible events for this gadget */
   struct GadgetEvent event;		/* actual gadget event */
   gadget_function callback_info;	/* function for pop-up info text */
   gadget_function callback_action;	/* function for gadget action */
