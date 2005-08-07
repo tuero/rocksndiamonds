@@ -1,4 +1,8 @@
 2005-08-07
+	* version number temporarily set to 3.1.1 (intermediate bugfix release)
+	* version 3.1.1 released
+
+2005-08-07
 	* changed some va_arg() arguments from 'long' to 'int', fixing problems
 	  on 64-bit architecture systems with LP64 data model
 

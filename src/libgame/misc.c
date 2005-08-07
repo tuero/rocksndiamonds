@@ -578,10 +578,18 @@ void GetOptions(char *argv[], void (*print_usage_function)(void))
   char *rw_base_path = RW_BASE_PATH;
   char **options_left = &argv[1];
 
+#if !defined(PLATFORM_MACOSX)
+  /* if the program is configured to start from current directory (default),
+     determine program package directory (KDE/Konqueror does not do this by
+     itself and fails otherwise); on Mac OS X, the program binary is stored
+     in an application package directory -- do not try to use this directory
+     as the program data directory (Mac OS X handles this correctly anyway) */
+
   if (strcmp(ro_base_path, ".") == 0)
     ro_base_path = program.command_basepath;
   if (strcmp(rw_base_path, ".") == 0)
     rw_base_path = program.command_basepath;
+#endif
 
   /* initialize global program options */
   options.display_name = NULL;

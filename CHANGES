@@ -1,7 +1,12 @@
-Release Version 3.2.0 [?? ??? ????]
+Release Version 3.1.1 [07 AUG 2005]
 -----------------------------------
 	- added tutorial level set created by Aaron Davidson
 	- added editor element descriptions written by Aaron Davidson
+	- added native game engine for Emerald Mine (Club) levels
+	- added level skipping functionality to main menu
+	- added support for dumping small-sized level sketches from editor
+	- added use of "editorsetup.conf" for different level sets
+	- lots of bugfixes and internal engine changes (see ChangeLog)
 
 Release Version 3.1.0 [07 JUN 2004]
 -----------------------------------
