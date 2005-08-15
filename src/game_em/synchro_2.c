@@ -20,7 +20,7 @@ void synchro_2(void)
 {
   register unsigned int x = 0;
   register unsigned int y = 1;
-  register unsigned long random = Random;
+  register unsigned long random = RandomEM;
   register unsigned short *cave_cache = Cave[y]; /* might be a win */
   unsigned long score = 0;
 
@@ -4887,7 +4887,7 @@ void synchro_2(void)
   if (ply1.alive || ply2.alive)
     lev.score += score; /* only get a score if someone is alive */
 
-  Random = random;
+  RandomEM = random;
 
   {
     void *temp = Cave;

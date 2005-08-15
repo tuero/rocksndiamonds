@@ -76,6 +76,9 @@ solaris-sdl:
 mac:
 	@$(MAKE_CMD) PLATFORM=macosx
 
+mac-static:
+	@$(MAKE_CMD) PLATFORM=macosx TARGET=sdl-static
+
 msdos:
 	@$(MAKE_CMD) PLATFORM=msdos
 
@@ -169,11 +172,13 @@ dist-build-all:
 	$(MAKE) clean
 	$(MAKE) dist-build-unix		; $(MAKE) dist-clean
 	$(MAKE) dist-build-win32	; $(MAKE) dist-clean
-	$(MAKE) dist-build-msdos	; $(MAKE) dist-clean
+#	$(MAKE) dist-build-msdos	; $(MAKE) dist-clean
 
-dist-all: dist-build-all dist-unix dist-msdos dist-win32 dist-macosx
+# dist-all: dist-build-all dist-unix dist-msdos dist-win32 dist-macosx
+dist-all: dist-build-all dist-unix dist-win32 dist-macosx
 
-upload-all: upload-unix upload-msdos upload-win32 upload-macosx
+# upload-all: upload-unix upload-msdos upload-win32 upload-macosx
+upload-all: upload-unix upload-win32 upload-macosx
 
 tags:
 	$(MAKE_CMD) tags

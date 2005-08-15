@@ -89,7 +89,7 @@ struct PLAYER
 
 #endif
 
-extern unsigned long Random;
+extern unsigned long RandomEM;
 
 extern struct PLAYER ply1;
 extern struct PLAYER ply2;

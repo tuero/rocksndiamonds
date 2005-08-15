@@ -38,7 +38,7 @@ void synchro_1(void)
   ply2.oldy = ply2.y;
   ply2.anim = SPR_still;
 
-  if (Random & 256)
+  if (RandomEM & 256)
   {
     if (ply1.alive) check_player(&ply1);
     if (ply2.alive) check_player(&ply2);
@@ -489,7 +489,7 @@ static void check_player(struct PLAYER *ply)
       ply->dynamite_cnt = 0;
     }
 
-    Random += 7;	/* be a bit more random if the player doesn't move */
+    RandomEM += 7;	/* be a bit more random if the player doesn't move */
 
     return;
   }

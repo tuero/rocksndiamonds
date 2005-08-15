@@ -8,7 +8,7 @@
 #include "level.h"
 
 
-unsigned long Random;
+unsigned long RandomEM;
 
 struct PLAYER ply1;
 struct PLAYER ply2;
@@ -29,7 +29,7 @@ void game_init_vars(void)
 {
   int x, y;
 
-  Random = 1684108901;
+  RandomEM = 1684108901;
 
   for (y = 0; y < HEIGHT; y++)
     for (x = 0; x < WIDTH; x++)
@@ -85,7 +85,7 @@ void GameActions_EM(byte action)
 
   game_animscreen();
 
-  Random = Random * 129 + 1;
+  RandomEM = RandomEM * 129 + 1;
 
   frame = (frame - 1) & 7;
 

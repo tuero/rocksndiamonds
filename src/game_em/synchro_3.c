@@ -63,7 +63,7 @@ void synchro_3(void)
 
   /* grow amoeba */
 
-  random = Random;
+  random = RandomEM;
 
   for (count = lev.amoeba_time; count--;)
   {
@@ -89,7 +89,7 @@ void synchro_3(void)
     random = random * 129 + 1;
   }
 
-  Random = random;
+  RandomEM = random;
 
   /* handle explosions */
 

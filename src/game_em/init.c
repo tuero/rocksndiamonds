@@ -379,13 +379,13 @@ unsigned int InitEngineRND_EM(long seed)
     int simple_rnd = SimpleRND(1000);
     int i;
 
-    for (i = 0; i < simple_rnd || Random == NEW_RANDOMIZE; i++)
-      Random = Random * 129 + 1;
+    for (i = 0; i < simple_rnd || RandomEM == NEW_RANDOMIZE; i++)
+      RandomEM = RandomEM * 129 + 1;
 
-    seed = Random;
+    seed = RandomEM;
   }
 
-  Random = seed;
+  RandomEM = seed;
 
   return (unsigned int) seed;
 }
