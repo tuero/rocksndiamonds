@@ -1,3 +1,6 @@
+2005-08-15
+	* fixed bug on Mac OS X (use of reserved name "Random") in EM engine
+
 2005-08-07
 	* version number temporarily set to 3.1.1 (intermediate bugfix release)
 	* version 3.1.1 released
