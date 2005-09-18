@@ -2760,20 +2760,23 @@ static void LoadLevel_InitElements(struct LevelInfo *level, char *filename)
   }
 
   /* correct custom element values (for old levels without these options) */
-  for (i = 0; i < NUM_CUSTOM_ELEMENTS; i++)
+  if (level->game_version < VERSION_IDENT(3,1,1,0))
   {
-    int element = EL_CUSTOM_START + i;
-    struct ElementInfo *ei = &element_info[element];
-
-    if (ei->access_direction == MV_NO_MOVING)
-      ei->access_direction = MV_ALL_DIRECTIONS;
-
-    for (j = 0; j < ei->num_change_pages; j++)
+    for (i = 0; i < NUM_CUSTOM_ELEMENTS; i++)
     {
-      struct ElementChangeInfo *change = &ei->change_page[j];
+      int element = EL_CUSTOM_START + i;
+      struct ElementInfo *ei = &element_info[element];
 
-      if (change->trigger_side == CH_SIDE_NONE)
-	change->trigger_side = CH_SIDE_ANY;
+      if (ei->access_direction == MV_NO_MOVING)
+	ei->access_direction = MV_ALL_DIRECTIONS;
+
+      for (j = 0; j < ei->num_change_pages; j++)
+      {
+	struct ElementChangeInfo *change = &ei->change_page[j];
+
+	if (change->trigger_side == CH_SIDE_NONE)
+	  change->trigger_side = CH_SIDE_ANY;
+      }
     }
   }
 

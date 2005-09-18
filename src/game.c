@@ -58,6 +58,8 @@
 
 #define USE_CHANGE_TO_TRIGGERED		(TRUE	* USE_NEW_STUFF		* 1)
 
+#define USE_BACK_WALKABLE_BUGFIX	(TRUE	* USE_NEW_STUFF		* 1)
+
 
 /* for DigField() */
 #define DF_NO_PUSH		0
@@ -11460,6 +11462,13 @@ int DigField(struct PlayerInfo *player,
 
   if (IS_TUBE(Back[jx][jy]) && game.engine_version >= VERSION_IDENT(2,2,0,0))
     old_element = Back[jx][jy];
+#if USE_BACK_WALKABLE_BUGFIX
+
+  /* in case of element dropped at player position, check background */
+  else if (Back[jx][jy] != EL_EMPTY &&
+	   game.engine_version >= VERSION_IDENT(2,2,0,0))
+    old_element = Back[jx][jy];
+#endif
 
 #endif
 

@@ -1,3 +1,7 @@
+2005-08-20
+	* fixed bug preventing "walkable from no direction" from being ignored
+	  (due to compatibility code overwriting this setting after loading)
+
 2005-08-15
 	* fixed bug on Mac OS X (use of reserved name "Random") in EM engine
 
