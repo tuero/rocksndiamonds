@@ -114,6 +114,11 @@ void setElementChangeInfoToDefaults(struct ElementChangeInfo *change)
   change->random_percentage = 100;
   change->replace_when = CP_WHEN_EMPTY;
 
+  change->use_change_action = FALSE;
+  change->change_action = CA_NO_ACTION;
+  change->change_action_mode = CA_MODE_UNDEFINED;
+  change->change_action_arg = CA_ARG_UNDEFINED;
+
   for (x = 0; x < 3; x++)
     for (y = 0; y < 3; y++)
       change->target_content[x][y] = EL_EMPTY_SPACE;
@@ -292,6 +297,9 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
       element_info[element].explosion_type = EXPLODES_3X3;
       element_info[element].explosion_delay = 16;
       element_info[element].ignition_delay = 8;
+
+      element_info[element].counter_initial = 0;
+      element_info[element].counter = 0;
 
       for (x = 0; x < 3; x++)
 	for (y = 0; y < 3; y++)

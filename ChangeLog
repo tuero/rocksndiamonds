@@ -1,3 +1,12 @@
+2005-11-19
+	* fixed music initialization bug in init.c (thanks to David Binderman)
+	* fixed mouse wheel "button" bug in editor (thanks to Tomi Belan)
+	  (this bug must probably be fixed at other places, too)
+
+2005-10-16
+	* fixed buggy '#include "SDL.h"' statements in src/libgame/sdl.h
+	  (should be '#include <SDL.h>' instead)
+
 2005-08-20
 	* fixed bug preventing "walkable from no direction" from being ignored
 	  (due to compatibility code overwriting this setting after loading)

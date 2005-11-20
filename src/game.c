@@ -7859,7 +7859,26 @@ static void ChangeActiveTrap(int x, int y)
     DrawLevelFieldCrumbledSand(x, y);
 }
 
-static void ChangeElementNowExt(int x, int y, int target_element)
+static void HandleChangeAction(int change_action)
+{
+  if (change_action == CA_EXIT_PLAYER)
+  {
+    printf("::: CA_EXIT_GAME\n");
+
+    /* !!! local_player <-> 4 players !!! (EXTEND THIS) !!! */
+    local_player->LevelSolved = local_player->GameOver = TRUE;
+  }
+  else if (change_action == CA_KILL_PLAYER)
+  {
+    printf("::: CA_KILL_PLAYER\n");
+
+    /* !!! local_player <-> 4 players !!! (EXTEND THIS) !!! */
+    KillHero(local_player);
+  }
+}
+
+static void ChangeElementNowExt(struct ElementChangeInfo *change,
+				int x, int y, int target_element)
 {
   int previous_move_direction = MovDir[x][y];
 #if 1
@@ -7946,6 +7965,9 @@ static void ChangeElementNowExt(int x, int y, int target_element)
   TestIfPlayerTouchesCustomElement(x, y);
   TestIfElementTouchesCustomElement(x, y);
 #endif
+
+  if (change->use_change_action)
+    HandleChangeAction(change->change_action);
 }
 
 static boolean ChangeElementNow(int x, int y, int element, int page)
@@ -8127,7 +8149,7 @@ static boolean ChangeElementNow(int x, int y, int element, int page)
 	  content_element = change->target_content[xx][yy];
 	  target_element = GET_TARGET_ELEMENT(content_element, change);
 
-	  ChangeElementNowExt(ex, ey, target_element);
+	  ChangeElementNowExt(change, ex, ey, target_element);
 
 	  something_has_changed = TRUE;
 
@@ -8145,7 +8167,7 @@ static boolean ChangeElementNow(int x, int y, int element, int page)
   {
     target_element = GET_TARGET_ELEMENT(change->target_element, change);
 
-    ChangeElementNowExt(x, y, target_element);
+    ChangeElementNowExt(change, x, y, target_element);
 
     PlayLevelSoundElementAction(x, y, element, ACTION_CHANGING);
   }

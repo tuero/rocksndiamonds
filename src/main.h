@@ -259,8 +259,11 @@
 #define CH_PLAYER_2		(1 << 1)
 #define CH_PLAYER_3		(1 << 2)
 #define CH_PLAYER_4		(1 << 3)
-#define CH_PLAYER_ANY		(CH_PLAYER_1 | CH_PLAYER_2 | CH_PLAYER_3 | \
+#define CH_PLAYER_ANY		(CH_PLAYER_1 | \
+				 CH_PLAYER_2 | \
+				 CH_PLAYER_3 | \
 				 CH_PLAYER_4)
+#define CH_PLAYER_TRIGGER	(1 << 4)
 
 /* values for change page for custom elements */
 #define CH_PAGE_ANY_FILE	(0xff)
@@ -273,6 +276,68 @@
 #define CP_WHEN_COLLECTIBLE	3
 #define CP_WHEN_REMOVABLE	4
 #define CP_WHEN_WALKABLE	5
+
+/* values for change actions for custom elements */
+#define CA_NO_ACTION		0
+#define CA_EXIT_PLAYER		1
+#define CA_KILL_PLAYER		2
+#define CA_RESTART_LEVEL	3
+#define CA_SHOW_ENVELOPE	4
+#define CA_ADD_KEY		5
+#define CA_DEL_KEY		6
+#define CA_SET_PLAYER_SPEED	7
+#define CA_SET_GEMS		8
+#define CA_SET_SCORE		9
+#define CA_SET_TIME		10
+#define CA_SET_COUNTER		11
+#define CA_SET_DYNABOMB_NUMBER	12
+#define CA_SET_DYNABOMB_SIZE	13
+#define CA_SET_DYNABOMB_POWER	14
+#define CA_TOGGLE_PLAYER_GRAVITY  15
+#define CA_ENABLE_PLAYER_GRAVITY  16
+#define CA_DISABLE_PLAYER_GRAVITY 17
+
+/* values for change action mode for custom elements */
+#define CA_MODE_UNDEFINED	0
+#define CA_MODE_ADD		1
+#define CA_MODE_SUBTRACT	2
+#define CA_MODE_MULTIPLY	3
+#define CA_MODE_DIVIDE		4
+#define CA_MODE_SET		5
+
+/* values for change action parameters for custom elements */
+#define CA_ARG_0		0
+#define CA_ARG_1		1
+#define CA_ARG_2		2
+#define CA_ARG_3		3
+#define CA_ARG_4		4
+#define CA_ARG_5		5
+#define CA_ARG_6		6
+#define CA_ARG_7		7
+#define CA_ARG_8		8
+#define CA_ARG_9		9
+#define CA_ARG_10		10
+#define CA_ARG_20		20
+#define CA_ARG_25		25
+#define CA_ARG_50		50
+#define CA_ARG_100		100
+#define CA_ARG_1000		1000
+#define CA_ARG_PLAYER		20000
+#define CA_ARG_PLAYER_HEADLINE	(CA_ARG_PLAYER + 0)
+#define CA_ARG_PLAYER_1		(CA_ARG_PLAYER + CH_PLAYER_1)
+#define CA_ARG_PLAYER_2		(CA_ARG_PLAYER + CH_PLAYER_2)
+#define CA_ARG_PLAYER_3		(CA_ARG_PLAYER + CH_PLAYER_3)
+#define CA_ARG_PLAYER_4		(CA_ARG_PLAYER + CH_PLAYER_4)
+#define CA_ARG_PLAYER_ANY	(CA_ARG_PLAYER + CH_PLAYER_ANY)
+#define CA_ARG_PLAYER_TRIGGER	(CA_ARG_PLAYER + CH_PLAYER_TRIGGER)
+#define CA_ARG_NUMBER		30000
+#define CA_ARG_NUMBER_HEADLINE	(CA_ARG_NUMBER + 0)
+#define CA_ARG_NUMBER_MIN	(CA_ARG_NUMBER + 1)
+#define CA_ARG_NUMBER_MAX	(CA_ARG_NUMBER + 2)
+#define CA_ARG_NUMBER_NORMAL	(CA_ARG_NUMBER + 3)
+#define CA_ARG_NUMBER_RESET	(CA_ARG_NUMBER + 4)
+#define CA_ARG_NUMBER_COUNT	(CA_ARG_NUMBER + 5)
+#define CA_ARG_UNDEFINED	30999
 
 /* values for custom move patterns (bits 0 - 3: basic move directions) */
 #define MV_BIT_TOWARDS_PLAYER	4
@@ -1829,6 +1894,11 @@ struct ElementChangeInfo
 
   boolean explode;		/* explode instead of change */
 
+  boolean use_change_action;	/* execute change action after change */
+  int change_action;		/* type of change action after change */
+  int change_action_mode;	/* mode of change action after change */
+  int change_action_arg;	/* parameter of change action after change */
+
   /* ---------- internal values used at runtime when playing ---------- */
 
   /* functions that are called before, while and after the change of an
@@ -1930,6 +2000,8 @@ struct ElementInfo
   int explosion_delay;		/* duration of explosion of this element */
   int ignition_delay;		/* delay for explosion by other explosion */
 
+  int counter_initial;		/* initial value of generic CE counter */
+
   struct ElementChangeInfo *change_page; /* actual list of change pages */
   struct ElementChangeInfo *change;	 /* pointer to current change page */
 
@@ -1955,6 +2027,8 @@ struct ElementInfo
   boolean can_leave_element;	/* element can leave other element behind */
   boolean can_leave_element_last;
 #endif
+
+  int counter;			/* current value of generic CE counter */
 
   /* ---------- internal values used in level editor ---------- */
 

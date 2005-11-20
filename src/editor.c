@@ -474,11 +474,14 @@
 #define GADGET_ID_CHANGE_PLAYER		(GADGET_ID_SELECTBOX_FIRST + 19)
 #define GADGET_ID_CHANGE_PAGE		(GADGET_ID_SELECTBOX_FIRST + 20)
 #define GADGET_ID_CHANGE_REPLACE_WHEN	(GADGET_ID_SELECTBOX_FIRST + 21)
-#define GADGET_ID_SELECT_CHANGE_PAGE	(GADGET_ID_SELECTBOX_FIRST + 22)
-#define GADGET_ID_GROUP_CHOICE_MODE	(GADGET_ID_SELECTBOX_FIRST + 23)
+#define GADGET_ID_CHANGE_ACTION		(GADGET_ID_SELECTBOX_FIRST + 22)
+#define GADGET_ID_CHANGE_ACTION_MODE	(GADGET_ID_SELECTBOX_FIRST + 23)
+#define GADGET_ID_CHANGE_ACTION_ARG	(GADGET_ID_SELECTBOX_FIRST + 24)
+#define GADGET_ID_SELECT_CHANGE_PAGE	(GADGET_ID_SELECTBOX_FIRST + 25)
+#define GADGET_ID_GROUP_CHOICE_MODE	(GADGET_ID_SELECTBOX_FIRST + 26)
 
 /* textbutton identifiers */
-#define GADGET_ID_TEXTBUTTON_FIRST	(GADGET_ID_SELECTBOX_FIRST + 24)
+#define GADGET_ID_TEXTBUTTON_FIRST	(GADGET_ID_SELECTBOX_FIRST + 27)
 
 #define GADGET_ID_PROPERTIES_INFO	(GADGET_ID_TEXTBUTTON_FIRST + 0)
 #define GADGET_ID_PROPERTIES_CONFIG	(GADGET_ID_TEXTBUTTON_FIRST + 1)
@@ -553,12 +556,13 @@
 #define GADGET_ID_CHANGE_USE_EXPLOSION	(GADGET_ID_CHECKBUTTON_FIRST + 33)
 #define GADGET_ID_CHANGE_ONLY_COMPLETE	(GADGET_ID_CHECKBUTTON_FIRST + 34)
 #define GADGET_ID_CHANGE_USE_RANDOM	(GADGET_ID_CHECKBUTTON_FIRST + 35)
-#define GADGET_ID_CHANGE_DELAY		(GADGET_ID_CHECKBUTTON_FIRST + 36)
-#define GADGET_ID_CHANGE_BY_DIRECT_ACT	(GADGET_ID_CHECKBUTTON_FIRST + 37)
-#define GADGET_ID_CHANGE_BY_OTHER_ACT	(GADGET_ID_CHECKBUTTON_FIRST + 38)
+#define GADGET_ID_CHANGE_USE_ACTION	(GADGET_ID_CHECKBUTTON_FIRST + 36)
+#define GADGET_ID_CHANGE_DELAY		(GADGET_ID_CHECKBUTTON_FIRST + 37)
+#define GADGET_ID_CHANGE_BY_DIRECT_ACT	(GADGET_ID_CHECKBUTTON_FIRST + 38)
+#define GADGET_ID_CHANGE_BY_OTHER_ACT	(GADGET_ID_CHECKBUTTON_FIRST + 39)
 
 /* gadgets for buttons in element list */
-#define GADGET_ID_ELEMENTLIST_FIRST	(GADGET_ID_CHECKBUTTON_FIRST + 39)
+#define GADGET_ID_ELEMENTLIST_FIRST	(GADGET_ID_CHECKBUTTON_FIRST + 40)
 #define GADGET_ID_ELEMENTLIST_LAST	(GADGET_ID_ELEMENTLIST_FIRST +	\
 	 				ED_NUM_ELEMENTLIST_BUTTONS - 1)
 
@@ -676,10 +680,13 @@
 #define ED_SELECTBOX_ID_CHANGE_PLAYER		19
 #define ED_SELECTBOX_ID_CHANGE_PAGE		20
 #define ED_SELECTBOX_ID_CHANGE_REPLACE_WHEN	21
-#define ED_SELECTBOX_ID_SELECT_CHANGE_PAGE	22
-#define ED_SELECTBOX_ID_GROUP_CHOICE_MODE	23
+#define ED_SELECTBOX_ID_CHANGE_ACTION		22
+#define ED_SELECTBOX_ID_CHANGE_ACTION_MODE	23
+#define ED_SELECTBOX_ID_CHANGE_ACTION_ARG	24
+#define ED_SELECTBOX_ID_SELECT_CHANGE_PAGE	25
+#define ED_SELECTBOX_ID_GROUP_CHOICE_MODE	26
 
-#define ED_NUM_SELECTBOX			24
+#define ED_NUM_SELECTBOX			27
 
 #define ED_SELECTBOX_ID_LEVEL_FIRST	ED_SELECTBOX_ID_TIME_OR_STEPS
 #define ED_SELECTBOX_ID_LEVEL_LAST	ED_SELECTBOX_ID_GAME_ENGINE_TYPE
@@ -761,8 +768,9 @@
 #define ED_CHECKBUTTON_ID_CHANGE_USE_CONTENT	34
 #define ED_CHECKBUTTON_ID_CHANGE_ONLY_COMPLETE	35
 #define ED_CHECKBUTTON_ID_CHANGE_USE_RANDOM	36
+#define ED_CHECKBUTTON_ID_CHANGE_USE_ACTION	37
 
-#define ED_NUM_CHECKBUTTONS			37
+#define ED_NUM_CHECKBUTTONS			38
 
 #define ED_CHECKBUTTON_ID_LEVEL_FIRST	ED_CHECKBUTTON_ID_INITIAL_GRAVITY
 #define ED_CHECKBUTTON_ID_LEVEL_LAST	ED_CHECKBUTTON_ID_RANDOM_RESTRICTED
@@ -775,7 +783,7 @@
 #define ED_CHECKBUTTON_ID_CUSTOM_LAST	ED_CHECKBUTTON_ID_CUSTOM2_LAST
 
 #define ED_CHECKBUTTON_ID_CHANGE_FIRST	ED_CHECKBUTTON_ID_CUSTOM_CAN_CHANGE
-#define ED_CHECKBUTTON_ID_CHANGE_LAST	ED_CHECKBUTTON_ID_CHANGE_USE_RANDOM
+#define ED_CHECKBUTTON_ID_CHANGE_LAST	ED_CHECKBUTTON_ID_CHANGE_USE_ACTION
 
 /* values for radiobutton gadgets */
 #define ED_RADIOBUTTON_ID_PERCENTAGE	0
@@ -1526,6 +1534,79 @@ static struct ValueTextInfo options_change_replace_when[] =
   { -1,				NULL				}
 };
 
+static struct ValueTextInfo options_change_action[] =
+{
+  { CA_NO_ACTION,		"no action"			},
+  { CA_EXIT_PLAYER,		"exit player"			},
+  { CA_KILL_PLAYER,		"kill player"			},
+  { CA_RESTART_LEVEL,		"restart level"			},
+  { CA_SHOW_ENVELOPE,		"show envelope"			},
+  { CA_ADD_KEY,			"add key"			},
+  { CA_DEL_KEY,			"remove key"			},
+  { CA_SET_PLAYER_SPEED,	"set player speed"		},
+  { CA_SET_GEMS,		"set gems"			},
+  { CA_SET_SCORE,		"set score"			},
+  { CA_SET_TIME,		"set time"			},
+  { CA_SET_COUNTER,		"set counter"			},
+  { CA_SET_DYNABOMB_NUMBER,	"set bomb number"		},
+  { CA_SET_DYNABOMB_SIZE,	"set bomb size"			},
+  { CA_SET_DYNABOMB_POWER,	"set bomb power"		},
+  { CA_TOGGLE_PLAYER_GRAVITY,	"toggle gravity"		},
+  { CA_ENABLE_PLAYER_GRAVITY,	"enable gravity"		},
+  { CA_DISABLE_PLAYER_GRAVITY,	"disable gravity"		},
+
+  { -1,				NULL				}
+};
+
+static struct ValueTextInfo options_change_action_mode[] =
+{
+  { CA_MODE_UNDEFINED,		" "				},
+  { CA_MODE_ADD,		"+"				},
+  { CA_MODE_SUBTRACT,		"-"				},
+  { CA_MODE_MULTIPLY,		"*"				},
+  { CA_MODE_DIVIDE,		"/"				},
+  { CA_MODE_SET,		"="				},
+
+  { -1,				NULL				}
+};
+
+static struct ValueTextInfo options_change_action_arg[] =
+{
+  { CA_ARG_PLAYER_HEADLINE,	"[players]"			},
+  { CA_ARG_PLAYER_1,		"1"				},
+  { CA_ARG_PLAYER_2,		"2"				},
+  { CA_ARG_PLAYER_3,		"3"				},
+  { CA_ARG_PLAYER_4,		"4"				},
+  { CA_ARG_PLAYER_ANY,		"any"				},
+  { CA_ARG_PLAYER_TRIGGER,	"trigger"			},
+  { CA_ARG_UNDEFINED,		" "				},
+  { CA_ARG_NUMBER_HEADLINE,	"[numbers]"			},
+  { CA_ARG_0,			"0"				},
+  { CA_ARG_1,			"1"				},
+  { CA_ARG_2,			"2"				},
+  { CA_ARG_3,			"3"				},
+  { CA_ARG_4,			"4"				},
+  { CA_ARG_5,			"5"				},
+  { CA_ARG_6,			"6"				},
+  { CA_ARG_7,			"7"				},
+  { CA_ARG_8,			"8"				},
+  { CA_ARG_9,			"9"				},
+  { CA_ARG_10,			"10"				},
+  { CA_ARG_20,			"20"				},
+  { CA_ARG_25,			"25"				},
+  { CA_ARG_50,			"50"				},
+  { CA_ARG_100,			"100"				},
+  { CA_ARG_1000,		"1000"				},
+  { CA_ARG_UNDEFINED,		" "				},
+  { CA_ARG_NUMBER_MIN,		"min"				},
+  { CA_ARG_NUMBER_MAX,		"max"				},
+  { CA_ARG_NUMBER_NORMAL,	"normal"			},
+  { CA_ARG_NUMBER_RESET,	"reset"				},
+  { CA_ARG_NUMBER_COUNT,	"counter"			},
+
+  { -1,				NULL				}
+};
+
 static char options_change_page_strings[MAX_CHANGE_PAGES][10];
 static struct ValueTextInfo options_change_page[MAX_CHANGE_PAGES + 1] =
 {
@@ -1740,6 +1821,30 @@ static struct
     options_change_replace_when,
     &custom_element_change.replace_when,
     "replace when", NULL,		"which elements can be replaced"
+  },
+  {
+    ED_ELEMENT_SETTINGS_XPOS(1),	ED_ELEMENT_SETTINGS_YPOS(13),
+    GADGET_ID_CHANGE_ACTION,		GADGET_ID_NONE,
+    -1,
+    options_change_action,
+    &custom_element_change.change_action,
+    NULL, NULL,				"action on specified condition"
+  },
+  {
+    -1,					ED_ELEMENT_SETTINGS_YPOS(13),
+    GADGET_ID_CHANGE_ACTION_MODE,	GADGET_ID_CHANGE_ACTION,
+    -1,
+    options_change_action_mode,
+    &custom_element_change.change_action_mode,
+    NULL, NULL,				"action operator"
+  },
+  {
+    -1,					ED_ELEMENT_SETTINGS_YPOS(13),
+    GADGET_ID_CHANGE_ACTION_ARG,	GADGET_ID_CHANGE_ACTION_MODE,
+    -1,
+    options_change_action_arg,
+    &custom_element_change.change_action_arg,
+    NULL, NULL,				"action parameter"
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(1),	ED_ELEMENT_SETTINGS_YPOS(14),
@@ -2213,7 +2318,7 @@ static struct
     ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(1),
     GADGET_ID_CUSTOM_CAN_CHANGE,	GADGET_ID_NONE,
     &custom_element_change.can_change,
-    NULL, "element changes to:",	"element can change to other element"
+    NULL, "element changes to:",	"change element on specified condition"
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(1),	ED_ELEMENT_SETTINGS_YPOS(2),
@@ -2256,6 +2361,12 @@ static struct
     GADGET_ID_CHANGE_USE_RANDOM,	GADGET_ID_NONE,
     &custom_element_change.use_random_replace,
     NULL, NULL,				"use percentage for random replace"
+  },
+  {
+    ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(13),
+    GADGET_ID_CHANGE_USE_ACTION,	GADGET_ID_NONE,
+    &custom_element_change.use_change_action,
+    NULL, NULL,				"execute action on specified condition"
   },
 };
 
@@ -2493,6 +2604,7 @@ static int new_element1 = EL_WALL;
 static int new_element2 = EL_EMPTY;
 static int new_element3 = EL_SAND;
 
+#define IS_VALID_BUTTON(button) (button >= 1 && button <= 3)
 #define BUTTON_ELEMENT(button) ((button) == 1 ? new_element1 : \
 				(button) == 2 ? new_element2 : \
 				(button) == 3 ? new_element3 : EL_EMPTY)
@@ -8454,8 +8566,13 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
   if (!started_inside_drawing_area)
     return;
 
+#if 1
+  if (!IS_VALID_BUTTON(button) && !button_release_event)
+    return;
+#else
   if (!button && !button_release_event)
     return;
+#endif
 
   /* automatically switch to 'single item' drawing mode, if needed */
   actual_drawing_function =
@@ -9023,6 +9140,14 @@ static void HandleControlButtons(struct GadgetInfo *gi)
   int step = BUTTON_STEPSIZE(button);
   int new_element = BUTTON_ELEMENT(button);
   int x, y;
+
+#if 0
+  /* MAKES PROBLEMS WITH ELEMENT LIST SCROLLBAR AND IS PROBABLY NOT NEEDED */
+  /* !!! CHECK WHAT HAPPENS WHEN MOUSE WHEEL IS USED OVER ELEMENT LIST !!! */
+
+  if (!IS_VALID_BUTTON(button))
+    return;
+#endif
 
   if (edit_mode == ED_MODE_DRAWING && drawing_function == GADGET_ID_TEXT)
     DrawLevelText(0, 0, 0, TEXT_END);

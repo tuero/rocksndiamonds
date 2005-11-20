@@ -4415,7 +4415,7 @@ static void InitArtworkConfig()
 
   for (i = 0; i < NUM_MUSIC_PREFIXES; i++)
     music_id_prefix[i] = music_prefix_info[i].prefix;
-  music_id_prefix[MAX_LEVELS] = NULL;
+  music_id_prefix[NUM_MUSIC_PREFIXES] = NULL;
 
   for (i = 0; i < NUM_ACTIONS; i++)
     action_id_suffix[i] = element_action_info[i].suffix;
