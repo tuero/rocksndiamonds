@@ -711,13 +711,19 @@ static void TapeRewind()
   InitRND(tape.random_seed);
 }
 
-void TapeStartRecording()
+static void TapeSetRandomSeed(long random_seed)
+{
+  tape.random_seed = InitRND(random_seed);
+}
+
+void TapeStartRecording(long random_seed)
 {
   if (!TAPE_IS_STOPPED(tape))
     TapeStop();
 
   TapeErase();
   TapeRewind();
+  TapeSetRandomSeed(random_seed);
 
   tape.recording = TRUE;
 
@@ -732,7 +738,7 @@ void TapeStartRecording()
 
 static void TapeStartGameRecording()
 {
-  TapeStartRecording();
+  TapeStartRecording(NEW_RANDOMIZE);
 
 #if defined(NETWORK_AVALIABLE)
   if (options.network)

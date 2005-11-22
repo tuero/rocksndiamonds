@@ -3949,6 +3949,12 @@ void InitElementPropertiesEngine(int engine_version)
       if (element_info[i].change_page[j].can_change)
 	SET_PROPERTY(i, EP_CAN_CHANGE, TRUE);
 
+    /* ---------- HAS_ACTION ----------------------------------------------- */
+    SET_PROPERTY(i, EP_HAS_ACTION, FALSE);	/* default: has no action */
+    for (j = 0; j < element_info[i].num_change_pages; j++)
+      if (element_info[i].change_page[j].use_action)
+	SET_PROPERTY(i, EP_HAS_ACTION, TRUE);
+
     /* ---------- GFX_CRUMBLED --------------------------------------------- */
 #if 1
     SET_PROPERTY(i, EP_GFX_CRUMBLED,
@@ -4278,6 +4284,11 @@ static void InitSetup()
 
   if (setup.options.verbose)
     options.verbose = TRUE;
+}
+
+static void InitGameInfo()
+{
+  game.restart_level = FALSE;
 }
 
 static void InitPlayerInfo()
@@ -4838,6 +4849,7 @@ void OpenAll()
 
   InitSetup();
 
+  InitGameInfo();
   InitPlayerInfo();
   InitArtworkInfo();		/* needed before loading gfx, sound & music */
   InitArtworkConfig();		/* needed before forking sound child process */

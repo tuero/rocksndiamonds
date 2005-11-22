@@ -2196,7 +2196,8 @@ void InitGame()
 #endif
   }
 
-  CloseDoor(DOOR_CLOSE_1);
+  if (!game.restart_level)
+    CloseDoor(DOOR_CLOSE_1);
 
   /* !!! FIX THIS (START) !!! */
   if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
@@ -2220,39 +2221,47 @@ void InitGame()
   }
   /* !!! FIX THIS (END) !!! */
 
-  /* copy default game door content to main double buffer */
-  BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
-	     DOOR_GFX_PAGEX5, DOOR_GFX_PAGEY1, DXSIZE, DYSIZE, DX, DY);
+  if (!game.restart_level)
+  {
+    /* copy default game door content to main double buffer */
+    BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
+	       DOOR_GFX_PAGEX5, DOOR_GFX_PAGEY1, DXSIZE, DYSIZE, DX, DY);
+  }
 
   DrawGameDoorValues();
 
-  UnmapGameButtons();
-  UnmapTapeButtons();
-  game_gadget[SOUND_CTRL_ID_MUSIC]->checked = setup.sound_music;
-  game_gadget[SOUND_CTRL_ID_LOOPS]->checked = setup.sound_loops;
-  game_gadget[SOUND_CTRL_ID_SIMPLE]->checked = setup.sound_simple;
-  MapGameButtons();
-  MapTapeButtons();
-
-  /* copy actual game door content to door double buffer for OpenDoor() */
-  BlitBitmap(drawto, bitmap_db_door,
-	     DX, DY, DXSIZE, DYSIZE, DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1);
-
-  OpenDoor(DOOR_OPEN_ALL);
-
-  PlaySoundStereo(SND_GAME_STARTING, SOUND_MIDDLE);
-
-  if (setup.sound_music)
-    PlayLevelMusic();
-
-  KeyboardAutoRepeatOffUnlessAutoplay();
-
-  if (options.debug)
+  if (!game.restart_level)
   {
-    for (i = 0; i < MAX_PLAYERS; i++)
-      printf("Player %d %sactive.\n",
-	     i + 1, (stored_player[i].active ? "" : "not "));
+    UnmapGameButtons();
+    UnmapTapeButtons();
+    game_gadget[SOUND_CTRL_ID_MUSIC]->checked = setup.sound_music;
+    game_gadget[SOUND_CTRL_ID_LOOPS]->checked = setup.sound_loops;
+    game_gadget[SOUND_CTRL_ID_SIMPLE]->checked = setup.sound_simple;
+    MapGameButtons();
+    MapTapeButtons();
+
+    /* copy actual game door content to door double buffer for OpenDoor() */
+    BlitBitmap(drawto, bitmap_db_door,
+	       DX, DY, DXSIZE, DYSIZE, DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1);
+
+    OpenDoor(DOOR_OPEN_ALL);
+
+    PlaySoundStereo(SND_GAME_STARTING, SOUND_MIDDLE);
+
+    if (setup.sound_music)
+      PlayLevelMusic();
+
+    KeyboardAutoRepeatOffUnlessAutoplay();
+
+    if (options.debug)
+    {
+      for (i = 0; i < MAX_PLAYERS; i++)
+	printf("Player %d %sactive.\n",
+	       i + 1, (stored_player[i].active ? "" : "not "));
+    }
   }
+
+  game.restart_level = FALSE;
 
 #if 0
   printf("::: starting game [%d]\n", FrameCounter);
@@ -7889,7 +7898,7 @@ static int getModifiedActionNumber(int value_old, int value_min, int value_max,
 	  value_new);
 }
 
-static void ExecuteCustomElementAction(int x, int y, int element, int page)
+static void ExecuteCustomElementAction(int element, int page)
 {
   struct ElementInfo *ei = &element_info[element];
   struct ElementChangeInfo *change = &ei->change_page[page];
@@ -7963,7 +7972,7 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
 
     case CA_RESTART_LEVEL:
     {
-      printf("::: CA_RESTART_LEVEL -- not yet implemented\n");
+      game.restart_level = TRUE;
 
       break;
     }
@@ -8550,7 +8559,7 @@ static void ChangeElement(int x, int y, int page)
 
 #if 1
     if (change->use_action)
-      ExecuteCustomElementAction(x, y, element, page);
+      ExecuteCustomElementAction(element, page);
 #endif
 
     if (ChangeElementNow(x, y, element, page))

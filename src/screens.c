@@ -511,6 +511,9 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
       }
       else if (y == 5)
       {
+#if 1
+	StartGameActions(options.network, setup.autorecord, NEW_RANDOMIZE);
+#else
 	if (setup.autorecord)
 	  TapeStartRecording();
 
@@ -524,6 +527,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 	  StopAnimation();
 	  InitGame();
 	}
+#endif
       }
       else if (y == 6)
       {
@@ -3082,6 +3086,9 @@ void HandleGameActions()
   }
   else
   {
+    if (game.restart_level)
+      StartGameActions(options.network, setup.autorecord, NEW_RANDOMIZE);
+
     if (local_player->LevelSolved)
       GameWon();
 
@@ -3094,6 +3101,30 @@ void HandleGameActions()
     if (tape.auto_play && !tape.playing)
       AutoPlayTape();	/* continue automatically playing next tape */
   }
+}
+
+void StartGameActions(boolean init_network_game, boolean record_tape,
+		      long random_seed)
+{
+  if (record_tape)
+    TapeStartRecording(random_seed);
+
+#if defined(NETWORK_AVALIABLE)
+  if (init_network_game)
+  {
+    SendToServer_StartPlaying();
+
+    return;
+  }
+#endif
+
+  StopAnimation();
+
+  game_status = GAME_MODE_PLAYING;
+
+  InitRND(random_seed);
+
+  InitGame();
 }
 
 /* ---------- new screen button stuff -------------------------------------- */

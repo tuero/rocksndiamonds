@@ -500,12 +500,12 @@ static void Handle_OP_START_PLAYING()
 {
   LevelDirTree *new_leveldir;
   int new_level_nr;
-  int dummy;				/* !!! HAS NO MEANING ANYMORE !!! */
+  int dummy;
   unsigned long new_random_seed;
   char *new_leveldir_identifier;
 
   new_level_nr = (buffer[2] << 8) + buffer[3];
-  dummy = (buffer[4] << 8) + buffer[5];
+  dummy = (buffer[4] << 8) + buffer[5];			/* (obsolete) */
   new_random_seed =
     (buffer[6] << 24) | (buffer[7] << 16) | (buffer[8] << 8) | (buffer[9]);
   new_leveldir_identifier = (char *)&buffer[10];
@@ -532,6 +532,9 @@ static void Handle_OP_START_PLAYING()
   LoadTape(level_nr);
   LoadLevel(level_nr);
 
+#if 1
+  StartGameActions(FALSE, setup.autorecord, new_random_seed);
+#else
   if (setup.autorecord)
     TapeStartRecording();
 
@@ -542,6 +545,7 @@ static void Handle_OP_START_PLAYING()
 
   game_status = GAME_MODE_PLAYING;
   InitGame();
+#endif
 }
 
 static void Handle_OP_PAUSE_PLAYING()

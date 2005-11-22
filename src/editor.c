@@ -9462,13 +9462,18 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 
 	DrawCompleteVideoDisplay();
 
+	level_editor_test_game = TRUE;
+
+#if 1
+	StartGameActions(FALSE, setup.autorecord, NEW_RANDOMIZE);
+#else
 	if (setup.autorecord)
 	  TapeStartRecording();
 
-	level_editor_test_game = TRUE;
 	game_status = GAME_MODE_PLAYING;
 
 	InitGame();
+#endif
       }
       break;
 

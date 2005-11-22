@@ -155,7 +155,10 @@
 #define EP_WALK_TO_OBJECT	81
 #define EP_DEADLY		82
 
-#define NUM_ELEMENT_PROPERTIES	83
+/* values for internal purpose only (game engine) */
+#define EP_HAS_ACTION		83
+
+#define NUM_ELEMENT_PROPERTIES	84
 
 #define NUM_EP_BITFIELDS	((NUM_ELEMENT_PROPERTIES + 31) / 32)
 #define EP_BITFIELD_BASE	0
@@ -506,6 +509,7 @@
 				HAS_PROPERTY(e, EP_CAN_EXPLODE_BY_EXPLOSION)
 #define COULD_MOVE_INTO_ACID(e)	HAS_PROPERTY(e, EP_COULD_MOVE_INTO_ACID)
 #define MAYBE_DONT_COLLIDE_WITH(e) HAS_PROPERTY(e, EP_MAYBE_DONT_COLLIDE_WITH)
+#define HAS_ACTION(e)		HAS_PROPERTY(e, EP_HAS_ACTION)
 
 /* special macros used in game engine */
 #define IS_CUSTOM_ELEMENT(e)	((e) >= EL_CUSTOM_START &&		\
@@ -1862,6 +1866,9 @@ struct GameInfo
   int player_boring_delay_random;
   int player_sleeping_delay_fixed;
   int player_sleeping_delay_random;
+
+  /* values for special game initialization control */
+  boolean restart_level;
 };
 
 struct GlobalInfo

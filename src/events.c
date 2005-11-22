@@ -696,6 +696,9 @@ void HandleKey(Key key, int key_status)
 
   if (game_status == GAME_MODE_MAIN && key == setup.shortcut.toggle_pause)
   {
+#if 1
+    StartGameActions(options.network, setup.autorecord, NEW_RANDOMIZE);
+#else
     if (setup.autorecord)
       TapeStartRecording();
 
@@ -709,6 +712,7 @@ void HandleKey(Key key, int key_status)
       StopAnimation();
       InitGame();
     }
+#endif
 
     return;
   }
