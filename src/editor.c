@@ -474,9 +474,9 @@
 #define GADGET_ID_CHANGE_PLAYER		(GADGET_ID_SELECTBOX_FIRST + 19)
 #define GADGET_ID_CHANGE_PAGE		(GADGET_ID_SELECTBOX_FIRST + 20)
 #define GADGET_ID_CHANGE_REPLACE_WHEN	(GADGET_ID_SELECTBOX_FIRST + 21)
-#define GADGET_ID_CHANGE_ACTION		(GADGET_ID_SELECTBOX_FIRST + 22)
-#define GADGET_ID_CHANGE_ACTION_MODE	(GADGET_ID_SELECTBOX_FIRST + 23)
-#define GADGET_ID_CHANGE_ACTION_ARG	(GADGET_ID_SELECTBOX_FIRST + 24)
+#define GADGET_ID_ACTION_TYPE		(GADGET_ID_SELECTBOX_FIRST + 22)
+#define GADGET_ID_ACTION_MODE		(GADGET_ID_SELECTBOX_FIRST + 23)
+#define GADGET_ID_ACTION_ARG		(GADGET_ID_SELECTBOX_FIRST + 24)
 #define GADGET_ID_SELECT_CHANGE_PAGE	(GADGET_ID_SELECTBOX_FIRST + 25)
 #define GADGET_ID_GROUP_CHOICE_MODE	(GADGET_ID_SELECTBOX_FIRST + 26)
 
@@ -680,9 +680,9 @@
 #define ED_SELECTBOX_ID_CHANGE_PLAYER		19
 #define ED_SELECTBOX_ID_CHANGE_PAGE		20
 #define ED_SELECTBOX_ID_CHANGE_REPLACE_WHEN	21
-#define ED_SELECTBOX_ID_CHANGE_ACTION		22
-#define ED_SELECTBOX_ID_CHANGE_ACTION_MODE	23
-#define ED_SELECTBOX_ID_CHANGE_ACTION_ARG	24
+#define ED_SELECTBOX_ID_ACTION_TYPE		22
+#define ED_SELECTBOX_ID_ACTION_MODE		23
+#define ED_SELECTBOX_ID_ACTION_ARG		24
 #define ED_SELECTBOX_ID_SELECT_CHANGE_PAGE	25
 #define ED_SELECTBOX_ID_GROUP_CHOICE_MODE	26
 
@@ -864,7 +864,7 @@
 
 /* values for elements with count for collecting */
 #define MIN_COLLECT_COUNT		0
-#define MAX_COLLECT_COUNT		100
+#define MAX_COLLECT_COUNT		255
 
 /* values for random placement */
 #define RANDOM_USE_PERCENTAGE		0
@@ -1433,6 +1433,7 @@ static struct ValueTextInfo options_change_direct_action[] =
 
   { CE_IMPACT,			"impact (on something)"		},
   { CE_SMASHED,			"smashed (from above)"		},
+  { CE_COUNT_AT_ZERO,		"CE count at zero"		},
 
   { -1,				NULL				}
 };
@@ -1455,6 +1456,7 @@ static struct ValueTextInfo options_change_other_action[] =
   { CE_SWITCH_OF_X,		"switch of"			},
   { CE_CHANGE_OF_X,		"change by page of"		},
   { CE_EXPLOSION_OF_X,		"explosion of"			},
+  { CE_COUNT_AT_ZERO_OF_X,	"CE count at zero of"		},
 
   { -1,				NULL				}
 };
@@ -1534,7 +1536,7 @@ static struct ValueTextInfo options_change_replace_when[] =
   { -1,				NULL				}
 };
 
-static struct ValueTextInfo options_change_action[] =
+static struct ValueTextInfo options_action_type[] =
 {
   { CA_NO_ACTION,		"no action"			},
   { CA_EXIT_PLAYER,		"exit player"			},
@@ -1545,9 +1547,10 @@ static struct ValueTextInfo options_change_action[] =
   { CA_DEL_KEY,			"remove key"			},
   { CA_SET_PLAYER_SPEED,	"set player speed"		},
   { CA_SET_GEMS,		"set gems"			},
-  { CA_SET_SCORE,		"set score"			},
   { CA_SET_TIME,		"set time"			},
-  { CA_SET_COUNTER,		"set counter"			},
+  { CA_SET_SCORE,		"set score"			},
+  { CA_SET_CE_SCORE,		"set CE score"			},
+  { CA_SET_CE_COUNT,		"set CE count"			},
   { CA_SET_DYNABOMB_NUMBER,	"set bomb number"		},
   { CA_SET_DYNABOMB_SIZE,	"set bomb size"			},
   { CA_SET_DYNABOMB_POWER,	"set bomb power"		},
@@ -1558,7 +1561,7 @@ static struct ValueTextInfo options_change_action[] =
   { -1,				NULL				}
 };
 
-static struct ValueTextInfo options_change_action_mode[] =
+static struct ValueTextInfo options_action_mode[] =
 {
   { CA_MODE_UNDEFINED,		" "				},
   { CA_MODE_ADD,		"+"				},
@@ -1570,9 +1573,9 @@ static struct ValueTextInfo options_change_action_mode[] =
   { -1,				NULL				}
 };
 
-static struct ValueTextInfo options_change_action_arg[] =
+static struct ValueTextInfo options_action_arg[] =
 {
-  { CA_ARG_PLAYER_HEADLINE,	"[players]"			},
+  { CA_ARG_PLAYER_HEADLINE,	"[player]"			},
   { CA_ARG_PLAYER_1,		"1"				},
   { CA_ARG_PLAYER_2,		"2"				},
   { CA_ARG_PLAYER_3,		"3"				},
@@ -1580,21 +1583,14 @@ static struct ValueTextInfo options_change_action_arg[] =
   { CA_ARG_PLAYER_ANY,		"any"				},
   { CA_ARG_PLAYER_TRIGGER,	"trigger"			},
   { CA_ARG_UNDEFINED,		" "				},
-  { CA_ARG_NUMBER_HEADLINE,	"[numbers]"			},
+  { CA_ARG_NUMBER_HEADLINE,	"[number]"			},
   { CA_ARG_0,			"0"				},
   { CA_ARG_1,			"1"				},
   { CA_ARG_2,			"2"				},
   { CA_ARG_3,			"3"				},
   { CA_ARG_4,			"4"				},
   { CA_ARG_5,			"5"				},
-  { CA_ARG_6,			"6"				},
-  { CA_ARG_7,			"7"				},
-  { CA_ARG_8,			"8"				},
-  { CA_ARG_9,			"9"				},
   { CA_ARG_10,			"10"				},
-  { CA_ARG_20,			"20"				},
-  { CA_ARG_25,			"25"				},
-  { CA_ARG_50,			"50"				},
   { CA_ARG_100,			"100"				},
   { CA_ARG_1000,		"1000"				},
   { CA_ARG_UNDEFINED,		" "				},
@@ -1602,7 +1598,13 @@ static struct ValueTextInfo options_change_action_arg[] =
   { CA_ARG_NUMBER_MAX,		"max"				},
   { CA_ARG_NUMBER_NORMAL,	"normal"			},
   { CA_ARG_NUMBER_RESET,	"reset"				},
-  { CA_ARG_NUMBER_COUNT,	"counter"			},
+  { CA_ARG_NUMBER_CE_SCORE,	"CE score"			},
+  { CA_ARG_NUMBER_CE_COUNT,	"CE count"			},
+  { CA_ARG_NUMBER_CE_DELAY,	"CE delay"			},
+  { CA_ARG_UNDEFINED,		" "				},
+  { CA_ARG_ELEMENT_HEADLINE,	"[element]"			},
+  { CA_ARG_ELEMENT_TARGET,	"target"			},
+  { CA_ARG_ELEMENT_TRIGGER,	"trigger"			},
 
   { -1,				NULL				}
 };
@@ -1824,26 +1826,26 @@ static struct
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(1),	ED_ELEMENT_SETTINGS_YPOS(13),
-    GADGET_ID_CHANGE_ACTION,		GADGET_ID_NONE,
+    GADGET_ID_ACTION_TYPE,		GADGET_ID_NONE,
     -1,
-    options_change_action,
-    &custom_element_change.change_action,
+    options_action_type,
+    &custom_element_change.action_type,
     NULL, NULL,				"action on specified condition"
   },
   {
     -1,					ED_ELEMENT_SETTINGS_YPOS(13),
-    GADGET_ID_CHANGE_ACTION_MODE,	GADGET_ID_CHANGE_ACTION,
+    GADGET_ID_ACTION_MODE,		GADGET_ID_ACTION_TYPE,
     -1,
-    options_change_action_mode,
-    &custom_element_change.change_action_mode,
+    options_action_mode,
+    &custom_element_change.action_mode,
     NULL, NULL,				"action operator"
   },
   {
     -1,					ED_ELEMENT_SETTINGS_YPOS(13),
-    GADGET_ID_CHANGE_ACTION_ARG,	GADGET_ID_CHANGE_ACTION_MODE,
+    GADGET_ID_ACTION_ARG,		GADGET_ID_ACTION_MODE,
     -1,
-    options_change_action_arg,
-    &custom_element_change.change_action_arg,
+    options_action_arg,
+    &custom_element_change.action_arg,
     NULL, NULL,				"action parameter"
   },
   {
@@ -2365,7 +2367,7 @@ static struct
   {
     ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(13),
     GADGET_ID_CHANGE_USE_ACTION,	GADGET_ID_NONE,
-    &custom_element_change.use_change_action,
+    &custom_element_change.use_action,
     NULL, NULL,				"execute action on specified condition"
   },
 };
@@ -6311,6 +6313,7 @@ static void CopyCustomElementPropertiesToEditor(int element)
      HAS_CHANGE_EVENT(element, CE_BLOCKED) ? CE_BLOCKED :
      HAS_CHANGE_EVENT(element, CE_IMPACT) ? CE_IMPACT :
      HAS_CHANGE_EVENT(element, CE_SMASHED) ? CE_SMASHED :
+     HAS_CHANGE_EVENT(element, CE_COUNT_AT_ZERO) ? CE_COUNT_AT_ZERO :
      custom_element_change.direct_action);
 
   /* set "change by other element action" selectbox help value */
@@ -6329,6 +6332,7 @@ static void CopyCustomElementPropertiesToEditor(int element)
      HAS_CHANGE_EVENT(element, CE_SWITCH_OF_X) ? CE_SWITCH_OF_X :
      HAS_CHANGE_EVENT(element, CE_CHANGE_OF_X) ? CE_CHANGE_OF_X :
      HAS_CHANGE_EVENT(element, CE_EXPLOSION_OF_X) ? CE_EXPLOSION_OF_X :
+     HAS_CHANGE_EVENT(element, CE_COUNT_AT_ZERO_OF_X) ? CE_COUNT_AT_ZERO_OF_X :
      custom_element_change.other_action);
 }
 
@@ -6500,6 +6504,7 @@ static void CopyCustomElementPropertiesToGame(int element)
   custom_element_change_events[CE_BLOCKED] = FALSE;
   custom_element_change_events[CE_IMPACT] = FALSE;
   custom_element_change_events[CE_SMASHED] = FALSE;
+  custom_element_change_events[CE_COUNT_AT_ZERO] = FALSE;
   custom_element_change_events[custom_element_change.direct_action] =
     custom_element_change_events[CE_BY_DIRECT_ACTION];
 
@@ -6518,6 +6523,7 @@ static void CopyCustomElementPropertiesToGame(int element)
   custom_element_change_events[CE_SWITCH_OF_X] = FALSE;
   custom_element_change_events[CE_CHANGE_OF_X] = FALSE;
   custom_element_change_events[CE_EXPLOSION_OF_X] = FALSE;
+  custom_element_change_events[CE_COUNT_AT_ZERO_OF_X] = FALSE;
   custom_element_change_events[custom_element_change.other_action] =
     custom_element_change_events[CE_BY_OTHER_ACTION];
 

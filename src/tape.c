@@ -1297,6 +1297,12 @@ void AutoPlayTape()
       continue;
     }
 
+#if 0
+    /* ACTIVATE THIS FOR LOADING/TESTING OF LEVELS ONLY */
+    printf("(only testing level)\n");
+    continue;
+#endif
+
     LoadSolutionTape(level_nr);
 #if 1
     if (tape.no_valid_file)

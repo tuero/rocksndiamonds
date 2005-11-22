@@ -143,6 +143,8 @@
 				 RND(element_info[e].move_delay_random))
 #define GET_MAX_MOVE_DELAY(e)	(   (element_info[e].move_delay_fixed) + \
 				    (element_info[e].move_delay_random))
+#define GET_CHANGE_DELAY(c)	(   ((c)->delay_fixed  * (c)->delay_frames) + \
+				 RND((c)->delay_random * (c)->delay_frames))
 
 #define GET_TARGET_ELEMENT(e, ch)					\
 	((e) == EL_TRIGGER_ELEMENT ? (ch)->actual_trigger_element :	\
@@ -1130,9 +1132,15 @@ inline void DrawGameValue_Keys(int key[MAX_NUM_KEYS])
 
   /* currently only 4 of 8 possible keys are displayed */
   for (i = 0; i < STD_NUM_KEYS; i++)
+  {
     if (key[i])
       DrawMiniGraphicExt(drawto, DX_KEYS + i * MINI_TILEX, DY_KEYS,
 			 el2edimg(EL_KEY_1 + i));
+    else
+      BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
+		 DOOR_GFX_PAGEX5 + XX_KEYS + i * MINI_TILEX, YY_KEYS,
+		 MINI_TILEX, MINI_TILEY, DX_KEYS + i * MINI_TILEX, DY_KEYS);
+  }
 }
 
 inline void DrawGameValue_Score(int value)
@@ -7859,21 +7867,301 @@ static void ChangeActiveTrap(int x, int y)
     DrawLevelFieldCrumbledSand(x, y);
 }
 
-static void HandleChangeAction(int change_action)
+static int getSpecialActionElement(int element, int number, int base_element)
 {
-  if (change_action == CA_EXIT_PLAYER)
-  {
-    printf("::: CA_EXIT_GAME\n");
+  return (element != EL_EMPTY ? element :
+	  number != -1 ? base_element + number - 1 :
+	  EL_EMPTY);
+}
 
-    /* !!! local_player <-> 4 players !!! (EXTEND THIS) !!! */
-    local_player->LevelSolved = local_player->GameOver = TRUE;
-  }
-  else if (change_action == CA_KILL_PLAYER)
-  {
-    printf("::: CA_KILL_PLAYER\n");
+static int getModifiedActionNumber(int value_old, int value_min, int value_max,
+				   int operator, int operand)
+{
+  int value_new = (operator == CA_MODE_ADD      ? value_old + operand :
+		   operator == CA_MODE_SUBTRACT ? value_old - operand :
+		   operator == CA_MODE_MULTIPLY ? value_old * operand :
+		   operator == CA_MODE_DIVIDE   ? value_old / MAX(1, operand) :
+		   operator == CA_MODE_SET      ? operand :
+		   value_old);
 
-    /* !!! local_player <-> 4 players !!! (EXTEND THIS) !!! */
-    KillHero(local_player);
+  return (value_new < value_min ? value_min :
+	  value_new > value_max ? value_max :
+	  value_new);
+}
+
+static void ExecuteCustomElementAction(int x, int y, int element, int page)
+{
+  struct ElementInfo *ei = &element_info[element];
+  struct ElementChangeInfo *change = &ei->change_page[page];
+  int action_type = change->action_type;
+  int action_mode = change->action_mode;
+  int action_arg = change->action_arg;
+  int i;
+
+  /* ---------- determine action paramater values ---------- */
+
+  int action_arg_element =
+    (action_arg == CA_ARG_PLAYER_TRIGGER  ? change->actual_trigger_player :
+     action_arg == CA_ARG_ELEMENT_TRIGGER ? change->actual_trigger_element :
+     action_arg == CA_ARG_ELEMENT_TARGET  ? change->target_element :
+     EL_EMPTY);
+
+  int action_arg_number =
+    (action_arg <= CA_ARG_MAX ? action_arg :
+     action_arg == CA_ARG_NUMBER_MIN ? CA_ARG_MIN :
+     action_arg == CA_ARG_NUMBER_MAX ? CA_ARG_MAX :
+     action_arg == CA_ARG_NUMBER_CE_SCORE ? ei->collect_score :
+     action_arg == CA_ARG_NUMBER_CE_COUNT ? ei->collect_count :
+     action_arg == CA_ARG_NUMBER_CE_DELAY ? GET_CHANGE_DELAY(change) :
+     -1);
+
+  /* (for explicit player choice, set invalid value to "no player") */
+  int action_arg_player_bits =
+    (action_arg == CA_ARG_PLAYER_ANY ? action_arg - CA_ARG_PLAYER :
+     action_arg >= CA_ARG_PLAYER_1 &&
+     action_arg <= CA_ARG_PLAYER_4 ? action_arg - CA_ARG_PLAYER :
+     action_arg >= CA_ARG_1 &&
+     action_arg <= CA_ARG_PLAYER_4 ? (1 << (action_arg - 1)) :
+     action_arg_element >= EL_PLAYER_1 &&
+     action_arg_element <= EL_PLAYER_4 ?
+     (1 << (action_arg_element - EL_PLAYER_1)) :
+     0);
+
+  /* (for implicit player choice, set invalid value to "all players") */
+  int trigger_player_bits =
+    (change->actual_trigger_player >= EL_PLAYER_1 &&
+     change->actual_trigger_player <= EL_PLAYER_4 ?
+     (1 << (change->actual_trigger_player - EL_PLAYER_1)) :
+     PLAYER_BITS_ANY);
+
+  /* ---------- execute action  ---------- */
+
+  switch(action_type)
+  {
+    case CA_NO_ACTION:
+    {
+      return;
+    }
+
+    case CA_EXIT_PLAYER:
+    {
+      for (i = 0; i < MAX_PLAYERS; i++)
+	if (action_arg_player_bits & (1 << i))
+	  stored_player[i].LevelSolved = stored_player[i].GameOver = TRUE;
+
+      break;
+    }
+
+    case CA_KILL_PLAYER:
+    {
+      for (i = 0; i < MAX_PLAYERS; i++)
+	if (action_arg_player_bits & (1 << i))
+	  KillHero(&stored_player[i]);
+
+      break;
+    }
+
+    case CA_RESTART_LEVEL:
+    {
+      printf("::: CA_RESTART_LEVEL -- not yet implemented\n");
+
+      break;
+    }
+
+    case CA_SHOW_ENVELOPE:
+    {
+      int element = getSpecialActionElement(action_arg_element,
+					    action_arg_number, EL_ENVELOPE_1);
+
+      if (IS_ENVELOPE(element))
+	local_player->show_envelope = element;
+
+      break;
+    }
+
+    case CA_ADD_KEY:
+    {
+      int element = getSpecialActionElement(action_arg_element,
+					    action_arg_number, EL_KEY_1);
+
+      if (IS_KEY(element))
+      {
+	for (i = 0; i < MAX_PLAYERS; i++)
+	{
+	  if (trigger_player_bits & (1 << i))
+	  {
+	    stored_player[i].key[KEY_NR(element)] = TRUE;
+
+	    DrawGameValue_Keys(stored_player[i].key);
+
+	    redraw_mask |= REDRAW_DOOR_1;
+	  }
+	}
+      }
+
+      break;
+    }
+
+    case CA_DEL_KEY:
+    {
+      int element = getSpecialActionElement(action_arg_element,
+					    action_arg_number, EL_KEY_1);
+
+      if (IS_KEY(element))
+      {
+	for (i = 0; i < MAX_PLAYERS; i++)
+	{
+	  if (trigger_player_bits & (1 << i))
+	  {
+	    stored_player[i].key[KEY_NR(element)] = FALSE;
+
+	    DrawGameValue_Keys(stored_player[i].key);
+
+	    redraw_mask |= REDRAW_DOOR_1;
+	  }
+	}
+      }
+
+      break;
+    }
+
+    case CA_SET_PLAYER_SPEED:
+    {
+      for (i = 0; i < MAX_PLAYERS; i++)
+      {
+	if (trigger_player_bits & (1 << i))
+	{
+	  if (action_arg == CA_ARG_NUMBER_RESET)
+	    stored_player[i].move_delay_value = game.initial_move_delay_value;
+	  else if (action_arg == CA_ARG_NUMBER_NORMAL)
+	    stored_player[i].move_delay_value = MOVE_DELAY_NORMAL_SPEED;
+	  else if (action_arg == CA_ARG_NUMBER_MIN)
+	    stored_player[i].move_delay_value = 16;
+	  else if (action_arg == CA_ARG_NUMBER_MAX)
+	    stored_player[i].move_delay_value = MOVE_DELAY_HIGH_SPEED;
+	  else
+	  {
+#if 0
+	    if (action_mode == CA_MODE_ADD)
+	    {
+	      action_mode = CA_MODE_DIVIDE;
+	      action_arg_number = (1 << action_arg_number);
+	    }
+	    else if (action_mode == CA_MODE_SUBTRACT)
+	    {
+	      action_mode = CA_MODE_MULTIPLY;
+	      action_arg_number = (1 << action_arg_number);
+	    }
+
+	    int mode = (action_mode == CA_MODE_MULTIPLY ? CA_MODE_DIVIDE :
+			action_mode == CA_MODE_DIVIDE   ? CA_MODE_MULTIPLY :
+			action_mode);
+
+	    stored_player[i].move_delay_value =
+	      getModifiedActionNumber(stored_player[i].move_delay_value,
+				      1, 16,
+				      action_mode, action_arg_number);
+#endif
+	  }
+	}
+      }
+
+      break;
+    }
+
+    case CA_SET_GEMS:
+    {
+      local_player->gems_still_needed =
+	getModifiedActionNumber(local_player->gems_still_needed, 0, 999,
+				action_mode, action_arg_number);
+
+      DrawGameValue_Emeralds(local_player->gems_still_needed);
+
+      break;
+    }
+
+    case CA_SET_TIME:
+    {
+      if (level.time > 0)	/* only modify limited time value */
+      {
+	TimeLeft = getModifiedActionNumber(TimeLeft, 0, 9999,
+					   action_mode, action_arg_number);
+
+	DrawGameValue_Time(TimeLeft);
+      }
+
+      break;
+    }
+
+    case CA_SET_SCORE:
+    {
+      local_player->score =
+	getModifiedActionNumber(local_player->score, 0, 99999,
+				action_mode, action_arg_number);
+
+      DrawGameValue_Score(local_player->score);
+
+      break;
+    }
+
+    case CA_SET_CE_SCORE:
+    {
+      printf("::: CA_SET_CE_SCORE -- not yet implemented\n");
+
+      break;
+    }
+
+    case CA_SET_CE_COUNT:
+    {
+      printf("::: CA_SET_CE_COUNT -- not yet implemented\n");
+
+      break;
+    }
+
+    case CA_SET_DYNABOMB_NUMBER:
+    {
+      printf("::: CA_SET_DYNABOMB_NUMBER -- not yet implemented\n");
+
+      break;
+    }
+
+    case CA_SET_DYNABOMB_SIZE:
+    {
+      printf("::: CA_SET_DYNABOMB_SIZE -- not yet implemented\n");
+
+      break;
+    }
+
+    case CA_SET_DYNABOMB_POWER:
+    {
+      printf("::: CA_SET_DYNABOMB_POWER -- not yet implemented\n");
+
+      break;
+    }
+
+    case CA_TOGGLE_PLAYER_GRAVITY:
+    {
+      game.gravity = !game.gravity;
+
+      break;
+    }
+
+    case CA_ENABLE_PLAYER_GRAVITY:
+    {
+      game.gravity = TRUE;
+
+      break;
+    }
+
+    case CA_DISABLE_PLAYER_GRAVITY:
+    {
+      game.gravity = FALSE;
+
+      break;
+    }
+
+    default:
+      break;
   }
 }
 
@@ -7966,8 +8254,10 @@ static void ChangeElementNowExt(struct ElementChangeInfo *change,
   TestIfElementTouchesCustomElement(x, y);
 #endif
 
-  if (change->use_change_action)
-    HandleChangeAction(change->change_action);
+#if 0
+  if (change->use_action)
+    ExecuteCustomElementAction(...);
+#endif
 }
 
 static boolean ChangeElementNow(int x, int y, int element, int page)
@@ -7982,7 +8272,7 @@ static boolean ChangeElementNow(int x, int y, int element, int page)
 
   if (ChangeEvent[x][y] == CE_DELAY)
   {
-    /* reset actual trigger element and player */
+    /* reset actual trigger element, trigger player and action element */
     change->actual_trigger_element = EL_EMPTY;
     change->actual_trigger_player = EL_PLAYER_1;
   }
@@ -8210,8 +8500,12 @@ static void ChangeElement(int x, int y, int page)
 
   if (ChangeDelay[x][y] == 0)		/* initialize element change */
   {
+#if 1
+    ChangeDelay[x][y] = GET_CHANGE_DELAY(change) + 1;
+#else
     ChangeDelay[x][y] = (    change->delay_fixed  * change->delay_frames +
 			 RND(change->delay_random * change->delay_frames)) + 1;
+#endif
 
     ResetGfxAnimation(x, y);
     ResetRandomAnimationValue(x, y);
@@ -8253,6 +8547,11 @@ static void ChangeElement(int x, int y, int page)
 
       return;
     }
+
+#if 1
+    if (change->use_action)
+      ExecuteCustomElementAction(x, y, element, page);
+#endif
 
     if (ChangeElementNow(x, y, element, page))
     {
@@ -11817,7 +12116,9 @@ int DigField(struct PlayerInfo *player,
 	}
 
 	if (element == EL_SPEED_PILL)
+	{
 	  player->move_delay_value = MOVE_DELAY_HIGH_SPEED;
+	}
 	else if (element == EL_EXTRA_TIME && level.time > 0)
 	{
 	  TimeLeft += 10;

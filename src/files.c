@@ -114,10 +114,10 @@ void setElementChangeInfoToDefaults(struct ElementChangeInfo *change)
   change->random_percentage = 100;
   change->replace_when = CP_WHEN_EMPTY;
 
-  change->use_change_action = FALSE;
-  change->change_action = CA_NO_ACTION;
-  change->change_action_mode = CA_MODE_UNDEFINED;
-  change->change_action_arg = CA_ARG_UNDEFINED;
+  change->use_action = FALSE;
+  change->action_type = CA_NO_ACTION;
+  change->action_mode = CA_MODE_UNDEFINED;
+  change->action_arg = CA_ARG_UNDEFINED;
 
   for (x = 0; x < 3; x++)
     for (y = 0; y < 3; y++)
@@ -1306,8 +1306,18 @@ static int LoadLevel_CUS4(FILE *file, int chunk_size, struct LevelInfo *level)
     change->trigger_page = (change->trigger_page == CH_PAGE_ANY_FILE ?
 			    CH_PAGE_ANY : (1 << change->trigger_page));
 
+#if 1
+    change->use_action = getFile8Bit(file);
+    change->action_type = getFile8Bit(file);
+    change->action_mode = getFile8Bit(file);
+    change->action_arg = getFile16BitBE(file);
+
+    /* some free bytes for future change property values and padding */
+    ReadUnusedBytesFromFile(file, 1);
+#else
     /* some free bytes for future change property values and padding */
     ReadUnusedBytesFromFile(file, 6);
+#endif
 
 #else
 
@@ -2711,7 +2721,8 @@ static void LoadLevel_InitElements(struct LevelInfo *level, char *filename)
   int i, j, x, y;
 
   /* map custom element change events that have changed in newer versions
-     (these following values were accidentally changed in version 3.0.1) */
+     (these following values were accidentally changed in version 3.0.1)
+     (this seems to be needed only for 'ab_levelset3' and 'ab_levelset4') */
   if (level->game_version <= VERSION_IDENT(3,0,0,0))
   {
     for (i = 0; i < NUM_CUSTOM_ELEMENTS; i++)
@@ -2719,7 +2730,7 @@ static void LoadLevel_InitElements(struct LevelInfo *level, char *filename)
       int element = EL_CUSTOM_START + i;
 
       /* order of checking and copying events to be mapped is important */
-      for (j = CE_BY_OTHER_ACTION; j >= CE_BY_PLAYER_OBSOLETE; j--)
+      for (j = CE_BY_OTHER_ACTION; j >= CE_COUNT_AT_ZERO; j--)
       {
 	if (HAS_CHANGE_EVENT(element, j - 2))
 	{
@@ -2740,20 +2751,30 @@ static void LoadLevel_InitElements(struct LevelInfo *level, char *filename)
     }
   }
 
+#if 0
+  /* !!! TESTS SHOWED THAT THIS CODE SEGMENT IS NOT NEEDED FOR ANY LEVEL !!! */
+
   /* some custom element change events get mapped since version 3.0.3 */
-  for (i = 0; i < NUM_CUSTOM_ELEMENTS; i++)
+#if 1
+  if (level->game_version >= VERSION_IDENT(3,0,3,0) &&
+      level->game_version <= VERSION_IDENT(3,2,0,3))
+#endif
   {
-    int element = EL_CUSTOM_START + i;
-
-    if (HAS_CHANGE_EVENT(element, CE_BY_PLAYER_OBSOLETE) ||
-	HAS_CHANGE_EVENT(element, CE_BY_COLLISION_OBSOLETE))
+    for (i = 0; i < NUM_CUSTOM_ELEMENTS; i++)
     {
-      SET_CHANGE_EVENT(element, CE_BY_PLAYER_OBSOLETE, FALSE);
-      SET_CHANGE_EVENT(element, CE_BY_COLLISION_OBSOLETE, FALSE);
+      int element = EL_CUSTOM_START + i;
 
-      SET_CHANGE_EVENT(element, CE_BY_DIRECT_ACTION, TRUE);
+      if (HAS_CHANGE_EVENT(element, CE_BY_PLAYER_OBSOLETE) ||
+	  HAS_CHANGE_EVENT(element, CE_BY_COLLISION_OBSOLETE))
+      {
+	SET_CHANGE_EVENT(element, CE_BY_PLAYER_OBSOLETE, FALSE);
+	SET_CHANGE_EVENT(element, CE_BY_COLLISION_OBSOLETE, FALSE);
+
+	SET_CHANGE_EVENT(element, CE_BY_DIRECT_ACTION, TRUE);
+      }
     }
   }
+#endif
 
   /* initialize "can_change" field for old levels with only one change page */
   if (level->game_version <= VERSION_IDENT(3,0,2,0))
@@ -3388,8 +3409,19 @@ static void SaveLevel_CUS4(FILE *file, struct LevelInfo *level, int element)
     putFile8Bit(file, (change->trigger_page == CH_PAGE_ANY ? CH_PAGE_ANY_FILE :
 		       log_2(change->trigger_page)));
 
+#if 1
+
+    putFile8Bit(file, change->use_action);
+    putFile8Bit(file, change->action_type);
+    putFile8Bit(file, change->action_mode);
+    putFile16BitBE(file, change->action_arg);
+
+    /* some free bytes for future change property values and padding */
+    WriteUnusedBytesToFile(file, 1);
+#else
     /* some free bytes for future change property values and padding */
     WriteUnusedBytesToFile(file, 6);
+#endif
 
 #else
 

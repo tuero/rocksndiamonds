@@ -187,8 +187,15 @@
 #define CE_PLAYER_PUSHES_X	13
 #define CE_PLAYER_COLLECTS_X	14
 #define CE_PLAYER_DROPS_X	15
+
+#if 1
+#define CE_COUNT_AT_ZERO	16
+#define CE_COUNT_AT_ZERO_OF_X	17
+#else
 #define CE_BY_PLAYER_OBSOLETE	16	/* obsolete; now CE_BY_DIRECT_ACTION */
 #define CE_BY_COLLISION_OBSOLETE 17	/* obsolete; now CE_BY_DIRECT_ACTION */
+#endif
+
 #define CE_BY_OTHER_ACTION	18	/* activates other element events */
 #define CE_BY_DIRECT_ACTION	19	/* activates direct element events */
 #define CE_PLAYER_DIGS_X	20
@@ -243,6 +250,18 @@
 			        (CH_ANY_EVENT_VAR(e) &= ~CH_EVENT_BIT(c))) : 0)
 #endif
 
+/* values for player bitmasks */
+#define PLAYER_BITS_NONE	0
+#define PLAYER_BITS_1		(1 << 0)
+#define PLAYER_BITS_2		(1 << 1)
+#define PLAYER_BITS_3		(1 << 2)
+#define PLAYER_BITS_4		(1 << 3)
+#define PLAYER_BITS_ANY		(PLAYER_BITS_1 | \
+				 PLAYER_BITS_2 | \
+				 PLAYER_BITS_3 | \
+				 PLAYER_BITS_4)
+#define PLAYER_BITS_TRIGGER	(1 << 4)
+
 /* values for change side for custom elements */
 #define CH_SIDE_NONE		MV_NO_MOVING
 #define CH_SIDE_LEFT		MV_LEFT
@@ -254,16 +273,12 @@
 #define CH_SIDE_ANY		MV_ANY_DIRECTION
 
 /* values for change player for custom elements */
-#define CH_PLAYER_NONE		0
-#define CH_PLAYER_1		(1 << 0)
-#define CH_PLAYER_2		(1 << 1)
-#define CH_PLAYER_3		(1 << 2)
-#define CH_PLAYER_4		(1 << 3)
-#define CH_PLAYER_ANY		(CH_PLAYER_1 | \
-				 CH_PLAYER_2 | \
-				 CH_PLAYER_3 | \
-				 CH_PLAYER_4)
-#define CH_PLAYER_TRIGGER	(1 << 4)
+#define CH_PLAYER_NONE		PLAYER_BITS_NONE
+#define CH_PLAYER_1		PLAYER_BITS_1
+#define CH_PLAYER_2		PLAYER_BITS_2
+#define CH_PLAYER_3		PLAYER_BITS_3
+#define CH_PLAYER_4		PLAYER_BITS_4
+#define CH_PLAYER_ANY		PLAYER_BITS_ANY
 
 /* values for change page for custom elements */
 #define CH_PAGE_ANY_FILE	(0xff)
@@ -287,15 +302,16 @@
 #define CA_DEL_KEY		6
 #define CA_SET_PLAYER_SPEED	7
 #define CA_SET_GEMS		8
-#define CA_SET_SCORE		9
-#define CA_SET_TIME		10
-#define CA_SET_COUNTER		11
-#define CA_SET_DYNABOMB_NUMBER	12
-#define CA_SET_DYNABOMB_SIZE	13
-#define CA_SET_DYNABOMB_POWER	14
-#define CA_TOGGLE_PLAYER_GRAVITY  15
-#define CA_ENABLE_PLAYER_GRAVITY  16
-#define CA_DISABLE_PLAYER_GRAVITY 17
+#define CA_SET_TIME		9
+#define CA_SET_SCORE		10
+#define CA_SET_CE_SCORE		11
+#define CA_SET_CE_COUNT		12
+#define CA_SET_DYNABOMB_NUMBER	13
+#define CA_SET_DYNABOMB_SIZE	14
+#define CA_SET_DYNABOMB_POWER	15
+#define CA_TOGGLE_PLAYER_GRAVITY  16
+#define CA_ENABLE_PLAYER_GRAVITY  17
+#define CA_DISABLE_PLAYER_GRAVITY 18
 
 /* values for change action mode for custom elements */
 #define CA_MODE_UNDEFINED	0
@@ -306,37 +322,38 @@
 #define CA_MODE_SET		5
 
 /* values for change action parameters for custom elements */
+#define CA_ARG_MIN		0
 #define CA_ARG_0		0
 #define CA_ARG_1		1
 #define CA_ARG_2		2
 #define CA_ARG_3		3
 #define CA_ARG_4		4
 #define CA_ARG_5		5
-#define CA_ARG_6		6
-#define CA_ARG_7		7
-#define CA_ARG_8		8
-#define CA_ARG_9		9
 #define CA_ARG_10		10
-#define CA_ARG_20		20
-#define CA_ARG_25		25
-#define CA_ARG_50		50
 #define CA_ARG_100		100
 #define CA_ARG_1000		1000
-#define CA_ARG_PLAYER		20000
+#define CA_ARG_MAX		9999
+#define CA_ARG_PLAYER		10000
 #define CA_ARG_PLAYER_HEADLINE	(CA_ARG_PLAYER + 0)
-#define CA_ARG_PLAYER_1		(CA_ARG_PLAYER + CH_PLAYER_1)
-#define CA_ARG_PLAYER_2		(CA_ARG_PLAYER + CH_PLAYER_2)
-#define CA_ARG_PLAYER_3		(CA_ARG_PLAYER + CH_PLAYER_3)
-#define CA_ARG_PLAYER_4		(CA_ARG_PLAYER + CH_PLAYER_4)
-#define CA_ARG_PLAYER_ANY	(CA_ARG_PLAYER + CH_PLAYER_ANY)
-#define CA_ARG_PLAYER_TRIGGER	(CA_ARG_PLAYER + CH_PLAYER_TRIGGER)
-#define CA_ARG_NUMBER		30000
+#define CA_ARG_PLAYER_1		(CA_ARG_PLAYER + PLAYER_BITS_1)
+#define CA_ARG_PLAYER_2		(CA_ARG_PLAYER + PLAYER_BITS_2)
+#define CA_ARG_PLAYER_3		(CA_ARG_PLAYER + PLAYER_BITS_3)
+#define CA_ARG_PLAYER_4		(CA_ARG_PLAYER + PLAYER_BITS_4)
+#define CA_ARG_PLAYER_ANY	(CA_ARG_PLAYER + PLAYER_BITS_ANY)
+#define CA_ARG_PLAYER_TRIGGER	(CA_ARG_PLAYER + PLAYER_BITS_TRIGGER)
+#define CA_ARG_NUMBER		20000
 #define CA_ARG_NUMBER_HEADLINE	(CA_ARG_NUMBER + 0)
 #define CA_ARG_NUMBER_MIN	(CA_ARG_NUMBER + 1)
 #define CA_ARG_NUMBER_MAX	(CA_ARG_NUMBER + 2)
 #define CA_ARG_NUMBER_NORMAL	(CA_ARG_NUMBER + 3)
 #define CA_ARG_NUMBER_RESET	(CA_ARG_NUMBER + 4)
-#define CA_ARG_NUMBER_COUNT	(CA_ARG_NUMBER + 5)
+#define CA_ARG_NUMBER_CE_SCORE	(CA_ARG_NUMBER + 5)
+#define CA_ARG_NUMBER_CE_COUNT	(CA_ARG_NUMBER + 6)
+#define CA_ARG_NUMBER_CE_DELAY	(CA_ARG_NUMBER + 7)
+#define CA_ARG_ELEMENT		30000
+#define CA_ARG_ELEMENT_HEADLINE	(CA_ARG_ELEMENT + 0)
+#define CA_ARG_ELEMENT_TARGET	(CA_ARG_ELEMENT + 1)
+#define CA_ARG_ELEMENT_TRIGGER	(CA_ARG_ELEMENT + 2)
 #define CA_ARG_UNDEFINED	30999
 
 /* values for custom move patterns (bits 0 - 3: basic move directions) */
@@ -1894,10 +1911,10 @@ struct ElementChangeInfo
 
   boolean explode;		/* explode instead of change */
 
-  boolean use_change_action;	/* execute change action after change */
-  int change_action;		/* type of change action after change */
-  int change_action_mode;	/* mode of change action after change */
-  int change_action_arg;	/* parameter of change action after change */
+  boolean use_action;		/* execute action on specified condition */
+  int action_type;		/* type of action */
+  int action_mode;		/* mode of action */
+  int action_arg;		/* parameter of action */
 
   /* ---------- internal values used at runtime when playing ---------- */
 

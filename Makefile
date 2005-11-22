@@ -123,6 +123,9 @@ enginetestfast: all
 enginetestnew: all
 	./Scripts/make_enginetest.sh new
 
+leveltest: all
+	./Scripts/make_enginetest.sh leveltest
+
 backup:
 	./Scripts/make_backup.sh src
 
