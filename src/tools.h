@@ -65,6 +65,7 @@ void RedrawPlayfield(boolean, int, int, int, int);
 void BackToFront();
 void FadeToFront();
 void ClearWindow();
+void SetMainBackgroundImageIfDefined(int);
 void SetMainBackgroundImage(int);
 void SetDoorBackgroundImage(int);
 void DrawBackground(int, int, int, int);

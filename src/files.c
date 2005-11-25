@@ -114,7 +114,7 @@ void setElementChangeInfoToDefaults(struct ElementChangeInfo *change)
   change->random_percentage = 100;
   change->replace_when = CP_WHEN_EMPTY;
 
-  change->use_action = FALSE;
+  change->has_action = FALSE;
   change->action_type = CA_NO_ACTION;
   change->action_mode = CA_MODE_UNDEFINED;
   change->action_arg = CA_ARG_UNDEFINED;
@@ -1307,7 +1307,7 @@ static int LoadLevel_CUS4(FILE *file, int chunk_size, struct LevelInfo *level)
 			    CH_PAGE_ANY : (1 << change->trigger_page));
 
 #if 1
-    change->use_action = getFile8Bit(file);
+    change->has_action = getFile8Bit(file);
     change->action_type = getFile8Bit(file);
     change->action_mode = getFile8Bit(file);
     change->action_arg = getFile16BitBE(file);
@@ -3411,7 +3411,7 @@ static void SaveLevel_CUS4(FILE *file, struct LevelInfo *level, int element)
 
 #if 1
 
-    putFile8Bit(file, change->use_action);
+    putFile8Bit(file, change->has_action);
     putFile8Bit(file, change->action_type);
     putFile8Bit(file, change->action_mode);
     putFile16BitBE(file, change->action_arg);

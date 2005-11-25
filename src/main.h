@@ -157,8 +157,9 @@
 
 /* values for internal purpose only (game engine) */
 #define EP_HAS_ACTION		83
+#define EP_CAN_CHANGE_OR_HAS_ACTION	84
 
-#define NUM_ELEMENT_PROPERTIES	84
+#define NUM_ELEMENT_PROPERTIES	85
 
 #define NUM_EP_BITFIELDS	((NUM_ELEMENT_PROPERTIES + 31) / 32)
 #define EP_BITFIELD_BASE	0
@@ -510,6 +511,8 @@
 #define COULD_MOVE_INTO_ACID(e)	HAS_PROPERTY(e, EP_COULD_MOVE_INTO_ACID)
 #define MAYBE_DONT_COLLIDE_WITH(e) HAS_PROPERTY(e, EP_MAYBE_DONT_COLLIDE_WITH)
 #define HAS_ACTION(e)		HAS_PROPERTY(e, EP_HAS_ACTION)
+#define CAN_CHANGE_OR_HAS_ACTION(e)	\
+				HAS_PROPERTY(e, EP_CAN_CHANGE_OR_HAS_ACTION)
 
 /* special macros used in game engine */
 #define IS_CUSTOM_ELEMENT(e)	((e) >= EL_CUSTOM_START &&		\
@@ -1918,7 +1921,7 @@ struct ElementChangeInfo
 
   boolean explode;		/* explode instead of change */
 
-  boolean use_action;		/* execute action on specified condition */
+  boolean has_action;		/* execute action on specified condition */
   int action_type;		/* type of action */
   int action_mode;		/* mode of action */
   int action_arg;		/* parameter of action */
@@ -1933,6 +1936,8 @@ struct ElementChangeInfo
 
   short actual_trigger_element;	/* element that actually triggered change */
   int actual_trigger_player;	/* player which actually triggered change */
+
+  boolean can_change_or_has_action;	/* can_change | has_action */
 
   /* ---------- internal values used in level editor ---------- */
 

@@ -3952,8 +3952,12 @@ void InitElementPropertiesEngine(int engine_version)
     /* ---------- HAS_ACTION ----------------------------------------------- */
     SET_PROPERTY(i, EP_HAS_ACTION, FALSE);	/* default: has no action */
     for (j = 0; j < element_info[i].num_change_pages; j++)
-      if (element_info[i].change_page[j].use_action)
+      if (element_info[i].change_page[j].has_action)
 	SET_PROPERTY(i, EP_HAS_ACTION, TRUE);
+
+    /* ---------- CAN_CHANGE_OR_HAS_ACTION --------------------------------- */
+    SET_PROPERTY(i, EP_CAN_CHANGE_OR_HAS_ACTION, (CAN_CHANGE(i) ||
+						  HAS_ACTION(i)));
 
     /* ---------- GFX_CRUMBLED --------------------------------------------- */
 #if 1

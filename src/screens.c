@@ -750,7 +750,10 @@ void DrawInfoScreen_HelpAnim(int start, int max_anims, boolean init)
     for (i = 0; i < MAX_INFO_ELEMENTS_ON_SCREEN; i++)
       infoscreen_step[i] = infoscreen_frame[i] = 0;
 
+#if 0
     SetMainBackgroundImage(IMG_BACKGROUND_INFO);
+#endif
+
     ClearWindow();
     DrawHeadline();
 
@@ -896,6 +899,8 @@ void DrawInfoScreen_HelpText(int element, int action, int direction, int ypos)
 
 void DrawInfoScreen_Elements()
 {
+  SetMainBackgroundImageIfDefined(IMG_BACKGROUND_INFO_ELEMENTS);
+
   LoadHelpAnimInfo();
   LoadHelpTextInfo();
 
@@ -971,6 +976,8 @@ void HandleInfoScreen_Elements(int button)
 
 void DrawInfoScreen_Music()
 {
+  SetMainBackgroundImageIfDefined(IMG_BACKGROUND_INFO_MUSIC);
+
   ClearWindow();
   DrawHeadline();
 
@@ -1103,6 +1110,8 @@ void DrawInfoScreen_Credits()
   int ystart = 150, ystep = 30;
   int ybottom = SYSIZE - 20;
 
+  SetMainBackgroundImageIfDefined(IMG_BACKGROUND_INFO_CREDITS);
+
   FadeSoundsAndMusic();
 
   ClearWindow();
@@ -1150,6 +1159,8 @@ void DrawInfoScreen_Program()
 {
   int ystart = 150, ystep = 30;
   int ybottom = SYSIZE - 20;
+
+  SetMainBackgroundImageIfDefined(IMG_BACKGROUND_INFO_PROGRAM);
 
   ClearWindow();
   DrawHeadline();
@@ -1227,6 +1238,8 @@ void DrawInfoScreen_LevelSet()
   int sy = SY + pad_y;
   int max_chars_per_line = (SXSIZE - 2 * pad_x) / font_width;
   int max_lines_per_screen = (SYSIZE - pad_y) / font_height - 1;
+
+  SetMainBackgroundImageIfDefined(IMG_BACKGROUND_INFO_LEVELSET);
 
   ClearWindow();
   DrawHeadline();

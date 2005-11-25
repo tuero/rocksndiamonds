@@ -425,6 +425,12 @@ void FadeToFront()
   BackToFront();
 }
 
+void SetMainBackgroundImageIfDefined(int graphic)
+{
+  if (graphic_info[graphic].bitmap)
+    SetMainBackgroundImage(graphic);
+}
+
 void SetMainBackgroundImage(int graphic)
 {
   SetMainBackgroundBitmap(graphic == IMG_UNDEFINED ? NULL :

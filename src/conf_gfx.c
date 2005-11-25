@@ -4161,6 +4161,10 @@ struct ConfigInfo image_config[] =
   { "background.EDITOR",			UNDEFINED_FILENAME	},
   { "background.INFO",				UNDEFINED_FILENAME	},
   { "background.INFO[ELEMENTS]",		UNDEFINED_FILENAME	},
+  { "background.INFO[MUSIC]",			UNDEFINED_FILENAME	},
+  { "background.INFO[CREDITS]",			UNDEFINED_FILENAME	},
+  { "background.INFO[PROGRAM]",			UNDEFINED_FILENAME	},
+  { "background.INFO[LEVELSET]",		UNDEFINED_FILENAME	},
   { "background.SETUP",				UNDEFINED_FILENAME	},
   { "background.DOOR",				UNDEFINED_FILENAME	},
 
