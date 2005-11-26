@@ -191,15 +191,8 @@
 #define CE_PLAYER_PUSHES_X	13
 #define CE_PLAYER_COLLECTS_X	14
 #define CE_PLAYER_DROPS_X	15
-
-#if 1
 #define CE_COUNT_AT_ZERO	16
 #define CE_COUNT_AT_ZERO_OF_X	17
-#else
-#define CE_BY_PLAYER_OBSOLETE	16	/* obsolete; now CE_BY_DIRECT_ACTION */
-#define CE_BY_COLLISION_OBSOLETE 17	/* obsolete; now CE_BY_DIRECT_ACTION */
-#endif
-
 #define CE_BY_OTHER_ACTION	18	/* activates other element events */
 #define CE_BY_DIRECT_ACTION	19	/* activates direct element events */
 #define CE_PLAYER_DIGS_X	20
@@ -218,8 +211,6 @@
 
 #define CE_BITMASK_DEFAULT	0
 
-#if 1
-
 #define CH_EVENT_VAR(e,c)	(element_info[e].change->has_event[c])
 #define CH_ANY_EVENT_VAR(e,c)	(element_info[e].has_change_event[c])
 
@@ -233,26 +224,6 @@
 				     CH_EVENT_VAR(e,c) = (v) : 0)
 #define SET_ANY_CHANGE_EVENT(e,c,v) (IS_CUSTOM_ELEMENT(e) ?		\
 				     CH_ANY_EVENT_VAR(e,c) = (v) : 0)
-
-#else
-
-#define CH_EVENT_BIT(c)		(1 << (c))
-#define CH_EVENT_VAR(e)		(element_info[e].change->events)
-#define CH_ANY_EVENT_VAR(e)	(element_info[e].change_events)
-
-#define HAS_CHANGE_EVENT(e,c)	(IS_CUSTOM_ELEMENT(e) &&		  \
-				 (CH_EVENT_VAR(e) & CH_EVENT_BIT(c)) != 0)
-#define HAS_ANY_CHANGE_EVENT(e,c) (IS_CUSTOM_ELEMENT(e) &&		  \
-				 (CH_ANY_EVENT_VAR(e) & CH_EVENT_BIT(c)) != 0)
-#define SET_CHANGE_EVENT(e,c,v)	(IS_CUSTOM_ELEMENT(e) ?			  \
-				 ((v) ?					  \
-				  (CH_EVENT_VAR(e) |=  CH_EVENT_BIT(c)) : \
-				  (CH_EVENT_VAR(e) &= ~CH_EVENT_BIT(c))) : 0)
-#define SET_ANY_CHANGE_EVENT(e,c,v) (IS_CUSTOM_ELEMENT(e) ?		  \
-			       ((v) ?					  \
-			        (CH_ANY_EVENT_VAR(e) |=  CH_EVENT_BIT(c)) : \
-			        (CH_ANY_EVENT_VAR(e) &= ~CH_EVENT_BIT(c))) : 0)
-#endif
 
 /* values for player bitmasks */
 #define PLAYER_BITS_NONE	0
@@ -616,8 +587,6 @@
 #define PLAYERINFO(x,y)		(&stored_player[StorePlayer[x][y]-EL_PLAYER_1])
 #define SHIELD_ON(p)		((p)->shield_normal_time_left > 0)
 
-#if 1
-
 #define ENEMY_PROTECTED_FIELD(x,y)	(IS_PROTECTED(Feld[x][y]) ||       \
 					 IS_PROTECTED(Back[x][y]))
 #define EXPLOSION_PROTECTED_FIELD(x,y)  (IS_EXPLOSION_PROOF(Feld[x][y]))
@@ -625,16 +594,6 @@
 					 ENEMY_PROTECTED_FIELD(x, y))
 #define PLAYER_EXPLOSION_PROTECTED(x,y) (SHIELD_ON(PLAYERINFO(x, y)) ||	   \
 					 EXPLOSION_PROTECTED_FIELD(x, y))
-
-#else
-
-#define PROTECTED_FIELD(x,y)	(IS_ACCESSIBLE_INSIDE(Feld[x][y]) &&	\
-				 IS_INDESTRUCTIBLE(Feld[x][y]))
-#define PLAYER_ENEMY_PROTECTED(x,y)	(SHIELD_ON(PLAYERINFO(x, y)) ||	\
-				 PROTECTED_FIELD(x, y))
-#define PLAYER_EXPLOSION_PROTECTED(x,y)	(SHIELD_ON(PLAYERINFO(x, y)) ||	\
-				 PROTECTED_FIELD(x, y))
-#endif
 
 #define PLAYER_SWITCHING(p,x,y)	((p)->is_switching &&			\
 				 (p)->switch_x == (x) && (p)->switch_y == (y))
@@ -1657,23 +1616,12 @@ struct PlayerInfo
 
   int show_envelope;
 
-#if 1	/* USE_NEW_MOVE_DELAY */
   int move_delay;
   int move_delay_value;
-#else
-  unsigned long move_delay;
-  int move_delay_value;
-#endif
-
   int move_delay_reset_counter;
 
-#if 1	/* USE_NEW_PUSH_DELAY */
   int push_delay;
   int push_delay_value;
-#else
-  unsigned long push_delay;
-  unsigned long push_delay_value;
-#endif
 
   unsigned long actual_frame_counter;
 
@@ -1778,11 +1726,6 @@ struct LevelInfo
 
   boolean block_last_field;	/* player blocks previous field while moving */
   boolean sp_block_last_field;	/* player blocks previous field while moving */
-
-#if 0	/* !!! THIS IS NOT A LEVEL SETTING => LOGIC MOVED TO "game.c" !!! */
-  int block_delay;		/* delay for blocking previous field */
-  int sp_block_delay;		/* delay for blocking previous field */
-#endif
 
   /* ('int' instead of 'boolean' because used as selectbox value in editor) */
   int use_step_counter;		/* count steps instead of seconds for level */
@@ -1894,11 +1837,7 @@ struct ElementChangeInfo
 {
   boolean can_change;		/* use or ignore this change info */
 
-#if 1
   boolean has_event[NUM_CHANGE_EVENTS];		/* change events */
-#else
-  unsigned long events;		/* change events */
-#endif
 
   int trigger_player;		/* player triggering change */
   int trigger_side;		/* side triggering change */
@@ -2041,21 +1980,12 @@ struct ElementInfo
 
   /* ---------- internal values used at runtime when playing ---------- */
 
-#if 1
   boolean has_change_event[NUM_CHANGE_EVENTS];
-#else
-  unsigned long change_events;	/* bitfield for combined change events */
-#endif
 
   int event_page_nr[NUM_CHANGE_EVENTS]; /* page number for each event */
   struct ElementChangeInfo *event_page[NUM_CHANGE_EVENTS]; /* page for event */
 
   boolean in_group[NUM_GROUP_ELEMENTS];
-
-#if 0
-  boolean can_leave_element;	/* element can leave other element behind */
-  boolean can_leave_element_last;
-#endif
 
   int counter;			/* current value of generic CE counter */
 
@@ -2192,10 +2122,6 @@ struct HelpAnimInfo
 };
 
 
-#if 0
-extern GC			tile_clip_gc;
-extern Bitmap		       *pix[];
-#endif
 extern Bitmap		       *bitmap_db_field, *bitmap_db_door;
 extern Pixmap			tile_clipmask[];
 extern DrawBuffer	      *fieldbuffer;

@@ -70,25 +70,6 @@
 #define SAME_SOUND_NR(x,y)		((x).nr == (y).nr)
 #define SAME_SOUND_DATA(x,y)		((x).data_ptr == (y).data_ptr)
 
-#if 0
-struct SoundHeader_SUN
-{
-  unsigned long magic;
-  unsigned long hdr_size;
-  unsigned long data_size;
-  unsigned long encoding;
-  unsigned long sample_rate;
-  unsigned long channels;
-};
-
-struct SoundHeader_8SVX
-{
-  char magic_FORM[4];
-  unsigned long chunk_size;
-  char magic_8SVX[4];
-};
-#endif
-
 #if defined(AUDIO_UNIX_NATIVE)
 struct SoundHeader_WAV
 {
@@ -151,15 +132,7 @@ typedef struct SoundControl SoundControl;
 static struct ArtworkListInfo *sound_info = NULL;
 static struct ArtworkListInfo *music_info = NULL;
 
-#if 0
-static SoundInfo **Sound = NULL;
-#endif
-
 static MusicInfo **Music_NoConf = NULL;
-
-#if 0
-static int num_sounds = 0;
-#endif
 
 static int num_music_noconf = 0;
 static int stereo_volume[SOUND_MAX_LEFT2RIGHT + 1];
@@ -270,11 +243,6 @@ static boolean ForkAudioProcess(void)
 
   if (audio.mixer_pid == 0)		/* we are the child process */
     audio.mixer_pid = getpid();
-
-#if 0
-  printf("PID: %d [%s]\n", getpid(),(IS_CHILD_PROCESS() ? "child" : "parent"));
-  Delay(10000 * 0);
-#endif
 
   if (IS_CHILD_PROCESS())
     Mixer_Main();			/* this function never returns */
@@ -831,22 +799,6 @@ static void Mixer_InsertSound(SoundControl snd_ctrl)
   int num_sounds = getSoundListSize();
   int num_music  = getMusicListSize();
 
-#if 0
-  if (IS_MUSIC(snd_ctrl))
-    printf("NEW MUSIC %d ARRIVED [%d/%d] [%d ACTIVE CHANNELS]\n",
-	   snd_ctrl.nr, num_music, num_music_noconf, mixer_active_channels);
-  else
-    printf("NEW SOUND %d ARRIVED [%d] [%d ACTIVE CHANNELS]\n",
-	   snd_ctrl.nr, num_sounds, mixer_active_channels);
-#endif
-
-#if 0
-  /* !!! TEST ONLY !!! */
-  if (IS_MUSIC(snd_ctrl))
-    snd_ctrl.nr = 0;
-#endif
-
-#if 1
   if (IS_MUSIC(snd_ctrl))
   {
     if (snd_ctrl.nr >= num_music)	/* invalid music */
@@ -871,32 +823,6 @@ static void Mixer_InsertSound(SoundControl snd_ctrl)
     snd_info = getSoundInfoEntryFromSoundID(snd_ctrl.nr);
   }
 
-  /*
-  if (snd_ctrl.nr >= (IS_MUSIC(snd_ctrl) ? num_music : num_sounds))
-    return;
-  */
-#else
-  if (IS_MUSIC(snd_ctrl))
-  {
-    if (num_music_noconf == 0)
-      return;
-
-    snd_ctrl.nr = snd_ctrl.nr % num_music_noconf;
-  }
-  else if (snd_ctrl.nr >= num_sounds)
-    return;
-#endif
-
-#if 0
-#if 1
-  snd_info = (IS_MUSIC(snd_ctrl) ? getMusicInfoEntryFromMusicID(snd_ctrl.nr) :
-	      getSoundInfoEntryFromSoundID(snd_ctrl.nr));
-#else
-  snd_info = (IS_MUSIC(snd_ctrl) ? Music_NoConf[snd_ctrl.nr] :
-	      getSoundInfoEntryFromSoundID(snd_ctrl.nr));
-#endif
-#endif
-
   if (snd_info == NULL)
     return;
 
@@ -910,10 +836,6 @@ static void Mixer_InsertSound(SoundControl snd_ctrl)
   /* play music samples on a dedicated music channel */
   if (IS_MUSIC(snd_ctrl))
   {
-#if 0
-    printf("::: slot %d, ptr 0x%08x\n", snd_ctrl.nr, snd_ctrl.data_ptr);
-#endif
-
     Mixer_StopMusicChannel();
 
     mixer[audio.music_channel] = snd_ctrl;
@@ -927,10 +849,6 @@ static void Mixer_InsertSound(SoundControl snd_ctrl)
     if (mixer[i].active && SAME_SOUND_DATA(mixer[i], snd_ctrl))
       k++;
 
-#if 0
-  printf("SOUND %d [CURRENTLY PLAYING %d TIMES]\n", snd_ctrl.nr, k);
-#endif
-
   /* reset expiration delay for already playing loop sounds */
   if (k > 0 && IS_LOOP(snd_ctrl))
   {
@@ -938,10 +856,6 @@ static void Mixer_InsertSound(SoundControl snd_ctrl)
     {
       if (mixer[i].active && SAME_SOUND_DATA(mixer[i], snd_ctrl))
       {
-#if 0
-	printf("RESETTING EXPIRATION FOR SOUND %d\n", snd_ctrl.nr);
-#endif
-
 	if (IS_FADING(mixer[i]))
 	  Mixer_UnFadeChannel(i);
 
@@ -951,20 +865,11 @@ static void Mixer_InsertSound(SoundControl snd_ctrl)
 
 	Mixer_SetChannelProperties(i);
 	Mixer_ResetChannelExpiration(i);
-
-#if 0
-	printf("RESETTING VOLUME/STEREO FOR SOUND %d TO %d/%d\n",
-	       snd_ctrl.nr, snd_ctrl.volume, snd_ctrl.stereo_position);
-#endif
       }
     }
 
     return;
   }
-
-#if 0
-  printf("PLAYING NEW SOUND %d\n", snd_ctrl.nr);
-#endif
 
   /* don't play sound more than n times simultaneously (with n == 2 for now) */
   if (k >= 2)
@@ -1052,16 +957,8 @@ static void Mixer_InsertSound(SoundControl snd_ctrl)
   /* add the new sound to the mixer */
   for (i = audio.first_sound_channel; i < audio.num_channels; i++)
   {
-#if 0
-    printf("CHECKING CHANNEL %d FOR SOUND %d ...\n", i, snd_ctrl.nr);
-#endif
-
     if (!mixer[i].active)
     {
-#if 0
-      printf("ADDING NEW SOUND %d TO MIXER\n", snd_ctrl.nr);
-#endif
-
 #if defined(AUDIO_UNIX_NATIVE)
       if (snd_info->data_len == 0)
       {
@@ -1408,11 +1305,9 @@ static int Mixer_Main_SimpleAudio(SoundControl snd_ctrl)
 	mixer[i].volume * (long)premix_first_buffer[j] / SOUND_MAX_VOLUME;
 
   /* might be needed for u-law /dev/audio */
-#if 1
   for (j = 0; j < sample_size; j++)
     playing_buffer[j] =
       linear_to_ulaw(premix_first_buffer[j]);
-#endif
 
   /* delete completed sound entries from the mixer */
   if (mixer[i].playing_pos >= mixer[i].data_len)
@@ -1637,10 +1532,6 @@ static void *Load_WAV(char *filename)
 
   if (!audio.sound_available)
     return NULL;
-
-#if 0
-  printf("loading WAV file '%s'\n", filename);
-#endif
 
   snd_info = checked_calloc(sizeof(SoundInfo));
 
@@ -1926,25 +1817,13 @@ void LoadCustomMusic_NoConf(void)
     if (music_already_used)
       continue;
 
-#if 0
-    if (FileIsSound(basename) || FileIsMusic(basename))
-      printf("DEBUG: loading music '%s' ...\n", basename);
-#endif
-
     if (draw_init_text)
       DrawInitText(basename, 150, FC_YELLOW);
 
     filename = getPath2(music_directory, basename);
 
-#if 1
     if (FileIsMusic(basename))
       mus_info = Load_WAV_or_MOD(filename);
-#else
-    if (FileIsSound(basename))
-      mus_info = Load_WAV(filename);
-    else if (FileIsMusic(basename))
-      mus_info = Load_MOD(filename);
-#endif
 
     free(filename);
 
@@ -2107,11 +1986,6 @@ void InitSoundList(struct ConfigInfo *config_list, int num_file_list_entries,
 
   sound_info->load_artwork = Load_WAV;
   sound_info->free_artwork = FreeSound;
-
-#if 0
-  num_sounds = sound_info->num_file_list_entries;
-  Sound = (SoundInfo **)sound_info->artwork_list;
-#endif
 }
 
 void InitMusicList(struct ConfigInfo *config_list, int num_file_list_entries,
@@ -2309,30 +2183,24 @@ void StopSoundExt(int nr, int state)
 static void ReloadCustomSounds()
 {
 #if 0
-  printf("DEBUG: reloading sounds '%s' ...\n", artwork.snd_current_identifier);
+  printf("::: reloading sounds '%s' ...\n", artwork.snd_current_identifier);
 #endif
 
   LoadArtworkConfig(sound_info);
   ReloadCustomArtworkList(sound_info);
-
-#if 0
-  num_sounds = getSoundListSize();
-#endif
 }
 
 static void ReloadCustomMusic()
 {
 #if 0
-  printf("DEBUG: reloading music '%s' ...\n", artwork.mus_current_identifier);
+  printf("::: reloading music '%s' ...\n", artwork.mus_current_identifier);
 #endif
 
   LoadArtworkConfig(music_info);
   ReloadCustomArtworkList(music_info);
 
-#if 1
   /* load all music files from directory not defined in "musicinfo.conf" */
   LoadCustomMusic_NoConf();
-#endif
 }
 
 void InitReloadCustomSounds(char *set_identifier)

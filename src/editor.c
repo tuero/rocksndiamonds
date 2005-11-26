@@ -1345,9 +1345,7 @@ static struct ValueTextInfo options_move_stepsize[] =
   { 4,				"normal"			},
   { 8,				"fast"				},
   { 16,				"very fast"			},
-#if 1
   { 32,				"even faster"			},
-#endif
 
   { -1,				NULL				}
 };
@@ -1396,9 +1394,6 @@ static struct ValueTextInfo options_explosion_type[] =
   { EXPLODES_3X3,		"3x3"				},
   { EXPLODES_CROSS,		"3+3"				},
   { EXPLODES_1X1,		"1x1"				},
-#if 0
-  { EP_INDESTRUCTIBLE,		"indestructible"		},
-#endif
 
   { -1,				NULL				}
 };
@@ -1420,17 +1415,11 @@ static struct ValueTextInfo options_change_direct_action[] =
   { CE_LEFT_BY_PLAYER,		"left by player"		},
   { CE_DROPPED_BY_PLAYER,	"dropped/thrown by player"	},
   { CE_SWITCHED,		"switched"			},
-#if 1
   { CE_HITTING_SOMETHING,	"hitting something"		},
   { CE_HIT_BY_SOMETHING,	"hit by something"		},
-#else
-  { CE_HITTING_SOMETHING,	"collision"			},
-#endif
-
 #if 0
   { CE_BLOCKED,			"blocked"			},
 #endif
-
   { CE_IMPACT,			"impact (on something)"		},
   { CE_SMASHED,			"smashed (from above)"		},
   { CE_COUNT_AT_ZERO,		"CE count at zero"		},
@@ -1449,10 +1438,8 @@ static struct ValueTextInfo options_change_other_action[] =
   { CE_PLAYER_COLLECTS_X,	"player collects"		},
   { CE_PLAYER_DROPS_X,		"player drops/throws"		},
   { CE_TOUCHING_X,		"touching"			},
-#if 1
   { CE_HITTING_X,		"hitting"			},
   { CE_HIT_BY_X,		"hit by"			},
-#endif
   { CE_SWITCH_OF_X,		"switch of"			},
   { CE_CHANGE_OF_X,		"change by page of"		},
   { CE_EXPLOSION_OF_X,		"explosion of"			},
@@ -1879,7 +1866,6 @@ static struct
   char *text_left, *text_right, *infotext;
 } textbutton_info[ED_NUM_TEXTBUTTONS] =
 {
-#if 1
   {
     ED_ELEMENT_SETTINGS_XPOS(0),	ED_COUNTER_YPOS(1),
     GADGET_ID_PROPERTIES_INFO,		GADGET_ID_NONE,
@@ -1910,26 +1896,6 @@ static struct
     8,					"Change",
     NULL, NULL,				"Custom element change configuration"
   },
-#else
-  {
-    ED_ELEMENT_SETTINGS_XPOS(0),	ED_COUNTER_YPOS(1),
-    GADGET_ID_PROPERTIES_INFO,		GADGET_ID_NONE,
-    11,					"Information",			
-    NULL, NULL,				"Show information about element"
-  },
-  {
-    ED_ELEMENT_SETTINGS_XPOS(0) + 166,	ED_COUNTER_YPOS(1),
-    GADGET_ID_PROPERTIES_CONFIG,	GADGET_ID_NONE,
-    11,					"Configure",
-    NULL, NULL,				"Configure element properties"
-  },
-  {
-    ED_ELEMENT_SETTINGS_XPOS(0) + 332,	ED_COUNTER_YPOS(1),
-    GADGET_ID_PROPERTIES_CHANGE,	GADGET_ID_NONE,
-    11,					"Advanced",
-    NULL, NULL,				"Advanced element configuration"
-  },
-#endif
   {
     -1,					ED_ELEMENT_SETTINGS_YPOS(2),
     GADGET_ID_SAVE_AS_TEMPLATE,		GADGET_ID_CUSTOM_USE_TEMPLATE,
@@ -2785,17 +2751,10 @@ static int editor_el_emerald_mine[] =
   EL_AMOEBA_WET,
   EL_AMOEBA_DRY,
 
-#if 1
   EL_EM_KEY_1,
   EL_EM_KEY_2,
   EL_EM_KEY_3,
   EL_EM_KEY_4,
-#else
-  EL_EM_KEY_1_FILE,
-  EL_EM_KEY_2_FILE,
-  EL_EM_KEY_3_FILE,
-  EL_EM_KEY_4_FILE,
-#endif
 
   EL_EM_GATE_1,
   EL_EM_GATE_2,
@@ -3977,209 +3936,6 @@ editor_elements_info[] =
   }
 };
 
-#if 0
-
-static struct
-{
-  short element;
-  short element_mapped;
-}
-forum_sketch_element_mapping[] =
-{
-  { EL_WALL_SLIPPERY,			EL_WALL			},
-  { EL_EXPANDABLE_WALL,			EL_WALL			},
-  { EL_EXPANDABLE_WALL_HORIZONTAL,	EL_WALL			},
-  { EL_EXPANDABLE_WALL_VERTICAL,	EL_WALL			},
-  { EL_EXPANDABLE_WALL_ANY,		EL_WALL			},
-  { EL_WALL_EMERALD,			EL_WALL			},
-  { EL_WALL_DIAMOND,			EL_WALL			},
-  { EL_WALL_BD_DIAMOND,			EL_WALL			},
-  { EL_WALL_EMERALD_YELLOW,		EL_WALL			},
-  { EL_WALL_EMERALD_RED,		EL_WALL			},
-  { EL_WALL_EMERALD_PURPLE,		EL_WALL			},
-  { EL_ACID_POOL_TOPLEFT,		EL_WALL			},
-  { EL_ACID_POOL_TOPRIGHT,		EL_WALL			},
-  { EL_ACID_POOL_BOTTOMLEFT,		EL_WALL			},
-  { EL_ACID_POOL_BOTTOM,		EL_WALL			},
-  { EL_ACID_POOL_BOTTOMRIGHT,		EL_WALL			},
-  { EL_BD_WALL,				EL_WALL			},
-
-  { EL_BD_ROCK,				EL_ROCK			},
-
-  { EL_SP_ZONK,				EL_ROCK			},
-  { EL_SP_BASE,				EL_SAND			},
-  { EL_SP_MURPHY,			EL_PLAYER_1		},
-  { EL_SP_INFOTRON,			EL_EMERALD		},
-  { EL_SP_HARDWARE_GRAY,		EL_STEELWALL		},
-  { EL_SP_EXIT_CLOSED,			EL_EXIT_OPEN		},
-  { EL_SP_DISK_ORANGE,			EL_BOMB			},
-  { EL_SP_DISK_RED,			EL_BOMB			},
-  { EL_SP_DISK_YELLOW,			EL_BOMB			},
-  { EL_SP_PORT_RIGHT,			EL_GATE_1_GRAY		},
-  { EL_SP_PORT_DOWN,			EL_GATE_1_GRAY		},
-  { EL_SP_PORT_LEFT,			EL_GATE_1_GRAY		},
-  { EL_SP_PORT_UP,			EL_GATE_1_GRAY		},
-  { EL_SP_GRAVITY_PORT_RIGHT,		EL_GATE_1_GRAY		},
-  { EL_SP_GRAVITY_PORT_DOWN,		EL_GATE_1_GRAY		},
-  { EL_SP_GRAVITY_PORT_LEFT,		EL_GATE_1_GRAY		},
-  { EL_SP_GRAVITY_PORT_UP,		EL_GATE_1_GRAY		},
-  { EL_SP_PORT_VERTICAL,		EL_GATE_1_GRAY		},
-  { EL_SP_PORT_HORIZONTAL,		EL_GATE_1_GRAY		},
-  { EL_SP_PORT_ANY,			EL_GATE_1_GRAY		},
-  { EL_SP_SNIKSNAK,			EL_BUG			},
-  { EL_SP_ELECTRON,			EL_SPACESHIP		},
-  { EL_SP_CHIP_SINGLE,			EL_WALL			},
-  { EL_SP_CHIP_LEFT,			EL_WALL			},
-  { EL_SP_CHIP_RIGHT,			EL_WALL			},
-  { EL_SP_CHIP_TOP,			EL_WALL			},
-  { EL_SP_CHIP_BOTTOM,			EL_WALL			},
-  { EL_SP_HARDWARE_BASE_1,		EL_STEELWALL		},
-  { EL_SP_HARDWARE_GREEN,		EL_STEELWALL		},
-  { EL_SP_HARDWARE_BLUE,		EL_STEELWALL		},
-  { EL_SP_HARDWARE_RED,			EL_STEELWALL		},
-  { EL_SP_HARDWARE_YELLOW,		EL_STEELWALL		},
-  { EL_SP_HARDWARE_BASE_2,		EL_STEELWALL		},
-  { EL_SP_HARDWARE_BASE_3,		EL_STEELWALL		},
-  { EL_SP_HARDWARE_BASE_3,		EL_STEELWALL		},
-  { EL_SP_HARDWARE_BASE_4,		EL_STEELWALL		},
-  { EL_SP_HARDWARE_BASE_5,		EL_STEELWALL		},
-  { EL_SP_HARDWARE_BASE_6,		EL_STEELWALL		},
-
-  { EL_STEELWALL_SLIPPERY,		EL_STEELWALL		},
-
-  { EL_EXIT_CLOSED,			EL_EXIT_OPEN		},
-
-  { EL_DIAMOND,				EL_EMERALD		},
-  { EL_BD_DIAMOND,			EL_EMERALD		},
-  { EL_EMERALD_YELLOW,			EL_EMERALD		},
-  { EL_EMERALD_RED,			EL_EMERALD		},
-  { EL_EMERALD_PURPLE,			EL_EMERALD		},
-
-  { EL_AMOEBA_DEAD,			EL_AMOEBA		},
-  { EL_AMOEBA_DROP,			EL_AMOEBA		},
-  { EL_AMOEBA_WET,			EL_AMOEBA		},
-  { EL_AMOEBA_DRY,			EL_AMOEBA		},
-  { EL_AMOEBA_FULL,			EL_AMOEBA		},
-  { EL_BD_AMOEBA,			EL_AMOEBA		},
-  { EL_AMOEBA_TO_DIAMOND,		EL_AMOEBA		},
-
-  { EL_DYNAMITE_ACTIVE,			EL_DYNAMITE		},
-
-  { EL_GATE_2_GRAY,			EL_GATE_1_GRAY		},
-  { EL_GATE_3_GRAY,			EL_GATE_1_GRAY		},
-  { EL_GATE_4_GRAY,			EL_GATE_1_GRAY		},
-
-  { EL_EM_KEY_1,			EL_KEY_1		},
-  { EL_EM_KEY_2,			EL_KEY_2		},
-  { EL_EM_KEY_3,			EL_KEY_3		},
-  { EL_EM_KEY_4,			EL_KEY_4		},
-
-  { EL_EM_GATE_1,			EL_GATE_1		},
-  { EL_EM_GATE_2,			EL_GATE_2		},
-  { EL_EM_GATE_3,			EL_GATE_3		},
-  { EL_EM_GATE_4,			EL_GATE_4		},
-
-  { EL_EM_GATE_1_GRAY,			EL_GATE_1_GRAY		},
-  { EL_EM_GATE_2_GRAY,			EL_GATE_1_GRAY		},
-  { EL_EM_GATE_3_GRAY,			EL_GATE_1_GRAY		},
-  { EL_EM_GATE_4_GRAY,			EL_GATE_1_GRAY		},
-
-  { EL_INVISIBLE_SAND,			EL_EMPTY		},
-  { EL_INVISIBLE_WALL,			EL_EMPTY		},
-  { EL_INVISIBLE_STEELWALL,		EL_EMPTY		},
-
-  { EL_PACMAN,				EL_YAMYAM		},
-  { EL_DARK_YAMYAM,			EL_YAMYAM		},
-
-  { EL_BD_MAGIC_WALL,			EL_MAGIC_WALL		},
-
-  { EL_DYNABOMB_INCREASE_NUMBER,	EL_BOMB			},
-  { EL_DYNABOMB_INCREASE_SIZE,		EL_BOMB			},
-  { EL_DYNABOMB_INCREASE_POWER,		EL_BOMB			},
-  { EL_BLACK_ORB,			EL_BOMB			},
-  { EL_DX_SUPABOMB,			EL_BOMB			},
-
-  { EL_SOKOBAN_OBJECT,			EL_KEY_1		},
-  { EL_SOKOBAN_FIELD_EMPTY,		EL_GATE_1_GRAY		},
-  { EL_SOKOBAN_FIELD_FULL,		EL_GATE_1		},
-  { EL_SOKOBAN_FIELD_PLAYER,		EL_PLAYER_1		},
-
-  { EL_BD_BUTTERFLY_RIGHT,		EL_BD_BUTTERFLY		},
-  { EL_BD_BUTTERFLY_UP,			EL_BD_BUTTERFLY		},
-  { EL_BD_BUTTERFLY_LEFT,		EL_BD_BUTTERFLY		},
-  { EL_BD_BUTTERFLY_DOWN,		EL_BD_BUTTERFLY		},
-
-  { EL_BD_FIREFLY_RIGHT,		EL_BD_FIREFLY		},
-  { EL_BD_FIREFLY_UP,			EL_BD_FIREFLY		},
-  { EL_BD_FIREFLY_LEFT,			EL_BD_FIREFLY		},
-  { EL_BD_FIREFLY_DOWN,			EL_BD_FIREFLY		},
-
-  { EL_PLAYER_2,			EL_PLAYER_1		},
-  { EL_PLAYER_3,			EL_PLAYER_1		},
-  { EL_PLAYER_4,			EL_PLAYER_1		},
-
-  { EL_BUG_RIGHT,			EL_BUG			},
-  { EL_BUG_UP,				EL_BUG			},
-  { EL_BUG_LEFT,			EL_BUG			},
-  { EL_BUG_DOWN,			EL_BUG			},
-
-  { EL_SPACESHIP_RIGHT,			EL_SPACESHIP		},
-  { EL_SPACESHIP_UP,			EL_SPACESHIP		},
-  { EL_SPACESHIP_LEFT,			EL_SPACESHIP		},
-  { EL_SPACESHIP_DOWN,			EL_SPACESHIP		},
-
-  { EL_PACMAN_RIGHT,			EL_YAMYAM		},
-  { EL_PACMAN_UP,			EL_YAMYAM		},
-  { EL_PACMAN_LEFT,			EL_YAMYAM		},
-  { EL_PACMAN_DOWN,			EL_YAMYAM		},
-
-  { -1,					-1			}
-};
-
-static struct
-{
-  short element;
-  char *element_string;
-}
-forum_sketch_element_strings[] =
-{
-  { EL_PLAYER_1,		"p" },
-  { EL_EMPTY,			"_" },
-  { EL_SAND,			"s" },
-  { EL_ROCK,			"b" },
-  { EL_EMERALD,			"e" },
-  { EL_BUG,			"u" },
-  { EL_SPACESHIP,		"h" },
-  { EL_BD_FIREFLY,		"f" },
-  { EL_BD_BUTTERFLY,		"b" },
-  { EL_AMOEBA,			"a" },
-  { EL_YAMYAM,			"y" },
-  { EL_WALL,			"w" },
-  { EL_STEELWALL,		"t" },
-  { EL_MAGIC_WALL,		"m" },
-  { EL_EXIT_OPEN,		"x" },
-  { EL_DYNAMITE,		"d" },
-  { EL_KEY_1,			"1" },
-  { EL_KEY_2,			"2" },
-  { EL_KEY_3,			"3" },
-  { EL_KEY_4,			"4" },
-  { EL_GATE_1,			"5" },
-  { EL_GATE_2,			"6" },
-  { EL_GATE_3,			"7" },
-  { EL_GATE_4,			"8" },
-  { EL_GATE_1_GRAY,		"9" },
-  { EL_BOMB,			"@" },
-  { EL_ROBOT,			"r" },
-  { EL_ROBOT_WHEEL,		"0" },
-  { EL_NUT,			"n" },
-  { EL_CUSTOM_1,		"c" },
-  { EL_CHAR_QUESTION,		"?" },
-
-  { -1,				NULL }
-};
-
-#endif
-
 
 /*
   -----------------------------------------------------------------------------
@@ -4235,42 +3991,32 @@ static char *getElementInfoText(int element)
 
 static void ReinitializeElementList()
 {
-  static boolean initialized = FALSE;
   int pos = 0;
   int i, j;
 
   checked_free(editor_elements);
 
-#if 0
-  if (!initialized)
-#else
-  /* reload user defined element list for each invocation of level editor */
-#endif
+  /* reload optional user defined element list for each invocation of editor */
+  LoadUserDefinedEditorElementList(&editor_el_user_defined_ptr,
+				   &num_editor_el_user_defined);
+
+  /* initialize list of empty elements (used for padding, if needed) */
+  for (i = 0; i < ED_NUM_ELEMENTLIST_BUTTONS; i++)
+    editor_el_empty[i] = EL_EMPTY;
+
+  /* do some sanity checks for each element from element list */
+  for (i = 0; editor_elements_info[i].setup_value != NULL; i++)
   {
-    /* initialize optional user defined element list */
-    LoadUserDefinedEditorElementList(&editor_el_user_defined_ptr,
-				     &num_editor_el_user_defined);
-
-    /* initialize list of empty elements (used for padding, if needed) */
-    for (i = 0; i < ED_NUM_ELEMENTLIST_BUTTONS; i++)
-      editor_el_empty[i] = EL_EMPTY;
-
-    /* do some sanity checks for each element from element list */
-    for (i = 0; editor_elements_info[i].setup_value != NULL; i++)
+    for (j = 0; j < *editor_elements_info[i].element_list_size; j++)
     {
-      for (j = 0; j < *editor_elements_info[i].element_list_size; j++)
-      {
-	int element = (*editor_elements_info[i].element_list)[j];
+      int element = (*editor_elements_info[i].element_list)[j];
 
-	if (element >= NUM_FILE_ELEMENTS)
-	  Error(ERR_WARN, "editor element %d is runtime element", element);
+      if (element >= NUM_FILE_ELEMENTS)
+	Error(ERR_WARN, "editor element %d is runtime element", element);
 
-	if (strcmp(getElementInfoText(element), INFOTEXT_UNKNOWN_ELEMENT) == 0)
-	  Error(ERR_WARN, "no element description for element %d", element);
-      }
+      if (strcmp(getElementInfoText(element), INFOTEXT_UNKNOWN_ELEMENT) == 0)
+	Error(ERR_WARN, "no element description for element %d", element);
     }
-
-    initialized = TRUE;
   }
 
   num_editor_elements = 0;
@@ -5502,14 +5248,6 @@ static void MapCounterButtons(int id)
   struct GadgetInfo *gi_down = level_editor_gadget[gadget_id_down];
   struct GadgetInfo *gi_text = level_editor_gadget[gadget_id_text];
   struct GadgetInfo *gi_up   = level_editor_gadget[gadget_id_up];
-#if 0
-  char infotext[MAX_OUTPUT_LINESIZE + 1];
-  int max_infotext_len = getMaxInfoTextLength();
-  int xoffset_left = 0;
-  int yoffset_left = ED_BORDER_SIZE;
-  int xoffset_right = getCounterGadgetWidth();
-  int yoffset_right = ED_BORDER_SIZE;
-#else
   int xoffset_left = getTextWidthForGadget(counterbutton_info[id].text_left);
   int xoffset_right = ED_GADGET_TEXT_DISTANCE;
   int yoffset_above = MINI_TILEX + ED_GADGET_DISTANCE;
@@ -5519,7 +5257,6 @@ static void MapCounterButtons(int id)
   int y_above = gi_down->y - yoffset_above;
   int x = gi_down->x;
   int y;	/* set after gadget position was modified */
-#endif
 
   /* set position for "value1/value2" counter gadgets (score in most cases) */
   if (id == ED_COUNTER_ID_ELEMENT_VALUE1 ||
@@ -5956,40 +5693,6 @@ static int setSelectboxValue(int selectbox_id, int new_value)
 
 static void copy_custom_element_settings(int element_from, int element_to)
 {
-#if 0
-  struct ElementInfo ei_to_old = element_info[element_to];
-  struct ElementInfo *ei_from = &element_info[element_from];
-  struct ElementInfo *ei_to = &element_info[element_to];
-  int i;
-
-  /* ---------- copy whole element structure ---------- */
-  *ei_to = *ei_from;
-
-  /* ---------- restore structure pointers which cannot be copied ---------- */
-  ei_to->token_name         = ei_to_old.token_name;
-  ei_to->class_name         = ei_to_old.class_name;
-  ei_to->editor_description = ei_to_old.editor_description;
-  ei_to->custom_description = ei_to_old.custom_description;
-  ei_to->change_page        = ei_to_old.change_page;
-  ei_to->change             = ei_to_old.change;
-  ei_to->group              = ei_to_old.group;
-
-  /* ---------- copy element base properties ---------- */
-  Properties[element_to][EP_BITFIELD_BASE] =
-    Properties[element_from][EP_BITFIELD_BASE];
-
-  /* ---------- reinitialize and copy change pages ---------- */
-  setElementChangePages(ei_to, ei_to->num_change_pages);
-
-  for (i=0; i < ei_to->num_change_pages; i++)
-    ei_to->change_page[i] = ei_from->change_page[i];
-
-  /* ---------- copy group element info ---------- */
-  if (ei_from->group != NULL && ei_to->group != NULL)	/* group or internal */
-    *ei_to->group = *ei_from->group;
-
-#else
-
   struct ElementInfo *ei_from = &element_info[element_from];
   struct ElementInfo *ei_to = &element_info[element_to];
   int i, x, y;
@@ -6050,8 +5753,6 @@ static void copy_custom_element_settings(int element_from, int element_to)
   /* ---------- copy group element info ---------- */
   if (ei_from->group != NULL && ei_to->group != NULL)	/* group or internal */
     *ei_to->group = *ei_from->group;
-
-#endif
 
   /* mark this custom element as modified */
   ei_to->modified_settings = TRUE;
@@ -6260,43 +5961,6 @@ static void CopyCustomElementPropertiesToEditor(int element)
      DONT_COLLIDE_WITH(element) ||
      DONT_RUN_INTO(element));
 
-#if 0
-  /* set explosion type selectbox help value */
-  custom_element.explosion_type =
-    (
-#if 0
-     IS_INDESTRUCTIBLE(element) ? EP_INDESTRUCTIBLE :
-#endif
-     CAN_EXPLODE_1X1(element) ? EP_CAN_EXPLODE_1X1 :
-     CAN_EXPLODE_3X3(element) ? EP_CAN_EXPLODE_3X3 :
-     CAN_EXPLODE_CROSS(element) ? EP_CAN_EXPLODE_CROSS :
-     custom_element.explosion_type);
-  custom_element_properties[EP_CAN_EXPLODE_AT_ALL] =
-    (
-#if 0
-     IS_INDESTRUCTIBLE(element) ||
-#endif
-     CAN_EXPLODE_1X1(element) ||
-     CAN_EXPLODE_3X3(element) ||
-     CAN_EXPLODE_CROSS(element));
-#endif
-
-#if 0
-  /* special case: sub-settings dependent from main setting */
-#if 0
-  custom_element.can_explode_by_fire = CAN_EXPLODE_BY_FIRE(element);
-  custom_element.can_explode_smashed = CAN_EXPLODE_SMASHED(element);
-  custom_element.can_explode_impact  = CAN_EXPLODE_IMPACT(element);
-#else
-  if (CAN_EXPLODE_BY_FIRE(element))
-    custom_element.can_explode_by_fire = TRUE;
-  if (CAN_EXPLODE_SMASHED(element))
-    custom_element.can_explode_smashed = TRUE;
-  if (CAN_EXPLODE_IMPACT(element))
-    custom_element.can_explode_impact  = TRUE;
-#endif
-#endif
-
   /* ---------- element settings: advanced (custom elements) --------------- */
 
   /* set "change by direct action" selectbox help value */
@@ -6344,7 +6008,6 @@ static void CopyGroupElementPropertiesToEditor(int element)
 
 static void CopyClassicElementPropertiesToEditor(int element)
 {
-#if 1
   if (ELEM_IS_PLAYER(element) || COULD_MOVE_INTO_ACID(element))
     custom_element_properties[EP_CAN_MOVE_INTO_ACID] =
       getMoveIntoAcidProperty(&level, element);
@@ -6352,17 +6015,6 @@ static void CopyClassicElementPropertiesToEditor(int element)
   if (MAYBE_DONT_COLLIDE_WITH(element))
     custom_element_properties[EP_DONT_COLLIDE_WITH] =
       getDontCollideWithProperty(&level, element);
-#else
-
-  if (COULD_MOVE_INTO_ACID(element))
-  {
-    int bit_nr = get_special_property_bit(element, EP_CAN_MOVE_INTO_ACID);
-
-    if (bit_nr > -1)
-      custom_element_properties[EP_CAN_MOVE_INTO_ACID] =
-	((level.can_move_into_acid_bits & (1 << bit_nr)) != 0);
-  }
-#endif
 }
 
 static void CopyElementPropertiesToEditor(int element)
@@ -6379,9 +6031,6 @@ static void CopyCustomElementPropertiesToGame(int element)
 {
   int i;
   int access_type_and_layer;
-#if 0
-  boolean can_explode;
-#endif
 
   /* mark that this custom element has been modified */
   custom_element.modified_settings = TRUE;
@@ -6447,48 +6096,6 @@ static void CopyCustomElementPropertiesToGame(int element)
   custom_element_properties[custom_element.deadliness] =
     custom_element_properties[EP_DEADLY];
 
-#if 0
-  /* set explosion type property from checkbox and selectbox */
-#if 0
-  custom_element_properties[EP_INDESTRUCTIBLE] = FALSE;
-#endif
-  custom_element_properties[EP_CAN_EXPLODE_1X1] = FALSE;
-  custom_element_properties[EP_CAN_EXPLODE_3X3] = FALSE;
-  custom_element_properties[EP_CAN_EXPLODE_CROSS] = FALSE;
-  custom_element_properties[EP_CAN_EXPLODE_BY_FIRE] = FALSE;
-  custom_element_properties[EP_CAN_EXPLODE_SMASHED] = FALSE;
-  custom_element_properties[EP_CAN_EXPLODE_IMPACT] = FALSE;
-  custom_element_properties[custom_element.explosion_type] =
-    custom_element_properties[EP_CAN_EXPLODE_AT_ALL];
-#endif
-
-#if 0
-  /* special case: sub-settings dependent from main setting */
-#if 0
-  can_explode = (custom_element_properties[EP_CAN_EXPLODE_1X1] ||
-		 custom_element_properties[EP_CAN_EXPLODE_3X3] ||
-		 custom_element_properties[EP_CAN_EXPLODE_CROSS]);
-  custom_element_properties[EP_CAN_EXPLODE_BY_FIRE] =
-    (can_explode && custom_element.can_explode_by_fire);
-  custom_element_properties[EP_CAN_EXPLODE_SMASHED] =
-    (can_explode && custom_element.can_explode_smashed);
-  custom_element_properties[EP_CAN_EXPLODE_IMPACT] =
-    (can_explode && custom_element.can_explode_impact);
-#else
-  if (custom_element_properties[EP_CAN_EXPLODE_1X1] ||
-      custom_element_properties[EP_CAN_EXPLODE_3X3] ||
-      custom_element_properties[EP_CAN_EXPLODE_CROSS])
-  {
-    custom_element_properties[EP_CAN_EXPLODE_BY_FIRE] =
-      custom_element.can_explode_by_fire;
-    custom_element_properties[EP_CAN_EXPLODE_SMASHED] =
-      custom_element.can_explode_smashed;
-    custom_element_properties[EP_CAN_EXPLODE_IMPACT] =
-      custom_element.can_explode_impact;
-  }
-#endif
-#endif
-
   /* ---------- element settings: advanced (custom elements) --------------- */
 
   /* set player change event from checkbox and selectbox */
@@ -6550,7 +6157,6 @@ static void CopyGroupElementPropertiesToGame(int element)
 
 static void CopyClassicElementPropertiesToGame(int element)
 {
-#if 1
   if (ELEM_IS_PLAYER(element) || COULD_MOVE_INTO_ACID(element))
     setMoveIntoAcidProperty(&level, element,
 			    custom_element_properties[EP_CAN_MOVE_INTO_ACID]);
@@ -6558,21 +6164,6 @@ static void CopyClassicElementPropertiesToGame(int element)
   if (MAYBE_DONT_COLLIDE_WITH(element))
     setDontCollideWithProperty(&level, element,
 			      custom_element_properties[EP_DONT_COLLIDE_WITH]);
-#else
-
-  if (COULD_MOVE_INTO_ACID(element))
-  {
-    int bit_nr = get_special_property_bit(element, EP_CAN_MOVE_INTO_ACID);
-
-    if (bit_nr > -1)
-    {
-      level.can_move_into_acid_bits &= ~(1 << bit_nr);
-
-      if (custom_element_properties[EP_CAN_MOVE_INTO_ACID])
-	level.can_move_into_acid_bits |= (1 << bit_nr);
-    }
-  }
-#endif
 }
 
 static void CopyElementPropertiesToGame(int element)
@@ -6612,11 +6203,6 @@ void DrawLevelEd()
   BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
 	     DOOR_GFX_PAGEX6, DOOR_GFX_PAGEY1, DXSIZE, DYSIZE, DX, DY);
 
-#if 0
-  /* draw mouse button brush elements */
-  RedrawDrawingElements();
-#endif
-
   /* draw bigger door */
   DrawSpecialEditorDoor();
 
@@ -6627,9 +6213,6 @@ void DrawLevelEd()
   redraw_mask |= REDRAW_ALL;
 
   ReinitializeElementListButtons();	/* custom element may look different */
-#if 0
-  ModifyEditorElementList();		/* may be needed for custom elements */
-#endif
 
   UnmapTapeButtons();
   MapControlButtons();
@@ -7064,8 +6647,6 @@ static boolean PrintInfoText(char *text, int font_nr, int start_line)
   return TRUE;
 }
 
-#if 1
-
 static int PrintElementDescriptionFromFile(char *filename, int start_line)
 {
   int font_nr = FONT_TEXT_2;
@@ -7081,97 +6662,6 @@ static int PrintElementDescriptionFromFile(char *filename, int start_line)
   return DrawTextFromFile(sx, sy, filename, font_nr, max_chars_per_line,
 			  max_lines_per_screen);
 }
-
-#else
-
-static int PrintElementDescriptionFromFile(char *filename, int start_line)
-{
-  int font_nr = FONT_TEXT_2;
-  int font_width = getFontWidth(font_nr);
-  int font_height = getFontHeight(font_nr);
-  int pad_x = ED_ELEMENT_SETTINGS_XPOS(0);
-  int pad_y = ED_ELEMENT_SETTINGS_YPOS(0) + ED_BORDER_SIZE;
-  int sx = SX + pad_x;
-  int sy = SY + pad_y;
-  int max_chars_per_line = (SXSIZE - 2 * pad_x) / font_width;
-  int max_lines_per_screen = (SYSIZE - pad_y) / font_height - 1;
-  int current_line = start_line;
-  char line[MAX_LINE_LEN];
-  char buffer[max_chars_per_line + 1];
-  int buffer_len;
-  FILE *file;
-
-  if (current_line >= max_lines_per_screen)
-    return 0;
-
-  if (filename == NULL)
-    return 0;
-
-  if (!(file = fopen(filename, MODE_READ)))
-    return 0;
-
-  buffer[0] = '\0';
-  buffer_len = 0;
-
-  while (!feof(file) && current_line < max_lines_per_screen)
-  {
-    char *line_ptr;
-    boolean last_line_was_empty = TRUE;
-
-    /* read next line of input file */
-    if (!fgets(line, MAX_LINE_LEN, file))
-      break;
-
-    /* skip comments (lines directly beginning with '#') */
-    if (line[0] == '#')
-      continue;
-
-    /* cut trailing newline from input line */
-    for (line_ptr = line; *line_ptr; line_ptr++)
-    {
-      if (*line_ptr == '\n' || *line_ptr == '\r')
-      {
-	*line_ptr = '\0';
-	break;
-      }
-    }
-
-    if (strlen(line) == 0)		/* special case: force empty line */
-      strcpy(line, "\n");
-
-    line_ptr = line;
-
-    while (*line_ptr && current_line < max_lines_per_screen)
-    {
-      boolean buffer_filled = RenderLineToBuffer(&line_ptr,
-						 buffer, &buffer_len,
-						 last_line_was_empty,
-						 max_chars_per_line);
-      if (buffer_filled)
-      {
-	DrawText(sx, sy + current_line * font_height, buffer, font_nr);
-	current_line++;
-
-	last_line_was_empty = (buffer_len == 0);
-
-	buffer[0] = '\0';
-	buffer_len = 0;
-      }
-    }
-  }
-
-  fclose(file);
-
-  if (buffer_len > 0 && current_line < max_lines_per_screen)
-  {
-    DrawText(sx, sy + current_line * font_height, buffer, font_nr);
-    current_line++;
-  }
-
-  return (current_line - start_line);
-}
-
-#endif
 
 static void DrawPropertiesTabulatorGadgets()
 {
@@ -7417,17 +6907,10 @@ static struct
   { EL_KEY_2,		&level.score[SC_KEY],		TEXT_COLLECTING	},
   { EL_KEY_3,		&level.score[SC_KEY],		TEXT_COLLECTING	},
   { EL_KEY_4,		&level.score[SC_KEY],		TEXT_COLLECTING	},
-#if 1
   { EL_EM_KEY_1,	&level.score[SC_KEY],		TEXT_COLLECTING	},
   { EL_EM_KEY_2,	&level.score[SC_KEY],		TEXT_COLLECTING	},
   { EL_EM_KEY_3,	&level.score[SC_KEY],		TEXT_COLLECTING	},
   { EL_EM_KEY_4,	&level.score[SC_KEY],		TEXT_COLLECTING	},
-#else
-  { EL_EM_KEY_1_FILE,	&level.score[SC_KEY],		TEXT_COLLECTING	},
-  { EL_EM_KEY_2_FILE,	&level.score[SC_KEY],		TEXT_COLLECTING	},
-  { EL_EM_KEY_3_FILE,	&level.score[SC_KEY],		TEXT_COLLECTING	},
-  { EL_EM_KEY_4_FILE,	&level.score[SC_KEY],		TEXT_COLLECTING	},
-#endif
   { EL_EMC_KEY_5,	&level.score[SC_KEY],		TEXT_COLLECTING	},
   { EL_EMC_KEY_6,	&level.score[SC_KEY],		TEXT_COLLECTING	},
   { EL_EMC_KEY_7,	&level.score[SC_KEY],		TEXT_COLLECTING	},
@@ -7986,6 +7469,7 @@ static void DrawArc(int from_x, int from_y, int to_x, int to_y,
 }
 
 #define DRAW_CIRCLES_BUTTON_AVAILABLE	0
+
 #if DRAW_CIRCLES_BUTTON_AVAILABLE
 static void DrawCircle(int from_x, int from_y, int to_x, int to_y,
 		       int element, boolean change_level)
@@ -8073,35 +7557,6 @@ static void CopyBrushExt(int from_x, int from_y, int to_x, int to_y,
 	int element = brush_buffer[x][y];
 	int element_mapped = element;
 
-#if 0
-	char *element_string = "?";
-	int k;
-
-	for (k = 0; forum_sketch_element_mapping[k].element != -1; k++)
-	{
-	  if (forum_sketch_element_mapping[k].element == element)
-	  {
-	    element_mapped = forum_sketch_element_mapping[k].element_mapped;
-	    break;
-	  }
-	}
-
-	if (IS_CUSTOM_ELEMENT(element))
-	  element_mapped = EL_CUSTOM_1;
-
-	for (k = 0; forum_sketch_element_strings[k].element != -1; k++)
-	{
-	  if (forum_sketch_element_strings[k].element == element_mapped)
-	  {
-	    element_string = forum_sketch_element_strings[k].element_string;
-	    break;
-	  }
-	}
-
-	printf("`%s", element_string);
-
-#else
-
 	if (IS_CUSTOM_ELEMENT(element))
 	  element_mapped = EL_CUSTOM_START;
 	else if (IS_GROUP_ELEMENT(element))
@@ -8110,7 +7565,6 @@ static void CopyBrushExt(int from_x, int from_y, int to_x, int to_y,
 	  element_mapped = EL_UNKNOWN;
 
 	printf("%c%03d", (mode == CB_DUMP_BRUSH ? '`' : '¸'), element_mapped);
-#endif
       }
 
       printf("\n");
@@ -8573,12 +8027,12 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
     return;
 
 #if 1
-  if (!IS_VALID_BUTTON(button) && !button_release_event)
-    return;
-#else
-  if (!button && !button_release_event)
+  if (!IS_VALID_BUTTON(button))
     return;
 #endif
+
+  if (!button && !button_release_event)
+    return;
 
   /* automatically switch to 'single item' drawing mode, if needed */
   actual_drawing_function =
@@ -9464,16 +8918,7 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 
 	level_editor_test_game = TRUE;
 
-#if 1
 	StartGameActions(FALSE, setup.autorecord, NEW_RANDOMIZE);
-#else
-	if (setup.autorecord)
-	  TapeStartRecording();
-
-	game_status = GAME_MODE_PLAYING;
-
-	InitGame();
-#endif
       }
       break;
 
@@ -9789,35 +9234,16 @@ static void HandleDrawingAreaInfo(struct GadgetInfo *gi)
 	    break;
 	}
 
-#if 1
 	if (actual_drawing_function == GADGET_ID_PICK_ELEMENT)
 	  sprintf(infotext, "%s: %d, %d", text, lx, ly);
 	else
 	  sprintf(infotext, "%s: %d, %d", text,
 		  ABS(lx - start_lx) + 1, ABS(ly - start_ly) + 1);
-#else
-	if (actual_drawing_function == GADGET_ID_PICK_ELEMENT)
-	  DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2,
-		    "%s: %d, %d", infotext, lx, ly);
-	else
-	  DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2,
-		    "%s: %d, %d", infotext,
-		    ABS(lx - start_lx) + 1, ABS(ly - start_ly) + 1);
-#endif
       }
-#if 1
       else if (actual_drawing_function == GADGET_ID_PICK_ELEMENT)
 	strncpy(infotext, getElementInfoText(Feld[lx][ly]), max_infotext_len);
       else
 	sprintf(infotext, "Level position: %d, %d", lx, ly);
-#else
-      else if (actual_drawing_function == GADGET_ID_PICK_ELEMENT)
-	DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2,
-		  "%s", getElementInfoText(Feld[lx][ly]));
-      else
-	DrawTextF(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2,
-		  "Level position: %d, %d", lx, ly);
-#endif
     }
 
     /* misuse this function to draw brush cursor, if needed */

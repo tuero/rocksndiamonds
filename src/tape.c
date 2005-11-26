@@ -345,102 +345,6 @@ void DrawVideoDisplay(unsigned long state, unsigned long value)
     },
   };
 
-#if 0
-  if (state & VIDEO_STATE_FFWD_OFF)
-  {
-#if 1
-    int cx = DOOR_GFX_PAGEX3, cy = DOOR_GFX_PAGEY2;
-
-    if (value != VIDEO_DISPLAY_SYMBOL_ONLY)
-      BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
-		 cx + VIDEO_LABEL_XPOS,
-		 cy + VIDEO_LABEL_YPOS,
-		 VIDEO_LABEL_XSIZE,
-		 VIDEO_LABEL_YSIZE,
-		 VX + VIDEO_LABEL_XPOS,
-		 VY + VIDEO_LABEL_YPOS);
-
-    cx = DOOR_GFX_PAGEX3;
-    cy = DOOR_GFX_PAGEY2;
-
-    if (value != VIDEO_DISPLAY_LABEL_ONLY)
-      BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
-		 cx + VIDEO_FFWD_SYMBOL_XPOS,
-		 cy + VIDEO_SYMBOL_YPOS,
-		 VIDEO_FFWD_SYMBOL_XSIZE,
-		 VIDEO_FFWD_SYMBOL_YSIZE,
-		 VX + VIDEO_SYMBOL_XPOS,
-		 VY + VIDEO_SYMBOL_YPOS);
-#else
-    int cx = DOOR_GFX_PAGEX3, cy = DOOR_GFX_PAGEY2;
-
-    BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
-	       cx + VIDEO_PLAY_SYMBOL_XPOS - 9,
-	       cy + VIDEO_PLAY_SYMBOL_YPOS,
-	       VIDEO_PLAY_SYMBOL_XSIZE - 2,
-	       VIDEO_PLAY_SYMBOL_YSIZE,
-	       VX + VIDEO_PLAY_SYMBOL_XPOS - 9,
-	       VY + VIDEO_PLAY_SYMBOL_YPOS);
-#endif
-  }
-#endif
-
-#if 0
-  if (state & VIDEO_STATE_PBEND_OFF)
-  {
-#if 1
-    int cx = DOOR_GFX_PAGEX3, cy = DOOR_GFX_PAGEY2;
-
-    if (value != VIDEO_DISPLAY_SYMBOL_ONLY)
-      BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
-		 cx + VIDEO_LABEL_XPOS,
-		 cy + VIDEO_LABEL_YPOS,
-		 VIDEO_LABEL_XSIZE,
-		 VIDEO_LABEL_YSIZE,
-		 VX + VIDEO_LABEL_XPOS,
-		 VY + VIDEO_LABEL_YPOS);
-
-    cx = DOOR_GFX_PAGEX3;
-    cy = DOOR_GFX_PAGEY2;
-
-    if (value != VIDEO_DISPLAY_LABEL_ONLY)
-      BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
-		 cx + VIDEO_PBEND_SYMBOL_XPOS,
-		 cy + VIDEO_SYMBOL_YPOS,
-		 VIDEO_PBEND_SYMBOL_XSIZE,
-		 VIDEO_PBEND_SYMBOL_YSIZE,
-		 VX + VIDEO_PBEND_SYMBOL_XPOS,
-		 VY + VIDEO_SYMBOL_YPOS);
-#else
-    int cx = DOOR_GFX_PAGEX3, cy = DOOR_GFX_PAGEY2;
-
-    BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
-	       cx + VIDEO_REC_LABEL_XPOS,
-	       cy + VIDEO_REC_LABEL_YPOS,
-	       VIDEO_PBEND_LABEL_XSIZE,
-	       VIDEO_PBEND_LABEL_YSIZE,
-	       VX + VIDEO_REC_LABEL_XPOS,
-	       VY + VIDEO_REC_LABEL_YPOS);
-#endif
-  }
-#endif
-
-#if 0
-  if (state & VIDEO_STATE_1STEP_OFF)
-  {
-    int cx = DOOR_GFX_PAGEX3, cy = DOOR_GFX_PAGEY2;
-
-    if (value != VIDEO_DISPLAY_LABEL_ONLY)
-      BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
-		 cx + VIDEO_1STEP_SYMBOL_XPOS,
-		 cy + VIDEO_SYMBOL_YPOS,
-		 VIDEO_1STEP_SYMBOL_XSIZE,
-		 VIDEO_1STEP_SYMBOL_YSIZE,
-		 VX + VIDEO_1STEP_SYMBOL_XPOS,
-		 VY + VIDEO_SYMBOL_YPOS);
-  }
-#endif
-
   for (k = 0; k < NUM_TAPE_FUNCTION_STATES; k++)	/* on or off states */
   {
     for (i = 0; i < NUM_TAPE_FUNCTIONS; i++)		/* record, play, ... */
@@ -476,102 +380,6 @@ void DrawVideoDisplay(unsigned long state, unsigned long value)
     }
   }
 
-#if 0
-  if (state & VIDEO_STATE_FFWD_ON)
-  {
-#if 1
-    int cx = DOOR_GFX_PAGEX6, cy = DOOR_GFX_PAGEY1;
-
-    if (value != VIDEO_DISPLAY_SYMBOL_ONLY)
-      BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
-		 cx + VIDEO_FFWD_LABEL_XPOS,
-		 cy + VIDEO_FFWD_LABEL_YPOS,
-		 VIDEO_LABEL_XSIZE,
-		 VIDEO_LABEL_YSIZE,
-		 VX + VIDEO_LABEL_XPOS,
-		 VY + VIDEO_LABEL_YPOS);
-
-    cx = DOOR_GFX_PAGEX6;
-    cy = DOOR_GFX_PAGEY1;
-
-    if (value != VIDEO_DISPLAY_LABEL_ONLY)
-      BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
-		 cx + VIDEO_FFWD_SYMBOL_XPOS,
-		 cy + VIDEO_FFWD_SYMBOL_YPOS,
-		 VIDEO_FFWD_SYMBOL_XSIZE,
-		 VIDEO_FFWD_SYMBOL_YSIZE,
-		 VX + VIDEO_SYMBOL_XPOS,
-		 VY + VIDEO_SYMBOL_YPOS);
-#else
-    int cx = DOOR_GFX_PAGEX4, cy = DOOR_GFX_PAGEY2;
-
-    BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
-	       cx + VIDEO_PLAY_SYMBOL_XPOS,
-	       cy + VIDEO_PLAY_SYMBOL_YPOS,
-	       VIDEO_PLAY_SYMBOL_XSIZE - 2,
-	       VIDEO_PLAY_SYMBOL_YSIZE,
-	       VX + VIDEO_PLAY_SYMBOL_XPOS - 9,
-	       VY + VIDEO_PLAY_SYMBOL_YPOS);
-#endif
-  }
-#endif
-
-#if 0
-  if (state & VIDEO_STATE_PBEND_ON)
-  {
-#if 1
-    int cx = DOOR_GFX_PAGEX6, cy = DOOR_GFX_PAGEY1;
-
-    if (value != VIDEO_DISPLAY_SYMBOL_ONLY)
-      BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
-		 cx + VIDEO_PBEND_LABEL_XPOS,
-		 cy + VIDEO_PBEND_LABEL_YPOS,
-		 VIDEO_LABEL_XSIZE,
-		 VIDEO_LABEL_YSIZE,
-		 VX + VIDEO_LABEL_XPOS,
-		 VY + VIDEO_LABEL_YPOS);
-
-    cx = DOOR_GFX_PAGEX6;
-    cy = DOOR_GFX_PAGEY1;
-
-    if (value != VIDEO_DISPLAY_LABEL_ONLY)
-      BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
-		 cx + VIDEO_PBEND_SYMBOL_XPOS,
-		 cy + VIDEO_PBEND_SYMBOL_YPOS,
-		 VIDEO_PBEND_SYMBOL_XSIZE,
-		 VIDEO_PBEND_SYMBOL_YSIZE,
-		 VX + VIDEO_SYMBOL_XPOS,
-		 VY + VIDEO_SYMBOL_YPOS);
-#else
-    int cx = DOOR_GFX_PAGEX6, cy = DOOR_GFX_PAGEY1;
-
-    BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
-	       cx + VIDEO_PBEND_LABEL_XPOS,
-	       cy + VIDEO_PBEND_LABEL_YPOS,
-	       VIDEO_PBEND_LABEL_XSIZE,
-	       VIDEO_PBEND_LABEL_YSIZE,
-	       VX + VIDEO_REC_LABEL_XPOS,
-	       VY + VIDEO_REC_LABEL_YPOS);
-#endif
-  }
-#endif
-
-#if 0
-  if (state & VIDEO_STATE_1STEP_ON)
-  {
-    int cx = DOOR_GFX_PAGEX6, cy = DOOR_GFX_PAGEY1;
-
-    if (value != VIDEO_DISPLAY_LABEL_ONLY)
-      BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
-		 cx + VIDEO_1STEP_SYMBOL_XPOS,
-		 cy + VIDEO_1STEP_SYMBOL_YPOS,
-		 VIDEO_1STEP_SYMBOL_XSIZE,
-		 VIDEO_1STEP_SYMBOL_YSIZE,
-		 VX + VIDEO_1STEP_SYMBOL_XPOS,
-		 VY + VIDEO_SYMBOL_YPOS);
-  }
-#endif
-
   if (state & VIDEO_STATE_DATE_ON)
   {
     int tag = value % 100;
@@ -597,16 +405,7 @@ void DrawVideoDisplay(unsigned long state, unsigned long value)
 	     int2str(sec, 2), FONT_TAPE_RECORDER);
   }
 
-#if 1
   redraw_mask |= REDRAW_DOOR_2;
-#else
-  if (state & VIDEO_STATE_DATE)
-    redraw_mask |= REDRAW_VIDEO_1;
-  if ((state & ~VIDEO_STATE_DATE) & VIDEO_STATE)
-    redraw_mask |= REDRAW_VIDEO_2;
-  if (state & VIDEO_PRESS)
-    redraw_mask |= REDRAW_VIDEO_3;
-#endif
 }
 
 void DrawCompleteVideoDisplay()
@@ -683,11 +482,6 @@ void TapeErase()
   tape.engine_version = level.game_version;
 
   TapeSetDate();
-
-#if 0
-  printf("::: tape.engine_version = level.game_version = %d \n",
-	 level.game_version);
-#endif
 
   for (i = 0; i < MAX_PLAYERS; i++)
     tape.player_participates[i] = FALSE;
@@ -782,11 +576,6 @@ void TapeHaltRecording()
 
 void TapeStopRecording()
 {
-#if 0
-  if (!tape.recording)
-    return;
-#endif
-
   TapeHaltRecording();
 
   tape.recording = FALSE;
@@ -800,23 +589,14 @@ void TapeRecordAction(byte action[MAX_PLAYERS])
 {
   int i;
 
-#if 1
-  if (!tape.recording)		/* record action even when tape is paused! */
+  if (!tape.recording)		/* (record action even when tape is paused) */
     return;
-#else
-  if (!tape.recording || tape.pausing)
-    return;
-#endif
 
   if (tape.counter >= MAX_TAPE_LEN - 1)
   {
     TapeStopRecording();
     return;
   }
-
-#if 0
-  printf("::: %05d: recording action: %d\n", FrameCounter, action[0]);
-#endif
 
   if (tape.pos[tape.counter].delay > 0)		/* already stored action */
   {
@@ -837,11 +617,6 @@ void TapeRecordAction(byte action[MAX_PLAYERS])
 
   if (tape.pos[tape.counter].delay == 0)	/* store new action */
   {
-
-#if 0
-    printf("::: %05d: new sequence\n", FrameCounter);
-#endif
-
     for (i = 0; i < MAX_PLAYERS; i++)
       tape.pos[tape.counter].action[i] = action[i];
 
@@ -852,11 +627,6 @@ void TapeRecordAction(byte action[MAX_PLAYERS])
 void TapeTogglePause(boolean toggle_manual)
 {
   int state = 0;
-
-#if 0
-  if (!tape.recording && !tape.playing)
-    return;
-#endif
 
   if (tape.pause_before_death)
     state |= VIDEO_STATE_PBEND_OFF;
@@ -878,11 +648,6 @@ void TapeTogglePause(boolean toggle_manual)
 
   DrawVideoDisplay(state, 0);
 
-#if 0
-  if (tape.pausing)
-    DrawVideoDisplay(VIDEO_STATE_PAUSE_ON, 0);
-#endif
-
   if (tape.warp_forward)
   {
     TapeStopWarpForward();
@@ -892,9 +657,6 @@ void TapeTogglePause(boolean toggle_manual)
       tape.quick_resume = FALSE;
 
       TapeAppendRecording();
-#if 0
-      TapeTogglePause(toggle_manual);
-#endif
     }
   }
 }
@@ -931,11 +693,6 @@ static void TapeStartGamePlaying()
 
 void TapeStopPlaying()
 {
-#if 0
-  if (!tape.playing)
-    return;
-#endif
-
   tape.playing = FALSE;
   tape.pausing = FALSE;
 
@@ -1028,22 +785,11 @@ byte *TapePlayAction()
     tape.delay_played = 0;
   }
 
-#if 0
-  printf("::: %05d: replaying action: %d\n", FrameCounter, action[0]);
-#endif
-
   return action;
 }
 
 void TapeStop()
 {
-#if 0
-  if (tape.recording)
-    printf("::: stopped recording: %d\n", FrameCounter);
-  else if (tape.playing)
-    printf("::: stopped playing:   %d\n\n", FrameCounter);
-#endif
-
   TapeStopRecording();
   TapeStopPlaying();
 
@@ -1079,7 +825,6 @@ static void TapeStartWarpForward()
 {
   tape.warp_forward = TRUE;
 
-#if 1
   if (!tape.fast_forward && !tape.pause_before_death)
   {
     tape.pausing = FALSE;
@@ -1087,15 +832,6 @@ static void TapeStartWarpForward()
 
     TapeDeactivateDisplayOn();
   }
-#else
-  if (!tape.fast_forward || tape.pause_before_death)
-  {
-    tape.pausing = FALSE;
-    tape.deactivate_display = TRUE;
-
-    TapeDeactivateDisplayOn();
-  }
-#endif
 
   if (tape.fast_forward || tape.pause_before_death)
     DrawVideoDisplay(VIDEO_STATE_WARP_ON, VIDEO_DISPLAY_SYMBOL_ONLY);
@@ -1111,16 +847,6 @@ static void TapeStopWarpForward()
   tape.deactivate_display = FALSE;
 
   TapeDeactivateDisplayOff(game_status == GAME_MODE_PLAYING);
-
-#if 0
-#if 1
-  if (game_status == GAME_MODE_PLAYING)
-#endif
-  {
-    RedrawPlayfield(TRUE, 0,0,0,0);
-    DrawGameDoorValues();
-  }
-#endif
 
   if (tape.pause_before_death)
     state |= VIDEO_STATE_WARP_OFF | VIDEO_STATE_PBEND_ON;
@@ -1310,11 +1036,8 @@ void AutoPlayTape()
 #endif
 
     LoadSolutionTape(level_nr);
-#if 1
+
     if (tape.no_valid_file)
-#else
-    if (TAPE_IS_EMPTY(tape))
-#endif
     {
       num_tape_missing++;
       if (level_nr >= 0 && level_nr < MAX_TAPES_PER_SET)
@@ -1543,15 +1266,6 @@ static void HandleTapeButtons(struct GadgetInfo *gi)
 	else					/* WARP FORWARD PLAY -> PLAY */
 	{
 	  TapeStopWarpForward();
-
-#if 0
-	  if (tape.pause_before_death)
-	    DrawVideoDisplay(VIDEO_STATE_WARP_OFF | VIDEO_STATE_PLAY_ON, 0);
-	  else if (tape.fast_forward)
-	    DrawVideoDisplay(VIDEO_STATE_WARP_OFF | VIDEO_STATE_FFWD_ON, 0);
-	  else
-	    DrawVideoDisplay(VIDEO_STATE_WARP_OFF | VIDEO_STATE_PBEND_ON, 0);
-#endif
 	}
       }
       else if (tape.recording)
@@ -1600,28 +1314,17 @@ static void HandleTapeButtons(struct GadgetInfo *gi)
 	else if (!tape.pause_before_death)	/* FFWD PLAY -> AUTO PAUSE */
 	{
 	  tape.pause_before_death = TRUE;
-#if 1
 	  DrawVideoDisplay(VIDEO_STATE_FFWD_OFF | VIDEO_STATE_PBEND_ON, 0);
-#else
-	  DrawVideoDisplay(VIDEO_STATE_PBEND_ON, VIDEO_DISPLAY_LABEL_ONLY);
-#endif
 	}
 	else					/* AUTO PAUSE -> NORMAL PLAY */
 	{
-#if 1
 	  if (tape.warp_forward)
 	    TapeStopWarpForward();
-#else
-	  tape.warp_forward = FALSE;
-#endif
+
 	  tape.fast_forward = FALSE;
 	  tape.pause_before_death = FALSE;
 
-#if 1
 	  DrawVideoDisplay(VIDEO_STATE_PBEND_OFF | VIDEO_STATE_PLAY_ON, 0);
-#else
-	  DrawVideoDisplay(VIDEO_STATE_FFWD_OFF | VIDEO_STATE_PBEND_OFF, 0);
-#endif
 	}
       }
       break;

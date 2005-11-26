@@ -77,180 +77,6 @@ static int copy_properties[][5] =
   }
 };
 
-static void InitTileClipmasks()
-{
-#if 0
-#if defined(TARGET_X11)
-  XGCValues clip_gc_values;
-  unsigned long clip_gc_valuemask;
-
-#if defined(TARGET_X11_NATIVE)
-
-#if 0
-  GC copy_clipmask_gc;
-
-  static struct
-  {
-    int start;
-    int count;
-  }
-  tile_needs_clipping[] =
-  {
-    { GFX_SPIELER1_UP, 4 },
-    { GFX_SPIELER1_DOWN, 4 },
-    { GFX_SPIELER1_LEFT, 4 },
-    { GFX_SPIELER1_RIGHT, 4 },
-    { GFX_SPIELER1_PUSH_LEFT, 4 },
-    { GFX_SPIELER1_PUSH_RIGHT, 4 },
-    { GFX_SPIELER2_UP, 4 },
-    { GFX_SPIELER2_DOWN, 4 },
-    { GFX_SPIELER2_LEFT, 4 },
-    { GFX_SPIELER2_RIGHT, 4 },
-    { GFX_SPIELER2_PUSH_LEFT, 4 },
-    { GFX_SPIELER2_PUSH_RIGHT, 4 },
-    { GFX_SPIELER3_UP, 4 },
-    { GFX_SPIELER3_DOWN, 4 },
-    { GFX_SPIELER3_LEFT, 4 },
-    { GFX_SPIELER3_RIGHT, 4 },
-    { GFX_SPIELER3_PUSH_LEFT, 4 },
-    { GFX_SPIELER3_PUSH_RIGHT, 4 },
-    { GFX_SPIELER4_UP, 4 },
-    { GFX_SPIELER4_DOWN, 4 },
-    { GFX_SPIELER4_LEFT, 4 },
-    { GFX_SPIELER4_RIGHT, 4 },
-    { GFX_SPIELER4_PUSH_LEFT, 4 },
-    { GFX_SPIELER4_PUSH_RIGHT, 4 },
-    { GFX_SP_MURPHY, 1 },
-    { GFX_MURPHY_GO_LEFT, 3 },
-    { GFX_MURPHY_GO_RIGHT, 3 },
-    { GFX_MURPHY_SNAP_UP, 1 },
-    { GFX_MURPHY_SNAP_DOWN, 1 },
-    { GFX_MURPHY_SNAP_RIGHT, 1 },
-    { GFX_MURPHY_SNAP_LEFT, 1 },
-    { GFX_MURPHY_PUSH_RIGHT, 1 },
-    { GFX_MURPHY_PUSH_LEFT, 1 },
-    { GFX_GEBLUBBER, 4 },
-    { GFX_DYNAMIT, 7 },
-    { GFX_DYNABOMB, 4 },
-    { GFX_EXPLOSION, 8 },
-    { GFX_SOKOBAN_OBJEKT, 1 },
-    { GFX_FUNKELN_BLAU, 3 },
-    { GFX_FUNKELN_WEISS, 3 },
-    { GFX2_SHIELD_PASSIVE, 3 },
-    { GFX2_SHIELD_ACTIVE, 3 },
-    { -1, 0 }
-  };
-#endif
-
-#endif /* TARGET_X11_NATIVE */
-#endif /* TARGET_X11 */
-
-  int i;
-
-  /* initialize pixmap array for special X11 tile clipping to Pixmap 'None' */
-  for (i = 0; i < NUM_TILES; i++)
-    tile_clipmask[i] = None;
-
-#if defined(TARGET_X11)
-  /* This stuff is needed because X11 (XSetClipOrigin(), to be precise) is
-     often very slow when preparing a masked XCopyArea() for big Pixmaps.
-     To prevent this, create small (tile-sized) mask Pixmaps which will then
-     be set much faster with XSetClipOrigin() and speed things up a lot. */
-
-  clip_gc_values.graphics_exposures = False;
-  clip_gc_valuemask = GCGraphicsExposures;
-  tile_clip_gc = XCreateGC(display, window->drawable,
-			   clip_gc_valuemask, &clip_gc_values);
-
-#if 0
-  for (i = 0; i < NUM_BITMAPS; i++)
-  {
-    if (pix[i]->clip_mask)
-    {
-      clip_gc_values.graphics_exposures = False;
-      clip_gc_values.clip_mask = pix[i]->clip_mask;
-      clip_gc_valuemask = GCGraphicsExposures | GCClipMask;
-      pix[i]->stored_clip_gc = XCreateGC(display, window->drawable,
-					 clip_gc_valuemask, &clip_gc_values);
-    }
-  }
-#endif
-
-#if defined(TARGET_X11_NATIVE)
-
-#if 0
-  /* create graphic context structures needed for clipping */
-  clip_gc_values.graphics_exposures = False;
-  clip_gc_valuemask = GCGraphicsExposures;
-  copy_clipmask_gc = XCreateGC(display, pix[PIX_BACK]->clip_mask,
-			       clip_gc_valuemask, &clip_gc_values);
-
-  /* create only those clipping Pixmaps we really need */
-  for (i = 0; tile_needs_clipping[i].start >= 0; i++)
-  {
-    int j;
-
-    for (j = 0; j < tile_needs_clipping[i].count; j++)
-    {
-      int tile = tile_needs_clipping[i].start + j;
-      int graphic = tile;
-      int src_x, src_y;
-      Bitmap *src_bitmap;
-      Pixmap src_pixmap;
-
-      getGraphicSource(graphic, &src_bitmap, &src_x, &src_y);
-      src_pixmap = src_bitmap->clip_mask;
-
-      tile_clipmask[tile] = XCreatePixmap(display, window->drawable,
-					  TILEX, TILEY, 1);
-
-      XCopyArea(display, src_pixmap, tile_clipmask[tile], copy_clipmask_gc,
-		src_x, src_y, TILEX, TILEY, 0, 0);
-    }
-  }
-
-  XFreeGC(display, copy_clipmask_gc);
-#endif
-
-#endif /* TARGET_X11_NATIVE */
-#endif /* TARGET_X11 */
-#endif
-}
-
-void FreeTileClipmasks()
-{
-#if 0
-#if defined(TARGET_X11)
-  int i;
-
-  for (i = 0; i < NUM_TILES; i++)
-  {
-    if (tile_clipmask[i] != None)
-    {
-      XFreePixmap(display, tile_clipmask[i]);
-      tile_clipmask[i] = None;
-    }
-  }
-
-  if (tile_clip_gc)
-    XFreeGC(display, tile_clip_gc);
-  tile_clip_gc = None;
-
-#if 0
-  for (i = 0; i < NUM_BITMAPS; i++)
-  {
-    if (pix[i] != NULL && pix[i]->stored_clip_gc)
-    {
-      XFreeGC(display, pix[i]->stored_clip_gc);
-      pix[i]->stored_clip_gc = None;
-    }
-  }
-#endif
-
-#endif /* TARGET_X11 */
-#endif
-}
-
 void FreeGadgets()
 {
   FreeLevelEditorGadgets();
@@ -296,22 +122,8 @@ void InitElementSmallImages()
     InitElementSmallImagesScaledUp(element_to_special_graphic[i].graphic);
 
   /* initialize images from dynamic configuration (may be elements or other) */
-#if 1
   for (i = 0; i < num_property_mappings; i++)
     InitElementSmallImagesScaledUp(property_mapping[i].artwork_index);
-#else
-  /* !!! THIS DOES NOT WORK -- "artwork_index" is graphic, not element !!! */
-  /* !!! ALSO, non-element graphics might need scaling-up !!! */
-  for (i = 0; i < num_property_mappings; i++)
-    if (property_mapping[i].artwork_index < MAX_NUM_ELEMENTS)
-      InitElementSmallImagesScaledUp(property_mapping[i].artwork_index);
-#endif
-
-#if 0
-  /* !!! FIX THIS (CHANGE TO USING NORMAL ELEMENT GRAPHIC DEFINITIONS) !!! */
-  for (i = IMG_EMC_OBJECT; i <= IMG_EMC_SPRITE; i++)
-    InitElementSmallImagesScaledUp(i);
-#endif
 }
 
 #if 1
@@ -358,13 +170,8 @@ void InitFontGraphicInfo()
   /* ---------- initialize font graphic definitions ---------- */
 
   /* always start with reliable default values (normal font graphics) */
-#if 1
   for (i = 0; i < NUM_FONTS; i++)
     font_info[i].graphic = IMG_FONT_INITIAL_1;
-#else
-  for (i = 0; i < NUM_FONTS; i++)
-    font_info[i].graphic = FONT_INITIAL_1;
-#endif
 
   /* initialize normal font/graphic mapping from static configuration */
   for (i = 0; font_to_graphic[i].font_nr > -1; i++)
@@ -631,7 +438,6 @@ void InitElementGraphicInfo()
   element_info[EL_AMOEBA_TO_DIAMOND].graphic[ACTION_DEFAULT] = IMG_AMOEBA_DEAD;
 #endif
 
-#if 1
   /* now set all undefined/invalid graphics to -1 to set to default after it */
   for (i = 0; i < MAX_NUM_ELEMENTS; i++)
   {
@@ -659,9 +465,7 @@ void InitElementGraphicInfo()
       }
     }
   }
-#endif
 
-#if 1
   /* adjust graphics with 2nd tile for movement according to direction
      (do this before correcting '-1' values to minimize calculations) */
   for (i = 0; i < MAX_NUM_ELEMENTS; i++)
@@ -689,18 +493,6 @@ void InitElementGraphicInfo()
 						   g->offset_y != 0);
 	  boolean front_is_left_or_upper = (src_x_front < src_x_back ||
 					    src_y_front < src_y_back);
-#if 0
-	  boolean second_tile_is_back =
-	    ((move_dir == MV_BIT_LEFT  && front_is_left_or_upper) ||
-	     (move_dir == MV_BIT_UP    && front_is_left_or_upper));
-	  boolean second_tile_is_front =
-	    ((move_dir == MV_BIT_RIGHT && front_is_left_or_upper) ||
-	     (move_dir == MV_BIT_DOWN  && front_is_left_or_upper));
-	  boolean second_tile_should_be_front =
-	    (g->second_tile_is_start == 0);
-	  boolean second_tile_should_be_back =
-	    (g->second_tile_is_start == 1);
-#endif
 	  boolean swap_movement_tiles_always = (g->swap_double_tiles == 1);
 	  boolean swap_movement_tiles_autodetected =
 	    (!frames_are_ordered_diagonally &&
@@ -709,17 +501,6 @@ void InitElementGraphicInfo()
 	      (move_dir == MV_BIT_RIGHT &&  front_is_left_or_upper) ||
 	      (move_dir == MV_BIT_DOWN  &&  front_is_left_or_upper)));
 	  Bitmap *dummy;
-
-#if 0
-	  printf("::: CHECKING element %d ('%s'), '%s', dir %d [(%d -> %d, %d), %d => %d]\n",
-		 i, element_info[i].token_name,
-		 element_action_info[act].suffix, move_dir,
-		 g->swap_double_tiles,
-		 swap_movement_tiles_never,
-		 swap_movement_tiles_always,
-		 swap_movement_tiles_autodetected,
-		 swap_movement_tiles);
-#endif
 
 	  /* swap frontside and backside graphic tile coordinates, if needed */
 	  if (swap_movement_tiles_always || swap_movement_tiles_autodetected)
@@ -738,16 +519,11 @@ void InitElementGraphicInfo()
 
 	    /* do not swap front and backside tiles again after correction */
 	    g->swap_double_tiles = 0;
-
-#if 0
-	    printf("    CORRECTED\n");
-#endif
 	  }
 	}
       }
     }
   }
-#endif
 
   /* now set all '-1' values to element specific default values */
   for (i = 0; i < MAX_NUM_ELEMENTS; i++)
@@ -879,16 +655,6 @@ void InitElementGraphicInfo()
 	if (element_info[i].direction_crumbled[act][dir] == -1)
 	  element_info[i].direction_crumbled[act][dir] =
 	    default_action_direction_crumbled;
-
-#if 0
-	if (i == EL_EMC_GRASS &&
-	    act == ACTION_DIGGING &&
-	    dir == MV_BIT_DOWN)
-	  printf("::: direction_crumbled == %d, %d, %d\n",
-		 element_info[i].direction_crumbled[act][dir],
-		 default_action_direction_crumbled,
-		 element_info[i].crumbled[act]);
-#endif
       }
 
       /* no graphic for this specific action -- use default action graphic */
@@ -910,7 +676,6 @@ void InitElementGraphicInfo()
     }
   }
 
-#if 1
   /* set animation mode to "none" for each graphic with only 1 frame */
   for (i = 0; i < MAX_NUM_ELEMENTS; i++)
   {
@@ -936,7 +701,6 @@ void InitElementGraphicInfo()
       }
     }
   }
-#endif
 
 #if 0
 #if DEBUG
@@ -1000,14 +764,12 @@ void InitElementSpecialGraphicInfo()
       element_info[element].special_graphic[special] = graphic;
   }
 
-#if 1
   /* now set all undefined/invalid graphics to default */
   for (i = 0; i < MAX_NUM_ELEMENTS; i++)
     for (j = 0; j < NUM_SPECIAL_GFX_ARGS; j++)
       if (graphic_info[element_info[i].special_graphic[j]].bitmap == NULL)
 	element_info[i].special_graphic[j] =
 	  element_info[i].graphic[ACTION_DEFAULT];
-#endif
 }
 
 static int get_element_from_token(char *token)
@@ -1047,48 +809,9 @@ static void set_graphic_parameters(int graphic, int graphic_copy_from)
   int anim_frames_per_line = 1;
   int i;
 
-#if 1
-#if 1
-
-  /* !!! NEW ARTWORK FALLBACK CODE !!! NEARLY UNTESTED !!! */
   /* if fallback to default artwork is done, also use the default parameters */
   if (image->fallback_to_default)
-  {
-#if 0
-    printf("::: FALLBACK for %d\n", graphic_copy_from);
-#endif
-
     parameter_raw = image->default_parameter;
-  }
-
-#else
-
-  /* !!! ARTWORK FALLBACK CODE !!! NEARLY UNTESTED !!! */
-  /* (better try to set a "fallback -> use default parameters" flag) */
-  if (src_bitmap)
-  {
-    int len_source_filename = strlen(src_bitmap->source_filename);
-    int len_default_filename = strlen(image->default_filename);
-    int pos_basename = len_source_filename - len_default_filename;
-    char *source_basename = &src_bitmap->source_filename[pos_basename];
-
-#if 0
-    printf("::: src_bitmap->source_filename -> '%s'\n",
-	   src_bitmap->source_filename);
-    printf("::: image->default_filename     -> '%s'\n",
-	   image->default_filename);
-    printf("::: image->filename             -> '%s'\n",
-	   image->filename);
-#endif
-
-    /* check if there was a fallback to the default artwork file */
-    if (strcmp(image->filename, image->default_filename) != 0 &&
-	pos_basename >= 0 &&
-	strcmp(source_basename, image->default_filename) == 0)
-      parameter_raw = image->default_parameter;
-  }
-#endif
-#endif
 
   /* get integer values from string parameters */
   for (i = 0; i < NUM_GFX_ARGS; i++)
@@ -1296,10 +1019,6 @@ static void InitGraphicInfo()
 
   graphic_info = checked_calloc(num_images * sizeof(struct GraphicInfo));
 
-#if 0
-  printf("::: graphic_info: %d entries\n", num_images);
-#endif
-
 #if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
   if (clipmasks_initialized)
   {
@@ -1324,13 +1043,8 @@ static void InitGraphicInfo()
     int src_bitmap_width, src_bitmap_height;
 
 #if 0
-    printf("::: image: '%s' [%d]\n", image->token, i);
-#endif
-
-#if 0
     printf("::: image # %d: '%s' ['%s']\n",
-	   i, image->token,
-	   getTokenFromImageID(i));
+	   i, image->token, getTokenFromImageID(i));
 #endif
 
     set_graphic_parameters(i, i);
@@ -1362,10 +1076,6 @@ static void InitGraphicInfo()
 	    "error: first animation frame out of bounds (%d, %d)",
 	    src_x, src_y);
       Error(ERR_RETURN, "custom graphic rejected for this element/action");
-
-#if 0
-      Error(ERR_RETURN, "scale_up_factor == %d", scale_up_factor);
-#endif
 
       if (i == fallback_graphic)
 	Error(ERR_EXIT, "fatal error: no fallback graphic available");
@@ -1542,7 +1252,6 @@ static void InitElementSoundInfo()
     }
   }
 
-#if 1
   /* copy sound settings to some elements that are only stored in level file
      in native R'n'D levels, but are used by game engine in native EM levels */
   for (i = 0; copy_properties[i][0] != -1; i++)
@@ -1550,7 +1259,6 @@ static void InitElementSoundInfo()
       for (act = 0; act < NUM_ACTIONS; act++)
 	element_info[copy_properties[i][j]].sound[act] =
 	  element_info[copy_properties[i][0]].sound[act];
-#endif
 }
 
 static void InitGameModeSoundInfo()
@@ -1579,7 +1287,6 @@ static void InitGameModeSoundInfo()
       menu.sound[i] = menu.sound[GAME_MODE_DEFAULT];
 
 #if 0
-  /* TEST ONLY */
   for (i = 0; i < NUM_SPECIAL_GFX_ARGS; i++)
     if (menu.sound[i] != -1)
       printf("::: menu.sound[%d] == %d\n", i, menu.sound[i]);
@@ -1610,10 +1317,6 @@ static void set_sound_parameters(int sound, char **parameter_raw)
 
 static void InitSoundInfo()
 {
-#if 0
-  struct PropertyMapping *property_mapping = getSoundListPropertyMapping();
-  int num_property_mappings = getSoundListPropertyMappingSize();
-#endif
   int *sound_effect_properties;
   int num_sounds = getSoundListSize();
   int i, j;
@@ -1657,11 +1360,6 @@ static void InitSoundInfo()
       }
     }
 
-#if 0
-    if (strcmp(sound->token, "custom_42") == 0)
-      printf("::: '%s' -> %d\n", sound->token, sound_info[i].loop);
-#endif
-
     /* associate elements and some selected sound actions */
 
     for (j = 0; j < MAX_NUM_ELEMENTS; j++)
@@ -1686,77 +1384,6 @@ static void InitSoundInfo()
   }
 
   free(sound_effect_properties);
-
-#if 0
-  /* !!! MOVED TO "InitElementSoundInfo()" !!! */
-  /* !!! everything defined here gets overwritten there !!! */
-
-  /* copy sound settings to some elements that are only stored in level file
-     in native R'n'D levels, but are used by game engine in native EM levels */
-  for (i = 0; i < NUM_ACTIONS; i++)
-    for (j = 0; copy_properties[j][0] != -1; j++)
-      for (k = 1; k <= 4; k++)
-	element_info[copy_properties[j][k]].sound[i] =
-	  element_info[copy_properties[j][0]].sound[i];
-
-  printf("::: bug   -> %d\n", element_info[EL_BUG].sound[ACTION_MOVING]);
-  printf("::: bug_r -> %d\n", element_info[EL_BUG_RIGHT].sound[ACTION_MOVING]);
-#endif
-
-#if 0
-  /* !!! now handled in InitElementSoundInfo() !!! */
-  /* initialize element/sound mapping from dynamic configuration */
-  for (i = 0; i < num_property_mappings; i++)
-  {
-    int element   = property_mapping[i].base_index;
-    int action    = property_mapping[i].ext1_index;
-    int sound     = property_mapping[i].artwork_index;
-
-    if (action < 0)
-      action = ACTION_DEFAULT;
-
-    printf("::: %d: %d, %d, %d ['%s']\n",
-	   i, element, action, sound, element_info[element].token_name);
-
-    element_info[element].sound[action] = sound;
-  }
-#endif
-
-#if 0
-  /* TEST ONLY */
-  {
-    int element = EL_CUSTOM_11;
-    int j = 0;
-
-    while (element_action_info[j].suffix)
-    {
-      printf("element %d, sound action '%s'  == %d\n",
-	     element, element_action_info[j].suffix,
-	     element_info[element].sound[j]);
-      j++;
-    }
-  }
-
-  PlaySoundLevelElementAction(0,0, EL_CUSTOM_11, ACTION_PUSHING);
-#endif
-
-#if 0
-  /* TEST ONLY */
-  {
-    int element = EL_SAND;
-    int sound_action = ACTION_DIGGING;
-    int j = 0;
-
-    while (element_action_info[j].suffix)
-    {
-      if (element_action_info[j].value == sound_action)
-	printf("element %d, sound action '%s'  == %d\n",
-	       element, element_action_info[j].suffix,
-	       element_info[element].sound[sound_action]);
-      j++;
-    }
-  }
-#endif
 }
 
 static void InitGameModeMusicInfo()
@@ -1834,7 +1461,6 @@ static void InitGameModeMusicInfo()
       menu.music[i] = menu.music[GAME_MODE_DEFAULT];
 
 #if 0
-  /* TEST ONLY */
   for (i = 0; i < MAX_LEVELS; i++)
     if (levelset.music[i] != -1)
       printf("::: levelset.music[%d] == %d\n", i, levelset.music[i]);
@@ -2030,7 +1656,6 @@ static int get_special_property_bit(int element, int property_bit_nr)
   return -1;
 }
 
-#if 1
 void setBitfieldProperty(int *bitfield, int property_bit_nr, int element,
 			 boolean property_value)
 {
@@ -2054,32 +1679,6 @@ boolean getBitfieldProperty(int *bitfield, int property_bit_nr, int element)
 
   return FALSE;
 }
-
-#else
-
-void setMoveIntoAcidProperty(struct LevelInfo *level, int element, boolean set)
-{
-  int bit_nr = get_special_property_bit(element, EP_CAN_MOVE_INTO_ACID);
-
-  if (bit_nr > -1)
-  {
-    level->can_move_into_acid_bits &= ~(1 << bit_nr);
-
-    if (set)
-      level->can_move_into_acid_bits |= (1 << bit_nr);
-  }
-}
-
-boolean getMoveIntoAcidProperty(struct LevelInfo *level, int element)
-{
-  int bit_nr = get_special_property_bit(element, EP_CAN_MOVE_INTO_ACID);
-
-  if (bit_nr > -1)
-    return ((level->can_move_into_acid_bits & (1 << bit_nr)) != 0);
-
-  return FALSE;
-}
-#endif
 
 void InitElementPropertiesStatic()
 {
@@ -2529,11 +2128,6 @@ void InitElementPropertiesStatic()
     EL_PENGUIN,
     EL_PIG,
     EL_DRAGON,
-
-#if 0	/* USE_GRAVITY_BUGFIX_OLD */
-    EL_PLAYER_IS_LEAVING,	/* needed for gravity + "block last field" */
-#endif
-
     -1
   };
 
@@ -3690,38 +3284,6 @@ void InitElementPropertiesStatic()
 
 void InitElementPropertiesEngine(int engine_version)
 {
-#if 0
-  static int active_properties[] =
-  {
-    EP_AMOEBALIVE,
-    EP_AMOEBOID,
-    EP_PFORTE,
-    EP_DONT_COLLIDE_WITH,
-    EP_MAUER,
-    EP_CAN_FALL,
-    EP_CAN_SMASH,
-    EP_CAN_PASS_MAGIC_WALL,
-    EP_CAN_MOVE,
-    EP_DONT_TOUCH,
-    EP_DONT_RUN_INTO,
-    EP_GEM,
-    EP_EXPLODES_BY_FIRE,
-    EP_PUSHABLE,
-    EP_PLAYER,
-    EP_HAS_CONTENT,
-    EP_DIGGABLE,
-    EP_PASSABLE_INSIDE,
-    EP_OVER_PLAYER,
-    EP_ACTIVE_BOMB,
-
-    EP_BELT,
-    EP_BELT_ACTIVE,
-    EP_BELT_SWITCH,
-    EP_WALKABLE_UNDER,
-    EP_EM_SLIPPERY_WALL,
-  };
-#endif
-
   static int no_wall_properties[] =
   {
     EP_DIGGABLE,
@@ -3753,10 +3315,6 @@ void InitElementPropertiesEngine(int engine_version)
 
   int i, j;
 
-#if 0
-  InitElementPropertiesStatic();
-#endif
-
   /* important: after initialization in InitElementPropertiesStatic(), the
      elements are not again initialized to a default value; therefore all
      changes have to make sure that they leave the element with a defined
@@ -3766,11 +3324,6 @@ void InitElementPropertiesEngine(int engine_version)
   /* set all special, combined or engine dependent element properties */
   for (i = 0; i < MAX_NUM_ELEMENTS; i++)
   {
-#if 0
-    for (j = EP_ACCESSIBLE_OVER; j < NUM_ELEMENT_PROPERTIES; j++)
-      SET_PROPERTY(i, j, FALSE);
-#endif
-
     /* ---------- INACTIVE ------------------------------------------------- */
     SET_PROPERTY(i, EP_INACTIVE, (i >= EL_CHAR_START && i <= EL_CHAR_END));
 
@@ -3825,12 +3378,6 @@ void InitElementPropertiesEngine(int engine_version)
 					     !IS_DIGGABLE(i) &&
 					     !IS_COLLECTIBLE(i)));
 
-#if 0
-    /* ---------- PROTECTED ------------------------------------------------ */
-    if (IS_ACCESSIBLE_INSIDE(i))
-      SET_PROPERTY(i, EP_PROTECTED, TRUE);
-#endif
-
     /* ---------- DRAGONFIRE_PROOF ----------------------------------------- */
 
     if (IS_HISTORIC_SOLID(i) || i == EL_EXPLOSION)
@@ -3845,20 +3392,9 @@ void InitElementPropertiesEngine(int engine_version)
     else if (engine_version < VERSION_IDENT(2,2,0,0))
       SET_PROPERTY(i, EP_EXPLOSION_PROOF, IS_INDESTRUCTIBLE(i));
     else
-#if 1
       SET_PROPERTY(i, EP_EXPLOSION_PROOF, (IS_INDESTRUCTIBLE(i) &&
 					   (!IS_WALKABLE(i) ||
 					    IS_PROTECTED(i))));
-#else
-#if 1
-      SET_PROPERTY(i, EP_EXPLOSION_PROOF, (IS_INDESTRUCTIBLE(i) &&
-					   !IS_WALKABLE_OVER(i) &&
-					   !IS_WALKABLE_UNDER(i)));
-#else
-      SET_PROPERTY(i, EP_EXPLOSION_PROOF, (IS_INDESTRUCTIBLE(i) &&
-					   IS_PROTECTED(i)));
-#endif
-#endif
 
     if (IS_CUSTOM_ELEMENT(i))
     {
@@ -3881,25 +3417,6 @@ void InitElementPropertiesEngine(int engine_version)
     SET_PROPERTY(i, EP_CAN_SMASH, (CAN_SMASH_PLAYER(i) ||
 				   CAN_SMASH_ENEMIES(i) ||
 				   CAN_SMASH_EVERYTHING(i)));
-
-#if 0
-    /* ---------- CAN_EXPLODE ---------------------------------------------- */
-    SET_PROPERTY(i, EP_CAN_EXPLODE, (CAN_EXPLODE_BY_FIRE(i) ||
-				     CAN_EXPLODE_SMASHED(i) ||
-				     CAN_EXPLODE_IMPACT(i)));
-#endif
-
-#if 0
-    /* ---------- CAN_EXPLODE_3X3 ------------------------------------------ */
-#if 0
-    SET_PROPERTY(i, EP_CAN_EXPLODE_3X3, (!CAN_EXPLODE_1X1(i) &&
-					 !CAN_EXPLODE_CROSS(i)));
-#else
-    SET_PROPERTY(i, EP_CAN_EXPLODE_3X3, (CAN_EXPLODE(i) &&
-					 !CAN_EXPLODE_1X1(i) &&
-					 !CAN_EXPLODE_CROSS(i)));
-#endif
-#endif
 
     /* ---------- CAN_EXPLODE_BY_FIRE -------------------------------------- */
     SET_PROPERTY(i, EP_CAN_EXPLODE_BY_FIRE, (CAN_EXPLODE(i) &&
@@ -3971,25 +3488,6 @@ void InitElementPropertiesEngine(int engine_version)
 #endif
   }
 
-#if 0
-  /* determine inactive elements (used for engine main loop optimization) */
-  for (i = 0; i < MAX_NUM_ELEMENTS; i++)
-  {
-    boolean active = FALSE;
-
-    for (j = 0; i < NUM_ELEMENT_PROPERTIES; j++)
-    {
-      if (HAS_PROPERTY(i, j))
-	active = TRUE;
-    }
-
-#if 0
-    if (!active)
-      SET_PROPERTY(i, EP_INACTIVE, TRUE);
-#endif
-  }
-#endif
-
   /* dynamically adjust element properties according to game engine version */
   {
     static int ep_em_slippery_wall[] =
@@ -4014,7 +3512,6 @@ void InitElementPropertiesEngine(int engine_version)
 		  engine_version > VERSION_IDENT(2,0,1,0)));
   }
 
-#if 1
   /* set default push delay values (corrected since version 3.0.7-1) */
   if (engine_version < VERSION_IDENT(3,0,7,1))
   {
@@ -4059,8 +3556,6 @@ void InitElementPropertiesEngine(int engine_version)
     SET_PROPERTY(EL_SP_SNIKSNAK, EP_DONT_COLLIDE_WITH, FALSE);
     SET_PROPERTY(EL_SP_ELECTRON, EP_DONT_COLLIDE_WITH, FALSE);
   }
-#endif
-
 #endif
 
   /* this is needed because some graphics depend on element properties */
@@ -4241,24 +3736,6 @@ void Execute_Command(char *command)
       while (*str_ptr != ' ' && *str_ptr != '\t' && *str_ptr != '\0')
 	str_ptr++;
     }
-
-#if 0
-    printf("level set == '%s'\n", global.autoplay_leveldir);
-
-    if (global.autoplay_all)
-      printf("play all levels\n");
-    else
-    {
-      printf("play the following levels:");
-
-      for (i = 0; i < MAX_TAPES_PER_SET; i++)
-	if (global.autoplay_level[i])
-	  printf(" %03d", i);
-
-      printf("\n");
-    }
-#endif
-
   }
   else if (strncmp(command, "convert ", 8) == 0)
   {
@@ -4531,8 +4008,6 @@ void InitGfx()
   DrawInitText(PROGRAM_COPYRIGHT_STRING, 50, FC_RED);
 
   DrawInitText("Loading graphics:", 120, FC_GREEN);
-
-  InitTileClipmasks();
 }
 
 void InitGfxBackground()
@@ -4569,9 +4044,7 @@ void InitLevelArtworkInfo()
 
 static void InitImages()
 {
-#if 1
   setLevelArtworkDir(artwork.gfx_first);
-#endif
 
 #if 0
   printf("::: InitImages for '%s' ['%s', '%s'] ['%s', '%s']\n",
@@ -4595,10 +4068,8 @@ static void InitSound(char *identifier)
   if (identifier == NULL)
     identifier = artwork.snd_current->identifier;
 
-#if 1
   /* set artwork path to send it to the sound server process */
   setLevelArtworkDir(artwork.snd_first);
-#endif
 
   InitReloadCustomSounds(identifier);
   ReinitializeSounds();
@@ -4609,10 +4080,8 @@ static void InitMusic(char *identifier)
   if (identifier == NULL)
     identifier = artwork.mus_current->identifier;
 
-#if 1
   /* set artwork path to send it to the sound server process */
   setLevelArtworkDir(artwork.mus_first);
-#endif
 
   InitReloadCustomMusic(identifier);
   ReinitializeMusic();
@@ -4725,12 +4194,7 @@ static char *getNewArtworkIdentifier(int type)
 	     artwork_current_identifier) != 0)
     artwork_new_identifier = artwork_current_identifier;
 
-#if 1
   *(ARTWORK_CURRENT_IDENTIFIER_PTR(artwork, type))= artwork_current_identifier;
-#else
-  /* newer versions of gcc do not like this anymore :-/ */
-  *(&(ARTWORK_CURRENT_IDENTIFIER(artwork, type))) = artwork_current_identifier;
-#endif
 
 #if 0
   if (type == ARTWORK_TYPE_GRAPHICS)
@@ -4782,14 +4246,6 @@ void ReloadCustomArtwork(int force_reload)
     ClearRectangle(window, 0, 0, WIN_XSIZE, WIN_YSIZE);
 
     InitImages();
-
-#if 0
-    printf("... '%s'\n",
-	   leveldir_current->graphics_set);
-#endif
-
-    FreeTileClipmasks();
-    InitTileClipmasks();
 
     redraw_screen = TRUE;
   }
@@ -4920,7 +4376,6 @@ void CloseAllAndExit(int exit_value)
 #endif
 
   FreeAllImages();
-  FreeTileClipmasks();
 
 #if defined(TARGET_SDL)
   if (network_server)	/* terminate network server */

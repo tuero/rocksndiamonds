@@ -178,11 +178,6 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
   level->block_last_field = FALSE;	/* EM does not block by default */
   level->sp_block_last_field = TRUE;	/* SP blocks the last field */
 
-#if 0	/* !!! THIS IS NOT A LEVEL SETTING => LOGIC MOVED TO "game.c" !!! */
-  level->block_delay = 8;		/* when blocking, block 8 frames */
-  level->sp_block_delay = 9;		/* SP indeed blocks 9 frames, not 8 */
-#endif
-
   level->can_move_into_acid_bits = ~0;	/* everything can move into acid */
   level->dont_collide_with_bits = ~0;	/* always deadly when colliding */
 
@@ -572,48 +567,6 @@ static int getFiletypeFromID(char *filetype_id)
   return filetype;
 }
 
-#if 0
-static void OLD_determineLevelFileInfo_Filename(struct LevelFileInfo *lfi)
-{
-  /* special case: level number is negative => check for level template file */
-  if (lfi->nr < 0)
-  {
-    setLevelFileInfo_SingleLevelFilename(lfi, LEVEL_FILE_TYPE_RND);
-
-    return;
-  }
-
-  if (leveldir_current->level_filename != NULL)
-  {
-    int filetype = getFiletypeFromID(leveldir_current->level_filetype);
-
-    /* check for file name/pattern specified in "levelinfo.conf" */
-    setLevelFileInfo_SingleLevelFilename(lfi, filetype);
-
-    if (fileExists(lfi->filename))
-      return;
-  }
-
-  /* check for native Rocks'n'Diamonds level file */
-  setLevelFileInfo_SingleLevelFilename(lfi, LEVEL_FILE_TYPE_RND);
-  if (fileExists(lfi->filename))
-    return;
-
-  /* check for classic Emerald Mine level file */
-  setLevelFileInfo_SingleLevelFilename(lfi, LEVEL_FILE_TYPE_EM);
-  if (fileExists(lfi->filename))
-    return;
-
-  /* check for various packed level file formats */
-  setLevelFileInfo_PackedLevelFilename(lfi, LEVEL_FILE_TYPE_UNKNOWN);
-  if (fileExists(lfi->filename))
-    return;
-
-  /* no known level file found -- try to use default values */
-  setLevelFileInfo_SingleLevelFilename(lfi, LEVEL_FILE_TYPE_UNKNOWN);
-}
-#endif
-
 static void determineLevelFileInfo_Filename(struct LevelFileInfo *lfi)
 {
   int nr = lfi->nr;
@@ -692,7 +645,6 @@ static void determineLevelFileInfo_Filetype(struct LevelFileInfo *lfi)
     lfi->type = getFileTypeFromBasename(lfi->basename);
 }
 
-#if 1
 static void setLevelFileInfo(struct LevelFileInfo *level_file_info, int nr)
 {
   /* always start with reliable default values */
@@ -704,24 +656,6 @@ static void setLevelFileInfo(struct LevelFileInfo *level_file_info, int nr)
   determineLevelFileInfo_Filetype(level_file_info);
 }
 
-#else
-
-static struct LevelFileInfo *getLevelFileInfo(int nr)
-{
-  static struct LevelFileInfo level_file_info;
-
-  /* always start with reliable default values */
-  setFileInfoToDefaults(&level_file_info);
-
-  level_file_info.nr = nr;	/* set requested level number */
-
-  determineLevelFileInfo_Filename(&level_file_info);
-  determineLevelFileInfo_Filetype(&level_file_info);
-
-  return &level_file_info;
-}
-#endif
-
 /* ------------------------------------------------------------------------- */
 /* functions for loading R'n'D level                                         */
 /* ------------------------------------------------------------------------- */
@@ -730,7 +664,6 @@ int getMappedElement(int element)
 {
   /* remap some (historic, now obsolete) elements */
 
-#if 1
   switch (element)
   {
     case EL_PLAYER_OBSOLETE:
@@ -773,18 +706,6 @@ int getMappedElement(int element)
       }
       break;
   }
-#else
-  if (element >= NUM_FILE_ELEMENTS)
-  {
-    Error(ERR_WARN, "invalid level element %d", element);
-
-    element = EL_UNKNOWN;
-  }
-  else if (element == EL_PLAYER_OBSOLETE)
-    element = EL_PLAYER_1;
-  else if (element == EL_KEY_OBSOLETE)
-    element = EL_KEY_1;
-#endif
 
   return element;
 }
@@ -1299,14 +1220,12 @@ static int LoadLevel_CUS4(FILE *file, int chunk_size, struct LevelInfo *level)
 
     change->trigger_side = getFile8Bit(file);
 
-#if 1
     change->trigger_player = getFile8Bit(file);
     change->trigger_page = getFile8Bit(file);
 
     change->trigger_page = (change->trigger_page == CH_PAGE_ANY_FILE ?
 			    CH_PAGE_ANY : (1 << change->trigger_page));
 
-#if 1
     change->has_action = getFile8Bit(file);
     change->action_type = getFile8Bit(file);
     change->action_mode = getFile8Bit(file);
@@ -1314,16 +1233,6 @@ static int LoadLevel_CUS4(FILE *file, int chunk_size, struct LevelInfo *level)
 
     /* some free bytes for future change property values and padding */
     ReadUnusedBytesFromFile(file, 1);
-#else
-    /* some free bytes for future change property values and padding */
-    ReadUnusedBytesFromFile(file, 6);
-#endif
-
-#else
-
-    /* some free bytes for future change property values and padding */
-    ReadUnusedBytesFromFile(file, 8);
-#endif
   }
 
   /* mark this custom element as modified */
@@ -1936,7 +1845,7 @@ static void OLD_LoadLevelFromFileInfo_EM(struct LevelInfo *level,
   level->field[x][y] = EL_PLAYER_2;
 }
 
-#else
+#endif
 
 void CopyNativeLevel_RND_to_EM(struct LevelInfo *level)
 {
@@ -2145,8 +2054,6 @@ static void LoadLevelFromFileInfo_EM(struct LevelInfo *level,
   if (!LoadNativeLevel_EM(level_file_info->filename))
     level->no_valid_file = TRUE;
 }
-
-#endif
 
 void CopyNativeLevel_RND_to_Native(struct LevelInfo *level)
 {
@@ -2568,22 +2475,8 @@ static void LoadLevel_InitVersion(struct LevelInfo *level, char *filename)
 #endif
 
   /* determine correct game engine version of current level */
-#if 1
   if (!leveldir_current->latest_engine)
-#else
-  if (IS_LEVELCLASS_CONTRIB(leveldir_current) ||
-      IS_LEVELCLASS_PRIVATE(leveldir_current) ||
-      IS_LEVELCLASS_UNDEFINED(leveldir_current))
-#endif
   {
-#if 0
-    printf("\n::: This level is private or contributed: '%s'\n", filename);
-#endif
-
-#if 0
-    printf("\n::: Use the stored game engine version for this level\n");
-#endif
-
     /* For all levels which are not forced to use the latest game engine
        version (normally user contributed, private and undefined levels),
        use the version of the game engine the levels were created for.
@@ -2594,21 +2487,9 @@ static void LoadLevel_InitVersion(struct LevelInfo *level, char *filename)
        pre-2.0 levels, where the game version is still taken from the
        file format version used to store the level -- see above). */
 
-#if 1
     /* player was faster than enemies in 1.0.0 and before */
     if (level->file_version == FILE_VERSION_1_0)
       level->double_speed = TRUE;
-#else
-    /* do some special adjustments to support older level versions */
-    if (level->file_version == FILE_VERSION_1_0)
-    {
-      Error(ERR_WARN, "level file '%s' has version number 1.0", filename);
-      Error(ERR_WARN, "using high speed movement for player");
-
-      /* player was faster than monsters in (pre-)1.0 levels */
-      level->double_speed = TRUE;
-    }
-#endif
 
     /* default behaviour for EM style gems was "slippery" only in 2.0.1 */
     if (level->game_version == VERSION_IDENT(2,0,1,0))
@@ -2653,38 +2534,9 @@ static void LoadLevel_InitVersion(struct LevelInfo *level, char *filename)
 	}
       }
     }
-
-#if 0	/* !!! MOVED TO "game.c", BECAUSE CAN CHANGE INSIDE LEVEL EDITOR !!! */
-#if 1	/* USE_NEW_BLOCK_STYLE */
-    /* blocking the last field when moving was corrected in version 3.1.1 */
-    if (level->game_version < VERSION_IDENT(3,1,1,0))
-    {
-#if 0
-      printf("::: %d\n", level->block_last_field);
-#endif
-
-      /* even "not blocking" was blocking the last field for one frame */
-      level->block_delay    = (level->block_last_field    ? 7 : 1);
-      level->sp_block_delay = (level->sp_block_last_field ? 7 : 1);
-
-      level->block_last_field = TRUE;
-      level->sp_block_last_field = TRUE;
-    }
-#endif
-#endif
-
   }
   else		/* always use the latest game engine version */
   {
-#if 0
-    printf("\n::: ALWAYS USE LATEST ENGINE FOR THIS LEVEL: [%d] '%s'\n",
-	   leveldir_current->sort_priority, filename);
-#endif
-
-#if 0
-    printf("\n::: Use latest game engine version for this level.\n");
-#endif
-
     /* For all levels which are forced to use the latest game engine version
        (normally all but user contributed, private and undefined levels), set
        the game engine version to the actual version; this allows for actual
@@ -2692,11 +2544,6 @@ static void LoadLevel_InitVersion(struct LevelInfo *level, char *filename)
        levels (from "classic" or other existing games) to make the emulation
        of the corresponding game more accurate, while (hopefully) not breaking
        existing levels created from other players. */
-
-#if 0
-    printf("::: changing engine from %d to %d\n",
-	   level->game_version, GAME_VERSION_ACTUAL);
-#endif
 
     level->game_version = GAME_VERSION_ACTUAL;
 
@@ -2710,10 +2557,6 @@ static void LoadLevel_InitVersion(struct LevelInfo *level, char *filename)
     if (level->file_version < FILE_VERSION_2_0)
       level->em_slippery_gems = TRUE;
   }
-
-#if 0
-  printf("::: => %d\n", level->game_version);
-#endif
 }
 
 static void LoadLevel_InitElements(struct LevelInfo *level, char *filename)
@@ -2750,31 +2593,6 @@ static void LoadLevel_InitElements(struct LevelInfo *level, char *filename)
       }
     }
   }
-
-#if 0
-  /* !!! TESTS SHOWED THAT THIS CODE SEGMENT IS NOT NEEDED FOR ANY LEVEL !!! */
-
-  /* some custom element change events get mapped since version 3.0.3 */
-#if 1
-  if (level->game_version >= VERSION_IDENT(3,0,3,0) &&
-      level->game_version <= VERSION_IDENT(3,2,0,3))
-#endif
-  {
-    for (i = 0; i < NUM_CUSTOM_ELEMENTS; i++)
-    {
-      int element = EL_CUSTOM_START + i;
-
-      if (HAS_CHANGE_EVENT(element, CE_BY_PLAYER_OBSOLETE) ||
-	  HAS_CHANGE_EVENT(element, CE_BY_COLLISION_OBSOLETE))
-      {
-	SET_CHANGE_EVENT(element, CE_BY_PLAYER_OBSOLETE, FALSE);
-	SET_CHANGE_EVENT(element, CE_BY_COLLISION_OBSOLETE, FALSE);
-
-	SET_CHANGE_EVENT(element, CE_BY_DIRECT_ACTION, TRUE);
-      }
-    }
-  }
-#endif
 
   /* initialize "can_change" field for old levels with only one change page */
   if (level->game_version <= VERSION_IDENT(3,0,2,0))
@@ -2842,31 +2660,6 @@ static void LoadLevel_InitElements(struct LevelInfo *level, char *filename)
     }
   }
 
-#if 0
-  /* set default push delay values (corrected since version 3.0.7-1) */
-  if (level->game_version < VERSION_IDENT(3,0,7,1))
-  {
-    game.default_push_delay_fixed = 2;
-    game.default_push_delay_random = 8;
-  }
-  else
-  {
-    game.default_push_delay_fixed = 8;
-    game.default_push_delay_random = 8;
-  }
-
-  /* set uninitialized push delay values of custom elements in older levels */
-  for (i = 0; i < NUM_CUSTOM_ELEMENTS; i++)
-  {
-    int element = EL_CUSTOM_START + i;
-
-    if (element_info[element].push_delay_fixed == -1)
-      element_info[element].push_delay_fixed = game.default_push_delay_fixed;
-    if (element_info[element].push_delay_random == -1)
-      element_info[element].push_delay_random = game.default_push_delay_random;
-  }
-#endif
-
   /* map elements that have changed in newer versions */
   level->amoeba_content = getMappedElementByVersion(level->amoeba_content,
 						    level->game_version);
@@ -2887,37 +2680,9 @@ static void LoadLevel_InitPlayfield(struct LevelInfo *level, char *filename)
 
   /* map elements that have changed in newer versions */
   for (y = 0; y < level->fieldy; y++)
-  {
     for (x = 0; x < level->fieldx; x++)
-    {
-      int element = level->field[x][y];
-
-#if 1
-      element = getMappedElementByVersion(element, level->game_version);
-#else
-      if (level->game_version <= VERSION_IDENT(2,2,0,0))
-      {
-	/* map game font elements */
-	element = (element == EL_CHAR('[')  ? EL_CHAR_AUMLAUT :
-		   element == EL_CHAR('\\') ? EL_CHAR_OUMLAUT :
-		   element == EL_CHAR(']')  ? EL_CHAR_UUMLAUT :
-		   element == EL_CHAR('^')  ? EL_CHAR_COPYRIGHT : element);
-      }
-
-      if (level->game_version < VERSION_IDENT(3,0,0,0))
-      {
-	/* map Supaplex gravity tube elements */
-	element = (element == EL_SP_GRAVITY_PORT_LEFT  ? EL_SP_PORT_LEFT  :
-		   element == EL_SP_GRAVITY_PORT_RIGHT ? EL_SP_PORT_RIGHT :
-		   element == EL_SP_GRAVITY_PORT_UP    ? EL_SP_PORT_UP    :
-		   element == EL_SP_GRAVITY_PORT_DOWN  ? EL_SP_PORT_DOWN  :
-		   element);
-      }
-#endif
-
-      level->field[x][y] = element;
-    }
-  }
+      level->field[x][y] = getMappedElementByVersion(level->field[x][y],
+						     level->game_version);
 
   /* copy elements to runtime playfield array */
   for (x = 0; x < MAX_LEV_FIELDX; x++)
@@ -2934,7 +2699,6 @@ static void LoadLevel_InitPlayfield(struct LevelInfo *level, char *filename)
 
 void LoadLevelTemplate(int nr)
 {
-#if 1
   char *filename;
 
   setLevelFileInfo(&level_template.file_info, nr);
@@ -2942,34 +2706,14 @@ void LoadLevelTemplate(int nr)
 
   LoadLevelFromFileInfo(&level_template, &level_template.file_info);
 
-#else
-
-#if 1
-  struct LevelFileInfo *level_file_info = getLevelFileInfo(nr);
-  char *filename = level_file_info->filename;
-
-  LoadLevelFromFileInfo(&level_template, level_file_info);
-#else
-  char *filename = getDefaultLevelFilename(nr);
-
-  LoadLevelFromFilename_RND(&level_template, filename);
-#endif
-#endif
-
-#if 1
   LoadLevel_InitVersion(&level_template, filename);
   LoadLevel_InitElements(&level_template, filename);
-#else
-  LoadLevel_InitVersion(&level, filename);
-  LoadLevel_InitElements(&level, filename);
-#endif
 
   ActivateLevelTemplate();
 }
 
 void LoadLevel(int nr)
 {
-#if 1
   char *filename;
 
   setLevelFileInfo(&level.file_info, nr);
@@ -2977,30 +2721,12 @@ void LoadLevel(int nr)
 
   LoadLevelFromFileInfo(&level, &level.file_info);
 
-#else
-
-#if 1
-  struct LevelFileInfo *level_file_info = getLevelFileInfo(nr);
-  char *filename = level_file_info->filename;
-
-  LoadLevelFromFileInfo(&level, level_file_info);
-#else
-  char *filename = getLevelFilename(nr);
-
-  LoadLevelFromFilename_RND(&level, filename);
-#endif
-#endif
-
   if (level.use_custom_template)
     LoadLevelTemplate(-1);
 
-#if 1
   LoadLevel_InitVersion(&level, filename);
   LoadLevel_InitElements(&level, filename);
   LoadLevel_InitPlayfield(&level, filename);
-#else
-  LoadLevel_InitLevel(&level, filename);
-#endif
 }
 
 static void SaveLevel_VERS(FILE *file, struct LevelInfo *level)
@@ -3404,12 +3130,9 @@ static void SaveLevel_CUS4(FILE *file, struct LevelInfo *level, int element)
 
     putFile8Bit(file, change->trigger_side);
 
-#if 1
     putFile8Bit(file, change->trigger_player);
     putFile8Bit(file, (change->trigger_page == CH_PAGE_ANY ? CH_PAGE_ANY_FILE :
 		       log_2(change->trigger_page)));
-
-#if 1
 
     putFile8Bit(file, change->has_action);
     putFile8Bit(file, change->action_type);
@@ -3418,16 +3141,6 @@ static void SaveLevel_CUS4(FILE *file, struct LevelInfo *level, int element)
 
     /* some free bytes for future change property values and padding */
     WriteUnusedBytesToFile(file, 1);
-#else
-    /* some free bytes for future change property values and padding */
-    WriteUnusedBytesToFile(file, 6);
-#endif
-
-#else
-
-    /* some free bytes for future change property values and padding */
-    WriteUnusedBytesToFile(file, 8);
-#endif
   }
 }
 
@@ -3822,10 +3535,6 @@ void LoadTapeFromFilename(char *filename)
   {
     tape.no_valid_file = TRUE;
 
-#if 0
-    Error(ERR_WARN, "cannot read tape '%s' -- using empty tape", filename);
-#endif
-
     return;
   }
 
@@ -4080,21 +3789,12 @@ void DumpTape(struct TapeInfo *tape)
 {
   int i, j;
 
-#if 1
   if (tape->no_valid_file)
   {
     Error(ERR_WARN, "cannot dump -- no valid tape file found");
 
     return;
   }
-#else
-  if (TAPE_IS_EMPTY(*tape))
-  {
-    Error(ERR_WARN, "no tape available for level %d", tape->level_nr);
-
-    return;
-  }
-#endif
 
   printf_line("-", 79);
   printf("Tape of Level %03d (file version %08d, game version %08d)\n",
@@ -4800,7 +4500,6 @@ void LoadUserDefinedEditorElementList(int **elements, int *num_elements)
   freeSetupFileHash(element_hash);
 
 #if 0
-  /* TEST-ONLY */
   for (i = 0; i < *num_elements; i++)
     printf("editor: element '%s' [%d]\n",
 	   element_info[(*elements)[i]].token_name, (*elements)[i]);
@@ -4965,17 +4664,9 @@ void LoadMusicInfo()
 
   new = &music_file_info;
 
-#if 0
-  printf("::: num_music == %d\n", num_music);
-#endif
-
   for (i = 0; i < num_music; i++)
   {
     music = getMusicListEntry(i);
-
-#if 0
-    printf("::: %d [%08x]\n", i, music->filename);
-#endif
 
     if (music->filename == NULL)
       continue;
@@ -5075,7 +4766,6 @@ void LoadMusicInfo()
   }
 
 #if 0
-  /* TEST-ONLY */
   for (next = music_file_info; next != NULL; next = next->next)
     printf("::: title == '%s'\n", next->title);
 #endif
@@ -5316,7 +5006,6 @@ void LoadHelpAnimInfo()
   freeSetupFileHash(direction_hash);
 
 #if 0
-  /* TEST ONLY */
   for (i = 0; i < num_list_entries; i++)
     printf("::: %d, %d, %d => %d\n",
 	   helpanim_info[i].element,
@@ -5352,7 +5041,6 @@ void LoadHelpTextInfo()
   }
 
 #if 0
-  /* TEST ONLY */
   BEGIN_HASH_ITERATION(helptext_info, itr)
   {
     printf("::: '%s' => '%s'\n",

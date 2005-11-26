@@ -48,11 +48,7 @@ int getAnimationFrame(int num_frames, int delay, int mode, int start_frame,
   }
   else if (mode & ANIM_PINGPONG)	/* oscillate (border frames once) */
   {
-#if 1
     int max_anim_frames = (num_frames > 1 ? 2 * num_frames - 2 : 1);
-#else
-    int max_anim_frames = 2 * num_frames - 2;
-#endif
 
     frame = (sync_frame % (delay * max_anim_frames)) / delay;
     frame = (frame < num_frames ? frame : max_anim_frames - frame);
@@ -127,7 +123,6 @@ void DrawAnim(Bitmap *toon_bitmap, GC toon_clip_gc,
 {
   int buf_x = DOOR_GFX_PAGEX3, buf_y = DOOR_GFX_PAGEY1;
 
-#if 1
   /* special method to avoid flickering interference with BackToFront() */
   BlitBitmap(backbuffer, screen_info.save_buffer, dest_x-pad_x, dest_y-pad_y,
 	     width+2*pad_x, height+2*pad_y, buf_x, buf_y);
@@ -141,16 +136,6 @@ void DrawAnim(Bitmap *toon_bitmap, GC toon_clip_gc,
 
   BlitBitmap(screen_info.save_buffer, backbuffer, buf_x, buf_y,
 	    width+2*pad_x, height+2*pad_y, dest_x-pad_x, dest_y-pad_y);
-#else
-  /* normal method, causing flickering interference with BackToFront() */
-  BlitBitmap(backbuffer, screen_info.save_buffer, dest_x-pad_x, dest_y-pad_y,
-	     width+2*pad_x, height+2*pad_y, buf_x, buf_y);
-  SetClipOrigin(toon_bitmap,toon_clip_gc, buf_x-src_x+pad_x,buf_y-src_y+pad_y);
-  BlitBitmapMasked(toon_bitmap, screen_info.save_buffer,
-		   src_x, src_y, width, height, buf_x+pad_x, buf_y+pad_y);
-  BlitBitmap(screen_info.save_buffer, window, buf_x, buf_y,
-	     width+2*pad_x, height+2*pad_y, dest_x-pad_x, dest_y-pad_y);
-#endif
 
   FlushDisplay();
 }

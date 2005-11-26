@@ -93,9 +93,6 @@ static DrawWindow *X11InitWindow()
   Pixmap icon_pixmap, iconmask_pixmap;
   unsigned int icon_width, icon_height;
   int icon_hot_x, icon_hot_y;
-#if 0
-  char icon_filename[256];
-#endif
   XSizeHints size_hints;
   XWMHints wm_hints;
   XClassHint class_hints;
@@ -110,16 +107,6 @@ static DrawWindow *X11InitWindow()
   unsigned long pen_bg = BlackPixel(display, screen);
   const int width = video.width, height = video.height;
   int i;
-
-#if 0
-#if !defined(PLATFORM_MSDOS)
-  static struct IconFileInfo icon_pic =
-  {
-    "rocks_icon.xbm",
-    "rocks_iconmask.xbm"
-  };
-#endif
-#endif
 
   screen_width = XDisplayWidth(display, screen);
   screen_height = XDisplayHeight(display, screen);
@@ -140,10 +127,6 @@ static DrawWindow *X11InitWindow()
     XChangeProperty(display, new_window->drawable, proto_atom, XA_ATOM, 32,
 		    PropModePrepend, (unsigned char *) &delete_atom, 1);
 
-#if 0
-  sprintf(icon_filename, "%s/%s", options.graphics_directory,
-	  icon_pic.picture_filename);
-#endif
   if (XReadBitmapFile(display, new_window->drawable,
 		      getCustomImageFilename(program.x11_icon_filename),
 		      &icon_width, &icon_height, &icon_pixmap,
@@ -151,10 +134,6 @@ static DrawWindow *X11InitWindow()
     Error(ERR_EXIT, "cannot read icon bitmap file '%s'",
 	  program.x11_icon_filename);
 
-#if 0
-  sprintf(icon_filename, "%s/%s", options.graphics_directory,
-	  icon_pic.picturemask_filename);
-#endif
   if (XReadBitmapFile(display, new_window->drawable,
 		      getCustomImageFilename(program.x11_iconmask_filename),
 		      &icon_width, &icon_height, &iconmask_pixmap,

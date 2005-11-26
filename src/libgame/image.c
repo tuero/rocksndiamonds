@@ -31,13 +31,6 @@ Image *newImage(unsigned int width, unsigned int height, unsigned int depth)
   unsigned int bytes_per_pixel = (depth + 7) / 8;
   int i;
 
-#if 0
-  if (depth > 8)
-    Error(ERR_EXIT, "images with more than 256 colors are not supported");
-
-  depth = 8;
-#endif
-
   image = checked_calloc(sizeof(Image));
   image->data = checked_calloc(width * height * bytes_per_pixel);
   image->width = width;
@@ -836,7 +829,7 @@ static void *Load_PCX(char *filename)
   ImageInfo *img_info;
 
 #if 0
-  printf("loading PCX file '%s'\n", filename);
+  printf("::: loading PCX file '%s'\n", filename);
 #endif
 
   img_info = checked_calloc(sizeof(ImageInfo));
@@ -1036,7 +1029,7 @@ void InitImageList(struct ConfigInfo *config_list, int num_file_list_entries,
 void ReloadCustomImages()
 {
 #if 0
-  printf("DEBUG: reloading images '%s' ...\n", artwork.gfx_current_identifier);
+  printf("::: reloading images '%s' ...\n", artwork.gfx_current_identifier);
 #endif
 
   LoadArtworkConfig(image_info);
@@ -1054,16 +1047,6 @@ void CreateImageWithSmallImages(int pos, int zoom_factor)
 
   img_info->contains_small_images = TRUE;
   img_info->scaled_up = TRUE;
-
-#if 0
-  if (zoom_factor)
-    printf("CreateImageWithSmallImages: '%s' zoomed by factor %d\n",
-	   img_info->source_filename, zoom_factor);
-#endif
-
-#if 0
-  printf("CreateImageWithSmallImages: '%s' done\n", img_info->source_filename);
-#endif
 }
 
 void FreeAllImages()

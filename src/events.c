@@ -104,10 +104,8 @@ static boolean NextValidEvent(Event *event)
     if (FilterMouseMotionEvents(event))
       handle_this_event = TRUE;
 
-#if 1
     if (SkipPressedMouseMotionEvent(event))
       handle_this_event = FALSE;
-#endif
 
     if (handle_this_event)
       return TRUE;
@@ -322,11 +320,6 @@ void HandleButtonEvent(ButtonEvent *event)
   else
     button_status = MB_RELEASED;
 
-#if 0
-  printf("::: button %s\n", event->type == EVENT_BUTTONPRESS ?
-	"pressed" : "released");
-#endif
-
   HandleButton(event->x, event->y, button_status);
 }
 
@@ -335,16 +328,10 @@ void HandleMotionEvent(MotionEvent *event)
   if (!PointerInWindow(window))
     return;	/* window and pointer are on different screens */
 
-#if 1
   if (button_status == MB_RELEASED && game_status != GAME_MODE_EDITOR)
     return;
-#endif
 
   motion_status = TRUE;
-
-#if 0
-  printf("::: %d, %d\n", event->x, event->y);
-#endif
 
   HandleButton(event->x, event->y, button_status);
 }
@@ -696,23 +683,7 @@ void HandleKey(Key key, int key_status)
 
   if (game_status == GAME_MODE_MAIN && key == setup.shortcut.toggle_pause)
   {
-#if 1
     StartGameActions(options.network, setup.autorecord, NEW_RANDOMIZE);
-#else
-    if (setup.autorecord)
-      TapeStartRecording();
-
-#if defined(NETWORK_AVALIABLE)
-    if (options.network)
-      SendToServer_StartPlaying();
-    else
-#endif
-    {
-      game_status = GAME_MODE_PLAYING;
-      StopAnimation();
-      InitGame();
-    }
-#endif
 
     return;
   }
@@ -884,32 +855,6 @@ void HandleKey(Key key, int key_status)
 	  }
 	  break;
 
-#if 0
-	case KSYM_a:
-	  if (ScrollStepSize == TILEX/8)
-	    ScrollStepSize = TILEX/4;
-	  else
-	    ScrollStepSize = TILEX/8;
-	  printf("ScrollStepSize == %d\n", ScrollStepSize);
-	  break;
-#endif
-
-#if 0
-	case KSYM_m:
-	  if (MoveSpeed == 8)
-	  {
-	    MoveSpeed = 4;
-	    ScrollStepSize = TILEX/4;
-	  }
-	  else
-	  {
-	    MoveSpeed = 8;
-	    ScrollStepSize = TILEX/8;
-	  }
-	  printf("MoveSpeed == %d\n", MoveSpeed);
-	  break;
-#endif
-
 	case KSYM_f:
 	  ScrollStepSize = TILEX/8;
 	  printf("ScrollStepSize == %d (1/8)\n", ScrollStepSize);
@@ -934,26 +879,6 @@ void HandleKey(Key key, int key_status)
 	  printf("::: currently using game engine version %d\n",
 		 game.engine_version);
 	  break;
-
-#if 0
-
-	case KSYM_z:
-	  {
-	    int i;
-
-	    for (i = 0; i < MAX_PLAYERS; i++)
-	    {
-	      printf("Player %d:\n", i);
-	      printf("  jx == %d, jy == %d\n",
-		     stored_player[i].jx, stored_player[i].jy);
-	      printf("  last_jx == %d, last_jy == %d\n",
-		     stored_player[i].last_jx, stored_player[i].last_jy);
-	    }
-	    printf("\n");
-	  }
-
-	  break;
-#endif
 #endif
 
 	default:

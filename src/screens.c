@@ -418,7 +418,6 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
     if (new_level_nr > leveldir_current->last_level)
       new_level_nr = leveldir_current->last_level;
 
-#if 1
     if (setup.handicap && new_level_nr > leveldir_current->handicap_level)
     {
       /* skipping levels is only allowed when trying to skip single level */
@@ -431,10 +430,6 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 
       new_level_nr = leveldir_current->handicap_level;
     }
-#else
-    if (setup.handicap && new_level_nr > leveldir_current->handicap_level)
-      new_level_nr = leveldir_current->handicap_level;
-#endif
 
     if (new_level_nr != old_level_nr)
     {
@@ -511,34 +506,20 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
       }
       else if (y == 5)
       {
-#if 1
 	StartGameActions(options.network, setup.autorecord, NEW_RANDOMIZE);
-#else
-	if (setup.autorecord)
-	  TapeStartRecording();
-
-#if defined(NETWORK_AVALIABLE)
-	if (options.network)
-	  SendToServer_StartPlaying();
-	else
-#endif
-	{
-	  game_status = GAME_MODE_PLAYING;
-	  StopAnimation();
-	  InitGame();
-	}
-#endif
       }
       else if (y == 6)
       {
 	game_status = GAME_MODE_SETUP;
 	setup_mode = SETUP_MODE_MAIN;
+
 	DrawSetupScreen();
       }
       else if (y == 7)
       {
 	SaveLevelSetup_LastSeries();
 	SaveLevelSetup_SeriesInfo();
+
         if (Request("Do you really want to quit ?", REQ_ASK | REQ_STAY_CLOSED))
 	  game_status = GAME_MODE_QUIT;
       }
@@ -750,10 +731,6 @@ void DrawInfoScreen_HelpAnim(int start, int max_anims, boolean init)
     for (i = 0; i < MAX_INFO_ELEMENTS_ON_SCREEN; i++)
       infoscreen_step[i] = infoscreen_frame[i] = 0;
 
-#if 0
-    SetMainBackgroundImage(IMG_BACKGROUND_INFO);
-#endif
-
     ClearWindow();
     DrawHeadline();
 
@@ -861,11 +838,7 @@ static char *getHelpText(int element, int action, int direction)
 
 void DrawInfoScreen_HelpText(int element, int action, int direction, int ypos)
 {
-#if 0
-  int font_nr = FONT_TEXT_2;
-#else
   int font_nr = FONT_LEVEL_NUMBER;
-#endif
   int font_width = getFontWidth(font_nr);
   int sx = mSX + MINI_TILEX + TILEX + MINI_TILEX;
   int sy = mSY + 65 + 2 * 32 + 1;
@@ -1225,11 +1198,7 @@ void DrawInfoScreen_LevelSet()
   int ystart = 150;
   int ybottom = SYSIZE - 20;
   char *filename = getLevelSetInfoFilename();
-#if 0
-  int font_nr = FONT_TEXT_2;
-#else
   int font_nr = FONT_LEVEL_NUMBER;
-#endif
   int font_width = getFontWidth(font_nr);
   int font_height = getFontHeight(font_nr);
   int pad_x = 32;
@@ -2250,14 +2219,8 @@ static void DrawSetupScreen_Generic()
 	(value_ptr == &setup.fullscreen   && !video.fullscreen_available))
       setup_info[i].type |= TYPE_GHOSTED;
 
-#if 0
-    if (setup_info[i].type & TYPE_STRING ||
-	(setup_info[i].type & TYPE_SWITCH && setup_mode == SETUP_MODE_EDITOR))
-      font_nr = FONT_MENU_2;
-#else
     if (setup_info[i].type & TYPE_STRING)
       font_nr = FONT_MENU_2;
-#endif
 
     DrawText(mSX + 32, mSY + ypos * 32, setup_info[i].text, font_nr);
 
@@ -2448,14 +2411,11 @@ static void drawPlayerSetupInputInfo(int player_nr)
   custom_key = setup.input[player_nr].key;
 
   DrawText(mSX+11*32, mSY+2*32, int2str(player_nr +1, 1), FONT_INPUT_1_ACTIVE);
-#if 1
+
   ClearRectangleOnBackground(drawto, mSX + 8 * TILEX, mSY + 2 * TILEY,
 			     TILEX, TILEY);
   DrawGraphicThruMaskExt(drawto, mSX + 8 * TILEX, mSY + 2 * TILEY,
 			 PLAYER_NR_GFX(IMG_PLAYER_1, player_nr), 0);
-#else
-  DrawGraphicThruMask(8, 2, PLAYER_NR_GFX(IMG_PLAYER_1, player_nr), 0);
-#endif
 
   if (setup.input[player_nr].use_joystick)
   {

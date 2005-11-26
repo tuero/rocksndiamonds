@@ -19,14 +19,7 @@
 #include "events.h"
 #include "config.h"
 
-#if 0
-GC			tile_clip_gc;
-Bitmap		       *pix[NUM_BITMAPS];
-#endif
 Bitmap		       *bitmap_db_field, *bitmap_db_door;
-#if 0
-Pixmap			tile_clipmask[NUM_TILES];
-#endif
 DrawBuffer	       *fieldbuffer;
 DrawBuffer	       *drawto_field;
 
