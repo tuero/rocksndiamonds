@@ -27,32 +27,7 @@
 /* EXPERIMENTAL STUFF */
 #define USE_NEW_STUFF			(TRUE				* 1)
 
-#define USE_NEW_MOVE_STYLE		(TRUE	* USE_NEW_STUFF		* 1)
-#define USE_NEW_MOVE_DELAY		(TRUE	* USE_NEW_STUFF		* 1)
-#define USE_NEW_PUSH_DELAY		(TRUE	* USE_NEW_STUFF		* 1)
-#define USE_NEW_BLOCK_STYLE		(TRUE	* USE_NEW_STUFF		* 1)
 #define USE_NEW_SP_SLIPPERY		(TRUE	* USE_NEW_STUFF		* 1)
-#define USE_NEW_RANDOMIZE		(TRUE	* USE_NEW_STUFF		* 1)
-
-#define USE_CAN_MOVE_NOT_MOVING		(TRUE	* USE_NEW_STUFF		* 1)
-#define USE_PREVIOUS_MOVE_DIR		(TRUE	* USE_NEW_STUFF		* 1)
-
-#define USE_PUSH_BUGFIX			(TRUE	* USE_NEW_STUFF		* 1)
-#define USE_GRAVITY_BUGFIX_NEW		(TRUE	* USE_NEW_STUFF		* 1)
-#define USE_GRAVITY_BUGFIX_OLD		(TRUE	* USE_NEW_STUFF		* 0)
-
-#define USE_PENGUIN_COLLECT_BUGFIX	(TRUE	* USE_NEW_STUFF		* 1)
-
-#define USE_IMPACT_BUGFIX		(TRUE	* USE_NEW_STUFF		* 1)
-
-#define USE_HITTING_SOMETHING_BUGFIX	(TRUE	* USE_NEW_STUFF		* 1)
-#define USE_HIT_BY_SOMETHING_BUGFIX	(TRUE	* USE_NEW_STUFF		* 1)
-
-#define USE_DROP_BUGFIX			(TRUE	* USE_NEW_STUFF		* 1)
-
-#define USE_CHANGE_TO_TRIGGERED		(TRUE	* USE_NEW_STUFF		* 1)
-
-#define USE_BACK_WALKABLE_BUGFIX	(TRUE	* USE_NEW_STUFF		* 1)
 
 
 /* for DigField() */
@@ -714,7 +689,6 @@ static void InitPlayerField(int x, int y, int element, boolean init_game)
 				level.sp_block_last_field :
 				level.block_last_field);
 
-#if USE_NEW_BLOCK_STYLE
     /* ---------- initialize player's last field block delay --------------- */
 
     /* always start with reliable default value (no adjustment needed) */
@@ -727,7 +701,6 @@ static void InitPlayerField(int x, int y, int element, boolean init_game)
     /* special case 2: in game engines before 3.1.1, blocking was different */
     if (game.use_block_last_field_bug)
       player->block_delay_adjustment = (player->block_last_field ? -1 : 1);
-#endif
 
     if (!options.network || player->connected)
     {
@@ -1223,7 +1196,6 @@ static void InitGameEngine()
 
   /* ---------- initialize player's initial move delay --------------------- */
 
-#if USE_NEW_MOVE_DELAY
   /* dynamically adjust player properties according to level information */
   game.initial_move_delay_value =
     (level.double_speed ? MOVE_DELAY_HIGH_SPEED : MOVE_DELAY_NORMAL_SPEED);
@@ -1231,16 +1203,6 @@ static void InitGameEngine()
   /* dynamically adjust player properties according to game engine version */
   game.initial_move_delay = (game.engine_version <= VERSION_IDENT(2,0,1,0) ?
 			     game.initial_move_delay_value : 0);
-#else
-  /* dynamically adjust player properties according to game engine version */
-  game.initial_move_delay =
-    (game.engine_version <= VERSION_IDENT(2,0,1,0) ? INITIAL_MOVE_DELAY_ON :
-     INITIAL_MOVE_DELAY_OFF);
-
-  /* dynamically adjust player properties according to level information */
-  game.initial_move_delay_value =
-    (level.double_speed ? MOVE_DELAY_HIGH_SPEED : MOVE_DELAY_NORMAL_SPEED);
-#endif
 
   /* ---------- initialize player's initial push delay --------------------- */
 
@@ -1414,16 +1376,11 @@ static void InitGameEngine()
     {
       if (IS_SP_ELEMENT(i))
       {
-#if USE_NEW_MOVE_STYLE
 	/* set SP push delay to just enough to push under a falling zonk */
 	int delay = (game.engine_version >= VERSION_IDENT(3,1,1,0) ? 8 : 6);
 
 	element_info[i].push_delay_fixed  = delay;
 	element_info[i].push_delay_random = 0;
-#else
-	element_info[i].push_delay_fixed  = 6;	/* just enough to escape ... */
-	element_info[i].push_delay_random = 0;	/* ... from falling zonk     */
-#endif
       }
     }
   }
@@ -1599,10 +1556,8 @@ void InitGame()
     player->switch_x = -1;
     player->switch_y = -1;
 
-#if USE_DROP_BUGFIX
     player->drop_x = -1;
     player->drop_y = -1;
-#endif
 
     player->show_envelope = 0;
 
@@ -1611,13 +1566,8 @@ void InitGame()
 
     player->move_delay_reset_counter = 0;
 
-#if USE_NEW_PUSH_DELAY
     player->push_delay       = -1;	/* initialized when pushing starts */
     player->push_delay_value = game.initial_push_delay_value;
-#else
-    player->push_delay       = 0;
-    player->push_delay_value = game.initial_push_delay_value;
-#endif
 
     player->drop_delay = 0;
 
@@ -1796,10 +1746,8 @@ void InitGame()
 	  player->element_nr = some_player->element_nr;
 #endif
 
-#if USE_NEW_BLOCK_STYLE
 	  player->block_last_field       = some_player->block_last_field;
 	  player->block_delay_adjustment = some_player->block_delay_adjustment;
-#endif
 
 	  StorePlayer[jx][jy] = player->element_nr;
 	  player->jx = player->last_jx = jx;
@@ -2522,12 +2470,12 @@ void InitMovingField(int x, int y, int direction)
   if (!WasJustMoving[x][y] || direction != MovDir[x][y])
     ResetGfxAnimation(x, y);
 
-#if USE_CAN_MOVE_NOT_MOVING
-
   MovDir[x][y] = direction;
   GfxDir[x][y] = direction;
   GfxAction[x][y] = (direction == MV_DOWN && CAN_FALL(element) ?
 		     ACTION_FALLING : ACTION_MOVING);
+
+  /* this is needed for CEs with property "can move" / "not moving" */
 
   if (getElementMoveStepsize(x, y) != 0)	/* moving or being moved */
   {
@@ -2540,25 +2488,6 @@ void InitMovingField(int x, int y, int direction)
     GfxAction[newx][newy] = GfxAction[x][y];
     GfxDir[newx][newy] = GfxDir[x][y];
   }
-
-#else
-
-  MovDir[newx][newy] = MovDir[x][y] = direction;
-  GfxDir[x][y] = direction;
-
-  if (Feld[newx][newy] == EL_EMPTY)
-    Feld[newx][newy] = EL_BLOCKED;
-
-  if (direction == MV_DOWN && CAN_FALL(element))
-    GfxAction[x][y] = ACTION_FALLING;
-  else
-    GfxAction[x][y] = ACTION_MOVING;
-
-  GfxFrame[newx][newy] = GfxFrame[x][y];
-  GfxRandom[newx][newy] = GfxRandom[x][y];
-  GfxAction[newx][newy] = GfxAction[x][y];
-  GfxDir[newx][newy] = GfxDir[x][y];
-#endif
 }
 
 void Moving2Blocked(int x, int y, int *goes_to_x, int *goes_to_y)
@@ -2884,11 +2813,7 @@ void RelocatePlayer(int jx, int jy, int el_player_raw)
       ScrollPlayer(player, SCROLL_GO_ON);
       ScrollScreen(NULL, SCROLL_GO_ON);
 
-#if USE_NEW_MOVE_DELAY
       AdvanceFrameAndPlayerCounters(player->index_nr);
-#else
-      FrameCounter++;
-#endif
 
       DrawPlayer(player);
 
@@ -4359,10 +4284,8 @@ inline static void TurnRoundExt(int x, int y)
     boolean can_turn_right =
       CUSTOM_ELEMENT_CAN_ENTER_FIELD(element, right_x,right_y);
 
-#if USE_CAN_MOVE_NOT_MOVING
-    if (element_info[element].move_stepsize == 0)	/* not moving */
+    if (element_info[element].move_stepsize == 0)	/* "not moving" */
       return;
-#endif
 
     if (move_pattern == MV_TURNING_LEFT)
       MovDir[x][y] = left_dir;
@@ -4474,15 +4397,13 @@ inline static void TurnRoundExt(int x, int y)
       boolean first_horiz = RND(2);
       int new_move_dir = MovDir[x][y];
 
-#if USE_CAN_MOVE_NOT_MOVING
-      if (element_info[element].move_stepsize == 0)	/* not moving */
+      if (element_info[element].move_stepsize == 0)	/* "not moving" */
       {
 	first_horiz = (ABS(attr_x - x) >= ABS(attr_y - y));
 	MovDir[x][y] &= (first_horiz ? MV_HORIZONTAL : MV_VERTICAL);
 
 	return;
       }
-#endif
 
       MovDir[x][y] =
 	new_move_dir & (first_horiz ? MV_HORIZONTAL : MV_VERTICAL);
@@ -4758,7 +4679,6 @@ void StartMoving(int x, int y)
     else if ((game.engine_version >= VERSION_IDENT(3,1,0,0) &&
 	      CheckCollision[x][y] && !IS_FREE(x, y + 1)) ||
 
-#if USE_IMPACT_BUGFIX
 	     (game.engine_version >= VERSION_IDENT(3,0,7,0) &&
 	      CAN_FALL(element) && WasJustFalling[x][y] &&
 	      (Feld[x][y + 1] == EL_BLOCKED || IS_PLAYER(x, y + 1))) ||
@@ -4766,15 +4686,6 @@ void StartMoving(int x, int y)
 	     (game.engine_version < VERSION_IDENT(2,2,0,7) &&
 	      CAN_FALL(element) && WasJustMoving[x][y] && !Pushed[x][y + 1] &&
 	      (Feld[x][y + 1] == EL_BLOCKED)))
-#else
-	     (game.engine_version >= VERSION_IDENT(3,0,7,0) &&
-	      CAN_SMASH(element) && WasJustFalling[x][y] &&
-	      (Feld[x][y + 1] == EL_BLOCKED || IS_PLAYER(x, y + 1))) ||
-
-	     (game.engine_version < VERSION_IDENT(2,2,0,7) &&
-	      CAN_SMASH(element) && WasJustMoving[x][y] && !Pushed[x][y + 1] &&
-	      (Feld[x][y + 1] == EL_BLOCKED)))
-#endif
     {
       /* this is needed for a special case not covered by calling "Impact()"
 	 from "ContinueMoving()": if an element moves to a tile directly below
@@ -5181,14 +5092,11 @@ void StartMoving(int x, int y)
       Store[newx][newy] = EL_EMPTY;
       if (IS_EQUAL_OR_IN_GROUP(new_element, MOVE_ENTER_EL(element)))
       {
-#if USE_CHANGE_TO_TRIGGERED
 	int move_leave_element = element_info[element].move_leave_element;
 
+	/* this makes it possible to leave the removed element again */
 	Store[newx][newy] = (move_leave_element == EL_TRIGGER_ELEMENT ?
 			     new_element : move_leave_element);
-#else
-	Store[newx][newy] = element_info[element].move_leave_element;
-#endif
       }
 
       if (move_pattern & MV_MAZE_RUNNER_STYLE)
@@ -5517,18 +5425,15 @@ void ContinueMoving(int x, int y)
   {
     int move_leave_element = ei->move_leave_element;
 
-#if USE_CHANGE_TO_TRIGGERED
+    /* this makes it possible to leave the removed element again */
     if (ei->move_leave_type == LEAVE_TYPE_LIMITED &&
         ei->move_leave_element == EL_TRIGGER_ELEMENT)
       move_leave_element = stored;
-#endif
 
     Feld[x][y] = move_leave_element;
 
-#if USE_PREVIOUS_MOVE_DIR
     if (element_info[Feld[x][y]].move_direction_initial == MV_START_PREVIOUS)
       MovDir[x][y] = direction;
-#endif
 
     InitField(x, y, FALSE);
 
@@ -5590,25 +5495,14 @@ void ContinueMoving(int x, int y)
   else if (element == EL_PENGUIN)
     TestIfFriendTouchesBadThing(newx, newy);
 
-#if USE_NEW_MOVE_STYLE
   /* give the player one last chance (one more frame) to move away */
   if (CAN_FALL(element) && direction == MV_DOWN &&
       (last_line || (!IS_FREE(x, newy + 1) &&
 		     (!IS_PLAYER(x, newy + 1) ||
 		      game.engine_version < VERSION_IDENT(3,1,1,0)))))
     Impact(x, newy);
-#else
-  if (CAN_FALL(element) && direction == MV_DOWN &&
-      (last_line || !IS_FREE(x, newy + 1)))
-    Impact(x, newy);
-#endif
 
-#if USE_PUSH_BUGFIX
   if (pushed_by_player && !game.use_change_when_pushing_bug)
-#else
-  if (pushed_by_player)
-#endif
-
   {
     int dig_side = MV_DIR_OPPOSITE(direction);
     struct PlayerInfo *player = PLAYERINFO(x, y);
@@ -7468,16 +7362,12 @@ void AdvanceFrameAndPlayerCounters(int player_nr)
     if (stored_player[i].MovPos != 0)
       stored_player[i].StepFrame += move_frames;
 
-#if USE_NEW_MOVE_DELAY
     if (stored_player[i].move_delay > 0)
       stored_player[i].move_delay--;
-#endif
 
-#if USE_NEW_PUSH_DELAY
     /* due to bugs in previous versions, counter must count up, not down */
     if (stored_player[i].push_delay != -1)
       stored_player[i].push_delay++;
-#endif
 
     if (stored_player[i].drop_delay > 0)
       stored_player[i].drop_delay--;
@@ -7639,7 +7529,6 @@ void GameActions()
     Changed[x][y] = FALSE;
     ChangeEvent[x][y] = -1;
 
-#if USE_NEW_BLOCK_STYLE
     /* this must be handled before main playfield loop */
     if (Feld[x][y] == EL_PLAYER_IS_LEAVING)
     {
@@ -7647,7 +7536,6 @@ void GameActions()
       if (MovDelay[x][y] <= 0)
 	RemoveField(x, y);
     }
-#endif
 
 #if DEBUG
     if (ChangePage[x][y] != -1 && ChangeDelay[x][y] != 1)
@@ -8002,31 +7890,7 @@ void GameActions()
     redraw_mask |= REDRAW_FPS;
   }
 
-#if USE_NEW_MOVE_DELAY
   AdvanceFrameAndPlayerCounters(-1);	/* advance counters for all players */
-#else
-  FrameCounter++;
-  TimeFrames++;
-
-  for (i = 0; i < MAX_PLAYERS; i++)
-  {
-    int move_frames =
-      MOVE_DELAY_NORMAL_SPEED /  stored_player[i].move_delay_value;
-
-    stored_player[i].Frame += move_frames;
-
-    if (stored_player[i].MovPos != 0)
-      stored_player[i].StepFrame += move_frames;
-
-#if USE_NEW_MOVE_DELAY
-    if (stored_player[i].move_delay > 0)
-      stored_player[i].move_delay--;
-#endif
-
-    if (stored_player[i].drop_delay > 0)
-      stored_player[i].drop_delay--;
-  }
-#endif
 
   if (local_player->show_envelope != 0 && local_player->MovPos == 0)
   {
@@ -8035,11 +7899,9 @@ void GameActions()
     local_player->show_envelope = 0;
   }
 
-#if USE_NEW_RANDOMIZE
   /* use random number generator in every frame to make it less predictable */
   if (game.engine_version >= VERSION_IDENT(3,1,1,0))
     RND(1);
-#endif
 }
 
 static boolean AllPlayersInSight(struct PlayerInfo *player, int x, int y)
@@ -8117,11 +7979,6 @@ static boolean canFallDown(struct PlayerInfo *player)
 
   return (IN_LEV_FIELD(jx, jy + 1) &&
 	  (IS_FREE(jx, jy + 1) ||
-#if USE_NEW_BLOCK_STYLE
-#if USE_GRAVITY_BUGFIX_OLD
-	   Feld[jx][jy + 1] == EL_PLAYER_IS_LEAVING ||
-#endif
-#endif
 	   (Feld[jx][jy + 1] == EL_ACID && player->can_fall_into_acid)) &&
 	  IS_WALKABLE_FROM(Feld[jx][jy], MV_DOWN) &&
 	  !IS_WALKABLE_INSIDE(Feld[jx][jy]));
@@ -8295,18 +8152,10 @@ boolean MovePlayer(struct PlayerInfo *player, int dx, int dy)
     return FALSE;
   }
 
-#if USE_NEW_MOVE_DELAY
   if (player->move_delay > 0)
-#else
-  if (!FrameReached(&player->move_delay, player->move_delay_value))
-#endif
-  {
     return FALSE;
-  }
 
-#if USE_NEW_MOVE_DELAY
   player->move_delay = -1;		/* set to "uninitialized" value */
-#endif
 
   /* store if player is automatically moved to next field */
   player->is_auto_moving = (player->programmed_action != MV_NO_MOVING);
@@ -8334,11 +8183,7 @@ boolean MovePlayer(struct PlayerInfo *player, int dx, int dy)
       ScrollPlayer(player, SCROLL_GO_ON);
       ScrollScreen(NULL, SCROLL_GO_ON);
 
-#if USE_NEW_MOVE_DELAY
       AdvanceFrameAndPlayerCounters(player->index_nr);
-#else
-      FrameCounter++;
-#endif
 
       DrawAllPlayers();
       BackToFront();
@@ -8451,26 +8296,19 @@ boolean MovePlayer(struct PlayerInfo *player, int dx, int dy)
   {
     CheckGravityMovementWhenNotMoving(player);
 
-    /*
-    player->last_move_dir = MV_NO_MOVING;
-    */
     player->is_moving = FALSE;
 
-#if USE_NEW_MOVE_STYLE
-    /* player is ALLOWED to move, but CANNOT move (something blocks his way) */
-    /* ensure that the player is also allowed to move in the next frame */
-    /* (currently, the player is forced to wait eight frames before he can try
-       again!!!) */
+    /* at this point, the player is allowed to move, but cannot move right now
+       (e.g. because of something blocking the way) -- ensure that the player
+       is also allowed to move in the next frame (in old versions before 3.1.1,
+       the player was forced to wait again for eight frames before next try) */
 
     if (game.engine_version >= VERSION_IDENT(3,1,1,0))
       player->move_delay = 0;	/* allow direct movement in the next frame */
-#endif
   }
 
-#if USE_NEW_MOVE_DELAY
   if (player->move_delay == -1)		/* not yet initialized by DigField() */
     player->move_delay = player->move_delay_value;
-#endif
 
   if (game.engine_version < VERSION_IDENT(3,0,7,0))
   {
@@ -8498,8 +8336,6 @@ void ScrollPlayer(struct PlayerInfo *player, int mode)
     player->actual_frame_counter = FrameCounter;
     player->GfxPos = move_stepsize * (player->MovPos / move_stepsize);
 
-#if USE_NEW_BLOCK_STYLE
-
     if ((player->block_last_field || player->block_delay_adjustment > 0) &&
 	Feld[last_jx][last_jy] == EL_EMPTY)
     {
@@ -8511,11 +8347,9 @@ void ScrollPlayer(struct PlayerInfo *player, int mode)
       {
 	last_field_block_delay += player->move_delay_value;
 
-#if USE_GRAVITY_BUGFIX_NEW
 	/* when blocking enabled, prevent moving up despite gravity */
 	if (game.gravity && player->MovDir == MV_UP)
 	  block_delay_adjustment = -1;
-#endif
       }
 
       /* add block delay adjustment (also possible when not blocking) */
@@ -8524,17 +8358,6 @@ void ScrollPlayer(struct PlayerInfo *player, int mode)
       Feld[last_jx][last_jy] = EL_PLAYER_IS_LEAVING;
       MovDelay[last_jx][last_jy] = last_field_block_delay + 1;
     }
-#else
-#if USE_NEW_MOVE_STYLE
-    if ((game.engine_version < VERSION_IDENT(3,1,1,0) ||
-	 player->block_last_field) &&
-	Feld[last_jx][last_jy] == EL_EMPTY)
-      Feld[last_jx][last_jy] = EL_PLAYER_IS_LEAVING;
-#else
-    if (Feld[last_jx][last_jy] == EL_EMPTY)
-      Feld[last_jx][last_jy] = EL_PLAYER_IS_LEAVING;
-#endif
-#endif
 
     return;
   }
@@ -8543,14 +8366,6 @@ void ScrollPlayer(struct PlayerInfo *player, int mode)
 
   player->MovPos += (player->MovPos > 0 ? -1 : 1) * move_stepsize;
   player->GfxPos = move_stepsize * (player->MovPos / move_stepsize);
-
-#if USE_NEW_BLOCK_STYLE
-#else
-  if (!player->block_last_field &&
-      Feld[last_jx][last_jy] == EL_PLAYER_IS_LEAVING)
-
-    RemoveField(last_jx, last_jy);
-#endif
 
   /* before DrawPlayer() to draw correct player graphic for this case */
   if (player->MovPos == 0)
@@ -8571,14 +8386,6 @@ void ScrollPlayer(struct PlayerInfo *player, int mode)
 	player->move_delay = 0;
       }
     }
-
-#if USE_NEW_BLOCK_STYLE
-#else
-    if (player->block_last_field &&
-	Feld[last_jx][last_jy] == EL_PLAYER_IS_LEAVING)
-
-      RemoveField(last_jx, last_jy);
-#endif
 
     player->last_jx = jx;
     player->last_jy = jy;
@@ -8845,12 +8652,6 @@ void TestIfElementHitsCustomElement(int x, int y, int direction)
   touched_element = (IN_LEV_FIELD(hitx, hity) ?
 		     MovingOrBlocked2Element(hitx, hity) : EL_STEELWALL);
 
-#if !USE_HITTING_SOMETHING_BUGFIX
-  /* "hitting something" is also true when hitting the playfield border */
-  CheckElementChangeBySide(x, y, hitting_element, touched_element,
-			   CE_HITTING_SOMETHING, direction);
-#endif
-
   if (IN_LEV_FIELD(hitx, hity))
   {
     int opposite_direction = MV_DIR_OPPOSITE(direction);
@@ -8864,29 +8665,20 @@ void TestIfElementHitsCustomElement(int x, int y, int direction)
 
     if (object_hit)
     {
-#if !USE_HIT_BY_SOMETHING_BUGFIX
-      CheckElementChangeBySide(hitx, hity, touched_element, hitting_element,
-			       CE_HIT_BY_SOMETHING, opposite_direction);
-#endif
-
       CheckElementChangeBySide(x, y, hitting_element, touched_element,
 			       CE_HITTING_X, touched_side);
 
       CheckElementChangeBySide(hitx, hity, touched_element,
 			       hitting_element, CE_HIT_BY_X, hitting_side);
 
-#if USE_HIT_BY_SOMETHING_BUGFIX
       CheckElementChangeBySide(hitx, hity, touched_element, hitting_element,
 			       CE_HIT_BY_SOMETHING, opposite_direction);
-#endif
     }
   }
 
-#if USE_HITTING_SOMETHING_BUGFIX
   /* "hitting something" is also true when hitting the playfield border */
   CheckElementChangeBySide(x, y, hitting_element, touched_element,
 			   CE_HITTING_SOMETHING, direction);
-#endif
 }
 
 #if 0
@@ -9309,11 +9101,7 @@ int DigField(struct PlayerInfo *player,
     if (mode == DF_NO_PUSH)	/* player just stopped pushing */
     {
       player->is_switching = FALSE;
-#if USE_NEW_PUSH_DELAY
       player->push_delay = -1;
-#else
-      player->push_delay = 0;
-#endif
 
       return MF_NO_ACTION;
     }
@@ -9325,12 +9113,10 @@ int DigField(struct PlayerInfo *player,
   if (IS_TUBE(Back[jx][jy]) && game.engine_version >= VERSION_IDENT(2,2,0,0))
     old_element = Back[jx][jy];
 
-#if USE_BACK_WALKABLE_BUGFIX
   /* in case of element dropped at player position, check background */
   else if (Back[jx][jy] != EL_EMPTY &&
 	   game.engine_version >= VERSION_IDENT(2,2,0,0))
     old_element = Back[jx][jy];
-#endif
 
   if (IS_WALKABLE(old_element) && !ACCESS_FROM(old_element, move_direction))
     return MF_NO_ACTION;	/* field has no opening in this direction */
@@ -9600,32 +9386,16 @@ int DigField(struct PlayerInfo *player,
     if (!checkDiagonalPushing(player, x, y, real_dx, real_dy))
       return MF_NO_ACTION;
 
-#if USE_NEW_PUSH_DELAY
     if (player->push_delay == -1)	/* new pushing; restart delay */
       player->push_delay = 0;
-#else
-    if (player->push_delay == 0)	/* new pushing; restart delay */
-      player->push_delay = FrameCounter;
-#endif
 
-#if USE_NEW_PUSH_DELAY
     if (player->push_delay < player->push_delay_value &&
 	!(tape.playing && tape.file_version < FILE_VERSION_2_0) &&
 	element != EL_SPRING && element != EL_BALLOON)
-#else
-    if (!FrameReached(&player->push_delay, player->push_delay_value) &&
-	!(tape.playing && tape.file_version < FILE_VERSION_2_0) &&
-	element != EL_SPRING && element != EL_BALLOON)
-#endif
     {
       /* make sure that there is no move delay before next try to push */
-#if USE_NEW_MOVE_DELAY
       if (game.engine_version >= VERSION_IDENT(3,0,7,1))
 	player->move_delay = 0;
-#else
-      if (game.engine_version >= VERSION_IDENT(3,0,7,1))
-	player->move_delay = INITIAL_MOVE_DELAY_OFF;
-#endif
 
       return MF_NO_ACTION;
     }
@@ -9681,8 +9451,7 @@ int DigField(struct PlayerInfo *player,
     else
       player->push_delay_value = -1;	/* get new value later */
 
-#if USE_PUSH_BUGFIX
-    /* now: check for element change _after_ element has been pushed! */
+    /* check for element change _after_ element has been pushed */
     if (game.use_change_when_pushing_bug)
     {
       CheckElementChangeByPlayer(x, y, element, CE_PUSHED_BY_PLAYER,
@@ -9690,10 +9459,6 @@ int DigField(struct PlayerInfo *player,
       CheckTriggeredElementChangeByPlayer(x,y, element, CE_PLAYER_PUSHES_X,
 					  player->index_bit, dig_side);
     }
-
-#else
-    /* check for element change _after_ element has been pushed! */
-#endif
   }
   else if (IS_SWITCHABLE(element))
   {
@@ -9815,15 +9580,9 @@ int DigField(struct PlayerInfo *player,
     return MF_NO_ACTION;
   }
 
-#if USE_NEW_PUSH_DELAY
   player->push_delay = -1;
-#else
-  player->push_delay = 0;
-#endif
 
-#if USE_PENGUIN_COLLECT_BUGFIX
   if (is_player)		/* function can also be called by EL_PENGUIN */
-#endif
   {
     if (Feld[x][y] != element)		/* really digged/collected something */
       player->is_collecting = !player->is_digging;
@@ -9915,14 +9674,12 @@ boolean DropElement(struct PlayerInfo *player)
 		      EL_DYNABOMB_PLAYER_1_ACTIVE + player->index_nr :
 		      EL_UNDEFINED);
 
-#if USE_DROP_BUGFIX
   /* do not drop an element on top of another element; when holding drop key
      pressed without moving, dropped element must move away before the next
      element can be dropped (this is especially important if the next element
      is dynamite, which can be placed on background for historical reasons) */
   if (PLAYER_DROPPING(player, dropx, dropy) && Feld[dropx][dropy] != EL_EMPTY)
     return MF_ACTION;
-#endif
 
   if (IS_THROWABLE(drop_element))
   {
@@ -10029,10 +9786,8 @@ boolean DropElement(struct PlayerInfo *player)
   player->drop_delay = GET_NEW_DROP_DELAY(drop_element);
   player->is_dropping = TRUE;
 
-#if USE_DROP_BUGFIX
   player->drop_x = dropx;
   player->drop_y = dropy;
-#endif
 
   return TRUE;
 }
