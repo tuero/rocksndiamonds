@@ -256,15 +256,13 @@ static boolean CheckTriggeredElementChangeExt(int, int, int, int, int,int,int);
 	CheckTriggeredElementChangeExt(x, y, e, ev, CH_PLAYER_ANY,	\
 				       CH_SIDE_ANY, p)
 
-static boolean CheckElementChangeExt(int, int, int, int, int, int, int, int);
+static boolean CheckElementChangeExt(int, int, int, int, int, int, int);
 #define CheckElementChange(x, y, e, te, ev)				\
-	CheckElementChangeExt(x, y, e, te, ev, CH_PLAYER_ANY, CH_SIDE_ANY, -1)
+	CheckElementChangeExt(x, y, e, te, ev, CH_PLAYER_ANY, CH_SIDE_ANY)
 #define CheckElementChangeByPlayer(x, y, e, ev, p, s)			\
-	CheckElementChangeExt(x, y, e, EL_EMPTY, ev, p, s, -1)
+	CheckElementChangeExt(x, y, e, EL_EMPTY, ev, p, s)
 #define CheckElementChangeBySide(x, y, e, te, ev, s)			\
-	CheckElementChangeExt(x, y, e, te, ev, CH_PLAYER_ANY, s, -1)
-#define CheckElementChangeByPage(x, y, e, te, ev, p)			\
-	CheckElementChangeExt(x, y, e, te, ev, CH_PLAYER_ANY, CH_SIDE_ANY, p)
+	CheckElementChangeExt(x, y, e, te, ev, CH_PLAYER_ANY, s)
 
 static void PlayLevelSound(int, int, int);
 static void PlayLevelSoundNearest(int, int, int);
@@ -6994,8 +6992,9 @@ static boolean CheckTriggeredElementChangeExt(int lx, int ly,
 					      int trigger_side,
 					      int trigger_page)
 {
-  int i, j, x, y;
+  boolean change_done_any = FALSE;
   int trigger_page_bits = (trigger_page < 0 ? CH_PAGE_ANY : 1 << trigger_page);
+  int i, p, x, y;
 
   if (!(trigger_events[trigger_element][trigger_event]))
     return FALSE;
@@ -7003,15 +7002,15 @@ static boolean CheckTriggeredElementChangeExt(int lx, int ly,
   for (i = 0; i < NUM_CUSTOM_ELEMENTS; i++)
   {
     int element = EL_CUSTOM_START + i;
-    boolean change_found = FALSE;
+    boolean change_done = FALSE;
 
     if (!CAN_CHANGE_OR_HAS_ACTION(element) ||
 	!HAS_ANY_CHANGE_EVENT(element, trigger_event))
       continue;
 
-    for (j = 0; j < element_info[element].num_change_pages; j++)
+    for (p = 0; p < element_info[element].num_change_pages; p++)
     {
-      struct ElementChangeInfo *change = &element_info[element].change_page[j];
+      struct ElementChangeInfo *change = &element_info[element].change_page[p];
 
       if (change->can_change_or_has_action &&
 	  change->has_event[trigger_event] &&
@@ -7023,28 +7022,29 @@ static boolean CheckTriggeredElementChangeExt(int lx, int ly,
 	change->actual_trigger_element = trigger_element;
 	change->actual_trigger_player = EL_PLAYER_1 + log_2(trigger_player);
 
-	if (change->can_change && !change_found)
+	if (change->can_change && !change_done)
 	{
-	  change_found = TRUE;
-
 	  for (y = 0; y < lev_fieldy; y++) for (x = 0; x < lev_fieldx; x++)
 	  {
 	    if (Feld[x][y] == element)
 	    {
 	      ChangeDelay[x][y] = 1;
 	      ChangeEvent[x][y] = trigger_event;
-	      ChangeElement(x, y, j);
+	      ChangeElement(x, y, p);
 	    }
 	  }
+
+	  change_done = TRUE;
+	  change_done_any = TRUE;
 	}
 
 	if (change->has_action)
-	  ExecuteCustomElementAction(element, j);
+	  ExecuteCustomElementAction(element, p);
       }
     }
   }
 
-  return TRUE;
+  return change_done_any;
 }
 
 static boolean CheckElementChangeExt(int x, int y,
@@ -7052,10 +7052,13 @@ static boolean CheckElementChangeExt(int x, int y,
 				     int trigger_element,
 				     int trigger_event,
 				     int trigger_player,
-				     int trigger_side,
-				     int trigger_page)
+				     int trigger_side)
 {
-  if (!CAN_CHANGE(element) || !HAS_ANY_CHANGE_EVENT(element, trigger_event))
+  boolean change_done = FALSE;
+  int p;
+
+  if (!CAN_CHANGE_OR_HAS_ACTION(element) ||
+      !HAS_ANY_CHANGE_EVENT(element, trigger_event))
     return FALSE;
 
   if (Feld[x][y] == EL_BLOCKED)
@@ -7067,54 +7070,40 @@ static boolean CheckElementChangeExt(int x, int y,
   if (Feld[x][y] != element)	/* check if element has already changed */
     return FALSE;
 
-  if (trigger_page < 0)
+  for (p = 0; p < element_info[element].num_change_pages; p++)
   {
-    boolean change_element = FALSE;
-    int i;
+    struct ElementChangeInfo *change = &element_info[element].change_page[p];
 
-    for (i = 0; i < element_info[element].num_change_pages; i++)
+    boolean check_trigger_element =
+      (trigger_event == CE_TOUCHING_X ||
+       trigger_event == CE_HITTING_X ||
+       trigger_event == CE_HIT_BY_X);
+
+    if (change->can_change_or_has_action &&
+	change->has_event[trigger_event] &&
+	change->trigger_side & trigger_side &&
+	change->trigger_player & trigger_player &&
+	(!check_trigger_element ||
+	 IS_EQUAL_OR_IN_GROUP(trigger_element, change->trigger_element)))
     {
-      struct ElementChangeInfo *change = &element_info[element].change_page[i];
+      change->actual_trigger_element = trigger_element;
+      change->actual_trigger_player = EL_PLAYER_1 + log_2(trigger_player);
 
-      boolean check_trigger_element =
-	(trigger_event == CE_TOUCHING_X ||
-	 trigger_event == CE_HITTING_X ||
-	 trigger_event == CE_HIT_BY_X);
-
-      if (change->can_change &&
-	  change->has_event[trigger_event] &&
-	  change->trigger_side & trigger_side &&
-	  change->trigger_player & trigger_player &&
-	  (!check_trigger_element ||
-	   IS_EQUAL_OR_IN_GROUP(trigger_element, change->trigger_element)))
+      if (change->can_change && !change_done)
       {
-	change_element = TRUE;
-	trigger_page = i;
+	ChangeDelay[x][y] = 1;
+	ChangeEvent[x][y] = trigger_event;
+	ChangeElement(x, y, p);
 
-	change->actual_trigger_element = trigger_element;
-	change->actual_trigger_player = EL_PLAYER_1 + log_2(trigger_player);
-
-	break;
+	change_done = TRUE;
       }
+
+      if (change->has_action)
+	ExecuteCustomElementAction(element, p);
     }
-
-    if (!change_element)
-      return FALSE;
-  }
-  else
-  {
-    struct ElementInfo *ei = &element_info[element];
-    struct ElementChangeInfo *change = &ei->change_page[trigger_page];
-
-    change->actual_trigger_element = trigger_element;
-    change->actual_trigger_player = EL_PLAYER_1;	/* unused */
   }
 
-  ChangeDelay[x][y] = 1;
-  ChangeEvent[x][y] = trigger_event;
-  ChangeElement(x, y, trigger_page);
-
-  return TRUE;
+  return change_done;
 }
 
 static void PlayPlayerSound(struct PlayerInfo *player)
