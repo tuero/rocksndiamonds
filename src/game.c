@@ -28,6 +28,7 @@
 #define USE_NEW_STUFF			(TRUE				* 1)
 
 #define USE_NEW_SP_SLIPPERY		(TRUE	* USE_NEW_STUFF		* 1)
+#define USE_NEW_COLLECT_COUNT		(TRUE	* USE_NEW_STUFF		* 1)
 
 
 /* for DigField() */
@@ -903,6 +904,10 @@ static void InitField(int x, int y, boolean init_game)
       }
       break;
   }
+
+#if USE_NEW_COLLECT_COUNT
+  Count[x][y] = element_info[Feld[x][y]].collect_count_initial;
+#endif
 }
 
 static inline void InitField_WithBug1(int x, int y, boolean init_game)
@@ -1644,7 +1649,9 @@ void InitGame()
       MovPos[x][y] = MovDir[x][y] = MovDelay[x][y] = 0;
       ChangeDelay[x][y] = 0;
       ChangePage[x][y] = -1;
-      Count[x][y] = element_info[Feld[x][y]].collect_count_initial;
+#if USE_NEW_COLLECT_COUNT
+      Count[x][y] = 0;		/* initialized in InitField() */
+#endif
       Store[x][y] = Store2[x][y] = StorePlayer[x][y] = Back[x][y] = 0;
       AmoebaNr[x][y] = 0;
       WasJustMoving[x][y] = 0;
@@ -2488,7 +2495,9 @@ void InitMovingField(int x, int y, int direction)
 
     MovDir[newx][newy] = MovDir[x][y];
 
+#if USE_NEW_COLLECT_COUNT
     Count[newx][newy] = Count[x][y];
+#endif
 
     GfxFrame[newx][newy] = GfxFrame[x][y];
     GfxRandom[newx][newy] = GfxRandom[x][y];
@@ -2571,7 +2580,9 @@ static void RemoveField(int x, int y)
   MovDir[x][y] = 0;
   MovDelay[x][y] = 0;
 
+#if USE_NEW_COLLECT_COUNT
   Count[x][y] = 0;
+#endif
 
   AmoebaNr[x][y] = 0;
   ChangeDelay[x][y] = 0;
@@ -3158,7 +3169,10 @@ void Explode(int ex, int ey, int phase, int mode)
     GfxDir[x][y] = MV_NO_MOVING;
     ChangeDelay[x][y] = 0;
     ChangePage[x][y] = -1;
+
+#if USE_NEW_COLLECT_COUNT
     Count[x][y] = 0;
+#endif
 
     InitField_WithBug2(x, y, FALSE);
 
@@ -5367,6 +5381,10 @@ void ContinueMoving(int x, int y)
     if (!game.magic_wall_active)
       Feld[x][y] = EL_MAGIC_WALL_DEAD;
     element = Feld[newx][newy] = Store[x][y];
+
+#if USE_NEW_COLLECT_COUNT
+    InitField(newx, newy, FALSE);
+#endif
   }
   else if (element == EL_BD_MAGIC_WALL_FILLING)
   {
@@ -5381,6 +5399,10 @@ void ContinueMoving(int x, int y)
     if (!game.magic_wall_active)
       Feld[x][y] = EL_BD_MAGIC_WALL_DEAD;
     element = Feld[newx][newy] = Store[x][y];
+
+#if USE_NEW_COLLECT_COUNT
+    InitField(newx, newy, FALSE);
+#endif
   }
   else if (element == EL_AMOEBA_DROPPING)
   {
@@ -5403,8 +5425,6 @@ void ContinueMoving(int x, int y)
   MovDir[x][y] = 0;
   MovDelay[x][y] = 0;
 
-  Count[x][y] = 0;
-
   MovDelay[newx][newy] = 0;
 
   if (CAN_CHANGE(element))
@@ -5414,12 +5434,20 @@ void ContinueMoving(int x, int y)
     ChangePage[newx][newy]  = ChangePage[x][y];
     Changed[newx][newy]     = Changed[x][y];
     ChangeEvent[newx][newy] = ChangeEvent[x][y];
+
+#if USE_NEW_COLLECT_COUNT
+    Count[newx][newy] = Count[x][y];
+#endif
   }
 
   ChangeDelay[x][y] = 0;
   ChangePage[x][y] = -1;
   Changed[x][y] = FALSE;
   ChangeEvent[x][y] = -1;
+
+#if USE_NEW_COLLECT_COUNT
+  Count[x][y] = 0;
+#endif
 
   /* copy animation control values to new field */
   GfxFrame[newx][newy]  = GfxFrame[x][y];
@@ -6453,7 +6481,11 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
      action_arg == CA_ARG_NUMBER_MIN ? CA_ARG_MIN :
      action_arg == CA_ARG_NUMBER_MAX ? CA_ARG_MAX :
      action_arg == CA_ARG_NUMBER_CE_SCORE ? ei->collect_score :
+#if USE_NEW_COLLECT_COUNT
      action_arg == CA_ARG_NUMBER_CE_COUNT ? Count[x][y] :
+#else
+     action_arg == CA_ARG_NUMBER_CE_COUNT ? ei->collect_count_initial :
+#endif
      action_arg == CA_ARG_NUMBER_CE_DELAY ? GET_CHANGE_DELAY(change) :
      -1);
 
@@ -6638,7 +6670,7 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
     case CA_SET_SCORE:
     {
       local_player->score =
-	getModifiedActionNumber(local_player->score, 0, 99999,
+	getModifiedActionNumber(local_player->score, 0, 9999,
 				action_mode, action_arg_number);
 
       DrawGameValue_Score(local_player->score);
@@ -6656,21 +6688,26 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
 
     case CA_SET_CE_COUNT:
     {
+#if USE_NEW_COLLECT_COUNT
       int count_last = Count[x][y];
 
       Count[x][y] = getModifiedActionNumber(Count[x][y], 0, 9999,
 					    action_mode, action_arg_number);
 
+#if 0
       printf("::: Count == %d\n", Count[x][y]);
+#endif
 
       if (Count[x][y] == 0 && count_last > 0)
       {
-
+#if 0
 	printf("::: CE_COUNT_AT_ZERO\n");
+#endif
 
 	CheckElementChange(x, y, element, EL_UNDEFINED, CE_COUNT_AT_ZERO);
 	CheckTriggeredElementChange(element, CE_COUNT_AT_ZERO_OF_X);
       }
+#endif
 
       break;
     }
@@ -7063,14 +7100,17 @@ static boolean CheckTriggeredElementChangeExt(int trigger_element,
 		ChangeDelay[x][y] = 1;
 		ChangeEvent[x][y] = trigger_event;
 		ChangeElement(x, y, p);
-
-		change_done = TRUE;
-		change_done_any = TRUE;
 	      }
 
 	      if (change->has_action)
 		ExecuteCustomElementAction(x, y, element, p);
 	    }
+	  }
+
+	  if (change->can_change)
+	  {
+	    change_done = TRUE;
+	    change_done_any = TRUE;
 	  }
 	}
       }
@@ -9144,7 +9184,20 @@ int DigField(struct PlayerInfo *player,
     return MF_NO_ACTION;	/* field has no opening in this direction */
 
   element = Feld[x][y];
+#if USE_NEW_COLLECT_COUNT
   collect_count = Count[x][y];
+#else
+  collect_count = element_info[element].collect_count_initial;
+#endif
+
+#if 0
+  if (element != EL_BLOCKED &&
+      Count[x][y] != element_info[element].collect_count_initial)
+    printf("::: %d: %d != %d\n",
+	   element,
+	   Count[x][y],
+	   element_info[element].collect_count_initial);
+#endif
 
   if (!is_player && !IS_COLLECTIBLE(element))	/* penguin cannot collect it */
     return MF_NO_ACTION;

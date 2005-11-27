@@ -1538,9 +1538,11 @@ static struct ValueTextInfo options_action_type[] =
   { CA_SET_SCORE,		"set score"			},
   { CA_SET_CE_SCORE,		"set CE score"			},
   { CA_SET_CE_COUNT,		"set CE count"			},
+#if 0
   { CA_SET_DYNABOMB_NUMBER,	"set bomb number"		},
   { CA_SET_DYNABOMB_SIZE,	"set bomb size"			},
   { CA_SET_DYNABOMB_POWER,	"set bomb power"		},
+#endif
   { CA_TOGGLE_PLAYER_GRAVITY,	"toggle gravity"		},
   { CA_ENABLE_PLAYER_GRAVITY,	"enable gravity"		},
   { CA_DISABLE_PLAYER_GRAVITY,	"disable gravity"		},
