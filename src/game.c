@@ -244,17 +244,15 @@ static void TestIfElementSmashesCustomElement(int, int, int);
 
 static void ChangeElement(int, int, int);
 
-static boolean CheckTriggeredElementChangeExt(int, int, int, int, int,int,int);
-#define CheckTriggeredElementChange(x, y, e, ev)			\
-	CheckTriggeredElementChangeExt(x, y, e, ev, CH_PLAYER_ANY,	\
-				       CH_SIDE_ANY, -1)
-#define CheckTriggeredElementChangeByPlayer(x, y, e, ev, p, s)		\
-	CheckTriggeredElementChangeExt(x, y, e, ev, p, s, -1)
-#define CheckTriggeredElementChangeBySide(x, y, e, ev, s)		\
-	CheckTriggeredElementChangeExt(x, y, e, ev, CH_PLAYER_ANY, s, -1)
-#define CheckTriggeredElementChangeByPage(x, y, e, ev, p)		\
-	CheckTriggeredElementChangeExt(x, y, e, ev, CH_PLAYER_ANY,	\
-				       CH_SIDE_ANY, p)
+static boolean CheckTriggeredElementChangeExt(int, int, int,int,int);
+#define CheckTriggeredElementChange(e, ev)				\
+	CheckTriggeredElementChangeExt(e, ev, CH_PLAYER_ANY, CH_SIDE_ANY, -1)
+#define CheckTriggeredElementChangeByPlayer(e, ev, p, s)		\
+	CheckTriggeredElementChangeExt(e, ev, p, s, -1)
+#define CheckTriggeredElementChangeBySide(e, ev, s)			\
+	CheckTriggeredElementChangeExt(e, ev, CH_PLAYER_ANY, s, -1)
+#define CheckTriggeredElementChangeByPage(e, ev, p)			\
+	CheckTriggeredElementChangeExt(e, ev, CH_PLAYER_ANY, CH_SIDE_ANY, p)
 
 static boolean CheckElementChangeExt(int, int, int, int, int, int, int);
 #define CheckElementChange(x, y, e, te, ev)				\
@@ -1254,6 +1252,20 @@ static void InitGameEngine()
     SET_PROPERTY(ch_delay->element, EP_CAN_CHANGE_OR_HAS_ACTION, TRUE);
   }
 
+  /* ---------- initialize internal run-time variables ------------- */
+
+  for (i = 0; i < NUM_CUSTOM_ELEMENTS; i++)
+  {
+    struct ElementInfo *ei = &element_info[EL_CUSTOM_START + i];
+
+    for (j = 0; j < ei->num_change_pages; j++)
+    {
+      ei->change_page[j].can_change_or_has_action =
+	(ei->change_page[j].can_change |
+	 ei->change_page[j].has_action);
+    }
+  }
+
   /* add change events from custom element configuration */
   for (i = 0; i < NUM_CUSTOM_ELEMENTS; i++)
   {
@@ -1261,7 +1273,7 @@ static void InitGameEngine()
 
     for (j = 0; j < ei->num_change_pages; j++)
     {
-      if (!ei->change_page[j].can_change)
+      if (!ei->change_page[j].can_change_or_has_action)
 	continue;
 
       for (k = 0; k < NUM_CHANGE_EVENTS; k++)
@@ -1275,20 +1287,6 @@ static void InitGameEngine()
 	  ei->event_page[k] = &ei->change_page[j];
 	}
       }
-    }
-  }
-
-  /* ---------- initialize internal run-time variables ------------- */
-
-  for (i = 0; i < NUM_CUSTOM_ELEMENTS; i++)
-  {
-    struct ElementInfo *ei = &element_info[EL_CUSTOM_START + i];
-
-    for (j = 0; j < ei->num_change_pages; j++)
-    {
-      ei->change_page[j].can_change_or_has_action =
-	(ei->change_page[j].can_change |
-	 ei->change_page[j].has_action);
     }
   }
 
@@ -1319,7 +1317,7 @@ static void InitGameEngine()
 
     for (j = 0; j < ei->num_change_pages; j++)
     {
-      if (!ei->change_page[j].can_change)
+      if (!ei->change_page[j].can_change_or_has_action)
 	continue;
 
       if (ei->change_page[j].has_event[CE_BY_OTHER_ACTION])
@@ -1398,16 +1396,23 @@ static void InitGameEngine()
     element_info[e].move_stepsize = move_stepsize_list[i].move_stepsize;
   }
 
-  /* ---------- initialize gem count --------------------------------------- */
+  /* ---------- initialize collect score ----------------------------------- */
 
-  /* initialize gem count values for each element */
+  /* initialize collect score values for custom elements from initial value */
+  for (i = 0; i < MAX_NUM_ELEMENTS; i++)
+    if (IS_CUSTOM_ELEMENT(i))
+      element_info[i].collect_score = element_info[i].collect_score_initial;
+
+  /* ---------- initialize collect count ----------------------------------- */
+
+  /* initialize collect count values for non-custom elements */
   for (i = 0; i < MAX_NUM_ELEMENTS; i++)
     if (!IS_CUSTOM_ELEMENT(i))
-      element_info[i].collect_count = 0;
+      element_info[i].collect_count_initial = 0;
 
-  /* add gem count values for all elements from pre-defined list */
+  /* add collect count values for all elements from pre-defined list */
   for (i = 0; collect_count_list[i].element != EL_UNDEFINED; i++)
-    element_info[collect_count_list[i].element].collect_count =
+    element_info[collect_count_list[i].element].collect_count_initial =
       collect_count_list[i].count;
 
   /* ---------- initialize access direction -------------------------------- */
@@ -1639,6 +1644,7 @@ void InitGame()
       MovPos[x][y] = MovDir[x][y] = MovDelay[x][y] = 0;
       ChangeDelay[x][y] = 0;
       ChangePage[x][y] = -1;
+      Count[x][y] = element_info[Feld[x][y]].collect_count_initial;
       Store[x][y] = Store2[x][y] = StorePlayer[x][y] = Back[x][y] = 0;
       AmoebaNr[x][y] = 0;
       WasJustMoving[x][y] = 0;
@@ -2481,6 +2487,9 @@ void InitMovingField(int x, int y, int direction)
       Feld[newx][newy] = EL_BLOCKED;
 
     MovDir[newx][newy] = MovDir[x][y];
+
+    Count[newx][newy] = Count[x][y];
+
     GfxFrame[newx][newy] = GfxFrame[x][y];
     GfxRandom[newx][newy] = GfxRandom[x][y];
     GfxAction[newx][newy] = GfxAction[x][y];
@@ -2561,6 +2570,8 @@ static void RemoveField(int x, int y)
   MovPos[x][y] = 0;
   MovDir[x][y] = 0;
   MovDelay[x][y] = 0;
+
+  Count[x][y] = 0;
 
   AmoebaNr[x][y] = 0;
   ChangeDelay[x][y] = 0;
@@ -2830,8 +2841,7 @@ void RelocatePlayer(int jx, int jy, int el_player_raw)
 			       CE_LEFT_BY_PLAYER,
 			       player->index_bit, leave_side);
 
-  CheckTriggeredElementChangeByPlayer(old_jx, old_jy, old_element,
-				      CE_PLAYER_LEAVES_X,
+  CheckTriggeredElementChangeByPlayer(old_element, CE_PLAYER_LEAVES_X,
 				      player->index_bit, leave_side);
 
   Feld[jx][jy] = el_player;
@@ -2853,8 +2863,7 @@ void RelocatePlayer(int jx, int jy, int el_player_raw)
     CheckElementChangeByPlayer(jx, jy, element, CE_ENTERED_BY_PLAYER,
 			       player->index_bit, enter_side);
 
-  CheckTriggeredElementChangeByPlayer(jx, jy, element,
-				      CE_PLAYER_ENTERS_X,
+  CheckTriggeredElementChangeByPlayer(element, CE_PLAYER_ENTERS_X,
 				      player->index_bit, enter_side);
 }
 
@@ -3149,6 +3158,7 @@ void Explode(int ex, int ey, int phase, int mode)
     GfxDir[x][y] = MV_NO_MOVING;
     ChangeDelay[x][y] = 0;
     ChangePage[x][y] = -1;
+    Count[x][y] = 0;
 
     InitField_WithBug2(x, y, FALSE);
 
@@ -3293,7 +3303,7 @@ void Bang(int x, int y)
       break;
   }
 
-  CheckTriggeredElementChange(x, y, element, CE_EXPLOSION_OF_X);
+  CheckTriggeredElementChange(element, CE_EXPLOSION_OF_X);
 }
 
 void SplashAcid(int x, int y)
@@ -3822,8 +3832,8 @@ void Impact(int x, int y)
 
 	  CheckElementChangeBySide(x, y + 1, smashed, element,
 				   CE_SWITCHED, CH_SIDE_TOP);
-	  CheckTriggeredElementChangeBySide(x, y + 1, smashed,
-					    CE_SWITCH_OF_X, CH_SIDE_TOP);
+	  CheckTriggeredElementChangeBySide(smashed, CE_SWITCH_OF_X,
+					    CH_SIDE_TOP);
 	}
       }
       else
@@ -5392,6 +5402,9 @@ void ContinueMoving(int x, int y)
   MovPos[x][y] = 0;
   MovDir[x][y] = 0;
   MovDelay[x][y] = 0;
+
+  Count[x][y] = 0;
+
   MovDelay[newx][newy] = 0;
 
   if (CAN_CHANGE(element))
@@ -5507,7 +5520,7 @@ void ContinueMoving(int x, int y)
 
     CheckElementChangeByPlayer(newx, newy, element, CE_PUSHED_BY_PLAYER,
 			       player->index_bit, dig_side);
-    CheckTriggeredElementChangeByPlayer(newx,newy, element, CE_PLAYER_PUSHES_X,
+    CheckTriggeredElementChangeByPlayer(element, CE_PLAYER_PUSHES_X,
 					player->index_bit, dig_side);
   }
 
@@ -6415,7 +6428,7 @@ static int getModifiedActionNumber(int value_old, int value_min, int value_max,
 	  value_new);
 }
 
-static void ExecuteCustomElementAction(int element, int page)
+static void ExecuteCustomElementAction(int x, int y, int element, int page)
 {
   struct ElementInfo *ei = &element_info[element];
   struct ElementChangeInfo *change = &ei->change_page[page];
@@ -6440,7 +6453,7 @@ static void ExecuteCustomElementAction(int element, int page)
      action_arg == CA_ARG_NUMBER_MIN ? CA_ARG_MIN :
      action_arg == CA_ARG_NUMBER_MAX ? CA_ARG_MAX :
      action_arg == CA_ARG_NUMBER_CE_SCORE ? ei->collect_score :
-     action_arg == CA_ARG_NUMBER_CE_COUNT ? ei->collect_count :
+     action_arg == CA_ARG_NUMBER_CE_COUNT ? Count[x][y] :
      action_arg == CA_ARG_NUMBER_CE_DELAY ? GET_CHANGE_DELAY(change) :
      -1);
 
@@ -6635,14 +6648,29 @@ static void ExecuteCustomElementAction(int element, int page)
 
     case CA_SET_CE_SCORE:
     {
-      printf("::: CA_SET_CE_SCORE -- not yet implemented\n");
-
+      ei->collect_score =
+	getModifiedActionNumber(ei->collect_score, 0, 9999,
+				action_mode, action_arg_number);
       break;
     }
 
     case CA_SET_CE_COUNT:
     {
-      printf("::: CA_SET_CE_COUNT -- not yet implemented\n");
+      int count_last = Count[x][y];
+
+      Count[x][y] = getModifiedActionNumber(Count[x][y], 0, 9999,
+					    action_mode, action_arg_number);
+
+      printf("::: Count == %d\n", Count[x][y]);
+
+      if (Count[x][y] == 0 && count_last > 0)
+      {
+
+	printf("::: CE_COUNT_AT_ZERO\n");
+
+	CheckElementChange(x, y, element, EL_UNDEFINED, CE_COUNT_AT_ZERO);
+	CheckTriggeredElementChange(element, CE_COUNT_AT_ZERO_OF_X);
+      }
 
       break;
     }
@@ -6903,7 +6931,7 @@ static boolean ChangeElementNow(int x, int y, int element, int page)
   }
 
   /* this uses direct change before indirect change */
-  CheckTriggeredElementChangeByPage(x, y, old_element, CE_CHANGE_OF_X, page);
+  CheckTriggeredElementChangeByPage(old_element, CE_CHANGE_OF_X, page);
 
   return TRUE;
 }
@@ -6985,8 +7013,7 @@ static void ChangeElement(int x, int y, int page)
   }
 }
 
-static boolean CheckTriggeredElementChangeExt(int lx, int ly,
-					      int trigger_element,
+static boolean CheckTriggeredElementChangeExt(int trigger_element,
 					      int trigger_event,
 					      int trigger_player,
 					      int trigger_side,
@@ -6994,7 +7021,7 @@ static boolean CheckTriggeredElementChangeExt(int lx, int ly,
 {
   boolean change_done_any = FALSE;
   int trigger_page_bits = (trigger_page < 0 ? CH_PAGE_ANY : 1 << trigger_page);
-  int i, p, x, y;
+  int i;
 
   if (!(trigger_events[trigger_element][trigger_event]))
     return FALSE;
@@ -7003,6 +7030,7 @@ static boolean CheckTriggeredElementChangeExt(int lx, int ly,
   {
     int element = EL_CUSTOM_START + i;
     boolean change_done = FALSE;
+    int p;
 
     if (!CAN_CHANGE_OR_HAS_ACTION(element) ||
 	!HAS_ANY_CHANGE_EVENT(element, trigger_event))
@@ -7022,24 +7050,29 @@ static boolean CheckTriggeredElementChangeExt(int lx, int ly,
 	change->actual_trigger_element = trigger_element;
 	change->actual_trigger_player = EL_PLAYER_1 + log_2(trigger_player);
 
-	if (change->can_change && !change_done)
+	if ((change->can_change && !change_done) || change->has_action)
 	{
+	  int x, y;
+
 	  for (y = 0; y < lev_fieldy; y++) for (x = 0; x < lev_fieldx; x++)
 	  {
 	    if (Feld[x][y] == element)
 	    {
-	      ChangeDelay[x][y] = 1;
-	      ChangeEvent[x][y] = trigger_event;
-	      ChangeElement(x, y, p);
+	      if (change->can_change && !change_done)
+	      {
+		ChangeDelay[x][y] = 1;
+		ChangeEvent[x][y] = trigger_event;
+		ChangeElement(x, y, p);
+
+		change_done = TRUE;
+		change_done_any = TRUE;
+	      }
+
+	      if (change->has_action)
+		ExecuteCustomElementAction(x, y, element, p);
 	    }
 	  }
-
-	  change_done = TRUE;
-	  change_done_any = TRUE;
 	}
-
-	if (change->has_action)
-	  ExecuteCustomElementAction(element, p);
       }
     }
   }
@@ -7099,7 +7132,7 @@ static boolean CheckElementChangeExt(int x, int y,
       }
 
       if (change->has_action)
-	ExecuteCustomElementAction(element, p);
+	ExecuteCustomElementAction(x, y, element, p);
     }
   }
 
@@ -8406,16 +8439,14 @@ void ScrollPlayer(struct PlayerInfo *player, int mode)
 				   CE_LEFT_BY_PLAYER,
 				   player->index_bit, leave_side);
 
-      CheckTriggeredElementChangeByPlayer(old_jx, old_jy, old_element,
-					  CE_PLAYER_LEAVES_X,
+      CheckTriggeredElementChangeByPlayer(old_element, CE_PLAYER_LEAVES_X,
 					  player->index_bit, leave_side);
 
       if (IS_CUSTOM_ELEMENT(new_element))
 	CheckElementChangeByPlayer(jx, jy, new_element, CE_ENTERED_BY_PLAYER,
 				   player->index_bit, enter_side);
 
-      CheckTriggeredElementChangeByPlayer(jx, jy, new_element,
-					  CE_PLAYER_ENTERS_X,
+      CheckTriggeredElementChangeByPlayer(new_element, CE_PLAYER_ENTERS_X,
 					  player->index_bit, enter_side);
     }
 
@@ -8543,8 +8574,7 @@ void TestIfPlayerTouchesCustomElement(int x, int y)
 
       CheckElementChangeByPlayer(xx, yy, border_element, CE_TOUCHED_BY_PLAYER,
 				 player->index_bit, border_side);
-      CheckTriggeredElementChangeByPlayer(xx, yy, border_element,
-					  CE_PLAYER_TOUCHES_X,
+      CheckTriggeredElementChangeByPlayer(border_element, CE_PLAYER_TOUCHES_X,
 					  player->index_bit, border_side);
     }
     else if (IS_PLAYER(xx, yy))
@@ -8559,8 +8589,7 @@ void TestIfPlayerTouchesCustomElement(int x, int y)
 
       CheckElementChangeByPlayer(x, y, center_element, CE_TOUCHED_BY_PLAYER,
 				 player->index_bit, center_side);
-      CheckTriggeredElementChangeByPlayer(x, y, center_element,
-					  CE_PLAYER_TOUCHES_X,
+      CheckTriggeredElementChangeByPlayer(center_element, CE_PLAYER_TOUCHES_X,
 					  player->index_bit, center_side);
       break;
     }
@@ -9075,6 +9104,7 @@ int DigField(struct PlayerInfo *player,
   int dig_side = MV_DIR_OPPOSITE(move_direction);
   int old_element = Feld[jx][jy];
   int element;
+  int collect_count;
 
   if (is_player)		/* function can also be called by EL_PENGUIN */
   {
@@ -9114,6 +9144,7 @@ int DigField(struct PlayerInfo *player,
     return MF_NO_ACTION;	/* field has no opening in this direction */
 
   element = Feld[x][y];
+  collect_count = Count[x][y];
 
   if (!is_player && !IS_COLLECTIBLE(element))	/* penguin cannot collect it */
     return MF_NO_ACTION;
@@ -9220,7 +9251,7 @@ int DigField(struct PlayerInfo *player,
 
     PlayLevelSoundElementAction(x, y, element, ACTION_DIGGING);
 
-    CheckTriggeredElementChangeByPlayer(x, y, element, CE_PLAYER_DIGS_X,
+    CheckTriggeredElementChangeByPlayer(element, CE_PLAYER_DIGS_X,
 					player->index_bit, dig_side);
 
     if (mode == DF_SNAP)
@@ -9288,19 +9319,18 @@ int DigField(struct PlayerInfo *player,
     {
       int i;
 
-      if (element_info[element].collect_count == 0)
+      if (collect_count == 0)
 	player->inventory_infinite_element = element;
       else
-	for (i = 0; i < element_info[element].collect_count; i++)
+	for (i = 0; i < collect_count; i++)
 	  if (player->inventory_size < MAX_INVENTORY_SIZE)
 	    player->inventory_element[player->inventory_size++] = element;
 
       DrawGameValue_Dynamite(local_player->inventory_size);
     }
-    else if (element_info[element].collect_count > 0)
+    else if (collect_count > 0)
     {
-      local_player->gems_still_needed -=
-	element_info[element].collect_count;
+      local_player->gems_still_needed -= collect_count;
       if (local_player->gems_still_needed < 0)
 	local_player->gems_still_needed = 0;
 
@@ -9311,8 +9341,7 @@ int DigField(struct PlayerInfo *player,
     PlayLevelSoundElementAction(x, y, element, ACTION_COLLECTING);
 
     if (is_player)
-      CheckTriggeredElementChangeByPlayer(x, y, element,
-					  CE_PLAYER_COLLECTS_X,
+      CheckTriggeredElementChangeByPlayer(element, CE_PLAYER_COLLECTS_X,
 					  player->index_bit, dig_side);
 
     if (mode == DF_SNAP)
@@ -9445,7 +9474,7 @@ int DigField(struct PlayerInfo *player,
     {
       CheckElementChangeByPlayer(x, y, element, CE_PUSHED_BY_PLAYER,
 				 player->index_bit, dig_side);
-      CheckTriggeredElementChangeByPlayer(x,y, element, CE_PLAYER_PUSHES_X,
+      CheckTriggeredElementChangeByPlayer(element, CE_PLAYER_PUSHES_X,
 					  player->index_bit, dig_side);
     }
   }
@@ -9453,8 +9482,7 @@ int DigField(struct PlayerInfo *player,
   {
     if (PLAYER_SWITCHING(player, x, y))
     {
-      CheckTriggeredElementChangeByPlayer(x,y, element,
-					  CE_PLAYER_PRESSES_X,
+      CheckTriggeredElementChangeByPlayer(element, CE_PLAYER_PRESSES_X,
 					  player->index_bit, dig_side);
 
       return MF_ACTION;
@@ -9537,11 +9565,10 @@ int DigField(struct PlayerInfo *player,
       DrawLevelField(x, y);
     }
 
-    CheckTriggeredElementChangeByPlayer(x, y, element,
-					CE_SWITCH_OF_X,
+    CheckTriggeredElementChangeByPlayer(element, CE_SWITCH_OF_X,
 					player->index_bit, dig_side);
 
-    CheckTriggeredElementChangeByPlayer(x, y, element, CE_PLAYER_PRESSES_X,
+    CheckTriggeredElementChangeByPlayer(element, CE_PLAYER_PRESSES_X,
 					player->index_bit, dig_side);
 
     return MF_ACTION;
@@ -9556,14 +9583,13 @@ int DigField(struct PlayerInfo *player,
 
       CheckElementChangeByPlayer(x, y, element, CE_SWITCHED,
 				 player->index_bit, dig_side);
-      CheckTriggeredElementChangeByPlayer(x, y, element,
-					  CE_SWITCH_OF_X,
+      CheckTriggeredElementChangeByPlayer(element, CE_SWITCH_OF_X,
 					  player->index_bit, dig_side);
     }
 
     CheckElementChangeByPlayer(x, y, element, CE_PRESSED_BY_PLAYER,
 			       player->index_bit, dig_side);
-    CheckTriggeredElementChangeByPlayer(x, y, element, CE_PLAYER_PRESSES_X,
+    CheckTriggeredElementChangeByPlayer(element, CE_PLAYER_PRESSES_X,
 					player->index_bit, dig_side);
 
     return MF_NO_ACTION;
@@ -9732,8 +9758,7 @@ boolean DropElement(struct PlayerInfo *player)
 
     CheckElementChangeByPlayer(dropx, dropy, new_element, CE_DROPPED_BY_PLAYER,
 			       player->index_bit, drop_side);
-    CheckTriggeredElementChangeByPlayer(dropx, dropy, new_element,
-					CE_PLAYER_DROPS_X,
+    CheckTriggeredElementChangeByPlayer(new_element, CE_PLAYER_DROPS_X,
 					player->index_bit, drop_side);
 
     TestIfElementTouchesCustomElement(dropx, dropy);

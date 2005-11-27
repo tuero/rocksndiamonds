@@ -269,8 +269,8 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
     {
       element_info[element].access_direction = MV_ALL_DIRECTIONS;
 
-      element_info[element].collect_score = 10;		/* special default */
-      element_info[element].collect_count = 1;		/* special default */
+      element_info[element].collect_score_initial = 10;	/* special default */
+      element_info[element].collect_count_initial = 1;	/* special default */
 
       element_info[element].push_delay_fixed = -1;	/* initialize later */
       element_info[element].push_delay_random = -1;	/* initialize later */
@@ -292,9 +292,6 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
       element_info[element].explosion_type = EXPLODES_3X3;
       element_info[element].explosion_delay = 16;
       element_info[element].ignition_delay = 8;
-
-      element_info[element].counter_initial = 0;
-      element_info[element].counter = 0;
 
       for (x = 0; x < 3; x++)
 	for (y = 0; y < 3; y++)
@@ -1042,8 +1039,8 @@ static int LoadLevel_CUS3(FILE *file, int chunk_size, struct LevelInfo *level)
     element_info[element].gfx_element =
       getMappedElement(getFile16BitBE(file));
 
-    element_info[element].collect_score = getFile8Bit(file);
-    element_info[element].collect_count = getFile8Bit(file);
+    element_info[element].collect_score_initial = getFile8Bit(file);
+    element_info[element].collect_count_initial = getFile8Bit(file);
 
     element_info[element].push_delay_fixed = getFile16BitBE(file);
     element_info[element].push_delay_random = getFile16BitBE(file);
@@ -1142,8 +1139,8 @@ static int LoadLevel_CUS4(FILE *file, int chunk_size, struct LevelInfo *level)
   ei->use_gfx_element = getFile8Bit(file);
   ei->gfx_element = getMappedElement(getFile16BitBE(file));
 
-  ei->collect_score = getFile8Bit(file);
-  ei->collect_count = getFile8Bit(file);
+  ei->collect_score_initial = getFile8Bit(file);
+  ei->collect_count_initial = getFile8Bit(file);
 
   ei->drop_delay_fixed = getFile8Bit(file);
   ei->push_delay_fixed = getFile8Bit(file);
@@ -2980,8 +2977,8 @@ static void SaveLevel_CUS3(FILE *file, struct LevelInfo *level,
 	putFile8Bit(file, element_info[element].use_gfx_element);
 	putFile16BitBE(file, element_info[element].gfx_element);
 
-	putFile8Bit(file, element_info[element].collect_score);
-	putFile8Bit(file, element_info[element].collect_count);
+	putFile8Bit(file, element_info[element].collect_score_initial);
+	putFile8Bit(file, element_info[element].collect_count_initial);
 
 	putFile16BitBE(file, element_info[element].push_delay_fixed);
 	putFile16BitBE(file, element_info[element].push_delay_random);
@@ -3056,8 +3053,8 @@ static void SaveLevel_CUS4(FILE *file, struct LevelInfo *level, int element)
   putFile8Bit(file, ei->use_gfx_element);
   putFile16BitBE(file, ei->gfx_element);
 
-  putFile8Bit(file, ei->collect_score);
-  putFile8Bit(file, ei->collect_count);
+  putFile8Bit(file, ei->collect_score_initial);
+  putFile8Bit(file, ei->collect_count_initial);
 
   putFile8Bit(file, ei->drop_delay_fixed);
   putFile8Bit(file, ei->push_delay_fixed);

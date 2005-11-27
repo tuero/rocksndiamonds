@@ -1056,7 +1056,7 @@ static struct
     MIN_SCORE,				MAX_SCORE,
     GADGET_ID_CUSTOM_SCORE_DOWN,	GADGET_ID_CUSTOM_SCORE_UP,
     GADGET_ID_CUSTOM_SCORE_TEXT,	GADGET_ID_NONE,
-    &custom_element.collect_score,
+    &custom_element.collect_score_initial,
     NULL,				"score", " "
   },
   {
@@ -1064,7 +1064,7 @@ static struct
     MIN_COLLECT_COUNT,			MAX_COLLECT_COUNT,
     GADGET_ID_CUSTOM_GEMCOUNT_DOWN,	GADGET_ID_CUSTOM_GEMCOUNT_UP,
     GADGET_ID_CUSTOM_GEMCOUNT_TEXT,	GADGET_ID_CUSTOM_SCORE_UP,
-    &custom_element.collect_count,
+    &custom_element.collect_count_initial,
     NULL,				"count", NULL
   },
   {
@@ -5712,8 +5712,8 @@ static void copy_custom_element_settings(int element_from, int element_to)
 
   ei_to->access_direction = ei_from->access_direction;
 
-  ei_to->collect_score = ei_from->collect_score;
-  ei_to->collect_count = ei_from->collect_count;
+  ei_to->collect_score_initial = ei_from->collect_score_initial;
+  ei_to->collect_count_initial = ei_from->collect_count_initial;
 
   ei_to->push_delay_fixed = ei_from->push_delay_fixed;
   ei_to->push_delay_random = ei_from->push_delay_random;

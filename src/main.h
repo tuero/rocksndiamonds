@@ -1942,8 +1942,8 @@ struct ElementInfo
 
   int access_direction;		/* accessible from which direction */
 
-  int collect_score;		/* score value for collecting */
-  int collect_count;		/* count value for collecting */
+  int collect_score_initial;	/* initial score value for collecting */
+  int collect_count_initial;	/* initial count value for collecting */
 
   int push_delay_fixed;		/* constant delay before pushing */
   int push_delay_random;	/* additional random delay before pushing */
@@ -1968,8 +1968,6 @@ struct ElementInfo
   int explosion_delay;		/* duration of explosion of this element */
   int ignition_delay;		/* delay for explosion by other explosion */
 
-  int counter_initial;		/* initial value of generic CE counter */
-
   struct ElementChangeInfo *change_page; /* actual list of change pages */
   struct ElementChangeInfo *change;	 /* pointer to current change page */
 
@@ -1987,7 +1985,7 @@ struct ElementInfo
 
   boolean in_group[NUM_GROUP_ELEMENTS];
 
-  int counter;			/* current value of generic CE counter */
+  int collect_score;		/* runtime score value for collecting */
 
   /* ---------- internal values used in level editor ---------- */
 
@@ -2147,6 +2145,7 @@ extern short			MovDir[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short			MovDelay[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short			ChangeDelay[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short			ChangePage[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern short			Count[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short			Store[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short			Store2[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short			StorePlayer[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
