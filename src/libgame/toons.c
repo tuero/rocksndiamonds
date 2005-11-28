@@ -306,7 +306,7 @@ void HandleAnimation(int mode)
   static int toon_nr = 0;
   int draw_mode;
 
-  if (!setup.toons)
+  if (!setup.toons || screen_info.num_toons == 0)
     return;
 
   /* this may happen after reloading graphics and redefining "num_toons" */

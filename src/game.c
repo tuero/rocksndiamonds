@@ -99,6 +99,8 @@
 
 /* values for other actions */
 #define MOVE_STEPSIZE_NORMAL	(TILEX / MOVE_DELAY_NORMAL_SPEED)
+#define MOVE_STEPSIZE_MIN	(1)
+#define MOVE_STEPSIZE_MAX	(TILEX)
 
 #define GET_DX_FROM_DIR(d)	((d) == MV_LEFT ? -1 : (d) == MV_RIGHT ? 1 : 0)
 #define GET_DY_FROM_DIR(d)	((d) == MV_UP   ? -1 : (d) == MV_DOWN  ? 1 : 0)
@@ -6441,8 +6443,8 @@ static int getSpecialActionElement(int element, int number, int base_element)
 	  EL_EMPTY);
 }
 
-static int getModifiedActionNumber(int value_old, int value_min, int value_max,
-				   int operator, int operand)
+static int getModifiedActionNumber(int value_old, int operator, int operand,
+				   int value_min, int value_max)
 {
   int value_new = (operator == CA_MODE_ADD      ? value_old + operand :
 		   operator == CA_MODE_SUBTRACT ? value_old - operand :
@@ -6476,10 +6478,38 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
      action_arg == CA_ARG_ELEMENT_TARGET  ? change->target_element :
      EL_EMPTY);
 
+  int action_arg_number_min =
+    (action_type == CA_SET_PLAYER_SPEED ? MOVE_STEPSIZE_MIN :
+     CA_ARG_MIN);
+
+  int action_arg_number_max =
+    (action_type == CA_SET_PLAYER_SPEED ? MOVE_STEPSIZE_MAX :
+     action_type == CA_SET_GEMS ? 999 :
+     action_type == CA_SET_TIME ? 9999 :
+     action_type == CA_SET_SCORE ? 99999 :
+     action_type == CA_SET_CE_SCORE ? 9999 :
+     action_type == CA_SET_CE_COUNT ? 9999 :
+     CA_ARG_MAX);
+
+  int action_arg_number_reset =
+    (action_type == CA_SET_PLAYER_SPEED ? TILEX/game.initial_move_delay_value :
+     action_type == CA_SET_GEMS ? level.gems_needed :
+     action_type == CA_SET_TIME ? level.time :
+     action_type == CA_SET_SCORE ? 0 :
+     action_type == CA_SET_CE_SCORE ? 0 :
+     action_type == CA_SET_CE_COUNT ? ei->collect_count_initial :
+     0);
+
+  int action_arg_number_normal =
+    (action_type == CA_SET_PLAYER_SPEED ? MOVE_STEPSIZE_NORMAL :
+     action_arg_number_reset);
+
   int action_arg_number =
     (action_arg <= CA_ARG_MAX ? action_arg :
-     action_arg == CA_ARG_NUMBER_MIN ? CA_ARG_MIN :
-     action_arg == CA_ARG_NUMBER_MAX ? CA_ARG_MAX :
+     action_arg == CA_ARG_NUMBER_MIN ? action_arg_number_min :
+     action_arg == CA_ARG_NUMBER_MAX ? action_arg_number_max :
+     action_arg == CA_ARG_NUMBER_RESET ? action_arg_number_reset :
+     action_arg == CA_ARG_NUMBER_NORMAL ? action_arg_number_normal :
      action_arg == CA_ARG_NUMBER_CE_SCORE ? ei->collect_score :
 #if USE_NEW_COLLECT_COUNT
      action_arg == CA_ARG_NUMBER_CE_COUNT ? Count[x][y] :
@@ -6488,6 +6518,19 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
 #endif
      action_arg == CA_ARG_NUMBER_CE_DELAY ? GET_CHANGE_DELAY(change) :
      -1);
+
+  int action_arg_number_old =
+    (action_type == CA_SET_GEMS ? local_player->gems_still_needed :
+     action_type == CA_SET_TIME ? TimeLeft :
+     action_type == CA_SET_SCORE ? local_player->score :
+     action_type == CA_SET_CE_SCORE ? ei->collect_score :
+     action_type == CA_SET_CE_COUNT ? Count[x][y] :
+     0);
+
+  int action_arg_number_new =
+    getModifiedActionNumber(action_arg_number_old,
+			    action_mode, action_arg_number,
+			    action_arg_number_min, action_arg_number_max);
 
   /* (for explicit player choice, set invalid value to "no player") */
   int action_arg_player_bits =
@@ -6605,38 +6648,24 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
       {
 	if (trigger_player_bits & (1 << i))
 	{
-	  if (action_arg == CA_ARG_NUMBER_RESET)
-	    stored_player[i].move_delay_value = game.initial_move_delay_value;
-	  else if (action_arg == CA_ARG_NUMBER_NORMAL)
-	    stored_player[i].move_delay_value = MOVE_DELAY_NORMAL_SPEED;
-	  else if (action_arg == CA_ARG_NUMBER_MIN)
-	    stored_player[i].move_delay_value = 16;
-	  else if (action_arg == CA_ARG_NUMBER_MAX)
-	    stored_player[i].move_delay_value = MOVE_DELAY_HIGH_SPEED;
-	  else
-	  {
+	  int move_stepsize = TILEX / stored_player[i].move_delay_value;
+
+	  move_stepsize =
+	    getModifiedActionNumber(move_stepsize,
+				    action_mode,
+				    action_arg_number,
+				    action_arg_number_min,
+				    action_arg_number_max);
+
+	  /* make sure that value is power of 2 */
+	  move_stepsize = (1 << log_2(move_stepsize));
+
+	  stored_player[i].move_delay_value = TILEX / move_stepsize;
+
 #if 0
-	    if (action_mode == CA_MODE_ADD)
-	    {
-	      action_mode = CA_MODE_DIVIDE;
-	      action_arg_number = (1 << action_arg_number);
-	    }
-	    else if (action_mode == CA_MODE_SUBTRACT)
-	    {
-	      action_mode = CA_MODE_MULTIPLY;
-	      action_arg_number = (1 << action_arg_number);
-	    }
-
-	    int mode = (action_mode == CA_MODE_MULTIPLY ? CA_MODE_DIVIDE :
-			action_mode == CA_MODE_DIVIDE   ? CA_MODE_MULTIPLY :
-			action_mode);
-
-	    stored_player[i].move_delay_value =
-	      getModifiedActionNumber(stored_player[i].move_delay_value,
-				      1, 16,
-				      action_mode, action_arg_number);
+	  printf("::: move_delay_value == %d\n",
+		 stored_player[i].move_delay_value);
 #endif
-	  }
 	}
       }
 
@@ -6645,9 +6674,7 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
 
     case CA_SET_GEMS:
     {
-      local_player->gems_still_needed =
-	getModifiedActionNumber(local_player->gems_still_needed, 0, 999,
-				action_mode, action_arg_number);
+      local_player->gems_still_needed = action_arg_number_new;
 
       DrawGameValue_Emeralds(local_player->gems_still_needed);
 
@@ -6658,10 +6685,13 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
     {
       if (level.time > 0)	/* only modify limited time value */
       {
-	TimeLeft = getModifiedActionNumber(TimeLeft, 0, 9999,
-					   action_mode, action_arg_number);
+	TimeLeft = action_arg_number_new;
 
 	DrawGameValue_Time(TimeLeft);
+
+	if (!TimeLeft && setup.time_limit)
+	  for (i = 0; i < MAX_PLAYERS; i++)
+	    KillHero(&stored_player[i]);
       }
 
       break;
@@ -6669,9 +6699,7 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
 
     case CA_SET_SCORE:
     {
-      local_player->score =
-	getModifiedActionNumber(local_player->score, 0, 9999,
-				action_mode, action_arg_number);
+      local_player->score = action_arg_number_new;
 
       DrawGameValue_Score(local_player->score);
 
@@ -6680,9 +6708,8 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
 
     case CA_SET_CE_SCORE:
     {
-      ei->collect_score =
-	getModifiedActionNumber(ei->collect_score, 0, 9999,
-				action_mode, action_arg_number);
+      ei->collect_score = action_arg_number_new;
+
       break;
     }
 
@@ -6691,8 +6718,7 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
 #if USE_NEW_COLLECT_COUNT
       int count_last = Count[x][y];
 
-      Count[x][y] = getModifiedActionNumber(Count[x][y], 0, 9999,
-					    action_mode, action_arg_number);
+      Count[x][y] = action_arg_number_new;
 
 #if 0
       printf("::: Count == %d\n", Count[x][y]);

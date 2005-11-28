@@ -67,10 +67,10 @@ void InitToons()
   int num_toons = MAX_NUM_TOONS;
   int i;
 
-  if (global.num_toons > 0 && global.num_toons < MAX_NUM_TOONS)
+  if (global.num_toons >= 0 && global.num_toons < MAX_NUM_TOONS)
     num_toons = global.num_toons;
 
-  for (i=0; i < num_toons; i++)
+  for (i = 0; i < num_toons; i++)
   {
     int graphic = IMG_TOON_1 + i;
     struct FileInfo *image = getImageListEntryFromImageID(graphic);
