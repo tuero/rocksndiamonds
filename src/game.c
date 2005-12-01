@@ -29,6 +29,7 @@
 
 #define USE_NEW_SP_SLIPPERY		(TRUE	* USE_NEW_STUFF		* 1)
 #define USE_NEW_COLLECT_COUNT		(TRUE	* USE_NEW_STUFF		* 1)
+#define USE_NEW_PLAYER_ANIM		(TRUE	* USE_NEW_STUFF		* 1)
 
 
 /* for DigField() */
@@ -89,11 +90,18 @@
 #define INITIAL_MOVE_DELAY_ON	0
 
 /* values for player movement speed (which is in fact a delay value) */
+#define MOVE_DELAY_MIN_SPEED	32
 #define MOVE_DELAY_NORMAL_SPEED	8
 #define MOVE_DELAY_HIGH_SPEED	4
+#define MOVE_DELAY_MAX_SPEED	1
 
+#if 0
 #define DOUBLE_MOVE_DELAY(x)	(x = (x <= MOVE_DELAY_HIGH_SPEED ? x * 2 : x))
 #define HALVE_MOVE_DELAY(x)	(x = (x >= MOVE_DELAY_HIGH_SPEED ? x / 2 : x))
+#else
+#define DOUBLE_MOVE_DELAY(x)	(x = (x < MOVE_DELAY_MIN_SPEED ? x * 2 : x))
+#define HALVE_MOVE_DELAY(x)	(x = (x > MOVE_DELAY_MAX_SPEED ? x / 2 : x))
+#endif
 #define DOUBLE_PLAYER_SPEED(p)	(HALVE_MOVE_DELAY((p)->move_delay_value))
 #define HALVE_PLAYER_SPEED(p)	(DOUBLE_MOVE_DELAY((p)->move_delay_value))
 
@@ -5314,11 +5322,6 @@ void StartMoving(int x, int y)
     ContinueMoving(x, y);
 }
 
-/* (emacs is confused here for some reason; this makes it happy again ;-) ) */
-void dummy()
-{
-}
-
 void ContinueMoving(int x, int y)
 {
   int element = Feld[x][y];
@@ -7439,11 +7442,24 @@ void AdvanceFrameAndPlayerCounters(int player_nr)
   for (i = 0; i < MAX_PLAYERS; i++)
   {
     boolean advance_player_counters = (player_nr == -1 || player_nr == i);
-    int move_frames =
-      MOVE_DELAY_NORMAL_SPEED /  stored_player[i].move_delay_value;
+    int move_delay_value = stored_player[i].move_delay_value;
+    int move_frames = MOVE_DELAY_NORMAL_SPEED / move_delay_value;
 
     if (!advance_player_counters)	/* not all players may be affected */
       continue;
+
+#if USE_NEW_PLAYER_ANIM
+    if (move_frames == 0)	/* less than one move per game frame */
+    {
+      int stepsize = TILEX / move_delay_value;
+      int delay = move_delay_value / MOVE_DELAY_NORMAL_SPEED;
+      int count = (stored_player[i].is_moving ?
+		   ABS(stored_player[i].MovPos) / stepsize : FrameCounter);
+
+      if (count % delay == 0)
+	move_frames = 1;
+    }
+#endif
 
     stored_player[i].Frame += move_frames;
 
@@ -7698,11 +7714,20 @@ void GameActions()
     if (IS_CHANGING(x, y) &&
 	(game.engine_version < VERSION_IDENT(3,0,7,1) || !Stop[x][y]))
     {
+      int page = element_info[element].event_page_nr[CE_DELAY];
 #if 0
-      ChangeElement(x, y, ChangePage[x][y] != -1 ? ChangePage[x][y] :
-		    element_info[element].event_page_nr[CE_DELAY]);
+      ChangeElement(x, y, ChangePage[x][y] != -1 ? ChangePage[x][y] : page);
 #else
-      ChangeElement(x, y, element_info[element].event_page_nr[CE_DELAY]);
+
+#if 0
+      printf("::: ChangeDelay == %d\n", ChangeDelay[x][y]);
+#endif
+
+      if (CAN_CHANGE(element))
+	ChangeElement(x, y, page);
+
+      if (HAS_ACTION(element) && ChangeDelay[x][y] == 0)
+	ExecuteCustomElementAction(x, y, element, page);
 #endif
 
       element = Feld[x][y];

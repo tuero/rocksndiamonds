@@ -17,7 +17,7 @@
 	  (should be '#include <SDL.h>' instead)
 
 2005-08-20
-	* fixed bug preventing "walkable from no direction" from being ignored
+	* fixed bug which prevented "walkable from no direction" from working
 	  (due to compatibility code overwriting this setting after loading)
 
 2005-08-15

@@ -1881,6 +1881,10 @@ void DrawPlayer(struct PlayerInfo *player)
     {
       GfxElement[jx][jy] = EL_UNDEFINED;
 
+      /* make sure that pushed elements are drawn with correct frame rate */
+      if (player->is_pushing && player->is_moving)
+	GfxFrame[jx][jy] = player->StepFrame;
+
       DrawLevelField(jx, jy);
     }
   }
@@ -1930,6 +1934,7 @@ void DrawPlayer(struct PlayerInfo *player)
 	 player->is_moving, player_is_moving);
 #endif
 
+#if 1
   if (player->is_pushing && player->is_moving)
   {
     int px = SCREENX(jx), py = SCREENY(jy);
@@ -1952,6 +1957,7 @@ void DrawPlayer(struct PlayerInfo *player)
     /* masked drawing is needed for EMC style (double) movement graphics */
     DrawGraphicShiftedThruMask(px, py, pxx, pyy, graphic, frame, NO_CUTTING);
   }
+#endif
 
   /* ----------------------------------------------------------------------- */
   /* draw things in front of player (active dynamite or dynabombs)           */
