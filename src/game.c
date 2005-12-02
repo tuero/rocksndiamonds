@@ -30,6 +30,8 @@
 #define USE_NEW_SP_SLIPPERY		(TRUE	* USE_NEW_STUFF		* 1)
 #define USE_NEW_COLLECT_COUNT		(TRUE	* USE_NEW_STUFF		* 1)
 #define USE_NEW_PLAYER_ANIM		(TRUE	* USE_NEW_STUFF		* 1)
+#define USE_NEW_ALL_SLIPPERY		(TRUE	* USE_NEW_STUFF		* 1)
+#define USE_NEW_PLAYER_SPEED		(TRUE	* USE_NEW_STUFF		* 1)
 
 
 /* for DigField() */
@@ -1708,6 +1710,27 @@ void InitGame()
   game.emulation = (emulate_bd ? EMU_BOULDERDASH :
 		    emulate_sb ? EMU_SOKOBAN :
 		    emulate_sp ? EMU_SUPAPLEX : EMU_NONE);
+
+#if USE_NEW_ALL_SLIPPERY
+  /* initialize type of slippery elements */
+  for (i = 0; i < MAX_NUM_ELEMENTS; i++)
+  {
+    if (!IS_CUSTOM_ELEMENT(i))
+    {
+      /* default: elements slip down either to the left or right randomly */
+      element_info[i].slippery_type = SLIPPERY_ANY_RANDOM;
+
+      /* SP style elements prefer to slip down on the left side */
+      if (game.engine_version >= VERSION_IDENT(3,1,1,0) && IS_SP_ELEMENT(i))
+	element_info[i].slippery_type = SLIPPERY_ANY_LEFT_RIGHT;
+
+      /* BD style elements prefer to slip down on the left side */
+      if (i == EL_BD_ROCK || i == EL_BD_DIAMOND ||
+	  game.emulation == EMU_BOULDERDASH)
+	element_info[i].slippery_type = SLIPPERY_ANY_LEFT_RIGHT;
+    }
+  }
+#endif
 
   /* initialize explosion and ignition delay */
   for (i = 0; i < MAX_NUM_ELEMENTS; i++)
@@ -4767,11 +4790,26 @@ void StartMoving(int x, int y)
 				 Feld[x + 1][y + 1] == EL_ACID));
       boolean can_fall_any  = (can_fall_left || can_fall_right);
       boolean can_fall_both = (can_fall_left && can_fall_right);
+      int slippery_type = element_info[Feld[x][y + 1]].slippery_type;
 
+#if USE_NEW_ALL_SLIPPERY
+      if (can_fall_any && slippery_type != SLIPPERY_ANY_RANDOM)
+      {
+	if (slippery_type == SLIPPERY_ANY_LEFT_RIGHT && can_fall_both)
+	  can_fall_right = FALSE;
+	else if (slippery_type == SLIPPERY_ANY_RIGHT_LEFT && can_fall_both)
+	  can_fall_left = FALSE;
+	else if (slippery_type == SLIPPERY_ONLY_LEFT)
+	  can_fall_right = FALSE;
+	else if (slippery_type == SLIPPERY_ONLY_RIGHT)
+	  can_fall_left = FALSE;
+
+	can_fall_any  = (can_fall_left || can_fall_right);
+	can_fall_both = FALSE;
+      }
+#else
       if (can_fall_any && IS_CUSTOM_ELEMENT(Feld[x][y + 1]))
       {
-	int slippery_type = element_info[Feld[x][y + 1]].slippery_type;
-
 	if (slippery_type == SLIPPERY_ONLY_LEFT)
 	  can_fall_right = FALSE;
 	else if (slippery_type == SLIPPERY_ONLY_RIGHT)
@@ -4784,7 +4822,10 @@ void StartMoving(int x, int y)
 	can_fall_any  = (can_fall_left || can_fall_right);
 	can_fall_both = (can_fall_left && can_fall_right);
       }
+#endif
 
+#if USE_NEW_ALL_SLIPPERY
+#else
 #if USE_NEW_SP_SLIPPERY
       /* !!! better use the same properties as for custom elements here !!! */
       else if (game.engine_version >= VERSION_IDENT(3,1,1,0) &&
@@ -4794,7 +4835,15 @@ void StartMoving(int x, int y)
 	can_fall_both = FALSE;
       }
 #endif
+#endif
 
+#if USE_NEW_ALL_SLIPPERY
+      if (can_fall_both)
+      {
+	can_fall_left = !(can_fall_right = RND(2));
+	can_fall_both = FALSE;
+      }
+#else
       if (can_fall_both)
       {
 	if (game.emulation == EMU_BOULDERDASH ||
@@ -4805,6 +4854,7 @@ void StartMoving(int x, int y)
 
 	can_fall_both = FALSE;
       }
+#endif
 
       if (can_fall_any)
       {
@@ -6653,6 +6703,14 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
 	{
 	  int move_stepsize = TILEX / stored_player[i].move_delay_value;
 
+	  if (action_mode == CA_MODE_ADD || action_mode == CA_MODE_SUBTRACT)
+	  {
+	    /* translate "+" and "-" to "*" and "/" with powers of two */
+	    action_arg_number = 1 << action_arg_number;
+	    action_mode = (action_mode == CA_MODE_ADD ? CA_MODE_MULTIPLY :
+			   CA_MODE_DIVIDE);
+	  }
+
 	  move_stepsize =
 	    getModifiedActionNumber(move_stepsize,
 				    action_mode,
@@ -6666,8 +6724,8 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
 	  stored_player[i].move_delay_value = TILEX / move_stepsize;
 
 #if 0
-	  printf("::: move_delay_value == %d\n",
-		 stored_player[i].move_delay_value);
+	  printf("::: move_delay_value == %d [%d]\n",
+		 stored_player[i].move_delay_value, action_arg_number);
 #endif
 	}
       }
@@ -8441,8 +8499,16 @@ void ScrollPlayer(struct PlayerInfo *player, int mode)
   int last_jx = player->last_jx, last_jy = player->last_jy;
   int move_stepsize = TILEX / player->move_delay_value;
 
-  if (!player->active || !player->MovPos)
+#if USE_NEW_PLAYER_SPEED
+  if (!player->active)
     return;
+
+  if (player->MovPos == 0 && mode == SCROLL_GO_ON)	/* player not moving */
+    return;
+#else
+  if (!player->active || player->MovPos == 0)
+    return;
+#endif
 
   if (mode == SCROLL_INIT)
   {
@@ -8472,20 +8538,47 @@ void ScrollPlayer(struct PlayerInfo *player, int mode)
       MovDelay[last_jx][last_jy] = last_field_block_delay + 1;
     }
 
+#if USE_NEW_PLAYER_SPEED
+    if (player->MovPos != 0)	/* player has not yet reached destination */
+      return;
+#else
     return;
+#endif
   }
   else if (!FrameReached(&player->actual_frame_counter, 1))
     return;
 
+#if 0
+    printf("::: player->MovPos: %d -> %d\n",
+	   player->MovPos,
+	   player->MovPos + (player->MovPos > 0 ? -1 : 1) * move_stepsize);
+#endif
+
+#if USE_NEW_PLAYER_SPEED
+    if (player->MovPos != 0)
+    {
+      player->MovPos += (player->MovPos > 0 ? -1 : 1) * move_stepsize;
+      player->GfxPos = move_stepsize * (player->MovPos / move_stepsize);
+
+      /* before DrawPlayer() to draw correct player graphic for this case */
+      if (player->MovPos == 0)
+	CheckGravityMovement(player);
+    }
+#else
   player->MovPos += (player->MovPos > 0 ? -1 : 1) * move_stepsize;
   player->GfxPos = move_stepsize * (player->MovPos / move_stepsize);
 
   /* before DrawPlayer() to draw correct player graphic for this case */
   if (player->MovPos == 0)
     CheckGravityMovement(player);
+#endif
 
   if (player->MovPos == 0)	/* player reached destination field */
   {
+#if 0
+    printf("::: player reached destination field\n");
+#endif
+
     if (player->move_delay_reset_counter > 0)
     {
       player->move_delay_reset_counter--;
