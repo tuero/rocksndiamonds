@@ -25,13 +25,13 @@
 #define USE_NEW_AMOEBA_CODE	FALSE
 
 /* EXPERIMENTAL STUFF */
-#define USE_NEW_STUFF			(TRUE				* 1)
+#define USE_NEW_STUFF			(			* 1)
 
-#define USE_NEW_SP_SLIPPERY		(TRUE	* USE_NEW_STUFF		* 1)
-#define USE_NEW_COLLECT_COUNT		(TRUE	* USE_NEW_STUFF		* 1)
-#define USE_NEW_PLAYER_ANIM		(TRUE	* USE_NEW_STUFF		* 1)
-#define USE_NEW_ALL_SLIPPERY		(TRUE	* USE_NEW_STUFF		* 1)
-#define USE_NEW_PLAYER_SPEED		(TRUE	* USE_NEW_STUFF		* 1)
+#define USE_NEW_SP_SLIPPERY		(USE_NEW_STUFF		* 1)
+#define USE_NEW_COLLECT_COUNT		(USE_NEW_STUFF		* 1)
+#define USE_NEW_PLAYER_ANIM		(USE_NEW_STUFF		* 1)
+#define USE_NEW_ALL_SLIPPERY		(USE_NEW_STUFF		* 1)
+#define USE_NEW_PLAYER_SPEED		(USE_NEW_STUFF		* 1)
 
 
 /* for DigField() */
@@ -1725,8 +1725,7 @@ void InitGame()
 	element_info[i].slippery_type = SLIPPERY_ANY_LEFT_RIGHT;
 
       /* BD style elements prefer to slip down on the left side */
-      if (i == EL_BD_ROCK || i == EL_BD_DIAMOND ||
-	  game.emulation == EMU_BOULDERDASH)
+      if (game.emulation == EMU_BOULDERDASH)
 	element_info[i].slippery_type = SLIPPERY_ANY_LEFT_RIGHT;
     }
   }
@@ -4840,7 +4839,11 @@ void StartMoving(int x, int y)
 #if USE_NEW_ALL_SLIPPERY
       if (can_fall_both)
       {
-	can_fall_left = !(can_fall_right = RND(2));
+	if (element == EL_BD_ROCK || element == EL_BD_DIAMOND)
+	  can_fall_right = FALSE;	/* slip down on left side */
+	else
+	  can_fall_left = !(can_fall_right = RND(2));
+
 	can_fall_both = FALSE;
       }
 #else
