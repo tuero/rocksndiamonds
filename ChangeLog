@@ -1,3 +1,9 @@
+2005-12-03
+	* fixed major bug which prevented private levels from being edited
+
+2005-12-02
+	* fixed graphical bug with player animation when player moves slowly
+
 2005-11-28
 	* fixed bug which prevented "global.num_toons: 0" from working
 
