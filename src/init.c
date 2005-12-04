@@ -202,9 +202,27 @@ void InitFontGraphicInfo()
     int font_nr = font_to_graphic[i].font_nr;
     int special = font_to_graphic[i].special;
     int graphic = font_to_graphic[i].graphic;
+#if 1
+    int base_graphic =
+      font_info[font_nr].special_graphic[GFX_SPECIAL_ARG_DEFAULT];
+#endif
 
     if (special >= 0 && special < NUM_SPECIAL_GFX_ARGS)
     {
+#if 1
+      boolean base_redefined =
+	getImageListEntryFromImageID(base_graphic)->redefined;
+      boolean special_redefined =
+	getImageListEntryFromImageID(graphic)->redefined;
+
+      /* if the base font ("font.title_1", for example) has been redefined,
+      	 but not the special font ("font.title_1.LEVELS", for example), do not
+	 use an existing (in this case considered obsolete) special font
+	 anymore, but use the automatically determined default font */
+      if (base_redefined && !special_redefined)
+	continue;
+#endif
+
       font_info[font_nr].special_graphic[special] = graphic;
       font_info[font_nr].special_bitmap_id[special] = num_font_bitmaps;
       num_font_bitmaps++;

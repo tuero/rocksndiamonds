@@ -115,28 +115,29 @@ static Bitmap *scrollbar_bitmap[NUM_SCROLLBAR_BITMAPS];
 #endif
 
 
-static void drawCursorExt(int xpos, int ypos, int color, int graphic)
+static void drawCursorExt(int xpos, int ypos, int color, int g)
 {
   static int cursor_array[SCR_FIELDY];
 
   if (xpos == 0)
   {
-    if (graphic != 0)
-      cursor_array[ypos] = graphic;
+    if (g != 0)
+      cursor_array[ypos] = g;
     else
-      graphic = cursor_array[ypos];
+      g = cursor_array[ypos];
   }
 
   if (color == FC_RED)
-    graphic = (graphic == IMG_MENU_BUTTON_LEFT  ? IMG_MENU_BUTTON_LEFT_ACTIVE :
-	       graphic == IMG_MENU_BUTTON_RIGHT ? IMG_MENU_BUTTON_RIGHT_ACTIVE:
-	       IMG_MENU_BUTTON_ACTIVE);
+    g = (g == IMG_MENU_BUTTON_LEFT  ? IMG_MENU_BUTTON_LEFT_ACTIVE  :
+	 g == IMG_MENU_BUTTON_RIGHT ? IMG_MENU_BUTTON_RIGHT_ACTIVE :
+	 g == IMG_MENU_BUTTON_LEAVE_MENU ? IMG_MENU_BUTTON_LEAVE_MENU_ACTIVE :
+	 g == IMG_MENU_BUTTON_ENTER_MENU ? IMG_MENU_BUTTON_ENTER_MENU_ACTIVE :
+	 IMG_MENU_BUTTON_ACTIVE);
 
   ypos += MENU_SCREEN_START_YPOS;
 
   DrawBackground(mSX + xpos * TILEX, mSY + ypos * TILEY, TILEX, TILEY);
-  DrawGraphicThruMaskExt(drawto, mSX + xpos * TILEX, mSY + ypos * TILEY,
-			 graphic, 0);
+  DrawGraphicThruMaskExt(drawto, mSX + xpos * TILEX, mSY + ypos * TILEY, g, 0);
 }
 
 static void initCursor(int ypos, int graphic)
@@ -323,11 +324,11 @@ void DrawMainMenu()
   }
 
   for (i = 0; i < 8; i++)
-    initCursor(i, (i == 1 || i == 4 || i == 6 ? IMG_MENU_BUTTON_RIGHT :
+    initCursor(i, (i == 1 || i == 4 || i == 6 ? IMG_MENU_BUTTON_ENTER_MENU :
 		   IMG_MENU_BUTTON));
 
-  drawCursorXY(level_width/32 + 4, 1, IMG_MENU_BUTTON_LEFT);
-  drawCursorXY(level_width/32 + 8, 1, IMG_MENU_BUTTON_RIGHT);
+  drawCursorXY(level_width / 32 + 4, 1, IMG_MENU_BUTTON_LEFT);
+  drawCursorXY(level_width / 32 + 8, 1, IMG_MENU_BUTTON_RIGHT);
 
   DrawTextSCentered(326, FONT_TITLE_2, "A Game by Artsoft Entertainment");
 
@@ -612,9 +613,9 @@ static void DrawInfoScreen_Main()
     DrawText(mSX + 32, mSY + ypos * 32, info_info[i].text, font_nr);
 
     if (info_info[i].type & TYPE_ENTER_MENU)
-      initCursor(i, IMG_MENU_BUTTON_RIGHT);
+      initCursor(i, IMG_MENU_BUTTON_ENTER_MENU);
     else if (info_info[i].type & TYPE_LEAVE_MENU)
-      initCursor(i, IMG_MENU_BUTTON_LEFT);
+      initCursor(i, IMG_MENU_BUTTON_LEAVE_MENU);
     else if (info_info[i].type & ~TYPE_SKIP_ENTRY)
       initCursor(i, IMG_MENU_BUTTON);
 
@@ -1435,9 +1436,9 @@ static void drawChooseTreeList(int first_entry, int num_page_entries,
     DrawText(mSX + 32, mSY + ypos * 32, buffer, FONT_TEXT_1 + node->color);
 
     if (node->parent_link)
-      initCursor(i, IMG_MENU_BUTTON_LEFT);
+      initCursor(i, IMG_MENU_BUTTON_LEAVE_MENU);
     else if (node->level_group)
-      initCursor(i, IMG_MENU_BUTTON_RIGHT);
+      initCursor(i, IMG_MENU_BUTTON_ENTER_MENU);
     else
       initCursor(i, IMG_MENU_BUTTON);
   }
@@ -2225,9 +2226,9 @@ static void DrawSetupScreen_Generic()
     DrawText(mSX + 32, mSY + ypos * 32, setup_info[i].text, font_nr);
 
     if (setup_info[i].type & TYPE_ENTER_MENU)
-      initCursor(i, IMG_MENU_BUTTON_RIGHT);
+      initCursor(i, IMG_MENU_BUTTON_ENTER_MENU);
     else if (setup_info[i].type & TYPE_LEAVE_MENU)
-      initCursor(i, IMG_MENU_BUTTON_LEFT);
+      initCursor(i, IMG_MENU_BUTTON_LEAVE_MENU);
     else if (setup_info[i].type & ~TYPE_SKIP_ENTRY)
       initCursor(i, IMG_MENU_BUTTON);
 
@@ -2339,10 +2340,10 @@ void DrawSetupScreen_Input()
 
   DrawText(mSX+16, mSY+16, "Setup Input", FONT_TITLE_1);
 
-  initCursor(0, IMG_MENU_BUTTON);
-  initCursor(1, IMG_MENU_BUTTON);
-  initCursor(2, IMG_MENU_BUTTON_RIGHT);
-  initCursor(13, IMG_MENU_BUTTON_LEFT);
+  initCursor(0,  IMG_MENU_BUTTON);
+  initCursor(1,  IMG_MENU_BUTTON);
+  initCursor(2,  IMG_MENU_BUTTON_ENTER_MENU);
+  initCursor(13, IMG_MENU_BUTTON_LEAVE_MENU);
 
   drawCursorXY(10, 0, IMG_MENU_BUTTON_LEFT);
   drawCursorXY(12, 0, IMG_MENU_BUTTON_RIGHT);
