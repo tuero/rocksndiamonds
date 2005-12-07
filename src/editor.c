@@ -1553,11 +1553,12 @@ static struct ValueTextInfo options_action_type[] =
 static struct ValueTextInfo options_action_mode[] =
 {
   { CA_MODE_UNDEFINED,		" "				},
+  { CA_MODE_SET,		"="				},
   { CA_MODE_ADD,		"+"				},
   { CA_MODE_SUBTRACT,		"-"				},
   { CA_MODE_MULTIPLY,		"*"				},
   { CA_MODE_DIVIDE,		"/"				},
-  { CA_MODE_SET,		"="				},
+  { CA_MODE_MODULO,		"%"				},
 
   { -1,				NULL				}
 };

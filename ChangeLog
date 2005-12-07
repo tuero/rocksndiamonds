@@ -1,3 +1,6 @@
+2005-12-05
+	* fixed graphical bug with smashing elements falling faster than player
+
 2005-12-03
 	* fixed major bug which prevented private levels from being edited
 	* fixed bug with precedence of general and special font definitions

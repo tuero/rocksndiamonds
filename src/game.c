@@ -245,8 +245,8 @@ static void InitBeltMovement(void);
 static void CloseAllOpenTimegates(void);
 static void CheckGravityMovement(struct PlayerInfo *);
 static void CheckGravityMovementWhenNotMoving(struct PlayerInfo *);
-static void KillHeroUnlessEnemyProtected(int, int);
-static void KillHeroUnlessExplosionProtected(int, int);
+static void KillPlayerUnlessEnemyProtected(int, int);
+static void KillPlayerUnlessExplosionProtected(int, int);
 
 static void TestIfPlayerTouchesCustomElement(int, int);
 static void TestIfElementTouchesCustomElement(int, int);
@@ -2331,7 +2331,7 @@ void GameWon()
     PlayLevelSoundElementAction(ExitX, ExitY, element, ACTION_CLOSING);
   }
 
-  /* Hero disappears */
+  /* player disappears */
   if (ExitX >= 0 && ExitY >= 0)
     DrawLevelField(ExitX, ExitY);
 
@@ -2899,7 +2899,7 @@ void RelocatePlayer(int jx, int jy, int el_player_raw)
   if (player == local_player)	/* only visually relocate local player */
     DrawRelocatePlayer(player);
 
-  TestIfHeroTouchesBadThing(jx, jy);
+  TestIfPlayerTouchesBadThing(jx, jy);
   TestIfPlayerTouchesCustomElement(jx, jy);
 
   if (IS_CUSTOM_ELEMENT(element))
@@ -3150,7 +3150,7 @@ void Explode(int ex, int ey, int phase, int mode)
     if (IS_PLAYER(x, y) && PLAYERINFO(x, y)->present &&
 	!PLAYER_EXPLOSION_PROTECTED(x, y))
     {
-      KillHeroUnlessExplosionProtected(x, y);
+      KillPlayerUnlessExplosionProtected(x, y);
       border_explosion = TRUE;
     }
     else if (CAN_EXPLODE_BY_EXPLOSION(border_element))
@@ -3744,7 +3744,7 @@ void Impact(int x, int y)
   if (impact && element == EL_AMOEBA_DROP)
   {
     if (object_hit && IS_PLAYER(x, y + 1))
-      KillHeroUnlessEnemyProtected(x, y + 1);
+      KillPlayerUnlessEnemyProtected(x, y + 1);
     else if (object_hit && smashed == EL_PENGUIN)
       Bang(x, y + 1);
     else
@@ -3786,7 +3786,7 @@ void Impact(int x, int y)
     {
       if (CAN_SMASH_PLAYER(element))
       {
-	KillHeroUnlessEnemyProtected(x, y + 1);
+	KillPlayerUnlessEnemyProtected(x, y + 1);
 	return;
       }
     }
@@ -5060,7 +5060,7 @@ void StartMoving(int x, int y)
 	IN_LEV_FIELD(newx, newy) && IS_PLAYER(newx, newy) &&
 	!PLAYER_ENEMY_PROTECTED(newx, newy))
     {
-      TestIfBadThingRunsIntoHero(x, y, MovDir[x][y]);
+      TestIfBadThingRunsIntoPlayer(x, y, MovDir[x][y]);
 
       return;
     }
@@ -5361,7 +5361,7 @@ void StartMoving(int x, int y)
 	DrawLevelElementAnimation(x, y, element);
 
       if (DONT_TOUCH(element))
-	TestIfBadThingTouchesHero(x, y);
+	TestIfBadThingTouchesPlayer(x, y);
 
       return;
     }
@@ -5583,7 +5583,7 @@ void ContinueMoving(int x, int y)
 
   if (DONT_TOUCH(element))	/* object may be nasty to player or others */
   {
-    TestIfBadThingTouchesHero(newx, newy);
+    TestIfBadThingTouchesPlayer(newx, newy);
     TestIfBadThingTouchesFriend(newx, newy);
 
     if (!IS_CUSTOM_ELEMENT(element))
@@ -6502,11 +6502,12 @@ static int getSpecialActionElement(int element, int number, int base_element)
 static int getModifiedActionNumber(int value_old, int operator, int operand,
 				   int value_min, int value_max)
 {
-  int value_new = (operator == CA_MODE_ADD      ? value_old + operand :
+  int value_new = (operator == CA_MODE_SET      ? operand :
+		   operator == CA_MODE_ADD      ? value_old + operand :
 		   operator == CA_MODE_SUBTRACT ? value_old - operand :
 		   operator == CA_MODE_MULTIPLY ? value_old * operand :
 		   operator == CA_MODE_DIVIDE   ? value_old / MAX(1, operand) :
-		   operator == CA_MODE_SET      ? operand :
+		   operator == CA_MODE_MODULO   ? value_old % MAX(1, operand) :
 		   value_old);
 
   return (value_new < value_min ? value_min :
@@ -6629,7 +6630,7 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
     {
       for (i = 0; i < MAX_PLAYERS; i++)
 	if (action_arg_player_bits & (1 << i))
-	  KillHero(&stored_player[i]);
+	  KillPlayer(&stored_player[i]);
 
       break;
     }
@@ -6755,7 +6756,7 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
 
 	if (!TimeLeft && setup.time_limit)
 	  for (i = 0; i < MAX_PLAYERS; i++)
-	    KillHero(&stored_player[i]);
+	    KillPlayer(&stored_player[i]);
       }
 
       break;
@@ -6898,7 +6899,7 @@ static void ChangeElementNowExt(struct ElementChangeInfo *change,
   Changed[x][y] |= ChangeEvent[x][y];	/* ignore same changes in this frame */
 #endif
 
-  TestIfBadThingTouchesHero(x, y);
+  TestIfBadThingTouchesPlayer(x, y);
   TestIfPlayerTouchesCustomElement(x, y);
   TestIfElementTouchesCustomElement(x, y);
 }
@@ -8032,7 +8033,7 @@ void GameActions()
 
 	if (!TimeLeft && setup.time_limit)
 	  for (i = 0; i < MAX_PLAYERS; i++)
-	    KillHero(&stored_player[i]);
+	    KillPlayer(&stored_player[i]);
       }
       else if (level.time == 0 && !AllPlayersGone) /* level w/o time limit */
 	DrawGameValue_Time(TimePlayed);
@@ -8268,10 +8269,10 @@ boolean MovePlayerOneStep(struct PlayerInfo *player,
       InitMovingField(jx, jy, MV_DOWN);
       Store[jx][jy] = EL_ACID;
       ContinueMoving(jx, jy);
-      BuryHero(player);
+      BuryPlayer(player);
     }
     else
-      TestIfHeroRunsIntoBadThing(jx, jy, player->MovDir);
+      TestIfPlayerRunsIntoBadThing(jx, jy, player->MovDir);
 
     return MF_MOVING;
   }
@@ -8486,12 +8487,12 @@ boolean MovePlayer(struct PlayerInfo *player, int dx, int dy)
 
   if (game.engine_version < VERSION_IDENT(3,0,7,0))
   {
-    TestIfHeroTouchesBadThing(jx, jy);
+    TestIfPlayerTouchesBadThing(jx, jy);
     TestIfPlayerTouchesCustomElement(jx, jy);
   }
 
   if (!player->active)
-    RemoveHero(player);
+    RemovePlayer(player);
 
   return moved;
 }
@@ -8604,7 +8605,7 @@ void ScrollPlayer(struct PlayerInfo *player, int mode)
 	Feld[jx][jy] == EL_SP_EXIT_OPENING)	/* <-- special case */
     {
       DrawPlayer(player);	/* needed here only to cleanup last field */
-      RemoveHero(player);
+      RemovePlayer(player);
 
       if (local_player->friends_still_needed == 0 ||
 	  IS_SP_ELEMENT(Feld[jx][jy]))
@@ -8639,7 +8640,7 @@ void ScrollPlayer(struct PlayerInfo *player, int mode)
 
     if (game.engine_version >= VERSION_IDENT(3,0,7,0))
     {
-      TestIfHeroTouchesBadThing(jx, jy);
+      TestIfPlayerTouchesBadThing(jx, jy);
       TestIfPlayerTouchesCustomElement(jx, jy);
 
       /* needed because pushed element has not yet reached its destination,
@@ -8648,7 +8649,7 @@ void ScrollPlayer(struct PlayerInfo *player, int mode)
 	TestIfElementTouchesCustomElement(jx, jy);	/* for empty space */
 
       if (!player->active)
-	RemoveHero(player);
+	RemovePlayer(player);
     }
 
     if (level.use_step_counter)
@@ -8668,7 +8669,7 @@ void ScrollPlayer(struct PlayerInfo *player, int mode)
 
 	if (!TimeLeft && setup.time_limit)
 	  for (i = 0; i < MAX_PLAYERS; i++)
-	    KillHero(&stored_player[i]);
+	    KillPlayer(&stored_player[i]);
       }
       else if (level.time == 0 && !AllPlayersGone) /* level w/o time limit */
 	DrawGameValue_Time(TimePlayed);
@@ -9007,7 +9008,7 @@ void TestIfGoodThingHitsBadThing(int good_x, int good_y, int good_move_dir)
 	  !IS_INDESTRUCTIBLE(bad_element))
 	Bang(kill_x, kill_y);
       else if (!PLAYER_ENEMY_PROTECTED(good_x, good_y))
-	KillHero(player);
+	KillPlayer(player);
     }
     else
       Bang(good_x, good_y);
@@ -9100,29 +9101,29 @@ void TestIfBadThingHitsGoodThing(int bad_x, int bad_y, int bad_move_dir)
 	  !IS_INDESTRUCTIBLE(bad_element))
 	Bang(bad_x, bad_y);
       else if (!PLAYER_ENEMY_PROTECTED(kill_x, kill_y))
-	KillHero(player);
+	KillPlayer(player);
     }
     else
       Bang(kill_x, kill_y);
   }
 }
 
-void TestIfHeroTouchesBadThing(int x, int y)
+void TestIfPlayerTouchesBadThing(int x, int y)
 {
   TestIfGoodThingHitsBadThing(x, y, MV_NO_MOVING);
 }
 
-void TestIfHeroRunsIntoBadThing(int x, int y, int move_dir)
+void TestIfPlayerRunsIntoBadThing(int x, int y, int move_dir)
 {
   TestIfGoodThingHitsBadThing(x, y, move_dir);
 }
 
-void TestIfBadThingTouchesHero(int x, int y)
+void TestIfBadThingTouchesPlayer(int x, int y)
 {
   TestIfBadThingHitsGoodThing(x, y, MV_NO_MOVING);
 }
 
-void TestIfBadThingRunsIntoHero(int x, int y, int move_dir)
+void TestIfBadThingRunsIntoPlayer(int x, int y, int move_dir)
 {
   TestIfBadThingHitsGoodThing(x, y, move_dir);
 }
@@ -9171,7 +9172,7 @@ void TestIfBadThingTouchesOtherBadThing(int bad_x, int bad_y)
     Bang(bad_x, bad_y);
 }
 
-void KillHero(struct PlayerInfo *player)
+void KillPlayer(struct PlayerInfo *player)
 {
   int jx = player->jx, jy = player->jy;
 
@@ -9186,22 +9187,22 @@ void KillHero(struct PlayerInfo *player)
   player->shield_deadly_time_left = 0;
 
   Bang(jx, jy);
-  BuryHero(player);
+  BuryPlayer(player);
 }
 
-static void KillHeroUnlessEnemyProtected(int x, int y)
+static void KillPlayerUnlessEnemyProtected(int x, int y)
 {
   if (!PLAYER_ENEMY_PROTECTED(x, y))
-    KillHero(PLAYERINFO(x, y));
+    KillPlayer(PLAYERINFO(x, y));
 }
 
-static void KillHeroUnlessExplosionProtected(int x, int y)
+static void KillPlayerUnlessExplosionProtected(int x, int y)
 {
   if (!PLAYER_EXPLOSION_PROTECTED(x, y))
-    KillHero(PLAYERINFO(x, y));
+    KillPlayer(PLAYERINFO(x, y));
 }
 
-void BuryHero(struct PlayerInfo *player)
+void BuryPlayer(struct PlayerInfo *player)
 {
   int jx = player->jx, jy = player->jy;
 
@@ -9212,10 +9213,10 @@ void BuryHero(struct PlayerInfo *player)
   PlayLevelSound(jx, jy, SND_GAME_LOSING);
 
   player->GameOver = TRUE;
-  RemoveHero(player);
+  RemovePlayer(player);
 }
 
-void RemoveHero(struct PlayerInfo *player)
+void RemovePlayer(struct PlayerInfo *player)
 {
   int jx = player->jx, jy = player->jy;
   int i, found = FALSE;
@@ -9225,6 +9226,9 @@ void RemoveHero(struct PlayerInfo *player)
 
   if (!ExplodeField[jx][jy])
     StorePlayer[jx][jy] = 0;
+
+  if (player->is_moving)
+    DrawLevelField(player->last_jx, player->last_jy);
 
   for (i = 0; i < MAX_PLAYERS; i++)
     if (stored_player[i].active)

@@ -290,11 +290,12 @@
 
 /* values for change action mode for custom elements */
 #define CA_MODE_UNDEFINED	0
-#define CA_MODE_ADD		1
-#define CA_MODE_SUBTRACT	2
-#define CA_MODE_MULTIPLY	3
-#define CA_MODE_DIVIDE		4
-#define CA_MODE_SET		5
+#define CA_MODE_SET		1
+#define CA_MODE_ADD		2
+#define CA_MODE_SUBTRACT	3
+#define CA_MODE_MULTIPLY	4
+#define CA_MODE_DIVIDE		5
+#define CA_MODE_MODULO		6
 
 /* values for change action parameters for custom elements */
 #define CA_ARG_MIN		0
