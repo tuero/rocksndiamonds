@@ -1353,8 +1353,9 @@
 #define GFX_ARG_POST_DELAY_RANDOM	35
 #define GFX_ARG_NAME			36
 #define GFX_ARG_SCALE_UP_FACTOR		37
+#define GFX_ARG_CLONE_FROM		38
 
-#define NUM_GFX_ARGS			38
+#define NUM_GFX_ARGS			39
 
 
 /* values for sound configuration suffixes */
@@ -2018,6 +2019,9 @@ struct FontInfo
 struct GraphicInfo
 {
   Bitmap *bitmap;
+  int src_image_width;		/* scaled bitmap size, but w/o small images */
+  int src_image_height;		/* scaled bitmap size, but w/o small images */
+
   int src_x, src_y;		/* start position of animation frames */
   int width, height;		/* width/height of each animation frame */
   int offset_x, offset_y;	/* x/y offset to next animation frame */
@@ -2034,6 +2038,7 @@ struct GraphicInfo
   int diggable_like;		/* element for cloning digging graphics */
   int border_size;		/* border size for "crumbled" graphics */
   int scale_up_factor;		/* optional factor for scaling image up */
+  int clone_from;		/* graphic for cloning *all* settings */
 
   int anim_delay_fixed;		/* optional delay values for bored and   */
   int anim_delay_random;	/* sleeping player animations (animation */

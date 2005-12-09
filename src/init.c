@@ -199,17 +199,13 @@ void InitFontGraphicInfo()
   /* initialize special font/graphic mapping from static configuration */
   for (i = 0; font_to_graphic[i].font_nr > -1; i++)
   {
-    int font_nr = font_to_graphic[i].font_nr;
-    int special = font_to_graphic[i].special;
-    int graphic = font_to_graphic[i].graphic;
-#if 1
-    int base_graphic =
-      font_info[font_nr].special_graphic[GFX_SPECIAL_ARG_DEFAULT];
-#endif
+    int font_nr      = font_to_graphic[i].font_nr;
+    int special      = font_to_graphic[i].special;
+    int graphic      = font_to_graphic[i].graphic;
+    int base_graphic = font2baseimg(font_nr);
 
     if (special >= 0 && special < NUM_SPECIAL_GFX_ARGS)
     {
-#if 1
       boolean base_redefined =
 	getImageListEntryFromImageID(base_graphic)->redefined;
       boolean special_redefined =
@@ -221,7 +217,6 @@ void InitFontGraphicInfo()
 	 anymore, but use the automatically determined default font */
       if (base_redefined && !special_redefined)
 	continue;
-#endif
 
       font_info[font_nr].special_graphic[special] = graphic;
       font_info[font_nr].special_bitmap_id[special] = num_font_bitmaps;
@@ -793,10 +788,28 @@ void InitElementSpecialGraphicInfo()
 static int get_element_from_token(char *token)
 {
   int i;
+  int x = 0;
 
   for (i = 0; i < MAX_NUM_ELEMENTS; i++)
     if (strcmp(element_info[i].token_name, token) == 0)
       return i;
+
+#if 1
+  for (i = 0; image_config[i].token != NULL; i++)
+  {
+    int len_config_value = strlen(image_config[i].value);
+
+    if (strcmp(&image_config[i].value[len_config_value - 4], ".pcx") != 0 &&
+	strcmp(&image_config[i].value[len_config_value - 4], ".wav") != 0 &&
+	strcmp(image_config[i].value, UNDEFINED_FILENAME) != 0)
+      continue;
+
+    if (strcmp(image_config[i].token, token) == 0)
+      return x;
+
+    x++;
+  }
+#endif
 
   return -1;
 }
@@ -827,6 +840,15 @@ static void set_graphic_parameters(int graphic, int graphic_copy_from)
   int anim_frames_per_line = 1;
   int i;
 
+#if 1
+  if (graphic != graphic_copy_from)
+  {
+    graphic_info[graphic] = graphic_info[graphic_copy_from];
+
+    return;
+  }
+#endif
+
   /* if fallback to default artwork is done, also use the default parameters */
   if (image->fallback_to_default)
     parameter_raw = image->default_parameter;
@@ -845,6 +867,8 @@ static void set_graphic_parameters(int graphic, int graphic_copy_from)
   graphic_info[graphic].bitmap = src_bitmap;
 
   /* start with reliable default values */
+  graphic_info[graphic].src_image_width = 0;
+  graphic_info[graphic].src_image_height = 0;
   graphic_info[graphic].src_x = 0;
   graphic_info[graphic].src_y = 0;
   graphic_info[graphic].width = TILEX;
@@ -858,6 +882,7 @@ static void set_graphic_parameters(int graphic, int graphic_copy_from)
   graphic_info[graphic].diggable_like = -1;	/* do not use clone element */
   graphic_info[graphic].border_size = TILEX / 8;  /* "CRUMBLED" border size */
   graphic_info[graphic].scale_up_factor = 1;	/* default: no scaling up */
+  graphic_info[graphic].clone_from = -1;	/* do not use clone graphic */
   graphic_info[graphic].anim_delay_fixed = 0;
   graphic_info[graphic].anim_delay_random = 0;
   graphic_info[graphic].post_delay_fixed = 0;
@@ -890,11 +915,14 @@ static void set_graphic_parameters(int graphic, int graphic_copy_from)
   if (src_bitmap)
   {
     /* get final bitmap size (with scaling, but without small images) */
-    int src_bitmap_width  = get_scaled_graphic_width(graphic);
-    int src_bitmap_height = get_scaled_graphic_height(graphic);
+    int src_image_width  = get_scaled_graphic_width(graphic);
+    int src_image_height = get_scaled_graphic_height(graphic);
 
-    anim_frames_per_row = src_bitmap_width  / graphic_info[graphic].width;
-    anim_frames_per_col = src_bitmap_height / graphic_info[graphic].height;
+    anim_frames_per_row = src_image_width  / graphic_info[graphic].width;
+    anim_frames_per_col = src_image_height / graphic_info[graphic].height;
+
+    graphic_info[graphic].src_image_width  = src_image_width;
+    graphic_info[graphic].src_image_height = src_image_height;
   }
 
   /* correct x or y offset dependent of vertical or horizontal frame order */
@@ -1017,6 +1045,26 @@ static void set_graphic_parameters(int graphic, int graphic_copy_from)
 
   /* this is only used for drawing envelope graphics */
   graphic_info[graphic].draw_masked = parameter[GFX_ARG_DRAW_MASKED];
+
+#if 1
+  /* optional graphic for cloning all graphics settings */
+  if (parameter[GFX_ARG_CLONE_FROM] != ARG_UNDEFINED_VALUE)
+    graphic_info[graphic].clone_from = parameter[GFX_ARG_CLONE_FROM];
+#else
+  /* optional graphic for cloning all graphics settings */
+  if (parameter[GFX_ARG_CLONE_FROM] != ARG_UNDEFINED_VALUE)
+  {
+    if (parameter[GFX_ARG_CLONE_FROM] != -1)
+    {
+      int clone_graphic = parameter[GFX_ARG_CLONE_FROM];
+
+      graphic_info[graphic] = graphic_info[clone_graphic];
+      graphic_info[graphic].clone_from = clone_graphic;
+
+      printf("::: %d -> %d\n", graphic, clone_graphic);
+    }
+  }
+#endif
 }
 
 static void InitGraphicInfo()
@@ -1053,6 +1101,54 @@ static void InitGraphicInfo()
   }
 #endif
 
+#if 1
+  /* first set all graphic paramaters ... */
+  for (i = 0; i < num_images; i++)
+  {
+    set_graphic_parameters(i, i);
+  }
+
+  /* ... then copy these parameters for cloned graphics */
+  for (i = 0; i < num_images; i++)
+  {
+    if (graphic_info[i].clone_from != -1)
+    {
+      int clone_graphic = graphic_info[i].clone_from;
+
+      if (graphic_info[clone_graphic].clone_from != -1)
+      {
+	Error(ERR_RETURN_LINE, "-");
+	Error(ERR_RETURN, "warning: error found in config file:");
+	Error(ERR_RETURN, "- config file: '%s'", getImageConfigFilename());
+	Error(ERR_RETURN, "- config token: '%s'", getTokenFromImageID(i));
+	Error(ERR_RETURN,
+	      "error: cannot clone from already cloned graphic '%s'",
+	      getTokenFromImageID(clone_graphic));
+	Error(ERR_RETURN, "custom graphic rejected for this element/action");
+
+	if (i == fallback_graphic)
+	  Error(ERR_EXIT, "fatal error: no fallback graphic available");
+
+	Error(ERR_RETURN, "fallback done to 'char_exclam' for this graphic");
+	Error(ERR_RETURN_LINE, "-");
+
+	set_graphic_parameters(i, fallback_graphic);
+      }
+      else
+      {
+	graphic_info[i] = graphic_info[clone_graphic];
+	graphic_info[i].clone_from = clone_graphic;
+
+#if 0
+	printf("::: graphic %d ['%s'] is cloned from %d ['%s']\n",
+	       i, getTokenFromImageID(i),
+	       clone_graphic, getTokenFromImageID(clone_graphic));
+#endif
+      }
+    }
+  }
+#endif
+
   for (i = 0; i < num_images; i++)
   {
     Bitmap *src_bitmap;
@@ -1065,16 +1161,38 @@ static void InitGraphicInfo()
 	   i, image->token, getTokenFromImageID(i));
 #endif
 
+#if 0
     set_graphic_parameters(i, i);
+#endif
 
     /* now check if no animation frames are outside of the loaded image */
+
+#if 0
+    if (graphic_info[i].bitmap == NULL)
+      Error(ERR_WARN, "no bitmap for graphic %d ['%s']",
+	    i, getTokenFromImageID(i));
+#endif
 
     if (graphic_info[i].bitmap == NULL)
       continue;		/* skip check for optional images that are undefined */
 
+#if 1
+    /* get final bitmap size (with scaling, but without small images) */
+    src_bitmap_width  = graphic_info[i].src_image_width;
+    src_bitmap_height = graphic_info[i].src_image_height;
+#else
     /* get final bitmap size (with scaling, but without small images) */
     src_bitmap_width  = get_scaled_graphic_width(i);
     src_bitmap_height = get_scaled_graphic_height(i);
+
+    if (graphic_info[i].clone_from != -1)
+    {
+      int clone_graphic = graphic_info[i].clone_from;
+
+      src_bitmap_width  = get_scaled_graphic_width(clone_graphic);
+      src_bitmap_height = get_scaled_graphic_height(clone_graphic);
+    }
+#endif
 
     first_frame = 0;
     getGraphicSource(i, first_frame, &src_bitmap, &src_x, &src_y);
@@ -1084,15 +1202,12 @@ static void InitGraphicInfo()
     {
       Error(ERR_RETURN_LINE, "-");
       Error(ERR_RETURN, "warning: error found in config file:");
-      Error(ERR_RETURN, "- config file: '%s'",
-	    getImageConfigFilename());
-      Error(ERR_RETURN, "- config token: '%s'",
-	    getTokenFromImageID(i));
-      Error(ERR_RETURN, "- image file: '%s'",
-	    src_bitmap->source_filename);
+      Error(ERR_RETURN, "- config file: '%s'", getImageConfigFilename());
+      Error(ERR_RETURN, "- config token: '%s'", getTokenFromImageID(i));
+      Error(ERR_RETURN, "- image file: '%s'", src_bitmap->source_filename);
       Error(ERR_RETURN,
-	    "error: first animation frame out of bounds (%d, %d)",
-	    src_x, src_y);
+	    "error: first animation frame out of bounds (%d, %d) [%d, %d]",
+	    src_x, src_y, src_bitmap_width, src_bitmap_height);
       Error(ERR_RETURN, "custom graphic rejected for this element/action");
 
       if (i == fallback_graphic)
@@ -1112,15 +1227,12 @@ static void InitGraphicInfo()
     {
       Error(ERR_RETURN_LINE, "-");
       Error(ERR_RETURN, "warning: error found in config file:");
-      Error(ERR_RETURN, "- config file: '%s'",
-	    getImageConfigFilename());
-      Error(ERR_RETURN, "- config token: '%s'",
-	    getTokenFromImageID(i));
-      Error(ERR_RETURN, "- image file: '%s'",
-	    src_bitmap->source_filename);
+      Error(ERR_RETURN, "- config file: '%s'", getImageConfigFilename());
+      Error(ERR_RETURN, "- config token: '%s'", getTokenFromImageID(i));
+      Error(ERR_RETURN, "- image file: '%s'", src_bitmap->source_filename);
       Error(ERR_RETURN,
-	    "error: last animation frame (%d) out of bounds (%d, %d)",
-	    last_frame, src_x, src_y);
+	    "error: last animation frame (%d) out of bounds (%d, %d) [%d, %d]",
+	    last_frame, src_x, src_y, src_bitmap_width, src_bitmap_height);
       Error(ERR_RETURN, "custom graphic rejected for this element/action");
 
       if (i == fallback_graphic)

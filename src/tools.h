@@ -148,6 +148,7 @@ int el2baseimg(int);
 int el2img(int);
 int el2edimg(int);
 int el2preimg(int);
+int font2baseimg(int);
 
 unsigned int InitRND(long);
 void InitGraphicInfo_EM(void);

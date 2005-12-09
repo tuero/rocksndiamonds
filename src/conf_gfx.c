@@ -59,6 +59,7 @@ struct ConfigTypeInfo image_config_suffix[] =
   { ".post_delay_random",		ARG_UNDEFINED,	TYPE_INTEGER	},
   { ".name",				ARG_UNDEFINED,	TYPE_STRING	},
   { ".scale_up_factor",			ARG_UNDEFINED,	TYPE_INTEGER	},
+  { ".clone_from",			ARG_UNDEFINED,	TYPE_TOKEN	},
 
   { NULL,				NULL,		0		}
 };
@@ -3860,14 +3861,14 @@ struct ConfigInfo image_config[] =
   { "menu.button_down.active.ypos",		"9"			},
   { "menu.button_down.active.frames",		"1"			},
 
-  { "menu.button_enter_menu",			"RocksDC.pcx"		},
-  { "menu.button_enter_menu.xpos",		"9"			},
-  { "menu.button_enter_menu.ypos",		"8"			},
-  { "menu.button_enter_menu.frames",		"1"			},
-  { "menu.button_enter_menu.active",		"RocksDC.pcx"		},
-  { "menu.button_enter_menu.active.xpos",	"9"			},
-  { "menu.button_enter_menu.active.ypos",	"9"			},
-  { "menu.button_enter_menu.active.frames",	"1"			},
+  { "menu.button_enter_menu2",			"RocksDC.pcx"		},
+  { "menu.button_enter_menu2.xpos",		"9"			},
+  { "menu.button_enter_menu2.ypos",		"8"			},
+  { "menu.button_enter_menu2.frames",		"1"			},
+  { "menu.button_enter_menu2.active",		"RocksDC.pcx"		},
+  { "menu.button_enter_menu2.active.xpos",	"9"			},
+  { "menu.button_enter_menu2.active.ypos",	"9"			},
+  { "menu.button_enter_menu2.active.frames",	"1"			},
   { "menu.button_leave_menu",			"RocksDC.pcx"		},
   { "menu.button_leave_menu.xpos",		"8"			},
   { "menu.button_leave_menu.ypos",		"8"			},
@@ -3876,6 +3877,11 @@ struct ConfigInfo image_config[] =
   { "menu.button_leave_menu.active.xpos",	"8"			},
   { "menu.button_leave_menu.active.ypos",	"9"			},
   { "menu.button_leave_menu.active.frames",	"1"			},
+
+  { "menu.button_enter_menu",			UNDEFINED_FILENAME	},
+  { "menu.button_enter_menu.clone_from",	"menu.button_right"	},
+  { "menu.button_enter_menu.active",		UNDEFINED_FILENAME	},
+  { "menu.button_enter_menu.active.clone_from",	"menu.button_right.active"},
 
   { "menu.scrollbar",				"RocksDC.pcx"		},
   { "menu.scrollbar.xpos",			"8"			},

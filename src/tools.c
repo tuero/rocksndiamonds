@@ -5474,6 +5474,11 @@ int el2preimg(int element)
   return element_info[element].special_graphic[GFX_SPECIAL_ARG_PREVIEW];
 }
 
+int font2baseimg(int font_nr)
+{
+  return font_info[font_nr].special_graphic[GFX_SPECIAL_ARG_DEFAULT];
+}
+
 int getGameFrameDelay_EM(int native_em_game_frame_delay)
 {
   int game_frame_delay_value;
