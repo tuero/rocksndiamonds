@@ -1067,6 +1067,51 @@ static void set_graphic_parameters(int graphic, int graphic_copy_from)
 #endif
 }
 
+static void set_cloned_graphic_parameters(int graphic)
+{
+  int fallback_graphic = IMG_CHAR_EXCLAM;
+  int max_num_images = getImageListSize();
+  int clone_graphic = graphic_info[graphic].clone_from;
+  int num_references_followed = 1;
+
+  while (graphic_info[clone_graphic].clone_from != -1 &&
+	 num_references_followed < max_num_images)
+  {
+    clone_graphic = graphic_info[clone_graphic].clone_from;
+
+    num_references_followed++;
+  }
+
+  if (num_references_followed >= max_num_images)
+  {
+    Error(ERR_RETURN_LINE, "-");
+    Error(ERR_RETURN, "warning: error found in config file:");
+    Error(ERR_RETURN, "- config file: '%s'", getImageConfigFilename());
+    Error(ERR_RETURN, "- config token: '%s'", getTokenFromImageID(graphic));
+    Error(ERR_RETURN, "error: loop discovered when resolving cloned graphics");
+    Error(ERR_RETURN, "custom graphic rejected for this element/action");
+
+    if (graphic == fallback_graphic)
+      Error(ERR_EXIT, "fatal error: no fallback graphic available");
+
+    Error(ERR_RETURN, "fallback done to 'char_exclam' for this graphic");
+    Error(ERR_RETURN_LINE, "-");
+
+    set_graphic_parameters(graphic, fallback_graphic);
+  }
+  else
+  {
+    graphic_info[graphic] = graphic_info[clone_graphic];
+    graphic_info[graphic].clone_from = clone_graphic;
+
+#if 0
+    printf("::: graphic %d ['%s'] is cloned from %d ['%s']\n",
+	   i, getTokenFromImageID(i),
+	   clone_graphic, getTokenFromImageID(clone_graphic));
+#endif
+  }
+}
+
 static void InitGraphicInfo()
 {
   int fallback_graphic = IMG_CHAR_EXCLAM;
@@ -1101,53 +1146,14 @@ static void InitGraphicInfo()
   }
 #endif
 
-#if 1
   /* first set all graphic paramaters ... */
   for (i = 0; i < num_images; i++)
-  {
     set_graphic_parameters(i, i);
-  }
 
   /* ... then copy these parameters for cloned graphics */
   for (i = 0; i < num_images; i++)
-  {
     if (graphic_info[i].clone_from != -1)
-    {
-      int clone_graphic = graphic_info[i].clone_from;
-
-      if (graphic_info[clone_graphic].clone_from != -1)
-      {
-	Error(ERR_RETURN_LINE, "-");
-	Error(ERR_RETURN, "warning: error found in config file:");
-	Error(ERR_RETURN, "- config file: '%s'", getImageConfigFilename());
-	Error(ERR_RETURN, "- config token: '%s'", getTokenFromImageID(i));
-	Error(ERR_RETURN,
-	      "error: cannot clone from already cloned graphic '%s'",
-	      getTokenFromImageID(clone_graphic));
-	Error(ERR_RETURN, "custom graphic rejected for this element/action");
-
-	if (i == fallback_graphic)
-	  Error(ERR_EXIT, "fatal error: no fallback graphic available");
-
-	Error(ERR_RETURN, "fallback done to 'char_exclam' for this graphic");
-	Error(ERR_RETURN_LINE, "-");
-
-	set_graphic_parameters(i, fallback_graphic);
-      }
-      else
-      {
-	graphic_info[i] = graphic_info[clone_graphic];
-	graphic_info[i].clone_from = clone_graphic;
-
-#if 0
-	printf("::: graphic %d ['%s'] is cloned from %d ['%s']\n",
-	       i, getTokenFromImageID(i),
-	       clone_graphic, getTokenFromImageID(clone_graphic));
-#endif
-      }
-    }
-  }
-#endif
+      set_cloned_graphic_parameters(i);
 
   for (i = 0; i < num_images; i++)
   {
