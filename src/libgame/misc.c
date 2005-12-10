@@ -1693,7 +1693,7 @@ static boolean string_has_parameter(char *s, char *s_contained)
   return string_has_parameter(substring, s_contained);
 }
 
-int get_parameter_value(char *suffix, char *value_raw, int type)
+int get_parameter_value(char *value_raw, char *suffix, int type)
 {
   char *value = getStringToLower(value_raw);
   int result = 0;	/* probably a save default value */
@@ -1744,7 +1744,7 @@ int get_auto_parameter_value(char *token, char *value_raw)
   if (suffix == NULL)
     suffix = token;
 
-  return get_parameter_value(suffix, value_raw, TYPE_INTEGER);
+  return get_parameter_value(value_raw, suffix, TYPE_INTEGER);
 }
 
 static void FreeCustomArtworkList(struct ArtworkListInfo *,

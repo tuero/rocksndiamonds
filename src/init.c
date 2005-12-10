@@ -785,16 +785,23 @@ void InitElementSpecialGraphicInfo()
 	  element_info[i].graphic[ACTION_DEFAULT];
 }
 
-static int get_element_from_token(char *token)
+static int get_graphic_parameter_value(char *value_raw, char *suffix, int type)
 {
   int i;
   int x = 0;
 
+  if (type != TYPE_TOKEN)
+    return get_parameter_value(value_raw, suffix, type);
+
+  if (strcmp(value_raw, ARG_UNDEFINED) == 0)
+    return ARG_UNDEFINED_VALUE;
+
+  /* !!! OPTIMIZE THIS BY USING HASH !!! */
   for (i = 0; i < MAX_NUM_ELEMENTS; i++)
-    if (strcmp(element_info[i].token_name, token) == 0)
+    if (strcmp(element_info[i].token_name, value_raw) == 0)
       return i;
 
-#if 1
+  /* !!! OPTIMIZE THIS BY USING HASH !!! */
   for (i = 0; image_config[i].token != NULL; i++)
   {
     int len_config_value = strlen(image_config[i].value);
@@ -804,12 +811,11 @@ static int get_element_from_token(char *token)
 	strcmp(image_config[i].value, UNDEFINED_FILENAME) != 0)
       continue;
 
-    if (strcmp(image_config[i].token, token) == 0)
+    if (strcmp(image_config[i].token, value_raw) == 0)
       return x;
 
     x++;
   }
-#endif
 
   return -1;
 }
@@ -830,24 +836,15 @@ static int get_scaled_graphic_height(int graphic)
   return original_height * scale_up_factor;
 }
 
-static void set_graphic_parameters(int graphic, int graphic_copy_from)
+static void set_graphic_parameters(int graphic)
 {
-  struct FileInfo *image = getImageListEntryFromImageID(graphic_copy_from);
+  struct FileInfo *image = getImageListEntryFromImageID(graphic);
   char **parameter_raw = image->parameter;
-  Bitmap *src_bitmap = getBitmapFromImageID(graphic_copy_from);
+  Bitmap *src_bitmap = getBitmapFromImageID(graphic);
   int parameter[NUM_GFX_ARGS];
   int anim_frames_per_row = 1, anim_frames_per_col = 1;
   int anim_frames_per_line = 1;
   int i;
-
-#if 1
-  if (graphic != graphic_copy_from)
-  {
-    graphic_info[graphic] = graphic_info[graphic_copy_from];
-
-    return;
-  }
-#endif
 
   /* if fallback to default artwork is done, also use the default parameters */
   if (image->fallback_to_default)
@@ -855,14 +852,9 @@ static void set_graphic_parameters(int graphic, int graphic_copy_from)
 
   /* get integer values from string parameters */
   for (i = 0; i < NUM_GFX_ARGS; i++)
-  {
-    parameter[i] =
-      get_parameter_value(image_config_suffix[i].token, parameter_raw[i],
-			  image_config_suffix[i].type);
-
-    if (image_config_suffix[i].type == TYPE_TOKEN)
-      parameter[i] = get_element_from_token(parameter_raw[i]);
-  }
+    parameter[i] = get_graphic_parameter_value(parameter_raw[i],
+					       image_config_suffix[i].token,
+					       image_config_suffix[i].type);
 
   graphic_info[graphic].bitmap = src_bitmap;
 
@@ -1046,25 +1038,9 @@ static void set_graphic_parameters(int graphic, int graphic_copy_from)
   /* this is only used for drawing envelope graphics */
   graphic_info[graphic].draw_masked = parameter[GFX_ARG_DRAW_MASKED];
 
-#if 1
   /* optional graphic for cloning all graphics settings */
   if (parameter[GFX_ARG_CLONE_FROM] != ARG_UNDEFINED_VALUE)
     graphic_info[graphic].clone_from = parameter[GFX_ARG_CLONE_FROM];
-#else
-  /* optional graphic for cloning all graphics settings */
-  if (parameter[GFX_ARG_CLONE_FROM] != ARG_UNDEFINED_VALUE)
-  {
-    if (parameter[GFX_ARG_CLONE_FROM] != -1)
-    {
-      int clone_graphic = parameter[GFX_ARG_CLONE_FROM];
-
-      graphic_info[graphic] = graphic_info[clone_graphic];
-      graphic_info[graphic].clone_from = clone_graphic;
-
-      printf("::: %d -> %d\n", graphic, clone_graphic);
-    }
-  }
-#endif
 }
 
 static void set_cloned_graphic_parameters(int graphic)
@@ -1097,18 +1073,12 @@ static void set_cloned_graphic_parameters(int graphic)
     Error(ERR_RETURN, "fallback done to 'char_exclam' for this graphic");
     Error(ERR_RETURN_LINE, "-");
 
-    set_graphic_parameters(graphic, fallback_graphic);
+    graphic_info[graphic] = graphic_info[fallback_graphic];
   }
   else
   {
     graphic_info[graphic] = graphic_info[clone_graphic];
     graphic_info[graphic].clone_from = clone_graphic;
-
-#if 0
-    printf("::: graphic %d ['%s'] is cloned from %d ['%s']\n",
-	   i, getTokenFromImageID(i),
-	   clone_graphic, getTokenFromImageID(clone_graphic));
-#endif
   }
 }
 
@@ -1148,7 +1118,7 @@ static void InitGraphicInfo()
 
   /* first set all graphic paramaters ... */
   for (i = 0; i < num_images; i++)
-    set_graphic_parameters(i, i);
+    set_graphic_parameters(i);
 
   /* ... then copy these parameters for cloned graphics */
   for (i = 0; i < num_images; i++)
@@ -1162,46 +1132,20 @@ static void InitGraphicInfo()
     int first_frame, last_frame;
     int src_bitmap_width, src_bitmap_height;
 
-#if 0
-    printf("::: image # %d: '%s' ['%s']\n",
-	   i, image->token, getTokenFromImageID(i));
-#endif
-
-#if 0
-    set_graphic_parameters(i, i);
-#endif
-
     /* now check if no animation frames are outside of the loaded image */
-
-#if 0
-    if (graphic_info[i].bitmap == NULL)
-      Error(ERR_WARN, "no bitmap for graphic %d ['%s']",
-	    i, getTokenFromImageID(i));
-#endif
 
     if (graphic_info[i].bitmap == NULL)
       continue;		/* skip check for optional images that are undefined */
 
-#if 1
     /* get final bitmap size (with scaling, but without small images) */
     src_bitmap_width  = graphic_info[i].src_image_width;
     src_bitmap_height = graphic_info[i].src_image_height;
-#else
-    /* get final bitmap size (with scaling, but without small images) */
-    src_bitmap_width  = get_scaled_graphic_width(i);
-    src_bitmap_height = get_scaled_graphic_height(i);
 
-    if (graphic_info[i].clone_from != -1)
-    {
-      int clone_graphic = graphic_info[i].clone_from;
-
-      src_bitmap_width  = get_scaled_graphic_width(clone_graphic);
-      src_bitmap_height = get_scaled_graphic_height(clone_graphic);
-    }
-#endif
+    /* check if first animation frame is inside specified bitmap */
 
     first_frame = 0;
     getGraphicSource(i, first_frame, &src_bitmap, &src_x, &src_y);
+
     if (src_x < 0 || src_y < 0 ||
 	src_x + TILEX > src_bitmap_width ||
 	src_y + TILEY > src_bitmap_height)
@@ -1222,11 +1166,14 @@ static void InitGraphicInfo()
       Error(ERR_RETURN, "fallback done to 'char_exclam' for this graphic");
       Error(ERR_RETURN_LINE, "-");
 
-      set_graphic_parameters(i, fallback_graphic);
+      graphic_info[i] = graphic_info[fallback_graphic];
     }
+
+    /* check if last animation frame is inside specified bitmap */
 
     last_frame = graphic_info[i].anim_frames - 1;
     getGraphicSource(i, last_frame, &src_bitmap, &src_x, &src_y);
+
     if (src_x < 0 || src_y < 0 ||
 	src_x + TILEX > src_bitmap_width ||
 	src_y + TILEY > src_bitmap_height)
@@ -1247,7 +1194,7 @@ static void InitGraphicInfo()
       Error(ERR_RETURN, "fallback done to 'char_exclam' for this graphic");
       Error(ERR_RETURN_LINE, "-");
 
-      set_graphic_parameters(i, fallback_graphic);
+      graphic_info[i] = graphic_info[fallback_graphic];
     }
 
 #if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
@@ -1437,7 +1384,8 @@ static void set_sound_parameters(int sound, char **parameter_raw)
   /* get integer values from string parameters */
   for (i = 0; i < NUM_SND_ARGS; i++)
     parameter[i] =
-      get_parameter_value(sound_config_suffix[i].token, parameter_raw[i],
+      get_parameter_value(parameter_raw[i],
+			  sound_config_suffix[i].token,
 			  sound_config_suffix[i].type);
 
   /* explicit loop mode setting in configuration overrides default value */
@@ -1614,7 +1562,8 @@ static void set_music_parameters(int music, char **parameter_raw)
   /* get integer values from string parameters */
   for (i = 0; i < NUM_MUS_ARGS; i++)
     parameter[i] =
-      get_parameter_value(music_config_suffix[i].token, parameter_raw[i],
+      get_parameter_value(parameter_raw[i],
+			  music_config_suffix[i].token,
 			  music_config_suffix[i].type);
 
   /* explicit loop mode setting in configuration overrides default value */
