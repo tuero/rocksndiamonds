@@ -1620,6 +1620,7 @@ struct PlayerInfo
 
   int move_delay;
   int move_delay_value;
+  int move_delay_value_next;
   int move_delay_reset_counter;
 
   int push_delay;

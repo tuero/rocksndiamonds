@@ -1584,6 +1584,8 @@ void InitGame()
     player->move_delay       = game.initial_move_delay;
     player->move_delay_value = game.initial_move_delay_value;
 
+    player->move_delay_value_next = -1;
+
     player->move_delay_reset_counter = 0;
 
     player->push_delay       = -1;	/* initialized when pushing starts */
@@ -6725,11 +6727,12 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
 	  /* make sure that value is power of 2 */
 	  move_stepsize = (1 << log_2(move_stepsize));
 
-	  stored_player[i].move_delay_value = TILEX / move_stepsize;
+	  /* do no immediately change -- the player might just be moving */
+	  stored_player[i].move_delay_value_next = TILEX / move_stepsize;
 
 #if 0
 	  printf("::: move_delay_value == %d [%d]\n",
-		 stored_player[i].move_delay_value, action_arg_number);
+		 stored_player[i].move_delay_value_next, action_arg_number);
 #endif
 	}
       }
@@ -7071,7 +7074,8 @@ static void ChangeElement(int x, int y, int page)
   struct ElementChangeInfo *change = &ei->change_page[page];
 
 #ifdef DEBUG
-  if (!CAN_CHANGE(element) && !CAN_CHANGE(Back[x][y]))
+  if (!CAN_CHANGE_OR_HAS_ACTION(element) &&
+      !CAN_CHANGE_OR_HAS_ACTION(Back[x][y]))
   {
     printf("\n\n");
     printf("ChangeElement(): %d,%d: element = %d ('%s')\n",
@@ -7082,7 +7086,7 @@ static void ChangeElement(int x, int y, int page)
 #endif
 
   /* this can happen with classic bombs on walkable, changing elements */
-  if (!CAN_CHANGE(element))
+  if (!CAN_CHANGE_OR_HAS_ACTION(element))
   {
 #if 0
     if (!CAN_CHANGE(Back[x][y]))	/* prevent permanent repetition */
@@ -7096,24 +7100,30 @@ static void ChangeElement(int x, int y, int page)
   {
     ChangeDelay[x][y] = GET_CHANGE_DELAY(change) + 1;
 
-    ResetGfxAnimation(x, y);
-    ResetRandomAnimationValue(x, y);
+    if (change->can_change)
+    {
+      ResetGfxAnimation(x, y);
+      ResetRandomAnimationValue(x, y);
 
-    if (change->pre_change_function)
-      change->pre_change_function(x, y);
+      if (change->pre_change_function)
+	change->pre_change_function(x, y);
+    }
   }
 
   ChangeDelay[x][y]--;
 
   if (ChangeDelay[x][y] != 0)		/* continue element change */
   {
-    int graphic = el_act_dir2img(element, GfxAction[x][y], GfxDir[x][y]);
+    if (change->can_change)
+    {
+      int graphic = el_act_dir2img(element, GfxAction[x][y], GfxDir[x][y]);
 
-    if (IS_ANIMATED(graphic))
-      DrawLevelGraphicAnimationIfNeeded(x, y, graphic);
+      if (IS_ANIMATED(graphic))
+	DrawLevelGraphicAnimationIfNeeded(x, y, graphic);
 
-    if (change->change_function)
-      change->change_function(x, y);
+      if (change->change_function)
+	change->change_function(x, y);
+    }
   }
   else					/* finish element change */
   {
@@ -7133,11 +7143,17 @@ static void ChangeElement(int x, int y, int page)
       return;
     }
 
-    if (ChangeElementNow(x, y, element, page))
+    if (change->can_change)
     {
-      if (change->post_change_function)
-	change->post_change_function(x, y);
+      if (ChangeElementNow(x, y, element, page))
+      {
+	if (change->post_change_function)
+	  change->post_change_function(x, y);
+      }
     }
+
+    if (change->has_action)
+      ExecuteCustomElementAction(x, y, element, page);
   }
 }
 
@@ -7192,9 +7208,13 @@ static boolean CheckTriggeredElementChangeExt(int trigger_element,
 		ChangeEvent[x][y] = trigger_event;
 		ChangeElement(x, y, p);
 	      }
-
+#if 1
+	      else if (change->has_action)
+		ExecuteCustomElementAction(x, y, element, p);
+#else
 	      if (change->has_action)
 		ExecuteCustomElementAction(x, y, element, p);
+#endif
 	    }
 	  }
 
@@ -7261,9 +7281,13 @@ static boolean CheckElementChangeExt(int x, int y,
 
 	change_done = TRUE;
       }
-
+#if 1
+      else if (change->has_action)
+	ExecuteCustomElementAction(x, y, element, p);
+#else
       if (change->has_action)
 	ExecuteCustomElementAction(x, y, element, p);
+#endif
     }
   }
 
@@ -7785,11 +7809,16 @@ void GameActions()
       printf("::: ChangeDelay == %d\n", ChangeDelay[x][y]);
 #endif
 
+#if 1
+      ChangeElement(x, y, page);
+#else
       if (CAN_CHANGE(element))
 	ChangeElement(x, y, page);
 
-      if (HAS_ACTION(element) && ChangeDelay[x][y] == 0)
+      if (HAS_ACTION(element))
 	ExecuteCustomElementAction(x, y, element, page);
+#endif
+
 #endif
 
       element = Feld[x][y];
@@ -8292,6 +8321,12 @@ boolean MovePlayerOneStep(struct PlayerInfo *player,
   player->jy = new_jy;
   StorePlayer[new_jx][new_jy] = player->element_nr;
 
+  if (player->move_delay_value_next != -1)
+  {
+    player->move_delay_value = player->move_delay_value_next;
+    player->move_delay_value_next = -1;
+  }
+
   player->MovPos =
     (dx > 0 || dy > 0 ? -1 : 1) * (TILEX - TILEX / player->move_delay_value);
 
@@ -8553,21 +8588,21 @@ void ScrollPlayer(struct PlayerInfo *player, int mode)
     return;
 
 #if 0
-    printf("::: player->MovPos: %d -> %d\n",
-	   player->MovPos,
-	   player->MovPos + (player->MovPos > 0 ? -1 : 1) * move_stepsize);
+  printf("::: player->MovPos: %d -> %d\n",
+	 player->MovPos,
+	 player->MovPos + (player->MovPos > 0 ? -1 : 1) * move_stepsize);
 #endif
 
 #if USE_NEW_PLAYER_SPEED
-    if (player->MovPos != 0)
-    {
-      player->MovPos += (player->MovPos > 0 ? -1 : 1) * move_stepsize;
-      player->GfxPos = move_stepsize * (player->MovPos / move_stepsize);
+  if (player->MovPos != 0)
+  {
+    player->MovPos += (player->MovPos > 0 ? -1 : 1) * move_stepsize;
+    player->GfxPos = move_stepsize * (player->MovPos / move_stepsize);
 
-      /* before DrawPlayer() to draw correct player graphic for this case */
-      if (player->MovPos == 0)
-	CheckGravityMovement(player);
-    }
+    /* before DrawPlayer() to draw correct player graphic for this case */
+    if (player->MovPos == 0)
+      CheckGravityMovement(player);
+  }
 #else
   player->MovPos += (player->MovPos > 0 ? -1 : 1) * move_stepsize;
   player->GfxPos = move_stepsize * (player->MovPos / move_stepsize);

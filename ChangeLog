@@ -1,3 +1,6 @@
+2005-12-10
+	* added image config suffix ".clone_from" to copy whole image settings
+
 2005-12-05
 	* fixed graphical bug with smashing elements falling faster than player
 
