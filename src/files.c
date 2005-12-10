@@ -2611,12 +2611,35 @@ static void LoadLevel_InitElements(struct LevelInfo *level, char *filename)
       int element = EL_CUSTOM_START + i;
       struct ElementInfo *ei = &element_info[element];
 
-      if (ei->access_direction == MV_NO_MOVING)
+      if (ei->access_direction == MV_NO_DIRECTIONS)
 	ei->access_direction = MV_ALL_DIRECTIONS;
+
+#if 0
+      for (j = 0; j < ei->num_change_pages; j++)
+      {
+	struct ElementChangeInfo *change = &ei->change_page[j];
+
+	if (change->trigger_side == CH_SIDE_NONE)
+	  change->trigger_side = CH_SIDE_ANY;
+      }
+#endif
+    }
+  }
+
+  /* correct custom element values (fix invalid values for all versions) */
+  if (1)
+  {
+    for (i = 0; i < NUM_CUSTOM_ELEMENTS; i++)
+    {
+      int element = EL_CUSTOM_START + i;
+      struct ElementInfo *ei = &element_info[element];
 
       for (j = 0; j < ei->num_change_pages; j++)
       {
 	struct ElementChangeInfo *change = &ei->change_page[j];
+
+	if (change->trigger_player == CH_PLAYER_NONE)
+	  change->trigger_player = CH_PLAYER_ANY;
 
 	if (change->trigger_side == CH_SIDE_NONE)
 	  change->trigger_side = CH_SIDE_ANY;

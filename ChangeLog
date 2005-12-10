@@ -1,5 +1,6 @@
 2005-12-10
 	* added image config suffix ".clone_from" to copy whole image settings
+	* fixed bug with invalid ("undefined") CE settings in old level files
 
 2005-12-05
 	* fixed graphical bug with smashing elements falling faster than player
