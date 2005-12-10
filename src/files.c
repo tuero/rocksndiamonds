@@ -2614,7 +2614,7 @@ static void LoadLevel_InitElements(struct LevelInfo *level, char *filename)
       if (ei->access_direction == MV_NO_DIRECTIONS)
 	ei->access_direction = MV_ALL_DIRECTIONS;
 
-#if 0
+#if 1
       for (j = 0; j < ei->num_change_pages; j++)
       {
 	struct ElementChangeInfo *change = &ei->change_page[j];
@@ -2626,6 +2626,7 @@ static void LoadLevel_InitElements(struct LevelInfo *level, char *filename)
     }
   }
 
+#if 0
   /* correct custom element values (fix invalid values for all versions) */
   if (1)
   {
@@ -2646,6 +2647,7 @@ static void LoadLevel_InitElements(struct LevelInfo *level, char *filename)
       }
     }
   }
+#endif
 
   /* initialize "can_explode" field for old levels which did not store this */
   /* !!! CHECK THIS -- "<= 3,1,0,0" IS PROBABLY WRONG !!! */

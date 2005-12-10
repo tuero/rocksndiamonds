@@ -32,7 +32,7 @@
 #define USE_NEW_PLAYER_ANIM		(USE_NEW_STUFF		* 1)
 #define USE_NEW_ALL_SLIPPERY		(USE_NEW_STUFF		* 1)
 #define USE_NEW_PLAYER_SPEED		(USE_NEW_STUFF		* 1)
-
+#define USE_NEW_DELAYED_ACTION		(USE_NEW_STUFF		* 1)
 
 /* for DigField() */
 #define DF_NO_PUSH		0
@@ -1262,6 +1262,9 @@ static void InitGameEngine()
     ei->change->pre_change_function  = ch_delay->pre_change_function;
     ei->change->change_function      = ch_delay->change_function;
     ei->change->post_change_function = ch_delay->post_change_function;
+
+    ei->change->can_change = TRUE;
+    ei->change->can_change_or_has_action = TRUE;
 
     ei->has_change_event[CE_DELAY] = TRUE;
 
@@ -7067,6 +7070,8 @@ static boolean ChangeElementNow(int x, int y, int element, int page)
   return TRUE;
 }
 
+#if USE_NEW_DELAYED_ACTION
+
 static void ChangeElement(int x, int y, int page)
 {
   int element = MovingOrBlocked2Element(x, y);
@@ -7157,6 +7162,87 @@ static void ChangeElement(int x, int y, int page)
   }
 }
 
+#else
+
+static void ChangeElement(int x, int y, int page)
+{
+  int element = MovingOrBlocked2Element(x, y);
+  struct ElementInfo *ei = &element_info[element];
+  struct ElementChangeInfo *change = &ei->change_page[page];
+
+#ifdef DEBUG
+  if (!CAN_CHANGE(element) && !CAN_CHANGE(Back[x][y]))
+  {
+    printf("\n\n");
+    printf("ChangeElement(): %d,%d: element = %d ('%s')\n",
+	   x, y, element, element_info[element].token_name);
+    printf("ChangeElement(): This should never happen!\n");
+    printf("\n\n");
+  }
+#endif
+
+  /* this can happen with classic bombs on walkable, changing elements */
+  if (!CAN_CHANGE(element))
+  {
+#if 0
+    if (!CAN_CHANGE(Back[x][y]))	/* prevent permanent repetition */
+      ChangeDelay[x][y] = 0;
+#endif
+
+    return;
+  }
+
+  if (ChangeDelay[x][y] == 0)		/* initialize element change */
+  {
+    ChangeDelay[x][y] = GET_CHANGE_DELAY(change) + 1;
+
+    ResetGfxAnimation(x, y);
+    ResetRandomAnimationValue(x, y);
+
+    if (change->pre_change_function)
+      change->pre_change_function(x, y);
+  }
+
+  ChangeDelay[x][y]--;
+
+  if (ChangeDelay[x][y] != 0)		/* continue element change */
+  {
+    int graphic = el_act_dir2img(element, GfxAction[x][y], GfxDir[x][y]);
+
+    if (IS_ANIMATED(graphic))
+      DrawLevelGraphicAnimationIfNeeded(x, y, graphic);
+
+    if (change->change_function)
+      change->change_function(x, y);
+  }
+  else					/* finish element change */
+  {
+    if (ChangePage[x][y] != -1)		/* remember page from delayed change */
+    {
+      page = ChangePage[x][y];
+      ChangePage[x][y] = -1;
+
+      change = &ei->change_page[page];
+    }
+
+    if (IS_MOVING(x, y))		/* never change a running system ;-) */
+    {
+      ChangeDelay[x][y] = 1;		/* try change after next move step */
+      ChangePage[x][y] = page;		/* remember page to use for change */
+
+      return;
+    }
+
+    if (ChangeElementNow(x, y, element, page))
+    {
+      if (change->post_change_function)
+	change->post_change_function(x, y);
+    }
+  }
+}
+
+#endif
+
 static boolean CheckTriggeredElementChangeExt(int trigger_element,
 					      int trigger_event,
 					      int trigger_player,
@@ -7208,7 +7294,7 @@ static boolean CheckTriggeredElementChangeExt(int trigger_element,
 		ChangeEvent[x][y] = trigger_event;
 		ChangeElement(x, y, p);
 	      }
-#if 1
+#if USE_NEW_DELAYED_ACTION
 	      else if (change->has_action)
 		ExecuteCustomElementAction(x, y, element, p);
 #else
@@ -7281,7 +7367,7 @@ static boolean CheckElementChangeExt(int x, int y,
 
 	change_done = TRUE;
       }
-#if 1
+#if USE_NEW_DELAYED_ACTION
       else if (change->has_action)
 	ExecuteCustomElementAction(x, y, element, p);
 #else
