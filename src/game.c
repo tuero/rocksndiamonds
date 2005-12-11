@@ -7052,7 +7052,10 @@ static boolean ChangeElementNow(int x, int y, int element, int page)
       }
 
       if (something_has_changed)
+      {
 	PlayLevelSoundElementAction(x, y, element, ACTION_CHANGING);
+	PlayLevelSoundElementAction(x, y, element, ACTION_PAGE_1 + page);
+      }
     }
   }
   else
@@ -7062,6 +7065,7 @@ static boolean ChangeElementNow(int x, int y, int element, int page)
     ChangeElementNowExt(change, x, y, target_element);
 
     PlayLevelSoundElementAction(x, y, element, ACTION_CHANGING);
+    PlayLevelSoundElementAction(x, y, element, ACTION_PAGE_1 + page);
   }
 
   /* this uses direct change before indirect change */
@@ -7296,10 +7300,16 @@ static boolean CheckTriggeredElementChangeExt(int trigger_element,
 	      }
 #if USE_NEW_DELAYED_ACTION
 	      else if (change->has_action)
+	      {
 		ExecuteCustomElementAction(x, y, element, p);
+		PlayLevelSoundElementAction(x, y, element, ACTION_PAGE_1 + p);
+	      }
 #else
 	      if (change->has_action)
+	      {
 		ExecuteCustomElementAction(x, y, element, p);
+		PlayLevelSoundElementAction(x, y, element, ACTION_PAGE_1 + p);
+	      }
 #endif
 	    }
 	  }
@@ -7369,10 +7379,16 @@ static boolean CheckElementChangeExt(int x, int y,
       }
 #if USE_NEW_DELAYED_ACTION
       else if (change->has_action)
+      {
 	ExecuteCustomElementAction(x, y, element, p);
+	PlayLevelSoundElementAction(x, y, element, ACTION_PAGE_1 + p);
+      }
 #else
       if (change->has_action)
+      {
 	ExecuteCustomElementAction(x, y, element, p);
+	PlayLevelSoundElementAction(x, y, element, ACTION_PAGE_1 + p);
+      }
 #endif
     }
   }

@@ -1,3 +1,7 @@
+2005-12-11
+	* skip empty level sets (with "levels: 0"; may be artwork base sets)
+	* added sound action ".page[1]" to ".page[32]" for each CE change page
+
 2005-12-10
 	* added image config suffix ".clone_from" to copy whole image settings
 	* fixed bug with invalid ("undefined") CE settings in old level files
@@ -11,6 +15,9 @@
 
 2005-12-02
 	* fixed graphical bug with player animation when player moves slowly
+
+2005-11-29
+	* uploaded pre-release (test) version 3.2.0-3 binary and source code
 
 2005-11-28
 	* fixed bug which prevented "global.num_toons: 0" from working

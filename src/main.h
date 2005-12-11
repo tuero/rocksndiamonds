@@ -1290,9 +1290,41 @@
 #define ACTION_SLURPED_BY_SPRING	49
 #define ACTION_TWINKLING		50
 #define ACTION_SPLASHING		51
-#define ACTION_OTHER			52
+#define ACTION_PAGE_1			52
+#define ACTION_PAGE_2			53
+#define ACTION_PAGE_3			54
+#define ACTION_PAGE_4			55
+#define ACTION_PAGE_5			56
+#define ACTION_PAGE_6			57
+#define ACTION_PAGE_7			58
+#define ACTION_PAGE_8			59
+#define ACTION_PAGE_9			60
+#define ACTION_PAGE_10			61
+#define ACTION_PAGE_11			62
+#define ACTION_PAGE_12			63
+#define ACTION_PAGE_13			64
+#define ACTION_PAGE_14			65
+#define ACTION_PAGE_15			66
+#define ACTION_PAGE_16			67
+#define ACTION_PAGE_17			68
+#define ACTION_PAGE_18			69
+#define ACTION_PAGE_19			70
+#define ACTION_PAGE_20			71
+#define ACTION_PAGE_21			72
+#define ACTION_PAGE_22			73
+#define ACTION_PAGE_23			74
+#define ACTION_PAGE_24			75
+#define ACTION_PAGE_25			76
+#define ACTION_PAGE_26			77
+#define ACTION_PAGE_27			78
+#define ACTION_PAGE_28			79
+#define ACTION_PAGE_29			80
+#define ACTION_PAGE_30			81
+#define ACTION_PAGE_31			82
+#define ACTION_PAGE_32			83
+#define ACTION_OTHER			84
 
-#define NUM_ACTIONS			53
+#define NUM_ACTIONS			85
 
 #define ACTION_BORING_LAST		ACTION_BORING_10
 #define ACTION_SLEEPING_LAST		ACTION_SLEEPING_3
@@ -1438,9 +1470,9 @@
 
 /* program information and versioning definitions */
 
-#define RELEASE_311			FALSE
+#define RELEASE_3_1_2			FALSE
 
-#if RELEASE_311
+#if RELEASE_3_1_2
 #define PROGRAM_VERSION_MAJOR		3
 #define PROGRAM_VERSION_MINOR		1
 #define PROGRAM_VERSION_PATCH		2
@@ -1450,7 +1482,7 @@
 #define PROGRAM_VERSION_MAJOR		3
 #define PROGRAM_VERSION_MINOR		2
 #define PROGRAM_VERSION_PATCH		0
-#define PROGRAM_VERSION_BUILD		3
+#define PROGRAM_VERSION_BUILD		4
 #endif
 
 #define PROGRAM_TITLE_STRING		"Rocks'n'Diamonds"

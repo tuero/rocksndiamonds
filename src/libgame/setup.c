@@ -1956,8 +1956,10 @@ static boolean LoadLevelInfoFromLevelConf(TreeInfo **node_first,
     leveldir_new->fullpath = getPath2(node_parent->fullpath, directory_name);
   }
 
+#if 0
   if (leveldir_new->levels < 1)
     leveldir_new->levels = 1;
+#endif
 
   leveldir_new->last_level =
     leveldir_new->first_level + leveldir_new->levels - 1;
@@ -1986,6 +1988,19 @@ static boolean LoadLevelInfoFromLevelConf(TreeInfo **node_first,
   leveldir_new->handicap_level =	/* set handicap to default value */
     (leveldir_new->user_defined || !leveldir_new->handicap ?
      leveldir_new->last_level : leveldir_new->first_level);
+
+#if 1
+  if (leveldir_new->levels < 1 && !leveldir_new->level_group)
+  {
+    /* skip level sets without levels (which are probably artwork base sets) */
+
+    freeSetupFileHash(setup_file_hash);
+    free(directory_path);
+    free(filename);
+
+    return FALSE;
+  }
+#endif
 
   pushTreeInfo(node_first, leveldir_new);
 

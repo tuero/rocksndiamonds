@@ -2844,14 +2844,14 @@ static int editor_el_emerald_mine_club[] =
   EL_EMC_WALL_11,
   EL_EMC_WALL_12,
 
-#if RELEASE_311
+#if RELEASE_3_1_2
   EL_EMPTY,
 #else
   EL_EMC_ANDROID,
 #endif
   EL_BALLOON,
   EL_BALLOON_SWITCH_ANY,
-#if RELEASE_311
+#if RELEASE_3_1_2
   EL_EMPTY,
 #else
   EL_BALLOON_SWITCH_NONE,
@@ -2864,7 +2864,7 @@ static int editor_el_emerald_mine_club[] =
 
   EL_EMC_GRASS,
   EL_EMC_PLANT,
-#if RELEASE_311
+#if RELEASE_3_1_2
   EL_EMPTY,
   EL_EMPTY,
 #else
@@ -2872,7 +2872,7 @@ static int editor_el_emerald_mine_club[] =
   EL_EMC_MAGNIFIER,
 #endif
 
-#if RELEASE_311
+#if RELEASE_3_1_2
   EL_EMPTY,
   EL_EMPTY,
 #else
@@ -2880,13 +2880,13 @@ static int editor_el_emerald_mine_club[] =
   EL_EMC_MAGIC_BALL_SWITCH,
 #endif
   EL_SPRING,
-#if RELEASE_311
+#if RELEASE_3_1_2
   EL_EMPTY,
 #else
   EL_EMC_SPRING_BUMPER,
 #endif
 
-#if RELEASE_311
+#if RELEASE_3_1_2
   EL_EMPTY,
 #else
   EL_EMC_DRIPPER,
