@@ -6596,19 +6596,17 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
 			    action_mode, action_arg_number,
 			    action_arg_number_min, action_arg_number_max);
 
-  /* (for explicit player choice, set invalid value to "no player") */
   int action_arg_player_bits =
-    (action_arg == CA_ARG_PLAYER_ANY ? action_arg - CA_ARG_PLAYER :
+    (action_arg == CA_ARG_PLAYER_ANY ? PLAYER_BITS_ANY :
      action_arg >= CA_ARG_PLAYER_1 &&
      action_arg <= CA_ARG_PLAYER_4 ? action_arg - CA_ARG_PLAYER :
      action_arg >= CA_ARG_1 &&
-     action_arg <= CA_ARG_PLAYER_4 ? (1 << (action_arg - 1)) :
+     action_arg <= CA_ARG_PLAYER_4 ? (1 << (action_arg - CA_ARG_1)) :
      action_arg_element >= EL_PLAYER_1 &&
      action_arg_element <= EL_PLAYER_4 ?
      (1 << (action_arg_element - EL_PLAYER_1)) :
-     0);
+     PLAYER_BITS_ANY);
 
-  /* (for implicit player choice, set invalid value to "all players") */
   int trigger_player_bits =
     (change->actual_trigger_player >= EL_PLAYER_1 &&
      change->actual_trigger_player <= EL_PLAYER_4 ?
