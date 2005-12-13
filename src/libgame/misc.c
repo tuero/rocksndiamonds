@@ -925,6 +925,25 @@ inline void swap_number_pairs(int *x1, int *y1, int *x2, int *y2)
   *y2 = help_y;
 }
 
+/* the "put" variants of the following file access functions check for the file
+   pointer being != NULL and return the number of bytes they have or would have
+   written; this allows for chunk writing functions to first determine the size
+   of the (not yet written) chunk, write the correct chunk size and finally
+   write the chunk itself */
+
+int getFile8BitInteger(FILE *file)
+{
+  return fgetc(file);
+}
+
+int putFile8BitInteger(FILE *file, int value)
+{
+  if (file != NULL)
+    fputc(value, file);
+
+  return 1;
+}
+
 int getFile16BitInteger(FILE *file, int byte_order)
 {
   if (byte_order == BYTE_ORDER_BIG_ENDIAN)
@@ -935,18 +954,23 @@ int getFile16BitInteger(FILE *file, int byte_order)
 	    (fgetc(file) << 8));
 }
 
-void putFile16BitInteger(FILE *file, int value, int byte_order)
+int putFile16BitInteger(FILE *file, int value, int byte_order)
 {
-  if (byte_order == BYTE_ORDER_BIG_ENDIAN)
+  if (file != NULL)
   {
-    fputc((value >> 8) & 0xff, file);
-    fputc((value >> 0) & 0xff, file);
+    if (byte_order == BYTE_ORDER_BIG_ENDIAN)
+    {
+      fputc((value >> 8) & 0xff, file);
+      fputc((value >> 0) & 0xff, file);
+    }
+    else	   /* BYTE_ORDER_LITTLE_ENDIAN */
+    {
+      fputc((value >> 0) & 0xff, file);
+      fputc((value >> 8) & 0xff, file);
+    }
   }
-  else		 /* BYTE_ORDER_LITTLE_ENDIAN */
-  {
-    fputc((value >> 0) & 0xff, file);
-    fputc((value >> 8) & 0xff, file);
-  }
+
+  return 2;
 }
 
 int getFile32BitInteger(FILE *file, int byte_order)
@@ -963,22 +987,27 @@ int getFile32BitInteger(FILE *file, int byte_order)
 	    (fgetc(file) << 24));
 }
 
-void putFile32BitInteger(FILE *file, int value, int byte_order)
+int putFile32BitInteger(FILE *file, int value, int byte_order)
 {
-  if (byte_order == BYTE_ORDER_BIG_ENDIAN)
+  if (file != NULL)
   {
-    fputc((value >> 24) & 0xff, file);
-    fputc((value >> 16) & 0xff, file);
-    fputc((value >>  8) & 0xff, file);
-    fputc((value >>  0) & 0xff, file);
+    if (byte_order == BYTE_ORDER_BIG_ENDIAN)
+    {
+      fputc((value >> 24) & 0xff, file);
+      fputc((value >> 16) & 0xff, file);
+      fputc((value >>  8) & 0xff, file);
+      fputc((value >>  0) & 0xff, file);
+    }
+    else	   /* BYTE_ORDER_LITTLE_ENDIAN */
+    {
+      fputc((value >>  0) & 0xff, file);
+      fputc((value >>  8) & 0xff, file);
+      fputc((value >> 16) & 0xff, file);
+      fputc((value >> 24) & 0xff, file);
+    }
   }
-  else		 /* BYTE_ORDER_LITTLE_ENDIAN */
-  {
-    fputc((value >>  0) & 0xff, file);
-    fputc((value >>  8) & 0xff, file);
-    fputc((value >> 16) & 0xff, file);
-    fputc((value >> 24) & 0xff, file);
-  }
+
+  return 4;
 }
 
 boolean getFileChunk(FILE *file, char *chunk_name, int *chunk_size,
@@ -1033,6 +1062,22 @@ void putFileVersion(FILE *file, int version)
   fputc(version_minor, file);
   fputc(version_patch, file);
   fputc(version_build, file);
+}
+
+void ReadBytesFromFile(FILE *file, byte *buffer, unsigned long bytes)
+{
+  int i;
+
+  for(i = 0; i < bytes && !feof(file); i++)
+    buffer[i] = fgetc(file);
+}
+
+void WriteBytesToFile(FILE *file, byte *buffer, unsigned long bytes)
+{
+  int i;
+
+  for(i = 0; i < bytes; i++)
+    fputc(buffer[i], file);
 }
 
 void ReadUnusedBytesFromFile(FILE *file, unsigned long bytes)

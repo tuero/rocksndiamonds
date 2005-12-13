@@ -651,7 +651,6 @@
 #define MIN_ELEMENT_CONTENTS	1
 #define STD_ELEMENT_CONTENTS	4
 #define MAX_ELEMENT_CONTENTS	8
-#define NUM_MAGIC_BALL_CONTENTS	8
 
 #define LEVEL_SCORE_ELEMENTS	16	/* level elements with score */
 
@@ -1482,7 +1481,7 @@
 #define PROGRAM_VERSION_MAJOR		3
 #define PROGRAM_VERSION_MINOR		2
 #define PROGRAM_VERSION_PATCH		0
-#define PROGRAM_VERSION_BUILD		4
+#define PROGRAM_VERSION_BUILD		5
 #endif
 
 #define PROGRAM_TITLE_STRING		"Rocks'n'Diamonds"
@@ -1582,6 +1581,11 @@ struct HiScore
 {
   char Name[MAX_PLAYER_NAME_LEN + 1];
   int Score;
+};
+
+struct Content
+{
+  int e[3][3];
 };
 
 struct PlayerInfo
@@ -1722,7 +1726,7 @@ struct LevelInfo
 
   int score[LEVEL_SCORE_ELEMENTS];
 
-  int yamyam_content[MAX_ELEMENT_CONTENTS][3][3];
+  struct Content yamyam_content[MAX_ELEMENT_CONTENTS];
   int num_yamyam_contents;
 
   int amoeba_speed;
@@ -1745,7 +1749,7 @@ struct LevelInfo
   int lenses_time;
   int magnify_time;
   int wind_direction_initial;
-  int ball_content[NUM_MAGIC_BALL_CONTENTS][3][3];
+  struct Content ball_content[MAX_ELEMENT_CONTENTS];
   boolean android_array[16];
 
   int can_move_into_acid_bits;	/* bitfield to store property for elements */
@@ -1886,7 +1890,7 @@ struct ElementChangeInfo
 
   short trigger_element;	/* element triggering change */
 
-  int target_content[3][3];	/* elements for extended change target */
+  struct Content target_content;/* elements for extended change target */
   boolean use_target_content;	/* use extended change target */
   boolean only_if_complete;	/* only use complete target content */
   boolean use_random_replace;	/* use random value for replacing elements */
@@ -1997,7 +2001,7 @@ struct ElementInfo
 
   int slippery_type;		/* how/where other elements slip away */
 
-  int content[3][3];		/* new elements after explosion */
+  struct Content content;	/* new elements after explosion */
 
   int explosion_type;		/* type of explosion, like 3x3, 3+3 or 1x1 */
   int explosion_delay;		/* duration of explosion of this element */

@@ -135,6 +135,9 @@ backup_lev:
 backup_gfx:
 	./Scripts/make_backup.sh gfx
 
+# prerelease:
+#	./Scripts/make_prerelease.sh
+
 dist-unix:
 	./Scripts/make_dist.sh unix .
 

@@ -25,7 +25,7 @@
 #define USE_NEW_AMOEBA_CODE	FALSE
 
 /* EXPERIMENTAL STUFF */
-#define USE_NEW_STUFF			(			* 1)
+#define USE_NEW_STUFF			(			  1)
 
 #define USE_NEW_SP_SLIPPERY		(USE_NEW_STUFF		* 1)
 #define USE_NEW_COLLECT_COUNT		(USE_NEW_STUFF		* 1)
@@ -1933,7 +1933,7 @@ void InitGame()
 
       for (yy = 0; yy < 3; yy++) for (xx = 0; xx < 3; xx++)
       {
-	content = element_info[element].content[xx][yy];
+	content = element_info[element].content.e[xx][yy];
 	is_player = ELEM_IS_PLAYER(content);
 
 	if (is_player && (found_rating < 2 || element < found_element))
@@ -1950,7 +1950,9 @@ void InitGame()
 
 	for (i = 0; i < element_info[element].num_change_pages; i++)
 	{
-	  content= element_info[element].change_page[i].target_content[xx][yy];
+	  content =
+	    element_info[element].change_page[i].target_content.e[xx][yy];
+
 	  is_player = ELEM_IS_PLAYER(content);
 
 	  if (is_player && (found_rating < 1 || element < found_element))
@@ -3066,10 +3068,10 @@ void Explode(int ex, int ey, int phase, int mode)
       else if (center_element == EL_AMOEBA_TO_DIAMOND)
 	Store[x][y] = level.amoeba_content;
       else if (center_element == EL_YAMYAM)
-	Store[x][y] = level.yamyam_content[game.yamyam_content_nr][xx][yy];
+	Store[x][y] = level.yamyam_content[game.yamyam_content_nr].e[xx][yy];
       else if (IS_CUSTOM_ELEMENT(center_element) &&
-	       element_info[center_element].content[xx][yy] != EL_EMPTY)
-	Store[x][y] = element_info[center_element].content[xx][yy];
+	       element_info[center_element].content.e[xx][yy] != EL_EMPTY)
+	Store[x][y] = element_info[center_element].content.e[xx][yy];
       else if (element == EL_WALL_EMERALD)
 	Store[x][y] = EL_EMERALD;
       else if (element == EL_WALL_DIAMOND)
@@ -3087,7 +3089,7 @@ void Explode(int ex, int ey, int phase, int mode)
       else if (element == EL_WALL_CRYSTAL)
 	Store[x][y] = EL_CRYSTAL;
       else if (IS_CUSTOM_ELEMENT(element) && !CAN_EXPLODE(element))
-	Store[x][y] = element_info[element].content[1][1];
+	Store[x][y] = element_info[element].content.e[1][1];
       else
 	Store[x][y] = EL_EMPTY;
 
@@ -6966,7 +6968,7 @@ static boolean ChangeElementNow(int x, int y, int element, int page)
       boolean is_destructible;
       int ex = x + xx - 1;
       int ey = y + yy - 1;
-      int content_element = change->target_content[xx][yy];
+      int content_element = change->target_content.e[xx][yy];
       int e;
 
       can_replace[xx][yy] = TRUE;
@@ -7038,7 +7040,7 @@ static boolean ChangeElementNow(int x, int y, int element, int page)
 
 	  ChangeEvent[ex][ey] = ChangeEvent[x][y];
 
-	  content_element = change->target_content[xx][yy];
+	  content_element = change->target_content.e[xx][yy];
 	  target_element = GET_TARGET_ELEMENT(content_element, change);
 
 	  ChangeElementNowExt(change, ex, ey, target_element);

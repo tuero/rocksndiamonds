@@ -1,3 +1,9 @@
+2005-12-12
+	* added level file chunk "CONF" for generic level and element settings
+
+2005-12-11
+	* uploaded pre-release (test) version 3.2.0-4 binary and source code
+
 2005-12-11
 	* skip empty level sets (with "levels: 0"; may be artwork base sets)
 	* added sound action ".page[1]" to ".page[32]" for each CE change page

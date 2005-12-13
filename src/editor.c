@@ -4170,7 +4170,7 @@ static void DrawDrawingArea(int id)
       for (x = 0; x < 3; x++)
 	DrawMiniGraphicExt(drawto,
 			   gi->x + x * MINI_TILEX, gi->y + y * MINI_TILEY,
-			   el2edimg(custom_element.content[x][y]));
+			   el2edimg(custom_element.content.e[x][y]));
   else if (id == ED_DRAWING_ID_CUSTOM_MOVE_ENTER)
     DrawMiniGraphicExt(drawto, gi->x, gi->y,
 		       el2edimg(custom_element.move_enter_element));
@@ -4185,7 +4185,7 @@ static void DrawDrawingArea(int id)
       for (x = 0; x < 3; x++)
 	DrawMiniGraphicExt(drawto,
 			   gi->x + x * MINI_TILEX, gi->y + y * MINI_TILEY,
-			   el2edimg(custom_element_change.target_content[x][y]));
+			   el2edimg(custom_element_change.target_content.e[x][y]));
   else if (id == ED_DRAWING_ID_CUSTOM_CHANGE_TRIGGER)
     DrawMiniGraphicExt(drawto, gi->x, gi->y,
 		       el2edimg(custom_element_change.trigger_element));
@@ -4202,7 +4202,7 @@ static void DrawDrawingArea(int id)
       for (x = 0; x < 3; x++)
 	DrawMiniGraphicExt(drawto,
 			   gi->x + x * MINI_TILEX, gi->y + y * MINI_TILEY,
-			   el2edimg(level.yamyam_content[nr][x][y]));
+			   el2edimg(level.yamyam_content[nr].e[x][y]));
   }
   else if (id >= ED_DRAWING_ID_MAGIC_BALL_CONTENT_0 &&
 	   id <= ED_DRAWING_ID_MAGIC_BALL_CONTENT_7)
@@ -4213,7 +4213,7 @@ static void DrawDrawingArea(int id)
       for (x = 0; x < 3; x++)
 	DrawMiniGraphicExt(drawto,
 			   gi->x + x * MINI_TILEX, gi->y + y * MINI_TILEY,
-			   el2edimg(level.ball_content[nr][x][y]));
+			   el2edimg(level.ball_content[nr].e[x][y]));
   }
 }
 
@@ -5737,7 +5737,7 @@ static void copy_custom_element_settings(int element_from, int element_to)
 
   for (y = 0; y < 3; y++)
     for (x = 0; x < 3; x++)
-      ei_to->content[x][y] = ei_from->content[x][y];
+      ei_to->content.e[x][y] = ei_from->content.e[x][y];
 
   ei_to->explosion_type = ei_from->explosion_type;
   ei_to->explosion_delay = ei_from->explosion_delay;
@@ -5772,8 +5772,8 @@ static void replace_custom_element_in_settings(int element_from,
 
     for (y = 0; y < 3; y++)
       for (x = 0; x < 3; x++)
-	if (ei->content[x][y] == element_from)
-	  ei->content[x][y] = element_to;
+	if (ei->content.e[x][y] == element_from)
+	  ei->content.e[x][y] = element_to;
 
     for (j = 0; j < ei->num_change_pages; j++)
     {
@@ -5787,8 +5787,8 @@ static void replace_custom_element_in_settings(int element_from,
 
       for (y = 0; y < 3; y++)
 	for (x = 0; x < 3; x++)
-	  if (change->target_content[x][y] == element_from)
-	    change->target_content[x][y] = element_to;
+	  if (change->target_content.e[x][y] == element_from)
+	    change->target_content.e[x][y] = element_to;
     }
 
     if (ei->group != NULL)				/* group or internal */
@@ -6558,7 +6558,7 @@ static void DrawMagicBallContentAreas()
   int y = SY + ED_AREA_MAGIC_BALL_CONTENT_YPOS(0) + ED_BORDER_AREA_YSIZE;
   int i;
 
-  for (i = 0; i < NUM_MAGIC_BALL_CONTENTS; i++)
+  for (i = 0; i < MAX_ELEMENT_CONTENTS; i++)
     MapDrawingArea(ED_DRAWING_ID_MAGIC_BALL_CONTENT_0 + i);
 
   DrawText(x, y + 0 * MINI_TILEY, "generated", FONT_TEXT_1);
@@ -8124,7 +8124,7 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 	}
 	else if (id == GADGET_ID_CUSTOM_CONTENT)
 	{
-	  custom_element.content[sx][sy] = new_element;
+	  custom_element.content.e[sx][sy] = new_element;
 
 	  CopyCustomElementPropertiesToGame(properties_element);
 	}
@@ -8148,7 +8148,7 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 	}
 	else if (id == GADGET_ID_CUSTOM_CHANGE_CONTENT)
 	{
-	  custom_element_change.target_content[sx][sy] = new_element;
+	  custom_element_change.target_content.e[sx][sy] = new_element;
 
 	  CopyCustomElementPropertiesToGame(properties_element);
 	}
@@ -8168,11 +8168,11 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 	  random_placement_background_element = new_element;
 	else if (id >= GADGET_ID_YAMYAM_CONTENT_0 &&
 		 id <= GADGET_ID_YAMYAM_CONTENT_7)
-	  level.yamyam_content[id - GADGET_ID_YAMYAM_CONTENT_0][sx][sy] =
+	  level.yamyam_content[id - GADGET_ID_YAMYAM_CONTENT_0].e[sx][sy] =
 	    new_element;
 	else if (id >= GADGET_ID_MAGIC_BALL_CONTENT_0 &&
 		 id <= GADGET_ID_MAGIC_BALL_CONTENT_7)
-	  level.ball_content[id - GADGET_ID_MAGIC_BALL_CONTENT_0][sx][sy] =
+	  level.ball_content[id - GADGET_ID_MAGIC_BALL_CONTENT_0].e[sx][sy] =
 	    new_element;
       }
       break;
@@ -8277,7 +8277,7 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
       else if (id == GADGET_ID_CUSTOM_GRAPHIC)
 	PickDrawingElement(button, custom_element.gfx_element);
       else if (id == GADGET_ID_CUSTOM_CONTENT)
-	PickDrawingElement(button, custom_element.content[sx][sy]);
+	PickDrawingElement(button, custom_element.content.e[sx][sy]);
       else if (id == GADGET_ID_CUSTOM_MOVE_ENTER)
 	PickDrawingElement(button, custom_element.move_enter_element);
       else if (id == GADGET_ID_CUSTOM_MOVE_LEAVE)
@@ -8285,7 +8285,7 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
       else if (id == GADGET_ID_CUSTOM_CHANGE_TARGET)
 	PickDrawingElement(button, custom_element_change.target_element);
       else if (id == GADGET_ID_CUSTOM_CHANGE_CONTENT)
-	PickDrawingElement(button, custom_element_change.target_content[sx][sy]);
+	PickDrawingElement(button, custom_element_change.target_content.e[sx][sy]);
       else if (id == GADGET_ID_CUSTOM_CHANGE_TRIGGER)
 	PickDrawingElement(button, custom_element_change.trigger_element);
       else if (id == GADGET_ID_GROUP_CONTENT)
@@ -8297,14 +8297,14 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
       {
 	int i = id - GADGET_ID_YAMYAM_CONTENT_0;
 
-	PickDrawingElement(button, level.yamyam_content[i][sx][sy]);
+	PickDrawingElement(button, level.yamyam_content[i].e[sx][sy]);
       }
       else if (id >= GADGET_ID_MAGIC_BALL_CONTENT_0 &&
 	       id <= GADGET_ID_MAGIC_BALL_CONTENT_7)
       {
 	int i = id - GADGET_ID_MAGIC_BALL_CONTENT_0;
 
-	PickDrawingElement(button, level.ball_content[i][sx][sy]);
+	PickDrawingElement(button, level.ball_content[i].e[sx][sy]);
       }
 
       break;
@@ -9267,7 +9267,7 @@ static void HandleDrawingAreaInfo(struct GadgetInfo *gi)
     else if (id == GADGET_ID_CUSTOM_GRAPHIC)
       element = custom_element.gfx_element;
     else if (id == GADGET_ID_CUSTOM_CONTENT)
-      element = custom_element.content[sx][sy];
+      element = custom_element.content.e[sx][sy];
     else if (id == GADGET_ID_CUSTOM_MOVE_ENTER)
       element = custom_element.move_enter_element;
     else if (id == GADGET_ID_CUSTOM_MOVE_LEAVE)
@@ -9275,7 +9275,7 @@ static void HandleDrawingAreaInfo(struct GadgetInfo *gi)
     else if (id == GADGET_ID_CUSTOM_CHANGE_TARGET)
       element = custom_element_change.target_element;
     else if (id == GADGET_ID_CUSTOM_CHANGE_CONTENT)
-      element = custom_element_change.target_content[sx][sy];
+      element = custom_element_change.target_content.e[sx][sy];
     else if (id == GADGET_ID_CUSTOM_CHANGE_TRIGGER)
       element = custom_element_change.trigger_element;
     else if (id == GADGET_ID_GROUP_CONTENT)
@@ -9284,10 +9284,10 @@ static void HandleDrawingAreaInfo(struct GadgetInfo *gi)
       element = random_placement_background_element;
     else if (id >= GADGET_ID_YAMYAM_CONTENT_0 &&
 	     id <= GADGET_ID_YAMYAM_CONTENT_7)
-      element = level.yamyam_content[id - GADGET_ID_YAMYAM_CONTENT_0][sx][sy];
+      element = level.yamyam_content[id -GADGET_ID_YAMYAM_CONTENT_0].e[sx][sy];
     else if (id >= GADGET_ID_MAGIC_BALL_CONTENT_0 &&
 	     id <= GADGET_ID_MAGIC_BALL_CONTENT_7)
-      element = level.ball_content[id -GADGET_ID_MAGIC_BALL_CONTENT_0][sx][sy];
+      element =level.ball_content[id-GADGET_ID_MAGIC_BALL_CONTENT_0].e[sx][sy];
 
     strncpy(infotext, getElementInfoText(element), max_infotext_len);
   }

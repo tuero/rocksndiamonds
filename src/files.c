@@ -49,6 +49,81 @@
 #define TAPE_COOKIE_TMPL	"ROCKSNDIAMONDS_TAPE_FILE_VERSION_x.x"
 #define SCORE_COOKIE		"ROCKSNDIAMONDS_SCORE_FILE_VERSION_1.2"
 
+/* values for "CONF" chunk */
+#define CONF_MASK_1_BYTE	0x00
+#define CONF_MASK_2_BYTE	0x40
+#define CONF_MASK_4_BYTE	0x80
+#define CONF_MASK_MULTI_BYTES	0xc0
+
+#define CONF_MASK_BYTES		0xc0
+#define CONF_MASK_TOKEN		0x3f
+
+#define CONF_LAST_ENTRY		(CONF_MASK_1_BYTE | 0)
+
+#define CONF_VALUE_SCORE_1	(CONF_MASK_1_BYTE | 1)
+#define CONF_VALUE_SCORE_2	(CONF_MASK_1_BYTE | 2)
+#define CONF_VALUE_SCORE_3	(CONF_MASK_1_BYTE | 3)
+#define CONF_VALUE_SCORE_4	(CONF_MASK_1_BYTE | 4)
+#define CONF_VALUE_TIME_1	(CONF_MASK_1_BYTE | 5)
+#define CONF_VALUE_TIME_2	(CONF_MASK_1_BYTE | 6)
+#define CONF_VALUE_TIME_3	(CONF_MASK_1_BYTE | 7)
+#define CONF_VALUE_TIME_4	(CONF_MASK_1_BYTE | 8)
+#define CONF_VALUE_SWITCH_1	(CONF_MASK_1_BYTE | 9)
+#define CONF_VALUE_SWITCH_2	(CONF_MASK_1_BYTE | 10)
+#define CONF_VALUE_SWITCH_3	(CONF_MASK_1_BYTE | 11)
+#define CONF_VALUE_SWITCH_4	(CONF_MASK_1_BYTE | 12)
+#define CONF_VALUE_USE_BUG_1	(CONF_MASK_1_BYTE | 13)
+#define CONF_VALUE_USE_BUG_2	(CONF_MASK_1_BYTE | 14)
+#define CONF_VALUE_USE_BUG_3	(CONF_MASK_1_BYTE | 15)
+#define CONF_VALUE_USE_BUG_4	(CONF_MASK_1_BYTE | 16)
+
+#define CONF_VALUE_ELEMENT_1	(CONF_MASK_2_BYTE | 1)
+#define CONF_VALUE_ELEMENT_2	(CONF_MASK_2_BYTE | 2)
+
+#define CONF_VALUE_CONTENT_1	(CONF_MASK_MULTI_BYTES | 1)
+#define CONF_VALUE_CONTENT_8	(CONF_MASK_MULTI_BYTES | 2)
+
+#define CONF_VALUE_BOOLEAN(x)	((x) >= CONF_VALUE_SWITCH_1 &&		\
+				 (x) <= CONF_VALUE_USE_BUG_4)
+
+#define CONF_VALUE_NUM_BYTES(x)	((x) == CONF_MASK_1_BYTE ? 1 :		\
+				 (x) == CONF_MASK_2_BYTE ? 2 :		\
+				 (x) == CONF_MASK_4_BYTE ? 4 : 0)
+
+#define CONF_CONTENT_NUM_ELEMENTS	(3 * 3)
+#define CONF_CONTENT_NUM_BYTES		(CONF_CONTENT_NUM_ELEMENTS * 2)
+
+#define CONF_CONTENT_ELEMENT_POS(c,x,y)	((c) * CONF_CONTENT_NUM_ELEMENTS +    \
+					 (y) * 3 + (x))
+#define CONF_CONTENT_BYTE_POS(c,x,y)	(CONF_CONTENT_ELEMENT_POS(c,x,y) * 2)
+#define CONF_CONTENT_ELEMENT(b,c,x,y) ((b[CONF_CONTENT_BYTE_POS(c,x,y)] << 8)|\
+				       (b[CONF_CONTENT_BYTE_POS(c,x,y) + 1]))
+
+static struct LevelInfo li;
+
+static struct
+{
+  int element;
+  int type;
+  void *value;
+} element_conf[] =
+{
+  /* 1-byte values */
+  { EL_EMC_ANDROID,	CONF_VALUE_TIME_1,	&li.android_move_time	},
+  { EL_EMC_ANDROID,	CONF_VALUE_TIME_2,	&li.android_clone_time	},
+  { EL_EMC_MAGIC_BALL,	CONF_VALUE_TIME_1,	&li.ball_time		},
+  { EL_EMC_LENSES,	CONF_VALUE_SCORE_1,	&li.lenses_score	},
+  { EL_EMC_LENSES,	CONF_VALUE_TIME_1,	&li.lenses_time		},
+  { EL_EMC_MAGNIFIER,	CONF_VALUE_SCORE_1,	&li.magnify_score	},
+  { EL_EMC_MAGNIFIER,	CONF_VALUE_TIME_1,	&li.magnify_time	},
+  { EL_ROBOT,		CONF_VALUE_SCORE_2,	&li.slurp_score		},
+
+  /* multi-byte values */
+  { EL_EMC_MAGIC_BALL,	CONF_VALUE_CONTENT_8,	&li.ball_content	},
+
+  { -1,			-1,			NULL			},
+};
+
 static struct
 {
   int filetype;
@@ -121,7 +196,7 @@ void setElementChangeInfoToDefaults(struct ElementChangeInfo *change)
 
   for (x = 0; x < 3; x++)
     for (y = 0; y < 3; y++)
-      change->target_content[x][y] = EL_EMPTY_SPACE;
+      change->target_content.e[x][y] = EL_EMPTY_SPACE;
 
   change->direct_action = 0;
   change->other_action = 0;
@@ -196,10 +271,10 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
   level->lenses_time = 10;
   level->magnify_time = 10;
   level->wind_direction_initial = MV_NO_MOVING;
-  for (i = 0; i < NUM_MAGIC_BALL_CONTENTS; i++)
+  for (i = 0; i < MAX_ELEMENT_CONTENTS; i++)
     for (x = 0; x < 3; x++)
       for (y = 0; y < 3; y++)
-	level->ball_content[i][x][y] = EL_EMPTY;
+	level->ball_content[i].e[x][y] = EL_EMPTY;
   for (i = 0; i < 16; i++)
     level->android_array[i] = FALSE;
 
@@ -227,7 +302,7 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
   for (i = 0; i < MAX_ELEMENT_CONTENTS; i++)
     for (x = 0; x < 3; x++)
       for (y = 0; y < 3; y++)
-	level->yamyam_content[i][x][y] =
+	level->yamyam_content[i].e[x][y] =
 	  (i < STD_ELEMENT_CONTENTS ? EL_ROCK : EL_EMPTY);
 
   level->field[0][0] = EL_PLAYER_1;
@@ -295,7 +370,7 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
 
       for (x = 0; x < 3; x++)
 	for (y = 0; y < 3; y++)
-	  element_info[element].content[x][y] = EL_EMPTY_SPACE;
+	  element_info[element].content.e[x][y] = EL_EMPTY_SPACE;
 
       element_info[element].access_type = 0;
       element_info[element].access_layer = 0;
@@ -762,7 +837,7 @@ static int LoadLevel_HEAD(FILE *file, int chunk_size, struct LevelInfo *level)
   for (i = 0; i < STD_ELEMENT_CONTENTS; i++)
     for (y = 0; y < 3; y++)
       for (x = 0; x < 3; x++)
-	level->yamyam_content[i][x][y] = getMappedElement(getFile8Bit(file));
+	level->yamyam_content[i].e[x][y] = getMappedElement(getFile8Bit(file));
 
   level->amoeba_speed		= getFile8Bit(file);
   level->time_magic_wall	= getFile8Bit(file);
@@ -866,7 +941,7 @@ static int LoadLevel_CONT(FILE *file, int chunk_size, struct LevelInfo *level)
   for (i = 0; i < MAX_ELEMENT_CONTENTS; i++)
     for (y = 0; y < 3; y++)
       for (x = 0; x < 3; x++)
-	level->yamyam_content[i][x][y] =
+	level->yamyam_content[i].e[x][y] =
 	  getMappedElement(level->encoding_16bit_field ?
 			   getFile16BitBE(file) : getFile8Bit(file));
   return chunk_size;
@@ -902,7 +977,7 @@ static int LoadLevel_CNT2(FILE *file, int chunk_size, struct LevelInfo *level)
     for (i = 0; i < num_contents; i++)
       for (y = 0; y < 3; y++)
 	for (x = 0; x < 3; x++)
-	  level->yamyam_content[i][x][y] = content_array[i][x][y];
+	  level->yamyam_content[i].e[x][y] = content_array[i][x][y];
   }
   else if (element == EL_BD_AMOEBA)
   {
@@ -1053,7 +1128,7 @@ static int LoadLevel_CUS3(FILE *file, int chunk_size, struct LevelInfo *level)
 
     for (y = 0; y < 3; y++)
       for (x = 0; x < 3; x++)
-	element_info[element].content[x][y] =
+	element_info[element].content.e[x][y] =
 	  getMappedElement(getFile16BitBE(file));
 
     event_bits = getFile32BitBE(file);
@@ -1081,7 +1156,7 @@ static int LoadLevel_CUS3(FILE *file, int chunk_size, struct LevelInfo *level)
 
     for (y = 0; y < 3; y++)
       for (x = 0; x < 3; x++)
-	element_info[element].change->target_content[x][y] =
+	element_info[element].change->target_content.e[x][y] =
 	  getMappedElement(getFile16BitBE(file));
 
     element_info[element].slippery_type = getFile8Bit(file);
@@ -1158,7 +1233,7 @@ static int LoadLevel_CUS4(FILE *file, int chunk_size, struct LevelInfo *level)
 
   for (y = 0; y < 3; y++)
     for (x = 0; x < 3; x++)
-      ei->content[x][y] = getMappedElement(getFile16BitBE(file));
+      ei->content.e[x][y] = getMappedElement(getFile16BitBE(file));
 
   ei->move_enter_element = getMappedElement(getFile16BitBE(file));
   ei->move_leave_element = getMappedElement(getFile16BitBE(file));
@@ -1211,7 +1286,7 @@ static int LoadLevel_CUS4(FILE *file, int chunk_size, struct LevelInfo *level)
 
     for (y = 0; y < 3; y++)
       for (x = 0; x < 3; x++)
-	change->target_content[x][y] = getMappedElement(getFile16BitBE(file));
+	change->target_content.e[x][y]= getMappedElement(getFile16BitBE(file));
 
     change->can_change = getFile8Bit(file);
 
@@ -1280,6 +1355,96 @@ static int LoadLevel_GRP1(FILE *file, int chunk_size, struct LevelInfo *level)
   element_info[element].modified_settings = TRUE;
 
   return chunk_size;
+}
+
+static int LoadLevel_CONF(FILE *file, int chunk_size, struct LevelInfo *level)
+{
+  int real_chunk_size = 0;
+  int i;
+
+  while (!feof(file))
+  {
+    int element = getFile16BitBE(file);
+    int type = getFile8Bit(file);
+    int bytes = type & CONF_MASK_BYTES;
+    boolean element_found = FALSE;
+
+    real_chunk_size += 3;
+
+    li = *level;	/* copy level information into temporary buffer */
+
+    if (bytes == CONF_MASK_MULTI_BYTES)
+    {
+      int num_bytes = getFile16BitBE(file);
+      byte *buffer = checked_malloc(num_bytes);
+
+      ReadBytesFromFile(file, buffer, num_bytes);
+
+      for (i = 0; element_conf[i].element != -1; i++)
+      {
+	if (element_conf[i].element == element &&
+	    element_conf[i].type    == type)
+	{
+	  element_found = TRUE;
+
+	  if (type == CONF_VALUE_CONTENT_8)
+	  {
+	    struct Content *content= (struct Content *)(element_conf[i].value);
+	    int num_contents = num_bytes / CONF_CONTENT_NUM_BYTES;
+	    int c, x, y;
+
+	    for (c = 0; c < num_contents; c++)
+	      for (y = 0; y < 3; y++)
+		for (x = 0; x < 3; x++)
+		  content[c].e[x][y] =
+		    getMappedElement(CONF_CONTENT_ELEMENT(buffer, c, x, y));
+	  }
+	  else
+	    element_found = FALSE;
+
+	  break;
+	}
+      }
+
+      checked_free(buffer);
+
+      real_chunk_size += 2 + num_bytes;
+    }
+    else
+    {
+      int value = (bytes == CONF_MASK_1_BYTE ? getFile8Bit   (file) :
+		   bytes == CONF_MASK_2_BYTE ? getFile16BitBE(file) :
+		   bytes == CONF_MASK_4_BYTE ? getFile32BitBE(file) : 0);
+
+      for (i = 0; element_conf[i].element != -1; i++)
+      {
+	if (element_conf[i].element == element &&
+	    element_conf[i].type    == type)
+	{
+	  if (CONF_VALUE_BOOLEAN(type))
+	    *(boolean *)(element_conf[i].value) = value;
+	  else
+	    *(int *)    (element_conf[i].value) = value;
+
+	  element_found = TRUE;
+
+	  break;
+	}
+      }
+
+      real_chunk_size += CONF_VALUE_NUM_BYTES(bytes);
+    }
+
+    *level = li;	/* copy temporary buffer back to level information */
+
+    if (!element_found)
+      Error(ERR_WARN, "cannot load CONF value for element %d", element);
+
+    if (type == CONF_LAST_ENTRY || real_chunk_size >= chunk_size)
+      break;
+  }
+
+  return real_chunk_size;
 }
 
 static void LoadLevelFromFileInfo_RND(struct LevelInfo *level,
@@ -1373,6 +1538,8 @@ static void LoadLevelFromFileInfo_RND(struct LevelInfo *level,
       { "CUS3", -1,			LoadLevel_CUS3 },
       { "CUS4", -1,			LoadLevel_CUS4 },
       { "GRP1", -1,			LoadLevel_GRP1 },
+      { "CONF", -1,			LoadLevel_CONF },
+
       {  NULL,  0,			NULL }
     };
 
@@ -1815,7 +1982,7 @@ static void OLD_LoadLevelFromFileInfo_EM(struct LevelInfo *level,
   for (i = 0; i < level->num_yamyam_contents; i++)
     for (y = 0; y < 3; y++)
       for (x = 0; x < 3; x++)
-	level->yamyam_content[i][x][y] =
+	level->yamyam_content[i].e[x][y] =
 	  map_em_element_yam(header[i * 9 + y * 3 + x]);
 
   level->amoeba_speed		= (header[52] * 256 + header[53]) % 256;
@@ -1884,7 +2051,7 @@ void CopyNativeLevel_RND_to_EM(struct LevelInfo *level)
     for (y = 0; y < 3; y++)
       for (x = 0; x < 3; x++)
 	lev->eater_array[i][y * 3 + x] =
-	  map_element_RND_to_EM(level->yamyam_content[i][x][y]);
+	  map_element_RND_to_EM(level->yamyam_content[i].e[x][y]);
 
   lev->amoeba_time		= level->amoeba_speed;
   lev->wonderwall_time_initial	= level->time_magic_wall;
@@ -1904,11 +2071,11 @@ void CopyNativeLevel_RND_to_EM(struct LevelInfo *level)
   lev->magnify_time		= level->magnify_time;
   lev->wind_direction_initial	= level->wind_direction_initial;
 
-  for (i = 0; i < NUM_MAGIC_BALL_CONTENTS; i++)
+  for (i = 0; i < MAX_ELEMENT_CONTENTS; i++)
     for (j = 0; j < 8; j++)
       lev->ball_array[i][j] =
 	map_element_RND_to_EM(level->
-			      ball_content[i][ball_xy[j][0]][ball_xy[j][1]]);
+			      ball_content[i].e[ball_xy[j][0]][ball_xy[j][1]]);
 
   for (i = 0; i < 16; i++)
     lev->android_array[i] = FALSE;	/* !!! YET TO COME !!! */
@@ -1996,7 +2163,7 @@ void CopyNativeLevel_EM_to_RND(struct LevelInfo *level)
   for (i = 0; i < level->num_yamyam_contents; i++)
     for (y = 0; y < 3; y++)
       for (x = 0; x < 3; x++)
-	level->yamyam_content[i][x][y] =
+	level->yamyam_content[i].e[x][y] =
 	  map_element_EM_to_RND(lev->eater_array[i][y * 3 + x]);
 
   level->amoeba_speed		= lev->amoeba_time;
@@ -2017,9 +2184,9 @@ void CopyNativeLevel_EM_to_RND(struct LevelInfo *level)
   level->magnify_time		= lev->magnify_time;
   level->wind_direction_initial	= lev->wind_direction_initial;
 
-  for (i = 0; i < NUM_MAGIC_BALL_CONTENTS; i++)
+  for (i = 0; i < MAX_ELEMENT_CONTENTS; i++)
     for (j = 0; j < 8; j++)
-      level->ball_content[i][ball_xy[j][0]][ball_xy[j][1]] =
+      level->ball_content[i].e[ball_xy[j][0]][ball_xy[j][1]] =
 	map_element_EM_to_RND(lev->ball_array[i][j]);
 
   for (i = 0; i < 16; i++)
@@ -2223,7 +2390,7 @@ static void LoadLevelFromFileStream_SP(FILE *file, struct LevelInfo *level,
   for (i = 0; i < level->num_yamyam_contents; i++)
     for (y = 0; y < 3; y++)
       for (x = 0; x < 3; x++)
-	level->yamyam_content[i][x][y] = EL_EMPTY;
+	level->yamyam_content[i].e[x][y] = EL_EMPTY;
 }
 
 static void LoadLevelFromFileInfo_SP(struct LevelInfo *level,
@@ -2688,8 +2855,8 @@ static void LoadLevel_InitElements(struct LevelInfo *level, char *filename)
   for (i = 0; i < MAX_ELEMENT_CONTENTS; i++)
     for (x = 0; x < 3; x++)
       for (y = 0; y < 3; y++)
-	level->yamyam_content[i][x][y] =
-	  getMappedElementByVersion(level->yamyam_content[i][x][y],
+	level->yamyam_content[i].e[x][y] =
+	  getMappedElementByVersion(level->yamyam_content[i].e[x][y],
 				    level->game_version);
 
   /* initialize element properties for level editor etc. */
@@ -2777,7 +2944,7 @@ static void SaveLevel_HEAD(FILE *file, struct LevelInfo *level)
     for (y = 0; y < 3; y++)
       for (x = 0; x < 3; x++)
 	putFile8Bit(file, (level->encoding_16bit_yamyam ? EL_EMPTY :
-			   level->yamyam_content[i][x][y]));
+			   level->yamyam_content[i].e[x][y]));
   putFile8Bit(file, level->amoeba_speed);
   putFile8Bit(file, level->time_magic_wall);
   putFile8Bit(file, level->time_wheel);
@@ -2841,9 +3008,9 @@ static void SaveLevel_CONT(FILE *file, struct LevelInfo *level)
     for (y = 0; y < 3; y++)
       for (x = 0; x < 3; x++)
 	if (level->encoding_16bit_field)
-	  putFile16BitBE(file, level->yamyam_content[i][x][y]);
+	  putFile16BitBE(file, level->yamyam_content[i].e[x][y]);
 	else
-	  putFile8Bit(file, level->yamyam_content[i][x][y]);
+	  putFile8Bit(file, level->yamyam_content[i].e[x][y]);
 }
 #endif
 
@@ -2862,7 +3029,7 @@ static void SaveLevel_CNT2(FILE *file, struct LevelInfo *level, int element)
     for (i = 0; i < MAX_ELEMENT_CONTENTS; i++)
       for (y = 0; y < 3; y++)
 	for (x = 0; x < 3; x++)
-	  content_array[i][x][y] = level->yamyam_content[i][x][y];
+	  content_array[i][x][y] = level->yamyam_content[i].e[x][y];
   }
   else if (element == EL_BD_AMOEBA)
   {
@@ -3016,7 +3183,7 @@ static void SaveLevel_CUS3(FILE *file, struct LevelInfo *level,
 
 	for (y = 0; y < 3; y++)
 	  for (x = 0; x < 3; x++)
-	    putFile16BitBE(file, element_info[element].content[x][y]);
+	    putFile16BitBE(file, element_info[element].content.e[x][y]);
 
 	putFile32BitBE(file, element_info[element].change->events);
 
@@ -3038,7 +3205,7 @@ static void SaveLevel_CUS3(FILE *file, struct LevelInfo *level,
 
 	for (y = 0; y < 3; y++)
 	  for (x = 0; x < 3; x++)
-	    putFile16BitBE(file, element_info[element].change->content[x][y]);
+	    putFile16BitBE(file,element_info[element].change->content.e[x][y]);
 
 	putFile8Bit(file, element_info[element].slippery_type);
 
@@ -3097,7 +3264,7 @@ static void SaveLevel_CUS4(FILE *file, struct LevelInfo *level, int element)
 
   for (y = 0; y < 3; y++)
     for (x = 0; x < 3; x++)
-      putFile16BitBE(file, ei->content[x][y]);
+      putFile16BitBE(file, ei->content.e[x][y]);
 
   putFile16BitBE(file, ei->move_enter_element);
   putFile16BitBE(file, ei->move_leave_element);
@@ -3146,7 +3313,7 @@ static void SaveLevel_CUS4(FILE *file, struct LevelInfo *level, int element)
 
     for (y = 0; y < 3; y++)
       for (x = 0; x < 3; x++)
-	putFile16BitBE(file, change->target_content[x][y]);
+	putFile16BitBE(file, change->target_content.e[x][y]);
 
     putFile8Bit(file, change->can_change);
 
@@ -3191,9 +3358,82 @@ static void SaveLevel_GRP1(FILE *file, struct LevelInfo *level, int element)
     putFile16BitBE(file, group->element[i]);
 }
 
+static int SaveLevel_CONF_Value(FILE *file, int element, int type, int value)
+{
+  int bytes = type & CONF_MASK_BYTES;
+  int num_bytes = 0;
+
+  if (bytes == CONF_MASK_MULTI_BYTES)
+    Error(ERR_EXIT, "SaveLevel_CONF_INT: invalid type CONF_MASK_MULTI_BYTES");
+
+  num_bytes += putFile16BitBE(file, element);
+  num_bytes += putFile8Bit(file, type);
+  num_bytes += (bytes == CONF_MASK_1_BYTE ? putFile8Bit   (file, value) :
+		bytes == CONF_MASK_2_BYTE ? putFile16BitBE(file, value) :
+		bytes == CONF_MASK_4_BYTE ? putFile32BitBE(file, value) : 0);
+
+  return num_bytes;
+}
+
+static int SaveLevel_CONF_Content(FILE *file, int element, int type,
+				  struct Content *content, int num_contents)
+{
+  int num_bytes = 0;
+  int i, x, y;
+
+  num_bytes += putFile16BitBE(file, element);
+  num_bytes += putFile8Bit(file, type);
+  num_bytes += putFile16BitBE(file, num_contents * CONF_CONTENT_NUM_BYTES);
+
+  for (i = 0; i < num_contents; i++)
+    for (y = 0; y < 3; y++)
+      for (x = 0; x < 3; x++)
+	num_bytes += putFile16BitBE(file, content[i].e[x][y]);
+
+  return num_bytes;
+}
+
+static int SaveLevel_CONF(FILE *file, struct LevelInfo *level)
+{
+  int chunk_size = 0;
+  int i;
+
+  li = *level;		/* copy level information into temporary buffer */
+
+  for (i = 0; element_conf[i].element != -1; i++)
+  {
+    int element = element_conf[i].element;
+    int type    = element_conf[i].type;
+    void *value = element_conf[i].value;
+    int bytes = type & CONF_MASK_BYTES;
+
+    if (bytes == CONF_MASK_MULTI_BYTES)
+    {
+      if (type == CONF_VALUE_CONTENT_8)
+      {
+	struct Content *content = (struct Content *)value;
+
+	chunk_size += SaveLevel_CONF_Content(file, element, type,
+					     content, MAX_ELEMENT_CONTENTS);
+      }
+      else
+	Error(ERR_WARN, "cannot save CONF value for element %d", element);
+    }
+    else
+    {
+      int value_int = (CONF_VALUE_BOOLEAN(type) ? *(boolean *)value :
+		       *(int *)value);
+
+      chunk_size += SaveLevel_CONF_Value(file, element, type, value_int);
+    }
+  }
+
+  return chunk_size;
+}
+
 static void SaveLevelFromFilename(struct LevelInfo *level, char *filename)
 {
-  int body_chunk_size;
+  int body_chunk_size, conf_chunk_size;
   int i, x, y;
   FILE *file;
 
@@ -3218,7 +3458,7 @@ static void SaveLevelFromFilename(struct LevelInfo *level, char *filename)
   for (i = 0; i < level->num_yamyam_contents; i++)
     for (y = 0; y < 3; y++)
       for (x = 0; x < 3; x++)
-	if (level->yamyam_content[i][x][y] > 255)
+	if (level->yamyam_content[i].e[x][y] > 255)
 	  level->encoding_16bit_yamyam = TRUE;
 
   /* check amoeba content for 16-bit elements */
@@ -3301,6 +3541,11 @@ static void SaveLevelFromFilename(struct LevelInfo *level, char *filename)
       }
     }
   }
+
+  conf_chunk_size = SaveLevel_CONF(NULL, level);	/* get chunk size */
+
+  putFileChunkBE(file, "CONF", conf_chunk_size);
+  SaveLevel_CONF(file, level);
 
   fclose(file);
 

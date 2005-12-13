@@ -118,19 +118,26 @@ void checked_free(void *);
 inline void swap_numbers(int *, int *);
 inline void swap_number_pairs(int *, int *, int *, int *);
 
+int getFile8BitInteger(FILE *);
+int putFile8BitInteger(FILE *, int);
 int getFile16BitInteger(FILE *, int);
-void putFile16BitInteger(FILE *, int, int);
+int putFile16BitInteger(FILE *, int, int);
 int getFile32BitInteger(FILE *, int);
-void putFile32BitInteger(FILE *, int, int);
+int putFile32BitInteger(FILE *, int, int);
+
 boolean getFileChunk(FILE *, char *, int *, int);
 void putFileChunk(FILE *, char *, int, int);
 int getFileVersion(FILE *);
 void putFileVersion(FILE *, int);
+
+void ReadBytesFromFile(FILE *, byte *, unsigned long);
+void WriteBytesToFile(FILE *, byte *, unsigned long);
+
 void ReadUnusedBytesFromFile(FILE *, unsigned long);
 void WriteUnusedBytesToFile(FILE *, unsigned long);
 
-#define getFile8Bit(f)        fgetc(f)
-#define putFile8Bit(f,x)      fputc(x, f)
+#define getFile8Bit(f)        getFile8BitInteger(f)
+#define putFile8Bit(f,x)      putFile8BitInteger(f,x)
 #define getFile16BitBE(f)     getFile16BitInteger(f,BYTE_ORDER_BIG_ENDIAN)
 #define getFile16BitLE(f)     getFile16BitInteger(f,BYTE_ORDER_LITTLE_ENDIAN)
 #define putFile16BitBE(f,x)   putFile16BitInteger(f,x,BYTE_ORDER_BIG_ENDIAN)
@@ -139,6 +146,7 @@ void WriteUnusedBytesToFile(FILE *, unsigned long);
 #define getFile32BitLE(f)     getFile32BitInteger(f,BYTE_ORDER_LITTLE_ENDIAN)
 #define putFile32BitBE(f,x)   putFile32BitInteger(f,x,BYTE_ORDER_BIG_ENDIAN)
 #define putFile32BitLE(f,x)   putFile32BitInteger(f,x,BYTE_ORDER_LITTLE_ENDIAN)
+
 #define getFileChunkBE(f,s,x) getFileChunk(f,s,x,BYTE_ORDER_BIG_ENDIAN)
 #define getFileChunkLE(f,s,x) getFileChunk(f,s,x,BYTE_ORDER_LITTLE_ENDIAN)
 #define putFileChunkBE(f,s,x) putFileChunk(f,s,x,BYTE_ORDER_BIG_ENDIAN)
