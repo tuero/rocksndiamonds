@@ -1,3 +1,6 @@
+2005-12-13
+	* added parameters to editor for "game of life" and "biomaze" elements
+
 2005-12-12
 	* added level file chunk "CONF" for generic level and element settings
 

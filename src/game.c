@@ -6030,10 +6030,14 @@ void AmoebeAbleger(int ax, int ay)
 void Life(int ax, int ay)
 {
   int x1, y1, x2, y2;
+#if 0
   static int life[4] = { 2, 3, 3, 3 };	/* parameters for "game of life" */
+#endif
   int life_time = 40;
   int element = Feld[ax][ay];
   int graphic = el2img(element);
+  int *life_parameter = (element == EL_GAME_OF_LIFE ? level.game_of_life :
+			 level.biomaze);
   boolean changed = FALSE;
 
   if (IS_ANIMATED(graphic))
@@ -6076,7 +6080,8 @@ void Life(int ax, int ay)
 
     if (xx == ax && yy == ay)		/* field in the middle */
     {
-      if (nachbarn < life[0] || nachbarn > life[1])
+      if (nachbarn < life_parameter[0] ||
+	  nachbarn > life_parameter[1])
       {
 	Feld[xx][yy] = EL_EMPTY;
 	if (!Stop[xx][yy])
@@ -6087,7 +6092,8 @@ void Life(int ax, int ay)
     }
     else if (IS_FREE(xx, yy) || CAN_GROW_INTO(Feld[xx][yy]))
     {					/* free border field */
-      if (nachbarn >= life[2] && nachbarn <= life[3])
+      if (nachbarn >= life_parameter[2] &&
+	  nachbarn <= life_parameter[3])
       {
 	Feld[xx][yy] = element;
 	MovDelay[xx][yy] = (element == EL_GAME_OF_LIFE ? 0 : life_time-1);

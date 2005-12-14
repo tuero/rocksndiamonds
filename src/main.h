@@ -1732,6 +1732,9 @@ struct LevelInfo
   int amoeba_speed;
   int amoeba_content;
 
+  int game_of_life[4];
+  int biomaze[4];
+
   int time_magic_wall;
   int time_wheel;
   int time_light;

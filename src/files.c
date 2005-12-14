@@ -60,31 +60,28 @@
 
 #define CONF_LAST_ENTRY		(CONF_MASK_1_BYTE | 0)
 
-#define CONF_VALUE_SCORE_1	(CONF_MASK_1_BYTE | 1)
-#define CONF_VALUE_SCORE_2	(CONF_MASK_1_BYTE | 2)
-#define CONF_VALUE_SCORE_3	(CONF_MASK_1_BYTE | 3)
-#define CONF_VALUE_SCORE_4	(CONF_MASK_1_BYTE | 4)
-#define CONF_VALUE_TIME_1	(CONF_MASK_1_BYTE | 5)
-#define CONF_VALUE_TIME_2	(CONF_MASK_1_BYTE | 6)
-#define CONF_VALUE_TIME_3	(CONF_MASK_1_BYTE | 7)
-#define CONF_VALUE_TIME_4	(CONF_MASK_1_BYTE | 8)
-#define CONF_VALUE_SWITCH_1	(CONF_MASK_1_BYTE | 9)
-#define CONF_VALUE_SWITCH_2	(CONF_MASK_1_BYTE | 10)
-#define CONF_VALUE_SWITCH_3	(CONF_MASK_1_BYTE | 11)
-#define CONF_VALUE_SWITCH_4	(CONF_MASK_1_BYTE | 12)
-#define CONF_VALUE_USE_BUG_1	(CONF_MASK_1_BYTE | 13)
-#define CONF_VALUE_USE_BUG_2	(CONF_MASK_1_BYTE | 14)
-#define CONF_VALUE_USE_BUG_3	(CONF_MASK_1_BYTE | 15)
-#define CONF_VALUE_USE_BUG_4	(CONF_MASK_1_BYTE | 16)
+#define CONF_VALUE_INTEGER_1	(CONF_MASK_1_BYTE | 1)
+#define CONF_VALUE_INTEGER_2	(CONF_MASK_1_BYTE | 2)
+#define CONF_VALUE_INTEGER_3	(CONF_MASK_1_BYTE | 3)
+#define CONF_VALUE_INTEGER_4	(CONF_MASK_1_BYTE | 4)
+#define CONF_VALUE_BOOLEAN_1	(CONF_MASK_1_BYTE | 5)
+#define CONF_VALUE_BOOLEAN_2	(CONF_MASK_1_BYTE | 6)
+#define CONF_VALUE_BOOLEAN_3	(CONF_MASK_1_BYTE | 7)
+#define CONF_VALUE_BOOLEAN_4	(CONF_MASK_1_BYTE | 8)
 
 #define CONF_VALUE_ELEMENT_1	(CONF_MASK_2_BYTE | 1)
 #define CONF_VALUE_ELEMENT_2	(CONF_MASK_2_BYTE | 2)
+#define CONF_VALUE_ELEMENT_3	(CONF_MASK_2_BYTE | 3)
+#define CONF_VALUE_ELEMENT_4	(CONF_MASK_2_BYTE | 4)
 
 #define CONF_VALUE_CONTENT_1	(CONF_MASK_MULTI_BYTES | 1)
 #define CONF_VALUE_CONTENT_8	(CONF_MASK_MULTI_BYTES | 2)
 
-#define CONF_VALUE_BOOLEAN(x)	((x) >= CONF_VALUE_SWITCH_1 &&		\
-				 (x) <= CONF_VALUE_USE_BUG_4)
+#define CONF_VALUE_INTEGER(x)	((x) >= CONF_VALUE_INTEGER_1 &&		\
+				 (x) <= CONF_VALUE_INTEGER_4)
+
+#define CONF_VALUE_BOOLEAN(x)	((x) >= CONF_VALUE_BOOLEAN_1 &&		\
+				 (x) <= CONF_VALUE_BOOLEAN_4)
 
 #define CONF_VALUE_NUM_BYTES(x)	((x) == CONF_MASK_1_BYTE ? 1 :		\
 				 (x) == CONF_MASK_2_BYTE ? 2 :		\
@@ -109,14 +106,22 @@ static struct
 } element_conf[] =
 {
   /* 1-byte values */
-  { EL_EMC_ANDROID,	CONF_VALUE_TIME_1,	&li.android_move_time	},
-  { EL_EMC_ANDROID,	CONF_VALUE_TIME_2,	&li.android_clone_time	},
-  { EL_EMC_MAGIC_BALL,	CONF_VALUE_TIME_1,	&li.ball_time		},
-  { EL_EMC_LENSES,	CONF_VALUE_SCORE_1,	&li.lenses_score	},
-  { EL_EMC_LENSES,	CONF_VALUE_TIME_1,	&li.lenses_time		},
-  { EL_EMC_MAGNIFIER,	CONF_VALUE_SCORE_1,	&li.magnify_score	},
-  { EL_EMC_MAGNIFIER,	CONF_VALUE_TIME_1,	&li.magnify_time	},
-  { EL_ROBOT,		CONF_VALUE_SCORE_2,	&li.slurp_score		},
+  { EL_EMC_ANDROID,	CONF_VALUE_INTEGER_1,	&li.android_move_time	},
+  { EL_EMC_ANDROID,	CONF_VALUE_INTEGER_2,	&li.android_clone_time	},
+  { EL_EMC_MAGIC_BALL,	CONF_VALUE_INTEGER_1,	&li.ball_time		},
+  { EL_EMC_LENSES,	CONF_VALUE_INTEGER_1,	&li.lenses_score	},
+  { EL_EMC_LENSES,	CONF_VALUE_INTEGER_2,	&li.lenses_time		},
+  { EL_EMC_MAGNIFIER,	CONF_VALUE_INTEGER_1,	&li.magnify_score	},
+  { EL_EMC_MAGNIFIER,	CONF_VALUE_INTEGER_2,	&li.magnify_time	},
+  { EL_ROBOT,		CONF_VALUE_INTEGER_1,	&li.slurp_score		},
+  { EL_GAME_OF_LIFE,	CONF_VALUE_INTEGER_1,	&li.game_of_life[0]	},
+  { EL_GAME_OF_LIFE,	CONF_VALUE_INTEGER_2,	&li.game_of_life[1]	},
+  { EL_GAME_OF_LIFE,	CONF_VALUE_INTEGER_3,	&li.game_of_life[2]	},
+  { EL_GAME_OF_LIFE,	CONF_VALUE_INTEGER_4,	&li.game_of_life[3]	},
+  { EL_BIOMAZE,		CONF_VALUE_INTEGER_1,	&li.biomaze[0]		},
+  { EL_BIOMAZE,		CONF_VALUE_INTEGER_2,	&li.biomaze[1]		},
+  { EL_BIOMAZE,		CONF_VALUE_INTEGER_3,	&li.biomaze[2]		},
+  { EL_BIOMAZE,		CONF_VALUE_INTEGER_4,	&li.biomaze[3]		},
 
   /* multi-byte values */
   { EL_EMC_MAGIC_BALL,	CONF_VALUE_CONTENT_8,	&li.ball_content	},
@@ -242,6 +247,16 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
   level->time_timegate = 10;
 
   level->amoeba_content = EL_DIAMOND;
+
+  level->game_of_life[0] = 2;
+  level->game_of_life[1] = 3;
+  level->game_of_life[2] = 3;
+  level->game_of_life[3] = 3;
+
+  level->biomaze[0] = 2;
+  level->biomaze[1] = 3;
+  level->biomaze[2] = 3;
+  level->biomaze[3] = 3;
 
   level->double_speed = FALSE;
   level->initial_gravity = FALSE;
