@@ -460,34 +460,35 @@
 
 #define GADGET_ID_TIME_OR_STEPS		(GADGET_ID_SELECTBOX_FIRST + 0)
 #define GADGET_ID_GAME_ENGINE_TYPE	(GADGET_ID_SELECTBOX_FIRST + 1)
-#define GADGET_ID_CUSTOM_WALK_TO_ACTION	(GADGET_ID_SELECTBOX_FIRST + 2)
-#define GADGET_ID_CUSTOM_EXPLOSION_TYPE	(GADGET_ID_SELECTBOX_FIRST + 3)
-#define GADGET_ID_CUSTOM_DEADLINESS	(GADGET_ID_SELECTBOX_FIRST + 4)
-#define GADGET_ID_CUSTOM_MOVE_PATTERN	(GADGET_ID_SELECTBOX_FIRST + 5)
-#define GADGET_ID_CUSTOM_MOVE_DIRECTION	(GADGET_ID_SELECTBOX_FIRST + 6)
-#define GADGET_ID_CUSTOM_MOVE_STEPSIZE	(GADGET_ID_SELECTBOX_FIRST + 7)
-#define GADGET_ID_CUSTOM_MOVE_LEAVE_TYPE (GADGET_ID_SELECTBOX_FIRST + 8)
-#define GADGET_ID_CUSTOM_SMASH_TARGETS	(GADGET_ID_SELECTBOX_FIRST + 9)
-#define GADGET_ID_CUSTOM_SLIPPERY_TYPE	(GADGET_ID_SELECTBOX_FIRST + 10)
-#define GADGET_ID_CUSTOM_ACCESS_TYPE	(GADGET_ID_SELECTBOX_FIRST + 11)
-#define GADGET_ID_CUSTOM_ACCESS_LAYER	(GADGET_ID_SELECTBOX_FIRST + 12)
-#define GADGET_ID_CUSTOM_ACCESS_PROTECTED (GADGET_ID_SELECTBOX_FIRST + 13)
-#define GADGET_ID_CUSTOM_ACCESS_DIRECTION (GADGET_ID_SELECTBOX_FIRST + 14)
-#define GADGET_ID_CHANGE_TIME_UNITS	(GADGET_ID_SELECTBOX_FIRST + 15)
-#define GADGET_ID_CHANGE_DIRECT_ACTION	(GADGET_ID_SELECTBOX_FIRST + 16)
-#define GADGET_ID_CHANGE_OTHER_ACTION	(GADGET_ID_SELECTBOX_FIRST + 17)
-#define GADGET_ID_CHANGE_SIDE		(GADGET_ID_SELECTBOX_FIRST + 18)
-#define GADGET_ID_CHANGE_PLAYER		(GADGET_ID_SELECTBOX_FIRST + 19)
-#define GADGET_ID_CHANGE_PAGE		(GADGET_ID_SELECTBOX_FIRST + 20)
-#define GADGET_ID_CHANGE_REPLACE_WHEN	(GADGET_ID_SELECTBOX_FIRST + 21)
-#define GADGET_ID_ACTION_TYPE		(GADGET_ID_SELECTBOX_FIRST + 22)
-#define GADGET_ID_ACTION_MODE		(GADGET_ID_SELECTBOX_FIRST + 23)
-#define GADGET_ID_ACTION_ARG		(GADGET_ID_SELECTBOX_FIRST + 24)
-#define GADGET_ID_SELECT_CHANGE_PAGE	(GADGET_ID_SELECTBOX_FIRST + 25)
-#define GADGET_ID_GROUP_CHOICE_MODE	(GADGET_ID_SELECTBOX_FIRST + 26)
+#define GADGET_ID_WIND_DIRECTION	(GADGET_ID_SELECTBOX_FIRST + 2)
+#define GADGET_ID_CUSTOM_WALK_TO_ACTION	(GADGET_ID_SELECTBOX_FIRST + 3)
+#define GADGET_ID_CUSTOM_EXPLOSION_TYPE	(GADGET_ID_SELECTBOX_FIRST + 4)
+#define GADGET_ID_CUSTOM_DEADLINESS	(GADGET_ID_SELECTBOX_FIRST + 5)
+#define GADGET_ID_CUSTOM_MOVE_PATTERN	(GADGET_ID_SELECTBOX_FIRST + 6)
+#define GADGET_ID_CUSTOM_MOVE_DIRECTION	(GADGET_ID_SELECTBOX_FIRST + 7)
+#define GADGET_ID_CUSTOM_MOVE_STEPSIZE	(GADGET_ID_SELECTBOX_FIRST + 8)
+#define GADGET_ID_CUSTOM_MOVE_LEAVE_TYPE (GADGET_ID_SELECTBOX_FIRST + 9)
+#define GADGET_ID_CUSTOM_SMASH_TARGETS	(GADGET_ID_SELECTBOX_FIRST + 10)
+#define GADGET_ID_CUSTOM_SLIPPERY_TYPE	(GADGET_ID_SELECTBOX_FIRST + 11)
+#define GADGET_ID_CUSTOM_ACCESS_TYPE	(GADGET_ID_SELECTBOX_FIRST + 12)
+#define GADGET_ID_CUSTOM_ACCESS_LAYER	(GADGET_ID_SELECTBOX_FIRST + 13)
+#define GADGET_ID_CUSTOM_ACCESS_PROTECTED (GADGET_ID_SELECTBOX_FIRST + 14)
+#define GADGET_ID_CUSTOM_ACCESS_DIRECTION (GADGET_ID_SELECTBOX_FIRST + 15)
+#define GADGET_ID_CHANGE_TIME_UNITS	(GADGET_ID_SELECTBOX_FIRST + 16)
+#define GADGET_ID_CHANGE_DIRECT_ACTION	(GADGET_ID_SELECTBOX_FIRST + 17)
+#define GADGET_ID_CHANGE_OTHER_ACTION	(GADGET_ID_SELECTBOX_FIRST + 18)
+#define GADGET_ID_CHANGE_SIDE		(GADGET_ID_SELECTBOX_FIRST + 19)
+#define GADGET_ID_CHANGE_PLAYER		(GADGET_ID_SELECTBOX_FIRST + 20)
+#define GADGET_ID_CHANGE_PAGE		(GADGET_ID_SELECTBOX_FIRST + 21)
+#define GADGET_ID_CHANGE_REPLACE_WHEN	(GADGET_ID_SELECTBOX_FIRST + 22)
+#define GADGET_ID_ACTION_TYPE		(GADGET_ID_SELECTBOX_FIRST + 23)
+#define GADGET_ID_ACTION_MODE		(GADGET_ID_SELECTBOX_FIRST + 24)
+#define GADGET_ID_ACTION_ARG		(GADGET_ID_SELECTBOX_FIRST + 25)
+#define GADGET_ID_SELECT_CHANGE_PAGE	(GADGET_ID_SELECTBOX_FIRST + 26)
+#define GADGET_ID_GROUP_CHOICE_MODE	(GADGET_ID_SELECTBOX_FIRST + 27)
 
 /* textbutton identifiers */
-#define GADGET_ID_TEXTBUTTON_FIRST	(GADGET_ID_SELECTBOX_FIRST + 27)
+#define GADGET_ID_TEXTBUTTON_FIRST	(GADGET_ID_SELECTBOX_FIRST + 28)
 
 #define GADGET_ID_PROPERTIES_INFO	(GADGET_ID_TEXTBUTTON_FIRST + 0)
 #define GADGET_ID_PROPERTIES_CONFIG	(GADGET_ID_TEXTBUTTON_FIRST + 1)
@@ -668,36 +669,37 @@
 /* values for selectbox gadgets */
 #define ED_SELECTBOX_ID_TIME_OR_STEPS		0
 #define ED_SELECTBOX_ID_GAME_ENGINE_TYPE	1
-#define ED_SELECTBOX_ID_CUSTOM_ACCESS_TYPE	2
-#define ED_SELECTBOX_ID_CUSTOM_ACCESS_LAYER	3
-#define ED_SELECTBOX_ID_CUSTOM_ACCESS_PROTECTED	4
-#define ED_SELECTBOX_ID_CUSTOM_ACCESS_DIRECTION	5
-#define ED_SELECTBOX_ID_CUSTOM_WALK_TO_ACTION	6
-#define ED_SELECTBOX_ID_CUSTOM_MOVE_PATTERN	7
-#define ED_SELECTBOX_ID_CUSTOM_MOVE_DIRECTION	8
-#define ED_SELECTBOX_ID_CUSTOM_MOVE_STEPSIZE	9
-#define ED_SELECTBOX_ID_CUSTOM_MOVE_LEAVE_TYPE	10
-#define ED_SELECTBOX_ID_CUSTOM_SMASH_TARGETS	11
-#define ED_SELECTBOX_ID_CUSTOM_SLIPPERY_TYPE	12
-#define ED_SELECTBOX_ID_CUSTOM_DEADLINESS	13
-#define ED_SELECTBOX_ID_CUSTOM_EXPLOSION_TYPE	14
-#define ED_SELECTBOX_ID_CHANGE_TIME_UNITS	15
-#define ED_SELECTBOX_ID_CHANGE_DIRECT_ACTION	16
-#define ED_SELECTBOX_ID_CHANGE_OTHER_ACTION	17
-#define ED_SELECTBOX_ID_CHANGE_SIDE		18
-#define ED_SELECTBOX_ID_CHANGE_PLAYER		19
-#define ED_SELECTBOX_ID_CHANGE_PAGE		20
-#define ED_SELECTBOX_ID_CHANGE_REPLACE_WHEN	21
-#define ED_SELECTBOX_ID_ACTION_TYPE		22
-#define ED_SELECTBOX_ID_ACTION_MODE		23
-#define ED_SELECTBOX_ID_ACTION_ARG		24
-#define ED_SELECTBOX_ID_SELECT_CHANGE_PAGE	25
-#define ED_SELECTBOX_ID_GROUP_CHOICE_MODE	26
+#define ED_SELECTBOX_ID_WIND_DIRECTION		2
+#define ED_SELECTBOX_ID_CUSTOM_ACCESS_TYPE	3
+#define ED_SELECTBOX_ID_CUSTOM_ACCESS_LAYER	4
+#define ED_SELECTBOX_ID_CUSTOM_ACCESS_PROTECTED	5
+#define ED_SELECTBOX_ID_CUSTOM_ACCESS_DIRECTION	6
+#define ED_SELECTBOX_ID_CUSTOM_WALK_TO_ACTION	7
+#define ED_SELECTBOX_ID_CUSTOM_MOVE_PATTERN	8
+#define ED_SELECTBOX_ID_CUSTOM_MOVE_DIRECTION	9
+#define ED_SELECTBOX_ID_CUSTOM_MOVE_STEPSIZE	10
+#define ED_SELECTBOX_ID_CUSTOM_MOVE_LEAVE_TYPE	11
+#define ED_SELECTBOX_ID_CUSTOM_SMASH_TARGETS	12
+#define ED_SELECTBOX_ID_CUSTOM_SLIPPERY_TYPE	13
+#define ED_SELECTBOX_ID_CUSTOM_DEADLINESS	14
+#define ED_SELECTBOX_ID_CUSTOM_EXPLOSION_TYPE	15
+#define ED_SELECTBOX_ID_CHANGE_TIME_UNITS	16
+#define ED_SELECTBOX_ID_CHANGE_DIRECT_ACTION	17
+#define ED_SELECTBOX_ID_CHANGE_OTHER_ACTION	18
+#define ED_SELECTBOX_ID_CHANGE_SIDE		19
+#define ED_SELECTBOX_ID_CHANGE_PLAYER		20
+#define ED_SELECTBOX_ID_CHANGE_PAGE		21
+#define ED_SELECTBOX_ID_CHANGE_REPLACE_WHEN	22
+#define ED_SELECTBOX_ID_ACTION_TYPE		23
+#define ED_SELECTBOX_ID_ACTION_MODE		24
+#define ED_SELECTBOX_ID_ACTION_ARG		25
+#define ED_SELECTBOX_ID_SELECT_CHANGE_PAGE	26
+#define ED_SELECTBOX_ID_GROUP_CHOICE_MODE	27
 
-#define ED_NUM_SELECTBOX			27
+#define ED_NUM_SELECTBOX			28
 
 #define ED_SELECTBOX_ID_LEVEL_FIRST	ED_SELECTBOX_ID_TIME_OR_STEPS
-#define ED_SELECTBOX_ID_LEVEL_LAST	ED_SELECTBOX_ID_GAME_ENGINE_TYPE
+#define ED_SELECTBOX_ID_LEVEL_LAST	ED_SELECTBOX_ID_WIND_DIRECTION
 
 #define ED_SELECTBOX_ID_CUSTOM1_FIRST	ED_SELECTBOX_ID_CUSTOM_ACCESS_TYPE
 #define ED_SELECTBOX_ID_CUSTOM1_LAST	ED_SELECTBOX_ID_CUSTOM_WALK_TO_ACTION
@@ -1264,6 +1266,17 @@ static struct ValueTextInfo options_game_engine_type[] =
   { -1,				NULL				}
 };
 
+static struct ValueTextInfo options_wind_direction[] =
+{
+  { MV_START_NONE,		"none"				},
+  { MV_START_LEFT,		"left"				},
+  { MV_START_RIGHT,		"right"				},
+  { MV_START_UP,		"up"				},
+  { MV_START_DOWN,		"down"				},
+
+  { -1,				NULL				}
+};
+
 static struct ValueTextInfo options_access_type[] =
 {
   { EP_WALKABLE,		"walkable"			},
@@ -1291,7 +1304,7 @@ static struct ValueTextInfo options_access_protected[] =
 
 static struct ValueTextInfo options_access_direction[] =
 {
-  { MV_NO_DIRECTIONS,		"no direction"			},
+  { MV_NO_DIRECTION,		"no direction"			},
   { MV_LEFT,			"left"				},
   { MV_RIGHT,			"right"				},
   { MV_UP,			"up"				},
@@ -1331,6 +1344,7 @@ static struct ValueTextInfo options_move_pattern[] =
   { MV_HORIZONTAL,		"horizontal"			},
   { MV_VERTICAL,		"vertical"			},
   { MV_ALL_DIRECTIONS,		"all directions"		},
+  { MV_WIND_DIRECTION,		"wind direction"		},
   { MV_TOWARDS_PLAYER,		"towards player"		},
   { MV_AWAY_FROM_PLAYER,	"away from player"		},
   { MV_ALONG_LEFT_SIDE,		"along left side"		},
@@ -1669,8 +1683,18 @@ static struct
     &level.game_engine_type,
     "game engine:", NULL,		"game engine"
   },
+  {
+    ED_LEVEL_SETTINGS_XPOS(0),		ED_LEVEL_SETTINGS_YPOS(12),
+    GADGET_ID_WIND_DIRECTION,		GADGET_ID_NONE,
+    -1,
+    options_wind_direction,
+    &level.wind_direction_initial,
+    "initial wind direction:", NULL,	"initial wind direction"
+  },
 
-  /* ---------- element settings: configure 1 (custom elements) ----------- */
+  /* ---------- element settings: configure (several elements) ------------- */
+
+  /* ---------- element settings: configure 1 (custom elements) ------------ */
 
   {
     ED_ELEMENT_SETTINGS_XPOS(1),	ED_ELEMENT_SETTINGS_YPOS(3),
@@ -1713,7 +1737,7 @@ static struct
     NULL, NULL,				"diggable/collectible/pushable"
   },
 
-  /* ---------- element settings: configure 2 (custom elements) ----------- */
+  /* ---------- element settings: configure 2 (custom elements) ------------ */
 
   {
     ED_ELEMENT_SETTINGS_XPOS(1),	ED_ELEMENT_SETTINGS_YPOS(1),
@@ -2606,7 +2630,7 @@ static int new_element3 = EL_SAND;
 #define BUTTON_STEPSIZE(button) ((button) == 1 ? 1 : (button) == 2 ? 5 : 10)
 
 /* forward declaration for internal use */
-static void ModifyEditorCounter(int, int);
+static void ModifyEditorCounterValue(int, int);
 static void ModifyEditorCounterLimits(int, int, int);
 static void ModifyEditorSelectbox(int, int);
 static void ModifyEditorDrawingArea(int, int, int);
@@ -5285,6 +5309,12 @@ static void MapCounterButtons(int id)
   int x = gi_down->x;
   int y;	/* set after gadget position was modified */
 
+  /* counter limits must be changed first to prevent value truncation */
+  ModifyEditorCounterLimits(id, counterbutton_info[id].min_value,
+			    counterbutton_info[id].max_value);
+
+  ModifyEditorCounterValue(id, *counterbutton_info[id].value);
+
   /* set position for "value[1,2,3,4]" counter gadgets (score in most cases) */
   if (id >= ED_COUNTER_ID_ELEMENT_VALUE1 &&
       id <= ED_COUNTER_ID_ELEMENT_VALUE4)
@@ -5305,9 +5335,6 @@ static void MapCounterButtons(int id)
   if (counterbutton_info[id].text_right)
     DrawText(x_right, y, counterbutton_info[id].text_right, FONT_TEXT_1);
 
-  ModifyEditorCounter(id, *counterbutton_info[id].value);
-  ModifyEditorCounterLimits(id, counterbutton_info[id].min_value,
-			    counterbutton_info[id].max_value);
   MapGadget(gi_down);
   MapGadget(gi_text);
   MapGadget(gi_up);
@@ -6358,7 +6385,7 @@ static void AdjustEditorScrollbar(int id)
 	       GDI_SCROLLBAR_ITEM_POSITION, item_position, GDI_END);
 }
 
-static void ModifyEditorCounter(int counter_id, int new_value)
+static void ModifyEditorCounterValue(int counter_id, int new_value)
 {
   int *counter_value = counterbutton_info[counter_id].value;
   int gadget_id = counterbutton_info[counter_id].gadget_id_text;
@@ -6880,6 +6907,7 @@ static void DrawPropertiesInfo()
 #define TEXT_GAME_OF_LIFE_2	"Max neighbours to survive"
 #define TEXT_GAME_OF_LIFE_3	"Min neighbours to create"
 #define TEXT_GAME_OF_LIFE_4	"Max neighbours to create"
+#define TEXT_TIME_BONUS		"Extra time to solve level"
 
 static struct
 {
@@ -6952,9 +6980,16 @@ static struct
   { EL_AMOEBA_FULL,	&level.amoeba_speed,		TEXT_AMOEBA_SPEED },
   { EL_BD_AMOEBA,	&level.amoeba_speed,		TEXT_AMOEBA_SPEED },
   { EL_MAGIC_WALL,	&level.time_magic_wall,		TEXT_DURATION	},
+  { EL_BD_MAGIC_WALL,	&level.time_magic_wall,		TEXT_DURATION	},
   { EL_ROBOT_WHEEL,	&level.time_wheel,		TEXT_DURATION	},
 
 #if 1
+  { EL_TIMEGATE_SWITCH,	&level.time_timegate,		TEXT_DURATION	},
+  { EL_LIGHT_SWITCH_ACTIVE, &level.time_light,		TEXT_DURATION	},
+  { EL_SHIELD_NORMAL,	&level.shield_normal_time,	TEXT_DURATION	},
+  { EL_SHIELD_DEADLY,	&level.shield_deadly_time,	TEXT_DURATION	},
+  { EL_EXTRA_TIME,	&level.extra_time,		TEXT_TIME_BONUS	},
+  { EL_TIME_ORB_FULL,	&level.time_orb_time,		TEXT_TIME_BONUS	},
   { EL_GAME_OF_LIFE,	&level.game_of_life[0],		TEXT_GAME_OF_LIFE_1 },
   { EL_GAME_OF_LIFE,	&level.game_of_life[1],		TEXT_GAME_OF_LIFE_2 },
   { EL_GAME_OF_LIFE,	&level.game_of_life[2],		TEXT_GAME_OF_LIFE_3 },
@@ -7100,6 +7135,11 @@ static void DrawPropertiesConfig()
 
   if (properties_element == EL_SPRING)
     MapCheckbuttonGadget(ED_CHECKBUTTON_ID_USE_SPRING_BUG);
+
+#if 0
+  if (properties_element == EL_BALLOON)
+    MapSelectboxGadget(ED_SELECTBOX_ID_WIND_DIRECTION);
+#endif
 
   if (CAN_GROW(properties_element))
   {
@@ -8385,7 +8425,7 @@ static void HandleCounterButtons(struct GadgetInfo *gi)
 				  REQ_ASK))
     {
       if (gadget_id == counterbutton_info[counter_id].gadget_id_text)
-	ModifyEditorCounter(counter_id, *counter_value);
+	ModifyEditorCounterValue(counter_id, *counter_value);
 
       return;
     }
@@ -8394,7 +8434,7 @@ static void HandleCounterButtons(struct GadgetInfo *gi)
   if (gadget_id == counterbutton_info[counter_id].gadget_id_text)
     *counter_value = gi->textinput.number_value;
   else
-    ModifyEditorCounter(counter_id, *counter_value + step);
+    ModifyEditorCounterValue(counter_id, *counter_value + step);
 
   if (counter_id == ED_COUNTER_ID_SELECT_LEVEL)
   {

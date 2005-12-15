@@ -1748,7 +1748,7 @@ int get_parameter_value(char *value_raw, char *suffix, int type)
     result = (strcmp(value, "left")  == 0 ? MV_LEFT :
 	      strcmp(value, "right") == 0 ? MV_RIGHT :
 	      strcmp(value, "up")    == 0 ? MV_UP :
-	      strcmp(value, "down")  == 0 ? MV_DOWN : MV_NO_MOVING);
+	      strcmp(value, "down")  == 0 ? MV_DOWN : MV_NONE);
   }
   else if (strcmp(suffix, ".anim_mode") == 0)
   {

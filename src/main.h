@@ -238,7 +238,7 @@
 #define PLAYER_BITS_TRIGGER	(1 << 4)
 
 /* values for change side for custom elements */
-#define CH_SIDE_NONE		MV_NO_MOVING
+#define CH_SIDE_NONE		MV_NONE
 #define CH_SIDE_LEFT		MV_LEFT
 #define CH_SIDE_RIGHT		MV_RIGHT
 #define CH_SIDE_TOP		MV_UP
@@ -346,6 +346,7 @@
 #define MV_BIT_TURNING_LEFT_RIGHT 14
 #define MV_BIT_TURNING_RIGHT_LEFT 15
 #define MV_BIT_TURNING_RANDOM	16
+#define MV_BIT_WIND_DIRECTION	17
 
 /* values for custom move patterns */
 #define MV_TOWARDS_PLAYER	(1 << MV_BIT_TOWARDS_PLAYER)
@@ -362,12 +363,14 @@
 #define MV_TURNING_LEFT_RIGHT	(1 << MV_BIT_TURNING_LEFT_RIGHT)
 #define MV_TURNING_RIGHT_LEFT	(1 << MV_BIT_TURNING_RIGHT_LEFT)
 #define MV_TURNING_RANDOM	(1 << MV_BIT_TURNING_RANDOM)
+#define MV_WIND_DIRECTION	(1 << MV_BIT_WIND_DIRECTION)
 
 /* values for initial move direction (bits 0 - 3: basic move directions) */
 #define MV_START_BIT_PREVIOUS	4
 
 /* values for initial move direction */
-#define MV_START_AUTOMATIC	(MV_NO_MOVING)
+#define MV_START_NONE		(MV_NONE)
+#define MV_START_AUTOMATIC	(MV_NONE)
 #define MV_START_LEFT		(MV_LEFT)
 #define MV_START_RIGHT		(MV_RIGHT)
 #define MV_START_UP		(MV_UP)
@@ -1740,6 +1743,12 @@ struct LevelInfo
   int time_light;
   int time_timegate;
 
+  int shield_normal_time;
+  int shield_deadly_time;
+
+  int extra_time;
+  int time_orb_time;
+
   /* values for the new EMC elements */
   int android_move_time;
   int android_clone_time;
@@ -1844,7 +1853,7 @@ struct GameInfo
   int belt_dir[4];
   int belt_dir_nr[4];
   int switchgate_pos;
-  int balloon_dir;
+  int wind_direction;
   boolean gravity;
   boolean explosions_delayed;
   boolean envelope_active;

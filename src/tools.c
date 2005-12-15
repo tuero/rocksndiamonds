@@ -5386,7 +5386,7 @@ int el_act_dir2img(int element, int action, int direction)
 {
   element = GFX_ELEMENT(element);
 
-  if (direction == MV_NO_MOVING)
+  if (direction == MV_NONE)
     return element_info[element].graphic[action];
 
   direction = MV_DIR_BIT(direction);
@@ -5397,7 +5397,7 @@ int el_act_dir2img(int element, int action, int direction)
 int el_act_dir2img(int element, int action, int direction)
 {
   element = GFX_ELEMENT(element);
-  direction = MV_DIR_BIT(direction);	/* default: MV_NO_MOVING => MV_DOWN */
+  direction = MV_DIR_BIT(direction);	/* default: MV_NONE => MV_DOWN */
 
   /* direction_graphic[][] == graphic[] for undefined direction graphics */
   return element_info[element].direction_graphic[action][direction];
@@ -5409,7 +5409,7 @@ static int el_act_dir2crm(int element, int action, int direction)
 {
   element = GFX_ELEMENT(element);
 
-  if (direction == MV_NO_MOVING)
+  if (direction == MV_NONE)
     return element_info[element].crumbled[action];
 
   direction = MV_DIR_BIT(direction);
@@ -5420,7 +5420,7 @@ static int el_act_dir2crm(int element, int action, int direction)
 static int el_act_dir2crm(int element, int action, int direction)
 {
   element = GFX_ELEMENT(element);
-  direction = MV_DIR_BIT(direction);	/* default: MV_NO_MOVING => MV_DOWN */
+  direction = MV_DIR_BIT(direction);	/* default: MV_NONE => MV_DOWN */
 
   /* direction_graphic[][] == graphic[] for undefined direction graphics */
   return element_info[element].direction_crumbled[action][direction];
@@ -5525,7 +5525,7 @@ void InitGraphicInfo_EM(void)
     object_mapping[i].element_rnd = EL_UNKNOWN;
     object_mapping[i].is_backside = FALSE;
     object_mapping[i].action = ACTION_DEFAULT;
-    object_mapping[i].direction = MV_NO_MOVING;
+    object_mapping[i].direction = MV_NONE;
   }
 
   /* always start with reliable default values */
@@ -5535,7 +5535,7 @@ void InitGraphicInfo_EM(void)
     {
       player_mapping[p][i].element_rnd = EL_UNKNOWN;
       player_mapping[p][i].action = ACTION_DEFAULT;
-      player_mapping[p][i].direction = MV_NO_MOVING;
+      player_mapping[p][i].direction = MV_NONE;
     }
   }
 
@@ -5985,7 +5985,7 @@ void InitGraphicInfo_EM(void)
       {
 	int effective_element = element;
 	int effective_action = action;
-	int graphic = (direction == MV_NO_MOVING ?
+	int graphic = (direction == MV_NONE ?
 		       el_act2img(effective_element, effective_action) :
 		       el_act_dir2img(effective_element, effective_action,
 				      direction));

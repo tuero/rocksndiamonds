@@ -103,30 +103,113 @@ static struct
   int element;
   int type;
   void *value;
+  int default_value;
 } element_conf[] =
 {
-  /* 1-byte values */
-  { EL_EMC_ANDROID,	CONF_VALUE_INTEGER_1,	&li.android_move_time	},
-  { EL_EMC_ANDROID,	CONF_VALUE_INTEGER_2,	&li.android_clone_time	},
-  { EL_EMC_MAGIC_BALL,	CONF_VALUE_INTEGER_1,	&li.ball_time		},
-  { EL_EMC_LENSES,	CONF_VALUE_INTEGER_1,	&li.lenses_score	},
-  { EL_EMC_LENSES,	CONF_VALUE_INTEGER_2,	&li.lenses_time		},
-  { EL_EMC_MAGNIFIER,	CONF_VALUE_INTEGER_1,	&li.magnify_score	},
-  { EL_EMC_MAGNIFIER,	CONF_VALUE_INTEGER_2,	&li.magnify_time	},
-  { EL_ROBOT,		CONF_VALUE_INTEGER_1,	&li.slurp_score		},
-  { EL_GAME_OF_LIFE,	CONF_VALUE_INTEGER_1,	&li.game_of_life[0]	},
-  { EL_GAME_OF_LIFE,	CONF_VALUE_INTEGER_2,	&li.game_of_life[1]	},
-  { EL_GAME_OF_LIFE,	CONF_VALUE_INTEGER_3,	&li.game_of_life[2]	},
-  { EL_GAME_OF_LIFE,	CONF_VALUE_INTEGER_4,	&li.game_of_life[3]	},
-  { EL_BIOMAZE,		CONF_VALUE_INTEGER_1,	&li.biomaze[0]		},
-  { EL_BIOMAZE,		CONF_VALUE_INTEGER_2,	&li.biomaze[1]		},
-  { EL_BIOMAZE,		CONF_VALUE_INTEGER_3,	&li.biomaze[2]		},
-  { EL_BIOMAZE,		CONF_VALUE_INTEGER_4,	&li.biomaze[3]		},
+  /* ---------- 1-byte values ---------------------------------------------- */
+  {
+    EL_EMC_ANDROID,			CONF_VALUE_INTEGER_1,
+    &li.android_move_time,		10
+  },
+  {
+    EL_EMC_ANDROID,			CONF_VALUE_INTEGER_2,
+    &li.android_clone_time,		10
+  },
+  {
+    EL_EMC_MAGIC_BALL,			CONF_VALUE_INTEGER_1,
+    &li.ball_time,			10
+  },
+  {
+    EL_EMC_LENSES,			CONF_VALUE_INTEGER_1,
+    &li.lenses_score,			10
+  },
+  {
+    EL_EMC_LENSES,			CONF_VALUE_INTEGER_2,
+    &li.lenses_time,			10
+  },
+  {
+    EL_EMC_MAGNIFIER,			CONF_VALUE_INTEGER_1,
+    &li.magnify_score,			10
+  },
+  {
+    EL_EMC_MAGNIFIER,			CONF_VALUE_INTEGER_2,
+    &li.magnify_time,			10
+  },
+  {
+    EL_ROBOT,				CONF_VALUE_INTEGER_1,
+    &li.slurp_score,			10
+  },
+  {
+    EL_GAME_OF_LIFE,			CONF_VALUE_INTEGER_1,
+    &li.game_of_life[0],		2
+  },
+  {
+    EL_GAME_OF_LIFE,			CONF_VALUE_INTEGER_2,
+    &li.game_of_life[1],		3
+  },
+  {
+    EL_GAME_OF_LIFE,			CONF_VALUE_INTEGER_3,
+    &li.game_of_life[2],		3
+  },
+  {
+    EL_GAME_OF_LIFE,			CONF_VALUE_INTEGER_4,
+    &li.game_of_life[3],		3
+  },
+  {
+    EL_BIOMAZE,				CONF_VALUE_INTEGER_1,
+    &li.biomaze[0],			2
+  },
+  {
+    EL_BIOMAZE,				CONF_VALUE_INTEGER_2,
+    &li.biomaze[1],			3
+  },
+  {
+    EL_BIOMAZE,				CONF_VALUE_INTEGER_3,
+    &li.biomaze[2],			3
+  },
+  {
+    EL_BIOMAZE,				CONF_VALUE_INTEGER_4,
+    &li.biomaze[3],			3
+  },
+  {
+    EL_BALLOON,				CONF_VALUE_INTEGER_1,
+    &li.wind_direction_initial,		MV_NONE
+  },
+  {
+    EL_TIMEGATE_SWITCH,			CONF_VALUE_INTEGER_1,
+    &li.time_timegate,			10
+  },
+  {
+    EL_LIGHT_SWITCH_ACTIVE,		CONF_VALUE_INTEGER_1,
+    &li.time_light,			10
+  },
+  {
+    EL_SHIELD_NORMAL,			CONF_VALUE_INTEGER_1,
+    &li.shield_normal_time,		10
+  },
+  {
+    EL_SHIELD_DEADLY,			CONF_VALUE_INTEGER_1,
+    &li.shield_deadly_time,		10
+  },
+  {
+    EL_EXTRA_TIME,			CONF_VALUE_INTEGER_1,
+    &li.extra_time,			10
+  },
+  {
+    EL_TIME_ORB_FULL,			CONF_VALUE_INTEGER_1,
+    &li.time_orb_time,			10
+  },
 
-  /* multi-byte values */
-  { EL_EMC_MAGIC_BALL,	CONF_VALUE_CONTENT_8,	&li.ball_content	},
+  /* ---------- multi-byte values ------------------------------------------ */
+  {
+    EL_EMC_MAGIC_BALL,			CONF_VALUE_CONTENT_8,
+    &li.ball_content,			EL_EMPTY
+  },
 
-  { -1,			-1,			NULL			},
+  {
+    -1,					-1,
+    NULL,				-1
+  },
 };
 
 static struct
@@ -150,6 +233,40 @@ filetype_id_list[] =
 /* ========================================================================= */
 /* level file functions                                                      */
 /* ========================================================================= */
+
+static void setLevelInfoToDefaultsFromConfigList(struct LevelInfo *level)
+{
+  int i;
+
+  li = *level;		/* copy level information into temporary buffer */
+
+  for (i = 0; element_conf[i].element != -1; i++)
+  {
+    int default_value = element_conf[i].default_value;
+    int type = element_conf[i].type;
+    int bytes = type & CONF_MASK_BYTES;
+
+    if (bytes != CONF_MASK_MULTI_BYTES)
+    {
+      if (CONF_VALUE_BOOLEAN(type))
+	*(boolean *)(element_conf[i].value) = default_value;
+      else
+	*(int *)    (element_conf[i].value) = default_value;
+    }
+    else if (type == CONF_VALUE_CONTENT_8)
+    {
+      struct Content *content = (struct Content *)(element_conf[i].value);
+      int c, x, y;
+
+      for (c = 0; c < MAX_ELEMENT_CONTENTS; c++)
+	for (y = 0; y < 3; y++)
+	  for (x = 0; x < 3; x++)
+	    content[c].e[x][y] = default_value;
+    }
+  }
+
+  *level = li;		/* copy temporary buffer back to level information */
+}
 
 void setElementChangePages(struct ElementInfo *ei, int change_pages)
 {
@@ -216,6 +333,7 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
   static boolean clipboard_elements_initialized = FALSE;
   int i, j, x, y;
 
+  setLevelInfoToDefaultsFromConfigList(level);
   setLevelInfoToDefaults_EM();
 
   level->native_em_level = &native_em_level;
@@ -243,8 +361,10 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
 
   level->time_magic_wall = 10;
   level->time_wheel = 10;
+#if 0
   level->time_light = 10;
   level->time_timegate = 10;
+#endif
 
   level->amoeba_content = EL_DIAMOND;
 
@@ -275,21 +395,25 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
   level->use_step_counter = FALSE;
 
   /* values for the new EMC elements */
+#if 0
   level->android_move_time = 10;
   level->android_clone_time = 10;
-  level->ball_random = FALSE;
-  level->ball_state_initial = FALSE;
   level->ball_time = 10;
   level->lenses_score = 10;
-  level->magnify_score = 10;
-  level->slurp_score = 10;
   level->lenses_time = 10;
+  level->magnify_score = 10;
   level->magnify_time = 10;
-  level->wind_direction_initial = MV_NO_MOVING;
+  level->slurp_score = 10;
+  level->wind_direction_initial = MV_NONE;
+#endif
+  level->ball_random = FALSE;
+  level->ball_state_initial = FALSE;
+#if 0
   for (i = 0; i < MAX_ELEMENT_CONTENTS; i++)
     for (x = 0; x < 3; x++)
       for (y = 0; y < 3; y++)
 	level->ball_content[i].e[x][y] = EL_EMPTY;
+#endif
   for (i = 0; i < 16; i++)
     level->android_array[i] = FALSE;
 
@@ -2793,7 +2917,7 @@ static void LoadLevel_InitElements(struct LevelInfo *level, char *filename)
       int element = EL_CUSTOM_START + i;
       struct ElementInfo *ei = &element_info[element];
 
-      if (ei->access_direction == MV_NO_DIRECTIONS)
+      if (ei->access_direction == MV_NO_DIRECTION)
 	ei->access_direction = MV_ALL_DIRECTIONS;
 
 #if 0
@@ -3373,13 +3497,27 @@ static void SaveLevel_GRP1(FILE *file, struct LevelInfo *level, int element)
     putFile16BitBE(file, group->element[i]);
 }
 
-static int SaveLevel_CONF_Value(FILE *file, int element, int type, int value)
+static int SaveLevel_CONF_Value(FILE *file, int pos)
 {
+  int default_value = element_conf[pos].default_value;
+  int element = element_conf[pos].element;
+  int type = element_conf[pos].type;
   int bytes = type & CONF_MASK_BYTES;
+  void *value_ptr = element_conf[pos].value;
+  int value = (CONF_VALUE_BOOLEAN(type) ? *(boolean *)value_ptr :
+	       *(int *)value_ptr);
   int num_bytes = 0;
+  boolean modified = FALSE;
+
+  /* check if any settings have been modified before saving them */
+  if (value != default_value)
+    modified = TRUE;
+
+  if (!modified)		/* do not save unmodified default settings */
+    return 0;
 
   if (bytes == CONF_MASK_MULTI_BYTES)
-    Error(ERR_EXIT, "SaveLevel_CONF_INT: invalid type CONF_MASK_MULTI_BYTES");
+    Error(ERR_EXIT, "SaveLevel_CONF_Value: cannot save multi-byte values");
 
   num_bytes += putFile16BitBE(file, element);
   num_bytes += putFile8Bit(file, type);
@@ -3390,11 +3528,25 @@ static int SaveLevel_CONF_Value(FILE *file, int element, int type, int value)
   return num_bytes;
 }
 
-static int SaveLevel_CONF_Content(FILE *file, int element, int type,
-				  struct Content *content, int num_contents)
+static int SaveLevel_CONF_Content(FILE *file, int pos, int num_contents)
 {
+  struct Content *content = (struct Content *)(element_conf[pos].value);
+  int default_value = element_conf[pos].default_value;
+  int element = element_conf[pos].element;
+  int type = element_conf[pos].type;
   int num_bytes = 0;
+  boolean modified = FALSE;
   int i, x, y;
+
+  /* check if any settings have been modified before saving them */
+  for (i = 0; i < num_contents; i++)
+    for (y = 0; y < 3; y++)
+      for (x = 0; x < 3; x++)
+	if (content[i].e[x][y] != default_value)
+	  modified = TRUE;
+
+  if (!modified)		/* do not save unmodified default settings */
+    return 0;
 
   num_bytes += putFile16BitBE(file, element);
   num_bytes += putFile8Bit(file, type);
@@ -3417,30 +3569,13 @@ static int SaveLevel_CONF(FILE *file, struct LevelInfo *level)
 
   for (i = 0; element_conf[i].element != -1; i++)
   {
-    int element = element_conf[i].element;
-    int type    = element_conf[i].type;
-    void *value = element_conf[i].value;
+    int type = element_conf[i].type;
     int bytes = type & CONF_MASK_BYTES;
 
-    if (bytes == CONF_MASK_MULTI_BYTES)
-    {
-      if (type == CONF_VALUE_CONTENT_8)
-      {
-	struct Content *content = (struct Content *)value;
-
-	chunk_size += SaveLevel_CONF_Content(file, element, type,
-					     content, MAX_ELEMENT_CONTENTS);
-      }
-      else
-	Error(ERR_WARN, "cannot save CONF value for element %d", element);
-    }
-    else
-    {
-      int value_int = (CONF_VALUE_BOOLEAN(type) ? *(boolean *)value :
-		       *(int *)value);
-
-      chunk_size += SaveLevel_CONF_Value(file, element, type, value_int);
-    }
+    if (bytes != CONF_MASK_MULTI_BYTES)
+      chunk_size += SaveLevel_CONF_Value(file, i);
+    else if (type == CONF_VALUE_CONTENT_8)
+      chunk_size += SaveLevel_CONF_Content(file, i, MAX_ELEMENT_CONTENTS);
   }
 
   return chunk_size;
@@ -3559,8 +3694,12 @@ static void SaveLevelFromFilename(struct LevelInfo *level, char *filename)
 
   conf_chunk_size = SaveLevel_CONF(NULL, level);	/* get chunk size */
 
-  putFileChunkBE(file, "CONF", conf_chunk_size);
-  SaveLevel_CONF(file, level);
+  /* check for non-default configuration settings to be saved in CONF chunk */
+  if (conf_chunk_size > 0)
+  {
+    putFileChunkBE(file, "CONF", conf_chunk_size);
+    SaveLevel_CONF(file, level);
+  }
 
   fclose(file);
 
@@ -3738,7 +3877,7 @@ static int LoadTape_BODY(FILE *file, int chunk_size, struct TapeInfo *tape)
 
     for (j = 0; j < MAX_PLAYERS; j++)
     {
-      tape->pos[i].action[j] = MV_NO_MOVING;
+      tape->pos[i].action[j] = MV_NONE;
 
       if (tape->player_participates[j])
 	tape->pos[i].action[j] = getFile8Bit(file);
@@ -3785,7 +3924,7 @@ static int LoadTape_BODY(FILE *file, int chunk_size, struct TapeInfo *tape)
 
 	/* delay part */
 	for (j = 0; j < MAX_PLAYERS; j++)
-	  tape->pos[i].action[j] = MV_NO_MOVING;
+	  tape->pos[i].action[j] = MV_NONE;
 	tape->pos[i].delay--;
 
 	i++;

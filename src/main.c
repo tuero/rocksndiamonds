@@ -77,7 +77,7 @@ int			scroll_x, scroll_y;
 
 int			FX = SX, FY = SY;
 int			ScrollStepSize;
-int			ScreenMovDir = MV_NO_MOVING, ScreenMovPos = 0;
+int			ScreenMovDir = MV_NONE, ScreenMovPos = 0;
 int			ScreenGfxPos = 0;
 int			BorderElement = EL_STEELWALL;
 int			GameFrameDelay = GAME_FRAME_DELAY;
@@ -1756,27 +1756,27 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
   {
     "balloon_switch_left",
     "balloon_switch",
-    "send balloon to the left"
+    "wind switch (left)"
   },
   {
     "balloon_switch_right",
     "balloon_switch",
-    "send balloon to the right"
+    "wind switch (right)"
   },
   {
     "balloon_switch_up",
     "balloon_switch",
-    "send balloon up"
+    "wind switch (up)"
   },
   {
     "balloon_switch_down",
     "balloon_switch",
-    "send balloon down"
+    "wind switch (down)"
   },
   {
     "balloon_switch_any",
     "balloon_switch",
-    "send balloon in pressed direction"
+    "wind switch (any direction)"
   },
   {
     "emc_steelwall_1",
@@ -3456,7 +3456,7 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
   {
     "balloon_switch_none",
     "balloon_switch",
-    "stop moving balloon"
+    "wind switch (off)"
   },
   {
     "emc_gate_5",

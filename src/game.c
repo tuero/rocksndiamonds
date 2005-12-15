@@ -582,7 +582,7 @@ access_direction_list[] =
   { EL_SP_GRAVITY_OFF_PORT_UP,		                             MV_DOWN },
   { EL_SP_GRAVITY_OFF_PORT_DOWN,	                     MV_UP           },
 
-  { EL_UNDEFINED,			MV_NO_MOVING			     }
+  { EL_UNDEFINED,			MV_NONE				     }
 };
 
 static boolean trigger_events[MAX_NUM_ELEMENTS][NUM_CHANGE_EVENTS];
@@ -657,7 +657,7 @@ static int getBeltDirFromBeltSwitchElement(int element)
   static int belt_move_dir[3] =
   {
     MV_LEFT,
-    MV_NO_MOVING,
+    MV_NONE,
     MV_RIGHT
   };
 
@@ -1498,10 +1498,10 @@ void InitGame()
     player->dynabombs_left = 0;
     player->dynabomb_xl = FALSE;
 
-    player->MovDir = MV_NO_MOVING;
+    player->MovDir = MV_NONE;
     player->MovPos = 0;
     player->GfxPos = 0;
-    player->GfxDir = MV_NO_MOVING;
+    player->GfxDir = MV_NONE;
     player->GfxAction = ACTION_DEFAULT;
     player->Frame = 0;
     player->StepFrame = 0;
@@ -1517,7 +1517,7 @@ void InitGame()
 
     player->step_counter = 0;
 
-    player->last_move_dir = MV_NO_MOVING;
+    player->last_move_dir = MV_NONE;
 
     player->is_waiting = FALSE;
     player->is_moving = FALSE;
@@ -1617,7 +1617,7 @@ void InitGame()
 #if defined(NETWORK_AVALIABLE)
   /* initial null action */
   if (network_playing)
-    SendToServer_MovePlayer(MV_NO_MOVING);
+    SendToServer_MovePlayer(MV_NONE);
 #endif
 
   ZX = ZY = -1;
@@ -1629,7 +1629,7 @@ void InitGame()
   TimeLeft = level.time;
   TapeTime = 0;
 
-  ScreenMovDir = MV_NO_MOVING;
+  ScreenMovDir = MV_NONE;
   ScreenMovPos = 0;
   ScreenGfxPos = 0;
 
@@ -1643,7 +1643,7 @@ void InitGame()
   game.light_time_left = 0;
   game.timegate_time_left = 0;
   game.switchgate_pos = 0;
-  game.balloon_dir = MV_NO_MOVING;
+  game.wind_direction = level.wind_direction_initial;
   game.gravity = level.initial_gravity;
   game.explosions_delayed = TRUE;
 
@@ -1651,7 +1651,7 @@ void InitGame()
 
   for (i = 0; i < NUM_BELTS; i++)
   {
-    game.belt_dir[i] = MV_NO_MOVING;
+    game.belt_dir[i] = MV_NONE;
     game.belt_dir_nr[i] = 3;		/* not moving, next moving left */
   }
 
@@ -1691,7 +1691,7 @@ void InitGame()
       GfxRandom[x][y] = INIT_GFX_RANDOM();
       GfxElement[x][y] = EL_UNDEFINED;
       GfxAction[x][y] = ACTION_DEFAULT;
-      GfxDir[x][y] = MV_NO_MOVING;
+      GfxDir[x][y] = MV_NONE;
     }
   }
 
@@ -1766,7 +1766,7 @@ void InitGame()
 
   /* correct non-moving belts to start moving left */
   for (i = 0; i < NUM_BELTS; i++)
-    if (game.belt_dir[i] == MV_NO_MOVING)
+    if (game.belt_dir[i] == MV_NONE)
       game.belt_dir_nr[i] = 3;		/* not moving, next moving left */
 
   /* check if any connected player was not found in playfield */
@@ -2147,7 +2147,7 @@ void InitMovDir(int x, int y)
 
 	if (move_direction_initial == MV_START_PREVIOUS)
 	{
-	  if (MovDir[x][y] != MV_NO_MOVING)
+	  if (MovDir[x][y] != MV_NONE)
 	    return;
 
 	  move_direction_initial = MV_START_AUTOMATIC;
@@ -2634,7 +2634,7 @@ static void RemoveField(int x, int y)
 
   GfxElement[x][y] = EL_UNDEFINED;
   GfxAction[x][y] = ACTION_DEFAULT;
-  GfxDir[x][y] = MV_NO_MOVING;
+  GfxDir[x][y] = MV_NONE;
 }
 
 void RemoveMovingField(int x, int y)
@@ -3205,7 +3205,7 @@ void Explode(int ex, int ey, int phase, int mode)
     Back[x][y] = 0;
 
     MovDir[x][y] = MovPos[x][y] = MovDelay[x][y] = 0;
-    GfxDir[x][y] = MV_NO_MOVING;
+    GfxDir[x][y] = MV_NONE;
     ChangeDelay[x][y] = 0;
     ChangePage[x][y] = -1;
 
@@ -3418,7 +3418,7 @@ static void InitBeltMovement()
 
       for (i = 0; i < NUM_BELTS; i++)
       {
-	if (IS_BELT(element) && game.belt_dir[i] != MV_NO_MOVING)
+	if (IS_BELT(element) && game.belt_dir[i] != MV_NONE)
 	{
 	  int e_belt_nr = getBeltNrFromBeltElement(element);
 	  int belt_nr = i;
@@ -3461,9 +3461,9 @@ static void ToggleBeltSwitch(int x, int y)
   static int belt_move_dir[4] =
   {
     MV_LEFT,
-    MV_NO_MOVING,
+    MV_NONE,
     MV_RIGHT,
-    MV_NO_MOVING,
+    MV_NONE,
   };
 
   int element = Feld[x][y];
@@ -3509,7 +3509,7 @@ static void ToggleBeltSwitch(int x, int y)
 	  DrawLevelField(xx, yy);
 	}
       }
-      else if (IS_BELT(element) && belt_dir != MV_NO_MOVING)
+      else if (IS_BELT(element) && belt_dir != MV_NONE)
       {
 	int e_belt_nr = getBeltNrFromBeltElement(element);
 
@@ -3521,7 +3521,7 @@ static void ToggleBeltSwitch(int x, int y)
 	  DrawLevelField(xx, yy);
 	}
       }
-      else if (IS_BELT_ACTIVE(element) && belt_dir == MV_NO_MOVING)
+      else if (IS_BELT_ACTIVE(element) && belt_dir == MV_NONE)
       {
 	int e_belt_nr = getBeltNrFromBeltActiveElement(element);
 
@@ -4174,7 +4174,7 @@ inline static void TurnRoundExt(int x, int y)
   }
   else if (element == EL_BALLOON)
   {
-    MovDir[x][y] = game.balloon_dir;
+    MovDir[x][y] = game.wind_direction;
     MovDelay[x][y] = 0;
   }
   else if (element == EL_SPRING)
@@ -4182,7 +4182,7 @@ inline static void TurnRoundExt(int x, int y)
     if (MovDir[x][y] & MV_HORIZONTAL &&
 	(!SPRING_CAN_ENTER_FIELD(element, move_x, move_y) ||
 	 SPRING_CAN_ENTER_FIELD(element, x, y + 1)))
-      MovDir[x][y] = MV_NO_MOVING;
+      MovDir[x][y] = MV_NONE;
 
     MovDelay[x][y] = 0;
   }
@@ -4251,7 +4251,7 @@ inline static void TurnRoundExt(int x, int y)
       }
     }
 
-    MovDir[x][y] = MV_NO_MOVING;
+    MovDir[x][y] = MV_NONE;
     if (attr_x < x)
       MovDir[x][y] |= (AllPlayersGone ? MV_RIGHT : MV_LEFT);
     else if (attr_x > x)
@@ -4388,6 +4388,11 @@ inline static void TurnRoundExt(int x, int y)
     MovDir[x][y] = move_pattern;
     MovDelay[x][y] = GET_NEW_MOVE_DELAY(element);
   }
+  else if (move_pattern & MV_WIND_DIRECTION)
+  {
+    MovDir[x][y] = game.wind_direction;
+    MovDelay[x][y] = GET_NEW_MOVE_DELAY(element);
+  }
   else if (move_pattern == MV_ALONG_LEFT_SIDE)
   {
     if (CUSTOM_ELEMENT_CAN_ENTER_FIELD(element, left_x, left_y))
@@ -4441,7 +4446,7 @@ inline static void TurnRoundExt(int x, int y)
       }
     }
 
-    MovDir[x][y] = MV_NO_MOVING;
+    MovDir[x][y] = MV_NONE;
     if (attr_x < x)
       MovDir[x][y] |= (move_away ? MV_RIGHT : MV_LEFT);
     else if (attr_x > x)
@@ -4487,7 +4492,7 @@ inline static void TurnRoundExt(int x, int y)
 	   move_pattern == MV_WHEN_DROPPED)
   {
     if (!CUSTOM_ELEMENT_CAN_ENTER_FIELD(element, move_x, move_y))
-      MovDir[x][y] = MV_NO_MOVING;
+      MovDir[x][y] = MV_NONE;
 
     MovDelay[x][y] = 0;
   }
@@ -4515,7 +4520,7 @@ inline static void TurnRoundExt(int x, int y)
     };
     boolean hunter_mode = (move_pattern == MV_MAZE_HUNTER);
     int move_preference = -1000000;	/* start with very low preference */
-    int new_move_dir = MV_NO_MOVING;
+    int new_move_dir = MV_NONE;
     int start_test = RND(4);
     int i;
 
@@ -4764,7 +4769,7 @@ void StartMoving(int x, int y)
     }
     else if (IS_FREE(x, y + 1) && element == EL_SPRING && level.use_spring_bug)
     {
-      if (MovDir[x][y] == MV_NO_MOVING)
+      if (MovDir[x][y] == MV_NONE)
       {
 	InitMovingField(x, y, MV_DOWN);
 	started_moving = TRUE;
@@ -4906,7 +4911,7 @@ void StartMoving(int x, int y)
 
   /* not "else if" because of elements that can fall and move (EL_SPRING) */
 #if 0
-  if (CAN_MOVE(element) && !started_moving && MovDir[x][y] != MV_NO_MOVING)
+  if (CAN_MOVE(element) && !started_moving && MovDir[x][y] != MV_NONE)
 #else
   if (CAN_MOVE(element) && !started_moving)
 #endif
@@ -4916,7 +4921,7 @@ void StartMoving(int x, int y)
 
 #if 0
 #if DEBUG
-    if (MovDir[x][y] == MV_NO_MOVING)
+    if (MovDir[x][y] == MV_NONE)
     {
       printf("StartMoving(): %d,%d: element %d ['%s'] not moving\n",
 	     x, y, element, element_info[element].token_name);
@@ -5103,7 +5108,7 @@ void StartMoving(int x, int y)
 	if (DigField(local_player, x, y, newx, newy, 0,0, DF_DIG) == MF_MOVING)
 	  DrawLevelField(newx, newy);
 	else
-	  GfxDir[x][y] = MovDir[x][y] = MV_NO_MOVING;
+	  GfxDir[x][y] = MovDir[x][y] = MV_NONE;
       }
       else if (!IS_FREE(newx, newy))
       {
@@ -6286,7 +6291,7 @@ void MauerWaechst(int x, int y)
 
       Feld[x][y] = Store[x][y];
       Store[x][y] = 0;
-      GfxDir[x][y] = MovDir[x][y] = MV_NO_MOVING;
+      GfxDir[x][y] = MovDir[x][y] = MV_NONE;
       DrawLevelField(x, y);
     }
   }
@@ -8387,7 +8392,7 @@ boolean MovePlayerOneStep(struct PlayerInfo *player,
   player->MovDir = (dx < 0 ? MV_LEFT :
 		    dx > 0 ? MV_RIGHT :
 		    dy < 0 ? MV_UP :
-		    dy > 0 ? MV_DOWN :	MV_NO_MOVING);
+		    dy > 0 ? MV_DOWN :	MV_NONE);
 
   if (!IN_LEV_FIELD(new_jx, new_jy))
     return MF_NO_ACTION;
@@ -8476,7 +8481,7 @@ boolean MovePlayer(struct PlayerInfo *player, int dx, int dy)
   player->move_delay = -1;		/* set to "uninitialized" value */
 
   /* store if player is automatically moved to next field */
-  player->is_auto_moving = (player->programmed_action != MV_NO_MOVING);
+  player->is_auto_moving = (player->programmed_action != MV_NONE);
 
   /* remove the last programmed player action */
   player->programmed_action = 0;
@@ -8849,7 +8854,7 @@ void ScrollScreen(struct PlayerInfo *player, int mode)
     redraw_mask |= REDRAW_FIELD;
   }
   else
-    ScreenMovDir = MV_NO_MOVING;
+    ScreenMovDir = MV_NONE;
 }
 
 void TestIfPlayerTouchesCustomElement(int x, int y)
@@ -9123,7 +9128,7 @@ void TestIfGoodThingHitsBadThing(int good_x, int good_y, int good_move_dir)
       continue;
 
     test_move_dir =
-      (IS_MOVING(test_x, test_y) ? MovDir[test_x][test_y] : MV_NO_MOVING);
+      (IS_MOVING(test_x, test_y) ? MovDir[test_x][test_y] : MV_NONE);
 
     test_element = MovingOrBlocked2ElementIfNotLeaving(test_x, test_y);
 
@@ -9197,7 +9202,7 @@ void TestIfBadThingHitsGoodThing(int bad_x, int bad_y, int bad_move_dir)
       continue;
 
     test_move_dir =
-      (IS_MOVING(test_x, test_y) ? MovDir[test_x][test_y] : MV_NO_MOVING);
+      (IS_MOVING(test_x, test_y) ? MovDir[test_x][test_y] : MV_NONE);
 
     test_element = Feld[test_x][test_y];
 
@@ -9253,7 +9258,7 @@ void TestIfBadThingHitsGoodThing(int bad_x, int bad_y, int bad_move_dir)
 
 void TestIfPlayerTouchesBadThing(int x, int y)
 {
-  TestIfGoodThingHitsBadThing(x, y, MV_NO_MOVING);
+  TestIfGoodThingHitsBadThing(x, y, MV_NONE);
 }
 
 void TestIfPlayerRunsIntoBadThing(int x, int y, int move_dir)
@@ -9263,7 +9268,7 @@ void TestIfPlayerRunsIntoBadThing(int x, int y, int move_dir)
 
 void TestIfBadThingTouchesPlayer(int x, int y)
 {
-  TestIfBadThingHitsGoodThing(x, y, MV_NO_MOVING);
+  TestIfBadThingHitsGoodThing(x, y, MV_NONE);
 }
 
 void TestIfBadThingRunsIntoPlayer(int x, int y, int move_dir)
@@ -9273,12 +9278,12 @@ void TestIfBadThingRunsIntoPlayer(int x, int y, int move_dir)
 
 void TestIfFriendTouchesBadThing(int x, int y)
 {
-  TestIfGoodThingHitsBadThing(x, y, MV_NO_MOVING);
+  TestIfGoodThingHitsBadThing(x, y, MV_NONE);
 }
 
 void TestIfBadThingTouchesFriend(int x, int y)
 {
-  TestIfBadThingHitsGoodThing(x, y, MV_NO_MOVING);
+  TestIfBadThingHitsGoodThing(x, y, MV_NONE);
 }
 
 void TestIfBadThingTouchesOtherBadThing(int bad_x, int bad_y)
@@ -9430,10 +9435,10 @@ int DigField(struct PlayerInfo *player,
   int jx = oldx, jy = oldy;
   int dx = x - jx, dy = y - jy;
   int nextx = x + dx, nexty = y + dy;
-  int move_direction = (dx == -1 ? MV_LEFT :
+  int move_direction = (dx == -1 ? MV_LEFT  :
 			dx == +1 ? MV_RIGHT :
-			dy == -1 ? MV_UP :
-			dy == +1 ? MV_DOWN : MV_NO_MOVING);
+			dy == -1 ? MV_UP    :
+			dy == +1 ? MV_DOWN  : MV_NONE);
   int opposite_direction = MV_DIR_OPPOSITE(move_direction);
   int dig_side = MV_DIR_OPPOSITE(move_direction);
   int old_element = Feld[jx][jy];
@@ -9620,14 +9625,14 @@ int DigField(struct PlayerInfo *player,
     }
     else if (element == EL_EXTRA_TIME && level.time > 0)
     {
-      TimeLeft += 10;
+      TimeLeft += level.extra_time;
       DrawGameValue_Time(TimeLeft);
     }
     else if (element == EL_SHIELD_NORMAL || element == EL_SHIELD_DEADLY)
     {
-      player->shield_normal_time_left += 10;
+      player->shield_normal_time_left += level.shield_normal_time;
       if (element == EL_SHIELD_DEADLY)
-	player->shield_deadly_time_left += 10;
+	player->shield_deadly_time_left += level.shield_deadly_time;
     }
     else if (element == EL_DYNAMITE || element == EL_SP_DISK_RED)
     {
@@ -9879,20 +9884,19 @@ int DigField(struct PlayerInfo *player,
     {
       ActivateTimegateSwitch(x, y);
     }
-    else if (element == EL_BALLOON_SWITCH_LEFT ||
+    else if (element == EL_BALLOON_SWITCH_LEFT  ||
 	     element == EL_BALLOON_SWITCH_RIGHT ||
-	     element == EL_BALLOON_SWITCH_UP ||
-	     element == EL_BALLOON_SWITCH_DOWN ||
+	     element == EL_BALLOON_SWITCH_UP    ||
+	     element == EL_BALLOON_SWITCH_DOWN  ||
+	     element == EL_BALLOON_SWITCH_NONE  ||
 	     element == EL_BALLOON_SWITCH_ANY)
     {
-      if (element == EL_BALLOON_SWITCH_ANY)
-	game.balloon_dir = move_direction;
-      else
-	game.balloon_dir = (element == EL_BALLOON_SWITCH_LEFT  ? MV_LEFT :
-			    element == EL_BALLOON_SWITCH_RIGHT ? MV_RIGHT :
-			    element == EL_BALLOON_SWITCH_UP    ? MV_UP :
-			    element == EL_BALLOON_SWITCH_DOWN  ? MV_DOWN :
-			    MV_NO_MOVING);
+      game.wind_direction = (element == EL_BALLOON_SWITCH_LEFT  ? MV_LEFT  :
+			     element == EL_BALLOON_SWITCH_RIGHT ? MV_RIGHT :
+			     element == EL_BALLOON_SWITCH_UP    ? MV_UP    :
+			     element == EL_BALLOON_SWITCH_DOWN  ? MV_DOWN  :
+			     element == EL_BALLOON_SWITCH_NONE  ? MV_NONE  :
+			     move_direction);
     }
     else if (element == EL_LAMP)
     {
@@ -9905,7 +9909,7 @@ int DigField(struct PlayerInfo *player,
     else if (element == EL_TIME_ORB_FULL)
     {
       Feld[x][y] = EL_TIME_ORB_EMPTY;
-      TimeLeft += 10;
+      TimeLeft += level.time_orb_time;
       DrawGameValue_Time(TimeLeft);
 
       ResetGfxAnimation(x, y);
@@ -9957,10 +9961,10 @@ boolean SnapField(struct PlayerInfo *player, int dx, int dy)
 {
   int jx = player->jx, jy = player->jy;
   int x = jx + dx, y = jy + dy;
-  int snap_direction = (dx == -1 ? MV_LEFT :
+  int snap_direction = (dx == -1 ? MV_LEFT  :
 			dx == +1 ? MV_RIGHT :
-			dy == -1 ? MV_UP :
-			dy == +1 ? MV_DOWN : MV_NO_MOVING);
+			dy == -1 ? MV_UP    :
+			dy == +1 ? MV_DOWN  : MV_NONE);
 
   if (player->MovPos != 0 && game.engine_version >= VERSION_IDENT(2,2,0,0))
     return FALSE;

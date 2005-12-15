@@ -1,5 +1,19 @@
+2005-12-15
+	* added missing configuration settings for the following elements:
+	  - EL_TIMEGATE_SWITCH		(time of open time gate)
+	  - EL_LIGHT_SWITCH_ACTIVE	(time of light switched on)
+	  - EL_SHIELD_NORMAL		(time of shield duration)
+	  - EL_SHIELD_DEADLY		(time of shield duration)
+	  - EL_EXTRA_TIME		(time added to level time)
+	  - EL_TIME_ORB_FULL		(time added to level time)
+
+2005-12-14
+	* added "wind direction" as a movement pattern for custom elements
+	* added initial wind direction for balloon / custom elements to editor
+	* added functionality for EL_BALLOON_SWITCH_NONE to R'n'D game engine
+
 2005-12-13
-	* added parameters to editor for "game of life" and "biomaze" elements
+	* added parameters for "game of life" and "biomaze" elements to editor
 
 2005-12-12
 	* added level file chunk "CONF" for generic level and element settings

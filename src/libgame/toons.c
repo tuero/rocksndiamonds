@@ -88,7 +88,7 @@ static int get_toon_direction(char *direction_string_raw)
 		   strcmp(direction_string, "right") == 0 ? MV_RIGHT :
 		   strcmp(direction_string, "up")    == 0 ? MV_UP :
 		   strcmp(direction_string, "down")  == 0 ? MV_DOWN :
-		   MV_NO_MOVING);
+		   MV_NONE);
 
   free(direction_string);
 

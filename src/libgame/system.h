@@ -100,7 +100,7 @@
 #define BUTTON_2		5
 
 /* values for move directions and special "button" key bitmasks */
-#define MV_NO_MOVING		0
+#define MV_NONE			0
 #define MV_LEFT			(1 << MV_BIT_LEFT)
 #define MV_RIGHT		(1 << MV_BIT_RIGHT)
 #define MV_UP			(1 << MV_BIT_UP)
@@ -110,7 +110,7 @@
 #define MV_VERTICAL		(MV_UP   | MV_DOWN)
 #define MV_ALL_DIRECTIONS	(MV_LEFT | MV_RIGHT | MV_UP | MV_DOWN)
 #define MV_ANY_DIRECTION	(MV_ALL_DIRECTIONS)
-#define MV_NO_DIRECTIONS	(MV_NO_MOVING)
+#define MV_NO_DIRECTION		(MV_NONE)
 
 #define KEY_BUTTON_1		(1 << BUTTON_1)
 #define KEY_BUTTON_2		(1 << BUTTON_2)
@@ -125,7 +125,7 @@
 #define MV_DIR_OPPOSITE(x)	((x) == MV_LEFT  ? MV_RIGHT :		\
 				 (x) == MV_RIGHT ? MV_LEFT  :		\
 				 (x) == MV_UP    ? MV_DOWN  :		\
-				 (x) == MV_DOWN  ? MV_UP    : MV_NO_MOVING)
+				 (x) == MV_DOWN  ? MV_UP    : MV_NONE)
 
 
 /* values for animation mode (frame order and direction) */
