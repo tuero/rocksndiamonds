@@ -892,8 +892,21 @@ static void InitField(int x, int y, boolean init_game)
       break;
 
     default:
+#if 1
+      if (IS_CUSTOM_ELEMENT(element))
+      {
+	if (CAN_MOVE(element))
+	  InitMovDir(x, y);
+
+#if USE_NEW_CUSTOM_VALUE
+	if (!element_info[element].use_last_ce_value)
+	  CustomValue[x][y] = GET_NEW_CUSTOM_VALUE(Feld[x][y]);
+#endif
+      }
+#else
       if (IS_CUSTOM_ELEMENT(element) && CAN_MOVE(element))
 	InitMovDir(x, y);
+#endif
       else if (IS_GROUP_ELEMENT(element))
       {
 	struct ElementGroupInfo *group = element_info[element].group;
@@ -919,12 +932,16 @@ static void InitField(int x, int y, boolean init_game)
       break;
   }
 
+#if 0
+
 #if USE_NEW_CUSTOM_VALUE
 
 #if 1
   CustomValue[x][y] = GET_NEW_CUSTOM_VALUE(Feld[x][y]);
 #else
   CustomValue[x][y] = element_info[Feld[x][y]].custom_value_initial;
+#endif
+
 #endif
 
 #endif
@@ -6929,6 +6946,9 @@ static void ChangeElementNowExt(struct ElementChangeInfo *change,
 				int x, int y, int target_element)
 {
   int previous_move_direction = MovDir[x][y];
+#if USE_NEW_CUSTOM_VALUE
+  int last_ce_value = CustomValue[x][y];
+#endif
   boolean add_player = (ELEM_IS_PLAYER(target_element) &&
 			IS_WALKABLE(Feld[x][y]));
 
@@ -6955,6 +6975,11 @@ static void ChangeElementNowExt(struct ElementChangeInfo *change,
 
     if (element_info[Feld[x][y]].move_direction_initial == MV_START_PREVIOUS)
       MovDir[x][y] = previous_move_direction;
+
+#if USE_NEW_CUSTOM_VALUE
+    if (element_info[Feld[x][y]].use_last_ce_value)
+      CustomValue[x][y] = last_ce_value;
+#endif
 
     InitField_WithBug1(x, y, FALSE);
 
@@ -9984,8 +10009,12 @@ int DigField(struct PlayerInfo *player,
     else if (element == EL_TIME_ORB_FULL)
     {
       Feld[x][y] = EL_TIME_ORB_EMPTY;
-      TimeLeft += level.time_orb_time;
-      DrawGameValue_Time(TimeLeft);
+
+      if (level.time > 0 || level.use_time_orb_bug)
+      {
+	TimeLeft += level.time_orb_time;
+	DrawGameValue_Time(TimeLeft);
+      }
 
       ResetGfxAnimation(x, y);
       DrawLevelField(x, y);

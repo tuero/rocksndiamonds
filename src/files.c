@@ -199,6 +199,10 @@ static struct
     EL_TIME_ORB_FULL,			CONF_VALUE_INTEGER_1,
     &li.time_orb_time,			10
   },
+  {
+    EL_TIME_ORB_FULL,			CONF_VALUE_BOOLEAN_1,
+    &li.use_time_orb_bug,		FALSE
+  },
 
   /* ---------- multi-byte values ------------------------------------------ */
   {
@@ -392,6 +396,8 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
   level->dont_collide_with_bits = ~0;	/* always deadly when colliding */
 
   level->use_spring_bug = FALSE;
+  level->use_time_orb_bug = FALSE;
+
   level->use_step_counter = FALSE;
 
   /* values for the new EMC elements */
@@ -2805,6 +2811,10 @@ static void LoadLevel_InitVersion(struct LevelInfo *level, char *filename)
     /* springs could be pushed over pits before (pre-release version) 2.2.0 */
     if (level->game_version < VERSION_IDENT(2,2,0,0))
       level->use_spring_bug = TRUE;
+
+    /* time orb caused limited time in endless time levels before 3.1.2 */
+    if (level->game_version < VERSION_IDENT(3,1,2,0))
+      level->use_time_orb_bug = TRUE;
 
     /* only few elements were able to actively move into acid before 3.1.0 */
     /* trigger settings did not exist before 3.1.0; set to default "any" */

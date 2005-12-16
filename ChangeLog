@@ -1,3 +1,11 @@
+2005-12-16
+	* added dynamic checkboxes to custom element action settings in editor
+	* added "CE value" counter for custom elements (instead of "CE count")
+	* added option to use the last "CE value" after custom element change
+	* added option to use the "CE value" of other elements in CE actions
+	* fixed odd behaviour when pressing time orb in levels w/o time limit
+	* added checkbox "use time orb bug" for older levels that use this bug
+
 2005-12-15
 	* added missing configuration settings for the following elements:
 	  - EL_TIMEGATE_SWITCH		(time of open time gate)

@@ -1799,6 +1799,7 @@ struct LevelInfo
   boolean initial_gravity;
   boolean em_slippery_gems;	/* EM style "gems slip from wall" behaviour */
   boolean use_spring_bug;	/* for compatibility with old levels */
+  boolean use_time_orb_bug;	/* for compatibility with old levels */
   boolean instant_relocation;	/* no visual delay when relocating player */
   boolean can_pass_to_walkable;	/* player can pass to empty or walkable tile */
   boolean grow_into_diggable;	/* amoeba can grow into anything diggable */
