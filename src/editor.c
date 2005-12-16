@@ -1570,27 +1570,39 @@ static struct ValueTextInfo options_action_type[] =
   { CA_SHOW_ENVELOPE,		"show envelope"			},
   { CA_ADD_KEY,			"add key"			},
   { CA_DEL_KEY,			"remove key"			},
-  { CA_SET_PLAYER_SPEED,	"set player speed"		},
   { CA_SET_GEMS,		"set gems"			},
   { CA_SET_TIME,		"set time"			},
   { CA_SET_SCORE,		"set score"			},
   { CA_SET_CE_SCORE,		"set CE score"			},
   { CA_SET_CE_COUNT,		"set CE count"			},
+  { CA_SET_PLAYER_SPEED,	"set player speed"		},
+  { CA_SET_PLAYER_GRAVITY,	"set gravity"			},
+  { CA_SET_WIND_DIRECTION,	"set wind dir."			},
 #if 0
   { CA_SET_DYNABOMB_NUMBER,	"set bomb number"		},
   { CA_SET_DYNABOMB_SIZE,	"set bomb size"			},
   { CA_SET_DYNABOMB_POWER,	"set bomb power"		},
 #endif
-  { CA_TOGGLE_PLAYER_GRAVITY,	"toggle gravity"		},
-  { CA_ENABLE_PLAYER_GRAVITY,	"enable gravity"		},
-  { CA_DISABLE_PLAYER_GRAVITY,	"disable gravity"		},
 
   { -1,				NULL				}
 };
 
-static struct ValueTextInfo options_action_mode[] =
+static struct ValueTextInfo options_action_mode_none[] =
 {
-  { CA_MODE_UNDEFINED,		" "				},
+  { CA_ARG_UNDEFINED,		" "				},
+
+  { -1,				NULL				}
+};
+
+static struct ValueTextInfo options_action_mode_set[] =
+{
+  { CA_MODE_SET,		"="				},
+
+  { -1,				NULL				}
+};
+
+static struct ValueTextInfo options_action_mode_calc[] =
+{
   { CA_MODE_SET,		"="				},
   { CA_MODE_ADD,		"+"				},
   { CA_MODE_SUBTRACT,		"-"				},
@@ -1601,7 +1613,14 @@ static struct ValueTextInfo options_action_mode[] =
   { -1,				NULL				}
 };
 
-static struct ValueTextInfo options_action_arg[] =
+static struct ValueTextInfo options_action_arg_none[] =
+{
+  { CA_ARG_UNDEFINED,		"         "			},
+
+  { -1,				NULL				}
+};
+
+static struct ValueTextInfo options_action_arg_player[] =
 {
   { CA_ARG_PLAYER_HEADLINE,	"[player]"			},
   { CA_ARG_PLAYER_1,		"1"				},
@@ -1610,7 +1629,12 @@ static struct ValueTextInfo options_action_arg[] =
   { CA_ARG_PLAYER_4,		"4"				},
   { CA_ARG_PLAYER_ANY,		"any"				},
   { CA_ARG_PLAYER_TRIGGER,	"trigger"			},
-  { CA_ARG_UNDEFINED,		" "				},
+
+  { -1,				NULL				}
+};
+
+static struct ValueTextInfo options_action_arg_number[] =
+{
   { CA_ARG_NUMBER_HEADLINE,	"[number]"			},
   { CA_ARG_0,			"0"				},
   { CA_ARG_1,			"1"				},
@@ -1624,15 +1648,72 @@ static struct ValueTextInfo options_action_arg[] =
   { CA_ARG_UNDEFINED,		" "				},
   { CA_ARG_NUMBER_MIN,		"min"				},
   { CA_ARG_NUMBER_MAX,		"max"				},
-  { CA_ARG_NUMBER_NORMAL,	"normal"			},
+  { CA_ARG_UNDEFINED,		" "				},
   { CA_ARG_NUMBER_RESET,	"reset"				},
+  { CA_ARG_UNDEFINED,		" "				},
   { CA_ARG_NUMBER_CE_SCORE,	"CE score"			},
   { CA_ARG_NUMBER_CE_COUNT,	"CE count"			},
   { CA_ARG_NUMBER_CE_DELAY,	"CE delay"			},
-  { CA_ARG_UNDEFINED,		" "				},
+
+  { -1,				NULL				}
+};
+
+static struct ValueTextInfo options_action_arg_element[] =
+{
   { CA_ARG_ELEMENT_HEADLINE,	"[element]"			},
   { CA_ARG_ELEMENT_TARGET,	"target"			},
   { CA_ARG_ELEMENT_TRIGGER,	"trigger"			},
+  { CA_ARG_UNDEFINED,		" "				},
+  { CA_ARG_NUMBER_HEADLINE,	"[number]"			},
+  { CA_ARG_1,			"1"				},
+  { CA_ARG_2,			"2"				},
+  { CA_ARG_3,			"3"				},
+  { CA_ARG_4,			"4"				},
+  { CA_ARG_5,			"5"				},
+  { CA_ARG_6,			"6"				},
+  { CA_ARG_7,			"7"				},
+  { CA_ARG_8,			"8"				},
+
+  { -1,				NULL				}
+};
+
+static struct ValueTextInfo options_action_arg_speed[] =
+{
+  { CA_ARG_SPEED_HEADLINE,	"[speed]"			},
+  { CA_ARG_SPEED_VERY_SLOW,	"very slow"			},
+  { CA_ARG_SPEED_SLOW,		"slow"				},
+  { CA_ARG_SPEED_NORMAL,	"normal"			},
+  { CA_ARG_SPEED_FAST,		"fast"				},
+  { CA_ARG_SPEED_VERY_FAST,	"very fast"			},
+  { CA_ARG_SPEED_EVEN_FASTER,	"ultrafast"			},
+  { CA_ARG_UNDEFINED,		" "				},
+  { CA_ARG_SPEED_SLOWER,	"slower"			},
+  { CA_ARG_SPEED_FASTER,	"faster"			},
+  { CA_ARG_UNDEFINED,		" "				},
+  { CA_ARG_SPEED_RESET,		"reset"				},
+
+  { -1,				NULL				}
+};
+
+static struct ValueTextInfo options_action_arg_gravity[] =
+{
+  { CA_ARG_GRAVITY_HEADLINE,	"[gravity]"			},
+  { CA_ARG_GRAVITY_ON,		"on"				},
+  { CA_ARG_GRAVITY_OFF,		"off"				},
+  { CA_ARG_GRAVITY_TOGGLE,	"toggle"			},
+
+  { -1,				NULL				}
+};
+
+static struct ValueTextInfo options_action_arg_direction[] =
+{
+  { CA_ARG_DIRECTION_HEADLINE,	"[dir.]"			},
+  { CA_ARG_DIRECTION_NONE,	"none"				},
+  { CA_ARG_DIRECTION_LEFT,	"left"				},
+  { CA_ARG_DIRECTION_RIGHT,	"right"				},
+  { CA_ARG_DIRECTION_UP,	"up"				},
+  { CA_ARG_DIRECTION_DOWN,	"down"				},
+  { CA_ARG_DIRECTION_TRIGGER,	"trigger"			},
 
   { -1,				NULL				}
 };
@@ -1652,6 +1733,40 @@ static struct ValueTextInfo options_group_choice_mode[] =
   { ANIM_PINGPONG2,		"pingpong 2"			},
 
   { -1,				NULL				}
+};
+
+static struct ValueTextInfo *action_arg_modes[] =
+{
+  options_action_mode_none,
+  options_action_mode_set,
+  options_action_mode_calc,
+};
+
+static struct
+{
+  int value;
+  int mode;
+  struct ValueTextInfo *options;
+}
+action_arg_options[] =
+{
+  { CA_NO_ACTION,		0,	options_action_arg_none,	},
+  { CA_EXIT_PLAYER,		0,	options_action_arg_player,	},
+  { CA_KILL_PLAYER,		0,	options_action_arg_player,	},
+  { CA_RESTART_LEVEL,		0,	options_action_arg_none,	},
+  { CA_SHOW_ENVELOPE,		0,	options_action_arg_element,	},
+  { CA_ADD_KEY,			0,	options_action_arg_element,	},
+  { CA_DEL_KEY,			0,	options_action_arg_element,	},
+  { CA_SET_PLAYER_SPEED,	1,	options_action_arg_speed,	},
+  { CA_SET_GEMS,		2,	options_action_arg_number,	},
+  { CA_SET_TIME,		2,	options_action_arg_number,	},
+  { CA_SET_SCORE,		2,	options_action_arg_number,	},
+  { CA_SET_CE_SCORE,		2,	options_action_arg_number,	},
+  { CA_SET_CE_COUNT,		2,	options_action_arg_number,	},
+  { CA_SET_PLAYER_GRAVITY,	1,	options_action_arg_gravity,	},
+  { CA_SET_WIND_DIRECTION,	1,	options_action_arg_direction,	},
+
+  { -1,				FALSE,	NULL				}
 };
 
 static struct
@@ -1874,7 +1989,7 @@ static struct
     -1,					ED_ELEMENT_SETTINGS_YPOS(13),
     GADGET_ID_ACTION_MODE,		GADGET_ID_ACTION_TYPE,
     -1,
-    options_action_mode,
+    options_action_mode_none,
     &custom_element_change.action_mode,
     NULL, NULL,				"action operator"
   },
@@ -1882,7 +1997,7 @@ static struct
     -1,					ED_ELEMENT_SETTINGS_YPOS(13),
     GADGET_ID_ACTION_ARG,		GADGET_ID_ACTION_MODE,
     -1,
-    options_action_arg,
+    options_action_arg_none,
     &custom_element_change.action_arg,
     NULL, NULL,				"action parameter"
   },
@@ -2632,7 +2747,8 @@ static int new_element3 = EL_SAND;
 /* forward declaration for internal use */
 static void ModifyEditorCounterValue(int, int);
 static void ModifyEditorCounterLimits(int, int, int);
-static void ModifyEditorSelectbox(int, int);
+static void ModifyEditorSelectboxValue(int, int);
+static void ModifyEditorSelectboxOptions(int, struct ValueTextInfo *);
 static void ModifyEditorDrawingArea(int, int, int);
 static void ModifyEditorElementList();
 static void RedrawDrawingElements();
@@ -5445,7 +5561,7 @@ static void MapSelectboxGadget(int id)
   if (selectbox_info[id].text_right)
     DrawText(x_right, y, selectbox_info[id].text_right, FONT_TEXT_1);
 
-  ModifyEditorSelectbox(id, *selectbox_info[id].value);
+  ModifyEditorSelectboxValue(id, *selectbox_info[id].value);
 
   MapGadget(gi);
 }
@@ -6405,13 +6521,26 @@ static void ModifyEditorCounterLimits(int counter_id, int min, int max)
   ModifyGadget(gi, GDI_NUMBER_MIN, min, GDI_NUMBER_MAX, max, GDI_END);
 }
 
-static void ModifyEditorSelectbox(int selectbox_id, int new_value)
+static void ModifyEditorSelectboxValue(int selectbox_id, int new_value)
 {
   int gadget_id = selectbox_info[selectbox_id].gadget_id;
   struct GadgetInfo *gi = level_editor_gadget[gadget_id];
   int new_index_value = setSelectboxValue(selectbox_id, new_value);
 
   ModifyGadget(gi, GDI_SELECTBOX_INDEX, new_index_value, GDI_END);
+}
+
+static void ModifyEditorSelectboxOptions(int selectbox_id,
+					 struct ValueTextInfo *options)
+{
+  int gadget_id = selectbox_info[selectbox_id].gadget_id;
+  struct GadgetInfo *gi = level_editor_gadget[gadget_id];
+
+  selectbox_info[selectbox_id].options = options;
+
+  /* set index to zero -- list may be shorter now (correct later, if needed) */
+  ModifyGadget(gi, GDI_SELECTBOX_INDEX, 0,
+	       GDI_SELECTBOX_OPTIONS, options, GDI_END);
 }
 
 static void ModifyEditorDrawingArea(int drawingarea_id, int xsize, int ysize)
@@ -7264,6 +7393,24 @@ static void DrawPropertiesChangeDrawingAreas()
 static void DrawPropertiesChange()
 {
   int i;
+
+  for (i = 0; action_arg_options[i].value != -1; i++)
+  {
+    if (action_arg_options[i].value == custom_element_change.action_type)
+    {
+      int mode = action_arg_options[i].mode;
+
+      ModifyEditorSelectboxOptions(ED_SELECTBOX_ID_ACTION_MODE,
+				   action_arg_modes[mode]);
+      ModifyEditorSelectboxValue(ED_SELECTBOX_ID_ACTION_MODE,
+				 custom_element_change.action_mode);
+
+      ModifyEditorSelectboxOptions(ED_SELECTBOX_ID_ACTION_ARG,
+				   action_arg_options[i].options);
+      ModifyEditorSelectboxValue(ED_SELECTBOX_ID_ACTION_ARG,
+				 custom_element_change.action_arg);
+    }
+  }
 
   /* draw stickybutton gadget */
   MapCheckbuttonGadget(ED_CHECKBUTTON_ID_STICK_ELEMENT);
@@ -8509,9 +8656,9 @@ static void HandleTextAreaGadgets(struct GadgetInfo *gi)
 static void HandleSelectboxGadgets(struct GadgetInfo *gi)
 {
   int type_id = gi->custom_type_id;
+  int value_new = selectbox_info[type_id].options[gi->selectbox.index].value;
 
-  *selectbox_info[type_id].value =
-    selectbox_info[type_id].options[gi->selectbox.index].value;
+  *selectbox_info[type_id].value = value_new;
 
   if (type_id == ED_SELECTBOX_ID_SELECT_CHANGE_PAGE)
   {
@@ -8525,6 +8672,9 @@ static void HandleSelectboxGadgets(struct GadgetInfo *gi)
 	    type_id <= ED_SELECTBOX_ID_CHANGE_LAST) ||
 	   (type_id == ED_SELECTBOX_ID_GROUP_CHOICE_MODE))
   {
+    if (type_id == ED_SELECTBOX_ID_ACTION_TYPE)
+      DrawPropertiesChange();
+
     CopyElementPropertiesToGame(properties_element);
 
     level.changed = TRUE;

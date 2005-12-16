@@ -1320,6 +1320,7 @@ static void InitGameEngine()
     {
       ei->change_page[j].actual_trigger_element = EL_EMPTY;
       ei->change_page[j].actual_trigger_player = EL_PLAYER_1;
+      ei->change_page[j].actual_trigger_side = CH_SIDE_NONE;
     }
   }
 
@@ -6575,16 +6576,14 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
      action_type == CA_SET_CE_COUNT ? ei->collect_count_initial :
      0);
 
-  int action_arg_number_normal =
-    (action_type == CA_SET_PLAYER_SPEED ? MOVE_STEPSIZE_NORMAL :
-     action_arg_number_reset);
-
   int action_arg_number =
     (action_arg <= CA_ARG_MAX ? action_arg :
+     action_arg >= CA_ARG_SPEED_VERY_SLOW &&
+     action_arg <= CA_ARG_SPEED_EVEN_FASTER ? (action_arg - CA_ARG_SPEED) :
+     action_arg == CA_ARG_SPEED_RESET ? action_arg_number_reset :
      action_arg == CA_ARG_NUMBER_MIN ? action_arg_number_min :
      action_arg == CA_ARG_NUMBER_MAX ? action_arg_number_max :
      action_arg == CA_ARG_NUMBER_RESET ? action_arg_number_reset :
-     action_arg == CA_ARG_NUMBER_NORMAL ? action_arg_number_normal :
      action_arg == CA_ARG_NUMBER_CE_SCORE ? ei->collect_score :
 #if USE_NEW_COLLECT_COUNT
      action_arg == CA_ARG_NUMBER_CE_COUNT ? Count[x][y] :
@@ -6715,45 +6714,6 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
       break;
     }
 
-    case CA_SET_PLAYER_SPEED:
-    {
-      for (i = 0; i < MAX_PLAYERS; i++)
-      {
-	if (trigger_player_bits & (1 << i))
-	{
-	  int move_stepsize = TILEX / stored_player[i].move_delay_value;
-
-	  if (action_mode == CA_MODE_ADD || action_mode == CA_MODE_SUBTRACT)
-	  {
-	    /* translate "+" and "-" to "*" and "/" with powers of two */
-	    action_arg_number = 1 << action_arg_number;
-	    action_mode = (action_mode == CA_MODE_ADD ? CA_MODE_MULTIPLY :
-			   CA_MODE_DIVIDE);
-	  }
-
-	  move_stepsize =
-	    getModifiedActionNumber(move_stepsize,
-				    action_mode,
-				    action_arg_number,
-				    action_arg_number_min,
-				    action_arg_number_max);
-
-	  /* make sure that value is power of 2 */
-	  move_stepsize = (1 << log_2(move_stepsize));
-
-	  /* do no immediately change -- the player might just be moving */
-	  stored_player[i].move_delay_value_next = TILEX / move_stepsize;
-
-#if 0
-	  printf("::: move_delay_value == %d [%d]\n",
-		 stored_player[i].move_delay_value_next, action_arg_number);
-#endif
-	}
-      }
-
-      break;
-    }
-
     case CA_SET_GEMS:
     {
       local_player->gems_still_needed = action_arg_number_new;
@@ -6820,6 +6780,108 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
       break;
     }
 
+#if 1
+    case CA_SET_PLAYER_SPEED:
+    {
+      for (i = 0; i < MAX_PLAYERS; i++)
+      {
+	if (trigger_player_bits & (1 << i))
+	{
+	  int move_stepsize = TILEX / stored_player[i].move_delay_value;
+
+	  if (action_arg == CA_ARG_SPEED_SLOWER ||
+	      action_arg == CA_ARG_SPEED_FASTER)
+	  {
+	    action_arg_number = 2;
+	    action_mode = (action_arg == CA_ARG_SPEED_SLOWER ? CA_MODE_DIVIDE :
+			   CA_MODE_MULTIPLY);
+	  }
+
+	  move_stepsize =
+	    getModifiedActionNumber(move_stepsize,
+				    action_mode,
+				    action_arg_number,
+				    action_arg_number_min,
+				    action_arg_number_max);
+
+	  /* make sure that value is power of 2 */
+	  move_stepsize = (1 << log_2(move_stepsize));
+
+	  /* do no immediately change -- the player might just be moving */
+	  stored_player[i].move_delay_value_next = TILEX / move_stepsize;
+
+#if 0
+	  printf("::: move_delay_value == %d [%d]\n",
+		 stored_player[i].move_delay_value_next, action_arg_number);
+#endif
+	}
+      }
+
+      break;
+    }
+#else
+    case CA_SET_PLAYER_SPEED:
+    {
+      for (i = 0; i < MAX_PLAYERS; i++)
+      {
+	if (trigger_player_bits & (1 << i))
+	{
+	  int move_stepsize = TILEX / stored_player[i].move_delay_value;
+
+	  if (action_mode == CA_MODE_ADD || action_mode == CA_MODE_SUBTRACT)
+	  {
+	    /* translate "+" and "-" to "*" and "/" with powers of two */
+	    action_arg_number = 1 << action_arg_number;
+	    action_mode = (action_mode == CA_MODE_ADD ? CA_MODE_MULTIPLY :
+			   CA_MODE_DIVIDE);
+	  }
+
+	  move_stepsize =
+	    getModifiedActionNumber(move_stepsize,
+				    action_mode,
+				    action_arg_number,
+				    action_arg_number_min,
+				    action_arg_number_max);
+
+	  /* make sure that value is power of 2 */
+	  move_stepsize = (1 << log_2(move_stepsize));
+
+	  /* do no immediately change -- the player might just be moving */
+	  stored_player[i].move_delay_value_next = TILEX / move_stepsize;
+
+#if 0
+	  printf("::: move_delay_value == %d [%d]\n",
+		 stored_player[i].move_delay_value_next, action_arg_number);
+#endif
+	}
+      }
+
+      break;
+    }
+#endif
+
+    case CA_SET_PLAYER_GRAVITY:
+    {
+      game.gravity = (action_arg == CA_ARG_GRAVITY_OFF    ? FALSE         :
+		      action_arg == CA_ARG_GRAVITY_ON     ? TRUE          :
+		      action_arg == CA_ARG_GRAVITY_TOGGLE ? !game.gravity :
+		      game.gravity);
+      break;
+    }
+
+    case CA_SET_WIND_DIRECTION:
+    {
+      game.wind_direction = (action_arg >= CA_ARG_DIRECTION_NONE &&
+			     action_arg <= CA_ARG_DIRECTION_DOWN ?
+			     action_arg - CA_ARG_DIRECTION :
+			     action_arg == CA_ARG_DIRECTION_TRIGGER ?
+			     MV_DIR_OPPOSITE(change->actual_trigger_side) :
+			     game.wind_direction);
+
+      break;
+    }
+
+#if 0
     case CA_SET_DYNABOMB_NUMBER:
     {
       printf("::: CA_SET_DYNABOMB_NUMBER -- not yet implemented\n");
@@ -6840,27 +6902,7 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
 
       break;
     }
-
-    case CA_TOGGLE_PLAYER_GRAVITY:
-    {
-      game.gravity = !game.gravity;
-
-      break;
-    }
-
-    case CA_ENABLE_PLAYER_GRAVITY:
-    {
-      game.gravity = TRUE;
-
-      break;
-    }
-
-    case CA_DISABLE_PLAYER_GRAVITY:
-    {
-      game.gravity = FALSE;
-
-      break;
-    }
+#endif
 
     default:
       break;
@@ -6936,6 +6978,7 @@ static boolean ChangeElementNow(int x, int y, int element, int page)
     /* reset actual trigger element, trigger player and action element */
     change->actual_trigger_element = EL_EMPTY;
     change->actual_trigger_player = EL_PLAYER_1;
+    change->actual_trigger_side = CH_SIDE_NONE;
   }
 
 #if 1
@@ -7294,6 +7337,7 @@ static boolean CheckTriggeredElementChangeExt(int trigger_element,
       {
 	change->actual_trigger_element = trigger_element;
 	change->actual_trigger_player = EL_PLAYER_1 + log_2(trigger_player);
+	change->actual_trigger_side = trigger_side;
 
 	if ((change->can_change && !change_done) || change->has_action)
 	{
@@ -7379,6 +7423,7 @@ static boolean CheckElementChangeExt(int x, int y,
     {
       change->actual_trigger_element = trigger_element;
       change->actual_trigger_player = EL_PLAYER_1 + log_2(trigger_player);
+      change->actual_trigger_side = trigger_side;
 
       if (change->can_change && !change_done)
       {
