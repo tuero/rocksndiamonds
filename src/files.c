@@ -42,7 +42,7 @@
 
 #define LEVEL_CHUNK_CNT3_SIZE(x) (LEVEL_CHUNK_CNT3_HEADER + (x))
 #define LEVEL_CHUNK_CUS3_SIZE(x) (2 + (x) * LEVEL_CPART_CUS3_SIZE)
-#define LEVEL_CHUNK_CUS4_SIZE(x) (48 + 48 + (x) * 48)
+#define LEVEL_CHUNK_CUS4_SIZE(x) (96 + (x) * 48)
 
 /* file identifier strings */
 #define LEVEL_COOKIE_TMPL	"ROCKSNDIAMONDS_LEVEL_FILE_VERSION_x.x"
@@ -450,79 +450,82 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
   for (i = 0; i < MAX_NUM_ELEMENTS; i++)
   {
     int element = i;
+    struct ElementInfo *ei = &element_info[element];
 
     /* never initialize clipboard elements after the very first time */
     if (IS_CLIPBOARD_ELEMENT(element) && clipboard_elements_initialized)
       continue;
 
-    setElementChangePages(&element_info[element], 1);
-    setElementChangeInfoToDefaults(element_info[element].change);
+    setElementChangePages(ei, 1);
+    setElementChangeInfoToDefaults(ei->change);
 
     if (IS_CUSTOM_ELEMENT(element) ||
 	IS_GROUP_ELEMENT(element) ||
 	IS_INTERNAL_ELEMENT(element))
     {
       for (j = 0; j < MAX_ELEMENT_NAME_LEN + 1; j++)
-	element_info[element].description[j] = '\0';
+	ei->description[j] = '\0';
 
-      if (element_info[element].custom_description != NULL)
-	strncpy(element_info[element].description,
-		element_info[element].custom_description,MAX_ELEMENT_NAME_LEN);
+      if (ei->custom_description != NULL)
+	strncpy(ei->description, ei->custom_description,MAX_ELEMENT_NAME_LEN);
       else
-	strcpy(element_info[element].description,
-	       element_info[element].editor_description);
+	strcpy(ei->description, ei->editor_description);
 
-      element_info[element].use_gfx_element = FALSE;
-      element_info[element].gfx_element = EL_EMPTY_SPACE;
+      ei->use_gfx_element = FALSE;
+      ei->gfx_element = EL_EMPTY_SPACE;
 
-      element_info[element].modified_settings = FALSE;
+      ei->modified_settings = FALSE;
     }
 
     if (IS_CUSTOM_ELEMENT(element) ||
 	IS_INTERNAL_ELEMENT(element))
     {
-      element_info[element].access_direction = MV_ALL_DIRECTIONS;
+      ei->access_direction = MV_ALL_DIRECTIONS;
 
-      element_info[element].collect_score_initial = 10;	/* special default */
-      element_info[element].collect_count_initial = 1;	/* special default */
+      ei->collect_score_initial = 10;	/* special default */
+      ei->collect_count_initial = 1;	/* special default */
 
-      element_info[element].push_delay_fixed = -1;	/* initialize later */
-      element_info[element].push_delay_random = -1;	/* initialize later */
-      element_info[element].drop_delay_fixed = 0;
-      element_info[element].drop_delay_random = 0;
-      element_info[element].move_delay_fixed = 0;
-      element_info[element].move_delay_random = 0;
+      ei->ce_value_fixed_initial = 0;
+      ei->ce_value_random_initial = 0;
+      ei->use_last_ce_value = FALSE;
 
-      element_info[element].move_pattern = MV_ALL_DIRECTIONS;
-      element_info[element].move_direction_initial = MV_START_AUTOMATIC;
-      element_info[element].move_stepsize = TILEX / 8;
+      ei->push_delay_fixed = -1;	/* initialize later */
+      ei->push_delay_random = -1;	/* initialize later */
+      ei->drop_delay_fixed = 0;
+      ei->drop_delay_random = 0;
+      ei->move_delay_fixed = 0;
+      ei->move_delay_random = 0;
 
-      element_info[element].move_enter_element = EL_EMPTY_SPACE;
-      element_info[element].move_leave_element = EL_EMPTY_SPACE;
-      element_info[element].move_leave_type = LEAVE_TYPE_UNLIMITED;
+      ei->move_pattern = MV_ALL_DIRECTIONS;
+      ei->move_direction_initial = MV_START_AUTOMATIC;
+      ei->move_stepsize = TILEX / 8;
 
-      element_info[element].slippery_type = SLIPPERY_ANY_RANDOM;
+      ei->move_enter_element = EL_EMPTY_SPACE;
+      ei->move_leave_element = EL_EMPTY_SPACE;
+      ei->move_leave_type = LEAVE_TYPE_UNLIMITED;
 
-      element_info[element].explosion_type = EXPLODES_3X3;
-      element_info[element].explosion_delay = 16;
-      element_info[element].ignition_delay = 8;
+      ei->slippery_type = SLIPPERY_ANY_RANDOM;
+
+      ei->explosion_type = EXPLODES_3X3;
+      ei->explosion_delay = 16;
+      ei->ignition_delay = 8;
 
       for (x = 0; x < 3; x++)
 	for (y = 0; y < 3; y++)
-	  element_info[element].content.e[x][y] = EL_EMPTY_SPACE;
+	  ei->content.e[x][y] = EL_EMPTY_SPACE;
 
-      element_info[element].access_type = 0;
-      element_info[element].access_layer = 0;
-      element_info[element].access_protected = 0;
-      element_info[element].walk_to_action = 0;
-      element_info[element].smash_targets = 0;
-      element_info[element].deadliness = 0;
+      ei->access_type = 0;
+      ei->access_layer = 0;
+      ei->access_protected = 0;
+      ei->walk_to_action = 0;
+      ei->smash_targets = 0;
+      ei->deadliness = 0;
 
-      element_info[element].can_explode_by_fire = FALSE;
-      element_info[element].can_explode_smashed = FALSE;
-      element_info[element].can_explode_impact = FALSE;
+      ei->can_explode_by_fire = FALSE;
+      ei->can_explode_smashed = FALSE;
+      ei->can_explode_impact = FALSE;
 
-      element_info[element].current_change_page = 0;
+      ei->current_change_page = 0;
 
       /* start with no properties at all */
       for (j = 0; j < NUM_EP_BITFIELDS; j++)
@@ -535,18 +538,21 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
     if (IS_GROUP_ELEMENT(element) ||
 	IS_INTERNAL_ELEMENT(element))
     {
+      struct ElementGroupInfo *group;
+
       /* initialize memory for list of elements in group */
-      if (element_info[element].group == NULL)
-	element_info[element].group =
-	  checked_malloc(sizeof(struct ElementGroupInfo));
+      if (ei->group == NULL)
+	ei->group = checked_malloc(sizeof(struct ElementGroupInfo));
+
+      group = ei->group;
 
       for (j = 0; j < MAX_ELEMENTS_IN_GROUP; j++)
-	element_info[element].group->element[j] = EL_EMPTY_SPACE;
+	group->element[j] = EL_EMPTY_SPACE;
 
       /* default: only one element in group */
-      element_info[element].group->num_elements = 1;
+      group->num_elements = 1;
 
-      element_info[element].group->choice_mode = ANIM_RANDOM;
+      group->choice_mode = ANIM_RANDOM;
     }
   }
 
@@ -1231,6 +1237,7 @@ static int LoadLevel_CUS3(FILE *file, int chunk_size, struct LevelInfo *level)
   for (i = 0; i < num_changed_custom_elements; i++)
   {
     int element = getFile16BitBE(file);
+    struct ElementInfo *ei = &element_info[element];
     unsigned long event_bits;
 
     if (!IS_CUSTOM_ELEMENT(element))
@@ -1241,70 +1248,66 @@ static int LoadLevel_CUS3(FILE *file, int chunk_size, struct LevelInfo *level)
     }
 
     for (j = 0; j < MAX_ELEMENT_NAME_LEN; j++)
-      element_info[element].description[j] = getFile8Bit(file);
-    element_info[element].description[MAX_ELEMENT_NAME_LEN] = 0;
+      ei->description[j] = getFile8Bit(file);
+    ei->description[MAX_ELEMENT_NAME_LEN] = 0;
 
     Properties[element][EP_BITFIELD_BASE] = getFile32BitBE(file);
 
     /* some free bytes for future properties and padding */
     ReadUnusedBytesFromFile(file, 7);
 
-    element_info[element].use_gfx_element = getFile8Bit(file);
-    element_info[element].gfx_element =
-      getMappedElement(getFile16BitBE(file));
+    ei->use_gfx_element = getFile8Bit(file);
+    ei->gfx_element = getMappedElement(getFile16BitBE(file));
 
-    element_info[element].collect_score_initial = getFile8Bit(file);
-    element_info[element].collect_count_initial = getFile8Bit(file);
+    ei->collect_score_initial = getFile8Bit(file);
+    ei->collect_count_initial = getFile8Bit(file);
 
-    element_info[element].push_delay_fixed = getFile16BitBE(file);
-    element_info[element].push_delay_random = getFile16BitBE(file);
-    element_info[element].move_delay_fixed = getFile16BitBE(file);
-    element_info[element].move_delay_random = getFile16BitBE(file);
+    ei->push_delay_fixed = getFile16BitBE(file);
+    ei->push_delay_random = getFile16BitBE(file);
+    ei->move_delay_fixed = getFile16BitBE(file);
+    ei->move_delay_random = getFile16BitBE(file);
 
-    element_info[element].move_pattern = getFile16BitBE(file);
-    element_info[element].move_direction_initial = getFile8Bit(file);
-    element_info[element].move_stepsize = getFile8Bit(file);
+    ei->move_pattern = getFile16BitBE(file);
+    ei->move_direction_initial = getFile8Bit(file);
+    ei->move_stepsize = getFile8Bit(file);
 
     for (y = 0; y < 3; y++)
       for (x = 0; x < 3; x++)
-	element_info[element].content.e[x][y] =
-	  getMappedElement(getFile16BitBE(file));
+	ei->content.e[x][y] = getMappedElement(getFile16BitBE(file));
 
     event_bits = getFile32BitBE(file);
     for (j = 0; j < NUM_CHANGE_EVENTS; j++)
       if (event_bits & (1 << j))
-	element_info[element].change->has_event[j] = TRUE;
+	ei->change->has_event[j] = TRUE;
 
-    element_info[element].change->target_element =
-      getMappedElement(getFile16BitBE(file));
+    ei->change->target_element = getMappedElement(getFile16BitBE(file));
 
-    element_info[element].change->delay_fixed = getFile16BitBE(file);
-    element_info[element].change->delay_random = getFile16BitBE(file);
-    element_info[element].change->delay_frames = getFile16BitBE(file);
+    ei->change->delay_fixed = getFile16BitBE(file);
+    ei->change->delay_random = getFile16BitBE(file);
+    ei->change->delay_frames = getFile16BitBE(file);
 
-    element_info[element].change->trigger_element =
-      getMappedElement(getFile16BitBE(file));
+    ei->change->trigger_element = getMappedElement(getFile16BitBE(file));
 
-    element_info[element].change->explode = getFile8Bit(file);
-    element_info[element].change->use_target_content = getFile8Bit(file);
-    element_info[element].change->only_if_complete = getFile8Bit(file);
-    element_info[element].change->use_random_replace = getFile8Bit(file);
+    ei->change->explode = getFile8Bit(file);
+    ei->change->use_target_content = getFile8Bit(file);
+    ei->change->only_if_complete = getFile8Bit(file);
+    ei->change->use_random_replace = getFile8Bit(file);
 
-    element_info[element].change->random_percentage = getFile8Bit(file);
-    element_info[element].change->replace_when = getFile8Bit(file);
+    ei->change->random_percentage = getFile8Bit(file);
+    ei->change->replace_when = getFile8Bit(file);
 
     for (y = 0; y < 3; y++)
       for (x = 0; x < 3; x++)
-	element_info[element].change->target_content.e[x][y] =
+	ei->change->target_content.e[x][y] =
 	  getMappedElement(getFile16BitBE(file));
 
-    element_info[element].slippery_type = getFile8Bit(file);
+    ei->slippery_type = getFile8Bit(file);
 
     /* some free bytes for future properties and padding */
     ReadUnusedBytesFromFile(file, LEVEL_CPART_CUS3_UNUSED);
 
     /* mark that this custom element has been modified */
-    element_info[element].modified_settings = TRUE;
+    ei->modified_settings = TRUE;
   }
 
   return chunk_size;
@@ -1316,6 +1319,8 @@ static int LoadLevel_CUS4(FILE *file, int chunk_size, struct LevelInfo *level)
   int chunk_size_expected;
   int element;
   int i, j, x, y;
+
+  /* ---------- custom element base property values (96 bytes) ------------- */
 
   element = getFile16BitBE(file);
 
@@ -1338,17 +1343,16 @@ static int LoadLevel_CUS4(FILE *file, int chunk_size, struct LevelInfo *level)
 
   ei->num_change_pages = getFile8Bit(file);
 
-  /* some free bytes for future base property values and padding */
-  ReadUnusedBytesFromFile(file, 5);
-
   chunk_size_expected = LEVEL_CHUNK_CUS4_SIZE(ei->num_change_pages);
   if (chunk_size_expected != chunk_size)
   {
-    ReadUnusedBytesFromFile(file, chunk_size - 48);
+    ReadUnusedBytesFromFile(file, chunk_size - 43);
     return chunk_size_expected;
   }
 
-  /* read custom property values */
+  ei->ce_value_fixed_initial = getFile16BitBE(file);
+  ei->ce_value_random_initial = getFile16BitBE(file);
+  ei->use_last_ce_value = getFile8Bit(file);
 
   ei->use_gfx_element = getFile8Bit(file);
   ei->gfx_element = getMappedElement(getFile16BitBE(file));
@@ -1390,7 +1394,7 @@ static int LoadLevel_CUS4(FILE *file, int chunk_size, struct LevelInfo *level)
   /* some free bytes for future custom property values and padding */
   ReadUnusedBytesFromFile(file, 1);
 
-  /* read change property values */
+  /* ---------- change page property values (48 bytes) --------------------- */
 
   setElementChangePages(ei, ei->num_change_pages);
 
@@ -2876,7 +2880,7 @@ static void LoadLevel_InitElements(struct LevelInfo *level, char *filename)
       int element = EL_CUSTOM_START + i;
 
       /* order of checking and copying events to be mapped is important */
-      for (j = CE_BY_OTHER_ACTION; j >= CE_COUNT_AT_ZERO; j--)
+      for (j = CE_BY_OTHER_ACTION; j >= CE_VALUE_GETS_ZERO; j--)
       {
 	if (HAS_CHANGE_EVENT(element, j - 2))
 	{
@@ -3290,63 +3294,64 @@ static void SaveLevel_CUS3(FILE *file, struct LevelInfo *level,
   for (i = 0; i < NUM_CUSTOM_ELEMENTS; i++)
   {
     int element = EL_CUSTOM_START + i;
+    struct ElementInfo *ei = &element_info[element];
 
-    if (element_info[element].modified_settings)
+    if (ei->modified_settings)
     {
       if (check < num_changed_custom_elements)
       {
 	putFile16BitBE(file, element);
 
 	for (j = 0; j < MAX_ELEMENT_NAME_LEN; j++)
-	  putFile8Bit(file, element_info[element].description[j]);
+	  putFile8Bit(file, ei->description[j]);
 
 	putFile32BitBE(file, Properties[element][EP_BITFIELD_BASE]);
 
 	/* some free bytes for future properties and padding */
 	WriteUnusedBytesToFile(file, 7);
 
-	putFile8Bit(file, element_info[element].use_gfx_element);
-	putFile16BitBE(file, element_info[element].gfx_element);
+	putFile8Bit(file, ei->use_gfx_element);
+	putFile16BitBE(file, ei->gfx_element);
 
-	putFile8Bit(file, element_info[element].collect_score_initial);
-	putFile8Bit(file, element_info[element].collect_count_initial);
+	putFile8Bit(file, ei->collect_score_initial);
+	putFile8Bit(file, ei->collect_count_initial);
 
-	putFile16BitBE(file, element_info[element].push_delay_fixed);
-	putFile16BitBE(file, element_info[element].push_delay_random);
-	putFile16BitBE(file, element_info[element].move_delay_fixed);
-	putFile16BitBE(file, element_info[element].move_delay_random);
+	putFile16BitBE(file, ei->push_delay_fixed);
+	putFile16BitBE(file, ei->push_delay_random);
+	putFile16BitBE(file, ei->move_delay_fixed);
+	putFile16BitBE(file, ei->move_delay_random);
 
-	putFile16BitBE(file, element_info[element].move_pattern);
-	putFile8Bit(file, element_info[element].move_direction_initial);
-	putFile8Bit(file, element_info[element].move_stepsize);
-
-	for (y = 0; y < 3; y++)
-	  for (x = 0; x < 3; x++)
-	    putFile16BitBE(file, element_info[element].content.e[x][y]);
-
-	putFile32BitBE(file, element_info[element].change->events);
-
-	putFile16BitBE(file, element_info[element].change->target_element);
-
-	putFile16BitBE(file, element_info[element].change->delay_fixed);
-	putFile16BitBE(file, element_info[element].change->delay_random);
-	putFile16BitBE(file, element_info[element].change->delay_frames);
-
-	putFile16BitBE(file, element_info[element].change->trigger_element);
-
-	putFile8Bit(file, element_info[element].change->explode);
-	putFile8Bit(file, element_info[element].change->use_target_content);
-	putFile8Bit(file, element_info[element].change->only_if_complete);
-	putFile8Bit(file, element_info[element].change->use_random_replace);
-
-	putFile8Bit(file, element_info[element].change->random_percentage);
-	putFile8Bit(file, element_info[element].change->replace_when);
+	putFile16BitBE(file, ei->move_pattern);
+	putFile8Bit(file, ei->move_direction_initial);
+	putFile8Bit(file, ei->move_stepsize);
 
 	for (y = 0; y < 3; y++)
 	  for (x = 0; x < 3; x++)
-	    putFile16BitBE(file,element_info[element].change->content.e[x][y]);
+	    putFile16BitBE(file, ei->content.e[x][y]);
 
-	putFile8Bit(file, element_info[element].slippery_type);
+	putFile32BitBE(file, ei->change->events);
+
+	putFile16BitBE(file, ei->change->target_element);
+
+	putFile16BitBE(file, ei->change->delay_fixed);
+	putFile16BitBE(file, ei->change->delay_random);
+	putFile16BitBE(file, ei->change->delay_frames);
+
+	putFile16BitBE(file, ei->change->trigger_element);
+
+	putFile8Bit(file, ei->change->explode);
+	putFile8Bit(file, ei->change->use_target_content);
+	putFile8Bit(file, ei->change->only_if_complete);
+	putFile8Bit(file, ei->change->use_random_replace);
+
+	putFile8Bit(file, ei->change->random_percentage);
+	putFile8Bit(file, ei->change->replace_when);
+
+	for (y = 0; y < 3; y++)
+	  for (x = 0; x < 3; x++)
+	    putFile16BitBE(file, ei->change->content.e[x][y]);
+
+	putFile8Bit(file, ei->slippery_type);
 
 	/* some free bytes for future properties and padding */
 	WriteUnusedBytesToFile(file, LEVEL_CPART_CUS3_UNUSED);
@@ -3366,6 +3371,8 @@ static void SaveLevel_CUS4(FILE *file, struct LevelInfo *level, int element)
   struct ElementInfo *ei = &element_info[element];
   int i, j, x, y;
 
+  /* ---------- custom element base property values (96 bytes) ------------- */
+
   putFile16BitBE(file, element);
 
   for (i = 0; i < MAX_ELEMENT_NAME_LEN; i++)
@@ -3376,10 +3383,9 @@ static void SaveLevel_CUS4(FILE *file, struct LevelInfo *level, int element)
 
   putFile8Bit(file, ei->num_change_pages);
 
-  /* some free bytes for future base property values and padding */
-  WriteUnusedBytesToFile(file, 5);
-
-  /* write custom property values */
+  putFile16BitBE(file, ei->ce_value_fixed_initial);
+  putFile16BitBE(file, ei->ce_value_random_initial);
+  putFile8Bit(file, ei->use_last_ce_value);
 
   putFile8Bit(file, ei->use_gfx_element);
   putFile16BitBE(file, ei->gfx_element);
@@ -3421,7 +3427,7 @@ static void SaveLevel_CUS4(FILE *file, struct LevelInfo *level, int element)
   /* some free bytes for future custom property values and padding */
   WriteUnusedBytesToFile(file, 1);
 
-  /* write change property values */
+  /* ---------- change page property values (48 bytes) --------------------- */
 
   for (i = 0; i < ei->num_change_pages; i++)
   {

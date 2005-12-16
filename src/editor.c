@@ -375,45 +375,51 @@
 #define GADGET_ID_CUSTOM_GEMCOUNT_DOWN	(GADGET_ID_COUNTER_FIRST + 45)
 #define GADGET_ID_CUSTOM_GEMCOUNT_TEXT	(GADGET_ID_COUNTER_FIRST + 46)
 #define GADGET_ID_CUSTOM_GEMCOUNT_UP	(GADGET_ID_COUNTER_FIRST + 47)
-#define GADGET_ID_PUSH_DELAY_FIX_DOWN	(GADGET_ID_COUNTER_FIRST + 48)
-#define GADGET_ID_PUSH_DELAY_FIX_TEXT	(GADGET_ID_COUNTER_FIRST + 49)
-#define GADGET_ID_PUSH_DELAY_FIX_UP	(GADGET_ID_COUNTER_FIRST + 50)
-#define GADGET_ID_PUSH_DELAY_RND_DOWN	(GADGET_ID_COUNTER_FIRST + 51)
-#define GADGET_ID_PUSH_DELAY_RND_TEXT	(GADGET_ID_COUNTER_FIRST + 52)
-#define GADGET_ID_PUSH_DELAY_RND_UP	(GADGET_ID_COUNTER_FIRST + 53)
-#define GADGET_ID_DROP_DELAY_FIX_DOWN	(GADGET_ID_COUNTER_FIRST + 54)
-#define GADGET_ID_DROP_DELAY_FIX_TEXT	(GADGET_ID_COUNTER_FIRST + 55)
-#define GADGET_ID_DROP_DELAY_FIX_UP	(GADGET_ID_COUNTER_FIRST + 56)
-#define GADGET_ID_DROP_DELAY_RND_DOWN	(GADGET_ID_COUNTER_FIRST + 57)
-#define GADGET_ID_DROP_DELAY_RND_TEXT	(GADGET_ID_COUNTER_FIRST + 58)
-#define GADGET_ID_DROP_DELAY_RND_UP	(GADGET_ID_COUNTER_FIRST + 59)
-#define GADGET_ID_MOVE_DELAY_FIX_DOWN	(GADGET_ID_COUNTER_FIRST + 60)
-#define GADGET_ID_MOVE_DELAY_FIX_TEXT	(GADGET_ID_COUNTER_FIRST + 61)
-#define GADGET_ID_MOVE_DELAY_FIX_UP	(GADGET_ID_COUNTER_FIRST + 62)
-#define GADGET_ID_MOVE_DELAY_RND_DOWN	(GADGET_ID_COUNTER_FIRST + 63)
-#define GADGET_ID_MOVE_DELAY_RND_TEXT	(GADGET_ID_COUNTER_FIRST + 64)
-#define GADGET_ID_MOVE_DELAY_RND_UP	(GADGET_ID_COUNTER_FIRST + 65)
-#define GADGET_ID_EXPLOSION_DELAY_DOWN	(GADGET_ID_COUNTER_FIRST + 66)
-#define GADGET_ID_EXPLOSION_DELAY_TEXT	(GADGET_ID_COUNTER_FIRST + 67)
-#define GADGET_ID_EXPLOSION_DELAY_UP	(GADGET_ID_COUNTER_FIRST + 68)
-#define GADGET_ID_IGNITION_DELAY_DOWN	(GADGET_ID_COUNTER_FIRST + 69)
-#define GADGET_ID_IGNITION_DELAY_TEXT	(GADGET_ID_COUNTER_FIRST + 70)
-#define GADGET_ID_IGNITION_DELAY_UP	(GADGET_ID_COUNTER_FIRST + 71)
-#define GADGET_ID_CHANGE_DELAY_FIX_DOWN	(GADGET_ID_COUNTER_FIRST + 72)
-#define GADGET_ID_CHANGE_DELAY_FIX_TEXT	(GADGET_ID_COUNTER_FIRST + 73)
-#define GADGET_ID_CHANGE_DELAY_FIX_UP	(GADGET_ID_COUNTER_FIRST + 74)
-#define GADGET_ID_CHANGE_DELAY_RND_DOWN	(GADGET_ID_COUNTER_FIRST + 75)
-#define GADGET_ID_CHANGE_DELAY_RND_TEXT	(GADGET_ID_COUNTER_FIRST + 76)
-#define GADGET_ID_CHANGE_DELAY_RND_UP	(GADGET_ID_COUNTER_FIRST + 77)
-#define GADGET_ID_CHANGE_CONT_RND_DOWN	(GADGET_ID_COUNTER_FIRST + 78)
-#define GADGET_ID_CHANGE_CONT_RND_TEXT	(GADGET_ID_COUNTER_FIRST + 79)
-#define GADGET_ID_CHANGE_CONT_RND_UP	(GADGET_ID_COUNTER_FIRST + 80)
-#define GADGET_ID_GROUP_CONTENT_DOWN	(GADGET_ID_COUNTER_FIRST + 81)
-#define GADGET_ID_GROUP_CONTENT_TEXT	(GADGET_ID_COUNTER_FIRST + 82)
-#define GADGET_ID_GROUP_CONTENT_UP	(GADGET_ID_COUNTER_FIRST + 83)
+#define GADGET_ID_CUSTOM_VALUE_FIX_DOWN	(GADGET_ID_COUNTER_FIRST + 48)
+#define GADGET_ID_CUSTOM_VALUE_FIX_TEXT	(GADGET_ID_COUNTER_FIRST + 49)
+#define GADGET_ID_CUSTOM_VALUE_FIX_UP	(GADGET_ID_COUNTER_FIRST + 50)
+#define GADGET_ID_CUSTOM_VALUE_RND_DOWN	(GADGET_ID_COUNTER_FIRST + 51)
+#define GADGET_ID_CUSTOM_VALUE_RND_TEXT	(GADGET_ID_COUNTER_FIRST + 52)
+#define GADGET_ID_CUSTOM_VALUE_RND_UP	(GADGET_ID_COUNTER_FIRST + 53)
+#define GADGET_ID_PUSH_DELAY_FIX_DOWN	(GADGET_ID_COUNTER_FIRST + 54)
+#define GADGET_ID_PUSH_DELAY_FIX_TEXT	(GADGET_ID_COUNTER_FIRST + 55)
+#define GADGET_ID_PUSH_DELAY_FIX_UP	(GADGET_ID_COUNTER_FIRST + 56)
+#define GADGET_ID_PUSH_DELAY_RND_DOWN	(GADGET_ID_COUNTER_FIRST + 57)
+#define GADGET_ID_PUSH_DELAY_RND_TEXT	(GADGET_ID_COUNTER_FIRST + 58)
+#define GADGET_ID_PUSH_DELAY_RND_UP	(GADGET_ID_COUNTER_FIRST + 59)
+#define GADGET_ID_DROP_DELAY_FIX_DOWN	(GADGET_ID_COUNTER_FIRST + 60)
+#define GADGET_ID_DROP_DELAY_FIX_TEXT	(GADGET_ID_COUNTER_FIRST + 61)
+#define GADGET_ID_DROP_DELAY_FIX_UP	(GADGET_ID_COUNTER_FIRST + 62)
+#define GADGET_ID_DROP_DELAY_RND_DOWN	(GADGET_ID_COUNTER_FIRST + 63)
+#define GADGET_ID_DROP_DELAY_RND_TEXT	(GADGET_ID_COUNTER_FIRST + 64)
+#define GADGET_ID_DROP_DELAY_RND_UP	(GADGET_ID_COUNTER_FIRST + 65)
+#define GADGET_ID_MOVE_DELAY_FIX_DOWN	(GADGET_ID_COUNTER_FIRST + 66)
+#define GADGET_ID_MOVE_DELAY_FIX_TEXT	(GADGET_ID_COUNTER_FIRST + 67)
+#define GADGET_ID_MOVE_DELAY_FIX_UP	(GADGET_ID_COUNTER_FIRST + 68)
+#define GADGET_ID_MOVE_DELAY_RND_DOWN	(GADGET_ID_COUNTER_FIRST + 69)
+#define GADGET_ID_MOVE_DELAY_RND_TEXT	(GADGET_ID_COUNTER_FIRST + 70)
+#define GADGET_ID_MOVE_DELAY_RND_UP	(GADGET_ID_COUNTER_FIRST + 71)
+#define GADGET_ID_EXPLOSION_DELAY_DOWN	(GADGET_ID_COUNTER_FIRST + 72)
+#define GADGET_ID_EXPLOSION_DELAY_TEXT	(GADGET_ID_COUNTER_FIRST + 73)
+#define GADGET_ID_EXPLOSION_DELAY_UP	(GADGET_ID_COUNTER_FIRST + 74)
+#define GADGET_ID_IGNITION_DELAY_DOWN	(GADGET_ID_COUNTER_FIRST + 75)
+#define GADGET_ID_IGNITION_DELAY_TEXT	(GADGET_ID_COUNTER_FIRST + 76)
+#define GADGET_ID_IGNITION_DELAY_UP	(GADGET_ID_COUNTER_FIRST + 77)
+#define GADGET_ID_CHANGE_DELAY_FIX_DOWN	(GADGET_ID_COUNTER_FIRST + 78)
+#define GADGET_ID_CHANGE_DELAY_FIX_TEXT	(GADGET_ID_COUNTER_FIRST + 79)
+#define GADGET_ID_CHANGE_DELAY_FIX_UP	(GADGET_ID_COUNTER_FIRST + 80)
+#define GADGET_ID_CHANGE_DELAY_RND_DOWN	(GADGET_ID_COUNTER_FIRST + 81)
+#define GADGET_ID_CHANGE_DELAY_RND_TEXT	(GADGET_ID_COUNTER_FIRST + 82)
+#define GADGET_ID_CHANGE_DELAY_RND_UP	(GADGET_ID_COUNTER_FIRST + 83)
+#define GADGET_ID_CHANGE_CONT_RND_DOWN	(GADGET_ID_COUNTER_FIRST + 84)
+#define GADGET_ID_CHANGE_CONT_RND_TEXT	(GADGET_ID_COUNTER_FIRST + 85)
+#define GADGET_ID_CHANGE_CONT_RND_UP	(GADGET_ID_COUNTER_FIRST + 86)
+#define GADGET_ID_GROUP_CONTENT_DOWN	(GADGET_ID_COUNTER_FIRST + 87)
+#define GADGET_ID_GROUP_CONTENT_TEXT	(GADGET_ID_COUNTER_FIRST + 88)
+#define GADGET_ID_GROUP_CONTENT_UP	(GADGET_ID_COUNTER_FIRST + 89)
 
 /* drawing area identifiers */
-#define GADGET_ID_DRAWING_AREA_FIRST	(GADGET_ID_COUNTER_FIRST + 84)
+#define GADGET_ID_DRAWING_AREA_FIRST	(GADGET_ID_COUNTER_FIRST + 90)
 
 #define GADGET_ID_DRAWING_LEVEL		(GADGET_ID_DRAWING_AREA_FIRST + 0)
 #define GADGET_ID_YAMYAM_CONTENT_0	(GADGET_ID_DRAWING_AREA_FIRST + 1)
@@ -556,20 +562,21 @@
 #define GADGET_ID_CUSTOM_SLIPPERY	(GADGET_ID_CHECKBUTTON_FIRST + 26)
 #define GADGET_ID_CUSTOM_ACCESSIBLE	(GADGET_ID_CHECKBUTTON_FIRST + 27)
 #define GADGET_ID_CUSTOM_GRAV_REACHABLE	(GADGET_ID_CHECKBUTTON_FIRST + 28)
-#define GADGET_ID_CUSTOM_USE_GRAPHIC	(GADGET_ID_CHECKBUTTON_FIRST + 29)
-#define GADGET_ID_CUSTOM_USE_TEMPLATE	(GADGET_ID_CHECKBUTTON_FIRST + 30)
-#define GADGET_ID_CUSTOM_CAN_CHANGE	(GADGET_ID_CHECKBUTTON_FIRST + 31)
-#define GADGET_ID_CHANGE_USE_CONTENT	(GADGET_ID_CHECKBUTTON_FIRST + 32)
-#define GADGET_ID_CHANGE_USE_EXPLOSION	(GADGET_ID_CHECKBUTTON_FIRST + 33)
-#define GADGET_ID_CHANGE_ONLY_COMPLETE	(GADGET_ID_CHECKBUTTON_FIRST + 34)
-#define GADGET_ID_CHANGE_USE_RANDOM	(GADGET_ID_CHECKBUTTON_FIRST + 35)
-#define GADGET_ID_CHANGE_HAS_ACTION	(GADGET_ID_CHECKBUTTON_FIRST + 36)
-#define GADGET_ID_CHANGE_DELAY		(GADGET_ID_CHECKBUTTON_FIRST + 37)
-#define GADGET_ID_CHANGE_BY_DIRECT_ACT	(GADGET_ID_CHECKBUTTON_FIRST + 38)
-#define GADGET_ID_CHANGE_BY_OTHER_ACT	(GADGET_ID_CHECKBUTTON_FIRST + 39)
+#define GADGET_ID_CUSTOM_USE_LAST_VALUE	(GADGET_ID_CHECKBUTTON_FIRST + 29)
+#define GADGET_ID_CUSTOM_USE_GRAPHIC	(GADGET_ID_CHECKBUTTON_FIRST + 30)
+#define GADGET_ID_CUSTOM_USE_TEMPLATE	(GADGET_ID_CHECKBUTTON_FIRST + 31)
+#define GADGET_ID_CUSTOM_CAN_CHANGE	(GADGET_ID_CHECKBUTTON_FIRST + 32)
+#define GADGET_ID_CHANGE_USE_CONTENT	(GADGET_ID_CHECKBUTTON_FIRST + 33)
+#define GADGET_ID_CHANGE_USE_EXPLOSION	(GADGET_ID_CHECKBUTTON_FIRST + 34)
+#define GADGET_ID_CHANGE_ONLY_COMPLETE	(GADGET_ID_CHECKBUTTON_FIRST + 35)
+#define GADGET_ID_CHANGE_USE_RANDOM	(GADGET_ID_CHECKBUTTON_FIRST + 36)
+#define GADGET_ID_CHANGE_HAS_ACTION	(GADGET_ID_CHECKBUTTON_FIRST + 37)
+#define GADGET_ID_CHANGE_DELAY		(GADGET_ID_CHECKBUTTON_FIRST + 38)
+#define GADGET_ID_CHANGE_BY_DIRECT_ACT	(GADGET_ID_CHECKBUTTON_FIRST + 39)
+#define GADGET_ID_CHANGE_BY_OTHER_ACT	(GADGET_ID_CHECKBUTTON_FIRST + 40)
 
 /* gadgets for buttons in element list */
-#define GADGET_ID_ELEMENTLIST_FIRST	(GADGET_ID_CHECKBUTTON_FIRST + 40)
+#define GADGET_ID_ELEMENTLIST_FIRST	(GADGET_ID_CHECKBUTTON_FIRST + 41)
 #define GADGET_ID_ELEMENTLIST_LAST	(GADGET_ID_ELEMENTLIST_FIRST +	\
 	 				ED_NUM_ELEMENTLIST_BUTTONS - 1)
 
@@ -597,20 +604,22 @@
 #define ED_COUNTER_ID_ENVELOPE_YSIZE	13
 #define ED_COUNTER_ID_CUSTOM_SCORE	14
 #define ED_COUNTER_ID_CUSTOM_GEMCOUNT	15
-#define ED_COUNTER_ID_PUSH_DELAY_FIX	16
-#define ED_COUNTER_ID_PUSH_DELAY_RND	17
-#define ED_COUNTER_ID_DROP_DELAY_FIX	18
-#define ED_COUNTER_ID_DROP_DELAY_RND	19
-#define ED_COUNTER_ID_MOVE_DELAY_FIX	20
-#define ED_COUNTER_ID_MOVE_DELAY_RND	21
-#define ED_COUNTER_ID_EXPLOSION_DELAY	22
-#define ED_COUNTER_ID_IGNITION_DELAY	23
-#define ED_COUNTER_ID_GROUP_CONTENT	24
-#define ED_COUNTER_ID_CHANGE_DELAY_FIX	25
-#define ED_COUNTER_ID_CHANGE_DELAY_RND	26
-#define ED_COUNTER_ID_CHANGE_CONT_RND	27
+#define ED_COUNTER_ID_CUSTOM_VALUE_FIX	16
+#define ED_COUNTER_ID_CUSTOM_VALUE_RND	17
+#define ED_COUNTER_ID_PUSH_DELAY_FIX	18
+#define ED_COUNTER_ID_PUSH_DELAY_RND	19
+#define ED_COUNTER_ID_DROP_DELAY_FIX	20
+#define ED_COUNTER_ID_DROP_DELAY_RND	21
+#define ED_COUNTER_ID_MOVE_DELAY_FIX	22
+#define ED_COUNTER_ID_MOVE_DELAY_RND	23
+#define ED_COUNTER_ID_EXPLOSION_DELAY	24
+#define ED_COUNTER_ID_IGNITION_DELAY	25
+#define ED_COUNTER_ID_GROUP_CONTENT	26
+#define ED_COUNTER_ID_CHANGE_DELAY_FIX	27
+#define ED_COUNTER_ID_CHANGE_DELAY_RND	28
+#define ED_COUNTER_ID_CHANGE_CONT_RND	29
 
-#define ED_NUM_COUNTERBUTTONS		28
+#define ED_NUM_COUNTERBUTTONS		30
 
 #define ED_COUNTER_ID_LEVEL_FIRST	ED_COUNTER_ID_LEVEL_XSIZE
 #define ED_COUNTER_ID_LEVEL_LAST	ED_COUNTER_ID_LEVEL_RANDOM
@@ -759,28 +768,29 @@
 #define ED_CHECKBUTTON_ID_CUSTOM_USE_TEMPLATE	15
 #define ED_CHECKBUTTON_ID_CUSTOM_ACCESSIBLE	16
 #define ED_CHECKBUTTON_ID_CUSTOM_GRAV_REACHABLE	17
-#define ED_CHECKBUTTON_ID_CUSTOM_WALK_TO_OBJECT	18
-#define ED_CHECKBUTTON_ID_CUSTOM_INDESTRUCTIBLE	19
-#define ED_CHECKBUTTON_ID_CUSTOM_CAN_MOVE	20
-#define ED_CHECKBUTTON_ID_CUSTOM_CAN_FALL	21
-#define ED_CHECKBUTTON_ID_CUSTOM_CAN_SMASH	22
-#define ED_CHECKBUTTON_ID_CUSTOM_SLIPPERY	23
-#define ED_CHECKBUTTON_ID_CUSTOM_DEADLY		24
-#define ED_CHECKBUTTON_ID_CUSTOM_CAN_EXPLODE	25
-#define ED_CHECKBUTTON_ID_CUSTOM_EXPLODE_FIRE	26
-#define ED_CHECKBUTTON_ID_CUSTOM_EXPLODE_SMASH	27
-#define ED_CHECKBUTTON_ID_CUSTOM_EXPLODE_IMPACT	28
-#define ED_CHECKBUTTON_ID_CUSTOM_CAN_CHANGE	29
-#define ED_CHECKBUTTON_ID_CHANGE_DELAY		30
-#define ED_CHECKBUTTON_ID_CHANGE_BY_DIRECT_ACT	31
-#define ED_CHECKBUTTON_ID_CHANGE_BY_OTHER_ACT	32
-#define ED_CHECKBUTTON_ID_CHANGE_USE_EXPLOSION	33
-#define ED_CHECKBUTTON_ID_CHANGE_USE_CONTENT	34
-#define ED_CHECKBUTTON_ID_CHANGE_ONLY_COMPLETE	35
-#define ED_CHECKBUTTON_ID_CHANGE_USE_RANDOM	36
-#define ED_CHECKBUTTON_ID_CHANGE_HAS_ACTION	37
+#define ED_CHECKBUTTON_ID_CUSTOM_USE_LAST_VALUE	18
+#define ED_CHECKBUTTON_ID_CUSTOM_WALK_TO_OBJECT	19
+#define ED_CHECKBUTTON_ID_CUSTOM_INDESTRUCTIBLE	20
+#define ED_CHECKBUTTON_ID_CUSTOM_CAN_MOVE	21
+#define ED_CHECKBUTTON_ID_CUSTOM_CAN_FALL	22
+#define ED_CHECKBUTTON_ID_CUSTOM_CAN_SMASH	23
+#define ED_CHECKBUTTON_ID_CUSTOM_SLIPPERY	24
+#define ED_CHECKBUTTON_ID_CUSTOM_DEADLY		25
+#define ED_CHECKBUTTON_ID_CUSTOM_CAN_EXPLODE	26
+#define ED_CHECKBUTTON_ID_CUSTOM_EXPLODE_FIRE	27
+#define ED_CHECKBUTTON_ID_CUSTOM_EXPLODE_SMASH	28
+#define ED_CHECKBUTTON_ID_CUSTOM_EXPLODE_IMPACT	29
+#define ED_CHECKBUTTON_ID_CUSTOM_CAN_CHANGE	30
+#define ED_CHECKBUTTON_ID_CHANGE_DELAY		31
+#define ED_CHECKBUTTON_ID_CHANGE_BY_DIRECT_ACT	32
+#define ED_CHECKBUTTON_ID_CHANGE_BY_OTHER_ACT	33
+#define ED_CHECKBUTTON_ID_CHANGE_USE_EXPLOSION	34
+#define ED_CHECKBUTTON_ID_CHANGE_USE_CONTENT	35
+#define ED_CHECKBUTTON_ID_CHANGE_ONLY_COMPLETE	36
+#define ED_CHECKBUTTON_ID_CHANGE_USE_RANDOM	37
+#define ED_CHECKBUTTON_ID_CHANGE_HAS_ACTION	38
 
-#define ED_NUM_CHECKBUTTONS			38
+#define ED_NUM_CHECKBUTTONS			39
 
 #define ED_CHECKBUTTON_ID_LEVEL_FIRST	ED_CHECKBUTTON_ID_INITIAL_GRAVITY
 #define ED_CHECKBUTTON_ID_LEVEL_LAST	ED_CHECKBUTTON_ID_RANDOM_RESTRICTED
@@ -1083,7 +1093,7 @@ static struct
     GADGET_ID_CUSTOM_SCORE_DOWN,	GADGET_ID_CUSTOM_SCORE_UP,
     GADGET_ID_CUSTOM_SCORE_TEXT,	GADGET_ID_NONE,
     &custom_element.collect_score_initial,
-    NULL,				"score", " "
+    NULL,				"CE score", " "
   },
   {
     -1,					ED_ELEMENT_SETTINGS_YPOS(6),
@@ -1091,7 +1101,23 @@ static struct
     GADGET_ID_CUSTOM_GEMCOUNT_DOWN,	GADGET_ID_CUSTOM_GEMCOUNT_UP,
     GADGET_ID_CUSTOM_GEMCOUNT_TEXT,	GADGET_ID_CUSTOM_SCORE_UP,
     &custom_element.collect_count_initial,
-    NULL,				"count", NULL
+    NULL,				"CE count", NULL
+  },
+  {
+    ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(12),
+    0,					9999,
+    GADGET_ID_CUSTOM_VALUE_FIX_DOWN,	GADGET_ID_CUSTOM_VALUE_FIX_UP,
+    GADGET_ID_CUSTOM_VALUE_FIX_TEXT,	GADGET_ID_NONE,
+    &custom_element.ce_value_fixed_initial,
+    NULL,				"CE value", NULL
+  },
+  {
+    ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(12),
+    0,					9999,
+    GADGET_ID_CUSTOM_VALUE_RND_DOWN,	GADGET_ID_CUSTOM_VALUE_RND_UP,
+    GADGET_ID_CUSTOM_VALUE_RND_TEXT,	GADGET_ID_CUSTOM_VALUE_FIX_UP,
+    &custom_element.ce_value_random_initial,
+    NULL,				"+random", NULL
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(1),	ED_ELEMENT_SETTINGS_YPOS(7),
@@ -1180,7 +1206,7 @@ static struct
     GADGET_ID_CHANGE_DELAY_FIX_DOWN,	GADGET_ID_CHANGE_DELAY_FIX_UP,
     GADGET_ID_CHANGE_DELAY_FIX_TEXT,	GADGET_ID_NONE,
     &custom_element_change.delay_fixed,
-    NULL,				"delay", NULL,
+    NULL,				"CE delay", NULL,
   },
   {
     -1,					ED_ELEMENT_SETTINGS_YPOS(2),
@@ -1460,7 +1486,7 @@ static struct ValueTextInfo options_change_direct_action[] =
 #endif
   { CE_IMPACT,			"impact (on something)"		},
   { CE_SMASHED,			"smashed (from above)"		},
-  { CE_COUNT_AT_ZERO,		"CE count at zero"		},
+  { CE_VALUE_GETS_ZERO,		"CE value gets 0"		},
 
   { -1,				NULL				}
 };
@@ -1481,7 +1507,7 @@ static struct ValueTextInfo options_change_other_action[] =
   { CE_SWITCH_OF_X,		"switch of"			},
   { CE_CHANGE_OF_X,		"change by page of"		},
   { CE_EXPLOSION_OF_X,		"explosion of"			},
-  { CE_COUNT_AT_ZERO_OF_X,	"CE count at zero of"		},
+  { CE_VALUE_GETS_ZERO_OF_X,	"CE value gets 0 of"		},
 
   { -1,				NULL				}
 };
@@ -1569,15 +1595,15 @@ static struct ValueTextInfo options_action_type[] =
   { CA_RESTART_LEVEL,		"restart level"			},
   { CA_SHOW_ENVELOPE,		"show envelope"			},
   { CA_ADD_KEY,			"add key"			},
-  { CA_DEL_KEY,			"remove key"			},
-  { CA_SET_GEMS,		"set gems"			},
-  { CA_SET_TIME,		"set time"			},
-  { CA_SET_SCORE,		"set score"			},
-  { CA_SET_CE_SCORE,		"set CE score"			},
-  { CA_SET_CE_COUNT,		"set CE count"			},
+  { CA_REMOVE_KEY,		"remove key"			},
   { CA_SET_PLAYER_SPEED,	"set player speed"		},
   { CA_SET_PLAYER_GRAVITY,	"set gravity"			},
   { CA_SET_WIND_DIRECTION,	"set wind dir."			},
+  { CA_SET_LEVEL_GEMS,		"set needed gems"		},
+  { CA_SET_LEVEL_TIME,		"set level time"		},
+  { CA_SET_LEVEL_SCORE,		"set level score"		},
+  { CA_SET_CE_SCORE,		"set CE score"			},
+  { CA_SET_CE_VALUE,		"set CE value"			},
 #if 0
   { CA_SET_DYNABOMB_NUMBER,	"set bomb number"		},
   { CA_SET_DYNABOMB_SIZE,	"set bomb size"			},
@@ -1651,19 +1677,21 @@ static struct ValueTextInfo options_action_arg_number[] =
   { CA_ARG_UNDEFINED,		" "				},
   { CA_ARG_NUMBER_RESET,	"reset"				},
   { CA_ARG_UNDEFINED,		" "				},
-  { CA_ARG_NUMBER_CE_SCORE,	"CE score"			},
-  { CA_ARG_NUMBER_CE_COUNT,	"CE count"			},
   { CA_ARG_NUMBER_CE_DELAY,	"CE delay"			},
+  { CA_ARG_NUMBER_CE_SCORE,	"CE score"			},
+  { CA_ARG_NUMBER_CE_VALUE,	"CE value"			},
+  { CA_ARG_UNDEFINED,		" "				},
+  { CA_ARG_ELEMENT_HEADLINE,	"[CE value"			},
+  { CA_ARG_ELEMENT_HEADLINE,	" of"				},
+  { CA_ARG_ELEMENT_HEADLINE,	" element]"			},
+  { CA_ARG_ELEMENT_TARGET,	"target"			},
+  { CA_ARG_ELEMENT_TRIGGER,	"trigger"			},
 
   { -1,				NULL				}
 };
 
-static struct ValueTextInfo options_action_arg_element[] =
+static struct ValueTextInfo options_action_arg_key[] =
 {
-  { CA_ARG_ELEMENT_HEADLINE,	"[element]"			},
-  { CA_ARG_ELEMENT_TARGET,	"target"			},
-  { CA_ARG_ELEMENT_TRIGGER,	"trigger"			},
-  { CA_ARG_UNDEFINED,		" "				},
   { CA_ARG_NUMBER_HEADLINE,	"[number]"			},
   { CA_ARG_1,			"1"				},
   { CA_ARG_2,			"2"				},
@@ -1673,6 +1701,25 @@ static struct ValueTextInfo options_action_arg_element[] =
   { CA_ARG_6,			"6"				},
   { CA_ARG_7,			"7"				},
   { CA_ARG_8,			"8"				},
+  { CA_ARG_UNDEFINED,		" "				},
+  { CA_ARG_ELEMENT_HEADLINE,	"[element]"			},
+  { CA_ARG_ELEMENT_TARGET,	"target"			},
+  { CA_ARG_ELEMENT_TRIGGER,	"trigger"			},
+
+  { -1,				NULL				}
+};
+
+static struct ValueTextInfo options_action_arg_envelope[] =
+{
+  { CA_ARG_NUMBER_HEADLINE,	"[number]"			},
+  { CA_ARG_1,			"1"				},
+  { CA_ARG_2,			"2"				},
+  { CA_ARG_3,			"3"				},
+  { CA_ARG_4,			"4"				},
+  { CA_ARG_UNDEFINED,		" "				},
+  { CA_ARG_ELEMENT_HEADLINE,	"[element]"			},
+  { CA_ARG_ELEMENT_TARGET,	"target"			},
+  { CA_ARG_ELEMENT_TRIGGER,	"trigger"			},
 
   { -1,				NULL				}
 };
@@ -1754,15 +1801,15 @@ action_arg_options[] =
   { CA_EXIT_PLAYER,		0,	options_action_arg_player,	},
   { CA_KILL_PLAYER,		0,	options_action_arg_player,	},
   { CA_RESTART_LEVEL,		0,	options_action_arg_none,	},
-  { CA_SHOW_ENVELOPE,		0,	options_action_arg_element,	},
-  { CA_ADD_KEY,			0,	options_action_arg_element,	},
-  { CA_DEL_KEY,			0,	options_action_arg_element,	},
+  { CA_SHOW_ENVELOPE,		0,	options_action_arg_envelope,	},
+  { CA_ADD_KEY,			0,	options_action_arg_key,		},
+  { CA_REMOVE_KEY,		0,	options_action_arg_key,		},
   { CA_SET_PLAYER_SPEED,	1,	options_action_arg_speed,	},
-  { CA_SET_GEMS,		2,	options_action_arg_number,	},
-  { CA_SET_TIME,		2,	options_action_arg_number,	},
-  { CA_SET_SCORE,		2,	options_action_arg_number,	},
+  { CA_SET_LEVEL_GEMS,		2,	options_action_arg_number,	},
+  { CA_SET_LEVEL_TIME,		2,	options_action_arg_number,	},
+  { CA_SET_LEVEL_SCORE,		2,	options_action_arg_number,	},
   { CA_SET_CE_SCORE,		2,	options_action_arg_number,	},
-  { CA_SET_CE_COUNT,		2,	options_action_arg_number,	},
+  { CA_SET_CE_VALUE,		2,	options_action_arg_number,	},
   { CA_SET_PLAYER_GRAVITY,	1,	options_action_arg_gravity,	},
   { CA_SET_WIND_DIRECTION,	1,	options_action_arg_direction,	},
 
@@ -2375,6 +2422,12 @@ static struct
     GADGET_ID_CUSTOM_GRAV_REACHABLE,	GADGET_ID_NONE,
     &custom_element_properties[EP_GRAVITY_REACHABLE],
     NULL, "reachable despite gravity",	"player can walk/dig despite gravity"
+  },
+  {
+    ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(13),
+    GADGET_ID_CUSTOM_USE_LAST_VALUE,	GADGET_ID_NONE,
+    &custom_element.use_last_ce_value,
+    NULL, "use last CE value after change", "use last CE value after change"
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(5),
@@ -5420,7 +5473,11 @@ static void MapCounterButtons(int id)
   int yoffset_above = MINI_TILEX + ED_GADGET_DISTANCE;
   int yoffset = ED_BORDER_SIZE;
   int x_left = gi_down->x - xoffset_left;
+#if 1
+  int x_right;	/* set after gadget position was modified */
+#else
   int x_right = gi_up->x + gi_up->width + xoffset_right;
+#endif
   int y_above = gi_down->y - yoffset_above;
   int x = gi_down->x;
   int y;	/* set after gadget position was modified */
@@ -5428,6 +5485,9 @@ static void MapCounterButtons(int id)
   /* counter limits must be changed first to prevent value truncation */
   ModifyEditorCounterLimits(id, counterbutton_info[id].min_value,
 			    counterbutton_info[id].max_value);
+
+  /* right text position might have changed after setting position above */
+  x_right = gi_up->x + gi_up->width + xoffset_right;
 
   ModifyEditorCounterValue(id, *counterbutton_info[id].value);
 
@@ -5440,6 +5500,7 @@ static void MapCounterButtons(int id)
     ModifyGadget(gi_up,   GDI_Y, SY + counterbutton_info[id].y, GDI_END);
   }
 
+  /* vertical position might have changed after setting position above */
   y = gi_up->y + yoffset;
 
   if (counterbutton_info[id].text_above)
@@ -5862,6 +5923,30 @@ static int setSelectboxValue(int selectbox_id, int new_value)
   return new_index_value;
 }
 
+static void setSelectboxSpecialActionOptions()
+{
+  int i;
+
+  /* change action mode and arg selectbox according to action type selectbox */
+  for (i = 0; action_arg_options[i].value != -1; i++)
+  {
+    if (action_arg_options[i].value == custom_element_change.action_type)
+    {
+      int mode = action_arg_options[i].mode;
+
+      ModifyEditorSelectboxOptions(ED_SELECTBOX_ID_ACTION_MODE,
+				   action_arg_modes[mode]);
+      ModifyEditorSelectboxValue(ED_SELECTBOX_ID_ACTION_MODE,
+				 custom_element_change.action_mode);
+
+      ModifyEditorSelectboxOptions(ED_SELECTBOX_ID_ACTION_ARG,
+				   action_arg_options[i].options);
+      ModifyEditorSelectboxValue(ED_SELECTBOX_ID_ACTION_ARG,
+				 custom_element_change.action_arg);
+    }
+  }
+}
+
 static void copy_custom_element_settings(int element_from, int element_to)
 {
   struct ElementInfo *ei_from = &element_info[element_from];
@@ -5885,6 +5970,10 @@ static void copy_custom_element_settings(int element_from, int element_to)
 
   ei_to->collect_score_initial = ei_from->collect_score_initial;
   ei_to->collect_count_initial = ei_from->collect_count_initial;
+
+  ei_to->ce_value_fixed_initial = ei_from->ce_value_fixed_initial;
+  ei_to->ce_value_random_initial = ei_from->ce_value_random_initial;
+  ei_to->use_last_ce_value = ei_from->use_last_ce_value;
 
   ei_to->push_delay_fixed = ei_from->push_delay_fixed;
   ei_to->push_delay_random = ei_from->push_delay_random;
@@ -6066,6 +6155,9 @@ static void CopyCustomElementPropertiesToEditor(int element)
   custom_element = element_info[element];
   custom_element_change = *element_info[element].change;
 
+  /* needed to initially set selectbox options for special action options */
+  setSelectboxSpecialActionOptions();
+
   /* needed to initially set selectbox value variables to reliable defaults */
   for (i = 0; i < ED_NUM_SELECTBOX; i++)
     setSelectboxValue(i, *selectbox_info[i].value);
@@ -6148,7 +6240,7 @@ static void CopyCustomElementPropertiesToEditor(int element)
      HAS_CHANGE_EVENT(element, CE_BLOCKED) ? CE_BLOCKED :
      HAS_CHANGE_EVENT(element, CE_IMPACT) ? CE_IMPACT :
      HAS_CHANGE_EVENT(element, CE_SMASHED) ? CE_SMASHED :
-     HAS_CHANGE_EVENT(element, CE_COUNT_AT_ZERO) ? CE_COUNT_AT_ZERO :
+     HAS_CHANGE_EVENT(element, CE_VALUE_GETS_ZERO) ? CE_VALUE_GETS_ZERO :
      custom_element_change.direct_action);
 
   /* set "change by other element action" selectbox help value */
@@ -6167,7 +6259,7 @@ static void CopyCustomElementPropertiesToEditor(int element)
      HAS_CHANGE_EVENT(element, CE_SWITCH_OF_X) ? CE_SWITCH_OF_X :
      HAS_CHANGE_EVENT(element, CE_CHANGE_OF_X) ? CE_CHANGE_OF_X :
      HAS_CHANGE_EVENT(element, CE_EXPLOSION_OF_X) ? CE_EXPLOSION_OF_X :
-     HAS_CHANGE_EVENT(element, CE_COUNT_AT_ZERO_OF_X) ? CE_COUNT_AT_ZERO_OF_X :
+     HAS_CHANGE_EVENT(element, CE_VALUE_GETS_ZERO_OF_X) ? CE_VALUE_GETS_ZERO_OF_X :
      custom_element_change.other_action);
 }
 
@@ -6282,7 +6374,7 @@ static void CopyCustomElementPropertiesToGame(int element)
   custom_element_change_events[CE_BLOCKED] = FALSE;
   custom_element_change_events[CE_IMPACT] = FALSE;
   custom_element_change_events[CE_SMASHED] = FALSE;
-  custom_element_change_events[CE_COUNT_AT_ZERO] = FALSE;
+  custom_element_change_events[CE_VALUE_GETS_ZERO] = FALSE;
   custom_element_change_events[custom_element_change.direct_action] =
     custom_element_change_events[CE_BY_DIRECT_ACTION];
 
@@ -6301,7 +6393,7 @@ static void CopyCustomElementPropertiesToGame(int element)
   custom_element_change_events[CE_SWITCH_OF_X] = FALSE;
   custom_element_change_events[CE_CHANGE_OF_X] = FALSE;
   custom_element_change_events[CE_EXPLOSION_OF_X] = FALSE;
-  custom_element_change_events[CE_COUNT_AT_ZERO_OF_X] = FALSE;
+  custom_element_change_events[CE_VALUE_GETS_ZERO_OF_X] = FALSE;
   custom_element_change_events[custom_element_change.other_action] =
     custom_element_change_events[CE_BY_OTHER_ACTION];
 
@@ -6519,6 +6611,16 @@ static void ModifyEditorCounterLimits(int counter_id, int min, int max)
   struct GadgetInfo *gi = level_editor_gadget[gadget_id];
 
   ModifyGadget(gi, GDI_NUMBER_MIN, min, GDI_NUMBER_MAX, max, GDI_END);
+
+  if (counter_id >= ED_COUNTER_ID_ELEMENT_VALUE1 &&
+      counter_id <= ED_COUNTER_ID_ELEMENT_VALUE4)
+  {
+    int gadget_id_up = counterbutton_info[counter_id].gadget_id_up;
+    struct GadgetInfo *gi_up = level_editor_gadget[gadget_id_up];
+
+    ModifyGadget(gi, GDI_TEXT_SIZE, (max < 10 ? 1 : 3), GDI_END);
+    ModifyGadget(gi_up, GDI_X, gi->x + gi->width + ED_GADGET_DISTANCE,GDI_END);
+  }
 }
 
 static void ModifyEditorSelectboxValue(int selectbox_id, int new_value)
@@ -7394,23 +7496,8 @@ static void DrawPropertiesChange()
 {
   int i;
 
-  for (i = 0; action_arg_options[i].value != -1; i++)
-  {
-    if (action_arg_options[i].value == custom_element_change.action_type)
-    {
-      int mode = action_arg_options[i].mode;
-
-      ModifyEditorSelectboxOptions(ED_SELECTBOX_ID_ACTION_MODE,
-				   action_arg_modes[mode]);
-      ModifyEditorSelectboxValue(ED_SELECTBOX_ID_ACTION_MODE,
-				 custom_element_change.action_mode);
-
-      ModifyEditorSelectboxOptions(ED_SELECTBOX_ID_ACTION_ARG,
-				   action_arg_options[i].options);
-      ModifyEditorSelectboxValue(ED_SELECTBOX_ID_ACTION_ARG,
-				 custom_element_change.action_arg);
-    }
-  }
+  /* needed to initially set selectbox options for special action options */
+  setSelectboxSpecialActionOptions();
 
   /* draw stickybutton gadget */
   MapCheckbuttonGadget(ED_CHECKBUTTON_ID_STICK_ELEMENT);
@@ -8656,6 +8743,7 @@ static void HandleTextAreaGadgets(struct GadgetInfo *gi)
 static void HandleSelectboxGadgets(struct GadgetInfo *gi)
 {
   int type_id = gi->custom_type_id;
+  int value_old = *selectbox_info[type_id].value;
   int value_new = selectbox_info[type_id].options[gi->selectbox.index].value;
 
   *selectbox_info[type_id].value = value_new;
@@ -8673,7 +8761,16 @@ static void HandleSelectboxGadgets(struct GadgetInfo *gi)
 	   (type_id == ED_SELECTBOX_ID_GROUP_CHOICE_MODE))
   {
     if (type_id == ED_SELECTBOX_ID_ACTION_TYPE)
+    {
+      /* when changing action type, reset action mode and action arg */
+      if (value_old != value_new)
+      {
+	custom_element_change.action_mode = -1;
+	custom_element_change.action_arg = -1;
+      }
+
       DrawPropertiesChange();
+    }
 
     CopyElementPropertiesToGame(properties_element);
 

@@ -191,8 +191,8 @@
 #define CE_PLAYER_PUSHES_X		13
 #define CE_PLAYER_COLLECTS_X		14
 #define CE_PLAYER_DROPS_X		15
-#define CE_COUNT_AT_ZERO		16
-#define CE_COUNT_AT_ZERO_OF_X		17
+#define CE_VALUE_GETS_ZERO		16
+#define CE_VALUE_GETS_ZERO_OF_X		17
 #define CE_BY_OTHER_ACTION		18
 #define CE_BY_DIRECT_ACTION		19
 #define CE_PLAYER_DIGS_X		20
@@ -274,15 +274,15 @@
 #define CA_RESTART_LEVEL		3
 #define CA_SHOW_ENVELOPE		4
 #define CA_ADD_KEY			5
-#define CA_DEL_KEY			6
-#define CA_SET_GEMS			7
-#define CA_SET_TIME			8
-#define CA_SET_SCORE			9
-#define CA_SET_CE_SCORE			10
-#define CA_SET_CE_COUNT			11
-#define CA_SET_PLAYER_SPEED		12
-#define CA_SET_PLAYER_GRAVITY		13
-#define CA_SET_WIND_DIRECTION		14
+#define CA_REMOVE_KEY			6
+#define CA_SET_PLAYER_SPEED		7
+#define CA_SET_PLAYER_GRAVITY		8
+#define CA_SET_WIND_DIRECTION		9
+#define CA_SET_LEVEL_GEMS		10
+#define CA_SET_LEVEL_TIME		11
+#define CA_SET_LEVEL_SCORE		12
+#define CA_SET_CE_SCORE			13
+#define CA_SET_CE_VALUE			14
 #if 0
 #define CA_SET_DYNABOMB_NUMBER		15
 #define CA_SET_DYNABOMB_SIZE		16
@@ -327,7 +327,7 @@
 #define CA_ARG_NUMBER_MAX		(CA_ARG_NUMBER + 1)
 #define CA_ARG_NUMBER_RESET		(CA_ARG_NUMBER + 2)
 #define CA_ARG_NUMBER_CE_SCORE		(CA_ARG_NUMBER + 3)
-#define CA_ARG_NUMBER_CE_COUNT		(CA_ARG_NUMBER + 4)
+#define CA_ARG_NUMBER_CE_VALUE		(CA_ARG_NUMBER + 4)
 #define CA_ARG_NUMBER_CE_DELAY		(CA_ARG_NUMBER + 5)
 #define CA_ARG_NUMBER_HEADLINE		(CA_ARG_NUMBER + 999)
 #define CA_ARG_ELEMENT			12000
@@ -1953,8 +1953,9 @@ struct ElementChangeInfo
   void (*post_change_function)(int x, int y);
 
   short actual_trigger_element;	/* element that actually triggered change */
-  int actual_trigger_side;	/* el.side that actually triggered change */
+  int actual_trigger_side;	/* element side that triggered the change */
   int actual_trigger_player;	/* player which actually triggered change */
+  int actual_trigger_ce_value;	/* CE value of element that triggered change */
 
   boolean can_change_or_has_action;	/* can_change | has_action */
 
@@ -2024,6 +2025,10 @@ struct ElementInfo
 
   int collect_score_initial;	/* initial score value for collecting */
   int collect_count_initial;	/* initial count value for collecting */
+
+  int ce_value_fixed_initial;	/* initial value for custom variable (fix) */
+  int ce_value_random_initial;	/* initial value for custom variable (rnd) */
+  boolean use_last_ce_value;	/* use value from element before change */
 
   int push_delay_fixed;		/* constant delay before pushing */
   int push_delay_random;	/* additional random delay before pushing */
@@ -2229,7 +2234,7 @@ extern short			MovDir[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short			MovDelay[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short			ChangeDelay[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short			ChangePage[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-extern short			Count[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern short			CustomValue[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short			Store[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short			Store2[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short			StorePlayer[MAX_LEV_FIELDX][MAX_LEV_FIELDY];

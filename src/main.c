@@ -43,7 +43,7 @@ short			MovDir[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 short			MovDelay[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 short			ChangeDelay[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 short			ChangePage[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-short			Count[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+short			CustomValue[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 short			Store[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 short			Store2[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 short			StorePlayer[MAX_LEV_FIELDX][MAX_LEV_FIELDY];

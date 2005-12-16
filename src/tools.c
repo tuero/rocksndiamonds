@@ -85,7 +85,7 @@ void DumpTile(int x, int y)
   printf("  MovDir:      %d\n", MovDir[x][y]);
   printf("  MovDelay:    %d\n", MovDelay[x][y]);
   printf("  ChangeDelay: %d\n", ChangeDelay[x][y]);
-  printf("  Count:       %d\n", Count[x][y]);
+  printf("  CustomValue: %d\n", CustomValue[x][y]);
   printf("  GfxElement:  %d\n", GfxElement[x][y]);
   printf("  GfxAction:   %d\n", GfxAction[x][y]);
   printf("  GfxFrame:    %d\n", GfxFrame[x][y]);
