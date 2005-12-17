@@ -3968,6 +3968,11 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
     "-",
     "-"
   },
+  {
+    "element.snapping",
+    "-",
+    "-"
+  },
 
   /* ----------------------------------------------------------------------- */
   /* dummy elements (never used as game elements, only used as graphics)     */

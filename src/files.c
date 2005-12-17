@@ -389,6 +389,8 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
   level->can_pass_to_walkable = FALSE;
   level->grow_into_diggable = TRUE;
 
+  level->block_snap_field = TRUE;
+
   level->block_last_field = FALSE;	/* EM does not block by default */
   level->sp_block_last_field = TRUE;	/* SP blocks the last field */
 
@@ -2783,77 +2785,10 @@ static void LoadLevel_InitVersion(struct LevelInfo *level, char *filename)
   if (leveldir_current == NULL)		/* only when dumping level */
     return;
 
-#if 0
-  printf("::: sort_priority: %d\n", leveldir_current->sort_priority);
-#endif
-
-  /* determine correct game engine version of current level */
-  if (!leveldir_current->latest_engine)
+  if (leveldir_current->latest_engine)
   {
-    /* For all levels which are not forced to use the latest game engine
-       version (normally user contributed, private and undefined levels),
-       use the version of the game engine the levels were created for.
+    /* ---------- use latest game engine ----------------------------------- */
 
-       Since 2.0.1, the game engine version is now directly stored
-       in the level file (chunk "VERS"), so there is no need anymore
-       to set the game version from the file version (except for old,
-       pre-2.0 levels, where the game version is still taken from the
-       file format version used to store the level -- see above). */
-
-    /* player was faster than enemies in 1.0.0 and before */
-    if (level->file_version == FILE_VERSION_1_0)
-      level->double_speed = TRUE;
-
-    /* default behaviour for EM style gems was "slippery" only in 2.0.1 */
-    if (level->game_version == VERSION_IDENT(2,0,1,0))
-      level->em_slippery_gems = TRUE;
-
-    /* springs could be pushed over pits before (pre-release version) 2.2.0 */
-    if (level->game_version < VERSION_IDENT(2,2,0,0))
-      level->use_spring_bug = TRUE;
-
-    /* time orb caused limited time in endless time levels before 3.1.2 */
-    if (level->game_version < VERSION_IDENT(3,1,2,0))
-      level->use_time_orb_bug = TRUE;
-
-    /* only few elements were able to actively move into acid before 3.1.0 */
-    /* trigger settings did not exist before 3.1.0; set to default "any" */
-    if (level->game_version < VERSION_IDENT(3,1,0,0))
-    {
-      int i, j;
-
-      /* correct "can move into acid" settings (all zero in old levels) */
-
-      level->can_move_into_acid_bits = 0; /* nothing can move into acid */
-      level->dont_collide_with_bits = 0; /* nothing is deadly when colliding */
-
-      setMoveIntoAcidProperty(level, EL_ROBOT,     TRUE);
-      setMoveIntoAcidProperty(level, EL_SATELLITE, TRUE);
-      setMoveIntoAcidProperty(level, EL_PENGUIN,   TRUE);
-      setMoveIntoAcidProperty(level, EL_BALLOON,   TRUE);
-
-      for (i = 0; i < NUM_CUSTOM_ELEMENTS; i++)
-	SET_PROPERTY(EL_CUSTOM_START + i, EP_CAN_MOVE_INTO_ACID, TRUE);
-
-      /* correct trigger settings (stored as zero == "none" in old levels) */
-
-      for (i = 0; i < NUM_CUSTOM_ELEMENTS; i++)
-      {
-	int element = EL_CUSTOM_START + i;
-	struct ElementInfo *ei = &element_info[element];
-
-	for (j = 0; j < ei->num_change_pages; j++)
-	{
-	  struct ElementChangeInfo *change = &ei->change_page[j];
-
-	  change->trigger_player = CH_PLAYER_ANY;
-	  change->trigger_page = CH_PAGE_ANY;
-	}
-      }
-    }
-  }
-  else		/* always use the latest game engine version */
-  {
     /* For all levels which are forced to use the latest game engine version
        (normally all but user contributed, private and undefined levels), set
        the game engine version to the actual version; this allows for actual
@@ -2873,6 +2808,76 @@ static void LoadLevel_InitVersion(struct LevelInfo *level, char *filename)
 
     if (level->file_version < FILE_VERSION_2_0)
       level->em_slippery_gems = TRUE;
+
+    return;
+  }
+
+  /* ---------- use game engine the level was created with ----------------- */
+
+  /* For all levels which are not forced to use the latest game engine
+     version (normally user contributed, private and undefined levels),
+     use the version of the game engine the levels were created for.
+
+     Since 2.0.1, the game engine version is now directly stored
+     in the level file (chunk "VERS"), so there is no need anymore
+     to set the game version from the file version (except for old,
+     pre-2.0 levels, where the game version is still taken from the
+     file format version used to store the level -- see above). */
+
+  /* player was faster than enemies in 1.0.0 and before */
+  if (level->file_version == FILE_VERSION_1_0)
+    level->double_speed = TRUE;
+
+  /* default behaviour for EM style gems was "slippery" only in 2.0.1 */
+  if (level->game_version == VERSION_IDENT(2,0,1,0))
+    level->em_slippery_gems = TRUE;
+
+  /* springs could be pushed over pits before (pre-release version) 2.2.0 */
+  if (level->game_version < VERSION_IDENT(2,2,0,0))
+    level->use_spring_bug = TRUE;
+
+  /* time orb caused limited time in endless time levels before 3.1.2 */
+  if (level->game_version < VERSION_IDENT(3,1,2,0))
+    level->use_time_orb_bug = TRUE;
+
+  /* default behaviour for snapping was "no snap delay" before 3.1.2 */
+  if (level->game_version < VERSION_IDENT(3,1,2,0))
+    level->block_snap_field = FALSE;
+
+  /* only few elements were able to actively move into acid before 3.1.0 */
+  /* trigger settings did not exist before 3.1.0; set to default "any" */
+  if (level->game_version < VERSION_IDENT(3,1,0,0))
+  {
+    int i, j;
+
+    /* correct "can move into acid" settings (all zero in old levels) */
+
+    level->can_move_into_acid_bits = 0; /* nothing can move into acid */
+    level->dont_collide_with_bits = 0; /* nothing is deadly when colliding */
+
+    setMoveIntoAcidProperty(level, EL_ROBOT,     TRUE);
+    setMoveIntoAcidProperty(level, EL_SATELLITE, TRUE);
+    setMoveIntoAcidProperty(level, EL_PENGUIN,   TRUE);
+    setMoveIntoAcidProperty(level, EL_BALLOON,   TRUE);
+
+    for (i = 0; i < NUM_CUSTOM_ELEMENTS; i++)
+      SET_PROPERTY(EL_CUSTOM_START + i, EP_CAN_MOVE_INTO_ACID, TRUE);
+
+    /* correct trigger settings (stored as zero == "none" in old levels) */
+
+    for (i = 0; i < NUM_CUSTOM_ELEMENTS; i++)
+    {
+      int element = EL_CUSTOM_START + i;
+      struct ElementInfo *ei = &element_info[element];
+
+      for (j = 0; j < ei->num_change_pages; j++)
+      {
+	struct ElementChangeInfo *change = &ei->change_page[j];
+
+	change->trigger_player = CH_PLAYER_ANY;
+	change->trigger_page = CH_PAGE_ANY;
+      }
+    }
   }
 }
 

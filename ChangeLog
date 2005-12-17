@@ -1,3 +1,7 @@
+2005-12-17
+	* added new player option "block snap field" (enabled by default) to
+	  make it possible to show a snapping animation like in Emerald Mine
+
 2005-12-16
 	* added dynamic checkboxes to custom element action settings in editor
 	* added "CE value" counter for custom elements (instead of "CE count")

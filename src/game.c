@@ -33,6 +33,7 @@
 #define USE_NEW_ALL_SLIPPERY		(USE_NEW_STUFF		* 1)
 #define USE_NEW_PLAYER_SPEED		(USE_NEW_STUFF		* 1)
 #define USE_NEW_DELAYED_ACTION		(USE_NEW_STUFF		* 1)
+#define USE_NEW_SNAP_DELAY		(USE_NEW_STUFF		* 1)
 
 /* for DigField() */
 #define DF_NO_PUSH		0
@@ -7930,6 +7931,18 @@ void GameActions()
 	RemoveField(x, y);
     }
 
+#if USE_NEW_SNAP_DELAY
+    if (Feld[x][y] == EL_ELEMENT_SNAPPING)
+    {
+      MovDelay[x][y]--;
+      if (MovDelay[x][y] <= 0)
+      {
+	RemoveField(x, y);
+	DrawLevelField(x, y);
+      }
+    }
+#endif
+
 #if DEBUG
     if (ChangePage[x][y] != -1 && ChangeDelay[x][y] != 1)
     {
@@ -8084,6 +8097,14 @@ void GameActions()
       CheckForDragon(x, y);
     else if (element == EL_EXPLOSION)
       ;	/* drawing of correct explosion animation is handled separately */
+    else if (element == EL_ELEMENT_SNAPPING)
+    {
+#if 1
+      graphic = el_act_dir2img(GfxElement[x][y], GfxAction[x][y],GfxDir[x][y]);
+
+      DrawLevelGraphicAnimationIfNeeded(x, y, graphic);
+#endif
+    }
     else if (IS_ANIMATED(graphic) && !IS_CHANGING(x, y))
       DrawLevelGraphicAnimationIfNeeded(x, y, graphic);
 
@@ -9483,6 +9504,27 @@ void RemovePlayer(struct PlayerInfo *player)
   ExitY = ZY = jy;
 }
 
+#if USE_NEW_SNAP_DELAY
+static void setFieldForSnapping(int x, int y, int element, int direction)
+{
+  struct ElementInfo *ei = &element_info[element];
+  int direction_bit = MV_DIR_BIT(direction);
+  int graphic_snapping = ei->direction_graphic[ACTION_SNAPPING][direction_bit];
+  int action = (graphic_snapping != IMG_EMPTY_SPACE ? ACTION_SNAPPING :
+		IS_DIGGABLE(element) ? ACTION_DIGGING : ACTION_COLLECTING);
+
+  Feld[x][y] = EL_ELEMENT_SNAPPING;
+  MovDelay[x][y] = MOVE_DELAY_NORMAL_SPEED + 1 - 1;
+
+  ResetGfxAnimation(x, y);
+
+  GfxElement[x][y] = element;
+  GfxAction[x][y] = action;
+  GfxDir[x][y] = direction;
+  GfxFrame[x][y] = -1;
+}
+#endif
+
 /*
   =============================================================================
   checkDiagonalPushing()
@@ -9707,7 +9749,14 @@ int DigField(struct PlayerInfo *player,
 					player->index_bit, dig_side);
 
     if (mode == DF_SNAP)
+    {
       TestIfElementTouchesCustomElement(x, y);	/* for empty space */
+
+#if USE_NEW_SNAP_DELAY
+      if (level.block_snap_field)
+	setFieldForSnapping(x, y, element, move_direction);
+#endif
+    }
   }
   else if (IS_COLLECTIBLE(element))
   {
@@ -9797,7 +9846,14 @@ int DigField(struct PlayerInfo *player,
 					  player->index_bit, dig_side);
 
     if (mode == DF_SNAP)
+    {
       TestIfElementTouchesCustomElement(x, y);	/* for empty space */
+
+#if USE_NEW_SNAP_DELAY
+      if (level.block_snap_field)
+	setFieldForSnapping(x, y, element, move_direction);
+#endif
+    }
   }
   else if (IS_PUSHABLE(element))
   {

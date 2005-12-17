@@ -1221,9 +1221,10 @@
 #define EL_QUICKSAND_FILLING		(EL_FIRST_RUNTIME_UNREAL + 15)
 #define EL_MAGIC_WALL_FILLING		(EL_FIRST_RUNTIME_UNREAL + 16)
 #define EL_BD_MAGIC_WALL_FILLING	(EL_FIRST_RUNTIME_UNREAL + 17)
+#define EL_ELEMENT_SNAPPING		(EL_FIRST_RUNTIME_UNREAL + 18)
 
 /* dummy elements (never used as game elements, only used as graphics) */
-#define EL_FIRST_DUMMY			(EL_FIRST_RUNTIME_UNREAL + 18)
+#define EL_FIRST_DUMMY			(EL_FIRST_RUNTIME_UNREAL + 19)
 
 #define EL_STEELWALL_TOPLEFT		(EL_FIRST_DUMMY + 0)
 #define EL_STEELWALL_TOPRIGHT		(EL_FIRST_DUMMY + 1)
@@ -1804,6 +1805,7 @@ struct LevelInfo
   boolean can_pass_to_walkable;	/* player can pass to empty or walkable tile */
   boolean grow_into_diggable;	/* amoeba can grow into anything diggable */
 
+  boolean block_snap_field;	/* snapping blocks field to show animation */
   boolean block_last_field;	/* player blocks previous field while moving */
   boolean sp_block_last_field;	/* player blocks previous field while moving */
 

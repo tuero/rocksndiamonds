@@ -976,6 +976,11 @@ static void DrawLevelFieldCrumbledSandExt(int x, int y, int graphic, int frame)
 	  IS_MOVING(xx, yy))
 	continue;
 
+#if 1
+      if (Feld[xx][yy] == EL_ELEMENT_SNAPPING)
+	continue;
+#endif
+
       element = TILE_GFX_ELEMENT(xx, yy);
 
       if (!GFX_CRUMBLED(element))
@@ -988,7 +993,11 @@ static void DrawLevelFieldCrumbledSandExt(int x, int y, int graphic, int frame)
 	continue;
 #endif
 
+#if 1
+      graphic = el_act2crm(element, ACTION_DEFAULT);
+#else
       graphic = el_act2crm(Feld[xx][yy], ACTION_DEFAULT);
+#endif
       crumbled_border_size = graphic_info[graphic].border_size;
 
       getGraphicSource(graphic, frame, &src_bitmap, &src_x, &src_y);
@@ -1023,7 +1032,20 @@ void DrawLevelFieldCrumbledSand(int x, int y)
   if (!IN_LEV_FIELD(x, y))
     return;
 
+#if 1
+  if (Feld[x][y] == EL_ELEMENT_SNAPPING &&
+      GFX_CRUMBLED(GfxElement[x][y]))
+  {
+    DrawLevelFieldCrumbledSandDigging(x, y, GfxDir[x][y], GfxFrame[x][y]);
+    return;
+  }
+#endif
+
+#if 1
+  graphic = el_act2crm(TILE_GFX_ELEMENT(x, y), ACTION_DEFAULT);
+#else
   graphic = el_act2crm(Feld[x][y], ACTION_DEFAULT);
+#endif
 
   DrawLevelFieldCrumbledSandExt(x, y, graphic, 0);
 }
@@ -1698,8 +1720,13 @@ inline void DrawLevelGraphicAnimationIfNeeded(int x, int y, int graphic)
 
   DrawGraphicAnimation(sx, sy, graphic);
 
+#if 1
+  if (GFX_CRUMBLED(TILE_GFX_ELEMENT(x, y)))
+    DrawLevelFieldCrumbledSand(x, y);
+#else
   if (GFX_CRUMBLED(Feld[x][y]))
     DrawLevelFieldCrumbledSand(x, y);
+#endif
 }
 
 void DrawLevelElementAnimationIfNeeded(int x, int y, int element)
