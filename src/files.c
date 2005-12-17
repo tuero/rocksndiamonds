@@ -203,6 +203,10 @@ static struct
     EL_TIME_ORB_FULL,			CONF_VALUE_BOOLEAN_1,
     &li.use_time_orb_bug,		FALSE
   },
+  {
+    EL_PLAYER_1,			CONF_VALUE_BOOLEAN_1,
+    &li.block_snap_field,		TRUE
+  },
 
   /* ---------- multi-byte values ------------------------------------------ */
   {
