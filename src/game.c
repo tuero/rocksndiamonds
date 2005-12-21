@@ -6773,11 +6773,6 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
 
 	  stored_player[i].cannot_move =
 	    (action_arg == CA_ARG_SPEED_NOT_MOVING ? TRUE : FALSE);
-
-#if 0
-	  printf("::: move_delay_value == %d [%d]\n",
-		 stored_player[i].move_delay_value_next, action_arg_number);
-#endif
 	}
       }
 
