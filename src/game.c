@@ -1560,6 +1560,8 @@ void InitGame()
     player->is_bored = FALSE;
     player->is_sleeping = FALSE;
 
+    player->cannot_move = FALSE;
+
     player->frame_counter_bored = -1;
     player->frame_counter_sleeping = -1;
 
@@ -6582,24 +6584,33 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
      action_arg == CA_ARG_ELEMENT_TARGET  ? change->target_element :
      EL_EMPTY);
 
+  int action_arg_direction =
+    (action_arg >= CA_ARG_DIRECTION_LEFT &&
+     action_arg <= CA_ARG_DIRECTION_DOWN ? action_arg - CA_ARG_DIRECTION :
+     action_arg == CA_ARG_DIRECTION_TRIGGER ?
+     change->actual_trigger_side :
+     action_arg == CA_ARG_DIRECTION_TRIGGER_BACK ?
+     MV_DIR_OPPOSITE(change->actual_trigger_side) :
+     MV_NONE);
+
   int action_arg_number_min =
-    (action_type == CA_SET_PLAYER_SPEED ? MOVE_STEPSIZE_MIN :
+    (action_type == CA_SET_SPEED ? MOVE_STEPSIZE_MIN :
      CA_ARG_MIN);
 
   int action_arg_number_max =
-    (action_type == CA_SET_PLAYER_SPEED ? MOVE_STEPSIZE_MAX :
-     action_type == CA_SET_LEVEL_GEMS ? 999 :
-     action_type == CA_SET_LEVEL_TIME ? 9999 :
-     action_type == CA_SET_LEVEL_SCORE ? 99999 :
+    (action_type == CA_SET_SPEED ? MOVE_STEPSIZE_MAX :
+     action_type == CA_SET_GEMS ? 999 :
+     action_type == CA_SET_TIME ? 9999 :
+     action_type == CA_SET_SCORE ? 99999 :
      action_type == CA_SET_CE_SCORE ? 9999 :
      action_type == CA_SET_CE_VALUE ? 9999 :
      CA_ARG_MAX);
 
   int action_arg_number_reset =
-    (action_type == CA_SET_PLAYER_SPEED ? TILEX/game.initial_move_delay_value :
-     action_type == CA_SET_LEVEL_GEMS ? level.gems_needed :
-     action_type == CA_SET_LEVEL_TIME ? level.time :
-     action_type == CA_SET_LEVEL_SCORE ? 0 :
+    (action_type == CA_SET_SPEED ? TILEX / game.initial_move_delay_value :
+     action_type == CA_SET_GEMS ? level.gems_needed :
+     action_type == CA_SET_TIME ? level.time :
+     action_type == CA_SET_SCORE ? 0 :
      action_type == CA_SET_CE_SCORE ? 0 :
 #if 1
      action_type == CA_SET_CE_VALUE ? GET_NEW_CUSTOM_VALUE(element) :
@@ -6610,7 +6621,7 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
 
   int action_arg_number =
     (action_arg <= CA_ARG_MAX ? action_arg :
-     action_arg >= CA_ARG_SPEED_VERY_SLOW &&
+     action_arg >= CA_ARG_SPEED_NOT_MOVING &&
      action_arg <= CA_ARG_SPEED_EVEN_FASTER ? (action_arg - CA_ARG_SPEED) :
      action_arg == CA_ARG_SPEED_RESET ? action_arg_number_reset :
      action_arg == CA_ARG_NUMBER_MIN ? action_arg_number_min :
@@ -6628,9 +6639,9 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
      -1);
 
   int action_arg_number_old =
-    (action_type == CA_SET_LEVEL_GEMS ? local_player->gems_still_needed :
-     action_type == CA_SET_LEVEL_TIME ? TimeLeft :
-     action_type == CA_SET_LEVEL_SCORE ? local_player->score :
+    (action_type == CA_SET_GEMS ? local_player->gems_still_needed :
+     action_type == CA_SET_TIME ? TimeLeft :
+     action_type == CA_SET_SCORE ? local_player->score :
      action_type == CA_SET_CE_SCORE ? ei->collect_score :
      action_type == CA_SET_CE_VALUE ? CustomValue[x][y] :
      0);
@@ -6640,21 +6651,16 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
 			    action_mode, action_arg_number,
 			    action_arg_number_min, action_arg_number_max);
 
-  int action_arg_player_bits =
-    (action_arg == CA_ARG_PLAYER_ANY ? PLAYER_BITS_ANY :
-     action_arg >= CA_ARG_PLAYER_1 &&
-     action_arg <= CA_ARG_PLAYER_4 ? action_arg - CA_ARG_PLAYER :
-     action_arg >= CA_ARG_1 &&
-     action_arg <= CA_ARG_PLAYER_4 ? (1 << (action_arg - CA_ARG_1)) :
-     action_arg_element >= EL_PLAYER_1 &&
-     action_arg_element <= EL_PLAYER_4 ?
-     (1 << (action_arg_element - EL_PLAYER_1)) :
-     PLAYER_BITS_ANY);
-
   int trigger_player_bits =
     (change->actual_trigger_player >= EL_PLAYER_1 &&
      change->actual_trigger_player <= EL_PLAYER_4 ?
      (1 << (change->actual_trigger_player - EL_PLAYER_1)) :
+     PLAYER_BITS_ANY);
+
+  int action_arg_player_bits =
+    (action_arg >= CA_ARG_PLAYER_1 &&
+     action_arg <= CA_ARG_PLAYER_4 ? action_arg - CA_ARG_PLAYER :
+     action_arg == CA_ARG_PLAYER_TRIGGER ? trigger_player_bits :
      PLAYER_BITS_ANY);
 
   /* ---------- execute action  ---------- */
@@ -6684,6 +6690,16 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
       break;
     }
 
+    case CA_MOVE_PLAYER:
+    {
+      /* automatically move to the next field in specified direction */
+      for (i = 0; i < MAX_PLAYERS; i++)
+	if (trigger_player_bits & (1 << i))
+	  stored_player[i].programmed_action = action_arg_direction;
+
+      break;
+    }
+
     case CA_RESTART_LEVEL:
     {
       game.restart_level = TRUE;
@@ -6702,8 +6718,9 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
       break;
     }
 
-    case CA_ADD_KEY:
+    case CA_SET_KEYS:
     {
+      int key_state = (action_mode == CA_MODE_ADD ? TRUE : FALSE);
       int element = getSpecialActionElement(action_arg_element,
 					    action_arg_number, EL_KEY_1);
 
@@ -6713,7 +6730,7 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
 	{
 	  if (trigger_player_bits & (1 << i))
 	  {
-	    stored_player[i].key[KEY_NR(element)] = TRUE;
+	    stored_player[i].key[KEY_NR(element)] = key_state;
 
 	    DrawGameValue_Keys(stored_player[i].key);
 
@@ -6725,31 +6742,7 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
       break;
     }
 
-    case CA_REMOVE_KEY:
-    {
-      int element = getSpecialActionElement(action_arg_element,
-					    action_arg_number, EL_KEY_1);
-
-      if (IS_KEY(element))
-      {
-	for (i = 0; i < MAX_PLAYERS; i++)
-	{
-	  if (trigger_player_bits & (1 << i))
-	  {
-	    stored_player[i].key[KEY_NR(element)] = FALSE;
-
-	    DrawGameValue_Keys(stored_player[i].key);
-
-	    redraw_mask |= REDRAW_DOOR_1;
-	  }
-	}
-      }
-
-      break;
-    }
-
-#if 1
-    case CA_SET_PLAYER_SPEED:
+    case CA_SET_SPEED:
     {
       for (i = 0; i < MAX_PLAYERS; i++)
       {
@@ -6778,44 +6771,8 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
 	  /* do no immediately change -- the player might just be moving */
 	  stored_player[i].move_delay_value_next = TILEX / move_stepsize;
 
-#if 0
-	  printf("::: move_delay_value == %d [%d]\n",
-		 stored_player[i].move_delay_value_next, action_arg_number);
-#endif
-	}
-      }
-
-      break;
-    }
-#else
-    case CA_SET_PLAYER_SPEED:
-    {
-      for (i = 0; i < MAX_PLAYERS; i++)
-      {
-	if (trigger_player_bits & (1 << i))
-	{
-	  int move_stepsize = TILEX / stored_player[i].move_delay_value;
-
-	  if (action_mode == CA_MODE_ADD || action_mode == CA_MODE_SUBTRACT)
-	  {
-	    /* translate "+" and "-" to "*" and "/" with powers of two */
-	    action_arg_number = 1 << action_arg_number;
-	    action_mode = (action_mode == CA_MODE_ADD ? CA_MODE_MULTIPLY :
-			   CA_MODE_DIVIDE);
-	  }
-
-	  move_stepsize =
-	    getModifiedActionNumber(move_stepsize,
-				    action_mode,
-				    action_arg_number,
-				    action_arg_number_min,
-				    action_arg_number_max);
-
-	  /* make sure that value is power of 2 */
-	  move_stepsize = (1 << log_2(move_stepsize));
-
-	  /* do no immediately change -- the player might just be moving */
-	  stored_player[i].move_delay_value_next = TILEX / move_stepsize;
+	  stored_player[i].cannot_move =
+	    (action_arg == CA_ARG_SPEED_NOT_MOVING ? TRUE : FALSE);
 
 #if 0
 	  printf("::: move_delay_value == %d [%d]\n",
@@ -6826,9 +6783,8 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
 
       break;
     }
-#endif
 
-    case CA_SET_PLAYER_GRAVITY:
+    case CA_SET_GRAVITY:
     {
       game.gravity = (action_arg == CA_ARG_GRAVITY_OFF    ? FALSE         :
 		      action_arg == CA_ARG_GRAVITY_ON     ? TRUE          :
@@ -6837,19 +6793,14 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
       break;
     }
 
-    case CA_SET_WIND_DIRECTION:
+    case CA_SET_WIND:
     {
-      game.wind_direction = (action_arg >= CA_ARG_DIRECTION_NONE &&
-			     action_arg <= CA_ARG_DIRECTION_DOWN ?
-			     action_arg - CA_ARG_DIRECTION :
-			     action_arg == CA_ARG_DIRECTION_TRIGGER ?
-			     MV_DIR_OPPOSITE(change->actual_trigger_side) :
-			     game.wind_direction);
+      game.wind_direction = action_arg_direction;
 
       break;
     }
 
-    case CA_SET_LEVEL_GEMS:
+    case CA_SET_GEMS:
     {
       local_player->gems_still_needed = action_arg_number_new;
 
@@ -6858,7 +6809,7 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
       break;
     }
 
-    case CA_SET_LEVEL_TIME:
+    case CA_SET_TIME:
     {
       if (level.time > 0)	/* only modify limited time value */
       {
@@ -6874,7 +6825,7 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
       break;
     }
 
-    case CA_SET_LEVEL_SCORE:
+    case CA_SET_SCORE:
     {
       local_player->score = action_arg_number_new;
 
@@ -8507,6 +8458,14 @@ boolean MovePlayerOneStep(struct PlayerInfo *player,
 
   if (!IN_LEV_FIELD(new_jx, new_jy))
     return MF_NO_ACTION;
+
+  if (player->cannot_move)
+  {
+    DigField(player, 0, 0, 0, 0, 0, 0, DF_NO_PUSH);
+    SnapField(player, 0, 0);
+
+    return MF_NO_ACTION;
+  }
 
   if (!options.network && !AllPlayersInSight(player, new_jx, new_jy))
     return MF_NO_ACTION;

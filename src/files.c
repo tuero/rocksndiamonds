@@ -2840,12 +2840,12 @@ static void LoadLevel_InitVersion(struct LevelInfo *level, char *filename)
   if (level->game_version < VERSION_IDENT(2,2,0,0))
     level->use_spring_bug = TRUE;
 
-  /* time orb caused limited time in endless time levels before 3.1.2 */
-  if (level->game_version < VERSION_IDENT(3,1,2,0))
+  /* time orb caused limited time in endless time levels before 3.2.0-5 */
+  if (level->game_version < VERSION_IDENT(3,2,0,5))
     level->use_time_orb_bug = TRUE;
 
-  /* default behaviour for snapping was "no snap delay" before 3.1.2 */
-  if (level->game_version < VERSION_IDENT(3,1,2,0))
+  /* default behaviour for snapping was "no snap delay" before 3.2.0-5 */
+  if (level->game_version < VERSION_IDENT(3,2,0,5))
     level->block_snap_field = FALSE;
 
   /* only few elements were able to actively move into acid before 3.1.0 */

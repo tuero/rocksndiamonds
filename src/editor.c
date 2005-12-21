@@ -1596,16 +1596,16 @@ static struct ValueTextInfo options_action_type[] =
   { CA_NO_ACTION,		"no action"			},
   { CA_EXIT_PLAYER,		"exit player"			},
   { CA_KILL_PLAYER,		"kill player"			},
+  { CA_MOVE_PLAYER,		"move player"			},
   { CA_RESTART_LEVEL,		"restart level"			},
   { CA_SHOW_ENVELOPE,		"show envelope"			},
-  { CA_ADD_KEY,			"add key"			},
-  { CA_REMOVE_KEY,		"remove key"			},
-  { CA_SET_PLAYER_SPEED,	"set player speed"		},
-  { CA_SET_PLAYER_GRAVITY,	"set gravity"			},
-  { CA_SET_WIND_DIRECTION,	"set wind dir."			},
-  { CA_SET_LEVEL_GEMS,		"set needed gems"		},
-  { CA_SET_LEVEL_TIME,		"set level time"		},
-  { CA_SET_LEVEL_SCORE,		"set level score"		},
+  { CA_SET_TIME,		"set level time"		},
+  { CA_SET_GEMS,		"set needed gems"		},
+  { CA_SET_SCORE,		"set level score"		},
+  { CA_SET_KEYS,		"set player keys"		},
+  { CA_SET_SPEED,		"set player speed"		},
+  { CA_SET_GRAVITY,		"set gravity"			},
+  { CA_SET_WIND,		"set wind dir."			},
   { CA_SET_CE_SCORE,		"set CE score"			},
   { CA_SET_CE_VALUE,		"set CE value"			},
 #if 0
@@ -1624,14 +1624,22 @@ static struct ValueTextInfo options_action_mode_none[] =
   { -1,				NULL				}
 };
 
-static struct ValueTextInfo options_action_mode_set[] =
+static struct ValueTextInfo options_action_mode_assign[] =
 {
   { CA_MODE_SET,		"="				},
 
   { -1,				NULL				}
 };
 
-static struct ValueTextInfo options_action_mode_calc[] =
+static struct ValueTextInfo options_action_mode_add_remove[] =
+{
+  { CA_MODE_ADD,		"+"				},
+  { CA_MODE_SUBTRACT,		"-"				},
+
+  { -1,				NULL				}
+};
+
+static struct ValueTextInfo options_action_mode_calculate[] =
 {
   { CA_MODE_SET,		"="				},
   { CA_MODE_ADD,		"+"				},
@@ -1731,6 +1739,7 @@ static struct ValueTextInfo options_action_arg_envelope[] =
 static struct ValueTextInfo options_action_arg_speed[] =
 {
   { CA_ARG_SPEED_HEADLINE,	"[speed]"			},
+  { CA_ARG_SPEED_NOT_MOVING,	"frozen"			},
   { CA_ARG_SPEED_VERY_SLOW,	"very slow"			},
   { CA_ARG_SPEED_SLOW,		"slow"				},
   { CA_ARG_SPEED_NORMAL,	"normal"			},
@@ -1765,6 +1774,7 @@ static struct ValueTextInfo options_action_arg_direction[] =
   { CA_ARG_DIRECTION_UP,	"up"				},
   { CA_ARG_DIRECTION_DOWN,	"down"				},
   { CA_ARG_DIRECTION_TRIGGER,	"trigger"			},
+  { CA_ARG_DIRECTION_TRIGGER_BACK, "-trigger"			},
 
   { -1,				NULL				}
 };
@@ -1789,8 +1799,9 @@ static struct ValueTextInfo options_group_choice_mode[] =
 static struct ValueTextInfo *action_arg_modes[] =
 {
   options_action_mode_none,
-  options_action_mode_set,
-  options_action_mode_calc,
+  options_action_mode_assign,
+  options_action_mode_add_remove,
+  options_action_mode_calculate,
 };
 
 static struct
@@ -1804,18 +1815,18 @@ action_arg_options[] =
   { CA_NO_ACTION,		0,	options_action_arg_none,	},
   { CA_EXIT_PLAYER,		0,	options_action_arg_player,	},
   { CA_KILL_PLAYER,		0,	options_action_arg_player,	},
+  { CA_MOVE_PLAYER,		0,	options_action_arg_direction,	},
   { CA_RESTART_LEVEL,		0,	options_action_arg_none,	},
   { CA_SHOW_ENVELOPE,		0,	options_action_arg_envelope,	},
-  { CA_ADD_KEY,			0,	options_action_arg_key,		},
-  { CA_REMOVE_KEY,		0,	options_action_arg_key,		},
-  { CA_SET_PLAYER_SPEED,	1,	options_action_arg_speed,	},
-  { CA_SET_LEVEL_GEMS,		2,	options_action_arg_number,	},
-  { CA_SET_LEVEL_TIME,		2,	options_action_arg_number,	},
-  { CA_SET_LEVEL_SCORE,		2,	options_action_arg_number,	},
-  { CA_SET_CE_SCORE,		2,	options_action_arg_number,	},
-  { CA_SET_CE_VALUE,		2,	options_action_arg_number,	},
-  { CA_SET_PLAYER_GRAVITY,	1,	options_action_arg_gravity,	},
-  { CA_SET_WIND_DIRECTION,	1,	options_action_arg_direction,	},
+  { CA_SET_TIME,		3,	options_action_arg_number,	},
+  { CA_SET_GEMS,		3,	options_action_arg_number,	},
+  { CA_SET_SCORE,		3,	options_action_arg_number,	},
+  { CA_SET_KEYS,		2,	options_action_arg_key,		},
+  { CA_SET_SPEED,		1,	options_action_arg_speed,	},
+  { CA_SET_GRAVITY,		1,	options_action_arg_gravity,	},
+  { CA_SET_WIND,		1,	options_action_arg_direction,	},
+  { CA_SET_CE_SCORE,		3,	options_action_arg_number,	},
+  { CA_SET_CE_VALUE,		3,	options_action_arg_number,	},
 
   { -1,				FALSE,	NULL				}
 };
@@ -2002,7 +2013,7 @@ static struct
     -1,
     options_change_trigger_side,
     &custom_element_change.trigger_side,
-    "at", "side",			"element side that causes change"
+    "at", "side",			"element side triggering change"
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(2),	ED_ELEMENT_SETTINGS_YPOS(7),
@@ -9662,7 +9673,7 @@ static void HandleDrawingAreaInfo(struct GadgetInfo *gi)
     else if (id == GADGET_ID_CUSTOM_MOVE_LEAVE)
       strcpy(infotext, "Element that will be left behind");
     else if (id == GADGET_ID_CUSTOM_CHANGE_TARGET)
-      strcpy(infotext, "New element after change");
+      strcpy(infotext, "New target element after change");
     else if (id == GADGET_ID_CUSTOM_CHANGE_CONTENT)
       strcpy(infotext, "New extended elements after change");
     else if (id == GADGET_ID_CUSTOM_CHANGE_TRIGGER)

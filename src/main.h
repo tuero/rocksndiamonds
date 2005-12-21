@@ -237,6 +237,15 @@
 					 PLAYER_BITS_4)
 #define PLAYER_BITS_TRIGGER		(1 << 4)
 
+/* values for move directions (bits 0 - 3: basic move directions) */
+#define MV_BIT_PREVIOUS			4
+#define MV_BIT_TRIGGER			5
+#define MV_BIT_TRIGGER_BACK		6
+
+#define MV_PREVIOUS			(1 << MV_BIT_PREVIOUS)
+#define MV_TRIGGER			(1 << MV_BIT_TRIGGER)
+#define MV_TRIGGER_BACK			(1 << MV_BIT_TRIGGER_BACK)
+
 /* values for change side for custom elements */
 #define CH_SIDE_NONE			MV_NONE
 #define CH_SIDE_LEFT			MV_LEFT
@@ -273,16 +282,16 @@
 #define CA_KILL_PLAYER			2
 #define CA_RESTART_LEVEL		3
 #define CA_SHOW_ENVELOPE		4
-#define CA_ADD_KEY			5
-#define CA_REMOVE_KEY			6
-#define CA_SET_PLAYER_SPEED		7
-#define CA_SET_PLAYER_GRAVITY		8
-#define CA_SET_WIND_DIRECTION		9
-#define CA_SET_LEVEL_GEMS		10
-#define CA_SET_LEVEL_TIME		11
-#define CA_SET_LEVEL_SCORE		12
-#define CA_SET_CE_SCORE			13
-#define CA_SET_CE_VALUE			14
+#define CA_SET_TIME			5
+#define CA_SET_GEMS			6
+#define CA_SET_SCORE			7
+#define CA_SET_WIND			8
+#define CA_SET_KEYS			9
+#define CA_SET_SPEED			10
+#define CA_SET_GRAVITY			11
+#define CA_SET_CE_SCORE			12
+#define CA_SET_CE_VALUE			13
+#define CA_MOVE_PLAYER			14
 #if 0
 #define CA_SET_DYNABOMB_NUMBER		15
 #define CA_SET_DYNABOMB_SIZE		16
@@ -335,6 +344,7 @@
 #define CA_ARG_ELEMENT_TRIGGER		(CA_ARG_ELEMENT + 1)
 #define CA_ARG_ELEMENT_HEADLINE		(CA_ARG_ELEMENT + 999)
 #define CA_ARG_SPEED			13000
+#define CA_ARG_SPEED_NOT_MOVING		(CA_ARG_SPEED + 0)
 #define CA_ARG_SPEED_VERY_SLOW		(CA_ARG_SPEED + 1)
 #define CA_ARG_SPEED_SLOW		(CA_ARG_SPEED + 2)
 #define CA_ARG_SPEED_NORMAL		(CA_ARG_SPEED + 4)
@@ -343,7 +353,7 @@
 #define CA_ARG_SPEED_EVEN_FASTER	(CA_ARG_SPEED + 32)
 #define CA_ARG_SPEED_SLOWER		(CA_ARG_SPEED + 50)
 #define CA_ARG_SPEED_FASTER		(CA_ARG_SPEED + 200)
-#define CA_ARG_SPEED_RESET		(CA_ARG_SPEED + 0)
+#define CA_ARG_SPEED_RESET		(CA_ARG_SPEED + 100)
 #define CA_ARG_SPEED_HEADLINE		(CA_ARG_SPEED + 999)
 #define CA_ARG_GRAVITY			14000
 #define CA_ARG_GRAVITY_OFF		(CA_ARG_GRAVITY + 0)
@@ -356,7 +366,8 @@
 #define CA_ARG_DIRECTION_RIGHT		(CA_ARG_DIRECTION + MV_RIGHT)
 #define CA_ARG_DIRECTION_UP		(CA_ARG_DIRECTION + MV_UP)
 #define CA_ARG_DIRECTION_DOWN		(CA_ARG_DIRECTION + MV_DOWN)
-#define CA_ARG_DIRECTION_TRIGGER	(CA_ARG_DIRECTION + MV_ANY_DIRECTION)
+#define CA_ARG_DIRECTION_TRIGGER	(CA_ARG_DIRECTION + MV_TRIGGER)
+#define CA_ARG_DIRECTION_TRIGGER_BACK	(CA_ARG_DIRECTION + MV_TRIGGER_BACK)
 #define CA_ARG_DIRECTION_HEADLINE	(CA_ARG_DIRECTION + 999)
 #define CA_ARG_UNDEFINED		19999
 
@@ -393,9 +404,6 @@
 #define MV_TURNING_RANDOM		(1 << MV_BIT_TURNING_RANDOM)
 #define MV_WIND_DIRECTION		(1 << MV_BIT_WIND_DIRECTION)
 
-/* values for initial move direction (bits 0 - 3: basic move directions) */
-#define MV_START_BIT_PREVIOUS		4
-
 /* values for initial move direction */
 #define MV_START_NONE			(MV_NONE)
 #define MV_START_AUTOMATIC		(MV_NONE)
@@ -404,7 +412,7 @@
 #define MV_START_UP			(MV_UP)
 #define MV_START_DOWN			(MV_DOWN)
 #define MV_START_RANDOM			(MV_ALL_DIRECTIONS)
-#define MV_START_PREVIOUS		(1 << MV_START_BIT_PREVIOUS)
+#define MV_START_PREVIOUS		(MV_PREVIOUS)
 
 /* values for elements left behind by custom elements */
 #define LEAVE_TYPE_UNLIMITED		0
@@ -1667,6 +1675,8 @@ struct PlayerInfo
 
   boolean is_bored;
   boolean is_sleeping;
+
+  boolean cannot_move;
 
   int frame_counter_bored;
   int frame_counter_sleeping;
