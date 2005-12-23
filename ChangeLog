@@ -1,3 +1,10 @@
+2005-12-22
+	* added new player option "use level start element" in level editor
+	  to set the correct focus at level start to elements from which the
+	  player is created later (this did not work before for cascaded CE
+	  changes resulting in creation of the player; it is now also possible
+	  to create the player from a yam yam which is smashed at level start)
+
 2005-12-20
 	* added "set player speed: not moving / frozen" to CE action options
 	* added "move player: l/r/u/d/trigger/-trigger" to CE action options

@@ -280,23 +280,25 @@
 #define CA_NO_ACTION			0
 #define CA_EXIT_PLAYER			1
 #define CA_KILL_PLAYER			2
-#define CA_RESTART_LEVEL		3
-#define CA_SHOW_ENVELOPE		4
-#define CA_SET_TIME			5
-#define CA_SET_GEMS			6
-#define CA_SET_SCORE			7
-#define CA_SET_WIND			8
-#define CA_SET_KEYS			9
-#define CA_SET_SPEED			10
-#define CA_SET_GRAVITY			11
-#define CA_SET_CE_SCORE			12
-#define CA_SET_CE_VALUE			13
-#define CA_MOVE_PLAYER			14
-#if 0
-#define CA_SET_DYNABOMB_NUMBER		15
-#define CA_SET_DYNABOMB_SIZE		16
-#define CA_SET_DYNABOMB_POWER		17
-#endif
+#define CA_MOVE_PLAYER			3
+#define CA_RESTART_LEVEL		4
+#define CA_SHOW_ENVELOPE		5
+#define CA_SET_LEVEL_TIME		6
+#define CA_SET_LEVEL_GEMS		7
+#define CA_SET_LEVEL_SCORE		8
+#define CA_SET_LEVEL_WIND		9
+#define CA_SET_LEVEL_GRAVITY		10
+#define CA_SET_PLAYER_KEYS		11
+#define CA_SET_PLAYER_SPEED		12
+#define CA_SET_PLAYER_SHIELD		13
+#define CA_SET_PLAYER_ARTWORK		14
+#define CA_SET_CE_SCORE			15
+#define CA_SET_CE_VALUE			16
+
+#define CA_HEADLINE_LEVEL_ACTIONS	250
+#define CA_HEADLINE_PLAYER_ACTIONS	251
+#define CA_HEADLINE_CE_ACTIONS		252
+#define CA_UNDEFINED			255
 
 /* values for change action mode for custom elements */
 #define CA_MODE_UNDEFINED		0
@@ -369,6 +371,11 @@
 #define CA_ARG_DIRECTION_TRIGGER	(CA_ARG_DIRECTION + MV_TRIGGER)
 #define CA_ARG_DIRECTION_TRIGGER_BACK	(CA_ARG_DIRECTION + MV_TRIGGER_BACK)
 #define CA_ARG_DIRECTION_HEADLINE	(CA_ARG_DIRECTION + 999)
+#define CA_ARG_SHIELD			16000
+#define CA_ARG_SHIELD_OFF		(CA_ARG_SHIELD + 0)
+#define CA_ARG_SHIELD_NORMAL		(CA_ARG_SHIELD + 1)
+#define CA_ARG_SHIELD_DEADLY		(CA_ARG_SHIELD + 2)
+#define CA_ARG_SHIELD_HEADLINE		(CA_ARG_SHIELD + 999)
 #define CA_ARG_UNDEFINED		19999
 
 /* values for custom move patterns (bits 0 - 3: basic move directions) */
@@ -642,6 +649,11 @@
 				 (p)->drop_x == (x) && (p)->drop_y == (y))
 
 #define PLAYER_NR_GFX(g,i)	((g) + i * (IMG_PLAYER_2 - IMG_PLAYER_1))
+
+#define GET_PLAYER_ELEMENT(e)	((e) >= EL_PLAYER_1 && (e) <= EL_PLAYER_4 ? \
+				 (e) : EL_PLAYER_1)
+
+#define GET_PLAYER_NR(e)	(GET_PLAYER_ELEMENT(e) - EL_PLAYER_1)
 
 #define ANIM_FRAMES(g)		(graphic_info[g].anim_frames)
 #define ANIM_DELAY(g)		(graphic_info[g].anim_delay)
@@ -1788,6 +1800,9 @@ struct LevelInfo
   int extra_time;
   int time_orb_time;
 
+  int start_element[MAX_PLAYERS];
+  boolean use_start_element[MAX_PLAYERS];
+
   /* values for the new EMC elements */
   int android_move_time;
   int android_clone_time;
@@ -1935,13 +1950,13 @@ struct ElementChangeInfo
   int trigger_side;		/* side triggering change */
   int trigger_page;		/* page triggering change */
 
-  short target_element;		/* target element after change */
+  int target_element;		/* target element after change */
 
   int delay_fixed;		/* added frame delay before changed (fixed) */
   int delay_random;		/* added frame delay before changed (random) */
   int delay_frames;		/* either 1 (frames) or 50 (seconds; 50 fps) */
 
-  short trigger_element;	/* element triggering change */
+  int trigger_element;		/* element triggering change */
 
   struct Content target_content;/* elements for extended change target */
   boolean use_target_content;	/* use extended change target */
@@ -1981,7 +1996,7 @@ struct ElementChangeInfo
 struct ElementGroupInfo
 {
   int num_elements;			/* number of elements in this group */
-  short element[MAX_ELEMENTS_IN_GROUP];	/* list of elements in this group */
+  int element[MAX_ELEMENTS_IN_GROUP];	/* list of elements in this group */
 
   int choice_mode;		/* how to choose element from group */
 
@@ -2032,7 +2047,7 @@ struct ElementInfo
   /* ---------- special element property values ---------- */
 
   boolean use_gfx_element;	/* use custom graphic element */
-  short gfx_element;		/* optional custom graphic element */
+  int gfx_element;		/* optional custom graphic element */
 
   int access_direction;		/* accessible from which direction */
 

@@ -439,18 +439,19 @@
 #define GADGET_ID_MAGIC_BALL_CONTENT_6	(GADGET_ID_DRAWING_AREA_FIRST + 15)
 #define GADGET_ID_MAGIC_BALL_CONTENT_7	(GADGET_ID_DRAWING_AREA_FIRST + 16)
 #define GADGET_ID_AMOEBA_CONTENT	(GADGET_ID_DRAWING_AREA_FIRST + 17)
-#define GADGET_ID_CUSTOM_GRAPHIC	(GADGET_ID_DRAWING_AREA_FIRST + 18)
-#define GADGET_ID_CUSTOM_CONTENT	(GADGET_ID_DRAWING_AREA_FIRST + 19)
-#define GADGET_ID_CUSTOM_MOVE_ENTER	(GADGET_ID_DRAWING_AREA_FIRST + 20)
-#define GADGET_ID_CUSTOM_MOVE_LEAVE	(GADGET_ID_DRAWING_AREA_FIRST + 21)
-#define GADGET_ID_CUSTOM_CHANGE_TARGET	(GADGET_ID_DRAWING_AREA_FIRST + 22)
-#define GADGET_ID_CUSTOM_CHANGE_CONTENT	(GADGET_ID_DRAWING_AREA_FIRST + 23)
-#define GADGET_ID_CUSTOM_CHANGE_TRIGGER	(GADGET_ID_DRAWING_AREA_FIRST + 24)
-#define GADGET_ID_GROUP_CONTENT		(GADGET_ID_DRAWING_AREA_FIRST + 25)
-#define GADGET_ID_RANDOM_BACKGROUND	(GADGET_ID_DRAWING_AREA_FIRST + 26)
+#define GADGET_ID_START_ELEMENT		(GADGET_ID_DRAWING_AREA_FIRST + 18)
+#define GADGET_ID_CUSTOM_GRAPHIC	(GADGET_ID_DRAWING_AREA_FIRST + 19)
+#define GADGET_ID_CUSTOM_CONTENT	(GADGET_ID_DRAWING_AREA_FIRST + 20)
+#define GADGET_ID_CUSTOM_MOVE_ENTER	(GADGET_ID_DRAWING_AREA_FIRST + 21)
+#define GADGET_ID_CUSTOM_MOVE_LEAVE	(GADGET_ID_DRAWING_AREA_FIRST + 22)
+#define GADGET_ID_CUSTOM_CHANGE_TARGET	(GADGET_ID_DRAWING_AREA_FIRST + 23)
+#define GADGET_ID_CUSTOM_CHANGE_CONTENT	(GADGET_ID_DRAWING_AREA_FIRST + 24)
+#define GADGET_ID_CUSTOM_CHANGE_TRIGGER	(GADGET_ID_DRAWING_AREA_FIRST + 25)
+#define GADGET_ID_GROUP_CONTENT		(GADGET_ID_DRAWING_AREA_FIRST + 26)
+#define GADGET_ID_RANDOM_BACKGROUND	(GADGET_ID_DRAWING_AREA_FIRST + 27)
 
 /* text input identifiers */
-#define GADGET_ID_TEXT_INPUT_FIRST	(GADGET_ID_DRAWING_AREA_FIRST + 27)
+#define GADGET_ID_TEXT_INPUT_FIRST	(GADGET_ID_DRAWING_AREA_FIRST + 28)
 
 #define GADGET_ID_LEVEL_NAME		(GADGET_ID_TEXT_INPUT_FIRST + 0)
 #define GADGET_ID_LEVEL_AUTHOR		(GADGET_ID_TEXT_INPUT_FIRST + 1)
@@ -547,38 +548,39 @@
 #define GADGET_ID_BLOCK_LAST_FIELD	(GADGET_ID_CHECKBUTTON_FIRST + 11)
 #define GADGET_ID_SP_BLOCK_LAST_FIELD	(GADGET_ID_CHECKBUTTON_FIRST + 12)
 #define GADGET_ID_INSTANT_RELOCATION	(GADGET_ID_CHECKBUTTON_FIRST + 13)
-#define GADGET_ID_CAN_PASS_TO_WALKABLE	(GADGET_ID_CHECKBUTTON_FIRST + 14)
-#define GADGET_ID_CAN_FALL_INTO_ACID	(GADGET_ID_CHECKBUTTON_FIRST + 15)
-#define GADGET_ID_CAN_MOVE_INTO_ACID	(GADGET_ID_CHECKBUTTON_FIRST + 16)
-#define GADGET_ID_DONT_COLLIDE_WITH	(GADGET_ID_CHECKBUTTON_FIRST + 17)
-#define GADGET_ID_CUSTOM_INDESTRUCTIBLE	(GADGET_ID_CHECKBUTTON_FIRST + 18)
-#define GADGET_ID_CUSTOM_CAN_EXPLODE	(GADGET_ID_CHECKBUTTON_FIRST + 19)
-#define GADGET_ID_CUSTOM_EXPLODE_FIRE	(GADGET_ID_CHECKBUTTON_FIRST + 20)
-#define GADGET_ID_CUSTOM_EXPLODE_SMASH	(GADGET_ID_CHECKBUTTON_FIRST + 21)
-#define GADGET_ID_CUSTOM_EXPLODE_IMPACT	(GADGET_ID_CHECKBUTTON_FIRST + 22)
-#define GADGET_ID_CUSTOM_WALK_TO_OBJECT	(GADGET_ID_CHECKBUTTON_FIRST + 23)
-#define GADGET_ID_CUSTOM_DEADLY		(GADGET_ID_CHECKBUTTON_FIRST + 24)
-#define GADGET_ID_CUSTOM_CAN_MOVE	(GADGET_ID_CHECKBUTTON_FIRST + 25)
-#define GADGET_ID_CUSTOM_CAN_FALL	(GADGET_ID_CHECKBUTTON_FIRST + 26)
-#define GADGET_ID_CUSTOM_CAN_SMASH	(GADGET_ID_CHECKBUTTON_FIRST + 27)
-#define GADGET_ID_CUSTOM_SLIPPERY	(GADGET_ID_CHECKBUTTON_FIRST + 28)
-#define GADGET_ID_CUSTOM_ACCESSIBLE	(GADGET_ID_CHECKBUTTON_FIRST + 29)
-#define GADGET_ID_CUSTOM_GRAV_REACHABLE	(GADGET_ID_CHECKBUTTON_FIRST + 30)
-#define GADGET_ID_CUSTOM_USE_LAST_VALUE	(GADGET_ID_CHECKBUTTON_FIRST + 31)
-#define GADGET_ID_CUSTOM_USE_GRAPHIC	(GADGET_ID_CHECKBUTTON_FIRST + 32)
-#define GADGET_ID_CUSTOM_USE_TEMPLATE	(GADGET_ID_CHECKBUTTON_FIRST + 33)
-#define GADGET_ID_CUSTOM_CAN_CHANGE	(GADGET_ID_CHECKBUTTON_FIRST + 34)
-#define GADGET_ID_CHANGE_USE_CONTENT	(GADGET_ID_CHECKBUTTON_FIRST + 35)
-#define GADGET_ID_CHANGE_USE_EXPLOSION	(GADGET_ID_CHECKBUTTON_FIRST + 36)
-#define GADGET_ID_CHANGE_ONLY_COMPLETE	(GADGET_ID_CHECKBUTTON_FIRST + 37)
-#define GADGET_ID_CHANGE_USE_RANDOM	(GADGET_ID_CHECKBUTTON_FIRST + 38)
-#define GADGET_ID_CHANGE_HAS_ACTION	(GADGET_ID_CHECKBUTTON_FIRST + 39)
-#define GADGET_ID_CHANGE_DELAY		(GADGET_ID_CHECKBUTTON_FIRST + 40)
-#define GADGET_ID_CHANGE_BY_DIRECT_ACT	(GADGET_ID_CHECKBUTTON_FIRST + 41)
-#define GADGET_ID_CHANGE_BY_OTHER_ACT	(GADGET_ID_CHECKBUTTON_FIRST + 42)
+#define GADGET_ID_USE_START_ELEMENT	(GADGET_ID_CHECKBUTTON_FIRST + 14)
+#define GADGET_ID_CAN_PASS_TO_WALKABLE	(GADGET_ID_CHECKBUTTON_FIRST + 15)
+#define GADGET_ID_CAN_FALL_INTO_ACID	(GADGET_ID_CHECKBUTTON_FIRST + 16)
+#define GADGET_ID_CAN_MOVE_INTO_ACID	(GADGET_ID_CHECKBUTTON_FIRST + 17)
+#define GADGET_ID_DONT_COLLIDE_WITH	(GADGET_ID_CHECKBUTTON_FIRST + 18)
+#define GADGET_ID_CUSTOM_INDESTRUCTIBLE	(GADGET_ID_CHECKBUTTON_FIRST + 19)
+#define GADGET_ID_CUSTOM_CAN_EXPLODE	(GADGET_ID_CHECKBUTTON_FIRST + 20)
+#define GADGET_ID_CUSTOM_EXPLODE_FIRE	(GADGET_ID_CHECKBUTTON_FIRST + 21)
+#define GADGET_ID_CUSTOM_EXPLODE_SMASH	(GADGET_ID_CHECKBUTTON_FIRST + 22)
+#define GADGET_ID_CUSTOM_EXPLODE_IMPACT	(GADGET_ID_CHECKBUTTON_FIRST + 23)
+#define GADGET_ID_CUSTOM_WALK_TO_OBJECT	(GADGET_ID_CHECKBUTTON_FIRST + 24)
+#define GADGET_ID_CUSTOM_DEADLY		(GADGET_ID_CHECKBUTTON_FIRST + 25)
+#define GADGET_ID_CUSTOM_CAN_MOVE	(GADGET_ID_CHECKBUTTON_FIRST + 26)
+#define GADGET_ID_CUSTOM_CAN_FALL	(GADGET_ID_CHECKBUTTON_FIRST + 27)
+#define GADGET_ID_CUSTOM_CAN_SMASH	(GADGET_ID_CHECKBUTTON_FIRST + 28)
+#define GADGET_ID_CUSTOM_SLIPPERY	(GADGET_ID_CHECKBUTTON_FIRST + 29)
+#define GADGET_ID_CUSTOM_ACCESSIBLE	(GADGET_ID_CHECKBUTTON_FIRST + 30)
+#define GADGET_ID_CUSTOM_GRAV_REACHABLE	(GADGET_ID_CHECKBUTTON_FIRST + 31)
+#define GADGET_ID_CUSTOM_USE_LAST_VALUE	(GADGET_ID_CHECKBUTTON_FIRST + 32)
+#define GADGET_ID_CUSTOM_USE_GRAPHIC	(GADGET_ID_CHECKBUTTON_FIRST + 33)
+#define GADGET_ID_CUSTOM_USE_TEMPLATE	(GADGET_ID_CHECKBUTTON_FIRST + 34)
+#define GADGET_ID_CUSTOM_CAN_CHANGE	(GADGET_ID_CHECKBUTTON_FIRST + 35)
+#define GADGET_ID_CHANGE_USE_CONTENT	(GADGET_ID_CHECKBUTTON_FIRST + 36)
+#define GADGET_ID_CHANGE_USE_EXPLOSION	(GADGET_ID_CHECKBUTTON_FIRST + 37)
+#define GADGET_ID_CHANGE_ONLY_COMPLETE	(GADGET_ID_CHECKBUTTON_FIRST + 38)
+#define GADGET_ID_CHANGE_USE_RANDOM	(GADGET_ID_CHECKBUTTON_FIRST + 39)
+#define GADGET_ID_CHANGE_HAS_ACTION	(GADGET_ID_CHECKBUTTON_FIRST + 40)
+#define GADGET_ID_CHANGE_DELAY		(GADGET_ID_CHECKBUTTON_FIRST + 41)
+#define GADGET_ID_CHANGE_BY_DIRECT_ACT	(GADGET_ID_CHECKBUTTON_FIRST + 42)
+#define GADGET_ID_CHANGE_BY_OTHER_ACT	(GADGET_ID_CHECKBUTTON_FIRST + 43)
 
 /* gadgets for buttons in element list */
-#define GADGET_ID_ELEMENTLIST_FIRST	(GADGET_ID_CHECKBUTTON_FIRST + 43)
+#define GADGET_ID_ELEMENTLIST_FIRST	(GADGET_ID_CHECKBUTTON_FIRST + 44)
 #define GADGET_ID_ELEMENTLIST_LAST	(GADGET_ID_ELEMENTLIST_FIRST +	\
 	 				ED_NUM_ELEMENTLIST_BUTTONS - 1)
 
@@ -764,37 +766,38 @@
 #define ED_CHECKBUTTON_ID_BLOCK_LAST_FIELD	9
 #define ED_CHECKBUTTON_ID_SP_BLOCK_LAST_FIELD	10
 #define ED_CHECKBUTTON_ID_INSTANT_RELOCATION	11
-#define ED_CHECKBUTTON_ID_CAN_PASS_TO_WALKABLE	12
-#define ED_CHECKBUTTON_ID_CAN_FALL_INTO_ACID	13
-#define ED_CHECKBUTTON_ID_CAN_MOVE_INTO_ACID	14
-#define ED_CHECKBUTTON_ID_DONT_COLLIDE_WITH	15
-#define ED_CHECKBUTTON_ID_CUSTOM_USE_GRAPHIC	16
-#define ED_CHECKBUTTON_ID_CUSTOM_USE_TEMPLATE	17
-#define ED_CHECKBUTTON_ID_CUSTOM_ACCESSIBLE	18
-#define ED_CHECKBUTTON_ID_CUSTOM_GRAV_REACHABLE	19
-#define ED_CHECKBUTTON_ID_CUSTOM_USE_LAST_VALUE	20
-#define ED_CHECKBUTTON_ID_CUSTOM_WALK_TO_OBJECT	21
-#define ED_CHECKBUTTON_ID_CUSTOM_INDESTRUCTIBLE	22
-#define ED_CHECKBUTTON_ID_CUSTOM_CAN_MOVE	23
-#define ED_CHECKBUTTON_ID_CUSTOM_CAN_FALL	24
-#define ED_CHECKBUTTON_ID_CUSTOM_CAN_SMASH	25
-#define ED_CHECKBUTTON_ID_CUSTOM_SLIPPERY	26
-#define ED_CHECKBUTTON_ID_CUSTOM_DEADLY		27
-#define ED_CHECKBUTTON_ID_CUSTOM_CAN_EXPLODE	28
-#define ED_CHECKBUTTON_ID_CUSTOM_EXPLODE_FIRE	29
-#define ED_CHECKBUTTON_ID_CUSTOM_EXPLODE_SMASH	30
-#define ED_CHECKBUTTON_ID_CUSTOM_EXPLODE_IMPACT	31
-#define ED_CHECKBUTTON_ID_CUSTOM_CAN_CHANGE	32
-#define ED_CHECKBUTTON_ID_CHANGE_DELAY		33
-#define ED_CHECKBUTTON_ID_CHANGE_BY_DIRECT_ACT	34
-#define ED_CHECKBUTTON_ID_CHANGE_BY_OTHER_ACT	35
-#define ED_CHECKBUTTON_ID_CHANGE_USE_EXPLOSION	36
-#define ED_CHECKBUTTON_ID_CHANGE_USE_CONTENT	37
-#define ED_CHECKBUTTON_ID_CHANGE_ONLY_COMPLETE	38
-#define ED_CHECKBUTTON_ID_CHANGE_USE_RANDOM	39
-#define ED_CHECKBUTTON_ID_CHANGE_HAS_ACTION	40
+#define ED_CHECKBUTTON_ID_USE_START_ELEMENT	12
+#define ED_CHECKBUTTON_ID_CAN_PASS_TO_WALKABLE	13
+#define ED_CHECKBUTTON_ID_CAN_FALL_INTO_ACID	14
+#define ED_CHECKBUTTON_ID_CAN_MOVE_INTO_ACID	15
+#define ED_CHECKBUTTON_ID_DONT_COLLIDE_WITH	16
+#define ED_CHECKBUTTON_ID_CUSTOM_USE_GRAPHIC	17
+#define ED_CHECKBUTTON_ID_CUSTOM_USE_TEMPLATE	18
+#define ED_CHECKBUTTON_ID_CUSTOM_ACCESSIBLE	19
+#define ED_CHECKBUTTON_ID_CUSTOM_GRAV_REACHABLE	20
+#define ED_CHECKBUTTON_ID_CUSTOM_USE_LAST_VALUE	21
+#define ED_CHECKBUTTON_ID_CUSTOM_WALK_TO_OBJECT	22
+#define ED_CHECKBUTTON_ID_CUSTOM_INDESTRUCTIBLE	23
+#define ED_CHECKBUTTON_ID_CUSTOM_CAN_MOVE	24
+#define ED_CHECKBUTTON_ID_CUSTOM_CAN_FALL	25
+#define ED_CHECKBUTTON_ID_CUSTOM_CAN_SMASH	26
+#define ED_CHECKBUTTON_ID_CUSTOM_SLIPPERY	27
+#define ED_CHECKBUTTON_ID_CUSTOM_DEADLY		28
+#define ED_CHECKBUTTON_ID_CUSTOM_CAN_EXPLODE	29
+#define ED_CHECKBUTTON_ID_CUSTOM_EXPLODE_FIRE	30
+#define ED_CHECKBUTTON_ID_CUSTOM_EXPLODE_SMASH	31
+#define ED_CHECKBUTTON_ID_CUSTOM_EXPLODE_IMPACT	32
+#define ED_CHECKBUTTON_ID_CUSTOM_CAN_CHANGE	33
+#define ED_CHECKBUTTON_ID_CHANGE_DELAY		34
+#define ED_CHECKBUTTON_ID_CHANGE_BY_DIRECT_ACT	35
+#define ED_CHECKBUTTON_ID_CHANGE_BY_OTHER_ACT	36
+#define ED_CHECKBUTTON_ID_CHANGE_USE_EXPLOSION	37
+#define ED_CHECKBUTTON_ID_CHANGE_USE_CONTENT	38
+#define ED_CHECKBUTTON_ID_CHANGE_ONLY_COMPLETE	39
+#define ED_CHECKBUTTON_ID_CHANGE_USE_RANDOM	40
+#define ED_CHECKBUTTON_ID_CHANGE_HAS_ACTION	41
 
-#define ED_NUM_CHECKBUTTONS			41
+#define ED_NUM_CHECKBUTTONS			42
 
 #define ED_CHECKBUTTON_ID_LEVEL_FIRST	ED_CHECKBUTTON_ID_INITIAL_GRAVITY
 #define ED_CHECKBUTTON_ID_LEVEL_LAST	ED_CHECKBUTTON_ID_RANDOM_RESTRICTED
@@ -837,17 +840,18 @@
 #define ED_DRAWING_ID_MAGIC_BALL_CONTENT_6	15
 #define ED_DRAWING_ID_MAGIC_BALL_CONTENT_7	16
 #define ED_DRAWING_ID_AMOEBA_CONTENT		17
-#define ED_DRAWING_ID_CUSTOM_GRAPHIC		18
-#define ED_DRAWING_ID_CUSTOM_CONTENT		19
-#define ED_DRAWING_ID_CUSTOM_MOVE_ENTER		20
-#define ED_DRAWING_ID_CUSTOM_MOVE_LEAVE		21
-#define ED_DRAWING_ID_CUSTOM_CHANGE_TARGET	22
-#define ED_DRAWING_ID_CUSTOM_CHANGE_CONTENT	23
-#define ED_DRAWING_ID_CUSTOM_CHANGE_TRIGGER	24
-#define ED_DRAWING_ID_GROUP_CONTENT		25
-#define ED_DRAWING_ID_RANDOM_BACKGROUND		26
+#define ED_DRAWING_ID_START_ELEMENT		18
+#define ED_DRAWING_ID_CUSTOM_GRAPHIC		19
+#define ED_DRAWING_ID_CUSTOM_CONTENT		20
+#define ED_DRAWING_ID_CUSTOM_MOVE_ENTER		21
+#define ED_DRAWING_ID_CUSTOM_MOVE_LEAVE		22
+#define ED_DRAWING_ID_CUSTOM_CHANGE_TARGET	23
+#define ED_DRAWING_ID_CUSTOM_CHANGE_CONTENT	24
+#define ED_DRAWING_ID_CUSTOM_CHANGE_TRIGGER	25
+#define ED_DRAWING_ID_GROUP_CONTENT		26
+#define ED_DRAWING_ID_RANDOM_BACKGROUND		27
 
-#define ED_NUM_DRAWING_AREAS			27
+#define ED_NUM_DRAWING_AREAS			28
 
 
 /*
@@ -1594,25 +1598,28 @@ static struct ValueTextInfo options_change_replace_when[] =
 static struct ValueTextInfo options_action_type[] =
 {
   { CA_NO_ACTION,		"no action"			},
-  { CA_EXIT_PLAYER,		"exit player"			},
-  { CA_KILL_PLAYER,		"kill player"			},
-  { CA_MOVE_PLAYER,		"move player"			},
+  { CA_UNDEFINED,		" "				},
+  { CA_HEADLINE_LEVEL_ACTIONS,	"[level actions]"		},
   { CA_RESTART_LEVEL,		"restart level"			},
   { CA_SHOW_ENVELOPE,		"show envelope"			},
-  { CA_SET_TIME,		"set level time"		},
-  { CA_SET_GEMS,		"set needed gems"		},
-  { CA_SET_SCORE,		"set level score"		},
-  { CA_SET_KEYS,		"set player keys"		},
-  { CA_SET_SPEED,		"set player speed"		},
-  { CA_SET_GRAVITY,		"set gravity"			},
-  { CA_SET_WIND,		"set wind dir."			},
+  { CA_SET_LEVEL_TIME,		"set time"			},
+  { CA_SET_LEVEL_SCORE,		"set score"			},
+  { CA_SET_LEVEL_GEMS,		"set needed gems"		},
+  { CA_SET_LEVEL_GRAVITY,	"set gravity"			},
+  { CA_SET_LEVEL_WIND,		"set wind dir."			},
+  { CA_UNDEFINED,		" "				},
+  { CA_HEADLINE_PLAYER_ACTIONS,	"[player actions]"		},
+  { CA_MOVE_PLAYER,		"move player"			},
+  { CA_EXIT_PLAYER,		"exit player"			},
+  { CA_KILL_PLAYER,		"kill player"			},
+  { CA_SET_PLAYER_KEYS,		"set keys"			},
+  { CA_SET_PLAYER_SPEED,	"set speed"			},
+  { CA_SET_PLAYER_SHIELD,	"set shield"			},
+  { CA_SET_PLAYER_ARTWORK,	"set artwork"			},
+  { CA_UNDEFINED,		" "				},
+  { CA_HEADLINE_CE_ACTIONS,	"[CE actions]"			},
   { CA_SET_CE_SCORE,		"set CE score"			},
   { CA_SET_CE_VALUE,		"set CE value"			},
-#if 0
-  { CA_SET_DYNABOMB_NUMBER,	"set bomb number"		},
-  { CA_SET_DYNABOMB_SIZE,	"set bomb size"			},
-  { CA_SET_DYNABOMB_POWER,	"set bomb power"		},
-#endif
 
   { -1,				NULL				}
 };
@@ -1702,6 +1709,21 @@ static struct ValueTextInfo options_action_arg_number[] =
   { -1,				NULL				}
 };
 
+static struct ValueTextInfo options_action_arg_envelope[] =
+{
+  { CA_ARG_NUMBER_HEADLINE,	"[number]"			},
+  { CA_ARG_1,			"1"				},
+  { CA_ARG_2,			"2"				},
+  { CA_ARG_3,			"3"				},
+  { CA_ARG_4,			"4"				},
+  { CA_ARG_UNDEFINED,		" "				},
+  { CA_ARG_ELEMENT_HEADLINE,	"[element]"			},
+  { CA_ARG_ELEMENT_TARGET,	"target"			},
+  { CA_ARG_ELEMENT_TRIGGER,	"trigger"			},
+
+  { -1,				NULL				}
+};
+
 static struct ValueTextInfo options_action_arg_key[] =
 {
   { CA_ARG_NUMBER_HEADLINE,	"[number]"			},
@@ -1713,21 +1735,6 @@ static struct ValueTextInfo options_action_arg_key[] =
   { CA_ARG_6,			"6"				},
   { CA_ARG_7,			"7"				},
   { CA_ARG_8,			"8"				},
-  { CA_ARG_UNDEFINED,		" "				},
-  { CA_ARG_ELEMENT_HEADLINE,	"[element]"			},
-  { CA_ARG_ELEMENT_TARGET,	"target"			},
-  { CA_ARG_ELEMENT_TRIGGER,	"trigger"			},
-
-  { -1,				NULL				}
-};
-
-static struct ValueTextInfo options_action_arg_envelope[] =
-{
-  { CA_ARG_NUMBER_HEADLINE,	"[number]"			},
-  { CA_ARG_1,			"1"				},
-  { CA_ARG_2,			"2"				},
-  { CA_ARG_3,			"3"				},
-  { CA_ARG_4,			"4"				},
   { CA_ARG_UNDEFINED,		" "				},
   { CA_ARG_ELEMENT_HEADLINE,	"[element]"			},
   { CA_ARG_ELEMENT_TARGET,	"target"			},
@@ -1751,6 +1758,25 @@ static struct ValueTextInfo options_action_arg_speed[] =
   { CA_ARG_SPEED_FASTER,	"faster"			},
   { CA_ARG_UNDEFINED,		" "				},
   { CA_ARG_SPEED_RESET,		"reset"				},
+
+  { -1,				NULL				}
+};
+
+static struct ValueTextInfo options_action_arg_shield[] =
+{
+  { CA_ARG_SHIELD_HEADLINE,	"[shield]"			},
+  { CA_ARG_SHIELD_OFF,		"off"				},
+  { CA_ARG_SHIELD_NORMAL,	"normal"			},
+  { CA_ARG_SHIELD_DEADLY,	"deadly"			},
+
+  { -1,				NULL				}
+};
+
+static struct ValueTextInfo options_action_arg_artwork[] =
+{
+  { CA_ARG_ELEMENT_HEADLINE,	"[element]"			},
+  { CA_ARG_ELEMENT_TARGET,	"target"			},
+  { CA_ARG_ELEMENT_TRIGGER,	"trigger"			},
 
   { -1,				NULL				}
 };
@@ -1818,13 +1844,15 @@ action_arg_options[] =
   { CA_MOVE_PLAYER,		0,	options_action_arg_direction,	},
   { CA_RESTART_LEVEL,		0,	options_action_arg_none,	},
   { CA_SHOW_ENVELOPE,		0,	options_action_arg_envelope,	},
-  { CA_SET_TIME,		3,	options_action_arg_number,	},
-  { CA_SET_GEMS,		3,	options_action_arg_number,	},
-  { CA_SET_SCORE,		3,	options_action_arg_number,	},
-  { CA_SET_KEYS,		2,	options_action_arg_key,		},
-  { CA_SET_SPEED,		1,	options_action_arg_speed,	},
-  { CA_SET_GRAVITY,		1,	options_action_arg_gravity,	},
-  { CA_SET_WIND,		1,	options_action_arg_direction,	},
+  { CA_SET_LEVEL_TIME,		3,	options_action_arg_number,	},
+  { CA_SET_LEVEL_GEMS,		3,	options_action_arg_number,	},
+  { CA_SET_LEVEL_SCORE,		3,	options_action_arg_number,	},
+  { CA_SET_LEVEL_GRAVITY,	1,	options_action_arg_gravity,	},
+  { CA_SET_LEVEL_WIND,		1,	options_action_arg_direction,	},
+  { CA_SET_PLAYER_KEYS,		2,	options_action_arg_key,		},
+  { CA_SET_PLAYER_SPEED,	1,	options_action_arg_speed,	},
+  { CA_SET_PLAYER_SHIELD,	1,	options_action_arg_shield,	},
+  { CA_SET_PLAYER_ARTWORK,	1,	options_action_arg_artwork,	},
   { CA_SET_CE_SCORE,		3,	options_action_arg_number,	},
   { CA_SET_CE_VALUE,		3,	options_action_arg_number,	},
 
@@ -2392,6 +2420,13 @@ static struct
     "no scrolling when relocating",	"player gets relocated without delay"
   },
   {
+    ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(6),
+    GADGET_ID_USE_START_ELEMENT,	GADGET_ID_NONE,
+    &level.use_start_element[0],
+    NULL,
+    "use level start element:",	       "start level at this element's position"
+  },
+  {
     ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(3),
     GADGET_ID_CAN_PASS_TO_WALKABLE,	GADGET_ID_NONE,
     &level.can_pass_to_walkable,
@@ -2589,130 +2624,140 @@ static struct
 static struct
 {
   int x, y;
-  int area_xsize, area_ysize;
   int gadget_id;
   int gadget_id_align;
-  char *text_left, *text_right, *text_below;
+  int *value;
+  int area_xsize, area_ysize;
+  char *text_left, *text_right, *text_below, *infotext;
 } drawingarea_info[ED_NUM_DRAWING_AREAS] =
 {
   /* ---------- level playfield content ------------------------------------ */
 
   {
-    0, 0,
-    MAX_ED_FIELDX, MAX_ED_FIELDY,
+    0,					0,
     GADGET_ID_DRAWING_LEVEL,		GADGET_ID_NONE,
-    NULL, NULL,				NULL
+    NULL,				MAX_ED_FIELDX, MAX_ED_FIELDY,
+    NULL, NULL, NULL,			NULL
   },
 
   /* ---------- yam yam content -------------------------------------------- */
 
   {
     ED_AREA_YAMYAM_CONTENT_XPOS(0),	ED_AREA_YAMYAM_CONTENT_YPOS(0),
-    3, 3,
     GADGET_ID_YAMYAM_CONTENT_0,		GADGET_ID_NONE,
-    NULL, NULL,				"1"
+    &level.yamyam_content[0].e[0][0],	3, 3,
+    NULL, NULL, "1",			NULL
   },
   {
     ED_AREA_YAMYAM_CONTENT_XPOS(1),	ED_AREA_YAMYAM_CONTENT_YPOS(1),
-    3, 3,
     GADGET_ID_YAMYAM_CONTENT_1,		GADGET_ID_NONE,
-    NULL, NULL,				"2"
+    &level.yamyam_content[1].e[0][0],	3, 3,
+    NULL, NULL, "2",			NULL
   },
   {
     ED_AREA_YAMYAM_CONTENT_XPOS(2),	ED_AREA_YAMYAM_CONTENT_YPOS(2),
-    3, 3,
     GADGET_ID_YAMYAM_CONTENT_2,		GADGET_ID_NONE,
-    NULL, NULL,				"3"
+    &level.yamyam_content[2].e[0][0],	3, 3,
+    NULL, NULL, "3",			NULL
   },
   {
     ED_AREA_YAMYAM_CONTENT_XPOS(3),	ED_AREA_YAMYAM_CONTENT_YPOS(3),
-    3, 3,
     GADGET_ID_YAMYAM_CONTENT_3,		GADGET_ID_NONE,
-    NULL, NULL,				"4"
+    &level.yamyam_content[3].e[0][0],	3, 3,
+    NULL, NULL, "4",			NULL
   },
   {
     ED_AREA_YAMYAM_CONTENT_XPOS(4),	ED_AREA_YAMYAM_CONTENT_YPOS(4),
-    3, 3,
     GADGET_ID_YAMYAM_CONTENT_4,		GADGET_ID_NONE,
-    NULL, NULL,				"5"
+    &level.yamyam_content[4].e[0][0],	3, 3,
+    NULL, NULL, "5",			NULL
   },
   {
     ED_AREA_YAMYAM_CONTENT_XPOS(5),	ED_AREA_YAMYAM_CONTENT_YPOS(5),
-    3, 3,
     GADGET_ID_YAMYAM_CONTENT_5,		GADGET_ID_NONE,
-    NULL, NULL,				"6"
+    &level.yamyam_content[5].e[0][0],	3, 3,
+    NULL, NULL, "6",			NULL
   },
   {
     ED_AREA_YAMYAM_CONTENT_XPOS(6),	ED_AREA_YAMYAM_CONTENT_YPOS(6),
-    3, 3,
     GADGET_ID_YAMYAM_CONTENT_6,		GADGET_ID_NONE,
-    NULL, NULL,				"7"
+    &level.yamyam_content[6].e[0][0],	3, 3,
+    NULL, NULL, "7",			NULL
   },
   {
     ED_AREA_YAMYAM_CONTENT_XPOS(7),	ED_AREA_YAMYAM_CONTENT_YPOS(7),
-    3, 3,
     GADGET_ID_YAMYAM_CONTENT_7,		GADGET_ID_NONE,
-    NULL, NULL,				"8"
+    &level.yamyam_content[7].e[0][0],	3, 3,
+    NULL, NULL, "8",			NULL
   },
 
   /* ---------- magic ball content ----------------------------------------- */
 
   {
     ED_AREA_MAGIC_BALL_CONTENT_XPOS(0),	ED_AREA_MAGIC_BALL_CONTENT_YPOS(0),
-    3, 3,
     GADGET_ID_MAGIC_BALL_CONTENT_0,	GADGET_ID_NONE,
-    NULL, NULL,				"1"
+    &level.ball_content[0].e[0][0],	3, 3,
+    NULL, NULL, "1",			NULL
   },
   {
     ED_AREA_MAGIC_BALL_CONTENT_XPOS(1),	ED_AREA_MAGIC_BALL_CONTENT_YPOS(1),
-    3, 3,
     GADGET_ID_MAGIC_BALL_CONTENT_1,	GADGET_ID_NONE,
-    NULL, NULL,				"2"
+    &level.ball_content[1].e[0][0],	3, 3,
+    NULL, NULL, "2",			NULL
   },
   {
     ED_AREA_MAGIC_BALL_CONTENT_XPOS(2),	ED_AREA_MAGIC_BALL_CONTENT_YPOS(2),
-    3, 3,
     GADGET_ID_MAGIC_BALL_CONTENT_2,	GADGET_ID_NONE,
-    NULL, NULL,				"3"
+    &level.ball_content[2].e[0][0],	3, 3,
+    NULL, NULL, "3",			NULL
   },
   {
     ED_AREA_MAGIC_BALL_CONTENT_XPOS(3),	ED_AREA_MAGIC_BALL_CONTENT_YPOS(3),
-    3, 3,
     GADGET_ID_MAGIC_BALL_CONTENT_3,	GADGET_ID_NONE,
-    NULL, NULL,				"4"
+    &level.ball_content[3].e[0][0],	3, 3,
+    NULL, NULL, "4",			NULL
   },
   {
     ED_AREA_MAGIC_BALL_CONTENT_XPOS(4),	ED_AREA_MAGIC_BALL_CONTENT_YPOS(4),
-    3, 3,
     GADGET_ID_MAGIC_BALL_CONTENT_4,	GADGET_ID_NONE,
-    NULL, NULL,				"5"
+    &level.ball_content[4].e[0][0],	3, 3,
+    NULL, NULL, "5",			NULL
   },
   {
     ED_AREA_MAGIC_BALL_CONTENT_XPOS(5),	ED_AREA_MAGIC_BALL_CONTENT_YPOS(5),
-    3, 3,
     GADGET_ID_MAGIC_BALL_CONTENT_5,	GADGET_ID_NONE,
-    NULL, NULL,				"6"
+    &level.ball_content[5].e[0][0],	3, 3,
+    NULL, NULL, "6",			NULL
   },
   {
     ED_AREA_MAGIC_BALL_CONTENT_XPOS(6),	ED_AREA_MAGIC_BALL_CONTENT_YPOS(6),
-    3, 3,
     GADGET_ID_MAGIC_BALL_CONTENT_6,	GADGET_ID_NONE,
-    NULL, NULL,				"7"
+    &level.ball_content[6].e[0][0],	3, 3,
+    NULL, NULL, "7",			NULL
   },
   {
     ED_AREA_MAGIC_BALL_CONTENT_XPOS(7),	ED_AREA_MAGIC_BALL_CONTENT_YPOS(7),
-    3, 3,
     GADGET_ID_MAGIC_BALL_CONTENT_7,	GADGET_ID_NONE,
-    NULL, NULL,				"8"
+    &level.ball_content[7].e[0][0],	3, 3,
+    NULL, NULL, "8",			NULL
   },
 
   /* ---------- amoeba content --------------------------------------------- */
 
   {
     ED_AREA_1X1_SETTINGS_XPOS(0),	ED_AREA_1X1_SETTINGS_YPOS(3),
-    1, 1,
     GADGET_ID_AMOEBA_CONTENT,		GADGET_ID_NONE,
-    "content:", NULL,			NULL
+    &level.amoeba_content,		1, 1,
+    "content:", NULL, NULL,		"amoeba content"
+  },
+
+  /* ---------- level start element ---------------------------------------- */
+
+  {
+    -1,					ED_AREA_1X1_SETTINGS_YPOS(6),
+    GADGET_ID_START_ELEMENT,		GADGET_ID_USE_START_ELEMENT,
+    &level.start_element[0],		1, 1,
+    NULL, NULL, NULL,			"level start element"
   },
 
   /* ---------- element settings: configure 1 (custom elements) ----------- */
@@ -2721,9 +2766,9 @@ static struct
 
   {
     -1,					ED_AREA_1X1_SETTINGS_YPOS(1),
-    1, 1,
     GADGET_ID_CUSTOM_GRAPHIC,		GADGET_ID_CUSTOM_USE_GRAPHIC,
-    NULL, NULL,				NULL
+    &custom_element.gfx_element,	1, 1,
+    NULL, NULL, NULL,			"custom graphic element"
   },
 
   /* ---------- element settings: configure 2 (custom elements) ----------- */
@@ -2732,24 +2777,24 @@ static struct
 
   {
     -1,					ED_AREA_3X3_SETTINGS_YPOS(10),
-    3, 3,
     GADGET_ID_CUSTOM_CONTENT,		GADGET_ID_NONE,	/* align three rows */
-    "content:", NULL,			NULL
+    &custom_element.content.e[0][0],	3, 3,
+    "content:", NULL, NULL,		NULL
   },
 
   /* ---------- custom enter and leave element (when moving) --------------- */
 
   {
     ED_AREA_1X1_SETTINGS_XPOS(1),	ED_AREA_1X1_SETTINGS_YPOS(3),
-    1, 1,
     GADGET_ID_CUSTOM_MOVE_ENTER,	GADGET_ID_NONE,
-    "can dig:", " ",			NULL
+    &custom_element.move_enter_element,	1, 1,
+    "can dig:", " ", NULL,		"element that can be digged/collected"
   },
   {
     -1,					ED_AREA_1X1_SETTINGS_YPOS(3),
-    1, 1,
     GADGET_ID_CUSTOM_MOVE_LEAVE,	GADGET_ID_CUSTOM_MOVE_LEAVE_TYPE,
-    NULL, NULL,				NULL
+    &custom_element.move_leave_element,	1, 1,
+    NULL, NULL, NULL,			"element that will be left behind"
   },
 
   /* ---------- element settings: advanced (custom elements) --------------- */
@@ -2758,45 +2803,45 @@ static struct
 
   {
     -1,					ED_AREA_1X1_SETTINGS_YPOS(1),
-    1, 1,
     GADGET_ID_CUSTOM_CHANGE_TARGET,	GADGET_ID_CUSTOM_CAN_CHANGE,
-    NULL, "after/when:",		NULL
+    &custom_element_change.target_element, 1, 1,
+    NULL, "after/when:", NULL,		"new target element after change"
   },
 
   /* ---------- custom change content (extended change target) ------------- */
 
   {
     -1,					ED_AREA_3X3_SETTINGS_YPOS(10),
-    3, 3,
     GADGET_ID_CUSTOM_CHANGE_CONTENT,	GADGET_ID_NONE,	/* align three rows */
-    NULL, NULL,				NULL
+    &custom_element_change.target_content.e[0][0], 3, 3,
+    NULL, NULL, NULL,			"new extended elements after change"
   },
 
   /* ---------- custom change trigger (element causing change) ------------- */
 
   {
     -1,					ED_AREA_1X1_SETTINGS_YPOS(5),
-    1, 1,
     GADGET_ID_CUSTOM_CHANGE_TRIGGER,	GADGET_ID_CHANGE_OTHER_ACTION,
-    NULL, NULL,				NULL
+    &custom_element_change.trigger_element, 1, 1,
+    NULL, NULL, NULL,			"other element triggering change"
   },
 
   /* ---------- group element content -------------------------------------- */
 
   {
     ED_AREA_1X1_SETTINGS_XPOS(0),	ED_AREA_1X1_SETTINGS_YPOS(4),
-    MAX_ELEMENTS_IN_GROUP, 1,
     GADGET_ID_GROUP_CONTENT,		GADGET_ID_NONE,
-    "content:", NULL,			NULL
+    &group_element_info.element[0],	MAX_ELEMENTS_IN_GROUP, 1,
+    "content:", NULL, NULL,		NULL
   },
 
   /* ---------- random background (for random painting) -------------------- */
 
   {
     -1,					ED_ELEMENT_SETTINGS_YPOS(14),
-    1, 1,
     GADGET_ID_RANDOM_BACKGROUND,	GADGET_ID_RANDOM_RESTRICTED,
-    NULL, NULL,				NULL
+    &random_placement_background_element, 1, 1,
+    NULL, NULL, NULL,			"random placement background"
   },
 };
 
@@ -4403,64 +4448,16 @@ static void DrawDrawingArea(int id)
   struct GadgetInfo *gi = level_editor_gadget[drawingarea_info[id].gadget_id];
   int x, y;
 
-  if (id == ED_DRAWING_ID_RANDOM_BACKGROUND)
-    DrawMiniGraphicExt(drawto, gi->x, gi->y,
-		       el2edimg(random_placement_background_element));
-  else if (id == ED_DRAWING_ID_AMOEBA_CONTENT)
-    DrawMiniGraphicExt(drawto, gi->x, gi->y, el2edimg(level.amoeba_content));
-  else if (id == ED_DRAWING_ID_CUSTOM_GRAPHIC)
-    DrawMiniGraphicExt(drawto, gi->x, gi->y,
-		       el2edimg(custom_element.gfx_element));
-  else if (id == ED_DRAWING_ID_CUSTOM_CONTENT)
-    for (y = 0; y < 3; y++)
-      for (x = 0; x < 3; x++)
-	DrawMiniGraphicExt(drawto,
-			   gi->x + x * MINI_TILEX, gi->y + y * MINI_TILEY,
-			   el2edimg(custom_element.content.e[x][y]));
-  else if (id == ED_DRAWING_ID_CUSTOM_MOVE_ENTER)
-    DrawMiniGraphicExt(drawto, gi->x, gi->y,
-		       el2edimg(custom_element.move_enter_element));
-  else if (id == ED_DRAWING_ID_CUSTOM_MOVE_LEAVE)
-    DrawMiniGraphicExt(drawto, gi->x, gi->y,
-		       el2edimg(custom_element.move_leave_element));
-  else if (id == ED_DRAWING_ID_CUSTOM_CHANGE_TARGET)
-    DrawMiniGraphicExt(drawto, gi->x, gi->y,
-		       el2edimg(custom_element_change.target_element));
-  else if (id == ED_DRAWING_ID_CUSTOM_CHANGE_CONTENT)
-    for (y = 0; y < 3; y++)
-      for (x = 0; x < 3; x++)
-	DrawMiniGraphicExt(drawto,
-			   gi->x + x * MINI_TILEX, gi->y + y * MINI_TILEY,
-			   el2edimg(custom_element_change.target_content.e[x][y]));
-  else if (id == ED_DRAWING_ID_CUSTOM_CHANGE_TRIGGER)
-    DrawMiniGraphicExt(drawto, gi->x, gi->y,
-		       el2edimg(custom_element_change.trigger_element));
-  else if (id == ED_DRAWING_ID_GROUP_CONTENT)
-    for (x = 0; x < group_element_info.num_elements; x++)
-      DrawMiniGraphicExt(drawto, gi->x + x * MINI_TILEX, gi->y,
-			 el2edimg(group_element_info.element[x]));
-  else if (id >= ED_DRAWING_ID_YAMYAM_CONTENT_0 &&
-	   id <= ED_DRAWING_ID_YAMYAM_CONTENT_7)
-  {
-    int nr = id - ED_DRAWING_ID_YAMYAM_CONTENT_0;
+  int *value = drawingarea_info[id].value;
+  int area_xsize = drawingarea_info[id].area_xsize;
+  int area_ysize = drawingarea_info[id].area_ysize;
 
-    for (y = 0; y < 3; y++)
-      for (x = 0; x < 3; x++)
-	DrawMiniGraphicExt(drawto,
-			   gi->x + x * MINI_TILEX, gi->y + y * MINI_TILEY,
-			   el2edimg(level.yamyam_content[nr].e[x][y]));
-  }
-  else if (id >= ED_DRAWING_ID_MAGIC_BALL_CONTENT_0 &&
-	   id <= ED_DRAWING_ID_MAGIC_BALL_CONTENT_7)
-  {
-    int nr = id - ED_DRAWING_ID_MAGIC_BALL_CONTENT_0;
-
-    for (y = 0; y < 3; y++)
-      for (x = 0; x < 3; x++)
-	DrawMiniGraphicExt(drawto,
-			   gi->x + x * MINI_TILEX, gi->y + y * MINI_TILEY,
-			   el2edimg(level.ball_content[nr].e[x][y]));
-  }
+  for (x = 0; x < area_xsize; x++)
+    for (y = 0; y < area_ysize; y++)
+      DrawMiniGraphicExt(drawto,
+			 gi->x + x * MINI_TILEX,
+			 gi->y + y * MINI_TILEY,
+			 el2edimg(value[x * area_ysize + y]));
 }
 
 static void ScrollMiniLevel(int from_x, int from_y, int scroll)
@@ -7363,14 +7360,27 @@ static void DrawPropertiesConfig()
 
   if (ELEM_IS_PLAYER(properties_element))
   {
+    int player_nr = GET_PLAYER_NR(properties_element);
+
+    /* this property can be set for every player individually */
+    drawingarea_info[ED_DRAWING_ID_START_ELEMENT].value =
+      &level.start_element[player_nr];
+
+    /* this property can be set for every player individually */
+    checkbutton_info[ED_CHECKBUTTON_ID_USE_START_ELEMENT].value =
+      &level.use_start_element[player_nr];
+
     MapCheckbuttonGadget(ED_CHECKBUTTON_ID_CAN_FALL_INTO_ACID);
     MapCheckbuttonGadget(properties_element == EL_SP_MURPHY ?
 			 ED_CHECKBUTTON_ID_SP_BLOCK_LAST_FIELD :
 			 ED_CHECKBUTTON_ID_BLOCK_LAST_FIELD);
     MapCheckbuttonGadget(ED_CHECKBUTTON_ID_BLOCK_SNAP_FIELD);
     MapCheckbuttonGadget(ED_CHECKBUTTON_ID_INSTANT_RELOCATION);
+    MapCheckbuttonGadget(ED_CHECKBUTTON_ID_USE_START_ELEMENT);
     MapCheckbuttonGadget(ED_CHECKBUTTON_ID_CAN_PASS_TO_WALKABLE);
     MapCheckbuttonGadget(ED_CHECKBUTTON_ID_DOUBLE_SPEED);
+
+    MapDrawingArea(ED_DRAWING_ID_START_ELEMENT);
   }
 
   if (IS_GEM(properties_element))
@@ -8454,6 +8464,9 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
       }
       else
       {
+	int type_id = gi->custom_type_id;
+	int pos = sx * drawingarea_info[type_id].area_ysize + sy;
+
 	if (item_xsize == MINI_TILEX && item_ysize == MINI_TILEY)
 	  DrawMiniGraphicExt(drawto,
 			     gi->x + sx * MINI_TILEX,
@@ -8465,71 +8478,19 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 			 gi->y + sy * TILEY,
 			 el2img(new_element), 0);
 
-	if (id == GADGET_ID_AMOEBA_CONTENT)
-	  level.amoeba_content = new_element;
-	else if (id == GADGET_ID_CUSTOM_GRAPHIC)
-	{
+	if (id == GADGET_ID_CUSTOM_GRAPHIC)
 	  new_element = GFX_ELEMENT(new_element);
-	  custom_element.gfx_element = new_element;
 
-	  CopyElementPropertiesToGame(properties_element);
+	drawingarea_info[type_id].value[pos] = new_element;
 
+	CopyElementPropertiesToGame(properties_element);
+
+	if (id == GADGET_ID_CUSTOM_GRAPHIC)
+	{
 	  UpdateCustomElementGraphicGadgets();
 
 	  FrameCounter = 0;	/* restart animation frame counter */
 	}
-	else if (id == GADGET_ID_CUSTOM_CONTENT)
-	{
-	  custom_element.content.e[sx][sy] = new_element;
-
-	  CopyCustomElementPropertiesToGame(properties_element);
-	}
-	else if (id == GADGET_ID_CUSTOM_MOVE_ENTER)
-	{
-	  custom_element.move_enter_element = new_element;
-
-	  CopyCustomElementPropertiesToGame(properties_element);
-	}
-	else if (id == GADGET_ID_CUSTOM_MOVE_LEAVE)
-	{
-	  custom_element.move_leave_element = new_element;
-
-	  CopyCustomElementPropertiesToGame(properties_element);
-	}
-	else if (id == GADGET_ID_CUSTOM_CHANGE_TARGET)
-	{
-	  custom_element_change.target_element = new_element;
-
-	  CopyCustomElementPropertiesToGame(properties_element);
-	}
-	else if (id == GADGET_ID_CUSTOM_CHANGE_CONTENT)
-	{
-	  custom_element_change.target_content.e[sx][sy] = new_element;
-
-	  CopyCustomElementPropertiesToGame(properties_element);
-	}
-	else if (id == GADGET_ID_CUSTOM_CHANGE_TRIGGER)
-	{
-	  custom_element_change.trigger_element = new_element;
-
-	  CopyCustomElementPropertiesToGame(properties_element);
-	}
-	else if (id == GADGET_ID_GROUP_CONTENT)
-	{
-	  group_element_info.element[sx] = new_element;
-
-	  CopyGroupElementPropertiesToGame(properties_element);
-	}
-	else if (id == GADGET_ID_RANDOM_BACKGROUND)
-	  random_placement_background_element = new_element;
-	else if (id >= GADGET_ID_YAMYAM_CONTENT_0 &&
-		 id <= GADGET_ID_YAMYAM_CONTENT_7)
-	  level.yamyam_content[id - GADGET_ID_YAMYAM_CONTENT_0].e[sx][sy] =
-	    new_element;
-	else if (id >= GADGET_ID_MAGIC_BALL_CONTENT_0 &&
-		 id <= GADGET_ID_MAGIC_BALL_CONTENT_7)
-	  level.ball_content[id - GADGET_ID_MAGIC_BALL_CONTENT_0].e[sx][sy] =
-	    new_element;
       }
       break;
 
@@ -8628,39 +8589,12 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 		      MB_LEFTBUTTON);
       else if (draw_level)
 	PickDrawingElement(button, Feld[lx][ly]);
-      else if (id == GADGET_ID_AMOEBA_CONTENT)
-	PickDrawingElement(button, level.amoeba_content);
-      else if (id == GADGET_ID_CUSTOM_GRAPHIC)
-	PickDrawingElement(button, custom_element.gfx_element);
-      else if (id == GADGET_ID_CUSTOM_CONTENT)
-	PickDrawingElement(button, custom_element.content.e[sx][sy]);
-      else if (id == GADGET_ID_CUSTOM_MOVE_ENTER)
-	PickDrawingElement(button, custom_element.move_enter_element);
-      else if (id == GADGET_ID_CUSTOM_MOVE_LEAVE)
-	PickDrawingElement(button, custom_element.move_leave_element);
-      else if (id == GADGET_ID_CUSTOM_CHANGE_TARGET)
-	PickDrawingElement(button, custom_element_change.target_element);
-      else if (id == GADGET_ID_CUSTOM_CHANGE_CONTENT)
-	PickDrawingElement(button, custom_element_change.target_content.e[sx][sy]);
-      else if (id == GADGET_ID_CUSTOM_CHANGE_TRIGGER)
-	PickDrawingElement(button, custom_element_change.trigger_element);
-      else if (id == GADGET_ID_GROUP_CONTENT)
-	PickDrawingElement(button, group_element_info.element[sx]);
-      else if (id == GADGET_ID_RANDOM_BACKGROUND)
-	PickDrawingElement(button, random_placement_background_element);
-      else if (id >= GADGET_ID_YAMYAM_CONTENT_0 &&
-	       id <= GADGET_ID_YAMYAM_CONTENT_7)
+      else
       {
-	int i = id - GADGET_ID_YAMYAM_CONTENT_0;
+	int type_id = gi->custom_type_id;
+	int pos = sx * drawingarea_info[type_id].area_ysize + sy;
 
-	PickDrawingElement(button, level.yamyam_content[i].e[sx][sy]);
-      }
-      else if (id >= GADGET_ID_MAGIC_BALL_CONTENT_0 &&
-	       id <= GADGET_ID_MAGIC_BALL_CONTENT_7)
-      {
-	int i = id - GADGET_ID_MAGIC_BALL_CONTENT_0;
-
-	PickDrawingElement(button, level.ball_content[i].e[sx][sy]);
+	PickDrawingElement(button, drawingarea_info[type_id].value[pos]);
       }
 
       break;
@@ -9511,6 +9445,7 @@ static void HandleDrawingAreaInfo(struct GadgetInfo *gi)
 {
   static int start_lx, start_ly;
   int id = gi->custom_id;
+  int type_id = gi->custom_type_id;
   int sx = gi->event.x;
   int sy = gi->event.y;
   int lx = sx + level_xpos;
@@ -9629,67 +9564,27 @@ static void HandleDrawingAreaInfo(struct GadgetInfo *gi)
   }
   else if (actual_drawing_function == GADGET_ID_PICK_ELEMENT)
   {
-    int element = EL_EMPTY;
-
-    if (id == GADGET_ID_AMOEBA_CONTENT)
-      element = level.amoeba_content;
-    else if (id == GADGET_ID_CUSTOM_GRAPHIC)
-      element = custom_element.gfx_element;
-    else if (id == GADGET_ID_CUSTOM_CONTENT)
-      element = custom_element.content.e[sx][sy];
-    else if (id == GADGET_ID_CUSTOM_MOVE_ENTER)
-      element = custom_element.move_enter_element;
-    else if (id == GADGET_ID_CUSTOM_MOVE_LEAVE)
-      element = custom_element.move_leave_element;
-    else if (id == GADGET_ID_CUSTOM_CHANGE_TARGET)
-      element = custom_element_change.target_element;
-    else if (id == GADGET_ID_CUSTOM_CHANGE_CONTENT)
-      element = custom_element_change.target_content.e[sx][sy];
-    else if (id == GADGET_ID_CUSTOM_CHANGE_TRIGGER)
-      element = custom_element_change.trigger_element;
-    else if (id == GADGET_ID_GROUP_CONTENT)
-      element = group_element_info.element[sx];
-    else if (id == GADGET_ID_RANDOM_BACKGROUND)
-      element = random_placement_background_element;
-    else if (id >= GADGET_ID_YAMYAM_CONTENT_0 &&
-	     id <= GADGET_ID_YAMYAM_CONTENT_7)
-      element = level.yamyam_content[id -GADGET_ID_YAMYAM_CONTENT_0].e[sx][sy];
-    else if (id >= GADGET_ID_MAGIC_BALL_CONTENT_0 &&
-	     id <= GADGET_ID_MAGIC_BALL_CONTENT_7)
-      element =level.ball_content[id-GADGET_ID_MAGIC_BALL_CONTENT_0].e[sx][sy];
+    int pos = sx * drawingarea_info[type_id].area_ysize + sy;
+    int element = drawingarea_info[type_id].value[pos];
 
     strncpy(infotext, getElementInfoText(element), max_infotext_len);
   }
   else
   {
-    if (id == GADGET_ID_AMOEBA_CONTENT)
-      strcpy(infotext, "Amoeba content");
-    else if (id == GADGET_ID_CUSTOM_GRAPHIC)
-      strcpy(infotext, "Custom graphic element");
-    else if (id == GADGET_ID_CUSTOM_CONTENT)
-      sprintf(infotext, "Custom element content position: %d, %d", sx, sy);
-    else if (id == GADGET_ID_CUSTOM_MOVE_ENTER)
-      strcpy(infotext, "Element that can be digged/collected");
-    else if (id == GADGET_ID_CUSTOM_MOVE_LEAVE)
-      strcpy(infotext, "Element that will be left behind");
-    else if (id == GADGET_ID_CUSTOM_CHANGE_TARGET)
-      strcpy(infotext, "New target element after change");
-    else if (id == GADGET_ID_CUSTOM_CHANGE_CONTENT)
-      strcpy(infotext, "New extended elements after change");
-    else if (id == GADGET_ID_CUSTOM_CHANGE_TRIGGER)
-      strcpy(infotext, "Other element triggering change");
+    if (id == GADGET_ID_CUSTOM_CONTENT)
+      sprintf(infotext, "custom element content position: %d, %d", sx, sy);
     else if (id == GADGET_ID_GROUP_CONTENT)
-      sprintf(infotext, "Group element position: %d", sx + 1);
-    else if (id == GADGET_ID_RANDOM_BACKGROUND)
-      strcpy(infotext, "Random placement background");
+      sprintf(infotext, "group element position: %d", sx + 1);
     else if (id >= GADGET_ID_YAMYAM_CONTENT_0 &&
 	     id <= GADGET_ID_YAMYAM_CONTENT_7)
-      sprintf(infotext, "Content area %d position: %d, %d",
+      sprintf(infotext, "content area %d position: %d, %d",
 	      id - GADGET_ID_YAMYAM_CONTENT_0 + 1, sx, sy);
     else if (id >= GADGET_ID_MAGIC_BALL_CONTENT_0 &&
 	     id <= GADGET_ID_MAGIC_BALL_CONTENT_7)
-      sprintf(infotext, "Content area %d position: %d, %d",
+      sprintf(infotext, "content area %d position: %d, %d",
 	      id - GADGET_ID_MAGIC_BALL_CONTENT_0 + 1, sx, sy);
+    else if (drawingarea_info[type_id].infotext != NULL)
+      strcpy(infotext, drawingarea_info[type_id].infotext);
   }
 
   infotext[max_infotext_len] = '\0';

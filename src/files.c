@@ -207,6 +207,40 @@ static struct
     EL_PLAYER_1,			CONF_VALUE_BOOLEAN_1,
     &li.block_snap_field,		TRUE
   },
+  {
+    EL_PLAYER_1,			CONF_VALUE_BOOLEAN_2,
+    &li.use_start_element[0],		FALSE
+  },
+  {
+    EL_PLAYER_2,			CONF_VALUE_ELEMENT_2,
+    &li.use_start_element[1],		FALSE
+  },
+  {
+    EL_PLAYER_3,			CONF_VALUE_ELEMENT_2,
+    &li.use_start_element[2],		FALSE
+  },
+  {
+    EL_PLAYER_4,			CONF_VALUE_ELEMENT_2,
+    &li.use_start_element[3],		FALSE
+  },
+
+  /* ---------- 2-byte values ---------------------------------------------- */
+  {
+    EL_PLAYER_1,			CONF_VALUE_ELEMENT_1,
+    &li.start_element[0],		EL_PLAYER_1
+  },
+  {
+    EL_PLAYER_2,			CONF_VALUE_ELEMENT_1,
+    &li.start_element[1],		EL_PLAYER_2
+  },
+  {
+    EL_PLAYER_3,			CONF_VALUE_ELEMENT_1,
+    &li.start_element[2],		EL_PLAYER_3
+  },
+  {
+    EL_PLAYER_4,			CONF_VALUE_ELEMENT_1,
+    &li.start_element[3],		EL_PLAYER_4
+  },
 
   /* ---------- multi-byte values ------------------------------------------ */
   {
@@ -308,7 +342,7 @@ void setElementChangeInfoToDefaults(struct ElementChangeInfo *change)
 
   change->delay_fixed = 0;
   change->delay_random = 0;
-  change->delay_frames = 1;
+  change->delay_frames = FRAMES_PER_SECOND;
 
   change->trigger_element = EL_EMPTY_SPACE;
 

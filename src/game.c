@@ -135,9 +135,6 @@
 	((e) == EL_TRIGGER_ELEMENT ? (ch)->actual_trigger_element :	\
 	 (e) == EL_TRIGGER_PLAYER  ? (ch)->actual_trigger_player : (e))
 
-#define GET_VALID_PLAYER_ELEMENT(e)					\
-	((e) >= EL_PLAYER_1 && (e) <= EL_PLAYER_4 ? (e) : EL_PLAYER_1)
-
 #define CAN_GROW_INTO(e)						\
 	((e) == EL_SAND || (IS_DIGGABLE(e) && level.grow_into_diggable))
 
@@ -1932,6 +1929,7 @@ void InitGame()
     int start_x = 0, start_y = 0;
     int found_rating = 0;
     int found_element = EL_UNDEFINED;
+    int player_nr = local_player->index_nr;
 
     for (y = 0; y < lev_fieldy; y++) for (x = 0; x < lev_fieldx; x++)
     {
@@ -1940,6 +1938,17 @@ void InitGame()
       int xx, yy;
       boolean is_player;
 
+      if (level.use_start_element[player_nr] &&
+	  level.start_element[player_nr] == element &&
+	  found_rating < 4)
+      {
+	start_x = x;
+	start_y = y;
+
+	found_rating = 4;
+	found_element = element;
+      }
+
       if (!IS_CUSTOM_ELEMENT(element))
 	continue;
 
@@ -1947,6 +1956,7 @@ void InitGame()
       {
 	for (i = 0; i < element_info[element].num_change_pages; i++)
 	{
+	  /* check for player created from custom element as single target */
 	  content = element_info[element].change_page[i].target_element;
 	  is_player = ELEM_IS_PLAYER(content);
 
@@ -1963,6 +1973,7 @@ void InitGame()
 
       for (yy = 0; yy < 3; yy++) for (xx = 0; xx < 3; xx++)
       {
+	/* check for player created from custom element as explosion content */
 	content = element_info[element].content.e[xx][yy];
 	is_player = ELEM_IS_PLAYER(content);
 
@@ -1980,6 +1991,7 @@ void InitGame()
 
 	for (i = 0; i < element_info[element].num_change_pages; i++)
 	{
+	  /* check for player created from custom element as extended target */
 	  content =
 	    element_info[element].change_page[i].target_content.e[xx][yy];
 
@@ -2862,8 +2874,9 @@ void DrawRelocatePlayer(struct PlayerInfo *player)
 
 void RelocatePlayer(int jx, int jy, int el_player_raw)
 {
-  int el_player = GET_VALID_PLAYER_ELEMENT(el_player_raw);
-  struct PlayerInfo *player = &stored_player[el_player - EL_PLAYER_1];
+  int el_player = GET_PLAYER_ELEMENT(el_player_raw);
+  int player_nr = GET_PLAYER_NR(el_player);
+  struct PlayerInfo *player = &stored_player[player_nr];
   boolean ffwd_delay = (tape.playing && tape.fast_forward);
   boolean no_delay = (tape.warp_forward);
   int frame_delay_value = (ffwd_delay ? FfwdFrameDelay : GameFrameDelay);
@@ -6594,23 +6607,23 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
      MV_NONE);
 
   int action_arg_number_min =
-    (action_type == CA_SET_SPEED ? MOVE_STEPSIZE_MIN :
+    (action_type == CA_SET_PLAYER_SPEED ? MOVE_STEPSIZE_MIN :
      CA_ARG_MIN);
 
   int action_arg_number_max =
-    (action_type == CA_SET_SPEED ? MOVE_STEPSIZE_MAX :
-     action_type == CA_SET_GEMS ? 999 :
-     action_type == CA_SET_TIME ? 9999 :
-     action_type == CA_SET_SCORE ? 99999 :
+    (action_type == CA_SET_PLAYER_SPEED ? MOVE_STEPSIZE_MAX :
+     action_type == CA_SET_LEVEL_GEMS ? 999 :
+     action_type == CA_SET_LEVEL_TIME ? 9999 :
+     action_type == CA_SET_LEVEL_SCORE ? 99999 :
      action_type == CA_SET_CE_SCORE ? 9999 :
      action_type == CA_SET_CE_VALUE ? 9999 :
      CA_ARG_MAX);
 
   int action_arg_number_reset =
-    (action_type == CA_SET_SPEED ? TILEX / game.initial_move_delay_value :
-     action_type == CA_SET_GEMS ? level.gems_needed :
-     action_type == CA_SET_TIME ? level.time :
-     action_type == CA_SET_SCORE ? 0 :
+    (action_type == CA_SET_PLAYER_SPEED ? TILEX/game.initial_move_delay_value :
+     action_type == CA_SET_LEVEL_GEMS ? level.gems_needed :
+     action_type == CA_SET_LEVEL_TIME ? level.time :
+     action_type == CA_SET_LEVEL_SCORE ? 0 :
      action_type == CA_SET_CE_SCORE ? 0 :
 #if 1
      action_type == CA_SET_CE_VALUE ? GET_NEW_CUSTOM_VALUE(element) :
@@ -6639,9 +6652,9 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
      -1);
 
   int action_arg_number_old =
-    (action_type == CA_SET_GEMS ? local_player->gems_still_needed :
-     action_type == CA_SET_TIME ? TimeLeft :
-     action_type == CA_SET_SCORE ? local_player->score :
+    (action_type == CA_SET_LEVEL_GEMS ? local_player->gems_still_needed :
+     action_type == CA_SET_LEVEL_TIME ? TimeLeft :
+     action_type == CA_SET_LEVEL_SCORE ? local_player->score :
      action_type == CA_SET_CE_SCORE ? ei->collect_score :
      action_type == CA_SET_CE_VALUE ? CustomValue[x][y] :
      0);
@@ -6718,7 +6731,7 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
       break;
     }
 
-    case CA_SET_KEYS:
+    case CA_SET_PLAYER_KEYS:
     {
       int key_state = (action_mode == CA_MODE_ADD ? TRUE : FALSE);
       int element = getSpecialActionElement(action_arg_element,
@@ -6742,7 +6755,7 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
       break;
     }
 
-    case CA_SET_SPEED:
+    case CA_SET_PLAYER_SPEED:
     {
       for (i = 0; i < MAX_PLAYERS; i++)
       {
@@ -6779,7 +6792,43 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
       break;
     }
 
-    case CA_SET_GRAVITY:
+    case CA_SET_PLAYER_SHIELD:
+    {
+      for (i = 0; i < MAX_PLAYERS; i++)
+      {
+	if (trigger_player_bits & (1 << i))
+	{
+	  if (action_arg == CA_ARG_SHIELD_OFF)
+	  {
+	    stored_player[i].shield_normal_time_left = 0;
+	    stored_player[i].shield_deadly_time_left = 0;
+	  }
+	  else if (action_arg == CA_ARG_SHIELD_NORMAL)
+	  {
+	    stored_player[i].shield_normal_time_left = 999999;
+	  }
+	  else if (action_arg == CA_ARG_SHIELD_DEADLY)
+	  {
+	    stored_player[i].shield_normal_time_left = 999999;
+	    stored_player[i].shield_deadly_time_left = 999999;
+	  }
+	}
+      }
+
+      break;
+    }
+
+    case CA_SET_PLAYER_ARTWORK:
+    {
+      for (i = 0; i < MAX_PLAYERS; i++)
+      {
+	int element = action_arg_element;
+      }
+
+      break;
+    }
+
+    case CA_SET_LEVEL_GRAVITY:
     {
       game.gravity = (action_arg == CA_ARG_GRAVITY_OFF    ? FALSE         :
 		      action_arg == CA_ARG_GRAVITY_ON     ? TRUE          :
@@ -6788,14 +6837,14 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
       break;
     }
 
-    case CA_SET_WIND:
+    case CA_SET_LEVEL_WIND:
     {
       game.wind_direction = action_arg_direction;
 
       break;
     }
 
-    case CA_SET_GEMS:
+    case CA_SET_LEVEL_GEMS:
     {
       local_player->gems_still_needed = action_arg_number_new;
 
@@ -6804,7 +6853,7 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
       break;
     }
 
-    case CA_SET_TIME:
+    case CA_SET_LEVEL_TIME:
     {
       if (level.time > 0)	/* only modify limited time value */
       {
@@ -6820,7 +6869,7 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
       break;
     }
 
-    case CA_SET_SCORE:
+    case CA_SET_LEVEL_SCORE:
     {
       local_player->score = action_arg_number_new;
 
@@ -6860,29 +6909,6 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
 
       break;
     }
-
-#if 0
-    case CA_SET_DYNABOMB_NUMBER:
-    {
-      printf("::: CA_SET_DYNABOMB_NUMBER -- not yet implemented\n");
-
-      break;
-    }
-
-    case CA_SET_DYNABOMB_SIZE:
-    {
-      printf("::: CA_SET_DYNABOMB_SIZE -- not yet implemented\n");
-
-      break;
-    }
-
-    case CA_SET_DYNABOMB_POWER:
-    {
-      printf("::: CA_SET_DYNABOMB_POWER -- not yet implemented\n");
-
-      break;
-    }
-#endif
 
     default:
       break;
