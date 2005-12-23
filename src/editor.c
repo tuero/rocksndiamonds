@@ -5561,9 +5561,8 @@ static void MapControlButtons()
 
   /* map buttons to select level */
   counter_id = ED_COUNTER_ID_SELECT_LEVEL;
-  ModifyEditorCounterLimits(counter_id,
-			    leveldir_current->first_level,
-			    leveldir_current->last_level);
+  counterbutton_info[counter_id].min_value = leveldir_current->first_level;
+  counterbutton_info[counter_id].max_value = leveldir_current->last_level;
   MapCounterButtons(counter_id);
 }
 
