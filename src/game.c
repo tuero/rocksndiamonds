@@ -2320,12 +2320,17 @@ void GameWon()
     {
       if (!tape.playing && !setup.sound_loops)
 	PlaySoundStereo(SND_GAME_LEVELTIME_BONUS, SOUND_MIDDLE);
-      if (TimeLeft > 0 && !(TimeLeft % 10))
-	RaiseScore(level.score[SC_TIME_BONUS]);
-      if (TimeLeft > 100 && !(TimeLeft % 10))
+
+      if (TimeLeft > 100 && TimeLeft % 10 == 0)
+      {
 	TimeLeft -= 10;
+	RaiseScore(level.score[SC_TIME_BONUS] * 10);
+      }
       else
+      {
 	TimeLeft--;
+	RaiseScore(level.score[SC_TIME_BONUS]);
+      }
 
       DrawGameValue_Time(TimeLeft);
 
@@ -2348,12 +2353,17 @@ void GameWon()
     {
       if (!tape.playing && !setup.sound_loops)
 	PlaySoundStereo(SND_GAME_LEVELTIME_BONUS, SOUND_MIDDLE);
-      if (TimePlayed < 999 && !(TimePlayed % 10))
-	RaiseScore(level.score[SC_TIME_BONUS]);
-      if (TimePlayed < 900 && !(TimePlayed % 10))
+
+      if (TimePlayed < 900 && TimePlayed % 10 == 0)
+      {
 	TimePlayed += 10;
+	RaiseScore(level.score[SC_TIME_BONUS] * 10);
+      }
       else
+      {
 	TimePlayed++;
+	RaiseScore(level.score[SC_TIME_BONUS]);
+      }
 
       DrawGameValue_Time(TimePlayed);
 
@@ -6589,7 +6599,11 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
   if (!change->has_action)
     return;
 
-  /* ---------- determine action paramater values ---------- */
+  /* ---------- determine action paramater values -------------------------- */
+
+  int level_time_value =
+    (level.time > 0 ? TimeLeft :
+     TimePlayed);
 
   int action_arg_element =
     (action_arg == CA_ARG_PLAYER_TRIGGER  ? change->actual_trigger_player :
@@ -6647,6 +6661,9 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
      action_arg == CA_ARG_NUMBER_CE_VALUE ? ei->custom_value_initial :
 #endif
      action_arg == CA_ARG_NUMBER_CE_DELAY ? GET_CHANGE_DELAY(change) :
+     action_arg == CA_ARG_NUMBER_LEVEL_TIME ? level_time_value :
+     action_arg == CA_ARG_NUMBER_LEVEL_GEMS ? local_player->gems_still_needed :
+     action_arg == CA_ARG_NUMBER_LEVEL_SCORE ? local_player->score :
      action_arg == CA_ARG_ELEMENT_TARGET ? GET_NEW_CUSTOM_VALUE(change->target_element) :
      action_arg == CA_ARG_ELEMENT_TRIGGER ? change->actual_trigger_ce_value :
      -1);
@@ -6676,13 +6693,95 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
      action_arg == CA_ARG_PLAYER_TRIGGER ? trigger_player_bits :
      PLAYER_BITS_ANY);
 
-  /* ---------- execute action  ---------- */
+  /* ---------- execute action  -------------------------------------------- */
 
   switch(action_type)
   {
     case CA_NO_ACTION:
     {
       return;
+    }
+
+    /* ---------- level actions  ------------------------------------------- */
+
+    case CA_RESTART_LEVEL:
+    {
+      game.restart_level = TRUE;
+
+      break;
+    }
+
+    case CA_SHOW_ENVELOPE:
+    {
+      int element = getSpecialActionElement(action_arg_element,
+					    action_arg_number, EL_ENVELOPE_1);
+
+      if (IS_ENVELOPE(element))
+	local_player->show_envelope = element;
+
+      break;
+    }
+
+    case CA_SET_LEVEL_TIME:
+    {
+      if (level.time > 0)	/* only modify limited time value */
+      {
+	TimeLeft = action_arg_number_new;
+
+	DrawGameValue_Time(TimeLeft);
+
+	if (!TimeLeft && setup.time_limit)
+	  for (i = 0; i < MAX_PLAYERS; i++)
+	    KillPlayer(&stored_player[i]);
+      }
+
+      break;
+    }
+
+    case CA_SET_LEVEL_SCORE:
+    {
+      local_player->score = action_arg_number_new;
+
+      DrawGameValue_Score(local_player->score);
+
+      break;
+    }
+
+    case CA_SET_LEVEL_GEMS:
+    {
+      local_player->gems_still_needed = action_arg_number_new;
+
+      DrawGameValue_Emeralds(local_player->gems_still_needed);
+
+      break;
+    }
+
+    case CA_SET_LEVEL_GRAVITY:
+    {
+      game.gravity = (action_arg == CA_ARG_GRAVITY_OFF    ? FALSE         :
+		      action_arg == CA_ARG_GRAVITY_ON     ? TRUE          :
+		      action_arg == CA_ARG_GRAVITY_TOGGLE ? !game.gravity :
+		      game.gravity);
+      break;
+    }
+
+    case CA_SET_LEVEL_WIND:
+    {
+      game.wind_direction = action_arg_direction;
+
+      break;
+    }
+
+    /* ---------- player actions  ------------------------------------------ */
+
+    case CA_MOVE_PLAYER:
+    {
+      /* automatically move to the next field in specified direction */
+      for (i = 0; i < MAX_PLAYERS; i++)
+	if (trigger_player_bits & (1 << i))
+	  stored_player[i].programmed_action = action_arg_direction;
+
+      break;
     }
 
     case CA_EXIT_PLAYER:
@@ -6699,34 +6798,6 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
       for (i = 0; i < MAX_PLAYERS; i++)
 	if (action_arg_player_bits & (1 << i))
 	  KillPlayer(&stored_player[i]);
-
-      break;
-    }
-
-    case CA_MOVE_PLAYER:
-    {
-      /* automatically move to the next field in specified direction */
-      for (i = 0; i < MAX_PLAYERS; i++)
-	if (trigger_player_bits & (1 << i))
-	  stored_player[i].programmed_action = action_arg_direction;
-
-      break;
-    }
-
-    case CA_RESTART_LEVEL:
-    {
-      game.restart_level = TRUE;
-
-      break;
-    }
-
-    case CA_SHOW_ENVELOPE:
-    {
-      int element = getSpecialActionElement(action_arg_element,
-					    action_arg_number, EL_ENVELOPE_1);
-
-      if (IS_ENVELOPE(element))
-	local_player->show_envelope = element;
 
       break;
     }
@@ -6828,55 +6899,7 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
       break;
     }
 
-    case CA_SET_LEVEL_GRAVITY:
-    {
-      game.gravity = (action_arg == CA_ARG_GRAVITY_OFF    ? FALSE         :
-		      action_arg == CA_ARG_GRAVITY_ON     ? TRUE          :
-		      action_arg == CA_ARG_GRAVITY_TOGGLE ? !game.gravity :
-		      game.gravity);
-      break;
-    }
-
-    case CA_SET_LEVEL_WIND:
-    {
-      game.wind_direction = action_arg_direction;
-
-      break;
-    }
-
-    case CA_SET_LEVEL_GEMS:
-    {
-      local_player->gems_still_needed = action_arg_number_new;
-
-      DrawGameValue_Emeralds(local_player->gems_still_needed);
-
-      break;
-    }
-
-    case CA_SET_LEVEL_TIME:
-    {
-      if (level.time > 0)	/* only modify limited time value */
-      {
-	TimeLeft = action_arg_number_new;
-
-	DrawGameValue_Time(TimeLeft);
-
-	if (!TimeLeft && setup.time_limit)
-	  for (i = 0; i < MAX_PLAYERS; i++)
-	    KillPlayer(&stored_player[i]);
-      }
-
-      break;
-    }
-
-    case CA_SET_LEVEL_SCORE:
-    {
-      local_player->score = action_arg_number_new;
-
-      DrawGameValue_Score(local_player->score);
-
-      break;
-    }
+    /* ---------- CE actions  ---------------------------------------------- */
 
     case CA_SET_CE_SCORE:
     {
@@ -10636,7 +10659,7 @@ void RaiseScoreElement(int element)
       RaiseScore(level.score[SC_SHIELD]);
       break;
     case EL_EXTRA_TIME:
-      RaiseScore(level.score[SC_TIME_BONUS]);
+      RaiseScore(level.extra_time_score);
       break;
     case EL_KEY_1:
     case EL_KEY_2:

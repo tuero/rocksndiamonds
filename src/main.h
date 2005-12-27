@@ -340,6 +340,9 @@
 #define CA_ARG_NUMBER_CE_SCORE		(CA_ARG_NUMBER + 3)
 #define CA_ARG_NUMBER_CE_VALUE		(CA_ARG_NUMBER + 4)
 #define CA_ARG_NUMBER_CE_DELAY		(CA_ARG_NUMBER + 5)
+#define CA_ARG_NUMBER_LEVEL_TIME	(CA_ARG_NUMBER + 6)
+#define CA_ARG_NUMBER_LEVEL_GEMS	(CA_ARG_NUMBER + 7)
+#define CA_ARG_NUMBER_LEVEL_SCORE	(CA_ARG_NUMBER + 8)
 #define CA_ARG_NUMBER_HEADLINE		(CA_ARG_NUMBER + 999)
 #define CA_ARG_ELEMENT			12000
 #define CA_ARG_ELEMENT_TARGET		(CA_ARG_ELEMENT + 0)
@@ -1800,9 +1803,12 @@ struct LevelInfo
   int extra_time;
   int time_orb_time;
 
+  int extra_time_score;
+
   int start_element[MAX_PLAYERS];
   boolean use_start_element[MAX_PLAYERS];
 
+#if 1
   /* values for the new EMC elements */
   int android_move_time;
   int android_clone_time;
@@ -1817,6 +1823,7 @@ struct LevelInfo
   int wind_direction_initial;
   struct Content ball_content[MAX_ELEMENT_CONTENTS];
   boolean android_array[16];
+#endif
 
   int can_move_into_acid_bits;	/* bitfield to store property for elements */
   int dont_collide_with_bits;	/* bitfield to store property for elements */

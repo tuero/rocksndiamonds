@@ -1023,7 +1023,7 @@ static struct
     GADGET_ID_LEVEL_TIMESCORE_DOWN,	GADGET_ID_LEVEL_TIMESCORE_UP,
     GADGET_ID_LEVEL_TIMESCORE_TEXT,	GADGET_ID_NONE,
     &level.score[SC_TIME_BONUS],
-    "score for each 10 sec/steps left:", NULL, NULL
+    "score for each second/step left:",	NULL, NULL
   },
   {
     ED_LEVEL_SETTINGS_XPOS(0),		ED_COUNTER2_YPOS(8),
@@ -1699,6 +1699,10 @@ static struct ValueTextInfo options_action_arg_number[] =
   { CA_ARG_NUMBER_CE_DELAY,	"CE delay"			},
   { CA_ARG_NUMBER_CE_SCORE,	"CE score"			},
   { CA_ARG_NUMBER_CE_VALUE,	"CE value"			},
+  { CA_ARG_UNDEFINED,		" "				},
+  { CA_ARG_NUMBER_LEVEL_TIME,	"time"				},
+  { CA_ARG_NUMBER_LEVEL_GEMS,	"gems"				},
+  { CA_ARG_NUMBER_LEVEL_SCORE,	"score"				},
   { CA_ARG_UNDEFINED,		" "				},
   { CA_ARG_ELEMENT_HEADLINE,	"[CE value"			},
   { CA_ARG_ELEMENT_HEADLINE,	" of"				},
@@ -7218,7 +7222,7 @@ static struct
   { EL_DYNABOMB_INCREASE_POWER,	&level.score[SC_DYNAMITE],TEXT_COLLECTING },
   { EL_SHIELD_NORMAL,	&level.score[SC_SHIELD],	TEXT_COLLECTING	},
   { EL_SHIELD_DEADLY,	&level.score[SC_SHIELD],	TEXT_COLLECTING	},
-  { EL_EXTRA_TIME,	&level.score[SC_TIME_BONUS],	TEXT_COLLECTING	},
+  { EL_EXTRA_TIME,	&level.extra_time_score,	TEXT_COLLECTING	},
   { EL_KEY_1,		&level.score[SC_KEY],		TEXT_COLLECTING	},
   { EL_KEY_2,		&level.score[SC_KEY],		TEXT_COLLECTING	},
   { EL_KEY_3,		&level.score[SC_KEY],		TEXT_COLLECTING	},

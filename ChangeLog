@@ -1,3 +1,7 @@
+2005-12-27
+	* changed "score for each 10 seconds/steps left" to "1 second/step"
+	* added own score for collecting "extra time" instead of sharing it
+
 2005-12-22
 	* added "set player shield: off / normal / deadly" to CE action options
 	* added new player option "use level start element" in level editor

@@ -196,6 +196,10 @@ static struct
     &li.extra_time,			10
   },
   {
+    EL_EXTRA_TIME,			CONF_VALUE_INTEGER_2,
+    &li.extra_time_score,		10
+  },
+  {
     EL_TIME_ORB_FULL,			CONF_VALUE_INTEGER_1,
     &li.time_orb_time,			10
   },
@@ -212,15 +216,15 @@ static struct
     &li.use_start_element[0],		FALSE
   },
   {
-    EL_PLAYER_2,			CONF_VALUE_ELEMENT_2,
+    EL_PLAYER_2,			CONF_VALUE_BOOLEAN_2,
     &li.use_start_element[1],		FALSE
   },
   {
-    EL_PLAYER_3,			CONF_VALUE_ELEMENT_2,
+    EL_PLAYER_3,			CONF_VALUE_BOOLEAN_2,
     &li.use_start_element[2],		FALSE
   },
   {
-    EL_PLAYER_4,			CONF_VALUE_ELEMENT_2,
+    EL_PLAYER_4,			CONF_VALUE_BOOLEAN_2,
     &li.use_start_element[3],		FALSE
   },
 
@@ -481,7 +485,7 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
   }
 
   for (i = 0; i < LEVEL_SCORE_ELEMENTS; i++)
-    level->score[i] = 10;
+    level->score[i] = (i == SC_TIME_BONUS ? 1 : 10);
 
   level->num_yamyam_contents = STD_ELEMENT_CONTENTS;
   for (i = 0; i < MAX_ELEMENT_CONTENTS; i++)
@@ -2874,13 +2878,20 @@ static void LoadLevel_InitVersion(struct LevelInfo *level, char *filename)
   if (level->game_version < VERSION_IDENT(2,2,0,0))
     level->use_spring_bug = TRUE;
 
-  /* time orb caused limited time in endless time levels before 3.2.0-5 */
   if (level->game_version < VERSION_IDENT(3,2,0,5))
+  {
+    /* time orb caused limited time in endless time levels before 3.2.0-5 */
     level->use_time_orb_bug = TRUE;
 
-  /* default behaviour for snapping was "no snap delay" before 3.2.0-5 */
-  if (level->game_version < VERSION_IDENT(3,2,0,5))
+    /* default behaviour for snapping was "no snap delay" before 3.2.0-5 */
     level->block_snap_field = FALSE;
+
+    /* extra time score was same value as time left score before 3.2.0-5 */
+    level->extra_time_score = level->score[SC_TIME_BONUS];
+
+    /* time bonus score was given for 10 s instead of 1 s before 3.2.0-5 */
+    level->score[SC_TIME_BONUS] /= 10;
+  }
 
   /* only few elements were able to actively move into acid before 3.1.0 */
   /* trigger settings did not exist before 3.1.0; set to default "any" */
