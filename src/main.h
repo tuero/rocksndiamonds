@@ -206,8 +206,13 @@
 #define CE_HITTING_X			28
 #define CE_HIT_BY_X			29
 #define CE_BLOCKED			30
+#define CE_SWITCHED_BY_PLAYER		31
+#define CE_PLAYER_SWITCHES_X		32
+#define CE_SNAPPED_BY_PLAYER		33
+#define CE_PLAYER_SNAPS_X		34
+#define CE_MOVE_OF_X			35
 
-#define NUM_CHANGE_EVENTS		31
+#define NUM_CHANGE_EVENTS		36
 
 #define CE_BITMASK_DEFAULT		0
 
@@ -345,8 +350,9 @@
 #define CA_ARG_NUMBER_LEVEL_SCORE	(CA_ARG_NUMBER + 8)
 #define CA_ARG_NUMBER_HEADLINE		(CA_ARG_NUMBER + 999)
 #define CA_ARG_ELEMENT			12000
-#define CA_ARG_ELEMENT_TARGET		(CA_ARG_ELEMENT + 0)
-#define CA_ARG_ELEMENT_TRIGGER		(CA_ARG_ELEMENT + 1)
+#define CA_ARG_ELEMENT_RESET		(CA_ARG_ELEMENT + 0)
+#define CA_ARG_ELEMENT_TARGET		(CA_ARG_ELEMENT + 1)
+#define CA_ARG_ELEMENT_TRIGGER		(CA_ARG_ELEMENT + 2)
 #define CA_ARG_ELEMENT_HEADLINE		(CA_ARG_ELEMENT + 999)
 #define CA_ARG_SPEED			13000
 #define CA_ARG_SPEED_NOT_MOVING		(CA_ARG_SPEED + 0)
@@ -1667,7 +1673,8 @@ struct PlayerInfo
 
   int GfxAction;
 
-  boolean use_murphy_graphic;
+  boolean use_murphy;
+  int artwork_element;
 
   boolean block_last_field;
   int block_delay_adjustment;	/* needed for different engine versions */

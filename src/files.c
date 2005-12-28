@@ -1456,8 +1456,9 @@ static int LoadLevel_CUS4(FILE *file, int chunk_size, struct LevelInfo *level)
     /* always start with reliable default values */
     setElementChangeInfoToDefaults(change);
 
+    /* bits 0 - 31 of "has_event[]" ... */
     event_bits = getFile32BitBE(file);
-    for (j = 0; j < NUM_CHANGE_EVENTS; j++)
+    for (j = 0; j < MIN(NUM_CHANGE_EVENTS, 32); j++)
       if (event_bits & (1 << j))
 	change->has_event[j] = TRUE;
 
@@ -1496,8 +1497,11 @@ static int LoadLevel_CUS4(FILE *file, int chunk_size, struct LevelInfo *level)
     change->action_mode = getFile8Bit(file);
     change->action_arg = getFile16BitBE(file);
 
-    /* some free bytes for future change property values and padding */
-    ReadUnusedBytesFromFile(file, 1);
+    /* ... bits 32 - 39 of "has_event[]" (not nice, but downward compatible) */
+    event_bits = getFile8Bit(file);
+    for (j = 32; j < NUM_CHANGE_EVENTS; j++)
+      if (event_bits & (1 << (j - 32)))
+	change->has_event[j] = TRUE;
   }
 
   /* mark this custom element as modified */
@@ -3496,12 +3500,13 @@ static void SaveLevel_CUS4(FILE *file, struct LevelInfo *level, int element)
   for (i = 0; i < ei->num_change_pages; i++)
   {
     struct ElementChangeInfo *change = &ei->change_page[i];
-    unsigned long event_bits = 0;
+    unsigned long event_bits;
 
-    for (j = 0; j < NUM_CHANGE_EVENTS; j++)
+    /* bits 0 - 31 of "has_event[]" ... */
+    event_bits = 0;
+    for (j = 0; j < MIN(NUM_CHANGE_EVENTS, 32); j++)
       if (change->has_event[j])
 	event_bits |= (1 << j);
-
     putFile32BitBE(file, event_bits);
 
     putFile16BitBE(file, change->target_element);
@@ -3537,8 +3542,12 @@ static void SaveLevel_CUS4(FILE *file, struct LevelInfo *level, int element)
     putFile8Bit(file, change->action_mode);
     putFile16BitBE(file, change->action_arg);
 
-    /* some free bytes for future change property values and padding */
-    WriteUnusedBytesToFile(file, 1);
+    /* ... bits 32 - 39 of "has_event[]" (not nice, but downward compatible) */
+    event_bits = 0;
+    for (j = 32; j < NUM_CHANGE_EVENTS; j++)
+      if (change->has_event[j])
+	event_bits |= (1 << (j - 32));
+    putFile8Bit(file, event_bits);
   }
 }
 

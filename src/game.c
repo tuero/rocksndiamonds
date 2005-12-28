@@ -232,6 +232,7 @@
 
 /* forward declaration for internal use */
 
+static void SetPlayerWaiting(struct PlayerInfo *, boolean);
 static void AdvanceFrameAndPlayerCounters(int);
 
 static boolean MovePlayerOneStep(struct PlayerInfo *, int, int, int, int);
@@ -680,7 +681,7 @@ static void InitPlayerField(int x, int y, int element, boolean init_game)
       }
       else
       {
-	stored_player[0].use_murphy_graphic = TRUE;
+	stored_player[0].use_murphy = TRUE;
       }
 
       Feld[x][y] = EL_PLAYER_1;
@@ -1473,6 +1474,28 @@ static void InitGameEngine()
       access_direction_list[i].direction;
 }
 
+int get_num_special_action(int element, int action_first, int action_last)
+{
+  int num_special_action = 0;
+  int i, j;
+
+  for (i = action_first; i <= action_last; i++)
+  {
+    boolean found = FALSE;
+
+    for (j = 0; j < NUM_DIRECTIONS; j++)
+      if (el_act_dir2img(element, i, j) !=
+	  el_act_dir2img(element, ACTION_DEFAULT, j))
+	found = TRUE;
+
+    if (found)
+      num_special_action++;
+    else
+      break;
+  }
+
+  return num_special_action;
+}
 
 /*
   =============================================================================
@@ -1487,7 +1510,7 @@ void InitGame()
   boolean emulate_bd = TRUE;	/* unless non-BOULDERDASH elements found */
   boolean emulate_sb = TRUE;	/* unless non-SOKOBAN     elements found */
   boolean emulate_sp = TRUE;	/* unless non-SUPAPLEX    elements found */
-  int i, j, k, x, y;
+  int i, j, x, y;
 
   InitGameEngine();
 
@@ -1531,7 +1554,8 @@ void InitGame()
     player->Frame = 0;
     player->StepFrame = 0;
 
-    player->use_murphy_graphic = FALSE;
+    player->use_murphy = FALSE;
+    player->artwork_element = player->element_nr;
 
     player->block_last_field = FALSE;	/* initialized in InitPlayerField() */
     player->block_delay_adjustment = 0;	/* initialized in InitPlayerField() */
@@ -1570,38 +1594,13 @@ void InitGame()
     player->special_action_bored = ACTION_DEFAULT;
     player->special_action_sleeping = ACTION_DEFAULT;
 
-    player->num_special_action_bored = 0;
-    player->num_special_action_sleeping = 0;
-
-    /* determine number of special actions for bored and sleeping animation */
-    for (j = ACTION_BORING_1; j <= ACTION_BORING_LAST; j++)
-    {
-      boolean found = FALSE;
-
-      for (k = 0; k < NUM_DIRECTIONS; k++)
-	if (el_act_dir2img(player->element_nr, j, k) !=
-	    el_act_dir2img(player->element_nr, ACTION_DEFAULT, k))
-	  found = TRUE;
-
-      if (found)
-	player->num_special_action_bored++;
-      else
-	break;
-    }
-    for (j = ACTION_SLEEPING_1; j <= ACTION_SLEEPING_LAST; j++)
-    {
-      boolean found = FALSE;
-
-      for (k = 0; k < NUM_DIRECTIONS; k++)
-	if (el_act_dir2img(player->element_nr, j, k) !=
-	    el_act_dir2img(player->element_nr, ACTION_DEFAULT, k))
-	  found = TRUE;
-
-      if (found)
-	player->num_special_action_sleeping++;
-      else
-	break;
-    }
+    /* set number of special actions for bored and sleeping animation */
+    player->num_special_action_bored =
+      get_num_special_action(player->artwork_element,
+			     ACTION_BORING_1, ACTION_BORING_LAST);
+    player->num_special_action_sleeping =
+      get_num_special_action(player->artwork_element,
+			     ACTION_SLEEPING_1, ACTION_SLEEPING_LAST);
 
     player->switch_x = -1;
     player->switch_y = -1;
@@ -1820,6 +1819,8 @@ void InitGame()
 #if 0
 	  player->element_nr = some_player->element_nr;
 #endif
+
+	  player->artwork_element = some_player->artwork_element;
 
 	  player->block_last_field       = some_player->block_last_field;
 	  player->block_delay_adjustment = some_player->block_delay_adjustment;
@@ -3106,7 +3107,7 @@ void Explode(int ex, int ey, int phase, int mode)
 	    break;
 	}
 
-	if (PLAYERINFO(ex, ey)->use_murphy_graphic)
+	if (PLAYERINFO(ex, ey)->use_murphy)
 	  Store[x][y] = EL_EMPTY;
       }
       else if (center_element == EL_MOLE)
@@ -3364,7 +3365,7 @@ void Bang(int x, int y)
   {
     struct PlayerInfo *player = PLAYERINFO(x, y);
 
-    element = Feld[x][y] = (player->use_murphy_graphic ? EL_SP_MURPHY :
+    element = Feld[x][y] = (player->use_murphy ? EL_SP_MURPHY :
 			    player->element_nr);
   }
 
@@ -5667,14 +5668,16 @@ void ContinueMoving(int x, int y)
 
   if (pushed_by_player && !game.use_change_when_pushing_bug)
   {
-    int dig_side = MV_DIR_OPPOSITE(direction);
+    int push_side = MV_DIR_OPPOSITE(direction);
     struct PlayerInfo *player = PLAYERINFO(x, y);
 
     CheckElementChangeByPlayer(newx, newy, element, CE_PUSHED_BY_PLAYER,
-			       player->index_bit, dig_side);
+			       player->index_bit, push_side);
     CheckTriggeredElementChangeByPlayer(newx,newy, element, CE_PLAYER_PUSHES_X,
-					player->index_bit, dig_side);
+					player->index_bit, push_side);
   }
+
+  CheckTriggeredElementChangeBySide(x, y, element, CE_MOVE_OF_X, direction);
 
   TestIfElementTouchesCustomElement(x, y);	/* empty or new element */
 
@@ -6893,7 +6896,25 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
     {
       for (i = 0; i < MAX_PLAYERS; i++)
       {
-	int element = action_arg_element;
+	if (trigger_player_bits & (1 << i))
+	{
+	  int artwork_element = action_arg_element;
+
+	  if (action_arg == CA_ARG_ELEMENT_RESET)
+	    artwork_element = stored_player[i].element_nr;
+
+	  stored_player[i].artwork_element = artwork_element;
+
+	  SetPlayerWaiting(&stored_player[i], FALSE);
+
+	  /* set number of special actions for bored and sleeping animation */
+	  stored_player[i].num_special_action_bored =
+	    get_num_special_action(artwork_element,
+				   ACTION_BORING_1, ACTION_BORING_LAST);
+	  stored_player[i].num_special_action_sleeping =
+	    get_num_special_action(artwork_element,
+				   ACTION_SLEEPING_1, ACTION_SLEEPING_LAST);
+	}
       }
 
       break;
@@ -7496,24 +7517,24 @@ static boolean CheckElementChangeExt(int x, int y,
 static void PlayPlayerSound(struct PlayerInfo *player)
 {
   int jx = player->jx, jy = player->jy;
-  int element = player->element_nr;
+  int sound_element = player->artwork_element;
   int last_action = player->last_action_waiting;
   int action = player->action_waiting;
 
   if (player->is_waiting)
   {
     if (action != last_action)
-      PlayLevelSoundElementAction(jx, jy, element, action);
+      PlayLevelSoundElementAction(jx, jy, sound_element, action);
     else
-      PlayLevelSoundElementActionIfLoop(jx, jy, element, action);
+      PlayLevelSoundElementActionIfLoop(jx, jy, sound_element, action);
   }
   else
   {
     if (action != last_action)
-      StopSound(element_info[element].sound[last_action]);
+      StopSound(element_info[sound_element].sound[last_action]);
 
     if (last_action == ACTION_SLEEPING)
-      PlayLevelSoundElementAction(jx, jy, element, ACTION_AWAKENING);
+      PlayLevelSoundElementAction(jx, jy, sound_element, ACTION_AWAKENING);
   }
 }
 
@@ -7580,7 +7601,7 @@ static void SetPlayerWaiting(struct PlayerInfo *player, boolean is_waiting)
 	     last_special_action < ACTION_SLEEPING_1 + num_special_action - 1 ?
 	     last_special_action + 1 : ACTION_SLEEPING);
 	  int special_graphic =
-	    el_act_dir2img(player->element_nr, special_action, move_dir);
+	    el_act_dir2img(player->artwork_element, special_action, move_dir);
 
 	  player->anim_delay_counter =
 	    graphic_info[special_graphic].anim_delay_fixed +
@@ -7612,7 +7633,7 @@ static void SetPlayerWaiting(struct PlayerInfo *player, boolean is_waiting)
 	  int special_action =
 	    ACTION_BORING_1 + SimpleRND(player->num_special_action_bored);
 	  int special_graphic =
-	    el_act_dir2img(player->element_nr, special_action, move_dir);
+	    el_act_dir2img(player->artwork_element, special_action, move_dir);
 
 	  player->anim_delay_counter =
 	    graphic_info[special_graphic].anim_delay_fixed +
@@ -7934,6 +7955,8 @@ void GameActions()
       {
 	RemoveField(x, y);
 	DrawLevelField(x, y);
+
+	TestIfElementTouchesCustomElement(x, y);	/* for empty space */
       }
     }
 #endif
@@ -8900,6 +8923,9 @@ void ScrollPlayer(struct PlayerInfo *player, int mode)
       CheckTriggeredElementChangeByPlayer(jx, jy, new_element,
 					  CE_PLAYER_ENTERS_X,
 					  player->index_bit, enter_side);
+
+      CheckTriggeredElementChangeBySide(jx, jy, player->element_nr,
+					CE_MOVE_OF_X, move_direction);
     }
 
     if (game.engine_version >= VERSION_IDENT(3,0,7,0))
@@ -9475,7 +9501,7 @@ void BuryPlayer(struct PlayerInfo *player)
   if (!player->active)
     return;
 
-  PlayLevelSoundElementAction(jx, jy, player->element_nr, ACTION_DYING);
+  PlayLevelSoundElementAction(jx, jy, player->artwork_element, ACTION_DYING);
   PlayLevelSound(jx, jy, SND_GAME_LOSING);
 
   player->GameOver = TRUE;
@@ -9648,7 +9674,17 @@ int DigField(struct PlayerInfo *player,
 
   if (mode == DF_SNAP && !IS_SNAPPABLE(element) &&
       game.engine_version >= VERSION_IDENT(2,2,0,0))
+  {
+    CheckElementChangeByPlayer(x, y, element, CE_SNAPPED_BY_PLAYER,
+			       player->index_bit, dig_side);
+    CheckTriggeredElementChangeByPlayer(x, y, element, CE_PLAYER_SNAPS_X,
+					player->index_bit, dig_side);
+
+    if (Feld[x][y] != element)		/* field changed by snapping */
+      return MF_ACTION;
+
     return MF_NO_ACTION;
+  }
 
   if (game.gravity && is_player && !player->is_auto_moving &&
       canFallDown(player) && move_direction != MV_DOWN &&
@@ -9685,7 +9721,7 @@ int DigField(struct PlayerInfo *player,
     if (element_info[sound_element].sound[sound_action] != SND_UNDEFINED)
       PlayLevelSoundElementAction(x, y, sound_element, sound_action);
     else
-      PlayLevelSoundElementAction(x, y, player->element_nr, sound_action);
+      PlayLevelSoundElementAction(x, y, player->artwork_element, sound_action);
   }
   else if (IS_PASSABLE(element) && canPassField(x, y, move_direction))
   {
@@ -9753,12 +9789,17 @@ int DigField(struct PlayerInfo *player,
 
     if (mode == DF_SNAP)
     {
-      TestIfElementTouchesCustomElement(x, y);	/* for empty space */
-
 #if USE_NEW_SNAP_DELAY
       if (level.block_snap_field)
 	setFieldForSnapping(x, y, element, move_direction);
+      else
+	TestIfElementTouchesCustomElement(x, y);	/* for empty space */
+#else
+      TestIfElementTouchesCustomElement(x, y);		/* for empty space */
 #endif
+
+      CheckTriggeredElementChangeByPlayer(x, y, element, CE_PLAYER_SNAPS_X,
+					  player->index_bit, dig_side);
     }
   }
   else if (IS_COLLECTIBLE(element))
@@ -9850,12 +9891,17 @@ int DigField(struct PlayerInfo *player,
 
     if (mode == DF_SNAP)
     {
-      TestIfElementTouchesCustomElement(x, y);	/* for empty space */
-
 #if USE_NEW_SNAP_DELAY
       if (level.block_snap_field)
 	setFieldForSnapping(x, y, element, move_direction);
+      else
+	TestIfElementTouchesCustomElement(x, y);	/* for empty space */
+#else
+      TestIfElementTouchesCustomElement(x, y);		/* for empty space */
 #endif
+
+      CheckTriggeredElementChangeByPlayer(x, y, element, CE_PLAYER_SNAPS_X,
+					  player->index_bit, dig_side);
     }
   }
   else if (IS_PUSHABLE(element))
@@ -10082,6 +10128,9 @@ int DigField(struct PlayerInfo *player,
     CheckTriggeredElementChangeByPlayer(x, y, element, CE_SWITCH_OF_X,
 					player->index_bit, dig_side);
 
+    CheckTriggeredElementChangeByPlayer(x, y, element, CE_PLAYER_SWITCHES_X,
+					player->index_bit, dig_side);
+
     CheckTriggeredElementChangeByPlayer(x, y, element, CE_PLAYER_PRESSES_X,
 					player->index_bit, dig_side);
 
@@ -10098,6 +10147,11 @@ int DigField(struct PlayerInfo *player,
       CheckElementChangeByPlayer(x, y, element, CE_SWITCHED,
 				 player->index_bit, dig_side);
       CheckTriggeredElementChangeByPlayer(x, y, element, CE_SWITCH_OF_X,
+					  player->index_bit, dig_side);
+
+      CheckElementChangeByPlayer(x, y, element, CE_SWITCHED_BY_PLAYER,
+				 player->index_bit, dig_side);
+      CheckTriggeredElementChangeByPlayer(x, y, element, CE_PLAYER_SWITCHES_X,
 					  player->index_bit, dig_side);
     }
 

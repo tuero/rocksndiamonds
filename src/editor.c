@@ -1482,6 +1482,8 @@ static struct ValueTextInfo options_change_direct_action[] =
 {
   { CE_TOUCHED_BY_PLAYER,	"touched by player"		},
   { CE_PRESSED_BY_PLAYER,	"pressed by player"		},
+  { CE_SWITCHED_BY_PLAYER,	"switched by player"		},
+  { CE_SNAPPED_BY_PLAYER,	"snapped by player"		},
   { CE_PUSHED_BY_PLAYER,	"pushed by player"		},
   { CE_ENTERED_BY_PLAYER,	"entered by player"		},
   { CE_LEFT_BY_PLAYER,		"left by player"		},
@@ -1503,6 +1505,8 @@ static struct ValueTextInfo options_change_other_action[] =
 {
   { CE_PLAYER_TOUCHES_X,	"player touches"		},
   { CE_PLAYER_PRESSES_X,	"player presses"		},
+  { CE_PLAYER_SWITCHES_X,	"player switches"		},
+  { CE_PLAYER_SNAPS_X,		"player snaps"			},
   { CE_PLAYER_PUSHES_X,		"player pushes"			},
   { CE_PLAYER_ENTERS_X,		"player enters"			},
   { CE_PLAYER_LEAVES_X,		"player leaves"			},
@@ -1515,6 +1519,7 @@ static struct ValueTextInfo options_change_other_action[] =
   { CE_SWITCH_OF_X,		"switch of"			},
   { CE_CHANGE_OF_X,		"change by page of"		},
   { CE_EXPLOSION_OF_X,		"explosion of"			},
+  { CE_MOVE_OF_X,		"move of"			},
   { CE_VALUE_GETS_ZERO_OF_X,	"CE value gets 0 of"		},
 
   { -1,				NULL				}
@@ -1781,6 +1786,8 @@ static struct ValueTextInfo options_action_arg_artwork[] =
   { CA_ARG_ELEMENT_HEADLINE,	"[element]"			},
   { CA_ARG_ELEMENT_TARGET,	"target"			},
   { CA_ARG_ELEMENT_TRIGGER,	"trigger"			},
+  { CA_ARG_UNDEFINED,		" "				},
+  { CA_ARG_ELEMENT_RESET,	"reset"				},
 
   { -1,				NULL				}
 };
@@ -6259,6 +6266,8 @@ static void CopyCustomElementPropertiesToEditor(int element)
   custom_element_change.direct_action =
     (HAS_CHANGE_EVENT(element, CE_TOUCHED_BY_PLAYER) ? CE_TOUCHED_BY_PLAYER :
      HAS_CHANGE_EVENT(element, CE_PRESSED_BY_PLAYER) ? CE_PRESSED_BY_PLAYER :
+     HAS_CHANGE_EVENT(element, CE_SWITCHED_BY_PLAYER) ? CE_SWITCHED_BY_PLAYER :
+     HAS_CHANGE_EVENT(element, CE_SNAPPED_BY_PLAYER) ? CE_SNAPPED_BY_PLAYER :
      HAS_CHANGE_EVENT(element, CE_PUSHED_BY_PLAYER) ? CE_PUSHED_BY_PLAYER :
      HAS_CHANGE_EVENT(element, CE_ENTERED_BY_PLAYER) ? CE_ENTERED_BY_PLAYER :
      HAS_CHANGE_EVENT(element, CE_LEFT_BY_PLAYER) ? CE_LEFT_BY_PLAYER :
@@ -6276,6 +6285,8 @@ static void CopyCustomElementPropertiesToEditor(int element)
   custom_element_change.other_action =
     (HAS_CHANGE_EVENT(element, CE_PLAYER_TOUCHES_X) ? CE_PLAYER_TOUCHES_X :
      HAS_CHANGE_EVENT(element, CE_PLAYER_PRESSES_X) ? CE_PLAYER_PRESSES_X :
+     HAS_CHANGE_EVENT(element, CE_PLAYER_SWITCHES_X) ? CE_PLAYER_SWITCHES_X :
+     HAS_CHANGE_EVENT(element, CE_PLAYER_SNAPS_X) ? CE_PLAYER_SNAPS_X :
      HAS_CHANGE_EVENT(element, CE_PLAYER_PUSHES_X) ? CE_PLAYER_PUSHES_X :
      HAS_CHANGE_EVENT(element, CE_PLAYER_ENTERS_X) ? CE_PLAYER_ENTERS_X :
      HAS_CHANGE_EVENT(element, CE_PLAYER_LEAVES_X) ? CE_PLAYER_LEAVES_X :
@@ -6288,6 +6299,7 @@ static void CopyCustomElementPropertiesToEditor(int element)
      HAS_CHANGE_EVENT(element, CE_SWITCH_OF_X) ? CE_SWITCH_OF_X :
      HAS_CHANGE_EVENT(element, CE_CHANGE_OF_X) ? CE_CHANGE_OF_X :
      HAS_CHANGE_EVENT(element, CE_EXPLOSION_OF_X) ? CE_EXPLOSION_OF_X :
+     HAS_CHANGE_EVENT(element, CE_MOVE_OF_X) ? CE_MOVE_OF_X :
      HAS_CHANGE_EVENT(element, CE_VALUE_GETS_ZERO_OF_X) ? CE_VALUE_GETS_ZERO_OF_X :
      custom_element_change.other_action);
 }
@@ -6393,6 +6405,8 @@ static void CopyCustomElementPropertiesToGame(int element)
   /* set player change event from checkbox and selectbox */
   custom_element_change_events[CE_TOUCHED_BY_PLAYER] = FALSE;
   custom_element_change_events[CE_PRESSED_BY_PLAYER] = FALSE;
+  custom_element_change_events[CE_SWITCHED_BY_PLAYER] = FALSE;
+  custom_element_change_events[CE_SNAPPED_BY_PLAYER] = FALSE;
   custom_element_change_events[CE_PUSHED_BY_PLAYER] = FALSE;
   custom_element_change_events[CE_ENTERED_BY_PLAYER] = FALSE;
   custom_element_change_events[CE_LEFT_BY_PLAYER] = FALSE;
@@ -6410,6 +6424,8 @@ static void CopyCustomElementPropertiesToGame(int element)
   /* set other element action change event from checkbox and selectbox */
   custom_element_change_events[CE_PLAYER_TOUCHES_X] = FALSE;
   custom_element_change_events[CE_PLAYER_PRESSES_X] = FALSE;
+  custom_element_change_events[CE_PLAYER_SWITCHES_X] = FALSE;
+  custom_element_change_events[CE_PLAYER_SNAPS_X] = FALSE;
   custom_element_change_events[CE_PLAYER_PUSHES_X] = FALSE;
   custom_element_change_events[CE_PLAYER_ENTERS_X] = FALSE;
   custom_element_change_events[CE_PLAYER_LEAVES_X] = FALSE;
@@ -6422,6 +6438,7 @@ static void CopyCustomElementPropertiesToGame(int element)
   custom_element_change_events[CE_SWITCH_OF_X] = FALSE;
   custom_element_change_events[CE_CHANGE_OF_X] = FALSE;
   custom_element_change_events[CE_EXPLOSION_OF_X] = FALSE;
+  custom_element_change_events[CE_MOVE_OF_X] = FALSE;
   custom_element_change_events[CE_VALUE_GETS_ZERO_OF_X] = FALSE;
   custom_element_change_events[custom_element_change.other_action] =
     custom_element_change_events[CE_BY_OTHER_ACTION];
@@ -6678,6 +6695,9 @@ static void ModifyEditorDrawingArea(int drawingarea_id, int xsize, int ysize)
 {
   int gadget_id = drawingarea_info[drawingarea_id].gadget_id;
   struct GadgetInfo *gi = level_editor_gadget[gadget_id];
+
+  drawingarea_info[drawingarea_id].area_xsize = xsize;
+  drawingarea_info[drawingarea_id].area_ysize = ysize;
 
   ModifyGadget(gi, GDI_AREA_SIZE, xsize, ysize, GDI_END);
 }

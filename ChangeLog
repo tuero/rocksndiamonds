@@ -1,6 +1,10 @@
 2005-12-27
 	* changed "score for each 10 seconds/steps left" to "1 second/step"
 	* added own score for collecting "extra time" instead of sharing it
+	* added change events "switched by player" and "player switches <e>"
+	* added change events "snapped by player" and "player snaps <e>"
+	* added "set player artwork: <element choice>" to CE action options
+	* added change event "move of <element>"
 
 2005-12-22
 	* added "set player shield: off / normal / deadly" to CE action options

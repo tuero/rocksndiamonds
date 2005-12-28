@@ -1750,7 +1750,7 @@ void DrawLevelElementAnimationIfNeeded(int x, int y, int element)
 
 static int getPlayerGraphic(struct PlayerInfo *player, int move_dir)
 {
-  if (player->use_murphy_graphic)
+  if (player->use_murphy)
   {
     /* this works only because currently only one player can be "murphy" ... */
     static int last_horizontal_dir = MV_LEFT;
@@ -1769,7 +1769,7 @@ static int getPlayerGraphic(struct PlayerInfo *player, int move_dir)
     return graphic;
   }
   else
-    return el_act_dir2img(player->element_nr, player->GfxAction, move_dir);
+    return el_act_dir2img(player->artwork_element, player->GfxAction,move_dir);
 }
 
 static boolean equalGraphics(int graphic1, int graphic2)
