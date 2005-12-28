@@ -5392,6 +5392,24 @@ int map_element_EM_to_RND(int element_em)
 
 #endif
 
+int map_direction_RND_to_EM(int direction)
+{
+  return (direction == MV_UP    ? 0 :
+	  direction == MV_RIGHT ? 1 :
+	  direction == MV_DOWN  ? 2 :
+	  direction == MV_LEFT  ? 3 :
+	  -1);
+}
+
+int map_direction_EM_to_RND(int direction)
+{
+  return (direction == 0 ? MV_UP    :
+	  direction == 1 ? MV_RIGHT :
+	  direction == 2 ? MV_DOWN  :
+	  direction == 3 ? MV_LEFT  :
+	  MV_NONE);
+}
+
 int get_next_element(int element)
 {
   switch(element)

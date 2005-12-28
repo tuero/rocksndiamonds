@@ -929,8 +929,8 @@ void prepare_em_level(void)
   lev.wheel_x   = lev.wheel_x_initial;
   lev.wheel_y   = lev.wheel_y_initial;
 
-  lev.wind_cnt       = lev.wind_cnt_initial;
   lev.wind_direction = lev.wind_direction_initial;
+  lev.wind_cnt       = lev.wind_cnt_initial;
 
   lev.wonderwall_state = lev.wonderwall_state_initial;
   lev.wonderwall_time  = lev.wonderwall_time_initial;

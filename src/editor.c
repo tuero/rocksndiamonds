@@ -2407,7 +2407,7 @@ static struct
     GADGET_ID_BLOCK_SNAP_FIELD,		GADGET_ID_NONE,
     &level.block_snap_field,
     NULL,
-    "block snap field when snapping",	"use snapping delay to show animation"
+    "block snapped field when snapping", "use snapping delay to show animation"
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(1),

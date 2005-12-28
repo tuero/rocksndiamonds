@@ -591,16 +591,28 @@
 
 #define IS_RND_GATE_GRAY(e)	((e) >= EL_GATE_1_GRAY &&		\
 	 			 (e) <= EL_GATE_4_GRAY)
+#define IS_RND_GATE_GRAY_ACTIVE(e) ((e) >= EL_GATE_1_GRAY_ACTIVE &&	\
+	 			 (e) <= EL_GATE_4_GRAY_ACTIVE)
 #define IS_EM_GATE_GRAY(e)	((e) >= EL_EM_GATE_1_GRAY &&		\
 	 			 (e) <= EL_EM_GATE_4_GRAY)
+#define IS_EM_GATE_GRAY_ACTIVE(e) ((e) >= EL_EM_GATE_1_GRAY_ACTIVE &&	\
+	 			 (e) <= EL_EM_GATE_4_GRAY_ACTIVE)
 #define IS_EMC_GATE_GRAY(e)	((e) >= EL_EMC_GATE_5_GRAY &&		\
 	 			 (e) <= EL_EMC_GATE_8_GRAY)
+#define IS_EMC_GATE_GRAY_ACTIVE(e) ((e) >= EL_EMC_GATE_5_GRAY_ACTIVE &&	\
+	 			 (e) <= EL_EMC_GATE_8_GRAY_ACTIVE)
 #define IS_GATE_GRAY(e)		(IS_RND_GATE_GRAY(e) ||			\
 				 IS_EM_GATE_GRAY(e) ||			\
 				 IS_EMC_GATE_GRAY(e))
+#define IS_GATE_GRAY_ACTIVE(e)	(IS_RND_GATE_GRAY_ACTIVE(e) ||		\
+				 IS_EM_GATE_GRAY_ACTIVE(e) ||		\
+				 IS_EMC_GATE_GRAY_ACTIVE(e))
 #define RND_GATE_GRAY_NR(e)	((e) - EL_GATE_1_GRAY)
+#define RND_GATE_GRAY_ACTIVE_NR(e) ((e) - EL_GATE_1_GRAY_ACTIVE)
 #define EM_GATE_GRAY_NR(e)	((e) - EL_EM_GATE_1_GRAY)
+#define EM_GATE_GRAY_ACTIVE_NR(e) ((e) - EL_EM_GATE_1_GRAY_ACTIVE)
 #define EMC_GATE_GRAY_NR(e)	((e) - EL_EMC_GATE_5_GRAY + 4)
+#define EMC_GATE_GRAY_ACTIVE_NR(e) ((e) - EL_EMC_GATE_5_GRAY_ACTIVE + 4)
 #define GATE_GRAY_NR(e)		(IS_RND_GATE_GRAY(e) ? RND_GATE_GRAY_NR(e) :  \
 				 IS_EM_GATE_GRAY(e) ?  EM_GATE_GRAY_NR(e) :   \
 				 IS_EMC_GATE_GRAY(e) ? EMC_GATE_GRAY_NR(e) : 0)
@@ -1228,9 +1240,23 @@
 #define EL_BD_MAGIC_WALL_EMPTYING	(EL_FIRST_RUNTIME_REAL + 42)
 #define EL_MAGIC_WALL_DEAD		(EL_FIRST_RUNTIME_REAL + 43)
 #define EL_BD_MAGIC_WALL_DEAD		(EL_FIRST_RUNTIME_REAL + 44)
+#define EL_EMC_FAKE_GRASS_ACTIVE	(EL_FIRST_RUNTIME_REAL + 45)
+#define EL_GATE_1_GRAY_ACTIVE		(EL_FIRST_RUNTIME_REAL + 46)
+#define EL_GATE_2_GRAY_ACTIVE		(EL_FIRST_RUNTIME_REAL + 47)
+#define EL_GATE_3_GRAY_ACTIVE		(EL_FIRST_RUNTIME_REAL + 48)
+#define EL_GATE_4_GRAY_ACTIVE		(EL_FIRST_RUNTIME_REAL + 49)
+#define EL_EM_GATE_1_GRAY_ACTIVE	(EL_FIRST_RUNTIME_REAL + 50)
+#define EL_EM_GATE_2_GRAY_ACTIVE	(EL_FIRST_RUNTIME_REAL + 51)
+#define EL_EM_GATE_3_GRAY_ACTIVE	(EL_FIRST_RUNTIME_REAL + 52)
+#define EL_EM_GATE_4_GRAY_ACTIVE	(EL_FIRST_RUNTIME_REAL + 53)
+#define EL_EMC_GATE_5_GRAY_ACTIVE	(EL_FIRST_RUNTIME_REAL + 54)
+#define EL_EMC_GATE_6_GRAY_ACTIVE	(EL_FIRST_RUNTIME_REAL + 55)
+#define EL_EMC_GATE_7_GRAY_ACTIVE	(EL_FIRST_RUNTIME_REAL + 56)
+#define EL_EMC_GATE_8_GRAY_ACTIVE	(EL_FIRST_RUNTIME_REAL + 57)
+#define EL_EMC_DRIPPER_ACTIVE		(EL_FIRST_RUNTIME_REAL + 58)
 
 /* "unreal" (and therefore not drawable) runtime elements */
-#define EL_FIRST_RUNTIME_UNREAL		(EL_FIRST_RUNTIME_REAL + 45)
+#define EL_FIRST_RUNTIME_UNREAL		(EL_FIRST_RUNTIME_REAL + 59)
 
 #define EL_BLOCKED			(EL_FIRST_RUNTIME_UNREAL + 0)
 #define EL_EXPLOSION			(EL_FIRST_RUNTIME_UNREAL + 1)
@@ -1542,7 +1568,7 @@
 #define PROGRAM_VERSION_MAJOR		3
 #define PROGRAM_VERSION_MINOR		2
 #define PROGRAM_VERSION_PATCH		0
-#define PROGRAM_VERSION_BUILD		5
+#define PROGRAM_VERSION_BUILD		6
 #endif
 
 #define PROGRAM_TITLE_STRING		"Rocks'n'Diamonds"
@@ -1927,6 +1953,12 @@ struct GameInfo
   boolean gravity;
   boolean explosions_delayed;
   boolean envelope_active;
+
+#if 1
+  /* values for the new EMC elements */
+  int lenses_time_left;
+  int magnify_time_left;
+#endif
 
   /* values for player idle animation (no effect on engine) */
   int player_boring_delay_fixed;

@@ -40,52 +40,52 @@
 #define TAPE_HEADER_SIZE	20	/* size of tape file header   */
 #define TAPE_HEADER_UNUSED	3	/* unused tape header bytes   */
 
-#define LEVEL_CHUNK_CNT3_SIZE(x) (LEVEL_CHUNK_CNT3_HEADER + (x))
-#define LEVEL_CHUNK_CUS3_SIZE(x) (2 + (x) * LEVEL_CPART_CUS3_SIZE)
-#define LEVEL_CHUNK_CUS4_SIZE(x) (96 + (x) * 48)
+#define LEVEL_CHUNK_CNT3_SIZE(x)	 (LEVEL_CHUNK_CNT3_HEADER + (x))
+#define LEVEL_CHUNK_CUS3_SIZE(x)	 (2 + (x) * LEVEL_CPART_CUS3_SIZE)
+#define LEVEL_CHUNK_CUS4_SIZE(x)	 (96 + (x) * 48)
 
 /* file identifier strings */
-#define LEVEL_COOKIE_TMPL	"ROCKSNDIAMONDS_LEVEL_FILE_VERSION_x.x"
-#define TAPE_COOKIE_TMPL	"ROCKSNDIAMONDS_TAPE_FILE_VERSION_x.x"
-#define SCORE_COOKIE		"ROCKSNDIAMONDS_SCORE_FILE_VERSION_1.2"
+#define LEVEL_COOKIE_TMPL		"ROCKSNDIAMONDS_LEVEL_FILE_VERSION_x.x"
+#define TAPE_COOKIE_TMPL		"ROCKSNDIAMONDS_TAPE_FILE_VERSION_x.x"
+#define SCORE_COOKIE			"ROCKSNDIAMONDS_SCORE_FILE_VERSION_1.2"
 
 /* values for "CONF" chunk */
-#define CONF_MASK_1_BYTE	0x00
-#define CONF_MASK_2_BYTE	0x40
-#define CONF_MASK_4_BYTE	0x80
-#define CONF_MASK_MULTI_BYTES	0xc0
+#define CONF_MASK_1_BYTE		0x00
+#define CONF_MASK_2_BYTE		0x40
+#define CONF_MASK_4_BYTE		0x80
+#define CONF_MASK_MULTI_BYTES		0xc0
 
-#define CONF_MASK_BYTES		0xc0
-#define CONF_MASK_TOKEN		0x3f
+#define CONF_MASK_BYTES			0xc0
+#define CONF_MASK_TOKEN			0x3f
 
-#define CONF_LAST_ENTRY		(CONF_MASK_1_BYTE | 0)
+#define CONF_LAST_ENTRY			(CONF_MASK_1_BYTE | 0)
 
-#define CONF_VALUE_INTEGER_1	(CONF_MASK_1_BYTE | 1)
-#define CONF_VALUE_INTEGER_2	(CONF_MASK_1_BYTE | 2)
-#define CONF_VALUE_INTEGER_3	(CONF_MASK_1_BYTE | 3)
-#define CONF_VALUE_INTEGER_4	(CONF_MASK_1_BYTE | 4)
-#define CONF_VALUE_BOOLEAN_1	(CONF_MASK_1_BYTE | 5)
-#define CONF_VALUE_BOOLEAN_2	(CONF_MASK_1_BYTE | 6)
-#define CONF_VALUE_BOOLEAN_3	(CONF_MASK_1_BYTE | 7)
-#define CONF_VALUE_BOOLEAN_4	(CONF_MASK_1_BYTE | 8)
+#define CONF_VALUE_INTEGER_1		(CONF_MASK_1_BYTE | 1)
+#define CONF_VALUE_INTEGER_2		(CONF_MASK_1_BYTE | 2)
+#define CONF_VALUE_INTEGER_3		(CONF_MASK_1_BYTE | 3)
+#define CONF_VALUE_INTEGER_4		(CONF_MASK_1_BYTE | 4)
+#define CONF_VALUE_BOOLEAN_1		(CONF_MASK_1_BYTE | 5)
+#define CONF_VALUE_BOOLEAN_2		(CONF_MASK_1_BYTE | 6)
+#define CONF_VALUE_BOOLEAN_3		(CONF_MASK_1_BYTE | 7)
+#define CONF_VALUE_BOOLEAN_4		(CONF_MASK_1_BYTE | 8)
 
-#define CONF_VALUE_ELEMENT_1	(CONF_MASK_2_BYTE | 1)
-#define CONF_VALUE_ELEMENT_2	(CONF_MASK_2_BYTE | 2)
-#define CONF_VALUE_ELEMENT_3	(CONF_MASK_2_BYTE | 3)
-#define CONF_VALUE_ELEMENT_4	(CONF_MASK_2_BYTE | 4)
+#define CONF_VALUE_ELEMENT_1		(CONF_MASK_2_BYTE | 1)
+#define CONF_VALUE_ELEMENT_2		(CONF_MASK_2_BYTE | 2)
+#define CONF_VALUE_ELEMENT_3		(CONF_MASK_2_BYTE | 3)
+#define CONF_VALUE_ELEMENT_4		(CONF_MASK_2_BYTE | 4)
 
-#define CONF_VALUE_CONTENT_1	(CONF_MASK_MULTI_BYTES | 1)
-#define CONF_VALUE_CONTENT_8	(CONF_MASK_MULTI_BYTES | 2)
+#define CONF_VALUE_CONTENT_1		(CONF_MASK_MULTI_BYTES | 1)
+#define CONF_VALUE_CONTENT_8		(CONF_MASK_MULTI_BYTES | 2)
 
-#define CONF_VALUE_INTEGER(x)	((x) >= CONF_VALUE_INTEGER_1 &&		\
-				 (x) <= CONF_VALUE_INTEGER_4)
+#define CONF_VALUE_INTEGER(x)		((x) >= CONF_VALUE_INTEGER_1 &&	\
+					 (x) <= CONF_VALUE_INTEGER_4)
 
-#define CONF_VALUE_BOOLEAN(x)	((x) >= CONF_VALUE_BOOLEAN_1 &&		\
-				 (x) <= CONF_VALUE_BOOLEAN_4)
+#define CONF_VALUE_BOOLEAN(x)		((x) >= CONF_VALUE_BOOLEAN_1 &&	\
+					 (x) <= CONF_VALUE_BOOLEAN_4)
 
-#define CONF_VALUE_NUM_BYTES(x)	((x) == CONF_MASK_1_BYTE ? 1 :		\
-				 (x) == CONF_MASK_2_BYTE ? 2 :		\
-				 (x) == CONF_MASK_4_BYTE ? 4 : 0)
+#define CONF_VALUE_NUM_BYTES(x)		((x) == CONF_MASK_1_BYTE ? 1 :	\
+					 (x) == CONF_MASK_2_BYTE ? 2 :	\
+					 (x) == CONF_MASK_4_BYTE ? 4 : 0)
 
 #define CONF_CONTENT_NUM_ELEMENTS	(3 * 3)
 #define CONF_CONTENT_NUM_BYTES		(CONF_CONTENT_NUM_ELEMENTS * 2)
@@ -2266,7 +2266,11 @@ void CopyNativeLevel_RND_to_EM(struct LevelInfo *level)
 
   lev->lenses_time		= level->lenses_time;
   lev->magnify_time		= level->magnify_time;
-  lev->wind_direction_initial	= level->wind_direction_initial;
+
+  lev->wind_direction_initial =
+    map_direction_RND_to_EM(level->wind_direction_initial);
+  lev->wind_cnt_initial = (level->wind_direction_initial != MV_NONE ?
+			   lev->wind_time : 0);
 
   for (i = 0; i < MAX_ELEMENT_CONTENTS; i++)
     for (j = 0; j < 8; j++)
@@ -2379,7 +2383,9 @@ void CopyNativeLevel_EM_to_RND(struct LevelInfo *level)
 
   level->lenses_time		= lev->lenses_time;
   level->magnify_time		= lev->magnify_time;
-  level->wind_direction_initial	= lev->wind_direction_initial;
+
+  level->wind_direction_initial =
+    map_direction_EM_to_RND(lev->wind_direction_initial);
 
   for (i = 0; i < MAX_ELEMENT_CONTENTS; i++)
     for (j = 0; j < 8; j++)

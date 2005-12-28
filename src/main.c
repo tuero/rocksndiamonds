@@ -3630,12 +3630,12 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
   },
   {
     "emc_fake_grass",
-    "fake grass",
+    "fake_grass",
     "fake grass"
   },
   {
     "emc_fake_acid",
-    "fake acid",
+    "fake_acid",
     "fake acid"
   },
   {
@@ -3872,6 +3872,77 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
     "bd_magic_wall_dead",
     "magic_wall",
     "-"
+  },
+
+  {
+    "emc_fake_grass.active",
+    "fake_grass",
+    "-"
+  },
+  {
+    "gate_1_gray.active",
+    "gate",
+    ""
+  },
+  {
+    "gate_2_gray.active",
+    "gate",
+    ""
+  },
+  {
+    "gate_3_gray.active",
+    "gate",
+    ""
+  },
+  {
+    "gate_4_gray.active",
+    "gate",
+    ""
+  },
+  {
+    "em_gate_1_gray.active",
+    "gate",
+    ""
+  },
+  {
+    "em_gate_2_gray.active",
+    "gate",
+    ""
+  },
+  {
+    "em_gate_3_gray.active",
+    "gate",
+    ""
+  },
+  {
+    "em_gate_4_gray.active",
+    "gate",
+    ""
+  },
+  {
+    "emc_gate_5_gray.active",
+    "gate",
+    "",
+  },
+  {
+    "emc_gate_6_gray.active",
+    "gate",
+    "",
+  },
+  {
+    "emc_gate_7_gray.active",
+    "gate",
+    "",
+  },
+  {
+    "emc_gate_8_gray.active",
+    "gate",
+    "",
+  },
+  {
+    "emc_dripper.active",
+    "dripper",
+    "dripper"
   },
 
   /* ----------------------------------------------------------------------- */

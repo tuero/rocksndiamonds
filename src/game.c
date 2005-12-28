@@ -1673,6 +1673,9 @@ void InitGame()
   game.gravity = level.initial_gravity;
   game.explosions_delayed = TRUE;
 
+  game.lenses_time_left = 0;
+  game.magnify_time_left = 0;
+
   game.envelope_active = FALSE;
 
   for (i = 0; i < NUM_BELTS; i++)
@@ -3648,50 +3651,155 @@ static void RedrawAllLightSwitchesAndInvisibleElements()
 {
   int x, y;
 
-  for (y = 0; y < lev_fieldy; y++)
+  for (y = 0; y < lev_fieldy; y++) for (x = 0; x < lev_fieldx; x++)
   {
-    for (x = 0; x < lev_fieldx; x++)
+    int element = Feld[x][y];
+
+    if (element == EL_LIGHT_SWITCH &&
+	game.light_time_left > 0)
     {
-      int element = Feld[x][y];
+      Feld[x][y] = EL_LIGHT_SWITCH_ACTIVE;
+      DrawLevelField(x, y);
+    }
+    else if (element == EL_LIGHT_SWITCH_ACTIVE &&
+	     game.light_time_left == 0)
+    {
+      Feld[x][y] = EL_LIGHT_SWITCH;
+      DrawLevelField(x, y);
+    }
+    else if (element == EL_EMC_DRIPPER &&
+	     game.light_time_left > 0)
+    {
+      Feld[x][y] = EL_EMC_DRIPPER_ACTIVE;
+      DrawLevelField(x, y);
+    }
+    else if (element == EL_EMC_DRIPPER_ACTIVE &&
+	     game.light_time_left == 0)
+    {
+      Feld[x][y] = EL_EMC_DRIPPER;
+      DrawLevelField(x, y);
+    }
+    else if (element == EL_INVISIBLE_STEELWALL ||
+	     element == EL_INVISIBLE_WALL ||
+	     element == EL_INVISIBLE_SAND)
+    {
+      if (game.light_time_left > 0)
+	Feld[x][y] = getInvisibleActiveFromInvisibleElement(element);
 
-      if (element == EL_LIGHT_SWITCH &&
-	  game.light_time_left > 0)
-      {
-	Feld[x][y] = EL_LIGHT_SWITCH_ACTIVE;
-	DrawLevelField(x, y);
-      }
-      else if (element == EL_LIGHT_SWITCH_ACTIVE &&
-	       game.light_time_left == 0)
-      {
-	Feld[x][y] = EL_LIGHT_SWITCH;
-	DrawLevelField(x, y);
-      }
-      else if (element == EL_INVISIBLE_STEELWALL ||
-	       element == EL_INVISIBLE_WALL ||
-	       element == EL_INVISIBLE_SAND)
-      {
-	if (game.light_time_left > 0)
-	  Feld[x][y] = getInvisibleActiveFromInvisibleElement(element);
+      DrawLevelField(x, y);
 
-	DrawLevelField(x, y);
+      /* uncrumble neighbour fields, if needed */
+      if (element == EL_INVISIBLE_SAND)
+	DrawLevelFieldCrumbledSandNeighbours(x, y);
+    }
+    else if (element == EL_INVISIBLE_STEELWALL_ACTIVE ||
+	     element == EL_INVISIBLE_WALL_ACTIVE ||
+	     element == EL_INVISIBLE_SAND_ACTIVE)
+    {
+      if (game.light_time_left == 0)
+	Feld[x][y] = getInvisibleFromInvisibleActiveElement(element);
 
-	/* uncrumble neighbour fields, if needed */
-	if (element == EL_INVISIBLE_SAND)
-	  DrawLevelFieldCrumbledSandNeighbours(x, y);
-      }
-      else if (element == EL_INVISIBLE_STEELWALL_ACTIVE ||
-	       element == EL_INVISIBLE_WALL_ACTIVE ||
-	       element == EL_INVISIBLE_SAND_ACTIVE)
-      {
-	if (game.light_time_left == 0)
-	  Feld[x][y] = getInvisibleFromInvisibleActiveElement(element);
+      DrawLevelField(x, y);
 
-	DrawLevelField(x, y);
+      /* re-crumble neighbour fields, if needed */
+      if (element == EL_INVISIBLE_SAND)
+	DrawLevelFieldCrumbledSandNeighbours(x, y);
+    }
+  }
+}
 
-	/* re-crumble neighbour fields, if needed */
-	if (element == EL_INVISIBLE_SAND)
-	  DrawLevelFieldCrumbledSandNeighbours(x, y);
-      }
+static void RedrawAllInvisibleElementsForLenses()
+{
+  int x, y;
+
+  for (y = 0; y < lev_fieldy; y++) for (x = 0; x < lev_fieldx; x++)
+  {
+    int element = Feld[x][y];
+
+    if (element == EL_EMC_DRIPPER &&
+	game.lenses_time_left > 0)
+    {
+      Feld[x][y] = EL_EMC_DRIPPER_ACTIVE;
+      DrawLevelField(x, y);
+    }
+    else if (element == EL_EMC_DRIPPER_ACTIVE &&
+	     game.lenses_time_left == 0)
+    {
+      Feld[x][y] = EL_EMC_DRIPPER;
+      DrawLevelField(x, y);
+    }
+    else if (element == EL_INVISIBLE_STEELWALL ||
+	     element == EL_INVISIBLE_WALL ||
+	     element == EL_INVISIBLE_SAND)
+    {
+      if (game.lenses_time_left > 0)
+	Feld[x][y] = getInvisibleActiveFromInvisibleElement(element);
+
+      DrawLevelField(x, y);
+
+      /* uncrumble neighbour fields, if needed */
+      if (element == EL_INVISIBLE_SAND)
+	DrawLevelFieldCrumbledSandNeighbours(x, y);
+    }
+    else if (element == EL_INVISIBLE_STEELWALL_ACTIVE ||
+	     element == EL_INVISIBLE_WALL_ACTIVE ||
+	     element == EL_INVISIBLE_SAND_ACTIVE)
+    {
+      if (game.lenses_time_left == 0)
+	Feld[x][y] = getInvisibleFromInvisibleActiveElement(element);
+
+      DrawLevelField(x, y);
+
+      /* re-crumble neighbour fields, if needed */
+      if (element == EL_INVISIBLE_SAND)
+	DrawLevelFieldCrumbledSandNeighbours(x, y);
+    }
+  }
+}
+
+static void RedrawAllInvisibleElementsForMagnifier()
+{
+  int x, y;
+
+  for (y = 0; y < lev_fieldy; y++) for (x = 0; x < lev_fieldx; x++)
+  {
+    int element = Feld[x][y];
+
+    if (element == EL_EMC_FAKE_GRASS &&
+	game.magnify_time_left > 0)
+    {
+      Feld[x][y] = EL_EMC_FAKE_GRASS_ACTIVE;
+      DrawLevelField(x, y);
+    }
+    else if (element == EL_EMC_FAKE_GRASS_ACTIVE &&
+	     game.magnify_time_left == 0)
+    {
+      Feld[x][y] = EL_EMC_FAKE_GRASS;
+      DrawLevelField(x, y);
+    }
+    else if (IS_GATE_GRAY(element) &&
+	     game.magnify_time_left > 0)
+    {
+      Feld[x][y] = (IS_RND_GATE_GRAY(element) ?
+		    element - EL_GATE_1_GRAY + EL_GATE_1_GRAY_ACTIVE :
+		    IS_EM_GATE_GRAY(element) ?
+		    element - EL_EM_GATE_1_GRAY + EL_EM_GATE_1_GRAY_ACTIVE :
+		    IS_EMC_GATE_GRAY(element) ?
+		    element - EL_EMC_GATE_5_GRAY + EL_EMC_GATE_5_GRAY_ACTIVE :
+		    element);
+      DrawLevelField(x, y);
+    }
+    else if (IS_GATE_GRAY_ACTIVE(element) &&
+	     game.magnify_time_left == 0)
+    {
+      Feld[x][y] = (IS_RND_GATE_GRAY_ACTIVE(element) ?
+		    element - EL_GATE_1_GRAY_ACTIVE + EL_GATE_1_GRAY :
+		    IS_EM_GATE_GRAY_ACTIVE(element) ?
+		    element - EL_EM_GATE_1_GRAY_ACTIVE + EL_EM_GATE_1_GRAY :
+		    IS_EMC_GATE_GRAY_ACTIVE(element) ?
+		    element - EL_EMC_GATE_5_GRAY_ACTIVE + EL_EMC_GATE_5_GRAY :
+		    element);
+      DrawLevelField(x, y);
     }
   }
 }
@@ -8258,6 +8366,22 @@ void GameActions()
       CloseAllOpenTimegates();
   }
 
+  if (game.lenses_time_left > 0)
+  {
+    game.lenses_time_left--;
+
+    if (game.lenses_time_left == 0)
+      RedrawAllInvisibleElementsForLenses();
+  }
+
+  if (game.magnify_time_left > 0)
+  {
+    game.magnify_time_left--;
+
+    if (game.magnify_time_left == 0)
+      RedrawAllInvisibleElementsForMagnifier();
+  }
+
   for (i = 0; i < MAX_PLAYERS; i++)
   {
     struct PlayerInfo *player = &stored_player[i];
@@ -9706,6 +9830,11 @@ int DigField(struct PlayerInfo *player,
       if (!player->key[RND_GATE_GRAY_NR(element)])
 	return MF_NO_ACTION;
     }
+    else if (IS_RND_GATE_GRAY_ACTIVE(element))
+    {
+      if (!player->key[RND_GATE_GRAY_ACTIVE_NR(element)])
+	return MF_NO_ACTION;
+    }
     else if (element == EL_EXIT_OPEN ||
 	     element == EL_SP_EXIT_OPEN ||
 	     element == EL_SP_EXIT_OPENING)
@@ -9739,6 +9868,11 @@ int DigField(struct PlayerInfo *player,
     else if (IS_EM_GATE_GRAY(element))
     {
       if (!player->key[EM_GATE_GRAY_NR(element)])
+	return MF_NO_ACTION;
+    }
+    else if (IS_EM_GATE_GRAY_ACTIVE(element))
+    {
+      if (!player->key[EM_GATE_GRAY_ACTIVE_NR(element)])
 	return MF_NO_ACTION;
     }
     else if (IS_SP_PORT(element))
@@ -9858,6 +9992,18 @@ int DigField(struct PlayerInfo *player,
     else if (IS_ENVELOPE(element))
     {
       player->show_envelope = element;
+    }
+    else if (element == EL_EMC_LENSES)
+    {
+      game.lenses_time_left = level.lenses_time * FRAMES_PER_SECOND;
+
+      RedrawAllInvisibleElementsForLenses();
+    }
+    else if (element == EL_EMC_MAGNIFIER)
+    {
+      game.magnify_time_left = level.magnify_time * FRAMES_PER_SECOND;
+
+      RedrawAllInvisibleElementsForMagnifier();
     }
     else if (IS_DROPPABLE(element) ||
 	     IS_THROWABLE(element))	/* can be collected and dropped */
