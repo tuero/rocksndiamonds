@@ -116,10 +116,6 @@ static struct
     &li.android_clone_time,		10
   },
   {
-    EL_EMC_MAGIC_BALL,			CONF_VALUE_INTEGER_1,
-    &li.ball_time,			10
-  },
-  {
     EL_EMC_LENSES,			CONF_VALUE_INTEGER_1,
     &li.lenses_score,			10
   },
@@ -226,6 +222,22 @@ static struct
   {
     EL_PLAYER_4,			CONF_VALUE_BOOLEAN_2,
     &li.use_start_element[3],		FALSE
+  },
+  {
+    EL_EMC_MAGIC_BALL,			CONF_VALUE_INTEGER_1,
+    &li.ball_time,			10
+  },
+  {
+    EL_EMC_MAGIC_BALL,			CONF_VALUE_INTEGER_2,
+    &li.num_ball_contents,		8
+  },
+  {
+    EL_EMC_MAGIC_BALL,			CONF_VALUE_BOOLEAN_1,
+    &li.ball_random,			FALSE
+  },
+  {
+    EL_EMC_MAGIC_BALL,			CONF_VALUE_BOOLEAN_2,
+    &li.ball_state_initial,		FALSE
   },
 
   /* ---------- 2-byte values ---------------------------------------------- */
@@ -455,10 +467,8 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
   level->magnify_time = 10;
   level->slurp_score = 10;
   level->wind_direction_initial = MV_NONE;
-#endif
   level->ball_random = FALSE;
   level->ball_state_initial = FALSE;
-#if 0
   for (i = 0; i < MAX_ELEMENT_CONTENTS; i++)
     for (x = 0; x < 3; x++)
       for (y = 0; y < 3; y++)
@@ -2259,6 +2269,7 @@ void CopyNativeLevel_RND_to_EM(struct LevelInfo *level)
   lev->ball_random		= level->ball_random;
   lev->ball_state_initial	= level->ball_state_initial;
   lev->ball_time		= level->ball_time;
+  lev->num_ball_arrays		= level->num_ball_contents;
 
   lev->lenses_score		= level->lenses_score;
   lev->magnify_score		= level->magnify_score;
@@ -2376,6 +2387,7 @@ void CopyNativeLevel_EM_to_RND(struct LevelInfo *level)
   level->ball_random		= lev->ball_random;
   level->ball_state_initial	= lev->ball_state_initial;
   level->ball_time		= lev->ball_time;
+  level->num_ball_contents	= lev->num_ball_arrays;
 
   level->lenses_score		= lev->lenses_score;
   level->magnify_score		= lev->magnify_score;

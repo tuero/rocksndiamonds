@@ -2874,6 +2874,10 @@ element_to_graphic[] =
     IMG_EMC_MAGIC_BALL_ACTIVE
   },
   {
+    EL_EMC_MAGIC_BALL,			ACTION_DROPPING, -1, FALSE,
+    IMG_EMC_MAGIC_BALL_DROPPING
+  },
+  {
     EL_EMC_MAGIC_BALL_SWITCH,		-1, -1, FALSE,
     IMG_EMC_MAGIC_BALL_SWITCH
   },
@@ -2988,6 +2992,10 @@ element_to_graphic[] =
   {
     EL_EMC_DRIPPER,			-1, -1, FALSE,
     IMG_EMC_DRIPPER
+  },
+  {
+    EL_EMC_DRIPPER_ACTIVE,		-1, -1, FALSE,
+    IMG_EMC_DRIPPER_ACTIVE
   },
   {
     EL_EMC_DRIPPER,			ACTION_ACTIVE, -1, FALSE,

@@ -898,7 +898,7 @@ static void InitField(int x, int y, boolean init_game)
 	  InitMovDir(x, y);
 
 #if USE_NEW_CUSTOM_VALUE
-	if (!element_info[element].use_last_ce_value)
+	if (!element_info[element].use_last_ce_value || init_game)
 	  CustomValue[x][y] = GET_NEW_CUSTOM_VALUE(Feld[x][y]);
 #endif
       }

@@ -4517,7 +4517,11 @@ void synchro_2(void)
 	}
       }
 
+#if 1
+      lev.ball_pos = (lev.ball_pos + 1) % lev.num_ball_arrays;
+#else
       lev.ball_pos = (lev.ball_pos + 1) & 7;
+#endif
       goto loop;
 
     /* --------------------------------------------------------------------- */

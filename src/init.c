@@ -3119,6 +3119,7 @@ void InitElementPropertiesStatic()
     EL_AMOEBA_DRY,
     EL_AMOEBA_FULL,
     EL_BD_AMOEBA,
+    EL_EMC_MAGIC_BALL,
     -1
   };
 

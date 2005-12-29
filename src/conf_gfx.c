@@ -3512,18 +3512,21 @@ struct ConfigInfo image_config[] =
   { "emc_magic_ball.xpos",			"0"			},
   { "emc_magic_ball.ypos",			"9"			},
   { "emc_magic_ball.frames",			"1"			},
-
   { "emc_magic_ball.active",			"RocksEMC.pcx"		},
   { "emc_magic_ball.active.xpos",		"0"			},
   { "emc_magic_ball.active.ypos",		"9"			},
   { "emc_magic_ball.active.frames",		"16"			},
   { "emc_magic_ball.active.frames_per_line",	"8"			},
+  { "emc_magic_ball.dropping",			"RocksElements.pcx"	},
+  { "emc_magic_ball.dropping.xpos",		"0"			},
+  { "emc_magic_ball.dropping.ypos",		"4"			},
+  { "emc_magic_ball.dropping.frames",		"8"			},
+  { "emc_magic_ball.dropping.anim_mode",	"linear"		},
 
   { "emc_magic_ball_switch",			"RocksEMC.pcx"		},
   { "emc_magic_ball_switch.xpos",		"8"			},
   { "emc_magic_ball_switch.ypos",		"10"			},
   { "emc_magic_ball_switch.frames",		"1"			},
-
   { "emc_magic_ball_switch.active",		"RocksEMC.pcx"		},
   { "emc_magic_ball_switch.active.xpos",	"8"			},
   { "emc_magic_ball_switch.active.ypos",	"9"			},

@@ -1854,7 +1854,10 @@ struct LevelInfo
   int lenses_time;
   int magnify_time;
   int wind_direction_initial;
+
   struct Content ball_content[MAX_ELEMENT_CONTENTS];
+  int num_ball_contents;
+
   boolean android_array[16];
 #endif
 
