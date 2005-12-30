@@ -60,6 +60,8 @@
 #define MAX_MENU_ENTRIES_ON_SCREEN	(SCR_FIELDY - 2)
 #define MENU_SCREEN_START_YPOS		2
 #define MENU_SCREEN_VALUE_XPOS		14
+#define MENU_TITLE1_YPOS		8
+#define MENU_TITLE2_YPOS		46
 
 /* buttons and scrollbars identifiers */
 #define SCREEN_CTRL_ID_SCROLL_UP	0
@@ -203,8 +205,8 @@ static void PlayMenuMusic()
 
 void DrawHeadline()
 {
-  DrawTextSCentered(8,  FONT_TITLE_1, PROGRAM_TITLE_STRING);
-  DrawTextSCentered(46, FONT_TITLE_2, PROGRAM_COPYRIGHT_STRING);
+  DrawTextSCentered(MENU_TITLE1_YPOS, FONT_TITLE_1, PROGRAM_TITLE_STRING);
+  DrawTextSCentered(MENU_TITLE2_YPOS, FONT_TITLE_2, PROGRAM_COPYRIGHT_STRING);
 }
 
 static void ToggleFullscreenIfNeeded()
@@ -235,6 +237,11 @@ void DrawMainMenu()
 {
   static LevelDirTree *leveldir_last_valid = NULL;
   char *name_text = (!options.network && setup.team_mode ? "Team:" : "Name:");
+#if 1
+  char *level_text = "Levelset";
+#else
+  char *level_text = "Level:";
+#endif
   int name_width, level_width;
   int i;
 
@@ -293,28 +300,59 @@ void DrawMainMenu()
 
   DrawHeadline();
 
-  DrawText(mSX + 32, mSY + 2*32, name_text, FONT_MENU_1);
-  DrawText(mSX + 32, mSY + 3*32, "Level:", FONT_MENU_1);
-  DrawText(mSX + 32, mSY + 4*32, "Hall Of Fame", FONT_MENU_1);
-  DrawText(mSX + 32, mSY + 5*32, "Level Creator", FONT_MENU_1);
-  DrawText(mSX + 32, mSY + 6*32, "Info Screen", FONT_MENU_1);
-  DrawText(mSX + 32, mSY + 7*32, "Start Game", FONT_MENU_1);
-  DrawText(mSX + 32, mSY + 8*32, "Setup", FONT_MENU_1);
-  DrawText(mSX + 32, mSY + 9*32, "Quit", FONT_MENU_1);
+  DrawText(mSX + 32, mSY + 2 * 32, name_text,       FONT_MENU_1);
+  DrawText(mSX + 32, mSY + 3 * 32, level_text,      FONT_MENU_1);
+  DrawText(mSX + 32, mSY + 4 * 32, "Hall Of Fame",  FONT_MENU_1);
+  DrawText(mSX + 32, mSY + 5 * 32, "Level Creator", FONT_MENU_1);
+  DrawText(mSX + 32, mSY + 6 * 32, "Info Screen",   FONT_MENU_1);
+  DrawText(mSX + 32, mSY + 7 * 32, "Start Game",    FONT_MENU_1);
+  DrawText(mSX + 32, mSY + 8 * 32, "Setup",         FONT_MENU_1);
+  DrawText(mSX + 32, mSY + 9 * 32, "Quit",          FONT_MENU_1);
 
   /* calculated after (possible) reload of custom artwork */
-  name_width = getTextWidth(name_text, FONT_MENU_1);
-  level_width = getTextWidth("Level:", FONT_MENU_1);
+  name_width  = getTextWidth(name_text,  FONT_MENU_1);
+#if 1
+  level_width = 9 * getFontWidth(FONT_MENU_1);
+#else
+  level_width = getTextWidth(level_text, FONT_MENU_1);
+#endif
 
-  DrawText(mSX + 32 + name_width, mSY + 2*32, setup.player_name, FONT_INPUT_1);
-  DrawText(mSX + level_width + 5 * 32, mSY + 3*32, int2str(level_nr,3),
+  DrawText(mSX + 32 + name_width, mSY + 2 * 32, setup.player_name,
+	   FONT_INPUT_1);
+#if 1
+  DrawText(mSX + level_width + 2 * 32, mSY + 3 * 32, int2str(level_nr, 3),
 	   FONT_VALUE_1);
+#else
+  DrawText(mSX + level_width + 5 * 32, mSY + 3 * 32, int2str(level_nr, 3),
+	   FONT_VALUE_1);
+#endif
 
   DrawMicroLevel(MICROLEVEL_XPOS, MICROLEVEL_YPOS, TRUE);
 
-  DrawTextF(mSX + 32 + level_width - 2, mSY + 3*32 + 1, FONT_TEXT_3, "%d-%d",
-	    leveldir_current->first_level, leveldir_current->last_level);
+#if 1
 
+#if 1
+  {
+    int text_height = getFontHeight(FONT_TEXT_3);
+    int ypos2 = -SY + 3 * 32 + 16;
+    int ypos1 = ypos2 - text_height;
+
+    DrawTextF(mSX + level_width + 6 * 32, mSY + ypos1, FONT_TEXT_3,
+	      "%03d", leveldir_current->first_level);
+    DrawTextF(mSX + level_width + 6 * 32, mSY + ypos2, FONT_TEXT_3,
+	      "%03d", leveldir_current->last_level);
+  }
+#else
+  DrawTextF(mSX + level_width + 6 * 32, mSY + 3 * 32 + 1, FONT_TEXT_3,
+	    "%d", leveldir_current->levels);
+#endif
+
+#else
+  DrawTextF(mSX + 32 + level_width - 2, mSY + 3 * 32 + 1, FONT_TEXT_3, "%d-%d",
+	    leveldir_current->first_level, leveldir_current->last_level);
+#endif
+
+#if 0
   if (leveldir_current->readonly)
   {
     DrawTextS(mSX + level_width + 9 * 32 - 2,
@@ -322,13 +360,19 @@ void DrawMainMenu()
     DrawTextS(mSX + level_width + 9 * 32 - 2,
 	      mSY + 3 * 32 + 1 + 7, FONT_TEXT_3, "ONLY");
   }
+#endif
 
   for (i = 0; i < 8; i++)
     initCursor(i, (i == 1 || i == 4 || i == 6 ? IMG_MENU_BUTTON_ENTER_MENU :
 		   IMG_MENU_BUTTON));
 
+#if 1
+  drawCursorXY(level_width / 32 + 1, 1, IMG_MENU_BUTTON_LEFT);
+  drawCursorXY(level_width / 32 + 5, 1, IMG_MENU_BUTTON_RIGHT);
+#else
   drawCursorXY(level_width / 32 + 4, 1, IMG_MENU_BUTTON_LEFT);
   drawCursorXY(level_width / 32 + 8, 1, IMG_MENU_BUTTON_RIGHT);
+#endif
 
   DrawTextSCentered(326, FONT_TITLE_2, "A Game by Artsoft Entertainment");
 
@@ -600,7 +644,11 @@ static void DrawInfoScreen_Main()
 
   ClearWindow();
 
+#if 1
+  DrawTextSCentered(mSY - SY + 16, FONT_TITLE_1, "Info Screen");
+#else
   DrawText(mSX + 16, mSY + 16, "Info Screen", FONT_TITLE_1);
+#endif
 
   info_info = info_info_main;
   num_info_info = 0;
@@ -1399,19 +1447,38 @@ static void drawChooseTreeList(int first_entry, int num_page_entries,
   char buffer[SCR_FIELDX * 2];
   int max_buffer_len = (SCR_FIELDX - 2) * 2;
   char *title_string = NULL;
+#if 0
+  int xoffset_sets = 16;
+#endif
+  int yoffset_sets = MENU_TITLE1_YPOS;
+#if 0
   int xoffset_setup = 16;
+#endif
   int yoffset_setup = 16;
+#if 1
+#if 0
+  int xoffset = (ti->type == TREE_TYPE_LEVEL_DIR ? xoffset_sets :
+		 xoffset_setup);
+#endif
+  int yoffset = (ti->type == TREE_TYPE_LEVEL_DIR ? yoffset_sets :
+		 yoffset_setup);
+#else
   int xoffset = (ti->type == TREE_TYPE_LEVEL_DIR ? 0 : xoffset_setup);
   int yoffset = (ti->type == TREE_TYPE_LEVEL_DIR ? 0 : yoffset_setup);
+#endif
   int last_game_status = game_status;	/* save current game status */
 
   title_string =
-    (ti->type == TREE_TYPE_LEVEL_DIR ? "Level Directories" :
+    (ti->type == TREE_TYPE_LEVEL_DIR ? "Level Sets" :
      ti->type == TREE_TYPE_GRAPHICS_DIR ? "Custom Graphics" :
      ti->type == TREE_TYPE_SOUNDS_DIR ? "Custom Sounds" :
      ti->type == TREE_TYPE_MUSIC_DIR ? "Custom Music" : "");
 
+#if 1
+  DrawTextSCentered(mSY - SY + yoffset, FONT_TITLE_1, title_string);
+#else
   DrawText(SX + xoffset, SY + yoffset, title_string, FONT_TITLE_1);
+#endif
 
   /* force LEVELS font on artwork setup screen */
   game_status = GAME_MODE_LEVELS;
@@ -1430,7 +1497,7 @@ static void drawChooseTreeList(int first_entry, int num_page_entries,
     node_first = getTreeInfoFirstGroupEntry(ti);
     node = getTreeInfoFromPos(node_first, entry_pos);
 
-    strncpy(buffer, node->name , max_buffer_len);
+    strncpy(buffer, node->name, max_buffer_len);
     buffer[max_buffer_len] = '\0';
 
     DrawText(mSX + 32, mSY + ypos * 32, buffer, FONT_TEXT_1 + node->color);
@@ -1452,6 +1519,11 @@ static void drawChooseTreeInfo(int entry_pos, TreeInfo *ti)
 {
   TreeInfo *node, *node_first;
   int x, last_redraw_mask = redraw_mask;
+#if 1
+  int ypos = MENU_TITLE2_YPOS;
+#else
+  int ypos = 40;
+#endif
 
   if (ti->type != TREE_TYPE_LEVEL_DIR)
     return;
@@ -1459,16 +1531,16 @@ static void drawChooseTreeInfo(int entry_pos, TreeInfo *ti)
   node_first = getTreeInfoFirstGroupEntry(ti);
   node = getTreeInfoFromPos(node_first, entry_pos);
 
-  DrawBackground(SX + 32, SY + 32, SXSIZE - 64, 32);
+  DrawBackground(SX, SY + ypos, SXSIZE, getFontHeight(FONT_TITLE_2));
 
   if (node->parent_link)
-    DrawTextFCentered(40, FONT_TITLE_2, "leave group \"%s\"",
+    DrawTextFCentered(ypos, FONT_TITLE_2, "leave group \"%s\"",
 		      node->class_desc);
   else if (node->level_group)
-    DrawTextFCentered(40, FONT_TITLE_2, "enter group \"%s\"",
+    DrawTextFCentered(ypos, FONT_TITLE_2, "enter group \"%s\"",
 		      node->class_desc);
   else if (ti->type == TREE_TYPE_LEVEL_DIR)
-    DrawTextFCentered(40, FONT_TITLE_2, "%3d levels (%s)",
+    DrawTextFCentered(ypos, FONT_TITLE_2, "%3d levels (%s)",
 		      node->levels, node->class_desc);
 
   /* let BackToFront() redraw only what is needed */
@@ -1747,8 +1819,15 @@ static void drawHallOfFameList(int first_entry, int highlight_position)
   SetMainBackgroundImage(IMG_BACKGROUND_SCORES);
   ClearWindow();
 
-  DrawText(mSX + 80, mSY + 8, "Hall Of Fame", FONT_TITLE_1);
-  DrawTextFCentered(46, FONT_TITLE_2, "HighScores of Level %d", level_nr);
+#if 1
+  DrawTextSCentered(MENU_TITLE1_YPOS, FONT_TITLE_1, "Hall Of Fame");
+  DrawTextFCentered(MENU_TITLE2_YPOS, FONT_TITLE_2,
+		    "HighScores of Level %d", level_nr);
+#else
+  DrawText(mSX + 80, mSY + MENU_TITLE1_YPOS, "Hall Of Fame", FONT_TITLE_1);
+  DrawTextFCentered(MENU_TITLE2_YPOS, FONT_TITLE_2,
+		    "HighScores of Level %d", level_nr);
+#endif
 
   for (i = 0; i < NUM_MENU_ENTRIES_ON_SCREEN; i++)
   {
@@ -1974,9 +2053,9 @@ static struct TokenInfo setup_info_editor[] =
   { TYPE_SWITCH,	&setup.editor.el_dx_boulderdash,"DX Boulderd.:"	},
   { TYPE_SWITCH,	&setup.editor.el_chars,		"Characters:"	},
   { TYPE_SWITCH,	&setup.editor.el_custom,	"Custom:"	},
-  { TYPE_SWITCH,	&setup.editor.el_custom_more,	"More Custom:"	},
   { TYPE_SWITCH,	&setup.editor.el_headlines,	"Headlines:"	},
   { TYPE_SWITCH,	&setup.editor.el_user_defined,	"User defined:"	},
+  { TYPE_SWITCH,	&setup.editor.el_dynamic,	"Dynamic:"	},
   { TYPE_EMPTY,		NULL,			""			},
   { TYPE_LEAVE_MENU,	execSetupMain, 		"Back"			},
 
@@ -2204,7 +2283,11 @@ static void DrawSetupScreen_Generic()
     title_string = "Setup Shortcuts";
   }
 
+#if 1
+  DrawTextSCentered(mSY - SY + 16, FONT_TITLE_1, title_string);
+#else
   DrawText(mSX + 16, mSY + 16, title_string, FONT_TITLE_1);
+#endif
 
   num_setup_info = 0;
   for (i = 0; setup_info[i].type != 0 && i < NUM_MENU_ENTRIES_ON_SCREEN; i++)
@@ -2237,6 +2320,11 @@ static void DrawSetupScreen_Generic()
 
     num_setup_info++;
   }
+
+#if 0
+  DrawTextSCentered(SYSIZE - 20, FONT_TEXT_4,
+		    "Joysticks deactivated in setup menu");
+#endif
 
   FadeToFront();
   InitAnimation();
@@ -2338,7 +2426,11 @@ void DrawSetupScreen_Input()
 {
   ClearWindow();
 
-  DrawText(mSX+16, mSY+16, "Setup Input", FONT_TITLE_1);
+#if 1
+  DrawTextSCentered(mSY - SY + 16, FONT_TITLE_1, "Setup Input");
+#else
+  DrawText(mSX + 16, mSY + 16, "Setup Input", FONT_TITLE_1);
+#endif
 
   initCursor(0,  IMG_MENU_BUTTON);
   initCursor(1,  IMG_MENU_BUTTON);
@@ -2348,12 +2440,14 @@ void DrawSetupScreen_Input()
   drawCursorXY(10, 0, IMG_MENU_BUTTON_LEFT);
   drawCursorXY(12, 0, IMG_MENU_BUTTON_RIGHT);
 
-  DrawText(mSX+32, mSY+2*32, "Player:", FONT_MENU_1);
-  DrawText(mSX+32, mSY+3*32, "Device:", FONT_MENU_1);
-  DrawText(mSX+32, mSY+15*32, "Back",   FONT_MENU_1);
+  DrawText(mSX + 32, mSY +  2 * 32, "Player:", FONT_MENU_1);
+  DrawText(mSX + 32, mSY +  3 * 32, "Device:", FONT_MENU_1);
+  DrawText(mSX + 32, mSY + 15 * 32, "Back",   FONT_MENU_1);
 
 #if 0
   DeactivateJoystickForCalibration();
+#endif
+#if 1
   DrawTextSCentered(SYSIZE - 20, FONT_TEXT_4,
 		    "Joysticks deactivated on this screen");
 #endif
@@ -2411,7 +2505,8 @@ static void drawPlayerSetupInputInfo(int player_nr)
 
   custom_key = setup.input[player_nr].key;
 
-  DrawText(mSX+11*32, mSY+2*32, int2str(player_nr +1, 1), FONT_INPUT_1_ACTIVE);
+  DrawText(mSX + 11 * 32, mSY + 2 * 32, int2str(player_nr + 1, 1),
+	   FONT_INPUT_1_ACTIVE);
 
   ClearRectangleOnBackground(drawto, mSX + 8 * TILEX, mSY + 2 * TILEY,
 			     TILEX, TILEY);
@@ -2422,36 +2517,36 @@ static void drawPlayerSetupInputInfo(int player_nr)
   {
     char *device_name = setup.input[player_nr].joy.device_name;
 
-    DrawText(mSX+8*32, mSY+3*32,
+    DrawText(mSX + 8 * 32, mSY + 3 * 32,
 	     joystick_name[getJoystickNrFromDeviceName(device_name)],
 	     FONT_VALUE_1);
-    DrawText(mSX+32, mSY+4*32, "Calibrate", FONT_MENU_1);
+    DrawText(mSX + 32, mSY + 4 * 32, "Calibrate", FONT_MENU_1);
   }
   else
   {
-    DrawText(mSX+8*32, mSY+3*32, "Keyboard ", FONT_VALUE_1);
-    DrawText(mSX+32,   mSY+4*32, "Customize", FONT_MENU_1);
+    DrawText(mSX + 8 * 32, mSY + 3 * 32, "Keyboard ", FONT_VALUE_1);
+    DrawText(mSX + 1 * 32, mSY + 4 * 32, "Customize", FONT_MENU_1);
   }
 
-  DrawText(mSX+32, mSY+5*32, "Actual Settings:", FONT_MENU_1);
+  DrawText(mSX + 32, mSY + 5 * 32, "Actual Settings:", FONT_MENU_1);
   drawCursorXY(1, 4, IMG_MENU_BUTTON_LEFT);
   drawCursorXY(1, 5, IMG_MENU_BUTTON_RIGHT);
   drawCursorXY(1, 6, IMG_MENU_BUTTON_UP);
   drawCursorXY(1, 7, IMG_MENU_BUTTON_DOWN);
-  DrawText(mSX+2*32, mSY+6*32, ":", FONT_VALUE_OLD);
-  DrawText(mSX+2*32, mSY+7*32, ":", FONT_VALUE_OLD);
-  DrawText(mSX+2*32, mSY+8*32, ":", FONT_VALUE_OLD);
-  DrawText(mSX+2*32, mSY+9*32, ":", FONT_VALUE_OLD);
-  DrawText(mSX+32, mSY+10*32, "Snap Field:", FONT_VALUE_OLD);
-  DrawText(mSX+32, mSY+12*32, "Drop Element:", FONT_VALUE_OLD);
+  DrawText(mSX + 2 * 32, mSY +  6 * 32, ":", FONT_VALUE_OLD);
+  DrawText(mSX + 2 * 32, mSY +  7 * 32, ":", FONT_VALUE_OLD);
+  DrawText(mSX + 2 * 32, mSY +  8 * 32, ":", FONT_VALUE_OLD);
+  DrawText(mSX + 2 * 32, mSY +  9 * 32, ":", FONT_VALUE_OLD);
+  DrawText(mSX + 1 * 32, mSY + 10 * 32, "Snap Field:", FONT_VALUE_OLD);
+  DrawText(mSX + 1 * 32, mSY + 12 * 32, "Drop Element:", FONT_VALUE_OLD);
 
   for (i = 0; i < 6; i++)
   {
     int ypos = 6 + i + (i > 3 ? i-3 : 0);
 
-    DrawText(mSX + 3*32, mSY + ypos*32,
+    DrawText(mSX + 3 * 32, mSY + ypos * 32,
 	     "              ", FONT_VALUE_1);
-    DrawText(mSX + 3*32, mSY + ypos*32,
+    DrawText(mSX + 3 * 32, mSY + ypos * 32,
 	     (setup.input[player_nr].use_joystick ?
 	      custom[i].text :
 	      getKeyNameFromKey(*custom[i].key)), FONT_VALUE_1);
@@ -2601,17 +2696,22 @@ void CustomizeKeyboard(int player_nr)
   custom_key = setup.input[player_nr].key;
 
   ClearWindow();
+
+#if 1
+  DrawTextSCentered(mSY - SY + 16, FONT_TITLE_1, "Keyboard Input");
+#else
   DrawText(mSX + 16, mSY + 16, "Keyboard Input", FONT_TITLE_1);
+#endif
 
   BackToFront();
   InitAnimation();
 
   step_nr = 0;
-  DrawText(mSX, mSY + (2+2*step_nr)*32,
+  DrawText(mSX, mSY + (2 + 2 * step_nr) * 32,
 	   customize_step[step_nr].text, FONT_INPUT_1_ACTIVE);
-  DrawText(mSX, mSY + (2+2*step_nr+1)*32,
+  DrawText(mSX, mSY + (2 + 2 * step_nr + 1) * 32,
 	   "Key:", FONT_INPUT_1_ACTIVE);
-  DrawText(mSX + 4*32, mSY + (2+2*step_nr+1)*32,
+  DrawText(mSX + 4 * 32, mSY + (2 + 2 * step_nr + 1) * 32,
 	   getKeyNameFromKey(*customize_step[step_nr].key), FONT_VALUE_OLD);
 
   while (!finished)
@@ -2651,32 +2751,32 @@ void CustomizeKeyboard(int player_nr)
 
 	    /* got new key binding */
 	    *customize_step[step_nr].key = key;
-	    DrawText(mSX + 4*32, mSY + (2+2*step_nr+1)*32,
+	    DrawText(mSX + 4 * 32, mSY + (2 + 2 * step_nr + 1) * 32,
 		     "             ", FONT_VALUE_1);
-	    DrawText(mSX + 4*32, mSY + (2+2*step_nr+1)*32,
+	    DrawText(mSX + 4 * 32, mSY + (2 + 2 * step_nr + 1) * 32,
 		     getKeyNameFromKey(key), FONT_VALUE_1);
 	    step_nr++;
 
 	    /* un-highlight last query */
-	    DrawText(mSX, mSY+(2+2*(step_nr-1))*32,
-		     customize_step[step_nr-1].text, FONT_MENU_1);
-	    DrawText(mSX, mSY+(2+2*(step_nr-1)+1)*32,
+	    DrawText(mSX, mSY + (2 + 2 * (step_nr - 1)) * 32,
+		     customize_step[step_nr - 1].text, FONT_MENU_1);
+	    DrawText(mSX, mSY + (2 + 2 * (step_nr - 1) + 1) * 32,
 		     "Key:", FONT_MENU_1);
 
 	    /* press 'Enter' to leave */
 	    if (step_nr == 6)
 	    {
-	      DrawText(mSX + 16, mSY + 15*32+16,
+	      DrawText(mSX + 16, mSY + 15 * 32 + 16,
 		       "Press Enter", FONT_TITLE_1);
 	      break;
 	    }
 
 	    /* query next key binding */
-	    DrawText(mSX, mSY+(2+2*step_nr)*32,
+	    DrawText(mSX, mSY + (2 + 2 * step_nr) * 32,
 		     customize_step[step_nr].text, FONT_INPUT_1_ACTIVE);
-	    DrawText(mSX, mSY+(2+2*step_nr+1)*32,
+	    DrawText(mSX, mSY + (2 + 2 * step_nr + 1) * 32,
 		     "Key:", FONT_INPUT_1_ACTIVE);
-	    DrawText(mSX + 4*32, mSY+(2+2*step_nr+1)*32,
+	    DrawText(mSX + 4 * 32, mSY + (2 + 2 * step_nr + 1) * 32,
 		     getKeyNameFromKey(*customize_step[step_nr].key),
 		     FONT_VALUE_OLD);
 	  }
@@ -2739,13 +2839,13 @@ static boolean CalibrateJoystickMain(int player_nr)
     }
   }
 
-  DrawText(mSX,      mSY +  6 * 32, " ROTATE JOYSTICK ", FONT_TITLE_1);
-  DrawText(mSX,      mSY +  7 * 32, "IN ALL DIRECTIONS", FONT_TITLE_1);
-  DrawText(mSX + 16, mSY +  9 * 32, "  IF ALL BALLS  ",  FONT_TITLE_1);
-  DrawText(mSX,      mSY + 10 * 32, "   ARE YELLOW,   ", FONT_TITLE_1);
-  DrawText(mSX,      mSY + 11 * 32, " CENTER JOYSTICK ", FONT_TITLE_1);
-  DrawText(mSX,      mSY + 12 * 32, "       AND       ", FONT_TITLE_1);
-  DrawText(mSX,      mSY + 13 * 32, "PRESS ANY BUTTON!", FONT_TITLE_1);
+  DrawTextSCentered(mSY - SY +  6 * 32, FONT_TITLE_1, "Rotate joystick");
+  DrawTextSCentered(mSY - SY +  7 * 32, FONT_TITLE_1, "in all directions");
+  DrawTextSCentered(mSY - SY +  9 * 32, FONT_TITLE_1, "if all balls");
+  DrawTextSCentered(mSY - SY + 10 * 32, FONT_TITLE_1, "are marked,");
+  DrawTextSCentered(mSY - SY + 11 * 32, FONT_TITLE_1, "center joystick");
+  DrawTextSCentered(mSY - SY + 12 * 32, FONT_TITLE_1, "and");
+  DrawTextSCentered(mSY - SY + 13 * 32, FONT_TITLE_1, "press any button!");
 
   joy_value = Joystick(player_nr);
   last_x = (joy_value & JOY_LEFT ? -1 : joy_value & JOY_RIGHT ? +1 : 0);

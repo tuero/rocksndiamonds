@@ -451,6 +451,17 @@ void InitElementGraphicInfo()
   element_info[EL_AMOEBA_TO_DIAMOND].graphic[ACTION_DEFAULT] = IMG_AMOEBA_DEAD;
 #endif
 
+#if 1
+  /* set hardcoded definitions for some internal elements without graphic */
+  for (i = 0; i < MAX_NUM_ELEMENTS; i++)
+  {
+    if (IS_EDITOR_CASCADE_INACTIVE(i))
+      element_info[i].graphic[ACTION_DEFAULT] = IMG_EDITOR_CASCADE_LIST;
+    else if (IS_EDITOR_CASCADE_ACTIVE(i))
+      element_info[i].graphic[ACTION_DEFAULT] = IMG_EDITOR_CASCADE_LIST_ACTIVE;
+  }
+#endif
+
   /* now set all undefined/invalid graphics to -1 to set to default after it */
   for (i = 0; i < MAX_NUM_ELEMENTS; i++)
   {
@@ -3350,74 +3361,115 @@ void InitElementPropertiesStatic()
     -1
   };
 
+  static int ep_editor_cascade_active[] =
+  {
+    EL_INTERNAL_CASCADE_BD_ACTIVE,
+    EL_INTERNAL_CASCADE_EM_ACTIVE,
+    EL_INTERNAL_CASCADE_EMC_ACTIVE,
+    EL_INTERNAL_CASCADE_RND_ACTIVE,
+    EL_INTERNAL_CASCADE_SB_ACTIVE,
+    EL_INTERNAL_CASCADE_SP_ACTIVE,
+    EL_INTERNAL_CASCADE_DC_ACTIVE,
+    EL_INTERNAL_CASCADE_DX_ACTIVE,
+    EL_INTERNAL_CASCADE_TEXT_ACTIVE,
+    EL_INTERNAL_CASCADE_CE_ACTIVE,
+    EL_INTERNAL_CASCADE_GE_ACTIVE,
+    EL_INTERNAL_CASCADE_USER_ACTIVE,
+    EL_INTERNAL_CASCADE_GENERIC_ACTIVE,
+    EL_INTERNAL_CASCADE_DYNAMIC_ACTIVE,
+    -1
+  };
+
+  static int ep_editor_cascade_inactive[] =
+  {
+    EL_INTERNAL_CASCADE_BD,
+    EL_INTERNAL_CASCADE_EM,
+    EL_INTERNAL_CASCADE_EMC,
+    EL_INTERNAL_CASCADE_RND,
+    EL_INTERNAL_CASCADE_SB,
+    EL_INTERNAL_CASCADE_SP,
+    EL_INTERNAL_CASCADE_DC,
+    EL_INTERNAL_CASCADE_DX,
+    EL_INTERNAL_CASCADE_TEXT,
+    EL_INTERNAL_CASCADE_CE,
+    EL_INTERNAL_CASCADE_GE,
+    EL_INTERNAL_CASCADE_USER,
+    EL_INTERNAL_CASCADE_GENERIC,
+    EL_INTERNAL_CASCADE_DYNAMIC,
+    -1
+  };
+
   static struct
   {
     int *elements;
     int property;
   } element_properties[] =
   {
-    { ep_diggable,		EP_DIGGABLE		},
-    { ep_collectible_only,	EP_COLLECTIBLE_ONLY	},
-    { ep_dont_run_into,		EP_DONT_RUN_INTO	},
-    { ep_dont_collide_with,	EP_DONT_COLLIDE_WITH	},
-    { ep_dont_touch,		EP_DONT_TOUCH		},
-    { ep_indestructible,	EP_INDESTRUCTIBLE	},
-    { ep_slippery,		EP_SLIPPERY		},
-    { ep_can_change,		EP_CAN_CHANGE		},
-    { ep_can_move,		EP_CAN_MOVE		},
-    { ep_can_fall,		EP_CAN_FALL		},
-    { ep_can_smash_player,	EP_CAN_SMASH_PLAYER	},
-    { ep_can_smash_enemies,	EP_CAN_SMASH_ENEMIES	},
-    { ep_can_smash_everything,	EP_CAN_SMASH_EVERYTHING	},
-    { ep_explodes_by_fire,	EP_EXPLODES_BY_FIRE	},
-    { ep_explodes_smashed,	EP_EXPLODES_SMASHED	},
-    { ep_explodes_impact,	EP_EXPLODES_IMPACT	},
-    { ep_walkable_over,		EP_WALKABLE_OVER	},
-    { ep_walkable_inside,	EP_WALKABLE_INSIDE	},
-    { ep_walkable_under,	EP_WALKABLE_UNDER	},
-    { ep_passable_over,		EP_PASSABLE_OVER	},
-    { ep_passable_inside,	EP_PASSABLE_INSIDE	},
-    { ep_passable_under,	EP_PASSABLE_UNDER	},
-    { ep_droppable,		EP_DROPPABLE		},
-    { ep_explodes_1x1_old,	EP_EXPLODES_1X1_OLD	},
-    { ep_pushable,		EP_PUSHABLE		},
-    { ep_explodes_cross_old,	EP_EXPLODES_CROSS_OLD	},
-    { ep_protected,		EP_PROTECTED		},
-    { ep_throwable,		EP_THROWABLE		},
-    { ep_can_explode,		EP_CAN_EXPLODE		},
-    { ep_gravity_reachable,	EP_GRAVITY_REACHABLE	},
+    { ep_diggable,			EP_DIGGABLE			},
+    { ep_collectible_only,		EP_COLLECTIBLE_ONLY		},
+    { ep_dont_run_into,			EP_DONT_RUN_INTO		},
+    { ep_dont_collide_with,		EP_DONT_COLLIDE_WITH		},
+    { ep_dont_touch,			EP_DONT_TOUCH			},
+    { ep_indestructible,		EP_INDESTRUCTIBLE		},
+    { ep_slippery,			EP_SLIPPERY			},
+    { ep_can_change,			EP_CAN_CHANGE			},
+    { ep_can_move,			EP_CAN_MOVE			},
+    { ep_can_fall,			EP_CAN_FALL			},
+    { ep_can_smash_player,		EP_CAN_SMASH_PLAYER		},
+    { ep_can_smash_enemies,		EP_CAN_SMASH_ENEMIES		},
+    { ep_can_smash_everything,		EP_CAN_SMASH_EVERYTHING		},
+    { ep_explodes_by_fire,		EP_EXPLODES_BY_FIRE		},
+    { ep_explodes_smashed,		EP_EXPLODES_SMASHED		},
+    { ep_explodes_impact,		EP_EXPLODES_IMPACT		},
+    { ep_walkable_over,			EP_WALKABLE_OVER		},
+    { ep_walkable_inside,		EP_WALKABLE_INSIDE		},
+    { ep_walkable_under,		EP_WALKABLE_UNDER		},
+    { ep_passable_over,			EP_PASSABLE_OVER		},
+    { ep_passable_inside,		EP_PASSABLE_INSIDE		},
+    { ep_passable_under,		EP_PASSABLE_UNDER		},
+    { ep_droppable,			EP_DROPPABLE			},
+    { ep_explodes_1x1_old,		EP_EXPLODES_1X1_OLD		},
+    { ep_pushable,			EP_PUSHABLE			},
+    { ep_explodes_cross_old,		EP_EXPLODES_CROSS_OLD		},
+    { ep_protected,			EP_PROTECTED			},
+    { ep_throwable,			EP_THROWABLE			},
+    { ep_can_explode,			EP_CAN_EXPLODE			},
+    { ep_gravity_reachable,		EP_GRAVITY_REACHABLE		},
 
-    { ep_player,		EP_PLAYER		},
-    { ep_can_pass_magic_wall,	EP_CAN_PASS_MAGIC_WALL	},
-    { ep_switchable,		EP_SWITCHABLE		},
-    { ep_bd_element,		EP_BD_ELEMENT		},
-    { ep_sp_element,		EP_SP_ELEMENT		},
-    { ep_sb_element,		EP_SB_ELEMENT		},
-    { ep_gem,			EP_GEM			},
-    { ep_food_dark_yamyam,	EP_FOOD_DARK_YAMYAM	},
-    { ep_food_penguin,		EP_FOOD_PENGUIN		},
-    { ep_food_pig,		EP_FOOD_PIG		},
-    { ep_historic_wall,		EP_HISTORIC_WALL	},
-    { ep_historic_solid,	EP_HISTORIC_SOLID	},
-    { ep_classic_enemy,		EP_CLASSIC_ENEMY	},
-    { ep_belt,			EP_BELT			},
-    { ep_belt_active,		EP_BELT_ACTIVE		},
-    { ep_belt_switch,		EP_BELT_SWITCH		},
-    { ep_tube,			EP_TUBE			},
-    { ep_keygate,		EP_KEYGATE		},
-    { ep_amoeboid,		EP_AMOEBOID		},
-    { ep_amoebalive,		EP_AMOEBALIVE		},
-    { ep_has_content,		EP_HAS_CONTENT		},
-    { ep_can_turn_each_move,	EP_CAN_TURN_EACH_MOVE	},
-    { ep_can_grow,		EP_CAN_GROW		},
-    { ep_active_bomb,		EP_ACTIVE_BOMB		},
-    { ep_inactive,		EP_INACTIVE		},
+    { ep_player,			EP_PLAYER			},
+    { ep_can_pass_magic_wall,		EP_CAN_PASS_MAGIC_WALL		},
+    { ep_switchable,			EP_SWITCHABLE			},
+    { ep_bd_element,			EP_BD_ELEMENT			},
+    { ep_sp_element,			EP_SP_ELEMENT			},
+    { ep_sb_element,			EP_SB_ELEMENT			},
+    { ep_gem,				EP_GEM				},
+    { ep_food_dark_yamyam,		EP_FOOD_DARK_YAMYAM		},
+    { ep_food_penguin,			EP_FOOD_PENGUIN			},
+    { ep_food_pig,			EP_FOOD_PIG			},
+    { ep_historic_wall,			EP_HISTORIC_WALL		},
+    { ep_historic_solid,		EP_HISTORIC_SOLID		},
+    { ep_classic_enemy,			EP_CLASSIC_ENEMY		},
+    { ep_belt,				EP_BELT				},
+    { ep_belt_active,			EP_BELT_ACTIVE			},
+    { ep_belt_switch,			EP_BELT_SWITCH			},
+    { ep_tube,				EP_TUBE				},
+    { ep_keygate,			EP_KEYGATE			},
+    { ep_amoeboid,			EP_AMOEBOID			},
+    { ep_amoebalive,			EP_AMOEBALIVE			},
+    { ep_has_content,			EP_HAS_CONTENT			},
+    { ep_can_turn_each_move,		EP_CAN_TURN_EACH_MOVE		},
+    { ep_can_grow,			EP_CAN_GROW			},
+    { ep_active_bomb,			EP_ACTIVE_BOMB			},
+    { ep_inactive,			EP_INACTIVE			},
 
-    { ep_em_slippery_wall,	EP_EM_SLIPPERY_WALL	},
+    { ep_em_slippery_wall,		EP_EM_SLIPPERY_WALL		},
 
-    { ep_gfx_crumbled,		EP_GFX_CRUMBLED		},
+    { ep_gfx_crumbled,			EP_GFX_CRUMBLED			},
 
-    { NULL,			-1			}
+    { ep_editor_cascade_active,		EP_EDITOR_CASCADE_ACTIVE	},
+    { ep_editor_cascade_inactive, 	EP_EDITOR_CASCADE_INACTIVE	},
+
+    { NULL,				-1				}
   };
 
   int i, j, k;
@@ -3645,6 +3697,10 @@ void InitElementPropertiesEngine(int engine_version)
     SET_PROPERTY(i, EP_GFX_CRUMBLED,
 		 element_info[i].crumbled[ACTION_DEFAULT] != IMG_EMPTY);
 #endif
+
+    /* ---------- EDITOR_CASCADE ------------------------------------------- */
+    SET_PROPERTY(i, EP_EDITOR_CASCADE, (IS_EDITOR_CASCADE_ACTIVE(i) ||
+					IS_EDITOR_CASCADE_INACTIVE(i)));
   }
 
   /* dynamically adjust element properties according to game engine version */

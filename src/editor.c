@@ -277,7 +277,7 @@
 #define ED_TEXTBUTTON_XSIZE		ED_WIN_COUNT_XSIZE
 #define ED_TEXTBUTTON_YSIZE		ED_WIN_COUNT_YSIZE
 
-/* values for ClearEditorGadgetInfoText() and HandleGadgetInfoText() */
+/* values for ClearEditorGadgetInfoText() and HandleEditorGadgetInfoText() */
 #define INFOTEXT_XPOS			SX
 #define INFOTEXT_YPOS			(SY + SYSIZE - MINI_TILEX + 2)
 #define INFOTEXT_XSIZE			SXSIZE
@@ -2937,6 +2937,7 @@ static void HandleRadiobuttons(struct GadgetInfo *);
 static void HandleCheckbuttons(struct GadgetInfo *);
 static void HandleControlButtons(struct GadgetInfo *);
 static void HandleDrawingAreaInfo(struct GadgetInfo *);
+static void PrintEditorGadgetInfoText(struct GadgetInfo *);
 
 static struct GadgetInfo *level_editor_gadget[NUM_EDITOR_GADGETS];
 static int right_gadget_border[NUM_EDITOR_GADGETS];
@@ -2958,6 +2959,12 @@ static int element_shift = 0;
 
 static int editor_hl_boulderdash[] =
 {
+  EL_INTERNAL_CASCADE_BD_ACTIVE,
+  EL_CHAR('B'),
+  EL_CHAR('D'),
+  EL_EMPTY,
+
+#if 0
   EL_CHAR('B'),
   EL_CHAR('O'),
   EL_CHAR('U'),
@@ -2972,6 +2979,7 @@ static int editor_hl_boulderdash[] =
   EL_CHAR('A'),
   EL_CHAR('S'),
   EL_CHAR('H'),
+#endif
 };
 
 static int editor_el_boulderdash[] =
@@ -3008,6 +3016,12 @@ static int num_editor_el_boulderdash = SIZEOF_ARRAY_INT(editor_el_boulderdash);
 
 static int editor_hl_emerald_mine[] =
 {
+  EL_INTERNAL_CASCADE_EM_ACTIVE,
+  EL_CHAR('E'),
+  EL_CHAR('M'),
+  EL_EMPTY,
+
+#if 0
   EL_CHAR('E'),
   EL_CHAR('M'),
   EL_CHAR('E'),
@@ -3022,6 +3036,7 @@ static int editor_hl_emerald_mine[] =
   EL_CHAR('I'),
   EL_CHAR('N'),
   EL_CHAR('E'),
+#endif
 };
 
 static int editor_el_emerald_mine[] =
@@ -3108,6 +3123,12 @@ static int num_editor_el_emerald_mine=SIZEOF_ARRAY_INT(editor_el_emerald_mine);
 
 static int editor_hl_emerald_mine_club[] =
 {
+  EL_INTERNAL_CASCADE_EMC_ACTIVE,
+  EL_CHAR('E'),
+  EL_CHAR('M'),
+  EL_CHAR('C'),
+
+#if 0
   EL_CHAR('E'),
   EL_CHAR('M'),
   EL_CHAR('E'),
@@ -3127,6 +3148,7 @@ static int editor_hl_emerald_mine_club[] =
   EL_CHAR('L'),
   EL_CHAR('U'),
   EL_CHAR('B'),
+#endif
 };
 
 static int editor_el_emerald_mine_club[] =
@@ -3240,10 +3262,17 @@ static int num_editor_el_emerald_mine_club=SIZEOF_ARRAY_INT(editor_el_emerald_mi
 
 static int editor_hl_more[] =
 {
+  EL_INTERNAL_CASCADE_RND_ACTIVE,
+  EL_CHAR('R'),
+  EL_CHAR('N'),
+  EL_CHAR('D'),
+
+#if 0
   EL_CHAR('M'),
   EL_CHAR('O'),
   EL_CHAR('R'),
   EL_CHAR('E'),
+#endif
 };
 
 static int editor_el_more[] =
@@ -3335,6 +3364,12 @@ static int num_editor_el_more = SIZEOF_ARRAY_INT(editor_el_more);
 
 static int editor_hl_sokoban[] =
 {
+  EL_INTERNAL_CASCADE_SB_ACTIVE,
+  EL_CHAR('S'),
+  EL_CHAR('B'),
+  EL_EMPTY,
+
+#if 0
   EL_CHAR('S'),
   EL_CHAR('O'),
   EL_CHAR('K'),
@@ -3344,6 +3379,7 @@ static int editor_hl_sokoban[] =
   EL_CHAR('B'),
   EL_CHAR('A'),
   EL_CHAR('N'),
+#endif
 };
 
 static int editor_el_sokoban[] =
@@ -3360,6 +3396,12 @@ static int num_editor_el_sokoban = SIZEOF_ARRAY_INT(editor_el_sokoban);
 
 static int editor_hl_supaplex[] =
 {
+  EL_INTERNAL_CASCADE_SP_ACTIVE,
+  EL_CHAR('S'),
+  EL_CHAR('P'),
+  EL_EMPTY,
+
+#if 0
   EL_CHAR('S'),
   EL_CHAR('U'),
   EL_CHAR('P'),
@@ -3369,6 +3411,7 @@ static int editor_hl_supaplex[] =
   EL_CHAR('L'),
   EL_CHAR('E'),
   EL_CHAR('X'),
+#endif
 };
 
 static int editor_el_supaplex[] =
@@ -3434,6 +3477,12 @@ static int num_editor_el_supaplex = SIZEOF_ARRAY_INT(editor_el_supaplex);
 
 static int editor_hl_diamond_caves[] =
 {
+  EL_INTERNAL_CASCADE_DC_ACTIVE,
+  EL_CHAR('D'),
+  EL_CHAR('C'),
+  EL_CHAR('2'),
+
+#if 0
   EL_CHAR('D'),
   EL_CHAR('I'),
   EL_CHAR('A'),
@@ -3453,6 +3502,7 @@ static int editor_hl_diamond_caves[] =
   EL_CHAR(' '),
   EL_CHAR('I'),
   EL_CHAR('I'),
+#endif
 };
 
 static int editor_el_diamond_caves[] =
@@ -3529,6 +3579,12 @@ static int num_editor_el_diamond_caves = SIZEOF_ARRAY_INT(editor_el_diamond_cave
 
 static int editor_hl_dx_boulderdash[] =
 {
+  EL_INTERNAL_CASCADE_DX_ACTIVE,
+  EL_CHAR('D'),
+  EL_CHAR('X'),
+  EL_EMPTY,
+
+#if 0
   EL_CHAR('D'),
   EL_CHAR('X'),
   EL_CHAR('-'),
@@ -3548,6 +3604,7 @@ static int editor_hl_dx_boulderdash[] =
   EL_CHAR('A'),
   EL_CHAR('S'),
   EL_CHAR('H'),
+#endif
 };
 
 static int editor_el_dx_boulderdash[] =
@@ -3579,10 +3636,17 @@ static int num_editor_el_dx_boulderdash = SIZEOF_ARRAY_INT(editor_el_dx_boulderd
 
 static int editor_hl_chars[] =
 {
+  EL_INTERNAL_CASCADE_TEXT_ACTIVE,
+  EL_CHAR('T'),
+  EL_CHAR('X'),
+  EL_CHAR('T'),
+
+#if 0
   EL_CHAR('T'),
   EL_CHAR('E'),
   EL_CHAR('X'),
   EL_CHAR('T'),
+#endif
 };
 
 static int editor_el_chars[] =
@@ -3684,6 +3748,12 @@ static int num_editor_el_chars = SIZEOF_ARRAY_INT(editor_el_chars);
 
 static int editor_hl_custom[] =
 {
+  EL_INTERNAL_CASCADE_CE_ACTIVE,
+  EL_CHAR('C'),
+  EL_CHAR('E'),
+  EL_EMPTY,
+
+#if 0
   EL_CHAR('C'),
   EL_CHAR('U'),
   EL_CHAR('S'),
@@ -3703,6 +3773,7 @@ static int editor_hl_custom[] =
   EL_CHAR('N'),
   EL_CHAR('T'),
   EL_CHAR('S'),
+#endif
 };
 
 static int editor_el_custom[] =
@@ -3865,19 +3936,8 @@ static int editor_el_custom[] =
   EL_CUSTOM_START + 124,
   EL_CUSTOM_START + 125,
   EL_CUSTOM_START + 126,
-  EL_CUSTOM_START + 127
-};
-static int *editor_hl_custom_ptr = editor_hl_custom;
-static int *editor_el_custom_ptr = editor_el_custom;
-static int num_editor_hl_custom = SIZEOF_ARRAY_INT(editor_hl_custom);
-static int num_editor_el_custom = SIZEOF_ARRAY_INT(editor_el_custom);
+  EL_CUSTOM_START + 127,
 
-static int editor_hl_custom_more[] =
-{
-};
-
-static int editor_el_custom_more[] =
-{
   EL_CUSTOM_START + 128,
   EL_CUSTOM_START + 129,
   EL_CUSTOM_START + 130,
@@ -4036,31 +4096,26 @@ static int editor_el_custom_more[] =
   EL_CUSTOM_START + 252,
   EL_CUSTOM_START + 253,
   EL_CUSTOM_START + 254,
-  EL_CUSTOM_START + 255
-};
-static int *editor_hl_custom_more_ptr = editor_hl_custom_more;
-static int *editor_el_custom_more_ptr = editor_el_custom_more;
-static int num_editor_hl_custom_more = SIZEOF_ARRAY_INT(editor_hl_custom_more);
-static int num_editor_el_custom_more = SIZEOF_ARRAY_INT(editor_el_custom_more);
+  EL_CUSTOM_START + 255,
 
-static int editor_hl_custom_special[] =
-{
-};
-
-static int editor_el_custom_special[] =
-{
   EL_TRIGGER_ELEMENT,
   EL_TRIGGER_PLAYER,
   EL_EMPTY,
   EL_EMPTY
 };
-static int *editor_hl_custom_special_ptr = editor_hl_custom_special;
-static int *editor_el_custom_special_ptr = editor_el_custom_special;
-static int num_editor_hl_custom_special = SIZEOF_ARRAY_INT(editor_hl_custom_special);
-static int num_editor_el_custom_special = SIZEOF_ARRAY_INT(editor_el_custom_special);
+static int *editor_hl_custom_ptr = editor_hl_custom;
+static int *editor_el_custom_ptr = editor_el_custom;
+static int num_editor_hl_custom = SIZEOF_ARRAY_INT(editor_hl_custom);
+static int num_editor_el_custom = SIZEOF_ARRAY_INT(editor_el_custom);
 
 static int editor_hl_group[] =
 {
+  EL_INTERNAL_CASCADE_GE_ACTIVE,
+  EL_CHAR('G'),
+  EL_CHAR('E'),
+  EL_EMPTY,
+
+#if 0
   EL_CHAR('G'),
   EL_CHAR('R'),
   EL_CHAR('O'),
@@ -4080,6 +4135,7 @@ static int editor_hl_group[] =
   EL_CHAR('N'),
   EL_CHAR('T'),
   EL_CHAR('S'),
+#endif
 };
 
 static int editor_el_group[] =
@@ -4102,19 +4158,8 @@ static int editor_el_group[] =
   EL_GROUP_START + 12,
   EL_GROUP_START + 13,
   EL_GROUP_START + 14,
-  EL_GROUP_START + 15
-};
-static int *editor_hl_group_ptr = editor_hl_group;
-static int *editor_el_group_ptr = editor_el_group;
-static int num_editor_hl_group = SIZEOF_ARRAY_INT(editor_hl_group);
-static int num_editor_el_group = SIZEOF_ARRAY_INT(editor_el_group);
+  EL_GROUP_START + 15,
 
-static int editor_hl_group_more[] =
-{
-};
-
-static int editor_el_group_more[] =
-{
   EL_GROUP_START + 16,
   EL_GROUP_START + 17,
   EL_GROUP_START + 18,
@@ -4135,13 +4180,19 @@ static int editor_el_group_more[] =
   EL_GROUP_START + 30,
   EL_GROUP_START + 31
 };
-static int *editor_hl_group_more_ptr = editor_hl_group_more;
-static int *editor_el_group_more_ptr = editor_el_group_more;
-static int num_editor_hl_group_more = SIZEOF_ARRAY_INT(editor_hl_group_more);
-static int num_editor_el_group_more = SIZEOF_ARRAY_INT(editor_el_group_more);
+static int *editor_hl_group_ptr = editor_hl_group;
+static int *editor_el_group_ptr = editor_el_group;
+static int num_editor_hl_group = SIZEOF_ARRAY_INT(editor_hl_group);
+static int num_editor_el_group = SIZEOF_ARRAY_INT(editor_el_group);
 
 static int editor_hl_user_defined[] =
 {
+  EL_INTERNAL_CASCADE_USER_ACTIVE,
+  EL_CHAR('M'),
+  EL_CHAR('Y'),
+  EL_EMPTY,
+
+#if 0
   EL_CHAR('U'),
   EL_CHAR('S'),
   EL_CHAR('E'),
@@ -4156,12 +4207,26 @@ static int editor_hl_user_defined[] =
   EL_CHAR('N'),
   EL_CHAR('E'),
   EL_CHAR('D'),
+#endif
 };
 
 static int *editor_hl_user_defined_ptr = editor_hl_user_defined;
 static int *editor_el_user_defined_ptr = NULL;
 static int num_editor_hl_user_defined=SIZEOF_ARRAY_INT(editor_hl_user_defined);
 static int num_editor_el_user_defined = 0;
+
+static int editor_hl_dynamic[] =
+{
+  EL_INTERNAL_CASCADE_DYNAMIC_ACTIVE,
+  EL_CHAR('D'),
+  EL_CHAR('Y'),
+  EL_CHAR('N'),
+};
+
+static int *editor_hl_dynamic_ptr = editor_hl_dynamic;
+static int *editor_el_dynamic_ptr = NULL;
+static int num_editor_hl_dynamic = SIZEOF_ARRAY_INT(editor_hl_dynamic);
+static int num_editor_el_dynamic = 0;
 
 static int editor_hl_empty[] = { };
 static int editor_el_empty[ED_NUM_ELEMENTLIST_BUTTONS];
@@ -4241,29 +4306,19 @@ editor_elements_info[] =
     &editor_el_custom_ptr,		&num_editor_el_custom
   },
   {
-    &setup.editor.el_custom_more,
-    &editor_hl_custom_more_ptr,		&num_editor_hl_custom_more,
-    &editor_el_custom_more_ptr,		&num_editor_el_custom_more
-  },
-  {
-    &setup.editor.el_custom,
-    &editor_hl_custom_special_ptr,	&num_editor_hl_custom_special,
-    &editor_el_custom_special_ptr,	&num_editor_el_custom_special
-  },
-  {
     &setup.editor.el_custom,
     &editor_hl_group_ptr,		&num_editor_hl_group,
     &editor_el_group_ptr,		&num_editor_el_group
   },
   {
-    &setup.editor.el_custom_more,
-    &editor_hl_group_more_ptr,		&num_editor_hl_group_more,
-    &editor_el_group_more_ptr,		&num_editor_el_group_more
-  },
-  {
     &setup.editor.el_user_defined,
     &editor_hl_user_defined_ptr,	&num_editor_hl_user_defined,
     &editor_el_user_defined_ptr,	&num_editor_el_user_defined
+  },
+  {
+    &setup.editor.el_dynamic,
+    &editor_hl_dynamic_ptr,		&num_editor_hl_dynamic,
+    &editor_el_dynamic_ptr,		&num_editor_el_dynamic,
   },
   {
     &use_el_empty,
@@ -4314,7 +4369,11 @@ static char *getElementInfoText(int element)
 {
   char *info_text = NULL;
 
+#if 1
+  if (element < MAX_NUM_ELEMENTS)
+#else
   if (element < NUM_FILE_ELEMENTS)
+#endif
   {
     if (strlen(element_info[element].description) > 0)
       info_text = element_info[element].description;
@@ -4330,6 +4389,53 @@ static char *getElementInfoText(int element)
   return info_text;
 }
 
+static void InitDynamicEditorElementList(int **elements, int *num_elements)
+{
+  boolean element_found[NUM_FILE_ELEMENTS];
+  int i, x, y;
+
+  /* initialize list of used elements to "not used" */
+  for (i = 0; i < NUM_FILE_ELEMENTS; i++)
+    element_found[i] = FALSE;
+
+  /* find all elements used in current level */
+  for (y = 0; y < lev_fieldy; y++)
+    for (x = 0; x < lev_fieldx; x++)
+      if (Feld[x][y] < NUM_FILE_ELEMENTS)	/* should always be true */
+	element_found[Feld[x][y]] = TRUE;
+
+  *num_elements = 0;
+
+  /* count number of elements used in current level */
+  for (i = 0; i < NUM_FILE_ELEMENTS; i++)
+    if (element_found[i])
+      (*num_elements)++;
+
+  /* add space for up to 3 more elements for padding that may be needed */
+  *num_elements += 3;
+
+  /* free memory for old list of elements, if needed */
+  checked_free(*elements);
+
+  /* allocate memory for new list of elements */
+  *elements = checked_malloc(*num_elements * sizeof(int));
+
+  *num_elements = 0;
+
+  /* add all elements used in current level (non-custom/group elements) */
+  for (i = 0; i < NUM_FILE_ELEMENTS; i++)
+    if (element_found[i] && !(IS_CUSTOM_ELEMENT(i) || IS_GROUP_ELEMENT(i)))
+      (*elements)[(*num_elements)++] = i;
+
+  /* add all elements used in current level (custom/group elements) */
+  for (i = 0; i < NUM_FILE_ELEMENTS; i++)
+    if (element_found[i] && (IS_CUSTOM_ELEMENT(i) || IS_GROUP_ELEMENT(i)))
+      (*elements)[(*num_elements)++] = i;
+
+  while (*num_elements % 4)	/* pad with empty elements, if needed */
+    (*elements)[(*num_elements)++] = EL_EMPTY;
+}
+
 static void ReinitializeElementList()
 {
   int pos = 0;
@@ -4340,6 +4446,10 @@ static void ReinitializeElementList()
   /* reload optional user defined element list for each invocation of editor */
   LoadUserDefinedEditorElementList(&editor_el_user_defined_ptr,
 				   &num_editor_el_user_defined);
+
+  /* initialize dynamic level element list for each invocation of editor */
+  InitDynamicEditorElementList(&editor_el_dynamic_ptr,
+			       &num_editor_el_dynamic);
 
   /* initialize list of empty elements (used for padding, if needed) */
   for (i = 0; i < ED_NUM_ELEMENTLIST_BUTTONS; i++)
@@ -4366,10 +4476,25 @@ static void ReinitializeElementList()
   /* determine size of element list */
   for (i = 0; editor_elements_info[i].setup_value != NULL; i++)
   {
+    boolean found_inactive_cascade = FALSE;
+
     if (*editor_elements_info[i].setup_value)
     {
       if (setup.editor.el_headlines)
+      {
 	num_editor_elements += *editor_elements_info[i].headline_list_size;
+
+	for (j = 0; j < *editor_elements_info[i].headline_list_size; j++)
+	{
+	  int element = (*editor_elements_info[i].headline_list)[j];
+
+	  if (IS_EDITOR_CASCADE_INACTIVE(element))
+	    found_inactive_cascade = TRUE;
+	}
+      }
+
+      if (found_inactive_cascade)
+	continue;
 
       num_editor_elements += *editor_elements_info[i].element_list_size;
     }
@@ -4389,11 +4514,25 @@ static void ReinitializeElementList()
   /* fill element list */
   for (i = 0; editor_elements_info[i].setup_value != NULL; i++)
   {
+    boolean found_inactive_cascade = FALSE;
+
     if (*editor_elements_info[i].setup_value)
     {
       if (setup.editor.el_headlines)
+      {
 	for (j = 0; j < *editor_elements_info[i].headline_list_size; j++)
-	  editor_elements[pos++] = (*editor_elements_info[i].headline_list)[j];
+	{
+	  int element = (*editor_elements_info[i].headline_list)[j];
+
+	  editor_elements[pos++] = element;
+
+	  if (IS_EDITOR_CASCADE_INACTIVE(element))
+	    found_inactive_cascade = TRUE;
+	}
+      }
+
+      if (found_inactive_cascade)
+	continue;
 
       for (j = 0; j < *editor_elements_info[i].element_list_size; j++)
 	editor_elements[pos++] = (*editor_elements_info[i].element_list)[j];
@@ -5961,11 +6100,12 @@ static boolean LevelContainsPlayer()
 
   return TRUE;		/* !!! CURRENTLY DEACTIVATED !!! */
 
-  for (y = 0; y < lev_fieldy; y++) 
-    for (x = 0; x < lev_fieldx; x++)
-      if (Feld[x][y] == EL_PLAYER_1 ||
-	  Feld[x][y] == EL_SP_MURPHY) 
-	player_found = TRUE;
+  for (y = 0; y < lev_fieldy; y++) for (x = 0; x < lev_fieldx; x++)
+  {
+    if (Feld[x][y] == EL_PLAYER_1 ||
+	Feld[x][y] == EL_SP_MURPHY) 
+      player_found = TRUE;
+  }
 
   return player_found;
 }
@@ -6557,6 +6697,7 @@ void DrawLevelEd()
 
   redraw_mask |= REDRAW_ALL;
 
+  ReinitializeElementList();		/* update dynamic level element list */
   ReinitializeElementListButtons();	/* custom element may look different */
 
   UnmapTapeButtons();
@@ -6672,6 +6813,25 @@ static void AdjustEditorScrollbar(int id)
     item_position = items_max - items_visible;
 
   ModifyGadget(gi, GDI_SCROLLBAR_ITEMS_MAX, items_max,
+	       GDI_SCROLLBAR_ITEM_POSITION, item_position, GDI_END);
+}
+
+static void AdjustElementListScrollbar()
+{
+  struct GadgetInfo *gi = level_editor_gadget[GADGET_ID_SCROLL_LIST_VERTICAL];
+  int items_max, items_visible, item_position;
+
+  if (element_shift < 0)
+    element_shift = 0;
+  if (element_shift > num_editor_elements - ED_NUM_ELEMENTLIST_BUTTONS)
+    element_shift = num_editor_elements - ED_NUM_ELEMENTLIST_BUTTONS;
+
+  items_max = num_editor_elements / ED_ELEMENTLIST_BUTTONS_HORIZ;
+  items_visible = ED_ELEMENTLIST_BUTTONS_VERT;
+  item_position = element_shift / ED_ELEMENTLIST_BUTTONS_HORIZ;
+
+  ModifyGadget(gi, GDI_SCROLLBAR_ITEMS_MAX, items_max,
+	       GDI_SCROLLBAR_ITEMS_VISIBLE, items_visible,
 	       GDI_SCROLLBAR_ITEM_POSITION, item_position, GDI_END);
 }
 
@@ -6824,10 +6984,15 @@ static void DrawLevelInfoWindow()
   ClearWindow();
   UnmapLevelEditorWindowGadgets();
 
+#if 0
+  DrawTextSCentered(ED_SETTINGS1_YPOS, FONT_TITLE_1, "Level Settings");
+  DrawTextSCentered(ED_SETTINGS2_YPOS, FONT_TITLE_1, "Editor Settings");
+#else
   DrawText(SX + ED_SETTINGS2_XPOS, SY + ED_SETTINGS1_YPOS,
 	   "Level Settings", FONT_TITLE_1);
   DrawText(SX + ED_SETTINGS2_XPOS, SY + ED_SETTINGS2_YPOS,
 	   "Editor Settings", FONT_TITLE_1);
+#endif
 
   /* draw counter gadgets */
   for (i = ED_COUNTER_ID_LEVEL_FIRST; i <= ED_COUNTER_ID_LEVEL_LAST; i++)
@@ -7734,8 +7899,12 @@ static void DrawPropertiesWindow()
   SetMainBackgroundImage(IMG_BACKGROUND_EDITOR);
   ClearWindow();
 
+#if 0
+  DrawTextSCentered(ED_SETTINGS1_YPOS, FONT_TITLE_1, "Element Settings");
+#else
   DrawText(SX + ED_SETTINGS2_XPOS, SY + ED_SETTINGS1_YPOS,
 	   "Element Settings", FONT_TITLE_1);
+#endif
 
   DrawElementBorder(SX + xstart * MINI_TILEX,
 		    SY + ystart * MINI_TILEY + MINI_TILEY / 2,
@@ -9329,6 +9498,34 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 	int element_position = id - GADGET_ID_ELEMENTLIST_FIRST;
 	int new_element = editor_elements[element_position + element_shift];
 
+	if (IS_EDITOR_CASCADE(new_element))
+	{
+	  int i;
+
+	  for (i = 0; editor_elements_info[i].setup_value != NULL; i++)
+	  {
+	    int *cascade_element = *editor_elements_info[i].headline_list;
+
+	    if (*cascade_element == new_element)
+	    {
+	      *cascade_element = EL_CASCADE_TOGGLE(*cascade_element);
+
+	      ReinitializeElementList();
+#if 0
+	      ReinitializeElementListButtons();
+#endif
+	      ModifyEditorElementList();
+	      AdjustElementListScrollbar();
+
+	      PrintEditorGadgetInfoText(level_editor_gadget[id]);
+
+	      break;
+	    }
+	  }
+
+	  break;
+	}
+
 	if (last_custom_copy_mode != -1)
 	{
 	  if (CopyCustomElement(properties_element, new_element,
@@ -9482,24 +9679,11 @@ void ClearEditorGadgetInfoText()
   DrawBackground(INFOTEXT_XPOS, INFOTEXT_YPOS, INFOTEXT_XSIZE, INFOTEXT_YSIZE);
 }
 
-void HandleEditorGadgetInfoText(void *ptr)
+void PrintEditorGadgetInfoText(struct GadgetInfo *gi)
 {
-  struct GadgetInfo *gi = (struct GadgetInfo *)ptr;
   char infotext[MAX_OUTPUT_LINESIZE + 1];
   char shortcut[MAX_OUTPUT_LINESIZE + 1];
   int max_infotext_len = getMaxInfoTextLength();
-
-  if (game_status != GAME_MODE_EDITOR)
-    return;
-
-  ClearEditorGadgetInfoText();
-
-  if (gi->event.type == GD_EVENT_INFO_LEAVING)
-    return;
-
-  /* misuse this function to delete brush cursor, if needed */
-  if (edit_mode == ED_MODE_DRAWING && draw_with_brush)
-    DeleteBrushFromCursor();
 
   if (gi == NULL || gi->info_text == NULL)
     return;
@@ -9529,6 +9713,61 @@ void HandleEditorGadgetInfoText(void *ptr)
   }
 
   DrawText(INFOTEXT_XPOS, INFOTEXT_YPOS, infotext, FONT_TEXT_2);
+}
+
+void HandleEditorGadgetInfoText(void *ptr)
+{
+  struct GadgetInfo *gi = (struct GadgetInfo *)ptr;
+#if 0
+  char infotext[MAX_OUTPUT_LINESIZE + 1];
+  char shortcut[MAX_OUTPUT_LINESIZE + 1];
+  int max_infotext_len = getMaxInfoTextLength();
+#endif
+
+  if (game_status != GAME_MODE_EDITOR)
+    return;
+
+  ClearEditorGadgetInfoText();
+
+  if (gi == NULL || gi->event.type == GD_EVENT_INFO_LEAVING)
+    return;
+
+  /* misuse this function to delete brush cursor, if needed */
+  if (edit_mode == ED_MODE_DRAWING && draw_with_brush)
+    DeleteBrushFromCursor();
+
+#if 1
+  PrintEditorGadgetInfoText(gi);
+#else
+  if (gi == NULL || gi->info_text == NULL)
+    return;
+
+  strncpy(infotext, gi->info_text, max_infotext_len);
+  infotext[max_infotext_len] = '\0';
+
+  if (gi->custom_id < ED_NUM_CTRL_BUTTONS)
+  {
+    int key = control_info[gi->custom_id].shortcut;
+
+    if (key)
+    {
+      if (gi->custom_id == GADGET_ID_SINGLE_ITEMS)	/* special case 1 */
+	sprintf(shortcut, " ('.' or '%c')", key);
+      else if (gi->custom_id == GADGET_ID_PICK_ELEMENT)	/* special case 2 */
+	sprintf(shortcut, " ('%c' or 'Ctrl')", key);
+      else if (gi->custom_id == GADGET_ID_TEST)		/* special case 3 */
+	sprintf(shortcut, " ('Enter' or 'Shift-%c')", key);
+      else						/* normal case */
+	sprintf(shortcut, " ('%s%c')",
+		(key >= 'A' && key <= 'Z' ? "Shift-" : ""), key);
+
+      if (strlen(infotext) + strlen(shortcut) <= max_infotext_len)
+	strcat(infotext, shortcut);
+    }
+  }
+
+  DrawText(INFOTEXT_XPOS, INFOTEXT_YPOS, infotext, FONT_TEXT_2);
+#endif
 }
 
 static void HandleDrawingAreaInfo(struct GadgetInfo *gi)

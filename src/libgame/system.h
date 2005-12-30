@@ -586,8 +586,8 @@ struct SetupEditorInfo
   boolean el_dx_boulderdash;
   boolean el_chars;
   boolean el_custom;
-  boolean el_custom_more;
   boolean el_user_defined;
+  boolean el_dynamic;
 
   boolean el_headlines;
 };

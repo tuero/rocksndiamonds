@@ -391,6 +391,10 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
   static boolean clipboard_elements_initialized = FALSE;
   int i, j, x, y;
 
+#if 1
+  InitElementPropertiesStatic();
+#endif
+
   setLevelInfoToDefaultsFromConfigList(level);
   setLevelInfoToDefaults_EM();
 
@@ -587,9 +591,13 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
 
       ei->current_change_page = 0;
 
+#if 0
+      /* !!! now done in InitElementPropertiesStatic() (see above) !!! */
+      /* !!! (else properties set there will be overwritten here)  !!! */
       /* start with no properties at all */
       for (j = 0; j < NUM_EP_BITFIELDS; j++)
 	Properties[element][j] = EP_BITMASK_DEFAULT;
+#endif
 
       /* now set default properties */
       SET_PROPERTY(element, EP_CAN_MOVE_INTO_ACID, TRUE);
@@ -2317,6 +2325,16 @@ void CopyNativeLevel_RND_to_EM(struct LevelInfo *level)
   /* initialize player positions and delete players from the playfield */
   for (y = 0; y < lev->height; y++) for (x = 0; x < lev->width; x++)
   {
+#if 1
+    /* !!! CURRENTLY ONLY SUPPORT FOR ONE PLAYER !!! */
+    if (ELEM_IS_PLAYER(level->field[x][y]))
+    {
+      ply1->x_initial = x + 1;
+      ply1->y_initial = y + 1;
+      level_em->cave[x + 1][y + 1] = map_element_RND_to_EM(EL_EMPTY);
+    }
+#else
+    /* !!! ADD SUPPORT FOR MORE THAN ONE PLAYER !!! */
     if (level->field[x][y] == EL_PLAYER_1)
     {
       ply1->x_initial = x + 1;
@@ -2329,6 +2347,7 @@ void CopyNativeLevel_RND_to_EM(struct LevelInfo *level)
       ply2->y_initial = y + 1;
       level_em->cave[x + 1][y + 1] = map_element_RND_to_EM(EL_EMPTY);
     }
+#endif
   }
 }
 
@@ -4479,9 +4498,9 @@ void SaveScore(int nr)
 #define SETUP_TOKEN_EDITOR_EL_DX_BOULDERDASH	7
 #define SETUP_TOKEN_EDITOR_EL_CHARS		8
 #define SETUP_TOKEN_EDITOR_EL_CUSTOM		9
-#define SETUP_TOKEN_EDITOR_EL_CUSTOM_MORE	10
-#define SETUP_TOKEN_EDITOR_EL_HEADLINES		11
-#define SETUP_TOKEN_EDITOR_EL_USER_DEFINED	12
+#define SETUP_TOKEN_EDITOR_EL_HEADLINES		10
+#define SETUP_TOKEN_EDITOR_EL_USER_DEFINED	11
+#define SETUP_TOKEN_EDITOR_EL_DYNAMIC		12
 
 #define NUM_EDITOR_SETUP_TOKENS			13
 
@@ -4570,9 +4589,9 @@ static struct TokenInfo editor_setup_tokens[] =
   { TYPE_SWITCH, &sei.el_dx_boulderdash,"editor.el_dx_boulderdash"	},
   { TYPE_SWITCH, &sei.el_chars,		"editor.el_chars"		},
   { TYPE_SWITCH, &sei.el_custom,	"editor.el_custom"		},
-  { TYPE_SWITCH, &sei.el_custom_more,	"editor.el_custom_more"		},
   { TYPE_SWITCH, &sei.el_headlines,	"editor.el_headlines"		},
   { TYPE_SWITCH, &sei.el_user_defined,	"editor.el_user_defined"	},
+  { TYPE_SWITCH, &sei.el_dynamic,	"editor.el_dynamic"		},
 };
 
 static struct TokenInfo shortcut_setup_tokens[] =
@@ -4670,10 +4689,10 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
   si->editor.el_dx_boulderdash    = TRUE;
   si->editor.el_chars             = TRUE;
   si->editor.el_custom            = TRUE;
-  si->editor.el_custom_more       = FALSE;
 
   si->editor.el_headlines = TRUE;
   si->editor.el_user_defined = FALSE;
+  si->editor.el_dynamic = TRUE;
 
   si->shortcut.save_game = DEFAULT_KEY_SAVE_GAME;
   si->shortcut.load_game = DEFAULT_KEY_LOAD_GAME;
@@ -4970,6 +4989,10 @@ void LoadUserDefinedEditorElementList(int **elements, int *num_elements)
   /* add space for up to 3 more elements for padding that may be needed */
   *num_elements += 3;
 
+  /* free memory for old list of elements, if needed */
+  checked_free(*elements);
+
+  /* allocate memory for new list of elements */
   *elements = checked_malloc(*num_elements * sizeof(int));
 
   *num_elements = 0;

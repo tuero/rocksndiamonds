@@ -4194,6 +4194,146 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
     "internal",
     "-"
   },
+  {
+    "internal_cascade_bd",
+    "internal",
+    "show Boulder Dash elements"
+  },
+  {
+    "internal_cascade_bd.active",
+    "internal",
+    "hide Boulder Dash elements"
+  },
+  {
+    "internal_cascade_em",
+    "internal",
+    "show Emerald Mine elements"
+  },
+  {
+    "internal_cascade_em.active",
+    "internal",
+    "hide Emerald Mine elements"
+  },
+  {
+    "internal_cascade_emc",
+    "internal",
+    "show Emerald Mine Club elements"
+  },
+  {
+    "internal_cascade_emc.active",
+    "internal",
+    "hide Emerald Mine Club elements"
+  },
+  {
+    "internal_cascade_rnd",
+    "internal",
+    "show Rocks'n'Diamonds elements"
+  },
+  {
+    "internal_cascade_rnd.active",
+    "internal",
+    "hide Rocks'n'Diamonds elements"
+  },
+  {
+    "internal_cascade_sb",
+    "internal",
+    "show Sokoban elements"
+  },
+  {
+    "internal_cascade_sb.active",
+    "internal",
+    "hide Sokoban elements"
+  },
+  {
+    "internal_cascade_sp",
+    "internal",
+    "show Supaplex elements"
+  },
+  {
+    "internal_cascade_sp.active",
+    "internal",
+    "hide Supaplex elements"
+  },
+  {
+    "internal_cascade_dc",
+    "internal",
+    "show Diamond Caves II elements"
+  },
+  {
+    "internal_cascade_dc.active",
+    "internal",
+    "hide Diamond Caves II elements"
+  },
+  {
+    "internal_cascade_dx",
+    "internal",
+    "show DX Boulderdash elements"
+  },
+  {
+    "internal_cascade_dx.active",
+    "internal",
+    "hide DX Boulderdash elements"
+  },
+  {
+    "internal_cascade_text",
+    "internal",
+    "show text elements"
+  },
+  {
+    "internal_cascade_text.active",
+    "internal",
+    "hide text elements"
+  },
+  {
+    "internal_cascade_ce",
+    "internal",
+    "show custom elements"
+  },
+  {
+    "internal_cascade_ce.active",
+    "internal",
+    "hide custom elements"
+  },
+  {
+    "internal_cascade_ge",
+    "internal",
+    "show group elements"
+  },
+  {
+    "internal_cascade_ge.active",
+    "internal",
+    "hide group elements"
+  },
+  {
+    "internal_cascade_user",
+    "internal",
+    "show user defined elements"
+  },
+  {
+    "internal_cascade_user.active",
+    "internal",
+    "hide user defined elements"
+  },
+  {
+    "internal_cascade_generic",
+    "internal",
+    "show elements"
+  },
+  {
+    "internal_cascade_generic.active",
+    "internal",
+    "hide elements"
+  },
+  {
+    "internal_cascade_dynamic",
+    "internal",
+    "show elements from this level"
+  },
+  {
+    "internal_cascade_dynamic.active",
+    "internal",
+    "hide elements from this level"
+  },
 
   /* keyword to stop parser: "ELEMENT_INFO_END" <-- do not change! */
 
