@@ -109,6 +109,14 @@ inline void InitElementSmallImagesScaledUp(int graphic)
 
 void InitElementSmallImages()
 {
+  static int special_graphics[] =
+  {
+    IMG_EDITOR_ELEMENT_BORDER,
+    IMG_EDITOR_ELEMENT_BORDER_INPUT,
+    IMG_EDITOR_CASCADE_LIST,
+    IMG_EDITOR_CASCADE_LIST_ACTIVE,
+    -1
+  };
   struct PropertyMapping *property_mapping = getImageListPropertyMapping();
   int num_property_mappings = getImageListPropertyMappingSize();
   int i;
@@ -124,6 +132,10 @@ void InitElementSmallImages()
   /* initialize images from dynamic configuration (may be elements or other) */
   for (i = 0; i < num_property_mappings; i++)
     InitElementSmallImagesScaledUp(property_mapping[i].artwork_index);
+
+  /* initialize special images from above list (non-element images) */
+  for (i = 0; special_graphics[i] > -1; i++)
+    InitElementSmallImagesScaledUp(special_graphics[i]);
 }
 
 #if 1
@@ -3371,7 +3383,7 @@ void InitElementPropertiesStatic()
     EL_INTERNAL_CASCADE_SP_ACTIVE,
     EL_INTERNAL_CASCADE_DC_ACTIVE,
     EL_INTERNAL_CASCADE_DX_ACTIVE,
-    EL_INTERNAL_CASCADE_TEXT_ACTIVE,
+    EL_INTERNAL_CASCADE_CHARS_ACTIVE,
     EL_INTERNAL_CASCADE_CE_ACTIVE,
     EL_INTERNAL_CASCADE_GE_ACTIVE,
     EL_INTERNAL_CASCADE_USER_ACTIVE,
@@ -3390,7 +3402,7 @@ void InitElementPropertiesStatic()
     EL_INTERNAL_CASCADE_SP,
     EL_INTERNAL_CASCADE_DC,
     EL_INTERNAL_CASCADE_DX,
-    EL_INTERNAL_CASCADE_TEXT,
+    EL_INTERNAL_CASCADE_CHARS,
     EL_INTERNAL_CASCADE_CE,
     EL_INTERNAL_CASCADE_GE,
     EL_INTERNAL_CASCADE_USER,
@@ -3858,6 +3870,10 @@ void Execute_Command(char *command)
     printf("# You can configure your personal editor element list here.\n");
     printf("# (The entries below are default and therefore commented out.)\n");
     printf("\n");
+
+    /* this is needed to be able to check element list for cascade elements */
+    InitElementPropertiesStatic();
+    InitElementPropertiesEngine(GAME_VERSION_ACTUAL);
 
     PrintEditorElementList();
 

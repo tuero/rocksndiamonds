@@ -52,6 +52,12 @@ void printf_line(char *line_string, int line_length)
   fprintf_line(stdout, line_string, line_length);
 }
 
+void printf_line_with_prefix(char *prefix, char *line_string, int line_length)
+{
+  fprintf(stdout, "%s", prefix);
+  fprintf_line(stdout, line_string, line_length);
+}
+
 
 /* int2str() returns a number converted to a string;
    the used memory is static, but will be overwritten by later calls,

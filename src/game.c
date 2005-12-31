@@ -34,6 +34,7 @@
 #define USE_NEW_PLAYER_SPEED		(USE_NEW_STUFF		* 1)
 #define USE_NEW_DELAYED_ACTION		(USE_NEW_STUFF		* 1)
 #define USE_NEW_SNAP_DELAY		(USE_NEW_STUFF		* 1)
+#define USE_ONLY_ONE_CHANGE_PER_FRAME	(USE_NEW_STUFF		* 0)
 
 /* for DigField() */
 #define DF_NO_PUSH		0
@@ -1209,6 +1210,38 @@ static void InitGameEngine()
   game.use_block_last_field_bug =
     (game.engine_version < VERSION_IDENT(3,1,1,0));
 
+  /*
+    Summary of bugfix/change:
+    Changed behaviour of CE changes with multiple changes per single frame.
+
+    Fixed/changed in version:
+    3.2.0-6
+
+    Description:
+    Before 3.2.0-6, only one single CE change was allowed in each engine frame.
+    This resulted in race conditions where CEs seem to behave strange in some
+    situations (where triggered CE changes were just skipped because there was
+    already a CE change on that tile in the playfield in that engine frame).
+    Since 3.2.0-6, this was changed to allow up to MAX_NUM_CHANGES_PER_FRAME.
+    (The number of changes per frame must be limited in any case, because else
+    it is easily possible to define CE changes that would result in an infinite
+    loop, causing the whole game to freeze. The MAX_NUM_CHANGES_PER_FRAME value
+    should be set large enough so that it would only be reached in cases where
+    the corresponding CE change conditions run into a loop. Therefore, it seems
+    to be reasonable to set MAX_NUM_CHANGES_PER_FRAME to the same value as the
+    maximal number of change pages for custom elements.)
+
+    Affected levels/tapes:
+    Probably many.
+  */
+
+#if USE_ONLY_ONE_CHANGE_PER_FRAME
+  game.max_num_changes_per_frame = 1;
+#else
+  game.max_num_changes_per_frame =
+    (game.engine_version < VERSION_IDENT(3,2,0,6) ? 1 : 32);
+#endif
+
   /* ---------------------------------------------------------------------- */
 
   /* dynamically adjust element properties according to game engine version */
@@ -1706,7 +1739,7 @@ void InitGame()
       Stop[x][y] = FALSE;
       Pushed[x][y] = FALSE;
 
-      Changed[x][y] = FALSE;
+      Changed[x][y] = 0;
       ChangeEvent[x][y] = -1;
 
       ExplodePhase[x][y] = 0;
@@ -5675,7 +5708,7 @@ void ContinueMoving(int x, int y)
 
   ChangeDelay[x][y] = 0;
   ChangePage[x][y] = -1;
-  Changed[x][y] = FALSE;
+  Changed[x][y] = 0;
   ChangeEvent[x][y] = -1;
 
 #if USE_NEW_CUSTOM_VALUE
@@ -7118,11 +7151,7 @@ static void ChangeElementNowExt(struct ElementChangeInfo *change,
   if (ELEM_IS_PLAYER(target_element))
     RelocatePlayer(x, y, target_element);
 
-#if 1
-  Changed[x][y] = TRUE;		/* ignore all further changes in this frame */
-#else
-  Changed[x][y] |= ChangeEvent[x][y];	/* ignore same changes in this frame */
-#endif
+  Changed[x][y]++;		/* count number of changes in the same frame */
 
   TestIfBadThingTouchesPlayer(x, y);
   TestIfPlayerTouchesCustomElement(x, y);
@@ -7148,21 +7177,11 @@ static boolean ChangeElementNow(int x, int y, int element, int page)
     change->actual_trigger_ce_value = 0;
   }
 
-#if 1
-  /* do not change any elements that have already changed in this frame */
-  if (Changed[x][y])
+  /* do not change elements more than a specified maximum number of changes */
+  if (Changed[x][y] >= game.max_num_changes_per_frame)
     return FALSE;
-#else
-  /* do not change already changed elements with same change event */
-  if (Changed[x][y] & ChangeEvent[x][y])
-    return FALSE;
-#endif
 
-#if 1
-  Changed[x][y] = TRUE;		/* ignore all further changes in this frame */
-#else
-  Changed[x][y] |= ChangeEvent[x][y];	/* ignore same changes in this frame */
-#endif
+  Changed[x][y]++;		/* count number of changes in the same frame */
 
   if (change->explode)
   {
@@ -8044,7 +8063,7 @@ void GameActions()
 
   for (y = 0; y < lev_fieldy; y++) for (x = 0; x < lev_fieldx; x++)
   {
-    Changed[x][y] = FALSE;
+    Changed[x][y] = 0;
     ChangeEvent[x][y] = -1;
 
     /* this must be handled before main playfield loop */
@@ -8652,8 +8671,19 @@ boolean MovePlayerOneStep(struct PlayerInfo *player,
 
   if (player->cannot_move)
   {
+#if 1
+    if (player->MovPos == 0)
+    {
+      player->is_moving = FALSE;
+      player->is_digging = FALSE;
+      player->is_collecting = FALSE;
+      player->is_snapping = FALSE;
+      player->is_pushing = FALSE;
+    }
+#else
     DigField(player, 0, 0, 0, 0, 0, 0, DF_NO_PUSH);
     SnapField(player, 0, 0);
+#endif
 
     return MF_NO_ACTION;
   }
@@ -10468,7 +10498,7 @@ boolean DropElement(struct PlayerInfo *player)
     PlayLevelSoundAction(dropx, dropy, ACTION_DROPPING);
 
     /* needed if previous element just changed to "empty" in the last frame */
-    Changed[dropx][dropy] = FALSE;		/* allow another change */
+    Changed[dropx][dropy] = 0;		/* allow at least one more change */
 
     CheckElementChangeByPlayer(dropx, dropy, new_element, CE_DROPPED_BY_PLAYER,
 			       player->index_bit, drop_side);
@@ -10508,7 +10538,7 @@ boolean DropElement(struct PlayerInfo *player)
     nextx = dropx + GET_DX_FROM_DIR(move_direction);
     nexty = dropy + GET_DY_FROM_DIR(move_direction);
 
-    Changed[dropx][dropy] = FALSE;		/* allow another change */
+    Changed[dropx][dropy] = 0;		/* allow at least one more change */
     CheckCollision[dropx][dropy] = 2;
   }
 

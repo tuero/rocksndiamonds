@@ -69,6 +69,7 @@
 
 void fprintf_line(FILE *, char *, int);
 void printf_line(char *, int);
+void printf_line_with_prefix(char *, char *, int);
 char *int2str(int, int);
 char *i_to_a(unsigned int);
 int log_2(unsigned int);

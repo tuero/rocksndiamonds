@@ -2919,6 +2919,7 @@ static void ModifyEditorSelectboxValue(int, int);
 static void ModifyEditorSelectboxOptions(int, struct ValueTextInfo *);
 static void ModifyEditorDrawingArea(int, int, int);
 static void ModifyEditorElementList();
+static void AdjustElementListScrollbar();
 static void RedrawDrawingElements();
 static void DrawDrawingWindow();
 static void DrawLevelInfoWindow();
@@ -3636,7 +3637,7 @@ static int num_editor_el_dx_boulderdash = SIZEOF_ARRAY_INT(editor_el_dx_boulderd
 
 static int editor_hl_chars[] =
 {
-  EL_INTERNAL_CASCADE_TEXT_ACTIVE,
+  EL_INTERNAL_CASCADE_CHARS_ACTIVE,
   EL_CHAR('T'),
   EL_CHAR('X'),
   EL_CHAR('T'),
@@ -4218,9 +4219,9 @@ static int num_editor_el_user_defined = 0;
 static int editor_hl_dynamic[] =
 {
   EL_INTERNAL_CASCADE_DYNAMIC_ACTIVE,
-  EL_CHAR('D'),
-  EL_CHAR('Y'),
-  EL_CHAR('N'),
+  EL_CHAR('U'),
+  EL_CHAR('S'),
+  EL_CHAR('E'),
 };
 
 static int *editor_hl_dynamic_ptr = editor_hl_dynamic;
@@ -4244,6 +4245,7 @@ static int num_editor_elements = 0;	/* dynamically determined */
 static struct
 {
   boolean *setup_value;
+  boolean *setup_cascade_value;
 
   int **headline_list;
   int *headline_list_size;
@@ -4257,75 +4259,90 @@ editor_elements_info[] =
 {
   {
     &setup.editor.el_boulderdash,
+    &setup.editor_cascade.el_bd,
     &editor_hl_boulderdash_ptr,		&num_editor_hl_boulderdash,
     &editor_el_boulderdash_ptr,		&num_editor_el_boulderdash
   },
   {
     &setup.editor.el_emerald_mine,
+    &setup.editor_cascade.el_em,
     &editor_hl_emerald_mine_ptr,	&num_editor_hl_emerald_mine,
     &editor_el_emerald_mine_ptr,	&num_editor_el_emerald_mine
   },
   {
     &setup.editor.el_emerald_mine_club,
+    &setup.editor_cascade.el_emc,
     &editor_hl_emerald_mine_club_ptr,	&num_editor_hl_emerald_mine_club,
     &editor_el_emerald_mine_club_ptr,	&num_editor_el_emerald_mine_club
   },
   {
     &setup.editor.el_more,
+    &setup.editor_cascade.el_rnd,
     &editor_hl_more_ptr,		&num_editor_hl_more,
     &editor_el_more_ptr,		&num_editor_el_more
   },
   {
     &setup.editor.el_sokoban,
+    &setup.editor_cascade.el_sb,
     &editor_hl_sokoban_ptr,		&num_editor_hl_sokoban,
     &editor_el_sokoban_ptr,		&num_editor_el_sokoban
   },
   {
     &setup.editor.el_supaplex,
+    &setup.editor_cascade.el_sp,
     &editor_hl_supaplex_ptr,		&num_editor_hl_supaplex,
     &editor_el_supaplex_ptr,		&num_editor_el_supaplex
   },
   {
     &setup.editor.el_diamond_caves,
+    &setup.editor_cascade.el_dc,
     &editor_hl_diamond_caves_ptr,	&num_editor_hl_diamond_caves,
     &editor_el_diamond_caves_ptr,	&num_editor_el_diamond_caves
   },
   {
     &setup.editor.el_dx_boulderdash,
+    &setup.editor_cascade.el_dx,
     &editor_hl_dx_boulderdash_ptr,	&num_editor_hl_dx_boulderdash,
     &editor_el_dx_boulderdash_ptr,	&num_editor_el_dx_boulderdash
   },
   {
     &setup.editor.el_chars,
+    &setup.editor_cascade.el_chars,
     &editor_hl_chars_ptr,		&num_editor_hl_chars,
     &editor_el_chars_ptr,		&num_editor_el_chars
   },
   {
     &setup.editor.el_custom,
+    &setup.editor_cascade.el_ce,
     &editor_hl_custom_ptr,		&num_editor_hl_custom,
     &editor_el_custom_ptr,		&num_editor_el_custom
   },
   {
     &setup.editor.el_custom,
+    &setup.editor_cascade.el_ge,
     &editor_hl_group_ptr,		&num_editor_hl_group,
     &editor_el_group_ptr,		&num_editor_el_group
   },
   {
     &setup.editor.el_user_defined,
+    &setup.editor_cascade.el_user,
     &editor_hl_user_defined_ptr,	&num_editor_hl_user_defined,
     &editor_el_user_defined_ptr,	&num_editor_el_user_defined
   },
   {
     &setup.editor.el_dynamic,
+    &setup.editor_cascade.el_dynamic,
     &editor_hl_dynamic_ptr,		&num_editor_hl_dynamic,
     &editor_el_dynamic_ptr,		&num_editor_el_dynamic,
   },
   {
     &use_el_empty,
+    &use_el_empty,
     &editor_hl_empty_ptr,		&num_editor_hl_empty,
     &editor_el_empty_ptr,		&num_editor_el_empty,
   },
   {
+    NULL,
     NULL,
     NULL,				NULL,
     NULL,				NULL
@@ -4438,8 +4455,28 @@ static void InitDynamicEditorElementList(int **elements, int *num_elements)
 
 static void ReinitializeElementList()
 {
+  static boolean initialization_needed = TRUE;
   int pos = 0;
   int i, j;
+
+  if (initialization_needed)
+  {
+    LoadSetup_EditorCascade();		/* load last editor cascade state */
+
+    /* initialize editor cascade element from saved cascade state */
+    for (i = 0; editor_elements_info[i].setup_value != NULL; i++)
+    {
+      int *cascade_element = &(*editor_elements_info[i].headline_list)[0];
+      boolean cascade_value = *editor_elements_info[i].setup_cascade_value;
+
+      if (IS_EDITOR_CASCADE(*cascade_element))
+	*cascade_element =
+	  (cascade_value ? EL_CASCADE_ACTIVE(*cascade_element) :
+	   EL_CASCADE_INACTIVE(*cascade_element));
+    }
+
+    initialization_needed = FALSE;
+  }
 
   checked_free(editor_elements);
 
@@ -4539,11 +4576,9 @@ static void ReinitializeElementList()
     }
   }
 
-  /* correct position of element list scrollbar */
-  if (element_shift < 0)
-    element_shift = 0;
-  if (element_shift > num_editor_elements - ED_NUM_ELEMENTLIST_BUTTONS)
-    element_shift = num_editor_elements - ED_NUM_ELEMENTLIST_BUTTONS;
+  /* this function is also called before editor gadgets are initialized */
+  if (level_editor_gadget[GADGET_ID_SCROLL_LIST_VERTICAL] != NULL)
+    AdjustElementListScrollbar();
 }
 
 void PrintEditorElementList()
@@ -4553,9 +4588,24 @@ void PrintEditorElementList()
 
   for (i = 0; editor_elements_info[i].setup_value != stop; i++)
   {
+    int cascade_element = (*editor_elements_info[i].headline_list)[0];
+
+    if (IS_EDITOR_CASCADE(cascade_element))
+    {
+      int cascade_element_show = EL_CASCADE_INACTIVE(cascade_element);
+      char *headline = element_info[cascade_element_show].editor_description;
+
+      printf_line_with_prefix("# ", "-", 77);
+      printf("# %s\n", headline);
+      printf_line_with_prefix("# ", "-", 77);
+    }
+
     for (j = 0; j < *editor_elements_info[i].headline_list_size; j++)
     {
       int element = (*editor_elements_info[i].headline_list)[j];
+
+      if (IS_EDITOR_CASCADE(element))
+	element = EL_CHAR_MINUS;
 
       printf("# %s\n", element_info[element].token_name);
     }
@@ -6821,6 +6871,7 @@ static void AdjustElementListScrollbar()
   struct GadgetInfo *gi = level_editor_gadget[GADGET_ID_SCROLL_LIST_VERTICAL];
   int items_max, items_visible, item_position;
 
+  /* correct position of element list scrollbar */
   if (element_shift < 0)
     element_shift = 0;
   if (element_shift > num_editor_elements - ED_NUM_ELEMENTLIST_BUTTONS)
@@ -6910,8 +6961,10 @@ static void ModifyEditorElementList()
     int element = editor_elements[element_shift + i];
 
     UnmapGadget(gi);
+
     getMiniGraphicSource(el2edimg(element), &gd->bitmap, &gd->x, &gd->y);
     ModifyGadget(gi, GDI_INFO_TEXT, getElementInfoText(element), GDI_END);
+
     MapGadget(gi);
   }
 }
@@ -9504,20 +9557,23 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 
 	  for (i = 0; editor_elements_info[i].setup_value != NULL; i++)
 	  {
-	    int *cascade_element = *editor_elements_info[i].headline_list;
+	    int *cascade_element= &(*editor_elements_info[i].headline_list)[0];
+	    boolean *cascade_value=editor_elements_info[i].setup_cascade_value;
 
 	    if (*cascade_element == new_element)
 	    {
 	      *cascade_element = EL_CASCADE_TOGGLE(*cascade_element);
+	      *cascade_value = IS_EDITOR_CASCADE_ACTIVE(*cascade_element);
 
+	      /* update element selection list */
 	      ReinitializeElementList();
-#if 0
-	      ReinitializeElementListButtons();
-#endif
 	      ModifyEditorElementList();
-	      AdjustElementListScrollbar();
 
+	      /* update cascading gadget info text */
 	      PrintEditorGadgetInfoText(level_editor_gadget[id]);
+
+	      /* save current editor cascading state */
+	      SaveSetup_EditorCascade();
 
 	      break;
 	    }

@@ -4504,6 +4504,24 @@ void SaveScore(int nr)
 
 #define NUM_EDITOR_SETUP_TOKENS			13
 
+/* editor cascade setup */
+#define SETUP_TOKEN_EDITOR_CASCADE_BD		0
+#define SETUP_TOKEN_EDITOR_CASCADE_EM		1
+#define SETUP_TOKEN_EDITOR_CASCADE_EMC		2
+#define SETUP_TOKEN_EDITOR_CASCADE_RND		3
+#define SETUP_TOKEN_EDITOR_CASCADE_SB		4
+#define SETUP_TOKEN_EDITOR_CASCADE_SP		5
+#define SETUP_TOKEN_EDITOR_CASCADE_DC		6
+#define SETUP_TOKEN_EDITOR_CASCADE_DX		7
+#define SETUP_TOKEN_EDITOR_CASCADE_TEXT		8
+#define SETUP_TOKEN_EDITOR_CASCADE_CE		9
+#define SETUP_TOKEN_EDITOR_CASCADE_GE		10
+#define SETUP_TOKEN_EDITOR_CASCADE_USER		11
+#define SETUP_TOKEN_EDITOR_CASCADE_GENERIC	12
+#define SETUP_TOKEN_EDITOR_CASCADE_DYNAMIC	13
+
+#define NUM_EDITOR_CASCADE_SETUP_TOKENS		14
+
 /* shortcut setup */
 #define SETUP_TOKEN_SHORTCUT_SAVE_GAME		0
 #define SETUP_TOKEN_SHORTCUT_LOAD_GAME		1
@@ -4545,6 +4563,7 @@ void SaveScore(int nr)
 
 static struct SetupInfo si;
 static struct SetupEditorInfo sei;
+static struct SetupEditorCascadeInfo seci;
 static struct SetupShortcutInfo ssi;
 static struct SetupInputInfo sii;
 static struct SetupSystemInfo syi;
@@ -4592,6 +4611,24 @@ static struct TokenInfo editor_setup_tokens[] =
   { TYPE_SWITCH, &sei.el_headlines,	"editor.el_headlines"		},
   { TYPE_SWITCH, &sei.el_user_defined,	"editor.el_user_defined"	},
   { TYPE_SWITCH, &sei.el_dynamic,	"editor.el_dynamic"		},
+};
+
+static struct TokenInfo editor_cascade_setup_tokens[] =
+{
+  { TYPE_SWITCH, &seci.el_bd,		"editor.cascade.el_bd"		},
+  { TYPE_SWITCH, &seci.el_em,		"editor.cascade.el_em"		},
+  { TYPE_SWITCH, &seci.el_emc,		"editor.cascade.el_emc"		},
+  { TYPE_SWITCH, &seci.el_rnd,		"editor.cascade.el_rnd"		},
+  { TYPE_SWITCH, &seci.el_sb,		"editor.cascade.el_sb"		},
+  { TYPE_SWITCH, &seci.el_sp,		"editor.cascade.el_sp"		},
+  { TYPE_SWITCH, &seci.el_dc,		"editor.cascade.el_dc"		},
+  { TYPE_SWITCH, &seci.el_dx,		"editor.cascade.el_dx"		},
+  { TYPE_SWITCH, &seci.el_chars,	"editor.cascade.el_chars"	},
+  { TYPE_SWITCH, &seci.el_ce,		"editor.cascade.el_ce"		},
+  { TYPE_SWITCH, &seci.el_ge,		"editor.cascade.el_ge"		},
+  { TYPE_SWITCH, &seci.el_user,		"editor.cascade.el_user"	},
+  { TYPE_SWITCH, &seci.el_generic,	"editor.cascade.el_generic"	},
+  { TYPE_SWITCH, &seci.el_dynamic,	"editor.cascade.el_dynamic"	},
 };
 
 static struct TokenInfo shortcut_setup_tokens[] =
@@ -4724,6 +4761,25 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
   si->options.verbose = FALSE;
 }
 
+static void setSetupInfoToDefaults_EditorCascade(struct SetupInfo *si)
+{
+  si->editor_cascade.el_bd	= TRUE;
+  si->editor_cascade.el_em	= TRUE;
+  si->editor_cascade.el_emc	= TRUE;
+  si->editor_cascade.el_rnd	= TRUE;
+  si->editor_cascade.el_sb	= TRUE;
+  si->editor_cascade.el_sp	= TRUE;
+  si->editor_cascade.el_dc	= TRUE;
+  si->editor_cascade.el_dx	= TRUE;
+
+  si->editor_cascade.el_chars	= FALSE;
+  si->editor_cascade.el_ce	= FALSE;
+  si->editor_cascade.el_ge	= FALSE;
+  si->editor_cascade.el_user	= FALSE;
+  si->editor_cascade.el_generic	= FALSE;
+  si->editor_cascade.el_dynamic	= FALSE;
+}
+
 static void decodeSetupFileHash(SetupFileHash *setup_file_hash)
 {
   int i, pnr;
@@ -4786,6 +4842,22 @@ static void decodeSetupFileHash(SetupFileHash *setup_file_hash)
   setup.options = soi;
 }
 
+static void decodeSetupFileHash_EditorCascade(SetupFileHash *setup_file_hash)
+{
+  int i;
+
+  if (!setup_file_hash)
+    return;
+
+  /* editor cascade setup */
+  seci = setup.editor_cascade;
+  for (i = 0; i < NUM_EDITOR_CASCADE_SETUP_TOKENS; i++)
+    setSetupInfo(editor_cascade_setup_tokens, i,
+		 getHashEntry(setup_file_hash,
+			      editor_cascade_setup_tokens[i].text));
+  setup.editor_cascade = seci;
+}
+
 void LoadSetup()
 {
   char *filename = getSetupFilename();
@@ -4814,6 +4886,27 @@ void LoadSetup()
   }
   else
     Error(ERR_WARN, "using default setup values");
+}
+
+void LoadSetup_EditorCascade()
+{
+  char *filename = getPath2(getSetupDir(), EDITORCASCADE_FILENAME);
+  SetupFileHash *setup_file_hash = NULL;
+
+  /* always start with reliable default values */
+  setSetupInfoToDefaults_EditorCascade(&setup);
+
+  setup_file_hash = loadSetupFileHash(filename);
+
+  if (setup_file_hash)
+  {
+    checkSetupFileHashIdentifier(setup_file_hash, getCookie("SETUP"));
+    decodeSetupFileHash_EditorCascade(setup_file_hash);
+
+    freeSetupFileHash(setup_file_hash);
+  }
+
+  free(filename);
 }
 
 void SaveSetup()
@@ -4886,6 +4979,37 @@ void SaveSetup()
   fclose(file);
 
   SetFilePermissions(filename, PERMS_PRIVATE);
+}
+
+void SaveSetup_EditorCascade()
+{
+  char *filename = getPath2(getSetupDir(), EDITORCASCADE_FILENAME);
+  FILE *file;
+  int i;
+
+  InitUserDataDirectory();
+
+  if (!(file = fopen(filename, MODE_WRITE)))
+  {
+    Error(ERR_WARN, "cannot write editor cascade state file '%s'", filename);
+    free(filename);
+    return;
+  }
+
+  fprintf(file, "%s\n", getFormattedSetupEntry(TOKEN_STR_FILE_IDENTIFIER,
+					       getCookie("SETUP")));
+  fprintf(file, "\n");
+
+  seci = setup.editor_cascade;
+  fprintf(file, "\n");
+  for (i = 0; i < NUM_EDITOR_SETUP_TOKENS; i++)
+    fprintf(file, "%s\n", getSetupLine(editor_cascade_setup_tokens, "", i));
+
+  fclose(file);
+
+  SetFilePermissions(filename, PERMS_PRIVATE);
+
+  free(filename);
 }
 
 void LoadCustomElementDescriptions()

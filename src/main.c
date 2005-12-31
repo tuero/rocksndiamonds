@@ -50,7 +50,7 @@ short			StorePlayer[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 short			Back[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 boolean			Stop[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 boolean			Pushed[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-boolean			Changed[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+short			Changed[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 short			ChangeEvent[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 short			WasJustMoving[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 short			WasJustFalling[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
@@ -4275,12 +4275,12 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
     "hide DX Boulderdash elements"
   },
   {
-    "internal_cascade_text",
+    "internal_cascade_chars",
     "internal",
     "show text elements"
   },
   {
-    "internal_cascade_text.active",
+    "internal_cascade_chars.active",
     "internal",
     "hide text elements"
   },
@@ -4327,12 +4327,12 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
   {
     "internal_cascade_dynamic",
     "internal",
-    "show elements from this level"
+    "show elements used in this level"
   },
   {
     "internal_cascade_dynamic.active",
     "internal",
-    "hide elements from this level"
+    "hide elements used in this level"
   },
 
   /* keyword to stop parser: "ELEMENT_INFO_END" <-- do not change! */

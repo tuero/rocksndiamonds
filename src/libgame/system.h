@@ -248,6 +248,7 @@
 #define SETUP_FILENAME		"setup.conf"
 #define LEVELSETUP_FILENAME	"levelsetup.conf"
 #define EDITORSETUP_FILENAME	"editorsetup.conf"
+#define EDITORCASCADE_FILENAME	"editorcascade.conf"
 #define HELPANIM_FILENAME	"helpanim.conf"
 #define HELPTEXT_FILENAME	"helptext.conf"
 #define LEVELINFO_FILENAME	"levelinfo.conf"
@@ -262,6 +263,7 @@
 #define SETUP_FILENAME		"setup.cnf"
 #define LEVELSETUP_FILENAME	"lvlsetup.cnf"
 #define EDITORSETUP_FILENAME	"edsetup.cnf"
+#define EDITORCASCADE_FILENAME	"edcascad.conf"
 #define HELPANIM_FILENAME	"helpanim.cnf"
 #define HELPTEXT_FILENAME	"helptext.cnf"
 #define LEVELINFO_FILENAME	"lvlinfo.cnf"
@@ -592,6 +594,24 @@ struct SetupEditorInfo
   boolean el_headlines;
 };
 
+struct SetupEditorCascadeInfo
+{
+  boolean el_bd;
+  boolean el_em;
+  boolean el_emc;
+  boolean el_rnd;
+  boolean el_sb;
+  boolean el_sp;
+  boolean el_dc;
+  boolean el_dx;
+  boolean el_chars;
+  boolean el_ce;
+  boolean el_ge;
+  boolean el_user;
+  boolean el_generic;
+  boolean el_dynamic;
+};
+
 struct SetupShortcutInfo
 {
   Key save_game;
@@ -636,6 +656,7 @@ struct SetupInfo
   boolean override_level_music;
 
   struct SetupEditorInfo editor;
+  struct SetupEditorCascadeInfo editor_cascade;
   struct SetupShortcutInfo shortcut;
   struct SetupInputInfo input[MAX_PLAYERS];
   struct SetupSystemInfo system;
