@@ -1758,14 +1758,16 @@ int get_parameter_value(char *value_raw, char *suffix, int type)
   }
   else if (strcmp(suffix, ".anim_mode") == 0)
   {
-    result = (string_has_parameter(value, "none")       ? ANIM_NONE :
-	      string_has_parameter(value, "loop")       ? ANIM_LOOP :
-	      string_has_parameter(value, "linear")     ? ANIM_LINEAR :
-	      string_has_parameter(value, "pingpong")   ? ANIM_PINGPONG :
-	      string_has_parameter(value, "pingpong2")  ? ANIM_PINGPONG2 :
-	      string_has_parameter(value, "random")     ? ANIM_RANDOM :
-	      string_has_parameter(value, "horizontal") ? ANIM_HORIZONTAL :
-	      string_has_parameter(value, "vertical")   ? ANIM_VERTICAL :
+    result = (string_has_parameter(value, "none")	? ANIM_NONE :
+	      string_has_parameter(value, "loop")	? ANIM_LOOP :
+	      string_has_parameter(value, "linear")	? ANIM_LINEAR :
+	      string_has_parameter(value, "pingpong")	? ANIM_PINGPONG :
+	      string_has_parameter(value, "pingpong2")	? ANIM_PINGPONG2 :
+	      string_has_parameter(value, "random")	? ANIM_RANDOM :
+	      string_has_parameter(value, "ce_value")	? ANIM_CE_VALUE :
+	      string_has_parameter(value, "ce_score")	? ANIM_CE_SCORE :
+	      string_has_parameter(value, "horizontal")	? ANIM_HORIZONTAL :
+	      string_has_parameter(value, "vertical")	? ANIM_VERTICAL :
 	      ANIM_DEFAULT);
 
     if (string_has_parameter(value, "reverse"))

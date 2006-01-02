@@ -3,6 +3,7 @@
 	* added option "use explosion from element" for player explosions
 
 2005-12-30
+	* added cascaded element lists in the level editor
 	* added possibility for multiple CE changes per frame (experimental)
 
 2005-12-28

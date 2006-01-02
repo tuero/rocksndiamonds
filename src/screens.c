@@ -2043,14 +2043,18 @@ static struct TokenInfo setup_info_editor[] =
 #if 0
   { TYPE_STRING,	NULL,			"Offer Special Elements:"},
 #endif
+
+#if 0
+#else
   { TYPE_SWITCH,	&setup.editor.el_boulderdash,	"BoulderDash:"	},
   { TYPE_SWITCH,	&setup.editor.el_emerald_mine,	"Emerald Mine:"	},
-  { TYPE_SWITCH,	&setup.editor.el_emerald_mine_club,"E.M. Club:"	},
-  { TYPE_SWITCH,	&setup.editor.el_more,		"More:"		},
+  { TYPE_SWITCH,	&setup.editor.el_emerald_mine_club,"E.M.C.:"	},
+  { TYPE_SWITCH,	&setup.editor.el_more,		"R'n'D:"	},
   { TYPE_SWITCH,	&setup.editor.el_sokoban,	"Sokoban:"	},
   { TYPE_SWITCH,	&setup.editor.el_supaplex,	"Supaplex:"	},
-  { TYPE_SWITCH,	&setup.editor.el_diamond_caves,	"Diamd. Caves:"	},
-  { TYPE_SWITCH,	&setup.editor.el_dx_boulderdash,"DX Boulderd.:"	},
+  { TYPE_SWITCH,	&setup.editor.el_diamond_caves,	"DC II:"	},
+  { TYPE_SWITCH,	&setup.editor.el_dx_boulderdash,"DX BD:"	},
+#endif
   { TYPE_SWITCH,	&setup.editor.el_chars,		"Characters:"	},
   { TYPE_SWITCH,	&setup.editor.el_custom,	"Custom:"	},
   { TYPE_SWITCH,	&setup.editor.el_headlines,	"Headlines:"	},

@@ -6233,6 +6233,32 @@ static int setSelectboxValue(int selectbox_id, int new_value)
   return new_index_value;
 }
 
+static void setSelectboxSpecialActionVariablesIfNeeded()
+{
+  int i;
+
+  /* change action mode and arg variables according to action type variable */
+  for (i = 0; action_arg_options[i].value != -1; i++)
+  {
+    if (action_arg_options[i].value == custom_element_change.action_type)
+    {
+      int mode = action_arg_options[i].mode;
+
+      /* only change if corresponding selectbox has changed */
+      if (selectbox_info[ED_SELECTBOX_ID_ACTION_MODE].options !=
+	  action_arg_modes[mode])
+	custom_element_change.action_mode = -1;
+
+      /* only change if corresponding selectbox has changed */
+      if (selectbox_info[ED_SELECTBOX_ID_ACTION_ARG].options !=
+	  action_arg_options[i].options)
+	custom_element_change.action_arg = -1;
+
+      break;
+    }
+  }
+}
+
 static void setSelectboxSpecialActionOptions()
 {
   int i;
@@ -6253,6 +6279,7 @@ static void setSelectboxSpecialActionOptions()
 				   action_arg_options[i].options);
       ModifyEditorSelectboxValue(ED_SELECTBOX_ID_ACTION_ARG,
 				 custom_element_change.action_arg);
+      break;
     }
   }
 }
@@ -7938,7 +7965,18 @@ static void DrawPropertiesChange()
   DrawPropertiesChangeDrawingAreas();
 }
 
-static void DrawElementName(int x, int y, int element)
+static void DrawEditorElementAnimation(int x, int y)
+{
+  int graphic = el2img(properties_element);
+  int frame = (ANIM_MODE(graphic) == ANIM_CE_VALUE ?
+	       custom_element.ce_value_fixed_initial :
+	       ANIM_MODE(graphic) == ANIM_CE_SCORE ?
+	       custom_element.collect_score_initial : FrameCounter);
+
+  DrawGraphicAnimationExt(drawto, x, y, graphic, frame, NO_MASKING);
+}
+
+static void DrawEditorElementName(int x, int y, int element)
 {
   char *element_name = getElementInfoText(element);
   int font_nr = FONT_TEXT_1;
@@ -8019,18 +8057,30 @@ static void DrawPropertiesWindow()
 	   "Element Settings", FONT_TITLE_1);
 #endif
 
+#if 1
+  FrameCounter = 0;	/* restart animation frame counter */
+#endif
+
   DrawElementBorder(SX + xstart * MINI_TILEX,
 		    SY + ystart * MINI_TILEY + MINI_TILEY / 2,
 		    TILEX, TILEY, FALSE);
+#if 1
+  DrawEditorElementAnimation(SX + xstart * MINI_TILEX,
+			     SY + ystart * MINI_TILEY + MINI_TILEY / 2);
+#else
   DrawGraphicAnimationExt(drawto,
 			  SX + xstart * MINI_TILEX,
 			  SY + ystart * MINI_TILEY + MINI_TILEY / 2,
 			  el2img(properties_element), -1, NO_MASKING);
+#endif
 
+#if 0
   FrameCounter = 0;	/* restart animation frame counter */
+#endif
 
-  DrawElementName((xstart + 3) * MINI_TILEX + 1, (ystart + 1) * MINI_TILEY + 1,
-		  properties_element);
+  DrawEditorElementName((xstart + 3) * MINI_TILEX + 1,
+			(ystart + 1) * MINI_TILEY + 1,
+			properties_element);
 
   DrawPropertiesTabulatorGadgets();
 
@@ -9101,11 +9151,15 @@ static void HandleSelectboxGadgets(struct GadgetInfo *gi)
   {
     if (type_id == ED_SELECTBOX_ID_ACTION_TYPE)
     {
-      /* when changing action type, reset action mode and action arg */
+      /* when changing action type, also check action mode and action arg */
       if (value_old != value_new)
       {
+#if 1
+	setSelectboxSpecialActionVariablesIfNeeded();
+#else
 	custom_element_change.action_mode = -1;
 	custom_element_change.action_arg = -1;
+#endif
       }
 
       DrawPropertiesChange();
@@ -9779,10 +9833,15 @@ void HandleLevelEditorIdle()
   if (!DelayReached(&action_delay, action_delay_value))
     return;
 
+#if 1
+  DrawEditorElementAnimation(SX + xpos * TILEX,
+			     SY + ypos * TILEY + MINI_TILEY / 2);
+#else
   DrawGraphicAnimationExt(drawto,
 			  SX + xpos * TILEX,
 			  SY + ypos * TILEY + MINI_TILEY / 2,
 			  el2img(properties_element), -1, NO_MASKING);
+#endif
 
   MarkTileDirty(xpos, ypos);
   MarkTileDirty(xpos, ypos + 1);

@@ -135,11 +135,13 @@
 #define ANIM_PINGPONG		(1 << 2)
 #define ANIM_PINGPONG2		(1 << 3)
 #define ANIM_RANDOM		(1 << 4)
-#define ANIM_REVERSE		(1 << 5)
+#define ANIM_CE_VALUE		(1 << 5)
+#define ANIM_CE_SCORE		(1 << 6)
+#define ANIM_REVERSE		(1 << 7)
 
 /* values for special (non game element) animation modes */
-#define ANIM_HORIZONTAL		(1 << 6)
-#define ANIM_VERTICAL		(1 << 7)
+#define ANIM_HORIZONTAL		(1 << 8)
+#define ANIM_VERTICAL		(1 << 9)
 
 #define ANIM_DEFAULT		ANIM_LOOP
 

@@ -132,6 +132,8 @@
 				 RND(element_info[e].ce_value_random_initial))
 #define GET_CHANGE_DELAY(c)	(   ((c)->delay_fixed  * (c)->delay_frames) + \
 				 RND((c)->delay_random * (c)->delay_frames))
+#define GET_CE_DELAY_VALUE(c)	(   ((c)->delay_fixed) + \
+				 RND((c)->delay_random))
 
 #define GET_TARGET_ELEMENT(e, ch)					\
 	((e) == EL_TRIGGER_ELEMENT ? (ch)->actual_trigger_element :	\
@@ -1528,7 +1530,6 @@ static void InitGameEngine()
 	 i == EL_BD_BUTTERFLY ? EL_BD_DIAMOND :
 	 i == EL_SP_ELECTRON ? EL_SP_INFOTRON :
 	 i == EL_AMOEBA_TO_DIAMOND ? level.amoeba_content :
-	 i == EL_YAMYAM ? EL_UNDEFINED :
 	 i == EL_WALL_EMERALD ? EL_EMERALD :
 	 i == EL_WALL_DIAMOND ? EL_DIAMOND :
 	 i == EL_WALL_BD_DIAMOND ? EL_BD_DIAMOND :
@@ -3209,8 +3210,16 @@ void Explode(int ex, int ey, int phase, int mode)
 	Store[x][y] = level.yamyam_content[game.yamyam_content_nr].e[xx][yy];
       else if (element_info[center_element].content.e[xx][yy] != EL_EMPTY)
 	Store[x][y] = element_info[center_element].content.e[xx][yy];
+#if 1
+      /* needed because EL_BD_BUTTERFLY is not defined as "CAN_EXPLODE"
+	 (killing EL_BD_BUTTERFLY with dynamite would result in BD diamond
+	 otherwise) -- FIX THIS !!! */
+      else if (!CAN_EXPLODE(element) && element != EL_BD_BUTTERFLY)
+	Store[x][y] = element_info[element].content.e[1][1];
+#else
       else if (!CAN_EXPLODE(element))
 	Store[x][y] = element_info[element].content.e[1][1];
+#endif
       else
 	Store[x][y] = EL_EMPTY;
 #else
@@ -4215,7 +4224,7 @@ inline static void TurnRoundExt(int x, int y)
 {
   static struct
   {
-    int x, y;
+    int dx, dy;
   } move_xy[] =
   {
     {  0,  0 },
@@ -4250,10 +4259,10 @@ inline static void TurnRoundExt(int x, int y)
   int right_dir = turn[old_move_dir].right;
   int back_dir  = turn[old_move_dir].back;
 
-  int left_dx  = move_xy[left_dir].x,     left_dy  = move_xy[left_dir].y;
-  int right_dx = move_xy[right_dir].x,    right_dy = move_xy[right_dir].y;
-  int move_dx  = move_xy[old_move_dir].x, move_dy  = move_xy[old_move_dir].y;
-  int back_dx  = move_xy[back_dir].x,     back_dy  = move_xy[back_dir].y;
+  int left_dx  = move_xy[left_dir].dx,     left_dy  = move_xy[left_dir].dy;
+  int right_dx = move_xy[right_dir].dx,    right_dy = move_xy[right_dir].dy;
+  int move_dx  = move_xy[old_move_dir].dx, move_dy  = move_xy[old_move_dir].dy;
+  int back_dx  = move_xy[back_dir].dx,     back_dy  = move_xy[back_dir].dy;
 
   int left_x  = x + left_dx,  left_y  = y + left_dy;
   int right_x = x + right_dx, right_y = y + right_dy;
@@ -4406,8 +4415,8 @@ inline static void TurnRoundExt(int x, int y)
     else
       MovDir[x][y] = back_dir;
 
-    xx = x + move_xy[MovDir[x][y]].x;
-    yy = y + move_xy[MovDir[x][y]].y;
+    xx = x + move_xy[MovDir[x][y]].dx;
+    yy = y + move_xy[MovDir[x][y]].dy;
 
     if (!IN_LEV_FIELD(xx, yy) ||
         (!IS_FREE(xx, yy) && !IS_FOOD_PIG(Feld[xx][yy])))
@@ -4434,8 +4443,8 @@ inline static void TurnRoundExt(int x, int y)
     else
       MovDir[x][y] = back_dir;
 
-    xx = x + move_xy[MovDir[x][y]].x;
-    yy = y + move_xy[MovDir[x][y]].y;
+    xx = x + move_xy[MovDir[x][y]].dx;
+    yy = y + move_xy[MovDir[x][y]].dy;
 
     if (!IN_LEV_FIELD_AND_IS_FREE(xx, yy))
       MovDir[x][y] = old_move_dir;
@@ -5794,7 +5803,11 @@ void ContinueMoving(int x, int y)
 
   MovDelay[newx][newy] = 0;
 
+#if 1
+  if (CAN_CHANGE_OR_HAS_ACTION(element))
+#else
   if (CAN_CHANGE(element))
+#endif
   {
     /* copy element change control values to new field */
     ChangeDelay[newx][newy] = ChangeDelay[x][y];
@@ -6905,7 +6918,7 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
 #else
      action_arg == CA_ARG_NUMBER_CE_VALUE ? ei->custom_value_initial :
 #endif
-     action_arg == CA_ARG_NUMBER_CE_DELAY ? GET_CHANGE_DELAY(change) :
+     action_arg == CA_ARG_NUMBER_CE_DELAY ? GET_CE_DELAY_VALUE(change) :
      action_arg == CA_ARG_NUMBER_LEVEL_TIME ? level_time_value :
      action_arg == CA_ARG_NUMBER_LEVEL_GEMS ? local_player->gems_still_needed :
      action_arg == CA_ARG_NUMBER_LEVEL_SCORE ? local_player->score :
@@ -7717,6 +7730,29 @@ static boolean CheckElementChangeExt(int x, int y,
       change->actual_trigger_side = trigger_side;
       change->actual_trigger_ce_value = CustomValue[x][y];
 
+      /* special case: trigger element not at (x,y) position for some events */
+      if (check_trigger_element)
+      {
+	static struct
+	{
+	  int dx, dy;
+	} move_xy[] =
+	  {
+	    {  0,  0 },
+	    { -1,  0 },
+	    { +1,  0 },
+	    {  0,  0 },
+	    {  0, -1 },
+	    {  0,  0 }, { 0, 0 }, { 0, 0 },
+	    {  0, +1 }
+	  };
+
+	int xx = x + move_xy[MV_DIR_OPPOSITE(trigger_side)].dx;
+	int yy = y + move_xy[MV_DIR_OPPOSITE(trigger_side)].dy;
+
+	change->actual_trigger_ce_value = CustomValue[xx][yy];
+      }
+
       if (change->can_change && !change_done)
       {
 	ChangeDelay[x][y] = 1;
@@ -8243,6 +8279,28 @@ void GameActions()
 
     if (graphic_info[graphic].anim_global_sync)
       GfxFrame[x][y] = FrameCounter;
+    else if (ANIM_MODE(graphic) == ANIM_CE_VALUE)
+    {
+      int old_gfx_frame = GfxFrame[x][y];
+
+      GfxFrame[x][y] = CustomValue[x][y];
+
+#if 1
+      if (GfxFrame[x][y] != old_gfx_frame)
+#endif
+	DrawLevelGraphicAnimation(x, y, graphic);
+    }
+    else if (ANIM_MODE(graphic) == ANIM_CE_SCORE)
+    {
+      int old_gfx_frame = GfxFrame[x][y];
+
+      GfxFrame[x][y] = element_info[element].collect_score;
+
+#if 1
+      if (GfxFrame[x][y] != old_gfx_frame)
+#endif
+	DrawLevelGraphicAnimation(x, y, graphic);
+    }
 
     if (ANIM_MODE(graphic) == ANIM_RANDOM &&
 	IS_NEXT_FRAME(GfxFrame[x][y], graphic))
@@ -8271,6 +8329,11 @@ void GameActions()
 
 #if 0
       printf("::: ChangeDelay == %d\n", ChangeDelay[x][y]);
+#endif
+
+#if 0
+      if (element == EL_CUSTOM_255)
+	printf("::: ChangeDelay == %d\n", ChangeDelay[x][y]);
 #endif
 
 #if 1
@@ -8355,6 +8418,12 @@ void GameActions()
     }
     else if (IS_ANIMATED(graphic) && !IS_CHANGING(x, y))
       DrawLevelGraphicAnimationIfNeeded(x, y, graphic);
+
+#if 0
+    if (element == EL_CUSTOM_255 ||
+	element == EL_CUSTOM_256)
+      DrawLevelGraphicAnimation(x, y, graphic);
+#endif
 
     if (IS_BELT_ACTIVE(element))
       PlayLevelSoundAction(x, y, ACTION_ACTIVE);
