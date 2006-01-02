@@ -1,3 +1,10 @@
+2006-01-01
+	* added option "use artwork from element" for custom player artwork
+	* added option "use explosion from element" for player explosions
+
+2005-12-30
+	* added possibility for multiple CE changes per frame (experimental)
+
 2005-12-28
 	* uploaded pre-release (test) version 3.2.0-5 binary and source code
 

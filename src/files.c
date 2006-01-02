@@ -64,24 +64,36 @@
 #define CONF_VALUE_INTEGER_2		(CONF_MASK_1_BYTE | 2)
 #define CONF_VALUE_INTEGER_3		(CONF_MASK_1_BYTE | 3)
 #define CONF_VALUE_INTEGER_4		(CONF_MASK_1_BYTE | 4)
-#define CONF_VALUE_BOOLEAN_1		(CONF_MASK_1_BYTE | 5)
-#define CONF_VALUE_BOOLEAN_2		(CONF_MASK_1_BYTE | 6)
-#define CONF_VALUE_BOOLEAN_3		(CONF_MASK_1_BYTE | 7)
-#define CONF_VALUE_BOOLEAN_4		(CONF_MASK_1_BYTE | 8)
+#define CONF_VALUE_INTEGER_5		(CONF_MASK_1_BYTE | 5)
+#define CONF_VALUE_INTEGER_6		(CONF_MASK_1_BYTE | 6)
+#define CONF_VALUE_INTEGER_7		(CONF_MASK_1_BYTE | 7)
+#define CONF_VALUE_INTEGER_8		(CONF_MASK_1_BYTE | 8)
+#define CONF_VALUE_BOOLEAN_1		(CONF_MASK_1_BYTE | 9)
+#define CONF_VALUE_BOOLEAN_2		(CONF_MASK_1_BYTE | 10)
+#define CONF_VALUE_BOOLEAN_3		(CONF_MASK_1_BYTE | 11)
+#define CONF_VALUE_BOOLEAN_4		(CONF_MASK_1_BYTE | 12)
+#define CONF_VALUE_BOOLEAN_5		(CONF_MASK_1_BYTE | 13)
+#define CONF_VALUE_BOOLEAN_6		(CONF_MASK_1_BYTE | 14)
+#define CONF_VALUE_BOOLEAN_7		(CONF_MASK_1_BYTE | 15)
+#define CONF_VALUE_BOOLEAN_8		(CONF_MASK_1_BYTE | 16)
 
 #define CONF_VALUE_ELEMENT_1		(CONF_MASK_2_BYTE | 1)
 #define CONF_VALUE_ELEMENT_2		(CONF_MASK_2_BYTE | 2)
 #define CONF_VALUE_ELEMENT_3		(CONF_MASK_2_BYTE | 3)
 #define CONF_VALUE_ELEMENT_4		(CONF_MASK_2_BYTE | 4)
+#define CONF_VALUE_ELEMENT_5		(CONF_MASK_2_BYTE | 5)
+#define CONF_VALUE_ELEMENT_6		(CONF_MASK_2_BYTE | 6)
+#define CONF_VALUE_ELEMENT_7		(CONF_MASK_2_BYTE | 7)
+#define CONF_VALUE_ELEMENT_8		(CONF_MASK_2_BYTE | 8)
 
 #define CONF_VALUE_CONTENT_1		(CONF_MASK_MULTI_BYTES | 1)
 #define CONF_VALUE_CONTENT_8		(CONF_MASK_MULTI_BYTES | 2)
 
 #define CONF_VALUE_INTEGER(x)		((x) >= CONF_VALUE_INTEGER_1 &&	\
-					 (x) <= CONF_VALUE_INTEGER_4)
+					 (x) <= CONF_VALUE_INTEGER_8)
 
 #define CONF_VALUE_BOOLEAN(x)		((x) >= CONF_VALUE_BOOLEAN_1 &&	\
-					 (x) <= CONF_VALUE_BOOLEAN_4)
+					 (x) <= CONF_VALUE_BOOLEAN_8)
 
 #define CONF_VALUE_NUM_BYTES(x)		((x) == CONF_MASK_1_BYTE ? 1 :	\
 					 (x) == CONF_MASK_2_BYTE ? 2 :	\
@@ -224,6 +236,38 @@ static struct
     &li.use_start_element[3],		FALSE
   },
   {
+    EL_PLAYER_1,			CONF_VALUE_BOOLEAN_3,
+    &li.use_artwork_element[0],		FALSE
+  },
+  {
+    EL_PLAYER_2,			CONF_VALUE_BOOLEAN_3,
+    &li.use_artwork_element[1],		FALSE
+  },
+  {
+    EL_PLAYER_3,			CONF_VALUE_BOOLEAN_3,
+    &li.use_artwork_element[2],		FALSE
+  },
+  {
+    EL_PLAYER_4,			CONF_VALUE_BOOLEAN_3,
+    &li.use_artwork_element[3],		FALSE
+  },
+  {
+    EL_PLAYER_1,			CONF_VALUE_BOOLEAN_4,
+    &li.use_explosion_element[0],	FALSE
+  },
+  {
+    EL_PLAYER_2,			CONF_VALUE_BOOLEAN_4,
+    &li.use_explosion_element[1],	FALSE
+  },
+  {
+    EL_PLAYER_3,			CONF_VALUE_BOOLEAN_4,
+    &li.use_explosion_element[2],	FALSE
+  },
+  {
+    EL_PLAYER_4,			CONF_VALUE_BOOLEAN_4,
+    &li.use_explosion_element[3],	FALSE
+  },
+  {
     EL_EMC_MAGIC_BALL,			CONF_VALUE_INTEGER_1,
     &li.ball_time,			10
   },
@@ -256,6 +300,38 @@ static struct
   {
     EL_PLAYER_4,			CONF_VALUE_ELEMENT_1,
     &li.start_element[3],		EL_PLAYER_4
+  },
+  {
+    EL_PLAYER_1,			CONF_VALUE_ELEMENT_2,
+    &li.artwork_element[0],		EL_PLAYER_1
+  },
+  {
+    EL_PLAYER_2,			CONF_VALUE_ELEMENT_2,
+    &li.artwork_element[1],		EL_PLAYER_2
+  },
+  {
+    EL_PLAYER_3,			CONF_VALUE_ELEMENT_2,
+    &li.artwork_element[2],		EL_PLAYER_3
+  },
+  {
+    EL_PLAYER_4,			CONF_VALUE_ELEMENT_2,
+    &li.artwork_element[3],		EL_PLAYER_4
+  },
+  {
+    EL_PLAYER_1,			CONF_VALUE_ELEMENT_3,
+    &li.explosion_element[0],		EL_PLAYER_1
+  },
+  {
+    EL_PLAYER_2,			CONF_VALUE_ELEMENT_3,
+    &li.explosion_element[1],		EL_PLAYER_2
+  },
+  {
+    EL_PLAYER_3,			CONF_VALUE_ELEMENT_3,
+    &li.explosion_element[2],		EL_PLAYER_3
+  },
+  {
+    EL_PLAYER_4,			CONF_VALUE_ELEMENT_3,
+    &li.explosion_element[3],		EL_PLAYER_4
   },
 
   /* ---------- multi-byte values ------------------------------------------ */

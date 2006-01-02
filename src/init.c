@@ -3137,6 +3137,11 @@ void InitElementPropertiesStatic()
 
   static int ep_has_content[] =
   {
+    EL_PLAYER_1,
+    EL_PLAYER_2,
+    EL_PLAYER_3,
+    EL_PLAYER_4,
+    EL_SP_MURPHY,
     EL_YAMYAM,
     EL_AMOEBA_WET,
     EL_AMOEBA_DRY,

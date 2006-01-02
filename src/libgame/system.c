@@ -515,6 +515,16 @@ inline void BlitBitmapOnBackground(Bitmap *src_bitmap, Bitmap *dst_bitmap,
 	       dst_x, dst_y);
 }
 
+inline void DrawSimpleBlackLine(Bitmap *bitmap, int from_x, int from_y,
+				int to_x, int to_y)
+{
+#if defined(TARGET_SDL)
+  SDLDrawSimpleLine(bitmap, from_x, from_y, to_x, to_y, BLACK_PIXEL);
+#else
+  X11DrawSimpleLine(bitmap, from_x, from_y, to_x, to_y, BLACK_PIXEL);
+#endif
+}
+
 inline void DrawSimpleWhiteLine(Bitmap *bitmap, int from_x, int from_y,
 				int to_x, int to_y)
 {

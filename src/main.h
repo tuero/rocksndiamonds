@@ -1885,6 +1885,12 @@ struct LevelInfo
   int start_element[MAX_PLAYERS];
   boolean use_start_element[MAX_PLAYERS];
 
+  int artwork_element[MAX_PLAYERS];
+  boolean use_artwork_element[MAX_PLAYERS];
+
+  int explosion_element[MAX_PLAYERS];
+  boolean use_explosion_element[MAX_PLAYERS];
+
 #if 1
   /* values for the new EMC elements */
   int android_move_time;

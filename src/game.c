@@ -50,13 +50,14 @@
 #define SCROLL_INIT		0
 #define SCROLL_GO_ON		1
 
-/* for Explode() */
+/* for Bang()/Explode() */
 #define EX_PHASE_START		0
 #define EX_TYPE_NONE		0
 #define EX_TYPE_NORMAL		(1 << 0)
 #define EX_TYPE_CENTER		(1 << 1)
 #define EX_TYPE_BORDER		(1 << 2)
 #define EX_TYPE_CROSS		(1 << 3)
+#define EX_TYPE_DYNA		(1 << 4)
 #define EX_TYPE_SINGLE_TILE	(EX_TYPE_CENTER | EX_TYPE_BORDER)
 
 /* special positions in the game control window (relative to control window) */
@@ -1138,7 +1139,7 @@ static void resolve_group_element(int group_element, int recursion_depth)
 
 static void InitGameEngine()
 {
-  int i, j, k, l;
+  int i, j, k, l, x, y;
 
   /* set game engine from tape file when re-playing, else from level file */
   game.engine_version = (tape.playing ? tape.engine_version :
@@ -1505,6 +1506,40 @@ static void InitGameEngine()
   for (i = 0; access_direction_list[i].element != EL_UNDEFINED; i++)
     element_info[access_direction_list[i].element].access_direction =
       access_direction_list[i].direction;
+
+  /* ---------- initialize explosion content ------------------------------- */
+  for (i = 0; i < MAX_NUM_ELEMENTS; i++)
+  {
+    if (IS_CUSTOM_ELEMENT(i))
+      continue;
+
+    for (y = 0; y < 3; y++) for (x = 0; x < 3; x++)
+    {
+      /* (content for EL_YAMYAM set at run-time with game.yamyam_content_nr) */
+
+      element_info[i].content.e[x][y] =
+	(i == EL_PLAYER_1 ? EL_EMERALD_YELLOW :
+	 i == EL_PLAYER_2 ? EL_EMERALD_RED :
+	 i == EL_PLAYER_3 ? EL_EMERALD :
+	 i == EL_PLAYER_4 ? EL_EMERALD_PURPLE :
+	 i == EL_MOLE ? EL_EMERALD_RED :
+	 i == EL_PENGUIN ? EL_EMERALD_PURPLE :
+	 i == EL_BUG ? (x == 1 && y == 1 ? EL_DIAMOND : EL_EMERALD) :
+	 i == EL_BD_BUTTERFLY ? EL_BD_DIAMOND :
+	 i == EL_SP_ELECTRON ? EL_SP_INFOTRON :
+	 i == EL_AMOEBA_TO_DIAMOND ? level.amoeba_content :
+	 i == EL_YAMYAM ? EL_UNDEFINED :
+	 i == EL_WALL_EMERALD ? EL_EMERALD :
+	 i == EL_WALL_DIAMOND ? EL_DIAMOND :
+	 i == EL_WALL_BD_DIAMOND ? EL_BD_DIAMOND :
+	 i == EL_WALL_EMERALD_YELLOW ? EL_EMERALD_YELLOW :
+	 i == EL_WALL_EMERALD_RED ? EL_EMERALD_RED :
+	 i == EL_WALL_EMERALD_PURPLE ? EL_EMERALD_PURPLE :
+	 i == EL_WALL_PEARL ? EL_PEARL :
+	 i == EL_WALL_CRYSTAL ? EL_CRYSTAL :
+	 EL_EMPTY);
+    }
+  }
 }
 
 int get_num_special_action(int element, int action_first, int action_last)
@@ -1588,7 +1623,9 @@ void InitGame()
     player->StepFrame = 0;
 
     player->use_murphy = FALSE;
-    player->artwork_element = player->element_nr;
+    player->artwork_element =
+      (level.use_artwork_element[i] ? level.artwork_element[i] :
+       player->element_nr);
 
     player->block_last_field = FALSE;	/* initialized in InitPlayerField() */
     player->block_delay_adjustment = 0;	/* initialized in InitPlayerField() */
@@ -3026,6 +3063,21 @@ void Explode(int ex, int ey, int phase, int mode)
   if (phase == EX_PHASE_START)		/* initialize 'Store[][]' field */
   {
     int center_element = Feld[ex][ey];
+    int artwork_element = center_element;	/* for custom player artwork */
+    int explosion_element = center_element;	/* for custom player artwork */
+
+    if (IS_PLAYER(ex, ey))
+    {
+      int player_nr = GET_PLAYER_NR(StorePlayer[ex][ey]);
+
+      artwork_element = stored_player[player_nr].artwork_element;
+
+      if (level.use_explosion_element[player_nr])
+      {
+	explosion_element = level.explosion_element[player_nr];
+	artwork_element = explosion_element;
+      }
+    }
 
 #if 0
     /* --- This is only really needed (and now handled) in "Impact()". --- */
@@ -3039,7 +3091,7 @@ void Explode(int ex, int ey, int phase, int mode)
     if (mode == EX_TYPE_NORMAL ||
 	mode == EX_TYPE_CENTER ||
 	mode == EX_TYPE_CROSS)
-      PlayLevelSoundAction(ex, ey, ACTION_EXPLODING);
+      PlayLevelSoundElementAction(ex, ey, artwork_element, ACTION_EXPLODING);
 
     /* remove things displayed in background while burning dynamite */
     if (Back[ex][ey] != EL_EMPTY && !IS_INDESTRUCTIBLE(Back[ex][ey]))
@@ -3053,7 +3105,7 @@ void Explode(int ex, int ey, int phase, int mode)
       Feld[ex][ey] = center_element;
     }
 
-    last_phase = element_info[center_element].explosion_delay + 1;
+    last_phase = element_info[explosion_element].explosion_delay + 1;
 
     for (y = ey - 1; y <= ey + 1; y++) for (x = ex - 1; x <= ex + 1; x++)
     {
@@ -3126,6 +3178,11 @@ void Explode(int ex, int ey, int phase, int mode)
 
       if (IS_PLAYER(ex, ey) && !PLAYER_EXPLOSION_PROTECTED(ex, ey))
       {
+	int player_nr = StorePlayer[ex][ey] - EL_PLAYER_1;
+
+	Store[x][y] = EL_PLAYER_IS_EXPLODING_1 + player_nr;
+
+#if 0
 	switch(StorePlayer[ex][ey])
 	{
 	  case EL_PLAYER_2:
@@ -3142,10 +3199,21 @@ void Explode(int ex, int ey, int phase, int mode)
 	    Store[x][y] = EL_PLAYER_IS_EXPLODING_1;
 	    break;
 	}
+#endif
 
 	if (PLAYERINFO(ex, ey)->use_murphy)
 	  Store[x][y] = EL_EMPTY;
       }
+#if 1
+      else if (center_element == EL_YAMYAM)
+	Store[x][y] = level.yamyam_content[game.yamyam_content_nr].e[xx][yy];
+      else if (element_info[center_element].content.e[xx][yy] != EL_EMPTY)
+	Store[x][y] = element_info[center_element].content.e[xx][yy];
+      else if (!CAN_EXPLODE(element))
+	Store[x][y] = element_info[element].content.e[1][1];
+      else
+	Store[x][y] = EL_EMPTY;
+#else
       else if (center_element == EL_MOLE)
 	Store[x][y] = EL_EMERALD_RED;
       else if (center_element == EL_PENGUIN)
@@ -3183,13 +3251,14 @@ void Explode(int ex, int ey, int phase, int mode)
 	Store[x][y] = element_info[element].content.e[1][1];
       else
 	Store[x][y] = EL_EMPTY;
+#endif
 
       if (x != ex || y != ey || mode == EX_TYPE_BORDER ||
 	  center_element == EL_AMOEBA_TO_DIAMOND)
 	Store2[x][y] = element;
 
       Feld[x][y] = EL_EXPLOSION;
-      GfxElement[x][y] = center_element;
+      GfxElement[x][y] = artwork_element;
 
       ExplodePhase[x][y] = 1;
       ExplodeDelay[x][y] = last_phase;
@@ -3283,12 +3352,30 @@ void Explode(int ex, int ey, int phase, int mode)
     /* player can escape from explosions and might therefore be still alive */
     if (element >= EL_PLAYER_IS_EXPLODING_1 &&
 	element <= EL_PLAYER_IS_EXPLODING_4)
-      Feld[x][y] = (stored_player[element - EL_PLAYER_IS_EXPLODING_1].active ?
-		    EL_EMPTY :
-		    element == EL_PLAYER_IS_EXPLODING_1 ? EL_EMERALD_YELLOW :
-		    element == EL_PLAYER_IS_EXPLODING_2 ? EL_EMERALD_RED :
-		    element == EL_PLAYER_IS_EXPLODING_3 ? EL_EMERALD :
-		    EL_EMERALD_PURPLE);
+    {
+      static int player_death_elements[] =
+      {
+	EL_EMERALD_YELLOW,
+	EL_EMERALD_RED,
+	EL_EMERALD,
+	EL_EMERALD_PURPLE
+      };
+      int player_nr = element - EL_PLAYER_IS_EXPLODING_1;
+      int player_death_element = player_death_elements[player_nr];
+
+      if (level.use_explosion_element[player_nr])
+      {
+	int explosion_element = level.explosion_element[player_nr];
+	int xx = MIN(MAX(0, x - stored_player[player_nr].jx + 1), 2);
+	int yy = MIN(MAX(0, y - stored_player[player_nr].jy + 1), 2);
+
+	player_death_element =
+	  element_info[explosion_element].content.e[xx][yy];
+      }
+
+      Feld[x][y] = (stored_player[player_nr].active ? EL_EMPTY :
+		    player_death_element);
+    }
 
     /* restore probably existing indestructible background element */
     if (Back[x][y] && IS_INDESTRUCTIBLE(Back[x][y]))
@@ -3396,6 +3483,7 @@ void DynaExplode(int ex, int ey)
 void Bang(int x, int y)
 {
   int element = MovingOrBlocked2Element(x, y);
+  int explosion_type = EX_TYPE_NORMAL;
 
   if (IS_PLAYER(x, y) && !PLAYER_EXPLOSION_PROTECTED(x, y))
   {
@@ -3403,6 +3491,16 @@ void Bang(int x, int y)
 
     element = Feld[x][y] = (player->use_murphy ? EL_SP_MURPHY :
 			    player->element_nr);
+
+    if (level.use_explosion_element[player->index_nr])
+    {
+      int explosion_element = level.explosion_element[player->index_nr];
+
+      if (element_info[explosion_element].explosion_type == EXPLODES_CROSS)
+	explosion_type = EX_TYPE_CROSS;
+      else if (element_info[explosion_element].explosion_type == EXPLODES_1X1)
+	explosion_type = EX_TYPE_CENTER;
+    }
   }
 
   switch(element)
@@ -3417,8 +3515,8 @@ void Bang(int x, int y)
     case EL_PACMAN:
     case EL_MOLE:
       RaiseScoreElement(element);
-      Explode(x, y, EX_PHASE_START, EX_TYPE_NORMAL);
       break;
+
     case EL_DYNABOMB_PLAYER_1_ACTIVE:
     case EL_DYNABOMB_PLAYER_2_ACTIVE:
     case EL_DYNABOMB_PLAYER_3_ACTIVE:
@@ -3426,26 +3524,29 @@ void Bang(int x, int y)
     case EL_DYNABOMB_INCREASE_NUMBER:
     case EL_DYNABOMB_INCREASE_SIZE:
     case EL_DYNABOMB_INCREASE_POWER:
-      DynaExplode(x, y);
+      explosion_type = EX_TYPE_DYNA;
       break;
+
     case EL_PENGUIN:
     case EL_LAMP:
     case EL_LAMP_ACTIVE:
     case EL_AMOEBA_TO_DIAMOND:
-      if (IS_PLAYER(x, y))
-	Explode(x, y, EX_PHASE_START, EX_TYPE_NORMAL);
-      else
-	Explode(x, y, EX_PHASE_START, EX_TYPE_CENTER);
+      if (!IS_PLAYER(x, y))	/* penguin and player may be at same field */
+	explosion_type = EX_TYPE_CENTER;
       break;
+
     default:
       if (element_info[element].explosion_type == EXPLODES_CROSS)
-	Explode(x, y, EX_PHASE_START, EX_TYPE_CROSS);
+	explosion_type = EX_TYPE_CROSS;
       else if (element_info[element].explosion_type == EXPLODES_1X1)
-	Explode(x, y, EX_PHASE_START, EX_TYPE_CENTER);
-      else
-	Explode(x, y, EX_PHASE_START, EX_TYPE_NORMAL);
+	explosion_type = EX_TYPE_CENTER;
       break;
   }
+
+  if (explosion_type == EX_TYPE_DYNA)
+    DynaExplode(x, y);
+  else
+    Explode(x, y, EX_PHASE_START, explosion_type);
 
   CheckTriggeredElementChange(x, y, element, CE_EXPLOSION_OF_X);
 }
@@ -7042,7 +7143,9 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
 	  int artwork_element = action_arg_element;
 
 	  if (action_arg == CA_ARG_ELEMENT_RESET)
-	    artwork_element = stored_player[i].element_nr;
+	    artwork_element =
+	      (level.use_artwork_element[i] ? level.artwork_element[i] :
+	       stored_player[i].element_nr);
 
 	  stored_player[i].artwork_element = artwork_element;
 

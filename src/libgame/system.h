@@ -909,6 +909,7 @@ inline void BlitBitmapMasked(Bitmap *, Bitmap *, int, int, int, int, int, int);
 inline boolean DrawingOnBackground(int, int);
 inline void BlitBitmapOnBackground(Bitmap *, Bitmap *, int, int, int, int, int,
 				   int);
+inline void DrawSimpleBlackLine(Bitmap *, int, int, int, int);
 inline void DrawSimpleWhiteLine(Bitmap *, int, int, int, int);
 inline void DrawLines(Bitmap *, struct XY *, int, Pixel);
 inline Pixel GetPixel(Bitmap *, int, int);
