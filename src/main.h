@@ -702,6 +702,7 @@
 #define EL_CASCADE_TOGGLE(e)	(IS_EDITOR_CASCADE_INACTIVE(e) ? (e) + 1 :    \
 				 IS_EDITOR_CASCADE_ACTIVE(e)   ? (e) - 1 : (e))
 
+#define EL_NAME(e)		(element_info[e].token_name)
 
 /* fundamental game speed values */
 #define ONE_SECOND_DELAY	1000	/* delay value for one second */

@@ -3065,8 +3065,40 @@ void Explode(int ex, int ey, int phase, int mode)
   if (phase == EX_PHASE_START)		/* initialize 'Store[][]' field */
   {
     int center_element = Feld[ex][ey];
-    int artwork_element = center_element;	/* for custom player artwork */
-    int explosion_element = center_element;	/* for custom player artwork */
+    int artwork_element, explosion_element;	/* set these values later */
+
+#if 0
+    /* --- This is only really needed (and now handled) in "Impact()". --- */
+    /* do not explode moving elements that left the explode field in time */
+    if (game.engine_version >= VERSION_IDENT(2,2,0,7) &&
+	center_element == EL_EMPTY &&
+	(mode == EX_TYPE_NORMAL || mode == EX_TYPE_CENTER))
+      return;
+#endif
+
+#if 0
+    /* !!! at this place, the center element may be EL_BLOCKED !!! */
+    if (mode == EX_TYPE_NORMAL ||
+	mode == EX_TYPE_CENTER ||
+	mode == EX_TYPE_CROSS)
+      PlayLevelSoundElementAction(ex, ey, artwork_element, ACTION_EXPLODING);
+#endif
+
+    /* remove things displayed in background while burning dynamite */
+    if (Back[ex][ey] != EL_EMPTY && !IS_INDESTRUCTIBLE(Back[ex][ey]))
+      Back[ex][ey] = 0;
+
+    if (IS_MOVING(ex, ey) || IS_BLOCKED(ex, ey))
+    {
+      /* put moving element to center field (and let it explode there) */
+      center_element = MovingOrBlocked2Element(ex, ey);
+      RemoveMovingField(ex, ey);
+      Feld[ex][ey] = center_element;
+    }
+
+    /* now "center_element" is finally determined -- set related values now */
+    artwork_element = center_element;		/* for custom player artwork */
+    explosion_element = center_element;		/* for custom player artwork */
 
     if (IS_PLAYER(ex, ey))
     {
@@ -3081,33 +3113,18 @@ void Explode(int ex, int ey, int phase, int mode)
       }
     }
 
-#if 0
-    /* --- This is only really needed (and now handled) in "Impact()". --- */
-    /* do not explode moving elements that left the explode field in time */
-    if (game.engine_version >= VERSION_IDENT(2,2,0,7) &&
-	center_element == EL_EMPTY &&
-	(mode == EX_TYPE_NORMAL || mode == EX_TYPE_CENTER))
-      return;
-#endif
-
+#if 1
     if (mode == EX_TYPE_NORMAL ||
 	mode == EX_TYPE_CENTER ||
 	mode == EX_TYPE_CROSS)
       PlayLevelSoundElementAction(ex, ey, artwork_element, ACTION_EXPLODING);
+#endif
 
-    /* remove things displayed in background while burning dynamite */
-    if (Back[ex][ey] != EL_EMPTY && !IS_INDESTRUCTIBLE(Back[ex][ey]))
-      Back[ex][ey] = 0;
-
-    if (IS_MOVING(ex, ey) || IS_BLOCKED(ex, ey))
-    {
-      /* put moving element to center field (and let it explode there) */
-      center_element = MovingOrBlocked2Element(ex, ey);
-      RemoveMovingField(ex, ey);
-      Feld[ex][ey] = center_element;
-    }
-
+#if 1
     last_phase = element_info[explosion_element].explosion_delay + 1;
+#else
+    last_phase = element_info[center_element].explosion_delay + 1;
+#endif
 
     for (y = ey - 1; y <= ey + 1; y++) for (x = ex - 1; x <= ex + 1; x++)
     {
@@ -3180,11 +3197,11 @@ void Explode(int ex, int ey, int phase, int mode)
 
       if (IS_PLAYER(ex, ey) && !PLAYER_EXPLOSION_PROTECTED(ex, ey))
       {
+#if 1
 	int player_nr = StorePlayer[ex][ey] - EL_PLAYER_1;
 
 	Store[x][y] = EL_PLAYER_IS_EXPLODING_1 + player_nr;
-
-#if 0
+#else
 	switch(StorePlayer[ex][ey])
 	{
 	  case EL_PLAYER_2:
@@ -3207,6 +3224,10 @@ void Explode(int ex, int ey, int phase, int mode)
 	  Store[x][y] = EL_EMPTY;
       }
 #if 1
+      /* !!! check this case -- currently needed for rnd_rado_negundo_v,
+	 !!! levels 015 018 019 020 021 022 023 026 027 028 !!! */
+      else if (ELEM_IS_PLAYER(center_element))
+	Store[x][y] = EL_EMPTY;
       else if (center_element == EL_YAMYAM)
 	Store[x][y] = level.yamyam_content[game.yamyam_content_nr].e[xx][yy];
       else if (element_info[center_element].content.e[xx][yy] != EL_EMPTY)
@@ -3363,28 +3384,16 @@ void Explode(int ex, int ey, int phase, int mode)
     if (element >= EL_PLAYER_IS_EXPLODING_1 &&
 	element <= EL_PLAYER_IS_EXPLODING_4)
     {
-      static int player_death_elements[] =
-      {
-	EL_EMERALD_YELLOW,
-	EL_EMERALD_RED,
-	EL_EMERALD,
-	EL_EMERALD_PURPLE
-      };
       int player_nr = element - EL_PLAYER_IS_EXPLODING_1;
-      int player_death_element = player_death_elements[player_nr];
+      int explosion_element = EL_PLAYER_1 + player_nr;
+      int xx = MIN(MAX(0, x - stored_player[player_nr].jx + 1), 2);
+      int yy = MIN(MAX(0, y - stored_player[player_nr].jy + 1), 2);
 
       if (level.use_explosion_element[player_nr])
-      {
-	int explosion_element = level.explosion_element[player_nr];
-	int xx = MIN(MAX(0, x - stored_player[player_nr].jx + 1), 2);
-	int yy = MIN(MAX(0, y - stored_player[player_nr].jy + 1), 2);
-
-	player_death_element =
-	  element_info[explosion_element].content.e[xx][yy];
-      }
+	explosion_element = level.explosion_element[player_nr];
 
       Feld[x][y] = (stored_player[player_nr].active ? EL_EMPTY :
-		    player_death_element);
+		    element_info[explosion_element].content.e[xx][yy]);
     }
 
     /* restore probably existing indestructible background element */
