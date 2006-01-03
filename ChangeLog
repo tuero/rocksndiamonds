@@ -1,3 +1,8 @@
+2006-01-02
+	* added animation types "ce_value" and "ce_score" to graphicsinfo.conf
+	* fixed bug with not keeping CE value for moving CEs with only action
+	* changed CE action selectboxes in editor to be only reset when needed
+
 2006-01-01
 	* added option "use artwork from element" for custom player artwork
 	* added option "use explosion from element" for player explosions

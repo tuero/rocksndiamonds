@@ -50,7 +50,7 @@ short			StorePlayer[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 short			Back[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 boolean			Stop[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 boolean			Pushed[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-short			Changed[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+short			ChangeCount[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 short			ChangeEvent[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 short			WasJustMoving[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 short			WasJustFalling[MAX_LEV_FIELDX][MAX_LEV_FIELDY];

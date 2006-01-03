@@ -35,6 +35,7 @@
 #define USE_NEW_DELAYED_ACTION		(USE_NEW_STUFF		* 1)
 #define USE_NEW_SNAP_DELAY		(USE_NEW_STUFF		* 1)
 #define USE_ONLY_ONE_CHANGE_PER_FRAME	(USE_NEW_STUFF		* 0)
+#define USE_QUICKSAND_IMPACT_BUGFIX	(USE_NEW_STUFF		* 0)
 
 /* for DigField() */
 #define DF_NO_PUSH		0
@@ -1777,7 +1778,7 @@ void InitGame()
       Stop[x][y] = FALSE;
       Pushed[x][y] = FALSE;
 
-      Changed[x][y] = 0;
+      ChangeCount[x][y] = 0;
       ChangeEvent[x][y] = -1;
 
       ExplodePhase[x][y] = 0;
@@ -4013,6 +4014,18 @@ void Impact(int x, int y)
 	ABS(MovPos[x][y + 1] + getElementMoveStepsize(x, y + 1)) >= TILEX)
       object_hit = FALSE;
 
+#if USE_QUICKSAND_IMPACT_BUGFIX
+    if (Feld[x][y + 1] == EL_QUICKSAND_EMPTYING && object_hit == FALSE)
+    {
+      RemoveMovingField(x, y + 1);
+      Feld[x][y + 1] = EL_QUICKSAND_EMPTY;
+      Feld[x][y + 2] = EL_ROCK;
+      DrawLevelField(x, y + 2);
+
+      object_hit = TRUE;
+    }
+#endif
+
     if (object_hit)
       smashed = MovingOrBlocked2Element(x, y + 1);
 
@@ -5812,17 +5825,25 @@ void ContinueMoving(int x, int y)
     /* copy element change control values to new field */
     ChangeDelay[newx][newy] = ChangeDelay[x][y];
     ChangePage[newx][newy]  = ChangePage[x][y];
-    Changed[newx][newy]     = Changed[x][y];
+    ChangeCount[newx][newy] = ChangeCount[x][y];
     ChangeEvent[newx][newy] = ChangeEvent[x][y];
 
+#if 0
 #if USE_NEW_CUSTOM_VALUE
     CustomValue[newx][newy] = CustomValue[x][y];
 #endif
+#endif
   }
+
+#if 1
+#if USE_NEW_CUSTOM_VALUE
+    CustomValue[newx][newy] = CustomValue[x][y];
+#endif
+#endif
 
   ChangeDelay[x][y] = 0;
   ChangePage[x][y] = -1;
-  Changed[x][y] = 0;
+  ChangeCount[x][y] = 0;
   ChangeEvent[x][y] = -1;
 
 #if USE_NEW_CUSTOM_VALUE
@@ -7263,11 +7284,11 @@ static void ChangeElementNowExt(struct ElementChangeInfo *change,
       DrawLevelFieldCrumbledSandNeighbours(x, y);
   }
 
-  /* "Changed[][]" not set yet to allow "entered by player" change one time */
+  /* "ChangeCount" not set yet to allow "entered by player" change one time */
   if (ELEM_IS_PLAYER(target_element))
     RelocatePlayer(x, y, target_element);
 
-  Changed[x][y]++;		/* count number of changes in the same frame */
+  ChangeCount[x][y]++;		/* count number of changes in the same frame */
 
   TestIfBadThingTouchesPlayer(x, y);
   TestIfPlayerTouchesCustomElement(x, y);
@@ -7294,10 +7315,10 @@ static boolean ChangeElementNow(int x, int y, int element, int page)
   }
 
   /* do not change elements more than a specified maximum number of changes */
-  if (Changed[x][y] >= game.max_num_changes_per_frame)
+  if (ChangeCount[x][y] >= game.max_num_changes_per_frame)
     return FALSE;
 
-  Changed[x][y]++;		/* count number of changes in the same frame */
+  ChangeCount[x][y]++;		/* count number of changes in the same frame */
 
   if (change->explode)
   {
@@ -8202,7 +8223,7 @@ void GameActions()
 
   for (y = 0; y < lev_fieldy; y++) for (x = 0; x < lev_fieldx; x++)
   {
-    Changed[x][y] = 0;
+    ChangeCount[x][y] = 0;
     ChangeEvent[x][y] = -1;
 
     /* this must be handled before main playfield loop */
@@ -10670,7 +10691,7 @@ boolean DropElement(struct PlayerInfo *player)
     PlayLevelSoundAction(dropx, dropy, ACTION_DROPPING);
 
     /* needed if previous element just changed to "empty" in the last frame */
-    Changed[dropx][dropy] = 0;		/* allow at least one more change */
+    ChangeCount[dropx][dropy] = 0;	/* allow at least one more change */
 
     CheckElementChangeByPlayer(dropx, dropy, new_element, CE_DROPPED_BY_PLAYER,
 			       player->index_bit, drop_side);
@@ -10710,7 +10731,7 @@ boolean DropElement(struct PlayerInfo *player)
     nextx = dropx + GET_DX_FROM_DIR(move_direction);
     nexty = dropy + GET_DY_FROM_DIR(move_direction);
 
-    Changed[dropx][dropy] = 0;		/* allow at least one more change */
+    ChangeCount[dropx][dropy] = 0;	/* allow at least one more change */
     CheckCollision[dropx][dropy] = 2;
   }
 
