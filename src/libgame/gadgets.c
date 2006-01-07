@@ -163,11 +163,15 @@ static void default_callback_action(void *ptr)
 
 static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 {
+  struct GadgetDesign *gd;
   int state = (pressed ? GD_BUTTON_PRESSED : GD_BUTTON_UNPRESSED);
-  struct GadgetDesign *gd = (!gi->active ? &gi->alt_design[state] :
-			     gi->checked ? &gi->alt_design[state] :
-			     &gi->design[state]);
   boolean redraw_selectbox = FALSE;
+
+  if (gi == NULL)
+    return;
+
+  gd = (!gi->active ? &gi->alt_design[state] :
+ 	gi->checked ? &gi->alt_design[state] : &gi->design[state]);
 
   switch (gi->type)
   {
@@ -686,6 +690,9 @@ static void HandleGadgetTags(struct GadgetInfo *gi, int first_tag, va_list ap)
 {
   int tag = first_tag;
 
+  if (gi == NULL)
+    return;
+
   while (tag != GDI_END)
   {
     switch(tag)
@@ -1149,6 +1156,9 @@ void ModifyGadget(struct GadgetInfo *gi, int first_tag, ...)
 
 void RedrawGadget(struct GadgetInfo *gi)
 {
+  if (gi == NULL)
+    return;
+
   if (gi->mapped)
     DrawGadget(gi, gi->state, gi->direct_draw);
 }

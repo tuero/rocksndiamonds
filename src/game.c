@@ -607,10 +607,10 @@ static int playfield_scan_delta_x = 1;
 static int playfield_scan_delta_y = 1;
 
 #define SCAN_PLAYFIELD(x, y)	for ((y) = playfield_scan_start_y;	\
-				     (y) >= 0 && (y) <= lev_fieldy;	\
+				     (y) >= 0 && (y) <= lev_fieldy - 1;	\
 				     (y) += playfield_scan_delta_y)	\
 				for ((x) = playfield_scan_start_x;	\
-				     (x) >= 0 && (x) <= lev_fieldx;	\
+				     (x) >= 0 && (x) <= lev_fieldx - 1;	\
 				     (x) += playfield_scan_delta_x)	\
 
 static void InitPlayfieldScanModeVars()

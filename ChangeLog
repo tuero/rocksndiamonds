@@ -1,7 +1,12 @@
 2006-01-07
+	* uploaded fixed pre-release version 3.2.0-6 binary and source code
+
+2006-01-07
 	* fixed bug when using "CE can leave behind <trigger element>"
 	* added new change condition "(after/when) creation of <element>"
 	* added new change condition "(after/when) digging <element>"
+	* fixed bug accessing invalid gadget that caused crashes under Windows
+	* deactivated new possibility for multiple CE changes per frame
 
 2006-01-04
 	* uploaded pre-release (test) version 3.2.0-6 binary and source code

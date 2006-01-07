@@ -4603,9 +4603,8 @@ static void ReinitializeElementList()
     }
   }
 
-  /* this function is also called before editor gadgets are initialized */
-  if (level_editor_gadget[GADGET_ID_SCROLL_LIST_VERTICAL] != NULL)
-    AdjustElementListScrollbar();
+  /* (this function is also called before editor gadgets are initialized!) */
+  AdjustElementListScrollbar();
 }
 
 void PrintEditorElementList()
@@ -5754,7 +5753,11 @@ void FreeLevelEditorGadgets()
   int i;
 
   for (i = 0; i < NUM_EDITOR_GADGETS; i++)
+  {
     FreeGadget(level_editor_gadget[i]);
+
+    level_editor_gadget[i] = NULL;
+  }
 }
 
 static void MapCounterButtons(int id)
