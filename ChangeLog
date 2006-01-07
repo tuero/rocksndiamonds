@@ -1,3 +1,11 @@
+2006-01-07
+	* fixed bug when using "CE can leave behind <trigger element>"
+	* added new change condition "(after/when) creation of <element>"
+	* added new change condition "(after/when) digging <element>"
+
+2006-01-04
+	* uploaded pre-release (test) version 3.2.0-6 binary and source code
+
 2006-01-02
 	* added animation types "ce_value" and "ce_score" to graphicsinfo.conf
 	* fixed bug with not keeping CE value for moving CEs with only action
@@ -9,6 +17,8 @@
 
 2005-12-30
 	* added cascaded element lists in the level editor
+	* added persistence for cascaded element lists by "editorcascade.conf"
+	* added dynamic element list with all elements used in current level
 	* added possibility for multiple CE changes per frame (experimental)
 
 2005-12-28

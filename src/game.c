@@ -34,7 +34,7 @@
 #define USE_NEW_PLAYER_SPEED		(USE_NEW_STUFF		* 1)
 #define USE_NEW_DELAYED_ACTION		(USE_NEW_STUFF		* 1)
 #define USE_NEW_SNAP_DELAY		(USE_NEW_STUFF		* 1)
-#define USE_ONLY_ONE_CHANGE_PER_FRAME	(USE_NEW_STUFF		* 0)
+#define USE_ONLY_ONE_CHANGE_PER_FRAME	(USE_NEW_STUFF		* 1)
 #define USE_QUICKSAND_IMPACT_BUGFIX	(USE_NEW_STUFF		* 0)
 
 /* for DigField() */
@@ -600,6 +600,46 @@ static boolean trigger_events[MAX_NUM_ELEMENTS][NUM_CHANGE_EVENTS];
 
 #define CE_PAGE(e, ce)		(element_info[e].event_page[ce])
 
+/* static variables for playfield scan mode (scanning forward or backward) */
+static int playfield_scan_start_x = 0;
+static int playfield_scan_start_y = 0;
+static int playfield_scan_delta_x = 1;
+static int playfield_scan_delta_y = 1;
+
+#define SCAN_PLAYFIELD(x, y)	for ((y) = playfield_scan_start_y;	\
+				     (y) >= 0 && (y) <= lev_fieldy;	\
+				     (y) += playfield_scan_delta_y)	\
+				for ((x) = playfield_scan_start_x;	\
+				     (x) >= 0 && (x) <= lev_fieldx;	\
+				     (x) += playfield_scan_delta_x)	\
+
+static void InitPlayfieldScanModeVars()
+{
+  if (game.use_reverse_scan_direction)
+  {
+    playfield_scan_start_x = lev_fieldx - 1;
+    playfield_scan_start_y = lev_fieldy - 1;
+
+    playfield_scan_delta_x = -1;
+    playfield_scan_delta_y = -1;
+  }
+  else
+  {
+    playfield_scan_start_x = 0;
+    playfield_scan_start_y = 0;
+
+    playfield_scan_delta_x = 1;
+    playfield_scan_delta_y = 1;
+  }
+}
+
+static void InitPlayfieldScanMode(int mode)
+{
+  game.use_reverse_scan_direction =
+    (mode == CA_ARG_SCAN_MODE_REVERSE ? TRUE : FALSE);
+
+  InitPlayfieldScanModeVars();
+}
 
 void GetPlayerConfig()
 {
@@ -936,6 +976,11 @@ static void InitField(int x, int y, boolean init_game)
       break;
   }
 
+#if 1
+  if (!init_game)
+    CheckTriggeredElementChange(x, y, element, CE_CREATION_OF_X);
+#endif
+
 #if 0
 
 #if USE_NEW_CUSTOM_VALUE
@@ -1247,6 +1292,9 @@ static void InitGameEngine()
 #endif
 
   /* ---------------------------------------------------------------------- */
+
+  /* default scan direction: scan playfield from top/left to bottom/right */
+  InitPlayfieldScanMode(CA_ARG_SCAN_MODE_NORMAL);
 
   /* dynamically adjust element properties according to game engine version */
   InitElementPropertiesEngine(game.engine_version);
@@ -1759,56 +1807,58 @@ void InitGame()
   for (i = 0; i < MAX_NUM_AMOEBA; i++)
     AmoebaCnt[i] = AmoebaCnt2[i] = 0;
 
-  for (x = 0; x < lev_fieldx; x++)
-  {
-    for (y = 0; y < lev_fieldy; y++)
-    {
-      Feld[x][y] = level.field[x][y];
-      MovPos[x][y] = MovDir[x][y] = MovDelay[x][y] = 0;
-      ChangeDelay[x][y] = 0;
-      ChangePage[x][y] = -1;
-#if USE_NEW_CUSTOM_VALUE
-      CustomValue[x][y] = 0;		/* initialized in InitField() */
+#if 1
+  SCAN_PLAYFIELD(x, y)
+#else
+  for (x = 0; x < lev_fieldx; x++) for (y = 0; y < lev_fieldy; y++)
 #endif
-      Store[x][y] = Store2[x][y] = StorePlayer[x][y] = Back[x][y] = 0;
-      AmoebaNr[x][y] = 0;
-      WasJustMoving[x][y] = 0;
-      WasJustFalling[x][y] = 0;
-      CheckCollision[x][y] = 0;
-      Stop[x][y] = FALSE;
-      Pushed[x][y] = FALSE;
+  {
+    Feld[x][y] = level.field[x][y];
+    MovPos[x][y] = MovDir[x][y] = MovDelay[x][y] = 0;
+    ChangeDelay[x][y] = 0;
+    ChangePage[x][y] = -1;
+#if USE_NEW_CUSTOM_VALUE
+    CustomValue[x][y] = 0;		/* initialized in InitField() */
+#endif
+    Store[x][y] = Store2[x][y] = StorePlayer[x][y] = Back[x][y] = 0;
+    AmoebaNr[x][y] = 0;
+    WasJustMoving[x][y] = 0;
+    WasJustFalling[x][y] = 0;
+    CheckCollision[x][y] = 0;
+    Stop[x][y] = FALSE;
+    Pushed[x][y] = FALSE;
 
-      ChangeCount[x][y] = 0;
-      ChangeEvent[x][y] = -1;
+    ChangeCount[x][y] = 0;
+    ChangeEvent[x][y] = -1;
 
-      ExplodePhase[x][y] = 0;
-      ExplodeDelay[x][y] = 0;
-      ExplodeField[x][y] = EX_TYPE_NONE;
+    ExplodePhase[x][y] = 0;
+    ExplodeDelay[x][y] = 0;
+    ExplodeField[x][y] = EX_TYPE_NONE;
 
-      RunnerVisit[x][y] = 0;
-      PlayerVisit[x][y] = 0;
+    RunnerVisit[x][y] = 0;
+    PlayerVisit[x][y] = 0;
 
-      GfxFrame[x][y] = 0;
-      GfxRandom[x][y] = INIT_GFX_RANDOM();
-      GfxElement[x][y] = EL_UNDEFINED;
-      GfxAction[x][y] = ACTION_DEFAULT;
-      GfxDir[x][y] = MV_NONE;
-    }
+    GfxFrame[x][y] = 0;
+    GfxRandom[x][y] = INIT_GFX_RANDOM();
+    GfxElement[x][y] = EL_UNDEFINED;
+    GfxAction[x][y] = ACTION_DEFAULT;
+    GfxDir[x][y] = MV_NONE;
   }
 
-  for (y = 0; y < lev_fieldy; y++)
+#if 1
+  SCAN_PLAYFIELD(x, y)
+#else
+  for (y = 0; y < lev_fieldy; y++) for (x = 0; x < lev_fieldx; x++)
+#endif
   {
-    for (x = 0; x < lev_fieldx; x++)
-    {
-      if (emulate_bd && !IS_BD_ELEMENT(Feld[x][y]))
-	emulate_bd = FALSE;
-      if (emulate_sb && !IS_SB_ELEMENT(Feld[x][y]))
-	emulate_sb = FALSE;
-      if (emulate_sp && !IS_SP_ELEMENT(Feld[x][y]))
-	emulate_sp = FALSE;
+    if (emulate_bd && !IS_BD_ELEMENT(Feld[x][y]))
+      emulate_bd = FALSE;
+    if (emulate_sb && !IS_SB_ELEMENT(Feld[x][y]))
+      emulate_sb = FALSE;
+    if (emulate_sp && !IS_SP_ELEMENT(Feld[x][y]))
+      emulate_sp = FALSE;
 
-      InitField(x, y, TRUE);
-    }
+    InitField(x, y, TRUE);
   }
 
   InitBeltMovement();
@@ -2007,7 +2057,11 @@ void InitGame()
     int found_element = EL_UNDEFINED;
     int player_nr = local_player->index_nr;
 
+#if 1
+    SCAN_PLAYFIELD(x, y)
+#else
     for (y = 0; y < lev_fieldy; y++) for (x = 0; x < lev_fieldx; x++)
+#endif
     {
       int element = Feld[x][y];
       int content;
@@ -3621,25 +3675,26 @@ static void InitBeltMovement()
     }
   }
 
-  for (y = 0; y < lev_fieldy; y++)
+#if 1
+  SCAN_PLAYFIELD(x, y)
+#else
+  for (y = 0; y < lev_fieldy; y++) for (x = 0; x < lev_fieldx; x++)
+#endif
   {
-    for (x = 0; x < lev_fieldx; x++)
+    int element = Feld[x][y];
+
+    for (i = 0; i < NUM_BELTS; i++)
     {
-      int element = Feld[x][y];
-
-      for (i = 0; i < NUM_BELTS; i++)
+      if (IS_BELT(element) && game.belt_dir[i] != MV_NONE)
       {
-	if (IS_BELT(element) && game.belt_dir[i] != MV_NONE)
+	int e_belt_nr = getBeltNrFromBeltElement(element);
+	int belt_nr = i;
+
+	if (e_belt_nr == belt_nr)
 	{
-	  int e_belt_nr = getBeltNrFromBeltElement(element);
-	  int belt_nr = i;
+	  int belt_part = Feld[x][y] - belt_base_element[belt_nr];
 
-	  if (e_belt_nr == belt_nr)
-	  {
-	    int belt_part = Feld[x][y] - belt_base_element[belt_nr];
-
-	    Feld[x][y] = belt_base_active_element[belt_nr] + belt_part;
-	  }
+	  Feld[x][y] = belt_base_active_element[belt_nr] + belt_part;
 	}
       }
     }
@@ -3704,45 +3759,46 @@ static void ToggleBeltSwitch(int x, int y)
       graphic_info[graphic].anim_mode |=  ANIM_REVERSE;
   }
 
-  for (yy = 0; yy < lev_fieldy; yy++)
+#if 1
+  SCAN_PLAYFIELD(xx, yy)
+#else
+  for (yy = 0; yy < lev_fieldy; yy++) for (xx = 0; xx < lev_fieldx; xx++)
+#endif
   {
-    for (xx = 0; xx < lev_fieldx; xx++)
+    int element = Feld[xx][yy];
+
+    if (IS_BELT_SWITCH(element))
     {
-      int element = Feld[xx][yy];
+      int e_belt_nr = getBeltNrFromBeltSwitchElement(element);
 
-      if (IS_BELT_SWITCH(element))
+      if (e_belt_nr == belt_nr)
       {
-	int e_belt_nr = getBeltNrFromBeltSwitchElement(element);
-
-	if (e_belt_nr == belt_nr)
-	{
-	  Feld[xx][yy] = belt_base_switch_element[belt_nr] + belt_dir_nr;
-	  DrawLevelField(xx, yy);
-	}
+	Feld[xx][yy] = belt_base_switch_element[belt_nr] + belt_dir_nr;
+	DrawLevelField(xx, yy);
       }
-      else if (IS_BELT(element) && belt_dir != MV_NONE)
+    }
+    else if (IS_BELT(element) && belt_dir != MV_NONE)
+    {
+      int e_belt_nr = getBeltNrFromBeltElement(element);
+
+      if (e_belt_nr == belt_nr)
       {
-	int e_belt_nr = getBeltNrFromBeltElement(element);
+	int belt_part = Feld[xx][yy] - belt_base_element[belt_nr];
 
-	if (e_belt_nr == belt_nr)
-	{
-	  int belt_part = Feld[xx][yy] - belt_base_element[belt_nr];
-
-	  Feld[xx][yy] = belt_base_active_element[belt_nr] + belt_part;
-	  DrawLevelField(xx, yy);
-	}
+	Feld[xx][yy] = belt_base_active_element[belt_nr] + belt_part;
+	DrawLevelField(xx, yy);
       }
-      else if (IS_BELT_ACTIVE(element) && belt_dir == MV_NONE)
+    }
+    else if (IS_BELT_ACTIVE(element) && belt_dir == MV_NONE)
+    {
+      int e_belt_nr = getBeltNrFromBeltActiveElement(element);
+
+      if (e_belt_nr == belt_nr)
       {
-	int e_belt_nr = getBeltNrFromBeltActiveElement(element);
+	int belt_part = Feld[xx][yy] - belt_base_active_element[belt_nr];
 
-	if (e_belt_nr == belt_nr)
-	{
-	  int belt_part = Feld[xx][yy] - belt_base_active_element[belt_nr];
-
-	  Feld[xx][yy] = belt_base_element[belt_nr] + belt_part;
-	  DrawLevelField(xx, yy);
-	}
+	Feld[xx][yy] = belt_base_element[belt_nr] + belt_part;
+	DrawLevelField(xx, yy);
       }
     }
   }
@@ -3754,32 +3810,33 @@ static void ToggleSwitchgateSwitch(int x, int y)
 
   game.switchgate_pos = !game.switchgate_pos;
 
-  for (yy = 0; yy < lev_fieldy; yy++)
+#if 1
+  SCAN_PLAYFIELD(xx, yy)
+#else
+  for (yy = 0; yy < lev_fieldy; yy++) for (xx = 0; xx < lev_fieldx; xx++)
+#endif
   {
-    for (xx = 0; xx < lev_fieldx; xx++)
+    int element = Feld[xx][yy];
+
+    if (element == EL_SWITCHGATE_SWITCH_UP ||
+	element == EL_SWITCHGATE_SWITCH_DOWN)
     {
-      int element = Feld[xx][yy];
+      Feld[xx][yy] = EL_SWITCHGATE_SWITCH_UP + game.switchgate_pos;
+      DrawLevelField(xx, yy);
+    }
+    else if (element == EL_SWITCHGATE_OPEN ||
+	     element == EL_SWITCHGATE_OPENING)
+    {
+      Feld[xx][yy] = EL_SWITCHGATE_CLOSING;
 
-      if (element == EL_SWITCHGATE_SWITCH_UP ||
-	  element == EL_SWITCHGATE_SWITCH_DOWN)
-      {
-	Feld[xx][yy] = EL_SWITCHGATE_SWITCH_UP + game.switchgate_pos;
-	DrawLevelField(xx, yy);
-      }
-      else if (element == EL_SWITCHGATE_OPEN ||
-	       element == EL_SWITCHGATE_OPENING)
-      {
-	Feld[xx][yy] = EL_SWITCHGATE_CLOSING;
+      PlayLevelSoundAction(xx, yy, ACTION_CLOSING);
+    }
+    else if (element == EL_SWITCHGATE_CLOSED ||
+	     element == EL_SWITCHGATE_CLOSING)
+    {
+      Feld[xx][yy] = EL_SWITCHGATE_OPENING;
 
-	PlayLevelSoundAction(xx, yy, ACTION_CLOSING);
-      }
-      else if (element == EL_SWITCHGATE_CLOSED ||
-	       element == EL_SWITCHGATE_CLOSING)
-      {
-	Feld[xx][yy] = EL_SWITCHGATE_OPENING;
-
-	PlayLevelSoundAction(xx, yy, ACTION_OPENING);
-      }
+      PlayLevelSoundAction(xx, yy, ACTION_OPENING);
     }
   }
 }
@@ -3804,7 +3861,11 @@ static void RedrawAllLightSwitchesAndInvisibleElements()
 {
   int x, y;
 
+#if 1
+  SCAN_PLAYFIELD(x, y)
+#else
   for (y = 0; y < lev_fieldy; y++) for (x = 0; x < lev_fieldx; x++)
+#endif
   {
     int element = Feld[x][y];
 
@@ -3865,7 +3926,11 @@ static void RedrawAllInvisibleElementsForLenses()
 {
   int x, y;
 
+#if 1
+  SCAN_PLAYFIELD(x, y)
+#else
   for (y = 0; y < lev_fieldy; y++) for (x = 0; x < lev_fieldx; x++)
+#endif
   {
     int element = Feld[x][y];
 
@@ -3914,7 +3979,11 @@ static void RedrawAllInvisibleElementsForMagnifier()
 {
   int x, y;
 
+#if 1
+  SCAN_PLAYFIELD(x, y)
+#else
   for (y = 0; y < lev_fieldy; y++) for (x = 0; x < lev_fieldx; x++)
+#endif
   {
     int element = Feld[x][y];
 
@@ -3974,28 +4043,29 @@ static void ActivateTimegateSwitch(int x, int y)
 
   game.timegate_time_left = level.time_timegate * FRAMES_PER_SECOND;
 
-  for (yy = 0; yy < lev_fieldy; yy++)
+#if 1
+  SCAN_PLAYFIELD(xx, yy)
+#else
+  for (yy = 0; yy < lev_fieldy; yy++) for (xx = 0; xx < lev_fieldx; xx++)
+#endif
   {
-    for (xx = 0; xx < lev_fieldx; xx++)
+    int element = Feld[xx][yy];
+
+    if (element == EL_TIMEGATE_CLOSED ||
+	element == EL_TIMEGATE_CLOSING)
     {
-      int element = Feld[xx][yy];
-
-      if (element == EL_TIMEGATE_CLOSED ||
-	  element == EL_TIMEGATE_CLOSING)
-      {
-	Feld[xx][yy] = EL_TIMEGATE_OPENING;
-	PlayLevelSound(xx, yy, SND_TIMEGATE_OPENING);
-      }
-
-      /*
-      else if (element == EL_TIMEGATE_SWITCH_ACTIVE)
-      {
-	Feld[xx][yy] = EL_TIMEGATE_SWITCH;
-	DrawLevelField(xx, yy);
-      }
-      */
-
+      Feld[xx][yy] = EL_TIMEGATE_OPENING;
+      PlayLevelSound(xx, yy, SND_TIMEGATE_OPENING);
     }
+
+    /*
+    else if (element == EL_TIMEGATE_SWITCH_ACTIVE)
+    {
+      Feld[xx][yy] = EL_TIMEGATE_SWITCH;
+      DrawLevelField(xx, yy);
+    }
+    */
+
   }
 
   Feld[x][y] = EL_TIMEGATE_SWITCH_ACTIVE;
@@ -4104,10 +4174,13 @@ void Impact(int x, int y)
 	 EL_BD_MAGIC_WALL_ACTIVE);
 
       /* activate magic wall / mill */
-      for (yy = 0; yy < lev_fieldy; yy++)
-	for (xx = 0; xx < lev_fieldx; xx++)
-	  if (Feld[xx][yy] == smashed)
-	    Feld[xx][yy] = activated_magic_wall;
+#if 1
+      SCAN_PLAYFIELD(xx, yy)
+#else
+      for (yy = 0; yy < lev_fieldy; yy++) for (xx = 0; xx < lev_fieldx; xx++)
+#endif
+	if (Feld[xx][yy] == smashed)
+	  Feld[xx][yy] = activated_magic_wall;
 
       game.magic_wall_time_left = level.time_magic_wall * FRAMES_PER_SECOND;
       game.magic_wall_active = TRUE;
@@ -5515,6 +5588,11 @@ void StartMoving(int x, int y)
       }
 
       Store[newx][newy] = EL_EMPTY;
+#if 1
+      /* this makes it possible to leave the removed element again */
+      if (IS_EQUAL_OR_IN_GROUP(new_element, MOVE_ENTER_EL(element)))
+	Store[newx][newy] = new_element;
+#else
       if (IS_EQUAL_OR_IN_GROUP(new_element, MOVE_ENTER_EL(element)))
       {
 	int move_leave_element = element_info[element].move_leave_element;
@@ -5523,6 +5601,7 @@ void StartMoving(int x, int y)
 	Store[newx][newy] = (move_leave_element == EL_TRIGGER_ELEMENT ?
 			     new_element : move_leave_element);
       }
+#endif
 
       if (move_pattern & MV_MAZE_RUNNER_STYLE)
       {
@@ -5718,12 +5797,13 @@ void StartMoving(int x, int y)
 void ContinueMoving(int x, int y)
 {
   int element = Feld[x][y];
-  int stored = Store[x][y];
   struct ElementInfo *ei = &element_info[element];
   int direction = MovDir[x][y];
   int dx = (direction == MV_LEFT ? -1 : direction == MV_RIGHT ? +1 : 0);
   int dy = (direction == MV_UP   ? -1 : direction == MV_DOWN  ? +1 : 0);
   int newx = x + dx, newy = y + dy;
+  int stored = Store[x][y];
+  int stored_new = Store[newx][newy];
   boolean pushed_by_player   = (Pushed[x][y] && IS_PLAYER(x, y));
   boolean pushed_by_conveyor = (Pushed[x][y] && !IS_PLAYER(x, y));
   boolean last_line = (newy == lev_fieldy - 1);
@@ -5874,10 +5954,16 @@ void ContinueMoving(int x, int y)
   {
     int move_leave_element = ei->move_leave_element;
 
+#if 1
+    /* this makes it possible to leave the removed element again */
+    if (ei->move_leave_element == EL_TRIGGER_ELEMENT)
+      move_leave_element = stored;
+#else
     /* this makes it possible to leave the removed element again */
     if (ei->move_leave_type == LEAVE_TYPE_LIMITED &&
         ei->move_leave_element == EL_TRIGGER_ELEMENT)
       move_leave_element = stored;
+#endif
 
     Feld[x][y] = move_leave_element;
 
@@ -5969,6 +6055,13 @@ void ContinueMoving(int x, int y)
   TestIfElementHitsCustomElement(newx, newy, direction);
   TestIfPlayerTouchesCustomElement(newx, newy);
   TestIfElementTouchesCustomElement(newx, newy);
+
+#if 1
+  if (IS_CUSTOM_ELEMENT(element) && ei->move_enter_element != EL_EMPTY &&
+      IS_EQUAL_OR_IN_GROUP(stored_new, ei->move_enter_element))
+    CheckElementChangeBySide(newx, newy, element, stored_new, CE_DIGGING_X,
+				      MV_DIR_OPPOSITE(direction));
+#endif
 }
 
 int AmoebeNachbarNr(int ax, int ay)
@@ -6037,13 +6130,14 @@ void AmoebenVereinigen(int ax, int ay)
       AmoebaCnt2[new_group_nr] += AmoebaCnt2[old_group_nr];
       AmoebaCnt2[old_group_nr] = 0;
 
-      for (yy = 0; yy < lev_fieldy; yy++)
+#if 1
+      SCAN_PLAYFIELD(xx, yy)
+#else
+      for (yy = 0; yy < lev_fieldy; yy++) for (xx = 0; xx < lev_fieldx; xx++)
+#endif
       {
-	for (xx = 0; xx < lev_fieldx; xx++)
-	{
-	  if (AmoebaNr[xx][yy] == old_group_nr)
-	    AmoebaNr[xx][yy] = new_group_nr;
-	}
+	if (AmoebaNr[xx][yy] == old_group_nr)
+	  AmoebaNr[xx][yy] = new_group_nr;
       }
     }
   }
@@ -6066,17 +6160,19 @@ void AmoebeUmwandeln(int ax, int ay)
     }
 #endif
 
-    for (y = 0; y < lev_fieldy; y++)
+#if 1
+    SCAN_PLAYFIELD(x, y)
+#else
+    for (y = 0; y < lev_fieldy; y++) for (x = 0; x < lev_fieldx; x++)
+#endif
     {
-      for (x = 0; x < lev_fieldx; x++)
+      if (Feld[x][y] == EL_AMOEBA_DEAD && AmoebaNr[x][y] == group_nr)
       {
-	if (Feld[x][y] == EL_AMOEBA_DEAD && AmoebaNr[x][y] == group_nr)
-	{
-	  AmoebaNr[x][y] = 0;
-	  Feld[x][y] = EL_AMOEBA_TO_DIAMOND;
-	}
+	AmoebaNr[x][y] = 0;
+	Feld[x][y] = EL_AMOEBA_TO_DIAMOND;
       }
     }
+
     PlayLevelSound(ax, ay, (IS_GEM(level.amoeba_content) ?
 			    SND_AMOEBA_TURNING_TO_GEM :
 			    SND_AMOEBA_TURNING_TO_ROCK));
@@ -6126,21 +6222,22 @@ void AmoebeUmwandelnBD(int ax, int ay, int new_element)
   }
 #endif
 
-  for (y = 0; y < lev_fieldy; y++)
+#if 1
+  SCAN_PLAYFIELD(x, y)
+#else
+  for (y = 0; y < lev_fieldy; y++) for (x = 0; x < lev_fieldx; x++)
+#endif
   {
-    for (x = 0; x < lev_fieldx; x++)
+    if (AmoebaNr[x][y] == group_nr &&
+	(Feld[x][y] == EL_AMOEBA_DEAD ||
+	 Feld[x][y] == EL_BD_AMOEBA ||
+	 Feld[x][y] == EL_AMOEBA_GROWING))
     {
-      if (AmoebaNr[x][y] == group_nr &&
-	  (Feld[x][y] == EL_AMOEBA_DEAD ||
-	   Feld[x][y] == EL_BD_AMOEBA ||
-	   Feld[x][y] == EL_AMOEBA_GROWING))
-      {
-	AmoebaNr[x][y] = 0;
-	Feld[x][y] = new_element;
-	InitField(x, y, FALSE);
-	DrawLevelField(x, y);
-	done = TRUE;
-      }
+      AmoebaNr[x][y] = 0;
+      Feld[x][y] = new_element;
+      InitField(x, y, FALSE);
+      DrawLevelField(x, y);
+      done = TRUE;
     }
   }
 
@@ -6531,18 +6628,19 @@ static void CloseAllOpenTimegates()
 {
   int x, y;
 
-  for (y = 0; y < lev_fieldy; y++)
+#if 1
+  SCAN_PLAYFIELD(x, y)
+#else
+  for (y = 0; y < lev_fieldy; y++) for (x = 0; x < lev_fieldx; x++)
+#endif
   {
-    for (x = 0; x < lev_fieldx; x++)
+    int element = Feld[x][y];
+
+    if (element == EL_TIMEGATE_OPEN || element == EL_TIMEGATE_OPENING)
     {
-      int element = Feld[x][y];
+      Feld[x][y] = EL_TIMEGATE_CLOSING;
 
-      if (element == EL_TIMEGATE_OPEN || element == EL_TIMEGATE_OPENING)
-      {
-	Feld[x][y] = EL_TIMEGATE_CLOSING;
-
-	PlayLevelSoundAction(x, y, ACTION_CLOSING);
-      }
+      PlayLevelSoundAction(x, y, ACTION_CLOSING);
     }
   }
 }
@@ -7241,6 +7339,15 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
       break;
     }
 
+    /* ---------- engine actions  ------------------------------------------ */
+
+    case CA_SET_ENGINE_SCAN_MODE:
+    {
+      InitPlayfieldScanMode(action_arg);
+
+      break;
+    }
+
     default:
       break;
   }
@@ -7633,7 +7740,7 @@ static void ChangeElement(int x, int y, int page)
 
 #endif
 
-static boolean CheckTriggeredElementChangeExt(int x, int y,
+static boolean CheckTriggeredElementChangeExt(int trigger_x, int trigger_y,
 					      int trigger_element,
 					      int trigger_event,
 					      int trigger_player,
@@ -7671,13 +7778,17 @@ static boolean CheckTriggeredElementChangeExt(int x, int y,
 	change->actual_trigger_element = trigger_element;
 	change->actual_trigger_player = EL_PLAYER_1 + log_2(trigger_player);
 	change->actual_trigger_side = trigger_side;
-	change->actual_trigger_ce_value = CustomValue[x][y];
+	change->actual_trigger_ce_value = CustomValue[trigger_x][trigger_y];
 
 	if ((change->can_change && !change_done) || change->has_action)
 	{
 	  int x, y;
 
+#if 1
+	  SCAN_PLAYFIELD(x, y)
+#else
 	  for (y = 0; y < lev_fieldy; y++) for (x = 0; x < lev_fieldx; x++)
+#endif
 	  {
 	    if (Feld[x][y] == element)
 	    {
@@ -8101,6 +8212,8 @@ void GameActions()
 
   /* ---------- main game synchronization point ---------- */
 
+  InitPlayfieldScanModeVars();
+
   WaitUntilDelayReached(&game_frame_delay, game_frame_delay_value);
 
   if (network_playing && !network_player_action_received)
@@ -8230,7 +8343,11 @@ void GameActions()
     }
   }
 
+#if 1
+  SCAN_PLAYFIELD(x, y)
+#else
   for (y = 0; y < lev_fieldy; y++) for (x = 0; x < lev_fieldx; x++)
+#endif
   {
     ChangeCount[x][y] = 0;
     ChangeEvent[x][y] = -1;
@@ -8302,10 +8419,21 @@ void GameActions()
 #endif
   }
 
+#if 1
+  SCAN_PLAYFIELD(x, y)
+#else
   for (y = 0; y < lev_fieldy; y++) for (x = 0; x < lev_fieldx; x++)
+#endif
   {
     element = Feld[x][y];
     graphic = el_act_dir2img(element, GfxAction[x][y], GfxDir[x][y]);
+
+#if 0
+    printf("::: %d,%d\n", x, y);
+
+    if (element == EL_ROCK)
+      printf("::: Yo man! Rocks can fall!\n");
+#endif
 
     if (graphic_info[graphic].anim_global_sync)
       GfxFrame[x][y] = FrameCounter;
@@ -8514,7 +8642,11 @@ void GameActions()
   {
     game.explosions_delayed = FALSE;
 
+#if 1
+    SCAN_PLAYFIELD(x, y)
+#else
     for (y = 0; y < lev_fieldy; y++) for (x = 0; x < lev_fieldx; x++)
+#endif
     {
       element = Feld[x][y];
 
@@ -8548,7 +8680,11 @@ void GameActions()
       game.magic_wall_time_left--;
       if (!game.magic_wall_time_left)
       {
+#if 1
+	SCAN_PLAYFIELD(x, y)
+#else
 	for (y = 0; y < lev_fieldy; y++) for (x = 0; x < lev_fieldx; x++)
+#endif
 	{
 	  element = Feld[x][y];
 
@@ -10441,7 +10577,11 @@ int DigField(struct PlayerInfo *player,
     {
       int xx, yy;
 
-      for (yy = 0; yy < lev_fieldy; yy++) for (xx=0; xx < lev_fieldx; xx++)
+#if 1
+      SCAN_PLAYFIELD(xx, yy)
+#else
+      for (yy = 0; yy < lev_fieldy; yy++) for (xx = 0; xx < lev_fieldx; xx++)
+#endif
       {
 	if (Feld[xx][yy] == EL_SP_DISK_YELLOW)
 	  Bang(xx, yy);

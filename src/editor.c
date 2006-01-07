@@ -1539,11 +1539,13 @@ static struct ValueTextInfo options_change_other_action[] =
   { CE_PLAYER_DROPS_X,		"player drops/throws"		},
   { CE_TOUCHING_X,		"touching"			},
   { CE_HITTING_X,		"hitting"			},
+  { CE_DIGGING_X,		"digging"			},
   { CE_HIT_BY_X,		"hit by"			},
   { CE_SWITCH_OF_X,		"switch of"			},
   { CE_CHANGE_OF_X,		"change by page of"		},
   { CE_EXPLOSION_OF_X,		"explosion of"			},
   { CE_MOVE_OF_X,		"move of"			},
+  { CE_CREATION_OF_X,		"creation of"			},
   { CE_VALUE_GETS_ZERO_OF_X,	"CE value gets 0 of"		},
 
   { -1,				NULL				}
@@ -1649,6 +1651,9 @@ static struct ValueTextInfo options_action_type[] =
   { CA_HEADLINE_CE_ACTIONS,	"[CE actions]"			},
   { CA_SET_CE_SCORE,		"set CE score"			},
   { CA_SET_CE_VALUE,		"set CE value"			},
+  { CA_UNDEFINED,		" "				},
+  { CA_HEADLINE_ENGINE_ACTIONS,	"[engine actions]"		},
+  { CA_SET_ENGINE_SCAN_MODE,	"set scan mode"			},
 
   { -1,				NULL				}
 };
@@ -1840,6 +1845,15 @@ static struct ValueTextInfo options_action_arg_direction[] =
   { -1,				NULL				}
 };
 
+static struct ValueTextInfo options_action_arg_scan_mode[] =
+{
+  { CA_ARG_SCAN_MODE_HEADLINE,	"[mode]"			},
+  { CA_ARG_SCAN_MODE_NORMAL,	"normal"			},
+  { CA_ARG_SCAN_MODE_REVERSE,	"reverse"			},
+
+  { -1,				NULL				}
+};
+
 static char options_change_page_strings[MAX_CHANGE_PAGES][10];
 static struct ValueTextInfo options_change_page[MAX_CHANGE_PAGES + 1] =
 {
@@ -1890,6 +1904,7 @@ action_arg_options[] =
   { CA_SET_PLAYER_ARTWORK,	1,	options_action_arg_artwork,	},
   { CA_SET_CE_SCORE,		3,	options_action_arg_number,	},
   { CA_SET_CE_VALUE,		3,	options_action_arg_number,	},
+  { CA_SET_ENGINE_SCAN_MODE,	1,	options_action_arg_scan_mode,	},
 
   { -1,				FALSE,	NULL				}
 };
@@ -3239,18 +3254,10 @@ static int editor_el_emerald_mine_club[] =
   EL_EMC_WALL_11,
   EL_EMC_WALL_12,
 
-#if RELEASE_3_1_2
-  EL_EMPTY,
-#else
   EL_EMC_ANDROID,
-#endif
   EL_BALLOON,
   EL_BALLOON_SWITCH_ANY,
-#if RELEASE_3_1_2
-  EL_EMPTY,
-#else
   EL_BALLOON_SWITCH_NONE,
-#endif
 
   EL_BALLOON_SWITCH_LEFT,
   EL_BALLOON_SWITCH_RIGHT,
@@ -3259,38 +3266,18 @@ static int editor_el_emerald_mine_club[] =
 
   EL_EMC_GRASS,
   EL_EMC_PLANT,
-#if RELEASE_3_1_2
-  EL_EMPTY,
-  EL_EMPTY,
-#else
   EL_EMC_LENSES,
   EL_EMC_MAGNIFIER,
-#endif
 
-#if RELEASE_3_1_2
-  EL_EMPTY,
-  EL_EMPTY,
-#else
   EL_EMC_MAGIC_BALL,
   EL_EMC_MAGIC_BALL_SWITCH,
-#endif
   EL_SPRING,
-#if RELEASE_3_1_2
-  EL_EMPTY,
-#else
   EL_EMC_SPRING_BUMPER,
-#endif
-
-#if RELEASE_3_1_2
-  EL_EMPTY,
-#else
 
 #if 0
   EL_EMC_DRIPPER,
 #else
   EL_EMPTY,
-#endif
-
 #endif
   EL_EMC_FAKE_GRASS,
   EL_EMPTY,
@@ -6596,11 +6583,13 @@ static void CopyCustomElementPropertiesToEditor(int element)
      HAS_CHANGE_EVENT(element, CE_PLAYER_DROPS_X) ? CE_PLAYER_DROPS_X :
      HAS_CHANGE_EVENT(element, CE_TOUCHING_X) ? CE_TOUCHING_X :
      HAS_CHANGE_EVENT(element, CE_HITTING_X) ? CE_HITTING_X :
+     HAS_CHANGE_EVENT(element, CE_DIGGING_X) ? CE_DIGGING_X :
      HAS_CHANGE_EVENT(element, CE_HIT_BY_X) ? CE_HIT_BY_X :
      HAS_CHANGE_EVENT(element, CE_SWITCH_OF_X) ? CE_SWITCH_OF_X :
      HAS_CHANGE_EVENT(element, CE_CHANGE_OF_X) ? CE_CHANGE_OF_X :
      HAS_CHANGE_EVENT(element, CE_EXPLOSION_OF_X) ? CE_EXPLOSION_OF_X :
      HAS_CHANGE_EVENT(element, CE_MOVE_OF_X) ? CE_MOVE_OF_X :
+     HAS_CHANGE_EVENT(element, CE_CREATION_OF_X) ? CE_CREATION_OF_X :
      HAS_CHANGE_EVENT(element, CE_VALUE_GETS_ZERO_OF_X) ? CE_VALUE_GETS_ZERO_OF_X :
      custom_element_change.other_action);
 }
@@ -6735,11 +6724,13 @@ static void CopyCustomElementPropertiesToGame(int element)
   custom_element_change_events[CE_PLAYER_DROPS_X] = FALSE;
   custom_element_change_events[CE_TOUCHING_X] = FALSE;
   custom_element_change_events[CE_HITTING_X] = FALSE;
+  custom_element_change_events[CE_DIGGING_X] = FALSE;
   custom_element_change_events[CE_HIT_BY_X] = FALSE;
   custom_element_change_events[CE_SWITCH_OF_X] = FALSE;
   custom_element_change_events[CE_CHANGE_OF_X] = FALSE;
   custom_element_change_events[CE_EXPLOSION_OF_X] = FALSE;
   custom_element_change_events[CE_MOVE_OF_X] = FALSE;
+  custom_element_change_events[CE_CREATION_OF_X] = FALSE;
   custom_element_change_events[CE_VALUE_GETS_ZERO_OF_X] = FALSE;
   custom_element_change_events[custom_element_change.other_action] =
     custom_element_change_events[CE_BY_OTHER_ACTION];

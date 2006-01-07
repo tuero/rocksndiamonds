@@ -214,8 +214,10 @@
 #define CE_SNAPPED_BY_PLAYER		33
 #define CE_PLAYER_SNAPS_X		34
 #define CE_MOVE_OF_X			35
+#define CE_DIGGING_X			36
+#define CE_CREATION_OF_X		37
 
-#define NUM_CHANGE_EVENTS		36
+#define NUM_CHANGE_EVENTS		38
 
 #define CE_BITMASK_DEFAULT		0
 
@@ -249,10 +251,14 @@
 #define MV_BIT_PREVIOUS			4
 #define MV_BIT_TRIGGER			5
 #define MV_BIT_TRIGGER_BACK		6
+#define MV_BIT_NORMAL			MV_BIT_TRIGGER
+#define MV_BIT_REVERSE			MV_BIT_TRIGGER_BACK
 
 #define MV_PREVIOUS			(1 << MV_BIT_PREVIOUS)
 #define MV_TRIGGER			(1 << MV_BIT_TRIGGER)
 #define MV_TRIGGER_BACK			(1 << MV_BIT_TRIGGER_BACK)
+#define MV_NORMAL			(1 << MV_BIT_NORMAL)
+#define MV_REVERSE			(1 << MV_BIT_REVERSE)
 
 /* values for change side for custom elements */
 #define CH_SIDE_NONE			MV_NONE
@@ -302,10 +308,12 @@
 #define CA_SET_PLAYER_ARTWORK		14
 #define CA_SET_CE_SCORE			15
 #define CA_SET_CE_VALUE			16
+#define CA_SET_ENGINE_SCAN_MODE		17
 
 #define CA_HEADLINE_LEVEL_ACTIONS	250
 #define CA_HEADLINE_PLAYER_ACTIONS	251
 #define CA_HEADLINE_CE_ACTIONS		252
+#define CA_HEADLINE_ENGINE_ACTIONS	253
 #define CA_UNDEFINED			255
 
 /* values for change action mode for custom elements */
@@ -388,7 +396,11 @@
 #define CA_ARG_SHIELD_NORMAL		(CA_ARG_SHIELD + 1)
 #define CA_ARG_SHIELD_DEADLY		(CA_ARG_SHIELD + 2)
 #define CA_ARG_SHIELD_HEADLINE		(CA_ARG_SHIELD + 999)
-#define CA_ARG_UNDEFINED		19999
+#define CA_ARG_SCAN_MODE		17000
+#define CA_ARG_SCAN_MODE_NORMAL		(CA_ARG_SCAN_MODE + MV_NORMAL)
+#define CA_ARG_SCAN_MODE_REVERSE	(CA_ARG_SCAN_MODE + MV_REVERSE)
+#define CA_ARG_SCAN_MODE_HEADLINE	(CA_ARG_SCAN_MODE + 999)
+#define CA_ARG_UNDEFINED		65535
 
 /* values for custom move patterns (bits 0 - 3: basic move directions) */
 #define MV_BIT_TOWARDS_PLAYER		4
@@ -1600,21 +1612,10 @@
 
 
 /* program information and versioning definitions */
-
-#define RELEASE_3_1_2			FALSE
-
-#if RELEASE_3_1_2
-#define PROGRAM_VERSION_MAJOR		3
-#define PROGRAM_VERSION_MINOR		1
-#define PROGRAM_VERSION_PATCH		2
-#define PROGRAM_VERSION_BUILD		0
-#else
-/* !!! make sure that packaging script can find unique version number !!! */
 #define PROGRAM_VERSION_MAJOR		3
 #define PROGRAM_VERSION_MINOR		2
 #define PROGRAM_VERSION_PATCH		0
-#define PROGRAM_VERSION_BUILD		6
-#endif
+#define PROGRAM_VERSION_BUILD		7
 
 #define PROGRAM_TITLE_STRING		"Rocks'n'Diamonds"
 #define PROGRAM_AUTHOR_STRING		"Holger Schemel"
@@ -1994,6 +1995,7 @@ struct GameInfo
   boolean use_change_when_pushing_bug;
   boolean use_block_last_field_bug;
   boolean max_num_changes_per_frame;
+  boolean use_reverse_scan_direction;
 
   /* variable within running game */
   int yamyam_content_nr;
