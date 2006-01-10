@@ -7419,19 +7419,19 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
   }
 }
 
-static void CreateField(int x, int y, int target_element)
+static void CreateFieldExt(int x, int y, int element, boolean is_change)
 {
   int previous_move_direction = MovDir[x][y];
 #if USE_NEW_CUSTOM_VALUE
   int last_ce_value = CustomValue[x][y];
 #endif
-  boolean add_player = (ELEM_IS_PLAYER(target_element) &&
+  boolean add_player = (ELEM_IS_PLAYER(element) &&
 			IS_WALKABLE(Feld[x][y]));
 
   /* check if element under player changes from accessible to unaccessible
      (needed for special case of dropping element which then changes) */
   if (IS_PLAYER(x, y) && !PLAYER_EXPLOSION_PROTECTED(x, y) &&
-      IS_ACCESSIBLE(Feld[x][y]) && !IS_ACCESSIBLE(target_element))
+      IS_ACCESSIBLE(Feld[x][y]) && !IS_ACCESSIBLE(element))
   {
     Bang(x, y);
 
@@ -7445,7 +7445,7 @@ static void CreateField(int x, int y, int target_element)
     else
       RemoveField(x, y);
 
-    Feld[x][y] = target_element;
+    Feld[x][y] = element;
 
     ResetGfxAnimation(x, y);
     ResetRandomAnimationValue(x, y);
@@ -7467,23 +7467,25 @@ static void CreateField(int x, int y, int target_element)
   }
 
   /* "ChangeCount" not set yet to allow "entered by player" change one time */
-  if (ELEM_IS_PLAYER(target_element))
-    RelocatePlayer(x, y, target_element);
+  if (ELEM_IS_PLAYER(element))
+    RelocatePlayer(x, y, element);
 
-#if 0
-  ChangeCount[x][y]++;		/* count number of changes in the same frame */
-#endif
+  if (is_change)
+    ChangeCount[x][y]++;	/* count number of changes in the same frame */
 
   TestIfBadThingTouchesPlayer(x, y);
   TestIfPlayerTouchesCustomElement(x, y);
   TestIfElementTouchesCustomElement(x, y);
 }
 
+static void CreateField(int x, int y, int element)
+{
+  CreateFieldExt(x, y, element, FALSE);
+}
+
 static void CreateElementFromChange(int x, int y, int element)
 {
-  CreateField(x, y, element);
-
-  ChangeCount[x][y]++;		/* count number of changes in the same frame */
+  CreateFieldExt(x, y, element, TRUE);
 }
 
 static boolean ChangeElement(int x, int y, int element, int page)
