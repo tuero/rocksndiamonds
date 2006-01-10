@@ -3450,6 +3450,7 @@ struct ConfigInfo image_config[] =
   { "emc_android.xpos",				"0"			},
   { "emc_android.ypos",				"8"			},
   { "emc_android.frames",			"8"			},
+  { "emc_android.delay",			"2"			},
 
   { "emc_grass",				"RocksEMC.pcx"		},
   { "emc_grass.xpos",				"0"			},

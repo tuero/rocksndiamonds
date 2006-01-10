@@ -237,6 +237,8 @@
 
 /* forward declaration for internal use */
 
+static void CreateField(int, int, int);
+
 static void SetPlayerWaiting(struct PlayerInfo *, boolean);
 static void AdvanceFrameAndPlayerCounters(int);
 
@@ -261,7 +263,7 @@ static void TestIfElementHitsCustomElement(int, int, int);
 static void TestIfElementSmashesCustomElement(int, int, int);
 #endif
 
-static void ChangeElement(int, int, int);
+static void HandleElementChange(int, int, int);
 
 static boolean CheckTriggeredElementChangeExt(int, int, int, int, int,int,int);
 #define CheckTriggeredElementChange(x, y, e, ev)			\
@@ -302,19 +304,22 @@ static struct GadgetInfo *game_gadget[NUM_GAME_BUTTONS];
 /* ------------------------------------------------------------------------- */
 
 /* forward declaration for changer functions */
-static void InitBuggyBase(int x, int y);
-static void WarnBuggyBase(int x, int y);
+static void InitBuggyBase(int, int);
+static void WarnBuggyBase(int, int);
 
-static void InitTrap(int x, int y);
-static void ActivateTrap(int x, int y);
-static void ChangeActiveTrap(int x, int y);
+static void InitTrap(int, int);
+static void ActivateTrap(int, int);
+static void ChangeActiveTrap(int, int);
 
-static void InitRobotWheel(int x, int y);
-static void RunRobotWheel(int x, int y);
-static void StopRobotWheel(int x, int y);
+static void InitRobotWheel(int, int);
+static void RunRobotWheel(int, int);
+static void StopRobotWheel(int, int);
 
-static void InitTimegateWheel(int x, int y);
-static void RunTimegateWheel(int x, int y);
+static void InitTimegateWheel(int, int);
+static void RunTimegateWheel(int, int);
+
+static void InitMagicBallDelay(int, int);
+static void ActivateMagicBall(int, int);
 
 struct ChangingElementInfo
 {
@@ -480,6 +485,14 @@ static struct ChangingElementInfo change_delay_list[] =
     InitTimegateWheel,
     RunTimegateWheel,
     NULL
+  },
+  {
+    EL_EMC_MAGIC_BALL_ACTIVE,
+    EL_EMC_MAGIC_BALL_ACTIVE,
+    0,
+    InitMagicBallDelay,
+    NULL,
+    ActivateMagicBall
   },
 
   {
@@ -933,6 +946,16 @@ static void InitField(int x, int y, boolean init_game)
     case EL_LIGHT_SWITCH_ACTIVE:
       if (init_game)
 	game.light_time_left = level.time_light * FRAMES_PER_SECOND;
+      break;
+
+    case EL_EMC_MAGIC_BALL:
+      if (game.ball_state)
+	Feld[x][y] = EL_EMC_MAGIC_BALL_ACTIVE;
+      break;
+
+    case EL_EMC_MAGIC_BALL_SWITCH:
+      if (game.ball_state)
+	Feld[x][y] = EL_EMC_MAGIC_BALL_SWITCH_ACTIVE;
       break;
 
     default:
@@ -1795,6 +1818,9 @@ void InitGame()
 
   game.lenses_time_left = 0;
   game.magnify_time_left = 0;
+
+  game.ball_state = level.ball_state_initial;
+  game.ball_content_nr = 0;
 
   game.envelope_active = FALSE;
 
@@ -6580,6 +6606,46 @@ static void RunTimegateWheel(int x, int y)
   PlayLevelSound(x, y, SND_TIMEGATE_SWITCH_ACTIVE);
 }
 
+static void InitMagicBallDelay(int x, int y)
+{
+  ChangeDelay[x][y] = level.ball_time * FRAMES_PER_SECOND;
+
+  if (ChangeDelay[x][y] == 0)
+    ChangeDelay[x][y] = 1;
+}
+
+static void ActivateMagicBall(int bx, int by)
+{
+  int x, y;
+
+  if (level.ball_random)
+  {
+    int pos_border = RND(8);	/* select one of the eight border elements */
+    int pos_content = (pos_border > 3 ? pos_border + 1 : pos_border);
+    int xx = pos_content % 3;
+    int yy = pos_content / 3;
+
+    x = bx - 1 + xx;
+    y = by - 1 + yy;
+
+    if (IN_LEV_FIELD(x, y) && Feld[x][y] == EL_EMPTY)
+      CreateField(x, y, level.ball_content[game.ball_content_nr].e[xx][yy]);
+  }
+  else
+  {
+    for (y = by - 1; y <= by + 1; y++) for (x = bx - 1; x <= bx + 1; x++)
+    {
+      int xx = x - bx + 1;
+      int yy = y - by + 1;
+
+      if (IN_LEV_FIELD(x, y) && Feld[x][y] == EL_EMPTY)
+	CreateField(x, y, level.ball_content[game.ball_content_nr].e[xx][yy]);
+    }
+  }
+
+  game.ball_content_nr = (game.ball_content_nr + 1) % level.num_ball_contents;
+}
+
 void CheckExit(int x, int y)
 {
   if (local_player->gems_still_needed > 0 ||
@@ -7353,8 +7419,7 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
   }
 }
 
-static void ChangeElementNowExt(struct ElementChangeInfo *change,
-				int x, int y, int target_element)
+static void CreateField(int x, int y, int target_element)
 {
   int previous_move_direction = MovDir[x][y];
 #if USE_NEW_CUSTOM_VALUE
@@ -7369,6 +7434,7 @@ static void ChangeElementNowExt(struct ElementChangeInfo *change,
       IS_ACCESSIBLE(Feld[x][y]) && !IS_ACCESSIBLE(target_element))
   {
     Bang(x, y);
+
     return;
   }
 
@@ -7404,14 +7470,23 @@ static void ChangeElementNowExt(struct ElementChangeInfo *change,
   if (ELEM_IS_PLAYER(target_element))
     RelocatePlayer(x, y, target_element);
 
+#if 0
   ChangeCount[x][y]++;		/* count number of changes in the same frame */
+#endif
 
   TestIfBadThingTouchesPlayer(x, y);
   TestIfPlayerTouchesCustomElement(x, y);
   TestIfElementTouchesCustomElement(x, y);
 }
 
-static boolean ChangeElementNow(int x, int y, int element, int page)
+static void CreateElementFromChange(int x, int y, int element)
+{
+  CreateField(x, y, element);
+
+  ChangeCount[x][y]++;		/* count number of changes in the same frame */
+}
+
+static boolean ChangeElement(int x, int y, int element, int page)
 {
   struct ElementChangeInfo *change = &element_info[element].change_page[page];
   int target_element;
@@ -7534,7 +7609,7 @@ static boolean ChangeElementNow(int x, int y, int element, int page)
 	  content_element = change->target_content.e[xx][yy];
 	  target_element = GET_TARGET_ELEMENT(content_element, change);
 
-	  ChangeElementNowExt(change, ex, ey, target_element);
+	  CreateElementFromChange(ex, ey, target_element);
 
 	  something_has_changed = TRUE;
 
@@ -7555,7 +7630,7 @@ static boolean ChangeElementNow(int x, int y, int element, int page)
   {
     target_element = GET_TARGET_ELEMENT(change->target_element, change);
 
-    ChangeElementNowExt(change, x, y, target_element);
+    CreateElementFromChange(x, y, target_element);
 
     PlayLevelSoundElementAction(x, y, element, ACTION_CHANGING);
     PlayLevelSoundElementAction(x, y, element, ACTION_PAGE_1 + page);
@@ -7569,7 +7644,7 @@ static boolean ChangeElementNow(int x, int y, int element, int page)
 
 #if USE_NEW_DELAYED_ACTION
 
-static void ChangeElement(int x, int y, int page)
+static void HandleElementChange(int x, int y, int page)
 {
   int element = MovingOrBlocked2Element(x, y);
   struct ElementInfo *ei = &element_info[element];
@@ -7580,9 +7655,9 @@ static void ChangeElement(int x, int y, int page)
       !CAN_CHANGE_OR_HAS_ACTION(Back[x][y]))
   {
     printf("\n\n");
-    printf("ChangeElement(): %d,%d: element = %d ('%s')\n",
+    printf("HandleElementChange(): %d,%d: element = %d ('%s')\n",
 	   x, y, element, element_info[element].token_name);
-    printf("ChangeElement(): This should never happen!\n");
+    printf("HandleElementChange(): This should never happen!\n");
     printf("\n\n");
   }
 #endif
@@ -7647,7 +7722,7 @@ static void ChangeElement(int x, int y, int page)
 
     if (change->can_change)
     {
-      if (ChangeElementNow(x, y, element, page))
+      if (ChangeElement(x, y, element, page))
       {
 	if (change->post_change_function)
 	  change->post_change_function(x, y);
@@ -7661,7 +7736,7 @@ static void ChangeElement(int x, int y, int page)
 
 #else
 
-static void ChangeElement(int x, int y, int page)
+static void HandleElementChange(int x, int y, int page)
 {
   int element = MovingOrBlocked2Element(x, y);
   struct ElementInfo *ei = &element_info[element];
@@ -7671,9 +7746,9 @@ static void ChangeElement(int x, int y, int page)
   if (!CAN_CHANGE(element) && !CAN_CHANGE(Back[x][y]))
   {
     printf("\n\n");
-    printf("ChangeElement(): %d,%d: element = %d ('%s')\n",
+    printf("HandleElementChange(): %d,%d: element = %d ('%s')\n",
 	   x, y, element, element_info[element].token_name);
-    printf("ChangeElement(): This should never happen!\n");
+    printf("HandleElementChange(): This should never happen!\n");
     printf("\n\n");
   }
 #endif
@@ -7730,7 +7805,7 @@ static void ChangeElement(int x, int y, int page)
       return;
     }
 
-    if (ChangeElementNow(x, y, element, page))
+    if (ChangeElement(x, y, element, page))
     {
       if (change->post_change_function)
 	change->post_change_function(x, y);
@@ -7796,7 +7871,8 @@ static boolean CheckTriggeredElementChangeExt(int trigger_x, int trigger_y,
 	      {
 		ChangeDelay[x][y] = 1;
 		ChangeEvent[x][y] = trigger_event;
-		ChangeElement(x, y, p);
+
+		HandleElementChange(x, y, p);
 	      }
 #if USE_NEW_DELAYED_ACTION
 	      else if (change->has_action)
@@ -7898,7 +7974,8 @@ static boolean CheckElementChangeExt(int x, int y,
       {
 	ChangeDelay[x][y] = 1;
 	ChangeEvent[x][y] = trigger_event;
-	ChangeElement(x, y, p);
+
+	HandleElementChange(x, y, p);
 
 	change_done = TRUE;
       }
@@ -8482,7 +8559,7 @@ void GameActions()
     {
       int page = element_info[element].event_page_nr[CE_DELAY];
 #if 0
-      ChangeElement(x, y, ChangePage[x][y] != -1 ? ChangePage[x][y] : page);
+      HandleElementChange(x, y, ChangePage[x][y] != -1 ? ChangePage[x][y] : page);
 #else
 
 #if 0
@@ -8495,10 +8572,10 @@ void GameActions()
 #endif
 
 #if 1
-      ChangeElement(x, y, page);
+      HandleElementChange(x, y, page);
 #else
       if (CAN_CHANGE(element))
-	ChangeElement(x, y, page);
+	HandleElementChange(x, y, page);
 
       if (HAS_ACTION(element))
 	ExecuteCustomElementAction(x, y, element, page);
@@ -10641,6 +10718,37 @@ int DigField(struct PlayerInfo *player,
 
       ResetGfxAnimation(x, y);
       DrawLevelField(x, y);
+    }
+    else if (element == EL_EMC_MAGIC_BALL_SWITCH ||
+	     element == EL_EMC_MAGIC_BALL_SWITCH_ACTIVE)
+    {
+      int xx, yy;
+
+      game.ball_state = !game.ball_state;
+
+#if 1
+      SCAN_PLAYFIELD(xx, yy)
+#else
+      for (yy = 0; yy < lev_fieldy; yy++) for (xx = 0; xx < lev_fieldx; xx++)
+#endif
+      {
+	int e = Feld[xx][yy];
+
+	if (game.ball_state)
+	{
+	  if (e == EL_EMC_MAGIC_BALL)
+	    CreateField(xx, yy, EL_EMC_MAGIC_BALL_ACTIVE);
+	  else if (e == EL_EMC_MAGIC_BALL_SWITCH)
+	    CreateField(xx, yy, EL_EMC_MAGIC_BALL_SWITCH_ACTIVE);
+	}
+	else
+	{
+	  if (e == EL_EMC_MAGIC_BALL_ACTIVE)
+	    CreateField(xx, yy, EL_EMC_MAGIC_BALL);
+	  else if (e == EL_EMC_MAGIC_BALL_SWITCH_ACTIVE)
+	    CreateField(xx, yy, EL_EMC_MAGIC_BALL_SWITCH);
+	}
+      }
     }
 
     CheckTriggeredElementChangeByPlayer(x, y, element, CE_SWITCH_OF_X,

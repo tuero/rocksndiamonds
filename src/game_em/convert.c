@@ -638,163 +638,173 @@ void convert_em_level(unsigned char *src, int file_version)
 
   if (temp & 1)
   {
-    lev.android_array[Xemerald] =
-      lev.android_array[Xemerald_pause] =
-      lev.android_array[Xemerald_fall] =
-      lev.android_array[Yemerald_sB] =
-      lev.android_array[Yemerald_eB] =
-      lev.android_array[Yemerald_wB] = Xemerald;
+    lev.android_array[Xemerald]		= Xemerald;
+    lev.android_array[Xemerald_pause]	= Xemerald;
+    lev.android_array[Xemerald_fall]	= Xemerald;
+    lev.android_array[Yemerald_sB]	= Xemerald;
+    lev.android_array[Yemerald_eB]	= Xemerald;
+    lev.android_array[Yemerald_wB]	= Xemerald;
   }
 
   if (temp & 2)
   {
-    lev.android_array[Xdiamond] =
-      lev.android_array[Xdiamond_pause] =
-      lev.android_array[Xdiamond_fall] =
-      lev.android_array[Ydiamond_sB] =
-      lev.android_array[Ydiamond_eB] =
-      lev.android_array[Ydiamond_wB] = Xdiamond;
+    lev.android_array[Xdiamond]		= Xdiamond;
+    lev.android_array[Xdiamond_pause]	= Xdiamond;
+    lev.android_array[Xdiamond_fall]	= Xdiamond;
+    lev.android_array[Ydiamond_sB]	= Xdiamond;
+    lev.android_array[Ydiamond_eB]	= Xdiamond;
+    lev.android_array[Ydiamond_wB]	= Xdiamond;
   }
 
   if (temp & 4)
   {
-    lev.android_array[Xstone] =
-      lev.android_array[Xstone_pause] =
-      lev.android_array[Xstone_fall] =
-      lev.android_array[Ystone_sB] =
-      lev.android_array[Ystone_eB] =
-      lev.android_array[Ystone_wB] = Xstone;
+    lev.android_array[Xstone]		= Xstone;
+    lev.android_array[Xstone_pause]	= Xstone;
+    lev.android_array[Xstone_fall]	= Xstone;
+    lev.android_array[Ystone_sB]	= Xstone;
+    lev.android_array[Ystone_eB]	= Xstone;
+    lev.android_array[Ystone_wB]	= Xstone;
   }
 
   if (temp & 8)
   {
-    lev.android_array[Xbomb] =
-      lev.android_array[Xbomb_pause] =
-      lev.android_array[Xbomb_fall] =
-      lev.android_array[Ybomb_sB] =
-      lev.android_array[Ybomb_eB] =
-      lev.android_array[Ybomb_wB] = Xbomb;
+    lev.android_array[Xbomb]		= Xbomb;
+    lev.android_array[Xbomb_pause]	= Xbomb;
+    lev.android_array[Xbomb_fall]	= Xbomb;
+    lev.android_array[Ybomb_sB]		= Xbomb;
+    lev.android_array[Ybomb_eB]		= Xbomb;
+    lev.android_array[Ybomb_wB]		= Xbomb;
   }
 
   if (temp & 16)
   {
-    lev.android_array[Xnut] =
-      lev.android_array[Xnut_pause] =
-      lev.android_array[Xnut_fall] =
-      lev.android_array[Ynut_sB] =
-      lev.android_array[Ynut_eB] =
-      lev.android_array[Ynut_wB] = Xnut;
+    lev.android_array[Xnut]		= Xnut;
+    lev.android_array[Xnut_pause]	= Xnut;
+    lev.android_array[Xnut_fall]	= Xnut;
+    lev.android_array[Ynut_sB]		= Xnut;
+    lev.android_array[Ynut_eB]		= Xnut;
+    lev.android_array[Ynut_wB]		= Xnut;
   }
 
   if (temp & 32)
   {
-    lev.android_array[Xtank_n] =
-      lev.android_array[Xtank_gon] =
-      lev.android_array[Ytank_nB] =
-      lev.android_array[Ytank_n_e] =
-      lev.android_array[Ytank_n_w] = Xtank_n;
+    lev.android_array[Xtank_n]		= Xtank_n;
+    lev.android_array[Xtank_gon]	= Xtank_n;
+    lev.android_array[Ytank_nB]		= Xtank_n;
+    lev.android_array[Ytank_n_e]	= Xtank_n;
+    lev.android_array[Ytank_n_w]	= Xtank_n;
 
-    lev.android_array[Xtank_e] =
-      lev.android_array[Xtank_goe] =
-      lev.android_array[Ytank_eB] =
-      lev.android_array[Ytank_e_s] =
-      lev.android_array[Ytank_e_n] = Xtank_e;
+    lev.android_array[Xtank_e]		= Xtank_e;
+    lev.android_array[Xtank_goe]	= Xtank_e;
+    lev.android_array[Ytank_eB]		= Xtank_e;
+    lev.android_array[Ytank_e_s]	= Xtank_e;
+    lev.android_array[Ytank_e_n]	= Xtank_e;
 
-    lev.android_array[Xtank_s] =
-      lev.android_array[Xtank_gos] =
-      lev.android_array[Ytank_sB] =
-      lev.android_array[Ytank_s_w] =
-      lev.android_array[Ytank_s_e] = Xtank_s;
+    lev.android_array[Xtank_s]		= Xtank_s;
+    lev.android_array[Xtank_gos]	= Xtank_s;
+    lev.android_array[Ytank_sB]		= Xtank_s;
+    lev.android_array[Ytank_s_w]	= Xtank_s;
+    lev.android_array[Ytank_s_e]	= Xtank_s;
 
-    lev.android_array[Xtank_w] =
-      lev.android_array[Xtank_gow] =
-      lev.android_array[Ytank_wB] =
-      lev.android_array[Ytank_w_n] =
-      lev.android_array[Ytank_w_s] = Xtank_w;
+    lev.android_array[Xtank_w]		= Xtank_w;
+    lev.android_array[Xtank_gow]	= Xtank_w;
+    lev.android_array[Ytank_wB]		= Xtank_w;
+    lev.android_array[Ytank_w_n]	= Xtank_w;
+    lev.android_array[Ytank_w_s]	= Xtank_w;
   }
 
   if (temp & 64)
   {
-    lev.android_array[Xeater_n] = lev.android_array[Yeater_nB] = Xeater_n;
-    lev.android_array[Xeater_e] = lev.android_array[Yeater_eB] = Xeater_e;
-    lev.android_array[Xeater_s] = lev.android_array[Yeater_sB] = Xeater_s;
-    lev.android_array[Xeater_w] = lev.android_array[Yeater_wB] = Xeater_w;
+    lev.android_array[Xeater_n]		= Xeater_n;
+    lev.android_array[Yeater_nB]	= Xeater_n;
+
+    lev.android_array[Xeater_e]		= Xeater_e;
+    lev.android_array[Yeater_eB]	= Xeater_e;
+
+    lev.android_array[Xeater_s]		= Xeater_s;
+    lev.android_array[Yeater_sB]	= Xeater_s;
+
+    lev.android_array[Xeater_w]		= Xeater_w;
+    lev.android_array[Yeater_wB]	= Xeater_w;
   }
 
   if (temp & 128)
   {
-    lev.android_array[Xbug_n] =
-      lev.android_array[Xbug_gon] =
-      lev.android_array[Ybug_nB] =
-      lev.android_array[Ybug_n_e] =
-      lev.android_array[Ybug_n_w] = Xbug_gon;
+    lev.android_array[Xbug_n]		= Xbug_gon;
+    lev.android_array[Xbug_gon]		= Xbug_gon;
+    lev.android_array[Ybug_nB]		= Xbug_gon;
+    lev.android_array[Ybug_n_e]		= Xbug_gon;
+    lev.android_array[Ybug_n_w]		= Xbug_gon;
 
-    lev.android_array[Xbug_e] =
-      lev.android_array[Xbug_goe] =
-      lev.android_array[Ybug_eB] =
-      lev.android_array[Ybug_e_s] =
-      lev.android_array[Ybug_e_n] = Xbug_goe;
+    lev.android_array[Xbug_e]		= Xbug_goe;
+    lev.android_array[Xbug_goe]		= Xbug_goe;
+    lev.android_array[Ybug_eB]		= Xbug_goe;
+    lev.android_array[Ybug_e_s]		= Xbug_goe;
+    lev.android_array[Ybug_e_n]		= Xbug_goe;
 
-    lev.android_array[Xbug_s] =
-      lev.android_array[Xbug_gos] =
-      lev.android_array[Ybug_sB] =
-      lev.android_array[Ybug_s_w] =
-      lev.android_array[Ybug_s_e] = Xbug_gos;
+    lev.android_array[Xbug_s]		= Xbug_gos;
+    lev.android_array[Xbug_gos]		= Xbug_gos;
+    lev.android_array[Ybug_sB]		= Xbug_gos;
+    lev.android_array[Ybug_s_w]		= Xbug_gos;
+    lev.android_array[Ybug_s_e]		= Xbug_gos;
 
-    lev.android_array[Xbug_w] =
-      lev.android_array[Xbug_gow] =
-      lev.android_array[Ybug_wB] =
-      lev.android_array[Ybug_w_n] =
-      lev.android_array[Ybug_w_s] = Xbug_gow;
+    lev.android_array[Xbug_w]		= Xbug_gow;
+    lev.android_array[Xbug_gow]		= Xbug_gow;
+    lev.android_array[Ybug_wB]		= Xbug_gow;
+    lev.android_array[Ybug_w_n]		= Xbug_gow;
+    lev.android_array[Ybug_w_s]		= Xbug_gow;
   }
 
   if (temp & 256)
   {
-    lev.android_array[Xalien] = lev.android_array[Xalien_pause] =
-      lev.android_array[Yalien_nB] = lev.android_array[Yalien_eB] =
-      lev.android_array[Yalien_sB] = lev.android_array[Yalien_wB] = Xalien;
+    lev.android_array[Xalien]		= Xalien;
+    lev.android_array[Xalien_pause]	= Xalien;
+    lev.android_array[Yalien_nB]	= Xalien;
+    lev.android_array[Yalien_eB]	= Xalien;
+    lev.android_array[Yalien_sB]	= Xalien;
+    lev.android_array[Yalien_wB]	= Xalien;
   }
 
   if (temp & 512)
   {
-    lev.android_array[Xspring] =
-      lev.android_array[Xspring_pause] =
-      lev.android_array[Xspring_e] =
-      lev.android_array[Yspring_eB] =
-      lev.android_array[Yspring_kill_eB] =
-      lev.android_array[Xspring_w] =
-      lev.android_array[Yspring_wB] =
-      lev.android_array[Yspring_kill_wB] =
-      lev.android_array[Xspring_fall] =
-      lev.android_array[Yspring_sB] = Xspring;
+    lev.android_array[Xspring]		= Xspring;
+    lev.android_array[Xspring_pause]	= Xspring;
+    lev.android_array[Xspring_e]	= Xspring;
+    lev.android_array[Yspring_eB]	= Xspring;
+    lev.android_array[Yspring_kill_eB]	= Xspring;
+    lev.android_array[Xspring_w]	= Xspring;
+    lev.android_array[Yspring_wB]	= Xspring;
+    lev.android_array[Yspring_kill_wB]	= Xspring;
+    lev.android_array[Xspring_fall]	= Xspring;
+    lev.android_array[Yspring_sB]	= Xspring;
   }
 
   if (temp & 1024)
   {
-    lev.android_array[Yballoon_nB] =
-      lev.android_array[Yballoon_eB] =
-      lev.android_array[Yballoon_sB] =
-      lev.android_array[Yballoon_wB] =
-      lev.android_array[Xballoon] = Xballoon;
+    lev.android_array[Yballoon_nB]	= Xballoon;
+    lev.android_array[Yballoon_eB]	= Xballoon;
+    lev.android_array[Yballoon_sB]	= Xballoon;
+    lev.android_array[Yballoon_wB]	= Xballoon;
+    lev.android_array[Xballoon]		= Xballoon;
   }
 
   if (temp & 2048)
   {
-    lev.android_array[Xdripper] =
-      lev.android_array[XdripperB] =
-      lev.android_array[Xamoeba_1] =
-      lev.android_array[Xamoeba_2] =
-      lev.android_array[Xamoeba_3] =
-      lev.android_array[Xamoeba_4] =
-      lev.android_array[Xamoeba_5] =
-      lev.android_array[Xamoeba_6] =
-      lev.android_array[Xamoeba_7] =
-      lev.android_array[Xamoeba_8] = Xdrip_eat;
+    lev.android_array[Xdripper]		= Xdrip_eat;
+    lev.android_array[XdripperB]	= Xdrip_eat;
+    lev.android_array[Xamoeba_1]	= Xdrip_eat;
+    lev.android_array[Xamoeba_2]	= Xdrip_eat;
+    lev.android_array[Xamoeba_3]	= Xdrip_eat;
+    lev.android_array[Xamoeba_4]	= Xdrip_eat;
+    lev.android_array[Xamoeba_5]	= Xdrip_eat;
+    lev.android_array[Xamoeba_6]	= Xdrip_eat;
+    lev.android_array[Xamoeba_7]	= Xdrip_eat;
+    lev.android_array[Xamoeba_8]	= Xdrip_eat;
   }
 
   if (temp & 4096)
   {
-    lev.android_array[Xdynamite] = Xdynamite;
+    lev.android_array[Xdynamite]	= Xdynamite;
   }
 
   for (temp = 1; temp < 2047; temp++)

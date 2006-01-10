@@ -2015,6 +2015,8 @@ struct GameInfo
   /* values for the new EMC elements */
   int lenses_time_left;
   int magnify_time_left;
+  boolean ball_state;
+  int ball_content_nr;
 #endif
 
   /* values for player idle animation (no effect on engine) */

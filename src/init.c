@@ -1809,6 +1809,7 @@ void InitElementPropertiesStatic()
     EL_SP_BUGGY_BASE_ACTIVE,
     EL_EMC_PLANT,
 #endif
+
     -1
   };
 
@@ -1851,6 +1852,7 @@ void InitElementPropertiesStatic()
     EL_SPEED_PILL,
     EL_EMC_LENSES,
     EL_EMC_MAGNIFIER,
+
     -1
   };
 
@@ -1881,6 +1883,7 @@ void InitElementPropertiesStatic()
     EL_SP_BUGGY_BASE_ACTIVE,
     EL_EMC_PLANT,
 #endif
+
     -1
   };
 
@@ -1899,6 +1902,7 @@ void InitElementPropertiesStatic()
     EL_PACMAN,
     EL_SP_SNIKSNAK,
     EL_SP_ELECTRON,
+
     -1
   };
 
@@ -1908,6 +1912,7 @@ void InitElementPropertiesStatic()
     EL_SPACESHIP,
     EL_BD_BUTTERFLY,
     EL_BD_FIREFLY,
+
     -1
   };
 
@@ -2028,6 +2033,7 @@ void InitElementPropertiesStatic()
     EL_TUBE_LEFT_DOWN,
     EL_TUBE_RIGHT_UP,
     EL_TUBE_RIGHT_DOWN,
+
     -1
   };
 
@@ -2069,6 +2075,9 @@ void InitElementPropertiesStatic()
     EL_EMC_WALL_SLIPPERY_2,
     EL_EMC_WALL_SLIPPERY_3,
     EL_EMC_WALL_SLIPPERY_4,
+    EL_EMC_MAGIC_BALL,
+    EL_EMC_MAGIC_BALL_ACTIVE,
+
     -1
   };
 
@@ -2098,6 +2107,7 @@ void InitElementPropertiesStatic()
     EL_BALLOON,
     EL_SPRING,
     EL_EMC_ANDROID,
+
     -1
   };
 
@@ -2126,6 +2136,7 @@ void InitElementPropertiesStatic()
     EL_CRYSTAL,
     EL_SPRING,
     EL_DX_SUPABOMB,
+
     -1
   };
 
@@ -2151,6 +2162,7 @@ void InitElementPropertiesStatic()
     EL_CRYSTAL,
     EL_SPRING,
     EL_DX_SUPABOMB,
+
     -1
   };
 
@@ -2159,6 +2171,7 @@ void InitElementPropertiesStatic()
     EL_ROCK,
     EL_BD_ROCK,
     EL_SP_ZONK,
+
     -1
   };
 
@@ -2167,6 +2180,7 @@ void InitElementPropertiesStatic()
     EL_ROCK,
     EL_BD_ROCK,
     EL_SP_ZONK,
+
     -1
   };
 
@@ -2203,6 +2217,7 @@ void InitElementPropertiesStatic()
 #if 0
     EL_BLACK_ORB,
 #endif
+
     -1
   };
 
@@ -2218,6 +2233,7 @@ void InitElementPropertiesStatic()
     EL_PIG,
     EL_DRAGON,
     EL_MOLE,
+
     -1
   };
 
@@ -2226,6 +2242,7 @@ void InitElementPropertiesStatic()
     EL_BOMB,
     EL_SP_DISK_ORANGE,
     EL_DX_SUPABOMB,
+
     -1
   };
 
@@ -2252,6 +2269,7 @@ void InitElementPropertiesStatic()
     EL_PENGUIN,
     EL_PIG,
     EL_DRAGON,
+
     -1
   };
 
@@ -2268,6 +2286,7 @@ void InitElementPropertiesStatic()
     EL_TUBE_LEFT_DOWN,
     EL_TUBE_RIGHT_UP,
     EL_TUBE_RIGHT_DOWN,
+
     -1
   };
 
@@ -2304,6 +2323,7 @@ void InitElementPropertiesStatic()
     EL_EMC_GATE_8_GRAY_ACTIVE,
     EL_SWITCHGATE_OPEN,
     EL_TIMEGATE_OPEN,
+
     -1
   };
 
@@ -2328,6 +2348,7 @@ void InitElementPropertiesStatic()
     EL_SP_GRAVITY_OFF_PORT_RIGHT,
     EL_SP_GRAVITY_OFF_PORT_UP,
     EL_SP_GRAVITY_OFF_PORT_DOWN,
+
     -1
   };
 
@@ -2363,6 +2384,7 @@ void InitElementPropertiesStatic()
     EL_SP_DISK_YELLOW,
     EL_BALLOON,
     EL_EMC_ANDROID,
+
     -1
   };
 
@@ -2434,6 +2456,7 @@ void InitElementPropertiesStatic()
     EL_SP_GRAVITY_OFF_PORT_RIGHT,
     EL_SP_GRAVITY_OFF_PORT_UP,
     EL_SP_GRAVITY_OFF_PORT_DOWN,
+
     -1
   };
 
@@ -2475,6 +2498,7 @@ void InitElementPropertiesStatic()
 
     /* elements that can explode only by explosion */
     EL_BLACK_ORB,
+
     -1
   };
 
@@ -2505,6 +2529,7 @@ void InitElementPropertiesStatic()
     EL_SP_GRAVITY_OFF_PORT_UP,
     EL_SP_GRAVITY_OFF_PORT_DOWN,
     EL_EMC_GRASS,
+
     -1
   };
 
@@ -2517,6 +2542,7 @@ void InitElementPropertiesStatic()
     EL_SP_MURPHY,
     EL_SOKOBAN_FIELD_PLAYER,
     EL_TRIGGER_PLAYER,
+
     -1
   };
 
@@ -2530,6 +2556,7 @@ void InitElementPropertiesStatic()
     EL_EMERALD_RED,
     EL_EMERALD_PURPLE,
     EL_DIAMOND,
+
     -1
   };
 
@@ -2563,6 +2590,8 @@ void InitElementPropertiesStatic()
     EL_LAMP,
     EL_TIME_ORB_FULL,
     EL_EMC_MAGIC_BALL_SWITCH,
+    EL_EMC_MAGIC_BALL_SWITCH_ACTIVE,
+
     -1
   };
 
@@ -2596,6 +2625,7 @@ void InitElementPropertiesStatic()
     EL_BD_AMOEBA,
     EL_CHAR_QUESTION,
     EL_UNKNOWN,
+
     -1
   };
 
@@ -2670,6 +2700,7 @@ void InitElementPropertiesStatic()
     EL_SP_BUGGY_BASE_ACTIVE,
     EL_SP_EXIT_OPENING,
     EL_SP_EXIT_CLOSING,
+
     -1
   };
 
@@ -2686,6 +2717,7 @@ void InitElementPropertiesStatic()
     EL_PLAYER_3,
     EL_PLAYER_4,
     EL_INVISIBLE_STEELWALL,
+
     -1
   };
 
@@ -2697,6 +2729,7 @@ void InitElementPropertiesStatic()
     EL_EMERALD_RED,
     EL_EMERALD_PURPLE,
     EL_DIAMOND,
+
     -1
   };
 
@@ -2724,6 +2757,7 @@ void InitElementPropertiesStatic()
     EL_DIAMOND,
     EL_PEARL,
     EL_CRYSTAL,
+
     -1
   };
 
@@ -2737,6 +2771,7 @@ void InitElementPropertiesStatic()
     EL_DIAMOND,
     EL_PEARL,
     EL_CRYSTAL,
+
     -1
   };
 
@@ -2748,6 +2783,7 @@ void InitElementPropertiesStatic()
     EL_EMERALD_RED,
     EL_EMERALD_PURPLE,
     EL_DIAMOND,
+
     -1
   };
 
@@ -2826,6 +2862,7 @@ void InitElementPropertiesStatic()
     EL_EMC_WALL_6,
     EL_EMC_WALL_7,
     EL_EMC_WALL_8,
+
     -1
   };
 
@@ -2989,6 +3026,7 @@ void InitElementPropertiesStatic()
     EL_TUBE_LEFT_DOWN,
     EL_TUBE_RIGHT_UP,
     EL_TUBE_RIGHT_DOWN,
+
     -1
   };
 
@@ -3005,6 +3043,7 @@ void InitElementPropertiesStatic()
     EL_PACMAN,
     EL_SP_SNIKSNAK,
     EL_SP_ELECTRON,
+
     -1
   };
 
@@ -3022,6 +3061,7 @@ void InitElementPropertiesStatic()
     EL_CONVEYOR_BELT_4_LEFT,
     EL_CONVEYOR_BELT_4_MIDDLE,
     EL_CONVEYOR_BELT_4_RIGHT,
+
     -1
   };
 
@@ -3039,6 +3079,7 @@ void InitElementPropertiesStatic()
     EL_CONVEYOR_BELT_4_LEFT_ACTIVE,
     EL_CONVEYOR_BELT_4_MIDDLE_ACTIVE,
     EL_CONVEYOR_BELT_4_RIGHT_ACTIVE,
+
     -1
   };
 
@@ -3056,6 +3097,7 @@ void InitElementPropertiesStatic()
     EL_CONVEYOR_BELT_4_SWITCH_LEFT,
     EL_CONVEYOR_BELT_4_SWITCH_MIDDLE,
     EL_CONVEYOR_BELT_4_SWITCH_RIGHT,
+
     -1
   };
 
@@ -3072,6 +3114,7 @@ void InitElementPropertiesStatic()
     EL_TUBE_VERTICAL_LEFT,
     EL_TUBE_VERTICAL_RIGHT,
     EL_TUBE_ANY,
+
     -1
   };
 
@@ -3113,6 +3156,7 @@ void InitElementPropertiesStatic()
     EL_EMC_GATE_6_GRAY_ACTIVE,
     EL_EMC_GATE_7_GRAY_ACTIVE,
     EL_EMC_GATE_8_GRAY_ACTIVE,
+
     -1
   };
 
@@ -3123,6 +3167,7 @@ void InitElementPropertiesStatic()
     EL_AMOEBA_DRY,
     EL_AMOEBA_FULL,
     EL_BD_AMOEBA,
+
     -1
   };
 
@@ -3132,6 +3177,7 @@ void InitElementPropertiesStatic()
     EL_AMOEBA_DRY,
     EL_AMOEBA_FULL,
     EL_BD_AMOEBA,
+
     -1
   };
 
@@ -3148,6 +3194,7 @@ void InitElementPropertiesStatic()
     EL_AMOEBA_FULL,
     EL_BD_AMOEBA,
     EL_EMC_MAGIC_BALL,
+
     -1
   };
 
@@ -3166,6 +3213,7 @@ void InitElementPropertiesStatic()
     EL_AMOEBA_FULL,
     EL_GAME_OF_LIFE,
     EL_BIOMAZE,
+
     -1
   };
 
@@ -3177,6 +3225,7 @@ void InitElementPropertiesStatic()
     EL_DYNABOMB_PLAYER_3_ACTIVE,
     EL_DYNABOMB_PLAYER_4_ACTIVE,
     EL_SP_DISK_RED_ACTIVE,
+
     -1
   };
 
@@ -3361,6 +3410,7 @@ void InitElementPropertiesStatic()
     EL_EMC_WALL_14,
     EL_EMC_WALL_15,
     EL_EMC_WALL_16,
+
     -1
   };
 
@@ -3375,6 +3425,7 @@ void InitElementPropertiesStatic()
     EL_LANDMINE,
     EL_TRAP,
     EL_TRAP_ACTIVE,
+
     -1
   };
 
@@ -3394,6 +3445,7 @@ void InitElementPropertiesStatic()
     EL_INTERNAL_CASCADE_USER_ACTIVE,
     EL_INTERNAL_CASCADE_GENERIC_ACTIVE,
     EL_INTERNAL_CASCADE_DYNAMIC_ACTIVE,
+
     -1
   };
 
@@ -3413,6 +3465,7 @@ void InitElementPropertiesStatic()
     EL_INTERNAL_CASCADE_USER,
     EL_INTERNAL_CASCADE_GENERIC,
     EL_INTERNAL_CASCADE_DYNAMIC,
+
     -1
   };
 
