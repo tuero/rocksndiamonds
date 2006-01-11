@@ -1681,7 +1681,7 @@ static int get_special_property_bit(int element, int property_bit_nr)
     { EL_SP_MURPHY,		0	},
     { EL_SOKOBAN_FIELD_PLAYER,	0	},
 
-    /* all element that can move may be able to also move into acid */
+    /* all elements that can move may be able to also move into acid */
     { EL_BUG,			1	},
     { EL_BUG_LEFT,		1	},
     { EL_BUG_RIGHT,		1	},
@@ -1723,6 +1723,7 @@ static int get_special_property_bit(int element, int property_bit_nr)
     { EL_SP_ELECTRON,		15	},
     { EL_BALLOON,		16	},
     { EL_SPRING,	        17	},
+    { EL_EMC_ANDROID,	        18	},
 
     { -1,			-1	},
   };
@@ -3181,7 +3182,7 @@ void InitElementPropertiesStatic()
     -1
   };
 
-  static int ep_has_content[] =
+  static int ep_has_editor_content[] =
   {
     EL_PLAYER_1,
     EL_PLAYER_2,
@@ -3194,6 +3195,7 @@ void InitElementPropertiesStatic()
     EL_AMOEBA_FULL,
     EL_BD_AMOEBA,
     EL_EMC_MAGIC_BALL,
+    EL_EMC_ANDROID,
 
     -1
   };
@@ -3526,7 +3528,7 @@ void InitElementPropertiesStatic()
     { ep_keygate,			EP_KEYGATE			},
     { ep_amoeboid,			EP_AMOEBOID			},
     { ep_amoebalive,			EP_AMOEBALIVE			},
-    { ep_has_content,			EP_HAS_CONTENT			},
+    { ep_has_editor_content,		EP_HAS_EDITOR_CONTENT		},
     { ep_can_turn_each_move,		EP_CAN_TURN_EACH_MOVE		},
     { ep_can_grow,			EP_CAN_GROW			},
     { ep_active_bomb,			EP_ACTIVE_BOMB			},

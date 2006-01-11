@@ -4758,6 +4758,63 @@ int map_element_EM_to_RND(int element_em)
   return EL_UNKNOWN;
 }
 
+void map_android_clone_elements_RND_to_EM(struct LevelInfo *level)
+{
+  struct LevelInfo_EM *level_em = level->native_em_level;
+  struct LEVEL *lev = level_em->lev;
+  int i, j;
+
+  for (i = 0; i < level->num_android_clone_elements; i++)
+  {
+    int element_rnd = level->android_clone_element[i];
+    int element_em = map_element_RND_to_EM(element_rnd);
+
+    for (j = 0; em_object_mapping_list[j].element_em != -1; j++)
+      if (em_object_mapping_list[j].element_rnd == element_rnd)
+	lev->android_array[em_object_mapping_list[j].element_em] = element_em;
+  }
+}
+
+void map_android_clone_elements_EM_to_RND(struct LevelInfo *level)
+{
+  struct LevelInfo_EM *level_em = level->native_em_level;
+  struct LEVEL *lev = level_em->lev;
+  int i, j;
+
+  level->num_android_clone_elements = 0;
+
+  for (i = 0; i < TILE_MAX; i++)
+  {
+    int element_em = lev->android_array[i];
+    int element_rnd;
+    boolean element_found = FALSE;
+
+    if (element_em == Xblank)
+      continue;
+
+    element_rnd = map_element_EM_to_RND(element_em);
+
+    for (j = 0; j < level->num_android_clone_elements; j++)
+      if (level->android_clone_element[j] == element_rnd)
+	element_found = TRUE;
+
+    if (!element_found)
+    {
+      level->android_clone_element[level->num_android_clone_elements++] =
+	element_rnd;
+
+      if (level->num_android_clone_elements == MAX_ANDROID_ELEMENTS)
+	break;
+    }
+  }
+
+  if (level->num_android_clone_elements == 0)
+  {
+    level->num_android_clone_elements = 1;
+    level->android_clone_element[0] = EL_EMPTY;
+  }
+}
+
 #if 0
 
 int map_element_RND_to_EM(int element_rnd)

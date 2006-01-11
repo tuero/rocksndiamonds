@@ -115,7 +115,7 @@
 #define EP_KEYGATE			49
 #define EP_AMOEBOID			50
 #define EP_AMOEBALIVE			51
-#define EP_HAS_CONTENT			52
+#define EP_HAS_EDITOR_CONTENT		52
 #define EP_CAN_TURN_EACH_MOVE		53
 #define EP_CAN_GROW			54
 #define EP_ACTIVE_BOMB			55
@@ -521,7 +521,7 @@
 #define IS_KEYGATE(e)		HAS_PROPERTY(e, EP_KEYGATE)
 #define IS_AMOEBOID(e)		HAS_PROPERTY(e, EP_AMOEBOID)
 #define IS_AMOEBALIVE(e)	HAS_PROPERTY(e, EP_AMOEBALIVE)
-#define HAS_CONTENT(e)		HAS_PROPERTY(e, EP_HAS_CONTENT)
+#define HAS_EDITOR_CONTENT(e)	HAS_PROPERTY(e, EP_HAS_EDITOR_CONTENT)
 #define CAN_TURN_EACH_MOVE(e)	HAS_PROPERTY(e, EP_CAN_TURN_EACH_MOVE)
 #define CAN_GROW(e)		HAS_PROPERTY(e, EP_CAN_GROW)
 #define IS_ACTIVE_BOMB(e)	HAS_PROPERTY(e, EP_ACTIVE_BOMB)
@@ -746,6 +746,8 @@
 #define MAX_CHANGE_PAGES	32
 #define MIN_ELEMENTS_IN_GROUP	1
 #define MAX_ELEMENTS_IN_GROUP	16
+#define MIN_ANDROID_ELEMENTS	1
+#define MAX_ANDROID_ELEMENTS	16
 
 /* values for elements with content */
 #define MIN_ELEMENT_CONTENTS	1
@@ -1910,7 +1912,11 @@ struct LevelInfo
   struct Content ball_content[MAX_ELEMENT_CONTENTS];
   int num_ball_contents;
 
+#if 0
   boolean android_array[16];
+#endif
+  int num_android_clone_elements;
+  int android_clone_element[MAX_ANDROID_ELEMENTS];
 #endif
 
   int can_move_into_acid_bits;	/* bitfield to store property for elements */

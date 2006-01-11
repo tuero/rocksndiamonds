@@ -142,6 +142,9 @@ int map_element_EM_to_RND(int);
 int map_direction_RND_to_EM(int);
 int map_direction_EM_to_RND(int);
 
+void map_android_clone_elements_RND_to_EM(struct LevelInfo *);
+void map_android_clone_elements_EM_to_RND(struct LevelInfo *);
+
 int get_next_element(int);
 int el_act_dir2img(int, int, int);
 int el_act2img(int, int);

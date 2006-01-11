@@ -6608,10 +6608,11 @@ static void RunTimegateWheel(int x, int y)
 
 static void InitMagicBallDelay(int x, int y)
 {
-  ChangeDelay[x][y] = level.ball_time * FRAMES_PER_SECOND;
-
-  if (ChangeDelay[x][y] == 0)
-    ChangeDelay[x][y] = 1;
+#if 1
+  ChangeDelay[x][y] = (level.ball_time + 1) * 8 + 1;
+#else
+  ChangeDelay[x][y] = level.ball_time * FRAMES_PER_SECOND + 1;
+#endif
 }
 
 static void ActivateMagicBall(int bx, int by)

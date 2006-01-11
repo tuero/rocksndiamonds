@@ -435,6 +435,7 @@ void HandleButton(int mx, int my, int button)
       break;
 
     case GAME_MODE_EDITOR:
+      HandleLevelEditorIdle();
       break;
 
     case GAME_MODE_INFO:

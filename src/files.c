@@ -86,8 +86,8 @@
 #define CONF_VALUE_ELEMENT_7		(CONF_MASK_2_BYTE | 7)
 #define CONF_VALUE_ELEMENT_8		(CONF_MASK_2_BYTE | 8)
 
-#define CONF_VALUE_CONTENT_1		(CONF_MASK_MULTI_BYTES | 1)
-#define CONF_VALUE_CONTENT_8		(CONF_MASK_MULTI_BYTES | 2)
+#define CONF_VALUE_ELEMENTS		(CONF_MASK_MULTI_BYTES | 1)
+#define CONF_VALUE_CONTENTS		(CONF_MASK_MULTI_BYTES | 2)
 
 #define CONF_VALUE_INTEGER(x)		((x) >= CONF_VALUE_INTEGER_1 &&	\
 					 (x) <= CONF_VALUE_INTEGER_8)
@@ -101,24 +101,43 @@
 
 #define CONF_CONTENT_NUM_ELEMENTS	(3 * 3)
 #define CONF_CONTENT_NUM_BYTES		(CONF_CONTENT_NUM_ELEMENTS * 2)
+#define CONF_ELEMENT_NUM_BYTES		(2)
+
+#define CONF_ENTITY_NUM_BYTES(t)	((t) == CONF_VALUE_ELEMENTS ?	\
+					 CONF_ELEMENT_NUM_BYTES :	\
+					 (t) == CONF_VALUE_CONTENTS ?	\
+					 CONF_CONTENT_NUM_BYTES : 1)
+
+#define CONF_ELEMENT_BYTE_POS(i)	((i) * CONF_ELEMENT_NUM_BYTES)
+#define CONF_ELEMENTS_ELEMENT(b,i)     ((b[CONF_ELEMENT_BYTE_POS(i)] << 8) |  \
+					(b[CONF_ELEMENT_BYTE_POS(i) + 1]))
 
 #define CONF_CONTENT_ELEMENT_POS(c,x,y)	((c) * CONF_CONTENT_NUM_ELEMENTS +    \
 					 (y) * 3 + (x))
-#define CONF_CONTENT_BYTE_POS(c,x,y)	(CONF_CONTENT_ELEMENT_POS(c,x,y) * 2)
-#define CONF_CONTENT_ELEMENT(b,c,x,y) ((b[CONF_CONTENT_BYTE_POS(c,x,y)] << 8)|\
-				       (b[CONF_CONTENT_BYTE_POS(c,x,y) + 1]))
+#define CONF_CONTENT_BYTE_POS(c,x,y)	(CONF_CONTENT_ELEMENT_POS(c,x,y) *    \
+					 CONF_ELEMENT_NUM_BYTES)
+#define CONF_CONTENTS_ELEMENT(b,c,x,y) ((b[CONF_CONTENT_BYTE_POS(c,x,y)]<< 8)|\
+					(b[CONF_CONTENT_BYTE_POS(c,x,y) + 1]))
 
 static struct LevelInfo li;
 
 static struct
 {
-  int element;
-  int type;
-  void *value;
-  int default_value;
+  int element;			/* element for which data is to be stored */
+  int type;			/* type of data to be stored */
+
+  /* (mandatory) */
+  void *value;			/* variable that holds the data to be stored */
+  int default_value;		/* initial default value for this variable */
+
+  /* (optional) */
+  void *num_entities;		/* number of entities for multi-byte data */
+  int default_num_entities;	/* default number of entities for this data */
+  int max_num_entities;		/* maximal number of entities for this data */
 } element_conf[] =
 {
   /* ---------- 1-byte values ---------------------------------------------- */
+
   {
     EL_EMC_ANDROID,			CONF_VALUE_INTEGER_1,
     &li.android_move_time,		10
@@ -272,10 +291,6 @@ static struct
     &li.ball_time,			10
   },
   {
-    EL_EMC_MAGIC_BALL,			CONF_VALUE_INTEGER_2,
-    &li.num_ball_contents,		8
-  },
-  {
     EL_EMC_MAGIC_BALL,			CONF_VALUE_BOOLEAN_1,
     &li.ball_random,			FALSE
   },
@@ -285,6 +300,7 @@ static struct
   },
 
   /* ---------- 2-byte values ---------------------------------------------- */
+
   {
     EL_PLAYER_1,			CONF_VALUE_ELEMENT_1,
     &li.start_element[0],		EL_PLAYER_1
@@ -335,14 +351,21 @@ static struct
   },
 
   /* ---------- multi-byte values ------------------------------------------ */
+
   {
-    EL_EMC_MAGIC_BALL,			CONF_VALUE_CONTENT_8,
-    &li.ball_content,			EL_EMPTY
+    EL_EMC_MAGIC_BALL,			CONF_VALUE_CONTENTS,
+    &li.ball_content,			EL_EMPTY,
+    &li.num_ball_contents,		4, MAX_ELEMENT_CONTENTS
+  },
+  {
+    EL_EMC_ANDROID,			CONF_VALUE_ELEMENTS,
+    &li.android_clone_element[0],	EL_EMPTY,
+    &li.num_android_clone_elements,	1, MAX_ANDROID_ELEMENTS
   },
 
   {
     -1,					-1,
-    NULL,				-1
+    NULL,				-1,
   },
 };
 
@@ -380,22 +403,38 @@ static void setLevelInfoToDefaultsFromConfigList(struct LevelInfo *level)
     int type = element_conf[i].type;
     int bytes = type & CONF_MASK_BYTES;
 
-    if (bytes != CONF_MASK_MULTI_BYTES)
+    if (bytes == CONF_MASK_MULTI_BYTES)
+    {
+      int default_num_entities = element_conf[i].default_num_entities;
+      int max_num_entities = element_conf[i].max_num_entities;
+
+      *(int *)(element_conf[i].num_entities) = default_num_entities;
+
+      if (type == CONF_VALUE_ELEMENTS)
+      {
+	int *element_array = (int *)(element_conf[i].value);
+	int j;
+
+	for (j = 0; j < max_num_entities; j++)
+	  element_array[j] = default_value;
+      }
+      else if (type == CONF_VALUE_CONTENTS)
+      {
+	struct Content *content = (struct Content *)(element_conf[i].value);
+	int c, x, y;
+
+	for (c = 0; c < max_num_entities; c++)
+	  for (y = 0; y < 3; y++)
+	    for (x = 0; x < 3; x++)
+	      content[c].e[x][y] = default_value;
+      }
+    }
+    else	/* constant size configuration data (1, 2 or 4 bytes) */
     {
       if (CONF_VALUE_BOOLEAN(type))
 	*(boolean *)(element_conf[i].value) = default_value;
       else
 	*(int *)    (element_conf[i].value) = default_value;
-    }
-    else if (type == CONF_VALUE_CONTENT_8)
-    {
-      struct Content *content = (struct Content *)(element_conf[i].value);
-      int c, x, y;
-
-      for (c = 0; c < MAX_ELEMENT_CONTENTS; c++)
-	for (y = 0; y < 3; y++)
-	  for (x = 0; x < 3; x++)
-	    content[c].e[x][y] = default_value;
     }
   }
 
@@ -554,8 +593,10 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
       for (y = 0; y < 3; y++)
 	level->ball_content[i].e[x][y] = EL_EMPTY;
 #endif
+#if 0
   for (i = 0; i < 16; i++)
     level->android_array[i] = FALSE;
+#endif
 
   level->use_custom_template = FALSE;
 
@@ -1676,19 +1717,41 @@ static int LoadLevel_CONF(FILE *file, int chunk_size, struct LevelInfo *level)
 	if (element_conf[i].element == element &&
 	    element_conf[i].type    == type)
 	{
+	  int num_entities = num_bytes / CONF_ENTITY_NUM_BYTES(type);
+	  int max_num_entities = element_conf[i].max_num_entities;
+
+	  if (num_entities > max_num_entities)
+	  {
+	    Error(ERR_WARN,
+		  "truncating number of entities for element %d from %d to %d",
+		  element, num_entities, max_num_entities);
+
+	    num_entities = max_num_entities;
+	  }
+
+	  *(int *)(element_conf[i].num_entities) = num_entities;
+
 	  element_found = TRUE;
 
-	  if (type == CONF_VALUE_CONTENT_8)
+	  if (type == CONF_VALUE_ELEMENTS)
+	  {
+	    int *element_array = (int *)(element_conf[i].value);
+	    int j;
+
+	    for (j = 0; j < num_entities; j++)
+	      element_array[j] =
+		getMappedElement(CONF_ELEMENTS_ELEMENT(buffer, j));
+	  }
+	  else if (type == CONF_VALUE_CONTENTS)
 	  {
 	    struct Content *content= (struct Content *)(element_conf[i].value);
-	    int num_contents = num_bytes / CONF_CONTENT_NUM_BYTES;
 	    int c, x, y;
 
-	    for (c = 0; c < num_contents; c++)
+	    for (c = 0; c < num_entities; c++)
 	      for (y = 0; y < 3; y++)
 		for (x = 0; x < 3; x++)
 		  content[c].e[x][y] =
-		    getMappedElement(CONF_CONTENT_ELEMENT(buffer, c, x, y));
+		    getMappedElement(CONF_CONTENTS_ELEMENT(buffer, c, x, y));
 	  }
 	  else
 	    element_found = FALSE;
@@ -1701,7 +1764,7 @@ static int LoadLevel_CONF(FILE *file, int chunk_size, struct LevelInfo *level)
 
       real_chunk_size += 2 + num_bytes;
     }
-    else
+    else	/* constant size configuration data (1, 2 or 4 bytes) */
     {
       int value = (bytes == CONF_MASK_1_BYTE ? getFile8Bit   (file) :
 		   bytes == CONF_MASK_2_BYTE ? getFile16BitBE(file) :
@@ -2373,8 +2436,12 @@ void CopyNativeLevel_RND_to_EM(struct LevelInfo *level)
 	map_element_RND_to_EM(level->
 			      ball_content[i].e[ball_xy[j][0]][ball_xy[j][1]]);
 
+  map_android_clone_elements_RND_to_EM(level);
+
+#if 0
   for (i = 0; i < 16; i++)
     lev->android_array[i] = FALSE;	/* !!! YET TO COME !!! */
+#endif
 
   /* first fill the complete playfield with the default border element */
   for (y = 0; y < EM_MAX_CAVE_HEIGHT; y++)
@@ -2499,8 +2566,12 @@ void CopyNativeLevel_EM_to_RND(struct LevelInfo *level)
       level->ball_content[i].e[ball_xy[j][0]][ball_xy[j][1]] =
 	map_element_EM_to_RND(lev->ball_array[i][j]);
 
+  map_android_clone_elements_EM_to_RND(level);
+
+#if 0
   for (i = 0; i < 16; i++)
     level->android_array[i] = FALSE;	/* !!! YET TO COME !!! */
+#endif
 
   /* convert the playfield (some elements need special treatment) */
   for (y = 0; y < level->fieldy; y++) for (x = 0; x < level->fieldx; x++)
@@ -3720,9 +3791,39 @@ static int SaveLevel_CONF_Value(FILE *file, int pos)
   return num_bytes;
 }
 
-static int SaveLevel_CONF_Content(FILE *file, int pos, int num_contents)
+static int SaveLevel_CONF_Elements(FILE *file, int pos)
+{
+  int *element_array = (int *)(element_conf[pos].value);
+  int num_elements = *(int *)element_conf[pos].num_entities;
+  int default_value = element_conf[pos].default_value;
+  int element = element_conf[pos].element;
+  int type = element_conf[pos].type;
+  int num_bytes = 0;
+  boolean modified = FALSE;
+  int i;
+
+  /* check if any settings have been modified before saving them */
+  for (i = 0; i < num_elements; i++)
+    if (element_array[i] != default_value)
+      modified = TRUE;
+
+  if (!modified)		/* do not save unmodified default settings */
+    return 0;
+
+  num_bytes += putFile16BitBE(file, element);
+  num_bytes += putFile8Bit(file, type);
+  num_bytes += putFile16BitBE(file, num_elements * CONF_ELEMENT_NUM_BYTES);
+
+  for (i = 0; i < num_elements; i++)
+    num_bytes += putFile16BitBE(file, element_array[i]);
+
+  return num_bytes;
+}
+
+static int SaveLevel_CONF_Contents(FILE *file, int pos)
 {
   struct Content *content = (struct Content *)(element_conf[pos].value);
+  int num_contents = *(int *)element_conf[pos].num_entities;
   int default_value = element_conf[pos].default_value;
   int element = element_conf[pos].element;
   int type = element_conf[pos].type;
@@ -3766,8 +3867,10 @@ static int SaveLevel_CONF(FILE *file, struct LevelInfo *level)
 
     if (bytes != CONF_MASK_MULTI_BYTES)
       chunk_size += SaveLevel_CONF_Value(file, i);
-    else if (type == CONF_VALUE_CONTENT_8)
-      chunk_size += SaveLevel_CONF_Content(file, i, MAX_ELEMENT_CONTENTS);
+    else if (type == CONF_VALUE_ELEMENTS)
+      chunk_size += SaveLevel_CONF_Elements(file, i);
+    else if (type == CONF_VALUE_CONTENTS)
+      chunk_size += SaveLevel_CONF_Contents(file, i);
   }
 
   return chunk_size;
