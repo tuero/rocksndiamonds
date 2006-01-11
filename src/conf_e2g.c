@@ -1058,48 +1058,16 @@ element_to_graphic[] =
     IMG_EM_GATE_1_GRAY
   },
   {
-    EL_EM_GATE_1_GRAY_ACTIVE,		-1, -1, FALSE,
-    IMG_EM_GATE_1_GRAY_ACTIVE
-  },
-  {
-    EL_EM_GATE_1_GRAY,			ACTION_ACTIVE, -1, FALSE,
-    IMG_EM_GATE_1_GRAY_ACTIVE
-  },
-  {
     EL_EM_GATE_2_GRAY,			-1, -1, FALSE,
     IMG_EM_GATE_2_GRAY
-  },
-  {
-    EL_EM_GATE_2_GRAY_ACTIVE,		-1, -1, FALSE,
-    IMG_EM_GATE_2_GRAY_ACTIVE
-  },
-  {
-    EL_EM_GATE_2_GRAY,			ACTION_ACTIVE, -1, FALSE,
-    IMG_EM_GATE_2_GRAY_ACTIVE
   },
   {
     EL_EM_GATE_3_GRAY,			-1, -1, FALSE,
     IMG_EM_GATE_3_GRAY
   },
   {
-    EL_EM_GATE_3_GRAY_ACTIVE,		-1, -1, FALSE,
-    IMG_EM_GATE_3_GRAY_ACTIVE
-  },
-  {
-    EL_EM_GATE_3_GRAY,			ACTION_ACTIVE, -1, FALSE,
-    IMG_EM_GATE_3_GRAY_ACTIVE
-  },
-  {
     EL_EM_GATE_4_GRAY,			-1, -1, FALSE,
     IMG_EM_GATE_4_GRAY
-  },
-  {
-    EL_EM_GATE_4_GRAY_ACTIVE,		-1, -1, FALSE,
-    IMG_EM_GATE_4_GRAY_ACTIVE
-  },
-  {
-    EL_EM_GATE_4_GRAY,			ACTION_ACTIVE, -1, FALSE,
-    IMG_EM_GATE_4_GRAY_ACTIVE
   },
   {
     EL_EXIT_CLOSED,			-1, -1, FALSE,
@@ -1734,48 +1702,16 @@ element_to_graphic[] =
     IMG_GATE_1_GRAY
   },
   {
-    EL_GATE_1_GRAY_ACTIVE,		-1, -1, FALSE,
-    IMG_GATE_1_GRAY_ACTIVE
-  },
-  {
-    EL_GATE_1_GRAY,			ACTION_ACTIVE, -1, FALSE,
-    IMG_GATE_1_GRAY_ACTIVE
-  },
-  {
     EL_GATE_2_GRAY,			-1, -1, FALSE,
     IMG_GATE_2_GRAY
-  },
-  {
-    EL_GATE_2_GRAY_ACTIVE,		-1, -1, FALSE,
-    IMG_GATE_2_GRAY_ACTIVE
-  },
-  {
-    EL_GATE_2_GRAY,			ACTION_ACTIVE, -1, FALSE,
-    IMG_GATE_2_GRAY_ACTIVE
   },
   {
     EL_GATE_3_GRAY,			-1, -1, FALSE,
     IMG_GATE_3_GRAY
   },
   {
-    EL_GATE_3_GRAY_ACTIVE,		-1, -1, FALSE,
-    IMG_GATE_3_GRAY_ACTIVE
-  },
-  {
-    EL_GATE_3_GRAY,			ACTION_ACTIVE, -1, FALSE,
-    IMG_GATE_3_GRAY_ACTIVE
-  },
-  {
     EL_GATE_4_GRAY,			-1, -1, FALSE,
     IMG_GATE_4_GRAY
-  },
-  {
-    EL_GATE_4_GRAY_ACTIVE,		-1, -1, FALSE,
-    IMG_GATE_4_GRAY_ACTIVE
-  },
-  {
-    EL_GATE_4_GRAY,			ACTION_ACTIVE, -1, FALSE,
-    IMG_GATE_4_GRAY_ACTIVE
   },
   {
     EL_GAME_OF_LIFE,			-1, -1, FALSE,
@@ -2758,64 +2694,32 @@ element_to_graphic[] =
     IMG_EMC_GATE_5
   },
   {
-    EL_EMC_GATE_6,			-1, -1, FALSE,
-    IMG_EMC_GATE_6
-  },
-  {
-    EL_EMC_GATE_7,			-1, -1, FALSE,
-    IMG_EMC_GATE_7
-  },
-  {
-    EL_EMC_GATE_8,			-1, -1, FALSE,
-    IMG_EMC_GATE_8
-  },
-  {
     EL_EMC_GATE_5_GRAY,			-1, -1, FALSE,
     IMG_EMC_GATE_5_GRAY
   },
   {
-    EL_EMC_GATE_5_GRAY_ACTIVE,		-1, -1, FALSE,
-    IMG_EMC_GATE_5_GRAY_ACTIVE
-  },
-  {
-    EL_EMC_GATE_5_GRAY,			ACTION_ACTIVE, -1, FALSE,
-    IMG_EMC_GATE_5_GRAY_ACTIVE
+    EL_EMC_GATE_6,			-1, -1, FALSE,
+    IMG_EMC_GATE_6
   },
   {
     EL_EMC_GATE_6_GRAY,			-1, -1, FALSE,
     IMG_EMC_GATE_6_GRAY
   },
   {
-    EL_EMC_GATE_6_GRAY_ACTIVE,		-1, -1, FALSE,
-    IMG_EMC_GATE_6_GRAY_ACTIVE
-  },
-  {
-    EL_EMC_GATE_6_GRAY,			ACTION_ACTIVE, -1, FALSE,
-    IMG_EMC_GATE_6_GRAY_ACTIVE
+    EL_EMC_GATE_7,			-1, -1, FALSE,
+    IMG_EMC_GATE_7
   },
   {
     EL_EMC_GATE_7_GRAY,			-1, -1, FALSE,
     IMG_EMC_GATE_7_GRAY
   },
   {
-    EL_EMC_GATE_7_GRAY_ACTIVE,		-1, -1, FALSE,
-    IMG_EMC_GATE_7_GRAY_ACTIVE
-  },
-  {
-    EL_EMC_GATE_7_GRAY,			ACTION_ACTIVE, -1, FALSE,
-    IMG_EMC_GATE_7_GRAY_ACTIVE
+    EL_EMC_GATE_8,			-1, -1, FALSE,
+    IMG_EMC_GATE_8
   },
   {
     EL_EMC_GATE_8_GRAY,			-1, -1, FALSE,
     IMG_EMC_GATE_8_GRAY
-  },
-  {
-    EL_EMC_GATE_8_GRAY_ACTIVE,		-1, -1, FALSE,
-    IMG_EMC_GATE_8_GRAY_ACTIVE
-  },
-  {
-    EL_EMC_GATE_8_GRAY,			ACTION_ACTIVE, -1, FALSE,
-    IMG_EMC_GATE_8_GRAY_ACTIVE
   },
   {
     EL_EMC_ANDROID,			-1, -1, FALSE,
@@ -2872,10 +2776,6 @@ element_to_graphic[] =
   {
     EL_EMC_MAGIC_BALL,			ACTION_ACTIVE, -1, FALSE,
     IMG_EMC_MAGIC_BALL_ACTIVE
-  },
-  {
-    EL_EMC_MAGIC_BALL,			ACTION_DROPPING, -1, FALSE,
-    IMG_EMC_MAGIC_BALL_DROPPING
   },
   {
     EL_EMC_MAGIC_BALL_SWITCH,		-1, -1, FALSE,
@@ -2970,19 +2870,11 @@ element_to_graphic[] =
     IMG_EMC_FAKE_GRASS_CRUMBLED
   },
   {
-    EL_EMC_FAKE_GRASS_ACTIVE,		-1, -1, FALSE,
-    IMG_EMC_FAKE_GRASS_ACTIVE
-  },
-  {
     EL_EMC_FAKE_GRASS,			ACTION_ACTIVE, -1, FALSE,
     IMG_EMC_FAKE_GRASS_ACTIVE
   },
   {
     EL_EMC_FAKE_GRASS,			ACTION_ACTIVE, -1, TRUE,
-    IMG_EMC_FAKE_GRASS_ACTIVE_CRUMBLED
-  },
-  {
-    EL_EMC_FAKE_GRASS_ACTIVE,		-1, -1, TRUE,
     IMG_EMC_FAKE_GRASS_ACTIVE_CRUMBLED
   },
   {
@@ -2992,10 +2884,6 @@ element_to_graphic[] =
   {
     EL_EMC_DRIPPER,			-1, -1, FALSE,
     IMG_EMC_DRIPPER
-  },
-  {
-    EL_EMC_DRIPPER_ACTIVE,		-1, -1, FALSE,
-    IMG_EMC_DRIPPER_ACTIVE
   },
   {
     EL_EMC_DRIPPER,			ACTION_ACTIVE, -1, FALSE,

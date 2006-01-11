@@ -100,7 +100,7 @@
 #define BUTTON_2		5
 
 /* values for move directions and special "button" key bitmasks */
-#define MV_NONE			0
+#define MV_NO_MOVING		0
 #define MV_LEFT			(1 << MV_BIT_LEFT)
 #define MV_RIGHT		(1 << MV_BIT_RIGHT)
 #define MV_UP			(1 << MV_BIT_UP)
@@ -110,7 +110,7 @@
 #define MV_VERTICAL		(MV_UP   | MV_DOWN)
 #define MV_ALL_DIRECTIONS	(MV_LEFT | MV_RIGHT | MV_UP | MV_DOWN)
 #define MV_ANY_DIRECTION	(MV_ALL_DIRECTIONS)
-#define MV_NO_DIRECTION		(MV_NONE)
+#define MV_NO_DIRECTIONS	(MV_NO_MOVING)
 
 #define KEY_BUTTON_1		(1 << BUTTON_1)
 #define KEY_BUTTON_2		(1 << BUTTON_2)
@@ -125,7 +125,7 @@
 #define MV_DIR_OPPOSITE(x)	((x) == MV_LEFT  ? MV_RIGHT :		\
 				 (x) == MV_RIGHT ? MV_LEFT  :		\
 				 (x) == MV_UP    ? MV_DOWN  :		\
-				 (x) == MV_DOWN  ? MV_UP    : MV_NONE)
+				 (x) == MV_DOWN  ? MV_UP    : MV_NO_MOVING)
 
 
 /* values for animation mode (frame order and direction) */
@@ -135,13 +135,11 @@
 #define ANIM_PINGPONG		(1 << 2)
 #define ANIM_PINGPONG2		(1 << 3)
 #define ANIM_RANDOM		(1 << 4)
-#define ANIM_CE_VALUE		(1 << 5)
-#define ANIM_CE_SCORE		(1 << 6)
-#define ANIM_REVERSE		(1 << 7)
+#define ANIM_REVERSE		(1 << 5)
 
 /* values for special (non game element) animation modes */
-#define ANIM_HORIZONTAL		(1 << 8)
-#define ANIM_VERTICAL		(1 << 9)
+#define ANIM_HORIZONTAL		(1 << 6)
+#define ANIM_VERTICAL		(1 << 7)
 
 #define ANIM_DEFAULT		ANIM_LOOP
 
@@ -250,7 +248,6 @@
 #define SETUP_FILENAME		"setup.conf"
 #define LEVELSETUP_FILENAME	"levelsetup.conf"
 #define EDITORSETUP_FILENAME	"editorsetup.conf"
-#define EDITORCASCADE_FILENAME	"editorcascade.conf"
 #define HELPANIM_FILENAME	"helpanim.conf"
 #define HELPTEXT_FILENAME	"helptext.conf"
 #define LEVELINFO_FILENAME	"levelinfo.conf"
@@ -265,7 +262,6 @@
 #define SETUP_FILENAME		"setup.cnf"
 #define LEVELSETUP_FILENAME	"lvlsetup.cnf"
 #define EDITORSETUP_FILENAME	"edsetup.cnf"
-#define EDITORCASCADE_FILENAME	"edcascad.conf"
 #define HELPANIM_FILENAME	"helpanim.cnf"
 #define HELPTEXT_FILENAME	"helptext.cnf"
 #define LEVELINFO_FILENAME	"lvlinfo.cnf"
@@ -590,28 +586,10 @@ struct SetupEditorInfo
   boolean el_dx_boulderdash;
   boolean el_chars;
   boolean el_custom;
+  boolean el_custom_more;
   boolean el_user_defined;
-  boolean el_dynamic;
 
   boolean el_headlines;
-};
-
-struct SetupEditorCascadeInfo
-{
-  boolean el_bd;
-  boolean el_em;
-  boolean el_emc;
-  boolean el_rnd;
-  boolean el_sb;
-  boolean el_sp;
-  boolean el_dc;
-  boolean el_dx;
-  boolean el_chars;
-  boolean el_ce;
-  boolean el_ge;
-  boolean el_user;
-  boolean el_generic;
-  boolean el_dynamic;
 };
 
 struct SetupShortcutInfo
@@ -658,7 +636,6 @@ struct SetupInfo
   boolean override_level_music;
 
   struct SetupEditorInfo editor;
-  struct SetupEditorCascadeInfo editor_cascade;
   struct SetupShortcutInfo shortcut;
   struct SetupInputInfo input[MAX_PLAYERS];
   struct SetupSystemInfo system;
@@ -911,7 +888,6 @@ inline void BlitBitmapMasked(Bitmap *, Bitmap *, int, int, int, int, int, int);
 inline boolean DrawingOnBackground(int, int);
 inline void BlitBitmapOnBackground(Bitmap *, Bitmap *, int, int, int, int, int,
 				   int);
-inline void DrawSimpleBlackLine(Bitmap *, int, int, int, int);
 inline void DrawSimpleWhiteLine(Bitmap *, int, int, int, int);
 inline void DrawLines(Bitmap *, struct XY *, int, Pixel);
 inline Pixel GetPixel(Bitmap *, int, int);

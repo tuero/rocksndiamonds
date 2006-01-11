@@ -52,12 +52,6 @@ void printf_line(char *line_string, int line_length)
   fprintf_line(stdout, line_string, line_length);
 }
 
-void printf_line_with_prefix(char *prefix, char *line_string, int line_length)
-{
-  fprintf(stdout, "%s", prefix);
-  fprintf_line(stdout, line_string, line_length);
-}
-
 
 /* int2str() returns a number converted to a string;
    the used memory is static, but will be overwritten by later calls,
@@ -211,6 +205,14 @@ unsigned long Counter()	/* get milliseconds since last call of InitCounter() */
 static void sleep_milliseconds(unsigned long milliseconds_delay)
 {
   boolean do_busy_waiting = (milliseconds_delay < 5 ? TRUE : FALSE);
+
+#if 0
+#if defined(PLATFORM_MSDOS)
+  /* don't use select() to perform waiting operations under DOS
+     environment; always use a busy loop for waiting instead */
+  do_busy_waiting = TRUE;
+#endif
+#endif
 
   if (do_busy_waiting)
   {
@@ -739,8 +741,10 @@ void GetOptions(char *argv[], void (*print_usage_function)(void))
       if (option_arg == next_option)
 	options_left++;
 
+#if 1
       /* when doing batch processing, always enable verbose mode (warnings) */
       options.verbose = TRUE;
+#endif
     }
     else if (*option == '-')
     {
@@ -931,25 +935,6 @@ inline void swap_number_pairs(int *x1, int *y1, int *x2, int *y2)
   *y2 = help_y;
 }
 
-/* the "put" variants of the following file access functions check for the file
-   pointer being != NULL and return the number of bytes they have or would have
-   written; this allows for chunk writing functions to first determine the size
-   of the (not yet written) chunk, write the correct chunk size and finally
-   write the chunk itself */
-
-int getFile8BitInteger(FILE *file)
-{
-  return fgetc(file);
-}
-
-int putFile8BitInteger(FILE *file, int value)
-{
-  if (file != NULL)
-    fputc(value, file);
-
-  return 1;
-}
-
 int getFile16BitInteger(FILE *file, int byte_order)
 {
   if (byte_order == BYTE_ORDER_BIG_ENDIAN)
@@ -960,23 +945,18 @@ int getFile16BitInteger(FILE *file, int byte_order)
 	    (fgetc(file) << 8));
 }
 
-int putFile16BitInteger(FILE *file, int value, int byte_order)
+void putFile16BitInteger(FILE *file, int value, int byte_order)
 {
-  if (file != NULL)
+  if (byte_order == BYTE_ORDER_BIG_ENDIAN)
   {
-    if (byte_order == BYTE_ORDER_BIG_ENDIAN)
-    {
-      fputc((value >> 8) & 0xff, file);
-      fputc((value >> 0) & 0xff, file);
-    }
-    else	   /* BYTE_ORDER_LITTLE_ENDIAN */
-    {
-      fputc((value >> 0) & 0xff, file);
-      fputc((value >> 8) & 0xff, file);
-    }
+    fputc((value >> 8) & 0xff, file);
+    fputc((value >> 0) & 0xff, file);
   }
-
-  return 2;
+  else		 /* BYTE_ORDER_LITTLE_ENDIAN */
+  {
+    fputc((value >> 0) & 0xff, file);
+    fputc((value >> 8) & 0xff, file);
+  }
 }
 
 int getFile32BitInteger(FILE *file, int byte_order)
@@ -993,27 +973,22 @@ int getFile32BitInteger(FILE *file, int byte_order)
 	    (fgetc(file) << 24));
 }
 
-int putFile32BitInteger(FILE *file, int value, int byte_order)
+void putFile32BitInteger(FILE *file, int value, int byte_order)
 {
-  if (file != NULL)
+  if (byte_order == BYTE_ORDER_BIG_ENDIAN)
   {
-    if (byte_order == BYTE_ORDER_BIG_ENDIAN)
-    {
-      fputc((value >> 24) & 0xff, file);
-      fputc((value >> 16) & 0xff, file);
-      fputc((value >>  8) & 0xff, file);
-      fputc((value >>  0) & 0xff, file);
-    }
-    else	   /* BYTE_ORDER_LITTLE_ENDIAN */
-    {
-      fputc((value >>  0) & 0xff, file);
-      fputc((value >>  8) & 0xff, file);
-      fputc((value >> 16) & 0xff, file);
-      fputc((value >> 24) & 0xff, file);
-    }
+    fputc((value >> 24) & 0xff, file);
+    fputc((value >> 16) & 0xff, file);
+    fputc((value >>  8) & 0xff, file);
+    fputc((value >>  0) & 0xff, file);
   }
-
-  return 4;
+  else		 /* BYTE_ORDER_LITTLE_ENDIAN */
+  {
+    fputc((value >>  0) & 0xff, file);
+    fputc((value >>  8) & 0xff, file);
+    fputc((value >> 16) & 0xff, file);
+    fputc((value >> 24) & 0xff, file);
+  }
 }
 
 boolean getFileChunk(FILE *file, char *chunk_name, int *chunk_size,
@@ -1068,22 +1043,6 @@ void putFileVersion(FILE *file, int version)
   fputc(version_minor, file);
   fputc(version_patch, file);
   fputc(version_build, file);
-}
-
-void ReadBytesFromFile(FILE *file, byte *buffer, unsigned long bytes)
-{
-  int i;
-
-  for(i = 0; i < bytes && !feof(file); i++)
-    buffer[i] = fgetc(file);
-}
-
-void WriteBytesToFile(FILE *file, byte *buffer, unsigned long bytes)
-{
-  int i;
-
-  for(i = 0; i < bytes; i++)
-    fputc(buffer[i], file);
 }
 
 void ReadUnusedBytesFromFile(FILE *file, unsigned long bytes)
@@ -1525,6 +1484,10 @@ void addNodeToList(ListNode **node_first, char *key, void *content)
 {
   ListNode *node_new = newListNode();
 
+#if 0
+  printf("LIST: adding node with key '%s'\n", key);
+#endif
+
   node_new->key = getStringCopy(key);
   node_new->content = content;
   node_new->next = *node_first;
@@ -1537,8 +1500,17 @@ void deleteNodeFromList(ListNode **node_first, char *key,
   if (node_first == NULL || *node_first == NULL)
     return;
 
+#if 0
+  printf("[CHECKING LIST KEY '%s' == '%s']\n",
+	 (*node_first)->key, key);
+#endif
+
   if (strcmp((*node_first)->key, key) == 0)
   {
+#if 0
+    printf("[DELETING LIST ENTRY]\n");
+#endif
+
     free((*node_first)->key);
     if (destructor_function)
       destructor_function((*node_first)->content);
@@ -1587,6 +1559,10 @@ boolean fileExists(char *filename)
 {
   if (filename == NULL)
     return FALSE;
+
+#if 0
+  printf("checking file '%s'\n", filename);
+#endif
 
   return (access(filename, F_OK) == 0);
 }
@@ -1744,7 +1720,7 @@ static boolean string_has_parameter(char *s, char *s_contained)
   return string_has_parameter(substring, s_contained);
 }
 
-int get_parameter_value(char *value_raw, char *suffix, int type)
+int get_parameter_value(char *suffix, char *value_raw, int type)
 {
   char *value = getStringToLower(value_raw);
   int result = 0;	/* probably a save default value */
@@ -1754,20 +1730,18 @@ int get_parameter_value(char *value_raw, char *suffix, int type)
     result = (strcmp(value, "left")  == 0 ? MV_LEFT :
 	      strcmp(value, "right") == 0 ? MV_RIGHT :
 	      strcmp(value, "up")    == 0 ? MV_UP :
-	      strcmp(value, "down")  == 0 ? MV_DOWN : MV_NONE);
+	      strcmp(value, "down")  == 0 ? MV_DOWN : MV_NO_MOVING);
   }
   else if (strcmp(suffix, ".anim_mode") == 0)
   {
-    result = (string_has_parameter(value, "none")	? ANIM_NONE :
-	      string_has_parameter(value, "loop")	? ANIM_LOOP :
-	      string_has_parameter(value, "linear")	? ANIM_LINEAR :
-	      string_has_parameter(value, "pingpong")	? ANIM_PINGPONG :
-	      string_has_parameter(value, "pingpong2")	? ANIM_PINGPONG2 :
-	      string_has_parameter(value, "random")	? ANIM_RANDOM :
-	      string_has_parameter(value, "ce_value")	? ANIM_CE_VALUE :
-	      string_has_parameter(value, "ce_score")	? ANIM_CE_SCORE :
-	      string_has_parameter(value, "horizontal")	? ANIM_HORIZONTAL :
-	      string_has_parameter(value, "vertical")	? ANIM_VERTICAL :
+    result = (string_has_parameter(value, "none")       ? ANIM_NONE :
+	      string_has_parameter(value, "loop")       ? ANIM_LOOP :
+	      string_has_parameter(value, "linear")     ? ANIM_LINEAR :
+	      string_has_parameter(value, "pingpong")   ? ANIM_PINGPONG :
+	      string_has_parameter(value, "pingpong2")  ? ANIM_PINGPONG2 :
+	      string_has_parameter(value, "random")     ? ANIM_RANDOM :
+	      string_has_parameter(value, "horizontal") ? ANIM_HORIZONTAL :
+	      string_has_parameter(value, "vertical")   ? ANIM_VERTICAL :
 	      ANIM_DEFAULT);
 
     if (string_has_parameter(value, "reverse"))
@@ -1797,7 +1771,7 @@ int get_auto_parameter_value(char *token, char *value_raw)
   if (suffix == NULL)
     suffix = token;
 
-  return get_parameter_value(value_raw, suffix, TYPE_INTEGER);
+  return get_parameter_value(suffix, value_raw, TYPE_INTEGER);
 }
 
 static void FreeCustomArtworkList(struct ArtworkListInfo *,
@@ -1916,6 +1890,11 @@ static boolean token_suffix_match(char *token, char *suffix, int start_pos)
   int len_token = strlen(token);
   int len_suffix = strlen(suffix);
 
+#if 0
+  if (IS_PARENT_PROCESS())
+    printf(":::::::::: check '%s' for '%s' ::::::::::\n", token, suffix);
+#endif
+
   if (start_pos < 0)	/* compare suffix from end of string */
     start_pos += len_token;
 
@@ -1958,6 +1937,16 @@ static void read_token_parameters(SetupFileHash *setup_file_hash,
     /* mark config file token as well known from default config */
     setHashEntry(setup_file_hash, file_list_entry->token, known_token_value);
   }
+#if 0
+  else
+  {
+    if (strcmp(file_list_entry->filename,
+	       file_list_entry->default_filename) != 0)
+      printf("___ resetting '%s' to default\n", file_list_entry->token);
+
+    setString(&file_list_entry->filename, file_list_entry->default_filename);
+  }
+#endif
 
   /* check for config tokens that can be build by base token and suffixes */
   for (i = 0; suffix_list[i].token != NULL; i++)
@@ -1986,6 +1975,11 @@ static void add_dynamic_file_list_entry(struct FileInfo **list,
 {
   struct FileInfo *new_list_entry;
   int parameter_array_size = num_suffix_list_entries * sizeof(char *);
+
+#if 0
+  if (IS_PARENT_PROCESS())
+    printf("===> found dynamic definition '%s'\n", token);
+#endif
 
   (*num_list_entries)++;
   *list = checked_realloc(*list, *num_list_entries * sizeof(struct FileInfo));
@@ -2048,6 +2042,10 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
   if (filename == NULL)
     return;
 
+#if 0
+  printf("::: LoadArtworkConfigFromFilename: '%s'\n", filename);
+#endif
+
   if ((setup_file_hash = loadSetupFileHash(filename)) == NULL)
     return;
 
@@ -2066,6 +2064,7 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
   /* at this point, we do not need the setup file hash anymore -- free it */
   freeSetupFileHash(setup_file_hash);
 
+#if 1
   /* map deprecated to current tokens (using prefix match and replace) */
   BEGIN_HASH_ITERATION(valid_file_hash, itr)
   {
@@ -2086,6 +2085,7 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
     }
   }
   END_HASH_ITERATION(valid_file_hash, itr)
+#endif
 
   /* read parameters for all known config file tokens */
   for (i = 0; i < num_file_list_entries; i++)
@@ -2142,6 +2142,16 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
       if (token_suffix_match(token, suffix_list[i].token, -len_suffix))
 	parameter_suffix_found = TRUE;
     }
+
+#if 0
+    if (IS_PARENT_PROCESS())
+    {
+      if (parameter_suffix_found)
+	printf("---> skipping token '%s' (parameter token)\n", token);
+      else
+	printf("---> examining token '%s': search prefix ...\n", token);
+    }
+#endif
 
     if (parameter_suffix_found)
       continue;
@@ -2481,14 +2491,25 @@ static void deleteArtworkListEntry(struct ArtworkListInfo *artwork_info,
   {
     char *filename = (*listnode)->source_filename;
 
+#if 0
+    printf("[decrementing reference counter of artwork '%s']\n", filename);
+#endif
+
     if (--(*listnode)->num_references <= 0)
+    {
+#if 0
+      printf("[deleting artwork '%s']\n", filename);
+#endif
+
       deleteNodeFromList(&artwork_info->content_list, filename,
 			 artwork_info->free_artwork);
+    }
 
     *listnode = NULL;
   }
 }
 
+#if 1
 static void replaceArtworkListEntry(struct ArtworkListInfo *artwork_info,
 				    struct ListNodeInfo **listnode,
 				    struct FileInfo *file_list_entry)
@@ -2503,6 +2524,12 @@ static void replaceArtworkListEntry(struct ArtworkListInfo *artwork_info,
   ListNode *node;
   char *basename = file_list_entry->filename;
   char *filename = getCustomArtworkFilename(basename, artwork_info->type);
+
+#if 0
+  if (strcmp(file_list_entry->token, "background.DOOR") == 0)
+    printf("::: replaceArtworkListEntry: '%s' => '%s'\n",
+	   basename, filename);
+#endif
 
   if (filename == NULL)
   {
@@ -2564,6 +2591,15 @@ static void replaceArtworkListEntry(struct ArtworkListInfo *artwork_info,
       return;
   }
 
+#if 0
+  if (strcmp(file_list_entry->token, "background.DOOR") == 0)
+    printf("::: replaceArtworkListEntry: LOAD IT'\n");
+#endif
+
+#if 0
+  printf("::: %s: '%s'\n", init_text[artwork_info->type], basename);
+#endif
+
   DrawInitText(init_text[artwork_info->type], 120, FC_GREEN);
   DrawInitText(basename, 150, FC_YELLOW);
 
@@ -2581,21 +2617,126 @@ static void replaceArtworkListEntry(struct ArtworkListInfo *artwork_info,
   {
     int error_mode = ERR_WARN;
 
+#if 1
     /* we can get away without sounds and music, but not without graphics */
     if (artwork_info->type == ARTWORK_TYPE_GRAPHICS)
       error_mode = ERR_EXIT;
+#endif
 
     Error(error_mode, "cannot load artwork file '%s'", basename);
     return;
   }
 }
 
+#else
+
+static void replaceArtworkListEntry(struct ArtworkListInfo *artwork_info,
+				    struct ListNodeInfo **listnode,
+				    char *basename)
+{
+  char *init_text[] =
+  {
+    "Loading graphics:",
+    "Loading sounds:",
+    "Loading music:"
+  };
+
+  ListNode *node;
+  char *filename = getCustomArtworkFilename(basename, artwork_info->type);
+
+  if (filename == NULL)
+  {
+    int error_mode = ERR_WARN;
+
+#if 1
+    /* !!! NEW ARTWORK FALLBACK CODE !!! NEARLY UNTESTED !!! */
+    /* before failing, try fallback to default artwork */
+#else
+    /* we can get away without sounds and music, but not without graphics */
+    if (*listnode == NULL && artwork_info->type == ARTWORK_TYPE_GRAPHICS)
+      error_mode = ERR_EXIT;
+#endif
+
+    Error(error_mode, "cannot find artwork file '%s'", basename);
+    return;
+  }
+
+  /* check if the old and the new artwork file are the same */
+  if (*listnode && strcmp((*listnode)->source_filename, filename) == 0)
+  {
+    /* The old and new artwork are the same (have the same filename and path).
+       This usually means that this artwork does not exist in this artwork set
+       and a fallback to the existing artwork is done. */
+
+#if 0
+    printf("[artwork '%s' already exists (same list entry)]\n", filename);
+#endif
+
+    return;
+  }
+
+  /* delete existing artwork file entry */
+  deleteArtworkListEntry(artwork_info, listnode);
+
+  /* check if the new artwork file already exists in the list of artworks */
+  if ((node = getNodeFromKey(artwork_info->content_list, filename)) != NULL)
+  {
+#if 0
+      printf("[artwork '%s' already exists (other list entry)]\n", filename);
+#endif
+
+      *listnode = (struct ListNodeInfo *)node->content;
+      (*listnode)->num_references++;
+
+      return;
+  }
+
+#if 0
+  printf("::: %s: '%s'\n", init_text[artwork_info->type], basename);
+#endif
+
+  DrawInitText(init_text[artwork_info->type], 120, FC_GREEN);
+  DrawInitText(basename, 150, FC_YELLOW);
+
+  if ((*listnode = artwork_info->load_artwork(filename)) != NULL)
+  {
+#if 0
+      printf("[adding new artwork '%s']\n", filename);
+#endif
+
+    (*listnode)->num_references = 1;
+    addNodeToList(&artwork_info->content_list, (*listnode)->source_filename,
+		  *listnode);
+  }
+  else
+  {
+    int error_mode = ERR_WARN;
+
+#if 1
+    /* we can get away without sounds and music, but not without graphics */
+    if (artwork_info->type == ARTWORK_TYPE_GRAPHICS)
+      error_mode = ERR_EXIT;
+#endif
+
+    Error(error_mode, "cannot load artwork file '%s'", basename);
+    return;
+  }
+}
+#endif
+
+#if 1
 static void LoadCustomArtwork(struct ArtworkListInfo *artwork_info,
 			      struct ListNodeInfo **listnode,
 			      struct FileInfo *file_list_entry)
 {
 #if 0
   printf("GOT CUSTOM ARTWORK FILE '%s'\n", filename);
+#endif
+
+#if 0
+  if (strcmp(file_list_entry->token, "background.DOOR") == 0)
+    printf("::: -> '%s' -> '%s'\n",
+	   file_list_entry->token, file_list_entry->filename);
 #endif
 
   if (strcmp(file_list_entry->filename, UNDEFINED_FILENAME) == 0)
@@ -2607,6 +2748,86 @@ static void LoadCustomArtwork(struct ArtworkListInfo *artwork_info,
   replaceArtworkListEntry(artwork_info, listnode, file_list_entry);
 }
 
+#else
+
+static void LoadCustomArtwork(struct ArtworkListInfo *artwork_info,
+			      struct ListNodeInfo **listnode,
+			      char *basename)
+{
+#if 0
+  printf("GOT CUSTOM ARTWORK FILE '%s'\n", filename);
+#endif
+
+  if (strcmp(basename, UNDEFINED_FILENAME) == 0)
+  {
+    deleteArtworkListEntry(artwork_info, listnode);
+    return;
+  }
+
+  replaceArtworkListEntry(artwork_info, listnode, basename);
+}
+#endif
+
+#if 1
+static void LoadArtworkToList(struct ArtworkListInfo *artwork_info,
+			      struct ListNodeInfo **listnode,
+			      struct FileInfo *file_list_entry)
+{
+#if 0
+  if (artwork_info->artwork_list == NULL ||
+      list_pos >= artwork_info->num_file_list_entries)
+    return;
+#endif
+
+#if 0
+  printf("loading artwork '%s' ...  [%d]\n",
+	 file_list_entry->filename, getNumNodes(artwork_info->content_list));
+#endif
+
+#if 1
+  LoadCustomArtwork(artwork_info, listnode, file_list_entry);
+#else
+  LoadCustomArtwork(artwork_info, &artwork_info->artwork_list[list_pos],
+		    basename);
+#endif
+
+#if 0
+  printf("loading artwork '%s' done [%d]\n",
+	 basename, getNumNodes(artwork_info->content_list));
+#endif
+}
+
+#else
+
+static void LoadArtworkToList(struct ArtworkListInfo *artwork_info,
+			      struct ListNodeInfo **listnode,
+			      char *basename, int list_pos)
+{
+#if 0
+  if (artwork_info->artwork_list == NULL ||
+      list_pos >= artwork_info->num_file_list_entries)
+    return;
+#endif
+
+#if 0
+  printf("loading artwork '%s' ...  [%d]\n",
+	 basename, getNumNodes(artwork_info->content_list));
+#endif
+
+#if 1
+  LoadCustomArtwork(artwork_info, listnode, basename);
+#else
+  LoadCustomArtwork(artwork_info, &artwork_info->artwork_list[list_pos],
+		    basename);
+#endif
+
+#if 0
+  printf("loading artwork '%s' done [%d]\n",
+	 basename, getNumNodes(artwork_info->content_list));
+#endif
+}
+#endif
+
 void ReloadCustomArtworkList(struct ArtworkListInfo *artwork_info)
 {
   struct FileInfo *file_list = artwork_info->file_list;
@@ -2616,13 +2837,86 @@ void ReloadCustomArtworkList(struct ArtworkListInfo *artwork_info)
     artwork_info->num_dynamic_file_list_entries;
   int i;
 
+#if 0
+  printf("DEBUG: reloading %d static artwork files ...\n",
+	 num_file_list_entries);
+#endif
+
   for (i = 0; i < num_file_list_entries; i++)
-    LoadCustomArtwork(artwork_info, &artwork_info->artwork_list[i],
+  {
+#if 0
+    if (strcmp(file_list[i].token, "background.DOOR") == 0)
+      printf("::: '%s' -> '%s'\n", file_list[i].token, file_list[i].filename);
+#endif
+
+#if 1
+    LoadArtworkToList(artwork_info, &artwork_info->artwork_list[i],
 		      &file_list[i]);
+#else
+    LoadArtworkToList(artwork_info, &artwork_info->artwork_list[i],
+		      file_list[i].filename, i);
+#endif
+
+#if 0
+    if (strcmp(file_list[i].token, "background.DOOR") == 0)
+    {
+      Bitmap *bitmap = getBitmapFromImageID(i);
+
+      printf("::: BITMAP: %08lx\n", bitmap);
+
+#if 0
+      BlitBitmap(bitmap, window, 0, 0, 100, 280, 0, 0);
+#endif
+    }
+#endif
+
+#if 0
+    /* !!! NEW ARTWORK FALLBACK CODE !!! NEARLY UNTESTED !!! */
+    if (artwork_info->artwork_list[i] == NULL &&
+	strcmp(file_list[i].filename, UNDEFINED_FILENAME) != 0 &&
+	strcmp(file_list[i].default_filename, file_list[i].filename) != 0 &&
+	strcmp(file_list[i].default_filename, UNDEFINED_FILENAME) != 0)
+    {
+      Error(ERR_WARN, "trying default artwork file '%s'",
+	    file_list[i].default_filename);
+
+      LoadArtworkToList(artwork_info, &artwork_info->artwork_list[i],
+			file_list[i].default_filename, i);
+
+      /* even the fallback to default artwork was not successful -- fail now */
+      if (artwork_info->artwork_list[i] == NULL &&
+	  artwork_info->type == ARTWORK_TYPE_GRAPHICS)
+	Error(ERR_EXIT, "cannot find artwork file '%s' or default file '%s'",
+	      file_list[i].filename, file_list[i].default_filename);
+
+      file_list[i].fallback_to_default = TRUE;
+    }
+#endif
+  }
+
+#if 0
+  printf("DEBUG: reloading %d dynamic artwork files ...\n",
+	 num_dynamic_file_list_entries);
+#endif
 
   for (i = 0; i < num_dynamic_file_list_entries; i++)
-    LoadCustomArtwork(artwork_info, &artwork_info->dynamic_artwork_list[i],
+  {
+#if 1
+    LoadArtworkToList(artwork_info, &artwork_info->dynamic_artwork_list[i],
 		      &dynamic_file_list[i]);
+#else
+    LoadArtworkToList(artwork_info, &artwork_info->dynamic_artwork_list[i],
+		      dynamic_file_list[i].filename, i);
+#endif
+
+#if 0
+    printf("::: '%s', '0x%08x'\n",
+	   dynamic_file_list[i].filename,
+	   dynamic_file_list[i].default_filename);
+#endif
+
+    /* dynamic artwork does not have default filename! */
+  }
 
 #if 0
   dumpList(artwork_info->content_list);
@@ -2651,11 +2945,21 @@ void FreeCustomArtworkLists(struct ArtworkListInfo *artwork_info)
   if (artwork_info == NULL)
     return;
 
+#if 0
+  printf("%s: FREEING ARTWORK ...\n",
+	 IS_CHILD_PROCESS() ? "CHILD" : "PARENT");
+#endif
+
   FreeCustomArtworkList(artwork_info, &artwork_info->artwork_list,
 			&artwork_info->num_file_list_entries);
 
   FreeCustomArtworkList(artwork_info, &artwork_info->dynamic_artwork_list,
 			&artwork_info->num_dynamic_file_list_entries);
+
+#if 0
+  printf("%s: FREEING ARTWORK -- DONE\n",
+	 IS_CHILD_PROCESS() ? "CHILD" : "PARENT");
+#endif
 }
 
 

@@ -203,6 +203,7 @@ static void AddPlayer(int fd)
 
   nxn = 1;
 
+#if 1
   while (again)
   {
     again = FALSE;
@@ -220,6 +221,19 @@ static void AddPlayer(int fd)
       v = v->next;
     }
   }
+#else
+ again:
+  v = player->next;
+  while (v)
+  {
+    if (v->number == nxn)
+    {
+      nxn++;
+      goto again;
+    }
+    v = v->next;
+  }
+#endif
 
   player->number = nxn;
 #if !defined(TARGET_SDL)

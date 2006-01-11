@@ -54,9 +54,6 @@ void SaveScore(int);
 void LoadSetup();
 void SaveSetup();
 
-void LoadSetup_EditorCascade();
-void SaveSetup_EditorCascade();
-
 void LoadCustomElementDescriptions();
 void LoadSpecialMenuDesignSettings();
 void LoadUserDefinedEditorElementList(int **, int *);

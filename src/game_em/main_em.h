@@ -593,7 +593,6 @@ struct LEVEL
   unsigned short eater_array[8][9];	/* eater data */
   unsigned short ball_array[8][8];	/* ball data */
   unsigned short android_array[TILE_MAX];/* android clone table */
-  unsigned int num_ball_arrays;		/* number of ball data arrays used */
 };
 
 struct PLAYER

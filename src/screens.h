@@ -32,8 +32,6 @@ void HandleSetupScreen(int, int, int, int, int);
 void HandleTypeName(int, Key);
 void HandleGameActions(void);
 
-void StartGameActions(boolean, boolean, long);
-
 void CreateScreenGadgets();
 void FreeScreenGadgets();
 

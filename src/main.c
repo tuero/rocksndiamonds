@@ -19,7 +19,14 @@
 #include "events.h"
 #include "config.h"
 
+#if 0
+GC			tile_clip_gc;
+Bitmap		       *pix[NUM_BITMAPS];
+#endif
 Bitmap		       *bitmap_db_field, *bitmap_db_door;
+#if 0
+Pixmap			tile_clipmask[NUM_TILES];
+#endif
 DrawBuffer	       *fieldbuffer;
 DrawBuffer	       *drawto_field;
 
@@ -43,14 +50,13 @@ short			MovDir[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 short			MovDelay[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 short			ChangeDelay[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 short			ChangePage[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-short			CustomValue[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 short			Store[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 short			Store2[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 short			StorePlayer[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 short			Back[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 boolean			Stop[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 boolean			Pushed[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-short			ChangeCount[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+boolean			Changed[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 short			ChangeEvent[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 short			WasJustMoving[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 short			WasJustFalling[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
@@ -77,7 +83,7 @@ int			scroll_x, scroll_y;
 
 int			FX = SX, FY = SY;
 int			ScrollStepSize;
-int			ScreenMovDir = MV_NONE, ScreenMovPos = 0;
+int			ScreenMovDir = MV_NO_MOVING, ScreenMovPos = 0;
 int			ScreenGfxPos = 0;
 int			BorderElement = EL_STEELWALL;
 int			GameFrameDelay = GAME_FRAME_DELAY;
@@ -1756,27 +1762,27 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
   {
     "balloon_switch_left",
     "balloon_switch",
-    "wind switch (left)"
+    "send balloon to the left"
   },
   {
     "balloon_switch_right",
     "balloon_switch",
-    "wind switch (right)"
+    "send balloon to the right"
   },
   {
     "balloon_switch_up",
     "balloon_switch",
-    "wind switch (up)"
+    "send balloon up"
   },
   {
     "balloon_switch_down",
     "balloon_switch",
-    "wind switch (down)"
+    "send balloon down"
   },
   {
     "balloon_switch_any",
     "balloon_switch",
-    "wind switch (any direction)"
+    "send balloon in pressed direction"
   },
   {
     "emc_steelwall_1",
@@ -3456,7 +3462,7 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
   {
     "balloon_switch_none",
     "balloon_switch",
-    "wind switch (off)"
+    "stop moving balloon"
   },
   {
     "emc_gate_5",
@@ -3630,12 +3636,12 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
   },
   {
     "emc_fake_grass",
-    "fake_grass",
+    "fake grass",
     "fake grass"
   },
   {
     "emc_fake_acid",
-    "fake_acid",
+    "fake acid",
     "fake acid"
   },
   {
@@ -3874,77 +3880,6 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
     "-"
   },
 
-  {
-    "emc_fake_grass.active",
-    "fake_grass",
-    "-"
-  },
-  {
-    "gate_1_gray.active",
-    "gate",
-    ""
-  },
-  {
-    "gate_2_gray.active",
-    "gate",
-    ""
-  },
-  {
-    "gate_3_gray.active",
-    "gate",
-    ""
-  },
-  {
-    "gate_4_gray.active",
-    "gate",
-    ""
-  },
-  {
-    "em_gate_1_gray.active",
-    "gate",
-    ""
-  },
-  {
-    "em_gate_2_gray.active",
-    "gate",
-    ""
-  },
-  {
-    "em_gate_3_gray.active",
-    "gate",
-    ""
-  },
-  {
-    "em_gate_4_gray.active",
-    "gate",
-    ""
-  },
-  {
-    "emc_gate_5_gray.active",
-    "gate",
-    "",
-  },
-  {
-    "emc_gate_6_gray.active",
-    "gate",
-    "",
-  },
-  {
-    "emc_gate_7_gray.active",
-    "gate",
-    "",
-  },
-  {
-    "emc_gate_8_gray.active",
-    "gate",
-    "",
-  },
-  {
-    "emc_dripper.active",
-    "dripper",
-    "dripper"
-  },
-
   /* ----------------------------------------------------------------------- */
   /* "unreal" (and therefore not drawable) runtime elements                  */
   /* ----------------------------------------------------------------------- */
@@ -4036,11 +3971,6 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
   },
   {
     "bd_magic_wall.filling",
-    "-",
-    "-"
-  },
-  {
-    "element.snapping",
     "-",
     "-"
   },
@@ -4194,146 +4124,6 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
     "internal",
     "-"
   },
-  {
-    "internal_cascade_bd",
-    "internal",
-    "show Boulder Dash elements"
-  },
-  {
-    "internal_cascade_bd.active",
-    "internal",
-    "hide Boulder Dash elements"
-  },
-  {
-    "internal_cascade_em",
-    "internal",
-    "show Emerald Mine elements"
-  },
-  {
-    "internal_cascade_em.active",
-    "internal",
-    "hide Emerald Mine elements"
-  },
-  {
-    "internal_cascade_emc",
-    "internal",
-    "show Emerald Mine Club elements"
-  },
-  {
-    "internal_cascade_emc.active",
-    "internal",
-    "hide Emerald Mine Club elements"
-  },
-  {
-    "internal_cascade_rnd",
-    "internal",
-    "show Rocks'n'Diamonds elements"
-  },
-  {
-    "internal_cascade_rnd.active",
-    "internal",
-    "hide Rocks'n'Diamonds elements"
-  },
-  {
-    "internal_cascade_sb",
-    "internal",
-    "show Sokoban elements"
-  },
-  {
-    "internal_cascade_sb.active",
-    "internal",
-    "hide Sokoban elements"
-  },
-  {
-    "internal_cascade_sp",
-    "internal",
-    "show Supaplex elements"
-  },
-  {
-    "internal_cascade_sp.active",
-    "internal",
-    "hide Supaplex elements"
-  },
-  {
-    "internal_cascade_dc",
-    "internal",
-    "show Diamond Caves II elements"
-  },
-  {
-    "internal_cascade_dc.active",
-    "internal",
-    "hide Diamond Caves II elements"
-  },
-  {
-    "internal_cascade_dx",
-    "internal",
-    "show DX Boulderdash elements"
-  },
-  {
-    "internal_cascade_dx.active",
-    "internal",
-    "hide DX Boulderdash elements"
-  },
-  {
-    "internal_cascade_chars",
-    "internal",
-    "show text elements"
-  },
-  {
-    "internal_cascade_chars.active",
-    "internal",
-    "hide text elements"
-  },
-  {
-    "internal_cascade_ce",
-    "internal",
-    "show custom elements"
-  },
-  {
-    "internal_cascade_ce.active",
-    "internal",
-    "hide custom elements"
-  },
-  {
-    "internal_cascade_ge",
-    "internal",
-    "show group elements"
-  },
-  {
-    "internal_cascade_ge.active",
-    "internal",
-    "hide group elements"
-  },
-  {
-    "internal_cascade_user",
-    "internal",
-    "show user defined elements"
-  },
-  {
-    "internal_cascade_user.active",
-    "internal",
-    "hide user defined elements"
-  },
-  {
-    "internal_cascade_generic",
-    "internal",
-    "show elements"
-  },
-  {
-    "internal_cascade_generic.active",
-    "internal",
-    "hide elements"
-  },
-  {
-    "internal_cascade_dynamic",
-    "internal",
-    "show elements used in this level"
-  },
-  {
-    "internal_cascade_dynamic.active",
-    "internal",
-    "hide elements used in this level"
-  },
 
   /* keyword to stop parser: "ELEMENT_INFO_END" <-- do not change! */
 
@@ -4403,38 +4193,6 @@ struct ElementActionInfo element_action_info[NUM_ACTIONS + 1 + 1] =
   { ".slurped_by_spring",	ACTION_SLURPED_BY_SPRING,	FALSE	},
   { ".twinkling",		ACTION_TWINKLING,		FALSE	},
   { ".splashing",		ACTION_SPLASHING,		FALSE	},
-  { ".page[1]",			ACTION_PAGE_1,			FALSE	},
-  { ".page[2]",			ACTION_PAGE_2,			FALSE	},
-  { ".page[3]",			ACTION_PAGE_3,			FALSE	},
-  { ".page[4]",			ACTION_PAGE_4,			FALSE	},
-  { ".page[5]",			ACTION_PAGE_5,			FALSE	},
-  { ".page[6]",			ACTION_PAGE_6,			FALSE	},
-  { ".page[7]",			ACTION_PAGE_7,			FALSE	},
-  { ".page[8]",			ACTION_PAGE_8,			FALSE	},
-  { ".page[9]",			ACTION_PAGE_9,			FALSE	},
-  { ".page[10]",		ACTION_PAGE_10,			FALSE	},
-  { ".page[11]",		ACTION_PAGE_11,			FALSE	},
-  { ".page[12]",		ACTION_PAGE_12,			FALSE	},
-  { ".page[13]",		ACTION_PAGE_13,			FALSE	},
-  { ".page[14]",		ACTION_PAGE_14,			FALSE	},
-  { ".page[15]",		ACTION_PAGE_15,			FALSE	},
-  { ".page[16]",		ACTION_PAGE_16,			FALSE	},
-  { ".page[17]",		ACTION_PAGE_17,			FALSE	},
-  { ".page[18]",		ACTION_PAGE_18,			FALSE	},
-  { ".page[19]",		ACTION_PAGE_19,			FALSE	},
-  { ".page[20]",		ACTION_PAGE_20,			FALSE	},
-  { ".page[21]",		ACTION_PAGE_21,			FALSE	},
-  { ".page[22]",		ACTION_PAGE_22,			FALSE	},
-  { ".page[23]",		ACTION_PAGE_23,			FALSE	},
-  { ".page[24]",		ACTION_PAGE_24,			FALSE	},
-  { ".page[25]",		ACTION_PAGE_25,			FALSE	},
-  { ".page[26]",		ACTION_PAGE_26,			FALSE	},
-  { ".page[27]",		ACTION_PAGE_27,			FALSE	},
-  { ".page[28]",		ACTION_PAGE_28,			FALSE	},
-  { ".page[29]",		ACTION_PAGE_29,			FALSE	},
-  { ".page[30]",		ACTION_PAGE_30,			FALSE	},
-  { ".page[31]",		ACTION_PAGE_31,			FALSE	},
-  { ".page[32]",		ACTION_PAGE_32,			FALSE	},
   { ".other",			ACTION_OTHER,			FALSE	},
 
   /* empty suffix always matches -- check as last entry in InitSoundInfo() */
