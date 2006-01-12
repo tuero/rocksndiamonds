@@ -98,7 +98,7 @@ void DrawCompleteVideoDisplay(void);
 void TapeDeactivateDisplayOn();
 void TapeDeactivateDisplayOff(boolean);
 
-void TapeStartRecording(void);
+void TapeStartRecording(long);
 void TapeHaltRecording(void);
 void TapeStopRecording(void);
 void TapeRecordAction(byte *);

@@ -68,16 +68,16 @@ void ScrollLevel(int, int);
 
 void TestIfGoodThingHitsBadThing(int, int, int);
 void TestIfBadThingHitsGoodThing(int, int, int);
-void TestIfHeroTouchesBadThing(int, int);
-void TestIfHeroRunsIntoBadThing(int, int, int);
-void TestIfBadThingTouchesHero(int, int);
-void TestIfBadThingRunsIntoHero(int, int, int);
+void TestIfPlayerTouchesBadThing(int, int);
+void TestIfPlayerRunsIntoBadThing(int, int, int);
+void TestIfBadThingTouchesPlayer(int, int);
+void TestIfBadThingRunsIntoPlayer(int, int, int);
 void TestIfFriendTouchesBadThing(int, int);
 void TestIfBadThingTouchesFriend(int, int);
 void TestIfBadThingTouchesOtherBadThing(int, int);
-void KillHero(struct PlayerInfo *);
-void BuryHero(struct PlayerInfo *);
-void RemoveHero(struct PlayerInfo *);
+void KillPlayer(struct PlayerInfo *);
+void BuryPlayer(struct PlayerInfo *);
+void RemovePlayer(struct PlayerInfo *);
 boolean SnapField(struct PlayerInfo *, int, int);
 boolean DropElement(struct PlayerInfo *);
 

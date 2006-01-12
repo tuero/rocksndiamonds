@@ -48,10 +48,6 @@ font_to_graphic[] =
     IMG_FONT_TITLE_1
   },
   {
-    FONT_TITLE_1,				GFX_SPECIAL_ARG_LEVELS,
-    IMG_FONT_TITLE_1_LEVELS
-  },
-  {
     FONT_TITLE_2,				-1,
     IMG_FONT_TITLE_2
   },

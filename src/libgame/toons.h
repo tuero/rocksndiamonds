@@ -35,27 +35,8 @@ struct ToonScreenInfo
 
 struct ToonInfo
 {
-#if 0
-  int graphic;
-  int width, height;
-  int src_x, src_y;
-  int anim_frames;
-  int step_delay;
-  int step_offset;
-  int anim_mode;
-  int direction;
-  int position;
-
-  int anim_delay;
-  int anim_start_frame;
-  Bitmap *bitmap;	/* dynamically initialized */
-
-  char *direction_str;
-  char *position_str;
-
-#else
-
   Bitmap *bitmap;
+
   int src_x, src_y;
   int width, height;
   int anim_frames;
@@ -64,9 +45,9 @@ struct ToonInfo
   int anim_mode;
   int step_offset;
   int step_delay;
+
   char *direction;
   char *position;
-#endif
 };
 
 

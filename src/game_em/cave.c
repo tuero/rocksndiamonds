@@ -42,6 +42,8 @@ void setLevelInfoToDefaults_EM(void)
   lev.wonderwall_state_initial = 0;
   lev.wonderwall_time_initial = 0;
 
+  lev.num_ball_arrays = 8;
+
   for (i = 0; i < TILE_MAX; i++)
     lev.android_array[i] = Xblank;
 

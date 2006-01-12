@@ -213,29 +213,6 @@ static void DrawBitmapFromTile(Bitmap *bitmap, Bitmap *tile,
 
 void SetBackgroundBitmap(Bitmap *background_bitmap_tile, int mask)
 {
-  /* !!! THIS DOES NOT WORK !!! REPLACED BITMAPS MAY HAVE SAME ADDRESS !!! */
-#if 0
-  static Bitmap *main_bitmap_tile = NULL;
-  static Bitmap *door_bitmap_tile = NULL;
-
-  if (mask == REDRAW_FIELD)
-  {
-    if (background_bitmap_tile == main_bitmap_tile)
-      return;		/* main background tile has not changed */
-
-    main_bitmap_tile = background_bitmap_tile;
-  }
-  else if (mask == REDRAW_DOOR_1)
-  {
-    if (background_bitmap_tile == door_bitmap_tile)
-      return;		/* main background tile has not changed */
-
-    door_bitmap_tile = background_bitmap_tile;
-  }
-  else			/* should not happen */
-    return;
-#endif
-
   if (background_bitmap_tile != NULL)
     gfx.background_bitmap_mask |= mask;
   else
@@ -444,13 +421,8 @@ inline boolean DrawingDeactivated(int x, int y, int width, int height)
 
 inline boolean DrawingOnBackground(int x, int y)
 {
-#if 1
   return (CheckDrawingArea(x, y, 1, 1, gfx.background_bitmap_mask) &&
 	  CheckDrawingArea(x, y, 1, 1, gfx.draw_background_mask));
-#else
-  return ((gfx.draw_background_mask & gfx.background_bitmap_mask) &&
-	  CheckDrawingArea(x, y, 1, 1, gfx.draw_background_mask));
-#endif
 }
 
 inline void BlitBitmap(Bitmap *src_bitmap, Bitmap *dst_bitmap,
@@ -487,12 +459,6 @@ inline void ClearRectangleOnBackground(Bitmap *bitmap, int x, int y,
     ClearRectangle(bitmap, x, y, width, height);
 }
 
-#if 0
-#ifndef TARGET_SDL
-static GC last_clip_gc = 0;	/* needed for XCopyArea() through clip mask */
-#endif
-#endif
-
 inline void SetClipMask(Bitmap *bitmap, GC clip_gc, Pixmap clip_pixmap)
 {
 #if defined(TARGET_X11)
@@ -501,9 +467,6 @@ inline void SetClipMask(Bitmap *bitmap, GC clip_gc, Pixmap clip_pixmap)
     bitmap->clip_gc = clip_gc;
     XSetClipMask(display, bitmap->clip_gc, clip_pixmap);
   }
-#if 0
-  last_clip_gc = clip_gc;
-#endif
 #endif
 }
 
@@ -515,9 +478,6 @@ inline void SetClipOrigin(Bitmap *bitmap, GC clip_gc, int clip_x, int clip_y)
     bitmap->clip_gc = clip_gc;
     XSetClipOrigin(display, bitmap->clip_gc, clip_x, clip_y);
   }
-#if 0
-  last_clip_gc = clip_gc;
-#endif
 #endif
 }
 
@@ -553,6 +513,16 @@ inline void BlitBitmapOnBackground(Bitmap *src_bitmap, Bitmap *dst_bitmap,
   else
     BlitBitmap(src_bitmap, dst_bitmap, src_x, src_y, width, height,
 	       dst_x, dst_y);
+}
+
+inline void DrawSimpleBlackLine(Bitmap *bitmap, int from_x, int from_y,
+				int to_x, int to_y)
+{
+#if defined(TARGET_SDL)
+  SDLDrawSimpleLine(bitmap, from_x, from_y, to_x, to_y, BLACK_PIXEL);
+#else
+  X11DrawSimpleLine(bitmap, from_x, from_y, to_x, to_y, BLACK_PIXEL);
+#endif
 }
 
 inline void DrawSimpleWhiteLine(Bitmap *bitmap, int from_x, int from_y,
@@ -900,20 +870,6 @@ void CreateBitmapWithSmallBitmaps(Bitmap *old_bitmap, int zoom_factor)
   if (zoom_factor != 8)
     FreeBitmap(tmp_bitmap_8);
 
-#if 0
-
-#if defined(TARGET_SDL)
-  /* !!! what about the old old_bitmap->surface ??? FIX ME !!! */
-  old_bitmap->surface = new_bitmap->surface;
-  new_bitmap->surface = NULL;
-#else
-  /* !!! see above !!! */
-  old_bitmap->drawable = new_bitmap->drawable;
-  new_bitmap->drawable = None;
-#endif
-
-#else
-
   /* replace image with extended image (containing normal, 1/2 and 1/8 size) */
 #if defined(TARGET_SDL)
   swap_bitmap.surface = old_bitmap->surface;
@@ -923,8 +879,6 @@ void CreateBitmapWithSmallBitmaps(Bitmap *old_bitmap, int zoom_factor)
   swap_bitmap.drawable = old_bitmap->drawable;
   old_bitmap->drawable = new_bitmap->drawable;
   new_bitmap->drawable = swap_bitmap.drawable;
-#endif
-
 #endif
 
   old_bitmap->width  = new_bitmap->width;
@@ -974,7 +928,9 @@ static const char *cursor_image_playfield[] =
 
   /* hot spot */
   "0,0"
+
 #else
+
   /* pixels */
   " X              ",
   "X.X             ",
@@ -1165,6 +1121,7 @@ inline void PeekEvent(Event *event)
 inline Key GetEventKey(KeyEvent *event, boolean with_modifiers)
 {
 #if defined(TARGET_SDL)
+
 #if 0
   printf("unicode == '%d', sym == '%d', mod == '0x%04x'\n",
 	 (int)event->keysym.unicode,
@@ -1178,7 +1135,9 @@ inline Key GetEventKey(KeyEvent *event, boolean with_modifiers)
     return event->keysym.unicode;
   else
     return event->keysym.sym;
+
 #else
+
 #if 0
   printf("with modifiers == '0x%04x', without modifiers == '0x%04x'\n",
 	 (int)XLookupKeysym(event, event->state),
