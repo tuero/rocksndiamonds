@@ -36,8 +36,10 @@
 #define USE_NEW_SNAP_DELAY		(USE_NEW_STUFF		* 1)
 #define USE_ONLY_ONE_CHANGE_PER_FRAME	(USE_NEW_STUFF		* 1)
 #define USE_ONE_MORE_CHANGE_PER_FRAME	(USE_NEW_STUFF		* 1)
-#define USE_QUICKSAND_IMPACT_BUGFIX	(USE_NEW_STUFF		* 0)
 #define USE_FIXED_DONT_RUN_INTO		(USE_NEW_STUFF		* 1)
+#define USE_NEW_SPRING_BUMPER		(USE_NEW_STUFF		* 1)
+
+#define USE_QUICKSAND_IMPACT_BUGFIX	(USE_NEW_STUFF		* 0)
 
 /* for DigField() */
 #define DF_NO_PUSH		0
@@ -45,9 +47,10 @@
 #define DF_SNAP			2
 
 /* for MovePlayer() */
-#define MF_NO_ACTION		0
-#define MF_MOVING		1
-#define MF_ACTION		2
+#define MP_NO_ACTION		0
+#define MP_MOVING		1
+#define MP_ACTION		2
+#define MP_DONT_RUN_INTO	(MP_MOVING | MP_ACTION)
 
 /* for ScrollPlayer() */
 #define SCROLL_INIT		0
@@ -4664,7 +4667,7 @@ inline static void TurnRoundExt(int x, int y)
   }
   else if (element == EL_SPRING)
   {
-#if 1
+#if USE_NEW_SPRING_BUMPER
     if (MovDir[x][y] & MV_HORIZONTAL)
     {
       if (SPRING_CAN_BUMP_FROM_FIELD(move_x, move_y) &&
@@ -5608,7 +5611,7 @@ void StartMoving(int x, int y)
       }
       else if (IS_FOOD_PENGUIN(Feld[newx][newy]))
       {
-	if (DigField(local_player, x, y, newx, newy, 0,0, DF_DIG) == MF_MOVING)
+	if (DigField(local_player, x, y, newx, newy, 0,0, DF_DIG) == MP_MOVING)
 	  DrawLevelField(newx, newy);
 	else
 	  GfxDir[x][y] = MovDir[x][y] = MV_NONE;
@@ -9176,7 +9179,7 @@ boolean MovePlayerOneStep(struct PlayerInfo *player,
   boolean player_can_move = !player->cannot_move;
 
   if (!player->active || (!dx && !dy))
-    return MF_NO_ACTION;
+    return MP_NO_ACTION;
 
   player->MovDir = (dx < 0 ? MV_LEFT :
 		    dx > 0 ? MV_RIGHT :
@@ -9184,7 +9187,7 @@ boolean MovePlayerOneStep(struct PlayerInfo *player,
 		    dy > 0 ? MV_DOWN :	MV_NONE);
 
   if (!IN_LEV_FIELD(new_jx, new_jy))
-    return MF_NO_ACTION;
+    return MP_NO_ACTION;
 
   if (!player_can_move)
   {
@@ -9203,12 +9206,12 @@ boolean MovePlayerOneStep(struct PlayerInfo *player,
 #endif
 
 #if 0
-    return MF_NO_ACTION;
+    return MP_NO_ACTION;
 #endif
   }
 
   if (!options.network && !AllPlayersInSight(player, new_jx, new_jy))
-    return MF_NO_ACTION;
+    return MP_NO_ACTION;
 
 #if !USE_FIXED_DONT_RUN_INTO
   element = MovingOrBlocked2ElementIfNotLeaving(new_jx, new_jy);
@@ -9228,17 +9231,26 @@ boolean MovePlayerOneStep(struct PlayerInfo *player,
     else
       TestIfPlayerRunsIntoBadThing(jx, jy, player->MovDir);
 
-    return MF_MOVING;
+    return MP_MOVING;
   }
 #endif
 
   can_move = DigField(player, jx, jy, new_jx, new_jy, real_dx,real_dy, DF_DIG);
-  if (can_move != MF_MOVING)
+#if 0
+#if USE_FIXED_DONT_RUN_INTO
+  if (can_move == MP_DONT_RUN_INTO)
+    return MP_MOVING;
+#endif
+#endif
+  if (can_move != MP_MOVING)
     return can_move;
+
+#if USE_FIXED_DONT_RUN_INTO
+#endif
 
   /* check if DigField() has caused relocation of the player */
   if (player->jx != jx || player->jy != jy)
-    return MF_NO_ACTION;	/* <-- !!! CHECK THIS [-> MF_ACTION ?] !!! */
+    return MP_NO_ACTION;	/* <-- !!! CHECK THIS [-> MP_ACTION ?] !!! */
 
   StorePlayer[jx][jy] = 0;
   player->last_jx = jx;
@@ -9262,14 +9274,14 @@ boolean MovePlayerOneStep(struct PlayerInfo *player,
 
   ScrollPlayer(player, SCROLL_INIT);
 
-  return MF_MOVING;
+  return MP_MOVING;
 }
 
 boolean MovePlayer(struct PlayerInfo *player, int dx, int dy)
 {
   int jx = player->jx, jy = player->jy;
   int old_jx = jx, old_jy = jy;
-  int moved = MF_NO_ACTION;
+  int moved = MP_NO_ACTION;
 
   if (!player->active)
     return FALSE;
@@ -9342,7 +9354,7 @@ boolean MovePlayer(struct PlayerInfo *player, int dx, int dy)
   jx = player->jx;
   jy = player->jy;
 
-  if (moved & MF_MOVING && !ScreenMovPos &&
+  if (moved & MP_MOVING && !ScreenMovPos &&
       (player == local_player || !options.network))
   {
     int old_scroll_x = scroll_x, old_scroll_y = scroll_y;
@@ -9413,7 +9425,7 @@ boolean MovePlayer(struct PlayerInfo *player, int dx, int dy)
 
   player->StepFrame = 0;
 
-  if (moved & MF_MOVING)
+  if (moved & MP_MOVING)
   {
     if (old_jx != jx && old_jy == jy)
       player->MovDir = (old_jx < jx ? MV_RIGHT : MV_LEFT);
@@ -10309,13 +10321,13 @@ int DigField(struct PlayerInfo *player,
       player->is_switching = FALSE;
       player->push_delay = -1;
 
-      return MF_NO_ACTION;
+      return MP_NO_ACTION;
     }
   }
 
 #if !USE_FIXED_DONT_RUN_INTO
   if (IS_MOVING(x, y) || IS_PLAYER(x, y))
-    return MF_NO_ACTION;
+    return MP_NO_ACTION;
 #endif
 
   if (IS_TUBE(Back[jx][jy]) && game.engine_version >= VERSION_IDENT(2,2,0,0))
@@ -10326,12 +10338,7 @@ int DigField(struct PlayerInfo *player,
 	   game.engine_version >= VERSION_IDENT(2,2,0,0))
     old_element = Back[jx][jy];
 
-  if (IS_WALKABLE(old_element) && !ACCESS_FROM(old_element, move_direction))
-    return MF_NO_ACTION;	/* field has no opening in this direction */
-
-  if (IS_PASSABLE(old_element) && !ACCESS_FROM(old_element,opposite_direction))
-    return MF_NO_ACTION;	/* field has no opening in this direction */
-
+#if 0
 #if USE_FIXED_DONT_RUN_INTO
   if (player_can_move && DONT_RUN_INTO(element))
   {
@@ -10347,13 +10354,68 @@ int DigField(struct PlayerInfo *player,
     else
       TestIfPlayerRunsIntoBadThing(jx, jy, player->MovDir);
 
-    return MF_NO_ACTION;
+    return MP_DONT_RUN_INTO;
   }
+#endif
+#endif
+
+#if 1
+#if USE_FIXED_DONT_RUN_INTO
+  if (player_can_move && DONT_RUN_INTO(element))
+  {
+    TestIfPlayerRunsIntoBadThing(jx, jy, player->MovDir);
+
+    return MP_DONT_RUN_INTO;
+  }
+#endif
+#endif
+
+  if (IS_WALKABLE(old_element) && !ACCESS_FROM(old_element, move_direction))
+    return MP_NO_ACTION;	/* field has no opening in this direction */
+
+  if (IS_PASSABLE(old_element) && !ACCESS_FROM(old_element,opposite_direction))
+    return MP_NO_ACTION;	/* field has no opening in this direction */
+
+#if 1
+#if USE_FIXED_DONT_RUN_INTO
+  if (player_can_move && element == EL_ACID && dx == 0 && dy == 1)
+  {
+    SplashAcid(x, y);
+    Feld[jx][jy] = EL_PLAYER_1;
+    InitMovingField(jx, jy, MV_DOWN);
+    Store[jx][jy] = EL_ACID;
+    ContinueMoving(jx, jy);
+    BuryPlayer(player);
+
+    return MP_DONT_RUN_INTO;
+  }
+#endif
+#endif
+
+#if 0
+#if USE_FIXED_DONT_RUN_INTO
+  if (player_can_move && DONT_RUN_INTO(element))
+  {
+    if (element == EL_ACID && dx == 0 && dy == 1)
+    {
+      SplashAcid(x, y);
+      Feld[jx][jy] = EL_PLAYER_1;
+      InitMovingField(jx, jy, MV_DOWN);
+      Store[jx][jy] = EL_ACID;
+      ContinueMoving(jx, jy);
+      BuryPlayer(player);
+    }
+    else
+      TestIfPlayerRunsIntoBadThing(jx, jy, player->MovDir);
+
+    return MP_DONT_RUN_INTO;
+  }
+#endif
 #endif
 
 #if USE_FIXED_DONT_RUN_INTO
   if (IS_MOVING(x, y) || IS_PLAYER(x, y))
-    return MF_NO_ACTION;
+    return MP_NO_ACTION;
 #endif
 
 #if !USE_FIXED_DONT_RUN_INTO
@@ -10363,7 +10425,10 @@ int DigField(struct PlayerInfo *player,
   collect_count = element_info[element].collect_count_initial;
 
   if (!is_player && !IS_COLLECTIBLE(element))	/* penguin cannot collect it */
-    return MF_NO_ACTION;
+    return MP_NO_ACTION;
+
+  if (game.engine_version < VERSION_IDENT(2,2,0,0))
+    player_can_move = player_can_move_or_snap;
 
   if (mode == DF_SNAP && !IS_SNAPPABLE(element) &&
       game.engine_version >= VERSION_IDENT(2,2,0,0))
@@ -10374,15 +10439,15 @@ int DigField(struct PlayerInfo *player,
 					player->index_bit, dig_side);
 
     if (Feld[x][y] != element)		/* field changed by snapping */
-      return MF_ACTION;
+      return MP_ACTION;
 
-    return MF_NO_ACTION;
+    return MP_NO_ACTION;
   }
 
   if (game.gravity && is_player && !player->is_auto_moving &&
       canFallDown(player) && move_direction != MV_DOWN &&
       !canMoveToValidFieldWithGravity(jx, jy, move_direction))
-    return MF_NO_ACTION;	/* player cannot walk here due to gravity */
+    return MP_NO_ACTION;	/* player cannot walk here due to gravity */
 
   if (player_can_move &&
       IS_WALKABLE(element) && ACCESS_FROM(element, opposite_direction))
@@ -10393,17 +10458,17 @@ int DigField(struct PlayerInfo *player,
     if (IS_RND_GATE(element))
     {
       if (!player->key[RND_GATE_NR(element)])
-	return MF_NO_ACTION;
+	return MP_NO_ACTION;
     }
     else if (IS_RND_GATE_GRAY(element))
     {
       if (!player->key[RND_GATE_GRAY_NR(element)])
-	return MF_NO_ACTION;
+	return MP_NO_ACTION;
     }
     else if (IS_RND_GATE_GRAY_ACTIVE(element))
     {
       if (!player->key[RND_GATE_GRAY_ACTIVE_NR(element)])
-	return MF_NO_ACTION;
+	return MP_NO_ACTION;
     }
     else if (element == EL_EXIT_OPEN ||
 	     element == EL_SP_EXIT_OPEN ||
@@ -10426,25 +10491,25 @@ int DigField(struct PlayerInfo *player,
 	   IS_PASSABLE(element) && canPassField(x, y, move_direction))
   {
     if (!ACCESS_FROM(element, opposite_direction))
-      return MF_NO_ACTION;	/* field not accessible from this direction */
+      return MP_NO_ACTION;	/* field not accessible from this direction */
 
     if (CAN_MOVE(element))	/* only fixed elements can be passed! */
-      return MF_NO_ACTION;
+      return MP_NO_ACTION;
 
     if (IS_EM_GATE(element))
     {
       if (!player->key[EM_GATE_NR(element)])
-	return MF_NO_ACTION;
+	return MP_NO_ACTION;
     }
     else if (IS_EM_GATE_GRAY(element))
     {
       if (!player->key[EM_GATE_GRAY_NR(element)])
-	return MF_NO_ACTION;
+	return MP_NO_ACTION;
     }
     else if (IS_EM_GATE_GRAY_ACTIVE(element))
     {
       if (!player->key[EM_GATE_GRAY_ACTIVE_NR(element)])
-	return MF_NO_ACTION;
+	return MP_NO_ACTION;
     }
     else if (IS_SP_PORT(element))
     {
@@ -10624,14 +10689,14 @@ int DigField(struct PlayerInfo *player,
   else if (player_can_move_or_snap && IS_PUSHABLE(element))
   {
     if (mode == DF_SNAP && element != EL_BD_ROCK)
-      return MF_NO_ACTION;
+      return MP_NO_ACTION;
 
     if (CAN_FALL(element) && dy)
-      return MF_NO_ACTION;
+      return MP_NO_ACTION;
 
     if (CAN_FALL(element) && IN_LEV_FIELD(x, y + 1) && IS_FREE(x, y + 1) &&
 	!(element == EL_SPRING && level.use_spring_bug))
-      return MF_NO_ACTION;
+      return MP_NO_ACTION;
 
     if (CAN_MOVE(element) && GET_MAX_MOVE_DELAY(element) == 0 &&
 	((move_direction & MV_VERTICAL &&
@@ -10644,12 +10709,12 @@ int DigField(struct PlayerInfo *player,
 	    IN_LEV_FIELD(x, y - 1) && IS_FREE(x, y - 1)) ||
 	   (element_info[element].move_pattern & MV_DOWN &&
 	    IN_LEV_FIELD(x, y + 1) && IS_FREE(x, y + 1))))))
-      return MF_NO_ACTION;
+      return MP_NO_ACTION;
 
     /* do not push elements already moving away faster than player */
     if (CAN_MOVE(element) && MovDir[x][y] == move_direction &&
 	ABS(getElementMoveStepsize(x, y)) > MOVE_STEPSIZE_NORMAL)
-      return MF_NO_ACTION;
+      return MP_NO_ACTION;
 
     if (game.engine_version >= VERSION_IDENT(3,1,0,0))
     {
@@ -10673,10 +10738,10 @@ int DigField(struct PlayerInfo *player,
 	  (IS_FREE(nextx, nexty) ||
 	   (Feld[nextx][nexty] == EL_SOKOBAN_FIELD_EMPTY &&
 	    IS_SB_ELEMENT(element)))))
-      return MF_NO_ACTION;
+      return MP_NO_ACTION;
 
     if (!checkDiagonalPushing(player, x, y, real_dx, real_dy))
-      return MF_NO_ACTION;
+      return MP_NO_ACTION;
 
     if (player->push_delay == -1)	/* new pushing; restart delay */
       player->push_delay = 0;
@@ -10689,7 +10754,7 @@ int DigField(struct PlayerInfo *player,
       if (game.engine_version >= VERSION_IDENT(3,0,7,1))
 	player->move_delay = 0;
 
-      return MF_NO_ACTION;
+      return MP_NO_ACTION;
     }
 
     if (IS_SB_ELEMENT(element))
@@ -10759,7 +10824,7 @@ int DigField(struct PlayerInfo *player,
       CheckTriggeredElementChangeByPlayer(x, y, element, CE_PLAYER_PRESSES_X,
 					  player->index_bit, dig_side);
 
-      return MF_ACTION;
+      return MP_ACTION;
     }
 
     player->is_switching = TRUE;
@@ -10886,7 +10951,7 @@ int DigField(struct PlayerInfo *player,
     CheckTriggeredElementChangeByPlayer(x, y, element, CE_PLAYER_PRESSES_X,
 					player->index_bit, dig_side);
 
-    return MF_ACTION;
+    return MP_ACTION;
   }
   else
   {
@@ -10912,7 +10977,7 @@ int DigField(struct PlayerInfo *player,
     CheckTriggeredElementChangeByPlayer(x, y, element, CE_PLAYER_PRESSES_X,
 					player->index_bit, dig_side);
 
-    return MF_NO_ACTION;
+    return MP_NO_ACTION;
   }
 
   player->push_delay = -1;
@@ -10923,7 +10988,7 @@ int DigField(struct PlayerInfo *player,
       player->is_collecting = !player->is_digging;
   }
 
-  return MF_MOVING;
+  return MP_MOVING;
 }
 
 boolean SnapField(struct PlayerInfo *player, int dx, int dy)
@@ -10975,7 +11040,7 @@ boolean SnapField(struct PlayerInfo *player, int dx, int dy)
 
   player->is_dropping = FALSE;
 
-  if (DigField(player, jx, jy, x, y, 0, 0, DF_SNAP) == MF_NO_ACTION)
+  if (DigField(player, jx, jy, x, y, 0, 0, DF_SNAP) == MP_NO_ACTION)
     return FALSE;
 
   player->is_snapping = TRUE;
@@ -11014,7 +11079,7 @@ boolean DropElement(struct PlayerInfo *player)
      element can be dropped (this is especially important if the next element
      is dynamite, which can be placed on background for historical reasons) */
   if (PLAYER_DROPPING(player, dropx, dropy) && Feld[dropx][dropy] != EL_EMPTY)
-    return MF_ACTION;
+    return MP_ACTION;
 
   if (IS_THROWABLE(drop_element))
   {
