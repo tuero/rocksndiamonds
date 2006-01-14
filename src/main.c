@@ -3944,6 +3944,11 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
     "dripper",
     "dripper"
   },
+  {
+    "emc_spring_bumper.active",
+    "emc_spring_bumper",
+    "spring bumper",
+  },
 
   /* ----------------------------------------------------------------------- */
   /* "unreal" (and therefore not drawable) runtime elements                  */

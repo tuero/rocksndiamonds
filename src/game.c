@@ -35,7 +35,9 @@
 #define USE_NEW_DELAYED_ACTION		(USE_NEW_STUFF		* 1)
 #define USE_NEW_SNAP_DELAY		(USE_NEW_STUFF		* 1)
 #define USE_ONLY_ONE_CHANGE_PER_FRAME	(USE_NEW_STUFF		* 1)
+#define USE_ONE_MORE_CHANGE_PER_FRAME	(USE_NEW_STUFF		* 1)
 #define USE_QUICKSAND_IMPACT_BUGFIX	(USE_NEW_STUFF		* 0)
+#define USE_FIXED_DONT_RUN_INTO		(USE_NEW_STUFF		* 1)
 
 /* for DigField() */
 #define DF_NO_PUSH		0
@@ -200,6 +202,10 @@
 
 #define SPRING_CAN_ENTER_FIELD(e, x, y)					\
 	ELEMENT_CAN_ENTER_FIELD_BASE_2(e, x, y, 0)
+
+#define SPRING_CAN_BUMP_FROM_FIELD(x, y)				\
+	(IN_LEV_FIELD(x, y) && (Feld[x][y] == EL_EMC_SPRING_BUMPER ||	\
+				Feld[x][y] == EL_EMC_SPRING_BUMPER_ACTIVE))
 
 #define GROUP_NR(e)		((e) - EL_GROUP_START)
 #define MOVE_ENTER_EL(e)	(element_info[e].move_enter_element)
@@ -493,6 +499,14 @@ static struct ChangingElementInfo change_delay_list[] =
     InitMagicBallDelay,
     NULL,
     ActivateMagicBall
+  },
+  {
+    EL_EMC_SPRING_BUMPER_ACTIVE,
+    EL_EMC_SPRING_BUMPER,
+    8,
+    NULL,
+    NULL,
+    NULL
   },
 
   {
@@ -4650,10 +4664,28 @@ inline static void TurnRoundExt(int x, int y)
   }
   else if (element == EL_SPRING)
   {
+#if 1
+    if (MovDir[x][y] & MV_HORIZONTAL)
+    {
+      if (SPRING_CAN_BUMP_FROM_FIELD(move_x, move_y) &&
+	  !SPRING_CAN_ENTER_FIELD(element, x, y + 1))
+      {
+	Feld[move_x][move_y] = EL_EMC_SPRING_BUMPER_ACTIVE;
+	ResetGfxAnimation(move_x, move_y);
+	DrawLevelField(move_x, move_y);
+
+	MovDir[x][y] = back_dir;
+      }
+      else if (!SPRING_CAN_ENTER_FIELD(element, move_x, move_y) ||
+	       SPRING_CAN_ENTER_FIELD(element, x, y + 1))
+	MovDir[x][y] = MV_NONE;
+    }
+#else
     if (MovDir[x][y] & MV_HORIZONTAL &&
 	(!SPRING_CAN_ENTER_FIELD(element, move_x, move_y) ||
 	 SPRING_CAN_ENTER_FIELD(element, x, y + 1)))
       MovDir[x][y] = MV_NONE;
+#endif
 
     MovDelay[x][y] = 0;
   }
@@ -8345,9 +8377,20 @@ void GameActions()
 
   /* ---------- main game synchronization point ---------- */
 
+  WaitUntilDelayReached(&game_frame_delay, game_frame_delay_value);
+
   InitPlayfieldScanModeVars();
 
-  WaitUntilDelayReached(&game_frame_delay, game_frame_delay_value);
+#if USE_ONE_MORE_CHANGE_PER_FRAME
+  if (game.engine_version >= VERSION_IDENT(3,2,0,7))
+  {
+    SCAN_PLAYFIELD(x, y)
+    {
+      ChangeCount[x][y] = 0;
+      ChangeEvent[x][y] = -1;
+    }
+  }
+#endif
 
   if (network_playing && !network_player_action_received)
   {
@@ -8528,7 +8571,7 @@ void GameActions()
     GfxFrame[x][y]++;
 
     /* reset finished pushing action (not done in ContinueMoving() to allow
-       continous pushing animation for elements with zero push delay) */
+       continuous pushing animation for elements with zero push delay) */
     if (GfxAction[x][y] == ACTION_PUSHING && !IS_MOVING(x, y))
     {
       ResetGfxAnimation(x, y);
@@ -9126,7 +9169,9 @@ boolean MovePlayerOneStep(struct PlayerInfo *player,
 {
   int jx = player->jx, jy = player->jy;
   int new_jx = jx + dx, new_jy = jy + dy;
+#if !USE_FIXED_DONT_RUN_INTO
   int element;
+#endif
   int can_move;
   boolean player_can_move = !player->cannot_move;
 
@@ -9165,8 +9210,10 @@ boolean MovePlayerOneStep(struct PlayerInfo *player,
   if (!options.network && !AllPlayersInSight(player, new_jx, new_jy))
     return MF_NO_ACTION;
 
+#if !USE_FIXED_DONT_RUN_INTO
   element = MovingOrBlocked2ElementIfNotLeaving(new_jx, new_jy);
 
+  /* (moved to DigField()) */
   if (player_can_move && DONT_RUN_INTO(element))
   {
     if (element == EL_ACID && dx == 0 && dy == 1)
@@ -9183,6 +9230,7 @@ boolean MovePlayerOneStep(struct PlayerInfo *player,
 
     return MF_MOVING;
   }
+#endif
 
   can_move = DigField(player, jx, jy, new_jx, new_jy, real_dx,real_dy, DF_DIG);
   if (can_move != MF_MOVING)
@@ -9873,6 +9921,7 @@ void TestIfElementSmashesCustomElement(int x, int y, int direction)
 void TestIfGoodThingHitsBadThing(int good_x, int good_y, int good_move_dir)
 {
   int i, kill_x = -1, kill_y = -1;
+
   int bad_element = -1;
   static int test_xy[4][2] =
   {
@@ -10225,7 +10274,8 @@ int DigField(struct PlayerInfo *player,
 {
   boolean is_player = (IS_PLAYER(oldx, oldy) || mode != DF_DIG);
   boolean player_was_pushing = player->is_pushing;
-  boolean player_can_enter = (!player->cannot_move || mode == DF_SNAP);
+  boolean player_can_move = (!player->cannot_move && mode != DF_SNAP);
+  boolean player_can_move_or_snap = (!player->cannot_move || mode == DF_SNAP);
   int jx = oldx, jy = oldy;
   int dx = x - jx, dy = y - jy;
   int nextx = x + dx, nexty = y + dy;
@@ -10236,7 +10286,11 @@ int DigField(struct PlayerInfo *player,
   int opposite_direction = MV_DIR_OPPOSITE(move_direction);
   int dig_side = MV_DIR_OPPOSITE(move_direction);
   int old_element = Feld[jx][jy];
+#if USE_FIXED_DONT_RUN_INTO
+  int element = MovingOrBlocked2ElementIfNotLeaving(x, y);
+#else
   int element;
+#endif
   int collect_count;
 
   if (is_player)		/* function can also be called by EL_PENGUIN */
@@ -10259,8 +10313,10 @@ int DigField(struct PlayerInfo *player,
     }
   }
 
+#if !USE_FIXED_DONT_RUN_INTO
   if (IS_MOVING(x, y) || IS_PLAYER(x, y))
     return MF_NO_ACTION;
+#endif
 
   if (IS_TUBE(Back[jx][jy]) && game.engine_version >= VERSION_IDENT(2,2,0,0))
     old_element = Back[jx][jy];
@@ -10276,27 +10332,35 @@ int DigField(struct PlayerInfo *player,
   if (IS_PASSABLE(old_element) && !ACCESS_FROM(old_element,opposite_direction))
     return MF_NO_ACTION;	/* field has no opening in this direction */
 
+#if USE_FIXED_DONT_RUN_INTO
+  if (player_can_move && DONT_RUN_INTO(element))
+  {
+    if (element == EL_ACID && dx == 0 && dy == 1)
+    {
+      SplashAcid(x, y);
+      Feld[jx][jy] = EL_PLAYER_1;
+      InitMovingField(jx, jy, MV_DOWN);
+      Store[jx][jy] = EL_ACID;
+      ContinueMoving(jx, jy);
+      BuryPlayer(player);
+    }
+    else
+      TestIfPlayerRunsIntoBadThing(jx, jy, player->MovDir);
+
+    return MF_NO_ACTION;
+  }
+#endif
+
+#if USE_FIXED_DONT_RUN_INTO
+  if (IS_MOVING(x, y) || IS_PLAYER(x, y))
+    return MF_NO_ACTION;
+#endif
+
+#if !USE_FIXED_DONT_RUN_INTO
   element = Feld[x][y];
-#if USE_NEW_CUSTOM_VALUE
+#endif
 
-#if 1
   collect_count = element_info[element].collect_count_initial;
-#else
-  collect_count = CustomValue[x][y];
-#endif
-
-#else
-  collect_count = element_info[element].collect_count_initial;
-#endif
-
-#if 0
-  if (element != EL_BLOCKED &&
-      CustomValue[x][y] != element_info[element].collect_count_initial)
-    printf("::: %d: %d != %d\n",
-	   element,
-	   CustomValue[x][y],
-	   element_info[element].collect_count_initial);
-#endif
 
   if (!is_player && !IS_COLLECTIBLE(element))	/* penguin cannot collect it */
     return MF_NO_ACTION;
@@ -10320,7 +10384,7 @@ int DigField(struct PlayerInfo *player,
       !canMoveToValidFieldWithGravity(jx, jy, move_direction))
     return MF_NO_ACTION;	/* player cannot walk here due to gravity */
 
-  if (player_can_enter &&
+  if (player_can_move &&
       IS_WALKABLE(element) && ACCESS_FROM(element, opposite_direction))
   {
     int sound_element = SND_ELEMENT(element);
@@ -10358,7 +10422,7 @@ int DigField(struct PlayerInfo *player,
     else
       PlayLevelSoundElementAction(x, y, player->artwork_element, sound_action);
   }
-  else if (player_can_enter &&
+  else if (player_can_move &&
 	   IS_PASSABLE(element) && canPassField(x, y, move_direction))
   {
     if (!ACCESS_FROM(element, opposite_direction))
@@ -10413,7 +10477,7 @@ int DigField(struct PlayerInfo *player,
 
     PlayLevelSoundAction(x, y, ACTION_PASSING);
   }
-  else if (player_can_enter && IS_DIGGABLE(element))
+  else if (player_can_move_or_snap && IS_DIGGABLE(element))
   {
     RemoveField(x, y);
 
@@ -10443,7 +10507,7 @@ int DigField(struct PlayerInfo *player,
 					  player->index_bit, dig_side);
     }
   }
-  else if (player_can_enter && IS_COLLECTIBLE(element))
+  else if (player_can_move_or_snap && IS_COLLECTIBLE(element))
   {
     RemoveField(x, y);
 
@@ -10557,7 +10621,7 @@ int DigField(struct PlayerInfo *player,
 					  player->index_bit, dig_side);
     }
   }
-  else if (player_can_enter && IS_PUSHABLE(element))
+  else if (player_can_move_or_snap && IS_PUSHABLE(element))
   {
     if (mode == DF_SNAP && element != EL_BD_ROCK)
       return MF_NO_ACTION;

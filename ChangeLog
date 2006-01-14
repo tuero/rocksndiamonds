@@ -2,6 +2,9 @@ XXXX-XX-XX
 	* added android (can clone elements) from EMC engine to R'n'D engine
 
 
+2006-01-14
+	* added spring bumper (reflects spring) from EMC engine to R'n'D engine
+
 2006-01-11
 	* added selectbox for initial player speed to player settings in editor
 
