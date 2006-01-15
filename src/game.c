@@ -10378,7 +10378,7 @@ int DigField(struct PlayerInfo *player,
 
 #if 1
 #if USE_FIXED_DONT_RUN_INTO
-  if (player_can_move && element == EL_ACID && dx == 0 && dy == 1)
+  if (player_can_move && element == EL_ACID && move_direction == MV_DOWN)
   {
     SplashAcid(x, y);
     Feld[jx][jy] = EL_PLAYER_1;
