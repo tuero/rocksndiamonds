@@ -142,6 +142,7 @@
 /* values for special (non game element) animation modes */
 #define ANIM_HORIZONTAL		(1 << 8)
 #define ANIM_VERTICAL		(1 << 9)
+#define ANIM_STATIC_PANEL	(1 << 10)
 
 #define ANIM_DEFAULT		ANIM_LOOP
 

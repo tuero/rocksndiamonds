@@ -3913,13 +3913,13 @@ struct ConfigInfo image_config[] =
   { "menu.button_down.active.ypos",		"9"			},
   { "menu.button_down.active.frames",		"1"			},
 
-  { "menu.button_enter_menu",			UNDEFINED_FILENAME	},
+  { "menu.button_enter_menu",			"RocksDC.pcx"		},
   { "menu.button_enter_menu.clone_from",	"menu.button_right"	},
-  { "menu.button_enter_menu.active",		UNDEFINED_FILENAME	},
+  { "menu.button_enter_menu.active",		"RocksDC.pcx"		},
   { "menu.button_enter_menu.active.clone_from",	"menu.button_right.active" },
-  { "menu.button_leave_menu",			UNDEFINED_FILENAME	},
+  { "menu.button_leave_menu",			"RocksDC.pcx"		},
   { "menu.button_leave_menu.clone_from",	"menu.button_left"	},
-  { "menu.button_leave_menu.active",		UNDEFINED_FILENAME	},
+  { "menu.button_leave_menu.active",		"RocksDC.pcx"		},
   { "menu.button_leave_menu.active.clone_from",	"menu.button_left.active" },
 
   { "menu.scrollbar",				"RocksDC.pcx"		},
@@ -4261,9 +4261,14 @@ struct ConfigInfo image_config[] =
   { "menu.list_size.SCORES",			"-1"			},
   { "menu.list_size.INFO",			"-1"			},
 
+  { "door_1.width",				"-1"			},
+  { "door_1.height",				"-1"			},
   { "door_1.step_offset",			"2"			},
   { "door_1.step_delay",			"10"			},
   { "door_1.anim_mode",				"default"		},
+
+  { "door_2.width",				"-1"			},
+  { "door_2.height",				"-1"			},
   { "door_2.step_offset",			"2"			},
   { "door_2.step_delay",			"10"			},
   { "door_2.anim_mode",				"default"		},

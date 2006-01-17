@@ -285,8 +285,10 @@ void DrawMainMenu()
   SetDrawtoField(DRAW_BACKBUFFER);
 #endif
 
+#if 0
   /* map gadgets for main menu screen */
   MapTapeButtons();
+#endif
 
   /* level_nr may have been set to value over handicap with level editor */
   if (setup.handicap && level_nr > leveldir_current->handicap_level)
@@ -390,6 +392,11 @@ void DrawMainMenu()
   PlayMenuMusic();
 
   OpenDoor(DOOR_CLOSE_1 | DOOR_OPEN_2);
+
+#if 1
+  /* map gadgets for main menu screen */
+  MapTapeButtons();
+#endif
 }
 
 #if 0

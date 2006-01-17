@@ -2450,6 +2450,15 @@ unsigned int MoveDoor(unsigned int door_state)
   unsigned long door_delay_value;
   int stepsize = 1;
 
+  if (door_1.width < 0 || door_1.width > DXSIZE)
+    door_1.width = DXSIZE;
+  if (door_1.height < 0 || door_1.height > DYSIZE)
+    door_1.height = DYSIZE;
+  if (door_2.width < 0 || door_2.width > VXSIZE)
+    door_2.width = VXSIZE;
+  if (door_2.height < 0 || door_2.height > VYSIZE)
+    door_2.height = VYSIZE;
+
   if (door_state == DOOR_GET_STATE)
     return(door1 | door2);
 
@@ -2489,12 +2498,31 @@ unsigned int MoveDoor(unsigned int door_state)
 
   if (door_state & DOOR_ACTION)
   {
-    boolean door_1_done = !(door_state & DOOR_ACTION_1);
-    boolean door_2_done = !(door_state & DOOR_ACTION_2);
-    int start = ((door_state & DOOR_NO_DELAY) ? DXSIZE : 0);
+    boolean handle_door_1 = (door_state & DOOR_ACTION_1);
+    boolean handle_door_2 = (door_state & DOOR_ACTION_2);
+    boolean door_1_done = (!handle_door_1);
+    boolean door_2_done = (!handle_door_2);
+    boolean door_1_vertical = (door_1.anim_mode & ANIM_VERTICAL);
+    boolean door_2_vertical = (door_2.anim_mode & ANIM_VERTICAL);
+    int door_size_1 = (door_1_vertical ? door_1.height : door_1.width);
+    int door_size_2 = (door_2_vertical ? door_2.height : door_2.width);
+    int max_door_size_1 = (door_1_vertical ? DYSIZE : DXSIZE);
+    int max_door_size_2 = (door_2_vertical ? VYSIZE : VXSIZE);
+    int door_size     = (handle_door_1 ? door_size_1     : door_size_2);
+    int max_door_size = (handle_door_1 ? max_door_size_1 : max_door_size_2);
+    int door_skip = max_door_size - door_size;
+#if 1
+    int end = door_size;
+#else
     int end = (door_state & DOOR_ACTION_1 &&
-	       door_1.anim_mode == ANIM_VERTICAL ? DYSIZE : DXSIZE);
-    int x;
+	       door_1.anim_mode & ANIM_VERTICAL ? DYSIZE : DXSIZE);
+#endif
+#if 1
+    int start = ((door_state & DOOR_NO_DELAY) ? end : 0);
+#else
+    int start = ((door_state & DOOR_NO_DELAY) ? end : offset_skip);
+#endif
+    int k;
 
     if (!(door_state & DOOR_NO_DELAY) && !setup.quick_doors)
     {
@@ -2505,26 +2533,34 @@ unsigned int MoveDoor(unsigned int door_state)
 	PlaySoundStereo(SND_DOOR_CLOSING, SOUND_MIDDLE);
     }
 
-    for (x = start; x <= end && !(door_1_done && door_2_done); x += stepsize)
+    for (k = start; k <= end && !(door_1_done && door_2_done); k += stepsize)
     {
+      int x = k;
       Bitmap *bitmap = graphic_info[IMG_GLOBAL_DOOR].bitmap;
       GC gc = bitmap->stored_clip_gc;
 
       if (door_state & DOOR_ACTION_1)
       {
 	int a = MIN(x * door_1.step_offset, end);
-	int i = (door_state & DOOR_OPEN_1 ? end - a : a);
+	int p = (door_state & DOOR_OPEN_1 ? end - a : a);
+	int i = p + door_skip;
 
-	if (x <= a)
+	if (door_1.anim_mode & ANIM_STATIC_PANEL)
 	{
 	  BlitBitmap(bitmap_db_door, drawto,
-		     DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1 + i / 2,
-		     DXSIZE, DYSIZE - i / 2, DX, DY);
+		     DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1,
+		     DXSIZE, DYSIZE, DX, DY);
+	}
+	else if (x <= a)
+	{
+	  BlitBitmap(bitmap_db_door, drawto,
+		     DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1 + p / 2,
+		     DXSIZE, DYSIZE - p / 2, DX, DY);
 
-	  ClearRectangle(drawto, DX, DY + DYSIZE - i / 2, DXSIZE, i / 2);
+	  ClearRectangle(drawto, DX, DY + DYSIZE - p / 2, DXSIZE, p / 2);
 	}
 
-	if (door_1.anim_mode == ANIM_HORIZONTAL && x <= DXSIZE)
+	if (door_1.anim_mode & ANIM_HORIZONTAL && x <= DXSIZE)
 	{
 	  int src1_x = DXSIZE,		src1_y = DOOR_GFX_PAGEY1;
 	  int dst1_x = DX + DXSIZE - i,	dst1_y = DY;
@@ -2540,7 +2576,7 @@ unsigned int MoveDoor(unsigned int door_state)
 	  BlitBitmapMasked(bitmap, drawto, src2_x, src2_y, width, height,
 			   dst2_x, dst2_y);
 	}
-	else if (door_1.anim_mode == ANIM_VERTICAL && x <= DYSIZE)
+	else if (door_1.anim_mode & ANIM_VERTICAL && x <= DYSIZE)
 	{
 	  int src1_x = DXSIZE,		src1_y = DOOR_GFX_PAGEY1;
 	  int dst1_x = DX,		dst1_y = DY + DYSIZE - i;
@@ -2597,19 +2633,26 @@ unsigned int MoveDoor(unsigned int door_state)
 
       if (door_state & DOOR_ACTION_2)
       {
-	int a = MIN(x * door_2.step_offset, VXSIZE);
-	int i = (door_state & DOOR_OPEN_2 ? VXSIZE - a : a);
+	int a = MIN(x * door_2.step_offset, door_size_2);
+	int p = (door_state & DOOR_OPEN_2 ? door_size_2 - a : a);
+	int i = p + door_skip;
 
-	if (x <= VYSIZE)
+	if (door_2.anim_mode & ANIM_STATIC_PANEL)
 	{
 	  BlitBitmap(bitmap_db_door, drawto,
-		     DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY2 + i / 2,
-		     VXSIZE, VYSIZE - i / 2, VX, VY);
+		     DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY2,
+		     VXSIZE, VYSIZE, VX, VY);
+	}
+	else if (x <= VYSIZE)
+	{
+	  BlitBitmap(bitmap_db_door, drawto,
+		     DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY2 + p / 2,
+		     VXSIZE, VYSIZE - p / 2, VX, VY);
 
-	  ClearRectangle(drawto, VX, VY + VYSIZE - i / 2, VXSIZE, i / 2);
+	  ClearRectangle(drawto, VX, VY + VYSIZE - p / 2, VXSIZE, p / 2);
 	}
 
-	if (door_2.anim_mode == ANIM_HORIZONTAL && x <= VXSIZE)
+	if (door_2.anim_mode & ANIM_HORIZONTAL && x <= VXSIZE)
 	{
 	  int src1_x = VXSIZE,		src1_y = DOOR_GFX_PAGEY2;
 	  int dst1_x = VX + VXSIZE - i,	dst1_y = VY;
@@ -2625,7 +2668,7 @@ unsigned int MoveDoor(unsigned int door_state)
 	  BlitBitmapMasked(bitmap, drawto, src2_x, src2_y, width, height,
 			   dst2_x, dst2_y);
 	}
-	else if (door_2.anim_mode == ANIM_VERTICAL && x <= VYSIZE)
+	else if (door_2.anim_mode & ANIM_VERTICAL && x <= VYSIZE)
 	{
 	  int src1_x = VXSIZE,		src1_y = DOOR_GFX_PAGEY2;
 	  int dst1_x = VX,		dst1_y = VY + VYSIZE - i;
@@ -2694,8 +2737,8 @@ void DrawSpecialEditorDoor()
 	     DOOR_GFX_PAGEX7, 0, EXSIZE + 8, 8,
 	     EX - 4, EY - 12);
   BlitBitmap(graphic_info[IMG_GLOBAL_BORDER].bitmap, drawto,
-	     EX - 4, VY - 4, EXSIZE + 8, EYSIZE - VYSIZE + 4,
-	     EX - 4, EY - 4);
+	     EX - 6, VY - 4, EXSIZE + 12, EYSIZE - VYSIZE + 4,
+	     EX - 6, EY - 4);
 
   redraw_mask |= REDRAW_ALL;
 }
@@ -2704,8 +2747,8 @@ void UndrawSpecialEditorDoor()
 {
   /* draw normal tape recorder window */
   BlitBitmap(graphic_info[IMG_GLOBAL_BORDER].bitmap, drawto,
-	     EX - 4, EY - 12, EXSIZE + 8, EYSIZE - VYSIZE + 12,
-	     EX - 4, EY - 12);
+	     EX - 6, EY - 12, EXSIZE + 12, EYSIZE - VYSIZE + 12,
+	     EX - 6, EY - 12);
 
   redraw_mask |= REDRAW_ALL;
 }
