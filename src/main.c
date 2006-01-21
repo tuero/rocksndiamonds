@@ -4458,12 +4458,16 @@ struct ElementActionInfo element_action_info[NUM_ACTIONS + 1 + 1] =
   { NULL,			0,				0	}
 };
 
-struct ElementDirectionInfo element_direction_info[NUM_DIRECTIONS + 1] =
+struct ElementDirectionInfo element_direction_info[NUM_DIRECTIONS_FULL + 1] =
 {
   { ".left",		MV_BIT_LEFT			},
   { ".right",		MV_BIT_RIGHT			},
   { ".up",		MV_BIT_UP			},
   { ".down",		MV_BIT_DOWN			},
+  { ".upleft",		MV_BIT_UP			},
+  { ".upright",		MV_BIT_RIGHT			},
+  { ".downleft",	MV_BIT_LEFT			},
+  { ".downright",	MV_BIT_DOWN			},
 
   { NULL,		0				}
 };

@@ -5698,7 +5698,7 @@ void LoadHelpAnimInfo()
 		 i_to_a(element_action_info[i].value));
 
   /* do not store direction index (bit) here, but direction value! */
-  for (i = 0; i < NUM_DIRECTIONS; i++)
+  for (i = 0; i < NUM_DIRECTIONS_FULL; i++)
     setHashEntry(direction_hash, element_direction_info[i].suffix,
 		 i_to_a(1 << element_direction_info[i].value));
 

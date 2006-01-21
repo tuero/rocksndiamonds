@@ -320,7 +320,7 @@ void InitElementGraphicInfo()
       element_info[i].graphic[act] = -1;
       element_info[i].crumbled[act] = -1;
 
-      for (dir = 0; dir < NUM_DIRECTIONS; dir++)
+      for (dir = 0; dir < NUM_DIRECTIONS_FULL; dir++)
       {
 	element_info[i].direction_graphic[act][dir] = -1;
 	element_info[i].direction_crumbled[act][dir] = -1;
@@ -404,7 +404,7 @@ void InitElementGraphicInfo()
     if (crumbled)
     {
       if (direction < 0)
-	for (dir = 0; dir < NUM_DIRECTIONS; dir++)
+	for (dir = 0; dir < NUM_DIRECTIONS_FULL; dir++)
 	  element_info[element].direction_crumbled[action][dir] = -1;
 
       if (direction > -1)
@@ -415,7 +415,7 @@ void InitElementGraphicInfo()
     else
     {
       if (direction < 0)
-	for (dir = 0; dir < NUM_DIRECTIONS; dir++)
+	for (dir = 0; dir < NUM_DIRECTIONS_FULL; dir++)
 	  element_info[element].direction_graphic[action][dir] = -1;
 
       if (direction > -1)
@@ -443,7 +443,7 @@ void InitElementGraphicInfo()
 	element_info[i].crumbled[act] =
 	  element_info[crumbled_like].crumbled[act];
       for (act = 0; act < NUM_ACTIONS; act++)
-	for (dir = 0; dir < NUM_DIRECTIONS; dir++)
+	for (dir = 0; dir < NUM_DIRECTIONS_FULL; dir++)
 	  element_info[i].direction_crumbled[act][dir] =
 	    element_info[crumbled_like].direction_crumbled[act][dir];
     }
@@ -452,7 +452,7 @@ void InitElementGraphicInfo()
     {
       element_info[i].graphic[ACTION_DIGGING] =
 	element_info[diggable_like].graphic[ACTION_DIGGING];
-      for (dir = 0; dir < NUM_DIRECTIONS; dir++)
+      for (dir = 0; dir < NUM_DIRECTIONS_FULL; dir++)
 	element_info[i].direction_graphic[ACTION_DIGGING][dir] =
 	  element_info[diggable_like].direction_graphic[ACTION_DIGGING][dir];
     }
@@ -489,7 +489,7 @@ void InitElementGraphicInfo()
       if (graphic > 0 && graphic_info[graphic].bitmap == NULL)
 	element_info[i].crumbled[act] = -1;
 
-      for (dir = 0; dir < NUM_DIRECTIONS; dir++)
+      for (dir = 0; dir < NUM_DIRECTIONS_FULL; dir++)
       {
 	graphic = element_info[i].direction_graphic[act][dir];
 	if (graphic > 0 && graphic_info[graphic].bitmap == NULL)
@@ -508,7 +508,7 @@ void InitElementGraphicInfo()
   {
     for (act = 0; act < NUM_ACTIONS; act++)
     {
-      for (dir = 0; dir < NUM_DIRECTIONS; dir++)
+      for (dir = 0; dir < NUM_DIRECTIONS_FULL; dir++)
       {
 	int graphic = element_info[i].direction_graphic[act][dir];
 	int move_dir = (act == ACTION_FALLING ? MV_BIT_DOWN : dir);
@@ -566,8 +566,8 @@ void InitElementGraphicInfo()
   {
     int default_graphic = element_info[i].graphic[ACTION_DEFAULT];
     int default_crumbled = element_info[i].crumbled[ACTION_DEFAULT];
-    int default_direction_graphic[NUM_DIRECTIONS];
-    int default_direction_crumbled[NUM_DIRECTIONS];
+    int default_direction_graphic[NUM_DIRECTIONS_FULL];
+    int default_direction_crumbled[NUM_DIRECTIONS_FULL];
 
     if (default_graphic == -1)
       default_graphic = IMG_UNKNOWN;
@@ -580,7 +580,7 @@ void InitElementGraphicInfo()
       default_crumbled = IMG_EMPTY;
 #endif
 
-    for (dir = 0; dir < NUM_DIRECTIONS; dir++)
+    for (dir = 0; dir < NUM_DIRECTIONS_FULL; dir++)
     {
       default_direction_graphic[dir] =
 	element_info[i].direction_graphic[ACTION_DEFAULT][dir];
@@ -653,7 +653,7 @@ void InitElementGraphicInfo()
 	default_action_crumbled = default_crumbled;
 #endif
 
-      for (dir = 0; dir < NUM_DIRECTIONS; dir++)
+      for (dir = 0; dir < NUM_DIRECTIONS_FULL; dir++)
       {
 	/* use action graphic as the default direction graphic, if undefined */
 	int default_action_direction_graphic = element_info[i].graphic[act];
@@ -725,7 +725,7 @@ void InitElementGraphicInfo()
       if (graphic_info[crumbled].anim_frames == 1)
 	graphic_info[crumbled].anim_mode = ANIM_NONE;
 
-      for (dir = 0; dir < NUM_DIRECTIONS; dir++)
+      for (dir = 0; dir < NUM_DIRECTIONS_FULL; dir++)
       {
 	graphic = element_info[i].direction_graphic[act][dir];
 	crumbled = element_info[i].direction_crumbled[act][dir];
@@ -4133,7 +4133,7 @@ static void InitArtworkConfig()
   static char *sound_id_prefix[2 * MAX_NUM_ELEMENTS + 1];
   static char *music_id_prefix[NUM_MUSIC_PREFIXES + 1];
   static char *action_id_suffix[NUM_ACTIONS + 1];
-  static char *direction_id_suffix[NUM_DIRECTIONS + 1];
+  static char *direction_id_suffix[NUM_DIRECTIONS_FULL + 1];
   static char *special_id_suffix[NUM_SPECIAL_GFX_ARGS + 1];
   static char *level_id_suffix[MAX_LEVELS + 1];
   static char *dummy[1] = { NULL };
@@ -4207,9 +4207,9 @@ static void InitArtworkConfig()
     action_id_suffix[i] = element_action_info[i].suffix;
   action_id_suffix[NUM_ACTIONS] = NULL;
 
-  for (i = 0; i < NUM_DIRECTIONS; i++)
+  for (i = 0; i < NUM_DIRECTIONS_FULL; i++)
     direction_id_suffix[i] = element_direction_info[i].suffix;
-  direction_id_suffix[NUM_DIRECTIONS] = NULL;
+  direction_id_suffix[NUM_DIRECTIONS_FULL] = NULL;
 
   for (i = 0; i < NUM_SPECIAL_GFX_ARGS; i++)
     special_id_suffix[i] = special_suffix_info[i].suffix;

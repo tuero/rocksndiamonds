@@ -3668,13 +3668,13 @@ struct ConfigInfo image_config[] =
   /* !!! TEMPORARILY STORED HERE -- PROBABLY TO BE CHANGED !!! */
 
   /* (for testing, change filename back to "emc_object dot pcx") */
-  { "emc_object",				"RocksEMC.pcx"		},
+  { "emc_object",				"emc_object.pcx"	},
 #if 0
   { "emc_object.scale_up_factor",		"2"			},
 #endif
 
   /* (for testing, change filename back to "emc_sprite dot pcx") */
-  { "emc_sprite",				"RocksEMC.pcx"		},
+  { "emc_sprite",				"emc_sprite.pcx"	},
 #if 0
   { "emc_sprite.scale_up_factor",		"2"			},
 #endif

@@ -4905,7 +4905,7 @@ inline static void TurnRoundExt(int x, int y)
       int start_pos = check_pos[MovDir[x][y] & 0x0f];
       int i;
 
-      MovDelay[x][y] = level.android_move_time;
+      MovDelay[x][y] = level.android_move_time * 8 + 1;
 
       if (start_pos < 0)	/* (should never happen) */
 	return;
@@ -5177,7 +5177,7 @@ static void TurnRound(int x, int y)
     GfxFrame[x][y] = 0;
 
   if (MovDelay[x][y])
-    GfxAction[x][y] = ACTION_TURNING_FROM_LEFT + MV_DIR_BIT(direction);
+    GfxAction[x][y] = ACTION_TURNING_FROM_LEFT + MV_DIR_TO_BIT(direction);
 }
 
 static boolean JustBeingPushed(int x, int y)
@@ -10368,7 +10368,7 @@ void RemovePlayer(struct PlayerInfo *player)
 static void setFieldForSnapping(int x, int y, int element, int direction)
 {
   struct ElementInfo *ei = &element_info[element];
-  int direction_bit = MV_DIR_BIT(direction);
+  int direction_bit = MV_DIR_TO_BIT(direction);
   int graphic_snapping = ei->direction_graphic[ACTION_SNAPPING][direction_bit];
   int action = (graphic_snapping != IMG_EMPTY_SPACE ? ACTION_SNAPPING :
 		IS_DIGGABLE(element) ? ACTION_DIGGING : ACTION_COLLECTING);

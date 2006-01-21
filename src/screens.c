@@ -887,7 +887,7 @@ static char *getHelpText(int element, int action, int direction)
     strcat(token, element_action_info[action].suffix);
 
   if (direction != -1)
-    strcat(token, element_direction_info[MV_DIR_BIT(direction)].suffix);
+    strcat(token, element_direction_info[MV_DIR_TO_BIT(direction)].suffix);
 
   return getHashEntry(helptext_info, token);
 }

@@ -95,6 +95,14 @@
 
 #define NUM_DIRECTIONS		4
 
+/* diagonal movement directions are used in a different contect than buttons */
+#define MV_BIT_UPLEFT		4
+#define MV_BIT_UPRIGHT		5
+#define MV_BIT_DOWNLEFT		6
+#define MV_BIT_DOWNRIGHT	7
+
+#define NUM_DIRECTIONS_FULL	8
+
 /* values for special "button" bitmasks */
 #define BUTTON_1		4
 #define BUTTON_2		5
@@ -105,6 +113,11 @@
 #define MV_RIGHT		(1 << MV_BIT_RIGHT)
 #define MV_UP			(1 << MV_BIT_UP)
 #define MV_DOWN	       		(1 << MV_BIT_DOWN)
+
+#define MV_UPLEFT		(MV_UP   | MV_LEFT)
+#define MV_UPRIGHT		(MV_UP   | MV_RIGHT)
+#define MV_DOWNLEFT		(MV_DOWN | MV_LEFT)
+#define MV_DOWNRIGHT		(MV_DOWN | MV_RIGHT)
 
 #define MV_HORIZONTAL		(MV_LEFT | MV_RIGHT)
 #define MV_VERTICAL		(MV_UP   | MV_DOWN)
@@ -118,15 +131,32 @@
 #define KEY_BUTTON		(KEY_BUTTON_1 | KEY_BUTTON_2)
 #define KEY_ACTION		(KEY_MOTION | KEY_BUTTON)
 
-#define MV_DIR_BIT(x)		((x) == MV_LEFT  ? MV_BIT_LEFT  :	\
-				 (x) == MV_RIGHT ? MV_BIT_RIGHT :	\
-				 (x) == MV_UP    ? MV_BIT_UP    : MV_BIT_DOWN)
+#define MV_DIR_FROM_BIT(x)	((x) < NUM_DIRECTIONS ? 1 << (x) :	  \
+				 (x) == MV_BIT_UPLEFT    ? MV_UPLEFT    : \
+				 (x) == MV_BIT_UPRIGHT   ? MV_UPRIGHT   : \
+				 (x) == MV_BIT_DOWNLEFT  ? MV_DOWNLEFT  : \
+				 (x) == MV_BIT_DOWNRIGHT ? MV_DOWNRIGHT : \
+				 MV_NONE)
 
-#define MV_DIR_OPPOSITE(x)	((x) == MV_LEFT  ? MV_RIGHT :		\
-				 (x) == MV_RIGHT ? MV_LEFT  :		\
-				 (x) == MV_UP    ? MV_DOWN  :		\
-				 (x) == MV_DOWN  ? MV_UP    : MV_NONE)
+#define MV_DIR_TO_BIT(x)	((x) == MV_LEFT      ? MV_BIT_LEFT      : \
+				 (x) == MV_RIGHT     ? MV_BIT_RIGHT     : \
+				 (x) == MV_UP        ? MV_BIT_UP        : \
+				 (x) == MV_DOWN      ? MV_BIT_DOWN      : \
+				 (x) == MV_UPLEFT    ? MV_BIT_UPLEFT    : \
+				 (x) == MV_UPRIGHT   ? MV_BIT_UPRIGHT   : \
+				 (x) == MV_DOWNLEFT  ? MV_BIT_DOWNLEFT  : \
+				 (x) == MV_DOWNRIGHT ? MV_BIT_DOWNRIGHT : \
+				 MV_BIT_DOWN)
 
+#define MV_DIR_OPPOSITE(x)	((x) == MV_LEFT      ? MV_RIGHT     : \
+				 (x) == MV_RIGHT     ? MV_LEFT      : \
+				 (x) == MV_UP        ? MV_DOWN      : \
+				 (x) == MV_DOWN      ? MV_UP        : \
+				 (x) == MV_UPLEFT    ? MV_DOWNRIGHT : \
+				 (x) == MV_UPRIGHT   ? MV_DOWNLEFT  : \
+				 (x) == MV_DOWNLEFT  ? MV_UPRIGHT   : \
+				 (x) == MV_DOWNRIGHT ? MV_UPLEFT    : \
+				 MV_NONE)
 
 /* values for animation mode (frame order and direction) */
 #define ANIM_NONE		0

@@ -2161,11 +2161,11 @@ struct ElementInfo
   /* ---------- graphic and sound definitions ---------- */
 
   int graphic[NUM_ACTIONS];	/* default graphics for several actions */
-  int direction_graphic[NUM_ACTIONS][NUM_DIRECTIONS];
+  int direction_graphic[NUM_ACTIONS][NUM_DIRECTIONS_FULL];
 				/* special graphics for left/right/up/down */
 
   int crumbled[NUM_ACTIONS];	/* crumbled graphics for several actions */
-  int direction_crumbled[NUM_ACTIONS][NUM_DIRECTIONS];
+  int direction_crumbled[NUM_ACTIONS][NUM_DIRECTIONS_FULL];
 				/* crumbled graphics for left/right/up/down */
 
   int special_graphic[NUM_SPECIAL_GFX_ARGS];

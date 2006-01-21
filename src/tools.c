@@ -3336,11 +3336,11 @@ em_object_mapping_list[] =
   },
   {
     Yandroid_ne,			FALSE,	FALSE,
-    EL_EMC_ANDROID,			ACTION_TURNING_FROM_UP, MV_BIT_RIGHT
+    EL_EMC_ANDROID,			ACTION_GROWING, MV_BIT_UPRIGHT
   },
   {
     Yandroid_neB,			FALSE,	TRUE,
-    EL_EMC_ANDROID,			ACTION_TURNING_FROM_UP, MV_BIT_RIGHT
+    EL_EMC_ANDROID,			ACTION_SHRINKING, MV_BIT_UPRIGHT
   },
   {
     Yandroid_e,				FALSE,	FALSE,
@@ -3352,11 +3352,11 @@ em_object_mapping_list[] =
   },
   {
     Yandroid_se,			FALSE,	FALSE,
-    EL_EMC_ANDROID,			ACTION_TURNING_FROM_DOWN, MV_BIT_RIGHT
+    EL_EMC_ANDROID,			ACTION_GROWING, MV_BIT_DOWNRIGHT
   },
   {
     Yandroid_seB,			FALSE,	TRUE,
-    EL_EMC_ANDROID,			ACTION_TURNING_FROM_DOWN, MV_BIT_RIGHT
+    EL_EMC_ANDROID,			ACTION_SHRINKING, MV_BIT_DOWNRIGHT
   },
   {
     Yandroid_s,				FALSE,	FALSE,
@@ -3368,11 +3368,11 @@ em_object_mapping_list[] =
   },
   {
     Yandroid_sw,			FALSE,	FALSE,
-    EL_EMC_ANDROID,			ACTION_TURNING_FROM_DOWN, MV_BIT_LEFT
+    EL_EMC_ANDROID,			ACTION_GROWING, MV_BIT_DOWNLEFT
   },
   {
     Yandroid_swB,			FALSE,	TRUE,
-    EL_EMC_ANDROID,			ACTION_TURNING_FROM_DOWN, MV_BIT_LEFT
+    EL_EMC_ANDROID,			ACTION_SHRINKING, MV_BIT_DOWNLEFT
   },
   {
     Yandroid_w,				FALSE,	FALSE,
@@ -3384,11 +3384,11 @@ em_object_mapping_list[] =
   },
   {
     Yandroid_nw,			FALSE,	FALSE,
-    EL_EMC_ANDROID,			ACTION_TURNING_FROM_UP, MV_BIT_LEFT
+    EL_EMC_ANDROID,			ACTION_GROWING, MV_BIT_UPLEFT
   },
   {
     Yandroid_nwB,			FALSE,	TRUE,
-    EL_EMC_ANDROID,			ACTION_TURNING_FROM_UP, MV_BIT_LEFT
+    EL_EMC_ANDROID,			ACTION_SHRINKING, MV_BIT_UPLEFT
   },
   {
     Xspring,				TRUE,	FALSE,
@@ -5534,7 +5534,7 @@ int el_act_dir2img(int element, int action, int direction)
   if (direction == MV_NONE)
     return element_info[element].graphic[action];
 
-  direction = MV_DIR_BIT(direction);
+  direction = MV_DIR_TO_BIT(direction);
 
   return element_info[element].direction_graphic[action][direction];
 }
@@ -5542,7 +5542,7 @@ int el_act_dir2img(int element, int action, int direction)
 int el_act_dir2img(int element, int action, int direction)
 {
   element = GFX_ELEMENT(element);
-  direction = MV_DIR_BIT(direction);	/* default: MV_NONE => MV_DOWN */
+  direction = MV_DIR_TO_BIT(direction);	/* default: MV_NONE => MV_DOWN */
 
   /* direction_graphic[][] == graphic[] for undefined direction graphics */
   return element_info[element].direction_graphic[action][direction];
@@ -5557,7 +5557,7 @@ static int el_act_dir2crm(int element, int action, int direction)
   if (direction == MV_NONE)
     return element_info[element].crumbled[action];
 
-  direction = MV_DIR_BIT(direction);
+  direction = MV_DIR_TO_BIT(direction);
 
   return element_info[element].direction_crumbled[action][direction];
 }
@@ -5565,7 +5565,7 @@ static int el_act_dir2crm(int element, int action, int direction)
 static int el_act_dir2crm(int element, int action, int direction)
 {
   element = GFX_ELEMENT(element);
-  direction = MV_DIR_BIT(direction);	/* default: MV_NONE => MV_DOWN */
+  direction = MV_DIR_TO_BIT(direction);	/* default: MV_NONE => MV_DOWN */
 
   /* direction_graphic[][] == graphic[] for undefined direction graphics */
   return element_info[element].direction_crumbled[action][direction];
@@ -5695,7 +5695,8 @@ void InitGraphicInfo_EM(void)
       object_mapping[e].action = em_object_mapping_list[i].action;
 
     if (em_object_mapping_list[i].direction != -1)
-      object_mapping[e].direction = (1 << em_object_mapping_list[i].direction);
+      object_mapping[e].direction =
+	MV_DIR_FROM_BIT(em_object_mapping_list[i].direction);
   }
 
   for (i = 0; em_player_mapping_list[i].action_em != -1; i++)
@@ -5710,7 +5711,7 @@ void InitGraphicInfo_EM(void)
 
     if (em_player_mapping_list[i].direction != -1)
       player_mapping[p][a].direction =
-	(1 << em_player_mapping_list[i].direction);
+	MV_DIR_FROM_BIT(em_player_mapping_list[i].direction);
   }
 
   for (i = 0; i < TILE_MAX; i++)
@@ -6026,6 +6027,13 @@ void InitGraphicInfo_EM(void)
 	(i << 16) | (j << 12) | (g_em->width << 6) | g_em->height;
 
 #if DEBUG_EM_GFX
+
+#if 1
+      /* skip check for EMC elements not contained in original EMC artwork */
+      if (element == EL_EMC_FAKE_ACID)
+	continue;
+#endif
+
       if (g_em->bitmap != debug_bitmap ||
 	  g_em->src_x != debug_src_x ||
 	  g_em->src_y != debug_src_y ||
