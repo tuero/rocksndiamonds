@@ -3168,6 +3168,7 @@ void InitElementPropertiesStatic()
     EL_AMOEBA_DRY,
     EL_AMOEBA_FULL,
     EL_BD_AMOEBA,
+    EL_EMC_DRIPPER,
 
     -1
   };
@@ -3178,6 +3179,7 @@ void InitElementPropertiesStatic()
     EL_AMOEBA_DRY,
     EL_AMOEBA_FULL,
     EL_BD_AMOEBA,
+    EL_EMC_DRIPPER,
 
     -1
   };
@@ -3215,6 +3217,7 @@ void InitElementPropertiesStatic()
     EL_AMOEBA_FULL,
     EL_GAME_OF_LIFE,
     EL_BIOMAZE,
+    EL_EMC_DRIPPER,
 
     -1
   };

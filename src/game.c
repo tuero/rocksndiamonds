@@ -179,6 +179,9 @@
 #define SATELLITE_CAN_ENTER_FIELD(x, y)					\
 	ELEMENT_CAN_ENTER_FIELD_BASE_2(EL_SATELLITE, x, y, 0)
 
+#define ANDROID_CAN_ENTER_FIELD(e, x, y)				\
+	ELEMENT_CAN_ENTER_FIELD_BASE_2(e, x, y, Feld[x][y] == EL_EMC_PLANT)
+
 #define ENEMY_CAN_ENTER_FIELD(e, x, y)					\
 	ELEMENT_CAN_ENTER_FIELD_BASE_2(e, x, y, 0)
 
@@ -329,6 +332,8 @@ static void RunTimegateWheel(int, int);
 
 static void InitMagicBallDelay(int, int);
 static void ActivateMagicBall(int, int);
+
+static void InitAndroid(int, int);
 
 struct ChangingElementInfo
 {
@@ -510,6 +515,22 @@ static struct ChangingElementInfo change_delay_list[] =
     NULL,
     NULL,
     NULL
+  },
+  {
+    EL_EMC_ANDROID_SHRINKING,
+    EL_EMPTY,
+    8,
+    NULL,
+    NULL,
+    NULL
+  },
+  {
+    EL_EMC_ANDROID_GROWING,
+    EL_EMC_ANDROID,
+    8,
+    NULL,
+    NULL,
+    InitAndroid
   },
 
   {
@@ -2817,8 +2838,13 @@ void InitMovingField(int x, int y, int direction)
 void Moving2Blocked(int x, int y, int *goes_to_x, int *goes_to_y)
 {
   int direction = MovDir[x][y];
+#if 1
+  int newx = x + (direction & MV_LEFT ? -1 : direction & MV_RIGHT ? +1 : 0);
+  int newy = y + (direction & MV_UP   ? -1 : direction & MV_DOWN  ? +1 : 0);
+#else
   int newx = x + (direction == MV_LEFT ? -1 : direction == MV_RIGHT ? +1 : 0);
   int newy = y + (direction == MV_UP   ? -1 : direction == MV_DOWN  ? +1 : 0);
+#endif
 
   *goes_to_x = newx;
   *goes_to_y = newy;
@@ -4694,7 +4720,8 @@ inline static void TurnRoundExt(int x, int y)
   }
   else if (element == EL_ROBOT ||
 	   element == EL_SATELLITE ||
-	   element == EL_PENGUIN)
+	   element == EL_PENGUIN ||
+	   element == EL_EMC_ANDROID)
   {
     int attr_x = -1, attr_y = -1;
 
@@ -4795,21 +4822,21 @@ inline static void TurnRoundExt(int x, int y)
 	  new_move_dir & (first_horiz ? MV_HORIZONTAL : MV_VERTICAL);
 	Moving2Blocked(x, y, &newx, &newy);
 
-	if (PENGUIN_CAN_ENTER_FIELD(EL_PENGUIN, newx, newy))
+	if (PENGUIN_CAN_ENTER_FIELD(element, newx, newy))
 	  return;
 
 	MovDir[x][y] =
 	  new_move_dir & (!first_horiz ? MV_HORIZONTAL : MV_VERTICAL);
 	Moving2Blocked(x, y, &newx, &newy);
 
-	if (PENGUIN_CAN_ENTER_FIELD(EL_PENGUIN, newx, newy))
+	if (PENGUIN_CAN_ENTER_FIELD(element, newx, newy))
 	  return;
 
 	MovDir[x][y] = old_move_dir;
 	return;
       }
     }
-    else	/* (element == EL_SATELLITE) */
+    else if (element == EL_SATELLITE)
     {
       int newx, newy;
 
@@ -4836,6 +4863,70 @@ inline static void TurnRoundExt(int x, int y)
 
 	MovDir[x][y] = old_move_dir;
 	return;
+      }
+    }
+    else if (element == EL_EMC_ANDROID)
+    {
+      static int check_pos[16] =
+      {
+	-1,		/*  0 => (invalid)          */
+	7,		/*  1 => MV_LEFT            */
+	3,		/*  2 => MV_RIGHT           */
+	-1,		/*  3 => (invalid)          */
+	1,		/*  4 =>            MV_UP   */
+	0,		/*  5 => MV_LEFT  | MV_UP   */
+	2,		/*  6 => MV_RIGHT | MV_UP   */
+	-1,		/*  7 => (invalid)          */
+	5,		/*  8 =>            MV_DOWN */
+	6,		/*  9 => MV_LEFT  | MV_DOWN */
+	4,		/* 10 => MV_RIGHT | MV_DOWN */
+	-1,		/* 11 => (invalid)          */
+	-1,		/* 12 => (invalid)          */
+	-1,		/* 13 => (invalid)          */
+	-1,		/* 14 => (invalid)          */
+	-1,		/* 15 => (invalid)          */
+      };
+      static struct
+      {
+	int dx, dy;
+	int dir;
+      } check_xy[8] =
+      {
+        { -1, -1,	MV_LEFT  | MV_UP   },
+       	{  0, -1,	           MV_UP   },
+	{ +1, -1,	MV_RIGHT | MV_UP   },
+	{ +1,  0,	MV_RIGHT           },
+	{ +1, +1,	MV_RIGHT | MV_DOWN },
+	{  0, +1,	           MV_DOWN },
+	{ -1, +1,	MV_LEFT  | MV_DOWN },
+	{ -1,  0,	MV_LEFT            },
+      };
+      int check_order = (RND(2) ? -1 : +1);
+      int start_pos = check_pos[MovDir[x][y] & 0x0f];
+      int i;
+
+      MovDelay[x][y] = level.android_move_time;
+
+      if (start_pos < 0)	/* (should never happen) */
+	return;
+
+      for (i = 0; i < 3; i++)
+      {
+	int pos_raw = start_pos + (i == 0 ? 0 : i == 1 ? 1 : -1) * check_order;
+	int pos = (pos_raw + 8) % 8;
+	int newx = x + check_xy[pos].dx;
+	int newy = y + check_xy[pos].dy;
+	int new_move_dir = check_xy[pos].dir;
+
+	if (IS_PLAYER(newx, newy))
+	  return;
+
+	if (ANDROID_CAN_ENTER_FIELD(element, newx, newy))
+	{
+	  MovDir[x][y] = new_move_dir;
+
+	  return;
+	}
       }
     }
   }
@@ -5652,6 +5743,48 @@ void StartMoving(int x, int y)
 	return;
       }
     }
+    else if (element == EL_EMC_ANDROID && IN_LEV_FIELD(newx, newy))
+    {
+      if (MovDir[x][y] & MV_HORIZONTAL && MovDir[x][y] & MV_VERTICAL &&
+	  ANDROID_CAN_ENTER_FIELD(element, newx, newy))
+      {
+	/* android is moving diagonally */
+
+	CreateField(x, y, EL_EMC_ANDROID_SHRINKING);
+
+#if 0
+	CheckTriggeredElementChangeBySide(x, y, element,
+					  CE_MOVE_OF_X, new_move_dir);
+
+	TestIfElementTouchesCustomElement(x, y); /* empty or new element */
+
+	TestIfElementHitsCustomElement(newx, newy, new_move_dir);
+	TestIfElementTouchesCustomElement(newx, newy);
+#endif
+
+	CreateField(newx, newy, EL_EMC_ANDROID_GROWING);
+
+	return;
+      }
+      else if (ANDROID_CAN_ENTER_FIELD(element, newx, newy))
+      {
+	Feld[newx][newy] = EL_EMPTY;
+	DrawLevelField(newx, newy);
+
+	PlayLevelSoundAction(x, y, ACTION_DIGGING);
+      }
+      else if (!IS_FREE(newx, newy))
+      {
+#if 0
+	if (IS_PLAYER(x, y))
+	  DrawPlayerField(x, y);
+	else
+	  DrawLevelField(x, y);
+#endif
+
+	return;
+      }
+    }
     else if (IS_CUSTOM_ELEMENT(element) &&
 	     CUSTOM_ELEMENT_CAN_ENTER_FIELD(element, newx, newy))
     {
@@ -6153,6 +6286,9 @@ void ContinueMoving(int x, int y)
 					player->index_bit, push_side);
   }
 
+  if (element == EL_EMC_ANDROID && pushed_by_player)	/* make another move */
+    MovDelay[newx][newy] = 1;
+
   CheckTriggeredElementChangeBySide(x, y, element, CE_MOVE_OF_X, direction);
 
   TestIfElementTouchesCustomElement(x, y);	/* empty or new element */
@@ -6430,6 +6566,7 @@ void AmoebeAbleger(int ax, int ay)
   int element = Feld[ax][ay];
   int graphic = el2img(element);
   int newax = ax, neway = ay;
+  boolean can_drop = (element == EL_AMOEBA_WET || element == EL_EMC_DRIPPER);
   static int xy[4][2] =
   {
     { 0, -1 },
@@ -6438,7 +6575,7 @@ void AmoebeAbleger(int ax, int ay)
     { 0, +1 }
   };
 
-  if (!level.amoeba_speed)
+  if (!level.amoeba_speed && element != EL_EMC_DRIPPER)
   {
     Feld[ax][ay] = EL_AMOEBA_DEAD;
     DrawLevelField(ax, ay);
@@ -6458,7 +6595,7 @@ void AmoebeAbleger(int ax, int ay)
       return;
   }
 
-  if (element == EL_AMOEBA_WET)	/* object is an acid / amoeba drop */
+  if (can_drop)			/* EL_AMOEBA_WET or EL_EMC_DRIPPER */
   {
     int start = RND(4);
     int x = ax + xy[start][0];
@@ -6552,13 +6689,13 @@ void AmoebeAbleger(int ax, int ay)
     }
   }
 
-  if (element != EL_AMOEBA_WET || neway < ay || !IS_FREE(newax, neway) ||
+  if (!can_drop || neway < ay || !IS_FREE(newax, neway) ||
       (neway == lev_fieldy - 1 && newax != ax))
   {
     Feld[newax][neway] = EL_AMOEBA_GROWING;	/* creation of new amoeba */
     Store[newax][neway] = element;
   }
-  else if (neway == ay)
+  else if (neway == ay || element == EL_EMC_DRIPPER)
   {
     Feld[newax][neway] = EL_AMOEBA_DROP;	/* drop left/right of amoeba */
 
@@ -6724,6 +6861,11 @@ static void ActivateMagicBall(int bx, int by)
   }
 
   game.ball_content_nr = (game.ball_content_nr + 1) % level.num_ball_contents;
+}
+
+static void InitAndroid(int x, int y)
+{
+  MovDelay[x][y] = level.android_move_time;
 }
 
 void CheckExit(int x, int y)

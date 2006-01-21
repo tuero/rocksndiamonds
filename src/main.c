@@ -3949,6 +3949,16 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
     "emc_spring_bumper",
     "spring bumper",
   },
+  {
+    "emc_android.shrinking",
+    "emc_android",
+    "android",
+  },
+  {
+    "emc_android.growing",
+    "emc_android",
+    "android",
+  },
 
   /* ----------------------------------------------------------------------- */
   /* "unreal" (and therefore not drawable) runtime elements                  */

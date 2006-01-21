@@ -3312,11 +3312,7 @@ static int editor_el_emerald_mine_club[] =
   EL_SPRING,
   EL_EMC_SPRING_BUMPER,
 
-#if 0
   EL_EMC_DRIPPER,
-#else
-  EL_EMPTY,
-#endif
   EL_EMC_FAKE_GRASS,
   EL_EMPTY,
   EL_EMPTY,
@@ -7669,6 +7665,7 @@ static struct
   { EL_AMOEBA_DRY,	&level.amoeba_speed,		TEXT_AMOEBA_SPEED },
   { EL_AMOEBA_FULL,	&level.amoeba_speed,		TEXT_AMOEBA_SPEED },
   { EL_BD_AMOEBA,	&level.amoeba_speed,		TEXT_AMOEBA_SPEED },
+  { EL_EMC_DRIPPER,	&level.amoeba_speed,		TEXT_AMOEBA_SPEED },
   { EL_MAGIC_WALL,	&level.time_magic_wall,		TEXT_DURATION	},
   { EL_BD_MAGIC_WALL,	&level.time_magic_wall,		TEXT_DURATION	},
   { EL_ROBOT_WHEEL,	&level.time_wheel,		TEXT_DURATION	},
