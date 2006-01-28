@@ -1250,6 +1250,11 @@ inline void InitJoysticks()
 #elif defined(PLATFORM_MSDOS)
   MSDOSInitJoysticks();
 #endif
+
+#if 0
+  for (i = 0; i < MAX_PLAYERS; i++)
+    printf("::: Joystick for player %d: %d\n", i, joystick.fd[i]);
+#endif
 }
 
 inline boolean ReadJoystick(int nr, int *x, int *y, boolean *b1, boolean *b2)

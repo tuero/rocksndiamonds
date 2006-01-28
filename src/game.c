@@ -333,7 +333,7 @@ static void RunTimegateWheel(int, int);
 static void InitMagicBallDelay(int, int);
 static void ActivateMagicBall(int, int);
 
-static void InitAndroid(int, int);
+static void InitDiagonalMovingElement(int, int);
 
 struct ChangingElementInfo
 {
@@ -517,20 +517,20 @@ static struct ChangingElementInfo change_delay_list[] =
     NULL
   },
   {
-    EL_EMC_ANDROID_SHRINKING,
+    EL_DIAGONAL_SHRINKING,
     EL_EMPTY,
-    8,
+    0,
     NULL,
     NULL,
     NULL
   },
   {
-    EL_EMC_ANDROID_GROWING,
-    EL_EMC_ANDROID,
-    8,
+    EL_DIAGONAL_GROWING,
+    EL_EMPTY,
+    0,
     NULL,
     NULL,
-    InitAndroid
+    InitDiagonalMovingElement
   },
 
   {
@@ -4912,7 +4912,8 @@ inline static void TurnRoundExt(int x, int y)
 
       for (i = 0; i < 3; i++)
       {
-	int pos_raw = start_pos + (i == 0 ? 0 : i == 1 ? 1 : -1) * check_order;
+	/* first check start_pos, then previous/next or (next/previous) pos */
+	int pos_raw = start_pos + (i < 2 ? i : -1) * check_order;
 	int pos = (pos_raw + 8) % 8;
 	int newx = x + check_xy[pos].dx;
 	int newy = y + check_xy[pos].dy;
@@ -5748,9 +5749,24 @@ void StartMoving(int x, int y)
       if (MovDir[x][y] & MV_HORIZONTAL && MovDir[x][y] & MV_VERTICAL &&
 	  ANDROID_CAN_ENTER_FIELD(element, newx, newy))
       {
+	int diagonal_move_dir = MovDir[x][y];
+	int change_delay = 8;
+	int graphic;
+
 	/* android is moving diagonally */
 
-	CreateField(x, y, EL_EMC_ANDROID_SHRINKING);
+	CreateField(x, y, EL_DIAGONAL_SHRINKING);
+
+	GfxElement[x][y] = EL_EMC_ANDROID;
+	GfxAction[x][y] = ACTION_SHRINKING;
+	GfxDir[x][y] = diagonal_move_dir;
+	ChangeDelay[x][y] = change_delay;
+
+	graphic = el_act_dir2img(GfxElement[x][y], GfxAction[x][y],
+				 GfxDir[x][y]);
+
+	DrawLevelGraphicAnimation(x, y, graphic);
+	PlayLevelSoundAction(x, y, ACTION_SHRINKING);
 
 #if 0
 	CheckTriggeredElementChangeBySide(x, y, element,
@@ -5762,7 +5778,19 @@ void StartMoving(int x, int y)
 	TestIfElementTouchesCustomElement(newx, newy);
 #endif
 
-	CreateField(newx, newy, EL_EMC_ANDROID_GROWING);
+	CreateField(newx, newy, EL_DIAGONAL_GROWING);
+
+	Store[newx][newy] = EL_EMC_ANDROID;
+	GfxElement[newx][newy] = EL_EMC_ANDROID;
+	GfxAction[newx][newy] = ACTION_GROWING;
+	GfxDir[newx][newy] = diagonal_move_dir;
+	ChangeDelay[newx][newy] = change_delay;
+
+	graphic = el_act_dir2img(GfxElement[newx][newy], GfxAction[newx][newy],
+				 GfxDir[newx][newy]);
+
+	DrawLevelGraphicAnimation(newx, newy, graphic);
+	PlayLevelSoundAction(newx, newy, ACTION_GROWING);
 
 	return;
       }
@@ -6863,9 +6891,11 @@ static void ActivateMagicBall(int bx, int by)
   game.ball_content_nr = (game.ball_content_nr + 1) % level.num_ball_contents;
 }
 
-static void InitAndroid(int x, int y)
+static void InitDiagonalMovingElement(int x, int y)
 {
+#if 0
   MovDelay[x][y] = level.android_move_time;
+#endif
 }
 
 void CheckExit(int x, int y)
@@ -7862,6 +7892,9 @@ static boolean ChangeElement(int x, int y, int element, int page)
   else
   {
     target_element = GET_TARGET_ELEMENT(change->target_element, change);
+
+    if (element == EL_DIAGONAL_GROWING)
+      target_element = Store[x][y];
 
     CreateElementFromChange(x, y, target_element);
 
@@ -8887,7 +8920,9 @@ void GameActions()
       CheckForDragon(x, y);
     else if (element == EL_EXPLOSION)
       ;	/* drawing of correct explosion animation is handled separately */
-    else if (element == EL_ELEMENT_SNAPPING)
+    else if (element == EL_ELEMENT_SNAPPING ||
+	     element == EL_DIAGONAL_SHRINKING ||
+	     element == EL_DIAGONAL_GROWING)
     {
 #if 1
       graphic = el_act_dir2img(GfxElement[x][y], GfxAction[x][y],GfxDir[x][y]);

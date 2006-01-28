@@ -1435,6 +1435,7 @@ void SDLInitJoysticks()
 
   for (i = 0; i < MAX_PLAYERS; i++)
   {
+    /* get configured joystick for this player */
     char *device_name = setup.input[i].joy.device_name;
     int joystick_nr = getJoystickNrFromDeviceName(device_name);
 

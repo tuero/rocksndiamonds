@@ -2514,6 +2514,8 @@ static void drawPlayerSetupInputInfo(int player_nr)
     "Joystick4"
   };
 
+  InitJoysticks();
+
   custom_key = setup.input[player_nr].key;
 
   DrawText(mSX + 11 * 32, mSY + 2 * 32, int2str(player_nr + 1, 1),
@@ -2527,10 +2529,10 @@ static void drawPlayerSetupInputInfo(int player_nr)
   if (setup.input[player_nr].use_joystick)
   {
     char *device_name = setup.input[player_nr].joy.device_name;
+    char *text = joystick_name[getJoystickNrFromDeviceName(device_name)];
+    int font_nr = (joystick.fd[player_nr] < 0 ? FONT_VALUE_OLD : FONT_VALUE_1);
 
-    DrawText(mSX + 8 * 32, mSY + 3 * 32,
-	     joystick_name[getJoystickNrFromDeviceName(device_name)],
-	     FONT_VALUE_1);
+    DrawText(mSX + 8 * 32, mSY + 3 * 32, text, font_nr);
     DrawText(mSX + 32, mSY + 4 * 32, "Calibrate", FONT_MENU_1);
   }
   else
@@ -2982,7 +2984,9 @@ static boolean CalibrateJoystickMain(int player_nr)
 
   StopAnimation();
 
+#if 0
   DrawSetupScreen_Input();
+#endif
 
   /* wait until the last pressed button was released */
   while (Joystick(player_nr) & JOY_BUTTON)
@@ -3005,13 +3009,25 @@ void CalibrateJoystick(int player_nr)
 {
   if (!CalibrateJoystickMain(player_nr))
   {
+    char *device_name = setup.input[player_nr].joy.device_name;
+    int nr = getJoystickNrFromDeviceName(device_name) + 1;
+    int xpos = mSX - SX;
+    int ypos = mSY - SY;
+
     ClearWindow();
 
-    DrawText(mSX + 16, mSY + 6 * 32, "  JOYSTICK NOT  ",  FONT_TITLE_1);
-    DrawText(mSX,      mSY + 7 * 32, "    AVAILABLE    ", FONT_TITLE_1);
+    DrawTextF(xpos + 16, ypos + 6 * 32, FONT_TITLE_1, "   JOYSTICK %d   ", nr);
+    DrawTextF(xpos + 16, ypos + 7 * 32, FONT_TITLE_1, " NOT AVAILABLE! ");
     BackToFront();
-    Delay(2000);	/* show error message for two seconds */
+
+    Delay(2000);		/* show error message for a short time */
+
+    ClearEventQueue();
   }
+
+#if 1
+  DrawSetupScreen_Input();
+#endif
 }
 
 void DrawSetupScreen()
