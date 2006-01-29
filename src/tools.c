@@ -4807,6 +4807,9 @@ void map_android_clone_elements_RND_to_EM(struct LevelInfo *level)
   struct LEVEL *lev = level_em->lev;
   int i, j;
 
+  for (i = 0; i < TILE_MAX; i++)
+    lev->android_array[i] = Xblank;
+
   for (i = 0; i < level->num_android_clone_elements; i++)
   {
     int element_rnd = level->android_clone_element[i];

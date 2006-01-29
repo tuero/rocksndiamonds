@@ -1789,6 +1789,55 @@ boolean getBitfieldProperty(int *bitfield, int property_bit_nr, int element)
   return FALSE;
 }
 
+#if 1
+static void resolve_group_element(int group_element, int recursion_depth)
+{
+  static int group_nr;
+  static struct ElementGroupInfo *group;
+  struct ElementGroupInfo *actual_group = element_info[group_element].group;
+  int i;
+
+  if (actual_group == NULL)			/* not yet initialized */
+    return;
+
+  if (recursion_depth > NUM_GROUP_ELEMENTS)	/* recursion too deep */
+  {
+    Error(ERR_WARN, "recursion too deep when resolving group element %d",
+	  group_element - EL_GROUP_START + 1);
+
+    /* replace element which caused too deep recursion by question mark */
+    group->element_resolved[group->num_elements_resolved++] = EL_UNKNOWN;
+
+    return;
+  }
+
+  if (recursion_depth == 0)			/* initialization */
+  {
+    group = actual_group;
+    group_nr = group_element - EL_GROUP_START;
+
+    group->num_elements_resolved = 0;
+    group->choice_pos = 0;
+  }
+
+  for (i = 0; i < actual_group->num_elements; i++)
+  {
+    int element = actual_group->element[i];
+
+    if (group->num_elements_resolved == NUM_FILE_ELEMENTS)
+      break;
+
+    if (IS_GROUP_ELEMENT(element))
+      resolve_group_element(element, recursion_depth + 1);
+    else
+    {
+      group->element_resolved[group->num_elements_resolved++] = element;
+      element_info[element].in_group[group_nr] = TRUE;
+    }
+  }
+}
+#endif
+
 void InitElementPropertiesStatic()
 {
   static int ep_diggable[] =
@@ -3607,6 +3656,17 @@ void InitElementPropertiesEngine(int engine_version)
      property (which means that conditional property changes must be set to
      a reliable default value before) */
 
+#if 1
+  /* ---------- recursively resolve group elements ------------------------- */
+
+  for (i = 0; i < MAX_NUM_ELEMENTS; i++)
+    for (j = 0; j < NUM_GROUP_ELEMENTS; j++)
+      element_info[i].in_group[j] = FALSE;
+
+  for (i = 0; i < NUM_GROUP_ELEMENTS; i++)
+    resolve_group_element(EL_GROUP_START + i, 0);
+#endif
+
   /* set all special, combined or engine dependent element properties */
   for (i = 0; i < MAX_NUM_ELEMENTS; i++)
   {
@@ -3745,6 +3805,12 @@ void InitElementPropertiesEngine(int engine_version)
     /* ---------- SP_PORT -------------------------------------------------- */
     SET_PROPERTY(i, EP_SP_PORT, (IS_SP_ELEMENT(i) &&
 				 IS_PASSABLE_INSIDE(i)));
+
+    /* ---------- CAN_BE_CLONED_BY_ANDROID --------------------------------- */
+    for (j = 0; j < level.num_android_clone_elements; j++)
+      SET_PROPERTY(i, EP_CAN_BE_CLONED_BY_ANDROID,
+		   (i != EL_EMPTY &&
+		    IS_EQUAL_OR_IN_GROUP(i, level.android_clone_element[j])));
 
     /* ---------- CAN_CHANGE ----------------------------------------------- */
     SET_PROPERTY(i, EP_CAN_CHANGE, FALSE);	/* default: cannot change */

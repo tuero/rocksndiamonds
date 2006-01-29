@@ -150,19 +150,20 @@
 #define EP_CAN_EXPLODE_BY_EXPLOSION	78
 #define EP_COULD_MOVE_INTO_ACID		79
 #define EP_MAYBE_DONT_COLLIDE_WITH	80
+#define EP_CAN_BE_CLONED_BY_ANDROID	81
 
 /* values for internal purpose only (level editor) */
-#define EP_WALK_TO_OBJECT		81
-#define EP_DEADLY			82
-#define EP_EDITOR_CASCADE		83
-#define EP_EDITOR_CASCADE_ACTIVE	84
-#define EP_EDITOR_CASCADE_INACTIVE	85
+#define EP_WALK_TO_OBJECT		82
+#define EP_DEADLY			83
+#define EP_EDITOR_CASCADE		84
+#define EP_EDITOR_CASCADE_ACTIVE	85
+#define EP_EDITOR_CASCADE_INACTIVE	86
 
 /* values for internal purpose only (game engine) */
-#define EP_HAS_ACTION			86
-#define EP_CAN_CHANGE_OR_HAS_ACTION	87
+#define EP_HAS_ACTION			87
+#define EP_CAN_CHANGE_OR_HAS_ACTION	88
 
-#define NUM_ELEMENT_PROPERTIES		88
+#define NUM_ELEMENT_PROPERTIES		89
 
 #define NUM_EP_BITFIELDS		((NUM_ELEMENT_PROPERTIES + 31) / 32)
 #define EP_BITFIELD_BASE		0
@@ -564,6 +565,8 @@
 				HAS_PROPERTY(e, EP_CAN_EXPLODE_BY_EXPLOSION)
 #define COULD_MOVE_INTO_ACID(e)	HAS_PROPERTY(e, EP_COULD_MOVE_INTO_ACID)
 #define MAYBE_DONT_COLLIDE_WITH(e) HAS_PROPERTY(e, EP_MAYBE_DONT_COLLIDE_WITH)
+#define CAN_BE_CLONED_BY_ANDROID(e)	\
+				HAS_PROPERTY(e, EP_CAN_BE_CLONED_BY_ANDROID)
 
 #define IS_EDITOR_CASCADE(e)	HAS_PROPERTY(e, EP_EDITOR_CASCADE)
 #define IS_EDITOR_CASCADE_ACTIVE(e)	\
@@ -662,6 +665,15 @@
 #define SND_ELEMENT(e)		(e)
 #endif
 
+#if 1
+#define GROUP_NR(e)		((e) - EL_GROUP_START)
+#define IS_IN_GROUP(e, nr)	(element_info[e].in_group[nr] == TRUE)
+#define IS_IN_GROUP_EL(e, ge)	(IS_IN_GROUP(e, (ge) - EL_GROUP_START))
+
+#define IS_EQUAL_OR_IN_GROUP(e, ge)					\
+	(IS_GROUP_ELEMENT(ge) ? IS_IN_GROUP(e, GROUP_NR(ge)) : (e) == (ge))
+#endif
+
 #define IS_PLAYER(x, y)		(ELEM_IS_PLAYER(StorePlayer[x][y]))
 
 #define IS_FREE(x, y)		(Feld[x][y] == EL_EMPTY && !IS_PLAYER(x, y))
@@ -670,6 +682,8 @@
 #define IS_MOVING(x,y)		(MovPos[x][y] != 0)
 #define IS_FALLING(x,y)		(MovPos[x][y] != 0 && MovDir[x][y] == MV_DOWN)
 #define IS_BLOCKED(x,y)		(Feld[x][y] == EL_BLOCKED)
+
+#define IS_MV_DIAGONAL(x)	((x) & MV_HORIZONTAL && (x) & MV_VERTICAL)
 
 #define EL_CHANGED(e)		((e) == EL_ROCK           ? EL_EMERALD :    \
 				 (e) == EL_BD_ROCK        ? EL_BD_DIAMOND : \

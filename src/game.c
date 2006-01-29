@@ -38,6 +38,7 @@
 #define USE_ONE_MORE_CHANGE_PER_FRAME	(USE_NEW_STUFF		* 1)
 #define USE_FIXED_DONT_RUN_INTO		(USE_NEW_STUFF		* 1)
 #define USE_NEW_SPRING_BUMPER		(USE_NEW_STUFF		* 1)
+#define USE_STOP_CHANGED_ELEMENTS	(USE_NEW_STUFF		* 1)
 
 #define USE_QUICKSAND_IMPACT_BUGFIX	(USE_NEW_STUFF		* 0)
 
@@ -182,6 +183,10 @@
 #define ANDROID_CAN_ENTER_FIELD(e, x, y)				\
 	ELEMENT_CAN_ENTER_FIELD_BASE_2(e, x, y, Feld[x][y] == EL_EMC_PLANT)
 
+#define ANDROID_CAN_CLONE_FIELD(x, y)					\
+	(IN_LEV_FIELD(x, y) && (CAN_BE_CLONED_BY_ANDROID(Feld[x][y]) ||	\
+				CAN_BE_CLONED_BY_ANDROID(EL_TRIGGER_ELEMENT)))
+
 #define ENEMY_CAN_ENTER_FIELD(e, x, y)					\
 	ELEMENT_CAN_ENTER_FIELD_BASE_2(e, x, y, 0)
 
@@ -213,13 +218,16 @@
 	(IN_LEV_FIELD(x, y) && (Feld[x][y] == EL_EMC_SPRING_BUMPER ||	\
 				Feld[x][y] == EL_EMC_SPRING_BUMPER_ACTIVE))
 
+#if 0
 #define GROUP_NR(e)		((e) - EL_GROUP_START)
-#define MOVE_ENTER_EL(e)	(element_info[e].move_enter_element)
 #define IS_IN_GROUP(e, nr)	(element_info[e].in_group[nr] == TRUE)
 #define IS_IN_GROUP_EL(e, ge)	(IS_IN_GROUP(e, (ge) - EL_GROUP_START))
 
 #define IS_EQUAL_OR_IN_GROUP(e, ge)					\
 	(IS_GROUP_ELEMENT(ge) ? IS_IN_GROUP(e, GROUP_NR(ge)) : (e) == (ge))
+#endif
+
+#define MOVE_ENTER_EL(e)	(element_info[e].move_enter_element)
 
 #define CE_ENTER_FIELD_COND(e, x, y)					\
 		(!IS_PLAYER(x, y) &&					\
@@ -518,7 +526,7 @@ static struct ChangingElementInfo change_delay_list[] =
   },
   {
     EL_DIAGONAL_SHRINKING,
-    EL_EMPTY,
+    EL_UNDEFINED,
     0,
     NULL,
     NULL,
@@ -526,7 +534,7 @@ static struct ChangingElementInfo change_delay_list[] =
   },
   {
     EL_DIAGONAL_GROWING,
-    EL_EMPTY,
+    EL_UNDEFINED,
     0,
     NULL,
     NULL,
@@ -1227,6 +1235,7 @@ void DrawGameDoorValues()
     DrawGameValue_Keys(stored_player[i].key);
 }
 
+#if 0
 static void resolve_group_element(int group_element, int recursion_depth)
 {
   static int group_nr;
@@ -1270,7 +1279,7 @@ static void resolve_group_element(int group_element, int recursion_depth)
     }
   }
 }
-
+#endif
 
 /*
   =============================================================================
@@ -1402,6 +1411,7 @@ static void InitGameEngine()
   printf("       => game.engine_version == %06d\n", game.engine_version);
 #endif
 
+#if 0
   /* ---------- recursively resolve group elements ------------------------- */
 
   for (i = 0; i < MAX_NUM_ELEMENTS; i++)
@@ -1410,6 +1420,7 @@ static void InitGameEngine()
 
   for (i = 0; i < NUM_GROUP_ELEMENTS; i++)
     resolve_group_element(EL_GROUP_START + i, 0);
+#endif
 
   /* ---------- initialize player's initial move delay --------------------- */
 
@@ -4901,14 +4912,86 @@ inline static void TurnRoundExt(int x, int y)
 	{ -1, +1,	MV_LEFT  | MV_DOWN },
 	{ -1,  0,	MV_LEFT            },
       };
-      int check_order = (RND(2) ? -1 : +1);
-      int start_pos = check_pos[MovDir[x][y] & 0x0f];
+      int start_pos, check_order;
+      boolean can_clone = FALSE;
       int i;
 
-      MovDelay[x][y] = level.android_move_time * 8 + 1;
+      /* check if there is any free field around current position */
+      for (i = 0; i < 8; i++)
+      {
+	int newx = x + check_xy[i].dx;
+	int newy = y + check_xy[i].dy;
 
-      if (start_pos < 0)	/* (should never happen) */
+	if (IN_LEV_FIELD_AND_IS_FREE(newx, newy))
+	{
+	  can_clone = TRUE;
+
+	  break;
+	}
+      }
+
+      if (can_clone)		/* randomly find an element to clone */
+      {
+	can_clone = FALSE;
+
+	start_pos = check_pos[RND(8)];
+	check_order = (RND(2) ? -1 : +1);
+
+	for (i = 0; i < 8; i++)
+	{
+	  int pos_raw = start_pos + i * check_order;
+	  int pos = (pos_raw + 8) % 8;
+	  int newx = x + check_xy[pos].dx;
+	  int newy = y + check_xy[pos].dy;
+
+	  if (ANDROID_CAN_CLONE_FIELD(newx, newy))
+	  {
+	    element_info[element].move_leave_type = LEAVE_TYPE_LIMITED;
+	    element_info[element].move_leave_element = EL_TRIGGER_ELEMENT;
+
+	    Store[x][y] = Feld[newx][newy];
+
+	    can_clone = TRUE;
+
+	    break;
+	  }
+	}
+      }
+
+      if (can_clone)		/* randomly find a direction to move */
+      {
+	can_clone = FALSE;
+
+	start_pos = check_pos[RND(8)];
+	check_order = (RND(2) ? -1 : +1);
+
+	for (i = 0; i < 8; i++)
+	{
+	  int pos_raw = start_pos + i * check_order;
+	  int pos = (pos_raw + 8) % 8;
+	  int newx = x + check_xy[pos].dx;
+	  int newy = y + check_xy[pos].dy;
+	  int new_move_dir = check_xy[pos].dir;
+
+	  if (IN_LEV_FIELD_AND_IS_FREE(newx, newy))
+	  {
+	    MovDir[x][y] = new_move_dir;
+	    MovDelay[x][y] = level.android_clone_time * 8 + 1;
+
+	    can_clone = TRUE;
+
+	    break;
+	  }
+	}
+      }
+
+      if (can_clone)		/* cloning and moving successful */
 	return;
+
+      /* cannot clone -- try to move towards player */
+
+      start_pos = check_pos[MovDir[x][y] & 0x0f];
+      check_order = (RND(2) ? -1 : +1);
 
       for (i = 0; i < 3; i++)
       {
@@ -4920,13 +5003,14 @@ inline static void TurnRoundExt(int x, int y)
 	int new_move_dir = check_xy[pos].dir;
 
 	if (IS_PLAYER(newx, newy))
-	  return;
+	  break;
 
 	if (ANDROID_CAN_ENTER_FIELD(element, newx, newy))
 	{
 	  MovDir[x][y] = new_move_dir;
+	  MovDelay[x][y] = level.android_move_time * 8 + 1;
 
-	  return;
+	  break;
 	}
       }
     }
@@ -5677,6 +5761,7 @@ void StartMoving(int x, int y)
 
     else if (CAN_MOVE_INTO_ACID(element) &&
 	     IN_LEV_FIELD(newx, newy) && Feld[newx][newy] == EL_ACID &&
+	     !IS_MV_DIAGONAL(MovDir[x][y]) &&
 	     (MovDir[x][y] == MV_DOWN ||
 	      game.engine_version >= VERSION_IDENT(3,1,0,0)))
     {
@@ -5746,60 +5831,82 @@ void StartMoving(int x, int y)
     }
     else if (element == EL_EMC_ANDROID && IN_LEV_FIELD(newx, newy))
     {
-      if (MovDir[x][y] & MV_HORIZONTAL && MovDir[x][y] & MV_VERTICAL &&
-	  ANDROID_CAN_ENTER_FIELD(element, newx, newy))
+      if (Store[x][y] != EL_EMPTY)
       {
-	int diagonal_move_dir = MovDir[x][y];
-	int change_delay = 8;
-	int graphic;
+	boolean can_clone = FALSE;
+	int xx, yy;
 
-	/* android is moving diagonally */
+	/* check if element to clone is still there */
+	for (yy = y - 1; yy <= y + 1; yy++) for (xx = x - 1; xx <= x + 1; xx++)
+	{
+	  if (IN_LEV_FIELD(xx, yy) && Feld[xx][yy] == Store[x][y])
+	  {
+	    can_clone = TRUE;
 
-	CreateField(x, y, EL_DIAGONAL_SHRINKING);
+	    break;
+	  }
+	}
 
-	GfxElement[x][y] = EL_EMC_ANDROID;
-	GfxAction[x][y] = ACTION_SHRINKING;
-	GfxDir[x][y] = diagonal_move_dir;
-	ChangeDelay[x][y] = change_delay;
-
-	graphic = el_act_dir2img(GfxElement[x][y], GfxAction[x][y],
-				 GfxDir[x][y]);
-
-	DrawLevelGraphicAnimation(x, y, graphic);
-	PlayLevelSoundAction(x, y, ACTION_SHRINKING);
-
-#if 0
-	CheckTriggeredElementChangeBySide(x, y, element,
-					  CE_MOVE_OF_X, new_move_dir);
-
-	TestIfElementTouchesCustomElement(x, y); /* empty or new element */
-
-	TestIfElementHitsCustomElement(newx, newy, new_move_dir);
-	TestIfElementTouchesCustomElement(newx, newy);
-#endif
-
-	CreateField(newx, newy, EL_DIAGONAL_GROWING);
-
-	Store[newx][newy] = EL_EMC_ANDROID;
-	GfxElement[newx][newy] = EL_EMC_ANDROID;
-	GfxAction[newx][newy] = ACTION_GROWING;
-	GfxDir[newx][newy] = diagonal_move_dir;
-	ChangeDelay[newx][newy] = change_delay;
-
-	graphic = el_act_dir2img(GfxElement[newx][newy], GfxAction[newx][newy],
-				 GfxDir[newx][newy]);
-
-	DrawLevelGraphicAnimation(newx, newy, graphic);
-	PlayLevelSoundAction(newx, newy, ACTION_GROWING);
-
-	return;
+	/* cannot clone or target field not free anymore -- do not clone */
+	if (!can_clone || !ANDROID_CAN_ENTER_FIELD(element, newx, newy))
+	  Store[x][y] = EL_EMPTY;
       }
-      else if (ANDROID_CAN_ENTER_FIELD(element, newx, newy))
-      {
-	Feld[newx][newy] = EL_EMPTY;
-	DrawLevelField(newx, newy);
 
-	PlayLevelSoundAction(x, y, ACTION_DIGGING);
+      if (ANDROID_CAN_ENTER_FIELD(element, newx, newy))
+      {
+	if (IS_MV_DIAGONAL(MovDir[x][y]))
+	{
+	  int diagonal_move_dir = MovDir[x][y];
+	  int stored = Store[x][y];
+	  int change_delay = 8;
+	  int graphic;
+
+	  /* android is moving diagonally */
+
+	  CreateField(x, y, EL_DIAGONAL_SHRINKING);
+
+	  Store[x][y] = (stored == EL_ACID ? EL_EMPTY : stored);
+	  GfxElement[x][y] = EL_EMC_ANDROID;
+	  GfxAction[x][y] = ACTION_SHRINKING;
+	  GfxDir[x][y] = diagonal_move_dir;
+	  ChangeDelay[x][y] = change_delay;
+
+	  graphic = el_act_dir2img(GfxElement[x][y], GfxAction[x][y],
+				   GfxDir[x][y]);
+
+	  DrawLevelGraphicAnimation(x, y, graphic);
+	  PlayLevelSoundAction(x, y, ACTION_SHRINKING);
+
+	  if (Feld[newx][newy] == EL_ACID)
+	  {
+	    SplashAcid(newx, newy);
+
+	    return;
+	  }
+
+	  CreateField(newx, newy, EL_DIAGONAL_GROWING);
+
+	  Store[newx][newy] = EL_EMC_ANDROID;
+	  GfxElement[newx][newy] = EL_EMC_ANDROID;
+	  GfxAction[newx][newy] = ACTION_GROWING;
+	  GfxDir[newx][newy] = diagonal_move_dir;
+	  ChangeDelay[newx][newy] = change_delay;
+
+	  graphic = el_act_dir2img(GfxElement[newx][newy],
+				   GfxAction[newx][newy], GfxDir[newx][newy]);
+
+	  DrawLevelGraphicAnimation(newx, newy, graphic);
+	  PlayLevelSoundAction(newx, newy, ACTION_GROWING);
+
+	  return;
+	}
+	else
+	{
+	  Feld[newx][newy] = EL_EMPTY;
+	  DrawLevelField(newx, newy);
+
+	  PlayLevelSoundAction(x, y, ACTION_DIGGING);
+	}
       }
       else if (!IS_FREE(newx, newy))
       {
@@ -6214,16 +6321,28 @@ void ContinueMoving(int x, int y)
   Pushed[x][y] = Pushed[newx][newy] = FALSE;
 
   /* some elements can leave other elements behind after moving */
+#if 1
+  if (ei->move_leave_element != EL_EMPTY &&
+      (ei->move_leave_type == LEAVE_TYPE_UNLIMITED || stored != EL_EMPTY) &&
+      (!IS_PLAYER(x, y) || IS_WALKABLE(ei->move_leave_element)))
+#else
   if (IS_CUSTOM_ELEMENT(element) && ei->move_leave_element != EL_EMPTY &&
       (ei->move_leave_type == LEAVE_TYPE_UNLIMITED || stored != EL_EMPTY) &&
       (!IS_PLAYER(x, y) || IS_WALKABLE(ei->move_leave_element)))
+#endif
   {
     int move_leave_element = ei->move_leave_element;
 
 #if 1
+#if 1
+    /* this makes it possible to leave the removed element again */
+    if (ei->move_leave_element == EL_TRIGGER_ELEMENT)
+      move_leave_element = (stored == EL_ACID ? EL_EMPTY : stored);
+#else
     /* this makes it possible to leave the removed element again */
     if (ei->move_leave_element == EL_TRIGGER_ELEMENT)
       move_leave_element = stored;
+#endif
 #else
     /* this makes it possible to leave the removed element again */
     if (ei->move_leave_type == LEAVE_TYPE_LIMITED &&
@@ -7746,6 +7865,19 @@ static void CreateField(int x, int y, int element)
 
 static void CreateElementFromChange(int x, int y, int element)
 {
+#if USE_STOP_CHANGED_ELEMENTS
+  if (game.engine_version >= VERSION_IDENT(3,2,0,7))
+  {
+    int old_element = Feld[x][y];
+
+    /* prevent changed element from moving in same engine frame
+       unless both old and new element can either fall or move */
+    if ((!CAN_FALL(old_element) || !CAN_FALL(element)) &&
+	(!CAN_MOVE(old_element) || !CAN_MOVE(element)))
+      Stop[x][y] = TRUE;
+  }
+#endif
+
   CreateFieldExt(x, y, element, TRUE);
 }
 
@@ -7893,8 +8025,13 @@ static boolean ChangeElement(int x, int y, int element, int page)
   {
     target_element = GET_TARGET_ELEMENT(change->target_element, change);
 
-    if (element == EL_DIAGONAL_GROWING)
+    if (element == EL_DIAGONAL_GROWING ||
+	element == EL_DIAGONAL_SHRINKING)
+    {
       target_element = Store[x][y];
+
+      Store[x][y] = EL_EMPTY;
+    }
 
     CreateElementFromChange(x, y, target_element);
 
