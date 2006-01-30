@@ -3643,6 +3643,11 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
     "dripper",
     "dripper"
   },
+  {
+    "trigger_ce_value",
+    "trigger",
+    "CE value of element triggering change"
+  },
 
   /* ----------------------------------------------------------------------- */
   /* "real" (and therefore drawable) runtime elements                        */

@@ -142,9 +142,18 @@
 #define GET_CE_DELAY_VALUE(c)	(   ((c)->delay_fixed) + \
 				 RND((c)->delay_random))
 
+#if 1
+#define GET_VALID_RUNTIME_ELEMENT(e)					\
+	 ((e) >= NUM_RUNTIME_ELEMENTS ? EL_UNKNOWN : (e))
+#else
+#define GET_VALID_FILE_ELEMENT(e)					\
+	((e) >= NUM_FILE_ELEMENTS ? EL_UNKNOWN : (e))
+#endif
+
 #define GET_TARGET_ELEMENT(e, ch)					\
-	((e) == EL_TRIGGER_ELEMENT ? (ch)->actual_trigger_element :	\
-	 (e) == EL_TRIGGER_PLAYER  ? (ch)->actual_trigger_player : (e))
+	((e) == EL_TRIGGER_PLAYER   ? (ch)->actual_trigger_player  :	\
+	 (e) == EL_TRIGGER_ELEMENT  ? (ch)->actual_trigger_element :	\
+	 (e) == EL_TRIGGER_CE_VALUE ? (ch)->actual_trigger_ce_value  : (e))
 
 #define CAN_GROW_INTO(e)						\
 	((e) == EL_SAND || (IS_DIGGABLE(e) && level.grow_into_diggable))
@@ -7487,8 +7496,10 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
      action_arg == CA_ARG_NUMBER_LEVEL_TIME ? level_time_value :
      action_arg == CA_ARG_NUMBER_LEVEL_GEMS ? local_player->gems_still_needed :
      action_arg == CA_ARG_NUMBER_LEVEL_SCORE ? local_player->score :
-     action_arg == CA_ARG_ELEMENT_TARGET ? GET_NEW_CUSTOM_VALUE(change->target_element) :
-     action_arg == CA_ARG_ELEMENT_TRIGGER ? change->actual_trigger_ce_value :
+     action_arg == CA_ARG_ELEMENT_CV_TARGET ? GET_NEW_CUSTOM_VALUE(change->target_element) :
+     action_arg == CA_ARG_ELEMENT_CV_TRIGGER ? change->actual_trigger_ce_value:
+     action_arg == CA_ARG_ELEMENT_NR_TARGET  ? change->target_element :
+     action_arg == CA_ARG_ELEMENT_NR_TRIGGER ? change->actual_trigger_element :
      -1);
 
   int action_arg_number_old =
@@ -7865,6 +7876,8 @@ static void CreateField(int x, int y, int element)
 
 static void CreateElementFromChange(int x, int y, int element)
 {
+  element = GET_VALID_RUNTIME_ELEMENT(element);
+
 #if USE_STOP_CHANGED_ELEMENTS
   if (game.engine_version >= VERSION_IDENT(3,2,0,7))
   {

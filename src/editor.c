@@ -1765,11 +1765,50 @@ static struct ValueTextInfo options_action_arg_number[] =
   { CA_ARG_NUMBER_LEVEL_GEMS,	"gems"				},
   { CA_ARG_NUMBER_LEVEL_SCORE,	"score"				},
   { CA_ARG_UNDEFINED,		" "				},
-  { CA_ARG_ELEMENT_HEADLINE,	"[CE value"			},
-  { CA_ARG_ELEMENT_HEADLINE,	" of"				},
-  { CA_ARG_ELEMENT_HEADLINE,	" element]"			},
-  { CA_ARG_ELEMENT_TARGET,	"target"			},
-  { CA_ARG_ELEMENT_TRIGGER,	"trigger"			},
+  { CA_ARG_ELEMENT_CV_HEADLINE,	"[CE value"			},
+  { CA_ARG_ELEMENT_CV_HEADLINE,	" of"				},
+  { CA_ARG_ELEMENT_CV_HEADLINE,	" element]"			},
+  { CA_ARG_ELEMENT_CV_TARGET,	"target"			},
+  { CA_ARG_ELEMENT_CV_TRIGGER,	"trigger"			},
+
+  { -1,				NULL				}
+};
+
+static struct ValueTextInfo options_action_arg_value[] =
+{
+  { CA_ARG_NUMBER_HEADLINE,	"[number]"			},
+  { CA_ARG_0,			"0"				},
+  { CA_ARG_1,			"1"				},
+  { CA_ARG_2,			"2"				},
+  { CA_ARG_3,			"3"				},
+  { CA_ARG_4,			"4"				},
+  { CA_ARG_5,			"5"				},
+  { CA_ARG_10,			"10"				},
+  { CA_ARG_100,			"100"				},
+  { CA_ARG_1000,		"1000"				},
+  { CA_ARG_UNDEFINED,		" "				},
+  { CA_ARG_NUMBER_MIN,		"min"				},
+  { CA_ARG_NUMBER_MAX,		"max"				},
+  { CA_ARG_UNDEFINED,		" "				},
+  { CA_ARG_NUMBER_RESET,	"reset"				},
+  { CA_ARG_UNDEFINED,		" "				},
+  { CA_ARG_NUMBER_CE_DELAY,	"CE delay"			},
+  { CA_ARG_NUMBER_CE_SCORE,	"CE score"			},
+  { CA_ARG_NUMBER_CE_VALUE,	"CE value"			},
+  { CA_ARG_UNDEFINED,		" "				},
+  { CA_ARG_NUMBER_LEVEL_TIME,	"time"				},
+  { CA_ARG_NUMBER_LEVEL_GEMS,	"gems"				},
+  { CA_ARG_NUMBER_LEVEL_SCORE,	"score"				},
+  { CA_ARG_UNDEFINED,		" "				},
+  { CA_ARG_ELEMENT_CV_HEADLINE,	"[CE value"			},
+  { CA_ARG_ELEMENT_CV_HEADLINE,	" of"				},
+  { CA_ARG_ELEMENT_CV_HEADLINE,	" element]"			},
+  { CA_ARG_ELEMENT_CV_TARGET,	"target"			},
+  { CA_ARG_ELEMENT_CV_TRIGGER,	"trigger"			},
+  { CA_ARG_UNDEFINED,		" "				},
+  { CA_ARG_ELEMENT_NR_HEADLINE,	"[element]"			},
+  { CA_ARG_ELEMENT_NR_TARGET,	"target"			},
+  { CA_ARG_ELEMENT_NR_TRIGGER,	"trigger"			},
 
   { -1,				NULL				}
 };
@@ -1929,8 +1968,8 @@ action_arg_options[] =
   { CA_SET_PLAYER_SPEED,	1,	options_action_arg_speed,	},
   { CA_SET_PLAYER_SHIELD,	1,	options_action_arg_shield,	},
   { CA_SET_PLAYER_ARTWORK,	1,	options_action_arg_artwork,	},
-  { CA_SET_CE_SCORE,		3,	options_action_arg_number,	},
-  { CA_SET_CE_VALUE,		3,	options_action_arg_number,	},
+  { CA_SET_CE_SCORE,		3,	options_action_arg_value,	},
+  { CA_SET_CE_VALUE,		3,	options_action_arg_value,	},
   { CA_SET_ENGINE_SCAN_MODE,	1,	options_action_arg_scan_mode,	},
 
   { -1,				FALSE,	NULL				}
@@ -4160,9 +4199,9 @@ static int editor_el_custom[] =
   EL_CUSTOM_START + 254,
   EL_CUSTOM_START + 255,
 
-  EL_TRIGGER_ELEMENT,
   EL_TRIGGER_PLAYER,
-  EL_EMPTY,
+  EL_TRIGGER_ELEMENT,
+  EL_TRIGGER_CE_VALUE,
   EL_EMPTY
 };
 static int *editor_hl_custom_ptr = editor_hl_custom;

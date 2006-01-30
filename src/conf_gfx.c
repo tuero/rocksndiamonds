@@ -3368,6 +3368,11 @@ struct ConfigInfo image_config[] =
   { "trigger_player.ypos",			"13"			},
   { "trigger_player.frames",			"1"			},
 
+  { "trigger_ce_value",				"RocksDC.pcx"		},
+  { "trigger_ce_value.xpos",			"15"			},
+  { "trigger_ce_value.ypos",			"15"			},
+  { "trigger_ce_value.frames",			"1"			},
+
   { "emc_key_5",				"RocksEMC.pcx"		},
   { "emc_key_5.xpos",				"0"			},
   { "emc_key_5.ypos",				"5"			},

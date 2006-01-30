@@ -2738,6 +2738,10 @@ element_to_graphic[] =
     IMG_TRIGGER_PLAYER
   },
   {
+    EL_TRIGGER_CE_VALUE,		-1, -1, FALSE,
+    IMG_TRIGGER_CE_VALUE
+  },
+  {
     EL_EMC_KEY_5,			-1, -1, FALSE,
     IMG_EMC_KEY_5
   },
