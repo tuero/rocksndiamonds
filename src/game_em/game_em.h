@@ -32,7 +32,11 @@ extern void em_open_all();
 extern void em_close_all();
 
 extern void InitGameEngine_EM();
+#if 1
+extern void GameActions_EM(byte *);
+#else
 extern void GameActions_EM(byte);
+#endif
 
 extern unsigned int InitEngineRND_EM(long);
 

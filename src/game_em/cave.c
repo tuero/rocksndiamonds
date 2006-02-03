@@ -47,7 +47,7 @@ void setLevelInfoToDefaults_EM(void)
   for (i = 0; i < TILE_MAX; i++)
     lev.android_array[i] = Xblank;
 
-  lev.home_initial = 1;		/* initial number of players in this level */
+  lev.home_initial = 2;		/* initial number of players in this level */
 
   ply1.alive_initial = (lev.home_initial >= 1);
   ply2.alive_initial = (lev.home_initial >= 2);

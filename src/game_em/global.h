@@ -24,7 +24,11 @@ extern unsigned char linear_to_ulaw[65536];
 int open_all(void);
 void close_all(void);
 
+#if 1
+void readjoy(byte, int);
+#else
 void readjoy(byte);
+#endif
 void input_eventloop(void);
 
 void blitscreen(void);

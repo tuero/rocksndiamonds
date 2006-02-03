@@ -3146,7 +3146,18 @@ void HandleGameActions()
     if (tape.recording)
       TapeRecordAction(tape_action);
 
+#if 1
+    {
+      byte effective_action[MAX_PLAYERS];
+
+      for (i = 0; i < MAX_PLAYERS; i++)
+	effective_action[i] = stored_player[i].effective_action;
+
+      GameActions_EM(effective_action);
+    }
+#else
     GameActions_EM(local_player->effective_action);
+#endif
 
     if (TimeFrames >= FRAMES_PER_SECOND)
     {
