@@ -9,8 +9,13 @@
 
 
 unsigned int frame;		/* current screen frame */
+#if 0
 unsigned int screen_x;		/* current scroll position */
 unsigned int screen_y;
+#else
+int screen_x;			/* current scroll position */
+int screen_y;
+#endif
 
 /* tiles currently on screen */
 static unsigned int screentiles[MAX_BUF_YSIZE][MAX_BUF_XSIZE];
@@ -444,26 +449,57 @@ void game_initscreen(void)
 
 void RedrawPlayfield_EM()
 {
-  unsigned int i, x, y;
+  int i, sx, sy;
+
+#if 1
+
+  int screen_x_min = TILEX;
+  int screen_y_min = TILEY;
+  int screen_x_max = (lev.width  - (SCR_FIELDX - 1)) * TILEX;
+  int screen_y_max = (lev.height - (SCR_FIELDY - 1)) * TILEY;
+  int offset = (setup.scroll_delay ? 3 : 0) * TILEX;
+  int stepsize = TILEX / 8;
+  int nr = 0;		/* !!! FIX THIS (CENTERED TO PLAYER 1) !!! */
+
+  sx = (frame * ply[nr].oldx + (8 - frame) * ply[nr].x) * stepsize
+    - ((SCR_FIELDX - 1) * TILEX) / 2;
+  sy = (frame * ply[nr].oldy + (8 - frame) * ply[nr].y) * stepsize
+    - ((SCR_FIELDY - 1) * TILEY) / 2;
+
+  /* calculate new screen scrolling position, with regard to scroll delay */
+  screen_x = (sx < screen_x - offset ? sx + offset :
+	      sx > screen_x + offset ? sx - offset : screen_x);
+  screen_y = (sy < screen_y - offset ? sy + offset :
+	      sy > screen_y + offset ? sy - offset : screen_y);
+
+  /* check minimal and maximal boundaries for screen scrolling position */
+  screen_x = (screen_x < screen_x_min ? screen_x_min :
+	      screen_x > screen_x_max ? screen_x_max : screen_x);
+  screen_y = (screen_y < screen_y_min ? screen_y_min :
+	      screen_y > screen_y_max ? screen_y_max : screen_y);
+
+#else
 
   /* !!! FIX THIS (CENTERED TO PLAYER 1) !!! */
-  x = (frame * ply[0].oldx + (8 - frame) * ply[0].x) * TILEX / 8
+  sx = (frame * ply[0].oldx + (8 - frame) * ply[0].x) * TILEX / 8
     + ((SCR_FIELDX - 1) * TILEX) / 2;
-  y = (frame * ply[0].oldy + (8 - frame) * ply[0].y) * TILEY / 8
+  sy = (frame * ply[0].oldy + (8 - frame) * ply[0].y) * TILEY / 8
     + ((SCR_FIELDY - 1) * TILEY) / 2;
 
-  if (x > lev.width * TILEX)
-    x = lev.width * TILEX;
-  if (y > lev.height * TILEY)
-    y = lev.height * TILEY;
+  if (sx > lev.width * TILEX)
+    sx = lev.width * TILEX;
+  if (sy > lev.height * TILEY)
+    sy = lev.height * TILEY;
 
-  if (x < SCR_FIELDX * TILEX)
-    x = SCR_FIELDX * TILEY;
-  if (y < SCR_FIELDY * TILEY)
-    y = SCR_FIELDY * TILEY;
+  if (sx < SCR_FIELDX * TILEX)
+    sx = SCR_FIELDX * TILEY;
+  if (sy < SCR_FIELDY * TILEY)
+    sy = SCR_FIELDY * TILEY;
 
-  screen_x = x - (SCR_FIELDX - 1) * TILEX;
-  screen_y = y - (SCR_FIELDY - 1) * TILEY;
+  screen_x = sx - (SCR_FIELDX - 1) * TILEX;
+  screen_y = sy - (SCR_FIELDY - 1) * TILEY;
+
+#endif
 
   animscreen();
 

@@ -737,11 +737,14 @@ inline static void DrawGraphicShiftedDouble(int x, int y, int dx, int dy,
   int y2 = y + SIGN(dy);
   int anim_frames = graphic_info[graphic].anim_frames;
   int sync_frame = (dx ? ABS(dx) : ABS(dy)) * anim_frames / TILESIZE;
+  boolean draw_start_tile = (cut_mode != CUT_ABOVE);	/* only for falling! */
+  boolean draw_end_tile   = (cut_mode != CUT_BELOW);	/* only for falling! */
 
   /* re-calculate animation frame for two-tile movement animation */
   frame = getGraphicAnimationFrame(graphic, sync_frame);
 
-  if (IN_SCR_FIELD(x1, y1))	/* movement start graphic inside screen area */
+  /* check if movement start graphic inside screen area and should be drawn */
+  if (draw_start_tile && IN_SCR_FIELD(x1, y1))
   {
     getGraphicSourceExt(graphic, frame, &src_bitmap, &src_x, &src_y, TRUE);
 
@@ -762,7 +765,8 @@ inline static void DrawGraphicShiftedDouble(int x, int y, int dx, int dy,
     MarkTileDirty(x1, y1);
   }
 
-  if (IN_SCR_FIELD(x2, y2))	/* movement end graphic inside screen area */
+  /* check if movement end graphic inside screen area and should be drawn */
+  if (draw_end_tile && IN_SCR_FIELD(x2, y2))
   {
     getGraphicSourceExt(graphic, frame, &src_bitmap, &src_x, &src_y, FALSE);
 

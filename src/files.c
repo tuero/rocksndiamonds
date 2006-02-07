@@ -3144,6 +3144,15 @@ static void LoadLevel_InitVersion(struct LevelInfo *level, char *filename)
   if (leveldir_current == NULL)		/* only when dumping level */
     return;
 
+  /* all engine modifications also valid for levels which use latest engine */
+#if 1
+  if (level->game_version < VERSION_IDENT(3,2,0,5))
+  {
+    /* time bonus score was given for 10 s instead of 1 s before 3.2.0-5 */
+    level->score[SC_TIME_BONUS] /= 10;
+  }
+#endif
+
   if (leveldir_current->latest_engine)
   {
     /* ---------- use latest game engine ----------------------------------- */
@@ -3206,8 +3215,10 @@ static void LoadLevel_InitVersion(struct LevelInfo *level, char *filename)
     /* extra time score was same value as time left score before 3.2.0-5 */
     level->extra_time_score = level->score[SC_TIME_BONUS];
 
+#if 0
     /* time bonus score was given for 10 s instead of 1 s before 3.2.0-5 */
     level->score[SC_TIME_BONUS] /= 10;
+#endif
   }
 
   /* only few elements were able to actively move into acid before 3.1.0 */

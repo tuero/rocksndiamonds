@@ -1,3 +1,6 @@
+2006-02-07
+	* added scroll delay (as configured in setup) to EMC graphics engine
+
 2006-02-06
 	* improved screen redraw for EMC graphics engine (faster and smoother)
 	* when not scrolling, do not redraw the whole playfield if not needed
