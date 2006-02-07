@@ -16,6 +16,32 @@
 
 #define RANDOM (random = random << 31 | random >> 1)
 
+static void set_nearest_player_xy(int x, int y, int *dx, int *dy)
+{
+  int distance, distance_shortest = EM_MAX_CAVE_WIDTH + EM_MAX_CAVE_HEIGHT;
+  int i;
+
+  /* default values if no players are alive anymore */
+  *dx = 0;
+  *dy = 0;
+
+  for (i = 0; i < MAX_PLAYERS; i++)
+  {
+    if (!ply[i].alive)
+      continue;
+
+    distance = ABS(ply[i].x - x) + ABS(ply[i].y - y);
+
+    if (distance < distance_shortest)
+    {
+      *dx = ply[i].x;
+      *dy = ply[i].y;
+
+      distance_shortest = distance;
+    }
+  }
+}
+
 void synchro_2(void)
 {
   register unsigned int x = 0;
@@ -1879,6 +1905,12 @@ void synchro_2(void)
 	    Cave[y+1][x+1] == Zplayer)
 	  goto android_still;
 
+#if 1
+
+	set_nearest_player_xy(x, y, &dx, &dy);
+
+#else
+
   	if (ply1.alive && ply2.alive)
 	{
   	  if ((ply1.x > x ? ply1.x - x : x - ply1.x) +
@@ -1910,6 +1942,8 @@ void synchro_2(void)
   	  dx = 0;
   	  dy = 0;
   	}
+
+#endif
 
   	Next[y][x] = Xblank;	/* assume we will move */
   	temp = ((x < dx) + 1 - (x > dx)) + ((y < dy) + 1 - (y > dy)) * 3;
@@ -3205,6 +3239,21 @@ void synchro_2(void)
     /* --------------------------------------------------------------------- */
 
     case Xalien:
+
+#if 1
+
+      if (lev.wheel_cnt)
+      {
+	dx = lev.wheel_x;
+	dy = lev.wheel_y;
+      }
+      else
+      {
+	set_nearest_player_xy(x, y, &dx, &dy);
+      }
+
+#else
+
       if (lev.wheel_cnt)
       {
 	dx = lev.wheel_x;
@@ -3241,6 +3290,8 @@ void synchro_2(void)
 	dx = 0;
 	dy = 0;
       }
+
+#endif
 
       if (RANDOM & 1)
       {
@@ -4888,8 +4939,8 @@ void synchro_2(void)
 
  done:
 
-  if (ply1.alive || ply2.alive)
-    lev.score += score; /* only get a score if someone is alive */
+  if (ply[0].alive || ply[1].alive || ply[2].alive || ply[3].alive)
+    lev.score += score;		/* only add a score if someone is alive */
 
   RandomEM = random;
 

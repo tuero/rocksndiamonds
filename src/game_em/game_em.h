@@ -26,7 +26,7 @@
 extern struct GlobalInfo_EM global_em_info;
 extern struct LevelInfo_EM native_em_level;
 extern struct GraphicInfo_EM graphic_info_em_object[TILE_MAX][8];
-extern struct GraphicInfo_EM graphic_info_em_player[2][SPR_MAX][8];
+extern struct GraphicInfo_EM graphic_info_em_player[MAX_PLAYERS][SPR_MAX][8];
 
 extern void em_open_all();
 extern void em_close_all();

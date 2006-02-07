@@ -599,6 +599,7 @@ struct LEVEL
 struct PLAYER
 {
   unsigned int num;
+  unsigned int exists;
   unsigned int alive_initial;
   unsigned int alive;
 
@@ -651,7 +652,7 @@ struct LevelInfo_EM
   unsigned short cave[EM_MAX_CAVE_WIDTH][EM_MAX_CAVE_HEIGHT];
 
   struct LEVEL *lev;
-  struct PLAYER *ply1, *ply2;
+  struct PLAYER *ply[MAX_PLAYERS];
 };
 
 struct GraphicInfo_EM

@@ -1,3 +1,10 @@
+2006-02-06
+	* improved screen redraw for EMC graphics engine (faster and smoother)
+	* when not scrolling, do not redraw the whole playfield if not needed
+
+2006-02-03
+	* added multi-player mode for EMC game engine (with up to four players)
+
 2006-01-28
 	* added android (can clone elements) from EMC engine to R'n'D engine
 

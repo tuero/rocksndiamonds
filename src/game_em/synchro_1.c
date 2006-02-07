@@ -18,7 +18,24 @@ static boolean player_killed(struct PLAYER *);
 
 void synchro_1(void)
 {
- /* must test for death and actually kill separately */
+#if 1
+
+  int start_check_nr;
+  int i;
+
+  /* must test for death and actually kill separately */
+
+  for (i = 0; i < MAX_PLAYERS; i++)
+  {
+    boolean ply_kill = player_killed(&ply[i]);
+
+    if (ply[i].alive && ply_kill)
+      kill_player(&ply[i]);
+  }
+
+#else
+
+  /* must test for death and actually kill separately */
   boolean ply1_kill = player_killed(&ply1);
   boolean ply2_kill = player_killed(&ply2);
 
@@ -27,9 +44,50 @@ void synchro_1(void)
   if (ply2.alive && ply2_kill)
     kill_player(&ply2);
 
+#endif
+
 #if 0
   ply1.alive = 1; /* debugging */
 #endif
+
+#if 1
+
+  for (i = 0; i < MAX_PLAYERS; i++)
+  {
+    ply[i].oldx = ply[i].x;
+    ply[i].oldy = ply[i].y;
+    ply[i].anim = SPR_still;
+  }
+
+  start_check_nr = (RandomEM & 128 ? 0 : 1) * 2 + (RandomEM & 256 ? 0 : 1);
+
+  for (i = 0; i < MAX_PLAYERS; i++)
+  {
+    int check_nr = (start_check_nr + i) % MAX_PLAYERS;
+
+    if (ply[check_nr].alive)
+      check_player(&ply[check_nr]);
+  }
+
+  for (i = 0; i < MAX_PLAYERS; i++)
+  {
+    if (!ply[i].alive)
+      continue;
+
+    if (Cave[ply[i].oldy][ply[i].oldx] == Zplayer)
+    {
+      Cave[ply[i].oldy][ply[i].oldx] = Xblank;
+      Next[ply[i].oldy][ply[i].oldx] = Xblank;
+    }
+
+    if (Cave[ply[i].y][ply[i].x] == Xblank)
+    {
+      Cave[ply[i].y][ply[i].x] = Zplayer;
+      Next[ply[i].y][ply[i].x] = Zplayer;
+    }
+  }
+
+#else
 
   ply1.oldx = ply1.x;
   ply1.oldy = ply1.y;
@@ -78,12 +136,18 @@ void synchro_1(void)
       Next[ply2.y][ply2.x] = Zplayer;
     }
   }
+
+#endif
 }
 
 static boolean player_killed(struct PLAYER *ply)
 {
   register unsigned int x = ply->x;
   register unsigned int y = ply->y;
+
+#if 0
+  printf("::: %d: %d, %d\n", ply->num, x, y);
+#endif
 
   if (!ply->alive)
     return FALSE;

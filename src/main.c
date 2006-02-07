@@ -290,60 +290,63 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
   {
     "key_1",
     "key",
-    "red key"
+    "key 1"
   },
   {
     "key_2",
     "key",
-    "yellow key"
+    "key 2"
   },
   {
     "key_3",
     "key",
-    "green key"
+    "key 3"
   },
   {
     "key_4",
     "key",
-    "blue key"
+    "key 4"
   },
   {
     "gate_1",
     "gate",
-    "red door"
+    "door 1"
   },
   {
     "gate_2",
     "gate",
-    "yellow door"
+    "door 2"
   },
   {
     "gate_3",
     "gate",
-    "green door"
+    "door 3"
   },
   {
     "gate_4",
     "gate",
-    "blue door"
+    "door 4"
   },
   {
     "gate_1_gray",
     "gate",
-    "gray door (opened by red key)"
+    "gray door (opened by key 1)"
   },
   {
     "gate_2_gray",
     "gate",
-    "gray door (opened by yellow key)"},
+    "gray door (opened by key 2)"
+  },
   {
     "gate_3_gray",
     "gate",
-    "gray door (opened by green key)"},
+    "gray door (opened by key 3)"
+  },
   {
     "gate_4_gray",
     "gate",
-    "gray door (opened by blue key)"},
+    "gray door (opened by key 4)"
+  },
   {
     "dynamite",
     "dynamite",
@@ -524,22 +527,22 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
   {
     "player_1",
     "player",
-    "yellow player"
+    "player 1"
   },
   {
     "player_2",
     "player",
-    "red player"
+    "player 2"
   },
   {
     "player_3",
     "player",
-    "green player"
+    "player 3"
   },
   {
     "player_4",
     "player",
-    "blue player"
+    "player 4"
   },
   {
     "bug.right",
@@ -1136,22 +1139,22 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
   {
     "em_gate_1",
     "gate",
-    "red door (EM style)"
+    "door 1 (EM style)"
   },
   {
     "em_gate_2",
     "gate",
-    "yellow door (EM style)"
+    "door 2 (EM style)"
   },
   {
     "em_gate_3",
     "gate",
-    "green door (EM style)"
+    "door 3 (EM style)"
   },
   {
     "em_gate_4",
     "gate",
-    "blue door (EM style)"
+    "door 4 (EM style)"
   },
   {
     "em_key_2_file_obsolete",
@@ -1371,22 +1374,22 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
   {
     "em_gate_1_gray",
     "gate",
-    "gray door (EM style, red key)"
+    "gray door (EM style, key 1)"
   },
   {
     "em_gate_2_gray",
     "gate",
-    "gray door (EM style, yellow key)"
+    "gray door (EM style, key 2)"
   },
   {
     "em_gate_3_gray",
     "gate",
-    "gray door (EM style, green key)"
+    "gray door (EM style, key 3)"
   },
   {
     "em_gate_4_gray",
     "gate",
-    "gray door (EM style, blue key)"
+    "gray door (EM style, key 4)"
   },
   {
     "unused_254",
@@ -1476,122 +1479,122 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
   {
     "conveyor_belt_1_left",
     "conveyor_belt",
-    "red conveyor belt (left)"
+    "conveyor belt 1 (left)"
   },
   {
     "conveyor_belt_1_middle",
     "conveyor_belt",
-    "red conveyor belt (middle)"
+    "conveyor belt 1 (middle)"
   },
   {
     "conveyor_belt_1_right",
     "conveyor_belt",
-    "red conveyor belt (right)"
+    "conveyor belt 1 (right)"
   },
   {
     "conveyor_belt_1_switch_left",
     "conveyor_belt_switch",
-    "switch for red conveyor belt (left)"
+    "switch for conveyor belt 1 (left)"
   },
   {
     "conveyor_belt_1_switch_middle",
     "conveyor_belt_switch",
-    "switch for red conveyor belt (middle)"
+    "switch for conveyor belt 1 (middle)"
   },
   {
     "conveyor_belt_1_switch_right",
     "conveyor_belt_switch",
-    "switch for red conveyor belt (right)"
+    "switch for conveyor belt 1 (right)"
   },
   {
     "conveyor_belt_2_left",
     "conveyor_belt",
-    "yellow conveyor belt (left)"
+    "conveyor belt 2 (left)"
   },
   {
     "conveyor_belt_2_middle",
     "conveyor_belt",
-    "yellow conveyor belt (middle)"
+    "conveyor belt 2 (middle)"
   },
   {
     "conveyor_belt_2_right",
     "conveyor_belt",
-    "yellow conveyor belt (right)"
+    "conveyor belt 2 (right)"
   },
   {
     "conveyor_belt_2_switch_left",
     "conveyor_belt_switch",
-    "switch for yellow conveyor belt (left)"
+    "switch for conveyor belt 2 (left)"
   },
   {
     "conveyor_belt_2_switch_middle",
     "conveyor_belt_switch",
-    "switch for yellow conveyor belt (middle)"
+    "switch for conveyor belt 2 (middle)"
   },
   {
     "conveyor_belt_2_switch_right",
     "conveyor_belt_switch",
-    "switch for yellow conveyor belt (right)"
+    "switch for conveyor belt 2 (right)"
   },
   {
     "conveyor_belt_3_left",
     "conveyor_belt",
-    "green conveyor belt (left)"
+    "conveyor belt 3 (left)"
   },
   {
     "conveyor_belt_3_middle",
     "conveyor_belt",
-    "green conveyor belt (middle)"
+    "conveyor belt 3 (middle)"
   },
   {
     "conveyor_belt_3_right",
     "conveyor_belt",
-    "green conveyor belt (right)"
+    "conveyor belt 3 (right)"
   },
   {
     "conveyor_belt_3_switch_left",
     "conveyor_belt_switch",
-    "switch for green conveyor belt (left)"
+    "switch for conveyor belt 3 (left)"
   },
   {
     "conveyor_belt_3_switch_middle",
     "conveyor_belt_switch",
-    "switch for green conveyor belt (middle)"
+    "switch for conveyor belt 3 (middle)"
   },
   {
     "conveyor_belt_3_switch_right",
     "conveyor_belt_switch",
-    "switch for green conveyor belt (right)"
+    "switch for conveyor belt 3 (right)"
   },
   {
     "conveyor_belt_4_left",
     "conveyor_belt",
-    "blue conveyor belt (left)"
+    "conveyor belt 4 (left)"
   },
   {
     "conveyor_belt_4_middle",
     "conveyor_belt",
-    "blue conveyor belt (middle)"
+    "conveyor belt 4 (middle)"
   },
   {
     "conveyor_belt_4_right",
     "conveyor_belt",
-    "blue conveyor belt (right)"
+    "conveyor belt 4 (right)"
   },
   {
     "conveyor_belt_4_switch_left",
     "conveyor_belt_switch",
-    "switch for blue conveyor belt (left)"
+    "switch for conveyor belt 4 (left)"
   },
   {
     "conveyor_belt_4_switch_middle",
     "conveyor_belt_switch",
-    "switch for blue conveyor belt (middle)"
+    "switch for conveyor belt 4 (middle)"
   },
   {
     "conveyor_belt_4_switch_right",
     "conveyor_belt_switch",
-    "switch for blue conveyor belt (right)"
+    "switch for conveyor belt 4 (right)"
   },
   {
     "landmine",
@@ -3201,22 +3204,22 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
   {
     "em_key_1",
     "key",
-    "red key (EM style)"
+    "key 1 (EM style)"
     },
   {
     "em_key_2",
     "key",
-    "yellow key (EM style)"
+    "key 2 (EM style)"
     },
   {
     "em_key_3",
     "key",
-    "green key (EM style)"
+    "key 3 (EM style)"
   },
   {
     "em_key_4",
     "key",
-    "blue key (EM style)"
+    "key 4 (EM style)"
   },
   {
     "envelope_1",

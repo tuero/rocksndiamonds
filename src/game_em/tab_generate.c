@@ -4435,7 +4435,7 @@ unsigned short map_ttl[128];
 struct GraphicInfo_EM graphic_info_em_object[TILE_MAX][8];
 
 /* map player number, frames and action to graphic info */
-struct GraphicInfo_EM graphic_info_em_player[2][SPR_MAX][8];
+struct GraphicInfo_EM graphic_info_em_player[MAX_PLAYERS][SPR_MAX][8];
 
 void create_tab(int *invert, unsigned char *array)
 {
@@ -4641,14 +4641,14 @@ void create_spr_graphics_info_em()
 {
   int i, j, k;
 
-  for (i = 0; i < 2; i++)
+  for (i = 0; i < MAX_PLAYERS; i++)
   {
     for (j = 0; j < SPR_MAX; j++)
     {
       for (k = 0; k < 8; k++)
       {
 	struct GraphicInfo_EM *g = &graphic_info_em_player[i][j][k];
-	int spr = map_spr[i][k][j];
+	int spr = map_spr[i % 2][k][j];
 
 	g->bitmap = sprBitmap;
 	g->src_x = (spr / 8) * TILEX;

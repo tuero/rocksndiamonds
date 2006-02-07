@@ -16,6 +16,8 @@ unsigned int screen_y;
 static unsigned int screentiles[MAX_BUF_YSIZE][MAX_BUF_XSIZE];
 static unsigned int crumbled_state[MAX_BUF_YSIZE][MAX_BUF_XSIZE];
 
+static boolean redraw[MAX_BUF_XSIZE][MAX_BUF_YSIZE];
+
 
 /* copy the entire screen to the window at the scroll position
  *
@@ -69,7 +71,54 @@ void BlitScreenToBitmap_EM(Bitmap *target_bitmap)
 
 void blitscreen(void)
 {
+#if 1
+
+  static boolean scrolling_last = FALSE;
+  unsigned int left = screen_x / TILEX;
+  unsigned int top  = screen_y / TILEY;
+  boolean scrolling = (screen_x % TILEX != 0 || screen_y % TILEY != 0);
+  int x, y;
+
+  SyncDisplay();
+
+  if (redraw_tiles > REDRAWTILES_THRESHOLD || scrolling || scrolling_last)
+  {
+    /* blit all (up to four) parts of the scroll buffer to the backbuffer */
+    BlitScreenToBitmap_EM(backbuffer);
+
+    /* blit the completely updated backbuffer to the window (in one blit) */
+    BlitBitmap(backbuffer, window, SX, SY, SXSIZE, SYSIZE, SX, SY);
+  }
+  else
+  {
+    for (x = 0; x < SCR_FIELDX; x++)
+    {
+      for (y = 0; y < SCR_FIELDY; y++)
+      {
+	int xx = (left + x) % MAX_BUF_XSIZE;
+	int yy = (top  + y) % MAX_BUF_YSIZE;
+
+	if (redraw[xx][yy])
+	  BlitBitmap(screenBitmap, window,
+		     xx * TILEX, yy * TILEY, TILEX, TILEY,
+		     SX + x * TILEX, SY + y * TILEY);
+      }
+    }
+  }
+
+  for (x = 0; x < MAX_BUF_XSIZE; x++)
+    for (y = 0; y < MAX_BUF_YSIZE; y++)
+      redraw[x][y] = FALSE;
+  redraw_tiles = 0;
+
+  scrolling_last = scrolling;
+
+#else
+
+  /* blit all (up to four) parts of the scroll buffer to the window */
   BlitScreenToBitmap_EM(window);
+
+#endif
 }
 
 static void DrawLevelField_EM(int x, int y, int sx, int sy,
@@ -225,7 +274,7 @@ static void animscreen(void)
 {
   unsigned int x, y, i;
   unsigned int left = screen_x / TILEX;
-  unsigned int top = screen_y / TILEY;
+  unsigned int top  = screen_y / TILEY;
   static int xy[4][2] =
   {
     { 0, -1 },
@@ -273,6 +322,9 @@ static void animscreen(void)
 
 	screentiles[sy][sx] = obj;
 	crumbled_state[sy][sx] = crm;
+
+	redraw[sx][sy] = TRUE;
+	redraw_tiles++;
       }
     }
   }
@@ -365,6 +417,8 @@ static void blitplayer(struct PLAYER *ply)
 void game_initscreen(void)
 {
   unsigned int x,y;
+  int dynamite_state = ply[0].dynamite;		/* !!! ONLY PLAYER 1 !!! */
+  int all_keys_state = ply[0].keys | ply[1].keys | ply[2].keys | ply[3].keys;
 
   frame = 6;
   screen_x = 0;
@@ -380,8 +434,8 @@ void game_initscreen(void)
   }
 
 #if 1
-  DrawAllGameValues(lev.required, ply1.dynamite, lev.score,
-		    lev.time, ply1.keys | ply2.keys);
+  DrawAllGameValues(lev.required, dynamite_state, lev.score,
+		    lev.time, all_keys_state);
 #else
   DrawAllGameValues(lev.required, ply1.dynamite, lev.score,
 		    DISPLAY_TIME(lev.time + 4), ply1.keys | ply2.keys);
@@ -390,11 +444,12 @@ void game_initscreen(void)
 
 void RedrawPlayfield_EM()
 {
-  unsigned int x,y;
+  unsigned int i, x, y;
 
-  x = (frame * ply1.oldx + (8 - frame) * ply1.x) * TILEX / 8
+  /* !!! FIX THIS (CENTERED TO PLAYER 1) !!! */
+  x = (frame * ply[0].oldx + (8 - frame) * ply[0].x) * TILEX / 8
     + ((SCR_FIELDX - 1) * TILEX) / 2;
-  y = (frame * ply1.oldy + (8 - frame) * ply1.y) * TILEY / 8
+  y = (frame * ply[0].oldy + (8 - frame) * ply[0].y) * TILEY / 8
     + ((SCR_FIELDY - 1) * TILEY) / 2;
 
   if (x > lev.width * TILEX)
@@ -411,8 +466,10 @@ void RedrawPlayfield_EM()
   screen_y = y - (SCR_FIELDY - 1) * TILEY;
 
   animscreen();
-  blitplayer(&ply1);
-  blitplayer(&ply2);
+
+  for (i = 0; i < MAX_PLAYERS; i++)
+    blitplayer(&ply[i]);
+
   blitscreen();
 
   FlushDisplay();
@@ -425,9 +482,12 @@ void game_animscreen(void)
 
 void DrawGameDoorValues_EM()
 {
+  int dynamite_state = ply[0].dynamite;		/* !!! ONLY PLAYER 1 !!! */
+  int all_keys_state = ply[0].keys | ply[1].keys | ply[2].keys | ply[3].keys;
+
 #if 1
-  DrawAllGameValues(lev.required, ply1.dynamite, lev.score,
-		    lev.time, ply1.keys | ply2.keys);
+  DrawAllGameValues(lev.required, dynamite_state, lev.score,
+		    lev.time, all_keys_state);
 #else
   DrawAllGameValues(lev.required, ply1.dynamite, lev.score,
 		    DISPLAY_TIME(lev.time), ply1.keys | ply2.keys);

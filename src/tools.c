@@ -4737,6 +4737,110 @@ em_player_mapping_list[] =
     SPR_still,				1,
     EL_PLAYER_2,			ACTION_DEFAULT, -1,
   },
+  {
+    SPR_walk + 0,			2,
+    EL_PLAYER_3,			ACTION_MOVING, MV_BIT_UP,
+  },
+  {
+    SPR_walk + 1,			2,
+    EL_PLAYER_3,			ACTION_MOVING, MV_BIT_RIGHT,
+  },
+  {
+    SPR_walk + 2,			2,
+    EL_PLAYER_3,			ACTION_MOVING, MV_BIT_DOWN,
+  },
+  {
+    SPR_walk + 3,			2,
+    EL_PLAYER_3,			ACTION_MOVING, MV_BIT_LEFT,
+  },
+  {
+    SPR_push + 0,			2,
+    EL_PLAYER_3,			ACTION_PUSHING, MV_BIT_UP,
+  },
+  {
+    SPR_push + 1,			2,
+    EL_PLAYER_3,			ACTION_PUSHING, MV_BIT_RIGHT,
+  },
+  {
+    SPR_push + 2,			2,
+    EL_PLAYER_3,			ACTION_PUSHING, MV_BIT_DOWN,
+  },
+  {
+    SPR_push + 3,			2,
+    EL_PLAYER_3,			ACTION_PUSHING, MV_BIT_LEFT,
+  },
+  {
+    SPR_spray + 0,			2,
+    EL_PLAYER_3,			ACTION_SNAPPING, MV_BIT_UP,
+  },
+  {
+    SPR_spray + 1,			2,
+    EL_PLAYER_3,			ACTION_SNAPPING, MV_BIT_RIGHT,
+  },
+  {
+    SPR_spray + 2,			2,
+    EL_PLAYER_3,			ACTION_SNAPPING, MV_BIT_DOWN,
+  },
+  {
+    SPR_spray + 3,			2,
+    EL_PLAYER_3,			ACTION_SNAPPING, MV_BIT_LEFT,
+  },
+  {
+    SPR_walk + 0,			3,
+    EL_PLAYER_4,			ACTION_MOVING, MV_BIT_UP,
+  },
+  {
+    SPR_walk + 1,			3,
+    EL_PLAYER_4,			ACTION_MOVING, MV_BIT_RIGHT,
+  },
+  {
+    SPR_walk + 2,			3,
+    EL_PLAYER_4,			ACTION_MOVING, MV_BIT_DOWN,
+  },
+  {
+    SPR_walk + 3,			3,
+    EL_PLAYER_4,			ACTION_MOVING, MV_BIT_LEFT,
+  },
+  {
+    SPR_push + 0,			3,
+    EL_PLAYER_4,			ACTION_PUSHING, MV_BIT_UP,
+  },
+  {
+    SPR_push + 1,			3,
+    EL_PLAYER_4,			ACTION_PUSHING, MV_BIT_RIGHT,
+  },
+  {
+    SPR_push + 2,			3,
+    EL_PLAYER_4,			ACTION_PUSHING, MV_BIT_DOWN,
+  },
+  {
+    SPR_push + 3,			3,
+    EL_PLAYER_4,			ACTION_PUSHING, MV_BIT_LEFT,
+  },
+  {
+    SPR_spray + 0,			3,
+    EL_PLAYER_4,			ACTION_SNAPPING, MV_BIT_UP,
+  },
+  {
+    SPR_spray + 1,			3,
+    EL_PLAYER_4,			ACTION_SNAPPING, MV_BIT_RIGHT,
+  },
+  {
+    SPR_spray + 2,			3,
+    EL_PLAYER_4,			ACTION_SNAPPING, MV_BIT_DOWN,
+  },
+  {
+    SPR_spray + 3,			3,
+    EL_PLAYER_4,			ACTION_SNAPPING, MV_BIT_LEFT,
+  },
+  {
+    SPR_still,				2,
+    EL_PLAYER_3,			ACTION_DEFAULT, -1,
+  },
+  {
+    SPR_still,				3,
+    EL_PLAYER_4,			ACTION_DEFAULT, -1,
+  },
 
   {
     -1,					-1,
@@ -5655,7 +5759,7 @@ unsigned int InitRND(long seed)
 void InitGraphicInfo_EM(void)
 {
   struct Mapping_EM_to_RND_object object_mapping[TILE_MAX];
-  struct Mapping_EM_to_RND_player player_mapping[2][SPR_MAX];
+  struct Mapping_EM_to_RND_player player_mapping[MAX_PLAYERS][SPR_MAX];
   int i, j, p;
 
 #if DEBUG_EM_GFX
@@ -5677,7 +5781,7 @@ void InitGraphicInfo_EM(void)
   }
 
   /* always start with reliable default values */
-  for (p = 0; p < 2; p++)
+  for (p = 0; p < MAX_PLAYERS; p++)
   {
     for (i = 0; i < SPR_MAX; i++)
     {
@@ -6021,6 +6125,15 @@ void InitGraphicInfo_EM(void)
 	g_em->height = TILEY - cy * step;
       }
 
+#if 1
+      /* create unique graphic identifier to decide if tile must be redrawn */
+      /* bit 31 - 16 (16 bit): EM style graphic
+	 bit 15 - 12 ( 4 bit): EM style frame
+	 bit 11 -  6 ( 6 bit): graphic width
+	 bit  5 -  0 ( 6 bit): graphic height */
+      g_em->unique_identifier =
+	(graphic << 16) | (frame << 12) | (g_em->width << 6) | g_em->height;
+#else
       /* create unique graphic identifier to decide if tile must be redrawn */
       /* bit 31 - 16 (16 bit): EM style element
 	 bit 15 - 12 ( 4 bit): EM style frame
@@ -6028,6 +6141,13 @@ void InitGraphicInfo_EM(void)
 	 bit  5 -  0 ( 6 bit): graphic height */
       g_em->unique_identifier =
 	(i << 16) | (j << 12) | (g_em->width << 6) | g_em->height;
+#endif
+
+#if 0
+      if (effective_element == EL_ROCK)
+	printf("::: EL_ROCK(%d, %d): %d, %d => %d\n",
+	       effective_action, j, graphic, frame, g_em->unique_identifier);
+#endif
 
 #if DEBUG_EM_GFX
 
@@ -6129,7 +6249,7 @@ void InitGraphicInfo_EM(void)
     }
   }
 
-  for (p = 0; p < 2; p++)
+  for (p = 0; p < MAX_PLAYERS; p++)
   {
     for (i = 0; i < SPR_MAX; i++)
     {

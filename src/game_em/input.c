@@ -10,9 +10,8 @@
 
 unsigned long RandomEM;
 
-struct PLAYER ply1;
-struct PLAYER ply2;
 struct LEVEL lev;
+struct PLAYER ply[MAX_PLAYERS];
 
 unsigned short **Boom;
 unsigned short **Cave;
@@ -92,8 +91,8 @@ void GameActions_EM(byte action[MAX_PLAYERS])
 
   frame = (frame - 1) & 7;
 
-  for (i = 0; i < 2; i++)
-    readjoy(action[i], i);
+  for (i = 0; i < MAX_PLAYERS; i++)
+    readjoy(action[i], &ply[i]);
 
   UpdateEngineValues(screen_x / TILEX, screen_y / TILEY);
 
@@ -190,7 +189,7 @@ void GameActions_EM(byte action)
 
 #if 1
 
-void readjoy(byte action, int player_nr)
+void readjoy(byte action, struct PLAYER *ply)
 {
   unsigned int north = 0, east = 0, south = 0, west = 0;
   unsigned int snap = 0, drop = 0;
@@ -213,29 +212,15 @@ void readjoy(byte action, int player_nr)
   if (action & JOY_BUTTON_2)
     drop = 1;
 
-  if (player_nr == 0)
+  ply->joy_snap = snap;
+  ply->joy_drop = drop;
+
+  if (ply->joy_stick || (north | east | south | west))
   {
-    ply1.joy_snap = snap;
-    ply1.joy_drop = drop;
-    if (ply1.joy_stick || (north | east | south | west))
-    {
-      ply1.joy_n = north;
-      ply1.joy_e = east;
-      ply1.joy_s = south;
-      ply1.joy_w = west;
-    }
-  }
-  else
-  {
-    ply2.joy_snap = snap;
-    ply2.joy_drop = drop;
-    if (ply2.joy_stick || (north | east | south | west))
-    {
-      ply2.joy_n = north;
-      ply2.joy_e = east;
-      ply2.joy_s = south;
-      ply2.joy_w = west;
-    }
+    ply->joy_n = north;
+    ply->joy_e = east;
+    ply->joy_s = south;
+    ply->joy_w = west;
   }
 }
 

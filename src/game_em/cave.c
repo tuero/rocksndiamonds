@@ -17,17 +17,17 @@ void setLevelInfoToDefaults_EM(void)
   native_em_level.file_version = FILE_VERSION_EM_ACTUAL;
 
   native_em_level.lev = &lev;
-  native_em_level.ply1 = &ply1;
-  native_em_level.ply2 = &ply2;
+  for (i = 0; i < MAX_PLAYERS; i++)
+    native_em_level.ply[i] = &ply[i];
 
   lev.width = 64;
   lev.height = 32;
 
-  ply1.x_initial = 0;
-  ply1.y_initial = 0;
-
-  ply2.x_initial = 0;
-  ply2.y_initial = 0;
+  for (i = 0; i < MAX_PLAYERS; i++)
+  {
+    ply[i].x_initial = 0;
+    ply[i].y_initial = 0;
+  }
 
   lev.lenses_cnt_initial = 0;
   lev.magnify_cnt_initial = 0;
@@ -47,10 +47,25 @@ void setLevelInfoToDefaults_EM(void)
   for (i = 0; i < TILE_MAX; i++)
     lev.android_array[i] = Xblank;
 
-  lev.home_initial = 2;		/* initial number of players in this level */
+#if 1
+  /* initial number of players in this level */
+  lev.home_initial = 0;
 
-  ply1.alive_initial = (lev.home_initial >= 1);
-  ply2.alive_initial = (lev.home_initial >= 2);
+  for (i = 0; i < MAX_PLAYERS; i++)
+  {
+    ply[i].exists = 0;
+    ply[i].alive_initial = FALSE;
+  }
+#else
+  /* initial number of players in this level */
+  lev.home_initial = (setup.team_mode ? 2 : 1);
+
+  for (i = 0; i < MAX_PLAYERS; i++)
+  {
+    ply[i].exists = 0;
+    ply[i].alive_initial = (lev.home_initial > i ? TRUE : FALSE);
+  }
+#endif
 }
 
 

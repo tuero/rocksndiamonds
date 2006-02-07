@@ -25,7 +25,7 @@ int open_all(void);
 void close_all(void);
 
 #if 1
-void readjoy(byte, int);
+void readjoy(byte, struct PLAYER *);
 #else
 void readjoy(byte);
 #endif

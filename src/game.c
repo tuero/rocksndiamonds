@@ -293,6 +293,8 @@ static void TestIfElementSmashesCustomElement(int, int, int);
 #endif
 
 static void HandleElementChange(int, int, int);
+static void ExecuteCustomElementAction(int, int, int, int);
+static boolean ChangeElement(int, int, int, int);
 
 static boolean CheckTriggeredElementChangeExt(int, int, int, int, int,int,int);
 #define CheckTriggeredElementChange(x, y, e, ev)			\
@@ -2814,14 +2816,33 @@ static void ResetRandomAnimationValue(int x, int y)
 
 static void ResetGfxAnimation(int x, int y)
 {
+#if 0
+  int element, graphic;
+#endif
+
   GfxFrame[x][y] = 0;
   GfxAction[x][y] = ACTION_DEFAULT;
   GfxDir[x][y] = MovDir[x][y];
+
+#if 0
+  element = Feld[x][y];
+  graphic = el_act_dir2img(element, GfxAction[x][y], GfxDir[x][y]);
+
+  if (graphic_info[graphic].anim_global_sync)
+    GfxFrame[x][y] = FrameCounter;
+  else if (ANIM_MODE(graphic) == ANIM_CE_VALUE)
+    GfxFrame[x][y] = CustomValue[x][y];
+  else if (ANIM_MODE(graphic) == ANIM_CE_SCORE)
+    GfxFrame[x][y] = element_info[element].collect_score;
+#endif
 }
 
 void InitMovingField(int x, int y, int direction)
 {
   int element = Feld[x][y];
+#if 0
+  int graphic;
+#endif
   int dx = (direction == MV_LEFT ? -1 : direction == MV_RIGHT ? +1 : 0);
   int dy = (direction == MV_UP   ? -1 : direction == MV_DOWN  ? +1 : 0);
   int newx = x + dx;
@@ -2834,6 +2855,17 @@ void InitMovingField(int x, int y, int direction)
   GfxDir[x][y] = direction;
   GfxAction[x][y] = (direction == MV_DOWN && CAN_FALL(element) ?
 		     ACTION_FALLING : ACTION_MOVING);
+
+#if 0
+  graphic = el_act_dir2img(element, GfxAction[x][y], GfxDir[x][y]);
+
+  if (graphic_info[graphic].anim_global_sync)
+    GfxFrame[x][y] = FrameCounter;
+  else if (ANIM_MODE(graphic) == ANIM_CE_VALUE)
+    GfxFrame[x][y] = CustomValue[x][y];
+  else if (ANIM_MODE(graphic) == ANIM_CE_SCORE)
+    GfxFrame[x][y] = element_info[element].collect_score;
+#endif
 
   /* this is needed for CEs with property "can move" / "not moving" */
 
@@ -5262,6 +5294,9 @@ inline static void TurnRoundExt(int x, int y)
 static void TurnRound(int x, int y)
 {
   int direction = MovDir[x][y];
+#if 1
+  int element, graphic;
+#endif
 
   TurnRoundExt(x, y);
 
@@ -5272,6 +5307,18 @@ static void TurnRound(int x, int y)
 
   if (MovDelay[x][y])
     GfxAction[x][y] = ACTION_TURNING_FROM_LEFT + MV_DIR_TO_BIT(direction);
+
+#if 1
+  element = Feld[x][y];
+  graphic = el_act_dir2img(element, GfxAction[x][y], GfxDir[x][y]);
+
+  if (graphic_info[graphic].anim_global_sync)
+    GfxFrame[x][y] = FrameCounter;
+  else if (ANIM_MODE(graphic) == ANIM_CE_VALUE)
+    GfxFrame[x][y] = CustomValue[x][y];
+  else if (ANIM_MODE(graphic) == ANIM_CE_SCORE)
+    GfxFrame[x][y] = element_info[element].collect_score;
+#endif
 }
 
 static boolean JustBeingPushed(int x, int y)
@@ -6448,6 +6495,28 @@ void ContinueMoving(int x, int y)
   CheckTriggeredElementChangeBySide(x, y, element, CE_MOVE_OF_X, direction);
 
   TestIfElementTouchesCustomElement(x, y);	/* empty or new element */
+
+#if 0
+  if (ChangePage[newx][newy] != -1)		/* delayed change */
+  {
+    int page = ChangePage[newx][newy];
+    struct ElementChangeInfo *change = &ei->change_page[page];
+
+    ChangePage[newx][newy] = -1;
+
+    if (change->can_change)
+    {
+      if (ChangeElement(newx, newy, element, page))
+      {
+        if (change->post_change_function)
+          change->post_change_function(newx, newy);
+      }
+    }
+
+    if (change->has_action)
+      ExecuteCustomElementAction(newx, newy, element, page);
+  }
+#endif
 
   TestIfElementHitsCustomElement(newx, newy, direction);
   TestIfPlayerTouchesCustomElement(newx, newy);
@@ -7790,6 +7859,10 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
 
 	CheckElementChange(x, y, element, EL_UNDEFINED, CE_VALUE_GETS_ZERO);
 	CheckTriggeredElementChange(x, y, element, CE_VALUE_GETS_ZERO_OF_X);
+
+#if 0
+	printf("::: RESULT: %d, %d\n", Feld[x][y], ChangePage[x][y]);
+#endif
       }
 #endif
 
@@ -8339,8 +8412,20 @@ static boolean CheckElementChangeExt(int x, int y,
     element = Feld[x][y];
   }
 
-  if (Feld[x][y] != element)	/* check if element has already changed */
+#if 0
+  /* check if element has already changed */
+  if (Feld[x][y] != element)
     return FALSE;
+#else
+  /* check if element has already changed or is about to change after moving */
+  if ((game.engine_version < VERSION_IDENT(3,2,0,7) &&
+       Feld[x][y] != element) ||
+
+      (game.engine_version >= VERSION_IDENT(3,2,0,7) &&
+       (ChangeCount[x][y] >= game.max_num_changes_per_frame ||
+	ChangePage[x][y] != -1)))
+    return FALSE;
+#endif
 
   for (p = 0; p < element_info[element].num_change_pages; p++)
   {

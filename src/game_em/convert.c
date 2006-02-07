@@ -563,12 +563,12 @@ void convert_em_level(unsigned char *src, int file_version)
 
   lev.required_initial = src[0x82F];
 
-  temp = src[0x830] << 8 | src[0x831];
-  ply1.x_initial = (temp & 63) + 1;
-  ply1.y_initial = (temp >> 6 & 31) + 1;
-  temp = src[0x832] << 8 | src[0x833];
-  ply2.x_initial = (temp & 63) + 1;
-  ply2.y_initial = (temp >> 6 & 31) + 1;
+  for (i = 0; i < 2; i++)
+  {
+    temp = src[0x830 + i * 2] << 8 | src[0x831 + i * 2];
+    ply[i].x_initial = (temp & 63) + 1;
+    ply[i].y_initial = (temp >> 6 & 31) + 1;
+  }
 
   temp = (src[0x834] << 8 | src[0x835]) * 28;
   if (temp > 9999)
@@ -886,17 +886,23 @@ void convert_em_level(unsigned char *src, int file_version)
       native_em_level.cave[x + 1][y + 1] = remap_emerald[src[temp++]];
 
   /* at last, set the two players at their positions in the playfield */
-  if (ply1.alive_initial)
-    native_em_level.cave[ply1.x_initial][ply1.y_initial] = Zplayer;
-  if (ply2.alive_initial)
-    native_em_level.cave[ply2.x_initial][ply2.y_initial] = Zplayer;
+  /* (native EM[C] levels always have exactly two players in a level) */
+#if 1
+  for (i = 0; i < 2; i++)
+    native_em_level.cave[ply[i].x_initial][ply[i].y_initial] = Zplayer;
+#else
+  for (i = 0; i < 2; i++)
+    if (ply[i].alive_initial)
+      native_em_level.cave[ply[i].x_initial][ply[i].y_initial] = Zplayer;
+#endif
 
   native_em_level.file_version = file_version;
 }
 
 void prepare_em_level(void)
 {
-  unsigned int x, y;
+  unsigned int i, x, y;
+  int players_left;
 
   /* reset all runtime variables to their initial values */
 
@@ -945,33 +951,64 @@ void prepare_em_level(void)
   lev.wonderwall_state = lev.wonderwall_state_initial;
   lev.wonderwall_time  = lev.wonderwall_time_initial;
 
-  lev.home = lev.home_initial;
-
   lev.killed_out_of_time = FALSE;
 
-  ply1.num = 0;
-  ply1.alive = ply1.alive_initial;
-  ply1.dynamite = 0;
-  ply1.dynamite_cnt = 0;
-  ply1.keys = 0;
-  ply1.anim = 0;
-  ply1.oldx = ply1.x = ply1.x_initial;
-  ply1.oldy = ply1.y = ply1.y_initial;
-  ply1.last_move_dir = MV_NONE;
-  ply1.joy_n = ply1.joy_e = ply1.joy_s = ply1.joy_w = 0;
-  ply1.joy_snap = ply1.joy_drop = 0;
-  ply1.joy_stick = ply1.joy_spin = 0;
+  /* determine number of players in this level */
+  lev.home_initial = 0;
 
-  ply2.num = 1;
-  ply2.alive = ply2.alive_initial;
-  ply2.dynamite = 0;
-  ply2.dynamite_cnt = 0;
-  ply2.keys = 0;
-  ply2.anim = 0;
-  ply2.oldx = ply2.x = ply2.x_initial;
-  ply2.oldy = ply2.y = ply2.y_initial;
-  ply2.last_move_dir = MV_NONE;
-  ply2.joy_n = ply2.joy_e = ply2.joy_s = ply2.joy_w = 0;
-  ply2.joy_snap = ply1.joy_drop = 0;
-  ply2.joy_stick = ply2.joy_spin = 0;
+  for (i = 0; i < MAX_PLAYERS; i++)
+  {
+    ply[i].exists = 0;
+    ply[i].alive_initial = FALSE;
+
+    if (ply[i].x_initial > 0 && ply[i].y_initial > 0)
+    {
+      ply[i].exists = 1;
+
+      lev.home_initial++;
+    }
+  }
+
+  if (!setup.team_mode)
+    lev.home_initial = MIN(lev.home_initial, 1);
+
+  lev.home = lev.home_initial;
+  players_left = lev.home_initial;
+
+  for (i = 0; i < MAX_PLAYERS; i++)
+  {
+    if (ply[i].exists)
+    {
+      if (players_left)
+      {
+	ply[i].alive_initial = TRUE;
+	players_left--;
+      }
+      else
+      {
+	native_em_level.cave[ply[i].x_initial][ply[i].y_initial] = Xblank;
+      }
+    }
+  }
+
+  for (i = 0; i < MAX_PLAYERS; i++)
+  {
+    ply[i].num = i;
+    ply[i].alive = ply[i].alive_initial;
+    ply[i].dynamite = 0;
+    ply[i].dynamite_cnt = 0;
+    ply[i].keys = 0;
+    ply[i].anim = 0;
+    ply[i].oldx = ply[i].x = ply[i].x_initial;
+    ply[i].oldy = ply[i].y = ply[i].y_initial;
+    ply[i].last_move_dir = MV_NONE;
+    ply[i].joy_n = ply[i].joy_e = ply[i].joy_s = ply[i].joy_w = 0;
+    ply[i].joy_snap  = ply[i].joy_drop = 0;
+    ply[i].joy_stick = ply[i].joy_spin = 0;
+
+#if 0
+    printf("player %d: x/y == %d/%d, alive == %d\n",
+	   i, ply[i].x_initial, ply[i].y_initial, ply[i].alive);
+#endif
+  }
 }

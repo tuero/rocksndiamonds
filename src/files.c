@@ -2389,9 +2389,16 @@ void CopyNativeLevel_RND_to_EM(struct LevelInfo *level)
   };
   struct LevelInfo_EM *level_em = level->native_em_level;
   struct LEVEL *lev = level_em->lev;
-  struct PLAYER *ply1 = level_em->ply1;
-  struct PLAYER *ply2 = level_em->ply2;
+  struct PLAYER **ply = level_em->ply;
   int i, j, x, y;
+
+#if 0
+  printf("::: A\n");
+  for (i = 0; i < MAX_ELEMENT_CONTENTS; i++)
+    for (j = 0; j < 8; j++)
+      printf("::: ball %d, %d: %d\n", i, j,
+	     level->ball_content[i].e[ball_xy[j][0]][ball_xy[j][1]]);
+#endif
 
   lev->width  = MIN(level->fieldx, EM_MAX_CAVE_WIDTH);
   lev->height = MIN(level->fieldy, EM_MAX_CAVE_HEIGHT);
@@ -2445,6 +2452,13 @@ void CopyNativeLevel_RND_to_EM(struct LevelInfo *level)
 	map_element_RND_to_EM(level->
 			      ball_content[i].e[ball_xy[j][0]][ball_xy[j][1]]);
 
+#if 0
+  for (i = 0; i < MAX_ELEMENT_CONTENTS; i++)
+    for (j = 0; j < 8; j++)
+      printf("::: ball %d, %d: %d\n", i, j,
+	     level->ball_content[i].e[ball_xy[j][0]][ball_xy[j][1]]);
+#endif
+
   map_android_clone_elements_RND_to_EM(level);
 
 #if 0
@@ -2468,15 +2482,42 @@ void CopyNativeLevel_RND_to_EM(struct LevelInfo *level)
     level_em->cave[x + 1][y + 1] = new_element;
   }
 
+#if 1
+
+  for (i = 0; i < MAX_PLAYERS; i++)
+  {
+    ply[i]->x_initial = 0;
+    ply[i]->y_initial = 0;
+  }
+
+#else
+
   ply1->x_initial = 0;
   ply1->y_initial = 0;
 
   ply2->x_initial = 0;
   ply2->y_initial = 0;
 
+#endif
+
   /* initialize player positions and delete players from the playfield */
   for (y = 0; y < lev->height; y++) for (x = 0; x < lev->width; x++)
   {
+
+#if 1
+
+    if (ELEM_IS_PLAYER(level->field[x][y]))
+    {
+      int player_nr = GET_PLAYER_NR(level->field[x][y]);
+
+      ply[player_nr]->x_initial = x + 1;
+      ply[player_nr]->y_initial = y + 1;
+
+      level_em->cave[x + 1][y + 1] = map_element_RND_to_EM(EL_EMPTY);
+    }
+
+#else
+
 #if 1
     /* !!! CURRENTLY ONLY SUPPORT FOR ONE PLAYER !!! */
     if (ELEM_IS_PLAYER(level->field[x][y]))
@@ -2500,6 +2541,9 @@ void CopyNativeLevel_RND_to_EM(struct LevelInfo *level)
       level_em->cave[x + 1][y + 1] = map_element_RND_to_EM(EL_EMPTY);
     }
 #endif
+
+#endif
+
   }
 }
 
@@ -2518,8 +2562,7 @@ void CopyNativeLevel_EM_to_RND(struct LevelInfo *level)
   };
   struct LevelInfo_EM *level_em = level->native_em_level;
   struct LEVEL *lev = level_em->lev;
-  struct PLAYER *ply1 = level_em->ply1;
-  struct PLAYER *ply2 = level_em->ply2;
+  struct PLAYER **ply = level_em->ply;
   int i, j, x, y;
 
   level->fieldx = MIN(lev->width,  MAX_LEV_FIELDX);
@@ -2570,10 +2613,26 @@ void CopyNativeLevel_EM_to_RND(struct LevelInfo *level)
   level->wind_direction_initial =
     map_direction_EM_to_RND(lev->wind_direction_initial);
 
+#if 0
+  printf("::: foo\n");
+  for (i = 0; i < MAX_ELEMENT_CONTENTS; i++)
+    for (j = 0; j < 8; j++)
+      printf("::: ball %d, %d: %d\n", i, j,
+	     level->ball_content[i].e[ball_xy[j][0]][ball_xy[j][1]]);
+#endif
+
   for (i = 0; i < MAX_ELEMENT_CONTENTS; i++)
     for (j = 0; j < 8; j++)
       level->ball_content[i].e[ball_xy[j][0]][ball_xy[j][1]] =
 	map_element_EM_to_RND(lev->ball_array[i][j]);
+
+#if 0
+  printf("::: bar\n");
+  for (i = 0; i < MAX_ELEMENT_CONTENTS; i++)
+    for (j = 0; j < 8; j++)
+      printf("::: ball %d, %d: %d\n", i, j,
+	     level->ball_content[i].e[ball_xy[j][0]][ball_xy[j][1]]);
+#endif
 
   map_android_clone_elements_EM_to_RND(level);
 
@@ -2593,12 +2652,49 @@ void CopyNativeLevel_EM_to_RND(struct LevelInfo *level)
     level->field[x][y] = new_element;
   }
 
+#if 0
+  printf("::: bar 0\n");
+  for (i = 0; i < MAX_ELEMENT_CONTENTS; i++)
+    for (j = 0; j < 8; j++)
+      printf("::: ball %d, %d: %d\n", i, j,
+	     level->ball_content[i].e[ball_xy[j][0]][ball_xy[j][1]]);
+#endif
+
+#if 1
+
+  for (i = 0; i < MAX_PLAYERS; i++)
+  {
+    /* in case of all players set to the same field, use the first player */
+    int nr = MAX_PLAYERS - i - 1;
+    int jx = ply[nr]->x_initial - 1;
+    int jy = ply[nr]->y_initial - 1;
+
+#if 0
+    printf("::: player %d: %d, %d\n", nr, jx, jy);
+#endif
+
+    if (jx != -1 && jy != -1)
+      level->field[jx][jy] = EL_PLAYER_1 + nr;
+  }
+
+#else
+
   /* in case of both players set to the same field, use the first player */
   level->field[ply2->x_initial - 1][ply2->y_initial - 1] = EL_PLAYER_2;
   level->field[ply1->x_initial - 1][ply1->y_initial - 1] = EL_PLAYER_1;
 
+#endif
+
 #if 0
   printf("::: native Emerald Mine file version: %d\n", level_em->file_version);
+#endif
+
+#if 0
+  printf("::: bar 2\n");
+  for (i = 0; i < MAX_ELEMENT_CONTENTS; i++)
+    for (j = 0; j < 8; j++)
+      printf("::: ball %d, %d: %d\n", i, j,
+	     level->ball_content[i].e[ball_xy[j][0]][ball_xy[j][1]]);
 #endif
 }
 
@@ -2617,6 +2713,30 @@ void CopyNativeLevel_RND_to_Native(struct LevelInfo *level)
 
 void CopyNativeLevel_Native_to_RND(struct LevelInfo *level)
 {
+
+#if 0
+  {
+    static int ball_xy[8][2] =
+      {
+	{ 0, 0 },
+	{ 1, 0 },
+	{ 2, 0 },
+	{ 0, 1 },
+	{ 2, 1 },
+	{ 0, 2 },
+	{ 1, 2 },
+	{ 2, 2 },
+      };
+    int i, j;
+
+    printf("::: A6\n");
+    for (i = 0; i < MAX_ELEMENT_CONTENTS; i++)
+      for (j = 0; j < 8; j++)
+	printf("::: ball %d, %d: %d\n", i, j,
+	       level->ball_content[i].e[ball_xy[j][0]][ball_xy[j][1]]);
+  }
+#endif
+
   if (level->game_engine_type == GAME_ENGINE_TYPE_EM)
     CopyNativeLevel_EM_to_RND(level);
 }
