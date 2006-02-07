@@ -8,6 +8,24 @@
 #include "level.h"
 
 
+#define MIN_SCREEN_X		(TILEX)
+#define MIN_SCREEN_Y		(TILEY)
+#define MAX_SCREEN_X		((lev.width  - (SCR_FIELDX - 1)) * TILEX)
+#define MAX_SCREEN_Y		((lev.height - (SCR_FIELDY - 1)) * TILEY)
+
+#define VALID_SCREEN_X(x)	((x) < MIN_SCREEN_X ? MIN_SCREEN_X :	\
+				 (x) > MAX_SCREEN_X ? MAX_SCREEN_X : (x))
+#define VALID_SCREEN_Y(y)	((y) < MIN_SCREEN_Y ? MIN_SCREEN_Y :	\
+				 (y) > MAX_SCREEN_Y ? MAX_SCREEN_Y : (y))
+
+#define PLAYER_SCREEN_X(p)	(((    frame) * ply[p].oldx +		\
+				  (8 - frame) * ply[p].x) * TILEX / 8	\
+				 - ((SCR_FIELDX - 1) * TILEX) / 2)
+#define PLAYER_SCREEN_Y(p)	(((    frame) * ply[p].oldy +		\
+				  (8 - frame) * ply[p].y) * TILEY / 8	\
+				 - ((SCR_FIELDY - 1) * TILEY) / 2)
+
+
 unsigned int frame;		/* current screen frame */
 #if 0
 unsigned int screen_x;		/* current scroll position */
@@ -424,10 +442,16 @@ void game_initscreen(void)
   unsigned int x,y;
   int dynamite_state = ply[0].dynamite;		/* !!! ONLY PLAYER 1 !!! */
   int all_keys_state = ply[0].keys | ply[1].keys | ply[2].keys | ply[3].keys;
+  int player_nr = 0;		/* !!! FIX THIS (CENTERED TO PLAYER 1) !!! */
 
   frame = 6;
+#if 1
+  screen_x = VALID_SCREEN_X(PLAYER_SCREEN_X(player_nr));
+  screen_y = VALID_SCREEN_Y(PLAYER_SCREEN_Y(player_nr));
+#else
   screen_x = 0;
   screen_y = 0;
+#endif
 
   for (y = 0; y < MAX_BUF_YSIZE; y++)
   {
@@ -449,42 +473,22 @@ void game_initscreen(void)
 
 void RedrawPlayfield_EM()
 {
-  int i, sx, sy;
+  int player_nr = 0;		/* !!! FIX THIS (CENTERED TO PLAYER 1) !!! */
+  int sx = PLAYER_SCREEN_X(player_nr);
+  int sy = PLAYER_SCREEN_Y(player_nr);
+  int i;
 
 #if 1
 
-  int screen_x_min = TILEX;
-  int screen_y_min = TILEY;
-  int screen_x_max = (lev.width  - (SCR_FIELDX - 1)) * TILEX;
-  int screen_y_max = (lev.height - (SCR_FIELDY - 1)) * TILEY;
   int offset = (setup.scroll_delay ? 3 : 0) * TILEX;
-  int stepsize = TILEX / 8;
-  int nr = 0;		/* !!! FIX THIS (CENTERED TO PLAYER 1) !!! */
-
-  sx = (frame * ply[nr].oldx + (8 - frame) * ply[nr].x) * stepsize
-    - ((SCR_FIELDX - 1) * TILEX) / 2;
-  sy = (frame * ply[nr].oldy + (8 - frame) * ply[nr].y) * stepsize
-    - ((SCR_FIELDY - 1) * TILEY) / 2;
 
   /* calculate new screen scrolling position, with regard to scroll delay */
-  screen_x = (sx < screen_x - offset ? sx + offset :
-	      sx > screen_x + offset ? sx - offset : screen_x);
-  screen_y = (sy < screen_y - offset ? sy + offset :
-	      sy > screen_y + offset ? sy - offset : screen_y);
-
-  /* check minimal and maximal boundaries for screen scrolling position */
-  screen_x = (screen_x < screen_x_min ? screen_x_min :
-	      screen_x > screen_x_max ? screen_x_max : screen_x);
-  screen_y = (screen_y < screen_y_min ? screen_y_min :
-	      screen_y > screen_y_max ? screen_y_max : screen_y);
+  screen_x = VALID_SCREEN_X(sx < screen_x - offset ? sx + offset :
+			    sx > screen_x + offset ? sx - offset : screen_x);
+  screen_y = VALID_SCREEN_Y(sy < screen_y - offset ? sy + offset :
+			    sy > screen_y + offset ? sy - offset : screen_y);
 
 #else
-
-  /* !!! FIX THIS (CENTERED TO PLAYER 1) !!! */
-  sx = (frame * ply[0].oldx + (8 - frame) * ply[0].x) * TILEX / 8
-    + ((SCR_FIELDX - 1) * TILEX) / 2;
-  sy = (frame * ply[0].oldy + (8 - frame) * ply[0].y) * TILEY / 8
-    + ((SCR_FIELDY - 1) * TILEY) / 2;
 
   if (sx > lev.width * TILEX)
     sx = lev.width * TILEX;
