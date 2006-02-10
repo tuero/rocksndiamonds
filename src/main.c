@@ -4423,7 +4423,7 @@ struct ElementActionInfo element_action_info[NUM_ACTIONS + 1 + 1] =
   { ".turning_from_down",	ACTION_TURNING_FROM_DOWN,	FALSE	},
   { ".smashed_by_rock",		ACTION_SMASHED_BY_ROCK,		FALSE	},
   { ".smashed_by_spring",	ACTION_SMASHED_BY_SPRING,	FALSE	},
-  { ".slurped_by_spring",	ACTION_SLURPED_BY_SPRING,	FALSE	},
+  { ".slurping",		ACTION_SLURPING,		FALSE	},
   { ".twinkling",		ACTION_TWINKLING,		FALSE	},
   { ".splashing",		ACTION_SPLASHING,		FALSE	},
   { ".page[1]",			ACTION_PAGE_1,			FALSE	},

@@ -1,3 +1,7 @@
+2006-02-09
+	* fixed minor graphical problems with springs smashing and slurping
+	  (when using R'n'D style graphics instead of EMC style graphics)
+
 2006-02-07
 	* added scroll delay (as configured in setup) to EMC graphics engine
 

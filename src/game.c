@@ -11769,7 +11769,7 @@ void PlayLevelSound_EM(int x, int y, int element_em, int sample)
       break;
 
     case SAMPLE_slurp:
-      PlayLevelSoundElementAction(x, y, element, ACTION_SLURPED_BY_SPRING);
+      PlayLevelSoundElementAction(x, y, element, ACTION_SLURPING);
       break;
 
     case SAMPLE_eater:

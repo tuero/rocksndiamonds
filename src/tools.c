@@ -3440,19 +3440,19 @@ em_object_mapping_list[] =
   },
   {
     Yspring_kill_e,			FALSE,	FALSE,
-    EL_ROBOT,				ACTION_SLURPED_BY_SPRING, MV_BIT_RIGHT
+    EL_SPRING,				ACTION_SLURPING, MV_BIT_RIGHT
   },
   {
     Yspring_kill_eB,			FALSE,	TRUE,
-    EL_ROBOT,				ACTION_SLURPED_BY_SPRING, MV_BIT_RIGHT
+    EL_SPRING,				ACTION_SLURPING, MV_BIT_RIGHT
   },
   {
     Yspring_kill_w,			FALSE,	FALSE,
-    EL_ROBOT,				ACTION_SLURPED_BY_SPRING, MV_BIT_LEFT
+    EL_SPRING,				ACTION_SLURPING, MV_BIT_LEFT
   },
   {
     Yspring_kill_wB,			FALSE,	TRUE,
-    EL_ROBOT,				ACTION_SLURPED_BY_SPRING, MV_BIT_LEFT
+    EL_SPRING,				ACTION_SLURPING, MV_BIT_LEFT
   },
   {
     Xeater_n,				TRUE,	FALSE,
@@ -4969,640 +4969,6 @@ void map_android_clone_elements_EM_to_RND(struct LevelInfo *level)
   }
 }
 
-#if 0
-
-int map_element_RND_to_EM(int element_rnd)
-{
-  static unsigned short mapping_RND_to_EM[NUM_FILE_ELEMENTS];
-  static boolean mapping_initialized = FALSE;
-
-  struct
-  {
-    int element_em;
-    int element_rnd;
-  }
-  mapping_RND_to_EM_list[] =
-  {
-    { Xblank,			EL_EMPTY			},
-    { Xstone,			EL_ROCK				},
-    { Xnut,			EL_NUT				},
-    { Xbug_n,			EL_BUG_UP			},
-    { Xbug_e,			EL_BUG_RIGHT			},
-    { Xbug_s,			EL_BUG_DOWN			},
-    { Xbug_w,			EL_BUG_LEFT			},
-    { Xtank_n,			EL_SPACESHIP_UP			},
-    { Xtank_e,			EL_SPACESHIP_RIGHT		},
-    { Xtank_s,			EL_SPACESHIP_DOWN		},
-    { Xtank_w,			EL_SPACESHIP_LEFT		},
-    { Xandroid,			EL_EMC_ANDROID			},
-    { Xandroid_1_n,		EL_EMC_ANDROID_UP		},
-    { Xandroid_1_e,		EL_EMC_ANDROID_RIGHT		},
-    { Xandroid_1_w,		EL_EMC_ANDROID_LEFT		},
-    { Xandroid_1_s,		EL_EMC_ANDROID_DOWN		},
-    { Xspring,			EL_SPRING			},
-    { Xeater_n,			EL_YAMYAM			},
-    { Xalien,			EL_ROBOT			},
-    { Xemerald,			EL_EMERALD			},
-    { Xdiamond,			EL_DIAMOND			},
-    { Xdrip_fall,		EL_AMOEBA_DROP			},
-    { Xbomb,			EL_BOMB				},
-    { Xballoon,			EL_BALLOON			},
-    { Xgrass,			EL_EMC_GRASS			},
-    { Xdirt,			EL_SAND				},
-    { Xacid_ne,			EL_ACID_POOL_TOPRIGHT		},
-    { Xacid_se,			EL_ACID_POOL_BOTTOMRIGHT	},
-    { Xacid_s,			EL_ACID_POOL_BOTTOM		},
-    { Xacid_sw,			EL_ACID_POOL_BOTTOMLEFT		},
-    { Xacid_nw,			EL_ACID_POOL_TOPLEFT		},
-    { Xacid_1,			EL_ACID				},
-    { Xball_1,			EL_EMC_MAGIC_BALL		},
-    { Xgrow_ns,			EL_EMC_GROW			},
-    { Xwonderwall,		EL_MAGIC_WALL			},
-    { Xamoeba_1,		EL_AMOEBA_WET			},
-    { Xdoor_1,			EL_EM_GATE_1			},
-    { Xdoor_2,			EL_EM_GATE_2			},
-    { Xdoor_3,			EL_EM_GATE_3			},
-    { Xdoor_4,			EL_EM_GATE_4			},
-    { Xdoor_5,			EL_EMC_GATE_5			},
-    { Xdoor_6,			EL_EMC_GATE_6			},
-    { Xdoor_7,			EL_EMC_GATE_7			},
-    { Xdoor_8,			EL_EMC_GATE_8			},
-    { Xkey_1,			EL_EM_KEY_1			},
-    { Xkey_2,			EL_EM_KEY_2			},
-    { Xkey_3,			EL_EM_KEY_3			},
-    { Xkey_4,			EL_EM_KEY_4			},
-    { Xkey_5,			EL_EMC_KEY_5			},
-    { Xkey_6,			EL_EMC_KEY_6			},
-    { Xkey_7,			EL_EMC_KEY_7			},
-    { Xkey_8,			EL_EMC_KEY_8			},
-    { Xwind_n,			EL_BALLOON_SWITCH_UP		},
-    { Xwind_e,			EL_BALLOON_SWITCH_RIGHT		},
-    { Xwind_s,			EL_BALLOON_SWITCH_DOWN		},
-    { Xwind_w,			EL_BALLOON_SWITCH_LEFT		},
-    { Xwind_nesw,		EL_BALLOON_SWITCH_ANY		},
-    { Xwind_stop,		EL_BALLOON_SWITCH_NONE		},
-    { Xexit,			EL_EXIT_CLOSED			},
-    { Xexit_1,			EL_EXIT_OPEN			},
-    { Xdynamite,		EL_DYNAMITE			},
-    { Xdynamite_1,		EL_DYNAMITE_ACTIVE		},
-    { Xbumper,			EL_EMC_BUMPER			},
-    { Xwheel,			EL_ROBOT_WHEEL			},
-    { Xswitch,			EL_UNKNOWN			},
-    { Xsand,			EL_QUICKSAND_EMPTY		},
-    { Xsand_stone,		EL_QUICKSAND_FULL		},
-    { Xplant,			EL_EMC_PLANT			},
-    { Xlenses,			EL_EMC_LENSES			},
-    { Xmagnify,			EL_EMC_MAGNIFIER		},
-    { Xdripper,			EL_UNKNOWN			},
-    { Xfake_blank,		EL_INVISIBLE_WALL		},
-    { Xfake_grass,		EL_INVISIBLE_SAND		},
-    { Xfake_door_1,		EL_EM_GATE_1_GRAY		},
-    { Xfake_door_2,		EL_EM_GATE_2_GRAY		},
-    { Xfake_door_3,		EL_EM_GATE_3_GRAY		},
-    { Xfake_door_4,		EL_EM_GATE_4_GRAY		},
-    { Xfake_door_5,		EL_EMC_GATE_5_GRAY		},
-    { Xfake_door_6,		EL_EMC_GATE_6_GRAY		},
-    { Xfake_door_7,		EL_EMC_GATE_7_GRAY		},
-    { Xfake_door_8,		EL_EMC_GATE_8_GRAY		},
-    { Xsteel_1,			EL_STEELWALL			},
-    { Xsteel_2,			EL_UNKNOWN			},
-    { Xsteel_3,			EL_EMC_STEELWALL_1		},
-    { Xsteel_4,			EL_UNKNOWN			},
-    { Xwall_1,			EL_WALL				},
-    { Xwall_2,			EL_UNKNOWN			},
-    { Xwall_3,			EL_UNKNOWN			},
-    { Xwall_4,			EL_UNKNOWN			},
-    { Xround_wall_1,		EL_WALL_SLIPPERY		},
-    { Xround_wall_2,		EL_UNKNOWN			},
-    { Xround_wall_3,		EL_UNKNOWN			},
-    { Xround_wall_4,		EL_UNKNOWN			},
-    { Xdecor_1,			EL_UNKNOWN			},
-    { Xdecor_2,			EL_EMC_WALL_6			},
-    { Xdecor_3,			EL_EMC_WALL_4			},
-    { Xdecor_4,			EL_EMC_WALL_5			},
-    { Xdecor_5,			EL_EMC_WALL_7			},
-    { Xdecor_6,			EL_EMC_WALL_8			},
-    { Xdecor_7,			EL_UNKNOWN			},
-    { Xdecor_8,			EL_EMC_WALL_1			},
-    { Xdecor_9,			EL_EMC_WALL_2			},
-    { Xdecor_10,		EL_EMC_WALL_3			},
-    { Xdecor_11,		EL_UNKNOWN			},
-    { Xdecor_12,		EL_UNKNOWN			},
-    { Xalpha_0,			EL_CHAR('0')			},
-    { Xalpha_1,			EL_CHAR('1')			},
-    { Xalpha_2,			EL_CHAR('2')			},
-    { Xalpha_3,			EL_CHAR('3')			},
-    { Xalpha_4,			EL_CHAR('4')			},
-    { Xalpha_5,			EL_CHAR('5')			},
-    { Xalpha_6,			EL_CHAR('6')			},
-    { Xalpha_7,			EL_CHAR('7')			},
-    { Xalpha_8,			EL_CHAR('8')			},
-    { Xalpha_9,			EL_CHAR('9')			},
-    { Xalpha_excla,		EL_CHAR('!')			},
-    { Xalpha_quote,		EL_CHAR('"')			},
-    { Xalpha_comma,		EL_CHAR(',')			},
-    { Xalpha_minus,		EL_CHAR('-')			},
-    { Xalpha_perio,		EL_CHAR('.')			},
-    { Xalpha_colon,		EL_CHAR(':')			},
-    { Xalpha_quest,		EL_CHAR('?')			},
-    { Xalpha_a,			EL_CHAR('A')			},
-    { Xalpha_b,			EL_CHAR('B')			},
-    { Xalpha_c,			EL_CHAR('C')			},
-    { Xalpha_d,			EL_CHAR('D')			},
-    { Xalpha_e,			EL_CHAR('E')			},
-    { Xalpha_f,			EL_CHAR('F')			},
-    { Xalpha_g,			EL_CHAR('G')			},
-    { Xalpha_h,			EL_CHAR('H')			},
-    { Xalpha_i,			EL_CHAR('I')			},
-    { Xalpha_j,			EL_CHAR('J')			},
-    { Xalpha_k,			EL_CHAR('K')			},
-    { Xalpha_l,			EL_CHAR('L')			},
-    { Xalpha_m,			EL_CHAR('M')			},
-    { Xalpha_n,			EL_CHAR('N')			},
-    { Xalpha_o,			EL_CHAR('O')			},
-    { Xalpha_p,			EL_CHAR('P')			},
-    { Xalpha_q,			EL_CHAR('Q')			},
-    { Xalpha_r,			EL_CHAR('R')			},
-    { Xalpha_s,			EL_CHAR('S')			},
-    { Xalpha_t,			EL_CHAR('T')			},
-    { Xalpha_u,			EL_CHAR('U')			},
-    { Xalpha_v,			EL_CHAR('V')			},
-    { Xalpha_w,			EL_CHAR('W')			},
-    { Xalpha_x,			EL_CHAR('X')			},
-    { Xalpha_y,			EL_CHAR('Y')			},
-    { Xalpha_z,			EL_CHAR('Z')			},
-    { Xalpha_arrow_e,		EL_CHAR('>')			},
-    { Xalpha_arrow_w,		EL_CHAR('<')			},
-    { Xalpha_copyr,		EL_CHAR('©')			},
-
-    { Zplayer,			EL_PLAYER_1			},
-    { Zplayer,			EL_PLAYER_2			},
-    { Zplayer,			EL_PLAYER_3			},
-    { Zplayer,			EL_PLAYER_4			},
-
-    { ZBORDER,			EL_EMC_LEVEL_BORDER		},
-
-    { -1,			-1				}
-  };
-
-  if (!mapping_initialized)
-  {
-    int i;
-
-    /* return "Xalpha_quest" for all undefined elements in mapping array */
-    for (i = 0; i < NUM_FILE_ELEMENTS; i++)
-      mapping_RND_to_EM[i] = Xalpha_quest;
-
-    for (i = 0; mapping_RND_to_EM_list[i].element_rnd != -1; i++)
-      mapping_RND_to_EM[mapping_RND_to_EM_list[i].element_rnd] =
-	mapping_RND_to_EM_list[i].element_em;
-
-    mapping_initialized = TRUE;
-  }
-
-  if (element_rnd >= 0 && element_rnd < NUM_FILE_ELEMENTS)
-    return mapping_RND_to_EM[element_rnd];
-
-  Error(ERR_WARN, "invalid RND level element %d", element_rnd);
-
-  return EL_UNKNOWN;
-}
-
-int map_element_EM_to_RND(int element_em)
-{
-  static unsigned short mapping_EM_to_RND[TILE_MAX];
-  static boolean mapping_initialized = FALSE;
-
-  struct
-  {
-    int element_em;
-    int element_rnd;
-  }
-  em_object_mapping_list[] =
-  {
-    { Xblank,			EL_EMPTY			},
-    { Yacid_splash_eB,		EL_EMPTY			},
-    { Yacid_splash_wB,		EL_EMPTY			},
-
-#ifdef EM_ENGINE_BAD_ROLL
-    { Xstone_force_e,		EL_ROCK				},
-    { Xstone_force_w,		EL_ROCK				},
-    { Xnut_force_e,		EL_NUT				},
-    { Xnut_force_w,		EL_NUT				},
-    { Xspring_force_e,		EL_SPRING			},
-    { Xspring_force_w,		EL_SPRING			},
-    { Xemerald_force_e,		EL_EMERALD			},
-    { Xemerald_force_w,		EL_EMERALD			},
-    { Xdiamond_force_e,		EL_DIAMOND			},
-    { Xdiamond_force_w,		EL_DIAMOND			},
-    { Xbomb_force_e,		EL_BOMB				},
-    { Xbomb_force_w,		EL_BOMB				},
-#endif
-
-    { Xstone,			EL_ROCK				},
-    { Xstone_pause,		EL_ROCK				},
-    { Xstone_fall,		EL_ROCK				},
-    { Ystone_s,			EL_ROCK				},
-    { Ystone_sB,		EL_ROCK				},
-    { Ystone_e,			EL_ROCK				},
-    { Ystone_eB,		EL_ROCK				},
-    { Ystone_w,			EL_ROCK				},
-    { Ystone_wB,		EL_ROCK				},
-    { Xnut,			EL_NUT				},
-    { Xnut_pause,		EL_NUT				},
-    { Xnut_fall,		EL_NUT				},
-    { Ynut_s,			EL_NUT				},
-    { Ynut_sB,			EL_NUT				},
-    { Ynut_e,			EL_NUT				},
-    { Ynut_eB,			EL_NUT				},
-    { Ynut_w,			EL_NUT				},
-    { Ynut_wB,			EL_NUT				},
-    { Xbug_n,			EL_BUG_UP			},
-    { Xbug_e,			EL_BUG_RIGHT			},
-    { Xbug_s,			EL_BUG_DOWN			},
-    { Xbug_w,			EL_BUG_LEFT			},
-    { Xbug_gon,			EL_BUG_UP			},
-    { Xbug_goe,			EL_BUG_RIGHT			},
-    { Xbug_gos,			EL_BUG_DOWN			},
-    { Xbug_gow,			EL_BUG_LEFT			},
-    { Ybug_n,			EL_BUG_UP			},
-    { Ybug_nB,			EL_BUG_UP			},
-    { Ybug_e,			EL_BUG_RIGHT			},
-    { Ybug_eB,			EL_BUG_RIGHT			},
-    { Ybug_s,			EL_BUG_DOWN			},
-    { Ybug_sB,			EL_BUG_DOWN			},
-    { Ybug_w,			EL_BUG_LEFT			},
-    { Ybug_wB,			EL_BUG_LEFT			},
-    { Ybug_w_n,			EL_BUG_UP			},
-    { Ybug_n_e,			EL_BUG_RIGHT			},
-    { Ybug_e_s,			EL_BUG_DOWN			},
-    { Ybug_s_w,			EL_BUG_LEFT			},
-    { Ybug_e_n,			EL_BUG_UP			},
-    { Ybug_s_e,			EL_BUG_RIGHT			},
-    { Ybug_w_s,			EL_BUG_DOWN			},
-    { Ybug_n_w,			EL_BUG_LEFT			},
-    { Ybug_stone,		EL_ROCK				},
-    { Ybug_spring,		EL_SPRING			},
-    { Xtank_n,			EL_SPACESHIP_UP			},
-    { Xtank_e,			EL_SPACESHIP_RIGHT		},
-    { Xtank_s,			EL_SPACESHIP_DOWN		},
-    { Xtank_w,			EL_SPACESHIP_LEFT		},
-    { Xtank_gon,		EL_SPACESHIP_UP			},
-    { Xtank_goe,		EL_SPACESHIP_RIGHT		},
-    { Xtank_gos,		EL_SPACESHIP_DOWN		},
-    { Xtank_gow,		EL_SPACESHIP_LEFT		},
-    { Ytank_n,			EL_SPACESHIP_UP			},
-    { Ytank_nB,			EL_SPACESHIP_UP			},
-    { Ytank_e,			EL_SPACESHIP_RIGHT		},
-    { Ytank_eB,			EL_SPACESHIP_RIGHT		},
-    { Ytank_s,			EL_SPACESHIP_DOWN		},
-    { Ytank_sB,			EL_SPACESHIP_DOWN		},
-    { Ytank_w,			EL_SPACESHIP_LEFT		},
-    { Ytank_wB,			EL_SPACESHIP_LEFT		},
-    { Ytank_w_n,		EL_SPACESHIP_UP			},
-    { Ytank_n_e,		EL_SPACESHIP_RIGHT		},
-    { Ytank_e_s,		EL_SPACESHIP_DOWN		},
-    { Ytank_s_w,		EL_SPACESHIP_LEFT		},
-    { Ytank_e_n,		EL_SPACESHIP_UP			},
-    { Ytank_s_e,		EL_SPACESHIP_RIGHT		},
-    { Ytank_w_s,		EL_SPACESHIP_DOWN		},
-    { Ytank_n_w,		EL_SPACESHIP_LEFT		},
-    { Ytank_stone,		EL_ROCK				},
-    { Ytank_spring,		EL_SPRING			},
-    { Xandroid,			EL_EMC_ANDROID			},
-    { Xandroid_1_n,		EL_EMC_ANDROID_UP		},
-    { Xandroid_2_n,		EL_EMC_ANDROID_UP		},
-    { Xandroid_1_e,		EL_EMC_ANDROID_RIGHT		},
-    { Xandroid_2_e,		EL_EMC_ANDROID_RIGHT		},
-    { Xandroid_1_w,		EL_EMC_ANDROID_LEFT		},
-    { Xandroid_2_w,		EL_EMC_ANDROID_LEFT		},
-    { Xandroid_1_s,		EL_EMC_ANDROID_DOWN		},
-    { Xandroid_2_s,		EL_EMC_ANDROID_DOWN		},
-    { Yandroid_n,		EL_EMC_ANDROID_UP		},
-    { Yandroid_nB,		EL_EMC_ANDROID_UP		},
-    { Yandroid_ne,		EL_EMC_ANDROID_RIGHT_UP		},
-    { Yandroid_neB,		EL_EMC_ANDROID_RIGHT_UP		},
-    { Yandroid_e,		EL_EMC_ANDROID_RIGHT		},
-    { Yandroid_eB,		EL_EMC_ANDROID_RIGHT		},
-    { Yandroid_se,		EL_EMC_ANDROID_RIGHT_DOWN	},
-    { Yandroid_seB,		EL_EMC_ANDROID_RIGHT_DOWN	},
-    { Yandroid_s,		EL_EMC_ANDROID_DOWN		},
-    { Yandroid_sB,		EL_EMC_ANDROID_DOWN		},
-    { Yandroid_sw,		EL_EMC_ANDROID_LEFT_DOWN	},
-    { Yandroid_swB,		EL_EMC_ANDROID_LEFT_DOWN	},
-    { Yandroid_w,		EL_EMC_ANDROID_LEFT		},
-    { Yandroid_wB,		EL_EMC_ANDROID_LEFT		},
-    { Yandroid_nw,		EL_EMC_ANDROID_LEFT_UP		},
-    { Yandroid_nwB,		EL_EMC_ANDROID_LEFT_UP		},
-    { Xspring,			EL_SPRING			},
-    { Xspring_pause,		EL_SPRING			},
-    { Xspring_e,		EL_SPRING			},
-    { Xspring_w,		EL_SPRING			},
-    { Xspring_fall,		EL_SPRING			},
-    { Yspring_s,		EL_SPRING			},
-    { Yspring_sB,		EL_SPRING			},
-    { Yspring_e,		EL_SPRING			},
-    { Yspring_eB,		EL_SPRING			},
-    { Yspring_w,		EL_SPRING			},
-    { Yspring_wB,		EL_SPRING			},
-    { Yspring_kill_e,		EL_SPRING			},
-    { Yspring_kill_eB,		EL_SPRING			},
-    { Yspring_kill_w,		EL_SPRING			},
-    { Yspring_kill_wB,		EL_SPRING			},
-    { Xeater_n,			EL_YAMYAM			},
-    { Xeater_e,			EL_YAMYAM			},
-    { Xeater_w,			EL_YAMYAM			},
-    { Xeater_s,			EL_YAMYAM			},
-    { Yeater_n,			EL_YAMYAM			},
-    { Yeater_nB,		EL_YAMYAM			},
-    { Yeater_e,			EL_YAMYAM			},
-    { Yeater_eB,		EL_YAMYAM			},
-    { Yeater_s,			EL_YAMYAM			},
-    { Yeater_sB,		EL_YAMYAM			},
-    { Yeater_w,			EL_YAMYAM			},
-    { Yeater_wB,		EL_YAMYAM			},
-    { Yeater_stone,		EL_ROCK				},
-    { Yeater_spring,		EL_SPRING			},
-    { Xalien,			EL_ROBOT			},
-    { Xalien_pause,		EL_ROBOT			},
-    { Yalien_n,			EL_ROBOT			},
-    { Yalien_nB,		EL_ROBOT			},
-    { Yalien_e,			EL_ROBOT			},
-    { Yalien_eB,		EL_ROBOT			},
-    { Yalien_s,			EL_ROBOT			},
-    { Yalien_sB,		EL_ROBOT			},
-    { Yalien_w,			EL_ROBOT			},
-    { Yalien_wB,		EL_ROBOT			},
-    { Yalien_stone,		EL_ROCK				},
-    { Yalien_spring,		EL_SPRING			},
-    { Xemerald,			EL_EMERALD			},
-    { Xemerald_pause,		EL_EMERALD			},
-    { Xemerald_fall,		EL_EMERALD			},
-    { Xemerald_shine,		EL_EMERALD			},
-    { Yemerald_s,		EL_EMERALD			},
-    { Yemerald_sB,		EL_EMERALD			},
-    { Yemerald_e,		EL_EMERALD			},
-    { Yemerald_eB,		EL_EMERALD			},
-    { Yemerald_w,		EL_EMERALD			},
-    { Yemerald_wB,		EL_EMERALD			},
-    { Yemerald_eat,		EL_EMERALD			},
-    { Yemerald_stone,		EL_ROCK				},
-    { Xdiamond,			EL_DIAMOND			},
-    { Xdiamond_pause,		EL_DIAMOND			},
-    { Xdiamond_fall,		EL_DIAMOND			},
-    { Xdiamond_shine,		EL_DIAMOND			},
-    { Ydiamond_s,		EL_DIAMOND			},
-    { Ydiamond_sB,		EL_DIAMOND			},
-    { Ydiamond_e,		EL_DIAMOND			},
-    { Ydiamond_eB,		EL_DIAMOND			},
-    { Ydiamond_w,		EL_DIAMOND			},
-    { Ydiamond_wB,		EL_DIAMOND			},
-    { Ydiamond_eat,		EL_DIAMOND			},
-    { Ydiamond_stone,		EL_ROCK				},
-    { Xdrip_fall,		EL_AMOEBA_DROP			},
-    { Xdrip_stretch,		EL_AMOEBA_DROP			},
-    { Xdrip_stretchB,		EL_AMOEBA_DROP			},
-    { Xdrip_eat,		EL_AMOEBA_DROP			},
-    { Ydrip_s1,			EL_AMOEBA_DROP			},
-    { Ydrip_s1B,		EL_AMOEBA_DROP			},
-    { Ydrip_s2,			EL_AMOEBA_DROP			},
-    { Ydrip_s2B,		EL_AMOEBA_DROP			},
-    { Xbomb,			EL_BOMB				},
-    { Xbomb_pause,		EL_BOMB				},
-    { Xbomb_fall,		EL_BOMB				},
-    { Ybomb_s,			EL_BOMB				},
-    { Ybomb_sB,			EL_BOMB				},
-    { Ybomb_e,			EL_BOMB				},
-    { Ybomb_eB,			EL_BOMB				},
-    { Ybomb_w,			EL_BOMB				},
-    { Ybomb_wB,			EL_BOMB				},
-    { Ybomb_eat,		EL_BOMB				},
-    { Xballoon,			EL_BALLOON			},
-    { Yballoon_n,		EL_BALLOON			},
-    { Yballoon_nB,		EL_BALLOON			},
-    { Yballoon_e,		EL_BALLOON			},
-    { Yballoon_eB,		EL_BALLOON			},
-    { Yballoon_s,		EL_BALLOON			},
-    { Yballoon_sB,		EL_BALLOON			},
-    { Yballoon_w,		EL_BALLOON			},
-    { Yballoon_wB,		EL_BALLOON			},
-    { Xgrass,			EL_SAND				},
-    { Ygrass_nB,		EL_SAND				},
-    { Ygrass_eB,		EL_SAND				},
-    { Ygrass_sB,		EL_SAND				},
-    { Ygrass_wB,		EL_SAND				},
-    { Xdirt,			EL_SAND				},
-    { Ydirt_nB,			EL_SAND				},
-    { Ydirt_eB,			EL_SAND				},
-    { Ydirt_sB,			EL_SAND				},
-    { Ydirt_wB,			EL_SAND				},
-    { Xacid_ne,			EL_ACID_POOL_TOPRIGHT		},
-    { Xacid_se,			EL_ACID_POOL_BOTTOMRIGHT	},
-    { Xacid_s,			EL_ACID_POOL_BOTTOM		},
-    { Xacid_sw,			EL_ACID_POOL_BOTTOMLEFT		},
-    { Xacid_nw,			EL_ACID_POOL_TOPLEFT		},
-    { Xacid_1,			EL_ACID				},
-    { Xacid_2,			EL_ACID				},
-    { Xacid_3,			EL_ACID				},
-    { Xacid_4,			EL_ACID				},
-    { Xacid_5,			EL_ACID				},
-    { Xacid_6,			EL_ACID				},
-    { Xacid_7,			EL_ACID				},
-    { Xacid_8,			EL_ACID				},
-    { Xball_1,			EL_EMC_MAGIC_BALL		},
-    { Xball_1B,			EL_EMC_MAGIC_BALL		},
-    { Xball_2,			EL_EMC_MAGIC_BALL		},
-    { Xball_2B,			EL_EMC_MAGIC_BALL		},
-    { Yball_eat,		EL_EMC_MAGIC_BALL		},
-    { Xgrow_ns,			EL_EMC_GROW			},
-    { Ygrow_ns_eat,		EL_EMC_GROW			},
-    { Xgrow_ew,			EL_EMC_GROW			},
-    { Ygrow_ew_eat,		EL_EMC_GROW			},
-    { Xwonderwall,		EL_MAGIC_WALL			},
-    { XwonderwallB,		EL_MAGIC_WALL			},
-    { Xamoeba_1,		EL_AMOEBA_WET			},
-    { Xamoeba_2,		EL_AMOEBA_WET			},
-    { Xamoeba_3,		EL_AMOEBA_WET			},
-    { Xamoeba_4,		EL_AMOEBA_WET			},
-    { Xamoeba_5,		EL_AMOEBA_WET			},
-    { Xamoeba_6,		EL_AMOEBA_WET			},
-    { Xamoeba_7,		EL_AMOEBA_WET			},
-    { Xamoeba_8,		EL_AMOEBA_WET			},
-    { Xdoor_1,			EL_EM_GATE_1			},
-    { Xdoor_2,			EL_EM_GATE_2			},
-    { Xdoor_3,			EL_EM_GATE_3			},
-    { Xdoor_4,			EL_EM_GATE_4			},
-    { Xdoor_5,			EL_EMC_GATE_5			},
-    { Xdoor_6,			EL_EMC_GATE_6			},
-    { Xdoor_7,			EL_EMC_GATE_7			},
-    { Xdoor_8,			EL_EMC_GATE_8			},
-    { Xkey_1,			EL_EM_KEY_1			},
-    { Xkey_2,			EL_EM_KEY_2			},
-    { Xkey_3,			EL_EM_KEY_3			},
-    { Xkey_4,			EL_EM_KEY_4			},
-    { Xkey_5,			EL_EMC_KEY_5			},
-    { Xkey_6,			EL_EMC_KEY_6			},
-    { Xkey_7,			EL_EMC_KEY_7			},
-    { Xkey_8,			EL_EMC_KEY_8			},
-    { Xwind_n,			EL_BALLOON_SWITCH_UP		},
-    { Xwind_e,			EL_BALLOON_SWITCH_RIGHT		},
-    { Xwind_s,			EL_BALLOON_SWITCH_DOWN		},
-    { Xwind_w,			EL_BALLOON_SWITCH_LEFT		},
-    { Xwind_nesw,		EL_BALLOON_SWITCH_ANY		},
-    { Xwind_stop,		EL_BALLOON_SWITCH_NONE		},
-    { Xexit,			EL_EXIT_CLOSED			},
-    { Xexit_1,			EL_EXIT_OPEN			},
-    { Xexit_2,			EL_EXIT_OPEN			},
-    { Xexit_3,			EL_EXIT_OPEN			},
-    { Xdynamite,		EL_DYNAMITE			},
-    { Ydynamite_eat,		EL_DYNAMITE			},
-    { Xdynamite_1,		EL_DYNAMITE_ACTIVE		},
-    { Xdynamite_2,		EL_DYNAMITE_ACTIVE		},
-    { Xdynamite_3,		EL_DYNAMITE_ACTIVE		},
-    { Xdynamite_4,		EL_DYNAMITE_ACTIVE		},
-    { Xbumper,			EL_EMC_BUMPER			},
-    { XbumperB,			EL_EMC_BUMPER			},
-    { Xwheel,			EL_ROBOT_WHEEL			},
-    { XwheelB,			EL_ROBOT_WHEEL			},
-    { Xswitch,			EL_UNKNOWN			},
-    { XswitchB,			EL_UNKNOWN			},
-    { Xsand,			EL_QUICKSAND_EMPTY		},
-    { Xsand_stone,		EL_QUICKSAND_FULL		},
-    { Xsand_stonein_1,		EL_QUICKSAND_FULL		},
-    { Xsand_stonein_2,		EL_QUICKSAND_FULL		},
-    { Xsand_stonein_3,		EL_QUICKSAND_FULL		},
-    { Xsand_stonein_4,		EL_QUICKSAND_FULL		},
-    { Xsand_stonesand_1,	EL_QUICKSAND_FULL		},
-    { Xsand_stonesand_2,	EL_QUICKSAND_FULL		},
-    { Xsand_stonesand_3,	EL_QUICKSAND_FULL		},
-    { Xsand_stonesand_4,	EL_QUICKSAND_FULL		},
-    { Xsand_stoneout_1,		EL_QUICKSAND_FULL		},
-    { Xsand_stoneout_2,		EL_QUICKSAND_FULL		},
-    { Xsand_sandstone_1,	EL_QUICKSAND_FULL		},
-    { Xsand_sandstone_2,	EL_QUICKSAND_FULL		},
-    { Xsand_sandstone_3,	EL_QUICKSAND_FULL		},
-    { Xsand_sandstone_4,	EL_QUICKSAND_FULL		},
-    { Xplant,			EL_EMC_PLANT			},
-    { Yplant,			EL_EMC_PLANT			},
-    { Xlenses,			EL_EMC_LENSES			},
-    { Xmagnify,			EL_EMC_MAGNIFIER		},
-    { Xdripper,			EL_UNKNOWN			},
-    { XdripperB,		EL_UNKNOWN			},
-    { Xfake_blank,		EL_INVISIBLE_WALL		},
-    { Xfake_blankB,		EL_INVISIBLE_WALL		},
-    { Xfake_grass,		EL_INVISIBLE_SAND		},
-    { Xfake_grassB,		EL_INVISIBLE_SAND		},
-    { Xfake_door_1,		EL_EM_GATE_1_GRAY		},
-    { Xfake_door_2,		EL_EM_GATE_2_GRAY		},
-    { Xfake_door_3,		EL_EM_GATE_3_GRAY		},
-    { Xfake_door_4,		EL_EM_GATE_4_GRAY		},
-    { Xfake_door_5,		EL_EMC_GATE_5_GRAY		},
-    { Xfake_door_6,		EL_EMC_GATE_6_GRAY		},
-    { Xfake_door_7,		EL_EMC_GATE_7_GRAY		},
-    { Xfake_door_8,		EL_EMC_GATE_8_GRAY		},
-    { Xsteel_1,			EL_STEELWALL			},
-    { Xsteel_2,			EL_UNKNOWN			},
-    { Xsteel_3,			EL_EMC_STEELWALL_1		},
-    { Xsteel_4,			EL_UNKNOWN			},
-    { Xwall_1,			EL_WALL				},
-    { Xwall_2,			EL_UNKNOWN			},
-    { Xwall_3,			EL_UNKNOWN			},
-    { Xwall_4,			EL_UNKNOWN			},
-    { Xround_wall_1,		EL_WALL_SLIPPERY		},
-    { Xround_wall_2,		EL_UNKNOWN			},
-    { Xround_wall_3,		EL_UNKNOWN			},
-    { Xround_wall_4,		EL_UNKNOWN			},
-    { Xdecor_1,			EL_UNKNOWN			},
-    { Xdecor_2,			EL_EMC_WALL_6			},
-    { Xdecor_3,			EL_EMC_WALL_4			},
-    { Xdecor_4,			EL_EMC_WALL_5			},
-    { Xdecor_5,			EL_EMC_WALL_7			},
-    { Xdecor_6,			EL_EMC_WALL_8			},
-    { Xdecor_7,			EL_UNKNOWN			},
-    { Xdecor_8,			EL_EMC_WALL_1			},
-    { Xdecor_9,			EL_EMC_WALL_2			},
-    { Xdecor_10,		EL_EMC_WALL_3			},
-    { Xdecor_11,		EL_UNKNOWN			},
-    { Xdecor_12,		EL_UNKNOWN			},
-    { Xalpha_0,			EL_CHAR('0')			},
-    { Xalpha_1,			EL_CHAR('1')			},
-    { Xalpha_2,			EL_CHAR('2')			},
-    { Xalpha_3,			EL_CHAR('3')			},
-    { Xalpha_4,			EL_CHAR('4')			},
-    { Xalpha_5,			EL_CHAR('5')			},
-    { Xalpha_6,			EL_CHAR('6')			},
-    { Xalpha_7,			EL_CHAR('7')			},
-    { Xalpha_8,			EL_CHAR('8')			},
-    { Xalpha_9,			EL_CHAR('9')			},
-    { Xalpha_excla,		EL_CHAR('!')			},
-    { Xalpha_quote,		EL_CHAR('"')			},
-    { Xalpha_comma,		EL_CHAR(',')			},
-    { Xalpha_minus,		EL_CHAR('-')			},
-    { Xalpha_perio,		EL_CHAR('.')			},
-    { Xalpha_colon,		EL_CHAR(':')			},
-    { Xalpha_quest,		EL_CHAR('?')			},
-    { Xalpha_a,			EL_CHAR('A')			},
-    { Xalpha_b,			EL_CHAR('B')			},
-    { Xalpha_c,			EL_CHAR('C')			},
-    { Xalpha_d,			EL_CHAR('D')			},
-    { Xalpha_e,			EL_CHAR('E')			},
-    { Xalpha_f,			EL_CHAR('F')			},
-    { Xalpha_g,			EL_CHAR('G')			},
-    { Xalpha_h,			EL_CHAR('H')			},
-    { Xalpha_i,			EL_CHAR('I')			},
-    { Xalpha_j,			EL_CHAR('J')			},
-    { Xalpha_k,			EL_CHAR('K')			},
-    { Xalpha_l,			EL_CHAR('L')			},
-    { Xalpha_m,			EL_CHAR('M')			},
-    { Xalpha_n,			EL_CHAR('N')			},
-    { Xalpha_o,			EL_CHAR('O')			},
-    { Xalpha_p,			EL_CHAR('P')			},
-    { Xalpha_q,			EL_CHAR('Q')			},
-    { Xalpha_r,			EL_CHAR('R')			},
-    { Xalpha_s,			EL_CHAR('S')			},
-    { Xalpha_t,			EL_CHAR('T')			},
-    { Xalpha_u,			EL_CHAR('U')			},
-    { Xalpha_v,			EL_CHAR('V')			},
-    { Xalpha_w,			EL_CHAR('W')			},
-    { Xalpha_x,			EL_CHAR('X')			},
-    { Xalpha_y,			EL_CHAR('Y')			},
-    { Xalpha_z,			EL_CHAR('Z')			},
-    { Xalpha_arrow_e,		EL_CHAR('>')			},
-    { Xalpha_arrow_w,		EL_CHAR('<')			},
-    { Xalpha_copyr,		EL_CHAR('©')			},
-
-    { Zplayer,			EL_PLAYER_1			},
-
-    { ZBORDER,			EL_EMC_LEVEL_BORDER		},
-
-    { -1,			-1				}
-  };
-
-  if (!mapping_initialized)
-  {
-    int i;
-
-    /* return "EL_UNKNOWN" for all undefined elements in mapping array */
-    for (i = 0; i < TILE_MAX; i++)
-      mapping_EM_to_RND[i] = EL_UNKNOWN;
-
-    for (i = 0; em_object_mapping_list[i].element_em != -1; i++)
-      mapping_EM_to_RND[em_object_mapping_list[i].element_em] =
-	em_object_mapping_list[i].element_rnd;
-
-    mapping_initialized = TRUE;
-  }
-
-  if (element_em >= 0 && element_em < TILE_MAX)
-    return mapping_EM_to_RND[element_em];
-
-  Error(ERR_WARN, "invalid EM level element %d", element_em);
-
-  return EL_UNKNOWN;
-}
-
-#endif
-
 int map_direction_RND_to_EM(int direction)
 {
   return (direction == MV_UP    ? 0 :
@@ -6081,8 +5447,9 @@ void InitGraphicInfo_EM(void)
       }
 
       if (!g->double_movement && (effective_action == ACTION_FALLING ||
-				  effective_action == ACTION_MOVING ||
-				  effective_action == ACTION_PUSHING))
+				  effective_action == ACTION_MOVING  ||
+				  effective_action == ACTION_PUSHING ||
+				  effective_action == ACTION_SLURPING))
       {
 	int move_dir =
 	  (effective_action == ACTION_FALLING ? MV_DOWN : direction);
@@ -6229,14 +5596,30 @@ void InitGraphicInfo_EM(void)
     {
       int element = object_mapping[i].element_rnd;
       int action = object_mapping[i].action;
+      int direction = object_mapping[i].direction;
+      boolean is_backside = object_mapping[i].is_backside;
+#if 1
+      int graphic_action  = el_act_dir2img(element, action, direction);
+      int graphic_default = el_act_dir2img(element, ACTION_DEFAULT, direction);
+#else
+      int graphic_action  = element_info[element].graphic[action];
+      int graphic_default = element_info[element].graphic[ACTION_DEFAULT];
+#endif
 
-      if (action == ACTION_SMASHED_BY_ROCK &&
-	  element_info[element].graphic[action] ==
-	  element_info[element].graphic[ACTION_DEFAULT])
+      if ((action == ACTION_SMASHED_BY_ROCK ||
+	   action == ACTION_SMASHED_BY_SPRING ||
+	   action == ACTION_SLURPING) &&
+	  graphic_action == graphic_default)
       {
+	int e = (action == ACTION_SMASHED_BY_ROCK   ? Ystone_s  :
+		 action == ACTION_SMASHED_BY_SPRING ? Yspring_s :
+		 direction == MV_LEFT  ? (is_backside? Yspring_wB: Yspring_w) :
+		 direction == MV_RIGHT ? (is_backside? Yspring_eB: Yspring_e) :
+		 Xspring);
+
 	/* no separate animation for "smashed by rock" -- use rock instead */
 	struct GraphicInfo_EM *g_em = &graphic_info_em_object[i][7 - j];
-	struct GraphicInfo_EM *g_xx = &graphic_info_em_object[Ystone_s][7 - j];
+	struct GraphicInfo_EM *g_xx = &graphic_info_em_object[e][7 - j];
 
 	g_em->bitmap		= g_xx->bitmap;
 	g_em->src_x		= g_xx->src_x;
@@ -6247,8 +5630,12 @@ void InitGraphicInfo_EM(void)
 	g_em->dst_offset_y	= g_xx->dst_offset_y;
 	g_em->width 		= g_xx->width;
 	g_em->height		= g_xx->height;
+#if 1
+	g_em->unique_identifier	= g_xx->unique_identifier;
+#endif
 
-	g_em->preserve_background = TRUE;
+	if (!is_backside)
+	  g_em->preserve_background = TRUE;
       }
     }
   }
@@ -6300,6 +5687,14 @@ void InitGraphicInfo_EM(void)
 	g_em->height = TILEY;
 
 #if DEBUG_EM_GFX
+
+#if 1
+	/* skip check for EMC elements not contained in original EMC artwork */
+	if (element == EL_PLAYER_3 ||
+	    element == EL_PLAYER_4)
+	  continue;
+#endif
+
 	if (g_em->bitmap != debug_bitmap ||
 	    g_em->src_x != debug_src_x ||
 	    g_em->src_y != debug_src_y)
