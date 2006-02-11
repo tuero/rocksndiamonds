@@ -6358,8 +6358,12 @@ static void copy_custom_element_settings(int element_from, int element_to)
     ei_to->description[i] = ei_from->description[i];
 
   /* ---------- copy element base properties ---------- */
+#if 1
+  ei_to->properties[EP_BITFIELD_BASE] = ei_from->properties[EP_BITFIELD_BASE];
+#else
   Properties[element_to][EP_BITFIELD_BASE] =
     Properties[element_from][EP_BITFIELD_BASE];
+#endif
 
   /* ---------- copy custom property values ---------- */
 

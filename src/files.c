@@ -718,8 +718,13 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
       /* !!! now done in InitElementPropertiesStatic() (see above) !!! */
       /* !!! (else properties set there will be overwritten here)  !!! */
       /* start with no properties at all */
+#if 1
+      for (j = 0; j < NUM_EP_BITFIELDS; j++)
+	ei->properties[j] = EP_BITMASK_DEFAULT;
+#else
       for (j = 0; j < NUM_EP_BITFIELDS; j++)
 	Properties[element][j] = EP_BITMASK_DEFAULT;
+#endif
 #endif
 
       /* now set default properties */
@@ -800,9 +805,15 @@ static void setFileInfoToDefaults(struct LevelFileInfo *level_file_info)
 
 static void ActivateLevelTemplate()
 {
+#if 1
+  /* Currently there is no special action needed to activate the template
+     data, because 'element_info' property settings overwrite the original
+     level data, while all other variables do not change. */
+#else
   /* Currently there is no special action needed to activate the template
      data, because 'element_info' and 'Properties' overwrite the original
      level data, while all other variables do not change. */
+#endif
 }
 
 static char *getLevelFilenameFromBasename(char *basename)
@@ -1381,10 +1392,17 @@ static int LoadLevel_CUS1(FILE *file, int chunk_size, struct LevelInfo *level)
     int element = getFile16BitBE(file);
     int properties = getFile32BitBE(file);
 
+#if 1
+    if (IS_CUSTOM_ELEMENT(element))
+      element_info[element].properties[EP_BITFIELD_BASE] = properties;
+    else
+      Error(ERR_WARN, "invalid custom element number %d", element);
+#else
     if (IS_CUSTOM_ELEMENT(element))
       Properties[element][EP_BITFIELD_BASE] = properties;
     else
       Error(ERR_WARN, "invalid custom element number %d", element);
+#endif
   }
 
   return chunk_size;
@@ -1445,7 +1463,11 @@ static int LoadLevel_CUS3(FILE *file, int chunk_size, struct LevelInfo *level)
       ei->description[j] = getFile8Bit(file);
     ei->description[MAX_ELEMENT_NAME_LEN] = 0;
 
+#if 1
+    ei->properties[EP_BITFIELD_BASE] = getFile32BitBE(file);
+#else
     Properties[element][EP_BITFIELD_BASE] = getFile32BitBE(file);
+#endif
 
     /* some free bytes for future properties and padding */
     ReadUnusedBytesFromFile(file, 7);
@@ -1532,7 +1554,11 @@ static int LoadLevel_CUS4(FILE *file, int chunk_size, struct LevelInfo *level)
     ei->description[i] = getFile8Bit(file);
   ei->description[MAX_ELEMENT_NAME_LEN] = 0;
 
+#if 1
+  ei->properties[EP_BITFIELD_BASE] = getFile32BitBE(file);
+#else
   Properties[element][EP_BITFIELD_BASE] = getFile32BitBE(file);
+#endif
   ReadUnusedBytesFromFile(file, 4);	/* reserved for more base properties */
 
   ei->num_change_pages = getFile8Bit(file);
@@ -3629,6 +3655,20 @@ static void SaveLevel_CUS1(FILE *file, struct LevelInfo *level,
   {
     int element = EL_CUSTOM_START + i;
 
+#if 1
+    struct ElementInfo *ei = &element_info[element];
+
+    if (ei->properties[EP_BITFIELD_BASE] != EP_BITMASK_DEFAULT)
+    {
+      if (check < num_changed_custom_elements)
+      {
+	putFile16BitBE(file, element);
+	putFile32BitBE(file, ei->properties[EP_BITFIELD_BASE]);
+      }
+
+      check++;
+    }
+#else
     if (Properties[element][EP_BITFIELD_BASE] != EP_BITMASK_DEFAULT)
     {
       if (check < num_changed_custom_elements)
@@ -3639,6 +3679,7 @@ static void SaveLevel_CUS1(FILE *file, struct LevelInfo *level,
 
       check++;
     }
+#endif
   }
 
   if (check != num_changed_custom_elements)	/* should not happen */
@@ -3697,7 +3738,11 @@ static void SaveLevel_CUS3(FILE *file, struct LevelInfo *level,
 	for (j = 0; j < MAX_ELEMENT_NAME_LEN; j++)
 	  putFile8Bit(file, ei->description[j]);
 
+#if 1
+	putFile32BitBE(file, ei->properties[EP_BITFIELD_BASE]);
+#else
 	putFile32BitBE(file, Properties[element][EP_BITFIELD_BASE]);
+#endif
 
 	/* some free bytes for future properties and padding */
 	WriteUnusedBytesToFile(file, 7);
@@ -3770,7 +3815,11 @@ static void SaveLevel_CUS4(FILE *file, struct LevelInfo *level, int element)
   for (i = 0; i < MAX_ELEMENT_NAME_LEN; i++)
     putFile8Bit(file, ei->description[i]);
 
+#if 1
+  putFile32BitBE(file, ei->properties[EP_BITFIELD_BASE]);
+#else
   putFile32BitBE(file, Properties[element][EP_BITFIELD_BASE]);
+#endif
   WriteUnusedBytesToFile(file, 4);	/* reserved for more base properties */
 
   putFile8Bit(file, ei->num_change_pages);

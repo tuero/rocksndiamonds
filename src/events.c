@@ -682,7 +682,8 @@ void HandleKey(Key key, int key_status)
     return;
   }
 
-  if (game_status == GAME_MODE_MAIN && key == setup.shortcut.toggle_pause)
+  if (game_status == GAME_MODE_MAIN &&
+      (key == setup.shortcut.toggle_pause || key == KSYM_space))
   {
     StartGameActions(options.network, setup.autorecord, NEW_RANDOMIZE);
 
@@ -719,7 +720,10 @@ void HandleKey(Key key, int key_status)
     case GAME_MODE_INFO:
       switch(key)
       {
+#if 0
+	/* !!! only use "space" key to start game from main menu !!! */
 	case KSYM_space:
+#endif
 	case KSYM_Return:
 	  if (game_status == GAME_MODE_MAIN)
 	    HandleMainMenu(0,0, 0,0, MB_MENU_CHOICE);

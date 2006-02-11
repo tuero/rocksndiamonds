@@ -452,6 +452,11 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
   {
     if (dx && choice == 1)
       x = (dx < 0 ? 10 : 14);
+    else if (dx > 0)
+    {
+      if (choice == 4 || choice == 6)
+	button = MB_MENU_CHOICE;
+    }
     else if (dy)
       y = choice + dy;
   }

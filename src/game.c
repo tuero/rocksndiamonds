@@ -10176,7 +10176,94 @@ void TestIfPlayerTouchesCustomElement(int x, int y)
   }
 }
 
+#if 1
+
 void TestIfElementTouchesCustomElement(int x, int y)
+{
+  static int xy[4][2] =
+  {
+    { 0, -1 },
+    { -1, 0 },
+    { +1, 0 },
+    { 0, +1 }
+  };
+  static int trigger_sides[4][2] =
+  {
+    /* center side	border side */
+    { CH_SIDE_TOP,	CH_SIDE_BOTTOM	},	/* check top    */
+    { CH_SIDE_LEFT,	CH_SIDE_RIGHT	},	/* check left   */
+    { CH_SIDE_RIGHT,	CH_SIDE_LEFT	},	/* check right  */
+    { CH_SIDE_BOTTOM,	CH_SIDE_TOP	}	/* check bottom */
+  };
+  static int touch_dir[4] =
+  {
+    MV_LEFT | MV_RIGHT,
+    MV_UP   | MV_DOWN,
+    MV_UP   | MV_DOWN,
+    MV_LEFT | MV_RIGHT
+  };
+  boolean change_center_element = FALSE;
+  int center_element = Feld[x][y];	/* should always be non-moving! */
+  int border_element_old[NUM_DIRECTIONS];
+  int i;
+
+  for (i = 0; i < NUM_DIRECTIONS; i++)
+  {
+    int xx = x + xy[i][0];
+    int yy = y + xy[i][1];
+    int border_element;
+
+    border_element_old[i] = -1;
+
+    if (!IN_LEV_FIELD(xx, yy))
+      continue;
+
+    if (game.engine_version < VERSION_IDENT(3,0,7,0))
+      border_element = Feld[xx][yy];	/* may be moving! */
+    else if (!IS_MOVING(xx, yy) && !IS_BLOCKED(xx, yy))
+      border_element = Feld[xx][yy];
+    else if (MovDir[xx][yy] & touch_dir[i])	/* elements are touching */
+      border_element = MovingOrBlocked2Element(xx, yy);
+    else
+      continue;			/* center and border element do not touch */
+
+    border_element_old[i] = border_element;
+  }
+
+  for (i = 0; i < NUM_DIRECTIONS; i++)
+  {
+    int xx = x + xy[i][0];
+    int yy = y + xy[i][1];
+    int center_side = trigger_sides[i][0];
+    int border_element = border_element_old[i];
+
+    if (border_element == -1)
+      continue;
+
+    /* check for change of border element */
+    CheckElementChangeBySide(xx, yy, border_element, center_element,
+			     CE_TOUCHING_X, center_side);
+  }
+
+  for (i = 0; i < NUM_DIRECTIONS; i++)
+  {
+    int border_side = trigger_sides[i][1];
+    int border_element = border_element_old[i];
+
+    if (border_element == -1)
+      continue;
+
+    /* check for change of center element (but change it only once) */
+    if (!change_center_element)
+      change_center_element =
+	CheckElementChangeBySide(x, y, center_element, border_element,
+				 CE_TOUCHING_X, border_side);
+  }
+}
+
+#else
+
+void TestIfElementTouchesCustomElement_OLD(int x, int y)
 {
   static int xy[4][2] =
   {
@@ -10235,6 +10322,8 @@ void TestIfElementTouchesCustomElement(int x, int y)
 			     CE_TOUCHING_X, center_side);
   }
 }
+
+#endif
 
 void TestIfElementHitsCustomElement(int x, int y, int direction)
 {

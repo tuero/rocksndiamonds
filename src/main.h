@@ -171,7 +171,11 @@
 #define EP_BITMASK_DEFAULT		0
 
 #define PROPERTY_BIT(p)			(1 << ((p) % 32))
+#if 1
+#define PROPERTY_VAR(e,p)		(element_info[e].properties[(p) / 32])
+#else
 #define PROPERTY_VAR(e,p)		(Properties[e][(p) / 32])
+#endif
 #define HAS_PROPERTY(e,p)	((PROPERTY_VAR(e, p) & PROPERTY_BIT(p)) != 0)
 #define SET_PROPERTY(e,p,v)	((v) ?					   \
 				 (PROPERTY_VAR(e,p) |=  PROPERTY_BIT(p)) : \
@@ -2199,6 +2203,8 @@ struct ElementInfo
 
   /* ---------- special element property values ---------- */
 
+  unsigned long properties[NUM_EP_BITFIELDS];	/* element base properties */
+
   boolean use_gfx_element;	/* use custom graphic element */
   int gfx_element;		/* optional custom graphic element */
 
@@ -2436,7 +2442,9 @@ extern short			ExplodeDelay[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern int			RunnerVisit[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern int			PlayerVisit[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 
+#if 0
 extern unsigned long		Properties[MAX_NUM_ELEMENTS][NUM_EP_BITFIELDS];
+#endif
 
 extern int			GfxFrame[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern int			GfxRandom[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
