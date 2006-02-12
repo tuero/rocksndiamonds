@@ -826,12 +826,15 @@ void DrawInfoScreen_HelpAnim(int start, int max_anims, boolean init)
     action = helpanim_info[j].action;
     direction = helpanim_info[j].direction;
 
+    if (element < 0)
+      element = EL_UNKNOWN;
+
     if (action != -1 && direction != -1)
       graphic = el_act_dir2img(element, action, direction);
     else if (action != -1)
       graphic = el_act2img(element, action);
     else if (direction != -1)
-      graphic = el_act2img(element, direction);
+      graphic = el_dir2img(element, direction);
     else
       graphic = el2img(element);
 
@@ -1000,7 +1003,7 @@ void HandleInfoScreen_Elements(int button)
   }
   else
   {
-    if (DelayReached(&info_delay, GAME_FRAME_DELAY))
+    if (DelayReached(&info_delay, GameFrameDelay))
       if (page < num_pages)
 	DrawInfoScreen_HelpAnim(page * anims_per_page, num_anims, FALSE);
 

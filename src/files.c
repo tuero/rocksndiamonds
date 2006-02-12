@@ -6040,7 +6040,8 @@ void LoadHelpAnimInfo()
 
 #if 0
   for (i = 0; i < num_list_entries; i++)
-    printf("::: %d, %d, %d => %d\n",
+    printf("::: '%s': %d, %d, %d => %d\n",
+	   EL_NAME(helpanim_info[i].element),
 	   helpanim_info[i].element,
 	   helpanim_info[i].action,
 	   helpanim_info[i].direction,

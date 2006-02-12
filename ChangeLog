@@ -1,3 +1,10 @@
+2006-02-12
+	* fixed potential crash bug in WarnBuggyBase() (missing boundary check)
+
+2006-02-11
+	* fixed bug with CE change order in TestIfElementTouchesCustomElement()
+	* fixed bug when displaying info element without action, but direction
+
 2006-02-09
 	* fixed minor graphical problems with springs smashing and slurping
 	  (when using R'n'D style graphics instead of EMC style graphics)

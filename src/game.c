@@ -39,6 +39,7 @@
 #define USE_FIXED_DONT_RUN_INTO		(USE_NEW_STUFF		* 1)
 #define USE_NEW_SPRING_BUMPER		(USE_NEW_STUFF		* 1)
 #define USE_STOP_CHANGED_ELEMENTS	(USE_NEW_STUFF		* 1)
+#define USE_ELEMENT_TOUCHING_BUGFIX	(USE_NEW_STUFF		* 1)
 
 #define USE_QUICKSAND_IMPACT_BUGFIX	(USE_NEW_STUFF		* 0)
 
@@ -7435,9 +7436,10 @@ static void WarnBuggyBase(int x, int y)
 
   for (i = 0; i < NUM_DIRECTIONS; i++)
   {
-    int xx = x + xy[i][0], yy = y + xy[i][1];
+    int xx = x + xy[i][0];
+    int yy = y + xy[i][1];
 
-    if (IS_PLAYER(xx, yy))
+    if (IN_LEV_FIELD(xx, yy) && IS_PLAYER(xx, yy))
     {
       PlayLevelSound(x, y, SND_SP_BUGGY_BASE_ACTIVE);
 
@@ -10176,7 +10178,7 @@ void TestIfPlayerTouchesCustomElement(int x, int y)
   }
 }
 
-#if 1
+#if USE_ELEMENT_TOUCHING_BUGFIX
 
 void TestIfElementTouchesCustomElement(int x, int y)
 {

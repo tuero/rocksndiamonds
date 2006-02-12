@@ -720,7 +720,9 @@ void HandleKey(Key key, int key_status)
     case GAME_MODE_INFO:
       switch(key)
       {
-#if 0
+#if 1
+	case KSYM_space:
+#else
 	/* !!! only use "space" key to start game from main menu !!! */
 	case KSYM_space:
 #endif
@@ -761,6 +763,12 @@ void HandleKey(Key key, int key_status)
 	  else if (game_status == GAME_MODE_INFO)
 	    HandleInfoScreen(0,0, 0, +1 * SCROLL_PAGE, MB_MENU_MARK);
 	  break;
+
+#ifdef DEBUG
+	case KSYM_0:
+	  GameFrameDelay = (GameFrameDelay == 500 ? GAME_FRAME_DELAY : 500);
+	  break;
+#endif
 
 	default:
 	  break;
