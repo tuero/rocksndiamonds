@@ -12,10 +12,10 @@
 
 void synchro_3(void)
 {
-  register unsigned int x;
-  register unsigned int y;
-  register unsigned int count;
-  register unsigned long random;
+  int x;
+  int y;
+  int count;
+  unsigned long random;
 
   /* update variables */
 

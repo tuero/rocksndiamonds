@@ -13,16 +13,16 @@ unsigned long RandomEM;
 struct LEVEL lev;
 struct PLAYER ply[MAX_PLAYERS];
 
-unsigned short **Boom;
-unsigned short **Cave;
-unsigned short **Next;
-unsigned short **Draw;
+short **Boom;
+short **Cave;
+short **Next;
+short **Draw;
 
-static unsigned short *Index[4][HEIGHT];
-static unsigned short Array[4][HEIGHT][WIDTH];
+static short *Index[4][HEIGHT];
+static short Array[4][HEIGHT][WIDTH];
 
-extern unsigned int screen_x;
-extern unsigned int screen_y;
+extern int screen_x;
+extern int screen_y;
 
 void game_init_vars(void)
 {
@@ -191,8 +191,8 @@ void GameActions_EM(byte action)
 
 void readjoy(byte action, struct PLAYER *ply)
 {
-  unsigned int north = 0, east = 0, south = 0, west = 0;
-  unsigned int snap = 0, drop = 0;
+  int north = 0, east = 0, south = 0, west = 0;
+  int snap = 0, drop = 0;
 
   if (action & JOY_LEFT)
     west = 1;
@@ -228,8 +228,8 @@ void readjoy(byte action, struct PLAYER *ply)
 
 void readjoy(byte action)
 {
-  unsigned int north = 0, east = 0, south = 0, west = 0;
-  unsigned int snap = 0, drop = 0;
+  int north = 0, east = 0, south = 0, west = 0;
+  int snap = 0, drop = 0;
 
   if (action & JOY_LEFT)
     west = 1;

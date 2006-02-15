@@ -2657,6 +2657,13 @@ void GameWon()
 
   BackToFront();
 
+#if 0
+  if (tape.playing)
+    printf("::: TAPE PLAYING -> DO NOT SAVE SCORE\n");
+  else
+    printf("::: NO TAPE PLAYING -> SAVING SCORE\n");
+#endif
+
   if (tape.playing)
     return;
 

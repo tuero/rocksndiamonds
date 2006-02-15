@@ -119,6 +119,10 @@
 #define CONF_CONTENTS_ELEMENT(b,c,x,y) ((b[CONF_CONTENT_BYTE_POS(c,x,y)]<< 8)|\
 					(b[CONF_CONTENT_BYTE_POS(c,x,y) + 1]))
 
+#if 0
+static void LoadLevel_InitPlayfield(struct LevelInfo *, char *);
+#endif
+
 static struct LevelInfo li;
 
 static struct
@@ -2497,6 +2501,45 @@ void CopyNativeLevel_RND_to_EM(struct LevelInfo *level)
     for (x = 0; x < EM_MAX_CAVE_WIDTH; x++)
       level_em->cave[x][y] = ZBORDER;
 
+#if 1
+
+#if 0
+#if 1
+  LoadLevel_InitPlayfield();
+#else
+  lev_fieldx = lev->width;	/* !!! also in LoadLevel_InitPlayfield() !!! */
+  lev_fieldy = lev->height;	/* !!! also in LoadLevel_InitPlayfield() !!! */
+  SetBorderElement();		/* !!! also in LoadLevel_InitPlayfield() !!! */
+#endif
+#endif
+
+#if 0
+  printf("::: BorderElement == %d\n", BorderElement);
+#endif
+
+  if (BorderElement == EL_STEELWALL)
+  {
+    for (y = 0; y < lev->height + 2; y++)
+      for (x = 0; x < lev->width + 2; x++)
+	level_em->cave[x + 1][y + 1] = map_element_RND_to_EM(EL_STEELWALL);
+  }
+
+  /* then copy the real level contents from level file into the playfield */
+  for (y = 0; y < lev->height; y++) for (x = 0; x < lev->width; x++)
+  {
+    int new_element = map_element_RND_to_EM(level->field[x][y]);
+    int offset = (BorderElement == EL_STEELWALL ? 1 : 0);
+    int xx = x + 1 + offset;
+    int yy = y + 1 + offset;
+
+    if (level->field[x][y] == EL_AMOEBA_DEAD)
+      new_element = map_element_RND_to_EM(EL_AMOEBA_WET);
+
+    level_em->cave[xx][yy] = new_element;
+  }
+
+#else
+
   /* then copy the real level contents from level file into the playfield */
   for (y = 0; y < lev->height; y++) for (x = 0; x < lev->width; x++)
   {
@@ -2507,6 +2550,8 @@ void CopyNativeLevel_RND_to_EM(struct LevelInfo *level)
 
     level_em->cave[x + 1][y + 1] = new_element;
   }
+
+#endif
 
 #if 1
 
@@ -2531,15 +2576,17 @@ void CopyNativeLevel_RND_to_EM(struct LevelInfo *level)
   {
 
 #if 1
-
     if (ELEM_IS_PLAYER(level->field[x][y]))
     {
       int player_nr = GET_PLAYER_NR(level->field[x][y]);
+      int offset = (BorderElement == EL_STEELWALL ? 1 : 0);
+      int xx = x + 1 + offset;
+      int yy = y + 1 + offset;
 
-      ply[player_nr]->x_initial = x + 1;
-      ply[player_nr]->y_initial = y + 1;
+      ply[player_nr]->x_initial = xx;
+      ply[player_nr]->y_initial = yy;
 
-      level_em->cave[x + 1][y + 1] = map_element_RND_to_EM(EL_EMPTY);
+      level_em->cave[xx][yy] = map_element_RND_to_EM(EL_EMPTY);
     }
 
 #else
@@ -2570,6 +2617,14 @@ void CopyNativeLevel_RND_to_EM(struct LevelInfo *level)
 
 #endif
 
+  }
+
+  if (BorderElement == EL_STEELWALL)
+  {
+#if 1
+    lev->width  += 2;
+    lev->height += 2;
+#endif
   }
 }
 
@@ -3145,10 +3200,15 @@ void LoadLevelFromFileInfo(struct LevelInfo *level,
   if (level->game_engine_type == GAME_ENGINE_TYPE_UNKNOWN)
     level->game_engine_type = GAME_ENGINE_TYPE_RND;
 
+#if 1
+  if (level_file_info->type != LEVEL_FILE_TYPE_RND)
+    CopyNativeLevel_Native_to_RND(level);
+#else
   if (level_file_info->type == LEVEL_FILE_TYPE_RND)
     CopyNativeLevel_RND_to_Native(level);
   else
     CopyNativeLevel_Native_to_RND(level);
+#endif
 }
 
 void LoadLevelFromFilename(struct LevelInfo *level, char *filename)
@@ -3447,6 +3507,21 @@ static void LoadLevel_InitPlayfield(struct LevelInfo *level, char *filename)
   SetBorderElement();
 }
 
+static void LoadLevel_InitNativeEngines(struct LevelInfo *level,char *filename)
+{
+  struct LevelFileInfo *level_file_info = &level->file_info;
+
+#if 1
+  if (level_file_info->type == LEVEL_FILE_TYPE_RND)
+    CopyNativeLevel_RND_to_Native(level);
+#else
+  if (level_file_info->type == LEVEL_FILE_TYPE_RND)
+    CopyNativeLevel_RND_to_Native(level);
+  else
+    CopyNativeLevel_Native_to_RND(level);
+#endif
+}
+
 void LoadLevelTemplate(int nr)
 {
   char *filename;
@@ -3477,6 +3552,8 @@ void LoadLevel(int nr)
   LoadLevel_InitVersion(&level, filename);
   LoadLevel_InitElements(&level, filename);
   LoadLevel_InitPlayfield(&level, filename);
+
+  LoadLevel_InitNativeEngines(&level, filename);
 }
 
 static void SaveLevel_VERS(FILE *file, struct LevelInfo *level)

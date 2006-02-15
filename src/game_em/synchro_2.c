@@ -44,15 +44,15 @@ static void set_nearest_player_xy(int x, int y, int *dx, int *dy)
 
 void synchro_2(void)
 {
-  register unsigned int x = 0;
-  register unsigned int y = 1;
-  register unsigned long random = RandomEM;
-  register unsigned short *cave_cache = Cave[y]; /* might be a win */
-  unsigned long score = 0;
+  int x = 0;
+  int y = 1;
+  unsigned long random = RandomEM;
+  short *cave_cache = Cave[y];	/* might be a win */
+  int score = 0;
 
-  unsigned int temp = 0;	/* initialized to make compilers happy */
-  unsigned int dx; /* only needed to find closest player */
-  unsigned int dy;
+  int temp = 0;			/* initialized to make compilers happy */
+  int dx;			/* only needed to find closest player */
+  int dy;
   int element;
 
  loop:

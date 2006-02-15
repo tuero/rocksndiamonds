@@ -1,3 +1,8 @@
+2006-02-15
+	* fixed bug with adding score when playing tape with EMC game engine
+	* added steel wall border for levels using EMC engine without border
+	* finally fixed delayed scrolling in EMC engine also for small levels
+
 2006-02-12
 	* fixed potential crash bug in WarnBuggyBase() (missing boundary check)
 

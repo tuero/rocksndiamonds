@@ -50,8 +50,8 @@
 #define MIN_LEV_FIELDY			3
 #define STD_LEV_FIELDX			64
 #define STD_LEV_FIELDY			32
-#define MAX_LEV_FIELDX			128
-#define MAX_LEV_FIELDY			128
+#define MAX_LEV_FIELDX			MAX_PLAYFIELD_WIDTH
+#define MAX_LEV_FIELDY			MAX_PLAYFIELD_HEIGHT
 
 #define SCREENX(a)			((a) - scroll_x)
 #define SCREENY(a)			((a) - scroll_y)

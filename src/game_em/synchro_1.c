@@ -142,8 +142,8 @@ void synchro_1(void)
 
 static boolean player_killed(struct PLAYER *ply)
 {
-  register unsigned int x = ply->x;
-  register unsigned int y = ply->y;
+  int x = ply->x;
+  int y = ply->y;
 
 #if 0
   printf("::: %d: %d, %d\n", ply->num, x, y);
@@ -272,8 +272,8 @@ static boolean player_killed(struct PLAYER *ply)
 
 static void kill_player(struct PLAYER *ply)
 {
-  register unsigned int x = ply->x;
-  register unsigned int y = ply->y;
+  int x = ply->x;
+  int y = ply->y;
 
   ply->alive = 0;
 
@@ -437,11 +437,11 @@ static void kill_player(struct PLAYER *ply)
 
 static void check_player(struct PLAYER *ply)
 {
-  unsigned int oldx = ply->x;
-  unsigned int oldy = ply->y;
-  register unsigned int x = oldx;
-  register unsigned int y = oldy;
-  unsigned int anim = 0;
+  int oldx = ply->x;
+  int oldy = ply->y;
+  int x = oldx;
+  int y = oldy;
+  int anim = 0;
   int dx = 0, dy = 0;
 
 #if 0
@@ -595,10 +595,10 @@ static void check_player(struct PLAYER *ply)
 static boolean player_digfield(struct PLAYER *ply, int dx, int dy)
 {
   int anim = (dx < 0 ? 3 : dx > 0 ? 1 : dy < 0 ? 0 : dy > 0 ? 2 : 2);
-  unsigned int oldx = ply->x;
-  unsigned int oldy = ply->y;
-  register unsigned int x = oldx + dx;
-  register unsigned int y = oldy + dy;
+  int oldx = ply->x;
+  int oldy = ply->y;
+  int x = oldx + dx;
+  int y = oldy + dy;
   boolean result = TRUE;
 
   if (!dx && !dy)			/* no direction specified */

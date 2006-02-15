@@ -16,9 +16,9 @@ extern struct LevelInfo_EM native_em_level;
 extern struct GraphicInfo_EM graphic_info_em_object[TILE_MAX][8];
 extern struct GraphicInfo_EM graphic_info_em_player[MAX_PLAYERS][SPR_MAX][8];
 
-extern unsigned short **Boom;
-extern unsigned short **Cave;
-extern unsigned short **Next;
-extern unsigned short **Draw;
+extern short **Boom;
+extern short **Cave;
+extern short **Next;
+extern short **Draw;
 
 #endif

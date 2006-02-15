@@ -14,7 +14,7 @@ extern int debug;
 extern char *progname;
 extern char *arg_basedir;
 
-extern unsigned int frame;
+extern int frame;
 
 extern short ulaw_to_linear[256];
 extern unsigned char linear_to_ulaw[65536];

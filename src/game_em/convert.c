@@ -548,7 +548,7 @@ void convert_em_level(unsigned char *src, int file_version)
   {
     0x800, 0x809, 0x812, 0x81B, 0x840, 0x849, 0x852, 0x85B
   };
-  unsigned int i, x, y, temp;
+  int i, x, y, temp;
 
 #if 1
   lev.time_seconds = src[0x83E] << 8 | src[0x83F];
@@ -901,7 +901,7 @@ void convert_em_level(unsigned char *src, int file_version)
 
 void prepare_em_level(void)
 {
-  unsigned int i, x, y;
+  int i, x, y;
   int players_left;
 
   /* reset all runtime variables to their initial values */

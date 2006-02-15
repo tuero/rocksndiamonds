@@ -3088,16 +3088,36 @@ void HandleGameActions()
     byte tape_action[MAX_PLAYERS];
     int i;
 
+#if 1
     if (level.native_em_level->lev->home == 0)	/* all players at home */
     {
+      local_player->LevelSolved = TRUE;
+      AllPlayersGone = TRUE;
+
+      level.native_em_level->lev->home = -1;
+    }
+
+    if (local_player->LevelSolved)
       GameWon();
 
-      if (!TAPE_IS_STOPPED(tape))
+    if (AllPlayersGone && !TAPE_IS_STOPPED(tape))
+      TapeStop();
+
+    if (game_status != GAME_MODE_PLAYING)
+      return;
+#else
+    if (level.native_em_level->lev->home == 0)	/* all players at home */
+    {
+      if (local_player->LevelSolved)
+	GameWon();
+
+      if (AllPlayersGone && !TAPE_IS_STOPPED(tape))
 	TapeStop();
 
       if (game_status != GAME_MODE_PLAYING)
 	return;
     }
+#endif
 
     if (level.native_em_level->ply[0]->alive == 0 &&
 	level.native_em_level->ply[1]->alive == 0 &&

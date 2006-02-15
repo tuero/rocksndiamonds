@@ -7,11 +7,15 @@
 #include "display.h"
 #include "level.h"
 
+#define MIN_SCREEN_XPOS		1
+#define MIN_SCREEN_YPOS		1
+#define MAX_SCREEN_XPOS		MAX(1, lev.width  - (SCR_FIELDX - 1))
+#define MAX_SCREEN_YPOS		MAX(1, lev.height - (SCR_FIELDY - 1))
 
-#define MIN_SCREEN_X		(TILEX)
-#define MIN_SCREEN_Y		(TILEY)
-#define MAX_SCREEN_X		((lev.width  - (SCR_FIELDX - 1)) * TILEX)
-#define MAX_SCREEN_Y		((lev.height - (SCR_FIELDY - 1)) * TILEY)
+#define MIN_SCREEN_X		(MIN_SCREEN_XPOS * TILEX)
+#define MIN_SCREEN_Y		(MIN_SCREEN_YPOS * TILEY)
+#define MAX_SCREEN_X		(MAX_SCREEN_XPOS * TILEX)
+#define MAX_SCREEN_Y		(MAX_SCREEN_YPOS * TILEY)
 
 #define VALID_SCREEN_X(x)	((x) < MIN_SCREEN_X ? MIN_SCREEN_X :	\
 				 (x) > MAX_SCREEN_X ? MAX_SCREEN_X : (x))
@@ -26,18 +30,18 @@
 				 - ((SCR_FIELDY - 1) * TILEY) / 2)
 
 
-unsigned int frame;		/* current screen frame */
+int frame;			/* current screen frame */
 #if 0
-unsigned int screen_x;		/* current scroll position */
-unsigned int screen_y;
+int screen_x;			/* current scroll position */
+int screen_y;
 #else
 int screen_x;			/* current scroll position */
 int screen_y;
 #endif
 
 /* tiles currently on screen */
-static unsigned int screentiles[MAX_BUF_YSIZE][MAX_BUF_XSIZE];
-static unsigned int crumbled_state[MAX_BUF_YSIZE][MAX_BUF_XSIZE];
+static int screentiles[MAX_BUF_YSIZE][MAX_BUF_XSIZE];
+static int crumbled_state[MAX_BUF_YSIZE][MAX_BUF_XSIZE];
 
 static boolean redraw[MAX_BUF_XSIZE][MAX_BUF_YSIZE];
 
@@ -49,8 +53,8 @@ static boolean redraw[MAX_BUF_XSIZE][MAX_BUF_YSIZE];
 
 void BlitScreenToBitmap_EM(Bitmap *target_bitmap)
 {
-  unsigned int x = screen_x % (MAX_BUF_XSIZE * TILEX);
-  unsigned int y = screen_y % (MAX_BUF_YSIZE * TILEY);
+  int x = screen_x % (MAX_BUF_XSIZE * TILEX);
+  int y = screen_y % (MAX_BUF_YSIZE * TILEY);
 
   if (x < 2 * TILEX && y < 2 * TILEY)
   {
@@ -97,8 +101,8 @@ void blitscreen(void)
 #if 1
 
   static boolean scrolling_last = FALSE;
-  unsigned int left = screen_x / TILEX;
-  unsigned int top  = screen_y / TILEY;
+  int left = screen_x / TILEX;
+  int top  = screen_y / TILEY;
   boolean scrolling = (screen_x % TILEX != 0 || screen_y % TILEY != 0);
   int x, y;
 
@@ -182,7 +186,7 @@ static void DrawLevelFieldCrumbled_EM(int x, int y, int sx, int sy,
 {
   int tile = Draw[y][x];
   struct GraphicInfo_EM *g = &graphic_info_em_object[tile][frame];
-  unsigned int i;
+  int i;
 
   if (crm == 0)		/* no crumbled edges for this tile */
     return;
@@ -295,9 +299,9 @@ static void DrawLevelPlayer_EM(int x1, int y1, int player_nr, int anim,
 
 static void animscreen(void)
 {
-  unsigned int x, y, i;
-  unsigned int left = screen_x / TILEX;
-  unsigned int top  = screen_y / TILEY;
+  int x, y, i;
+  int left = screen_x / TILEX;
+  int top  = screen_y / TILEY;
   static int xy[4][2] =
   {
     { 0, -1 },
@@ -314,8 +318,8 @@ static void animscreen(void)
       int sy = y % MAX_BUF_YSIZE;    
       int tile = Draw[y][x];
       struct GraphicInfo_EM *g = &graphic_info_em_object[tile][frame];
-      unsigned int obj = g->unique_identifier;
-      unsigned int crm = 0;
+      int obj = g->unique_identifier;
+      int crm = 0;
 
       /* re-calculate crumbled state of this tile */
       if (g->has_crumbled_graphics)
@@ -361,7 +365,7 @@ static void animscreen(void)
 
 static void blitplayer(struct PLAYER *ply)
 {
-  unsigned int x1, y1, x2, y2;
+  int x1, y1, x2, y2;
 
   if (!ply->alive)
     return;
@@ -372,8 +376,8 @@ static void blitplayer(struct PLAYER *ply)
   x2 = x1 + TILEX - 1;
   y2 = y1 + TILEY - 1;
 
-  if ((unsigned int)(x2 - screen_x) < ((MAX_BUF_XSIZE - 1) * TILEX - 1) &&
-      (unsigned int)(y2 - screen_y) < ((MAX_BUF_YSIZE - 1) * TILEY - 1))
+  if ((int)(x2 - screen_x) < ((MAX_BUF_XSIZE - 1) * TILEX - 1) &&
+      (int)(y2 - screen_y) < ((MAX_BUF_YSIZE - 1) * TILEY - 1))
   {
     /* some casts to "int" are needed because of negative calculation values */
     int dx = (int)ply->x - (int)ply->oldx;
@@ -439,7 +443,7 @@ static void blitplayer(struct PLAYER *ply)
 
 void game_initscreen(void)
 {
-  unsigned int x,y;
+  int x,y;
   int dynamite_state = ply[0].dynamite;		/* !!! ONLY PLAYER 1 !!! */
   int all_keys_state = ply[0].keys | ply[1].keys | ply[2].keys | ply[3].keys;
   int player_nr = 0;		/* !!! FIX THIS (CENTERED TO PLAYER 1) !!! */
@@ -483,10 +487,10 @@ void RedrawPlayfield_EM()
   int offset = (setup.scroll_delay ? 3 : 0) * TILEX;
 
   /* calculate new screen scrolling position, with regard to scroll delay */
-  screen_x = VALID_SCREEN_X(sx < screen_x - offset ? sx + offset :
-			    sx > screen_x + offset ? sx - offset : screen_x);
-  screen_y = VALID_SCREEN_Y(sy < screen_y - offset ? sy + offset :
-			    sy > screen_y + offset ? sy - offset : screen_y);
+  screen_x = VALID_SCREEN_X(sx + offset < screen_x ? sx + offset :
+			    sx - offset > screen_x ? sx - offset : screen_x);
+  screen_y = VALID_SCREEN_Y(sy + offset < screen_y ? sy + offset :
+			    sy - offset > screen_y ? sy - offset : screen_y);
 
 #else
 

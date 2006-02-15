@@ -299,18 +299,18 @@ void em_close_all(void)
 
 /* ---------------------------------------------------------------------- */
 
-extern unsigned int screen_x;
-extern unsigned int screen_y;
+extern int screen_x;
+extern int screen_y;
 
 void play_element_sound(int x, int y, int sample, int element)
 {
 #if 0
-  unsigned int left = screen_x / TILEX;
-  unsigned int top  = screen_y / TILEY;
+  int left = screen_x / TILEX;
+  int top  = screen_y / TILEY;
 
   if ((x == -1 && y == -1) ||	/* play sound in the middle of the screen */
-      ((unsigned int)(y - top)  <= SCR_FIELDY &&
-       (unsigned int)(x - left) <= SCR_FIELDX))
+      ((int)(y - top)  <= SCR_FIELDY &&
+       (int)(x - left) <= SCR_FIELDX))
 #endif
   {
 #if 1

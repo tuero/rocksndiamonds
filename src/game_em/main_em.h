@@ -6,8 +6,14 @@
 
 /* 2000-07-30T11:06:03Z ---------------------------------------------------- */
 
+#if 1
+/* one border for ZBORDER elements, one border for steelwall, if needed */
+#define EM_MAX_CAVE_WIDTH		(MAX_PLAYFIELD_WIDTH  + 2 + 2)
+#define EM_MAX_CAVE_HEIGHT		(MAX_PLAYFIELD_HEIGHT + 2 + 2)
+#else
 #define EM_MAX_CAVE_WIDTH		102
 #define EM_MAX_CAVE_HEIGHT		102
+#endif
 
 /* define these for backwards compatibility */
 #define EM_ENGINE_BAD_ROLL
@@ -18,9 +24,9 @@
   -----------------------------------------------------------------------------
   definition of elements used in the Emerald Mine Club engine;
   the element names have the following properties:
-  - elements that start with an 'X' can be stored in a level file;
-  - elements that start with an 'Y' indicate moving elements;
-  - elements that end with a 'B' are the "backside" of a moving element.
+  - elements that start with 'X' can be stored in a level file
+  - elements that start with 'Y' indicate moving elements
+  - elements that end with 'B' are the "backside" of moving elements
   -----------------------------------------------------------------------------
 */
 
@@ -520,111 +526,111 @@ enum
 
 struct LEVEL
 {
-  unsigned int home_initial;		/* number of players (initial) */
-  unsigned int home;			/* number of players not yet at home */
-					/* 0 == all players at home */
+  int home_initial;		/* number of players (initial) */
+  int home;			/* number of players not yet at home */
+				/* 0 == all players at home */
 
-  unsigned int width;			/* playfield width */
-  unsigned int height;			/* playfield height */
+  int width;			/* playfield width */
+  int height;			/* playfield height */
 
-  unsigned int time_seconds;		/* available time (seconds) */
-  unsigned int time_initial;		/* available time (initial) */
-  unsigned int time;			/* time remaining (runtime) */
+  int time_seconds;		/* available time (seconds) */
+  int time_initial;		/* available time (initial) */
+  int time;			/* time remaining (runtime) */
 
-  boolean killed_out_of_time;		/* kill player due to time out */
+  boolean killed_out_of_time;	/* kill player due to time out */
 
-  unsigned int required_initial;	/* emeralds needed (initial) */
-  unsigned int required;		/* emeralds needed (runtime) */
+  int required_initial;		/* emeralds needed (initial) */
+  int required;			/* emeralds needed (runtime) */
 
-  unsigned int score;			/* score */
+  int score;			/* score */
 
   /* all below entries must be filled every time a level is read */
 
-  unsigned int alien_score;		/* score for killing alien */
-  unsigned int amoeba_time;		/* amoeba speed */
-  unsigned int android_move_cnt_initial;/* android move counter (initial) */
-  unsigned int android_move_cnt;	/* android move counter */
-  unsigned int android_move_time;	/* android move reset time */
-  unsigned int android_clone_cnt_initial;/* android clone counter (initial) */
-  unsigned int android_clone_cnt;	/* android clone counter */
-  unsigned int android_clone_time;	/* android clone reset time */
-  unsigned int ball_cnt;		/* ball counter */
-  unsigned int ball_pos;		/* ball array pos counter */
-  unsigned int ball_random;		/* ball is random flag */
-  unsigned int ball_state_initial;	/* ball active flag (initial) */
-  unsigned int ball_state;		/* ball active flag */
-  unsigned int ball_time;		/* ball reset time */
-  unsigned int bug_score;		/* score for killing bug */
-  unsigned int diamond_score;		/* score for collecting diamond */
-  unsigned int dynamite_score;		/* score for collecting dynamite */
-  unsigned int eater_pos;		/* eater array pos */
-  unsigned int eater_score;		/* score for killing eater */
-  unsigned int emerald_score;		/* score for collecting emerald */
-  unsigned int exit_score;		/* score for entering exit */
-  unsigned int key_score;		/* score for colleting key */
-  unsigned int lenses_cnt_initial;	/* lenses counter (initial) */
-  unsigned int lenses_cnt;		/* lenses counter */
-  unsigned int lenses_score;		/* score for collecting lenses */
-  unsigned int lenses_time;		/* lenses reset time */
-  unsigned int magnify_cnt_initial;	/* magnify counter (initial) */
-  unsigned int magnify_cnt;		/* magnify counter */
-  unsigned int magnify_score;		/* score for collecting magnifier */
-  unsigned int magnify_time;		/* magnify reset time */
-  unsigned int nut_score;		/* score for cracking nut */
-  unsigned int shine_cnt;		/* shine counter for emerald/diamond */
-  unsigned int slurp_score;		/* score for slurping alien */
-  unsigned int tank_score;		/* score for killing tank */
-  unsigned int wheel_cnt_initial;	/* wheel counter (initial) */
-  unsigned int wheel_cnt;		/* wheel counter */
-  unsigned int wheel_x_initial;		/* wheel x pos (initial) */
-  unsigned int wheel_x;			/* wheel x pos */
-  unsigned int wheel_y_initial;		/* wheel y pos (initial) */
-  unsigned int wheel_y;			/* wheel y pos */
-  unsigned int wheel_time;		/* wheel reset time */
-  unsigned int wind_cnt_initial;	/* wind counter (initial) */
-  unsigned int wind_cnt;		/* wind time counter */
-  unsigned int wind_direction_initial;	/* wind direction (initial) */
-  unsigned int wind_direction;		/* wind direction */
-  unsigned int wind_time;		/* wind reset time */
-  unsigned int wonderwall_state_initial;/* wonderwall active flag (initial) */
-  unsigned int wonderwall_state;	/* wonderwall active flag */
-  unsigned int wonderwall_time_initial;	/* wonderwall time (initial) */
-  unsigned int wonderwall_time;		/* wonderwall time */
-  unsigned short eater_array[8][9];	/* eater data */
-  unsigned short ball_array[8][8];	/* ball data */
-  unsigned short android_array[TILE_MAX];/* android clone table */
-  unsigned int num_ball_arrays;		/* number of ball data arrays used */
+  int alien_score;		/* score for killing alien */
+  int amoeba_time;		/* amoeba speed */
+  int android_move_cnt_initial;	/* android move counter (initial) */
+  int android_move_cnt;		/* android move counter */
+  int android_move_time;	/* android move reset time */
+  int android_clone_cnt_initial;/* android clone counter (initial) */
+  int android_clone_cnt;	/* android clone counter */
+  int android_clone_time;	/* android clone reset time */
+  int ball_cnt;			/* ball counter */
+  int ball_pos;			/* ball array pos counter */
+  int ball_random;		/* ball is random flag */
+  int ball_state_initial;	/* ball active flag (initial) */
+  int ball_state;		/* ball active flag */
+  int ball_time;		/* ball reset time */
+  int bug_score;		/* score for killing bug */
+  int diamond_score;		/* score for collecting diamond */
+  int dynamite_score;		/* score for collecting dynamite */
+  int eater_pos;		/* eater array pos */
+  int eater_score;		/* score for killing eater */
+  int emerald_score;		/* score for collecting emerald */
+  int exit_score;		/* score for entering exit */
+  int key_score;		/* score for colleting key */
+  int lenses_cnt_initial;	/* lenses counter (initial) */
+  int lenses_cnt;		/* lenses counter */
+  int lenses_score;		/* score for collecting lenses */
+  int lenses_time;		/* lenses reset time */
+  int magnify_cnt_initial;	/* magnify counter (initial) */
+  int magnify_cnt;		/* magnify counter */
+  int magnify_score;		/* score for collecting magnifier */
+  int magnify_time;		/* magnify reset time */
+  int nut_score;		/* score for cracking nut */
+  int shine_cnt;		/* shine counter for emerald/diamond */
+  int slurp_score;		/* score for slurping alien */
+  int tank_score;		/* score for killing tank */
+  int wheel_cnt_initial;	/* wheel counter (initial) */
+  int wheel_cnt;		/* wheel counter */
+  int wheel_x_initial;		/* wheel x pos (initial) */
+  int wheel_x;			/* wheel x pos */
+  int wheel_y_initial;		/* wheel y pos (initial) */
+  int wheel_y;			/* wheel y pos */
+  int wheel_time;		/* wheel reset time */
+  int wind_cnt_initial;		/* wind counter (initial) */
+  int wind_cnt;			/* wind time counter */
+  int wind_direction_initial;	/* wind direction (initial) */
+  int wind_direction;		/* wind direction */
+  int wind_time;		/* wind reset time */
+  int wonderwall_state_initial;	/* wonderwall active flag (initial) */
+  int wonderwall_state;		/* wonderwall active flag */
+  int wonderwall_time_initial;	/* wonderwall time (initial) */
+  int wonderwall_time;		/* wonderwall time */
+  short eater_array[8][9];	/* eater data */
+  short ball_array[8][8];	/* ball data */
+  short android_array[TILE_MAX];/* android clone table */
+  int num_ball_arrays;		/* number of ball data arrays used */
 };
 
 struct PLAYER
 {
-  unsigned int num;
-  unsigned int exists;
-  unsigned int alive_initial;
-  unsigned int alive;
+  int num;
+  int exists;
+  int alive_initial;
+  int alive;
 
-  unsigned int dynamite;
-  unsigned int dynamite_cnt;
-  unsigned int keys;
-  unsigned int anim;
+  int dynamite;
+  int dynamite_cnt;
+  int keys;
+  int anim;
 
-  unsigned int x_initial;
-  unsigned int y_initial;
-  unsigned int x;
-  unsigned int y;
-  unsigned int oldx;
-  unsigned int oldy;
+  int x_initial;
+  int y_initial;
+  int x;
+  int y;
+  int oldx;
+  int oldy;
 
-  unsigned int last_move_dir;
+  int last_move_dir;
 
-  unsigned joy_n:1;
-  unsigned joy_e:1;
-  unsigned joy_s:1;
-  unsigned joy_w:1;
-  unsigned joy_snap:1;
-  unsigned joy_drop:1;
-  unsigned joy_stick:1;
-  unsigned joy_spin:1;
+  int joy_n:1;
+  int joy_e:1;
+  int joy_s:1;
+  int joy_w:1;
+  int joy_snap:1;
+  int joy_drop:1;
+  int joy_stick:1;
+  int joy_spin:1;
 };
 
 
@@ -649,7 +655,7 @@ struct LevelInfo_EM
 {
   int file_version;
 
-  unsigned short cave[EM_MAX_CAVE_WIDTH][EM_MAX_CAVE_HEIGHT];
+  short cave[EM_MAX_CAVE_WIDTH][EM_MAX_CAVE_HEIGHT];
 
   struct LEVEL *lev;
   struct PLAYER *ply[MAX_PLAYERS];

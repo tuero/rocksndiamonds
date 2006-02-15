@@ -213,6 +213,10 @@
 #define CURSOR_PLAYFIELD	1
 
 
+/* maximum playfield size supported by libgame functions */
+#define MAX_PLAYFIELD_WIDTH	128
+#define MAX_PLAYFIELD_HEIGHT	128
+
 /* maximum number of parallel players supported by libgame functions */
 #define MAX_PLAYERS		4
 
