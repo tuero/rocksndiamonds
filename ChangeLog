@@ -1,3 +1,6 @@
+2006-02-16
+	* added use of "Home" and "End" keys to handle element list in editor
+
 2006-02-15
 	* fixed bug with adding score when playing tape with EMC game engine
 	* added steel wall border for levels using EMC engine without border

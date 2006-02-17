@@ -9890,6 +9890,19 @@ void HandleLevelEditorKeyInput(Key key)
 	button = MB_RIGHTBUTTON;
 	break;
 
+      case KSYM_Home:
+      case KSYM_End:
+	element_shift = (key == KSYM_Home ? 0 :
+			 num_editor_elements - ED_NUM_ELEMENTLIST_BUTTONS);
+
+	ModifyGadget(level_editor_gadget[GADGET_ID_SCROLL_LIST_VERTICAL],
+		     GDI_SCROLLBAR_ITEM_POSITION,
+		     element_shift / ED_ELEMENTLIST_BUTTONS_HORIZ, GDI_END);
+
+	ModifyEditorElementList();
+
+	break;
+
       case KSYM_Escape:
         if (edit_mode == ED_MODE_DRAWING)
 	{
