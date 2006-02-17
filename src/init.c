@@ -1884,6 +1884,7 @@ void InitElementPropertiesStatic()
     EL_EMC_KEY_7,
     EL_EMC_KEY_8,
     EL_DYNAMITE,
+    EL_EM_DYNAMITE,
     EL_DYNABOMB_INCREASE_NUMBER,
     EL_DYNABOMB_INCREASE_SIZE,
     EL_DYNABOMB_INCREASE_POWER,
@@ -2248,8 +2249,10 @@ void InitElementPropertiesStatic()
     EL_MOLE,
 
     /* new elements */
-    EL_DYNAMITE_ACTIVE,
     EL_DYNAMITE,
+    EL_DYNAMITE_ACTIVE,
+    EL_EM_DYNAMITE,
+    EL_EM_DYNAMITE_ACTIVE,
     EL_DYNABOMB_PLAYER_1_ACTIVE,
     EL_DYNABOMB_PLAYER_2_ACTIVE,
     EL_DYNABOMB_PLAYER_3_ACTIVE,
@@ -2529,8 +2532,10 @@ void InitElementPropertiesStatic()
     EL_MOLE,
 
     /* elements that can explode by explosion or by dragonfire */
-    EL_DYNAMITE_ACTIVE,
     EL_DYNAMITE,
+    EL_DYNAMITE_ACTIVE,
+    EL_EM_DYNAMITE,
+    EL_EM_DYNAMITE_ACTIVE,
     EL_DYNABOMB_PLAYER_1_ACTIVE,
     EL_DYNABOMB_PLAYER_2_ACTIVE,
     EL_DYNABOMB_PLAYER_3_ACTIVE,
@@ -3274,6 +3279,7 @@ void InitElementPropertiesStatic()
   static int ep_active_bomb[] =
   {
     EL_DYNAMITE_ACTIVE,
+    EL_EM_DYNAMITE_ACTIVE,
     EL_DYNABOMB_PLAYER_1_ACTIVE,
     EL_DYNABOMB_PLAYER_2_ACTIVE,
     EL_DYNABOMB_PLAYER_3_ACTIVE,
@@ -3344,6 +3350,7 @@ void InitElementPropertiesStatic()
     EL_EMC_GATE_7_GRAY_ACTIVE,
     EL_EMC_GATE_8_GRAY_ACTIVE,
     EL_DYNAMITE,
+    EL_EM_DYNAMITE,
     EL_INVISIBLE_STEELWALL,
     EL_INVISIBLE_WALL,
     EL_INVISIBLE_SAND,

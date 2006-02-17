@@ -987,6 +987,10 @@ static void InitField(int x, int y, boolean init_game)
       MovDelay[x][y] = 96;
       break;
 
+    case EL_EM_DYNAMITE_ACTIVE:
+      MovDelay[x][y] = 32;
+      break;
+
     case EL_LAMP:
       local_player->lights_still_needed++;
       break;
@@ -11107,7 +11111,9 @@ int DigField(struct PlayerInfo *player,
       if (element == EL_SHIELD_DEADLY)
 	player->shield_deadly_time_left += level.shield_deadly_time;
     }
-    else if (element == EL_DYNAMITE || element == EL_SP_DISK_RED)
+    else if (element == EL_DYNAMITE ||
+	     element == EL_EM_DYNAMITE ||
+	     element == EL_SP_DISK_RED)
     {
       if (player->inventory_size < MAX_INVENTORY_SIZE)
 	player->inventory_element[player->inventory_size++] = element;
@@ -11636,6 +11642,8 @@ boolean DropElement(struct PlayerInfo *player)
 
       if (new_element == EL_DYNAMITE)
 	new_element = EL_DYNAMITE_ACTIVE;
+      else if (new_element == EL_EM_DYNAMITE)
+	new_element = EL_EM_DYNAMITE_ACTIVE;
       else if (new_element == EL_SP_DISK_RED)
 	new_element = EL_SP_DISK_RED_ACTIVE;
     }
@@ -11867,7 +11875,7 @@ void PlayLevelSound_EM(int x, int y, int element_em, int sample)
       break;
 
     case SAMPLE_slurp:
-      PlayLevelSoundElementAction(x, y, element, ACTION_SLURPING);
+      PlayLevelSoundElementAction(x, y, element, ACTION_EATING);
       break;
 
     case SAMPLE_eater:
@@ -12029,6 +12037,7 @@ void RaiseScoreElement(int element)
       RaiseScore(level.score[SC_NUT]);
       break;
     case EL_DYNAMITE:
+    case EL_EM_DYNAMITE:
     case EL_SP_DISK_RED:
     case EL_DYNABOMB_INCREASE_NUMBER:
     case EL_DYNABOMB_INCREASE_SIZE:

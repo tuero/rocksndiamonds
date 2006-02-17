@@ -948,6 +948,23 @@ struct ConfigInfo image_config[] =
   { "dynamite.active.EDITOR.xpos",		"1"			},
   { "dynamite.active.EDITOR.ypos",		"14"			},
 
+  { "em_dynamite",				"RocksElements.pcx"	},
+  { "em_dynamite.xpos",				"0"			},
+  { "em_dynamite.ypos",				"3"			},
+  { "em_dynamite.frames",			"1"			},
+  { "em_dynamite.EDITOR",			"RocksElements.pcx"	},
+  { "em_dynamite.EDITOR.xpos",			"0"			},
+  { "em_dynamite.EDITOR.ypos",			"14"			},
+  { "em_dynamite.active",			"RocksElements.pcx"	},
+  { "em_dynamite.active.xpos",			"1"			},
+  { "em_dynamite.active.ypos",			"3"			},
+  { "em_dynamite.active.frames",		"7"			},
+  { "em_dynamite.active.delay",			"4"			},
+  { "em_dynamite.active.anim_mode",		"linear"		},
+  { "em_dynamite.active.EDITOR",		"RocksElements.pcx"	},
+  { "em_dynamite.active.EDITOR.xpos",		"1"			},
+  { "em_dynamite.active.EDITOR.ypos",		"14"			},
+
   { "wall_emerald",				"RocksElements.pcx"	},
   { "wall_emerald.xpos",			"4"			},
   { "wall_emerald.ypos",			"8"			},
@@ -3713,13 +3730,13 @@ struct ConfigInfo image_config[] =
   /* !!! TEMPORARILY STORED HERE -- PROBABLY TO BE CHANGED !!! */
 
   /* (for testing, change filename back to "emc_object dot pcx") */
-  { "emc_object",				"emc_object.pcx"	},
+  { "emc_object",				"emc_objects.pcx"	},
 #if 0
   { "emc_object.scale_up_factor",		"2"			},
 #endif
 
   /* (for testing, change filename back to "emc_sprite dot pcx") */
-  { "emc_sprite",				"emc_sprite.pcx"	},
+  { "emc_sprite",				"emc_players.pcx"	},
 #if 0
   { "emc_sprite.scale_up_factor",		"2"			},
 #endif

@@ -1864,12 +1864,14 @@ void DrawPlayer(struct PlayerInfo *player)
       DrawLevelElement(last_jx, last_jy, Back[last_jx][last_jy]);
 
       if (last_element == EL_DYNAMITE_ACTIVE ||
+	  last_element == EL_EM_DYNAMITE_ACTIVE ||
 	  last_element == EL_SP_DISK_RED_ACTIVE)
 	DrawDynamite(last_jx, last_jy);
       else
 	DrawLevelFieldThruMask(last_jx, last_jy);
     }
     else if (last_element == EL_DYNAMITE_ACTIVE ||
+	     last_element == EL_EM_DYNAMITE_ACTIVE ||
 	     last_element == EL_SP_DISK_RED_ACTIVE)
       DrawDynamite(last_jx, last_jy);
     else
@@ -3440,19 +3442,19 @@ em_object_mapping_list[] =
   },
   {
     Yspring_kill_e,			FALSE,	FALSE,
-    EL_SPRING,				ACTION_SLURPING, MV_BIT_RIGHT
+    EL_SPRING,				ACTION_EATING, MV_BIT_RIGHT
   },
   {
     Yspring_kill_eB,			FALSE,	TRUE,
-    EL_SPRING,				ACTION_SLURPING, MV_BIT_RIGHT
+    EL_SPRING,				ACTION_EATING, MV_BIT_RIGHT
   },
   {
     Yspring_kill_w,			FALSE,	FALSE,
-    EL_SPRING,				ACTION_SLURPING, MV_BIT_LEFT
+    EL_SPRING,				ACTION_EATING, MV_BIT_LEFT
   },
   {
     Yspring_kill_wB,			FALSE,	TRUE,
-    EL_SPRING,				ACTION_SLURPING, MV_BIT_LEFT
+    EL_SPRING,				ACTION_EATING, MV_BIT_LEFT
   },
   {
     Xeater_n,				TRUE,	FALSE,
@@ -4084,27 +4086,27 @@ em_object_mapping_list[] =
   },
   {
     Xdynamite,				TRUE,	FALSE,
-    EL_DYNAMITE,			-1, -1
+    EL_EM_DYNAMITE,			-1, -1
   },
   {
     Ydynamite_eat,			FALSE,	FALSE,
-    EL_DYNAMITE,			ACTION_COLLECTING, -1
+    EL_EM_DYNAMITE,			ACTION_COLLECTING, -1
   },
   {
     Xdynamite_1,			TRUE,	FALSE,
-    EL_DYNAMITE_ACTIVE,			-1, -1
+    EL_EM_DYNAMITE_ACTIVE,		-1, -1
   },
   {
     Xdynamite_2,			FALSE,	FALSE,
-    EL_DYNAMITE_ACTIVE,			-1, -1
+    EL_EM_DYNAMITE_ACTIVE,		-1, -1
   },
   {
     Xdynamite_3,			FALSE,	FALSE,
-    EL_DYNAMITE_ACTIVE,			-1, -1
+    EL_EM_DYNAMITE_ACTIVE,		-1, -1
   },
   {
     Xdynamite_4,			FALSE,	FALSE,
-    EL_DYNAMITE_ACTIVE,			-1, -1
+    EL_EM_DYNAMITE_ACTIVE,		-1, -1
   },
   {
     Xbumper,				TRUE,	FALSE,
@@ -5335,9 +5337,9 @@ void InitGraphicInfo_EM(void)
 			i == Xexit_2 ? j + 8 :
 			i == Xexit_3 ? j + 16 :
 			i == Xdynamite_1 ? 0 :
-			i == Xdynamite_2 ? 20 :
-			i == Xdynamite_3 ? 40 :
-			i == Xdynamite_4 ? 60 :
+			i == Xdynamite_2 ? 8 :
+			i == Xdynamite_3 ? 16 :
+			i == Xdynamite_4 ? 24 :
 			i == Xsand_stonein_1 ? j + 1 :
 			i == Xsand_stonein_2 ? j + 9 :
 			i == Xsand_stonein_3 ? j + 17 :
@@ -5449,7 +5451,7 @@ void InitGraphicInfo_EM(void)
       if (!g->double_movement && (effective_action == ACTION_FALLING ||
 				  effective_action == ACTION_MOVING  ||
 				  effective_action == ACTION_PUSHING ||
-				  effective_action == ACTION_SLURPING))
+				  effective_action == ACTION_EATING))
       {
 	int move_dir =
 	  (effective_action == ACTION_FALLING ? MV_DOWN : direction);
@@ -5608,7 +5610,7 @@ void InitGraphicInfo_EM(void)
 
       if ((action == ACTION_SMASHED_BY_ROCK ||
 	   action == ACTION_SMASHED_BY_SPRING ||
-	   action == ACTION_SLURPING) &&
+	   action == ACTION_EATING) &&
 	  graphic_action == graphic_default)
       {
 	int e = (action == ACTION_SMASHED_BY_ROCK   ? Ystone_s  :

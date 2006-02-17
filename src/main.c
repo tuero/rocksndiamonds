@@ -1394,14 +1394,14 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
     "gray door (EM style, key 4)"
   },
   {
-    "unused_254",
-    "unused",
-    "(not used)"
+    "em_dynamite",
+    "dynamite",
+    "dynamite (EM style)"
   },
   {
-    "unused_255",
-    "unused",
-    "(not used)"
+    "em_dynamite.active",
+    "dynamite",
+    "burning dynamite (EM style)"
   },
   {
     "pearl",
@@ -4425,7 +4425,7 @@ struct ElementActionInfo element_action_info[NUM_ACTIONS + 1 + 1] =
   { ".turning_from_down",	ACTION_TURNING_FROM_DOWN,	FALSE	},
   { ".smashed_by_rock",		ACTION_SMASHED_BY_ROCK,		FALSE	},
   { ".smashed_by_spring",	ACTION_SMASHED_BY_SPRING,	FALSE	},
-  { ".slurping",		ACTION_SLURPING,		FALSE	},
+  { ".eating",			ACTION_EATING,			FALSE	},
   { ".twinkling",		ACTION_TWINKLING,		FALSE	},
   { ".splashing",		ACTION_SPLASHING,		FALSE	},
   { ".page[1]",			ACTION_PAGE_1,			FALSE	},

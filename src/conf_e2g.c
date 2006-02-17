@@ -690,6 +690,18 @@ element_to_graphic[] =
     IMG_DYNAMITE_ACTIVE
   },
   {
+    EL_EM_DYNAMITE,			-1, -1, FALSE,
+    IMG_EM_DYNAMITE
+  },
+  {
+    EL_EM_DYNAMITE_ACTIVE,		-1, -1, FALSE,
+    IMG_EM_DYNAMITE_ACTIVE
+  },
+  {
+    EL_EM_DYNAMITE,			ACTION_ACTIVE, -1, FALSE,
+    IMG_EM_DYNAMITE_ACTIVE
+  },
+  {
     EL_WALL_EMERALD,			-1, -1, FALSE,
     IMG_WALL_EMERALD
   },

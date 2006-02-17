@@ -2489,7 +2489,7 @@ static struct
     "slip down from certain flat walls","use EM style slipping behaviour"
   },
   {
-    ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(1),
+    ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(2),
     GADGET_ID_USE_SPRING_BUG,		GADGET_ID_NONE,
     &level.use_spring_bug,
     NULL,
@@ -3353,6 +3353,11 @@ static int editor_el_emerald_mine_club[] =
 
   EL_EMC_DRIPPER,
   EL_EMC_FAKE_GRASS,
+  EL_EMPTY,
+  EL_EMPTY,
+
+  EL_EM_DYNAMITE,
+  EL_EM_DYNAMITE_ACTIVE,
   EL_EMPTY,
   EL_EMPTY,
 };
@@ -7625,7 +7630,7 @@ static void DrawPropertiesInfo()
 
 #define TEXT_COLLECTING		"Score for collecting"
 #define TEXT_SMASHING		"Score for smashing"
-#define TEXT_SLURPING		"Score for slurping"
+#define TEXT_SLURPING		"Score for slurping robot"
 #define TEXT_CRACKING		"Score for cracking"
 #define TEXT_AMOEBA_SPEED	"Speed of amoeba growth"
 #define TEXT_DURATION		"Duration when activated"
@@ -7686,6 +7691,7 @@ static struct
   { EL_PACMAN_DOWN,	&level.score[SC_PACMAN],	TEXT_SMASHING	},
   { EL_NUT,		&level.score[SC_NUT],		TEXT_CRACKING	},
   { EL_DYNAMITE,	&level.score[SC_DYNAMITE],	TEXT_COLLECTING	},
+  { EL_EM_DYNAMITE,	&level.score[SC_DYNAMITE],	TEXT_COLLECTING	},
   { EL_DYNABOMB_INCREASE_NUMBER,&level.score[SC_DYNAMITE],TEXT_COLLECTING },
   { EL_DYNABOMB_INCREASE_SIZE,	&level.score[SC_DYNAMITE],TEXT_COLLECTING },
   { EL_DYNABOMB_INCREASE_POWER,	&level.score[SC_DYNAMITE],TEXT_COLLECTING },
@@ -7736,7 +7742,7 @@ static struct
   { EL_EMC_MAGIC_BALL,	&level.ball_time,		TEXT_BALL_DELAY	},
   { EL_EMC_LENSES,	&level.lenses_score,		TEXT_COLLECTING	},
   { EL_EMC_MAGNIFIER,	&level.magnify_score,		TEXT_COLLECTING	},
-  { EL_ROBOT,		&level.slurp_score,		TEXT_SLURPING	},
+  { EL_SPRING,		&level.slurp_score,		TEXT_SLURPING	},
   { EL_EMC_LENSES,	&level.lenses_time,		TEXT_DURATION	},
   { EL_EMC_MAGNIFIER,	&level.magnify_time,		TEXT_DURATION	},
 #endif
