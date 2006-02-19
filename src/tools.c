@@ -127,7 +127,11 @@ void RedrawPlayfield(boolean force_redraw, int x, int y, int width, int height)
   if (game_status == GAME_MODE_PLAYING &&
       level.game_engine_type == GAME_ENGINE_TYPE_EM)
   {
+#if 1
+    RedrawPlayfield_EM(force_redraw);
+#else
     BlitScreenToBitmap_EM(backbuffer);
+#endif
   }
   else if (game_status == GAME_MODE_PLAYING && !game.envelope_active)
   {
@@ -1826,6 +1830,13 @@ void DrawPlayer(struct PlayerInfo *player)
   int last_player_graphic = getPlayerGraphic(player, move_dir);
   int last_player_frame = player->Frame;
   int frame = 0;
+
+#if 1
+  /* GfxElement[][] is set to the element the player is digging or collecting;
+     remove also for off-screen player if the player is not moving anymore */
+  if (IN_LEV_FIELD(jx, jy) && !player_is_moving)
+    GfxElement[jx][jy] = EL_UNDEFINED;
+#endif
 
   if (!player->active || !IN_SCR_FIELD(SCREENX(last_jx), SCREENY(last_jy)))
     return;
@@ -5116,6 +5127,14 @@ int getGameFrameDelay_EM(int native_em_game_frame_delay)
     game_frame_delay_value = 0;
 
   return game_frame_delay_value;
+}
+
+int getCenteredPlayer_EM()
+{
+  if (game.centered_to_player != game.centered_to_player_next)
+    game.centered_to_player = game.centered_to_player_next;
+
+  return game.centered_to_player;
 }
 
 unsigned int InitRND(long seed)

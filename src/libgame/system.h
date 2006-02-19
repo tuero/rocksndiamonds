@@ -684,6 +684,7 @@ struct SetupInfo
   boolean time_limit;
   boolean fullscreen;
   boolean ask_on_escape;
+  boolean quick_switch;
 
   char *graphics_set;
   char *sounds_set;

@@ -45,6 +45,7 @@ static int crumbled_state[MAX_BUF_YSIZE][MAX_BUF_XSIZE];
 
 static boolean redraw[MAX_BUF_XSIZE][MAX_BUF_YSIZE];
 
+static int centered_to_player;
 
 /* copy the entire screen to the window at the scroll position
  *
@@ -106,7 +107,9 @@ void blitscreen(void)
   boolean scrolling = (screen_x % TILEX != 0 || screen_y % TILEY != 0);
   int x, y;
 
+#if 0
   SyncDisplay();
+#endif
 
   if (redraw_tiles > REDRAWTILES_THRESHOLD || scrolling || scrolling_last)
   {
@@ -160,6 +163,15 @@ static void DrawLevelField_EM(int x, int y, int sx, int sy,
   int width = g->width;
   int height = g->height;
 
+#if 1
+  int left = screen_x / TILEX;
+  int top  = screen_y / TILEY;
+
+  if (x < left || x >= left + MAX_BUF_XSIZE ||
+      y < top  || y >= top  + MAX_BUF_YSIZE)
+    return;
+#endif
+
   if (draw_masked)
   {
     if (width > 0 && height > 0)
@@ -187,6 +199,15 @@ static void DrawLevelFieldCrumbled_EM(int x, int y, int sx, int sy,
   int tile = Draw[y][x];
   struct GraphicInfo_EM *g = &graphic_info_em_object[tile][frame];
   int i;
+
+#if 1
+  int left = screen_x / TILEX;
+  int top  = screen_y / TILEY;
+
+  if (x < left || x >= left + MAX_BUF_XSIZE ||
+      y < top  || y >= top  + MAX_BUF_YSIZE)
+    return;
+#endif
 
   if (crm == 0)		/* no crumbled edges for this tile */
     return;
@@ -241,6 +262,15 @@ static void DrawLevelPlayer_EM(int x1, int y1, int player_nr, int anim,
 
   int src_x = g->src_x, src_y = g->src_y;
   int dst_x, dst_y;
+
+#if 1
+  if (x1 < screen_x - TILEX || x1 >= screen_x + MAX_BUF_XSIZE * TILEX ||
+      y1 < screen_y - TILEY || y1 >= screen_y + MAX_BUF_YSIZE * TILEY)
+    return;
+
+  x1 %= MAX_BUF_XSIZE * TILEX;
+  y1 %= MAX_BUF_YSIZE * TILEY;
+#endif
 
   if (draw_masked)
   {
@@ -398,10 +428,12 @@ static void blitplayer(struct PLAYER *ply)
     /* only diggable elements can be crumbled in the classic EM engine */
     boolean player_is_digging = (new_crm != 0);
 
+#if 0
     x1 %= MAX_BUF_XSIZE * TILEX;
     y1 %= MAX_BUF_YSIZE * TILEY;
     x2 %= MAX_BUF_XSIZE * TILEX;
     y2 %= MAX_BUF_YSIZE * TILEY;
+#endif
 
     if (player_is_digging)
     {
@@ -446,7 +478,13 @@ void game_initscreen(void)
   int x,y;
   int dynamite_state = ply[0].dynamite;		/* !!! ONLY PLAYER 1 !!! */
   int all_keys_state = ply[0].keys | ply[1].keys | ply[2].keys | ply[3].keys;
+#if 1
+  int player_nr = getCenteredPlayer_EM();
+#else
   int player_nr = 0;		/* !!! FIX THIS (CENTERED TO PLAYER 1) !!! */
+#endif
+
+  centered_to_player = player_nr;
 
   frame = 6;
 #if 1
@@ -475,12 +513,200 @@ void game_initscreen(void)
 #endif
 }
 
-void RedrawPlayfield_EM()
+#if 0
+void DrawRelocatePlayer(struct PlayerInfo *player, boolean quick_relocation)
 {
+  boolean ffwd_delay = (tape.playing && tape.fast_forward);
+  boolean no_delay = (tape.warp_forward);
+  int frame_delay_value = (ffwd_delay ? FfwdFrameDelay : GameFrameDelay);
+  int wait_delay_value = (no_delay ? 0 : frame_delay_value);
+  int jx = player->jx;
+  int jy = player->jy;
+
+  if (quick_relocation)
+  {
+    int offset = (setup.scroll_delay ? 3 : 0);
+
+    if (!IN_VIS_FIELD(SCREENX(jx), SCREENY(jy)))
+    {
+      scroll_x = (player->jx < SBX_Left  + MIDPOSX ? SBX_Left :
+		  player->jx > SBX_Right + MIDPOSX ? SBX_Right :
+		  player->jx - MIDPOSX);
+
+      scroll_y = (player->jy < SBY_Upper + MIDPOSY ? SBY_Upper :
+		  player->jy > SBY_Lower + MIDPOSY ? SBY_Lower :
+		  player->jy - MIDPOSY);
+    }
+    else
+    {
+      if ((player->MovDir == MV_LEFT  && scroll_x > jx - MIDPOSX + offset) ||
+	  (player->MovDir == MV_RIGHT && scroll_x < jx - MIDPOSX - offset))
+	scroll_x = jx - MIDPOSX + (scroll_x < jx-MIDPOSX ? -offset : +offset);
+
+      if ((player->MovDir == MV_UP  && scroll_y > jy - MIDPOSY + offset) ||
+	  (player->MovDir == MV_DOWN && scroll_y < jy - MIDPOSY - offset))
+	scroll_y = jy - MIDPOSY + (scroll_y < jy-MIDPOSY ? -offset : +offset);
+
+      /* don't scroll over playfield boundaries */
+      if (scroll_x < SBX_Left || scroll_x > SBX_Right)
+	scroll_x = (scroll_x < SBX_Left ? SBX_Left : SBX_Right);
+
+      /* don't scroll over playfield boundaries */
+      if (scroll_y < SBY_Upper || scroll_y > SBY_Lower)
+	scroll_y = (scroll_y < SBY_Upper ? SBY_Upper : SBY_Lower);
+    }
+
+    RedrawPlayfield(TRUE, 0,0,0,0);
+  }
+  else
+  {
+    int scroll_xx = -999, scroll_yy = -999;
+
+    ScrollScreen(NULL, SCROLL_GO_ON);	/* scroll last frame to full tile */
+
+    while (scroll_xx != scroll_x || scroll_yy != scroll_y)
+    {
+      int dx = 0, dy = 0;
+      int fx = FX, fy = FY;
+
+      scroll_xx = (player->jx < SBX_Left  + MIDPOSX ? SBX_Left :
+		   player->jx > SBX_Right + MIDPOSX ? SBX_Right :
+		   player->jx - MIDPOSX);
+
+      scroll_yy = (player->jy < SBY_Upper + MIDPOSY ? SBY_Upper :
+		   player->jy > SBY_Lower + MIDPOSY ? SBY_Lower :
+		   player->jy - MIDPOSY);
+
+      dx = (scroll_xx < scroll_x ? +1 : scroll_xx > scroll_x ? -1 : 0);
+      dy = (scroll_yy < scroll_y ? +1 : scroll_yy > scroll_y ? -1 : 0);
+
+      if (dx == 0 && dy == 0)		/* no scrolling needed at all */
+	break;
+
+      scroll_x -= dx;
+      scroll_y -= dy;
+
+      fx += dx * TILEX / 2;
+      fy += dy * TILEY / 2;
+
+      ScrollLevel(dx, dy);
+      DrawAllPlayers();
+
+      /* scroll in two steps of half tile size to make things smoother */
+      BlitBitmap(drawto_field, window, fx, fy, SXSIZE, SYSIZE, SX, SY);
+      FlushDisplay();
+      Delay(wait_delay_value);
+
+      /* scroll second step to align at full tile size */
+      BackToFront();
+      Delay(wait_delay_value);
+    }
+
+    DrawPlayer(player);
+    BackToFront();
+    Delay(wait_delay_value);
+  }
+}
+#endif
+
+void RedrawPlayfield_EM(boolean force_redraw)
+{
+#if 1
+  int player_nr = getCenteredPlayer_EM();
+  boolean draw_new_player_location = FALSE;
+  boolean quick_relocation = setup.quick_switch;
+#else
   int player_nr = 0;		/* !!! FIX THIS (CENTERED TO PLAYER 1) !!! */
+#endif
   int sx = PLAYER_SCREEN_X(player_nr);
   int sy = PLAYER_SCREEN_Y(player_nr);
-  int i;
+  int i, x, y;
+
+#if 1
+  boolean scrolling = (screen_x % TILEX != 0 || screen_y % TILEY != 0);
+
+  if (!scrolling)	/* screen currently aligned at tile position */
+  {
+    if (player_nr != centered_to_player)
+    {
+      centered_to_player = player_nr;
+
+      draw_new_player_location = TRUE;
+      force_redraw = TRUE;
+    }
+  }
+#endif
+
+  if (draw_new_player_location && !quick_relocation)
+  {
+#if 1
+    unsigned long game_frame_delay_value = getGameFrameDelay_EM(20);
+#else
+    unsigned long game_frame_delay_value = getGameFrameDelay_EM(25);
+#endif
+    int wait_delay_value = game_frame_delay_value;
+    int screen_xx = -999, screen_yy = -999;
+
+    while (screen_xx != screen_x || screen_yy != screen_y)
+    {
+      int screen_xx = VALID_SCREEN_X(PLAYER_SCREEN_X(player_nr));
+      int screen_yy = VALID_SCREEN_Y(PLAYER_SCREEN_Y(player_nr));
+      int dx = (screen_xx < screen_x ? +1 : screen_xx > screen_x ? -1 : 0);
+      int dy = (screen_yy < screen_y ? +1 : screen_yy > screen_y ? -1 : 0);
+      int dxx = 0, dyy = 0;
+
+      if (dx == 0 && dy == 0)		/* no scrolling needed at all */
+	break;
+
+      screen_x -= dx * TILEX;
+      screen_y -= dy * TILEY;
+
+      dxx += dx * TILEX / 2;
+      dyy += dy * TILEY / 2;
+
+      /* scroll in two steps of half tile size to make things smoother */
+      screen_x += dxx;
+      screen_y += dyy;
+
+      animscreen();
+
+      for (i = 0; i < MAX_PLAYERS; i++)
+	blitplayer(&ply[i]);
+
+      blitscreen();
+      FlushDisplay();
+      Delay(wait_delay_value);
+
+      /* scroll second step to align at full tile size */
+      screen_x -= dxx;
+      screen_y -= dyy;
+
+      SyncDisplay();
+
+      animscreen();
+
+      for (i = 0; i < MAX_PLAYERS; i++)
+	blitplayer(&ply[i]);
+
+      blitscreen();
+      FlushDisplay();
+      Delay(wait_delay_value);
+    }
+  }
+
+#if 1
+  if (force_redraw)
+  {
+    for (y = 0; y < MAX_BUF_YSIZE; y++)
+    {
+      for (x = 0; x < MAX_BUF_XSIZE; x++)
+      {
+	screentiles[y][x] = -1;
+	crumbled_state[y][x] = 0;
+      }
+    }
+  }
+#endif
 
 #if 1
 
@@ -514,6 +740,8 @@ void RedrawPlayfield_EM()
   for (i = 0; i < MAX_PLAYERS; i++)
     blitplayer(&ply[i]);
 
+  SyncDisplay();
+
   blitscreen();
 
   FlushDisplay();
@@ -521,7 +749,7 @@ void RedrawPlayfield_EM()
 
 void game_animscreen(void)
 {
-  RedrawPlayfield_EM();
+  RedrawPlayfield_EM(FALSE);
 }
 
 void DrawGameDoorValues_EM()

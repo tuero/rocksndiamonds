@@ -44,7 +44,7 @@ extern void setLevelInfoToDefaults_EM();
 extern boolean LoadNativeLevel_EM(char *);
 
 extern void BlitScreenToBitmap_EM(Bitmap *);
-extern void RedrawPlayfield_EM();
+extern void RedrawPlayfield_EM(boolean);
 extern void DrawGameDoorValues_EM();
 
 #endif	/* GAME_EM_H */

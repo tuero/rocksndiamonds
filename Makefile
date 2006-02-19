@@ -127,7 +127,13 @@ leveltest: all
 	./Scripts/make_enginetest.sh leveltest
 
 backup:
-	./Scripts/make_backup.sh src
+	./Scripts/make_backup.sh src 1
+
+backup2:
+	./Scripts/make_backup.sh src 2
+
+backup3:
+	./Scripts/make_backup.sh src 3
 
 backup_lev:
 	./Scripts/make_backup.sh lev

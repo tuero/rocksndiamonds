@@ -4923,14 +4923,15 @@ void SaveScore(int nr)
 #define SETUP_TOKEN_TIME_LIMIT			14
 #define SETUP_TOKEN_FULLSCREEN			15
 #define SETUP_TOKEN_ASK_ON_ESCAPE		16
-#define SETUP_TOKEN_GRAPHICS_SET		17
-#define SETUP_TOKEN_SOUNDS_SET			18
-#define SETUP_TOKEN_MUSIC_SET			19
-#define SETUP_TOKEN_OVERRIDE_LEVEL_GRAPHICS	20
-#define SETUP_TOKEN_OVERRIDE_LEVEL_SOUNDS	21
-#define SETUP_TOKEN_OVERRIDE_LEVEL_MUSIC	22
+#define SETUP_TOKEN_QUICK_SWITCH		17
+#define SETUP_TOKEN_GRAPHICS_SET		18
+#define SETUP_TOKEN_SOUNDS_SET			19
+#define SETUP_TOKEN_MUSIC_SET			20
+#define SETUP_TOKEN_OVERRIDE_LEVEL_GRAPHICS	21
+#define SETUP_TOKEN_OVERRIDE_LEVEL_SOUNDS	22
+#define SETUP_TOKEN_OVERRIDE_LEVEL_MUSIC	23
 
-#define NUM_GLOBAL_SETUP_TOKENS			23
+#define NUM_GLOBAL_SETUP_TOKENS			24
 
 /* editor setup */
 #define SETUP_TOKEN_EDITOR_EL_BOULDERDASH	0
@@ -5033,6 +5034,7 @@ static struct TokenInfo global_setup_tokens[] =
   { TYPE_SWITCH, &si.time_limit,	"time_limit"			},
   { TYPE_SWITCH, &si.fullscreen,	"fullscreen"			},
   { TYPE_SWITCH, &si.ask_on_escape,	"ask_on_escape"			},
+  { TYPE_SWITCH, &si.quick_switch,	"quick_player_switch"		},
   { TYPE_STRING, &si.graphics_set,	"graphics_set"			},
   { TYPE_STRING, &si.sounds_set,	"sounds_set"			},
   { TYPE_STRING, &si.music_set,		"music_set"			},
@@ -5153,6 +5155,7 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
   si->time_limit = TRUE;
   si->fullscreen = FALSE;
   si->ask_on_escape = TRUE;
+  si->quick_switch = FALSE;
 
   si->graphics_set = getStringCopy(GFX_CLASSIC_SUBDIR);
   si->sounds_set = getStringCopy(SND_CLASSIC_SUBDIR);

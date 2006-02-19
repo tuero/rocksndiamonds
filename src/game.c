@@ -1933,6 +1933,8 @@ void InitGame()
 
   game.envelope_active = FALSE;
 
+  game.centered_to_player = game.centered_to_player_next = 0;	/* player_1 */
+
   for (i = 0; i < NUM_BELTS; i++)
   {
     game.belt_dir[i] = MV_NONE;
@@ -3095,7 +3097,7 @@ void CheckDynamite(int x, int y)
   Bang(x, y);
 }
 
-void DrawRelocatePlayer(struct PlayerInfo *player)
+void DrawRelocatePlayer(struct PlayerInfo *player, boolean quick_relocation)
 {
   boolean ffwd_delay = (tape.playing && tape.fast_forward);
   boolean no_delay = (tape.warp_forward);
@@ -3104,19 +3106,19 @@ void DrawRelocatePlayer(struct PlayerInfo *player)
   int jx = player->jx;
   int jy = player->jy;
 
-  if (level.instant_relocation)
+  if (quick_relocation)
   {
     int offset = (setup.scroll_delay ? 3 : 0);
 
     if (!IN_VIS_FIELD(SCREENX(jx), SCREENY(jy)))
     {
-      scroll_x = (local_player->jx < SBX_Left  + MIDPOSX ? SBX_Left :
-		  local_player->jx > SBX_Right + MIDPOSX ? SBX_Right :
-		  local_player->jx - MIDPOSX);
+      scroll_x = (player->jx < SBX_Left  + MIDPOSX ? SBX_Left :
+		  player->jx > SBX_Right + MIDPOSX ? SBX_Right :
+		  player->jx - MIDPOSX);
 
-      scroll_y = (local_player->jy < SBY_Upper + MIDPOSY ? SBY_Upper :
-		  local_player->jy > SBY_Lower + MIDPOSY ? SBY_Lower :
-		  local_player->jy - MIDPOSY);
+      scroll_y = (player->jy < SBY_Upper + MIDPOSY ? SBY_Upper :
+		  player->jy > SBY_Lower + MIDPOSY ? SBY_Lower :
+		  player->jy - MIDPOSY);
     }
     else
     {
@@ -3150,13 +3152,13 @@ void DrawRelocatePlayer(struct PlayerInfo *player)
       int dx = 0, dy = 0;
       int fx = FX, fy = FY;
 
-      scroll_xx = (local_player->jx < SBX_Left  + MIDPOSX ? SBX_Left :
-		   local_player->jx > SBX_Right + MIDPOSX ? SBX_Right :
-		   local_player->jx - MIDPOSX);
+      scroll_xx = (player->jx < SBX_Left  + MIDPOSX ? SBX_Left :
+		   player->jx > SBX_Right + MIDPOSX ? SBX_Right :
+		   player->jx - MIDPOSX);
 
-      scroll_yy = (local_player->jy < SBY_Upper + MIDPOSY ? SBY_Upper :
-		   local_player->jy > SBY_Lower + MIDPOSY ? SBY_Lower :
-		   local_player->jy - MIDPOSY);
+      scroll_yy = (player->jy < SBY_Upper + MIDPOSY ? SBY_Upper :
+		   player->jy > SBY_Lower + MIDPOSY ? SBY_Lower :
+		   player->jy - MIDPOSY);
 
       dx = (scroll_xx < scroll_x ? +1 : scroll_xx > scroll_x ? -1 : 0);
       dy = (scroll_yy < scroll_y ? +1 : scroll_yy > scroll_y ? -1 : 0);
@@ -3265,7 +3267,7 @@ void RelocatePlayer(int jx, int jy, int el_player_raw)
   }
 
   if (player == local_player)	/* only visually relocate local player */
-    DrawRelocatePlayer(player);
+    DrawRelocatePlayer(player, level.instant_relocation);
 
   TestIfPlayerTouchesBadThing(jx, jy);
   TestIfPlayerTouchesCustomElement(jx, jy);
@@ -8807,6 +8809,18 @@ void GameActions()
 
   InitPlayfieldScanModeVars();
 
+  if (ScreenMovPos == 0)	/* screen currently aligned at tile position */
+  {
+    if (game.centered_to_player != game.centered_to_player_next)
+    {
+      struct PlayerInfo *player = &stored_player[game.centered_to_player_next];
+
+      DrawRelocatePlayer(player, setup.quick_switch);
+
+      game.centered_to_player = game.centered_to_player_next;
+    }
+  }
+
 #if USE_ONE_MORE_CHANGE_PER_FRAME
   if (game.engine_version >= VERSION_IDENT(3,2,0,7))
   {
@@ -9635,8 +9649,10 @@ boolean MovePlayerOneStep(struct PlayerInfo *player,
 #endif
   }
 
+#if 0
   if (!options.network && !AllPlayersInSight(player, new_jx, new_jy))
     return MP_NO_ACTION;
+#endif
 
 #if !USE_FIXED_DONT_RUN_INTO
   element = MovingOrBlocked2ElementIfNotLeaving(new_jx, new_jy);
@@ -9779,8 +9795,13 @@ boolean MovePlayer(struct PlayerInfo *player, int dx, int dy)
   jx = player->jx;
   jy = player->jy;
 
+#if 1
+  if (moved & MP_MOVING && !ScreenMovPos &&
+      player->index_nr == game.centered_to_player)
+#else
   if (moved & MP_MOVING && !ScreenMovPos &&
       (player == local_player || !options.network))
+#endif
   {
     int old_scroll_x = scroll_x, old_scroll_y = scroll_y;
     int offset = (setup.scroll_delay ? 3 : 0);
@@ -9835,12 +9856,14 @@ boolean MovePlayer(struct PlayerInfo *player, int dx, int dy)
 
     if (scroll_x != old_scroll_x || scroll_y != old_scroll_y)
     {
+#if 0
       if (!options.network && !AllPlayersInVisibleScreen())
       {
 	scroll_x = old_scroll_x;
 	scroll_y = old_scroll_y;
       }
       else
+#endif
       {
 	ScrollScreen(player, SCROLL_INIT);
 	ScrollLevel(old_scroll_x - scroll_x, old_scroll_y - scroll_y);

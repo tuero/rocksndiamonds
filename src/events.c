@@ -566,7 +566,6 @@ static void HandleKeysSpecial(Key key)
 
 void HandleKey(Key key, int key_status)
 {
-  int joy = 0;
   boolean anyTextGadgetActiveOrJustFinished = anyTextGadgetActive();
   static struct SetupKeyboardInfo custom_key;
   static struct
@@ -583,6 +582,8 @@ void HandleKey(Key key, int key_status)
     { &custom_key.snap,  DEFAULT_KEY_SNAP,  JOY_BUTTON_1 },
     { &custom_key.drop,  DEFAULT_KEY_DROP,  JOY_BUTTON_2 }
   };
+  int joy = 0;
+  int i;
 
   if (game_status == GAME_MODE_PLAYING)
   {
@@ -593,7 +594,6 @@ void HandleKey(Key key, int key_status)
 
     for (pnr = 0; pnr < MAX_PLAYERS; pnr++)
     {
-      int i;
       byte key_action = 0;
 
       if (setup.input[pnr].use_joystick)
@@ -649,8 +649,6 @@ void HandleKey(Key key, int key_status)
   }
   else
   {
-    int i;
-
     for (i = 0; i < 6; i++)
       if (key == key_info[i].key_default)
 	joy |= key_info[i].action;
@@ -698,6 +696,13 @@ void HandleKey(Key key, int key_status)
       TapeQuickLoad();
     else if (key == setup.shortcut.toggle_pause)
       TapeTogglePause(TAPE_TOGGLE_MANUAL);
+  }
+
+  if (game_status == GAME_MODE_PLAYING)
+  {
+    for (i = 0; i < MAX_PLAYERS; i++)
+      if (key == KSYM_1 + i)
+	game.centered_to_player_next = i;
   }
 
   HandleKeysSpecial(key);
@@ -813,6 +818,7 @@ void HandleKey(Key key, int key_status)
 
 #ifdef DEBUG
 	case KSYM_0:
+#if 0
 	case KSYM_1:
 	case KSYM_2:
 	case KSYM_3:
@@ -822,6 +828,7 @@ void HandleKey(Key key, int key_status)
 	case KSYM_7:
 	case KSYM_8:
 	case KSYM_9:
+#endif
 	  if (key == KSYM_0)
 	  {
 	    if (GameFrameDelay == 500)

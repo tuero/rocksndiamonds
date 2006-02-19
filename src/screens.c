@@ -2047,6 +2047,7 @@ static struct TokenInfo setup_info_game[] =
   { TYPE_SWITCH,	&setup.skip_levels,	"Skip Levels:"		},
   { TYPE_SWITCH,	&setup.time_limit,	"Timelimit:"		},
   { TYPE_SWITCH,	&setup.autorecord,	"Auto-Record:"		},
+  { TYPE_SWITCH,	&setup.quick_switch,	"Quick Switch:"		},
   { TYPE_EMPTY,		NULL,			""			},
   { TYPE_LEAVE_MENU,	execSetupMain, 		"Back"			},
 
