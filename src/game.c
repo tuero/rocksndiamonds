@@ -8811,10 +8811,13 @@ void GameActions()
 
   if (ScreenMovPos == 0)	/* screen currently aligned at tile position */
   {
+    struct PlayerInfo *player = &stored_player[game.centered_to_player_next];
+
+    if (!player->active)
+      game.centered_to_player_next = game.centered_to_player;
+
     if (game.centered_to_player != game.centered_to_player_next)
     {
-      struct PlayerInfo *player = &stored_player[game.centered_to_player_next];
-
       DrawRelocatePlayer(player, setup.quick_switch);
 
       game.centered_to_player = game.centered_to_player_next;

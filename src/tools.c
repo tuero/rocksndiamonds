@@ -5131,6 +5131,9 @@ int getGameFrameDelay_EM(int native_em_game_frame_delay)
 
 int getCenteredPlayer_EM()
 {
+  if (!native_em_level.ply[game.centered_to_player_next]->alive)
+    game.centered_to_player_next = game.centered_to_player;
+
   if (game.centered_to_player != game.centered_to_player_next)
     game.centered_to_player = game.centered_to_player_next;
 

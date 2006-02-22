@@ -1,3 +1,10 @@
+2006-02-22
+	* fixed little bug when trying to switch to player that does not exist
+
+2006-02-19
+	* added player switching (visual and quick) to R'n'D and EM game engine
+	* added setup option to select visual or quick in-game player switching
+
 2006-02-16
 	* added use of "Home" and "End" keys to handle element list in editor
 
