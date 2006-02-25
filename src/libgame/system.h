@@ -891,6 +891,7 @@ extern struct ArtworkInfo	artwork;
 extern struct JoystickInfo	joystick;
 extern struct SetupInfo		setup;
 
+extern LevelDirTree	       *leveldir_first_all;
 extern LevelDirTree	       *leveldir_first;
 extern LevelDirTree	       *leveldir_current;
 extern int			level_nr;

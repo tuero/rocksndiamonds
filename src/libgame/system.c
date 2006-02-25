@@ -41,6 +41,7 @@ struct ArtworkInfo	artwork;
 struct JoystickInfo	joystick;
 struct SetupInfo	setup;
 
+LevelDirTree	       *leveldir_first_all = NULL;
 LevelDirTree	       *leveldir_first = NULL;
 LevelDirTree	       *leveldir_current = NULL;
 int			level_nr;

@@ -1933,7 +1933,7 @@ void InitGame()
 
   game.envelope_active = FALSE;
 
-  game.centered_to_player = game.centered_to_player_next = 0;	/* player_1 */
+  game.centered_player_nr = game.centered_player_nr_next = -1;	/* focus all */
 
   for (i = 0; i < NUM_BELTS; i++)
   {
@@ -3266,8 +3266,14 @@ void RelocatePlayer(int jx, int jy, int el_player_raw)
     InitField(jx, jy, FALSE);
   }
 
+#if 1
+  /* only visually relocate centered player */
+  if (player->index_nr == game.centered_player_nr)
+    DrawRelocatePlayer(player, level.instant_relocation);
+#else
   if (player == local_player)	/* only visually relocate local player */
     DrawRelocatePlayer(player, level.instant_relocation);
+#endif
 
   TestIfPlayerTouchesBadThing(jx, jy);
   TestIfPlayerTouchesCustomElement(jx, jy);
@@ -8811,16 +8817,22 @@ void GameActions()
 
   if (ScreenMovPos == 0)	/* screen currently aligned at tile position */
   {
-    struct PlayerInfo *player = &stored_player[game.centered_to_player_next];
+    struct PlayerInfo *player;
+    int player_nr = game.centered_player_nr_next;
+
+    if (game.centered_player_nr_next == -1)
+      player_nr = local_player->index_nr;
+
+    player = &stored_player[player_nr];
 
     if (!player->active)
-      game.centered_to_player_next = game.centered_to_player;
+      game.centered_player_nr_next = game.centered_player_nr;
 
-    if (game.centered_to_player != game.centered_to_player_next)
+    if (game.centered_player_nr != game.centered_player_nr_next)
     {
       DrawRelocatePlayer(player, setup.quick_switch);
 
-      game.centered_to_player = game.centered_to_player_next;
+      game.centered_player_nr = game.centered_player_nr_next;
     }
   }
 
@@ -9652,7 +9664,11 @@ boolean MovePlayerOneStep(struct PlayerInfo *player,
 #endif
   }
 
-#if 0
+#if 1
+  if (!options.network && game.centered_player_nr == -1 &&
+      !AllPlayersInSight(player, new_jx, new_jy))
+    return MP_NO_ACTION;
+#else
   if (!options.network && !AllPlayersInSight(player, new_jx, new_jy))
     return MP_NO_ACTION;
 #endif
@@ -9800,7 +9816,8 @@ boolean MovePlayer(struct PlayerInfo *player, int dx, int dy)
 
 #if 1
   if (moved & MP_MOVING && !ScreenMovPos &&
-      player->index_nr == game.centered_to_player)
+      (player->index_nr == game.centered_player_nr ||
+       game.centered_player_nr == -1))
 #else
   if (moved & MP_MOVING && !ScreenMovPos &&
       (player == local_player || !options.network))
@@ -9859,7 +9876,15 @@ boolean MovePlayer(struct PlayerInfo *player, int dx, int dy)
 
     if (scroll_x != old_scroll_x || scroll_y != old_scroll_y)
     {
-#if 0
+#if 1
+      if (!options.network && game.centered_player_nr == -1 &&
+	  !AllPlayersInVisibleScreen())
+      {
+	scroll_x = old_scroll_x;
+	scroll_y = old_scroll_y;
+      }
+      else
+#else
       if (!options.network && !AllPlayersInVisibleScreen())
       {
 	scroll_x = old_scroll_x;

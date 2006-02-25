@@ -5129,15 +5129,16 @@ int getGameFrameDelay_EM(int native_em_game_frame_delay)
   return game_frame_delay_value;
 }
 
-int getCenteredPlayer_EM()
+int getCenteredPlayerNr_EM()
 {
-  if (!native_em_level.ply[game.centered_to_player_next]->alive)
-    game.centered_to_player_next = game.centered_to_player;
+  if (game.centered_player_nr_next >= 0 &&
+      !native_em_level.ply[game.centered_player_nr_next]->alive)
+    game.centered_player_nr_next = game.centered_player_nr;
 
-  if (game.centered_to_player != game.centered_to_player_next)
-    game.centered_to_player = game.centered_to_player_next;
+  if (game.centered_player_nr != game.centered_player_nr_next)
+    game.centered_player_nr = game.centered_player_nr_next;
 
-  return game.centered_to_player;
+  return game.centered_player_nr;
 }
 
 unsigned int InitRND(long seed)

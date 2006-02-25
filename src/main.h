@@ -2081,8 +2081,8 @@ struct GameInfo
   boolean restart_level;
 
   /* values for special game control */
-  int centered_to_player;
-  int centered_to_player_next;
+  int centered_player_nr;
+  int centered_player_nr_next;
 };
 
 struct GlobalInfo

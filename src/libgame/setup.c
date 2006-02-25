@@ -799,7 +799,7 @@ void InitLevelSetupDirectory(char *level_subdir)
 
 
 /* ------------------------------------------------------------------------- */
-/* some functions to handle lists of level directories                       */
+/* some functions to handle lists of level and artwork directories           */
 /* ------------------------------------------------------------------------- */
 
 TreeInfo *newTreeInfo()
@@ -925,6 +925,43 @@ TreeInfo *getTreeInfoFromIdentifier(TreeInfo *node, char *identifier)
   }
 
   return NULL;
+}
+
+TreeInfo *cloneTreeNode(TreeInfo **node_top, TreeInfo *node_parent,
+			TreeInfo *node, boolean skip_sets_without_levels)
+{
+  TreeInfo *node_new;
+
+  if (node == NULL)
+    return NULL;
+
+  if (!node->parent_link && !node->level_group &&
+      skip_sets_without_levels && node->levels == 0)
+    return cloneTreeNode(node_top, node_parent, node->next,
+			 skip_sets_without_levels);
+
+  node_new = newTreeInfo();
+
+  *node_new = *node;				/* copy complete node */
+
+  node_new->node_top = node_top;		/* correct top node link */
+  node_new->node_parent = node_parent;		/* correct parent node link */
+
+  if (node->level_group)
+    node_new->node_group = cloneTreeNode(node_top, node_new, node->node_group,
+					 skip_sets_without_levels);
+
+  node_new->next = cloneTreeNode(node_top, node_parent, node->next,
+				 skip_sets_without_levels);
+  
+  return node_new;
+}
+
+void cloneTree(TreeInfo **ti_new, TreeInfo *ti, boolean skip_empty_sets)
+{
+  TreeInfo *ti_cloned = cloneTreeNode(ti_new, NULL, ti, skip_empty_sets);
+
+  *ti_new = ti_cloned;
 }
 
 void dumpTreeInfo(TreeInfo *node, int depth)
@@ -1989,6 +2026,8 @@ static boolean LoadLevelInfoFromLevelConf(TreeInfo **node_first,
     (leveldir_new->user_defined || !leveldir_new->handicap ?
      leveldir_new->last_level : leveldir_new->first_level);
 
+#if 0
+  /* !!! don't skip sets without levels (else artwork base sets are missing) */
 #if 1
   if (leveldir_new->levels < 1 && !leveldir_new->level_group)
   {
@@ -2000,6 +2039,7 @@ static boolean LoadLevelInfoFromLevelConf(TreeInfo **node_first,
 
     return FALSE;
   }
+#endif
 #endif
 
   pushTreeInfo(node_first, leveldir_new);
@@ -2092,6 +2132,11 @@ void LoadLevelInfo()
 
   LoadLevelInfoFromLevelDir(&leveldir_first, NULL, options.level_directory);
   LoadLevelInfoFromLevelDir(&leveldir_first, NULL, getUserLevelDir(NULL));
+
+#if 1
+  leveldir_first_all = leveldir_first;
+  cloneTree(&leveldir_first, leveldir_first_all, TRUE);
+#endif
 
   /* before sorting, the first entries will be from the user directory */
   leveldir_current = getFirstValidTreeInfoEntry(leveldir_first);
@@ -2448,9 +2493,9 @@ void LoadLevelArtworkInfo()
 {
   DrawInitText("Looking for custom level artwork:", 120, FC_GREEN);
 
-  LoadArtworkInfoFromLevelInfo(&artwork.gfx_first, leveldir_first);
-  LoadArtworkInfoFromLevelInfo(&artwork.snd_first, leveldir_first);
-  LoadArtworkInfoFromLevelInfo(&artwork.mus_first, leveldir_first);
+  LoadArtworkInfoFromLevelInfo(&artwork.gfx_first, leveldir_first_all);
+  LoadArtworkInfoFromLevelInfo(&artwork.snd_first, leveldir_first_all);
+  LoadArtworkInfoFromLevelInfo(&artwork.mus_first, leveldir_first_all);
 
   /* needed for reloading level artwork not known at ealier stage */
 

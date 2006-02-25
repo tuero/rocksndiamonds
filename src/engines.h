@@ -24,8 +24,10 @@
 extern void SetBitmaps_EM(Bitmap **);
 extern void UpdateEngineValues(int, int);
 extern void DrawAllGameValues(int, int, int, int, int);
+
 extern int getGameFrameDelay_EM(int);
-extern int getCenteredPlayer_EM();
+extern int getCenteredPlayerNr_EM();
+
 extern void PlayLevelSound_EM(int, int, int, int);
 extern void InitGraphicInfo_EM(void);
 

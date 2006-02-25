@@ -45,7 +45,7 @@ static int crumbled_state[MAX_BUF_YSIZE][MAX_BUF_XSIZE];
 
 static boolean redraw[MAX_BUF_XSIZE][MAX_BUF_YSIZE];
 
-static int centered_to_player;
+static int centered_player_nr;
 
 /* copy the entire screen to the window at the scroll position
  *
@@ -479,12 +479,18 @@ void game_initscreen(void)
   int dynamite_state = ply[0].dynamite;		/* !!! ONLY PLAYER 1 !!! */
   int all_keys_state = ply[0].keys | ply[1].keys | ply[2].keys | ply[3].keys;
 #if 1
-  int player_nr = getCenteredPlayer_EM();
+  int player_nr;
+#else
+#if 1
+  int player_nr = getCenteredPlayerNr_EM();
 #else
   int player_nr = 0;		/* !!! FIX THIS (CENTERED TO PLAYER 1) !!! */
 #endif
+#endif
 
-  centered_to_player = player_nr;
+  centered_player_nr = getCenteredPlayerNr_EM();
+
+  player_nr = (centered_player_nr != -1 ? centered_player_nr : 0);
 
   frame = 6;
 #if 1
@@ -612,7 +618,8 @@ void DrawRelocatePlayer(struct PlayerInfo *player, boolean quick_relocation)
 void RedrawPlayfield_EM(boolean force_redraw)
 {
 #if 1
-  int player_nr = getCenteredPlayer_EM();
+  int centered_player_nr_next = getCenteredPlayerNr_EM();
+  int player_nr = (centered_player_nr_next != -1 ? centered_player_nr_next :0);
   boolean draw_new_player_location = FALSE;
   boolean quick_relocation = setup.quick_switch;
 #else
@@ -627,9 +634,9 @@ void RedrawPlayfield_EM(boolean force_redraw)
 
   if (!scrolling)	/* screen currently aligned at tile position */
   {
-    if (player_nr != centered_to_player)
+    if (centered_player_nr != centered_player_nr_next)
     {
-      centered_to_player = player_nr;
+      centered_player_nr = centered_player_nr_next;
 
       draw_new_player_location = TRUE;
       force_redraw = TRUE;

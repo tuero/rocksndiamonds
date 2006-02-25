@@ -700,9 +700,12 @@ void HandleKey(Key key, int key_status)
 
   if (game_status == GAME_MODE_PLAYING)
   {
-    for (i = 0; i < MAX_PLAYERS; i++)
-      if (key == KSYM_1 + i)
-	game.centered_to_player_next = i;
+    if (key == KSYM_5)
+      game.centered_player_nr_next = -1;
+    else
+      for (i = 0; i < MAX_PLAYERS; i++)
+	if (key == KSYM_1 + i)
+	  game.centered_player_nr_next = i;
   }
 
   HandleKeysSpecial(key);
