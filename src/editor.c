@@ -9912,7 +9912,7 @@ void HandleLevelEditorKeyInput(Key key)
       case KSYM_Escape:
         if (edit_mode == ED_MODE_DRAWING)
 	{
-	  RequestExitLevelEditor(setup.ask_on_escape);
+	  RequestExitLevelEditor(setup.ask_on_escape_editor);
 	}
         else if (edit_mode == ED_MODE_INFO)
 	{

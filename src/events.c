@@ -700,11 +700,11 @@ void HandleKey(Key key, int key_status)
 
   if (game_status == GAME_MODE_PLAYING)
   {
-    if (key == KSYM_5)
+    if (key == setup.shortcut.focus_player_all)
       game.centered_player_nr_next = -1;
     else
       for (i = 0; i < MAX_PLAYERS; i++)
-	if (key == KSYM_1 + i)
+	if (key == setup.shortcut.focus_player[i])
 	  game.centered_player_nr_next = i;
   }
 

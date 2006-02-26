@@ -34,78 +34,83 @@
 
 
 /* the additional 'b' is needed for Win32 to open files in binary mode */
-#define MODE_READ		"rb"
-#define MODE_WRITE		"wb"
-#define MODE_APPEND		"ab"
+#define MODE_READ			"rb"
+#define MODE_WRITE			"wb"
+#define MODE_APPEND			"ab"
 
-#define DEFAULT_DEPTH		0
+#define DEFAULT_DEPTH			0
 
-#define BLIT_OPAQUE		0
-#define BLIT_MASKED		1
-#define BLIT_INVERSE		2
-#define BLIT_ON_BACKGROUND	3
+#define BLIT_OPAQUE			0
+#define BLIT_MASKED			1
+#define BLIT_INVERSE			2
+#define BLIT_ON_BACKGROUND		3
 
-#define FULLSCREEN_NOT_AVAILABLE FALSE
-#define FULLSCREEN_AVAILABLE	 TRUE
+#define FULLSCREEN_NOT_AVAILABLE	FALSE
+#define FULLSCREEN_AVAILABLE		TRUE
 
 /* default input keys */
-#define DEFAULT_KEY_LEFT	KSYM_Left
-#define DEFAULT_KEY_RIGHT	KSYM_Right
-#define DEFAULT_KEY_UP		KSYM_Up
-#define DEFAULT_KEY_DOWN	KSYM_Down
+#define DEFAULT_KEY_LEFT		KSYM_Left
+#define DEFAULT_KEY_RIGHT		KSYM_Right
+#define DEFAULT_KEY_UP			KSYM_Up
+#define DEFAULT_KEY_DOWN		KSYM_Down
 #if defined(PLATFORM_MACOSX)
-#define DEFAULT_KEY_SNAP	KSYM_Control_L
-#define DEFAULT_KEY_DROP	KSYM_KP_Enter
+#define DEFAULT_KEY_SNAP		KSYM_Control_L
+#define DEFAULT_KEY_DROP		KSYM_KP_Enter
 #else
-#define DEFAULT_KEY_SNAP	KSYM_Control_L
-#define DEFAULT_KEY_DROP	KSYM_Control_R
+#define DEFAULT_KEY_SNAP		KSYM_Control_L
+#define DEFAULT_KEY_DROP		KSYM_Control_R
 #endif
-#define DEFAULT_KEY_OKAY	KSYM_Return
-#define DEFAULT_KEY_CANCEL	KSYM_Escape
+#define DEFAULT_KEY_OKAY		KSYM_Return
+#define DEFAULT_KEY_CANCEL		KSYM_Escape
 
 /* default shortcut keys */
-#define DEFAULT_KEY_SAVE_GAME	KSYM_F1
-#define DEFAULT_KEY_LOAD_GAME	KSYM_F2
-#define DEFAULT_KEY_TOGGLE_PAUSE KSYM_space
+#define DEFAULT_KEY_SAVE_GAME		KSYM_F1
+#define DEFAULT_KEY_LOAD_GAME		KSYM_F2
+#define DEFAULT_KEY_TOGGLE_PAUSE	KSYM_space
+#define DEFAULT_KEY_FOCUS_PLAYER_1	KSYM_F5
+#define DEFAULT_KEY_FOCUS_PLAYER_2	KSYM_F6
+#define DEFAULT_KEY_FOCUS_PLAYER_3	KSYM_F7
+#define DEFAULT_KEY_FOCUS_PLAYER_4	KSYM_F8
+#define DEFAULT_KEY_FOCUS_PLAYER_ALL	KSYM_F9
 
 /* values for key_status */
-#define KEY_NOT_PRESSED		FALSE
-#define KEY_RELEASED		FALSE
-#define KEY_PRESSED		TRUE
+#define KEY_NOT_PRESSED			FALSE
+#define KEY_RELEASED			FALSE
+#define KEY_PRESSED			TRUE
 
 /* values for button status */
-#define MB_NOT_PRESSED		FALSE
-#define MB_NOT_RELEASED		TRUE
-#define MB_RELEASED		FALSE
-#define MB_PRESSED		TRUE
-#define MB_MENU_CHOICE		FALSE
-#define MB_MENU_MARK		TRUE
-#define MB_MENU_INITIALIZE	(-1)
-#define MB_MENU_LEAVE		(-2)
-#define MB_LEFTBUTTON		1
-#define MB_MIDDLEBUTTON		2
-#define MB_RIGHTBUTTON		3
+#define MB_NOT_PRESSED			FALSE
+#define MB_NOT_RELEASED			TRUE
+#define MB_RELEASED			FALSE
+#define MB_PRESSED			TRUE
+#define MB_MENU_CHOICE			FALSE
+#define MB_MENU_MARK			TRUE
+#define MB_MENU_INITIALIZE		(-1)
+#define MB_MENU_LEAVE			(-2)
+#define MB_LEFTBUTTON			1
+#define MB_MIDDLEBUTTON			2
+#define MB_RIGHTBUTTON			3
 
 
 /* values for move directions */
-#define MV_BIT_LEFT		0
-#define MV_BIT_RIGHT		1
-#define MV_BIT_UP		2
-#define MV_BIT_DOWN	       	3
+#define MV_BIT_LEFT			0
+#define MV_BIT_RIGHT			1
+#define MV_BIT_UP			2
+#define MV_BIT_DOWN	       		3
 
-#define NUM_DIRECTIONS		4
+#define NUM_DIRECTIONS			4
 
 /* diagonal movement directions are used in a different contect than buttons */
-#define MV_BIT_UPLEFT		4
-#define MV_BIT_UPRIGHT		5
-#define MV_BIT_DOWNLEFT		6
-#define MV_BIT_DOWNRIGHT	7
+#define MV_BIT_UPLEFT			4
+#define MV_BIT_UPRIGHT			5
+#define MV_BIT_DOWNLEFT			6
+#define MV_BIT_DOWNRIGHT		7
 
-#define NUM_DIRECTIONS_FULL	8
+#define NUM_DIRECTIONS_FULL		8
 
 /* values for special "button" bitmasks */
-#define BUTTON_1		4
-#define BUTTON_2		5
+#define BUTTON_1			4
+#define BUTTON_2			5
 
 /* values for move directions and special "button" key bitmasks */
 #define MV_NONE			0
@@ -645,7 +650,6 @@ struct SetupEditorCascadeInfo
   boolean el_ce;
   boolean el_ge;
   boolean el_user;
-  boolean el_generic;
   boolean el_dynamic;
 };
 
@@ -654,6 +658,9 @@ struct SetupShortcutInfo
   Key save_game;
   Key load_game;
   Key toggle_pause;
+
+  Key focus_player[MAX_PLAYERS];
+  Key focus_player_all;
 };
 
 struct SetupSystemInfo
@@ -684,6 +691,7 @@ struct SetupInfo
   boolean time_limit;
   boolean fullscreen;
   boolean ask_on_escape;
+  boolean ask_on_escape_editor;
   boolean quick_switch;
 
   char *graphics_set;

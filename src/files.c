@@ -4929,15 +4929,16 @@ void SaveScore(int nr)
 #define SETUP_TOKEN_TIME_LIMIT			14
 #define SETUP_TOKEN_FULLSCREEN			15
 #define SETUP_TOKEN_ASK_ON_ESCAPE		16
-#define SETUP_TOKEN_QUICK_SWITCH		17
-#define SETUP_TOKEN_GRAPHICS_SET		18
-#define SETUP_TOKEN_SOUNDS_SET			19
-#define SETUP_TOKEN_MUSIC_SET			20
-#define SETUP_TOKEN_OVERRIDE_LEVEL_GRAPHICS	21
-#define SETUP_TOKEN_OVERRIDE_LEVEL_SOUNDS	22
-#define SETUP_TOKEN_OVERRIDE_LEVEL_MUSIC	23
+#define SETUP_TOKEN_ASK_ON_ESCAPE_EDITOR	17
+#define SETUP_TOKEN_QUICK_SWITCH		18
+#define SETUP_TOKEN_GRAPHICS_SET		19
+#define SETUP_TOKEN_SOUNDS_SET			20
+#define SETUP_TOKEN_MUSIC_SET			21
+#define SETUP_TOKEN_OVERRIDE_LEVEL_GRAPHICS	22
+#define SETUP_TOKEN_OVERRIDE_LEVEL_SOUNDS	23
+#define SETUP_TOKEN_OVERRIDE_LEVEL_MUSIC	24
 
-#define NUM_GLOBAL_SETUP_TOKENS			24
+#define NUM_GLOBAL_SETUP_TOKENS			25
 
 /* editor setup */
 #define SETUP_TOKEN_EDITOR_EL_BOULDERDASH	0
@@ -4978,8 +4979,13 @@ void SaveScore(int nr)
 #define SETUP_TOKEN_SHORTCUT_SAVE_GAME		0
 #define SETUP_TOKEN_SHORTCUT_LOAD_GAME		1
 #define SETUP_TOKEN_SHORTCUT_TOGGLE_PAUSE	2
+#define SETUP_TOKEN_SHORTCUT_FOCUS_PLAYER_1	3
+#define SETUP_TOKEN_SHORTCUT_FOCUS_PLAYER_2	4
+#define SETUP_TOKEN_SHORTCUT_FOCUS_PLAYER_3	5
+#define SETUP_TOKEN_SHORTCUT_FOCUS_PLAYER_4	6
+#define SETUP_TOKEN_SHORTCUT_FOCUS_PLAYER_ALL	7
 
-#define NUM_SHORTCUT_SETUP_TOKENS		3
+#define NUM_SHORTCUT_SETUP_TOKENS		8
 
 /* player setup */
 #define SETUP_TOKEN_PLAYER_USE_JOYSTICK		0
@@ -5040,6 +5046,7 @@ static struct TokenInfo global_setup_tokens[] =
   { TYPE_SWITCH, &si.time_limit,	"time_limit"			},
   { TYPE_SWITCH, &si.fullscreen,	"fullscreen"			},
   { TYPE_SWITCH, &si.ask_on_escape,	"ask_on_escape"			},
+  { TYPE_SWITCH, &si.ask_on_escape_editor, "ask_on_escape_editor"	},
   { TYPE_SWITCH, &si.quick_switch,	"quick_player_switch"		},
   { TYPE_STRING, &si.graphics_set,	"graphics_set"			},
   { TYPE_STRING, &si.sounds_set,	"sounds_set"			},
@@ -5080,7 +5087,6 @@ static struct TokenInfo editor_cascade_setup_tokens[] =
   { TYPE_SWITCH, &seci.el_ce,		"editor.cascade.el_ce"		},
   { TYPE_SWITCH, &seci.el_ge,		"editor.cascade.el_ge"		},
   { TYPE_SWITCH, &seci.el_user,		"editor.cascade.el_user"	},
-  { TYPE_SWITCH, &seci.el_generic,	"editor.cascade.el_generic"	},
   { TYPE_SWITCH, &seci.el_dynamic,	"editor.cascade.el_dynamic"	},
 };
 
@@ -5088,7 +5094,12 @@ static struct TokenInfo shortcut_setup_tokens[] =
 {
   { TYPE_KEY_X11, &ssi.save_game,	"shortcut.save_game"		},
   { TYPE_KEY_X11, &ssi.load_game,	"shortcut.load_game"		},
-  { TYPE_KEY_X11, &ssi.toggle_pause,	"shortcut.toggle_pause"		}
+  { TYPE_KEY_X11, &ssi.toggle_pause,	"shortcut.toggle_pause"		},
+  { TYPE_KEY_X11, &ssi.focus_player[0],	"shortcut.focus_player_1"	},
+  { TYPE_KEY_X11, &ssi.focus_player[1],	"shortcut.focus_player_2"	},
+  { TYPE_KEY_X11, &ssi.focus_player[2],	"shortcut.focus_player_3"	},
+  { TYPE_KEY_X11, &ssi.focus_player[3],	"shortcut.focus_player_4"	},
+  { TYPE_KEY_X11, &ssi.focus_player_all,"shortcut.focus_player_all"	},
 };
 
 static struct TokenInfo player_setup_tokens[] =
@@ -5108,18 +5119,18 @@ static struct TokenInfo player_setup_tokens[] =
   { TYPE_KEY_X11, &sii.key.up,		".key.move_up"			},
   { TYPE_KEY_X11, &sii.key.down,	".key.move_down"		},
   { TYPE_KEY_X11, &sii.key.snap,	".key.snap_field"		},
-  { TYPE_KEY_X11, &sii.key.drop,	".key.place_bomb"		}
+  { TYPE_KEY_X11, &sii.key.drop,	".key.place_bomb"		},
 };
 
 static struct TokenInfo system_setup_tokens[] =
 {
   { TYPE_STRING,  &syi.sdl_audiodriver,	"system.sdl_audiodriver"	},
-  { TYPE_INTEGER, &syi.audio_fragment_size,"system.audio_fragment_size"	}
+  { TYPE_INTEGER, &syi.audio_fragment_size,"system.audio_fragment_size"	},
 };
 
 static struct TokenInfo options_setup_tokens[] =
 {
-  { TYPE_BOOLEAN, &soi.verbose,		"options.verbose"		}
+  { TYPE_BOOLEAN, &soi.verbose,		"options.verbose"		},
 };
 
 static char *get_corrected_login_name(char *login_name)
@@ -5161,6 +5172,7 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
   si->time_limit = TRUE;
   si->fullscreen = FALSE;
   si->ask_on_escape = TRUE;
+  si->ask_on_escape_editor = TRUE;
   si->quick_switch = FALSE;
 
   si->graphics_set = getStringCopy(GFX_CLASSIC_SUBDIR);
@@ -5188,6 +5200,12 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
   si->shortcut.save_game = DEFAULT_KEY_SAVE_GAME;
   si->shortcut.load_game = DEFAULT_KEY_LOAD_GAME;
   si->shortcut.toggle_pause = DEFAULT_KEY_TOGGLE_PAUSE;
+
+  si->shortcut.focus_player[0] = DEFAULT_KEY_FOCUS_PLAYER_1;
+  si->shortcut.focus_player[1] = DEFAULT_KEY_FOCUS_PLAYER_2;
+  si->shortcut.focus_player[2] = DEFAULT_KEY_FOCUS_PLAYER_3;
+  si->shortcut.focus_player[3] = DEFAULT_KEY_FOCUS_PLAYER_4;
+  si->shortcut.focus_player_all = DEFAULT_KEY_FOCUS_PLAYER_ALL;
 
   for (i = 0; i < MAX_PLAYERS; i++)
   {
@@ -5230,7 +5248,6 @@ static void setSetupInfoToDefaults_EditorCascade(struct SetupInfo *si)
   si->editor_cascade.el_ce	= FALSE;
   si->editor_cascade.el_ge	= FALSE;
   si->editor_cascade.el_user	= FALSE;
-  si->editor_cascade.el_generic	= FALSE;
   si->editor_cascade.el_dynamic	= FALSE;
 }
 
@@ -5326,7 +5343,7 @@ void LoadSetup()
   {
     char *player_name_new;
 
-    checkSetupFileHashIdentifier(setup_file_hash, getCookie("SETUP"));
+    checkSetupFileHashIdentifier(setup_file_hash, filename,getCookie("SETUP"));
     decodeSetupFileHash(setup_file_hash);
 
     setup.direct_draw = !setup.double_buffering;
@@ -5354,7 +5371,7 @@ void LoadSetup_EditorCascade()
 
   if (setup_file_hash)
   {
-    checkSetupFileHashIdentifier(setup_file_hash, getCookie("SETUP"));
+    checkSetupFileHashIdentifier(setup_file_hash, filename,getCookie("SETUP"));
     decodeSetupFileHash_EditorCascade(setup_file_hash);
 
     freeSetupFileHash(setup_file_hash);

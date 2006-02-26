@@ -29,15 +29,16 @@
 #define SETUP_MODE_GAME			1
 #define SETUP_MODE_EDITOR		2
 #define SETUP_MODE_INPUT		3
-#define SETUP_MODE_SHORTCUT		4
-#define SETUP_MODE_GRAPHICS		5
-#define SETUP_MODE_SOUND		6
-#define SETUP_MODE_ARTWORK		7
-#define SETUP_MODE_CHOOSE_GRAPHICS	8
-#define SETUP_MODE_CHOOSE_SOUNDS	9
-#define SETUP_MODE_CHOOSE_MUSIC		10
+#define SETUP_MODE_SHORTCUT_1		4
+#define SETUP_MODE_SHORTCUT_2		5
+#define SETUP_MODE_GRAPHICS		6
+#define SETUP_MODE_SOUND		7
+#define SETUP_MODE_ARTWORK		8
+#define SETUP_MODE_CHOOSE_GRAPHICS	9
+#define SETUP_MODE_CHOOSE_SOUNDS	10
+#define SETUP_MODE_CHOOSE_MUSIC		11
 
-#define MAX_SETUP_MODES			11
+#define MAX_SETUP_MODES			12
 
 /* for input setup functions */
 #define SETUPINPUT_SCREEN_POS_START	0
@@ -2006,9 +2007,15 @@ static void execSetupInput()
   DrawSetupScreen();
 }
 
-static void execSetupShortcut()
+static void execSetupShortcut1()
 {
-  setup_mode = SETUP_MODE_SHORTCUT;
+  setup_mode = SETUP_MODE_SHORTCUT_1;
+  DrawSetupScreen();
+}
+
+static void execSetupShortcut2()
+{
+  setup_mode = SETUP_MODE_SHORTCUT_2;
   DrawSetupScreen();
 }
 
@@ -2026,13 +2033,14 @@ static void execSaveAndExitSetup()
 
 static struct TokenInfo setup_info_main[] =
 {
-  { TYPE_ENTER_MENU,	execSetupGame,		"Game Settings"		},
-  { TYPE_ENTER_MENU,	execSetupEditor,	"Editor Settings"	},
+  { TYPE_ENTER_MENU,	execSetupGame,		"Game & Menu"		},
+  { TYPE_ENTER_MENU,	execSetupEditor,	"Editor"		},
   { TYPE_ENTER_MENU,	execSetupGraphics,	"Graphics"		},
   { TYPE_ENTER_MENU,	execSetupSound,		"Sound & Music"		},
   { TYPE_ENTER_MENU,	execSetupArtwork,	"Custom Artwork"	},
   { TYPE_ENTER_MENU,	execSetupInput,		"Input Devices"		},
-  { TYPE_ENTER_MENU,	execSetupShortcut,	"Key Shortcuts"		},
+  { TYPE_ENTER_MENU,	execSetupShortcut1,	"Key Shortcuts 1"	},
+  { TYPE_ENTER_MENU,	execSetupShortcut2,	"Key Shortcuts 2"	},
   { TYPE_EMPTY,		NULL,			""			},
   { TYPE_LEAVE_MENU,	execExitSetup, 		"Exit"			},
   { TYPE_LEAVE_MENU,	execSaveAndExitSetup,	"Save and Exit"		},
@@ -2042,12 +2050,11 @@ static struct TokenInfo setup_info_main[] =
 
 static struct TokenInfo setup_info_game[] =
 {
-  { TYPE_SWITCH,	&setup.team_mode,	"Team-Mode:"		},
+  { TYPE_SWITCH,	&setup.team_mode,	"Team-Mode (Multi-Player):" },
   { TYPE_SWITCH,	&setup.handicap,	"Handicap:"		},
-  { TYPE_SWITCH,	&setup.skip_levels,	"Skip Levels:"		},
-  { TYPE_SWITCH,	&setup.time_limit,	"Timelimit:"		},
-  { TYPE_SWITCH,	&setup.autorecord,	"Auto-Record:"		},
-  { TYPE_SWITCH,	&setup.quick_switch,	"Quick Switch:"		},
+  { TYPE_SWITCH,	&setup.skip_levels,	"Skip Unsolved Levels:"	},
+  { TYPE_SWITCH,	&setup.time_limit,	"Time Limit:"		},
+  { TYPE_SWITCH,	&setup.autorecord,	"Auto-Record Tapes:"	},
   { TYPE_EMPTY,		NULL,			""			},
   { TYPE_LEAVE_MENU,	execSetupMain, 		"Back"			},
 
@@ -2062,20 +2069,20 @@ static struct TokenInfo setup_info_editor[] =
 
 #if 0
 #else
-  { TYPE_SWITCH,	&setup.editor.el_boulderdash,	"BoulderDash:"	},
+  { TYPE_SWITCH,	&setup.editor.el_boulderdash,	"Boulder Dash:" },
   { TYPE_SWITCH,	&setup.editor.el_emerald_mine,	"Emerald Mine:"	},
-  { TYPE_SWITCH,	&setup.editor.el_emerald_mine_club,"E.M.C.:"	},
-  { TYPE_SWITCH,	&setup.editor.el_more,		"R'n'D:"	},
+  { TYPE_SWITCH, &setup.editor.el_emerald_mine_club,	"Emerald Mine Club:" },
+  { TYPE_SWITCH,	&setup.editor.el_more,		"Rocks'n'Diamonds:" },
   { TYPE_SWITCH,	&setup.editor.el_sokoban,	"Sokoban:"	},
   { TYPE_SWITCH,	&setup.editor.el_supaplex,	"Supaplex:"	},
-  { TYPE_SWITCH,	&setup.editor.el_diamond_caves,	"DC II:"	},
-  { TYPE_SWITCH,	&setup.editor.el_dx_boulderdash,"DX BD:"	},
+  { TYPE_SWITCH,	&setup.editor.el_diamond_caves,	"Diamond Caves II:" },
+  { TYPE_SWITCH,	&setup.editor.el_dx_boulderdash,"DX-Boulderdash:" },
 #endif
-  { TYPE_SWITCH,	&setup.editor.el_chars,		"Characters:"	},
-  { TYPE_SWITCH,	&setup.editor.el_custom,	"Custom:"	},
+  { TYPE_SWITCH,	&setup.editor.el_chars,		"Text Characters:" },
+  { TYPE_SWITCH,	&setup.editor.el_custom,  "Custom & Group Elements:" },
   { TYPE_SWITCH,	&setup.editor.el_headlines,	"Headlines:"	},
-  { TYPE_SWITCH,	&setup.editor.el_user_defined,	"User defined:"	},
-  { TYPE_SWITCH,	&setup.editor.el_dynamic,	"Dynamic:"	},
+  { TYPE_SWITCH, &setup.editor.el_user_defined, "User defined element list:" },
+  { TYPE_SWITCH,	&setup.editor.el_dynamic,  "Dynamic level elements:" },
   { TYPE_EMPTY,		NULL,			""			},
   { TYPE_LEAVE_MENU,	execSetupMain, 		"Back"			},
 
@@ -2084,14 +2091,15 @@ static struct TokenInfo setup_info_editor[] =
 
 static struct TokenInfo setup_info_graphics[] =
 {
-  { TYPE_SWITCH,	&setup.fullscreen,	"Fullscreen:"		},
-  { TYPE_SWITCH,	&setup.scroll_delay,	"Scroll Delay:"		},
-  { TYPE_SWITCH,	&setup.soft_scrolling,	"Soft Scroll.:"		},
+  { TYPE_SWITCH,	&setup.fullscreen,	"Fullscreen Mode:"	},
+  { TYPE_SWITCH,	&setup.scroll_delay,	"Delayed Scrolling:"	},
+  { TYPE_SWITCH,	&setup.soft_scrolling,	"Soft Scrolling:"	},
 #if 0
-  { TYPE_SWITCH,	&setup.double_buffering,"Buffered gfx:"		},
+  { TYPE_SWITCH,	&setup.double_buffering,"Double-Buffering:"	},
   { TYPE_SWITCH,	&setup.fading,		"Fading:"		},
 #endif
-  { TYPE_SWITCH,	&setup.quick_doors,	"Quick Doors:"		},
+  { TYPE_SWITCH,	&setup.quick_switch,	"Quick Player Focus Switch:" },
+  { TYPE_SWITCH,	&setup.quick_doors,	"Quick Menu Doors:"	},
   { TYPE_SWITCH,	&setup.toons,		"Toons:"		},
   { TYPE_EMPTY,		NULL,			""			},
   { TYPE_LEAVE_MENU,	execSetupMain, 		"Back"			},
@@ -2101,9 +2109,9 @@ static struct TokenInfo setup_info_graphics[] =
 
 static struct TokenInfo setup_info_sound[] =
 {
-  { TYPE_SWITCH,	&setup.sound_simple,	"Simple Sound:"		},
-  { TYPE_SWITCH,	&setup.sound_loops,	"Sound Loops:"		},
-  { TYPE_SWITCH,	&setup.sound_music,	"Game Music:"		},
+  { TYPE_SWITCH,	&setup.sound_simple,	"Sound Effects (Normal):"  },
+  { TYPE_SWITCH,	&setup.sound_loops,	"Sound Effects (Looping):" },
+  { TYPE_SWITCH,	&setup.sound_music,	"Music:"		},
   { TYPE_EMPTY,		NULL,			""			},
   { TYPE_LEAVE_MENU,	execSetupMain, 		"Back"			},
 
@@ -2119,26 +2127,51 @@ static struct TokenInfo setup_info_artwork[] =
   { TYPE_ENTER_MENU,	execSetupChooseMusic,	"Custom Music"		},
   { TYPE_STRING,	&music_set_name,	""			},
   { TYPE_EMPTY,		NULL,			""			},
+#if 1
+  { TYPE_YES_NO, &setup.override_level_graphics,"Override Level Graphics:" },
+  { TYPE_YES_NO, &setup.override_level_sounds,	"Override Level Sounds:"   },
+  { TYPE_YES_NO, &setup.override_level_music,	"Override Level Music:"    },
+#else
   { TYPE_STRING,	NULL,			"Override Level Artwork:"},
   { TYPE_YES_NO,	&setup.override_level_graphics,	"Graphics:"	},
   { TYPE_YES_NO,	&setup.override_level_sounds,	"Sounds:"	},
   { TYPE_YES_NO,	&setup.override_level_music,	"Music:"	},
+#endif
   { TYPE_EMPTY,		NULL,			""			},
   { TYPE_LEAVE_MENU,	execSetupMain, 		"Back"			},
 
   { 0,			NULL,			NULL			}
 };
 
-static struct TokenInfo setup_info_shortcut[] =
+static struct TokenInfo setup_info_shortcut_1[] =
 {
-  { TYPE_KEYTEXT,	NULL,			"Quick Save Game:",	},
-  { TYPE_KEY,		&setup.shortcut.save_game,	""		},
-  { TYPE_KEYTEXT,	NULL,			"Quick Load Game:",	},
-  { TYPE_KEY,		&setup.shortcut.load_game,	""		},
-  { TYPE_KEYTEXT,	NULL,			"Toggle Pause:",	},
-  { TYPE_KEY,		&setup.shortcut.toggle_pause,	""		},
+  { TYPE_KEYTEXT,	NULL,		"Quick Save Game to Tape:",	},
+  { TYPE_KEY,		&setup.shortcut.save_game, ""			},
+  { TYPE_KEYTEXT,	NULL,		"Quick Load Game from Tape:",	},
+  { TYPE_KEY,		&setup.shortcut.load_game, ""			},
+  { TYPE_KEYTEXT,	NULL,		"Start Game & Toggle Pause:",	},
+  { TYPE_KEY,		&setup.shortcut.toggle_pause, ""		},
   { TYPE_EMPTY,		NULL,			""			},
-  { TYPE_YES_NO,	&setup.ask_on_escape,	"Ask on Esc:"		},
+  { TYPE_YES_NO,	&setup.ask_on_escape,	"Ask on 'Esc' Key:"	},
+  { TYPE_YES_NO, &setup.ask_on_escape_editor,	"Ask on 'Esc' Key (Editor):" },
+  { TYPE_EMPTY,		NULL,			""			},
+  { TYPE_LEAVE_MENU,	execSetupMain, 		"Back"			},
+
+  { 0,			NULL,			NULL			}
+};
+
+static struct TokenInfo setup_info_shortcut_2[] =
+{
+  { TYPE_KEYTEXT,	NULL,		"Set Focus to Player 1:",	},
+  { TYPE_KEY,		&setup.shortcut.focus_player[0], ""		},
+  { TYPE_KEYTEXT,	NULL,		"Set Focus to Player 2:",	},
+  { TYPE_KEY,		&setup.shortcut.focus_player[1], ""		},
+  { TYPE_KEYTEXT,	NULL,		"Set Focus to Player 3:",	},
+  { TYPE_KEY,		&setup.shortcut.focus_player[2], ""		},
+  { TYPE_KEYTEXT,	NULL,		"Set Focus to Player 4:",	},
+  { TYPE_KEY,		&setup.shortcut.focus_player[3], ""		},
+  { TYPE_KEYTEXT,	NULL,		"Set Focus to All Players:",	},
+  { TYPE_KEY,		&setup.shortcut.focus_player_all, ""		},
   { TYPE_EMPTY,		NULL,			""			},
   { TYPE_LEAVE_MENU,	execSetupMain, 		"Back"			},
 
@@ -2207,7 +2240,11 @@ static void drawSetupValue(int pos)
 
   if (type & TYPE_KEY)
   {
+#if 1
+    xpos = 1;
+#else
     xpos = 3;
+#endif
 
     if (type & TYPE_QUERY)
     {
@@ -2297,9 +2334,14 @@ static void DrawSetupScreen_Generic()
     setup_info = setup_info_artwork;
     title_string = "Custom Artwork";
   }
-  else if (setup_mode == SETUP_MODE_SHORTCUT)
+  else if (setup_mode == SETUP_MODE_SHORTCUT_1)
   {
-    setup_info = setup_info_shortcut;
+    setup_info = setup_info_shortcut_1;
+    title_string = "Setup Shortcuts";
+  }
+  else if (setup_mode == SETUP_MODE_SHORTCUT_2)
+  {
+    setup_info = setup_info_shortcut_2;
     title_string = "Setup Shortcuts";
   }
 
@@ -2323,8 +2365,16 @@ static void DrawSetupScreen_Generic()
 	(value_ptr == &setup.fullscreen   && !video.fullscreen_available))
       setup_info[i].type |= TYPE_GHOSTED;
 
+#if 1
+    if (setup_info[i].type & (TYPE_SWITCH |
+			      TYPE_YES_NO |
+			      TYPE_STRING |
+			      TYPE_KEYTEXT))
+      font_nr = FONT_MENU_2;
+#else
     if (setup_info[i].type & TYPE_STRING)
       font_nr = FONT_MENU_2;
+#endif
 
     DrawText(mSX + 32, mSY + ypos * 32, setup_info[i].text, font_nr);
 

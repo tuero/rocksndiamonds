@@ -1590,14 +1590,14 @@ SetupFileHash *loadSetupFileHash(char *filename)
 }
 
 void checkSetupFileHashIdentifier(SetupFileHash *setup_file_hash,
-				  char *identifier)
+				  char *filename, char *identifier)
 {
   char *value = getHashEntry(setup_file_hash, TOKEN_STR_FILE_IDENTIFIER);
 
   if (value == NULL)
-    Error(ERR_WARN, "configuration file has no file identifier");
+    Error(ERR_WARN, "config file '%s' has no file identifier", filename);
   else if (!checkCookieString(value, identifier))
-    Error(ERR_WARN, "configuration file has wrong file identifier");
+    Error(ERR_WARN, "config file '%s' has wrong file identifier", filename);
 }
 
 
@@ -1962,7 +1962,8 @@ static boolean LoadLevelInfoFromLevelConf(TreeInfo **node_first,
 
   leveldir_new->subdir = getStringCopy(directory_name);
 
-  checkSetupFileHashIdentifier(setup_file_hash, getCookie("LEVELINFO"));
+  checkSetupFileHashIdentifier(setup_file_hash, filename,
+			       getCookie("LEVELINFO"));
 
   /* set all structure fields according to the token/value pairs */
   ldi = *leveldir_new;
@@ -2215,7 +2216,7 @@ static boolean LoadArtworkInfoFromArtworkConf(TreeInfo **node_first,
   if (setup_file_hash)	/* (before defining ".color" and ".class_desc") */
   {
 #if 0
-    checkSetupFileHashIdentifier(setup_file_hash, getCookie("..."));
+    checkSetupFileHashIdentifier(setup_file_hash, filename, getCookie("..."));
 #endif
 
     /* set all structure fields according to the token/value pairs */
@@ -2707,7 +2708,8 @@ void LoadLevelSetup_LastSeries()
     if (leveldir_current == NULL)
       leveldir_current = getFirstValidTreeInfoEntry(leveldir_first);
 
-    checkSetupFileHashIdentifier(level_setup_hash, getCookie("LEVELSETUP"));
+    checkSetupFileHashIdentifier(level_setup_hash, filename,
+				 getCookie("LEVELSETUP"));
 
     freeSetupFileHash(level_setup_hash);
   }
@@ -2851,7 +2853,8 @@ void LoadLevelSetup_SeriesInfo()
       leveldir_current->handicap_level = level_nr;
     }
 
-    checkSetupFileHashIdentifier(level_setup_hash, getCookie("LEVELSETUP"));
+    checkSetupFileHashIdentifier(level_setup_hash, filename,
+				 getCookie("LEVELSETUP"));
 
     freeSetupFileHash(level_setup_hash);
   }
