@@ -1193,16 +1193,16 @@ void translate_keyname(Key *keysym, char **x11name, char **name, int mode)
 
     /* more ASCII keys */
     { KSYM_bracketleft,	"XK_bracketleft",	"[" },
-    { KSYM_backslash,	"XK_backslash",		"backslash" },
+    { KSYM_backslash,	"XK_backslash",		"\\" },
     { KSYM_bracketright,"XK_bracketright",	"]" },
-    { KSYM_asciicircum,	"XK_asciicircum",	"circumflex" },
+    { KSYM_asciicircum,	"XK_asciicircum",	"^" },
     { KSYM_underscore,	"XK_underscore",	"_" },
     { KSYM_grave,	"XK_grave",		"grave" },
     { KSYM_quoteleft,	"XK_quoteleft",		"quote left" },
     { KSYM_braceleft,	"XK_braceleft",		"brace left" },
     { KSYM_bar,		"XK_bar",		"bar" },
     { KSYM_braceright,	"XK_braceright",	"brace right" },
-    { KSYM_asciitilde,	"XK_asciitilde",	"ascii tilde" },
+    { KSYM_asciitilde,	"XK_asciitilde",	"~" },
 
     /* special (non-ASCII) keys */
     { KSYM_Adiaeresis,	"XK_Adiaeresis",	"Ä" },
@@ -1232,8 +1232,13 @@ void translate_keyname(Key *keysym, char **x11name, char **name, int mode)
       sprintf(name_buffer, "%c", '0' + (char)(key - KSYM_0));
     else if (key >= KSYM_KP_0 && key <= KSYM_KP_9)
       sprintf(name_buffer, "keypad %c", '0' + (char)(key - KSYM_KP_0));
+#if 1
+    else if (key >= KSYM_FKEY_FIRST && key <= KSYM_FKEY_LAST)
+      sprintf(name_buffer, "F%d", (int)(key - KSYM_FKEY_FIRST + 1));
+#else
     else if (key >= KSYM_FKEY_FIRST && key <= KSYM_FKEY_LAST)
       sprintf(name_buffer, "function F%d", (int)(key - KSYM_FKEY_FIRST + 1));
+#endif
     else if (key == KSYM_UNDEFINED)
       strcpy(name_buffer, "(undefined)");
     else

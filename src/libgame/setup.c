@@ -2645,6 +2645,9 @@ char *getSetupValue(int type, void *value)
       break;
   }
 
+  if (type & TYPE_GHOSTED)
+    strcpy(value_string, "n/a");
+
   return value_string;
 }
 

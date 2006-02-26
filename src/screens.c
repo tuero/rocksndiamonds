@@ -61,6 +61,7 @@
 #define MAX_MENU_ENTRIES_ON_SCREEN	(SCR_FIELDY - 2)
 #define MENU_SCREEN_START_YPOS		2
 #define MENU_SCREEN_VALUE_XPOS		14
+#define MENU_SCREEN_MAX_XPOS		(SCR_FIELDX - 1)
 #define MENU_TITLE1_YPOS		8
 #define MENU_TITLE2_YPOS		46
 
@@ -2232,8 +2233,8 @@ static void drawSetupValue(int pos)
   int font_nr = FONT_VALUE_1;
   int type = setup_info[pos].type;
   void *value = setup_info[pos].value;
-  char *value_string = (!(type & TYPE_GHOSTED) ? getSetupValue(type, value) :
-			"n/a");
+  char *value_string = getSetupValue(type, value);
+  int i;
 
   if (value_string == NULL)
     return;
@@ -2267,8 +2268,14 @@ static void drawSetupValue(int pos)
     font_nr = (*(boolean *)value ? FONT_OPTION_ON : FONT_OPTION_OFF);
   }
 
+#if 1
+  for (i = xpos; i <= MENU_SCREEN_MAX_XPOS; i++)
+    DrawText(mSX + i * 32, mSY + ypos * 32, " ", font_nr);
+#else
   DrawText(mSX + xpos * 32, mSY + ypos * 32,
 	   (xpos == 3 ? "              " : "   "), font_nr);
+#endif
+
   DrawText(mSX + xpos * 32, mSY + ypos * 32, value_string, font_nr);
 }
 
