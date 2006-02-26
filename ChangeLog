@@ -1,3 +1,7 @@
+2006-02-26
+	* fixed bug with explosion graphic for player using "Murphy" graphic
+	* fixed bug with explosion graphic if player leaves explosion in time
+
 2006-02-25
 	* fixed bug with random value initialization when recording tapes
 	* fixed bug with playing single player tapes when team mode activated

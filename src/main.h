@@ -667,6 +667,18 @@
 #define GFX_ELEMENT(e)		(element_info[e].use_gfx_element ?	\
 				 element_info[e].gfx_element : e)
 
+#if 1
+#define TILE_GFX_ELEMENT(x, y)						\
+		   (GfxElement[x][y] != EL_UNDEFINED &&			\
+		    Feld[x][y] != EL_EXPLOSION ?			\
+		    GfxElement[x][y] : Feld[x][y])
+#else
+#define TILE_GFX_ELEMENT(x, y)						\
+	GFX_ELEMENT(GfxElement[x][y] != EL_UNDEFINED &&			\
+		    Feld[x][y] != EL_EXPLOSION ?			\
+		    GfxElement[x][y] : Feld[x][y])
+#endif
+
 /* !!! "use sound" deactivated due to problems with level "bug machine" !!! */
 /* (solution: add separate "use sound of element" to level file and editor) */
 #if 0

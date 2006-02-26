@@ -832,6 +832,9 @@ static void InitPlayerField(int x, int y, int element, boolean init_game)
       else
       {
 	stored_player[0].use_murphy = TRUE;
+
+	if (!level.use_artwork_element[0])
+	  stored_player[0].artwork_element = EL_SP_MURPHY;
       }
 
       Feld[x][y] = EL_PLAYER_1;
@@ -3530,6 +3533,11 @@ void Explode(int ex, int ey, int phase, int mode)
       Feld[x][y] = EL_EXPLOSION;
       GfxElement[x][y] = artwork_element;
 
+#if 0
+      printf(":: setting gfx(%d,%d) to %d ['%s']\n",
+	     x, y, artwork_element, EL_NAME(artwork_element));
+#endif
+
       ExplodePhase[x][y] = 1;
       ExplodeDelay[x][y] = last_phase;
 
@@ -3564,6 +3572,11 @@ void Explode(int ex, int ey, int phase, int mode)
 #endif
 #if 1
 
+#if 1
+  /* this can happen if the player leaves an explosion just in time */
+  if (GfxElement[x][y] == EL_UNDEFINED)
+    GfxElement[x][y] = EL_EMPTY;
+#else
   if (GfxElement[x][y] == EL_UNDEFINED)
   {
     printf("\n\n");
@@ -3573,6 +3586,8 @@ void Explode(int ex, int ey, int phase, int mode)
 
     GfxElement[x][y] = EL_EMPTY;
   }
+#endif
+
 #endif
 
   border_element = Store2[x][y];

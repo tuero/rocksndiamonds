@@ -903,10 +903,6 @@ void DrawLevelFieldThruMask(int x, int y)
   DrawLevelElementExt(x, y, 0, 0, Feld[x][y], NO_CUTTING, USE_MASKING);
 }
 
-#define TILE_GFX_ELEMENT(x, y)						    \
-	(GfxElement[x][y] != EL_UNDEFINED && Feld[x][y] != EL_EXPLOSION ?   \
-	 GfxElement[x][y] : Feld[x][y])
-
 static void DrawLevelFieldCrumbledSandExt(int x, int y, int graphic, int frame)
 {
   Bitmap *src_bitmap;
@@ -1041,10 +1037,17 @@ void DrawLevelFieldCrumbledSand(int x, int y)
     return;
 
 #if 1
+  /*
   if (Feld[x][y] == EL_ELEMENT_SNAPPING &&
+      GFX_CRUMBLED(GfxElement[x][y]))
+  */
+
+  if (Feld[x][y] == EL_ELEMENT_SNAPPING &&
+      GfxElement[x][y] != EL_UNDEFINED &&
       GFX_CRUMBLED(GfxElement[x][y]))
   {
     DrawLevelFieldCrumbledSandDigging(x, y, GfxDir[x][y], GfxFrame[x][y]);
+
     return;
   }
 #endif
@@ -2020,7 +2023,9 @@ void DrawPlayer(struct PlayerInfo *player)
 
   if (player_is_moving && last_element == EL_EXPLOSION)
   {
-    int graphic = el_act2img(GfxElement[last_jx][last_jy], ACTION_EXPLODING);
+    int element = (GfxElement[last_jx][last_jy] != EL_UNDEFINED ?
+		   GfxElement[last_jx][last_jy] :  EL_EMPTY);
+    int graphic = el_act2img(element, ACTION_EXPLODING);
     int delay = (game.emulation == EMU_SUPAPLEX ? 3 : 2);
     int phase = ExplodePhase[last_jx][last_jy] - 1;
     int frame = getGraphicAnimationFrame(graphic, phase - delay);
