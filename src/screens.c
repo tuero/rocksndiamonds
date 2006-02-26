@@ -3184,6 +3184,27 @@ void HandleGameActions()
       for (i = 0; i < MAX_PLAYERS; i++)
 	effective_action[i] = stored_player[i].effective_action;
 
+
+#if 0
+      printf("::: %s: ",
+	     tape.playing ? "PLAYING" :
+	     tape.recording ? "RECORDING" :
+	     "STOPPED");
+
+      for (i = 1; i < MAX_PLAYERS; i++)
+	if ((recorded_player_action && recorded_player_action[i] != 0) ||
+	    tape_action[i] != 0 ||
+	    effective_action[i] != 0)
+	  printf("::: -----------------> WARNING!\n");
+
+      printf("::: %08d: %08x [%08x] [%08x]\n",
+	     FrameCounter,
+	     (recorded_player_action ? recorded_player_action[0] : -1),
+	     tape_action[0],
+	     effective_action[0]);
+#endif
+
+
       GameActions_EM(effective_action);
     }
 #else
@@ -3249,8 +3270,15 @@ void HandleGameActions()
 void StartGameActions(boolean init_network_game, boolean record_tape,
 		      long random_seed)
 {
+#if 1
+  unsigned long new_random_seed = InitRND(random_seed);
+
+  if (record_tape)
+    TapeStartRecording(new_random_seed);
+#else
   if (record_tape)
     TapeStartRecording(random_seed);
+#endif
 
 #if defined(NETWORK_AVALIABLE)
   if (init_network_game)
@@ -3265,7 +3293,9 @@ void StartGameActions(boolean init_network_game, boolean record_tape,
 
   game_status = GAME_MODE_PLAYING;
 
+#if 0
   InitRND(random_seed);
+#endif
 
   InitGame();
 }

@@ -4769,6 +4769,7 @@ void SaveTape(int nr)
 
 void DumpTape(struct TapeInfo *tape)
 {
+  int tape_frame_counter;
   int i, j;
 
   if (tape->no_valid_file)
@@ -4786,12 +4787,14 @@ void DumpTape(struct TapeInfo *tape)
   printf("Level series identifier: '%s'\n", tape->level_identifier);
   printf_line("-", 79);
 
+  tape_frame_counter = 0;
+
   for (i = 0; i < tape->length; i++)
   {
     if (i >= MAX_TAPE_LEN)
       break;
 
-    printf("%03d: ", i);
+    printf("%04d: ", i);
 
     for (j = 0; j < MAX_PLAYERS; j++)
     {
@@ -4810,7 +4813,10 @@ void DumpTape(struct TapeInfo *tape)
       }
     }
 
-    printf("(%03d)\n", tape->pos[i].delay);
+    printf("(%03d) ", tape->pos[i].delay);
+    printf("[%05d]\n", tape_frame_counter);
+
+    tape_frame_counter += tape->pos[i].delay;
   }
 
   printf_line("-", 79);

@@ -2099,7 +2099,7 @@ void InitGame()
 
   if (tape.playing)
   {
-    /* when playing a tape, eliminate all players which do not participate */
+    /* when playing a tape, eliminate all players who do not participate */
 
     for (i = 0; i < MAX_PLAYERS; i++)
     {

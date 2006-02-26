@@ -2134,6 +2134,10 @@ void LoadLevelInfo()
   LoadLevelInfoFromLevelDir(&leveldir_first, NULL, getUserLevelDir(NULL));
 
 #if 1
+  /* after loading all level set information, clone the level directory tree
+     and remove all level sets without levels (these may still contain artwork
+     to be offered in the setup menu as "custom artwork", and are therefore
+     checked for existing artwork in the function "LoadLevelArtworkInfo()") */
   leveldir_first_all = leveldir_first;
   cloneTree(&leveldir_first, leveldir_first_all, TRUE);
 #endif

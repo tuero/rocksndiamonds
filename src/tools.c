@@ -5141,6 +5141,21 @@ int getCenteredPlayerNr_EM()
   return game.centered_player_nr;
 }
 
+int getActivePlayers_EM()
+{
+  int num_players = 0;
+  int i;
+
+  if (!tape.playing)
+    return -1;
+
+  for (i = 0; i < MAX_PLAYERS; i++)
+    if (tape.player_participates[i])
+      num_players++;
+
+  return num_players;
+}
+
 unsigned int InitRND(long seed)
 {
   if (level.game_engine_type == GAME_ENGINE_TYPE_EM)

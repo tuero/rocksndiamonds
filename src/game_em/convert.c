@@ -903,6 +903,7 @@ void prepare_em_level(void)
 {
   int i, x, y;
   int players_left;
+  int num_tape_players;
 
   /* reset all runtime variables to their initial values */
 
@@ -969,7 +970,11 @@ void prepare_em_level(void)
     }
   }
 
-  if (!setup.team_mode)
+  num_tape_players = getActivePlayers_EM();
+
+  if (num_tape_players != -1)
+    lev.home_initial = MIN(lev.home_initial, num_tape_players);
+  else if (!setup.team_mode)
     lev.home_initial = MIN(lev.home_initial, 1);
 
   lev.home = lev.home_initial;
@@ -986,7 +991,12 @@ void prepare_em_level(void)
       }
       else
       {
-	native_em_level.cave[ply[i].x_initial][ply[i].y_initial] = Xblank;
+	int x = ply[i].x_initial;
+	int y = ply[i].y_initial;
+
+	native_em_level.cave[x][y] = Xblank;
+
+	Cave[y][x] = Next[y][x] = Draw[y][x] = Xblank;
       }
     }
   }
