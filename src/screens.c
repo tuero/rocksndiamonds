@@ -2064,12 +2064,6 @@ static struct TokenInfo setup_info_game[] =
 
 static struct TokenInfo setup_info_editor[] =
 {
-#if 0
-  { TYPE_STRING,	NULL,			"Offer Special Elements:"},
-#endif
-
-#if 0
-#else
   { TYPE_SWITCH,	&setup.editor.el_boulderdash,	"Boulder Dash:" },
   { TYPE_SWITCH,	&setup.editor.el_emerald_mine,	"Emerald Mine:"	},
   { TYPE_SWITCH, &setup.editor.el_emerald_mine_club,	"Emerald Mine Club:" },
@@ -2078,7 +2072,6 @@ static struct TokenInfo setup_info_editor[] =
   { TYPE_SWITCH,	&setup.editor.el_supaplex,	"Supaplex:"	},
   { TYPE_SWITCH,	&setup.editor.el_diamond_caves,	"Diamond Caves II:" },
   { TYPE_SWITCH,	&setup.editor.el_dx_boulderdash,"DX-Boulderdash:" },
-#endif
   { TYPE_SWITCH,	&setup.editor.el_chars,		"Text Characters:" },
   { TYPE_SWITCH,	&setup.editor.el_custom,  "Custom & Group Elements:" },
   { TYPE_SWITCH,	&setup.editor.el_headlines,	"Headlines:"	},

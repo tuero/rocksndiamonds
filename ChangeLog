@@ -1,3 +1,6 @@
+2006-02-28
+	* fixed bug when scanning empty level group directories (endless loop)
+
 2006-02-26
 	* fixed bug with explosion graphic for player using "Murphy" graphic
 	* fixed bug with explosion graphic if player leaves explosion in time

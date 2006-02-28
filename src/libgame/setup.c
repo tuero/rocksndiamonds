@@ -2113,7 +2113,8 @@ static void LoadLevelInfoFromLevelDir(TreeInfo **node_first,
 
   closedir(dir);
 
-  if (!valid_entry_found)
+  /* special case: top level directory may directly contain "levelinfo.conf" */
+  if (node_parent == NULL && !valid_entry_found)
   {
     /* check if this directory directly contains a file "levelinfo.conf" */
     valid_entry_found |= LoadLevelInfoFromLevelConf(node_first, node_parent,
