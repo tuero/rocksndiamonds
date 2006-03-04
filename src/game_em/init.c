@@ -44,6 +44,7 @@ int play_element[SAMPLE_MAX];
 static boolean use_native_em_sound = 0;
 
 struct GlobalInfo_EM global_em_info;
+struct GameInfo_EM game_em;
 
 #if defined(AUDIO_UNIX_NATIVE)
 static int sound_pid = -1;

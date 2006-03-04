@@ -1,4 +1,5 @@
 2006-02-28
+	* level sets with "levels: 0" are ignored for levels, but not artwork
 	* fixed bug when scanning empty level group directories (endless loop)
 
 2006-02-26

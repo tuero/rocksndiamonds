@@ -1021,4 +1021,10 @@ void prepare_em_level(void)
 	   i, ply[i].x_initial, ply[i].y_initial, ply[i].alive);
 #endif
   }
+
+  game_em.any_player_moving = FALSE;
+  game_em.last_moving_player = 0;	/* default: first player */
+
+  for (i = 0; i < MAX_PLAYERS; i++)
+    game_em.last_player_direction[i] = MV_NONE;
 }

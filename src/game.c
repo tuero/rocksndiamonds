@@ -3146,22 +3146,20 @@ void DrawRelocatePlayer(struct PlayerInfo *player, boolean quick_relocation)
   }
   else
   {
-    int scroll_xx = -999, scroll_yy = -999;
+    int scroll_xx = (player->jx < SBX_Left  + MIDPOSX ? SBX_Left :
+		     player->jx > SBX_Right + MIDPOSX ? SBX_Right :
+		     player->jx - MIDPOSX);
+
+    int scroll_yy = (player->jy < SBY_Upper + MIDPOSY ? SBY_Upper :
+		     player->jy > SBY_Lower + MIDPOSY ? SBY_Lower :
+		     player->jy - MIDPOSY);
 
     ScrollScreen(NULL, SCROLL_GO_ON);	/* scroll last frame to full tile */
 
-    while (scroll_xx != scroll_x || scroll_yy != scroll_y)
+    while (scroll_x != scroll_xx || scroll_y != scroll_yy)
     {
       int dx = 0, dy = 0;
       int fx = FX, fy = FY;
-
-      scroll_xx = (player->jx < SBX_Left  + MIDPOSX ? SBX_Left :
-		   player->jx > SBX_Right + MIDPOSX ? SBX_Right :
-		   player->jx - MIDPOSX);
-
-      scroll_yy = (player->jy < SBY_Upper + MIDPOSY ? SBY_Upper :
-		   player->jy > SBY_Lower + MIDPOSY ? SBY_Lower :
-		   player->jy - MIDPOSY);
 
       dx = (scroll_xx < scroll_x ? +1 : scroll_xx > scroll_x ? -1 : 0);
       dy = (scroll_yy < scroll_y ? +1 : scroll_yy > scroll_y ? -1 : 0);

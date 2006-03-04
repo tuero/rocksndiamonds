@@ -5119,19 +5119,9 @@ int font2baseimg(int font_nr)
   return font_info[font_nr].special_graphic[GFX_SPECIAL_ARG_DEFAULT];
 }
 
-int getGameFrameDelay_EM(int native_em_game_frame_delay)
+void setCenteredPlayerNr_EM(int centered_player_nr)
 {
-  int game_frame_delay_value;
-
-  game_frame_delay_value =
-    (tape.playing && tape.fast_forward ? FfwdFrameDelay :
-     GameFrameDelay == GAME_FRAME_DELAY ? native_em_game_frame_delay :
-     GameFrameDelay);
-
-  if (tape.playing && tape.warp_forward && !tape.pausing)
-    game_frame_delay_value = 0;
-
-  return game_frame_delay_value;
+  game.centered_player_nr = game.centered_player_nr_next = centered_player_nr;
 }
 
 int getCenteredPlayerNr_EM()
@@ -5159,6 +5149,21 @@ int getActivePlayers_EM()
       num_players++;
 
   return num_players;
+}
+
+int getGameFrameDelay_EM(int native_em_game_frame_delay)
+{
+  int game_frame_delay_value;
+
+  game_frame_delay_value =
+    (tape.playing && tape.fast_forward ? FfwdFrameDelay :
+     GameFrameDelay == GAME_FRAME_DELAY ? native_em_game_frame_delay :
+     GameFrameDelay);
+
+  if (tape.playing && tape.warp_forward && !tape.pausing)
+    game_frame_delay_value = 0;
+
+  return game_frame_delay_value;
 }
 
 unsigned int InitRND(long seed)

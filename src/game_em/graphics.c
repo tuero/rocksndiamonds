@@ -22,22 +22,20 @@
 #define VALID_SCREEN_Y(y)	((y) < MIN_SCREEN_Y ? MIN_SCREEN_Y :	\
 				 (y) > MAX_SCREEN_Y ? MAX_SCREEN_Y : (y))
 
-#define PLAYER_SCREEN_X(p)	(((    frame) * ply[p].oldx +		\
-				  (8 - frame) * ply[p].x) * TILEX / 8	\
+#define PLAYER_SCREEN_X_F(p,f)	(((    f) * ply[p].oldx +		\
+				  (8 - f) * ply[p].x) * TILEX / 8	\
 				 - ((SCR_FIELDX - 1) * TILEX) / 2)
-#define PLAYER_SCREEN_Y(p)	(((    frame) * ply[p].oldy +		\
-				  (8 - frame) * ply[p].y) * TILEY / 8	\
+#define PLAYER_SCREEN_Y_F(p,f)	(((    f) * ply[p].oldy +		\
+				  (8 - f) * ply[p].y) * TILEY / 8	\
 				 - ((SCR_FIELDY - 1) * TILEY) / 2)
+
+#define PLAYER_SCREEN_X(p)	PLAYER_SCREEN_X_F(p, frame)
+#define PLAYER_SCREEN_Y(p)	PLAYER_SCREEN_Y_F(p, frame)
 
 
 int frame;			/* current screen frame */
-#if 0
 int screen_x;			/* current scroll position */
 int screen_y;
-#else
-int screen_x;			/* current scroll position */
-int screen_y;
-#endif
 
 /* tiles currently on screen */
 static int screentiles[MAX_BUF_YSIZE][MAX_BUF_XSIZE];
@@ -615,24 +613,129 @@ void DrawRelocatePlayer(struct PlayerInfo *player, boolean quick_relocation)
 }
 #endif
 
+void setMinimalPlayerBoundaries(int *sx1, int *sy1, int *sx2, int *sy2)
+{
+  boolean num_checked_players = 0;
+  int i;
+
+  for (i = 0; i < MAX_PLAYERS; i++)
+  {
+    if (ply[i].alive)
+    {
+#if 0
+      int sx = PLAYER_SCREEN_X_F(i, 0);
+      int sy = PLAYER_SCREEN_Y_F(i, 0);
+#else
+      int sx = PLAYER_SCREEN_X(i);
+      int sy = PLAYER_SCREEN_Y(i);
+#endif
+
+#if 0
+      /* round player position to full tile */
+      sx = (sx / TILEX) * TILEX;
+      sy = (sy / TILEY) * TILEY;
+#endif
+
+      if (num_checked_players == 0)
+      {
+	*sx1 = *sx2 = sx;
+	*sy1 = *sy2 = sy;
+      }
+      else
+      {
+	*sx1 = MIN(*sx1, sx);
+	*sy1 = MIN(*sy1, sy);
+	*sx2 = MAX(*sx2, sx);
+	*sy2 = MAX(*sy2, sy);
+      }
+
+      num_checked_players++;
+    }
+  }
+}
+
+boolean checkIfAllPlayersFitToScreen()
+{
+  int sx1 = 0, sy1 = 0, sx2 = 0, sy2 = 0;
+
+  setMinimalPlayerBoundaries(&sx1, &sy1, &sx2, &sy2);
+
+  return (sx2 - sx1 <= SCR_FIELDX * TILEX &&
+	  sy2 - sy1 <= SCR_FIELDY * TILEY);
+}
+
+void setScreenCenteredToAllPlayers(int *sx, int *sy)
+{
+  int sx1 = screen_x, sy1 = screen_y, sx2 = screen_x, sy2 = screen_y;
+
+  setMinimalPlayerBoundaries(&sx1, &sy1, &sx2, &sy2);
+
+  *sx = (sx1 + sx2) / 2;
+  *sy = (sy1 + sy2) / 2;
+}
+
+void setMaxCenterDistanceForAllPlayers(int *max_dx, int *max_dy)
+{
+  int sx1 = screen_x, sy1 = screen_y, sx2 = screen_x, sy2 = screen_y;
+
+  setMinimalPlayerBoundaries(&sx1, &sy1, &sx2, &sy2);
+
+  *max_dx = MAX(ABS(sx1 - screen_x), ABS(sx2 - screen_x));
+  *max_dy = MAX(ABS(sy1 - screen_y), ABS(sy2 - screen_y));
+}
+
+boolean checkIfAllPlayersAreVisible()
+{
+  int max_dx, max_dy;
+
+  setMaxCenterDistanceForAllPlayers(&max_dx, &max_dy);
+
+  return (max_dx <= SCR_FIELDX * TILEX / 2 &&
+	  max_dy <= SCR_FIELDY * TILEY / 2);
+}
+
 void RedrawPlayfield_EM(boolean force_redraw)
 {
 #if 1
   int centered_player_nr_next = getCenteredPlayerNr_EM();
-  int player_nr = (centered_player_nr_next != -1 ? centered_player_nr_next :0);
+#if 0
+  int player_nr;
+#endif
+  boolean all_players_visible = checkIfAllPlayersAreVisible();
+  boolean all_players_fit_to_screen = checkIfAllPlayersFitToScreen();
   boolean draw_new_player_location = FALSE;
   boolean quick_relocation = setup.quick_switch;
 #else
   int player_nr = 0;		/* !!! FIX THIS (CENTERED TO PLAYER 1) !!! */
 #endif
-  int sx = PLAYER_SCREEN_X(player_nr);
-  int sy = PLAYER_SCREEN_Y(player_nr);
-  int i, x, y;
+  int offset = (setup.scroll_delay ? 3 : 0) * TILEX;
+  int offset_x = offset;
+  int offset_y = offset;
+  int screen_x_old = screen_x;
+  int screen_y_old = screen_y;
+  int x, y, sx, sy;
+  int i;
+
+#if 0
+  player_nr = (centered_player_nr_next != -1 ? centered_player_nr_next :0);
+
+  sx = PLAYER_SCREEN_X(player_nr);
+  sy = PLAYER_SCREEN_Y(player_nr);
+#endif
+
+  if (centered_player_nr_next == -1 && !all_players_fit_to_screen)
+  {
+    setCenteredPlayerNr_EM(centered_player_nr);
+
+    centered_player_nr_next = centered_player_nr;
+  }
 
 #if 1
   boolean scrolling = (screen_x % TILEX != 0 || screen_y % TILEY != 0);
 
+#if 0
   if (!scrolling)	/* screen currently aligned at tile position */
+#endif
   {
     if (centered_player_nr != centered_player_nr_next)
     {
@@ -644,6 +747,66 @@ void RedrawPlayfield_EM(boolean force_redraw)
   }
 #endif
 
+#if 1
+  if (centered_player_nr == -1)
+  {
+    int max_dx, max_dy;
+
+#if 1
+    if (draw_new_player_location)
+      setScreenCenteredToAllPlayers(&sx, &sy);
+    else
+    {
+      sx = PLAYER_SCREEN_X(game_em.last_moving_player);
+      sy = PLAYER_SCREEN_Y(game_em.last_moving_player);
+    }
+
+#else
+
+#if 0
+    setScreenCenteredToAllPlayers(&sx, &sy);
+#endif
+
+#if 1
+    sx = PLAYER_SCREEN_X(game_em.last_moving_player);
+    sy = PLAYER_SCREEN_Y(game_em.last_moving_player);
+#endif
+#endif
+
+#if 0
+    printf("::: %d\n", all_players_visible);
+
+    if (!all_players_visible)
+    {
+      sx = screen_x;
+      sy = screen_y;
+
+      offset_x = 0;
+      offset_y = 0;
+    }
+#endif
+
+#if 0
+#if 1
+    offset_x = 0;
+    offset_y = 0;
+#else
+    setMaxCenterDistanceForAllPlayers(&max_dx, &max_dy);
+
+    if (max_dx > offset_x)
+      offset_x = MAX(0, offset_x - (max_dx - offset_x));
+    if (max_dy > offset_y)
+      offset_y = MAX(0, offset_y - (max_dy - offset_y));
+#endif
+#endif
+  }
+  else
+  {
+    sx = PLAYER_SCREEN_X(centered_player_nr);
+    sy = PLAYER_SCREEN_Y(centered_player_nr);
+  }
+#endif
+
   if (draw_new_player_location && !quick_relocation)
   {
 #if 1
@@ -652,12 +815,16 @@ void RedrawPlayfield_EM(boolean force_redraw)
     unsigned long game_frame_delay_value = getGameFrameDelay_EM(25);
 #endif
     int wait_delay_value = game_frame_delay_value;
-    int screen_xx = -999, screen_yy = -999;
+#if 1
+    int screen_xx = VALID_SCREEN_X(sx);
+    int screen_yy = VALID_SCREEN_Y(sy);
+#else
+    int screen_xx = VALID_SCREEN_X(PLAYER_SCREEN_X(player_nr));
+    int screen_yy = VALID_SCREEN_Y(PLAYER_SCREEN_Y(player_nr));
+#endif
 
-    while (screen_xx != screen_x || screen_yy != screen_y)
+    while (screen_x != screen_xx || screen_y != screen_yy)
     {
-      int screen_xx = VALID_SCREEN_X(PLAYER_SCREEN_X(player_nr));
-      int screen_yy = VALID_SCREEN_Y(PLAYER_SCREEN_Y(player_nr));
       int dx = (screen_xx < screen_x ? +1 : screen_xx > screen_x ? -1 : 0);
       int dy = (screen_yy < screen_y ? +1 : screen_yy > screen_y ? -1 : 0);
       int dxx = 0, dyy = 0;
@@ -665,11 +832,31 @@ void RedrawPlayfield_EM(boolean force_redraw)
       if (dx == 0 && dy == 0)		/* no scrolling needed at all */
 	break;
 
+#if 1
+      if (ABS(screen_xx - screen_x) >= TILEX ||
+	  ABS(screen_yy - screen_y) >= TILEY)
+      {
+	screen_x -= dx * TILEX;
+	screen_y -= dy * TILEY;
+
+	dxx = dx * TILEX / 2;
+	dyy = dy * TILEY / 2;
+      }
+      else
+      {
+	screen_x = screen_xx;
+	screen_y = screen_yy;
+
+	dxx = 0;
+	dyy = 0;
+      }
+#else
       screen_x -= dx * TILEX;
       screen_y -= dy * TILEY;
 
       dxx += dx * TILEX / 2;
       dyy += dy * TILEY / 2;
+#endif
 
       /* scroll in two steps of half tile size to make things smoother */
       screen_x += dxx;
@@ -699,9 +886,11 @@ void RedrawPlayfield_EM(boolean force_redraw)
       FlushDisplay();
       Delay(wait_delay_value);
     }
+
+    screen_x_old = screen_x;
+    screen_y_old = screen_y;
   }
 
-#if 1
   if (force_redraw)
   {
     for (y = 0; y < MAX_BUF_YSIZE; y++)
@@ -713,33 +902,74 @@ void RedrawPlayfield_EM(boolean force_redraw)
       }
     }
   }
+
+  /* calculate new screen scrolling position, with regard to scroll delay */
+  screen_x = VALID_SCREEN_X(sx + offset_x < screen_x ? sx + offset_x :
+			    sx - offset_x > screen_x ? sx - offset_x :
+			    screen_x);
+  screen_y = VALID_SCREEN_Y(sy + offset_y < screen_y ? sy + offset_y :
+			    sy - offset_y > screen_y ? sy - offset_y :
+			    screen_y);
+
+#if 1
+  /* prevent scrolling further than player step size screen when scrolling */
+  if (ABS(screen_x - screen_x_old) > TILEX / 8 ||
+      ABS(screen_y - screen_y_old) > TILEY / 8)
+  {
+    int dx = SIGN(screen_x - screen_x_old);
+    int dy = SIGN(screen_y - screen_y_old);
+
+    screen_x = screen_x_old + dx * TILEX / 8;
+    screen_y = screen_y_old + dy * TILEY / 8;
+  }
 #endif
 
 #if 1
+  if (centered_player_nr == -1)
+  {
+    boolean all_players_visible_old = all_players_visible;
 
-  int offset = (setup.scroll_delay ? 3 : 0) * TILEX;
+    all_players_visible = checkIfAllPlayersAreVisible();
 
-  /* calculate new screen scrolling position, with regard to scroll delay */
-  screen_x = VALID_SCREEN_X(sx + offset < screen_x ? sx + offset :
-			    sx - offset > screen_x ? sx - offset : screen_x);
-  screen_y = VALID_SCREEN_Y(sy + offset < screen_y ? sy + offset :
-			    sy - offset > screen_y ? sy - offset : screen_y);
+#if 0
+    printf("::: OLD(%d) -> NEW(%d) / OLD(%d, %d) -> NEW(%d, %d)\n",
+	   all_players_visible_old,
+	   all_players_visible,
+	   screen_x_old, screen_y_old,
+	   screen_x, screen_y);
+#endif
 
-#else
+    if (!all_players_visible)
+    {
+      screen_x = screen_x_old;
+      screen_y = screen_y_old;
+    }
+  }
+#endif
 
-  if (sx > lev.width * TILEX)
-    sx = lev.width * TILEX;
-  if (sy > lev.height * TILEY)
-    sy = lev.height * TILEY;
+#if 1
+  /* prevent scrolling if no player is moving */
+  if (!game_em.any_player_moving)
+  {
+    screen_x = screen_x_old;
+    screen_y = screen_y_old;
+  }
+  else
+  {
+    /* prevent scrolling against the players move direction */
+    int player_nr = game_em.last_moving_player;
+    int player_move_dir = game_em.last_player_direction[player_nr];
+    int dx = SIGN(screen_x - screen_x_old);
+    int dy = SIGN(screen_y - screen_y_old);
 
-  if (sx < SCR_FIELDX * TILEX)
-    sx = SCR_FIELDX * TILEY;
-  if (sy < SCR_FIELDY * TILEY)
-    sy = SCR_FIELDY * TILEY;
+    if (dx < 0 && player_move_dir == MV_RIGHT ||
+	dx > 0 && player_move_dir == MV_LEFT)
+      screen_x = screen_x_old;
 
-  screen_x = sx - (SCR_FIELDX - 1) * TILEX;
-  screen_y = sy - (SCR_FIELDY - 1) * TILEY;
-
+    if (dy < 0 && player_move_dir == MV_DOWN ||
+	dy > 0 && player_move_dir == MV_UP)
+      screen_y = screen_y_old;
+  }
 #endif
 
   animscreen();

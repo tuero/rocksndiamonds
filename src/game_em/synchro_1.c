@@ -23,6 +23,8 @@ void synchro_1(void)
   int start_check_nr;
   int i;
 
+  game_em.any_player_moving = FALSE;
+
   /* must test for death and actually kill separately */
 
   for (i = 0; i < MAX_PLAYERS; i++)
@@ -584,6 +586,10 @@ static void check_player(struct PLAYER *ply)
 	ply->last_move_dir = (dx < 0 ? MV_LEFT : MV_RIGHT);
       else if (oldy != ply->y)
 	ply->last_move_dir = (dy < 0 ? MV_UP : MV_DOWN);
+
+      game_em.any_player_moving = TRUE;
+      game_em.last_moving_player = ply->num;
+      game_em.last_player_direction[ply->num] = ply->last_move_dir;
     }
   }
   else					/* player wants to snap */

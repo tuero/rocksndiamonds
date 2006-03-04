@@ -651,6 +651,13 @@ struct GlobalInfo_EM
   Bitmap *screenbuffer;
 };
 
+struct GameInfo_EM
+{
+  boolean any_player_moving;
+  int last_moving_player;
+  int last_player_direction[MAX_PLAYERS];
+};
+
 struct LevelInfo_EM
 {
   int file_version;
@@ -678,5 +685,7 @@ struct GraphicInfo_EM
 
   int unique_identifier;	/* used to identify needed screen updates */
 };
+
+extern struct GameInfo_EM game_em;
 
 #endif	/* MAIN_EM_H */
