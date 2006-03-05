@@ -1989,6 +1989,7 @@ struct LevelInfo
   boolean can_pass_to_walkable;	/* player can pass to empty or walkable tile */
   boolean grow_into_diggable;	/* amoeba can grow into anything diggable */
 
+  boolean continuous_snapping;	/* repeated snapping without releasing key */
   boolean block_snap_field;	/* snapping blocks field to show animation */
   boolean block_last_field;	/* player blocks previous field while moving */
   boolean sp_block_last_field;	/* player blocks previous field while moving */

@@ -291,6 +291,10 @@ static struct
     &li.use_explosion_element[3],	FALSE
   },
   {
+    EL_PLAYER_1,			CONF_VALUE_BOOLEAN_5,
+    &li.continuous_snapping,		TRUE
+  },
+  {
     EL_PLAYER_1,			CONF_VALUE_INTEGER_1,
     &li.initial_player_stepsize,	STEPSIZE_NORMAL
   },
@@ -572,7 +576,9 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
   level->can_pass_to_walkable = FALSE;
   level->grow_into_diggable = TRUE;
 
+#if 0
   level->block_snap_field = TRUE;
+#endif
 
   level->block_last_field = FALSE;	/* EM does not block by default */
   level->sp_block_last_field = TRUE;	/* SP blocks the last field */
@@ -3305,6 +3311,12 @@ static void LoadLevel_InitVersion(struct LevelInfo *level, char *filename)
     /* time bonus score was given for 10 s instead of 1 s before 3.2.0-5 */
     level->score[SC_TIME_BONUS] /= 10;
 #endif
+  }
+
+  if (level->game_version < VERSION_IDENT(3,2,0,7))
+  {
+    /* default behaviour for snapping was "not continuous" before 3.2.0-7 */
+    level->continuous_snapping = FALSE;
   }
 
   /* only few elements were able to actively move into acid before 3.1.0 */

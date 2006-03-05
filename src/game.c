@@ -40,6 +40,7 @@
 #define USE_NEW_SPRING_BUMPER		(USE_NEW_STUFF		* 1)
 #define USE_STOP_CHANGED_ELEMENTS	(USE_NEW_STUFF		* 1)
 #define USE_ELEMENT_TOUCHING_BUGFIX	(USE_NEW_STUFF		* 1)
+#define USE_NEW_CONTINUOUS_SNAPPING	(USE_NEW_STUFF		* 1)
 
 #define USE_QUICKSAND_IMPACT_BUGFIX	(USE_NEW_STUFF		* 0)
 
@@ -97,6 +98,11 @@
 #define DX_TIME1		(DX + XX_TIME1)
 #define DX_TIME2		(DX + XX_TIME2)
 #define DY_TIME			(DY + YY_TIME)
+
+/* values for delayed check of falling and moving elements and for collision */
+#define CHECK_DELAY_MOVING	3
+#define CHECK_DELAY_FALLING	3
+#define CHECK_DELAY_COLLISION	2
 
 /* values for initial player move delay (initial delay counter value) */
 #define INITIAL_MOVE_DELAY_OFF	-1
@@ -6484,13 +6490,13 @@ void ContinueMoving(int x, int y)
     int nextx = newx + dx, nexty = newy + dy;
     boolean check_collision_again = IN_LEV_FIELD_AND_IS_FREE(nextx, nexty);
 
-    WasJustMoving[newx][newy] = 3;
+    WasJustMoving[newx][newy] = CHECK_DELAY_MOVING;
 
     if (CAN_FALL(element) && direction == MV_DOWN)
-      WasJustFalling[newx][newy] = 3;
+      WasJustFalling[newx][newy] = CHECK_DELAY_FALLING;
 
     if ((!CAN_FALL(element) || direction == MV_DOWN) && check_collision_again)
-      CheckCollision[newx][newy] = 2;
+      CheckCollision[newx][newy] = CHECK_DELAY_COLLISION;
   }
 
   if (DONT_TOUCH(element))	/* object may be nasty to player or others */
@@ -11579,6 +11585,8 @@ boolean SnapField(struct PlayerInfo *player, int dx, int dy)
 			dx == +1 ? MV_RIGHT :
 			dy == -1 ? MV_UP    :
 			dy == +1 ? MV_DOWN  : MV_NONE);
+  boolean can_continue_snapping = (level.continuous_snapping &&
+				   WasJustFalling[x][y] < CHECK_DELAY_FALLING);
 
   if (player->MovPos != 0 && game.engine_version >= VERSION_IDENT(2,2,0,0))
     return FALSE;
@@ -11606,8 +11614,14 @@ boolean SnapField(struct PlayerInfo *player, int dx, int dy)
     return FALSE;
   }
 
+#if USE_NEW_CONTINUOUS_SNAPPING
+  /* prevent snapping with already pressed snap key when not allowed */
+  if (player->is_snapping && !can_continue_snapping)
+    return FALSE;
+#else
   if (player->is_snapping)
     return FALSE;
+#endif
 
   player->MovDir = snap_direction;
 
@@ -11762,7 +11776,7 @@ boolean DropElement(struct PlayerInfo *player)
     nexty = dropy + GET_DY_FROM_DIR(move_direction);
 
     ChangeCount[dropx][dropy] = 0;	/* allow at least one more change */
-    CheckCollision[dropx][dropy] = 2;
+    CheckCollision[dropx][dropy] = CHECK_DELAY_COLLISION;
   }
 
   player->drop_delay = GET_NEW_DROP_DELAY(drop_element);

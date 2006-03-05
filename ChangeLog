@@ -1,3 +1,11 @@
+2006-03-05
+	* added "continuous snapping" (snapping many elements while holding the
+	  snap key pressed, without releasing the snap key after each element)
+	  as a new player setting for more compatibility with the classic games
+
+2006-03-04
+	* finished scrolling for "focus on all players" in EMC graphics engine
+
 2006-02-28
 	* level sets with "levels: 0" are ignored for levels, but not artwork
 	* fixed bug when scanning empty level group directories (endless loop)
