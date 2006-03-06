@@ -1,3 +1,6 @@
+2006-03-06
+	* fixed bug with missing (zero) score values for native Supaplex levels
+
 2006-03-05
 	* added "continuous snapping" (snapping many elements while holding the
 	  snap key pressed, without releasing the snap key after each element)
