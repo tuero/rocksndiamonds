@@ -1,3 +1,7 @@
+2006-03-08
+	* added delayed ignition of EM style dynamite when used in R'n'D engine
+	* added limited movement range to EMC engine when focus on all players
+
 2006-03-06
 	* fixed bug with missing (zero) score values for native Supaplex levels
 

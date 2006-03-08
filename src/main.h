@@ -1825,6 +1825,7 @@ struct PlayerInfo
   boolean is_pushing;
   boolean is_switching;
   boolean is_dropping;
+  boolean is_dropping_pressed;
 
   boolean is_bored;
   boolean is_sleeping;
@@ -1860,6 +1861,7 @@ struct PlayerInfo
   unsigned long actual_frame_counter;
 
   int drop_delay;
+  int drop_pressed_delay;
 
   int step_counter;
 

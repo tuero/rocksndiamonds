@@ -11,6 +11,9 @@
 #include "display.h"
 
 
+extern int centered_player_nr;
+extern boolean checkIfAllPlayersFitToScreen();
+
 static void check_player(struct PLAYER *);
 static void kill_player(struct PLAYER *);
 static boolean player_digfield(struct PLAYER *, int, int);
@@ -537,6 +540,30 @@ static void check_player(struct PLAYER *ply)
   }
 #endif
 
+  if (dx || dy)
+  {
+    int oldx = ply->x;
+    int oldy = ply->y;
+    int x = oldx + dx;
+    int y = oldy + dy;
+    boolean can_move = TRUE;
+
+    ply->x = x;
+    ply->y = y;
+
+    can_move = (centered_player_nr != -1 || checkIfAllPlayersFitToScreen());
+
+    ply->x = oldx;
+    ply->y = oldy;
+
+    if (!can_move)
+    {
+      ply->joy_n = ply->joy_e = ply->joy_s = ply->joy_w = 0;
+
+      return;
+    }
+  }
+
   if (dx == 0 && dy == 0)
   {
     ply->joy_stick = 0;
@@ -562,7 +589,7 @@ static void check_player(struct PLAYER *ply)
 
   ply->joy_stick = 1;
   ply->joy_n = ply->joy_e = ply->joy_s = ply->joy_w = 0;
-  ply->dynamite_cnt = 0; /* reset dynamite timer if we move */
+  ply->dynamite_cnt = 0;	/* reset dynamite timer if we move */
   ply->joy_spin = !ply->joy_spin;
 
   if (ply->joy_snap == 0)		/* player wants to move */

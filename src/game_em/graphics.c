@@ -40,7 +40,11 @@ static int crumbled_state[MAX_BUF_YSIZE][MAX_BUF_XSIZE];
 
 static boolean redraw[MAX_BUF_XSIZE][MAX_BUF_YSIZE];
 
+#if 1
+int centered_player_nr;
+#else
 static int centered_player_nr;
+#endif
 
 /* copy the entire screen to the window at the scroll position */
 
@@ -620,21 +624,22 @@ void setScreenCenteredToAllPlayers(int *sx, int *sy)
   *sy = (sy1 + sy2) / 2;
 }
 
-void setMaxCenterDistanceForAllPlayers(int *max_dx, int *max_dy)
+void setMaxCenterDistanceForAllPlayers(int *max_dx, int *max_dy,
+				       int center_x, int center_y)
 {
-  int sx1 = screen_x, sy1 = screen_y, sx2 = screen_x, sy2 = screen_y;
+  int sx1 = center_x, sy1 = center_y, sx2 = center_x, sy2 = center_y;
 
   setMinimalPlayerBoundaries(&sx1, &sy1, &sx2, &sy2);
 
-  *max_dx = MAX(ABS(sx1 - screen_x), ABS(sx2 - screen_x));
-  *max_dy = MAX(ABS(sy1 - screen_y), ABS(sy2 - screen_y));
+  *max_dx = MAX(ABS(sx1 - center_x), ABS(sx2 - center_x));
+  *max_dy = MAX(ABS(sy1 - center_y), ABS(sy2 - center_y));
 }
 
-boolean checkIfAllPlayersAreVisible()
+boolean checkIfAllPlayersAreVisible(int center_x, int center_y)
 {
   int max_dx, max_dy;
 
-  setMaxCenterDistanceForAllPlayers(&max_dx, &max_dy);
+  setMaxCenterDistanceForAllPlayers(&max_dx, &max_dy, center_x, center_y);
 
   return (max_dx <= SCR_FIELDX * TILEX / 2 &&
 	  max_dy <= SCR_FIELDY * TILEY / 2);
@@ -642,11 +647,15 @@ boolean checkIfAllPlayersAreVisible()
 
 void RedrawPlayfield_EM(boolean force_redraw)
 {
+#if 0
   boolean all_players_visible = checkIfAllPlayersAreVisible();
+#endif
   boolean all_players_fit_to_screen = checkIfAllPlayersFitToScreen();
   boolean draw_new_player_location = FALSE;
   boolean quick_relocation = setup.quick_switch;
+#if 0
   boolean scrolling = (screen_x % TILEX != 0 || screen_y % TILEY != 0);
+#endif
   int centered_player_nr_next = getCenteredPlayerNr_EM();
   int offset = (setup.scroll_delay ? 3 : 0) * TILEX;
   int offset_x = offset;
@@ -664,7 +673,9 @@ void RedrawPlayfield_EM(boolean force_redraw)
     centered_player_nr_next = centered_player_nr;
   }
 
-#if 0
+#if 1
+  /* also allow focus switching when screen is scrolled to half tile */
+#else
   if (!scrolling)	/* screen currently aligned at tile position */
 #endif
   {
@@ -716,6 +727,32 @@ void RedrawPlayfield_EM(boolean force_redraw)
 	break;
 
 #if 1
+
+      if (ABS(screen_xx - screen_x) >= TILEX)
+      {
+	screen_x -= dx * TILEX;
+	dxx = dx * TILEX / 2;
+      }
+      else
+      {
+	screen_x = screen_xx;
+	dxx = 0;
+      }
+
+      if (ABS(screen_yy - screen_y) >= TILEY)
+      {
+	screen_y -= dy * TILEY;
+	dyy = dy * TILEY / 2;
+      }
+      else
+      {
+	screen_y = screen_yy;
+	dyy = 0;
+      }
+
+#else
+
+#if 1
       if (ABS(screen_xx - screen_x) >= TILEX ||
 	  ABS(screen_yy - screen_y) >= TILEY)
       {
@@ -739,6 +776,8 @@ void RedrawPlayfield_EM(boolean force_redraw)
 
       dxx += dx * TILEX / 2;
       dyy += dy * TILEY / 2;
+#endif
+
 #endif
 
       /* scroll in two steps of half tile size to make things smoother */
@@ -808,13 +847,29 @@ void RedrawPlayfield_EM(boolean force_redraw)
   /* prevent scrolling away from the other players when focus on all players */
   if (centered_player_nr == -1)
   {
-    all_players_visible = checkIfAllPlayersAreVisible();
+#if 1
+    /* check if all players are still visible with new scrolling position */
+    if (!checkIfAllPlayersAreVisible(screen_x, screen_y))
+    {
+      /* reset horizontal scroll position to last value, if needed */
+      if (!checkIfAllPlayersAreVisible(screen_x, screen_y_old))
+	screen_x = screen_x_old;
+
+      /* reset vertical scroll position to last value, if needed */
+      if (!checkIfAllPlayersAreVisible(screen_x_old, screen_y))
+	screen_y = screen_y_old;
+    }
+#else
+    boolean all_players_visible = checkIfAllPlayersAreVisible();
 
     if (!all_players_visible)
     {
+      printf("::: not all players visible\n");
+
       screen_x = screen_x_old;
       screen_y = screen_y_old;
     }
+#endif
   }
 
   /* prevent scrolling (for screen correcting) if no player is moving */
@@ -831,12 +886,12 @@ void RedrawPlayfield_EM(boolean force_redraw)
     int dx = SIGN(screen_x - screen_x_old);
     int dy = SIGN(screen_y - screen_y_old);
 
-    if ((dx < 0 && player_move_dir == MV_RIGHT) ||
-	(dx > 0 && player_move_dir == MV_LEFT))
+    if ((dx < 0 && player_move_dir != MV_LEFT) ||
+	(dx > 0 && player_move_dir != MV_RIGHT))
       screen_x = screen_x_old;
 
-    if ((dy < 0 && player_move_dir == MV_DOWN) ||
-	(dy > 0 && player_move_dir == MV_UP))
+    if ((dy < 0 && player_move_dir != MV_UP) ||
+	(dy > 0 && player_move_dir != MV_DOWN))
       screen_y = screen_y_old;
   }
 

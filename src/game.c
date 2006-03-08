@@ -1834,6 +1834,7 @@ void InitGame()
     player->is_pushing = FALSE;
     player->is_switching = FALSE;
     player->is_dropping = FALSE;
+    player->is_dropping_pressed = FALSE;
 
     player->is_bored = FALSE;
     player->is_sleeping = FALSE;
@@ -1882,6 +1883,7 @@ void InitGame()
     player->push_delay_value = game.initial_push_delay_value;
 
     player->drop_delay = 0;
+    player->drop_pressed_delay = 0;
 
     player->last_jx = player->last_jy = 0;
     player->jx = player->jy = 0;
@@ -8710,8 +8712,8 @@ static byte PlayerActions(struct PlayerInfo *player, byte player_action)
   int down	= player_action & JOY_DOWN;
   int button1	= player_action & JOY_BUTTON_1;
   int button2	= player_action & JOY_BUTTON_2;
-  int dx	= (left ? -1	: right ? 1	: 0);
-  int dy	= (up   ? -1	: down  ? 1	: 0);
+  int dx	= (left ? -1 : right ? 1 : 0);
+  int dy	= (up   ? -1 : down  ? 1 : 0);
 
   if (!player->active || tape.pausing)
     return 0;
@@ -8756,6 +8758,8 @@ static byte PlayerActions(struct PlayerInfo *player, byte player_action)
       player->is_moving = FALSE;
 
     player->is_dropping = FALSE;
+    player->is_dropping_pressed = FALSE;
+    player->drop_pressed_delay = 0;
 
     return 0;
   }
@@ -8806,6 +8810,9 @@ void AdvanceFrameAndPlayerCounters(int player_nr)
 
     if (stored_player[i].drop_delay > 0)
       stored_player[i].drop_delay--;
+
+    if (stored_player[i].is_dropping_pressed)
+      stored_player[i].drop_pressed_delay++;
   }
 }
 
@@ -9934,6 +9941,8 @@ boolean MovePlayer(struct PlayerInfo *player, int dx, int dy)
     player->is_snapping = FALSE;
     player->is_switching = FALSE;
     player->is_dropping = FALSE;
+    player->is_dropping_pressed = FALSE;
+    player->drop_pressed_delay = 0;
   }
   else
   {
@@ -11633,6 +11642,8 @@ boolean SnapField(struct PlayerInfo *player, int dx, int dy)
   }
 
   player->is_dropping = FALSE;
+  player->is_dropping_pressed = FALSE;
+  player->drop_pressed_delay = 0;
 
   if (DigField(player, jx, jy, x, y, 0, 0, DF_SNAP) == MP_NO_ACTION)
     return FALSE;
@@ -11668,6 +11679,8 @@ boolean DropElement(struct PlayerInfo *player)
 		      EL_DYNABOMB_PLAYER_1_ACTIVE + player->index_nr :
 		      EL_UNDEFINED);
 
+  player->is_dropping_pressed = TRUE;
+
   /* do not drop an element on top of another element; when holding drop key
      pressed without moving, dropped element must move away before the next
      element can be dropped (this is especially important if the next element
@@ -11693,6 +11706,10 @@ boolean DropElement(struct PlayerInfo *player)
 
   /* check if player has anything that can be dropped */
   if (new_element == EL_UNDEFINED)
+    return FALSE;
+
+  /* check if drop key was pressed long enough for EM style dynamite */
+  if (new_element == EL_EM_DYNAMITE && player->drop_pressed_delay < 40)
     return FALSE;
 
   /* check if anything can be dropped at the current position */
@@ -11781,6 +11798,9 @@ boolean DropElement(struct PlayerInfo *player)
 
   player->drop_delay = GET_NEW_DROP_DELAY(drop_element);
   player->is_dropping = TRUE;
+
+  player->drop_pressed_delay = 0;
+  player->is_dropping_pressed = FALSE;
 
   player->drop_x = dropx;
   player->drop_y = dropy;
