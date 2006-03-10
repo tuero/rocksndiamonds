@@ -936,41 +936,45 @@ static void InitField(int x, int y, boolean init_game)
 	Feld[x][y] = EL_ACID_POOL_BOTTOMRIGHT;
       break;
 
+    case EL_BUG:
     case EL_BUG_RIGHT:
     case EL_BUG_UP:
     case EL_BUG_LEFT:
     case EL_BUG_DOWN:
-    case EL_BUG:
+    case EL_SPACESHIP:
     case EL_SPACESHIP_RIGHT:
     case EL_SPACESHIP_UP:
     case EL_SPACESHIP_LEFT:
     case EL_SPACESHIP_DOWN:
-    case EL_SPACESHIP:
+    case EL_BD_BUTTERFLY:
     case EL_BD_BUTTERFLY_RIGHT:
     case EL_BD_BUTTERFLY_UP:
     case EL_BD_BUTTERFLY_LEFT:
     case EL_BD_BUTTERFLY_DOWN:
-    case EL_BD_BUTTERFLY:
+    case EL_BD_FIREFLY:
     case EL_BD_FIREFLY_RIGHT:
     case EL_BD_FIREFLY_UP:
     case EL_BD_FIREFLY_LEFT:
     case EL_BD_FIREFLY_DOWN:
-    case EL_BD_FIREFLY:
     case EL_PACMAN_RIGHT:
     case EL_PACMAN_UP:
     case EL_PACMAN_LEFT:
     case EL_PACMAN_DOWN:
     case EL_YAMYAM:
+    case EL_YAMYAM_LEFT:
+    case EL_YAMYAM_RIGHT:
+    case EL_YAMYAM_UP:
+    case EL_YAMYAM_DOWN:
     case EL_DARK_YAMYAM:
     case EL_ROBOT:
     case EL_PACMAN:
     case EL_SP_SNIKSNAK:
     case EL_SP_ELECTRON:
+    case EL_MOLE:
     case EL_MOLE_LEFT:
     case EL_MOLE_RIGHT:
     case EL_MOLE_UP:
     case EL_MOLE_DOWN:
-    case EL_MOLE:
       InitMovDir(x, y);
       break;
 
@@ -2440,6 +2444,14 @@ void InitMovDir(int x, int y)
     case EL_PACMAN_DOWN:
       Feld[x][y] = EL_PACMAN;
       MovDir[x][y] = direction[0][element - EL_PACMAN_RIGHT];
+      break;
+
+    case EL_YAMYAM_LEFT:
+    case EL_YAMYAM_RIGHT:
+    case EL_YAMYAM_UP:
+    case EL_YAMYAM_DOWN:
+      Feld[x][y] = EL_YAMYAM;
+      MovDir[x][y] = direction[2][element - EL_YAMYAM_LEFT];
       break;
 
     case EL_SP_SNIKSNAK:

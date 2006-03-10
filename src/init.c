@@ -67,6 +67,11 @@ static int copy_properties[][5] =
     EL_PACMAN_UP,		EL_PACMAN_DOWN
   },
   {
+    EL_YAMYAM,
+    EL_YAMYAM_LEFT,		EL_YAMYAM_RIGHT,
+    EL_YAMYAM_UP,		EL_YAMYAM_DOWN
+  },
+  {
     EL_MOLE,
     EL_MOLE_LEFT,		EL_MOLE_RIGHT,
     EL_MOLE_UP,			EL_MOLE_DOWN
@@ -1703,6 +1708,10 @@ static int get_special_property_bit(int element, int property_bit_nr)
     { EL_BD_FIREFLY_UP,		4	},
     { EL_BD_FIREFLY_DOWN,	4	},
     { EL_YAMYAM,		5	},
+    { EL_YAMYAM_LEFT,		5	},
+    { EL_YAMYAM_RIGHT,		5	},
+    { EL_YAMYAM_UP,		5	},
+    { EL_YAMYAM_DOWN,		5	},
     { EL_DARK_YAMYAM,		6	},
     { EL_ROBOT,			7	},
     { EL_PACMAN,		8	},
@@ -3246,6 +3255,10 @@ void InitElementPropertiesStatic()
     EL_PLAYER_4,
     EL_SP_MURPHY,
     EL_YAMYAM,
+    EL_YAMYAM_LEFT,
+    EL_YAMYAM_RIGHT,
+    EL_YAMYAM_UP,
+    EL_YAMYAM_DOWN,
     EL_AMOEBA_WET,
     EL_AMOEBA_DRY,
     EL_AMOEBA_FULL,

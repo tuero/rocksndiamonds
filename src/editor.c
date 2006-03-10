@@ -3369,6 +3369,11 @@ static int editor_el_emerald_mine_club[] =
   EL_EM_DYNAMITE_ACTIVE,
   EL_EMPTY,
   EL_EMPTY,
+
+  EL_YAMYAM_LEFT,
+  EL_YAMYAM_RIGHT,
+  EL_YAMYAM_UP,
+  EL_YAMYAM_DOWN,
 };
 static int *editor_hl_emerald_mine_club_ptr = editor_hl_emerald_mine_club;
 static int *editor_el_emerald_mine_club_ptr = editor_el_emerald_mine_club;
@@ -7691,6 +7696,10 @@ static struct
   { EL_BD_FIREFLY_DOWN, &level.score[SC_SPACESHIP],	TEXT_SMASHING	},
   { EL_SP_SNIKSNAK,	&level.score[SC_SPACESHIP],	TEXT_SMASHING	},
   { EL_YAMYAM,		&level.score[SC_YAMYAM],	TEXT_SMASHING	},
+  { EL_YAMYAM_LEFT,	&level.score[SC_YAMYAM],	TEXT_SMASHING	},
+  { EL_YAMYAM_RIGHT,	&level.score[SC_YAMYAM],	TEXT_SMASHING	},
+  { EL_YAMYAM_UP,	&level.score[SC_YAMYAM],	TEXT_SMASHING	},
+  { EL_YAMYAM_DOWN,	&level.score[SC_YAMYAM],	TEXT_SMASHING	},
   { EL_DARK_YAMYAM,	&level.score[SC_YAMYAM],	TEXT_SMASHING	},
   { EL_ROBOT,		&level.score[SC_ROBOT],		TEXT_SMASHING	},
   { EL_PACMAN,		&level.score[SC_PACMAN],	TEXT_SMASHING	},
@@ -7841,7 +7850,11 @@ static void DrawPropertiesConfig()
 
     if (IS_AMOEBOID(properties_element))
       MapDrawingArea(ED_DRAWING_ID_AMOEBA_CONTENT);
-    else if (properties_element == EL_YAMYAM)
+    else if (properties_element == EL_YAMYAM ||
+	     properties_element == EL_YAMYAM_LEFT ||
+	     properties_element == EL_YAMYAM_RIGHT ||
+	     properties_element == EL_YAMYAM_UP ||
+	     properties_element == EL_YAMYAM_DOWN)
       DrawYamYamContentAreas();
     else if (properties_element == EL_EMC_MAGIC_BALL)
     {

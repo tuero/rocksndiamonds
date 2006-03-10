@@ -187,7 +187,7 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
   {
     "yamyam",
     "yamyam",
-    "yam yam"
+    "yam yam (random start direction)"
   },
   {
     "robot",
@@ -3652,6 +3652,26 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
     "trigger_ce_value",
     "trigger",
     "CE value of element triggering change"
+  },
+  {
+    "yamyam.left",
+    "yamyam",
+    "yam yam (starts moving left)"
+  },
+  {
+    "yamyam.right",
+    "yamyam",
+    "yam yam (starts moving right)"
+  },
+  {
+    "yamyam.up",
+    "yamyam",
+    "yam yam (starts moving up)"
+  },
+  {
+    "yamyam.down",
+    "yamyam",
+    "yam yam (starts moving down)"
   },
 
   /* ----------------------------------------------------------------------- */

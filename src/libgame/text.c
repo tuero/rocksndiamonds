@@ -255,14 +255,20 @@ void DrawTextExt(DrawBuffer *dst_bitmap, int dst_x, int dst_y, char *text,
   struct FontBitmapInfo *font = &gfx.font_bitmap_info[font_bitmap_id];
   int font_width = getFontWidth(font_nr);
   int font_height = getFontHeight(font_nr);
+#if 0
   int border_1 = gfx.sx + gfx.sxsize;
   int border_2 = gfx.dx + gfx.dxsize;
+  int dst_x_start = dst_x;
+#endif
   Bitmap *src_bitmap;
   int src_x, src_y;
-  int dst_x_start = dst_x;
   char *text_ptr = text;
 
   if (font->bitmap == NULL)
+    return;
+
+  /* skip text to be printed outside the window (left/right will be clipped) */
+  if (dst_y < 0 || dst_y + font_height > video.height)
     return;
 
   /* add offset for drawing font characters */
@@ -278,10 +284,24 @@ void DrawTextExt(DrawBuffer *dst_bitmap, int dst_x, int dst_y, char *text,
 
     getFontCharSource(font_nr, c, &src_bitmap, &src_x, &src_y);
 
-    /* make sure that text does not run off the screen at the right side */
+    /* clip text at the left side of the window */
+    if (dst_x < 0)
+    {
+      dst_x += font_width;
+
+      continue;
+    }
+
+    /* clip text at the right side of the window */
+#if 1
+    if (dst_x + font_width > video.width)
+      break;
+#else
+    /* (this does not work well when trying to print text to whole screen) */
     if ((dst_x_start < border_1 && dst_x + font_width > border_1) ||
 	(dst_x_start < border_2 && dst_x + font_width > border_2))
       break;
+#endif
 
     if (mask_mode == BLIT_INVERSE)	/* special mode for text gadgets */
     {

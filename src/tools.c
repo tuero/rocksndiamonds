@@ -3474,19 +3474,19 @@ em_object_mapping_list[] =
   },
   {
     Xeater_n,				TRUE,	FALSE,
-    EL_YAMYAM,				-1, -1
+    EL_YAMYAM_UP,			-1, -1
   },
   {
-    Xeater_e,				FALSE,	FALSE,
-    EL_YAMYAM,				-1, -1
+    Xeater_e,				TRUE,	FALSE,
+    EL_YAMYAM_RIGHT,			-1, -1
   },
   {
-    Xeater_w,				FALSE,	FALSE,
-    EL_YAMYAM,				-1, -1
+    Xeater_w,				TRUE,	FALSE,
+    EL_YAMYAM_LEFT,			-1, -1
   },
   {
-    Xeater_s,				FALSE,	FALSE,
-    EL_YAMYAM,				-1, -1
+    Xeater_s,				TRUE,	FALSE,
+    EL_YAMYAM_DOWN,			-1, -1
   },
   {
     Yeater_n,				FALSE,	FALSE,
@@ -4591,10 +4591,6 @@ em_object_mapping_list[] =
   {
     Xalpha_arrow_w,			TRUE,	FALSE,
     EL_CHAR('<'),			-1, -1
-  },
-  {
-    Xalpha_copyr,			TRUE,	FALSE,
-    EL_CHAR('©'),			-1, -1
   },
   {
     Xalpha_copyr,			TRUE,	FALSE,

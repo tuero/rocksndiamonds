@@ -3249,6 +3249,10 @@ static void LoadLevel_InitVersion(struct LevelInfo *level, char *filename)
   }
 #endif
 
+#if 0
+  leveldir_current->latest_engine = TRUE;	/* !!! TEST ONLY !!! */
+#endif
+
   if (leveldir_current->latest_engine)
   {
     /* ---------- use latest game engine ----------------------------------- */

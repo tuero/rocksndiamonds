@@ -882,6 +882,38 @@ element_to_graphic[] =
     IMG_YAMYAM
   },
   {
+    EL_YAMYAM_LEFT,			-1, -1, FALSE,
+    IMG_YAMYAM_LEFT
+  },
+  {
+    EL_YAMYAM,				-1, MV_BIT_LEFT, FALSE,
+    IMG_YAMYAM_LEFT
+  },
+  {
+    EL_YAMYAM_RIGHT,			-1, -1, FALSE,
+    IMG_YAMYAM_RIGHT
+  },
+  {
+    EL_YAMYAM,				-1, MV_BIT_RIGHT, FALSE,
+    IMG_YAMYAM_RIGHT
+  },
+  {
+    EL_YAMYAM_UP,			-1, -1, FALSE,
+    IMG_YAMYAM_UP
+  },
+  {
+    EL_YAMYAM,				-1, MV_BIT_UP, FALSE,
+    IMG_YAMYAM_UP
+  },
+  {
+    EL_YAMYAM_DOWN,			-1, -1, FALSE,
+    IMG_YAMYAM_DOWN
+  },
+  {
+    EL_YAMYAM,				-1, MV_BIT_DOWN, FALSE,
+    IMG_YAMYAM_DOWN
+  },
+  {
     EL_YAMYAM,				ACTION_MOVING, -1, FALSE,
     IMG_YAMYAM_MOVING
   },

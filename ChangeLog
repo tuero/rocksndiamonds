@@ -1,3 +1,6 @@
+2006-03-09
+	* fixed small bug in EMC level loader (copyright sign in EM II levels)
+
 2006-03-08
 	* added delayed ignition of EM style dynamite when used in R'n'D engine
 	* added limited movement range to EMC engine when focus on all players

@@ -151,7 +151,7 @@ int cleanup_em_level(unsigned char *src, int length)
     for (i = 2112; i < 2148; i++) src[i] = src[i - 64];
   }
   else if (length >= 2106 &&
-	   src[0] == 241 &&
+	   src[0] == 241 &&	/* <-- Emerald Mine I levels */
 	   src[1983] == 27)
   {
     unsigned char j = 94;
@@ -171,7 +171,7 @@ int cleanup_em_level(unsigned char *src, int length)
   }
 #if 1
   else if (length >= 2106 &&
-	   src[0] == 245 &&
+	   src[0] == 245 &&	/* <-- Emerald Mine II levels */
 	   src[1983] == 27)
   {
     unsigned char j = 94;
@@ -188,6 +188,11 @@ int cleanup_em_level(unsigned char *src, int length)
       src[i] = remap_v4eater[src[i] >= 28 ? 0 : src[i]];
     for (i = 2112; i < 2148; i++)
       src[i] = src[i - 64];
+
+    /* fix copyright sign in Emerald Mine II levels */
+    for (i = 0; i < 2048; i++)
+      if (src[i] == 241)
+	src[i] = 254;		/* replace 'Xdecor_1' with 'Xalpha_copyr' */
   }
 #endif
   else
@@ -538,7 +543,7 @@ static unsigned short remap_emerald[256] =
   Xblank,		Xblank,		Xblank,		Xblank,
 #else
   /* special elements added to solve compatibility problems */
-  Xblank,		Xblank,		Xblank,		Xfake_acid_1
+  Xblank,		Xblank,		Xalpha_copyr,	Xfake_acid_1
 #endif
 };
 

@@ -1269,7 +1269,12 @@
 
 #define EL_TRIGGER_CE_VALUE		705
 
-#define NUM_FILE_ELEMENTS		706
+#define EL_YAMYAM_LEFT			706
+#define EL_YAMYAM_RIGHT			707
+#define EL_YAMYAM_UP			708
+#define EL_YAMYAM_DOWN			709
+
+#define NUM_FILE_ELEMENTS		710
 
 
 /* "real" (and therefore drawable) runtime elements */
