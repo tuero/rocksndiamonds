@@ -1753,6 +1753,10 @@ int get_num_special_action(int element, int action_first, int action_last)
       break;
   }
 
+#if 0
+  printf("::: %d->%d: %d\n", action_first, action_last, num_special_action);
+#endif
+
   return num_special_action;
 }
 
@@ -1849,11 +1853,15 @@ void InitGame()
     player->anim_delay_counter = 0;
     player->post_delay_counter = 0;
 
+    player->dir_waiting = MV_NONE;
     player->action_waiting = ACTION_DEFAULT;
     player->last_action_waiting = ACTION_DEFAULT;
     player->special_action_bored = ACTION_DEFAULT;
     player->special_action_sleeping = ACTION_DEFAULT;
 
+#if 1
+    /* cannot be set here -- could be modified in Init[Player]Field() below */
+#else
     /* set number of special actions for bored and sleeping animation */
     player->num_special_action_bored =
       get_num_special_action(player->artwork_element,
@@ -1861,6 +1869,7 @@ void InitGame()
     player->num_special_action_sleeping =
       get_num_special_action(player->artwork_element,
 			     ACTION_SLEEPING_1, ACTION_SLEEPING_LAST);
+#endif
 
     player->switch_x = -1;
     player->switch_y = -1;
@@ -2014,6 +2023,22 @@ void InitGame()
   }
 
   InitBeltMovement();
+
+  for (i = 0; i < MAX_PLAYERS; i++)
+  {
+    struct PlayerInfo *player = &stored_player[i];
+
+#if 1
+    /* set number of special actions for bored and sleeping animation */
+    player->num_special_action_bored =
+      get_num_special_action(player->artwork_element,
+			     ACTION_BORING_1, ACTION_BORING_LAST);
+    player->num_special_action_sleeping =
+      get_num_special_action(player->artwork_element,
+			     ACTION_SLEEPING_1, ACTION_SLEEPING_LAST);
+#endif
+
+  }
 
   game.emulation = (emulate_bd ? EMU_BOULDERDASH :
 		    emulate_sb ? EMU_SOKOBAN :
@@ -8591,6 +8616,7 @@ static void SetPlayerWaiting(struct PlayerInfo *player, boolean is_waiting)
   boolean last_waiting = player->is_waiting;
   int move_dir = player->MovDir;
 
+  player->dir_waiting = move_dir;
   player->last_action_waiting = player->action_waiting;
 
   if (is_waiting)
@@ -8608,7 +8634,11 @@ static void SetPlayerWaiting(struct PlayerInfo *player, boolean is_waiting)
 	game.player_sleeping_delay_fixed +
 	SimpleRND(game.player_sleeping_delay_random);
 
+#if 1
+      InitPlayerGfxAnimation(player, ACTION_WAITING, move_dir);
+#else
       InitPlayerGfxAnimation(player, ACTION_WAITING, player->MovDir);
+#endif
     }
 
     if (game.player_sleeping_delay_fixed +
@@ -8625,6 +8655,24 @@ static void SetPlayerWaiting(struct PlayerInfo *player, boolean is_waiting)
     player->action_waiting = (player->is_sleeping ? ACTION_SLEEPING :
 			      player->is_bored ? ACTION_BORING :
 			      ACTION_WAITING);
+
+#if 1
+    if (player->is_sleeping && player->use_murphy)
+    {
+      /* special for Murphy: leaning against solid objects when sleeping */
+
+      if (!IN_LEV_FIELD(player->jx - 1, player->jy) ||
+	  Feld[player->jx - 1][player->jy] != EL_EMPTY)
+	move_dir = MV_LEFT;
+      else if (!IN_LEV_FIELD(player->jx + 1, player->jy) ||
+	       Feld[player->jx + 1][player->jy] != EL_EMPTY)
+	move_dir = MV_RIGHT;
+      else
+	player->is_sleeping = FALSE;
+
+      player->dir_waiting = move_dir;
+    }
+#endif
 
     if (player->is_sleeping)
     {
@@ -8708,6 +8756,7 @@ static void SetPlayerWaiting(struct PlayerInfo *player, boolean is_waiting)
     player->anim_delay_counter = 0;
     player->post_delay_counter = 0;
 
+    player->dir_waiting = player->MovDir;
     player->action_waiting = ACTION_DEFAULT;
 
     player->special_action_bored = ACTION_DEFAULT;

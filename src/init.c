@@ -717,6 +717,8 @@ void InitElementGraphicInfo()
     }
   }
 
+#if 0
+  /* !!! THIS ALSO CLEARS SPECIAL FLAGS (AND IS NOT NEEDED ANYWAY) !!! */
   /* set animation mode to "none" for each graphic with only 1 frame */
   for (i = 0; i < MAX_NUM_ELEMENTS; i++)
   {
@@ -742,6 +744,7 @@ void InitElementGraphicInfo()
       }
     }
   }
+#endif
 
 #if 0
 #if DEBUG

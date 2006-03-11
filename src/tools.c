@@ -1825,6 +1825,7 @@ void DrawPlayer(struct PlayerInfo *player)
   int next_jx = jx + dx;
   int next_jy = jy + dy;
   boolean player_is_moving = (player->MovPos ? TRUE : FALSE);
+  boolean player_is_opaque = FALSE;
   int sx = SCREENX(jx), sy = SCREENY(jy);
   int sxx = 0, syy = 0;
   int element = Feld[jx][jy], last_element = Feld[last_jx][last_jy];
@@ -1864,6 +1865,11 @@ void DrawPlayer(struct PlayerInfo *player)
 	    player->is_snapping   ? ACTION_SNAPPING        :
 	    player->is_dropping   ? ACTION_DROPPING        :
 	    player->is_waiting    ? player->action_waiting : ACTION_DEFAULT);
+
+#if 1
+  if (player->is_waiting)
+    move_dir = player->dir_waiting;
+#endif
 
   InitPlayerGfxAnimation(player, action, move_dir);
 
@@ -1913,16 +1919,17 @@ void DrawPlayer(struct PlayerInfo *player)
   {
     if (player_is_moving && GfxElement[jx][jy] != EL_UNDEFINED)
     {
-      if (GFX_CRUMBLED(GfxElement[jx][jy]))
+      int old_element = GfxElement[jx][jy];
+      int old_graphic = el_act_dir2img(old_element, action, move_dir);
+      int frame = getGraphicAnimationFrame(old_graphic, player->StepFrame);
+
+      if (GFX_CRUMBLED(old_element))
 	DrawLevelFieldCrumbledSandDigging(jx, jy, move_dir, player->StepFrame);
       else
-      {
-	int old_element = GfxElement[jx][jy];
-	int old_graphic = el_act_dir2img(old_element, action, move_dir);
-	int frame = getGraphicAnimationFrame(old_graphic, player->StepFrame);
-
 	DrawGraphic(sx, sy, old_graphic, frame);
-      }
+
+      if (graphic_info[old_graphic].anim_mode & ANIM_OPAQUE_PLAYER)
+	player_is_opaque = TRUE;
     }
     else
     {
@@ -1960,7 +1967,10 @@ void DrawPlayer(struct PlayerInfo *player)
   if (!setup.soft_scrolling && ScreenMovPos)
     sxx = syy = 0;
 
-  DrawGraphicShiftedThruMask(sx, sy, sxx, syy, graphic, frame, NO_CUTTING);
+  if (player_is_opaque)
+    DrawGraphicShifted(sx, sy, sxx, syy, graphic, frame,NO_CUTTING,NO_MASKING);
+  else
+    DrawGraphicShiftedThruMask(sx, sy, sxx, syy, graphic, frame, NO_CUTTING);
 
   if (SHIELD_ON(player))
   {

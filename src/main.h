@@ -1843,6 +1843,7 @@ struct PlayerInfo
   int anim_delay_counter;
   int post_delay_counter;
 
+  int dir_waiting;
   int action_waiting, last_action_waiting;
   int special_action_bored;
   int special_action_sleeping;
