@@ -5132,9 +5132,11 @@ void setCenteredPlayerNr_EM(int centered_player_nr)
 
 int getCenteredPlayerNr_EM()
 {
+#if 0
   if (game.centered_player_nr_next >= 0 &&
       !native_em_level.ply[game.centered_player_nr_next]->alive)
     game.centered_player_nr_next = game.centered_player_nr;
+#endif
 
   if (game.centered_player_nr != game.centered_player_nr_next)
     game.centered_player_nr = game.centered_player_nr_next;
@@ -5142,7 +5144,17 @@ int getCenteredPlayerNr_EM()
   return game.centered_player_nr;
 }
 
-int getActivePlayers_EM()
+void setSetCenteredPlayer_EM(boolean set_centered_player)
+{
+  game.set_centered_player = set_centered_player;
+}
+
+boolean getSetCenteredPlayer_EM()
+{
+  return game.set_centered_player;
+}
+
+int getNumActivePlayers_EM()
 {
   int num_players = 0;
   int i;

@@ -1958,6 +1958,7 @@ void InitGame()
   game.envelope_active = FALSE;
 
   game.centered_player_nr = game.centered_player_nr_next = -1;	/* focus all */
+  game.set_centered_player = FALSE;
 
   for (i = 0; i < NUM_BELTS; i++)
   {
@@ -3145,6 +3146,183 @@ void CheckDynamite(int x, int y)
   Bang(x, y);
 }
 
+#if 1
+
+static void setMinimalPlayerBoundaries(int *sx1, int *sy1, int *sx2, int *sy2)
+{
+  boolean num_checked_players = 0;
+  int i;
+
+  for (i = 0; i < MAX_PLAYERS; i++)
+  {
+    if (stored_player[i].active)
+    {
+      int sx = stored_player[i].jx;
+      int sy = stored_player[i].jy;
+
+      if (num_checked_players == 0)
+      {
+	*sx1 = *sx2 = sx;
+	*sy1 = *sy2 = sy;
+      }
+      else
+      {
+	*sx1 = MIN(*sx1, sx);
+	*sy1 = MIN(*sy1, sy);
+	*sx2 = MAX(*sx2, sx);
+	*sy2 = MAX(*sy2, sy);
+      }
+
+      num_checked_players++;
+    }
+  }
+}
+
+static boolean checkIfAllPlayersFitToScreen_RND()
+{
+  int sx1 = 0, sy1 = 0, sx2 = 0, sy2 = 0;
+
+  setMinimalPlayerBoundaries(&sx1, &sy1, &sx2, &sy2);
+
+  return (sx2 - sx1 < SCR_FIELDX &&
+	  sy2 - sy1 < SCR_FIELDY);
+}
+
+static void setScreenCenteredToAllPlayers(int *sx, int *sy)
+{
+  int sx1 = scroll_x, sy1 = scroll_y, sx2 = scroll_x, sy2 = scroll_y;
+
+  setMinimalPlayerBoundaries(&sx1, &sy1, &sx2, &sy2);
+
+  *sx = (sx1 + sx2) / 2;
+  *sy = (sy1 + sy2) / 2;
+}
+
+#if 0
+static void setMaxCenterDistanceForAllPlayers(int *max_dx, int *max_dy,
+					      int center_x, int center_y)
+{
+  int sx1 = center_x, sy1 = center_y, sx2 = center_x, sy2 = center_y;
+
+  setMinimalPlayerBoundaries(&sx1, &sy1, &sx2, &sy2);
+
+  *max_dx = MAX(ABS(sx1 - center_x), ABS(sx2 - center_x));
+  *max_dy = MAX(ABS(sy1 - center_y), ABS(sy2 - center_y));
+}
+
+static boolean checkIfAllPlayersAreVisible(int center_x, int center_y)
+{
+  int max_dx, max_dy;
+
+  setMaxCenterDistanceForAllPlayers(&max_dx, &max_dy, center_x, center_y);
+
+  return (max_dx <= SCR_FIELDX / 2 &&
+	  max_dy <= SCR_FIELDY / 2);
+}
+#endif
+
+#endif
+
+#if 1
+
+void DrawRelocateScreen(int x, int y, int move_dir, boolean center_screen,
+			boolean quick_relocation)
+{
+  boolean ffwd_delay = (tape.playing && tape.fast_forward);
+  boolean no_delay = (tape.warp_forward);
+  int frame_delay_value = (ffwd_delay ? FfwdFrameDelay : GameFrameDelay);
+  int wait_delay_value = (no_delay ? 0 : frame_delay_value);
+
+  if (quick_relocation)
+  {
+    int offset = (setup.scroll_delay ? 3 : 0);
+
+#if 0
+    if (center_screen)
+      offset = 0;
+#endif
+
+    if (!IN_VIS_FIELD(SCREENX(x), SCREENY(y)) || center_screen)
+    {
+      scroll_x = (x < SBX_Left  + MIDPOSX ? SBX_Left :
+		  x > SBX_Right + MIDPOSX ? SBX_Right :
+		  x - MIDPOSX);
+
+      scroll_y = (y < SBY_Upper + MIDPOSY ? SBY_Upper :
+		  y > SBY_Lower + MIDPOSY ? SBY_Lower :
+		  y - MIDPOSY);
+    }
+    else
+    {
+      if ((move_dir == MV_LEFT  && scroll_x > x - MIDPOSX + offset) ||
+	  (move_dir == MV_RIGHT && scroll_x < x - MIDPOSX - offset))
+	scroll_x = x - MIDPOSX + (scroll_x < x - MIDPOSX ? -offset : +offset);
+
+      if ((move_dir == MV_UP   && scroll_y > y - MIDPOSY + offset) ||
+	  (move_dir == MV_DOWN && scroll_y < y - MIDPOSY - offset))
+	scroll_y = y - MIDPOSY + (scroll_y < y - MIDPOSY ? -offset : +offset);
+
+      /* don't scroll over playfield boundaries */
+      if (scroll_x < SBX_Left || scroll_x > SBX_Right)
+	scroll_x = (scroll_x < SBX_Left ? SBX_Left : SBX_Right);
+
+      /* don't scroll over playfield boundaries */
+      if (scroll_y < SBY_Upper || scroll_y > SBY_Lower)
+	scroll_y = (scroll_y < SBY_Upper ? SBY_Upper : SBY_Lower);
+    }
+
+    RedrawPlayfield(TRUE, 0,0,0,0);
+  }
+  else
+  {
+    int scroll_xx = (x < SBX_Left  + MIDPOSX ? SBX_Left :
+		     x > SBX_Right + MIDPOSX ? SBX_Right :
+		     x - MIDPOSX);
+
+    int scroll_yy = (y < SBY_Upper + MIDPOSY ? SBY_Upper :
+		     y > SBY_Lower + MIDPOSY ? SBY_Lower :
+		     y - MIDPOSY);
+
+    ScrollScreen(NULL, SCROLL_GO_ON);	/* scroll last frame to full tile */
+
+    while (scroll_x != scroll_xx || scroll_y != scroll_yy)
+    {
+      int dx = 0, dy = 0;
+      int fx = FX, fy = FY;
+
+      dx = (scroll_xx < scroll_x ? +1 : scroll_xx > scroll_x ? -1 : 0);
+      dy = (scroll_yy < scroll_y ? +1 : scroll_yy > scroll_y ? -1 : 0);
+
+      if (dx == 0 && dy == 0)		/* no scrolling needed at all */
+	break;
+
+      scroll_x -= dx;
+      scroll_y -= dy;
+
+      fx += dx * TILEX / 2;
+      fy += dy * TILEY / 2;
+
+      ScrollLevel(dx, dy);
+      DrawAllPlayers();
+
+      /* scroll in two steps of half tile size to make things smoother */
+      BlitBitmap(drawto_field, window, fx, fy, SXSIZE, SYSIZE, SX, SY);
+      FlushDisplay();
+      Delay(wait_delay_value);
+
+      /* scroll second step to align at full tile size */
+      BackToFront();
+      Delay(wait_delay_value);
+    }
+
+    DrawAllPlayers();
+    BackToFront();
+    Delay(wait_delay_value);
+  }
+}
+
+#else
+
 void DrawRelocatePlayer(struct PlayerInfo *player, boolean quick_relocation)
 {
   boolean ffwd_delay = (tape.playing && tape.fast_forward);
@@ -3237,6 +3415,8 @@ void DrawRelocatePlayer(struct PlayerInfo *player, boolean quick_relocation)
   }
 }
 
+#endif
+
 void RelocatePlayer(int jx, int jy, int el_player_raw)
 {
   int el_player = GET_PLAYER_ELEMENT(el_player_raw);
@@ -3314,8 +3494,13 @@ void RelocatePlayer(int jx, int jy, int el_player_raw)
 
 #if 1
   /* only visually relocate centered player */
+#if 1
+  DrawRelocateScreen(player->jx, player->jy, player->MovDir, FALSE,
+		     level.instant_relocation);
+#else
   if (player->index_nr == game.centered_player_nr)
     DrawRelocatePlayer(player, level.instant_relocation);
+#endif
 #else
   if (player == local_player)	/* only visually relocate local player */
     DrawRelocatePlayer(player, level.instant_relocation);
@@ -8659,7 +8844,7 @@ static void SetPlayerWaiting(struct PlayerInfo *player, boolean is_waiting)
 #if 1
     if (player->is_sleeping && player->use_murphy)
     {
-      /* special for Murphy: leaning against solid objects when sleeping */
+      /* special case for sleeping Murphy when leaning against non-free tile */
 
       if (!IN_LEV_FIELD(player->jx - 1, player->jy) ||
 	  Feld[player->jx - 1][player->jy] != EL_EMPTY)
@@ -8902,25 +9087,69 @@ void GameActions()
 
   InitPlayfieldScanModeVars();
 
-  if (ScreenMovPos == 0)	/* screen currently aligned at tile position */
+  if (game.set_centered_player)
   {
+    boolean all_players_fit_to_screen = checkIfAllPlayersFitToScreen_RND();
+
+    /* switching to "all players" only possible if all players fit to screen */
+    if (game.centered_player_nr_next == -1 && !all_players_fit_to_screen)
+    {
+      game.centered_player_nr_next = game.centered_player_nr;
+      game.set_centered_player = FALSE;
+    }
+
+    /* do not switch focus to non-existing (or non-active) player */
+    if (game.centered_player_nr_next >= 0 &&
+	!stored_player[game.centered_player_nr_next].active)
+    {
+      game.centered_player_nr_next = game.centered_player_nr;
+      game.set_centered_player = FALSE;
+    }
+  }
+
+  if (game.set_centered_player &&
+      ScreenMovPos == 0)	/* screen currently aligned at tile position */
+  {
+#if 0
     struct PlayerInfo *player;
     int player_nr = game.centered_player_nr_next;
+#endif
+    int sx, sy;
 
     if (game.centered_player_nr_next == -1)
-      player_nr = local_player->index_nr;
+    {
+      setScreenCenteredToAllPlayers(&sx, &sy);
+    }
+    else
+    {
+      sx = stored_player[game.centered_player_nr_next].jx;
+      sy = stored_player[game.centered_player_nr_next].jy;
+    }
 
+#if 0
     player = &stored_player[player_nr];
 
     if (!player->active)
       game.centered_player_nr_next = game.centered_player_nr;
 
+    sx = player->jx;
+    sy = player->jy;
+#endif
+
+#if 0
     if (game.centered_player_nr != game.centered_player_nr_next)
+#endif
     {
+#if 1
+      DrawRelocateScreen(sx, sy, MV_NONE, TRUE, setup.quick_switch);
+#else
       DrawRelocatePlayer(player, setup.quick_switch);
+#endif
 
       game.centered_player_nr = game.centered_player_nr_next;
     }
+
+    game.set_centered_player = FALSE;
   }
 
 #if USE_ONE_MORE_CHANGE_PER_FRAME

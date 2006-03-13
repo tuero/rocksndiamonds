@@ -574,7 +574,7 @@ void DrawRelocatePlayer(struct PlayerInfo *player, boolean quick_relocation)
 }
 #endif
 
-void setMinimalPlayerBoundaries(int *sx1, int *sy1, int *sx2, int *sy2)
+static void setMinimalPlayerBoundaries(int *sx1, int *sy1, int *sx2, int *sy2)
 {
   boolean num_checked_players = 0;
   int i;
@@ -614,7 +614,7 @@ boolean checkIfAllPlayersFitToScreen()
 	  sy2 - sy1 <= SCR_FIELDY * TILEY);
 }
 
-void setScreenCenteredToAllPlayers(int *sx, int *sy)
+static void setScreenCenteredToAllPlayers(int *sx, int *sy)
 {
   int sx1 = screen_x, sy1 = screen_y, sx2 = screen_x, sy2 = screen_y;
 
@@ -624,8 +624,8 @@ void setScreenCenteredToAllPlayers(int *sx, int *sy)
   *sy = (sy1 + sy2) / 2;
 }
 
-void setMaxCenterDistanceForAllPlayers(int *max_dx, int *max_dy,
-				       int center_x, int center_y)
+static void setMaxCenterDistanceForAllPlayers(int *max_dx, int *max_dy,
+					      int center_x, int center_y)
 {
   int sx1 = center_x, sy1 = center_y, sx2 = center_x, sy2 = center_y;
 
@@ -635,7 +635,7 @@ void setMaxCenterDistanceForAllPlayers(int *max_dx, int *max_dy,
   *max_dy = MAX(ABS(sy1 - center_y), ABS(sy2 - center_y));
 }
 
-boolean checkIfAllPlayersAreVisible(int center_x, int center_y)
+static boolean checkIfAllPlayersAreVisible(int center_x, int center_y)
 {
   int max_dx, max_dy;
 
@@ -650,12 +650,12 @@ void RedrawPlayfield_EM(boolean force_redraw)
 #if 0
   boolean all_players_visible = checkIfAllPlayersAreVisible();
 #endif
-  boolean all_players_fit_to_screen = checkIfAllPlayersFitToScreen();
   boolean draw_new_player_location = FALSE;
   boolean quick_relocation = setup.quick_switch;
 #if 0
   boolean scrolling = (screen_x % TILEX != 0 || screen_y % TILEY != 0);
 #endif
+  boolean set_centered_player = getSetCenteredPlayer_EM();
   int centered_player_nr_next = getCenteredPlayerNr_EM();
   int offset = (setup.scroll_delay ? 3 : 0) * TILEX;
   int offset_x = offset;
@@ -665,12 +665,29 @@ void RedrawPlayfield_EM(boolean force_redraw)
   int x, y, sx, sy;
   int i;
 
-  /* switching to "all players" only possible if all players fit to screen */
-  if (centered_player_nr_next == -1 && !all_players_fit_to_screen)
+  if (set_centered_player)
   {
-    setCenteredPlayerNr_EM(centered_player_nr);
+    boolean all_players_fit_to_screen = checkIfAllPlayersFitToScreen();
 
-    centered_player_nr_next = centered_player_nr;
+    /* switching to "all players" only possible if all players fit to screen */
+    if (centered_player_nr_next == -1 && !all_players_fit_to_screen)
+    {
+      centered_player_nr_next = centered_player_nr;
+      setCenteredPlayerNr_EM(centered_player_nr);
+
+      set_centered_player = FALSE;
+      setSetCenteredPlayer_EM(FALSE);
+    }
+
+    /* do not switch focus to non-existing (or non-active) player */
+    if (centered_player_nr_next >= 0 && !ply[centered_player_nr_next].alive)
+    {
+      centered_player_nr_next = centered_player_nr;
+      setCenteredPlayerNr_EM(centered_player_nr);
+
+      set_centered_player = FALSE;
+      setSetCenteredPlayer_EM(FALSE);
+    }
   }
 
 #if 1
@@ -679,12 +696,18 @@ void RedrawPlayfield_EM(boolean force_redraw)
   if (!scrolling)	/* screen currently aligned at tile position */
 #endif
   {
+#if 1
+    if (set_centered_player)
+#else
     if (centered_player_nr != centered_player_nr_next)
+#endif
     {
       centered_player_nr = centered_player_nr_next;
 
       draw_new_player_location = TRUE;
       force_redraw = TRUE;
+
+      setSetCenteredPlayer_EM(FALSE);
     }
   }
 
@@ -704,6 +727,19 @@ void RedrawPlayfield_EM(boolean force_redraw)
   {
     sx = PLAYER_SCREEN_X(centered_player_nr);
     sy = PLAYER_SCREEN_Y(centered_player_nr);
+  }
+
+  if (draw_new_player_location && quick_relocation)
+  {
+    screen_x = VALID_SCREEN_X(sx);
+    screen_y = VALID_SCREEN_Y(sy);
+    screen_x_old = screen_x;
+    screen_y_old = screen_y;
+
+#if 0
+    offset_x = 0;
+    offset_y = 0;
+#endif
   }
 
   if (draw_new_player_location && !quick_relocation)

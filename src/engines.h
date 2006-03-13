@@ -27,7 +27,9 @@ extern void DrawAllGameValues(int, int, int, int, int);
 
 extern void setCenteredPlayerNr_EM(int);
 extern int getCenteredPlayerNr_EM();
-extern int getActivePlayers_EM();
+extern void setSetCenteredPlayer_EM(boolean);
+extern boolean getSetCenteredPlayer_EM();
+extern int getNumActivePlayers_EM();
 extern int getGameFrameDelay_EM(int);
 
 extern void PlayLevelSound_EM(int, int, int, int);

@@ -2104,6 +2104,7 @@ struct GameInfo
   /* values for special game control */
   int centered_player_nr;
   int centered_player_nr_next;
+  boolean set_centered_player;
 };
 
 struct GlobalInfo

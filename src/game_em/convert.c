@@ -975,7 +975,7 @@ void prepare_em_level(void)
     }
   }
 
-  num_tape_players = getActivePlayers_EM();
+  num_tape_players = getNumActivePlayers_EM();
 
   if (num_tape_players != -1)
     lev.home_initial = MIN(lev.home_initial, num_tape_players);
