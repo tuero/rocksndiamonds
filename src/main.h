@@ -765,10 +765,6 @@
 #define EL_NAME(e)		((e) >= 0 ? element_info[e].token_name : "(?)")
 
 /* fundamental game speed values */
-#define ONE_SECOND_DELAY	1000	/* delay value for one second */
-#define GAME_FRAME_DELAY	20	/* frame delay in milliseconds */
-#define FFWD_FRAME_DELAY	10	/* 200% speed for fast forward */
-#define FRAMES_PER_SECOND	(ONE_SECOND_DELAY / GAME_FRAME_DELAY)
 #define MICROLEVEL_SCROLL_DELAY	50	/* delay for scrolling micro level */
 #define MICROLEVEL_LABEL_DELAY	250	/* delay for micro level label */
 
@@ -776,13 +772,14 @@
 #define MAX_LEVEL_NAME_LEN	32
 #define MAX_LEVEL_AUTHOR_LEN	32
 #define MAX_ELEMENT_NAME_LEN	32
-#define MAX_TAPE_LEN		(1000 * FRAMES_PER_SECOND) /* max.time x fps */
 #define MAX_TAPES_PER_SET	1024
 #define MAX_SCORE_ENTRIES	100
 #define MAX_NUM_AMOEBA		100
+#if 0	/* game.h */
 #define MAX_INVENTORY_SIZE	1000
 #define STD_NUM_KEYS		4
 #define MAX_NUM_KEYS		8
+#endif
 #define NUM_BELTS		4
 #define NUM_BELT_PARTS		3
 #define MIN_ENVELOPE_XSIZE	1
@@ -1785,107 +1782,6 @@ struct Content
   int e[3][3];
 };
 
-struct PlayerInfo
-{
-  boolean present;		/* player present in level playfield */
-  boolean connected;		/* player connected (locally or via network) */
-  boolean active;		/* player present and connected */
-
-  int index_nr;			/* player number (0 to 3) */
-  int index_bit;		/* player number bit (1 << 0 to 1 << 3) */
-  int element_nr;		/* element (EL_PLAYER_1 to EL_PLAYER_4) */
-  int client_nr;		/* network client identifier */
-
-  byte action;			/* action from local input device */
-  byte effective_action;	/* action acknowledged from network server
-				   or summarized over all configured input
-				   devices when in single player mode */
-  byte programmed_action;	/* action forced by game itself (like moving
-				   through doors); overrides other actions */
-
-  int jx, jy, last_jx, last_jy;
-  int MovDir, MovPos, GfxDir, GfxPos;
-  int Frame, StepFrame;
-
-  int GfxAction;
-
-  boolean use_murphy;
-  int artwork_element;
-
-  boolean block_last_field;
-  int block_delay_adjustment;	/* needed for different engine versions */
-
-  boolean can_fall_into_acid;
-
-  boolean LevelSolved, GameOver;
-
-  int last_move_dir;
-
-  boolean is_waiting;
-  boolean is_moving;
-  boolean is_auto_moving;
-  boolean is_digging;
-  boolean is_snapping;
-  boolean is_collecting;
-  boolean is_pushing;
-  boolean is_switching;
-  boolean is_dropping;
-  boolean is_dropping_pressed;
-
-  boolean is_bored;
-  boolean is_sleeping;
-
-  boolean cannot_move;
-
-  int frame_counter_bored;
-  int frame_counter_sleeping;
-
-  int anim_delay_counter;
-  int post_delay_counter;
-
-  int dir_waiting;
-  int action_waiting, last_action_waiting;
-  int special_action_bored;
-  int special_action_sleeping;
-
-  int num_special_action_bored;
-  int num_special_action_sleeping;
-
-  int switch_x, switch_y;
-  int drop_x, drop_y;
-
-  int show_envelope;
-
-  int move_delay;
-  int move_delay_value;
-  int move_delay_value_next;
-  int move_delay_reset_counter;
-
-  int push_delay;
-  int push_delay_value;
-
-  unsigned long actual_frame_counter;
-
-  int drop_delay;
-  int drop_pressed_delay;
-
-  int step_counter;
-
-  int score;
-  int gems_still_needed;
-  int sokobanfields_still_needed;
-  int lights_still_needed;
-  int friends_still_needed;
-  int key[MAX_NUM_KEYS];
-  int dynabomb_count, dynabomb_size, dynabombs_left, dynabomb_xl;
-  int shield_normal_time_left;
-  int shield_deadly_time_left;
-
-  int inventory_element[MAX_INVENTORY_SIZE];
-  int inventory_infinite_element;
-  int inventory_size;
-};
-
 struct LevelSetInfo
 {
   int music[MAX_LEVELS];
@@ -2012,99 +1908,6 @@ struct LevelInfo
   boolean no_valid_file;	/* set when level file missing or invalid */
 
   boolean changed;		/* set when level was changed in the editor */
-};
-
-struct TapeInfo
-{
-  int file_version;	/* file format version the tape is stored with    */
-  int game_version;	/* game release version the tape was created with */
-  int engine_version;	/* game engine version the tape was recorded with */
-
-  char *level_identifier;
-  int level_nr;
-  unsigned long random_seed;
-  unsigned long date;
-  unsigned long counter;
-  unsigned long length;
-  unsigned long length_seconds;
-  unsigned int delay_played;
-  boolean pause_before_death;
-  boolean recording, playing, pausing;
-  boolean fast_forward;
-  boolean warp_forward;
-  boolean deactivate_display;
-  boolean auto_play;
-  boolean auto_play_level_solved;
-  boolean quick_resume;
-  boolean single_step;
-  boolean changed;
-  boolean player_participates[MAX_PLAYERS];
-  int num_participating_players;
-
-  struct
-  {
-    byte action[MAX_PLAYERS];
-    byte delay;
-  } pos[MAX_TAPE_LEN];
-
-  boolean no_valid_file;	/* set when tape file missing or invalid */
-};
-
-struct GameInfo
-{
-  /* values for engine initialization */
-  int default_push_delay_fixed;
-  int default_push_delay_random;
-
-  /* constant within running game */
-  int engine_version;
-  int emulation;
-  int initial_move_delay;
-  int initial_move_delay_value;
-  int initial_push_delay_value;
-
-  /* flags to handle bugs in and changes between different engine versions */
-  /* (for the latest engine version, these flags should always be "FALSE") */
-  boolean use_change_when_pushing_bug;
-  boolean use_block_last_field_bug;
-  boolean max_num_changes_per_frame;
-  boolean use_reverse_scan_direction;
-
-  /* variable within running game */
-  int yamyam_content_nr;
-  boolean magic_wall_active;
-  int magic_wall_time_left;
-  int light_time_left;
-  int timegate_time_left;
-  int belt_dir[4];
-  int belt_dir_nr[4];
-  int switchgate_pos;
-  int wind_direction;
-  boolean gravity;
-  boolean explosions_delayed;
-  boolean envelope_active;
-
-#if 1
-  /* values for the new EMC elements */
-  int lenses_time_left;
-  int magnify_time_left;
-  boolean ball_state;
-  int ball_content_nr;
-#endif
-
-  /* values for player idle animation (no effect on engine) */
-  int player_boring_delay_fixed;
-  int player_boring_delay_random;
-  int player_sleeping_delay_fixed;
-  int player_sleeping_delay_random;
-
-  /* values for special game initialization control */
-  boolean restart_level;
-
-  /* values for special game control */
-  int centered_player_nr;
-  int centered_player_nr_next;
-  boolean set_centered_player;
 };
 
 struct GlobalInfo
@@ -2505,10 +2308,8 @@ extern int			graphics_action_mapping[];
 
 extern struct LevelSetInfo	levelset;
 extern struct LevelInfo		level, level_template;
-extern struct PlayerInfo	stored_player[], *local_player;
 extern struct HiScore		highscore[];
 extern struct TapeInfo		tape;
-extern struct GameInfo		game;
 extern struct GlobalInfo	global;
 extern struct MenuInfo		menu;
 extern struct DoorInfo		door_1, door_2;

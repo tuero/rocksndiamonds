@@ -333,6 +333,32 @@ static void PlayLevelMusic();
 static void MapGameButtons();
 static void HandleGameButtons(struct GadgetInfo *);
 
+int AmoebeNachbarNr(int, int);
+void AmoebeUmwandeln(int, int);
+void ContinueMoving(int, int);
+void Bang(int, int);
+void InitMovDir(int, int);
+void InitAmoebaNr(int, int);
+int NewHiScore(void);
+
+void TestIfGoodThingHitsBadThing(int, int, int);
+void TestIfBadThingHitsGoodThing(int, int, int);
+void TestIfPlayerTouchesBadThing(int, int);
+void TestIfPlayerRunsIntoBadThing(int, int, int);
+void TestIfBadThingTouchesPlayer(int, int);
+void TestIfBadThingRunsIntoPlayer(int, int, int);
+void TestIfFriendTouchesBadThing(int, int);
+void TestIfBadThingTouchesFriend(int, int);
+void TestIfBadThingTouchesOtherBadThing(int, int);
+
+void KillPlayer(struct PlayerInfo *);
+void BuryPlayer(struct PlayerInfo *);
+void RemovePlayer(struct PlayerInfo *);
+
+boolean SnapField(struct PlayerInfo *, int, int);
+boolean DropElement(struct PlayerInfo *);
+
+
 static struct GadgetInfo *game_gadget[NUM_GAME_BUTTONS];
 
 
@@ -689,6 +715,18 @@ static int playfield_scan_delta_y = 1;
 				for ((x) = playfield_scan_start_x;	\
 				     (x) >= 0 && (x) <= lev_fieldx - 1;	\
 				     (x) += playfield_scan_delta_x)	\
+
+#ifdef DEBUG
+void DEBUG_SetMaximumDynamite()
+{
+  int i;
+
+  for (i = 0; i < MAX_INVENTORY_SIZE; i++)
+    if (local_player->inventory_size < MAX_INVENTORY_SIZE)
+      local_player->inventory_element[local_player->inventory_size++] =
+	EL_DYNAMITE;
+}
+#endif
 
 static void InitPlayfieldScanModeVars()
 {
@@ -8847,10 +8885,12 @@ static void SetPlayerWaiting(struct PlayerInfo *player, boolean is_waiting)
       /* special case for sleeping Murphy when leaning against non-free tile */
 
       if (!IN_LEV_FIELD(player->jx - 1, player->jy) ||
-	  Feld[player->jx - 1][player->jy] != EL_EMPTY)
+	  (Feld[player->jx - 1][player->jy] != EL_EMPTY &&
+	   !IS_MOVING(player->jx - 1, player->jy)))
 	move_dir = MV_LEFT;
       else if (!IN_LEV_FIELD(player->jx + 1, player->jy) ||
-	       Feld[player->jx + 1][player->jy] != EL_EMPTY)
+	       (Feld[player->jx + 1][player->jy] != EL_EMPTY &&
+		!IS_MOVING(player->jx + 1, player->jy)))
 	move_dir = MV_RIGHT;
       else
 	player->is_sleeping = FALSE;
@@ -9087,6 +9127,7 @@ void GameActions()
 
   InitPlayfieldScanModeVars();
 
+#if 0
   if (game.set_centered_player)
   {
     boolean all_players_fit_to_screen = checkIfAllPlayersFitToScreen_RND();
@@ -9151,6 +9192,7 @@ void GameActions()
 
     game.set_centered_player = FALSE;
   }
+#endif
 
 #if USE_ONE_MORE_CHANGE_PER_FRAME
   if (game.engine_version >= VERSION_IDENT(3,2,0,7))
@@ -9184,6 +9226,79 @@ void GameActions()
     return;
 
   recorded_player_action = (tape.playing ? TapePlayAction() : NULL);
+
+#if 1
+  if (tape.set_centered_player)
+  {
+    game.centered_player_nr_next = tape.centered_player_nr_next;
+    game.set_centered_player = TRUE;
+  }
+
+  if (game.set_centered_player)
+  {
+    boolean all_players_fit_to_screen = checkIfAllPlayersFitToScreen_RND();
+
+    /* switching to "all players" only possible if all players fit to screen */
+    if (game.centered_player_nr_next == -1 && !all_players_fit_to_screen)
+    {
+      game.centered_player_nr_next = game.centered_player_nr;
+      game.set_centered_player = FALSE;
+    }
+
+    /* do not switch focus to non-existing (or non-active) player */
+    if (game.centered_player_nr_next >= 0 &&
+	!stored_player[game.centered_player_nr_next].active)
+    {
+      game.centered_player_nr_next = game.centered_player_nr;
+      game.set_centered_player = FALSE;
+    }
+  }
+
+  if (game.set_centered_player &&
+      ScreenMovPos == 0)	/* screen currently aligned at tile position */
+  {
+#if 0
+    struct PlayerInfo *player;
+    int player_nr = game.centered_player_nr_next;
+#endif
+    int sx, sy;
+
+    if (game.centered_player_nr_next == -1)
+    {
+      setScreenCenteredToAllPlayers(&sx, &sy);
+    }
+    else
+    {
+      sx = stored_player[game.centered_player_nr_next].jx;
+      sy = stored_player[game.centered_player_nr_next].jy;
+    }
+
+#if 0
+    player = &stored_player[player_nr];
+
+    if (!player->active)
+      game.centered_player_nr_next = game.centered_player_nr;
+
+    sx = player->jx;
+    sy = player->jy;
+#endif
+
+#if 0
+    if (game.centered_player_nr != game.centered_player_nr_next)
+#endif
+    {
+#if 1
+      DrawRelocateScreen(sx, sy, MV_NONE, TRUE, setup.quick_switch);
+#else
+      DrawRelocatePlayer(player, setup.quick_switch);
+#endif
+
+      game.centered_player_nr = game.centered_player_nr_next;
+    }
+
+    game.set_centered_player = FALSE;
+  }
+#endif
 
 #if 1
   /* !!! CHECK THIS (tape.pausing is always FALSE here!) !!! */

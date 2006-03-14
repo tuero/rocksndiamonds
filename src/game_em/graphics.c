@@ -40,10 +40,12 @@ static int crumbled_state[MAX_BUF_YSIZE][MAX_BUF_XSIZE];
 
 static boolean redraw[MAX_BUF_XSIZE][MAX_BUF_YSIZE];
 
+#if 0
 #if 1
 int centered_player_nr;
 #else
 static int centered_player_nr;
+#endif
 #endif
 
 /* copy the entire screen to the window at the scroll position */
@@ -458,9 +460,11 @@ void game_initscreen(void)
 
   frame = 6;
 
-  centered_player_nr = getCenteredPlayerNr_EM();
+#if 0
+  game.centered_player_nr = getCenteredPlayerNr_EM();
+#endif
 
-  player_nr = (centered_player_nr != -1 ? centered_player_nr : 0);
+  player_nr = (game.centered_player_nr != -1 ? game.centered_player_nr : 0);
 
   screen_x = VALID_SCREEN_X(PLAYER_SCREEN_X(player_nr));
   screen_y = VALID_SCREEN_Y(PLAYER_SCREEN_Y(player_nr));
@@ -655,8 +659,10 @@ void RedrawPlayfield_EM(boolean force_redraw)
 #if 0
   boolean scrolling = (screen_x % TILEX != 0 || screen_y % TILEY != 0);
 #endif
-  boolean set_centered_player = getSetCenteredPlayer_EM();
-  int centered_player_nr_next = getCenteredPlayerNr_EM();
+#if 0
+  boolean game.set_centered_player = getSetCenteredPlayer_EM();
+  int game.centered_player_nr_next = getCenteredPlayerNr_EM();
+#endif
   int offset = (setup.scroll_delay ? 3 : 0) * TILEX;
   int offset_x = offset;
   int offset_y = offset;
@@ -665,28 +671,23 @@ void RedrawPlayfield_EM(boolean force_redraw)
   int x, y, sx, sy;
   int i;
 
-  if (set_centered_player)
+  if (game.set_centered_player)
   {
     boolean all_players_fit_to_screen = checkIfAllPlayersFitToScreen();
 
     /* switching to "all players" only possible if all players fit to screen */
-    if (centered_player_nr_next == -1 && !all_players_fit_to_screen)
+    if (game.centered_player_nr_next == -1 && !all_players_fit_to_screen)
     {
-      centered_player_nr_next = centered_player_nr;
-      setCenteredPlayerNr_EM(centered_player_nr);
-
-      set_centered_player = FALSE;
-      setSetCenteredPlayer_EM(FALSE);
+      game.centered_player_nr_next = game.centered_player_nr;
+      game.set_centered_player = FALSE;
     }
 
     /* do not switch focus to non-existing (or non-active) player */
-    if (centered_player_nr_next >= 0 && !ply[centered_player_nr_next].alive)
+    if (game.centered_player_nr_next >= 0 &&
+	!ply[game.centered_player_nr_next].alive)
     {
-      centered_player_nr_next = centered_player_nr;
-      setCenteredPlayerNr_EM(centered_player_nr);
-
-      set_centered_player = FALSE;
-      setSetCenteredPlayer_EM(FALSE);
+      game.centered_player_nr_next = game.centered_player_nr;
+      game.set_centered_player = FALSE;
     }
   }
 
@@ -697,21 +698,21 @@ void RedrawPlayfield_EM(boolean force_redraw)
 #endif
   {
 #if 1
-    if (set_centered_player)
+    if (game.set_centered_player)
 #else
-    if (centered_player_nr != centered_player_nr_next)
+    if (game.centered_player_nr != game.centered_player_nr_next)
 #endif
     {
-      centered_player_nr = centered_player_nr_next;
+      game.centered_player_nr = game.centered_player_nr_next;
 
       draw_new_player_location = TRUE;
       force_redraw = TRUE;
 
-      setSetCenteredPlayer_EM(FALSE);
+      game.set_centered_player = FALSE;
     }
   }
 
-  if (centered_player_nr == -1)
+  if (game.centered_player_nr == -1)
   {
     if (draw_new_player_location)
     {
@@ -725,8 +726,8 @@ void RedrawPlayfield_EM(boolean force_redraw)
   }
   else
   {
-    sx = PLAYER_SCREEN_X(centered_player_nr);
-    sy = PLAYER_SCREEN_Y(centered_player_nr);
+    sx = PLAYER_SCREEN_X(game.centered_player_nr);
+    sy = PLAYER_SCREEN_Y(game.centered_player_nr);
   }
 
   if (draw_new_player_location && quick_relocation)
@@ -881,7 +882,7 @@ void RedrawPlayfield_EM(boolean force_redraw)
   }
 
   /* prevent scrolling away from the other players when focus on all players */
-  if (centered_player_nr == -1)
+  if (game.centered_player_nr == -1)
   {
 #if 1
     /* check if all players are still visible with new scrolling position */

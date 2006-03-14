@@ -16,6 +16,7 @@
 #include "main.h"
 #include "init.h"
 #include "game.h"
+#include "tape.h"
 #include "events.h"
 #include "config.h"
 

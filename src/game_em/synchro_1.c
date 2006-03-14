@@ -11,7 +11,10 @@
 #include "display.h"
 
 
+#if 0
 extern int centered_player_nr;
+#endif
+
 extern boolean checkIfAllPlayersFitToScreen();
 
 static void check_player(struct PLAYER *);
@@ -551,7 +554,8 @@ static void check_player(struct PLAYER *ply)
     ply->x = x;
     ply->y = y;
 
-    can_move = (centered_player_nr != -1 || checkIfAllPlayersFitToScreen());
+    can_move = (game.centered_player_nr != -1 ||
+		checkIfAllPlayersFitToScreen());
 
     ply->x = oldx;
     ply->y = oldy;

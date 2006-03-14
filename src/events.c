@@ -544,10 +544,7 @@ static void HandleKeysSpecial(Key key)
   {
 #ifdef DEBUG
     if (is_string_suffix(cheat_input, ".q"))
-      for (i = 0; i < MAX_INVENTORY_SIZE; i++)
-	if (local_player->inventory_size < MAX_INVENTORY_SIZE)
-	  local_player->inventory_element[local_player->inventory_size++] =
-	    EL_DYNAMITE;
+      DEBUG_SetMaximumDynamite();
 #endif
   }
   else if (game_status == GAME_MODE_EDITOR)
@@ -713,6 +710,12 @@ void HandleKey(Key key, int key_status)
     {
       game.centered_player_nr_next = centered_player_nr_next;
       game.set_centered_player = TRUE;
+
+      if (tape.recording)
+      {
+	tape.centered_player_nr_next = game.centered_player_nr_next;
+	tape.set_centered_player = TRUE;
+      }
     }
   }
 

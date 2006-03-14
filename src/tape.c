@@ -485,6 +485,9 @@ void TapeErase()
 
   for (i = 0; i < MAX_PLAYERS; i++)
     tape.player_participates[i] = FALSE;
+
+  tape.centered_player_nr_next = -1;
+  tape.set_centered_player = FALSE;
 }
 
 static void TapeRewind()
@@ -501,6 +504,9 @@ static void TapeRewind()
   tape.auto_play_level_solved = FALSE;
   tape.quick_resume = FALSE;
   tape.single_step = FALSE;
+
+  tape.centered_player_nr_next = -1;
+  tape.set_centered_player = FALSE;
 
   InitRND(tape.random_seed);
 }
@@ -585,8 +591,9 @@ void TapeStopRecording()
   MapTapeEjectButton();
 }
 
-void TapeRecordAction(byte action[MAX_PLAYERS])
+void TapeRecordAction(byte action_raw[MAX_PLAYERS])
 {
+  byte action[MAX_PLAYERS];
   int i;
 
   if (!tape.recording)		/* (record action even when tape is paused) */
@@ -596,6 +603,19 @@ void TapeRecordAction(byte action[MAX_PLAYERS])
   {
     TapeStopRecording();
     return;
+  }
+
+  for (i = 0; i < MAX_PLAYERS; i++)
+    action[i] = action_raw[i];
+
+  if (tape.set_centered_player)
+  {
+    for (i = 0; i < MAX_PLAYERS; i++)
+      if (tape.centered_player_nr_next == i ||
+	  tape.centered_player_nr_next == -1)
+	action[i] |= SET_FOCUS;
+
+    tape.set_centered_player = FALSE;
   }
 
   if (tape.pos[tape.counter].delay > 0)		/* already stored action */
@@ -777,6 +797,21 @@ byte *TapePlayAction()
 
   for (i = 0; i < MAX_PLAYERS; i++)
     action[i] = tape.pos[tape.counter].action[i];
+
+  tape.set_centered_player = FALSE;
+  tape.centered_player_nr_next = -999;
+
+  for (i = 0; i < MAX_PLAYERS; i++)
+  {
+    if (action[i] & SET_FOCUS)
+    {
+      tape.set_centered_player = TRUE;
+      tape.centered_player_nr_next =
+	(tape.centered_player_nr_next == -999 ? i : -1);
+    }
+
+    action[i] &= ~SET_FOCUS;
+  }
 
   tape.delay_played++;
   if (tape.delay_played >= tape.pos[tape.counter].delay)

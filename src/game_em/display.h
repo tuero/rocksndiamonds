@@ -42,7 +42,10 @@
 #define SYSIZE			(SCR_FIELDY * TILEY)
 
 #if 1
+
+#if 0
 #define FRAMES_PER_SECOND	50
+#endif
 
 #define ROUNDED_DIVIDE(x, y)	(((x) + (y) - 1) / (y))
 

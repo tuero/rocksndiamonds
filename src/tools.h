@@ -15,6 +15,7 @@
 #define TOOLS_H
 
 #include "main.h"
+#include "game.h"
 
 /* for SetDrawtoField */
 #define DRAW_DIRECT		0

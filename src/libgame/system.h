@@ -112,6 +112,9 @@
 #define BUTTON_1			4
 #define BUTTON_2			5
 
+/* values for special "focus player" bitmasks */
+#define BIT_SET_FOCUS			6
+
 /* values for move directions and special "button" key bitmasks */
 #define MV_NONE			0
 #define MV_LEFT			(1 << MV_BIT_LEFT)
@@ -135,6 +138,8 @@
 #define KEY_MOTION		(MV_LEFT | MV_RIGHT | MV_UP | MV_DOWN)
 #define KEY_BUTTON		(KEY_BUTTON_1 | KEY_BUTTON_2)
 #define KEY_ACTION		(KEY_MOTION | KEY_BUTTON)
+
+#define SET_FOCUS		(1 << BIT_SET_FOCUS)
 
 #define MV_DIR_FROM_BIT(x)	((x) < NUM_DIRECTIONS ? 1 << (x) :	  \
 				 (x) == MV_BIT_UPLEFT    ? MV_UPLEFT    : \
@@ -218,6 +223,11 @@
 #define CURSOR_DEFAULT		0
 #define CURSOR_PLAYFIELD	1
 
+/* fundamental game speed values */
+#define ONE_SECOND_DELAY	1000	/* delay value for one second */
+#define GAME_FRAME_DELAY	20	/* frame delay in milliseconds */
+#define FFWD_FRAME_DELAY	10	/* 200% speed for fast forward */
+#define FRAMES_PER_SECOND	(ONE_SECOND_DELAY / GAME_FRAME_DELAY)
 
 /* maximum playfield size supported by libgame functions */
 #define MAX_PLAYFIELD_WIDTH	128

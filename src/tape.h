@@ -14,12 +14,13 @@
 #ifndef TAPE_H
 #define TAPE_H
 
-#include "main.h"
-
 
 /* values for TapeTogglePause() */
 #define	TAPE_TOGGLE_MANUAL	TRUE
 #define	TAPE_TOGGLE_AUTOMATIC	FALSE
+
+/* values for tape properties */
+#define MAX_TAPE_LEN		(1000 * FRAMES_PER_SECOND) /* max.time x fps */
 
 /* some positions in the video tape control window */
 #define VIDEO_DISPLAY1_XPOS	5
@@ -90,6 +91,45 @@
 #define VIDEO_DISPLAY_DEFAULT		0
 #define VIDEO_DISPLAY_LABEL_ONLY	-1
 #define VIDEO_DISPLAY_SYMBOL_ONLY	-2
+
+
+struct TapeInfo
+{
+  int file_version;	/* file format version the tape is stored with    */
+  int game_version;	/* game release version the tape was created with */
+  int engine_version;	/* game engine version the tape was recorded with */
+
+  char *level_identifier;
+  int level_nr;
+  unsigned long random_seed;
+  unsigned long date;
+  unsigned long counter;
+  unsigned long length;
+  unsigned long length_seconds;
+  unsigned int delay_played;
+  boolean pause_before_death;
+  boolean recording, playing, pausing;
+  boolean fast_forward;
+  boolean warp_forward;
+  boolean deactivate_display;
+  boolean auto_play;
+  boolean auto_play_level_solved;
+  boolean quick_resume;
+  boolean single_step;
+  boolean changed;
+  boolean player_participates[MAX_PLAYERS];
+  int num_participating_players;
+  int centered_player_nr_next;
+  boolean set_centered_player;
+
+  struct
+  {
+    byte action[MAX_PLAYERS];
+    byte delay;
+  } pos[MAX_TAPE_LEN];
+
+  boolean no_valid_file;	/* set when tape file missing or invalid */
+};
 
 
 void DrawVideoDisplay(unsigned long, unsigned long);

@@ -5125,6 +5125,7 @@ int font2baseimg(int font_nr)
   return font_info[font_nr].special_graphic[GFX_SPECIAL_ARG_DEFAULT];
 }
 
+#if 0
 void setCenteredPlayerNr_EM(int centered_player_nr)
 {
   game.centered_player_nr = game.centered_player_nr_next = centered_player_nr;
@@ -5153,6 +5154,7 @@ boolean getSetCenteredPlayer_EM()
 {
   return game.set_centered_player;
 }
+#endif
 
 int getNumActivePlayers_EM()
 {
