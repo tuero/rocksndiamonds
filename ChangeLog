@@ -1,3 +1,6 @@
+2006-03-18
+	* fixed bug in multi-player movement with focus on both players
+
 2006-03-14
 	* added player focus switching to level tape recording and re-playing
 

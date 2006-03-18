@@ -578,6 +578,34 @@ void DrawRelocatePlayer(struct PlayerInfo *player, boolean quick_relocation)
 }
 #endif
 
+static int getMaxCenterDistancePlayerNr(int center_x, int center_y)
+{
+  int max_dx = 0, max_dy = 0;
+  int player_nr = game_em.last_moving_player;
+  int i;
+
+  for (i = 0; i < MAX_PLAYERS; i++)
+  {
+    if (ply[i].alive)
+    {
+      int sx = PLAYER_SCREEN_X(i);
+      int sy = PLAYER_SCREEN_Y(i);
+
+      if (game_em.last_player_direction[i] != MV_NONE &&
+	  (ABS(sx - center_x) > max_dx ||
+	   ABS(sy - center_y) > max_dy))
+      {
+	max_dx = MAX(max_dx, ABS(sx - center_x));
+	max_dy = MAX(max_dy, ABS(sy - center_y));
+
+	player_nr = i;
+      }
+    }
+  }
+
+  return player_nr;
+}
+
 static void setMinimalPlayerBoundaries(int *sx1, int *sy1, int *sx2, int *sy2)
 {
   boolean num_checked_players = 0;
@@ -663,6 +691,11 @@ void RedrawPlayfield_EM(boolean force_redraw)
   boolean game.set_centered_player = getSetCenteredPlayer_EM();
   int game.centered_player_nr_next = getCenteredPlayerNr_EM();
 #endif
+#if 1
+  int player_nr = getMaxCenterDistancePlayerNr(screen_x, screen_y);
+#else
+  int player_nr = game_em.last_moving_player;
+#endif
   int offset = (setup.scroll_delay ? 3 : 0) * TILEX;
   int offset_x = offset;
   int offset_y = offset;
@@ -720,8 +753,13 @@ void RedrawPlayfield_EM(boolean force_redraw)
     }
     else
     {
+#if 1
+      sx = PLAYER_SCREEN_X(player_nr);
+      sy = PLAYER_SCREEN_Y(player_nr);
+#else
       sx = PLAYER_SCREEN_X(game_em.last_moving_player);
       sy = PLAYER_SCREEN_Y(game_em.last_moving_player);
+#endif
     }
   }
   else
@@ -918,7 +956,9 @@ void RedrawPlayfield_EM(boolean force_redraw)
   else
   {
     /* prevent scrolling against the players move direction */
+#if 0
     int player_nr = game_em.last_moving_player;
+#endif
     int player_move_dir = game_em.last_player_direction[player_nr];
     int dx = SIGN(screen_x - screen_x_old);
     int dy = SIGN(screen_y - screen_y_old);

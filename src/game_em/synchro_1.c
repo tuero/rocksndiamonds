@@ -452,6 +452,8 @@ static void check_player(struct PLAYER *ply)
   int anim = 0;
   int dx = 0, dy = 0;
 
+  game_em.last_player_direction[ply->num] = MV_NONE;
+
 #if 0
   printf("::: up == %d, down == %d, left == %d, right == %d, fire == %d [spin == %d, stick == %d]\n",
 	 ply->joy_n, ply->joy_s, ply->joy_w, ply->joy_e, ply->joy_fire,
