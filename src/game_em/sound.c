@@ -20,9 +20,6 @@
 #include <soundcard.h>
 #endif
 
-#include "global.h"
-#include "sample.h"
-
 static char audioname[] = "/dev/audio";
 
 static const int sound_priority[SAMPLE_MAX] =

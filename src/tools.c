@@ -63,6 +63,12 @@ void DumpTile(int x, int y)
   int sx = SCREENX(x);
   int sy = SCREENY(y);
 
+  if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
+  {
+    x--;
+    y--;
+  }
+
   printf_line("-", 79);
   printf("Field Info: SCREEN(%d, %d), LEVEL(%d, %d)\n", sx, sy, x, y);
   printf_line("-", 79);
@@ -5171,6 +5177,7 @@ int getNumActivePlayers_EM()
   return num_players;
 }
 
+#if 1
 int getGameFrameDelay_EM(int native_em_game_frame_delay)
 {
   int game_frame_delay_value;
@@ -5185,6 +5192,7 @@ int getGameFrameDelay_EM(int native_em_game_frame_delay)
 
   return game_frame_delay_value;
 }
+#endif
 
 unsigned int InitRND(long seed)
 {

@@ -3,9 +3,7 @@
  * graphics manipulation crap
  */
 
-#include "global.h"
-#include "display.h"
-#include "level.h"
+#include "main_em.h"
 
 #define MIN_SCREEN_XPOS		1
 #define MIN_SCREEN_YPOS		1

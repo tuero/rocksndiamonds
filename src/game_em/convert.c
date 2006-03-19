@@ -8,9 +8,7 @@
  * inconsequential, but no doubt it will break some caves.
  */
 
-#include "global.h"
-#include "tile.h"
-#include "level.h"
+#include "main_em.h"
 
 
 static unsigned char remap_v6[256] =

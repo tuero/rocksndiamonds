@@ -3,9 +3,7 @@
  * handle input from x11 and keyboard and joystick
  */
 
-#include "global.h"
-#include "display.h"
-#include "level.h"
+#include "main_em.h"
 
 
 unsigned long RandomEM;

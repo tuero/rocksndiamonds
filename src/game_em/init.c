@@ -3,18 +3,14 @@
  * open X11 display and sound
  */
 
+#include "main_em.h"
+
+
 #include <signal.h>
 
 #if !defined(TARGET_SDL)
 #include <sys/wait.h>
 #endif
-
-#include "main_em.h"
-
-#include "global.h"
-#include "display.h"
-#include "sample.h"
-#include "level.h"
 
 
 Bitmap *objBitmap;

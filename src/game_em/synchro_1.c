@@ -5,10 +5,7 @@
  * large switch statement for tiles the player interacts with.
  */
 
-#include "tile.h"
-#include "level.h"
-#include "sample.h"
-#include "display.h"
+#include "main_em.h"
 
 
 #if 0

@@ -5,9 +5,7 @@
  * this should be spread over the frames for reduced cpu load.
  */
 
-#include "tile.h"
-#include "level.h"
-#include "sample.h"
+#include "main_em.h"
 
 
 void synchro_3(void)

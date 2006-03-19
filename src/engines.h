@@ -27,13 +27,6 @@ extern void SetBitmaps_EM(Bitmap **);
 extern void UpdateEngineValues(int, int);
 extern void DrawAllGameValues(int, int, int, int, int);
 
-#if 0
-extern void setCenteredPlayerNr_EM(int);
-extern int getCenteredPlayerNr_EM();
-extern void setSetCenteredPlayer_EM(boolean);
-extern boolean getSetCenteredPlayer_EM();
-#endif
-
 extern int getNumActivePlayers_EM();
 extern int getGameFrameDelay_EM(int);
 

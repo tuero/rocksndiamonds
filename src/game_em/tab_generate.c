@@ -11,11 +11,10 @@
  * modify.
  */
 
-#include "tile.h"
-#include "display.h"
+#include "main_em.h"
 
 
-/* ---------------------------------------------------------------------- */
+/* ------------------------------------------------------------------------- */
 
 /* 0=stop 1=blank */
 int tile_blank[] =
@@ -69,7 +68,8 @@ int tile_android_move[] =
   TILE_MAX
 };
 
-/* ---------------------------------------------------------------------- */
+
+/* ------------------------------------------------------------------------- */
 
 /* explosions: special format */
 /* everything is initially filled with Xboom_1 */
@@ -152,7 +152,8 @@ int tile_explode[] =
   TILE_MAX			/* up until here are dynamite explosions */
 };
 
-/* ---------------------------------------------------------------------- */
+
+/* ------------------------------------------------------------------------- */
 
 /* map the graphics file to internal tiles and animations
  *

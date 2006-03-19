@@ -3,9 +3,7 @@
  * cave data structures
  */
 
-#include "global.h"
-#include "tile.h"
-#include "level.h"
+#include "main_em.h"
 
 
 struct LevelInfo_EM native_em_level;

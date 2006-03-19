@@ -8,10 +8,7 @@
  * compilers suck.
  */
 
-#include "display.h"
-#include "tile.h"
-#include "level.h"
-#include "sample.h"
+#include "main_em.h"
 
 
 #define RANDOM (random = random << 31 | random >> 1)
