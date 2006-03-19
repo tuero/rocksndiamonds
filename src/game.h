@@ -203,7 +203,12 @@ void Moving2Blocked(int, int, int *, int *);
 void Blocked2Moving(int, int, int *, int *);
 void DrawDynamite(int, int);
 
+void StartGameActions(boolean, boolean, long);
+
 void GameActions(void);
+void GameActions_EM_Main();
+void GameActions_RND();
+
 void ScrollLevel(int, int);
 
 void InitPlayLevelSound();

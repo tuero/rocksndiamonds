@@ -33,7 +33,7 @@ extern void em_close_all();
 
 extern void InitGameEngine_EM();
 #if 1
-extern void GameActions_EM(byte *);
+extern void GameActions_EM(byte *, boolean);
 #else
 extern void GameActions_EM(byte);
 #endif

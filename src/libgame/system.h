@@ -139,7 +139,7 @@
 #define KEY_BUTTON		(KEY_BUTTON_1 | KEY_BUTTON_2)
 #define KEY_ACTION		(KEY_MOTION | KEY_BUTTON)
 
-#define SET_FOCUS		(1 << BIT_SET_FOCUS)
+#define KEY_SET_FOCUS		(1 << BIT_SET_FOCUS)
 
 #define MV_DIR_FROM_BIT(x)	((x) < NUM_DIRECTIONS ? 1 << (x) :	  \
 				 (x) == MV_BIT_UPLEFT    ? MV_UPLEFT    : \
@@ -704,6 +704,7 @@ struct SetupInfo
   boolean ask_on_escape;
   boolean ask_on_escape_editor;
   boolean quick_switch;
+  boolean input_on_focus;
 
   char *graphics_set;
   char *sounds_set;

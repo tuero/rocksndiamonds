@@ -613,7 +613,7 @@ void TapeRecordAction(byte action_raw[MAX_PLAYERS])
     for (i = 0; i < MAX_PLAYERS; i++)
       if (tape.centered_player_nr_next == i ||
 	  tape.centered_player_nr_next == -1)
-	action[i] |= SET_FOCUS;
+	action[i] |= KEY_SET_FOCUS;
 
     tape.set_centered_player = FALSE;
   }
@@ -803,14 +803,14 @@ byte *TapePlayAction()
 
   for (i = 0; i < MAX_PLAYERS; i++)
   {
-    if (action[i] & SET_FOCUS)
+    if (action[i] & KEY_SET_FOCUS)
     {
       tape.set_centered_player = TRUE;
       tape.centered_player_nr_next =
 	(tape.centered_player_nr_next == -999 ? i : -1);
     }
 
-    action[i] &= ~SET_FOCUS;
+    action[i] &= ~KEY_SET_FOCUS;
   }
 
   tape.delay_played++;

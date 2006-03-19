@@ -171,7 +171,9 @@ void EventLoop(void)
        has its own synchronization and is CPU friendly, too */
 
     if (game_status == GAME_MODE_PLAYING)
+    {
       HandleGameActions();
+    }
     else
     {
       SyncDisplay();

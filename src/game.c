@@ -9051,6 +9051,79 @@ static byte PlayerActions(struct PlayerInfo *player, byte player_action)
   }
 }
 
+static void CheckLevelTime()
+{
+  int i;
+
+  if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
+  {
+    if (level.native_em_level->lev->home == 0)	/* all players at home */
+    {
+      local_player->LevelSolved = TRUE;
+      AllPlayersGone = TRUE;
+
+      level.native_em_level->lev->home = -1;
+    }
+
+    if (level.native_em_level->ply[0]->alive == 0 &&
+	level.native_em_level->ply[1]->alive == 0 &&
+	level.native_em_level->ply[2]->alive == 0 &&
+	level.native_em_level->ply[3]->alive == 0)	/* all dead */
+      AllPlayersGone = TRUE;
+  }
+
+  if (TimeFrames >= FRAMES_PER_SECOND)
+  {
+    TimeFrames = 0;
+    TapeTime++;
+
+    for (i = 0; i < MAX_PLAYERS; i++)
+    {
+      struct PlayerInfo *player = &stored_player[i];
+
+      if (SHIELD_ON(player))
+      {
+	player->shield_normal_time_left--;
+
+	if (player->shield_deadly_time_left > 0)
+	  player->shield_deadly_time_left--;
+      }
+    }
+
+    if (!level.use_step_counter)
+    {
+      TimePlayed++;
+
+      if (TimeLeft > 0)
+      {
+	TimeLeft--;
+
+	if (TimeLeft <= 10 && setup.time_limit)
+	  PlaySoundStereo(SND_GAME_RUNNING_OUT_OF_TIME, SOUND_MIDDLE);
+
+	DrawGameValue_Time(TimeLeft);
+
+	if (!TimeLeft && setup.time_limit)
+	{
+	  if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
+	    level.native_em_level->lev->killed_out_of_time = TRUE;
+	  else
+	    for (i = 0; i < MAX_PLAYERS; i++)
+	      KillPlayer(&stored_player[i]);
+	}
+      }
+      else if (level.time == 0 && !AllPlayersGone) /* level w/o time limit */
+	DrawGameValue_Time(TimePlayed);
+
+      level.native_em_level->lev->time =
+	(level.time == 0 ? TimePlayed : TimeLeft);
+    }
+
+    if (tape.recording || tape.playing)
+      DrawVideoDisplay(VIDEO_STATE_TIME_ON, TapeTime);
+  }
+}
+
 void AdvanceFrameAndPlayerCounters(int player_nr)
 {
   int i;
@@ -9102,17 +9175,75 @@ void AdvanceFrameAndPlayerCounters(int player_nr)
   }
 }
 
+void StartGameActions(boolean init_network_game, boolean record_tape,
+		      long random_seed)
+{
+#if 1
+  unsigned long new_random_seed = InitRND(random_seed);
+
+  if (record_tape)
+    TapeStartRecording(new_random_seed);
+#else
+  if (record_tape)
+    TapeStartRecording(random_seed);
+#endif
+
+#if defined(NETWORK_AVALIABLE)
+  if (init_network_game)
+  {
+    SendToServer_StartPlaying();
+
+    return;
+  }
+#endif
+
+  StopAnimation();
+
+  game_status = GAME_MODE_PLAYING;
+
+#if 0
+  InitRND(random_seed);
+#endif
+
+  InitGame();
+}
+
 void GameActions()
 {
   static unsigned long game_frame_delay = 0;
   unsigned long game_frame_delay_value;
-  int magic_wall_x = 0, magic_wall_y = 0;
-  int i, x, y, element, graphic;
   byte *recorded_player_action;
   byte summarized_player_action = 0;
   byte tape_action[MAX_PLAYERS];
+  int i;
 
-  if (game_status != GAME_MODE_PLAYING)
+  if (game.restart_level)
+    StartGameActions(options.network, setup.autorecord, NEW_RANDOMIZE);
+
+  if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
+  {
+    if (level.native_em_level->lev->home == 0)	/* all players at home */
+    {
+      local_player->LevelSolved = TRUE;
+      AllPlayersGone = TRUE;
+
+      level.native_em_level->lev->home = -1;
+    }
+
+    if (level.native_em_level->ply[0]->alive == 0 &&
+	level.native_em_level->ply[1]->alive == 0 &&
+	level.native_em_level->ply[2]->alive == 0 &&
+	level.native_em_level->ply[3]->alive == 0)	/* all dead */
+      AllPlayersGone = TRUE;
+  }
+
+  if (local_player->LevelSolved)
+    GameWon();
+
+  if (AllPlayersGone && !TAPE_IS_STOPPED(tape))
+    TapeStop();
+
+  if (game_status != GAME_MODE_PLAYING)		/* status might have changed */
     return;
 
   game_frame_delay_value =
@@ -9124,86 +9255,6 @@ void GameActions()
   /* ---------- main game synchronization point ---------- */
 
   WaitUntilDelayReached(&game_frame_delay, game_frame_delay_value);
-
-  InitPlayfieldScanModeVars();
-
-#if 0
-  if (game.set_centered_player)
-  {
-    boolean all_players_fit_to_screen = checkIfAllPlayersFitToScreen_RND();
-
-    /* switching to "all players" only possible if all players fit to screen */
-    if (game.centered_player_nr_next == -1 && !all_players_fit_to_screen)
-    {
-      game.centered_player_nr_next = game.centered_player_nr;
-      game.set_centered_player = FALSE;
-    }
-
-    /* do not switch focus to non-existing (or non-active) player */
-    if (game.centered_player_nr_next >= 0 &&
-	!stored_player[game.centered_player_nr_next].active)
-    {
-      game.centered_player_nr_next = game.centered_player_nr;
-      game.set_centered_player = FALSE;
-    }
-  }
-
-  if (game.set_centered_player &&
-      ScreenMovPos == 0)	/* screen currently aligned at tile position */
-  {
-#if 0
-    struct PlayerInfo *player;
-    int player_nr = game.centered_player_nr_next;
-#endif
-    int sx, sy;
-
-    if (game.centered_player_nr_next == -1)
-    {
-      setScreenCenteredToAllPlayers(&sx, &sy);
-    }
-    else
-    {
-      sx = stored_player[game.centered_player_nr_next].jx;
-      sy = stored_player[game.centered_player_nr_next].jy;
-    }
-
-#if 0
-    player = &stored_player[player_nr];
-
-    if (!player->active)
-      game.centered_player_nr_next = game.centered_player_nr;
-
-    sx = player->jx;
-    sy = player->jy;
-#endif
-
-#if 0
-    if (game.centered_player_nr != game.centered_player_nr_next)
-#endif
-    {
-#if 1
-      DrawRelocateScreen(sx, sy, MV_NONE, TRUE, setup.quick_switch);
-#else
-      DrawRelocatePlayer(player, setup.quick_switch);
-#endif
-
-      game.centered_player_nr = game.centered_player_nr_next;
-    }
-
-    game.set_centered_player = FALSE;
-  }
-#endif
-
-#if USE_ONE_MORE_CHANGE_PER_FRAME
-  if (game.engine_version >= VERSION_IDENT(3,2,0,7))
-  {
-    SCAN_PLAYFIELD(x, y)
-    {
-      ChangeCount[x][y] = 0;
-      ChangeEvent[x][y] = -1;
-    }
-  }
-#endif
 
   if (network_playing && !network_player_action_received)
   {
@@ -9227,13 +9278,97 @@ void GameActions()
 
   recorded_player_action = (tape.playing ? TapePlayAction() : NULL);
 
-#if 1
   if (tape.set_centered_player)
   {
     game.centered_player_nr_next = tape.centered_player_nr_next;
     game.set_centered_player = TRUE;
   }
 
+  for (i = 0; i < MAX_PLAYERS; i++)
+  {
+    summarized_player_action |= stored_player[i].action;
+
+    if (!network_playing)
+      stored_player[i].effective_action = stored_player[i].action;
+  }
+
+#if defined(NETWORK_AVALIABLE)
+  if (network_playing)
+    SendToServer_MovePlayer(summarized_player_action);
+#endif
+
+  if (!options.network && !setup.team_mode)
+    local_player->effective_action = summarized_player_action;
+
+  if (setup.team_mode && setup.input_on_focus && game.centered_player_nr != -1)
+  {
+    for (i = 0; i < MAX_PLAYERS; i++)
+      stored_player[i].effective_action =
+	(i == game.centered_player_nr ? summarized_player_action : 0);
+  }
+
+  if (recorded_player_action != NULL)
+    for (i = 0; i < MAX_PLAYERS; i++)
+      stored_player[i].effective_action = recorded_player_action[i];
+
+  for (i = 0; i < MAX_PLAYERS; i++)
+  {
+    tape_action[i] = stored_player[i].effective_action;
+
+    /* (this can only happen in the R'n'D game engine) */
+    if (tape.recording && tape_action[i] && !tape.player_participates[i])
+      tape.player_participates[i] = TRUE;    /* player just appeared from CE */
+  }
+
+  /* only record actions from input devices, but not programmed actions */
+  if (tape.recording)
+    TapeRecordAction(tape_action);
+
+  if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
+  {
+    GameActions_EM_Main();
+  }
+  else
+  {
+    GameActions_RND();
+  }
+}
+
+void GameActions_EM_Main()
+{
+  byte effective_action[MAX_PLAYERS];
+  boolean warp_mode = (tape.playing && tape.warp_forward && !tape.pausing);
+  int i;
+
+  for (i = 0; i < MAX_PLAYERS; i++)
+    effective_action[i] = stored_player[i].effective_action;
+
+  GameActions_EM(effective_action, warp_mode);
+
+  CheckLevelTime();
+
+  AdvanceFrameAndPlayerCounters(-1);	/* advance counters for all players */
+}
+
+void GameActions_RND()
+{
+  int magic_wall_x = 0, magic_wall_y = 0;
+  int i, x, y, element, graphic;
+
+  InitPlayfieldScanModeVars();
+
+#if USE_ONE_MORE_CHANGE_PER_FRAME
+  if (game.engine_version >= VERSION_IDENT(3,2,0,7))
+  {
+    SCAN_PLAYFIELD(x, y)
+    {
+      ChangeCount[x][y] = 0;
+      ChangeEvent[x][y] = -1;
+    }
+  }
+#endif
+
+#if 1
   if (game.set_centered_player)
   {
     boolean all_players_fit_to_screen = checkIfAllPlayersFitToScreen_RND();
@@ -9257,10 +9392,6 @@ void GameActions()
   if (game.set_centered_player &&
       ScreenMovPos == 0)	/* screen currently aligned at tile position */
   {
-#if 0
-    struct PlayerInfo *player;
-    int player_nr = game.centered_player_nr_next;
-#endif
     int sx, sy;
 
     if (game.centered_player_nr_next == -1)
@@ -9273,70 +9404,12 @@ void GameActions()
       sy = stored_player[game.centered_player_nr_next].jy;
     }
 
-#if 0
-    player = &stored_player[player_nr];
+    DrawRelocateScreen(sx, sy, MV_NONE, TRUE, setup.quick_switch);
 
-    if (!player->active)
-      game.centered_player_nr_next = game.centered_player_nr;
-
-    sx = player->jx;
-    sy = player->jy;
-#endif
-
-#if 0
-    if (game.centered_player_nr != game.centered_player_nr_next)
-#endif
-    {
-#if 1
-      DrawRelocateScreen(sx, sy, MV_NONE, TRUE, setup.quick_switch);
-#else
-      DrawRelocatePlayer(player, setup.quick_switch);
-#endif
-
-      game.centered_player_nr = game.centered_player_nr_next;
-    }
-
+    game.centered_player_nr = game.centered_player_nr_next;
     game.set_centered_player = FALSE;
   }
 #endif
-
-#if 1
-  /* !!! CHECK THIS (tape.pausing is always FALSE here!) !!! */
-  if (recorded_player_action == NULL && tape.pausing)
-    return;
-#endif
-
-  for (i = 0; i < MAX_PLAYERS; i++)
-  {
-    summarized_player_action |= stored_player[i].action;
-
-    if (!network_playing)
-      stored_player[i].effective_action = stored_player[i].action;
-  }
-
-#if defined(NETWORK_AVALIABLE)
-  if (network_playing)
-    SendToServer_MovePlayer(summarized_player_action);
-#endif
-
-  if (!options.network && !setup.team_mode)
-    local_player->effective_action = summarized_player_action;
-
-  if (recorded_player_action != NULL)
-    for (i = 0; i < MAX_PLAYERS; i++)
-      stored_player[i].effective_action = recorded_player_action[i];
-
-  for (i = 0; i < MAX_PLAYERS; i++)
-  {
-    tape_action[i] = stored_player[i].effective_action;
-
-    if (tape.recording && tape_action[i] && !tape.player_participates[i])
-      tape.player_participates[i] = TRUE;    /* player just appeared from CE */
-  }
-
-  /* only save actions from input devices, but not programmed actions */
-  if (tape.recording)
-    TapeRecordAction(tape_action);
 
   for (i = 0; i < MAX_PLAYERS; i++)
   {
@@ -9816,48 +9889,7 @@ void GameActions()
     }
   }
 
-  if (TimeFrames >= FRAMES_PER_SECOND)
-  {
-    TimeFrames = 0;
-    TapeTime++;
-
-    for (i = 0; i < MAX_PLAYERS; i++)
-    {
-      struct PlayerInfo *player = &stored_player[i];
-
-      if (SHIELD_ON(player))
-      {
-	player->shield_normal_time_left--;
-
-	if (player->shield_deadly_time_left > 0)
-	  player->shield_deadly_time_left--;
-      }
-    }
-
-    if (!level.use_step_counter)
-    {
-      TimePlayed++;
-
-      if (TimeLeft > 0)
-      {
-	TimeLeft--;
-
-	if (TimeLeft <= 10 && setup.time_limit)
-	  PlaySoundStereo(SND_GAME_RUNNING_OUT_OF_TIME, SOUND_MIDDLE);
-
-	DrawGameValue_Time(TimeLeft);
-
-	if (!TimeLeft && setup.time_limit)
-	  for (i = 0; i < MAX_PLAYERS; i++)
-	    KillPlayer(&stored_player[i]);
-      }
-      else if (level.time == 0 && !AllPlayersGone) /* level w/o time limit */
-	DrawGameValue_Time(TimePlayed);
-    }
-
-    if (tape.recording || tape.playing)
-      DrawVideoDisplay(VIDEO_STATE_TIME_ON, TapeTime);
-  }
+  CheckLevelTime();
 
   DrawAllPlayers();
   PlayAllPlayersSound();
