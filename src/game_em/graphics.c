@@ -694,6 +694,7 @@ void RedrawPlayfield_EM(boolean force_redraw)
 #else
   int player_nr = game_em.last_moving_player;
 #endif
+  int stepsize = TILEX / 8;
   int offset = (setup.scroll_delay ? 3 : 0) * TILEX;
   int offset_x = offset;
   int offset_y = offset;
@@ -745,7 +746,11 @@ void RedrawPlayfield_EM(boolean force_redraw)
 
   if (game.centered_player_nr == -1)
   {
+#if 1
+    if (draw_new_player_location || offset == 0)
+#else
     if (draw_new_player_location)
+#endif
     {
       setScreenCenteredToAllPlayers(&sx, &sy);
     }
@@ -906,23 +911,37 @@ void RedrawPlayfield_EM(boolean force_redraw)
 			    sy - offset_y > screen_y ? sy - offset_y :
 			    screen_y);
 
-  /* prevent scrolling further than player step size screen when scrolling */
-  if (ABS(screen_x - screen_x_old) > TILEX / 8 ||
-      ABS(screen_y - screen_y_old) > TILEY / 8)
+#if 1
+  /* prevent scrolling further than double player step size when scrolling */
+  if (ABS(screen_x - screen_x_old) > 2 * stepsize ||
+      ABS(screen_y - screen_y_old) > 2 * stepsize)
   {
     int dx = SIGN(screen_x - screen_x_old);
     int dy = SIGN(screen_y - screen_y_old);
 
-    screen_x = screen_x_old + dx * TILEX / 8;
-    screen_y = screen_y_old + dy * TILEY / 8;
+    screen_x = screen_x_old + dx * 2 * stepsize;
+    screen_y = screen_y_old + dy * 2 * stepsize;
   }
+#else
+  /* prevent scrolling further than player step size when scrolling */
+  if (ABS(screen_x - screen_x_old) > stepsize ||
+      ABS(screen_y - screen_y_old) > stepsize)
+  {
+    int dx = SIGN(screen_x - screen_x_old);
+    int dy = SIGN(screen_y - screen_y_old);
+
+    screen_x = screen_x_old + dx * stepsize;
+    screen_y = screen_y_old + dy * stepsize;
+  }
+#endif
 
   /* prevent scrolling away from the other players when focus on all players */
   if (game.centered_player_nr == -1)
   {
 #if 1
     /* check if all players are still visible with new scrolling position */
-    if (!checkIfAllPlayersAreVisible(screen_x, screen_y))
+    if (checkIfAllPlayersAreVisible(screen_x_old, screen_y_old) &&
+	!checkIfAllPlayersAreVisible(screen_x, screen_y))
     {
       /* reset horizontal scroll position to last value, if needed */
       if (!checkIfAllPlayersAreVisible(screen_x, screen_y_old))

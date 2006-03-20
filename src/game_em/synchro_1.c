@@ -548,13 +548,26 @@ static void check_player(struct PLAYER *ply)
     int oldy = ply->y;
     int x = oldx + dx;
     int y = oldy + dy;
-    boolean can_move = TRUE;
+    boolean players_visible_before_move;
+    boolean players_visible_after_move;
+    boolean can_move;
+
+    players_visible_before_move = checkIfAllPlayersFitToScreen();
 
     ply->x = x;
     ply->y = y;
 
+    players_visible_after_move = checkIfAllPlayersFitToScreen();
+
+    /*
+      player is allowed to move only in the following cases:
+      - it is not needed to display all players (not focussed to all players)
+      - all players are (still or again) visible after the move
+      - some players were already outside visible screen area before the move
+    */
     can_move = (game.centered_player_nr != -1 ||
-		checkIfAllPlayersFitToScreen());
+		players_visible_after_move ||
+		!players_visible_before_move);
 
     ply->x = oldx;
     ply->y = oldy;
