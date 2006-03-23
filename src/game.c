@@ -1209,14 +1209,18 @@ inline void DrawGameValue_Dynamite(int value)
 
 inline void DrawGameValue_Keys(int key[MAX_NUM_KEYS])
 {
+  int base_key_graphic = EL_KEY_1;
   int i;
+
+  if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
+    base_key_graphic = EL_EM_KEY_1;
 
   /* currently only 4 of 8 possible keys are displayed */
   for (i = 0; i < STD_NUM_KEYS; i++)
   {
     if (key[i])
       DrawMiniGraphicExt(drawto, DX_KEYS + i * MINI_TILEX, DY_KEYS,
-			 el2edimg(EL_KEY_1 + i));
+			 el2edimg(base_key_graphic + i));
     else
       BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
 		 DOOR_GFX_PAGEX5 + XX_KEYS + i * MINI_TILEX, YY_KEYS,
@@ -1282,7 +1286,9 @@ void DrawAllGameValues(int emeralds, int dynamite, int score, int time,
 
 void DrawGameDoorValues()
 {
-  int i;
+  int dynamite_state = 0;
+  int key_bits = 0;
+  int i, j;
 
   if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
   {
@@ -1291,6 +1297,7 @@ void DrawGameDoorValues()
     return;
   }
 
+#if 0
   DrawGameValue_Level(level_nr);
 
   DrawGameValue_Emeralds(local_player->gems_still_needed);
@@ -1298,8 +1305,37 @@ void DrawGameDoorValues()
   DrawGameValue_Score(local_player->score);
   DrawGameValue_Time(TimeLeft);
 
-  for (i = 0; i < MAX_PLAYERS; i++)
+#else
+
+  if (game.centered_player_nr == -1)
+  {
+    for (i = 0; i < MAX_PLAYERS; i++)
+    {
+      for (j = 0; j < MAX_NUM_KEYS; j++)
+	if (stored_player[i].key[j])
+	  key_bits |= (1 << j);
+
+      dynamite_state += stored_player[i].inventory_size;
+    }
+
+#if 0
     DrawGameValue_Keys(stored_player[i].key);
+#endif
+  }
+  else
+  {
+    int player_nr = game.centered_player_nr;
+
+    for (i = 0; i < MAX_NUM_KEYS; i++)
+      if (stored_player[player_nr].key[i])
+	key_bits |= (1 << i);
+
+    dynamite_state = stored_player[player_nr].inventory_size;
+  }
+
+  DrawAllGameValues(local_player->gems_still_needed, dynamite_state,
+		    local_player->score, TimeLeft, key_bits);
+#endif
 }
 
 #if 0
@@ -8021,7 +8057,11 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
 	  {
 	    stored_player[i].key[KEY_NR(element)] = key_state;
 
+#if 1
+	    DrawGameDoorValues();
+#else
 	    DrawGameValue_Keys(stored_player[i].key);
+#endif
 
 	    redraw_mask |= REDRAW_DOOR_1;
 	  }
@@ -9404,10 +9444,11 @@ void GameActions_RND()
       sy = stored_player[game.centered_player_nr_next].jy;
     }
 
-    DrawRelocateScreen(sx, sy, MV_NONE, TRUE, setup.quick_switch);
-
     game.centered_player_nr = game.centered_player_nr_next;
     game.set_centered_player = FALSE;
+
+    DrawRelocateScreen(sx, sy, MV_NONE, TRUE, setup.quick_switch);
+    DrawGameDoorValues();
   }
 #endif
 
@@ -11634,7 +11675,11 @@ int DigField(struct PlayerInfo *player,
       if (player->inventory_size < MAX_INVENTORY_SIZE)
 	player->inventory_element[player->inventory_size++] = element;
 
+#if 1
+      DrawGameDoorValues();
+#else
       DrawGameValue_Dynamite(local_player->inventory_size);
+#endif
     }
     else if (element == EL_DYNABOMB_INCREASE_NUMBER)
     {
@@ -11653,7 +11698,11 @@ int DigField(struct PlayerInfo *player,
     {
       player->key[KEY_NR(element)] = TRUE;
 
+#if 1
+      DrawGameDoorValues();
+#else
       DrawGameValue_Keys(player->key);
+#endif
 
       redraw_mask |= REDRAW_DOOR_1;
     }
@@ -11685,7 +11734,11 @@ int DigField(struct PlayerInfo *player,
 	  if (player->inventory_size < MAX_INVENTORY_SIZE)
 	    player->inventory_element[player->inventory_size++] = element;
 
+#if 1
+      DrawGameDoorValues();
+#else
       DrawGameValue_Dynamite(local_player->inventory_size);
+#endif
     }
     else if (collect_count > 0)
     {
@@ -12170,7 +12223,11 @@ boolean DropElement(struct PlayerInfo *player)
     {
       player->inventory_size--;
 
+#if 1
+      DrawGameDoorValues();
+#else
       DrawGameValue_Dynamite(local_player->inventory_size);
+#endif
 
       if (new_element == EL_DYNAMITE)
 	new_element = EL_DYNAMITE_ACTIVE;

@@ -1008,12 +1008,47 @@ void game_animscreen(void)
 
 void DrawGameDoorValues_EM()
 {
+#if 1
+  int dynamite_state;
+  int key_state;
+#else
   int dynamite_state = ply[0].dynamite;		/* !!! ONLY PLAYER 1 !!! */
-  int all_keys_state = ply[0].keys | ply[1].keys | ply[2].keys | ply[3].keys;
+  int key_state = ply[0].keys | ply[1].keys | ply[2].keys | ply[3].keys;
+#endif
+
+#if 1
+  if (game.centered_player_nr == -1)
+  {
+#if 1
+    int i;
+
+    dynamite_state = 0;
+    key_state = 0;
+
+    for (i = 0; i < MAX_PLAYERS; i++)
+    {
+      dynamite_state += ply[i].dynamite;
+      key_state |= ply[i].keys;
+    }
+
+#else
+
+    dynamite_state = ply[0].dynamite;		/* !!! ONLY PLAYER 1 !!! */
+    key_state = ply[0].keys | ply[1].keys | ply[2].keys | ply[3].keys;
+#endif
+  }
+  else
+  {
+    int player_nr = game.centered_player_nr;
+
+    dynamite_state = ply[player_nr].dynamite;
+    key_state = ply[player_nr].keys;
+  }
+#endif
 
 #if 1
   DrawAllGameValues(lev.required, dynamite_state, lev.score,
-		    lev.time, all_keys_state);
+		    lev.time, key_state);
 #else
   DrawAllGameValues(lev.required, ply1.dynamite, lev.score,
 		    DISPLAY_TIME(lev.time), ply1.keys | ply2.keys);
