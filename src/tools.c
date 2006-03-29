@@ -133,11 +133,9 @@ void RedrawPlayfield(boolean force_redraw, int x, int y, int width, int height)
   if (game_status == GAME_MODE_PLAYING &&
       level.game_engine_type == GAME_ENGINE_TYPE_EM)
   {
-#if 1
-    RedrawPlayfield_EM(force_redraw);
-#else
-    BlitScreenToBitmap_EM(backbuffer);
-#endif
+    /* currently there is no partial redraw -- always redraw whole playfield */
+
+    RedrawPlayfield_EM(TRUE);
   }
   else if (game_status == GAME_MODE_PLAYING && !game.envelope_active)
   {

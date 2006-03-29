@@ -28,6 +28,7 @@
 
 static struct GadgetInfo *gadget_list_first_entry = NULL;
 static struct GadgetInfo *gadget_list_last_entry = NULL;
+static struct GadgetInfo *last_info_gi = NULL;
 static int next_free_gadget_id = 1;
 static boolean gadget_id_wrapped = FALSE;
 
@@ -1197,6 +1198,10 @@ void FreeGadget(struct GadgetInfo *gi)
 {
   struct GadgetInfo *gi_previous = gadget_list_first_entry;
 
+  /* prevent "last_info_gi" from pointing to memory that will be freed */
+  if (last_info_gi == gi)
+    last_info_gi = NULL;
+
   while (gi_previous != NULL && gi_previous->next != gi)
     gi_previous = gi_previous->next;
 
@@ -1376,7 +1381,6 @@ void ClickOnGadget(struct GadgetInfo *gi, int button)
 
 boolean HandleGadgets(int mx, int my, int button)
 {
-  static struct GadgetInfo *last_info_gi = NULL;
   static unsigned long pressed_delay = 0;
   static int last_button = 0;
   static int last_mx = 0, last_my = 0;

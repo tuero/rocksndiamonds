@@ -375,11 +375,11 @@ static void Handle_OP_START_PLAYING(struct NetworkServerPlayerInfo *player)
 
   if (options.verbose)
     Error(ERR_NETWORK_SERVER,
-	  "client %d (%s) starts game [level %d from levedir %d (%s)]",
+	  "client %d (%s) starts game [level %d from leveldir %d (%s)]",
 	  player->number, player->player_name,
 	  (buffer[2] << 8) + buffer[3],
 	  (buffer[4] << 8) + buffer[5],
-	  &buffer[6]);
+	  &buffer[10]);
 
   for (w = first_player; w; w = w->next)
     if (w->introduced)
@@ -387,6 +387,8 @@ static void Handle_OP_START_PLAYING(struct NetworkServerPlayerInfo *player)
 
   /* reset frame counter */
   ServerFrameCounter = 0;
+
+  Error(ERR_NETWORK_SERVER, "resetting ServerFrameCounter to 0");
 
   /* reset player actions */
   for (v = first_player; v; v = v->next)
@@ -416,10 +418,12 @@ static void Handle_OP_CONTINUE_PLAYING(struct NetworkServerPlayerInfo *player)
 
 static void Handle_OP_STOP_PLAYING(struct NetworkServerPlayerInfo *player)
 {
+  int cause_for_stopping = buffer[2];
+
   if (options.verbose)
-    Error(ERR_NETWORK_SERVER, "client %d (%s) stops game",
-	  player->number, player->player_name);
-  broadcast(NULL, 2, 0);
+    Error(ERR_NETWORK_SERVER, "client %d (%s) stops game [%d]",
+	  player->number, player->player_name, cause_for_stopping);
+  broadcast(NULL, 3, 0);
 }
 
 static void Handle_OP_MOVE_PLAYER(struct NetworkServerPlayerInfo *player)
@@ -466,6 +470,11 @@ static void Handle_OP_MOVE_PLAYER(struct NetworkServerPlayerInfo *player)
   buffer[5] = (unsigned char)((ServerFrameCounter >>  0) & 0xff);
 
   broadcast(NULL, 6 + last_client_nr, 0);
+
+#if 0
+  Error(ERR_NETWORK_SERVER, "sending ServerFrameCounter value %d",
+	ServerFrameCounter);
+#endif
 
   ServerFrameCounter++;
 }

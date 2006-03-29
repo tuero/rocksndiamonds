@@ -690,7 +690,8 @@ void RedrawPlayfield_EM(boolean force_redraw)
   int game.centered_player_nr_next = getCenteredPlayerNr_EM();
 #endif
 #if 1
-  int player_nr = getMaxCenterDistancePlayerNr(screen_x, screen_y);
+  int max_center_distance_player_nr =
+    getMaxCenterDistancePlayerNr(screen_x, screen_y);
 #else
   int player_nr = game_em.last_moving_player;
 #endif
@@ -757,8 +758,8 @@ void RedrawPlayfield_EM(boolean force_redraw)
     else
     {
 #if 1
-      sx = PLAYER_SCREEN_X(player_nr);
-      sy = PLAYER_SCREEN_Y(player_nr);
+      sx = PLAYER_SCREEN_X(max_center_distance_player_nr);
+      sy = PLAYER_SCREEN_Y(max_center_distance_player_nr);
 #else
       sx = PLAYER_SCREEN_X(game_em.last_moving_player);
       sy = PLAYER_SCREEN_Y(game_em.last_moving_player);
@@ -976,6 +977,8 @@ void RedrawPlayfield_EM(boolean force_redraw)
 #if 0
     int player_nr = game_em.last_moving_player;
 #endif
+    int player_nr = (game.centered_player_nr == -1 ?
+		     max_center_distance_player_nr : game.centered_player_nr);
     int player_move_dir = game_em.last_player_direction[player_nr];
     int dx = SIGN(screen_x - screen_x_old);
     int dy = SIGN(screen_y - screen_y_old);

@@ -1,3 +1,16 @@
+2006-03-29
+	* changed behaviour of network games with internal errors (because of
+	  different client frame counters) from immediately terminating R'n'D
+	  to displaying an error message requester and stopping only the game
+	  (also to prevent impression of crashes under non command-line runs)
+	* fixed playing network games with the EMC engine (did not work before)
+	* fixed bug with not scrolling the screen in multi-player mode with the
+	  focus on player 1 when all players are moving in different directions
+	* fixed bug with keeping pointer to gadget even after its deallocation
+
+2006-03-22
+	* uploaded pre-release (test) version 3.2.0-7 binary and source code
+
 2006-03-19
 	* code cleanup for game action control for R'n'D and EMC game engine
 

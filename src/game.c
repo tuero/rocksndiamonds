@@ -9168,6 +9168,11 @@ void AdvanceFrameAndPlayerCounters(int player_nr)
 {
   int i;
 
+#if 0
+  Error(ERR_NETWORK_CLIENT, "advancing frame counter from %d to %d",
+	FrameCounter, FrameCounter + 1);
+#endif
+
   /* advance frame counters (global frame counter and time frame counter) */
   FrameCounter++;
   TimeFrames++;
@@ -9218,15 +9223,10 @@ void AdvanceFrameAndPlayerCounters(int player_nr)
 void StartGameActions(boolean init_network_game, boolean record_tape,
 		      long random_seed)
 {
-#if 1
   unsigned long new_random_seed = InitRND(random_seed);
 
   if (record_tape)
     TapeStartRecording(new_random_seed);
-#else
-  if (record_tape)
-    TapeStartRecording(random_seed);
-#endif
 
 #if defined(NETWORK_AVALIABLE)
   if (init_network_game)
@@ -9240,10 +9240,6 @@ void StartGameActions(boolean init_network_game, boolean record_tape,
   StopAnimation();
 
   game_status = GAME_MODE_PLAYING;
-
-#if 0
-  InitRND(random_seed);
-#endif
 
   InitGame();
 }
@@ -9311,10 +9307,18 @@ void GameActions()
 
     if (!network_player_action_received)
       return;		/* failed to get network player actions in time */
+
+    /* do not yet reset "network_player_action_received" (for tape.pausing) */
   }
 
   if (tape.pausing)
     return;
+
+  /* at this point we know that we really continue executing the game */
+
+#if 1
+  network_player_action_received = FALSE;
+#endif
 
   recorded_player_action = (tape.playing ? TapePlayAction() : NULL);
 
@@ -9483,7 +9487,9 @@ void GameActions_RND()
     ScrollPlayer(&stored_player[i], SCROLL_GO_ON);
   }
 
+#if 0
   network_player_action_received = FALSE;
+#endif
 
   ScrollScreen(NULL, SCROLL_GO_ON);
 
@@ -12673,7 +12679,7 @@ void RequestQuitGame(boolean ask_if_really_quit)
   {
 #if defined(NETWORK_AVALIABLE)
     if (options.network)
-      SendToServer_StopPlaying();
+      SendToServer_StopPlaying(NETWORK_STOP_BY_PLAYER);
     else
 #endif
     {

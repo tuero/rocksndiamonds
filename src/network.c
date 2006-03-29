@@ -66,6 +66,7 @@ static byte realbuffer[512];
 static byte readbuffer[MAX_BUFFER_SIZE], writbuffer[MAX_BUFFER_SIZE];
 static byte *buffer = realbuffer + 4;
 static int nread = 0, nwrite = 0;
+static boolean stop_network_game = FALSE;
 
 static void SendBufferToServer(int size)
 {
@@ -342,11 +343,12 @@ void SendToServer_ContinuePlaying()
   SendBufferToServer(2);
 }
 
-void SendToServer_StopPlaying()
+void SendToServer_StopPlaying(int cause_for_stopping)
 {
   buffer[1] = OP_STOP_PLAYING;
+  buffer[2] = cause_for_stopping;
 
-  SendBufferToServer(2);
+  SendBufferToServer(3);
 }
 
 void SendToServer_MovePlayer(byte player_action)
@@ -568,8 +570,18 @@ static void Handle_OP_CONTINUE_PLAYING()
 
 static void Handle_OP_STOP_PLAYING()
 {
-  printf("OP_STOP_PLAYING: %d\n", buffer[0]);
-  Error(ERR_NETWORK_CLIENT, "client %d stops game", buffer[0]);
+  printf("OP_STOP_PLAYING: %d [%d]\n", buffer[0], buffer[2]);
+  Error(ERR_NETWORK_CLIENT, "client %d stops game [%d]", buffer[0], buffer[2]);
+
+  if (game_status == GAME_MODE_PLAYING)
+  {
+    if (buffer[2] == NETWORK_STOP_BY_PLAYER)
+      Request("Network game stopped by player!", REQ_CONFIRM);
+    else if (buffer[2] == NETWORK_STOP_BY_ERROR)
+      Request("Network game stopped due to internal error!", REQ_CONFIRM);
+    else
+      Request("Network game stopped !", REQ_CONFIRM);
+  }
 
   game_status = GAME_MODE_MAIN;
   DrawMainMenu();
@@ -586,12 +598,26 @@ static void Handle_OP_MOVE_PLAYER(unsigned int len)
   server_frame_counter =
     (buffer[2] << 24) | (buffer[3] << 16) | (buffer[4] << 8) | (buffer[5]);
 
+#if 0
+  Error(ERR_NETWORK_CLIENT, "receiving server frame counter value %d [%d]",
+	server_frame_counter, FrameCounter);
+#endif
+
   if (server_frame_counter != FrameCounter)
   {
     Error(ERR_RETURN, "client and servers frame counters out of sync");
     Error(ERR_RETURN, "frame counter of client is %d", FrameCounter);
     Error(ERR_RETURN, "frame counter of server is %d", server_frame_counter);
+
+#if 1
+    Error(ERR_RETURN, "this should not happen -- please debug");
+
+    stop_network_game = TRUE;
+
+    return;
+#else
     Error(ERR_EXIT,   "this should not happen -- please debug");
+#endif
   }
 
   /* copy valid player actions */
@@ -605,6 +631,8 @@ static void Handle_OP_MOVE_PLAYER(unsigned int len)
 static void HandleNetworkingMessages()
 {
   unsigned int message_length;
+
+  stop_network_game = FALSE;
 
   while (nread >= 4 && nread >= 4 + readbuffer[3])
   {
@@ -670,6 +698,10 @@ static void HandleNetworkingMessages()
   }
 
   fflush(stdout);
+
+  /* in case of internal error, stop network game */
+  if (stop_network_game)
+    SendToServer_StopPlaying(NETWORK_STOP_BY_ERROR);
 }
 
 /* TODO */
