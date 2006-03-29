@@ -7,6 +7,8 @@
 	* fixed bug with not scrolling the screen in multi-player mode with the
 	  focus on player 1 when all players are moving in different directions
 	* fixed bug with keeping pointer to gadget even after its deallocation
+	* fixed bug with allowing "focus on all players" in network games
+	* fixed bug with player focus when playing tapes from network games
 
 2006-03-22
 	* uploaded pre-release (test) version 3.2.0-7 binary and source code

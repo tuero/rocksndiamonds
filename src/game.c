@@ -2031,8 +2031,22 @@ void InitGame()
 
   game.envelope_active = FALSE;
 
-  game.centered_player_nr = game.centered_player_nr_next = -1;	/* focus all */
+  /* set focus to local player for network games, else to all players */
+  game.centered_player_nr = (network_playing ? local_player->index_nr : -1);
+  game.centered_player_nr_next = game.centered_player_nr;
   game.set_centered_player = FALSE;
+
+  if (network_playing && tape.recording)
+  {
+    /* store client dependent player focus when recording network games */
+    tape.centered_player_nr_next = game.centered_player_nr_next;
+    tape.set_centered_player = TRUE;
+  }
+
+#if 0
+  printf("::: focus set to player %d [%d]\n",
+	 game.centered_player_nr, local_player->index_nr);
+#endif
 
   for (i = 0; i < NUM_BELTS; i++)
   {
@@ -12856,7 +12870,10 @@ static void HandleGameButtons(struct GadgetInfo *gi)
   switch (id)
   {
     case GAME_CTRL_ID_STOP:
-      RequestQuitGame(TRUE);
+      if (tape.playing)
+	TapeStop();
+      else
+	RequestQuitGame(TRUE);
       break;
 
     case GAME_CTRL_ID_PAUSE:
@@ -12883,7 +12900,7 @@ static void HandleGameButtons(struct GadgetInfo *gi)
 #endif
 	{
 	  tape.pausing = FALSE;
-	  DrawVideoDisplay(VIDEO_STATE_PAUSE_OFF,0);
+	  DrawVideoDisplay(VIDEO_STATE_PAUSE_OFF, 0);
 	}
       }
       break;

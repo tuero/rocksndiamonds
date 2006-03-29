@@ -697,7 +697,7 @@ void HandleKey(Key key, int key_status)
       TapeTogglePause(TAPE_TOGGLE_MANUAL);
   }
 
-  if (game_status == GAME_MODE_PLAYING)
+  if (game_status == GAME_MODE_PLAYING && !network_playing)
   {
     int centered_player_nr_next = -999;
 

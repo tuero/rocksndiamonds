@@ -431,11 +431,18 @@ static void Handle_OP_NUMBER_WANTED()
   }
   else if (old_client_nr == first_player.nr)	/* failed -- local player? */
   {
+#if 0
     char *color[] = { "yellow", "red", "green", "blue" };
+#endif
     char request[100];
 
+#if 1
+    sprintf(request, "Sorry ! Player %d already exists ! You are player %d !",
+	    index_nr_wanted + 1, new_index_nr + 1);
+#else
     sprintf(request, "Sorry ! %s player still exists ! You are %s player !",
 	    color[index_nr_wanted], color[new_index_nr]);
+#endif
     Request(request, REQ_CONFIRM);
 
     Error(ERR_NETWORK_CLIENT, "cannot switch -- you keep client # %d",

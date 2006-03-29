@@ -293,11 +293,11 @@ static void Handle_OP_NUMBER_WANTED(struct NetworkServerPlayerInfo *player)
       Error(ERR_NETWORK_SERVER, "client %d (%s) switches to # %d",
 	    player->number, player->player_name, nr_wanted);
     else if (player->number == nr_wanted)
-      Error(ERR_NETWORK_SERVER, "client %d (%s) still has # %d",
+      Error(ERR_NETWORK_SERVER, "client %d (%s) already has # %d",
 	    player->number, player->player_name, nr_wanted);
     else
       Error(ERR_NETWORK_SERVER,
-	    "client %d (%s) cannot switch (client %d still exists)",
+	    "client %d (%s) cannot switch (client %d already exists)",
 	    player->number, player->player_name, nr_wanted);
   }
 
