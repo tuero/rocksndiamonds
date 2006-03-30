@@ -1,3 +1,6 @@
+2006-03-30
+	* fixed "grass" to "sand" in older EM levels (up to file version V4)
+
 2006-03-29
 	* changed behaviour of network games with internal errors (because of
 	  different client frame counters) from immediately terminating R'n'D

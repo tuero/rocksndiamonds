@@ -197,7 +197,7 @@ int cleanup_em_level(unsigned char *src, int length)
   {
     /* ---------- this cave has unknown file format ---------- */
 
-#if 1
+#if 0
     printf("::: %d, %d\n", src[0], src[1983]);
 #endif
 
@@ -545,6 +545,20 @@ static unsigned short remap_emerald[256] =
 #endif
 };
 
+static int get_em_element(unsigned short em_element_raw, int file_version)
+{
+  int em_element = remap_emerald[em_element_raw];
+
+  if (file_version <= FILE_VERSION_EM_V4)
+  {
+    /* versions up to V4 had no grass, but only sand/dirt */
+    if (em_element == Xgrass)
+      em_element = Xdirt;
+  }
+
+  return em_element;
+}
+
 void convert_em_level(unsigned char *src, int file_version)
 {
   static int eater_offset[8] =
@@ -614,9 +628,10 @@ void convert_em_level(unsigned char *src, int file_version)
 
   for (i = 0; i < 8; i++)
     for (x = 0; x < 9; x++)
-      lev.eater_array[i][x] = remap_emerald[src[eater_offset[i] + x]];
+      lev.eater_array[i][x] =
+	get_em_element(src[eater_offset[i] + x], file_version);
 
-  temp = remap_emerald[src[0x86F]];
+  temp = get_em_element(src[0x86F], file_version);
   for (y = 0; y < 8; y++)
   {
     if (src[0x872] & 1)
@@ -886,7 +901,8 @@ void convert_em_level(unsigned char *src, int file_version)
   temp = 0;
   for (y = 0; y < lev.height; y++)
     for (x = 0; x < lev.width; x++)
-      native_em_level.cave[x + 1][y + 1] = remap_emerald[src[temp++]];
+      native_em_level.cave[x + 1][y + 1] =
+	get_em_element(src[temp++], file_version);
 
   /* at last, set the two players at their positions in the playfield */
   /* (native EM[C] levels always have exactly two players in a level) */

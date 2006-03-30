@@ -3758,6 +3758,10 @@ struct ConfigInfo image_config[] =
   { "emc_fake_grass.active.CRUMBLED.xpos",	"3"			},
   { "emc_fake_grass.active.CRUMBLED.ypos",	"4"			},
   { "emc_fake_grass.active.CRUMBLED.frames",	"1"			},
+  { "emc_fake_grass.EDITOR",			"RocksEMC.pcx"		},
+  { "emc_fake_grass.EDITOR.xpos",		"2"			},
+  { "emc_fake_grass.EDITOR.ypos",		"4"			},
+  { "emc_fake_grass.EDITOR.frames",		"1"			},
 
   { "emc_fake_acid",				"RocksElements.pcx"	},
   { "emc_fake_acid.xpos",			"12"			},
