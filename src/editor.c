@@ -1751,8 +1751,6 @@ static struct ValueTextInfo options_action_arg_number[] =
   { CA_ARG_4,			"4"				},
   { CA_ARG_5,			"5"				},
   { CA_ARG_10,			"10"				},
-  { CA_ARG_100,			"100"				},
-  { CA_ARG_1000,		"1000"				},
   { CA_ARG_UNDEFINED,		" "				},
   { CA_ARG_NUMBER_MIN,		"min"				},
   { CA_ARG_NUMBER_MAX,		"max"				},
@@ -1767,11 +1765,13 @@ static struct ValueTextInfo options_action_arg_number[] =
   { CA_ARG_NUMBER_LEVEL_GEMS,	"gems"				},
   { CA_ARG_NUMBER_LEVEL_SCORE,	"score"				},
   { CA_ARG_UNDEFINED,		" "				},
-  { CA_ARG_ELEMENT_CV_HEADLINE,	"[CE value"			},
-  { CA_ARG_ELEMENT_CV_HEADLINE,	" of"				},
-  { CA_ARG_ELEMENT_CV_HEADLINE,	" element]"			},
+  { CA_ARG_ELEMENT_CV_HEADLINE,	"[CE value]"			},
   { CA_ARG_ELEMENT_CV_TARGET,	"target"			},
   { CA_ARG_ELEMENT_CV_TRIGGER,	"trigger"			},
+  { CA_ARG_UNDEFINED,		" "				},
+  { CA_ARG_ELEMENT_CS_HEADLINE,	"[CE score]"			},
+  { CA_ARG_ELEMENT_CS_TARGET,	"target"			},
+  { CA_ARG_ELEMENT_CS_TRIGGER,	"trigger"			},
 
   { -1,				NULL				}
 };
@@ -1786,8 +1786,6 @@ static struct ValueTextInfo options_action_arg_value[] =
   { CA_ARG_4,			"4"				},
   { CA_ARG_5,			"5"				},
   { CA_ARG_10,			"10"				},
-  { CA_ARG_100,			"100"				},
-  { CA_ARG_1000,		"1000"				},
   { CA_ARG_UNDEFINED,		" "				},
   { CA_ARG_NUMBER_MIN,		"min"				},
   { CA_ARG_NUMBER_MAX,		"max"				},
@@ -1802,11 +1800,13 @@ static struct ValueTextInfo options_action_arg_value[] =
   { CA_ARG_NUMBER_LEVEL_GEMS,	"gems"				},
   { CA_ARG_NUMBER_LEVEL_SCORE,	"score"				},
   { CA_ARG_UNDEFINED,		" "				},
-  { CA_ARG_ELEMENT_CV_HEADLINE,	"[CE value"			},
-  { CA_ARG_ELEMENT_CV_HEADLINE,	" of"				},
-  { CA_ARG_ELEMENT_CV_HEADLINE,	" element]"			},
+  { CA_ARG_ELEMENT_CV_HEADLINE,	"[CE value]"			},
   { CA_ARG_ELEMENT_CV_TARGET,	"target"			},
   { CA_ARG_ELEMENT_CV_TRIGGER,	"trigger"			},
+  { CA_ARG_UNDEFINED,		" "				},
+  { CA_ARG_ELEMENT_CS_HEADLINE,	"[CE score]"			},
+  { CA_ARG_ELEMENT_CS_TARGET,	"target"			},
+  { CA_ARG_ELEMENT_CS_TRIGGER,	"trigger"			},
   { CA_ARG_UNDEFINED,		" "				},
   { CA_ARG_ELEMENT_NR_HEADLINE,	"[element]"			},
   { CA_ARG_ELEMENT_NR_TARGET,	"target"			},
@@ -4221,7 +4221,12 @@ static int editor_el_custom[] =
   EL_TRIGGER_PLAYER,
   EL_TRIGGER_ELEMENT,
   EL_TRIGGER_CE_VALUE,
-  EL_EMPTY
+  EL_TRIGGER_CE_SCORE,
+
+  EL_EMPTY,
+  EL_EMPTY,
+  EL_CURRENT_CE_VALUE,
+  EL_CURRENT_CE_SCORE
 };
 static int *editor_hl_custom_ptr = editor_hl_custom;
 static int *editor_el_custom_ptr = editor_el_custom;
@@ -9929,6 +9934,37 @@ void HandleLevelEditorKeyInput(Key key)
 		     element_shift / ED_ELEMENTLIST_BUTTONS_HORIZ, GDI_END);
 
 	ModifyEditorElementList();
+
+	break;
+
+      case KSYM_Insert:
+      case KSYM_Delete:
+	for (i = 0; i < num_editor_elements; i++)
+	{
+	  int e = editor_elements[i];
+
+	  if ((key == KSYM_Insert &&
+	       (e == EL_INTERNAL_CASCADE_CE ||
+		e == EL_INTERNAL_CASCADE_CE_ACTIVE)) ||
+	      (key == KSYM_Delete &&
+	       (e == EL_INTERNAL_CASCADE_GE ||
+		e == EL_INTERNAL_CASCADE_GE_ACTIVE)))
+	    break;
+	}
+
+	if (i < num_editor_elements)
+	{
+	  element_shift = i;
+
+	  if (element_shift > num_editor_elements - ED_NUM_ELEMENTLIST_BUTTONS)
+	    element_shift = num_editor_elements - ED_NUM_ELEMENTLIST_BUTTONS;
+
+	  ModifyGadget(level_editor_gadget[GADGET_ID_SCROLL_LIST_VERTICAL],
+		       GDI_SCROLLBAR_ITEM_POSITION,
+		       element_shift / ED_ELEMENTLIST_BUTTONS_HORIZ, GDI_END);
+
+	  ModifyEditorElementList();
+	}
 
 	break;
 

@@ -1,3 +1,12 @@
+2006-04-01
+	* added use of "Insert" and "Delete" keys to navigate element list in
+	  level editor to start of custom elements or start of group elements
+	* added virtual elements to access CE value and CE score of elements:
+	  - "CE value of triggering element"
+	  - "CE score of triggering element"
+	  - "CE value of current element"
+	  - "CE score of current element"
+
 2006-03-30
 	* fixed "grass" to "sand" in older EM levels (up to file version V4)
 

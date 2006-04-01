@@ -142,12 +142,14 @@
 				 RND(element_info[e].move_delay_random))
 #define GET_MAX_MOVE_DELAY(e)	(   (element_info[e].move_delay_fixed) + \
 				    (element_info[e].move_delay_random))
-#define GET_NEW_CUSTOM_VALUE(e)	(   (element_info[e].ce_value_fixed_initial) +\
+#define GET_NEW_CE_VALUE(e)	(   (element_info[e].ce_value_fixed_initial) +\
 				 RND(element_info[e].ce_value_random_initial))
+#define GET_CE_SCORE(e)		(   (element_info[e].collect_score))
 #define GET_CHANGE_DELAY(c)	(   ((c)->delay_fixed  * (c)->delay_frames) + \
 				 RND((c)->delay_random * (c)->delay_frames))
 #define GET_CE_DELAY_VALUE(c)	(   ((c)->delay_fixed) + \
 				 RND((c)->delay_random))
+
 
 #if 1
 #define GET_VALID_RUNTIME_ELEMENT(e)					\
@@ -157,10 +159,13 @@
 	((e) >= NUM_FILE_ELEMENTS ? EL_UNKNOWN : (e))
 #endif
 
-#define GET_TARGET_ELEMENT(e, ch)					\
-	((e) == EL_TRIGGER_PLAYER   ? (ch)->actual_trigger_player  :	\
-	 (e) == EL_TRIGGER_ELEMENT  ? (ch)->actual_trigger_element :	\
-	 (e) == EL_TRIGGER_CE_VALUE ? (ch)->actual_trigger_ce_value  : (e))
+#define GET_TARGET_ELEMENT(e, ch, cv, cs)				\
+	((e) == EL_TRIGGER_PLAYER   ? (ch)->actual_trigger_player    :	\
+	 (e) == EL_TRIGGER_ELEMENT  ? (ch)->actual_trigger_element   :	\
+	 (e) == EL_TRIGGER_CE_VALUE ? (ch)->actual_trigger_ce_value  :	\
+	 (e) == EL_TRIGGER_CE_SCORE ? (ch)->actual_trigger_ce_score  :	\
+	 (e) == EL_CURRENT_CE_VALUE ? (cv) :				\
+	 (e) == EL_CURRENT_CE_SCORE ? (cs) : (e))
 
 #define CAN_GROW_INTO(e)						\
 	((e) == EL_SAND || (IS_DIGGABLE(e) && level.grow_into_diggable))
@@ -1114,7 +1119,7 @@ static void InitField(int x, int y, boolean init_game)
 
 #if USE_NEW_CUSTOM_VALUE
 	if (!element_info[element].use_last_ce_value || init_game)
-	  CustomValue[x][y] = GET_NEW_CUSTOM_VALUE(Feld[x][y]);
+	  CustomValue[x][y] = GET_NEW_CE_VALUE(Feld[x][y]);
 #endif
       }
 #else
@@ -1156,7 +1161,7 @@ static void InitField(int x, int y, boolean init_game)
 #if USE_NEW_CUSTOM_VALUE
 
 #if 1
-  CustomValue[x][y] = GET_NEW_CUSTOM_VALUE(Feld[x][y]);
+  CustomValue[x][y] = GET_NEW_CE_VALUE(Feld[x][y]);
 #else
   CustomValue[x][y] = element_info[Feld[x][y]].custom_value_initial;
 #endif
@@ -1646,6 +1651,7 @@ static void InitGameEngine()
       ei->change_page[j].actual_trigger_player = EL_PLAYER_1;
       ei->change_page[j].actual_trigger_side = CH_SIDE_NONE;
       ei->change_page[j].actual_trigger_ce_value = 0;
+      ei->change_page[j].actual_trigger_ce_score = 0;
     }
   }
 
@@ -7844,6 +7850,7 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
 {
   struct ElementInfo *ei = &element_info[element];
   struct ElementChangeInfo *change = &ei->change_page[page];
+  int target_element = change->target_element;
   int action_type = change->action_type;
   int action_mode = change->action_mode;
   int action_arg = change->action_arg;
@@ -7882,8 +7889,8 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
      action_type == CA_SET_LEVEL_GEMS ? 999 :
      action_type == CA_SET_LEVEL_TIME ? 9999 :
      action_type == CA_SET_LEVEL_SCORE ? 99999 :
-     action_type == CA_SET_CE_SCORE ? 9999 :
      action_type == CA_SET_CE_VALUE ? 9999 :
+     action_type == CA_SET_CE_SCORE ? 9999 :
      CA_ARG_MAX);
 
   int action_arg_number_reset =
@@ -7891,12 +7898,12 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
      action_type == CA_SET_LEVEL_GEMS ? level.gems_needed :
      action_type == CA_SET_LEVEL_TIME ? level.time :
      action_type == CA_SET_LEVEL_SCORE ? 0 :
-     action_type == CA_SET_CE_SCORE ? 0 :
 #if 1
-     action_type == CA_SET_CE_VALUE ? GET_NEW_CUSTOM_VALUE(element) :
+     action_type == CA_SET_CE_VALUE ? GET_NEW_CE_VALUE(element) :
 #else
      action_type == CA_SET_CE_VALUE ? ei->custom_value_initial :
 #endif
+     action_type == CA_SET_CE_SCORE ? 0 :
      0);
 
   int action_arg_number =
@@ -7907,18 +7914,20 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
      action_arg == CA_ARG_NUMBER_MIN ? action_arg_number_min :
      action_arg == CA_ARG_NUMBER_MAX ? action_arg_number_max :
      action_arg == CA_ARG_NUMBER_RESET ? action_arg_number_reset :
-     action_arg == CA_ARG_NUMBER_CE_SCORE ? ei->collect_score :
 #if USE_NEW_CUSTOM_VALUE
      action_arg == CA_ARG_NUMBER_CE_VALUE ? CustomValue[x][y] :
 #else
      action_arg == CA_ARG_NUMBER_CE_VALUE ? ei->custom_value_initial :
 #endif
+     action_arg == CA_ARG_NUMBER_CE_SCORE ? ei->collect_score :
      action_arg == CA_ARG_NUMBER_CE_DELAY ? GET_CE_DELAY_VALUE(change) :
      action_arg == CA_ARG_NUMBER_LEVEL_TIME ? level_time_value :
      action_arg == CA_ARG_NUMBER_LEVEL_GEMS ? local_player->gems_still_needed :
      action_arg == CA_ARG_NUMBER_LEVEL_SCORE ? local_player->score :
-     action_arg == CA_ARG_ELEMENT_CV_TARGET ? GET_NEW_CUSTOM_VALUE(change->target_element) :
+     action_arg == CA_ARG_ELEMENT_CV_TARGET ? GET_NEW_CE_VALUE(target_element):
      action_arg == CA_ARG_ELEMENT_CV_TRIGGER ? change->actual_trigger_ce_value:
+     action_arg == CA_ARG_ELEMENT_CS_TARGET ? GET_CE_SCORE(target_element) :
+     action_arg == CA_ARG_ELEMENT_CS_TRIGGER ? change->actual_trigger_ce_score:
      action_arg == CA_ARG_ELEMENT_NR_TARGET  ? change->target_element :
      action_arg == CA_ARG_ELEMENT_NR_TRIGGER ? change->actual_trigger_element :
      -1);
@@ -7927,8 +7936,8 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
     (action_type == CA_SET_LEVEL_GEMS ? local_player->gems_still_needed :
      action_type == CA_SET_LEVEL_TIME ? TimeLeft :
      action_type == CA_SET_LEVEL_SCORE ? local_player->score :
-     action_type == CA_SET_CE_SCORE ? ei->collect_score :
      action_type == CA_SET_CE_VALUE ? CustomValue[x][y] :
+     action_type == CA_SET_CE_SCORE ? ei->collect_score :
      0);
 
   int action_arg_number_new =
@@ -8189,13 +8198,6 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
 
     /* ---------- CE actions  ---------------------------------------------- */
 
-    case CA_SET_CE_SCORE:
-    {
-      ei->collect_score = action_arg_number_new;
-
-      break;
-    }
-
     case CA_SET_CE_VALUE:
     {
 #if USE_NEW_CUSTOM_VALUE
@@ -8221,6 +8223,13 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
 #endif
       }
 #endif
+
+      break;
+    }
+
+    case CA_SET_CE_SCORE:
+    {
+      ei->collect_score = action_arg_number_new;
 
       break;
     }
@@ -8325,7 +8334,10 @@ static void CreateElementFromChange(int x, int y, int element)
 
 static boolean ChangeElement(int x, int y, int element, int page)
 {
-  struct ElementChangeInfo *change = &element_info[element].change_page[page];
+  struct ElementInfo *ei = &element_info[element];
+  struct ElementChangeInfo *change = &ei->change_page[page];
+  int ce_value = CustomValue[x][y];
+  int ce_score = ei->collect_score;
   int target_element;
   int old_element = Feld[x][y];
 
@@ -8340,6 +8352,7 @@ static boolean ChangeElement(int x, int y, int element, int page)
     change->actual_trigger_player = EL_PLAYER_1;
     change->actual_trigger_side = CH_SIDE_NONE;
     change->actual_trigger_ce_value = 0;
+    change->actual_trigger_ce_score = 0;
   }
 
   /* do not change elements more than a specified maximum number of changes */
@@ -8444,7 +8457,8 @@ static boolean ChangeElement(int x, int y, int element, int page)
 	  ChangeEvent[ex][ey] = ChangeEvent[x][y];
 
 	  content_element = change->target_content.e[xx][yy];
-	  target_element = GET_TARGET_ELEMENT(content_element, change);
+	  target_element = GET_TARGET_ELEMENT(content_element, change,
+					      ce_value, ce_score);
 
 	  CreateElementFromChange(ex, ey, target_element);
 
@@ -8465,7 +8479,8 @@ static boolean ChangeElement(int x, int y, int element, int page)
   }
   else
   {
-    target_element = GET_TARGET_ELEMENT(change->target_element, change);
+    target_element = GET_TARGET_ELEMENT(change->target_element, change,
+					ce_value, ce_score);
 
     if (element == EL_DIAGONAL_GROWING ||
 	element == EL_DIAGONAL_SHRINKING)
@@ -8699,6 +8714,7 @@ static boolean CheckTriggeredElementChangeExt(int trigger_x, int trigger_y,
 	change->actual_trigger_player = EL_PLAYER_1 + log_2(trigger_player);
 	change->actual_trigger_side = trigger_side;
 	change->actual_trigger_ce_value = CustomValue[trigger_x][trigger_y];
+	change->actual_trigger_ce_score = GET_CE_SCORE(trigger_element);
 
 	if ((change->can_change && !change_done) || change->has_action)
 	{
@@ -8803,6 +8819,7 @@ static boolean CheckElementChangeExt(int x, int y,
       change->actual_trigger_player = EL_PLAYER_1 + log_2(trigger_player);
       change->actual_trigger_side = trigger_side;
       change->actual_trigger_ce_value = CustomValue[x][y];
+      change->actual_trigger_ce_score = GET_CE_SCORE(trigger_element);
 
       /* special case: trigger element not at (x,y) position for some events */
       if (check_trigger_element)
@@ -8825,6 +8842,7 @@ static boolean CheckElementChangeExt(int x, int y,
 	int yy = y + move_xy[MV_DIR_OPPOSITE(trigger_side)].dy;
 
 	change->actual_trigger_ce_value = CustomValue[xx][yy];
+	change->actual_trigger_ce_score = GET_CE_SCORE(trigger_element);
       }
 
       if (change->can_change && !change_done)

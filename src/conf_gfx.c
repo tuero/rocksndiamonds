@@ -3446,8 +3446,23 @@ struct ConfigInfo image_config[] =
 
   { "trigger_ce_value",				"RocksDC.pcx"		},
   { "trigger_ce_value.xpos",			"15"			},
-  { "trigger_ce_value.ypos",			"15"			},
+  { "trigger_ce_value.ypos",			"11"			},
   { "trigger_ce_value.frames",			"1"			},
+
+  { "trigger_ce_score",				"RocksDC.pcx"		},
+  { "trigger_ce_score.xpos",			"15"			},
+  { "trigger_ce_score.ypos",			"12"			},
+  { "trigger_ce_score.frames",			"1"			},
+
+  { "current_ce_value",				"RocksDC.pcx"		},
+  { "current_ce_value.xpos",			"14"			},
+  { "current_ce_value.ypos",			"11"			},
+  { "current_ce_value.frames",			"1"			},
+
+  { "current_ce_score",				"RocksDC.pcx"		},
+  { "current_ce_score.xpos",			"14"			},
+  { "current_ce_score.ypos",			"12"			},
+  { "current_ce_score.frames",			"1"			},
 
   { "emc_key_5",				"RocksEMC.pcx"		},
   { "emc_key_5.xpos",				"0"			},

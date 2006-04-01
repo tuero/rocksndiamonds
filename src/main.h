@@ -381,13 +381,16 @@
 #define CA_ARG_ELEMENT_RESET		(CA_ARG_ELEMENT + 0)
 #define CA_ARG_ELEMENT_TARGET		(CA_ARG_ELEMENT + 1)
 #define CA_ARG_ELEMENT_TRIGGER		(CA_ARG_ELEMENT + 2)
-#define CA_ARG_ELEMENT_HEADLINE		(CA_ARG_ELEMENT + 998)
+#define CA_ARG_ELEMENT_HEADLINE		(CA_ARG_ELEMENT + 997)
 #define CA_ARG_ELEMENT_CV_TARGET	(CA_ARG_ELEMENT_TARGET)
 #define CA_ARG_ELEMENT_CV_TRIGGER	(CA_ARG_ELEMENT_TRIGGER)
 #define CA_ARG_ELEMENT_CV_HEADLINE	(CA_ARG_ELEMENT_HEADLINE)
 #define CA_ARG_ELEMENT_NR_TARGET	(CA_ARG_ELEMENT + 3)
 #define CA_ARG_ELEMENT_NR_TRIGGER	(CA_ARG_ELEMENT + 4)
-#define CA_ARG_ELEMENT_NR_HEADLINE	(CA_ARG_ELEMENT + 999)
+#define CA_ARG_ELEMENT_NR_HEADLINE	(CA_ARG_ELEMENT + 998)
+#define CA_ARG_ELEMENT_CS_TARGET	(CA_ARG_ELEMENT + 5)
+#define CA_ARG_ELEMENT_CS_TRIGGER	(CA_ARG_ELEMENT + 6)
+#define CA_ARG_ELEMENT_CS_HEADLINE	(CA_ARG_ELEMENT + 999)
 #define CA_ARG_SPEED			13000
 #define CA_ARG_SPEED_NOT_MOVING		(CA_ARG_SPEED + STEPSIZE_NOT_MOVING)
 #define CA_ARG_SPEED_VERY_SLOW		(CA_ARG_SPEED + STEPSIZE_VERY_SLOW)
@@ -1265,13 +1268,16 @@
 #define EL_EMC_DRIPPER			704
 
 #define EL_TRIGGER_CE_VALUE		705
+#define EL_TRIGGER_CE_SCORE		706
+#define EL_CURRENT_CE_VALUE		707
+#define EL_CURRENT_CE_SCORE		708
 
-#define EL_YAMYAM_LEFT			706
-#define EL_YAMYAM_RIGHT			707
-#define EL_YAMYAM_UP			708
-#define EL_YAMYAM_DOWN			709
+#define EL_YAMYAM_LEFT			709
+#define EL_YAMYAM_RIGHT			710
+#define EL_YAMYAM_UP			711
+#define EL_YAMYAM_DOWN			712
 
-#define NUM_FILE_ELEMENTS		710
+#define NUM_FILE_ELEMENTS		713
 
 
 /* "real" (and therefore drawable) runtime elements */
@@ -1970,6 +1976,7 @@ struct ElementChangeInfo
   int actual_trigger_side;	/* element side that triggered the change */
   int actual_trigger_player;	/* player which actually triggered change */
   int actual_trigger_ce_value;	/* CE value of element that triggered change */
+  int actual_trigger_ce_score;	/* CE score of element that triggered change */
 
   boolean can_change_or_has_action;	/* can_change | has_action */
 

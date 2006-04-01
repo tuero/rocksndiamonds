@@ -3655,6 +3655,21 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
     "CE value of element triggering change"
   },
   {
+    "trigger_ce_score",
+    "trigger",
+    "CE score of element triggering change"
+  },
+  {
+    "current_ce_value",
+    "current",
+    "CE value of current element"
+  },
+  {
+    "current_ce_score",
+    "current",
+    "CE score of current element"
+  },
+  {
     "yamyam.left",
     "yamyam",
     "yam yam (starts moving left)"

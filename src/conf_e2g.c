@@ -2814,6 +2814,18 @@ element_to_graphic[] =
     IMG_TRIGGER_CE_VALUE
   },
   {
+    EL_TRIGGER_CE_SCORE,		-1, -1, FALSE,
+    IMG_TRIGGER_CE_SCORE
+  },
+  {
+    EL_CURRENT_CE_VALUE,		-1, -1, FALSE,
+    IMG_CURRENT_CE_VALUE
+  },
+  {
+    EL_CURRENT_CE_SCORE,		-1, -1, FALSE,
+    IMG_CURRENT_CE_SCORE
+  },
+  {
     EL_EMC_KEY_5,			-1, -1, FALSE,
     IMG_EMC_KEY_5
   },
