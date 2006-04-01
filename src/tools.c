@@ -20,6 +20,10 @@
 #include "network.h"
 #include "tape.h"
 
+
+/* select level set with EMC X11 graphics before activating EM GFX debugging */
+#define DEBUG_EM_GFX	0
+
 /* tool button identifiers */
 #define TOOL_CTRL_ID_YES	0
 #define TOOL_CTRL_ID_NO		1
@@ -1041,6 +1045,8 @@ void DrawLevelFieldCrumbledSand(int x, int y)
     return;
 
 #if 1
+  /* !!! CHECK THIS !!! */
+
   /*
   if (Feld[x][y] == EL_ELEMENT_SNAPPING &&
       GFX_CRUMBLED(GfxElement[x][y]))
@@ -4171,19 +4177,19 @@ em_object_mapping_list[] =
     EL_QUICKSAND_FULL,			-1, -1
   },
   {
-    Xsand_stonein_1,			FALSE,	FALSE,
+    Xsand_stonein_1,			FALSE,	TRUE,
     EL_ROCK,				ACTION_FILLING, -1
   },
   {
-    Xsand_stonein_2,			FALSE,	FALSE,
+    Xsand_stonein_2,			FALSE,	TRUE,
     EL_ROCK,				ACTION_FILLING, -1
   },
   {
-    Xsand_stonein_3,			FALSE,	FALSE,
+    Xsand_stonein_3,			FALSE,	TRUE,
     EL_ROCK,				ACTION_FILLING, -1
   },
   {
-    Xsand_stonein_4,			FALSE,	FALSE,
+    Xsand_stonein_4,			FALSE,	TRUE,
     EL_ROCK,				ACTION_FILLING, -1
   },
   {
@@ -5200,8 +5206,6 @@ unsigned int InitRND(long seed)
     return InitEngineRND(seed);
 }
 
-#define DEBUG_EM_GFX	0
-
 void InitGraphicInfo_EM(void)
 {
   struct Mapping_EM_to_RND_object object_mapping[TILE_MAX];
@@ -5209,12 +5213,16 @@ void InitGraphicInfo_EM(void)
   int i, j, p;
 
 #if DEBUG_EM_GFX
+  int num_em_gfx_errors = 0;
+
   if (graphic_info_em_object[0][0].bitmap == NULL)
   {
     /* EM graphics not yet initialized in em_open_all() */
 
     return;
   }
+
+  printf("::: [4 errors can be ignored (1 x 'bomb', 3 x 'em_dynamite']\n");
 #endif
 
   /* always start with reliable default values */
@@ -5308,12 +5316,12 @@ void InitGraphicInfo_EM(void)
 			       i == Ymagnify_eat ? element :
 			       i == Ygrass_eat ? element :
 			       i == Ydirt_eat ? element :
-			       i == Yspring_kill_e ? EL_SPRING :
-			       i == Yspring_kill_w ? EL_SPRING :
 			       i == Yemerald_stone ? EL_EMERALD :
 			       i == Ydiamond_stone ? EL_ROCK :
-			       i == Xsand_stonein_4 ? EL_EMPTY :
-			       i == Xsand_stoneout_2 ? EL_ROCK :
+			       i == Xsand_stonein_1 ? element :
+			       i == Xsand_stonein_2 ? element :
+			       i == Xsand_stonein_3 ? element :
+			       i == Xsand_stonein_4 ? element :
 			       is_backside ? EL_EMPTY :
 			       action_removing ? EL_EMPTY :
 			       element);
@@ -5355,6 +5363,7 @@ void InitGraphicInfo_EM(void)
 				     direction));
       int base_graphic = el_act2img(effective_element, ACTION_DEFAULT);
       int base_crumbled = el_act2crm(effective_element, ACTION_DEFAULT);
+      boolean has_action_graphics = (graphic != base_graphic);
       boolean has_crumbled_graphics = (base_crumbled != base_graphic);
       struct GraphicInfo *g = &graphic_info[graphic];
       struct GraphicInfo_EM *g_em = &graphic_info_em_object[i][7 - j];
@@ -5522,23 +5531,43 @@ void InitGraphicInfo_EM(void)
 	g_em->crumbled_border_size = graphic_info[crumbled].border_size;
       }
 
-      if (!g->double_movement && (effective_action == ACTION_FALLING ||
-				  effective_action == ACTION_MOVING  ||
-				  effective_action == ACTION_PUSHING ||
-				  effective_action == ACTION_EATING))
+#if 0
+      if (element == EL_ROCK &&
+	  effective_action == ACTION_FILLING)
+	printf("::: has_action_graphics == %d\n", has_action_graphics);
+#endif
+
+      if ((!g->double_movement && (effective_action == ACTION_FALLING ||
+				   effective_action == ACTION_MOVING  ||
+				   effective_action == ACTION_PUSHING ||
+				   effective_action == ACTION_EATING)) ||
+	  (!has_action_graphics && (effective_action == ACTION_FILLING ||
+				    effective_action == ACTION_EMPTYING)))
       {
 	int move_dir =
-	  (effective_action == ACTION_FALLING ? MV_DOWN : direction);
+	  (effective_action == ACTION_FALLING ||
+	   effective_action == ACTION_FILLING ||
+	   effective_action == ACTION_EMPTYING ? MV_DOWN : direction);
 	int dx = (move_dir == MV_LEFT ? -1 : move_dir == MV_RIGHT ? 1 : 0);
 	int dy = (move_dir == MV_UP   ? -1 : move_dir == MV_DOWN  ? 1 : 0);
-	int num_steps = (i == Ydrip_s1 ||
-			 i == Ydrip_s1B ||
-			 i == Ydrip_s2 ||
-			 i == Ydrip_s2B ? 16 : 8);
+	int num_steps = (i == Ydrip_s1  ? 16 :
+			 i == Ydrip_s1B ? 16 :
+			 i == Ydrip_s2  ? 16 :
+			 i == Ydrip_s2B ? 16 :
+			 i == Xsand_stonein_1 ? 32 :
+			 i == Xsand_stonein_2 ? 32 :
+			 i == Xsand_stonein_3 ? 32 :
+			 i == Xsand_stonein_4 ? 32 :
+			 i == Xsand_stoneout_1 ? 16 :
+			 i == Xsand_stoneout_2 ? 16 : 8);
 	int cx = ABS(dx) * (TILEX / num_steps);
 	int cy = ABS(dy) * (TILEY / num_steps);
-	int step_frame = (i == Ydrip_s2 ||
-			  i == Ydrip_s2B ? j + 8 : j) + 1;
+	int step_frame = (i == Ydrip_s2         ? j + 8 :
+			  i == Ydrip_s2B        ? j + 8 :
+			  i == Xsand_stonein_2  ? j + 8 :
+			  i == Xsand_stonein_3  ? j + 16 :
+			  i == Xsand_stonein_4  ? j + 24 :
+			  i == Xsand_stoneout_2 ? j + 8 : j) + 1;
 	int step = (is_backside ? step_frame : num_steps - step_frame);
 
 	if (is_backside)	/* tile where movement starts */
@@ -5660,6 +5689,8 @@ void InitGraphicInfo_EM(void)
 	  printf("    %d (%d): size %d,%d should be %d,%d\n",
 		 j, is_backside,
 		 g_em->width, g_em->height, TILEX, TILEY);
+
+	num_em_gfx_errors++;
       }
 #endif
 
@@ -5806,6 +5837,8 @@ void InitGraphicInfo_EM(void)
 		   g_em->src_x / 32, g_em->src_y / 32,
 		   debug_src_x, debug_src_y,
 		   debug_src_x / 32, debug_src_y / 32);
+
+	  num_em_gfx_errors++;
 	}
 #endif
 
@@ -5814,6 +5847,9 @@ void InitGraphicInfo_EM(void)
   }
 
 #if DEBUG_EM_GFX
+  printf("\n");
+  printf("::: [%d errors found]\n", num_em_gfx_errors);
+
   exit(0);
 #endif
 }
