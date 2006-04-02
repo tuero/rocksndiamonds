@@ -1,5 +1,6 @@
 2006-04-02
 	* fixed handling of over-large selectboxes (less error-prone now)
+	* fixed bug when creating GE with walkable element under the player
 
 2006-04-01
 	* added use of "Insert" and "Delete" keys to navigate element list in

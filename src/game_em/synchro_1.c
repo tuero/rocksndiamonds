@@ -12,6 +12,8 @@
 extern int centered_player_nr;
 #endif
 
+#define USE_CHANGED_ACID_STUFF		1
+
 extern boolean checkIfAllPlayersFitToScreen();
 
 static void check_player(struct PLAYER *);
@@ -421,7 +423,7 @@ static void kill_player(struct PLAYER *ply)
 
   switch(Cave[y][x])
   {
-#if 1
+#if USE_CHANGED_ACID_STUFF
     case Xacid_1:
     case Xacid_2:
     case Xacid_3:
@@ -684,7 +686,7 @@ static boolean player_digfield(struct PLAYER *ply, int dx, int dy)
 	ply->y = y;
 	break;
 
-#if 1
+#if USE_CHANGED_ACID_STUFF
       case Xacid_1:
       case Xacid_2:
       case Xacid_3:
@@ -693,12 +695,12 @@ static boolean player_digfield(struct PLAYER *ply, int dx, int dy)
       case Xacid_6:
       case Xacid_7:
       case Xacid_8:
-#endif
 	if (Cave[y-1][x+1] == Xblank)
 	  Cave[y-1][x+1] = Yacid_splash_eB;
 	if (Cave[y-1][x-1] == Xblank)
 	  Cave[y-1][x-1] = Yacid_splash_wB;
 	play_element_sound(x, y, SAMPLE_acid, Xacid_1);
+#endif
 
       case Xboom_android:
       case Xboom_1:
@@ -718,7 +720,8 @@ static boolean player_digfield(struct PLAYER *ply, int dx, int dy)
       case Xtank_goe:
       case Xtank_gos:
       case Xtank_gow:
-#if 0
+
+#if !USE_CHANGED_ACID_STUFF
       case Xacid_1:
       case Xacid_2:
       case Xacid_3:

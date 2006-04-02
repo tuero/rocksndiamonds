@@ -866,6 +866,32 @@ static int getBeltDirFromBeltSwitchElement(int element)
   return belt_move_dir[belt_dir_nr];
 }
 
+static int get_element_from_group_element(int element)
+{
+  if (IS_GROUP_ELEMENT(element))
+  {
+    struct ElementGroupInfo *group = element_info[element].group;
+    int last_anim_random_frame = gfx.anim_random_frame;
+    int element_pos;
+
+    if (group->choice_mode == ANIM_RANDOM)
+      gfx.anim_random_frame = RND(group->num_elements_resolved);
+
+    element_pos = getAnimationFrame(group->num_elements_resolved, 1,
+				    group->choice_mode, 0,
+				    group->choice_pos);
+
+    if (group->choice_mode == ANIM_RANDOM)
+      gfx.anim_random_frame = last_anim_random_frame;
+
+    group->choice_pos++;
+
+    element = group->element_resolved[element_pos];
+  }
+
+  return element;
+}
+
 static void InitPlayerField(int x, int y, int element, boolean init_game)
 {
   if (element == EL_SP_MURPHY)
@@ -1128,6 +1154,11 @@ static void InitField(int x, int y, boolean init_game)
 #endif
       else if (IS_GROUP_ELEMENT(element))
       {
+#if 1
+	Feld[x][y] = get_element_from_group_element(element);
+
+	InitField(x, y, init_game);
+#else
 	struct ElementGroupInfo *group = element_info[element].group;
 	int last_anim_random_frame = gfx.anim_random_frame;
 	int element_pos;
@@ -1147,6 +1178,7 @@ static void InitField(int x, int y, boolean init_game)
 	Feld[x][y] = group->element_resolved[element_pos];
 
 	InitField(x, y, init_game);
+#endif
       }
       break;
   }
@@ -8250,22 +8282,26 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
 
 static void CreateFieldExt(int x, int y, int element, boolean is_change)
 {
+  int old_element = Feld[x][y];
+  int new_element = get_element_from_group_element(element);
   int previous_move_direction = MovDir[x][y];
 #if USE_NEW_CUSTOM_VALUE
   int last_ce_value = CustomValue[x][y];
 #endif
-  boolean add_player = (ELEM_IS_PLAYER(element) &&
-			IS_WALKABLE(Feld[x][y]));
+  boolean add_player = (ELEM_IS_PLAYER(new_element) &&
+			IS_WALKABLE(old_element));
 
+#if 0
   /* check if element under player changes from accessible to unaccessible
      (needed for special case of dropping element which then changes) */
   if (IS_PLAYER(x, y) && !PLAYER_EXPLOSION_PROTECTED(x, y) &&
-      IS_ACCESSIBLE(Feld[x][y]) && !IS_ACCESSIBLE(element))
+      IS_ACCESSIBLE(old_element) && !IS_ACCESSIBLE(new_element))
   {
     Bang(x, y);
 
     return;
   }
+#endif
 
   if (!add_player)
   {
@@ -8274,30 +8310,44 @@ static void CreateFieldExt(int x, int y, int element, boolean is_change)
     else
       RemoveField(x, y);
 
-    Feld[x][y] = element;
+    Feld[x][y] = new_element;
 
     ResetGfxAnimation(x, y);
     ResetRandomAnimationValue(x, y);
 
-    if (element_info[Feld[x][y]].move_direction_initial == MV_START_PREVIOUS)
+    if (element_info[new_element].move_direction_initial == MV_START_PREVIOUS)
       MovDir[x][y] = previous_move_direction;
 
 #if USE_NEW_CUSTOM_VALUE
-    if (element_info[Feld[x][y]].use_last_ce_value)
+    if (element_info[new_element].use_last_ce_value)
       CustomValue[x][y] = last_ce_value;
 #endif
 
     InitField_WithBug1(x, y, FALSE);
 
+    new_element = Feld[x][y];	/* element may have changed */
+
     DrawLevelField(x, y);
 
-    if (GFX_CRUMBLED(Feld[x][y]))
+    if (GFX_CRUMBLED(new_element))
       DrawLevelFieldCrumbledSandNeighbours(x, y);
   }
 
+#if 1
+  /* check if element under player changes from accessible to unaccessible
+     (needed for special case of dropping element which then changes) */
+  if (IS_PLAYER(x, y) && !PLAYER_EXPLOSION_PROTECTED(x, y) &&
+      IS_ACCESSIBLE(old_element) && !IS_ACCESSIBLE(new_element))
+  {
+    Bang(x, y);
+
+    return;
+  }
+#endif
+
   /* "ChangeCount" not set yet to allow "entered by player" change one time */
-  if (ELEM_IS_PLAYER(element))
-    RelocatePlayer(x, y, element);
+  if (ELEM_IS_PLAYER(new_element))
+    RelocatePlayer(x, y, new_element);
 
   if (is_change)
     ChangeCount[x][y]++;	/* count number of changes in the same frame */
