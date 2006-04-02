@@ -1385,6 +1385,7 @@ boolean HandleGadgets(int mx, int my, int button)
   static int last_button = 0;
   static int last_mx = 0, last_my = 0;
   static int pressed_mx = 0, pressed_my = 0;
+  static boolean keep_selectbox_open = FALSE;
   int scrollbar_mouse_pos = 0;
   struct GadgetInfo *new_gi, *gi;
   boolean press_event;
@@ -1511,6 +1512,10 @@ boolean HandleGadgets(int mx, int my, int button)
     gadget_released_inside_select_area = FALSE;
   }
 
+  /* setting state for handling over-large selectbox */
+  if (keep_selectbox_open && (press_event || !mouse_inside_select_line))
+    keep_selectbox_open = FALSE;
+
   /* if new gadget pressed, store this gadget  */
   if (gadget_pressed)
     last_gi = new_gi;
@@ -1527,8 +1532,9 @@ boolean HandleGadgets(int mx, int my, int button)
   if (gadget_released)
   {
     if (gi->type & GD_TYPE_SELECTBOX &&
-	(mouse_released_where_pressed ||
-	!gadget_released_inside_select_area))	     /* selectbox stays open */
+	(keep_selectbox_open ||
+	 mouse_released_where_pressed ||
+	 !gadget_released_inside_select_area))	     /* selectbox stays open */
     {
       gi->selectbox.stay_open = TRUE;
       pressed_mx = 0;
@@ -1589,7 +1595,8 @@ boolean HandleGadgets(int mx, int my, int button)
       if (gi->textarea.cursor_position != old_cursor_position)
 	DrawGadget(gi, DG_PRESSED, gi->direct_draw);
     }
-    else if (gi->type & GD_TYPE_SELECTBOX && gi->selectbox.open)
+    else if (gi->type & GD_TYPE_SELECTBOX && gi->selectbox.open &&
+	     !keep_selectbox_open)
     {
       int old_index = gi->selectbox.current_index;
 
@@ -1713,6 +1720,12 @@ boolean HandleGadgets(int mx, int my, int button)
 	return TRUE;
       }
     }
+    else if (gi->type & GD_TYPE_SELECTBOX)
+    {
+      /* keep selectbox open in case of over-large selectbox */
+      keep_selectbox_open = (mouse_inside_select_line &&
+			     mouse_inside_select_area);
+    }
 
     DrawGadget(gi, DG_PRESSED, gi->direct_draw);
 
@@ -1746,7 +1759,7 @@ boolean HandleGadgets(int mx, int my, int button)
       else if (gadget_moving_off_borders && gi->state == GD_BUTTON_PRESSED)
 	DrawGadget(gi, DG_UNPRESSED, gi->direct_draw);
     }
-    else if (gi->type & GD_TYPE_SELECTBOX)
+    else if (gi->type & GD_TYPE_SELECTBOX && !keep_selectbox_open)
     {
       int old_index = gi->selectbox.current_index;
 
@@ -1818,7 +1831,8 @@ boolean HandleGadgets(int mx, int my, int button)
 
     if (gi->type & GD_TYPE_SELECTBOX)
     {
-      if (mouse_released_where_pressed ||
+      if (keep_selectbox_open ||
+	  mouse_released_where_pressed ||
 	  !gadget_released_inside_select_area)	     /* selectbox stays open */
       {
 	deactivate_gadget = FALSE;

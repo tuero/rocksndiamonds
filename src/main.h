@@ -670,6 +670,7 @@
 #define GFX_ELEMENT(e)		(element_info[e].use_gfx_element ?	\
 				 element_info[e].gfx_element : e)
 
+/* !!! CHECK THIS !!! */
 #if 1
 #define TILE_GFX_ELEMENT(x, y)						\
 		   (GfxElement[x][y] != EL_UNDEFINED &&			\
