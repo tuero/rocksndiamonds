@@ -1,3 +1,6 @@
+2006-04-03
+	* changed EM engine behaviour back to re-allow initial rolling springs
+
 2006-04-02
 	* fixed handling of over-large selectboxes (less error-prone now)
 	* fixed bug when creating GE with walkable element under the player
@@ -48,6 +51,7 @@
 
 2006-03-10
 	* added four new yam yams with explicit start direction for EMC engine
+	* fixed bug in src/libgame/text.c with printing text outside the window
 
 2006-03-09
 	* fixed small bug in EMC level loader (copyright sign in EM II levels)

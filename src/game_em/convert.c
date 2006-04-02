@@ -11,6 +11,8 @@
 #include "main_em.h"
 
 
+#define ALLOW_ROLLING_SPRING
+
 static unsigned char remap_v6[256] =
 {
   /* filter crap for v6 */
@@ -20,7 +22,11 @@ static unsigned char remap_v6[256] =
   0,16,2,18,       36,37,37,37,     40,41,42,43,     44,45,128,128,
   128,148,148,     148,45,45,45,    148,0,57,58,     59,60,61,62,63,
 
+#ifdef ALLOW_ROLLING_SPRING
+  64,65,66,67,     68,69,69,71,     72,73,74,75,     118,75,75,75,
+#else
   64,65,66,67,     68,69,69,69,     69,73,74,75,     118,75,75,75,
+#endif
   75,75,75,75,     75,153,153,153,  153,153,153,153, 153,153,153,153,
   153,153,153,99,  100,68,68,68,    68,68,68,68,     68,118,118,118,
   118,118,114,115, 131,118,118,119, 120,121,122,118, 118,118,118,118,
@@ -439,6 +445,11 @@ int cleanup_em_level(unsigned char *src, int length)
  * - rolling spring is now turned into regular spring. it appears the emc
  *   editor only uses the force code for initially moving spring. i will
  *   follow this in my editor.
+ *
+ * 2006-04-02
+ * - introduced ALLOW_ROLLING_SPRING; if defined, do NOT turn rolling spring
+ *   into regular spring, because this breaks at least E.M.C. Mine 3, level 79
+ *   (see comment directly above)
  */
 
 static unsigned short remap_emerald[256] =
@@ -463,10 +474,17 @@ static unsigned short remap_emerald[256] =
   Xstone,		Xgrow_ew,	Xgrow_ns,	Xdynamite_1,
   Xdynamite_2,		Xdynamite_3,	Xdynamite_4,	Xacid_s,
 
+#ifdef ALLOW_ROLLING_SPRING
+  Xexit_1,		Xexit_2,	Xexit_3,	Xballoon,
+  Xplant,		Xspring,	Xspring_fall,	Xspring_w,
+  Xspring_e,		Xball_1,	Xball_2,	Xandroid,
+  Xblank,		Xandroid,	Xandroid,	Xandroid,
+#else
   Xexit_1,		Xexit_2,	Xexit_3,	Xballoon,
   Xplant,		Xspring,	Xspring,	Xspring,
   Xspring,		Xball_1,	Xball_2,	Xandroid,
   Xblank,		Xandroid,	Xandroid,	Xandroid,
+#endif
 
   Xandroid,		Xandroid,	Xandroid,	Xandroid,
   Xandroid,		Xblank,		Xblank,		Xblank,
