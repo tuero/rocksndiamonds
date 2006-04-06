@@ -148,7 +148,7 @@ void translate_joyname(int *joysymbol, char **name, int mode)
 
     for (i = 0; i < 6; i++)
     {
-      if (strcmp(*name, translate_joy[i].name) == 0)
+      if (strEqual(*name, translate_joy[i].name))
       {
 	*joysymbol = translate_joy[i].joysymbol;
 	break;

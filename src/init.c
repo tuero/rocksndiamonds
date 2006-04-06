@@ -824,12 +824,12 @@ static int get_graphic_parameter_value(char *value_raw, char *suffix, int type)
   if (type != TYPE_TOKEN)
     return get_parameter_value(value_raw, suffix, type);
 
-  if (strcmp(value_raw, ARG_UNDEFINED) == 0)
+  if (strEqual(value_raw, ARG_UNDEFINED))
     return ARG_UNDEFINED_VALUE;
 
   /* !!! OPTIMIZE THIS BY USING HASH !!! */
   for (i = 0; i < MAX_NUM_ELEMENTS; i++)
-    if (strcmp(element_info[i].token_name, value_raw) == 0)
+    if (strEqual(element_info[i].token_name, value_raw))
       return i;
 
   /* !!! OPTIMIZE THIS BY USING HASH !!! */
@@ -837,12 +837,12 @@ static int get_graphic_parameter_value(char *value_raw, char *suffix, int type)
   {
     int len_config_value = strlen(image_config[i].value);
 
-    if (strcmp(&image_config[i].value[len_config_value - 4], ".pcx") != 0 &&
-	strcmp(&image_config[i].value[len_config_value - 4], ".wav") != 0 &&
-	strcmp(image_config[i].value, UNDEFINED_FILENAME) != 0)
+    if (!strEqual(&image_config[i].value[len_config_value - 4], ".pcx") &&
+	!strEqual(&image_config[i].value[len_config_value - 4], ".wav") &&
+	!strEqual(image_config[i].value, UNDEFINED_FILENAME))
       continue;
 
-    if (strcmp(image_config[i].token, value_raw) == 0)
+    if (strEqual(image_config[i].token, value_raw))
       return x;
 
     x++;
@@ -1290,8 +1290,8 @@ static void InitElementSoundInfo()
       element_info[element].sound[action] = sound;
     else
       for (j = 0; j < MAX_NUM_ELEMENTS; j++)
-	if (strcmp(element_info[j].class_name,
-		   element_info[element].class_name) == 0)
+	if (strEqual(element_info[j].class_name,
+		     element_info[element].class_name))
 	  element_info[j].sound[action] = sound;
   }
 
@@ -1309,8 +1309,8 @@ static void InitElementSoundInfo()
       action = ACTION_DEFAULT;
 
     for (j = 0; j < MAX_NUM_ELEMENTS; j++)
-      if (strcmp(element_info[j].class_name,
-		 element_info[element_class].class_name) == 0)
+      if (strEqual(element_info[j].class_name,
+		   element_info[element_class].class_name))
 	element_info[j].sound[action] = sound;
   }
 
@@ -1465,8 +1465,8 @@ static void InitSoundInfo()
       int len_action_text = strlen(element_action_info[j].suffix);
 
       if (len_action_text < len_effect_text &&
-	  strcmp(&sound->token[len_effect_text - len_action_text],
-		 element_action_info[j].suffix) == 0)
+	  strEqual(&sound->token[len_effect_text - len_action_text],
+		   element_action_info[j].suffix))
       {
 	sound_effect_properties[i] = element_action_info[j].value;
 	sound_info[i].loop = element_action_info[j].is_loop_sound;
@@ -3969,7 +3969,7 @@ void Execute_Command(char *command)
 {
   int i;
 
-  if (strcmp(command, "print graphicsinfo.conf") == 0)
+  if (strEqual(command, "print graphicsinfo.conf"))
   {
     printf("# You can configure additional/alternative image files here.\n");
     printf("# (The entries below are default and therefore commented out.)\n");
@@ -3985,7 +3985,7 @@ void Execute_Command(char *command)
 
     exit(0);
   }
-  else if (strcmp(command, "print soundsinfo.conf") == 0)
+  else if (strEqual(command, "print soundsinfo.conf"))
   {
     printf("# You can configure additional/alternative sound files here.\n");
     printf("# (The entries below are default and therefore commented out.)\n");
@@ -4001,7 +4001,7 @@ void Execute_Command(char *command)
 
     exit(0);
   }
-  else if (strcmp(command, "print musicinfo.conf") == 0)
+  else if (strEqual(command, "print musicinfo.conf"))
   {
     printf("# You can configure additional/alternative music files here.\n");
     printf("# (The entries below are default and therefore commented out.)\n");
@@ -4017,7 +4017,7 @@ void Execute_Command(char *command)
 
     exit(0);
   }
-  else if (strcmp(command, "print editorsetup.conf") == 0)
+  else if (strEqual(command, "print editorsetup.conf"))
   {
     printf("# You can configure your personal editor element list here.\n");
     printf("# (The entries below are default and therefore commented out.)\n");
@@ -4031,7 +4031,7 @@ void Execute_Command(char *command)
 
     exit(0);
   }
-  else if (strcmp(command, "print helpanim.conf") == 0)
+  else if (strEqual(command, "print helpanim.conf"))
   {
     printf("# You can configure different element help animations here.\n");
     printf("# (The entries below are default and therefore commented out.)\n");
@@ -4042,13 +4042,13 @@ void Execute_Command(char *command)
       printf("# %s\n", getFormattedSetupEntry(helpanim_config[i].token,
 					      helpanim_config[i].value));
 
-      if (strcmp(helpanim_config[i].token, "end") == 0)
+      if (strEqual(helpanim_config[i].token, "end"))
 	printf("#\n");
     }
 
     exit(0);
   }
-  else if (strcmp(command, "print helptext.conf") == 0)
+  else if (strEqual(command, "print helptext.conf"))
   {
     printf("# You can configure different element help text here.\n");
     printf("# (The entries below are default and therefore commented out.)\n");
@@ -4342,18 +4342,18 @@ void InitGfx()
       sprintf(font_token, "%s_%d", CONFIG_TOKEN_FONT_INITIAL, j + 1);
       len_font_token = strlen(font_token);
 
-      if (strcmp(image_config[i].token, font_token) == 0)
+      if (strEqual(image_config[i].token, font_token))
 	filename_font_initial = image_config[i].value;
       else if (strlen(image_config[i].token) > len_font_token &&
 	       strncmp(image_config[i].token, font_token, len_font_token) == 0)
       {
-	if (strcmp(&image_config[i].token[len_font_token], ".x") == 0)
+	if (strEqual(&image_config[i].token[len_font_token], ".x"))
 	  font_initial[j].src_x = atoi(image_config[i].value);
-	else if (strcmp(&image_config[i].token[len_font_token], ".y") == 0)
+	else if (strEqual(&image_config[i].token[len_font_token], ".y"))
 	  font_initial[j].src_y = atoi(image_config[i].value);
-	else if (strcmp(&image_config[i].token[len_font_token], ".width") == 0)
+	else if (strEqual(&image_config[i].token[len_font_token], ".width"))
 	  font_initial[j].width = atoi(image_config[i].value);
-	else if (strcmp(&image_config[i].token[len_font_token],".height") == 0)
+	else if (strEqual(&image_config[i].token[len_font_token],".height"))
 	  font_initial[j].height = atoi(image_config[i].value);
       }
     }
@@ -4573,8 +4573,8 @@ static char *getNewArtworkIdentifier(int type)
 #endif
 
   /* ---------- reload if current artwork identifier has changed ----------- */
-  if (strcmp(ARTWORK_CURRENT_IDENTIFIER(artwork, type),
-	     artwork_current_identifier) != 0)
+  if (!strEqual(ARTWORK_CURRENT_IDENTIFIER(artwork, type),
+		artwork_current_identifier))
     artwork_new_identifier = artwork_current_identifier;
 
   *(ARTWORK_CURRENT_IDENTIFIER_PTR(artwork, type))= artwork_current_identifier;

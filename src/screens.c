@@ -594,7 +594,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
       else if (y == 3)
       {
 	if (leveldir_current->readonly &&
-	    strcmp(setup.player_name, "Artsoft") != 0)
+	    !strEqual(setup.player_name, "Artsoft"))
 	  Request("This level is read only !", REQ_CONFIRM);
 	game_status = GAME_MODE_EDITOR;
 	DrawLevelEd();
@@ -1140,17 +1140,17 @@ void HandleInfoScreen_Music(int button)
       DrawTextSCentered(100, FONT_TEXT_1, "The Game Background Music:");
     }
 
-    if (strcmp(list->title, UNKNOWN_NAME) != 0)
+    if (!strEqual(list->title, UNKNOWN_NAME))
     {
-      if (strcmp(list->title_header, UNKNOWN_NAME) != 0)
+      if (!strEqual(list->title_header, UNKNOWN_NAME))
 	DrawTextSCentered(ystart + y++ * dy, FONT_TEXT_2, list->title_header);
 
       DrawTextFCentered(ystart + y++ * dy, FONT_TEXT_3, "\"%s\"", list->title);
     }
 
-    if (strcmp(list->artist, UNKNOWN_NAME) != 0)
+    if (!strEqual(list->artist, UNKNOWN_NAME))
     {
-      if (strcmp(list->artist_header, UNKNOWN_NAME) != 0)
+      if (!strEqual(list->artist_header, UNKNOWN_NAME))
 	DrawTextSCentered(ystart + y++ * dy, FONT_TEXT_2, list->artist_header);
       else
 	DrawTextSCentered(ystart + y++ * dy, FONT_TEXT_2, "by");
@@ -1158,9 +1158,9 @@ void HandleInfoScreen_Music(int button)
       DrawTextFCentered(ystart + y++ * dy, FONT_TEXT_3, "%s", list->artist);
     }
 
-    if (strcmp(list->album, UNKNOWN_NAME) != 0)
+    if (!strEqual(list->album, UNKNOWN_NAME))
     {
-      if (strcmp(list->album_header, UNKNOWN_NAME) != 0)
+      if (!strEqual(list->album_header, UNKNOWN_NAME))
 	DrawTextSCentered(ystart + y++ * dy, FONT_TEXT_2, list->album_header);
       else
 	DrawTextSCentered(ystart + y++ * dy, FONT_TEXT_2, "from the album");
@@ -1168,9 +1168,9 @@ void HandleInfoScreen_Music(int button)
       DrawTextFCentered(ystart + y++ * dy, FONT_TEXT_3, "\"%s\"", list->album);
     }
 
-    if (strcmp(list->year, UNKNOWN_NAME) != 0)
+    if (!strEqual(list->year, UNKNOWN_NAME))
     {
-      if (strcmp(list->year_header, UNKNOWN_NAME) != 0)
+      if (!strEqual(list->year_header, UNKNOWN_NAME))
 	DrawTextSCentered(ystart + y++ * dy, FONT_TEXT_2, list->year_header);
       else
 	DrawTextSCentered(ystart + y++ * dy, FONT_TEXT_2, "from the year");
@@ -1904,8 +1904,10 @@ static void drawHallOfFameList(int first_entry, int highlight_position)
     DrawText(mSX, sy, int2str(entry + 1, 3), font_nr1);
     DrawText(mSX + dx1, sy, ".", font_nr1);
     DrawText(mSX + dx2, sy, ".........................", font_nr3);
-    if (strcmp(highscore[entry].Name, EMPTY_PLAYER_NAME) != 0)
+
+    if (!strEqual(highscore[entry].Name, EMPTY_PLAYER_NAME))
       DrawText(mSX + dx2, sy, highscore[entry].Name, font_nr2);
+
     DrawText(mSX + dx3, sy, int2str(highscore[entry].Score, 5), font_nr4);
   }
 

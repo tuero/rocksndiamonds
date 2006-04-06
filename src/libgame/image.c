@@ -930,7 +930,7 @@ int getImageIDFromToken(char *token)
   int i;
 
   for (i = 0; i < num_list_entries; i++)
-    if (strcmp(file_list[i].token, token) == 0)
+    if (strEqual(file_list[i].token, token))
       return i;
 
   return -1;

@@ -88,10 +88,10 @@ int getAnimationFrame(int num_frames, int delay, int mode, int start_frame,
 static int get_toon_direction(char *direction_string_raw)
 {
   char *direction_string = getStringToLower(direction_string_raw);
-  int direction = (strcmp(direction_string, "left")  == 0 ? MV_LEFT :
-		   strcmp(direction_string, "right") == 0 ? MV_RIGHT :
-		   strcmp(direction_string, "up")    == 0 ? MV_UP :
-		   strcmp(direction_string, "down")  == 0 ? MV_DOWN :
+  int direction = (strEqual(direction_string, "left")  ? MV_LEFT :
+		   strEqual(direction_string, "right") ? MV_RIGHT :
+		   strEqual(direction_string, "up")    ? MV_UP :
+		   strEqual(direction_string, "down")  ? MV_DOWN :
 		   MV_NONE);
 
   free(direction_string);
@@ -177,13 +177,13 @@ boolean AnimateToon(int toon_nr, boolean restart)
     {
       int pos_bottom = screen_info.height - anim->height;
 
-      if (strcmp(anim->position, "top") == 0)
+      if (strEqual(anim->position, "top"))
 	pos_y = 0;
-      else if (strcmp(anim->position, "bottom") == 0)
+      else if (strEqual(anim->position, "bottom"))
 	pos_y = pos_bottom;
-      else if (strcmp(anim->position, "upper")  == 0)
+      else if (strEqual(anim->position, "upper"))
 	pos_y = SimpleRND(pos_bottom / 2);
-      else if (strcmp(anim->position, "lower")  == 0)
+      else if (strEqual(anim->position, "lower"))
 	pos_y = pos_bottom / 2 + SimpleRND(pos_bottom / 2);
       else
 	pos_y = SimpleRND(pos_bottom);
@@ -205,9 +205,9 @@ boolean AnimateToon(int toon_nr, boolean restart)
     {
       int pos_right = screen_info.width - anim->width;
 
-      if (strcmp(anim->position, "left") == 0)
+      if (strEqual(anim->position, "left"))
 	pos_x = 0;
-      else if (strcmp(anim->position, "right")  == 0)
+      else if (strEqual(anim->position, "right"))
 	pos_x = pos_right;
       else
 	pos_x = SimpleRND(pos_right);

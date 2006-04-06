@@ -2911,7 +2911,7 @@ int NewHiScore()
 
   LoadScore(level_nr);
 
-  if (strcmp(setup.player_name, EMPTY_PLAYER_NAME) == 0 ||
+  if (strEqual(setup.player_name, EMPTY_PLAYER_NAME) ||
       local_player->score < highscore[MAX_SCORE_ENTRIES - 1].Score) 
     return -1;
 
@@ -2927,7 +2927,7 @@ int NewHiScore()
 
 #ifdef ONE_PER_NAME
 	for (l = k; l < MAX_SCORE_ENTRIES; l++)
-	  if (!strcmp(setup.player_name, highscore[l].Name))
+	  if (strEqual(setup.player_name, highscore[l].Name))
 	    m = l;
 	if (m == k)	/* player's new highscore overwrites his old one */
 	  goto put_into_list;

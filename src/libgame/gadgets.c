@@ -1464,7 +1464,7 @@ boolean HandleGadgets(int mx, int my, int button)
     {
       CheckRangeOfNumericInputGadget(gi);
 
-      if (strcmp(gi->textinput.value, gi->textinput.last_value) != 0)
+      if (!strEqual(gi->textinput.last_value, gi->textinput.value))
 	strcpy(gi->textinput.last_value, gi->textinput.value);
       else
 	gadget_changed = FALSE;
@@ -1911,7 +1911,7 @@ boolean HandleGadgetsKeyInput(Key key)
     {
       CheckRangeOfNumericInputGadget(gi);
 
-      if (strcmp(gi->textinput.value, gi->textinput.last_value) != 0)
+      if (!strEqual(gi->textinput.last_value, gi->textinput.value))
 	strcpy(gi->textinput.last_value, gi->textinput.value);
       else
 	gadget_changed = FALSE;

@@ -1652,9 +1652,9 @@ void DrawMicroLevel(int xpos, int ypos, boolean restart)
 
   /* !!! THIS ALL SUCKS -- SHOULD BE CLEANLY REWRITTEN !!! */
   /* redraw micro level label, if needed */
-  if (strcmp(level.name, NAMELESS_LEVEL_NAME) != 0 &&
-      strcmp(level.author, ANONYMOUS_NAME) != 0 &&
-      strcmp(level.author, leveldir_current->name) != 0 &&
+  if (!strEqual(level.name, NAMELESS_LEVEL_NAME) &&
+      !strEqual(level.author, ANONYMOUS_NAME) &&
+      !strEqual(level.author, leveldir_current->name) &&
       DelayReached(&label_delay, MICROLEVEL_LABEL_DELAY))
   {
     int max_label_counter = 23;

@@ -774,7 +774,7 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
     return;
 
   /* try to determine better author name than 'anonymous' */
-  if (strcmp(leveldir_current->author, ANONYMOUS_NAME) != 0)
+  if (!strEqual(leveldir_current->author, ANONYMOUS_NAME))
   {
     strncpy(level->author, leveldir_current->author, MAX_LEVEL_AUTHOR_LEN);
     level->author[MAX_LEVEL_AUTHOR_LEN] = '\0';
@@ -982,7 +982,7 @@ static int getFiletypeFromID(char *filetype_id)
   {
     char *id_lower = getStringToLower(filetype_id_list[i].id);
     
-    if (strcmp(filetype_id_lower, id_lower) == 0)
+    if (strEqual(filetype_id_lower, id_lower))
       filetype = filetype_id_list[i].filetype;
 
     free(id_lower);
@@ -1866,12 +1866,12 @@ static void LoadLevelFromFileInfo_RND(struct LevelInfo *level,
   }
 
   getFileChunkBE(file, chunk_name, NULL);
-  if (strcmp(chunk_name, "RND1") == 0)
+  if (strEqual(chunk_name, "RND1"))
   {
     getFile32BitBE(file);		/* not used */
 
     getFileChunkBE(file, chunk_name, NULL);
-    if (strcmp(chunk_name, "CAVE") != 0)
+    if (!strEqual(chunk_name, "CAVE"))
     {
       level->no_valid_file = TRUE;
 
@@ -1947,7 +1947,7 @@ static void LoadLevelFromFileInfo_RND(struct LevelInfo *level,
       int i = 0;
 
       while (chunk_info[i].name != NULL &&
-	     strcmp(chunk_name, chunk_info[i].name) != 0)
+	     !strEqual(chunk_name, chunk_info[i].name))
 	i++;
 
       if (chunk_info[i].name == NULL)
@@ -3088,7 +3088,7 @@ static void LoadLevelFromFileInfo_SP(struct LevelInfo *level,
 
     if (reading_multipart_level &&
 	(!is_multipart_level ||
-	 strcmp(level->name, multipart_level.name) != 0))
+	 !strEqual(level->name, multipart_level.name)))
     {
       /* we are already reading parts of a multi-part level, but this level is
 	 either not a multi-part level, or a part of a different multi-part
@@ -4541,12 +4541,12 @@ void LoadTapeFromFilename(char *filename)
   }
 
   getFileChunkBE(file, chunk_name, NULL);
-  if (strcmp(chunk_name, "RND1") == 0)
+  if (strEqual(chunk_name, "RND1"))
   {
     getFile32BitBE(file);		/* not used */
 
     getFileChunkBE(file, chunk_name, NULL);
-    if (strcmp(chunk_name, "TAPE") != 0)
+    if (!strEqual(chunk_name, "TAPE"))
     {
       tape.no_valid_file = TRUE;
 
@@ -4612,7 +4612,7 @@ void LoadTapeFromFilename(char *filename)
       int i = 0;
 
       while (chunk_info[i].name != NULL &&
-	     strcmp(chunk_name, chunk_info[i].name) != 0)
+	     !strEqual(chunk_name, chunk_info[i].name))
 	i++;
 
       if (chunk_info[i].name == NULL)
@@ -5550,7 +5550,7 @@ void LoadSpecialMenuDesignSettings()
   /* always start with reliable default values from default config */
   for (i = 0; image_config_vars[i].token != NULL; i++)
     for (j = 0; image_config[j].token != NULL; j++)
-      if (strcmp(image_config_vars[i].token, image_config[j].token) == 0)
+      if (strEqual(image_config_vars[i].token, image_config[j].token))
 	*image_config_vars[i].value =
 	  get_auto_parameter_value(image_config_vars[i].token,
 				   image_config[j].value);
@@ -5775,7 +5775,7 @@ static boolean music_info_listed_ext(struct MusicFileInfo *list,
 				     char *basename, boolean is_sound)
 {
   for (; list != NULL; list = list->next)
-    if (list->is_sound == is_sound && strcmp(list->basename, basename) == 0)
+    if (list->is_sound == is_sound && strEqual(list->basename, basename))
       return TRUE;
 
   return FALSE;
@@ -5833,7 +5833,7 @@ void LoadMusicInfo()
     if (music->filename == NULL)
       continue;
 
-    if (strcmp(music->filename, UNDEFINED_FILENAME) == 0)
+    if (strEqual(music->filename, UNDEFINED_FILENAME))
       continue;
 
     /* a configured file may be not recognized as music */
@@ -5872,7 +5872,7 @@ void LoadMusicInfo()
       if (music->filename == NULL)
 	continue;
 
-      if (strcmp(basename, music->filename) == 0)
+      if (strEqual(basename, music->filename))
       {
 	music_already_used = TRUE;
 	break;
@@ -5908,7 +5908,7 @@ void LoadMusicInfo()
     if (sound->filename == NULL)
       continue;
 
-    if (strcmp(sound->filename, UNDEFINED_FILENAME) == 0)
+    if (strEqual(sound->filename, UNDEFINED_FILENAME))
       continue;
 
     /* a configured file may be not recognized as sound */
@@ -6017,7 +6017,7 @@ void LoadHelpAnimInfo()
     char *element_value, *action_value, *direction_value;
     int delay = atoi(list->value);
 
-    if (strcmp(list->token, "end") == 0)
+    if (strEqual(list->token, "end"))
     {
       add_helpanim_entry(HELPANIM_LIST_NEXT, -1, -1, -1, &num_list_entries);
 

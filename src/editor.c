@@ -4630,7 +4630,7 @@ static void ReinitializeElementList()
       if (element >= NUM_FILE_ELEMENTS)
 	Error(ERR_WARN, "editor element %d is runtime element", element);
 
-      if (strcmp(getElementInfoText(element), INFOTEXT_UNKNOWN_ELEMENT) == 0)
+      if (strEqual(getElementInfoText(element), INFOTEXT_UNKNOWN_ELEMENT))
 	Error(ERR_WARN, "no element description for element %d", element);
     }
   }

@@ -104,6 +104,7 @@ char *getStringCat2(char *, char *);
 char *getStringCopy(char *);
 char *getStringToLower(char *);
 void setString(char **, char *);
+boolean strEqual(char *, char *);
 
 void GetOptions(char **, void (*print_usage_function)(void));
 

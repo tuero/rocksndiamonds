@@ -753,7 +753,7 @@ void ReloadCustomImage(Bitmap *bitmap, char *basename)
     return;
   }
 
-  if (strcmp(filename, bitmap->source_filename) == 0)
+  if (strEqual(filename, bitmap->source_filename))
   {
     /* The old and new image are the same (have the same filename and path).
        This usually means that this image does not exist in this graphic set

@@ -1,3 +1,9 @@
+2006-04-06
+	* added selection between ECS and AGA graphics for EMC levels to setup
+
+2006-04-04
+	* adjusted font handling for various narrow EMC style fonts
+
 2006-04-03
 	* changed EM engine behaviour back to re-allow initial rolling springs
 

@@ -1284,7 +1284,7 @@ void SDLSetMouseCursor(struct MouseCursorInfo *cursor_info)
 
 inline void SDLOpenAudio(void)
 {
-  if (strcmp(setup.system.sdl_audiodriver, ARG_DEFAULT) != 0)
+  if (!strEqual(setup.system.sdl_audiodriver, ARG_DEFAULT))
     putenv(getStringCat2("SDL_AUDIODRIVER=", setup.system.sdl_audiodriver));
 
   if (SDL_InitSubSystem(SDL_INIT_AUDIO) < 0)

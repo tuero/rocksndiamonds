@@ -565,6 +565,14 @@ void setString(char **old_value, char *new_value)
   *old_value = getStringCopy(new_value);
 }
 
+boolean strEqual(char *s1, char *s2)
+{
+  return (s1 == NULL && s2 == NULL ? TRUE  :
+	  s1 == NULL && s2 != NULL ? FALSE :
+	  s1 != NULL && s2 == NULL ? FALSE :
+	  strcmp(s1, s2) == 0);
+}
+
 
 /* ------------------------------------------------------------------------- */
 /* command line option handling functions                                    */
@@ -583,9 +591,9 @@ void GetOptions(char *argv[], void (*print_usage_function)(void))
      in an application package directory -- do not try to use this directory
      as the program data directory (Mac OS X handles this correctly anyway) */
 
-  if (strcmp(ro_base_path, ".") == 0)
+  if (strEqual(ro_base_path, "."))
     ro_base_path = program.command_basepath;
-  if (strcmp(rw_base_path, ".") == 0)
+  if (strEqual(rw_base_path, "."))
     rw_base_path = program.command_basepath;
 #endif
 
@@ -625,7 +633,7 @@ void GetOptions(char *argv[], void (*print_usage_function)(void))
     strcpy(option_str, option);			/* copy argument into buffer */
     option = option_str;
 
-    if (strcmp(option, "--") == 0)		/* stop scanning arguments */
+    if (strEqual(option, "--"))			/* stop scanning arguments */
       break;
 
     if (strncmp(option, "--", 2) == 0)		/* treat '--' like '-' */
@@ -643,7 +651,7 @@ void GetOptions(char *argv[], void (*print_usage_function)(void))
 
     option_len = strlen(option);
 
-    if (strcmp(option, "-") == 0)
+    if (strEqual(option, "-"))
       Error(ERR_EXIT_HELP, "unrecognized option '%s'", option);
     else if (strncmp(option, "-help", option_len) == 0)
     {
@@ -1305,7 +1313,7 @@ void translate_keyname(Key *keysym, char **x11name, char **name, int mode)
     i = 0;
     do
     {
-      if (strcmp(translate_key[i].name, *name) == 0)
+      if (strEqual(translate_key[i].name, *name))
       {
 	key = translate_key[i].key;
 	break;
@@ -1360,7 +1368,7 @@ void translate_keyname(Key *keysym, char **x11name, char **name, int mode)
 
       do
       {
-	if (strcmp(name_ptr, translate_key[i].x11name) == 0)
+	if (strEqual(name_ptr, translate_key[i].x11name))
 	{
 	  key = translate_key[i].key;
 	  break;
@@ -1442,9 +1450,9 @@ char getCharFromKey(Key key)
 
   if (strlen(keyname) == 1)
     letter = keyname[0];
-  else if (strcmp(keyname, "space") == 0)
+  else if (strEqual(keyname, "space"))
     letter = ' ';
-  else if (strcmp(keyname, "circumflex") == 0)
+  else if (strEqual(keyname, "circumflex"))
     letter = '^';
 
   return letter;
@@ -1482,14 +1490,14 @@ int get_integer_from_string(char *s)
 
   for (i = 0; number_text[i][0] != NULL; i++)
     for (j = 0; j < 3; j++)
-      if (strcmp(s_lower, number_text[i][j]) == 0)
+      if (strEqual(s_lower, number_text[i][j]))
 	result = i;
 
   if (result == -1)
   {
-    if (strcmp(s_lower, "false") == 0)
+    if (strEqual(s_lower, "false"))
       result = 0;
-    else if (strcmp(s_lower, "true") == 0)
+    else if (strEqual(s_lower, "true"))
       result = 1;
     else
       result = atoi(s);
@@ -1505,9 +1513,9 @@ boolean get_boolean_from_string(char *s)
   char *s_lower = getStringToLower(s);
   boolean result = FALSE;
 
-  if (strcmp(s_lower, "true") == 0 ||
-      strcmp(s_lower, "yes") == 0 ||
-      strcmp(s_lower, "on") == 0 ||
+  if (strEqual(s_lower, "true") ||
+      strEqual(s_lower, "yes") ||
+      strEqual(s_lower, "on") ||
       get_integer_from_string(s) == 1)
     result = TRUE;
 
@@ -1542,7 +1550,7 @@ void deleteNodeFromList(ListNode **node_first, char *key,
   if (node_first == NULL || *node_first == NULL)
     return;
 
-  if (strcmp((*node_first)->key, key) == 0)
+  if (strEqual((*node_first)->key, key))
   {
     free((*node_first)->key);
     if (destructor_function)
@@ -1558,7 +1566,7 @@ ListNode *getNodeFromKey(ListNode *node_first, char *key)
   if (node_first == NULL)
     return NULL;
 
-  if (strcmp(node_first->key, key) == 0)
+  if (strEqual(node_first->key, key))
     return node_first;
   else
     return getNodeFromKey(node_first->next, key);
@@ -1634,7 +1642,7 @@ boolean fileHasSuffix(char *basename, char *suffix)
 
   if (basename_length > suffix_length + 1 &&
       basename_lower[basename_length - suffix_length - 1] == '.' &&
-      strcmp(&basename_lower[basename_length - suffix_length], suffix) == 0)
+      strEqual(&basename_lower[basename_length - suffix_length], suffix))
     return TRUE;
 
   return FALSE;
@@ -1754,14 +1762,14 @@ int get_parameter_value(char *value_raw, char *suffix, int type)
   char *value = getStringToLower(value_raw);
   int result = 0;	/* probably a save default value */
 
-  if (strcmp(suffix, ".direction") == 0)
+  if (strEqual(suffix, ".direction"))
   {
-    result = (strcmp(value, "left")  == 0 ? MV_LEFT :
-	      strcmp(value, "right") == 0 ? MV_RIGHT :
-	      strcmp(value, "up")    == 0 ? MV_UP :
-	      strcmp(value, "down")  == 0 ? MV_DOWN : MV_NONE);
+    result = (strEqual(value, "left")  ? MV_LEFT :
+	      strEqual(value, "right") ? MV_RIGHT :
+	      strEqual(value, "up")    ? MV_UP :
+	      strEqual(value, "down")  ? MV_DOWN : MV_NONE);
   }
-  else if (strcmp(suffix, ".anim_mode") == 0)
+  else if (strEqual(suffix, ".anim_mode"))
   {
     result = (string_has_parameter(value, "none")	? ANIM_NONE :
 	      string_has_parameter(value, "loop")	? ANIM_LOOP :
@@ -1786,7 +1794,7 @@ int get_parameter_value(char *value_raw, char *suffix, int type)
   }
   else		/* generic parameter of type integer or boolean */
   {
-    result = (strcmp(value, ARG_UNDEFINED) == 0 ? ARG_UNDEFINED_VALUE :
+    result = (strEqual(value, ARG_UNDEFINED) ? ARG_UNDEFINED_VALUE :
 	      type == TYPE_INTEGER ? get_integer_from_string(value) :
 	      type == TYPE_BOOLEAN ? get_boolean_from_string(value) :
 	      ARG_UNDEFINED_VALUE);
@@ -1868,8 +1876,8 @@ struct FileInfo *getFileListFromConfigList(struct ConfigInfo *config_list,
       int len_suffix = strlen(suffix_list[j].token);
 
       if (len_suffix < len_config_token &&
-	  strcmp(&config_list[i].token[len_config_token - len_suffix],
-		 suffix_list[j].token) == 0)
+	  strEqual(&config_list[i].token[len_config_token - len_suffix],
+		   suffix_list[j].token))
       {
 	setString(&file_list[list_pos].default_parameter[j],
 		  config_list[i].value);
@@ -1881,7 +1889,7 @@ struct FileInfo *getFileListFromConfigList(struct ConfigInfo *config_list,
 
     /* the following tokens are no file definitions, but other config tokens */
     for (j = 0; ignore_tokens[j] != NULL; j++)
-      if (strcmp(config_list[i].token, ignore_tokens[j]) == 0)
+      if (strEqual(config_list[i].token, ignore_tokens[j]))
 	is_file_entry = FALSE;
 
     if (is_file_entry)
@@ -1893,9 +1901,9 @@ struct FileInfo *getFileListFromConfigList(struct ConfigInfo *config_list,
 	break;
 
       /* simple sanity check if this is really a file definition */
-      if (strcmp(&config_list[i].value[len_config_value - 4], ".pcx") != 0 &&
-	  strcmp(&config_list[i].value[len_config_value - 4], ".wav") != 0 &&
-	  strcmp(config_list[i].value, UNDEFINED_FILENAME) != 0)
+      if (!strEqual(&config_list[i].value[len_config_value - 4], ".pcx") &&
+	  !strEqual(&config_list[i].value[len_config_value - 4], ".wav") &&
+	  !strEqual(config_list[i].value, UNDEFINED_FILENAME))
       {
 	Error(ERR_RETURN, "Configuration directive '%s' -> '%s':",
 	      config_list[i].token, config_list[i].value);
@@ -2112,7 +2120,7 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
   {
     char *value = HASH_ITERATION_VALUE(itr);
 
-    if (strcmp(value, known_token_value) != 0)
+    if (!strEqual(value, known_token_value))
       setHashEntry(extra_file_hash, HASH_ITERATION_TOKEN(itr), value);
   }
   END_HASH_ITERATION(valid_file_hash, itr)
@@ -2341,7 +2349,7 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
 
     BEGIN_HASH_ITERATION(extra_file_hash, itr)
     {
-      if (strcmp(HASH_ITERATION_VALUE(itr), known_token_value) == 0)
+      if (strEqual(HASH_ITERATION_VALUE(itr), known_token_value))
 	dynamic_tokens_found = TRUE;
       else
 	unknown_tokens_found = TRUE;
@@ -2358,7 +2366,7 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
       {
 	char *value = getHashEntry(extra_file_hash, list->token);
 
-	if (value != NULL && strcmp(value, known_token_value) == 0)
+	if (value != NULL && strEqual(value, known_token_value))
 	  Error(ERR_RETURN, "- dynamic token: '%s'", list->token);
       }
 
@@ -2375,7 +2383,7 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
       {
 	char *value = getHashEntry(extra_file_hash, list->token);
 
-	if (value != NULL && strcmp(value, known_token_value) != 0)
+	if (value != NULL && !strEqual(value, known_token_value))
 	  Error(ERR_RETURN, "- dynamic token: '%s'", list->token);
       }
 
@@ -2481,7 +2489,7 @@ void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
 
   filename_local = getCustomArtworkConfigFilename(artwork_info->type);
 
-  if (filename_local != NULL && strcmp(filename_base, filename_local) != 0)
+  if (filename_local != NULL && !strEqual(filename_base, filename_local))
     LoadArtworkConfigFromFilename(artwork_info, filename_local);
 }
 
@@ -2522,7 +2530,7 @@ static void replaceArtworkListEntry(struct ArtworkListInfo *artwork_info,
     basename = file_list_entry->default_filename;
 
     /* dynamic artwork has no default filename / skip empty default artwork */
-    if (basename == NULL || strcmp(basename, UNDEFINED_FILENAME) == 0)
+    if (basename == NULL || strEqual(basename, UNDEFINED_FILENAME))
       return;
 
     file_list_entry->fallback_to_default = TRUE;
@@ -2546,7 +2554,7 @@ static void replaceArtworkListEntry(struct ArtworkListInfo *artwork_info,
   }
 
   /* check if the old and the new artwork file are the same */
-  if (*listnode && strcmp((*listnode)->source_filename, filename) == 0)
+  if (*listnode && strEqual((*listnode)->source_filename, filename))
   {
     /* The old and new artwork are the same (have the same filename and path).
        This usually means that this artwork does not exist in this artwork set
@@ -2609,7 +2617,7 @@ static void LoadCustomArtwork(struct ArtworkListInfo *artwork_info,
   printf("GOT CUSTOM ARTWORK FILE '%s'\n", filename);
 #endif
 
-  if (strcmp(file_list_entry->filename, UNDEFINED_FILENAME) == 0)
+  if (strEqual(file_list_entry->filename, UNDEFINED_FILENAME))
   {
     deleteArtworkListEntry(artwork_info, listnode);
     return;

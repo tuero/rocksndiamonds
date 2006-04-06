@@ -468,7 +468,7 @@ static boolean is_string_suffix(char *string, char *suffix)
   if (suffix_len > string_len)
     return FALSE;
 
-  return (strcmp(&string[string_len - suffix_len], suffix) == 0);
+  return (strEqual(&string[string_len - suffix_len], suffix));
 }
 
 #define MAX_CHEAT_INPUT_LEN	32

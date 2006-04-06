@@ -1568,7 +1568,7 @@ static void *Load_WAV(char *filename)
 
   /* read chunk id "RIFF" */
   getFileChunkLE(file, chunk_name, &chunk_size);
-  if (strcmp(chunk_name, "RIFF") != 0)
+  if (!strEqual(chunk_name, "RIFF"))
   {
     Error(ERR_WARN, "missing 'RIFF' chunk of sound file '%s'", filename);
     fclose(file);
@@ -1578,7 +1578,7 @@ static void *Load_WAV(char *filename)
 
   /* read "RIFF" type id "WAVE" */
   getFileChunkLE(file, chunk_name, NULL);
-  if (strcmp(chunk_name, "WAVE") != 0)
+  if (!strEqual(chunk_name, "WAVE"))
   {
     Error(ERR_WARN, "missing 'WAVE' type ID of sound file '%s'", filename);
     fclose(file);
@@ -1588,7 +1588,7 @@ static void *Load_WAV(char *filename)
 
   while (getFileChunkLE(file, chunk_name, &chunk_size))
   {
-    if (strcmp(chunk_name, "fmt ") == 0)
+    if (strEqual(chunk_name, "fmt "))
     {
       if (chunk_size < WAV_HEADER_SIZE)
       {
@@ -1652,7 +1652,7 @@ static void *Load_WAV(char *filename)
       printf("  Significant bits per sample: %d'\n", header.bits_per_sample);
 #endif
     }
-    else if (strcmp(chunk_name, "data") == 0)
+    else if (strEqual(chunk_name, "data"))
     {
       data_byte_len = chunk_size;
 
@@ -1775,7 +1775,7 @@ void LoadCustomMusic_NoConf(void)
     return;
 
   if (last_music_directory != NULL &&
-      strcmp(last_music_directory, music_directory) == 0)
+      strEqual(last_music_directory, music_directory))
     return;	/* old and new music directory are the same */
 
   if (last_music_directory != NULL)
@@ -1807,7 +1807,7 @@ void LoadCustomMusic_NoConf(void)
     {
       struct FileInfo *music = getMusicListEntry(i);
 
-      if (strcmp(basename, music->filename) == 0)
+      if (strEqual(basename, music->filename))
       {
 	music_already_used = TRUE;
 	break;

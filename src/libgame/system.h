@@ -277,8 +277,6 @@
 #define RW_BASE_PATH		RW_GAME_DIR
 
 /* directory names */
-#define GRAPHICS_ECS_DIRECTORY	"graphics.ecs"
-#define GRAPHICS_AGA_DIRECTORY	"graphics.aga"
 #define GRAPHICS_DIRECTORY	"graphics"
 #define SOUNDS_DIRECTORY	"sounds"
 #define MUSIC_DIRECTORY		"music"
@@ -748,8 +746,8 @@ struct TreeInfo
   char *imported_from;	/* optional comment for imported levels or artwork */
   char *imported_by;	/* optional comment for imported levels or artwork */
 
-  char *graphics_ecs_set; /* special EMC custom graphics set (ECS graphics) */
-  char *graphics_aga_set; /* special EMC custom graphics set (AGA graphics) */
+  char *graphics_set_ecs; /* special EMC custom graphics set (ECS graphics) */
+  char *graphics_set_aga; /* special EMC custom graphics set (AGA graphics) */
   char *graphics_set;	/* optional custom graphics set (level tree only) */
   char *sounds_set;	/* optional custom sounds set (level tree only) */
   char *music_set;	/* optional custom music set (level tree only) */
