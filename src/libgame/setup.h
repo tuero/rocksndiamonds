@@ -22,25 +22,27 @@
 #define TYPE_BOOLEAN			(1 << 0)
 #define TYPE_SWITCH			(1 << 1)
 #define TYPE_YES_NO			(1 << 2)
-#define TYPE_KEY			(1 << 3)
-#define TYPE_KEY_X11			(1 << 4)
-#define TYPE_INTEGER			(1 << 5)
-#define TYPE_STRING			(1 << 6)
-#define TYPE_TOKEN			(1 << 7)
+#define TYPE_ECS_AGA			(1 << 3)
+#define TYPE_KEY			(1 << 4)
+#define TYPE_KEY_X11			(1 << 5)
+#define TYPE_INTEGER			(1 << 6)
+#define TYPE_STRING			(1 << 7)
+#define TYPE_TOKEN			(1 << 8)
 
 #define TYPE_BOOLEAN_STYLE		(TYPE_BOOLEAN | \
 					 TYPE_SWITCH  | \
-					 TYPE_YES_NO)
+					 TYPE_YES_NO  | \
+					 TYPE_ECS_AGA )
 
 /* additional values for setup screen */
-#define TYPE_ENTER_SCREEN		(1 << 8)
-#define TYPE_ENTER_MENU			(1 << 9)
-#define TYPE_LEAVE_MENU			(1 << 10)
-#define TYPE_EMPTY			(1 << 11)
-#define TYPE_KEYTEXT			(1 << 12)
+#define TYPE_ENTER_SCREEN		(1 << 9)
+#define TYPE_ENTER_MENU			(1 << 10)
+#define TYPE_LEAVE_MENU			(1 << 11)
+#define TYPE_EMPTY			(1 << 12)
+#define TYPE_KEYTEXT			(1 << 13)
 
-#define TYPE_GHOSTED			(1 << 13)
-#define TYPE_QUERY			(1 << 14)
+#define TYPE_GHOSTED			(1 << 14)
+#define TYPE_QUERY			(1 << 15)
 
 #define TYPE_VALUE			(TYPE_BOOLEAN_STYLE	| \
 					 TYPE_KEY		| \
@@ -269,6 +271,8 @@ void checkSetupFileHashIdentifier(SetupFileHash *, char *, char *);
 void setSetupInfo(struct TokenInfo *, int, char *);
 char *getSetupValue(int, void *);
 char *getSetupLine(struct TokenInfo *, char *, int);
+
+boolean AdjustGraphicsForEMC();
 
 void LoadLevelInfo(void);
 void LoadArtworkInfo(void);

@@ -1643,11 +1643,12 @@
 #define FONT_VALUE_1			26
 #define FONT_VALUE_2			27
 #define FONT_VALUE_OLD			28
-#define FONT_LEVEL_NUMBER		29
-#define FONT_TAPE_RECORDER		30
-#define FONT_GAME_INFO			31
+#define FONT_LEVEL_NUMBER_ACTIVE	29
+#define FONT_LEVEL_NUMBER		30
+#define FONT_TAPE_RECORDER		31
+#define FONT_GAME_INFO			32
 
-#define NUM_FONTS			32
+#define NUM_FONTS			33
 #define NUM_INITIAL_FONTS		4
 
 /* values for game_status (must match special image configuration suffixes) */

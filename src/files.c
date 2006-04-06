@@ -4952,14 +4952,15 @@ void SaveScore(int nr)
 #define SETUP_TOKEN_ASK_ON_ESCAPE_EDITOR	17
 #define SETUP_TOKEN_QUICK_SWITCH		18
 #define SETUP_TOKEN_INPUT_ON_FOCUS		19
-#define SETUP_TOKEN_GRAPHICS_SET		20
-#define SETUP_TOKEN_SOUNDS_SET			21
-#define SETUP_TOKEN_MUSIC_SET			22
-#define SETUP_TOKEN_OVERRIDE_LEVEL_GRAPHICS	23
-#define SETUP_TOKEN_OVERRIDE_LEVEL_SOUNDS	24
-#define SETUP_TOKEN_OVERRIDE_LEVEL_MUSIC	25
+#define SETUP_TOKEN_PREFER_AGA_GRAPHICS		20
+#define SETUP_TOKEN_GRAPHICS_SET		21
+#define SETUP_TOKEN_SOUNDS_SET			22
+#define SETUP_TOKEN_MUSIC_SET			23
+#define SETUP_TOKEN_OVERRIDE_LEVEL_GRAPHICS	24
+#define SETUP_TOKEN_OVERRIDE_LEVEL_SOUNDS	25
+#define SETUP_TOKEN_OVERRIDE_LEVEL_MUSIC	26
 
-#define NUM_GLOBAL_SETUP_TOKENS			26
+#define NUM_GLOBAL_SETUP_TOKENS			27
 
 /* editor setup */
 #define SETUP_TOKEN_EDITOR_EL_BOULDERDASH	0
@@ -5070,6 +5071,7 @@ static struct TokenInfo global_setup_tokens[] =
   { TYPE_SWITCH, &si.ask_on_escape_editor, "ask_on_escape_editor"	},
   { TYPE_SWITCH, &si.quick_switch,	"quick_player_switch"		},
   { TYPE_SWITCH, &si.input_on_focus,	"input_on_focus"		},
+  { TYPE_SWITCH, &si.prefer_aga_graphics, "prefer_aga_graphics"		},
   { TYPE_STRING, &si.graphics_set,	"graphics_set"			},
   { TYPE_STRING, &si.sounds_set,	"sounds_set"			},
   { TYPE_STRING, &si.music_set,		"music_set"			},
@@ -5197,6 +5199,7 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
   si->ask_on_escape_editor = TRUE;
   si->quick_switch = FALSE;
   si->input_on_focus = FALSE;
+  si->prefer_aga_graphics = TRUE;
 
   si->graphics_set = getStringCopy(GFX_CLASSIC_SUBDIR);
   si->sounds_set = getStringCopy(SND_CLASSIC_SUBDIR);

@@ -277,6 +277,8 @@
 #define RW_BASE_PATH		RW_GAME_DIR
 
 /* directory names */
+#define GRAPHICS_ECS_DIRECTORY	"graphics.ecs"
+#define GRAPHICS_AGA_DIRECTORY	"graphics.aga"
 #define GRAPHICS_DIRECTORY	"graphics"
 #define SOUNDS_DIRECTORY	"sounds"
 #define MUSIC_DIRECTORY		"music"
@@ -436,9 +438,9 @@
 
 #define ARTWORK_FIRST_NODE(artwork, type)				\
 				((type) == ARTWORK_TYPE_GRAPHICS ?	\
-				 (artwork).gfx_first :	\
+				 (artwork).gfx_first :			\
 				 (type) == ARTWORK_TYPE_SOUNDS ?	\
-				 (artwork).snd_first :	\
+				 (artwork).snd_first :			\
 				 (artwork).mus_first)
 
 #define ARTWORK_CURRENT_IDENTIFIER_PTR(artwork, type)			\
@@ -705,6 +707,7 @@ struct SetupInfo
   boolean ask_on_escape_editor;
   boolean quick_switch;
   boolean input_on_focus;
+  boolean prefer_aga_graphics;
 
   char *graphics_set;
   char *sounds_set;
@@ -745,6 +748,8 @@ struct TreeInfo
   char *imported_from;	/* optional comment for imported levels or artwork */
   char *imported_by;	/* optional comment for imported levels or artwork */
 
+  char *graphics_ecs_set; /* special EMC custom graphics set (ECS graphics) */
+  char *graphics_aga_set; /* special EMC custom graphics set (AGA graphics) */
   char *graphics_set;	/* optional custom graphics set (level tree only) */
   char *sounds_set;	/* optional custom sounds set (level tree only) */
   char *music_set;	/* optional custom music set (level tree only) */

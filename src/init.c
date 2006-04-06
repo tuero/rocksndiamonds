@@ -4608,13 +4608,19 @@ static char *getNewArtworkIdentifier(int type)
 
 void ReloadCustomArtwork(int force_reload)
 {
-  char *gfx_new_identifier = getNewArtworkIdentifier(ARTWORK_TYPE_GRAPHICS);
-  char *snd_new_identifier = getNewArtworkIdentifier(ARTWORK_TYPE_SOUNDS);
-  char *mus_new_identifier = getNewArtworkIdentifier(ARTWORK_TYPE_MUSIC);
+  char *gfx_new_identifier;
+  char *snd_new_identifier;
+  char *mus_new_identifier;
   boolean force_reload_gfx = (force_reload & (1 << ARTWORK_TYPE_GRAPHICS));
   boolean force_reload_snd = (force_reload & (1 << ARTWORK_TYPE_SOUNDS));
   boolean force_reload_mus = (force_reload & (1 << ARTWORK_TYPE_MUSIC));
   boolean redraw_screen = FALSE;
+
+  force_reload_gfx |= AdjustGraphicsForEMC();
+
+  gfx_new_identifier = getNewArtworkIdentifier(ARTWORK_TYPE_GRAPHICS);
+  snd_new_identifier = getNewArtworkIdentifier(ARTWORK_TYPE_SOUNDS);
+  mus_new_identifier = getNewArtworkIdentifier(ARTWORK_TYPE_MUSIC);
 
   if (gfx_new_identifier != NULL || force_reload_gfx)
   {

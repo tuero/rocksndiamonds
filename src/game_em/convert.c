@@ -185,6 +185,7 @@ int cleanup_em_level(unsigned char *src, int length)
 
     for (i = 0; i < 2106; i++)
       src[i] = (src[i] ^ (j += 7)) - 0x11;
+    src[0] = 131;		/* needed for Emerald Mine II levels */
     src[1] = 131;
     for (i = 0; i < 2048; i++)
       src[i] = remap_v4[src[i]];

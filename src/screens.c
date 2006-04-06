@@ -136,6 +136,8 @@ static void drawCursorExt(int xpos, int ypos, int color, int g)
 	 g == IMG_MENU_BUTTON_RIGHT ? IMG_MENU_BUTTON_RIGHT_ACTIVE :
 	 g == IMG_MENU_BUTTON_LEAVE_MENU ? IMG_MENU_BUTTON_LEAVE_MENU_ACTIVE :
 	 g == IMG_MENU_BUTTON_ENTER_MENU ? IMG_MENU_BUTTON_ENTER_MENU_ACTIVE :
+	 g == IMG_MENU_BUTTON_LAST_LEVEL ? IMG_MENU_BUTTON_LAST_LEVEL_ACTIVE :
+	 g == IMG_MENU_BUTTON_NEXT_LEVEL ? IMG_MENU_BUTTON_NEXT_LEVEL_ACTIVE :
 	 IMG_MENU_BUTTON_ACTIVE);
 
   ypos += MENU_SCREEN_START_YPOS;
@@ -235,6 +237,26 @@ static void ToggleFullscreenIfNeeded()
   }
 }
 
+static int getLastLevelButtonPos()
+{
+  return 10;
+}
+
+static int getCurrentLevelTextPos()
+{
+  return (getLastLevelButtonPos() + 1);
+}
+
+static int getNextLevelButtonPos()
+{
+  return getLastLevelButtonPos() + 3 + 1;
+}
+
+static int getLevelRangeTextPos()
+{
+  return getNextLevelButtonPos() + 1;
+}
+
 void DrawMainMenu()
 {
   static LevelDirTree *leveldir_last_valid = NULL;
@@ -316,19 +338,29 @@ void DrawMainMenu()
   /* calculated after (possible) reload of custom artwork */
   name_width  = getTextWidth(name_text,  FONT_MENU_1);
 #if 1
+  level_width = 9 * 32;
+#else
+#if 1
   level_width = 9 * getFontWidth(FONT_MENU_1);
 #else
   level_width = getTextWidth(level_text, FONT_MENU_1);
 #endif
+#endif
 
   DrawText(mSX + 32 + name_width, mSY + 2 * 32, setup.player_name,
 	   FONT_INPUT_1);
+
+#if 1
+  DrawText(mSX + getCurrentLevelTextPos() * 32, mSY + 3 * 32,
+	   int2str(level_nr, 3), FONT_VALUE_1);
+#else
 #if 1
   DrawText(mSX + level_width + 2 * 32, mSY + 3 * 32, int2str(level_nr, 3),
 	   FONT_VALUE_1);
 #else
   DrawText(mSX + level_width + 5 * 32, mSY + 3 * 32, int2str(level_nr, 3),
 	   FONT_VALUE_1);
+#endif
 #endif
 
   DrawMicroLevel(MICROLEVEL_XPOS, MICROLEVEL_YPOS, TRUE);
@@ -338,12 +370,17 @@ void DrawMainMenu()
 #if 1
   {
     int text_height = getFontHeight(FONT_TEXT_3);
+#if 1
+    int xpos = getLevelRangeTextPos() * 32;
+#else
+    int xpos = level_width + 6 * 32;
+#endif
     int ypos2 = -SY + 3 * 32 + 16;
     int ypos1 = ypos2 - text_height;
 
-    DrawTextF(mSX + level_width + 6 * 32, mSY + ypos1, FONT_TEXT_3,
+    DrawTextF(mSX + xpos, mSY + ypos1, FONT_TEXT_3,
 	      "%03d", leveldir_current->first_level);
-    DrawTextF(mSX + level_width + 6 * 32, mSY + ypos2, FONT_TEXT_3,
+    DrawTextF(mSX + xpos, mSY + ypos2, FONT_TEXT_3,
 	      "%03d", leveldir_current->last_level);
   }
 #else
@@ -371,11 +408,16 @@ void DrawMainMenu()
 		   IMG_MENU_BUTTON));
 
 #if 1
+  drawCursorXY(getLastLevelButtonPos(), 1, IMG_MENU_BUTTON_LAST_LEVEL);
+  drawCursorXY(getNextLevelButtonPos(), 1, IMG_MENU_BUTTON_NEXT_LEVEL);
+#else
+#if 1
   drawCursorXY(level_width / 32 + 1, 1, IMG_MENU_BUTTON_LEFT);
   drawCursorXY(level_width / 32 + 5, 1, IMG_MENU_BUTTON_RIGHT);
 #else
   drawCursorXY(level_width / 32 + 4, 1, IMG_MENU_BUTTON_LEFT);
   drawCursorXY(level_width / 32 + 8, 1, IMG_MENU_BUTTON_RIGHT);
+#endif
 #endif
 
   DrawTextSCentered(326, FONT_TITLE_2, "A Game by Artsoft Entertainment");
@@ -2088,14 +2130,15 @@ static struct TokenInfo setup_info_graphics[] =
 {
   { TYPE_SWITCH,	&setup.fullscreen,	"Fullscreen Mode:"	},
   { TYPE_SWITCH,	&setup.scroll_delay,	"Delayed Scrolling:"	},
-  { TYPE_SWITCH,	&setup.soft_scrolling,	"Soft Scrolling:"	},
 #if 0
+  { TYPE_SWITCH,	&setup.soft_scrolling,	"Soft Scrolling:"	},
   { TYPE_SWITCH,	&setup.double_buffering,"Double-Buffering:"	},
   { TYPE_SWITCH,	&setup.fading,		"Fading:"		},
 #endif
   { TYPE_SWITCH,	&setup.quick_switch,	"Quick Player Focus Switch:" },
   { TYPE_SWITCH,	&setup.quick_doors,	"Quick Menu Doors:"	},
   { TYPE_SWITCH,	&setup.toons,		"Toons:"		},
+  { TYPE_ECS_AGA,	&setup.prefer_aga_graphics,"EMC graphics preference:" },
   { TYPE_EMPTY,		NULL,			""			},
   { TYPE_LEAVE_MENU,	execSetupMain, 		"Back"			},
 
@@ -2225,6 +2268,7 @@ static void drawSetupValue(int pos)
   int xpos = MENU_SCREEN_VALUE_XPOS;
   int ypos = MENU_SCREEN_START_YPOS + pos;
   int font_nr = FONT_VALUE_1;
+  int font_width = getFontWidth(font_nr);
   int type = setup_info[pos].type;
   void *value = setup_info[pos].value;
   char *value_string = getSetupValue(type, value);
@@ -2257,17 +2301,26 @@ static void drawSetupValue(int pos)
     if (strlen(value_string) > max_value_len)
       value_string[max_value_len] = '\0';
   }
+  else if (type & TYPE_ECS_AGA)
+  {
+    font_nr = FONT_VALUE_1;
+  }
   else if (type & TYPE_BOOLEAN_STYLE)
   {
     font_nr = (*(boolean *)value ? FONT_OPTION_ON : FONT_OPTION_OFF);
   }
 
 #if 1
+  for (i = 0; i <= MENU_SCREEN_MAX_XPOS - xpos; i++)
+    DrawText(mSX + xpos * 32 + i * font_width, mSY + ypos * 32, " ", font_nr);
+#else
+#if 1
   for (i = xpos; i <= MENU_SCREEN_MAX_XPOS; i++)
     DrawText(mSX + i * 32, mSY + ypos * 32, " ", font_nr);
 #else
   DrawText(mSX + xpos * 32, mSY + ypos * 32,
 	   (xpos == 3 ? "              " : "   "), font_nr);
+#endif
 #endif
 
   DrawText(mSX + xpos * 32, mSY + ypos * 32, value_string, font_nr);
@@ -2370,6 +2423,7 @@ static void DrawSetupScreen_Generic()
     if (setup_info[i].type & (TYPE_SWITCH |
 			      TYPE_YES_NO |
 			      TYPE_STRING |
+			      TYPE_ECS_AGA |
 			      TYPE_KEYTEXT))
       font_nr = FONT_MENU_2;
 #else

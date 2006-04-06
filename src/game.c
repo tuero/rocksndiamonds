@@ -1236,12 +1236,16 @@ static inline void InitField_WithBug2(int x, int y, boolean init_game)
 
 inline void DrawGameValue_Emeralds(int value)
 {
-  DrawText(DX_EMERALDS, DY_EMERALDS, int2str(value, 3), FONT_TEXT_2);
+  int xpos = (3 * 14 - 3 * getFontWidth(FONT_TEXT_2)) / 2;
+
+  DrawText(DX_EMERALDS + xpos, DY_EMERALDS, int2str(value, 3), FONT_TEXT_2);
 }
 
 inline void DrawGameValue_Dynamite(int value)
 {
-  DrawText(DX_DYNAMITE, DY_DYNAMITE, int2str(value, 3), FONT_TEXT_2);
+  int xpos = (3 * 14 - 3 * getFontWidth(FONT_TEXT_2)) / 2;
+
+  DrawText(DX_DYNAMITE + xpos, DY_DYNAMITE, int2str(value, 3), FONT_TEXT_2);
 }
 
 inline void DrawGameValue_Keys(int key[MAX_NUM_KEYS])
@@ -1267,15 +1271,24 @@ inline void DrawGameValue_Keys(int key[MAX_NUM_KEYS])
 
 inline void DrawGameValue_Score(int value)
 {
-  DrawText(DX_SCORE, DY_SCORE, int2str(value, 5), FONT_TEXT_2);
+  int xpos = (5 * 14 - 5 * getFontWidth(FONT_TEXT_2)) / 2;
+
+  DrawText(DX_SCORE + xpos, DY_SCORE, int2str(value, 5), FONT_TEXT_2);
 }
 
 inline void DrawGameValue_Time(int value)
 {
+  int xpos3 = (3 * 14 - 3 * getFontWidth(FONT_TEXT_2)) / 2;
+  int xpos4 = (4 * 10 - 4 * getFontWidth(FONT_LEVEL_NUMBER)) / 2;
+
+  /* clear background if value just changed its size */
+  if (value == 999 || value == 1000)
+    ClearRectangle(drawto, DX_TIME1, DY_TIME, 14 * 3, 14);
+
   if (value < 1000)
-    DrawText(DX_TIME1, DY_TIME, int2str(value, 3), FONT_TEXT_2);
+    DrawText(DX_TIME1 + xpos3, DY_TIME, int2str(value, 3), FONT_TEXT_2);
   else
-    DrawText(DX_TIME2, DY_TIME, int2str(value, 4), FONT_LEVEL_NUMBER);
+    DrawText(DX_TIME2 + xpos4, DY_TIME, int2str(value, 4), FONT_LEVEL_NUMBER);
 }
 
 inline void DrawGameValue_Level(int value)
