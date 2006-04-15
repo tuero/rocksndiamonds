@@ -3012,22 +3012,36 @@ void InitPlayerGfxAnimation(struct PlayerInfo *player, int action, int dir)
   }
 }
 
-static void ResetRandomAnimationValue(int x, int y)
+#if USE_GFX_RESET_GFX_ANIMATION
+static void ResetGfxFrame(int x, int y, boolean redraw)
 {
-  GfxRandom[x][y] = INIT_GFX_RANDOM();
+  int element = Feld[x][y];
+  int graphic = el_act_dir2img(element, GfxAction[x][y], GfxDir[x][y]);
+  int last_gfx_frame = GfxFrame[x][y];
+
+  if (graphic_info[graphic].anim_global_sync)
+    GfxFrame[x][y] = FrameCounter;
+  else if (ANIM_MODE(graphic) == ANIM_CE_VALUE)
+    GfxFrame[x][y] = CustomValue[x][y];
+  else if (ANIM_MODE(graphic) == ANIM_CE_SCORE)
+    GfxFrame[x][y] = element_info[element].collect_score;
+
+  if (redraw && GfxFrame[x][y] != last_gfx_frame)
+    DrawLevelGraphicAnimation(x, y, graphic);
 }
+#endif
 
 static void ResetGfxAnimation(int x, int y)
 {
-#if USE_GFX_RESET_GFX_ANIMATION
+#if 0
   int element, graphic;
 #endif
 
-  GfxFrame[x][y] = 0;
   GfxAction[x][y] = ACTION_DEFAULT;
   GfxDir[x][y] = MovDir[x][y];
+  GfxFrame[x][y] = 0;
 
-#if USE_GFX_RESET_GFX_ANIMATION
+#if 0
   element = Feld[x][y];
   graphic = el_act_dir2img(element, GfxAction[x][y], GfxDir[x][y]);
 
@@ -3038,6 +3052,15 @@ static void ResetGfxAnimation(int x, int y)
   else if (ANIM_MODE(graphic) == ANIM_CE_SCORE)
     GfxFrame[x][y] = element_info[element].collect_score;
 #endif
+
+#if USE_GFX_RESET_GFX_ANIMATION
+  ResetGfxFrame(x, y, FALSE);
+#endif
+}
+
+static void ResetRandomAnimationValue(int x, int y)
+{
+  GfxRandom[x][y] = INIT_GFX_RANDOM();
 }
 
 void InitMovingField(int x, int y, int direction)
@@ -5712,6 +5735,8 @@ static void TurnRound(int x, int y)
     GfxAction[x][y] = ACTION_TURNING_FROM_LEFT + MV_DIR_TO_BIT(direction);
 
 #if 1
+  ResetGfxFrame(x, y, FALSE);
+#else
   element = Feld[x][y];
   graphic = el_act_dir2img(element, GfxAction[x][y], GfxDir[x][y]);
 
@@ -9720,6 +9745,9 @@ void GameActions_RND()
       printf("::: Yo man! Rocks can fall!\n");
 #endif
 
+#if 1
+    ResetGfxFrame(x, y, TRUE);
+#else
     if (graphic_info[graphic].anim_global_sync)
       GfxFrame[x][y] = FrameCounter;
     else if (ANIM_MODE(graphic) == ANIM_CE_VALUE)
@@ -9744,6 +9772,7 @@ void GameActions_RND()
 #endif
 	DrawLevelGraphicAnimation(x, y, graphic);
     }
+#endif
 
     if (ANIM_MODE(graphic) == ANIM_RANDOM &&
 	IS_NEXT_FRAME(GfxFrame[x][y], graphic))
