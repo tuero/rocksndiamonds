@@ -364,6 +364,8 @@ void RemovePlayer(struct PlayerInfo *);
 boolean SnapField(struct PlayerInfo *, int, int);
 boolean DropElement(struct PlayerInfo *);
 
+static int getInvisibleActiveFromInvisibleElement(int);
+static int getInvisibleFromInvisibleActiveElement(int);
 
 static struct GadgetInfo *game_gadget[NUM_GAME_BUTTONS];
 
@@ -1125,6 +1127,14 @@ static void InitField(int x, int y, boolean init_game)
     case EL_LIGHT_SWITCH_ACTIVE:
       if (init_game)
 	game.light_time_left = level.time_light * FRAMES_PER_SECOND;
+      break;
+
+    case EL_INVISIBLE_STEELWALL:
+    case EL_INVISIBLE_WALL:
+    case EL_INVISIBLE_SAND:
+      if (game.light_time_left > 0 ||
+	  game.lenses_time_left > 0)
+        Feld[x][y] = getInvisibleActiveFromInvisibleElement(element);
       break;
 
     case EL_EMC_MAGIC_BALL:
@@ -5720,7 +5730,7 @@ inline static void TurnRoundExt(int x, int y)
 static void TurnRound(int x, int y)
 {
   int direction = MovDir[x][y];
-#if 1
+#if 0
   int element, graphic;
 #endif
 

@@ -1,5 +1,6 @@
 2006-04-15
 	* fixed bug with displaying wrong animation frame 0 after CE changes
+	* fixed bug with creating invisible elements when light switch is on
 
 2006-04-06
 	* added selection between ECS and AGA graphics for EMC levels to setup
