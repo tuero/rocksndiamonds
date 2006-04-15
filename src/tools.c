@@ -503,6 +503,17 @@ inline int getGraphicAnimationFrame(int graphic, int sync_frame)
   if (graphic_info[graphic].anim_global_sync || sync_frame < 0)
     sync_frame = FrameCounter;
 
+#if 0
+  if (graphic == element_info[EL_CUSTOM_START + 255].graphic[ACTION_DEFAULT] &&
+      sync_frame == 0 &&
+      FrameCounter > 10)
+  {
+    int x = 1 / 0;
+
+    printf("::: FOO!\n");
+  }
+#endif
+
   return getAnimationFrame(graphic_info[graphic].anim_frames,
 			   graphic_info[graphic].anim_delay,
 			   graphic_info[graphic].anim_mode,

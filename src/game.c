@@ -41,6 +41,7 @@
 #define USE_STOP_CHANGED_ELEMENTS	(USE_NEW_STUFF		* 1)
 #define USE_ELEMENT_TOUCHING_BUGFIX	(USE_NEW_STUFF		* 1)
 #define USE_NEW_CONTINUOUS_SNAPPING	(USE_NEW_STUFF		* 1)
+#define USE_GFX_RESET_GFX_ANIMATION	(USE_NEW_STUFF		* 1)
 
 #define USE_QUICKSAND_IMPACT_BUGFIX	(USE_NEW_STUFF		* 0)
 
@@ -3018,7 +3019,7 @@ static void ResetRandomAnimationValue(int x, int y)
 
 static void ResetGfxAnimation(int x, int y)
 {
-#if 0
+#if USE_GFX_RESET_GFX_ANIMATION
   int element, graphic;
 #endif
 
@@ -3026,7 +3027,7 @@ static void ResetGfxAnimation(int x, int y)
   GfxAction[x][y] = ACTION_DEFAULT;
   GfxDir[x][y] = MovDir[x][y];
 
-#if 0
+#if USE_GFX_RESET_GFX_ANIMATION
   element = Feld[x][y];
   graphic = el_act_dir2img(element, GfxAction[x][y], GfxDir[x][y]);
 
@@ -8325,8 +8326,10 @@ static void CreateFieldExt(int x, int y, int element, boolean is_change)
 
     Feld[x][y] = new_element;
 
+#if !USE_GFX_RESET_GFX_ANIMATION
     ResetGfxAnimation(x, y);
     ResetRandomAnimationValue(x, y);
+#endif
 
     if (element_info[new_element].move_direction_initial == MV_START_PREVIOUS)
       MovDir[x][y] = previous_move_direction;
@@ -8339,6 +8342,11 @@ static void CreateFieldExt(int x, int y, int element, boolean is_change)
     InitField_WithBug1(x, y, FALSE);
 
     new_element = Feld[x][y];	/* element may have changed */
+
+#if USE_GFX_RESET_GFX_ANIMATION
+    ResetGfxAnimation(x, y);
+    ResetRandomAnimationValue(x, y);
+#endif
 
     DrawLevelField(x, y);
 
