@@ -295,8 +295,11 @@ void InitFontGraphicInfo()
       font_bitmap_info[font_bitmap_id].src_y  = graphic_info[graphic].src_y;
       font_bitmap_info[font_bitmap_id].width  = graphic_info[graphic].width;
       font_bitmap_info[font_bitmap_id].height = graphic_info[graphic].height;
-      font_bitmap_info[font_bitmap_id].draw_x = graphic_info[graphic].draw_x;
-      font_bitmap_info[font_bitmap_id].draw_y = graphic_info[graphic].draw_y;
+
+      font_bitmap_info[font_bitmap_id].draw_xoffset =
+	graphic_info[graphic].draw_xoffset;
+      font_bitmap_info[font_bitmap_id].draw_yoffset =
+	graphic_info[graphic].draw_yoffset;
 
       font_bitmap_info[font_bitmap_id].num_chars =
 	graphic_info[graphic].anim_frames;
@@ -1063,8 +1066,8 @@ static void set_graphic_parameters(int graphic)
   graphic_info[graphic].step_delay  = parameter[GFX_ARG_STEP_DELAY];
 
   /* this is only used for drawing font characters */
-  graphic_info[graphic].draw_x = parameter[GFX_ARG_DRAW_XOFFSET];
-  graphic_info[graphic].draw_y = parameter[GFX_ARG_DRAW_YOFFSET];
+  graphic_info[graphic].draw_xoffset = parameter[GFX_ARG_DRAW_XOFFSET];
+  graphic_info[graphic].draw_yoffset = parameter[GFX_ARG_DRAW_YOFFSET];
 
   /* this is only used for drawing envelope graphics */
   graphic_info[graphic].draw_masked = parameter[GFX_ARG_DRAW_MASKED];

@@ -561,9 +561,13 @@ struct AudioSystemInfo
 struct FontBitmapInfo
 {
   Bitmap *bitmap;
+
   int src_x, src_y;		/* start position of animation frames */
   int width, height;		/* width/height of each animation frame */
-  int draw_x, draw_y;		/* offset for drawing font characters */
+
+  int draw_xoffset;		/* offset for drawing font characters */
+  int draw_yoffset;		/* offset for drawing font characters */
+
   int num_chars;
   int num_chars_per_line;
 

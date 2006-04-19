@@ -55,6 +55,8 @@
 void InitFontInfo(struct FontBitmapInfo *, int, int (*function)(int));
 void FreeFontInfo(struct FontBitmapInfo *);
 
+struct FontBitmapInfo *getFontBitmapInfo(int);
+
 int getFontWidth(int);
 int getFontHeight(int);
 int getTextWidth(char *, int);

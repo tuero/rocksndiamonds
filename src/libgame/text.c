@@ -130,6 +130,13 @@ void FreeFontInfo(struct FontBitmapInfo *font_bitmap_info)
   free(font_bitmap_info);
 }
 
+struct FontBitmapInfo *getFontBitmapInfo(int font_nr)
+{
+  int font_bitmap_id = gfx.select_font_function(font_nr);
+
+  return &gfx.font_bitmap_info[font_bitmap_id];
+}
+
 int getFontWidth(int font_nr)
 {
   int font_bitmap_id = gfx.select_font_function(font_nr);
@@ -272,8 +279,8 @@ void DrawTextExt(DrawBuffer *dst_bitmap, int dst_x, int dst_y, char *text,
     return;
 
   /* add offset for drawing font characters */
-  dst_x += font->draw_x;
-  dst_y += font->draw_y;
+  dst_x += font->draw_xoffset;
+  dst_y += font->draw_yoffset;
 
   while (*text_ptr)
   {

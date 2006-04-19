@@ -57,13 +57,17 @@
 #define MAX_INFO_MODES			6
 
 /* for various menu stuff  */
-#define MAX_INFO_ELEMENTS_ON_SCREEN	10
-#define MAX_MENU_ENTRIES_ON_SCREEN	(SCR_FIELDY - 2)
+#define MENU_SCREEN_START_XPOS		1
 #define MENU_SCREEN_START_YPOS		2
 #define MENU_SCREEN_VALUE_XPOS		14
 #define MENU_SCREEN_MAX_XPOS		(SCR_FIELDX - 1)
 #define MENU_TITLE1_YPOS		8
 #define MENU_TITLE2_YPOS		46
+#define MAX_INFO_ELEMENTS_ON_SCREEN	10
+#define MAX_MENU_ENTRIES_ON_SCREEN	(SCR_FIELDY - MENU_SCREEN_START_YPOS)
+#define MAX_MENU_TEXT_LENGTH_BIG	(MENU_SCREEN_VALUE_XPOS -	\
+					 MENU_SCREEN_START_XPOS)
+#define MAX_MENU_TEXT_LENGTH_MEDIUM	(MAX_MENU_TEXT_LENGTH_BIG * 2)
 
 /* buttons and scrollbars identifiers */
 #define SCREEN_CTRL_ID_SCROLL_UP	0
@@ -73,6 +77,30 @@
 #define NUM_SCREEN_SCROLLBUTTONS	2
 #define NUM_SCREEN_SCROLLBARS		1
 #define NUM_SCREEN_GADGETS		3
+
+/* graphic position and size values for buttons and scrollbars */
+#define SC_SCROLLBUTTON_XSIZE		TILEX
+#define SC_SCROLLBUTTON_YSIZE		TILEY
+
+#define SC_SCROLLBAR_XPOS		(SXSIZE - SC_SCROLLBUTTON_XSIZE)
+
+#define SC_SCROLL_VERTICAL_XSIZE	SC_SCROLLBUTTON_XSIZE
+#define SC_SCROLL_VERTICAL_YSIZE	((MAX_MENU_ENTRIES_ON_SCREEN - 2) * \
+					 SC_SCROLLBUTTON_YSIZE)
+
+#define SC_SCROLL_UP_XPOS		SC_SCROLLBAR_XPOS
+#define SC_SCROLL_UP_YPOS		(2 * SC_SCROLLBUTTON_YSIZE)
+
+#define SC_SCROLL_VERTICAL_XPOS		SC_SCROLLBAR_XPOS
+#define SC_SCROLL_VERTICAL_YPOS		(SC_SCROLL_UP_YPOS + \
+					 SC_SCROLLBUTTON_YSIZE)
+
+#define SC_SCROLL_DOWN_XPOS		SC_SCROLLBAR_XPOS
+#define SC_SCROLL_DOWN_YPOS		(SC_SCROLL_VERTICAL_YPOS + \
+					 SC_SCROLL_VERTICAL_YSIZE)
+
+#define SC_BORDER_SIZE			14
+
 
 /* forward declarations of internal functions */
 static void HandleScreenGadgets(struct GadgetInfo *);
@@ -711,10 +739,11 @@ static void DrawInfoScreen_Main()
 
   for (i = 0; info_info[i].type != 0 && i < NUM_MENU_ENTRIES_ON_SCREEN; i++)
   {
+    int xpos = MENU_SCREEN_START_XPOS;
     int ypos = MENU_SCREEN_START_YPOS + i;
     int font_nr = FONT_MENU_1;
 
-    DrawText(mSX + 32, mSY + ypos * 32, info_info[i].text, font_nr);
+    DrawText(mSX + xpos * 32, mSY + ypos * 32, info_info[i].text, font_nr);
 
     if (info_info[i].type & TYPE_ENTER_MENU)
       initCursor(i, IMG_MENU_BUTTON_ENTER_MENU);
@@ -1503,8 +1532,6 @@ static void drawChooseTreeList(int first_entry, int num_page_entries,
 			       TreeInfo *ti)
 {
   int i;
-  char buffer[SCR_FIELDX * 2];
-  int max_buffer_len = (SCR_FIELDX - 2) * 2;
   char *title_string = NULL;
 #if 0
   int xoffset_sets = 16;
@@ -1544,14 +1571,24 @@ static void drawChooseTreeList(int first_entry, int num_page_entries,
 
   /* clear tree list area, but not title or scrollbar */
   DrawBackground(mSX, mSY + MENU_SCREEN_START_YPOS * 32,
-		 SXSIZE - 32 + menu.scrollbar_xoffset,
+		 SC_SCROLLBAR_XPOS + menu.scrollbar_xoffset,
 		 MAX_MENU_ENTRIES_ON_SCREEN * 32);
 
   for (i = 0; i < num_page_entries; i++)
   {
     TreeInfo *node, *node_first;
     int entry_pos = first_entry + i;
+    int xpos = MENU_SCREEN_START_XPOS;
     int ypos = MENU_SCREEN_START_YPOS + i;
+    int startx = mSX + xpos * 32;
+    int starty = mSY + ypos * 32;
+    int font_nr = FONT_TEXT_1;
+    int font_xoffset = getFontBitmapInfo(font_nr)->draw_xoffset;
+    int startx_text = startx + font_xoffset;
+    int startx_scrollbar = mSX + SC_SCROLLBAR_XPOS + menu.scrollbar_xoffset;
+    int text_size = startx_scrollbar - startx_text;
+    int max_buffer_len = text_size / getFontWidth(font_nr);
+    char buffer[max_buffer_len + 1];
 
     node_first = getTreeInfoFirstGroupEntry(ti);
     node = getTreeInfoFromPos(node_first, entry_pos);
@@ -1559,7 +1596,7 @@ static void drawChooseTreeList(int first_entry, int num_page_entries,
     strncpy(buffer, node->name, max_buffer_len);
     buffer[max_buffer_len] = '\0';
 
-    DrawText(mSX + 32, mSY + ypos * 32, buffer, FONT_TEXT_1 + node->color);
+    DrawText(startx, starty, buffer, font_nr + node->color);
 
     if (node->parent_link)
       initCursor(i, IMG_MENU_BUTTON_LEAVE_MENU);
@@ -2265,12 +2302,41 @@ static Key getSetupKey()
   return key;
 }
 
+static int getSetupTextFont(int type)
+{
+  if (type & (TYPE_SWITCH |
+	      TYPE_YES_NO |
+	      TYPE_STRING |
+	      TYPE_ECS_AGA |
+	      TYPE_KEYTEXT))
+    return FONT_MENU_2;
+  else
+    return FONT_MENU_1;
+}
+
+static int getSetupValueFont(int type, void *value)
+{
+  if (type & TYPE_KEY)
+    return (type & TYPE_QUERY ? FONT_INPUT_1_ACTIVE : FONT_VALUE_1);
+  else if (type & TYPE_STRING)
+    return FONT_VALUE_2;
+  else if (type & TYPE_ECS_AGA)
+    return FONT_VALUE_1;
+  else if (type & TYPE_BOOLEAN_STYLE)
+    return (*(boolean *)value ? FONT_OPTION_ON : FONT_OPTION_OFF);
+  else
+    return FONT_VALUE_1;
+}
+
 static void drawSetupValue(int pos)
 {
+  boolean font_draw_xoffset_modified = FALSE;
+  int font_draw_xoffset_old = -1;
   int xpos = MENU_SCREEN_VALUE_XPOS;
   int ypos = MENU_SCREEN_START_YPOS + pos;
-  int font_nr = FONT_VALUE_1;
-  int font_width = getFontWidth(font_nr);
+  int startx = mSX + xpos * 32;
+  int starty = mSY + ypos * 32;
+  int font_nr, font_width;
   int type = setup_info[pos].type;
   void *value = setup_info[pos].value;
   char *value_string = getSetupValue(type, value);
@@ -2282,7 +2348,7 @@ static void drawSetupValue(int pos)
   if (type & TYPE_KEY)
   {
 #if 1
-    xpos = 1;
+    xpos = MENU_SCREEN_START_XPOS;
 #else
     xpos = 3;
 #endif
@@ -2290,42 +2356,99 @@ static void drawSetupValue(int pos)
     if (type & TYPE_QUERY)
     {
       value_string = "<press key>";
+#if 0
       font_nr = FONT_INPUT_1_ACTIVE;
+#endif
     }
   }
   else if (type & TYPE_STRING)
   {
     int max_value_len = (SCR_FIELDX - 2) * 2;
 
-    xpos = 1;
+    xpos = MENU_SCREEN_START_XPOS;
+#if 0
     font_nr = FONT_VALUE_2;
+#endif
 
     if (strlen(value_string) > max_value_len)
       value_string[max_value_len] = '\0';
   }
   else if (type & TYPE_ECS_AGA)
   {
+#if 0
     font_nr = FONT_VALUE_1;
+#endif
   }
   else if (type & TYPE_BOOLEAN_STYLE)
   {
+#if 0
     font_nr = (*(boolean *)value ? FONT_OPTION_ON : FONT_OPTION_OFF);
+#endif
+  }
+
+  startx = mSX + xpos * 32;
+  starty = mSY + ypos * 32;
+  font_nr = getSetupValueFont(type, value);
+  font_width = getFontWidth(font_nr);
+
+  /* downward compatibility correction for Juergen Bonhagen's menu settings */
+  if (setup_mode != SETUP_MODE_INPUT)
+  {
+    int check_font_nr = FONT_OPTION_ON; /* known font that needs correction */
+    int font1_xoffset = getFontBitmapInfo(font_nr)->draw_xoffset;
+    int font2_xoffset = getFontBitmapInfo(check_font_nr)->draw_xoffset;
+    int text_startx = mSX + MENU_SCREEN_START_XPOS * 32;
+    int text_font_nr = getSetupTextFont(FONT_MENU_2);
+    int text_font_xoffset = getFontBitmapInfo(text_font_nr)->draw_xoffset;
+    int text_width = MAX_MENU_TEXT_LENGTH_MEDIUM * getFontWidth(text_font_nr);
+    boolean correct_font_draw_xoffset = FALSE;
+
+    if (xpos == MENU_SCREEN_START_XPOS &&
+	startx + font1_xoffset < text_startx + text_font_xoffset)
+      correct_font_draw_xoffset = TRUE;
+
+    if (xpos == MENU_SCREEN_VALUE_XPOS &&
+	startx + font2_xoffset < text_startx + text_width + text_font_xoffset)
+      correct_font_draw_xoffset = TRUE;
+
+#if 0
+    printf("::: %d + %d < %d + %d + %d\n",
+	   startx, font_xoffset, text_startx, text_width, text_font_xoffset);
+    printf("::: => need correction == %d\n", correct_font_draw_xoffset);
+#endif
+
+    /* check if setup value would overlap with setup text when printed */
+    /* (this can happen for extreme/wrong values for font draw offset) */
+    if (correct_font_draw_xoffset)
+    {
+      font_draw_xoffset_old = getFontBitmapInfo(font_nr)->draw_xoffset;
+      font_draw_xoffset_modified = TRUE;
+
+      if (type & TYPE_KEY)
+	getFontBitmapInfo(font_nr)->draw_xoffset += 2 * getFontWidth(font_nr);
+      else if (!(type & TYPE_STRING))
+	getFontBitmapInfo(font_nr)->draw_xoffset = text_font_xoffset + 20 -
+	  MAX_MENU_TEXT_LENGTH_MEDIUM * (16 - getFontWidth(text_font_nr));
+    }
   }
 
 #if 1
   for (i = 0; i <= MENU_SCREEN_MAX_XPOS - xpos; i++)
-    DrawText(mSX + xpos * 32 + i * font_width, mSY + ypos * 32, " ", font_nr);
+    DrawText(startx + i * font_width, starty, " ", font_nr);
 #else
 #if 1
   for (i = xpos; i <= MENU_SCREEN_MAX_XPOS; i++)
-    DrawText(mSX + i * 32, mSY + ypos * 32, " ", font_nr);
+    DrawText(mSX + i * 32, starty, " ", font_nr);
 #else
-  DrawText(mSX + xpos * 32, mSY + ypos * 32,
+  DrawText(startx, starty,
 	   (xpos == 3 ? "              " : "   "), font_nr);
 #endif
 #endif
 
-  DrawText(mSX + xpos * 32, mSY + ypos * 32, value_string, font_nr);
+  DrawText(startx, starty, value_string, font_nr);
+
+  if (font_draw_xoffset_modified)
+    getFontBitmapInfo(font_nr)->draw_xoffset = font_draw_xoffset_old;
 }
 
 static void changeSetupValue(int pos)
@@ -2411,8 +2534,13 @@ static void DrawSetupScreen_Generic()
   for (i = 0; setup_info[i].type != 0 && i < NUM_MENU_ENTRIES_ON_SCREEN; i++)
   {
     void *value_ptr = setup_info[i].value;
+    int xpos = MENU_SCREEN_START_XPOS;
     int ypos = MENU_SCREEN_START_YPOS + i;
+#if 1
+    int font_nr;
+#else
     int font_nr = FONT_MENU_1;
+#endif
 
     /* set some entries to "unchangeable" according to other variables */
     if ((value_ptr == &setup.sound_simple && !audio.sound_available) ||
@@ -2421,6 +2549,9 @@ static void DrawSetupScreen_Generic()
 	(value_ptr == &setup.fullscreen   && !video.fullscreen_available))
       setup_info[i].type |= TYPE_GHOSTED;
 
+#if 1
+    font_nr = getSetupTextFont(setup_info[i].type);
+#else
 #if 1
     if (setup_info[i].type & (TYPE_SWITCH |
 			      TYPE_YES_NO |
@@ -2432,8 +2563,9 @@ static void DrawSetupScreen_Generic()
     if (setup_info[i].type & TYPE_STRING)
       font_nr = FONT_MENU_2;
 #endif
+#endif
 
-    DrawText(mSX + 32, mSY + ypos * 32, setup_info[i].text, font_nr);
+    DrawText(mSX + xpos * 32, mSY + ypos * 32, setup_info[i].text, font_nr);
 
     if (setup_info[i].type & TYPE_ENTER_MENU)
       initCursor(i, IMG_MENU_BUTTON_ENTER_MENU);
@@ -3194,25 +3326,8 @@ void HandleGameActions()
     AutoPlayTape();	/* continue automatically playing next tape */
 }
 
+
 /* ---------- new screen button stuff -------------------------------------- */
-
-/* graphic position and size values for buttons and scrollbars */
-#define SC_SCROLLBUTTON_XSIZE		TILEX
-#define SC_SCROLLBUTTON_YSIZE		TILEY
-
-#define SC_SCROLL_VERTICAL_XSIZE	SC_SCROLLBUTTON_XSIZE
-#define SC_SCROLL_VERTICAL_YSIZE	((MAX_MENU_ENTRIES_ON_SCREEN - 2) * \
-					 SC_SCROLLBUTTON_YSIZE)
-#define SC_SCROLL_UP_XPOS		(SXSIZE - SC_SCROLLBUTTON_XSIZE)
-#define SC_SCROLL_UP_YPOS		(2 * SC_SCROLLBUTTON_YSIZE)
-#define SC_SCROLL_VERTICAL_XPOS		SC_SCROLL_UP_XPOS
-#define SC_SCROLL_VERTICAL_YPOS		(SC_SCROLL_UP_YPOS + \
-					 SC_SCROLLBUTTON_YSIZE)
-#define SC_SCROLL_DOWN_XPOS		SC_SCROLL_UP_XPOS
-#define SC_SCROLL_DOWN_YPOS		(SC_SCROLL_VERTICAL_YPOS + \
-					 SC_SCROLL_VERTICAL_YSIZE)
-
-#define SC_BORDER_SIZE			14
 
 static struct
 {

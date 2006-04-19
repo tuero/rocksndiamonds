@@ -2156,7 +2156,8 @@ struct GraphicInfo
   int step_offset;		/* optional step offset of toon animations */
   int step_delay;		/* optional step delay of toon animations */
 
-  int draw_x, draw_y;		/* optional offset for drawing fonts chars */
+  int draw_xoffset;		/* optional offset for drawing font chars */
+  int draw_yoffset;		/* optional offset for drawing font chars */
 
   int draw_masked;		/* optional setting for drawing envelope gfx */
 
