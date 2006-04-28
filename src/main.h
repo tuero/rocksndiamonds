@@ -221,8 +221,10 @@
 #define CE_MOVE_OF_X			35
 #define CE_DIGGING_X			36
 #define CE_CREATION_OF_X		37
+#define CE_SCORE_GETS_ZERO		38
+#define CE_SCORE_GETS_ZERO_OF_X		39
 
-#define NUM_CHANGE_EVENTS		38
+#define NUM_CHANGE_EVENTS		40
 
 #define CE_BITMASK_DEFAULT		0
 

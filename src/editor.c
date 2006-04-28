@@ -1550,6 +1550,7 @@ static struct ValueTextInfo options_change_direct_action[] =
   { CE_IMPACT,			"impact (on something)"		},
   { CE_SMASHED,			"smashed (from above)"		},
   { CE_VALUE_GETS_ZERO,		"CE value gets 0"		},
+  { CE_SCORE_GETS_ZERO,		"CE score gets 0"		},
 
   { -1,				NULL				}
 };
@@ -1576,6 +1577,7 @@ static struct ValueTextInfo options_change_other_action[] =
   { CE_MOVE_OF_X,		"move of"			},
   { CE_CREATION_OF_X,		"creation of"			},
   { CE_VALUE_GETS_ZERO_OF_X,	"CE value gets 0 of"		},
+  { CE_SCORE_GETS_ZERO_OF_X,	"CE score gets 0 of"		},
 
   { -1,				NULL				}
 };
@@ -6675,6 +6677,7 @@ static void CopyCustomElementPropertiesToEditor(int element)
      HAS_CHANGE_EVENT(element, CE_IMPACT) ? CE_IMPACT :
      HAS_CHANGE_EVENT(element, CE_SMASHED) ? CE_SMASHED :
      HAS_CHANGE_EVENT(element, CE_VALUE_GETS_ZERO) ? CE_VALUE_GETS_ZERO :
+     HAS_CHANGE_EVENT(element, CE_SCORE_GETS_ZERO) ? CE_SCORE_GETS_ZERO :
      custom_element_change.direct_action);
 
   /* set "change by other element action" selectbox help value */
@@ -6699,6 +6702,7 @@ static void CopyCustomElementPropertiesToEditor(int element)
      HAS_CHANGE_EVENT(element, CE_MOVE_OF_X) ? CE_MOVE_OF_X :
      HAS_CHANGE_EVENT(element, CE_CREATION_OF_X) ? CE_CREATION_OF_X :
      HAS_CHANGE_EVENT(element, CE_VALUE_GETS_ZERO_OF_X) ? CE_VALUE_GETS_ZERO_OF_X :
+     HAS_CHANGE_EVENT(element, CE_SCORE_GETS_ZERO_OF_X) ? CE_SCORE_GETS_ZERO_OF_X :
      custom_element_change.other_action);
 }
 
@@ -6816,6 +6820,7 @@ static void CopyCustomElementPropertiesToGame(int element)
   custom_element_change_events[CE_IMPACT] = FALSE;
   custom_element_change_events[CE_SMASHED] = FALSE;
   custom_element_change_events[CE_VALUE_GETS_ZERO] = FALSE;
+  custom_element_change_events[CE_SCORE_GETS_ZERO] = FALSE;
   custom_element_change_events[custom_element_change.direct_action] =
     custom_element_change_events[CE_BY_DIRECT_ACTION];
 
@@ -6840,6 +6845,7 @@ static void CopyCustomElementPropertiesToGame(int element)
   custom_element_change_events[CE_MOVE_OF_X] = FALSE;
   custom_element_change_events[CE_CREATION_OF_X] = FALSE;
   custom_element_change_events[CE_VALUE_GETS_ZERO_OF_X] = FALSE;
+  custom_element_change_events[CE_SCORE_GETS_ZERO_OF_X] = FALSE;
   custom_element_change_events[custom_element_change.other_action] =
     custom_element_change_events[CE_BY_OTHER_ACTION];
 

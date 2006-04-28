@@ -189,6 +189,14 @@ dist-build-all:
 # dist-all: dist-build-all dist-unix dist-msdos dist-win32 dist-macosx
 dist-all: dist-build-all dist-unix dist-win32 dist-macosx
 
+# !!! TEST ONLY !!!
+test-setup:
+#	$(MAKE) clean
+#	$(MAKE) dist-build-win32
+#	$(MAKE) clean
+
+	$(MAKE) dist-win32
+
 # upload-all: upload-unix upload-msdos upload-win32 upload-macosx
 upload-all: upload-unix upload-win32 upload-macosx
 

@@ -8282,15 +8282,15 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
     case CA_SET_CE_VALUE:
     {
 #if USE_NEW_CUSTOM_VALUE
-      int last_custom_value = CustomValue[x][y];
+      int last_ce_value = CustomValue[x][y];
 
       CustomValue[x][y] = action_arg_number_new;
 
 #if 0
-      printf("::: Count == %d\n", CustomValue[x][y]);
+      printf("::: CE value == %d\n", CustomValue[x][y]);
 #endif
 
-      if (CustomValue[x][y] == 0 && last_custom_value > 0)
+      if (CustomValue[x][y] == 0 && last_ce_value > 0)
       {
 #if 0
 	printf("::: CE_VALUE_GETS_ZERO\n");
@@ -8310,7 +8310,29 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
 
     case CA_SET_CE_SCORE:
     {
+#if USE_NEW_CUSTOM_VALUE
+      int last_ce_score = ei->collect_score;
+
       ei->collect_score = action_arg_number_new;
+
+#if 0
+      printf("::: CE score == %d\n", ei->collect_score);
+#endif
+
+      if (ei->collect_score == 0 && last_ce_score > 0)
+      {
+#if 0
+	printf("::: CE_SCORE_GETS_ZERO\n");
+#endif
+
+	CheckElementChange(x, y, element, EL_UNDEFINED, CE_SCORE_GETS_ZERO);
+	CheckTriggeredElementChange(x, y, element, CE_SCORE_GETS_ZERO_OF_X);
+
+#if 0
+	printf("::: RESULT: %d, %d\n", Feld[x][y], ChangePage[x][y]);
+#endif
+      }
+#endif
 
       break;
     }

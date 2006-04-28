@@ -3378,6 +3378,7 @@ static void LoadLevel_InitElements(struct LevelInfo *level, char *filename)
       int element = EL_CUSTOM_START + i;
 
       /* order of checking and copying events to be mapped is important */
+      /* (do not change the start and end value -- they are constant) */
       for (j = CE_BY_OTHER_ACTION; j >= CE_VALUE_GETS_ZERO; j--)
       {
 	if (HAS_CHANGE_EVENT(element, j - 2))
@@ -3388,6 +3389,7 @@ static void LoadLevel_InitElements(struct LevelInfo *level, char *filename)
       }
 
       /* order of checking and copying events to be mapped is important */
+      /* (do not change the start and end value -- they are constant) */
       for (j = CE_PLAYER_COLLECTS_X; j >= CE_HITTING_SOMETHING; j--)
       {
 	if (HAS_CHANGE_EVENT(element, j - 1))
