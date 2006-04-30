@@ -4523,6 +4523,7 @@ struct ElementDirectionInfo element_direction_info[NUM_DIRECTIONS_FULL + 1] =
 struct SpecialSuffixInfo special_suffix_info[NUM_SPECIAL_GFX_ARGS + 1 + 1] =
 {
   { ".[DEFAULT]",	GAME_MODE_DEFAULT,		},
+  { ".TITLE",		GAME_MODE_TITLE,		},
   { ".MAIN",		GAME_MODE_MAIN,			},
   { ".LEVELS",		GAME_MODE_LEVELS		},
   { ".SCORES",		GAME_MODE_SCORES,		},

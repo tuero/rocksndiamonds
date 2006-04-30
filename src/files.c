@@ -4944,25 +4944,26 @@ void SaveScore(int nr)
 #define SETUP_TOKEN_SOFT_SCROLLING		7
 #define SETUP_TOKEN_FADING			8
 #define SETUP_TOKEN_AUTORECORD			9
-#define SETUP_TOKEN_QUICK_DOORS			10
-#define SETUP_TOKEN_TEAM_MODE			11
-#define SETUP_TOKEN_HANDICAP			12
-#define SETUP_TOKEN_SKIP_LEVELS			13
-#define SETUP_TOKEN_TIME_LIMIT			14
-#define SETUP_TOKEN_FULLSCREEN			15
-#define SETUP_TOKEN_ASK_ON_ESCAPE		16
-#define SETUP_TOKEN_ASK_ON_ESCAPE_EDITOR	17
-#define SETUP_TOKEN_QUICK_SWITCH		18
-#define SETUP_TOKEN_INPUT_ON_FOCUS		19
-#define SETUP_TOKEN_PREFER_AGA_GRAPHICS		20
-#define SETUP_TOKEN_GRAPHICS_SET		21
-#define SETUP_TOKEN_SOUNDS_SET			22
-#define SETUP_TOKEN_MUSIC_SET			23
-#define SETUP_TOKEN_OVERRIDE_LEVEL_GRAPHICS	24
-#define SETUP_TOKEN_OVERRIDE_LEVEL_SOUNDS	25
-#define SETUP_TOKEN_OVERRIDE_LEVEL_MUSIC	26
+#define SETUP_TOKEN_SHOW_TITLESCREEN		10
+#define SETUP_TOKEN_QUICK_DOORS			11
+#define SETUP_TOKEN_TEAM_MODE			12
+#define SETUP_TOKEN_HANDICAP			13
+#define SETUP_TOKEN_SKIP_LEVELS			14
+#define SETUP_TOKEN_TIME_LIMIT			15
+#define SETUP_TOKEN_FULLSCREEN			16
+#define SETUP_TOKEN_ASK_ON_ESCAPE		17
+#define SETUP_TOKEN_ASK_ON_ESCAPE_EDITOR	18
+#define SETUP_TOKEN_QUICK_SWITCH		19
+#define SETUP_TOKEN_INPUT_ON_FOCUS		20
+#define SETUP_TOKEN_PREFER_AGA_GRAPHICS		21
+#define SETUP_TOKEN_GRAPHICS_SET		22
+#define SETUP_TOKEN_SOUNDS_SET			23
+#define SETUP_TOKEN_MUSIC_SET			24
+#define SETUP_TOKEN_OVERRIDE_LEVEL_GRAPHICS	25
+#define SETUP_TOKEN_OVERRIDE_LEVEL_SOUNDS	26
+#define SETUP_TOKEN_OVERRIDE_LEVEL_MUSIC	27
 
-#define NUM_GLOBAL_SETUP_TOKENS			27
+#define NUM_GLOBAL_SETUP_TOKENS			28
 
 /* editor setup */
 #define SETUP_TOKEN_EDITOR_EL_BOULDERDASH	0
@@ -5064,6 +5065,7 @@ static struct TokenInfo global_setup_tokens[] =
   { TYPE_SWITCH, &si.soft_scrolling,	"soft_scrolling"		},
   { TYPE_SWITCH, &si.fading,		"screen_fading"			},
   { TYPE_SWITCH, &si.autorecord,	"automatic_tape_recording"	},
+  { TYPE_SWITCH, &si.show_titlescreen,	"show_titlescreen"		},
   { TYPE_SWITCH, &si.quick_doors,	"quick_doors"			},
   { TYPE_SWITCH, &si.team_mode,		"team_mode"			},
   { TYPE_SWITCH, &si.handicap,		"handicap"			},
@@ -5193,6 +5195,7 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
   si->soft_scrolling = TRUE;
   si->fading = FALSE;
   si->autorecord = TRUE;
+  si->show_titlescreen = TRUE;
   si->quick_doors = FALSE;
   si->team_mode = FALSE;
   si->handicap = TRUE;
@@ -5587,7 +5590,7 @@ static void LoadSpecialMenuDesignSettingsFromFilename(char *filename)
   freeSetupFileHash(setup_file_hash);
 }
 
-void LoadSpecialMenuDesignSettings_NEW()
+void LoadSpecialMenuDesignSettings()
 {
   char *filename_base = UNDEFINED_FILENAME, *filename_local;
   int i, j;
@@ -5600,7 +5603,7 @@ void LoadSpecialMenuDesignSettings_NEW()
 	  get_auto_parameter_value(image_config_vars[i].token,
 				   image_config[j].value);
 
-#if 0
+#if 1
   if (!SETUP_OVERRIDE_ARTWORK(setup, ARTWORK_TYPE_GRAPHICS))
   {
     /* first look for special settings configured in level series config */
@@ -5621,51 +5624,6 @@ void LoadSpecialMenuDesignSettings_NEW()
 
   LoadSpecialMenuDesignSettingsFromFilename(filename_local);
 #endif
-}
-
-void LoadSpecialMenuDesignSettings()
-{
-  char *filename = getCustomArtworkConfigFilename(ARTWORK_TYPE_GRAPHICS);
-  SetupFileHash *setup_file_hash;
-  int i, j;
-
-  /* always start with reliable default values from default config */
-  for (i = 0; image_config_vars[i].token != NULL; i++)
-    for (j = 0; image_config[j].token != NULL; j++)
-      if (strEqual(image_config_vars[i].token, image_config[j].token))
-        *image_config_vars[i].value =
-          get_auto_parameter_value(image_config_vars[i].token,
-                                   image_config[j].value);
-
-  if ((setup_file_hash = loadSetupFileHash(filename)) == NULL)
-    return;
-
-  /* special case: initialize with default values that may be overwritten */
-  for (i = 0; i < NUM_SPECIAL_GFX_ARGS; i++)
-  {
-    char *value_x = getHashEntry(setup_file_hash, "menu.draw_xoffset");
-    char *value_y = getHashEntry(setup_file_hash, "menu.draw_yoffset");
-    char *list_size = getHashEntry(setup_file_hash, "menu.list_size");
-
-    if (value_x != NULL)
-      menu.draw_xoffset[i] = get_integer_from_string(value_x);
-    if (value_y != NULL)
-      menu.draw_yoffset[i] = get_integer_from_string(value_y);
-    if (list_size != NULL)
-      menu.list_size[i] = get_integer_from_string(list_size);
-  }
-
-  /* read (and overwrite with) values that may be specified in config file */
-  for (i = 0; image_config_vars[i].token != NULL; i++)
-  {
-    char *value = getHashEntry(setup_file_hash, image_config_vars[i].token);
-
-    if (value != NULL)
-      *image_config_vars[i].value =
-        get_auto_parameter_value(image_config_vars[i].token, value);
-  }
-
-  freeSetupFileHash(setup_file_hash);
 }
 
 void LoadUserDefinedEditorElementList(int **elements, int *num_elements)

@@ -1,5 +1,6 @@
 2006-04-30
-	* fixed bug that forced re-defining menu settings in each config file
+	* fixed bug that forced re-defining of menu settings in local graphics
+	  config file which are already defined in existing base config file
 
 2006-04-29
 	* added the possibility to define up to five title screens for each

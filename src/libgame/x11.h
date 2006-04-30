@@ -334,20 +334,21 @@ struct XY
 
 /* X11 function definitions */
 
-inline void X11InitVideoDisplay(void);
-inline void X11InitVideoBuffer(DrawBuffer **, DrawWindow **);
+void X11InitVideoDisplay(void);
+void X11InitVideoBuffer(DrawBuffer **, DrawWindow **);
 
 void X11ZoomBitmap(Bitmap *, Bitmap *);
 Bitmap *X11LoadImage(char *);
 
-inline void X11CreateBitmapContent(Bitmap *, int, int, int);
-inline void X11FreeBitmapPointers(Bitmap *);
-inline void X11CopyArea(Bitmap *, Bitmap *, int, int, int, int, int, int, int);
-inline void X11FillRectangle(Bitmap *, int, int, int, int, Pixel);
-inline void X11DrawSimpleLine(Bitmap *, int, int, int, int, Pixel);
-inline Pixel X11GetPixel(Bitmap *, int, int);
-inline Pixel X11GetPixelFromRGB(unsigned int, unsigned int, unsigned int);
-inline void X11DestroyImage(XImage *);
+void X11CreateBitmapContent(Bitmap *, int, int, int);
+void X11FreeBitmapPointers(Bitmap *);
+void X11CopyArea(Bitmap *, Bitmap *, int, int, int, int, int, int, int);
+void X11FillRectangle(Bitmap *, int, int, int, int, Pixel);
+void X11FadeScreen(Bitmap *, int, int, int);
+void X11DrawSimpleLine(Bitmap *, int, int, int, int, Pixel);
+Pixel X11GetPixel(Bitmap *, int, int);
+Pixel X11GetPixelFromRGB(unsigned int, unsigned int, unsigned int);
+void X11DestroyImage(XImage *);
 
 #if defined(TARGET_X11_NATIVE)
 void X11SetMouseCursor(struct MouseCursorInfo *);

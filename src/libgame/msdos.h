@@ -722,8 +722,8 @@ void XFillRectangle(Display *, Drawable, GC, int, int,
 Pixmap XCreatePixmap(Display *, Drawable, unsigned int, unsigned int,
 		     unsigned int);
 void XSync(Display *, Bool);
-inline void XCopyArea(Display *, Drawable, Drawable, GC, int, int,
-		      unsigned int, unsigned int, int, int);
+void XCopyArea(Display *, Drawable, Drawable, GC, int, int,
+	       unsigned int, unsigned int, int, int);
 int Read_PCX_to_Pixmap(Display *, Window, GC, char *, Pixmap *, Pixmap *);
 int XReadBitmapFile(Display *, Drawable, char *,
 		    unsigned int *, unsigned int *, Pixmap *, int *, int *);

@@ -22,7 +22,7 @@
 static void X11InitDisplay();
 static DrawWindow *X11InitWindow();
 
-inline void X11InitVideoDisplay(void)
+void X11InitVideoDisplay(void)
 {
   /* initialize X11 video */
   X11InitDisplay();
@@ -31,7 +31,7 @@ inline void X11InitVideoDisplay(void)
   video.default_depth = XDefaultDepth(display, screen);
 }
 
-inline void X11InitVideoBuffer(DrawBuffer **backbuffer, DrawWindow **window)
+void X11InitVideoBuffer(DrawBuffer **backbuffer, DrawWindow **window)
 {
   *window = X11InitWindow();
 
@@ -307,8 +307,8 @@ Bitmap *X11LoadImage(char *filename)
   return new_bitmap;
 }
 
-inline void X11CreateBitmapContent(Bitmap *new_bitmap,
-				   int width, int height, int depth)
+void X11CreateBitmapContent(Bitmap *new_bitmap,
+			    int width, int height, int depth)
 {
   Pixmap pixmap;
 
@@ -327,7 +327,7 @@ inline void X11CreateBitmapContent(Bitmap *new_bitmap,
   new_bitmap->line_gc[1] = window->line_gc[1];
 }
 
-inline void X11FreeBitmapPointers(Bitmap *bitmap)
+void X11FreeBitmapPointers(Bitmap *bitmap)
 {
   /* The X11 version seems to have a memory leak here -- although
      "XFreePixmap()" is called, the corresponding memory seems not
@@ -346,30 +346,44 @@ inline void X11FreeBitmapPointers(Bitmap *bitmap)
   bitmap->stored_clip_gc = None;
 }
 
-inline void X11CopyArea(Bitmap *src_bitmap, Bitmap *dst_bitmap,
-			int src_x, int src_y, int width, int height,
-			int dst_x, int dst_y, int mask_mode)
+void X11CopyArea(Bitmap *src_bitmap, Bitmap *dst_bitmap,
+		 int src_x, int src_y, int width, int height,
+		 int dst_x, int dst_y, int mask_mode)
 {
   XCopyArea(display, src_bitmap->drawable, dst_bitmap->drawable,
 	    (mask_mode == BLIT_MASKED ? src_bitmap->clip_gc : dst_bitmap->gc),
 	    src_x, src_y, width, height, dst_x, dst_y);
 }
 
-inline void X11FillRectangle(Bitmap *bitmap, int x, int y,
-			     int width, int height, Pixel color)
+void X11FillRectangle(Bitmap *bitmap, int x, int y,
+		      int width, int height, Pixel color)
 {
   XSetForeground(display, bitmap->gc, color);
   XFillRectangle(display, bitmap->drawable, bitmap->gc, x, y, width, height);
 }
 
-inline void X11DrawSimpleLine(Bitmap *bitmap, int from_x, int from_y,
-			      int to_x, int to_y, Pixel color)
+void X11FadeScreen(Bitmap *bitmap_cross, int fade_mode, int fade_delay,
+		   int post_delay)
+{
+  /* fading currently not supported -- simply copy target image to screen */
+
+  if (fade_mode == FADE_MODE_FADE_OUT)
+    X11FillRectangle(window, 0, 0, video.width, video.height, BLACK_PIXEL);
+  else
+    X11CopyArea(bitmap_cross != NULL ? bitmap_cross : backbuffer, window,
+		0, 0, video.width, video.height, 0, 0, BLIT_OPAQUE);
+
+  /* as we currently cannot use the fade delay, also do not use post delay */
+}
+
+void X11DrawSimpleLine(Bitmap *bitmap, int from_x, int from_y,
+		       int to_x, int to_y, Pixel color)
 {
   XSetForeground(display, bitmap->gc, color);
   XDrawLine(display, bitmap->drawable, bitmap->gc, from_x, from_y, to_x, to_y);
 }
 
-inline Pixel X11GetPixel(Bitmap *bitmap, int x, int y)
+Pixel X11GetPixel(Bitmap *bitmap, int x, int y)
 {
   XImage *pixel_image;
   Pixel pixel_value;
@@ -384,8 +398,8 @@ inline Pixel X11GetPixel(Bitmap *bitmap, int x, int y)
 }
 
 #if defined(TARGET_X11_NATIVE)
-inline Pixel X11GetPixelFromRGB(unsigned int color_r, unsigned int color_g,
-				unsigned int color_b)
+Pixel X11GetPixelFromRGB(unsigned int color_r, unsigned int color_g,
+			 unsigned int color_b)
 {
   XColor xcolor;
   Pixel pixel;
@@ -402,7 +416,7 @@ inline Pixel X11GetPixelFromRGB(unsigned int color_r, unsigned int color_g,
 }
 #endif	/* TARGET_X11_NATIVE */
 
-inline void X11DestroyImage(XImage *ximage)
+void X11DestroyImage(XImage *ximage)
 {
 #if defined(TARGET_X11_NATIVE)
   /* this seems to be needed for OS/2, but does not hurt on other platforms */

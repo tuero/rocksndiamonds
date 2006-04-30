@@ -336,20 +336,23 @@ void DrawTitleScreen()
   CloseDoor(DOOR_CLOSE_1);
 #endif
 
-  HandleTitleScreen(0, 0, 0, 0, MB_MENU_INITIALIZE);
-
   PlayMenuSound();
   PlayMenuMusic();
 
+  HandleTitleScreen(0, 0, 0, 0, MB_MENU_INITIALIZE);
+
+#if 0
 #if 1
   FadeIn(1000);
 #else
   FadeToFront();
 #endif
+#endif
+
   StopAnimation();
 }
 
-void DrawMainMenu()
+static void DrawMainMenuExt(int fade_delay)
 {
   static LevelDirTree *leveldir_last_valid = NULL;
   boolean levelset_has_changed = FALSE;
@@ -405,7 +408,9 @@ void DrawMainMenu()
   SetDrawtoField(DRAW_BACKBUFFER);
 #endif
 
-  if (levelset_has_changed && graphic_info[IMG_TITLESCREEN_1].bitmap != NULL)
+  if (setup.show_titlescreen &&
+      levelset_has_changed &&
+      graphic_info[IMG_TITLESCREEN_1].bitmap != NULL)
   {
     game_status = GAME_MODE_TITLE;
     DrawTitleScreen();
@@ -526,8 +531,10 @@ void DrawMainMenu()
 
   DrawTextSCentered(326, FONT_TITLE_2, "A Game by Artsoft Entertainment");
 
+#if 0
   FadeToFront();
   InitAnimation();
+#endif
 
   HandleMainMenu(0, 0, 0, 0, MB_MENU_INITIALIZE);
 
@@ -539,12 +546,33 @@ void DrawMainMenu()
   PlayMenuSound();
   PlayMenuMusic();
 
+#if 1
   OpenDoor(DOOR_CLOSE_1 | DOOR_OPEN_2);
+#else
+  if (fade_delay > 0)
+    OpenDoor(DOOR_CLOSE_1 | DOOR_OPEN_2 | DOOR_NO_DELAY | DOOR_FORCE_REDRAW);
+  else
+    OpenDoor(DOOR_CLOSE_1 | DOOR_OPEN_2);
+#endif
 
 #if 1
   /* map gadgets for main menu screen */
   MapTapeButtons();
 #endif
+
+#if 1
+  if (fade_delay > 0)
+    FadeIn(fade_delay);
+  else
+    BackToFront();
+
+  InitAnimation();
+#endif
+}
+
+void DrawMainMenu()
+{
+  DrawMainMenuExt(FALSE);
 }
 
 #if 0
@@ -582,6 +610,7 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
 {
   static int title_nr = 0;
   boolean return_to_main_menu = FALSE;
+  boolean use_fading_main_menu = TRUE;
   boolean use_cross_fading = TRUE;
   int fade_delay = 1000;
   int post_delay = 500;
@@ -592,21 +621,21 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
 
     DrawTitleScreenImage(title_nr);
 
+    FadeIn(fade_delay);
+
     return;
   }
   else if (button == MB_MENU_LEAVE)
   {
     return_to_main_menu = TRUE;
+    use_fading_main_menu = FALSE;
   }
   else if (button == MB_MENU_CHOICE)
   {
     title_nr++;
 
     if (!use_cross_fading)
-    {
-      FadeOut(fade_delay);
-      Delay(post_delay);
-    }
+      FadeOut(fade_delay, post_delay);
 
     if (title_nr < MAX_NUM_TITLE_SCREENS &&
 	graphic_info[IMG_TITLESCREEN_1 + title_nr].bitmap != NULL)
@@ -627,8 +656,7 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
     }
     else
     {
-      FadeOut(fade_delay);
-      Delay(post_delay);
+      FadeOut(fade_delay, post_delay);
 
       return_to_main_menu = TRUE;
     }
@@ -638,8 +666,12 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
   {
     RedrawBackground();
 
+#if 1
+    OpenDoor(DOOR_CLOSE_1 | DOOR_OPEN_2 | DOOR_NO_DELAY | DOOR_FORCE_REDRAW);
+#endif
+
     game_status = GAME_MODE_MAIN;
-    DrawMainMenu();
+    DrawMainMenuExt(use_fading_main_menu ? fade_delay : 0);
   }
 }
 
@@ -2321,7 +2353,8 @@ static struct TokenInfo setup_info_graphics[] =
 #endif
   { TYPE_SWITCH,	&setup.quick_switch,	"Quick Player Focus Switch:" },
   { TYPE_SWITCH,	&setup.quick_doors,	"Quick Menu Doors:"	},
-  { TYPE_SWITCH,	&setup.toons,		"Toons:"		},
+  { TYPE_SWITCH,	&setup.show_titlescreen,"Show Title Screens:"	},
+  { TYPE_SWITCH,	&setup.toons,		"Show Toons:"		},
   { TYPE_ECS_AGA,	&setup.prefer_aga_graphics,"EMC graphics preference:" },
   { TYPE_EMPTY,		NULL,			""			},
   { TYPE_LEAVE_MENU,	execSetupMain, 		"Back"			},

@@ -24,7 +24,7 @@
 /* ========================================================================= */
 
 /* functions from SGE library */
-inline void sge_Line(SDL_Surface *, Sint16, Sint16, Sint16, Sint16, Uint32);
+void sge_Line(SDL_Surface *, Sint16, Sint16, Sint16, Sint16, Uint32);
 
 /* #ifdef PLATFORM_WIN32 */
 #define FULLSCREEN_BUG
@@ -38,7 +38,7 @@ static int fullscreen_yoffset;
 static int video_xoffset;
 static int video_yoffset;
 
-inline void SDLInitVideoDisplay(void)
+void SDLInitVideoDisplay(void)
 {
   putenv("SDL_VIDEO_CENTERED=1");
 
@@ -50,8 +50,8 @@ inline void SDLInitVideoDisplay(void)
   video.default_depth = SDL_GetVideoInfo()->vfmt->BitsPerPixel;
 }
 
-inline void SDLInitVideoBuffer(DrawBuffer **backbuffer, DrawWindow **window,
-			       boolean fullscreen)
+void SDLInitVideoBuffer(DrawBuffer **backbuffer, DrawWindow **window,
+			boolean fullscreen)
 {
 #ifdef FULLSCREEN_BUG
   int i;
@@ -109,7 +109,7 @@ inline void SDLInitVideoBuffer(DrawBuffer **backbuffer, DrawWindow **window,
   *window = CreateBitmap(video.width, video.height, video.depth);
 }
 
-inline boolean SDLSetVideoMode(DrawBuffer **backbuffer, boolean fullscreen)
+boolean SDLSetVideoMode(DrawBuffer **backbuffer, boolean fullscreen)
 {
   boolean success = TRUE;
   int surface_flags_fullscreen = SURFACE_FLAGS | SDL_FULLSCREEN;
@@ -172,8 +172,8 @@ inline boolean SDLSetVideoMode(DrawBuffer **backbuffer, boolean fullscreen)
   return success;
 }
 
-inline void SDLCreateBitmapContent(Bitmap *new_bitmap,
-				   int width, int height, int depth)
+void SDLCreateBitmapContent(Bitmap *new_bitmap, int width, int height,
+			    int depth)
 {
   SDL_Surface *surface_tmp, *surface_native;
 
@@ -190,7 +190,7 @@ inline void SDLCreateBitmapContent(Bitmap *new_bitmap,
   new_bitmap->surface = surface_native;
 }
 
-inline void SDLFreeBitmapPointers(Bitmap *bitmap)
+void SDLFreeBitmapPointers(Bitmap *bitmap)
 {
   if (bitmap->surface)
     SDL_FreeSurface(bitmap->surface);
@@ -200,10 +200,9 @@ inline void SDLFreeBitmapPointers(Bitmap *bitmap)
   bitmap->surface_masked = NULL;
 }
 
-inline void SDLCopyArea(Bitmap *src_bitmap, Bitmap *dst_bitmap,
-			int src_x, int src_y,
-			int width, int height,
-			int dst_x, int dst_y, int mask_mode)
+void SDLCopyArea(Bitmap *src_bitmap, Bitmap *dst_bitmap,
+		 int src_x, int src_y, int width, int height,
+		 int dst_x, int dst_y, int mask_mode)
 {
   Bitmap *real_dst_bitmap = (dst_bitmap == window ? backbuffer : dst_bitmap);
   SDL_Rect src_rect, dst_rect;
@@ -243,8 +242,8 @@ inline void SDLCopyArea(Bitmap *src_bitmap, Bitmap *dst_bitmap,
     SDL_UpdateRect(backbuffer->surface, dst_x, dst_y, width, height);
 }
 
-inline void SDLFillRectangle(Bitmap *dst_bitmap, int x, int y,
-			     int width, int height, Uint32 color)
+void SDLFillRectangle(Bitmap *dst_bitmap, int x, int y,
+		      int width, int height, Uint32 color)
 {
   Bitmap *real_dst_bitmap = (dst_bitmap == window ? backbuffer : dst_bitmap);
   SDL_Rect rect;
@@ -268,8 +267,93 @@ inline void SDLFillRectangle(Bitmap *dst_bitmap, int x, int y,
     SDL_UpdateRect(backbuffer->surface, x, y, width, height);
 }
 
-inline void SDLDrawSimpleLine(Bitmap *dst_bitmap, int from_x, int from_y,
-			      int to_x, int to_y, Uint32 color)
+void SDLFadeScreen(Bitmap *bitmap_cross, int fade_mode, int fade_delay,
+		   int post_delay)
+{
+  static boolean initialization_needed = TRUE;
+  static SDL_Surface *surface_screen_copy = NULL;
+  static SDL_Surface *surface_black = NULL;
+  SDL_Surface *surface_screen = backbuffer->surface;
+  SDL_Surface *surface_cross;		/* initialized later */
+  boolean fade_reverse;			/* initialized later */
+  unsigned int time_last, time_current;
+  float alpha;
+  int alpha_final;
+
+  if (initialization_needed)
+  {
+    unsigned int flags = SDL_SRCALPHA;
+
+    /* use same surface type as screen surface */
+    if ((surface_screen->flags & SDL_HWSURFACE))
+      flags |= SDL_HWSURFACE;
+    else
+      flags |= SDL_SWSURFACE;
+
+    /* create surface for temporary copy of screen buffer */
+    if ((surface_screen_copy =
+	 SDL_CreateRGBSurface(flags,
+			      surface_screen->w,
+			      surface_screen->h,
+			      surface_screen->format->BitsPerPixel,
+			      surface_screen->format->Rmask,
+			      surface_screen->format->Gmask,
+			      surface_screen->format->Bmask,
+			      surface_screen->format->Amask)) == NULL)
+      Error(ERR_EXIT, "SDL_CreateRGBSurface(	) failed: %s", SDL_GetError());
+
+    /* create black surface for fading from/to black */
+    if ((surface_black =
+	 SDL_CreateRGBSurface(flags,
+			      surface_screen->w,
+			      surface_screen->h,
+			      surface_screen->format->BitsPerPixel,
+			      surface_screen->format->Rmask,
+			      surface_screen->format->Gmask,
+			      surface_screen->format->Bmask,
+			      surface_screen->format->Amask)) == NULL)
+      Error(ERR_EXIT, "SDL_CreateRGBSurface(	) failed: %s", SDL_GetError());
+
+    /* completely fill the surface with black color pixels */
+    SDL_FillRect(surface_black, NULL,
+		 SDL_MapRGB(surface_screen->format, 0, 0, 0));
+
+    initialization_needed = FALSE;
+  }
+
+  /* copy the current screen backbuffer to the temporary screen copy buffer */
+  SDL_BlitSurface(surface_screen, NULL, surface_screen_copy, NULL);
+
+  fade_reverse = (fade_mode == FADE_MODE_FADE_IN ? TRUE : FALSE);
+  surface_cross = (fade_mode == FADE_MODE_CROSSFADE ? bitmap_cross->surface :
+		   surface_black);
+
+  time_current = SDL_GetTicks();
+
+  for (alpha = 0.0; alpha < 255.0;)
+  {
+    time_last = time_current;
+    time_current = SDL_GetTicks();
+    alpha += 255 * ((float)(time_current - time_last) / fade_delay);
+    alpha_final = (int)(fade_reverse ? 255.0 - alpha : alpha);
+    alpha_final = MIN(MAX(0, alpha_final), 255);
+
+    /* draw existing image to screen buffer */
+    SDL_BlitSurface(surface_screen_copy, NULL, surface_screen, NULL);
+
+    /* draw new image to screen buffer using alpha blending */
+    SDL_SetAlpha(surface_cross, SDL_SRCALPHA, alpha_final);
+    SDL_BlitSurface(surface_cross, NULL, surface_screen, NULL);
+
+    /* draw screen buffer to visible display */
+    SDL_Flip(surface_screen);
+  }
+
+  Delay(post_delay);
+}
+
+void SDLDrawSimpleLine(Bitmap *dst_bitmap, int from_x, int from_y,
+		       int to_x, int to_y, Uint32 color)
 {
   SDL_Surface *surface = dst_bitmap->surface;
   SDL_Rect rect;
@@ -296,8 +380,8 @@ inline void SDLDrawSimpleLine(Bitmap *dst_bitmap, int from_x, int from_y,
   SDL_FillRect(surface, &rect, color);
 }
 
-inline void SDLDrawLine(Bitmap *dst_bitmap, int from_x, int from_y,
-			int to_x, int to_y, Uint32 color)
+void SDLDrawLine(Bitmap *dst_bitmap, int from_x, int from_y,
+		 int to_x, int to_y, Uint32 color)
 {
 #ifdef FULLSCREEN_BUG
   if (dst_bitmap == backbuffer || dst_bitmap == window)
@@ -313,8 +397,8 @@ inline void SDLDrawLine(Bitmap *dst_bitmap, int from_x, int from_y,
 }
 
 #if 0
-inline void SDLDrawLines(SDL_Surface *surface, struct XY *points,
-			 int num_points, Uint32 color)
+void SDLDrawLines(SDL_Surface *surface, struct XY *points,
+		  int num_points, Uint32 color)
 {
   int i, x, y;
   int line_width = 4;
@@ -342,7 +426,7 @@ inline void SDLDrawLines(SDL_Surface *surface, struct XY *points,
 }
 #endif
 
-inline Pixel SDLGetPixel(Bitmap *src_bitmap, int x, int y)
+Pixel SDLGetPixel(Bitmap *src_bitmap, int x, int y)
 {
   SDL_Surface *surface = src_bitmap->surface;
 
@@ -843,7 +927,7 @@ void sge_LineRGB(SDL_Surface *Surface, Sint16 x1, Sint16 y1, Sint16 x2,
   sge_Line(Surface, x1, y1, x2, y2, SDL_MapRGB(Surface->format, R, G, B));
 }
 
-inline void SDLPutPixel(Bitmap *dst_bitmap, int x, int y, Pixel pixel)
+void SDLPutPixel(Bitmap *dst_bitmap, int x, int y, Pixel pixel)
 {
 #ifdef FULLSCREEN_BUG
   if (dst_bitmap == backbuffer || dst_bitmap == window)
@@ -863,8 +947,8 @@ inline void SDLPutPixel(Bitmap *dst_bitmap, int x, int y, Pixel pixel)
   -----------------------------------------------------------------------------
 */
 
-inline void SDLInvertArea(Bitmap *bitmap, int src_x, int src_y,
-			  int width, int height, Uint32 color)
+void SDLInvertArea(Bitmap *bitmap, int src_x, int src_y,
+		   int width, int height, Uint32 color)
 {
   int x, y;
 
@@ -879,9 +963,9 @@ inline void SDLInvertArea(Bitmap *bitmap, int src_x, int src_y,
   }
 }
 
-inline void SDLCopyInverseMasked(Bitmap *src_bitmap, Bitmap *dst_bitmap,
-				 int src_x, int src_y, int width, int height,
-				 int dst_x, int dst_y)
+void SDLCopyInverseMasked(Bitmap *src_bitmap, Bitmap *dst_bitmap,
+			  int src_x, int src_y, int width, int height,
+			  int dst_x, int dst_y)
 {
   int x, y;
 
@@ -1282,7 +1366,7 @@ void SDLSetMouseCursor(struct MouseCursorInfo *cursor_info)
 /* audio functions                                                           */
 /* ========================================================================= */
 
-inline void SDLOpenAudio(void)
+void SDLOpenAudio(void)
 {
   if (!strEqual(setup.system.sdl_audiodriver, ARG_DEFAULT))
     putenv(getStringCat2("SDL_AUDIODRIVER=", setup.system.sdl_audiodriver));
@@ -1314,7 +1398,7 @@ inline void SDLOpenAudio(void)
   Mixer_InitChannels();
 }
 
-inline void SDLCloseAudio(void)
+void SDLCloseAudio(void)
 {
   Mix_HaltMusic();
   Mix_HaltChannel(-1);
@@ -1328,7 +1412,7 @@ inline void SDLCloseAudio(void)
 /* event functions                                                           */
 /* ========================================================================= */
 
-inline void SDLNextEvent(Event *event)
+void SDLNextEvent(Event *event)
 {
   SDL_WaitEvent(event);
 

@@ -117,8 +117,8 @@ void *checked_calloc(unsigned long);
 void *checked_realloc(void *, unsigned long);
 void checked_free(void *);
 
-inline void swap_numbers(int *, int *);
-inline void swap_number_pairs(int *, int *, int *, int *);
+void swap_numbers(int *, int *);
+void swap_number_pairs(int *, int *, int *, int *);
 
 int getFile8BitInteger(FILE *);
 int putFile8BitInteger(FILE *, int);

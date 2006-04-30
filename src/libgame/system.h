@@ -212,6 +212,10 @@
 #define REDRAW_FPS		(1 << 11)
 #define REDRAWTILES_THRESHOLD	(SCR_FIELDX * SCR_FIELDY / 2)
 
+#define FADE_MODE_FADE_IN	0
+#define FADE_MODE_FADE_OUT	1
+#define FADE_MODE_CROSSFADE	2
+
 #define IN_GFX_SCREEN(x, y)	(x >= gfx.sx && x < gfx.sx + gfx.sxsize && \
 				 y >= gfx.sy && y < gfx.sy + gfx.sysize)
 #define IN_GFX_DOOR(x, y)	(x >= gfx.dx && x < gfx.dx + gfx.dxsize && \
@@ -701,6 +705,7 @@ struct SetupInfo
   boolean soft_scrolling;
   boolean fading;
   boolean autorecord;
+  boolean show_titlescreen;
   boolean quick_doors;
   boolean team_mode;
   boolean handicap;
@@ -961,36 +966,36 @@ void SetDrawBackgroundMask(int);
 void SetMainBackgroundBitmap(Bitmap *);
 void SetDoorBackgroundBitmap(Bitmap *);
 
-inline void InitVideoDisplay(void);
-inline void CloseVideoDisplay(void);
-inline void InitVideoBuffer(DrawBuffer **,DrawWindow **, int,int,int, boolean);
-inline Bitmap *CreateBitmapStruct(void);
-inline Bitmap *CreateBitmap(int, int, int);
-inline void FreeBitmap(Bitmap *);
-inline void BlitBitmap(Bitmap *, Bitmap *, int, int, int, int, int, int);
-inline void FillRectangle(Bitmap *, int, int, int, int, Pixel);
-inline void ClearRectangle(Bitmap *, int, int, int, int);
-inline void ClearRectangleOnBackground(Bitmap *, int, int, int, int);
-inline void SetClipMask(Bitmap *, GC, Pixmap);
-inline void SetClipOrigin(Bitmap *, GC, int, int);
-inline void BlitBitmapMasked(Bitmap *, Bitmap *, int, int, int, int, int, int);
-inline boolean DrawingOnBackground(int, int);
-inline void BlitBitmapOnBackground(Bitmap *, Bitmap *, int, int, int, int, int,
-				   int);
-inline void DrawSimpleBlackLine(Bitmap *, int, int, int, int);
-inline void DrawSimpleWhiteLine(Bitmap *, int, int, int, int);
-inline void DrawLines(Bitmap *, struct XY *, int, Pixel);
-inline Pixel GetPixel(Bitmap *, int, int);
-inline Pixel GetPixelFromRGB(Bitmap *, unsigned int,unsigned int,unsigned int);
-inline Pixel GetPixelFromRGBcompact(Bitmap *, unsigned int);
+void InitVideoDisplay(void);
+void CloseVideoDisplay(void);
+void InitVideoBuffer(DrawBuffer **,DrawWindow **, int,int,int, boolean);
+Bitmap *CreateBitmapStruct(void);
+Bitmap *CreateBitmap(int, int, int);
+void FreeBitmap(Bitmap *);
+void BlitBitmap(Bitmap *, Bitmap *, int, int, int, int, int, int);
+void FadeScreen(Bitmap *bitmap, int, int, int);
+void FillRectangle(Bitmap *, int, int, int, int, Pixel);
+void ClearRectangle(Bitmap *, int, int, int, int);
+void ClearRectangleOnBackground(Bitmap *, int, int, int, int);
+void SetClipMask(Bitmap *, GC, Pixmap);
+void SetClipOrigin(Bitmap *, GC, int, int);
+void BlitBitmapMasked(Bitmap *, Bitmap *, int, int, int, int, int, int);
+boolean DrawingOnBackground(int, int);
+void BlitBitmapOnBackground(Bitmap *, Bitmap *, int, int, int, int, int, int);
+void DrawSimpleBlackLine(Bitmap *, int, int, int, int);
+void DrawSimpleWhiteLine(Bitmap *, int, int, int, int);
+void DrawLines(Bitmap *, struct XY *, int, Pixel);
+Pixel GetPixel(Bitmap *, int, int);
+Pixel GetPixelFromRGB(Bitmap *, unsigned int,unsigned int,unsigned int);
+Pixel GetPixelFromRGBcompact(Bitmap *, unsigned int);
 
-inline void FlushDisplay(void);
-inline void SyncDisplay(void);
-inline void KeyboardAutoRepeatOn(void);
-inline void KeyboardAutoRepeatOff(void);
-inline boolean PointerInWindow(DrawWindow *);
-inline boolean SetVideoMode(boolean);
-inline boolean ChangeVideoModeIfNeeded(boolean);
+void FlushDisplay(void);
+void SyncDisplay(void);
+void KeyboardAutoRepeatOn(void);
+void KeyboardAutoRepeatOff(void);
+boolean PointerInWindow(DrawWindow *);
+boolean SetVideoMode(boolean);
+boolean ChangeVideoModeIfNeeded(boolean);
 
 Bitmap *LoadImage(char *);
 Bitmap *LoadCustomImage(char *);
@@ -1002,20 +1007,20 @@ void ScaleBitmap(Bitmap *, int);
 
 void SetMouseCursor(int);
 
-inline void OpenAudio(void);
-inline void CloseAudio(void);
-inline void SetAudioMode(boolean);
+void OpenAudio(void);
+void CloseAudio(void);
+void SetAudioMode(boolean);
 
-inline void InitEventFilter(EventFilter);
-inline boolean PendingEvent(void);
-inline void NextEvent(Event *event);
-inline void PeekEvent(Event *event);
-inline Key GetEventKey(KeyEvent *, boolean);
-inline KeyMod HandleKeyModState(Key, int);
-inline KeyMod GetKeyModState();
-inline boolean CheckCloseWindowEvent(ClientMessageEvent *);
+void InitEventFilter(EventFilter);
+boolean PendingEvent(void);
+void NextEvent(Event *event);
+void PeekEvent(Event *event);
+Key GetEventKey(KeyEvent *, boolean);
+KeyMod HandleKeyModState(Key, int);
+KeyMod GetKeyModState();
+boolean CheckCloseWindowEvent(ClientMessageEvent *);
 
-inline void InitJoysticks();
-inline boolean ReadJoystick(int, int *, int *, boolean *, boolean *);
+void InitJoysticks();
+boolean ReadJoystick(int, int *, int *, boolean *, boolean *);
 
 #endif /* SYSTEM_H */

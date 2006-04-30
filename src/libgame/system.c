@@ -281,7 +281,7 @@ inline static void sysCopyArea(Bitmap *src_bitmap, Bitmap *dst_bitmap,
 #endif
 }
 
-inline void InitVideoDisplay(void)
+void InitVideoDisplay(void)
 {
 #if defined(TARGET_SDL)
   SDLInitVideoDisplay();
@@ -290,7 +290,7 @@ inline void InitVideoDisplay(void)
 #endif
 }
 
-inline void CloseVideoDisplay(void)
+void CloseVideoDisplay(void)
 {
   KeyboardAutoRepeatOn();
 
@@ -302,9 +302,8 @@ inline void CloseVideoDisplay(void)
 #endif
 }
 
-inline void InitVideoBuffer(DrawBuffer **backbuffer, DrawWindow **window,
-			    int width, int height, int depth,
-			    boolean fullscreen)
+void InitVideoBuffer(DrawBuffer **backbuffer, DrawWindow **window,
+		     int width, int height, int depth, boolean fullscreen)
 {
   video.width = width;
   video.height = height;
@@ -319,7 +318,7 @@ inline void InitVideoBuffer(DrawBuffer **backbuffer, DrawWindow **window,
 #endif
 }
 
-inline Bitmap *CreateBitmapStruct(void)
+Bitmap *CreateBitmapStruct(void)
 {
 #if defined(TARGET_SDL)
   return checked_calloc(sizeof(struct SDLSurfaceInfo));
@@ -328,7 +327,7 @@ inline Bitmap *CreateBitmapStruct(void)
 #endif
 }
 
-inline Bitmap *CreateBitmap(int width, int height, int depth)
+Bitmap *CreateBitmap(int width, int height, int depth)
 {
   Bitmap *new_bitmap = CreateBitmapStruct();
   int real_depth = GetRealDepth(depth);
@@ -371,7 +370,7 @@ inline static void TransferBitmapPointers(Bitmap *src_bitmap,
   *dst_bitmap = *src_bitmap;
 }
 
-inline void FreeBitmap(Bitmap *bitmap)
+void FreeBitmap(Bitmap *bitmap)
 {
   if (bitmap == NULL)
     return;
@@ -381,7 +380,7 @@ inline void FreeBitmap(Bitmap *bitmap)
   free(bitmap);
 }
 
-inline void CloseWindow(DrawWindow *window)
+void CloseWindow(DrawWindow *window)
 {
 #if defined(TARGET_X11)
   if (window->drawable)
@@ -394,7 +393,7 @@ inline void CloseWindow(DrawWindow *window)
 #endif
 }
 
-static inline boolean CheckDrawingArea(int x, int y, int width, int height,
+inline static boolean CheckDrawingArea(int x, int y, int width, int height,
 				       int draw_mask)
 {
   if (draw_mask == REDRAW_NONE)
@@ -415,20 +414,20 @@ static inline boolean CheckDrawingArea(int x, int y, int width, int height,
   return FALSE;
 }
 
-inline boolean DrawingDeactivated(int x, int y, int width, int height)
+boolean DrawingDeactivated(int x, int y, int width, int height)
 {
   return CheckDrawingArea(x, y, width, height, gfx.draw_deactivation_mask);
 }
 
-inline boolean DrawingOnBackground(int x, int y)
+boolean DrawingOnBackground(int x, int y)
 {
   return (CheckDrawingArea(x, y, 1, 1, gfx.background_bitmap_mask) &&
 	  CheckDrawingArea(x, y, 1, 1, gfx.draw_background_mask));
 }
 
-inline void BlitBitmap(Bitmap *src_bitmap, Bitmap *dst_bitmap,
-		       int src_x, int src_y, int width, int height,
-		       int dst_x, int dst_y)
+void BlitBitmap(Bitmap *src_bitmap, Bitmap *dst_bitmap,
+		int src_x, int src_y, int width, int height,
+		int dst_x, int dst_y)
 {
   if (DrawingDeactivated(dst_x, dst_y, width, height))
     return;
@@ -437,8 +436,18 @@ inline void BlitBitmap(Bitmap *src_bitmap, Bitmap *dst_bitmap,
 	      dst_x, dst_y, BLIT_OPAQUE);
 }
 
-inline void FillRectangle(Bitmap *bitmap, int x, int y, int width, int height,
-			  Pixel color)
+void FadeScreen(Bitmap *bitmap_cross, int fade_mode, int fade_delay,
+		int post_delay)
+{
+#if defined(TARGET_SDL)
+  SDLFadeScreen(bitmap_cross, fade_mode, fade_delay, post_delay);
+#else
+  X11FadeScreen(bitmap_cross, fade_mode, fade_delay, post_delay);
+#endif
+}
+
+void FillRectangle(Bitmap *bitmap, int x, int y, int width, int height,
+		   Pixel color)
 {
   if (DrawingDeactivated(x, y, width, height))
     return;
@@ -446,13 +455,13 @@ inline void FillRectangle(Bitmap *bitmap, int x, int y, int width, int height,
   sysFillRectangle(bitmap, x, y, width, height, color);
 }
 
-inline void ClearRectangle(Bitmap *bitmap, int x, int y, int width, int height)
+void ClearRectangle(Bitmap *bitmap, int x, int y, int width, int height)
 {
   FillRectangle(bitmap, x, y, width, height, BLACK_PIXEL);
 }
 
-inline void ClearRectangleOnBackground(Bitmap *bitmap, int x, int y,
-				       int width, int height)
+void ClearRectangleOnBackground(Bitmap *bitmap, int x, int y,
+				int width, int height)
 {
   if (DrawingOnBackground(x, y))
     BlitBitmap(gfx.background_bitmap, bitmap, x, y, width, height, x, y);
@@ -460,7 +469,7 @@ inline void ClearRectangleOnBackground(Bitmap *bitmap, int x, int y,
     ClearRectangle(bitmap, x, y, width, height);
 }
 
-inline void SetClipMask(Bitmap *bitmap, GC clip_gc, Pixmap clip_pixmap)
+void SetClipMask(Bitmap *bitmap, GC clip_gc, Pixmap clip_pixmap)
 {
 #if defined(TARGET_X11)
   if (clip_gc)
@@ -471,7 +480,7 @@ inline void SetClipMask(Bitmap *bitmap, GC clip_gc, Pixmap clip_pixmap)
 #endif
 }
 
-inline void SetClipOrigin(Bitmap *bitmap, GC clip_gc, int clip_x, int clip_y)
+void SetClipOrigin(Bitmap *bitmap, GC clip_gc, int clip_x, int clip_y)
 {
 #if defined(TARGET_X11)
   if (clip_gc)
@@ -482,10 +491,9 @@ inline void SetClipOrigin(Bitmap *bitmap, GC clip_gc, int clip_x, int clip_y)
 #endif
 }
 
-inline void BlitBitmapMasked(Bitmap *src_bitmap, Bitmap *dst_bitmap,
-			     int src_x, int src_y,
-			     int width, int height,
-			     int dst_x, int dst_y)
+void BlitBitmapMasked(Bitmap *src_bitmap, Bitmap *dst_bitmap,
+		      int src_x, int src_y, int width, int height,
+		      int dst_x, int dst_y)
 {
   if (DrawingDeactivated(dst_x, dst_y, width, height))
     return;
@@ -494,10 +502,9 @@ inline void BlitBitmapMasked(Bitmap *src_bitmap, Bitmap *dst_bitmap,
 	      dst_x, dst_y, BLIT_MASKED);
 }
 
-inline void BlitBitmapOnBackground(Bitmap *src_bitmap, Bitmap *dst_bitmap,
-				   int src_x, int src_y,
-				   int width, int height,
-				   int dst_x, int dst_y)
+void BlitBitmapOnBackground(Bitmap *src_bitmap, Bitmap *dst_bitmap,
+			    int src_x, int src_y, int width, int height,
+			    int dst_x, int dst_y)
 {
   if (DrawingOnBackground(dst_x, dst_y))
   {
@@ -516,8 +523,8 @@ inline void BlitBitmapOnBackground(Bitmap *src_bitmap, Bitmap *dst_bitmap,
 	       dst_x, dst_y);
 }
 
-inline void DrawSimpleBlackLine(Bitmap *bitmap, int from_x, int from_y,
-				int to_x, int to_y)
+void DrawSimpleBlackLine(Bitmap *bitmap, int from_x, int from_y,
+			 int to_x, int to_y)
 {
 #if defined(TARGET_SDL)
   SDLDrawSimpleLine(bitmap, from_x, from_y, to_x, to_y, BLACK_PIXEL);
@@ -526,8 +533,8 @@ inline void DrawSimpleBlackLine(Bitmap *bitmap, int from_x, int from_y,
 #endif
 }
 
-inline void DrawSimpleWhiteLine(Bitmap *bitmap, int from_x, int from_y,
-				int to_x, int to_y)
+void DrawSimpleWhiteLine(Bitmap *bitmap, int from_x, int from_y,
+			 int to_x, int to_y)
 {
 #if defined(TARGET_SDL)
   SDLDrawSimpleLine(bitmap, from_x, from_y, to_x, to_y, WHITE_PIXEL);
@@ -537,8 +544,8 @@ inline void DrawSimpleWhiteLine(Bitmap *bitmap, int from_x, int from_y,
 }
 
 #if !defined(TARGET_X11_NATIVE)
-inline void DrawLine(Bitmap *bitmap, int from_x, int from_y,
-		     int to_x, int to_y, Pixel pixel, int line_width)
+void DrawLine(Bitmap *bitmap, int from_x, int from_y,
+	      int to_x, int to_y, Pixel pixel, int line_width)
 {
   int x, y;
 
@@ -567,8 +574,7 @@ inline void DrawLine(Bitmap *bitmap, int from_x, int from_y,
 }
 #endif
 
-inline void DrawLines(Bitmap *bitmap, struct XY *points, int num_points,
-		      Pixel pixel)
+void DrawLines(Bitmap *bitmap, struct XY *points, int num_points, Pixel pixel)
 {
 #if !defined(TARGET_X11_NATIVE)
   int line_width = 4;
@@ -588,7 +594,7 @@ inline void DrawLines(Bitmap *bitmap, struct XY *points, int num_points,
 #endif
 }
 
-inline Pixel GetPixel(Bitmap *bitmap, int x, int y)
+Pixel GetPixel(Bitmap *bitmap, int x, int y)
 {
   if (x < 0 || x >= bitmap->width ||
       y < 0 || y >= bitmap->height)
@@ -603,8 +609,8 @@ inline Pixel GetPixel(Bitmap *bitmap, int x, int y)
 #endif
 }
 
-inline Pixel GetPixelFromRGB(Bitmap *bitmap, unsigned int color_r,
-			     unsigned int color_g, unsigned int color_b)
+Pixel GetPixelFromRGB(Bitmap *bitmap, unsigned int color_r,
+		      unsigned int color_g, unsigned int color_b)
 {
 #if defined(TARGET_SDL)
   return SDL_MapRGB(bitmap->surface->format, color_r, color_g, color_b);
@@ -615,7 +621,7 @@ inline Pixel GetPixelFromRGB(Bitmap *bitmap, unsigned int color_r,
 #endif
 }
 
-inline Pixel GetPixelFromRGBcompact(Bitmap *bitmap, unsigned int color)
+Pixel GetPixelFromRGBcompact(Bitmap *bitmap, unsigned int color)
 {
   unsigned int color_r = (color >> 16) & 0xff;
   unsigned int color_g = (color >>  8) & 0xff;
@@ -625,7 +631,7 @@ inline Pixel GetPixelFromRGBcompact(Bitmap *bitmap, unsigned int color)
 }
 
 /* execute all pending screen drawing operations */
-inline void FlushDisplay(void)
+void FlushDisplay(void)
 {
 #ifndef TARGET_SDL
   XFlush(display);
@@ -633,14 +639,14 @@ inline void FlushDisplay(void)
 }
 
 /* execute and wait for all pending screen drawing operations */
-inline void SyncDisplay(void)
+void SyncDisplay(void)
 {
 #ifndef TARGET_SDL
   XSync(display, FALSE);
 #endif
 }
 
-inline void KeyboardAutoRepeatOn(void)
+void KeyboardAutoRepeatOn(void)
 {
 #if defined(TARGET_SDL)
   SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY / 2,
@@ -652,7 +658,7 @@ inline void KeyboardAutoRepeatOn(void)
 #endif
 }
 
-inline void KeyboardAutoRepeatOff(void)
+void KeyboardAutoRepeatOff(void)
 {
 #if defined(TARGET_SDL)
   SDL_EnableKeyRepeat(0, SDL_DEFAULT_REPEAT_INTERVAL);
@@ -663,7 +669,7 @@ inline void KeyboardAutoRepeatOff(void)
 #endif
 }
 
-inline boolean PointerInWindow(DrawWindow *window)
+boolean PointerInWindow(DrawWindow *window)
 {
 #if defined(TARGET_SDL)
   return TRUE;
@@ -680,7 +686,7 @@ inline boolean PointerInWindow(DrawWindow *window)
 #endif
 }
 
-inline boolean SetVideoMode(boolean fullscreen)
+boolean SetVideoMode(boolean fullscreen)
 {
 #if defined(TARGET_SDL)
   return SDLSetVideoMode(&backbuffer, fullscreen);
@@ -701,7 +707,7 @@ inline boolean SetVideoMode(boolean fullscreen)
 #endif
 }
 
-inline boolean ChangeVideoModeIfNeeded(boolean fullscreen)
+boolean ChangeVideoModeIfNeeded(boolean fullscreen)
 {
 #if defined(TARGET_SDL)
   if ((fullscreen && !video.fullscreen_enabled && video.fullscreen_available)||
@@ -1061,7 +1067,7 @@ void SetMouseCursor(int mode)
 /* audio functions                                                           */
 /* ========================================================================= */
 
-inline void OpenAudio(void)
+void OpenAudio(void)
 {
   /* always start with reliable default values */
   audio.sound_available = FALSE;
@@ -1089,7 +1095,7 @@ inline void OpenAudio(void)
 #endif
 }
 
-inline void CloseAudio(void)
+void CloseAudio(void)
 {
 #if defined(TARGET_SDL)
   SDLCloseAudio();
@@ -1102,7 +1108,7 @@ inline void CloseAudio(void)
   audio.sound_enabled = FALSE;
 }
 
-inline void SetAudioMode(boolean enabled)
+void SetAudioMode(boolean enabled)
 {
   if (!audio.sound_available)
     return;
@@ -1115,7 +1121,7 @@ inline void SetAudioMode(boolean enabled)
 /* event functions                                                           */
 /* ========================================================================= */
 
-inline void InitEventFilter(EventFilter filter_function)
+void InitEventFilter(EventFilter filter_function)
 {
 #if defined(TARGET_SDL)
   /* set event filter to filter out certain events */
@@ -1123,7 +1129,7 @@ inline void InitEventFilter(EventFilter filter_function)
 #endif
 }
 
-inline boolean PendingEvent(void)
+boolean PendingEvent(void)
 {
 #if defined(TARGET_SDL)
   return (SDL_PollEvent(NULL) ? TRUE : FALSE);
@@ -1132,7 +1138,7 @@ inline boolean PendingEvent(void)
 #endif
 }
 
-inline void NextEvent(Event *event)
+void NextEvent(Event *event)
 {
 #if defined(TARGET_SDL)
   SDLNextEvent(event);
@@ -1141,7 +1147,7 @@ inline void NextEvent(Event *event)
 #endif
 }
 
-inline void PeekEvent(Event *event)
+void PeekEvent(Event *event)
 {
 #if defined(TARGET_SDL)
   SDL_PeepEvents(event, 1, SDL_PEEKEVENT, SDL_ALLEVENTS);
@@ -1150,7 +1156,7 @@ inline void PeekEvent(Event *event)
 #endif
 }
 
-inline Key GetEventKey(KeyEvent *event, boolean with_modifiers)
+Key GetEventKey(KeyEvent *event, boolean with_modifiers)
 {
 #if defined(TARGET_SDL)
 
@@ -1183,7 +1189,7 @@ inline Key GetEventKey(KeyEvent *event, boolean with_modifiers)
 #endif
 }
 
-inline KeyMod HandleKeyModState(Key key, int key_status)
+KeyMod HandleKeyModState(Key key, int key_status)
 {
   static KeyMod current_modifiers = KMOD_None;
 
@@ -1232,7 +1238,7 @@ inline KeyMod HandleKeyModState(Key key, int key_status)
   return current_modifiers;
 }
 
-inline KeyMod GetKeyModState()
+KeyMod GetKeyModState()
 {
 #if defined(TARGET_SDL)
   return (KeyMod)SDL_GetModState();
@@ -1241,7 +1247,7 @@ inline KeyMod GetKeyModState()
 #endif
 }
 
-inline boolean CheckCloseWindowEvent(ClientMessageEvent *event)
+boolean CheckCloseWindowEvent(ClientMessageEvent *event)
 {
   if (event->type != EVENT_CLIENTMESSAGE)
     return FALSE;
@@ -1262,7 +1268,7 @@ inline boolean CheckCloseWindowEvent(ClientMessageEvent *event)
 /* joystick functions                                                        */
 /* ========================================================================= */
 
-inline void InitJoysticks()
+void InitJoysticks()
 {
   int i;
 
@@ -1289,7 +1295,7 @@ inline void InitJoysticks()
 #endif
 }
 
-inline boolean ReadJoystick(int nr, int *x, int *y, boolean *b1, boolean *b2)
+boolean ReadJoystick(int nr, int *x, int *y, boolean *b1, boolean *b2)
 {
 #if defined(TARGET_SDL)
   return SDLReadJoystick(nr, x, y, b1, b2);

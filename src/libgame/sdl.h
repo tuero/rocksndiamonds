@@ -352,21 +352,21 @@ struct XY
 
 /* SDL function definitions */
 
-inline void SDLInitVideoDisplay(void);
-inline void SDLInitVideoBuffer(DrawBuffer **, DrawWindow **, boolean);
-inline boolean SDLSetVideoMode(DrawBuffer **, boolean);
-inline void SDLCreateBitmapContent(Bitmap *, int, int, int);
-inline void SDLFreeBitmapPointers(Bitmap *);
-inline void SDLCopyArea(Bitmap *, Bitmap *, int, int, int, int, int, int, int);
-inline void SDLFillRectangle(Bitmap *, int, int, int, int, Uint32);
-inline void SDLDrawSimpleLine(Bitmap *, int, int, int, int, Uint32);
-inline void SDLDrawLine(Bitmap *, int, int, int, int, Uint32);
-inline Pixel SDLGetPixel(Bitmap *, int, int);
-inline void SDLPutPixel(Bitmap *, int, int, Pixel);
+void SDLInitVideoDisplay(void);
+void SDLInitVideoBuffer(DrawBuffer **, DrawWindow **, boolean);
+boolean SDLSetVideoMode(DrawBuffer **, boolean);
+void SDLCreateBitmapContent(Bitmap *, int, int, int);
+void SDLFreeBitmapPointers(Bitmap *);
+void SDLCopyArea(Bitmap *, Bitmap *, int, int, int, int, int, int, int);
+void SDLFillRectangle(Bitmap *, int, int, int, int, Uint32);
+void SDLFadeScreen(Bitmap *, int, int, int);
+void SDLDrawSimpleLine(Bitmap *, int, int, int, int, Uint32);
+void SDLDrawLine(Bitmap *, int, int, int, int, Uint32);
+Pixel SDLGetPixel(Bitmap *, int, int);
+void SDLPutPixel(Bitmap *, int, int, Pixel);
 
-inline void SDLInvertArea(Bitmap *, int, int, int, int, Uint32);
-inline void SDLCopyInverseMasked(Bitmap *, Bitmap *, int, int, int, int,
-				 int, int);
+void SDLInvertArea(Bitmap *, int, int, int, int, Uint32);
+void SDLCopyInverseMasked(Bitmap *, Bitmap *, int, int, int, int, int, int);
 
 void SDLZoomBitmap(Bitmap *, Bitmap *);
 
@@ -374,10 +374,10 @@ Bitmap *SDLLoadImage(char *);
 
 void SDLSetMouseCursor(struct MouseCursorInfo *);
 
-inline void SDLOpenAudio(void);
-inline void SDLCloseAudio(void);
+void SDLOpenAudio(void);
+void SDLCloseAudio(void);
 
-inline void SDLNextEvent(Event *);
+void SDLNextEvent(Event *);
 
 void HandleJoystickEvent(Event *);
 void SDLInitJoysticks(void);

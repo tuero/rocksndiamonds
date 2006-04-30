@@ -46,8 +46,9 @@
 #define DOOR_COPY_BACK		(1 << 4)
 #define DOOR_NO_COPY_BACK	(1 << 5)
 #define DOOR_NO_DELAY		(1 << 6)
-#define DOOR_GET_STATE		(1 << 7)
-#define DOOR_SET_STATE		(1 << 8)
+#define DOOR_FORCE_REDRAW	(1 << 7)
+#define DOOR_GET_STATE		(1 << 8)
+#define DOOR_SET_STATE		(1 << 9)
 
 /* for Request */
 #define REQ_ASK			(1 << 0)
@@ -67,7 +68,7 @@ void BackToFront();
 void FadeToFront();
 
 void FadeIn(int);
-void FadeOut(int);
+void FadeOut(int, int);
 void FadeCross(Bitmap *, int);
 
 void ClearWindow();

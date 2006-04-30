@@ -414,119 +414,25 @@ void FadeToFront()
   BackToFront();
 }
 
-#define FADE_MODE_FADE_IN	0
-#define FADE_MODE_FADE_OUT	1
-#define FADE_MODE_CROSSFADE	2
-
-static void FadeExt(Bitmap *bitmap_cross, int fade_ms, int fade_mode)
+void FadeIn(int fade_delay)
 {
-  static boolean initialization_needed = TRUE;
-  static SDL_Surface *surface_screen_copy = NULL;
-  static SDL_Surface *surface_black = NULL;
-  SDL_Surface *surface_screen = backbuffer->surface;
-  SDL_Surface *surface_cross;		/* initialized later */
-  boolean fade_reverse;			/* initialized later */
-  unsigned int time_last, time_current;
-  float alpha;
-  int alpha_final;
-
-  if (initialization_needed)
-  {
-    unsigned int flags = SDL_SRCALPHA;
-
-    /* use same surface type as screen surface */
-    if ((surface_screen->flags & SDL_HWSURFACE))
-      flags |= SDL_HWSURFACE;
-    else
-      flags |= SDL_SWSURFACE;
-
-    /* create surface for temporary copy of screen buffer */
-    if ((surface_screen_copy =
-	 SDL_CreateRGBSurface(flags,
-			      surface_screen->w,
-			      surface_screen->h,
-			      surface_screen->format->BitsPerPixel,
-			      surface_screen->format->Rmask,
-			      surface_screen->format->Gmask,
-			      surface_screen->format->Bmask,
-			      surface_screen->format->Amask)) == NULL)
-      Error(ERR_EXIT, "SDL_CreateRGBSurface(	) failed: %s", SDL_GetError());
-
-    /* create black surface for fading from/to black */
-    if ((surface_black =
-	 SDL_CreateRGBSurface(flags,
-			      surface_screen->w,
-			      surface_screen->h,
-			      surface_screen->format->BitsPerPixel,
-			      surface_screen->format->Rmask,
-			      surface_screen->format->Gmask,
-			      surface_screen->format->Bmask,
-			      surface_screen->format->Amask)) == NULL)
-      Error(ERR_EXIT, "SDL_CreateRGBSurface(	) failed: %s", SDL_GetError());
-
-    /* completely fill the surface with black color pixels */
-    SDL_FillRect(surface_black, NULL,
-		 SDL_MapRGB(surface_screen->format, 0, 0, 0));
-
-    initialization_needed = FALSE;
-  }
-
-  /* copy the current screen backbuffer to the temporary screen copy buffer */
-  SDL_BlitSurface(surface_screen, NULL, surface_screen_copy, NULL);
-
-  fade_reverse = (fade_mode == FADE_MODE_FADE_IN ? TRUE : FALSE);
-  surface_cross = (fade_mode == FADE_MODE_CROSSFADE ? bitmap_cross->surface :
-		   surface_black);
-
-  time_current = SDL_GetTicks();
-
-  for (alpha = 0.0; alpha < 255.0;)
-  {
-    time_last = time_current;
-    time_current = SDL_GetTicks();
-    alpha += 255 * ((float)(time_current - time_last) / fade_ms);
-    alpha_final = (int)(fade_reverse ? 255.0 - alpha : alpha);
-    alpha_final = MIN(MAX(0, alpha_final), 255);
-
-    /* draw existing image to screen buffer */
-    SDL_BlitSurface(surface_screen_copy, NULL, surface_screen, NULL);
-
-    /* draw new image to screen buffer using alpha blending */
-    SDL_SetAlpha(surface_cross, SDL_SRCALPHA, alpha_final);
-    SDL_BlitSurface(surface_cross, NULL, surface_screen, NULL);
-
-    /* draw screen buffer to visible display */
-    SDL_Flip(surface_screen);
-  }
+  FadeScreen(NULL, FADE_MODE_FADE_IN, fade_delay, 0);
 
   redraw_mask = REDRAW_NONE;
 }
 
-void FadeIn(int fade_ms)
+void FadeOut(int fade_delay, int post_delay)
 {
-#ifdef TARGET_SDL
-  FadeExt(NULL, fade_ms, FADE_MODE_FADE_IN);
-#else
-  BackToFront();
-#endif
+  FadeScreen(NULL, FADE_MODE_FADE_OUT, fade_delay, post_delay);
+
+  redraw_mask = REDRAW_NONE;
 }
 
-void FadeOut(int fade_ms)
+void FadeCross(Bitmap *bitmap, int fade_delay)
 {
-#ifdef TARGET_SDL
-  FadeExt(NULL, fade_ms, FADE_MODE_FADE_OUT);
-#else
-  BackToFront();
-#endif
-}
+  FadeScreen(bitmap, FADE_MODE_CROSSFADE, fade_delay, 0);
 
-void FadeCross(Bitmap *bitmap, int fade_ms)
-{
-#ifdef TARGET_SDL
-  FadeExt(bitmap, fade_ms, FADE_MODE_CROSSFADE);
-#else
-  BackToFront();
-#endif
+  redraw_mask = REDRAW_NONE;
 }
 
 void SetMainBackgroundImageIfDefined(int graphic)
@@ -2641,14 +2547,17 @@ unsigned int MoveDoor(unsigned int door_state)
     return (door1 | door2);
   }
 
-  if (door1 == DOOR_OPEN_1 && door_state & DOOR_OPEN_1)
-    door_state &= ~DOOR_OPEN_1;
-  else if (door1 == DOOR_CLOSE_1 && door_state & DOOR_CLOSE_1)
-    door_state &= ~DOOR_CLOSE_1;
-  if (door2 == DOOR_OPEN_2 && door_state & DOOR_OPEN_2)
-    door_state &= ~DOOR_OPEN_2;
-  else if (door2 == DOOR_CLOSE_2 && door_state & DOOR_CLOSE_2)
-    door_state &= ~DOOR_CLOSE_2;
+  if (!(door_state & DOOR_FORCE_REDRAW))
+  {
+    if (door1 == DOOR_OPEN_1 && door_state & DOOR_OPEN_1)
+      door_state &= ~DOOR_OPEN_1;
+    else if (door1 == DOOR_CLOSE_1 && door_state & DOOR_CLOSE_1)
+      door_state &= ~DOOR_CLOSE_1;
+    if (door2 == DOOR_OPEN_2 && door_state & DOOR_OPEN_2)
+      door_state &= ~DOOR_OPEN_2;
+    else if (door2 == DOOR_CLOSE_2 && door_state & DOOR_CLOSE_2)
+      door_state &= ~DOOR_CLOSE_2;
+  }
 
   door_delay_value = (door_state & DOOR_ACTION_1 ? door_1.step_delay :
 		      door_2.step_delay);
