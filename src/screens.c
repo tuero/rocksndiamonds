@@ -201,40 +201,6 @@ static void drawChooseTreeCursor(int ypos, int color)
   game_status = last_game_status;	/* restore current game status */
 }
 
-static void PlayMenuSound()
-{
-  int sound = menu.sound[game_status];
-
-  if (sound == SND_UNDEFINED)
-    return;
-
-  if (sound_info[sound].loop)
-    PlaySoundLoop(sound);
-  else
-    PlaySound(sound);
-}
-
-static void PlayMenuSoundIfLoop()
-{
-  int sound = menu.sound[game_status];
-
-  if (sound == SND_UNDEFINED)
-    return;
-
-  if (sound_info[sound].loop)
-    PlaySoundLoop(sound);
-}
-
-static void PlayMenuMusic()
-{
-  int music = menu.music[game_status];
-
-  if (music == MUS_UNDEFINED)
-    return;
-
-  PlayMusic(music);
-}
-
 void DrawHeadline()
 {
   DrawTextSCentered(MENU_TITLE1_YPOS, FONT_TITLE_1, PROGRAM_TITLE_STRING);
@@ -312,11 +278,7 @@ void DrawTitleScreenImage(int nr)
   dst_x = (WIN_XSIZE - width) / 2;
   dst_y = (WIN_YSIZE - height) / 2;
 
-#if 1
   ClearRectangleOnBackground(drawto, 0, 0, WIN_XSIZE, WIN_YSIZE);
-#else
-  DrawBackground(0, 0, WIN_XSIZE, WIN_YSIZE);
-#endif
 
   if (DrawingOnBackground(dst_x, dst_y))
     BlitBitmapMasked(bitmap, drawto, src_x, src_y, width, height, dst_x, dst_y);
@@ -332,22 +294,10 @@ void DrawTitleScreen()
 
   SetMainBackgroundImage(IMG_BACKGROUND_TITLE);
 
-#if 0
-  CloseDoor(DOOR_CLOSE_1);
-#endif
-
   PlayMenuSound();
   PlayMenuMusic();
 
   HandleTitleScreen(0, 0, 0, 0, MB_MENU_INITIALIZE);
-
-#if 0
-#if 1
-  FadeIn(1000);
-#else
-  FadeToFront();
-#endif
-#endif
 
   StopAnimation();
 }
@@ -375,6 +325,10 @@ static void DrawMainMenuExt(int fade_delay)
   SetDrawBackgroundMask(REDRAW_FIELD);
 
   audio.sound_deactivated = FALSE;
+
+#if 1
+  GetPlayerConfig();
+#endif
 
   /* needed if last screen was the playing screen, invoked from level editor */
   if (level_editor_test_game)
@@ -427,7 +381,9 @@ static void DrawMainMenuExt(int fade_delay)
   if (setup.handicap && level_nr > leveldir_current->handicap_level)
     level_nr = leveldir_current->handicap_level;
 
+#if 0
   GetPlayerConfig();
+#endif
   LoadLevel(level_nr);
 
   SetMainBackgroundImage(IMG_BACKGROUND_MAIN);
@@ -561,10 +517,7 @@ static void DrawMainMenuExt(int fade_delay)
 #endif
 
 #if 1
-  if (fade_delay > 0)
-    FadeIn(fade_delay);
-  else
-    BackToFront();
+  FadeIn(fade_delay);
 
   InitAnimation();
 #endif
@@ -650,7 +603,7 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
       drawto = drawto_last;
 
       if (use_cross_fading)
-	FadeCross(bitmap_db_title, fade_delay);
+	FadeCross(fade_delay);
       else
 	FadeIn(fade_delay);
     }

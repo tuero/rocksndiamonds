@@ -19,13 +19,14 @@
 /* values for music configuration */
 
 #define MUS_BACKGROUND					0
-#define MUS_BACKGROUND_MAIN				1
-#define MUS_BACKGROUND_LEVELS				2
-#define MUS_BACKGROUND_SCORES				3
-#define MUS_BACKGROUND_EDITOR				4
-#define MUS_BACKGROUND_INFO				5
-#define MUS_BACKGROUND_SETUP				6
+#define MUS_BACKGROUND_TITLE				1
+#define MUS_BACKGROUND_MAIN				2
+#define MUS_BACKGROUND_LEVELS				3
+#define MUS_BACKGROUND_SCORES				4
+#define MUS_BACKGROUND_EDITOR				5
+#define MUS_BACKGROUND_INFO				6
+#define MUS_BACKGROUND_SETUP				7
 
-#define NUM_MUSIC_FILES					7
+#define NUM_MUSIC_FILES					8
 
 #endif	/* CONF_MUS_H */

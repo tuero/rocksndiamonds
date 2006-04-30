@@ -69,7 +69,7 @@ void FadeToFront();
 
 void FadeIn(int);
 void FadeOut(int, int);
-void FadeCross(Bitmap *, int);
+void FadeCross(int);
 
 void ClearWindow();
 void SetMainBackgroundImageIfDefined(int);
@@ -164,5 +164,10 @@ int font2baseimg(int);
 
 unsigned int InitRND(long);
 void InitGraphicInfo_EM(void);
+
+void PlayMenuSound();
+void PlayMenuSoundStereo(int, int);
+void PlayMenuSoundIfLoop();
+void PlayMenuMusic();
 
 #endif	/* TOOLS_H */

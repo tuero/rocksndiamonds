@@ -27,6 +27,10 @@ static struct
 gamemode_to_sound[] =
 {
   {
+    GFX_SPECIAL_ARG_TITLE,
+    SND_BACKGROUND_TITLE
+  },
+  {
     GFX_SPECIAL_ARG_MAIN,
     SND_BACKGROUND_MAIN
   },

@@ -1001,6 +1001,7 @@ void HandleJoystick()
 
   switch(game_status)
   {
+    case GAME_MODE_TITLE:
     case GAME_MODE_MAIN:
     case GAME_MODE_LEVELS:
     case GAME_MODE_SETUP:

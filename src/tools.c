@@ -416,6 +416,13 @@ void FadeToFront()
 
 void FadeIn(int fade_delay)
 {
+  if (fade_delay == 0)
+  {
+    BackToFront();
+
+    return;
+  }
+
   FadeScreen(NULL, FADE_MODE_FADE_IN, fade_delay, 0);
 
   redraw_mask = REDRAW_NONE;
@@ -423,14 +430,30 @@ void FadeIn(int fade_delay)
 
 void FadeOut(int fade_delay, int post_delay)
 {
+  if (fade_delay == 0)
+  {
+    ClearRectangle(backbuffer, 0, 0, WIN_XSIZE, WIN_YSIZE);
+    BackToFront();
+
+    return;
+  }
+
   FadeScreen(NULL, FADE_MODE_FADE_OUT, fade_delay, post_delay);
 
   redraw_mask = REDRAW_NONE;
 }
 
-void FadeCross(Bitmap *bitmap, int fade_delay)
+void FadeCross(int fade_delay)
 {
-  FadeScreen(bitmap, FADE_MODE_CROSSFADE, fade_delay, 0);
+  if (fade_delay == 0)
+  {
+    BlitBitmap(bitmap_db_title, backbuffer, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
+    BackToFront();
+
+    return;
+  }
+
+  FadeScreen(bitmap_db_title, FADE_MODE_CROSSFADE, fade_delay, 0);
 
   redraw_mask = REDRAW_NONE;
 }
@@ -1429,7 +1452,7 @@ void ShowEnvelope(int envelope_nr)
 
   game.envelope_active = TRUE;	/* needed for RedrawPlayfield() events */
 
-  PlaySoundStereo(sound_opening, SOUND_MIDDLE);
+  PlayMenuSoundStereo(sound_opening, SOUND_MIDDLE);
 
   if (anim_mode == ANIM_DEFAULT)
     AnimateEnvelope(envelope_nr, ANIM_DEFAULT, ACTION_OPENING);
@@ -1441,7 +1464,7 @@ void ShowEnvelope(int envelope_nr)
   else
     WaitForEventToContinue();
 
-  PlaySoundStereo(sound_closing, SOUND_MIDDLE);
+  PlayMenuSoundStereo(sound_closing, SOUND_MIDDLE);
 
   if (anim_mode != ANIM_NONE)
     AnimateEnvelope(envelope_nr, main_anim_mode, ACTION_CLOSING);
@@ -2606,9 +2629,9 @@ unsigned int MoveDoor(unsigned int door_state)
     {
       /* opening door sound has priority over simultaneously closing door */
       if (door_state & (DOOR_OPEN_1 | DOOR_OPEN_2))
-	PlaySoundStereo(SND_DOOR_OPENING, SOUND_MIDDLE);
+	PlayMenuSoundStereo(SND_DOOR_OPENING, SOUND_MIDDLE);
       else if (door_state & (DOOR_CLOSE_1 | DOOR_CLOSE_2))
-	PlaySoundStereo(SND_DOOR_CLOSING, SOUND_MIDDLE);
+	PlayMenuSoundStereo(SND_DOOR_CLOSING, SOUND_MIDDLE);
     }
 
     for (k = start; k <= end && !(door_1_done && door_2_done); k += stepsize)
@@ -5890,4 +5913,61 @@ void InitGraphicInfo_EM(void)
 
   exit(0);
 #endif
+}
+
+void PlayMenuSound()
+{
+  int sound = menu.sound[game_status];
+
+  if (sound == SND_UNDEFINED)
+    return;
+
+  if ((!setup.sound_simple && !IS_LOOP_SOUND(sound)) ||
+      (!setup.sound_loops && IS_LOOP_SOUND(sound)))
+    return;
+
+  if (IS_LOOP_SOUND(sound))
+    PlaySoundLoop(sound);
+  else
+    PlaySound(sound);
+}
+
+void PlayMenuSoundStereo(int sound, int stereo_position)
+{
+  if (sound == SND_UNDEFINED)
+    return;
+
+  if ((!setup.sound_simple && !IS_LOOP_SOUND(sound)) ||
+      (!setup.sound_loops && IS_LOOP_SOUND(sound)))
+    return;
+
+  if (IS_LOOP_SOUND(sound))
+    PlaySoundExt(sound, SOUND_MAX_VOLUME, stereo_position, SND_CTRL_PLAY_LOOP);
+  else
+    PlaySoundStereo(sound, stereo_position);
+}
+
+void PlayMenuSoundIfLoop()
+{
+  int sound = menu.sound[game_status];
+
+  if (sound == SND_UNDEFINED)
+    return;
+
+  if ((!setup.sound_simple && !IS_LOOP_SOUND(sound)) ||
+      (!setup.sound_loops && IS_LOOP_SOUND(sound)))
+    return;
+
+  if (IS_LOOP_SOUND(sound))
+    PlaySoundLoop(sound);
+}
+
+void PlayMenuMusic()
+{
+  int music = menu.music[game_status];
+
+  if (music == MUS_UNDEFINED)
+    return;
+
+  PlayMusic(music);
 }
