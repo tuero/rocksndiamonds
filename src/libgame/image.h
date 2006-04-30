@@ -91,6 +91,7 @@ void InitImageList(struct ConfigInfo *, int, struct ConfigTypeInfo *,
 
 void ReloadCustomImages();
 void CreateImageWithSmallImages(int, int);
+void ScaleImage(int, int);
 
 void FreeAllImages();
 

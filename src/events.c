@@ -420,6 +420,10 @@ void HandleButton(int mx, int my, int button)
 
   switch(game_status)
   {
+    case GAME_MODE_TITLE:
+      HandleTitleScreen(mx,my, 0,0, button);
+      break;
+
     case GAME_MODE_MAIN:
       HandleMainMenu(mx,my, 0,0, button);
       break;
@@ -735,6 +739,7 @@ void HandleKey(Key key, int key_status)
       HandleTypeName(0, key);
       break;
 
+    case GAME_MODE_TITLE:
     case GAME_MODE_MAIN:
     case GAME_MODE_LEVELS:
     case GAME_MODE_SETUP:
@@ -748,7 +753,9 @@ void HandleKey(Key key, int key_status)
 	case KSYM_space:
 #endif
 	case KSYM_Return:
-	  if (game_status == GAME_MODE_MAIN)
+	  if (game_status == GAME_MODE_TITLE)
+	    HandleTitleScreen(0,0, 0,0, MB_MENU_CHOICE);
+	  else if (game_status == GAME_MODE_MAIN)
 	    HandleMainMenu(0,0, 0,0, MB_MENU_CHOICE);
           else if (game_status == GAME_MODE_LEVELS)
             HandleChooseLevel(0,0, 0,0, MB_MENU_CHOICE);
@@ -759,7 +766,9 @@ void HandleKey(Key key, int key_status)
 	  break;
 
 	case KSYM_Escape:
-          if (game_status == GAME_MODE_LEVELS)
+	  if (game_status == GAME_MODE_TITLE)
+	    HandleTitleScreen(0,0, 0,0, MB_MENU_LEAVE);
+          else if (game_status == GAME_MODE_LEVELS)
             HandleChooseLevel(0,0, 0,0, MB_MENU_LEAVE);
 	  else if (game_status == GAME_MODE_SETUP)
 	    HandleSetupScreen(0,0, 0,0, MB_MENU_LEAVE);
@@ -1003,7 +1012,9 @@ void HandleJoystick()
 	  !DelayReached(&joystickmove_delay, GADGET_FRAME_DELAY))
 	newbutton = dx = dy = 0;
 
-      if (game_status == GAME_MODE_MAIN)
+      if (game_status == GAME_MODE_TITLE)
+	HandleTitleScreen(0,0,dx,dy,newbutton ? MB_MENU_CHOICE : MB_MENU_MARK);
+      else if (game_status == GAME_MODE_MAIN)
 	HandleMainMenu(0,0,dx,dy,newbutton ? MB_MENU_CHOICE : MB_MENU_MARK);
       else if (game_status == GAME_MODE_LEVELS)
         HandleChooseLevel(0,0,dx,dy,newbutton ? MB_MENU_CHOICE : MB_MENU_MARK);

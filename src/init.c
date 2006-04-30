@@ -143,6 +143,15 @@ void InitElementSmallImages()
     InitElementSmallImagesScaledUp(special_graphics[i]);
 }
 
+void InitScaledImages()
+{
+  int i;
+
+  /* scale normal images from static configuration, if not already scaled */
+  for (i = 0; i < NUM_IMAGE_FILES; i++)
+    ScaleImage(i, graphic_info[i].scale_up_factor);
+}
+
 #if 1
 /* !!! FIX THIS (CHANGE TO USING NORMAL ELEMENT GRAPHIC DEFINITIONS) !!! */
 void SetBitmaps_EM(Bitmap **em_bitmap)
@@ -1647,7 +1656,8 @@ static void ReinitializeGraphics()
   InitElementGraphicInfo();		/* element game graphic mapping */
   InitElementSpecialGraphicInfo();	/* element special graphic mapping */
 
-  InitElementSmallImages();		/* scale images to all needed sizes */
+  InitElementSmallImages();		/* scale elements to all needed sizes */
+  InitScaledImages();			/* scale all other images, if needed */
   InitFontGraphicInfo();		/* initialize text drawing functions */
 
   InitGraphicInfo_EM();			/* graphic mapping for EM engine */
@@ -4371,7 +4381,8 @@ void InitGfx()
   if (filename_font_initial == NULL)	/* should not happen */
     Error(ERR_EXIT, "cannot get filename for '%s'", CONFIG_TOKEN_FONT_INITIAL);
 
-  /* create additional image buffers for double-buffering */
+  /* create additional image buffers for double-buffering and cross-fading */
+  bitmap_db_title = CreateBitmap(WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH);
   bitmap_db_field = CreateBitmap(FXSIZE, FYSIZE, DEFAULT_DEPTH);
   bitmap_db_door  = CreateBitmap(3 * DXSIZE, DYSIZE + VYSIZE, DEFAULT_DEPTH);
 
@@ -4396,6 +4407,14 @@ void InitGfx()
   DrawInitText("Loading graphics:", 120, FC_GREEN);
 }
 
+void RedrawBackground()
+{
+  BlitBitmap(graphic_info[IMG_GLOBAL_BORDER].bitmap, backbuffer,
+	     0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
+
+  redraw_mask = REDRAW_ALL;
+}
+
 void InitGfxBackground()
 {
   int x, y;
@@ -4404,8 +4423,8 @@ void InitGfxBackground()
   fieldbuffer = bitmap_db_field;
   SetDrawtoField(DRAW_BACKBUFFER);
 
-  BlitBitmap(graphic_info[IMG_GLOBAL_BORDER].bitmap, backbuffer,
-	     0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
+  RedrawBackground();
+
   ClearRectangle(backbuffer, REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE);
   ClearRectangle(bitmap_db_door, 0, 0, 3 * DXSIZE, DYSIZE + VYSIZE);
 
@@ -4662,7 +4681,11 @@ void ReloadCustomArtwork(int force_reload)
 
   if (redraw_screen)
   {
+#if 1
+    RedrawBackground();
+#else
     InitGfxBackground();
+#endif
 
     /* force redraw of (open or closed) door graphics */
     SetDoorState(DOOR_OPEN_ALL);

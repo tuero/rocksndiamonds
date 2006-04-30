@@ -20,7 +20,9 @@
 #include "events.h"
 #include "config.h"
 
-Bitmap		       *bitmap_db_field, *bitmap_db_door;
+Bitmap		       *bitmap_db_title;
+Bitmap		       *bitmap_db_field;
+Bitmap		       *bitmap_db_door;
 DrawBuffer	       *fieldbuffer;
 DrawBuffer	       *drawto_field;
 

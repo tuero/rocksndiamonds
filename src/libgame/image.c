@@ -1049,6 +1049,19 @@ void CreateImageWithSmallImages(int pos, int zoom_factor)
   img_info->scaled_up = TRUE;
 }
 
+void ScaleImage(int pos, int zoom_factor)
+{
+  ImageInfo *img_info = getImageInfoEntryFromImageID(pos);
+
+  if (img_info == NULL || img_info->scaled_up)
+    return;
+
+  if (zoom_factor != 1)
+    ScaleBitmap(img_info->bitmap, zoom_factor);
+
+  img_info->scaled_up = TRUE;
+}
+
 void FreeAllImages()
 {
   FreeCustomArtworkLists(image_info);

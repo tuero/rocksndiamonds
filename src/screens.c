@@ -285,9 +285,74 @@ static int getLevelRangeTextPos()
   return getNextLevelButtonPos() + 1;
 }
 
+void DrawTitleScreenImage(int nr)
+{
+  int graphic = IMG_TITLESCREEN_1 + nr;
+  Bitmap *bitmap = graphic_info[graphic].bitmap;
+  int width  = graphic_info[graphic].src_image_width;
+  int height = graphic_info[graphic].src_image_height;
+  int src_x = 0, src_y = 0;
+  int dst_x, dst_y;
+
+  if (bitmap == NULL)
+    return;
+
+  if (width > WIN_XSIZE)
+  {
+    src_x = (width - WIN_XSIZE) / 2;
+    width = WIN_XSIZE;
+  }
+
+  if (height > WIN_YSIZE)
+  {
+    src_y = (height - WIN_YSIZE) / 2;
+    height = WIN_YSIZE;
+  }
+
+  dst_x = (WIN_XSIZE - width) / 2;
+  dst_y = (WIN_YSIZE - height) / 2;
+
+#if 1
+  ClearRectangleOnBackground(drawto, 0, 0, WIN_XSIZE, WIN_YSIZE);
+#else
+  DrawBackground(0, 0, WIN_XSIZE, WIN_YSIZE);
+#endif
+
+  if (DrawingOnBackground(dst_x, dst_y))
+    BlitBitmapMasked(bitmap, drawto, src_x, src_y, width, height, dst_x, dst_y);
+  else
+    BlitBitmap(bitmap, drawto, src_x, src_y, width, height, dst_x, dst_y);
+
+  redraw_mask = REDRAW_ALL;
+}
+
+void DrawTitleScreen()
+{
+  KeyboardAutoRepeatOff();
+
+  SetMainBackgroundImage(IMG_BACKGROUND_TITLE);
+
+#if 0
+  CloseDoor(DOOR_CLOSE_1);
+#endif
+
+  HandleTitleScreen(0, 0, 0, 0, MB_MENU_INITIALIZE);
+
+  PlayMenuSound();
+  PlayMenuMusic();
+
+#if 1
+  FadeIn(1000);
+#else
+  FadeToFront();
+#endif
+  StopAnimation();
+}
+
 void DrawMainMenu()
 {
   static LevelDirTree *leveldir_last_valid = NULL;
+  boolean levelset_has_changed = FALSE;
   char *name_text = (!options.network && setup.team_mode ? "Team:" : "Name:");
 #if 1
   char *level_text = "Levelset";
@@ -327,6 +392,9 @@ void DrawMainMenu()
   if (!validLevelSeries(leveldir_current))
     leveldir_current = getFirstValidTreeInfoEntry(leveldir_last_valid);
 
+  if (leveldir_current != leveldir_last_valid)
+    levelset_has_changed = TRUE;
+
   /* store valid level series information */
   leveldir_last_valid = leveldir_current;
 
@@ -336,6 +404,14 @@ void DrawMainMenu()
 #ifdef TARGET_SDL
   SetDrawtoField(DRAW_BACKBUFFER);
 #endif
+
+  if (levelset_has_changed && graphic_info[IMG_TITLESCREEN_1].bitmap != NULL)
+  {
+    game_status = GAME_MODE_TITLE;
+    DrawTitleScreen();
+
+    return;
+  }
 
 #if 0
   /* map gadgets for main menu screen */
@@ -501,6 +577,71 @@ static void gotoTopLevelDir()
   }
 }
 #endif
+
+void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
+{
+  static int title_nr = 0;
+  boolean return_to_main_menu = FALSE;
+  boolean use_cross_fading = TRUE;
+  int fade_delay = 1000;
+  int post_delay = 500;
+
+  if (button == MB_MENU_INITIALIZE)
+  {
+    title_nr = 0;
+
+    DrawTitleScreenImage(title_nr);
+
+    return;
+  }
+  else if (button == MB_MENU_LEAVE)
+  {
+    return_to_main_menu = TRUE;
+  }
+  else if (button == MB_MENU_CHOICE)
+  {
+    title_nr++;
+
+    if (!use_cross_fading)
+    {
+      FadeOut(fade_delay);
+      Delay(post_delay);
+    }
+
+    if (title_nr < MAX_NUM_TITLE_SCREENS &&
+	graphic_info[IMG_TITLESCREEN_1 + title_nr].bitmap != NULL)
+    {
+      Bitmap *drawto_last = drawto;
+
+      if (use_cross_fading)
+	drawto = bitmap_db_title;
+
+      DrawTitleScreenImage(title_nr);
+
+      drawto = drawto_last;
+
+      if (use_cross_fading)
+	FadeCross(bitmap_db_title, fade_delay);
+      else
+	FadeIn(fade_delay);
+    }
+    else
+    {
+      FadeOut(fade_delay);
+      Delay(post_delay);
+
+      return_to_main_menu = TRUE;
+    }
+  }
+
+  if (return_to_main_menu)
+  {
+    RedrawBackground();
+
+    game_status = GAME_MODE_MAIN;
+    DrawMainMenu();
+  }
+}
 
 void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 {
@@ -2146,6 +2287,7 @@ static struct TokenInfo setup_info_game[] =
 
 static struct TokenInfo setup_info_editor[] =
 {
+#if 0
   { TYPE_SWITCH,	&setup.editor.el_boulderdash,	"Boulder Dash:" },
   { TYPE_SWITCH,	&setup.editor.el_emerald_mine,	"Emerald Mine:"	},
   { TYPE_SWITCH, &setup.editor.el_emerald_mine_club,	"Emerald Mine Club:" },
@@ -2154,11 +2296,14 @@ static struct TokenInfo setup_info_editor[] =
   { TYPE_SWITCH,	&setup.editor.el_supaplex,	"Supaplex:"	},
   { TYPE_SWITCH,	&setup.editor.el_diamond_caves,	"Diamond Caves II:" },
   { TYPE_SWITCH,	&setup.editor.el_dx_boulderdash,"DX-Boulderdash:" },
+#endif
   { TYPE_SWITCH,	&setup.editor.el_chars,		"Text Characters:" },
   { TYPE_SWITCH,	&setup.editor.el_custom,  "Custom & Group Elements:" },
   { TYPE_SWITCH,	&setup.editor.el_headlines,	"Headlines:"	},
   { TYPE_SWITCH, &setup.editor.el_user_defined, "User defined element list:" },
   { TYPE_SWITCH,	&setup.editor.el_dynamic,  "Dynamic level elements:" },
+  { TYPE_EMPTY,		NULL,			""			},
+  { TYPE_SWITCH, &setup.editor.show_element_token,	"Show element token:" },
   { TYPE_EMPTY,		NULL,			""			},
   { TYPE_LEAVE_MENU,	execSetupMain, 		"Back"			},
 

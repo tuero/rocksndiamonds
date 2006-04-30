@@ -241,7 +241,8 @@ void BackToFront()
   if (redraw_mask & REDRAW_ALL)
   {
     BlitBitmap(backbuffer, window, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
-    redraw_mask = 0;
+
+    redraw_mask = REDRAW_NONE;
   }
 
   if (redraw_mask & REDRAW_FIELD)
@@ -411,6 +412,114 @@ void FadeToFront()
 #endif
 
   BackToFront();
+}
+
+#define FADE_MODE_FADE_IN	0
+#define FADE_MODE_FADE_OUT	1
+#define FADE_MODE_CROSSFADE	2
+
+static void FadeExt(Bitmap *bitmap_cross, int fade_ms, int fade_mode)
+{
+  SDL_Surface *surface_screen = backbuffer->surface;
+  SDL_Surface *surface_screen_copy = NULL;
+  SDL_Surface *surface_black = NULL;
+  SDL_Surface *surface_cross;		/* initialized later */
+  boolean fade_reverse;			/* initialized later */
+  unsigned int flags = SDL_SRCALPHA;
+  unsigned int time_last, time_current;
+  float alpha;
+  int alpha_final;
+
+  /* use same surface type as screen surface */
+  if ((surface_screen->flags & SDL_HWSURFACE))
+    flags |= SDL_HWSURFACE;
+  else
+    flags |= SDL_SWSURFACE;
+
+  /* create surface for copy of screen buffer */
+  if ((surface_screen_copy =
+       SDL_CreateRGBSurface(flags,
+			    surface_screen->w,
+			    surface_screen->h,
+			    surface_screen->format->BitsPerPixel,
+			    surface_screen->format->Rmask,
+			    surface_screen->format->Gmask,
+			    surface_screen->format->Bmask,
+			    surface_screen->format->Amask)) == NULL)
+    Error(ERR_EXIT, "SDL_CreateRGBSurface() failed: %s", SDL_GetError());
+
+  SDL_BlitSurface(surface_screen, NULL, surface_screen_copy, NULL);
+
+  /* create black surface for fading from/to black */
+  if ((surface_black =
+       SDL_CreateRGBSurface(flags,
+			    surface_screen->w,
+			    surface_screen->h,
+			    surface_screen->format->BitsPerPixel,
+			    surface_screen->format->Rmask,
+			    surface_screen->format->Gmask,
+			    surface_screen->format->Bmask,
+			    surface_screen->format->Amask)) == NULL)
+    Error(ERR_EXIT, "SDL_CreateRGBSurface() failed: %s", SDL_GetError());
+
+  SDL_FillRect(surface_black, NULL, SDL_MapRGB(surface_screen->format, 0,0,0));
+
+  fade_reverse = (fade_mode == FADE_MODE_FADE_IN ? TRUE : FALSE);
+  surface_cross = (fade_mode == FADE_MODE_CROSSFADE ? bitmap_cross->surface :
+		   surface_black);
+
+  time_current = SDL_GetTicks();
+
+  for (alpha = 0.0; alpha < 255.0;)
+  {
+    time_last = time_current;
+    time_current = SDL_GetTicks();
+    alpha += 255 * ((float)(time_current - time_last) / fade_ms);
+    alpha_final = (int)(fade_reverse ? 255.0 - alpha : alpha);
+    alpha_final = MIN(MAX(0, alpha_final), 255);
+
+    /* draw existing image to screen buffer */
+    SDL_BlitSurface(surface_screen_copy, NULL, surface_screen, NULL);
+
+    /* draw new image to screen buffer using alpha blending */
+    SDL_SetAlpha(surface_cross, SDL_SRCALPHA, alpha_final);
+    SDL_BlitSurface(surface_cross, NULL, surface_screen, NULL);
+
+    /* draw screen buffer to visible display */
+    SDL_Flip(surface_screen);
+  }
+
+  SDL_FreeSurface(surface_screen_copy);
+  SDL_FreeSurface(surface_black);
+
+  redraw_mask = REDRAW_NONE;
+}
+
+void FadeIn(int fade_ms)
+{
+#ifdef TARGET_SDL
+  FadeExt(NULL, fade_ms, FADE_MODE_FADE_IN);
+#else
+  BackToFront();
+#endif
+}
+
+void FadeOut(int fade_ms)
+{
+#ifdef TARGET_SDL
+  FadeExt(NULL, fade_ms, FADE_MODE_FADE_OUT);
+#else
+  BackToFront();
+#endif
+}
+
+void FadeCross(Bitmap *bitmap, int fade_ms)
+{
+#ifdef TARGET_SDL
+  FadeExt(bitmap, fade_ms, FADE_MODE_CROSSFADE);
+#else
+  BackToFront();
+#endif
 }
 
 void SetMainBackgroundImageIfDefined(int graphic)
@@ -2513,7 +2622,7 @@ unsigned int MoveDoor(unsigned int door_state)
     door_2.height = VYSIZE;
 
   if (door_state == DOOR_GET_STATE)
-    return(door1 | door2);
+    return (door1 | door2);
 
   if (door_state & DOOR_SET_STATE)
   {
@@ -2522,7 +2631,7 @@ unsigned int MoveDoor(unsigned int door_state)
     if (door_state & DOOR_ACTION_2)
       door2 = door_state & DOOR_ACTION_2;
 
-    return(door1 | door2);
+    return (door1 | door2);
   }
 
   if (door1 == DOOR_OPEN_1 && door_state & DOOR_OPEN_1)
@@ -2765,13 +2874,15 @@ unsigned int MoveDoor(unsigned int door_state)
 	door_2_done = (a == VXSIZE);
       }
 
-      BackToFront();
-
-      if (game_status == GAME_MODE_MAIN)
-	DoAnimation();
-
       if (!(door_state & DOOR_NO_DELAY))
+      {
+	BackToFront();
+
+	if (game_status == GAME_MODE_MAIN)
+	  DoAnimation();
+
 	WaitUntilDelayReached(&door_delay, door_delay_value);
+      }
     }
   }
 

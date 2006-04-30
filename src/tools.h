@@ -65,6 +65,11 @@ void SetDrawtoField(int);
 void RedrawPlayfield(boolean, int, int, int, int);
 void BackToFront();
 void FadeToFront();
+
+void FadeIn(int);
+void FadeOut(int);
+void FadeCross(Bitmap *, int);
+
 void ClearWindow();
 void SetMainBackgroundImageIfDefined(int);
 void SetMainBackgroundImage(int);

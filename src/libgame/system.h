@@ -649,6 +649,8 @@ struct SetupEditorInfo
   boolean el_dynamic;
 
   boolean el_headlines;
+
+  boolean show_element_token;
 };
 
 struct SetupEditorCascadeInfo
@@ -996,6 +998,7 @@ void ReloadCustomImage(Bitmap *, char *);
 
 Bitmap *ZoomBitmap(Bitmap *, int, int);
 void CreateBitmapWithSmallBitmaps(Bitmap *, int);
+void ScaleBitmap(Bitmap *, int);
 
 void SetMouseCursor(int);
 

@@ -7597,6 +7597,16 @@ static void DrawPropertiesInfo()
   int screen_line = 0;
   int i, x, y;
 
+#if 1
+  if (setup.editor.show_element_token)
+  {
+    DrawTextF(pad_x, pad_y + screen_line++ * font2_height, FONT_TEXT_3,
+	      "[%s]", element_info[properties_element].token_name);
+    screen_line++;
+  }
+
+#else
+
 #if DEBUG
   if (IS_CUSTOM_ELEMENT(properties_element))
   {
@@ -7610,6 +7620,7 @@ static void DrawPropertiesInfo()
 	      "[Group Element %d]", properties_element - EL_GROUP_START + 1);
     screen_line++;
   }
+#endif
 #endif
 
   /* ----- print number of elements / percentage of this element in level */

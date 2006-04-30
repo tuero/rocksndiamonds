@@ -4389,7 +4389,14 @@ struct ConfigInfo image_config[] =
   { "background.envelope_4.anim_mode",		"default"		},
   { "background.envelope_4.draw_masked",	"false"			},
 
+  { "titlescreen_1",				UNDEFINED_FILENAME	},
+  { "titlescreen_2",				UNDEFINED_FILENAME	},
+  { "titlescreen_3",				UNDEFINED_FILENAME	},
+  { "titlescreen_4",				UNDEFINED_FILENAME	},
+  { "titlescreen_5",				UNDEFINED_FILENAME	},
+
   { "background",				UNDEFINED_FILENAME	},
+  { "background.TITLE",				UNDEFINED_FILENAME	},
   { "background.MAIN",				UNDEFINED_FILENAME	},
   { "background.LEVELS",			UNDEFINED_FILENAME	},
   { "background.SCORES",			UNDEFINED_FILENAME	},

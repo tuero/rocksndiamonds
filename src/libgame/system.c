@@ -794,19 +794,17 @@ Bitmap *ZoomBitmap(Bitmap *src_bitmap, int zoom_width, int zoom_height)
   return dst_bitmap;
 }
 
-void CreateBitmapWithSmallBitmaps(Bitmap *old_bitmap, int zoom_factor)
+static void CreateScaledBitmaps(Bitmap *old_bitmap, int zoom_factor,
+				boolean create_small_bitmaps)
 {
   Bitmap swap_bitmap;
   Bitmap *new_bitmap, *tmp_bitmap_1, *tmp_bitmap_2, *tmp_bitmap_8;
   int width_1, height_1, width_2, height_2, width_8, height_8;
   int new_width, new_height;
 
+  /* calculate new image dimensions for normal sized image */
   width_1  = old_bitmap->width  * zoom_factor;
   height_1 = old_bitmap->height * zoom_factor;
-  width_2  = width_1  / 2;
-  height_2 = height_1 / 2;
-  width_8  = width_1  / 8;
-  height_8 = height_1 / 8;
 
   /* get image with normal size (this might require scaling up) */
   if (zoom_factor != 1)
@@ -814,17 +812,26 @@ void CreateBitmapWithSmallBitmaps(Bitmap *old_bitmap, int zoom_factor)
   else
     tmp_bitmap_1 = old_bitmap;
 
-  /* get image with 1/2 of normal size (for use in the level editor) */
-  if (zoom_factor != 2)
-    tmp_bitmap_2 = ZoomBitmap(tmp_bitmap_1, width_1 / 2, height_1 / 2);
-  else
-    tmp_bitmap_2 = old_bitmap;
+  if (create_small_bitmaps)
+  {
+    /* calculate new image dimensions for small images */
+    width_2  = width_1  / 2;
+    height_2 = height_1 / 2;
+    width_8  = width_1  / 8;
+    height_8 = height_1 / 8;
 
-  /* get image with 1/8 of normal size (for use on the preview screen) */
-  if (zoom_factor != 8)
-    tmp_bitmap_8 = ZoomBitmap(tmp_bitmap_1, width_1 / 8, height_1 / 8);
-  else
-    tmp_bitmap_8 = old_bitmap;
+    /* get image with 1/2 of normal size (for use in the level editor) */
+    if (zoom_factor != 2)
+      tmp_bitmap_2 = ZoomBitmap(tmp_bitmap_1, width_1 / 2, height_1 / 2);
+    else
+      tmp_bitmap_2 = old_bitmap;
+
+    /* get image with 1/8 of normal size (for use on the preview screen) */
+    if (zoom_factor != 8)
+      tmp_bitmap_8 = ZoomBitmap(tmp_bitmap_1, width_1 / 8, height_1 / 8);
+    else
+      tmp_bitmap_8 = old_bitmap;
+  }
 
   /* if image was scaled up, create new clipmask for normal size image */
   if (zoom_factor != 1)
@@ -851,25 +858,39 @@ void CreateBitmapWithSmallBitmaps(Bitmap *old_bitmap, int zoom_factor)
 #endif
   }
 
-  new_width  = width_1;
-  new_height = height_1 + (height_1 + 1) / 2;     /* prevent odd height */
+  if (create_small_bitmaps)
+  {
+    new_width  = width_1;
+    new_height = height_1 + (height_1 + 1) / 2;     /* prevent odd height */
 
-  new_bitmap = CreateBitmap(new_width, new_height, DEFAULT_DEPTH);
+    new_bitmap = CreateBitmap(new_width, new_height, DEFAULT_DEPTH);
 
-  BlitBitmap(tmp_bitmap_1, new_bitmap, 0, 0, width_1, height_1, 0, 0);
-  BlitBitmap(tmp_bitmap_2, new_bitmap, 0, 0, width_1 / 2, height_1 / 2,
-	     0, height_1);
-  BlitBitmap(tmp_bitmap_8, new_bitmap, 0, 0, width_1 / 8, height_1 / 8,
-	     3 * width_1 / 4, height_1);
+    BlitBitmap(tmp_bitmap_1, new_bitmap, 0, 0, width_1, height_1, 0, 0);
+    BlitBitmap(tmp_bitmap_2, new_bitmap, 0, 0, width_1 / 2, height_1 / 2,
+	       0, height_1);
+    BlitBitmap(tmp_bitmap_8, new_bitmap, 0, 0, width_1 / 8, height_1 / 8,
+	       3 * width_1 / 4, height_1);
+  }
+  else
+  {
+    new_width  = width_1;
+    new_height = height_1;
 
-  if (zoom_factor != 1)
-    FreeBitmap(tmp_bitmap_1);
+    new_bitmap = tmp_bitmap_1;	/* directly use tmp_bitmap_1 as new bitmap */
+  }
 
-  if (zoom_factor != 2)
-    FreeBitmap(tmp_bitmap_2);
+  if (create_small_bitmaps)
+  {
+    /* if no small bitmaps created, tmp_bitmap_1 is used as new bitmap now */
+    if (zoom_factor != 1)
+      FreeBitmap(tmp_bitmap_1);
 
-  if (zoom_factor != 8)
-    FreeBitmap(tmp_bitmap_8);
+    if (zoom_factor != 2)
+      FreeBitmap(tmp_bitmap_2);
+
+    if (zoom_factor != 8)
+      FreeBitmap(tmp_bitmap_8);
+  }
 
   /* replace image with extended image (containing normal, 1/2 and 1/8 size) */
 #if defined(TARGET_SDL)
@@ -885,7 +906,17 @@ void CreateBitmapWithSmallBitmaps(Bitmap *old_bitmap, int zoom_factor)
   old_bitmap->width  = new_bitmap->width;
   old_bitmap->height = new_bitmap->height;
 
-  FreeBitmap(new_bitmap);
+  FreeBitmap(new_bitmap);	/* this actually frees the _old_ bitmap now */
+}
+
+void CreateBitmapWithSmallBitmaps(Bitmap *old_bitmap, int zoom_factor)
+{
+  CreateScaledBitmaps(old_bitmap, zoom_factor, TRUE);
+}
+
+void ScaleBitmap(Bitmap *old_bitmap, int zoom_factor)
+{
+  CreateScaledBitmaps(old_bitmap, zoom_factor, FALSE);
 }
 
 

@@ -36,6 +36,7 @@ void InitElementPropertiesStatic(void);
 void InitElementPropertiesEngine(int);
 
 void ReloadCustomArtwork(int);
+void RedrawBackground();
 
 void KeyboardAutoRepeatOffUnlessAutoplay();
 

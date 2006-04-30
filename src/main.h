@@ -780,12 +780,16 @@
 #define MAX_ELEMENT_NAME_LEN	32
 #define MAX_TAPES_PER_SET	1024
 #define MAX_SCORE_ENTRIES	100
+#define MAX_NUM_TITLE_SCREENS	5
+
 #define MAX_NUM_AMOEBA		100
+
 #if 0	/* game.h */
 #define MAX_INVENTORY_SIZE	1000
 #define STD_NUM_KEYS		4
 #define MAX_NUM_KEYS		8
 #endif
+
 #define NUM_BELTS		4
 #define NUM_BELT_PARTS		3
 #define MIN_ENVELOPE_XSIZE	1
@@ -1543,18 +1547,19 @@
 
 /* values for special image configuration suffixes (must match game mode) */
 #define GFX_SPECIAL_ARG_DEFAULT		0
-#define GFX_SPECIAL_ARG_MAIN		1
-#define GFX_SPECIAL_ARG_LEVELS		2
-#define GFX_SPECIAL_ARG_SCORES		3
-#define GFX_SPECIAL_ARG_EDITOR		4
-#define GFX_SPECIAL_ARG_INFO		5
-#define GFX_SPECIAL_ARG_SETUP		6
-#define GFX_SPECIAL_ARG_PLAYING		7
-#define GFX_SPECIAL_ARG_DOOR		8
-#define GFX_SPECIAL_ARG_PREVIEW		9
-#define GFX_SPECIAL_ARG_CRUMBLED	10
+#define GFX_SPECIAL_ARG_TITLE		1
+#define GFX_SPECIAL_ARG_MAIN		2
+#define GFX_SPECIAL_ARG_LEVELS		3
+#define GFX_SPECIAL_ARG_SCORES		4
+#define GFX_SPECIAL_ARG_EDITOR		5
+#define GFX_SPECIAL_ARG_INFO		6
+#define GFX_SPECIAL_ARG_SETUP		7
+#define GFX_SPECIAL_ARG_PLAYING		8
+#define GFX_SPECIAL_ARG_DOOR		9
+#define GFX_SPECIAL_ARG_PREVIEW		10
+#define GFX_SPECIAL_ARG_CRUMBLED	11
 
-#define NUM_SPECIAL_GFX_ARGS		11
+#define NUM_SPECIAL_GFX_ARGS		12
 
 
 /* values for image configuration suffixes */
@@ -1655,20 +1660,21 @@
 
 /* values for game_status (must match special image configuration suffixes) */
 #define GAME_MODE_DEFAULT		0
-#define GAME_MODE_MAIN			1
-#define GAME_MODE_LEVELS		2
-#define GAME_MODE_SCORES		3
-#define GAME_MODE_EDITOR		4
-#define GAME_MODE_INFO			5
-#define GAME_MODE_SETUP			6
-#define GAME_MODE_PLAYING		7
-#define GAME_MODE_PSEUDO_DOOR		8
-#define GAME_MODE_PSEUDO_PREVIEW	9
-#define GAME_MODE_PSEUDO_CRUMBLED	10
+#define GAME_MODE_TITLE			1
+#define GAME_MODE_MAIN			2
+#define GAME_MODE_LEVELS		3
+#define GAME_MODE_SCORES		4
+#define GAME_MODE_EDITOR		5
+#define GAME_MODE_INFO			6
+#define GAME_MODE_SETUP			7
+#define GAME_MODE_PLAYING		8
+#define GAME_MODE_PSEUDO_DOOR		9
+#define GAME_MODE_PSEUDO_PREVIEW	10
+#define GAME_MODE_PSEUDO_CRUMBLED	11
 
 /* there are no special config file suffixes for these modes */
-#define GAME_MODE_PSEUDO_TYPENAME	11
-#define GAME_MODE_QUIT			12
+#define GAME_MODE_PSEUDO_TYPENAME	12
+#define GAME_MODE_QUIT			13
 
 /* special definitions currently only used for custom artwork configuration */
 #define MUSIC_PREFIX_BACKGROUND		0
@@ -2237,10 +2243,12 @@ struct HelpAnimInfo
 };
 
 
-extern Bitmap		       *bitmap_db_field, *bitmap_db_door;
+extern Bitmap		       *bitmap_db_title;
+extern Bitmap		       *bitmap_db_field;
+extern Bitmap		       *bitmap_db_door;
 extern Pixmap			tile_clipmask[];
-extern DrawBuffer	      *fieldbuffer;
-extern DrawBuffer	      *drawto_field;
+extern DrawBuffer	       *fieldbuffer;
+extern DrawBuffer	       *drawto_field;
 
 extern int			game_status;
 extern boolean			level_editor_test_game;
