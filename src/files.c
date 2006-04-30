@@ -5547,19 +5547,14 @@ void LoadCustomElementDescriptions()
   freeSetupFileHash(setup_file_hash);
 }
 
-void LoadSpecialMenuDesignSettings()
+static void LoadSpecialMenuDesignSettingsFromFilename(char *filename)
 {
-  char *filename = getCustomArtworkConfigFilename(ARTWORK_TYPE_GRAPHICS);
   SetupFileHash *setup_file_hash;
-  int i, j;
+  int i;
 
-  /* always start with reliable default values from default config */
-  for (i = 0; image_config_vars[i].token != NULL; i++)
-    for (j = 0; image_config[j].token != NULL; j++)
-      if (strEqual(image_config_vars[i].token, image_config[j].token))
-	*image_config_vars[i].value =
-	  get_auto_parameter_value(image_config_vars[i].token,
-				   image_config[j].value);
+#if 0
+  printf("LoadSpecialMenuDesignSettings from file '%s' ...\n", filename);
+#endif
 
   if ((setup_file_hash = loadSetupFileHash(filename)) == NULL)
     return;
@@ -5587,6 +5582,87 @@ void LoadSpecialMenuDesignSettings()
     if (value != NULL)
       *image_config_vars[i].value =
 	get_auto_parameter_value(image_config_vars[i].token, value);
+  }
+
+  freeSetupFileHash(setup_file_hash);
+}
+
+void LoadSpecialMenuDesignSettings_NEW()
+{
+  char *filename_base = UNDEFINED_FILENAME, *filename_local;
+  int i, j;
+
+  /* always start with reliable default values from default config */
+  for (i = 0; image_config_vars[i].token != NULL; i++)
+    for (j = 0; image_config[j].token != NULL; j++)
+      if (strEqual(image_config_vars[i].token, image_config[j].token))
+	*image_config_vars[i].value =
+	  get_auto_parameter_value(image_config_vars[i].token,
+				   image_config[j].value);
+
+#if 0
+  if (!SETUP_OVERRIDE_ARTWORK(setup, ARTWORK_TYPE_GRAPHICS))
+  {
+    /* first look for special settings configured in level series config */
+    filename_base = getCustomArtworkLevelConfigFilename(ARTWORK_TYPE_GRAPHICS);
+
+    if (fileExists(filename_base))
+      LoadSpecialMenuDesignSettingsFromFilename(filename_base);
+  }
+
+  filename_local = getCustomArtworkConfigFilename(ARTWORK_TYPE_GRAPHICS);
+
+  if (filename_local != NULL && !strEqual(filename_base, filename_local))
+    LoadSpecialMenuDesignSettingsFromFilename(filename_local);
+
+#else
+
+  filename_local = getCustomArtworkConfigFilename(ARTWORK_TYPE_GRAPHICS);
+
+  LoadSpecialMenuDesignSettingsFromFilename(filename_local);
+#endif
+}
+
+void LoadSpecialMenuDesignSettings()
+{
+  char *filename = getCustomArtworkConfigFilename(ARTWORK_TYPE_GRAPHICS);
+  SetupFileHash *setup_file_hash;
+  int i, j;
+
+  /* always start with reliable default values from default config */
+  for (i = 0; image_config_vars[i].token != NULL; i++)
+    for (j = 0; image_config[j].token != NULL; j++)
+      if (strEqual(image_config_vars[i].token, image_config[j].token))
+        *image_config_vars[i].value =
+          get_auto_parameter_value(image_config_vars[i].token,
+                                   image_config[j].value);
+
+  if ((setup_file_hash = loadSetupFileHash(filename)) == NULL)
+    return;
+
+  /* special case: initialize with default values that may be overwritten */
+  for (i = 0; i < NUM_SPECIAL_GFX_ARGS; i++)
+  {
+    char *value_x = getHashEntry(setup_file_hash, "menu.draw_xoffset");
+    char *value_y = getHashEntry(setup_file_hash, "menu.draw_yoffset");
+    char *list_size = getHashEntry(setup_file_hash, "menu.list_size");
+
+    if (value_x != NULL)
+      menu.draw_xoffset[i] = get_integer_from_string(value_x);
+    if (value_y != NULL)
+      menu.draw_yoffset[i] = get_integer_from_string(value_y);
+    if (list_size != NULL)
+      menu.list_size[i] = get_integer_from_string(list_size);
+  }
+
+  /* read (and overwrite with) values that may be specified in config file */
+  for (i = 0; image_config_vars[i].token != NULL; i++)
+  {
+    char *value = getHashEntry(setup_file_hash, image_config_vars[i].token);
+
+    if (value != NULL)
+      *image_config_vars[i].value =
+        get_auto_parameter_value(image_config_vars[i].token, value);
   }
 
   freeSetupFileHash(setup_file_hash);

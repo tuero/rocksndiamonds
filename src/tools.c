@@ -420,49 +420,59 @@ void FadeToFront()
 
 static void FadeExt(Bitmap *bitmap_cross, int fade_ms, int fade_mode)
 {
+  static boolean initialization_needed = TRUE;
+  static SDL_Surface *surface_screen_copy = NULL;
+  static SDL_Surface *surface_black = NULL;
   SDL_Surface *surface_screen = backbuffer->surface;
-  SDL_Surface *surface_screen_copy = NULL;
-  SDL_Surface *surface_black = NULL;
   SDL_Surface *surface_cross;		/* initialized later */
   boolean fade_reverse;			/* initialized later */
-  unsigned int flags = SDL_SRCALPHA;
   unsigned int time_last, time_current;
   float alpha;
   int alpha_final;
 
-  /* use same surface type as screen surface */
-  if ((surface_screen->flags & SDL_HWSURFACE))
-    flags |= SDL_HWSURFACE;
-  else
-    flags |= SDL_SWSURFACE;
+  if (initialization_needed)
+  {
+    unsigned int flags = SDL_SRCALPHA;
 
-  /* create surface for copy of screen buffer */
-  if ((surface_screen_copy =
-       SDL_CreateRGBSurface(flags,
-			    surface_screen->w,
-			    surface_screen->h,
-			    surface_screen->format->BitsPerPixel,
-			    surface_screen->format->Rmask,
-			    surface_screen->format->Gmask,
-			    surface_screen->format->Bmask,
-			    surface_screen->format->Amask)) == NULL)
-    Error(ERR_EXIT, "SDL_CreateRGBSurface() failed: %s", SDL_GetError());
+    /* use same surface type as screen surface */
+    if ((surface_screen->flags & SDL_HWSURFACE))
+      flags |= SDL_HWSURFACE;
+    else
+      flags |= SDL_SWSURFACE;
 
+    /* create surface for temporary copy of screen buffer */
+    if ((surface_screen_copy =
+	 SDL_CreateRGBSurface(flags,
+			      surface_screen->w,
+			      surface_screen->h,
+			      surface_screen->format->BitsPerPixel,
+			      surface_screen->format->Rmask,
+			      surface_screen->format->Gmask,
+			      surface_screen->format->Bmask,
+			      surface_screen->format->Amask)) == NULL)
+      Error(ERR_EXIT, "SDL_CreateRGBSurface(	) failed: %s", SDL_GetError());
+
+    /* create black surface for fading from/to black */
+    if ((surface_black =
+	 SDL_CreateRGBSurface(flags,
+			      surface_screen->w,
+			      surface_screen->h,
+			      surface_screen->format->BitsPerPixel,
+			      surface_screen->format->Rmask,
+			      surface_screen->format->Gmask,
+			      surface_screen->format->Bmask,
+			      surface_screen->format->Amask)) == NULL)
+      Error(ERR_EXIT, "SDL_CreateRGBSurface(	) failed: %s", SDL_GetError());
+
+    /* completely fill the surface with black color pixels */
+    SDL_FillRect(surface_black, NULL,
+		 SDL_MapRGB(surface_screen->format, 0, 0, 0));
+
+    initialization_needed = FALSE;
+  }
+
+  /* copy the current screen backbuffer to the temporary screen copy buffer */
   SDL_BlitSurface(surface_screen, NULL, surface_screen_copy, NULL);
-
-  /* create black surface for fading from/to black */
-  if ((surface_black =
-       SDL_CreateRGBSurface(flags,
-			    surface_screen->w,
-			    surface_screen->h,
-			    surface_screen->format->BitsPerPixel,
-			    surface_screen->format->Rmask,
-			    surface_screen->format->Gmask,
-			    surface_screen->format->Bmask,
-			    surface_screen->format->Amask)) == NULL)
-    Error(ERR_EXIT, "SDL_CreateRGBSurface() failed: %s", SDL_GetError());
-
-  SDL_FillRect(surface_black, NULL, SDL_MapRGB(surface_screen->format, 0,0,0));
 
   fade_reverse = (fade_mode == FADE_MODE_FADE_IN ? TRUE : FALSE);
   surface_cross = (fade_mode == FADE_MODE_CROSSFADE ? bitmap_cross->surface :
@@ -488,9 +498,6 @@ static void FadeExt(Bitmap *bitmap_cross, int fade_ms, int fade_mode)
     /* draw screen buffer to visible display */
     SDL_Flip(surface_screen);
   }
-
-  SDL_FreeSurface(surface_screen_copy);
-  SDL_FreeSurface(surface_black);
 
   redraw_mask = REDRAW_NONE;
 }

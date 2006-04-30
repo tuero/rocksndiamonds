@@ -2067,6 +2067,10 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
   if (filename == NULL)
     return;
 
+#if 0
+  printf("LoadArtworkConfigFromFilename '%s' ...\n", filename);
+#endif
+
   if ((setup_file_hash = loadSetupFileHash(filename)) == NULL)
     return;
 
@@ -2432,10 +2436,6 @@ void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
   int num_suffix_list_entries = artwork_info->num_suffix_list_entries;
   char *filename_base = UNDEFINED_FILENAME, *filename_local;
   int i, j;
-
-#if 0
-  printf("GOT CUSTOM ARTWORK CONFIG FILE '%s'\n", filename);
-#endif
 
   DrawInitText("Loading artwork config:", 120, FC_GREEN);
   DrawInitText(ARTWORKINFO_FILENAME(artwork_info->type), 150, FC_YELLOW);

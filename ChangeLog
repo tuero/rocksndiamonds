@@ -1,3 +1,11 @@
+2006-04-30
+	* fixed bug that forced re-defining menu settings in each config file
+
+2006-04-29
+	* added the possibility to define up to five title screens for each
+	  level set that are displayed after loading using (cross)fading in/out
+	  (this was added to display the various start images of the EMC sets)
+
 2006-04-28
 	* added "CE score gets zero [of]" to custom element trigger conditions
 	* added setup option to display element token name in level editor
