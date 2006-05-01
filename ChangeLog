@@ -1,6 +1,7 @@
 2006-04-30
 	* fixed bug that forced re-defining of menu settings in local graphics
 	  config file which are already defined in existing base config file
+	* fixed small bug that caused door sounds playing when music is enabled
 
 2006-04-29
 	* added the possibility to define up to five title screens for each

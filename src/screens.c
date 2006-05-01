@@ -265,12 +265,14 @@ void DrawTitleScreenImage(int nr)
 
   if (width > WIN_XSIZE)
   {
+    /* image width too large for window => center image horizontally */
     src_x = (width - WIN_XSIZE) / 2;
     width = WIN_XSIZE;
   }
 
   if (height > WIN_YSIZE)
   {
+    /* image height too large for window => center image vertically */
     src_y = (height - WIN_YSIZE) / 2;
     height = WIN_YSIZE;
   }
@@ -565,8 +567,8 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
   boolean return_to_main_menu = FALSE;
   boolean use_fading_main_menu = TRUE;
   boolean use_cross_fading = TRUE;
-  int fade_delay = 1000;
-  int post_delay = 500;
+  int fade_delay = 500;
+  int post_delay = fade_delay / 2;
 
   if (button == MB_MENU_INITIALIZE)
   {
@@ -609,6 +611,8 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
     }
     else
     {
+      FadeSoundsAndMusic();
+
       FadeOut(fade_delay, post_delay);
 
       return_to_main_menu = TRUE;
