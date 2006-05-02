@@ -275,10 +275,43 @@ void SDLFadeScreen(Bitmap *bitmap_cross, int fade_mode, int fade_delay,
   static SDL_Surface *surface_black = NULL;
   SDL_Surface *surface_screen = backbuffer->surface;
   SDL_Surface *surface_cross;		/* initialized later */
-  boolean fade_reverse;			/* initialized later */
+  SDL_Rect src_rect, dst_rect;
+  int src_x = 0, src_y = 0;
+  int dst_x = 0, dst_y = 0;
+  boolean fade_reverse = (fade_mode == FADE_MODE_FADE_IN ? TRUE : FALSE);
   unsigned int time_last, time_current;
   float alpha;
   int alpha_final;
+
+  src_rect.x = src_x;
+  src_rect.y = src_y;
+  src_rect.w = video.width;
+  src_rect.h = video.height;
+
+#ifdef FULLSCREEN_BUG
+  dst_x += video_xoffset;
+  dst_y += video_yoffset;
+#endif
+
+  dst_rect.x = dst_x;
+  dst_rect.y = dst_y;
+  dst_rect.w = video.width;
+  dst_rect.h = video.height;
+
+#if 0
+  if (!initialization_needed)
+  {
+    /* check if screen size has changed (can happen when toggling fullscreen) */
+    if (surface_screen_copy->w != surface_screen->w ||
+	surface_screen_copy->h != surface_screen->h)
+    {
+      SDL_FreeSurface(surface_screen_copy);
+      SDL_FreeSurface(surface_black);
+
+      initialization_needed = TRUE;
+    }
+  }
+#endif
 
   if (initialization_needed)
   {
@@ -293,8 +326,13 @@ void SDLFadeScreen(Bitmap *bitmap_cross, int fade_mode, int fade_delay,
     /* create surface for temporary copy of screen buffer */
     if ((surface_screen_copy =
 	 SDL_CreateRGBSurface(flags,
+#if 1
+			      video.width,
+			      video.height,
+#else
 			      surface_screen->w,
 			      surface_screen->h,
+#endif
 			      surface_screen->format->BitsPerPixel,
 			      surface_screen->format->Rmask,
 			      surface_screen->format->Gmask,
@@ -305,8 +343,13 @@ void SDLFadeScreen(Bitmap *bitmap_cross, int fade_mode, int fade_delay,
     /* create black surface for fading from/to black */
     if ((surface_black =
 	 SDL_CreateRGBSurface(flags,
+#if 1
+			      video.width,
+			      video.height,
+#else
 			      surface_screen->w,
 			      surface_screen->h,
+#endif
 			      surface_screen->format->BitsPerPixel,
 			      surface_screen->format->Rmask,
 			      surface_screen->format->Gmask,
@@ -322,9 +365,8 @@ void SDLFadeScreen(Bitmap *bitmap_cross, int fade_mode, int fade_delay,
   }
 
   /* copy the current screen backbuffer to the temporary screen copy buffer */
-  SDL_BlitSurface(surface_screen, NULL, surface_screen_copy, NULL);
+  SDL_BlitSurface(surface_screen, &dst_rect, surface_screen_copy, &src_rect);
 
-  fade_reverse = (fade_mode == FADE_MODE_FADE_IN ? TRUE : FALSE);
   surface_cross = (fade_mode == FADE_MODE_CROSSFADE ? bitmap_cross->surface :
 		   surface_black);
 
@@ -339,11 +381,11 @@ void SDLFadeScreen(Bitmap *bitmap_cross, int fade_mode, int fade_delay,
     alpha_final = MIN(MAX(0, alpha_final), 255);
 
     /* draw existing image to screen buffer */
-    SDL_BlitSurface(surface_screen_copy, NULL, surface_screen, NULL);
+    SDL_BlitSurface(surface_screen_copy, &src_rect, surface_screen, &dst_rect);
 
     /* draw new image to screen buffer using alpha blending */
     SDL_SetAlpha(surface_cross, SDL_SRCALPHA, alpha_final);
-    SDL_BlitSurface(surface_cross, NULL, surface_screen, NULL);
+    SDL_BlitSurface(surface_cross, &src_rect, surface_screen, &dst_rect);
 
     /* draw screen buffer to visible display */
     SDL_Flip(surface_screen);
