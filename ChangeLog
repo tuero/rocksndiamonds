@@ -1,5 +1,9 @@
 2006-05-06
 	* added some missing element descriptions to the level editor
+	* added down position of switchgate switch to the level editor
+	  and allowed the use of both switch positions at the same time
+	* changed use of "Insert" and "Delete" keys to navigate element list in
+	  level editor to start of previous or next cascading block of elements
 
 2006-05-05
 	* added the possibility to view the title screen to the info screen menu

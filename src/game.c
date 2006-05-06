@@ -42,6 +42,7 @@
 #define USE_ELEMENT_TOUCHING_BUGFIX	(USE_NEW_STUFF		* 1)
 #define USE_NEW_CONTINUOUS_SNAPPING	(USE_NEW_STUFF		* 1)
 #define USE_GFX_RESET_GFX_ANIMATION	(USE_NEW_STUFF		* 1)
+#define USE_BOTH_SWITCHGATE_SWITCHES	(USE_NEW_STUFF		* 1)
 
 #define USE_QUICKSAND_IMPACT_BUGFIX	(USE_NEW_STUFF		* 0)
 
@@ -1119,10 +1120,12 @@ static void InitField(int x, int y, boolean init_game)
       }
       break;
 
+#if !USE_BOTH_SWITCHGATE_SWITCHES
     case EL_SWITCHGATE_SWITCH_DOWN:	/* always start with same switch pos */
       if (init_game)
 	Feld[x][y] = EL_SWITCHGATE_SWITCH_UP;
       break;
+#endif
 
     case EL_LIGHT_SWITCH_ACTIVE:
       if (init_game)
@@ -4419,12 +4422,25 @@ static void ToggleSwitchgateSwitch(int x, int y)
   {
     int element = Feld[xx][yy];
 
+#if !USE_BOTH_SWITCHGATE_SWITCHES
     if (element == EL_SWITCHGATE_SWITCH_UP ||
 	element == EL_SWITCHGATE_SWITCH_DOWN)
     {
       Feld[xx][yy] = EL_SWITCHGATE_SWITCH_UP + game.switchgate_pos;
       DrawLevelField(xx, yy);
     }
+#else
+    if (element == EL_SWITCHGATE_SWITCH_UP)
+    {
+      Feld[xx][yy] = EL_SWITCHGATE_SWITCH_DOWN;
+      DrawLevelField(xx, yy);
+    }
+    else if (element == EL_SWITCHGATE_SWITCH_DOWN)
+    {
+      Feld[xx][yy] = EL_SWITCHGATE_SWITCH_UP;
+      DrawLevelField(xx, yy);
+    }
+#endif
     else if (element == EL_SWITCHGATE_OPEN ||
 	     element == EL_SWITCHGATE_OPENING)
     {

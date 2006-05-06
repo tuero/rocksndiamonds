@@ -1413,49 +1413,213 @@ void HandleInfoScreen_Music(int button)
     PlaySoundLoop(list->music);
 }
 
-void DrawInfoScreen_Credits()
+static boolean DrawInfoScreen_CreditsScreen(int screen_nr)
 {
   int ystart = 150, ystep = 30;
   int ybottom = SYSIZE - 20;
-
-  SetMainBackgroundImageIfDefined(IMG_BACKGROUND_INFO_CREDITS);
-
-  FadeSoundsAndMusic();
 
   ClearWindow();
   DrawHeadline();
 
   DrawTextSCentered(100, FONT_TEXT_1, "Credits:");
-  DrawTextSCentered(ystart + 0 * ystep, FONT_TEXT_2, "DOS port of the game:");
-  DrawTextSCentered(ystart + 1 * ystep, FONT_TEXT_3, "Guido Schulz");
-  DrawTextSCentered(ystart + 2 * ystep, FONT_TEXT_2, "Additional toons:");
-  DrawTextSCentered(ystart + 3 * ystep, FONT_TEXT_3, "Karl Hörnell");
-  DrawTextSCentered(ystart + 5 * ystep, FONT_TEXT_2,
-		    "...and many thanks to all contributors");
-  DrawTextSCentered(ystart + 6 * ystep, FONT_TEXT_2, "of new levels!");
+
+  if (screen_nr == 0)
+  {
+    DrawTextSCentered(ystart + 0 * ystep, FONT_TEXT_2,
+		      "Special thanks to");
+    DrawTextSCentered(ystart + 1 * ystep, FONT_TEXT_3,
+		      "Peter Liepa");
+    DrawTextSCentered(ystart + 2 * ystep, FONT_TEXT_2,
+		      "for creating");
+    DrawTextSCentered(ystart + 3 * ystep, FONT_TEXT_3,
+		      "\"Boulder Dash\"");
+    DrawTextSCentered(ystart + 4 * ystep, FONT_TEXT_2,
+		      "in the year");
+    DrawTextSCentered(ystart + 5 * ystep, FONT_TEXT_3,
+		      "1984");
+    DrawTextSCentered(ystart + 6 * ystep, FONT_TEXT_2,
+		      "published by");
+    DrawTextSCentered(ystart + 7 * ystep, FONT_TEXT_3,
+		      "First Star Software");
+  }
+  else if (screen_nr == 1)
+  {
+    DrawTextSCentered(ystart + 0 * ystep, FONT_TEXT_2,
+		      "Special thanks to");
+    DrawTextSCentered(ystart + 1 * ystep, FONT_TEXT_3,
+		      "Klaus Heinz & Volker Wertich");
+    DrawTextSCentered(ystart + 2 * ystep, FONT_TEXT_2,
+		      "for creating");
+    DrawTextSCentered(ystart + 3 * ystep, FONT_TEXT_3,
+		      "\"Emerald Mine\"");
+    DrawTextSCentered(ystart + 4 * ystep, FONT_TEXT_2,
+		      "in the year");
+    DrawTextSCentered(ystart + 5 * ystep, FONT_TEXT_3,
+		      "1987");
+    DrawTextSCentered(ystart + 6 * ystep, FONT_TEXT_2,
+		      "published by");
+    DrawTextSCentered(ystart + 7 * ystep, FONT_TEXT_3,
+		      "Kingsoft");
+  }
+  else if (screen_nr == 2)
+  {
+    DrawTextSCentered(ystart + 0 * ystep, FONT_TEXT_2,
+		      "Special thanks to");
+    DrawTextSCentered(ystart + 1 * ystep, FONT_TEXT_3,
+		      "Michael Stopp & Philip Jespersen");
+    DrawTextSCentered(ystart + 2 * ystep, FONT_TEXT_2,
+		      "for creating");
+    DrawTextSCentered(ystart + 3 * ystep, FONT_TEXT_3,
+		      "\"Supaplex\"");
+    DrawTextSCentered(ystart + 4 * ystep, FONT_TEXT_2,
+		      "in the year");
+    DrawTextSCentered(ystart + 5 * ystep, FONT_TEXT_3,
+		      "1991");
+    DrawTextSCentered(ystart + 6 * ystep, FONT_TEXT_2,
+		      "published by");
+    DrawTextSCentered(ystart + 7 * ystep, FONT_TEXT_3,
+		      "Digital Integration");
+  }
+  else if (screen_nr == 3)
+  {
+    DrawTextSCentered(ystart + 0 * ystep, FONT_TEXT_2,
+		      "Special thanks to");
+    DrawTextSCentered(ystart + 1 * ystep, FONT_TEXT_3,
+		      "Hiroyuki Imabayashi");
+    DrawTextSCentered(ystart + 2 * ystep, FONT_TEXT_2,
+		      "for creating");
+    DrawTextSCentered(ystart + 3 * ystep, FONT_TEXT_3,
+		      "\"Sokoban\"");
+    DrawTextSCentered(ystart + 4 * ystep, FONT_TEXT_2,
+		      "in the year");
+    DrawTextSCentered(ystart + 5 * ystep, FONT_TEXT_3,
+		      "1982");
+    DrawTextSCentered(ystart + 6 * ystep, FONT_TEXT_2,
+		      "published by");
+    DrawTextSCentered(ystart + 7 * ystep, FONT_TEXT_3,
+		      "Thinking Rabbit");
+  }
+  else if (screen_nr == 4)
+  {
+    DrawTextSCentered(ystart + 0 * ystep, FONT_TEXT_2,
+		      "Special thanks to");
+    DrawTextSCentered(ystart + 1 * ystep, FONT_TEXT_3,
+		      "Alan Bond");
+    DrawTextSCentered(ystart + 2 * ystep, FONT_TEXT_2,
+		      "and");
+    DrawTextSCentered(ystart + 3 * ystep, FONT_TEXT_3,
+		      "Jürgen Bonhagen");
+    DrawTextSCentered(ystart + 4 * ystep, FONT_TEXT_2,
+		      "for the continuous creation");
+    DrawTextSCentered(ystart + 5 * ystep, FONT_TEXT_2,
+		      "of outstanding level sets");
+  }
+  else if (screen_nr == 5)
+  {
+    DrawTextSCentered(ystart + 0 * ystep, FONT_TEXT_2,
+		      "Thanks to");
+    DrawTextSCentered(ystart + 1 * ystep, FONT_TEXT_3,
+		      "Peter Elzner");
+    DrawTextSCentered(ystart + 2 * ystep, FONT_TEXT_2,
+		      "for ideas and inspiration by");
+    DrawTextSCentered(ystart + 3 * ystep, FONT_TEXT_3,
+		      "Diamond Caves");
+
+    DrawTextSCentered(ystart + 5 * ystep, FONT_TEXT_2,
+		      "Thanks to");
+    DrawTextSCentered(ystart + 6 * ystep, FONT_TEXT_3,
+		      "Steffest");
+    DrawTextSCentered(ystart + 7 * ystep, FONT_TEXT_2,
+		      "for ideas and inspiration by");
+    DrawTextSCentered(ystart + 8 * ystep, FONT_TEXT_3,
+		      "DX-Boulderdash");
+  }
+  else if (screen_nr == 6)
+  {
+    DrawTextSCentered(ystart + 0 * ystep, FONT_TEXT_2,
+		      "Thanks to");
+    DrawTextSCentered(ystart + 1 * ystep, FONT_TEXT_3,
+		      "David Tritscher");
+    DrawTextSCentered(ystart + 2 * ystep, FONT_TEXT_2,
+		      "for the new Emerald Mine engine");
+  }
+  else if (screen_nr == 7)
+  {
+    DrawTextSCentered(ystart + 0 * ystep, FONT_TEXT_2,
+		      "Thanks to");
+    DrawTextSCentered(ystart + 1 * ystep, FONT_TEXT_3,
+		      "Guido Schulz");
+    DrawTextSCentered(ystart + 2 * ystep, FONT_TEXT_2,
+		      "for the initial DOS port");
+
+    DrawTextSCentered(ystart + 4 * ystep, FONT_TEXT_2,
+		      "Thanks to");
+    DrawTextSCentered(ystart + 5 * ystep, FONT_TEXT_3,
+		      "Karl Hörnell");
+    DrawTextSCentered(ystart + 6 * ystep, FONT_TEXT_2,
+		      "for some additional toons");
+  }
+  else if (screen_nr == 8)
+  {
+    DrawTextSCentered(ystart + 0 * ystep, FONT_TEXT_2,
+		      "And not to forget:");
+    DrawTextSCentered(ystart + 1 * ystep, FONT_TEXT_2,
+		      "Many thanks to");
+    DrawTextSCentered(ystart + 2 * ystep, FONT_TEXT_3,
+		      "All those who contributed");
+    DrawTextSCentered(ystart + 3 * ystep, FONT_TEXT_3,
+		      "levels to this game");
+    DrawTextSCentered(ystart + 4 * ystep, FONT_TEXT_3,
+		      "since 1995");
+  }
+  else
+  {
+    return FALSE;
+  }
 
   DrawTextSCentered(ybottom, FONT_TEXT_4,
-		    "Press any key or button for info menu");
+		    "Press any key or button for next page");
+
+  return TRUE;
+}
+
+void DrawInfoScreen_Credits()
+{
+  SetMainBackgroundImageIfDefined(IMG_BACKGROUND_INFO_CREDITS);
+
+  FadeSoundsAndMusic();
+
+  HandleInfoScreen_Credits(MB_MENU_INITIALIZE);
 }
 
 void HandleInfoScreen_Credits(int button)
 {
-  int button_released = !button;
+  static int screen_nr = 0;
 
-  if (button == MB_MENU_LEAVE)
+  if (button == MB_MENU_INITIALIZE)
+  {
+    screen_nr = 0;
+
+    DrawInfoScreen_CreditsScreen(screen_nr);
+  }
+  else if (button == MB_MENU_LEAVE)
   {
     info_mode = INFO_MODE_MAIN;
     DrawInfoScreen();
 
     return;
   }
-
-  if (button_released)
+  else if (button == MB_MENU_CHOICE)
   {
-    FadeSoundsAndMusic();
+    screen_nr++;
 
-    info_mode = INFO_MODE_MAIN;
-    DrawInfoScreen();
+    if (!DrawInfoScreen_CreditsScreen(screen_nr))
+    {
+      FadeSoundsAndMusic();
+
+      info_mode = INFO_MODE_MAIN;
+      DrawInfoScreen();
+    }
   }
   else
   {

@@ -3671,7 +3671,7 @@ static int editor_el_diamond_caves[] =
   EL_SWITCHGATE_OPEN,
   EL_SWITCHGATE_CLOSED,
   EL_SWITCHGATE_SWITCH_UP,
-  EL_EMPTY,
+  EL_SWITCHGATE_SWITCH_DOWN,
 
   EL_ENVELOPE_1,
   EL_ENVELOPE_2,
@@ -9933,7 +9933,9 @@ void HandleLevelEditorKeyInput(Key key)
   }
   else if (button_status == MB_RELEASED)
   {
-    int i, id = GADGET_ID_NONE;
+    int id = GADGET_ID_NONE;
+    int new_element_shift = element_shift;
+    int i;
 
     switch (key)
     {
@@ -9973,6 +9975,32 @@ void HandleLevelEditorKeyInput(Key key)
 
       case KSYM_Insert:
       case KSYM_Delete:
+#if 1
+	/* IS_EDITOR_CASCADE */
+	for (i = 0; i < num_editor_elements; i++)
+	{
+	  if ((key == KSYM_Insert && i == element_shift) ||
+	      (key == KSYM_Delete && new_element_shift > element_shift))
+	    break;
+
+	  if (IS_EDITOR_CASCADE(editor_elements[i]))
+	    new_element_shift = i;
+	}
+
+	if (i < num_editor_elements)
+	  element_shift = new_element_shift;
+
+	if (element_shift > num_editor_elements - ED_NUM_ELEMENTLIST_BUTTONS)
+	  element_shift = num_editor_elements - ED_NUM_ELEMENTLIST_BUTTONS;
+
+	ModifyGadget(level_editor_gadget[GADGET_ID_SCROLL_LIST_VERTICAL],
+		     GDI_SCROLLBAR_ITEM_POSITION,
+		     element_shift / ED_ELEMENTLIST_BUTTONS_HORIZ, GDI_END);
+
+	ModifyEditorElementList();
+
+#else
+
 	for (i = 0; i < num_editor_elements; i++)
 	{
 	  int e = editor_elements[i];
@@ -9999,6 +10027,7 @@ void HandleLevelEditorKeyInput(Key key)
 
 	  ModifyEditorElementList();
 	}
+#endif
 
 	break;
 
