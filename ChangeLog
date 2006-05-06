@@ -1,3 +1,10 @@
+2006-05-06
+	* added some missing element descriptions to the level editor
+
+2006-05-05
+	* added the possibility to view the title screen to the info screen menu
+	* fixed some minor bugs with viewing title screens
+
 2006-05-02
 	* fixed bug with title (cross)fading in/out when using fullscreen mode
 

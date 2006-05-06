@@ -2615,8 +2615,8 @@ unsigned int MoveDoor(unsigned int door_state)
 #if 1
     int end = door_size;
 #else
-    int end = (door_state & DOOR_ACTION_1 &&
-	       door_1.anim_mode & ANIM_VERTICAL ? DYSIZE : DXSIZE);
+    int end = (door_state & DOOR_ACTION_1 && door_1.anim_mode & ANIM_VERTICAL ?
+	       DYSIZE : DXSIZE);
 #endif
 #if 1
     int start = ((door_state & DOOR_NO_DELAY) ? end : 0);
@@ -2734,9 +2734,15 @@ unsigned int MoveDoor(unsigned int door_state)
 
       if (door_state & DOOR_ACTION_2)
       {
+#if 1
+	int a = MIN(x * door_2.step_offset, door_size);
+	int p = (door_state & DOOR_OPEN_2 ? door_size - a : a);
+	int i = p + door_skip;
+#else
 	int a = MIN(x * door_2.step_offset, door_size_2);
 	int p = (door_state & DOOR_OPEN_2 ? door_size_2 - a : a);
 	int i = p + door_skip;
+#endif
 
 	if (door_2.anim_mode & ANIM_STATIC_PANEL)
 	{

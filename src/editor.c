@@ -4536,6 +4536,32 @@ static char *getElementInfoText(int element)
   return info_text;
 }
 
+char *getElementDescriptionFilename(int element)
+{
+  char *docs_dir = options.docs_directory;
+  char *elements_subdir = "elements";
+  static char *filename = NULL;
+  char basename[MAX_FILENAME_LEN];
+
+  checked_free(filename);
+
+  /* 1st try: look for element description file for exactly this element */
+  sprintf(basename, "%s.txt", element_info[element].token_name);
+  filename = getPath3(docs_dir, elements_subdir, basename);
+  if (fileExists(filename))
+    return filename;
+
+  free(filename);
+
+  /* 2nd try: look for element description file for this element's class */
+  sprintf(basename, "%s.txt", element_info[element].class_name);
+  filename = getPath3(docs_dir, elements_subdir, basename);
+  if (fileExists(filename))
+    return filename;
+
+  return NULL;
+}
+
 static void InitDynamicEditorElementList(int **elements, int *num_elements)
 {
   boolean element_found[NUM_FILE_ELEMENTS];
@@ -6891,10 +6917,23 @@ static void CopyElementPropertiesToGame(int element)
     CopyClassicElementPropertiesToGame(element);
 }
 
+void CheckElementDescriptions()
+{
+  int i;
+
+  for (i = 0; i < NUM_FILE_ELEMENTS; i++)
+    if (getElementDescriptionFilename(i) == NULL && !IS_OBSOLETE(i))
+      Error(ERR_WARN, "no element description for element '%s'", EL_NAME(i));
+}
+
 void DrawLevelEd()
 {
   CloseDoor(DOOR_CLOSE_ALL);
   OpenDoor(DOOR_OPEN_2 | DOOR_NO_DELAY);
+
+#if DEBUG
+  CheckElementDescriptions();
+#endif
 
   if (level_editor_test_game)
   {
@@ -7418,32 +7457,6 @@ static void DrawEnvelopeTextArea(int envelope_nr)
 	       GDI_END);
 
   MapTextAreaGadget(ED_TEXTAREA_ID_ENVELOPE_INFO);
-}
-
-char *getElementDescriptionFilename(int element)
-{
-  char *docs_dir = options.docs_directory;
-  char *elements_subdir = "elements";
-  static char *filename = NULL;
-  char basename[MAX_FILENAME_LEN];
-
-  checked_free(filename);
-
-  /* 1st try: look for element description file for exactly this element */
-  sprintf(basename, "%s.txt", element_info[element].token_name);
-  filename = getPath3(docs_dir, elements_subdir, basename);
-  if (fileExists(filename))
-    return filename;
-
-  free(filename);
-
-  /* 2nd try: look for element description file for this element's class */
-  sprintf(basename, "%s.txt", element_info[element].class_name);
-  filename = getPath3(docs_dir, elements_subdir, basename);
-  if (fileExists(filename))
-    return filename;
-
-  return NULL;
 }
 
 static boolean PrintInfoText(char *text, int font_nr, int start_line)

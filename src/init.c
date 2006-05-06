@@ -3559,6 +3559,19 @@ void InitElementPropertiesStatic()
     -1
   };
 
+  static int ep_obsolete[] =
+  {
+    EL_PLAYER_OBSOLETE,
+    EL_KEY_OBSOLETE,
+    EL_EM_KEY_1_FILE_OBSOLETE,
+    EL_EM_KEY_2_FILE_OBSOLETE,
+    EL_EM_KEY_3_FILE_OBSOLETE,
+    EL_EM_KEY_4_FILE_OBSOLETE,
+    EL_ENVELOPE_OBSOLETE,
+
+    -1
+  };
+
   static struct
   {
     int *elements;
@@ -3628,6 +3641,8 @@ void InitElementPropertiesStatic()
 
     { ep_editor_cascade_active,		EP_EDITOR_CASCADE_ACTIVE	},
     { ep_editor_cascade_inactive, 	EP_EDITOR_CASCADE_INACTIVE	},
+
+    { ep_obsolete,		 	EP_OBSOLETE			},
 
     { NULL,				-1				}
   };

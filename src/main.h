@@ -163,7 +163,10 @@
 #define EP_HAS_ACTION			87
 #define EP_CAN_CHANGE_OR_HAS_ACTION	88
 
-#define NUM_ELEMENT_PROPERTIES		89
+/* values for internal purpose only (other) */
+#define EP_OBSOLETE			89
+
+#define NUM_ELEMENT_PROPERTIES		90
 
 #define NUM_EP_BITFIELDS		((NUM_ELEMENT_PROPERTIES + 31) / 32)
 #define EP_BITFIELD_BASE		0
@@ -592,6 +595,8 @@
 #define HAS_ACTION(e)		HAS_PROPERTY(e, EP_HAS_ACTION)
 #define CAN_CHANGE_OR_HAS_ACTION(e)	\
 				HAS_PROPERTY(e, EP_CAN_CHANGE_OR_HAS_ACTION)
+
+#define IS_OBSOLETE(e)		HAS_PROPERTY(e, EP_OBSOLETE)
 
 /* special macros used in game engine */
 #define IS_CUSTOM_ELEMENT(e)	((e) >= EL_CUSTOM_START &&		\

@@ -48,13 +48,14 @@
 
 /* screens on the info screen */
 #define INFO_MODE_MAIN			0
-#define INFO_MODE_ELEMENTS		1
-#define INFO_MODE_MUSIC			2
-#define INFO_MODE_CREDITS		3
-#define INFO_MODE_PROGRAM		4
-#define INFO_MODE_LEVELSET		5
+#define INFO_MODE_TITLESCREEN		1
+#define INFO_MODE_ELEMENTS		2
+#define INFO_MODE_MUSIC			3
+#define INFO_MODE_CREDITS		4
+#define INFO_MODE_PROGRAM		5
+#define INFO_MODE_LEVELSET		6
 
-#define MAX_INFO_MODES			6
+#define MAX_INFO_MODES			7
 
 /* for various menu stuff  */
 #define MENU_SCREEN_START_XPOS		1
@@ -115,9 +116,11 @@ static void DrawChooseLevel(void);
 static void DrawInfoScreen(void);
 static void DrawSetupScreen(void);
 
+static void DrawInfoScreenExt(int);
 static void DrawInfoScreen_HelpAnim(int, int, boolean);
 static void DrawInfoScreen_HelpText(int, int, int, int);
 static void HandleInfoScreen_Main(int, int, int, int, int);
+static void HandleInfoScreen_TitleScreen(int);
 static void HandleInfoScreen_Elements(int);
 static void HandleInfoScreen_Music(int);
 static void HandleInfoScreen_Credits(int);
@@ -491,6 +494,8 @@ static void DrawMainMenuExt(int fade_delay)
 
 #if 0
   FadeToFront();
+#endif
+#if 0
   InitAnimation();
 #endif
 
@@ -504,6 +509,7 @@ static void DrawMainMenuExt(int fade_delay)
   PlayMenuSound();
   PlayMenuMusic();
 
+#if 0
 #if 1
   OpenDoor(DOOR_CLOSE_1 | DOOR_OPEN_2);
 #else
@@ -512,6 +518,11 @@ static void DrawMainMenuExt(int fade_delay)
   else
     OpenDoor(DOOR_CLOSE_1 | DOOR_OPEN_2);
 #endif
+#endif
+
+#if 0
+  InitAnimation();
+#endif
 
 #if 1
   /* map gadgets for main menu screen */
@@ -519,15 +530,25 @@ static void DrawMainMenuExt(int fade_delay)
 #endif
 
 #if 1
+#if 1
   FadeIn(fade_delay);
+#else
+  BackToFront();
+#endif
+#endif
 
+#if 1
   InitAnimation();
+#endif
+
+#if 1
+  OpenDoor(DOOR_CLOSE_1 | DOOR_OPEN_2);
 #endif
 }
 
 void DrawMainMenu()
 {
-  DrawMainMenuExt(FALSE);
+  DrawMainMenuExt(0);
 }
 
 #if 0
@@ -573,6 +594,13 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
   if (button == MB_MENU_INITIALIZE)
   {
     title_nr = 0;
+
+    if (game_status == GAME_MODE_INFO)
+    {
+      FadeSoundsAndMusic();
+
+      FadeOut(fade_delay, post_delay);
+    }
 
     DrawTitleScreenImage(title_nr);
 
@@ -621,14 +649,24 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
 
   if (return_to_main_menu)
   {
+    int menu_fade_delay = (use_fading_main_menu ? fade_delay : 0);
+
     RedrawBackground();
 
-#if 1
-    OpenDoor(DOOR_CLOSE_1 | DOOR_OPEN_2 | DOOR_NO_DELAY | DOOR_FORCE_REDRAW);
-#endif
+    if (game_status == GAME_MODE_INFO)
+    {
+      OpenDoor(DOOR_CLOSE_1 | DOOR_CLOSE_2 | DOOR_NO_DELAY | DOOR_FORCE_REDRAW);
 
-    game_status = GAME_MODE_MAIN;
-    DrawMainMenuExt(use_fading_main_menu ? fade_delay : 0);
+      info_mode = INFO_MODE_MAIN;
+      DrawInfoScreenExt(menu_fade_delay);
+    }
+    else	/* default: return to main menu */
+    {
+      OpenDoor(DOOR_CLOSE_1 | DOOR_OPEN_2 | DOOR_NO_DELAY | DOOR_FORCE_REDRAW);
+
+      game_status = GAME_MODE_MAIN;
+      DrawMainMenuExt(menu_fade_delay);
+    }
   }
 }
 
@@ -800,6 +838,12 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 static struct TokenInfo *info_info;
 static int num_info_info;
 
+static void execInfoTitleScreen()
+{
+  info_mode = INFO_MODE_TITLESCREEN;
+  DrawInfoScreen();
+}
+
 static void execInfoElements()
 {
   info_mode = INFO_MODE_ELEMENTS;
@@ -838,6 +882,7 @@ static void execExitInfo()
 
 static struct TokenInfo info_info_main[] =
 {
+  { TYPE_ENTER_SCREEN,	execInfoTitleScreen,	"Title Screen"		},
   { TYPE_ENTER_SCREEN,	execInfoElements,	"Elements Info"		},
   { TYPE_ENTER_SCREEN,	execInfoMusic,		"Music Info"		},
   { TYPE_ENTER_SCREEN,	execInfoCredits,	"Credits"		},
@@ -849,7 +894,7 @@ static struct TokenInfo info_info_main[] =
   { 0,			NULL,			NULL			}
 };
 
-static void DrawInfoScreen_Main()
+static void DrawInfoScreen_Main(int fade_delay)
 {
   int i;
 
@@ -885,6 +930,18 @@ static void DrawInfoScreen_Main()
     num_info_info++;
   }
 
+#if 1
+
+  HandleInfoScreen_Main(0, 0, 0, 0, MB_MENU_INITIALIZE);
+
+  PlayMenuSound();
+  PlayMenuMusic();
+
+  FadeIn(fade_delay);
+  InitAnimation();
+
+#else
+
   FadeToFront();
   InitAnimation();
 
@@ -892,6 +949,7 @@ static void DrawInfoScreen_Main()
   PlayMenuMusic();
 
   HandleInfoScreen_Main(0, 0, 0, 0, MB_MENU_INITIALIZE);
+#endif
 }
 
 void HandleInfoScreen_Main(int mx, int my, int dx, int dy, int button)
@@ -1135,6 +1193,16 @@ void DrawInfoScreen_HelpText(int element, int action, int direction, int ypos)
 
   DrawTextWrapped(sx, sy + ypos * ystep, text, font_nr,
 		  max_chars_per_line, max_lines_per_text);
+}
+
+void DrawInfoScreen_TitleScreen()
+{
+  DrawTitleScreen();
+}
+
+void HandleInfoScreen_TitleScreen(int button)
+{
+  HandleTitleScreen(0, 0, 0, 0, button);
 }
 
 void DrawInfoScreen_Elements()
@@ -1518,11 +1586,13 @@ void HandleInfoScreen_LevelSet(int button)
   }
 }
 
-void DrawInfoScreen()
+static void DrawInfoScreenExt(int fade_delay)
 {
   SetMainBackgroundImage(IMG_BACKGROUND_INFO);
 
-  if (info_mode == INFO_MODE_ELEMENTS)
+  if (info_mode == INFO_MODE_TITLESCREEN)
+    DrawInfoScreen_TitleScreen();
+  else if (info_mode == INFO_MODE_ELEMENTS)
     DrawInfoScreen_Elements();
   else if (info_mode == INFO_MODE_MUSIC)
     DrawInfoScreen_Music();
@@ -1533,7 +1603,7 @@ void DrawInfoScreen()
   else if (info_mode == INFO_MODE_LEVELSET)
     DrawInfoScreen_LevelSet();
   else
-    DrawInfoScreen_Main();
+    DrawInfoScreen_Main(fade_delay);
 
   if (info_mode != INFO_MODE_MUSIC)
   {
@@ -1542,9 +1612,16 @@ void DrawInfoScreen()
   }
 }
 
+void DrawInfoScreen()
+{
+  DrawInfoScreenExt(0);
+}
+
 void HandleInfoScreen(int mx, int my, int dx, int dy, int button)
 {
-  if (info_mode == INFO_MODE_ELEMENTS)
+  if (info_mode == INFO_MODE_TITLESCREEN)
+    HandleInfoScreen_TitleScreen(button);
+  else if (info_mode == INFO_MODE_ELEMENTS)
     HandleInfoScreen_Elements(button);
   else if (info_mode == INFO_MODE_MUSIC)
     HandleInfoScreen_Music(button);
