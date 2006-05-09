@@ -1691,7 +1691,7 @@ static struct ValueTextInfo options_action_type[] =
 
 static struct ValueTextInfo options_action_mode_none[] =
 {
-  { CA_ARG_UNDEFINED,		" "				},
+  { CA_MODE_UNDEFINED,		" "				},
 
   { -1,				NULL				}
 };
@@ -6366,12 +6366,22 @@ static void setSelectboxSpecialActionVariablesIfNeeded()
       /* only change if corresponding selectbox has changed */
       if (selectbox_info[ED_SELECTBOX_ID_ACTION_MODE].options !=
 	  action_arg_modes[mode])
+#if 0
+	custom_element_change.action_mode =
+	  (action_arg_modes[mode])[0].value;
+#else
 	custom_element_change.action_mode = -1;
+#endif
 
       /* only change if corresponding selectbox has changed */
       if (selectbox_info[ED_SELECTBOX_ID_ACTION_ARG].options !=
 	  action_arg_options[i].options)
+#if 0
+	custom_element_change.action_arg =
+	  action_arg_options[i].options[0].value;
+#else
 	custom_element_change.action_arg = -1;
+#endif
 
       break;
     }

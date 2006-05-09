@@ -29,11 +29,6 @@
 #define TYPE_STRING			(1 << 7)
 #define TYPE_TOKEN			(1 << 8)
 
-#define TYPE_BOOLEAN_STYLE		(TYPE_BOOLEAN | \
-					 TYPE_SWITCH  | \
-					 TYPE_YES_NO  | \
-					 TYPE_ECS_AGA )
-
 /* additional values for setup screen */
 #define TYPE_ENTER_SCREEN		(1 << 9)
 #define TYPE_ENTER_MENU			(1 << 10)
@@ -44,6 +39,20 @@
 #define TYPE_GHOSTED			(1 << 14)
 #define TYPE_QUERY			(1 << 15)
 
+/* additional values for internal purposes */
+#define TYPE_BITFIELD			(1 << 16)
+#define TYPE_ELEMENT			(1 << 17)
+#define TYPE_CONTENT			(1 << 18)
+#define TYPE_ELEMENT_LIST		(1 << 19)
+#define TYPE_CONTENT_LIST		(1 << 20)
+
+/* derived values for setup file handling */
+#define TYPE_BOOLEAN_STYLE		(TYPE_BOOLEAN | \
+					 TYPE_SWITCH  | \
+					 TYPE_YES_NO  | \
+					 TYPE_ECS_AGA )
+
+/* derived values for setup screen */
 #define TYPE_VALUE			(TYPE_BOOLEAN_STYLE	| \
 					 TYPE_KEY		| \
 					 TYPE_KEY_X11		| \
