@@ -158,7 +158,8 @@ static struct ElementInfo xx_ei;
 static struct ElementChangeInfo xx_change;
 static struct ElementGroupInfo xx_group;
 static unsigned int xx_event_bits_0_31, xx_event_bits_32_63;
-static int xx_num_description_bytes;
+static char xx_default_description[MAX_ELEMENT_NAME_LEN + 1];
+static int xx_default_description_length;
 static int xx_num_contents;
 static int xx_current_change_page;
 
@@ -176,6 +177,7 @@ struct ElementFileConfig
   void *num_entities;		/* number of entities for multi-byte data */
   int default_num_entities;	/* default number of entities for this data */
   int max_num_entities;		/* maximal number of entities for this data */
+  char *default_string;		/* optional default string for string data */
 };
 
 static struct ElementFileConfig element_conf[] =
@@ -483,8 +485,9 @@ static struct ElementFileConfig custom_element_conf[] =
   {
     -1,
     TYPE_STRING,			CONF_VALUE_BYTES(1),
-    &xx_ei.description[0],		0,
-    &xx_num_description_bytes,	MAX_ELEMENT_NAME_LEN, MAX_ELEMENT_NAME_LEN,
+    &xx_ei.description[0],		-1,
+    &xx_default_description_length,	-1, MAX_ELEMENT_NAME_LEN,
+    &xx_default_description[0]
   },
 
   {
@@ -799,8 +802,9 @@ static struct ElementFileConfig group_element_conf[] =
   {
     -1,
     TYPE_STRING,			CONF_VALUE_BYTES(1),
-    &xx_ei.description[0],		0,
-    &xx_num_description_bytes,	MAX_ELEMENT_NAME_LEN, MAX_ELEMENT_NAME_LEN,
+    &xx_ei.description[0],		-1,
+    &xx_default_description_length,	-1, MAX_ELEMENT_NAME_LEN,
+    &xx_default_description[0]
   },
 
   {
@@ -856,6 +860,33 @@ filetype_id_list[] =
 /* level file functions                                                      */
 /* ========================================================================= */
 
+static char *getDefaultElementDescription(struct ElementInfo *ei)
+{
+  static char description[MAX_ELEMENT_NAME_LEN + 1];
+  char *default_description = (ei->custom_description != NULL ?
+			       ei->custom_description :
+			       ei->editor_description);
+  int i;
+
+  /* always start with reliable default values */
+  for (i = 0; i < MAX_ELEMENT_NAME_LEN + 1; i++)
+    description[i] = '\0';
+
+  /* truncate element description to MAX_ELEMENT_NAME_LEN bytes */
+  strncpy(description, default_description, MAX_ELEMENT_NAME_LEN);
+
+  return &description[0];
+}
+
+static void setElementDescriptionToDefault(struct ElementInfo *ei)
+{
+  char *default_description = getDefaultElementDescription(ei);
+  int i;
+
+  for (i = 0; i < MAX_ELEMENT_NAME_LEN + 1; i++)
+    ei->description[i] = default_description[i];
+}
+
 static void setLevelInfoToDefaultsFromConfigList(struct LevelInfo *level)
 {
   int i;
@@ -876,7 +907,14 @@ static void setLevelInfoToDefaultsFromConfigList(struct LevelInfo *level)
 
       *(int *)(element_conf[i].num_entities) = default_num_entities;
 
-      if (data_type == TYPE_ELEMENT_LIST)
+      if (data_type == TYPE_STRING)
+      {
+	char *default_string = element_conf[i].default_string;
+	char *string = (char *)(element_conf[i].value);
+
+	strncpy(string, default_string, max_num_entities);
+      }
+      else if (data_type == TYPE_ELEMENT_LIST)
       {
 	int *element_array = (int *)(element_conf[i].value);
 	int j;
@@ -1114,6 +1152,9 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
 	IS_GROUP_ELEMENT(element) ||
 	IS_INTERNAL_ELEMENT(element))
     {
+#if 1
+      setElementDescriptionToDefault(ei);
+#else
       for (j = 0; j < MAX_ELEMENT_NAME_LEN + 1; j++)
 	ei->description[j] = '\0';
 
@@ -1121,6 +1162,7 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
 	strncpy(ei->description, ei->custom_description,MAX_ELEMENT_NAME_LEN);
       else
 	strcpy(ei->description, ei->editor_description);
+#endif
 
       ei->use_gfx_element = FALSE;
       ei->gfx_element = EL_EMPTY_SPACE;
@@ -2204,7 +2246,7 @@ static int LoadLevel_MicroChunk(FILE *file, struct ElementFileConfig *config,
     int num_bytes = getFile16BitBE(file);
     byte *buffer = checked_malloc(num_bytes);
 
-#if 1
+#if 0
     printf("::: - found multi bytes\n");
 #endif
 
@@ -2232,7 +2274,15 @@ static int LoadLevel_MicroChunk(FILE *file, struct ElementFileConfig *config,
 
 	element_found = TRUE;
 
-	if (data_type == TYPE_ELEMENT_LIST)
+	if (data_type == TYPE_STRING)
+	{
+	  char *string = (char *)(config[i].value);
+	  int j;
+
+	  for (j = 0; j < max_num_entities; j++)
+	    string[j] = (j < num_entities ? buffer[j] : '\0');
+	}
+	else if (data_type == TYPE_ELEMENT_LIST)
 	{
 	  int *element_array = (int *)(config[i].value);
 	  int j;
@@ -2269,7 +2319,7 @@ static int LoadLevel_MicroChunk(FILE *file, struct ElementFileConfig *config,
 		 byte_mask == CONF_MASK_2_BYTE ? getFile16BitBE(file) :
 		 byte_mask == CONF_MASK_4_BYTE ? getFile32BitBE(file) : 0);
 
-#if 1
+#if 0
     printf("::: - found single bytes\n");
 #endif
 
@@ -2455,7 +2505,7 @@ static int LoadLevel_CUSX(FILE *file, int chunk_size, struct LevelInfo *level)
   {
     real_chunk_size += LoadLevel_MicroChunk(file, custom_element_conf, -1);
 
-#if 1
+#if 0
     printf("::: - real_chunk_size now %d\n", real_chunk_size);
 #endif
 
@@ -4742,6 +4792,125 @@ static void SaveLevel_GRP1(FILE *file, struct LevelInfo *level, int element)
     putFile16BitBE(file, group->element[i]);
 }
 
+static int SaveLevel_MicroChunk(FILE *file, struct ElementFileConfig *entry)
+{
+  int data_type = entry->data_type;
+  int conf_type = entry->conf_type;
+  int byte_mask = conf_type & CONF_MASK_BYTES;
+  int element = entry->element;
+  int default_value = entry->default_value;
+  int num_bytes = 0;
+  boolean modified = FALSE;
+
+  if (byte_mask != CONF_MASK_MULTI_BYTES)
+  {
+    void *value_ptr = entry->value;
+    int value = (data_type == TYPE_BOOLEAN ? *(boolean *)value_ptr :
+		 *(int *)value_ptr);
+
+    /* check if any settings have been modified before saving them */
+    if (value != default_value)
+      modified = TRUE;
+
+    if (!modified)		/* do not save unmodified default settings */
+      return 0;
+
+    if (element != -1)
+      num_bytes += putFile16BitBE(file, element);
+
+    num_bytes += putFile8Bit(file, conf_type);
+    num_bytes += (byte_mask == CONF_MASK_1_BYTE ? putFile8Bit   (file, value) :
+		  byte_mask == CONF_MASK_2_BYTE ? putFile16BitBE(file, value) :
+		  byte_mask == CONF_MASK_4_BYTE ? putFile32BitBE(file, value) :
+		  0);
+
+    return num_bytes;
+  }
+  else if (data_type == TYPE_STRING)
+  {
+    char *default_string = entry->default_string;
+    char *string = (char *)(entry->value);
+    int string_length = strlen(string);
+    int i;
+
+    /* check if any settings have been modified before saving them */
+    if (!strEqual(string, default_string))
+      modified = TRUE;
+
+    if (!modified)		/* do not save unmodified default settings */
+      return 0;
+
+    if (element != -1)
+      num_bytes += putFile16BitBE(file, element);
+
+    num_bytes += putFile8Bit(file, conf_type);
+    num_bytes += putFile16BitBE(file, string_length);
+
+    for (i = 0; i < string_length; i++)
+      num_bytes += putFile8Bit(file, string[i]);
+
+    return num_bytes;
+  }
+  else if (data_type == TYPE_ELEMENT_LIST)
+  {
+    int *element_array = (int *)(entry->value);
+    int num_elements = *(int *)(entry->num_entities);
+    int i;
+
+    /* check if any settings have been modified before saving them */
+    for (i = 0; i < num_elements; i++)
+      if (element_array[i] != default_value)
+	modified = TRUE;
+
+    if (!modified)		/* do not save unmodified default settings */
+      return 0;
+
+    if (element != -1)
+      num_bytes += putFile16BitBE(file, element);
+
+    num_bytes += putFile8Bit(file, conf_type);
+    num_bytes += putFile16BitBE(file, num_elements * CONF_ELEMENT_NUM_BYTES);
+
+    for (i = 0; i < num_elements; i++)
+      num_bytes += putFile16BitBE(file, element_array[i]);
+
+    return num_bytes;
+  }
+  else if (data_type == TYPE_CONTENT_LIST)
+  {
+    struct Content *content = (struct Content *)(entry->value);
+    int num_contents = *(int *)(entry->num_entities);
+    int i, x, y;
+
+    /* check if any settings have been modified before saving them */
+    for (i = 0; i < num_contents; i++)
+      for (y = 0; y < 3; y++)
+	for (x = 0; x < 3; x++)
+	  if (content[i].e[x][y] != default_value)
+	    modified = TRUE;
+
+    if (!modified)		/* do not save unmodified default settings */
+      return 0;
+
+    if (element != -1)
+      num_bytes += putFile16BitBE(file, element);
+
+    num_bytes += putFile8Bit(file, conf_type);
+    num_bytes += putFile16BitBE(file, num_contents * CONF_CONTENT_NUM_BYTES);
+
+    for (i = 0; i < num_contents; i++)
+      for (y = 0; y < 3; y++)
+	for (x = 0; x < 3; x++)
+	  num_bytes += putFile16BitBE(file, content[i].e[x][y]);
+
+    return num_bytes;
+  }
+
+  return 0;
+}
+
+#if 0
+
 static int SaveLevel_MicroChunk_SingleValue(FILE *file,
 					    struct ElementFileConfig *entry)
 {
@@ -4848,6 +5017,8 @@ static int SaveLevel_MicroChunk_ContentList(FILE *file,
   return num_bytes;
 }
 
+#endif
+
 static int SaveLevel_CONF(FILE *file, struct LevelInfo *level)
 {
   int chunk_size = 0;
@@ -4857,6 +5028,9 @@ static int SaveLevel_CONF(FILE *file, struct LevelInfo *level)
 
   for (i = 0; element_conf[i].data_type != -1; i++)
   {
+#if 1
+    chunk_size += SaveLevel_MicroChunk(file, &element_conf[i]);
+#else
     struct ElementFileConfig *config = &element_conf[i];
     int data_type = config->data_type;
     int conf_type = config->conf_type;
@@ -4868,6 +5042,7 @@ static int SaveLevel_CONF(FILE *file, struct LevelInfo *level)
       chunk_size += SaveLevel_MicroChunk_ElementList(file, config);
     else if (data_type == TYPE_CONTENT_LIST)
       chunk_size += SaveLevel_MicroChunk_ContentList(file, config);
+#endif
   }
 
   return chunk_size;
@@ -4883,7 +5058,10 @@ static int SaveLevel_CUSX(FILE *file, struct LevelInfo *level, int element)
 
   xx_ei = *ei;		/* copy element data into temporary buffer */
 
-  xx_num_description_bytes = MAX_ELEMENT_NAME_LEN;
+  /* set default description string for this specific element */
+  strcpy(xx_default_description, getDefaultElementDescription(ei));
+
+  /* set (fixed) number of content areas (may have been overwritten earlier) */
   xx_num_contents = 1;
 
 #if 0
@@ -4891,19 +5069,7 @@ static int SaveLevel_CUSX(FILE *file, struct LevelInfo *level, int element)
 #endif
 
   for (i = 0; custom_element_conf[i].data_type != -1; i++)
-  {
-    struct ElementFileConfig *config = &custom_element_conf[i];
-    int data_type = config->data_type;
-    int conf_type = config->conf_type;
-    int byte_mask = conf_type & CONF_MASK_BYTES;
-
-    if (byte_mask != CONF_MASK_MULTI_BYTES)
-      chunk_size += SaveLevel_MicroChunk_SingleValue(file, config);
-    else if (data_type == TYPE_ELEMENT_LIST)
-      chunk_size += SaveLevel_MicroChunk_ElementList(file, config);
-    else if (data_type == TYPE_CONTENT_LIST)
-      chunk_size += SaveLevel_MicroChunk_ContentList(file, config);
-  }
+    chunk_size += SaveLevel_MicroChunk(file, &custom_element_conf[i]);
 
 #if 0
   printf("::: - change pages\n");
@@ -4939,19 +5105,7 @@ static int SaveLevel_CUSX(FILE *file, struct LevelInfo *level, int element)
     }
 
     for (i = 0; custom_element_change_conf[i].data_type != -1; i++)
-    {
-      struct ElementFileConfig *config = &custom_element_change_conf[i];
-      int data_type = config->data_type;
-      int conf_type = config->conf_type;
-      int byte_mask = conf_type & CONF_MASK_BYTES;
-
-      if (byte_mask != CONF_MASK_MULTI_BYTES)
-	chunk_size += SaveLevel_MicroChunk_SingleValue(file, config);
-      else if (data_type == TYPE_ELEMENT_LIST)
-	chunk_size += SaveLevel_MicroChunk_ElementList(file, config);
-      else if (data_type == TYPE_CONTENT_LIST)
-	chunk_size += SaveLevel_MicroChunk_ContentList(file, config);
-    }
+      chunk_size += SaveLevel_MicroChunk(file, &custom_element_change_conf[i]);
   }
 
   return chunk_size;
@@ -4969,23 +5123,11 @@ static int SaveLevel_GRPX(FILE *file, struct LevelInfo *level, int element)
   xx_ei = *ei;		/* copy element data into temporary buffer */
   xx_group = *group;	/* copy group data into temporary buffer */
 
-  xx_num_description_bytes = MAX_ELEMENT_NAME_LEN;
-  xx_num_contents = 1;
+  /* set default description string for this specific element */
+  strcpy(xx_default_description, getDefaultElementDescription(ei));
 
   for (i = 0; group_element_conf[i].data_type != -1; i++)
-  {
-    struct ElementFileConfig *config = &group_element_conf[i];
-    int data_type = config->data_type;
-    int conf_type = config->conf_type;
-    int byte_mask = conf_type & CONF_MASK_BYTES;
-
-    if (byte_mask != CONF_MASK_MULTI_BYTES)
-      chunk_size += SaveLevel_MicroChunk_SingleValue(file, config);
-    else if (data_type == TYPE_ELEMENT_LIST)
-      chunk_size += SaveLevel_MicroChunk_ElementList(file, config);
-    else if (data_type == TYPE_CONTENT_LIST)
-      chunk_size += SaveLevel_MicroChunk_ContentList(file, config);
-  }
+    chunk_size += SaveLevel_MicroChunk(file, &group_element_conf[i]);
 
   return chunk_size;
 }
