@@ -157,7 +157,7 @@ static struct LevelInfo li;
 static struct ElementInfo xx_ei;
 static struct ElementChangeInfo xx_change;
 static struct ElementGroupInfo xx_group;
-static unsigned int xx_event_bits_0_31, xx_event_bits_32_63;
+static unsigned int xx_event_bits[NUM_CE_BITFIELDS];
 static char xx_default_description[MAX_ELEMENT_NAME_LEN + 1];
 static int xx_default_description_length;
 static int xx_num_contents;
@@ -618,7 +618,7 @@ static struct ElementFileConfig custom_element_conf[] =
 
   {
     -1,
-    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(7),
+    TYPE_INTEGER,			CONF_VALUE_8_BIT(7),
     &xx_ei.slippery_type,		SLIPPERY_ANY_RANDOM
   },
 
@@ -679,12 +679,12 @@ static struct ElementFileConfig custom_element_change_conf[] =
   {
     -1,
     TYPE_BITFIELD,			CONF_VALUE_32_BIT(1),
-    &xx_event_bits_0_31,		0
+    &xx_event_bits[0],			0
   },
   {
     -1,
     TYPE_BITFIELD,			CONF_VALUE_32_BIT(2),
-    &xx_event_bits_32_63,		0
+    &xx_event_bits[1],			0
   },
 
   {
@@ -860,6 +860,42 @@ filetype_id_list[] =
 /* level file functions                                                      */
 /* ========================================================================= */
 
+static void resetEventFlags(struct ElementChangeInfo *change)
+{
+  int i;
+
+  for (i = 0; i < NUM_CHANGE_EVENTS; i++)
+    change->has_event[i] = FALSE;
+}
+
+static void resetEventBits()
+{
+  int i;
+
+  for (i = 0; i < NUM_CE_BITFIELDS; i++)
+    xx_event_bits[i] = 0;
+}
+
+static void setEventFlagsFromEventBits(struct ElementChangeInfo *change)
+{
+  int i;
+
+  /* important: only change event flag if corresponding event bit is set */
+  for (i = 0; i < NUM_CHANGE_EVENTS; i++)
+    if (xx_event_bits[EVENT_BITFIELD_NR(i)] & EVENT_BIT(i))
+      change->has_event[i] = TRUE;
+}
+
+static void setEventBitsFromEventFlags(struct ElementChangeInfo *change)
+{
+  int i;
+
+  /* important: only change event bit if corresponding event flag is set */
+  for (i = 0; i < NUM_CHANGE_EVENTS; i++)
+    if (change->has_event[i])
+      xx_event_bits[EVENT_BITFIELD_NR(i)] |= EVENT_BIT(i);
+}
+
 static char *getDefaultElementDescription(struct ElementInfo *ei)
 {
   static char description[MAX_ELEMENT_NAME_LEN + 1];
@@ -887,36 +923,34 @@ static void setElementDescriptionToDefault(struct ElementInfo *ei)
     ei->description[i] = default_description[i];
 }
 
-static void setLevelInfoToDefaultsFromConfigList(struct LevelInfo *level)
+static void setConfigToDefaultsFromConfigList(struct ElementFileConfig *config)
 {
   int i;
 
-  li = *level;		/* copy level data into temporary buffer */
-
-  for (i = 0; element_conf[i].data_type != -1; i++)
+  for (i = 0; config[i].data_type != -1; i++)
   {
-    int default_value = element_conf[i].default_value;
-    int data_type = element_conf[i].data_type;
-    int conf_type = element_conf[i].conf_type;
+    int default_value = config[i].default_value;
+    int data_type = config[i].data_type;
+    int conf_type = config[i].conf_type;
     int byte_mask = conf_type & CONF_MASK_BYTES;
 
     if (byte_mask == CONF_MASK_MULTI_BYTES)
     {
-      int default_num_entities = element_conf[i].default_num_entities;
-      int max_num_entities = element_conf[i].max_num_entities;
+      int default_num_entities = config[i].default_num_entities;
+      int max_num_entities = config[i].max_num_entities;
 
-      *(int *)(element_conf[i].num_entities) = default_num_entities;
+      *(int *)(config[i].num_entities) = default_num_entities;
 
       if (data_type == TYPE_STRING)
       {
-	char *default_string = element_conf[i].default_string;
-	char *string = (char *)(element_conf[i].value);
+	char *default_string = config[i].default_string;
+	char *string = (char *)(config[i].value);
 
 	strncpy(string, default_string, max_num_entities);
       }
       else if (data_type == TYPE_ELEMENT_LIST)
       {
-	int *element_array = (int *)(element_conf[i].value);
+	int *element_array = (int *)(config[i].value);
 	int j;
 
 	for (j = 0; j < max_num_entities; j++)
@@ -924,7 +958,7 @@ static void setLevelInfoToDefaultsFromConfigList(struct LevelInfo *level)
       }
       else if (data_type == TYPE_CONTENT_LIST)
       {
-	struct Content *content = (struct Content *)(element_conf[i].value);
+	struct Content *content = (struct Content *)(config[i].value);
 	int c, x, y;
 
 	for (c = 0; c < max_num_entities; c++)
@@ -936,13 +970,11 @@ static void setLevelInfoToDefaultsFromConfigList(struct LevelInfo *level)
     else	/* constant size configuration data (1, 2 or 4 bytes) */
     {
       if (data_type == TYPE_BOOLEAN)
-	*(boolean *)(element_conf[i].value) = default_value;
+	*(boolean *)(config[i].value) = default_value;
       else
-	*(int *)    (element_conf[i].value) = default_value;
+	*(int *)    (config[i].value) = default_value;
     }
   }
-
-  *level = li;		/* copy temporary buffer back to level data */
 }
 
 void setElementChangePages(struct ElementInfo *ei, int change_pages)
@@ -962,8 +994,16 @@ void setElementChangePages(struct ElementInfo *ei, int change_pages)
 
 void setElementChangeInfoToDefaults(struct ElementChangeInfo *change)
 {
-  int i, x, y;
+  xx_change = *change;		/* copy change data into temporary buffer */
+  xx_num_contents = 1;
 
+  setConfigToDefaultsFromConfigList(custom_element_change_conf);
+
+  *change = xx_change;
+
+  resetEventFlags(change);
+
+#if 0
   change->can_change = FALSE;
 
   for (i = 0; i < NUM_CHANGE_EVENTS; i++)
@@ -996,6 +1036,7 @@ void setElementChangeInfoToDefaults(struct ElementChangeInfo *change)
   for (x = 0; x < 3; x++)
     for (y = 0; y < 3; y++)
       change->target_content.e[x][y] = EL_EMPTY_SPACE;
+#endif
 
   change->direct_action = 0;
   change->other_action = 0;
@@ -1008,13 +1049,18 @@ void setElementChangeInfoToDefaults(struct ElementChangeInfo *change)
 static void setLevelInfoToDefaults(struct LevelInfo *level)
 {
   static boolean clipboard_elements_initialized = FALSE;
-  int i, j, x, y;
+  int i, x, y;
 
 #if 1
   InitElementPropertiesStatic();
 #endif
 
-  setLevelInfoToDefaultsFromConfigList(level);
+  li = *level;		/* copy level data into temporary buffer */
+
+  setConfigToDefaultsFromConfigList(element_conf);
+
+  *level = li;		/* copy temporary buffer back to level data */
+
   setLevelInfoToDefaults_EM();
 
   level->native_em_level = &native_em_level;
@@ -1049,6 +1095,7 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
 
   level->amoeba_content = EL_DIAMOND;
 
+#if 0
   level->game_of_life[0] = 2;
   level->game_of_life[1] = 3;
   level->game_of_life[2] = 3;
@@ -1058,6 +1105,7 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
   level->biomaze[1] = 3;
   level->biomaze[2] = 3;
   level->biomaze[3] = 3;
+#endif
 
 #if 0
   level->double_speed = FALSE;
@@ -1096,12 +1144,12 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
   level->wind_direction_initial = MV_NONE;
   level->ball_random = FALSE;
   level->ball_state_initial = FALSE;
+
   for (i = 0; i < MAX_ELEMENT_CONTENTS; i++)
     for (x = 0; x < 3; x++)
       for (y = 0; y < 3; y++)
 	level->ball_content[i].e[x][y] = EL_EMPTY;
-#endif
-#if 0
+
   for (i = 0; i < 16; i++)
     level->android_array[i] = FALSE;
 #endif
@@ -1141,7 +1189,14 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
     int element = i;
     struct ElementInfo *ei = &element_info[element];
 
+    xx_ei = *ei;	/* copy element data into temporary buffer */
+
+    setConfigToDefaultsFromConfigList(custom_element_conf);
+
+    *ei = xx_ei;
+
     /* never initialize clipboard elements after the very first time */
+    /* (to be able to use clipboard elements between several levels) */
     if (IS_CLIPBOARD_ELEMENT(element) && clipboard_elements_initialized)
       continue;
 
@@ -1164,8 +1219,10 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
 	strcpy(ei->description, ei->editor_description);
 #endif
 
+#if 0
       ei->use_gfx_element = FALSE;
       ei->gfx_element = EL_EMPTY_SPACE;
+#endif
 
       ei->modified_settings = FALSE;
     }
@@ -1173,6 +1230,7 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
     if (IS_CUSTOM_ELEMENT(element) ||
 	IS_INTERNAL_ELEMENT(element))
     {
+#if 0
       ei->access_direction = MV_ALL_DIRECTIONS;
 
       ei->collect_score_initial = 10;	/* special default */
@@ -1206,6 +1264,7 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
       for (x = 0; x < 3; x++)
 	for (y = 0; y < 3; y++)
 	  ei->content.e[x][y] = EL_EMPTY_SPACE;
+#endif
 
       ei->access_type = 0;
       ei->access_layer = 0;
@@ -1248,6 +1307,13 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
 
       group = ei->group;
 
+      xx_group = *group;	/* copy group data into temporary buffer */
+
+      setConfigToDefaultsFromConfigList(group_element_conf);
+
+      *group = xx_group;
+
+#if 0
       for (j = 0; j < MAX_ELEMENTS_IN_GROUP; j++)
 	group->element[j] = EL_EMPTY_SPACE;
 
@@ -1255,6 +1321,7 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
       group->num_elements = 1;
 
       group->choice_mode = ANIM_RANDOM;
+#endif
     }
   }
 
@@ -2492,6 +2559,7 @@ static int LoadLevel_CUSX(FILE *file, int chunk_size, struct LevelInfo *level)
   int element = getFile16BitBE(file);
   int real_chunk_size = 2;
   struct ElementInfo *ei = &element_info[element];
+  int i;
 
 #if 1
   printf("::: CUSX: loading element '%s' ...\n", EL_NAME(element));
@@ -2524,36 +2592,34 @@ static int LoadLevel_CUSX(FILE *file, int chunk_size, struct LevelInfo *level)
 	  EL_NAME(element));
 
     ei->num_change_pages = 1;
+
     setElementChangePages(ei, 1);
+    setElementChangeInfoToDefaults(ei->change);
 
     return real_chunk_size;
   }
 
+  /* initialize number of change pages stored for this custom element */
   setElementChangePages(ei, ei->num_change_pages);
+  for (i = 0; i < ei->num_change_pages; i++)
+    setElementChangeInfoToDefaults(&ei->change_page[i]);
 
+  /* start with reading properties for the first change page */
   xx_current_change_page = 0;
-
-  xx_event_bits_0_31 = 0;
-  xx_event_bits_32_63 = 0;
 
   while (!feof(file))
   {
     struct ElementChangeInfo *change = &ei->change_page[xx_current_change_page];
-    int i;
 
     xx_change = *change;	/* copy change data into temporary buffer */
+
+    resetEventBits();		/* reset bits; change page might have changed */
 
     real_chunk_size += LoadLevel_MicroChunk(file,custom_element_change_conf,-1);
 
     *change = xx_change;
 
-    for (i = 0; i < NUM_CHANGE_EVENTS; i++)
-      if ((i <  32 && xx_event_bits_0_31  & (1 << i)) ||
-	  (i >= 32 && xx_event_bits_32_63 & (1 << (i - 32))))
-	change->has_event[i] = TRUE;
-
-    xx_event_bits_0_31 = 0;
-    xx_event_bits_32_63 = 0;
+    setEventFlagsFromEventBits(change);
 
     if (real_chunk_size >= chunk_size)
       break;
@@ -5052,7 +5118,7 @@ static int SaveLevel_CUSX(FILE *file, struct LevelInfo *level, int element)
 {
   struct ElementInfo *ei = &element_info[element];
   int chunk_size = 0;
-  int i;
+  int i, j;
 
   chunk_size += putFile16BitBE(file, element);
 
@@ -5090,22 +5156,17 @@ static int SaveLevel_CUSX(FILE *file, struct LevelInfo *level, int element)
 	   i, xx_change.action_arg);
 #endif
 
-    xx_event_bits_0_31 = 0;
-    xx_event_bits_32_63 = 0;
+    resetEventBits();
+    setEventBitsFromEventFlags(change);
 
-    for (i = 0; i < NUM_CHANGE_EVENTS; i++)
-    {
-      if (change->has_event[i])
-      {
-	if (i < 32)
-	  xx_event_bits_0_31 |= (1 << i);
-	else
-	  xx_event_bits_32_63 |= (1 << (i - 32));
-      }
-    }
+    for (j = 0; custom_element_change_conf[j].data_type != -1; j++)
+      chunk_size += SaveLevel_MicroChunk(file, &custom_element_change_conf[j]);
 
-    for (i = 0; custom_element_change_conf[i].data_type != -1; i++)
-      chunk_size += SaveLevel_MicroChunk(file, &custom_element_change_conf[i]);
+#if 0
+    if (element == EL_CUSTOM_START)
+      printf("::: - saving change page %d / %d (%d bytes)\n",
+	     i, ei->num_change_pages, chunk_size);
+#endif
   }
 
   return chunk_size;
@@ -5214,7 +5275,7 @@ static void SaveLevelFromFilename(struct LevelInfo *level, char *filename)
   /* if not using template level, check for non-default custom/group elements */
   if (!level->use_custom_template)
   {
-#if 1
+#if 0
     for (i = 0; i < NUM_CUSTOM_ELEMENTS; i++)
     {
       int element = EL_CUSTOM_START + i;
@@ -5227,9 +5288,7 @@ static void SaveLevelFromFilename(struct LevelInfo *level, char *filename)
 	SaveLevel_CUS4(file, level, element);
       }
     }
-#endif
 
-#if 1
     for (i = 0; i < NUM_GROUP_ELEMENTS; i++)
     {
       int element = EL_GROUP_START + i;
@@ -5276,15 +5335,8 @@ static void SaveLevelFromFilename(struct LevelInfo *level, char *filename)
 	putFileChunkBE(file, "CUSX", cusx_chunk_size);
 	SaveLevel_CUSX(file, level, element);
       }
-
-#if 0
-      if (i == 1)
-	break;
-#endif
     }
-#endif
 
-#if 1
     for (i = 0; i < NUM_GROUP_ELEMENTS; i++)
     {
       int element = EL_GROUP_START + i;
@@ -5300,11 +5352,6 @@ static void SaveLevelFromFilename(struct LevelInfo *level, char *filename)
 	putFileChunkBE(file, "GRPX", grpx_chunk_size);
 	SaveLevel_GRPX(file, level, element);
       }
-
-#if 0
-      if (i == 1)
-	break;
-#endif
     }
 #endif
   }

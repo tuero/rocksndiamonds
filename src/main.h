@@ -229,7 +229,12 @@
 
 #define NUM_CHANGE_EVENTS		40
 
+#define NUM_CE_BITFIELDS		((NUM_CHANGE_EVENTS + 31) / 32)
+
 #define CE_BITMASK_DEFAULT		0
+
+#define EVENT_BITFIELD_NR(e)		(e / 32)
+#define EVENT_BIT(e)			(1 << ((e) % 32))
 
 #define CH_EVENT_VAR(e,c)		(element_info[e].change->has_event[c])
 #define CH_ANY_EVENT_VAR(e,c)		(element_info[e].has_change_event[c])
