@@ -169,8 +169,9 @@
 #define NUM_ELEMENT_PROPERTIES		90
 
 #define NUM_EP_BITFIELDS		((NUM_ELEMENT_PROPERTIES + 31) / 32)
-#define EP_BITFIELD_BASE		0
+#define EP_BITFIELD_BASE_NR		0
 
+#define EP_BITMASK_BASE_DEFAULT		(1 << EP_CAN_MOVE_INTO_ACID)
 #define EP_BITMASK_DEFAULT		0
 
 #define PROPERTY_BIT(p)			(1 << ((p) % 32))
@@ -233,8 +234,8 @@
 
 #define CE_BITMASK_DEFAULT		0
 
-#define EVENT_BITFIELD_NR(e)		(e / 32)
-#define EVENT_BIT(e)			(1 << ((e) % 32))
+#define CH_EVENT_BITFIELD_NR(e)		(e / 32)
+#define CH_EVENT_BIT(e)			(1 << ((e) % 32))
 
 #define CH_EVENT_VAR(e,c)		(element_info[e].change->has_event[c])
 #define CH_ANY_EVENT_VAR(e,c)		(element_info[e].has_change_event[c])

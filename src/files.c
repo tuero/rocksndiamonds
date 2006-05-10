@@ -154,7 +154,7 @@ static void LoadLevel_InitPlayfield(struct LevelInfo *, char *);
 
 /* temporary variables used to store pointers to structure members */
 static struct LevelInfo li;
-static struct ElementInfo xx_ei;
+static struct ElementInfo xx_ei, yy_ei;
 static struct ElementChangeInfo xx_change;
 static struct ElementGroupInfo xx_group;
 static unsigned int xx_event_bits[NUM_CE_BITFIELDS];
@@ -174,6 +174,7 @@ struct ElementFileConfig
   int default_value;		/* initial default value for this variable */
 
   /* (optional) */
+  void *value_copy;		/* variable that holds the data to be copied */
   void *num_entities;		/* number of entities for multi-byte data */
   int default_num_entities;	/* default number of entities for this data */
   int max_num_entities;		/* maximal number of entities for this data */
@@ -463,13 +464,13 @@ static struct ElementFileConfig element_conf[] =
   {
     EL_EMC_ANDROID,
     TYPE_ELEMENT_LIST,			CONF_VALUE_BYTES(1),
-    &li.android_clone_element[0],	EL_EMPTY,
+    &li.android_clone_element[0],	EL_EMPTY, NULL,
     &li.num_android_clone_elements,	1, MAX_ANDROID_ELEMENTS
   },
   {
     EL_EMC_MAGIC_BALL,
     TYPE_CONTENT_LIST,			CONF_VALUE_BYTES(2),
-    &li.ball_content,			EL_EMPTY,
+    &li.ball_content,			EL_EMPTY, NULL,
     &li.num_ball_contents,		4, MAX_ELEMENT_CONTENTS
   },
 
@@ -486,6 +487,7 @@ static struct ElementFileConfig custom_element_conf[] =
     -1,
     TYPE_STRING,			CONF_VALUE_BYTES(1),
     &xx_ei.description[0],		-1,
+    &yy_ei.description[0],
     &xx_default_description_length,	-1, MAX_ELEMENT_NAME_LEN,
     &xx_default_description[0]
   },
@@ -493,155 +495,177 @@ static struct ElementFileConfig custom_element_conf[] =
   {
     -1,
     TYPE_BITFIELD,			CONF_VALUE_32_BIT(1),
-    &xx_ei.properties[EP_BITFIELD_BASE],
-#if 0
-    EP_BITMASK_DEFAULT
-#else
-    (1 << EP_CAN_MOVE_INTO_ACID)
-#endif
+    &xx_ei.properties[EP_BITFIELD_BASE_NR], EP_BITMASK_BASE_DEFAULT,
+    &yy_ei.properties[EP_BITFIELD_BASE_NR]
   },
 #if 0
   /* (reserved) */
   {
     -1,
     TYPE_BITFIELD,			CONF_VALUE_32_BIT(2),
-    &xx_ei.properties[EP_BITFIELD_BASE + 1], EP_BITMASK_DEFAULT
+    &xx_ei.properties[EP_BITFIELD_BASE_NR + 1], EP_BITMASK_DEFAULT,
+    &yy_ei.properties[EP_BITFIELD_BASE_NR + 1]
   },
 #endif
 
   {
     -1,
     TYPE_BOOLEAN,			CONF_VALUE_8_BIT(1),
-    &xx_ei.use_gfx_element,		FALSE
+    &xx_ei.use_gfx_element,		FALSE,
+    &yy_ei.use_gfx_element
   },
   {
     -1,
     TYPE_ELEMENT,			CONF_VALUE_16_BIT(1),
-    &xx_ei.gfx_element,			EL_EMPTY_SPACE
+    &xx_ei.gfx_element,			EL_EMPTY_SPACE,
+    &yy_ei.gfx_element
   },
 
   {
     -1,
     TYPE_BITFIELD,			CONF_VALUE_8_BIT(2),
-    &xx_ei.access_direction,		MV_ALL_DIRECTIONS
+    &xx_ei.access_direction,		MV_ALL_DIRECTIONS,
+    &yy_ei.access_direction
   },
 
   {
     -1,
     TYPE_INTEGER,			CONF_VALUE_16_BIT(2),
-    &xx_ei.collect_score_initial,	10
+    &xx_ei.collect_score_initial,	10,
+    &yy_ei.collect_score_initial
   },
   {
     -1,
     TYPE_INTEGER,			CONF_VALUE_16_BIT(3),
-    &xx_ei.collect_count_initial,	1
+    &xx_ei.collect_count_initial,	1,
+    &yy_ei.collect_count_initial
   },
 
   {
     -1,
     TYPE_INTEGER,			CONF_VALUE_16_BIT(4),
-    &xx_ei.ce_value_fixed_initial,	0
+    &xx_ei.ce_value_fixed_initial,	0,
+    &yy_ei.ce_value_fixed_initial
   },
   {
     -1,
     TYPE_INTEGER,			CONF_VALUE_16_BIT(5),
-    &xx_ei.ce_value_random_initial,	0
+    &xx_ei.ce_value_random_initial,	0,
+    &yy_ei.ce_value_random_initial
   },
   {
     -1,
     TYPE_BOOLEAN,			CONF_VALUE_8_BIT(3),
-    &xx_ei.use_last_ce_value,		FALSE
+    &xx_ei.use_last_ce_value,		FALSE,
+    &yy_ei.use_last_ce_value
   },
 
   {
     -1,
     TYPE_INTEGER,			CONF_VALUE_16_BIT(6),
     &xx_ei.push_delay_fixed,		8,
+    &yy_ei.push_delay_fixed
   },
   {
     -1,
     TYPE_INTEGER,			CONF_VALUE_16_BIT(7),
     &xx_ei.push_delay_random,		8,
+    &yy_ei.push_delay_random
   },
   {
     -1,
     TYPE_INTEGER,			CONF_VALUE_16_BIT(8),
-    &xx_ei.drop_delay_fixed,		0
+    &xx_ei.drop_delay_fixed,		0,
+    &yy_ei.drop_delay_fixed
   },
   {
     -1,
     TYPE_INTEGER,			CONF_VALUE_16_BIT(9),
-    &xx_ei.drop_delay_random,		0
+    &xx_ei.drop_delay_random,		0,
+    &yy_ei.drop_delay_random
   },
   {
     -1,
     TYPE_INTEGER,			CONF_VALUE_16_BIT(10),
-    &xx_ei.move_delay_fixed,		0
+    &xx_ei.move_delay_fixed,		0,
+    &yy_ei.move_delay_fixed
   },
   {
     -1,
     TYPE_INTEGER,			CONF_VALUE_16_BIT(11),
-    &xx_ei.move_delay_random,		0
+    &xx_ei.move_delay_random,		0,
+    &yy_ei.move_delay_random
   },
 
   {
     -1,
     TYPE_BITFIELD,			CONF_VALUE_32_BIT(3),
-    &xx_ei.move_pattern,		MV_ALL_DIRECTIONS
+    &xx_ei.move_pattern,		MV_ALL_DIRECTIONS,
+    &yy_ei.move_pattern
   },
   {
     -1,
     TYPE_BITFIELD,			CONF_VALUE_8_BIT(4),
-    &xx_ei.move_direction_initial,	MV_START_AUTOMATIC
+    &xx_ei.move_direction_initial,	MV_START_AUTOMATIC,
+    &yy_ei.move_direction_initial
   },
   {
     -1,
     TYPE_INTEGER,			CONF_VALUE_8_BIT(5),
-    &xx_ei.move_stepsize,		TILEX / 8
+    &xx_ei.move_stepsize,		TILEX / 8,
+    &yy_ei.move_stepsize
   },
 
   {
     -1,
     TYPE_ELEMENT,			CONF_VALUE_16_BIT(12),
-    &xx_ei.move_enter_element,		EL_EMPTY_SPACE
+    &xx_ei.move_enter_element,		EL_EMPTY_SPACE,
+    &yy_ei.move_enter_element
   },
   {
     -1,
     TYPE_ELEMENT,			CONF_VALUE_16_BIT(13),
-    &xx_ei.move_leave_element,		EL_EMPTY_SPACE
+    &xx_ei.move_leave_element,		EL_EMPTY_SPACE,
+    &yy_ei.move_leave_element
   },
   {
     -1,
     TYPE_INTEGER,			CONF_VALUE_8_BIT(6),
-    &xx_ei.move_leave_type,		LEAVE_TYPE_UNLIMITED
+    &xx_ei.move_leave_type,		LEAVE_TYPE_UNLIMITED,
+    &yy_ei.move_leave_type
   },
 
   {
     -1,
     TYPE_INTEGER,			CONF_VALUE_8_BIT(7),
-    &xx_ei.slippery_type,		SLIPPERY_ANY_RANDOM
+    &xx_ei.slippery_type,		SLIPPERY_ANY_RANDOM,
+    &yy_ei.slippery_type
   },
 
   {
     -1,
     TYPE_INTEGER,			CONF_VALUE_8_BIT(8),
-    &xx_ei.explosion_type,		EXPLODES_3X3
+    &xx_ei.explosion_type,		EXPLODES_3X3,
+    &yy_ei.explosion_type
   },
   {
     -1,
     TYPE_INTEGER,			CONF_VALUE_16_BIT(14),
-    &xx_ei.explosion_delay,		16
+    &xx_ei.explosion_delay,		16,
+    &yy_ei.explosion_delay
   },
   {
     -1,
     TYPE_INTEGER,			CONF_VALUE_16_BIT(15),
-    &xx_ei.ignition_delay,		8
+    &xx_ei.ignition_delay,		8,
+    &yy_ei.ignition_delay
   },
 
   {
     -1,
     TYPE_CONTENT_LIST,			CONF_VALUE_BYTES(2),
     &xx_ei.content,			EL_EMPTY_SPACE,
+    &yy_ei.content,
     &xx_num_contents,			1, 1
   },
 
@@ -650,13 +674,15 @@ static struct ElementFileConfig custom_element_conf[] =
   {
     -1,
     TYPE_INTEGER,			CONF_VALUE_8_BIT(9),
-    &xx_ei.num_change_pages,		-1	/* always save this value */
+    &xx_ei.num_change_pages,		-1,	/* value must always be saved */
+    &yy_ei.num_change_pages
   },
 
   {
     -1,
     -1,					-1,
     NULL,				-1,
+    NULL
   },
 };
 
@@ -667,8 +693,10 @@ static struct ElementFileConfig custom_element_change_conf[] =
   {
     -1,
     TYPE_INTEGER,			CONF_VALUE_8_BIT(1),
-    &xx_current_change_page,		-1
+    &xx_current_change_page,		-1	/* value must always be saved */
   },
+
+  /* ---------- (the remaining entries can be in any order) ----------------- */
 
   {
     -1,
@@ -786,7 +814,7 @@ static struct ElementFileConfig custom_element_change_conf[] =
   {
     -1,
     TYPE_CONTENT_LIST,			CONF_VALUE_BYTES(1),
-    &xx_change.target_content,		EL_EMPTY_SPACE,
+    &xx_change.target_content,		EL_EMPTY_SPACE, NULL,
     &xx_num_contents,			1, 1
   },
 
@@ -802,7 +830,7 @@ static struct ElementFileConfig group_element_conf[] =
   {
     -1,
     TYPE_STRING,			CONF_VALUE_BYTES(1),
-    &xx_ei.description[0],		-1,
+    &xx_ei.description[0],		-1, NULL,
     &xx_default_description_length,	-1, MAX_ELEMENT_NAME_LEN,
     &xx_default_description[0]
   },
@@ -827,7 +855,7 @@ static struct ElementFileConfig group_element_conf[] =
   {
     -1,
     TYPE_ELEMENT_LIST,			CONF_VALUE_BYTES(2),
-    &xx_group.element[0],		EL_EMPTY_SPACE,
+    &xx_group.element[0],		EL_EMPTY_SPACE, NULL,
     &xx_group.num_elements,		1, MAX_ELEMENTS_IN_GROUP
   },
 
@@ -882,7 +910,7 @@ static void setEventFlagsFromEventBits(struct ElementChangeInfo *change)
 
   /* important: only change event flag if corresponding event bit is set */
   for (i = 0; i < NUM_CHANGE_EVENTS; i++)
-    if (xx_event_bits[EVENT_BITFIELD_NR(i)] & EVENT_BIT(i))
+    if (xx_event_bits[CH_EVENT_BITFIELD_NR(i)] & CH_EVENT_BIT(i))
       change->has_event[i] = TRUE;
 }
 
@@ -893,7 +921,7 @@ static void setEventBitsFromEventFlags(struct ElementChangeInfo *change)
   /* important: only change event bit if corresponding event flag is set */
   for (i = 0; i < NUM_CHANGE_EVENTS; i++)
     if (change->has_event[i])
-      xx_event_bits[EVENT_BITFIELD_NR(i)] |= EVENT_BIT(i);
+      xx_event_bits[CH_EVENT_BITFIELD_NR(i)] |= CH_EVENT_BIT(i);
 }
 
 static char *getDefaultElementDescription(struct ElementInfo *ei)
@@ -977,6 +1005,145 @@ static void setConfigToDefaultsFromConfigList(struct ElementFileConfig *config)
   }
 }
 
+static void copyConfigFromConfigList(struct ElementFileConfig *config)
+{
+  int i;
+
+  for (i = 0; config[i].data_type != -1; i++)
+  {
+    int data_type = config[i].data_type;
+    int conf_type = config[i].conf_type;
+    int byte_mask = conf_type & CONF_MASK_BYTES;
+
+    if (byte_mask == CONF_MASK_MULTI_BYTES)
+    {
+      int max_num_entities = config[i].max_num_entities;
+
+      if (data_type == TYPE_STRING)
+      {
+	char *string      = (char *)(config[i].value);
+	char *string_copy = (char *)(config[i].value_copy);
+
+	strncpy(string_copy, string, max_num_entities);
+      }
+      else if (data_type == TYPE_ELEMENT_LIST)
+      {
+	int *element_array      = (int *)(config[i].value);
+	int *element_array_copy = (int *)(config[i].value_copy);
+	int j;
+
+	for (j = 0; j < max_num_entities; j++)
+	  element_array_copy[j] = element_array[j];
+      }
+      else if (data_type == TYPE_CONTENT_LIST)
+      {
+	struct Content *content      = (struct Content *)(config[i].value);
+	struct Content *content_copy = (struct Content *)(config[i].value_copy);
+	int c, x, y;
+
+	for (c = 0; c < max_num_entities; c++)
+	  for (y = 0; y < 3; y++)
+	    for (x = 0; x < 3; x++)
+	      content_copy[c].e[x][y] = content[c].e[x][y];
+      }
+    }
+    else	/* constant size configuration data (1, 2 or 4 bytes) */
+    {
+      if (data_type == TYPE_BOOLEAN)
+	*(boolean *)(config[i].value_copy) = *(boolean *)(config[i].value);
+      else
+	*(int *)    (config[i].value_copy) = *(int *)    (config[i].value);
+    }
+  }
+}
+
+#if 1
+void copyElementInfo(struct ElementInfo *ei_from, struct ElementInfo *ei_to)
+{
+#if 1
+  int i;
+#else
+  int i, x, y;
+#endif
+
+#if 1
+  xx_ei = *ei_from;	/* copy element data into temporary buffer */
+  yy_ei = *ei_to;	/* copy element data into temporary buffer */
+
+  copyConfigFromConfigList(custom_element_conf);
+
+  *ei_from = xx_ei;
+  *ei_to   = yy_ei;
+#endif
+
+#if 0
+  /* ---------- copy element description ---------- */
+  for (i = 0; i < MAX_ELEMENT_NAME_LEN + 1; i++)
+    ei_to->description[i] = ei_from->description[i];
+
+  /* ---------- copy element base properties ---------- */
+  ei_to->properties[EP_BITFIELD_BASE_NR] =
+    ei_from->properties[EP_BITFIELD_BASE_NR];
+
+  /* ---------- copy custom property values ---------- */
+
+  ei_to->use_gfx_element = ei_from->use_gfx_element;
+  ei_to->gfx_element = ei_from->gfx_element;
+
+  ei_to->access_direction = ei_from->access_direction;
+
+  ei_to->collect_score_initial = ei_from->collect_score_initial;
+  ei_to->collect_count_initial = ei_from->collect_count_initial;
+
+  ei_to->ce_value_fixed_initial = ei_from->ce_value_fixed_initial;
+  ei_to->ce_value_random_initial = ei_from->ce_value_random_initial;
+  ei_to->use_last_ce_value = ei_from->use_last_ce_value;
+
+  ei_to->push_delay_fixed = ei_from->push_delay_fixed;
+  ei_to->push_delay_random = ei_from->push_delay_random;
+  ei_to->drop_delay_fixed = ei_from->drop_delay_fixed;
+  ei_to->drop_delay_random = ei_from->drop_delay_random;
+  ei_to->move_delay_fixed = ei_from->move_delay_fixed;
+  ei_to->move_delay_random = ei_from->move_delay_random;
+
+  ei_to->move_pattern = ei_from->move_pattern;
+  ei_to->move_direction_initial = ei_from->move_direction_initial;
+  ei_to->move_stepsize = ei_from->move_stepsize;
+
+  ei_to->move_enter_element = ei_from->move_enter_element;
+  ei_to->move_leave_element = ei_from->move_leave_element;
+  ei_to->move_leave_type = ei_from->move_leave_type;
+
+  ei_to->slippery_type = ei_from->slippery_type;
+
+  ei_to->explosion_type = ei_from->explosion_type;
+  ei_to->explosion_delay = ei_from->explosion_delay;
+  ei_to->ignition_delay = ei_from->ignition_delay;
+
+  for (y = 0; y < 3; y++)
+    for (x = 0; x < 3; x++)
+      ei_to->content.e[x][y] = ei_from->content.e[x][y];
+#endif
+
+  /* ---------- reinitialize and copy change pages ---------- */
+
+  ei_to->num_change_pages = ei_from->num_change_pages;
+  ei_to->current_change_page = ei_from->current_change_page;
+
+  setElementChangePages(ei_to, ei_to->num_change_pages);
+
+  for (i = 0; i < ei_to->num_change_pages; i++)
+    ei_to->change_page[i] = ei_from->change_page[i];
+
+  /* ---------- copy group element info ---------- */
+  if (ei_from->group != NULL && ei_to->group != NULL)	/* group or internal */
+    *ei_to->group = *ei_from->group;
+
+  /* mark this custom element as modified */
+  ei_to->modified_settings = TRUE;
+}
+#endif
+
 void setElementChangePages(struct ElementInfo *ei, int change_pages)
 {
   int change_page_size = sizeof(struct ElementChangeInfo);
@@ -994,6 +1161,11 @@ void setElementChangePages(struct ElementInfo *ei, int change_pages)
 
 void setElementChangeInfoToDefaults(struct ElementChangeInfo *change)
 {
+#if 0
+  int i, x, y;
+#endif
+
+#if 1
   xx_change = *change;		/* copy change data into temporary buffer */
   xx_num_contents = 1;
 
@@ -1002,6 +1174,7 @@ void setElementChangeInfoToDefaults(struct ElementChangeInfo *change)
   *change = xx_change;
 
   resetEventFlags(change);
+#endif
 
 #if 0
   change->can_change = FALSE;
@@ -1049,17 +1222,23 @@ void setElementChangeInfoToDefaults(struct ElementChangeInfo *change)
 static void setLevelInfoToDefaults(struct LevelInfo *level)
 {
   static boolean clipboard_elements_initialized = FALSE;
+#if 0
+  int i, j, x, y;
+#else
   int i, x, y;
+#endif
 
 #if 1
   InitElementPropertiesStatic();
 #endif
 
+#if 1
   li = *level;		/* copy level data into temporary buffer */
 
   setConfigToDefaultsFromConfigList(element_conf);
 
   *level = li;		/* copy temporary buffer back to level data */
+#endif
 
   setLevelInfoToDefaults_EM();
 
@@ -1189,11 +1368,18 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
     int element = i;
     struct ElementInfo *ei = &element_info[element];
 
-    xx_ei = *ei;	/* copy element data into temporary buffer */
+#if 1
+    if (IS_CUSTOM_ELEMENT(element) ||
+	IS_GROUP_ELEMENT(element) ||
+	IS_INTERNAL_ELEMENT(element))
+    {
+      xx_ei = *ei;	/* copy element data into temporary buffer */
 
-    setConfigToDefaultsFromConfigList(custom_element_conf);
+      setConfigToDefaultsFromConfigList(custom_element_conf);
 
-    *ei = xx_ei;
+      *ei = xx_ei;
+    }
+#endif
 
     /* never initialize clipboard elements after the very first time */
     /* (to be able to use clipboard elements between several levels) */
@@ -1292,8 +1478,10 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
 #endif
 #endif
 
+#if 0
       /* now set default properties */
       SET_PROPERTY(element, EP_CAN_MOVE_INTO_ACID, TRUE);
+#endif
     }
 
     if (IS_GROUP_ELEMENT(element) ||
@@ -1307,11 +1495,13 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
 
       group = ei->group;
 
+#if 1
       xx_group = *group;	/* copy group data into temporary buffer */
 
       setConfigToDefaultsFromConfigList(group_element_conf);
 
       *group = xx_group;
+#endif
 
 #if 0
       for (j = 0; j < MAX_ELEMENTS_IN_GROUP; j++)
@@ -1967,12 +2157,12 @@ static int LoadLevel_CUS1(FILE *file, int chunk_size, struct LevelInfo *level)
 
 #if 1
     if (IS_CUSTOM_ELEMENT(element))
-      element_info[element].properties[EP_BITFIELD_BASE] = properties;
+      element_info[element].properties[EP_BITFIELD_BASE_NR] = properties;
     else
       Error(ERR_WARN, "invalid custom element number %d", element);
 #else
     if (IS_CUSTOM_ELEMENT(element))
-      Properties[element][EP_BITFIELD_BASE] = properties;
+      Properties[element][EP_BITFIELD_BASE_NR] = properties;
     else
       Error(ERR_WARN, "invalid custom element number %d", element);
 #endif
@@ -2037,9 +2227,9 @@ static int LoadLevel_CUS3(FILE *file, int chunk_size, struct LevelInfo *level)
     ei->description[MAX_ELEMENT_NAME_LEN] = 0;
 
 #if 1
-    ei->properties[EP_BITFIELD_BASE] = getFile32BitBE(file);
+    ei->properties[EP_BITFIELD_BASE_NR] = getFile32BitBE(file);
 #else
-    Properties[element][EP_BITFIELD_BASE] = getFile32BitBE(file);
+    Properties[element][EP_BITFIELD_BASE_NR] = getFile32BitBE(file);
 #endif
 
     /* some free bytes for future properties and padding */
@@ -2128,9 +2318,9 @@ static int LoadLevel_CUS4(FILE *file, int chunk_size, struct LevelInfo *level)
   ei->description[MAX_ELEMENT_NAME_LEN] = 0;
 
 #if 1
-  ei->properties[EP_BITFIELD_BASE] = getFile32BitBE(file);
+  ei->properties[EP_BITFIELD_BASE_NR] = getFile32BitBE(file);
 #else
-  Properties[element][EP_BITFIELD_BASE] = getFile32BitBE(file);
+  Properties[element][EP_BITFIELD_BASE_NR] = getFile32BitBE(file);
 #endif
   ReadUnusedBytesFromFile(file, 4);	/* reserved for more base properties */
 
@@ -2561,7 +2751,7 @@ static int LoadLevel_CUSX(FILE *file, int chunk_size, struct LevelInfo *level)
   struct ElementInfo *ei = &element_info[element];
   int i;
 
-#if 1
+#if 0
   printf("::: CUSX: loading element '%s' ...\n", EL_NAME(element));
 #endif
 
@@ -4567,23 +4757,23 @@ static void SaveLevel_CUS1(FILE *file, struct LevelInfo *level,
 #if 1
     struct ElementInfo *ei = &element_info[element];
 
-    if (ei->properties[EP_BITFIELD_BASE] != EP_BITMASK_DEFAULT)
+    if (ei->properties[EP_BITFIELD_BASE_NR] != EP_BITMASK_DEFAULT)
     {
       if (check < num_changed_custom_elements)
       {
 	putFile16BitBE(file, element);
-	putFile32BitBE(file, ei->properties[EP_BITFIELD_BASE]);
+	putFile32BitBE(file, ei->properties[EP_BITFIELD_BASE_NR]);
       }
 
       check++;
     }
 #else
-    if (Properties[element][EP_BITFIELD_BASE] != EP_BITMASK_DEFAULT)
+    if (Properties[element][EP_BITFIELD_BASE_NR] != EP_BITMASK_DEFAULT)
     {
       if (check < num_changed_custom_elements)
       {
 	putFile16BitBE(file, element);
-	putFile32BitBE(file, Properties[element][EP_BITFIELD_BASE]);
+	putFile32BitBE(file, Properties[element][EP_BITFIELD_BASE_NR]);
       }
 
       check++;
@@ -4648,9 +4838,9 @@ static void SaveLevel_CUS3(FILE *file, struct LevelInfo *level,
 	  putFile8Bit(file, ei->description[j]);
 
 #if 1
-	putFile32BitBE(file, ei->properties[EP_BITFIELD_BASE]);
+	putFile32BitBE(file, ei->properties[EP_BITFIELD_BASE_NR]);
 #else
-	putFile32BitBE(file, Properties[element][EP_BITFIELD_BASE]);
+	putFile32BitBE(file, Properties[element][EP_BITFIELD_BASE_NR]);
 #endif
 
 	/* some free bytes for future properties and padding */
@@ -4712,6 +4902,7 @@ static void SaveLevel_CUS3(FILE *file, struct LevelInfo *level,
 }
 #endif
 
+#if 0
 static void SaveLevel_CUS4(FILE *file, struct LevelInfo *level, int element)
 {
   struct ElementInfo *ei = &element_info[element];
@@ -4725,9 +4916,9 @@ static void SaveLevel_CUS4(FILE *file, struct LevelInfo *level, int element)
     putFile8Bit(file, ei->description[i]);
 
 #if 1
-  putFile32BitBE(file, ei->properties[EP_BITFIELD_BASE]);
+  putFile32BitBE(file, ei->properties[EP_BITFIELD_BASE_NR]);
 #else
-  putFile32BitBE(file, Properties[element][EP_BITFIELD_BASE]);
+  putFile32BitBE(file, Properties[element][EP_BITFIELD_BASE_NR]);
 #endif
   WriteUnusedBytesToFile(file, 4);	/* reserved for more base properties */
 
@@ -4832,7 +5023,9 @@ static void SaveLevel_CUS4(FILE *file, struct LevelInfo *level, int element)
     putFile8Bit(file, event_bits);
   }
 }
+#endif
 
+#if 0
 static void SaveLevel_GRP1(FILE *file, struct LevelInfo *level, int element)
 {
   struct ElementInfo *ei = &element_info[element];
@@ -4857,6 +5050,7 @@ static void SaveLevel_GRP1(FILE *file, struct LevelInfo *level, int element)
   for (i = 0; i < MAX_ELEMENTS_IN_GROUP; i++)
     putFile16BitBE(file, group->element[i]);
 }
+#endif
 
 static int SaveLevel_MicroChunk(FILE *file, struct ElementFileConfig *entry)
 {

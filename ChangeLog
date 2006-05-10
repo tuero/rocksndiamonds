@@ -1,3 +1,16 @@
+2006-05-09
+	* changed level file format by adding two new chunks "CUSX" (for custom
+	  elements, replacing the previous "CUS4" chunk) and "GRPX" (for group
+	  elements, replacing the previous "GRP1" chunk); these new IFF style
+	  chunks use the new and flexible "micro chunks inside chunks" technique
+	  already used with the new "CONF" chunk (for normal element properties)
+	  which makes it possible to easily extend the existing level format
+	  (instead of using fixed-length chunks like before, which are either
+	  too big due to reserved bytes for future use, or too small when those
+	  reserved bytes have all been used and even more data should be stored,
+	  requiring the replacement by new and larger chunks just like it went
+	  with "CUS1" to "CUS4"); this whole problem now does not exist anymore
+
 2006-05-06
 	* added some missing element descriptions to the level editor
 	* added down position of switchgate switch to the level editor

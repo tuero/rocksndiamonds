@@ -6413,6 +6413,18 @@ static void setSelectboxSpecialActionOptions()
   }
 }
 
+#if 1
+
+static void copy_custom_element_settings(int element_from, int element_to)
+{
+  struct ElementInfo *ei_from = &element_info[element_from];
+  struct ElementInfo *ei_to = &element_info[element_to];
+
+  copyElementInfo(ei_from, ei_to);
+}
+
+#else
+
 static void copy_custom_element_settings(int element_from, int element_to)
 {
   struct ElementInfo *ei_from = &element_info[element_from];
@@ -6425,10 +6437,11 @@ static void copy_custom_element_settings(int element_from, int element_to)
 
   /* ---------- copy element base properties ---------- */
 #if 1
-  ei_to->properties[EP_BITFIELD_BASE] = ei_from->properties[EP_BITFIELD_BASE];
+  ei_to->properties[EP_BITFIELD_BASE_NR] =
+    ei_from->properties[EP_BITFIELD_BASE_NR];
 #else
-  Properties[element_to][EP_BITFIELD_BASE] =
-    Properties[element_from][EP_BITFIELD_BASE];
+  Properties[element_to][EP_BITFIELD_BASE_NR] =
+    Properties[element_from][EP_BITFIELD_BASE_NR];
 #endif
 
   /* ---------- copy custom property values ---------- */
@@ -6462,13 +6475,13 @@ static void copy_custom_element_settings(int element_from, int element_to)
 
   ei_to->slippery_type = ei_from->slippery_type;
 
-  for (y = 0; y < 3; y++)
-    for (x = 0; x < 3; x++)
-      ei_to->content.e[x][y] = ei_from->content.e[x][y];
-
   ei_to->explosion_type = ei_from->explosion_type;
   ei_to->explosion_delay = ei_from->explosion_delay;
   ei_to->ignition_delay = ei_from->ignition_delay;
+
+  for (y = 0; y < 3; y++)
+    for (x = 0; x < 3; x++)
+      ei_to->content.e[x][y] = ei_from->content.e[x][y];
 
   /* ---------- reinitialize and copy change pages ---------- */
 
@@ -6477,7 +6490,7 @@ static void copy_custom_element_settings(int element_from, int element_to)
 
   setElementChangePages(ei_to, ei_to->num_change_pages);
 
-  for (i=0; i < ei_to->num_change_pages; i++)
+  for (i = 0; i < ei_to->num_change_pages; i++)
     ei_to->change_page[i] = ei_from->change_page[i];
 
   /* ---------- copy group element info ---------- */
@@ -6487,6 +6500,7 @@ static void copy_custom_element_settings(int element_from, int element_to)
   /* mark this custom element as modified */
   ei_to->modified_settings = TRUE;
 }
+#endif
 
 static void replace_custom_element_in_settings(int element_from,
 					       int element_to)
