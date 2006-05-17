@@ -820,8 +820,6 @@
 #define STD_ELEMENT_CONTENTS	4
 #define MAX_ELEMENT_CONTENTS	8
 
-#define LEVEL_SCORE_ELEMENTS	16	/* level elements with score */
-
 /* often used screen positions */
 #define SX			8
 #define SY			8
@@ -879,6 +877,10 @@
 #define SC_CRYSTAL		11
 #define SC_PEARL		12
 #define SC_SHIELD		13
+#define SC_UNKNOWN_14		14
+#define SC_UNKNOWN_15		15
+
+#define LEVEL_SCORE_ELEMENTS	16	/* level elements with score */
 
 
 /* "real" level file elements */

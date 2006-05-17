@@ -8379,7 +8379,7 @@ static void CreateFieldExt(int x, int y, int element, boolean is_change)
 			IS_WALKABLE(old_element));
 
 #if 0
-  /* check if element under player changes from accessible to unaccessible
+  /* check if element under the player changes from accessible to unaccessible
      (needed for special case of dropping element which then changes) */
   if (IS_PLAYER(x, y) && !PLAYER_EXPLOSION_PROTECTED(x, y) &&
       IS_ACCESSIBLE(old_element) && !IS_ACCESSIBLE(new_element))
@@ -8428,8 +8428,9 @@ static void CreateFieldExt(int x, int y, int element, boolean is_change)
   }
 
 #if 1
-  /* check if element under player changes from accessible to unaccessible
+  /* check if element under the player changes from accessible to unaccessible
      (needed for special case of dropping element which then changes) */
+  /* (must be checked after creating new element for walkable group elements) */
   if (IS_PLAYER(x, y) && !PLAYER_EXPLOSION_PROTECTED(x, y) &&
       IS_ACCESSIBLE(old_element) && !IS_ACCESSIBLE(new_element))
   {
