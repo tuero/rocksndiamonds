@@ -1,3 +1,14 @@
+2006-05-17
+	* changed gravity (which only affects the player) from level property
+	  to player property (only makes a difference in multi-player levels)
+	* added change events "change when CE value/score changes"
+	* added change events "change when CE value/score changes of <element>"
+
+2006-05-16
+	* added new "INFO" chunk to level file format for global level settings
+	* added all element settings from "HEAD" chunk to "CONF" chunk
+	* added all global level settings from "HEAD" chunk to "INFO" chunk
+
 2006-05-09
 	* changed level file format by adding two new chunks "CUSX" (for custom
 	  elements, replacing the previous "CUS4" chunk) and "GRPX" (for group
@@ -12,6 +23,7 @@
 	  with "CUS1" to "CUS4"); this whole problem now does not exist anymore
 
 2006-05-06
+	* added credits pages to the "credits" section that were really missing
 	* added some missing element descriptions to the level editor
 	* added down position of switchgate switch to the level editor
 	  and allowed the use of both switch positions at the same time

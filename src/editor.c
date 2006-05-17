@@ -547,22 +547,22 @@
 #define GADGET_ID_RANDOM_PERCENTAGE	(GADGET_ID_CHECKBUTTON_FIRST + 0)
 #define GADGET_ID_RANDOM_QUANTITY	(GADGET_ID_CHECKBUTTON_FIRST + 1)
 #define GADGET_ID_RANDOM_RESTRICTED	(GADGET_ID_CHECKBUTTON_FIRST + 2)
-#define GADGET_ID_INITIAL_GRAVITY	(GADGET_ID_CHECKBUTTON_FIRST + 3)
-#define GADGET_ID_STICK_ELEMENT		(GADGET_ID_CHECKBUTTON_FIRST + 4)
-#define GADGET_ID_EM_SLIPPERY_GEMS	(GADGET_ID_CHECKBUTTON_FIRST + 5)
-#define GADGET_ID_USE_SPRING_BUG	(GADGET_ID_CHECKBUTTON_FIRST + 6)
-#define GADGET_ID_USE_TIME_ORB_BUG	(GADGET_ID_CHECKBUTTON_FIRST + 7)
-#define GADGET_ID_RANDOM_BALL_CONTENT	(GADGET_ID_CHECKBUTTON_FIRST + 8)
-#define GADGET_ID_INITIAL_BALL_STATE	(GADGET_ID_CHECKBUTTON_FIRST + 9)
-#define GADGET_ID_GROW_INTO_DIGGABLE	(GADGET_ID_CHECKBUTTON_FIRST + 10)
-#define GADGET_ID_CONTINUOUS_SNAPPING	(GADGET_ID_CHECKBUTTON_FIRST + 11)
-#define GADGET_ID_BLOCK_SNAP_FIELD	(GADGET_ID_CHECKBUTTON_FIRST + 12)
-#define GADGET_ID_BLOCK_LAST_FIELD	(GADGET_ID_CHECKBUTTON_FIRST + 13)
-#define GADGET_ID_SP_BLOCK_LAST_FIELD	(GADGET_ID_CHECKBUTTON_FIRST + 14)
-#define GADGET_ID_INSTANT_RELOCATION	(GADGET_ID_CHECKBUTTON_FIRST + 15)
-#define GADGET_ID_USE_START_ELEMENT	(GADGET_ID_CHECKBUTTON_FIRST + 16)
-#define GADGET_ID_USE_ARTWORK_ELEMENT	(GADGET_ID_CHECKBUTTON_FIRST + 17)
-#define GADGET_ID_USE_EXPLOSION_ELEMENT	(GADGET_ID_CHECKBUTTON_FIRST + 18)
+#define GADGET_ID_STICK_ELEMENT		(GADGET_ID_CHECKBUTTON_FIRST + 3)
+#define GADGET_ID_EM_SLIPPERY_GEMS	(GADGET_ID_CHECKBUTTON_FIRST + 4)
+#define GADGET_ID_USE_SPRING_BUG	(GADGET_ID_CHECKBUTTON_FIRST + 5)
+#define GADGET_ID_USE_TIME_ORB_BUG	(GADGET_ID_CHECKBUTTON_FIRST + 6)
+#define GADGET_ID_RANDOM_BALL_CONTENT	(GADGET_ID_CHECKBUTTON_FIRST + 7)
+#define GADGET_ID_INITIAL_BALL_STATE	(GADGET_ID_CHECKBUTTON_FIRST + 8)
+#define GADGET_ID_GROW_INTO_DIGGABLE	(GADGET_ID_CHECKBUTTON_FIRST + 9)
+#define GADGET_ID_CONTINUOUS_SNAPPING	(GADGET_ID_CHECKBUTTON_FIRST + 10)
+#define GADGET_ID_BLOCK_SNAP_FIELD	(GADGET_ID_CHECKBUTTON_FIRST + 11)
+#define GADGET_ID_BLOCK_LAST_FIELD	(GADGET_ID_CHECKBUTTON_FIRST + 12)
+#define GADGET_ID_SP_BLOCK_LAST_FIELD	(GADGET_ID_CHECKBUTTON_FIRST + 13)
+#define GADGET_ID_INSTANT_RELOCATION	(GADGET_ID_CHECKBUTTON_FIRST + 14)
+#define GADGET_ID_USE_START_ELEMENT	(GADGET_ID_CHECKBUTTON_FIRST + 15)
+#define GADGET_ID_USE_ARTWORK_ELEMENT	(GADGET_ID_CHECKBUTTON_FIRST + 16)
+#define GADGET_ID_USE_EXPLOSION_ELEMENT	(GADGET_ID_CHECKBUTTON_FIRST + 17)
+#define GADGET_ID_INITIAL_GRAVITY	(GADGET_ID_CHECKBUTTON_FIRST + 18)
 #define GADGET_ID_CAN_PASS_TO_WALKABLE	(GADGET_ID_CHECKBUTTON_FIRST + 19)
 #define GADGET_ID_CAN_FALL_INTO_ACID	(GADGET_ID_CHECKBUTTON_FIRST + 20)
 #define GADGET_ID_CAN_MOVE_INTO_ACID	(GADGET_ID_CHECKBUTTON_FIRST + 21)
@@ -771,23 +771,23 @@
 #define ED_GRAPHICBUTTON_ID_CHANGE_LAST   ED_GRAPHICBUTTON_ID_PASTE_CHANGE_PAGE
 
 /* values for checkbutton gadgets */
-#define ED_CHECKBUTTON_ID_INITIAL_GRAVITY	0
-#define ED_CHECKBUTTON_ID_RANDOM_RESTRICTED	1
-#define ED_CHECKBUTTON_ID_STICK_ELEMENT		2
-#define ED_CHECKBUTTON_ID_EM_SLIPPERY_GEMS	3
-#define ED_CHECKBUTTON_ID_USE_SPRING_BUG	4
-#define ED_CHECKBUTTON_ID_USE_TIME_ORB_BUG	5
-#define ED_CHECKBUTTON_ID_RANDOM_BALL_CONTENT	6
-#define ED_CHECKBUTTON_ID_INITIAL_BALL_STATE	7
-#define ED_CHECKBUTTON_ID_GROW_INTO_DIGGABLE	8
-#define ED_CHECKBUTTON_ID_CONTINUOUS_SNAPPING	9
-#define ED_CHECKBUTTON_ID_BLOCK_SNAP_FIELD	10
-#define ED_CHECKBUTTON_ID_BLOCK_LAST_FIELD	11
-#define ED_CHECKBUTTON_ID_SP_BLOCK_LAST_FIELD	12
-#define ED_CHECKBUTTON_ID_INSTANT_RELOCATION	13
-#define ED_CHECKBUTTON_ID_USE_START_ELEMENT	14
-#define ED_CHECKBUTTON_ID_USE_ARTWORK_ELEMENT	15
-#define ED_CHECKBUTTON_ID_USE_EXPLOSION_ELEMENT	16
+#define ED_CHECKBUTTON_ID_RANDOM_RESTRICTED	0
+#define ED_CHECKBUTTON_ID_STICK_ELEMENT		1
+#define ED_CHECKBUTTON_ID_EM_SLIPPERY_GEMS	2
+#define ED_CHECKBUTTON_ID_USE_SPRING_BUG	3
+#define ED_CHECKBUTTON_ID_USE_TIME_ORB_BUG	4
+#define ED_CHECKBUTTON_ID_RANDOM_BALL_CONTENT	5
+#define ED_CHECKBUTTON_ID_INITIAL_BALL_STATE	6
+#define ED_CHECKBUTTON_ID_GROW_INTO_DIGGABLE	7
+#define ED_CHECKBUTTON_ID_CONTINUOUS_SNAPPING	8
+#define ED_CHECKBUTTON_ID_BLOCK_SNAP_FIELD	9
+#define ED_CHECKBUTTON_ID_BLOCK_LAST_FIELD	10
+#define ED_CHECKBUTTON_ID_SP_BLOCK_LAST_FIELD	11
+#define ED_CHECKBUTTON_ID_INSTANT_RELOCATION	12
+#define ED_CHECKBUTTON_ID_USE_START_ELEMENT	13
+#define ED_CHECKBUTTON_ID_USE_ARTWORK_ELEMENT	14
+#define ED_CHECKBUTTON_ID_USE_EXPLOSION_ELEMENT	15
+#define ED_CHECKBUTTON_ID_INITIAL_GRAVITY	16
 #define ED_CHECKBUTTON_ID_CAN_PASS_TO_WALKABLE	17
 #define ED_CHECKBUTTON_ID_CAN_FALL_INTO_ACID	18
 #define ED_CHECKBUTTON_ID_CAN_MOVE_INTO_ACID	19
@@ -820,7 +820,7 @@
 
 #define ED_NUM_CHECKBUTTONS			46
 
-#define ED_CHECKBUTTON_ID_LEVEL_FIRST	ED_CHECKBUTTON_ID_INITIAL_GRAVITY
+#define ED_CHECKBUTTON_ID_LEVEL_FIRST	ED_CHECKBUTTON_ID_RANDOM_RESTRICTED
 #define ED_CHECKBUTTON_ID_LEVEL_LAST	ED_CHECKBUTTON_ID_RANDOM_RESTRICTED
 
 #define ED_CHECKBUTTON_ID_CUSTOM1_FIRST	ED_CHECKBUTTON_ID_CUSTOM_USE_GRAPHIC
@@ -1549,6 +1549,8 @@ static struct ValueTextInfo options_change_direct_action[] =
 #endif
   { CE_IMPACT,			"impact (on something)"		},
   { CE_SMASHED,			"smashed (from above)"		},
+  { CE_VALUE_CHANGES,		"CE value changes"		},
+  { CE_SCORE_CHANGES,		"CE score changes"		},
   { CE_VALUE_GETS_ZERO,		"CE value gets 0"		},
   { CE_SCORE_GETS_ZERO,		"CE score gets 0"		},
 
@@ -1576,6 +1578,8 @@ static struct ValueTextInfo options_change_other_action[] =
   { CE_EXPLOSION_OF_X,		"explosion of"			},
   { CE_MOVE_OF_X,		"move of"			},
   { CE_CREATION_OF_X,		"creation of"			},
+  { CE_VALUE_CHANGES_OF_X,	"CE value changes of"		},
+  { CE_SCORE_CHANGES_OF_X,	"CE score changes of"		},
   { CE_VALUE_GETS_ZERO_OF_X,	"CE value gets 0 of"		},
   { CE_SCORE_GETS_ZERO_OF_X,	"CE score gets 0 of"		},
 
@@ -1667,7 +1671,6 @@ static struct ValueTextInfo options_action_type[] =
   { CA_SET_LEVEL_TIME,		"set time"			},
   { CA_SET_LEVEL_SCORE,		"set score"			},
   { CA_SET_LEVEL_GEMS,		"set needed gems"		},
-  { CA_SET_LEVEL_GRAVITY,	"set gravity"			},
   { CA_SET_LEVEL_WIND,		"set wind dir."			},
   { CA_UNDEFINED,		" "				},
   { CA_HEADLINE_PLAYER_ACTIONS,	"[player actions]"		},
@@ -1677,11 +1680,12 @@ static struct ValueTextInfo options_action_type[] =
   { CA_SET_PLAYER_KEYS,		"set keys"			},
   { CA_SET_PLAYER_SPEED,	"set speed"			},
   { CA_SET_PLAYER_SHIELD,	"set shield"			},
+  { CA_SET_PLAYER_GRAVITY,	"set gravity"			},
   { CA_SET_PLAYER_ARTWORK,	"set artwork"			},
   { CA_UNDEFINED,		" "				},
   { CA_HEADLINE_CE_ACTIONS,	"[CE actions]"			},
-  { CA_SET_CE_SCORE,		"set CE score"			},
   { CA_SET_CE_VALUE,		"set CE value"			},
+  { CA_SET_CE_SCORE,		"set CE score"			},
   { CA_UNDEFINED,		" "				},
   { CA_HEADLINE_ENGINE_ACTIONS,	"[engine actions]"		},
   { CA_SET_ENGINE_SCAN_MODE,	"set scan mode"			},
@@ -1761,9 +1765,9 @@ static struct ValueTextInfo options_action_arg_number[] =
   { CA_ARG_UNDEFINED,		" "				},
   { CA_ARG_NUMBER_RESET,	"reset"				},
   { CA_ARG_UNDEFINED,		" "				},
-  { CA_ARG_NUMBER_CE_DELAY,	"CE delay"			},
-  { CA_ARG_NUMBER_CE_SCORE,	"CE score"			},
   { CA_ARG_NUMBER_CE_VALUE,	"CE value"			},
+  { CA_ARG_NUMBER_CE_SCORE,	"CE score"			},
+  { CA_ARG_NUMBER_CE_DELAY,	"CE delay"			},
   { CA_ARG_UNDEFINED,		" "				},
   { CA_ARG_NUMBER_LEVEL_TIME,	"time"				},
   { CA_ARG_NUMBER_LEVEL_GEMS,	"gems"				},
@@ -1798,9 +1802,9 @@ static struct ValueTextInfo options_action_arg_value[] =
   { CA_ARG_UNDEFINED,		" "				},
   { CA_ARG_NUMBER_RESET,	"reset"				},
   { CA_ARG_UNDEFINED,		" "				},
-  { CA_ARG_NUMBER_CE_DELAY,	"CE delay"			},
-  { CA_ARG_NUMBER_CE_SCORE,	"CE score"			},
   { CA_ARG_NUMBER_CE_VALUE,	"CE value"			},
+  { CA_ARG_NUMBER_CE_SCORE,	"CE score"			},
+  { CA_ARG_NUMBER_CE_DELAY,	"CE delay"			},
   { CA_ARG_UNDEFINED,		" "				},
   { CA_ARG_NUMBER_LEVEL_TIME,	"time"				},
   { CA_ARG_NUMBER_LEVEL_GEMS,	"gems"				},
@@ -1970,14 +1974,14 @@ action_arg_options[] =
   { CA_SET_LEVEL_TIME,		3,	options_action_arg_number,	},
   { CA_SET_LEVEL_GEMS,		3,	options_action_arg_number,	},
   { CA_SET_LEVEL_SCORE,		3,	options_action_arg_number,	},
-  { CA_SET_LEVEL_GRAVITY,	1,	options_action_arg_gravity,	},
   { CA_SET_LEVEL_WIND,		1,	options_action_arg_direction,	},
   { CA_SET_PLAYER_KEYS,		2,	options_action_arg_key,		},
   { CA_SET_PLAYER_SPEED,	1,	options_action_arg_speed,	},
   { CA_SET_PLAYER_SHIELD,	1,	options_action_arg_shield,	},
+  { CA_SET_PLAYER_GRAVITY,	1,	options_action_arg_gravity,	},
   { CA_SET_PLAYER_ARTWORK,	1,	options_action_arg_artwork,	},
-  { CA_SET_CE_SCORE,		3,	options_action_arg_value,	},
   { CA_SET_CE_VALUE,		3,	options_action_arg_value,	},
+  { CA_SET_CE_SCORE,		3,	options_action_arg_value,	},
   { CA_SET_ENGINE_SCAN_MODE,	1,	options_action_arg_scan_mode,	},
 
   { -1,				FALSE,	NULL				}
@@ -2466,13 +2470,6 @@ static struct
   /* ---------- level and editor settings ---------------------------------- */
 
   {
-    ED_LEVEL_SETTINGS_XPOS(0),		ED_LEVEL_SETTINGS_YPOS(11),
-    GADGET_ID_INITIAL_GRAVITY,		GADGET_ID_NONE,
-    &level.initial_gravity,
-    NULL,
-    "initial gravity",			"set initial level gravity"
-  },
-  {
     ED_LEVEL_SETTINGS_XPOS(0),		ED_COUNTER2_YPOS(9) - MINI_TILEY,
     GADGET_ID_RANDOM_RESTRICTED,	GADGET_ID_NONE,
     &random_placement_background_restricted,
@@ -2586,6 +2583,13 @@ static struct
     &level.use_explosion_element[0],
     NULL,
     "use explosion from element:",	"use explosion properties from element"
+  },
+  {
+    ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(11),
+    GADGET_ID_INITIAL_GRAVITY,		GADGET_ID_NONE,
+    &level.initial_player_gravity[0],
+    NULL,
+    "use initial gravity",		"set initial player gravity"
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(4),
@@ -2999,7 +3003,7 @@ static struct
   /* ---------- custom change content (extended change target) ------------- */
 
   {
-    -1,					ED_AREA_3X3_SETTINGS_YPOS(10),
+    -1,					ED_AREA_3X3_SETTINGS_YPOS(9),
     GADGET_ID_CUSTOM_CHANGE_CONTENT,	GADGET_ID_NONE,	/* align three rows */
     &custom_element_change.target_content.e[0][0], 3, 3,
     NULL, NULL, NULL,			"new extended elements after change"
@@ -6726,6 +6730,8 @@ static void CopyCustomElementPropertiesToEditor(int element)
      HAS_CHANGE_EVENT(element, CE_BLOCKED) ? CE_BLOCKED :
      HAS_CHANGE_EVENT(element, CE_IMPACT) ? CE_IMPACT :
      HAS_CHANGE_EVENT(element, CE_SMASHED) ? CE_SMASHED :
+     HAS_CHANGE_EVENT(element, CE_VALUE_CHANGES) ? CE_VALUE_CHANGES :
+     HAS_CHANGE_EVENT(element, CE_SCORE_CHANGES) ? CE_SCORE_CHANGES :
      HAS_CHANGE_EVENT(element, CE_VALUE_GETS_ZERO) ? CE_VALUE_GETS_ZERO :
      HAS_CHANGE_EVENT(element, CE_SCORE_GETS_ZERO) ? CE_SCORE_GETS_ZERO :
      custom_element_change.direct_action);
@@ -6751,6 +6757,8 @@ static void CopyCustomElementPropertiesToEditor(int element)
      HAS_CHANGE_EVENT(element, CE_EXPLOSION_OF_X) ? CE_EXPLOSION_OF_X :
      HAS_CHANGE_EVENT(element, CE_MOVE_OF_X) ? CE_MOVE_OF_X :
      HAS_CHANGE_EVENT(element, CE_CREATION_OF_X) ? CE_CREATION_OF_X :
+     HAS_CHANGE_EVENT(element, CE_VALUE_CHANGES_OF_X) ? CE_VALUE_CHANGES_OF_X :
+     HAS_CHANGE_EVENT(element, CE_SCORE_CHANGES_OF_X) ? CE_SCORE_CHANGES_OF_X :
      HAS_CHANGE_EVENT(element, CE_VALUE_GETS_ZERO_OF_X) ? CE_VALUE_GETS_ZERO_OF_X :
      HAS_CHANGE_EVENT(element, CE_SCORE_GETS_ZERO_OF_X) ? CE_SCORE_GETS_ZERO_OF_X :
      custom_element_change.other_action);
@@ -6869,6 +6877,8 @@ static void CopyCustomElementPropertiesToGame(int element)
   custom_element_change_events[CE_BLOCKED] = FALSE;
   custom_element_change_events[CE_IMPACT] = FALSE;
   custom_element_change_events[CE_SMASHED] = FALSE;
+  custom_element_change_events[CE_VALUE_CHANGES] = FALSE;
+  custom_element_change_events[CE_SCORE_CHANGES] = FALSE;
   custom_element_change_events[CE_VALUE_GETS_ZERO] = FALSE;
   custom_element_change_events[CE_SCORE_GETS_ZERO] = FALSE;
   custom_element_change_events[custom_element_change.direct_action] =
@@ -6894,6 +6904,8 @@ static void CopyCustomElementPropertiesToGame(int element)
   custom_element_change_events[CE_EXPLOSION_OF_X] = FALSE;
   custom_element_change_events[CE_MOVE_OF_X] = FALSE;
   custom_element_change_events[CE_CREATION_OF_X] = FALSE;
+  custom_element_change_events[CE_VALUE_CHANGES_OF_X] = FALSE;
+  custom_element_change_events[CE_SCORE_CHANGES_OF_X] = FALSE;
   custom_element_change_events[CE_VALUE_GETS_ZERO_OF_X] = FALSE;
   custom_element_change_events[CE_SCORE_GETS_ZERO_OF_X] = FALSE;
   custom_element_change_events[custom_element_change.other_action] =
@@ -7949,6 +7961,8 @@ static void DrawPropertiesConfig()
       &level.use_artwork_element[player_nr];
     checkbutton_info[ED_CHECKBUTTON_ID_USE_EXPLOSION_ELEMENT].value =
       &level.use_explosion_element[player_nr];
+    checkbutton_info[ED_CHECKBUTTON_ID_INITIAL_GRAVITY].value =
+      &level.initial_player_gravity[player_nr];
 
     MapCheckbuttonGadget(ED_CHECKBUTTON_ID_CAN_FALL_INTO_ACID);
     MapCheckbuttonGadget(properties_element == EL_SP_MURPHY ?
@@ -7960,6 +7974,7 @@ static void DrawPropertiesConfig()
     MapCheckbuttonGadget(ED_CHECKBUTTON_ID_USE_START_ELEMENT);
     MapCheckbuttonGadget(ED_CHECKBUTTON_ID_USE_ARTWORK_ELEMENT);
     MapCheckbuttonGadget(ED_CHECKBUTTON_ID_USE_EXPLOSION_ELEMENT);
+    MapCheckbuttonGadget(ED_CHECKBUTTON_ID_INITIAL_GRAVITY);
     MapCheckbuttonGadget(ED_CHECKBUTTON_ID_CAN_PASS_TO_WALKABLE);
 
     MapDrawingArea(ED_DRAWING_ID_START_ELEMENT);

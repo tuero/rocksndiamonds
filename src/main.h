@@ -227,8 +227,12 @@
 #define CE_CREATION_OF_X		37
 #define CE_SCORE_GETS_ZERO		38
 #define CE_SCORE_GETS_ZERO_OF_X		39
+#define CE_VALUE_CHANGES		40
+#define CE_VALUE_CHANGES_OF_X		41
+#define CE_SCORE_CHANGES		42
+#define CE_SCORE_CHANGES_OF_X		43
 
-#define NUM_CHANGE_EVENTS		40
+#define NUM_CHANGE_EVENTS		44
 
 #define NUM_CE_BITFIELDS		((NUM_CHANGE_EVENTS + 31) / 32)
 
@@ -329,7 +333,7 @@
 #define CA_SET_LEVEL_GEMS		7
 #define CA_SET_LEVEL_SCORE		8
 #define CA_SET_LEVEL_WIND		9
-#define CA_SET_LEVEL_GRAVITY		10
+#define CA_SET_PLAYER_GRAVITY		10
 #define CA_SET_PLAYER_KEYS		11
 #define CA_SET_PLAYER_SPEED		12
 #define CA_SET_PLAYER_SHIELD		13
@@ -1915,6 +1919,8 @@ struct LevelInfo
   int initial_player_stepsize;	/* initial player speed */
 
   boolean initial_gravity;
+  boolean initial_player_gravity[MAX_PLAYERS];
+
   boolean em_slippery_gems;	/* EM style "gems slip from wall" behaviour */
   boolean use_spring_bug;	/* for compatibility with old levels */
   boolean use_time_orb_bug;	/* for compatibility with old levels */

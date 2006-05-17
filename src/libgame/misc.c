@@ -1779,6 +1779,7 @@ int get_parameter_value(char *value_raw, char *suffix, int type)
 	      string_has_parameter(value, "random")	? ANIM_RANDOM :
 	      string_has_parameter(value, "ce_value")	? ANIM_CE_VALUE :
 	      string_has_parameter(value, "ce_score")	? ANIM_CE_SCORE :
+	      string_has_parameter(value, "ce_delay")	? ANIM_CE_DELAY :
 	      string_has_parameter(value, "horizontal")	? ANIM_HORIZONTAL :
 	      string_has_parameter(value, "vertical")	? ANIM_VERTICAL :
 	      ANIM_DEFAULT);

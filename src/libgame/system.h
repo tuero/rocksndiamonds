@@ -177,13 +177,14 @@
 #define ANIM_RANDOM		(1 << 4)
 #define ANIM_CE_VALUE		(1 << 5)
 #define ANIM_CE_SCORE		(1 << 6)
-#define ANIM_REVERSE		(1 << 7)
-#define ANIM_OPAQUE_PLAYER	(1 << 8)
+#define ANIM_CE_DELAY		(1 << 7)
+#define ANIM_REVERSE		(1 << 8)
+#define ANIM_OPAQUE_PLAYER	(1 << 9)
 
 /* values for special (non game element) animation modes */
-#define ANIM_HORIZONTAL		(1 << 9)
-#define ANIM_VERTICAL		(1 << 10)
-#define ANIM_STATIC_PANEL	(1 << 11)
+#define ANIM_HORIZONTAL		(1 << 10)
+#define ANIM_VERTICAL		(1 << 11)
+#define ANIM_STATIC_PANEL	(1 << 12)
 
 #define ANIM_DEFAULT		ANIM_LOOP
 

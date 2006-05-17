@@ -213,6 +213,11 @@ static struct LevelFileConfigInfo chunk_config_CONF[] =
   },
   {
     EL_PLAYER_1,
+    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(6),
+    &li.initial_player_gravity[0],	FALSE
+  },
+  {
+    EL_PLAYER_1,
     TYPE_BOOLEAN,			CONF_VALUE_8_BIT(9),
     &li.block_snap_field,		TRUE
   },
@@ -254,6 +259,11 @@ static struct LevelFileConfigInfo chunk_config_CONF[] =
 
   {
     EL_PLAYER_2,
+    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(6),
+    &li.initial_player_gravity[1],	FALSE
+  },
+  {
+    EL_PLAYER_2,
     TYPE_BOOLEAN,			CONF_VALUE_8_BIT(10),
     &li.use_start_element[1],		FALSE
   },
@@ -285,6 +295,11 @@ static struct LevelFileConfigInfo chunk_config_CONF[] =
 
   {
     EL_PLAYER_3,
+    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(6),
+    &li.initial_player_gravity[2],	FALSE
+  },
+  {
+    EL_PLAYER_3,
     TYPE_BOOLEAN,			CONF_VALUE_8_BIT(10),
     &li.use_start_element[2],		FALSE
   },
@@ -314,6 +329,11 @@ static struct LevelFileConfigInfo chunk_config_CONF[] =
     &li.explosion_element[2],		EL_PLAYER_3
   },
 
+  {
+    EL_PLAYER_4,
+    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(6),
+    &li.initial_player_gravity[3],	FALSE
+  },
   {
     EL_PLAYER_4,
     TYPE_BOOLEAN,			CONF_VALUE_8_BIT(10),
@@ -561,12 +581,6 @@ static struct LevelFileConfigInfo chunk_config_CONF[] =
   },
 
   {
-    EL_BALLOON,
-    TYPE_BITFIELD,			CONF_VALUE_8_BIT(1),
-    &li.wind_direction_initial,		MV_NONE
-  },
-
-  {
     EL_EMC_ANDROID,
     TYPE_INTEGER,			CONF_VALUE_16_BIT(1),
     &li.android_move_time,		10
@@ -694,13 +708,19 @@ static struct LevelFileConfigInfo chunk_config_INFO[] =
 
   {
     -1,
-    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(4),
-    &li.em_slippery_gems,		FALSE
+    TYPE_BITFIELD,			CONF_VALUE_8_BIT(4),
+    &li.wind_direction_initial,		MV_NONE
   },
 
   {
     -1,
     TYPE_BOOLEAN,			CONF_VALUE_8_BIT(5),
+    &li.em_slippery_gems,		FALSE
+  },
+
+  {
+    -1,
+    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(6),
     &li.use_custom_template,		FALSE
   },
 
@@ -712,7 +732,7 @@ static struct LevelFileConfigInfo chunk_config_INFO[] =
 
   {
     -1,
-    TYPE_BITFIELD,			CONF_VALUE_8_BIT(6),
+    TYPE_BITFIELD,			CONF_VALUE_8_BIT(7),
     &li.dont_collide_with_bits,		~0	/* default: always deadly */
   },
 
@@ -4954,6 +4974,7 @@ static void SaveLevel_AUTH(FILE *file, struct LevelInfo *level)
     putFile8Bit(file, level->author[i]);
 }
 
+#if 0
 static void SaveLevel_TITL(FILE *file, struct LevelInfo *level)
 {
   int i;
@@ -4961,6 +4982,7 @@ static void SaveLevel_TITL(FILE *file, struct LevelInfo *level)
   for (i = 0; i < MAX_LEVEL_NAME_LEN; i++)
     putFile8Bit(file, level->name[i]);
 }
+#endif
 
 static void SaveLevel_BODY(FILE *file, struct LevelInfo *level)
 {
@@ -4994,6 +5016,7 @@ static void SaveLevel_CONT(FILE *file, struct LevelInfo *level)
 }
 #endif
 
+#if 0
 static void SaveLevel_CNT2(FILE *file, struct LevelInfo *level, int element)
 {
   int i, x, y;
@@ -5044,6 +5067,7 @@ static void SaveLevel_CNT2(FILE *file, struct LevelInfo *level, int element)
       for (x = 0; x < 3; x++)
 	putFile16BitBE(file, content_array[i][x][y]);
 }
+#endif
 
 static void SaveLevel_CNT3(FILE *file, struct LevelInfo *level, int element)
 {
@@ -5868,7 +5892,7 @@ static void SaveLevelFromFilename(struct LevelInfo *level, char *filename)
       /* check if non-default element settings need to be saved */
       if (cusx_chunk_size > cusx_chunk_size_no_changes)
       {
-#if 1
+#if 0
 	printf("::: SAVING CE %d\n", i + 1);
 #endif
 
@@ -5885,7 +5909,7 @@ static void SaveLevelFromFilename(struct LevelInfo *level, char *filename)
       /* check if non-default element settings need to be saved */
       if (grpx_chunk_size > grpx_chunk_size_no_changes)
       {
-#if 1
+#if 0
 	printf("::: SAVING GE %d\n", i + 1);
 #endif
 

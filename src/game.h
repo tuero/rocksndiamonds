@@ -109,6 +109,8 @@ struct PlayerInfo
 
   boolean can_fall_into_acid;
 
+  boolean gravity;
+
   boolean LevelSolved, GameOver;
 
   int last_move_dir;

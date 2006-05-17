@@ -43,6 +43,7 @@
 #define USE_NEW_CONTINUOUS_SNAPPING	(USE_NEW_STUFF		* 1)
 #define USE_GFX_RESET_GFX_ANIMATION	(USE_NEW_STUFF		* 1)
 #define USE_BOTH_SWITCHGATE_SWITCHES	(USE_NEW_STUFF		* 1)
+#define USE_PLAYER_GRAVITY		(USE_NEW_STUFF		* 1)
 
 #define USE_QUICKSAND_IMPACT_BUGFIX	(USE_NEW_STUFF		* 0)
 
@@ -1964,6 +1965,8 @@ void InitGame()
     player->block_last_field = FALSE;	/* initialized in InitPlayerField() */
     player->block_delay_adjustment = 0;	/* initialized in InitPlayerField() */
 
+    player->gravity = level.initial_player_gravity[i];
+
     player->can_fall_into_acid = CAN_MOVE_INTO_ACID(player->element_nr);
 
     player->actual_frame_counter = 0;
@@ -3038,6 +3041,8 @@ static void ResetGfxFrame(int x, int y, boolean redraw)
     GfxFrame[x][y] = CustomValue[x][y];
   else if (ANIM_MODE(graphic) == ANIM_CE_SCORE)
     GfxFrame[x][y] = element_info[element].collect_score;
+  else if (ANIM_MODE(graphic) == ANIM_CE_DELAY)
+    GfxFrame[x][y] = ChangeDelay[x][y];
 
   if (redraw && GfxFrame[x][y] != last_gfx_frame)
     DrawLevelGraphicAnimation(x, y, graphic);
@@ -3064,6 +3069,8 @@ static void ResetGfxAnimation(int x, int y)
     GfxFrame[x][y] = CustomValue[x][y];
   else if (ANIM_MODE(graphic) == ANIM_CE_SCORE)
     GfxFrame[x][y] = element_info[element].collect_score;
+  else if (ANIM_MODE(graphic) == ANIM_CE_DELAY)
+    GfxFrame[x][y] = ChangeDelay[x][y];
 #endif
 
 #if USE_GFX_RESET_GFX_ANIMATION
@@ -3104,6 +3111,8 @@ void InitMovingField(int x, int y, int direction)
     GfxFrame[x][y] = CustomValue[x][y];
   else if (ANIM_MODE(graphic) == ANIM_CE_SCORE)
     GfxFrame[x][y] = element_info[element].collect_score;
+  else if (ANIM_MODE(graphic) == ANIM_CE_DELAY)
+    GfxFrame[x][y] = ChangeDelay[x][y];
 #endif
 
   /* this is needed for CEs with property "can move" / "not moving" */
@@ -5772,6 +5781,8 @@ static void TurnRound(int x, int y)
     GfxFrame[x][y] = CustomValue[x][y];
   else if (ANIM_MODE(graphic) == ANIM_CE_SCORE)
     GfxFrame[x][y] = element_info[element].collect_score;
+  else if (ANIM_MODE(graphic) == ANIM_CE_DELAY)
+    GfxFrame[x][y] = ChangeDelay[x][y];
 #endif
 }
 
@@ -8117,6 +8128,7 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
       break;
     }
 
+#if !USE_PLAYER_GRAVITY
     case CA_SET_LEVEL_GRAVITY:
     {
       game.gravity = (action_arg == CA_ARG_GRAVITY_OFF    ? FALSE         :
@@ -8125,6 +8137,7 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
 		      game.gravity);
       break;
     }
+#endif
 
     case CA_SET_LEVEL_WIND:
     {
@@ -8263,6 +8276,25 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
       break;
     }
 
+#if USE_PLAYER_GRAVITY
+    case CA_SET_PLAYER_GRAVITY:
+    {
+      for (i = 0; i < MAX_PLAYERS; i++)
+      {
+	if (trigger_player_bits & (1 << i))
+	{
+	  stored_player[i].gravity =
+	    (action_arg == CA_ARG_GRAVITY_OFF    ? FALSE                     :
+	     action_arg == CA_ARG_GRAVITY_ON     ? TRUE                      :
+	     action_arg == CA_ARG_GRAVITY_TOGGLE ? !stored_player[i].gravity :
+	     stored_player[i].gravity);
+	}
+      }
+
+      break;
+    }
+#endif
+
     case CA_SET_PLAYER_ARTWORK:
     {
       for (i = 0; i < MAX_PLAYERS; i++)
@@ -8306,19 +8338,26 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
       printf("::: CE value == %d\n", CustomValue[x][y]);
 #endif
 
-      if (CustomValue[x][y] == 0 && last_ce_value > 0)
+      if (CustomValue[x][y] != last_ce_value)
       {
+	CheckElementChange(x, y, element, EL_UNDEFINED, CE_VALUE_CHANGES);
+	CheckTriggeredElementChange(x, y, element, CE_VALUE_CHANGES_OF_X);
+
+	if (CustomValue[x][y] == 0)
+	{
 #if 0
-	printf("::: CE_VALUE_GETS_ZERO\n");
+	  printf("::: CE_VALUE_GETS_ZERO\n");
 #endif
 
-	CheckElementChange(x, y, element, EL_UNDEFINED, CE_VALUE_GETS_ZERO);
-	CheckTriggeredElementChange(x, y, element, CE_VALUE_GETS_ZERO_OF_X);
+	  CheckElementChange(x, y, element, EL_UNDEFINED, CE_VALUE_GETS_ZERO);
+	  CheckTriggeredElementChange(x, y, element, CE_VALUE_GETS_ZERO_OF_X);
 
 #if 0
-	printf("::: RESULT: %d, %d\n", Feld[x][y], ChangePage[x][y]);
+	  printf("::: RESULT: %d, %d\n", Feld[x][y], ChangePage[x][y]);
 #endif
+	}
       }
+
 #endif
 
       break;
@@ -8335,19 +8374,26 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
       printf("::: CE score == %d\n", ei->collect_score);
 #endif
 
-      if (ei->collect_score == 0 && last_ce_score > 0)
+      if (ei->collect_score != last_ce_score)
       {
+	CheckElementChange(x, y, element, EL_UNDEFINED, CE_SCORE_CHANGES);
+	CheckTriggeredElementChange(x, y, element, CE_SCORE_CHANGES_OF_X);
+
+	if (ei->collect_score == 0)
+	{
 #if 0
-	printf("::: CE_SCORE_GETS_ZERO\n");
+	  printf("::: CE_SCORE_GETS_ZERO\n");
 #endif
 
-	CheckElementChange(x, y, element, EL_UNDEFINED, CE_SCORE_GETS_ZERO);
-	CheckTriggeredElementChange(x, y, element, CE_SCORE_GETS_ZERO_OF_X);
+	  CheckElementChange(x, y, element, EL_UNDEFINED, CE_SCORE_GETS_ZERO);
+	  CheckTriggeredElementChange(x, y, element, CE_SCORE_GETS_ZERO_OF_X);
 
 #if 0
-	printf("::: RESULT: %d, %d\n", Feld[x][y], ChangePage[x][y]);
+	  printf("::: RESULT: %d, %d\n", Feld[x][y], ChangePage[x][y]);
 #endif
+	}
       }
+
 #endif
 
       break;
@@ -9821,6 +9867,17 @@ void GameActions_RND()
 #endif
 	DrawLevelGraphicAnimation(x, y, graphic);
     }
+    else if (ANIM_MODE(graphic) == ANIM_CE_DELAY)
+    {
+      int old_gfx_frame = GfxFrame[x][y];
+
+      GfxFrame[x][y] = ChangeDelay[x][y];
+
+#if 1
+      if (GfxFrame[x][y] != old_gfx_frame)
+#endif
+	DrawLevelGraphicAnimation(x, y, graphic);
+    }
 #endif
 
     if (ANIM_MODE(graphic) == ANIM_RANDOM &&
@@ -10268,7 +10325,11 @@ static boolean canMoveToValidFieldWithGravity(int x, int y, int move_dir)
 
 static void CheckGravityMovement(struct PlayerInfo *player)
 {
+#if USE_PLAYER_GRAVITY
+  if (player->gravity && !player->programmed_action)
+#else
   if (game.gravity && !player->programmed_action)
+#endif
   {
     int move_dir_horizontal = player->effective_action & MV_HORIZONTAL;
     int move_dir_vertical   = player->effective_action & MV_VERTICAL;
@@ -10290,7 +10351,11 @@ static void CheckGravityMovementWhenNotMoving(struct PlayerInfo *player)
 {
   return CheckGravityMovement(player);
 
+#if USE_PLAYER_GRAVITY
+  if (player->gravity && !player->programmed_action)
+#else
   if (game.gravity && !player->programmed_action)
+#endif
   {
     int jx = player->jx, jy = player->jy;
     boolean field_under_player_is_free =
@@ -10673,8 +10738,13 @@ void ScrollPlayer(struct PlayerInfo *player, int mode)
 	last_field_block_delay += player->move_delay_value;
 
 	/* when blocking enabled, prevent moving up despite gravity */
+#if USE_PLAYER_GRAVITY
+	if (player->gravity && player->MovDir == MV_UP)
+	  block_delay_adjustment = -1;
+#else
 	if (game.gravity && player->MovDir == MV_UP)
 	  block_delay_adjustment = -1;
+#endif
       }
 
       /* add block delay adjustment (also possible when not blocking) */
@@ -11702,10 +11772,17 @@ int DigField(struct PlayerInfo *player,
     return MP_NO_ACTION;
   }
 
+#if USE_PLAYER_GRAVITY
+  if (player->gravity && is_player && !player->is_auto_moving &&
+      canFallDown(player) && move_direction != MV_DOWN &&
+      !canMoveToValidFieldWithGravity(jx, jy, move_direction))
+    return MP_NO_ACTION;	/* player cannot walk here due to gravity */
+#else
   if (game.gravity && is_player && !player->is_auto_moving &&
       canFallDown(player) && move_direction != MV_DOWN &&
       !canMoveToValidFieldWithGravity(jx, jy, move_direction))
     return MP_NO_ACTION;	/* player cannot walk here due to gravity */
+#endif
 
   if (player_can_move &&
       IS_WALKABLE(element) && ACCESS_FROM(element, opposite_direction))
@@ -11775,17 +11852,29 @@ int DigField(struct PlayerInfo *player,
 	  element == EL_SP_GRAVITY_PORT_RIGHT ||
 	  element == EL_SP_GRAVITY_PORT_UP ||
 	  element == EL_SP_GRAVITY_PORT_DOWN)
+#if USE_PLAYER_GRAVITY
+	player->gravity = !player->gravity;
+#else
 	game.gravity = !game.gravity;
+#endif
       else if (element == EL_SP_GRAVITY_ON_PORT_LEFT ||
 	       element == EL_SP_GRAVITY_ON_PORT_RIGHT ||
 	       element == EL_SP_GRAVITY_ON_PORT_UP ||
 	       element == EL_SP_GRAVITY_ON_PORT_DOWN)
+#if USE_PLAYER_GRAVITY
+	player->gravity = TRUE;
+#else
 	game.gravity = TRUE;
+#endif
       else if (element == EL_SP_GRAVITY_OFF_PORT_LEFT ||
 	       element == EL_SP_GRAVITY_OFF_PORT_RIGHT ||
 	       element == EL_SP_GRAVITY_OFF_PORT_UP ||
 	       element == EL_SP_GRAVITY_OFF_PORT_DOWN)
+#if USE_PLAYER_GRAVITY
+	player->gravity = FALSE;
+#else
 	game.gravity = FALSE;
+#endif
     }
 
     /* automatically move to the next field with double speed */
