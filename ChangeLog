@@ -2,6 +2,7 @@
 	* added new chunk "NAME" to level file format for level name settings
 	* added new chunk "NOTE" to level file format for envelope settings
 	* changed name of chunk "CONF" to "ELEM" (for normal element settings)
+	* updated magic(5) file to recognize changed and new level file chunks
 
 2006-05-17
 	* changed gravity (which only affects the player) from level property

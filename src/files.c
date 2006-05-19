@@ -32,6 +32,7 @@
 #define LEVEL_CHUNK_AUTH_SIZE	MAX_LEVEL_AUTHOR_LEN
 
 #define LEVEL_CHUNK_VERS_SIZE	8	/* size of file version chunk */
+#define LEVEL_CHUNK_DATE_SIZE	4	/* size of file date chunk    */
 #define LEVEL_CHUNK_HEAD_SIZE	80	/* size of level file header  */
 #define LEVEL_CHUNK_HEAD_UNUSED	0	/* unused level header bytes  */
 #define LEVEL_CHUNK_CNT2_SIZE	160	/* size of level CNT2 chunk   */
@@ -1160,6 +1161,19 @@ filetype_id_list[] =
 /* level file functions                                                      */
 /* ========================================================================= */
 
+static struct DateInfo getCurrentDate()
+{
+  time_t epoch_seconds = time(NULL);
+  struct tm *now = localtime(&epoch_seconds);
+  struct DateInfo date;
+
+  date.year  = now->tm_year + 1900;
+  date.month = now->tm_mon  + 1;
+  date.day   = now->tm_mday;
+
+  return date;
+}
+
 static void resetEventFlags(struct ElementChangeInfo *change)
 {
   int i;
@@ -1523,6 +1537,8 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
 
   level->file_version = FILE_VERSION_ACTUAL;
   level->game_version = GAME_VERSION_ACTUAL;
+
+  level->creation_date = getCurrentDate();
 
 #if 1
   level->encoding_16bit_field  = TRUE;
@@ -2236,6 +2252,15 @@ static int LoadLevel_VERS(FILE *file, int chunk_size, struct LevelInfo *level)
 {
   level->file_version = getFileVersion(file);
   level->game_version = getFileVersion(file);
+
+  return chunk_size;
+}
+
+static int LoadLevel_DATE(FILE *file, int chunk_size, struct LevelInfo *level)
+{
+  level->creation_date.year  = getFile16BitBE(file);
+  level->creation_date.month = getFile8Bit(file);
+  level->creation_date.day   = getFile8Bit(file);
 
   return chunk_size;
 }
@@ -3314,6 +3339,7 @@ static void LoadLevelFromFileInfo_RND(struct LevelInfo *level,
     chunk_info[] =
     {
       { "VERS", LEVEL_CHUNK_VERS_SIZE,	LoadLevel_VERS },
+      { "DATE", LEVEL_CHUNK_DATE_SIZE,	LoadLevel_DATE },
       { "HEAD", LEVEL_CHUNK_HEAD_SIZE,	LoadLevel_HEAD },
       { "NAME", LEVEL_CHUNK_NAME_SIZE,	LoadLevel_NAME },
       { "AUTH", LEVEL_CHUNK_AUTH_SIZE,	LoadLevel_AUTH },
@@ -4988,6 +5014,17 @@ static int SaveLevel_VERS(FILE *file, struct LevelInfo *level)
   return chunk_size;
 }
 
+static int SaveLevel_DATE(FILE *file, struct LevelInfo *level)
+{
+  int chunk_size = 0;
+
+  chunk_size += putFile16BitBE(file, level->creation_date.year);
+  chunk_size += putFile8Bit(file,    level->creation_date.month);
+  chunk_size += putFile8Bit(file,    level->creation_date.day);
+
+  return chunk_size;
+}
+
 #if 0
 static void SaveLevel_HEAD(FILE *file, struct LevelInfo *level)
 {
@@ -5884,6 +5921,8 @@ static void SaveLevelFromFilename(struct LevelInfo *level, char *filename)
   level->file_version = FILE_VERSION_ACTUAL;
   level->game_version = GAME_VERSION_ACTUAL;
 
+  level->creation_date = getCurrentDate();
+
 #if 0
   /* check level field for 16-bit elements */
   level->encoding_16bit_field = FALSE;
@@ -5922,6 +5961,10 @@ static void SaveLevelFromFilename(struct LevelInfo *level, char *filename)
   chunk_size = SaveLevel_VERS(NULL, level);
   putFileChunkBE(file, "VERS", chunk_size);
   SaveLevel_VERS(file, level);
+
+  chunk_size = SaveLevel_DATE(NULL, level);
+  putFileChunkBE(file, "DATE", chunk_size);
+  SaveLevel_DATE(file, level);
 
 #if 0
   putFileChunkBE(file, "HEAD", LEVEL_CHUNK_HEAD_SIZE);
@@ -6004,23 +6047,19 @@ static void SaveLevelFromFilename(struct LevelInfo *level, char *filename)
 #endif
 
   chunk_size = SaveLevel_ELEM(NULL, level);
-
-  /* check if non-default element settings need to be saved */
-  if (chunk_size > LEVEL_CHUNK_ELEM_UNCHANGED)
+  if (chunk_size > LEVEL_CHUNK_ELEM_UNCHANGED)		/* save if changed */
   {
     putFileChunkBE(file, "ELEM", chunk_size);
     SaveLevel_ELEM(file, level);
   }
 
 #if 1
-  for (i = 0; i < 4; i++)
+  for (i = 0; i < NUM_ENVELOPES; i++)
   {
     int element = EL_ENVELOPE_1 + i;
 
     chunk_size = SaveLevel_NOTE(NULL, level, element);
-
-    /* check if non-default element settings need to be saved */
-    if (chunk_size > LEVEL_CHUNK_NOTE_UNCHANGED)
+    if (chunk_size > LEVEL_CHUNK_NOTE_UNCHANGED)	/* save if changed */
     {
       putFileChunkBE(file, "NOTE", chunk_size);
       SaveLevel_NOTE(file, level, element);
@@ -6037,9 +6076,7 @@ static void SaveLevelFromFilename(struct LevelInfo *level, char *filename)
       int element = EL_CUSTOM_START + i;
 
       chunk_size = SaveLevel_CUSX(NULL, level, element);
-
-      /* check if non-default element settings need to be saved */
-      if (chunk_size > LEVEL_CHUNK_CUSX_UNCHANGED)
+      if (chunk_size > LEVEL_CHUNK_CUSX_UNCHANGED)	/* save if changed */
       {
 	putFileChunkBE(file, "CUSX", chunk_size);
 	SaveLevel_CUSX(file, level, element);
@@ -6051,9 +6088,7 @@ static void SaveLevelFromFilename(struct LevelInfo *level, char *filename)
       int element = EL_GROUP_START + i;
 
       chunk_size = SaveLevel_GRPX(NULL, level, element);
-
-      /* check if non-default element settings need to be saved */
-      if (chunk_size > LEVEL_CHUNK_GRPX_UNCHANGED)
+      if (chunk_size > LEVEL_CHUNK_GRPX_UNCHANGED)	/* save if changed */
       {
 	putFileChunkBE(file, "GRPX", chunk_size);
 	SaveLevel_GRPX(file, level, element);

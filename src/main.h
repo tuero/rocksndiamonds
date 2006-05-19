@@ -1838,6 +1838,13 @@ struct LevelFileInfo
   char *filename;
 };
 
+struct DateInfo
+{
+  int year;
+  int month;
+  int day;
+};
+
 struct LevelInfo
 {
   struct LevelFileInfo file_info;
@@ -1849,6 +1856,8 @@ struct LevelInfo
 
   int file_version;	/* file format version the level is stored with    */
   int game_version;	/* game release version the level was created with */
+
+  struct DateInfo creation_date;
 
   boolean encoding_16bit_field;		/* level contains 16-bit elements  */
   boolean encoding_16bit_yamyam;	/* yamyam contains 16-bit elements */
