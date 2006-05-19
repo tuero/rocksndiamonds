@@ -29,8 +29,8 @@ struct GameInfo
   /* constant within running game */
   int engine_version;
   int emulation;
-  int initial_move_delay;
-  int initial_move_delay_value;
+  int initial_move_delay[MAX_PLAYERS];
+  int initial_move_delay_value[MAX_PLAYERS];
   int initial_push_delay_value;
 
   /* flags to handle bugs in and changes between different engine versions */

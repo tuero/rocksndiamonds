@@ -780,6 +780,7 @@ static int get_move_delay_from_stepsize(int move_stepsize)
 static void SetPlayerMoveSpeed(struct PlayerInfo *player, int move_stepsize,
 			       boolean init_game)
 {
+  int player_nr = player->index_nr;
   int move_delay = get_move_delay_from_stepsize(move_stepsize);
   boolean cannot_move = (move_stepsize == STEPSIZE_NOT_MOVING ? TRUE : FALSE);
 
@@ -791,8 +792,8 @@ static void SetPlayerMoveSpeed(struct PlayerInfo *player, int move_stepsize,
 
   if (init_game)
   {
-    player->move_delay       = game.initial_move_delay;
-    player->move_delay_value = game.initial_move_delay_value;
+    player->move_delay       = game.initial_move_delay[player_nr];
+    player->move_delay_value = game.initial_move_delay_value[player_nr];
 
     player->move_delay_value_next = -1;
 
@@ -1594,8 +1595,9 @@ static void InitGameEngine()
 
 #if 1
   /* dynamically adjust player properties according to level information */
-  game.initial_move_delay_value =
-    get_move_delay_from_stepsize(level.initial_player_stepsize);
+  for (i = 0; i < MAX_PLAYERS; i++)
+    game.initial_move_delay_value[i] =
+      get_move_delay_from_stepsize(level.initial_player_stepsize[i]);
 #else
   /* dynamically adjust player properties according to level information */
   game.initial_move_delay_value =
@@ -1603,8 +1605,10 @@ static void InitGameEngine()
 #endif
 
   /* dynamically adjust player properties according to game engine version */
-  game.initial_move_delay = (game.engine_version <= VERSION_IDENT(2,0,1,0) ?
-			     game.initial_move_delay_value : 0);
+  for (i = 0; i < MAX_PLAYERS; i++)
+    game.initial_move_delay[i] =
+      (game.engine_version <= VERSION_IDENT(2,0,1,0) ?
+       game.initial_move_delay_value[i] : 0);
 
   /* ---------- initialize player's initial push delay --------------------- */
 
@@ -2022,7 +2026,7 @@ void InitGame()
     player->show_envelope = 0;
 
 #if 1
-    SetPlayerMoveSpeed(player, level.initial_player_stepsize, TRUE);
+    SetPlayerMoveSpeed(player, level.initial_player_stepsize[i], TRUE);
 #else
     player->move_delay       = game.initial_move_delay;
     player->move_delay_value = game.initial_move_delay_value;
@@ -2088,8 +2092,15 @@ void InitGame()
   game.timegate_time_left = 0;
   game.switchgate_pos = 0;
   game.wind_direction = level.wind_direction_initial;
+
+#if !USE_PLAYER_GRAVITY
+#if 1
+  game.gravity = FALSE;
+#else
   game.gravity = level.initial_gravity;
+#endif
   game.explosions_delayed = TRUE;
+#endif
 
   game.lenses_time_left = 0;
   game.magnify_time_left = 0;
@@ -8002,7 +8013,7 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
      CA_ARG_MAX);
 
   int action_arg_number_reset =
-    (action_type == CA_SET_PLAYER_SPEED ? level.initial_player_stepsize :
+    (action_type == CA_SET_PLAYER_SPEED ? level.initial_player_stepsize[0] :
      action_type == CA_SET_LEVEL_GEMS ? level.gems_needed :
      action_type == CA_SET_LEVEL_TIME ? level.time :
      action_type == CA_SET_LEVEL_SCORE ? 0 :
@@ -8223,6 +8234,10 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
 	    action_arg_number = 2;
 	    action_mode = (action_arg == CA_ARG_SPEED_SLOWER ? CA_MODE_DIVIDE :
 			   CA_MODE_MULTIPLY);
+	  }
+	  else if (action_arg == CA_ARG_NUMBER_RESET)
+	  {
+	    action_arg_number = level.initial_player_stepsize[i];
 	  }
 
 	  move_stepsize =

@@ -1549,8 +1549,10 @@ static struct ValueTextInfo options_change_direct_action[] =
 #endif
   { CE_IMPACT,			"impact (on something)"		},
   { CE_SMASHED,			"smashed (from above)"		},
+#if 0
   { CE_VALUE_CHANGES,		"CE value changes"		},
   { CE_SCORE_CHANGES,		"CE score changes"		},
+#endif
   { CE_VALUE_GETS_ZERO,		"CE value gets 0"		},
   { CE_SCORE_GETS_ZERO,		"CE score gets 0"		},
 
@@ -2032,7 +2034,7 @@ static struct
     GADGET_ID_PLAYER_SPEED,		GADGET_ID_NONE,
     -1,
     options_player_speed,
-    &level.initial_player_stepsize,
+    &level.initial_player_stepsize[0],
     "initial player speed:", NULL,	"initial player speed"
   },
 
@@ -7485,7 +7487,7 @@ static void DrawEnvelopeTextArea(int envelope_nr)
   DrawBackground(gi->x, gi->y, gi->width, gi->height);
 
   if (envelope_nr != -1)
-    textarea_info[id].value = level.envelope_text[envelope_nr];
+    textarea_info[id].value = level.envelope[envelope_nr].text;
 
   ModifyGadget(gi, GDI_AREA_SIZE,
 	       *counterbutton_info[ED_COUNTER_ID_ENVELOPE_XSIZE].value,
@@ -7947,6 +7949,7 @@ static void DrawPropertiesConfig()
     int player_nr = GET_PLAYER_NR(properties_element);
 
     /* these properties can be set for every player individually */
+
     drawingarea_info[ED_DRAWING_ID_START_ELEMENT].value =
       &level.start_element[player_nr];
     drawingarea_info[ED_DRAWING_ID_ARTWORK_ELEMENT].value =
@@ -7954,7 +7957,6 @@ static void DrawPropertiesConfig()
     drawingarea_info[ED_DRAWING_ID_EXPLOSION_ELEMENT].value =
       &level.explosion_element[player_nr];
 
-    /* these properties can be set for every player individually */
     checkbutton_info[ED_CHECKBUTTON_ID_USE_START_ELEMENT].value =
       &level.use_start_element[player_nr];
     checkbutton_info[ED_CHECKBUTTON_ID_USE_ARTWORK_ELEMENT].value =
@@ -7963,6 +7965,9 @@ static void DrawPropertiesConfig()
       &level.use_explosion_element[player_nr];
     checkbutton_info[ED_CHECKBUTTON_ID_INITIAL_GRAVITY].value =
       &level.initial_player_gravity[player_nr];
+
+    selectbox_info[ED_SELECTBOX_ID_PLAYER_SPEED].value =
+      &level.initial_player_stepsize[player_nr];
 
     MapCheckbuttonGadget(ED_CHECKBUTTON_ID_CAN_FALL_INTO_ACID);
     MapCheckbuttonGadget(properties_element == EL_SP_MURPHY ?
@@ -8030,8 +8035,8 @@ static void DrawPropertiesConfig()
     int counter2_id = ED_COUNTER_ID_ENVELOPE_YSIZE;
     int envelope_nr = properties_element - EL_ENVELOPE_1;
 
-    counterbutton_info[counter1_id].value = &level.envelope_xsize[envelope_nr];
-    counterbutton_info[counter2_id].value = &level.envelope_ysize[envelope_nr];
+    counterbutton_info[counter1_id].value = &level.envelope[envelope_nr].xsize;
+    counterbutton_info[counter2_id].value = &level.envelope[envelope_nr].ysize;
 
     /* display counter to choose size of envelope text area */
     MapCounterButtons(ED_COUNTER_ID_ENVELOPE_XSIZE);

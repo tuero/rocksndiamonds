@@ -1398,8 +1398,8 @@ void AnimateEnvelope(int envelope_nr, int anim_mode, int action)
   int font_nr = FONT_ENVELOPE_1 + envelope_nr;
   int font_width = getFontWidth(font_nr);
   int font_height = getFontHeight(font_nr);
-  int max_xsize = level.envelope_xsize[envelope_nr];
-  int max_ysize = level.envelope_ysize[envelope_nr];
+  int max_xsize = level.envelope[envelope_nr].xsize;
+  int max_ysize = level.envelope[envelope_nr].ysize;
   int xstart = (anim_mode & ANIM_VERTICAL ? max_xsize : 0);
   int ystart = (anim_mode & ANIM_HORIZONTAL ? max_ysize : 0);
   int xend = max_xsize;
@@ -1426,7 +1426,7 @@ void AnimateEnvelope(int envelope_nr, int anim_mode, int action)
       DrawEnvelopeBackground(envelope_nr, sx,sy, xx,yy, xsize, ysize, font_nr);
 
     DrawTextToTextArea(SX + sx + font_width, SY + sy + font_height,
-		       level.envelope_text[envelope_nr], font_nr, max_xsize,
+		       level.envelope[envelope_nr].text, font_nr, max_xsize,
 		       xsize - 2, ysize - 2, mask_mode);
 
     redraw_mask |= REDRAW_FIELD | REDRAW_FROM_BACKBUFFER;

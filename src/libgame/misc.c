@@ -1041,17 +1041,27 @@ boolean getFileChunk(FILE *file, char *chunk_name, int *chunk_size,
   return (feof(file) || ferror(file) ? FALSE : TRUE);
 }
 
-void putFileChunk(FILE *file, char *chunk_name, int chunk_size,
-		  int byte_order)
+int putFileChunk(FILE *file, char *chunk_name, int chunk_size,
+		 int byte_order)
 {
+  int num_bytes = 0;
+
   /* write chunk name */
-  fputs(chunk_name, file);
+  if (file != NULL)
+    fputs(chunk_name, file);
+
+  num_bytes += strlen(chunk_name);
 
   if (chunk_size >= 0)
   {
     /* write chunk size */
-    putFile32BitInteger(file, chunk_size, byte_order);
+    if (file != NULL)
+      putFile32BitInteger(file, chunk_size, byte_order);
+
+    num_bytes += 4;
   }
+
+  return num_bytes;
 }
 
 int getFileVersion(FILE *file)
@@ -1065,17 +1075,22 @@ int getFileVersion(FILE *file)
 		       version_build);
 }
 
-void putFileVersion(FILE *file, int version)
+int putFileVersion(FILE *file, int version)
 {
-  int version_major = VERSION_MAJOR(version);
-  int version_minor = VERSION_MINOR(version);
-  int version_patch = VERSION_PATCH(version);
-  int version_build = VERSION_BUILD(version);
+  if (file != NULL)
+  {
+    int version_major = VERSION_MAJOR(version);
+    int version_minor = VERSION_MINOR(version);
+    int version_patch = VERSION_PATCH(version);
+    int version_build = VERSION_BUILD(version);
 
-  fputc(version_major, file);
-  fputc(version_minor, file);
-  fputc(version_patch, file);
-  fputc(version_build, file);
+    fputc(version_major, file);
+    fputc(version_minor, file);
+    fputc(version_patch, file);
+    fputc(version_build, file);
+  }
+
+  return 4;
 }
 
 void ReadBytesFromFile(FILE *file, byte *buffer, unsigned long bytes)

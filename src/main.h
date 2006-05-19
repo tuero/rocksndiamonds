@@ -807,6 +807,7 @@
 
 #define NUM_BELTS		4
 #define NUM_BELT_PARTS		3
+#define NUM_ENVELOPES		4
 #define MIN_ENVELOPE_XSIZE	1
 #define MIN_ENVELOPE_YSIZE	1
 #define MAX_ENVELOPE_XSIZE	30
@@ -1815,6 +1816,14 @@ struct Content
   int e[3][3];
 };
 
+struct EnvelopeInfo
+{
+  int xsize;
+  int ysize;
+
+  char text[MAX_ENVELOPE_TEXT_LEN + 1];
+};
+
 struct LevelSetInfo
 {
   int music[MAX_LEVELS];
@@ -1853,8 +1862,7 @@ struct LevelInfo
   char name[MAX_LEVEL_NAME_LEN + 1];
   char author[MAX_LEVEL_AUTHOR_LEN + 1];
 
-  char envelope_text[4][MAX_ENVELOPE_TEXT_LEN + 1];
-  int envelope_xsize[4], envelope_ysize[4];
+  struct EnvelopeInfo envelope[NUM_ENVELOPES];
 
   int score[LEVEL_SCORE_ELEMENTS];
 
@@ -1916,9 +1924,7 @@ struct LevelInfo
   int can_move_into_acid_bits;	/* bitfield to store property for elements */
   int dont_collide_with_bits;	/* bitfield to store property for elements */
 
-  int initial_player_stepsize;	/* initial player speed */
-
-  boolean initial_gravity;
+  int initial_player_stepsize[MAX_PLAYERS];	/* initial player speed */
   boolean initial_player_gravity[MAX_PLAYERS];
 
   boolean em_slippery_gems;	/* EM style "gems slip from wall" behaviour */

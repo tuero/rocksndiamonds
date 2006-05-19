@@ -28,6 +28,9 @@
 #define CHUNK_SIZE_UNDEFINED	0	/* undefined chunk size == 0  */
 #define CHUNK_SIZE_NONE		-1	/* do not write chunk size    */
 
+#define LEVEL_CHUNK_NAME_SIZE	MAX_LEVEL_NAME_LEN
+#define LEVEL_CHUNK_AUTH_SIZE	MAX_LEVEL_AUTHOR_LEN
+
 #define LEVEL_CHUNK_VERS_SIZE	8	/* size of file version chunk */
 #define LEVEL_CHUNK_HEAD_SIZE	80	/* size of level file header  */
 #define LEVEL_CHUNK_HEAD_UNUSED	0	/* unused level header bytes  */
@@ -38,6 +41,16 @@
 #define LEVEL_CPART_CUS3_SIZE	134	/* size of CUS3 chunk part    */
 #define LEVEL_CPART_CUS3_UNUSED	15	/* unused CUS3 bytes / part   */
 #define LEVEL_CHUNK_GRP1_SIZE	74	/* size of level GRP1 chunk   */
+
+/* (element number, number of change pages, change page number) */
+#define LEVEL_CHUNK_CUSX_UNCHANGED	(2 + (1 + 1) + (1 + 1))
+
+/* (element number only) */
+#define LEVEL_CHUNK_GRPX_UNCHANGED	2
+#define LEVEL_CHUNK_NOTE_UNCHANGED	2
+
+/* (nothing at all if unchanged) */
+#define LEVEL_CHUNK_ELEM_UNCHANGED	0
 
 #define TAPE_CHUNK_VERS_SIZE	8	/* size of file version chunk */
 #define TAPE_CHUNK_HEAD_SIZE	20	/* size of tape file header   */
@@ -52,7 +65,12 @@
 #define TAPE_COOKIE_TMPL		"ROCKSNDIAMONDS_TAPE_FILE_VERSION_x.x"
 #define SCORE_COOKIE			"ROCKSNDIAMONDS_SCORE_FILE_VERSION_1.2"
 
-/* values for "CONF" chunk */
+/* values for deciding when (not) to save configuration data */
+#define SAVE_CONF_NEVER			0
+#define SAVE_CONF_ALWAYS		1
+#define SAVE_CONF_WHEN_CHANGED		-1
+
+/* values for chunks using micro chunks */
 #define CONF_MASK_1_BYTE		0x00
 #define CONF_MASK_2_BYTE		0x40
 #define CONF_MASK_4_BYTE		0x80
@@ -66,68 +84,15 @@
 #define CONF_VALUE_4_BYTE(x)		(CONF_MASK_4_BYTE	| (x))
 #define CONF_VALUE_MULTI_BYTES(x)	(CONF_MASK_MULTI_BYTES	| (x))
 
-/* a sequence of configuration values can be terminated by this value */
-#define CONF_LAST_ENTRY			CONF_VALUE_1_BYTE(0)
-
 /* these definitions are just for convenience of use and readability */
 #define CONF_VALUE_8_BIT(x)		CONF_VALUE_1_BYTE(x)
 #define CONF_VALUE_16_BIT(x)		CONF_VALUE_2_BYTE(x)
 #define CONF_VALUE_32_BIT(x)		CONF_VALUE_4_BYTE(x)
 #define CONF_VALUE_BYTES(x)		CONF_VALUE_MULTI_BYTES(x)
 
-#if 0
-#define CONF_VALUE_INTEGER_1		CONF_VALUE_8_BIT(1)
-#define CONF_VALUE_INTEGER_2		CONF_VALUE_8_BIT(2)
-#define CONF_VALUE_INTEGER_3		CONF_VALUE_8_BIT(3)
-#define CONF_VALUE_INTEGER_4		CONF_VALUE_8_BIT(4)
-#define CONF_VALUE_INTEGER_5		CONF_VALUE_8_BIT(5)
-#define CONF_VALUE_INTEGER_6		CONF_VALUE_8_BIT(6)
-#define CONF_VALUE_INTEGER_7		CONF_VALUE_8_BIT(7)
-#define CONF_VALUE_INTEGER_8		CONF_VALUE_8_BIT(8)
-#define CONF_VALUE_BOOLEAN_1		CONF_VALUE_8_BIT(9)
-#define CONF_VALUE_BOOLEAN_2		CONF_VALUE_8_BIT(10)
-#define CONF_VALUE_BOOLEAN_3		CONF_VALUE_8_BIT(11)
-#define CONF_VALUE_BOOLEAN_4		CONF_VALUE_8_BIT(12)
-#define CONF_VALUE_BOOLEAN_5		CONF_VALUE_8_BIT(13)
-#define CONF_VALUE_BOOLEAN_6		CONF_VALUE_8_BIT(14)
-#define CONF_VALUE_BOOLEAN_7		CONF_VALUE_8_BIT(15)
-#define CONF_VALUE_BOOLEAN_8		CONF_VALUE_8_BIT(16)
-
-#define CONF_VALUE_ELEMENT_1		CONF_VALUE_16_BIT(1)
-#define CONF_VALUE_ELEMENT_2		CONF_VALUE_16_BIT(2)
-#define CONF_VALUE_ELEMENT_3		CONF_VALUE_16_BIT(3)
-#define CONF_VALUE_ELEMENT_4		CONF_VALUE_16_BIT(4)
-#define CONF_VALUE_ELEMENT_5		CONF_VALUE_16_BIT(5)
-#define CONF_VALUE_ELEMENT_6		CONF_VALUE_16_BIT(6)
-#define CONF_VALUE_ELEMENT_7		CONF_VALUE_16_BIT(7)
-#define CONF_VALUE_ELEMENT_8		CONF_VALUE_16_BIT(8)
-
-#define CONF_VALUE_ELEMENTS		CONF_VALUE_BYTES(1)
-#define CONF_VALUE_CONTENTS		CONF_VALUE_BYTES(2)
-#endif
-
-#if 0
-#define CONF_VALUE_INTEGER(x)		((x) >= CONF_VALUE_INTEGER_1 &&	\
-					 (x) <= CONF_VALUE_INTEGER_8)
-
-#define CONF_VALUE_BOOLEAN(x)		((x) >= CONF_VALUE_BOOLEAN_1 &&	\
-					 (x) <= CONF_VALUE_BOOLEAN_8)
-#endif
-
 #define CONF_VALUE_NUM_BYTES(x)		((x) == CONF_MASK_1_BYTE ? 1 :	\
 					 (x) == CONF_MASK_2_BYTE ? 2 :	\
 					 (x) == CONF_MASK_4_BYTE ? 4 : 0)
-
-#if 0
-#define CONF_CONTENT_NUM_ELEMENTS	(3 * 3)
-#define CONF_CONTENT_NUM_BYTES		(CONF_CONTENT_NUM_ELEMENTS * 2)
-#define CONF_ELEMENT_NUM_BYTES		(2)
-
-#define CONF_ENTITY_NUM_BYTES(t)	((t) == CONF_VALUE_ELEMENTS ?	\
-					 CONF_ELEMENT_NUM_BYTES :	\
-					 (t) == CONF_VALUE_CONTENTS ?	\
-					 CONF_CONTENT_NUM_BYTES : 1)
-#endif
 
 #define CONF_CONTENT_NUM_ELEMENTS	(3 * 3)
 #define CONF_CONTENT_NUM_BYTES		(CONF_CONTENT_NUM_ELEMENTS * 2)
@@ -151,26 +116,25 @@
 #define CONF_CONTENTS_ELEMENT(b,c,x,y) ((b[CONF_CONTENT_BYTE_POS(c,x,y)]<< 8)|\
 					(b[CONF_CONTENT_BYTE_POS(c,x,y) + 1]))
 
-#if 0
-static void LoadLevel_InitPlayfield(struct LevelInfo *, char *);
-#endif
-
 /* temporary variables used to store pointers to structure members */
 static struct LevelInfo li;
 static struct ElementInfo xx_ei, yy_ei;
 static struct ElementChangeInfo xx_change;
 static struct ElementGroupInfo xx_group;
+static struct EnvelopeInfo xx_envelope;
 static unsigned int xx_event_bits[NUM_CE_BITFIELDS];
 static char xx_default_description[MAX_ELEMENT_NAME_LEN + 1];
-static int xx_default_description_length;
 static int xx_num_contents;
 static int xx_current_change_page;
+static char xx_default_string_empty[1] = "";
+static int xx_string_length_unused;
 
 struct LevelFileConfigInfo
 {
   int element;			/* element for which data is to be stored */
-  int data_type;		/* internal type of data */
-  int conf_type;		/* special type identifier stored in file */
+  int save_type;		/* save data always, never or when changed */
+  int data_type;		/* data type (used internally, not stored) */
+  int conf_type;		/* micro chunk identifier (stored in file) */
 
   /* (mandatory) */
   void *value;			/* variable that holds the data to be stored */
@@ -184,458 +148,558 @@ struct LevelFileConfigInfo
   char *default_string;		/* optional default string for string data */
 };
 
-static struct LevelFileConfigInfo chunk_config_CONF[] =
+static struct LevelFileConfigInfo chunk_config_INFO[] =
 {
+  /* ---------- values not related to single elements ----------------------- */
+
   {
-    EL_PLAYER_1,
+    -1,					SAVE_CONF_ALWAYS,
     TYPE_INTEGER,			CONF_VALUE_8_BIT(1),
-    &li.initial_player_stepsize,	STEPSIZE_NORMAL
+    &li.game_engine_type,		GAME_ENGINE_TYPE_RND
+  },
+
+  {
+    -1,					SAVE_CONF_ALWAYS,
+    TYPE_INTEGER,			CONF_VALUE_16_BIT(1),
+    &li.fieldx,				STD_LEV_FIELDX
   },
   {
-    EL_PLAYER_1,
+    -1,					SAVE_CONF_ALWAYS,
+    TYPE_INTEGER,			CONF_VALUE_16_BIT(2),
+    &li.fieldy,				STD_LEV_FIELDY
+  },
+
+  {
+    -1,					SAVE_CONF_ALWAYS,
+    TYPE_INTEGER,			CONF_VALUE_16_BIT(3),
+    &li.time,				100
+  },
+
+  {
+    -1,					SAVE_CONF_ALWAYS,
+    TYPE_INTEGER,			CONF_VALUE_16_BIT(4),
+    &li.gems_needed,			0
+  },
+
+  {
+    -1,					-1,
     TYPE_BOOLEAN,			CONF_VALUE_8_BIT(2),
+    &li.use_step_counter,		FALSE
+  },
+
+  {
+    -1,					-1,
+    TYPE_BITFIELD,			CONF_VALUE_8_BIT(4),
+    &li.wind_direction_initial,		MV_NONE
+  },
+
+  {
+    -1,					-1,
+    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(5),
+    &li.em_slippery_gems,		FALSE
+  },
+
+  {
+    -1,					-1,
+    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(6),
+    &li.use_custom_template,		FALSE
+  },
+
+  {
+    -1,					-1,
+    TYPE_BITFIELD,			CONF_VALUE_32_BIT(1),
+    &li.can_move_into_acid_bits,	~0	/* default: everything can */
+  },
+
+  {
+    -1,					-1,
+    TYPE_BITFIELD,			CONF_VALUE_8_BIT(7),
+    &li.dont_collide_with_bits,		~0	/* default: always deadly */
+  },
+
+  {
+    -1,					-1,
+    TYPE_INTEGER,			CONF_VALUE_16_BIT(5),
+    &li.score[SC_TIME_BONUS],		1
+  },
+
+  {
+    -1,					-1,
+    -1,					-1,
+    NULL,				-1,
+  },
+};
+
+static struct LevelFileConfigInfo chunk_config_ELEM[] =
+{
+  /* (these values are the same for each player) */
+  {
+    EL_PLAYER_1,			-1,
+    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(1),
     &li.block_last_field,		FALSE	/* default case for EM levels */
   },
   {
-    EL_PLAYER_1,
-    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(3),
+    EL_PLAYER_1,			-1,
+    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(2),
     &li.sp_block_last_field,		TRUE	/* default case for SP levels */
   },
   {
-    EL_PLAYER_1,
-    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(4),
+    EL_PLAYER_1,			-1,
+    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(3),
     &li.instant_relocation,		FALSE
   },
   {
-    EL_PLAYER_1,
-    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(5),
+    EL_PLAYER_1,			-1,
+    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(4),
     &li.can_pass_to_walkable,		FALSE
   },
   {
-    EL_PLAYER_1,
-    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(6),
-    &li.initial_player_gravity[0],	FALSE
-  },
-  {
-    EL_PLAYER_1,
-    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(9),
+    EL_PLAYER_1,			-1,
+    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(5),
     &li.block_snap_field,		TRUE
   },
   {
-    EL_PLAYER_1,
-    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(10),
+    EL_PLAYER_1,			-1,
+    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(6),
+    &li.continuous_snapping,		TRUE
+  },
+
+  /* (these values are different for each player) */
+  {
+    EL_PLAYER_1,			-1,
+    TYPE_INTEGER,			CONF_VALUE_8_BIT(7),
+    &li.initial_player_stepsize[0],	STEPSIZE_NORMAL
+  },
+  {
+    EL_PLAYER_1,			-1,
+    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(8),
+    &li.initial_player_gravity[0],	FALSE
+  },
+  {
+    EL_PLAYER_1,			-1,
+    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(9),
     &li.use_start_element[0],		FALSE
   },
   {
-    EL_PLAYER_1,
+    EL_PLAYER_1,			-1,
     TYPE_ELEMENT,			CONF_VALUE_16_BIT(1),
     &li.start_element[0],		EL_PLAYER_1
   },
   {
-    EL_PLAYER_1,
-    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(11),
+    EL_PLAYER_1,			-1,
+    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(10),
     &li.use_artwork_element[0],		FALSE
   },
   {
-    EL_PLAYER_1,
+    EL_PLAYER_1,			-1,
     TYPE_ELEMENT,			CONF_VALUE_16_BIT(2),
     &li.artwork_element[0],		EL_PLAYER_1
   },
   {
-    EL_PLAYER_1,
-    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(12),
+    EL_PLAYER_1,			-1,
+    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(11),
     &li.use_explosion_element[0],	FALSE
   },
   {
-    EL_PLAYER_1,
+    EL_PLAYER_1,			-1,
     TYPE_ELEMENT,			CONF_VALUE_16_BIT(3),
     &li.explosion_element[0],		EL_PLAYER_1
   },
-  {
-    EL_PLAYER_1,
-    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(13),
-    &li.continuous_snapping,		TRUE
-  },
 
   {
-    EL_PLAYER_2,
-    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(6),
+    EL_PLAYER_2,			-1,
+    TYPE_INTEGER,			CONF_VALUE_8_BIT(7),
+    &li.initial_player_stepsize[1],	STEPSIZE_NORMAL
+  },
+  {
+    EL_PLAYER_2,			-1,
+    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(8),
     &li.initial_player_gravity[1],	FALSE
   },
   {
-    EL_PLAYER_2,
-    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(10),
+    EL_PLAYER_2,			-1,
+    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(9),
     &li.use_start_element[1],		FALSE
   },
   {
-    EL_PLAYER_2,
+    EL_PLAYER_2,			-1,
     TYPE_ELEMENT,			CONF_VALUE_16_BIT(1),
     &li.start_element[1],		EL_PLAYER_2
   },
   {
-    EL_PLAYER_2,
-    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(11),
+    EL_PLAYER_2,			-1,
+    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(10),
     &li.use_artwork_element[1],		FALSE
   },
   {
-    EL_PLAYER_2,
+    EL_PLAYER_2,			-1,
     TYPE_ELEMENT,			CONF_VALUE_16_BIT(2),
     &li.artwork_element[1],		EL_PLAYER_2
   },
   {
-    EL_PLAYER_2,
-    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(12),
+    EL_PLAYER_2,			-1,
+    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(11),
     &li.use_explosion_element[1],	FALSE
   },
   {
-    EL_PLAYER_2,
+    EL_PLAYER_2,			-1,
     TYPE_ELEMENT,			CONF_VALUE_16_BIT(3),
     &li.explosion_element[1],		EL_PLAYER_2
   },
 
   {
-    EL_PLAYER_3,
-    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(6),
+    EL_PLAYER_3,			-1,
+    TYPE_INTEGER,			CONF_VALUE_8_BIT(7),
+    &li.initial_player_stepsize[2],	STEPSIZE_NORMAL
+  },
+  {
+    EL_PLAYER_3,			-1,
+    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(8),
     &li.initial_player_gravity[2],	FALSE
   },
   {
-    EL_PLAYER_3,
-    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(10),
+    EL_PLAYER_3,			-1,
+    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(9),
     &li.use_start_element[2],		FALSE
   },
   {
-    EL_PLAYER_3,
+    EL_PLAYER_3,			-1,
     TYPE_ELEMENT,			CONF_VALUE_16_BIT(1),
     &li.start_element[2],		EL_PLAYER_3
   },
   {
-    EL_PLAYER_3,
-    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(11),
+    EL_PLAYER_3,			-1,
+    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(10),
     &li.use_artwork_element[2],		FALSE
   },
   {
-    EL_PLAYER_3,
+    EL_PLAYER_3,			-1,
     TYPE_ELEMENT,			CONF_VALUE_16_BIT(2),
     &li.artwork_element[2],		EL_PLAYER_3
   },
   {
-    EL_PLAYER_3,
-    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(12),
+    EL_PLAYER_3,			-1,
+    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(11),
     &li.use_explosion_element[2],	FALSE
   },
   {
-    EL_PLAYER_3,
+    EL_PLAYER_3,			-1,
     TYPE_ELEMENT,			CONF_VALUE_16_BIT(3),
     &li.explosion_element[2],		EL_PLAYER_3
   },
 
   {
-    EL_PLAYER_4,
-    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(6),
+    EL_PLAYER_4,			-1,
+    TYPE_INTEGER,			CONF_VALUE_8_BIT(7),
+    &li.initial_player_stepsize[3],	STEPSIZE_NORMAL
+  },
+  {
+    EL_PLAYER_4,			-1,
+    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(8),
     &li.initial_player_gravity[3],	FALSE
   },
   {
-    EL_PLAYER_4,
-    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(10),
+    EL_PLAYER_4,			-1,
+    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(9),
     &li.use_start_element[3],		FALSE
   },
   {
-    EL_PLAYER_4,
+    EL_PLAYER_4,			-1,
     TYPE_ELEMENT,			CONF_VALUE_16_BIT(1),
     &li.start_element[3],		EL_PLAYER_4
   },
   {
-    EL_PLAYER_4,
-    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(11),
+    EL_PLAYER_4,			-1,
+    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(10),
     &li.use_artwork_element[3],		FALSE
   },
   {
-    EL_PLAYER_4,
+    EL_PLAYER_4,			-1,
     TYPE_ELEMENT,			CONF_VALUE_16_BIT(2),
     &li.artwork_element[3],		EL_PLAYER_4
   },
   {
-    EL_PLAYER_4,
-    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(12),
+    EL_PLAYER_4,			-1,
+    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(11),
     &li.use_explosion_element[3],	FALSE
   },
   {
-    EL_PLAYER_4,
+    EL_PLAYER_4,			-1,
     TYPE_ELEMENT,			CONF_VALUE_16_BIT(3),
     &li.explosion_element[3],		EL_PLAYER_4
   },
 
   {
-    EL_EMERALD,
+    EL_EMERALD,				-1,
     TYPE_INTEGER,			CONF_VALUE_16_BIT(1),
     &li.score[SC_EMERALD],		10
   },
 
   {
-    EL_DIAMOND,
+    EL_DIAMOND,				-1,
     TYPE_INTEGER,			CONF_VALUE_16_BIT(1),
     &li.score[SC_DIAMOND],		10
   },
 
   {
-    EL_BUG,
+    EL_BUG,				-1,
     TYPE_INTEGER,			CONF_VALUE_16_BIT(1),
     &li.score[SC_BUG],			10
   },
 
   {
-    EL_SPACESHIP,
+    EL_SPACESHIP,			-1,
     TYPE_INTEGER,			CONF_VALUE_16_BIT(1),
     &li.score[SC_SPACESHIP],		10
   },
 
   {
-    EL_PACMAN,
+    EL_PACMAN,				-1,
     TYPE_INTEGER,			CONF_VALUE_16_BIT(1),
     &li.score[SC_PACMAN],		10
   },
 
   {
-    EL_NUT,
+    EL_NUT,				-1,
     TYPE_INTEGER,			CONF_VALUE_16_BIT(1),
     &li.score[SC_NUT],			10
   },
 
   {
-    EL_DYNAMITE,
+    EL_DYNAMITE,			-1,
     TYPE_INTEGER,			CONF_VALUE_16_BIT(1),
     &li.score[SC_DYNAMITE],		10
   },
 
   {
-    EL_KEY_1,
+    EL_KEY_1,				-1,
     TYPE_INTEGER,			CONF_VALUE_16_BIT(1),
     &li.score[SC_KEY],			10
   },
 
   {
-    EL_PEARL,
+    EL_PEARL,				-1,
     TYPE_INTEGER,			CONF_VALUE_16_BIT(1),
     &li.score[SC_PEARL],		10
   },
 
   {
-    EL_CRYSTAL,
+    EL_CRYSTAL,				-1,
     TYPE_INTEGER,			CONF_VALUE_16_BIT(1),
     &li.score[SC_CRYSTAL],		10
   },
 
   {
-    EL_BD_AMOEBA,
+    EL_BD_AMOEBA,			-1,
     TYPE_ELEMENT,			CONF_VALUE_16_BIT(1),
     &li.amoeba_content,			EL_DIAMOND
   },
   {
-    EL_BD_AMOEBA,
+    EL_BD_AMOEBA,			-1,
     TYPE_INTEGER,			CONF_VALUE_16_BIT(2),
     &li.amoeba_speed,			10
   },
   {
-    EL_BD_AMOEBA,
+    EL_BD_AMOEBA,			-1,
     TYPE_BOOLEAN,			CONF_VALUE_8_BIT(1),
     &li.grow_into_diggable,		TRUE
   },
 
   {
-    EL_YAMYAM,
+    EL_YAMYAM,				-1,
     TYPE_CONTENT_LIST,			CONF_VALUE_BYTES(1),
     &li.yamyam_content,			EL_ROCK, NULL,
     &li.num_yamyam_contents,		4, MAX_ELEMENT_CONTENTS
   },
   {
-    EL_YAMYAM,
+    EL_YAMYAM,				-1,
     TYPE_INTEGER,			CONF_VALUE_16_BIT(1),
     &li.score[SC_YAMYAM],		10
   },
 
   {
-    EL_ROBOT,
+    EL_ROBOT,				-1,
     TYPE_INTEGER,			CONF_VALUE_16_BIT(1),
     &li.score[SC_ROBOT],		10
   },
   {
-    EL_ROBOT,
+    EL_ROBOT,				-1,
     TYPE_INTEGER,			CONF_VALUE_16_BIT(2),
     &li.slurp_score,			10
   },
 
   {
-    EL_ROBOT_WHEEL,
+    EL_ROBOT_WHEEL,			-1,
     TYPE_INTEGER,			CONF_VALUE_16_BIT(1),
     &li.time_wheel,			10
   },
 
   {
-    EL_MAGIC_WALL,
+    EL_MAGIC_WALL,			-1,
     TYPE_INTEGER,			CONF_VALUE_16_BIT(1),
     &li.time_magic_wall,		10
   },
 
   {
-    EL_GAME_OF_LIFE,
+    EL_GAME_OF_LIFE,			-1,
     TYPE_INTEGER,			CONF_VALUE_8_BIT(1),
     &li.game_of_life[0],		2
   },
   {
-    EL_GAME_OF_LIFE,
+    EL_GAME_OF_LIFE,			-1,
     TYPE_INTEGER,			CONF_VALUE_8_BIT(2),
     &li.game_of_life[1],		3
   },
   {
-    EL_GAME_OF_LIFE,
+    EL_GAME_OF_LIFE,			-1,
     TYPE_INTEGER,			CONF_VALUE_8_BIT(3),
     &li.game_of_life[2],		3
   },
   {
-    EL_GAME_OF_LIFE,
+    EL_GAME_OF_LIFE,			-1,
     TYPE_INTEGER,			CONF_VALUE_8_BIT(4),
     &li.game_of_life[3],		3
   },
 
   {
-    EL_BIOMAZE,
+    EL_BIOMAZE,				-1,
     TYPE_INTEGER,			CONF_VALUE_8_BIT(1),
     &li.biomaze[0],			2
   },
   {
-    EL_BIOMAZE,
+    EL_BIOMAZE,				-1,
     TYPE_INTEGER,			CONF_VALUE_8_BIT(2),
     &li.biomaze[1],			3
   },
   {
-    EL_BIOMAZE,
+    EL_BIOMAZE,				-1,
     TYPE_INTEGER,			CONF_VALUE_8_BIT(3),
     &li.biomaze[2],			3
   },
   {
-    EL_BIOMAZE,
+    EL_BIOMAZE,				-1,
     TYPE_INTEGER,			CONF_VALUE_8_BIT(4),
     &li.biomaze[3],			3
   },
 
   {
-    EL_TIMEGATE_SWITCH,
+    EL_TIMEGATE_SWITCH,			-1,
     TYPE_INTEGER,			CONF_VALUE_16_BIT(1),
     &li.time_timegate,			10
   },
 
   {
-    EL_LIGHT_SWITCH_ACTIVE,
+    EL_LIGHT_SWITCH_ACTIVE,		-1,
     TYPE_INTEGER,			CONF_VALUE_16_BIT(1),
     &li.time_light,			10
   },
 
   {
-    EL_SHIELD_NORMAL,
+    EL_SHIELD_NORMAL,			-1,
     TYPE_INTEGER,			CONF_VALUE_16_BIT(1),
     &li.shield_normal_time,		10
   },
   {
-    EL_SHIELD_NORMAL,
+    EL_SHIELD_NORMAL,			-1,
     TYPE_INTEGER,			CONF_VALUE_16_BIT(2),
     &li.score[SC_SHIELD],		10
   },
 
   {
-    EL_SHIELD_DEADLY,
+    EL_SHIELD_DEADLY,			-1,
     TYPE_INTEGER,			CONF_VALUE_16_BIT(1),
     &li.shield_deadly_time,		10
   },
   {
-    EL_SHIELD_DEADLY,
+    EL_SHIELD_DEADLY,			-1,
     TYPE_INTEGER,			CONF_VALUE_16_BIT(2),
     &li.score[SC_SHIELD],		10
   },
 
   {
-    EL_EXTRA_TIME,
+    EL_EXTRA_TIME,			-1,
     TYPE_INTEGER,			CONF_VALUE_16_BIT(1),
     &li.extra_time,			10
   },
   {
-    EL_EXTRA_TIME,
+    EL_EXTRA_TIME,			-1,
     TYPE_INTEGER,			CONF_VALUE_16_BIT(2),
     &li.extra_time_score,		10
   },
 
   {
-    EL_TIME_ORB_FULL,
+    EL_TIME_ORB_FULL,			-1,
     TYPE_INTEGER,			CONF_VALUE_16_BIT(1),
     &li.time_orb_time,			10
   },
   {
-    EL_TIME_ORB_FULL,
+    EL_TIME_ORB_FULL,			-1,
     TYPE_BOOLEAN,			CONF_VALUE_8_BIT(1),
     &li.use_time_orb_bug,		FALSE
   },
 
   {
-    EL_SPRING,
+    EL_SPRING,				-1,
     TYPE_BOOLEAN,			CONF_VALUE_8_BIT(1),
     &li.use_spring_bug,			FALSE
   },
 
   {
-    EL_EMC_ANDROID,
+    EL_EMC_ANDROID,			-1,
     TYPE_INTEGER,			CONF_VALUE_16_BIT(1),
     &li.android_move_time,		10
   },
   {
-    EL_EMC_ANDROID,
+    EL_EMC_ANDROID,			-1,
     TYPE_INTEGER,			CONF_VALUE_16_BIT(2),
     &li.android_clone_time,		10
   },
   {
-    EL_EMC_ANDROID,
+    EL_EMC_ANDROID,			-1,
     TYPE_ELEMENT_LIST,			CONF_VALUE_BYTES(1),
     &li.android_clone_element[0],	EL_EMPTY, NULL,
     &li.num_android_clone_elements,	1, MAX_ANDROID_ELEMENTS
   },
 
   {
-    EL_EMC_LENSES,
+    EL_EMC_LENSES,			-1,
     TYPE_INTEGER,			CONF_VALUE_16_BIT(1),
     &li.lenses_score,			10
   },
   {
-    EL_EMC_LENSES,
+    EL_EMC_LENSES,			-1,
     TYPE_INTEGER,			CONF_VALUE_16_BIT(2),
     &li.lenses_time,			10
   },
 
   {
-    EL_EMC_MAGNIFIER,
+    EL_EMC_MAGNIFIER,			-1,
     TYPE_INTEGER,			CONF_VALUE_16_BIT(1),
     &li.magnify_score,			10
   },
   {
-    EL_EMC_MAGNIFIER,
+    EL_EMC_MAGNIFIER,			-1,
     TYPE_INTEGER,			CONF_VALUE_16_BIT(2),
     &li.magnify_time,			10
   },
 
   {
-    EL_EMC_MAGIC_BALL,
+    EL_EMC_MAGIC_BALL,			-1,
     TYPE_INTEGER,			CONF_VALUE_16_BIT(1),
     &li.ball_time,			10
   },
   {
-    EL_EMC_MAGIC_BALL,
+    EL_EMC_MAGIC_BALL,			-1,
     TYPE_BOOLEAN,			CONF_VALUE_8_BIT(1),
     &li.ball_random,			FALSE
   },
   {
-    EL_EMC_MAGIC_BALL,
+    EL_EMC_MAGIC_BALL,			-1,
     TYPE_BOOLEAN,			CONF_VALUE_8_BIT(2),
     &li.ball_state_initial,		FALSE
   },
   {
-    EL_EMC_MAGIC_BALL,
+    EL_EMC_MAGIC_BALL,			-1,
     TYPE_CONTENT_LIST,			CONF_VALUE_BYTES(1),
     &li.ball_content,			EL_EMPTY, NULL,
     &li.num_ball_contents,		4, MAX_ELEMENT_CONTENTS
@@ -644,106 +708,46 @@ static struct LevelFileConfigInfo chunk_config_CONF[] =
   /* ---------- unused values ----------------------------------------------- */
 
   {
-    EL_UNKNOWN,
+    EL_UNKNOWN,				SAVE_CONF_NEVER,
     TYPE_INTEGER,			CONF_VALUE_16_BIT(1),
     &li.score[SC_UNKNOWN_14],		10
   },
   {
-    EL_UNKNOWN,
+    EL_UNKNOWN,				SAVE_CONF_NEVER,
     TYPE_INTEGER,			CONF_VALUE_16_BIT(2),
     &li.score[SC_UNKNOWN_15],		10
   },
 
   {
-    -1,
+    -1,					-1,
     -1,					-1,
     NULL,				-1,
   },
 };
 
-static struct LevelFileConfigInfo chunk_config_INFO[] =
+static struct LevelFileConfigInfo chunk_config_NOTE[] =
 {
-  /* ---------- values not related to single elements ----------------------- */
-
   {
-    -1,
+    -1,					-1,
     TYPE_INTEGER,			CONF_VALUE_8_BIT(1),
-    &li.game_engine_type,		GAME_ENGINE_TYPE_RND
+    &xx_envelope.xsize,			MAX_ENVELOPE_XSIZE,
+  },
+  {
+    -1,					-1,
+    TYPE_INTEGER,			CONF_VALUE_8_BIT(2),
+    &xx_envelope.ysize,			MAX_ENVELOPE_YSIZE,
   },
 
   {
-    -1,
-    TYPE_INTEGER,			CONF_VALUE_16_BIT(1),
-    &li.fieldx,				STD_LEV_FIELDX
-  },
-  {
-    -1,
-    TYPE_INTEGER,			CONF_VALUE_16_BIT(2),
-    &li.fieldy,				STD_LEV_FIELDY
+    -1,					-1,
+    TYPE_STRING,			CONF_VALUE_BYTES(1),
+    &xx_envelope.text,			-1, NULL,
+    &xx_string_length_unused,		-1, MAX_ENVELOPE_TEXT_LEN,
+    &xx_default_string_empty[0]
   },
 
   {
-    -1,
-    TYPE_INTEGER,			CONF_VALUE_16_BIT(3),
-    &li.time,				100
-  },
-
-  {
-    -1,
-    TYPE_INTEGER,			CONF_VALUE_16_BIT(4),
-    &li.gems_needed,			0
-  },
-
-  {
-    -1,
-    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(2),
-    &li.use_step_counter,		FALSE
-  },
-
-  {
-    -1,
-    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(3),
-    &li.initial_gravity,		FALSE
-  },
-
-  {
-    -1,
-    TYPE_BITFIELD,			CONF_VALUE_8_BIT(4),
-    &li.wind_direction_initial,		MV_NONE
-  },
-
-  {
-    -1,
-    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(5),
-    &li.em_slippery_gems,		FALSE
-  },
-
-  {
-    -1,
-    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(6),
-    &li.use_custom_template,		FALSE
-  },
-
-  {
-    -1,
-    TYPE_BITFIELD,			CONF_VALUE_32_BIT(1),
-    &li.can_move_into_acid_bits,	~0	/* default: everything can */
-  },
-
-  {
-    -1,
-    TYPE_BITFIELD,			CONF_VALUE_8_BIT(7),
-    &li.dont_collide_with_bits,		~0	/* default: always deadly */
-  },
-
-  {
-    -1,
-    TYPE_INTEGER,			CONF_VALUE_16_BIT(5),
-    &li.score[SC_TIME_BONUS],		1
-  },
-
-  {
-    -1,
+    -1,					-1,
     -1,					-1,
     NULL,				-1,
   },
@@ -752,16 +756,16 @@ static struct LevelFileConfigInfo chunk_config_INFO[] =
 static struct LevelFileConfigInfo chunk_config_CUSX_base[] =
 {
   {
-    -1,
+    -1,					-1,
     TYPE_STRING,			CONF_VALUE_BYTES(1),
     &xx_ei.description[0],		-1,
     &yy_ei.description[0],
-    &xx_default_description_length,	-1, MAX_ELEMENT_NAME_LEN,
+    &xx_string_length_unused,		-1, MAX_ELEMENT_NAME_LEN,
     &xx_default_description[0]
   },
 
   {
-    -1,
+    -1,					-1,
     TYPE_BITFIELD,			CONF_VALUE_32_BIT(1),
     &xx_ei.properties[EP_BITFIELD_BASE_NR], EP_BITMASK_BASE_DEFAULT,
     &yy_ei.properties[EP_BITFIELD_BASE_NR]
@@ -769,7 +773,7 @@ static struct LevelFileConfigInfo chunk_config_CUSX_base[] =
 #if 0
   /* (reserved) */
   {
-    -1,
+    -1,					-1,
     TYPE_BITFIELD,			CONF_VALUE_32_BIT(2),
     &xx_ei.properties[EP_BITFIELD_BASE_NR + 1], EP_BITMASK_DEFAULT,
     &yy_ei.properties[EP_BITFIELD_BASE_NR + 1]
@@ -777,160 +781,160 @@ static struct LevelFileConfigInfo chunk_config_CUSX_base[] =
 #endif
 
   {
-    -1,
+    -1,					-1,
     TYPE_BOOLEAN,			CONF_VALUE_8_BIT(1),
     &xx_ei.use_gfx_element,		FALSE,
     &yy_ei.use_gfx_element
   },
   {
-    -1,
+    -1,					-1,
     TYPE_ELEMENT,			CONF_VALUE_16_BIT(1),
     &xx_ei.gfx_element,			EL_EMPTY_SPACE,
     &yy_ei.gfx_element
   },
 
   {
-    -1,
+    -1,					-1,
     TYPE_BITFIELD,			CONF_VALUE_8_BIT(2),
     &xx_ei.access_direction,		MV_ALL_DIRECTIONS,
     &yy_ei.access_direction
   },
 
   {
-    -1,
+    -1,					-1,
     TYPE_INTEGER,			CONF_VALUE_16_BIT(2),
     &xx_ei.collect_score_initial,	10,
     &yy_ei.collect_score_initial
   },
   {
-    -1,
+    -1,					-1,
     TYPE_INTEGER,			CONF_VALUE_16_BIT(3),
     &xx_ei.collect_count_initial,	1,
     &yy_ei.collect_count_initial
   },
 
   {
-    -1,
+    -1,					-1,
     TYPE_INTEGER,			CONF_VALUE_16_BIT(4),
     &xx_ei.ce_value_fixed_initial,	0,
     &yy_ei.ce_value_fixed_initial
   },
   {
-    -1,
+    -1,					-1,
     TYPE_INTEGER,			CONF_VALUE_16_BIT(5),
     &xx_ei.ce_value_random_initial,	0,
     &yy_ei.ce_value_random_initial
   },
   {
-    -1,
+    -1,					-1,
     TYPE_BOOLEAN,			CONF_VALUE_8_BIT(3),
     &xx_ei.use_last_ce_value,		FALSE,
     &yy_ei.use_last_ce_value
   },
 
   {
-    -1,
+    -1,					-1,
     TYPE_INTEGER,			CONF_VALUE_16_BIT(6),
     &xx_ei.push_delay_fixed,		8,
     &yy_ei.push_delay_fixed
   },
   {
-    -1,
+    -1,					-1,
     TYPE_INTEGER,			CONF_VALUE_16_BIT(7),
     &xx_ei.push_delay_random,		8,
     &yy_ei.push_delay_random
   },
   {
-    -1,
+    -1,					-1,
     TYPE_INTEGER,			CONF_VALUE_16_BIT(8),
     &xx_ei.drop_delay_fixed,		0,
     &yy_ei.drop_delay_fixed
   },
   {
-    -1,
+    -1,					-1,
     TYPE_INTEGER,			CONF_VALUE_16_BIT(9),
     &xx_ei.drop_delay_random,		0,
     &yy_ei.drop_delay_random
   },
   {
-    -1,
+    -1,					-1,
     TYPE_INTEGER,			CONF_VALUE_16_BIT(10),
     &xx_ei.move_delay_fixed,		0,
     &yy_ei.move_delay_fixed
   },
   {
-    -1,
+    -1,					-1,
     TYPE_INTEGER,			CONF_VALUE_16_BIT(11),
     &xx_ei.move_delay_random,		0,
     &yy_ei.move_delay_random
   },
 
   {
-    -1,
+    -1,					-1,
     TYPE_BITFIELD,			CONF_VALUE_32_BIT(3),
     &xx_ei.move_pattern,		MV_ALL_DIRECTIONS,
     &yy_ei.move_pattern
   },
   {
-    -1,
+    -1,					-1,
     TYPE_BITFIELD,			CONF_VALUE_8_BIT(4),
     &xx_ei.move_direction_initial,	MV_START_AUTOMATIC,
     &yy_ei.move_direction_initial
   },
   {
-    -1,
+    -1,					-1,
     TYPE_INTEGER,			CONF_VALUE_8_BIT(5),
     &xx_ei.move_stepsize,		TILEX / 8,
     &yy_ei.move_stepsize
   },
 
   {
-    -1,
+    -1,					-1,
     TYPE_ELEMENT,			CONF_VALUE_16_BIT(12),
     &xx_ei.move_enter_element,		EL_EMPTY_SPACE,
     &yy_ei.move_enter_element
   },
   {
-    -1,
+    -1,					-1,
     TYPE_ELEMENT,			CONF_VALUE_16_BIT(13),
     &xx_ei.move_leave_element,		EL_EMPTY_SPACE,
     &yy_ei.move_leave_element
   },
   {
-    -1,
+    -1,					-1,
     TYPE_INTEGER,			CONF_VALUE_8_BIT(6),
     &xx_ei.move_leave_type,		LEAVE_TYPE_UNLIMITED,
     &yy_ei.move_leave_type
   },
 
   {
-    -1,
+    -1,					-1,
     TYPE_INTEGER,			CONF_VALUE_8_BIT(7),
     &xx_ei.slippery_type,		SLIPPERY_ANY_RANDOM,
     &yy_ei.slippery_type
   },
 
   {
-    -1,
+    -1,					-1,
     TYPE_INTEGER,			CONF_VALUE_8_BIT(8),
     &xx_ei.explosion_type,		EXPLODES_3X3,
     &yy_ei.explosion_type
   },
   {
-    -1,
+    -1,					-1,
     TYPE_INTEGER,			CONF_VALUE_16_BIT(14),
     &xx_ei.explosion_delay,		16,
     &yy_ei.explosion_delay
   },
   {
-    -1,
+    -1,					-1,
     TYPE_INTEGER,			CONF_VALUE_16_BIT(15),
     &xx_ei.ignition_delay,		8,
     &yy_ei.ignition_delay
   },
 
   {
-    -1,
+    -1,					-1,
     TYPE_CONTENT_LIST,			CONF_VALUE_BYTES(2),
     &xx_ei.content,			EL_EMPTY_SPACE,
     &yy_ei.content,
@@ -940,14 +944,14 @@ static struct LevelFileConfigInfo chunk_config_CUSX_base[] =
   /* ---------- "num_change_pages" must be the last entry ------------------- */
 
   {
-    -1,
+    -1,					SAVE_CONF_ALWAYS,
     TYPE_INTEGER,			CONF_VALUE_8_BIT(9),
-    &xx_ei.num_change_pages,		-1,	/* value must always be saved */
+    &xx_ei.num_change_pages,		1,
     &yy_ei.num_change_pages
   },
 
   {
-    -1,
+    -1,					-1,
     -1,					-1,
     NULL,				-1,
     NULL
@@ -959,135 +963,135 @@ static struct LevelFileConfigInfo chunk_config_CUSX_change[] =
   /* ---------- "current_change_page" must be the first entry --------------- */
 
   {
-    -1,
+    -1,					SAVE_CONF_ALWAYS,
     TYPE_INTEGER,			CONF_VALUE_8_BIT(1),
-    &xx_current_change_page,		-1	/* value must always be saved */
+    &xx_current_change_page,		-1
   },
 
   /* ---------- (the remaining entries can be in any order) ----------------- */
 
   {
-    -1,
+    -1,					-1,
     TYPE_BOOLEAN,			CONF_VALUE_8_BIT(2),
     &xx_change.can_change,		FALSE
   },
 
   {
-    -1,
+    -1,					-1,
     TYPE_BITFIELD,			CONF_VALUE_32_BIT(1),
     &xx_event_bits[0],			0
   },
   {
-    -1,
+    -1,					-1,
     TYPE_BITFIELD,			CONF_VALUE_32_BIT(2),
     &xx_event_bits[1],			0
   },
 
   {
-    -1,
+    -1,					-1,
     TYPE_BITFIELD,			CONF_VALUE_8_BIT(3),
     &xx_change.trigger_player,		CH_PLAYER_ANY
   },
   {
-    -1,
+    -1,					-1,
     TYPE_BITFIELD,			CONF_VALUE_8_BIT(4),
     &xx_change.trigger_side,		CH_SIDE_ANY
   },
   {
-    -1,
+    -1,					-1,
     TYPE_BITFIELD,			CONF_VALUE_32_BIT(3),
     &xx_change.trigger_page,		CH_PAGE_ANY
   },
 
   {
-    -1,
+    -1,					-1,
     TYPE_ELEMENT,			CONF_VALUE_16_BIT(1),
     &xx_change.target_element,		EL_EMPTY_SPACE
   },
 
   {
-    -1,
+    -1,					-1,
     TYPE_INTEGER,			CONF_VALUE_16_BIT(2),
     &xx_change.delay_fixed,		0
   },
   {
-    -1,
+    -1,					-1,
     TYPE_INTEGER,			CONF_VALUE_16_BIT(3),
     &xx_change.delay_random,		0
   },
   {
-    -1,
+    -1,					-1,
     TYPE_INTEGER,			CONF_VALUE_16_BIT(4),
     &xx_change.delay_frames,		FRAMES_PER_SECOND
   },
 
   {
-    -1,
+    -1,					-1,
     TYPE_ELEMENT,			CONF_VALUE_16_BIT(5),
     &xx_change.trigger_element,		EL_EMPTY_SPACE
   },
 
   {
-    -1,
+    -1,					-1,
     TYPE_BOOLEAN,			CONF_VALUE_8_BIT(6),
     &xx_change.explode,			FALSE
   },
   {
-    -1,
+    -1,					-1,
     TYPE_BOOLEAN,			CONF_VALUE_8_BIT(7),
     &xx_change.use_target_content,	FALSE
   },
   {
-    -1,
+    -1,					-1,
     TYPE_BOOLEAN,			CONF_VALUE_8_BIT(8),
     &xx_change.only_if_complete,	FALSE
   },
   {
-    -1,
+    -1,					-1,
     TYPE_BOOLEAN,			CONF_VALUE_8_BIT(9),
     &xx_change.use_random_replace,	FALSE
   },
   {
-    -1,
+    -1,					-1,
     TYPE_INTEGER,			CONF_VALUE_8_BIT(10),
     &xx_change.random_percentage,	100
   },
   {
-    -1,
+    -1,					-1,
     TYPE_INTEGER,			CONF_VALUE_8_BIT(11),
     &xx_change.replace_when,		CP_WHEN_EMPTY
   },
 
   {
-    -1,
+    -1,					-1,
     TYPE_BOOLEAN,			CONF_VALUE_8_BIT(12),
     &xx_change.has_action,		FALSE
   },
   {
-    -1,
+    -1,					-1,
     TYPE_INTEGER,			CONF_VALUE_8_BIT(13),
     &xx_change.action_type,		CA_NO_ACTION
   },
   {
-    -1,
+    -1,					-1,
     TYPE_INTEGER,			CONF_VALUE_8_BIT(14),
     &xx_change.action_mode,		CA_MODE_UNDEFINED
   },
   {
-    -1,
+    -1,					-1,
     TYPE_INTEGER,			CONF_VALUE_16_BIT(6),
     &xx_change.action_arg,		CA_ARG_UNDEFINED
   },
 
   {
-    -1,
+    -1,					-1,
     TYPE_CONTENT_LIST,			CONF_VALUE_BYTES(1),
     &xx_change.target_content,		EL_EMPTY_SPACE, NULL,
     &xx_num_contents,			1, 1
   },
 
   {
-    -1,
+    -1,					-1,
     -1,					-1,
     NULL,				-1,
   },
@@ -1096,39 +1100,39 @@ static struct LevelFileConfigInfo chunk_config_CUSX_change[] =
 static struct LevelFileConfigInfo chunk_config_GRPX[] =
 {
   {
-    -1,
+    -1,					-1,
     TYPE_STRING,			CONF_VALUE_BYTES(1),
     &xx_ei.description[0],		-1, NULL,
-    &xx_default_description_length,	-1, MAX_ELEMENT_NAME_LEN,
+    &xx_string_length_unused,		-1, MAX_ELEMENT_NAME_LEN,
     &xx_default_description[0]
   },
 
   {
-    -1,
+    -1,					-1,
     TYPE_BOOLEAN,			CONF_VALUE_8_BIT(1),
     &xx_ei.use_gfx_element,		FALSE
   },
   {
-    -1,
+    -1,					-1,
     TYPE_ELEMENT,			CONF_VALUE_16_BIT(1),
     &xx_ei.gfx_element,			EL_EMPTY_SPACE
   },
 
   {
-    -1,
+    -1,					-1,
     TYPE_INTEGER,			CONF_VALUE_8_BIT(2),
     &xx_group.choice_mode,		ANIM_RANDOM
   },
 
   {
-    -1,
+    -1,					-1,
     TYPE_ELEMENT_LIST,			CONF_VALUE_BYTES(2),
     &xx_group.element[0],		EL_EMPTY_SPACE, NULL,
     &xx_group.num_elements,		1, MAX_ELEMENTS_IN_GROUP
   },
 
   {
-    -1,
+    -1,					-1,
     -1,					-1,
     NULL,				-1,
   },
@@ -1504,7 +1508,7 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
   li = *level;		/* copy level data into temporary buffer */
 
   setConfigToDefaultsFromConfigList(chunk_config_INFO);
-  setConfigToDefaultsFromConfigList(chunk_config_CONF);
+  setConfigToDefaultsFromConfigList(chunk_config_ELEM);
 
   *level = li;		/* copy temporary buffer back to level data */
 #endif
@@ -1520,9 +1524,15 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
   level->file_version = FILE_VERSION_ACTUAL;
   level->game_version = GAME_VERSION_ACTUAL;
 
+#if 1
+  level->encoding_16bit_field  = TRUE;
+  level->encoding_16bit_yamyam = TRUE;
+  level->encoding_16bit_amoeba = TRUE;
+#else
   level->encoding_16bit_field  = FALSE;	/* default: only 8-bit elements */
   level->encoding_16bit_yamyam = FALSE;	/* default: only 8-bit elements */
   level->encoding_16bit_amoeba = FALSE;	/* default: only 8-bit elements */
+#endif
 
 #if 0
   level->fieldx = STD_LEV_FIELDX;
@@ -1626,12 +1636,14 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
   strcpy(level->name, NAMELESS_LEVEL_NAME);
   strcpy(level->author, ANONYMOUS_NAME);
 
+#if 0
   for (i = 0; i < 4; i++)
   {
     level->envelope_text[i][0] = '\0';
     level->envelope_xsize[i] = MAX_ENVELOPE_XSIZE;
     level->envelope_ysize[i] = MAX_ENVELOPE_YSIZE;
   }
+#endif
 
 #if 0
   for (i = 0; i < LEVEL_SCORE_ELEMENTS; i++)
@@ -1654,6 +1666,15 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
   {
     int element = i;
     struct ElementInfo *ei = &element_info[element];
+
+    if (IS_ENVELOPE(element))
+    {
+      int envelope_nr = element - EL_ENVELOPE_1;
+
+      setConfigToDefaultsFromConfigList(chunk_config_NOTE);
+
+      level->envelope[envelope_nr] = xx_envelope;
+    }
 
 #if 1
     if (IS_CUSTOM_ELEMENT(element) ||
@@ -2221,6 +2242,8 @@ static int LoadLevel_VERS(FILE *file, int chunk_size, struct LevelInfo *level)
 
 static int LoadLevel_HEAD(FILE *file, int chunk_size, struct LevelInfo *level)
 {
+  int initial_player_stepsize;
+  int initial_player_gravity;
   int i, x, y;
 
   level->fieldx = getFile8Bit(file);
@@ -2247,10 +2270,17 @@ static int LoadLevel_HEAD(FILE *file, int chunk_size, struct LevelInfo *level)
   level->time_wheel		= getFile8Bit(file);
   level->amoeba_content		= getMappedElement(getFile8Bit(file));
 
-  level->initial_player_stepsize = (getFile8Bit(file) == 1 ? STEPSIZE_FAST :
-				    STEPSIZE_NORMAL);
+  initial_player_stepsize	= (getFile8Bit(file) == 1 ? STEPSIZE_FAST :
+				   STEPSIZE_NORMAL);
 
-  level->initial_gravity	= (getFile8Bit(file) == 1 ? TRUE : FALSE);
+  for (i = 0; i < MAX_PLAYERS; i++)
+    level->initial_player_stepsize[0] = initial_player_stepsize;
+
+  initial_player_gravity	= (getFile8Bit(file) == 1 ? TRUE : FALSE);
+
+  for (i = 0; i < MAX_PLAYERS; i++)
+    level->initial_player_gravity[0] = initial_player_gravity;
+
   level->encoding_16bit_field	= (getFile8Bit(file) == 1 ? TRUE : FALSE);
   level->em_slippery_gems	= (getFile8Bit(file) == 1 ? TRUE : FALSE);
 
@@ -2275,13 +2305,24 @@ static int LoadLevel_HEAD(FILE *file, int chunk_size, struct LevelInfo *level)
   return chunk_size;
 }
 
+static int LoadLevel_NAME(FILE *file, int chunk_size, struct LevelInfo *level)
+{
+  int i;
+
+  for (i = 0; i < MAX_LEVEL_NAME_LEN; i++)
+    level->name[i] = getFile8Bit(file);
+  level->name[MAX_LEVEL_NAME_LEN] = 0;
+
+  return chunk_size;
+}
+
 static int LoadLevel_AUTH(FILE *file, int chunk_size, struct LevelInfo *level)
 {
   int i;
 
   for (i = 0; i < MAX_LEVEL_AUTHOR_LEN; i++)
     level->author[i] = getFile8Bit(file);
-  level->author[MAX_LEVEL_NAME_LEN] = 0;
+  level->author[MAX_LEVEL_AUTHOR_LEN] = 0;
 
   return chunk_size;
 }
@@ -2413,8 +2454,8 @@ static int LoadLevel_CNT3(FILE *file, int chunk_size, struct LevelInfo *level)
 
   envelope_len = getFile16BitBE(file);
 
-  level->envelope_xsize[envelope_nr] = getFile8Bit(file);
-  level->envelope_ysize[envelope_nr] = getFile8Bit(file);
+  level->envelope[envelope_nr].xsize = getFile8Bit(file);
+  level->envelope[envelope_nr].ysize = getFile8Bit(file);
 
   ReadUnusedBytesFromFile(file, LEVEL_CHUNK_CNT3_UNUSED);
 
@@ -2426,7 +2467,7 @@ static int LoadLevel_CNT3(FILE *file, int chunk_size, struct LevelInfo *level)
   }
 
   for (i = 0; i < envelope_len; i++)
-    level->envelope_text[envelope_nr][i] = getFile8Bit(file);
+    level->envelope[envelope_nr].text[i] = getFile8Bit(file);
 
   return chunk_size;
 }
@@ -2445,7 +2486,7 @@ static int LoadLevel_CUS1(FILE *file, int chunk_size, struct LevelInfo *level)
 
   for (i = 0; i < num_changed_custom_elements; i++)
   {
-    int element = getFile16BitBE(file);
+    int element = getMappedElement(getFile16BitBE(file));
     int properties = getFile32BitBE(file);
 
 #if 1
@@ -2484,8 +2525,8 @@ static int LoadLevel_CUS2(FILE *file, int chunk_size, struct LevelInfo *level)
 
   for (i = 0; i < num_changed_custom_elements; i++)
   {
-    int element = getFile16BitBE(file);
-    int custom_target_element = getFile16BitBE(file);
+    int element = getMappedElement(getFile16BitBE(file));
+    int custom_target_element = getMappedElement(getFile16BitBE(file));
 
     if (IS_CUSTOM_ELEMENT(element))
       element_info[element].change->target_element = custom_target_element;
@@ -2510,7 +2551,7 @@ static int LoadLevel_CUS3(FILE *file, int chunk_size, struct LevelInfo *level)
 
   for (i = 0; i < num_changed_custom_elements; i++)
   {
-    int element = getFile16BitBE(file);
+    int element = getMappedElement(getFile16BitBE(file));
     struct ElementInfo *ei = &element_info[element];
     unsigned int event_bits;
 
@@ -2600,7 +2641,7 @@ static int LoadLevel_CUS4(FILE *file, int chunk_size, struct LevelInfo *level)
 
   /* ---------- custom element base property values (96 bytes) ------------- */
 
-  element = getFile16BitBE(file);
+  element = getMappedElement(getFile16BitBE(file));
 
   if (!IS_CUSTOM_ELEMENT(element))
   {
@@ -2749,7 +2790,7 @@ static int LoadLevel_GRP1(FILE *file, int chunk_size, struct LevelInfo *level)
   int element;
   int i;
 
-  element = getFile16BitBE(file);
+  element = getMappedElement(getFile16BitBE(file));
 
   if (!IS_GROUP_ELEMENT(element))
   {
@@ -2886,6 +2927,9 @@ static int LoadLevel_MicroChunk(FILE *file, struct LevelFileConfigInfo *conf,
       {
 	int data_type = conf[i].data_type;
 
+	if (data_type == TYPE_ELEMENT)
+	  value = getMappedElement(value);
+
 	if (data_type == TYPE_BOOLEAN)
 	  *(boolean *)(conf[i].value) = value;
 	else
@@ -2936,7 +2980,7 @@ static int LoadLevel_INFO(FILE *file, int chunk_size, struct LevelInfo *level)
   return real_chunk_size;
 }
 
-static int LoadLevel_CONF(FILE *file, int chunk_size, struct LevelInfo *level)
+static int LoadLevel_ELEM(FILE *file, int chunk_size, struct LevelInfo *level)
 {
   int real_chunk_size = 0;
 
@@ -2946,10 +2990,10 @@ static int LoadLevel_CONF(FILE *file, int chunk_size, struct LevelInfo *level)
 
   while (!feof(file))
   {
-    int element = getFile16BitBE(file);
+    int element = getMappedElement(getFile16BitBE(file));
 #if 1
     real_chunk_size += 2;
-    real_chunk_size += LoadLevel_MicroChunk(file, chunk_config_CONF,
+    real_chunk_size += LoadLevel_MicroChunk(file, chunk_config_ELEM,
 					    element, element);
 #else
     int conf_type = getFile8Bit(file);
@@ -2970,14 +3014,14 @@ static int LoadLevel_CONF(FILE *file, int chunk_size, struct LevelInfo *level)
 
       ReadBytesFromFile(file, buffer, num_bytes);
 
-      for (i = 0; chunk_config_CONF[i].data_type != -1; i++)
+      for (i = 0; chunk_config_ELEM[i].data_type != -1; i++)
       {
-	if (chunk_config_CONF[i].element == element &&
-	    chunk_config_CONF[i].conf_type == conf_type)
+	if (chunk_config_ELEM[i].element == element &&
+	    chunk_config_ELEM[i].conf_type == conf_type)
 	{
-	  int data_type = chunk_config_CONF[i].data_type;
+	  int data_type = chunk_config_ELEM[i].data_type;
 	  int num_entities = num_bytes / CONF_ENTITY_NUM_BYTES(data_type);
-	  int max_num_entities = chunk_config_CONF[i].max_num_entities;
+	  int max_num_entities = chunk_config_ELEM[i].max_num_entities;
 
 	  if (num_entities > max_num_entities)
 	  {
@@ -2988,13 +3032,13 @@ static int LoadLevel_CONF(FILE *file, int chunk_size, struct LevelInfo *level)
 	    num_entities = max_num_entities;
 	  }
 
-	  *(int *)(chunk_config_CONF[i].num_entities) = num_entities;
+	  *(int *)(chunk_config_ELEM[i].num_entities) = num_entities;
 
 	  element_found = TRUE;
 
 	  if (data_type == TYPE_ELEMENT_LIST)
 	  {
-	    int *element_array = (int *)(chunk_config_CONF[i].value);
+	    int *element_array = (int *)(chunk_config_ELEM[i].value);
 	    int j;
 
 	    for (j = 0; j < num_entities; j++)
@@ -3003,7 +3047,7 @@ static int LoadLevel_CONF(FILE *file, int chunk_size, struct LevelInfo *level)
 	  }
 	  else if (data_type == TYPE_CONTENT_LIST)
 	  {
-	    struct Content *content= (struct Content *)(chunk_config_CONF[i].value);
+	    struct Content *content= (struct Content *)(chunk_config_ELEM[i].value);
 	    int c, x, y;
 
 	    for (c = 0; c < num_entities; c++)
@@ -3029,17 +3073,17 @@ static int LoadLevel_CONF(FILE *file, int chunk_size, struct LevelInfo *level)
 		   byte_mask == CONF_MASK_2_BYTE ? getFile16BitBE(file) :
 		   byte_mask == CONF_MASK_4_BYTE ? getFile32BitBE(file) : 0);
 
-      for (i = 0; chunk_config_CONF[i].data_type != -1; i++)
+      for (i = 0; chunk_config_ELEM[i].data_type != -1; i++)
       {
-	if (chunk_config_CONF[i].element == element &&
-	    chunk_config_CONF[i].conf_type == conf_type)
+	if (chunk_config_ELEM[i].element == element &&
+	    chunk_config_ELEM[i].conf_type == conf_type)
 	{
-	  int data_type = chunk_config_CONF[i].data_type;
+	  int data_type = chunk_config_ELEM[i].data_type;
 
 	  if (data_type == TYPE_BOOLEAN)
-	    *(boolean *)(chunk_config_CONF[i].value) = value;
+	    *(boolean *)(chunk_config_ELEM[i].value) = value;
 	  else
-	    *(int *)    (chunk_config_CONF[i].value) = value;
+	    *(int *)    (chunk_config_ELEM[i].value) = value;
 
 	  element_found = TRUE;
 
@@ -3058,13 +3102,8 @@ static int LoadLevel_CONF(FILE *file, int chunk_size, struct LevelInfo *level)
     *level = li;	/* copy temporary buffer back to level data */
 #endif
 
-#if 1
     if (real_chunk_size >= chunk_size)
       break;
-#else
-    if (conf_type == CONF_LAST_ENTRY || real_chunk_size >= chunk_size)
-      break;
-#endif
   }
 
 #if 1
@@ -3074,9 +3113,29 @@ static int LoadLevel_CONF(FILE *file, int chunk_size, struct LevelInfo *level)
   return real_chunk_size;
 }
 
+static int LoadLevel_NOTE(FILE *file, int chunk_size, struct LevelInfo *level)
+{
+  int element = getMappedElement(getFile16BitBE(file));
+  int envelope_nr = element - EL_ENVELOPE_1;
+  int real_chunk_size = 2;
+
+  while (!feof(file))
+  {
+    real_chunk_size += LoadLevel_MicroChunk(file, chunk_config_NOTE,
+					    -1, element);
+
+    if (real_chunk_size >= chunk_size)
+      break;
+  }
+
+  level->envelope[envelope_nr] = xx_envelope;
+
+  return real_chunk_size;
+}
+
 static int LoadLevel_CUSX(FILE *file, int chunk_size, struct LevelInfo *level)
 {
-  int element = getFile16BitBE(file);
+  int element = getMappedElement(getFile16BitBE(file));
   int real_chunk_size = 2;
   struct ElementInfo *ei = &element_info[element];
   int i;
@@ -3152,7 +3211,7 @@ static int LoadLevel_CUSX(FILE *file, int chunk_size, struct LevelInfo *level)
 
 static int LoadLevel_GRPX(FILE *file, int chunk_size, struct LevelInfo *level)
 {
-  int element = getFile16BitBE(file);
+  int element = getMappedElement(getFile16BitBE(file));
   int real_chunk_size = 2;
   struct ElementInfo *ei = &element_info[element];
   struct ElementGroupInfo *group = ei->group;
@@ -3256,7 +3315,9 @@ static void LoadLevelFromFileInfo_RND(struct LevelInfo *level,
     {
       { "VERS", LEVEL_CHUNK_VERS_SIZE,	LoadLevel_VERS },
       { "HEAD", LEVEL_CHUNK_HEAD_SIZE,	LoadLevel_HEAD },
-      { "AUTH", MAX_LEVEL_AUTHOR_LEN,	LoadLevel_AUTH },
+      { "NAME", LEVEL_CHUNK_NAME_SIZE,	LoadLevel_NAME },
+      { "AUTH", LEVEL_CHUNK_AUTH_SIZE,	LoadLevel_AUTH },
+      { "INFO", -1,			LoadLevel_INFO },
       { "BODY", -1,			LoadLevel_BODY },
       { "CONT", -1,			LoadLevel_CONT },
       { "CNT2", LEVEL_CHUNK_CNT2_SIZE,	LoadLevel_CNT2 },
@@ -3266,8 +3327,8 @@ static void LoadLevelFromFileInfo_RND(struct LevelInfo *level,
       { "CUS3", -1,			LoadLevel_CUS3 },
       { "CUS4", -1,			LoadLevel_CUS4 },
       { "GRP1", -1,			LoadLevel_GRP1 },
-      { "INFO", -1,			LoadLevel_INFO },
-      { "CONF", -1,			LoadLevel_CONF },
+      { "ELEM", -1,			LoadLevel_ELEM },
+      { "NOTE", -1,			LoadLevel_NOTE },
       { "CUSX", -1,			LoadLevel_CUSX },
       { "GRPX", -1,			LoadLevel_GRPX },
 
@@ -4174,6 +4235,7 @@ void CopyNativeLevel_Native_to_RND(struct LevelInfo *level)
 static void LoadLevelFromFileStream_SP(FILE *file, struct LevelInfo *level,
 				       int nr)
 {
+  int initial_player_gravity;
   int num_special_ports;
   int i, x, y;
 
@@ -4207,7 +4269,10 @@ static void LoadLevelFromFileStream_SP(FILE *file, struct LevelInfo *level,
   ReadUnusedBytesFromFile(file, 4);	/* (not used by Supaplex engine) */
 
   /* initial gravity: 1 == "on", anything else (0) == "off" */
-  level->initial_gravity = (fgetc(file) == 1 ? TRUE : FALSE);
+  initial_player_gravity = (fgetc(file) == 1 ? TRUE : FALSE);
+
+  for (i = 0; i < MAX_PLAYERS; i++)
+    level->initial_player_gravity[i] = initial_player_gravity;
 
   ReadUnusedBytesFromFile(file, 1);	/* (not used by Supaplex engine) */
 
@@ -4569,6 +4634,8 @@ void LoadLevelFromFilename(struct LevelInfo *level, char *filename)
 
 static void LoadLevel_InitVersion(struct LevelInfo *level, char *filename)
 {
+  int i;
+
   if (leveldir_current == NULL)		/* only when dumping level */
     return;
 
@@ -4626,7 +4693,8 @@ static void LoadLevel_InitVersion(struct LevelInfo *level, char *filename)
 
   /* player was faster than enemies in 1.0.0 and before */
   if (level->file_version == FILE_VERSION_1_0)
-    level->initial_player_stepsize = STEPSIZE_FAST;
+    for (i = 0; i < MAX_PLAYERS; i++)
+      level->initial_player_stepsize[i] = STEPSIZE_FAST;
 
   /* default behaviour for EM style gems was "slippery" only in 2.0.1 */
   if (level->game_version == VERSION_IDENT(2,0,1,0))
@@ -4910,12 +4978,17 @@ void LoadLevel(int nr)
   LoadLevel_InitNativeEngines(&level, filename);
 }
 
-static void SaveLevel_VERS(FILE *file, struct LevelInfo *level)
+static int SaveLevel_VERS(FILE *file, struct LevelInfo *level)
 {
-  putFileVersion(file, level->file_version);
-  putFileVersion(file, level->game_version);
+  int chunk_size = 0;
+
+  chunk_size += putFileVersion(file, level->file_version);
+  chunk_size += putFileVersion(file, level->game_version);
+
+  return chunk_size;
 }
 
+#if 0
 static void SaveLevel_HEAD(FILE *file, struct LevelInfo *level)
 {
   int i, x, y;
@@ -4965,35 +5038,57 @@ static void SaveLevel_HEAD(FILE *file, struct LevelInfo *level)
 
   WriteUnusedBytesToFile(file, LEVEL_CHUNK_HEAD_UNUSED);
 }
+#endif
 
-static void SaveLevel_AUTH(FILE *file, struct LevelInfo *level)
+static int SaveLevel_NAME(FILE *file, struct LevelInfo *level)
 {
-  int i;
-
-  for (i = 0; i < MAX_LEVEL_AUTHOR_LEN; i++)
-    putFile8Bit(file, level->author[i]);
-}
-
-#if 0
-static void SaveLevel_TITL(FILE *file, struct LevelInfo *level)
-{
+  int chunk_size = 0;
   int i;
 
   for (i = 0; i < MAX_LEVEL_NAME_LEN; i++)
-    putFile8Bit(file, level->name[i]);
-}
-#endif
+    chunk_size += putFile8Bit(file, level->name[i]);
 
-static void SaveLevel_BODY(FILE *file, struct LevelInfo *level)
+  return chunk_size;
+}
+
+static int SaveLevel_AUTH(FILE *file, struct LevelInfo *level)
 {
+  int chunk_size = 0;
+  int i;
+
+  for (i = 0; i < MAX_LEVEL_AUTHOR_LEN; i++)
+    chunk_size += putFile8Bit(file, level->author[i]);
+
+  return chunk_size;
+}
+
+#if 0
+static int SaveLevel_BODY(FILE *file, struct LevelInfo *level)
+{
+  int chunk_size = 0;
   int x, y;
 
   for (y = 0; y < level->fieldy; y++) 
     for (x = 0; x < level->fieldx; x++) 
       if (level->encoding_16bit_field)
-	putFile16BitBE(file, level->field[x][y]);
+	chunk_size += putFile16BitBE(file, level->field[x][y]);
       else
-	putFile8Bit(file, level->field[x][y]);
+	chunk_size += putFile8Bit(file, level->field[x][y]);
+
+  return chunk_size;
+}
+#endif
+
+static int SaveLevel_BODY(FILE *file, struct LevelInfo *level)
+{
+  int chunk_size = 0;
+  int x, y;
+
+  for (y = 0; y < level->fieldy; y++) 
+    for (x = 0; x < level->fieldx; x++) 
+      chunk_size += putFile16BitBE(file, level->field[x][y]);
+
+  return chunk_size;
 }
 
 #if 0
@@ -5069,22 +5164,28 @@ static void SaveLevel_CNT2(FILE *file, struct LevelInfo *level, int element)
 }
 #endif
 
-static void SaveLevel_CNT3(FILE *file, struct LevelInfo *level, int element)
+#if 0
+static int SaveLevel_CNT3(FILE *file, struct LevelInfo *level, int element)
 {
-  int i;
   int envelope_nr = element - EL_ENVELOPE_1;
   int envelope_len = strlen(level->envelope_text[envelope_nr]) + 1;
+  int chunk_size = 0;
+  int i;
 
-  putFile16BitBE(file, element);
-  putFile16BitBE(file, envelope_len);
-  putFile8Bit(file, level->envelope_xsize[envelope_nr]);
-  putFile8Bit(file, level->envelope_ysize[envelope_nr]);
+  chunk_size += putFile16BitBE(file, element);
+  chunk_size += putFile16BitBE(file, envelope_len);
+  chunk_size += putFile8Bit(file, level->envelope_xsize[envelope_nr]);
+  chunk_size += putFile8Bit(file, level->envelope_ysize[envelope_nr]);
 
   WriteUnusedBytesToFile(file, LEVEL_CHUNK_CNT3_UNUSED);
+  chunk_size += LEVEL_CHUNK_CNT3_UNUSED;
 
   for (i = 0; i < envelope_len; i++)
-    putFile8Bit(file, level->envelope_text[envelope_nr][i]);
+    chunk_size += putFile8Bit(file, level->envelope_text[envelope_nr][i]);
+
+  return chunk_size;
 }
+#endif
 
 #if 0
 static void SaveLevel_CUS1(FILE *file, struct LevelInfo *level,
@@ -5399,6 +5500,7 @@ static void SaveLevel_GRP1(FILE *file, struct LevelInfo *level, int element)
 static int SaveLevel_MicroChunk(FILE *file, struct LevelFileConfigInfo *entry,
 				boolean write_element)
 {
+  int save_type = entry->save_type;
   int data_type = entry->data_type;
   int conf_type = entry->conf_type;
   int byte_mask = conf_type & CONF_MASK_BYTES;
@@ -5417,7 +5519,9 @@ static int SaveLevel_MicroChunk(FILE *file, struct LevelFileConfigInfo *entry,
     if (value != default_value)
       modified = TRUE;
 
-    if (!modified)		/* do not save unmodified default settings */
+    /* do not save if explicitly told or if unmodified default settings */
+    if ((save_type == SAVE_CONF_NEVER) ||
+	(save_type == SAVE_CONF_WHEN_CHANGED && !modified))
       return 0;
 
     if (write_element)
@@ -5428,8 +5532,6 @@ static int SaveLevel_MicroChunk(FILE *file, struct LevelFileConfigInfo *entry,
 		  byte_mask == CONF_MASK_2_BYTE ? putFile16BitBE(file, value) :
 		  byte_mask == CONF_MASK_4_BYTE ? putFile32BitBE(file, value) :
 		  0);
-
-    return num_bytes;
   }
   else if (data_type == TYPE_STRING)
   {
@@ -5442,7 +5544,9 @@ static int SaveLevel_MicroChunk(FILE *file, struct LevelFileConfigInfo *entry,
     if (!strEqual(string, default_string))
       modified = TRUE;
 
-    if (!modified)		/* do not save unmodified default settings */
+    /* do not save if explicitly told or if unmodified default settings */
+    if ((save_type == SAVE_CONF_NEVER) ||
+	(save_type == SAVE_CONF_WHEN_CHANGED && !modified))
       return 0;
 
     if (write_element)
@@ -5453,8 +5557,6 @@ static int SaveLevel_MicroChunk(FILE *file, struct LevelFileConfigInfo *entry,
 
     for (i = 0; i < string_length; i++)
       num_bytes += putFile8Bit(file, string[i]);
-
-    return num_bytes;
   }
   else if (data_type == TYPE_ELEMENT_LIST)
   {
@@ -5467,7 +5569,9 @@ static int SaveLevel_MicroChunk(FILE *file, struct LevelFileConfigInfo *entry,
       if (element_array[i] != default_value)
 	modified = TRUE;
 
-    if (!modified)		/* do not save unmodified default settings */
+    /* do not save if explicitly told or if unmodified default settings */
+    if ((save_type == SAVE_CONF_NEVER) ||
+	(save_type == SAVE_CONF_WHEN_CHANGED && !modified))
       return 0;
 
     if (write_element)
@@ -5478,8 +5582,6 @@ static int SaveLevel_MicroChunk(FILE *file, struct LevelFileConfigInfo *entry,
 
     for (i = 0; i < num_elements; i++)
       num_bytes += putFile16BitBE(file, element_array[i]);
-
-    return num_bytes;
   }
   else if (data_type == TYPE_CONTENT_LIST)
   {
@@ -5494,7 +5596,9 @@ static int SaveLevel_MicroChunk(FILE *file, struct LevelFileConfigInfo *entry,
 	  if (content[i].e[x][y] != default_value)
 	    modified = TRUE;
 
-    if (!modified)		/* do not save unmodified default settings */
+    /* do not save if explicitly told or if unmodified default settings */
+    if ((save_type == SAVE_CONF_NEVER) ||
+	(save_type == SAVE_CONF_WHEN_CHANGED && !modified))
       return 0;
 
     if (write_element)
@@ -5507,11 +5611,9 @@ static int SaveLevel_MicroChunk(FILE *file, struct LevelFileConfigInfo *entry,
       for (y = 0; y < 3; y++)
 	for (x = 0; x < 3; x++)
 	  num_bytes += putFile16BitBE(file, content[i].e[x][y]);
-
-    return num_bytes;
   }
 
-  return 0;
+  return num_bytes;
 }
 
 #if 0
@@ -5637,19 +5739,19 @@ static int SaveLevel_INFO(FILE *file, struct LevelInfo *level)
   return chunk_size;
 }
 
-static int SaveLevel_CONF(FILE *file, struct LevelInfo *level)
+static int SaveLevel_ELEM(FILE *file, struct LevelInfo *level)
 {
   int chunk_size = 0;
   int i;
 
   li = *level;		/* copy level data into temporary buffer */
 
-  for (i = 0; chunk_config_CONF[i].data_type != -1; i++)
+  for (i = 0; chunk_config_ELEM[i].data_type != -1; i++)
   {
 #if 1
-    chunk_size += SaveLevel_MicroChunk(file, &chunk_config_CONF[i], TRUE);
+    chunk_size += SaveLevel_MicroChunk(file, &chunk_config_ELEM[i], TRUE);
 #else
-    struct LevelFileConfigInfo *conf = &chunk_config_CONF[i];
+    struct LevelFileConfigInfo *conf = &chunk_config_ELEM[i];
     int data_type = conf->data_type;
     int conf_type = conf->conf_type;
     int byte_mask = conf_type & CONF_MASK_BYTES;
@@ -5662,6 +5764,23 @@ static int SaveLevel_CONF(FILE *file, struct LevelInfo *level)
       chunk_size += SaveLevel_MicroChunk_ContentList(file, conf);
 #endif
   }
+
+  return chunk_size;
+}
+
+static int SaveLevel_NOTE(FILE *file, struct LevelInfo *level, int element)
+{
+  int envelope_nr = element - EL_ENVELOPE_1;
+  int chunk_size = 0;
+  int i;
+
+  chunk_size += putFile16BitBE(file, element);
+
+  /* copy envelope data into temporary buffer */
+  xx_envelope = level->envelope[envelope_nr];
+
+  for (i = 0; chunk_config_NOTE[i].data_type != -1; i++)
+    chunk_size += SaveLevel_MicroChunk(file, &chunk_config_NOTE[i], FALSE);
 
   return chunk_size;
 }
@@ -5748,8 +5867,12 @@ static int SaveLevel_GRPX(FILE *file, struct LevelInfo *level, int element)
 
 static void SaveLevelFromFilename(struct LevelInfo *level, char *filename)
 {
-  int body_chunk_size, info_chunk_size, conf_chunk_size;
+  int chunk_size;
+#if 1
+  int i;
+#else
   int i, x, y;
+#endif
   FILE *file;
 
   if (!(file = fopen(filename, MODE_WRITE)))
@@ -5761,13 +5884,16 @@ static void SaveLevelFromFilename(struct LevelInfo *level, char *filename)
   level->file_version = FILE_VERSION_ACTUAL;
   level->game_version = GAME_VERSION_ACTUAL;
 
+#if 0
   /* check level field for 16-bit elements */
   level->encoding_16bit_field = FALSE;
   for (y = 0; y < level->fieldy; y++) 
     for (x = 0; x < level->fieldx; x++) 
       if (level->field[x][y] > 255)
 	level->encoding_16bit_field = TRUE;
+#endif
 
+#if 0
   /* check yamyam content for 16-bit elements */
   level->encoding_16bit_yamyam = FALSE;
   for (i = 0; i < level->num_yamyam_contents; i++)
@@ -5775,29 +5901,47 @@ static void SaveLevelFromFilename(struct LevelInfo *level, char *filename)
       for (x = 0; x < 3; x++)
 	if (level->yamyam_content[i].e[x][y] > 255)
 	  level->encoding_16bit_yamyam = TRUE;
+#endif
 
+#if 0
   /* check amoeba content for 16-bit elements */
   level->encoding_16bit_amoeba = FALSE;
   if (level->amoeba_content > 255)
     level->encoding_16bit_amoeba = TRUE;
+#endif
 
+#if 0
   /* calculate size of "BODY" chunk */
   body_chunk_size =
     level->fieldx * level->fieldy * (level->encoding_16bit_field ? 2 : 1);
+#endif
 
   putFileChunkBE(file, "RND1", CHUNK_SIZE_UNDEFINED);
   putFileChunkBE(file, "CAVE", CHUNK_SIZE_NONE);
 
-  putFileChunkBE(file, "VERS", LEVEL_CHUNK_VERS_SIZE);
+  chunk_size = SaveLevel_VERS(NULL, level);
+  putFileChunkBE(file, "VERS", chunk_size);
   SaveLevel_VERS(file, level);
 
+#if 0
   putFileChunkBE(file, "HEAD", LEVEL_CHUNK_HEAD_SIZE);
   SaveLevel_HEAD(file, level);
+#endif
 
-  putFileChunkBE(file, "AUTH", MAX_LEVEL_AUTHOR_LEN);
+  chunk_size = SaveLevel_NAME(NULL, level);
+  putFileChunkBE(file, "NAME", chunk_size);
+  SaveLevel_NAME(file, level);
+
+  chunk_size = SaveLevel_AUTH(NULL, level);
+  putFileChunkBE(file, "AUTH", chunk_size);
   SaveLevel_AUTH(file, level);
 
-  putFileChunkBE(file, "BODY", body_chunk_size);
+  chunk_size = SaveLevel_INFO(NULL, level);
+  putFileChunkBE(file, "INFO", chunk_size);
+  SaveLevel_INFO(file, level);
+
+  chunk_size = SaveLevel_BODY(NULL, level);
+  putFileChunkBE(file, "BODY", chunk_size);
   SaveLevel_BODY(file, level);
 
 #if 0
@@ -5815,6 +5959,7 @@ static void SaveLevelFromFilename(struct LevelInfo *level, char *filename)
   }
 #endif
 
+#if 0
   /* check for envelope content */
   for (i = 0; i < 4; i++)
   {
@@ -5826,11 +5971,12 @@ static void SaveLevelFromFilename(struct LevelInfo *level, char *filename)
       SaveLevel_CNT3(file, level, EL_ENVELOPE_1 + i);
     }
   }
+#endif
 
+#if 0
   /* if not using template level, check for non-default custom/group elements */
   if (!level->use_custom_template)
   {
-#if 0
     for (i = 0; i < NUM_CUSTOM_ELEMENTS; i++)
     {
       int element = EL_CUSTOM_START + i;
@@ -5854,49 +6000,48 @@ static void SaveLevelFromFilename(struct LevelInfo *level, char *filename)
 	SaveLevel_GRP1(file, level, element);
       }
     }
+  }
 #endif
-  }
 
-  info_chunk_size = SaveLevel_INFO(NULL, level);
-
-  /* check if non-default level settings need to be saved */
-  if (info_chunk_size > 0)
-  {
-    putFileChunkBE(file, "INFO", info_chunk_size);
-    SaveLevel_INFO(file, level);
-  }
-
-  conf_chunk_size = SaveLevel_CONF(NULL, level);
+  chunk_size = SaveLevel_ELEM(NULL, level);
 
   /* check if non-default element settings need to be saved */
-  if (conf_chunk_size > 0)
+  if (chunk_size > LEVEL_CHUNK_ELEM_UNCHANGED)
   {
-    putFileChunkBE(file, "CONF", conf_chunk_size);
-    SaveLevel_CONF(file, level);
+    putFileChunkBE(file, "ELEM", chunk_size);
+    SaveLevel_ELEM(file, level);
   }
 
+#if 1
+  for (i = 0; i < 4; i++)
+  {
+    int element = EL_ENVELOPE_1 + i;
+
+    chunk_size = SaveLevel_NOTE(NULL, level, element);
+
+    /* check if non-default element settings need to be saved */
+    if (chunk_size > LEVEL_CHUNK_NOTE_UNCHANGED)
+    {
+      putFileChunkBE(file, "NOTE", chunk_size);
+      SaveLevel_NOTE(file, level, element);
+    }
+  }
+#endif
+
+#if 1
   /* if not using template level, check for non-default custom/group elements */
   if (!level->use_custom_template)
   {
-    /* (element number, number of change pages, change page number) */
-    int cusx_chunk_size_no_changes = (2) + (1 + 1) + (1 + 1);
-    /* (element number only) */
-    int grpx_chunk_size_no_changes = (2);
-
-#if 1
     for (i = 0; i < NUM_CUSTOM_ELEMENTS; i++)
     {
       int element = EL_CUSTOM_START + i;
-      int cusx_chunk_size = SaveLevel_CUSX(NULL, level, element);
+
+      chunk_size = SaveLevel_CUSX(NULL, level, element);
 
       /* check if non-default element settings need to be saved */
-      if (cusx_chunk_size > cusx_chunk_size_no_changes)
+      if (chunk_size > LEVEL_CHUNK_CUSX_UNCHANGED)
       {
-#if 0
-	printf("::: SAVING CE %d\n", i + 1);
-#endif
-
-	putFileChunkBE(file, "CUSX", cusx_chunk_size);
+	putFileChunkBE(file, "CUSX", chunk_size);
 	SaveLevel_CUSX(file, level, element);
       }
     }
@@ -5904,21 +6049,18 @@ static void SaveLevelFromFilename(struct LevelInfo *level, char *filename)
     for (i = 0; i < NUM_GROUP_ELEMENTS; i++)
     {
       int element = EL_GROUP_START + i;
-      int grpx_chunk_size = SaveLevel_GRPX(NULL, level, element);
+
+      chunk_size = SaveLevel_GRPX(NULL, level, element);
 
       /* check if non-default element settings need to be saved */
-      if (grpx_chunk_size > grpx_chunk_size_no_changes)
+      if (chunk_size > LEVEL_CHUNK_GRPX_UNCHANGED)
       {
-#if 0
-	printf("::: SAVING GE %d\n", i + 1);
-#endif
-
-	putFileChunkBE(file, "GRPX", grpx_chunk_size);
+	putFileChunkBE(file, "GRPX", chunk_size);
 	SaveLevel_GRPX(file, level, element);
       }
     }
-#endif
   }
+#endif
 
   fclose(file);
 
@@ -5968,8 +6110,12 @@ void DumpLevel(struct LevelInfo *level)
   printf("\n");
   printf("Amoeba speed: %d\n", level->amoeba_speed);
   printf("\n");
+
+#if 0
   printf("Initial gravity:             %s\n", (level->initial_gravity ? "yes" : "no"));
   printf("Initial player stepsize:     %d\n", level->initial_player_stepsize);
+#endif
+
   printf("EM style slippery gems:      %s\n", (level->em_slippery_gems ? "yes" : "no"));
   printf("Player blocks last field:    %s\n", (level->block_last_field ? "yes" : "no"));
   printf("SP player blocks last field: %s\n", (level->sp_block_last_field ? "yes" : "no"));

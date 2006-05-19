@@ -1,3 +1,8 @@
+2006-05-19
+	* added new chunk "NAME" to level file format for level name settings
+	* added new chunk "NOTE" to level file format for envelope settings
+	* changed name of chunk "CONF" to "ELEM" (for normal element settings)
+
 2006-05-17
 	* changed gravity (which only affects the player) from level property
 	  to player property (only makes a difference in multi-player levels)
@@ -5,7 +10,7 @@
 	* added change events "change when CE value/score changes of <element>"
 
 2006-05-16
-	* added new "INFO" chunk to level file format for global level settings
+	* added new chunk "INFO" to level file format for global level settings
 	* added all element settings from "HEAD" chunk to "CONF" chunk
 	* added all global level settings from "HEAD" chunk to "INFO" chunk
 
