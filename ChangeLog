@@ -1,3 +1,6 @@
+2006-05-20
+	* changed file version identifier to reflect recent level file changes
+
 2006-05-19
 	* added new chunk "NAME" to level file format for level name settings
 	* added new chunk "NOTE" to level file format for envelope settings

@@ -1741,16 +1741,18 @@
 #define FILE_VERSION_1_2		VERSION_IDENT(1,2,0,0)
 #define FILE_VERSION_1_4		VERSION_IDENT(1,4,0,0)
 #define FILE_VERSION_2_0		VERSION_IDENT(2,0,0,0)
+#define FILE_VERSION_3_0		VERSION_IDENT(3,0,0,0)
 
 /* file version does not change for every program version, but is changed
    when new features are introduced that are incompatible with older file
    versions, so that they can be treated accordingly */
-#define FILE_VERSION_ACTUAL		FILE_VERSION_2_0
+#define FILE_VERSION_ACTUAL		FILE_VERSION_3_0
 
 #define GAME_VERSION_1_0		FILE_VERSION_1_0
 #define GAME_VERSION_1_2		FILE_VERSION_1_2
 #define GAME_VERSION_1_4		FILE_VERSION_1_4
 #define GAME_VERSION_2_0		FILE_VERSION_2_0
+#define GAME_VERSION_3_0		FILE_VERSION_3_0
 
 #define GAME_VERSION_ACTUAL		VERSION_IDENT(PROGRAM_VERSION_MAJOR, \
 						      PROGRAM_VERSION_MINOR, \
