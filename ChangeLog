@@ -1,11 +1,16 @@
+2006-05-30
+	* fixed some bugs when displaying title screens from info screen menu
+
 2006-05-20
-	* changed file version identifier to reflect recent level file changes
+	* changed file major version to 3 to reflect level file format changes
+	* uploaded pre-release (test) version 3.2.0-8 binary and source code
 
 2006-05-19
 	* added new chunk "NAME" to level file format for level name settings
 	* added new chunk "NOTE" to level file format for envelope settings
 	* changed name of chunk "CONF" to "ELEM" (for normal element settings)
 	* updated magic(5) file to recognize changed and new level file chunks
+	* removed change events "change when CE value/score changes" as unneeded
 
 2006-05-17
 	* changed gravity (which only affects the player) from level property

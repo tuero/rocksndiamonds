@@ -48,7 +48,7 @@
 
 /* screens on the info screen */
 #define INFO_MODE_MAIN			0
-#define INFO_MODE_TITLESCREEN		1
+#define INFO_MODE_TITLE			1
 #define INFO_MODE_ELEMENTS		2
 #define INFO_MODE_MUSIC			3
 #define INFO_MODE_CREDITS		4
@@ -117,6 +117,7 @@ static void DrawInfoScreen(void);
 static void DrawSetupScreen(void);
 
 static void DrawInfoScreenExt(int);
+static void DrawInfoScreen_NotAvailable(char *, char *);
 static void DrawInfoScreen_HelpAnim(int, int, boolean);
 static void DrawInfoScreen_HelpText(int, int, int, int);
 static void HandleInfoScreen_Main(int, int, int, int, int);
@@ -298,9 +299,6 @@ void DrawTitleScreen()
   KeyboardAutoRepeatOff();
 
   SetMainBackgroundImage(IMG_BACKGROUND_TITLE);
-
-  PlayMenuSound();
-  PlayMenuMusic();
 
   HandleTitleScreen(0, 0, 0, 0, MB_MENU_INITIALIZE);
 
@@ -593,14 +591,31 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
 
   if (button == MB_MENU_INITIALIZE)
   {
+    int last_game_status = game_status;	/* save current game status */
     title_nr = 0;
 
     if (game_status == GAME_MODE_INFO)
     {
+      if (graphic_info[IMG_TITLESCREEN_1].bitmap == NULL)
+      {
+	DrawInfoScreen_NotAvailable("Title screen information:",
+				    "No title screen for this level set.");
+
+	return;
+      }
+
       FadeSoundsAndMusic();
 
       FadeOut(fade_delay, post_delay);
     }
+
+    /* force TITLE music on title info screen */
+    game_status = GAME_MODE_TITLE;
+
+    PlayMenuSound();
+    PlayMenuMusic();
+
+    game_status = last_game_status;	/* restore current game status */
 
     DrawTitleScreenImage(title_nr);
 
@@ -615,6 +630,15 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
   }
   else if (button == MB_MENU_CHOICE)
   {
+    if (game_status == GAME_MODE_INFO &&
+	graphic_info[IMG_TITLESCREEN_1].bitmap == NULL)
+    {
+      info_mode = INFO_MODE_MAIN;
+      DrawInfoScreen();
+
+      return;
+    }
+
     title_nr++;
 
     if (!use_cross_fading)
@@ -840,7 +864,7 @@ static int num_info_info;
 
 static void execInfoTitleScreen()
 {
-  info_mode = INFO_MODE_TITLESCREEN;
+  info_mode = INFO_MODE_TITLE;
   DrawInfoScreen();
 }
 
@@ -1033,6 +1057,24 @@ void HandleInfoScreen_Main(int mx, int my, int dx, int dy, int button)
       }
     }
   }
+}
+
+void DrawInfoScreen_NotAvailable(char *text_title, char *text_error)
+{
+  int ystart = 150;
+  int ybottom = SYSIZE - 20;
+
+  SetMainBackgroundImageIfDefined(IMG_BACKGROUND_INFO_LEVELSET);
+
+  ClearWindow();
+  DrawHeadline();
+
+  DrawTextSCentered(100, FONT_TEXT_1, text_title);
+
+  DrawTextSCentered(ybottom, FONT_TEXT_4,
+		    "Press any key or button for info menu");
+
+  DrawTextSCentered(ystart, FONT_TEXT_2, text_error);
 }
 
 void DrawInfoScreen_HelpAnim(int start, int max_anims, boolean init)
@@ -1754,7 +1796,7 @@ static void DrawInfoScreenExt(int fade_delay)
 {
   SetMainBackgroundImage(IMG_BACKGROUND_INFO);
 
-  if (info_mode == INFO_MODE_TITLESCREEN)
+  if (info_mode == INFO_MODE_TITLE)
     DrawInfoScreen_TitleScreen();
   else if (info_mode == INFO_MODE_ELEMENTS)
     DrawInfoScreen_Elements();
@@ -1769,7 +1811,9 @@ static void DrawInfoScreenExt(int fade_delay)
   else
     DrawInfoScreen_Main(fade_delay);
 
-  if (info_mode != INFO_MODE_MUSIC)
+  if (info_mode != INFO_MODE_MAIN &&
+      info_mode != INFO_MODE_TITLE &&
+      info_mode != INFO_MODE_MUSIC)
   {
     PlayMenuSound();
     PlayMenuMusic();
@@ -1783,7 +1827,7 @@ void DrawInfoScreen()
 
 void HandleInfoScreen(int mx, int my, int dx, int dy, int button)
 {
-  if (info_mode == INFO_MODE_TITLESCREEN)
+  if (info_mode == INFO_MODE_TITLE)
     HandleInfoScreen_TitleScreen(button);
   else if (info_mode == INFO_MODE_ELEMENTS)
     HandleInfoScreen_Elements(button);
