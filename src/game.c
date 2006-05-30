@@ -11861,6 +11861,21 @@ int DigField(struct PlayerInfo *player,
       if (!player->key[EM_GATE_GRAY_ACTIVE_NR(element)])
 	return MP_NO_ACTION;
     }
+    else if (IS_EMC_GATE(element))
+    {
+      if (!player->key[EMC_GATE_NR(element)])
+	return MP_NO_ACTION;
+    }
+    else if (IS_EMC_GATE_GRAY(element))
+    {
+      if (!player->key[EMC_GATE_GRAY_NR(element)])
+	return MP_NO_ACTION;
+    }
+    else if (IS_EMC_GATE_GRAY_ACTIVE(element))
+    {
+      if (!player->key[EMC_GATE_GRAY_ACTIVE_NR(element)])
+	return MP_NO_ACTION;
+    }
     else if (IS_SP_PORT(element))
     {
       if (element == EL_SP_GRAVITY_PORT_LEFT ||
