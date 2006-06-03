@@ -1767,8 +1767,22 @@ static void InitGameEngine()
   {
     if (!IS_CUSTOM_ELEMENT(i))
     {
+#if 1
+      /* set default push delay values (corrected since version 3.0.7-1) */
+      if (game.engine_version < VERSION_IDENT(3,0,7,1))
+      {
+	element_info[i].push_delay_fixed = 2;
+	element_info[i].push_delay_random = 8;
+      }
+      else
+      {
+	element_info[i].push_delay_fixed = 8;
+	element_info[i].push_delay_random = 8;
+      }
+#else
       element_info[i].push_delay_fixed  = game.default_push_delay_fixed;
       element_info[i].push_delay_random = game.default_push_delay_random;
+#endif
     }
   }
 
@@ -11681,6 +11695,8 @@ int DigField(struct PlayerInfo *player,
 	   game.engine_version >= VERSION_IDENT(2,2,0,0))
     old_element = Back[jx][jy];
 
+  /* checking here causes player to move into acid even if the current field
+     cannot be left to that direction */
 #if 0
 #if USE_FIXED_DONT_RUN_INTO
   if (player_can_move && DONT_RUN_INTO(element))
@@ -11702,6 +11718,39 @@ int DigField(struct PlayerInfo *player,
 #endif
 #endif
 
+#if 1	/* ------------------------------ NEW ------------------------------ */
+
+  if (IS_WALKABLE(old_element) && !ACCESS_FROM(old_element, move_direction))
+    return MP_NO_ACTION;	/* field has no opening in this direction */
+
+  if (IS_PASSABLE(old_element) && !ACCESS_FROM(old_element,opposite_direction))
+    return MP_NO_ACTION;	/* field has no opening in this direction */
+
+#if USE_FIXED_DONT_RUN_INTO
+  if (player_can_move && element == EL_ACID && move_direction == MV_DOWN)
+  {
+    SplashAcid(x, y);
+    Feld[jx][jy] = EL_PLAYER_1;
+    InitMovingField(jx, jy, MV_DOWN);
+    Store[jx][jy] = EL_ACID;
+    ContinueMoving(jx, jy);
+    BuryPlayer(player);
+
+    return MP_DONT_RUN_INTO;
+  }
+#endif
+
+#if USE_FIXED_DONT_RUN_INTO
+  if (player_can_move && DONT_RUN_INTO(element))
+  {
+    TestIfPlayerRunsIntoBadThing(jx, jy, player->MovDir);
+
+    return MP_DONT_RUN_INTO;
+  }
+#endif
+
+#else	/* ------------------------------ OLD ------------------------------ */
+
 #if 1
 #if USE_FIXED_DONT_RUN_INTO
   if (player_can_move && DONT_RUN_INTO(element))
@@ -11719,6 +11768,7 @@ int DigField(struct PlayerInfo *player,
   if (IS_PASSABLE(old_element) && !ACCESS_FROM(old_element,opposite_direction))
     return MP_NO_ACTION;	/* field has no opening in this direction */
 
+  /* checking here causes player to explode when moving into acid */
 #if 1
 #if USE_FIXED_DONT_RUN_INTO
   if (player_can_move && element == EL_ACID && move_direction == MV_DOWN)
@@ -11734,6 +11784,8 @@ int DigField(struct PlayerInfo *player,
   }
 #endif
 #endif
+
+#endif	/* ------------------------------ END ------------------------------ */
 
 #if 0
 #if USE_FIXED_DONT_RUN_INTO

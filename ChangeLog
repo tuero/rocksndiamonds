@@ -1,3 +1,6 @@
+2006-06-03
+	* fixed crash bug when number of custom graphic frames was set to zero
+
 2006-05-30
 	* fixed some bugs when displaying title screens from info screen menu
 

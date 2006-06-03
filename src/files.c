@@ -2527,6 +2527,11 @@ static int LoadLevel_CUS1(FILE *file, int chunk_size, struct LevelInfo *level)
 #endif
 
 #if 1
+    /* older game versions that wrote level files with CUS1 chunks used
+       different default push delay values (not yet stored in level file) */
+    element_info[element].push_delay_fixed = 2;
+    element_info[element].push_delay_random = 8;
+#else
     /* needed for older levels (see src/init.c for details) */
     element_info[element].push_delay_fixed = -1;	/* initialize later */
     element_info[element].push_delay_random = -1;	/* initialize later */
@@ -4930,6 +4935,7 @@ static void LoadLevel_InitElements(struct LevelInfo *level, char *filename)
 
   /* initialize element properties for level editor etc. */
   InitElementPropertiesEngine(level->game_version);
+  InitElementPropertiesAfterLoading(level->game_version);
 }
 
 static void LoadLevel_InitPlayfield(struct LevelInfo *level, char *filename)
@@ -6470,6 +6476,7 @@ void LoadTapeFromFilename(char *filename)
   tape.length_seconds = GetTapeLength();
 
 #if 0
+  printf("::: tape file version: %d\n", tape.file_version);
   printf("::: tape game version: %d\n", tape.game_version);
   printf("::: tape engine version: %d\n", tape.engine_version);
 #endif

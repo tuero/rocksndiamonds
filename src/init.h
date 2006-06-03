@@ -34,6 +34,7 @@ boolean getBitfieldProperty(int *, int, int);
 
 void InitElementPropertiesStatic(void);
 void InitElementPropertiesEngine(int);
+void InitElementPropertiesAfterLoading(int);
 
 void ReloadCustomArtwork(int);
 void RedrawBackground();

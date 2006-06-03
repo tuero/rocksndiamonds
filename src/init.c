@@ -1018,6 +1018,9 @@ static void set_graphic_parameters(int graphic)
   else
     graphic_info[graphic].anim_frames = 1;
 
+  if (graphic_info[graphic].anim_frames == 0)	/* frames must be at least 1 */
+    graphic_info[graphic].anim_frames = 1;
+
   graphic_info[graphic].anim_frames_per_line =
     (parameter[GFX_ARG_FRAMES_PER_LINE] != ARG_UNDEFINED_VALUE ?
      parameter[GFX_ARG_FRAMES_PER_LINE] : anim_frames_per_line);
@@ -3919,6 +3922,7 @@ void InitElementPropertiesEngine(int engine_version)
 		  engine_version > VERSION_IDENT(2,0,1,0)));
   }
 
+#if 0
   /* set default push delay values (corrected since version 3.0.7-1) */
   if (engine_version < VERSION_IDENT(3,0,7,1))
   {
@@ -3930,7 +3934,9 @@ void InitElementPropertiesEngine(int engine_version)
     game.default_push_delay_fixed = 8;
     game.default_push_delay_random = 8;
   }
+#endif
 
+#if 0
   /* set uninitialized push delay values of custom elements in older levels */
   for (i = 0; i < NUM_CUSTOM_ELEMENTS; i++)
   {
@@ -3941,7 +3947,9 @@ void InitElementPropertiesEngine(int engine_version)
     if (element_info[element].push_delay_random == -1)
       element_info[element].push_delay_random = game.default_push_delay_random;
   }
+#endif
 
+#if 0
   /* set some other uninitialized values of custom elements in older levels */
   if (engine_version < VERSION_IDENT(3,1,0,0))
   {
@@ -3955,6 +3963,7 @@ void InitElementPropertiesEngine(int engine_version)
       element_info[element].ignition_delay = 8;
     }
   }
+#endif
 
 #if 0
   /* set element properties that were handled incorrectly in older levels */
@@ -3968,6 +3977,54 @@ void InitElementPropertiesEngine(int engine_version)
   /* this is needed because some graphics depend on element properties */
   if (game_status == GAME_MODE_PLAYING)
     InitElementGraphicInfo();
+}
+
+void InitElementPropertiesAfterLoading(int engine_version)
+{
+  int i;
+
+#if 0
+  /* set default push delay values (corrected since version 3.0.7-1) */
+  if (engine_version < VERSION_IDENT(3,0,7,1))
+  {
+    game.default_push_delay_fixed = 2;
+    game.default_push_delay_random = 8;
+  }
+  else
+  {
+    game.default_push_delay_fixed = 8;
+    game.default_push_delay_random = 8;
+  }
+#endif
+
+#if 0
+  /* set uninitialized push delay values of custom elements in older levels */
+  for (i = 0; i < NUM_CUSTOM_ELEMENTS; i++)
+  {
+    int element = EL_CUSTOM_START + i;
+
+    if (element_info[element].push_delay_fixed == -1)
+      element_info[element].push_delay_fixed = game.default_push_delay_fixed;
+    if (element_info[element].push_delay_random == -1)
+      element_info[element].push_delay_random = game.default_push_delay_random;
+  }
+#endif
+
+#if 1
+  /* set some other uninitialized values of custom elements in older levels */
+  if (engine_version < VERSION_IDENT(3,1,0,0))
+  {
+    for (i = 0; i < NUM_CUSTOM_ELEMENTS; i++)
+    {
+      int element = EL_CUSTOM_START + i;
+
+      element_info[element].access_direction = MV_ALL_DIRECTIONS;
+
+      element_info[element].explosion_delay = 17;
+      element_info[element].ignition_delay = 8;
+    }
+  }
+#endif
 }
 
 static void InitGlobal()
