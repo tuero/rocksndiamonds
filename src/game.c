@@ -8450,8 +8450,10 @@ static void CreateFieldExt(int x, int y, int element, boolean is_change)
 #if USE_NEW_CUSTOM_VALUE
   int last_ce_value = CustomValue[x][y];
 #endif
-  boolean add_player = (ELEM_IS_PLAYER(new_element) &&
-			IS_WALKABLE(old_element));
+  boolean new_element_is_player = ELEM_IS_PLAYER(new_element);
+  boolean add_player_onto_element = (new_element_is_player &&
+				     new_element != EL_SOKOBAN_FIELD_PLAYER &&
+				     IS_WALKABLE(old_element));
 
 #if 0
   /* check if element under the player changes from accessible to unaccessible
@@ -8465,7 +8467,7 @@ static void CreateFieldExt(int x, int y, int element, boolean is_change)
   }
 #endif
 
-  if (!add_player)
+  if (!add_player_onto_element)
   {
     if (IS_MOVING(x, y) || IS_BLOCKED(x, y))
       RemoveMovingField(x, y);
@@ -8516,7 +8518,7 @@ static void CreateFieldExt(int x, int y, int element, boolean is_change)
 #endif
 
   /* "ChangeCount" not set yet to allow "entered by player" change one time */
-  if (ELEM_IS_PLAYER(new_element))
+  if (new_element_is_player)
     RelocatePlayer(x, y, new_element);
 
   if (is_change)

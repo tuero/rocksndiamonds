@@ -1,5 +1,11 @@
 2006-06-03
+	* fixed bug with player exploding when moving into acid
+	* fixed bug with level settings being reset in editor and when playing
+	  (some compatibility settings being set not only after level loading)
 	* fixed crash bug when number of custom graphic frames was set to zero
+	* fixed bug with teleporting player on walkable tile not working anymore
+	* added partial compatibility support for pre-release-only "CONF" chunk
+	  (to make Alan Bond's "color cycle" demo work again :-) )
 
 2006-05-30
 	* fixed some bugs when displaying title screens from info screen menu

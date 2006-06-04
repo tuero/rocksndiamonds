@@ -1139,6 +1139,61 @@ static struct LevelFileConfigInfo chunk_config_GRPX[] =
   },
 };
 
+static struct LevelFileConfigInfo chunk_config_CONF[] =		/* (OBSOLETE) */
+{
+  {
+    EL_PLAYER_1,			-1,
+    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(9),
+    &li.block_snap_field,		TRUE
+  },
+  {
+    EL_PLAYER_1,			-1,
+    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(13),
+    &li.continuous_snapping,		TRUE
+  },
+  {
+    EL_PLAYER_1,			-1,
+    TYPE_INTEGER,			CONF_VALUE_8_BIT(1),
+    &li.initial_player_stepsize[0],	STEPSIZE_NORMAL
+  },
+  {
+    EL_PLAYER_1,			-1,
+    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(10),
+    &li.use_start_element[0],		FALSE
+  },
+  {
+    EL_PLAYER_1,			-1,
+    TYPE_ELEMENT,			CONF_VALUE_16_BIT(1),
+    &li.start_element[0],		EL_PLAYER_1
+  },
+  {
+    EL_PLAYER_1,			-1,
+    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(11),
+    &li.use_artwork_element[0],		FALSE
+  },
+  {
+    EL_PLAYER_1,			-1,
+    TYPE_ELEMENT,			CONF_VALUE_16_BIT(2),
+    &li.artwork_element[0],		EL_PLAYER_1
+  },
+  {
+    EL_PLAYER_1,			-1,
+    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(12),
+    &li.use_explosion_element[0],	FALSE
+  },
+  {
+    EL_PLAYER_1,			-1,
+    TYPE_ELEMENT,			CONF_VALUE_16_BIT(3),
+    &li.explosion_element[0],		EL_PLAYER_1
+  },
+
+  {
+    -1,					-1,
+    -1,					-1,
+    NULL,				-1,
+  },
+};
+
 static struct
 {
   int filetype;
@@ -3010,6 +3065,28 @@ static int LoadLevel_INFO(FILE *file, int chunk_size, struct LevelInfo *level)
   return real_chunk_size;
 }
 
+static int LoadLevel_CONF(FILE *file, int chunk_size, struct LevelInfo *level)
+{
+  int real_chunk_size = 0;
+
+  li = *level;		/* copy level data into temporary buffer */
+
+  while (!feof(file))
+  {
+    int element = getMappedElement(getFile16BitBE(file));
+
+    real_chunk_size += 2;
+    real_chunk_size += LoadLevel_MicroChunk(file, chunk_config_CONF,
+					    element, element);
+    if (real_chunk_size >= chunk_size)
+      break;
+  }
+
+  *level = li;		/* copy temporary buffer back to level data */
+
+  return real_chunk_size;
+}
+
 static int LoadLevel_ELEM(FILE *file, int chunk_size, struct LevelInfo *level)
 {
   int real_chunk_size = 0;
@@ -3358,6 +3435,7 @@ static void LoadLevelFromFileInfo_RND(struct LevelInfo *level,
       { "CUS3", -1,			LoadLevel_CUS3 },
       { "CUS4", -1,			LoadLevel_CUS4 },
       { "GRP1", -1,			LoadLevel_GRP1 },
+      { "CONF", -1,			LoadLevel_CONF },
       { "ELEM", -1,			LoadLevel_ELEM },
       { "NOTE", -1,			LoadLevel_NOTE },
       { "CUSX", -1,			LoadLevel_CUSX },
