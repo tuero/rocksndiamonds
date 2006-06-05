@@ -227,8 +227,8 @@ static struct LevelFileConfigInfo chunk_config_INFO[] =
   {
     -1,					-1,
     -1,					-1,
-    NULL,				-1,
-  },
+    NULL,				-1
+  }
 };
 
 static struct LevelFileConfigInfo chunk_config_ELEM[] =
@@ -722,8 +722,8 @@ static struct LevelFileConfigInfo chunk_config_ELEM[] =
   {
     -1,					-1,
     -1,					-1,
-    NULL,				-1,
-  },
+    NULL,				-1
+  }
 };
 
 static struct LevelFileConfigInfo chunk_config_NOTE[] =
@@ -750,8 +750,8 @@ static struct LevelFileConfigInfo chunk_config_NOTE[] =
   {
     -1,					-1,
     -1,					-1,
-    NULL,				-1,
-  },
+    NULL,				-1
+  }
 };
 
 static struct LevelFileConfigInfo chunk_config_CUSX_base[] =
@@ -956,7 +956,7 @@ static struct LevelFileConfigInfo chunk_config_CUSX_base[] =
     -1,					-1,
     NULL,				-1,
     NULL
-  },
+  }
 };
 
 static struct LevelFileConfigInfo chunk_config_CUSX_change[] =
@@ -1094,8 +1094,8 @@ static struct LevelFileConfigInfo chunk_config_CUSX_change[] =
   {
     -1,					-1,
     -1,					-1,
-    NULL,				-1,
-  },
+    NULL,				-1
+  }
 };
 
 static struct LevelFileConfigInfo chunk_config_GRPX[] =
@@ -1135,8 +1135,8 @@ static struct LevelFileConfigInfo chunk_config_GRPX[] =
   {
     -1,					-1,
     -1,					-1,
-    NULL,				-1,
-  },
+    NULL,				-1
+  }
 };
 
 static struct LevelFileConfigInfo chunk_config_CONF[] =		/* (OBSOLETE) */
@@ -1190,8 +1190,8 @@ static struct LevelFileConfigInfo chunk_config_CONF[] =		/* (OBSOLETE) */
   {
     -1,					-1,
     -1,					-1,
-    NULL,				-1,
-  },
+    NULL,				-1
+  }
 };
 
 static struct

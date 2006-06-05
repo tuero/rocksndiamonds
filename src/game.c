@@ -11732,7 +11732,11 @@ int DigField(struct PlayerInfo *player,
   if (player_can_move && element == EL_ACID && move_direction == MV_DOWN)
   {
     SplashAcid(x, y);
+#if 1
+    Feld[jx][jy] = player->artwork_element;
+#else
     Feld[jx][jy] = EL_PLAYER_1;
+#endif
     InitMovingField(jx, jy, MV_DOWN);
     Store[jx][jy] = EL_ACID;
     ContinueMoving(jx, jy);
