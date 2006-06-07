@@ -44,6 +44,7 @@
 #define USE_GFX_RESET_GFX_ANIMATION	(USE_NEW_STUFF		* 1)
 #define USE_BOTH_SWITCHGATE_SWITCHES	(USE_NEW_STUFF		* 1)
 #define USE_PLAYER_GRAVITY		(USE_NEW_STUFF		* 1)
+#define USE_FIXED_BORDER_RUNNING_GFX	(USE_NEW_STUFF		* 1)
 
 #define USE_QUICKSAND_IMPACT_BUGFIX	(USE_NEW_STUFF		* 0)
 
@@ -1992,6 +1993,8 @@ void InitGame()
     player->step_counter = 0;
 
     player->last_move_dir = MV_NONE;
+
+    player->is_active = FALSE;
 
     player->is_waiting = FALSE;
     player->is_moving = FALSE;
@@ -10587,6 +10590,8 @@ boolean MovePlayer(struct PlayerInfo *player, int dx, int dy)
     player->move_delay_value = original_move_delay_value;
   }
 
+  player->is_active = FALSE;
+
   if (player->last_move_dir & MV_HORIZONTAL)
   {
     if (!(moved |= MovePlayerOneStep(player, 0, dy, dx, dy)))
@@ -10597,6 +10602,17 @@ boolean MovePlayer(struct PlayerInfo *player, int dx, int dy)
     if (!(moved |= MovePlayerOneStep(player, dx, 0, dx, dy)))
       moved |= MovePlayerOneStep(player, 0, dy, dx, dy);
   }
+
+#if USE_FIXED_BORDER_RUNNING_GFX
+  if (!moved && !player->is_active)
+  {
+    player->is_moving = FALSE;
+    player->is_digging = FALSE;
+    player->is_collecting = FALSE;
+    player->is_snapping = FALSE;
+    player->is_pushing = FALSE;
+  }
+#endif
 
   jx = player->jx;
   jy = player->jy;
@@ -12182,6 +12198,7 @@ int DigField(struct PlayerInfo *player,
     }
 
     player->is_pushing = TRUE;
+    player->is_active = TRUE;
 
     if (!(IN_LEV_FIELD(nextx, nexty) &&
 	  (IS_FREE(nextx, nexty) ||
@@ -12434,7 +12451,10 @@ int DigField(struct PlayerInfo *player,
   if (is_player)		/* function can also be called by EL_PENGUIN */
   {
     if (Feld[x][y] != element)		/* really digged/collected something */
+    {
       player->is_collecting = !player->is_digging;
+      player->is_active = TRUE;
+    }
   }
 
   return MP_MOVING;
@@ -12503,6 +12523,7 @@ boolean SnapField(struct PlayerInfo *player, int dx, int dy)
     return FALSE;
 
   player->is_snapping = TRUE;
+  player->is_active = TRUE;
 
   if (player->MovPos == 0)
   {

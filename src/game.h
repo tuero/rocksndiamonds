@@ -115,6 +115,8 @@ struct PlayerInfo
 
   int last_move_dir;
 
+  boolean is_active;
+
   boolean is_waiting;
   boolean is_moving;
   boolean is_auto_moving;

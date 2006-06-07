@@ -1,5 +1,6 @@
 2006-06-06
 	* fixed bug with displaying any player as "yellow" when moving into acid
+	* fixed bug with displaying running player when player stopped at border
 
 2006-06-03
 	* fixed bug with player exploding when moving into acid

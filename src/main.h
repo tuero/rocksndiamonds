@@ -784,6 +784,11 @@
 				 IS_EDITOR_CASCADE_ACTIVE(e)   ? (e) - 1 : (e))
 
 #define EL_NAME(e)		((e) >= 0 ? element_info[e].token_name : "(?)")
+#define MV_TEXT(d)		((d) == MV_NONE  ? "MV_NONE"  :		\
+				 (d) == MV_LEFT  ? "MV_LEFT"  :		\
+				 (d) == MV_RIGHT ? "MV_RIGHT" :		\
+				 (d) == MV_UP    ? "MV_UP"    :		\
+				 (d) == MV_DOWN  ? "MV_DOWN"  : "(various)")
 
 /* fundamental game speed values */
 #define MICROLEVEL_SCROLL_DELAY	50	/* delay for scrolling micro level */
