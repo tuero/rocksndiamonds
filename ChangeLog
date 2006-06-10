@@ -13,6 +13,7 @@
 
 2006-05-30
 	* fixed some bugs when displaying title screens from info screen menu
+	* fixed bug which caused EMC doors #5 to #8 to be passable without keys
 
 2006-05-20
 	* changed file major version to 3 to reflect level file format changes

@@ -2573,9 +2573,14 @@ static struct TokenInfo setup_info_editor[] =
 #endif
   { TYPE_SWITCH,	&setup.editor.el_chars,		"Text Characters:" },
   { TYPE_SWITCH,	&setup.editor.el_custom,  "Custom & Group Elements:" },
+#if 0
   { TYPE_SWITCH,	&setup.editor.el_headlines,	"Headlines:"	},
+#endif
   { TYPE_SWITCH, &setup.editor.el_user_defined, "User defined element list:" },
   { TYPE_SWITCH,	&setup.editor.el_dynamic,  "Dynamic level elements:" },
+  { TYPE_EMPTY,		NULL,			""			},
+  { TYPE_SWITCH,	&setup.editor.el_by_game,   "Show elements by game:" },
+  { TYPE_SWITCH,	&setup.editor.el_by_type,   "Show elements by type:" },
   { TYPE_EMPTY,		NULL,			""			},
   { TYPE_SWITCH, &setup.editor.show_element_token,	"Show element token:" },
   { TYPE_EMPTY,		NULL,			""			},

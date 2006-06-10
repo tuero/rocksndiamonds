@@ -45,6 +45,7 @@
 #define USE_BOTH_SWITCHGATE_SWITCHES	(USE_NEW_STUFF		* 1)
 #define USE_PLAYER_GRAVITY		(USE_NEW_STUFF		* 1)
 #define USE_FIXED_BORDER_RUNNING_GFX	(USE_NEW_STUFF		* 1)
+#define USE_QUICKSAND_BD_ROCK_BUGFIX	(USE_NEW_STUFF		* 0)
 
 #define USE_QUICKSAND_IMPACT_BUGFIX	(USE_NEW_STUFF		* 0)
 
@@ -5861,7 +5862,12 @@ void StartMoving(int x, int y)
 	started_moving = TRUE;
 
 	Feld[x][y] = EL_QUICKSAND_EMPTYING;
+#if USE_QUICKSAND_BD_ROCK_BUGFIX
+	if (Store[x][y] != EL_ROCK && Store[x][y] != EL_BD_ROCK)
+	  Store[x][y] = EL_ROCK;
+#else
 	Store[x][y] = EL_ROCK;
+#endif
 
 	PlayLevelSoundAction(x, y, ACTION_EMPTYING);
       }

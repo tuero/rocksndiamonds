@@ -655,6 +655,9 @@ struct SetupEditorInfo
 
   boolean el_headlines;
 
+  boolean el_by_game;
+  boolean el_by_type;
+
   boolean show_element_token;
 };
 

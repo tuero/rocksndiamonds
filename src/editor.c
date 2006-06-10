@@ -3111,6 +3111,16 @@ static int edit_mode_properties;
 
 static int element_shift = 0;
 
+static int editor_el_players[] =
+{
+  EL_PLAYER_1,
+  EL_PLAYER_2,
+  EL_PLAYER_3,
+  EL_PLAYER_4
+};
+static int *editor_el_players_ptr = editor_el_players;
+static int num_editor_el_players = SIZEOF_ARRAY_INT(editor_el_players);
+
 static int editor_hl_boulderdash[] =
 {
   EL_INTERNAL_CASCADE_BD_ACTIVE,
@@ -4378,6 +4388,13 @@ static boolean use_el_empty = FALSE;
 static int *editor_elements = NULL;	/* dynamically allocated */
 static int num_editor_elements = 0;	/* dynamically determined */
 
+static boolean setup_editor_show_always = TRUE;
+static boolean setup_editor_cascade_never = FALSE;
+
+static int editor_hl_unused[] = { EL_EMPTY };
+static int *editor_hl_unused_ptr = editor_hl_unused;
+static int num_editor_hl_unused = 0;
+
 static struct
 {
   boolean *setup_value;
@@ -4393,6 +4410,12 @@ static struct
 }
 editor_elements_info[] =
 {
+  {
+    &setup_editor_show_always,
+    &setup_editor_cascade_never,
+    &editor_hl_unused_ptr,		&num_editor_hl_unused,
+    &editor_el_players_ptr,		&num_editor_el_players
+  },
   {
     &setup.editor.el_boulderdash,
     &setup.editor_cascade.el_bd,
@@ -7816,6 +7839,7 @@ static struct
 
 #if 1
   { EL_TIMEGATE_SWITCH,	&level.time_timegate,		TEXT_DURATION	},
+  { EL_LIGHT_SWITCH,	&level.time_light,		TEXT_DURATION	},
   { EL_LIGHT_SWITCH_ACTIVE, &level.time_light,		TEXT_DURATION	},
   { EL_SHIELD_NORMAL,	&level.shield_normal_time,	TEXT_DURATION	},
   { EL_SHIELD_DEADLY,	&level.shield_deadly_time,	TEXT_DURATION	},
@@ -10027,7 +10051,8 @@ void HandleLevelEditorKeyInput(Key key)
 	      (key == KSYM_Delete && new_element_shift > element_shift))
 	    break;
 
-	  if (IS_EDITOR_CASCADE(editor_elements[i]))
+	  /* jump to next cascade block (or to start of element list) */
+	  if (i == 0 || IS_EDITOR_CASCADE(editor_elements[i]))
 	    new_element_shift = i;
 	}
 

@@ -6881,9 +6881,11 @@ void SaveScore(int nr)
 #define SETUP_TOKEN_EDITOR_EL_HEADLINES		10
 #define SETUP_TOKEN_EDITOR_EL_USER_DEFINED	11
 #define SETUP_TOKEN_EDITOR_EL_DYNAMIC		12
-#define SETUP_TOKEN_EDITOR_SHOW_ELEMENT_TOKEN	13
+#define SETUP_TOKEN_EDITOR_EL_BY_GAME		13
+#define SETUP_TOKEN_EDITOR_EL_BY_TYPE		14
+#define SETUP_TOKEN_EDITOR_SHOW_ELEMENT_TOKEN	15
 
-#define NUM_EDITOR_SETUP_TOKENS			14
+#define NUM_EDITOR_SETUP_TOKENS			16
 
 /* editor cascade setup */
 #define SETUP_TOKEN_EDITOR_CASCADE_BD		0
@@ -7002,6 +7004,8 @@ static struct TokenInfo editor_setup_tokens[] =
   { TYPE_SWITCH, &sei.el_headlines,	"editor.el_headlines"		},
   { TYPE_SWITCH, &sei.el_user_defined,	"editor.el_user_defined"	},
   { TYPE_SWITCH, &sei.el_dynamic,	"editor.el_dynamic"		},
+  { TYPE_SWITCH, &sei.el_by_game,	"editor.el_by_game"		},
+  { TYPE_SWITCH, &sei.el_by_type,	"editor.el_by_type"		},
   { TYPE_SWITCH, &sei.show_element_token,"editor.show_element_token"	},
 };
 
