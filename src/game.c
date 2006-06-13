@@ -7810,7 +7810,8 @@ void MauerAbleger(int ax, int ay)
 
   if (element == EL_EXPANDABLE_WALL_HORIZONTAL ||
       element == EL_EXPANDABLE_WALL_ANY ||
-      element == EL_EXPANDABLE_WALL)
+      element == EL_EXPANDABLE_WALL ||
+      element == EL_BD_EXPANDABLE_WALL)
   {
     if (links_frei)
     {
@@ -10020,7 +10021,8 @@ void GameActions_RND()
     else if (element == EL_EXPANDABLE_WALL ||
 	     element == EL_EXPANDABLE_WALL_HORIZONTAL ||
 	     element == EL_EXPANDABLE_WALL_VERTICAL ||
-	     element == EL_EXPANDABLE_WALL_ANY)
+	     element == EL_EXPANDABLE_WALL_ANY ||
+	     element == EL_BD_EXPANDABLE_WALL)
       MauerAbleger(x, y);
     else if (element == EL_FLAMES)
       CheckForDragon(x, y);

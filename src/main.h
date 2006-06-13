@@ -1307,7 +1307,9 @@
 #define EL_YAMYAM_UP			711
 #define EL_YAMYAM_DOWN			712
 
-#define NUM_FILE_ELEMENTS		713
+#define EL_BD_EXPANDABLE_WALL		713
+
+#define NUM_FILE_ELEMENTS		714
 
 
 /* "real" (and therefore drawable) runtime elements */

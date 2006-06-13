@@ -2381,6 +2381,14 @@ struct ConfigInfo image_config[] =
   { "expandable_wall_any.EDITOR.xpos",		"12"			},
   { "expandable_wall_any.EDITOR.ypos",		"13"			},
 
+  { "bd_expandable_wall",			"RocksElements.pcx"	},
+  { "bd_expandable_wall.xpos",			"5"			},
+  { "bd_expandable_wall.ypos",			"9"			},
+  { "bd_expandable_wall.frames",		"1"			},
+  { "bd_expandable_wall.EDITOR",		"RocksDC.pcx"		},
+  { "bd_expandable_wall.EDITOR.xpos",		"15"			},
+  { "bd_expandable_wall.EDITOR.ypos",		"15"			},
+
   { "expandable_wall.growing.left",		"RocksElements.pcx"	},
   { "expandable_wall.growing.left.xpos",	"8"			},
   { "expandable_wall.growing.left.ypos",	"10"			},

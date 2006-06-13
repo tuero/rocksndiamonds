@@ -3148,6 +3148,34 @@ static int editor_hl_boulderdash[] =
 
 static int editor_el_boulderdash[] =
 {
+#if 1
+  EL_EMPTY,
+  EL_SAND,
+  EL_BD_ROCK,
+  EL_BD_DIAMOND,
+
+  EL_STEELWALL,
+  EL_BD_WALL,
+  EL_BD_EXPANDABLE_WALL,
+  EL_BD_MAGIC_WALL,
+
+  EL_BD_AMOEBA,
+  EL_BD_BUTTERFLY_UP,
+  EL_BD_FIREFLY_UP,
+  EL_EXIT_CLOSED,
+
+  EL_BD_BUTTERFLY_LEFT,
+  EL_BD_FIREFLY_LEFT,
+  EL_BD_BUTTERFLY_RIGHT,
+  EL_BD_FIREFLY_RIGHT,
+
+  EL_EMPTY,
+  EL_BD_BUTTERFLY_DOWN,
+  EL_BD_FIREFLY_DOWN,
+  EL_EXIT_OPEN,
+
+#else
+
   EL_PLAYER_1,
   EL_EMPTY,
   EL_SAND,
@@ -3171,7 +3199,8 @@ static int editor_el_boulderdash[] =
   EL_BD_AMOEBA,
   EL_BD_BUTTERFLY_DOWN,
   EL_BD_FIREFLY_DOWN,
-  EL_EMPTY,
+  EL_BD_EXPANDABLE_WALL,
+#endif
 };
 static int *editor_hl_boulderdash_ptr = editor_hl_boulderdash;
 static int *editor_el_boulderdash_ptr = editor_el_boulderdash;
@@ -3205,13 +3234,71 @@ static int editor_hl_emerald_mine[] =
 
 static int editor_el_emerald_mine[] =
 {
-  EL_PLAYER_1,
-  EL_PLAYER_2,
-  EL_PLAYER_3,
-  EL_PLAYER_4,
+#if 1
+  EL_SAND,
+  EL_ROCK,
+  EL_QUICKSAND_EMPTY,
+  EL_QUICKSAND_FULL,
+
+  EL_STEELWALL,
+  EL_WALL,
+  EL_WALL_SLIPPERY,
+  EL_MAGIC_WALL,
+
+  EL_EMERALD,
+  EL_DIAMOND,
+  EL_NUT,
+  EL_BOMB,
+
+  EL_WALL_EMERALD,
+  EL_WALL_DIAMOND,
+  EL_DYNAMITE,
+  EL_DYNAMITE_ACTIVE,
+
+  EL_YAMYAM,
+  EL_BUG_UP,
+  EL_SPACESHIP_UP,
+  EL_ROBOT,
+
+  EL_BUG_LEFT,
+  EL_SPACESHIP_LEFT,
+  EL_BUG_RIGHT,
+  EL_SPACESHIP_RIGHT,
+
+  EL_ROBOT_WHEEL,
+  EL_BUG_DOWN,
+  EL_SPACESHIP_DOWN,
+  EL_INVISIBLE_WALL,
+
+  EL_ACID_POOL_TOPLEFT,
+  EL_ACID,
+  EL_ACID_POOL_TOPRIGHT,
+  EL_AMOEBA_DROP,
+
+  EL_ACID_POOL_BOTTOMLEFT,
+  EL_ACID_POOL_BOTTOM,
+  EL_ACID_POOL_BOTTOMRIGHT,
+  EL_AMOEBA_WET,
+
+  EL_EM_KEY_1,
+  EL_EM_KEY_2,
+  EL_EM_KEY_3,
+  EL_EM_KEY_4,
+
+  EL_EM_GATE_1,
+  EL_EM_GATE_2,
+  EL_EM_GATE_3,
+  EL_EM_GATE_4,
+
+  EL_EM_GATE_1_GRAY,
+  EL_EM_GATE_2_GRAY,
+  EL_EM_GATE_3_GRAY,
+  EL_EM_GATE_4_GRAY,
+
+#else
 
   EL_PLAYER_1,
-  EL_EMPTY,
+  EL_PLAYER_2,
   EL_SAND,
   EL_ROCK,
 
@@ -3279,6 +3366,7 @@ static int editor_el_emerald_mine[] =
   EL_EM_GATE_2_GRAY,
   EL_EM_GATE_3_GRAY,
   EL_EM_GATE_4_GRAY,
+#endif
 };
 static int *editor_hl_emerald_mine_ptr = editor_hl_emerald_mine;
 static int *editor_el_emerald_mine_ptr = editor_el_emerald_mine;
@@ -3317,6 +3405,84 @@ static int editor_hl_emerald_mine_club[] =
 
 static int editor_el_emerald_mine_club[] =
 {
+#if 1
+  EL_EMC_KEY_5,
+  EL_EMC_KEY_6,
+  EL_EMC_KEY_7,
+  EL_EMC_KEY_8,
+
+  EL_EMC_GATE_5,
+  EL_EMC_GATE_6,
+  EL_EMC_GATE_7,
+  EL_EMC_GATE_8,
+
+  EL_EMC_GATE_5_GRAY,
+  EL_EMC_GATE_6_GRAY,
+  EL_EMC_GATE_7_GRAY,
+  EL_EMC_GATE_8_GRAY,
+
+  EL_EMC_STEELWALL_1,
+  EL_EMC_STEELWALL_2,
+  EL_EMC_STEELWALL_3,
+  EL_EMC_STEELWALL_4,
+
+  EL_EMC_WALL_13,
+  EL_EMC_WALL_14,
+  EL_EMC_WALL_15,
+  EL_EMC_WALL_16,
+
+  EL_EMC_WALL_SLIPPERY_1,
+  EL_EMC_WALL_SLIPPERY_2,
+  EL_EMC_WALL_SLIPPERY_3,
+  EL_EMC_WALL_SLIPPERY_4,
+
+  EL_EMC_WALL_1,
+  EL_EMC_WALL_2,
+  EL_EMC_WALL_3,
+  EL_EMC_WALL_4,
+
+  EL_EMC_WALL_5,
+  EL_EMC_WALL_6,
+  EL_EMC_WALL_7,
+  EL_EMC_WALL_8,
+
+  EL_EMC_WALL_9,
+  EL_EMC_WALL_10,
+  EL_EMC_WALL_11,
+  EL_EMC_WALL_12,
+
+  EL_EMC_ANDROID,
+  EL_BALLOON,
+  EL_BALLOON_SWITCH_ANY,
+  EL_BALLOON_SWITCH_NONE,
+
+  EL_BALLOON_SWITCH_LEFT,
+  EL_BALLOON_SWITCH_RIGHT,
+  EL_BALLOON_SWITCH_UP,
+  EL_BALLOON_SWITCH_DOWN,
+
+  EL_EMC_GRASS,
+  EL_EMC_FAKE_GRASS,
+  EL_EMC_PLANT,
+  EL_EMC_DRIPPER,
+
+  EL_EMC_MAGIC_BALL,
+  EL_EMC_MAGIC_BALL_SWITCH,
+  EL_SPRING,
+  EL_EMC_SPRING_BUMPER,
+
+  EL_EMC_LENSES,
+  EL_EMC_MAGNIFIER,
+  EL_EM_DYNAMITE,
+  EL_EM_DYNAMITE_ACTIVE,
+
+  EL_YAMYAM_LEFT,
+  EL_YAMYAM_RIGHT,
+  EL_YAMYAM_UP,
+  EL_YAMYAM_DOWN,
+
+#else
+
   EL_EMC_KEY_5,
   EL_EMC_KEY_6,
   EL_EMC_KEY_7,
@@ -3396,13 +3562,14 @@ static int editor_el_emerald_mine_club[] =
   EL_YAMYAM_RIGHT,
   EL_YAMYAM_UP,
   EL_YAMYAM_DOWN,
+#endif
 };
 static int *editor_hl_emerald_mine_club_ptr = editor_hl_emerald_mine_club;
 static int *editor_el_emerald_mine_club_ptr = editor_el_emerald_mine_club;
 static int num_editor_hl_emerald_mine_club=SIZEOF_ARRAY_INT(editor_hl_emerald_mine_club);
 static int num_editor_el_emerald_mine_club=SIZEOF_ARRAY_INT(editor_el_emerald_mine_club);
 
-static int editor_hl_more[] =
+static int editor_hl_rnd[] =
 {
   EL_INTERNAL_CASCADE_RND_ACTIVE,
   EL_CHAR('R'),
@@ -3417,8 +3584,9 @@ static int editor_hl_more[] =
 #endif
 };
 
-static int editor_el_more[] =
+static int editor_el_rnd[] =
 {
+#if 1
   EL_KEY_1,
   EL_KEY_2,
   EL_KEY_3,
@@ -3439,7 +3607,94 @@ static int editor_el_more[] =
   EL_ARROW_UP,
   EL_ARROW_DOWN,
 
+  EL_AMOEBA_DEAD,
+  EL_AMOEBA_DRY,
   EL_AMOEBA_FULL,
+  EL_GAME_OF_LIFE,
+
+  EL_EMERALD_YELLOW,
+  EL_EMERALD_RED,
+  EL_EMERALD_PURPLE,
+  EL_BIOMAZE,
+
+  EL_WALL_EMERALD_YELLOW,
+  EL_WALL_EMERALD_RED,
+  EL_WALL_EMERALD_PURPLE,
+  EL_WALL_BD_DIAMOND,
+
+  EL_SPEED_PILL,
+  EL_PACMAN_UP,
+  EL_TIME_ORB_FULL,
+  EL_TIME_ORB_EMPTY,
+
+  EL_PACMAN_LEFT,
+  EL_DARK_YAMYAM,
+  EL_PACMAN_RIGHT,
+  EL_EMPTY,
+
+  EL_BLACK_ORB,
+  EL_PACMAN_DOWN,
+  EL_LAMP,
+  EL_LAMP_ACTIVE,
+
+  EL_DYNABOMB_INCREASE_NUMBER,
+  EL_DYNABOMB_INCREASE_SIZE,
+  EL_DYNABOMB_INCREASE_POWER,
+  EL_STONEBLOCK,
+
+  EL_MOLE,
+  EL_PENGUIN,
+  EL_PIG,
+  EL_DRAGON,
+
+  EL_BUG,
+  EL_MOLE_UP,
+  EL_BD_BUTTERFLY,
+  EL_BD_FIREFLY,
+
+  EL_MOLE_LEFT,
+  EL_SATELLITE,
+  EL_MOLE_RIGHT,
+  EL_PACMAN,
+
+  EL_SPACESHIP,
+  EL_MOLE_DOWN,
+  EL_INVISIBLE_STEELWALL,
+  EL_INVISIBLE_WALL,
+
+  EL_EXPANDABLE_WALL,
+  EL_EXPANDABLE_WALL_HORIZONTAL,
+  EL_EXPANDABLE_WALL_VERTICAL,
+  EL_EXPANDABLE_WALL_ANY,
+
+#else
+
+  EL_KEY_1,
+  EL_KEY_2,
+  EL_KEY_3,
+  EL_KEY_4,
+
+  EL_GATE_1,
+  EL_GATE_2,
+  EL_GATE_3,
+  EL_GATE_4,
+
+  EL_GATE_1_GRAY,
+  EL_GATE_2_GRAY,
+  EL_GATE_3_GRAY,
+  EL_GATE_4_GRAY,
+
+  EL_ARROW_LEFT,
+  EL_ARROW_RIGHT,
+  EL_ARROW_UP,
+  EL_ARROW_DOWN,
+
+  EL_AMOEBA_DEAD,
+  EL_AMOEBA_DRY,
+  EL_AMOEBA_FULL,
+  EL_EMPTY,
+
+  EL_EMPTY,
   EL_EMERALD_YELLOW,
   EL_EMERALD_RED,
   EL_EMERALD_PURPLE,
@@ -3498,11 +3753,12 @@ static int editor_el_more[] =
   EL_INVISIBLE_WALL,
   EL_SPEED_PILL,
   EL_BLACK_ORB,
+#endif
 };
-static int *editor_hl_more_ptr = editor_hl_more;
-static int *editor_el_more_ptr = editor_el_more;
-static int num_editor_hl_more = SIZEOF_ARRAY_INT(editor_hl_more);
-static int num_editor_el_more = SIZEOF_ARRAY_INT(editor_el_more);
+static int *editor_hl_rnd_ptr = editor_hl_rnd;
+static int *editor_el_rnd_ptr = editor_el_rnd;
+static int num_editor_hl_rnd = SIZEOF_ARRAY_INT(editor_hl_rnd);
+static int num_editor_el_rnd = SIZEOF_ARRAY_INT(editor_el_rnd);
 
 static int editor_hl_sokoban[] =
 {
@@ -3559,6 +3815,59 @@ static int editor_hl_supaplex[] =
 static int editor_el_supaplex[] =
 {
 #if 1
+  EL_SP_MURPHY,
+  EL_EMPTY,
+  EL_SP_BASE,
+  EL_SP_BUGGY_BASE,
+
+  EL_SP_INFOTRON,
+  EL_SP_ZONK,
+  EL_SP_SNIKSNAK,
+  EL_SP_ELECTRON,
+
+  EL_SP_DISK_RED,
+  EL_SP_DISK_ORANGE,
+  EL_SP_DISK_YELLOW,
+  EL_SP_TERMINAL,
+
+  EL_SP_EXIT_CLOSED,
+  EL_SP_PORT_HORIZONTAL,
+  EL_SP_PORT_VERTICAL,
+  EL_SP_PORT_ANY,
+
+  EL_SP_PORT_LEFT,
+  EL_SP_PORT_RIGHT,
+  EL_SP_PORT_UP,
+  EL_SP_PORT_DOWN,
+
+  EL_SP_GRAVITY_PORT_LEFT,
+  EL_SP_GRAVITY_PORT_RIGHT,
+  EL_SP_GRAVITY_PORT_UP,
+  EL_SP_GRAVITY_PORT_DOWN,
+
+  EL_SP_HARDWARE_GRAY,
+  EL_SP_HARDWARE_GREEN,
+  EL_SP_HARDWARE_BLUE,
+  EL_SP_HARDWARE_RED,
+
+  EL_SP_HARDWARE_BASE_1,
+  EL_SP_HARDWARE_BASE_2,
+  EL_SP_HARDWARE_BASE_3,
+  EL_SP_HARDWARE_BASE_4,
+
+  EL_SP_HARDWARE_BASE_5,
+  EL_SP_HARDWARE_BASE_6,
+  EL_SP_HARDWARE_YELLOW,
+  EL_SP_CHIP_TOP,
+
+  EL_SP_CHIP_SINGLE,
+  EL_SP_CHIP_LEFT,
+  EL_SP_CHIP_RIGHT,
+  EL_SP_CHIP_BOTTOM,
+
+#else
+
+#if 1
   EL_EMPTY,
 #else
   EL_SP_EMPTY,
@@ -3611,6 +3920,7 @@ static int editor_el_supaplex[] =
   EL_SP_HARDWARE_BASE_6,
   EL_SP_CHIP_TOP,
   EL_SP_CHIP_BOTTOM,
+#endif
 };
 static int *editor_hl_supaplex_ptr = editor_hl_supaplex;
 static int *editor_el_supaplex_ptr = editor_el_supaplex;
@@ -3649,6 +3959,74 @@ static int editor_hl_diamond_caves[] =
 
 static int editor_el_diamond_caves[] =
 {
+#if 1
+  EL_PEARL,
+  EL_CRYSTAL,
+  EL_WALL_PEARL,
+  EL_WALL_CRYSTAL,
+
+  EL_CONVEYOR_BELT_1_LEFT,
+  EL_CONVEYOR_BELT_1_MIDDLE,
+  EL_CONVEYOR_BELT_1_RIGHT,
+  EL_CONVEYOR_BELT_1_SWITCH_MIDDLE,
+
+  EL_CONVEYOR_BELT_2_LEFT,
+  EL_CONVEYOR_BELT_2_MIDDLE,
+  EL_CONVEYOR_BELT_2_RIGHT,
+  EL_CONVEYOR_BELT_2_SWITCH_MIDDLE,
+
+  EL_CONVEYOR_BELT_3_LEFT,
+  EL_CONVEYOR_BELT_3_MIDDLE,
+  EL_CONVEYOR_BELT_3_RIGHT,
+  EL_CONVEYOR_BELT_3_SWITCH_MIDDLE,
+
+  EL_CONVEYOR_BELT_4_LEFT,
+  EL_CONVEYOR_BELT_4_MIDDLE,
+  EL_CONVEYOR_BELT_4_RIGHT,
+  EL_CONVEYOR_BELT_4_SWITCH_MIDDLE,
+
+  EL_CONVEYOR_BELT_1_SWITCH_LEFT,
+  EL_CONVEYOR_BELT_2_SWITCH_LEFT,
+  EL_CONVEYOR_BELT_3_SWITCH_LEFT,
+  EL_CONVEYOR_BELT_4_SWITCH_LEFT,
+
+  EL_CONVEYOR_BELT_1_SWITCH_RIGHT,
+  EL_CONVEYOR_BELT_2_SWITCH_RIGHT,
+  EL_CONVEYOR_BELT_3_SWITCH_RIGHT,
+  EL_CONVEYOR_BELT_4_SWITCH_RIGHT,
+
+  EL_SWITCHGATE_CLOSED,
+  EL_SWITCHGATE_OPEN,
+  EL_SWITCHGATE_SWITCH_UP,
+  EL_SWITCHGATE_SWITCH_DOWN,
+
+  EL_TIMEGATE_CLOSED,
+  EL_TIMEGATE_OPEN,
+  EL_TIMEGATE_SWITCH,
+  EL_EMPTY,
+
+  EL_SIGN_EXCLAMATION,
+  EL_SIGN_STOP,
+  EL_LIGHT_SWITCH,
+  EL_LIGHT_SWITCH_ACTIVE,
+
+  EL_STEELWALL_SLIPPERY,
+  EL_INVISIBLE_SAND,
+  EL_LANDMINE,
+  EL_EMPTY,
+
+  EL_SHIELD_NORMAL,
+  EL_SHIELD_DEADLY,
+  EL_EXTRA_TIME,
+  EL_EMPTY,
+
+  EL_ENVELOPE_1,
+  EL_ENVELOPE_2,
+  EL_ENVELOPE_3,
+  EL_ENVELOPE_4,
+
+#else
+
   EL_PEARL,
   EL_CRYSTAL,
   EL_WALL_PEARL,
@@ -3713,6 +4091,8 @@ static int editor_el_diamond_caves[] =
   EL_SHIELD_DEADLY,
   EL_EXTRA_TIME,
   EL_EMPTY,
+
+#endif
 };
 static int *editor_hl_diamond_caves_ptr = editor_hl_diamond_caves;
 static int *editor_el_diamond_caves_ptr = editor_el_diamond_caves;
@@ -4437,8 +4817,8 @@ editor_elements_info[] =
   {
     &setup.editor.el_more,
     &setup.editor_cascade.el_rnd,
-    &editor_hl_more_ptr,		&num_editor_hl_more,
-    &editor_el_more_ptr,		&num_editor_el_more
+    &editor_hl_rnd_ptr,			&num_editor_hl_rnd,
+    &editor_el_rnd_ptr,			&num_editor_el_rnd
   },
   {
     &setup.editor.el_sokoban,

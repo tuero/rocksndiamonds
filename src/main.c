@@ -250,7 +250,7 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
   {
     "amoeba_wet",
     "amoeba",
-    "dropping amoeba"
+    "dropping amoeba (EM style)"
   },
   {
     "amoeba_dry",
@@ -410,7 +410,7 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
   {
     "expandable_wall",
     "wall",
-    "growing wall"
+    "growing wall (horizontal, visible)"
   },
   {
     "bd_diamond",
@@ -3690,6 +3690,11 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
     "yamyam.down",
     "yamyam",
     "yam yam (starts moving down)"
+  },
+  {
+    "bd_expandable_wall",
+    "wall",
+    "growing wall (horizontal, BD style)"
   },
 
   /* ----------------------------------------------------------------------- */
