@@ -1,3 +1,12 @@
+2006-06-21
+	* fixed newly introduced bug with wrongly initializing clipboard element
+
+2006-06-19
+	* fixed bug with displaying visible/invisible level border in editor
+
+2006-06-14
+	* reorganized some elements in the level editor element list
+
 2006-06-06
 	* fixed bug with displaying any player as "yellow" when moving into acid
 	* fixed bug with displaying running player when player stopped at border

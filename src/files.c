@@ -1738,6 +1738,11 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
     int element = i;
     struct ElementInfo *ei = &element_info[element];
 
+    /* never initialize clipboard elements after the very first time */
+    /* (to be able to use clipboard elements between several levels) */
+    if (IS_CLIPBOARD_ELEMENT(element) && clipboard_elements_initialized)
+      continue;
+
     if (IS_ENVELOPE(element))
     {
       int envelope_nr = element - EL_ENVELOPE_1;
@@ -1759,11 +1764,6 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
       *ei = xx_ei;
     }
 #endif
-
-    /* never initialize clipboard elements after the very first time */
-    /* (to be able to use clipboard elements between several levels) */
-    if (IS_CLIPBOARD_ELEMENT(element) && clipboard_elements_initialized)
-      continue;
 
     setElementChangePages(ei, 1);
     setElementChangeInfoToDefaults(ei->change);

@@ -1960,8 +1960,17 @@ void DrawPlayer(struct PlayerInfo *player)
 	     last_element == EL_EM_DYNAMITE_ACTIVE ||
 	     last_element == EL_SP_DISK_RED_ACTIVE)
       DrawDynamite(last_jx, last_jy);
+#if 0
+    /* !!! this is not enough to prevent flickering of players which are
+       moving next to each others without a free tile between them -- this
+       can only be solved by drawing all players layer by layer (first the
+       background, then the foreground etc.) !!! => TODO */
+    else if (!IS_PLAYER(last_jx, last_jy))
+      DrawLevelField(last_jx, last_jy);
+#else
     else
       DrawLevelField(last_jx, last_jy);
+#endif
 
     if (player->is_pushing && IN_SCR_FIELD(SCREENX(next_jx), SCREENY(next_jy)))
       DrawLevelElement(next_jx, next_jy, EL_EMPTY);

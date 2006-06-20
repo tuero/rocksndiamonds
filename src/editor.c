@@ -9261,11 +9261,20 @@ static void SetTextCursor(int unused_sx, int unused_sy, int sx, int sy,
     DrawAreaBorder(sx, sy, sx, sy);
 }
 
+static void CheckLevelBorderElement(boolean redraw_playfield)
+{
+  int last_border_element = BorderElement;
+
+  SetBorderElement();
+
+  if (redraw_playfield && BorderElement != last_border_element)
+    DrawMiniLevel(ed_fieldx, ed_fieldy, level_xpos, level_ypos);
+}
+
 static void CopyLevelToUndoBuffer(int mode)
 {
   static boolean accumulated_undo = FALSE;
   boolean new_undo_buffer_position = TRUE;
-  int last_border_element;
   int x, y;
 
   switch (mode)
@@ -9298,10 +9307,7 @@ static void CopyLevelToUndoBuffer(int mode)
       UndoBuffer[undo_buffer_position][x][y] = Feld[x][y];
 
   /* check if drawing operation forces change of border style */
-  last_border_element = BorderElement;
-  SetBorderElement();
-  if (BorderElement != last_border_element)
-    DrawMiniLevel(ed_fieldx, ed_fieldy, level_xpos, level_ypos);
+  CheckLevelBorderElement(TRUE);
 
   level.changed = TRUE;
 }
@@ -10187,7 +10193,12 @@ static void HandleControlButtons(struct GadgetInfo *gi)
       for (x = 0; x < lev_fieldx; x++)
 	for (y = 0; y < lev_fieldy; y++)
 	  Feld[x][y] = UndoBuffer[undo_buffer_position][x][y];
-      DrawMiniLevel(ed_fieldx, ed_fieldy, level_xpos,level_ypos);
+
+      /* check if undo operation forces change of border style */
+      CheckLevelBorderElement(FALSE);
+
+      DrawMiniLevel(ed_fieldx, ed_fieldy, level_xpos, level_ypos);
+
       break;
 
     case GADGET_ID_INFO:
