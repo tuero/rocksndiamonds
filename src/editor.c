@@ -3451,16 +3451,6 @@ static int editor_el_emerald_mine_club[] =
   EL_EMC_WALL_11,
   EL_EMC_WALL_12,
 
-  EL_EMC_ANDROID,
-  EL_BALLOON,
-  EL_BALLOON_SWITCH_ANY,
-  EL_BALLOON_SWITCH_NONE,
-
-  EL_BALLOON_SWITCH_LEFT,
-  EL_BALLOON_SWITCH_RIGHT,
-  EL_BALLOON_SWITCH_UP,
-  EL_BALLOON_SWITCH_DOWN,
-
   EL_EMC_GRASS,
   EL_EMC_FAKE_GRASS,
   EL_EMC_PLANT,
@@ -3476,10 +3466,20 @@ static int editor_el_emerald_mine_club[] =
   EL_EM_DYNAMITE,
   EL_EM_DYNAMITE_ACTIVE,
 
-  EL_YAMYAM_LEFT,
-  EL_YAMYAM_RIGHT,
+  EL_BALLOON,
   EL_YAMYAM_UP,
+  EL_BALLOON_SWITCH_UP,
+  EL_BALLOON_SWITCH_ANY,
+
+  EL_YAMYAM_LEFT,
+  EL_BALLOON_SWITCH_LEFT,
+  EL_YAMYAM_RIGHT,
+  EL_BALLOON_SWITCH_RIGHT,
+
+  EL_EMC_ANDROID,
   EL_YAMYAM_DOWN,
+  EL_BALLOON_SWITCH_DOWN,
+  EL_BALLOON_SWITCH_NONE,
 
 #else
 
@@ -4618,8 +4618,23 @@ static int editor_el_custom[] =
   EL_CUSTOM_START + 252,
   EL_CUSTOM_START + 253,
   EL_CUSTOM_START + 254,
-  EL_CUSTOM_START + 255,
+  EL_CUSTOM_START + 255
+};
+static int *editor_hl_custom_ptr = editor_hl_custom;
+static int *editor_el_custom_ptr = editor_el_custom;
+static int num_editor_hl_custom = SIZEOF_ARRAY_INT(editor_hl_custom);
+static int num_editor_el_custom = SIZEOF_ARRAY_INT(editor_el_custom);
 
+static int editor_hl_reference[] =
+{
+  EL_INTERNAL_CASCADE_REF_ACTIVE,
+  EL_CHAR('R'),
+  EL_CHAR('E'),
+  EL_CHAR('F')
+};
+
+static int editor_el_reference[] =
+{
   EL_TRIGGER_PLAYER,
   EL_TRIGGER_ELEMENT,
   EL_TRIGGER_CE_VALUE,
@@ -4630,10 +4645,10 @@ static int editor_el_custom[] =
   EL_CURRENT_CE_VALUE,
   EL_CURRENT_CE_SCORE
 };
-static int *editor_hl_custom_ptr = editor_hl_custom;
-static int *editor_el_custom_ptr = editor_el_custom;
-static int num_editor_hl_custom = SIZEOF_ARRAY_INT(editor_hl_custom);
-static int num_editor_el_custom = SIZEOF_ARRAY_INT(editor_el_custom);
+static int *editor_hl_reference_ptr = editor_hl_reference;
+static int *editor_el_reference_ptr = editor_el_reference;
+static int num_editor_hl_reference = SIZEOF_ARRAY_INT(editor_hl_reference);
+static int num_editor_el_reference = SIZEOF_ARRAY_INT(editor_el_reference);
 
 static int editor_hl_group[] =
 {
@@ -4855,6 +4870,12 @@ editor_elements_info[] =
     &setup.editor_cascade.el_ce,
     &editor_hl_custom_ptr,		&num_editor_hl_custom,
     &editor_el_custom_ptr,		&num_editor_el_custom
+  },
+  {
+    &setup.editor.el_custom,
+    &setup.editor_cascade.el_ref,
+    &editor_hl_reference_ptr,		&num_editor_hl_reference,
+    &editor_el_reference_ptr,		&num_editor_el_reference
   },
   {
     &setup.editor.el_custom,

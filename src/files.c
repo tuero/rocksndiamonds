@@ -6899,8 +6899,8 @@ void SaveScore(int nr)
 #define SETUP_TOKEN_EDITOR_CASCADE_TEXT		8
 #define SETUP_TOKEN_EDITOR_CASCADE_CE		9
 #define SETUP_TOKEN_EDITOR_CASCADE_GE		10
-#define SETUP_TOKEN_EDITOR_CASCADE_USER		11
-#define SETUP_TOKEN_EDITOR_CASCADE_GENERIC	12
+#define SETUP_TOKEN_EDITOR_CASCADE_REF		11
+#define SETUP_TOKEN_EDITOR_CASCADE_USER		12
 #define SETUP_TOKEN_EDITOR_CASCADE_DYNAMIC	13
 
 #define NUM_EDITOR_CASCADE_SETUP_TOKENS		14
@@ -7022,6 +7022,7 @@ static struct TokenInfo editor_cascade_setup_tokens[] =
   { TYPE_SWITCH, &seci.el_chars,	"editor.cascade.el_chars"	},
   { TYPE_SWITCH, &seci.el_ce,		"editor.cascade.el_ce"		},
   { TYPE_SWITCH, &seci.el_ge,		"editor.cascade.el_ge"		},
+  { TYPE_SWITCH, &seci.el_ref,		"editor.cascade.el_ref"		},
   { TYPE_SWITCH, &seci.el_user,		"editor.cascade.el_user"	},
   { TYPE_SWITCH, &seci.el_dynamic,	"editor.cascade.el_dynamic"	},
 };
@@ -7188,6 +7189,7 @@ static void setSetupInfoToDefaults_EditorCascade(struct SetupInfo *si)
   si->editor_cascade.el_chars	= FALSE;
   si->editor_cascade.el_ce	= FALSE;
   si->editor_cascade.el_ge	= FALSE;
+  si->editor_cascade.el_ref	= FALSE;
   si->editor_cascade.el_user	= FALSE;
   si->editor_cascade.el_dynamic	= FALSE;
 }
@@ -7414,7 +7416,7 @@ void SaveSetup_EditorCascade()
 
   seci = setup.editor_cascade;
   fprintf(file, "\n");
-  for (i = 0; i < NUM_EDITOR_SETUP_TOKENS; i++)
+  for (i = 0; i < NUM_EDITOR_CASCADE_SETUP_TOKENS; i++)
     fprintf(file, "%s\n", getSetupLine(editor_cascade_setup_tokens, "", i));
 
   fclose(file);

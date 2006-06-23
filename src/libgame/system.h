@@ -674,6 +674,7 @@ struct SetupEditorCascadeInfo
   boolean el_chars;
   boolean el_ce;
   boolean el_ge;
+  boolean el_ref;
   boolean el_user;
   boolean el_dynamic;
 };

@@ -199,7 +199,7 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
   },
   {
     "steelwall",
-    "wall",
+    "steelwall",
     "steel wall"
   },
   {
@@ -444,7 +444,7 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
   },
   {
     "invisible_steelwall",
-    "wall",
+    "steelwall",
     "invisible steel wall"
   },
   {
@@ -1703,7 +1703,7 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
   },
   {
     "steelwall_slippery",
-    "wall",
+    "steelwall",
     "slippery steel wall"
   },
   {
@@ -1788,22 +1788,22 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
   },
   {
     "emc_steelwall_1",
-    "wall",
+    "steelwall",
     "steel wall"
   },
   {
     "emc_steelwall_2",
-    "wall",
+    "steelwall",
     "steel wall"
   },
   {
     "emc_steelwall_3",
-    "wall",
+    "steelwall",
     "steel wall"
   },
   {
     "emc_steelwall_4",
-    "wall",
+    "steelwall",
     "steel wall"
   },
   {
@@ -3758,7 +3758,7 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
   },
   {
     "invisible_steelwall.active",
-    "wall",
+    "steelwall",
     "-"
   },
   {
@@ -4373,6 +4373,16 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
     "hide group elements"
   },
   {
+    "internal_cascade_ref",
+    "internal",
+    "show reference elements"
+  },
+  {
+    "internal_cascade_ref.active",
+    "internal",
+    "hide reference elements"
+  },
+  {
     "internal_cascade_user",
     "internal",
     "show user defined elements"
@@ -4381,16 +4391,6 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
     "internal_cascade_user.active",
     "internal",
     "hide user defined elements"
-  },
-  {
-    "internal_cascade_generic",
-    "internal",
-    "show elements"
-  },
-  {
-    "internal_cascade_generic.active",
-    "internal",
-    "hide elements"
   },
   {
     "internal_cascade_dynamic",

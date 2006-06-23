@@ -1,3 +1,6 @@
+2006-06-23
+	* reorganized level editor element list a bit to match engines better
+
 2006-06-21
 	* fixed newly introduced bug with wrongly initializing clipboard element
 
