@@ -818,6 +818,9 @@ static void CreateScaledBitmaps(Bitmap *old_bitmap, int zoom_factor,
   else
     tmp_bitmap_1 = old_bitmap;
 
+  /* this is only needed to make compilers happy */
+  tmp_bitmap_2 = tmp_bitmap_8 = NULL;
+
   if (create_small_bitmaps)
   {
     /* calculate new image dimensions for small images */

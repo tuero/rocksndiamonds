@@ -193,7 +193,7 @@ dist-all: dist-build-all dist-unix dist-win32 dist-macosx
 test-setup:
 #	$(MAKE) clean
 #	$(MAKE) dist-build-win32
-#	$(MAKE) clean
+#	$(MAKE) dist-clean
 
 	$(MAKE) dist-win32
 

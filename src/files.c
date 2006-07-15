@@ -6989,8 +6989,19 @@ static struct TokenInfo global_setup_tokens[] =
   { TYPE_SWITCH, &si.override_level_music,    "override_level_music"	},
 };
 
+static boolean not_used = FALSE;
 static struct TokenInfo editor_setup_tokens[] =
 {
+#if 1
+  { TYPE_SWITCH, &not_used,		"editor.el_boulderdash"		},
+  { TYPE_SWITCH, &not_used,		"editor.el_emerald_mine"	},
+  { TYPE_SWITCH, &not_used,		"editor.el_emerald_mine_club"	},
+  { TYPE_SWITCH, &not_used,		"editor.el_more"		},
+  { TYPE_SWITCH, &not_used,		"editor.el_sokoban"		},
+  { TYPE_SWITCH, &not_used,		"editor.el_supaplex"		},
+  { TYPE_SWITCH, &not_used,		"editor.el_diamond_caves"	},
+  { TYPE_SWITCH, &not_used,		"editor.el_dx_boulderdash"	},
+#else
   { TYPE_SWITCH, &sei.el_boulderdash,	"editor.el_boulderdash"		},
   { TYPE_SWITCH, &sei.el_emerald_mine,	"editor.el_emerald_mine"	},
   { TYPE_SWITCH, &sei.el_emerald_mine_club,"editor.el_emerald_mine_club"},
@@ -6999,9 +7010,14 @@ static struct TokenInfo editor_setup_tokens[] =
   { TYPE_SWITCH, &sei.el_supaplex,	"editor.el_supaplex"		},
   { TYPE_SWITCH, &sei.el_diamond_caves,	"editor.el_diamond_caves"	},
   { TYPE_SWITCH, &sei.el_dx_boulderdash,"editor.el_dx_boulderdash"	},
+#endif
   { TYPE_SWITCH, &sei.el_chars,		"editor.el_chars"		},
   { TYPE_SWITCH, &sei.el_custom,	"editor.el_custom"		},
+#if 1
+  { TYPE_SWITCH, &not_used,		"editor.el_headlines"		},
+#else
   { TYPE_SWITCH, &sei.el_headlines,	"editor.el_headlines"		},
+#endif
   { TYPE_SWITCH, &sei.el_user_defined,	"editor.el_user_defined"	},
   { TYPE_SWITCH, &sei.el_dynamic,	"editor.el_dynamic"		},
   { TYPE_SWITCH, &sei.el_by_game,	"editor.el_by_game"		},
