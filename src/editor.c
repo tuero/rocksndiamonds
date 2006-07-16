@@ -1026,7 +1026,7 @@ static struct
     NULL,				" ", "height",
   },
   {
-    ED_LEVEL_SETTINGS_XPOS(0),		ED_LEVEL_SETTINGS_YPOS(6),
+    ED_LEVEL_SETTINGS_XPOS(0),		ED_LEVEL_SETTINGS_YPOS(5),
     0,					999,
     GADGET_ID_LEVEL_GEMSLIMIT_DOWN,	GADGET_ID_LEVEL_GEMSLIMIT_UP,
     GADGET_ID_LEVEL_GEMSLIMIT_TEXT,	GADGET_ID_NONE,
@@ -1034,7 +1034,7 @@ static struct
     NULL, "number of gems to collect:",	NULL
   },
   {
-    ED_LEVEL_SETTINGS_XPOS(0),		ED_LEVEL_SETTINGS_YPOS(8),
+    ED_LEVEL_SETTINGS_XPOS(0),		ED_LEVEL_SETTINGS_YPOS(7),
     0,					9999,
     GADGET_ID_LEVEL_TIMELIMIT_DOWN,	GADGET_ID_LEVEL_TIMELIMIT_UP,
     GADGET_ID_LEVEL_TIMELIMIT_TEXT,	GADGET_ID_NONE,
@@ -1042,7 +1042,7 @@ static struct
     "time or step limit to solve level:", NULL, NULL
   },
   {
-    ED_LEVEL_SETTINGS_XPOS(0),		ED_LEVEL_SETTINGS_YPOS(10),
+    ED_LEVEL_SETTINGS_XPOS(0),		ED_LEVEL_SETTINGS_YPOS(9),
     0,					255,
     GADGET_ID_LEVEL_TIMESCORE_DOWN,	GADGET_ID_LEVEL_TIMESCORE_UP,
     GADGET_ID_LEVEL_TIMESCORE_TEXT,	GADGET_ID_NONE,
@@ -2003,7 +2003,7 @@ static struct
   /* ---------- level and editor settings ---------------------------------- */
 
   {
-    -1,					ED_LEVEL_SETTINGS_YPOS(8),
+    -1,					ED_LEVEL_SETTINGS_YPOS(7),
     GADGET_ID_TIME_OR_STEPS,		GADGET_ID_LEVEL_TIMELIMIT_UP,
     -1,
     options_time_or_steps,
@@ -2011,7 +2011,7 @@ static struct
     NULL, "(0 => no limit)",		"time or step limit"
   },
   {
-    ED_LEVEL_SETTINGS_XPOS(0),		ED_LEVEL_SETTINGS_YPOS(5),
+    ED_LEVEL_SETTINGS_XPOS(0),		ED_LEVEL_SETTINGS_YPOS(11),
     GADGET_ID_GAME_ENGINE_TYPE,		GADGET_ID_NONE,
     -1,
     options_game_engine_type,
@@ -2019,7 +2019,7 @@ static struct
     "game engine:", NULL,		"game engine"
   },
   {
-    ED_LEVEL_SETTINGS_XPOS(0),		ED_LEVEL_SETTINGS_YPOS(12),
+    ED_LEVEL_SETTINGS_XPOS(0),		ED_LEVEL_SETTINGS_YPOS(10),
     GADGET_ID_WIND_DIRECTION,		GADGET_ID_NONE,
     -1,
     options_wind_direction,
