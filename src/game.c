@@ -8420,6 +8420,8 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
 
 	if (ei->collect_score == 0)
 	{
+	  int xx, yy;
+
 #if 0
 	  printf("::: CE_SCORE_GETS_ZERO\n");
 #endif
@@ -8429,6 +8431,26 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
 
 #if 0
 	  printf("::: RESULT: %d, %d\n", Feld[x][y], ChangePage[x][y]);
+#endif
+
+#if 1
+	  /*
+	    This is a very special case that seems to be a mixture between
+	    CheckElementChange() and CheckTriggeredElementChange(): while
+	    the first one only affects single elements that are triggered
+	    directly, the second one affects multiple elements in the playfield
+	    that are triggered indirectly by another element. This is a third
+	    case: Changing the CE score always affects multiple identical CEs,
+	    so every affected CE must be checked, not only the single CE for
+	    which the CE score was changed in the first place (as every instance
+	    of that CE shares the same CE score, and therefore also can change)!
+	  */
+	  SCAN_PLAYFIELD(xx, yy)
+	  {
+	    if (Feld[xx][yy] == element)
+	      CheckElementChange(xx, yy, element, EL_UNDEFINED,
+				 CE_SCORE_GETS_ZERO);
+	  }
 #endif
 	}
       }

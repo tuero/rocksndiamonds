@@ -1,4 +1,9 @@
 2006-07-16
+	* fixed bug (very special case) with CE_SCORE_GETS_ZERO, which can
+	  affect multiple instances of the same CE, although this kind of
+	  change condition usually only affects one single custom element
+
+2006-07-16
 	* version number set to 3.2.1
 
 2006-07-16
