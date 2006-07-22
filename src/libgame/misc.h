@@ -97,6 +97,7 @@ char *getHomeDir(void);
 
 char *getBasePath(char *);
 char *getBaseName(char *);
+char *getBaseNamePtr(char *);
 
 char *getPath2(char *, char *);
 char *getPath3(char *, char *, char*);

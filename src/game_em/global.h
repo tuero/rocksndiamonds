@@ -51,7 +51,7 @@ void synchro_1(void);
 void synchro_2(void);
 void synchro_3(void);
 
-int  cleanup_em_level(unsigned char *, int);
+int  cleanup_em_level(unsigned char *, int, char *);
 void convert_em_level(unsigned char *, int);
 void prepare_em_level(void);
 

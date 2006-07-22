@@ -470,7 +470,7 @@ static char *getLastPathSeparatorPtr(char *filename)
   return last_separator;
 }
 
-static char *getBaseNamePtr(char *filename)
+char *getBaseNamePtr(char *filename)
 {
   char *last_separator = getLastPathSeparatorPtr(filename);
 

@@ -1,3 +1,8 @@
+2006-07-22
+	* fixed level versions of EMC level loader (from V4 to V1, V2 and V3)
+	* fixed level time for EMC levels for V2 engine (V2 and V5 levels)
+	* fixed special handling of vertically stacked acid becoming fake acid
+
 2006-07-16
 	* fixed bug (very special case) with CE_SCORE_GETS_ZERO, which can
 	  affect multiple instances of the same CE, although this kind of

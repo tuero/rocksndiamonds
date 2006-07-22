@@ -101,20 +101,31 @@ static unsigned char remap_v4eater[28] =
   146,147,175,65,66,64,2,18
 };
 
-int cleanup_em_level(unsigned char *src, int length)
+static boolean filename_has_v1_format(char *filename)
 {
-  int file_version = 0;
+  char *basename = getBaseNamePtr(filename);
+
+  return (strlen(basename) == 3 &&
+	  basename[0] == 'a' &&
+	  basename[1] >= 'a' && basename[1] <= 'k' &&
+	  basename[2] >= '0' && basename[2] <= '9');
+}
+
+int cleanup_em_level(unsigned char *src, int length, char *filename)
+{
+  int file_version = FILE_VERSION_EM_UNKNOWN;
   int i;
 
   if (length >= 2172 &&
-      src[2106] == 255 &&
-      src[2107] == 54 &&
-      src[2108] == 48 &&
-      src[2109] == 48)
+      src[2106] == 255 &&		/* version id: */
+      src[2107] == 54 &&		/* '6' */
+      src[2108] == 48 &&		/* '0' */
+      src[2109] == 48)			/* '0' */
   {
     /* ---------- this cave has V6 file format ---------- */
     file_version = FILE_VERSION_EM_V6;
 
+    /* remap elements to internal EMC level format */
     for (i = 0; i < 2048; i++)
       src[i] = remap_v6[src[i]];
     for (i = 2048; i < 2084; i++)
@@ -123,14 +134,15 @@ int cleanup_em_level(unsigned char *src, int length)
       src[i] = remap_v6[src[i]];
   }
   else if (length >= 2110 &&
-	   src[2106] == 255 &&
-	   src[2107] == 53 &&
-	   src[2108] == 48 &&
-	   src[2109] == 48)
+	   src[2106] == 255 &&		/* version id: */
+	   src[2107] == 53 &&		/* '5' */
+	   src[2108] == 48 &&		/* '0' */
+	   src[2109] == 48)		/* '0' */
   {
     /* ---------- this cave has V5 file format ---------- */
     file_version = FILE_VERSION_EM_V5;
 
+    /* remap elements to internal EMC level format */
     for (i = 0; i < 2048; i++)
       src[i] = remap_v5[src[i]];
     for (i = 2048; i < 2084; i++)
@@ -138,6 +150,95 @@ int cleanup_em_level(unsigned char *src, int length)
     for (i = 2112; i < 2148; i++)
       src[i] = src[i - 64];
   }
+
+#if 1	/* ================================================================== */
+
+  else if (length >= 2106 &&
+	   (src[1983] == 27 ||		/* encrypted (only EM I/II/III) */
+	    src[1983] == 116 ||		/* unencrypted (usual case) */
+	    src[1983] == 131))		/* unencrypted (rare case) */
+  {
+    /* ---------- this cave has V1, V2 or V3 file format ---------- */
+
+    boolean fix_copyright = FALSE;
+
+    /*
+      byte at position 1983 (0x07bf) is used as "magic byte":
+      - 27  (0x1b)	=> encrypted level (V3 only / Kingsoft original games)
+      - 116 (0x74)	=> unencrypted level (byte is corrected to 131 (0x83))
+      - 131 (0x83)	=> unencrypted level (happens only in very rare cases)
+    */
+
+    if (src[1983] == 27)	/* (0x1b) -- after decryption: 116 (0x74) */
+    {
+      /* this is original (encrypted) Emerald Mine I, II or III level file */
+
+      int first_byte = src[0];
+      unsigned char code0 = 0x65;
+      unsigned char code1 = 0x11;
+
+      /* decode encrypted level data */
+      for (i = 0; i < 2106; i++)
+      {
+	src[i] ^= code0;
+	src[i] -= code1;
+
+	code0 = (code0 + 7) & 0xff;
+      }
+
+      src[1] = 131;		/* needed for all Emerald Mine levels */
+
+      /* first byte is either 0xf1 (EM I and III) or 0xf5 (EM II) */
+      if (first_byte == 0xf5)
+      {
+	src[0] = 131;		/* only needed for Emerald Mine II levels */
+
+	fix_copyright = TRUE;
+      }
+
+      /* ---------- this cave has V3 file format ---------- */
+      file_version = FILE_VERSION_EM_V3;
+    }
+    else if (filename_has_v1_format(filename))
+    {
+      /* ---------- this cave has V1 file format ---------- */
+      file_version = FILE_VERSION_EM_V1;
+    }
+    else
+    {
+      /* ---------- this cave has V2 file format ---------- */
+      file_version = FILE_VERSION_EM_V2;
+    }
+
+    /* remap elements to internal EMC level format */
+    for (i = 0; i < 2048; i++)
+      src[i] = remap_v4[src[i]];
+    for (i = 2048; i < 2084; i++)
+      src[i] = remap_v4eater[src[i] >= 28 ? 0 : src[i]];
+    for (i = 2112; i < 2148; i++)
+      src[i] = src[i - 64];
+
+    if (fix_copyright)		/* fix "(c)" sign in Emerald Mine II levels */
+    {
+      for (i = 0; i < 2048; i++)
+	if (src[i] == 241)
+	  src[i] = 254;		/* replace 'Xdecor_1' with 'Xalpha_copyr' */
+    }
+  }
+  else
+  {
+    /* ---------- this cave has unknown file format ---------- */
+
+    /* if file has length of old-style level file, print (wrong) magic byte */
+    if (length < 2110)
+      Error(ERR_WARN, "unknown magic byte 0x%02x at position 0x%04x",
+	    src[1983], 1983);
+
+    return FILE_VERSION_EM_UNKNOWN;
+  }
+
+#else	/* ================================================================== */
+
 #if 0
   else if (length >= 2106)	/* !!! TEST ONLY: SHOW BROKEN LEVELS !!! */
 #else
@@ -148,14 +249,16 @@ int cleanup_em_level(unsigned char *src, int length)
     /* ---------- this cave has V4 file format ---------- */
     file_version = FILE_VERSION_EM_V4;
 
+    /* remap elements to internal EMC level format */
     for (i = 0; i < 2048; i++)
       src[i] = remap_v4[src[i]];
     for (i = 2048; i < 2084; i++)
       src[i] = remap_v4eater[src[i] >= 28 ? 0 : src[i]];
-    for (i = 2112; i < 2148; i++) src[i] = src[i - 64];
+    for (i = 2112; i < 2148; i++)
+      src[i] = src[i - 64];
   }
   else if (length >= 2106 &&
-	   src[0] == 241 &&	/* <-- Emerald Mine I levels */
+	   src[0] == 241 &&	/* <-- Emerald Mine I and III levels */
 	   src[1983] == 27)
   {
     unsigned char j = 94;
@@ -163,9 +266,13 @@ int cleanup_em_level(unsigned char *src, int length)
     /* ---------- this cave has V3 file format ---------- */
     file_version = FILE_VERSION_EM_V3;
 
+    /* decrypt encrypted level file */
     for (i = 0; i < 2106; i++)
       src[i] = (src[i] ^ (j += 7)) - 0x11;
+
     src[1] = 131;
+
+    /* remap elements to internal EMC level format */
     for (i = 0; i < 2048; i++)
       src[i] = remap_v4[src[i]];
     for (i = 2048; i < 2084; i++)
@@ -183,10 +290,14 @@ int cleanup_em_level(unsigned char *src, int length)
     /* ---------- this cave has V3 file format ---------- */
     file_version = FILE_VERSION_EM_V3;
 
+    /* decrypt encrypted level file */
     for (i = 0; i < 2106; i++)
       src[i] = (src[i] ^ (j += 7)) - 0x11;
+
     src[0] = 131;		/* needed for Emerald Mine II levels */
     src[1] = 131;
+
+    /* remap elements to internal EMC level format */
     for (i = 0; i < 2048; i++)
       src[i] = remap_v4[src[i]];
     for (i = 2048; i < 2084; i++)
@@ -211,16 +322,23 @@ int cleanup_em_level(unsigned char *src, int length)
     return 0;
   }
 
+#endif	/* ================================================================== */
+
   if (file_version < FILE_VERSION_EM_V6)
   {
     /* id */
-    src[2106] = 255;
-    src[2107] = 54;
-    src[2108] = 48;
-    src[2109] = 48;
+    src[2106] = 255;		/* version id: */
+    src[2107] = 54;		/* '6' */
+    src[2108] = 48;		/* '0' */
+    src[2109] = 48;		/* '0' */
 
     /* time */
     i = src[2094] * 10;
+    /* stored level time of levels for the V2 player was changed to 50% of the
+       time for the V1 player (original V3 levels already considered this) */
+    if (file_version != FILE_VERSION_EM_V1 &&
+	file_version != FILE_VERSION_EM_V3)
+      i /= 2;
     src[2110] = i >> 8;
     src[2111] = i;
 
@@ -229,7 +347,17 @@ int cleanup_em_level(unsigned char *src, int length)
 
     /* ball data */
     src[2159] = 128;
+
+#if 0
+    printf("::: STORED TIME (< V6): %d s\n", src[2094] * 10);
+#endif
   }
+#if 0
+  else
+  {
+    printf("::: STORED TIME (>= V6): %d s\n", src[2110] * 256 + src[2111]);
+  }
+#endif
 
   /* ---------- at this stage, the cave data always has V6 format ---------- */
 
@@ -242,10 +370,33 @@ int cleanup_em_level(unsigned char *src, int length)
       src[i] = 147;
 
 #if 0
+
   /* fix acid */
   for (i = 64; i < 2048; i++)
     if (src[i] == 63)		/* replace element above 'Xacid_s' ... */
       src[i - 64] = 101;	/* ... with 'Xacid_1' */
+
+#else
+
+#if 1
+  /* fix acid */
+  for (i = 64; i < 2048; i++)
+    if (src[i] == 63)		/* replace element above 'Xacid_s' ... */
+      src[i - 64] = 101;	/* ... with 'Xacid_1' */
+
+  /* fix acid with no base beneath it (see below for details (*)) */
+  for (i = 64; i < 2048 - 1; i++)
+  {
+    if (file_version <= FILE_VERSION_EM_V2 &&
+	src[i - 64] == 101 && src[i] != 63)	/* acid without base */
+    {
+      if (src[i - 1] == 101 ||			/* remove acid over acid row */
+	  src[i + 1] == 101)
+	src[i - 64] = 6;	/* replace element above with 'Xblank' */
+      else
+	src[i - 64] = 255;	/* replace element above with 'Xfake_acid_1' */
+    }
+  }
 
 #else
 
@@ -254,13 +405,25 @@ int cleanup_em_level(unsigned char *src, int length)
   {
     if (src[i] == 63)		/* 'Xacid_s' (acid pool, bottom middle) */
     {
-      if (file_version == FILE_VERSION_EM_V4 &&
+      if (file_version <= FILE_VERSION_EM_V2 &&
 	  i < 2048 - 64 && src[i + 64] == 63)
-	src[i - 64] = 255;	/* replace element above with 'Xfake_acid_1' */
+      {
+	int obj_left  = remap_emerald[src[i - 1]];
+	int obj_right = remap_emerald[src[i + 1]];
+
+	if (obj_left == Xblank || obj_right == Xblank ||
+	    obj_left == Xplant || obj_right == Xplant)
+	  src[i - 64] = 6;	/* replace element above with 'Xblank' */
+	else
+	  src[i - 64] = 255;	/* replace element above with 'Xfake_acid_1' */
+      }
       else
+      {
 	src[i - 64] = 101;	/* replace element above with 'Xacid_1' */
+      }
     }
   }
+#endif
 #endif
 
   /* fix acid in eater 1 */
@@ -392,7 +555,9 @@ int cleanup_em_level(unsigned char *src, int length)
   length = 2172;
 
 #if 1
+#if 1
   if (options.debug)
+#endif
     printf("::: EM level file version: %d\n", file_version);
 #endif
 
@@ -418,6 +583,9 @@ int cleanup_em_level(unsigned char *src, int length)
  *   in eater.
  * - acid is always deadly even with no base beneath it (this breaks cave 0 in
  *   downunder mine 16)
+ *   (*) fixed (see above):
+ *       - downunder mine 16, level 0, works again
+ *       - downunder mine 11, level 71, corrected (only cosmetically)
  *
  * so far all below have not broken any caves:
  *
@@ -568,9 +736,9 @@ static int get_em_element(unsigned short em_element_raw, int file_version)
 {
   int em_element = remap_emerald[em_element_raw];
 
-  if (file_version <= FILE_VERSION_EM_V4)
+  if (file_version < FILE_VERSION_EM_V5)
   {
-    /* versions up to V4 had no grass, but only sand/dirt */
+    /* versions below V5 had no grass, but only sand/dirt */
     if (em_element == Xgrass)
       em_element = Xdirt;
   }

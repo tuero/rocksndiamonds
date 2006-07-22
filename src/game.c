@@ -9673,6 +9673,10 @@ void GameActions_EM_Main()
   for (i = 0; i < MAX_PLAYERS; i++)
     effective_action[i] = stored_player[i].effective_action;
 
+#if 0
+  printf("::: %04d: %08x\n", FrameCounter, effective_action[0]);
+#endif
+
   GameActions_EM(effective_action, warp_mode);
 
   CheckLevelTime();

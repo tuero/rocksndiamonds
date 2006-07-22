@@ -102,7 +102,9 @@ boolean LoadNativeLevel_EM(char *filename)
     return FALSE;
   }
 
-  if (!(file_version = cleanup_em_level(raw_leveldata, raw_leveldata_length)))
+  file_version = cleanup_em_level(raw_leveldata, raw_leveldata_length,filename);
+
+  if (file_version == FILE_VERSION_EM_UNKNOWN)
   {
     Error(ERR_WARN, "unknown EM level '%s' -- using empty level", filename);
 

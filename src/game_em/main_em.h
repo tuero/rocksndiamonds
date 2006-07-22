@@ -28,8 +28,11 @@
 /* ------------------------------------------------------------------------- */
 
 /* values for native Emerald Mine game version */
+#define FILE_VERSION_EM_UNKNOWN	0
+#define FILE_VERSION_EM_V1	1
+#define FILE_VERSION_EM_V2	2
 #define FILE_VERSION_EM_V3	3
-#define FILE_VERSION_EM_V4	4
+#define FILE_VERSION_EM_V4	4	/* (there really was no version 4) */
 #define FILE_VERSION_EM_V5	5
 #define FILE_VERSION_EM_V6	6
 
