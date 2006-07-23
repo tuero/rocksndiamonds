@@ -1,3 +1,7 @@
+2006-07-23
+	* changed scrollbars to always show last line as first after scrolling
+	  (that means jumping n - 1 screen lines instead of n screen lines)
+
 2006-07-22
 	* fixed level versions of EMC level loader (from V4 to V1, V2 and V3)
 	* fixed level time for EMC levels for V2 engine (V2 and V5 levels)

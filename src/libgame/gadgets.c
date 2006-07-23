@@ -1687,11 +1687,12 @@ boolean HandleGadgets(int mx, int my, int button)
 
 	struct GadgetScrollbar *gs = &gi->scrollbar;
 	int old_item_position = gs->item_position;
+	int item_steps = gs->items_visible - 1;
+	int item_direction = (mpos < gpos + gi->scrollbar.position ? -1 : +1);
 
 	changed_position = FALSE;
 
-	gs->item_position +=
-	  gs->items_visible * (mpos < gpos + gi->scrollbar.position ? -1 : +1);
+	gs->item_position += item_steps * item_direction;
 
 	if (gs->item_position < 0)
 	  gs->item_position = 0;
