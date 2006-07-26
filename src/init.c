@@ -4221,6 +4221,45 @@ void Execute_Command(char *command)
       global.convert_level_nr = atoi(str_ptr);	/* get level_nr value */
     }
   }
+
+#if DEBUG
+#if defined(TARGET_SDL)
+  else if (strEqual(command, "SDL_ListModes"))
+  {
+    SDL_Rect **modes;
+    int i;
+
+    SDL_Init(SDL_INIT_VIDEO);
+
+    /* get available fullscreen/hardware modes */
+    modes = SDL_ListModes(NULL, SDL_FULLSCREEN | SDL_HWSURFACE);
+
+    /* check if there are any modes available */
+    if (modes == NULL)
+    {
+      printf("No modes available!\n");
+
+      exit(-1);
+    }
+
+    /* check if our resolution is restricted */
+    if (modes == (SDL_Rect **)-1)
+    {
+      printf("All resolutions available.\n");
+    }
+    else
+    {
+      /* print valid modes */
+      printf("Available Modes:\n");
+      for(i = 0; modes[i]; i++)
+	printf("  %d x %d\n", modes[i]->w, modes[i]->h);
+    }
+
+    exit(0);
+  }
+#endif
+#endif
+
   else
   {
     Error(ERR_EXIT_HELP, "unrecognized command '%s'", command);
