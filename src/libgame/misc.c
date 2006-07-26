@@ -750,6 +750,45 @@ void GetOptions(char *argv[], void (*print_usage_function)(void))
       /* when doing batch processing, always enable verbose mode (warnings) */
       options.verbose = TRUE;
     }
+#if 1
+#if DEBUG
+#if defined(TARGET_SDL)
+    else if (strncmp(option, "-SDL_ListModes", option_len) == 0)
+    {
+      SDL_Rect **modes;
+      int i;
+
+      SDL_Init(SDL_INIT_VIDEO);
+
+      /* get available fullscreen/hardware modes */
+      modes=SDL_ListModes(NULL, SDL_FULLSCREEN|SDL_HWSURFACE);
+
+      /* check if there are any modes available */
+      if (modes == (SDL_Rect **)0)
+      {
+	printf("No modes available!\n");
+
+	exit(-1);
+      }
+
+      /* check if our resolution is restricted */
+      if (modes == (SDL_Rect **)-1)
+      {
+	printf("All resolutions available.\n");
+      }
+      else
+      {
+	/* print valid modes */
+	printf("Available Modes:\n");
+	for(i = 0; modes[i]; i++)
+	  printf("  %d x %d\n", modes[i]->w, modes[i]->h);
+      }
+
+      exit(0);
+    }
+#endif
+#endif
+#endif
     else if (*option == '-')
     {
       Error(ERR_EXIT_HELP, "unrecognized option '%s'", option_str);

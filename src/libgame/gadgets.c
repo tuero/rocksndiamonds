@@ -65,9 +65,28 @@ static int getNewGadgetID()
   return id;
 }
 
-static struct GadgetInfo *getGadgetInfoFromMousePosition(int mx, int my)
+static struct GadgetInfo *getGadgetInfoFromMousePosition(int mx, int my,
+							 int button)
 {
   struct GadgetInfo *gi;
+
+  /* first check for scrollbars in case of mouse scroll wheel button events */
+  if (button == 4 || button == 5)
+  {
+#if 0
+    printf("WHOA! SCROLL WHEEL DETECTED [%d]\n", button);
+#endif
+
+    for (gi = gadget_list_first_entry; gi != NULL; gi = gi->next)
+    {
+      if (gi->mapped && gi->active &&
+	  gi->type & GD_TYPE_SCROLLBAR)
+	return gi;
+    }
+
+    /* no active scrollbar found -- ignore this button event */
+    return NULL;
+  }
 
   /* open selectboxes may overlap other active gadgets, so check them first */
   for (gi = gadget_list_first_entry; gi != NULL; gi = gi->next)
@@ -1386,6 +1405,7 @@ boolean HandleGadgets(int mx, int my, int button)
   static int last_mx = 0, last_my = 0;
   static int pressed_mx = 0, pressed_my = 0;
   static boolean keep_selectbox_open = FALSE;
+  static boolean gadget_stopped = FALSE;
   int scrollbar_mouse_pos = 0;
   struct GadgetInfo *new_gi, *gi;
   boolean press_event;
@@ -1398,9 +1418,12 @@ boolean HandleGadgets(int mx, int my, int button)
   boolean gadget_pressed_repeated;
   boolean gadget_pressed_off_borders;
   boolean gadget_pressed_inside_select_line;
+  boolean gadget_pressed_delay_reached;
   boolean gadget_moving;
   boolean gadget_moving_inside;
   boolean gadget_moving_off_borders;
+  boolean gadget_draggable;
+  boolean gadget_dragging;
   boolean gadget_released;
   boolean gadget_released_inside;
   boolean gadget_released_inside_select_line;
@@ -1420,10 +1443,10 @@ boolean HandleGadgets(int mx, int my, int button)
   }
 
   /* check which gadget is under the mouse pointer */
-  new_gi = getGadgetInfoFromMousePosition(mx, my);
+  new_gi = getGadgetInfoFromMousePosition(mx, my, button);
 
   /* check if button state has changed since last invocation */
-  press_event = (button != 0 && last_button == 0);
+  press_event   = (button != 0 && last_button == 0);
   release_event = (button == 0 && last_button != 0);
   last_button = button;
 
@@ -1492,6 +1515,9 @@ boolean HandleGadgets(int mx, int my, int button)
   gadget_pressed_repeated =
     (button != 0 && last_gi != NULL && new_gi == last_gi);
 
+  gadget_pressed_delay_reached =
+    DelayReached(&pressed_delay, GADGET_FRAME_DELAY);
+
   gadget_released =		(release_event && last_gi != NULL);
   gadget_released_inside =	(gadget_released && new_gi == last_gi);
   gadget_released_off_borders =	(gadget_released && new_gi != last_gi);
@@ -1548,6 +1574,14 @@ boolean HandleGadgets(int mx, int my, int button)
   /* modify event position values even if no gadget is pressed */
   if (button == 0 && !release_event)
     gi = new_gi;
+
+  /* if new gadget or if no gadget was pressed, release stopped processing */
+  if (gadget_pressed || new_gi == NULL)
+    gadget_stopped = FALSE;
+
+  /* if gadget was stopped while being handled, stop gadget processing here */
+  if (gadget_stopped)
+    return TRUE;
 
   if (gi != NULL)
   {
@@ -1633,6 +1667,91 @@ boolean HandleGadgets(int mx, int my, int button)
     last_info_gi = new_gi;
   }
 
+#if 1
+
+  gadget_draggable = (gi && gi->type & GD_TYPE_SCROLLBAR);
+
+  /* reset drag position for newly pressed scrollbar to "not dragging" */
+  if (gadget_pressed && gadget_draggable)
+    gi->scrollbar.drag_position = -1;
+
+  gadget_dragging = (gadget_draggable && gi->scrollbar.drag_position != -1);
+
+  /* clicking next to a scrollbar to move it is not considered "moving" */
+  if (gadget_draggable && !gadget_dragging)
+    gadget_moving = FALSE;
+
+  /* when leaving scrollbar area when jump-scrolling, stop gadget processing */
+  if (gadget_draggable && !gadget_dragging && gadget_moving_off_borders)
+    gadget_stopped = TRUE;
+
+  if ((gadget_pressed) ||
+      (gadget_pressed_repeated && gadget_pressed_delay_reached))
+  {
+    if (gi->type & GD_TYPE_SCROLLBAR && !gadget_dragging)
+    {
+      int mpos = (gi->type == GD_TYPE_SCROLLBAR_HORIZONTAL ? mx    : my);
+      int gpos = (gi->type == GD_TYPE_SCROLLBAR_HORIZONTAL ? gi->x : gi->y);
+
+      if (button > 3 ||
+	  mpos < gpos + gi->scrollbar.position ||
+	  mpos >= gpos + gi->scrollbar.position + gi->scrollbar.size)
+      {
+	/* click scrollbar one scrollbar length up/left or down/right */
+
+	struct GadgetScrollbar *gs = &gi->scrollbar;
+	int old_item_position = gs->item_position;
+	int item_steps = gs->items_visible - 1;
+	int item_direction = (mpos < gpos + gi->scrollbar.position ? -1 : +1);
+
+	if (button > 3)
+	{
+	  item_steps = 3;
+	  item_direction = (button == 4 ? -1 : +1);
+	}
+
+	changed_position = FALSE;
+
+	gs->item_position += item_steps * item_direction;
+
+	if (gs->item_position < 0)
+	  gs->item_position = 0;
+	else if (gs->item_position > gs->items_max - gs->items_visible)
+	  gs->item_position = gs->items_max - gs->items_visible;
+
+	if (old_item_position != gs->item_position)
+	{
+	  gi->event.item_position = gs->item_position;
+	  changed_position = TRUE;
+	}
+
+	ModifyGadget(gi, GDI_SCROLLBAR_ITEM_POSITION, gs->item_position,
+		     GDI_END);
+
+	gi->state = GD_BUTTON_UNPRESSED;
+	gi->event.type = GD_EVENT_MOVING;
+	gi->event.off_borders = FALSE;
+
+	if (gi->event_mask & GD_EVENT_MOVING && changed_position)
+	  gi->callback_action(gi);
+
+	return TRUE;
+      }
+      else
+      {
+	/* don't handle this scrollbar anymore when mouse position reached */
+	if (gadget_pressed_repeated)
+	{
+	  gadget_stopped = TRUE;
+
+	  return TRUE;
+	}
+      }
+    }
+  }
+
+#endif
+
   if (gadget_pressed)
   {
     if (gi->type == GD_TYPE_CHECK_BUTTON)
@@ -1661,64 +1780,16 @@ boolean HandleGadgets(int mx, int my, int button)
     }
     else if (gi->type & GD_TYPE_SCROLLBAR)
     {
-      int mpos, gpos;
+      int mpos = (gi->type == GD_TYPE_SCROLLBAR_HORIZONTAL ? mx    : my);
+      int gpos = (gi->type == GD_TYPE_SCROLLBAR_HORIZONTAL ? gi->x : gi->y);
 
-      if (gi->type == GD_TYPE_SCROLLBAR_HORIZONTAL)
-      {
-	mpos = mx;
-	gpos = gi->x;
-      }
-      else
-      {
-	mpos = my;
-	gpos = gi->y;
-      }
-
-      if (mpos >= gpos + gi->scrollbar.position &&
+      if (button >= 1 && button <= 3 &&
+	  mpos >= gpos + gi->scrollbar.position &&
 	  mpos < gpos + gi->scrollbar.position + gi->scrollbar.size)
       {
-	/* drag scrollbar */
+	/* start dragging scrollbar */
 	gi->scrollbar.drag_position =
 	  scrollbar_mouse_pos - gi->scrollbar.position;
-      }
-      else
-      {
-	/* click scrollbar one scrollbar length up/left or down/right */
-
-	struct GadgetScrollbar *gs = &gi->scrollbar;
-	int old_item_position = gs->item_position;
-	int item_steps = gs->items_visible - 1;
-	int item_direction = (mpos < gpos + gi->scrollbar.position ? -1 : +1);
-
-	changed_position = FALSE;
-
-	gs->item_position += item_steps * item_direction;
-
-	if (gs->item_position < 0)
-	  gs->item_position = 0;
-	else if (gs->item_position > gs->items_max - gs->items_visible)
-	  gs->item_position = gs->items_max - gs->items_visible;
-
-	if (old_item_position != gs->item_position)
-	{
-	  gi->event.item_position = gs->item_position;
-	  changed_position = TRUE;
-	}
-
-	ModifyGadget(gi, GDI_SCROLLBAR_ITEM_POSITION, gs->item_position,
-		     GDI_END);
-
-	gi->state = GD_BUTTON_UNPRESSED;
-	gi->event.type = GD_EVENT_MOVING;
-	gi->event.off_borders = FALSE;
-
-	if (gi->event_mask & GD_EVENT_MOVING && changed_position)
-	  gi->callback_action(gi);
-
-	/* don't handle this scrollbar anymore while mouse button pressed */
-	last_gi = NULL;
-
-	return TRUE;
       }
     }
     else if (gi->type & GD_TYPE_SELECTBOX)
@@ -1746,9 +1817,14 @@ boolean HandleGadgets(int mx, int my, int button)
   {
     gi->event.type = GD_EVENT_PRESSED;
 
+#if 1
+    if (gi->event_mask & GD_EVENT_REPEATED && gadget_pressed_delay_reached)
+      gi->callback_action(gi);
+#else
     if (gi->event_mask & GD_EVENT_REPEATED &&
 	DelayReached(&pressed_delay, GADGET_FRAME_DELAY))
       gi->callback_action(gi);
+#endif
   }
 
   if (gadget_moving)
@@ -1815,7 +1891,7 @@ boolean HandleGadgets(int mx, int my, int button)
       DrawGadget(gi, DG_PRESSED, gi->direct_draw);
     }
 
-    gi->state = (gadget_moving_inside || gi->type & GD_TYPE_SCROLLBAR ?
+    gi->state = (gadget_moving_inside || gadget_draggable ?
 		 GD_BUTTON_PRESSED : GD_BUTTON_UNPRESSED);
     gi->event.type = GD_EVENT_MOVING;
     gi->event.off_borders = gadget_moving_off_borders;
@@ -1864,6 +1940,9 @@ boolean HandleGadgets(int mx, int my, int button)
     if (gi->type & GD_TYPE_SCROLLBAR)
       DrawGadget(gi, DG_UNPRESSED, gi->direct_draw);
 
+#if 1
+    gi->state = GD_BUTTON_UNPRESSED;
+#endif
     gi->event.type = GD_EVENT_RELEASED;
 
     if (gi->event_mask & GD_EVENT_RELEASED &&
