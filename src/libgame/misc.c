@@ -33,31 +33,133 @@
 #include "image.h"
 
 
-/* ------------------------------------------------------------------------- */
+/* ========================================================================= */
 /* some generic helper functions                                             */
+/* ========================================================================= */
+
+/* ------------------------------------------------------------------------- */
+/* platform independent wrappers for printf() et al. (newline aware)         */
 /* ------------------------------------------------------------------------- */
 
-void fprintf_line(FILE *stream, char *line_string, int line_length)
+static void vfprintf_newline(FILE *stream, char *format, va_list ap)
 {
+#if defined(PLATFORM_WIN32) || defined(PLATFORM_MSDOS)
+  char *newline = "\r\n";
+#else
+  char *newline = "\n";
+#endif
+
+  vfprintf(stream, format, ap);
+
+  fprintf(stream, "%s", newline);
+}
+
+static void vprintf_error_ext(char *format, va_list ap, boolean print_newline)
+{
+  FILE *error = stderr;
+
+#if defined(PLATFORM_WIN32) || defined(PLATFORM_MSDOS)
+  if ((error = openErrorFile()) == NULL)
+    program.exit_function(1);
+#endif
+
+  if (print_newline)
+    vfprintf_newline(error, format, ap);
+  else
+    vfprintf(error, format, ap);
+
+  if (error != stderr)
+    fclose(error);
+}
+
+static void vprintf_error(char *format, va_list ap)
+{
+  vprintf_error_ext(format, ap, FALSE);
+}
+
+static void vprintf_error_newline(char *format, va_list ap)
+{
+  vprintf_error_ext(format, ap, TRUE);
+}
+
+static void printf_error(char *format, ...)
+{
+  if (format)
+  {
+    va_list ap;
+
+    va_start(ap, format);
+    vprintf_error(format, ap);
+    va_end(ap);
+  }
+}
+
+static void printf_error_newline(char *format, ...)
+{
+  if (format)
+  {
+    va_list ap;
+
+    va_start(ap, format);
+    vprintf_error_newline(format, ap);
+    va_end(ap);
+  }
+}
+
+static void fprintf_newline(FILE *stream, char *format, ...)
+{
+  if (format)
+  {
+    va_list ap;
+
+    va_start(ap, format);
+    vfprintf_newline(stream, format, ap);
+    va_end(ap);
+  }
+}
+
+static char *get_line_string(char *line_chars, int line_length)
+{
+  static char *buffer = NULL;
+  int line_chars_length = strlen(line_chars);
   int i;
 
+  if (buffer != NULL)
+    checked_free(buffer);
+
+  buffer = checked_malloc(line_chars_length * line_length + 1);
+
   for (i = 0; i < line_length; i++)
-    fprintf(stream, "%s", line_string);
+    strcpy(&buffer[i * line_chars_length], line_chars);
 
-  fprintf(stream, "\n");
+  return buffer;
 }
 
-void printf_line(char *line_string, int line_length)
+void fprintf_line(FILE *stream, char *line_chars, int line_length)
 {
-  fprintf_line(stdout, line_string, line_length);
+  fprintf_newline(stream, get_line_string(line_chars, line_length));
 }
 
-void printf_line_with_prefix(char *prefix, char *line_string, int line_length)
+void printf_line(char *line_chars, int line_length)
+{
+  fprintf_line(stdout, line_chars, line_length);
+}
+
+void printf_line_error(char *line_chars, int line_length)
+{
+  printf_error_newline(get_line_string(line_chars, line_length));
+}
+
+void printf_line_with_prefix(char *prefix, char *line_chars, int line_length)
 {
   fprintf(stdout, "%s", prefix);
-  fprintf_line(stdout, line_string, line_length);
+  fprintf_line(stdout, line_chars, line_length);
 }
 
+
+/* ------------------------------------------------------------------------- */
+/* string functions                                                          */
+/* ------------------------------------------------------------------------- */
 
 /* int2str() returns a number converted to a string;
    the used memory is static, but will be overwritten by later calls,
@@ -832,6 +934,69 @@ char *GetError()
   return internal_error;
 }
 
+#if 1
+
+void Error(int mode, char *format, ...)
+{
+  static boolean last_line_was_separator = FALSE;
+  char *process_name = "";
+
+  /* display warnings only when running in verbose mode */
+  if (mode & ERR_WARN && !options.verbose)
+    return;
+
+  if (mode == ERR_RETURN_LINE)
+  {
+    if (!last_line_was_separator)
+      printf_line_error(format, 79);
+
+    last_line_was_separator = TRUE;
+
+    return;
+  }
+
+  last_line_was_separator = FALSE;
+
+  if (mode & ERR_SOUND_SERVER)
+    process_name = " sound server";
+  else if (mode & ERR_NETWORK_SERVER)
+    process_name = " network server";
+  else if (mode & ERR_NETWORK_CLIENT)
+    process_name = " network client **";
+
+  if (format)
+  {
+    va_list ap;
+
+    printf_error("%s%s: ", program.command_basename, process_name);
+
+    if (mode & ERR_WARN)
+      printf_error("warning: ");
+
+    va_start(ap, format);
+    vprintf_error_newline(format, ap);
+    va_end(ap);
+  }
+  
+  if (mode & ERR_HELP)
+    printf_error_newline("%s: Try option '--help' for more information.",
+			 program.command_basename);
+
+  if (mode & ERR_EXIT)
+    printf_error_newline("%s%s: aborting",
+			 program.command_basename, process_name);
+
+  if (mode & ERR_EXIT)
+  {
+    if (mode & ERR_FROM_SERVER)
+      exit(1);				/* child process: normal exit */
+    else
+      program.exit_function(1);		/* main process: clean up stuff */
+  }
+}
+
+#else
+
 void Error(int mode, char *format, ...)
 {
   static boolean last_line_was_separator = FALSE;
@@ -855,12 +1020,13 @@ void Error(int mode, char *format, ...)
 
   last_line_was_separator = FALSE;
 
-#if defined(PLATFORM_MSDOS)
+#if defined(PLATFORM_WIN32) || defined(PLATFORM_MSDOS)
   newline = "\r\n";
 
   if ((error = openErrorFile()) == NULL)
   {
     printf("Cannot write to error output file!%s", newline);
+
     program.exit_function(1);
   }
 #endif
@@ -907,6 +1073,8 @@ void Error(int mode, char *format, ...)
       program.exit_function(1);		/* main process: clean up stuff */
   }
 }
+
+#endif
 
 
 /* ------------------------------------------------------------------------- */
@@ -2736,25 +2904,51 @@ void FreeCustomArtworkLists(struct ArtworkListInfo *artwork_info)
 /* ------------------------------------------------------------------------- */
 /* functions only needed for non-Unix (non-command-line) systems             */
 /* (MS-DOS only; SDL/Windows creates files "stdout.txt" and "stderr.txt")    */
+/* (now also added for Windows, to create files in user data directory)      */
 /* ------------------------------------------------------------------------- */
 
-#if defined(PLATFORM_MSDOS)
+#if defined(PLATFORM_WIN32) || defined(PLATFORM_MSDOS)
 
-#define ERROR_FILENAME		"stderr.txt"
+#define ERROR_BASENAME		"stderr.txt"
+
+static char *error_filename = NULL;
+
+#if defined(PLATFORM_WIN32)
 
 void initErrorFile()
 {
-  unlink(ERROR_FILENAME);
+  if (error_filename == NULL)
+    error_filename = getPath2(getUserDataDir(), ERROR_BASENAME);
+
+  unlink(error_filename);
 }
+
+#elif defined(PLATFORM_MSDOS)
+
+void initErrorFile()
+{
+  if (error_filename == NULL)
+    error_filename = ERROR_BASENAME;
+
+  unlink(error_filename);
+}
+
+#endif	/* PLATFORM_MSDOS */
 
 FILE *openErrorFile()
 {
-  return fopen(ERROR_FILENAME, MODE_APPEND);
+  FILE *error_file = fopen(error_filename, MODE_APPEND);
+
+  if (error_file == NULL)
+    fprintf_newline(stderr, "ERROR: cannot open file '%s' for appending!",
+		    error_filename);
+
+  return error_file;
 }
 
 void dumpErrorFile()
 {
-  FILE *error_file = fopen(ERROR_FILENAME, MODE_READ);
+  FILE *error_file = fopen(error_filename, MODE_READ);
 
   if (error_file != NULL)
   {
@@ -2764,7 +2958,8 @@ void dumpErrorFile()
     fclose(error_file);
   }
 }
-#endif
+
+#endif	/* PLATFORM_WIN32 || PLATFORM_MSDOS */
 
 
 /* ------------------------------------------------------------------------- */

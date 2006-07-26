@@ -113,6 +113,9 @@ void InitPlatformDependentStuff(void)
 {
 #if defined(PLATFORM_MSDOS)
   _fmode = O_BINARY;
+#endif
+
+#if defined(PLATFORM_WIN32) || defined(PLATFORM_MSDOS)
   initErrorFile();
 #endif
 
