@@ -32,7 +32,7 @@ void HandleClientMessageEvent(ClientMessageEvent *event);
 
 void HandleNoEvent(void);
 
-void HandleButton(int, int, int);
+void HandleButton(int, int, int, int);
 void HandleKey(Key, int);
 void HandleJoystick();
 

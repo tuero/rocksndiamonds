@@ -322,7 +322,7 @@ void HandleButtonEvent(ButtonEvent *event)
   else
     button_status = MB_RELEASED;
 
-  HandleButton(event->x, event->y, button_status);
+  HandleButton(event->x, event->y, button_status, event->button);
 }
 
 void HandleMotionEvent(MotionEvent *event)
@@ -335,7 +335,7 @@ void HandleMotionEvent(MotionEvent *event)
 
   motion_status = TRUE;
 
-  HandleButton(event->x, event->y, button_status);
+  HandleButton(event->x, event->y, button_status, button_status);
 }
 
 void HandleKeyEvent(KeyEvent *event)
@@ -396,7 +396,7 @@ void HandleClientMessageEvent(ClientMessageEvent *event)
     CloseAllAndExit(0);
 }
 
-void HandleButton(int mx, int my, int button)
+void HandleButton(int mx, int my, int button, int button_nr)
 {
   static int old_mx = 0, old_my = 0;
 
@@ -418,14 +418,18 @@ void HandleButton(int mx, int my, int button)
     mx = my = -32;	/* force mouse event to be outside screen tiles */
   }
 
-  switch(game_status)
+  /* do not use scroll wheel button events for anything other than gadgets */
+  if (button_nr > 3)
+    return;
+
+  switch (game_status)
   {
     case GAME_MODE_TITLE:
-      HandleTitleScreen(mx,my, 0,0, button);
+      HandleTitleScreen(mx, my, 0, 0, button);
       break;
 
     case GAME_MODE_MAIN:
-      HandleMainMenu(mx,my, 0,0, button);
+      HandleMainMenu(mx, my, 0, 0, button);
       break;
 
     case GAME_MODE_PSEUDO_TYPENAME:
@@ -433,11 +437,11 @@ void HandleButton(int mx, int my, int button)
       break;
 
     case GAME_MODE_LEVELS:
-      HandleChooseLevel(mx,my, 0,0, button);
+      HandleChooseLevel(mx, my, 0, 0, button);
       break;
 
     case GAME_MODE_SCORES:
-      HandleHallOfFame(0,0, 0,0, button);
+      HandleHallOfFame(0, 0, 0, 0, button);
       break;
 
     case GAME_MODE_EDITOR:
@@ -445,11 +449,11 @@ void HandleButton(int mx, int my, int button)
       break;
 
     case GAME_MODE_INFO:
-      HandleInfoScreen(mx,my, 0,0, button);
+      HandleInfoScreen(mx, my, 0, 0, button);
       break;
 
     case GAME_MODE_SETUP:
-      HandleSetupScreen(mx,my, 0,0, button);
+      HandleSetupScreen(mx, my, 0, 0, button);
       break;
 
     case GAME_MODE_PLAYING:
@@ -947,7 +951,8 @@ void HandleNoEvent()
 {
   if (button_status && game_status != GAME_MODE_PLAYING)
   {
-    HandleButton(0, 0, -button_status);
+    HandleButton(0, 0, -button_status, button_status);
+
     return;
   }
 

@@ -2402,6 +2402,8 @@ static struct
   int gd_x, gd_y;
   int x, y;
   int width, height;
+  int wheel_x, wheel_y;
+  int wheel_width, wheel_height;
   int type;
   int gadget_id;
   char *infotext;
@@ -2411,6 +2413,8 @@ static struct
     ED_SCROLLBAR_XPOS,			ED_SCROLLBAR_YPOS,
     SX + ED_SCROLL_HORIZONTAL_XPOS,	SY + ED_SCROLL_HORIZONTAL_YPOS,
     ED_SCROLL_HORIZONTAL_XSIZE,		ED_SCROLL_HORIZONTAL_YSIZE,
+    -1,					-1,
+    -1,					-1,
     GD_TYPE_SCROLLBAR_HORIZONTAL,
     GADGET_ID_SCROLL_HORIZONTAL,
     "scroll level editing area horizontally"
@@ -2419,6 +2423,8 @@ static struct
     ED_SCROLLBAR_XPOS,			ED_SCROLLBAR_YPOS,
     SX + ED_SCROLL_VERTICAL_XPOS,	SY + ED_SCROLL_VERTICAL_YPOS,
     ED_SCROLL_VERTICAL_XSIZE,		ED_SCROLL_VERTICAL_YSIZE,
+    0,					0,
+    SX + SXSIZE + SX,			WIN_YSIZE,
     GD_TYPE_SCROLLBAR_VERTICAL,
     GADGET_ID_SCROLL_VERTICAL,
     "scroll level editing area vertically"
@@ -2427,6 +2433,8 @@ static struct
     ED_SCROLLBAR2_XPOS,			ED_SCROLLBAR2_YPOS,
     DX + ED_SCROLL2_VERTICAL_XPOS,	DY + ED_SCROLL2_VERTICAL_YPOS,
     ED_SCROLL2_VERTICAL_XSIZE,		ED_SCROLL2_VERTICAL_YSIZE,
+    SX + SXSIZE + SX,			0,
+    WIN_XSIZE - (SX + SXSIZE + SX),	WIN_YSIZE,
     GD_TYPE_SCROLLBAR_VERTICAL,
     GADGET_ID_SCROLL_LIST_VERTICAL,
     "scroll element list vertically"
@@ -6140,6 +6148,10 @@ static void CreateScrollbarGadgets()
 		      GDI_SCROLLBAR_ITEMS_MAX, items_max,
 		      GDI_SCROLLBAR_ITEMS_VISIBLE, items_visible,
 		      GDI_SCROLLBAR_ITEM_POSITION, item_position,
+		      GDI_WHEEL_AREA_X, scrollbar_info[i].wheel_x,
+		      GDI_WHEEL_AREA_Y, scrollbar_info[i].wheel_y,
+		      GDI_WHEEL_AREA_WIDTH, scrollbar_info[i].wheel_width,
+		      GDI_WHEEL_AREA_HEIGHT, scrollbar_info[i].wheel_height,
 		      GDI_STATE, GD_BUTTON_UNPRESSED,
 		      GDI_DESIGN_UNPRESSED, gd_bitmap, gd_x1, gd_y1,
 		      GDI_DESIGN_PRESSED, gd_bitmap, gd_x2, gd_y2,

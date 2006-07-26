@@ -73,18 +73,17 @@ static struct GadgetInfo *getGadgetInfoFromMousePosition(int mx, int my,
   /* first check for scrollbars in case of mouse scroll wheel button events */
   if (button == 4 || button == 5)
   {
-#if 0
-    printf("WHOA! SCROLL WHEEL DETECTED [%d]\n", button);
-#endif
-
+    /* check for the first active scrollbar with matching mouse wheel area */
     for (gi = gadget_list_first_entry; gi != NULL; gi = gi->next)
     {
       if (gi->mapped && gi->active &&
-	  gi->type & GD_TYPE_SCROLLBAR)
+	  gi->type & GD_TYPE_SCROLLBAR &&
+	  mx >= gi->wheelarea.x && mx < gi->wheelarea.x + gi->wheelarea.width &&
+	  my >= gi->wheelarea.y && my < gi->wheelarea.y + gi->wheelarea.height)
 	return gi;
     }
 
-    /* no active scrollbar found -- ignore this button event */
+    /* no active scrollbar found -- ignore this scroll wheel button event */
     return NULL;
   }
 
@@ -993,6 +992,22 @@ static void HandleGadgetTags(struct GadgetInfo *gi, int first_tag, va_list ap)
 
       case GDI_SCROLLBAR_ITEM_POSITION:
 	gi->scrollbar.item_position = va_arg(ap, int);
+	break;
+
+      case GDI_WHEEL_AREA_X:
+	gi->wheelarea.x = va_arg(ap, int);
+	break;
+
+      case GDI_WHEEL_AREA_Y:
+	gi->wheelarea.y = va_arg(ap, int);
+	break;
+
+      case GDI_WHEEL_AREA_WIDTH:
+	gi->wheelarea.width = va_arg(ap, int);
+	break;
+
+      case GDI_WHEEL_AREA_HEIGHT:
+	gi->wheelarea.height = va_arg(ap, int);
 	break;
 
       case GDI_CALLBACK_INFO:
