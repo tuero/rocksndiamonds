@@ -4874,5 +4874,8 @@ void CloseAllAndExit(int exit_value)
   CloseVideoDisplay();
   ClosePlatformDependentStuff();
 
+  if (exit_value != 0)
+    NotifyUserAboutErrorFile();
+
   exit(exit_value);
 }

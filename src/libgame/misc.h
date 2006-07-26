@@ -188,11 +188,11 @@ void LoadArtworkConfig(struct ArtworkListInfo *);
 void ReloadCustomArtworkList(struct ArtworkListInfo *);
 void FreeCustomArtworkLists(struct ArtworkListInfo *);
 
-#if !defined(PLATFORM_UNIX)
+char *getErrorFilename(char *);
 void initErrorFile();
 FILE *openErrorFile();
 void dumpErrorFile();
-#endif
+void NotifyUserAboutErrorFile();
 
 void debug_print_timestamp(int, char *);
 

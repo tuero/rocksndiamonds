@@ -333,6 +333,27 @@
 #define SCOREFILE_EXTENSION	"sco"
 #endif
 
+#define ERROR_BASENAME		"stderr.txt"
+
+#define CHAR_PATH_SEPARATOR_UNIX	'/'
+#define CHAR_PATH_SEPARATOR_DOS		'\\'
+
+#define STRING_PATH_SEPARATOR_UNIX	"/"
+#define STRING_PATH_SEPARATOR_DOS	"\\"
+
+#define STRING_NEWLINE_UNIX		"\n"
+#define STRING_NEWLINE_DOS		"\r\n"
+
+#if defined(PLATFORM_WIN32) || defined(PLATFORM_MSDOS)
+#define CHAR_PATH_SEPARATOR	CHAR_PATH_SEPARATOR_DOS
+#define STRING_PATH_SEPARATOR	STRING_PATH_SEPARATOR_DOS
+#define STRING_NEWLINE		STRING_NEWLINE_DOS
+#else
+#define CHAR_PATH_SEPARATOR	CHAR_PATH_SEPARATOR_UNIX
+#define STRING_PATH_SEPARATOR	STRING_PATH_SEPARATOR_UNIX
+#define STRING_NEWLINE		STRING_NEWLINE_UNIX
+#endif
+
 
 /* areas in bitmap PIX_DOOR */
 /* meaning in PIX_DB_DOOR: (3 PAGEs)
@@ -507,6 +528,8 @@ struct ProgramInfo
 
   char *cookie_prefix;
   char *filename_prefix;	/* prefix to cut off from DOS filenames */
+
+  char *error_filename;		/* used instead of 'stderr' on some systems */
 
   int version_major;
   int version_minor;

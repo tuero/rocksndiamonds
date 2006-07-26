@@ -43,11 +43,7 @@
 
 static void vfprintf_newline(FILE *stream, char *format, va_list ap)
 {
-#if defined(PLATFORM_WIN32) || defined(PLATFORM_MSDOS)
-  char *newline = "\r\n";
-#else
-  char *newline = "\n";
-#endif
+  char *newline = STRING_NEWLINE;
 
   vfprintf(stream, format, ap);
 
@@ -56,20 +52,15 @@ static void vfprintf_newline(FILE *stream, char *format, va_list ap)
 
 static void vprintf_error_ext(char *format, va_list ap, boolean print_newline)
 {
-  FILE *error = stderr;
-
-#if defined(PLATFORM_WIN32) || defined(PLATFORM_MSDOS)
-  if ((error = openErrorFile()) == NULL)
-    program.exit_function(1);
-#endif
+  FILE *error_file = openErrorFile();	/* this returns at least 'stderr' */
 
   if (print_newline)
-    vfprintf_newline(error, format, ap);
+    vfprintf_newline(error_file, format, ap);
   else
-    vfprintf(error, format, ap);
+    vfprintf(error_file, format, ap);
 
-  if (error != stderr)
-    fclose(error);
+  if (error_file != stderr)		/* do not close stream 'stderr' */
+    fclose(error_file);
 }
 
 static void vprintf_error(char *format, va_list ap)
@@ -562,12 +553,10 @@ char *getHomeDir()
 
 static char *getLastPathSeparatorPtr(char *filename)
 {
-  char *last_separator = strrchr(filename, '/');
+  char *last_separator = strrchr(filename, CHAR_PATH_SEPARATOR_UNIX);
 
-#if !defined(PLATFORM_UNIX)
   if (last_separator == NULL)	/* also try DOS/Windows variant */
-    last_separator = strrchr(filename, '\\');
-#endif
+    last_separator = strrchr(filename, CHAR_PATH_SEPARATOR_DOS);
 
   return last_separator;
 }
@@ -607,21 +596,23 @@ char *getBasePath(char *filename)
 
 char *getPath2(char *path1, char *path2)
 {
+  char *sep = STRING_PATH_SEPARATOR;
   char *complete_path = checked_malloc(strlen(path1) + 1 +
 				       strlen(path2) + 1);
 
-  sprintf(complete_path, "%s/%s", path1, path2);
+  sprintf(complete_path, "%s%s%s", path1, sep, path2);
 
   return complete_path;
 }
 
 char *getPath3(char *path1, char *path2, char *path3)
 {
+  char *sep = STRING_PATH_SEPARATOR;
   char *complete_path = checked_malloc(strlen(path1) + 1 +
 				       strlen(path2) + 1 +
 				       strlen(path3) + 1);
 
-  sprintf(complete_path, "%s/%s/%s", path1, path2, path3);
+  sprintf(complete_path, "%s%s%s%s%s", path1, sep, path2, sep, path3);
 
   return complete_path;
 }
@@ -2907,48 +2898,32 @@ void FreeCustomArtworkLists(struct ArtworkListInfo *artwork_info)
 /* (now also added for Windows, to create files in user data directory)      */
 /* ------------------------------------------------------------------------- */
 
-#if defined(PLATFORM_WIN32) || defined(PLATFORM_MSDOS)
-
-#define ERROR_BASENAME		"stderr.txt"
-
-static char *error_filename = NULL;
-
-#if defined(PLATFORM_WIN32)
+char *getErrorFilename(char *basename)
+{
+  return getPath2(getUserDataDir(), basename);
+}
 
 void initErrorFile()
 {
-  if (error_filename == NULL)
-    error_filename = getPath2(getUserDataDir(), ERROR_BASENAME);
-
-  unlink(error_filename);
+  unlink(program.error_filename);
 }
-
-#elif defined(PLATFORM_MSDOS)
-
-void initErrorFile()
-{
-  if (error_filename == NULL)
-    error_filename = ERROR_BASENAME;
-
-  unlink(error_filename);
-}
-
-#endif	/* PLATFORM_MSDOS */
 
 FILE *openErrorFile()
 {
-  FILE *error_file = fopen(error_filename, MODE_APPEND);
+  FILE *error_file = stderr;
 
-  if (error_file == NULL)
+#if defined(PLATFORM_WIN32) || defined(PLATFORM_MSDOS)
+  if ((error_file = fopen(program.error_filename, MODE_APPEND)) == NULL)
     fprintf_newline(stderr, "ERROR: cannot open file '%s' for appending!",
-		    error_filename);
+		    program.error_filename);
+#endif
 
   return error_file;
 }
 
 void dumpErrorFile()
 {
-  FILE *error_file = fopen(error_filename, MODE_READ);
+  FILE *error_file = fopen(program.error_filename, MODE_READ);
 
   if (error_file != NULL)
   {
@@ -2959,7 +2934,17 @@ void dumpErrorFile()
   }
 }
 
-#endif	/* PLATFORM_WIN32 || PLATFORM_MSDOS */
+void NotifyUserAboutErrorFile()
+{
+#if defined(PLATFORM_WIN32)
+  char *title_text = getStringCat2(program.program_title, " Error Message");
+  char *error_text = getStringCat2("The program was aborted due to an error; "
+				   "for details, see the following error file:"
+				   STRING_NEWLINE, program.error_filename);
+
+  MessageBox(NULL, error_text, title_text, MB_OK);
+#endif
+}
 
 
 /* ------------------------------------------------------------------------- */

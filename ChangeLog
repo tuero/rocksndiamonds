@@ -6,6 +6,7 @@
 	  holding "Ctrl" button pressed while scrolling the wheel
 	* changed output file "stderr.txt" on Windows platform now always to be
 	  created in the R'n'D sub-directory of the personal documents directory
+	* added Windows message box to direct to "stderr.txt" after error aborts
 
 2006-07-25
 	* improved general scrollbar handling (when jump-scrolling scrollbars)

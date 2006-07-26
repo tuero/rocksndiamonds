@@ -93,6 +93,8 @@ void InitProgramInfo(char *argv0,
   program.version_major = VERSION_MAJOR(program_version);
   program.version_minor = VERSION_MINOR(program_version);
   program.version_patch = VERSION_PATCH(program_version);
+
+  program.error_filename = getErrorFilename(ERROR_BASENAME);
 }
 
 void InitExitFunction(void (*exit_function)(int))
