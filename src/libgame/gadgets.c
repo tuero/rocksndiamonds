@@ -73,11 +73,14 @@ static struct GadgetInfo *getGadgetInfoFromMousePosition(int mx, int my,
   /* first check for scrollbars in case of mouse scroll wheel button events */
   if (button == 4 || button == 5)
   {
+    boolean check_horizontal = (GetKeyModState() & KMOD_Control);
+
     /* check for the first active scrollbar with matching mouse wheel area */
     for (gi = gadget_list_first_entry; gi != NULL; gi = gi->next)
     {
       if (gi->mapped && gi->active &&
-	  gi->type & GD_TYPE_SCROLLBAR &&
+	  ((gi->type & GD_TYPE_SCROLLBAR_HORIZONTAL && check_horizontal) ||
+	   (gi->type & GD_TYPE_SCROLLBAR_VERTICAL && !check_horizontal)) &&
 	  mx >= gi->wheelarea.x && mx < gi->wheelarea.x + gi->wheelarea.width &&
 	  my >= gi->wheelarea.y && my < gi->wheelarea.y + gi->wheelarea.height)
 	return gi;

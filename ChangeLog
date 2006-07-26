@@ -2,6 +2,8 @@
 	* improved level number selection in main menu and player selection in
 	  setup menu (input devices section) by using standard button gadgets
 	* added support for mouse scroll wheel (caused buggy behaviour before)
+	* added support for scrolling horizontal scrollbars with mouse wheel by
+	  holding "Ctrl" button pressed while scrolling the wheel
 
 2006-07-25
 	* improved general scrollbar handling (when jump-scrolling scrollbars)
