@@ -1401,6 +1401,7 @@ void ClickOnGadget(struct GadgetInfo *gi, int button)
 boolean HandleGadgets(int mx, int my, int button)
 {
   static unsigned long pressed_delay = 0;
+  static unsigned long pressed_delay_value = GADGET_FRAME_DELAY;
   static int last_button = 0;
   static int last_mx = 0, last_my = 0;
   static int pressed_mx = 0, pressed_my = 0;
@@ -1516,7 +1517,7 @@ boolean HandleGadgets(int mx, int my, int button)
     (button != 0 && last_gi != NULL && new_gi == last_gi);
 
   gadget_pressed_delay_reached =
-    DelayReached(&pressed_delay, GADGET_FRAME_DELAY);
+    DelayReached(&pressed_delay, pressed_delay_value);
 
   gadget_released =		(release_event && last_gi != NULL);
   gadget_released_inside =	(gadget_released && new_gi == last_gi);
@@ -1688,6 +1689,20 @@ boolean HandleGadgets(int mx, int my, int button)
   if ((gadget_pressed) ||
       (gadget_pressed_repeated && gadget_pressed_delay_reached))
   {
+    if (gadget_pressed)		/* gadget pressed the first time */
+    {
+      /* initialize delay counter */
+      DelayReached(&pressed_delay, 0);
+
+      /* start gadget delay with longer delay after first click on gadget */
+      pressed_delay_value = GADGET_FRAME_DELAY_FIRST;
+    }
+    else			/* gadget hold pressed for some time */
+    {
+      /* after first repeated gadget click, continue with shorter delay value */
+      pressed_delay_value = GADGET_FRAME_DELAY;
+    }
+
     if (gi->type & GD_TYPE_SCROLLBAR && !gadget_dragging)
     {
       int mpos = (gi->type == GD_TYPE_SCROLLBAR_HORIZONTAL ? mx    : my);
@@ -1806,9 +1821,6 @@ boolean HandleGadgets(int mx, int my, int button)
     gi->event.button = button;
     gi->event.off_borders = FALSE;
 
-    /* initialize delay counter */
-    DelayReached(&pressed_delay, 0);
-
     if (gi->event_mask & GD_EVENT_PRESSED)
       gi->callback_action(gi);
   }
@@ -1817,14 +1829,8 @@ boolean HandleGadgets(int mx, int my, int button)
   {
     gi->event.type = GD_EVENT_PRESSED;
 
-#if 1
     if (gi->event_mask & GD_EVENT_REPEATED && gadget_pressed_delay_reached)
       gi->callback_action(gi);
-#else
-    if (gi->event_mask & GD_EVENT_REPEATED &&
-	DelayReached(&pressed_delay, GADGET_FRAME_DELAY))
-      gi->callback_action(gi);
-#endif
   }
 
   if (gadget_moving)

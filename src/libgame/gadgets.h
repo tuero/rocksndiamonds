@@ -17,7 +17,8 @@
 #include "system.h"
 
 
-#define GADGET_FRAME_DELAY	150	/* delay between gadget actions */
+#define GADGET_FRAME_DELAY_FIRST	250	/* delay after first click */
+#define GADGET_FRAME_DELAY		100	/* delay for pressed butten */
 
 /* gadget types */
 #define GD_TYPE_NORMAL_BUTTON		(1 << 0)

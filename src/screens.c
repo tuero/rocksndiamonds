@@ -71,15 +71,27 @@
 #define MAX_MENU_TEXT_LENGTH_MEDIUM	(MAX_MENU_TEXT_LENGTH_BIG * 2)
 
 /* buttons and scrollbars identifiers */
-#define SCREEN_CTRL_ID_SCROLL_UP	0
-#define SCREEN_CTRL_ID_SCROLL_DOWN	1
-#define SCREEN_CTRL_ID_SCROLL_VERTICAL	2
+#define SCREEN_CTRL_ID_LAST_LEVEL	0
+#define SCREEN_CTRL_ID_NEXT_LEVEL	1
+#define SCREEN_CTRL_ID_LAST_PLAYER	2
+#define SCREEN_CTRL_ID_NEXT_PLAYER	3
+#define SCREEN_CTRL_ID_SCROLL_UP	4
+#define SCREEN_CTRL_ID_SCROLL_DOWN	5
+#define SCREEN_CTRL_ID_SCROLL_VERTICAL	6
 
+#define NUM_SCREEN_GADGETS		7
+
+#define NUM_SCREEN_MENUBUTTONS		4
 #define NUM_SCREEN_SCROLLBUTTONS	2
 #define NUM_SCREEN_SCROLLBARS		1
-#define NUM_SCREEN_GADGETS		3
+
+#define SCREEN_MASK_MAIN		(1 << 0)
+#define SCREEN_MASK_INPUT		(1 << 1)
 
 /* graphic position and size values for buttons and scrollbars */
+#define SC_MENUBUTTON_XSIZE		TILEX
+#define SC_MENUBUTTON_YSIZE		TILEY
+
 #define SC_SCROLLBUTTON_XSIZE		TILEX
 #define SC_SCROLLBUTTON_YSIZE		TILEY
 
@@ -127,7 +139,8 @@ static void HandleInfoScreen_Music(int);
 static void HandleInfoScreen_Credits(int);
 static void HandleInfoScreen_Program(int);
 
-static void MapChooseTreeGadgets(TreeInfo *);
+static void MapScreenMenuGadgets(int);
+static void MapScreenTreeGadgets(TreeInfo *);
 
 static struct GadgetInfo *screen_gadget[NUM_SCREEN_GADGETS];
 static int setup_mode = SETUP_MODE_MAIN;
@@ -475,6 +488,8 @@ static void DrawMainMenuExt(int fade_delay)
     initCursor(i, (i == 1 || i == 4 || i == 6 ? IMG_MENU_BUTTON_ENTER_MENU :
 		   IMG_MENU_BUTTON));
 
+#if 0
+
 #if 1
   drawCursorXY(getLastLevelButtonPos(), 1, IMG_MENU_BUTTON_LAST_LEVEL);
   drawCursorXY(getNextLevelButtonPos(), 1, IMG_MENU_BUTTON_NEXT_LEVEL);
@@ -486,6 +501,8 @@ static void DrawMainMenuExt(int fade_delay)
   drawCursorXY(level_width / 32 + 4, 1, IMG_MENU_BUTTON_LEFT);
   drawCursorXY(level_width / 32 + 8, 1, IMG_MENU_BUTTON_RIGHT);
 #endif
+#endif
+
 #endif
 
   DrawTextSCentered(326, FONT_TITLE_2, "A Game by Artsoft Entertainment");
@@ -523,8 +540,13 @@ static void DrawMainMenuExt(int fade_delay)
 #endif
 
 #if 1
+  /* create gadgets for main menu screen */
+  FreeScreenGadgets();
+  CreateScreenGadgets();
+
   /* map gadgets for main menu screen */
   MapTapeButtons();
+  MapScreenMenuGadgets(SCREEN_MASK_MAIN);
 #endif
 
 #if 1
@@ -694,9 +716,55 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
   }
 }
 
+void HandleMainMenu_SelectLevel(int step, int direction)
+{
+  int old_level_nr = level_nr;
+  int new_level_nr;
+
+  new_level_nr = old_level_nr + step * direction;
+  if (new_level_nr < leveldir_current->first_level)
+    new_level_nr = leveldir_current->first_level;
+  if (new_level_nr > leveldir_current->last_level)
+    new_level_nr = leveldir_current->last_level;
+
+  if (setup.handicap && new_level_nr > leveldir_current->handicap_level)
+  {
+    /* skipping levels is only allowed when trying to skip single level */
+    if (setup.skip_levels && step == 1 &&
+	Request("Level still unsolved ! Skip despite handicap ?", REQ_ASK))
+    {
+      leveldir_current->handicap_level++;
+      SaveLevelSetup_SeriesInfo();
+    }
+
+    new_level_nr = leveldir_current->handicap_level;
+  }
+
+  if (new_level_nr != old_level_nr)
+  {
+    level_nr = new_level_nr;
+
+    DrawText(mSX + 11 * 32, mSY + 3 * 32, int2str(level_nr, 3), FONT_VALUE_1);
+
+    LoadLevel(level_nr);
+    DrawMicroLevel(MICROLEVEL_XPOS, MICROLEVEL_YPOS, TRUE);
+
+    TapeErase();
+    LoadTape(level_nr);
+    DrawCompleteVideoDisplay();
+
+    /* needed because DrawMicroLevel() takes some time */
+    BackToFront();
+    SyncDisplay();
+  }
+}
+
 void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 {
+#if 0
   static unsigned long level_delay = 0;
+  static unsigned long level_delay_value = GADGET_FRAME_DELAY;
+#endif
   static int choice = 5;
   int x = 0;
   int y = choice;
@@ -725,9 +793,24 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
       y = choice + dy;
   }
 
+#if 0
+  /* start gadget delay with longer delay after first click on gadget */
+  if (button == 0)
+    pressed_delay_value = GADGET_FRAME_DELAY_FIRST;
+#endif
+
+#if 1
+
+  if (y == 1 && dx != 0 && button)
+  {
+    HandleMainMenu_SelectLevel(1, dx < 0 ? -1 : +1);
+  }
+
+#else
+
   if (y == 1 && ((x == 10 && level_nr > leveldir_current->first_level) ||
 		 (x == 14 && level_nr < leveldir_current->last_level)) &&
-      button && DelayReached(&level_delay, GADGET_FRAME_DELAY))
+      button && DelayReached(&level_delay, level_delay_value))
   {
     int step = (button == 1 ? 1 : button == 2 ? 5 : 10);
     int old_level_nr = level_nr;
@@ -769,9 +852,16 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
       /* needed because DrawMicroLevel() takes some time */
       BackToFront();
       SyncDisplay();
+
       DelayReached(&level_delay, 0);	/* reset delay counter */
+#if 0
+      pressed_delay_value = GADGET_FRAME_DELAY_FIRST;
+#endif
     }
   }
+
+#endif
+
   else if (IN_VIS_FIELD(x, y) &&
 	   y >= 0 && y <= 7 && (y != 1 || x < 10))
   {
@@ -1920,7 +2010,7 @@ static void DrawChooseTree(TreeInfo **ti_ptr)
   ClearWindow();
 
   HandleChooseTree(0, 0, 0, 0, MB_MENU_INITIALIZE, ti_ptr);
-  MapChooseTreeGadgets(*ti_ptr);
+  MapScreenTreeGadgets(*ti_ptr);
 
   FadeToFront();
   InitAnimation();
@@ -3123,8 +3213,10 @@ void DrawSetupScreen_Input()
   initCursor(2,  IMG_MENU_BUTTON_ENTER_MENU);
   initCursor(13, IMG_MENU_BUTTON_LEAVE_MENU);
 
+#if 0
   drawCursorXY(10, 0, IMG_MENU_BUTTON_LEFT);
   drawCursorXY(12, 0, IMG_MENU_BUTTON_RIGHT);
+#endif
 
   DrawText(mSX + 32, mSY +  2 * 32, "Player:", FONT_MENU_1);
   DrawText(mSX + 32, mSY +  3 * 32, "Device:", FONT_MENU_1);
@@ -3136,6 +3228,15 @@ void DrawSetupScreen_Input()
 #if 1
   DrawTextSCentered(SYSIZE - 20, FONT_TEXT_4,
 		    "Joysticks deactivated on this screen");
+#endif
+
+#if 1
+  /* create gadgets for setup input menu screen */
+  FreeScreenGadgets();
+  CreateScreenGadgets();
+
+  /* map gadgets for setup input menu screen */
+  MapScreenMenuGadgets(SCREEN_MASK_INPUT);
 #endif
 
   HandleSetupScreen_Input(0, 0, 0, 0, MB_MENU_INITIALIZE);
@@ -3241,10 +3342,30 @@ static void drawPlayerSetupInputInfo(int player_nr)
   }
 }
 
+static int input_player_nr = 0;
+
+void HandleSetupScreen_Input_Player(int step, int direction)
+{
+  int old_player_nr = input_player_nr;
+  int new_player_nr;
+
+  new_player_nr = old_player_nr + step * direction;
+  if (new_player_nr < 0)
+    new_player_nr = 0;
+  if (new_player_nr > MAX_PLAYERS - 1)
+    new_player_nr = MAX_PLAYERS - 1;
+
+  if (new_player_nr != old_player_nr)
+  {
+    input_player_nr = new_player_nr;
+
+    drawPlayerSetupInputInfo(input_player_nr);
+  }
+}
+
 void HandleSetupScreen_Input(int mx, int my, int dx, int dy, int button)
 {
   static int choice = 0;
-  static int player_nr = 0;
   int x = 0;
   int y = choice;
   int pos_start  = SETUPINPUT_SCREEN_POS_START;
@@ -3254,7 +3375,7 @@ void HandleSetupScreen_Input(int mx, int my, int dx, int dy, int button)
 
   if (button == MB_MENU_INITIALIZE)
   {
-    drawPlayerSetupInputInfo(player_nr);
+    drawPlayerSetupInputInfo(input_player_nr);
     drawCursor(choice, FC_RED);
 
     return;
@@ -3288,6 +3409,15 @@ void HandleSetupScreen_Input(int mx, int my, int dx, int dy, int button)
       y = (dy > 0 ? pos_empty2 + 1 : pos_empty1 - 1);
   }
 
+#if 1
+
+  if (y == 0 && dx != 0 && button)
+  {
+    HandleSetupScreen_Input_Player(1, dx < 0 ? -1 : +1);
+  }
+
+#else
+
   if (IN_VIS_FIELD(x, y) &&
       y == 0 && ((x < 10 && !button) || ((x == 10 || x == 12) && button)))
   {
@@ -3296,10 +3426,14 @@ void HandleSetupScreen_Input(int mx, int my, int dx, int dy, int button)
     if (!DelayReached(&delay, GADGET_FRAME_DELAY))
       return;
 
-    player_nr = (player_nr + (x == 10 ? -1 : +1) + MAX_PLAYERS) % MAX_PLAYERS;
+    input_player_nr =
+      (input_player_nr + (x == 10 ? -1 : +1) + MAX_PLAYERS) % MAX_PLAYERS;
 
-    drawPlayerSetupInputInfo(player_nr);
+    drawPlayerSetupInputInfo(input_player_nr);
   }
+
+#endif
+
   else if (IN_VIS_FIELD(x, y) &&
 	   y >= pos_start && y <= pos_end &&
 	   !(y >= pos_empty1 && y <= pos_empty2))
@@ -3317,14 +3451,14 @@ void HandleSetupScreen_Input(int mx, int my, int dx, int dy, int button)
     {
       if (y == 1)
       {
-	char *device_name = setup.input[player_nr].joy.device_name;
+	char *device_name = setup.input[input_player_nr].joy.device_name;
 
-	if (!setup.input[player_nr].use_joystick)
+	if (!setup.input[input_player_nr].use_joystick)
 	{
 	  int new_device_nr = (dx >= 0 ? 0 : MAX_PLAYERS - 1);
 
 	  setJoystickDeviceToNr(device_name, new_device_nr);
-	  setup.input[player_nr].use_joystick = TRUE;
+	  setup.input[input_player_nr].use_joystick = TRUE;
 	}
 	else
 	{
@@ -3332,22 +3466,22 @@ void HandleSetupScreen_Input(int mx, int my, int dx, int dy, int button)
 	  int new_device_nr = device_nr + (dx >= 0 ? +1 : -1);
 
 	  if (new_device_nr < 0 || new_device_nr >= MAX_PLAYERS)
-	    setup.input[player_nr].use_joystick = FALSE;
+	    setup.input[input_player_nr].use_joystick = FALSE;
 	  else
 	    setJoystickDeviceToNr(device_name, new_device_nr);
 	}
 
-	drawPlayerSetupInputInfo(player_nr);
+	drawPlayerSetupInputInfo(input_player_nr);
       }
       else if (y == 2)
       {
-	if (setup.input[player_nr].use_joystick)
+	if (setup.input[input_player_nr].use_joystick)
 	{
 	  InitJoysticks();
-	  CalibrateJoystick(player_nr);
+	  CalibrateJoystick(input_player_nr);
 	}
 	else
-	  CustomizeKeyboard(player_nr);
+	  CustomizeKeyboard(input_player_nr);
       }
       else if (y == pos_end)
       {
@@ -3756,6 +3890,74 @@ void HandleGameActions()
 
 /* ---------- new screen button stuff -------------------------------------- */
 
+static void getScreenMenuButtonPos(int *x, int *y, int gadget_id)
+{
+  switch (gadget_id)
+  {
+    case SCREEN_CTRL_ID_LAST_LEVEL:
+      *x = mSX + TILEX * getLastLevelButtonPos();
+      *y = mSY + TILEY * (MENU_SCREEN_START_YPOS + 1);
+      break;
+
+    case SCREEN_CTRL_ID_NEXT_LEVEL:
+      *x = mSX + TILEX * getNextLevelButtonPos();
+      *y = mSY + TILEY * (MENU_SCREEN_START_YPOS + 1);
+      break;
+
+    case SCREEN_CTRL_ID_LAST_PLAYER:
+      *x = mSX + TILEX * 10;
+      *y = mSY + TILEY * MENU_SCREEN_START_YPOS;
+      break;
+
+    case SCREEN_CTRL_ID_NEXT_PLAYER:
+      *x = mSX + TILEX * 12;
+      *y = mSY + TILEY * MENU_SCREEN_START_YPOS;
+      break;
+
+    default:
+      Error(ERR_EXIT, "unknown gadget ID %d", gadget_id);
+  }
+}
+
+static struct
+{
+  int gfx_unpressed, gfx_pressed;
+  void (*get_gadget_position)(int *, int *, int);
+  int gadget_id;
+  int screen_mask;
+  char *infotext;
+} menubutton_info[NUM_SCREEN_MENUBUTTONS] =
+{
+  {
+    IMG_MENU_BUTTON_LAST_LEVEL, IMG_MENU_BUTTON_LAST_LEVEL_ACTIVE,
+    getScreenMenuButtonPos,
+    SCREEN_CTRL_ID_LAST_LEVEL,
+    SCREEN_MASK_MAIN,
+    "last level"
+  },
+  {
+    IMG_MENU_BUTTON_NEXT_LEVEL, IMG_MENU_BUTTON_NEXT_LEVEL_ACTIVE,
+    getScreenMenuButtonPos,
+    SCREEN_CTRL_ID_NEXT_LEVEL,
+    SCREEN_MASK_MAIN,
+    "next level"
+  },
+  {
+    IMG_MENU_BUTTON_LEFT, IMG_MENU_BUTTON_LEFT_ACTIVE,
+    getScreenMenuButtonPos,
+    SCREEN_CTRL_ID_LAST_PLAYER,
+    SCREEN_MASK_INPUT,
+    "last player"
+  },
+  {
+    IMG_MENU_BUTTON_RIGHT, IMG_MENU_BUTTON_RIGHT_ACTIVE,
+    getScreenMenuButtonPos,
+    SCREEN_CTRL_ID_NEXT_PLAYER,
+    SCREEN_MASK_INPUT,
+    "next player"
+  },
+};
+
 static struct
 {
   int gfx_unpressed, gfx_pressed;
@@ -3805,6 +4007,59 @@ static struct
     "scroll level series vertically"
   }
 };
+
+static void CreateScreenMenubuttons()
+{
+  struct GadgetInfo *gi;
+  unsigned long event_mask;
+  int i;
+
+  for (i = 0; i < NUM_SCREEN_MENUBUTTONS; i++)
+  {
+    Bitmap *gd_bitmap_unpressed, *gd_bitmap_pressed;
+    int gfx_unpressed, gfx_pressed;
+    int x, y, width, height;
+    int gd_x1, gd_x2, gd_y1, gd_y2;
+    int id = menubutton_info[i].gadget_id;
+
+    event_mask = GD_EVENT_PRESSED | GD_EVENT_REPEATED;
+
+    menubutton_info[i].get_gadget_position(&x, &y, id);
+
+    width = SC_MENUBUTTON_XSIZE;
+    height = SC_MENUBUTTON_YSIZE;
+
+    gfx_unpressed = menubutton_info[i].gfx_unpressed;
+    gfx_pressed   = menubutton_info[i].gfx_pressed;
+    gd_bitmap_unpressed = graphic_info[gfx_unpressed].bitmap;
+    gd_bitmap_pressed   = graphic_info[gfx_pressed].bitmap;
+    gd_x1 = graphic_info[gfx_unpressed].src_x;
+    gd_y1 = graphic_info[gfx_unpressed].src_y;
+    gd_x2 = graphic_info[gfx_pressed].src_x;
+    gd_y2 = graphic_info[gfx_pressed].src_y;
+
+    gi = CreateGadget(GDI_CUSTOM_ID, id,
+		      GDI_CUSTOM_TYPE_ID, i,
+		      GDI_INFO_TEXT, menubutton_info[i].infotext,
+		      GDI_X, x,
+		      GDI_Y, y,
+		      GDI_WIDTH, width,
+		      GDI_HEIGHT, height,
+		      GDI_TYPE, GD_TYPE_NORMAL_BUTTON,
+		      GDI_STATE, GD_BUTTON_UNPRESSED,
+		      GDI_DESIGN_UNPRESSED, gd_bitmap_unpressed, gd_x1, gd_y1,
+		      GDI_DESIGN_PRESSED, gd_bitmap_pressed, gd_x2, gd_y2,
+		      GDI_DIRECT_DRAW, FALSE,
+		      GDI_EVENT_MASK, event_mask,
+		      GDI_CALLBACK_ACTION, HandleScreenGadgets,
+		      GDI_END);
+
+    if (gi == NULL)
+      Error(ERR_EXIT, "cannot create gadget");
+
+    screen_gadget[id] = gi;
+  }
+}
 
 static void CreateScreenScrollbuttons()
 {
@@ -3965,6 +4220,8 @@ void CreateScreenGadgets()
   }
 #endif
 
+  CreateScreenMenubuttons();
+
   /* force LEVELS draw offset for scrollbar / scrollbutton gadgets */
   game_status = GAME_MODE_LEVELS;
 
@@ -3993,7 +4250,16 @@ void FreeScreenGadgets()
     FreeGadget(screen_gadget[i]);
 }
 
-void MapChooseTreeGadgets(TreeInfo *ti)
+void MapScreenMenuGadgets(int screen_mask)
+{
+  int i;
+
+  for (i = 0; i < NUM_SCREEN_MENUBUTTONS; i++)
+    if (screen_mask & menubutton_info[i].screen_mask)
+      MapGadget(screen_gadget[menubutton_info[i].gadget_id]);
+}
+
+void MapScreenTreeGadgets(TreeInfo *ti)
 {
   int num_entries = numTreeInfoInGroup(ti);
   int i;
@@ -4001,29 +4267,42 @@ void MapChooseTreeGadgets(TreeInfo *ti)
   if (num_entries <= NUM_MENU_ENTRIES_ON_SCREEN)
     return;
 
-  for (i = 0; i < NUM_SCREEN_GADGETS; i++)
-    MapGadget(screen_gadget[i]);
-}
+  for (i = 0; i < NUM_SCREEN_SCROLLBUTTONS; i++)
+    MapGadget(screen_gadget[scrollbutton_info[i].gadget_id]);
 
-#if 0
-void UnmapChooseTreeGadgets()
-{
-  int i;
-
-  for (i = 0; i < NUM_SCREEN_GADGETS; i++)
-    UnmapGadget(screen_gadget[i]);
+  for (i = 0; i < NUM_SCREEN_SCROLLBARS; i++)
+    MapGadget(screen_gadget[scrollbar_info[i].gadget_id]);
 }
-#endif
 
 static void HandleScreenGadgets(struct GadgetInfo *gi)
 {
   int id = gi->custom_id;
+  int button = gi->event.button;
+  int step = (button == 1 ? 1 : button == 2 ? 5 : 10);
 
+#if 0
   if (game_status != GAME_MODE_LEVELS && game_status != GAME_MODE_SETUP)
     return;
+#endif
 
   switch (id)
   {
+    case SCREEN_CTRL_ID_LAST_LEVEL:
+      HandleMainMenu_SelectLevel(step, -1);
+      break;
+
+    case SCREEN_CTRL_ID_NEXT_LEVEL:
+      HandleMainMenu_SelectLevel(step, +1);
+      break;
+
+    case SCREEN_CTRL_ID_LAST_PLAYER:
+      HandleSetupScreen_Input_Player(step, -1);
+      break;
+
+    case SCREEN_CTRL_ID_NEXT_PLAYER:
+      HandleSetupScreen_Input_Player(step, +1);
+      break;
+
     case SCREEN_CTRL_ID_SCROLL_UP:
       if (game_status == GAME_MODE_LEVELS)
 	HandleChooseLevel(0,0, 0, -1 * SCROLL_LINE, MB_MENU_MARK);

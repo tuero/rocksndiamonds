@@ -1,3 +1,11 @@
+2006-07-26
+	* improved level number selection in main menu and player selection in
+	  setup menu (input devices section) by using standard button gadgets
+
+2006-07-25
+	* improved general scrollbar handling
+	* added support for mouse scroll wheels
+
 2006-07-23
 	* changed scrollbars to always show last line as first after scrolling
 	  (that means jumping n - 1 screen lines instead of n screen lines)
