@@ -189,8 +189,8 @@ void ReloadCustomArtworkList(struct ArtworkListInfo *);
 void FreeCustomArtworkLists(struct ArtworkListInfo *);
 
 char *getErrorFilename(char *);
-void initErrorFile();
-FILE *openErrorFile();
+void openErrorFile();
+void closeErrorFile();
 void dumpErrorFile();
 void NotifyUserAboutErrorFile();
 

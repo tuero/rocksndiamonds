@@ -50,53 +50,6 @@ static void vfprintf_newline(FILE *stream, char *format, va_list ap)
   fprintf(stream, "%s", newline);
 }
 
-static void vprintf_error_ext(char *format, va_list ap, boolean print_newline)
-{
-  FILE *error_file = openErrorFile();	/* this returns at least 'stderr' */
-
-  if (print_newline)
-    vfprintf_newline(error_file, format, ap);
-  else
-    vfprintf(error_file, format, ap);
-
-  if (error_file != stderr)		/* do not close stream 'stderr' */
-    fclose(error_file);
-}
-
-static void vprintf_error(char *format, va_list ap)
-{
-  vprintf_error_ext(format, ap, FALSE);
-}
-
-static void vprintf_error_newline(char *format, va_list ap)
-{
-  vprintf_error_ext(format, ap, TRUE);
-}
-
-static void printf_error(char *format, ...)
-{
-  if (format)
-  {
-    va_list ap;
-
-    va_start(ap, format);
-    vprintf_error(format, ap);
-    va_end(ap);
-  }
-}
-
-static void printf_error_newline(char *format, ...)
-{
-  if (format)
-  {
-    va_list ap;
-
-    va_start(ap, format);
-    vprintf_error_newline(format, ap);
-    va_end(ap);
-  }
-}
-
 static void fprintf_newline(FILE *stream, char *format, ...)
 {
   if (format)
@@ -109,36 +62,19 @@ static void fprintf_newline(FILE *stream, char *format, ...)
   }
 }
 
-static char *get_line_string(char *line_chars, int line_length)
-{
-  static char *buffer = NULL;
-  int line_chars_length = strlen(line_chars);
-  int i;
-
-  if (buffer != NULL)
-    checked_free(buffer);
-
-  buffer = checked_malloc(line_chars_length * line_length + 1);
-
-  for (i = 0; i < line_length; i++)
-    strcpy(&buffer[i * line_chars_length], line_chars);
-
-  return buffer;
-}
-
 void fprintf_line(FILE *stream, char *line_chars, int line_length)
 {
-  fprintf_newline(stream, get_line_string(line_chars, line_length));
+  int i;
+
+  for (i = 0; i < line_length; i++)
+    fprintf(stream, "%s", line_chars);
+
+  fprintf_newline(stream, "");
 }
 
 void printf_line(char *line_chars, int line_length)
 {
   fprintf_line(stdout, line_chars, line_length);
-}
-
-void printf_line_error(char *line_chars, int line_length)
-{
-  printf_error_newline(get_line_string(line_chars, line_length));
 }
 
 void printf_line_with_prefix(char *prefix, char *line_chars, int line_length)
@@ -900,7 +836,7 @@ void Error(int mode, char *format, ...)
   if (mode == ERR_RETURN_LINE)
   {
     if (!last_line_was_separator)
-      printf_line_error(format, 79);
+      fprintf_line(program.error_file, format, 79);
 
     last_line_was_separator = TRUE;
 
@@ -920,23 +856,25 @@ void Error(int mode, char *format, ...)
   {
     va_list ap;
 
-    printf_error("%s%s: ", program.command_basename, process_name);
+    fprintf(program.error_file, "%s%s: ", program.command_basename,
+	    process_name);
 
     if (mode & ERR_WARN)
-      printf_error("warning: ");
+      fprintf(program.error_file, "warning: ");
 
     va_start(ap, format);
-    vprintf_error_newline(format, ap);
+    vfprintf_newline(program.error_file, format, ap);
     va_end(ap);
   }
   
   if (mode & ERR_HELP)
-    printf_error_newline("%s: Try option '--help' for more information.",
-			 program.command_basename);
+    fprintf_newline(program.error_file,
+		    "%s: Try option '--help' for more information.",
+		    program.command_basename);
 
   if (mode & ERR_EXIT)
-    printf_error_newline("%s%s: aborting",
-			 program.command_basename, process_name);
+    fprintf_newline(program.error_file, "%s%s: aborting",
+		    program.command_basename, process_name);
 
   if (mode & ERR_EXIT)
   {
@@ -2864,22 +2802,22 @@ char *getErrorFilename(char *basename)
   return getPath2(getUserDataDir(), basename);
 }
 
-void initErrorFile()
+void openErrorFile()
 {
-  unlink(program.error_filename);
-}
-
-FILE *openErrorFile()
-{
-  FILE *error_file = stderr;
+  /* always start with reliable default values */
+  program.error_file = stderr;
 
 #if defined(PLATFORM_WIN32) || defined(PLATFORM_MSDOS)
-  if ((error_file = fopen(program.error_filename, MODE_APPEND)) == NULL)
-    fprintf_newline(stderr, "ERROR: cannot open file '%s' for appending!",
+  if ((program.error_file = fopen(program.error_filename, MODE_WRITE)) == NULL)
+    fprintf_newline(stderr, "ERROR: cannot open file '%s' for writing!",
 		    program.error_filename);
 #endif
+}
 
-  return error_file;
+void closeErrorFile()
+{
+  if (program.error_file != stderr)	/* do not close stream 'stderr' */
+    fclose(program.error_file);
 }
 
 void dumpErrorFile()

@@ -529,7 +529,8 @@ struct ProgramInfo
   char *cookie_prefix;
   char *filename_prefix;	/* prefix to cut off from DOS filenames */
 
-  char *error_filename;		/* used instead of 'stderr' on some systems */
+  char *error_filename;		/* filename where to write error messages to */
+  FILE *error_file;		/* (used instead of 'stderr' on some systems) */
 
   int version_major;
   int version_minor;

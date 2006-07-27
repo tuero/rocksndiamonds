@@ -95,6 +95,7 @@ void InitProgramInfo(char *argv0,
   program.version_patch = VERSION_PATCH(program_version);
 
   program.error_filename = getErrorFilename(ERROR_BASENAME);
+  program.error_file = stderr;
 }
 
 void InitExitFunction(void (*exit_function)(int))
@@ -118,7 +119,7 @@ void InitPlatformDependentStuff(void)
 #endif
 
 #if defined(PLATFORM_WIN32) || defined(PLATFORM_MSDOS)
-  initErrorFile();
+  openErrorFile();
 #endif
 
 #if defined(TARGET_SDL)
@@ -131,6 +132,10 @@ void InitPlatformDependentStuff(void)
 
 void ClosePlatformDependentStuff(void)
 {
+#if defined(PLATFORM_WIN32) || defined(PLATFORM_MSDOS)
+  closeErrorFile();
+#endif
+
 #if defined(PLATFORM_MSDOS)
   dumpErrorFile();
 #endif
