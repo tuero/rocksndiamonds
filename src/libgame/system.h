@@ -526,7 +526,10 @@ struct ProgramInfo
 {
   char *command_basepath;	/* directory that contains the program */
   char *command_basename;	/* base filename of the program binary */
-  char *userdata_directory;	/* personal user data directory */
+
+  char *userdata_subdir;	/* personal user game data directory */
+  char *userdata_subdir_unix;	/* personal user game data directory (Unix) */
+  char *userdata_path;		/* resulting full path to game data directory */
 
   char *program_title;
   char *window_title;
@@ -990,7 +993,7 @@ extern int			FrameCounter;
 /* function definitions */
 
 void InitProgramInfo(char *, char *, char *, char *, char *, char *, char *,
-		     char *, char *, char *, int);
+		     char *, char *, char *, char *, int);
 
 void InitExitFunction(void (*exit_function)(int));
 void InitPlatformDependentStuff(void);

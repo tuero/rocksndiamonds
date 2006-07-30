@@ -17,6 +17,13 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "platform.h"
+
+#if !defined(PLATFORM_WIN32)
+#include <pwd.h>
+#include <sys/param.h>
+#endif
+
 #include "setup.h"
 #include "joystick.h"
 #include "text.h"
@@ -100,7 +107,7 @@ static char *getLevelClassDescription(TreeInfo *ldi)
 static char *getUserLevelDir(char *level_subdir)
 {
   static char *userlevel_dir = NULL;
-  char *data_dir = getUserDataDir();
+  char *data_dir = getUserGameDataDir();
   char *userlevel_subdir = LEVELS_DIRECTORY;
 
   checked_free(userlevel_dir);
@@ -132,7 +139,7 @@ static char *getScoreDir(char *level_subdir)
 static char *getLevelSetupDir(char *level_subdir)
 {
   static char *levelsetup_dir = NULL;
-  char *data_dir = getUserDataDir();
+  char *data_dir = getUserGameDataDir();
   char *levelsetup_subdir = LEVELSETUP_DIRECTORY;
 
   checked_free(levelsetup_dir);
@@ -168,7 +175,7 @@ char *getCurrentLevelDir()
 static char *getTapeDir(char *level_subdir)
 {
   static char *tape_dir = NULL;
-  char *data_dir = getUserDataDir();
+  char *data_dir = getUserGameDataDir();
   char *tape_subdir = TAPES_DIRECTORY;
 
   checked_free(tape_dir);
@@ -258,7 +265,7 @@ static char *getUserGraphicsDir()
   static char *usergraphics_dir = NULL;
 
   if (usergraphics_dir == NULL)
-    usergraphics_dir = getPath2(getUserDataDir(), GRAPHICS_DIRECTORY);
+    usergraphics_dir = getPath2(getUserGameDataDir(), GRAPHICS_DIRECTORY);
 
   return usergraphics_dir;
 }
@@ -268,7 +275,7 @@ static char *getUserSoundsDir()
   static char *usersounds_dir = NULL;
 
   if (usersounds_dir == NULL)
-    usersounds_dir = getPath2(getUserDataDir(), SOUNDS_DIRECTORY);
+    usersounds_dir = getPath2(getUserGameDataDir(), SOUNDS_DIRECTORY);
 
   return usersounds_dir;
 }
@@ -278,7 +285,7 @@ static char *getUserMusicDir()
   static char *usermusic_dir = NULL;
 
   if (usermusic_dir == NULL)
-    usermusic_dir = getPath2(getUserDataDir(), MUSIC_DIRECTORY);
+    usermusic_dir = getPath2(getUserGameDataDir(), MUSIC_DIRECTORY);
 
   return usermusic_dir;
 }
@@ -764,7 +771,7 @@ char *getCustomMusicDirectory(void)
 
 void InitTapeDirectory(char *level_subdir)
 {
-  createDirectory(getUserDataDir(), "user data", PERMS_PRIVATE);
+  createDirectory(getUserGameDataDir(), "user data", PERMS_PRIVATE);
   createDirectory(getTapeDir(NULL), "main tape", PERMS_PRIVATE);
   createDirectory(getTapeDir(level_subdir), "level tape", PERMS_PRIVATE);
 }
@@ -782,7 +789,7 @@ void InitUserLevelDirectory(char *level_subdir)
 {
   if (!fileExists(getUserLevelDir(level_subdir)))
   {
-    createDirectory(getUserDataDir(), "user data", PERMS_PRIVATE);
+    createDirectory(getUserGameDataDir(), "user data", PERMS_PRIVATE);
     createDirectory(getUserLevelDir(NULL), "main user level", PERMS_PRIVATE);
     createDirectory(getUserLevelDir(level_subdir), "user level",PERMS_PRIVATE);
 
@@ -792,7 +799,7 @@ void InitUserLevelDirectory(char *level_subdir)
 
 void InitLevelSetupDirectory(char *level_subdir)
 {
-  createDirectory(getUserDataDir(), "user data", PERMS_PRIVATE);
+  createDirectory(getUserGameDataDir(), "user data", PERMS_PRIVATE);
   createDirectory(getLevelSetupDir(NULL), "main level setup", PERMS_PRIVATE);
   createDirectory(getLevelSetupDir(level_subdir), "level setup",PERMS_PRIVATE);
 }
@@ -1108,14 +1115,36 @@ void sortTreeInfo(TreeInfo **node_first,
 #define FILE_PERMS_PRIVATE	(MODE_R_ALL | MODE_W_PRIVATE)
 #define FILE_PERMS_PUBLIC	(MODE_R_ALL | MODE_W_PUBLIC)
 
-char *getUserDataDir(void)
+char *getHomeDir()
 {
-  static char *userdata_dir = NULL;
+  static char *dir = NULL;
 
-  if (userdata_dir == NULL)
-    userdata_dir = getPath2(getHomeDir(), program.userdata_directory);
+#if defined(PLATFORM_WIN32)
+  if (dir == NULL)
+  {
+    dir = checked_malloc(MAX_PATH + 1);
 
-  return userdata_dir;
+    if (!SUCCEEDED(SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, 0, dir)))
+      strcpy(dir, ".");
+  }
+#elif defined(PLATFORM_UNIX)
+  if (dir == NULL)
+  {
+    if ((dir = getenv("HOME")) == NULL)
+    {
+      struct passwd *pwd;
+
+      if ((pwd = getpwuid(getuid())) != NULL)
+	dir = getStringCopy(pwd->pw_dir);
+      else
+	dir = ".";
+    }
+  }
+#else
+  dir = ".";
+#endif
+
+  return dir;
 }
 
 char *getCommonDataDir(void)
@@ -1141,9 +1170,58 @@ char *getCommonDataDir(void)
   return common_data_dir;
 }
 
+char *getPersonalDataDir(void)
+{
+  static char *personal_data_dir = NULL;
+
+#if defined(PLATFORM_MACOSX)
+  if (personal_data_dir == NULL)
+    personal_data_dir = getPath2(getHomeDir(), "Documents");
+#else
+  if (personal_data_dir == NULL)
+    personal_data_dir = getHomeDir();
+#endif
+
+  return personal_data_dir;
+}
+
+char *getUserGameDataDir(void)
+{
+  if (program.userdata_path == NULL)
+    program.userdata_path = getPath2(getPersonalDataDir(),
+				     program.userdata_subdir);
+
+  return program.userdata_path;
+}
+
+void fixUserGameDataDir()
+{
+#if defined(PLATFORM_MACOSX)
+  char *userdata_dir_old = getPath2(getHomeDir(), program.userdata_subdir_unix);
+  char *userdata_dir_new = getUserGameDataDir();
+
+  /* convert old Unix style game data directory to Mac OS X style, if needed */
+  if (fileExists(userdata_dir_old) && !fileExists(userdata_dir_new))
+  {
+    if (rename(userdata_dir_old, userdata_dir_new) != 0)
+    {
+      Error(ERR_WARN, "cannot move game data directory '%s' to '%s'",
+	    userdata_dir_old, userdata_dir_new);
+
+      /* continue using Unix style data directory -- this should not happen */
+      program.userdata_path = getPath2(getPersonalDataDir(),
+				       program.userdata_subdir_unix);
+    }
+  }
+
+  free(userdata_dir_old);
+  free(userdata_dir_new);
+#endif
+}
+
 char *getSetupDir()
 {
-  return getUserDataDir();
+  return getUserGameDataDir();
 }
 
 static mode_t posix_umask(mode_t mask)
@@ -1183,7 +1261,7 @@ void createDirectory(char *dir, char *text, int permission_class)
 
 void InitUserDataDirectory()
 {
-  createDirectory(getUserDataDir(), "user data", PERMS_PRIVATE);
+  createDirectory(getUserGameDataDir(), "user data", PERMS_PRIVATE);
 }
 
 void SetFilePermissions(char *filename, int permission_class)

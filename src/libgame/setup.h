@@ -248,10 +248,14 @@ void dumpTreeInfo(TreeInfo *, int);
 void sortTreeInfo(TreeInfo **,
 		  int (*compare_function)(const void *, const void *));
 
-char *getUserDataDir(void);
+char *getHomeDir(void);
 char *getCommonDataDir(void);
+char *getPersonalDataDir(void);
+char *getUserGameDataDir(void);
 char *getSetupDir(void);
 char *getCurrentLevelDir(void);
+
+void fixUserGameDataDir(void);
 
 void createDirectory(char *, char *, int);
 void InitUserDataDirectory(void);

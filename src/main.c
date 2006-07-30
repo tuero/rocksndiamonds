@@ -4688,7 +4688,7 @@ static void print_usage()
 
 int main(int argc, char *argv[])
 {
-  InitProgramInfo(argv[0], USERDATA_DIRECTORY,
+  InitProgramInfo(argv[0], USERDATA_DIRECTORY, USERDATA_DIRECTORY_UNIX,
 		  PROGRAM_TITLE_STRING, getWindowTitleString(),
 		  ICON_TITLE_STRING, X11_ICON_FILENAME, X11_ICONMASK_FILENAME,
 		  MSDOS_POINTER_FILENAME,

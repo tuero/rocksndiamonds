@@ -450,38 +450,6 @@ char *getRealName()
   return real_name;
 }
 
-char *getHomeDir()
-{
-  static char *dir = NULL;
-
-#if defined(PLATFORM_WIN32)
-  if (dir == NULL)
-  {
-    dir = checked_malloc(MAX_PATH + 1);
-
-    if (!SUCCEEDED(SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, 0, dir)))
-      strcpy(dir, ".");
-  }
-#elif defined(PLATFORM_UNIX)
-  if (dir == NULL)
-  {
-    if ((dir = getenv("HOME")) == NULL)
-    {
-      struct passwd *pwd;
-
-      if ((pwd = getpwuid(getuid())) != NULL)
-	dir = getStringCopy(pwd->pw_dir);
-      else
-	dir = ".";
-    }
-  }
-#else
-  dir = ".";
-#endif
-
-  return dir;
-}
-
 
 /* ------------------------------------------------------------------------- */
 /* path manipulation functions                                               */
@@ -2799,7 +2767,7 @@ void FreeCustomArtworkLists(struct ArtworkListInfo *artwork_info)
 
 char *getErrorFilename(char *basename)
 {
-  return getPath2(getUserDataDir(), basename);
+  return getPath2(getUserGameDataDir(), basename);
 }
 
 void openErrorFile()

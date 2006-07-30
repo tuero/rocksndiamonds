@@ -93,7 +93,6 @@ unsigned int get_random_number(int, int);
 
 char *getLoginName(void);
 char *getRealName(void);
-char *getHomeDir(void);
 
 char *getBasePath(char *);
 char *getBaseName(char *);

@@ -69,8 +69,8 @@ int			FrameCounter = 0;
 /* ========================================================================= */
 
 void InitProgramInfo(char *argv0,
-		     char *userdata_directory, char *program_title,
-		     char *window_title, char *icon_title,
+		     char *userdata_subdir, char *userdata_subdir_unix,
+		     char *program_title, char *window_title, char *icon_title,
 		     char *x11_icon_filename, char *x11_iconmask_filename,
 		     char *msdos_cursor_filename,
 		     char *cookie_prefix, char *filename_prefix,
@@ -79,10 +79,14 @@ void InitProgramInfo(char *argv0,
   program.command_basepath = getBasePath(argv0);
   program.command_basename = getBaseName(argv0);
 
-  program.userdata_directory = userdata_directory;
+  program.userdata_subdir = userdata_subdir;
+  program.userdata_subdir_unix = userdata_subdir_unix;
+  program.userdata_path = getUserGameDataDir();
+
   program.program_title = program_title;
   program.window_title = window_title;
   program.icon_title = icon_title;
+
   program.x11_icon_filename = x11_icon_filename;
   program.x11_iconmask_filename = x11_iconmask_filename;
   program.msdos_cursor_filename = msdos_cursor_filename;
@@ -118,7 +122,11 @@ void InitPlatformDependentStuff(void)
   _fmode = O_BINARY;
 #endif
 
-#if defined(PLATFORM_WIN32) || defined(PLATFORM_MSDOS)
+#if defined(PLATFORM_MACOSX)
+  fixUserGameDataDir();
+#endif
+
+#if !defined(PLATFORM_UNIX) || defined(PLATFORM_MACOSX)
   openErrorFile();
 #endif
 

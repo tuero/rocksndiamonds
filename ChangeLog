@@ -1,5 +1,6 @@
 2006-07-30
 	* improved down-scaling of images for better level and preview graphics
+	* changed user data directory for Mac OS X from Unix style to new place
 
 2006-07-26
 	* improved level number selection in main menu and player selection in
