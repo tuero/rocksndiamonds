@@ -1046,11 +1046,68 @@ typedef struct
   Uint8 a;
 } tColorRGBA;
 
+int zoomSurfaceRGBA_scaleDownBy2(SDL_Surface *src, SDL_Surface *dst)
+{
+  int x, y;
+  tColorRGBA *sp, *csp, *dp;
+  int sgap, dgap;
+
+  /* pointer setup */
+  sp = csp = (tColorRGBA *) src->pixels;
+  dp = (tColorRGBA *) dst->pixels;
+  sgap = src->pitch - src->w * 4;
+  dgap = dst->pitch - dst->w * 4;
+
+  for (y = 0; y < dst->h; y++)
+  {
+    sp = csp;
+
+    for (x = 0; x < dst->w; x++)
+    {
+      tColorRGBA *sp0 = sp;
+      tColorRGBA *sp1 = (tColorRGBA *) ((Uint8 *) sp + src->pitch);
+      tColorRGBA *sp00 = &sp0[0];
+      tColorRGBA *sp01 = &sp0[1];
+      tColorRGBA *sp10 = &sp1[0];
+      tColorRGBA *sp11 = &sp1[1];
+      tColorRGBA new;
+
+      /* create new color pixel from all four source color pixels */
+      new.r = (sp00->r + sp01->r + sp10->r + sp11->r) / 4;
+      new.g = (sp00->g + sp01->g + sp10->g + sp11->g) / 4;
+      new.b = (sp00->b + sp01->b + sp10->b + sp11->b) / 4;
+      new.a = (sp00->a + sp01->a + sp10->a + sp11->a) / 4;
+
+      /* draw */
+      *dp = new;
+
+      /* advance source pointers */
+      sp += 2;
+
+      /* advance destination pointer */
+      dp++;
+    }
+
+    /* advance source pointer */
+    csp = (tColorRGBA *) ((Uint8 *) csp + 2 * src->pitch);
+
+    /* advance destination pointers */
+    dp = (tColorRGBA *) ((Uint8 *) dp + dgap);
+  }
+
+  return 0;
+}
+
 int zoomSurfaceRGBA(SDL_Surface *src, SDL_Surface *dst)
 {
   int x, y, sx, sy, *sax, *say, *csax, *csay, csx, csy;
   tColorRGBA *sp, *csp, *dp;
   int sgap, dgap;
+
+  /* use specialized zoom function when scaling down to exactly half size */
+  if (src->w == 2 * dst->w &&
+      src->h == 2 * dst->h)
+    return zoomSurfaceRGBA_scaleDownBy2(src, dst);
 
   /* variable setup */
   sx = (int) (65536.0 * (float) src->w / (float) dst->w);

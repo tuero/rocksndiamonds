@@ -90,7 +90,17 @@
 #define MB_LEFTBUTTON			1
 #define MB_MIDDLEBUTTON			2
 #define MB_RIGHTBUTTON			3
-
+#define MB_WHEEL_UP			4
+#define MB_WHEEL_DOWN			5
+#define MB_WHEEL_LEFT			6
+#define MB_WHEEL_RIGHT			7
+#define IS_WHEEL_BUTTON_VERTICAL(b)	((b) >= MB_WHEEL_UP &&		\
+					 (b) <= MB_WHEEL_DOWN)
+#define IS_WHEEL_BUTTON_HORIZONTAL(b)	((b) >= MB_WHEEL_LEFT &&	\
+					 (b) <= MB_WHEEL_RIGHT)
+#define IS_WHEEL_BUTTON(b)		((b) >= MB_WHEEL_UP &&		\
+					 (b) <= MB_WHEEL_DOWN)
+#define DEFAULT_WHEEL_STEPS		3
 
 /* values for move directions */
 #define MV_BIT_LEFT			0

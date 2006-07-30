@@ -71,9 +71,11 @@ static struct GadgetInfo *getGadgetInfoFromMousePosition(int mx, int my,
   struct GadgetInfo *gi;
 
   /* first check for scrollbars in case of mouse scroll wheel button events */
-  if (button == 4 || button == 5)
+  if (IS_WHEEL_BUTTON(button))
   {
-    boolean check_horizontal = (GetKeyModState() & KMOD_Control);
+    /* real horizontal wheel or vertical wheel with modifier key pressed */
+    boolean check_horizontal = (IS_WHEEL_BUTTON_HORIZONTAL(button) ||
+				GetKeyModState() & KMOD_Shift);
 
     /* check for the first active scrollbar with matching mouse wheel area */
     for (gi = gadget_list_first_entry; gi != NULL; gi = gi->next)
@@ -1725,10 +1727,11 @@ boolean HandleGadgets(int mx, int my, int button)
     {
       int mpos = (gi->type == GD_TYPE_SCROLLBAR_HORIZONTAL ? mx    : my);
       int gpos = (gi->type == GD_TYPE_SCROLLBAR_HORIZONTAL ? gi->x : gi->y);
+      int slider_start = gpos + gi->scrollbar.position;
+      int slider_end   = gpos + gi->scrollbar.position + gi->scrollbar.size - 1;
+      boolean inside_slider = (mpos >= slider_start && mpos <= slider_end);
 
-      if (button > 3 ||
-	  mpos < gpos + gi->scrollbar.position ||
-	  mpos >= gpos + gi->scrollbar.position + gi->scrollbar.size)
+      if (IS_WHEEL_BUTTON(button) || !inside_slider)
       {
 	/* click scrollbar one scrollbar length up/left or down/right */
 
@@ -1737,10 +1740,13 @@ boolean HandleGadgets(int mx, int my, int button)
 	int item_steps = gs->items_visible - 1;
 	int item_direction = (mpos < gpos + gi->scrollbar.position ? -1 : +1);
 
-	if (button > 3)
+	if (IS_WHEEL_BUTTON(button))
 	{
-	  item_steps = 3;
-	  item_direction = (button == 4 ? -1 : +1);
+	  boolean scroll_single_step = (GetKeyModState() & KMOD_Alt);
+
+	  item_steps = (scroll_single_step ? 1 : DEFAULT_WHEEL_STEPS);
+	  item_direction = (button == MB_WHEEL_UP ||
+			    button == MB_WHEEL_LEFT ? -1 : +1);
 	}
 
 	changed_position = FALSE;
@@ -1815,10 +1821,11 @@ boolean HandleGadgets(int mx, int my, int button)
     {
       int mpos = (gi->type == GD_TYPE_SCROLLBAR_HORIZONTAL ? mx    : my);
       int gpos = (gi->type == GD_TYPE_SCROLLBAR_HORIZONTAL ? gi->x : gi->y);
+      int slider_start = gpos + gi->scrollbar.position;
+      int slider_end   = gpos + gi->scrollbar.position + gi->scrollbar.size - 1;
+      boolean inside_slider = (mpos >= slider_start && mpos <= slider_end);
 
-      if (button >= 1 && button <= 3 &&
-	  mpos >= gpos + gi->scrollbar.position &&
-	  mpos < gpos + gi->scrollbar.position + gi->scrollbar.size)
+      if (!IS_WHEEL_BUTTON(button) && inside_slider)
       {
 	/* start dragging scrollbar */
 	gi->scrollbar.drag_position =

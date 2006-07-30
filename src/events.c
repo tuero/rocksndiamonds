@@ -419,7 +419,7 @@ void HandleButton(int mx, int my, int button, int button_nr)
   }
 
   /* do not use scroll wheel button events for anything other than gadgets */
-  if (button_nr > 3)
+  if (IS_WHEEL_BUTTON(button_nr))
     return;
 
   switch (game_status)

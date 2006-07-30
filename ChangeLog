@@ -1,3 +1,6 @@
+2006-07-30
+	* improved down-scaling of images for better level and preview graphics
+
 2006-07-26
 	* improved level number selection in main menu and player selection in
 	  setup menu (input devices section) by using standard button gadgets
