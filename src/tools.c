@@ -44,6 +44,8 @@ static int el_act2crm(int, int);
 static struct GadgetInfo *tool_gadget[NUM_TOOL_BUTTONS];
 static int request_gadget_id = -1;
 
+static int preview_tilesize = 4;
+
 static char *print_if_not_empty(int element)
 {
   static char *s = NULL;
@@ -1493,6 +1495,37 @@ void getMicroGraphicSource(int graphic, Bitmap **bitmap, int *x, int *y)
   *y = src_y;
 }
 
+void getPreviewGraphicSource(int graphic, Bitmap **bitmap, int *x, int *y,
+			     int tilesize)
+{
+  struct
+  {
+    int width_mult, width_div;
+    int height_mult, height_div;
+  } offset_calc[4] =
+  {
+    { 0, 1,	0, 1	},
+    { 0, 1,	2, 3	},
+    { 1, 2,	2, 3	},
+    { 3, 4,	2, 3	},
+  };
+  int offset_calc_pos = (tilesize < MICRO_TILESIZE || tilesize > TILESIZE ? 3 :
+			 5 - log_2(tilesize));
+  Bitmap *src_bitmap = graphic_info[graphic].bitmap;
+  int width_mult = offset_calc[offset_calc_pos].width_mult;
+  int width_div = offset_calc[offset_calc_pos].width_div;
+  int height_mult = offset_calc[offset_calc_pos].height_mult;
+  int height_div = offset_calc[offset_calc_pos].height_div;
+  int mini_startx = src_bitmap->width * width_mult / width_div;
+  int mini_starty = src_bitmap->height * height_mult / height_div;
+  int src_x = mini_startx + graphic_info[graphic].src_x * tilesize / TILESIZE;
+  int src_y = mini_starty + graphic_info[graphic].src_y * tilesize / TILESIZE;
+
+  *bitmap = src_bitmap;
+  *x = src_x;
+  *y = src_y;
+}
+
 void DrawMicroElement(int xpos, int ypos, int element)
 {
   Bitmap *src_bitmap;
@@ -1502,6 +1535,16 @@ void DrawMicroElement(int xpos, int ypos, int element)
   getMicroGraphicSource(graphic, &src_bitmap, &src_x, &src_y);
   BlitBitmap(src_bitmap, drawto, src_x, src_y, MICRO_TILEX, MICRO_TILEY,
 	     xpos, ypos);
+}
+
+void DrawPreviewElement(int xpos, int ypos, int element, int tilesize)
+{
+  Bitmap *src_bitmap;
+  int src_x, src_y;
+  int graphic = el2preimg(element);
+
+  getPreviewGraphicSource(graphic, &src_bitmap, &src_x, &src_y, tilesize);
+  BlitBitmap(src_bitmap, drawto, src_x, src_y, tilesize, tilesize, xpos, ypos);
 }
 
 void DrawLevel()
@@ -1529,33 +1572,37 @@ void DrawMiniLevel(int size_x, int size_y, int scroll_x, int scroll_y)
   redraw_mask |= REDRAW_FIELD;
 }
 
-static void DrawMicroLevelExt(int xpos, int ypos, int from_x, int from_y)
+static void DrawMicroLevelExt(int xpos, int ypos, int from_x, int from_y,
+			      int preview_size_x, int preview_size_y)
 {
   int x, y;
 
   DrawBackground(xpos, ypos, MICROLEVEL_XSIZE, MICROLEVEL_YSIZE);
 
-  if (lev_fieldx < STD_LEV_FIELDX)
-    xpos += (STD_LEV_FIELDX - lev_fieldx) / 2 * MICRO_TILEX;
-  if (lev_fieldy < STD_LEV_FIELDY)
-    ypos += (STD_LEV_FIELDY - lev_fieldy) / 2 * MICRO_TILEY;
+  if (lev_fieldx < preview_size_x)
+    xpos += (preview_size_x - lev_fieldx) / 2 * preview_tilesize;
+  if (lev_fieldy < preview_size_y)
+    ypos += (preview_size_y - lev_fieldy) / 2 * preview_tilesize;
 
-  xpos += MICRO_TILEX;
-  ypos += MICRO_TILEY;
+  xpos += preview_tilesize;
+  ypos += preview_tilesize;
 
-  for (x = -1; x <= STD_LEV_FIELDX; x++)
+  for (x = -1; x <= preview_size_x; x++)
   {
-    for (y = -1; y <= STD_LEV_FIELDY; y++)
+    for (y = -1; y <= preview_size_y; y++)
     {
       int lx = from_x + x, ly = from_y + y;
 
-      if (lx >= 0 && lx < lev_fieldx && ly >= 0 && ly < lev_fieldy)
-	DrawMicroElement(xpos + x * MICRO_TILEX, ypos + y * MICRO_TILEY,
-			 level.field[lx][ly]);
-      else if (lx >= -1 && lx < lev_fieldx+1 && ly >= -1 && ly < lev_fieldy+1
-	       && BorderElement != EL_EMPTY)
-	DrawMicroElement(xpos + x * MICRO_TILEX, ypos + y * MICRO_TILEY,
-			 getBorderElement(lx, ly));
+      if (lx >= 0 && lx < lev_fieldx &&
+	  ly >= 0 && ly < lev_fieldy)
+	DrawPreviewElement(xpos + x * preview_tilesize,
+			   ypos + y * preview_tilesize,
+			   level.field[lx][ly], preview_tilesize);
+      else if (lx >= -1 && lx < lev_fieldx+1 &&
+	       ly >= -1 && ly < lev_fieldy+1 && BorderElement != EL_EMPTY)
+	DrawPreviewElement(xpos + x * preview_tilesize,
+			   ypos + y * preview_tilesize,
+			   getBorderElement(lx, ly), preview_tilesize);
     }
   }
 
@@ -1625,6 +1672,8 @@ void DrawMicroLevel(int xpos, int ypos, boolean restart)
   static unsigned long label_delay = 0;
   static int from_x, from_y, scroll_direction;
   static int label_state, label_counter;
+  int preview_size_x = STD_LEV_FIELDX * MICRO_TILESIZE / preview_tilesize;
+  int preview_size_y = STD_LEV_FIELDY * MICRO_TILESIZE / preview_tilesize;
   int last_game_status = game_status;	/* save current game status */
 
   /* force PREVIEW font on preview level */
@@ -1637,7 +1686,8 @@ void DrawMicroLevel(int xpos, int ypos, boolean restart)
     label_state = 1;
     label_counter = 0;
 
-    DrawMicroLevelExt(xpos, ypos, from_x, from_y);
+    DrawMicroLevelExt(xpos, ypos, from_x, from_y,
+		      preview_size_x, preview_size_y);
     DrawMicroLevelLabelExt(label_state);
 
     /* initialize delay counters */
@@ -1666,7 +1716,7 @@ void DrawMicroLevel(int xpos, int ypos, boolean restart)
   }
 
   /* scroll micro level, if needed */
-  if ((lev_fieldx > STD_LEV_FIELDX || lev_fieldy > STD_LEV_FIELDY) &&
+  if ((lev_fieldx > preview_size_x || lev_fieldy > preview_size_y) &&
       DelayReached(&scroll_delay, MICROLEVEL_SCROLL_DELAY))
   {
     switch (scroll_direction)
@@ -1679,7 +1729,7 @@ void DrawMicroLevel(int xpos, int ypos, boolean restart)
 	break;
 
       case MV_RIGHT:
-	if (from_x < lev_fieldx - STD_LEV_FIELDX)
+	if (from_x < lev_fieldx - preview_size_x)
 	  from_x++;
 	else
 	  scroll_direction = MV_DOWN;
@@ -1693,7 +1743,7 @@ void DrawMicroLevel(int xpos, int ypos, boolean restart)
 	break;
 
       case MV_DOWN:
-	if (from_y < lev_fieldy - STD_LEV_FIELDY)
+	if (from_y < lev_fieldy - preview_size_y)
 	  from_y++;
 	else
 	  scroll_direction = MV_LEFT;
@@ -1703,7 +1753,8 @@ void DrawMicroLevel(int xpos, int ypos, boolean restart)
 	break;
     }
 
-    DrawMicroLevelExt(xpos, ypos, from_x, from_y);
+    DrawMicroLevelExt(xpos, ypos, from_x, from_y,
+		      preview_size_x, preview_size_y);
   }
 
   /* !!! THIS ALL SUCKS -- SHOULD BE CLEANLY REWRITTEN !!! */

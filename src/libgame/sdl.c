@@ -26,10 +26,6 @@
 /* functions from SGE library */
 void sge_Line(SDL_Surface *, Sint16, Sint16, Sint16, Sint16, Uint32);
 
-/* #ifdef PLATFORM_WIN32 */
-#define FULLSCREEN_BUG
-/* #endif */
-
 /* stuff needed to work around SDL/Windows fullscreen drawing bug */
 static int fullscreen_width;
 static int fullscreen_height;
@@ -37,6 +33,29 @@ static int fullscreen_xoffset;
 static int fullscreen_yoffset;
 static int video_xoffset;
 static int video_yoffset;
+
+static void setFullscreenParameters()
+{
+  struct ScreenModeInfo *fullscreen_mode;
+  int i;
+
+  fullscreen_mode = get_screen_mode_from_string(setup.fullscreen_mode);
+
+  for (i = 0; video.fullscreen_modes[i].width != -1; i++)
+  {
+    if (fullscreen_mode->width  == video.fullscreen_modes[i].width &&
+	fullscreen_mode->height == video.fullscreen_modes[i].height)
+    {
+      fullscreen_width  = fullscreen_mode->width;
+      fullscreen_height = fullscreen_mode->height;
+
+      fullscreen_xoffset = (fullscreen_width  - video.width)  / 2;
+      fullscreen_yoffset = (fullscreen_height - video.height) / 2;
+
+      break;
+    }
+  }
+}
 
 void SDLInitVideoDisplay(void)
 {
@@ -53,8 +72,6 @@ void SDLInitVideoDisplay(void)
 void SDLInitVideoBuffer(DrawBuffer **backbuffer, DrawWindow **window,
 			boolean fullscreen)
 {
-#ifdef FULLSCREEN_BUG
-  int i;
   static int screen_xy[][2] =
   {
     {  640, 480 },
@@ -62,7 +79,8 @@ void SDLInitVideoBuffer(DrawBuffer **backbuffer, DrawWindow **window,
     { 1024, 768 },
     {   -1,  -1 }
   };
-#endif
+  SDL_Rect **modes;
+  int i, j;
 
   /* default: normal game window size */
   fullscreen_width = video.width;
@@ -70,20 +88,83 @@ void SDLInitVideoBuffer(DrawBuffer **backbuffer, DrawWindow **window,
   fullscreen_xoffset = 0;
   fullscreen_yoffset = 0;
 
-#ifdef FULLSCREEN_BUG
   for (i = 0; screen_xy[i][0] != -1; i++)
   {
-    if (video.width <= screen_xy[i][0] && video.height <= screen_xy[i][1])
+    if (screen_xy[i][0] >= video.width && screen_xy[i][1] >= video.height)
     {
-      fullscreen_width = screen_xy[i][0];
+      fullscreen_width  = screen_xy[i][0];
       fullscreen_height = screen_xy[i][1];
+
       break;
     }
   }
 
-  fullscreen_xoffset = (fullscreen_width - video.width) / 2;
+  fullscreen_xoffset = (fullscreen_width  - video.width)  / 2;
   fullscreen_yoffset = (fullscreen_height - video.height) / 2;
-#endif
+
+  /* get available hardware supported fullscreen modes */
+  modes = SDL_ListModes(NULL, SDL_FULLSCREEN | SDL_HWSURFACE);
+
+  if (modes == NULL)
+  {
+    /* no screen modes available => no fullscreen mode support */
+    video.fullscreen_available = FALSE;
+  }
+  else if (modes == (SDL_Rect **)-1)
+  {
+    /* fullscreen resolution is not restricted -- all resolutions available */
+    video.fullscreen_modes = checked_calloc(2 * sizeof(struct ScreenModeInfo));
+
+    /* use native video buffer size for fullscreen mode */
+    video.fullscreen_modes[0].width  = video.width;
+    video.fullscreen_modes[0].height = video.height;
+
+    video.fullscreen_modes[1].width  = -1;
+    video.fullscreen_modes[1].height = -1;
+  }
+  else
+  {
+    /* in this case, a certain number of screen modes is available */
+    int num_modes = 0;
+
+    for(i = 0; modes[i] != NULL; i++)
+    {
+      boolean found_mode = FALSE;
+
+      /* screen mode is smaller than video buffer size -- skip it */
+      if (modes[i]->w < video.width || modes[i]->h < video.height)
+	continue;
+
+      if (video.fullscreen_modes != NULL)
+	for (j = 0; video.fullscreen_modes[j].width != -1; j++)
+	  if (modes[i]->w == video.fullscreen_modes[j].width &&
+	      modes[i]->h == video.fullscreen_modes[j].height)
+	    found_mode = TRUE;
+
+      if (found_mode)		/* screen mode already stored -- skip it */
+	continue;
+
+      /* new mode found; add it to list of available fullscreen modes */
+
+      num_modes++;
+
+      video.fullscreen_modes = checked_realloc(video.fullscreen_modes,
+					       (num_modes + 1) *
+					       sizeof(struct ScreenModeInfo));
+
+      video.fullscreen_modes[num_modes - 1].width  = modes[i]->w;
+      video.fullscreen_modes[num_modes - 1].height = modes[i]->h;
+
+      video.fullscreen_modes[num_modes].width  = -1;
+      video.fullscreen_modes[num_modes].height = -1;
+    }
+
+    if (num_modes == 0)
+    {
+      /* no appropriate screen modes available => no fullscreen mode support */
+      video.fullscreen_available = FALSE;
+    }
+  }
 
   /* open SDL video output device (window or fullscreen mode) */
   if (!SDLSetVideoMode(backbuffer, fullscreen))
@@ -121,6 +202,8 @@ boolean SDLSetVideoMode(DrawBuffer **backbuffer, boolean fullscreen)
 
   if (fullscreen && !video.fullscreen_enabled && video.fullscreen_available)
   {
+    setFullscreenParameters();
+
     video_xoffset = fullscreen_xoffset;
     video_yoffset = fullscreen_yoffset;
 
@@ -207,26 +290,22 @@ void SDLCopyArea(Bitmap *src_bitmap, Bitmap *dst_bitmap,
   Bitmap *real_dst_bitmap = (dst_bitmap == window ? backbuffer : dst_bitmap);
   SDL_Rect src_rect, dst_rect;
 
-#ifdef FULLSCREEN_BUG
   if (src_bitmap == backbuffer)
   {
     src_x += video_xoffset;
     src_y += video_yoffset;
   }
-#endif
 
   src_rect.x = src_x;
   src_rect.y = src_y;
   src_rect.w = width;
   src_rect.h = height;
 
-#ifdef FULLSCREEN_BUG
   if (dst_bitmap == backbuffer || dst_bitmap == window)
   {
     dst_x += video_xoffset;
     dst_y += video_yoffset;
   }
-#endif
 
   dst_rect.x = dst_x;
   dst_rect.y = dst_y;
@@ -248,13 +327,11 @@ void SDLFillRectangle(Bitmap *dst_bitmap, int x, int y,
   Bitmap *real_dst_bitmap = (dst_bitmap == window ? backbuffer : dst_bitmap);
   SDL_Rect rect;
 
-#ifdef FULLSCREEN_BUG
   if (dst_bitmap == backbuffer || dst_bitmap == window)
   {
     x += video_xoffset;
     y += video_yoffset;
   }
-#endif
 
   rect.x = x;
   rect.y = y;
@@ -288,10 +365,8 @@ void SDLFadeScreen(Bitmap *bitmap_cross, int fade_mode, int fade_delay,
   src_rect.w = video.width;
   src_rect.h = video.height;
 
-#ifdef FULLSCREEN_BUG
   dst_x += video_xoffset;
   dst_y += video_yoffset;
-#endif
 
   dst_rect.x = dst_x;
   dst_rect.y = dst_y;
@@ -411,13 +486,11 @@ void SDLDrawSimpleLine(Bitmap *dst_bitmap, int from_x, int from_y,
   rect.w = (to_x - from_x + 1);
   rect.h = (to_y - from_y + 1);
 
-#ifdef FULLSCREEN_BUG
   if (dst_bitmap == backbuffer || dst_bitmap == window)
   {
     rect.x += video_xoffset;
     rect.y += video_yoffset;
   }
-#endif
 
   SDL_FillRect(surface, &rect, color);
 }
@@ -425,7 +498,6 @@ void SDLDrawSimpleLine(Bitmap *dst_bitmap, int from_x, int from_y,
 void SDLDrawLine(Bitmap *dst_bitmap, int from_x, int from_y,
 		 int to_x, int to_y, Uint32 color)
 {
-#ifdef FULLSCREEN_BUG
   if (dst_bitmap == backbuffer || dst_bitmap == window)
   {
     from_x += video_xoffset;
@@ -433,7 +505,6 @@ void SDLDrawLine(Bitmap *dst_bitmap, int from_x, int from_y,
     to_x += video_xoffset;
     to_y += video_yoffset;
   }
-#endif
 
   sge_Line(dst_bitmap->surface, from_x, from_y, to_x, to_y, color);
 }
@@ -472,13 +543,11 @@ Pixel SDLGetPixel(Bitmap *src_bitmap, int x, int y)
 {
   SDL_Surface *surface = src_bitmap->surface;
 
-#ifdef FULLSCREEN_BUG
   if (src_bitmap == backbuffer || src_bitmap == window)
   {
     x += video_xoffset;
     y += video_yoffset;
   }
-#endif
 
   switch (surface->format->BytesPerPixel)
   {
@@ -971,13 +1040,11 @@ void sge_LineRGB(SDL_Surface *Surface, Sint16 x1, Sint16 y1, Sint16 x2,
 
 void SDLPutPixel(Bitmap *dst_bitmap, int x, int y, Pixel pixel)
 {
-#ifdef FULLSCREEN_BUG
   if (dst_bitmap == backbuffer || dst_bitmap == window)
   {
     x += video_xoffset;
     y += video_yoffset;
   }
-#endif
 
   sge_PutPixel(dst_bitmap->surface, x, y, pixel);
 }
@@ -1515,7 +1582,6 @@ void SDLNextEvent(Event *event)
 {
   SDL_WaitEvent(event);
 
-#ifdef FULLSCREEN_BUG
   if (event->type == EVENT_BUTTONPRESS ||
       event->type == EVENT_BUTTONRELEASE)
   {
@@ -1539,7 +1605,6 @@ void SDLNextEvent(Event *event)
     else
       ((MotionEvent *)event)->y = 0;
   }
-#endif
 }
 
 

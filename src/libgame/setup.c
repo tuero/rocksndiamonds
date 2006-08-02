@@ -86,6 +86,9 @@ static char *levelclass_desc[NUM_LEVELCLASS_DESC] =
 
 #define MAX_COOKIE_LEN				256
 
+static void setTreeInfoToDefaults(TreeInfo *, int);
+static int compareTreeInfoEntries(const void *, const void *);
+
 static int token_value_position   = TOKEN_VALUE_POSITION_DEFAULT;
 static int token_comment_position = TOKEN_COMMENT_POSITION_DEFAULT;
 
@@ -94,9 +97,9 @@ static int token_comment_position = TOKEN_COMMENT_POSITION_DEFAULT;
 /* file functions                                                            */
 /* ------------------------------------------------------------------------- */
 
-static char *getLevelClassDescription(TreeInfo *ldi)
+static char *getLevelClassDescription(TreeInfo *ti)
 {
-  int position = ldi->sort_priority / 100;
+  int position = ti->sort_priority / 100;
 
   if (position >= 0 && position < NUM_LEVELCLASS_DESC)
     return levelclass_desc[position];
@@ -814,6 +817,15 @@ TreeInfo *newTreeInfo()
   return checked_calloc(sizeof(TreeInfo));
 }
 
+TreeInfo *newTreeInfo_setDefaults(int type)
+{
+  TreeInfo *ti = newTreeInfo();
+
+  setTreeInfoToDefaults(ti, type);
+
+  return ti;
+}
+
 void pushTreeInfo(TreeInfo **node_first, TreeInfo *node_new)
 {
   node_new->next = *node_first;
@@ -1020,8 +1032,9 @@ void dumpTreeInfo(TreeInfo *node, int depth)
   }
 }
 
-void sortTreeInfo(TreeInfo **node_first,
-		  int (*compare_function)(const void *, const void *))
+void sortTreeInfoBySortFunction(TreeInfo **node_first,
+				int (*compare_function)(const void *,
+							const void *))
 {
   int num_nodes = numTreeInfo(*node_first);
   TreeInfo **sort_array;
@@ -1062,10 +1075,15 @@ void sortTreeInfo(TreeInfo **node_first,
   while (node)
   {
     if (node->node_group != NULL)
-      sortTreeInfo(&node->node_group, compare_function);
+      sortTreeInfoBySortFunction(&node->node_group, compare_function);
 
     node = node->next;
   }
+}
+
+void sortTreeInfo(TreeInfo **node_first)
+{
+  sortTreeInfoBySortFunction(node_first, compareTreeInfoEntries);
 }
 
 
@@ -1194,7 +1212,7 @@ char *getUserGameDataDir(void)
   return program.userdata_path;
 }
 
-void fixUserGameDataDir()
+void updateUserGameDataDir()
 {
 #if defined(PLATFORM_MACOSX)
   char *userdata_dir_old = getPath2(getHomeDir(), program.userdata_subdir_unix);
@@ -1768,164 +1786,170 @@ static struct TokenInfo levelinfo_tokens[] =
   { TYPE_BOOLEAN,	&ldi.skip_levels,	"skip_levels"		}
 };
 
-static void setTreeInfoToDefaults(TreeInfo *ldi, int type)
+static void setTreeInfoToDefaults(TreeInfo *ti, int type)
 {
-  ldi->type = type;
+  ti->type = type;
 
-  ldi->node_top = (ldi->type == TREE_TYPE_LEVEL_DIR ? &leveldir_first :
-		   ldi->type == TREE_TYPE_GRAPHICS_DIR ? &artwork.gfx_first :
-		   ldi->type == TREE_TYPE_SOUNDS_DIR ? &artwork.snd_first :
-		   ldi->type == TREE_TYPE_MUSIC_DIR ? &artwork.mus_first :
-		   NULL);
+  ti->node_top = (ti->type == TREE_TYPE_LEVEL_DIR    ? &leveldir_first :
+		  ti->type == TREE_TYPE_GRAPHICS_DIR ? &artwork.gfx_first :
+		  ti->type == TREE_TYPE_SOUNDS_DIR   ? &artwork.snd_first :
+		  ti->type == TREE_TYPE_MUSIC_DIR    ? &artwork.mus_first :
+		  NULL);
 
-  ldi->node_parent = NULL;
-  ldi->node_group = NULL;
-  ldi->next = NULL;
+  ti->node_parent = NULL;
+  ti->node_group = NULL;
+  ti->next = NULL;
 
-  ldi->cl_first = -1;
-  ldi->cl_cursor = -1;
+  ti->cl_first = -1;
+  ti->cl_cursor = -1;
 
-  ldi->subdir = NULL;
-  ldi->fullpath = NULL;
-  ldi->basepath = NULL;
-  ldi->identifier = NULL;
-  ldi->name = getStringCopy(ANONYMOUS_NAME);
-  ldi->name_sorting = NULL;
-  ldi->author = getStringCopy(ANONYMOUS_NAME);
+  ti->subdir = NULL;
+  ti->fullpath = NULL;
+  ti->basepath = NULL;
+  ti->identifier = NULL;
+  ti->name = getStringCopy(ANONYMOUS_NAME);
+  ti->name_sorting = NULL;
+  ti->author = getStringCopy(ANONYMOUS_NAME);
 
-  ldi->sort_priority = LEVELCLASS_UNDEFINED;	/* default: least priority */
-  ldi->latest_engine = FALSE;			/* default: get from level */
-  ldi->parent_link = FALSE;
-  ldi->in_user_dir = FALSE;
-  ldi->user_defined = FALSE;
-  ldi->color = 0;
-  ldi->class_desc = NULL;
+  ti->sort_priority = LEVELCLASS_UNDEFINED;	/* default: least priority */
+  ti->latest_engine = FALSE;			/* default: get from level */
+  ti->parent_link = FALSE;
+  ti->in_user_dir = FALSE;
+  ti->user_defined = FALSE;
+  ti->color = 0;
+  ti->class_desc = NULL;
 
-  if (ldi->type == TREE_TYPE_LEVEL_DIR)
+  ti->infotext = getStringCopy(TREE_INFOTEXT(ti->type));
+
+  if (ti->type == TREE_TYPE_LEVEL_DIR)
   {
-    ldi->imported_from = NULL;
-    ldi->imported_by = NULL;
+    ti->imported_from = NULL;
+    ti->imported_by = NULL;
 
-    ldi->graphics_set_ecs = NULL;
-    ldi->graphics_set_aga = NULL;
-    ldi->graphics_set = NULL;
-    ldi->sounds_set = NULL;
-    ldi->music_set = NULL;
-    ldi->graphics_path = getStringCopy(UNDEFINED_FILENAME);
-    ldi->sounds_path = getStringCopy(UNDEFINED_FILENAME);
-    ldi->music_path = getStringCopy(UNDEFINED_FILENAME);
+    ti->graphics_set_ecs = NULL;
+    ti->graphics_set_aga = NULL;
+    ti->graphics_set = NULL;
+    ti->sounds_set = NULL;
+    ti->music_set = NULL;
+    ti->graphics_path = getStringCopy(UNDEFINED_FILENAME);
+    ti->sounds_path = getStringCopy(UNDEFINED_FILENAME);
+    ti->music_path = getStringCopy(UNDEFINED_FILENAME);
 
-    ldi->level_filename = NULL;
-    ldi->level_filetype = NULL;
+    ti->level_filename = NULL;
+    ti->level_filetype = NULL;
 
-    ldi->levels = 0;
-    ldi->first_level = 0;
-    ldi->last_level = 0;
-    ldi->level_group = FALSE;
-    ldi->handicap_level = 0;
-    ldi->readonly = TRUE;
-    ldi->handicap = TRUE;
-    ldi->skip_levels = FALSE;
+    ti->levels = 0;
+    ti->first_level = 0;
+    ti->last_level = 0;
+    ti->level_group = FALSE;
+    ti->handicap_level = 0;
+    ti->readonly = TRUE;
+    ti->handicap = TRUE;
+    ti->skip_levels = FALSE;
   }
 }
 
-static void setTreeInfoToDefaultsFromParent(TreeInfo *ldi, TreeInfo *parent)
+static void setTreeInfoToDefaultsFromParent(TreeInfo *ti, TreeInfo *parent)
 {
   if (parent == NULL)
   {
     Error(ERR_WARN, "setTreeInfoToDefaultsFromParent(): parent == NULL");
 
-    setTreeInfoToDefaults(ldi, TREE_TYPE_UNDEFINED);
+    setTreeInfoToDefaults(ti, TREE_TYPE_UNDEFINED);
 
     return;
   }
 
   /* copy all values from the parent structure */
 
-  ldi->type = parent->type;
+  ti->type = parent->type;
 
-  ldi->node_top = parent->node_top;
-  ldi->node_parent = parent;
-  ldi->node_group = NULL;
-  ldi->next = NULL;
+  ti->node_top = parent->node_top;
+  ti->node_parent = parent;
+  ti->node_group = NULL;
+  ti->next = NULL;
 
-  ldi->cl_first = -1;
-  ldi->cl_cursor = -1;
+  ti->cl_first = -1;
+  ti->cl_cursor = -1;
 
-  ldi->subdir = NULL;
-  ldi->fullpath = NULL;
-  ldi->basepath = NULL;
-  ldi->identifier = NULL;
-  ldi->name = getStringCopy(ANONYMOUS_NAME);
-  ldi->name_sorting = NULL;
-  ldi->author = getStringCopy(parent->author);
+  ti->subdir = NULL;
+  ti->fullpath = NULL;
+  ti->basepath = NULL;
+  ti->identifier = NULL;
+  ti->name = getStringCopy(ANONYMOUS_NAME);
+  ti->name_sorting = NULL;
+  ti->author = getStringCopy(parent->author);
 
-  ldi->sort_priority = parent->sort_priority;
-  ldi->latest_engine = parent->latest_engine;
-  ldi->parent_link = FALSE;
-  ldi->in_user_dir = parent->in_user_dir;
-  ldi->user_defined = parent->user_defined;
-  ldi->color = parent->color;
-  ldi->class_desc = getStringCopy(parent->class_desc);
+  ti->sort_priority = parent->sort_priority;
+  ti->latest_engine = parent->latest_engine;
+  ti->parent_link = FALSE;
+  ti->in_user_dir = parent->in_user_dir;
+  ti->user_defined = parent->user_defined;
+  ti->color = parent->color;
+  ti->class_desc = getStringCopy(parent->class_desc);
 
-  if (ldi->type == TREE_TYPE_LEVEL_DIR)
+  ti->infotext = getStringCopy(parent->infotext);
+
+  if (ti->type == TREE_TYPE_LEVEL_DIR)
   {
-    ldi->imported_from = getStringCopy(parent->imported_from);
-    ldi->imported_by = getStringCopy(parent->imported_by);
+    ti->imported_from = getStringCopy(parent->imported_from);
+    ti->imported_by = getStringCopy(parent->imported_by);
 
-    ldi->graphics_set_ecs = NULL;
-    ldi->graphics_set_aga = NULL;
-    ldi->graphics_set = NULL;
-    ldi->sounds_set = NULL;
-    ldi->music_set = NULL;
-    ldi->graphics_path = getStringCopy(UNDEFINED_FILENAME);
-    ldi->sounds_path = getStringCopy(UNDEFINED_FILENAME);
-    ldi->music_path = getStringCopy(UNDEFINED_FILENAME);
+    ti->graphics_set_ecs = NULL;
+    ti->graphics_set_aga = NULL;
+    ti->graphics_set = NULL;
+    ti->sounds_set = NULL;
+    ti->music_set = NULL;
+    ti->graphics_path = getStringCopy(UNDEFINED_FILENAME);
+    ti->sounds_path = getStringCopy(UNDEFINED_FILENAME);
+    ti->music_path = getStringCopy(UNDEFINED_FILENAME);
 
-    ldi->level_filename = NULL;
-    ldi->level_filetype = NULL;
+    ti->level_filename = NULL;
+    ti->level_filetype = NULL;
 
-    ldi->levels = 0;
-    ldi->first_level = 0;
-    ldi->last_level = 0;
-    ldi->level_group = FALSE;
-    ldi->handicap_level = 0;
-    ldi->readonly = TRUE;
-    ldi->handicap = TRUE;
-    ldi->skip_levels = FALSE;
+    ti->levels = 0;
+    ti->first_level = 0;
+    ti->last_level = 0;
+    ti->level_group = FALSE;
+    ti->handicap_level = 0;
+    ti->readonly = TRUE;
+    ti->handicap = TRUE;
+    ti->skip_levels = FALSE;
   }
 }
 
-static void freeTreeInfo(TreeInfo *ldi)
+static void freeTreeInfo(TreeInfo *ti)
 {
-  checked_free(ldi->subdir);
-  checked_free(ldi->fullpath);
-  checked_free(ldi->basepath);
-  checked_free(ldi->identifier);
+  checked_free(ti->subdir);
+  checked_free(ti->fullpath);
+  checked_free(ti->basepath);
+  checked_free(ti->identifier);
 
-  checked_free(ldi->name);
-  checked_free(ldi->name_sorting);
-  checked_free(ldi->author);
+  checked_free(ti->name);
+  checked_free(ti->name_sorting);
+  checked_free(ti->author);
 
-  checked_free(ldi->class_desc);
+  checked_free(ti->class_desc);
 
-  if (ldi->type == TREE_TYPE_LEVEL_DIR)
+  checked_free(ti->infotext);
+
+  if (ti->type == TREE_TYPE_LEVEL_DIR)
   {
-    checked_free(ldi->imported_from);
-    checked_free(ldi->imported_by);
+    checked_free(ti->imported_from);
+    checked_free(ti->imported_by);
 
-    checked_free(ldi->graphics_set_ecs);
-    checked_free(ldi->graphics_set_aga);
-    checked_free(ldi->graphics_set);
-    checked_free(ldi->sounds_set);
-    checked_free(ldi->music_set);
+    checked_free(ti->graphics_set_ecs);
+    checked_free(ti->graphics_set_aga);
+    checked_free(ti->graphics_set);
+    checked_free(ti->sounds_set);
+    checked_free(ti->music_set);
 
-    checked_free(ldi->graphics_path);
-    checked_free(ldi->sounds_path);
-    checked_free(ldi->music_path);
+    checked_free(ti->graphics_path);
+    checked_free(ti->sounds_path);
+    checked_free(ti->music_path);
 
-    checked_free(ldi->level_filename);
-    checked_free(ldi->level_filetype);
+    checked_free(ti->level_filename);
+    checked_free(ti->level_filetype);
   }
 }
 
@@ -2278,7 +2302,7 @@ void LoadLevelInfo()
   if (leveldir_first == NULL)
     Error(ERR_EXIT, "cannot find any valid level series in any directory");
 
-  sortTreeInfo(&leveldir_first, compareTreeInfoEntries);
+  sortTreeInfo(&leveldir_first);
 
 #if 0
   dumpTreeInfo(leveldir_first, 0);
@@ -2573,9 +2597,9 @@ void LoadArtworkInfo()
   printf("music set == %s\n\n", artwork.mus_current_identifier);
 #endif
 
-  sortTreeInfo(&artwork.gfx_first, compareTreeInfoEntries);
-  sortTreeInfo(&artwork.snd_first, compareTreeInfoEntries);
-  sortTreeInfo(&artwork.mus_first, compareTreeInfoEntries);
+  sortTreeInfo(&artwork.gfx_first);
+  sortTreeInfo(&artwork.snd_first);
+  sortTreeInfo(&artwork.mus_first);
 
 #if 0
   dumpTreeInfo(artwork.gfx_first, 0);
@@ -2668,9 +2692,9 @@ void LoadLevelArtworkInfo()
       artwork.mus_current = getFirstValidTreeInfoEntry(artwork.mus_first);
   }
 
-  sortTreeInfo(&artwork.gfx_first, compareTreeInfoEntries);
-  sortTreeInfo(&artwork.snd_first, compareTreeInfoEntries);
-  sortTreeInfo(&artwork.mus_first, compareTreeInfoEntries);
+  sortTreeInfo(&artwork.gfx_first);
+  sortTreeInfo(&artwork.snd_first);
+  sortTreeInfo(&artwork.mus_first);
 
 #if 0
   dumpTreeInfo(artwork.gfx_first, 0);

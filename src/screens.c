@@ -32,13 +32,14 @@
 #define SETUP_MODE_SHORTCUT_1		4
 #define SETUP_MODE_SHORTCUT_2		5
 #define SETUP_MODE_GRAPHICS		6
-#define SETUP_MODE_SOUND		7
-#define SETUP_MODE_ARTWORK		8
-#define SETUP_MODE_CHOOSE_GRAPHICS	9
-#define SETUP_MODE_CHOOSE_SOUNDS	10
-#define SETUP_MODE_CHOOSE_MUSIC		11
+#define SETUP_MODE_CHOOSE_SCREEN_MODE	7
+#define SETUP_MODE_SOUND		8
+#define SETUP_MODE_ARTWORK		9
+#define SETUP_MODE_CHOOSE_GRAPHICS	10
+#define SETUP_MODE_CHOOSE_SOUNDS	11
+#define SETUP_MODE_CHOOSE_MUSIC		12
 
-#define MAX_SETUP_MODES			12
+#define MAX_SETUP_MODES			13
 
 /* for input setup functions */
 #define SETUPINPUT_SCREEN_POS_START	0
@@ -121,6 +122,7 @@ static void HandleSetupScreen_Generic(int, int, int, int, int);
 static void HandleSetupScreen_Input(int, int, int, int, int);
 static void CustomizeKeyboard(int);
 static void CalibrateJoystick(int);
+static void execSetupGraphics(void);
 static void execSetupArtwork(void);
 static void HandleChooseTree(int, int, int, int, int, TreeInfo **);
 
@@ -145,6 +147,9 @@ static void MapScreenTreeGadgets(TreeInfo *);
 static struct GadgetInfo *screen_gadget[NUM_SCREEN_GADGETS];
 static int setup_mode = SETUP_MODE_MAIN;
 static int info_mode = INFO_MODE_MAIN;
+
+static TreeInfo *screen_modes = NULL;
+static TreeInfo *screen_mode_current = NULL;
 
 #define DRAW_OFFSET_MODE(x)	(x >= GAME_MODE_MAIN &&			\
 				 x <= GAME_MODE_SETUP ? x :		\
@@ -1034,9 +1039,9 @@ static void DrawInfoScreen_Main(int fade_delay)
 
     DrawText(mSX + xpos * 32, mSY + ypos * 32, info_info[i].text, font_nr);
 
-    if (info_info[i].type & TYPE_ENTER_MENU)
+    if (info_info[i].type & (TYPE_ENTER_MENU|TYPE_ENTER_LIST))
       initCursor(i, IMG_MENU_BUTTON_ENTER_MENU);
-    else if (info_info[i].type & TYPE_LEAVE_MENU)
+    else if (info_info[i].type & (TYPE_LEAVE_MENU|TYPE_LEAVE_LIST))
       initCursor(i, IMG_MENU_BUTTON_LEAVE_MENU);
     else if (info_info[i].type & ~TYPE_SKIP_ENTRY)
       initCursor(i, IMG_MENU_BUTTON);
@@ -1139,7 +1144,7 @@ void HandleInfoScreen_Main(int mx, int my, int dx, int dy, int button)
     }
     else if (!(info_info[y].type & TYPE_GHOSTED))
     {
-      if (info_info[y].type & TYPE_ENTER_OR_LEAVE_MENU)
+      if (info_info[y].type & TYPE_ENTER_OR_LEAVE)
       {
 	void (*menu_callback_function)(void) = info_info[choice].value;
 
@@ -2059,11 +2064,7 @@ static void drawChooseTreeList(int first_entry, int num_page_entries,
 #endif
   int last_game_status = game_status;	/* save current game status */
 
-  title_string =
-    (ti->type == TREE_TYPE_LEVEL_DIR ? "Level Sets" :
-     ti->type == TREE_TYPE_GRAPHICS_DIR ? "Custom Graphics" :
-     ti->type == TREE_TYPE_SOUNDS_DIR ? "Custom Sounds" :
-     ti->type == TREE_TYPE_MUSIC_DIR ? "Custom Music" : "");
+  title_string = ti->infotext;
 
 #if 1
   DrawTextSCentered(mSY - SY + yoffset, FONT_TITLE_1, title_string);
@@ -2213,7 +2214,13 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
     }
     else if (game_status == GAME_MODE_SETUP)
     {
-      execSetupArtwork();
+      if (game_status == GAME_MODE_SETUP)
+      {
+	if (setup_mode == SETUP_MODE_CHOOSE_SCREEN_MODE)
+	  execSetupGraphics();
+	else
+	  execSetupArtwork();
+      }
     }
     else
     {
@@ -2366,7 +2373,10 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
 
 	if (game_status == GAME_MODE_SETUP)
 	{
-	  execSetupArtwork();
+	  if (setup_mode == SETUP_MODE_CHOOSE_SCREEN_MODE)
+	    execSetupGraphics();
+	  else
+	    execSetupArtwork();
 	}
 	else
 	{
@@ -2518,6 +2528,7 @@ void HandleHallOfFame(int mx, int my, int dx, int dy, int button)
 static struct TokenInfo *setup_info;
 static int num_setup_info;
 
+static char *screen_mode_text;
 static char *graphics_set_name;
 static char *sounds_set_name;
 static char *music_set_name;
@@ -2542,7 +2553,61 @@ static void execSetupEditor()
 
 static void execSetupGraphics()
 {
+  if (video.fullscreen_available && screen_modes == NULL)
+  {
+    int i;
+
+    for (i = 0; video.fullscreen_modes[i].width != -1; i++)
+    {
+      TreeInfo *ti = newTreeInfo_setDefaults(TREE_TYPE_UNDEFINED);
+      char identifier[20], name[20];
+      int x = video.fullscreen_modes[i].width;
+      int y = video.fullscreen_modes[i].height;
+
+      ti->node_top = &screen_modes;
+      ti->sort_priority = x * y;
+
+      sprintf(identifier, "%dx%d", x, y);
+      sprintf(name,     "%d x %d", x, y);
+
+      setString(&ti->identifier, identifier);
+      setString(&ti->name, name);
+      setString(&ti->name_sorting, name);
+      setString(&ti->infotext, "Fullscreen Mode");
+
+      pushTreeInfo(&screen_modes, ti);
+    }
+
+    sortTreeInfo(&screen_modes);
+
+    /* set current screen mode for fullscreen mode to reliable default value */
+    screen_mode_current = getTreeInfoFromIdentifier(screen_modes,
+						    DEFAULT_FULLSCREEN_MODE);
+    if (screen_mode_current == NULL)
+      screen_mode_current = screen_modes;
+
+    if (screen_mode_current == NULL)
+      video.fullscreen_available = FALSE;
+  }
+
+  if (video.fullscreen_available)
+  {
+    setup.fullscreen_mode = screen_mode_current->identifier;
+
+    /* needed for displaying screen mode name instead of identifier */
+    screen_mode_text = screen_mode_current->name;
+  }
+
   setup_mode = SETUP_MODE_GRAPHICS;
+  DrawSetupScreen();
+}
+
+static void execSetupChooseScreenMode()
+{
+  if (!video.fullscreen_available)
+    return;
+
+  setup_mode = SETUP_MODE_CHOOSE_SCREEN_MODE;
   DrawSetupScreen();
 }
 
@@ -2683,7 +2748,9 @@ static struct TokenInfo setup_info_editor[] =
 
 static struct TokenInfo setup_info_graphics[] =
 {
-  { TYPE_SWITCH,	&setup.fullscreen,	"Fullscreen Mode:"	},
+  { TYPE_SWITCH,	&setup.fullscreen,	"Fullscreen:"		},
+  { TYPE_ENTER_LIST,	execSetupChooseScreenMode, "Fullscreen Mode:"	},
+  { TYPE_STRING,	&screen_mode_text,	""			},
   { TYPE_SWITCH,	&setup.scroll_delay,	"Delayed Scrolling:"	},
 #if 0
   { TYPE_SWITCH,	&setup.soft_scrolling,	"Soft Scrolling:"	},
@@ -2714,11 +2781,11 @@ static struct TokenInfo setup_info_sound[] =
 
 static struct TokenInfo setup_info_artwork[] =
 {
-  { TYPE_ENTER_MENU,	execSetupChooseGraphics,"Custom Graphics"	},
+  { TYPE_ENTER_LIST,	execSetupChooseGraphics,"Custom Graphics:"	},
   { TYPE_STRING,	&graphics_set_name,	""			},
-  { TYPE_ENTER_MENU,	execSetupChooseSounds,	"Custom Sounds"		},
+  { TYPE_ENTER_LIST,	execSetupChooseSounds,	"Custom Sounds:"	},
   { TYPE_STRING,	&sounds_set_name,	""			},
-  { TYPE_ENTER_MENU,	execSetupChooseMusic,	"Custom Music"		},
+  { TYPE_ENTER_LIST,	execSetupChooseMusic,	"Custom Music:"		},
   { TYPE_STRING,	&music_set_name,	""			},
   { TYPE_EMPTY,		NULL,			""			},
 #if 1
@@ -2825,7 +2892,8 @@ static int getSetupTextFont(int type)
 	      TYPE_YES_NO |
 	      TYPE_STRING |
 	      TYPE_ECS_AGA |
-	      TYPE_KEYTEXT))
+	      TYPE_KEYTEXT |
+	      TYPE_ENTER_LIST))
     return FONT_MENU_2;
   else
     return FONT_MENU_1;
@@ -3063,7 +3131,8 @@ static void DrawSetupScreen_Generic()
     if ((value_ptr == &setup.sound_simple && !audio.sound_available) ||
 	(value_ptr == &setup.sound_loops  && !audio.loops_available) ||
 	(value_ptr == &setup.sound_music  && !audio.music_available) ||
-	(value_ptr == &setup.fullscreen   && !video.fullscreen_available))
+	(value_ptr == &setup.fullscreen   && !video.fullscreen_available) ||
+	(value_ptr == &screen_mode_text   && !video.fullscreen_available))
       setup_info[i].type |= TYPE_GHOSTED;
 
 #if 1
@@ -3084,9 +3153,9 @@ static void DrawSetupScreen_Generic()
 
     DrawText(mSX + xpos * 32, mSY + ypos * 32, setup_info[i].text, font_nr);
 
-    if (setup_info[i].type & TYPE_ENTER_MENU)
+    if (setup_info[i].type & (TYPE_ENTER_MENU|TYPE_ENTER_LIST))
       initCursor(i, IMG_MENU_BUTTON_ENTER_MENU);
-    else if (setup_info[i].type & TYPE_LEAVE_MENU)
+    else if (setup_info[i].type & (TYPE_LEAVE_MENU|TYPE_LEAVE_LIST))
       initCursor(i, IMG_MENU_BUTTON_LEAVE_MENU);
     else if (setup_info[i].type & ~TYPE_SKIP_ENTRY)
       initCursor(i, IMG_MENU_BUTTON);
@@ -3179,7 +3248,7 @@ void HandleSetupScreen_Generic(int mx, int my, int dx, int dy, int button)
     }
     else if (!(setup_info[y].type & TYPE_GHOSTED))
     {
-      if (setup_info[y].type & TYPE_ENTER_OR_LEAVE_MENU)
+      if (setup_info[y].type & TYPE_ENTER_OR_LEAVE)
       {
 	void (*menu_callback_function)(void) = setup_info[choice].value;
 
@@ -3847,6 +3916,8 @@ void DrawSetupScreen()
 
   if (setup_mode == SETUP_MODE_INPUT)
     DrawSetupScreen_Input();
+  else if (setup_mode == SETUP_MODE_CHOOSE_SCREEN_MODE)
+    DrawChooseTree(&screen_mode_current);
   else if (setup_mode == SETUP_MODE_CHOOSE_GRAPHICS)
     DrawChooseTree(&artwork.gfx_current);
   else if (setup_mode == SETUP_MODE_CHOOSE_SOUNDS)
@@ -3864,6 +3935,8 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
 {
   if (setup_mode == SETUP_MODE_INPUT)
     HandleSetupScreen_Input(mx, my, dx, dy, button);
+  else if (setup_mode == SETUP_MODE_CHOOSE_SCREEN_MODE)
+    HandleChooseTree(mx, my, dx, dy, button, &screen_mode_current);
   else if (setup_mode == SETUP_MODE_CHOOSE_GRAPHICS)
     HandleChooseTree(mx, my, dx, dy, button, &artwork.gfx_current);
   else if (setup_mode == SETUP_MODE_CHOOSE_SOUNDS)

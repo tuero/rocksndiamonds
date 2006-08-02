@@ -426,6 +426,21 @@
 
 #define NUM_TREE_TYPES		4
 
+#define INFOTEXT_UNDEFINED	""
+#define INFOTEXT_GRAPHICS_DIR	"Custom Graphics"
+#define INFOTEXT_SOUNDS_DIR	"Custom Sounds"
+#define INFOTEXT_MUSIC_DIR	"Custom Music"
+#define INFOTEXT_LEVEL_DIR	"Level Sets"
+
+#define TREE_INFOTEXT(t)	((t) == TREE_TYPE_LEVEL_DIR ?		\
+				 INFOTEXT_LEVEL_DIR :			\
+				 (t) == TREE_TYPE_GRAPHICS_DIR ?	\
+				 INFOTEXT_GRAPHICS_DIR :		\
+				 (t) == TREE_TYPE_SOUNDS_DIR ?		\
+				 INFOTEXT_SOUNDS_DIR :			\
+				 (t) == TREE_TYPE_MUSIC_DIR ?		\
+				 INFOTEXT_MUSIC_DIR :			\
+				 INFOTEXT_UNDEFINED)
 
 /* values for artwork handling */
 #define LEVELDIR_ARTWORK_SET_PTR(leveldir, type)			\
@@ -573,12 +588,18 @@ struct OptionInfo
   boolean debug;
 };
 
+struct ScreenModeInfo
+{
+  int width, height;
+};
+
 struct VideoSystemInfo
 {
   int default_depth;
   int width, height, depth;
   boolean fullscreen_available;
   boolean fullscreen_enabled;
+  struct ScreenModeInfo *fullscreen_modes;
 };
 
 struct AudioSystemInfo
@@ -754,6 +775,7 @@ struct SetupInfo
   boolean skip_levels;
   boolean time_limit;
   boolean fullscreen;
+  char *fullscreen_mode;
   boolean ask_on_escape;
   boolean ask_on_escape_editor;
   boolean quick_switch;
@@ -829,6 +851,8 @@ struct TreeInfo
   int color;		/* color to use on selection screen for this level */
   char *class_desc;	/* description of level series class */
   int handicap_level;	/* number of the lowest unsolved level */
+
+  char *infotext;	/* optional text to describe the tree type (headline) */
 };
 
 typedef struct TreeInfo TreeInfo;

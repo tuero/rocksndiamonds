@@ -123,7 +123,7 @@ void InitPlatformDependentStuff(void)
 #endif
 
 #if defined(PLATFORM_MACOSX)
-  fixUserGameDataDir();
+  updateUserGameDataDir();
 #endif
 
 #if !defined(PLATFORM_UNIX) || defined(PLATFORM_MACOSX)
@@ -328,6 +328,7 @@ void InitVideoBuffer(DrawBuffer **backbuffer, DrawWindow **window,
   video.depth = GetRealDepth(depth);
   video.fullscreen_available = FULLSCREEN_STATUS;
   video.fullscreen_enabled = FALSE;
+  video.fullscreen_modes = NULL;
 
 #if defined(TARGET_SDL)
   SDLInitVideoBuffer(backbuffer, window, fullscreen);

@@ -31,20 +31,23 @@
 
 /* additional values for setup screen */
 #define TYPE_ENTER_SCREEN		(1 << 9)
-#define TYPE_ENTER_MENU			(1 << 10)
-#define TYPE_LEAVE_MENU			(1 << 11)
-#define TYPE_EMPTY			(1 << 12)
-#define TYPE_KEYTEXT			(1 << 13)
+#define TYPE_LEAVE_SCREEN		(1 << 10)
+#define TYPE_ENTER_MENU			(1 << 11)
+#define TYPE_LEAVE_MENU			(1 << 12)
+#define TYPE_ENTER_LIST			(1 << 13)
+#define TYPE_LEAVE_LIST			(1 << 14)
+#define TYPE_EMPTY			(1 << 15)
+#define TYPE_KEYTEXT			(1 << 16)
 
-#define TYPE_GHOSTED			(1 << 14)
-#define TYPE_QUERY			(1 << 15)
+#define TYPE_GHOSTED			(1 << 17)
+#define TYPE_QUERY			(1 << 18)
 
 /* additional values for internal purposes */
-#define TYPE_BITFIELD			(1 << 16)
-#define TYPE_ELEMENT			(1 << 17)
-#define TYPE_CONTENT			(1 << 18)
-#define TYPE_ELEMENT_LIST		(1 << 19)
-#define TYPE_CONTENT_LIST		(1 << 20)
+#define TYPE_BITFIELD			(1 << 19)
+#define TYPE_ELEMENT			(1 << 20)
+#define TYPE_CONTENT			(1 << 21)
+#define TYPE_ELEMENT_LIST		(1 << 22)
+#define TYPE_CONTENT_LIST		(1 << 23)
 
 /* derived values for setup file handling */
 #define TYPE_BOOLEAN_STYLE		(TYPE_BOOLEAN | \
@@ -62,11 +65,15 @@
 
 #define TYPE_SKIP_ENTRY			(TYPE_EMPTY		| \
 					 TYPE_KEY		| \
-					 TYPE_STRING)
+					 TYPE_STRING		| \
+					 TYPE_GHOSTED)
 
-#define TYPE_ENTER_OR_LEAVE_MENU	(TYPE_ENTER_SCREEN	| \
+#define TYPE_ENTER_OR_LEAVE		(TYPE_ENTER_SCREEN	| \
+					 TYPE_LEAVE_SCREEN	| \
 					 TYPE_ENTER_MENU	| \
-					 TYPE_LEAVE_MENU)
+					 TYPE_LEAVE_MENU	| \
+					 TYPE_ENTER_LIST	| \
+					 TYPE_LEAVE_LIST)
 
 /* cookie token for file identifier and version number */
 #define TOKEN_STR_FILE_IDENTIFIER	"file_identifier"
@@ -235,6 +242,7 @@ void InitUserLevelDirectory(char *);
 void InitLevelSetupDirectory(char *);
 
 TreeInfo *newTreeInfo();
+TreeInfo *newTreeInfo_setDefaults(int);
 void pushTreeInfo(TreeInfo **, TreeInfo *);
 int numTreeInfo(TreeInfo *);
 boolean validLevelSeries(TreeInfo *);
@@ -245,8 +253,10 @@ int posTreeInfo(TreeInfo *);
 TreeInfo *getTreeInfoFromPos(TreeInfo *, int);
 TreeInfo *getTreeInfoFromIdentifier(TreeInfo *, char *);
 void dumpTreeInfo(TreeInfo *, int);
-void sortTreeInfo(TreeInfo **,
-		  int (*compare_function)(const void *, const void *));
+void sortTreeInfoBySortFunction(TreeInfo **,
+				int (*compare_function)(const void *,
+							const void *));
+void sortTreeInfo(TreeInfo **);
 
 char *getHomeDir(void);
 char *getCommonDataDir(void);
@@ -255,7 +265,7 @@ char *getUserGameDataDir(void);
 char *getSetupDir(void);
 char *getCurrentLevelDir(void);
 
-void fixUserGameDataDir(void);
+void updateUserGameDataDir(void);
 
 void createDirectory(char *, char *, int);
 void InitUserDataDirectory(void);

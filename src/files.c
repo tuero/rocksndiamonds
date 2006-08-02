@@ -6853,19 +6853,20 @@ void SaveScore(int nr)
 #define SETUP_TOKEN_SKIP_LEVELS			14
 #define SETUP_TOKEN_TIME_LIMIT			15
 #define SETUP_TOKEN_FULLSCREEN			16
-#define SETUP_TOKEN_ASK_ON_ESCAPE		17
-#define SETUP_TOKEN_ASK_ON_ESCAPE_EDITOR	18
-#define SETUP_TOKEN_QUICK_SWITCH		19
-#define SETUP_TOKEN_INPUT_ON_FOCUS		20
-#define SETUP_TOKEN_PREFER_AGA_GRAPHICS		21
-#define SETUP_TOKEN_GRAPHICS_SET		22
-#define SETUP_TOKEN_SOUNDS_SET			23
-#define SETUP_TOKEN_MUSIC_SET			24
-#define SETUP_TOKEN_OVERRIDE_LEVEL_GRAPHICS	25
-#define SETUP_TOKEN_OVERRIDE_LEVEL_SOUNDS	26
-#define SETUP_TOKEN_OVERRIDE_LEVEL_MUSIC	27
+#define SETUP_TOKEN_FULLSCREEN_MODE		17
+#define SETUP_TOKEN_ASK_ON_ESCAPE		18
+#define SETUP_TOKEN_ASK_ON_ESCAPE_EDITOR	19
+#define SETUP_TOKEN_QUICK_SWITCH		20
+#define SETUP_TOKEN_INPUT_ON_FOCUS		21
+#define SETUP_TOKEN_PREFER_AGA_GRAPHICS		22
+#define SETUP_TOKEN_GRAPHICS_SET		23
+#define SETUP_TOKEN_SOUNDS_SET			24
+#define SETUP_TOKEN_MUSIC_SET			25
+#define SETUP_TOKEN_OVERRIDE_LEVEL_GRAPHICS	26
+#define SETUP_TOKEN_OVERRIDE_LEVEL_SOUNDS	27
+#define SETUP_TOKEN_OVERRIDE_LEVEL_MUSIC	28
 
-#define NUM_GLOBAL_SETUP_TOKENS			28
+#define NUM_GLOBAL_SETUP_TOKENS			29
 
 /* editor setup */
 #define SETUP_TOKEN_EDITOR_EL_BOULDERDASH	0
@@ -6976,6 +6977,7 @@ static struct TokenInfo global_setup_tokens[] =
   { TYPE_SWITCH, &si.skip_levels,	"skip_levels"			},
   { TYPE_SWITCH, &si.time_limit,	"time_limit"			},
   { TYPE_SWITCH, &si.fullscreen,	"fullscreen"			},
+  { TYPE_SWITCH, &si.fullscreen_mode,	"fullscreen_mode"		},
   { TYPE_SWITCH, &si.ask_on_escape,	"ask_on_escape"			},
   { TYPE_SWITCH, &si.ask_on_escape_editor, "ask_on_escape_editor"	},
   { TYPE_SWITCH, &si.quick_switch,	"quick_player_switch"		},
@@ -7125,6 +7127,7 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
   si->skip_levels = TRUE;
   si->time_limit = TRUE;
   si->fullscreen = FALSE;
+  si->fullscreen_mode = getStringCopy(DEFAULT_FULLSCREEN_MODE);
   si->ask_on_escape = TRUE;
   si->ask_on_escape_editor = TRUE;
   si->quick_switch = FALSE;

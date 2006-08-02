@@ -180,6 +180,8 @@ char *get_mapped_token(char *);
 int get_parameter_value(char *, char *, int);
 int get_auto_parameter_value(char *, char *);
 
+struct ScreenModeInfo *get_screen_mode_from_string(char *);
+
 struct FileInfo *getFileListFromConfigList(struct ConfigInfo *,
 					   struct ConfigTypeInfo *,
 					   char **, int);

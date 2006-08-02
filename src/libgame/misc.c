@@ -1900,6 +1900,29 @@ int get_auto_parameter_value(char *token, char *value_raw)
   return get_parameter_value(value_raw, suffix, TYPE_INTEGER);
 }
 
+struct ScreenModeInfo *get_screen_mode_from_string(char *screen_mode_string)
+{
+  static struct ScreenModeInfo screen_mode;
+  char *screen_mode_string_x = strchr(screen_mode_string, 'x');
+  char *screen_mode_string_copy;
+  char *screen_mode_string_pos_w;
+  char *screen_mode_string_pos_h;
+
+  if (screen_mode_string_x == NULL)	/* invalid screen mode format */
+    return NULL;
+
+  screen_mode_string_copy = getStringCopy(screen_mode_string);
+
+  screen_mode_string_pos_w = screen_mode_string_copy;
+  screen_mode_string_pos_h = strchr(screen_mode_string_copy, 'x');
+  *screen_mode_string_pos_h++ = '\0';
+
+  screen_mode.width  = atoi(screen_mode_string_pos_w);
+  screen_mode.height = atoi(screen_mode_string_pos_h);
+
+  return &screen_mode;
+}
+
 static void FreeCustomArtworkList(struct ArtworkListInfo *,
 				  struct ListNodeInfo ***, int *);
 

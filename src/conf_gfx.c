@@ -4457,6 +4457,25 @@ struct ConfigInfo image_config[] =
   { "door_2.step_delay",			"10"			},
   { "door_2.anim_mode",				"default"		},
 
+#if DEBUG
+  { "game.level.x",				"-1"			},
+  { "game.level.y",				"-1"			},
+  { "game.gems.x",				"-1"			},
+  { "game.gems.y",				"-1"			},
+  { "game.bombs.x",				"-1"			},
+  { "game.bombs.y",				"-1"			},
+  { "game.keys.x",				"-1"			},
+  { "game.keys.y",				"-1"			},
+  { "game.score.x",				"-1"			},
+  { "game.score.y",				"-1"			},
+  { "game.time.x",				"-1"			},
+  { "game.time.y",				"-1"			},
+#if 0
+  { "game.tape.x",				"-1"			},
+  { "game.tape.y",				"-1"			},
+#endif
+#endif
+
   { "[player].boring_delay_fixed",		"1000"			},
   { "[player].boring_delay_random",		"1000"			},
   { "[player].sleeping_delay_fixed",		"2000"			},

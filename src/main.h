@@ -42,6 +42,8 @@
 #define WIN_XSIZE			672
 #define WIN_YSIZE			560
 
+#define DEFAULT_FULLSCREEN_MODE		"800x600"
+
 #define SCR_FIELDX			17
 #define SCR_FIELDY			17
 #define MAX_BUF_XSIZE			(SCR_FIELDX + 2)

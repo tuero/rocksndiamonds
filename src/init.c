@@ -4249,8 +4249,8 @@ void Execute_Command(char *command)
     }
     else
     {
-      /* print valid modes */
       printf("Available Modes:\n");
+
       for(i = 0; modes[i]; i++)
 	printf("  %d x %d\n", modes[i]->w, modes[i]->h);
     }
