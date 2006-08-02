@@ -68,12 +68,15 @@
 					 TYPE_STRING		| \
 					 TYPE_GHOSTED)
 
-#define TYPE_ENTER_OR_LEAVE		(TYPE_ENTER_SCREEN	| \
-					 TYPE_LEAVE_SCREEN	| \
+#define TYPE_ENTER			(TYPE_ENTER_SCREEN	| \
 					 TYPE_ENTER_MENU	| \
+					 TYPE_ENTER_LIST)
+
+#define TYPE_LEAVE			(TYPE_LEAVE_SCREEN	| \
 					 TYPE_LEAVE_MENU	| \
-					 TYPE_ENTER_LIST	| \
 					 TYPE_LEAVE_LIST)
+
+#define TYPE_ENTER_OR_LEAVE		(TYPE_ENTER | TYPE_LEAVE)
 
 /* cookie token for file identifier and version number */
 #define TOKEN_STR_FILE_IDENTIFIER	"file_identifier"

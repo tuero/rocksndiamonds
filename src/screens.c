@@ -1114,7 +1114,7 @@ void HandleInfoScreen_Main(int mx, int my, int dx, int dy, int button)
   {
     if (dx)
     {
-      int menu_navigation_type = (dx < 0 ? TYPE_LEAVE_MENU : TYPE_ENTER_MENU);
+      int menu_navigation_type = (dx < 0 ? TYPE_LEAVE : TYPE_ENTER);
 
       if (info_info[choice].type & menu_navigation_type ||
 	  info_info[choice].type & TYPE_ENTER_SCREEN ||
@@ -3192,6 +3192,7 @@ void HandleSetupScreen_Generic(int mx, int my, int dx, int dy, int button)
     choice_store[setup_mode] = choice;
 
     drawCursor(choice, FC_RED);
+
     return;
   }
   else if (button == MB_MENU_LEAVE)
@@ -3203,6 +3204,7 @@ void HandleSetupScreen_Generic(int mx, int my, int dx, int dy, int button)
 	void (*menu_callback_function)(void) = setup_info[y].value;
 
 	menu_callback_function();
+
 	break;	/* absolutely needed because function changes 'setup_info'! */
       }
     }
@@ -3219,7 +3221,7 @@ void HandleSetupScreen_Generic(int mx, int my, int dx, int dy, int button)
   {
     if (dx)
     {
-      int menu_navigation_type = (dx < 0 ? TYPE_LEAVE_MENU : TYPE_ENTER_MENU);
+      int menu_navigation_type = (dx < 0 ? TYPE_LEAVE : TYPE_ENTER);
 
       if (setup_info[choice].type & menu_navigation_type ||
 	  setup_info[choice].type & TYPE_BOOLEAN_STYLE)
@@ -3234,6 +3236,44 @@ void HandleSetupScreen_Generic(int mx, int my, int dx, int dy, int button)
       y += dy;
   }
 
+#if 1
+  if (IN_VIS_FIELD(x, y) && y >= 0 && y < num_setup_info)
+  {
+    if (button)
+    {
+      if (y != choice && setup_info[y].type & ~TYPE_SKIP_ENTRY)
+      {
+	drawCursor(y, FC_RED);
+	drawCursor(choice, FC_BLUE);
+	choice = choice_store[setup_mode] = y;
+      }
+    }
+    else if (!(setup_info[y].type & TYPE_GHOSTED))
+    {
+      /* when selecting key headline, execute function for key value change */
+      if (setup_info[y].type & TYPE_KEYTEXT &&
+	  setup_info[y + 1].type & TYPE_KEY)
+	y++;
+
+      /* when selecting string value, execute function for list selection */
+      if (setup_info[y].type & TYPE_STRING && y > 0 &&
+	  setup_info[y - 1].type & TYPE_ENTER_LIST)
+	y--;
+
+      if (setup_info[y].type & TYPE_ENTER_OR_LEAVE)
+      {
+	void (*menu_callback_function)(void) = setup_info[y].value;
+
+	menu_callback_function();
+      }
+      else
+      {
+	if (setup_info[y].type & TYPE_VALUE)
+	  changeSetupValue(y);
+      }
+    }
+  }
+#else
   if (IN_VIS_FIELD(x, y) &&
       y >= 0 && y < num_setup_info && setup_info[y].type & ~TYPE_SKIP_ENTRY)
   {
@@ -3265,6 +3305,7 @@ void HandleSetupScreen_Generic(int mx, int my, int dx, int dy, int button)
       }
     }
   }
+#endif
 }
 
 void DrawSetupScreen_Input()
