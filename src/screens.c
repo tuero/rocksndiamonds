@@ -2576,7 +2576,7 @@ static void execSetupGraphics()
       get_aspect_ratio_from_screen_mode(&video.fullscreen_modes[i], &xx, &yy);
 
       ti->node_top = &screen_modes;
-      ti->sort_priority = x * y;
+      ti->sort_priority = x * 10000 + y;
 
       sprintf(identifier, "%dx%d", x, y);
       sprintf(name,     "%d x %d [%d:%d]", x, y, xx, yy);

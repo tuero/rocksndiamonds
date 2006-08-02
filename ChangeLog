@@ -11,7 +11,9 @@
 	  setup menu (input devices section) by using standard button gadgets
 	* added support for mouse scroll wheel (caused buggy behaviour before)
 	* added support for scrolling horizontal scrollbars with mouse wheel by
-	  holding "Ctrl" button pressed while scrolling the wheel
+	  holding "Ctrl" key pressed while scrolling the wheel
+	* added support for single step mouse wheel scrolling by holding "Alt"
+	  key pressed while scrolling the wheel
 	* changed output file "stderr.txt" on Windows platform now always to be
 	  created in the R'n'D sub-directory of the personal documents directory
 	* added Windows message box to direct to "stderr.txt" after error aborts
