@@ -1923,6 +1923,25 @@ struct ScreenModeInfo *get_screen_mode_from_string(char *screen_mode_string)
   return &screen_mode;
 }
 
+void get_aspect_ratio_from_screen_mode(struct ScreenModeInfo *screen_mode,
+				       int *x, int *y)
+{
+  float aspect_ratio = (float)screen_mode->width / (float)screen_mode->height;
+  float aspect_ratio_new;
+  int i = 1;
+
+  do
+  {
+    *x = i * aspect_ratio;
+    *y = i;
+
+    aspect_ratio_new = (float)*x / (float)*y;
+
+    i++;
+  }
+  while (aspect_ratio_new != aspect_ratio && *x < screen_mode->width);
+}
+
 static void FreeCustomArtworkList(struct ArtworkListInfo *,
 				  struct ListNodeInfo ***, int *);
 

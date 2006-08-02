@@ -231,11 +231,19 @@ void DrawHeadline()
 
 static void ToggleFullscreenIfNeeded()
 {
-  if (setup.fullscreen != video.fullscreen_enabled)
+  if (setup.fullscreen != video.fullscreen_enabled ||
+      setup.fullscreen_mode != video.fullscreen_mode_current)
   {
     /* save old door content */
     BlitBitmap(backbuffer, bitmap_db_door,
 	       DX, DY, DXSIZE, DYSIZE, DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1);
+
+    if (setup.fullscreen && video.fullscreen_enabled)
+    {
+      /* keep fullscreen mode, but change screen mode */
+      video.fullscreen_mode_current = setup.fullscreen_mode;
+      video.fullscreen_enabled = FALSE;
+    }
 
     /* toggle fullscreen */
     ChangeVideoModeIfNeeded(setup.fullscreen);
@@ -2563,12 +2571,15 @@ static void execSetupGraphics()
       char identifier[20], name[20];
       int x = video.fullscreen_modes[i].width;
       int y = video.fullscreen_modes[i].height;
+      int xx, yy;
+
+      get_aspect_ratio_from_screen_mode(&video.fullscreen_modes[i], &xx, &yy);
 
       ti->node_top = &screen_modes;
       ti->sort_priority = x * y;
 
       sprintf(identifier, "%dx%d", x, y);
-      sprintf(name,     "%d x %d", x, y);
+      sprintf(name,     "%d x %d [%d:%d]", x, y, xx, yy);
 
       setString(&ti->identifier, identifier);
       setString(&ti->name, name);
@@ -2578,11 +2589,19 @@ static void execSetupGraphics()
       pushTreeInfo(&screen_modes, ti);
     }
 
+    /* sort fullscreen modes to start with lowest available screen resolution */
     sortTreeInfo(&screen_modes);
 
-    /* set current screen mode for fullscreen mode to reliable default value */
+    /* set current screen mode for fullscreen mode to configured setup value */
     screen_mode_current = getTreeInfoFromIdentifier(screen_modes,
-						    DEFAULT_FULLSCREEN_MODE);
+						    setup.fullscreen_mode);
+
+    /* if that fails, set current screen mode to reliable default value */
+    if (screen_mode_current == NULL)
+      screen_mode_current = getTreeInfoFromIdentifier(screen_modes,
+						      DEFAULT_FULLSCREEN_MODE);
+
+    /* if that also fails, set current screen mode to first available mode */
     if (screen_mode_current == NULL)
       screen_mode_current = screen_modes;
 

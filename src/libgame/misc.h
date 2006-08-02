@@ -181,6 +181,7 @@ int get_parameter_value(char *, char *, int);
 int get_auto_parameter_value(char *, char *);
 
 struct ScreenModeInfo *get_screen_mode_from_string(char *);
+void get_aspect_ratio_from_screen_mode(struct ScreenModeInfo *, int *x, int *y);
 
 struct FileInfo *getFileListFromConfigList(struct ConfigInfo *,
 					   struct ConfigTypeInfo *,

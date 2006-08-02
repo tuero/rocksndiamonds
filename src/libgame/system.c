@@ -329,6 +329,7 @@ void InitVideoBuffer(DrawBuffer **backbuffer, DrawWindow **window,
   video.fullscreen_available = FULLSCREEN_STATUS;
   video.fullscreen_enabled = FALSE;
   video.fullscreen_modes = NULL;
+  video.fullscreen_mode_current = NULL;
 
 #if defined(TARGET_SDL)
   SDLInitVideoBuffer(backbuffer, window, fullscreen);

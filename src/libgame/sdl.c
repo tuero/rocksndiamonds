@@ -41,6 +41,9 @@ static void setFullscreenParameters()
 
   fullscreen_mode = get_screen_mode_from_string(setup.fullscreen_mode);
 
+  if (fullscreen_mode == NULL)
+    return;
+
   for (i = 0; video.fullscreen_modes[i].width != -1; i++)
   {
     if (fullscreen_mode->width  == video.fullscreen_modes[i].width &&

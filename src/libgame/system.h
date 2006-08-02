@@ -597,9 +597,11 @@ struct VideoSystemInfo
 {
   int default_depth;
   int width, height, depth;
+
   boolean fullscreen_available;
   boolean fullscreen_enabled;
   struct ScreenModeInfo *fullscreen_modes;
+  char *fullscreen_mode_current;
 };
 
 struct AudioSystemInfo

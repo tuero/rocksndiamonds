@@ -6977,7 +6977,7 @@ static struct TokenInfo global_setup_tokens[] =
   { TYPE_SWITCH, &si.skip_levels,	"skip_levels"			},
   { TYPE_SWITCH, &si.time_limit,	"time_limit"			},
   { TYPE_SWITCH, &si.fullscreen,	"fullscreen"			},
-  { TYPE_SWITCH, &si.fullscreen_mode,	"fullscreen_mode"		},
+  { TYPE_STRING, &si.fullscreen_mode,	"fullscreen_mode"		},
   { TYPE_SWITCH, &si.ask_on_escape,	"ask_on_escape"			},
   { TYPE_SWITCH, &si.ask_on_escape_editor, "ask_on_escape_editor"	},
   { TYPE_SWITCH, &si.quick_switch,	"quick_player_switch"		},

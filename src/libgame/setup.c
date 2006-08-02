@@ -1176,7 +1176,7 @@ char *getCommonDataDir(void)
 
     if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_COMMON_DOCUMENTS, NULL, 0, dir))
 	&& !strEqual(dir, ""))		/* empty for Windows 95/98 */
-      common_data_dir = getPath2(dir, program.userdata_directory);
+      common_data_dir = getPath2(dir, program.userdata_subdir);
     else
       common_data_dir = options.rw_base_directory;
   }
