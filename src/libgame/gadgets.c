@@ -768,20 +768,14 @@ static void HandleGadgetTags(struct GadgetInfo *gi, int first_tag, va_list ap)
 	break;
 
       case GDI_ACTIVE:
-	/* take care here: "boolean" is typedef'ed as "unsigned char",
-	   which gets promoted to "int" */
 	gi->active = (boolean)va_arg(ap, int);
 	break;
 
       case GDI_DIRECT_DRAW:
-	/* take care here: "boolean" is typedef'ed as "unsigned char",
-	   which gets promoted to "int" */
 	gi->direct_draw = (boolean)va_arg(ap, int);
 	break;
 
       case GDI_CHECKED:
-	/* take care here: "boolean" is typedef'ed as "unsigned char",
-	   which gets promoted to "int" */
 	gi->checked = (boolean)va_arg(ap, int);
 	break;
 
@@ -1501,7 +1495,7 @@ boolean HandleGadgets(int mx, int my, int button)
        (gadget_pressed_inside_select_line && !mouse_inside_select_area)))
   {
     struct GadgetInfo *gi = last_gi;
-    boolean gadget_changed = (gi->event_mask & GD_EVENT_TEXT_LEAVING);
+    boolean gadget_changed = ((gi->event_mask & GD_EVENT_TEXT_LEAVING) != 0);
 
     /* check if text gadget has changed its value */
     if (gi->type & GD_TYPE_TEXT_INPUT)
@@ -1742,7 +1736,7 @@ boolean HandleGadgets(int mx, int my, int button)
 
 	if (IS_WHEEL_BUTTON(button))
 	{
-	  boolean scroll_single_step = (GetKeyModState() & KMOD_Alt);
+	  boolean scroll_single_step = ((GetKeyModState() & KMOD_Alt) != 0);
 
 	  item_steps = (scroll_single_step ? 1 : DEFAULT_WHEEL_STEPS);
 	  item_direction = (button == MB_WHEEL_UP ||
@@ -2016,7 +2010,7 @@ boolean HandleGadgetsKeyInput(Key key)
 
   if (key == KSYM_Return)	/* valid for both text input and selectbox */
   {
-    boolean gadget_changed = (gi->event_mask & GD_EVENT_TEXT_RETURN);
+    boolean gadget_changed = ((gi->event_mask & GD_EVENT_TEXT_RETURN) != 0);
 
     if (gi->type & GD_TYPE_TEXT_INPUT)
     {

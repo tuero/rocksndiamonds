@@ -1,3 +1,10 @@
+2006-08-04
+	* fixed bug with scrollbars inside editor when using the Windows mouse
+	  enhancement tool "True X-Mouse" (which injects key events to the event
+	  queue to insert selected stuff into the Windows clipboard, which gets
+	  confused with the "Insert" key for jumping to the last editor cascade
+	  block in the element list)
+
 2006-08-01
 	* added selection of preferred fullscreen mode to setup / graphics menu
 	  (useful if default mode 800 x 600 does not match screen aspect ratio)
@@ -11,9 +18,9 @@
 	  setup menu (input devices section) by using standard button gadgets
 	* added support for mouse scroll wheel (caused buggy behaviour before)
 	* added support for scrolling horizontal scrollbars with mouse wheel by
-	  holding "Ctrl" key pressed while scrolling the wheel
+	  holding "Shift" key pressed while scrolling the wheel
 	* added support for single step mouse wheel scrolling by holding "Alt"
-	  key pressed while scrolling the wheel
+	  key pressed while scrolling the wheel (can be combined with "Shift")
 	* changed output file "stderr.txt" on Windows platform now always to be
 	  created in the R'n'D sub-directory of the personal documents directory
 	* added Windows message box to direct to "stderr.txt" after error aborts

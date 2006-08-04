@@ -10467,8 +10467,12 @@ void HandleLevelEditorKeyInput(Key key)
 
       case KSYM_Insert:
       case KSYM_Delete:
-#if 1
-	/* IS_EDITOR_CASCADE */
+
+	/* this is needed to prevent interference with running "True X-Mouse" */
+	if (GetKeyModStateFromEvents() & KMOD_Control)
+	  break;
+
+	/* check for last or next editor cascade block in element list */
 	for (i = 0; i < num_editor_elements; i++)
 	{
 	  if ((key == KSYM_Insert && i == element_shift) ||
@@ -10492,36 +10496,6 @@ void HandleLevelEditorKeyInput(Key key)
 
 	ModifyEditorElementList();
 
-#else
-
-	for (i = 0; i < num_editor_elements; i++)
-	{
-	  int e = editor_elements[i];
-
-	  if ((key == KSYM_Insert &&
-	       (e == EL_INTERNAL_CASCADE_CE ||
-		e == EL_INTERNAL_CASCADE_CE_ACTIVE)) ||
-	      (key == KSYM_Delete &&
-	       (e == EL_INTERNAL_CASCADE_GE ||
-		e == EL_INTERNAL_CASCADE_GE_ACTIVE)))
-	    break;
-	}
-
-	if (i < num_editor_elements)
-	{
-	  element_shift = i;
-
-	  if (element_shift > num_editor_elements - ED_NUM_ELEMENTLIST_BUTTONS)
-	    element_shift = num_editor_elements - ED_NUM_ELEMENTLIST_BUTTONS;
-
-	  ModifyGadget(level_editor_gadget[GADGET_ID_SCROLL_LIST_VERTICAL],
-		       GDI_SCROLLBAR_ITEM_POSITION,
-		       element_shift / ED_ELEMENTLIST_BUTTONS_HORIZ, GDI_END);
-
-	  ModifyEditorElementList();
-	}
-#endif
-
 	break;
 
       case KSYM_Escape:
@@ -10542,6 +10516,7 @@ void HandleLevelEditorKeyInput(Key key)
 	  DrawDrawingWindow();
 	  edit_mode = ED_MODE_DRAWING;
 	}
+
         break;
 
       default:

@@ -315,6 +315,11 @@ void HandleExposeEvent(ExposeEvent *event)
 
 void HandleButtonEvent(ButtonEvent *event)
 {
+#if 0
+  printf("::: BUTTON EVENT: button %d %s\n", event->button,
+	 event->type == EVENT_BUTTONPRESS ? "pressed" : "released");
+#endif
+
   motion_status = FALSE;
 
   if (event->type == EVENT_BUTTONPRESS)
@@ -344,6 +349,11 @@ void HandleKeyEvent(KeyEvent *event)
   boolean with_modifiers = (game_status == GAME_MODE_PLAYING ? FALSE : TRUE);
   Key key = GetEventKey(event, with_modifiers);
   Key keymod = (with_modifiers ? GetEventKey(event, FALSE) : key);
+
+#if 0
+  printf("::: KEY EVENT: %d %s\n", GetEventKey(event, TRUE),
+	 event->type == EVENT_KEYPRESS ? "pressed" : "released");
+#endif
 
   HandleKeyModState(keymod, key_status);
   HandleKey(key, key_status);

@@ -44,7 +44,7 @@ static int el_act2crm(int, int);
 static struct GadgetInfo *tool_gadget[NUM_TOOL_BUTTONS];
 static int request_gadget_id = -1;
 
-static int preview_tilesize = 4;
+static int preview_tilesize = TILEX / 8;
 
 static char *print_if_not_empty(int element)
 {
@@ -1584,8 +1584,13 @@ static void DrawMicroLevelExt(int xpos, int ypos, int from_x, int from_y,
   if (lev_fieldy < preview_size_y)
     ypos += (preview_size_y - lev_fieldy) / 2 * preview_tilesize;
 
+#if 1
+  xpos += MICRO_TILEX;
+  ypos += MICRO_TILEY;
+#else
   xpos += preview_tilesize;
   ypos += preview_tilesize;
+#endif
 
   for (x = -1; x <= preview_size_x; x++)
   {

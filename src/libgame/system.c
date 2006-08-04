@@ -1229,7 +1229,6 @@ KeyMod HandleKeyModState(Key key, int key_status)
 {
   static KeyMod current_modifiers = KMOD_None;
 
-#if !defined(TARGET_SDL)
   if (key != KSYM_UNDEFINED)	/* new key => check for modifier key change */
   {
     KeyMod new_modifier = KMOD_None;
@@ -1269,7 +1268,6 @@ KeyMod HandleKeyModState(Key key, int key_status)
     else
       current_modifiers &= ~new_modifier;
   }
-#endif
 
   return current_modifiers;
 }
@@ -1281,6 +1279,17 @@ KeyMod GetKeyModState()
 #else
   return HandleKeyModState(KSYM_UNDEFINED, 0);
 #endif
+}
+
+KeyMod GetKeyModStateFromEvents()
+{
+  /* always use key modifier state as tracked from key events (this is needed
+     if the modifier key event was injected into the event queue, but the key
+     was not really pressed on keyboard -- SDL_GetModState() seems to directly
+     query the keys as held pressed on the keyboard) -- this case is currently
+     only used to filter out clipboard insert events from "True X-Mouse" tool */
+
+  return HandleKeyModState(KSYM_UNDEFINED, 0);
 }
 
 boolean CheckCloseWindowEvent(ClientMessageEvent *event)

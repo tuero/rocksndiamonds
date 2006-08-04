@@ -10401,7 +10401,7 @@ static void CheckGravityMovement(struct PlayerInfo *player)
   {
     int move_dir_horizontal = player->effective_action & MV_HORIZONTAL;
     int move_dir_vertical   = player->effective_action & MV_VERTICAL;
-    boolean player_is_snapping = player->effective_action & JOY_BUTTON_1;
+    boolean player_is_snapping = (player->effective_action & JOY_BUTTON_1);
     int jx = player->jx, jy = player->jy;
     boolean player_is_moving_to_valid_field =
       (!player_is_snapping &&

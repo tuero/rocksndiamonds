@@ -2568,7 +2568,7 @@ static void execSetupGraphics()
     for (i = 0; video.fullscreen_modes[i].width != -1; i++)
     {
       TreeInfo *ti = newTreeInfo_setDefaults(TREE_TYPE_UNDEFINED);
-      char identifier[20], name[20];
+      char identifier[32], name[32];
       int x = video.fullscreen_modes[i].width;
       int y = video.fullscreen_modes[i].height;
       int xx, yy;

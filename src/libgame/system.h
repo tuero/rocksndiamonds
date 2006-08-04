@@ -1086,6 +1086,7 @@ void PeekEvent(Event *event);
 Key GetEventKey(KeyEvent *, boolean);
 KeyMod HandleKeyModState(Key, int);
 KeyMod GetKeyModState();
+KeyMod GetKeyModStateFromEvents();
 boolean CheckCloseWindowEvent(ClientMessageEvent *);
 
 void InitJoysticks();
