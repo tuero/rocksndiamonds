@@ -72,7 +72,7 @@ void InitProgramInfo(char *argv0,
 		     char *userdata_subdir, char *userdata_subdir_unix,
 		     char *program_title, char *window_title, char *icon_title,
 		     char *x11_icon_filename, char *x11_iconmask_filename,
-		     char *msdos_cursor_filename,
+		     char *sdl_icon_filename, char *msdos_cursor_filename,
 		     char *cookie_prefix, char *filename_prefix,
 		     int program_version)
 {
@@ -89,6 +89,7 @@ void InitProgramInfo(char *argv0,
 
   program.x11_icon_filename = x11_icon_filename;
   program.x11_iconmask_filename = x11_iconmask_filename;
+  program.sdl_icon_filename = sdl_icon_filename;
   program.msdos_cursor_filename = msdos_cursor_filename;
 
   program.cookie_prefix = cookie_prefix;

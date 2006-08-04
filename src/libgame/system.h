@@ -552,6 +552,7 @@ struct ProgramInfo
 
   char *x11_icon_filename;
   char *x11_iconmask_filename;
+  char *sdl_icon_filename;
   char *msdos_cursor_filename;
 
   char *cookie_prefix;
@@ -1019,7 +1020,7 @@ extern int			FrameCounter;
 /* function definitions */
 
 void InitProgramInfo(char *, char *, char *, char *, char *, char *, char *,
-		     char *, char *, char *, char *, int);
+		     char *, char *, char *, char *, char *, int);
 
 void InitExitFunction(void (*exit_function)(int));
 void InitPlatformDependentStuff(void);

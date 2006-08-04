@@ -4,6 +4,7 @@
 	  queue to insert selected stuff into the Windows clipboard, which gets
 	  confused with the "Insert" key for jumping to the last editor cascade
 	  block in the element list)
+	* added Rocks'n'Diamonds icon for use as window icon to SDL version
 
 2006-08-01
 	* added selection of preferred fullscreen mode to setup / graphics menu

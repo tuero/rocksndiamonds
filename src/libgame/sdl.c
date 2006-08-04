@@ -15,6 +15,7 @@
 #include "sound.h"
 #include "joystick.h"
 #include "misc.h"
+#include "setup.h"
 
 
 #if defined(TARGET_SDL)
@@ -58,6 +59,32 @@ static void setFullscreenParameters()
       break;
     }
   }
+}
+
+static void SDLSetWindowIcon(char *basename)
+{
+  char *filename = getCustomImageFilename(basename);
+  SDL_Surface *surface;
+
+  if (filename == NULL)
+  {
+    Error(ERR_WARN, "SDLSetWindowIcon(): cannot find file '%s'", basename);
+
+    return;
+  }
+
+  if ((surface = IMG_Load(filename)) == NULL)
+  {
+    Error(ERR_WARN, "IMG_Load() failed: %s", SDL_GetError());
+
+    return;
+  }
+
+  /* set transparent color */
+  SDL_SetColorKey(surface, SDL_SRCCOLORKEY,
+		  SDL_MapRGB(surface->format, 0x00, 0x00, 0x00));
+
+  SDL_WM_SetIcon(surface, NULL);
 }
 
 void SDLInitVideoDisplay(void)
@@ -168,6 +195,9 @@ void SDLInitVideoBuffer(DrawBuffer **backbuffer, DrawWindow **window,
       video.fullscreen_available = FALSE;
     }
   }
+
+  /* set window icon */
+  SDLSetWindowIcon(program.sdl_icon_filename);
 
   /* open SDL video output device (window or fullscreen mode) */
   if (!SDLSetVideoMode(backbuffer, fullscreen))
@@ -1465,6 +1495,7 @@ Bitmap *SDLLoadImage(char *filename)
   if ((sdl_image_tmp = IMG_Load(filename)) == NULL)
   {
     SetError("IMG_Load(): %s", SDL_GetError());
+
     return NULL;
   }
 
@@ -1472,6 +1503,7 @@ Bitmap *SDLLoadImage(char *filename)
   if ((new_bitmap->surface = SDL_DisplayFormat(sdl_image_tmp)) == NULL)
   {
     SetError("SDL_DisplayFormat(): %s", SDL_GetError());
+
     return NULL;
   }
 
@@ -1481,6 +1513,7 @@ Bitmap *SDLLoadImage(char *filename)
   if ((new_bitmap->surface_masked = SDL_DisplayFormat(sdl_image_tmp)) == NULL)
   {
     SetError("SDL_DisplayFormat(): %s", SDL_GetError());
+
     return NULL;
   }
 

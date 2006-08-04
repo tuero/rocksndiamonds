@@ -869,7 +869,7 @@
 #define MICROLEVEL_XSIZE	((STD_LEV_FIELDX + 2) * MICRO_TILEX)
 #define MICROLEVEL_YSIZE	((STD_LEV_FIELDY + 2) * MICRO_TILEY)
 #define MICROLEVEL_XPOS		(SX + (SXSIZE - MICROLEVEL_XSIZE) / 2)
-#define MICROLEVEL_YPOS		(SX + 12 * TILEY - MICRO_TILEY)
+#define MICROLEVEL_YPOS		(SY + 12 * TILEY - MICRO_TILEY)
 #define MICROLABEL1_YPOS	(MICROLEVEL_YPOS - 36)
 #define MICROLABEL2_YPOS	(MICROLEVEL_YPOS + MICROLEVEL_YSIZE + 7)
 
@@ -1721,7 +1721,9 @@
 
 #define PROGRAM_TITLE_STRING		"Rocks'n'Diamonds"
 #define PROGRAM_AUTHOR_STRING		"Holger Schemel"
-#define PROGRAM_COPYRIGHT_STRING       "Copyright ©1995-2006 by Holger Schemel"
+#define PROGRAM_COPYRIGHT_STRING	"Copyright ©1995-2006 by Holger Schemel"
+#define PROGRAM_EMAIL_STRING		"info@artsoft.org"
+#define PROGRAM_WEBSITE_STRING		"http://www.artsoft.org/"
 
 #define ICON_TITLE_STRING		PROGRAM_TITLE_STRING
 #define COOKIE_PREFIX			"ROCKSNDIAMONDS"
@@ -1744,6 +1746,7 @@
 
 #define X11_ICON_FILENAME		"rocks_icon.xbm"
 #define X11_ICONMASK_FILENAME		"rocks_iconmask.xbm"
+#define SDL_ICON_FILENAME		"rocks_icon_32x32.pcx"
 #define MSDOS_POINTER_FILENAME		"mouse.pcx"
 
 /* file version numbers for resource files (levels, tapes, score, setup, etc.)

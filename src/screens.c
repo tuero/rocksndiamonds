@@ -1789,7 +1789,7 @@ void DrawInfoScreen_Program()
   DrawTextSCentered(ystart + 1 * ystep, FONT_TEXT_2,
 		    "If you like it, send e-mail to:");
   DrawTextSCentered(ystart + 2 * ystep, FONT_TEXT_3,
-		    "info@artsoft.org");
+		    PROGRAM_EMAIL_STRING);
   DrawTextSCentered(ystart + 3 * ystep, FONT_TEXT_2,
 		    "or SnailMail to:");
   DrawTextSCentered(ystart + 4 * ystep + 0, FONT_TEXT_3,
@@ -1800,12 +1800,15 @@ void DrawInfoScreen_Program()
 		    "33604 Bielefeld");
   DrawTextSCentered(ystart + 4 * ystep + 60, FONT_TEXT_3,
 		    "Germany");
-
   DrawTextSCentered(ystart + 7 * ystep, FONT_TEXT_2,
-		    "If you have created new levels,");
-  DrawTextSCentered(ystart + 8 * ystep, FONT_TEXT_2,
-		    "send them to me to include them!");
+		    "More information and levels:");
+  DrawTextSCentered(ystart + 8 * ystep, FONT_TEXT_3,
+		    PROGRAM_WEBSITE_STRING);
   DrawTextSCentered(ystart + 9 * ystep, FONT_TEXT_2,
+		    "If you have created new levels,");
+  DrawTextSCentered(ystart + 10 * ystep, FONT_TEXT_2,
+		    "send them to me to include them!");
+  DrawTextSCentered(ystart + 11 * ystep, FONT_TEXT_2,
 		    ":-)");
 
   DrawTextSCentered(ybottom, FONT_TEXT_4,

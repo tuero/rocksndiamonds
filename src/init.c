@@ -4455,6 +4455,7 @@ void InitGfx()
 {
   char *filename_font_initial = NULL;
   Bitmap *bitmap_font_initial = NULL;
+  int font_height;
   int i, j;
 
   /* determine settings for initial font (for displaying startup messages) */
@@ -4514,8 +4515,11 @@ void InitGfx()
 
   InitFontGraphicInfo();
 
+  font_height = getFontHeight(FC_RED);
+
   DrawInitText(getProgramInitString(), 20, FC_YELLOW);
   DrawInitText(PROGRAM_COPYRIGHT_STRING, 50, FC_RED);
+  DrawInitText(PROGRAM_WEBSITE_STRING, WIN_YSIZE - 20 - font_height, FC_RED);
 
   DrawInitText("Loading graphics:", 120, FC_GREEN);
 }
