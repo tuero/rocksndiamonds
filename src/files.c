@@ -4743,7 +4743,7 @@ void LoadLevelFromFilename(struct LevelInfo *level, char *filename)
 
 static void LoadLevel_InitVersion(struct LevelInfo *level, char *filename)
 {
-  int i;
+  int i, j;
 
   if (leveldir_current == NULL)		/* only when dumping level */
     return;
@@ -4840,8 +4840,6 @@ static void LoadLevel_InitVersion(struct LevelInfo *level, char *filename)
   /* trigger settings did not exist before 3.1.0; set to default "any" */
   if (level->game_version < VERSION_IDENT(3,1,0,0))
   {
-    int i, j;
-
     /* correct "can move into acid" settings (all zero in old levels) */
 
     level->can_move_into_acid_bits = 0; /* nothing can move into acid */
@@ -4870,6 +4868,28 @@ static void LoadLevel_InitVersion(struct LevelInfo *level, char *filename)
 	change->trigger_page = CH_PAGE_ANY;
       }
     }
+  }
+
+  /* try to detect and fix "Snake Bite" levels, which are broken with 3.2.0 */
+  {
+    int element = EL_CUSTOM_START + 255;
+    struct ElementInfo *ei = &element_info[element];
+    struct ElementChangeInfo *change = &ei->change_page[0];
+
+    /* This is needed to fix a problem that was caused by a bugfix in function
+       game.c/CreateFieldExt() introduced with 3.2.0 that corrects the behaviour
+       when a custom element changes to EL_SOKOBAN_FIELD_PLAYER (before, it did
+       not replace walkable elements, but instead just placed the player on it,
+       without placing the Sokoban field under the player). Unfortunately, this
+       breaks "Snake Bite" style levels when the snake is halfway through a door
+       that just closes (the snake head is still alive and can be moved in this
+       case). This can be fixed by replacing the EL_SOKOBAN_FIELD_PLAYER by the
+       player (without Sokoban element) which then gets killed as designed). */
+
+    if ((strncmp(leveldir_current->identifier, "snake_bite", 10) == 0 ||
+	 strncmp(ei->description, "pause b4 death", 14) == 0) &&
+	change->target_element == EL_SOKOBAN_FIELD_PLAYER)
+      change->target_element = EL_PLAYER_1;
   }
 }
 

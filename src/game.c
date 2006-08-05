@@ -49,6 +49,9 @@
 
 #define USE_QUICKSAND_IMPACT_BUGFIX	(USE_NEW_STUFF		* 0)
 
+#define USE_CODE_THAT_BREAKS_SNAKE_BITE	(USE_NEW_STUFF		* 1)
+
+
 /* for DigField() */
 #define DF_NO_PUSH		0
 #define DF_DIG			1
@@ -8484,7 +8487,12 @@ static void CreateFieldExt(int x, int y, int element, boolean is_change)
 #endif
   boolean new_element_is_player = ELEM_IS_PLAYER(new_element);
   boolean add_player_onto_element = (new_element_is_player &&
+#if USE_CODE_THAT_BREAKS_SNAKE_BITE
+				     /* this breaks SnakeBite when a snake is
+					halfway through a door that closes */
+				     /* NOW FIXED AT LEVEL INIT IN files.c */
 				     new_element != EL_SOKOBAN_FIELD_PLAYER &&
+#endif
 				     IS_WALKABLE(old_element));
 
 #if 0
