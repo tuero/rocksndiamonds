@@ -687,8 +687,8 @@ void HandleKey(Key key, int key_status)
   if (key_status == KEY_RELEASED)
     return;
 
-  if (key == KSYM_Return && GetKeyModState() & KMOD_Alt &&
-      video.fullscreen_available)
+  if ((key == KSYM_Return || key == KSYM_KP_Enter) &&
+      (GetKeyModState() & KMOD_Alt) && video.fullscreen_available)
   {
     setup.fullscreen = !setup.fullscreen;
 
