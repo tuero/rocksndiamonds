@@ -229,38 +229,6 @@ void DrawHeadline()
   DrawTextSCentered(MENU_TITLE2_YPOS, FONT_TITLE_2, PROGRAM_COPYRIGHT_STRING);
 }
 
-static void ToggleFullscreenIfNeeded()
-{
-  if (setup.fullscreen != video.fullscreen_enabled ||
-      setup.fullscreen_mode != video.fullscreen_mode_current)
-  {
-    /* save old door content */
-    BlitBitmap(backbuffer, bitmap_db_door,
-	       DX, DY, DXSIZE, DYSIZE, DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1);
-
-    if (setup.fullscreen && video.fullscreen_enabled)
-    {
-      /* keep fullscreen mode, but change screen mode */
-      video.fullscreen_mode_current = setup.fullscreen_mode;
-      video.fullscreen_enabled = FALSE;
-    }
-
-    /* toggle fullscreen */
-    ChangeVideoModeIfNeeded(setup.fullscreen);
-    setup.fullscreen = video.fullscreen_enabled;
-
-    /* redraw background to newly created backbuffer */
-    BlitBitmap(graphic_info[IMG_GLOBAL_BORDER].bitmap, backbuffer,
-	       0,0, WIN_XSIZE,WIN_YSIZE, 0,0);
-
-    /* restore old door content */
-    BlitBitmap(bitmap_db_door, backbuffer,
-	       DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1, DXSIZE, DYSIZE, DX, DY);
-
-    redraw_mask = REDRAW_ALL;
-  }
-}
-
 static int getLastLevelButtonPos()
 {
   return 10;

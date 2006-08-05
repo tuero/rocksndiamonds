@@ -170,4 +170,6 @@ void PlayMenuSoundStereo(int, int);
 void PlayMenuSoundIfLoop();
 void PlayMenuMusic();
 
+void ToggleFullscreenIfNeeded();
+
 #endif	/* TOOLS_H */

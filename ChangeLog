@@ -5,6 +5,7 @@
 	  confused with the "Insert" key for jumping to the last editor cascade
 	  block in the element list)
 	* added Rocks'n'Diamonds icon for use as window icon to SDL version
+	* added key shortcut "Alt + Enter" to toggle fullscreen mode at any time
 
 2006-08-01
 	* added selection of preferred fullscreen mode to setup / graphics menu

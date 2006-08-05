@@ -687,6 +687,16 @@ void HandleKey(Key key, int key_status)
   if (key_status == KEY_RELEASED)
     return;
 
+  if (key == KSYM_Return && GetKeyModState() & KMOD_Alt &&
+      video.fullscreen_available)
+  {
+    setup.fullscreen = !setup.fullscreen;
+
+    ToggleFullscreenIfNeeded();
+
+    return;
+  }
+
   if (game_status == GAME_MODE_PLAYING && AllPlayersGone &&
       (key == KSYM_Return || key == setup.shortcut.toggle_pause))
   {

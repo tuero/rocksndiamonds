@@ -6037,3 +6037,33 @@ void PlayMenuMusic()
 
   PlayMusic(music);
 }
+
+void ToggleFullscreenIfNeeded()
+{
+  if (setup.fullscreen != video.fullscreen_enabled ||
+      setup.fullscreen_mode != video.fullscreen_mode_current)
+  {
+    Bitmap *tmp_backbuffer = CreateBitmap(WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH);
+
+    /* save backbuffer content which gets lost when toggling fullscreen mode */
+    BlitBitmap(backbuffer, tmp_backbuffer, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
+
+    if (setup.fullscreen && video.fullscreen_enabled)
+    {
+      /* keep fullscreen mode, but change screen mode */
+      video.fullscreen_mode_current = setup.fullscreen_mode;
+      video.fullscreen_enabled = FALSE;
+    }
+
+    /* toggle fullscreen */
+    ChangeVideoModeIfNeeded(setup.fullscreen);
+    setup.fullscreen = video.fullscreen_enabled;
+
+    /* restore backbuffer content from temporary backbuffer backup bitmap */
+    BlitBitmap(tmp_backbuffer, backbuffer, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
+
+    FreeBitmap(tmp_backbuffer);
+
+    redraw_mask = REDRAW_ALL;
+  }
+}
