@@ -167,13 +167,21 @@
 	((e) >= NUM_FILE_ELEMENTS ? EL_UNKNOWN : (e))
 #endif
 
-#define GET_TARGET_ELEMENT(e, ch, cv, cs)				\
+#define RESOLVED_REFERENCE_ELEMENT(be, e)				\
+	((be) + (e) - EL_SELF < EL_CUSTOM_START ? EL_CUSTOM_START :	\
+	 (be) + (e) - EL_SELF > EL_CUSTOM_END   ? EL_CUSTOM_END :	\
+	 (be) + (e) - EL_SELF)
+
+#define GET_TARGET_ELEMENT(be, e, ch, cv, cs)				\
 	((e) == EL_TRIGGER_PLAYER   ? (ch)->actual_trigger_player    :	\
 	 (e) == EL_TRIGGER_ELEMENT  ? (ch)->actual_trigger_element   :	\
 	 (e) == EL_TRIGGER_CE_VALUE ? (ch)->actual_trigger_ce_value  :	\
 	 (e) == EL_TRIGGER_CE_SCORE ? (ch)->actual_trigger_ce_score  :	\
 	 (e) == EL_CURRENT_CE_VALUE ? (cv) :				\
-	 (e) == EL_CURRENT_CE_SCORE ? (cs) : (e))
+	 (e) == EL_CURRENT_CE_SCORE ? (cs) :				\
+	 (e) >= EL_LAST_CE_8 && (e) <= EL_NEXT_CE_8 ?			\
+	 RESOLVED_REFERENCE_ELEMENT(be, e) :				\
+	 (e))
 
 #define CAN_GROW_INTO(e)						\
 	((e) == EL_SAND || (IS_DIGGABLE(e) && level.grow_into_diggable))
@@ -1201,6 +1209,7 @@ static void InitField(int x, int y, boolean init_game)
 	InitField(x, y, init_game);
 #endif
       }
+
       break;
   }
 
@@ -1451,6 +1460,18 @@ static void resolve_group_element(int group_element, int recursion_depth)
       group->element_resolved[group->num_elements_resolved++] = element;
       element_info[element].in_group[group_nr] = TRUE;
     }
+  }
+}
+#endif
+
+#if 0
+static void replace_reference_element(int base_element, int *element)
+{
+  if (*element >= EL_LAST_CE_8 && *element <= EL_NEXT_CE_8)
+  {
+    *element = base_element + *element - EL_SELF;
+    *element = (*element < EL_CUSTOM_START ? EL_CUSTOM_START :
+		*element > EL_CUSTOM_END   ? EL_CUSTOM_END   : *element);
   }
 }
 #endif
@@ -1757,6 +1778,11 @@ static void InitGameEngine()
 	      for (l = 0; l < group->num_elements_resolved; l++)
 		trigger_events[group->element_resolved[l]][k] = TRUE;
 	    }
+#if 1
+	    else if (trigger_element == EL_ANY_ELEMENT)
+	      for (l = 0; l < MAX_NUM_ELEMENTS; l++)
+		trigger_events[l][k] = TRUE;
+#endif
 	    else
 	      trigger_events[trigger_element][k] = TRUE;
 	  }
@@ -1894,6 +1920,29 @@ static void InitGameEngine()
 	 EL_EMPTY);
     }
   }
+
+#if 0
+  /* ---------- initialize reference elements ------------------------------- */
+  for (i = 0; i < NUM_CUSTOM_ELEMENTS; i++)
+  {
+    int element = EL_CUSTOM_START + i;
+    struct ElementInfo *ei = &element_info[element];
+
+    for (y = 0; y < 3; y++) for (x = 0; x < 3; x++)
+      replace_reference_element(element, &ei->content.e[x][y]);
+
+    for (j = 0; j < ei->num_change_pages; j++)
+    {
+      struct ElementChangeInfo *change = &ei->change_page[j];
+
+      replace_reference_element(element, &change->target_element);
+      replace_reference_element(element, &change->trigger_element);
+
+      for (y = 0; y < 3; y++) for (x = 0; x < 3; x++)
+	replace_reference_element(element, &change->target_content.e[x][y]);
+    }
+  }
+#endif
 }
 
 int get_num_special_action(int element, int action_first, int action_last)
@@ -8719,7 +8768,7 @@ static boolean ChangeElement(int x, int y, int element, int page)
 	  ChangeEvent[ex][ey] = ChangeEvent[x][y];
 
 	  content_element = change->target_content.e[xx][yy];
-	  target_element = GET_TARGET_ELEMENT(content_element, change,
+	  target_element = GET_TARGET_ELEMENT(element, content_element, change,
 					      ce_value, ce_score);
 
 	  CreateElementFromChange(ex, ey, target_element);
@@ -8741,7 +8790,7 @@ static boolean ChangeElement(int x, int y, int element, int page)
   }
   else
   {
-    target_element = GET_TARGET_ELEMENT(change->target_element, change,
+    target_element = GET_TARGET_ELEMENT(element, change->target_element, change,
 					ce_value, ce_score);
 
     if (element == EL_DIAGONAL_GROWING ||

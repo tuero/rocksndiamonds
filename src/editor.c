@@ -4633,31 +4633,6 @@ static int *editor_el_custom_ptr = editor_el_custom;
 static int num_editor_hl_custom = SIZEOF_ARRAY_INT(editor_hl_custom);
 static int num_editor_el_custom = SIZEOF_ARRAY_INT(editor_el_custom);
 
-static int editor_hl_reference[] =
-{
-  EL_INTERNAL_CASCADE_REF_ACTIVE,
-  EL_CHAR('R'),
-  EL_CHAR('E'),
-  EL_CHAR('F')
-};
-
-static int editor_el_reference[] =
-{
-  EL_TRIGGER_PLAYER,
-  EL_TRIGGER_ELEMENT,
-  EL_TRIGGER_CE_VALUE,
-  EL_TRIGGER_CE_SCORE,
-
-  EL_EMPTY,
-  EL_EMPTY,
-  EL_CURRENT_CE_VALUE,
-  EL_CURRENT_CE_SCORE
-};
-static int *editor_hl_reference_ptr = editor_hl_reference;
-static int *editor_el_reference_ptr = editor_el_reference;
-static int num_editor_hl_reference = SIZEOF_ARRAY_INT(editor_hl_reference);
-static int num_editor_el_reference = SIZEOF_ARRAY_INT(editor_el_reference);
-
 static int editor_hl_group[] =
 {
   EL_INTERNAL_CASCADE_GE_ACTIVE,
@@ -4734,6 +4709,51 @@ static int *editor_hl_group_ptr = editor_hl_group;
 static int *editor_el_group_ptr = editor_el_group;
 static int num_editor_hl_group = SIZEOF_ARRAY_INT(editor_hl_group);
 static int num_editor_el_group = SIZEOF_ARRAY_INT(editor_el_group);
+
+static int editor_hl_reference[] =
+{
+  EL_INTERNAL_CASCADE_REF_ACTIVE,
+  EL_CHAR('R'),
+  EL_CHAR('E'),
+  EL_CHAR('F')
+};
+
+static int editor_el_reference[] =
+{
+  EL_TRIGGER_PLAYER,
+  EL_TRIGGER_ELEMENT,
+  EL_TRIGGER_CE_VALUE,
+  EL_TRIGGER_CE_SCORE,
+
+  EL_SELF,
+  EL_ANY_ELEMENT,
+  EL_CURRENT_CE_VALUE,
+  EL_CURRENT_CE_SCORE,
+
+  EL_LAST_CE_8,
+  EL_LAST_CE_7,
+  EL_LAST_CE_6,
+  EL_LAST_CE_5,
+
+  EL_LAST_CE_4,
+  EL_LAST_CE_3,
+  EL_LAST_CE_2,
+  EL_LAST_CE_1,
+
+  EL_NEXT_CE_1,
+  EL_NEXT_CE_2,
+  EL_NEXT_CE_3,
+  EL_NEXT_CE_4,
+
+  EL_NEXT_CE_5,
+  EL_NEXT_CE_6,
+  EL_NEXT_CE_7,
+  EL_NEXT_CE_8,
+};
+static int *editor_hl_reference_ptr = editor_hl_reference;
+static int *editor_el_reference_ptr = editor_el_reference;
+static int num_editor_hl_reference = SIZEOF_ARRAY_INT(editor_hl_reference);
+static int num_editor_el_reference = SIZEOF_ARRAY_INT(editor_el_reference);
 
 static int editor_hl_user_defined[] =
 {
@@ -4881,15 +4901,15 @@ editor_elements_info[] =
   },
   {
     &setup.editor.el_custom,
-    &setup.editor_cascade.el_ref,
-    &editor_hl_reference_ptr,		&num_editor_hl_reference,
-    &editor_el_reference_ptr,		&num_editor_el_reference
-  },
-  {
-    &setup.editor.el_custom,
     &setup.editor_cascade.el_ge,
     &editor_hl_group_ptr,		&num_editor_hl_group,
     &editor_el_group_ptr,		&num_editor_el_group
+  },
+  {
+    &setup.editor.el_custom,
+    &setup.editor_cascade.el_ref,
+    &editor_hl_reference_ptr,		&num_editor_hl_reference,
+    &editor_el_reference_ptr,		&num_editor_el_reference
   },
   {
     &setup.editor.el_user_defined,

@@ -2830,6 +2830,78 @@ element_to_graphic[] =
     IMG_CURRENT_CE_SCORE
   },
   {
+    EL_LAST_CE_1,			-1, -1, FALSE,
+    IMG_LAST_CE_1
+  },
+  {
+    EL_LAST_CE_2,			-1, -1, FALSE,
+    IMG_LAST_CE_2
+  },
+  {
+    EL_LAST_CE_3,			-1, -1, FALSE,
+    IMG_LAST_CE_3
+  },
+  {
+    EL_LAST_CE_4,			-1, -1, FALSE,
+    IMG_LAST_CE_4
+  },
+  {
+    EL_LAST_CE_5,			-1, -1, FALSE,
+    IMG_LAST_CE_5
+  },
+  {
+    EL_LAST_CE_6,			-1, -1, FALSE,
+    IMG_LAST_CE_6
+  },
+  {
+    EL_LAST_CE_7,			-1, -1, FALSE,
+    IMG_LAST_CE_7
+  },
+  {
+    EL_LAST_CE_8,			-1, -1, FALSE,
+    IMG_LAST_CE_8
+  },
+  {
+    EL_NEXT_CE_1,			-1, -1, FALSE,
+    IMG_NEXT_CE_1
+  },
+  {
+    EL_NEXT_CE_2,			-1, -1, FALSE,
+    IMG_NEXT_CE_2
+  },
+  {
+    EL_NEXT_CE_3,			-1, -1, FALSE,
+    IMG_NEXT_CE_3
+  },
+  {
+    EL_NEXT_CE_4,			-1, -1, FALSE,
+    IMG_NEXT_CE_4
+  },
+  {
+    EL_NEXT_CE_5,			-1, -1, FALSE,
+    IMG_NEXT_CE_5
+  },
+  {
+    EL_NEXT_CE_6,			-1, -1, FALSE,
+    IMG_NEXT_CE_6
+  },
+  {
+    EL_NEXT_CE_7,			-1, -1, FALSE,
+    IMG_NEXT_CE_7
+  },
+  {
+    EL_NEXT_CE_8,			-1, -1, FALSE,
+    IMG_NEXT_CE_8
+  },
+  {
+    EL_SELF,				-1, -1, FALSE,
+    IMG_SELF
+  },
+  {
+    EL_ANY_ELEMENT,			-1, -1, FALSE,
+    IMG_ANY_ELEMENT
+  },
+  {
     EL_EMC_KEY_5,			-1, -1, FALSE,
     IMG_EMC_KEY_5
   },

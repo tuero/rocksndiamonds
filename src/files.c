@@ -4870,6 +4870,7 @@ static void LoadLevel_InitVersion(struct LevelInfo *level, char *filename)
     }
   }
 
+#if 1
   /* try to detect and fix "Snake Bite" levels, which are broken with 3.2.0 */
   {
     int element = EL_CUSTOM_START + 255;
@@ -4891,6 +4892,7 @@ static void LoadLevel_InitVersion(struct LevelInfo *level, char *filename)
 	change->target_element == EL_SOKOBAN_FIELD_PLAYER)
       change->target_element = EL_PLAYER_1;
   }
+#endif
 }
 
 static void LoadLevel_InitElements(struct LevelInfo *level, char *filename)

@@ -3484,6 +3484,96 @@ struct ConfigInfo image_config[] =
   { "current_ce_score.ypos",			"12"			},
   { "current_ce_score.frames",			"1"			},
 
+  { "last_ce_1",				"RocksMore.pcx"		},
+  { "last_ce_1.xpos",				"0"			},
+  { "last_ce_1.ypos",				"7"			},
+  { "last_ce_1.frames",				"1"			},
+
+  { "last_ce_2",				"RocksMore.pcx"		},
+  { "last_ce_2.xpos",				"1"			},
+  { "last_ce_2.ypos",				"7"			},
+  { "last_ce_2.frames",				"1"			},
+
+  { "last_ce_3",				"RocksMore.pcx"		},
+  { "last_ce_3.xpos",				"2"			},
+  { "last_ce_3.ypos",				"7"			},
+  { "last_ce_3.frames",				"1"			},
+
+  { "last_ce_4",				"RocksMore.pcx"		},
+  { "last_ce_4.xpos",				"3"			},
+  { "last_ce_4.ypos",				"7"			},
+  { "last_ce_4.frames",				"1"			},
+
+  { "last_ce_5",				"RocksMore.pcx"		},
+  { "last_ce_5.xpos",				"4"			},
+  { "last_ce_5.ypos",				"7"			},
+  { "last_ce_5.frames",				"1"			},
+
+  { "last_ce_6",				"RocksMore.pcx"		},
+  { "last_ce_6.xpos",				"5"			},
+  { "last_ce_6.ypos",				"7"			},
+  { "last_ce_6.frames",				"1"			},
+
+  { "last_ce_7",				"RocksMore.pcx"		},
+  { "last_ce_7.xpos",				"6"			},
+  { "last_ce_7.ypos",				"7"			},
+  { "last_ce_7.frames",				"1"			},
+
+  { "last_ce_8",				"RocksMore.pcx"		},
+  { "last_ce_8.xpos",				"7"			},
+  { "last_ce_8.ypos",				"7"			},
+  { "last_ce_8.frames",				"1"			},
+
+  { "next_ce_1",				"RocksMore.pcx"		},
+  { "next_ce_1.xpos",				"0"			},
+  { "next_ce_1.ypos",				"8"			},
+  { "next_ce_1.frames",				"1"			},
+
+  { "next_ce_2",				"RocksMore.pcx"		},
+  { "next_ce_2.xpos",				"1"			},
+  { "next_ce_2.ypos",				"8"			},
+  { "next_ce_2.frames",				"1"			},
+
+  { "next_ce_3",				"RocksMore.pcx"		},
+  { "next_ce_3.xpos",				"2"			},
+  { "next_ce_3.ypos",				"8"			},
+  { "next_ce_3.frames",				"1"			},
+
+  { "next_ce_4",				"RocksMore.pcx"		},
+  { "next_ce_4.xpos",				"3"			},
+  { "next_ce_4.ypos",				"8"			},
+  { "next_ce_4.frames",				"1"			},
+
+  { "next_ce_5",				"RocksMore.pcx"		},
+  { "next_ce_5.xpos",				"4"			},
+  { "next_ce_5.ypos",				"8"			},
+  { "next_ce_5.frames",				"1"			},
+
+  { "next_ce_6",				"RocksMore.pcx"		},
+  { "next_ce_6.xpos",				"5"			},
+  { "next_ce_6.ypos",				"8"			},
+  { "next_ce_6.frames",				"1"			},
+
+  { "next_ce_7",				"RocksMore.pcx"		},
+  { "next_ce_7.xpos",				"6"			},
+  { "next_ce_7.ypos",				"8"			},
+  { "next_ce_7.frames",				"1"			},
+
+  { "next_ce_8",				"RocksMore.pcx"		},
+  { "next_ce_8.xpos",				"7"			},
+  { "next_ce_8.ypos",				"8"			},
+  { "next_ce_8.frames",				"1"			},
+
+  { "self",					"RocksMore.pcx"		},
+  { "self.xpos",				"8"			},
+  { "self.ypos",				"7"			},
+  { "self.frames",				"1"			},
+
+  { "any_element",				"RocksMore.pcx"		},
+  { "any_element.xpos",				"9"			},
+  { "any_element.ypos",				"7"			},
+  { "any_element.frames",			"1"			},
+
   { "emc_key_5",				"RocksEMC.pcx"		},
   { "emc_key_5.xpos",				"0"			},
   { "emc_key_5.ypos",				"5"			},

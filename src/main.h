@@ -715,8 +715,15 @@
 #define IS_IN_GROUP(e, nr)	(element_info[e].in_group[nr] == TRUE)
 #define IS_IN_GROUP_EL(e, ge)	(IS_IN_GROUP(e, (ge) - EL_GROUP_START))
 
+#if 1
+#define IS_EQUAL_OR_IN_GROUP(e, ge)					\
+	(ge == EL_ANY_ELEMENT ? TRUE :					\
+	 IS_GROUP_ELEMENT(ge) ? IS_IN_GROUP(e, GROUP_NR(ge)) : (e) == (ge))
+#else
 #define IS_EQUAL_OR_IN_GROUP(e, ge)					\
 	(IS_GROUP_ELEMENT(ge) ? IS_IN_GROUP(e, GROUP_NR(ge)) : (e) == (ge))
+#endif
+
 #endif
 
 #define IS_PLAYER(x, y)		(ELEM_IS_PLAYER(StorePlayer[x][y]))
@@ -1311,7 +1318,26 @@
 
 #define EL_BD_EXPANDABLE_WALL		713
 
-#define NUM_FILE_ELEMENTS		714
+#define EL_LAST_CE_8			714
+#define EL_LAST_CE_7			715
+#define EL_LAST_CE_6			716
+#define EL_LAST_CE_5			717
+#define EL_LAST_CE_4			718
+#define EL_LAST_CE_3			719
+#define EL_LAST_CE_2			720
+#define EL_LAST_CE_1			721
+#define EL_SELF				722
+#define EL_NEXT_CE_1			723
+#define EL_NEXT_CE_2			724
+#define EL_NEXT_CE_3			725
+#define EL_NEXT_CE_4			726
+#define EL_NEXT_CE_5			727
+#define EL_NEXT_CE_6			728
+#define EL_NEXT_CE_7			729
+#define EL_NEXT_CE_8			730
+#define EL_ANY_ELEMENT			731
+
+#define NUM_FILE_ELEMENTS		732
 
 
 /* "real" (and therefore drawable) runtime elements */

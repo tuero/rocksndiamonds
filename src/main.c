@@ -3696,6 +3696,96 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
     "wall",
     "growing wall (horizontal, BD style)"
   },
+  {
+    "last_ce_8",
+    "last_ce",
+    "CE 8 positions earlier in list"
+  },
+  {
+    "last_ce_7",
+    "last_ce",
+    "CE 7 positions earlier in list"
+  },
+  {
+    "last_ce_6",
+    "last_ce",
+    "CE 6 positions earlier in list"
+  },
+  {
+    "last_ce_5",
+    "last_ce",
+    "CE 5 positions earlier in list"
+  },
+  {
+    "last_ce_4",
+    "last_ce",
+    "CE 4 positions earlier in list"
+  },
+  {
+    "last_ce_3",
+    "last_ce",
+    "CE 3 positions earlier in list"
+  },
+  {
+    "last_ce_2",
+    "last_ce",
+    "CE 2 positions earlier in list"
+  },
+  {
+    "last_ce_1",
+    "last_ce",
+    "CE 1 position earlier in list"
+  },
+  {
+    "self",
+    "self",
+    "the current custom element"
+  },
+  {
+    "next_ce_1",
+    "next_ce",
+    "CE 1 position later in list"
+  },
+  {
+    "next_ce_2",
+    "next_ce",
+    "CE 2 positions later in list"
+  },
+  {
+    "next_ce_3",
+    "next_ce",
+    "CE 3 positions later in list"
+  },
+  {
+    "next_ce_4",
+    "next_ce",
+    "CE 4 positions later in list"
+  },
+  {
+    "next_ce_5",
+    "next_ce",
+    "CE 5 positions later in list"
+  },
+  {
+    "next_ce_6",
+    "next_ce",
+    "CE 6 positions later in list"
+  },
+  {
+    "next_ce_7",
+    "next_ce",
+    "CE 7 positions later in list"
+  },
+  {
+    "next_ce_8",
+    "next_ce",
+    "CE 8 positions later in list"
+  },
+  {
+    "any_element",
+    "any_element",
+    "this element matches any element"
+  },
 
   /* ----------------------------------------------------------------------- */
   /* "real" (and therefore drawable) runtime elements                        */
