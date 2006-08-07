@@ -912,7 +912,36 @@ void RedrawPlayfield_EM(boolean force_redraw)
 			    sy - offset_y > screen_y ? sy - offset_y :
 			    screen_y);
 
+#if 0
+  printf("::: (%d, %d) => (%d, %d) [(%d, %d), (%d, %d)] [%d, %d] [%d / %d]\n",
+	 screen_x_old, screen_y_old,
+	 screen_x, screen_y,
+	 ply[max_center_distance_player_nr].oldx,
+	 ply[max_center_distance_player_nr].x,
+	 ply[max_center_distance_player_nr].oldy,
+	 ply[max_center_distance_player_nr].y,
+	 sx, sy,
+	 ABS(screen_x - screen_x_old),
+	 ABS(screen_y - screen_y_old));
+#endif
+
 #if 1
+
+#if 1
+  /* prevent scrolling further than double player step size when scrolling */
+  if (ABS(screen_x - screen_x_old) > 2 * stepsize)
+  {
+    int dx = SIGN(screen_x - screen_x_old);
+
+    screen_x = screen_x_old + dx * 2 * stepsize;
+  }
+  if (ABS(screen_y - screen_y_old) > 2 * stepsize)
+  {
+    int dy = SIGN(screen_y - screen_y_old);
+
+    screen_y = screen_y_old + dy * 2 * stepsize;
+  }
+#else
   /* prevent scrolling further than double player step size when scrolling */
   if (ABS(screen_x - screen_x_old) > 2 * stepsize ||
       ABS(screen_y - screen_y_old) > 2 * stepsize)
@@ -923,6 +952,8 @@ void RedrawPlayfield_EM(boolean force_redraw)
     screen_x = screen_x_old + dx * 2 * stepsize;
     screen_y = screen_y_old + dy * 2 * stepsize;
   }
+#endif
+
 #else
   /* prevent scrolling further than player step size when scrolling */
   if (ABS(screen_x - screen_x_old) > stepsize ||

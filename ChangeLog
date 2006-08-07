@@ -1,3 +1,6 @@
+2006-08-07
+	* fixed bug with bumpy scrolling with EM engine in double player mode
+
 2006-08-05
 	* added compatibility code to fix "Snake Bite" style levels that were
 	  broken due to a bugfix regarding EL_SOKOBAN_FIELD_PLAYER in 3.2.0
