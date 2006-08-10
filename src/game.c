@@ -1366,6 +1366,7 @@ void DrawAllGameValues(int emeralds, int dynamite, int score, int time,
 
 void DrawGameDoorValues()
 {
+  int time_value = (level.time == 0 ? TimePlayed : TimeLeft);
   int dynamite_state = 0;
   int key_bits = 0;
   int i, j;
@@ -1414,7 +1415,7 @@ void DrawGameDoorValues()
   }
 
   DrawAllGameValues(local_player->gems_still_needed, dynamite_state,
-		    local_player->score, TimeLeft, key_bits);
+		    local_player->score, time_value, key_bits);
 #endif
 }
 

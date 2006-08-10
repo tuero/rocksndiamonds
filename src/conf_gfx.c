@@ -4548,6 +4548,9 @@ struct ConfigInfo image_config[] =
   { "door_2.anim_mode",				"default"		},
 
 #if DEBUG
+  { "preview.x",				"-1"			},
+  { "preview.y",				"-1"			},
+
   { "game.level.x",				"-1"			},
   { "game.level.y",				"-1"			},
   { "game.gems.x",				"-1"			},
