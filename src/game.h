@@ -20,8 +20,21 @@
 #define MAX_NUM_KEYS		8
 
 
+struct GamePanelInfo
+{
+  struct XY level;
+  struct XY gems;
+  struct XY inventory;
+  struct XY keys;
+  struct XY score;
+  struct XY time;
+};
+
 struct GameInfo
 {
+  /* values for control panel */
+  struct GamePanelInfo panel;
+
   /* values for engine initialization */
   int default_push_delay_fixed;
   int default_push_delay_random;

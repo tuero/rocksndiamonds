@@ -1,5 +1,6 @@
 2006-08-12
 	* added configurable level preview position, tile size and dimensions
+	* added configurable game panel value positions (gems, time, score etc.)
 
 2006-08-10
 	* fixed small bug with time displayed incorrectly when collecting CEs

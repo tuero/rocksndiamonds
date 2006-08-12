@@ -82,11 +82,6 @@ struct MouseCursorInfo
   char mask[CURSOR_MAX_WIDTH * CURSOR_MAX_HEIGHT / 8];
 };
 
-struct XY
-{
-  short x, y;
-};
-
 
 /* SDL symbol definitions */
 

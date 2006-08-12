@@ -2343,6 +2343,7 @@ struct HelpAnimInfo
 
 extern Bitmap		       *bitmap_db_title;
 extern Bitmap		       *bitmap_db_field;
+extern Bitmap		       *bitmap_db_panel;
 extern Bitmap		       *bitmap_db_door;
 extern Pixmap			tile_clipmask[];
 extern DrawBuffer	       *fieldbuffer;

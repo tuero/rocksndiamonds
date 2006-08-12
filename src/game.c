@@ -77,6 +77,28 @@
 #define EX_TYPE_DYNA		(1 << 4)
 #define EX_TYPE_SINGLE_TILE	(EX_TYPE_CENTER | EX_TYPE_BORDER)
 
+#if 1
+
+#define	PANEL_DEACTIVATED(p)	((p).x < 0 || (p).y < 0)
+
+/* special positions in the game control window (relative to control window) */
+#define XX_LEVEL1		(game.panel.level.x)
+#define XX_LEVEL2		(game.panel.level.x - 1)
+#define YY_LEVEL		(game.panel.level.y)
+#define XX_EMERALDS		(game.panel.gems.x)
+#define YY_EMERALDS		(game.panel.gems.y)
+#define XX_DYNAMITE		(game.panel.inventory.x)
+#define YY_DYNAMITE		(game.panel.inventory.y)
+#define XX_KEYS			(game.panel.keys.x)
+#define YY_KEYS			(game.panel.keys.y)
+#define XX_SCORE		(game.panel.score.x)
+#define YY_SCORE		(game.panel.score.y)
+#define XX_TIME1		(game.panel.time.x)
+#define XX_TIME2		(game.panel.time.x + 1)
+#define YY_TIME			(game.panel.time.y)
+
+#else
+
 /* special positions in the game control window (relative to control window) */
 #define XX_LEVEL		37
 #define YY_LEVEL		20
@@ -92,8 +114,11 @@
 #define XX_TIME2		30
 #define YY_TIME			194
 
+#endif
+
 /* special positions in the game control window (relative to main window) */
-#define DX_LEVEL		(DX + XX_LEVEL)
+#define DX_LEVEL1		(DX + XX_LEVEL1)
+#define DX_LEVEL2		(DX + XX_LEVEL2)
 #define DY_LEVEL		(DY + YY_LEVEL)
 #define DX_EMERALDS		(DX + XX_EMERALDS)
 #define DY_EMERALDS		(DY + YY_EMERALDS)
@@ -1268,12 +1293,18 @@ inline void DrawGameValue_Emeralds(int value)
 {
   int xpos = (3 * 14 - 3 * getFontWidth(FONT_TEXT_2)) / 2;
 
+  if (PANEL_DEACTIVATED(game.panel.gems))
+    return;
+
   DrawText(DX_EMERALDS + xpos, DY_EMERALDS, int2str(value, 3), FONT_TEXT_2);
 }
 
 inline void DrawGameValue_Dynamite(int value)
 {
   int xpos = (3 * 14 - 3 * getFontWidth(FONT_TEXT_2)) / 2;
+
+  if (PANEL_DEACTIVATED(game.panel.inventory))
+    return;
 
   DrawText(DX_DYNAMITE + xpos, DY_DYNAMITE, int2str(value, 3), FONT_TEXT_2);
 }
@@ -1283,25 +1314,32 @@ inline void DrawGameValue_Keys(int key[MAX_NUM_KEYS])
   int base_key_graphic = EL_KEY_1;
   int i;
 
+  if (PANEL_DEACTIVATED(game.panel.keys))
+    return;
+
   if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
     base_key_graphic = EL_EM_KEY_1;
 
   /* currently only 4 of 8 possible keys are displayed */
   for (i = 0; i < STD_NUM_KEYS; i++)
   {
+    int x = XX_KEYS + i * MINI_TILEX;
+    int y = YY_KEYS;
+
     if (key[i])
-      DrawMiniGraphicExt(drawto, DX_KEYS + i * MINI_TILEX, DY_KEYS,
-			 el2edimg(base_key_graphic + i));
+      DrawMiniGraphicExt(drawto, DX + x,DY + y, el2edimg(base_key_graphic + i));
     else
       BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
-		 DOOR_GFX_PAGEX5 + XX_KEYS + i * MINI_TILEX, YY_KEYS,
-		 MINI_TILEX, MINI_TILEY, DX_KEYS + i * MINI_TILEX, DY_KEYS);
+		 DOOR_GFX_PAGEX5 + x, y, MINI_TILEX, MINI_TILEY, DX + x,DY + y);
   }
 }
 
 inline void DrawGameValue_Score(int value)
 {
   int xpos = (5 * 14 - 5 * getFontWidth(FONT_TEXT_2)) / 2;
+
+  if (PANEL_DEACTIVATED(game.panel.score))
+    return;
 
   DrawText(DX_SCORE + xpos, DY_SCORE, int2str(value, 5), FONT_TEXT_2);
 }
@@ -1311,9 +1349,12 @@ inline void DrawGameValue_Time(int value)
   int xpos3 = (3 * 14 - 3 * getFontWidth(FONT_TEXT_2)) / 2;
   int xpos4 = (4 * 10 - 4 * getFontWidth(FONT_LEVEL_NUMBER)) / 2;
 
+  if (PANEL_DEACTIVATED(game.panel.time))
+    return;
+
   /* clear background if value just changed its size */
   if (value == 999 || value == 1000)
-    ClearRectangle(drawto, DX_TIME1, DY_TIME, 14 * 3, 14);
+    ClearRectangleOnBackground(drawto, DX_TIME1, DY_TIME, 14 * 3, 14);
 
   if (value < 1000)
     DrawText(DX_TIME1 + xpos3, DY_TIME, int2str(value, 3), FONT_TEXT_2);
@@ -1323,9 +1364,15 @@ inline void DrawGameValue_Time(int value)
 
 inline void DrawGameValue_Level(int value)
 {
+  if (PANEL_DEACTIVATED(game.panel.level))
+    return;
+
   if (level_nr < 100)
-    DrawText(DX_LEVEL, DY_LEVEL, int2str(value, 2), FONT_TEXT_2);
+    DrawText(DX_LEVEL1, DY_LEVEL, int2str(value, 2), FONT_TEXT_2);
   else
+#if 1
+    DrawText(DX_LEVEL2, DY_LEVEL, int2str(value, 3), FONT_LEVEL_NUMBER);
+#else
   {
     /* misuse area for displaying emeralds to draw bigger level number */
     DrawTextExt(drawto, DX_EMERALDS, DY_EMERALDS,
@@ -1343,6 +1390,7 @@ inline void DrawGameValue_Level(int value)
 
     /* yes, this is all really ugly :-) */
   }
+#endif
 }
 
 void DrawAllGameValues(int emeralds, int dynamite, int score, int time,
@@ -2605,6 +2653,11 @@ void InitGame()
     BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
 	       DOOR_GFX_PAGEX5, DOOR_GFX_PAGEY1, DXSIZE, DYSIZE, DX, DY);
   }
+
+#if 1
+  SetPanelBackground();
+  SetDrawBackgroundMask(REDRAW_DOOR_1);
+#endif
 
   DrawGameDoorValues();
 

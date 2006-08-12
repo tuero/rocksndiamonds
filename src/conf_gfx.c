@@ -4555,24 +4555,18 @@ struct ConfigInfo image_config[] =
   { "preview.step_offset",			"1"			},
   { "preview.step_delay",			"50"			},
 
-#if DEBUG
-  { "game.level.x",				"-1"			},
-  { "game.level.y",				"-1"			},
-  { "game.gems.x",				"-1"			},
-  { "game.gems.y",				"-1"			},
-  { "game.bombs.x",				"-1"			},
-  { "game.bombs.y",				"-1"			},
-  { "game.keys.x",				"-1"			},
-  { "game.keys.y",				"-1"			},
-  { "game.score.x",				"-1"			},
-  { "game.score.y",				"-1"			},
-  { "game.time.x",				"-1"			},
-  { "game.time.y",				"-1"			},
-#if 0
-  { "game.tape.x",				"-1"			},
-  { "game.tape.y",				"-1"			},
-#endif
-#endif
+  { "game.panel.level.x",			"37"			},
+  { "game.panel.level.y",			"20"			},
+  { "game.panel.gems.x",			"29"			},
+  { "game.panel.gems.y",			"54"			},
+  { "game.panel.inventory.x",			"29"			},
+  { "game.panel.inventory.y",			"89"			},
+  { "game.panel.keys.x",			"18"			},
+  { "game.panel.keys.y",			"123"			},
+  { "game.panel.score.x",			"15"			},
+  { "game.panel.score.y",			"159"			},
+  { "game.panel.time.x",			"29"			},
+  { "game.panel.time.y",			"194"			},
 
   { "[player].boring_delay_fixed",		"1000"			},
   { "[player].boring_delay_random",		"1000"			},

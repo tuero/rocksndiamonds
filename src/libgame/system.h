@@ -979,6 +979,11 @@ struct ArtworkListInfo
   void (*free_artwork)(void *);			/* destructor function */
 };
 
+struct XY
+{
+  int x, y;
+};
+
 
 /* ========================================================================= */
 /* exported variables                                                        */

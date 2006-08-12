@@ -22,6 +22,7 @@
 
 Bitmap		       *bitmap_db_title;
 Bitmap		       *bitmap_db_field;
+Bitmap		       *bitmap_db_panel;
 Bitmap		       *bitmap_db_door;
 DrawBuffer	       *fieldbuffer;
 DrawBuffer	       *drawto_field;
@@ -4681,6 +4682,19 @@ struct TokenIntPtrInfo image_config_vars[] =
   { "preview.tile_size",	&preview.tile_size			    },
   { "preview.step_offset",	&preview.step_offset			    },
   { "preview.step_delay",	&preview.step_delay			    },
+
+  { "game.panel.level.x",	&game.panel.level.x			    },
+  { "game.panel.level.y",	&game.panel.level.y			    },
+  { "game.panel.gems.x",	&game.panel.gems.x			    },
+  { "game.panel.gems.y",	&game.panel.gems.y			    },
+  { "game.panel.inventory.x",	&game.panel.inventory.x			    },
+  { "game.panel.inventory.y",	&game.panel.inventory.y			    },
+  { "game.panel.keys.x",	&game.panel.keys.x			    },
+  { "game.panel.keys.y",	&game.panel.keys.y			    },
+  { "game.panel.score.x",	&game.panel.score.x			    },
+  { "game.panel.score.y",	&game.panel.score.y			    },
+  { "game.panel.time.x",	&game.panel.time.x			    },
+  { "game.panel.time.y",	&game.panel.time.y			    },
 
   { "[player].boring_delay_fixed",	&game.player_boring_delay_fixed     },
   { "[player].boring_delay_random",	&game.player_boring_delay_random    },

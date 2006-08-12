@@ -75,6 +75,7 @@ void ClearWindow();
 void SetMainBackgroundImageIfDefined(int);
 void SetMainBackgroundImage(int);
 void SetDoorBackgroundImage(int);
+void SetPanelBackground();
 void DrawBackground(int, int, int, int);
 
 void MarkTileDirty(int, int);

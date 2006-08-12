@@ -480,6 +480,14 @@ void SetDoorBackgroundImage(int graphic)
 			  graphic_info[IMG_BACKGROUND].bitmap);
 }
 
+void SetPanelBackground()
+{
+  BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, bitmap_db_panel,
+             DOOR_GFX_PAGEX5, DOOR_GFX_PAGEY1, DXSIZE, DYSIZE, 0, 0);
+
+  SetDoorBackgroundBitmap(bitmap_db_panel);
+}
+
 void DrawBackground(int dst_x, int dst_y, int width, int height)
 {
   ClearRectangleOnBackground(backbuffer, dst_x, dst_y, width, height);
@@ -2306,6 +2314,10 @@ boolean Request(char *text, unsigned int req_state)
 	       DOOR_GFX_PAGEX2, DOOR_GFX_PAGEY1);
   }
 
+#if 1
+  SetDoorBackgroundImage(IMG_BACKGROUND_DOOR);
+#endif
+
   SetDrawBackgroundMask(REDRAW_FIELD | REDRAW_DOOR_1);
 
   /* clear door drawing field */
@@ -2375,7 +2387,15 @@ boolean Request(char *text, unsigned int req_state)
 
   if (!(req_state & REQUEST_WAIT_FOR_INPUT))
   {
-    SetDrawBackgroundMask(REDRAW_FIELD);
+    if (game_status == GAME_MODE_PLAYING)
+    {
+      SetPanelBackground();
+      SetDrawBackgroundMask(REDRAW_DOOR_1);
+    }
+    else
+    {
+      SetDrawBackgroundMask(REDRAW_FIELD);
+    }
 
     return FALSE;
   }
@@ -2520,7 +2540,15 @@ boolean Request(char *text, unsigned int req_state)
 
   RemapAllGadgets();
 
-  SetDrawBackgroundMask(REDRAW_FIELD);
+  if (game_status == GAME_MODE_PLAYING)
+  {
+    SetPanelBackground();
+    SetDrawBackgroundMask(REDRAW_DOOR_1);
+  }
+  else
+  {
+    SetDrawBackgroundMask(REDRAW_FIELD);
+  }
 
 #if defined(NETWORK_AVALIABLE)
   /* continue network game after request */
