@@ -109,6 +109,7 @@ struct GameInfo		game;
 struct GlobalInfo	global;
 struct MenuInfo		menu;
 struct DoorInfo		door_1, door_2;
+struct PreviewInfo	preview;
 struct GraphicInfo     *graphic_info = NULL;
 struct SoundInfo       *sound_info = NULL;
 struct MusicInfo       *music_info = NULL;
@@ -4638,47 +4639,55 @@ struct SpecialSuffixInfo special_suffix_info[NUM_SPECIAL_GFX_ARGS + 1 + 1] =
 
 struct TokenIntPtrInfo image_config_vars[] =
 {
-  { "global.num_toons",		&global.num_toons			   },
+  { "global.num_toons",		&global.num_toons			    },
 
-  { "menu.draw_xoffset",	&menu.draw_xoffset[GFX_SPECIAL_ARG_DEFAULT]},
-  { "menu.draw_yoffset",	&menu.draw_yoffset[GFX_SPECIAL_ARG_DEFAULT]},
-  { "menu.draw_xoffset.MAIN",	&menu.draw_xoffset[GFX_SPECIAL_ARG_MAIN]   },
-  { "menu.draw_yoffset.MAIN",	&menu.draw_yoffset[GFX_SPECIAL_ARG_MAIN]   },
-  { "menu.draw_xoffset.LEVELS",	&menu.draw_xoffset[GFX_SPECIAL_ARG_LEVELS] },
-  { "menu.draw_yoffset.LEVELS",	&menu.draw_yoffset[GFX_SPECIAL_ARG_LEVELS] },
-  { "menu.draw_xoffset.SCORES",	&menu.draw_xoffset[GFX_SPECIAL_ARG_SCORES] },
-  { "menu.draw_yoffset.SCORES",	&menu.draw_yoffset[GFX_SPECIAL_ARG_SCORES] },
-  { "menu.draw_xoffset.EDITOR",	&menu.draw_xoffset[GFX_SPECIAL_ARG_EDITOR] },
-  { "menu.draw_yoffset.EDITOR",	&menu.draw_yoffset[GFX_SPECIAL_ARG_EDITOR] },
-  { "menu.draw_xoffset.INFO",	&menu.draw_xoffset[GFX_SPECIAL_ARG_INFO]   },
-  { "menu.draw_yoffset.INFO",	&menu.draw_yoffset[GFX_SPECIAL_ARG_INFO]   },
-  { "menu.draw_xoffset.SETUP",	&menu.draw_xoffset[GFX_SPECIAL_ARG_SETUP]  },
-  { "menu.draw_yoffset.SETUP",	&menu.draw_yoffset[GFX_SPECIAL_ARG_SETUP]  },
+  { "menu.draw_xoffset",	&menu.draw_xoffset[GFX_SPECIAL_ARG_DEFAULT] },
+  { "menu.draw_yoffset",	&menu.draw_yoffset[GFX_SPECIAL_ARG_DEFAULT] },
+  { "menu.draw_xoffset.MAIN",	&menu.draw_xoffset[GFX_SPECIAL_ARG_MAIN]    },
+  { "menu.draw_yoffset.MAIN",	&menu.draw_yoffset[GFX_SPECIAL_ARG_MAIN]    },
+  { "menu.draw_xoffset.LEVELS",	&menu.draw_xoffset[GFX_SPECIAL_ARG_LEVELS]  },
+  { "menu.draw_yoffset.LEVELS",	&menu.draw_yoffset[GFX_SPECIAL_ARG_LEVELS]  },
+  { "menu.draw_xoffset.SCORES",	&menu.draw_xoffset[GFX_SPECIAL_ARG_SCORES]  },
+  { "menu.draw_yoffset.SCORES",	&menu.draw_yoffset[GFX_SPECIAL_ARG_SCORES]  },
+  { "menu.draw_xoffset.EDITOR",	&menu.draw_xoffset[GFX_SPECIAL_ARG_EDITOR]  },
+  { "menu.draw_yoffset.EDITOR",	&menu.draw_yoffset[GFX_SPECIAL_ARG_EDITOR]  },
+  { "menu.draw_xoffset.INFO",	&menu.draw_xoffset[GFX_SPECIAL_ARG_INFO]    },
+  { "menu.draw_yoffset.INFO",	&menu.draw_yoffset[GFX_SPECIAL_ARG_INFO]    },
+  { "menu.draw_xoffset.SETUP",	&menu.draw_xoffset[GFX_SPECIAL_ARG_SETUP]   },
+  { "menu.draw_yoffset.SETUP",	&menu.draw_yoffset[GFX_SPECIAL_ARG_SETUP]   },
 
-  { "menu.scrollbar_xoffset",	&menu.scrollbar_xoffset			   },
+  { "menu.scrollbar_xoffset",	&menu.scrollbar_xoffset			    },
 
-  { "menu.list_size",		&menu.list_size[GFX_SPECIAL_ARG_DEFAULT]   },
-  { "menu.list_size.LEVELS",	&menu.list_size[GFX_SPECIAL_ARG_LEVELS]	   },
-  { "menu.list_size.SCORES",	&menu.list_size[GFX_SPECIAL_ARG_SCORES]	   },
-  { "menu.list_size.INFO",	&menu.list_size[GFX_SPECIAL_ARG_INFO]	   },
+  { "menu.list_size",		&menu.list_size[GFX_SPECIAL_ARG_DEFAULT]    },
+  { "menu.list_size.LEVELS",	&menu.list_size[GFX_SPECIAL_ARG_LEVELS]	    },
+  { "menu.list_size.SCORES",	&menu.list_size[GFX_SPECIAL_ARG_SCORES]	    },
+  { "menu.list_size.INFO",	&menu.list_size[GFX_SPECIAL_ARG_INFO]	    },
 
-  { "door_1.width",		&door_1.width				   },
-  { "door_1.height",		&door_1.height				   },
-  { "door_1.step_offset",	&door_1.step_offset			   },
-  { "door_1.step_delay",	&door_1.step_delay			   },
-  { "door_1.anim_mode",		&door_1.anim_mode			   },
-  { "door_2.width",		&door_2.width				   },
-  { "door_2.height",		&door_2.height				   },
-  { "door_2.step_offset",	&door_2.step_offset			   },
-  { "door_2.step_delay",	&door_2.step_delay			   },
-  { "door_2.anim_mode",		&door_2.anim_mode			   },
+  { "door_1.width",		&door_1.width				    },
+  { "door_1.height",		&door_1.height				    },
+  { "door_1.step_offset",	&door_1.step_offset			    },
+  { "door_1.step_delay",	&door_1.step_delay			    },
+  { "door_1.anim_mode",		&door_1.anim_mode			    },
+  { "door_2.width",		&door_2.width				    },
+  { "door_2.height",		&door_2.height				    },
+  { "door_2.step_offset",	&door_2.step_offset			    },
+  { "door_2.step_delay",	&door_2.step_delay			    },
+  { "door_2.anim_mode",		&door_2.anim_mode			    },
 
-  { "[player].boring_delay_fixed",	&game.player_boring_delay_fixed    },
-  { "[player].boring_delay_random",	&game.player_boring_delay_random   },
-  { "[player].sleeping_delay_fixed",	&game.player_sleeping_delay_fixed  },
-  { "[player].sleeping_delay_random",	&game.player_sleeping_delay_random },
+  { "preview.x",		&preview.x				    },
+  { "preview.y",		&preview.y				    },
+  { "preview.xsize",		&preview.xsize				    },
+  { "preview.ysize",		&preview.ysize				    },
+  { "preview.tile_size",	&preview.tile_size			    },
+  { "preview.step_offset",	&preview.step_offset			    },
+  { "preview.step_delay",	&preview.step_delay			    },
 
-  { NULL,			NULL,					   }
+  { "[player].boring_delay_fixed",	&game.player_boring_delay_fixed     },
+  { "[player].boring_delay_random",	&game.player_boring_delay_random    },
+  { "[player].sleeping_delay_fixed",	&game.player_sleeping_delay_fixed   },
+  { "[player].sleeping_delay_random",	&game.player_sleeping_delay_random  },
+
+  { NULL,			NULL,					    }
 };
 
 

@@ -295,7 +295,7 @@ void InitFontGraphicInfo()
       if (graphic_info[graphic].anim_frames < MIN_NUM_CHARS_PER_FONT)
       {
 	graphic_info[graphic].anim_frames = DEFAULT_NUM_CHARS_PER_FONT;
-	graphic_info[graphic].anim_frames_per_line= DEFAULT_NUM_CHARS_PER_LINE;
+	graphic_info[graphic].anim_frames_per_line = DEFAULT_NUM_CHARS_PER_LINE;
       }
 
       /* copy font relevant information from graphics information */

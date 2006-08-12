@@ -4547,10 +4547,15 @@ struct ConfigInfo image_config[] =
   { "door_2.step_delay",			"10"			},
   { "door_2.anim_mode",				"default"		},
 
-#if DEBUG
-  { "preview.x",				"-1"			},
-  { "preview.y",				"-1"			},
+  { "preview.x",				"148"			},
+  { "preview.y",				"388"			},
+  { "preview.xsize",				"66"			},
+  { "preview.ysize",				"34"			},
+  { "preview.tile_size",			"4"			},
+  { "preview.step_offset",			"1"			},
+  { "preview.step_delay",			"50"			},
 
+#if DEBUG
   { "game.level.x",				"-1"			},
   { "game.level.y",				"-1"			},
   { "game.gems.x",				"-1"			},

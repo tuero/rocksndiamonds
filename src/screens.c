@@ -425,7 +425,7 @@ static void DrawMainMenuExt(int fade_delay)
 #endif
 #endif
 
-  DrawMicroLevel(MICROLEVEL_XPOS, MICROLEVEL_YPOS, TRUE);
+  DrawPreviewLevel(TRUE);
 
 #if 1
 
@@ -728,13 +728,13 @@ void HandleMainMenu_SelectLevel(int step, int direction)
     DrawText(mSX + 11 * 32, mSY + 3 * 32, int2str(level_nr, 3), FONT_VALUE_1);
 
     LoadLevel(level_nr);
-    DrawMicroLevel(MICROLEVEL_XPOS, MICROLEVEL_YPOS, TRUE);
+    DrawPreviewLevel(TRUE);
 
     TapeErase();
     LoadTape(level_nr);
     DrawCompleteVideoDisplay();
 
-    /* needed because DrawMicroLevel() takes some time */
+    /* needed because DrawPreviewLevel() takes some time */
     BackToFront();
     SyncDisplay();
   }
@@ -824,13 +824,13 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 	       FONT_VALUE_1);
 
       LoadLevel(level_nr);
-      DrawMicroLevel(MICROLEVEL_XPOS, MICROLEVEL_YPOS, TRUE);
+      DrawPreviewLevel(TRUE);
 
       TapeErase();
       LoadTape(level_nr);
       DrawCompleteVideoDisplay();
 
-      /* needed because DrawMicroLevel() takes some time */
+      /* needed because DrawPreviewLevel() takes some time */
       BackToFront();
       SyncDisplay();
 
@@ -920,7 +920,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 
   if (game_status == GAME_MODE_MAIN)
   {
-    DrawMicroLevel(MICROLEVEL_XPOS, MICROLEVEL_YPOS, FALSE);
+    DrawPreviewLevel(FALSE);
     DoAnimation();
   }
 }

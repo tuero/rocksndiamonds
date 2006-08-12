@@ -44,8 +44,6 @@ static int el_act2crm(int, int);
 static struct GadgetInfo *tool_gadget[NUM_TOOL_BUTTONS];
 static int request_gadget_id = -1;
 
-static int preview_tilesize = TILEX / 4;
-
 static char *print_if_not_empty(int element)
 {
   static char *s = NULL;
@@ -1482,19 +1480,6 @@ void ShowEnvelope(int envelope_nr)
   BackToFront();
 }
 
-void getMicroGraphicSource(int graphic, Bitmap **bitmap, int *x, int *y)
-{
-  Bitmap *src_bitmap = graphic_info[graphic].bitmap;
-  int mini_startx = src_bitmap->width * 3 / 4;
-  int mini_starty = src_bitmap->height * 2 / 3;
-  int src_x = mini_startx + graphic_info[graphic].src_x / 8;
-  int src_y = mini_starty + graphic_info[graphic].src_y / 8;
-
-  *bitmap = src_bitmap;
-  *x = src_x;
-  *y = src_y;
-}
-
 void getPreviewGraphicSource(int graphic, Bitmap **bitmap, int *x, int *y,
 			     int tilesize)
 {
@@ -1526,25 +1511,14 @@ void getPreviewGraphicSource(int graphic, Bitmap **bitmap, int *x, int *y,
   *y = src_y;
 }
 
-void DrawMicroElement(int xpos, int ypos, int element)
-{
-  Bitmap *src_bitmap;
-  int src_x, src_y;
-  int graphic = el2preimg(element);
-
-  getMicroGraphicSource(graphic, &src_bitmap, &src_x, &src_y);
-  BlitBitmap(src_bitmap, drawto, src_x, src_y, MICRO_TILEX, MICRO_TILEY,
-	     xpos, ypos);
-}
-
-void DrawPreviewElement(int xpos, int ypos, int element, int tilesize)
+void DrawPreviewElement(int dst_x, int dst_y, int element, int tilesize)
 {
   Bitmap *src_bitmap;
   int src_x, src_y;
   int graphic = el2preimg(element);
 
   getPreviewGraphicSource(graphic, &src_bitmap, &src_x, &src_y, tilesize);
-  BlitBitmap(src_bitmap, drawto, src_x, src_y, tilesize, tilesize, xpos, ypos);
+  BlitBitmap(src_bitmap, drawto, src_x, src_y, tilesize, tilesize, dst_x,dst_y);
 }
 
 void DrawLevel()
@@ -1572,34 +1546,36 @@ void DrawMiniLevel(int size_x, int size_y, int scroll_x, int scroll_y)
   redraw_mask |= REDRAW_FIELD;
 }
 
-static void DrawMicroLevelExt(int xpos, int ypos, int from_x, int from_y)
+static void DrawPreviewLevelExt(int from_x, int from_y)
 {
   boolean show_level_border = (BorderElement != EL_EMPTY);
-  int level_size_x = lev_fieldx + (show_level_border ? 2 : 0);
-  int level_size_y = lev_fieldy + (show_level_border ? 2 : 0);
-  int preview_size_x = MICROLEVEL_XSIZE / preview_tilesize;
-  int preview_size_y = MICROLEVEL_YSIZE / preview_tilesize;
-  int real_preview_size_x = MIN(level_size_x, preview_size_x);
-  int real_preview_size_y = MIN(level_size_y, preview_size_y);
+  int dst_x = preview.x;
+  int dst_y = preview.y;
+  int level_xsize = lev_fieldx + (show_level_border ? 2 : 0);
+  int level_ysize = lev_fieldy + (show_level_border ? 2 : 0);
+  int tile_size = preview.tile_size;
+  int preview_width  = preview.xsize * tile_size;
+  int preview_height = preview.ysize * tile_size;
+  int real_preview_xsize = MIN(level_xsize, preview.xsize);
+  int real_preview_ysize = MIN(level_ysize, preview.ysize);
   int x, y;
 
-  DrawBackground(xpos, ypos, MICROLEVEL_XSIZE, MICROLEVEL_YSIZE);
+  DrawBackground(dst_x, dst_y, preview_width, preview_height);
 
-  xpos += (MICROLEVEL_XSIZE - real_preview_size_x * preview_tilesize) / 2;
-  ypos += (MICROLEVEL_YSIZE - real_preview_size_y * preview_tilesize) / 2;
+  dst_x += (preview_width  - real_preview_xsize * tile_size) / 2;
+  dst_y += (preview_height - real_preview_ysize * tile_size) / 2;
 
-  for (x = 0; x < real_preview_size_x; x++)
+  for (x = 0; x < real_preview_xsize; x++)
   {
-    for (y = 0; y < real_preview_size_y; y++)
+    for (y = 0; y < real_preview_ysize; y++)
     {
       int lx = from_x + x + (show_level_border ? -1 : 0);
       int ly = from_y + y + (show_level_border ? -1 : 0);
       int element = (IN_LEV_FIELD(lx, ly) ? level.field[lx][ly] :
 		     getBorderElement(lx, ly));
 
-      DrawPreviewElement(xpos + x * preview_tilesize,
-			 ypos + y * preview_tilesize,
-			 element, preview_tilesize);
+      DrawPreviewElement(dst_x + x * tile_size, dst_y + y * tile_size,
+			 element, tile_size);
     }
   }
 
@@ -1615,7 +1591,7 @@ static void DrawMicroLevelExt(int xpos, int ypos, int from_x, int from_y)
 #define MICROLABEL_IMPORTED_BY_HEAD	6
 #define MICROLABEL_IMPORTED_BY		7
 
-static void DrawMicroLevelLabelExt(int mode)
+static void DrawPreviewLevelLabelExt(int mode)
 {
   char label_text[MAX_OUTPUT_LINESIZE + 1];
   int max_len_label_text;
@@ -1663,20 +1639,17 @@ static void DrawMicroLevelLabelExt(int mode)
   redraw_mask |= REDRAW_MICROLEVEL;
 }
 
-void DrawMicroLevel(int xpos, int ypos, boolean restart)
+void DrawPreviewLevel(boolean restart)
 {
   static unsigned long scroll_delay = 0;
   static unsigned long label_delay = 0;
   static int from_x, from_y, scroll_direction;
   static int label_state, label_counter;
-  int delay_factor = preview_tilesize / MICRO_TILESIZE;
-  unsigned long scroll_delay_value = MICROLEVEL_SCROLL_DELAY * delay_factor;
+  unsigned long scroll_delay_value = preview.step_delay;
   boolean show_level_border = (BorderElement != EL_EMPTY);
-  int level_size_x = lev_fieldx + (show_level_border ? 2 : 0);
-  int level_size_y = lev_fieldy + (show_level_border ? 2 : 0);
-  int preview_size_x = MICROLEVEL_XSIZE / preview_tilesize;
-  int preview_size_y = MICROLEVEL_YSIZE / preview_tilesize;
-  int last_game_status = game_status;	/* save current game status */
+  int level_xsize = lev_fieldx + (show_level_border ? 2 : 0);
+  int level_ysize = lev_fieldy + (show_level_border ? 2 : 0);
+  int last_game_status = game_status;		/* save current game status */
 
   /* force PREVIEW font on preview level */
   game_status = GAME_MODE_PSEUDO_PREVIEW;
@@ -1688,8 +1661,8 @@ void DrawMicroLevel(int xpos, int ypos, boolean restart)
     label_state = 1;
     label_counter = 0;
 
-    DrawMicroLevelExt(xpos, ypos, from_x, from_y);
-    DrawMicroLevelLabelExt(label_state);
+    DrawPreviewLevelExt(from_x, from_y);
+    DrawPreviewLevelLabelExt(label_state);
 
     /* initialize delay counters */
     DelayReached(&scroll_delay, 0);
@@ -1716,36 +1689,50 @@ void DrawMicroLevel(int xpos, int ypos, boolean restart)
     return;
   }
 
-  /* scroll micro level, if needed */
-  if ((level_size_x > preview_size_x || level_size_y > preview_size_y) &&
+  /* scroll preview level, if needed */
+  if ((level_xsize > preview.xsize || level_ysize > preview.ysize) &&
       DelayReached(&scroll_delay, scroll_delay_value))
   {
     switch (scroll_direction)
     {
       case MV_LEFT:
 	if (from_x > 0)
-	  from_x--;
+	{
+	  from_x -= preview.step_offset;
+	  from_x = (from_x < 0 ? 0 : from_x);
+	}
 	else
 	  scroll_direction = MV_UP;
 	break;
 
       case MV_RIGHT:
-	if (from_x < level_size_x - preview_size_x)
-	  from_x++;
+	if (from_x < level_xsize - preview.xsize)
+	{
+	  from_x += preview.step_offset;
+	  from_x = (from_x > level_xsize - preview.xsize ?
+		    level_xsize - preview.xsize : from_x);
+	}
 	else
 	  scroll_direction = MV_DOWN;
 	break;
 
       case MV_UP:
 	if (from_y > 0)
-	  from_y--;
+	{
+	  from_y -= preview.step_offset;
+	  from_y = (from_y < 0 ? 0 : from_y);
+	}
 	else
 	  scroll_direction = MV_RIGHT;
 	break;
 
       case MV_DOWN:
-	if (from_y < level_size_y - preview_size_y)
-	  from_y++;
+	if (from_y < level_ysize - preview.ysize)
+	{
+	  from_y += preview.step_offset;
+	  from_y = (from_y > level_ysize - preview.ysize ?
+		    level_ysize - preview.ysize : from_y);
+	}
 	else
 	  scroll_direction = MV_LEFT;
 	break;
@@ -1754,7 +1741,7 @@ void DrawMicroLevel(int xpos, int ypos, boolean restart)
 	break;
     }
 
-    DrawMicroLevelExt(xpos, ypos, from_x, from_y);
+    DrawPreviewLevelExt(from_x, from_y);
   }
 
   /* !!! THIS ALL SUCKS -- SHOULD BE CLEANLY REWRITTEN !!! */
@@ -1795,7 +1782,7 @@ void DrawMicroLevel(int xpos, int ypos, boolean restart)
       label_state = (label_state == MICROLABEL_IMPORTED_FROM_HEAD ?
 		     MICROLABEL_IMPORTED_BY_HEAD : MICROLABEL_IMPORTED_BY);
 
-    DrawMicroLevelLabelExt(label_state);
+    DrawPreviewLevelLabelExt(label_state);
   }
 
   game_status = last_game_status;	/* restore current game status */

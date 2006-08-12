@@ -124,11 +124,9 @@ void DrawMiniElementOrWall(int, int, int, int);
 
 void ShowEnvelope();
 
-void getMicroGraphicSource(int, Bitmap **, int *, int *);
-void DrawMicroElement(int, int, int);
 void DrawLevel(void);
 void DrawMiniLevel(int, int, int, int);
-void DrawMicroLevel(int, int, boolean);
+void DrawPreviewLevel(boolean);
 
 void WaitForEventToContinue();
 boolean Request(char *, unsigned int);

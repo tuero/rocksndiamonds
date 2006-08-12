@@ -1852,6 +1852,15 @@ struct DoorInfo
   int anim_mode;
 };
 
+struct PreviewInfo
+{
+  int x, y;
+  int xsize, ysize;
+  int tile_size;
+  int step_offset;
+  int step_delay;
+};
+
 struct HiScore
 {
   char Name[MAX_PLAYER_NAME_LEN + 1];
@@ -2221,20 +2230,28 @@ struct GraphicInfo
 
   int src_x, src_y;		/* start position of animation frames */
   int width, height;		/* width/height of each animation frame */
+
   int offset_x, offset_y;	/* x/y offset to next animation frame */
   int offset2_x, offset2_y;	/* x/y offset to second movement tile */
+
   boolean double_movement;	/* animation has second movement tile */
   int swap_double_tiles;	/* explicitely force or forbid tile swapping */
+
   int anim_frames;
   int anim_frames_per_line;
   int anim_start_frame;
   int anim_delay;		/* important: delay of 1 means "no delay"! */
   int anim_mode;
+
   boolean anim_global_sync;
+
   int crumbled_like;		/* element for cloning crumble graphics */
   int diggable_like;		/* element for cloning digging graphics */
+
   int border_size;		/* border size for "crumbled" graphics */
+
   int scale_up_factor;		/* optional factor for scaling image up */
+
   int clone_from;		/* graphic for cloning *all* settings */
 
   int anim_delay_fixed;		/* optional delay values for bored and   */
@@ -2414,6 +2431,7 @@ extern struct TapeInfo		tape;
 extern struct GlobalInfo	global;
 extern struct MenuInfo		menu;
 extern struct DoorInfo		door_1, door_2;
+extern struct PreviewInfo	preview;
 extern struct ElementInfo	element_info[];
 extern struct ElementNameInfo	element_name_info[];
 extern struct ElementActionInfo	element_action_info[];
