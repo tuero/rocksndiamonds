@@ -2057,8 +2057,15 @@ void DrawPlayer(struct PlayerInfo *player)
       GfxElement[jx][jy] = EL_UNDEFINED;
 
       /* make sure that pushed elements are drawn with correct frame rate */
+#if 1
+      graphic = el_act_dir2img(element, ACTION_PUSHING, move_dir);
+
+      if (player->is_pushing && player->is_moving && !IS_ANIM_MODE_CE(graphic))
+	GfxFrame[jx][jy] = player->StepFrame;
+#else
       if (player->is_pushing && player->is_moving)
 	GfxFrame[jx][jy] = player->StepFrame;
+#endif
 
       DrawLevelField(jx, jy);
     }
@@ -2118,15 +2125,26 @@ void DrawPlayer(struct PlayerInfo *player)
     int px = SCREENX(jx), py = SCREENY(jy);
     int pxx = (TILEX - ABS(sxx)) * dx;
     int pyy = (TILEY - ABS(syy)) * dy;
+    int gfx_frame = GfxFrame[jx][jy];
 
     int graphic;
+    int sync_frame;
     int frame;
 
     if (!IS_MOVING(jx, jy))		/* push movement already finished */
+    {
       element = Feld[next_jx][next_jy];
+      gfx_frame = GfxFrame[next_jx][next_jy];
+    }
 
     graphic = el_act_dir2img(element, ACTION_PUSHING, move_dir);
+
+#if 1
+    sync_frame = (IS_ANIM_MODE_CE(graphic) ? gfx_frame : player->StepFrame);
+    frame = getGraphicAnimationFrame(graphic, sync_frame);
+#else
     frame = getGraphicAnimationFrame(graphic, player->StepFrame);
+#endif
 
     /* draw background element under pushed element (like the Sokoban field) */
     if (Back[next_jx][next_jy])

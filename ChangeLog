@@ -1,3 +1,6 @@
+2006-08-14
+	* fixed bug with displaying pushed CE with value/score/delay anim_mode
+
 2006-08-12
 	* added configurable level preview position, tile size and dimensions
 	* added configurable game panel value positions (gems, time, score etc.)
