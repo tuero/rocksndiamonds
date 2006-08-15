@@ -457,13 +457,15 @@ void BlitBitmap(Bitmap *src_bitmap, Bitmap *dst_bitmap,
 	      dst_x, dst_y, BLIT_OPAQUE);
 }
 
-void FadeScreen(Bitmap *bitmap_cross, int fade_mode, int fade_delay,
-		int post_delay)
+void FadeRectangle(Bitmap *bitmap_cross, int x, int y, int width, int height,
+		   int fade_mode, int fade_delay, int post_delay)
 {
 #if defined(TARGET_SDL)
-  SDLFadeScreen(bitmap_cross, fade_mode, fade_delay, post_delay);
+  SDLFadeRectangle(bitmap_cross, x, y, width, height,
+		   fade_mode, fade_delay, post_delay);
 #else
-  X11FadeScreen(bitmap_cross, fade_mode, fade_delay, post_delay);
+  X11FadeRectangle(bitmap_cross, x, y, width, height,
+		   fade_mode, fade_delay, post_delay);
 #endif
 }
 

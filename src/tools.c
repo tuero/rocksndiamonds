@@ -423,7 +423,8 @@ void FadeIn(int fade_delay)
     return;
   }
 
-  FadeScreen(NULL, FADE_MODE_FADE_IN, fade_delay, 0);
+  FadeRectangle(NULL, 0, 0, WIN_XSIZE, WIN_YSIZE,
+		FADE_MODE_FADE_IN, fade_delay, 0);
 
   redraw_mask = REDRAW_NONE;
 }
@@ -438,7 +439,8 @@ void FadeOut(int fade_delay, int post_delay)
     return;
   }
 
-  FadeScreen(NULL, FADE_MODE_FADE_OUT, fade_delay, post_delay);
+  FadeRectangle(NULL, 0, 0, WIN_XSIZE, WIN_YSIZE,
+		FADE_MODE_FADE_OUT, fade_delay, post_delay);
 
   redraw_mask = REDRAW_NONE;
 }
@@ -453,9 +455,58 @@ void FadeCross(int fade_delay)
     return;
   }
 
-  FadeScreen(bitmap_db_title, FADE_MODE_CROSSFADE, fade_delay, 0);
+  FadeRectangle(bitmap_db_title, 0, 0, WIN_XSIZE, WIN_YSIZE,
+		FADE_MODE_CROSSFADE, fade_delay, 0);
 
   redraw_mask = REDRAW_NONE;
+}
+
+void FadeInField(int fade_delay)
+{
+  if (fade_delay == 0)
+  {
+    BackToFront();
+
+    return;
+  }
+
+  FadeRectangle(NULL, REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE,
+		FADE_MODE_FADE_IN, fade_delay, 0);
+
+  redraw_mask &= ~REDRAW_FIELD;
+}
+
+void FadeOutField(int fade_delay, int post_delay)
+{
+  if (fade_delay == 0)
+  {
+    ClearRectangle(backbuffer, REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE);
+    BackToFront();
+
+    return;
+  }
+
+  FadeRectangle(NULL, REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE,
+		FADE_MODE_FADE_OUT, fade_delay, post_delay);
+
+  redraw_mask &= ~REDRAW_FIELD;
+}
+
+void FadeCrossField(int fade_delay)
+{
+  if (fade_delay == 0)
+  {
+    BlitBitmap(bitmap_db_title, backbuffer, REAL_SX, REAL_SY,
+	       FULL_SXSIZE, FULL_SYSIZE, REAL_SX, REAL_SY);
+    BackToFront();
+
+    return;
+  }
+
+  FadeRectangle(bitmap_db_title, REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE,
+		FADE_MODE_CROSSFADE, fade_delay, 0);
+
+  redraw_mask &= ~REDRAW_FIELD;
 }
 
 void SetMainBackgroundImageIfDefined(int graphic)
@@ -490,7 +541,11 @@ void SetPanelBackground()
 
 void DrawBackground(int dst_x, int dst_y, int width, int height)
 {
+#if 1
+  ClearRectangleOnBackground(drawto, dst_x, dst_y, width, height);
+#else
   ClearRectangleOnBackground(backbuffer, dst_x, dst_y, width, height);
+#endif
 
   redraw_mask |= REDRAW_FIELD;
 }

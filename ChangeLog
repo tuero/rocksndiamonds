@@ -1,5 +1,6 @@
 2006-08-15
 	* changed behaviour after solved game -- do not immediately stop engine
+	* added some more smooth screen fadings (game start, hall of fame etc.)
 
 2006-08-14
 	* fixed bug with displaying pushed CE with value/score/delay anim_mode

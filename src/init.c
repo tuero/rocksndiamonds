@@ -4892,7 +4892,11 @@ void OpenAll()
   em_open_all();
 #endif
 
+#if 0
+  DrawMainMenuExt(TITLE_SCREEN_FADE_DELAY, REDRAW_ALL);
+#else
   DrawMainMenu();
+#endif
 
   InitNetworkServer();
 }

@@ -2037,7 +2037,10 @@ void InitGame()
   boolean emulate_bd = TRUE;	/* unless non-BOULDERDASH elements found */
   boolean emulate_sb = TRUE;	/* unless non-SOKOBAN     elements found */
   boolean emulate_sp = TRUE;	/* unless non-SUPAPLEX    elements found */
+  boolean do_fading = (game_status == GAME_MODE_MAIN);
   int i, j, x, y;
+
+  game_status = GAME_MODE_PLAYING;
 
   InitGameEngine();
 
@@ -2629,6 +2632,11 @@ void InitGame()
 		local_player->jy - MIDPOSY);
   }
 
+  StopAnimation();
+
+  if (do_fading)
+    FadeOutField(TITLE_SCREEN_FADE_DELAY, TITLE_SCREEN_POST_DELAY);
+
   if (!game.restart_level)
     CloseDoor(DOOR_CLOSE_1);
 
@@ -2650,9 +2658,15 @@ void InitGame()
       BlitBitmap(fieldbuffer, backbuffer, FX, FY, SXSIZE, SYSIZE, SX, SY);
 
     redraw_mask |= REDRAW_FROM_BACKBUFFER;
+
+#if 0
     FadeToFront();
+#endif
   }
   /* !!! FIX THIS (END) !!! */
+
+  if (do_fading)
+    FadeInField(TITLE_SCREEN_FADE_DELAY);
 
   if (!game.restart_level)
   {
@@ -3045,9 +3059,11 @@ void GameEnd()
 
   if (!local_player->LevelSolved_SaveScore)
   {
+    FadeOutField(TITLE_SCREEN_FADE_DELAY, TITLE_SCREEN_POST_DELAY);
+
     game_status = GAME_MODE_MAIN;
 
-    DrawMainMenu();
+    DrawMainMenuExt(TITLE_SCREEN_FADE_DELAY, REDRAW_FIELD);
 
     return;
   }
@@ -3077,6 +3093,8 @@ void GameEnd()
   }
   else
   {
+    FadeOutField(TITLE_SCREEN_FADE_DELAY, TITLE_SCREEN_POST_DELAY);
+
     game_status = GAME_MODE_MAIN;
 
     if (raise_level)
@@ -3085,7 +3103,7 @@ void GameEnd()
       TapeErase();
     }
 
-    DrawMainMenu();
+    DrawMainMenuExt(TITLE_SCREEN_FADE_DELAY, REDRAW_FIELD);
   }
 
   local_player->LevelSolved_SaveScore = FALSE;
@@ -9827,10 +9845,6 @@ void StartGameActions(boolean init_network_game, boolean record_tape,
   }
 #endif
 
-  StopAnimation();
-
-  game_status = GAME_MODE_PLAYING;
-
   InitGame();
 }
 
@@ -13412,8 +13426,20 @@ void RequestQuitGame(boolean ask_if_really_quit)
     else
 #endif
     {
-      game_status = GAME_MODE_MAIN;
-      DrawMainMenu();
+      if (!ask_if_really_quit || level_editor_test_game)
+      {
+	game_status = GAME_MODE_MAIN;
+
+	DrawMainMenu();
+      }
+      else
+      {
+	FadeOutField(TITLE_SCREEN_FADE_DELAY, TITLE_SCREEN_POST_DELAY);
+
+	game_status = GAME_MODE_MAIN;
+
+	DrawMainMenuExt(TITLE_SCREEN_FADE_DELAY, REDRAW_FIELD);
+      }
     }
   }
   else

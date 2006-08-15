@@ -21,6 +21,7 @@
 #define SCROLL_PAGE	(2 * SCR_FIELDY)
 
 
+void DrawMainMenuExt(int, int);
 void DrawMainMenu(void);
 void DrawHallOfFame(int);
 

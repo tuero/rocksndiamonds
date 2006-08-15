@@ -214,7 +214,7 @@ void DrawGameValue_Time(int);
 void DrawGameDoorValues(void);
 
 void InitGameSound();
-void InitGame(void);
+void InitGame();
 
 void UpdateEngineValues(int, int);
 void GameWon(void);

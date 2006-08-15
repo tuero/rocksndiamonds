@@ -354,7 +354,7 @@ void SDLCreateBitmapContent(Bitmap *, int, int, int);
 void SDLFreeBitmapPointers(Bitmap *);
 void SDLCopyArea(Bitmap *, Bitmap *, int, int, int, int, int, int, int);
 void SDLFillRectangle(Bitmap *, int, int, int, int, Uint32);
-void SDLFadeScreen(Bitmap *, int, int, int);
+void SDLFadeRectangle(Bitmap *, int, int, int, int, int, int, int);
 void SDLDrawSimpleLine(Bitmap *, int, int, int, int, Uint32);
 void SDLDrawLine(Bitmap *, int, int, int, int, Uint32);
 Pixel SDLGetPixel(Bitmap *, int, int);

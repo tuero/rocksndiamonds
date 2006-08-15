@@ -362,16 +362,16 @@ void X11FillRectangle(Bitmap *bitmap, int x, int y,
   XFillRectangle(display, bitmap->drawable, bitmap->gc, x, y, width, height);
 }
 
-void X11FadeScreen(Bitmap *bitmap_cross, int fade_mode, int fade_delay,
-		   int post_delay)
+void X11FadeRectangle(Bitmap *bitmap_cross, int x, int y, int width, int height,
+		      int fade_mode, int fade_delay, int post_delay)
 {
   /* fading currently not supported -- simply copy target image to screen */
 
   if (fade_mode == FADE_MODE_FADE_OUT)
-    X11FillRectangle(window, 0, 0, video.width, video.height, BLACK_PIXEL);
+    X11FillRectangle(window, x, y, width, height, BLACK_PIXEL);
   else
     X11CopyArea(bitmap_cross != NULL ? bitmap_cross : backbuffer, window,
-		0, 0, video.width, video.height, 0, 0, BLIT_OPAQUE);
+		x, y, width, height, 0, 0, BLIT_OPAQUE);
 
   /* as we currently cannot use the fade delay, also do not use post delay */
 }

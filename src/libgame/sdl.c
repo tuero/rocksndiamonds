@@ -354,8 +354,8 @@ void SDLCopyArea(Bitmap *src_bitmap, Bitmap *dst_bitmap,
     SDL_UpdateRect(backbuffer->surface, dst_x, dst_y, width, height);
 }
 
-void SDLFillRectangle(Bitmap *dst_bitmap, int x, int y,
-		      int width, int height, Uint32 color)
+void SDLFillRectangle(Bitmap *dst_bitmap, int x, int y, int width, int height,
+		      Uint32 color)
 {
   Bitmap *real_dst_bitmap = (dst_bitmap == window ? backbuffer : dst_bitmap);
   SDL_Rect rect;
@@ -377,8 +377,8 @@ void SDLFillRectangle(Bitmap *dst_bitmap, int x, int y,
     SDL_UpdateRect(backbuffer->surface, x, y, width, height);
 }
 
-void SDLFadeScreen(Bitmap *bitmap_cross, int fade_mode, int fade_delay,
-		   int post_delay)
+void SDLFadeRectangle(Bitmap *bitmap_cross, int x, int y, int width, int height,
+		      int fade_mode, int fade_delay, int post_delay)
 {
   static boolean initialization_needed = TRUE;
   static SDL_Surface *surface_screen_copy = NULL;
@@ -386,8 +386,8 @@ void SDLFadeScreen(Bitmap *bitmap_cross, int fade_mode, int fade_delay,
   SDL_Surface *surface_screen = backbuffer->surface;
   SDL_Surface *surface_cross;		/* initialized later */
   SDL_Rect src_rect, dst_rect;
-  int src_x = 0, src_y = 0;
-  int dst_x = 0, dst_y = 0;
+  int src_x = x, src_y = y;
+  int dst_x = x, dst_y = y;
   boolean fade_reverse = (fade_mode == FADE_MODE_FADE_IN ? TRUE : FALSE);
   unsigned int time_last, time_current;
   float alpha;
@@ -395,16 +395,16 @@ void SDLFadeScreen(Bitmap *bitmap_cross, int fade_mode, int fade_delay,
 
   src_rect.x = src_x;
   src_rect.y = src_y;
-  src_rect.w = video.width;
-  src_rect.h = video.height;
+  src_rect.w = width;
+  src_rect.h = height;
 
   dst_x += video_xoffset;
   dst_y += video_yoffset;
 
   dst_rect.x = dst_x;
   dst_rect.y = dst_y;
-  dst_rect.w = video.width;
-  dst_rect.h = video.height;
+  dst_rect.w = width;
+  dst_rect.h = height;
 
 #if 0
   if (!initialization_needed)
@@ -496,7 +496,11 @@ void SDLFadeScreen(Bitmap *bitmap_cross, int fade_mode, int fade_delay,
     SDL_BlitSurface(surface_cross, &src_rect, surface_screen, &dst_rect);
 
     /* draw screen buffer to visible display */
+#if 1
+    SDL_UpdateRect(surface_screen, dst_x, dst_y, width, height);
+#else
     SDL_Flip(surface_screen);
+#endif
   }
 
   Delay(post_delay);

@@ -542,14 +542,14 @@ static void TapeStartGameRecording()
 
 #if defined(NETWORK_AVALIABLE)
   if (options.network)
-    SendToServer_StartPlaying();
-  else
-#endif
   {
-    game_status = GAME_MODE_PLAYING;
-    StopAnimation();
-    InitGame();
+    SendToServer_StartPlaying();
+
+    return;
   }
+#endif
+
+  InitGame();
 }
 
 static void TapeAppendRecording()
@@ -706,8 +706,6 @@ static void TapeStartGamePlaying()
 {
   TapeStartPlaying();
 
-  game_status = GAME_MODE_PLAYING;
-  StopAnimation();
   InitGame();
 }
 

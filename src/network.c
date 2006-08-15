@@ -541,20 +541,7 @@ static void Handle_OP_START_PLAYING()
   LoadTape(level_nr);
   LoadLevel(level_nr);
 
-#if 1
   StartGameActions(FALSE, setup.autorecord, new_random_seed);
-#else
-  if (setup.autorecord)
-    TapeStartRecording();
-
-  if (tape.recording)
-    tape.random_seed = new_random_seed;
-
-  InitRND(new_random_seed);
-
-  game_status = GAME_MODE_PLAYING;
-  InitGame();
-#endif
 }
 
 static void Handle_OP_PAUSE_PLAYING()
