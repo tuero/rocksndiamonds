@@ -115,6 +115,8 @@
 
 #define SC_BORDER_SIZE			14
 
+#define TITLE_SCREEN_FADE_DELAY		250
+
 
 /* forward declarations of internal functions */
 static void HandleScreenGadgets(struct GadgetInfo *);
@@ -589,7 +591,7 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
   boolean return_to_main_menu = FALSE;
   boolean use_fading_main_menu = TRUE;
   boolean use_cross_fading = TRUE;
-  int fade_delay = 500;
+  int fade_delay = TITLE_SCREEN_FADE_DELAY;
   int post_delay = fade_delay / 2;
 
   if (button == MB_MENU_INITIALIZE)

@@ -700,9 +700,13 @@ void HandleKey(Key key, int key_status)
   if (game_status == GAME_MODE_PLAYING && AllPlayersGone &&
       (key == KSYM_Return || key == setup.shortcut.toggle_pause))
   {
+#if 1
+    GameEnd();
+#else
     CloseDoor(DOOR_CLOSE_1);
     game_status = GAME_MODE_MAIN;
     DrawMainMenu();
+#endif
 
     return;
   }
@@ -1065,9 +1069,14 @@ void HandleJoystick()
 
       if (AllPlayersGone && newbutton)
       {
+#if 1
+	GameEnd();
+#else
 	CloseDoor(DOOR_CLOSE_1);
 	game_status = GAME_MODE_MAIN;
 	DrawMainMenu();
+#endif
+
 	return;
       }
 

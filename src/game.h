@@ -126,6 +126,10 @@ struct PlayerInfo
 
   boolean LevelSolved, GameOver;
 
+  boolean LevelSolved_GameEnd;
+  boolean LevelSolved_SaveTape;
+  boolean LevelSolved_SaveScore;
+
   int last_move_dir;
 
   boolean is_active;
@@ -214,6 +218,7 @@ void InitGame(void);
 
 void UpdateEngineValues(int, int);
 void GameWon(void);
+void GameEnd(void);
 
 void InitPlayerGfxAnimation(struct PlayerInfo *, int, int);
 void Moving2Blocked(int, int, int *, int *);

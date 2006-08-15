@@ -51,6 +51,9 @@
 
 #define USE_CODE_THAT_BREAKS_SNAKE_BITE	(USE_NEW_STUFF		* 1)
 
+#define USE_UFAST_PLAYER_EXIT_BUGFIX	(USE_NEW_STUFF		* 1)
+#define USE_NEW_GAME_WON		(USE_NEW_STUFF		* 1)
+
 
 /* for DigField() */
 #define DF_NO_PUSH		0
@@ -2177,6 +2180,10 @@ void InitGame()
 
     player->LevelSolved = FALSE;
     player->GameOver = FALSE;
+
+    player->LevelSolved_GameEnd = FALSE;
+    player->LevelSolved_SaveTape = FALSE;
+    player->LevelSolved_SaveScore = FALSE;
   }
 
   network_player_action_received = FALSE;
@@ -2902,6 +2909,190 @@ void InitAmoebaNr(int x, int y)
   AmoebaCnt2[group_nr]++;
 }
 
+#if USE_NEW_GAME_WON
+
+void GameWon()
+{
+  static boolean score_done = FALSE;
+  static boolean player_done = FALSE;
+  static int game_over_delay = 0;
+  int game_over_delay_value = 50;
+
+  /* do not start end game actions before the player stops moving (to exit) */
+  if (local_player->MovPos)
+    return;
+
+  if (tape.auto_play)		/* tape might already be stopped here */
+    tape.auto_play_level_solved = TRUE;
+
+  if (!local_player->LevelSolved_GameEnd)
+  {
+    local_player->LevelSolved_GameEnd = TRUE;
+    local_player->LevelSolved_SaveTape = tape.recording;
+    local_player->LevelSolved_SaveScore = !tape.playing;
+
+    score_done = FALSE;
+    player_done = FALSE;
+    game_over_delay = 0;
+  }
+
+  PlaySoundStereo(SND_GAME_WINNING, SOUND_MIDDLE);
+
+  if (TimeLeft > 0)
+  {
+    if (!tape.playing)
+    {
+      if (setup.sound_loops)
+	PlaySoundExt(SND_GAME_LEVELTIME_BONUS, SOUND_MAX_VOLUME, SOUND_MIDDLE,
+		     SND_CTRL_PLAY_LOOP);
+      else
+	PlaySoundStereo(SND_GAME_LEVELTIME_BONUS, SOUND_MIDDLE);
+    }
+
+    if (TimeLeft > 100 && TimeLeft % 10 == 0)
+    {
+      TimeLeft -= 10;
+      RaiseScore(level.score[SC_TIME_BONUS] * 10);
+    }
+    else
+    {
+      TimeLeft--;
+      RaiseScore(level.score[SC_TIME_BONUS]);
+    }
+
+    DrawGameValue_Time(TimeLeft);
+
+#if 0
+    if (!tape.playing)
+      Delay(10);
+#endif
+
+    if (TimeLeft <= 0 && !tape.playing && setup.sound_loops)
+      StopSound(SND_GAME_LEVELTIME_BONUS);
+  }
+  else if (level.time == 0 && TimePlayed < 999)	/* level without time limit */
+  {
+    if (!tape.playing)
+    {
+      if (setup.sound_loops)
+	PlaySoundExt(SND_GAME_LEVELTIME_BONUS, SOUND_MAX_VOLUME, SOUND_MIDDLE,
+		     SND_CTRL_PLAY_LOOP);
+      else
+	PlaySoundStereo(SND_GAME_LEVELTIME_BONUS, SOUND_MIDDLE);
+    }
+
+    if (TimePlayed < 900 && TimePlayed % 10 == 0)
+    {
+      TimePlayed += 10;
+      RaiseScore(level.score[SC_TIME_BONUS] * 10);
+    }
+    else
+    {
+      TimePlayed++;
+      RaiseScore(level.score[SC_TIME_BONUS]);
+    }
+
+    DrawGameValue_Time(TimePlayed);
+
+    if (TimePlayed >= 999 && !tape.playing && setup.sound_loops)
+      StopSound(SND_GAME_LEVELTIME_BONUS);
+  }
+  else
+  {
+    score_done = TRUE;
+  }
+
+  /* close exit door after last player */
+  if (AllPlayersGone && ExitX >= 0 && ExitY >= 0 &&
+      (Feld[ExitX][ExitY] == EL_EXIT_OPEN ||
+       Feld[ExitX][ExitY] == EL_SP_EXIT_OPEN))
+  {
+    int element = Feld[ExitX][ExitY];
+
+    Feld[ExitX][ExitY] = (element == EL_EXIT_OPEN ? EL_EXIT_CLOSING :
+			  EL_SP_EXIT_CLOSING);
+
+    PlayLevelSoundElementAction(ExitX, ExitY, element, ACTION_CLOSING);
+  }
+
+  /* player disappears */
+  if (ExitX >= 0 && ExitY >= 0 && !player_done)
+  {
+    DrawLevelField(ExitX, ExitY);
+
+    player_done = TRUE;
+  }
+
+  game_over_delay++;
+
+  if (game_over_delay < game_over_delay_value || !score_done)
+    return;
+}
+
+void GameEnd()
+{
+  int hi_pos;
+  boolean raise_level = FALSE;
+
+  CloseDoor(DOOR_CLOSE_1);
+
+  if (local_player->LevelSolved_SaveTape)
+  {
+    TapeStop();
+
+    SaveTape(tape.level_nr);		/* Ask to save tape */
+  }
+
+  if (!local_player->LevelSolved_SaveScore)
+  {
+    game_status = GAME_MODE_MAIN;
+
+    DrawMainMenu();
+
+    return;
+  }
+
+  if (level_nr == leveldir_current->handicap_level)
+  {
+    leveldir_current->handicap_level++;
+    SaveLevelSetup_SeriesInfo();
+  }
+
+  if (level_editor_test_game)
+    local_player->score = -1;	/* no highscore when playing from editor */
+  else if (level_nr < leveldir_current->last_level)
+    raise_level = TRUE;		/* advance to next level */
+
+  if ((hi_pos = NewHiScore()) >= 0) 
+  {
+    game_status = GAME_MODE_SCORES;
+
+    DrawHallOfFame(hi_pos);
+
+    if (raise_level)
+    {
+      level_nr++;
+      TapeErase();
+    }
+  }
+  else
+  {
+    game_status = GAME_MODE_MAIN;
+
+    if (raise_level)
+    {
+      level_nr++;
+      TapeErase();
+    }
+
+    DrawMainMenu();
+  }
+
+  local_player->LevelSolved_SaveScore = FALSE;
+}
+
+#else
+
 void GameWon()
 {
   int hi_pos;
@@ -3055,6 +3246,8 @@ void GameWon()
 
   BackToFront();
 }
+
+#endif
 
 int NewHiScore()
 {
@@ -10667,7 +10860,14 @@ boolean MovePlayerOneStep(struct PlayerInfo *player,
 
   PlayerVisit[jx][jy] = FrameCounter;
 
+#if USE_UFAST_PLAYER_EXIT_BUGFIX
+  player->is_moving = TRUE;
+#endif
+
+#if 1
+  /* should better be called in MovePlayer(), but this breaks some tapes */
   ScrollPlayer(player, SCROLL_INIT);
+#endif
 
   return MP_MOVING;
 }
@@ -10865,6 +11065,11 @@ boolean MovePlayer(struct PlayerInfo *player, int dx, int dy)
     player->is_dropping = FALSE;
     player->is_dropping_pressed = FALSE;
     player->drop_pressed_delay = 0;
+
+#if 0
+    /* should better be called here than above, but this breaks some tapes */
+    ScrollPlayer(player, SCROLL_INIT);
+#endif
   }
   else
   {
