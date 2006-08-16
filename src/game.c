@@ -2634,11 +2634,11 @@ void InitGame()
 
   StopAnimation();
 
-  if (do_fading)
-    FadeOutField(TITLE_SCREEN_FADE_DELAY, TITLE_SCREEN_POST_DELAY);
-
   if (!game.restart_level)
     CloseDoor(DOOR_CLOSE_1);
+
+  if (do_fading)
+    FadeOut(REDRAW_FIELD);
 
   /* !!! FIX THIS (START) !!! */
   if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
@@ -2666,7 +2666,7 @@ void InitGame()
   /* !!! FIX THIS (END) !!! */
 
   if (do_fading)
-    FadeInField(TITLE_SCREEN_FADE_DELAY);
+    FadeIn(REDRAW_FIELD);
 
   if (!game.restart_level)
   {
@@ -3059,11 +3059,11 @@ void GameEnd()
 
   if (!local_player->LevelSolved_SaveScore)
   {
-    FadeOutField(TITLE_SCREEN_FADE_DELAY, TITLE_SCREEN_POST_DELAY);
+    FadeOut(REDRAW_FIELD);
 
     game_status = GAME_MODE_MAIN;
 
-    DrawMainMenuExt(TITLE_SCREEN_FADE_DELAY, REDRAW_FIELD);
+    DrawAndFadeInMainMenu(REDRAW_FIELD);
 
     return;
   }
@@ -3093,7 +3093,7 @@ void GameEnd()
   }
   else
   {
-    FadeOutField(TITLE_SCREEN_FADE_DELAY, TITLE_SCREEN_POST_DELAY);
+    FadeOut(REDRAW_FIELD);
 
     game_status = GAME_MODE_MAIN;
 
@@ -3103,7 +3103,7 @@ void GameEnd()
       TapeErase();
     }
 
-    DrawMainMenuExt(TITLE_SCREEN_FADE_DELAY, REDRAW_FIELD);
+    DrawAndFadeInMainMenu(REDRAW_FIELD);
   }
 
   local_player->LevelSolved_SaveScore = FALSE;
@@ -13434,11 +13434,11 @@ void RequestQuitGame(boolean ask_if_really_quit)
       }
       else
       {
-	FadeOutField(TITLE_SCREEN_FADE_DELAY, TITLE_SCREEN_POST_DELAY);
+	FadeOut(REDRAW_FIELD);
 
 	game_status = GAME_MODE_MAIN;
 
-	DrawMainMenuExt(TITLE_SCREEN_FADE_DELAY, REDRAW_FIELD);
+	DrawAndFadeInMainMenu(REDRAW_FIELD);
       }
     }
   }

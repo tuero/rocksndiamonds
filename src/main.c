@@ -20,7 +20,7 @@
 #include "events.h"
 #include "config.h"
 
-Bitmap		       *bitmap_db_title;
+Bitmap		       *bitmap_db_cross;
 Bitmap		       *bitmap_db_field;
 Bitmap		       *bitmap_db_panel;
 Bitmap		       *bitmap_db_door;
@@ -4663,6 +4663,9 @@ struct TokenIntPtrInfo image_config_vars[] =
   { "menu.list_size.LEVELS",	&menu.list_size[GFX_SPECIAL_ARG_LEVELS]	    },
   { "menu.list_size.SCORES",	&menu.list_size[GFX_SPECIAL_ARG_SCORES]	    },
   { "menu.list_size.INFO",	&menu.list_size[GFX_SPECIAL_ARG_INFO]	    },
+
+  { "menu.fade_delay",		&menu.fade_delay			    },
+  { "menu.post_delay",		&menu.post_delay			    },
 
   { "door_1.width",		&door_1.width				    },
   { "door_1.height",		&door_1.height				    },

@@ -68,11 +68,8 @@ void BackToFront();
 void FadeToFront();
 
 void FadeIn(int);
-void FadeOut(int, int);
+void FadeOut(int);
 void FadeCross(int);
-void FadeInField(int);
-void FadeOutField(int, int);
-void FadeCrossField(int);
 
 void ClearWindow();
 void SetMainBackgroundImageIfDefined(int);

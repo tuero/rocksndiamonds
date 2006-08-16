@@ -299,7 +299,7 @@ void DrawTitleScreen()
   StopAnimation();
 }
 
-void DrawMainMenuExt(int fade_delay, int redraw_mask)
+void DrawMainMenuExt(int redraw_mask, boolean do_fading)
 {
   static LevelDirTree *leveldir_last_valid = NULL;
   boolean levelset_has_changed = FALSE;
@@ -532,12 +532,10 @@ void DrawMainMenuExt(int fade_delay, int redraw_mask)
 
 #if 1
 #if 1
-  if (redraw_mask == REDRAW_FIELD)
-    FadeInField(fade_delay);
-  else if (redraw_mask == REDRAW_ALL)
-    FadeIn(fade_delay);
-
-  BackToFront();
+  if (do_fading)
+    FadeIn(redraw_mask);
+  else
+    BackToFront();
 #else
   BackToFront();
 #endif
@@ -552,9 +550,14 @@ void DrawMainMenuExt(int fade_delay, int redraw_mask)
 #endif
 }
 
+void DrawAndFadeInMainMenu(int redraw_mask)
+{
+  DrawMainMenuExt(redraw_mask, TRUE);
+}
+
 void DrawMainMenu()
 {
-  DrawMainMenuExt(0, REDRAW_ALL);
+  DrawMainMenuExt(REDRAW_ALL, FALSE);
 }
 
 #if 0
@@ -594,8 +597,6 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
   boolean return_to_main_menu = FALSE;
   boolean use_fading_main_menu = TRUE;
   boolean use_cross_fading = TRUE;
-  int fade_delay = TITLE_SCREEN_FADE_DELAY;
-  int post_delay = TITLE_SCREEN_POST_DELAY;
 
   if (button == MB_MENU_INITIALIZE)
   {
@@ -614,7 +615,7 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
 
       FadeSoundsAndMusic();
 
-      FadeOut(fade_delay, post_delay);
+      FadeOut(REDRAW_ALL);
     }
 
     /* force TITLE music on title info screen */
@@ -627,7 +628,7 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
 
     DrawTitleScreenImage(title_nr);
 
-    FadeIn(fade_delay);
+    FadeIn(REDRAW_ALL);
 
     return;
   }
@@ -650,7 +651,7 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
     title_nr++;
 
     if (!use_cross_fading)
-      FadeOut(fade_delay, post_delay);
+      FadeOut(REDRAW_ALL);
 
     if (title_nr < MAX_NUM_TITLE_SCREENS &&
 	graphic_info[IMG_TITLESCREEN_1 + title_nr].bitmap != NULL)
@@ -658,22 +659,22 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
       Bitmap *drawto_last = drawto;
 
       if (use_cross_fading)
-	drawto = bitmap_db_title;
+	drawto = bitmap_db_cross;
 
       DrawTitleScreenImage(title_nr);
 
       drawto = drawto_last;
 
       if (use_cross_fading)
-	FadeCross(fade_delay);
+	FadeCross(REDRAW_ALL);
       else
-	FadeIn(fade_delay);
+	FadeIn(REDRAW_ALL);
     }
     else
     {
       FadeSoundsAndMusic();
 
-      FadeOut(fade_delay, post_delay);
+      FadeOut(REDRAW_ALL);
 
       return_to_main_menu = TRUE;
     }
@@ -681,8 +682,6 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
 
   if (return_to_main_menu)
   {
-    int menu_fade_delay = (use_fading_main_menu ? fade_delay : 0);
-
     RedrawBackground();
 
     if (game_status == GAME_MODE_INFO)
@@ -690,14 +689,14 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
       OpenDoor(DOOR_CLOSE_1 | DOOR_CLOSE_2 | DOOR_NO_DELAY | DOOR_FORCE_REDRAW);
 
       info_mode = INFO_MODE_MAIN;
-      DrawInfoScreenExt(menu_fade_delay);
+      DrawInfoScreenExt(use_fading_main_menu);
     }
     else	/* default: return to main menu */
     {
       OpenDoor(DOOR_CLOSE_1 | DOOR_OPEN_2 | DOOR_NO_DELAY | DOOR_FORCE_REDRAW);
 
       game_status = GAME_MODE_MAIN;
-      DrawMainMenuExt(menu_fade_delay, REDRAW_ALL);
+      DrawMainMenuExt(REDRAW_ALL, use_fading_main_menu);
     }
   }
 }
@@ -994,7 +993,7 @@ static struct TokenInfo info_info_main[] =
   { 0,			NULL,			NULL			}
 };
 
-static void DrawInfoScreen_Main(int fade_delay)
+static void DrawInfoScreen_Main(boolean do_fading)
 {
   int i;
 
@@ -1037,7 +1036,11 @@ static void DrawInfoScreen_Main(int fade_delay)
   PlayMenuSound();
   PlayMenuMusic();
 
-  FadeIn(fade_delay);
+  if (do_fading)
+    FadeIn(REDRAW_ALL);
+  else
+    BackToFront();
+
   InitAnimation();
 
 #else
@@ -1466,7 +1469,7 @@ void HandleInfoScreen_Music(int button)
     FadeSoundsAndMusic();
 
     if (button != MB_MENU_INITIALIZE)
-      drawto = bitmap_db_title;
+      drawto = bitmap_db_cross;
 
     ClearWindow();
     DrawHeadline();
@@ -1533,7 +1536,7 @@ void HandleInfoScreen_Music(int button)
     drawto = drawto_last;
 
     if (button != MB_MENU_INITIALIZE)
-      FadeCrossField(TITLE_SCREEN_FADE_DELAY);
+      FadeCross(REDRAW_FIELD);
   }
 
   if (list != NULL && list->is_sound && sound_info[list->music].loop)
@@ -1743,7 +1746,7 @@ void HandleInfoScreen_Credits(int button)
 
     screen_nr++;
 
-    drawto = bitmap_db_title;
+    drawto = bitmap_db_cross;
 
     show_screen = DrawInfoScreen_CreditsScreen(screen_nr);
 
@@ -1751,7 +1754,7 @@ void HandleInfoScreen_Credits(int button)
   
     if (show_screen)
     {
-      FadeCrossField(TITLE_SCREEN_FADE_DELAY);
+      FadeCross(REDRAW_FIELD);
     }
     else
     {
@@ -1893,7 +1896,7 @@ void HandleInfoScreen_LevelSet(int button)
   }
 }
 
-static void DrawInfoScreenExt(int fade_delay)
+static void DrawInfoScreenExt(boolean do_fading)
 {
   SetMainBackgroundImage(IMG_BACKGROUND_INFO);
 
@@ -1910,7 +1913,7 @@ static void DrawInfoScreenExt(int fade_delay)
   else if (info_mode == INFO_MODE_LEVELSET)
     DrawInfoScreen_LevelSet();
   else
-    DrawInfoScreen_Main(fade_delay);
+    DrawInfoScreen_Main(do_fading);
 
   if (info_mode != INFO_MODE_MAIN &&
       info_mode != INFO_MODE_TITLE &&
@@ -2420,7 +2423,7 @@ void DrawHallOfFame(int highlight_position)
   if (highlight_position < 0) 
     LoadScore(level_nr);
 
-  FadeOutField(TITLE_SCREEN_FADE_DELAY, TITLE_SCREEN_POST_DELAY);
+  FadeOut(REDRAW_FIELD);
 
 #if 0
   FadeToFront();
@@ -2432,7 +2435,7 @@ void DrawHallOfFame(int highlight_position)
 
   HandleHallOfFame(highlight_position, 0, 0, 0, MB_MENU_INITIALIZE);
 
-  FadeInField(TITLE_SCREEN_FADE_DELAY);
+  FadeIn(REDRAW_FIELD);
 }
 
 static void drawHallOfFameList(int first_entry, int highlight_position)
@@ -2524,16 +2527,16 @@ void HandleHallOfFame(int mx, int my, int dx, int dy, int button)
 
     game_status = GAME_MODE_MAIN;
 
-    DrawMainMenuExt(0, REDRAW_FIELD);
+    DrawMainMenu();
   }
   else if (button == MB_MENU_CHOICE)
   {
     FadeSound(SND_BACKGROUND_SCORES);
-    FadeOutField(TITLE_SCREEN_FADE_DELAY, TITLE_SCREEN_POST_DELAY);
+    FadeOut(REDRAW_FIELD);
 
     game_status = GAME_MODE_MAIN;
 
-    DrawMainMenuExt(TITLE_SCREEN_FADE_DELAY, REDRAW_FIELD);
+    DrawAndFadeInMainMenu(REDRAW_FIELD);
   }
 
   if (game_status == GAME_MODE_SCORES)

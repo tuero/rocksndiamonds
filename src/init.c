@@ -4496,7 +4496,7 @@ void InitGfx()
     Error(ERR_EXIT, "cannot get filename for '%s'", CONFIG_TOKEN_FONT_INITIAL);
 
   /* create additional image buffers for double-buffering and cross-fading */
-  bitmap_db_title = CreateBitmap(WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH);
+  bitmap_db_cross = CreateBitmap(WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH);
   bitmap_db_field = CreateBitmap(FXSIZE, FYSIZE, DEFAULT_DEPTH);
   bitmap_db_panel = CreateBitmap(DXSIZE, DYSIZE, DEFAULT_DEPTH);
   bitmap_db_door  = CreateBitmap(3 * DXSIZE, DYSIZE + VYSIZE, DEFAULT_DEPTH);
@@ -4893,7 +4893,7 @@ void OpenAll()
 #endif
 
 #if 0
-  DrawMainMenuExt(TITLE_SCREEN_FADE_DELAY, REDRAW_ALL);
+  DrawMainMenuExt(REDRAW_ALL);
 #else
   DrawMainMenu();
 #endif

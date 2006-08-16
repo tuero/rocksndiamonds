@@ -414,99 +414,60 @@ void FadeToFront()
   BackToFront();
 }
 
-void FadeIn(int fade_delay)
+void FadeExt(int fade_mask, int fade_mode)
 {
+  Bitmap *bitmap = (fade_mode == FADE_MODE_CROSSFADE ? bitmap_db_cross : NULL);
+  int fade_delay = menu.fade_delay;
+  int post_delay = (fade_mode == FADE_MODE_FADE_OUT ? menu.post_delay : 0);
+  int x, y, width, height;
+
+  if (fade_mask & REDRAW_ALL)
+  {
+    x = 0;
+    y = 0;
+    width  = WIN_XSIZE;
+    height = WIN_YSIZE;
+  }
+  else if (fade_mask & REDRAW_FIELD)
+  {
+    x = REAL_SX;
+    y = REAL_SY;
+    width  = FULL_SXSIZE;
+    height = FULL_SYSIZE;
+  }
+
+  redraw_mask |= fade_mask;
+
   if (fade_delay == 0)
   {
+    if (fade_mode == FADE_MODE_CROSSFADE)
+      BlitBitmap(bitmap, backbuffer, x, y, width, height, x, y);
+    else if (fade_mode == FADE_MODE_FADE_OUT)
+      ClearRectangle(backbuffer, x, y, width, height);
+
     BackToFront();
 
     return;
   }
 
-  FadeRectangle(NULL, 0, 0, WIN_XSIZE, WIN_YSIZE,
-		FADE_MODE_FADE_IN, fade_delay, 0);
+  FadeRectangle(bitmap, x, y, width, height, fade_mode, fade_delay, post_delay);
 
-  redraw_mask = REDRAW_NONE;
+  redraw_mask &= ~fade_mask;
 }
 
-void FadeOut(int fade_delay, int post_delay)
+void FadeIn(int fade_mask)
 {
-  if (fade_delay == 0)
-  {
-    ClearRectangle(backbuffer, 0, 0, WIN_XSIZE, WIN_YSIZE);
-    BackToFront();
-
-    return;
-  }
-
-  FadeRectangle(NULL, 0, 0, WIN_XSIZE, WIN_YSIZE,
-		FADE_MODE_FADE_OUT, fade_delay, post_delay);
-
-  redraw_mask = REDRAW_NONE;
+  FadeExt(fade_mask, FADE_MODE_FADE_IN);
 }
 
-void FadeCross(int fade_delay)
+void FadeOut(int fade_mask)
 {
-  if (fade_delay == 0)
-  {
-    BlitBitmap(bitmap_db_title, backbuffer, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
-    BackToFront();
-
-    return;
-  }
-
-  FadeRectangle(bitmap_db_title, 0, 0, WIN_XSIZE, WIN_YSIZE,
-		FADE_MODE_CROSSFADE, fade_delay, 0);
-
-  redraw_mask = REDRAW_NONE;
+  FadeExt(fade_mask, FADE_MODE_FADE_OUT);
 }
 
-void FadeInField(int fade_delay)
+void FadeCross(int fade_mask)
 {
-  if (fade_delay == 0)
-  {
-    BackToFront();
-
-    return;
-  }
-
-  FadeRectangle(NULL, REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE,
-		FADE_MODE_FADE_IN, fade_delay, 0);
-
-  redraw_mask &= ~REDRAW_FIELD;
-}
-
-void FadeOutField(int fade_delay, int post_delay)
-{
-  if (fade_delay == 0)
-  {
-    ClearRectangle(backbuffer, REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE);
-    BackToFront();
-
-    return;
-  }
-
-  FadeRectangle(NULL, REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE,
-		FADE_MODE_FADE_OUT, fade_delay, post_delay);
-
-  redraw_mask &= ~REDRAW_FIELD;
-}
-
-void FadeCrossField(int fade_delay)
-{
-  if (fade_delay == 0)
-  {
-    BlitBitmap(bitmap_db_title, backbuffer, REAL_SX, REAL_SY,
-	       FULL_SXSIZE, FULL_SYSIZE, REAL_SX, REAL_SY);
-    BackToFront();
-
-    return;
-  }
-
-  FadeRectangle(bitmap_db_title, REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE,
-		FADE_MODE_CROSSFADE, fade_delay, 0);
-
-  redraw_mask &= ~REDRAW_FIELD;
+  FadeExt(fade_mask, FADE_MODE_CROSSFADE);
 }
 
 void SetMainBackgroundImageIfDefined(int graphic)

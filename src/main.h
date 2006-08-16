@@ -806,10 +806,6 @@
 #define MICROLEVEL_SCROLL_DELAY	50	/* delay for scrolling micro level */
 #define MICROLEVEL_LABEL_DELAY	250	/* delay for micro level label */
 
-/* values for fading in and out */
-#define TITLE_SCREEN_FADE_DELAY		250
-#define TITLE_SCREEN_POST_DELAY		(TITLE_SCREEN_FADE_DELAY / 2)
-
 /* boundaries of arrays etc. */
 #define MAX_LEVEL_NAME_LEN	32
 #define MAX_LEVEL_AUTHOR_LEN	32
@@ -1846,6 +1842,9 @@ struct MenuInfo
 
   int list_size[NUM_SPECIAL_GFX_ARGS];
 
+  int fade_delay;
+  int post_delay;
+
   int sound[NUM_SPECIAL_GFX_ARGS];
   int music[NUM_SPECIAL_GFX_ARGS];
 };
@@ -2348,7 +2347,7 @@ struct HelpAnimInfo
 };
 
 
-extern Bitmap		       *bitmap_db_title;
+extern Bitmap		       *bitmap_db_cross;
 extern Bitmap		       *bitmap_db_field;
 extern Bitmap		       *bitmap_db_panel;
 extern Bitmap		       *bitmap_db_door;

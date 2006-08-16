@@ -327,6 +327,7 @@ void InitVideoBuffer(DrawBuffer **backbuffer, DrawWindow **window,
   video.width = width;
   video.height = height;
   video.depth = GetRealDepth(depth);
+
   video.fullscreen_available = FULLSCREEN_STATUS;
   video.fullscreen_enabled = FALSE;
   video.fullscreen_modes = NULL;

@@ -62,6 +62,9 @@ void InitGameEngine_EM()
 
   game_initscreen();
   game_animscreen();
+
+  /* blit playfield from scroll buffer to back buffer for fading in */
+  BlitScreenToBitmap_EM(backbuffer);
 }
 
 void GameActions_EM(byte action[MAX_PLAYERS], boolean warp_mode)
@@ -69,6 +72,14 @@ void GameActions_EM(byte action[MAX_PLAYERS], boolean warp_mode)
   int i;
 
   game_animscreen();
+
+#if 1
+  SyncDisplay();
+
+  blitscreen();
+
+  FlushDisplay();
+#endif
 
   RandomEM = RandomEM * 129 + 1;
 

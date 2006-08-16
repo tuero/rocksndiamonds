@@ -4535,6 +4535,9 @@ struct ConfigInfo image_config[] =
   { "menu.list_size.SCORES",			"-1"			},
   { "menu.list_size.INFO",			"-1"			},
 
+  { "menu.fade_delay",				"250"			},
+  { "menu.post_delay",				"125"			},
+
   { "door_1.width",				"-1"			},
   { "door_1.height",				"-1"			},
   { "door_1.step_offset",			"2"			},

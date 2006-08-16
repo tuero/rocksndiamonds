@@ -1028,11 +1028,13 @@ void RedrawPlayfield_EM(boolean force_redraw)
   for (i = 0; i < MAX_PLAYERS; i++)
     blitplayer(&ply[i]);
 
+#if 0
   SyncDisplay();
 
   blitscreen();
 
   FlushDisplay();
+#endif
 }
 
 void game_animscreen(void)
