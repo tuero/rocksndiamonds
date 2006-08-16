@@ -389,7 +389,6 @@ void SDLFadeRectangle(Bitmap *bitmap_cross, int x, int y, int width, int height,
   SDL_Rect src_rect, dst_rect;
   int src_x = x, src_y = y;
   int dst_x = x, dst_y = y;
-  boolean fade_reverse = (fade_mode == FADE_MODE_FADE_IN ? TRUE : FALSE);
   unsigned int time_last, time_current;
   float alpha;
   int alpha_final;
@@ -463,13 +462,18 @@ void SDLFadeRectangle(Bitmap *bitmap_cross, int x, int y, int width, int height,
   /* copy source and target surfaces to temporary surfaces for fading */
   if (fade_mode == FADE_MODE_CROSSFADE)
   {
-    SDL_BlitSurface(surface_cross, &src_rect, surface_source, &src_rect);
+    SDL_BlitSurface(surface_cross,  &src_rect, surface_source, &src_rect);
     SDL_BlitSurface(surface_screen, &dst_rect, surface_target, &src_rect);
   }
-  else
+  else if (fade_mode == FADE_MODE_FADE_IN)
+  {
+    SDL_BlitSurface(surface_black,  &src_rect, surface_source, &src_rect);
+    SDL_BlitSurface(surface_screen, &dst_rect, surface_target, &src_rect);
+  }
+  else		/* FADE_MODE_FADE_OUT */
   {
     SDL_BlitSurface(surface_screen, &dst_rect, surface_source, &src_rect);
-    SDL_BlitSurface(surface_black, &src_rect, surface_target, &src_rect);
+    SDL_BlitSurface(surface_black,  &src_rect, surface_target, &src_rect);
   }
 
   time_current = SDL_GetTicks();
@@ -479,8 +483,7 @@ void SDLFadeRectangle(Bitmap *bitmap_cross, int x, int y, int width, int height,
     time_last = time_current;
     time_current = SDL_GetTicks();
     alpha += 255 * ((float)(time_current - time_last) / fade_delay);
-    alpha_final = (int)(fade_reverse ? 255.0 - alpha : alpha);
-    alpha_final = MIN(MAX(0, alpha_final), 255);
+    alpha_final = MIN(MAX(0, alpha), 255);
 
     /* draw existing (source) image to screen buffer */
     SDL_BlitSurface(surface_source, &src_rect, surface_screen, &dst_rect);

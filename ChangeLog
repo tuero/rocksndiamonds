@@ -1,3 +1,6 @@
+2006-08-16
+	* code cleanup of new fading functions
+
 2006-08-15
 	* changed behaviour after solved game -- do not immediately stop engine
 	* added some more smooth screen fadings (game start, hall of fame etc.)
