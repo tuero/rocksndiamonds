@@ -70,6 +70,7 @@ void FadeToFront();
 void FadeIn(int);
 void FadeOut(int);
 void FadeCross(int);
+void FadeCrossSaveBackbuffer();
 
 void ClearWindow();
 void SetMainBackgroundImageIfDefined(int);

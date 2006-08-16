@@ -381,10 +381,11 @@ void SDLFadeRectangle(Bitmap *bitmap_cross, int x, int y, int width, int height,
 		      int fade_mode, int fade_delay, int post_delay)
 {
   static boolean initialization_needed = TRUE;
-  static SDL_Surface *surface_screen_copy = NULL;
+  static SDL_Surface *surface_source = NULL;
+  static SDL_Surface *surface_target = NULL;
   static SDL_Surface *surface_black = NULL;
   SDL_Surface *surface_screen = backbuffer->surface;
-  SDL_Surface *surface_cross;		/* initialized later */
+  SDL_Surface *surface_cross = (bitmap_cross ? bitmap_cross->surface : NULL);
   SDL_Rect src_rect, dst_rect;
   int src_x = x, src_y = y;
   int dst_x = x, dst_y = y;
@@ -406,21 +407,6 @@ void SDLFadeRectangle(Bitmap *bitmap_cross, int x, int y, int width, int height,
   dst_rect.w = width;
   dst_rect.h = height;
 
-#if 0
-  if (!initialization_needed)
-  {
-    /* check if screen size has changed (can happen when toggling fullscreen) */
-    if (surface_screen_copy->w != surface_screen->w ||
-	surface_screen_copy->h != surface_screen->h)
-    {
-      SDL_FreeSurface(surface_screen_copy);
-      SDL_FreeSurface(surface_black);
-
-      initialization_needed = TRUE;
-    }
-  }
-#endif
-
   if (initialization_needed)
   {
     unsigned int flags = SDL_SRCALPHA;
@@ -431,39 +417,41 @@ void SDLFadeRectangle(Bitmap *bitmap_cross, int x, int y, int width, int height,
     else
       flags |= SDL_SWSURFACE;
 
-    /* create surface for temporary copy of screen buffer */
-    if ((surface_screen_copy =
+    /* create surface for temporary copy of screen buffer (source) */
+    if ((surface_source =
 	 SDL_CreateRGBSurface(flags,
-#if 1
 			      video.width,
 			      video.height,
-#else
-			      surface_screen->w,
-			      surface_screen->h,
-#endif
 			      surface_screen->format->BitsPerPixel,
 			      surface_screen->format->Rmask,
 			      surface_screen->format->Gmask,
 			      surface_screen->format->Bmask,
 			      surface_screen->format->Amask)) == NULL)
-      Error(ERR_EXIT, "SDL_CreateRGBSurface(	) failed: %s", SDL_GetError());
+      Error(ERR_EXIT, "SDL_CreateRGBSurface() failed: %s", SDL_GetError());
+
+    /* create surface for cross-fading screen buffer (target) */
+    if ((surface_target =
+	 SDL_CreateRGBSurface(flags,
+			      video.width,
+			      video.height,
+			      surface_screen->format->BitsPerPixel,
+			      surface_screen->format->Rmask,
+			      surface_screen->format->Gmask,
+			      surface_screen->format->Bmask,
+			      surface_screen->format->Amask)) == NULL)
+      Error(ERR_EXIT, "SDL_CreateRGBSurface() failed: %s", SDL_GetError());
 
     /* create black surface for fading from/to black */
     if ((surface_black =
 	 SDL_CreateRGBSurface(flags,
-#if 1
 			      video.width,
 			      video.height,
-#else
-			      surface_screen->w,
-			      surface_screen->h,
-#endif
 			      surface_screen->format->BitsPerPixel,
 			      surface_screen->format->Rmask,
 			      surface_screen->format->Gmask,
 			      surface_screen->format->Bmask,
 			      surface_screen->format->Amask)) == NULL)
-      Error(ERR_EXIT, "SDL_CreateRGBSurface(	) failed: %s", SDL_GetError());
+      Error(ERR_EXIT, "SDL_CreateRGBSurface() failed: %s", SDL_GetError());
 
     /* completely fill the surface with black color pixels */
     SDL_FillRect(surface_black, NULL,
@@ -472,11 +460,17 @@ void SDLFadeRectangle(Bitmap *bitmap_cross, int x, int y, int width, int height,
     initialization_needed = FALSE;
   }
 
-  /* copy the current screen backbuffer to the temporary screen copy buffer */
-  SDL_BlitSurface(surface_screen, &dst_rect, surface_screen_copy, &src_rect);
-
-  surface_cross = (fade_mode == FADE_MODE_CROSSFADE ? bitmap_cross->surface :
-		   surface_black);
+  /* copy source and target surfaces to temporary surfaces for fading */
+  if (fade_mode == FADE_MODE_CROSSFADE)
+  {
+    SDL_BlitSurface(surface_cross, &src_rect, surface_source, &src_rect);
+    SDL_BlitSurface(surface_screen, &dst_rect, surface_target, &src_rect);
+  }
+  else
+  {
+    SDL_BlitSurface(surface_screen, &dst_rect, surface_source, &src_rect);
+    SDL_BlitSurface(surface_black, &src_rect, surface_target, &src_rect);
+  }
 
   time_current = SDL_GetTicks();
 
@@ -488,15 +482,15 @@ void SDLFadeRectangle(Bitmap *bitmap_cross, int x, int y, int width, int height,
     alpha_final = (int)(fade_reverse ? 255.0 - alpha : alpha);
     alpha_final = MIN(MAX(0, alpha_final), 255);
 
-    /* draw existing image to screen buffer */
-    SDL_BlitSurface(surface_screen_copy, &src_rect, surface_screen, &dst_rect);
+    /* draw existing (source) image to screen buffer */
+    SDL_BlitSurface(surface_source, &src_rect, surface_screen, &dst_rect);
 
-    /* draw new image to screen buffer using alpha blending */
-    SDL_SetAlpha(surface_cross, SDL_SRCALPHA, alpha_final);
-    SDL_BlitSurface(surface_cross, &src_rect, surface_screen, &dst_rect);
+    /* draw new (target) image to screen buffer using alpha blending */
+    SDL_SetAlpha(surface_target, SDL_SRCALPHA, alpha_final);
+    SDL_BlitSurface(surface_target, &src_rect, surface_screen, &dst_rect);
 
-    /* draw screen buffer to visible display */
 #if 1
+    /* only update the region of the screen that is affected from fading */
     SDL_UpdateRect(surface_screen, dst_x, dst_y, width, height);
 #else
     SDL_Flip(surface_screen);

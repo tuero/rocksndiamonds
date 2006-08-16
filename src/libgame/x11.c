@@ -365,13 +365,12 @@ void X11FillRectangle(Bitmap *bitmap, int x, int y,
 void X11FadeRectangle(Bitmap *bitmap_cross, int x, int y, int width, int height,
 		      int fade_mode, int fade_delay, int post_delay)
 {
-  /* fading currently not supported -- simply copy target image to screen */
+  /* fading currently not supported -- simply copy backbuffer to screen */
 
   if (fade_mode == FADE_MODE_FADE_OUT)
     X11FillRectangle(window, x, y, width, height, BLACK_PIXEL);
   else
-    X11CopyArea(bitmap_cross != NULL ? bitmap_cross : backbuffer, window,
-		x, y, width, height, 0, 0, BLIT_OPAQUE);
+    X11CopyArea(backbuffer, window, x, y, width, height, 0, 0, BLIT_OPAQUE);
 
   /* as we currently cannot use the fade delay, also do not use post delay */
 }

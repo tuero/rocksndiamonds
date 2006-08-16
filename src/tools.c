@@ -440,9 +440,7 @@ void FadeExt(int fade_mask, int fade_mode)
 
   if (fade_delay == 0)
   {
-    if (fade_mode == FADE_MODE_CROSSFADE)
-      BlitBitmap(bitmap, backbuffer, x, y, width, height, x, y);
-    else if (fade_mode == FADE_MODE_FADE_OUT)
+    if (fade_mode == FADE_MODE_FADE_OUT)
       ClearRectangle(backbuffer, x, y, width, height);
 
     BackToFront();
@@ -468,6 +466,11 @@ void FadeOut(int fade_mask)
 void FadeCross(int fade_mask)
 {
   FadeExt(fade_mask, FADE_MODE_CROSSFADE);
+}
+
+void FadeCrossSaveBackbuffer()
+{
+  BlitBitmap(backbuffer, bitmap_db_cross, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
 }
 
 void SetMainBackgroundImageIfDefined(int graphic)

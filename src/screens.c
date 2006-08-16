@@ -658,9 +658,13 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
     {
       Bitmap *drawto_last = drawto;
 
+#if 1
+      if (use_cross_fading)
+	FadeCrossSaveBackbuffer();
+#else
       if (use_cross_fading)
 	drawto = bitmap_db_cross;
-
+#endif
       DrawTitleScreenImage(title_nr);
 
       drawto = drawto_last;
@@ -1468,8 +1472,13 @@ void HandleInfoScreen_Music(int button)
 
     FadeSoundsAndMusic();
 
+#if 1
+    if (button != MB_MENU_INITIALIZE)
+      FadeCrossSaveBackbuffer();
+#else
     if (button != MB_MENU_INITIALIZE)
       drawto = bitmap_db_cross;
+#endif
 
     ClearWindow();
     DrawHeadline();
@@ -1746,7 +1755,11 @@ void HandleInfoScreen_Credits(int button)
 
     screen_nr++;
 
+#if 1
+    FadeCrossSaveBackbuffer();
+#else
     drawto = bitmap_db_cross;
+#endif
 
     show_screen = DrawInfoScreen_CreditsScreen(screen_nr);
 
