@@ -438,7 +438,7 @@ void FadeExt(int fade_mask, int fade_mode)
 
   redraw_mask |= fade_mask;
 
-  if (fade_delay == 0)
+  if (!setup.fading || fade_delay == 0)
   {
     if (fade_mode == FADE_MODE_FADE_OUT)
       ClearRectangle(backbuffer, x, y, width, height);

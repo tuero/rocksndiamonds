@@ -1,3 +1,8 @@
+2006-08-18
+	* fixed bug that caused broken tapes when manually appending to tapes
+	  using the "pause before death" functionality, followed by recording
+	* added setup option to disable fading of screens for faster testing
+
 2006-08-16
 	* code cleanup of new fading functions
 

@@ -71,6 +71,22 @@ void GameActions_EM(byte action[MAX_PLAYERS], boolean warp_mode)
 {
   int i;
 
+#if 0
+  static int foo = -1;
+
+  if (action[0] == 0 && foo != 0)
+    printf("KEY RELEASED @ %05d\n", FrameCounter);
+
+  foo = action[0];
+#endif
+
+#if 0
+#if 1
+  if (FrameCounter % 10 == 0)
+#endif
+    printf("::: %05d: %lu, %d\n", FrameCounter, RandomEM, frame);
+#endif
+
   game_animscreen();
 
 #if 1

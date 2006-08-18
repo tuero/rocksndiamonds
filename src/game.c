@@ -9924,7 +9924,25 @@ void GameActions()
   network_player_action_received = FALSE;
 #endif
 
+  /* when playing tape, read previously recorded player input from tape data */
   recorded_player_action = (tape.playing ? TapePlayAction() : NULL);
+
+#if 1
+  /* TapePlayAction() may return NULL when toggling to "pause before death" */
+  if (tape.pausing)
+    return;
+#endif
+
+#if 0
+  if (tape.playing)
+  {
+    if (recorded_player_action == NULL)
+      printf("!!! THIS SHOULD NOT HAPPEN !!!\n");
+    else
+      printf("::: %05d: TAPE PLAYING: %08x\n",
+	     FrameCounter, recorded_player_action[0]);
+  }
+#endif
 
   if (tape.set_centered_player)
   {
@@ -9971,6 +9989,12 @@ void GameActions()
   /* only record actions from input devices, but not programmed actions */
   if (tape.recording)
     TapeRecordAction(tape_action);
+
+#if 0
+  if (tape.recording)
+    printf("::: %05d: TAPE RECORDING: %08x\n",
+	   FrameCounter, tape_action[0]);
+#endif
 
   if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
   {

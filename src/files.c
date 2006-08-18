@@ -7140,7 +7140,7 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
   si->direct_draw = !si->double_buffering;
   si->scroll_delay = TRUE;
   si->soft_scrolling = TRUE;
-  si->fading = FALSE;
+  si->fading = TRUE;
   si->autorecord = TRUE;
   si->show_titlescreen = TRUE;
   si->quick_doors = FALSE;
