@@ -140,6 +140,11 @@ void RedrawPlayfield(boolean force_redraw, int x, int y, int width, int height)
     /* currently there is no partial redraw -- always redraw whole playfield */
 
     RedrawPlayfield_EM(TRUE);
+
+#if 1
+    /* blit playfield from scroll buffer to normal back buffer for fading in */
+    BlitScreenToBitmap_EM(backbuffer);
+#endif
   }
   else if (game_status == GAME_MODE_PLAYING && !game.envelope_active)
   {

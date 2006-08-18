@@ -93,13 +93,15 @@ void BlitScreenToBitmap_EM(Bitmap *target_bitmap)
   }
 }
 
-void blitscreen(void)
+void BackToFront_EM(void)
 {
   static boolean scrolling_last = FALSE;
   int left = screen_x / TILEX;
   int top  = screen_y / TILEY;
   boolean scrolling = (screen_x % TILEX != 0 || screen_y % TILEY != 0);
   int x, y;
+
+  SyncDisplay();
 
   if (redraw_tiles > REDRAWTILES_THRESHOLD || scrolling || scrolling_last)
   {
@@ -126,12 +128,19 @@ void blitscreen(void)
     }
   }
 
+  FlushDisplay();
+
   for (x = 0; x < MAX_BUF_XSIZE; x++)
     for (y = 0; y < MAX_BUF_YSIZE; y++)
       redraw[x][y] = FALSE;
   redraw_tiles = 0;
 
   scrolling_last = scrolling;
+}
+
+void blitscreen(void)
+{
+  BackToFront_EM();
 }
 
 static void DrawLevelField_EM(int x, int y, int sx, int sy,
@@ -869,14 +878,16 @@ void RedrawPlayfield_EM(boolean force_redraw)
 	blitplayer(&ply[i]);
 
       blitscreen();
-      FlushDisplay();
+
       Delay(wait_delay_value);
 
       /* scroll second step to align at full tile size */
       screen_x -= dxx;
       screen_y -= dyy;
 
+#if 0
       SyncDisplay();
+#endif
 
       animscreen();
 
@@ -884,7 +895,7 @@ void RedrawPlayfield_EM(boolean force_redraw)
 	blitplayer(&ply[i]);
 
       blitscreen();
-      FlushDisplay();
+
       Delay(wait_delay_value);
     }
 
@@ -1029,11 +1040,11 @@ void RedrawPlayfield_EM(boolean force_redraw)
     blitplayer(&ply[i]);
 
 #if 0
+#if 0
   SyncDisplay();
+#endif
 
   blitscreen();
-
-  FlushDisplay();
 #endif
 }
 

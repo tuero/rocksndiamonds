@@ -2644,6 +2644,11 @@ void InitGame()
   if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
   {
     InitGameEngine_EM();
+
+#if 1
+    /* blit playfield from scroll buffer to normal back buffer for fading in */
+    BlitScreenToBitmap_EM(backbuffer);
+#endif
   }
   else
   {
@@ -2654,6 +2659,7 @@ void InitGame()
     if (game.timegate_time_left == 0)
       CloseAllOpenTimegates();
 
+    /* blit playfield from scroll buffer to normal back buffer for fading in */
     if (setup.soft_scrolling)
       BlitBitmap(fieldbuffer, backbuffer, FX, FY, SXSIZE, SYSIZE, SX, SY);
 
@@ -2667,6 +2673,8 @@ void InitGame()
 
   if (do_fading)
     FadeIn(REDRAW_FIELD);
+
+  BackToFront();
 
   if (!game.restart_level)
   {

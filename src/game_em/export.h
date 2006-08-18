@@ -710,6 +710,7 @@ extern unsigned int InitEngineRND_EM(long);
 extern void setLevelInfoToDefaults_EM();
 extern boolean LoadNativeLevel_EM(char *);
 
+extern void BackToFront_EM(void);
 extern void BlitScreenToBitmap_EM(Bitmap *);
 extern void RedrawPlayfield_EM(boolean);
 extern void DrawGameDoorValues_EM();

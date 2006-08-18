@@ -4875,6 +4875,10 @@ void OpenAll()
 
   InitGfxBackground();
 
+#if 1
+  em_open_all();
+#endif
+
   if (global.autoplay_leveldir)
   {
     AutoPlayTape();
@@ -4888,7 +4892,7 @@ void OpenAll()
 
   game_status = GAME_MODE_MAIN;
 
-#if 1
+#if 0
   em_open_all();
 #endif
 
