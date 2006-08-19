@@ -141,10 +141,8 @@ void RedrawPlayfield(boolean force_redraw, int x, int y, int width, int height)
 
     RedrawPlayfield_EM(TRUE);
 
-#if 1
     /* blit playfield from scroll buffer to normal back buffer for fading in */
     BlitScreenToBitmap_EM(backbuffer);
-#endif
   }
   else if (game_status == GAME_MODE_PLAYING && !game.envelope_active)
   {
@@ -579,17 +577,6 @@ inline int getGraphicAnimationFrame(int graphic, int sync_frame)
   /* animation synchronized with global frame counter, not move position */
   if (graphic_info[graphic].anim_global_sync || sync_frame < 0)
     sync_frame = FrameCounter;
-
-#if 0
-  if (graphic == element_info[EL_CUSTOM_START + 255].graphic[ACTION_DEFAULT] &&
-      sync_frame == 0 &&
-      FrameCounter > 10)
-  {
-    int x = 1 / 0;
-
-    printf("::: FOO!\n");
-  }
-#endif
 
   return getAnimationFrame(graphic_info[graphic].anim_frames,
 			   graphic_info[graphic].anim_delay,
@@ -1070,34 +1057,20 @@ static void DrawLevelFieldCrumbledSandExt(int x, int y, int graphic, int frame)
       int sxx = sx + xy[i][0];
       int syy = sy + xy[i][1];
 
-#if 1
       if (!IN_LEV_FIELD(xx, yy) ||
 	  !IN_SCR_FIELD(sxx, syy) ||
 	  IS_MOVING(xx, yy))
 	continue;
 
-#if 1
       if (Feld[xx][yy] == EL_ELEMENT_SNAPPING)
 	continue;
-#endif
 
       element = TILE_GFX_ELEMENT(xx, yy);
 
       if (!GFX_CRUMBLED(element))
 	continue;
-#else
-      if (!IN_LEV_FIELD(xx, yy) ||
-	  !IN_SCR_FIELD(sxx, syy) ||
-	  !GFX_CRUMBLED(Feld[xx][yy]) ||
-	  IS_MOVING(xx, yy))
-	continue;
-#endif
 
-#if 1
       graphic = el_act2crm(element, ACTION_DEFAULT);
-#else
-      graphic = el_act2crm(Feld[xx][yy], ACTION_DEFAULT);
-#endif
       crumbled_border_size = graphic_info[graphic].border_size;
 
       getGraphicSource(graphic, frame, &src_bitmap, &src_x, &src_y);
@@ -1971,12 +1944,10 @@ void DrawPlayer(struct PlayerInfo *player)
   int last_player_frame = player->Frame;
   int frame = 0;
 
-#if 1
   /* GfxElement[][] is set to the element the player is digging or collecting;
      remove also for off-screen player if the player is not moving anymore */
   if (IN_LEV_FIELD(jx, jy) && !player_is_moving)
     GfxElement[jx][jy] = EL_UNDEFINED;
-#endif
 
   if (!player->active || !IN_SCR_FIELD(SCREENX(last_jx), SCREENY(last_jy)))
     return;
@@ -2002,10 +1973,8 @@ void DrawPlayer(struct PlayerInfo *player)
 	    player->is_dropping   ? ACTION_DROPPING        :
 	    player->is_waiting    ? player->action_waiting : ACTION_DEFAULT);
 
-#if 1
   if (player->is_waiting)
     move_dir = player->dir_waiting;
-#endif
 
   InitPlayerGfxAnimation(player, action, move_dir);
 
@@ -2729,17 +2698,8 @@ unsigned int MoveDoor(unsigned int door_state)
     int door_size     = (handle_door_1 ? door_size_1     : door_size_2);
     int max_door_size = (handle_door_1 ? max_door_size_1 : max_door_size_2);
     int door_skip = max_door_size - door_size;
-#if 1
     int end = door_size;
-#else
-    int end = (door_state & DOOR_ACTION_1 && door_1.anim_mode & ANIM_VERTICAL ?
-	       DYSIZE : DXSIZE);
-#endif
-#if 1
     int start = ((door_state & DOOR_NO_DELAY) ? end : 0);
-#else
-    int start = ((door_state & DOOR_NO_DELAY) ? end : offset_skip);
-#endif
     int k;
 
     if (!(door_state & DOOR_NO_DELAY) && !setup.quick_doors)
@@ -2851,15 +2811,9 @@ unsigned int MoveDoor(unsigned int door_state)
 
       if (door_state & DOOR_ACTION_2)
       {
-#if 1
 	int a = MIN(x * door_2.step_offset, door_size);
 	int p = (door_state & DOOR_OPEN_2 ? door_size - a : a);
 	int i = p + door_skip;
-#else
-	int a = MIN(x * door_2.step_offset, door_size_2);
-	int p = (door_state & DOOR_OPEN_2 ? door_size_2 - a : a);
-	int i = p + door_skip;
-#endif
 
 	if (door_2.anim_mode & ANIM_STATIC_PANEL)
 	{
@@ -5319,37 +5273,6 @@ int font2baseimg(int font_nr)
   return font_info[font_nr].special_graphic[GFX_SPECIAL_ARG_DEFAULT];
 }
 
-#if 0
-void setCenteredPlayerNr_EM(int centered_player_nr)
-{
-  game.centered_player_nr = game.centered_player_nr_next = centered_player_nr;
-}
-
-int getCenteredPlayerNr_EM()
-{
-#if 0
-  if (game.centered_player_nr_next >= 0 &&
-      !native_em_level.ply[game.centered_player_nr_next]->alive)
-    game.centered_player_nr_next = game.centered_player_nr;
-#endif
-
-  if (game.centered_player_nr != game.centered_player_nr_next)
-    game.centered_player_nr = game.centered_player_nr_next;
-
-  return game.centered_player_nr;
-}
-
-void setSetCenteredPlayer_EM(boolean set_centered_player)
-{
-  game.set_centered_player = set_centered_player;
-}
-
-boolean getSetCenteredPlayer_EM()
-{
-  return game.set_centered_player;
-}
-#endif
-
 int getNumActivePlayers_EM()
 {
   int num_players = 0;
@@ -5365,7 +5288,6 @@ int getNumActivePlayers_EM()
   return num_players;
 }
 
-#if 1
 int getGameFrameDelay_EM(int native_em_game_frame_delay)
 {
   int game_frame_delay_value;
@@ -5380,7 +5302,6 @@ int getGameFrameDelay_EM(int native_em_game_frame_delay)
 
   return game_frame_delay_value;
 }
-#endif
 
 unsigned int InitRND(long seed)
 {
@@ -5785,7 +5706,6 @@ void InitGraphicInfo_EM(void)
 	g_em->height = TILEY - cy * step;
       }
 
-#if 1
       /* create unique graphic identifier to decide if tile must be redrawn */
       /* bit 31 - 16 (16 bit): EM style graphic
 	 bit 15 - 12 ( 4 bit): EM style frame
@@ -5793,29 +5713,12 @@ void InitGraphicInfo_EM(void)
 	 bit  5 -  0 ( 6 bit): graphic height */
       g_em->unique_identifier =
 	(graphic << 16) | (frame << 12) | (g_em->width << 6) | g_em->height;
-#else
-      /* create unique graphic identifier to decide if tile must be redrawn */
-      /* bit 31 - 16 (16 bit): EM style element
-	 bit 15 - 12 ( 4 bit): EM style frame
-	 bit 11 -  6 ( 6 bit): graphic width
-	 bit  5 -  0 ( 6 bit): graphic height */
-      g_em->unique_identifier =
-	(i << 16) | (j << 12) | (g_em->width << 6) | g_em->height;
-#endif
-
-#if 0
-      if (effective_element == EL_ROCK)
-	printf("::: EL_ROCK(%d, %d): %d, %d => %d\n",
-	       effective_action, j, graphic, frame, g_em->unique_identifier);
-#endif
 
 #if DEBUG_EM_GFX
 
-#if 1
       /* skip check for EMC elements not contained in original EMC artwork */
       if (element == EL_EMC_FAKE_ACID)
 	continue;
-#endif
 
       if (g_em->bitmap != debug_bitmap ||
 	  g_em->src_x != debug_src_x ||
@@ -5889,13 +5792,8 @@ void InitGraphicInfo_EM(void)
       int action = object_mapping[i].action;
       int direction = object_mapping[i].direction;
       boolean is_backside = object_mapping[i].is_backside;
-#if 1
       int graphic_action  = el_act_dir2img(element, action, direction);
       int graphic_default = el_act_dir2img(element, ACTION_DEFAULT, direction);
-#else
-      int graphic_action  = element_info[element].graphic[action];
-      int graphic_default = element_info[element].graphic[ACTION_DEFAULT];
-#endif
 
       if ((action == ACTION_SMASHED_BY_ROCK ||
 	   action == ACTION_SMASHED_BY_SPRING ||
@@ -5921,9 +5819,7 @@ void InitGraphicInfo_EM(void)
 	g_em->dst_offset_y	= g_xx->dst_offset_y;
 	g_em->width 		= g_xx->width;
 	g_em->height		= g_xx->height;
-#if 1
 	g_em->unique_identifier	= g_xx->unique_identifier;
-#endif
 
 	if (!is_backside)
 	  g_em->preserve_background = TRUE;
@@ -5979,12 +5875,10 @@ void InitGraphicInfo_EM(void)
 
 #if DEBUG_EM_GFX
 
-#if 1
 	/* skip check for EMC elements not contained in original EMC artwork */
 	if (element == EL_PLAYER_3 ||
 	    element == EL_PLAYER_4)
 	  continue;
-#endif
 
 	if (g_em->bitmap != debug_bitmap ||
 	    g_em->src_x != debug_src_x ||

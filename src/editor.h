@@ -1,7 +1,7 @@
 /***********************************************************
 * Rocks'n'Diamonds -- McDuffin Strikes Back!               *
 *----------------------------------------------------------*
-* (c) 1995-2002 Artsoft Entertainment                      *
+* (c) 1995-2006 Artsoft Entertainment                      *
 *               Holger Schemel                             *
 *               Detmolder Strasse 189                      *
 *               33604 Bielefeld                            *
@@ -15,10 +15,6 @@
 #define EDITOR_H
 
 #include "main.h"
-
-/* number of element button columns and rows in the edit window */
-#define MAX_ELEM_X		4
-#define MAX_ELEM_Y		10
 
 void CreateLevelEditorGadgets();
 void FreeLevelEditorGadgets();

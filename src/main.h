@@ -1,7 +1,7 @@
 /***********************************************************
 * Rocks'n'Diamonds -- McDuffin Strikes Back!               *
 *----------------------------------------------------------*
-* (c) 1995-2002 Artsoft Entertainment                      *
+* (c) 1995-2006 Artsoft Entertainment                      *
 *               Holger Schemel                             *
 *               Detmolder Strasse 189                      *
 *               33604 Bielefeld                            *
@@ -177,11 +177,7 @@
 #define EP_BITMASK_DEFAULT		0
 
 #define PROPERTY_BIT(p)			(1 << ((p) % 32))
-#if 1
 #define PROPERTY_VAR(e,p)		(element_info[e].properties[(p) / 32])
-#else
-#define PROPERTY_VAR(e,p)		(Properties[e][(p) / 32])
-#endif
 #define HAS_PROPERTY(e,p)	((PROPERTY_VAR(e, p) & PROPERTY_BIT(p)) != 0)
 #define SET_PROPERTY(e,p,v)	((v) ?					   \
 				 (PROPERTY_VAR(e,p) |=  PROPERTY_BIT(p)) : \
@@ -710,21 +706,13 @@
 #define SND_ELEMENT(e)		(e)
 #endif
 
-#if 1
 #define GROUP_NR(e)		((e) - EL_GROUP_START)
 #define IS_IN_GROUP(e, nr)	(element_info[e].in_group[nr] == TRUE)
 #define IS_IN_GROUP_EL(e, ge)	(IS_IN_GROUP(e, (ge) - EL_GROUP_START))
 
-#if 1
 #define IS_EQUAL_OR_IN_GROUP(e, ge)					\
 	(ge == EL_ANY_ELEMENT ? TRUE :					\
 	 IS_GROUP_ELEMENT(ge) ? IS_IN_GROUP(e, GROUP_NR(ge)) : (e) == (ge))
-#else
-#define IS_EQUAL_OR_IN_GROUP(e, ge)					\
-	(IS_GROUP_ELEMENT(ge) ? IS_IN_GROUP(e, GROUP_NR(ge)) : (e) == (ge))
-#endif
-
-#endif
 
 #define IS_PLAYER(x, y)		(ELEM_IS_PLAYER(StorePlayer[x][y]))
 
@@ -815,12 +803,6 @@
 #define MAX_NUM_TITLE_SCREENS	5
 
 #define MAX_NUM_AMOEBA		100
-
-#if 0	/* game.h */
-#define MAX_INVENTORY_SIZE	1000
-#define STD_NUM_KEYS		4
-#define MAX_NUM_KEYS		8
-#endif
 
 #define NUM_BELTS		4
 #define NUM_BELT_PARTS		3
@@ -1968,7 +1950,6 @@ struct LevelInfo
   int explosion_element[MAX_PLAYERS];
   boolean use_explosion_element[MAX_PLAYERS];
 
-#if 1
   /* values for the new EMC elements */
   int android_move_time;
   int android_clone_time;
@@ -1985,12 +1966,8 @@ struct LevelInfo
   struct Content ball_content[MAX_ELEMENT_CONTENTS];
   int num_ball_contents;
 
-#if 0
-  boolean android_array[16];
-#endif
   int num_android_clone_elements;
   int android_clone_element[MAX_ANDROID_ELEMENTS];
-#endif
 
   int can_move_into_acid_bits;	/* bitfield to store property for elements */
   int dont_collide_with_bits;	/* bitfield to store property for elements */
@@ -2395,10 +2372,6 @@ extern short			ExplodePhase[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short			ExplodeDelay[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern int			RunnerVisit[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern int			PlayerVisit[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-
-#if 0
-extern unsigned long		Properties[MAX_NUM_ELEMENTS][NUM_EP_BITFIELDS];
-#endif
 
 extern int			GfxFrame[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern int			GfxRandom[MAX_LEV_FIELDX][MAX_LEV_FIELDY];

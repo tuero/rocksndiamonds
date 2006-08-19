@@ -1,7 +1,7 @@
 /***********************************************************
 * Rocks'n'Diamonds -- McDuffin Strikes Back!               *
 *----------------------------------------------------------*
-* (c) 1995-2002 Artsoft Entertainment                      *
+* (c) 1995-2006 Artsoft Entertainment                      *
 *               Holger Schemel                             *
 *               Detmolder Strasse 189                      *
 *               33604 Bielefeld                            *
@@ -67,13 +67,11 @@ struct GameInfo
   boolean explosions_delayed;
   boolean envelope_active;
 
-#if 1
   /* values for the new EMC elements */
   int lenses_time_left;
   int magnify_time_left;
   boolean ball_state;
   int ball_content_nr;
-#endif
 
   /* values for player idle animation (no effect on engine) */
   int player_boring_delay_fixed;

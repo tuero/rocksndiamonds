@@ -24,6 +24,9 @@
 #include "network.h"
 
 
+#define	DEBUG_EVENTS		0
+
+
 static boolean cursor_inside_playfield = FALSE;
 static boolean playfield_cursor_set = FALSE;
 static unsigned long playfield_cursor_delay = 0;
@@ -315,7 +318,7 @@ void HandleExposeEvent(ExposeEvent *event)
 
 void HandleButtonEvent(ButtonEvent *event)
 {
-#if 0
+#if DEBUG_EVENTS
   printf("::: BUTTON EVENT: button %d %s\n", event->button,
 	 event->type == EVENT_BUTTONPRESS ? "pressed" : "released");
 #endif
@@ -350,7 +353,7 @@ void HandleKeyEvent(KeyEvent *event)
   Key key = GetEventKey(event, with_modifiers);
   Key keymod = (with_modifiers ? GetEventKey(event, FALSE) : key);
 
-#if 0
+#if DEBUG_EVENTS
   printf("::: KEY EVENT: %d %s\n", GetEventKey(event, TRUE),
 	 event->type == EVENT_KEYPRESS ? "pressed" : "released");
 #endif
@@ -512,7 +515,7 @@ static void HandleKeysSpecial(Key key)
   cheat_input[cheat_input_len++] = letter;
   cheat_input[cheat_input_len] = '\0';
 
-#if 0
+#if DEBUG_EVENTS
   printf("::: '%s' [%d]\n", cheat_input, cheat_input_len);
 #endif
 
@@ -700,13 +703,7 @@ void HandleKey(Key key, int key_status)
   if (game_status == GAME_MODE_PLAYING && AllPlayersGone &&
       (key == KSYM_Return || key == setup.shortcut.toggle_pause))
   {
-#if 1
     GameEnd();
-#else
-    CloseDoor(DOOR_CLOSE_1);
-    game_status = GAME_MODE_MAIN;
-    DrawMainMenu();
-#endif
 
     return;
   }
@@ -836,38 +833,6 @@ void HandleKey(Key key, int key_status)
 	  break;
       }
       break;
-
-#if 0
-    case GAME_MODE_SCORES:
-      switch(key)
-      {
-	case KSYM_space:
-	case KSYM_Return:
-	  HandleHallOfFame(0, 0, 0, 0, MB_MENU_CHOICE);
-	  break;
-
-	case KSYM_Escape:
-#if 1
-	  HandleHallOfFame(0, 0, 0, 0, MB_MENU_LEAVE);
-#else
-	  game_status = GAME_MODE_MAIN;
-	  DrawMainMenu();
-#endif
-	  break;
-
-        case KSYM_Page_Up:
-	  HandleHallOfFame(0, 0, 0, -1 * SCROLL_PAGE, MB_MENU_MARK);
-	  break;
-
-        case KSYM_Page_Down:
-	  HandleHallOfFame(0, 0, 0, +1 * SCROLL_PAGE, MB_MENU_MARK);
-	  break;
-
-	default:
-	  break;
-      }
-      break;
-#endif
 
     case GAME_MODE_EDITOR:
       if (!anyTextGadgetActiveOrJustFinished || key == KSYM_Escape)
@@ -1082,13 +1047,7 @@ void HandleJoystick()
 
       if (AllPlayersGone && newbutton)
       {
-#if 1
 	GameEnd();
-#else
-	CloseDoor(DOOR_CLOSE_1);
-	game_status = GAME_MODE_MAIN;
-	DrawMainMenu();
-#endif
 
 	return;
       }
