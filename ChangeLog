@@ -1,5 +1,8 @@
 2006-08-19
-	* code cleanup (removed many annoying "#if 0" blocks)
+	* version 3.2.1 released
+
+2006-08-19
+	* general code cleanup (removing many annoying "#if 0" blocks etc.)
 
 2006-08-18
 	* fixed bug that caused broken tapes when manually appending to tapes
