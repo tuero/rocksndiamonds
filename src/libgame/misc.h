@@ -1,7 +1,7 @@
 /***********************************************************
 * Artsoft Retro-Game Library                               *
 *----------------------------------------------------------*
-* (c) 1994-2002 Artsoft Entertainment                      *
+* (c) 1994-2006 Artsoft Entertainment                      *
 *               Holger Schemel                             *
 *               Detmolder Strasse 189                      *
 *               33604 Bielefeld                            *
@@ -80,13 +80,6 @@ void Delay(unsigned long);
 boolean FrameReached(unsigned long *, unsigned long);
 boolean DelayReached(unsigned long *, unsigned long);
 void WaitUntilDelayReached(unsigned long *, unsigned long);
-
-#if 0
-unsigned int SimpleRND(unsigned int);
-unsigned int InitSimpleRND(long);
-unsigned int RND(unsigned int);
-unsigned int InitRND(long);
-#endif
 
 unsigned int init_random_number(int, long);
 unsigned int get_random_number(int, int);

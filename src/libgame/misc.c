@@ -1,7 +1,7 @@
 /***********************************************************
 * Artsoft Retro-Game Library                               *
 *----------------------------------------------------------*
-* (c) 1994-2002 Artsoft Entertainment                      *
+* (c) 1994-2006 Artsoft Entertainment                      *
 *               Holger Schemel                             *
 *               Detmolder Strasse 189                      *
 *               33604 Bielefeld                            *
@@ -790,8 +790,6 @@ char *GetError()
   return internal_error;
 }
 
-#if 1
-
 void Error(int mode, char *format, ...)
 {
   static boolean last_line_was_separator = FALSE;
@@ -852,87 +850,6 @@ void Error(int mode, char *format, ...)
       program.exit_function(1);		/* main process: clean up stuff */
   }
 }
-
-#else
-
-void Error(int mode, char *format, ...)
-{
-  static boolean last_line_was_separator = FALSE;
-  char *process_name = "";
-  FILE *error = stderr;
-  char *newline = "\n";
-
-  /* display warnings only when running in verbose mode */
-  if (mode & ERR_WARN && !options.verbose)
-    return;
-
-  if (mode == ERR_RETURN_LINE)
-  {
-    if (!last_line_was_separator)
-      fprintf_line(error, format, 79);
-
-    last_line_was_separator = TRUE;
-
-    return;
-  }
-
-  last_line_was_separator = FALSE;
-
-#if defined(PLATFORM_WIN32) || defined(PLATFORM_MSDOS)
-  newline = "\r\n";
-
-  if ((error = openErrorFile()) == NULL)
-  {
-    printf("Cannot write to error output file!%s", newline);
-
-    program.exit_function(1);
-  }
-#endif
-
-  if (mode & ERR_SOUND_SERVER)
-    process_name = " sound server";
-  else if (mode & ERR_NETWORK_SERVER)
-    process_name = " network server";
-  else if (mode & ERR_NETWORK_CLIENT)
-    process_name = " network client **";
-
-  if (format)
-  {
-    va_list ap;
-
-    fprintf(error, "%s%s: ", program.command_basename, process_name);
-
-    if (mode & ERR_WARN)
-      fprintf(error, "warning: ");
-
-    va_start(ap, format);
-    vfprintf(error, format, ap);
-    va_end(ap);
-  
-    fprintf(error, "%s", newline);
-  }
-  
-  if (mode & ERR_HELP)
-    fprintf(error, "%s: Try option '--help' for more information.%s",
-	    program.command_basename, newline);
-
-  if (mode & ERR_EXIT)
-    fprintf(error, "%s%s: aborting%s",
-	    program.command_basename, process_name, newline);
-
-  if (error != stderr)
-    fclose(error);
-
-  if (mode & ERR_EXIT)
-  {
-    if (mode & ERR_FROM_SERVER)
-      exit(1);				/* child process: normal exit */
-    else
-      program.exit_function(1);		/* main process: clean up stuff */
-  }
-}
-
-#endif
 
 
 /* ------------------------------------------------------------------------- */
@@ -1320,13 +1237,8 @@ void translate_keyname(Key *keysym, char **x11name, char **name, int mode)
       sprintf(name_buffer, "%c", '0' + (char)(key - KSYM_0));
     else if (key >= KSYM_KP_0 && key <= KSYM_KP_9)
       sprintf(name_buffer, "keypad %c", '0' + (char)(key - KSYM_KP_0));
-#if 1
     else if (key >= KSYM_FKEY_FIRST && key <= KSYM_FKEY_LAST)
       sprintf(name_buffer, "F%d", (int)(key - KSYM_FKEY_FIRST + 1));
-#else
-    else if (key >= KSYM_FKEY_FIRST && key <= KSYM_FKEY_LAST)
-      sprintf(name_buffer, "function F%d", (int)(key - KSYM_FKEY_FIRST + 1));
-#endif
     else if (key == KSYM_UNDEFINED)
       strcpy(name_buffer, "(undefined)");
     else

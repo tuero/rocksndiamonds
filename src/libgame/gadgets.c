@@ -1,7 +1,7 @@
 /***********************************************************
 * Artsoft Retro-Game Library                               *
 *----------------------------------------------------------*
-* (c) 1994-2002 Artsoft Entertainment                      *
+* (c) 1994-2006 Artsoft Entertainment                      *
 *               Holger Schemel                             *
 *               Detmolder Strasse 189                      *
 *               33604 Bielefeld                            *
@@ -1682,8 +1682,6 @@ boolean HandleGadgets(int mx, int my, int button)
     last_info_gi = new_gi;
   }
 
-#if 1
-
   gadget_draggable = (gi && gi->type & GD_TYPE_SCROLLBAR);
 
   /* reset drag position for newly pressed scrollbar to "not dragging" */
@@ -1782,8 +1780,6 @@ boolean HandleGadgets(int mx, int my, int button)
       }
     }
   }
-
-#endif
 
   if (gadget_pressed)
   {
@@ -1965,9 +1961,7 @@ boolean HandleGadgets(int mx, int my, int button)
     if (gi->type & GD_TYPE_SCROLLBAR)
       DrawGadget(gi, DG_UNPRESSED, gi->direct_draw);
 
-#if 1
     gi->state = GD_BUTTON_UNPRESSED;
-#endif
     gi->event.type = GD_EVENT_RELEASED;
 
     if (gi->event_mask & GD_EVENT_RELEASED &&
