@@ -2555,7 +2555,7 @@ static struct TokenInfo setup_info_graphics[] =
   { TYPE_SWITCH,	&setup.soft_scrolling,	"Soft Scrolling:"	},
   { TYPE_SWITCH,	&setup.double_buffering,"Double-Buffering:"	},
 #endif
-  { TYPE_SWITCH,	&setup.fading,		"Fading:"		},
+  { TYPE_SWITCH,	&setup.fade_screens,	"Fade Screens:"		},
   { TYPE_SWITCH,	&setup.quick_switch,	"Quick Player Focus Switch:" },
   { TYPE_SWITCH,	&setup.quick_doors,	"Quick Menu Doors:"	},
   { TYPE_SWITCH,	&setup.show_titlescreen,"Show Title Screens:"	},

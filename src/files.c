@@ -5915,7 +5915,7 @@ void SaveScore(int nr)
 #define SETUP_TOKEN_TOONS			5
 #define SETUP_TOKEN_SCROLL_DELAY		6
 #define SETUP_TOKEN_SOFT_SCROLLING		7
-#define SETUP_TOKEN_FADING			8
+#define SETUP_TOKEN_FADE_SCREENS		8
 #define SETUP_TOKEN_AUTORECORD			9
 #define SETUP_TOKEN_SHOW_TITLESCREEN		10
 #define SETUP_TOKEN_QUICK_DOORS			11
@@ -6039,7 +6039,7 @@ static struct TokenInfo global_setup_tokens[] =
   { TYPE_SWITCH, &si.toons,		"toons"				},
   { TYPE_SWITCH, &si.scroll_delay,	"scroll_delay"			},
   { TYPE_SWITCH, &si.soft_scrolling,	"soft_scrolling"		},
-  { TYPE_SWITCH, &si.fading,		"screen_fading"			},
+  { TYPE_SWITCH, &si.fade_screens,	"fade_screens"			},
   { TYPE_SWITCH, &si.autorecord,	"automatic_tape_recording"	},
   { TYPE_SWITCH, &si.show_titlescreen,	"show_titlescreen"		},
   { TYPE_SWITCH, &si.quick_doors,	"quick_doors"			},
@@ -6189,7 +6189,7 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
   si->direct_draw = !si->double_buffering;
   si->scroll_delay = TRUE;
   si->soft_scrolling = TRUE;
-  si->fading = TRUE;
+  si->fade_screens = TRUE;
   si->autorecord = TRUE;
   si->show_titlescreen = TRUE;
   si->quick_doors = FALSE;

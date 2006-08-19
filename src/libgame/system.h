@@ -769,7 +769,7 @@ struct SetupInfo
   boolean direct_draw;		/* !double_buffering (redundant!) */
   boolean scroll_delay;
   boolean soft_scrolling;
-  boolean fading;
+  boolean fade_screens;
   boolean autorecord;
   boolean show_titlescreen;
   boolean quick_doors;

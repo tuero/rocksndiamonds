@@ -424,24 +424,24 @@ void FadeExt(int fade_mask, int fade_mode)
   int post_delay = (fade_mode == FADE_MODE_FADE_OUT ? menu.post_delay : 0);
   int x, y, width, height;
 
-  if (fade_mask & REDRAW_ALL)
-  {
-    x = 0;
-    y = 0;
-    width  = WIN_XSIZE;
-    height = WIN_YSIZE;
-  }
-  else if (fade_mask & REDRAW_FIELD)
+  if (fade_mask & REDRAW_FIELD)
   {
     x = REAL_SX;
     y = REAL_SY;
     width  = FULL_SXSIZE;
     height = FULL_SYSIZE;
   }
+  else		/* REDRAW_ALL */
+  {
+    x = 0;
+    y = 0;
+    width  = WIN_XSIZE;
+    height = WIN_YSIZE;
+  }
 
   redraw_mask |= fade_mask;
 
-  if (!setup.fading || fade_delay == 0)
+  if (!setup.fade_screens || fade_delay == 0)
   {
     if (fade_mode == FADE_MODE_FADE_OUT)
       ClearRectangle(backbuffer, x, y, width, height);
