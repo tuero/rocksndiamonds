@@ -2726,14 +2726,11 @@ char *getErrorFilename(char *basename)
 
 void openErrorFile()
 {
-  /* always start with reliable default values */
-  program.error_file = stderr;
+  InitUserDataDirectory();
 
-#if defined(PLATFORM_WIN32) || defined(PLATFORM_MSDOS)
   if ((program.error_file = fopen(program.error_filename, MODE_WRITE)) == NULL)
     fprintf_newline(stderr, "ERROR: cannot open file '%s' for writing!",
 		    program.error_filename);
-#endif
 }
 
 void closeErrorFile()

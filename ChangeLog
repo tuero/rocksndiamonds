@@ -1,6 +1,9 @@
 2006-08-20
 	* version 3.2.1 released
 
+2006-08-20
+	* fixed nasty bugs with handling error message file on Mac OS X systems
+
 2006-08-19
 	* general code cleanup (removing many annoying "#if 0" blocks etc.)
 

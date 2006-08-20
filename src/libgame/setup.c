@@ -1205,18 +1205,20 @@ char *getPersonalDataDir(void)
 
 char *getUserGameDataDir(void)
 {
-  if (program.userdata_path == NULL)
-    program.userdata_path = getPath2(getPersonalDataDir(),
-				     program.userdata_subdir);
+  static char *user_game_data_dir = NULL;
 
-  return program.userdata_path;
+  if (user_game_data_dir == NULL)
+    user_game_data_dir = getPath2(getPersonalDataDir(),
+				  program.userdata_subdir);
+
+  return user_game_data_dir;
 }
 
 void updateUserGameDataDir()
 {
 #if defined(PLATFORM_MACOSX)
   char *userdata_dir_old = getPath2(getHomeDir(), program.userdata_subdir_unix);
-  char *userdata_dir_new = getUserGameDataDir();
+  char *userdata_dir_new = getUserGameDataDir();	/* do not free() this */
 
   /* convert old Unix style game data directory to Mac OS X style, if needed */
   if (fileExists(userdata_dir_old) && !fileExists(userdata_dir_new))
@@ -1233,7 +1235,6 @@ void updateUserGameDataDir()
   }
 
   free(userdata_dir_old);
-  free(userdata_dir_new);
 #endif
 }
 

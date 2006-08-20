@@ -63,6 +63,10 @@ static void setFullscreenParameters()
 
 static void SDLSetWindowIcon(char *basename)
 {
+  /* (setting the window icon on Mac OS X would replace the high-quality
+     dock icon with the currently smaller (and uglier) icon from file) */
+
+#if !defined(PLATFORM_MACOSX)
   char *filename = getCustomImageFilename(basename);
   SDL_Surface *surface;
 
@@ -85,6 +89,7 @@ static void SDLSetWindowIcon(char *basename)
 		  SDL_MapRGB(surface->format, 0x00, 0x00, 0x00));
 
   SDL_WM_SetIcon(surface, NULL);
+#endif
 }
 
 void SDLInitVideoDisplay(void)
