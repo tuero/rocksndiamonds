@@ -611,7 +611,7 @@ void synchro_2(void)
   	  Boom[y+2][x-1] = Xemerald;
   	  Boom[y+2][x] = Xemerald;
   	  Boom[y+2][x+1] = Xemerald;
-#if 0
+#if PLAY_ELEMENT_SOUND
 	  play_element_sound(x, y, SAMPLE_boom, element);
 #endif
   	  score += lev.bug_score;
@@ -637,7 +637,7 @@ void synchro_2(void)
   	  Boom[y+2][x-1] = Xblank;
   	  Boom[y+2][x] = Xblank;
   	  Boom[y+2][x+1] = Xblank;
-#if 0
+#if PLAY_ELEMENT_SOUND
 	  play_element_sound(x, y, SAMPLE_boom, element);
 #endif
   	  score += lev.tank_score;
@@ -697,7 +697,7 @@ void synchro_2(void)
   	  Boom[y+2][x-1] = lev.eater_array[lev.eater_pos][6];
   	  Boom[y+2][x] = lev.eater_array[lev.eater_pos][7];
   	  Boom[y+2][x+1] = lev.eater_array[lev.eater_pos][8];
-#if 0
+#if PLAY_ELEMENT_SOUND
 	  play_element_sound(x, y, SAMPLE_boom, element);
 #endif
   	  lev.eater_pos = (lev.eater_pos + 1) & 7;
@@ -718,7 +718,7 @@ void synchro_2(void)
   	  Boom[y+2][x-1] = Xblank;
   	  Boom[y+2][x] = Xblank;
   	  Boom[y+2][x+1] = Xblank;
-#if 0
+#if PLAY_ELEMENT_SOUND
 	  play_element_sound(x, y, SAMPLE_boom, element);
 #endif
   	  score += lev.alien_score;
@@ -799,7 +799,7 @@ void synchro_2(void)
   	  Boom[y+2][x-1] = Xblank;
   	  Boom[y+2][x] = Xblank;
   	  Boom[y+2][x+1] = Xblank;
-#if 0
+#if PLAY_ELEMENT_SOUND
 	  play_element_sound(x, y, SAMPLE_boom, element);
 #endif
   	  goto loop;
@@ -2838,7 +2838,7 @@ void synchro_2(void)
   	  Boom[y+2][x-1] = Xblank;
   	  Boom[y+2][x] = Xblank;
   	  Boom[y+2][x+1] = Xblank;
-#if 0
+#if PLAY_ELEMENT_SOUND
 	  play_element_sound(x, y, SAMPLE_boom, element);
 #endif
   	  goto loop;
@@ -2863,7 +2863,7 @@ void synchro_2(void)
   	  Boom[y+2][x-1] = Xemerald;
   	  Boom[y+2][x] = Xemerald;
   	  Boom[y+2][x+1] = Xemerald;
-#if 0
+#if PLAY_ELEMENT_SOUND
 	  play_element_sound(x, y, SAMPLE_boom, element);
 #endif
   	  score += lev.bug_score;
@@ -2889,7 +2889,7 @@ void synchro_2(void)
   	  Boom[y+2][x-1] = Xblank;
   	  Boom[y+2][x] = Xblank;
   	  Boom[y+2][x+1] = Xblank;
-#if 0
+#if PLAY_ELEMENT_SOUND
 	  play_element_sound(x, y, SAMPLE_boom, element);
 #endif
   	  score += lev.tank_score;
@@ -2911,7 +2911,7 @@ void synchro_2(void)
   	  Boom[y+2][x-1] = lev.eater_array[lev.eater_pos][6];
   	  Boom[y+2][x] = lev.eater_array[lev.eater_pos][7];
   	  Boom[y+2][x+1] = lev.eater_array[lev.eater_pos][8];
-#if 0
+#if PLAY_ELEMENT_SOUND
 	  play_element_sound(x, y, SAMPLE_boom, element);
 #endif
   	  lev.eater_pos = (lev.eater_pos + 1) & 7;
@@ -2932,7 +2932,7 @@ void synchro_2(void)
   	  Boom[y+2][x-1] = Xblank;
   	  Boom[y+2][x] = Xblank;
   	  Boom[y+2][x+1] = Xblank;
-#if 0
+#if PLAY_ELEMENT_SOUND
 	  play_element_sound(x, y, SAMPLE_boom, element);
 #endif
   	  score += lev.alien_score;
@@ -4189,7 +4189,7 @@ void synchro_2(void)
   	  Boom[y+1][x-1] = Xblank;
   	  Boom[y+1][x] = Xblank;
   	  Boom[y+1][x+1] = Xblank;
-#if 0
+#if PLAY_ELEMENT_SOUND
 	  play_element_sound(x, y, SAMPLE_boom, element);
 #endif
   	  goto loop;
@@ -4878,7 +4878,7 @@ void synchro_2(void)
       Boom[y+1][x-1] = Xemerald;
       Boom[y+1][x] = Xemerald;
       Boom[y+1][x+1] = Xemerald;
-#if 0
+#if PLAY_ELEMENT_SOUND
       play_element_sound(x, y, SAMPLE_boom, element);
 #endif
       goto loop;
@@ -4897,19 +4897,22 @@ void synchro_2(void)
       Boom[y+1][x-1] = Xblank;
       Boom[y+1][x] = Xblank;
       Boom[y+1][x+1] = Xblank;
-#if 0
+#if PLAY_ELEMENT_SOUND
       play_element_sound(x, y, SAMPLE_boom, element);
 #endif
       goto loop;
 
     case Xboom_android:
-#if 0
+#if PLAY_ELEMENT_SOUND
       play_element_sound(x, y, SAMPLE_boom, Xandroid);
 #endif
     case Xboom_1:
       Next[y][x] = Xboom_2;
-#if 1
-      play_sound(x, y, SAMPLE_boom);
+#if !PLAY_ELEMENT_SOUND
+      if (x != lev.exit_x && y != lev.exit_y)
+	play_sound(x, y, SAMPLE_boom);
+      else
+	lev.exit_x = lev.exit_y = -1;
 #endif
       goto loop;
 

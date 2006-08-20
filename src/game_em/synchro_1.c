@@ -296,7 +296,9 @@ static void kill_player(struct PLAYER *ply)
     case Xbug_gow:
       Cave[y-1][x] = Xboom_bug;
 #if 0
+#if PLAY_ELEMENT_SOUND
       play_element_sound(x, y, SAMPLE_boom, Zplayer);
+#endif
 #endif
       break;
 
@@ -310,7 +312,9 @@ static void kill_player(struct PLAYER *ply)
     case Xtank_gow:
       Cave[y-1][x] = Xboom_bomb;
 #if 0
+#if PLAY_ELEMENT_SOUND
       play_element_sound(x, y, SAMPLE_boom, Zplayer);
+#endif
 #endif
       break;
   }
@@ -327,7 +331,9 @@ static void kill_player(struct PLAYER *ply)
     case Xbug_gow:
       Cave[y][x+1] = Xboom_bug;
 #if 0
+#if PLAY_ELEMENT_SOUND
       play_element_sound(x, y, SAMPLE_boom, Zplayer);
+#endif
 #endif
       break;
 
@@ -341,7 +347,9 @@ static void kill_player(struct PLAYER *ply)
     case Xtank_gow:
       Cave[y][x+1] = Xboom_bomb;
 #if 0
+#if PLAY_ELEMENT_SOUND
       play_element_sound(x, y, SAMPLE_boom, Zplayer);
+#endif
 #endif
       break;
   }
@@ -358,7 +366,9 @@ static void kill_player(struct PLAYER *ply)
     case Xbug_gow:
       Cave[y+1][x] = Xboom_bug;
 #if 0
+#if PLAY_ELEMENT_SOUND
       play_element_sound(x, y, SAMPLE_boom, Zplayer);
+#endif
 #endif
       break;
 
@@ -372,7 +382,9 @@ static void kill_player(struct PLAYER *ply)
     case Xtank_gow:
       Cave[y+1][x] = Xboom_bomb;
 #if 0
+#if PLAY_ELEMENT_SOUND
       play_element_sound(x, y, SAMPLE_boom, Zplayer);
+#endif
 #endif
       break;
   }
@@ -389,7 +401,9 @@ static void kill_player(struct PLAYER *ply)
     case Xbug_gow:
       Cave[y][x-1] = Xboom_bug;
 #if 0
+#if PLAY_ELEMENT_SOUND
       play_element_sound(x, y, SAMPLE_boom, Zplayer);
+#endif
 #endif
       break;
 
@@ -403,7 +417,9 @@ static void kill_player(struct PLAYER *ply)
     case Xtank_gow:
       Cave[y][x-1] = Xboom_bomb;
 #if 0
+#if PLAY_ELEMENT_SOUND
       play_element_sound(x, y, SAMPLE_boom, Zplayer);
+#endif
 #endif
       break;
   }
@@ -413,10 +429,15 @@ static void kill_player(struct PLAYER *ply)
     case Xexit_1:
     case Xexit_2:
     case Xexit_3:
+      lev.exit_x = x;
+      lev.exit_y = y;
       play_element_sound(x, y, SAMPLE_exit_leave, Xexit_1);
       break;
 
     default:
+#if PLAY_ELEMENT_SOUND
+      play_element_sound(x, y, SAMPLE_boom, Zplayer);
+#endif
       play_element_sound(x, y, SAMPLE_die, Zplayer);
       break;
   }
@@ -1245,7 +1266,10 @@ static boolean player_digfield(struct PLAYER *ply, int dx, int dy)
       case Xexit_1:
       case Xexit_2:
       case Xexit_3:
+#if 0
+	/* !!! already played in kill_player !!! */
 	play_element_sound(x, y, SAMPLE_exit_leave, Xexit_1);
+#endif
 
 	lev.home--;
 

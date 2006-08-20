@@ -52,7 +52,6 @@
 #define USE_CODE_THAT_BREAKS_SNAKE_BITE	(USE_NEW_STUFF		* 1)
 
 #define USE_UFAST_PLAYER_EXIT_BUGFIX	(USE_NEW_STUFF		* 1)
-#define USE_NEW_GAME_WON		(USE_NEW_STUFF		* 1)
 
 
 /* for DigField() */
@@ -1298,6 +1297,11 @@ void DrawAllGameValues(int emeralds, int dynamite, int score, int time,
   int key[MAX_NUM_KEYS];
   int i;
 
+  /* prevent EM engine from updating time/score values parallel to GameWon() */
+  if (level.game_engine_type == GAME_ENGINE_TYPE_EM &&
+      local_player->LevelSolved)
+    return;
+
   for (i = 0; i < MAX_NUM_KEYS; i++)
     key[i] = key_bits & (1 << i);
 
@@ -1309,14 +1313,15 @@ void DrawAllGameValues(int emeralds, int dynamite, int score, int time,
   DrawGameValue_Time(time);
 
   DrawGameValue_Keys(key);
-
-  redraw_mask |= REDRAW_DOOR_1;
 }
 
 void DrawGameDoorValues()
 {
   int time_value = (level.time == 0 ? TimePlayed : TimeLeft);
-  int dynamite_state = 0;
+  int dynamite_value = 0;
+  int score_value = (local_player->LevelSolved ? local_player->score_final :
+		     local_player->score);
+  int gems_value = local_player->gems_still_needed;
   int key_bits = 0;
   int i, j;
 
@@ -1335,7 +1340,7 @@ void DrawGameDoorValues()
 	if (stored_player[i].key[j])
 	  key_bits |= (1 << j);
 
-      dynamite_state += stored_player[i].inventory_size;
+      dynamite_value += stored_player[i].inventory_size;
     }
   }
   else
@@ -1346,11 +1351,11 @@ void DrawGameDoorValues()
       if (stored_player[player_nr].key[i])
 	key_bits |= (1 << i);
 
-    dynamite_state = stored_player[player_nr].inventory_size;
+    dynamite_value = stored_player[player_nr].inventory_size;
   }
 
-  DrawAllGameValues(local_player->gems_still_needed, dynamite_state,
-		    local_player->score, time_value, key_bits);
+  DrawAllGameValues(gems_value, dynamite_value, score_value, time_value,
+		    key_bits);
 }
 
 
@@ -1839,6 +1844,8 @@ void InitGame()
     player->programmed_action = 0;
 
     player->score = 0;
+    player->score_final = 0;
+
     player->gems_still_needed = level.gems_needed;
     player->sokobanfields_still_needed = 0;
     player->lights_still_needed = 0;
@@ -2423,7 +2430,7 @@ void InitGame()
 
     OpenDoor(DOOR_OPEN_ALL);
 
-    PlaySoundStereo(SND_GAME_STARTING, SOUND_MIDDLE);
+    PlaySound(SND_GAME_STARTING);
 
     if (setup.sound_music)
       PlayLevelMusic();
@@ -2648,12 +2655,19 @@ void InitAmoebaNr(int x, int y)
   AmoebaCnt2[group_nr]++;
 }
 
-#if USE_NEW_GAME_WON
+static void PlayerWins(struct PlayerInfo *player)
+{
+  player->LevelSolved = TRUE;
+  player->GameOver = TRUE;
+
+  player->score_final = (level.game_engine_type == GAME_ENGINE_TYPE_EM ?
+			 level.native_em_level->lev->score : player->score);
+}
 
 void GameWon()
 {
-  static boolean score_done = FALSE;
-  static boolean player_done = FALSE;
+  static int time, time_final;
+  static int score, score_final;
   static int game_over_delay = 0;
   int game_over_delay_value = 50;
 
@@ -2661,106 +2675,90 @@ void GameWon()
   if (local_player->MovPos)
     return;
 
-  if (tape.auto_play)		/* tape might already be stopped here */
-    tape.auto_play_level_solved = TRUE;
-
   if (!local_player->LevelSolved_GameEnd)
   {
     local_player->LevelSolved_GameEnd = TRUE;
     local_player->LevelSolved_SaveTape = tape.recording;
     local_player->LevelSolved_SaveScore = !tape.playing;
 
-    score_done = FALSE;
-    player_done = FALSE;
-    game_over_delay = 0;
+    if (tape.auto_play)		/* tape might already be stopped here */
+      tape.auto_play_level_solved = TRUE;
+
+    game_over_delay = game_over_delay_value;
+
+    time = time_final = (level.time == 0 ? TimePlayed : TimeLeft);
+    score = score_final = local_player->score_final;
+
+    if (TimeLeft > 0)
+    {
+      time_final = 0;
+      score_final += TimeLeft * level.score[SC_TIME_BONUS];
+    }
+    else if (level.time == 0 && TimePlayed < 999)
+    {
+      time_final = 999;
+      score_final += (999 - TimePlayed) * level.score[SC_TIME_BONUS];
+    }
+
+    local_player->score_final = score_final;
+
+    if (level_editor_test_game)
+    {
+      time = time_final;
+      score = score_final;
+
+      DrawGameValue_Time(time);
+      DrawGameValue_Score(score);
+    }
+
+    if (ExitX >= 0 && ExitY >= 0)	/* local player has left the level */
+    {
+      /* close exit door after last player */
+      if (AllPlayersGone &&
+	  (Feld[ExitX][ExitY] == EL_EXIT_OPEN ||
+	   Feld[ExitX][ExitY] == EL_SP_EXIT_OPEN))
+      {
+	int element = Feld[ExitX][ExitY];
+
+	Feld[ExitX][ExitY] = (element == EL_EXIT_OPEN ? EL_EXIT_CLOSING :
+			      EL_SP_EXIT_CLOSING);
+
+	PlayLevelSoundElementAction(ExitX, ExitY, element, ACTION_CLOSING);
+      }
+
+      /* player disappears */
+      DrawLevelField(ExitX, ExitY);
+    }
+
+    PlaySound(SND_GAME_WINNING);
   }
 
-  PlaySoundStereo(SND_GAME_WINNING, SOUND_MIDDLE);
-
-  if (TimeLeft > 0)
+  if (game_over_delay > 0)
   {
-    if (!tape.playing)
-    {
-      if (setup.sound_loops)
-	PlaySoundExt(SND_GAME_LEVELTIME_BONUS, SOUND_MAX_VOLUME, SOUND_MIDDLE,
-		     SND_CTRL_PLAY_LOOP);
-      else
-	PlaySoundStereo(SND_GAME_LEVELTIME_BONUS, SOUND_MIDDLE);
-    }
+    game_over_delay--;
 
-    if (TimeLeft > 100 && TimeLeft % 10 == 0)
-    {
-      TimeLeft -= 10;
-      RaiseScore(level.score[SC_TIME_BONUS] * 10);
-    }
-    else
-    {
-      TimeLeft--;
-      RaiseScore(level.score[SC_TIME_BONUS]);
-    }
-
-    DrawGameValue_Time(TimeLeft);
-
-    if (TimeLeft <= 0 && !tape.playing && setup.sound_loops)
-      StopSound(SND_GAME_LEVELTIME_BONUS);
-  }
-  else if (level.time == 0 && TimePlayed < 999)	/* level without time limit */
-  {
-    if (!tape.playing)
-    {
-      if (setup.sound_loops)
-	PlaySoundExt(SND_GAME_LEVELTIME_BONUS, SOUND_MAX_VOLUME, SOUND_MIDDLE,
-		     SND_CTRL_PLAY_LOOP);
-      else
-	PlaySoundStereo(SND_GAME_LEVELTIME_BONUS, SOUND_MIDDLE);
-    }
-
-    if (TimePlayed < 900 && TimePlayed % 10 == 0)
-    {
-      TimePlayed += 10;
-      RaiseScore(level.score[SC_TIME_BONUS] * 10);
-    }
-    else
-    {
-      TimePlayed++;
-      RaiseScore(level.score[SC_TIME_BONUS]);
-    }
-
-    DrawGameValue_Time(TimePlayed);
-
-    if (TimePlayed >= 999 && !tape.playing && setup.sound_loops)
-      StopSound(SND_GAME_LEVELTIME_BONUS);
-  }
-  else
-  {
-    score_done = TRUE;
-  }
-
-  /* close exit door after last player */
-  if (AllPlayersGone && ExitX >= 0 && ExitY >= 0 &&
-      (Feld[ExitX][ExitY] == EL_EXIT_OPEN ||
-       Feld[ExitX][ExitY] == EL_SP_EXIT_OPEN))
-  {
-    int element = Feld[ExitX][ExitY];
-
-    Feld[ExitX][ExitY] = (element == EL_EXIT_OPEN ? EL_EXIT_CLOSING :
-			  EL_SP_EXIT_CLOSING);
-
-    PlayLevelSoundElementAction(ExitX, ExitY, element, ACTION_CLOSING);
-  }
-
-  /* player disappears */
-  if (ExitX >= 0 && ExitY >= 0 && !player_done)
-  {
-    DrawLevelField(ExitX, ExitY);
-
-    player_done = TRUE;
-  }
-
-  game_over_delay++;
-
-  if (game_over_delay < game_over_delay_value || !score_done)
     return;
+  }
+
+  if (time != time_final)
+  {
+    int time_to_go = ABS(time_final - time);
+    int time_count_dir = (time < time_final ? +1 : -1);
+    int time_count_steps = (time_to_go > 100 && time_to_go % 10 == 0 ? 10 : 1);
+
+    time  += time_count_steps * time_count_dir;
+    score += time_count_steps * level.score[SC_TIME_BONUS];
+
+    DrawGameValue_Time(time);
+    DrawGameValue_Score(score);
+
+    if (time == time_final)
+      StopSound(SND_GAME_LEVELTIME_BONUS);
+    else if (setup.sound_loops)
+      PlaySoundLoop(SND_GAME_LEVELTIME_BONUS);
+    else
+      PlaySound(SND_GAME_LEVELTIME_BONUS);
+  }
 }
 
 void GameEnd()
@@ -2774,7 +2772,16 @@ void GameEnd()
   {
     TapeStop();
 
-    SaveTape(tape.level_nr);		/* Ask to save tape */
+    SaveTape(tape.level_nr);		/* ask to save tape */
+  }
+
+  if (level_editor_test_game)
+  {
+    game_status = GAME_MODE_MAIN;
+
+    DrawMainMenu();
+
+    return;
   }
 
   if (!local_player->LevelSolved_SaveScore)
@@ -2794,10 +2801,8 @@ void GameEnd()
     SaveLevelSetup_SeriesInfo();
   }
 
-  if (level_editor_test_game)
-    local_player->score = -1;	/* no highscore when playing from editor */
-  else if (level_nr < leveldir_current->last_level)
-    raise_level = TRUE;		/* advance to next level */
+  if (level_nr < leveldir_current->last_level)
+    raise_level = TRUE;			/* advance to next level */
 
   if ((hi_pos = NewHiScore()) >= 0) 
   {
@@ -2825,160 +2830,7 @@ void GameEnd()
 
     DrawAndFadeInMainMenu(REDRAW_FIELD);
   }
-
-  local_player->LevelSolved_SaveScore = FALSE;
 }
-
-#else
-
-void GameWon()
-{
-  int hi_pos;
-  boolean raise_level = FALSE;
-
-  if (local_player->MovPos)
-    return;
-
-  if (tape.auto_play)		/* tape might already be stopped here */
-    tape.auto_play_level_solved = TRUE;
-
-  local_player->LevelSolved = FALSE;
-
-  PlaySoundStereo(SND_GAME_WINNING, SOUND_MIDDLE);
-
-  if (TimeLeft)
-  {
-    if (!tape.playing && setup.sound_loops)
-      PlaySoundExt(SND_GAME_LEVELTIME_BONUS, SOUND_MAX_VOLUME, SOUND_MIDDLE,
-		   SND_CTRL_PLAY_LOOP);
-
-    while (TimeLeft > 0)
-    {
-      if (!tape.playing && !setup.sound_loops)
-	PlaySoundStereo(SND_GAME_LEVELTIME_BONUS, SOUND_MIDDLE);
-
-      if (TimeLeft > 100 && TimeLeft % 10 == 0)
-      {
-	TimeLeft -= 10;
-	RaiseScore(level.score[SC_TIME_BONUS] * 10);
-      }
-      else
-      {
-	TimeLeft--;
-	RaiseScore(level.score[SC_TIME_BONUS]);
-      }
-
-      DrawGameValue_Time(TimeLeft);
-
-      BackToFront();
-
-      if (!tape.playing)
-	Delay(10);
-    }
-
-    if (!tape.playing && setup.sound_loops)
-      StopSound(SND_GAME_LEVELTIME_BONUS);
-  }
-  else if (level.time == 0)		/* level without time limit */
-  {
-    if (!tape.playing && setup.sound_loops)
-      PlaySoundExt(SND_GAME_LEVELTIME_BONUS, SOUND_MAX_VOLUME, SOUND_MIDDLE,
-		   SND_CTRL_PLAY_LOOP);
-
-    while (TimePlayed < 999)
-    {
-      if (!tape.playing && !setup.sound_loops)
-	PlaySoundStereo(SND_GAME_LEVELTIME_BONUS, SOUND_MIDDLE);
-
-      if (TimePlayed < 900 && TimePlayed % 10 == 0)
-      {
-	TimePlayed += 10;
-	RaiseScore(level.score[SC_TIME_BONUS] * 10);
-      }
-      else
-      {
-	TimePlayed++;
-	RaiseScore(level.score[SC_TIME_BONUS]);
-      }
-
-      DrawGameValue_Time(TimePlayed);
-
-      BackToFront();
-
-      if (!tape.playing)
-	Delay(10);
-    }
-
-    if (!tape.playing && setup.sound_loops)
-      StopSound(SND_GAME_LEVELTIME_BONUS);
-  }
-
-  /* close exit door after last player */
-  if (AllPlayersGone && ExitX >= 0 && ExitY >= 0 &&
-      (Feld[ExitX][ExitY] == EL_EXIT_OPEN ||
-       Feld[ExitX][ExitY] == EL_SP_EXIT_OPEN))
-  {
-    int element = Feld[ExitX][ExitY];
-
-    Feld[ExitX][ExitY] = (element == EL_EXIT_OPEN ? EL_EXIT_CLOSING :
-			  EL_SP_EXIT_CLOSING);
-
-    PlayLevelSoundElementAction(ExitX, ExitY, element, ACTION_CLOSING);
-  }
-
-  /* player disappears */
-  if (ExitX >= 0 && ExitY >= 0)
-    DrawLevelField(ExitX, ExitY);
-
-  BackToFront();
-
-  if (tape.playing)
-    return;
-
-  CloseDoor(DOOR_CLOSE_1);
-
-  if (tape.recording)
-  {
-    TapeStop();
-    SaveTape(tape.level_nr);		/* Ask to save tape */
-  }
-
-  if (level_nr == leveldir_current->handicap_level)
-  {
-    leveldir_current->handicap_level++;
-    SaveLevelSetup_SeriesInfo();
-  }
-
-  if (level_editor_test_game)
-    local_player->score = -1;	/* no highscore when playing from editor */
-  else if (level_nr < leveldir_current->last_level)
-    raise_level = TRUE;		/* advance to next level */
-
-  if ((hi_pos = NewHiScore()) >= 0) 
-  {
-    game_status = GAME_MODE_SCORES;
-    DrawHallOfFame(hi_pos);
-    if (raise_level)
-    {
-      level_nr++;
-      TapeErase();
-    }
-  }
-  else
-  {
-    game_status = GAME_MODE_MAIN;
-    if (raise_level)
-    {
-      level_nr++;
-      TapeErase();
-    }
-    DrawMainMenu();
-  }
-
-  BackToFront();
-}
-
-#endif
 
 int NewHiScore()
 {
@@ -2988,12 +2840,12 @@ int NewHiScore()
   LoadScore(level_nr);
 
   if (strEqual(setup.player_name, EMPTY_PLAYER_NAME) ||
-      local_player->score < highscore[MAX_SCORE_ENTRIES - 1].Score) 
+      local_player->score_final < highscore[MAX_SCORE_ENTRIES - 1].Score) 
     return -1;
 
   for (k = 0; k < MAX_SCORE_ENTRIES; k++) 
   {
-    if (local_player->score > highscore[k].Score)
+    if (local_player->score_final > highscore[k].Score)
     {
       /* player has made it to the hall of fame */
 
@@ -3021,7 +2873,7 @@ int NewHiScore()
 #endif
       strncpy(highscore[k].Name, setup.player_name, MAX_PLAYER_NAME_LEN);
       highscore[k].Name[MAX_PLAYER_NAME_LEN] = '\0';
-      highscore[k].Score = local_player->score; 
+      highscore[k].Score = local_player->score_final; 
       position = k;
       break;
     }
@@ -6064,7 +5916,7 @@ void StartMoving(int x, int y)
 	local_player->friends_still_needed--;
 	if (!local_player->friends_still_needed &&
 	    !local_player->GameOver && AllPlayersGone)
-	  local_player->LevelSolved = local_player->GameOver = TRUE;
+	  PlayerWins(local_player);
 
 	return;
       }
@@ -7884,7 +7736,7 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
     {
       for (i = 0; i < MAX_PLAYERS; i++)
 	if (action_arg_player_bits & (1 << i))
-	  stored_player[i].LevelSolved = stored_player[i].GameOver = TRUE;
+	  PlayerWins(&stored_player[i]);
 
       break;
     }
@@ -9022,7 +8874,8 @@ static void CheckLevelTime()
   {
     if (level.native_em_level->lev->home == 0)	/* all players at home */
     {
-      local_player->LevelSolved = TRUE;
+      PlayerWins(local_player);
+
       AllPlayersGone = TRUE;
 
       level.native_em_level->lev->home = -1;
@@ -9053,7 +8906,7 @@ static void CheckLevelTime()
       }
     }
 
-    if (!level.use_step_counter)
+    if (!local_player->LevelSolved && !level.use_step_counter)
     {
       TimePlayed++;
 
@@ -9062,7 +8915,7 @@ static void CheckLevelTime()
 	TimeLeft--;
 
 	if (TimeLeft <= 10 && setup.time_limit)
-	  PlaySoundStereo(SND_GAME_RUNNING_OUT_OF_TIME, SOUND_MIDDLE);
+	  PlaySound(SND_GAME_RUNNING_OUT_OF_TIME);
 
 	DrawGameValue_Time(TimeLeft);
 
@@ -9174,7 +9027,8 @@ void GameActions()
   {
     if (level.native_em_level->lev->home == 0)	/* all players at home */
     {
-      local_player->LevelSolved = TRUE;
+      PlayerWins(local_player);
+
       AllPlayersGone = TRUE;
 
       level.native_em_level->lev->home = -1;
@@ -10419,7 +10273,7 @@ void ScrollPlayer(struct PlayerInfo *player, int mode)
 
       if (local_player->friends_still_needed == 0 ||
 	  IS_SP_ELEMENT(Feld[jx][jy]))
-	player->LevelSolved = player->GameOver = TRUE;
+	PlayerWins(player);
     }
 
     /* this breaks one level: "machine", level 000 */
@@ -10467,7 +10321,7 @@ void ScrollPlayer(struct PlayerInfo *player, int mode)
 	RemovePlayer(player);
     }
 
-    if (level.use_step_counter)
+    if (!local_player->LevelSolved && level.use_step_counter)
     {
       int i;
 
@@ -10478,7 +10332,7 @@ void ScrollPlayer(struct PlayerInfo *player, int mode)
 	TimeLeft--;
 
 	if (TimeLeft <= 10 && setup.time_limit)
-	  PlaySoundStereo(SND_GAME_RUNNING_OUT_OF_TIME, SOUND_MIDDLE);
+	  PlaySound(SND_GAME_RUNNING_OUT_OF_TIME);
 
 	DrawGameValue_Time(TimeLeft);
 
@@ -11701,7 +11555,8 @@ int DigField(struct PlayerInfo *player,
       if (local_player->sokobanfields_still_needed == 0 &&
 	  game.emulation == EMU_SOKOBAN)
       {
-	player->LevelSolved = player->GameOver = TRUE;
+	PlayerWins(player);
+
 	PlayLevelSound(x, y, SND_GAME_SOKOBAN_SOLVING);
       }
     }
@@ -12243,9 +12098,12 @@ static void PlayLevelMusic()
     PlayMusic(MAP_NOCONF_MUSIC(level_nr));	/* from music dir */
 }
 
-void PlayLevelSound_EM(int x, int y, int element_em, int sample)
+void PlayLevelSound_EM(int xx, int yy, int element_em, int sample)
 {
   int element = (element_em > -1 ? map_element_EM_to_RND(element_em) : 0);
+  int offset = (BorderElement == EL_STEELWALL ? 1 : 0);
+  int x = xx - 1 - offset;
+  int y = yy - 1 - offset;
 
   switch (sample)
   {
@@ -12391,7 +12249,7 @@ void PlayLevelSound_EM(int x, int y, int element_em, int sample)
       break;
 
     case SAMPLE_time:
-      PlaySoundStereo(SND_GAME_RUNNING_OUT_OF_TIME, SOUND_MIDDLE);
+      PlaySound(SND_GAME_RUNNING_OUT_OF_TIME);
       break;
 
     default:
@@ -12399,6 +12257,31 @@ void PlayLevelSound_EM(int x, int y, int element_em, int sample)
       break;
   }
 }
+
+#if 0
+void ChangeTime(int value)
+{
+  int *time = (level.time == 0 ? &TimePlayed : &TimeLeft);
+
+  *time += value;
+
+  /* EMC game engine uses value from time counter of RND game engine */
+  level.native_em_level->lev->time = *time;
+
+  DrawGameValue_Time(*time);
+}
+
+void RaiseScore(int value)
+{
+  /* EMC game engine and RND game engine have separate score counters */
+  int *score = (level.game_engine_type == GAME_ENGINE_TYPE_EM ?
+		&level.native_em_level->lev->score : &local_player->score);
+
+  *score += value;
+
+  DrawGameValue_Score(*score);
+}
+#endif
 
 void RaiseScore(int value)
 {

@@ -83,6 +83,9 @@
 #define SXSIZE			(SCR_FIELDX * TILEX)
 #define SYSIZE			(SCR_FIELDY * TILEY)
 
+/* other settings */
+#define PLAY_ELEMENT_SOUND	FALSE
+
 
 /* ------------------------------------------------------------------------- */
 /* macro function definitions                                                */

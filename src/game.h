@@ -183,6 +183,8 @@ struct PlayerInfo
   int step_counter;
 
   int score;
+  int score_final;
+
   int gems_still_needed;
   int sokobanfields_still_needed;
   int lights_still_needed;

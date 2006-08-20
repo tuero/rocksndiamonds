@@ -1233,4 +1233,6 @@ void prepare_em_level(void)
 
   for (i = 0; i < MAX_PLAYERS; i++)
     game_em.last_player_direction[i] = MV_NONE;
+
+  lev.exit_x = lev.exit_y = -1;	/* kludge for playing player exit sound */
 }
