@@ -1,3 +1,8 @@
+2006-08-23
+	* added engine snapshot functionality for instant tape reloading (this
+	  only works for the last tape saved using "quick save", and does not
+	  work across program restarts, because it completely works in memory)
+
 2006-08-21
 	* version number set to 3.2.2
 

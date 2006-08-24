@@ -1544,7 +1544,7 @@ void deleteNodeFromList(ListNode **node_first, char *key,
 
   if (strEqual((*node_first)->key, key))
   {
-    free((*node_first)->key);
+    checked_free((*node_first)->key);
     if (destructor_function)
       destructor_function((*node_first)->content);
     *node_first = (*node_first)->next;

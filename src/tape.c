@@ -902,18 +902,25 @@ static void TapeSingleStep()
 
 void TapeQuickSave()
 {
-  if (game_status == GAME_MODE_PLAYING)
+  if (game_status == GAME_MODE_MAIN)
   {
-    if (tape.recording)
-      TapeHaltRecording();	/* prepare tape for saving on-the-fly */
-
-    if (TAPE_IS_EMPTY(tape))
-      Request("No tape that can be saved !", REQ_CONFIRM);
-    else
-      SaveTape(tape.level_nr);
-  }
-  else if (game_status == GAME_MODE_MAIN)
     Request("No game that can be saved !", REQ_CONFIRM);
+
+    return;
+  }
+
+  if (game_status != GAME_MODE_PLAYING)
+    return;
+
+  if (tape.recording)
+    TapeHaltRecording();	/* prepare tape for saving on-the-fly */
+
+  if (TAPE_IS_EMPTY(tape))
+    Request("No tape that can be saved !", REQ_CONFIRM);
+  else
+    SaveTape(tape.level_nr);
+
+  SaveEngineSnapshot();
 }
 
 void TapeQuickLoad()
@@ -935,25 +942,42 @@ void TapeQuickLoad()
     return;
   }
 
-  if (game_status == GAME_MODE_PLAYING || game_status == GAME_MODE_MAIN)
+  if (game_status != GAME_MODE_PLAYING && game_status != GAME_MODE_MAIN)
+    return;
+
+  if (CheckEngineSnapshot())
   {
-    TapeStop();
-    TapeErase();
+    TapeStartGamePlaying();
 
-    LoadTape(level_nr);
-    if (!TAPE_IS_EMPTY(tape))
-    {
-      TapeStartGamePlaying();
-      TapeStartWarpForward();
+    LoadEngineSnapshot();
 
-      tape.quick_resume = TRUE;
-    }
-    else	/* this should not happen (basically checked above) */
-    {
-      int reopen_door = (game_status == GAME_MODE_PLAYING ? REQ_REOPEN : 0);
+    tape.playing = TRUE;
+    tape.pausing = TRUE;
 
-      Request("No tape for this level !", REQ_CONFIRM | reopen_door);
-    }
+    TapeStopWarpForward();
+    TapeAppendRecording();
+
+    if (FrameCounter > 0)
+      return;
+  }
+
+  TapeStop();
+  TapeErase();
+
+  LoadTape(level_nr);
+
+  if (!TAPE_IS_EMPTY(tape))
+  {
+    TapeStartGamePlaying();
+    TapeStartWarpForward();
+
+    tape.quick_resume = TRUE;
+  }
+  else	/* this should not happen (basically checked above) */
+  {
+    int reopen_door = (game_status == GAME_MODE_PLAYING ? REQ_REOPEN : 0);
+
+    Request("No tape for this level !", REQ_CONFIRM | reopen_door);
   }
 }
 

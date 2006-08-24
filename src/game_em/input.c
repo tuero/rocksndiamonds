@@ -22,6 +22,8 @@ static short Array[4][HEIGHT][WIDTH];
 extern int screen_x;
 extern int screen_y;
 
+struct EngineSnapshotInfo_EM engine_snapshot_em;
+
 void game_init_vars(void)
 {
   int x, y;
@@ -159,4 +161,44 @@ void readjoy(byte action, struct PLAYER *ply)
     ply->joy_s = south;
     ply->joy_w = west;
   }
+}
+
+void SaveEngineSnapshotValues_EM()
+{
+  int i, j, k;
+
+  engine_snapshot_em.RandomEM = RandomEM;
+  engine_snapshot_em.game_em = game_em;
+  engine_snapshot_em.lev = lev;
+  engine_snapshot_em.screen_x = screen_x;
+  engine_snapshot_em.screen_y = screen_y;
+  engine_snapshot_em.frame = frame;
+
+  for (i = 0; i < 4; i++)
+    engine_snapshot_em.ply[i] = ply[i];
+
+  for (i = 0; i < 4; i++)
+    for (j = 0; j < HEIGHT; j++)
+      for (k = 0; k < WIDTH; k++)
+	engine_snapshot_em.Array[i][j][k] = Array[i][j][k];
+
+}
+
+void LoadEngineSnapshotValues_EM()
+{
+  int i, j, k;
+
+  RandomEM = engine_snapshot_em.RandomEM;
+  game_em = engine_snapshot_em.game_em;
+  screen_x = engine_snapshot_em.screen_x;
+  screen_y = engine_snapshot_em.screen_y;
+  frame = engine_snapshot_em.frame;
+
+  for (i = 0; i < 4; i++)
+    ply[i] = engine_snapshot_em.ply[i];
+
+  for (i = 0; i < 4; i++)
+    for (j = 0; j < HEIGHT; j++)
+      for (k = 0; k < WIDTH; k++)
+	Array[i][j][k] = engine_snapshot_em.Array[i][j][k];
 }
