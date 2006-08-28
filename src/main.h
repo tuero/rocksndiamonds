@@ -2397,8 +2397,6 @@ extern int			ExitX, ExitY;
 extern int			AllPlayersGone;
 
 extern int			TimeFrames, TimePlayed, TimeLeft, TapeTime;
-extern boolean			SiebAktiv;
-extern int			SiebCount;
 
 extern boolean			network_player_action_received;
 

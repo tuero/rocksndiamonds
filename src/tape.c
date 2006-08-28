@@ -677,6 +677,9 @@ void TapeTogglePause(boolean toggle_manual)
       tape.quick_resume = FALSE;
 
       TapeAppendRecording();
+
+      if (!CheckEngineSnapshot())
+	SaveEngineSnapshot();
     }
   }
 }
@@ -945,7 +948,7 @@ void TapeQuickLoad()
   if (game_status != GAME_MODE_PLAYING && game_status != GAME_MODE_MAIN)
     return;
 
-  if (CheckEngineSnapshot())
+  if (1 && CheckEngineSnapshot())
   {
     TapeStartGamePlaying();
 

@@ -27,10 +27,13 @@
 /* values for InitRND() */
 #define NEW_RANDOMIZE			-1
 
-#define InitEngineRND(seed)		init_random_number(0, seed)
-#define InitSimpleRND(seed)		init_random_number(1, seed)
-#define RND(max)			get_random_number(0, max)
-#define SimpleRND(max)			get_random_number(1, max)
+#define RANDOM_ENGINE			0
+#define RANDOM_SIMPLE			1
+
+#define InitEngineRandom(seed)		init_random_number(RANDOM_ENGINE, seed)
+#define InitSimpleRandom(seed)		init_random_number(RANDOM_SIMPLE, seed)
+#define GetEngineRandom(max)		get_random_number(RANDOM_ENGINE, max)
+#define GetSimpleRandom(max)		get_random_number(RANDOM_SIMPLE, max)
 
 /* values for Error() */
 #define ERR_RETURN			0

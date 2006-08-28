@@ -142,7 +142,7 @@
 #define GET_DX_FROM_DIR(d)	((d) == MV_LEFT ? -1 : (d) == MV_RIGHT ? 1 : 0)
 #define GET_DY_FROM_DIR(d)	((d) == MV_UP   ? -1 : (d) == MV_DOWN  ? 1 : 0)
 
-#define	INIT_GFX_RANDOM()	(SimpleRND(1000000))
+#define	INIT_GFX_RANDOM()	(GetSimpleRandom(1000000))
 
 #define GET_NEW_PUSH_DELAY(e)	(   (element_info[e].push_delay_fixed) + \
 				 RND(element_info[e].push_delay_random))
@@ -2671,18 +2671,24 @@ void GameWon()
   static int game_over_delay = 0;
   int game_over_delay_value = 50;
 
-  /* do not start end game actions before the player stops moving (to exit) */
-  if (local_player->MovPos)
-    return;
-
   if (!local_player->LevelSolved_GameEnd)
   {
+    int i;
+
+    /* do not start end game actions before the player stops moving (to exit) */
+    if (local_player->MovPos)
+      return;
+
     local_player->LevelSolved_GameEnd = TRUE;
     local_player->LevelSolved_SaveTape = tape.recording;
     local_player->LevelSolved_SaveScore = !tape.playing;
 
     if (tape.auto_play)		/* tape might already be stopped here */
       tape.auto_play_level_solved = TRUE;
+
+#if 1
+    TapeStop();
+#endif
 
     game_over_delay = game_over_delay_value;
 
@@ -2730,6 +2736,19 @@ void GameWon()
       DrawLevelField(ExitX, ExitY);
     }
 
+    for (i = 0; i < MAX_PLAYERS; i++)
+    {
+      struct PlayerInfo *player = &stored_player[i];
+
+      if (player->present)
+      {
+	RemovePlayer(player);
+
+	/* player disappears */
+	DrawLevelField(player->jx, player->jy);
+      }
+    }
+
     PlaySound(SND_GAME_WINNING);
   }
 
@@ -2770,7 +2789,9 @@ void GameEnd()
 
   if (local_player->LevelSolved_SaveTape)
   {
+#if 0
     TapeStop();
+#endif
 
     SaveTape(tape.level_nr);		/* ask to save tape */
   }
@@ -7207,7 +7228,7 @@ void EdelsteinFunkeln(int x, int y)
     return;
 
   if (MovDelay[x][y] == 0)	/* next animation frame */
-    MovDelay[x][y] = 11 * !SimpleRND(500);
+    MovDelay[x][y] = 11 * !GetSimpleRandom(500);
 
   if (MovDelay[x][y] != 0)	/* wait some time before next frame */
   {
@@ -8672,11 +8693,11 @@ static void SetPlayerWaiting(struct PlayerInfo *player, boolean is_waiting)
       player->frame_counter_bored =
 	FrameCounter +
 	game.player_boring_delay_fixed +
-	SimpleRND(game.player_boring_delay_random);
+	GetSimpleRandom(game.player_boring_delay_random);
       player->frame_counter_sleeping =
 	FrameCounter +
 	game.player_sleeping_delay_fixed +
-	SimpleRND(game.player_sleeping_delay_random);
+	GetSimpleRandom(game.player_sleeping_delay_random);
 
       InitPlayerGfxAnimation(player, ACTION_WAITING, move_dir);
     }
@@ -8732,10 +8753,10 @@ static void SetPlayerWaiting(struct PlayerInfo *player, boolean is_waiting)
 
 	  player->anim_delay_counter =
 	    graphic_info[special_graphic].anim_delay_fixed +
-	    SimpleRND(graphic_info[special_graphic].anim_delay_random);
+	    GetSimpleRandom(graphic_info[special_graphic].anim_delay_random);
 	  player->post_delay_counter =
 	    graphic_info[special_graphic].post_delay_fixed +
-	    SimpleRND(graphic_info[special_graphic].post_delay_random);
+	    GetSimpleRandom(graphic_info[special_graphic].post_delay_random);
 
 	  player->special_action_sleeping = special_action;
 	}
@@ -8758,16 +8779,16 @@ static void SetPlayerWaiting(struct PlayerInfo *player, boolean is_waiting)
 	if (player->anim_delay_counter == 0 && player->post_delay_counter == 0)
 	{
 	  int special_action =
-	    ACTION_BORING_1 + SimpleRND(player->num_special_action_bored);
+	    ACTION_BORING_1 + GetSimpleRandom(player->num_special_action_bored);
 	  int special_graphic =
 	    el_act_dir2img(player->artwork_element, special_action, move_dir);
 
 	  player->anim_delay_counter =
 	    graphic_info[special_graphic].anim_delay_fixed +
-	    SimpleRND(graphic_info[special_graphic].anim_delay_random);
+	    GetSimpleRandom(graphic_info[special_graphic].anim_delay_random);
 	  player->post_delay_counter =
 	    graphic_info[special_graphic].post_delay_fixed +
-	    SimpleRND(graphic_info[special_graphic].post_delay_random);
+	    GetSimpleRandom(graphic_info[special_graphic].post_delay_random);
 
 	  player->special_action_bored = special_action;
 	}
@@ -12413,14 +12434,55 @@ void RequestQuitGame(boolean ask_if_really_quit)
 
 
 /* ------------------------------------------------------------------------- */
-/* game engine snapshot handling                                             */
+/* random generator functions                                                */
+/* ------------------------------------------------------------------------- */
+
+unsigned int InitEngineRandom_RND(long seed)
+{
+  game.num_random_calls = 0;
+
+#if 0
+  unsigned int rnd_seed = InitEngineRandom(seed);
+
+  printf("::: START RND: %d\n", rnd_seed);
+
+  return rnd_seed;
+#else
+
+  return InitEngineRandom(seed);
+
+#endif
+
+}
+
+unsigned int RND(int max)
+{
+  if (max > 0)
+  {
+    game.num_random_calls++;
+
+    return GetEngineRandom(max);
+  }
+
+  return 0;
+}
+
+
+/* ------------------------------------------------------------------------- */
+/* game engine snapshot handling functions                                   */
 /* ------------------------------------------------------------------------- */
 
 #define ARGS_ADDRESS_AND_SIZEOF(x)		(&(x)), (sizeof(x))
 
 struct EngineSnapshotInfo
 {
+  /* runtime values for custom element collect score */
   int collect_score[NUM_CUSTOM_ELEMENTS];
+
+  /* runtime values for group element choice position */
+  int choice_pos[NUM_GROUP_ELEMENTS];
+
+  /* runtime values for belt position animations */
   int belt_graphic[4 * NUM_BELT_PARTS];
   int belt_anim_mode[4 * NUM_BELT_PARTS];
 };
@@ -12459,7 +12521,18 @@ static void SaveEngineSnapshotValues_RND()
   int i, j;
 
   for (i = 0; i < NUM_CUSTOM_ELEMENTS; i++)
-    engine_snapshot_rnd.collect_score[i] = element_info[i].collect_score;
+  {
+    int element = EL_CUSTOM_START + i;
+
+    engine_snapshot_rnd.collect_score[i] = element_info[element].collect_score;
+  }
+
+  for (i = 0; i < NUM_GROUP_ELEMENTS; i++)
+  {
+    int element = EL_GROUP_START + i;
+
+    engine_snapshot_rnd.choice_pos[i] = element_info[element].group->choice_pos;
+  }
 
   for (i = 0; i < 4; i++)
   {
@@ -12473,14 +12546,30 @@ static void SaveEngineSnapshotValues_RND()
       engine_snapshot_rnd.belt_anim_mode[i * 4 + j] = anim_mode;
     }
   }
+
+#if 0
+  printf("::: SAVE: %d RNDs\n", game.num_random_calls);
+#endif
 }
 
 static void LoadEngineSnapshotValues_RND()
 {
+  unsigned long num_random_calls = game.num_random_calls;
   int i, j;
 
   for (i = 0; i < NUM_CUSTOM_ELEMENTS; i++)
-    element_info[i].collect_score = engine_snapshot_rnd.collect_score[i];
+  {
+    int element = EL_CUSTOM_START + i;
+
+    element_info[element].collect_score = engine_snapshot_rnd.collect_score[i];
+  }
+
+  for (i = 0; i < NUM_GROUP_ELEMENTS; i++)
+  {
+    int element = EL_GROUP_START + i;
+
+    element_info[element].group->choice_pos = engine_snapshot_rnd.choice_pos[i];
+  }
 
   for (i = 0; i < 4; i++)
   {
@@ -12492,6 +12581,26 @@ static void LoadEngineSnapshotValues_RND()
       graphic_info[graphic].anim_mode = anim_mode;
     }
   }
+
+#if 0
+  printf("::: LOADING ... : %d RNDs\n", num_random_calls);
+#endif
+
+  InitRND(tape.random_seed);
+  for (i = 0; i < num_random_calls; i++)
+    RND(1);
+
+  if (game.num_random_calls != num_random_calls)
+  {
+    Error(ERR_RETURN, "number of random calls out of sync");
+    Error(ERR_RETURN, "number of random calls should be %d", num_random_calls);
+    Error(ERR_RETURN, "number of random calls is %d", game.num_random_calls);
+    Error(ERR_EXIT, "this should not happen -- please debug");
+  }
+
+#if 0
+  printf("::: LOADED: %d RNDs\n", num_random_calls);
+#endif
 }
 
 static void SaveEngineSnapshotBuffer(void *buffer, int size)

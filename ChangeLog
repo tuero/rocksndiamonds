@@ -1,3 +1,6 @@
+2006-08-28
+	* fixed bug in GameWon() when level contains no exit (like in Sokoban)
+
 2006-08-23
 	* added engine snapshot functionality for instant tape reloading (this
 	  only works for the last tape saved using "quick save", and does not

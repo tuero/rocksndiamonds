@@ -167,12 +167,19 @@ void SaveEngineSnapshotValues_EM()
 {
   int i, j, k;
 
-  engine_snapshot_em.RandomEM = RandomEM;
   engine_snapshot_em.game_em = game_em;
   engine_snapshot_em.lev = lev;
+
+  engine_snapshot_em.RandomEM = RandomEM;
+  engine_snapshot_em.frame = frame;
+
   engine_snapshot_em.screen_x = screen_x;
   engine_snapshot_em.screen_y = screen_y;
-  engine_snapshot_em.frame = frame;
+
+  engine_snapshot_em.Boom = Boom;
+  engine_snapshot_em.Cave = Cave;
+  engine_snapshot_em.Next = Next;
+  engine_snapshot_em.Draw = Draw;
 
   for (i = 0; i < 4; i++)
     engine_snapshot_em.ply[i] = ply[i];
@@ -181,18 +188,25 @@ void SaveEngineSnapshotValues_EM()
     for (j = 0; j < HEIGHT; j++)
       for (k = 0; k < WIDTH; k++)
 	engine_snapshot_em.Array[i][j][k] = Array[i][j][k];
-
 }
 
 void LoadEngineSnapshotValues_EM()
 {
   int i, j, k;
 
-  RandomEM = engine_snapshot_em.RandomEM;
   game_em = engine_snapshot_em.game_em;
+  lev = engine_snapshot_em.lev;
+
+  RandomEM = engine_snapshot_em.RandomEM;
+  frame = engine_snapshot_em.frame;
+
   screen_x = engine_snapshot_em.screen_x;
   screen_y = engine_snapshot_em.screen_y;
-  frame = engine_snapshot_em.frame;
+
+  Boom = engine_snapshot_em.Boom;
+  Cave = engine_snapshot_em.Cave;
+  Next = engine_snapshot_em.Next;
+  Draw = engine_snapshot_em.Draw;
 
   for (i = 0; i < 4; i++)
     ply[i] = engine_snapshot_em.ply[i];

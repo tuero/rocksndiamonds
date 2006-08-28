@@ -4762,7 +4762,7 @@ void OpenAll()
   InitCounter();
 
   InitRND(NEW_RANDOMIZE);
-  InitSimpleRND(NEW_RANDOMIZE);
+  InitSimpleRandom(NEW_RANDOMIZE);
 
   InitJoysticks();
 

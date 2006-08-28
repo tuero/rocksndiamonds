@@ -369,11 +369,11 @@ void sound_play(void)
   memset(play, 0, sizeof(play));
 }
 
-unsigned int InitEngineRND_EM(long seed)
+unsigned int InitEngineRandom_EM(long seed)
 {
   if (seed == NEW_RANDOMIZE)
   {
-    int simple_rnd = SimpleRND(1000);
+    int simple_rnd = GetSimpleRandom(1000);
     int i;
 
     for (i = 0; i < simple_rnd || RandomEM == NEW_RANDOMIZE; i++)

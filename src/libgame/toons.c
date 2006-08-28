@@ -65,7 +65,7 @@ int getAnimationFrame(int num_frames, int delay, int mode, int start_frame,
     /* note: expect different frames for the same delay cycle! */
 
     if (gfx.anim_random_frame < 0)
-      frame = SimpleRND(num_frames);
+      frame = GetSimpleRandom(num_frames);
     else
       frame = gfx.anim_random_frame % num_frames;
   }
@@ -182,11 +182,11 @@ boolean AnimateToon(int toon_nr, boolean restart)
       else if (strEqual(anim->position, "bottom"))
 	pos_y = pos_bottom;
       else if (strEqual(anim->position, "upper"))
-	pos_y = SimpleRND(pos_bottom / 2);
+	pos_y = GetSimpleRandom(pos_bottom / 2);
       else if (strEqual(anim->position, "lower"))
-	pos_y = pos_bottom / 2 + SimpleRND(pos_bottom / 2);
+	pos_y = pos_bottom / 2 + GetSimpleRandom(pos_bottom / 2);
       else
-	pos_y = SimpleRND(pos_bottom);
+	pos_y = GetSimpleRandom(pos_bottom);
 
       if (direction == MV_RIGHT)
       {
@@ -210,7 +210,7 @@ boolean AnimateToon(int toon_nr, boolean restart)
       else if (strEqual(anim->position, "right"))
 	pos_x = pos_right;
       else
-	pos_x = SimpleRND(pos_right);
+	pos_x = GetSimpleRandom(pos_right);
 
       if (direction == MV_DOWN)
       {
@@ -354,7 +354,7 @@ void HandleAnimation(int mode)
   if (reset_delay)
   {
     animstart_delay = Counter();
-    animstart_delay_value = SimpleRND(3000);
+    animstart_delay_value = GetSimpleRandom(3000);
     reset_delay = FALSE;
   }
 
@@ -363,7 +363,7 @@ void HandleAnimation(int mode)
     if (!DelayReached(&animstart_delay, animstart_delay_value))
       return;
 
-    toon_nr = SimpleRND(screen_info.num_toons);
+    toon_nr = GetSimpleRandom(screen_info.num_toons);
   }
 
   anim_restart = reset_delay = AnimateToon(toon_nr, anim_restart);

@@ -701,6 +701,10 @@ struct EngineSnapshotInfo_EM
   int screen_x;
   int screen_y;
   int frame;
+  short **Boom;
+  short **Cave;
+  short **Next;
+  short **Draw;
 };
 
 
@@ -720,7 +724,7 @@ extern void em_close_all();
 extern void InitGameEngine_EM();
 extern void GameActions_EM(byte *, boolean);
 
-extern unsigned int InitEngineRND_EM(long);
+extern unsigned int InitEngineRandom_EM(long);
 
 extern void setLevelInfoToDefaults_EM();
 extern boolean LoadNativeLevel_EM(char *);

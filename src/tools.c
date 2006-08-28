@@ -2226,6 +2226,10 @@ void WaitForEventToContinue()
 
   button_status = MB_RELEASED;
 
+#if 1
+  ClearEventQueue();
+#endif
+
   while (still_wait)
   {
     if (PendingEvent())
@@ -5306,9 +5310,9 @@ int getGameFrameDelay_EM(int native_em_game_frame_delay)
 unsigned int InitRND(long seed)
 {
   if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
-    return InitEngineRND_EM(seed);
+    return InitEngineRandom_EM(seed);
   else
-    return InitEngineRND(seed);
+    return InitEngineRandom_RND(seed);
 }
 
 void InitGraphicInfo_EM(void)
