@@ -948,7 +948,7 @@ void TapeQuickLoad()
   if (game_status != GAME_MODE_PLAYING && game_status != GAME_MODE_MAIN)
     return;
 
-  if (1 && CheckEngineSnapshot())
+  if (CheckEngineSnapshot())
   {
     TapeStartGamePlaying();
 

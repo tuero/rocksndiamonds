@@ -1,3 +1,7 @@
+2006-08-29
+	* fixed bug with redrawing screen in fullscreen mode after quick tape
+	  reloading when using the EMC game engine
+
 2006-08-28
 	* fixed bug in GameWon() when level contains no exit (like in Sokoban)
 

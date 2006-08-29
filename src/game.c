@@ -12586,9 +12586,12 @@ static void LoadEngineSnapshotValues_RND()
   printf("::: LOADING ... : %d RNDs\n", num_random_calls);
 #endif
 
-  InitRND(tape.random_seed);
-  for (i = 0; i < num_random_calls; i++)
-    RND(1);
+  if (level.game_engine_type == GAME_ENGINE_TYPE_RND)
+  {
+    InitRND(tape.random_seed);
+    for (i = 0; i < num_random_calls; i++)
+      RND(1);
+  }
 
   if (game.num_random_calls != num_random_calls)
   {
