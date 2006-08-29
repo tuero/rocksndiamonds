@@ -2830,36 +2830,36 @@ element_to_graphic[] =
     IMG_CURRENT_CE_SCORE
   },
   {
-    EL_LAST_CE_1,			-1, -1, FALSE,
-    IMG_LAST_CE_1
+    EL_PREV_CE_1,			-1, -1, FALSE,
+    IMG_PREV_CE_1
   },
   {
-    EL_LAST_CE_2,			-1, -1, FALSE,
-    IMG_LAST_CE_2
+    EL_PREV_CE_2,			-1, -1, FALSE,
+    IMG_PREV_CE_2
   },
   {
-    EL_LAST_CE_3,			-1, -1, FALSE,
-    IMG_LAST_CE_3
+    EL_PREV_CE_3,			-1, -1, FALSE,
+    IMG_PREV_CE_3
   },
   {
-    EL_LAST_CE_4,			-1, -1, FALSE,
-    IMG_LAST_CE_4
+    EL_PREV_CE_4,			-1, -1, FALSE,
+    IMG_PREV_CE_4
   },
   {
-    EL_LAST_CE_5,			-1, -1, FALSE,
-    IMG_LAST_CE_5
+    EL_PREV_CE_5,			-1, -1, FALSE,
+    IMG_PREV_CE_5
   },
   {
-    EL_LAST_CE_6,			-1, -1, FALSE,
-    IMG_LAST_CE_6
+    EL_PREV_CE_6,			-1, -1, FALSE,
+    IMG_PREV_CE_6
   },
   {
-    EL_LAST_CE_7,			-1, -1, FALSE,
-    IMG_LAST_CE_7
+    EL_PREV_CE_7,			-1, -1, FALSE,
+    IMG_PREV_CE_7
   },
   {
-    EL_LAST_CE_8,			-1, -1, FALSE,
-    IMG_LAST_CE_8
+    EL_PREV_CE_8,			-1, -1, FALSE,
+    IMG_PREV_CE_8
   },
   {
     EL_NEXT_CE_1,			-1, -1, FALSE,

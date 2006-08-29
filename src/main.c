@@ -3695,43 +3695,43 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
     "growing wall (horizontal, BD style)"
   },
   {
-    "last_ce_8",
-    "last_ce",
+    "prev_ce_8",
+    "prev_ce",
     "CE 8 positions earlier in list"
   },
   {
-    "last_ce_7",
-    "last_ce",
+    "prev_ce_7",
+    "prev_ce",
     "CE 7 positions earlier in list"
   },
   {
-    "last_ce_6",
-    "last_ce",
+    "prev_ce_6",
+    "prev_ce",
     "CE 6 positions earlier in list"
   },
   {
-    "last_ce_5",
-    "last_ce",
+    "prev_ce_5",
+    "prev_ce",
     "CE 5 positions earlier in list"
   },
   {
-    "last_ce_4",
-    "last_ce",
+    "prev_ce_4",
+    "prev_ce",
     "CE 4 positions earlier in list"
   },
   {
-    "last_ce_3",
-    "last_ce",
+    "prev_ce_3",
+    "prev_ce",
     "CE 3 positions earlier in list"
   },
   {
-    "last_ce_2",
-    "last_ce",
+    "prev_ce_2",
+    "prev_ce",
     "CE 2 positions earlier in list"
   },
   {
-    "last_ce_1",
-    "last_ce",
+    "prev_ce_1",
+    "prev_ce",
     "CE 1 position earlier in list"
   },
   {

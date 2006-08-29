@@ -328,17 +328,8 @@ void WaitUntilDelayReached(unsigned long *counter_var, unsigned long delay)
 /* random generator functions                                                */
 /* ------------------------------------------------------------------------- */
 
-#if 0
-static int foo = -1;
-#endif
-
 unsigned int init_random_number(int nr, long seed)
 {
-#if 0
-  if (nr == 0)
-    foo = 0;
-#endif
-
   if (seed == NEW_RANDOMIZE)
   {
 #if defined(TARGET_SDL)
@@ -358,26 +349,7 @@ unsigned int init_random_number(int nr, long seed)
 
 unsigned int get_random_number(int nr, int max)
 {
-#if 0
-  if (max > 0)
-  {
-    long int rnd_raw = random_linux_libc(nr);
-    unsigned int rnd = rnd_raw % max;
-
-    if (nr == 0)
-    {
-      printf("::: %d: %d [%d MOD %d]\n", foo++, rnd, rnd_raw, max);
-    }
-
-    return rnd;
-  }
-  else
-  {
-    return 0;
-  }
-#else
   return (max > 0 ? random_linux_libc(nr) % max : 0);
-#endif
 }
 
 

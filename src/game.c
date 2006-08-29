@@ -176,7 +176,7 @@
 	 (e) == EL_TRIGGER_CE_SCORE ? (ch)->actual_trigger_ce_score  :	\
 	 (e) == EL_CURRENT_CE_VALUE ? (cv) :				\
 	 (e) == EL_CURRENT_CE_SCORE ? (cs) :				\
-	 (e) >= EL_LAST_CE_8 && (e) <= EL_NEXT_CE_8 ?			\
+	 (e) >= EL_PREV_CE_8 && (e) <= EL_NEXT_CE_8 ?			\
 	 RESOLVED_REFERENCE_ELEMENT(be, e) :				\
 	 (e))
 
@@ -12546,10 +12546,6 @@ static void SaveEngineSnapshotValues_RND()
       engine_snapshot_rnd.belt_anim_mode[i * 4 + j] = anim_mode;
     }
   }
-
-#if 0
-  printf("::: SAVE: %d RNDs\n", game.num_random_calls);
-#endif
 }
 
 static void LoadEngineSnapshotValues_RND()
@@ -12582,10 +12578,6 @@ static void LoadEngineSnapshotValues_RND()
     }
   }
 
-#if 0
-  printf("::: LOADING ... : %d RNDs\n", num_random_calls);
-#endif
-
   if (level.game_engine_type == GAME_ENGINE_TYPE_RND)
   {
     InitRND(tape.random_seed);
@@ -12600,10 +12592,6 @@ static void LoadEngineSnapshotValues_RND()
     Error(ERR_RETURN, "number of random calls is %d", game.num_random_calls);
     Error(ERR_EXIT, "this should not happen -- please debug");
   }
-
-#if 0
-  printf("::: LOADED: %d RNDs\n", num_random_calls);
-#endif
 }
 
 static void SaveEngineSnapshotBuffer(void *buffer, int size)

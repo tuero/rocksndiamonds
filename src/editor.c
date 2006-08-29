@@ -4144,15 +4144,15 @@ static int editor_el_reference[] =
   EL_CURRENT_CE_VALUE,
   EL_CURRENT_CE_SCORE,
 
-  EL_LAST_CE_8,
-  EL_LAST_CE_7,
-  EL_LAST_CE_6,
-  EL_LAST_CE_5,
+  EL_PREV_CE_8,
+  EL_PREV_CE_7,
+  EL_PREV_CE_6,
+  EL_PREV_CE_5,
 
-  EL_LAST_CE_4,
-  EL_LAST_CE_3,
-  EL_LAST_CE_2,
-  EL_LAST_CE_1,
+  EL_PREV_CE_4,
+  EL_PREV_CE_3,
+  EL_PREV_CE_2,
+  EL_PREV_CE_1,
 
   EL_NEXT_CE_1,
   EL_NEXT_CE_2,
