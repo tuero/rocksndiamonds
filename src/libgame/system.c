@@ -424,13 +424,16 @@ inline static boolean CheckDrawingArea(int x, int y, int width, int height,
   if (draw_mask & REDRAW_ALL)
     return TRUE;
 
-  if ((draw_mask & REDRAW_FIELD) && x < gfx.real_sx + gfx.full_sxsize)
+  if ((draw_mask & REDRAW_FIELD) &&
+      x >= gfx.real_sx && x < gfx.real_sx + gfx.full_sxsize)
     return TRUE;
 
-  if ((draw_mask & REDRAW_DOOR_1) && x >= gfx.dx && y < gfx.dy + gfx.dysize)
+  if ((draw_mask & REDRAW_DOOR_1) &&
+      x >= gfx.dx && y < gfx.dy + gfx.dysize)
     return TRUE;
 
-  if ((draw_mask & REDRAW_DOOR_2) && x >= gfx.dx && y >= gfx.vy)
+  if ((draw_mask & REDRAW_DOOR_2) &&
+      x >= gfx.dx && y >= gfx.vy)
     return TRUE;
 
   return FALSE;

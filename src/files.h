@@ -39,6 +39,7 @@ void LoadLevelTemplate(int);
 void SaveLevel(int);
 void SaveLevelTemplate();
 void DumpLevel(struct LevelInfo *);
+boolean SaveLevelChecked(int);
 
 void CopyNativeLevel_RND_to_Native(struct LevelInfo *);
 void CopyNativeLevel_Native_to_RND(struct LevelInfo *);
@@ -48,6 +49,7 @@ void LoadTape(int);
 void LoadSolutionTape(int);
 void SaveTape(int);
 void DumpTape(struct TapeInfo *);
+boolean SaveTapeChecked(int);
 
 void LoadScore(int);
 void SaveScore(int);

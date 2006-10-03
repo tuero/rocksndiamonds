@@ -5276,6 +5276,25 @@ void SaveLevelTemplate()
   SaveLevelFromFilename(&level, filename);
 }
 
+boolean SaveLevelChecked(int nr)
+{
+  char *filename = getDefaultLevelFilename(nr);
+  boolean new_level = !fileExists(filename);
+  boolean level_saved = FALSE;
+
+  if (new_level || Request("Save this level and kill the old ?", REQ_ASK))
+  {
+    SaveLevel(nr);
+
+    if (new_level)
+      Request("Level saved !", REQ_CONFIRM);
+
+    level_saved = TRUE;
+  }
+
+  return level_saved;
+}
+
 void DumpLevel(struct LevelInfo *level)
 {
   if (level->no_valid_file)
@@ -5704,7 +5723,9 @@ void SaveTape(int nr)
 {
   char *filename = getTapeFilename(nr);
   FILE *file;
+#if 0
   boolean new_tape = TRUE;
+#endif
   int num_participating_players = 0;
   int info_chunk_size;
   int body_chunk_size;
@@ -5712,6 +5733,7 @@ void SaveTape(int nr)
 
   InitTapeDirectory(leveldir_current->subdir);
 
+#if 0
   /* if a tape still exists, ask to overwrite it */
   if (fileExists(filename))
   {
@@ -5719,6 +5741,7 @@ void SaveTape(int nr)
     if (!Request("Replace old tape ?", REQ_ASK))
       return;
   }
+#endif
 
   if (!(file = fopen(filename, MODE_WRITE)))
   {
@@ -5758,8 +5781,29 @@ void SaveTape(int nr)
 
   tape.changed = FALSE;
 
+#if 0
   if (new_tape)
     Request("Tape saved !", REQ_CONFIRM);
+#endif
+}
+
+boolean SaveTapeChecked(int nr)
+{
+  char *filename = getTapeFilename(nr);
+  boolean new_tape = !fileExists(filename);
+  boolean tape_saved = FALSE;
+
+  if (new_tape || Request("Replace old tape ?", REQ_ASK))
+  {
+    SaveTape(nr);
+
+    if (new_tape)
+      Request("Tape saved !", REQ_CONFIRM);
+
+    tape_saved = TRUE;
+  }
+
+  return tape_saved;
 }
 
 void DumpTape(struct TapeInfo *tape)

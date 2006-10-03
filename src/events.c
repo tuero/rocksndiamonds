@@ -667,8 +667,18 @@ void HandleKey(Key key, int key_status)
 	  element_dropped[pnr] = FALSE;
 	}
       }
+#if 1
+      else if (tape.recording && tape.pausing)
+      {
+	/* prevent key release events from un-pausing a paused game */
+	if (key_status == KEY_PRESSED &&
+	    (key_action & KEY_ACTION))
+	  TapeTogglePause(TAPE_TOGGLE_MANUAL);
+      }
+#else
       else if (tape.recording && tape.pausing && (key_action & KEY_ACTION))
 	TapeTogglePause(TAPE_TOGGLE_MANUAL);
+#endif
     }
   }
   else

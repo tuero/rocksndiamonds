@@ -919,11 +919,14 @@ void TapeQuickSave()
     TapeHaltRecording();	/* prepare tape for saving on-the-fly */
 
   if (TAPE_IS_EMPTY(tape))
+  {
     Request("No tape that can be saved !", REQ_CONFIRM);
-  else
-    SaveTape(tape.level_nr);
 
-  SaveEngineSnapshot();
+    return;
+  }
+
+  if (SaveTapeChecked(tape.level_nr))
+    SaveEngineSnapshot();
 }
 
 void TapeQuickLoad()
@@ -953,6 +956,8 @@ void TapeQuickLoad()
     TapeStartGamePlaying();
 
     LoadEngineSnapshot();
+
+    DrawCompleteVideoDisplay();
 
     tape.playing = TRUE;
     tape.pausing = TRUE;
@@ -1296,18 +1301,22 @@ static void HandleTapeButtons(struct GadgetInfo *gi)
   {
     case TAPE_CTRL_ID_EJECT:
       TapeStop();
+
       if (TAPE_IS_EMPTY(tape))
       {
 	LoadTape(level_nr);
+
 	if (TAPE_IS_EMPTY(tape))
 	  Request("No tape for this level !", REQ_CONFIRM);
       }
       else
       {
 	if (tape.changed)
-	  SaveTape(tape.level_nr);
+	  SaveTapeChecked(tape.level_nr);
+
 	TapeErase();
       }
+
       DrawCompleteVideoDisplay();
       break;
 
@@ -1325,6 +1334,7 @@ static void HandleTapeButtons(struct GadgetInfo *gi)
       }
       else if (tape.recording)
 	TapeSingleStep();
+
       break;
 
     case TAPE_CTRL_ID_STOP:

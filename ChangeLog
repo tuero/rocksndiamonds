@@ -1,5 +1,9 @@
 2006-10-03
 	* fixed bug with not unmapping main menu screen gadgets on other screens
+	* fixed bug with un-pausing a paused game by releasing still pressed key
+	* fixed bug with not redrawing screen when toggling to/from fullscreen
+	  mode while fast reloading tape (without redrawing playfield contents)
+	* fixed bug with quick-saving tape snapshot despite answering with "no"
 
 2006-08-30
 	* version number set to 3.2.3

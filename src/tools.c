@@ -6026,6 +6026,11 @@ void ToggleFullscreenIfNeeded()
 
     FreeBitmap(tmp_backbuffer);
 
+#if 1
+    /* update visible window/screen */
+    BlitBitmap(backbuffer, window, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
+#else
     redraw_mask = REDRAW_ALL;
+#endif
   }
 }

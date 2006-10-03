@@ -2800,7 +2800,11 @@ void GameEnd()
     TapeStop();
 #endif
 
+#if 1
+    SaveTapeChecked(tape.level_nr);	/* ask to save tape */
+#else
     SaveTape(tape.level_nr);		/* ask to save tape */
+#endif
   }
 
   if (level_editor_test_game)
