@@ -1,6 +1,16 @@
+2006-10-03
+	* fixed bug with not unmapping main menu screen gadgets on other screens
+
+2006-08-30
+	* version number set to 3.2.3
+
+2006-08-29
+	* version 3.2.2 released
+
 2006-08-29
 	* fixed bug with redrawing screen in fullscreen mode after quick tape
 	  reloading when using the EMC game engine
+	* changed token names from "last_ce_[1-8]" to "prev_ce_[1-8]"
 
 2006-08-28
 	* fixed bug in GameWon() when level contains no exit (like in Sokoban)

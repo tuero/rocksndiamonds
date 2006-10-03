@@ -2445,6 +2445,13 @@ void InitGame()
     }
   }
 
+#if 1
+  UnmapAllGadgets();
+
+  MapGameButtons();
+  MapTapeButtons();
+#endif
+
   game.restart_level = FALSE;
 }
 

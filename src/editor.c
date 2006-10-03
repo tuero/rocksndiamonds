@@ -6761,7 +6761,11 @@ void DrawLevelEd()
   ReinitializeElementList();		/* update dynamic level element list */
   ReinitializeElementListButtons();	/* custom element may look different */
 
+#if 1
+  UnmapAllGadgets();
+#else
   UnmapTapeButtons();
+#endif
   MapControlButtons();
 
   DrawEditModeWindow();
