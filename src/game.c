@@ -53,6 +53,9 @@
 
 #define USE_UFAST_PLAYER_EXIT_BUGFIX	(USE_NEW_STUFF		* 1)
 
+#define USE_GFX_RESET_ONLY_WHEN_MOVING	(USE_NEW_STUFF		* 1)
+#define USE_GFX_RESET_PLAYER_ARTWORK	(USE_NEW_STUFF		* 1)
+
 
 /* for DigField() */
 #define DF_NO_PUSH		0
@@ -3003,22 +3006,33 @@ static void ResetRandomAnimationValue(int x, int y)
 void InitMovingField(int x, int y, int direction)
 {
   int element = Feld[x][y];
+  int move_stepsize = getElementMoveStepsize(x, y);
   int dx = (direction == MV_LEFT ? -1 : direction == MV_RIGHT ? +1 : 0);
   int dy = (direction == MV_UP   ? -1 : direction == MV_DOWN  ? +1 : 0);
   int newx = x + dx;
   int newy = y + dy;
+  boolean is_moving = (move_stepsize != 0);	/* moving or being moved */
+  boolean continues_moving = (WasJustMoving[x][y] && direction == MovDir[x][y]);
 
-  if (!WasJustMoving[x][y] || direction != MovDir[x][y])
+  /* reset animation only for moving elements that change direction of moving
+     (else CEs with property "can move" / "not moving" are reset each frame) */
+#if USE_GFX_RESET_ONLY_WHEN_MOVING
+  if (is_moving && !continues_moving)
     ResetGfxAnimation(x, y);
+#else
+  if (!continues_moving)
+    ResetGfxAnimation(x, y);
+#endif
 
   MovDir[x][y] = direction;
   GfxDir[x][y] = direction;
-  GfxAction[x][y] = (direction == MV_DOWN && CAN_FALL(element) ?
+  GfxAction[x][y] = (!is_moving ? ACTION_WAITING :
+		     direction == MV_DOWN && CAN_FALL(element) ?
 		     ACTION_FALLING : ACTION_MOVING);
 
   /* this is needed for CEs with property "can move" / "not moving" */
 
-  if (getElementMoveStepsize(x, y) != 0)	/* moving or being moved */
+  if (is_moving)
   {
     if (Feld[newx][newy] == EL_EMPTY)
       Feld[newx][newy] = EL_BLOCKED;
@@ -7230,7 +7244,7 @@ static void CloseAllOpenTimegates()
   }
 }
 
-void EdelsteinFunkeln(int x, int y)
+void DrawTwinkleOnField(int x, int y)
 {
   if (!IN_SCR_FIELD(SCREENX(x), SCREENY(y)) || IS_MOVING(x, y))
     return;
@@ -7900,6 +7914,11 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
 	    artwork_element =
 	      (level.use_artwork_element[i] ? level.artwork_element[i] :
 	       stored_player[i].element_nr);
+
+#if USE_GFX_RESET_PLAYER_ARTWORK
+	  if (stored_player[i].artwork_element != artwork_element)
+	    stored_player[i].Frame = 0;
+#endif
 
 	  stored_player[i].artwork_element = artwork_element;
 
@@ -9445,7 +9464,7 @@ void GameActions_RND()
 	DrawLevelGraphicAnimationIfNeeded(x, y, graphic);
 
       if (IS_GEM(element) || element == EL_SP_INFOTRON)
-	EdelsteinFunkeln(x, y);
+	DrawTwinkleOnField(x, y);
     }
     else if ((element == EL_ACID ||
 	      element == EL_EXIT_OPEN ||

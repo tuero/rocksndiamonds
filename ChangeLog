@@ -1,3 +1,7 @@
+2006-10-09
+	* fixed bug with CE with move speed "not moving" not being animated
+	* when changing player artwork by CE action, reset animation frame
+
 2006-10-03
 	* fixed bug with not unmapping main menu screen gadgets on other screens
 	* fixed bug with un-pausing a paused game by releasing still pressed key
