@@ -1,3 +1,7 @@
+2006-10-12
+	* added directives "border.draw_masked.*" for menu/playfield area and
+	  door areas to display overlapping/masked borders from "global.border"
+
 2006-10-09
 	* fixed bug with CE with move speed "not moving" not being animated
 	* when changing player artwork by CE action, reset animation frame

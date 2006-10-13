@@ -335,15 +335,20 @@ void HandleAnimation(int mode)
       break;
 
     case ANIM_STOP:
-      redraw_mask |= (REDRAW_FIELD | REDRAW_FROM_BACKBUFFER);
+      if (anim_running)
+      {
+#if 0
+	redraw_mask |= (REDRAW_FIELD | REDRAW_FROM_BACKBUFFER);
 
-      /* Redraw background even when in direct drawing mode */
-      draw_mode = setup.direct_draw;
-      setup.direct_draw = FALSE;
-      screen_info.update_function();
-      setup.direct_draw = draw_mode;
+	/* Redraw background even when in direct drawing mode */
+	draw_mode = setup.direct_draw;
+	setup.direct_draw = FALSE;
+	screen_info.update_function();
+	setup.direct_draw = draw_mode;
+#endif
 
-      anim_running = FALSE;
+	anim_running = FALSE;
+      }
 
       return;
 

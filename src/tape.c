@@ -1239,6 +1239,7 @@ void CreateTapeButtons()
 		      GDI_STATE, GD_BUTTON_UNPRESSED,
 		      GDI_DESIGN_UNPRESSED, gd_bitmap, gd_x1, gd_y,
 		      GDI_DESIGN_PRESSED, gd_bitmap, gd_x2, gd_y,
+		      GDI_DIRECT_DRAW, FALSE,
 		      GDI_EVENT_MASK, GD_EVENT_RELEASED,
 		      GDI_CALLBACK_ACTION, HandleTapeButtons,
 		      GDI_END);

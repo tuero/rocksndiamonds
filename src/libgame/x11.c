@@ -363,14 +363,18 @@ void X11FillRectangle(Bitmap *bitmap, int x, int y,
 }
 
 void X11FadeRectangle(Bitmap *bitmap_cross, int x, int y, int width, int height,
-		      int fade_mode, int fade_delay, int post_delay)
+		      int fade_mode, int fade_delay, int post_delay,
+		      void (*draw_border_function)(void))
 {
   /* fading currently not supported -- simply copy backbuffer to screen */
 
   if (fade_mode == FADE_MODE_FADE_OUT)
-    X11FillRectangle(window, x, y, width, height, BLACK_PIXEL);
-  else
-    X11CopyArea(backbuffer, window, x, y, width, height, 0, 0, BLIT_OPAQUE);
+    X11FillRectangle(backbuffer, x, y, width, height, BLACK_PIXEL);
+
+  if (draw_border_function != NULL)
+    draw_border_function();
+
+  X11CopyArea(backbuffer, window, x, y, width, height, 0, 0, BLIT_OPAQUE);
 
   /* as we currently cannot use the fade delay, also do not use post delay */
 }

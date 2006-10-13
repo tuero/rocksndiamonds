@@ -194,6 +194,63 @@ void RedrawPlayfield(boolean force_redraw, int x, int y, int width, int height)
   BlitBitmap(drawto, window, x, y, width, height, x, y);
 }
 
+void DrawMaskedBorder_FIELD()
+{
+  if (game_status >= GAME_MODE_TITLE &&
+      game_status <= GAME_MODE_PLAYING &&
+      border.draw_masked[game_status])
+    BlitBitmapMasked(graphic_info[IMG_GLOBAL_BORDER].bitmap, backbuffer,
+		     REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE,
+		     REAL_SX, REAL_SY);
+}
+
+void DrawMaskedBorder_DOOR_1()
+{
+  if (border.draw_masked[GFX_SPECIAL_ARG_DOOR] &&
+      (game_status != GAME_MODE_EDITOR ||
+       border.draw_masked[GFX_SPECIAL_ARG_EDITOR]))
+    BlitBitmapMasked(graphic_info[IMG_GLOBAL_BORDER].bitmap, backbuffer,
+		     DX, DY, DXSIZE, DYSIZE, DX, DY);
+}
+
+void DrawMaskedBorder_DOOR_2()
+{
+  if (border.draw_masked[GFX_SPECIAL_ARG_DOOR] &&
+      game_status != GAME_MODE_EDITOR)
+    BlitBitmapMasked(graphic_info[IMG_GLOBAL_BORDER].bitmap, backbuffer,
+		     VX, VY, VXSIZE, VYSIZE, VX, VY);
+}
+
+void DrawMaskedBorder_DOOR_3()
+{
+  /* currently not available */
+}
+
+void DrawMaskedBorder_ALL()
+{
+  DrawMaskedBorder_FIELD();
+  DrawMaskedBorder_DOOR_1();
+  DrawMaskedBorder_DOOR_2();
+  DrawMaskedBorder_DOOR_3();
+}
+
+void DrawMaskedBorder(int redraw_mask)
+{
+  if (redraw_mask & REDRAW_ALL)
+    DrawMaskedBorder_ALL();
+  else
+  {
+    if (redraw_mask & REDRAW_FIELD)
+      DrawMaskedBorder_FIELD();
+    if (redraw_mask & REDRAW_DOOR_1)
+      DrawMaskedBorder_DOOR_1();
+    if (redraw_mask & REDRAW_DOOR_2)
+      DrawMaskedBorder_DOOR_2();
+    if (redraw_mask & REDRAW_DOOR_3)
+      DrawMaskedBorder_DOOR_3();
+  }
+}
+
 void BackToFront()
 {
   int x,y;
@@ -260,6 +317,7 @@ void BackToFront()
     if (game_status != GAME_MODE_PLAYING ||
 	redraw_mask & REDRAW_FROM_BACKBUFFER)
     {
+      DrawMaskedBorder(REDRAW_FIELD);
       BlitBitmap(backbuffer, window,
 		 REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE, REAL_SX, REAL_SY);
     }
@@ -278,7 +336,21 @@ void BackToFront()
 	  ABS(ScreenMovPos) == ScrollStepSize ||
 	  redraw_tiles > REDRAWTILES_THRESHOLD)
       {
+#if 1
+	if (border.draw_masked[GFX_SPECIAL_ARG_MAIN])
+	{
+	  BlitBitmap(buffer, backbuffer, fx, fy, SXSIZE, SYSIZE, SX, SY);
+
+	  DrawMaskedBorder(REDRAW_FIELD);
+	  BlitBitmap(backbuffer, window,
+		     REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE,
+		     REAL_SX, REAL_SY);
+	}
+	else
+	  BlitBitmap(buffer, window, fx, fy, SXSIZE, SYSIZE, SX, SY);
+#else
 	BlitBitmap(buffer, window, fx, fy, SXSIZE, SYSIZE, SX, SY);
+#endif
 
 #if 0
 #ifdef DEBUG
@@ -302,13 +374,22 @@ void BackToFront()
   if (redraw_mask & REDRAW_DOORS)
   {
     if (redraw_mask & REDRAW_DOOR_1)
+    {
+      DrawMaskedBorder(REDRAW_DOOR_1);
       BlitBitmap(backbuffer, window, DX, DY, DXSIZE, DYSIZE, DX, DY);
+    }
 
     if (redraw_mask & REDRAW_DOOR_2)
+    {
+      DrawMaskedBorder(REDRAW_DOOR_2);
       BlitBitmap(backbuffer, window, VX, VY, VXSIZE, VYSIZE, VX, VY);
+    }
 
     if (redraw_mask & REDRAW_DOOR_3)
+    {
+      DrawMaskedBorder(REDRAW_DOOR_3);
       BlitBitmap(backbuffer, window, EX, EY, EXSIZE, EYSIZE, EX, EY);
+    }
 
     redraw_mask &= ~REDRAW_DOORS;
   }
@@ -426,6 +507,7 @@ void FadeToFront()
 
 void FadeExt(int fade_mask, int fade_mode)
 {
+  void (*draw_border_function)(void) = NULL;
   Bitmap *bitmap = (fade_mode == FADE_MODE_CROSSFADE ? bitmap_db_cross : NULL);
   int fade_delay = menu.fade_delay;
   int post_delay = (fade_mode == FADE_MODE_FADE_OUT ? menu.post_delay : 0);
@@ -437,6 +519,8 @@ void FadeExt(int fade_mask, int fade_mode)
     y = REAL_SY;
     width  = FULL_SXSIZE;
     height = FULL_SYSIZE;
+
+    draw_border_function = DrawMaskedBorder_FIELD;
   }
   else		/* REDRAW_ALL */
   {
@@ -458,7 +542,8 @@ void FadeExt(int fade_mask, int fade_mode)
     return;
   }
 
-  FadeRectangle(bitmap, x, y, width, height, fade_mode, fade_delay, post_delay);
+  FadeRectangle(bitmap, x, y, width, height, fade_mode, fade_delay, post_delay,
+		draw_border_function);
 
   redraw_mask &= ~fade_mask;
 }
@@ -3093,6 +3178,7 @@ void CreateToolButtons()
 		      GDI_DECORATION_POSITION, deco_xpos, deco_ypos,
 		      GDI_DECORATION_SIZE, MINI_TILEX, MINI_TILEY,
 		      GDI_DECORATION_SHIFTING, 1, 1,
+		      GDI_DIRECT_DRAW, FALSE,
 		      GDI_EVENT_MASK, event_mask,
 		      GDI_CALLBACK_ACTION, HandleToolButtons,
 		      GDI_END);
@@ -6002,23 +6088,45 @@ void PlayMenuMusic()
 
 void ToggleFullscreenIfNeeded()
 {
+  boolean change_fullscreen = (setup.fullscreen !=
+			       video.fullscreen_enabled);
+  boolean change_fullscreen_mode = (video.fullscreen_enabled &&
+				    !strEqual(setup.fullscreen_mode,
+					      video.fullscreen_mode_current));
+
+  if (!video.fullscreen_available)
+    return;
+
+#if 1
+  if (change_fullscreen || change_fullscreen_mode)
+#else
   if (setup.fullscreen != video.fullscreen_enabled ||
       setup.fullscreen_mode != video.fullscreen_mode_current)
+#endif
   {
     Bitmap *tmp_backbuffer = CreateBitmap(WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH);
 
     /* save backbuffer content which gets lost when toggling fullscreen mode */
     BlitBitmap(backbuffer, tmp_backbuffer, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
 
+#if 1
+    if (change_fullscreen_mode)
+#else
     if (setup.fullscreen && video.fullscreen_enabled)
+#endif
     {
-      /* keep fullscreen mode, but change screen mode */
+      /* keep fullscreen, but change fullscreen mode (screen resolution) */
+#if 1
+      /* (this is now set in sdl.c) */
+#else
       video.fullscreen_mode_current = setup.fullscreen_mode;
-      video.fullscreen_enabled = FALSE;
+#endif
+      video.fullscreen_enabled = FALSE;		/* force new fullscreen mode */
     }
 
     /* toggle fullscreen */
     ChangeVideoModeIfNeeded(setup.fullscreen);
+
     setup.fullscreen = video.fullscreen_enabled;
 
     /* restore backbuffer content from temporary backbuffer backup bitmap */

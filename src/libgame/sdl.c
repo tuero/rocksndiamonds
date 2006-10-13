@@ -35,12 +35,12 @@ static int fullscreen_yoffset;
 static int video_xoffset;
 static int video_yoffset;
 
-static void setFullscreenParameters()
+static void setFullscreenParameters(char *fullscreen_mode_string)
 {
   struct ScreenModeInfo *fullscreen_mode;
   int i;
 
-  fullscreen_mode = get_screen_mode_from_string(setup.fullscreen_mode);
+  fullscreen_mode = get_screen_mode_from_string(fullscreen_mode_string);
 
   if (fullscreen_mode == NULL)
     return;
@@ -240,7 +240,7 @@ boolean SDLSetVideoMode(DrawBuffer **backbuffer, boolean fullscreen)
 
   if (fullscreen && !video.fullscreen_enabled && video.fullscreen_available)
   {
-    setFullscreenParameters();
+    setFullscreenParameters(setup.fullscreen_mode);
 
     video_xoffset = fullscreen_xoffset;
     video_yoffset = fullscreen_yoffset;
@@ -255,6 +255,7 @@ boolean SDLSetVideoMode(DrawBuffer **backbuffer, boolean fullscreen)
 
       /* do not try it again */
       video.fullscreen_available = FALSE;
+
       success = FALSE;
     }
     else
@@ -262,6 +263,8 @@ boolean SDLSetVideoMode(DrawBuffer **backbuffer, boolean fullscreen)
       (*backbuffer)->surface = new_surface;
 
       video.fullscreen_enabled = TRUE;
+      video.fullscreen_mode_current = setup.fullscreen_mode;
+
       success = TRUE;
     }
   }
@@ -383,7 +386,8 @@ void SDLFillRectangle(Bitmap *dst_bitmap, int x, int y, int width, int height,
 }
 
 void SDLFadeRectangle(Bitmap *bitmap_cross, int x, int y, int width, int height,
-		      int fade_mode, int fade_delay, int post_delay)
+		      int fade_mode, int fade_delay, int post_delay,
+		      void (*draw_border_function)(void))
 {
   static boolean initialization_needed = TRUE;
   static SDL_Surface *surface_source = NULL;
@@ -496,6 +500,9 @@ void SDLFadeRectangle(Bitmap *bitmap_cross, int x, int y, int width, int height,
     /* draw new (target) image to screen buffer using alpha blending */
     SDL_SetAlpha(surface_target, SDL_SRCALPHA, alpha_final);
     SDL_BlitSurface(surface_target, &src_rect, surface_screen, &dst_rect);
+
+    if (draw_border_function != NULL)
+      draw_border_function();
 
 #if 1
     /* only update the region of the screen that is affected from fading */

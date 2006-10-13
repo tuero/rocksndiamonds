@@ -1047,7 +1047,8 @@ Bitmap *CreateBitmapStruct(void);
 Bitmap *CreateBitmap(int, int, int);
 void FreeBitmap(Bitmap *);
 void BlitBitmap(Bitmap *, Bitmap *, int, int, int, int, int, int);
-void FadeRectangle(Bitmap *bitmap, int, int, int, int, int, int, int);
+void FadeRectangle(Bitmap *bitmap, int, int, int, int, int, int, int,
+		   void (*draw_border_function)(void));
 void FillRectangle(Bitmap *, int, int, int, int, Pixel);
 void ClearRectangle(Bitmap *, int, int, int, int);
 void ClearRectangleOnBackground(Bitmap *, int, int, int, int);

@@ -462,14 +462,15 @@ void BlitBitmap(Bitmap *src_bitmap, Bitmap *dst_bitmap,
 }
 
 void FadeRectangle(Bitmap *bitmap_cross, int x, int y, int width, int height,
-		   int fade_mode, int fade_delay, int post_delay)
+		   int fade_mode, int fade_delay, int post_delay,
+		   void (*draw_border_function)(void))
 {
 #if defined(TARGET_SDL)
   SDLFadeRectangle(bitmap_cross, x, y, width, height,
-		   fade_mode, fade_delay, post_delay);
+		   fade_mode, fade_delay, post_delay, draw_border_function);
 #else
   X11FadeRectangle(bitmap_cross, x, y, width, height,
-		   fade_mode, fade_delay, post_delay);
+		   fade_mode, fade_delay, post_delay, draw_border_function);
 #endif
 }
 

@@ -62,6 +62,13 @@
 
 void DumpTile(int, int);
 
+void DrawMaskedBorder_FIELD();
+void DrawMaskedBorder_DOOR_1();
+void DrawMaskedBorder_DOOR_2();
+void DrawMaskedBorder_DOOR_3();
+void DrawMaskedBorder_ALL();
+void DrawMaskedBorder(int);
+
 void SetDrawtoField(int);
 void RedrawPlayfield(boolean, int, int, int, int);
 void BackToFront();

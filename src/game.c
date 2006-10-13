@@ -2927,10 +2927,9 @@ int NewHiScore()
   return position;
 }
 
-inline static int getElementMoveStepsize(int x, int y)
+inline static int getElementMoveStepsizeExt(int x, int y, int direction)
 {
   int element = Feld[x][y];
-  int direction = MovDir[x][y];
   int dx = (direction == MV_LEFT ? -1 : direction == MV_RIGHT ? +1 : 0);
   int dy = (direction == MV_UP   ? -1 : direction == MV_DOWN  ? +1 : 0);
   int horiz_move = (dx != 0);
@@ -2948,6 +2947,11 @@ inline static int getElementMoveStepsize(int x, int y)
   }
 
   return step;
+}
+
+inline static int getElementMoveStepsize(int x, int y)
+{
+  return getElementMoveStepsizeExt(x, y, MovDir[x][y]);
 }
 
 void InitPlayerGfxAnimation(struct PlayerInfo *player, int action, int dir)
@@ -3006,19 +3010,35 @@ static void ResetRandomAnimationValue(int x, int y)
 void InitMovingField(int x, int y, int direction)
 {
   int element = Feld[x][y];
-  int move_stepsize = getElementMoveStepsize(x, y);
   int dx = (direction == MV_LEFT ? -1 : direction == MV_RIGHT ? +1 : 0);
   int dy = (direction == MV_UP   ? -1 : direction == MV_DOWN  ? +1 : 0);
   int newx = x + dx;
   int newy = y + dy;
-  boolean is_moving = (move_stepsize != 0);	/* moving or being moved */
+  boolean is_moving_before, is_moving_after;
+#if 0
   boolean continues_moving = (WasJustMoving[x][y] && direction == MovDir[x][y]);
+#endif
 
-  /* reset animation only for moving elements that change direction of moving
+  /* check if element was/is moving or being moved before/after mode change */
+#if 1
+  is_moving_before = WasJustMoving[x][y];
+#else
+  is_moving_before = (getElementMoveStepsizeExt(x, y, MovDir[x][y]) != 0);
+#endif
+  is_moving_after  = (getElementMoveStepsizeExt(x, y, direction)    != 0);
+
+  /* reset animation only for moving elements which change direction of moving
+     or which just started or stopped moving
      (else CEs with property "can move" / "not moving" are reset each frame) */
 #if USE_GFX_RESET_ONLY_WHEN_MOVING
-  if (is_moving && !continues_moving)
+#if 1
+  if (is_moving_before != is_moving_after ||
+      direction != MovDir[x][y])
     ResetGfxAnimation(x, y);
+#else
+  if ((is_moving_before || is_moving_after) && !continues_moving)
+    ResetGfxAnimation(x, y);
+#endif
 #else
   if (!continues_moving)
     ResetGfxAnimation(x, y);
@@ -3026,13 +3046,19 @@ void InitMovingField(int x, int y, int direction)
 
   MovDir[x][y] = direction;
   GfxDir[x][y] = direction;
-  GfxAction[x][y] = (!is_moving ? ACTION_WAITING :
+
+#if USE_GFX_RESET_ONLY_WHEN_MOVING
+  GfxAction[x][y] = (!is_moving_after ? ACTION_WAITING :
 		     direction == MV_DOWN && CAN_FALL(element) ?
 		     ACTION_FALLING : ACTION_MOVING);
+#else
+  GfxAction[x][y] = (direction == MV_DOWN && CAN_FALL(element) ?
+		     ACTION_FALLING : ACTION_MOVING);
+#endif
 
   /* this is needed for CEs with property "can move" / "not moving" */
 
-  if (is_moving)
+  if (is_moving_after)
   {
     if (Feld[newx][newy] == EL_EMPTY)
       Feld[newx][newy] = EL_BLOCKED;

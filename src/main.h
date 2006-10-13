@@ -1815,6 +1815,11 @@
 #define NUM_ENGINE_TYPES		3
 
 
+struct BorderInfo
+{
+  int draw_masked[NUM_SPECIAL_GFX_ARGS];
+};
+
 struct MenuInfo
 {
   int draw_xoffset[NUM_SPECIAL_GFX_ARGS];
@@ -2407,6 +2412,7 @@ extern struct LevelInfo		level, level_template;
 extern struct HiScore		highscore[];
 extern struct TapeInfo		tape;
 extern struct GlobalInfo	global;
+extern struct BorderInfo	border;
 extern struct MenuInfo		menu;
 extern struct DoorInfo		door_1, door_2;
 extern struct PreviewInfo	preview;

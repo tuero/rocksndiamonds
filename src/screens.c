@@ -358,6 +358,7 @@ void DrawMainMenuExt(int redraw_mask, boolean do_fading)
       graphic_info[IMG_TITLESCREEN_1].bitmap != NULL)
   {
     game_status = GAME_MODE_TITLE;
+
     DrawTitleScreen();
 
     return;
@@ -430,6 +431,8 @@ void DrawMainMenuExt(int redraw_mask, boolean do_fading)
   /* map gadgets for main menu screen */
   MapTapeButtons();
   MapScreenMenuGadgets(SCREEN_MASK_MAIN);
+
+  DrawMaskedBorder(REDRAW_ALL);
 
   if (do_fading)
     FadeIn(redraw_mask);
@@ -847,6 +850,8 @@ static void DrawInfoScreen_Main(boolean do_fading)
 
   PlayMenuSound();
   PlayMenuMusic();
+
+  DrawMaskedBorder(REDRAW_ALL);
 
   if (do_fading)
     FadeIn(REDRAW_ALL);

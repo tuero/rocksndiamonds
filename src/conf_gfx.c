@@ -4513,6 +4513,16 @@ struct ConfigInfo image_config[] =
 
   { "global.num_toons",				"20"			},
 
+  { "border.draw_masked.TITLE",			"false"			},
+  { "border.draw_masked.MAIN",			"false"			},
+  { "border.draw_masked.LEVELS",		"false"			},
+  { "border.draw_masked.SCORES",		"false"			},
+  { "border.draw_masked.EDITOR",		"false"			},
+  { "border.draw_masked.INFO",			"false"			},
+  { "border.draw_masked.SETUP",			"false"			},
+  { "border.draw_masked.PLAYING",		"false"			},
+  { "border.draw_masked.DOOR",			"false"			},
+
   { "menu.draw_xoffset",			"0"			},
   { "menu.draw_yoffset",			"0"			},
   { "menu.draw_xoffset.MAIN",			"0"			},

@@ -339,7 +339,8 @@ void X11CreateBitmapContent(Bitmap *, int, int, int);
 void X11FreeBitmapPointers(Bitmap *);
 void X11CopyArea(Bitmap *, Bitmap *, int, int, int, int, int, int, int);
 void X11FillRectangle(Bitmap *, int, int, int, int, Pixel);
-void X11FadeRectangle(Bitmap *, int, int, int, int, int, int, int);
+void X11FadeRectangle(Bitmap *, int, int, int, int, int, int, int,
+		      void (*draw_border_function)(void));
 void X11DrawSimpleLine(Bitmap *, int, int, int, int, Pixel);
 Pixel X11GetPixel(Bitmap *, int, int);
 Pixel X11GetPixelFromRGB(unsigned int, unsigned int, unsigned int);
