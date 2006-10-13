@@ -128,9 +128,10 @@ static void HandleChooseTree(int, int, int, int, int, TreeInfo **);
 
 static void DrawChooseLevel(void);
 static void DrawInfoScreen(void);
+static void DrawAndFadeInInfoScreen(int);
 static void DrawSetupScreen(void);
 
-static void DrawInfoScreenExt(int);
+static void DrawInfoScreenExt(int, int);
 static void DrawInfoScreen_NotAvailable(char *, char *);
 static void DrawInfoScreen_HelpAnim(int, int, boolean);
 static void DrawInfoScreen_HelpText(int, int, int, int);
@@ -579,7 +580,7 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
       OpenDoor(DOOR_CLOSE_1 | DOOR_CLOSE_2 | DOOR_NO_DELAY | DOOR_FORCE_REDRAW);
 
       info_mode = INFO_MODE_MAIN;
-      DrawInfoScreenExt(use_fading_main_menu);
+      DrawInfoScreenExt(REDRAW_ALL, use_fading_main_menu);
     }
     else	/* default: return to main menu */
     {
@@ -814,7 +815,7 @@ static struct TokenInfo info_info_main[] =
   { 0,			NULL,			NULL			}
 };
 
-static void DrawInfoScreen_Main(boolean do_fading)
+static void DrawInfoScreen_Main(int redraw_mask, boolean do_fading)
 {
   int i;
 
@@ -854,7 +855,7 @@ static void DrawInfoScreen_Main(boolean do_fading)
   DrawMaskedBorder(REDRAW_ALL);
 
   if (do_fading)
-    FadeIn(REDRAW_ALL);
+    FadeIn(redraw_mask);
   else
     BackToFront();
 
@@ -1136,12 +1137,15 @@ void DrawInfoScreen_Elements()
 {
   SetMainBackgroundImageIfDefined(IMG_BACKGROUND_INFO_ELEMENTS);
 
+  FadeOut(REDRAW_FIELD);
+
   LoadHelpAnimInfo();
   LoadHelpTextInfo();
 
   HandleInfoScreen_Elements(MB_MENU_INITIALIZE);
 
-  FadeToFront();
+  FadeIn(REDRAW_FIELD);
+
   InitAnimation();
 }
 
@@ -1190,14 +1194,21 @@ void HandleInfoScreen_Elements(int button)
     if (page >= num_pages)
     {
       FadeSoundsAndMusic();
+      FadeOut(REDRAW_FIELD);
 
       info_mode = INFO_MODE_MAIN;
-      DrawInfoScreen();
+      DrawAndFadeInInfoScreen(REDRAW_FIELD);
 
       return;
     }
 
+    if (button != MB_MENU_INITIALIZE)
+      FadeCrossSaveBackbuffer();
+
     DrawInfoScreen_HelpAnim(page * anims_per_page, num_anims, TRUE);
+
+    if (button != MB_MENU_INITIALIZE)
+      FadeCross(REDRAW_FIELD);
   }
   else
   {
@@ -1213,12 +1224,16 @@ void DrawInfoScreen_Music()
 {
   SetMainBackgroundImageIfDefined(IMG_BACKGROUND_INFO_MUSIC);
 
+  FadeOut(REDRAW_FIELD);
+
   ClearWindow();
   DrawHeadline();
 
   LoadMusicInfo();
 
   HandleInfoScreen_Music(MB_MENU_INITIALIZE);
+
+  FadeIn(REDRAW_FIELD);
 }
 
 void HandleInfoScreen_Music(int button)
@@ -1265,8 +1280,11 @@ void HandleInfoScreen_Music(int button)
 
     if (list == NULL)
     {
+      FadeSoundsAndMusic();
+      FadeOut(REDRAW_FIELD);
+
       info_mode = INFO_MODE_MAIN;
-      DrawInfoScreen();
+      DrawAndFadeInInfoScreen(REDRAW_FIELD);
 
       return;
     }
@@ -1350,6 +1368,9 @@ static boolean DrawInfoScreen_CreditsScreen(int screen_nr)
 {
   int ystart = 150, ystep = 30;
   int ybottom = SYSIZE - 20;
+
+  if (screen_nr > 8)
+    return FALSE;
 
   ClearWindow();
   DrawHeadline();
@@ -1505,10 +1526,12 @@ static boolean DrawInfoScreen_CreditsScreen(int screen_nr)
     DrawTextSCentered(ystart + 4 * ystep, FONT_TEXT_3,
 		      "since 1995");
   }
+#if 0
   else
   {
     return FALSE;
   }
+#endif
 
   DrawTextSCentered(ybottom, FONT_TEXT_4,
 		    "Press any key or button for next page");
@@ -1522,7 +1545,11 @@ void DrawInfoScreen_Credits()
 
   FadeSoundsAndMusic();
 
+  FadeOut(REDRAW_FIELD);
+
   HandleInfoScreen_Credits(MB_MENU_INITIALIZE);
+
+  FadeIn(REDRAW_FIELD);
 }
 
 void HandleInfoScreen_Credits(int button)
@@ -1559,9 +1586,10 @@ void HandleInfoScreen_Credits(int button)
     else
     {
       FadeSoundsAndMusic();
+      FadeOut(REDRAW_FIELD);
 
       info_mode = INFO_MODE_MAIN;
-      DrawInfoScreen();
+      DrawAndFadeInInfoScreen(REDRAW_FIELD);
     }
   }
   else
@@ -1576,6 +1604,8 @@ void DrawInfoScreen_Program()
   int ybottom = SYSIZE - 20;
 
   SetMainBackgroundImageIfDefined(IMG_BACKGROUND_INFO_PROGRAM);
+
+  FadeOut(REDRAW_FIELD);
 
   ClearWindow();
   DrawHeadline();
@@ -1611,6 +1641,8 @@ void DrawInfoScreen_Program()
 
   DrawTextSCentered(ybottom, FONT_TEXT_4,
 		    "Press any key or button for info menu");
+
+  FadeIn(REDRAW_FIELD);
 }
 
 void HandleInfoScreen_Program(int button)
@@ -1628,9 +1660,10 @@ void HandleInfoScreen_Program(int button)
   if (button_released)
   {
     FadeSoundsAndMusic();
+    FadeOut(REDRAW_FIELD);
 
     info_mode = INFO_MODE_MAIN;
-    DrawInfoScreen();
+    DrawAndFadeInInfoScreen(REDRAW_FIELD);
   }
   else
   {
@@ -1655,6 +1688,8 @@ void DrawInfoScreen_LevelSet()
 
   SetMainBackgroundImageIfDefined(IMG_BACKGROUND_INFO_LEVELSET);
 
+  FadeOut(REDRAW_FIELD);
+
   ClearWindow();
   DrawHeadline();
 
@@ -1669,6 +1704,8 @@ void DrawInfoScreen_LevelSet()
   else
     DrawTextSCentered(ystart, FONT_TEXT_2,
 		      "No information for this level set.");
+
+  FadeIn(REDRAW_FIELD);
 }
 
 void HandleInfoScreen_LevelSet(int button)
@@ -1686,9 +1723,10 @@ void HandleInfoScreen_LevelSet(int button)
   if (button_released)
   {
     FadeSoundsAndMusic();
+    FadeOut(REDRAW_FIELD);
 
     info_mode = INFO_MODE_MAIN;
-    DrawInfoScreen();
+    DrawAndFadeInInfoScreen(REDRAW_FIELD);
   }
   else
   {
@@ -1696,7 +1734,7 @@ void HandleInfoScreen_LevelSet(int button)
   }
 }
 
-static void DrawInfoScreenExt(boolean do_fading)
+static void DrawInfoScreenExt(int redraw_mask, boolean do_fading)
 {
   SetMainBackgroundImage(IMG_BACKGROUND_INFO);
 
@@ -1713,7 +1751,7 @@ static void DrawInfoScreenExt(boolean do_fading)
   else if (info_mode == INFO_MODE_LEVELSET)
     DrawInfoScreen_LevelSet();
   else
-    DrawInfoScreen_Main(do_fading);
+    DrawInfoScreen_Main(redraw_mask, do_fading);
 
   if (info_mode != INFO_MODE_MAIN &&
       info_mode != INFO_MODE_TITLE &&
@@ -1724,9 +1762,14 @@ static void DrawInfoScreenExt(boolean do_fading)
   }
 }
 
+void DrawAndFadeInInfoScreen(int redraw_mask)
+{
+  DrawInfoScreenExt(redraw_mask, TRUE);
+}
+
 void DrawInfoScreen()
 {
-  DrawInfoScreenExt(0);
+  DrawInfoScreenExt(REDRAW_ALL, FALSE);
 }
 
 void HandleInfoScreen(int mx, int my, int dx, int dy, int button)

@@ -268,6 +268,11 @@ void BackToFront()
   if (redraw_mask == REDRAW_NONE)
     return;
 
+  if (redraw_mask & REDRAW_TILES &&
+      game_status == GAME_MODE_PLAYING &&
+      border.draw_masked[game_status])
+    redraw_mask |= REDRAW_FIELD;
+
   if (global.fps_slowdown && game_status == GAME_MODE_PLAYING)
   {
     static boolean last_frame_skipped = FALSE;
@@ -305,8 +310,15 @@ void BackToFront()
 
   SyncDisplay();
 
+#if 1
+  DrawMaskedBorder(redraw_mask);
+#endif
+
   if (redraw_mask & REDRAW_ALL)
   {
+#if 0
+    DrawMaskedBorder(REDRAW_ALL);
+#endif
     BlitBitmap(backbuffer, window, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
 
     redraw_mask = REDRAW_NONE;
@@ -317,7 +329,9 @@ void BackToFront()
     if (game_status != GAME_MODE_PLAYING ||
 	redraw_mask & REDRAW_FROM_BACKBUFFER)
     {
+#if 0
       DrawMaskedBorder(REDRAW_FIELD);
+#endif
       BlitBitmap(backbuffer, window,
 		 REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE, REAL_SX, REAL_SY);
     }
@@ -375,19 +389,25 @@ void BackToFront()
   {
     if (redraw_mask & REDRAW_DOOR_1)
     {
+#if 0
       DrawMaskedBorder(REDRAW_DOOR_1);
+#endif
       BlitBitmap(backbuffer, window, DX, DY, DXSIZE, DYSIZE, DX, DY);
     }
 
     if (redraw_mask & REDRAW_DOOR_2)
     {
+#if 0
       DrawMaskedBorder(REDRAW_DOOR_2);
+#endif
       BlitBitmap(backbuffer, window, VX, VY, VXSIZE, VYSIZE, VX, VY);
     }
 
     if (redraw_mask & REDRAW_DOOR_3)
     {
+#if 0
       DrawMaskedBorder(REDRAW_DOOR_3);
+#endif
       BlitBitmap(backbuffer, window, EX, EY, EXSIZE, EYSIZE, EX, EY);
     }
 
@@ -2627,8 +2647,13 @@ boolean Request(char *text, unsigned int req_state)
 
     DoAnimation();
 
+#if 1
+    if (!PendingEvent())	/* delay only if no pending events */
+      Delay(10);
+#else
     /* don't eat all CPU time */
     Delay(10);
+#endif
   }
 
   if (game_status != GAME_MODE_MAIN)
