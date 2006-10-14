@@ -1820,6 +1820,50 @@ struct BorderInfo
   int draw_masked[NUM_SPECIAL_GFX_ARGS];
 };
 
+struct MenuMainButtonInfo
+{
+  struct XY name;
+  struct XY levels;
+  struct XY scores;
+  struct XY editor;
+  struct XY info;
+  struct XY game;
+  struct XY setup;
+  struct XY quit;
+  struct XY prev_level;
+  struct XY next_level;
+};
+
+struct MenuMainTextInfo
+{
+  struct Rect name;
+  struct Rect levels;
+  struct Rect scores;
+  struct Rect editor;
+  struct Rect info;
+  struct Rect game;
+  struct Rect setup;
+  struct Rect quit;
+
+  struct XY current_level;
+  struct XY first_level;
+  struct XY last_level;
+  struct XY levelset_info;
+  struct XY level_info;
+};
+
+struct MenuMainInputInfo
+{
+  struct XY name;
+};
+
+struct MenuMainInfo
+{
+  struct MenuMainButtonInfo button;
+  struct MenuMainTextInfo text;
+  struct MenuMainInputInfo input;
+};
+
 struct MenuInfo
 {
   int draw_xoffset[NUM_SPECIAL_GFX_ARGS];
@@ -1834,6 +1878,8 @@ struct MenuInfo
 
   int sound[NUM_SPECIAL_GFX_ARGS];
   int music[NUM_SPECIAL_GFX_ARGS];
+
+  struct MenuMainInfo main;
 };
 
 struct DoorInfo

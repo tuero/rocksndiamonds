@@ -72,9 +72,9 @@
 #define MAX_MENU_TEXT_LENGTH_MEDIUM	(MAX_MENU_TEXT_LENGTH_BIG * 2)
 
 /* buttons and scrollbars identifiers */
-#define SCREEN_CTRL_ID_LAST_LEVEL	0
+#define SCREEN_CTRL_ID_PREV_LEVEL	0
 #define SCREEN_CTRL_ID_NEXT_LEVEL	1
-#define SCREEN_CTRL_ID_LAST_PLAYER	2
+#define SCREEN_CTRL_ID_PREV_PLAYER	2
 #define SCREEN_CTRL_ID_NEXT_PLAYER	3
 #define SCREEN_CTRL_ID_SCROLL_UP	4
 #define SCREEN_CTRL_ID_SCROLL_DOWN	5
@@ -187,7 +187,7 @@ static void drawCursorExt(int xpos, int ypos, int color, int g)
 	 g == IMG_MENU_BUTTON_RIGHT ? IMG_MENU_BUTTON_RIGHT_ACTIVE :
 	 g == IMG_MENU_BUTTON_LEAVE_MENU ? IMG_MENU_BUTTON_LEAVE_MENU_ACTIVE :
 	 g == IMG_MENU_BUTTON_ENTER_MENU ? IMG_MENU_BUTTON_ENTER_MENU_ACTIVE :
-	 g == IMG_MENU_BUTTON_LAST_LEVEL ? IMG_MENU_BUTTON_LAST_LEVEL_ACTIVE :
+	 g == IMG_MENU_BUTTON_PREV_LEVEL ? IMG_MENU_BUTTON_PREV_LEVEL_ACTIVE :
 	 g == IMG_MENU_BUTTON_NEXT_LEVEL ? IMG_MENU_BUTTON_NEXT_LEVEL_ACTIVE :
 	 IMG_MENU_BUTTON_ACTIVE);
 
@@ -3725,7 +3725,7 @@ static void getScreenMenuButtonPos(int *x, int *y, int gadget_id)
 {
   switch (gadget_id)
   {
-    case SCREEN_CTRL_ID_LAST_LEVEL:
+    case SCREEN_CTRL_ID_PREV_LEVEL:
       *x = mSX + TILEX * getLastLevelButtonPos();
       *y = mSY + TILEY * (MENU_SCREEN_START_YPOS + 1);
       break;
@@ -3735,7 +3735,7 @@ static void getScreenMenuButtonPos(int *x, int *y, int gadget_id)
       *y = mSY + TILEY * (MENU_SCREEN_START_YPOS + 1);
       break;
 
-    case SCREEN_CTRL_ID_LAST_PLAYER:
+    case SCREEN_CTRL_ID_PREV_PLAYER:
       *x = mSX + TILEX * 10;
       *y = mSY + TILEY * MENU_SCREEN_START_YPOS;
       break;
@@ -3760,9 +3760,9 @@ static struct
 } menubutton_info[NUM_SCREEN_MENUBUTTONS] =
 {
   {
-    IMG_MENU_BUTTON_LAST_LEVEL, IMG_MENU_BUTTON_LAST_LEVEL_ACTIVE,
+    IMG_MENU_BUTTON_PREV_LEVEL, IMG_MENU_BUTTON_PREV_LEVEL_ACTIVE,
     getScreenMenuButtonPos,
-    SCREEN_CTRL_ID_LAST_LEVEL,
+    SCREEN_CTRL_ID_PREV_LEVEL,
     SCREEN_MASK_MAIN,
     "last level"
   },
@@ -3776,7 +3776,7 @@ static struct
   {
     IMG_MENU_BUTTON_LEFT, IMG_MENU_BUTTON_LEFT_ACTIVE,
     getScreenMenuButtonPos,
-    SCREEN_CTRL_ID_LAST_PLAYER,
+    SCREEN_CTRL_ID_PREV_PLAYER,
     SCREEN_MASK_INPUT,
     "last player"
   },
@@ -4117,7 +4117,7 @@ static void HandleScreenGadgets(struct GadgetInfo *gi)
 
   switch (id)
   {
-    case SCREEN_CTRL_ID_LAST_LEVEL:
+    case SCREEN_CTRL_ID_PREV_LEVEL:
       HandleMainMenu_SelectLevel(step, -1);
       break;
 
@@ -4125,7 +4125,7 @@ static void HandleScreenGadgets(struct GadgetInfo *gi)
       HandleMainMenu_SelectLevel(step, +1);
       break;
 
-    case SCREEN_CTRL_ID_LAST_PLAYER:
+    case SCREEN_CTRL_ID_PREV_PLAYER:
       HandleSetupScreen_Input_Player(step, -1);
       break;
 

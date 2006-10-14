@@ -308,7 +308,6 @@ void HandleAnimation(int mode)
   static boolean anim_restart = TRUE;
   static boolean reset_delay = TRUE;
   static int toon_nr = 0;
-  int draw_mode;
 
   if (!setup.toons || screen_info.num_toons == 0)
     return;
@@ -338,6 +337,8 @@ void HandleAnimation(int mode)
       if (anim_running)
       {
 #if 0
+	int draw_mode;
+
 	redraw_mask |= (REDRAW_FIELD | REDRAW_FROM_BACKBUFFER);
 
 	/* Redraw background even when in direct drawing mode */

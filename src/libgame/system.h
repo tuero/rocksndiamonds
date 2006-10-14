@@ -984,6 +984,12 @@ struct XY
   int x, y;
 };
 
+struct Rect
+{
+  int x, y;
+  int width, height;
+};
+
 
 /* ========================================================================= */
 /* exported variables                                                        */

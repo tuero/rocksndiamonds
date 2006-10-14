@@ -56,6 +56,8 @@
 #define USE_GFX_RESET_ONLY_WHEN_MOVING	(USE_NEW_STUFF		* 1)
 #define USE_GFX_RESET_PLAYER_ARTWORK	(USE_NEW_STUFF		* 1)
 
+#define USE_FIX_KILLED_BY_NON_WALKABLE	(USE_NEW_STUFF		* 1)
+
 
 /* for DigField() */
 #define DF_NO_PUSH		0
@@ -8055,6 +8057,7 @@ static void CreateFieldExt(int x, int y, int element, boolean is_change)
 #if USE_NEW_CUSTOM_VALUE
   int last_ce_value = CustomValue[x][y];
 #endif
+  boolean player_explosion_protected = PLAYER_EXPLOSION_PROTECTED(x, y);
   boolean new_element_is_player = ELEM_IS_PLAYER(new_element);
   boolean add_player_onto_element = (new_element_is_player &&
 #if USE_CODE_THAT_BREAKS_SNAKE_BITE
@@ -8118,6 +8121,15 @@ static void CreateFieldExt(int x, int y, int element, boolean is_change)
   /* check if element under the player changes from accessible to unaccessible
      (needed for special case of dropping element which then changes) */
   /* (must be checked after creating new element for walkable group elements) */
+#if USE_FIX_KILLED_BY_NON_WALKABLE
+  if (IS_PLAYER(x, y) && !player_explosion_protected &&
+      IS_ACCESSIBLE(old_element) && !IS_ACCESSIBLE(new_element))
+  {
+    Bang(x, y);
+
+    return;
+  }
+#else
   if (IS_PLAYER(x, y) && !PLAYER_EXPLOSION_PROTECTED(x, y) &&
       IS_ACCESSIBLE(old_element) && !IS_ACCESSIBLE(new_element))
   {
@@ -8125,6 +8137,7 @@ static void CreateFieldExt(int x, int y, int element, boolean is_change)
 
     return;
   }
+#endif
 #endif
 
   /* "ChangeCount" not set yet to allow "entered by player" change one time */
