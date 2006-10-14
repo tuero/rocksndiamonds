@@ -1,3 +1,7 @@
+2006-10-14
+	* fixed bug that prevented player from correctly being created in the
+	  top left corner by a custom element change in a level without player
+
 2006-10-13
 	* added page fading effects for remaining info sub-screens
 	* fixed small bug that caused some delays when answering door request

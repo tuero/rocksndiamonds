@@ -1932,8 +1932,10 @@ void InitGame()
     player->drop_delay = 0;
     player->drop_pressed_delay = 0;
 
-    player->last_jx = player->last_jy = 0;
-    player->jx = player->jy = 0;
+    player->last_jx = -1;
+    player->last_jy = -1;
+    player->jx = -1;
+    player->jy = -1;
 
     player->shield_normal_time_left = 0;
     player->shield_deadly_time_left = 0;
