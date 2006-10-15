@@ -3,6 +3,7 @@
 	  top left corner by a custom element change in a level without player
 	* fixed bug that prevented player from being killed when indestructible,
 	  non-walkable element is placed on player position by extended change
+	* added configurable main menu button and text positions
 
 2006-10-13
 	* added page fading effects for remaining info sub-screens

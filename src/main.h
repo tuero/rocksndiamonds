@@ -1822,16 +1822,17 @@ struct BorderInfo
 
 struct MenuMainButtonInfo
 {
-  struct XY name;
-  struct XY levels;
-  struct XY scores;
-  struct XY editor;
-  struct XY info;
-  struct XY game;
-  struct XY setup;
-  struct XY quit;
-  struct XY prev_level;
-  struct XY next_level;
+  struct Rect name;
+  struct Rect levels;
+  struct Rect scores;
+  struct Rect editor;
+  struct Rect info;
+  struct Rect game;
+  struct Rect setup;
+  struct Rect quit;
+
+  struct Rect prev_level;
+  struct Rect next_level;
 };
 
 struct MenuMainTextInfo
@@ -1845,16 +1846,16 @@ struct MenuMainTextInfo
   struct Rect setup;
   struct Rect quit;
 
-  struct XY current_level;
-  struct XY first_level;
-  struct XY last_level;
-  struct XY levelset_info;
-  struct XY level_info;
+  struct Rect current_level;
+  struct Rect first_level;
+  struct Rect last_level;
+  struct Rect levelset_info;
+  struct Rect level_info;
 };
 
 struct MenuMainInputInfo
 {
-  struct XY name;
+  struct Rect name;
 };
 
 struct MenuMainInfo

@@ -115,6 +115,18 @@
 
 #define SC_BORDER_SIZE			14
 
+/* other useful macro definitions */
+#define BUTTON_GRAPHIC_ACTIVE(g)					       \
+	(g == IMG_MENU_BUTTON_LEFT       ? IMG_MENU_BUTTON_LEFT_ACTIVE       : \
+	 g == IMG_MENU_BUTTON_RIGHT      ? IMG_MENU_BUTTON_RIGHT_ACTIVE      : \
+	 g == IMG_MENU_BUTTON_UP         ? IMG_MENU_BUTTON_UP_ACTIVE         : \
+	 g == IMG_MENU_BUTTON_DOWN       ? IMG_MENU_BUTTON_DOWN_ACTIVE       : \
+         g == IMG_MENU_BUTTON_LEAVE_MENU ? IMG_MENU_BUTTON_LEAVE_MENU_ACTIVE : \
+         g == IMG_MENU_BUTTON_ENTER_MENU ? IMG_MENU_BUTTON_ENTER_MENU_ACTIVE : \
+         g == IMG_MENU_BUTTON_PREV_LEVEL ? IMG_MENU_BUTTON_PREV_LEVEL_ACTIVE : \
+         g == IMG_MENU_BUTTON_NEXT_LEVEL ? IMG_MENU_BUTTON_NEXT_LEVEL_ACTIVE : \
+         IMG_MENU_BUTTON_ACTIVE)
+
 
 /* forward declarations of internal functions */
 static void HandleScreenGadgets(struct GadgetInfo *);
@@ -170,6 +182,254 @@ static Bitmap *scrollbar_bitmap[NUM_SCROLLBAR_BITMAPS];
 #endif
 
 
+#define MAIN_CONTROL_NAME		0
+#define MAIN_CONTROL_LEVELS		1
+#define MAIN_CONTROL_SCORES		2
+#define MAIN_CONTROL_EDITOR		3
+#define MAIN_CONTROL_INFO		4
+#define MAIN_CONTROL_GAME		5
+#define MAIN_CONTROL_SETUP		6
+#define MAIN_CONTROL_QUIT		7
+#define MAIN_CONTROL_PREV_LEVEL		8
+#define MAIN_CONTROL_NEXT_LEVEL		9
+#define MAIN_CONTROL_CURRENT_LEVEL	10
+#define MAIN_CONTROL_FIRST_LEVEL	11
+#define MAIN_CONTROL_LAST_LEVEL		12
+#define MAIN_CONTROL_LEVELSET_INFO	13
+#define MAIN_CONTROL_LEVEL_INFO		14
+
+static char main_text_name[10];
+static char main_text_current_level[10];
+static char main_text_first_level[10];
+static char main_text_last_level[10];
+static char main_input_name[MAX_PLAYER_NAME_LEN + 1];
+
+static struct
+{
+  int nr;
+
+  struct Rect *pos_button;
+  int button_graphic;
+
+  struct Rect *pos_text;
+  char *text;
+  int font_text;
+
+  struct Rect *pos_input;
+  char *input;
+  int font_input;
+}
+main_controls[] =
+{
+  {
+    MAIN_CONTROL_NAME,
+    &menu.main.button.name,		IMG_MENU_BUTTON,
+    &menu.main.text.name,		main_text_name,		FONT_MENU_1,
+    &menu.main.input.name,		main_input_name,	FONT_INPUT_1,
+  },
+  {
+    MAIN_CONTROL_LEVELS,
+    &menu.main.button.levels,		IMG_MENU_BUTTON_ENTER_MENU,
+    &menu.main.text.levels,		"Levelset",		FONT_MENU_1,
+    NULL,				NULL,			-1,
+  },
+  {
+    MAIN_CONTROL_SCORES,
+    &menu.main.button.scores,		IMG_MENU_BUTTON,
+    &menu.main.text.scores,		"Hall Of Fame",		FONT_MENU_1,
+    NULL,				NULL,			-1,
+  },
+  {
+    MAIN_CONTROL_EDITOR,
+    &menu.main.button.editor,		IMG_MENU_BUTTON,
+    &menu.main.text.editor,		"Level Creator",	FONT_MENU_1,	
+    NULL,				NULL,			-1,
+  },
+  {
+    MAIN_CONTROL_INFO,
+    &menu.main.button.info,		IMG_MENU_BUTTON_ENTER_MENU,
+    &menu.main.text.info,		"Info Screen",		FONT_MENU_1,
+    NULL,				NULL,			-1,
+  },
+  {
+    MAIN_CONTROL_GAME,
+    &menu.main.button.game,		IMG_MENU_BUTTON,
+    &menu.main.text.game,		"Start Game",		FONT_MENU_1,
+    NULL,				NULL,			-1,
+  },
+  {
+    MAIN_CONTROL_SETUP,
+    &menu.main.button.setup,		IMG_MENU_BUTTON_ENTER_MENU,
+    &menu.main.text.setup,		"Setup",		FONT_MENU_1,
+    NULL,				NULL,			-1,
+  },
+  {
+    MAIN_CONTROL_QUIT,
+    &menu.main.button.quit,		IMG_MENU_BUTTON,
+    &menu.main.text.quit,		"Quit",			FONT_MENU_1,
+    NULL,				NULL,			-1,
+  },
+#if 0
+  {
+    MAIN_CONTROL_PREV_LEVEL,
+    &menu.main.button.prev_level,	IMG_MENU_BUTTON_PREV_LEVEL,
+    NULL,				NULL,			-1,
+    NULL,				NULL,			-1,
+  },
+  {
+    MAIN_CONTROL_NEXT_LEVEL,
+    &menu.main.button.next_level,	IMG_MENU_BUTTON_NEXT_LEVEL,
+    NULL,				NULL,			-1,
+    NULL,				NULL,			-1,
+  },
+#endif
+  {
+    MAIN_CONTROL_CURRENT_LEVEL,
+    NULL,				-1,
+    &menu.main.text.current_level,	main_text_current_level,FONT_VALUE_1,
+    NULL,				NULL,			-1,
+  },
+  {
+    MAIN_CONTROL_FIRST_LEVEL,
+    NULL,				-1,
+    &menu.main.text.first_level,	main_text_first_level,	FONT_TEXT_3,
+    NULL,				NULL,			-1,
+  },
+  {
+    MAIN_CONTROL_LAST_LEVEL,
+    NULL,				-1,
+    &menu.main.text.last_level,		main_text_last_level,	FONT_TEXT_3,
+    NULL,				NULL,			-1,
+  },
+  {
+    MAIN_CONTROL_LEVELSET_INFO,
+    NULL,				-1,
+    &menu.main.text.levelset_info,	NULL,			-1,
+    NULL,				NULL,			-1,
+  },
+  {
+    MAIN_CONTROL_LEVEL_INFO,
+    NULL,				-1,
+    &menu.main.text.level_info,		NULL,			-1,
+    NULL,				NULL,			-1,
+  },
+
+  {
+    -1,
+    NULL,				-1,
+    NULL,				NULL,			-1,
+    NULL,				NULL,			-1,
+  }
+};
+
+
+static void InitializeMainControls()
+{
+  boolean local_team_mode = (!options.network && setup.team_mode);
+  int i;
+
+  /* set main control text values to dynamically determined values */
+  sprintf(main_text_name,          "%s",   local_team_mode ? "Team:" : "Name:");
+  sprintf(main_text_current_level, "%s",   int2str(level_nr, 3));
+  sprintf(main_text_first_level,   "%03d", leveldir_current->first_level);
+  sprintf(main_text_last_level,    "%03d", leveldir_current->last_level);
+  sprintf(main_input_name,         "%s",   setup.player_name);
+
+  /* set main control screen positions to dynamically determined values */
+  for (i = 0; main_controls[i].nr != -1; i++)
+  {
+    int nr                  = main_controls[i].nr;
+    struct Rect *pos_button = main_controls[i].pos_button;
+    struct Rect *pos_text   = main_controls[i].pos_text;
+    struct Rect *pos_input  = main_controls[i].pos_input;
+    char *text              = main_controls[i].text;
+    char *input             = main_controls[i].input;
+    int font_text           = main_controls[i].font_text;
+    int font_input          = main_controls[i].font_input;
+    int button_graphic      = main_controls[i].button_graphic;
+
+    int font_text_width   = (font_text  != -1 ? getFontWidth(font_text)   : 0);
+    int font_text_height  = (font_text  != -1 ? getFontHeight(font_text)  : 0);
+    int font_input_width  = (font_input != -1 ? getFontWidth(font_input)  : 0);
+    int font_input_height = (font_input != -1 ? getFontHeight(font_input) : 0);
+    int text_chars  = (text  != NULL ? strlen(text)  : 0);
+    int input_chars = (input != NULL ? strlen(input) : 0);
+
+    int button_width  = graphic_info[button_graphic].width;
+    int button_height = graphic_info[button_graphic].height;
+    int text_width   = font_text_width * text_chars;
+    int text_height  = font_text_height;
+    int input_width  = font_input_width * input_chars;
+    int input_height = font_input_height;
+
+    if (nr == MAIN_CONTROL_NAME)
+    {
+      if (menu.main.input.name.x == -1)
+	menu.main.input.name.x = menu.main.text.name.x + text_width;
+      if (menu.main.input.name.y == -1)
+	menu.main.input.name.y = menu.main.text.name.y;
+
+      menu.main.input.name.width  = font_input_width * MAX_PLAYER_NAME_LEN;
+      menu.main.input.name.height = font_input_height;
+    }
+
+    if (pos_button != NULL)
+    {
+      if (pos_button->width == 0)
+	pos_button->width = button_width;
+      if (pos_button->height == 0)
+	pos_button->height = button_height;
+    }
+
+    if (pos_text != NULL)
+    {
+      if (pos_text->width == -1)
+	pos_text->width = text_width;
+      if (pos_text->height == -1)
+	pos_text->height = text_height;
+    }
+
+    if (pos_input != NULL)
+    {
+      if (pos_input->width == -1)
+	pos_input->width = input_width;
+      if (pos_input->height == -1)
+	pos_input->height = input_height;
+    }
+  }
+}
+
+static void DrawMainControlButton(int pos, boolean active)
+{
+  int i;
+
+  for (i = 0; main_controls[i].nr != -1; i++)
+  {
+    if (main_controls[i].nr == pos)
+    {
+      struct Rect *pos_button = main_controls[i].pos_button;
+      int graphic = main_controls[i].button_graphic;
+      int x = mSX + pos_button->x;
+      int y = mSY + pos_button->y;
+
+      if (active)
+	graphic = BUTTON_GRAPHIC_ACTIVE(graphic);
+
+      DrawBackground(x, y, pos_button->width, pos_button->height);
+      DrawGraphicThruMaskExt(drawto, x, y, graphic, 0);
+
+      break;
+    }
+  }
+}
+
+static boolean insideRect(struct Rect *rect, int x, int y)
+{
+  return (rect != NULL &&
+	  x >= rect->x && x < rect->x + rect->width &&
+	  y >= rect->y && y < rect->y + rect->height);
+}
+
 static void drawCursorExt(int xpos, int ypos, int color, int g)
 {
   static int cursor_array[SCR_FIELDY];
@@ -183,13 +443,7 @@ static void drawCursorExt(int xpos, int ypos, int color, int g)
   }
 
   if (color == FC_RED)
-    g = (g == IMG_MENU_BUTTON_LEFT  ? IMG_MENU_BUTTON_LEFT_ACTIVE  :
-	 g == IMG_MENU_BUTTON_RIGHT ? IMG_MENU_BUTTON_RIGHT_ACTIVE :
-	 g == IMG_MENU_BUTTON_LEAVE_MENU ? IMG_MENU_BUTTON_LEAVE_MENU_ACTIVE :
-	 g == IMG_MENU_BUTTON_ENTER_MENU ? IMG_MENU_BUTTON_ENTER_MENU_ACTIVE :
-	 g == IMG_MENU_BUTTON_PREV_LEVEL ? IMG_MENU_BUTTON_PREV_LEVEL_ACTIVE :
-	 g == IMG_MENU_BUTTON_NEXT_LEVEL ? IMG_MENU_BUTTON_NEXT_LEVEL_ACTIVE :
-	 IMG_MENU_BUTTON_ACTIVE);
+    g = BUTTON_GRAPHIC_ACTIVE(g);
 
   ypos += MENU_SCREEN_START_YPOS;
 
@@ -230,25 +484,27 @@ void DrawHeadline()
   DrawTextSCentered(MENU_TITLE2_YPOS, FONT_TITLE_2, PROGRAM_COPYRIGHT_STRING);
 }
 
-static int getLastLevelButtonPos()
+#if 0
+static int getPrevlevelButtonPos()
 {
   return 10;
 }
 
 static int getCurrentLevelTextPos()
 {
-  return (getLastLevelButtonPos() + 1);
+  return (getPrevlevelButtonPos() + 1);
 }
 
 static int getNextLevelButtonPos()
 {
-  return getLastLevelButtonPos() + 3 + 1;
+  return getPrevlevelButtonPos() + 3 + 1;
 }
 
 static int getLevelRangeTextPos()
 {
   return getNextLevelButtonPos() + 1;
 }
+#endif
 
 void DrawTitleScreenImage(int nr)
 {
@@ -304,9 +560,11 @@ void DrawMainMenuExt(int redraw_mask, boolean do_fading)
 {
   static LevelDirTree *leveldir_last_valid = NULL;
   boolean levelset_has_changed = FALSE;
-  char *name_text = (!options.network && setup.team_mode ? "Team:" : "Name:");
-  char *level_text = "Levelset";
+#if 0
+  boolean local_team_mode = (!options.network && setup.team_mode);
+  char *name_text = (local_team_mode ? "Team:" : "Name:");
   int name_width, level_width;
+#endif
   int i;
 
   UnmapAllGadgets();
@@ -376,8 +634,35 @@ void DrawMainMenuExt(int redraw_mask, boolean do_fading)
 
   DrawHeadline();
 
+#if 1
+  InitializeMainControls();
+
+  for (i = 0; main_controls[i].nr != -1; i++)
+  {
+    struct Rect *pos_button = main_controls[i].pos_button;
+    struct Rect *pos_text   = main_controls[i].pos_text;
+    struct Rect *pos_input  = main_controls[i].pos_input;
+    char *text              = main_controls[i].text;
+    char *input             = main_controls[i].input;
+    int font_text           = main_controls[i].font_text;
+    int font_input          = main_controls[i].font_input;
+    int button_graphic      = main_controls[i].button_graphic;
+
+    if (pos_button != NULL)
+      DrawGraphicThruMaskExt(drawto, mSX + pos_button->x, mSY + pos_button->y,
+			     button_graphic, 0);
+
+    if (pos_text != NULL && text != NULL)
+      DrawText(mSX + pos_text->x, mSY + pos_text->y, text, font_text);
+
+    if (pos_input != NULL && input != NULL)
+      DrawText(mSX + pos_input->x, mSY + pos_input->y, input, font_input);
+  }
+
+#else
+
   DrawText(mSX + 32, mSY + 2 * 32, name_text,       FONT_MENU_1);
-  DrawText(mSX + 32, mSY + 3 * 32, level_text,      FONT_MENU_1);
+  DrawText(mSX + 32, mSY + 3 * 32, "Levelset",      FONT_MENU_1);
   DrawText(mSX + 32, mSY + 4 * 32, "Hall Of Fame",  FONT_MENU_1);
   DrawText(mSX + 32, mSY + 5 * 32, "Level Creator", FONT_MENU_1);
   DrawText(mSX + 32, mSY + 6 * 32, "Info Screen",   FONT_MENU_1);
@@ -395,23 +680,24 @@ void DrawMainMenuExt(int redraw_mask, boolean do_fading)
   DrawText(mSX + getCurrentLevelTextPos() * 32, mSY + 3 * 32,
 	   int2str(level_nr, 3), FONT_VALUE_1);
 
-  DrawPreviewLevel(TRUE);
-
   {
     int text_height = getFontHeight(FONT_TEXT_3);
-    int xpos = getLevelRangeTextPos() * 32;
-    int ypos2 = -SY + 3 * 32 + 16;
+    int xpos = getLevelRangeTextPos() * 32 + 8;
+    int ypos2 = 3 * 32 + 16;
     int ypos1 = ypos2 - text_height;
 
-    DrawTextF(mSX + xpos, mSY + ypos1, FONT_TEXT_3,
+    DrawTextF(mSX - SX + xpos, mSY - SY + ypos1, FONT_TEXT_3,
 	      "%03d", leveldir_current->first_level);
-    DrawTextF(mSX + xpos, mSY + ypos2, FONT_TEXT_3,
+    DrawTextF(mSX - SX + xpos, mSY - SY + ypos2, FONT_TEXT_3,
 	      "%03d", leveldir_current->last_level);
   }
 
   for (i = 0; i < 8; i++)
     initCursor(i, (i == 1 || i == 4 || i == 6 ? IMG_MENU_BUTTON_ENTER_MENU :
 		   IMG_MENU_BUTTON));
+#endif
+
+  DrawPreviewLevel(TRUE);
 
   DrawTextSCentered(326, FONT_TITLE_2, "A Game by Artsoft Entertainment");
 
@@ -635,6 +921,140 @@ void HandleMainMenu_SelectLevel(int step, int direction)
   }
 }
 
+#if 1
+
+void HandleMainMenu(int mx, int my, int dx, int dy, int button)
+{
+  static int choice = MAIN_CONTROL_GAME;
+  int pos = choice;
+  int i;
+
+  if (button == MB_MENU_INITIALIZE)
+  {
+    DrawMainControlButton(choice, TRUE);
+
+    return;
+  }
+
+  if (mx || my)		/* mouse input */
+  {
+    pos = -1;
+
+    for (i = 0; main_controls[i].nr != -1; i++)
+    {
+      if (insideRect(main_controls[i].pos_button, mx - mSX, my - mSY) ||
+	  insideRect(main_controls[i].pos_text,   mx - mSX, my - mSY) ||
+	  insideRect(main_controls[i].pos_input,  mx - mSX, my - mSY))
+      {
+	pos = main_controls[i].nr;
+
+	break;
+      }
+    }
+  }
+  else if (dx || dy)	/* keyboard input */
+  {
+    if (dx > 0 && (choice == MAIN_CONTROL_INFO ||
+		   choice == MAIN_CONTROL_SETUP))
+      button = MB_MENU_CHOICE;
+    else if (dy)
+      pos = choice + dy;
+  }
+
+  if (pos == MAIN_CONTROL_LEVELS && dx != 0 && button)
+  {
+    HandleMainMenu_SelectLevel(1, dx < 0 ? -1 : +1);
+  }
+  else if (pos >= MAIN_CONTROL_NAME && pos <= MAIN_CONTROL_QUIT)
+  {
+    if (button)
+    {
+      if (pos != choice)
+      {
+	DrawMainControlButton(pos, TRUE);
+	DrawMainControlButton(choice, FALSE);
+
+	choice = pos;
+      }
+    }
+    else
+    {
+      if (pos == MAIN_CONTROL_NAME)
+      {
+	game_status = GAME_MODE_PSEUDO_TYPENAME;
+
+	HandleTypeName(strlen(setup.player_name), 0);
+      }
+      else if (pos == MAIN_CONTROL_LEVELS)
+      {
+	if (leveldir_first)
+	{
+	  game_status = GAME_MODE_LEVELS;
+
+	  SaveLevelSetup_LastSeries();
+	  SaveLevelSetup_SeriesInfo();
+
+#if 0
+	  gotoTopLevelDir();
+#endif
+
+	  DrawChooseLevel();
+	}
+      }
+      else if (pos == MAIN_CONTROL_SCORES)
+      {
+	game_status = GAME_MODE_SCORES;
+
+	DrawHallOfFame(-1);
+      }
+      else if (pos == MAIN_CONTROL_EDITOR)
+      {
+	if (leveldir_current->readonly &&
+	    !strEqual(setup.player_name, "Artsoft"))
+	  Request("This level is read only !", REQ_CONFIRM);
+
+	game_status = GAME_MODE_EDITOR;
+
+	DrawLevelEd();
+      }
+      else if (pos == MAIN_CONTROL_INFO)
+      {
+	game_status = GAME_MODE_INFO;
+	info_mode = INFO_MODE_MAIN;
+
+	DrawInfoScreen();
+      }
+      else if (pos == MAIN_CONTROL_GAME)
+      {
+	StartGameActions(options.network, setup.autorecord, NEW_RANDOMIZE);
+      }
+      else if (pos == MAIN_CONTROL_SETUP)
+      {
+	game_status = GAME_MODE_SETUP;
+	setup_mode = SETUP_MODE_MAIN;
+
+	DrawSetupScreen();
+      }
+      else if (pos == MAIN_CONTROL_QUIT)
+      {
+	SaveLevelSetup_LastSeries();
+	SaveLevelSetup_SeriesInfo();
+
+        if (Request("Do you really want to quit ?", REQ_ASK | REQ_STAY_CLOSED))
+	  game_status = GAME_MODE_QUIT;
+      }
+    }
+  }
+
+  if (game_status == GAME_MODE_MAIN)
+  {
+    DrawPreviewLevel(FALSE);
+    DoAnimation();
+  }
+}
+
+#else
+
 void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 {
   static int choice = 5;
@@ -750,6 +1170,8 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
     DoAnimation();
   }
 }
+
+#endif
 
 
 /* ========================================================================= */
@@ -3725,8 +4147,19 @@ static void getScreenMenuButtonPos(int *x, int *y, int gadget_id)
 {
   switch (gadget_id)
   {
+#if 1
     case SCREEN_CTRL_ID_PREV_LEVEL:
-      *x = mSX + TILEX * getLastLevelButtonPos();
+      *x = mSX + menu.main.button.prev_level.x;
+      *y = mSY + menu.main.button.prev_level.y;
+      break;
+
+    case SCREEN_CTRL_ID_NEXT_LEVEL:
+      *x = mSX + menu.main.button.next_level.x;
+      *y = mSY + menu.main.button.next_level.y;
+      break;
+#else
+    case SCREEN_CTRL_ID_PREV_LEVEL:
+      *x = mSX + TILEX * getPrevlevelButtonPos();
       *y = mSY + TILEY * (MENU_SCREEN_START_YPOS + 1);
       break;
 
@@ -3734,6 +4167,7 @@ static void getScreenMenuButtonPos(int *x, int *y, int gadget_id)
       *x = mSX + TILEX * getNextLevelButtonPos();
       *y = mSY + TILEY * (MENU_SCREEN_START_YPOS + 1);
       break;
+#endif
 
     case SCREEN_CTRL_ID_PREV_PLAYER:
       *x = mSX + TILEX * 10;
