@@ -26,6 +26,8 @@ void DrawAndFadeInMainMenu(int);
 void DrawMainMenu(void);
 void DrawHallOfFame(int);
 
+void RedrawSetupScreenAfterFullscreenToggle();
+
 void HandleTitleScreen(int, int, int, int, int);
 void HandleMainMenu(int, int, int, int, int);
 void HandleChooseLevel(int, int, int, int, int);

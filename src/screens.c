@@ -164,13 +164,31 @@ static int info_mode = INFO_MODE_MAIN;
 static TreeInfo *screen_modes = NULL;
 static TreeInfo *screen_mode_current = NULL;
 
-#define DRAW_OFFSET_MODE(x)	(x >= GAME_MODE_MAIN &&			\
-				 x <= GAME_MODE_SETUP ? x :		\
-				 x == GAME_MODE_PSEUDO_TYPENAME ?	\
+#define DRAW_MODE(s)		((s) >= GAME_MODE_MAIN &&		\
+				 (s) <= GAME_MODE_SETUP ? (s) :		\
+				 (s) == GAME_MODE_PSEUDO_TYPENAME ?	\
 				 GAME_MODE_MAIN : GAME_MODE_DEFAULT)
 
-#define mSX (SX + menu.draw_xoffset[DRAW_OFFSET_MODE(game_status)])
-#define mSY (SY + menu.draw_yoffset[DRAW_OFFSET_MODE(game_status)])
+#define DRAW_MODE_INFO(i)	((i) >= INFO_MODE_ELEMENTS &&		\
+				 (i) <= INFO_MODE_LEVELSET ? (i) :	\
+				 INFO_MODE_MAIN)
+
+#define DRAW_XOFFSET_INFO(i)	(DRAW_MODE_INFO(i) == INFO_MODE_MAIN ?	\
+				 menu.draw_xoffset[GAME_MODE_INFO] :	\
+				 menu.draw_xoffset_info[DRAW_MODE_INFO(i)])
+#define DRAW_YOFFSET_INFO(i)	(DRAW_MODE_INFO(i) == INFO_MODE_MAIN ?	\
+				 menu.draw_yoffset[GAME_MODE_INFO] :	\
+				 menu.draw_yoffset_info[DRAW_MODE_INFO(i)])
+
+#define DRAW_XOFFSET(s)		((s) == GAME_MODE_INFO ?		\
+				 DRAW_XOFFSET_INFO(info_mode) :		\
+				 menu.draw_xoffset[DRAW_MODE(s)])
+#define DRAW_YOFFSET(s)		((s) == GAME_MODE_INFO ?		\
+				 DRAW_YOFFSET_INFO(info_mode) :		\
+				 menu.draw_yoffset[DRAW_MODE(s)])
+
+#define mSX			(SX + DRAW_XOFFSET(game_status))
+#define mSY			(SY + DRAW_YOFFSET(game_status))
 
 #define NUM_MENU_ENTRIES_ON_SCREEN (menu.list_size[game_status] > 2 ?	\
 				    menu.list_size[game_status] :	\
@@ -4262,6 +4280,12 @@ void DrawSetupScreen()
 
   PlayMenuSound();
   PlayMenuMusic();
+}
+
+void RedrawSetupScreenAfterFullscreenToggle()
+{
+  if (setup_mode == SETUP_MODE_GRAPHICS)
+    DrawSetupScreen();
 }
 
 void HandleSetupScreen(int mx, int my, int dx, int dy, int button)

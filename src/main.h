@@ -1599,6 +1599,17 @@
 
 #define NUM_SPECIAL_GFX_ARGS		12
 
+/* these additional definitions are currently only used for draw offsets */
+#define GFX_SPECIAL_ARG_INFO_MAIN	0
+#define GFX_SPECIAL_ARG_INFO_TITLE	1
+#define GFX_SPECIAL_ARG_INFO_ELEMENTS	2
+#define GFX_SPECIAL_ARG_INFO_MUSIC	3
+#define GFX_SPECIAL_ARG_INFO_CREDITS	4
+#define GFX_SPECIAL_ARG_INFO_PROGRAM	5
+#define GFX_SPECIAL_ARG_INFO_LEVELSET	6
+
+#define NUM_SPECIAL_GFX_INFO_ARGS	7
+
 
 /* values for image configuration suffixes */
 #define GFX_ARG_X			0
@@ -1884,6 +1895,8 @@ struct MenuInfo
 {
   int draw_xoffset[NUM_SPECIAL_GFX_ARGS];
   int draw_yoffset[NUM_SPECIAL_GFX_ARGS];
+  int draw_xoffset_info[NUM_SPECIAL_GFX_INFO_ARGS];
+  int draw_yoffset_info[NUM_SPECIAL_GFX_INFO_ARGS];
 
   int scrollbar_xoffset;
 
@@ -1911,6 +1924,7 @@ struct PreviewInfo
 {
   int x, y;
   int xsize, ysize;
+  int xoffset, yoffset;
   int tile_size;
   int step_offset;
   int step_delay;

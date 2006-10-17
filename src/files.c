@@ -6619,6 +6619,18 @@ static void LoadSpecialMenuDesignSettingsFromFilename(char *filename)
       menu.list_size[i] = get_integer_from_string(list_size);
   }
 
+  /* special case: initialize with default values that may be overwritten */
+  for (i = 0; i < NUM_SPECIAL_GFX_INFO_ARGS; i++)
+  {
+    char *value_x = getHashEntry(setup_file_hash, "menu.draw_xoffset.INFO");
+    char *value_y = getHashEntry(setup_file_hash, "menu.draw_yoffset.INFO");
+
+    if (value_x != NULL)
+      menu.draw_xoffset_info[i] = get_integer_from_string(value_x);
+    if (value_y != NULL)
+      menu.draw_yoffset_info[i] = get_integer_from_string(value_y);
+  }
+
   /* read (and overwrite with) values that may be specified in config file */
   for (i = 0; image_config_vars[i].token != NULL; i++)
   {

@@ -1777,7 +1777,8 @@ void DrawPreviewLevel(boolean restart)
 
   if (restart)
   {
-    from_x = from_y = 0;
+    from_x = preview.xoffset;
+    from_y = preview.yoffset;
     scroll_direction = MV_RIGHT;
     label_state = 1;
     label_counter = 0;

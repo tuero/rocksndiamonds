@@ -711,6 +711,9 @@ void HandleKey(Key key, int key_status)
 
     ToggleFullscreenIfNeeded();
 
+    if (game_status == GAME_MODE_SETUP)
+      RedrawSetupScreenAfterFullscreenToggle();
+
     return;
   }
 
