@@ -322,13 +322,13 @@ main_controls[] =
   {
     MAIN_CONTROL_LEVELSET_INFO,
     NULL,				-1,
-    &menu.main.text.levelset_info,	NULL,			-1,
+    &menu.main.text.level_info_1,	NULL,			-1,
     NULL,				NULL,			-1,
   },
   {
     MAIN_CONTROL_LEVEL_INFO,
     NULL,				-1,
-    &menu.main.text.level_info,		NULL,			-1,
+    &menu.main.text.level_info_2,	NULL,			-1,
     NULL,				NULL,			-1,
   },
 
@@ -4621,10 +4621,17 @@ static void CreateScreenScrollbars()
 		      GDI_SCROLLBAR_ITEMS_MAX, items_max,
 		      GDI_SCROLLBAR_ITEMS_VISIBLE, items_visible,
 		      GDI_SCROLLBAR_ITEM_POSITION, item_position,
+#if 1
+		      GDI_WHEEL_AREA_X, SX,
+		      GDI_WHEEL_AREA_Y, SY,
+		      GDI_WHEEL_AREA_WIDTH, SXSIZE,
+		      GDI_WHEEL_AREA_HEIGHT, SYSIZE,
+#else
 		      GDI_WHEEL_AREA_X, 0,
 		      GDI_WHEEL_AREA_Y, 0,
 		      GDI_WHEEL_AREA_WIDTH, WIN_XSIZE,
 		      GDI_WHEEL_AREA_HEIGHT, WIN_YSIZE,
+#endif
 		      GDI_STATE, GD_BUTTON_UNPRESSED,
 		      GDI_DESIGN_UNPRESSED, gd_bitmap_unpressed, gd_x1, gd_y1,
 		      GDI_DESIGN_PRESSED, gd_bitmap_pressed, gd_x2, gd_y2,

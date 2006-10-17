@@ -1,6 +1,8 @@
 2006-10-17
 	* added additional configuration directives for info screen draw offset:
 	  menu.draw_{x,y}offset.INFO[{ELEMENTS,MUSIC,CREDITS,PROGRAM,LEVELSET}]
+	* added additional configuration directives for preview info text
+	* limited mouse wheel sensitive screen area to scrollable screen area
 
 2006-10-16
 	* added highlighted menu text entries to menu navigation when selected

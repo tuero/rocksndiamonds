@@ -1875,8 +1875,8 @@ struct MenuMainTextInfo
   struct Rect current_level;
   struct Rect first_level;
   struct Rect last_level;
-  struct Rect levelset_info;
-  struct Rect level_info;
+  struct Rect level_info_1;
+  struct Rect level_info_2;
 };
 
 struct MenuMainInputInfo

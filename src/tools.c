@@ -1732,8 +1732,14 @@ static void DrawPreviewLevelLabelExt(int mode)
 
   if (strlen(label_text) > 0)
   {
+#if 1
+    int text_width = getTextWidth(label_text, font_nr);
+    int lxpos = SX + menu.main.text.level_info_2.x - text_width / 2;
+    int lypos = SY + menu.main.text.level_info_2.y;
+#else
     int lxpos = SX + (SXSIZE - getTextWidth(label_text, font_nr)) / 2;
     int lypos = MICROLABEL2_YPOS;
+#endif
 
     DrawText(lxpos, lypos, label_text, font_nr);
   }
@@ -1751,8 +1757,14 @@ static void DrawPreviewLevelLabelExt(int mode)
 
   if (strlen(label_text) > 0)
   {
+#if 1
+    int text_width = getTextWidth(label_text, font_nr);
+    int lxpos = SX + menu.main.text.level_info_2.x - text_width / 2;
+    int lypos = SY + menu.main.text.level_info_2.y;
+#else
     int lxpos = SX + (SXSIZE - getTextWidth(label_text, font_nr)) / 2;
     int lypos = MICROLABEL2_YPOS;
+#endif
 
     DrawText(lxpos, lypos, label_text, font_nr);
   }
@@ -1795,13 +1807,20 @@ void DrawPreviewLevel(boolean restart)
       char label_text[MAX_OUTPUT_LINESIZE + 1];
       int font_nr = FONT_TEXT_1;
       int max_len_label_text = SXSIZE / getFontWidth(font_nr);
+      int text_width;
       int lxpos, lypos;
 
       strncpy(label_text, leveldir_current->name, max_len_label_text);
       label_text[max_len_label_text] = '\0';
 
+#if 1
+      text_width = getTextWidth(label_text, font_nr);
+      lxpos = SX + menu.main.text.level_info_1.x - text_width / 2;
+      lypos = SY + menu.main.text.level_info_1.y;
+#else
       lxpos = SX + (SXSIZE - getTextWidth(label_text, font_nr)) / 2;
       lypos = SY + MICROLABEL1_YPOS;
+#endif
 
       DrawText(lxpos, lypos, label_text, font_nr);
     }
