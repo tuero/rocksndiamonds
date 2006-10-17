@@ -4788,7 +4788,8 @@ struct TokenIntPtrInfo image_config_vars[] =
 /* ------------------------------------------------------------------------- */
 
 /* Important: When one entry is a prefix of another entry, the longer entry
-   must come first, because the dynamic configuration does prefix matching! */
+   must come first, because the dynamic configuration does prefix matching!
+   (These definitions must match the corresponding definitions in "main.h"!) */
 
 struct FontInfo font_info[NUM_FONTS + 1] =
 {
@@ -4798,6 +4799,8 @@ struct FontInfo font_info[NUM_FONTS + 1] =
   { "font.initial_4"		},
   { "font.title_1"		},
   { "font.title_2"		},
+  { "font.menu_1.active"	},
+  { "font.menu_2.active"	},
   { "font.menu_1"		},
   { "font.menu_2"		},
   { "font.text_1.active"	},

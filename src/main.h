@@ -1658,43 +1658,58 @@
 #define NUM_MUS_ARGS			1
 
 
-/* values for font configuration */
+/* values for font configuration (definitions must match those from main.c) */
 #define FONT_INITIAL_1			0
 #define FONT_INITIAL_2			1
 #define FONT_INITIAL_3			2
 #define FONT_INITIAL_4			3
 #define FONT_TITLE_1			4
 #define FONT_TITLE_2			5
-#define FONT_MENU_1			6
-#define FONT_MENU_2			7
-#define FONT_TEXT_1_ACTIVE		8
-#define FONT_TEXT_2_ACTIVE		9
-#define FONT_TEXT_3_ACTIVE		10
-#define FONT_TEXT_4_ACTIVE		11
-#define FONT_TEXT_1			12
-#define FONT_TEXT_2			13
-#define FONT_TEXT_3			14
-#define FONT_TEXT_4			15
-#define FONT_ENVELOPE_1			16
-#define FONT_ENVELOPE_2			17
-#define FONT_ENVELOPE_3			18
-#define FONT_ENVELOPE_4			19
-#define FONT_INPUT_1_ACTIVE		20
-#define FONT_INPUT_2_ACTIVE		21
-#define FONT_INPUT_1			22
-#define FONT_INPUT_2			23
-#define FONT_OPTION_OFF			24
-#define FONT_OPTION_ON			25
-#define FONT_VALUE_1			26
-#define FONT_VALUE_2			27
-#define FONT_VALUE_OLD			28
-#define FONT_LEVEL_NUMBER_ACTIVE	29
-#define FONT_LEVEL_NUMBER		30
-#define FONT_TAPE_RECORDER		31
-#define FONT_GAME_INFO			32
+#define FONT_MENU_1_ACTIVE		6
+#define FONT_MENU_2_ACTIVE		7
+#define FONT_MENU_1			8
+#define FONT_MENU_2			9
+#define FONT_TEXT_1_ACTIVE		10
+#define FONT_TEXT_2_ACTIVE		11
+#define FONT_TEXT_3_ACTIVE		12
+#define FONT_TEXT_4_ACTIVE		13
+#define FONT_TEXT_1			14
+#define FONT_TEXT_2			15
+#define FONT_TEXT_3			16
+#define FONT_TEXT_4			17
+#define FONT_ENVELOPE_1			18
+#define FONT_ENVELOPE_2			19
+#define FONT_ENVELOPE_3			20
+#define FONT_ENVELOPE_4			21
+#define FONT_INPUT_1_ACTIVE		22
+#define FONT_INPUT_2_ACTIVE		23
+#define FONT_INPUT_1			24
+#define FONT_INPUT_2			25
+#define FONT_OPTION_OFF			26
+#define FONT_OPTION_ON			27
+#define FONT_VALUE_1			28
+#define FONT_VALUE_2			29
+#define FONT_VALUE_OLD			30
+#define FONT_LEVEL_NUMBER_ACTIVE	31
+#define FONT_LEVEL_NUMBER		32
+#define FONT_TAPE_RECORDER		33
+#define FONT_GAME_INFO			34
 
-#define NUM_FONTS			33
+#define NUM_FONTS			35
 #define NUM_INITIAL_FONTS		4
+
+#define FONT_ACTIVE(f)							  \
+	((f) == FONT_MENU_1		? FONT_MENU_1_ACTIVE		: \
+	 (f) == FONT_MENU_2		? FONT_MENU_2_ACTIVE		: \
+	 (f) == FONT_TEXT_1		? FONT_TEXT_1_ACTIVE		: \
+	 (f) == FONT_TEXT_2		? FONT_TEXT_2_ACTIVE		: \
+	 (f) == FONT_TEXT_3		? FONT_TEXT_3_ACTIVE		: \
+	 (f) == FONT_TEXT_4		? FONT_TEXT_4_ACTIVE		: \
+	 (f) == FONT_INPUT_1		? FONT_INPUT_1_ACTIVE		: \
+	 (f) == FONT_INPUT_2		? FONT_INPUT_2_ACTIVE		: \
+	 (f) == FONT_LEVEL_NUMBER	? FONT_LEVEL_NUMBER_ACTIVE	: \
+	 (f))
+
 
 /* values for game_status (must match special image configuration suffixes) */
 #define GAME_MODE_DEFAULT		0

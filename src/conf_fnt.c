@@ -56,8 +56,16 @@ font_to_graphic[] =
     IMG_FONT_MENU_1
   },
   {
+    FONT_MENU_1_ACTIVE,				-1,
+    IMG_FONT_MENU_1_ACTIVE
+  },
+  {
     FONT_MENU_2,				-1,
     IMG_FONT_MENU_2
+  },
+  {
+    FONT_MENU_2_ACTIVE,				-1,
+    IMG_FONT_MENU_2_ACTIVE
   },
   {
     FONT_TEXT_1,				-1,

@@ -194,14 +194,20 @@ void RedrawPlayfield(boolean force_redraw, int x, int y, int width, int height)
   BlitBitmap(drawto, window, x, y, width, height, x, y);
 }
 
+void DrawMaskedBorder_Rect(int x, int y, int width, int height)
+{
+  Bitmap *bitmap = graphic_info[IMG_GLOBAL_BORDER].bitmap;
+
+  SetClipOrigin(bitmap, bitmap->stored_clip_gc, 0, 0);
+  BlitBitmapMasked(bitmap, backbuffer, x, y, width, height, x, y);
+}
+
 void DrawMaskedBorder_FIELD()
 {
   if (game_status >= GAME_MODE_TITLE &&
       game_status <= GAME_MODE_PLAYING &&
       border.draw_masked[game_status])
-    BlitBitmapMasked(graphic_info[IMG_GLOBAL_BORDER].bitmap, backbuffer,
-		     REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE,
-		     REAL_SX, REAL_SY);
+    DrawMaskedBorder_Rect(REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE);
 }
 
 void DrawMaskedBorder_DOOR_1()
@@ -209,16 +215,14 @@ void DrawMaskedBorder_DOOR_1()
   if (border.draw_masked[GFX_SPECIAL_ARG_DOOR] &&
       (game_status != GAME_MODE_EDITOR ||
        border.draw_masked[GFX_SPECIAL_ARG_EDITOR]))
-    BlitBitmapMasked(graphic_info[IMG_GLOBAL_BORDER].bitmap, backbuffer,
-		     DX, DY, DXSIZE, DYSIZE, DX, DY);
+    DrawMaskedBorder_Rect(DX, DY, DXSIZE, DYSIZE);
 }
 
 void DrawMaskedBorder_DOOR_2()
 {
   if (border.draw_masked[GFX_SPECIAL_ARG_DOOR] &&
       game_status != GAME_MODE_EDITOR)
-    BlitBitmapMasked(graphic_info[IMG_GLOBAL_BORDER].bitmap, backbuffer,
-		     VX, VY, VXSIZE, VYSIZE, VX, VY);
+    DrawMaskedBorder_Rect(VX, VY, VXSIZE, VYSIZE);
 }
 
 void DrawMaskedBorder_DOOR_3()

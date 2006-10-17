@@ -250,7 +250,7 @@ void InitFontGraphicInfo()
     }
   }
 
-  /* initialize special element/graphic mapping from dynamic configuration */
+  /* initialize special font/graphic mapping from dynamic configuration */
   for (i = 0; i < num_property_mappings; i++)
   {
     int font_nr = property_mapping[i].base_index - MAX_NUM_ELEMENTS;
@@ -265,6 +265,54 @@ void InitFontGraphicInfo()
       font_info[font_nr].special_graphic[special] = graphic;
       font_info[font_nr].special_bitmap_id[special] = num_font_bitmaps;
       num_font_bitmaps++;
+    }
+  }
+
+  /* reset non-redefined ".active" font graphics if normal font is redefined */
+  /* (this different treatment is needed because normal and active fonts are
+     independently defined ("active" is not a property of font definitions!) */
+  for (i = 0; i < NUM_FONTS; i++)
+  {
+    int font_nr_base = i;
+    int font_nr_active = FONT_ACTIVE(font_nr_base);
+
+    /* check only those fonts with exist as normal and ".active" variant */
+    if (font_nr_base != font_nr_active)
+    {
+      int base_graphic = font_info[font_nr_base].graphic;
+      int active_graphic = font_info[font_nr_active].graphic;
+      boolean base_redefined =
+	getImageListEntryFromImageID(base_graphic)->redefined;
+      boolean active_redefined =
+	getImageListEntryFromImageID(active_graphic)->redefined;
+
+      /* if the base font ("font.menu_1", for example) has been redefined,
+	 but not the active font ("font.menu_1.active", for example), do not
+	 use an existing (in this case considered obsolete) active font
+	 anymore, but use the automatically determined default font */
+      if (base_redefined && !active_redefined)
+	font_info[font_nr_active].graphic = base_graphic;
+
+      /* now also check each "special" font (which may be the same as above) */
+      for (j = 0; j < NUM_SPECIAL_GFX_ARGS; j++)
+      {
+	int base_graphic = font_info[font_nr_base].special_graphic[j];
+	int active_graphic = font_info[font_nr_active].special_graphic[j];
+	boolean base_redefined =
+	  getImageListEntryFromImageID(base_graphic)->redefined;
+	boolean active_redefined =
+	  getImageListEntryFromImageID(active_graphic)->redefined;
+
+	/* same as above, but check special graphic definitions, for example:
+	   redefined "font.menu_1.MAIN" invalidates "font.menu_1.active.MAIN" */
+	if (base_redefined && !active_redefined)
+	{
+	  font_info[font_nr_active].special_graphic[j] =
+	    font_info[font_nr_base].special_graphic[j];
+	  font_info[font_nr_active].special_bitmap_id[j] =
+	    font_info[font_nr_base].special_bitmap_id[j];
+	}
+      }
     }
   }
 
