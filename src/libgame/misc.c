@@ -1761,6 +1761,12 @@ int get_parameter_value(char *value_raw, char *suffix, int type)
 	      strEqual(value, "up")    ? MV_UP :
 	      strEqual(value, "down")  ? MV_DOWN : MV_NONE);
   }
+  else if (strEqual(suffix, ".align"))
+  {
+    result = (strEqual(value, "left")   ? ALIGN_LEFT :
+	      strEqual(value, "right")  ? ALIGN_RIGHT :
+	      strEqual(value, "center") ? ALIGN_CENTER : ALIGN_DEFAULT);
+  }
   else if (strEqual(suffix, ".anim_mode"))
   {
     result = (string_has_parameter(value, "none")	? ANIM_NONE :
@@ -1774,6 +1780,7 @@ int get_parameter_value(char *value_raw, char *suffix, int type)
 	      string_has_parameter(value, "ce_delay")	? ANIM_CE_DELAY :
 	      string_has_parameter(value, "horizontal")	? ANIM_HORIZONTAL :
 	      string_has_parameter(value, "vertical")	? ANIM_VERTICAL :
+	      string_has_parameter(value, "centered")	? ANIM_CENTERED :
 	      ANIM_DEFAULT);
 
     if (string_has_parameter(value, "reverse"))

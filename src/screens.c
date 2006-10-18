@@ -213,8 +213,11 @@ static Bitmap *scrollbar_bitmap[NUM_SCROLLBAR_BITMAPS];
 #define MAIN_CONTROL_CURRENT_LEVEL	10
 #define MAIN_CONTROL_FIRST_LEVEL	11
 #define MAIN_CONTROL_LAST_LEVEL		12
-#define MAIN_CONTROL_LEVELSET_INFO	13
-#define MAIN_CONTROL_LEVEL_INFO		14
+#define MAIN_CONTROL_LEVEL_INFO_1	13
+#define MAIN_CONTROL_LEVEL_INFO_2	14
+#define MAIN_CONTROL_TITLE_1		15
+#define MAIN_CONTROL_TITLE_2		16
+#define MAIN_CONTROL_TITLE_3		17
 
 static char main_text_name[10];
 static char main_text_current_level[10];
@@ -226,14 +229,14 @@ static struct
 {
   int nr;
 
-  struct Rect *pos_button;
+  struct MenuPosInfo *pos_button;
   int button_graphic;
 
-  struct Rect *pos_text;
+  struct MenuPosInfo *pos_text;
   char *text;
   int font_text;
 
-  struct Rect *pos_input;
+  struct MenuPosInfo *pos_input;
   char *input;
   int font_input;
 }
@@ -320,15 +323,33 @@ main_controls[] =
     NULL,				NULL,			-1,
   },
   {
-    MAIN_CONTROL_LEVELSET_INFO,
+    MAIN_CONTROL_LEVEL_INFO_1,
     NULL,				-1,
     &menu.main.text.level_info_1,	NULL,			-1,
     NULL,				NULL,			-1,
   },
   {
-    MAIN_CONTROL_LEVEL_INFO,
+    MAIN_CONTROL_LEVEL_INFO_2,
     NULL,				-1,
     &menu.main.text.level_info_2,	NULL,			-1,
+    NULL,				NULL,			-1,
+  },
+  {
+    MAIN_CONTROL_TITLE_1,
+    NULL,				-1,
+    &menu.main.text.title_1,		PROGRAM_TITLE_STRING,	FONT_TITLE_1,
+    NULL,				NULL,			-1,
+  },
+  {
+    MAIN_CONTROL_TITLE_2,
+    NULL,				-1,
+    &menu.main.text.title_2,		PROGRAM_COPYRIGHT_STRING, FONT_TITLE_2,
+    NULL,				NULL,			-1,
+  },
+  {
+    MAIN_CONTROL_TITLE_3,
+    NULL,				-1,
+    &menu.main.text.title_3,		PROGRAM_GAME_BY_STRING,	FONT_TITLE_2,
     NULL,				NULL,			-1,
   },
 
@@ -356,15 +377,15 @@ static void InitializeMainControls()
   /* set main control screen positions to dynamically determined values */
   for (i = 0; main_controls[i].nr != -1; i++)
   {
-    int nr                  = main_controls[i].nr;
-    struct Rect *pos_button = main_controls[i].pos_button;
-    struct Rect *pos_text   = main_controls[i].pos_text;
-    struct Rect *pos_input  = main_controls[i].pos_input;
-    char *text              = main_controls[i].text;
-    char *input             = main_controls[i].input;
-    int button_graphic      = main_controls[i].button_graphic;
-    int font_text           = main_controls[i].font_text;
-    int font_input          = main_controls[i].font_input;
+    int nr                         = main_controls[i].nr;
+    struct MenuPosInfo *pos_button = main_controls[i].pos_button;
+    struct MenuPosInfo *pos_text   = main_controls[i].pos_text;
+    struct MenuPosInfo *pos_input  = main_controls[i].pos_input;
+    char *text                     = main_controls[i].text;
+    char *input                    = main_controls[i].input;
+    int button_graphic             = main_controls[i].button_graphic;
+    int font_text                  = main_controls[i].font_text;
+    int font_input                 = main_controls[i].font_input;
 
     int font_text_width   = (font_text  != -1 ? getFontWidth(font_text)   : 0);
     int font_text_height  = (font_text  != -1 ? getFontHeight(font_text)  : 0);
@@ -405,12 +426,15 @@ static void InitializeMainControls()
 
     if (pos_text != NULL)
     {
+      /* calculate width for non-clickable text -- needed for text alignment */
+      boolean calculate_text_width = (pos_button == NULL && text != NULL);
+
       if (pos_text->x == -1 && pos_button != NULL)
 	pos_text->x = pos_button->x + pos_button->width;
       if (pos_text->y == -1 && pos_button != NULL)
 	pos_text->y = pos_button->y;
 
-      if (pos_text->width == -1)
+      if (pos_text->width == -1 || calculate_text_width)
 	pos_text->width = text_width;
       if (pos_text->height == -1)
 	pos_text->height = text_height;
@@ -437,17 +461,16 @@ static void DrawCursorAndText_Main(int pos, boolean active)
 
   for (i = 0; main_controls[i].nr != -1; i++)
   {
-    if (main_controls[i].nr == pos)
+    if (main_controls[i].nr == pos || pos == -1)
     {
-      struct Rect *pos_button = main_controls[i].pos_button;
-      struct Rect *pos_text   = main_controls[i].pos_text;
-      char *text              = main_controls[i].text;
-      int font_text           = main_controls[i].font_text;
-      int button_graphic      = main_controls[i].button_graphic;
-      int button_x = mSX + pos_button->x;
-      int button_y = mSY + pos_button->y;
-      int text_x   = mSX + pos_text->x;
-      int text_y   = mSY + pos_text->y;
+      struct MenuPosInfo *pos_button = main_controls[i].pos_button;
+      struct MenuPosInfo *pos_text   = main_controls[i].pos_text;
+      struct MenuPosInfo *pos_input  = main_controls[i].pos_input;
+      char *text                     = main_controls[i].text;
+      char *input                    = main_controls[i].input;
+      int button_graphic             = main_controls[i].button_graphic;
+      int font_text                  = main_controls[i].font_text;
+      int font_input                 = main_controls[i].font_input;
 
       if (active)
       {
@@ -455,22 +478,46 @@ static void DrawCursorAndText_Main(int pos, boolean active)
 	font_text = FONT_ACTIVE(font_text);
       }
 
-      DrawBackground(button_x, button_y, pos_button->width, pos_button->height);
-      DrawGraphicThruMaskExt(drawto, button_x, button_y, button_graphic, 0);
+      if (pos_button != NULL)
+      {
+	int button_x = mSX + pos_button->x;
+	int button_y = mSY + pos_button->y;
 
-      DrawBackground(text_x, text_y, pos_text->width, pos_text->height);
-      DrawText(text_x, text_y, text, font_text);
+	DrawBackground(button_x,button_y, pos_button->width,pos_button->height);
+	DrawGraphicThruMaskExt(drawto, button_x, button_y, button_graphic, 0);
+      }
 
-      break;
+      if (pos_text != NULL && text != NULL)
+      {
+	int text_x = mSX + ALIGNED_XPOS(pos_text->x, pos_text->width,
+					pos_text->align);
+	int text_y = mSY + pos_text->y;
+
+	DrawBackground(text_x, text_y, pos_text->width, pos_text->height);
+	DrawText(text_x, text_y, text, font_text);
+      }
+
+      if (pos_input != NULL && input != NULL)
+      {
+	int input_x = mSX + ALIGNED_XPOS(pos_input->x, pos_input->width,
+					 pos_input->align);
+	int input_y = mSY + pos_input->y;
+
+	DrawBackground(input_x, input_y, pos_input->width, pos_input->height);
+	DrawText(input_x, input_y, input, font_input);
+      }
     }
   }
 }
 
-static boolean insideRect(struct Rect *rect, int x, int y)
+static boolean insideMenuPosRect(struct MenuPosInfo *rect, int x, int y)
 {
+  int rect_x = ALIGNED_XPOS(rect->x, rect->width, rect->align);
+  int rect_y = rect->y;
+
   return (rect != NULL &&
-	  x >= rect->x && x < rect->x + rect->width &&
-	  y >= rect->y && y < rect->y + rect->height);
+	  x >= rect_x && x < rect_x + rect->width &&
+	  y >= rect_y && y < rect_y + rect->height);
 }
 
 static void drawCursorExt(int xpos, int ypos, boolean active, int graphic)
@@ -516,7 +563,7 @@ static void drawChooseTreeCursor(int ypos, boolean active)
   /* force LEVELS draw offset on artwork setup screen */
   game_status = GAME_MODE_LEVELS;
 
-  drawCursorExt(0, ypos, active, 0);
+  drawCursorExt(0, ypos, active, -1);
 
   game_status = last_game_status;	/* restore current game status */
 }
@@ -608,7 +655,9 @@ void DrawMainMenuExt(int redraw_mask, boolean do_fading)
   char *name_text = (local_team_mode ? "Team:" : "Name:");
   int name_width, level_width;
 #endif
+#if 0
   int i;
+#endif
 
   UnmapAllGadgets();
   FadeSoundsAndMusic();
@@ -675,21 +724,22 @@ void DrawMainMenuExt(int redraw_mask, boolean do_fading)
   SetMainBackgroundImage(IMG_BACKGROUND_MAIN);
   ClearWindow();
 
-  DrawHeadline();
-
 #if 1
   InitializeMainControls();
 
+#if 1
+  DrawCursorAndText_Main(-1, FALSE);
+#else
   for (i = 0; main_controls[i].nr != -1; i++)
   {
-    struct Rect *pos_button = main_controls[i].pos_button;
-    struct Rect *pos_text   = main_controls[i].pos_text;
-    struct Rect *pos_input  = main_controls[i].pos_input;
-    char *text              = main_controls[i].text;
-    char *input             = main_controls[i].input;
-    int button_graphic      = main_controls[i].button_graphic;
-    int font_text           = main_controls[i].font_text;
-    int font_input          = main_controls[i].font_input;
+    struct MenuPosInfo *pos_button = main_controls[i].pos_button;
+    struct MenuPosInfo *pos_text   = main_controls[i].pos_text;
+    struct MenuPosInfo *pos_input  = main_controls[i].pos_input;
+    char *text                     = main_controls[i].text;
+    char *input                    = main_controls[i].input;
+    int button_graphic             = main_controls[i].button_graphic;
+    int font_text                  = main_controls[i].font_text;
+    int font_input                 = main_controls[i].font_input;
 
     if (pos_button != NULL)
       DrawGraphicThruMaskExt(drawto, mSX + pos_button->x, mSY + pos_button->y,
@@ -701,8 +751,11 @@ void DrawMainMenuExt(int redraw_mask, boolean do_fading)
     if (pos_input != NULL && input != NULL)
       DrawText(mSX + pos_input->x, mSY + pos_input->y, input, font_input);
   }
+#endif
 
 #else
+
+  DrawHeadline();
 
   DrawText(mSX + 32, mSY + 2 * 32, name_text,       FONT_MENU_1);
   DrawText(mSX + 32, mSY + 3 * 32, "Levelset",      FONT_MENU_1);
@@ -738,11 +791,11 @@ void DrawMainMenuExt(int redraw_mask, boolean do_fading)
   for (i = 0; i < 8; i++)
     initCursor(i, (i == 1 || i == 4 || i == 6 ? IMG_MENU_BUTTON_ENTER_MENU :
 		   IMG_MENU_BUTTON));
+
+  DrawTextSCentered(326, FONT_TITLE_2, PROGRAM_GAME_BY_STRING);
 #endif
 
   DrawPreviewLevel(TRUE);
-
-  DrawTextSCentered(326, FONT_TITLE_2, "A Game by Artsoft Entertainment");
 
   HandleMainMenu(0, 0, 0, 0, MB_MENU_INITIALIZE);
 
@@ -985,9 +1038,9 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 
     for (i = 0; main_controls[i].nr != -1; i++)
     {
-      if (insideRect(main_controls[i].pos_button, mx - mSX, my - mSY) ||
-	  insideRect(main_controls[i].pos_text,   mx - mSX, my - mSY) ||
-	  insideRect(main_controls[i].pos_input,  mx - mSX, my - mSY))
+      if (insideMenuPosRect(main_controls[i].pos_button, mx - mSX, my - mSY) ||
+	  insideMenuPosRect(main_controls[i].pos_text,   mx - mSX, my - mSY) ||
+	  insideMenuPosRect(main_controls[i].pos_input,  mx - mSX, my - mSY))
       {
 	pos = main_controls[i].nr;
 
@@ -2530,7 +2583,7 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
 
     drawChooseTreeList(ti->cl_first, num_page_entries, ti);
     drawChooseTreeInfo(ti->cl_first + ti->cl_cursor, ti);
-    drawChooseTreeCursor(ti->cl_cursor, FC_RED);
+    drawChooseTreeCursor(ti->cl_cursor, TRUE);
 
     return;
   }
@@ -2598,7 +2651,8 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
 
 	drawChooseTreeList(ti->cl_first, num_page_entries, ti);
 	drawChooseTreeInfo(ti->cl_first + ti->cl_cursor, ti);
-	drawChooseTreeCursor(ti->cl_cursor, FC_RED);
+	drawChooseTreeCursor(ti->cl_cursor, TRUE);
+
 	AdjustChooseTreeScrollbar(SCREEN_CTRL_ID_SCROLL_VERTICAL,
 				  ti->cl_first, ti);
       }
@@ -2612,7 +2666,8 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
 
 	drawChooseTreeList(ti->cl_first, num_page_entries, ti);
 	drawChooseTreeInfo(ti->cl_first + ti->cl_cursor, ti);
-	drawChooseTreeCursor(ti->cl_cursor, FC_RED);
+	drawChooseTreeCursor(ti->cl_cursor, TRUE);
+
 	AdjustChooseTreeScrollbar(SCREEN_CTRL_ID_SCROLL_VERTICAL,
 				  ti->cl_first, ti);
       }
@@ -2659,9 +2714,10 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
     {
       if (y != ti->cl_cursor)
       {
-	drawChooseTreeCursor(y, FC_RED);
-	drawChooseTreeCursor(ti->cl_cursor, FC_BLUE);
+	drawChooseTreeCursor(ti->cl_cursor, FALSE);
+	drawChooseTreeCursor(y, TRUE);
 	drawChooseTreeInfo(ti->cl_first + y, ti);
+
 	ti->cl_cursor = y;
       }
     }

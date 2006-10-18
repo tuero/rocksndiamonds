@@ -1670,8 +1670,6 @@ void DrawMiniLevel(int size_x, int size_y, int scroll_x, int scroll_y)
 static void DrawPreviewLevelExt(int from_x, int from_y)
 {
   boolean show_level_border = (BorderElement != EL_EMPTY);
-  int dst_x = preview.x;
-  int dst_y = preview.y;
   int level_xsize = lev_fieldx + (show_level_border ? 2 : 0);
   int level_ysize = lev_fieldy + (show_level_border ? 2 : 0);
   int tile_size = preview.tile_size;
@@ -1679,6 +1677,8 @@ static void DrawPreviewLevelExt(int from_x, int from_y)
   int preview_height = preview.ysize * tile_size;
   int real_preview_xsize = MIN(level_xsize, preview.xsize);
   int real_preview_ysize = MIN(level_ysize, preview.ysize);
+  int dst_x = SX + ALIGNED_XPOS(preview.x, preview_width, preview.align);
+  int dst_y = SY + preview.y;
   int x, y;
 
   DrawBackground(dst_x, dst_y, preview_width, preview_height);
@@ -1712,8 +1712,24 @@ static void DrawPreviewLevelExt(int from_x, int from_y)
 #define MICROLABEL_IMPORTED_BY_HEAD	6
 #define MICROLABEL_IMPORTED_BY		7
 
+static int getMaxTextLength(struct MenuPosInfo *pos, int font_nr)
+{
+  int max_text_width = SXSIZE;
+  int font_width = getFontWidth(font_nr);
+
+  if (pos->align == ALIGN_CENTER)
+    max_text_width = (pos->x < SXSIZE / 2 ? pos->x * 2 : (SXSIZE - pos->x) * 2);
+  else if (pos->align == ALIGN_RIGHT)
+    max_text_width = pos->x;
+  else
+    max_text_width = SXSIZE - pos->x;
+
+  return max_text_width / font_width;
+}
+
 static void DrawPreviewLevelLabelExt(int mode)
 {
+  struct MenuPosInfo *pos = &menu.main.text.level_info_2;
   char label_text[MAX_OUTPUT_LINESIZE + 1];
   int max_len_label_text;
   int font_nr = FONT_TEXT_2;
@@ -1724,7 +1740,11 @@ static void DrawPreviewLevelLabelExt(int mode)
       mode == MICROLABEL_IMPORTED_BY_HEAD)
     font_nr = FONT_TEXT_3;
 
+#if 1
+  max_len_label_text = getMaxTextLength(pos, font_nr);
+#else
   max_len_label_text = SXSIZE / getFontWidth(font_nr);
+#endif
 
   for (i = 0; i < max_len_label_text; i++)
     label_text[i] = ' ';
@@ -1733,15 +1753,13 @@ static void DrawPreviewLevelLabelExt(int mode)
   if (strlen(label_text) > 0)
   {
 #if 1
-    int text_width = getTextWidth(label_text, font_nr);
-    int lxpos = SX + menu.main.text.level_info_2.x - text_width / 2;
-    int lypos = SY + menu.main.text.level_info_2.y;
+    DrawTextSAligned(pos->x, pos->y, label_text, font_nr, pos->align);
 #else
     int lxpos = SX + (SXSIZE - getTextWidth(label_text, font_nr)) / 2;
     int lypos = MICROLABEL2_YPOS;
-#endif
 
     DrawText(lxpos, lypos, label_text, font_nr);
+#endif
   }
 
   strncpy(label_text,
@@ -1758,15 +1776,13 @@ static void DrawPreviewLevelLabelExt(int mode)
   if (strlen(label_text) > 0)
   {
 #if 1
-    int text_width = getTextWidth(label_text, font_nr);
-    int lxpos = SX + menu.main.text.level_info_2.x - text_width / 2;
-    int lypos = SY + menu.main.text.level_info_2.y;
+    DrawTextSAligned(pos->x, pos->y, label_text, font_nr, pos->align);
 #else
     int lxpos = SX + (SXSIZE - getTextWidth(label_text, font_nr)) / 2;
     int lypos = MICROLABEL2_YPOS;
-#endif
 
     DrawText(lxpos, lypos, label_text, font_nr);
+#endif
   }
 
   redraw_mask |= REDRAW_MICROLEVEL;
@@ -1789,8 +1805,20 @@ void DrawPreviewLevel(boolean restart)
 
   if (restart)
   {
-    from_x = preview.xoffset;
-    from_y = preview.yoffset;
+    from_x = 0;
+    from_y = 0;
+
+    if (preview.anim_mode == ANIM_CENTERED)
+    {
+      if (level_xsize > preview.xsize)
+	from_x = (level_xsize - preview.xsize) / 2;
+      if (level_ysize > preview.ysize)
+	from_y = (level_ysize - preview.ysize) / 2;
+    }
+
+    from_x += preview.xoffset;
+    from_y += preview.yoffset;
+
     scroll_direction = MV_RIGHT;
     label_state = 1;
     label_counter = 0;
@@ -1804,25 +1832,30 @@ void DrawPreviewLevel(boolean restart)
 
     if (leveldir_current->name)
     {
+      struct MenuPosInfo *pos = &menu.main.text.level_info_1;
       char label_text[MAX_OUTPUT_LINESIZE + 1];
       int font_nr = FONT_TEXT_1;
+#if 1
+      int max_len_label_text = getMaxTextLength(pos, font_nr);
+#else
       int max_len_label_text = SXSIZE / getFontWidth(font_nr);
+#endif
+#if 0
       int text_width;
       int lxpos, lypos;
+#endif
 
       strncpy(label_text, leveldir_current->name, max_len_label_text);
       label_text[max_len_label_text] = '\0';
 
 #if 1
-      text_width = getTextWidth(label_text, font_nr);
-      lxpos = SX + menu.main.text.level_info_1.x - text_width / 2;
-      lypos = SY + menu.main.text.level_info_1.y;
+      DrawTextSAligned(pos->x, pos->y, label_text, font_nr, pos->align);
 #else
       lxpos = SX + (SXSIZE - getTextWidth(label_text, font_nr)) / 2;
       lypos = SY + MICROLABEL1_YPOS;
-#endif
 
       DrawText(lxpos, lypos, label_text, font_nr);
+#endif
     }
 
     game_status = last_game_status;	/* restore current game status */
@@ -1831,7 +1864,8 @@ void DrawPreviewLevel(boolean restart)
   }
 
   /* scroll preview level, if needed */
-  if ((level_xsize > preview.xsize || level_ysize > preview.ysize) &&
+  if (preview.anim_mode != ANIM_NONE &&
+      (level_xsize > preview.xsize || level_ysize > preview.ysize) &&
       DelayReached(&scroll_delay, scroll_delay_value))
   {
     switch (scroll_direction)

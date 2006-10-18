@@ -1761,6 +1761,7 @@
 #define PROGRAM_COPYRIGHT_STRING	"Copyright ©1995-2006 by Holger Schemel"
 #define PROGRAM_EMAIL_STRING		"info@artsoft.org"
 #define PROGRAM_WEBSITE_STRING		"http://www.artsoft.org/"
+#define PROGRAM_GAME_BY_STRING		"A Game by Artsoft Entertainment"
 
 #define ICON_TITLE_STRING		PROGRAM_TITLE_STRING
 #define COOKIE_PREFIX			"ROCKSNDIAMONDS"
@@ -1846,42 +1847,52 @@ struct BorderInfo
   int draw_masked[NUM_SPECIAL_GFX_ARGS];
 };
 
+struct MenuPosInfo
+{
+  int x, y;
+  int width, height;
+  int align;
+};
+
 struct MenuMainButtonInfo
 {
-  struct Rect name;
-  struct Rect levels;
-  struct Rect scores;
-  struct Rect editor;
-  struct Rect info;
-  struct Rect game;
-  struct Rect setup;
-  struct Rect quit;
+  struct MenuPosInfo name;
+  struct MenuPosInfo levels;
+  struct MenuPosInfo scores;
+  struct MenuPosInfo editor;
+  struct MenuPosInfo info;
+  struct MenuPosInfo game;
+  struct MenuPosInfo setup;
+  struct MenuPosInfo quit;
 
-  struct Rect prev_level;
-  struct Rect next_level;
+  struct MenuPosInfo prev_level;
+  struct MenuPosInfo next_level;
 };
 
 struct MenuMainTextInfo
 {
-  struct Rect name;
-  struct Rect levels;
-  struct Rect scores;
-  struct Rect editor;
-  struct Rect info;
-  struct Rect game;
-  struct Rect setup;
-  struct Rect quit;
+  struct MenuPosInfo name;
+  struct MenuPosInfo levels;
+  struct MenuPosInfo scores;
+  struct MenuPosInfo editor;
+  struct MenuPosInfo info;
+  struct MenuPosInfo game;
+  struct MenuPosInfo setup;
+  struct MenuPosInfo quit;
 
-  struct Rect current_level;
-  struct Rect first_level;
-  struct Rect last_level;
-  struct Rect level_info_1;
-  struct Rect level_info_2;
+  struct MenuPosInfo current_level;
+  struct MenuPosInfo first_level;
+  struct MenuPosInfo last_level;
+  struct MenuPosInfo level_info_1;
+  struct MenuPosInfo level_info_2;
+  struct MenuPosInfo title_1;
+  struct MenuPosInfo title_2;
+  struct MenuPosInfo title_3;
 };
 
 struct MenuMainInputInfo
 {
-  struct Rect name;
+  struct MenuPosInfo name;
 };
 
 struct MenuMainInfo
@@ -1923,11 +1934,13 @@ struct DoorInfo
 struct PreviewInfo
 {
   int x, y;
+  int align;
   int xsize, ysize;
   int xoffset, yoffset;
   int tile_size;
   int step_offset;
   int step_delay;
+  int anim_mode;
 };
 
 struct HiScore

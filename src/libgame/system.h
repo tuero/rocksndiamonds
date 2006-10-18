@@ -194,9 +194,20 @@
 /* values for special (non game element) animation modes */
 #define ANIM_HORIZONTAL		(1 << 10)
 #define ANIM_VERTICAL		(1 << 11)
-#define ANIM_STATIC_PANEL	(1 << 12)
+#define ANIM_CENTERED		(1 << 12)
+#define ANIM_STATIC_PANEL	(1 << 13)
 
 #define ANIM_DEFAULT		ANIM_LOOP
+
+/* values for text alignment */
+#define ALIGN_LEFT		(1 << 0)
+#define ALIGN_RIGHT		(1 << 1)
+#define ALIGN_CENTER		(1 << 2)
+
+#define ALIGN_DEFAULT		ALIGN_LEFT
+
+#define ALIGNED_XPOS(x,w,a)	((a) == ALIGN_CENTER ? (x) - (w) / 2 :	\
+				 (a) == ALIGN_RIGHT  ? (x) - (w) : (x))
 
 /* values for redraw_mask */
 #define REDRAW_NONE		(0)

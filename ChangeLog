@@ -1,3 +1,6 @@
+2006-10-18
+	* added configuration directives for the remaining main menu items
+
 2006-10-17
 	* added additional configuration directives for info screen draw offset:
 	  menu.draw_{x,y}offset.INFO[{ELEMENTS,MUSIC,CREDITS,PROGRAM,LEVELSET}]

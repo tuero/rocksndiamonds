@@ -68,6 +68,8 @@ void DrawTextF(int, int, int, char *, ...);
 void DrawTextFCentered(int, int, char *, ...);
 void DrawTextS(int, int, int, char *);
 void DrawTextSCentered(int, int, char *);
+void DrawTextSAligned(int, int, char *, int, int);
+void DrawTextAligned(int, int, char *, int, int);
 void DrawText(int, int, char *, int);
 void DrawTextExt(DrawBuffer *, int, int, char *, int, int);
 void DrawTextToTextArea(int, int, char *, int, int, int, int, int);

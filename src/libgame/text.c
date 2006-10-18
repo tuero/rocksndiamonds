@@ -240,6 +240,18 @@ void DrawTextSCentered(int y, int font_nr, char *text)
 	   gfx.sy + y, text, font_nr);
 }
 
+void DrawTextSAligned(int x, int y, char *text, int font_nr, int align)
+{
+  DrawText(gfx.sx + ALIGNED_XPOS(x, getTextWidth(text, font_nr), align),
+	   gfx.sx + y, text, font_nr);
+}
+
+void DrawTextAligned(int x, int y, char *text, int font_nr, int align)
+{
+  DrawText(ALIGNED_XPOS(x, getTextWidth(text, font_nr), align),
+	   y, text, font_nr);
+}
+
 void DrawText(int x, int y, char *text, int font_nr)
 {
   int mask_mode = BLIT_OPAQUE;
