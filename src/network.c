@@ -626,7 +626,7 @@ static void HandleNetworkingMessages()
     nread -= 4 + message_length;
     memmove(readbuffer, readbuffer + 4 + message_length, nread);
 
-    switch(buffer[1])
+    switch (buffer[1])
     {
       case OP_BAD_PROTOCOL_VERSION:
 	Handle_OP_BAD_PROTOCOL_VERSION();

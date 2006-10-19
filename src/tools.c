@@ -2602,7 +2602,7 @@ boolean Request(char *text, unsigned int req_state)
 
       NextEvent(&event);
 
-      switch(event.type)
+      switch (event.type)
       {
 	case EVENT_BUTTONPRESS:
 	case EVENT_BUTTONRELEASE:
@@ -2634,7 +2634,7 @@ boolean Request(char *text, unsigned int req_state)
 	  /* this sets 'request_gadget_id' */
 	  HandleGadgets(mx, my, button_status);
 
-	  switch(request_gadget_id)
+	  switch (request_gadget_id)
 	  {
 	    case TOOL_CTRL_ID_YES:
 	      result = TRUE;
@@ -2667,7 +2667,7 @@ boolean Request(char *text, unsigned int req_state)
 	}
 
 	case EVENT_KEYPRESS:
-	  switch(GetEventKey((KeyEvent *)&event, TRUE))
+	  switch (GetEventKey((KeyEvent *)&event, TRUE))
 	  {
 	    case KSYM_Return:
 	      result = 1;
@@ -5341,7 +5341,7 @@ int map_direction_EM_to_RND(int direction)
 
 int get_next_element(int element)
 {
-  switch(element)
+  switch (element)
   {
     case EL_QUICKSAND_FILLING:		return EL_QUICKSAND_FULL;
     case EL_QUICKSAND_EMPTYING:		return EL_QUICKSAND_EMPTY;

@@ -4497,6 +4497,11 @@ struct ConfigInfo image_config[] =
   { "background.envelope_4.anim_mode",		"default"		},
   { "background.envelope_4.draw_masked",	"false"			},
 
+  { "titlescreen_initial_1",			UNDEFINED_FILENAME	},
+  { "titlescreen_initial_2",			UNDEFINED_FILENAME	},
+  { "titlescreen_initial_3",			UNDEFINED_FILENAME	},
+  { "titlescreen_initial_4",			UNDEFINED_FILENAME	},
+  { "titlescreen_initial_5",			UNDEFINED_FILENAME	},
   { "titlescreen_1",				UNDEFINED_FILENAME	},
   { "titlescreen_2",				UNDEFINED_FILENAME	},
   { "titlescreen_3",				UNDEFINED_FILENAME	},
@@ -4567,6 +4572,7 @@ struct ConfigInfo image_config[] =
 
   { "menu.fade_delay",				"250"			},
   { "menu.post_delay",				"125"			},
+  { "menu.auto_delay",				"0"			},
 
   { "main.button.name.x",			"0"			},
   { "main.button.name.y",			"64"			},

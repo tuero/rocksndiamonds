@@ -158,6 +158,9 @@ static void MapScreenMenuGadgets(int);
 static void MapScreenTreeGadgets(TreeInfo *);
 
 static struct GadgetInfo *screen_gadget[NUM_SCREEN_GADGETS];
+
+static boolean show_titlescreen_initial = TRUE;
+
 static int setup_mode = SETUP_MODE_MAIN;
 static int info_mode = INFO_MODE_MAIN;
 
@@ -512,11 +515,13 @@ static void DrawCursorAndText_Main(int pos, boolean active)
 
 static boolean insideMenuPosRect(struct MenuPosInfo *rect, int x, int y)
 {
+  if (rect == NULL)
+    return FALSE;
+
   int rect_x = ALIGNED_XPOS(rect->x, rect->width, rect->align);
   int rect_y = rect->y;
 
-  return (rect != NULL &&
-	  x >= rect_x && x < rect_x + rect->width &&
+  return (x >= rect_x && x < rect_x + rect->width &&
 	  y >= rect_y && y < rect_y + rect->height);
 }
 
@@ -596,9 +601,15 @@ static int getLevelRangeTextPos()
 }
 #endif
 
+static int getTitleScreenGraphic()
+{
+  return (show_titlescreen_initial ? IMG_TITLESCREEN_INITIAL_1 :
+	  IMG_TITLESCREEN_1);
+}
+
 void DrawTitleScreenImage(int nr)
 {
-  int graphic = IMG_TITLESCREEN_1 + nr;
+  int graphic = getTitleScreenGraphic() + nr;
   Bitmap *bitmap = graphic_info[graphic].bitmap;
   int width  = graphic_info[graphic].src_image_width;
   int height = graphic_info[graphic].src_image_height;
@@ -705,8 +716,10 @@ void DrawMainMenuExt(int redraw_mask, boolean do_fading)
 #endif
 
   if (setup.show_titlescreen &&
-      levelset_has_changed &&
-      graphic_info[IMG_TITLESCREEN_1].bitmap != NULL)
+      ((levelset_has_changed &&
+	graphic_info[IMG_TITLESCREEN_1].bitmap != NULL) ||
+       (show_titlescreen_initial &&
+	graphic_info[IMG_TITLESCREEN_INITIAL_1].bitmap != NULL)))
   {
     game_status = GAME_MODE_TITLE;
 
@@ -870,14 +883,18 @@ static void gotoTopLevelDir()
 
 void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
 {
+  static unsigned long title_delay = 0;
   static int title_nr = 0;
   boolean return_to_main_menu = FALSE;
   boolean use_fading_main_menu = TRUE;
-  boolean use_cross_fading = TRUE;
+  boolean use_cross_fading = !show_titlescreen_initial;		/* default */
+  int auto_delay = menu.auto_delay;
 
   if (button == MB_MENU_INITIALIZE)
   {
     int last_game_status = game_status;	/* save current game status */
+
+    title_delay = 0;
     title_nr = 0;
 
     if (game_status == GAME_MODE_INFO)
@@ -907,9 +924,19 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
 
     FadeIn(REDRAW_ALL);
 
+    DelayReached(&title_delay, 0);	/* reset delay counter */
+
     return;
   }
-  else if (button == MB_MENU_LEAVE)
+
+  int anim_delay = graphic_info[getTitleScreenGraphic() + title_nr].anim_delay;
+  if (anim_delay > 1)
+    auto_delay = anim_delay;
+
+  if (auto_delay > 0 && DelayReached(&title_delay, auto_delay))
+    button = MB_MENU_CHOICE;
+
+  if (button == MB_MENU_LEAVE)
   {
     return_to_main_menu = TRUE;
     use_fading_main_menu = FALSE;
@@ -927,11 +954,26 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
 
     title_nr++;
 
+    if (show_titlescreen_initial &&
+	(title_nr >= MAX_NUM_TITLE_SCREENS ||
+	 graphic_info[IMG_TITLESCREEN_INITIAL_1 + title_nr].bitmap == NULL))
+    {
+      show_titlescreen_initial = FALSE;
+
+      title_nr = 0;	/* restart with title screens for current level set */
+    }
+
+    int anim_mode = graphic_info[getTitleScreenGraphic() + title_nr].anim_mode;
+
+    use_cross_fading = (anim_mode == ANIM_FADE ? FALSE :
+			anim_mode == ANIM_CROSSFADE ? TRUE :
+			use_cross_fading);
+
     if (!use_cross_fading)
       FadeOut(REDRAW_ALL);
 
     if (title_nr < MAX_NUM_TITLE_SCREENS &&
-	graphic_info[IMG_TITLESCREEN_1 + title_nr].bitmap != NULL)
+	graphic_info[getTitleScreenGraphic() + title_nr].bitmap != NULL)
     {
       if (use_cross_fading)
 	FadeCrossSaveBackbuffer();
@@ -942,6 +984,8 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
 	FadeCross(REDRAW_ALL);
       else
 	FadeIn(REDRAW_ALL);
+
+      DelayReached(&title_delay, 0);	/* reset delay counter */
     }
     else
     {
@@ -3275,7 +3319,7 @@ static Key getSetupKey()
 
       NextEvent(&event);
 
-      switch(event.type)
+      switch (event.type)
       {
         case EVENT_KEYPRESS:
 	  {
@@ -4020,7 +4064,7 @@ void CustomizeKeyboard(int player_nr)
 
       NextEvent(&event);
 
-      switch(event.type)
+      switch (event.type)
       {
         case EVENT_KEYPRESS:
 	  {
@@ -4170,10 +4214,10 @@ static boolean CalibrateJoystickMain(int player_nr)
 
       NextEvent(&event);
 
-      switch(event.type)
+      switch (event.type)
       {
 	case EVENT_KEYPRESS:
-	  switch(GetEventKey((KeyEvent *)&event, TRUE))
+	  switch (GetEventKey((KeyEvent *)&event, TRUE))
 	  {
 	    case KSYM_Return:
 	      if (check_remaining == 0)

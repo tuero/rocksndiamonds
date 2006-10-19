@@ -196,6 +196,8 @@
 #define ANIM_VERTICAL		(1 << 11)
 #define ANIM_CENTERED		(1 << 12)
 #define ANIM_STATIC_PANEL	(1 << 13)
+#define ANIM_FADE		(1 << 14)
+#define ANIM_CROSSFADE		(1 << 15)
 
 #define ANIM_DEFAULT		ANIM_LOOP
 

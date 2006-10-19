@@ -2488,7 +2488,7 @@ void InitMovDir(int x, int y)
     { MV_LEFT,  MV_RIGHT, MV_UP, MV_DOWN }
   };
 
-  switch(element)
+  switch (element)
   {
     case EL_BUG_RIGHT:
     case EL_BUG_UP:
@@ -3922,7 +3922,7 @@ void Bang(int x, int y)
     }
   }
 
-  switch(element)
+  switch (element)
   {
     case EL_BUG:
     case EL_SPACESHIP:
@@ -7717,7 +7717,7 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
 
   /* ---------- execute action  -------------------------------------------- */
 
-  switch(action_type)
+  switch (action_type)
   {
     case CA_NO_ACTION:
     {
@@ -12384,7 +12384,7 @@ void RaiseScore(int value)
 
 void RaiseScoreElement(int element)
 {
-  switch(element)
+  switch (element)
   {
     case EL_EMERALD:
     case EL_BD_DIAMOND:

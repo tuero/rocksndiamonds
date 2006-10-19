@@ -740,7 +740,7 @@ void NetworkServer(int port, int serveronly)
 	    break;
 	  }
 
-	  switch(buffer[1])
+	  switch (buffer[1])
 	  {
 	    case OP_PLAYER_NAME:
 	      Handle_OP_PLAYER_NAME(player, len);

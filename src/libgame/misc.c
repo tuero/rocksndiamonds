@@ -1781,6 +1781,8 @@ int get_parameter_value(char *value_raw, char *suffix, int type)
 	      string_has_parameter(value, "horizontal")	? ANIM_HORIZONTAL :
 	      string_has_parameter(value, "vertical")	? ANIM_VERTICAL :
 	      string_has_parameter(value, "centered")	? ANIM_CENTERED :
+	      string_has_parameter(value, "fade")	? ANIM_FADE :
+	      string_has_parameter(value, "crossfade")	? ANIM_CROSSFADE :
 	      ANIM_DEFAULT);
 
     if (string_has_parameter(value, "reverse"))

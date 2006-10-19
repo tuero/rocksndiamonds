@@ -127,7 +127,7 @@ void EventLoop(void)
 
       while (NextValidEvent(&event))
       {
-  	switch(event.type)
+  	switch (event.type)
   	{
   	  case EVENT_BUTTONPRESS:
   	  case EVENT_BUTTONRELEASE:
@@ -194,7 +194,7 @@ void EventLoop(void)
 
 void HandleOtherEvents(Event *event)
 {
-  switch(event->type)
+  switch (event->type)
   {
     case EVENT_EXPOSE:
       HandleExposeEvent((ExposeEvent *) event);
@@ -238,7 +238,7 @@ void ClearEventQueue()
 
     NextEvent(&event);
 
-    switch(event.type)
+    switch (event.type)
     {
       case EVENT_BUTTONRELEASE:
 	button_status = MB_RELEASED;
@@ -281,7 +281,7 @@ void SleepWhileUnmapped()
 
     NextEvent(&event);
 
-    switch(event.type)
+    switch (event.type)
     {
       case EVENT_BUTTONRELEASE:
 	button_status = MB_RELEASED;
@@ -781,7 +781,7 @@ void HandleKey(Key key, int key_status)
       key = KSYM_UNDEFINED;
   }
 
-  switch(game_status)
+  switch (game_status)
   {
     case GAME_MODE_PSEUDO_TYPENAME:
       HandleTypeName(0, key);
@@ -793,7 +793,7 @@ void HandleKey(Key key, int key_status)
     case GAME_MODE_SETUP:
     case GAME_MODE_INFO:
     case GAME_MODE_SCORES:
-      switch(key)
+      switch (key)
       {
 	case KSYM_space:
 	case KSYM_Return:
@@ -864,7 +864,7 @@ void HandleKey(Key key, int key_status)
 
     case GAME_MODE_PLAYING:
     {
-      switch(key)
+      switch (key)
       {
         case KSYM_Escape:
 	  RequestQuitGame(setup.ask_on_escape);
@@ -1029,7 +1029,7 @@ void HandleJoystick()
   int dx	= (left ? -1	: right ? 1	: 0);
   int dy	= (up   ? -1	: down  ? 1	: 0);
 
-  switch(game_status)
+  switch (game_status)
   {
     case GAME_MODE_TITLE:
     case GAME_MODE_MAIN:

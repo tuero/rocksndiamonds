@@ -1915,6 +1915,7 @@ struct MenuInfo
 
   int fade_delay;
   int post_delay;
+  int auto_delay;
 
   int sound[NUM_SPECIAL_GFX_ARGS];
   int music[NUM_SPECIAL_GFX_ARGS];

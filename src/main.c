@@ -4693,6 +4693,7 @@ struct TokenIntPtrInfo image_config_vars[] =
 
   { "menu.fade_delay",		&menu.fade_delay			      },
   { "menu.post_delay",		&menu.post_delay			      },
+  { "menu.auto_delay",		&menu.auto_delay			      },
 
   { "main.button.name.x",	&menu.main.button.name.x		      },
   { "main.button.name.y",	&menu.main.button.name.y		      },
