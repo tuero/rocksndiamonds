@@ -1651,8 +1651,11 @@
 #define GFX_ARG_NAME			36
 #define GFX_ARG_SCALE_UP_FACTOR		37
 #define GFX_ARG_CLONE_FROM		38
+#define GFX_ARG_FADE_DELAY		39
+#define GFX_ARG_POST_DELAY		40
+#define GFX_ARG_AUTO_DELAY		41
 
-#define NUM_GFX_ARGS			39
+#define NUM_GFX_ARGS			42
 
 
 /* values for sound configuration suffixes */
@@ -1900,6 +1903,17 @@ struct MenuMainInfo
   struct MenuMainButtonInfo button;
   struct MenuMainTextInfo text;
   struct MenuMainInputInfo input;
+};
+
+struct TitleInfo
+{
+  int fade_delay;
+  int post_delay;
+  int auto_delay;
+
+  int fade_delay_final;
+  int post_delay_final;
+  int auto_delay_final;
 };
 
 struct MenuInfo
@@ -2345,6 +2359,10 @@ struct GraphicInfo
 
   int draw_masked;		/* optional setting for drawing envelope gfx */
 
+  int fade_delay;		/* optional setting for drawing title screens */
+  int post_delay;		/* optional setting for drawing title screens */
+  int auto_delay;		/* optional setting for drawing title screens */
+
 #if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
   Pixmap clip_mask;		/* single-graphic-only clip mask for X11 */
   GC clip_gc;			/* single-graphic-only clip gc for X11 */
@@ -2503,6 +2521,7 @@ extern struct HiScore		highscore[];
 extern struct TapeInfo		tape;
 extern struct GlobalInfo	global;
 extern struct BorderInfo	border;
+extern struct TitleInfo		title;
 extern struct MenuInfo		menu;
 extern struct DoorInfo		door_1, door_2;
 extern struct PreviewInfo	preview;

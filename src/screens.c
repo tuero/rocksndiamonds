@@ -644,6 +644,19 @@ void DrawTitleScreenImage(int nr)
     BlitBitmap(bitmap, drawto, src_x, src_y, width, height, dst_x, dst_y);
 
   redraw_mask = REDRAW_ALL;
+
+  /* reset fading control values to default config settings */
+  title.fade_delay_final = title.fade_delay;
+  title.post_delay_final = title.post_delay;
+  title.auto_delay_final = title.auto_delay;
+
+  /* override default settings with image config settings, if defined */
+  if (graphic_info[graphic].fade_delay > -1)
+    title.fade_delay_final = graphic_info[graphic].fade_delay;
+  if (graphic_info[graphic].post_delay > -1)
+    title.post_delay_final = graphic_info[graphic].post_delay;
+  if (graphic_info[graphic].auto_delay > -1)
+    title.auto_delay_final = graphic_info[graphic].auto_delay;
 }
 
 void DrawTitleScreen()
@@ -888,7 +901,6 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
   boolean return_to_main_menu = FALSE;
   boolean use_fading_main_menu = TRUE;
   boolean use_cross_fading = !show_titlescreen_initial;		/* default */
-  int auto_delay = menu.auto_delay;
 
   if (button == MB_MENU_INITIALIZE)
   {
@@ -896,6 +908,10 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
 
     title_delay = 0;
     title_nr = 0;
+
+    if (show_titlescreen_initial &&
+	graphic_info[IMG_TITLESCREEN_INITIAL_1].bitmap == NULL)
+      show_titlescreen_initial = FALSE;
 
     if (game_status == GAME_MODE_INFO)
     {
@@ -929,11 +945,8 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
     return;
   }
 
-  int anim_delay = graphic_info[getTitleScreenGraphic() + title_nr].anim_delay;
-  if (anim_delay > 1)
-    auto_delay = anim_delay;
-
-  if (auto_delay > 0 && DelayReached(&title_delay, auto_delay))
+  if (title.auto_delay_final > -1 &&
+      DelayReached(&title_delay, title.auto_delay_final))
     button = MB_MENU_CHOICE;
 
   if (button == MB_MENU_LEAVE)
@@ -943,6 +956,8 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
   }
   else if (button == MB_MENU_CHOICE)
   {
+    int anim_mode;
+
     if (game_status == GAME_MODE_INFO &&
 	graphic_info[IMG_TITLESCREEN_1].bitmap == NULL)
     {
@@ -963,7 +978,7 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
       title_nr = 0;	/* restart with title screens for current level set */
     }
 
-    int anim_mode = graphic_info[getTitleScreenGraphic() + title_nr].anim_mode;
+    anim_mode = graphic_info[getTitleScreenGraphic() + title_nr].anim_mode;
 
     use_cross_fading = (anim_mode == ANIM_FADE ? FALSE :
 			anim_mode == ANIM_CROSSFADE ? TRUE :
@@ -999,6 +1014,8 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
 
   if (return_to_main_menu)
   {
+    show_titlescreen_initial = FALSE;
+
     RedrawBackground();
 
     if (game_status == GAME_MODE_INFO)
@@ -1753,7 +1770,6 @@ void HandleInfoScreen_Elements(int button)
   static int num_pages;
   static int page;
   int anims_per_page = MAX_INFO_ELEMENTS_ON_SCREEN;
-  int button_released = !button;
   int i;
 
   if (button == MB_MENU_INITIALIZE)
@@ -1761,6 +1777,7 @@ void HandleInfoScreen_Elements(int button)
     boolean new_element = TRUE;
 
     num_anims = 0;
+
     for (i = 0; helpanim_info[i].element != HELPANIM_LIST_END; i++)
     {
       if (helpanim_info[i].element == HELPANIM_LIST_NEXT)
@@ -1775,15 +1792,15 @@ void HandleInfoScreen_Elements(int button)
     num_pages = (num_anims + anims_per_page - 1) / anims_per_page;
     page = 0;
   }
-  else if (button == MB_MENU_LEAVE)
+
+  if (button == MB_MENU_LEAVE)
   {
     info_mode = INFO_MODE_MAIN;
     DrawInfoScreen();
 
     return;
   }
-
-  if (button_released || button == MB_MENU_INITIALIZE)
+  else if (button == MB_MENU_CHOICE || button == MB_MENU_INITIALIZE)
   {
     if (button != MB_MENU_INITIALIZE)
       page++;
@@ -1838,7 +1855,6 @@ void HandleInfoScreen_Music(int button)
   static struct MusicFileInfo *list = NULL;
   int ystart = 150, dy = 30;
   int ybottom = SYSIZE - 20;
-  int button_released = !button;
 
   if (button == MB_MENU_INITIALIZE)
   {
@@ -1859,15 +1875,15 @@ void HandleInfoScreen_Music(int button)
       return;
     }
   }
-  else if (button == MB_MENU_LEAVE)
+
+  if (button == MB_MENU_LEAVE)
   {
     info_mode = INFO_MODE_MAIN;
     DrawInfoScreen();
 
     return;
   }
-
-  if (button_released || button == MB_MENU_INITIALIZE)
+  else if (button == MB_MENU_CHOICE || button == MB_MENU_INITIALIZE)
   {
     int y = 0;
 
@@ -2244,8 +2260,6 @@ void DrawInfoScreen_Program()
 
 void HandleInfoScreen_Program(int button)
 {
-  int button_released = !button;
-
   if (button == MB_MENU_LEAVE)
   {
     info_mode = INFO_MODE_MAIN;
@@ -2253,8 +2267,7 @@ void HandleInfoScreen_Program(int button)
 
     return;
   }
-
-  if (button_released)
+  else if (button == MB_MENU_CHOICE)
   {
     FadeSoundsAndMusic();
     FadeOut(REDRAW_FIELD);
@@ -2307,8 +2320,6 @@ void DrawInfoScreen_LevelSet()
 
 void HandleInfoScreen_LevelSet(int button)
 {
-  int button_released = !button;
-
   if (button == MB_MENU_LEAVE)
   {
     info_mode = INFO_MODE_MAIN;
@@ -2316,8 +2327,7 @@ void HandleInfoScreen_LevelSet(int button)
 
     return;
   }
-
-  if (button_released)
+  else if (button == MB_MENU_CHOICE)
   {
     FadeSoundsAndMusic();
     FadeOut(REDRAW_FIELD);

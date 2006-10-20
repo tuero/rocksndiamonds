@@ -1,3 +1,17 @@
+2006-10-20
+	* added configuration directives for control of title screens:
+	  - "title.fade_delay" for fading time
+	  - "title.post_delay" for pause between screens (when not crossfading)
+	  - "title.auto_delay" to automatically continue after some time
+	  these settings can each be overridden by specifying them with titles:
+	  - "titlescreen_initial_{1-5}.{fade_delay,post_delay,auto_delay}"
+	  - "titlescreen_{1-5}.{fade_delay,post_delay,auto_delay}"
+	  fading mode can also be specified:
+	  - "titlescreen_initial_{1-5}.anim_mode: {fade,crossfade}
+	  - "titlescreen_{1-5}.anim_mode: {fade,crossfade}
+	  default is using normal fading for menues and initial title screens,
+	  while using cross-fading for level set title screens
+
 2006-10-18
 	* added configuration directives for the remaining main menu items
 

@@ -105,6 +105,7 @@ struct SetupInfo	setup;
 struct GameInfo		game;
 struct GlobalInfo	global;
 struct BorderInfo	border;
+struct TitleInfo	title;
 struct MenuInfo		menu;
 struct DoorInfo		door_1, door_2;
 struct PreviewInfo	preview;
@@ -4649,6 +4650,14 @@ struct TokenIntPtrInfo image_config_vars[] =
   { "border.draw_masked.PLAYING",&border.draw_masked[GFX_SPECIAL_ARG_PLAYING] },
   { "border.draw_masked.DOOR",	 &border.draw_masked[GFX_SPECIAL_ARG_DOOR]    },
 
+  { "title.fade_delay",		&title.fade_delay			      },
+  { "title.post_delay",		&title.post_delay			      },
+  { "title.auto_delay",		&title.auto_delay			      },
+
+  { "menu.fade_delay",		&menu.fade_delay			      },
+  { "menu.post_delay",		&menu.post_delay			      },
+  { "menu.auto_delay",		&menu.auto_delay			      },
+
   { "menu.draw_xoffset",	&menu.draw_xoffset[GFX_SPECIAL_ARG_DEFAULT]   },
   { "menu.draw_yoffset",	&menu.draw_yoffset[GFX_SPECIAL_ARG_DEFAULT]   },
   { "menu.draw_xoffset.MAIN",	&menu.draw_xoffset[GFX_SPECIAL_ARG_MAIN]      },
@@ -4690,10 +4699,6 @@ struct TokenIntPtrInfo image_config_vars[] =
   { "menu.list_size.LEVELS",	&menu.list_size[GFX_SPECIAL_ARG_LEVELS]	      },
   { "menu.list_size.SCORES",	&menu.list_size[GFX_SPECIAL_ARG_SCORES]	      },
   { "menu.list_size.INFO",	&menu.list_size[GFX_SPECIAL_ARG_INFO]	      },
-
-  { "menu.fade_delay",		&menu.fade_delay			      },
-  { "menu.post_delay",		&menu.post_delay			      },
-  { "menu.auto_delay",		&menu.auto_delay			      },
 
   { "main.button.name.x",	&menu.main.button.name.x		      },
   { "main.button.name.y",	&menu.main.button.name.y		      },

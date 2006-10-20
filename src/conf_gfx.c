@@ -60,6 +60,9 @@ struct ConfigTypeInfo image_config_suffix[] =
   { ".name",				ARG_UNDEFINED,	TYPE_STRING	},
   { ".scale_up_factor",			ARG_UNDEFINED,	TYPE_INTEGER	},
   { ".clone_from",			ARG_UNDEFINED,	TYPE_TOKEN	},
+  { ".fade_delay",			ARG_UNDEFINED,	TYPE_INTEGER	},
+  { ".post_delay",			ARG_UNDEFINED,	TYPE_INTEGER	},
+  { ".auto_delay",			ARG_UNDEFINED,	TYPE_INTEGER	},
 
   { NULL,				NULL,		0		}
 };
@@ -4538,6 +4541,14 @@ struct ConfigInfo image_config[] =
   { "border.draw_masked.PLAYING",		"false"			},
   { "border.draw_masked.DOOR",			"false"			},
 
+  { "title.fade_delay",				"500"			},
+  { "title.post_delay",				"250"			},
+  { "title.auto_delay",				"-1"			},
+
+  { "menu.fade_delay",				"250"			},
+  { "menu.post_delay",				"125"			},
+  { "menu.auto_delay",				"-1"			},
+
   { "menu.draw_xoffset",			"0"			},
   { "menu.draw_yoffset",			"0"			},
   { "menu.draw_xoffset.MAIN",			"0"			},
@@ -4569,10 +4580,6 @@ struct ConfigInfo image_config[] =
   { "menu.list_size.LEVELS",			"-1"			},
   { "menu.list_size.SCORES",			"-1"			},
   { "menu.list_size.INFO",			"-1"			},
-
-  { "menu.fade_delay",				"250"			},
-  { "menu.post_delay",				"125"			},
-  { "menu.auto_delay",				"0"			},
 
   { "main.button.name.x",			"0"			},
   { "main.button.name.y",			"64"			},

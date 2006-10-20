@@ -533,9 +533,8 @@ void FadeExt(int fade_mask, int fade_mode)
 {
   void (*draw_border_function)(void) = NULL;
   Bitmap *bitmap = (fade_mode == FADE_MODE_CROSSFADE ? bitmap_db_cross : NULL);
-  int fade_delay = menu.fade_delay;
-  int post_delay = (fade_mode == FADE_MODE_FADE_OUT ? menu.post_delay : 0);
   int x, y, width, height;
+  int fade_delay, post_delay;
 
   if (fade_mask & REDRAW_FIELD)
   {
@@ -543,6 +542,9 @@ void FadeExt(int fade_mask, int fade_mode)
     y = REAL_SY;
     width  = FULL_SXSIZE;
     height = FULL_SYSIZE;
+
+    fade_delay = menu.fade_delay;
+    post_delay = (fade_mode == FADE_MODE_FADE_OUT ? menu.post_delay : 0);
 
     draw_border_function = DrawMaskedBorder_FIELD;
   }
@@ -552,6 +554,9 @@ void FadeExt(int fade_mask, int fade_mode)
     y = 0;
     width  = WIN_XSIZE;
     height = WIN_YSIZE;
+
+    fade_delay = title.fade_delay_final;
+    post_delay = (fade_mode == FADE_MODE_FADE_OUT ? title.post_delay_final : 0);
   }
 
   redraw_mask |= fade_mask;

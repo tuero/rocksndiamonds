@@ -970,6 +970,9 @@ static void set_graphic_parameters(int graphic)
   graphic_info[graphic].anim_delay_random = 0;
   graphic_info[graphic].post_delay_fixed = 0;
   graphic_info[graphic].post_delay_random = 0;
+  graphic_info[graphic].fade_delay = -1;
+  graphic_info[graphic].post_delay = -1;
+  graphic_info[graphic].auto_delay = -1;
 
   /* optional x and y tile position of animation frame sequence */
   if (parameter[GFX_ARG_XPOS] != ARG_UNDEFINED_VALUE)
@@ -1135,6 +1138,14 @@ static void set_graphic_parameters(int graphic)
   /* optional graphic for cloning all graphics settings */
   if (parameter[GFX_ARG_CLONE_FROM] != ARG_UNDEFINED_VALUE)
     graphic_info[graphic].clone_from = parameter[GFX_ARG_CLONE_FROM];
+
+  /* optional settings for drawing title screens */
+  if (parameter[GFX_ARG_FADE_DELAY] != ARG_UNDEFINED_VALUE)
+    graphic_info[graphic].fade_delay = parameter[GFX_ARG_FADE_DELAY];
+  if (parameter[GFX_ARG_POST_DELAY] != ARG_UNDEFINED_VALUE)
+    graphic_info[graphic].post_delay = parameter[GFX_ARG_POST_DELAY];
+  if (parameter[GFX_ARG_AUTO_DELAY] != ARG_UNDEFINED_VALUE)
+    graphic_info[graphic].auto_delay = parameter[GFX_ARG_AUTO_DELAY];
 }
 
 static void set_cloned_graphic_parameters(int graphic)
