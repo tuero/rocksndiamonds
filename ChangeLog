@@ -11,6 +11,7 @@
 	  - "titlescreen_{1-5}.anim_mode: {fade,crossfade}
 	  default is using normal fading for menues and initial title screens,
 	  while using cross-fading for level set title screens
+	* fixed bug with background not drawn in Hall of Fame after game was won
 
 2006-10-18
 	* added configuration directives for the remaining main menu items

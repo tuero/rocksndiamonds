@@ -2848,6 +2848,15 @@ void DrawHallOfFame(int highlight_position)
 {
   UnmapAllGadgets();
   FadeSoundsAndMusic();
+
+  /* (this is needed when called from GameEnd() after winning a game) */
+  KeyboardAutoRepeatOn();
+  ActivateJoystick();
+
+  /* (this is needed when called from GameEnd() after winning a game) */
+  SetDrawDeactivationMask(REDRAW_NONE);
+  SetDrawBackgroundMask(REDRAW_FIELD);
+
   CloseDoor(DOOR_CLOSE_2);
 
   if (highlight_position < 0) 

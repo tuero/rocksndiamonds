@@ -629,7 +629,9 @@ void SetPanelBackground()
 
 void DrawBackground(int dst_x, int dst_y, int width, int height)
 {
-#if 1
+  /* !!! "drawto" might still point to playfield buffer here (see below) !!! */
+  /* (when entering hall of fame after playing) */
+#if 0
   ClearRectangleOnBackground(drawto, dst_x, dst_y, width, height);
 #else
   ClearRectangleOnBackground(backbuffer, dst_x, dst_y, width, height);
@@ -640,8 +642,11 @@ void DrawBackground(int dst_x, int dst_y, int width, int height)
 
 void ClearWindow()
 {
+  /* !!! "drawto" might still point to playfield buffer here (see above) !!! */
+  /* (when entering hall of fame after playing) */
   DrawBackground(REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE);
 
+  /* !!! maybe this should be done before clearing the background !!! */
   if (setup.soft_scrolling && game_status == GAME_MODE_PLAYING)
   {
     ClearRectangle(fieldbuffer, 0, 0, FXSIZE, FYSIZE);
