@@ -1,3 +1,6 @@
+2006-10-22
+	* fixed bugs with player name and current level positions on main screen
+
 2006-10-20
 	* added configuration directives for control of title screens:
 	  - "title.fade_delay" for fading time

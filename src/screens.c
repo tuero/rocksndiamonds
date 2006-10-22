@@ -228,7 +228,7 @@ static char main_text_first_level[10];
 static char main_text_last_level[10];
 static char main_input_name[MAX_PLAYER_NAME_LEN + 1];
 
-static struct
+struct MainControlInfo
 {
   int nr;
 
@@ -242,8 +242,9 @@ static struct
   struct MenuPosInfo *pos_input;
   char *input;
   int font_input;
-}
-main_controls[] =
+};
+
+static struct MainControlInfo main_controls[] =
 {
   {
     MAIN_CONTROL_NAME,
@@ -294,6 +295,7 @@ main_controls[] =
     NULL,				NULL,			-1,
   },
 #if 0
+  /* (these two buttons are real gadgets) */
   {
     MAIN_CONTROL_PREV_LEVEL,
     &menu.main.button.prev_level,	IMG_MENU_BUTTON_PREV_LEVEL,
@@ -380,15 +382,16 @@ static void InitializeMainControls()
   /* set main control screen positions to dynamically determined values */
   for (i = 0; main_controls[i].nr != -1; i++)
   {
-    int nr                         = main_controls[i].nr;
-    struct MenuPosInfo *pos_button = main_controls[i].pos_button;
-    struct MenuPosInfo *pos_text   = main_controls[i].pos_text;
-    struct MenuPosInfo *pos_input  = main_controls[i].pos_input;
-    char *text                     = main_controls[i].text;
-    char *input                    = main_controls[i].input;
-    int button_graphic             = main_controls[i].button_graphic;
-    int font_text                  = main_controls[i].font_text;
-    int font_input                 = main_controls[i].font_input;
+    struct MainControlInfo *mci = &main_controls[i];
+    int nr                         = mci->nr;
+    struct MenuPosInfo *pos_button = mci->pos_button;
+    struct MenuPosInfo *pos_text   = mci->pos_text;
+    struct MenuPosInfo *pos_input  = mci->pos_input;
+    char *text                     = mci->text;
+    char *input                    = mci->input;
+    int button_graphic             = mci->button_graphic;
+    int font_text                  = mci->font_text;
+    int font_input                 = mci->font_input;
 
     int font_text_width   = (font_text  != -1 ? getFontWidth(font_text)   : 0);
     int font_text_height  = (font_text  != -1 ? getFontHeight(font_text)  : 0);
@@ -458,22 +461,24 @@ static void InitializeMainControls()
   }
 }
 
-static void DrawCursorAndText_Main(int pos, boolean active)
+static void DrawCursorAndText_Main(int nr, boolean active)
 {
   int i;
 
   for (i = 0; main_controls[i].nr != -1; i++)
   {
-    if (main_controls[i].nr == pos || pos == -1)
+    struct MainControlInfo *mci = &main_controls[i];
+
+    if (mci->nr == nr || nr == -1)
     {
-      struct MenuPosInfo *pos_button = main_controls[i].pos_button;
-      struct MenuPosInfo *pos_text   = main_controls[i].pos_text;
-      struct MenuPosInfo *pos_input  = main_controls[i].pos_input;
-      char *text                     = main_controls[i].text;
-      char *input                    = main_controls[i].input;
-      int button_graphic             = main_controls[i].button_graphic;
-      int font_text                  = main_controls[i].font_text;
-      int font_input                 = main_controls[i].font_input;
+      struct MenuPosInfo *pos_button = mci->pos_button;
+      struct MenuPosInfo *pos_text   = mci->pos_text;
+      struct MenuPosInfo *pos_input  = mci->pos_input;
+      char *text                     = mci->text;
+      char *input                    = mci->input;
+      int button_graphic             = mci->button_graphic;
+      int font_text                  = mci->font_text;
+      int font_input                 = mci->font_input;
 
       if (active)
       {
@@ -511,6 +516,17 @@ static void DrawCursorAndText_Main(int pos, boolean active)
       }
     }
   }
+}
+
+static struct MainControlInfo *getMainControlInfo(int nr)
+{
+  int i;
+
+  for (i = 0; main_controls[i].nr != -1; i++)
+    if (main_controls[i].nr == nr)
+      return &main_controls[i];
+
+  return NULL;
 }
 
 static boolean insideMenuPosRect(struct MenuPosInfo *rect, int x, int y)
@@ -1061,9 +1077,16 @@ void HandleMainMenu_SelectLevel(int step, int direction)
 
   if (new_level_nr != old_level_nr)
   {
+    struct MainControlInfo *mci= getMainControlInfo(MAIN_CONTROL_CURRENT_LEVEL);
+
     level_nr = new_level_nr;
 
+#if 1
+    DrawText(mSX + mci->pos_text->x, mSY + mci->pos_text->y,
+	     int2str(level_nr, 3), mci->font_text);
+#else
     DrawText(mSX + 11 * 32, mSY + 3 * 32, int2str(level_nr, 3), FONT_VALUE_1);
+#endif
 
     LoadLevel(level_nr);
     DrawPreviewLevel(TRUE);
@@ -2406,18 +2429,30 @@ void HandleInfoScreen(int mx, int my, int dx, int dy, int button)
 
 void HandleTypeName(int newxpos, Key key)
 {
+  struct MainControlInfo *mci = getMainControlInfo(MAIN_CONTROL_NAME);
+#if 1
+  static int xpos = 0;
+#else
   static int xpos = 0, ypos = 2;
-  int font_width = getFontWidth(FONT_INPUT_1_ACTIVE);
+#endif
+  int font_nr = mci->font_input;
+  int font_active_nr = FONT_ACTIVE(font_nr);
+  int font_width = getFontWidth(font_active_nr);
+#if 1
+  int startx = mSX + mci->pos_input->x;
+  int starty = mSY + mci->pos_input->y;
+#else
   int name_width = getFontWidth(FONT_MENU_1) * strlen("Name:");
   int startx = mSX + 32 + name_width;
   int starty = mSY + ypos * 32;
+#endif
 
   if (newxpos)
   {
     xpos = newxpos;
 
-    DrawText(startx, starty, setup.player_name, FONT_INPUT_1_ACTIVE);
-    DrawText(startx + xpos * font_width, starty, "_", FONT_INPUT_1_ACTIVE);
+    DrawText(startx, starty, setup.player_name, font_active_nr);
+    DrawText(startx + xpos * font_width, starty, "_", font_active_nr);
 
     return;
   }
@@ -2435,24 +2470,27 @@ void HandleTypeName(int newxpos, Key key)
 
     setup.player_name[xpos] = ascii;
     setup.player_name[xpos + 1] = 0;
+
     xpos++;
 
-    DrawText(startx, starty, setup.player_name, FONT_INPUT_1_ACTIVE);
-    DrawText(startx + xpos * font_width, starty, "_", FONT_INPUT_1_ACTIVE);
+    DrawText(startx, starty, setup.player_name, font_active_nr);
+    DrawText(startx + xpos * font_width, starty, "_", font_active_nr);
   }
   else if ((key == KSYM_Delete || key == KSYM_BackSpace) && xpos > 0)
   {
     xpos--;
+
     setup.player_name[xpos] = 0;
 
-    DrawText(startx + xpos * font_width, starty, "_ ", FONT_INPUT_1_ACTIVE);
+    DrawText(startx + xpos * font_width, starty, "_ ", font_active_nr);
   }
   else if (key == KSYM_Return && xpos > 0)
   {
-    DrawText(startx, starty, setup.player_name, FONT_INPUT_1);
-    DrawText(startx + xpos * font_width, starty, " ", FONT_INPUT_1_ACTIVE);
+    DrawText(startx, starty, setup.player_name, font_nr);
+    DrawText(startx + xpos * font_width, starty, " ", font_active_nr);
 
     SaveSetup();
+
     game_status = GAME_MODE_MAIN;
   }
 }
