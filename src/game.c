@@ -12683,6 +12683,9 @@ void SaveEngineSnapshot()
 {
   FreeEngineSnapshot();		/* free previous snapshot, if needed */
 
+  if (level_editor_test_game)	/* do not save snapshots from editor */
+    return;
+
   /* copy some special values to a structure better suited for the snapshot */
 
   SaveEngineSnapshotValues_RND();

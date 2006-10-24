@@ -1,3 +1,6 @@
+2006-10-24
+	* fixed bug that allowed making engine snapshots from the level editor
+
 2006-10-22
 	* fixed bugs with player name and current level positions on main screen
 
