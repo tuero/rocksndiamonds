@@ -975,9 +975,17 @@ static void set_graphic_parameters(int graphic)
   graphic_info[graphic].auto_delay = -1;
 
 #if 1
+  /* optional zoom factor for scaling up the image to a larger size */
+  if (parameter[GFX_ARG_SCALE_UP_FACTOR] != ARG_UNDEFINED_VALUE)
+    graphic_info[graphic].scale_up_factor = parameter[GFX_ARG_SCALE_UP_FACTOR];
+  if (graphic_info[graphic].scale_up_factor < 1)
+    graphic_info[graphic].scale_up_factor = 1;		/* no scaling */
+#endif
+
+#if 1
   if (graphic_info[graphic].use_image_size)
   {
-    /* set default bitmap size (with scaling, but without small images) */
+    /* set new default bitmap size (with scaling, but without small images) */
     graphic_info[graphic].width  = get_scaled_graphic_width(graphic);
     graphic_info[graphic].height = get_scaled_graphic_height(graphic);
   }
@@ -1001,11 +1009,13 @@ static void set_graphic_parameters(int graphic)
   if (parameter[GFX_ARG_HEIGHT] != ARG_UNDEFINED_VALUE)
     graphic_info[graphic].height = parameter[GFX_ARG_HEIGHT];
 
+#if 0
   /* optional zoom factor for scaling up the image to a larger size */
   if (parameter[GFX_ARG_SCALE_UP_FACTOR] != ARG_UNDEFINED_VALUE)
     graphic_info[graphic].scale_up_factor = parameter[GFX_ARG_SCALE_UP_FACTOR];
   if (graphic_info[graphic].scale_up_factor < 1)
     graphic_info[graphic].scale_up_factor = 1;		/* no scaling */
+#endif
 
   if (src_bitmap)
   {

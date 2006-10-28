@@ -1,7 +1,11 @@
 2006-10-28
 	* fixed bug when displaying titlescreen with size less than element tile
-	* fixed bug which caused elements with "change when digging <e>" event
+	* fixed bug that caused elements with "change when digging <e>" event
 	  to change for _every_ digged element, not only those specified in <e>
+	* fixed bug that caused impact style collision when dropping element one
+	  tile over the player that can both fall down and smash players
+	* fixed bug that caused impact style collision when element changed to
+	  falling/smashing element over the player immediately after movement
 
 2006-10-24
 	* fixed bug that allowed making engine snapshots from the level editor

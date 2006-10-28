@@ -2479,6 +2479,7 @@ extern short			ChangeEvent[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short			WasJustMoving[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short			WasJustFalling[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short			CheckCollision[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern short			CheckImpact[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short			AmoebaNr[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short			AmoebaCnt[MAX_NUM_AMOEBA];
 extern short			AmoebaCnt2[MAX_NUM_AMOEBA];

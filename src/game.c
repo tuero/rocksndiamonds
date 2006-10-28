@@ -57,6 +57,7 @@
 #define USE_GFX_RESET_PLAYER_ARTWORK	(USE_NEW_STUFF		* 1)
 
 #define USE_FIX_KILLED_BY_NON_WALKABLE	(USE_NEW_STUFF		* 1)
+#define USE_FIX_IMPACT_COLLISION	(USE_NEW_STUFF		* 1)
 
 
 /* for DigField() */
@@ -120,8 +121,9 @@
 
 /* values for delayed check of falling and moving elements and for collision */
 #define CHECK_DELAY_MOVING	3
-#define CHECK_DELAY_FALLING	3
+#define CHECK_DELAY_FALLING	CHECK_DELAY_MOVING
 #define CHECK_DELAY_COLLISION	2
+#define CHECK_DELAY_IMPACT	CHECK_DELAY_COLLISION
 
 /* values for initial player move delay (initial delay counter value) */
 #define INITIAL_MOVE_DELAY_OFF	-1
@@ -2037,6 +2039,7 @@ void InitGame()
     WasJustMoving[x][y] = 0;
     WasJustFalling[x][y] = 0;
     CheckCollision[x][y] = 0;
+    CheckImpact[x][y] = 0;
     Stop[x][y] = FALSE;
     Pushed[x][y] = FALSE;
 
@@ -5634,9 +5637,14 @@ void StartMoving(int x, int y)
 
       Store[x][y] = EL_ACID;
     }
-    else if ((game.engine_version >= VERSION_IDENT(3,1,0,0) &&
+    else if (
+#if USE_FIX_IMPACT_COLLISION
+	     (game.engine_version >= VERSION_IDENT(3,1,0,0) &&
+	      CheckImpact[x][y] && !IS_FREE(x, y + 1)) ||
+#else
+	     (game.engine_version >= VERSION_IDENT(3,1,0,0) &&
 	      CheckCollision[x][y] && !IS_FREE(x, y + 1)) ||
-
+#endif
 	     (game.engine_version >= VERSION_IDENT(3,0,7,0) &&
 	      CAN_FALL(element) && WasJustFalling[x][y] &&
 	      (Feld[x][y + 1] == EL_BLOCKED || IS_PLAYER(x, y + 1))) ||
@@ -5656,6 +5664,7 @@ void StartMoving(int x, int y)
 	 simply not covered here... :-/ ) */
 
       CheckCollision[x][y] = 0;
+      CheckImpact[x][y] = 0;
 
       Impact(x, y);
     }
@@ -6600,6 +6609,11 @@ void ContinueMoving(int x, int y)
 
     if ((!CAN_FALL(element) || direction == MV_DOWN) && check_collision_again)
       CheckCollision[newx][newy] = CHECK_DELAY_COLLISION;
+
+#if USE_FIX_IMPACT_COLLISION
+    if (CAN_FALL(element) && direction == MV_DOWN && check_collision_again)
+      CheckImpact[newx][newy] = CHECK_DELAY_IMPACT;
+#endif
   }
 
   if (DONT_TOUCH(element))	/* object may be nasty to player or others */
@@ -9429,6 +9443,8 @@ void GameActions_RND()
       WasJustFalling[x][y]--;
     if (CheckCollision[x][y] > 0)
       CheckCollision[x][y]--;
+    if (CheckImpact[x][y] > 0)
+      CheckImpact[x][y]--;
 
     GfxFrame[x][y]++;
 
@@ -12065,7 +12081,13 @@ boolean DropElement(struct PlayerInfo *player)
     nexty = dropy + GET_DY_FROM_DIR(move_direction);
 
     ChangeCount[dropx][dropy] = 0;	/* allow at least one more change */
+
+#if USE_FIX_IMPACT_COLLISION
+    /* do not cause impact style collision by dropping elements that can fall */
     CheckCollision[dropx][dropy] = CHECK_DELAY_COLLISION;
+#else
+    CheckCollision[dropx][dropy] = CHECK_DELAY_COLLISION;
+#endif
   }
 
   player->drop_delay = GET_NEW_DROP_DELAY(drop_element);
@@ -12747,6 +12769,7 @@ void SaveEngineSnapshot()
   SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(WasJustMoving));
   SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(WasJustFalling));
   SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(CheckCollision));
+  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(CheckImpact));
   SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(Stop));
   SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(Pushed));
 
