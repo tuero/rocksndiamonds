@@ -627,17 +627,37 @@ void SetPanelBackground()
   SetDoorBackgroundBitmap(bitmap_db_panel);
 }
 
-void DrawBackground(int dst_x, int dst_y, int width, int height)
+void DrawBackground(int x, int y, int width, int height)
 {
   /* !!! "drawto" might still point to playfield buffer here (see below) !!! */
   /* (when entering hall of fame after playing) */
 #if 0
-  ClearRectangleOnBackground(drawto, dst_x, dst_y, width, height);
+  ClearRectangleOnBackground(drawto, x, y, width, height);
 #else
-  ClearRectangleOnBackground(backbuffer, dst_x, dst_y, width, height);
+  ClearRectangleOnBackground(backbuffer, x, y, width, height);
 #endif
 
   redraw_mask |= REDRAW_FIELD;
+}
+
+void DrawBackgroundForFont(int x, int y, int width, int height, int font_nr)
+{
+  struct FontBitmapInfo *font = getFontBitmapInfo(font_nr);
+
+  if (font->bitmap == NULL)
+    return;
+
+  DrawBackground(x, y, width, height);
+}
+
+void DrawBackgroundForGraphic(int x, int y, int width, int height, int graphic)
+{
+  struct GraphicInfo *g = &graphic_info[graphic];
+
+  if (g->bitmap == NULL)
+    return;
+
+  DrawBackground(x, y, width, height);
 }
 
 void ClearWindow()

@@ -270,8 +270,12 @@ void DrawText(int x, int y, char *text, int font_nr)
 void DrawTextExt(DrawBuffer *dst_bitmap, int dst_x, int dst_y, char *text,
 		 int font_nr, int mask_mode)
 {
+#if 1
+  struct FontBitmapInfo *font = getFontBitmapInfo(font_nr);
+#else
   int font_bitmap_id = gfx.select_font_function(font_nr);
   struct FontBitmapInfo *font = &gfx.font_bitmap_info[font_bitmap_id];
+#endif
   int font_width = getFontWidth(font_nr);
   int font_height = getFontHeight(font_nr);
 #if 0

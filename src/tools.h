@@ -85,6 +85,8 @@ void SetMainBackgroundImage(int);
 void SetDoorBackgroundImage(int);
 void SetPanelBackground();
 void DrawBackground(int, int, int, int);
+void DrawBackgroundForFont(int, int, int, int, int);
+void DrawBackgroundForGraphic(int, int, int, int, int);
 
 void MarkTileDirty(int, int);
 void SetBorderElement();

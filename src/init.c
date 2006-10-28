@@ -949,13 +949,13 @@ static void set_graphic_parameters(int graphic)
 
   graphic_info[graphic].bitmap = src_bitmap;
 
-  /* start with reliable default values */
+  /* always start with reliable default values */
   graphic_info[graphic].src_image_width = 0;
   graphic_info[graphic].src_image_height = 0;
   graphic_info[graphic].src_x = 0;
   graphic_info[graphic].src_y = 0;
-  graphic_info[graphic].width = TILEX;
-  graphic_info[graphic].height = TILEY;
+  graphic_info[graphic].width  = TILEX;	/* default for element graphics */
+  graphic_info[graphic].height = TILEY;	/* default for element graphics */
   graphic_info[graphic].offset_x = 0;	/* one or both of these values ... */
   graphic_info[graphic].offset_y = 0;	/* ... will be corrected later */
   graphic_info[graphic].offset2_x = 0;	/* one or both of these values ... */
@@ -973,6 +973,15 @@ static void set_graphic_parameters(int graphic)
   graphic_info[graphic].fade_delay = -1;
   graphic_info[graphic].post_delay = -1;
   graphic_info[graphic].auto_delay = -1;
+
+#if 1
+  if (graphic_info[graphic].use_image_size)
+  {
+    /* set default bitmap size (with scaling, but without small images) */
+    graphic_info[graphic].width  = get_scaled_graphic_width(graphic);
+    graphic_info[graphic].height = get_scaled_graphic_height(graphic);
+  }
+#endif
 
   /* optional x and y tile position of animation frame sequence */
   if (parameter[GFX_ARG_XPOS] != ARG_UNDEFINED_VALUE)
@@ -1201,9 +1210,59 @@ static void InitGraphicInfo()
   GC copy_clipmask_gc = None;
 #endif
 
+  /* use image size as default values for width and height for these images */
+  static int full_size_graphics[] =
+  {
+    IMG_GLOBAL_BORDER,
+    IMG_GLOBAL_DOOR,
+
+    IMG_BACKGROUND_ENVELOPE_1,
+    IMG_BACKGROUND_ENVELOPE_2,
+    IMG_BACKGROUND_ENVELOPE_3,
+    IMG_BACKGROUND_ENVELOPE_4,
+
+    IMG_BACKGROUND,
+    IMG_BACKGROUND_TITLE,
+    IMG_BACKGROUND_MAIN,
+    IMG_BACKGROUND_LEVELS,
+    IMG_BACKGROUND_SCORES,
+    IMG_BACKGROUND_EDITOR,
+    IMG_BACKGROUND_INFO,
+    IMG_BACKGROUND_INFO_ELEMENTS,
+    IMG_BACKGROUND_INFO_MUSIC,
+    IMG_BACKGROUND_INFO_CREDITS,
+    IMG_BACKGROUND_INFO_PROGRAM,
+    IMG_BACKGROUND_INFO_LEVELSET,
+    IMG_BACKGROUND_SETUP,
+    IMG_BACKGROUND_DOOR,
+
+    IMG_TITLESCREEN_INITIAL_1,
+    IMG_TITLESCREEN_INITIAL_2,
+    IMG_TITLESCREEN_INITIAL_3,
+    IMG_TITLESCREEN_INITIAL_4,
+    IMG_TITLESCREEN_INITIAL_5,
+    IMG_TITLESCREEN_1,
+    IMG_TITLESCREEN_2,
+    IMG_TITLESCREEN_3,
+    IMG_TITLESCREEN_4,
+    IMG_TITLESCREEN_5,
+
+    -1
+  };
+
   checked_free(graphic_info);
 
   graphic_info = checked_calloc(num_images * sizeof(struct GraphicInfo));
+
+#if 1
+  /* initialize "use_image_size" flag with default value */
+  for (i = 0; i < num_images; i++)
+    graphic_info[i].use_image_size = FALSE;
+
+  /* initialize "use_image_size" flag from static configuration above */
+  for (i = 0; full_size_graphics[i] != -1; i++)
+    graphic_info[full_size_graphics[i]].use_image_size = TRUE;
+#endif
 
 #if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
   if (clipmasks_initialized)
@@ -1234,6 +1293,7 @@ static void InitGraphicInfo()
   {
     Bitmap *src_bitmap;
     int src_x, src_y;
+    int width, height;
     int first_frame, last_frame;
     int src_bitmap_width, src_bitmap_height;
 
@@ -1241,6 +1301,10 @@ static void InitGraphicInfo()
 
     if (graphic_info[i].bitmap == NULL)
       continue;		/* skip check for optional images that are undefined */
+
+    /* get image size (this can differ from the standard element tile size!) */
+    width  = graphic_info[i].width;
+    height = graphic_info[i].height;
 
     /* get final bitmap size (with scaling, but without small images) */
     src_bitmap_width  = graphic_info[i].src_image_width;
@@ -1251,9 +1315,15 @@ static void InitGraphicInfo()
     first_frame = 0;
     getGraphicSource(i, first_frame, &src_bitmap, &src_x, &src_y);
 
+#if 1
+    /* this avoids calculating wrong start position for out-of-bounds frame */
+    src_x = graphic_info[i].src_x;
+    src_y = graphic_info[i].src_y;
+#endif
+
     if (src_x < 0 || src_y < 0 ||
-	src_x + TILEX > src_bitmap_width ||
-	src_y + TILEY > src_bitmap_height)
+	src_x + width  > src_bitmap_width ||
+	src_y + height > src_bitmap_height)
     {
       Error(ERR_RETURN_LINE, "-");
       Error(ERR_RETURN, "warning: error found in config file:");
@@ -1280,8 +1350,8 @@ static void InitGraphicInfo()
     getGraphicSource(i, last_frame, &src_bitmap, &src_x, &src_y);
 
     if (src_x < 0 || src_y < 0 ||
-	src_x + TILEX > src_bitmap_width ||
-	src_y + TILEY > src_bitmap_height)
+	src_x + width  > src_bitmap_width ||
+	src_y + height > src_bitmap_height)
     {
       Error(ERR_RETURN_LINE, "-");
       Error(ERR_RETURN, "warning: error found in config file:");

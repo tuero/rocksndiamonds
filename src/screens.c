@@ -488,31 +488,32 @@ static void DrawCursorAndText_Main(int nr, boolean active)
 
       if (pos_button != NULL)
       {
-	int button_x = mSX + pos_button->x;
-	int button_y = mSY + pos_button->y;
+	struct MenuPosInfo *pos = pos_button;
+	int x = mSX + pos->x;
+	int y = mSY + pos->y;
 
-	DrawBackground(button_x,button_y, pos_button->width,pos_button->height);
-	DrawGraphicThruMaskExt(drawto, button_x, button_y, button_graphic, 0);
+	DrawBackgroundForGraphic(x, y, pos->width, pos->height, button_graphic);
+	DrawGraphicThruMaskExt(drawto, x, y, button_graphic, 0);
       }
 
       if (pos_text != NULL && text != NULL)
       {
-	int text_x = mSX + ALIGNED_XPOS(pos_text->x, pos_text->width,
-					pos_text->align);
-	int text_y = mSY + pos_text->y;
+	struct MenuPosInfo *pos = pos_text;
+	int x = mSX + ALIGNED_XPOS(pos->x, pos->width, pos->align);
+	int y = mSY + pos->y;
 
-	DrawBackground(text_x, text_y, pos_text->width, pos_text->height);
-	DrawText(text_x, text_y, text, font_text);
+	DrawBackgroundForFont(x, y, pos->width, pos->height, font_text);
+	DrawText(x, y, text, font_text);
       }
 
       if (pos_input != NULL && input != NULL)
       {
-	int input_x = mSX + ALIGNED_XPOS(pos_input->x, pos_input->width,
-					 pos_input->align);
-	int input_y = mSY + pos_input->y;
+	struct MenuPosInfo *pos = pos_input;
+	int x = mSX + ALIGNED_XPOS(pos->x, pos->width, pos->align);
+	int y = mSY + pos->y;
 
-	DrawBackground(input_x, input_y, pos_input->width, pos_input->height);
-	DrawText(input_x, input_y, input, font_input);
+	DrawBackgroundForFont(x, y, pos->width, pos->height, font_input);
+	DrawText(x, y, input, font_input);
       }
     }
   }
@@ -558,7 +559,7 @@ static void drawCursorExt(int xpos, int ypos, boolean active, int graphic)
   if (active)
     graphic = BUTTON_GRAPHIC_ACTIVE(graphic);
 
-  DrawBackground(x, y, TILEX, TILEY);
+  DrawBackgroundForGraphic(x, y, TILEX, TILEY, graphic);
   DrawGraphicThruMaskExt(drawto, x, y, graphic, 0);
 }
 
@@ -627,9 +628,16 @@ void DrawTitleScreenImage(int nr)
 {
   int graphic = getTitleScreenGraphic() + nr;
   Bitmap *bitmap = graphic_info[graphic].bitmap;
+#if 1
+  int width  = graphic_info[graphic].width;
+  int height = graphic_info[graphic].height;
+  int src_x = graphic_info[graphic].src_x;
+  int src_y = graphic_info[graphic].src_y;
+#else
   int width  = graphic_info[graphic].src_image_width;
   int height = graphic_info[graphic].src_image_height;
   int src_x = 0, src_y = 0;
+#endif
   int dst_x, dst_y;
 
   if (bitmap == NULL)
@@ -2600,6 +2608,7 @@ static void drawChooseTreeInfo(int entry_pos, TreeInfo *ti)
   TreeInfo *node, *node_first;
   int x, last_redraw_mask = redraw_mask;
   int ypos = MENU_TITLE2_YPOS;
+  int font_nr = FONT_TITLE_2;
 
   if (ti->type != TREE_TYPE_LEVEL_DIR)
     return;
@@ -2607,16 +2616,16 @@ static void drawChooseTreeInfo(int entry_pos, TreeInfo *ti)
   node_first = getTreeInfoFirstGroupEntry(ti);
   node = getTreeInfoFromPos(node_first, entry_pos);
 
-  DrawBackground(SX, SY + ypos, SXSIZE, getFontHeight(FONT_TITLE_2));
+  DrawBackgroundForFont(SX, SY + ypos, SXSIZE, getFontHeight(font_nr), font_nr);
 
   if (node->parent_link)
-    DrawTextFCentered(ypos, FONT_TITLE_2, "leave group \"%s\"",
+    DrawTextFCentered(ypos, font_nr, "leave group \"%s\"",
 		      node->class_desc);
   else if (node->level_group)
-    DrawTextFCentered(ypos, FONT_TITLE_2, "enter group \"%s\"",
+    DrawTextFCentered(ypos, font_nr, "enter group \"%s\"",
 		      node->class_desc);
   else if (ti->type == TREE_TYPE_LEVEL_DIR)
-    DrawTextFCentered(ypos, FONT_TITLE_2, "%3d levels (%s)",
+    DrawTextFCentered(ypos, font_nr, "%3d levels (%s)",
 		      node->levels, node->class_desc);
 
   /* let BackToFront() redraw only what is needed */

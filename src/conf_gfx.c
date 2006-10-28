@@ -4500,17 +4500,6 @@ struct ConfigInfo image_config[] =
   { "background.envelope_4.anim_mode",		"default"		},
   { "background.envelope_4.draw_masked",	"false"			},
 
-  { "titlescreen_initial_1",			UNDEFINED_FILENAME	},
-  { "titlescreen_initial_2",			UNDEFINED_FILENAME	},
-  { "titlescreen_initial_3",			UNDEFINED_FILENAME	},
-  { "titlescreen_initial_4",			UNDEFINED_FILENAME	},
-  { "titlescreen_initial_5",			UNDEFINED_FILENAME	},
-  { "titlescreen_1",				UNDEFINED_FILENAME	},
-  { "titlescreen_2",				UNDEFINED_FILENAME	},
-  { "titlescreen_3",				UNDEFINED_FILENAME	},
-  { "titlescreen_4",				UNDEFINED_FILENAME	},
-  { "titlescreen_5",				UNDEFINED_FILENAME	},
-
   { "background",				UNDEFINED_FILENAME	},
   { "background.TITLE",				UNDEFINED_FILENAME	},
   { "background.MAIN",				UNDEFINED_FILENAME	},
@@ -4525,6 +4514,17 @@ struct ConfigInfo image_config[] =
   { "background.INFO[LEVELSET]",		UNDEFINED_FILENAME	},
   { "background.SETUP",				UNDEFINED_FILENAME	},
   { "background.DOOR",				UNDEFINED_FILENAME	},
+
+  { "titlescreen_initial_1",			UNDEFINED_FILENAME	},
+  { "titlescreen_initial_2",			UNDEFINED_FILENAME	},
+  { "titlescreen_initial_3",			UNDEFINED_FILENAME	},
+  { "titlescreen_initial_4",			UNDEFINED_FILENAME	},
+  { "titlescreen_initial_5",			UNDEFINED_FILENAME	},
+  { "titlescreen_1",				UNDEFINED_FILENAME	},
+  { "titlescreen_2",				UNDEFINED_FILENAME	},
+  { "titlescreen_3",				UNDEFINED_FILENAME	},
+  { "titlescreen_4",				UNDEFINED_FILENAME	},
+  { "titlescreen_5",				UNDEFINED_FILENAME	},
 
   /* the following directives are not associated with an image, but
      probably make sense to be defined in "graphicsinfo.conf", too */

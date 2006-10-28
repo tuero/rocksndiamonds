@@ -2363,6 +2363,8 @@ struct GraphicInfo
   int post_delay;		/* optional setting for drawing title screens */
   int auto_delay;		/* optional setting for drawing title screens */
 
+  boolean use_image_size;	/* use image size as default width and height */
+
 #if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
   Pixmap clip_mask;		/* single-graphic-only clip mask for X11 */
   GC clip_gc;			/* single-graphic-only clip gc for X11 */
