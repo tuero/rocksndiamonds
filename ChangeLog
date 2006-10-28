@@ -1,5 +1,7 @@
 2006-10-28
 	* fixed bug when displaying titlescreen with size less than element tile
+	* fixed bug which caused elements with "change when digging <e>" event
+	  to change for _every_ digged element, not only those specified in <e>
 
 2006-10-24
 	* fixed bug that allowed making engine snapshots from the level editor

@@ -6667,7 +6667,7 @@ void ContinueMoving(int x, int y)
   if (IS_CUSTOM_ELEMENT(element) && ei->move_enter_element != EL_EMPTY &&
       IS_EQUAL_OR_IN_GROUP(stored_new, ei->move_enter_element))
     CheckElementChangeBySide(newx, newy, element, stored_new, CE_DIGGING_X,
-				      MV_DIR_OPPOSITE(direction));
+			     MV_DIR_OPPOSITE(direction));
 }
 
 int AmoebeNachbarNr(int ax, int ay)
@@ -8644,10 +8644,18 @@ static boolean CheckElementChangeExt(int x, int y,
   {
     struct ElementChangeInfo *change = &element_info[element].change_page[p];
 
+    /* check trigger element for all events where the element that is checked
+       for changing interacts with a directly adjacent element -- this is
+       different to element changes that affect other elements to change on the
+       whole playfield (which is handeld by CheckTriggeredElementChangeExt()) */
     boolean check_trigger_element =
       (trigger_event == CE_TOUCHING_X ||
        trigger_event == CE_HITTING_X ||
-       trigger_event == CE_HIT_BY_X);
+       trigger_event == CE_HIT_BY_X ||
+#if 1
+       /* this one was forgotten until 3.2.3 */
+       trigger_event == CE_DIGGING_X);
+#endif
 
     if (change->can_change_or_has_action &&
 	change->has_event[trigger_event] &&
