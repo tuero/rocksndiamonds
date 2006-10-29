@@ -4572,7 +4572,11 @@ void InitGfx()
 
   font_height = getFontHeight(FC_RED);
 
+#if 1
+  DrawInitText(getWindowTitleString(), 20, FC_YELLOW);
+#else
   DrawInitText(getProgramInitString(), 20, FC_YELLOW);
+#endif
   DrawInitText(PROGRAM_COPYRIGHT_STRING, 50, FC_RED);
   DrawInitText(PROGRAM_WEBSITE_STRING, WIN_YSIZE - 20 - font_height, FC_RED);
 

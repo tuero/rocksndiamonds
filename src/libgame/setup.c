@@ -92,6 +92,8 @@ static int compareTreeInfoEntries(const void *, const void *);
 static int token_value_position   = TOKEN_VALUE_POSITION_DEFAULT;
 static int token_comment_position = TOKEN_COMMENT_POSITION_DEFAULT;
 
+static SetupFileHash *level_artwork_info_hash = NULL;
+
 
 /* ------------------------------------------------------------------------- */
 /* file functions                                                            */
@@ -1704,6 +1706,27 @@ static void *loadSetupFileData(char *filename, boolean use_hash)
   return setup_file_data;
 }
 
+void saveSetupFileHash(SetupFileHash *hash, char *filename)
+{
+  FILE *file;
+
+  if (!(file = fopen(filename, MODE_WRITE)))
+  {
+    Error(ERR_WARN, "cannot write configuration file '%s'", filename);
+
+    return;
+  }
+
+  BEGIN_HASH_ITERATION(hash, itr)
+  {
+    fprintf(file, "%s\n", getFormattedSetupEntry(HASH_ITERATION_TOKEN(itr),
+						 HASH_ITERATION_VALUE(itr)));
+  }
+  END_HASH_ITERATION(hash, itr)
+
+  fclose(file);
+}
+
 SetupFileList *loadSetupFileList(char *filename)
 {
   return (SetupFileList *)loadSetupFileData(filename, FALSE);
@@ -2651,6 +2674,20 @@ void LoadArtworkInfoFromLevelInfo(ArtworkDirTree **artwork_node,
 void LoadLevelArtworkInfo()
 {
   DrawInitText("Looking for custom level artwork:", 120, FC_GREEN);
+
+#if 0
+  if (level_artwork_info_hash == NULL)
+  {
+    char *filename = getPath2(getSetupDir(), "test.conf");
+
+    level_artwork_info_hash = loadSetupFileHash(filename);
+
+    if (level_artwork_info_hash == NULL)
+      level_artwork_info_hash = newSetupFileHash();
+
+    free(filename);
+  }
+#endif
 
   LoadArtworkInfoFromLevelInfo(&artwork.gfx_first, leveldir_first_all);
   LoadArtworkInfoFromLevelInfo(&artwork.snd_first, leveldir_first_all);

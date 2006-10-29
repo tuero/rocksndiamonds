@@ -274,7 +274,7 @@ void BackToFront()
 
   if (redraw_mask & REDRAW_TILES &&
       game_status == GAME_MODE_PLAYING &&
-      border.draw_masked[game_status])
+      border.draw_masked[GAME_MODE_PLAYING])
     redraw_mask |= REDRAW_FIELD;
 
   if (global.fps_slowdown && game_status == GAME_MODE_PLAYING)
@@ -315,7 +315,10 @@ void BackToFront()
   SyncDisplay();
 
 #if 1
-  DrawMaskedBorder(redraw_mask);
+  if (game_status != GAME_MODE_PLAYING ||
+      redraw_mask & REDRAW_FROM_BACKBUFFER ||
+      buffer == backbuffer)
+    DrawMaskedBorder(redraw_mask);
 #endif
 
   if (redraw_mask & REDRAW_ALL)
@@ -333,9 +336,6 @@ void BackToFront()
     if (game_status != GAME_MODE_PLAYING ||
 	redraw_mask & REDRAW_FROM_BACKBUFFER)
     {
-#if 0
-      DrawMaskedBorder(REDRAW_FIELD);
-#endif
       BlitBitmap(backbuffer, window,
 		 REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE, REAL_SX, REAL_SY);
     }
@@ -354,21 +354,22 @@ void BackToFront()
 	  ABS(ScreenMovPos) == ScrollStepSize ||
 	  redraw_tiles > REDRAWTILES_THRESHOLD)
       {
-#if 1
-	if (border.draw_masked[GFX_SPECIAL_ARG_MAIN])
+	if (border.draw_masked[GAME_MODE_PLAYING])
 	{
-	  BlitBitmap(buffer, backbuffer, fx, fy, SXSIZE, SYSIZE, SX, SY);
+	  if (buffer != backbuffer)
+	  {
+	    BlitBitmap(buffer, backbuffer, fx, fy, SXSIZE, SYSIZE, SX, SY);
+	    DrawMaskedBorder(REDRAW_FIELD);
+	  }
 
-	  DrawMaskedBorder(REDRAW_FIELD);
 	  BlitBitmap(backbuffer, window,
 		     REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE,
 		     REAL_SX, REAL_SY);
 	}
 	else
+	{
 	  BlitBitmap(buffer, window, fx, fy, SXSIZE, SYSIZE, SX, SY);
-#else
-	BlitBitmap(buffer, window, fx, fy, SXSIZE, SYSIZE, SX, SY);
-#endif
+	}
 
 #if 0
 #ifdef DEBUG
@@ -392,28 +393,13 @@ void BackToFront()
   if (redraw_mask & REDRAW_DOORS)
   {
     if (redraw_mask & REDRAW_DOOR_1)
-    {
-#if 0
-      DrawMaskedBorder(REDRAW_DOOR_1);
-#endif
       BlitBitmap(backbuffer, window, DX, DY, DXSIZE, DYSIZE, DX, DY);
-    }
 
     if (redraw_mask & REDRAW_DOOR_2)
-    {
-#if 0
-      DrawMaskedBorder(REDRAW_DOOR_2);
-#endif
       BlitBitmap(backbuffer, window, VX, VY, VXSIZE, VYSIZE, VX, VY);
-    }
 
     if (redraw_mask & REDRAW_DOOR_3)
-    {
-#if 0
-      DrawMaskedBorder(REDRAW_DOOR_3);
-#endif
       BlitBitmap(backbuffer, window, EX, EY, EXSIZE, EYSIZE, EX, EY);
-    }
 
     redraw_mask &= ~REDRAW_DOORS;
   }

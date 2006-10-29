@@ -2734,35 +2734,38 @@ void GameWon()
       DrawGameValue_Score(score);
     }
 
-    if (ExitX >= 0 && ExitY >= 0)	/* local player has left the level */
+    if (level.game_engine_type == GAME_ENGINE_TYPE_RND)
     {
-      /* close exit door after last player */
-      if (AllPlayersGone &&
-	  (Feld[ExitX][ExitY] == EL_EXIT_OPEN ||
-	   Feld[ExitX][ExitY] == EL_SP_EXIT_OPEN))
+      if (ExitX >= 0 && ExitY >= 0)	/* local player has left the level */
       {
-	int element = Feld[ExitX][ExitY];
+	/* close exit door after last player */
+	if (AllPlayersGone &&
+	    (Feld[ExitX][ExitY] == EL_EXIT_OPEN ||
+	     Feld[ExitX][ExitY] == EL_SP_EXIT_OPEN))
+	{
+	  int element = Feld[ExitX][ExitY];
 
-	Feld[ExitX][ExitY] = (element == EL_EXIT_OPEN ? EL_EXIT_CLOSING :
-			      EL_SP_EXIT_CLOSING);
+	  Feld[ExitX][ExitY] = (element == EL_EXIT_OPEN ? EL_EXIT_CLOSING :
+				EL_SP_EXIT_CLOSING);
 
-	PlayLevelSoundElementAction(ExitX, ExitY, element, ACTION_CLOSING);
-      }
-
-      /* player disappears */
-      DrawLevelField(ExitX, ExitY);
-    }
-
-    for (i = 0; i < MAX_PLAYERS; i++)
-    {
-      struct PlayerInfo *player = &stored_player[i];
-
-      if (player->present)
-      {
-	RemovePlayer(player);
+	  PlayLevelSoundElementAction(ExitX, ExitY, element, ACTION_CLOSING);
+	}
 
 	/* player disappears */
-	DrawLevelField(player->jx, player->jy);
+	DrawLevelField(ExitX, ExitY);
+      }
+
+      for (i = 0; i < MAX_PLAYERS; i++)
+      {
+	struct PlayerInfo *player = &stored_player[i];
+
+	if (player->present)
+	{
+	  RemovePlayer(player);
+
+	  /* player disappears */
+	  DrawLevelField(player->jx, player->jy);
+	}
       }
     }
 

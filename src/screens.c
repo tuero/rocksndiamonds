@@ -2561,10 +2561,17 @@ static void drawChooseTreeList(int first_entry, int num_page_entries,
   /* force LEVELS font on artwork setup screen */
   game_status = GAME_MODE_LEVELS;
 
+#if 1
+  /* clear tree list area, but not title or scrollbar */
+  DrawBackground(mSX, mSY + MENU_SCREEN_START_YPOS * 32,
+		 SC_SCROLLBAR_XPOS + menu.scrollbar_xoffset,
+		 NUM_MENU_ENTRIES_ON_SCREEN * 32);
+#else
   /* clear tree list area, but not title or scrollbar */
   DrawBackground(mSX, mSY + MENU_SCREEN_START_YPOS * 32,
 		 SC_SCROLLBAR_XPOS + menu.scrollbar_xoffset,
 		 MAX_MENU_ENTRIES_ON_SCREEN * 32);
+#endif
 
   for (i = 0; i < num_page_entries; i++)
   {
