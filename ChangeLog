@@ -1,3 +1,9 @@
+2006-10-29
+	* fixed graphical bug when using fewer menu entries on level selection
+	  screen than usual (with "menu.list_size.LEVELS" directive)
+	* fixed crash bug (Windows/SDL only) caused by BlitBitmap blitting from
+	  the backbuffer to the backbuffer by error (with identical rectangle)
+
 2006-10-28
 	* fixed bug when displaying titlescreen with size less than element tile
 	* fixed bug that caused elements with "change when digging <e>" event
