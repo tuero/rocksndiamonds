@@ -94,9 +94,12 @@ char *getBasePath(char *);
 char *getBaseName(char *);
 char *getBaseNamePtr(char *);
 
+char *getStringCat2WithSeparator(char *, char *, char *);
+char *getStringCat3WithSeparator(char *, char *, char *, char *);
+char *getStringCat2(char *, char *);
+char *getStringCat3(char *, char *, char *);
 char *getPath2(char *, char *);
 char *getPath3(char *, char *, char*);
-char *getStringCat2(char *, char *);
 char *getStringCopy(char *);
 char *getStringToLower(char *);
 void setString(char **, char *);

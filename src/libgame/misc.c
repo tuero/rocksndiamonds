@@ -498,36 +498,45 @@ char *getBasePath(char *filename)
 /* various string functions                                                  */
 /* ------------------------------------------------------------------------- */
 
-char *getPath2(char *path1, char *path2)
+char *getStringCat2WithSeparator(char *s1, char *s2, char *sep)
 {
-  char *sep = STRING_PATH_SEPARATOR;
-  char *complete_path = checked_malloc(strlen(path1) + 1 +
-				       strlen(path2) + 1);
+  char *complete_string = checked_malloc(strlen(s1) + strlen(sep) +
+					 strlen(s2) + 1);
 
-  sprintf(complete_path, "%s%s%s", path1, sep, path2);
+  sprintf(complete_string, "%s%s%s", s1, sep, s2);
 
-  return complete_path;
+  return complete_string;
 }
 
-char *getPath3(char *path1, char *path2, char *path3)
+char *getStringCat3WithSeparator(char *s1, char *s2, char *s3, char *sep)
 {
-  char *sep = STRING_PATH_SEPARATOR;
-  char *complete_path = checked_malloc(strlen(path1) + 1 +
-				       strlen(path2) + 1 +
-				       strlen(path3) + 1);
+  char *complete_string = checked_malloc(strlen(s1) + strlen(sep) +
+					 strlen(s2) + strlen(sep) +
+					 strlen(s3) + 1);
 
-  sprintf(complete_path, "%s%s%s%s%s", path1, sep, path2, sep, path3);
+  sprintf(complete_string, "%s%s%s%s%s", s1, sep, s2, sep, s3);
 
-  return complete_path;
+  return complete_string;
 }
 
 char *getStringCat2(char *s1, char *s2)
 {
-  char *complete_string = checked_malloc(strlen(s1) + strlen(s2) + 1);
+  return getStringCat2WithSeparator(s1, s2, "");
+}
 
-  sprintf(complete_string, "%s%s", s1, s2);
+char *getStringCat3(char *s1, char *s2, char *s3)
+{
+  return getStringCat3WithSeparator(s1, s2, s3, "");
+}
 
-  return complete_string;
+char *getPath2(char *path1, char *path2)
+{
+  return getStringCat2WithSeparator(path1, path2, STRING_PATH_SEPARATOR);
+}
+
+char *getPath3(char *path1, char *path2, char *path3)
+{
+  return getStringCat3WithSeparator(path1, path2, path3, STRING_PATH_SEPARATOR);
 }
 
 char *getStringCopy(char *s)

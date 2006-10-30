@@ -1810,6 +1810,24 @@ static struct TokenInfo levelinfo_tokens[] =
   { TYPE_BOOLEAN,	&ldi.skip_levels,	"skip_levels"		}
 };
 
+static struct TokenInfo artworkinfo_tokens[] =
+{
+  /* artwork directory info */
+  { TYPE_STRING,	&ldi.identifier,	"identifier"		},
+  { TYPE_STRING,	&ldi.subdir,		"subdir"		},
+  { TYPE_STRING,	&ldi.name,		"name"			},
+  { TYPE_STRING,	&ldi.name_sorting,	"name_sorting"		},
+  { TYPE_STRING,	&ldi.author,		"author"		},
+  { TYPE_INTEGER,	&ldi.sort_priority,	"sort_priority"		},
+  { TYPE_STRING,	&ldi.basepath,		"basepath"		},
+  { TYPE_STRING,	&ldi.fullpath,		"fullpath"		},
+  { TYPE_BOOLEAN,	&ldi.in_user_dir,	"in_user_dir"		},
+  { TYPE_INTEGER,	&ldi.color,		"color"			},
+  { TYPE_STRING,	&ldi.class_desc,	"class_desc"		},
+
+  { -1,			NULL,			NULL			},
+};
+
 static void setTreeInfoToDefaults(TreeInfo *ti, int type)
 {
   ti->type = type;
@@ -2554,6 +2572,20 @@ static TreeInfo *getDummyArtworkInfo(int type)
 
 void LoadArtworkInfo()
 {
+#if 1
+  if (level_artwork_info_hash == NULL)
+  {
+    char *filename = getPath2(getSetupDir(), "test.conf");
+
+    level_artwork_info_hash = loadSetupFileHash(filename);
+
+    if (level_artwork_info_hash == NULL)
+      level_artwork_info_hash = newSetupFileHash();
+
+    free(filename);
+  }
+#endif
+
   DrawInitText("Looking for custom artwork:", 120, FC_GREEN);
 
   LoadArtworkInfoFromArtworkDir(&artwork.gfx_first, NULL,
@@ -2644,10 +2676,84 @@ void LoadArtworkInfoFromLevelInfo(ArtworkDirTree **artwork_node,
       char *path = getPath2(getLevelDirFromTreeInfo(level_node),
 			    ARTWORK_DIRECTORY((*artwork_node)->type));
 
+#if 0
+      printf("::: looking in directory '%s' for '%s' ...\n",
+	     path, ARTWORK_DIRECTORY((*artwork_node)->type));
+#endif
+
+#if 1
+      char *type_string = ARTWORK_DIRECTORY((*artwork_node)->type);
+      char *identifier = level_node->subdir;
+      char *type_identifier = getStringCat2WithSeparator(type_string,
+							 identifier, ".");
+      char *cache_entry = getHashEntry(level_artwork_info_hash,
+				       type_identifier);
+      boolean cached = (cache_entry != NULL && strEqual(cache_entry, "true"));
+
+      if (cached)
+      {
+	int i;
+
+	printf("::: LOADING existing hash entry for '%s' ...\n",
+	       identifier);
+
+	char *type_dir = ARTWORK_DIRECTORY((*artwork_node)->type);
+	TreeInfo *artwork_new = newTreeInfo();
+
+	setTreeInfoToDefaults(artwork_new, (*artwork_node)->type);
+
+	/* set all structure fields according to the token/value pairs */
+	ldi = *artwork_new;
+	for (i = 0; artworkinfo_tokens[i].type != -1; i++)
+	{
+	  char *token = getStringCat3WithSeparator(type_dir, identifier,
+						   artworkinfo_tokens[i].text,
+						   ".");
+	  char *value = getHashEntry(level_artwork_info_hash, token);
+
+	  printf("::: - '%s' => '%s'\n", token, value);
+
+	  setSetupInfo(artworkinfo_tokens, i, value);
+
+	  /* check if cache entry for this item is invalid or incomplete */
+	  if (value == NULL)
+	  {
+	    printf("::: - WARNING: cache entry '%s' invalid\n", token);
+
+	    cached = FALSE;
+	  }
+
+	  checked_free(token);
+	}
+	*artwork_new = ldi;
+
+#if 0
+	if (artwork_new->name_sorting == NULL)
+	{
+	  printf("::: BOOOM!\n");
+	  exit(10);
+	}
+#endif
+
+	if (cached)
+	  pushTreeInfo(artwork_node, artwork_new);
+	else
+	  freeTreeInfo(artwork_new);
+      }
+
+      if (!cached)
+	LoadArtworkInfoFromArtworkDir(artwork_node, NULL, path,
+				      (*artwork_node)->type);
+#else
       LoadArtworkInfoFromArtworkDir(artwork_node, NULL, path,
 				    (*artwork_node)->type);
+#endif
 
+#if 1
+      if (!cached && topnode_last != *artwork_node)
+#else
       if (topnode_last != *artwork_node)
+#endif
       {
 	free((*artwork_node)->identifier);
 	free((*artwork_node)->name);
@@ -2659,9 +2765,44 @@ void LoadArtworkInfoFromLevelInfo(ArtworkDirTree **artwork_node,
 
 	(*artwork_node)->sort_priority = level_node->sort_priority;
 	(*artwork_node)->color = LEVELCOLOR((*artwork_node));
+
+#if 1
+	{
+	  int i;
+
+	  printf("::: adding hash entry for set '%s' ...\n", type_identifier);
+
+	  setHashEntry(level_artwork_info_hash, type_identifier, "true");
+
+	  ldi = **artwork_node;
+	  for (i = 0; artworkinfo_tokens[i].type != -1; i++)
+	  {
+	    char *token = getStringCat2WithSeparator(type_identifier,
+						     artworkinfo_tokens[i].text,
+						     ".");
+	    char *value = getSetupValue(artworkinfo_tokens[i].type,
+					artworkinfo_tokens[i].value);
+	    if (value != NULL)
+	    {
+	      setHashEntry(level_artwork_info_hash, token, value);
+
+	      printf("::: - setting '%s' => '%s'\n\n",
+		     token, value);
+	    }
+
+	    if (strEqual(artworkinfo_tokens[i].text, "name_sorting"))
+	      printf("::: - '%s' => '%s' => '%s'\n",
+		     identifier, token,
+		     (*artwork_node)->name_sorting);
+
+	    checked_free(token);
+	  }
+	}
+#endif
       }
 
       free(path);
+      free(type_identifier);
     }
 
     if (level_node->node_group != NULL)
@@ -2675,23 +2816,17 @@ void LoadLevelArtworkInfo()
 {
   DrawInitText("Looking for custom level artwork:", 120, FC_GREEN);
 
-#if 0
-  if (level_artwork_info_hash == NULL)
-  {
-    char *filename = getPath2(getSetupDir(), "test.conf");
-
-    level_artwork_info_hash = loadSetupFileHash(filename);
-
-    if (level_artwork_info_hash == NULL)
-      level_artwork_info_hash = newSetupFileHash();
-
-    free(filename);
-  }
-#endif
-
   LoadArtworkInfoFromLevelInfo(&artwork.gfx_first, leveldir_first_all);
   LoadArtworkInfoFromLevelInfo(&artwork.snd_first, leveldir_first_all);
   LoadArtworkInfoFromLevelInfo(&artwork.mus_first, leveldir_first_all);
+
+#if 1
+  char *filename = getPath2(getSetupDir(), "test.conf");
+
+  saveSetupFileHash(level_artwork_info_hash, filename);
+
+  free(filename);
+#endif
 
   /* needed for reloading level artwork not known at ealier stage */
 
@@ -2832,6 +2967,9 @@ char *getSetupValue(int type, void *value)
       break;
 
     case TYPE_STRING:
+      if (*(char **)value == NULL)
+	return NULL;
+
       strcpy(value_string, *(char **)value);
       break;
 
