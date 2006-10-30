@@ -1,3 +1,6 @@
+2006-10-30
+	* added caching of custom artwork information for faster startup times
+
 2006-10-29
 	* fixed graphical bug when using fewer menu entries on level selection
 	  screen than usual (with "menu.list_size.LEVELS" directive)
