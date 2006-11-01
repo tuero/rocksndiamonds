@@ -314,18 +314,16 @@ void BackToFront()
 
   SyncDisplay();
 
-#if 1
+  /* prevent drawing masked border to backbuffer when using playfield buffer */
   if (game_status != GAME_MODE_PLAYING ||
       redraw_mask & REDRAW_FROM_BACKBUFFER ||
       buffer == backbuffer)
     DrawMaskedBorder(redraw_mask);
-#endif
+  else
+    DrawMaskedBorder(redraw_mask & REDRAW_DOORS);
 
   if (redraw_mask & REDRAW_ALL)
   {
-#if 0
-    DrawMaskedBorder(REDRAW_ALL);
-#endif
     BlitBitmap(backbuffer, window, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
 
     redraw_mask = REDRAW_NONE;
@@ -358,6 +356,7 @@ void BackToFront()
 	{
 	  if (buffer != backbuffer)
 	  {
+	    /* copy playfield buffer to backbuffer to add masked border */
 	    BlitBitmap(buffer, backbuffer, fx, fy, SXSIZE, SYSIZE, SX, SY);
 	    DrawMaskedBorder(REDRAW_FIELD);
 	  }
