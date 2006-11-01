@@ -187,14 +187,20 @@ void getFontCharSource(int font_nr, char c, Bitmap **bitmap, int *x, int *y)
 
 void DrawInitText(char *text, int ypos, int font_nr)
 {
-  if (window &&
+  if (window != NULL &&
       gfx.num_fonts > 0 &&
       gfx.font_bitmap_info[font_nr].bitmap != NULL)
   {
-    ClearRectangle(window, 0, ypos, video.width, getFontHeight(font_nr));
-    DrawTextExt(window, (video.width - getTextWidth(text, font_nr)) / 2, ypos,
-		text, font_nr, BLIT_OPAQUE);
-    FlushDisplay();
+    int x = (video.width - getTextWidth(text, font_nr)) / 2;
+    int y = ypos;
+    int width = video.width;
+    int height = getFontHeight(font_nr);
+
+    ClearRectangle(drawto, 0, y, width, height);
+    DrawTextExt(drawto, x, y, text, font_nr, BLIT_OPAQUE);
+
+    /* this makes things significantly faster than directly drawing to window */
+    BlitBitmap(drawto, window, 0, y, width, height, 0, y);
   }
 }
 

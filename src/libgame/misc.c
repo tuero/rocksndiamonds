@@ -2490,7 +2490,7 @@ void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
   char *filename_base = UNDEFINED_FILENAME, *filename_local;
   int i, j;
 
-  DrawInitText("Loading artwork config:", 120, FC_GREEN);
+  DrawInitText("Loading artwork config", 120, FC_GREEN);
   DrawInitText(ARTWORKINFO_FILENAME(artwork_info->type), 150, FC_YELLOW);
 
   /* always start with reliable default values */
@@ -2567,9 +2567,9 @@ static void replaceArtworkListEntry(struct ArtworkListInfo *artwork_info,
 {
   char *init_text[] =
   {
-    "Loading graphics:",
-    "Loading sounds:",
-    "Loading music:"
+    "Loading graphics",
+    "Loading sounds",
+    "Loading music"
   };
 
   ListNode *node;
@@ -2787,6 +2787,8 @@ void NotifyUserAboutErrorFile()
 /* the following is only for debugging purpose and normally not used         */
 /* ------------------------------------------------------------------------- */
 
+#if DEBUG
+
 #define DEBUG_NUM_TIMESTAMPS	3
 
 void debug_print_timestamp(int counter_nr, char *message)
@@ -2799,10 +2801,10 @@ void debug_print_timestamp(int counter_nr, char *message)
   counter[counter_nr][0] = Counter();
 
   if (message)
-    printf("%s %.2f seconds\n", message,
+    printf("%s %.3f seconds\n", message,
 	   (float)(counter[counter_nr][0] - counter[counter_nr][1]) / 1000);
 
-  counter[counter_nr][1] = Counter();
+  counter[counter_nr][1] = counter[counter_nr][0];
 }
 
 void debug_print_parent_only(char *format, ...)
@@ -2821,3 +2823,4 @@ void debug_print_parent_only(char *format, ...)
     printf("\n");
   }
 }
+#endif

@@ -1,3 +1,6 @@
+2006-11-01
+	* some optimizations on startup speed by reducing initial text output
+
 2006-10-30
 	* added caching of custom artwork information for faster startup times
 

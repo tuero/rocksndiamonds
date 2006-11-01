@@ -1792,7 +1792,7 @@ void LoadCustomMusic_NoConf(void)
   }
 
   if (draw_init_text)
-    DrawInitText("Loading music:", 120, FC_GREEN);
+    DrawInitText("Loading music", 120, FC_GREEN);
 
   while ((dir_entry = readdir(dir)) != NULL)	/* loop until last dir entry */
   {

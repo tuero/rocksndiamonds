@@ -321,8 +321,7 @@ void CloseVideoDisplay(void)
 #endif
 }
 
-void InitVideoBuffer(DrawBuffer **backbuffer, DrawWindow **window,
-		     int width, int height, int depth, boolean fullscreen)
+void InitVideoBuffer(int width, int height, int depth, boolean fullscreen)
 {
   video.width = width;
   video.height = height;
@@ -334,10 +333,12 @@ void InitVideoBuffer(DrawBuffer **backbuffer, DrawWindow **window,
   video.fullscreen_mode_current = NULL;
 
 #if defined(TARGET_SDL)
-  SDLInitVideoBuffer(backbuffer, window, fullscreen);
+  SDLInitVideoBuffer(&backbuffer, &window, fullscreen);
 #else
-  X11InitVideoBuffer(backbuffer, window);
+  X11InitVideoBuffer(&backbuffer, &window);
 #endif
+
+  drawto = backbuffer;
 }
 
 Bitmap *CreateBitmapStruct(void)

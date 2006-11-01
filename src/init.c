@@ -4580,7 +4580,7 @@ void InitGfx()
   DrawInitText(PROGRAM_COPYRIGHT_STRING, 50, FC_RED);
   DrawInitText(PROGRAM_WEBSITE_STRING, WIN_YSIZE - 20 - font_height, FC_RED);
 
-  DrawInitText("Loading graphics:", 120, FC_GREEN);
+  DrawInitText("Loading graphics", 120, FC_GREEN);
 }
 
 void RedrawBackground()
@@ -4595,7 +4595,6 @@ void InitGfxBackground()
 {
   int x, y;
 
-  drawto = backbuffer;
   fieldbuffer = bitmap_db_field;
   SetDrawtoField(DRAW_BACKBUFFER);
 
@@ -4910,8 +4909,7 @@ void OpenAll()
   InitJoysticks();
 
   InitVideoDisplay();
-  InitVideoBuffer(&backbuffer, &window, WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH,
-		  setup.fullscreen);
+  InitVideoBuffer(WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH, setup.fullscreen);
 
   InitEventFilter(FilterMouseMotionEvents);
 
@@ -4920,8 +4918,11 @@ void OpenAll()
 
   InitGfx();
 
+  // debug_print_timestamp(0, "INIT");
   InitLevelInfo();
+  // debug_print_timestamp(0, "TIME InitLevelInfo:        ");
   InitLevelArtworkInfo();
+  // debug_print_timestamp(0, "TIME InitLevelArtworkInfo: ");
 
   InitImages();			/* needs to know current level directory */
   InitSound(NULL);		/* needs to know current level directory */

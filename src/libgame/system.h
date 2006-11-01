@@ -312,6 +312,7 @@
 #define TAPES_DIRECTORY		"tapes"
 #define SCORES_DIRECTORY	"scores"
 #define DOCS_DIRECTORY		"docs"
+#define CACHE_DIRECTORY		"cache"
 
 #if !defined(PLATFORM_MSDOS)
 #define GFX_CLASSIC_SUBDIR	"gfx_classic"
@@ -336,6 +337,7 @@
 #define GRAPHICSINFO_FILENAME	"graphicsinfo.conf"
 #define SOUNDSINFO_FILENAME	"soundsinfo.conf"
 #define MUSICINFO_FILENAME	"musicinfo.conf"
+#define ARTWORKINFO_CACHE_FILE	"artworkinfo.cache"
 #define LEVELFILE_EXTENSION	"level"
 #define TAPEFILE_EXTENSION	"tape"
 #define SCOREFILE_EXTENSION	"score"
@@ -351,6 +353,7 @@
 #define GRAPHICSINFO_FILENAME	"gfxinfo.cnf"
 #define SOUNDSINFO_FILENAME	"sndinfo.cnf"
 #define MUSICINFO_FILENAME	"musinfo.cnf"
+#define ARTWORKINFO_CACHE_FILE	"artinfo.cac"
 #define LEVELFILE_EXTENSION	"lvl"
 #define TAPEFILE_EXTENSION	"tap"
 #define SCOREFILE_EXTENSION	"sco"
@@ -1061,7 +1064,7 @@ void SetDoorBackgroundBitmap(Bitmap *);
 
 void InitVideoDisplay(void);
 void CloseVideoDisplay(void);
-void InitVideoBuffer(DrawBuffer **,DrawWindow **, int,int,int, boolean);
+void InitVideoBuffer(int, int, int, boolean);
 Bitmap *CreateBitmapStruct(void);
 Bitmap *CreateBitmap(int, int, int);
 void FreeBitmap(Bitmap *);
