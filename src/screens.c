@@ -944,6 +944,8 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
 	DrawInfoScreen_NotAvailable("Title screen information:",
 				    "No title screen for this level set.");
 
+	title.auto_delay_final = -1;
+
 	return;
       }
 
@@ -985,8 +987,10 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
     if (game_status == GAME_MODE_INFO &&
 	graphic_info[IMG_TITLESCREEN_1].bitmap == NULL)
     {
+      FadeOut(REDRAW_FIELD);
+
       info_mode = INFO_MODE_MAIN;
-      DrawInfoScreen();
+      DrawAndFadeInInfoScreen(REDRAW_FIELD);
 
       return;
     }
@@ -1592,20 +1596,24 @@ void HandleInfoScreen_Main(int mx, int my, int dx, int dy, int button)
 
 void DrawInfoScreen_NotAvailable(char *text_title, char *text_error)
 {
-  int ystart = 150;
+  int ystart1 = 100;
+  int ystart2 = 150;
   int ybottom = SYSIZE - 20;
 
   SetMainBackgroundImageIfDefined(IMG_BACKGROUND_INFO_LEVELSET);
 
+  FadeOut(REDRAW_FIELD);
+
   ClearWindow();
   DrawHeadline();
 
-  DrawTextSCentered(100, FONT_TEXT_1, text_title);
+  DrawTextSCentered(ystart1, FONT_TEXT_1, text_title);
+  DrawTextSCentered(ystart2, FONT_TEXT_2, text_error);
 
   DrawTextSCentered(ybottom, FONT_TEXT_4,
 		    "Press any key or button for info menu");
 
-  DrawTextSCentered(ystart, FONT_TEXT_2, text_error);
+  FadeIn(REDRAW_FIELD);
 }
 
 void DrawInfoScreen_HelpAnim(int start, int max_anims, boolean init)
