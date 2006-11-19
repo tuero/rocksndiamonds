@@ -1249,7 +1249,11 @@ static void setEventFlagsFromEventBits(struct ElementChangeInfo *change)
 {
   int i;
 
-  /* important: only change event flag if corresponding event bit is set */
+  /* important: only change event flag if corresponding event bit is set
+     (this is because all xx_event_bits[] values are loaded separately,
+     and all xx_event_bits[] values are set back to zero before loading
+     another value xx_event_bits[x] (each value representing 32 flags)) */
+
   for (i = 0; i < NUM_CHANGE_EVENTS; i++)
     if (xx_event_bits[CH_EVENT_BITFIELD_NR(i)] & CH_EVENT_BIT(i))
       change->has_event[i] = TRUE;
@@ -1259,7 +1263,11 @@ static void setEventBitsFromEventFlags(struct ElementChangeInfo *change)
 {
   int i;
 
-  /* important: only change event bit if corresponding event flag is set */
+  /* in contrast to the above function setEventFlagsFromEventBits(), it
+     would also be possible to set all bits in xx_event_bits[] to 0 or 1
+     depending on the corresponding change->has_event[i] values here, as
+     all xx_event_bits[] values are reset in resetEventBits() before */
+
   for (i = 0; i < NUM_CHANGE_EVENTS; i++)
     if (change->has_event[i])
       xx_event_bits[CH_EVENT_BITFIELD_NR(i)] |= CH_EVENT_BIT(i);
@@ -1446,7 +1454,11 @@ void setElementChangePages(struct ElementInfo *ei, int change_pages)
 void setElementChangeInfoToDefaults(struct ElementChangeInfo *change)
 {
   xx_change = *change;		/* copy change data into temporary buffer */
+
+#if 0
+  /* (not needed; set by setConfigToDefaultsFromConfigList()) */
   xx_num_contents = 1;
+#endif
 
   setConfigToDefaultsFromConfigList(chunk_config_CUSX_change);
 
@@ -2606,7 +2618,21 @@ static int LoadLevel_MicroChunk(FILE *file, struct LevelFileConfigInfo *conf,
 	  num_entities = max_num_entities;
 	}
 
-	*(int *)(conf[i].num_entities) = num_entities;
+	if (num_entities == 0 && (data_type == TYPE_ELEMENT_LIST ||
+				  data_type == TYPE_CONTENT_LIST))
+	{
+	  /* for element and content lists, zero entities are not allowed */
+	  Error(ERR_WARN, "found empty list of entities for element %d",
+		element);
+
+	  /* do not set "num_entities" here to prevent reading behind buffer */
+
+	  *(int *)(conf[i].num_entities) = 1;	/* at least one is required */
+	}
+	else
+	{
+	  *(int *)(conf[i].num_entities) = num_entities;
+	}
 
 	element_found = TRUE;
 
@@ -5120,8 +5146,11 @@ static int SaveLevel_CUSX(FILE *file, struct LevelInfo *level, int element)
   /* set default description string for this specific element */
   strcpy(xx_default_description, getDefaultElementDescription(ei));
 
-  /* set (fixed) number of content areas (may have been overwritten earlier) */
+#if 0
+  /* set (fixed) number of content areas (may be wrong by broken level file) */
+  /* (this is now directly corrected for broken level files after loading) */
   xx_num_contents = 1;
+#endif
 
   for (i = 0; chunk_config_CUSX_base[i].data_type != -1; i++)
     chunk_size += SaveLevel_MicroChunk(file, &chunk_config_CUSX_base[i], FALSE);
