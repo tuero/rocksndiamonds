@@ -2044,12 +2044,12 @@ static int LoadLevel_HEAD(FILE *file, int chunk_size, struct LevelInfo *level)
 				   STEPSIZE_NORMAL);
 
   for (i = 0; i < MAX_PLAYERS; i++)
-    level->initial_player_stepsize[0] = initial_player_stepsize;
+    level->initial_player_stepsize[i] = initial_player_stepsize;
 
   initial_player_gravity	= (getFile8Bit(file) == 1 ? TRUE : FALSE);
 
   for (i = 0; i < MAX_PLAYERS; i++)
-    level->initial_player_gravity[0] = initial_player_gravity;
+    level->initial_player_gravity[i] = initial_player_gravity;
 
   level->encoding_16bit_field	= (getFile8Bit(file) == 1 ? TRUE : FALSE);
   level->em_slippery_gems	= (getFile8Bit(file) == 1 ? TRUE : FALSE);

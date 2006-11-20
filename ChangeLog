@@ -1,3 +1,6 @@
+2006-11-21
+	* fixed nasty bug with initialization only done for the first player
+
 2006-11-19
 	* small change to handle loading empty element/content list micro chunks
 
