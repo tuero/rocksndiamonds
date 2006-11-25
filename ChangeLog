@@ -1,3 +1,7 @@
+2006-11-25
+	* fixed infinite loop / crash bug when killing the player while having
+	  a CE with the setting "kill player X when explosion of <player X>"
+
 2006-11-21
 	* fixed nasty bug with initialization only done for the first player
 

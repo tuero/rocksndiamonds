@@ -96,6 +96,7 @@ struct PlayerInfo
   boolean present;		/* player present in level playfield */
   boolean connected;		/* player connected (locally or via network) */
   boolean active;		/* player present and connected */
+  boolean killed;		/* player maybe present/active, but killed */
 
   int index_nr;			/* player number (0 to 3) */
   int index_bit;		/* player number bit (1 << 0 to 1 << 3) */

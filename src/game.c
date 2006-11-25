@@ -1845,6 +1845,7 @@ void InitGame()
 
     player->present = FALSE;
     player->active = FALSE;
+    player->killed = FALSE;
 
     player->action = 0;
     player->effective_action = 0;
@@ -11058,6 +11059,21 @@ void KillPlayer(struct PlayerInfo *player)
 
   if (!player->active)
     return;
+
+  /* the following code was introduced to prevent an infinite loop when calling
+     -> Bang()
+     -> CheckTriggeredElementChangeExt()
+     -> ExecuteCustomElementAction()
+     -> KillPlayer()
+     -> (infinitely repeating the above sequence of function calls)
+     which occurs when killing the player while having a CE with the setting
+     "kill player X when explosion of <player X>"; the solution using a new
+     field "player->killed" was chosen for backwards compatibility, although
+     clever use of the fields "player->active" etc. would probably also work */
+  if (player->killed)
+    return;
+
+  player->killed = TRUE;
 
   /* remove accessible field at the player's position */
   Feld[jx][jy] = EL_EMPTY;
