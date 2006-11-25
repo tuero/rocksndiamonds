@@ -22,6 +22,10 @@
   { "char_space.xpos",				"0"			},
   { "char_space.ypos",				"0"			},
   { "char_space.frames",			"1"			},
+  { "char_space.EDITOR",			"RocksFontEM.pcx"	},
+  { "char_space.EDITOR.xpos",			"7"			},
+  { "char_space.EDITOR.ypos",			"4"			},
+  { "char_space.EDITOR.frames",			"1"			},
 
   { "char_exclam",				"RocksFontEM.pcx"	},
   { "char_exclam.xpos",				"1"			},

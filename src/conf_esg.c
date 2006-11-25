@@ -1512,6 +1512,10 @@ element_to_special_graphic[] =
     IMG_GROUP_32_EDITOR
   },
   {
+    EL_CHAR_SPACE,				GFX_SPECIAL_ARG_EDITOR,
+    IMG_CHAR_SPACE_EDITOR
+  },
+  {
     -1,						-1,
     -1
   },

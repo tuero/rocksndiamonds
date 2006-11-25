@@ -1,6 +1,8 @@
 2006-11-25
 	* fixed infinite loop / crash bug when killing the player while having
 	  a CE with the setting "kill player X when explosion of <player X>"
+	* added special editor graphic for "char_space" to distinguish it from
+	  "empty_space" when editing a level (in-game graphics still the same)
 
 2006-11-21
 	* fixed nasty bug with initialization only done for the first player
