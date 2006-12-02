@@ -19,6 +19,7 @@
 #include "cartoons.h"
 #include "network.h"
 #include "tape.h"
+#include "screens.h"
 
 
 /* select level set with EMC X11 graphics before activating EM GFX debugging */
@@ -240,6 +241,10 @@ void DrawMaskedBorder_ALL()
 
 void DrawMaskedBorder(int redraw_mask)
 {
+  /* do not draw masked screen borders when displaying title screens */
+  if (effectiveGameStatus() == GAME_MODE_TITLE)
+    return;
+
   if (redraw_mask & REDRAW_ALL)
     DrawMaskedBorder_ALL();
   else

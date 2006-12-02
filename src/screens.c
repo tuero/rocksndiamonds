@@ -624,6 +624,14 @@ static int getTitleScreenGraphic()
 	  IMG_TITLESCREEN_1);
 }
 
+int effectiveGameStatus()
+{
+  if (game_status == GAME_MODE_INFO && info_mode == INFO_MODE_TITLE)
+    return GAME_MODE_TITLE;
+
+  return game_status;
+}
+
 void DrawTitleScreenImage(int nr)
 {
   int graphic = getTitleScreenGraphic() + nr;

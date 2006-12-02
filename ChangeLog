@@ -1,3 +1,7 @@
+2006-12-02
+	* fixed bug with displaying masked borders over title screens when
+	  screen fading is disabled
+
 2006-11-25
 	* fixed infinite loop / crash bug when killing the player while having
 	  a CE with the setting "kill player X when explosion of <player X>"
