@@ -3328,8 +3328,8 @@ static void setScreenCenteredToAllPlayers(int *sx, int *sy)
   *sy = (sy1 + sy2) / 2;
 }
 
-void DrawRelocateScreen(int x, int y, int move_dir, boolean center_screen,
-			boolean quick_relocation)
+void DrawRelocateScreen(int old_x, int old_y, int x, int y, int move_dir,
+			boolean center_screen, boolean quick_relocation)
 {
   boolean ffwd_delay = (tape.playing && tape.fast_forward);
   boolean no_delay = (tape.warp_forward);
@@ -3342,13 +3342,39 @@ void DrawRelocateScreen(int x, int y, int move_dir, boolean center_screen,
 
     if (!IN_VIS_FIELD(SCREENX(x), SCREENY(y)) || center_screen)
     {
-      scroll_x = (x < SBX_Left  + MIDPOSX ? SBX_Left :
-		  x > SBX_Right + MIDPOSX ? SBX_Right :
-		  x - MIDPOSX);
+      if (center_screen)
+      {
+	scroll_x = (x < SBX_Left  + MIDPOSX ? SBX_Left :
+		    x > SBX_Right + MIDPOSX ? SBX_Right :
+		    x - MIDPOSX);
 
-      scroll_y = (y < SBY_Upper + MIDPOSY ? SBY_Upper :
-		  y > SBY_Lower + MIDPOSY ? SBY_Lower :
-		  y - MIDPOSY);
+	scroll_y = (y < SBY_Upper + MIDPOSY ? SBY_Upper :
+		    y > SBY_Lower + MIDPOSY ? SBY_Lower :
+		    y - MIDPOSY);
+      }
+      else
+      {
+	/* quick relocation (without scrolling), but do not center screen */
+
+	int center_scroll_x = (old_x < SBX_Left  + MIDPOSX ? SBX_Left :
+			       old_x > SBX_Right + MIDPOSX ? SBX_Right :
+			       old_x - MIDPOSX);
+
+	int center_scroll_y = (old_y < SBY_Upper + MIDPOSY ? SBY_Upper :
+			       old_y > SBY_Lower + MIDPOSY ? SBY_Lower :
+			       old_y - MIDPOSY);
+
+	int offset_x = x + (scroll_x - center_scroll_x);
+	int offset_y = y + (scroll_y - center_scroll_y);
+
+	scroll_x = (offset_x < SBX_Left  + MIDPOSX ? SBX_Left :
+		    offset_x > SBX_Right + MIDPOSX ? SBX_Right :
+		    offset_x - MIDPOSX);
+
+	scroll_y = (offset_y < SBY_Upper + MIDPOSY ? SBY_Upper :
+		    offset_y > SBY_Lower + MIDPOSY ? SBY_Lower :
+		    offset_y - MIDPOSY);
+      }
     }
     else
     {
@@ -3495,8 +3521,8 @@ void RelocatePlayer(int jx, int jy, int el_player_raw)
   }
 
   /* only visually relocate centered player */
-  DrawRelocateScreen(player->jx, player->jy, player->MovDir, FALSE,
-		     level.instant_relocation);
+  DrawRelocateScreen(old_jx, old_jy, player->jx, player->jy, player->MovDir,
+		     FALSE, level.instant_relocation);
 
   TestIfPlayerTouchesBadThing(jx, jy);
   TestIfPlayerTouchesCustomElement(jx, jy);
@@ -9341,7 +9367,7 @@ void GameActions_RND()
     game.centered_player_nr = game.centered_player_nr_next;
     game.set_centered_player = FALSE;
 
-    DrawRelocateScreen(sx, sy, MV_NONE, TRUE, setup.quick_switch);
+    DrawRelocateScreen(0, 0, sx, sy, MV_NONE, TRUE, setup.quick_switch);
     DrawGameDoorValues();
   }
 

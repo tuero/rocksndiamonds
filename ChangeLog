@@ -1,3 +1,9 @@
+2006-12-03
+	* improved "no scrolling when relocating" to also consider scroll delay
+	  (meaning that the player is not automatically centered in this case;
+	  this makes it possible to "invisibly" relocate the player to a region
+	  of the level playfield which looks the same as the old level region)
+
 2006-12-02
 	* fixed bug with displaying masked borders over title screens when
 	  screen fading is disabled
