@@ -251,6 +251,10 @@ struct GadgetInfo
   struct GadgetInfo *next;		/* next list entry */
 };
 
+
+void InitGadgetsSoundCallback(void (*activating_function)(void),
+			      void (*selecting_function)(void));
+
 struct GadgetInfo *CreateGadget(int, ...);
 void FreeGadget(struct GadgetInfo *);
 

@@ -336,7 +336,7 @@ void HandleAnimation(int mode)
     case ANIM_STOP:
       if (anim_running)
       {
-#if 0
+#if 1
 	int draw_mode;
 
 	redraw_mask |= (REDRAW_FIELD | REDRAW_FROM_BACKBUFFER);

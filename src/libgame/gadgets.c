@@ -32,6 +32,17 @@ static struct GadgetInfo *last_info_gi = NULL;
 static int next_free_gadget_id = 1;
 static boolean gadget_id_wrapped = FALSE;
 
+static void (*PlayGadgetSoundActivating)(void) = NULL;
+static void (*PlayGadgetSoundSelecting)(void) = NULL;
+
+
+void InitGadgetsSoundCallback(void (*activating_function)(void),
+			      void (*selecting_function)(void))
+{
+  PlayGadgetSoundActivating = activating_function;
+  PlayGadgetSoundSelecting = selecting_function;
+}
+
 static struct GadgetInfo *getGadgetInfoFromGadgetID(int id)
 {
   struct GadgetInfo *gi = gadget_list_first_entry;
@@ -1783,6 +1794,8 @@ boolean HandleGadgets(int mx, int my, int button)
 
   if (gadget_pressed)
   {
+    PlayGadgetSoundActivating();
+
     if (gi->type == GD_TYPE_CHECK_BUTTON)
     {
       gi->checked = !gi->checked;

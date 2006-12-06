@@ -104,6 +104,8 @@ void InitGadgets()
   CreateToolButtons();
   CreateScreenGadgets();
 
+  InitGadgetsSoundCallback(PlaySoundActivating, PlaySoundSelecting);
+
   gadgets_initialized = TRUE;
 }
 

@@ -6186,7 +6186,20 @@ void PlayMenuMusic()
   if (music == MUS_UNDEFINED)
     return;
 
+  if (!setup.sound_music)
+    return;
+
   PlayMusic(music);
+}
+
+void PlaySoundActivating()
+{
+  PlaySound(SND_MENU_ITEM_ACTIVATING);
+}
+
+void PlaySoundSelecting()
+{
+  PlaySound(SND_MENU_ITEM_SELECTING);
 }
 
 void ToggleFullscreenIfNeeded()

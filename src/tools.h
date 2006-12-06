@@ -178,6 +178,8 @@ void PlayMenuSound();
 void PlayMenuSoundStereo(int, int);
 void PlayMenuSoundIfLoop();
 void PlayMenuMusic();
+void PlaySoundActivating();
+void PlaySoundSelecting();
 
 void ToggleFullscreenIfNeeded();
 

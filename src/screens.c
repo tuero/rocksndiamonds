@@ -461,7 +461,8 @@ static void InitializeMainControls()
   }
 }
 
-static void DrawCursorAndText_Main(int nr, boolean active)
+static void DrawCursorAndText_Main_Ext(int nr, boolean active_text,
+				       boolean active_input)
 {
   int i;
 
@@ -480,10 +481,15 @@ static void DrawCursorAndText_Main(int nr, boolean active)
       int font_text                  = mci->font_text;
       int font_input                 = mci->font_input;
 
-      if (active)
+      if (active_text)
       {
 	button_graphic = BUTTON_GRAPHIC_ACTIVE(button_graphic);
 	font_text = FONT_ACTIVE(font_text);
+      }
+
+      if (active_input)
+      {
+	font_input = FONT_ACTIVE(font_input);
       }
 
       if (pos_button != NULL)
@@ -518,6 +524,18 @@ static void DrawCursorAndText_Main(int nr, boolean active)
     }
   }
 }
+
+static void DrawCursorAndText_Main(int nr, boolean active_text)
+{
+  DrawCursorAndText_Main_Ext(nr, active_text, FALSE);
+}
+
+#if 0
+static void DrawCursorAndText_Main_Input(int nr, boolean active_text)
+{
+  DrawCursorAndText_Main_Ext(nr, active_text, TRUE);
+}
+#endif
 
 static struct MainControlInfo *getMainControlInfo(int nr)
 {
@@ -1099,6 +1117,8 @@ void HandleMainMenu_SelectLevel(int step, int direction)
   {
     struct MainControlInfo *mci= getMainControlInfo(MAIN_CONTROL_CURRENT_LEVEL);
 
+    PlaySound(SND_MENU_ITEM_SELECTING);
+
     level_nr = new_level_nr;
 
 #if 1
@@ -1171,6 +1191,8 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
     {
       if (pos != choice)
       {
+	PlaySound(SND_MENU_ITEM_ACTIVATING);
+
 	DrawCursorAndText_Main(choice, FALSE);
 	DrawCursorAndText_Main(pos, TRUE);
 
@@ -1179,6 +1201,8 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
     }
     else
     {
+      PlaySound(SND_MENU_ITEM_SELECTING);
+
       if (pos == MAIN_CONTROL_NAME)
       {
 	game_status = GAME_MODE_PSEUDO_TYPENAME;
@@ -1579,6 +1603,8 @@ void HandleInfoScreen_Main(int mx, int my, int dx, int dy, int button)
     {
       if (y != choice)
       {
+	PlaySound(SND_MENU_ITEM_ACTIVATING);
+
 #if 1
 	DrawCursorAndText_Info(choice, FALSE);
 	DrawCursorAndText_Info(y, TRUE);
@@ -1592,6 +1618,8 @@ void HandleInfoScreen_Main(int mx, int my, int dx, int dy, int button)
     }
     else if (!(info_info[y].type & TYPE_GHOSTED))
     {
+      PlaySound(SND_MENU_ITEM_SELECTING);
+
       if (info_info[y].type & TYPE_ENTER_OR_LEAVE)
       {
 	void (*menu_callback_function)(void) = info_info[choice].value;
@@ -1842,6 +1870,8 @@ void HandleInfoScreen_Elements(int button)
 
   if (button == MB_MENU_LEAVE)
   {
+    PlaySound(SND_MENU_ITEM_SELECTING);
+
     info_mode = INFO_MODE_MAIN;
     DrawInfoScreen();
 
@@ -1850,7 +1880,11 @@ void HandleInfoScreen_Elements(int button)
   else if (button == MB_MENU_CHOICE || button == MB_MENU_INITIALIZE)
   {
     if (button != MB_MENU_INITIALIZE)
+    {
+      PlaySound(SND_MENU_ITEM_SELECTING);
+
       page++;
+    }
 
     if (page >= num_pages)
     {
@@ -1925,6 +1959,10 @@ void HandleInfoScreen_Music(int button)
 
   if (button == MB_MENU_LEAVE)
   {
+    PlaySound(SND_MENU_ITEM_SELECTING);
+
+    FadeSoundsAndMusic();
+
     info_mode = INFO_MODE_MAIN;
     DrawInfoScreen();
 
@@ -1935,8 +1973,12 @@ void HandleInfoScreen_Music(int button)
     int y = 0;
 
     if (button != MB_MENU_INITIALIZE)
+    {
+      PlaySound(SND_MENU_ITEM_SELECTING);
+
       if (list != NULL)
 	list = list->next;
+    }
 
     if (list == NULL)
     {
@@ -2224,6 +2266,8 @@ void HandleInfoScreen_Credits(int button)
   }
   else if (button == MB_MENU_LEAVE)
   {
+    PlaySound(SND_MENU_ITEM_SELECTING);
+
     info_mode = INFO_MODE_MAIN;
     DrawInfoScreen();
 
@@ -2232,6 +2276,8 @@ void HandleInfoScreen_Credits(int button)
   else if (button == MB_MENU_CHOICE)
   {
     boolean show_screen;
+
+    PlaySound(SND_MENU_ITEM_SELECTING);
 
     screen_nr++;
 
@@ -2309,6 +2355,8 @@ void HandleInfoScreen_Program(int button)
 {
   if (button == MB_MENU_LEAVE)
   {
+    PlaySound(SND_MENU_ITEM_SELECTING);
+
     info_mode = INFO_MODE_MAIN;
     DrawInfoScreen();
 
@@ -2316,6 +2364,8 @@ void HandleInfoScreen_Program(int button)
   }
   else if (button == MB_MENU_CHOICE)
   {
+    PlaySound(SND_MENU_ITEM_SELECTING);
+
     FadeSoundsAndMusic();
     FadeOut(REDRAW_FIELD);
 
@@ -2369,6 +2419,8 @@ void HandleInfoScreen_LevelSet(int button)
 {
   if (button == MB_MENU_LEAVE)
   {
+    PlaySound(SND_MENU_ITEM_SELECTING);
+
     info_mode = INFO_MODE_MAIN;
     DrawInfoScreen();
 
@@ -2376,6 +2428,8 @@ void HandleInfoScreen_LevelSet(int button)
   }
   else if (button == MB_MENU_CHOICE)
   {
+    PlaySound(SND_MENU_ITEM_SELECTING);
+
     FadeSoundsAndMusic();
     FadeOut(REDRAW_FIELD);
 
@@ -2455,6 +2509,11 @@ void HandleTypeName(int newxpos, Key key)
 {
   struct MainControlInfo *mci = getMainControlInfo(MAIN_CONTROL_NAME);
 #if 1
+  struct MenuPosInfo *pos = mci->pos_input;
+  int startx = mSX + ALIGNED_XPOS(pos->x, pos->width, pos->align);
+  int starty = mSY + pos->y;
+#endif
+#if 1
   static int xpos = 0;
 #else
   static int xpos = 0, ypos = 2;
@@ -2463,8 +2522,10 @@ void HandleTypeName(int newxpos, Key key)
   int font_active_nr = FONT_ACTIVE(font_nr);
   int font_width = getFontWidth(font_active_nr);
 #if 1
+#if 0
   int startx = mSX + mci->pos_input->x;
   int starty = mSY + mci->pos_input->y;
+#endif
 #else
   int name_width = getFontWidth(FONT_MENU_1) * strlen("Name:");
   int startx = mSX + 32 + name_width;
@@ -2713,6 +2774,8 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
   }
   else if (button == MB_MENU_LEAVE)
   {
+    PlaySound(SND_MENU_ITEM_SELECTING);
+
     if (ti->node_parent)
     {
       *ti_ptr = ti->node_parent;
@@ -2813,6 +2876,8 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
 
     if (node_cursor->node_group)
     {
+      PlaySound(SND_MENU_ITEM_SELECTING);
+
       node_cursor->cl_first = ti->cl_first;
       node_cursor->cl_cursor = ti->cl_cursor;
       *ti_ptr = node_cursor->node_group;
@@ -2823,6 +2888,8 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
   }
   else if (dx == -1 && ti->node_parent)
   {
+    PlaySound(SND_MENU_ITEM_SELECTING);
+
     *ti_ptr = ti->node_parent;
     DrawChooseTree(ti_ptr);
 
@@ -2838,6 +2905,8 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
     {
       if (y != ti->cl_cursor)
       {
+	PlaySound(SND_MENU_ITEM_ACTIVATING);
+
 	drawChooseTreeCursor(ti->cl_cursor, FALSE);
 	drawChooseTreeCursor(y, TRUE);
 	drawChooseTreeInfo(ti->cl_first + y, ti);
@@ -2849,6 +2918,8 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
     {
       TreeInfo *node_first, *node_cursor;
       int entry_pos = ti->cl_first + y;
+
+      PlaySound(SND_MENU_ITEM_SELECTING);
 
       node_first = getTreeInfoFirstGroupEntry(ti);
       node_cursor = getTreeInfoFromPos(node_first, entry_pos);
@@ -3023,6 +3094,8 @@ void HandleHallOfFame(int mx, int my, int dx, int dy, int button)
   }
   else if (button == MB_MENU_LEAVE)
   {
+    PlaySound(SND_MENU_ITEM_SELECTING);
+
     FadeSound(SND_BACKGROUND_SCORES);
 
     game_status = GAME_MODE_MAIN;
@@ -3031,6 +3104,8 @@ void HandleHallOfFame(int mx, int my, int dx, int dy, int button)
   }
   else if (button == MB_MENU_CHOICE)
   {
+    PlaySound(SND_MENU_ITEM_SELECTING);
+
     FadeSound(SND_BACKGROUND_SCORES);
     FadeOut(REDRAW_FIELD);
 
@@ -3722,6 +3797,8 @@ void HandleSetupScreen_Generic(int mx, int my, int dx, int dy, int button)
   }
   else if (button == MB_MENU_LEAVE)
   {
+    PlaySound(SND_MENU_ITEM_SELECTING);
+
     for (y = 0; y < num_setup_info; y++)
     {
       if (setup_info[y].type & TYPE_LEAVE_MENU)
@@ -3767,6 +3844,8 @@ void HandleSetupScreen_Generic(int mx, int my, int dx, int dy, int button)
     {
       if (y != choice && setup_info[y].type & ~TYPE_SKIP_ENTRY)
       {
+	PlaySound(SND_MENU_ITEM_ACTIVATING);
+
 #if 1
 	DrawCursorAndText_Setup(choice, FALSE);
 	DrawCursorAndText_Setup(y, TRUE);
@@ -3780,6 +3859,8 @@ void HandleSetupScreen_Generic(int mx, int my, int dx, int dy, int button)
     }
     else if (!(setup_info[y].type & TYPE_GHOSTED))
     {
+      PlaySound(SND_MENU_ITEM_SELECTING);
+
       /* when selecting key headline, execute function for key value change */
       if (setup_info[y].type & TYPE_KEYTEXT &&
 	  setup_info[y + 1].type & TYPE_KEY)
