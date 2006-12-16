@@ -1,3 +1,6 @@
+2006-12-16
+	* fixed nasty string overflow bug when entering too long envelope text
+
 2006-12-05
 	* added feedback sounds for menu navigation "menu.item.activating" and
 	  "menu.item.selecting" (for highlighting and executing menu entries)

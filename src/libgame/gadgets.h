@@ -150,14 +150,14 @@ struct GadgetDrawingArea
 
 struct GadgetTextButton
 {
-  char value[MAX_GADGET_TEXTSIZE];	/* text written on the button */
+  char value[MAX_GADGET_TEXTSIZE + 1];	/* text written on the button */
   int size;				/* maximal size of button text */
 };
 
 struct GadgetTextInput
 {
-  char value[MAX_GADGET_TEXTSIZE];	/* text string in input field */
-  char last_value[MAX_GADGET_TEXTSIZE];	/* last text string in input field */
+  char value[MAX_GADGET_TEXTSIZE + 1];	/* text string in input field */
+  char last_value[MAX_GADGET_TEXTSIZE + 1];/* last text string in input field */
   int cursor_position;			/* actual text cursor position */
   int number_value;			/* integer value, if numeric */
   int number_min;			/* minimal allowed numeric value */
@@ -167,8 +167,8 @@ struct GadgetTextInput
 
 struct GadgetTextArea
 {
-  char value[MAX_GADGET_TEXTSIZE];	/* text string in input field */
-  char last_value[MAX_GADGET_TEXTSIZE];	/* last text string in input field */
+  char value[MAX_GADGET_TEXTSIZE + 1];	/* text string in input field */
+  char last_value[MAX_GADGET_TEXTSIZE + 1];/* last text string in input field */
   int cursor_position;			/* actual text cursor position */
   int cursor_x;				/* actual x cursor position */
   int cursor_y;				/* actual y cursor position */
@@ -221,7 +221,7 @@ struct GadgetInfo
   int id;				/* internal gadget identifier */
   int custom_id;			/* custom gadget identifier */
   int custom_type_id;			/* custom gadget type identifier */
-  char info_text[MAX_INFO_TEXTSIZE];	/* short popup info text */
+  char info_text[MAX_INFO_TEXTSIZE + 1];/* short popup info text */
   int x, y;				/* gadget position */
   int width, height;			/* gadget size */
   unsigned int type;			/* type (button, text input, ...) */

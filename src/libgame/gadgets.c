@@ -742,7 +742,7 @@ static void HandleGadgetTags(struct GadgetInfo *gi, int first_tag, va_list ap)
 
       case GDI_INFO_TEXT:
 	{
-	  int max_textsize = MAX_INFO_TEXTSIZE - 1;
+	  int max_textsize = MAX_INFO_TEXTSIZE;
 	  char *text = va_arg(ap, char *);
 
 	  if (text != NULL)
@@ -826,7 +826,7 @@ static void HandleGadgetTags(struct GadgetInfo *gi, int first_tag, va_list ap)
 	  int max_textsize = MAX_GADGET_TEXTSIZE;
 
 	  if (gi->textinput.size)
-	    max_textsize = MIN(gi->textinput.size, MAX_GADGET_TEXTSIZE - 1);
+	    max_textsize = MIN(gi->textinput.size, MAX_GADGET_TEXTSIZE);
 
 	  strncpy(gi->textinput.value, va_arg(ap, char *), max_textsize);
 	  strcpy(gi->textinput.last_value, gi->textinput.value);
@@ -844,7 +844,7 @@ static void HandleGadgetTags(struct GadgetInfo *gi, int first_tag, va_list ap)
       case GDI_TEXT_SIZE:
 	{
 	  int tag_value = va_arg(ap, int);
-	  int max_textsize = MIN(tag_value, MAX_GADGET_TEXTSIZE - 1);
+	  int max_textsize = MIN(tag_value, MAX_GADGET_TEXTSIZE);
 
 	  gi->textinput.size = max_textsize;
 	  gi->textinput.value[max_textsize] = '\0';
@@ -1992,10 +1992,10 @@ boolean HandleGadgets(int mx, int my, int button)
 
 static void insertCharIntoTextArea(struct GadgetInfo *gi, char c)
 {
-  char text[MAX_GADGET_TEXTSIZE];
+  char text[MAX_GADGET_TEXTSIZE + 1];
   int cursor_position = gi->textarea.cursor_position;
 
-  if (strlen(gi->textarea.value) == MAX_GADGET_TEXTSIZE) /* no space left */
+  if (strlen(gi->textarea.value) >= MAX_GADGET_TEXTSIZE) /* no space left */
     return;
 
   strcpy(text, gi->textarea.value);
@@ -2056,7 +2056,7 @@ boolean HandleGadgetsKeyInput(Key key)
   }
   else if (gi->type & GD_TYPE_TEXT_INPUT)	/* only valid for text input */
   {
-    char text[MAX_GADGET_TEXTSIZE];
+    char text[MAX_GADGET_TEXTSIZE + 1];
     int text_length = strlen(gi->textinput.value);
     int cursor_pos = gi->textinput.cursor_position;
     char letter = getCharFromKey(key);
@@ -2103,7 +2103,7 @@ boolean HandleGadgetsKeyInput(Key key)
   }
   else if (gi->type & GD_TYPE_TEXT_AREA)	/* only valid for text area */
   {
-    char text[MAX_GADGET_TEXTSIZE];
+    char text[MAX_GADGET_TEXTSIZE + 1];
     int text_length = strlen(gi->textarea.value);
     int area_ysize = gi->textarea.ysize;
     int cursor_x_pref = gi->textarea.cursor_x_preferred;

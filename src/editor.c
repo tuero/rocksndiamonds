@@ -9081,7 +9081,14 @@ static void HandleTextAreaGadgets(struct GadgetInfo *gi)
 {
   int type_id = gi->custom_type_id;
 
+#if 1
+  strncpy(textarea_info[type_id].value, gi->textarea.value,
+	  MAX_ENVELOPE_TEXT_LEN);
+  textarea_info[type_id].value[MAX_ENVELOPE_TEXT_LEN] = '\0';
+#else
+  /* !!! BUGGY !!! MAX_ENVELOPE_TEXT_LEN != MAX_GADGET_TEXTSIZE !!! */
   strcpy(textarea_info[type_id].value, gi->textarea.value);
+#endif
 
   level.changed = TRUE;
 }
