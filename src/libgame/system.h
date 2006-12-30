@@ -1059,6 +1059,7 @@ void InitGfxDoor2Info(int, int, int, int);
 void InitGfxScrollbufferInfo(int, int);
 void SetDrawDeactivationMask(int);
 void SetDrawBackgroundMask(int);
+void SetWindowBackgroundBitmap(Bitmap *);
 void SetMainBackgroundBitmap(Bitmap *);
 void SetDoorBackgroundBitmap(Bitmap *);
 

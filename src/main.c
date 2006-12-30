@@ -4620,6 +4620,7 @@ struct SpecialSuffixInfo special_suffix_info[NUM_SPECIAL_GFX_ARGS + 1 + 1] =
 {
   { ".[DEFAULT]",	GFX_SPECIAL_ARG_DEFAULT,	},
   { ".TITLE",		GFX_SPECIAL_ARG_TITLE,		},
+  { ".MESSAGE",		GFX_SPECIAL_ARG_MESSAGE,	},
   { ".MAIN",		GFX_SPECIAL_ARG_MAIN,		},
   { ".LEVELS",		GFX_SPECIAL_ARG_LEVELS		},
   { ".SCORES",		GFX_SPECIAL_ARG_SCORES,		},

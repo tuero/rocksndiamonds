@@ -80,6 +80,7 @@ void FadeCross(int);
 void FadeCrossSaveBackbuffer();
 
 void ClearWindow();
+void SetWindowBackgroundImageIfDefined(int);
 void SetMainBackgroundImageIfDefined(int);
 void SetMainBackgroundImage(int);
 void SetDoorBackgroundImage(int);

@@ -245,6 +245,7 @@ struct ConfigInfo sound_config[] =
   { "menu.item.selecting",		"base.wav"			},
 
   { "background.TITLE",			UNDEFINED_FILENAME		},
+  { "background.MESSAGE",		UNDEFINED_FILENAME		},
   { "background.MAIN",			UNDEFINED_FILENAME		},
   { "background.LEVELS",		UNDEFINED_FILENAME		},
   { "background.SCORES",		"halloffame.wav"		},

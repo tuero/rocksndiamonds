@@ -31,6 +31,10 @@ gamemode_to_sound[] =
     SND_BACKGROUND_TITLE
   },
   {
+    GFX_SPECIAL_ARG_MESSAGE,
+    SND_BACKGROUND_MESSAGE
+  },
+  {
     GFX_SPECIAL_ARG_MAIN,
     SND_BACKGROUND_MAIN
   },

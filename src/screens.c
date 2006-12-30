@@ -709,6 +709,41 @@ void DrawTitleScreenImage(int nr)
     title.auto_delay_final = graphic_info[graphic].auto_delay;
 }
 
+void DrawTitleScreenMessage(char *filename)
+{
+  int font_nr = FONT_TEXT_1;
+  int font_width;
+  int font_height;
+  int pad_x = 16;
+  int pad_y = 32;
+  int sx = pad_x;
+  int sy = pad_y;
+  int max_chars_per_line;
+  int max_lines_per_screen;
+  int last_game_status = game_status;	/* save current game status */
+
+  if (filename == NULL)
+    return;
+
+  SetDrawBackgroundMask(REDRAW_ALL);
+  SetWindowBackgroundImageIfDefined(IMG_BACKGROUND_MESSAGE);
+
+  ClearRectangleOnBackground(drawto, 0, 0, WIN_XSIZE, WIN_YSIZE);
+
+  /* force MESSAGE font on title message screen */
+  game_status = GAME_MODE_MESSAGE;
+
+  font_width = getFontWidth(font_nr);
+  font_height = getFontHeight(font_nr);
+  max_chars_per_line = (WIN_XSIZE - 2 * pad_x) / font_width;
+  max_lines_per_screen = (WIN_YSIZE - pad_y) / font_height - 1;
+
+  DrawTextFromFile(sx, sy, filename, font_nr, max_chars_per_line,
+		   max_lines_per_screen, FALSE);
+
+  game_status = last_game_status;	/* restore current game status */
+}
+
 void DrawTitleScreen()
 {
   KeyboardAutoRepeatOff();
@@ -780,7 +815,8 @@ void DrawMainMenuExt(int redraw_mask, boolean do_fading)
 
   if (setup.show_titlescreen &&
       ((levelset_has_changed &&
-	graphic_info[IMG_TITLESCREEN_1].bitmap != NULL) ||
+	(graphic_info[IMG_TITLESCREEN_1].bitmap != NULL ||
+	 getLevelSetMessageFilename() != NULL)) ||
        (show_titlescreen_initial &&
 	graphic_info[IMG_TITLESCREEN_INITIAL_1].bitmap != NULL)))
   {
@@ -948,9 +984,13 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
 {
   static unsigned long title_delay = 0;
   static int title_nr = 0;
+  static boolean showing_message = FALSE;
+  char *filename = getLevelSetMessageFilename();
   boolean return_to_main_menu = FALSE;
   boolean use_fading_main_menu = TRUE;
   boolean use_cross_fading = !show_titlescreen_initial;		/* default */
+  boolean no_title_info = (graphic_info[IMG_TITLESCREEN_1].bitmap == NULL &&
+			   filename == NULL);
 
   if (button == MB_MENU_INITIALIZE)
   {
@@ -958,6 +998,7 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
 
     title_delay = 0;
     title_nr = 0;
+    showing_message = FALSE;
 
     if (show_titlescreen_initial &&
 	graphic_info[IMG_TITLESCREEN_INITIAL_1].bitmap == NULL)
@@ -965,7 +1006,7 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
 
     if (game_status == GAME_MODE_INFO)
     {
-      if (graphic_info[IMG_TITLESCREEN_1].bitmap == NULL)
+      if (no_title_info)
       {
 	DrawInfoScreen_NotAvailable("Title screen information:",
 				    "No title screen for this level set.");
@@ -988,7 +1029,20 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
 
     game_status = last_game_status;	/* restore current game status */
 
-    DrawTitleScreenImage(title_nr);
+    if (graphic_info[getTitleScreenGraphic()].bitmap != NULL)
+    {
+      DrawTitleScreenImage(title_nr);
+    }
+    else
+    {
+      DrawTitleScreenMessage(filename);
+
+      showing_message = TRUE;
+
+      title.fade_delay_final = title.fade_delay;
+      title.post_delay_final = title.post_delay;
+      title.auto_delay_final = -1;
+    }
 
     FadeIn(REDRAW_ALL);
 
@@ -1010,8 +1064,7 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
   {
     int anim_mode;
 
-    if (game_status == GAME_MODE_INFO &&
-	graphic_info[IMG_TITLESCREEN_1].bitmap == NULL)
+    if (game_status == GAME_MODE_INFO && no_title_info)
     {
       FadeOut(REDRAW_FIELD);
 
@@ -1055,6 +1108,22 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
 	FadeIn(REDRAW_ALL);
 
       DelayReached(&title_delay, 0);	/* reset delay counter */
+    }
+    else if (!showing_message && filename != NULL)
+    {
+      if (use_cross_fading)
+	FadeCrossSaveBackbuffer();
+
+      DrawTitleScreenMessage(filename);
+
+      if (use_cross_fading)
+	FadeCross(REDRAW_ALL);
+      else
+	FadeIn(REDRAW_ALL);
+
+      DelayReached(&title_delay, 0);	/* reset delay counter */
+
+      showing_message = TRUE;
     }
     else
     {
@@ -2407,7 +2476,7 @@ void DrawInfoScreen_LevelSet()
 
   if (filename != NULL)
     DrawTextFromFile(sx, sy, filename, font_nr, max_chars_per_line,
-		     max_lines_per_screen);
+		     max_lines_per_screen, TRUE);
   else
     DrawTextSCentered(ystart, FONT_TEXT_2,
 		      "No information for this level set.");

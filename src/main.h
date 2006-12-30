@@ -1586,18 +1586,19 @@
 /* values for special image configuration suffixes (must match game mode) */
 #define GFX_SPECIAL_ARG_DEFAULT		0
 #define GFX_SPECIAL_ARG_TITLE		1
-#define GFX_SPECIAL_ARG_MAIN		2
-#define GFX_SPECIAL_ARG_LEVELS		3
-#define GFX_SPECIAL_ARG_SCORES		4
-#define GFX_SPECIAL_ARG_EDITOR		5
-#define GFX_SPECIAL_ARG_INFO		6
-#define GFX_SPECIAL_ARG_SETUP		7
-#define GFX_SPECIAL_ARG_PLAYING		8
-#define GFX_SPECIAL_ARG_DOOR		9
-#define GFX_SPECIAL_ARG_PREVIEW		10
-#define GFX_SPECIAL_ARG_CRUMBLED	11
+#define GFX_SPECIAL_ARG_MESSAGE		2
+#define GFX_SPECIAL_ARG_MAIN		3
+#define GFX_SPECIAL_ARG_LEVELS		4
+#define GFX_SPECIAL_ARG_SCORES		5
+#define GFX_SPECIAL_ARG_EDITOR		6
+#define GFX_SPECIAL_ARG_INFO		7
+#define GFX_SPECIAL_ARG_SETUP		8
+#define GFX_SPECIAL_ARG_PLAYING		9
+#define GFX_SPECIAL_ARG_DOOR		10
+#define GFX_SPECIAL_ARG_PREVIEW		11
+#define GFX_SPECIAL_ARG_CRUMBLED	12
 
-#define NUM_SPECIAL_GFX_ARGS		12
+#define NUM_SPECIAL_GFX_ARGS		13
 
 /* these additional definitions are currently only used for draw offsets */
 #define GFX_SPECIAL_ARG_INFO_MAIN	0
@@ -1728,20 +1729,21 @@
 /* values for game_status (must match special image configuration suffixes) */
 #define GAME_MODE_DEFAULT		0
 #define GAME_MODE_TITLE			1
-#define GAME_MODE_MAIN			2
-#define GAME_MODE_LEVELS		3
-#define GAME_MODE_SCORES		4
-#define GAME_MODE_EDITOR		5
-#define GAME_MODE_INFO			6
-#define GAME_MODE_SETUP			7
-#define GAME_MODE_PLAYING		8
-#define GAME_MODE_PSEUDO_DOOR		9
-#define GAME_MODE_PSEUDO_PREVIEW	10
-#define GAME_MODE_PSEUDO_CRUMBLED	11
+#define GAME_MODE_MESSAGE		2
+#define GAME_MODE_MAIN			3
+#define GAME_MODE_LEVELS		4
+#define GAME_MODE_SCORES		5
+#define GAME_MODE_EDITOR		6
+#define GAME_MODE_INFO			7
+#define GAME_MODE_SETUP			8
+#define GAME_MODE_PLAYING		9
+#define GAME_MODE_PSEUDO_DOOR		10
+#define GAME_MODE_PSEUDO_PREVIEW	11
+#define GAME_MODE_PSEUDO_CRUMBLED	12
 
 /* there are no special config file suffixes for these modes */
-#define GAME_MODE_PSEUDO_TYPENAME	12
-#define GAME_MODE_QUIT			13
+#define GAME_MODE_PSEUDO_TYPENAME	13
+#define GAME_MODE_QUIT			14
 
 /* special definitions currently only used for custom artwork configuration */
 #define MUSIC_PREFIX_BACKGROUND		0

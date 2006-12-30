@@ -35,6 +35,10 @@ gamemode_to_music[] =
     MUS_BACKGROUND_TITLE
   },
   {
+    GFX_SPECIAL_ARG_MESSAGE,
+    MUS_BACKGROUND_MESSAGE
+  },
+  {
     GFX_SPECIAL_ARG_MAIN,
     MUS_BACKGROUND_MAIN
   },

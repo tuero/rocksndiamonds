@@ -497,6 +497,35 @@ char *getLevelSetInfoFilename()
   return NULL;
 }
 
+char *getLevelSetMessageFilename()
+{
+  static char *filename = NULL;
+  char *basenames[] =
+  {
+    "MESSAGE",
+    "MESSAGE.TXT",
+    "MESSAGE.txt",
+    "Message",
+    "Message.txt",
+    "message",
+    "message.txt",
+
+    NULL
+  };
+  int i;
+
+  for (i = 0; basenames[i] != NULL; i++)
+  {
+    checked_free(filename);
+    filename = getPath2(getCurrentLevelDir(), basenames[i]);
+
+    if (fileExists(filename))
+      return filename;
+  }
+
+  return NULL;
+}
+
 static char *getCorrectedArtworkBasename(char *basename)
 {
   char *basename_corrected = basename;

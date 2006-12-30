@@ -75,6 +75,6 @@ void DrawTextExt(DrawBuffer *, int, int, char *, int, int);
 void DrawTextToTextArea(int, int, char *, int, int, int, int, int);
 boolean RenderLineToBuffer(char **, char *, int *, boolean, int);
 void DrawTextWrapped(int, int, char *, int, int, int);
-int DrawTextFromFile(int, int, char *, int, int, int);
+int DrawTextFromFile(int, int, char *, int, int, int, boolean);
 
 #endif	/* TEXT_H */

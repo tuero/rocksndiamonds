@@ -242,7 +242,8 @@ void DrawMaskedBorder_ALL()
 void DrawMaskedBorder(int redraw_mask)
 {
   /* do not draw masked screen borders when displaying title screens */
-  if (effectiveGameStatus() == GAME_MODE_TITLE)
+  if (effectiveGameStatus() == GAME_MODE_TITLE ||
+      effectiveGameStatus() == GAME_MODE_MESSAGE)
     return;
 
   if (redraw_mask & REDRAW_ALL)
@@ -587,10 +588,16 @@ void FadeCrossSaveBackbuffer()
   BlitBitmap(backbuffer, bitmap_db_cross, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
 }
 
+void SetWindowBackgroundImageIfDefined(int graphic)
+{
+  if (graphic_info[graphic].bitmap)
+    SetWindowBackgroundBitmap(graphic_info[graphic].bitmap);
+}
+
 void SetMainBackgroundImageIfDefined(int graphic)
 {
   if (graphic_info[graphic].bitmap)
-    SetMainBackgroundImage(graphic);
+    SetMainBackgroundBitmap(graphic_info[graphic].bitmap);
 }
 
 void SetMainBackgroundImage(int graphic)
