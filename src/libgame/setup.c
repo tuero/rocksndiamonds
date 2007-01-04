@@ -88,6 +88,7 @@ static char *levelclass_desc[NUM_LEVELCLASS_DESC] =
 
 
 static void setTreeInfoToDefaults(TreeInfo *, int);
+static TreeInfo *getTreeInfoCopy(TreeInfo *ti);
 static int compareTreeInfoEntries(const void *, const void *);
 
 static int token_value_position   = TOKEN_VALUE_POSITION_DEFAULT;
@@ -1009,9 +1010,13 @@ TreeInfo *cloneTreeNode(TreeInfo **node_top, TreeInfo *node_parent,
     return cloneTreeNode(node_top, node_parent, node->next,
 			 skip_sets_without_levels);
 
+#if 1
+  node_new = getTreeInfoCopy(node);		/* copy complete node */
+#else
   node_new = newTreeInfo();
 
   *node_new = *node;				/* copy complete node */
+#endif
 
   node_new->node_top = node_top;		/* correct top node link */
   node_new->node_parent = node_parent;		/* correct parent node link */
@@ -2017,6 +2022,68 @@ static void setTreeInfoToDefaultsFromParent(TreeInfo *ti, TreeInfo *parent)
   }
 }
 
+static TreeInfo *getTreeInfoCopy(TreeInfo *ti)
+{
+  TreeInfo *ti_copy = newTreeInfo();
+
+  /* copy all values from the original structure */
+
+  ti_copy->type			= ti->type;
+
+  ti_copy->node_top		= ti->node_top;
+  ti_copy->node_parent		= ti->node_parent;
+  ti_copy->node_group		= ti->node_group;
+  ti_copy->next			= ti->next;
+
+  ti_copy->cl_first		= ti->cl_first;
+  ti_copy->cl_cursor		= ti->cl_cursor;
+
+  ti_copy->subdir		= getStringCopy(ti->subdir);
+  ti_copy->fullpath		= getStringCopy(ti->fullpath);
+  ti_copy->basepath		= getStringCopy(ti->basepath);
+  ti_copy->identifier		= getStringCopy(ti->identifier);
+  ti_copy->name			= getStringCopy(ti->name);
+  ti_copy->name_sorting		= getStringCopy(ti->name_sorting);
+  ti_copy->author		= getStringCopy(ti->author);
+  ti_copy->imported_from	= getStringCopy(ti->imported_from);
+  ti_copy->imported_by		= getStringCopy(ti->imported_by);
+
+  ti_copy->graphics_set_ecs	= getStringCopy(ti->graphics_set_ecs);
+  ti_copy->graphics_set_aga	= getStringCopy(ti->graphics_set_aga);
+  ti_copy->graphics_set		= getStringCopy(ti->graphics_set);
+  ti_copy->sounds_set		= getStringCopy(ti->sounds_set);
+  ti_copy->music_set		= getStringCopy(ti->music_set);
+  ti_copy->graphics_path	= getStringCopy(ti->graphics_path);
+  ti_copy->sounds_path		= getStringCopy(ti->sounds_path);
+  ti_copy->music_path		= getStringCopy(ti->music_path);
+
+  ti_copy->level_filename	= getStringCopy(ti->level_filename);
+  ti_copy->level_filetype	= getStringCopy(ti->level_filetype);
+
+  ti_copy->levels		= ti->levels;
+  ti_copy->first_level		= ti->first_level;
+  ti_copy->last_level		= ti->last_level;
+  ti_copy->sort_priority	= ti->sort_priority;
+
+  ti_copy->latest_engine	= ti->latest_engine;
+
+  ti_copy->level_group		= ti->level_group;
+  ti_copy->parent_link		= ti->parent_link;
+  ti_copy->in_user_dir		= ti->in_user_dir;
+  ti_copy->user_defined		= ti->user_defined;
+  ti_copy->readonly		= ti->readonly;
+  ti_copy->handicap		= ti->handicap;
+  ti_copy->skip_levels		= ti->skip_levels;
+
+  ti_copy->color		= ti->color;
+  ti_copy->class_desc		= getStringCopy(ti->class_desc);
+  ti_copy->handicap_level	= ti->handicap_level;
+
+  ti_copy->infotext		= getStringCopy(ti->infotext);
+
+  return ti_copy;
+}
+
 static void freeTreeInfo(TreeInfo *ti)
 {
   if (ti == NULL)
@@ -2484,8 +2551,12 @@ static boolean LoadLevelInfoFromLevelConf(TreeInfo **node_first,
     (leveldir_new->user_defined || !leveldir_new->handicap ?
      leveldir_new->last_level : leveldir_new->first_level);
 
+#if 1
   if (leveldir_new->level_group)
     DrawInitText(leveldir_new->name, 150, FC_YELLOW);
+#else
+  DrawInitText(leveldir_new->name, 150, FC_YELLOW);
+#endif
 
 #if 0
   /* !!! don't skip sets without levels (else artwork base sets are missing) */
