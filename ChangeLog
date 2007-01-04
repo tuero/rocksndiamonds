@@ -1,5 +1,8 @@
 2007-01-04
 	* fixed malloc/free bug when updating EMC artwork entries in level list
+	* added workaround (warning and request to quit the current game) when
+	  changing elements cause endless recursion loop (which would otherwise
+	  freeze the game, causing a crash-like program exit on some systems)
 
 2006-12-16
 	* fixed nasty string overflow bug when entering too long envelope text

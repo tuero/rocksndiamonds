@@ -379,6 +379,33 @@ static int getInvisibleFromInvisibleActiveElement(int);
 
 static struct GadgetInfo *game_gadget[NUM_GAME_BUTTONS];
 
+/* for detection of endless loops, caused by custom element programming */
+/* (using "MAX_PLAYFIELD_WIDTH" here is just a rough approximation...) */
+#define MAX_ELEMENT_CHANGE_RECURSION_DEPTH	(MAX_PLAYFIELD_WIDTH)
+
+#define RECURSION_LOOP_DETECTION_START(e, rc)				\
+{									\
+  if (recursion_loop_detected)						\
+    return (rc);							\
+									\
+  if (recursion_loop_depth > MAX_ELEMENT_CHANGE_RECURSION_DEPTH)	\
+  {									\
+    recursion_loop_detected = TRUE;					\
+    recursion_loop_element = (e);					\
+  }									\
+									\
+  recursion_loop_depth++;						\
+}
+
+#define RECURSION_LOOP_DETECTION_END()					\
+{									\
+  recursion_loop_depth--;						\
+}
+
+static int recursion_loop_depth;
+static boolean recursion_loop_detected;
+static boolean recursion_loop_element;
+
 
 /* ------------------------------------------------------------------------- */
 /* definition of elements that automatically change to other elements after  */
@@ -1786,6 +1813,11 @@ static void InitGameEngine()
 	 EL_EMPTY);
     }
   }
+
+  /* ---------- initialize recursion detection ------------------------------ */
+  recursion_loop_depth = 0;
+  recursion_loop_detected = FALSE;
+  recursion_loop_element = EL_UNDEFINED;
 }
 
 int get_num_special_action(int element, int action_first, int action_last)
@@ -8578,6 +8610,14 @@ static boolean CheckTriggeredElementChangeExt(int trigger_x, int trigger_y,
   if (!(trigger_events[trigger_element][trigger_event]))
     return FALSE;
 
+#if 0
+  printf("::: CheckTriggeredElementChangeExt %d ... [%d, %d, %d, '%s']\n",
+	 trigger_event, recursion_loop_depth, recursion_loop_detected,
+	 recursion_loop_element, EL_NAME(recursion_loop_element));
+#endif
+
+  RECURSION_LOOP_DETECTION_START(trigger_element, FALSE);
+
   for (i = 0; i < NUM_CUSTOM_ELEMENTS; i++)
   {
     int element = EL_CUSTOM_START + i;
@@ -8646,6 +8686,8 @@ static boolean CheckTriggeredElementChangeExt(int trigger_x, int trigger_y,
     }
   }
 
+  RECURSION_LOOP_DETECTION_END();
+
   return change_done_any;
 }
 
@@ -8683,6 +8725,14 @@ static boolean CheckElementChangeExt(int x, int y,
 	ChangePage[x][y] != -1)))
     return FALSE;
 #endif
+
+#if 0
+  printf("::: CheckElementChangeExt %d ... [%d, %d, %d, '%s']\n",
+	 trigger_event, recursion_loop_depth, recursion_loop_detected,
+	 recursion_loop_element, EL_NAME(recursion_loop_element));
+#endif
+
+  RECURSION_LOOP_DETECTION_START(trigger_element, FALSE);
 
   for (p = 0; p < element_info[element].num_change_pages; p++)
   {
@@ -8762,6 +8812,8 @@ static boolean CheckElementChangeExt(int x, int y,
 #endif
     }
   }
+
+  RECURSION_LOOP_DETECTION_END();
 
   return change_done;
 }
@@ -9163,6 +9215,25 @@ void GameActions()
   byte summarized_player_action = 0;
   byte tape_action[MAX_PLAYERS];
   int i;
+
+  /* detect endless loops, caused by custom element programming */
+  if (recursion_loop_detected && recursion_loop_depth == 0)
+  {
+    char *message = getStringCat3("Internal Error ! Element ",
+				  EL_NAME(recursion_loop_element),
+				  " caused endless loop ! Quit the game ?");
+
+    Error(ERR_WARN, "element '%s' caused endless loop in game engine",
+	  EL_NAME(recursion_loop_element));
+
+    RequestQuitGameExt(FALSE, level_editor_test_game, message);
+
+    recursion_loop_detected = FALSE;	/* if game should be continued */
+
+    free(message);
+
+    return;
+  }
 
   if (game.restart_level)
     StartGameActions(options.network, setup.autorecord, NEW_RANDOMIZE);
@@ -11096,8 +11167,10 @@ void KillPlayer(struct PlayerInfo *player)
      "kill player X when explosion of <player X>"; the solution using a new
      field "player->killed" was chosen for backwards compatibility, although
      clever use of the fields "player->active" etc. would probably also work */
+#if 1
   if (player->killed)
     return;
+#endif
 
   player->killed = TRUE;
 
@@ -12536,13 +12609,9 @@ void RaiseScoreElement(int element)
   }
 }
 
-void RequestQuitGame(boolean ask_if_really_quit)
+void RequestQuitGameExt(boolean skip_request, boolean quick_quit, char *message)
 {
-  if (AllPlayersGone ||
-      !ask_if_really_quit ||
-      level_editor_test_game ||
-      Request("Do you really want to quit the game ?",
-	      REQ_ASK | REQ_STAY_CLOSED))
+  if (skip_request || Request(message, REQ_ASK | REQ_STAY_CLOSED))
   {
 #if defined(NETWORK_AVALIABLE)
     if (options.network)
@@ -12550,7 +12619,7 @@ void RequestQuitGame(boolean ask_if_really_quit)
     else
 #endif
     {
-      if (!ask_if_really_quit || level_editor_test_game)
+      if (quick_quit)
       {
 	game_status = GAME_MODE_MAIN;
 
@@ -12566,7 +12635,7 @@ void RequestQuitGame(boolean ask_if_really_quit)
       }
     }
   }
-  else
+  else		/* continue playing the game */
   {
     if (tape.playing && tape.deactivate_display)
       TapeDeactivateDisplayOff(TRUE);
@@ -12576,6 +12645,15 @@ void RequestQuitGame(boolean ask_if_really_quit)
     if (tape.playing && tape.deactivate_display)
       TapeDeactivateDisplayOn();
   }
+}
+
+void RequestQuitGame(boolean ask_if_really_quit)
+{
+  boolean quick_quit = (!ask_if_really_quit || level_editor_test_game);
+  boolean skip_request = AllPlayersGone || quick_quit;
+
+  RequestQuitGameExt(skip_request, quick_quit,
+		     "Do you really want to quit the game ?");
 }
 
 

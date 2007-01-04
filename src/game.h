@@ -241,6 +241,8 @@ void PlayLevelSound_EM(int, int, int, int);
 
 void RaiseScore(int);
 void RaiseScoreElement(int);
+
+void RequestQuitGameExt(boolean, boolean, char *);
 void RequestQuitGame(boolean);
 
 unsigned int InitEngineRandom_RND(long);
