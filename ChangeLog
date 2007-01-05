@@ -1,3 +1,6 @@
+2007-01-05
+	* version 3.2.3 released
+
 2007-01-04
 	* fixed malloc/free bug when updating EMC artwork entries in level list
 	* added workaround (warning and request to quit the current game) when

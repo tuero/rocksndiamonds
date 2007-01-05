@@ -6201,12 +6201,16 @@ void PlayMenuMusic()
 
 void PlaySoundActivating()
 {
+#if 0
   PlaySound(SND_MENU_ITEM_ACTIVATING);
+#endif
 }
 
 void PlaySoundSelecting()
 {
+#if 0
   PlaySound(SND_MENU_ITEM_SELECTING);
+#endif
 }
 
 void ToggleFullscreenIfNeeded()
