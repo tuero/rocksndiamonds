@@ -3742,12 +3742,127 @@ static int editor_el_chars[] =
   EL_CHAR('°'),
   EL_CHAR('®'),
   EL_CHAR(FONT_ASCII_CURSOR),
+  EL_CHAR(FONT_ASCII_BUTTON),
+
+  EL_CHAR(FONT_ASCII_UP),
+  EL_CHAR(FONT_ASCII_DOWN),
+  EL_CHAR(' '),
   EL_CHAR(' ')
 };
 static int *editor_hl_chars_ptr = editor_hl_chars;
 static int *editor_el_chars_ptr = editor_el_chars;
 static int num_editor_hl_chars = SIZEOF_ARRAY_INT(editor_hl_chars);
 static int num_editor_el_chars = SIZEOF_ARRAY_INT(editor_el_chars);
+
+static int editor_hl_steelchars[] =
+{
+  EL_INTERNAL_CASCADE_STEELCHARS_ACTIVE,
+  EL_STEELCHAR('T'),
+  EL_STEELCHAR('X'),
+  EL_STEELCHAR('T'),
+};
+
+static int editor_el_steelchars[] =
+{
+  EL_STEELCHAR(' '),
+  EL_STEELCHAR('!'),
+  EL_STEELCHAR('"'),
+  EL_STEELCHAR('#'),
+
+  EL_STEELCHAR('$'),
+  EL_STEELCHAR('%'),
+  EL_STEELCHAR('&'),
+  EL_STEELCHAR('\''),
+
+  EL_STEELCHAR('('),
+  EL_STEELCHAR(')'),
+  EL_STEELCHAR('*'),
+  EL_STEELCHAR('+'),
+
+  EL_STEELCHAR(','),
+  EL_STEELCHAR('-'),
+  EL_STEELCHAR('.'),
+  EL_STEELCHAR('/'),
+
+  EL_STEELCHAR('0'),
+  EL_STEELCHAR('1'),
+  EL_STEELCHAR('2'),
+  EL_STEELCHAR('3'),
+
+  EL_STEELCHAR('4'),
+  EL_STEELCHAR('5'),
+  EL_STEELCHAR('6'),
+  EL_STEELCHAR('7'),
+
+  EL_STEELCHAR('8'),
+  EL_STEELCHAR('9'),
+  EL_STEELCHAR(':'),
+  EL_STEELCHAR(';'),
+
+  EL_STEELCHAR('<'),
+  EL_STEELCHAR('='),
+  EL_STEELCHAR('>'),
+  EL_STEELCHAR('?'),
+
+  EL_STEELCHAR('@'),
+  EL_STEELCHAR('A'),
+  EL_STEELCHAR('B'),
+  EL_STEELCHAR('C'),
+
+  EL_STEELCHAR('D'),
+  EL_STEELCHAR('E'),
+  EL_STEELCHAR('F'),
+  EL_STEELCHAR('G'),
+
+  EL_STEELCHAR('H'),
+  EL_STEELCHAR('I'),
+  EL_STEELCHAR('J'),
+  EL_STEELCHAR('K'),
+
+  EL_STEELCHAR('L'),
+  EL_STEELCHAR('M'),
+  EL_STEELCHAR('N'),
+  EL_STEELCHAR('O'),
+
+  EL_STEELCHAR('P'),
+  EL_STEELCHAR('Q'),
+  EL_STEELCHAR('R'),
+  EL_STEELCHAR('S'),
+
+  EL_STEELCHAR('T'),
+  EL_STEELCHAR('U'),
+  EL_STEELCHAR('V'),
+  EL_STEELCHAR('W'),
+
+  EL_STEELCHAR('X'),
+  EL_STEELCHAR('Y'),
+  EL_STEELCHAR('Z'),
+  EL_STEELCHAR('['),
+
+  EL_STEELCHAR('\\'),
+  EL_STEELCHAR(']'),
+  EL_STEELCHAR('^'),
+  EL_STEELCHAR('_'),
+
+  EL_STEELCHAR('©'),
+  EL_STEELCHAR('Ä'),
+  EL_STEELCHAR('Ö'),
+  EL_STEELCHAR('Ü'),
+
+  EL_STEELCHAR('°'),
+  EL_STEELCHAR('®'),
+  EL_STEELCHAR(FONT_ASCII_CURSOR),
+  EL_STEELCHAR(FONT_ASCII_BUTTON),
+
+  EL_STEELCHAR(FONT_ASCII_UP),
+  EL_STEELCHAR(FONT_ASCII_DOWN),
+  EL_STEELCHAR(' '),
+  EL_STEELCHAR(' ')
+};
+static int *editor_hl_steelchars_ptr = editor_hl_steelchars;
+static int *editor_el_steelchars_ptr = editor_el_steelchars;
+static int num_editor_hl_steelchars = SIZEOF_ARRAY_INT(editor_hl_steelchars);
+static int num_editor_el_steelchars = SIZEOF_ARRAY_INT(editor_el_steelchars);
 
 static int editor_hl_custom[] =
 {
@@ -4304,6 +4419,12 @@ editor_elements_info[] =
     &setup.editor_cascade.el_chars,
     &editor_hl_chars_ptr,		&num_editor_hl_chars,
     &editor_el_chars_ptr,		&num_editor_el_chars
+  },
+  {
+    &setup.editor.el_steelchars,
+    &setup.editor_cascade.el_steelchars,
+    &editor_hl_steelchars_ptr,		&num_editor_hl_steelchars,
+    &editor_el_steelchars_ptr,		&num_editor_el_steelchars
   },
   {
     &setup.editor.el_custom,

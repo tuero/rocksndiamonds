@@ -4110,7 +4110,7 @@ int getMappedElement_DC(int element)
       element = EL_ROCK;
       break;
 
-      /* 0x0118 - 0x036c: (?) */
+      /* 0x0117 - 0x036e: (?) */
       /* EL_DIAMOND */
 
       /* 0x042d - 0x0684: (?) */
@@ -4582,15 +4582,15 @@ int getMappedElement_DC(int element)
       break;
 
     case 0x15d7:	/* (blue) */
-      element = EL_CHAR_ASCIICIRCUM;
+      element = EL_CHAR_UP;
       break;
 
     case 0x15d8:	/* (blue) */
-      element = EL_CHAR_UNDERSCORE;
+      element = EL_CHAR_DOWN;
       break;
 
     case 0x15d9:	/* (blue) */
-      element = EL_CHAR_ASTERISK;
+      element = EL_CHAR_BUTTON;
       break;
 
     case 0x15da:	/* (blue) */
@@ -4798,15 +4798,15 @@ int getMappedElement_DC(int element)
       break;
 
     case 0x160d:	/* (green) */
-      element = EL_CHAR_ASCIICIRCUM;
+      element = EL_CHAR_UP;
       break;
 
     case 0x160e:	/* (green) */
-      element = EL_CHAR_UNDERSCORE;
+      element = EL_CHAR_DOWN;
       break;
 
     case 0x160f:	/* (green) */
-      element = EL_CHAR_ASTERISK;
+      element = EL_CHAR_BUTTON;
       break;
 
     case 0x1610:	/* (green) */
@@ -4830,435 +4830,435 @@ int getMappedElement_DC(int element)
       break;
 
     case 0x1615:	/* (blue steel) */
-      element = EL_CHAR_A;
+      element = EL_STEELCHAR_A;
       break;
 
     case 0x1616:	/* (blue steel) */
-      element = EL_CHAR_B;
+      element = EL_STEELCHAR_B;
       break;
 
     case 0x1617:	/* (blue steel) */
-      element = EL_CHAR_C;
+      element = EL_STEELCHAR_C;
       break;
 
     case 0x1618:	/* (blue steel) */
-      element = EL_CHAR_D;
+      element = EL_STEELCHAR_D;
       break;
 
     case 0x1619:	/* (blue steel) */
-      element = EL_CHAR_E;
+      element = EL_STEELCHAR_E;
       break;
 
     case 0x161a:	/* (blue steel) */
-      element = EL_CHAR_F;
+      element = EL_STEELCHAR_F;
       break;
 
     case 0x161b:	/* (blue steel) */
-      element = EL_CHAR_G;
+      element = EL_STEELCHAR_G;
       break;
 
     case 0x161c:	/* (blue steel) */
-      element = EL_CHAR_H;
+      element = EL_STEELCHAR_H;
       break;
 
     case 0x161d:	/* (blue steel) */
-      element = EL_CHAR_I;
+      element = EL_STEELCHAR_I;
       break;
 
     case 0x161e:	/* (blue steel) */
-      element = EL_CHAR_J;
+      element = EL_STEELCHAR_J;
       break;
 
     case 0x161f:	/* (blue steel) */
-      element = EL_CHAR_K;
+      element = EL_STEELCHAR_K;
       break;
 
     case 0x1620:	/* (blue steel) */
-      element = EL_CHAR_L;
+      element = EL_STEELCHAR_L;
       break;
 
     case 0x1621:	/* (blue steel) */
-      element = EL_CHAR_M;
+      element = EL_STEELCHAR_M;
       break;
 
     case 0x1622:	/* (blue steel) */
-      element = EL_CHAR_N;
+      element = EL_STEELCHAR_N;
       break;
 
     case 0x1623:	/* (blue steel) */
-      element = EL_CHAR_O;
+      element = EL_STEELCHAR_O;
       break;
 
     case 0x1624:	/* (blue steel) */
-      element = EL_CHAR_P;
+      element = EL_STEELCHAR_P;
       break;
 
     case 0x1625:	/* (blue steel) */
-      element = EL_CHAR_Q;
+      element = EL_STEELCHAR_Q;
       break;
 
     case 0x1626:	/* (blue steel) */
-      element = EL_CHAR_R;
+      element = EL_STEELCHAR_R;
       break;
 
     case 0x1627:	/* (blue steel) */
-      element = EL_CHAR_S;
+      element = EL_STEELCHAR_S;
       break;
 
     case 0x1628:	/* (blue steel) */
-      element = EL_CHAR_T;
+      element = EL_STEELCHAR_T;
       break;
 
     case 0x1629:	/* (blue steel) */
-      element = EL_CHAR_U;
+      element = EL_STEELCHAR_U;
       break;
 
     case 0x162a:	/* (blue steel) */
-      element = EL_CHAR_V;
+      element = EL_STEELCHAR_V;
       break;
 
     case 0x162b:	/* (blue steel) */
-      element = EL_CHAR_W;
+      element = EL_STEELCHAR_W;
       break;
 
     case 0x162c:	/* (blue steel) */
-      element = EL_CHAR_X;
+      element = EL_STEELCHAR_X;
       break;
 
     case 0x162d:	/* (blue steel) */
-      element = EL_CHAR_Y;
+      element = EL_STEELCHAR_Y;
       break;
 
     case 0x162e:	/* (blue steel) */
-      element = EL_CHAR_Z;
+      element = EL_STEELCHAR_Z;
       break;
 
     case 0x162f:	/* (blue steel) */
-      element = EL_CHAR_AUMLAUT;
+      element = EL_STEELCHAR_AUMLAUT;
       break;
 
     case 0x1630:	/* (blue steel) */
-      element = EL_CHAR_OUMLAUT;
+      element = EL_STEELCHAR_OUMLAUT;
       break;
 
     case 0x1631:	/* (blue steel) */
-      element = EL_CHAR_UUMLAUT;
+      element = EL_STEELCHAR_UUMLAUT;
       break;
 
     case 0x1632:	/* (blue steel) */
-      element = EL_CHAR_0;
+      element = EL_STEELCHAR_0;
       break;
 
     case 0x1633:	/* (blue steel) */
-      element = EL_CHAR_1;
+      element = EL_STEELCHAR_1;
       break;
 
     case 0x1634:	/* (blue steel) */
-      element = EL_CHAR_2;
+      element = EL_STEELCHAR_2;
       break;
 
     case 0x1635:	/* (blue steel) */
-      element = EL_CHAR_3;
+      element = EL_STEELCHAR_3;
       break;
 
     case 0x1636:	/* (blue steel) */
-      element = EL_CHAR_4;
+      element = EL_STEELCHAR_4;
       break;
 
     case 0x1637:	/* (blue steel) */
-      element = EL_CHAR_5;
+      element = EL_STEELCHAR_5;
       break;
 
     case 0x1638:	/* (blue steel) */
-      element = EL_CHAR_6;
+      element = EL_STEELCHAR_6;
       break;
 
     case 0x1639:	/* (blue steel) */
-      element = EL_CHAR_7;
+      element = EL_STEELCHAR_7;
       break;
 
     case 0x163a:	/* (blue steel) */
-      element = EL_CHAR_8;
+      element = EL_STEELCHAR_8;
       break;
 
     case 0x163b:	/* (blue steel) */
-      element = EL_CHAR_9;
+      element = EL_STEELCHAR_9;
       break;
 
     case 0x163c:	/* (blue steel) */
-      element = EL_CHAR_PERIOD;
+      element = EL_STEELCHAR_PERIOD;
       break;
 
     case 0x163d:	/* (blue steel) */
-      element = EL_CHAR_EXCLAM;
+      element = EL_STEELCHAR_EXCLAM;
       break;
 
     case 0x163e:	/* (blue steel) */
-      element = EL_CHAR_COLON;
+      element = EL_STEELCHAR_COLON;
       break;
 
     case 0x163f:	/* (blue steel) */
-      element = EL_CHAR_LESS;
+      element = EL_STEELCHAR_LESS;
       break;
 
     case 0x1640:	/* (blue steel) */
-      element = EL_CHAR_GREATER;
+      element = EL_STEELCHAR_GREATER;
       break;
 
     case 0x1641:	/* (blue steel) */
-      element = EL_CHAR_QUESTION;
+      element = EL_STEELCHAR_QUESTION;
       break;
 
     case 0x1642:	/* (blue steel) */
-      element = EL_CHAR_COPYRIGHT;
+      element = EL_STEELCHAR_COPYRIGHT;
       break;
 
     case 0x1643:	/* (blue steel) */
-      element = EL_CHAR_ASCIICIRCUM;
+      element = EL_STEELCHAR_UP;
       break;
 
     case 0x1644:	/* (blue steel) */
-      element = EL_CHAR_UNDERSCORE;
+      element = EL_STEELCHAR_DOWN;
       break;
 
     case 0x1645:	/* (blue steel) */
-      element = EL_CHAR_ASTERISK;
+      element = EL_STEELCHAR_BUTTON;
       break;
 
     case 0x1646:	/* (blue steel) */
-      element = EL_CHAR_PLUS;
+      element = EL_STEELCHAR_PLUS;
       break;
 
     case 0x1647:	/* (blue steel) */
-      element = EL_CHAR_MINUS;
+      element = EL_STEELCHAR_MINUS;
       break;
 
     case 0x1648:	/* (blue steel) */
-      element = EL_CHAR_APOSTROPHE;
+      element = EL_STEELCHAR_APOSTROPHE;
       break;
 
     case 0x1649:	/* (blue steel) */
-      element = EL_CHAR_PARENLEFT;
+      element = EL_STEELCHAR_PARENLEFT;
       break;
 
     case 0x164a:	/* (blue steel) */
-      element = EL_CHAR_PARENRIGHT;
+      element = EL_STEELCHAR_PARENRIGHT;
       break;
 
     case 0x164b:	/* (green steel) */
-      element = EL_CHAR_A;
+      element = EL_STEELCHAR_A;
       break;
 
     case 0x164c:	/* (green steel) */
-      element = EL_CHAR_B;
+      element = EL_STEELCHAR_B;
       break;
 
     case 0x164d:	/* (green steel) */
-      element = EL_CHAR_C;
+      element = EL_STEELCHAR_C;
       break;
 
     case 0x164e:	/* (green steel) */
-      element = EL_CHAR_D;
+      element = EL_STEELCHAR_D;
       break;
 
     case 0x164f:	/* (green steel) */
-      element = EL_CHAR_E;
+      element = EL_STEELCHAR_E;
       break;
 
     case 0x1650:	/* (green steel) */
-      element = EL_CHAR_F;
+      element = EL_STEELCHAR_F;
       break;
 
     case 0x1651:	/* (green steel) */
-      element = EL_CHAR_G;
+      element = EL_STEELCHAR_G;
       break;
 
     case 0x1652:	/* (green steel) */
-      element = EL_CHAR_H;
+      element = EL_STEELCHAR_H;
       break;
 
     case 0x1653:	/* (green steel) */
-      element = EL_CHAR_I;
+      element = EL_STEELCHAR_I;
       break;
 
     case 0x1654:	/* (green steel) */
-      element = EL_CHAR_J;
+      element = EL_STEELCHAR_J;
       break;
 
     case 0x1655:	/* (green steel) */
-      element = EL_CHAR_K;
+      element = EL_STEELCHAR_K;
       break;
 
     case 0x1656:	/* (green steel) */
-      element = EL_CHAR_L;
+      element = EL_STEELCHAR_L;
       break;
 
     case 0x1657:	/* (green steel) */
-      element = EL_CHAR_M;
+      element = EL_STEELCHAR_M;
       break;
 
     case 0x1658:	/* (green steel) */
-      element = EL_CHAR_N;
+      element = EL_STEELCHAR_N;
       break;
 
     case 0x1659:	/* (green steel) */
-      element = EL_CHAR_O;
+      element = EL_STEELCHAR_O;
       break;
 
     case 0x165a:	/* (green steel) */
-      element = EL_CHAR_P;
+      element = EL_STEELCHAR_P;
       break;
 
     case 0x165b:	/* (green steel) */
-      element = EL_CHAR_Q;
+      element = EL_STEELCHAR_Q;
       break;
 
     case 0x165c:	/* (green steel) */
-      element = EL_CHAR_R;
+      element = EL_STEELCHAR_R;
       break;
 
     case 0x165d:	/* (green steel) */
-      element = EL_CHAR_S;
+      element = EL_STEELCHAR_S;
       break;
 
     case 0x165e:	/* (green steel) */
-      element = EL_CHAR_T;
+      element = EL_STEELCHAR_T;
       break;
 
     case 0x165f:	/* (green steel) */
-      element = EL_CHAR_U;
+      element = EL_STEELCHAR_U;
       break;
 
     case 0x1660:	/* (green steel) */
-      element = EL_CHAR_V;
+      element = EL_STEELCHAR_V;
       break;
 
     case 0x1661:	/* (green steel) */
-      element = EL_CHAR_W;
+      element = EL_STEELCHAR_W;
       break;
 
     case 0x1662:	/* (green steel) */
-      element = EL_CHAR_X;
+      element = EL_STEELCHAR_X;
       break;
 
     case 0x1663:	/* (green steel) */
-      element = EL_CHAR_Y;
+      element = EL_STEELCHAR_Y;
       break;
 
     case 0x1664:	/* (green steel) */
-      element = EL_CHAR_Z;
+      element = EL_STEELCHAR_Z;
       break;
 
     case 0x1665:	/* (green steel) */
-      element = EL_CHAR_AUMLAUT;
+      element = EL_STEELCHAR_AUMLAUT;
       break;
 
     case 0x1666:	/* (green steel) */
-      element = EL_CHAR_OUMLAUT;
+      element = EL_STEELCHAR_OUMLAUT;
       break;
 
     case 0x1667:	/* (green steel) */
-      element = EL_CHAR_UUMLAUT;
+      element = EL_STEELCHAR_UUMLAUT;
       break;
 
     case 0x1668:	/* (green steel) */
-      element = EL_CHAR_0;
+      element = EL_STEELCHAR_0;
       break;
 
     case 0x1669:	/* (green steel) */
-      element = EL_CHAR_1;
+      element = EL_STEELCHAR_1;
       break;
 
     case 0x166a:	/* (green steel) */
-      element = EL_CHAR_2;
+      element = EL_STEELCHAR_2;
       break;
 
     case 0x166b:	/* (green steel) */
-      element = EL_CHAR_3;
+      element = EL_STEELCHAR_3;
       break;
 
     case 0x166c:	/* (green steel) */
-      element = EL_CHAR_4;
+      element = EL_STEELCHAR_4;
       break;
 
     case 0x166d:	/* (green steel) */
-      element = EL_CHAR_5;
+      element = EL_STEELCHAR_5;
       break;
 
     case 0x166e:	/* (green steel) */
-      element = EL_CHAR_6;
+      element = EL_STEELCHAR_6;
       break;
 
     case 0x166f:	/* (green steel) */
-      element = EL_CHAR_7;
+      element = EL_STEELCHAR_7;
       break;
 
     case 0x1670:	/* (green steel) */
-      element = EL_CHAR_8;
+      element = EL_STEELCHAR_8;
       break;
 
     case 0x1671:	/* (green steel) */
-      element = EL_CHAR_9;
+      element = EL_STEELCHAR_9;
       break;
 
     case 0x1672:	/* (green steel) */
-      element = EL_CHAR_PERIOD;
+      element = EL_STEELCHAR_PERIOD;
       break;
 
     case 0x1673:	/* (green steel) */
-      element = EL_CHAR_EXCLAM;
+      element = EL_STEELCHAR_EXCLAM;
       break;
 
     case 0x1674:	/* (green steel) */
-      element = EL_CHAR_COLON;
+      element = EL_STEELCHAR_COLON;
       break;
 
     case 0x1675:	/* (green steel) */
-      element = EL_CHAR_LESS;
+      element = EL_STEELCHAR_LESS;
       break;
 
     case 0x1676:	/* (green steel) */
-      element = EL_CHAR_GREATER;
+      element = EL_STEELCHAR_GREATER;
       break;
 
     case 0x1677:	/* (green steel) */
-      element = EL_CHAR_QUESTION;
+      element = EL_STEELCHAR_QUESTION;
       break;
 
     case 0x1678:	/* (green steel) */
-      element = EL_CHAR_COPYRIGHT;
+      element = EL_STEELCHAR_COPYRIGHT;
       break;
 
     case 0x1679:	/* (green steel) */
-      element = EL_CHAR_ASCIICIRCUM;
+      element = EL_STEELCHAR_UP;
       break;
 
     case 0x167a:	/* (green steel) */
-      element = EL_CHAR_UNDERSCORE;
+      element = EL_STEELCHAR_DOWN;
       break;
 
     case 0x167b:	/* (green steel) */
-      element = EL_CHAR_ASTERISK;
+      element = EL_STEELCHAR_BUTTON;
       break;
 
     case 0x167c:	/* (green steel) */
-      element = EL_CHAR_PLUS;
+      element = EL_STEELCHAR_PLUS;
       break;
 
     case 0x167d:	/* (green steel) */
-      element = EL_CHAR_MINUS;
+      element = EL_STEELCHAR_MINUS;
       break;
 
     case 0x167e:	/* (green steel) */
-      element = EL_CHAR_APOSTROPHE;
+      element = EL_STEELCHAR_APOSTROPHE;
       break;
 
     case 0x167f:	/* (green steel) */
-      element = EL_CHAR_PARENLEFT;
+      element = EL_STEELCHAR_PARENLEFT;
       break;
 
     case 0x1680:	/* (green steel) */
-      element = EL_CHAR_PARENRIGHT;
+      element = EL_STEELCHAR_PARENRIGHT;
       break;
 
     case 0x1681:	/* gate (red) */
@@ -5509,7 +5509,7 @@ int getMappedElement_DC(int element)
       break;
 
     default:
-      if (element >= 0x0118 && element <= 0x036c)	/* (?) */
+      if (element >= 0x0117 && element <= 0x036e)	/* (?) */
 	element = EL_DIAMOND;
       else if (element >= 0x042d && element <= 0x0684)	/* (?) */
 	element = EL_EMERALD;
@@ -7664,15 +7664,16 @@ void SaveScore(int nr)
 #define SETUP_TOKEN_EDITOR_EL_DIAMOND_CAVES	6
 #define SETUP_TOKEN_EDITOR_EL_DX_BOULDERDASH	7
 #define SETUP_TOKEN_EDITOR_EL_CHARS		8
-#define SETUP_TOKEN_EDITOR_EL_CUSTOM		9
-#define SETUP_TOKEN_EDITOR_EL_HEADLINES		10
-#define SETUP_TOKEN_EDITOR_EL_USER_DEFINED	11
-#define SETUP_TOKEN_EDITOR_EL_DYNAMIC		12
-#define SETUP_TOKEN_EDITOR_EL_BY_GAME		13
-#define SETUP_TOKEN_EDITOR_EL_BY_TYPE		14
-#define SETUP_TOKEN_EDITOR_SHOW_ELEMENT_TOKEN	15
+#define SETUP_TOKEN_EDITOR_EL_STEELCHARS	9
+#define SETUP_TOKEN_EDITOR_EL_CUSTOM		10
+#define SETUP_TOKEN_EDITOR_EL_HEADLINES		11
+#define SETUP_TOKEN_EDITOR_EL_USER_DEFINED	12
+#define SETUP_TOKEN_EDITOR_EL_DYNAMIC		13
+#define SETUP_TOKEN_EDITOR_EL_BY_GAME		14
+#define SETUP_TOKEN_EDITOR_EL_BY_TYPE		15
+#define SETUP_TOKEN_EDITOR_SHOW_ELEMENT_TOKEN	16
 
-#define NUM_EDITOR_SETUP_TOKENS			16
+#define NUM_EDITOR_SETUP_TOKENS			17
 
 /* editor cascade setup */
 #define SETUP_TOKEN_EDITOR_CASCADE_BD		0
@@ -7684,13 +7685,14 @@ void SaveScore(int nr)
 #define SETUP_TOKEN_EDITOR_CASCADE_DC		6
 #define SETUP_TOKEN_EDITOR_CASCADE_DX		7
 #define SETUP_TOKEN_EDITOR_CASCADE_TEXT		8
-#define SETUP_TOKEN_EDITOR_CASCADE_CE		9
-#define SETUP_TOKEN_EDITOR_CASCADE_GE		10
-#define SETUP_TOKEN_EDITOR_CASCADE_REF		11
-#define SETUP_TOKEN_EDITOR_CASCADE_USER		12
-#define SETUP_TOKEN_EDITOR_CASCADE_DYNAMIC	13
+#define SETUP_TOKEN_EDITOR_CASCADE_STEELTEXT	9
+#define SETUP_TOKEN_EDITOR_CASCADE_CE		10
+#define SETUP_TOKEN_EDITOR_CASCADE_GE		11
+#define SETUP_TOKEN_EDITOR_CASCADE_REF		12
+#define SETUP_TOKEN_EDITOR_CASCADE_USER		13
+#define SETUP_TOKEN_EDITOR_CASCADE_DYNAMIC	14
 
-#define NUM_EDITOR_CASCADE_SETUP_TOKENS		14
+#define NUM_EDITOR_CASCADE_SETUP_TOKENS		15
 
 /* shortcut setup */
 #define SETUP_TOKEN_SHORTCUT_SAVE_GAME		0
@@ -7800,6 +7802,7 @@ static struct TokenInfo editor_setup_tokens[] =
   { TYPE_SWITCH, &sei.el_dx_boulderdash,"editor.el_dx_boulderdash"	},
 #endif
   { TYPE_SWITCH, &sei.el_chars,		"editor.el_chars"		},
+  { TYPE_SWITCH, &sei.el_steelchars,	"editor.el_steelchars"		},
   { TYPE_SWITCH, &sei.el_custom,	"editor.el_custom"		},
 #if 1
   { TYPE_SWITCH, &not_used,		"editor.el_headlines"		},
@@ -7824,6 +7827,7 @@ static struct TokenInfo editor_cascade_setup_tokens[] =
   { TYPE_SWITCH, &seci.el_dc,		"editor.cascade.el_dc"		},
   { TYPE_SWITCH, &seci.el_dx,		"editor.cascade.el_dx"		},
   { TYPE_SWITCH, &seci.el_chars,	"editor.cascade.el_chars"	},
+  { TYPE_SWITCH, &seci.el_steelchars,	"editor.cascade.el_steelchars"	},
   { TYPE_SWITCH, &seci.el_ce,		"editor.cascade.el_ce"		},
   { TYPE_SWITCH, &seci.el_ge,		"editor.cascade.el_ge"		},
   { TYPE_SWITCH, &seci.el_ref,		"editor.cascade.el_ref"		},
@@ -7936,6 +7940,7 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
   si->editor.el_diamond_caves     = TRUE;
   si->editor.el_dx_boulderdash    = TRUE;
   si->editor.el_chars             = TRUE;
+  si->editor.el_steelchars        = TRUE;
   si->editor.el_custom            = TRUE;
 
   si->editor.el_headlines = TRUE;
@@ -7982,21 +7987,22 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
 
 static void setSetupInfoToDefaults_EditorCascade(struct SetupInfo *si)
 {
-  si->editor_cascade.el_bd	= TRUE;
-  si->editor_cascade.el_em	= TRUE;
-  si->editor_cascade.el_emc	= TRUE;
-  si->editor_cascade.el_rnd	= TRUE;
-  si->editor_cascade.el_sb	= TRUE;
-  si->editor_cascade.el_sp	= TRUE;
-  si->editor_cascade.el_dc	= TRUE;
-  si->editor_cascade.el_dx	= TRUE;
+  si->editor_cascade.el_bd		= TRUE;
+  si->editor_cascade.el_em		= TRUE;
+  si->editor_cascade.el_emc		= TRUE;
+  si->editor_cascade.el_rnd		= TRUE;
+  si->editor_cascade.el_sb		= TRUE;
+  si->editor_cascade.el_sp		= TRUE;
+  si->editor_cascade.el_dc		= TRUE;
+  si->editor_cascade.el_dx		= TRUE;
 
-  si->editor_cascade.el_chars	= FALSE;
-  si->editor_cascade.el_ce	= FALSE;
-  si->editor_cascade.el_ge	= FALSE;
-  si->editor_cascade.el_ref	= FALSE;
-  si->editor_cascade.el_user	= FALSE;
-  si->editor_cascade.el_dynamic	= FALSE;
+  si->editor_cascade.el_chars		= FALSE;
+  si->editor_cascade.el_steelchars	= FALSE;
+  si->editor_cascade.el_ce		= FALSE;
+  si->editor_cascade.el_ge		= FALSE;
+  si->editor_cascade.el_ref		= FALSE;
+  si->editor_cascade.el_user		= FALSE;
+  si->editor_cascade.el_dynamic		= FALSE;
 }
 
 static void decodeSetupFileHash(SetupFileHash *setup_file_hash)

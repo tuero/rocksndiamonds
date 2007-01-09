@@ -3407,6 +3407,7 @@ static struct TokenInfo setup_info_editor[] =
   { TYPE_SWITCH,	&setup.editor.el_dx_boulderdash,"DX-Boulderdash:" },
 #endif
   { TYPE_SWITCH,	&setup.editor.el_chars,		"Text Characters:" },
+  { TYPE_SWITCH,	&setup.editor.el_steelchars,"Text Characters (Steel):"},
   { TYPE_SWITCH,	&setup.editor.el_custom,  "Custom & Group Elements:" },
 #if 0
   { TYPE_SWITCH,	&setup.editor.el_headlines,	"Headlines:"	},

@@ -34,6 +34,12 @@
 
 /* special character mapping for default fonts */
 #define FONT_ASCII_CURSOR	((char)160)
+#define FONT_ASCII_BUTTON	((char)128)
+#define FONT_ASCII_UP		((char)129)
+#define FONT_ASCII_DOWN		((char)130)
+#define FONT_ASCII_LEFT		((char)'<')
+#define FONT_ASCII_RIGHT	((char)'>')
+
 #define MAP_FONT_ASCII(c)	((c) >= 'a' && (c) <= 'z' ? 'A' + (c) - 'a' : \
 				 (c) == '©'		  ? 96  :	      \
 				 (c) == 'ä' || (c) == 'Ä' ? 97  :	      \
@@ -42,6 +48,9 @@
 				 (c) == '°'		  ? 100 :	      \
 				 (c) == '®'		  ? 101 :	      \
 				 (c) == FONT_ASCII_CURSOR ? 102 :	      \
+				 (c) == FONT_ASCII_BUTTON ? 109 :	      \
+				 (c) == FONT_ASCII_UP	  ? 110 :	      \
+				 (c) == FONT_ASCII_DOWN	  ? 111 :	      \
 				 (c))
 
 /* 64 regular ordered ASCII characters, 6 special characters, 1 cursor char. */

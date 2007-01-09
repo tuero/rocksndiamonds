@@ -1115,17 +1115,17 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
   {
     "char_unused",
     "char",
-    "letter ''"
+    "letter 'button'"
   },
   {
     "char_unused",
     "char",
-    "letter ''"
+    "letter 'up'"
   },
   {
     "char_unused",
     "char",
-    "letter ''"
+    "letter 'down'"
   },
   {
     "expandable_wall_horizontal",
@@ -3787,6 +3787,406 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
     "any_element",
     "this element matches any element"
   },
+  {
+    "steelchar_space",
+    "steelchar",
+    "steel letter ' '"
+  },
+  {
+    "steelchar_exclam",
+    "steelchar",
+    "steel letter '!'"
+  },
+  {
+    "steelchar_quotedbl",
+    "steelchar",
+    "steel letter '\"'"
+  },
+  {
+    "steelchar_numbersign",
+    "steelchar",
+    "steel letter '#'"
+  },
+  {
+    "steelchar_dollar",
+    "steelchar",
+    "steel letter '$'"
+  },
+  {
+    "steelchar_percent",
+    "steelchar",
+    "steel letter '%'"
+  },
+  {
+    "steelchar_ampersand",
+    "steelchar",
+    "steel letter '&'"
+  },
+  {
+    "steelchar_apostrophe",
+    "steelchar",
+    "steel letter '''"
+  },
+  {
+    "steelchar_parenleft",
+    "steelchar",
+    "steel letter '('"
+  },
+  {
+    "steelchar_parenright",
+    "steelchar",
+    "steel letter ')'"
+  },
+  {
+    "steelchar_asterisk",
+    "steelchar",
+    "steel letter '*'"
+  },
+  {
+    "steelchar_plus",
+    "steelchar",
+    "steel letter '+'"
+  },
+  {
+    "steelchar_comma",
+    "steelchar",
+    "steel letter ','"
+  },
+  {
+    "steelchar_minus",
+    "steelchar",
+    "steel letter '-'"
+  },
+  {
+    "steelchar_period",
+    "steelchar",
+    "steel letter '.'"
+  },
+  {
+    "steelchar_slash",
+    "steelchar",
+    "steel letter '/'"
+  },
+  {
+    "steelchar_0",
+    "steelchar",
+    "steel letter '0'"
+  },
+  {
+    "steelchar_1",
+    "steelchar",
+    "steel letter '1'"
+  },
+  {
+    "steelchar_2",
+    "steelchar",
+    "steel letter '2'"
+  },
+  {
+    "steelchar_3",
+    "steelchar",
+    "steel letter '3'"
+  },
+  {
+    "steelchar_4",
+    "steelchar",
+    "steel letter '4'"
+  },
+  {
+    "steelchar_5",
+    "steelchar",
+    "steel letter '5'"
+  },
+  {
+    "steelchar_6",
+    "steelchar",
+    "steel letter '6'"
+  },
+  {
+    "steelchar_7",
+    "steelchar",
+    "steel letter '7'"
+  },
+  {
+    "steelchar_8",
+    "steelchar",
+    "steel letter '8'"
+  },
+  {
+    "steelchar_9",
+    "steelchar",
+    "steel letter '9'"
+  },
+  {
+    "steelchar_colon",
+    "steelchar",
+    "steel letter ':'"
+  },
+  {
+    "steelchar_semicolon",
+    "steelchar",
+    "steel letter ';'"
+  },
+  {
+    "steelchar_less",
+    "steelchar",
+    "steel letter '<'"
+  },
+  {
+    "steelchar_equal",
+    "steelchar",
+    "steel letter '='"
+  },
+  {
+    "steelchar_greater",
+    "steelchar",
+    "steel letter '>'"
+  },
+  {
+    "steelchar_question",
+    "steelchar",
+    "steel letter '?'"
+  },
+  {
+    "steelchar_at",
+    "steelchar",
+    "steel letter '@'"
+  },
+  {
+    "steelchar_a",
+    "steelchar",
+    "steel letter 'A'"
+  },
+  {
+    "steelchar_b",
+    "steelchar",
+    "steel letter 'B'"
+  },
+  {
+    "steelchar_c",
+    "steelchar",
+    "steel letter 'C'"
+  },
+  {
+    "steelchar_d",
+    "steelchar",
+    "steel letter 'D'"
+  },
+  {
+    "steelchar_e",
+    "steelchar",
+    "steel letter 'E'"
+  },
+  {
+    "steelchar_f",
+    "steelchar",
+    "steel letter 'F'"
+  },
+  {
+    "steelchar_g",
+    "steelchar",
+    "steel letter 'G'"
+  },
+  {
+    "steelchar_h",
+    "steelchar",
+    "steel letter 'H'"
+  },
+  {
+    "steelchar_i",
+    "steelchar",
+    "steel letter 'I'"
+  },
+  {
+    "steelchar_j",
+    "steelchar",
+    "steel letter 'J'"
+  },
+  {
+    "steelchar_k",
+    "steelchar",
+    "steel letter 'K'"
+  },
+  {
+    "steelchar_l",
+    "steelchar",
+    "steel letter 'L'"
+  },
+  {
+    "steelchar_m",
+    "steelchar",
+    "steel letter 'M'"
+  },
+  {
+    "steelchar_n",
+    "steelchar",
+    "steel letter 'N'"
+  },
+  {
+    "steelchar_o",
+    "steelchar",
+    "steel letter 'O'"
+  },
+  {
+    "steelchar_p",
+    "steelchar",
+    "steel letter 'P'"
+  },
+  {
+    "steelchar_q",
+    "steelchar",
+    "steel letter 'Q'"
+  },
+  {
+    "steelchar_r",
+    "steelchar",
+    "steel letter 'R'"
+  },
+  {
+    "steelchar_s",
+    "steelchar",
+    "steel letter 'S'"
+  },
+  {
+    "steelchar_t",
+    "steelchar",
+    "steel letter 'T'"
+  },
+  {
+    "steelchar_u",
+    "steelchar",
+    "steel letter 'U'"
+  },
+  {
+    "steelchar_v",
+    "steelchar",
+    "steel letter 'V'"
+  },
+  {
+    "steelchar_w",
+    "steelchar",
+    "steel letter 'W'"
+  },
+  {
+    "steelchar_x",
+    "steelchar",
+    "steel letter 'X'"
+  },
+  {
+    "steelchar_y",
+    "steelchar",
+    "steel letter 'Y'"
+  },
+  {
+    "steelchar_z",
+    "steelchar",
+    "steel letter 'Z'"
+  },
+  {
+    "steelchar_bracketleft",
+    "steelchar",
+    "steel letter '['"
+  },
+  {
+    "steelchar_backslash",
+    "steelchar",
+    "steel letter '\\'"
+  },
+  {
+    "steelchar_bracketright",
+    "steelchar",
+    "steel letter ']'"
+  },
+  {
+    "steelchar_asciicircum",
+    "steelchar",
+    "steel letter '^'"
+  },
+  {
+    "steelchar_underscore",
+    "steelchar",
+    "steel letter '_'"
+  },
+  {
+    "steelchar_copyright",
+    "steelchar",
+    "steel letter '©'"
+  },
+  {
+    "steelchar_aumlaut",
+    "steelchar",
+    "steel letter 'Ä'"
+  },
+  {
+    "steelchar_oumlaut",
+    "steelchar",
+    "steel letter 'Ö'"
+  },
+  {
+    "steelchar_uumlaut",
+    "steelchar",
+    "steel letter 'Ü'"
+  },
+  {
+    "steelchar_degree",
+    "steelchar",
+    "steel letter '°'"
+  },
+  {
+    "steelchar_trademark",
+    "steelchar",
+    "steel letter '®'"
+  },
+  {
+    "steelchar_cursor",
+    "steelchar",
+    "steel letter ' '"
+  },
+  {
+    "steelchar_unused",
+    "steelchar",
+    "steel letter ''"
+  },
+  {
+    "steelchar_unused",
+    "steelchar",
+    "steel letter ''"
+  },
+  {
+    "steelchar_unused",
+    "steelchar",
+    "steel letter ''"
+  },
+  {
+    "steelchar_unused",
+    "steelchar",
+    "steel letter ''"
+  },
+  {
+    "steelchar_unused",
+    "steelchar",
+    "steel letter ''"
+  },
+  {
+    "steelchar_unused",
+    "steelchar",
+    "steel letter ''"
+  },
+  {
+    "steelchar_unused",
+    "steelchar",
+    "steel letter 'button'"
+  },
+  {
+    "steelchar_unused",
+    "steelchar",
+    "steel letter 'up'"
+  },
+  {
+    "steelchar_unused",
+    "steelchar",
+    "steel letter 'down'"
+  },
 
   /* ----------------------------------------------------------------------- */
   /* "real" (and therefore drawable) runtime elements                        */
@@ -4442,6 +4842,16 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
     "internal_cascade_chars.active",
     "internal",
     "hide text elements"
+  },
+  {
+    "internal_cascade_steelchars",
+    "internal",
+    "show steel text elements"
+  },
+  {
+    "internal_cascade_steelchars.active",
+    "internal",
+    "hide steel text elements"
   },
   {
     "internal_cascade_ce",

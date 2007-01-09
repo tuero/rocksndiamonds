@@ -3675,6 +3675,7 @@ void InitElementPropertiesStatic()
     EL_INTERNAL_CASCADE_DC_ACTIVE,
     EL_INTERNAL_CASCADE_DX_ACTIVE,
     EL_INTERNAL_CASCADE_CHARS_ACTIVE,
+    EL_INTERNAL_CASCADE_STEELCHARS_ACTIVE,
     EL_INTERNAL_CASCADE_CE_ACTIVE,
     EL_INTERNAL_CASCADE_GE_ACTIVE,
     EL_INTERNAL_CASCADE_REF_ACTIVE,
@@ -3695,6 +3696,7 @@ void InitElementPropertiesStatic()
     EL_INTERNAL_CASCADE_DC,
     EL_INTERNAL_CASCADE_DX,
     EL_INTERNAL_CASCADE_CHARS,
+    EL_INTERNAL_CASCADE_STEELCHARS,
     EL_INTERNAL_CASCADE_CE,
     EL_INTERNAL_CASCADE_GE,
     EL_INTERNAL_CASCADE_REF,
@@ -3865,7 +3867,14 @@ void InitElementPropertiesEngine(int engine_version)
   for (i = 0; i < MAX_NUM_ELEMENTS; i++)
   {
     /* ---------- INACTIVE ------------------------------------------------- */
-    SET_PROPERTY(i, EP_INACTIVE, (i >= EL_CHAR_START && i <= EL_CHAR_END));
+    SET_PROPERTY(i, EP_INACTIVE, ((i >= EL_CHAR_START &&
+				   i <= EL_CHAR_END) ||
+				  (i >= EL_STEELCHAR_START &&
+				   i <= EL_STEELCHAR_END)));
+
+    /* ---------- INDESTRUCTIBLE -------------------------------------------- */
+    if (i >= EL_STEELCHAR_START && i <= EL_STEELCHAR_END)
+      SET_PROPERTY(i, EP_INDESTRUCTIBLE, TRUE);
 
     /* ---------- WALKABLE, PASSABLE, ACCESSIBLE --------------------------- */
     SET_PROPERTY(i, EP_WALKABLE, (IS_WALKABLE_OVER(i) ||
@@ -3919,7 +3928,6 @@ void InitElementPropertiesEngine(int engine_version)
 					     !IS_COLLECTIBLE(i)));
 
     /* ---------- DRAGONFIRE_PROOF ----------------------------------------- */
-
     if (IS_HISTORIC_SOLID(i) || i == EL_EXPLOSION)
       SET_PROPERTY(i, EP_DRAGONFIRE_PROOF, TRUE);
     else

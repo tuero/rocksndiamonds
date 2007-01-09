@@ -726,6 +726,7 @@ struct SetupEditorInfo
   boolean el_diamond_caves;
   boolean el_dx_boulderdash;
   boolean el_chars;
+  boolean el_steelchars;
   boolean el_custom;
   boolean el_user_defined;
   boolean el_dynamic;
@@ -749,6 +750,7 @@ struct SetupEditorCascadeInfo
   boolean el_dc;
   boolean el_dx;
   boolean el_chars;
+  boolean el_steelchars;
   boolean el_ce;
   boolean el_ge;
   boolean el_ref;

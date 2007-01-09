@@ -3578,6 +3578,314 @@ element_to_graphic[] =
     IMG_CHAR_CURSOR
   },
   {
+    EL_CHAR_BUTTON,			-1, -1, FALSE,
+    IMG_CHAR_BUTTON
+  },
+  {
+    EL_CHAR_UP,				-1, -1, FALSE,
+    IMG_CHAR_UP
+  },
+  {
+    EL_CHAR_DOWN,			-1, -1, FALSE,
+    IMG_CHAR_DOWN
+  },
+  {
+    EL_STEELCHAR_SPACE,			-1, -1, FALSE,
+    IMG_STEELCHAR_SPACE
+  },
+  {
+    EL_STEELCHAR_EXCLAM,		-1, -1, FALSE,
+    IMG_STEELCHAR_EXCLAM
+  },
+  {
+    EL_STEELCHAR_QUOTEDBL,		-1, -1, FALSE,
+    IMG_STEELCHAR_QUOTEDBL
+  },
+  {
+    EL_STEELCHAR_NUMBERSIGN,		-1, -1, FALSE,
+    IMG_STEELCHAR_NUMBERSIGN
+  },
+  {
+    EL_STEELCHAR_DOLLAR,		-1, -1, FALSE,
+    IMG_STEELCHAR_DOLLAR
+  },
+  {
+    EL_STEELCHAR_PERCENT,		-1, -1, FALSE,
+    IMG_STEELCHAR_PERCENT
+  },
+  {
+    EL_STEELCHAR_AMPERSAND,		-1, -1, FALSE,
+    IMG_STEELCHAR_AMPERSAND
+  },
+  {
+    EL_STEELCHAR_APOSTROPHE,		-1, -1, FALSE,
+    IMG_STEELCHAR_APOSTROPHE
+  },
+  {
+    EL_STEELCHAR_PARENLEFT,		-1, -1, FALSE,
+    IMG_STEELCHAR_PARENLEFT
+  },
+  {
+    EL_STEELCHAR_PARENRIGHT,		-1, -1, FALSE,
+    IMG_STEELCHAR_PARENRIGHT
+  },
+  {
+    EL_STEELCHAR_ASTERISK,		-1, -1, FALSE,
+    IMG_STEELCHAR_ASTERISK
+  },
+  {
+    EL_STEELCHAR_PLUS,			-1, -1, FALSE,
+    IMG_STEELCHAR_PLUS
+  },
+  {
+    EL_STEELCHAR_COMMA,			-1, -1, FALSE,
+    IMG_STEELCHAR_COMMA
+  },
+  {
+    EL_STEELCHAR_MINUS,			-1, -1, FALSE,
+    IMG_STEELCHAR_MINUS
+  },
+  {
+    EL_STEELCHAR_PERIOD,		-1, -1, FALSE,
+    IMG_STEELCHAR_PERIOD
+  },
+  {
+    EL_STEELCHAR_SLASH,			-1, -1, FALSE,
+    IMG_STEELCHAR_SLASH
+  },
+  {
+    EL_STEELCHAR_0,			-1, -1, FALSE,
+    IMG_STEELCHAR_0
+  },
+  {
+    EL_STEELCHAR_1,			-1, -1, FALSE,
+    IMG_STEELCHAR_1
+  },
+  {
+    EL_STEELCHAR_2,			-1, -1, FALSE,
+    IMG_STEELCHAR_2
+  },
+  {
+    EL_STEELCHAR_3,			-1, -1, FALSE,
+    IMG_STEELCHAR_3
+  },
+  {
+    EL_STEELCHAR_4,			-1, -1, FALSE,
+    IMG_STEELCHAR_4
+  },
+  {
+    EL_STEELCHAR_5,			-1, -1, FALSE,
+    IMG_STEELCHAR_5
+  },
+  {
+    EL_STEELCHAR_6,			-1, -1, FALSE,
+    IMG_STEELCHAR_6
+  },
+  {
+    EL_STEELCHAR_7,			-1, -1, FALSE,
+    IMG_STEELCHAR_7
+  },
+  {
+    EL_STEELCHAR_8,			-1, -1, FALSE,
+    IMG_STEELCHAR_8
+  },
+  {
+    EL_STEELCHAR_9,			-1, -1, FALSE,
+    IMG_STEELCHAR_9
+  },
+  {
+    EL_STEELCHAR_COLON,			-1, -1, FALSE,
+    IMG_STEELCHAR_COLON
+  },
+  {
+    EL_STEELCHAR_SEMICOLON,		-1, -1, FALSE,
+    IMG_STEELCHAR_SEMICOLON
+  },
+  {
+    EL_STEELCHAR_LESS,			-1, -1, FALSE,
+    IMG_STEELCHAR_LESS
+  },
+  {
+    EL_STEELCHAR_EQUAL,			-1, -1, FALSE,
+    IMG_STEELCHAR_EQUAL
+  },
+  {
+    EL_STEELCHAR_GREATER,		-1, -1, FALSE,
+    IMG_STEELCHAR_GREATER
+  },
+  {
+    EL_STEELCHAR_QUESTION,		-1, -1, FALSE,
+    IMG_STEELCHAR_QUESTION
+  },
+  {
+    EL_STEELCHAR_AT,			-1, -1, FALSE,
+    IMG_STEELCHAR_AT
+  },
+  {
+    EL_STEELCHAR_A,			-1, -1, FALSE,
+    IMG_STEELCHAR_A
+  },
+  {
+    EL_STEELCHAR_B,			-1, -1, FALSE,
+    IMG_STEELCHAR_B
+  },
+  {
+    EL_STEELCHAR_C,			-1, -1, FALSE,
+    IMG_STEELCHAR_C
+  },
+  {
+    EL_STEELCHAR_D,			-1, -1, FALSE,
+    IMG_STEELCHAR_D
+  },
+  {
+    EL_STEELCHAR_E,			-1, -1, FALSE,
+    IMG_STEELCHAR_E
+  },
+  {
+    EL_STEELCHAR_F,			-1, -1, FALSE,
+    IMG_STEELCHAR_F
+  },
+  {
+    EL_STEELCHAR_G,			-1, -1, FALSE,
+    IMG_STEELCHAR_G
+  },
+  {
+    EL_STEELCHAR_H,			-1, -1, FALSE,
+    IMG_STEELCHAR_H
+  },
+  {
+    EL_STEELCHAR_I,			-1, -1, FALSE,
+    IMG_STEELCHAR_I
+  },
+  {
+    EL_STEELCHAR_J,			-1, -1, FALSE,
+    IMG_STEELCHAR_J
+  },
+  {
+    EL_STEELCHAR_K,			-1, -1, FALSE,
+    IMG_STEELCHAR_K
+  },
+  {
+    EL_STEELCHAR_L,			-1, -1, FALSE,
+    IMG_STEELCHAR_L
+  },
+  {
+    EL_STEELCHAR_M,			-1, -1, FALSE,
+    IMG_STEELCHAR_M
+  },
+  {
+    EL_STEELCHAR_N,			-1, -1, FALSE,
+    IMG_STEELCHAR_N
+  },
+  {
+    EL_STEELCHAR_O,			-1, -1, FALSE,
+    IMG_STEELCHAR_O
+  },
+  {
+    EL_STEELCHAR_P,			-1, -1, FALSE,
+    IMG_STEELCHAR_P
+  },
+  {
+    EL_STEELCHAR_Q,			-1, -1, FALSE,
+    IMG_STEELCHAR_Q
+  },
+  {
+    EL_STEELCHAR_R,			-1, -1, FALSE,
+    IMG_STEELCHAR_R
+  },
+  {
+    EL_STEELCHAR_S,			-1, -1, FALSE,
+    IMG_STEELCHAR_S
+  },
+  {
+    EL_STEELCHAR_T,			-1, -1, FALSE,
+    IMG_STEELCHAR_T
+  },
+  {
+    EL_STEELCHAR_U,			-1, -1, FALSE,
+    IMG_STEELCHAR_U
+  },
+  {
+    EL_STEELCHAR_V,			-1, -1, FALSE,
+    IMG_STEELCHAR_V
+  },
+  {
+    EL_STEELCHAR_W,			-1, -1, FALSE,
+    IMG_STEELCHAR_W
+  },
+  {
+    EL_STEELCHAR_X,			-1, -1, FALSE,
+    IMG_STEELCHAR_X
+  },
+  {
+    EL_STEELCHAR_Y,			-1, -1, FALSE,
+    IMG_STEELCHAR_Y
+  },
+  {
+    EL_STEELCHAR_Z,			-1, -1, FALSE,
+    IMG_STEELCHAR_Z
+  },
+  {
+    EL_STEELCHAR_BRACKETLEFT,		-1, -1, FALSE,
+    IMG_STEELCHAR_BRACKETLEFT
+  },
+  {
+    EL_STEELCHAR_BACKSLASH,		-1, -1, FALSE,
+    IMG_STEELCHAR_BACKSLASH
+  },
+  {
+    EL_STEELCHAR_BRACKETRIGHT,		-1, -1, FALSE,
+    IMG_STEELCHAR_BRACKETRIGHT
+  },
+  {
+    EL_STEELCHAR_ASCIICIRCUM,		-1, -1, FALSE,
+    IMG_STEELCHAR_ASCIICIRCUM
+  },
+  {
+    EL_STEELCHAR_UNDERSCORE,		-1, -1, FALSE,
+    IMG_STEELCHAR_UNDERSCORE
+  },
+  {
+    EL_STEELCHAR_COPYRIGHT,		-1, -1, FALSE,
+    IMG_STEELCHAR_COPYRIGHT
+  },
+  {
+    EL_STEELCHAR_AUMLAUT,		-1, -1, FALSE,
+    IMG_STEELCHAR_AUMLAUT
+  },
+  {
+    EL_STEELCHAR_OUMLAUT,		-1, -1, FALSE,
+    IMG_STEELCHAR_OUMLAUT
+  },
+  {
+    EL_STEELCHAR_UUMLAUT,		-1, -1, FALSE,
+    IMG_STEELCHAR_UUMLAUT
+  },
+  {
+    EL_STEELCHAR_DEGREE,		-1, -1, FALSE,
+    IMG_STEELCHAR_DEGREE
+  },
+  {
+    EL_STEELCHAR_TRADEMARK,		-1, -1, FALSE,
+    IMG_STEELCHAR_TRADEMARK
+  },
+  {
+    EL_STEELCHAR_CURSOR,		-1, -1, FALSE,
+    IMG_STEELCHAR_CURSOR
+  },
+  {
+    EL_STEELCHAR_BUTTON,		-1, -1, FALSE,
+    IMG_STEELCHAR_BUTTON
+  },
+  {
+    EL_STEELCHAR_UP,			-1, -1, FALSE,
+    IMG_STEELCHAR_UP
+  },
+  {
+    EL_STEELCHAR_DOWN,			-1, -1, FALSE,
+    IMG_STEELCHAR_DOWN
+  },
+  {
     EL_CUSTOM_1,			-1, -1, FALSE,
     IMG_CUSTOM_1
   },
