@@ -244,7 +244,8 @@
 	ELEMENT_CAN_ENTER_FIELD_BASE_2(e, x, y, IS_FOOD_PIG(Feld[x][y]))
 
 #define PENGUIN_CAN_ENTER_FIELD(e, x, y)				\
-	ELEMENT_CAN_ENTER_FIELD_BASE_2(e, x, y, (Feld[x][y] == EL_EXIT_OPEN ||\
+	ELEMENT_CAN_ENTER_FIELD_BASE_2(e, x, y, (Feld[x][y] == EL_EXIT_OPEN || \
+						 Feld[x][y] == EL_STEEL_EXIT_OPEN || \
 						 IS_FOOD_PENGUIN(Feld[x][y])))
 #define DRAGON_CAN_ENTER_FIELD(e, x, y)					\
 	ELEMENT_CAN_ENTER_FIELD_BASE_2(e, x, y, 0)
@@ -469,6 +470,22 @@ static struct ChangingElementInfo change_delay_list[] =
   {
     EL_EXIT_CLOSING,
     EL_EXIT_CLOSED,
+    29,
+    NULL,
+    NULL,
+    NULL
+  },
+  {
+    EL_STEEL_EXIT_OPENING,
+    EL_STEEL_EXIT_OPEN,
+    29,
+    NULL,
+    NULL,
+    NULL
+  },
+  {
+    EL_STEEL_EXIT_CLOSING,
+    EL_STEEL_EXIT_CLOSED,
     29,
     NULL,
     NULL,
@@ -2774,12 +2791,14 @@ void GameWon()
 	/* close exit door after last player */
 	if (AllPlayersGone &&
 	    (Feld[ExitX][ExitY] == EL_EXIT_OPEN ||
-	     Feld[ExitX][ExitY] == EL_SP_EXIT_OPEN))
+	     Feld[ExitX][ExitY] == EL_SP_EXIT_OPEN ||
+	     Feld[ExitX][ExitY] == EL_STEEL_EXIT_OPEN))
 	{
 	  int element = Feld[ExitX][ExitY];
 
 	  Feld[ExitX][ExitY] = (element == EL_EXIT_OPEN ? EL_EXIT_CLOSING :
-				EL_SP_EXIT_CLOSING);
+				element == EL_SP_EXIT_OPEN ? EL_SP_EXIT_CLOSING:
+				EL_STEEL_EXIT_CLOSING);
 
 	  PlayLevelSoundElementAction(ExitX, ExitY, element, ACTION_CLOSING);
 	}
@@ -5054,7 +5073,8 @@ inline static void TurnRoundExt(int x, int y)
     	int ex = x + xy[i][0];
     	int ey = y + xy[i][1];
 
-    	if (IN_LEV_FIELD(ex, ey) && Feld[ex][ey] == EL_EXIT_OPEN)
+    	if (IN_LEV_FIELD(ex, ey) && (Feld[ex][ey] == EL_EXIT_OPEN ||
+				     Feld[ex][ey] == EL_STEEL_EXIT_OPEN))
 	{
 	  attr_x = ex;
  	  attr_y = ey;
@@ -6051,7 +6071,8 @@ void StartMoving(int x, int y)
     }
     else if (element == EL_PENGUIN && IN_LEV_FIELD(newx, newy))
     {
-      if (Feld[newx][newy] == EL_EXIT_OPEN)
+      if (Feld[newx][newy] == EL_EXIT_OPEN ||
+	  Feld[newx][newy] == EL_STEEL_EXIT_OPEN)
       {
 	RemoveField(x, y);
 	DrawLevelField(x, y);
@@ -7310,6 +7331,29 @@ void CheckExit(int x, int y)
   Feld[x][y] = EL_EXIT_OPENING;
 
   PlayLevelSoundNearest(x, y, SND_CLASS_EXIT_OPENING);
+}
+
+void CheckExitSteel(int x, int y)
+{
+  if (local_player->gems_still_needed > 0 ||
+      local_player->sokobanfields_still_needed > 0 ||
+      local_player->lights_still_needed > 0)
+  {
+    int element = Feld[x][y];
+    int graphic = el2img(element);
+
+    if (IS_ANIMATED(graphic))
+      DrawLevelGraphicAnimationIfNeeded(x, y, graphic);
+
+    return;
+  }
+
+  if (AllPlayersGone)	/* do not re-open exit door closed after last player */
+    return;
+
+  Feld[x][y] = EL_STEEL_EXIT_OPENING;
+
+  PlayLevelSoundNearest(x, y, SND_CLASS_STEEL_EXIT_OPENING);
 }
 
 void CheckExitSP(int x, int y)
@@ -9635,6 +9679,7 @@ void GameActions_RND()
     else if ((element == EL_ACID ||
 	      element == EL_EXIT_OPEN ||
 	      element == EL_SP_EXIT_OPEN ||
+	      element == EL_STEEL_EXIT_OPEN ||
 	      element == EL_SP_TERMINAL ||
 	      element == EL_SP_TERMINAL_ACTIVE ||
 	      element == EL_EXTRA_TIME ||
@@ -9660,6 +9705,8 @@ void GameActions_RND()
       Life(x, y);
     else if (element == EL_EXIT_CLOSED)
       CheckExit(x, y);
+    else if (element == EL_STEEL_EXIT_CLOSED)
+      CheckExitSteel(x, y);
     else if (element == EL_SP_EXIT_CLOSED)
       CheckExitSP(x, y);
     else if (element == EL_EXPANDABLE_WALL_GROWING)
@@ -10482,6 +10529,7 @@ void ScrollPlayer(struct PlayerInfo *player, int mode)
     player->last_jy = jy;
 
     if (Feld[jx][jy] == EL_EXIT_OPEN ||
+	Feld[jx][jy] == EL_STEEL_EXIT_OPEN ||
 	Feld[jx][jy] == EL_SP_EXIT_OPEN ||
 	Feld[jx][jy] == EL_SP_EXIT_OPENING)	/* <-- special case */
     {
@@ -11447,6 +11495,7 @@ int DigField(struct PlayerInfo *player,
 	return MP_NO_ACTION;
     }
     else if (element == EL_EXIT_OPEN ||
+	     element == EL_STEEL_EXIT_OPEN ||
 	     element == EL_SP_EXIT_OPEN ||
 	     element == EL_SP_EXIT_OPENING)
     {

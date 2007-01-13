@@ -3788,403 +3788,403 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
     "this element matches any element"
   },
   {
-    "steelchar_space",
-    "steelchar",
+    "steel_char_space",
+    "steel_char",
     "steel letter ' '"
   },
   {
-    "steelchar_exclam",
-    "steelchar",
+    "steel_char_exclam",
+    "steel_char",
     "steel letter '!'"
   },
   {
-    "steelchar_quotedbl",
-    "steelchar",
+    "steel_char_quotedbl",
+    "steel_char",
     "steel letter '\"'"
   },
   {
-    "steelchar_numbersign",
-    "steelchar",
+    "steel_char_numbersign",
+    "steel_char",
     "steel letter '#'"
   },
   {
-    "steelchar_dollar",
-    "steelchar",
+    "steel_char_dollar",
+    "steel_char",
     "steel letter '$'"
   },
   {
-    "steelchar_percent",
-    "steelchar",
+    "steel_char_percent",
+    "steel_char",
     "steel letter '%'"
   },
   {
-    "steelchar_ampersand",
-    "steelchar",
+    "steel_char_ampersand",
+    "steel_char",
     "steel letter '&'"
   },
   {
-    "steelchar_apostrophe",
-    "steelchar",
+    "steel_char_apostrophe",
+    "steel_char",
     "steel letter '''"
   },
   {
-    "steelchar_parenleft",
-    "steelchar",
+    "steel_char_parenleft",
+    "steel_char",
     "steel letter '('"
   },
   {
-    "steelchar_parenright",
-    "steelchar",
+    "steel_char_parenright",
+    "steel_char",
     "steel letter ')'"
   },
   {
-    "steelchar_asterisk",
-    "steelchar",
+    "steel_char_asterisk",
+    "steel_char",
     "steel letter '*'"
   },
   {
-    "steelchar_plus",
-    "steelchar",
+    "steel_char_plus",
+    "steel_char",
     "steel letter '+'"
   },
   {
-    "steelchar_comma",
-    "steelchar",
+    "steel_char_comma",
+    "steel_char",
     "steel letter ','"
   },
   {
-    "steelchar_minus",
-    "steelchar",
+    "steel_char_minus",
+    "steel_char",
     "steel letter '-'"
   },
   {
-    "steelchar_period",
-    "steelchar",
+    "steel_char_period",
+    "steel_char",
     "steel letter '.'"
   },
   {
-    "steelchar_slash",
-    "steelchar",
+    "steel_char_slash",
+    "steel_char",
     "steel letter '/'"
   },
   {
-    "steelchar_0",
-    "steelchar",
+    "steel_char_0",
+    "steel_char",
     "steel letter '0'"
   },
   {
-    "steelchar_1",
-    "steelchar",
+    "steel_char_1",
+    "steel_char",
     "steel letter '1'"
   },
   {
-    "steelchar_2",
-    "steelchar",
+    "steel_char_2",
+    "steel_char",
     "steel letter '2'"
   },
   {
-    "steelchar_3",
-    "steelchar",
+    "steel_char_3",
+    "steel_char",
     "steel letter '3'"
   },
   {
-    "steelchar_4",
-    "steelchar",
+    "steel_char_4",
+    "steel_char",
     "steel letter '4'"
   },
   {
-    "steelchar_5",
-    "steelchar",
+    "steel_char_5",
+    "steel_char",
     "steel letter '5'"
   },
   {
-    "steelchar_6",
-    "steelchar",
+    "steel_char_6",
+    "steel_char",
     "steel letter '6'"
   },
   {
-    "steelchar_7",
-    "steelchar",
+    "steel_char_7",
+    "steel_char",
     "steel letter '7'"
   },
   {
-    "steelchar_8",
-    "steelchar",
+    "steel_char_8",
+    "steel_char",
     "steel letter '8'"
   },
   {
-    "steelchar_9",
-    "steelchar",
+    "steel_char_9",
+    "steel_char",
     "steel letter '9'"
   },
   {
-    "steelchar_colon",
-    "steelchar",
+    "steel_char_colon",
+    "steel_char",
     "steel letter ':'"
   },
   {
-    "steelchar_semicolon",
-    "steelchar",
+    "steel_char_semicolon",
+    "steel_char",
     "steel letter ';'"
   },
   {
-    "steelchar_less",
-    "steelchar",
+    "steel_char_less",
+    "steel_char",
     "steel letter '<'"
   },
   {
-    "steelchar_equal",
-    "steelchar",
+    "steel_char_equal",
+    "steel_char",
     "steel letter '='"
   },
   {
-    "steelchar_greater",
-    "steelchar",
+    "steel_char_greater",
+    "steel_char",
     "steel letter '>'"
   },
   {
-    "steelchar_question",
-    "steelchar",
+    "steel_char_question",
+    "steel_char",
     "steel letter '?'"
   },
   {
-    "steelchar_at",
-    "steelchar",
+    "steel_char_at",
+    "steel_char",
     "steel letter '@'"
   },
   {
-    "steelchar_a",
-    "steelchar",
+    "steel_char_a",
+    "steel_char",
     "steel letter 'A'"
   },
   {
-    "steelchar_b",
-    "steelchar",
+    "steel_char_b",
+    "steel_char",
     "steel letter 'B'"
   },
   {
-    "steelchar_c",
-    "steelchar",
+    "steel_char_c",
+    "steel_char",
     "steel letter 'C'"
   },
   {
-    "steelchar_d",
-    "steelchar",
+    "steel_char_d",
+    "steel_char",
     "steel letter 'D'"
   },
   {
-    "steelchar_e",
-    "steelchar",
+    "steel_char_e",
+    "steel_char",
     "steel letter 'E'"
   },
   {
-    "steelchar_f",
-    "steelchar",
+    "steel_char_f",
+    "steel_char",
     "steel letter 'F'"
   },
   {
-    "steelchar_g",
-    "steelchar",
+    "steel_char_g",
+    "steel_char",
     "steel letter 'G'"
   },
   {
-    "steelchar_h",
-    "steelchar",
+    "steel_char_h",
+    "steel_char",
     "steel letter 'H'"
   },
   {
-    "steelchar_i",
-    "steelchar",
+    "steel_char_i",
+    "steel_char",
     "steel letter 'I'"
   },
   {
-    "steelchar_j",
-    "steelchar",
+    "steel_char_j",
+    "steel_char",
     "steel letter 'J'"
   },
   {
-    "steelchar_k",
-    "steelchar",
+    "steel_char_k",
+    "steel_char",
     "steel letter 'K'"
   },
   {
-    "steelchar_l",
-    "steelchar",
+    "steel_char_l",
+    "steel_char",
     "steel letter 'L'"
   },
   {
-    "steelchar_m",
-    "steelchar",
+    "steel_char_m",
+    "steel_char",
     "steel letter 'M'"
   },
   {
-    "steelchar_n",
-    "steelchar",
+    "steel_char_n",
+    "steel_char",
     "steel letter 'N'"
   },
   {
-    "steelchar_o",
-    "steelchar",
+    "steel_char_o",
+    "steel_char",
     "steel letter 'O'"
   },
   {
-    "steelchar_p",
-    "steelchar",
+    "steel_char_p",
+    "steel_char",
     "steel letter 'P'"
   },
   {
-    "steelchar_q",
-    "steelchar",
+    "steel_char_q",
+    "steel_char",
     "steel letter 'Q'"
   },
   {
-    "steelchar_r",
-    "steelchar",
+    "steel_char_r",
+    "steel_char",
     "steel letter 'R'"
   },
   {
-    "steelchar_s",
-    "steelchar",
+    "steel_char_s",
+    "steel_char",
     "steel letter 'S'"
   },
   {
-    "steelchar_t",
-    "steelchar",
+    "steel_char_t",
+    "steel_char",
     "steel letter 'T'"
   },
   {
-    "steelchar_u",
-    "steelchar",
+    "steel_char_u",
+    "steel_char",
     "steel letter 'U'"
   },
   {
-    "steelchar_v",
-    "steelchar",
+    "steel_char_v",
+    "steel_char",
     "steel letter 'V'"
   },
   {
-    "steelchar_w",
-    "steelchar",
+    "steel_char_w",
+    "steel_char",
     "steel letter 'W'"
   },
   {
-    "steelchar_x",
-    "steelchar",
+    "steel_char_x",
+    "steel_char",
     "steel letter 'X'"
   },
   {
-    "steelchar_y",
-    "steelchar",
+    "steel_char_y",
+    "steel_char",
     "steel letter 'Y'"
   },
   {
-    "steelchar_z",
-    "steelchar",
+    "steel_char_z",
+    "steel_char",
     "steel letter 'Z'"
   },
   {
-    "steelchar_bracketleft",
-    "steelchar",
+    "steel_char_bracketleft",
+    "steel_char",
     "steel letter '['"
   },
   {
-    "steelchar_backslash",
-    "steelchar",
+    "steel_char_backslash",
+    "steel_char",
     "steel letter '\\'"
   },
   {
-    "steelchar_bracketright",
-    "steelchar",
+    "steel_char_bracketright",
+    "steel_char",
     "steel letter ']'"
   },
   {
-    "steelchar_asciicircum",
-    "steelchar",
+    "steel_char_asciicircum",
+    "steel_char",
     "steel letter '^'"
   },
   {
-    "steelchar_underscore",
-    "steelchar",
+    "steel_char_underscore",
+    "steel_char",
     "steel letter '_'"
   },
   {
-    "steelchar_copyright",
-    "steelchar",
+    "steel_char_copyright",
+    "steel_char",
     "steel letter '©'"
   },
   {
-    "steelchar_aumlaut",
-    "steelchar",
+    "steel_char_aumlaut",
+    "steel_char",
     "steel letter 'Ä'"
   },
   {
-    "steelchar_oumlaut",
-    "steelchar",
+    "steel_char_oumlaut",
+    "steel_char",
     "steel letter 'Ö'"
   },
   {
-    "steelchar_uumlaut",
-    "steelchar",
+    "steel_char_uumlaut",
+    "steel_char",
     "steel letter 'Ü'"
   },
   {
-    "steelchar_degree",
-    "steelchar",
+    "steel_char_degree",
+    "steel_char",
     "steel letter '°'"
   },
   {
-    "steelchar_trademark",
-    "steelchar",
+    "steel_char_trademark",
+    "steel_char",
     "steel letter '®'"
   },
   {
-    "steelchar_cursor",
-    "steelchar",
+    "steel_char_cursor",
+    "steel_char",
     "steel letter ' '"
   },
   {
-    "steelchar_unused",
-    "steelchar",
+    "steel_char_unused",
+    "steel_char",
     "steel letter ''"
   },
   {
-    "steelchar_unused",
-    "steelchar",
+    "steel_char_unused",
+    "steel_char",
     "steel letter ''"
   },
   {
-    "steelchar_unused",
-    "steelchar",
+    "steel_char_unused",
+    "steel_char",
     "steel letter ''"
   },
   {
-    "steelchar_unused",
-    "steelchar",
+    "steel_char_unused",
+    "steel_char",
     "steel letter ''"
   },
   {
-    "steelchar_unused",
-    "steelchar",
+    "steel_char_unused",
+    "steel_char",
     "steel letter ''"
   },
   {
-    "steelchar_unused",
-    "steelchar",
+    "steel_char_unused",
+    "steel_char",
     "steel letter ''"
   },
   {
-    "steelchar_unused",
-    "steelchar",
+    "steel_char_unused",
+    "steel_char",
     "steel letter 'button'"
   },
   {
-    "steelchar_unused",
-    "steelchar",
+    "steel_char_unused",
+    "steel_char",
     "steel letter 'up'"
   },
   {
-    "steelchar_unused",
-    "steelchar",
+    "steel_char_unused",
+    "steel_char",
     "steel letter 'down'"
   },
   {
@@ -4246,6 +4246,116 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
     "steel_exit_open",
     "steel_exit",
     "open steel exit"
+  },
+  {
+    "dc_steelwall_1_left",
+    "steelwall",
+    "steel wall (left)"
+  },
+  {
+    "dc_steelwall_1_right",
+    "steelwall",
+    "steel wall (right)"
+  },
+  {
+    "dc_steelwall_1_top",
+    "steelwall",
+    "steel wall (top)"
+  },
+  {
+    "dc_steelwall_1_bottom",
+    "steelwall",
+    "steel wall (bottom)"
+  },
+  {
+    "dc_steelwall_1_horizontal",
+    "steelwall",
+    "steel wall (top/bottom)"
+  },
+  {
+    "dc_steelwall_1_vertical",
+    "steelwall",
+    "steel wall (left/right)"
+  },
+  {
+    "dc_steelwall_1_topleft",
+    "steelwall",
+    "steel wall (top/left)"
+  },
+  {
+    "dc_steelwall_1_topright",
+    "steelwall",
+    "steel wall (top/right)"
+  },
+  {
+    "dc_steelwall_1_bottomleft",
+    "steelwall",
+    "steel wall (bottom/left)"
+  },
+  {
+    "dc_steelwall_1_bottomright",
+    "steelwall",
+    "steel wall (bottom/right)"
+  },
+  {
+    "dc_steelwall_1_topleft_2",
+    "steelwall",
+    "steel wall (top/left corner)"
+  },
+  {
+    "dc_steelwall_1_topright_2",
+    "steelwall",
+    "steel wall (top/right corner)"
+  },
+  {
+    "dc_steelwall_1_bottomleft_2",
+    "steelwall",
+    "steel wall (bottom/left corner)"
+  },
+  {
+    "dc_steelwall_1_bottomright_2",
+    "steelwall",
+    "steel wall (bottom/right corner)"
+  },
+  {
+    "dc_steelwall_2_left",
+    "steelwall",
+    "steel wall (left)"
+  },
+  {
+    "dc_steelwall_2_right",
+    "steelwall",
+    "steel wall (right)"
+  },
+  {
+    "dc_steelwall_2_top",
+    "steelwall",
+    "steel wall (top)"
+  },
+  {
+    "dc_steelwall_2_bottom",
+    "steelwall",
+    "steel wall (bottom)"
+  },
+  {
+    "dc_steelwall_2_horizontal",
+    "steelwall",
+    "steel wall (horizontal)"
+  },
+  {
+    "dc_steelwall_2_vertical",
+    "steelwall",
+    "steel wall (vertical)"
+  },
+  {
+    "dc_steelwall_2_middle",
+    "steelwall",
+    "steel wall (middle)"
+  },
+  {
+    "dc_steelwall_2_single",
+    "steelwall",
+    "steel wall (single)"
   },
 
   /* ----------------------------------------------------------------------- */
@@ -4914,12 +5024,12 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
     "hide text elements"
   },
   {
-    "internal_cascade_steelchars",
+    "internal_cascade_steel_chars",
     "internal",
     "show steel text elements"
   },
   {
-    "internal_cascade_steelchars.active",
+    "internal_cascade_steel_chars.active",
     "internal",
     "hide steel text elements"
   },

@@ -392,379 +392,379 @@
   { "char_down.ypos",				"4"			},
   { "char_down.frames",				"1"			},
 
-  { "steelchar_space",				"RocksFontDC.pcx"	},
-  { "steelchar_space.xpos",			"0"			},
-  { "steelchar_space.ypos",			"0"			},
-  { "steelchar_space.frames",			"1"			},
-  { "steelchar_space.EDITOR",			"RocksFontDC.pcx"	},
-  { "steelchar_space.EDITOR.xpos",		"7"			},
-  { "steelchar_space.EDITOR.ypos",		"4"			},
-  { "steelchar_space.EDITOR.frames",		"1"			},
-
-  { "steelchar_exclam",				"RocksFontDC.pcx"	},
-  { "steelchar_exclam.xpos",			"1"			},
-  { "steelchar_exclam.ypos",			"0"			},
-  { "steelchar_exclam.frames",			"1"			},
-
-  { "steelchar_quotedbl",			"RocksFontDC.pcx"	},
-  { "steelchar_quotedbl.xpos",			"2"			},
-  { "steelchar_quotedbl.ypos",			"0"			},
-  { "steelchar_quotedbl.frames",		"1"			},
-
-  { "steelchar_numbersign",			"RocksFontDC.pcx"	},
-  { "steelchar_numbersign.xpos",		"3"			},
-  { "steelchar_numbersign.ypos",		"0"			},
-  { "steelchar_numbersign.frames",		"1"			},
-
-  { "steelchar_dollar",				"RocksFontDC.pcx"	},
-  { "steelchar_dollar.xpos",			"4"			},
-  { "steelchar_dollar.ypos",			"0"			},
-  { "steelchar_dollar.frames",			"1"			},
-
-  { "steelchar_percent",			"RocksFontDC.pcx"	},
-  { "steelchar_percent.xpos",			"5"			},
-  { "steelchar_percent.ypos",			"0"			},
-  { "steelchar_percent.frames",			"1"			},
-
-  { "steelchar_ampersand",			"RocksFontDC.pcx"	},
-  { "steelchar_ampersand.xpos",			"6"			},
-  { "steelchar_ampersand.ypos",			"0"			},
-  { "steelchar_ampersand.frames",		"1"			},
-
-  { "steelchar_apostrophe",			"RocksFontDC.pcx"	},
-  { "steelchar_apostrophe.xpos",		"7"			},
-  { "steelchar_apostrophe.ypos",		"0"			},
-  { "steelchar_apostrophe.frames",		"1"			},
-
-  { "steelchar_parenleft",			"RocksFontDC.pcx"	},
-  { "steelchar_parenleft.xpos",			"8"			},
-  { "steelchar_parenleft.ypos",			"0"			},
-  { "steelchar_parenleft.frames",		"1"			},
-
-  { "steelchar_parenright",			"RocksFontDC.pcx"	},
-  { "steelchar_parenright.xpos",		"9"			},
-  { "steelchar_parenright.ypos",		"0"			},
-  { "steelchar_parenright.frames",		"1"			},
-
-  { "steelchar_asterisk",			"RocksFontDC.pcx"	},
-  { "steelchar_asterisk.xpos",			"10"			},
-  { "steelchar_asterisk.ypos",			"0"			},
-  { "steelchar_asterisk.frames",		"1"			},
-
-  { "steelchar_plus",				"RocksFontDC.pcx"	},
-  { "steelchar_plus.xpos",			"11"			},
-  { "steelchar_plus.ypos",			"0"			},
-  { "steelchar_plus.frames",			"1"			},
-
-  { "steelchar_comma",				"RocksFontDC.pcx"	},
-  { "steelchar_comma.xpos",			"12"			},
-  { "steelchar_comma.ypos",			"0"			},
-  { "steelchar_comma.frames",			"1"			},
-
-  { "steelchar_minus",				"RocksFontDC.pcx"	},
-  { "steelchar_minus.xpos",			"13"			},
-  { "steelchar_minus.ypos",			"0"			},
-  { "steelchar_minus.frames",			"1"			},
-
-  { "steelchar_period",				"RocksFontDC.pcx"	},
-  { "steelchar_period.xpos",			"14"			},
-  { "steelchar_period.ypos",			"0"			},
-  { "steelchar_period.frames",			"1"			},
-
-  { "steelchar_slash",				"RocksFontDC.pcx"	},
-  { "steelchar_slash.xpos",			"15"			},
-  { "steelchar_slash.ypos",			"0"			},
-  { "steelchar_slash.frames",			"1"			},
-
-  { "steelchar_0",				"RocksFontDC.pcx"	},
-  { "steelchar_0.xpos",				"0"			},
-  { "steelchar_0.ypos",				"1"			},
-  { "steelchar_0.frames",			"1"			},
-
-  { "steelchar_1",				"RocksFontDC.pcx"	},
-  { "steelchar_1.xpos",				"1"			},
-  { "steelchar_1.ypos",				"1"			},
-  { "steelchar_1.frames",			"1"			},
-
-  { "steelchar_2",				"RocksFontDC.pcx"	},
-  { "steelchar_2.xpos",				"2"			},
-  { "steelchar_2.ypos",				"1"			},
-  { "steelchar_2.frames",			"1"			},
-
-  { "steelchar_3",				"RocksFontDC.pcx"	},
-  { "steelchar_3.xpos",				"3"			},
-  { "steelchar_3.ypos",				"1"			},
-  { "steelchar_3.frames",			"1"			},
-
-  { "steelchar_4",				"RocksFontDC.pcx"	},
-  { "steelchar_4.xpos",				"4"			},
-  { "steelchar_4.ypos",				"1"			},
-  { "steelchar_4.frames",			"1"			},
-
-  { "steelchar_5",				"RocksFontDC.pcx"	},
-  { "steelchar_5.xpos",				"5"			},
-  { "steelchar_5.ypos",				"1"			},
-  { "steelchar_5.frames",			"1"			},
-
-  { "steelchar_6",				"RocksFontDC.pcx"	},
-  { "steelchar_6.xpos",				"6"			},
-  { "steelchar_6.ypos",				"1"			},
-  { "steelchar_6.frames",			"1"			},
-
-  { "steelchar_7",				"RocksFontDC.pcx"	},
-  { "steelchar_7.xpos",				"7"			},
-  { "steelchar_7.ypos",				"1"			},
-  { "steelchar_7.frames",			"1"			},
-
-  { "steelchar_8",				"RocksFontDC.pcx"	},
-  { "steelchar_8.xpos",				"8"			},
-  { "steelchar_8.ypos",				"1"			},
-  { "steelchar_8.frames",			"1"			},
-
-  { "steelchar_9",				"RocksFontDC.pcx"	},
-  { "steelchar_9.xpos",				"9"			},
-  { "steelchar_9.ypos",				"1"			},
-  { "steelchar_9.frames",			"1"			},
-
-  { "steelchar_colon",				"RocksFontDC.pcx"	},
-  { "steelchar_colon.xpos",			"10"			},
-  { "steelchar_colon.ypos",			"1"			},
-  { "steelchar_colon.frames",			"1"			},
-
-  { "steelchar_semicolon",			"RocksFontDC.pcx"	},
-  { "steelchar_semicolon.xpos",			"11"			},
-  { "steelchar_semicolon.ypos",			"1"			},
-  { "steelchar_semicolon.frames",		"1"			},
-
-  { "steelchar_less",				"RocksFontDC.pcx"	},
-  { "steelchar_less.xpos",			"12"			},
-  { "steelchar_less.ypos",			"1"			},
-  { "steelchar_less.frames",			"1"			},
-
-  { "steelchar_equal",				"RocksFontDC.pcx"	},
-  { "steelchar_equal.xpos",			"13"			},
-  { "steelchar_equal.ypos",			"1"			},
-  { "steelchar_equal.frames",			"1"			},
-
-  { "steelchar_greater",			"RocksFontDC.pcx"	},
-  { "steelchar_greater.xpos",			"14"			},
-  { "steelchar_greater.ypos",			"1"			},
-  { "steelchar_greater.frames",			"1"			},
-
-  { "steelchar_question",			"RocksFontDC.pcx"	},
-  { "steelchar_question.xpos",			"15"			},
-  { "steelchar_question.ypos",			"1"			},
-  { "steelchar_question.frames",		"1"			},
-
-  { "steelchar_at",				"RocksFontDC.pcx"	},
-  { "steelchar_at.xpos",			"0"			},
-  { "steelchar_at.ypos",			"2"			},
-  { "steelchar_at.frames",			"1"			},
-
-  { "steelchar_a",				"RocksFontDC.pcx"	},
-  { "steelchar_a.xpos",				"1"			},
-  { "steelchar_a.ypos",				"2"			},
-  { "steelchar_a.frames",			"1"			},
-
-  { "steelchar_b",				"RocksFontDC.pcx"	},
-  { "steelchar_b.xpos",				"2"			},
-  { "steelchar_b.ypos",				"2"			},
-  { "steelchar_b.frames",			"1"			},
-
-  { "steelchar_c",				"RocksFontDC.pcx"	},
-  { "steelchar_c.xpos",				"3"			},
-  { "steelchar_c.ypos",				"2"			},
-  { "steelchar_c.frames",			"1"			},
-
-  { "steelchar_d",				"RocksFontDC.pcx"	},
-  { "steelchar_d.xpos",				"4"			},
-  { "steelchar_d.ypos",				"2"			},
-  { "steelchar_d.frames",			"1"			},
-
-  { "steelchar_e",				"RocksFontDC.pcx"	},
-  { "steelchar_e.xpos",				"5"			},
-  { "steelchar_e.ypos",				"2"			},
-  { "steelchar_e.frames",			"1"			},
-
-  { "steelchar_f",				"RocksFontDC.pcx"	},
-  { "steelchar_f.xpos",				"6"			},
-  { "steelchar_f.ypos",				"2"			},
-  { "steelchar_f.frames",			"1"			},
-
-  { "steelchar_g",				"RocksFontDC.pcx"	},
-  { "steelchar_g.xpos",				"7"			},
-  { "steelchar_g.ypos",				"2"			},
-  { "steelchar_g.frames",			"1"			},
-
-  { "steelchar_h",				"RocksFontDC.pcx"	},
-  { "steelchar_h.xpos",				"8"			},
-  { "steelchar_h.ypos",				"2"			},
-  { "steelchar_h.frames",			"1"			},
-
-  { "steelchar_i",				"RocksFontDC.pcx"	},
-  { "steelchar_i.xpos",				"9"			},
-  { "steelchar_i.ypos",				"2"			},
-  { "steelchar_i.frames",			"1"			},
-
-  { "steelchar_j",				"RocksFontDC.pcx"	},
-  { "steelchar_j.xpos",				"10"			},
-  { "steelchar_j.ypos",				"2"			},
-  { "steelchar_j.frames",			"1"			},
-
-  { "steelchar_k",				"RocksFontDC.pcx"	},
-  { "steelchar_k.xpos",				"11"			},
-  { "steelchar_k.ypos",				"2"			},
-  { "steelchar_k.frames",			"1"			},
-
-  { "steelchar_l",				"RocksFontDC.pcx"	},
-  { "steelchar_l.xpos",				"12"			},
-  { "steelchar_l.ypos",				"2"			},
-  { "steelchar_l.frames",			"1"			},
-
-  { "steelchar_m",				"RocksFontDC.pcx"	},
-  { "steelchar_m.xpos",				"13"			},
-  { "steelchar_m.ypos",				"2"			},
-  { "steelchar_m.frames",			"1"			},
-
-  { "steelchar_n",				"RocksFontDC.pcx"	},
-  { "steelchar_n.xpos",				"14"			},
-  { "steelchar_n.ypos",				"2"			},
-  { "steelchar_n.frames",			"1"			},
-
-  { "steelchar_o",				"RocksFontDC.pcx"	},
-  { "steelchar_o.xpos",				"15"			},
-  { "steelchar_o.ypos",				"2"			},
-  { "steelchar_o.frames",			"1"			},
-
-  { "steelchar_p",				"RocksFontDC.pcx"	},
-  { "steelchar_p.xpos",				"0"			},
-  { "steelchar_p.ypos",				"3"			},
-  { "steelchar_p.frames",			"1"			},
-
-  { "steelchar_q",				"RocksFontDC.pcx"	},
-  { "steelchar_q.xpos",				"1"			},
-  { "steelchar_q.ypos",				"3"			},
-  { "steelchar_q.frames",			"1"			},
-
-  { "steelchar_r",				"RocksFontDC.pcx"	},
-  { "steelchar_r.xpos",				"2"			},
-  { "steelchar_r.ypos",				"3"			},
-  { "steelchar_r.frames",			"1"			},
-
-  { "steelchar_s",				"RocksFontDC.pcx"	},
-  { "steelchar_s.xpos",				"3"			},
-  { "steelchar_s.ypos",				"3"			},
-  { "steelchar_s.frames",			"1"			},
-
-  { "steelchar_t",				"RocksFontDC.pcx"	},
-  { "steelchar_t.xpos",				"4"			},
-  { "steelchar_t.ypos",				"3"			},
-  { "steelchar_t.frames",			"1"			},
-
-  { "steelchar_u",				"RocksFontDC.pcx"	},
-  { "steelchar_u.xpos",				"5"			},
-  { "steelchar_u.ypos",				"3"			},
-  { "steelchar_u.frames",			"1"			},
-
-  { "steelchar_v",				"RocksFontDC.pcx"	},
-  { "steelchar_v.xpos",				"6"			},
-  { "steelchar_v.ypos",				"3"			},
-  { "steelchar_v.frames",			"1"			},
-
-  { "steelchar_w",				"RocksFontDC.pcx"	},
-  { "steelchar_w.xpos",				"7"			},
-  { "steelchar_w.ypos",				"3"			},
-  { "steelchar_w.frames",			"1"			},
-
-  { "steelchar_x",				"RocksFontDC.pcx"	},
-  { "steelchar_x.xpos",				"8"			},
-  { "steelchar_x.ypos",				"3"			},
-  { "steelchar_x.frames",			"1"			},
-
-  { "steelchar_y",				"RocksFontDC.pcx"	},
-  { "steelchar_y.xpos",				"9"			},
-  { "steelchar_y.ypos",				"3"			},
-  { "steelchar_y.frames",			"1"			},
-
-  { "steelchar_z",				"RocksFontDC.pcx"	},
-  { "steelchar_z.xpos",				"10"			},
-  { "steelchar_z.ypos",				"3"			},
-  { "steelchar_z.frames",			"1"			},
-
-  { "steelchar_bracketleft",			"RocksFontDC.pcx"	},
-  { "steelchar_bracketleft.xpos",		"11"			},
-  { "steelchar_bracketleft.ypos",		"3"			},
-  { "steelchar_bracketleft.frames",		"1"			},
-
-  { "steelchar_backslash",			"RocksFontDC.pcx"	},
-  { "steelchar_backslash.xpos",			"12"			},
-  { "steelchar_backslash.ypos",			"3"			},
-  { "steelchar_backslash.frames",		"1"			},
-
-  { "steelchar_bracketright",			"RocksFontDC.pcx"	},
-  { "steelchar_bracketright.xpos",		"13"			},
-  { "steelchar_bracketright.ypos",		"3"			},
-  { "steelchar_bracketright.frames",		"1"			},
-
-  { "steelchar_asciicircum",			"RocksFontDC.pcx"	},
-  { "steelchar_asciicircum.xpos",		"14"			},
-  { "steelchar_asciicircum.ypos",		"3"			},
-  { "steelchar_asciicircum.frames",		"1"			},
-
-  { "steelchar_underscore",			"RocksFontDC.pcx"	},
-  { "steelchar_underscore.xpos",		"15"			},
-  { "steelchar_underscore.ypos",		"3"			},
-  { "steelchar_underscore.frames",		"1"			},
-
-  { "steelchar_copyright",			"RocksFontDC.pcx"	},
-  { "steelchar_copyright.xpos",			"0"			},
-  { "steelchar_copyright.ypos",			"4"			},
-  { "steelchar_copyright.frames",		"1"			},
-
-  { "steelchar_aumlaut",			"RocksFontDC.pcx"	},
-  { "steelchar_aumlaut.xpos",			"1"			},
-  { "steelchar_aumlaut.ypos",			"4"			},
-  { "steelchar_aumlaut.frames",			"1"			},
-
-  { "steelchar_oumlaut",			"RocksFontDC.pcx"	},
-  { "steelchar_oumlaut.xpos",			"2"			},
-  { "steelchar_oumlaut.ypos",			"4"			},
-  { "steelchar_oumlaut.frames",			"1"			},
-
-  { "steelchar_uumlaut",			"RocksFontDC.pcx"	},
-  { "steelchar_uumlaut.xpos",			"3"			},
-  { "steelchar_uumlaut.ypos",			"4"			},
-  { "steelchar_uumlaut.frames",			"1"			},
-
-  { "steelchar_degree",				"RocksFontDC.pcx"	},
-  { "steelchar_degree.xpos",			"4"			},
-  { "steelchar_degree.ypos",			"4"			},
-  { "steelchar_degree.frames",			"1"			},
-
-  { "steelchar_trademark",			"RocksFontDC.pcx"	},
-  { "steelchar_trademark.xpos",			"5"			},
-  { "steelchar_trademark.ypos",			"4"			},
-  { "steelchar_trademark.frames",		"1"			},
-
-  { "steelchar_cursor",				"RocksFontDC.pcx"	},
-  { "steelchar_cursor.xpos",			"6"			},
-  { "steelchar_cursor.ypos",			"4"			},
-  { "steelchar_cursor.frames",			"1"			},
-
-  { "steelchar_button",				"RocksFontDC.pcx"	},
-  { "steelchar_button.xpos",			"13"			},
-  { "steelchar_button.ypos",			"4"			},
-  { "steelchar_button.frames",			"1"			},
-
-  { "steelchar_up",				"RocksFontDC.pcx"	},
-  { "steelchar_up.xpos",			"14"			},
-  { "steelchar_up.ypos",			"4"			},
-  { "steelchar_up.frames",			"1"			},
-
-  { "steelchar_down",				"RocksFontDC.pcx"	},
-  { "steelchar_down.xpos",			"15"			},
-  { "steelchar_down.ypos",			"4"			},
-  { "steelchar_down.frames",			"1"			},
+  { "steel_char_space",				"RocksFontDC.pcx"	},
+  { "steel_char_space.xpos",			"0"			},
+  { "steel_char_space.ypos",			"0"			},
+  { "steel_char_space.frames",			"1"			},
+  { "steel_char_space.EDITOR",			"RocksFontDC.pcx"	},
+  { "steel_char_space.EDITOR.xpos",		"7"			},
+  { "steel_char_space.EDITOR.ypos",		"4"			},
+  { "steel_char_space.EDITOR.frames",		"1"			},
+
+  { "steel_char_exclam",			"RocksFontDC.pcx"	},
+  { "steel_char_exclam.xpos",			"1"			},
+  { "steel_char_exclam.ypos",			"0"			},
+  { "steel_char_exclam.frames",			"1"			},
+
+  { "steel_char_quotedbl",			"RocksFontDC.pcx"	},
+  { "steel_char_quotedbl.xpos",			"2"			},
+  { "steel_char_quotedbl.ypos",			"0"			},
+  { "steel_char_quotedbl.frames",		"1"			},
+
+  { "steel_char_numbersign",			"RocksFontDC.pcx"	},
+  { "steel_char_numbersign.xpos",		"3"			},
+  { "steel_char_numbersign.ypos",		"0"			},
+  { "steel_char_numbersign.frames",		"1"			},
+
+  { "steel_char_dollar",			"RocksFontDC.pcx"	},
+  { "steel_char_dollar.xpos",			"4"			},
+  { "steel_char_dollar.ypos",			"0"			},
+  { "steel_char_dollar.frames",			"1"			},
+
+  { "steel_char_percent",			"RocksFontDC.pcx"	},
+  { "steel_char_percent.xpos",			"5"			},
+  { "steel_char_percent.ypos",			"0"			},
+  { "steel_char_percent.frames",		"1"			},
+
+  { "steel_char_ampersand",			"RocksFontDC.pcx"	},
+  { "steel_char_ampersand.xpos",		"6"			},
+  { "steel_char_ampersand.ypos",		"0"			},
+  { "steel_char_ampersand.frames",		"1"			},
+
+  { "steel_char_apostrophe",			"RocksFontDC.pcx"	},
+  { "steel_char_apostrophe.xpos",		"7"			},
+  { "steel_char_apostrophe.ypos",		"0"			},
+  { "steel_char_apostrophe.frames",		"1"			},
+
+  { "steel_char_parenleft",			"RocksFontDC.pcx"	},
+  { "steel_char_parenleft.xpos",		"8"			},
+  { "steel_char_parenleft.ypos",		"0"			},
+  { "steel_char_parenleft.frames",		"1"			},
+
+  { "steel_char_parenright",			"RocksFontDC.pcx"	},
+  { "steel_char_parenright.xpos",		"9"			},
+  { "steel_char_parenright.ypos",		"0"			},
+  { "steel_char_parenright.frames",		"1"			},
+
+  { "steel_char_asterisk",			"RocksFontDC.pcx"	},
+  { "steel_char_asterisk.xpos",			"10"			},
+  { "steel_char_asterisk.ypos",			"0"			},
+  { "steel_char_asterisk.frames",		"1"			},
+
+  { "steel_char_plus",				"RocksFontDC.pcx"	},
+  { "steel_char_plus.xpos",			"11"			},
+  { "steel_char_plus.ypos",			"0"			},
+  { "steel_char_plus.frames",			"1"			},
+
+  { "steel_char_comma",				"RocksFontDC.pcx"	},
+  { "steel_char_comma.xpos",			"12"			},
+  { "steel_char_comma.ypos",			"0"			},
+  { "steel_char_comma.frames",			"1"			},
+
+  { "steel_char_minus",				"RocksFontDC.pcx"	},
+  { "steel_char_minus.xpos",			"13"			},
+  { "steel_char_minus.ypos",			"0"			},
+  { "steel_char_minus.frames",			"1"			},
+
+  { "steel_char_period",			"RocksFontDC.pcx"	},
+  { "steel_char_period.xpos",			"14"			},
+  { "steel_char_period.ypos",			"0"			},
+  { "steel_char_period.frames",			"1"			},
+
+  { "steel_char_slash",				"RocksFontDC.pcx"	},
+  { "steel_char_slash.xpos",			"15"			},
+  { "steel_char_slash.ypos",			"0"			},
+  { "steel_char_slash.frames",			"1"			},
+
+  { "steel_char_0",				"RocksFontDC.pcx"	},
+  { "steel_char_0.xpos",			"0"			},
+  { "steel_char_0.ypos",			"1"			},
+  { "steel_char_0.frames",			"1"			},
+
+  { "steel_char_1",				"RocksFontDC.pcx"	},
+  { "steel_char_1.xpos",			"1"			},
+  { "steel_char_1.ypos",			"1"			},
+  { "steel_char_1.frames",			"1"			},
+
+  { "steel_char_2",				"RocksFontDC.pcx"	},
+  { "steel_char_2.xpos",			"2"			},
+  { "steel_char_2.ypos",			"1"			},
+  { "steel_char_2.frames",			"1"			},
+
+  { "steel_char_3",				"RocksFontDC.pcx"	},
+  { "steel_char_3.xpos",			"3"			},
+  { "steel_char_3.ypos",			"1"			},
+  { "steel_char_3.frames",			"1"			},
+
+  { "steel_char_4",				"RocksFontDC.pcx"	},
+  { "steel_char_4.xpos",			"4"			},
+  { "steel_char_4.ypos",			"1"			},
+  { "steel_char_4.frames",			"1"			},
+
+  { "steel_char_5",				"RocksFontDC.pcx"	},
+  { "steel_char_5.xpos",			"5"			},
+  { "steel_char_5.ypos",			"1"			},
+  { "steel_char_5.frames",			"1"			},
+
+  { "steel_char_6",				"RocksFontDC.pcx"	},
+  { "steel_char_6.xpos",			"6"			},
+  { "steel_char_6.ypos",			"1"			},
+  { "steel_char_6.frames",			"1"			},
+
+  { "steel_char_7",				"RocksFontDC.pcx"	},
+  { "steel_char_7.xpos",			"7"			},
+  { "steel_char_7.ypos",			"1"			},
+  { "steel_char_7.frames",			"1"			},
+
+  { "steel_char_8",				"RocksFontDC.pcx"	},
+  { "steel_char_8.xpos",			"8"			},
+  { "steel_char_8.ypos",			"1"			},
+  { "steel_char_8.frames",			"1"			},
+
+  { "steel_char_9",				"RocksFontDC.pcx"	},
+  { "steel_char_9.xpos",			"9"			},
+  { "steel_char_9.ypos",			"1"			},
+  { "steel_char_9.frames",			"1"			},
+
+  { "steel_char_colon",				"RocksFontDC.pcx"	},
+  { "steel_char_colon.xpos",			"10"			},
+  { "steel_char_colon.ypos",			"1"			},
+  { "steel_char_colon.frames",			"1"			},
+
+  { "steel_char_semicolon",			"RocksFontDC.pcx"	},
+  { "steel_char_semicolon.xpos",		"11"			},
+  { "steel_char_semicolon.ypos",		"1"			},
+  { "steel_char_semicolon.frames",		"1"			},
+
+  { "steel_char_less",				"RocksFontDC.pcx"	},
+  { "steel_char_less.xpos",			"12"			},
+  { "steel_char_less.ypos",			"1"			},
+  { "steel_char_less.frames",			"1"			},
+
+  { "steel_char_equal",				"RocksFontDC.pcx"	},
+  { "steel_char_equal.xpos",			"13"			},
+  { "steel_char_equal.ypos",			"1"			},
+  { "steel_char_equal.frames",			"1"			},
+
+  { "steel_char_greater",			"RocksFontDC.pcx"	},
+  { "steel_char_greater.xpos",			"14"			},
+  { "steel_char_greater.ypos",			"1"			},
+  { "steel_char_greater.frames",		"1"			},
+
+  { "steel_char_question",			"RocksFontDC.pcx"	},
+  { "steel_char_question.xpos",			"15"			},
+  { "steel_char_question.ypos",			"1"			},
+  { "steel_char_question.frames",		"1"			},
+
+  { "steel_char_at",				"RocksFontDC.pcx"	},
+  { "steel_char_at.xpos",			"0"			},
+  { "steel_char_at.ypos",			"2"			},
+  { "steel_char_at.frames",			"1"			},
+
+  { "steel_char_a",				"RocksFontDC.pcx"	},
+  { "steel_char_a.xpos",			"1"			},
+  { "steel_char_a.ypos",			"2"			},
+  { "steel_char_a.frames",			"1"			},
+
+  { "steel_char_b",				"RocksFontDC.pcx"	},
+  { "steel_char_b.xpos",			"2"			},
+  { "steel_char_b.ypos",			"2"			},
+  { "steel_char_b.frames",			"1"			},
+
+  { "steel_char_c",				"RocksFontDC.pcx"	},
+  { "steel_char_c.xpos",			"3"			},
+  { "steel_char_c.ypos",			"2"			},
+  { "steel_char_c.frames",			"1"			},
+
+  { "steel_char_d",				"RocksFontDC.pcx"	},
+  { "steel_char_d.xpos",			"4"			},
+  { "steel_char_d.ypos",			"2"			},
+  { "steel_char_d.frames",			"1"			},
+
+  { "steel_char_e",				"RocksFontDC.pcx"	},
+  { "steel_char_e.xpos",			"5"			},
+  { "steel_char_e.ypos",			"2"			},
+  { "steel_char_e.frames",			"1"			},
+
+  { "steel_char_f",				"RocksFontDC.pcx"	},
+  { "steel_char_f.xpos",			"6"			},
+  { "steel_char_f.ypos",			"2"			},
+  { "steel_char_f.frames",			"1"			},
+
+  { "steel_char_g",				"RocksFontDC.pcx"	},
+  { "steel_char_g.xpos",			"7"			},
+  { "steel_char_g.ypos",			"2"			},
+  { "steel_char_g.frames",			"1"			},
+
+  { "steel_char_h",				"RocksFontDC.pcx"	},
+  { "steel_char_h.xpos",			"8"			},
+  { "steel_char_h.ypos",			"2"			},
+  { "steel_char_h.frames",			"1"			},
+
+  { "steel_char_i",				"RocksFontDC.pcx"	},
+  { "steel_char_i.xpos",			"9"			},
+  { "steel_char_i.ypos",			"2"			},
+  { "steel_char_i.frames",			"1"			},
+
+  { "steel_char_j",				"RocksFontDC.pcx"	},
+  { "steel_char_j.xpos",			"10"			},
+  { "steel_char_j.ypos",			"2"			},
+  { "steel_char_j.frames",			"1"			},
+
+  { "steel_char_k",				"RocksFontDC.pcx"	},
+  { "steel_char_k.xpos",			"11"			},
+  { "steel_char_k.ypos",			"2"			},
+  { "steel_char_k.frames",			"1"			},
+
+  { "steel_char_l",				"RocksFontDC.pcx"	},
+  { "steel_char_l.xpos",			"12"			},
+  { "steel_char_l.ypos",			"2"			},
+  { "steel_char_l.frames",			"1"			},
+
+  { "steel_char_m",				"RocksFontDC.pcx"	},
+  { "steel_char_m.xpos",			"13"			},
+  { "steel_char_m.ypos",			"2"			},
+  { "steel_char_m.frames",			"1"			},
+
+  { "steel_char_n",				"RocksFontDC.pcx"	},
+  { "steel_char_n.xpos",			"14"			},
+  { "steel_char_n.ypos",			"2"			},
+  { "steel_char_n.frames",			"1"			},
+
+  { "steel_char_o",				"RocksFontDC.pcx"	},
+  { "steel_char_o.xpos",			"15"			},
+  { "steel_char_o.ypos",			"2"			},
+  { "steel_char_o.frames",			"1"			},
+
+  { "steel_char_p",				"RocksFontDC.pcx"	},
+  { "steel_char_p.xpos",			"0"			},
+  { "steel_char_p.ypos",			"3"			},
+  { "steel_char_p.frames",			"1"			},
+
+  { "steel_char_q",				"RocksFontDC.pcx"	},
+  { "steel_char_q.xpos",			"1"			},
+  { "steel_char_q.ypos",			"3"			},
+  { "steel_char_q.frames",			"1"			},
+
+  { "steel_char_r",				"RocksFontDC.pcx"	},
+  { "steel_char_r.xpos",			"2"			},
+  { "steel_char_r.ypos",			"3"			},
+  { "steel_char_r.frames",			"1"			},
+
+  { "steel_char_s",				"RocksFontDC.pcx"	},
+  { "steel_char_s.xpos",			"3"			},
+  { "steel_char_s.ypos",			"3"			},
+  { "steel_char_s.frames",			"1"			},
+
+  { "steel_char_t",				"RocksFontDC.pcx"	},
+  { "steel_char_t.xpos",			"4"			},
+  { "steel_char_t.ypos",			"3"			},
+  { "steel_char_t.frames",			"1"			},
+
+  { "steel_char_u",				"RocksFontDC.pcx"	},
+  { "steel_char_u.xpos",			"5"			},
+  { "steel_char_u.ypos",			"3"			},
+  { "steel_char_u.frames",			"1"			},
+
+  { "steel_char_v",				"RocksFontDC.pcx"	},
+  { "steel_char_v.xpos",			"6"			},
+  { "steel_char_v.ypos",			"3"			},
+  { "steel_char_v.frames",			"1"			},
+
+  { "steel_char_w",				"RocksFontDC.pcx"	},
+  { "steel_char_w.xpos",			"7"			},
+  { "steel_char_w.ypos",			"3"			},
+  { "steel_char_w.frames",			"1"			},
+
+  { "steel_char_x",				"RocksFontDC.pcx"	},
+  { "steel_char_x.xpos",			"8"			},
+  { "steel_char_x.ypos",			"3"			},
+  { "steel_char_x.frames",			"1"			},
+
+  { "steel_char_y",				"RocksFontDC.pcx"	},
+  { "steel_char_y.xpos",			"9"			},
+  { "steel_char_y.ypos",			"3"			},
+  { "steel_char_y.frames",			"1"			},
+
+  { "steel_char_z",				"RocksFontDC.pcx"	},
+  { "steel_char_z.xpos",			"10"			},
+  { "steel_char_z.ypos",			"3"			},
+  { "steel_char_z.frames",			"1"			},
+
+  { "steel_char_bracketleft",			"RocksFontDC.pcx"	},
+  { "steel_char_bracketleft.xpos",		"11"			},
+  { "steel_char_bracketleft.ypos",		"3"			},
+  { "steel_char_bracketleft.frames",		"1"			},
+
+  { "steel_char_backslash",			"RocksFontDC.pcx"	},
+  { "steel_char_backslash.xpos",		"12"			},
+  { "steel_char_backslash.ypos",		"3"			},
+  { "steel_char_backslash.frames",		"1"			},
+
+  { "steel_char_bracketright",			"RocksFontDC.pcx"	},
+  { "steel_char_bracketright.xpos",		"13"			},
+  { "steel_char_bracketright.ypos",		"3"			},
+  { "steel_char_bracketright.frames",		"1"			},
+
+  { "steel_char_asciicircum",			"RocksFontDC.pcx"	},
+  { "steel_char_asciicircum.xpos",		"14"			},
+  { "steel_char_asciicircum.ypos",		"3"			},
+  { "steel_char_asciicircum.frames",		"1"			},
+
+  { "steel_char_underscore",			"RocksFontDC.pcx"	},
+  { "steel_char_underscore.xpos",		"15"			},
+  { "steel_char_underscore.ypos",		"3"			},
+  { "steel_char_underscore.frames",		"1"			},
+
+  { "steel_char_copyright",			"RocksFontDC.pcx"	},
+  { "steel_char_copyright.xpos",		"0"			},
+  { "steel_char_copyright.ypos",		"4"			},
+  { "steel_char_copyright.frames",		"1"			},
+
+  { "steel_char_aumlaut",			"RocksFontDC.pcx"	},
+  { "steel_char_aumlaut.xpos",			"1"			},
+  { "steel_char_aumlaut.ypos",			"4"			},
+  { "steel_char_aumlaut.frames",		"1"			},
+
+  { "steel_char_oumlaut",			"RocksFontDC.pcx"	},
+  { "steel_char_oumlaut.xpos",			"2"			},
+  { "steel_char_oumlaut.ypos",			"4"			},
+  { "steel_char_oumlaut.frames",		"1"			},
+
+  { "steel_char_uumlaut",			"RocksFontDC.pcx"	},
+  { "steel_char_uumlaut.xpos",			"3"			},
+  { "steel_char_uumlaut.ypos",			"4"			},
+  { "steel_char_uumlaut.frames",		"1"			},
+
+  { "steel_char_degree",			"RocksFontDC.pcx"	},
+  { "steel_char_degree.xpos",			"4"			},
+  { "steel_char_degree.ypos",			"4"			},
+  { "steel_char_degree.frames",			"1"			},
+
+  { "steel_char_trademark",			"RocksFontDC.pcx"	},
+  { "steel_char_trademark.xpos",		"5"			},
+  { "steel_char_trademark.ypos",		"4"			},
+  { "steel_char_trademark.frames",		"1"			},
+
+  { "steel_char_cursor",			"RocksFontDC.pcx"	},
+  { "steel_char_cursor.xpos",			"6"			},
+  { "steel_char_cursor.ypos",			"4"			},
+  { "steel_char_cursor.frames",			"1"			},
+
+  { "steel_char_button",			"RocksFontDC.pcx"	},
+  { "steel_char_button.xpos",			"13"			},
+  { "steel_char_button.ypos",			"4"			},
+  { "steel_char_button.frames",			"1"			},
+
+  { "steel_char_up",				"RocksFontDC.pcx"	},
+  { "steel_char_up.xpos",			"14"			},
+  { "steel_char_up.ypos",			"4"			},
+  { "steel_char_up.frames",			"1"			},
+
+  { "steel_char_down",				"RocksFontDC.pcx"	},
+  { "steel_char_down.xpos",			"15"			},
+  { "steel_char_down.ypos",			"4"			},
+  { "steel_char_down.frames",			"1"			},
 
 
 #endif	/* CONF_CHR_C */

@@ -3634,9 +3634,44 @@ static int editor_el_diamond_caves[] =
   EL_EMPTY,
   EL_EMPTY,
 
+  EL_DC_STEELWALL_2_SINGLE,
+  EL_DC_STEELWALL_2_TOP,
   EL_STEEL_EXIT_CLOSED,
   EL_STEEL_EXIT_OPEN,
+
+  EL_DC_STEELWALL_2_LEFT,
+  EL_DC_STEELWALL_2_MIDDLE,
+  EL_DC_STEELWALL_2_HORIZONTAL,
+  EL_DC_STEELWALL_2_RIGHT,
+
+  EL_DC_STEELWALL_1_TOPLEFT,
+  EL_DC_STEELWALL_2_VERTICAL,
+  EL_DC_STEELWALL_1_TOPRIGHT,
   EL_EMPTY,
+
+  EL_DC_STEELWALL_1_VERTICAL,
+  EL_DC_STEELWALL_2_BOTTOM,
+  EL_EMPTY,
+  EL_EMPTY,
+
+  EL_DC_STEELWALL_1_BOTTOMLEFT,
+  EL_DC_STEELWALL_1_HORIZONTAL,
+  EL_DC_STEELWALL_1_BOTTOMRIGHT,
+  EL_EMPTY,
+
+  EL_DC_STEELWALL_1_BOTTOMRIGHT_2,
+  EL_DC_STEELWALL_1_BOTTOM,
+  EL_DC_STEELWALL_1_BOTTOMLEFT_2,
+  EL_EMPTY,
+
+  EL_DC_STEELWALL_1_RIGHT,
+  EL_EMPTY,
+  EL_DC_STEELWALL_1_LEFT,
+  EL_EMPTY,
+
+  EL_DC_STEELWALL_1_TOPRIGHT_2,
+  EL_DC_STEELWALL_1_TOP,
+  EL_DC_STEELWALL_1_TOPLEFT_2,
   EL_EMPTY,
 };
 static int *editor_hl_diamond_caves_ptr = editor_hl_diamond_caves;
@@ -3789,115 +3824,115 @@ static int *editor_el_chars_ptr = editor_el_chars;
 static int num_editor_hl_chars = SIZEOF_ARRAY_INT(editor_hl_chars);
 static int num_editor_el_chars = SIZEOF_ARRAY_INT(editor_el_chars);
 
-static int editor_hl_steelchars[] =
+static int editor_hl_steel_chars[] =
 {
-  EL_INTERNAL_CASCADE_STEELCHARS_ACTIVE,
-  EL_STEELCHAR('T'),
-  EL_STEELCHAR('X'),
-  EL_STEELCHAR('T'),
+  EL_INTERNAL_CASCADE_STEEL_CHARS_ACTIVE,
+  EL_STEEL_CHAR('T'),
+  EL_STEEL_CHAR('X'),
+  EL_STEEL_CHAR('T'),
 };
 
-static int editor_el_steelchars[] =
+static int editor_el_steel_chars[] =
 {
-  EL_STEELCHAR(' '),
-  EL_STEELCHAR('!'),
-  EL_STEELCHAR('"'),
-  EL_STEELCHAR('#'),
+  EL_STEEL_CHAR(' '),
+  EL_STEEL_CHAR('!'),
+  EL_STEEL_CHAR('"'),
+  EL_STEEL_CHAR('#'),
 
-  EL_STEELCHAR('$'),
-  EL_STEELCHAR('%'),
-  EL_STEELCHAR('&'),
-  EL_STEELCHAR('\''),
+  EL_STEEL_CHAR('$'),
+  EL_STEEL_CHAR('%'),
+  EL_STEEL_CHAR('&'),
+  EL_STEEL_CHAR('\''),
 
-  EL_STEELCHAR('('),
-  EL_STEELCHAR(')'),
-  EL_STEELCHAR('*'),
-  EL_STEELCHAR('+'),
+  EL_STEEL_CHAR('('),
+  EL_STEEL_CHAR(')'),
+  EL_STEEL_CHAR('*'),
+  EL_STEEL_CHAR('+'),
 
-  EL_STEELCHAR(','),
-  EL_STEELCHAR('-'),
-  EL_STEELCHAR('.'),
-  EL_STEELCHAR('/'),
+  EL_STEEL_CHAR(','),
+  EL_STEEL_CHAR('-'),
+  EL_STEEL_CHAR('.'),
+  EL_STEEL_CHAR('/'),
 
-  EL_STEELCHAR('0'),
-  EL_STEELCHAR('1'),
-  EL_STEELCHAR('2'),
-  EL_STEELCHAR('3'),
+  EL_STEEL_CHAR('0'),
+  EL_STEEL_CHAR('1'),
+  EL_STEEL_CHAR('2'),
+  EL_STEEL_CHAR('3'),
 
-  EL_STEELCHAR('4'),
-  EL_STEELCHAR('5'),
-  EL_STEELCHAR('6'),
-  EL_STEELCHAR('7'),
+  EL_STEEL_CHAR('4'),
+  EL_STEEL_CHAR('5'),
+  EL_STEEL_CHAR('6'),
+  EL_STEEL_CHAR('7'),
 
-  EL_STEELCHAR('8'),
-  EL_STEELCHAR('9'),
-  EL_STEELCHAR(':'),
-  EL_STEELCHAR(';'),
+  EL_STEEL_CHAR('8'),
+  EL_STEEL_CHAR('9'),
+  EL_STEEL_CHAR(':'),
+  EL_STEEL_CHAR(';'),
 
-  EL_STEELCHAR('<'),
-  EL_STEELCHAR('='),
-  EL_STEELCHAR('>'),
-  EL_STEELCHAR('?'),
+  EL_STEEL_CHAR('<'),
+  EL_STEEL_CHAR('='),
+  EL_STEEL_CHAR('>'),
+  EL_STEEL_CHAR('?'),
 
-  EL_STEELCHAR('@'),
-  EL_STEELCHAR('A'),
-  EL_STEELCHAR('B'),
-  EL_STEELCHAR('C'),
+  EL_STEEL_CHAR('@'),
+  EL_STEEL_CHAR('A'),
+  EL_STEEL_CHAR('B'),
+  EL_STEEL_CHAR('C'),
 
-  EL_STEELCHAR('D'),
-  EL_STEELCHAR('E'),
-  EL_STEELCHAR('F'),
-  EL_STEELCHAR('G'),
+  EL_STEEL_CHAR('D'),
+  EL_STEEL_CHAR('E'),
+  EL_STEEL_CHAR('F'),
+  EL_STEEL_CHAR('G'),
 
-  EL_STEELCHAR('H'),
-  EL_STEELCHAR('I'),
-  EL_STEELCHAR('J'),
-  EL_STEELCHAR('K'),
+  EL_STEEL_CHAR('H'),
+  EL_STEEL_CHAR('I'),
+  EL_STEEL_CHAR('J'),
+  EL_STEEL_CHAR('K'),
 
-  EL_STEELCHAR('L'),
-  EL_STEELCHAR('M'),
-  EL_STEELCHAR('N'),
-  EL_STEELCHAR('O'),
+  EL_STEEL_CHAR('L'),
+  EL_STEEL_CHAR('M'),
+  EL_STEEL_CHAR('N'),
+  EL_STEEL_CHAR('O'),
 
-  EL_STEELCHAR('P'),
-  EL_STEELCHAR('Q'),
-  EL_STEELCHAR('R'),
-  EL_STEELCHAR('S'),
+  EL_STEEL_CHAR('P'),
+  EL_STEEL_CHAR('Q'),
+  EL_STEEL_CHAR('R'),
+  EL_STEEL_CHAR('S'),
 
-  EL_STEELCHAR('T'),
-  EL_STEELCHAR('U'),
-  EL_STEELCHAR('V'),
-  EL_STEELCHAR('W'),
+  EL_STEEL_CHAR('T'),
+  EL_STEEL_CHAR('U'),
+  EL_STEEL_CHAR('V'),
+  EL_STEEL_CHAR('W'),
 
-  EL_STEELCHAR('X'),
-  EL_STEELCHAR('Y'),
-  EL_STEELCHAR('Z'),
-  EL_STEELCHAR('['),
+  EL_STEEL_CHAR('X'),
+  EL_STEEL_CHAR('Y'),
+  EL_STEEL_CHAR('Z'),
+  EL_STEEL_CHAR('['),
 
-  EL_STEELCHAR('\\'),
-  EL_STEELCHAR(']'),
-  EL_STEELCHAR('^'),
-  EL_STEELCHAR('_'),
+  EL_STEEL_CHAR('\\'),
+  EL_STEEL_CHAR(']'),
+  EL_STEEL_CHAR('^'),
+  EL_STEEL_CHAR('_'),
 
-  EL_STEELCHAR('©'),
-  EL_STEELCHAR('Ä'),
-  EL_STEELCHAR('Ö'),
-  EL_STEELCHAR('Ü'),
+  EL_STEEL_CHAR('©'),
+  EL_STEEL_CHAR('Ä'),
+  EL_STEEL_CHAR('Ö'),
+  EL_STEEL_CHAR('Ü'),
 
-  EL_STEELCHAR('°'),
-  EL_STEELCHAR('®'),
-  EL_STEELCHAR(FONT_ASCII_CURSOR),
-  EL_STEELCHAR(FONT_ASCII_BUTTON),
+  EL_STEEL_CHAR('°'),
+  EL_STEEL_CHAR('®'),
+  EL_STEEL_CHAR(FONT_ASCII_CURSOR),
+  EL_STEEL_CHAR(FONT_ASCII_BUTTON),
 
-  EL_STEELCHAR(FONT_ASCII_UP),
-  EL_STEELCHAR(FONT_ASCII_DOWN),
-  EL_STEELCHAR(' '),
-  EL_STEELCHAR(' ')
+  EL_STEEL_CHAR(FONT_ASCII_UP),
+  EL_STEEL_CHAR(FONT_ASCII_DOWN),
+  EL_STEEL_CHAR(' '),
+  EL_STEEL_CHAR(' ')
 };
-static int *editor_hl_steelchars_ptr = editor_hl_steelchars;
-static int *editor_el_steelchars_ptr = editor_el_steelchars;
-static int num_editor_hl_steelchars = SIZEOF_ARRAY_INT(editor_hl_steelchars);
-static int num_editor_el_steelchars = SIZEOF_ARRAY_INT(editor_el_steelchars);
+static int *editor_hl_steel_chars_ptr = editor_hl_steel_chars;
+static int *editor_el_steel_chars_ptr = editor_el_steel_chars;
+static int num_editor_hl_steel_chars = SIZEOF_ARRAY_INT(editor_hl_steel_chars);
+static int num_editor_el_steel_chars = SIZEOF_ARRAY_INT(editor_el_steel_chars);
 
 static int editor_hl_custom[] =
 {
@@ -4456,10 +4491,10 @@ editor_elements_info[] =
     &editor_el_chars_ptr,		&num_editor_el_chars
   },
   {
-    &setup.editor.el_steelchars,
-    &setup.editor_cascade.el_steelchars,
-    &editor_hl_steelchars_ptr,		&num_editor_hl_steelchars,
-    &editor_el_steelchars_ptr,		&num_editor_el_steelchars
+    &setup.editor.el_steel_chars,
+    &setup.editor_cascade.el_steel_chars,
+    &editor_hl_steel_chars_ptr,		&num_editor_hl_steel_chars,
+    &editor_el_steel_chars_ptr,		&num_editor_el_steel_chars
   },
   {
     &setup.editor.el_custom,
@@ -8591,33 +8626,7 @@ void DumpBrush_Small()
 
 static void FloodFill(int from_x, int from_y, int fill_element)
 {
-  int i,x,y;
-  int old_element;
-  static int check[4][2] = { {-1,0}, {0,-1}, {1,0}, {0,1} };
-  static int safety = 0;
-
-  /* check if starting field still has the desired content */
-  if (Feld[from_x][from_y] == fill_element)
-    return;
-
-  safety++;
-
-  if (safety > lev_fieldx*lev_fieldy)
-    Error(ERR_EXIT, "Something went wrong in 'FloodFill()'. Please debug.");
-
-  old_element = Feld[from_x][from_y];
-  Feld[from_x][from_y] = fill_element;
-
-  for (i = 0; i < 4; i++)
-  {
-    x = from_x + check[i][0];
-    y = from_y + check[i][1];
-
-    if (IN_LEV_FIELD(x,y) && Feld[x][y] == old_element)
-      FloodFill(x, y, fill_element);
-  }
-
-  safety--;
+  FloodFillLevel(from_x, from_y, fill_element, Feld, lev_fieldx, lev_fieldy);
 }
 
 /* values for DrawLevelText() modes */

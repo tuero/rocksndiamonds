@@ -710,6 +710,39 @@ void SetBorderElement()
   }
 }
 
+void FloodFillLevel(int from_x, int from_y, int fill_element,
+		    short field[MAX_LEV_FIELDX][MAX_LEV_FIELDY],
+		    int max_fieldx, int max_fieldy)
+{
+  int i,x,y;
+  int old_element;
+  static int check[4][2] = { { -1, 0 }, { 0, -1 }, { 1, 0 }, { 0, 1 } };
+  static int safety = 0;
+
+  /* check if starting field still has the desired content */
+  if (field[from_x][from_y] == fill_element)
+    return;
+
+  safety++;
+
+  if (safety > max_fieldx * max_fieldy)
+    Error(ERR_EXIT, "Something went wrong in 'FloodFill()'. Please debug.");
+
+  old_element = field[from_x][from_y];
+  field[from_x][from_y] = fill_element;
+
+  for (i = 0; i < 4; i++)
+  {
+    x = from_x + check[i][0];
+    y = from_y + check[i][1];
+
+    if (IN_FIELD(x, y, max_fieldx, max_fieldy) && field[x][y] == old_element)
+      FloodFillLevel(x, y, fill_element, field, max_fieldx, max_fieldy);
+  }
+
+  safety--;
+}
+
 void SetRandomAnimationValue(int x, int y)
 {
   gfx.anim_random_frame = GfxRandom[x][y];

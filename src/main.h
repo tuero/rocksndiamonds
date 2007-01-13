@@ -34,7 +34,7 @@
 #define IMG_SP_EMPTY			IMG_SP_EMPTY_SPACE
 #define IMG_EXPLOSION			IMG_DEFAULT_EXPLODING
 #define IMG_CHAR_START			IMG_CHAR_SPACE
-#define IMG_STEELCHAR_START		IMG_STEELCHAR_SPACE
+#define IMG_STEEL_CHAR_START		IMG_STEEL_CHAR_SPACE
 #define IMG_CUSTOM_START		IMG_CUSTOM_1
 
 #define SND_UNDEFINED			(-1)
@@ -60,9 +60,16 @@
 #define SCREENY(a)			((a) - scroll_y)
 #define LEVELX(a)			((a) + scroll_x)
 #define LEVELY(a)			((a) + scroll_y)
-#define IN_VIS_FIELD(x,y) ((x)>=0 && (x)<SCR_FIELDX && (y)>=0 &&(y)<SCR_FIELDY)
-#define IN_SCR_FIELD(x,y) ((x)>=BX1 && (x)<=BX2 && (y)>=BY1 &&(y)<=BY2)
-#define IN_LEV_FIELD(x,y) ((x)>=0 && (x)<lev_fieldx && (y)>=0 &&(y)<lev_fieldy)
+
+#define IN_FIELD(x, y, xsize, ysize)	((x) >= 0 && (x) < (xsize) &&	   \
+					 (y) >= 0 && (y) < (ysize))
+#define IN_FIELD_MINMAX(x, y, xmin, ymin, xmax, ymax)			   \
+					((x) >= (xmin) && (x) <= (xmax) && \
+					 (y) >= (ymin) && (y) <= (ymax))
+
+#define IN_VIS_FIELD(x, y)		IN_FIELD(x, y, SCR_FIELDX, SCR_FIELDY)
+#define IN_LEV_FIELD(x, y)		IN_FIELD(x, y, lev_fieldx, lev_fieldy)
+#define IN_SCR_FIELD(x, y)		IN_FIELD_MINMAX(x,y, BX1,BY1, BX2,BY2)
 
 /* values for configurable properties (custom elem's only, else pre-defined) */
 #define EP_DIGGABLE			0
@@ -1323,16 +1330,16 @@
 #define EL_NEXT_CE_8			730
 #define EL_ANY_ELEMENT			731
 
-#define EL_STEELCHAR_START		732
-#define EL_STEELCHAR_ASCII0		(EL_STEELCHAR_START  - 32)
-#define EL_STEELCHAR_ASCII0_START	(EL_STEELCHAR_ASCII0 + 32)
+#define EL_STEEL_CHAR_START		732
+#define EL_STEEL_CHAR_ASCII0		(EL_STEEL_CHAR_START  - 32)
+#define EL_STEEL_CHAR_ASCII0_START	(EL_STEEL_CHAR_ASCII0 + 32)
 
 /* (auto-generated data structure definitions included with normal chars) */
 
-#define EL_STEELCHAR_ASCII0_END		(EL_STEELCHAR_ASCII0 + 111)
-#define EL_STEELCHAR_END		(EL_STEELCHAR_START  + 79)
+#define EL_STEEL_CHAR_ASCII0_END	(EL_STEEL_CHAR_ASCII0 + 111)
+#define EL_STEEL_CHAR_END		(EL_STEEL_CHAR_START  + 79)
 
-#define EL_STEELCHAR(c)			(EL_STEELCHAR_ASCII0 +MAP_FONT_ASCII(c))
+#define EL_STEEL_CHAR(c)		(EL_STEEL_CHAR_ASCII0+MAP_FONT_ASCII(c))
 
 #define EL_SPERMS			812
 #define EL_BULLET			813
@@ -1348,7 +1355,31 @@
 #define EL_STEEL_EXIT_CLOSED		822
 #define EL_STEEL_EXIT_OPEN		823
 
-#define NUM_FILE_ELEMENTS		824
+#define EL_DC_STEELWALL_1_LEFT		824
+#define EL_DC_STEELWALL_1_RIGHT		825
+#define EL_DC_STEELWALL_1_TOP		826
+#define EL_DC_STEELWALL_1_BOTTOM	827
+#define EL_DC_STEELWALL_1_HORIZONTAL	828
+#define EL_DC_STEELWALL_1_VERTICAL	829
+#define EL_DC_STEELWALL_1_TOPLEFT	830
+#define EL_DC_STEELWALL_1_TOPRIGHT	831
+#define EL_DC_STEELWALL_1_BOTTOMLEFT	832
+#define EL_DC_STEELWALL_1_BOTTOMRIGHT	833
+#define EL_DC_STEELWALL_1_TOPLEFT_2	834
+#define EL_DC_STEELWALL_1_TOPRIGHT_2	835
+#define EL_DC_STEELWALL_1_BOTTOMLEFT_2	836
+#define EL_DC_STEELWALL_1_BOTTOMRIGHT_2	837
+
+#define EL_DC_STEELWALL_2_LEFT		838
+#define EL_DC_STEELWALL_2_RIGHT		839
+#define EL_DC_STEELWALL_2_TOP		840
+#define EL_DC_STEELWALL_2_BOTTOM	841
+#define EL_DC_STEELWALL_2_HORIZONTAL	842
+#define EL_DC_STEELWALL_2_VERTICAL	843
+#define EL_DC_STEELWALL_2_MIDDLE	844
+#define EL_DC_STEELWALL_2_SINGLE	845
+
+#define NUM_FILE_ELEMENTS		846
 
 
 /* "real" (and therefore drawable) runtime elements */
@@ -1499,8 +1530,8 @@
 #define EL_INTERNAL_CASCADE_DX_ACTIVE		(EL_FIRST_INTERNAL + 19)
 #define EL_INTERNAL_CASCADE_CHARS		(EL_FIRST_INTERNAL + 20)
 #define EL_INTERNAL_CASCADE_CHARS_ACTIVE	(EL_FIRST_INTERNAL + 21)
-#define EL_INTERNAL_CASCADE_STEELCHARS		(EL_FIRST_INTERNAL + 22)
-#define EL_INTERNAL_CASCADE_STEELCHARS_ACTIVE	(EL_FIRST_INTERNAL + 23)
+#define EL_INTERNAL_CASCADE_STEEL_CHARS		(EL_FIRST_INTERNAL + 22)
+#define EL_INTERNAL_CASCADE_STEEL_CHARS_ACTIVE	(EL_FIRST_INTERNAL + 23)
 #define EL_INTERNAL_CASCADE_CE			(EL_FIRST_INTERNAL + 24)
 #define EL_INTERNAL_CASCADE_CE_ACTIVE		(EL_FIRST_INTERNAL + 25)
 #define EL_INTERNAL_CASCADE_GE			(EL_FIRST_INTERNAL + 26)

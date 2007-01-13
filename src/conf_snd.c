@@ -130,6 +130,9 @@ struct ConfigInfo sound_config[] =
   { "[exit].opening",			"oeffnen.wav"			},
   { "[exit].closing",			"oeffnen.wav"			},
   { "[exit].passing",			"buing.wav"			},
+  { "[steel_exit].opening",		"oeffnen.wav"			},
+  { "[steel_exit].closing",		"oeffnen.wav"			},
+  { "[steel_exit].passing",		"buing.wav"			},
   { "penguin.passing",			"buing.wav"			},
 
   /* sounds for Emerald Mine Club style elements and actions */
