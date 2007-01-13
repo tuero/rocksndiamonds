@@ -1190,6 +1190,22 @@ element_to_graphic[] =
     IMG_EXIT_CLOSING
   },
   {
+    EL_STEEL_EXIT_CLOSED,		-1, -1, FALSE,
+    IMG_STEEL_EXIT_CLOSED
+  },
+  {
+    EL_STEEL_EXIT_OPENING,		-1, -1, FALSE,
+    IMG_STEEL_EXIT_OPENING
+  },
+  {
+    EL_STEEL_EXIT_OPEN,			-1, -1, FALSE,
+    IMG_STEEL_EXIT_OPEN
+  },
+  {
+    EL_STEEL_EXIT_CLOSING,		-1, -1, FALSE,
+    IMG_STEEL_EXIT_CLOSING
+  },
+  {
     EL_BALLOON,				-1, -1, FALSE,
     IMG_BALLOON
   },
@@ -1610,12 +1626,84 @@ element_to_graphic[] =
     IMG_ENVELOPE_4_COLLECTING
   },
   {
+    EL_SIGN_RADIOACTIVITY,		-1, -1, FALSE,
+    IMG_SIGN_RADIOACTIVITY
+  },
+  {
+    EL_SIGN_GIVE_WAY,			-1, -1, FALSE,
+    IMG_SIGN_GIVE_WAY
+  },
+  {
+    EL_SIGN_NO_ENTRY,			-1, -1, FALSE,
+    IMG_SIGN_NO_ENTRY
+  },
+  {
+    EL_SIGN_EMERGENCY_EXIT,		-1, -1, FALSE,
+    IMG_SIGN_EMERGENCY_EXIT
+  },
+  {
+    EL_SIGN_YIN_YANG,			-1, -1, FALSE,
+    IMG_SIGN_YIN_YANG
+  },
+  {
     EL_SIGN_EXCLAMATION,		-1, -1, FALSE,
     IMG_SIGN_EXCLAMATION
   },
   {
     EL_SIGN_STOP,			-1, -1, FALSE,
     IMG_SIGN_STOP
+  },
+  {
+    EL_SIGN_PARKING,			-1, -1, FALSE,
+    IMG_SIGN_PARKING
+  },
+  {
+    EL_SIGN_WHEELCHAIR,			-1, -1, FALSE,
+    IMG_SIGN_WHEELCHAIR
+  },
+  {
+    EL_SIGN_ENTRY_FORBIDDEN,		-1, -1, FALSE,
+    IMG_SIGN_ENTRY_FORBIDDEN
+  },
+  {
+    EL_SPERMS,				-1, -1, FALSE,
+    IMG_SPERMS
+  },
+  {
+    EL_BULLET,				-1, -1, FALSE,
+    IMG_BULLET
+  },
+  {
+    EL_HEART,				-1, -1, FALSE,
+    IMG_HEART
+  },
+  {
+    EL_CROSS,				-1, -1, FALSE,
+    IMG_CROSS
+  },
+  {
+    EL_FRANKIE,				-1, -1, FALSE,
+    IMG_FRANKIE
+  },
+  {
+    EL_SIGN_SPERMS,			-1, -1, FALSE,
+    IMG_SIGN_SPERMS
+  },
+  {
+    EL_SIGN_BULLET,			-1, -1, FALSE,
+    IMG_SIGN_BULLET
+  },
+  {
+    EL_SIGN_HEART,			-1, -1, FALSE,
+    IMG_SIGN_HEART
+  },
+  {
+    EL_SIGN_CROSS,			-1, -1, FALSE,
+    IMG_SIGN_CROSS
+  },
+  {
+    EL_SIGN_FRANKIE,			-1, -1, FALSE,
+    IMG_SIGN_FRANKIE
   },
   {
     EL_LANDMINE,			-1, -1, FALSE,
@@ -3254,43 +3342,11 @@ element_to_graphic[] =
     IMG_CHAR_QUESTION
   },
   {
-    EL_SIGN_EXIT,			-1, -1, FALSE,
+    EL_SIGN_UNUSED_1,			-1, -1, FALSE,
     IMG_CHAR_QUESTION
   },
   {
-    EL_SIGN_HEART,			-1, -1, FALSE,
-    IMG_CHAR_QUESTION
-  },
-  {
-    EL_SIGN_ONEWAY,			-1, -1, FALSE,
-    IMG_CHAR_QUESTION
-  },
-  {
-    EL_SIGN_OTHER,			-1, -1, FALSE,
-    IMG_CHAR_QUESTION
-  },
-  {
-    EL_SIGN_PARKING,			-1, -1, FALSE,
-    IMG_CHAR_QUESTION
-  },
-  {
-    EL_SIGN_RADIOACTIVITY,		-1, -1, FALSE,
-    IMG_CHAR_QUESTION
-  },
-  {
-    EL_SIGN_ROUND,			-1, -1, FALSE,
-    IMG_CHAR_QUESTION
-  },
-  {
-    EL_SIGN_TRIANGLE,			-1, -1, FALSE,
-    IMG_CHAR_QUESTION
-  },
-  {
-    EL_SIGN_WHEELCHAIR,			-1, -1, FALSE,
-    IMG_CHAR_QUESTION
-  },
-  {
-    EL_SIGN_YINYANG,			-1, -1, FALSE,
+    EL_SIGN_UNUSED_2,			-1, -1, FALSE,
     IMG_CHAR_QUESTION
   },
   {

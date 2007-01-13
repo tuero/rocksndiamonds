@@ -4148,12 +4148,12 @@ int getMappedElement_DC(int element)
       element = EL_EXIT_CLOSED;
       break;
 
-    case 0x0eeb:	/* steel exit (open) */
-      element = EL_EXIT_OPEN;
+    case 0x0eeb:
+      element = EL_STEEL_EXIT_OPEN;
       break;
 
-    case 0x0efc:	/* steel exit (closed) */
-      element = EL_EXIT_CLOSED;
+    case 0x0efc:
+      element = EL_STEEL_EXIT_CLOSED;
       break;
 
     case 0x0f4f:	/* dynamite (lit 1) */
@@ -5450,7 +5450,7 @@ int getMappedElement_DC(int element)
       break;
 
     case 0x16b0:
-      element = EL_SIGN_ONEWAY;
+      element = EL_SIGN_NO_ENTRY;
       break;
 
     case 0x16b1:
@@ -5458,19 +5458,19 @@ int getMappedElement_DC(int element)
       break;
 
     case 0x16b2:
-      element = EL_SIGN_TRIANGLE;
+      element = EL_SIGN_GIVE_WAY;
       break;
 
     case 0x16b3:
-      element = EL_SIGN_ROUND;
+      element = EL_SIGN_ENTRY_FORBIDDEN;
       break;
 
     case 0x16b4:
-      element = EL_SIGN_EXIT;
+      element = EL_SIGN_EMERGENCY_EXIT;
       break;
 
     case 0x16b5:
-      element = EL_SIGN_YINYANG;
+      element = EL_SIGN_YIN_YANG;
       break;
 
     case 0x16b6:

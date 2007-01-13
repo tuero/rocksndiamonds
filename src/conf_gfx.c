@@ -1521,6 +1521,29 @@ struct ConfigInfo image_config[] =
   { "exit.closing.delay",			"6"			},
   { "exit.closing.anim_mode",			"linear,reverse"	},
 
+  { "steel_exit_closed",			"RocksDC2.pcx"	},
+  { "steel_exit_closed.xpos",			"0"			},
+  { "steel_exit_closed.ypos",			"5"			},
+  { "steel_exit_closed.frames",			"1"			},
+  { "steel_exit.opening",			"RocksDC2.pcx"	},
+  { "steel_exit.opening.xpos",			"0"			},
+  { "steel_exit.opening.ypos",			"5"			},
+  { "steel_exit.opening.frames",		"5"			},
+  { "steel_exit.opening.delay",			"6"			},
+  { "steel_exit.opening.anim_mode",		"linear"		},
+  { "steel_exit_open",				"RocksDC2.pcx"	},
+  { "steel_exit_open.xpos",			"4"			},
+  { "steel_exit_open.ypos",			"5"			},
+  { "steel_exit_open.frames",			"4"			},
+  { "steel_exit_open.delay",			"4"			},
+  { "steel_exit_open.anim_mode",		"pingpong"		},
+  { "steel_exit.closing",			"RocksDC2.pcx"	},
+  { "steel_exit.closing.xpos",			"0"			},
+  { "steel_exit.closing.ypos",			"5"			},
+  { "steel_exit.closing.frames",		"5"			},
+  { "steel_exit.closing.delay",			"6"			},
+  { "steel_exit.closing.anim_mode",		"linear,reverse"	},
+
   /* images for Emerald Mine Club style elements and actions */
 
   { "balloon",					"RocksDC.pcx"		},
@@ -1937,6 +1960,31 @@ struct ConfigInfo image_config[] =
   { "envelope_4.collecting.delay",		"2"			},
   { "envelope_4.collecting.anim_mode",		"linear"		},
 
+  { "sign_radioactivity",			"RocksDC.pcx"		},
+  { "sign_radioactivity.xpos",			"4"			},
+  { "sign_radioactivity.ypos",			"13"			},
+  { "sign_radioactivity.frames",		"1"			},
+
+  { "sign_give_way",				"RocksDC.pcx"		},
+  { "sign_give_way.xpos",			"5"			},
+  { "sign_give_way.ypos",			"13"			},
+  { "sign_give_way.frames",			"1"			},
+
+  { "sign_no_entry",				"RocksDC.pcx"		},
+  { "sign_no_entry.xpos",			"6"			},
+  { "sign_no_entry.ypos",			"13"			},
+  { "sign_no_entry.frames",			"1"			},
+
+  { "sign_emergency_exit",			"RocksDC.pcx"		},
+  { "sign_emergency_exit.xpos",			"7"			},
+  { "sign_emergency_exit.ypos",			"13"			},
+  { "sign_emergency_exit.frames",		"1"			},
+
+  { "sign_yin_yang",				"RocksDC.pcx"		},
+  { "sign_yin_yang.xpos",			"4"			},
+  { "sign_yin_yang.ypos",			"14"			},
+  { "sign_yin_yang.frames",			"1"			},
+
   { "sign_exclamation",				"RocksDC.pcx"		},
   { "sign_exclamation.xpos",			"5"			},
   { "sign_exclamation.ypos",			"14"			},
@@ -1946,6 +1994,71 @@ struct ConfigInfo image_config[] =
   { "sign_stop.xpos",				"6"			},
   { "sign_stop.ypos",				"14"			},
   { "sign_stop.frames",				"1"			},
+
+  { "sign_parking",				"RocksDC.pcx"		},
+  { "sign_parking.xpos",			"6"			},
+  { "sign_parking.ypos",			"15"			},
+  { "sign_parking.frames",			"1"			},
+
+  { "sign_wheelchair",				"RocksDC.pcx"		},
+  { "sign_wheelchair.xpos",			"7"			},
+  { "sign_wheelchair.ypos",			"15"			},
+  { "sign_wheelchair.frames",			"1"			},
+
+  { "sign_entry_forbidden",			"RocksDC.pcx"		},
+  { "sign_entry_forbidden.xpos",		"12"			},
+  { "sign_entry_forbidden.ypos",		"15"			},
+  { "sign_entry_forbidden.frames",		"1"			},
+
+  { "sperms",					"RocksDC2.pcx"		},
+  { "sperms.xpos",				"0"			},
+  { "sperms.ypos",				"3"			},
+  { "sperms.frames",				"1"			},
+
+  { "bullet",					"RocksDC2.pcx"		},
+  { "bullet.xpos",				"1"			},
+  { "bullet.ypos",				"3"			},
+  { "bullet.frames",				"1"			},
+
+  { "heart",					"RocksDC2.pcx"		},
+  { "heart.xpos",				"2"			},
+  { "heart.ypos",				"3"			},
+  { "heart.frames",				"1"			},
+
+  { "cross",					"RocksDC2.pcx"		},
+  { "cross.xpos",				"3"			},
+  { "cross.ypos",				"3"			},
+  { "cross.frames",				"1"			},
+
+  { "frankie",					"RocksDC2.pcx"		},
+  { "frankie.xpos",				"4"			},
+  { "frankie.ypos",				"3"			},
+  { "frankie.frames",				"1"			},
+
+  { "sign_sperms",				"RocksDC2.pcx"		},
+  { "sign_sperms.xpos",				"0"			},
+  { "sign_sperms.ypos",				"4"			},
+  { "sign_sperms.frames",			"1"			},
+
+  { "sign_bullet",				"RocksDC2.pcx"		},
+  { "sign_bullet.xpos",				"1"			},
+  { "sign_bullet.ypos",				"4"			},
+  { "sign_bullet.frames",			"1"			},
+
+  { "sign_heart",				"RocksDC2.pcx"		},
+  { "sign_heart.xpos",				"2"			},
+  { "sign_heart.ypos",				"4"			},
+  { "sign_heart.frames",			"1"			},
+
+  { "sign_cross",				"RocksDC2.pcx"		},
+  { "sign_cross.xpos",				"3"			},
+  { "sign_cross.ypos",				"4"			},
+  { "sign_cross.frames",			"1"			},
+
+  { "sign_frankie",				"RocksDC2.pcx"		},
+  { "sign_frankie.xpos",			"4"			},
+  { "sign_frankie.ypos",			"4"			},
+  { "sign_frankie.frames",			"1"			},
 
   { "landmine",					"RocksDC.pcx"		},
   { "landmine.xpos",				"7"			},

@@ -1624,63 +1624,63 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
   },
   {
     "sign_exclamation",
-    "wall",
+    "sign",
     "sign (exclamation)"
   },
   {
     "sign_radioactivity",
-    "wall",
+    "sign",
     "sign (radio activity)"
   },
   {
     "sign_stop",
-    "wall",
+    "sign",
     "sign (stop)"
   },
   {
     "sign_wheelchair",
-    "wall",
+    "sign",
     "sign (wheel chair)"
   },
   {
     "sign_parking",
-    "wall",
+    "sign",
     "sign (parking)"
   },
   {
-    "sign_oneway",
-    "wall",
-    "sign (one way)"
+    "sign_no_entry",
+    "sign",
+    "sign (no entry)"
   },
   {
-    "sign_heart",
-    "wall",
-    "sign (heart)"
+    "sign_unused_1",
+    "sign",
+    "sign (unused)"
   },
   {
-    "sign_triangle",
-    "wall",
-    "sign (triangle)"
+    "sign_give_way",
+    "sign",
+    "sign (give way)"
   },
   {
-    "sign_round",
-    "wall",
-    "sign (round)"
+    "sign_entry_forbidden",
+    "sign",
+    "sign (entry forbidden)"
   },
   {
-    "sign_exit",
-    "wall",
-    "sign (exit)"
+    "sign_emergency_exit",
+    "sign",
+    "sign (emergency exit)"
   },
   {
-    "sign_yinyang",
-    "wall",
+    "sign_yin_yang",
+    "sign",
     "sign (yin yang)"
   },
   {
-    "sign_other",
-    "wall",
-    "sign (other)"
+    "sign_unused_2",
+    "sign",
+    "sign (unused)"
   },
   {
     "mole.left",
@@ -4187,6 +4187,66 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
     "steelchar",
     "steel letter 'down'"
   },
+  {
+    "sperms",
+    "frankie",
+    "sperms"
+  },
+  {
+    "bullet",
+    "frankie",
+    "bullet"
+  },
+  {
+    "heart",
+    "frankie",
+    "heart"
+  },
+  {
+    "cross",
+    "frankie",
+    "cross"
+  },
+  {
+    "frankie",
+    "frankie",
+    "frankie"
+  },
+  {
+    "sign_sperms",
+    "sign",
+    "sign (sperms)"
+  },
+  {
+    "sign_bullet",
+    "sign",
+    "sign (bullet)"
+  },
+  {
+    "sign_heart",
+    "sign",
+    "sign (heart)"
+  },
+  {
+    "sign_cross",
+    "sign",
+    "sign (cross)"
+  },
+  {
+    "sign_frankie",
+    "sign",
+    "sign (frankie)"
+  },
+  {
+    "steel_exit_closed",
+    "steel_exit",
+    "closed steel exit"
+  },
+  {
+    "steel_exit_open",
+    "steel_exit",
+    "open steel exit"
+  },
 
   /* ----------------------------------------------------------------------- */
   /* "real" (and therefore drawable) runtime elements                        */
@@ -4330,6 +4390,16 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
   {
     "exit.closing",
     "exit",
+    "-"
+  },
+  {
+    "steel_exit.opening",
+    "steel_exit",
+    "-"
+  },
+  {
+    "steel_exit.closing",
+    "steel_exit",
     "-"
   },
   {

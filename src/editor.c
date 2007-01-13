@@ -3603,6 +3603,41 @@ static int editor_el_diamond_caves[] =
   EL_ENVELOPE_2,
   EL_ENVELOPE_3,
   EL_ENVELOPE_4,
+
+  EL_SIGN_RADIOACTIVITY,
+  EL_SIGN_WHEELCHAIR,
+  EL_SIGN_PARKING,
+  EL_SIGN_NO_ENTRY,
+
+  EL_SIGN_GIVE_WAY,
+  EL_SIGN_ENTRY_FORBIDDEN,
+  EL_SIGN_EMERGENCY_EXIT,
+  EL_SIGN_YIN_YANG,
+
+  EL_SIGN_SPERMS,
+  EL_SIGN_BULLET,
+  EL_SIGN_HEART,
+  EL_SIGN_CROSS,
+
+  EL_SIGN_FRANKIE,
+  EL_EMPTY,
+  EL_EMPTY,
+  EL_EMPTY,
+
+  EL_SPERMS,
+  EL_BULLET,
+  EL_HEART,
+  EL_CROSS,
+
+  EL_FRANKIE,
+  EL_EMPTY,
+  EL_EMPTY,
+  EL_EMPTY,
+
+  EL_STEEL_EXIT_CLOSED,
+  EL_STEEL_EXIT_OPEN,
+  EL_EMPTY,
+  EL_EMPTY,
 };
 static int *editor_hl_diamond_caves_ptr = editor_hl_diamond_caves;
 static int *editor_el_diamond_caves_ptr = editor_el_diamond_caves;

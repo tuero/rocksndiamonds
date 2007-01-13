@@ -2346,7 +2346,7 @@ static TreeInfo *getArtworkInfoCacheEntry(LevelDirTree *level_node, int type)
       if (value == NULL)
       {
 #if 1
-	printf("::: - WARNING: cache entry '%s' invalid\n", token);
+	Error(ERR_WARN, "cache entry '%s' invalid", token);
 #endif
 
 	cached = FALSE;
@@ -2452,6 +2452,8 @@ static boolean LoadLevelInfoFromLevelConf(TreeInfo **node_first,
 					  char *level_directory,
 					  char *directory_name)
 {
+  static unsigned long progress_delay = 0;
+  unsigned long progress_delay_value = 100;	/* (in milliseconds) */
   char *directory_path = getPath2(level_directory, directory_name);
   char *filename = getPath2(directory_path, LEVELINFO_FILENAME);
   SetupFileHash *setup_file_hash;
@@ -2552,7 +2554,8 @@ static boolean LoadLevelInfoFromLevelConf(TreeInfo **node_first,
      leveldir_new->last_level : leveldir_new->first_level);
 
 #if 1
-  if (leveldir_new->level_group)
+  if (leveldir_new->level_group ||
+      DelayReached(&progress_delay, progress_delay_value))
     DrawInitText(leveldir_new->name, 150, FC_YELLOW);
 #else
   DrawInitText(leveldir_new->name, 150, FC_YELLOW);
@@ -3000,6 +3003,8 @@ void LoadArtworkInfo()
 void LoadArtworkInfoFromLevelInfo(ArtworkDirTree **artwork_node,
 				  LevelDirTree *level_node)
 {
+  static unsigned long progress_delay = 0;
+  unsigned long progress_delay_value = 100;	/* (in milliseconds) */
   int type = (*artwork_node)->type;
 
   /* recursively check all level directories for artwork sub-directories */
@@ -3045,7 +3050,8 @@ void LoadArtworkInfoFromLevelInfo(ArtworkDirTree **artwork_node,
     }
 
 #if 1
-    if (level_node->level_group)
+    if (level_node->level_group ||
+	DelayReached(&progress_delay, progress_delay_value))
       DrawInitText(level_node->name, 150, FC_YELLOW);
 #endif
 
