@@ -381,8 +381,8 @@ static int getInvisibleFromInvisibleActiveElement(int);
 static struct GadgetInfo *game_gadget[NUM_GAME_BUTTONS];
 
 /* for detection of endless loops, caused by custom element programming */
-/* (using "MAX_PLAYFIELD_WIDTH" here is just a rough approximation...) */
-#define MAX_ELEMENT_CHANGE_RECURSION_DEPTH	(MAX_PLAYFIELD_WIDTH)
+/* (using maximal playfield width x 10 is just a rough approximation) */
+#define MAX_ELEMENT_CHANGE_RECURSION_DEPTH	(MAX_PLAYFIELD_WIDTH * 10)
 
 #define RECURSION_LOOP_DETECTION_START(e, rc)				\
 {									\

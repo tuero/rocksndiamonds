@@ -1,3 +1,11 @@
+2007-01-14
+	* changed maximum value for endless loop detection to a higher value
+	  (some levels really used very deep recursion without being endless)
+
+2007-01-13
+	* added growing steel walls for newly supported Diamond Caves II levels
+	* added snappable land mine for newly supported Diamond Caves II levels
+
 2007-01-08
 	* added steel text elements for newly supported Diamond Caves II levels
 
