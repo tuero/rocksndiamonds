@@ -613,6 +613,14 @@ static struct ChangingElementInfo change_delay_list[] =
     NULL
   },
   {
+    EL_DC_TIMEGATE_SWITCH_ACTIVE,
+    EL_DC_TIMEGATE_SWITCH,
+    0,
+    InitTimegateWheel,
+    RunTimegateWheel,
+    NULL
+  },
+  {
     EL_EMC_MAGIC_BALL_ACTIVE,
     EL_EMC_MAGIC_BALL_ACTIVE,
     0,
@@ -1176,6 +1184,11 @@ static void InitField(int x, int y, boolean init_game)
     case EL_SWITCHGATE_SWITCH_DOWN:	/* always start with same switch pos */
       if (init_game)
 	Feld[x][y] = EL_SWITCHGATE_SWITCH_UP;
+      break;
+
+    case EL_DC_SWITCHGATE_SWITCH_DOWN:	/* always start with same switch pos */
+      if (init_game)
+	Feld[x][y] = EL_DC_SWITCHGATE_SWITCH_UP;
       break;
 #endif
 
@@ -4030,6 +4043,10 @@ void Bang(int x, int y)
       explosion_type = EX_TYPE_DYNA;
       break;
 
+    case EL_DC_LANDMINE:
+      explosion_type = EX_TYPE_CENTER;
+      break;
+
     case EL_PENGUIN:
     case EL_LAMP:
     case EL_LAMP_ACTIVE:
@@ -4243,6 +4260,12 @@ static void ToggleSwitchgateSwitch(int x, int y)
       Feld[xx][yy] = EL_SWITCHGATE_SWITCH_UP + game.switchgate_pos;
       DrawLevelField(xx, yy);
     }
+    else if (element == EL_DC_SWITCHGATE_SWITCH_UP ||
+	     element == EL_DC_SWITCHGATE_SWITCH_DOWN)
+    {
+      Feld[xx][yy] = EL_DC_SWITCHGATE_SWITCH_UP + game.switchgate_pos;
+      DrawLevelField(xx, yy);
+    }
 #else
     if (element == EL_SWITCHGATE_SWITCH_UP)
     {
@@ -4252,6 +4275,16 @@ static void ToggleSwitchgateSwitch(int x, int y)
     else if (element == EL_SWITCHGATE_SWITCH_DOWN)
     {
       Feld[xx][yy] = EL_SWITCHGATE_SWITCH_UP;
+      DrawLevelField(xx, yy);
+    }
+    else if (element == EL_DC_SWITCHGATE_SWITCH_UP)
+    {
+      Feld[xx][yy] = EL_DC_SWITCHGATE_SWITCH_DOWN;
+      DrawLevelField(xx, yy);
+    }
+    else if (element == EL_DC_SWITCHGATE_SWITCH_DOWN)
+    {
+      Feld[xx][yy] = EL_DC_SWITCHGATE_SWITCH_UP;
       DrawLevelField(xx, yy);
     }
 #endif
@@ -4470,7 +4503,7 @@ static void ActivateTimegateSwitch(int x, int y)
 	element == EL_TIMEGATE_CLOSING)
     {
       Feld[xx][yy] = EL_TIMEGATE_OPENING;
-      PlayLevelSound(xx, yy, SND_TIMEGATE_OPENING);
+      PlayLevelSound(xx, yy, SND_CLASS_TIMEGATE_OPENING);
     }
 
     /*
@@ -4483,7 +4516,12 @@ static void ActivateTimegateSwitch(int x, int y)
 
   }
 
+#if 1
+  Feld[x][y] = (Feld[x][y] == EL_TIMEGATE_SWITCH ? EL_TIMEGATE_SWITCH_ACTIVE :
+		EL_DC_TIMEGATE_SWITCH_ACTIVE);
+#else
   Feld[x][y] = EL_TIMEGATE_SWITCH_ACTIVE;
+#endif
 }
 
 void Impact(int x, int y)
@@ -4678,7 +4716,9 @@ void Impact(int x, int y)
 	  ToggleBeltSwitch(x, y + 1);
 	}
 	else if (smashed == EL_SWITCHGATE_SWITCH_UP ||
-		 smashed == EL_SWITCHGATE_SWITCH_DOWN)
+		 smashed == EL_SWITCHGATE_SWITCH_DOWN ||
+		 smashed == EL_DC_SWITCHGATE_SWITCH_UP ||
+		 smashed == EL_DC_SWITCHGATE_SWITCH_DOWN)
 	{
 	  ToggleSwitchgateSwitch(x, y + 1);
 	}
@@ -7266,7 +7306,7 @@ static void InitTimegateWheel(int x, int y)
 
 static void RunTimegateWheel(int x, int y)
 {
-  PlayLevelSound(x, y, SND_TIMEGATE_SWITCH_ACTIVE);
+  PlayLevelSound(x, y, SND_CLASS_TIMEGATE_SWITCH_ACTIVE);
 }
 
 static void InitMagicBallDelay(int x, int y)
@@ -7588,6 +7628,108 @@ void MauerAbleger(int ax, int ay)
        element == EL_EXPANDABLE_WALL) &&
       ((links_massiv && rechts_massiv) ||
        element == EL_EXPANDABLE_WALL_VERTICAL))
+    Feld[ax][ay] = EL_WALL;
+
+  if (new_wall)
+    PlayLevelSoundAction(ax, ay, ACTION_GROWING);
+}
+
+void MauerAblegerStahl(int ax, int ay)
+{
+  int element = Feld[ax][ay];
+  int graphic = el2img(element);
+  boolean oben_frei = FALSE, unten_frei = FALSE;
+  boolean links_frei = FALSE, rechts_frei = FALSE;
+  boolean oben_massiv = FALSE, unten_massiv = FALSE;
+  boolean links_massiv = FALSE, rechts_massiv = FALSE;
+  boolean new_wall = FALSE;
+
+  if (IS_ANIMATED(graphic))
+    DrawLevelGraphicAnimationIfNeeded(ax, ay, graphic);
+
+  if (!MovDelay[ax][ay])	/* start building new wall */
+    MovDelay[ax][ay] = 6;
+
+  if (MovDelay[ax][ay])		/* wait some time before building new wall */
+  {
+    MovDelay[ax][ay]--;
+    if (MovDelay[ax][ay])
+      return;
+  }
+
+  if (IN_LEV_FIELD(ax, ay-1) && IS_FREE(ax, ay-1))
+    oben_frei = TRUE;
+  if (IN_LEV_FIELD(ax, ay+1) && IS_FREE(ax, ay+1))
+    unten_frei = TRUE;
+  if (IN_LEV_FIELD(ax-1, ay) && IS_FREE(ax-1, ay))
+    links_frei = TRUE;
+  if (IN_LEV_FIELD(ax+1, ay) && IS_FREE(ax+1, ay))
+    rechts_frei = TRUE;
+
+  if (element == EL_EXPANDABLE_STEELWALL_VERTICAL ||
+      element == EL_EXPANDABLE_STEELWALL_ANY)
+  {
+    if (oben_frei)
+    {
+      Feld[ax][ay-1] = EL_EXPANDABLE_STEELWALL_GROWING;
+      Store[ax][ay-1] = element;
+      GfxDir[ax][ay-1] = MovDir[ax][ay-1] = MV_UP;
+      if (IN_SCR_FIELD(SCREENX(ax), SCREENY(ay-1)))
+  	DrawGraphic(SCREENX(ax), SCREENY(ay - 1),
+		    IMG_EXPANDABLE_STEELWALL_GROWING_UP, 0);
+      new_wall = TRUE;
+    }
+    if (unten_frei)
+    {
+      Feld[ax][ay+1] = EL_EXPANDABLE_STEELWALL_GROWING;
+      Store[ax][ay+1] = element;
+      GfxDir[ax][ay+1] = MovDir[ax][ay+1] = MV_DOWN;
+      if (IN_SCR_FIELD(SCREENX(ax), SCREENY(ay+1)))
+  	DrawGraphic(SCREENX(ax), SCREENY(ay + 1),
+		    IMG_EXPANDABLE_STEELWALL_GROWING_DOWN, 0);
+      new_wall = TRUE;
+    }
+  }
+
+  if (element == EL_EXPANDABLE_STEELWALL_HORIZONTAL ||
+      element == EL_EXPANDABLE_STEELWALL_ANY)
+  {
+    if (links_frei)
+    {
+      Feld[ax-1][ay] = EL_EXPANDABLE_STEELWALL_GROWING;
+      Store[ax-1][ay] = element;
+      GfxDir[ax-1][ay] = MovDir[ax-1][ay] = MV_LEFT;
+      if (IN_SCR_FIELD(SCREENX(ax-1), SCREENY(ay)))
+  	DrawGraphic(SCREENX(ax - 1), SCREENY(ay),
+		    IMG_EXPANDABLE_STEELWALL_GROWING_LEFT, 0);
+      new_wall = TRUE;
+    }
+
+    if (rechts_frei)
+    {
+      Feld[ax+1][ay] = EL_EXPANDABLE_STEELWALL_GROWING;
+      Store[ax+1][ay] = element;
+      GfxDir[ax+1][ay] = MovDir[ax+1][ay] = MV_RIGHT;
+      if (IN_SCR_FIELD(SCREENX(ax+1), SCREENY(ay)))
+  	DrawGraphic(SCREENX(ax + 1), SCREENY(ay),
+		    IMG_EXPANDABLE_STEELWALL_GROWING_RIGHT, 0);
+      new_wall = TRUE;
+    }
+  }
+
+  if (!IN_LEV_FIELD(ax, ay-1) || IS_WALL(Feld[ax][ay-1]))
+    oben_massiv = TRUE;
+  if (!IN_LEV_FIELD(ax, ay+1) || IS_WALL(Feld[ax][ay+1]))
+    unten_massiv = TRUE;
+  if (!IN_LEV_FIELD(ax-1, ay) || IS_WALL(Feld[ax-1][ay]))
+    links_massiv = TRUE;
+  if (!IN_LEV_FIELD(ax+1, ay) || IS_WALL(Feld[ax+1][ay]))
+    rechts_massiv = TRUE;
+
+  if (((oben_massiv && unten_massiv) ||
+       element == EL_EXPANDABLE_STEELWALL_HORIZONTAL) &&
+      ((links_massiv && rechts_massiv) ||
+       element == EL_EXPANDABLE_STEELWALL_VERTICAL))
     Feld[ax][ay] = EL_WALL;
 
   if (new_wall)
@@ -9709,7 +9851,8 @@ void GameActions_RND()
       CheckExitSteel(x, y);
     else if (element == EL_SP_EXIT_CLOSED)
       CheckExitSP(x, y);
-    else if (element == EL_EXPANDABLE_WALL_GROWING)
+    else if (element == EL_EXPANDABLE_WALL_GROWING ||
+	     element == EL_EXPANDABLE_STEELWALL_GROWING)
       MauerWaechst(x, y);
     else if (element == EL_EXPANDABLE_WALL ||
 	     element == EL_EXPANDABLE_WALL_HORIZONTAL ||
@@ -9717,6 +9860,10 @@ void GameActions_RND()
 	     element == EL_EXPANDABLE_WALL_ANY ||
 	     element == EL_BD_EXPANDABLE_WALL)
       MauerAbleger(x, y);
+    else if (element == EL_EXPANDABLE_STEELWALL_HORIZONTAL ||
+	     element == EL_EXPANDABLE_STEELWALL_VERTICAL ||
+	     element == EL_EXPANDABLE_STEELWALL_ANY)
+      MauerAblegerStahl(x, y);
     else if (element == EL_FLAMES)
       CheckForDragon(x, y);
     else if (element == EL_EXPLOSION)
@@ -11455,6 +11602,9 @@ int DigField(struct PlayerInfo *player,
     CheckTriggeredElementChangeByPlayer(x, y, element, CE_PLAYER_SNAPS_X,
 					player->index_bit, dig_side);
 
+    if (element == EL_DC_LANDMINE)
+      Bang(x, y);
+
     if (Feld[x][y] != element)		/* field changed by snapping */
       return MP_ACTION;
 
@@ -11912,7 +12062,9 @@ int DigField(struct PlayerInfo *player,
       ToggleBeltSwitch(x, y);
     }
     else if (element == EL_SWITCHGATE_SWITCH_UP ||
-	     element == EL_SWITCHGATE_SWITCH_DOWN)
+	     element == EL_SWITCHGATE_SWITCH_DOWN ||
+	     element == EL_DC_SWITCHGATE_SWITCH_UP ||
+	     element == EL_DC_SWITCHGATE_SWITCH_DOWN)
     {
       ToggleSwitchgateSwitch(x, y);
     }
@@ -11921,7 +12073,8 @@ int DigField(struct PlayerInfo *player,
     {
       ToggleLightSwitch(x, y);
     }
-    else if (element == EL_TIMEGATE_SWITCH)
+    else if (element == EL_TIMEGATE_SWITCH ||
+	     element == EL_DC_TIMEGATE_SWITCH)
     {
       ActivateTimegateSwitch(x, y);
     }

@@ -1604,8 +1604,8 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
   },
   {
     "landmine",
-    "sand",
-    "land mine"
+    "landmine",
+    "land mine (not removable)"
   },
   {
     "envelope_obsolete",
@@ -4357,6 +4357,51 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
     "steelwall",
     "steel wall (single)"
   },
+  {
+    "dc_switchgate_switch_up",
+    "switchgate_switch",
+    "switch for switch gate (steel)"
+  },
+  {
+    "dc_switchgate_switch_down",
+    "switchgate_switch",
+    "switch for switch gate (steel)"
+  },
+  {
+    "dc_timegate_switch",
+    "timegate_switch",
+    "switch for time gate (steel)"
+  },
+  {
+    "dc_timegate_switch.active",
+    "timegate_switch",
+    "switch for time gate (steel)"
+  },
+  {
+    "dc_landmine",
+    "landmine",
+    "land mine (removable)"
+  },
+  {
+    "expandable_steelwall",
+    "steelwall",
+    "growing steel wall"
+  },
+  {
+    "expandable_steelwall_horizontal",
+    "steelwall",
+    "growing steel wall (horizontal)"
+  },
+  {
+    "expandable_steelwall_vertical",
+    "steelwall",
+    "growing steel wall (vertical)"
+  },
+  {
+    "expandable_steelwall_any",
+    "steelwall",
+    "growing steel wall (any direction)"
+  },
 
   /* ----------------------------------------------------------------------- */
   /* "real" (and therefore drawable) runtime elements                        */
@@ -4720,6 +4765,11 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
   },
   {
     "expandable_wall.growing",
+    "-",
+    "-"
+  },
+  {
+    "expandable_steelwall.growing",
     "-",
     "-"
   },

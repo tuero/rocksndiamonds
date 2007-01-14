@@ -4252,7 +4252,7 @@ int getMappedElement_DC(int element)
       break;
 
     case 0x1437:
-      element = EL_SWITCHGATE_SWITCH_UP;
+      element = EL_DC_SWITCHGATE_SWITCH_UP;
       break;
 
     case 0x143a:
@@ -4320,15 +4320,15 @@ int getMappedElement_DC(int element)
       break;
 
     case 0x14ce:	/* growing steel wall (left/right) */
-      element = EL_EXPANDABLE_WALL_HORIZONTAL;
+      element = EL_EXPANDABLE_STEELWALL_HORIZONTAL;
       break;
 
     case 0x14df:	/* growing steel wall (up/down) */
-      element = EL_EXPANDABLE_WALL_VERTICAL;
+      element = EL_EXPANDABLE_STEELWALL_VERTICAL;
       break;
 
     case 0x14e8:	/* growing steel wall (up/down/left/right) */
-      element = EL_EXPANDABLE_WALL_ANY;
+      element = EL_EXPANDABLE_STEELWALL_ANY;
       break;
 
     case 0x14e9:
@@ -4359,7 +4359,7 @@ int getMappedElement_DC(int element)
       /* EL_SAND */
 
       /* 0x1590 - 0x159f: */
-      /* EL_LANDMINE */
+      /* EL_DC_LANDMINE */
 
     case 0x15a0:
       element = EL_DYNAMITE;
@@ -5310,7 +5310,7 @@ int getMappedElement_DC(int element)
       break;
 
     case 0x168d:
-      element = EL_TIMEGATE_SWITCH;
+      element = EL_DC_TIMEGATE_SWITCH;
       break;
 
     case 0x168e:
@@ -5516,7 +5516,7 @@ int getMappedElement_DC(int element)
       else if (element >= 0x157c && element <= 0x158b)
 	element = EL_SAND;
       else if (element >= 0x1590 && element <= 0x159f)
-	element = EL_LANDMINE;
+	element = EL_DC_LANDMINE;
       else if (element >= 0x16bc && element <= 0x16cb)
 	element = EL_INVISIBLE_SAND;
       else
@@ -5696,8 +5696,15 @@ static void LoadLevelFromFileInfo_DC(struct LevelInfo *level,
 
   fclose(file);
 
+  /* Diamond Caves has the same (strange) behaviour as Emerald Mine that gems
+     can slip down from flat walls, like normal walls and steel walls */
+  level->em_slippery_gems = TRUE;
+
+#if 0
   /* Diamond Caves II levels are always surrounded by indestructible wall, but
      not necessarily in a rectangular way -- fill with invisible steel wall */
+
+  /* !!! not always true !!! keep level and set BorderElement instead !!! */
 
   for (y = 0; y < level->fieldy; y++) for (x = 0; x < level->fieldx; x++)
   {
@@ -5714,6 +5721,7 @@ static void LoadLevelFromFileInfo_DC(struct LevelInfo *level,
 		     level->field, level->fieldx, level->fieldy);
 #endif
   }
+#endif
 }
 
 
@@ -6077,7 +6085,10 @@ static void LoadLevel_InitPlayfield(struct LevelInfo *level, char *filename)
   lev_fieldy = level->fieldy;
 
   /* determine border element for this level */
-  SetBorderElement();
+  if (level->file_info.type == LEVEL_FILE_TYPE_DC)
+    BorderElement = EL_EMPTY;	/* (in editor, SetBorderElement() is used) */
+  else
+    SetBorderElement();
 }
 
 static void LoadLevel_InitNativeEngines(struct LevelInfo *level,char *filename)

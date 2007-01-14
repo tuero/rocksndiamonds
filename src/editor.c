@@ -2516,7 +2516,7 @@ static struct
     GADGET_ID_EM_SLIPPERY_GEMS,		GADGET_ID_NONE,
     &level.em_slippery_gems,
     NULL,
-    "slip down from certain flat walls","use EM style slipping behaviour"
+    "slip down from certain flat walls","use EM/DC style slipping behaviour"
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(2),
@@ -3574,15 +3574,20 @@ static int editor_el_diamond_caves[] =
   EL_CONVEYOR_BELT_3_SWITCH_RIGHT,
   EL_CONVEYOR_BELT_4_SWITCH_RIGHT,
 
+  EL_TIMEGATE_CLOSED,
+  EL_TIMEGATE_OPEN,
+  EL_TIMEGATE_SWITCH,
+  EL_DC_TIMEGATE_SWITCH,
+
   EL_SWITCHGATE_CLOSED,
   EL_SWITCHGATE_OPEN,
   EL_SWITCHGATE_SWITCH_UP,
   EL_SWITCHGATE_SWITCH_DOWN,
 
-  EL_TIMEGATE_CLOSED,
-  EL_TIMEGATE_OPEN,
-  EL_TIMEGATE_SWITCH,
   EL_EMPTY,
+  EL_EMPTY,
+  EL_DC_SWITCHGATE_SWITCH_UP,
+  EL_DC_SWITCHGATE_SWITCH_DOWN,
 
   EL_SIGN_EXCLAMATION,
   EL_SIGN_STOP,
@@ -3592,7 +3597,7 @@ static int editor_el_diamond_caves[] =
   EL_STEELWALL_SLIPPERY,
   EL_INVISIBLE_SAND,
   EL_LANDMINE,
-  EL_EMPTY,
+  EL_DC_LANDMINE,
 
   EL_SHIELD_NORMAL,
   EL_SHIELD_DEADLY,
@@ -3672,6 +3677,11 @@ static int editor_el_diamond_caves[] =
   EL_DC_STEELWALL_1_TOPRIGHT_2,
   EL_DC_STEELWALL_1_TOP,
   EL_DC_STEELWALL_1_TOPLEFT_2,
+  EL_EMPTY,
+
+  EL_EXPANDABLE_STEELWALL_HORIZONTAL,
+  EL_EXPANDABLE_STEELWALL_VERTICAL,
+  EL_EXPANDABLE_STEELWALL_ANY,
   EL_EMPTY,
 };
 static int *editor_hl_diamond_caves_ptr = editor_hl_diamond_caves;
@@ -7759,7 +7769,8 @@ static struct
   { EL_BD_MAGIC_WALL,	&level.time_magic_wall,		TEXT_DURATION	},
   { EL_ROBOT_WHEEL,	&level.time_wheel,		TEXT_DURATION	},
 
-  { EL_TIMEGATE_SWITCH,	&level.time_timegate,		TEXT_DURATION	},
+  { EL_TIMEGATE_SWITCH,	  &level.time_timegate,		TEXT_DURATION	},
+  { EL_DC_TIMEGATE_SWITCH,&level.time_timegate,		TEXT_DURATION	},
   { EL_LIGHT_SWITCH,	&level.time_light,		TEXT_DURATION	},
   { EL_LIGHT_SWITCH_ACTIVE, &level.time_light,		TEXT_DURATION	},
   { EL_SHIELD_NORMAL,	&level.shield_normal_time,	TEXT_DURATION	},

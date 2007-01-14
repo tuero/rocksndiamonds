@@ -2023,6 +2023,7 @@ void InitElementPropertiesStatic()
     /* (if amoeba can grow into anything diggable, maybe keep these out) */
 #if 0
     EL_LANDMINE,
+    EL_DC_LANDMINE,
     EL_TRAP_ACTIVE,
     EL_SP_BUGGY_BASE_ACTIVE,
     EL_EMC_PLANT,
@@ -2072,6 +2073,11 @@ void InitElementPropertiesStatic()
     EL_EMC_LENSES,
     EL_EMC_MAGNIFIER,
 
+#if 0
+    /* !!! handle separately !!! */
+    EL_DC_LANDMINE,	/* deadly when running into, but can be snapped */
+#endif
+
     -1
   };
 
@@ -2098,6 +2104,7 @@ void InitElementPropertiesStatic()
     /* !!! maybe this should better be handled by 'ep_diggable' !!! */
 #if 1
     EL_LANDMINE,
+    EL_DC_LANDMINE,
     EL_TRAP_ACTIVE,
     EL_SP_BUGGY_BASE_ACTIVE,
     EL_EMC_PLANT,
@@ -2258,17 +2265,17 @@ void InitElementPropertiesStatic()
     EL_SWITCHGATE_OPENING,
     EL_SWITCHGATE_CLOSED,
     EL_SWITCHGATE_CLOSING,
-#if 0
-    EL_SWITCHGATE_SWITCH_UP,
-    EL_SWITCHGATE_SWITCH_DOWN,
+#if 1
+    EL_DC_SWITCHGATE_SWITCH_UP,
+    EL_DC_SWITCHGATE_SWITCH_DOWN,
 #endif
     EL_TIMEGATE_OPEN,
     EL_TIMEGATE_OPENING,
     EL_TIMEGATE_CLOSED,
     EL_TIMEGATE_CLOSING,
-#if 0
-    EL_TIMEGATE_SWITCH,
-    EL_TIMEGATE_SWITCH_ACTIVE,
+#if 1
+    EL_DC_TIMEGATE_SWITCH,
+    EL_DC_TIMEGATE_SWITCH_ACTIVE,
 #endif
     EL_TUBE_ANY,
     EL_TUBE_VERTICAL,
@@ -2281,6 +2288,9 @@ void InitElementPropertiesStatic()
     EL_TUBE_LEFT_DOWN,
     EL_TUBE_RIGHT_UP,
     EL_TUBE_RIGHT_DOWN,
+    EL_EXPANDABLE_STEELWALL_HORIZONTAL,
+    EL_EXPANDABLE_STEELWALL_VERTICAL,
+    EL_EXPANDABLE_STEELWALL_ANY,
 
     -1
   };
@@ -2831,9 +2841,12 @@ void InitElementPropertiesStatic()
     EL_CONVEYOR_BELT_4_SWITCH_RIGHT,
     EL_SWITCHGATE_SWITCH_UP,
     EL_SWITCHGATE_SWITCH_DOWN,
+    EL_DC_SWITCHGATE_SWITCH_UP,
+    EL_DC_SWITCHGATE_SWITCH_DOWN,
     EL_LIGHT_SWITCH,
     EL_LIGHT_SWITCH_ACTIVE,
     EL_TIMEGATE_SWITCH,
+    EL_DC_TIMEGATE_SWITCH,
     EL_BALLOON_SWITCH_LEFT,
     EL_BALLOON_SWITCH_RIGHT,
     EL_BALLOON_SWITCH_UP,
@@ -3169,8 +3182,12 @@ void InitElementPropertiesStatic()
     EL_INVISIBLE_WALL_ACTIVE,
     EL_SWITCHGATE_SWITCH_UP,
     EL_SWITCHGATE_SWITCH_DOWN,
+    EL_DC_SWITCHGATE_SWITCH_UP,
+    EL_DC_SWITCHGATE_SWITCH_DOWN,
     EL_TIMEGATE_SWITCH,
     EL_TIMEGATE_SWITCH_ACTIVE,
+    EL_DC_TIMEGATE_SWITCH,
+    EL_DC_TIMEGATE_SWITCH_ACTIVE,
     EL_EMC_WALL_1,
     EL_EMC_WALL_2,
     EL_EMC_WALL_3,
@@ -3744,6 +3761,7 @@ void InitElementPropertiesStatic()
   {
     EL_SAND,
     EL_LANDMINE,
+    EL_DC_LANDMINE,
     EL_TRAP,
     EL_TRAP_ACTIVE,
 
@@ -4136,12 +4154,16 @@ void InitElementPropertiesEngine(int engine_version)
   {
     static int ep_em_slippery_wall[] =
     {
-      EL_STEELWALL,
       EL_WALL,
+      EL_STEELWALL,
       EL_EXPANDABLE_WALL,
       EL_EXPANDABLE_WALL_HORIZONTAL,
       EL_EXPANDABLE_WALL_VERTICAL,
       EL_EXPANDABLE_WALL_ANY,
+      EL_EXPANDABLE_STEELWALL_HORIZONTAL,
+      EL_EXPANDABLE_STEELWALL_VERTICAL,
+      EL_EXPANDABLE_STEELWALL_ANY,
+      EL_EXPANDABLE_STEELWALL_GROWING,
       -1
     };
 
