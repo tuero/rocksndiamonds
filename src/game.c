@@ -1966,6 +1966,8 @@ void InitGame()
     for (j = 0; j < MAX_NUM_KEYS; j++)
       player->key[j] = FALSE;
 
+    player->num_white_keys = 0;
+
     player->dynabomb_count = 0;
     player->dynabomb_size = 1;
     player->dynabombs_left = 0;
@@ -11822,6 +11824,15 @@ int DigField(struct PlayerInfo *player,
       if (!player->key[EMC_GATE_GRAY_ACTIVE_NR(element)])
 	return MP_NO_ACTION;
     }
+    else if (element == EL_DC_GATE_WHITE ||
+	     element == EL_DC_GATE_WHITE_GRAY ||
+	     element == EL_DC_GATE_WHITE_GRAY_ACTIVE)
+    {
+      if (player->num_white_keys == 0)
+	return MP_NO_ACTION;
+
+      player->num_white_keys--;
+    }
     else if (IS_SP_PORT(element))
     {
       if (element == EL_SP_GRAVITY_PORT_LEFT ||
@@ -11947,6 +11958,13 @@ int DigField(struct PlayerInfo *player,
       player->key[KEY_NR(element)] = TRUE;
 
       DrawGameDoorValues();
+    }
+    else if (element == EL_DC_KEY_WHITE)
+    {
+      player->num_white_keys++;
+
+      /* display white keys? */
+      /* DrawGameDoorValues(); */
     }
     else if (IS_ENVELOPE(element))
     {
@@ -12924,6 +12942,7 @@ void RaiseScoreElement(int element)
     case EL_EMC_KEY_6:
     case EL_EMC_KEY_7:
     case EL_EMC_KEY_8:
+    case EL_DC_KEY_WHITE:
       RaiseScore(level.score[SC_KEY]);
       break;
     default:

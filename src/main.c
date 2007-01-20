@@ -1428,17 +1428,17 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
     "wall with crystal"
   },
   {
-    "door_white",
+    "dc_gate_white",
     "gate",
-    "white door"
+    "white gate"
   },
   {
-    "door_white_gray",
+    "dc_gate_white_gray",
     "gate",
     "gray door (opened by white key)"
   },
   {
-    "key_white",
+    "dc_key_white",
     "key",
     "white key"
   },
@@ -4379,8 +4379,8 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
   },
   {
     "dc_landmine",
-    "landmine",
-    "land mine (removable)"
+    "dc_landmine",
+    "land mine (DC style, removable)"
   },
   {
     "expandable_steelwall",
@@ -4421,6 +4421,11 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
     "em_steel_exit_open",
     "em_steel_exit",
     "open steel exit (EM style)"
+  },
+  {
+    "dc_gate_fake_gray",
+    "gate",
+    "gray door (opened by no key)"
   },
 
   /* ----------------------------------------------------------------------- */
@@ -4745,6 +4750,11 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
   },
   {
     "emc_gate_8_gray.active",
+    "gate",
+    "",
+  },
+  {
+    "dc_gate_white_gray.active",
     "gate",
     "",
   },

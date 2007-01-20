@@ -1437,6 +1437,11 @@ struct ConfigInfo image_config[] =
   { "em_key_4.ypos",				"6"			},
   { "em_key_4.frames",				"1"			},
 
+  { "dc_key_white",				"RocksSP.pcx"		},
+  { "dc_key_white.xpos",			"7"			},
+  { "dc_key_white.ypos",			"5"			},
+  { "dc_key_white.frames",			"1"			},
+
   { "em_gate_1",				"RocksSP.pcx"		},
   { "em_gate_1.xpos",				"0"			},
   { "em_gate_1.ypos",				"7"			},
@@ -1453,6 +1458,12 @@ struct ConfigInfo image_config[] =
   { "em_gate_4.xpos",				"3"			},
   { "em_gate_4.ypos",				"7"			},
   { "em_gate_4.frames",				"1"			},
+
+  { "dc_gate_white",				"RocksSP.pcx"		},
+  { "dc_gate_white.xpos",			"6"			},
+  { "dc_gate_white.ypos",			"5"			},
+  { "dc_gate_white.frames",			"1"			},
+
   { "em_gate_1_gray",				"RocksSP.pcx"		},
   { "em_gate_1_gray.xpos",			"4"			},
   { "em_gate_1_gray.ypos",			"7"			},
@@ -1497,6 +1508,23 @@ struct ConfigInfo image_config[] =
   { "em_gate_4_gray.active.xpos",		"3"			},
   { "em_gate_4_gray.active.ypos",		"7"			},
   { "em_gate_4_gray.active.frames",		"1"			},
+
+  { "dc_gate_white_gray",			"RocksSP.pcx"		},
+  { "dc_gate_white_gray.xpos",			"7"			},
+  { "dc_gate_white_gray.ypos",			"7"			},
+  { "dc_gate_white_gray.frames",		"1"			},
+  { "dc_gate_white_gray.EDITOR",		"RocksSP.pcx"		},
+  { "dc_gate_white_gray.EDITOR.xpos",		"11"			},
+  { "dc_gate_white_gray.EDITOR.ypos",		"11"			},
+  { "dc_gate_white_gray.active",		"RocksSP.pcx"		},
+  { "dc_gate_white_gray.active.xpos",		"6"			},
+  { "dc_gate_white_gray.active.ypos",		"5"			},
+  { "dc_gate_white_gray.active.frames",		"1"			},
+
+  { "dc_gate_fake_gray",			"RocksSP.pcx"		},
+  { "dc_gate_fake_gray.xpos",			"7"			},
+  { "dc_gate_fake_gray.ypos",			"7"			},
+  { "dc_gate_fake_gray.frames",			"1"			},
 
   { "exit_closed",				"RocksElements.pcx"	},
   { "exit_closed.xpos",				"0"			},

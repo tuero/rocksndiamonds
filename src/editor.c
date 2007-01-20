@@ -3688,6 +3688,11 @@ static int editor_el_diamond_caves[] =
   EL_EM_EXIT_OPEN,
   EL_EM_STEEL_EXIT_CLOSED,
   EL_EM_STEEL_EXIT_OPEN,
+
+  EL_DC_KEY_WHITE,
+  EL_DC_GATE_WHITE,
+  EL_DC_GATE_WHITE_GRAY,
+  EL_DC_GATE_FAKE_GRAY,
 };
 static int *editor_hl_diamond_caves_ptr = editor_hl_diamond_caves;
 static int *editor_el_diamond_caves_ptr = editor_el_diamond_caves;

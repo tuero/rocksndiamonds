@@ -1,5 +1,8 @@
 2007-01-20
 	* fixed small drawing bug in X11FadeRectangle
+	* added EM/DC style exits for newly supported Diamond Caves II levels
+	* added white key and gate for newly supported Diamond Caves II levels
+	* added fake (no key) gate for newly supported Diamond Caves II levels
 
 2007-01-14
 	* changed maximum value for endless loop detection to a higher value

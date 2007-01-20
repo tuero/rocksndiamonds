@@ -194,6 +194,7 @@ struct PlayerInfo
   int lights_still_needed;
   int friends_still_needed;
   int key[MAX_NUM_KEYS];
+  int num_white_keys;
   int dynabomb_count, dynabomb_size, dynabombs_left, dynabomb_xl;
   int shield_normal_time_left;
   int shield_deadly_time_left;

@@ -1110,6 +1110,10 @@ element_to_graphic[] =
     IMG_EM_KEY_4
   },
   {
+    EL_DC_KEY_WHITE,			-1, -1, FALSE,
+    IMG_DC_KEY_WHITE
+  },
+  {
     EL_EM_GATE_1,			-1, -1, FALSE,
     IMG_EM_GATE_1
   },
@@ -1124,6 +1128,10 @@ element_to_graphic[] =
   {
     EL_EM_GATE_4,			-1, -1, FALSE,
     IMG_EM_GATE_4
+  },
+  {
+    EL_DC_GATE_WHITE,			-1, -1, FALSE,
+    IMG_DC_GATE_WHITE
   },
   {
     EL_EM_GATE_1_GRAY,			-1, -1, FALSE,
@@ -1172,6 +1180,22 @@ element_to_graphic[] =
   {
     EL_EM_GATE_4_GRAY,			ACTION_ACTIVE, -1, FALSE,
     IMG_EM_GATE_4_GRAY_ACTIVE
+  },
+  {
+    EL_DC_GATE_WHITE_GRAY,		-1, -1, FALSE,
+    IMG_DC_GATE_WHITE_GRAY
+  },
+  {
+    EL_DC_GATE_WHITE_GRAY_ACTIVE,	-1, -1, FALSE,
+    IMG_DC_GATE_WHITE_GRAY_ACTIVE
+  },
+  {
+    EL_DC_GATE_WHITE_GRAY,		ACTION_ACTIVE, -1, FALSE,
+    IMG_DC_GATE_WHITE_GRAY_ACTIVE
+  },
+  {
+    EL_DC_GATE_FAKE_GRAY,		-1, -1, FALSE,
+    IMG_DC_GATE_FAKE_GRAY
   },
   {
     EL_EXIT_CLOSED,			-1, -1, FALSE,
@@ -3510,23 +3534,11 @@ element_to_graphic[] =
     IMG_BD_FIREFLY
   },
   {
-    EL_DOOR_WHITE,			-1, -1, FALSE,
-    IMG_CHAR_QUESTION
-  },
-  {
-    EL_DOOR_WHITE_GRAY,			-1, -1, FALSE,
-    IMG_CHAR_QUESTION
-  },
-  {
     EL_DX_UNKNOWN_15,			-1, -1, FALSE,
     IMG_CHAR_QUESTION
   },
   {
     EL_DX_UNKNOWN_42,			-1, -1, FALSE,
-    IMG_CHAR_QUESTION
-  },
-  {
-    EL_KEY_WHITE,			-1, -1, FALSE,
     IMG_CHAR_QUESTION
   },
   {

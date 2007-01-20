@@ -4382,7 +4382,7 @@ int getMappedElement_DC(int element)
       break;
 
     case 0x15a5:	/* key (white) */
-      element = EL_KEY_WHITE;
+      element = EL_DC_KEY_WHITE;
       break;
 
     case 0x15a6:
@@ -5294,15 +5294,15 @@ int getMappedElement_DC(int element)
       break;
 
     case 0x1689:	/* gate (white) */
-      element = EL_DOOR_WHITE;
+      element = EL_DC_GATE_WHITE;
       break;
 
     case 0x168a:	/* secret gate (white) */
-      element = EL_DOOR_WHITE_GRAY;
+      element = EL_DC_GATE_WHITE_GRAY;
       break;
 
     case 0x168b:	/* secret gate (no key) */
-      element = EL_UNKNOWN;
+      element = EL_DC_GATE_FAKE_GRAY;
       break;
 
     case 0x168c:
