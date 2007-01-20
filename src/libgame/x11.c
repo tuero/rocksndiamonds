@@ -374,7 +374,7 @@ void X11FadeRectangle(Bitmap *bitmap_cross, int x, int y, int width, int height,
   if (draw_border_function != NULL)
     draw_border_function();
 
-  X11CopyArea(backbuffer, window, x, y, width, height, 0, 0, BLIT_OPAQUE);
+  X11CopyArea(backbuffer, window, x, y, width, height, x, y, BLIT_OPAQUE);
 
   /* as we currently cannot use the fade delay, also do not use post delay */
 }

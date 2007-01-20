@@ -1206,6 +1206,38 @@ element_to_graphic[] =
     IMG_STEEL_EXIT_CLOSING
   },
   {
+    EL_EM_EXIT_CLOSED,			-1, -1, FALSE,
+    IMG_EM_EXIT_CLOSED
+  },
+  {
+    EL_EM_EXIT_OPENING,			-1, -1, FALSE,
+    IMG_EM_EXIT_OPENING
+  },
+  {
+    EL_EM_EXIT_OPEN,			-1, -1, FALSE,
+    IMG_EM_EXIT_OPEN
+  },
+  {
+    EL_EM_EXIT_CLOSING,			-1, -1, FALSE,
+    IMG_EM_EXIT_CLOSING
+  },
+  {
+    EL_EM_STEEL_EXIT_CLOSED,		-1, -1, FALSE,
+    IMG_EM_STEEL_EXIT_CLOSED
+  },
+  {
+    EL_EM_STEEL_EXIT_OPENING,		-1, -1, FALSE,
+    IMG_EM_STEEL_EXIT_OPENING
+  },
+  {
+    EL_EM_STEEL_EXIT_OPEN,		-1, -1, FALSE,
+    IMG_EM_STEEL_EXIT_OPEN
+  },
+  {
+    EL_EM_STEEL_EXIT_CLOSING,		-1, -1, FALSE,
+    IMG_EM_STEEL_EXIT_CLOSING
+  },
+  {
     EL_BALLOON,				-1, -1, FALSE,
     IMG_BALLOON
   },

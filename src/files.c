@@ -4141,19 +4141,19 @@ int getMappedElement_DC(int element)
       break;
 
     case 0x0ed2:
-      element = EL_EXIT_OPEN;
+      element = EL_EM_EXIT_OPEN;
       break;
 
     case 0x0ee3:
-      element = EL_EXIT_CLOSED;
+      element = EL_EM_EXIT_CLOSED;
       break;
 
     case 0x0eeb:
-      element = EL_STEEL_EXIT_OPEN;
+      element = EL_EM_STEEL_EXIT_OPEN;
       break;
 
     case 0x0efc:
-      element = EL_STEEL_EXIT_CLOSED;
+      element = EL_EM_STEEL_EXIT_CLOSED;
       break;
 
     case 0x0f4f:	/* dynamite (lit 1) */

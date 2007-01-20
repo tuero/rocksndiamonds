@@ -4402,6 +4402,26 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
     "steelwall",
     "growing steel wall (any direction)"
   },
+  {
+    "em_exit_closed",
+    "em_exit",
+    "closed exit (EM style)"
+  },
+  {
+    "em_exit_open",
+    "em_exit",
+    "open exit (EM style)"
+  },
+  {
+    "em_steel_exit_closed",
+    "em_steel_exit",
+    "closed steel exit (EM style)"
+  },
+  {
+    "em_steel_exit_open",
+    "em_steel_exit",
+    "open steel exit (EM style)"
+  },
 
   /* ----------------------------------------------------------------------- */
   /* "real" (and therefore drawable) runtime elements                        */
@@ -4555,6 +4575,26 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
   {
     "steel_exit.closing",
     "steel_exit",
+    "-"
+  },
+  {
+    "em_exit.opening",
+    "em_exit",
+    "-"
+  },
+  {
+    "em_exit.closing",
+    "em_exit",
+    "-"
+  },
+  {
+    "em_steel_exit.opening",
+    "em_steel_exit",
+    "-"
+  },
+  {
+    "em_steel_exit.closing",
+    "em_steel_exit",
     "-"
   },
   {

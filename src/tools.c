@@ -4484,19 +4484,19 @@ em_object_mapping_list[] =
   },
   {
     Xexit,				TRUE,	FALSE,
-    EL_EXIT_CLOSED,			-1, -1
+    EL_EM_EXIT_CLOSED,			-1, -1
   },
   {
     Xexit_1,				TRUE,	FALSE,
-    EL_EXIT_OPEN,			-1, -1
+    EL_EM_EXIT_OPEN,			-1, -1
   },
   {
     Xexit_2,				FALSE,	FALSE,
-    EL_EXIT_OPEN,			-1, -1
+    EL_EM_EXIT_OPEN,			-1, -1
   },
   {
     Xexit_3,				FALSE,	FALSE,
-    EL_EXIT_OPEN,			-1, -1
+    EL_EM_EXIT_OPEN,			-1, -1
   },
   {
     Xdynamite,				TRUE,	FALSE,

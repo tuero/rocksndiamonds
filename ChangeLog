@@ -1,3 +1,6 @@
+2007-01-20
+	* fixed small drawing bug in X11FadeRectangle
+
 2007-01-14
 	* changed maximum value for endless loop detection to a higher value
 	  (some levels really used very deep recursion without being endless)
