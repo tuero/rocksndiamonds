@@ -1,19 +1,24 @@
 2007-01-20
 	* fixed small drawing bug in X11FadeRectangle
-	* added EM/DC style exits for newly supported Diamond Caves II levels
-	* added white key and gate for newly supported Diamond Caves II levels
-	* added fake (no key) gate for newly supported Diamond Caves II levels
+	* added new elements for newly supported Diamond Caves II levels:
+	  - EM/DC style exits that disappear after passing
+	  - white key and gate (one white key needed for each white gate)
+	  - fake gate (there is no key to open/pass this kind of gate!)
+	  - extended magic wall which also handles pearls and crystals
+	  - fast quicksand
 
 2007-01-14
 	* changed maximum value for endless loop detection to a higher value
 	  (some levels really used very deep recursion without being endless)
 
 2007-01-13
-	* added growing steel walls for newly supported Diamond Caves II levels
-	* added snappable land mine for newly supported Diamond Caves II levels
+	* added new elements for newly supported Diamond Caves II levels:
+	  - growing steel walls
+	  - snappable land mine
 
 2007-01-08
-	* added steel text elements for newly supported Diamond Caves II levels
+	* added new elements for newly supported Diamond Caves II levels:
+	  - steel text elements
 
 2007-01-06
 	* added level file loader for native Diamond Caves II levels

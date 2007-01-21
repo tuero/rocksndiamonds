@@ -3693,6 +3693,11 @@ static int editor_el_diamond_caves[] =
   EL_DC_GATE_WHITE,
   EL_DC_GATE_WHITE_GRAY,
   EL_DC_GATE_FAKE_GRAY,
+
+  EL_DC_MAGIC_WALL,
+  EL_QUICKSAND_FAST_EMPTY,
+  EL_QUICKSAND_FAST_FULL,
+  EL_EMPTY,
 };
 static int *editor_hl_diamond_caves_ptr = editor_hl_diamond_caves;
 static int *editor_el_diamond_caves_ptr = editor_el_diamond_caves;
@@ -7610,6 +7615,7 @@ static void DrawPropertiesInfo()
 
     /* pre-defined properties */
     { EP_CAN_PASS_MAGIC_WALL,	"- can pass magic walls"		},
+    { EP_CAN_PASS_DC_MAGIC_WALL,"- can pass magic walls (DC style)"	},
     { EP_SWITCHABLE,		"- can be switched"			},
 #if 0
     { EP_HAS_EDITOR_CONTENT,	"- can contain other elements"		},
@@ -7777,6 +7783,7 @@ static struct
   { EL_EMC_DRIPPER,	&level.amoeba_speed,		TEXT_AMOEBA_SPEED },
   { EL_MAGIC_WALL,	&level.time_magic_wall,		TEXT_DURATION	},
   { EL_BD_MAGIC_WALL,	&level.time_magic_wall,		TEXT_DURATION	},
+  { EL_DC_MAGIC_WALL,	&level.time_magic_wall,		TEXT_DURATION	},
   { EL_ROBOT_WHEEL,	&level.time_wheel,		TEXT_DURATION	},
 
   { EL_TIMEGATE_SWITCH,	  &level.time_timegate,		TEXT_DURATION	},

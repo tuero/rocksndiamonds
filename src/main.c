@@ -216,12 +216,12 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
   {
     "quicksand_empty",
     "quicksand",
-    "empty quicksand"
+    "quicksand (empty)"
   },
   {
     "quicksand_full",
     "quicksand",
-    "quicksand with rock"
+    "quicksand (with rock)"
   },
   {
     "amoeba_drop",
@@ -4427,6 +4427,21 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
     "gate",
     "gray door (opened by no key)"
   },
+  {
+    "dc_magic_wall",
+    "dc_magic_wall",
+    "magic wall (DC style)"
+  },
+  {
+    "quicksand_fast_empty",
+    "quicksand",
+    "fast quicksand (empty)"
+  },
+  {
+    "quicksand_fast_full",
+    "quicksand",
+    "fast quicksand (with rock)"
+  },
 
   /* ----------------------------------------------------------------------- */
   /* "real" (and therefore drawable) runtime elements                        */
@@ -4648,12 +4663,22 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
     "-"
   },
   {
+    "quicksand_fast.emptying",
+    "quicksand",
+    "-"
+  },
+  {
     "magic_wall.active",
     "magic_wall",
     "-"
   },
   {
     "bd_magic_wall.active",
+    "magic_wall",
+    "-"
+  },
+  {
+    "dc_magic_wall.active",
     "magic_wall",
     "-"
   },
@@ -4668,6 +4693,11 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
     "-"
   },
   {
+    "dc_magic_wall_full",
+    "magic_wall",
+    "-"
+  },
+  {
     "magic_wall.emptying",
     "magic_wall",
     "-"
@@ -4678,12 +4708,22 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
     "-"
   },
   {
+    "dc_magic_wall.emptying",
+    "magic_wall",
+    "-"
+  },
+  {
     "magic_wall_dead",
     "magic_wall",
     "-"
   },
   {
     "bd_magic_wall_dead",
+    "magic_wall",
+    "-"
+  },
+  {
+    "dc_magic_wall_dead",
     "magic_wall",
     "-"
   },
@@ -4859,12 +4899,22 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
     "-"
   },
   {
+    "quicksand_fast.filling",
+    "quicksand",
+    "-"
+  },
+  {
     "magic_wall.filling",
     "-",
     "-"
   },
   {
     "bd_magic_wall.filling",
+    "-",
+    "-"
+  },
+  {
+    "dc_magic_wall.filling",
     "-",
     "-"
   },

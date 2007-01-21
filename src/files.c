@@ -4133,7 +4133,7 @@ int getMappedElement_DC(int element)
       break;
 
     case 0x0e77:	/* quicksand (boulder) */
-      element = EL_QUICKSAND_FULL;
+      element = EL_QUICKSAND_FAST_FULL;
       break;
 
     case 0x0e99:	/* slow quicksand (boulder) */
@@ -4184,7 +4184,7 @@ int getMappedElement_DC(int element)
       break;
 
     case 0x0fb9:
-      element = EL_MAGIC_WALL;
+      element = EL_DC_MAGIC_WALL;
       break;
 
     case 0x0fd0:
@@ -4348,7 +4348,7 @@ int getMappedElement_DC(int element)
       break;
 
     case 0x1578:	/* quicksand (empty) */
-      element = EL_QUICKSAND_EMPTY;
+      element = EL_QUICKSAND_FAST_EMPTY;
       break;
 
     case 0x1579:	/* slow quicksand (empty) */

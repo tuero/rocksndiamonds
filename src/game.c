@@ -734,10 +734,14 @@ move_stepsize_list[] =
   { EL_AMOEBA_DROPPING,		2 },
   { EL_QUICKSAND_FILLING,	1 },
   { EL_QUICKSAND_EMPTYING,	1 },
+  { EL_QUICKSAND_FAST_FILLING,	2 },
+  { EL_QUICKSAND_FAST_EMPTYING,	2 },
   { EL_MAGIC_WALL_FILLING,	2 },
-  { EL_BD_MAGIC_WALL_FILLING,	2 },
   { EL_MAGIC_WALL_EMPTYING,	2 },
+  { EL_BD_MAGIC_WALL_FILLING,	2 },
   { EL_BD_MAGIC_WALL_EMPTYING,	2 },
+  { EL_DC_MAGIC_WALL_FILLING,	2 },
+  { EL_DC_MAGIC_WALL_EMPTYING,	2 },
 
   { EL_UNDEFINED,		0 },
 };
@@ -3339,8 +3343,10 @@ void RemoveMovingField(int x, int y)
 
   if (element == EL_BLOCKED &&
       (Feld[oldx][oldy] == EL_QUICKSAND_EMPTYING ||
+       Feld[oldx][oldy] == EL_QUICKSAND_FAST_EMPTYING ||
        Feld[oldx][oldy] == EL_MAGIC_WALL_EMPTYING ||
        Feld[oldx][oldy] == EL_BD_MAGIC_WALL_EMPTYING ||
+       Feld[oldx][oldy] == EL_DC_MAGIC_WALL_EMPTYING ||
        Feld[oldx][oldy] == EL_AMOEBA_DROPPING))
     next_element = get_next_element(Feld[oldx][oldy]);
 
@@ -4619,6 +4625,16 @@ void Impact(int x, int y)
 
       object_hit = TRUE;
     }
+
+    if (Feld[x][y + 1] == EL_QUICKSAND_FAST_EMPTYING && object_hit == FALSE)
+    {
+      RemoveMovingField(x, y + 1);
+      Feld[x][y + 1] = EL_QUICKSAND_FAST_EMPTY;
+      Feld[x][y + 2] = EL_ROCK;
+      DrawLevelField(x, y + 2);
+
+      object_hit = TRUE;
+    }
 #endif
 
     if (object_hit)
@@ -4647,7 +4663,8 @@ void Impact(int x, int y)
     Bang(x, y);
     return;
   }
-  else if (impact && element == EL_PEARL)
+  else if (impact && element == EL_PEARL &&
+	   smashed != EL_DC_MAGIC_WALL && smashed != EL_DC_MAGIC_WALL_ACTIVE)
   {
     ResetGfxAnimation(x, y);
 
@@ -4680,26 +4697,33 @@ void Impact(int x, int y)
 
   if (object_hit)		/* check which object was hit */
   {
-    if (CAN_PASS_MAGIC_WALL(element) && 
-	(smashed == EL_MAGIC_WALL ||
-	 smashed == EL_BD_MAGIC_WALL))
+    if ((CAN_PASS_MAGIC_WALL(element) && 
+	 (smashed == EL_MAGIC_WALL ||
+	  smashed == EL_BD_MAGIC_WALL)) ||
+	(CAN_PASS_DC_MAGIC_WALL(element) &&
+	 smashed == EL_DC_MAGIC_WALL))
     {
       int xx, yy;
       int activated_magic_wall =
 	(smashed == EL_MAGIC_WALL ? EL_MAGIC_WALL_ACTIVE :
-	 EL_BD_MAGIC_WALL_ACTIVE);
+	 smashed == EL_BD_MAGIC_WALL ? EL_BD_MAGIC_WALL_ACTIVE :
+	 EL_DC_MAGIC_WALL_ACTIVE);
 
       /* activate magic wall / mill */
       SCAN_PLAYFIELD(xx, yy)
+      {
 	if (Feld[xx][yy] == smashed)
 	  Feld[xx][yy] = activated_magic_wall;
+      }
 
       game.magic_wall_time_left = level.time_magic_wall * FRAMES_PER_SECOND;
       game.magic_wall_active = TRUE;
 
       PlayLevelSound(x, y, (smashed == EL_MAGIC_WALL ?
 			    SND_MAGIC_WALL_ACTIVATING :
-			    SND_BD_MAGIC_WALL_ACTIVATING));
+			    smashed == EL_BD_MAGIC_WALL ?
+			    SND_BD_MAGIC_WALL_ACTIVATING :
+			    SND_DC_MAGIC_WALL_ACTIVATING));
     }
 
     if (IS_PLAYER(x, y + 1))
@@ -4814,12 +4838,15 @@ void Impact(int x, int y)
   /* play sound of magic wall / mill */
   if (!last_line &&
       (Feld[x][y + 1] == EL_MAGIC_WALL_ACTIVE ||
-       Feld[x][y + 1] == EL_BD_MAGIC_WALL_ACTIVE))
+       Feld[x][y + 1] == EL_BD_MAGIC_WALL_ACTIVE ||
+       Feld[x][y + 1] == EL_DC_MAGIC_WALL_ACTIVE))
   {
     if (Feld[x][y + 1] == EL_MAGIC_WALL_ACTIVE)
       PlayLevelSound(x, y, SND_MAGIC_WALL_FILLING);
     else if (Feld[x][y + 1] == EL_BD_MAGIC_WALL_ACTIVE)
       PlayLevelSound(x, y, SND_BD_MAGIC_WALL_FILLING);
+    else if (Feld[x][y + 1] == EL_DC_MAGIC_WALL_ACTIVE)
+      PlayLevelSound(x, y, SND_DC_MAGIC_WALL_FILLING);
 
     return;
   }
@@ -5736,6 +5763,43 @@ void StartMoving(int x, int y)
 	PlayLevelSoundAction(x, y, ACTION_FILLING);
       }
     }
+    else if (element == EL_QUICKSAND_FAST_FULL)
+    {
+      if (IS_FREE(x, y + 1))
+      {
+	InitMovingField(x, y, MV_DOWN);
+	started_moving = TRUE;
+
+	Feld[x][y] = EL_QUICKSAND_FAST_EMPTYING;
+#if USE_QUICKSAND_BD_ROCK_BUGFIX
+	if (Store[x][y] != EL_ROCK && Store[x][y] != EL_BD_ROCK)
+	  Store[x][y] = EL_ROCK;
+#else
+	Store[x][y] = EL_ROCK;
+#endif
+
+	PlayLevelSoundAction(x, y, ACTION_EMPTYING);
+      }
+      else if (Feld[x][y + 1] == EL_QUICKSAND_FAST_EMPTY)
+      {
+	if (!MovDelay[x][y])
+	  MovDelay[x][y] = TILEY + 1;
+
+	if (MovDelay[x][y])
+	{
+	  MovDelay[x][y]--;
+	  if (MovDelay[x][y])
+	    return;
+	}
+
+	Feld[x][y] = EL_QUICKSAND_FAST_EMPTY;
+	Feld[x][y + 1] = EL_QUICKSAND_FAST_FULL;
+	Store[x][y + 1] = Store[x][y];
+	Store[x][y] = 0;
+
+	PlayLevelSoundAction(x, y, ACTION_FILLING);
+      }
+    }
     else if ((element == EL_ROCK || element == EL_BD_ROCK) &&
 	     Feld[x][y + 1] == EL_QUICKSAND_EMPTY)
     {
@@ -5743,6 +5807,17 @@ void StartMoving(int x, int y)
       started_moving = TRUE;
 
       Feld[x][y] = EL_QUICKSAND_FILLING;
+      Store[x][y] = element;
+
+      PlayLevelSoundAction(x, y, ACTION_FILLING);
+    }
+    else if ((element == EL_ROCK || element == EL_BD_ROCK) &&
+	     Feld[x][y + 1] == EL_QUICKSAND_FAST_EMPTY)
+    {
+      InitMovingField(x, y, MV_DOWN);
+      started_moving = TRUE;
+
+      Feld[x][y] = EL_QUICKSAND_FAST_FILLING;
       Store[x][y] = element;
 
       PlayLevelSoundAction(x, y, ACTION_FILLING);
@@ -5783,7 +5858,7 @@ void StartMoving(int x, int y)
 	started_moving = TRUE;
 
 	Feld[x][y] = EL_BD_MAGIC_WALL_EMPTYING;
-	Store[x][y] = EL_CHANGED2(Store[x][y]);
+	Store[x][y] = EL_CHANGED_BD(Store[x][y]);
       }
       else if (Feld[x][y + 1] == EL_BD_MAGIC_WALL_ACTIVE)
       {
@@ -5799,20 +5874,52 @@ void StartMoving(int x, int y)
 
 	Feld[x][y] = EL_BD_MAGIC_WALL_ACTIVE;
 	Feld[x][y + 1] = EL_BD_MAGIC_WALL_FULL;
-	Store[x][y + 1] = EL_CHANGED2(Store[x][y]);
+	Store[x][y + 1] = EL_CHANGED_BD(Store[x][y]);
 	Store[x][y] = 0;
       }
     }
-    else if (CAN_PASS_MAGIC_WALL(element) &&
-	     (Feld[x][y + 1] == EL_MAGIC_WALL_ACTIVE ||
-	      Feld[x][y + 1] == EL_BD_MAGIC_WALL_ACTIVE))
+    else if (element == EL_DC_MAGIC_WALL_FULL)
+    {
+      if (IS_FREE(x, y + 1))
+      {
+	InitMovingField(x, y, MV_DOWN);
+	started_moving = TRUE;
+
+	Feld[x][y] = EL_DC_MAGIC_WALL_EMPTYING;
+	Store[x][y] = EL_CHANGED_DC(Store[x][y]);
+      }
+      else if (Feld[x][y + 1] == EL_DC_MAGIC_WALL_ACTIVE)
+      {
+	if (!MovDelay[x][y])
+	  MovDelay[x][y] = TILEY/4 + 1;
+
+	if (MovDelay[x][y])
+	{
+	  MovDelay[x][y]--;
+	  if (MovDelay[x][y])
+	    return;
+	}
+
+	Feld[x][y] = EL_DC_MAGIC_WALL_ACTIVE;
+	Feld[x][y + 1] = EL_DC_MAGIC_WALL_FULL;
+	Store[x][y + 1] = EL_CHANGED_DC(Store[x][y]);
+	Store[x][y] = 0;
+      }
+    }
+    else if ((CAN_PASS_MAGIC_WALL(element) &&
+	      (Feld[x][y + 1] == EL_MAGIC_WALL_ACTIVE ||
+	       Feld[x][y + 1] == EL_BD_MAGIC_WALL_ACTIVE)) ||
+	     (CAN_PASS_DC_MAGIC_WALL(element) &&
+	      (Feld[x][y + 1] == EL_DC_MAGIC_WALL_ACTIVE)))
+
     {
       InitMovingField(x, y, MV_DOWN);
       started_moving = TRUE;
 
       Feld[x][y] =
 	(Feld[x][y + 1] == EL_MAGIC_WALL_ACTIVE ? EL_MAGIC_WALL_FILLING :
-	 EL_BD_MAGIC_WALL_FILLING);
+	 Feld[x][y + 1] == EL_BD_MAGIC_WALL_ACTIVE ? EL_BD_MAGIC_WALL_FILLING :
+	 EL_DC_MAGIC_WALL_FILLING);
       Store[x][y] = element;
     }
     else if (CAN_FALL(element) && Feld[x][y + 1] == EL_ACID)
@@ -6628,6 +6735,16 @@ void ContinueMoving(int x, int y)
     Feld[x][y] = get_next_element(element);
     element = Feld[newx][newy] = Store[x][y];
   }
+  else if (element == EL_QUICKSAND_FAST_FILLING)
+  {
+    element = Feld[newx][newy] = get_next_element(element);
+    Store[newx][newy] = Store[x][y];
+  }
+  else if (element == EL_QUICKSAND_FAST_EMPTYING)
+  {
+    Feld[x][y] = get_next_element(element);
+    element = Feld[newx][newy] = Store[x][y];
+  }
   else if (element == EL_MAGIC_WALL_FILLING)
   {
     element = Feld[newx][newy] = get_next_element(element);
@@ -6658,6 +6775,24 @@ void ContinueMoving(int x, int y)
     Feld[x][y] = get_next_element(element);
     if (!game.magic_wall_active)
       Feld[x][y] = EL_BD_MAGIC_WALL_DEAD;
+    element = Feld[newx][newy] = Store[x][y];
+
+#if USE_NEW_CUSTOM_VALUE
+    InitField(newx, newy, FALSE);
+#endif
+  }
+  else if (element == EL_DC_MAGIC_WALL_FILLING)
+  {
+    element = Feld[newx][newy] = get_next_element(element);
+    if (!game.magic_wall_active)
+      element = Feld[newx][newy] = EL_DC_MAGIC_WALL_DEAD;
+    Store[newx][newy] = Store[x][y];
+  }
+  else if (element == EL_DC_MAGIC_WALL_EMPTYING)
+  {
+    Feld[x][y] = get_next_element(element);
+    if (!game.magic_wall_active)
+      Feld[x][y] = EL_DC_MAGIC_WALL_DEAD;
     element = Feld[newx][newy] = Store[x][y];
 
 #if USE_NEW_CUSTOM_VALUE
@@ -7163,7 +7298,8 @@ void AmoebeAbleger(int ax, int ay)
 
     if (IS_FREE(x, y) ||
 	CAN_GROW_INTO(Feld[x][y]) ||
-	Feld[x][y] == EL_QUICKSAND_EMPTY)
+	Feld[x][y] == EL_QUICKSAND_EMPTY ||
+	Feld[x][y] == EL_QUICKSAND_FAST_EMPTY)
     {
       newax = x;
       neway = y;
@@ -7188,7 +7324,8 @@ void AmoebeAbleger(int ax, int ay)
 
       if (IS_FREE(x, y) ||
 	  CAN_GROW_INTO(Feld[x][y]) ||
-	  Feld[x][y] == EL_QUICKSAND_EMPTY)
+	  Feld[x][y] == EL_QUICKSAND_EMPTY ||
+	  Feld[x][y] == EL_QUICKSAND_FAST_EMPTY)
       {
 	newax = x;
 	neway = y;
@@ -10011,7 +10148,10 @@ void GameActions_RND()
 	   element == EL_MAGIC_WALL_EMPTYING ||
 	   element == EL_BD_MAGIC_WALL_FULL ||
 	   element == EL_BD_MAGIC_WALL_ACTIVE ||
-	   element == EL_BD_MAGIC_WALL_EMPTYING) &&
+	   element == EL_BD_MAGIC_WALL_EMPTYING ||
+	   element == EL_DC_MAGIC_WALL_FULL ||
+	   element == EL_DC_MAGIC_WALL_ACTIVE ||
+	   element == EL_DC_MAGIC_WALL_EMPTYING) &&
 	  ABS(x-jx) + ABS(y-jy) < ABS(magic_wall_x-jx) + ABS(magic_wall_y-jy))
       {
 	magic_wall_x = x;
@@ -10036,6 +10176,7 @@ void GameActions_RND()
 	  (element == EL_EMPTY ||
 	   CAN_GROW_INTO(element) ||
 	   element == EL_QUICKSAND_EMPTY ||
+	   element == EL_QUICKSAND_FAST_EMPTY ||
 	   element == EL_ACID_SPLASH_LEFT ||
 	   element == EL_ACID_SPLASH_RIGHT))
       {
@@ -10082,6 +10223,10 @@ void GameActions_RND()
 	  element == EL_BD_MAGIC_WALL_ACTIVE ||
 	  element == EL_BD_MAGIC_WALL_EMPTYING)
 	PlayLevelSound(magic_wall_x, magic_wall_y, SND_BD_MAGIC_WALL_ACTIVE);
+      else if (element == EL_DC_MAGIC_WALL_FULL ||
+	       element == EL_DC_MAGIC_WALL_ACTIVE ||
+	       element == EL_DC_MAGIC_WALL_EMPTYING)
+	PlayLevelSound(magic_wall_x, magic_wall_y, SND_DC_MAGIC_WALL_ACTIVE);
       else
 	PlayLevelSound(magic_wall_x, magic_wall_y, SND_MAGIC_WALL_ACTIVE);
     }
@@ -10105,6 +10250,12 @@ void GameActions_RND()
 		   element == EL_BD_MAGIC_WALL_FULL)
 	  {
 	    Feld[x][y] = EL_BD_MAGIC_WALL_DEAD;
+	    DrawLevelField(x, y);
+	  }
+	  else if (element == EL_DC_MAGIC_WALL_ACTIVE ||
+		   element == EL_DC_MAGIC_WALL_FULL)
+	  {
+	    Feld[x][y] = EL_DC_MAGIC_WALL_DEAD;
 	    DrawLevelField(x, y);
 	  }
 	}

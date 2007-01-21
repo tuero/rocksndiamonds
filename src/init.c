@@ -2389,8 +2389,10 @@ void InitElementPropertiesStatic()
     EL_NUT,
     EL_AMOEBA_DROP,
     EL_QUICKSAND_FULL,
+    EL_QUICKSAND_FAST_FULL,
     EL_MAGIC_WALL_FULL,
     EL_BD_MAGIC_WALL_FULL,
+    EL_DC_MAGIC_WALL_FULL,
     EL_TIME_ORB_FULL,
     EL_TIME_ORB_EMPTY,
     EL_SP_ZONK,
@@ -2833,6 +2835,22 @@ void InitElementPropertiesStatic()
     EL_EMERALD_RED,
     EL_EMERALD_PURPLE,
     EL_DIAMOND,
+
+    -1
+  };
+
+  static int ep_can_pass_dc_magic_wall[] =
+  {
+    EL_ROCK,
+    EL_BD_ROCK,
+    EL_EMERALD,
+    EL_BD_DIAMOND,
+    EL_EMERALD_YELLOW,
+    EL_EMERALD_RED,
+    EL_EMERALD_PURPLE,
+    EL_DIAMOND,
+    EL_PEARL,
+    EL_CRYSTAL,
 
     -1
   };
@@ -3566,6 +3584,7 @@ void InitElementPropertiesStatic()
     EL_STEELWALL,
     EL_AMOEBA_DEAD,
     EL_QUICKSAND_EMPTY,
+    EL_QUICKSAND_FAST_EMPTY,
     EL_STONEBLOCK,
     EL_ROBOT_WHEEL,
     EL_KEY_1,
@@ -3650,6 +3669,8 @@ void InitElementPropertiesStatic()
     EL_MAGIC_WALL_DEAD,
     EL_BD_MAGIC_WALL,
     EL_BD_MAGIC_WALL_DEAD,
+    EL_DC_MAGIC_WALL,
+    EL_DC_MAGIC_WALL_DEAD,
     EL_AMOEBA_TO_DIAMOND,
     EL_BLOCKED,
     EL_SP_EMPTY,
@@ -3883,6 +3904,7 @@ void InitElementPropertiesStatic()
 
     { ep_player,			EP_PLAYER			},
     { ep_can_pass_magic_wall,		EP_CAN_PASS_MAGIC_WALL		},
+    { ep_can_pass_dc_magic_wall,	EP_CAN_PASS_DC_MAGIC_WALL	},
     { ep_switchable,			EP_SWITCHABLE			},
     { ep_bd_element,			EP_BD_ELEMENT			},
     { ep_sp_element,			EP_SP_ELEMENT			},

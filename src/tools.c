@@ -1410,13 +1410,17 @@ void DrawScreenField(int x, int y)
     boolean cut_mode = NO_CUTTING;
 
     if (element == EL_QUICKSAND_EMPTYING ||
+	element == EL_QUICKSAND_FAST_EMPTYING ||
 	element == EL_MAGIC_WALL_EMPTYING ||
 	element == EL_BD_MAGIC_WALL_EMPTYING ||
+	element == EL_DC_MAGIC_WALL_EMPTYING ||
 	element == EL_AMOEBA_DROPPING)
       cut_mode = CUT_ABOVE;
     else if (element == EL_QUICKSAND_FILLING ||
+	     element == EL_QUICKSAND_FAST_FILLING ||
 	     element == EL_MAGIC_WALL_FILLING ||
-	     element == EL_BD_MAGIC_WALL_FILLING)
+	     element == EL_BD_MAGIC_WALL_FILLING ||
+	     element == EL_DC_MAGIC_WALL_FILLING)
       cut_mode = CUT_BELOW;
 
     if (cut_mode == CUT_ABOVE)
@@ -1458,8 +1462,10 @@ void DrawScreenField(int x, int y)
     content_old = Store[oldx][oldy];
 
     if (element_old == EL_QUICKSAND_EMPTYING ||
+	element_old == EL_QUICKSAND_FAST_EMPTYING ||
 	element_old == EL_MAGIC_WALL_EMPTYING ||
 	element_old == EL_BD_MAGIC_WALL_EMPTYING ||
+	element_old == EL_DC_MAGIC_WALL_EMPTYING ||
 	element_old == EL_AMOEBA_DROPPING)
       cut_mode = CUT_ABOVE;
 
@@ -5405,10 +5411,14 @@ int get_next_element(int element)
   {
     case EL_QUICKSAND_FILLING:		return EL_QUICKSAND_FULL;
     case EL_QUICKSAND_EMPTYING:		return EL_QUICKSAND_EMPTY;
+    case EL_QUICKSAND_FAST_FILLING:	return EL_QUICKSAND_FAST_FULL;
+    case EL_QUICKSAND_FAST_EMPTYING:	return EL_QUICKSAND_FAST_EMPTY;
     case EL_MAGIC_WALL_FILLING:		return EL_MAGIC_WALL_FULL;
     case EL_MAGIC_WALL_EMPTYING:	return EL_MAGIC_WALL_ACTIVE;
     case EL_BD_MAGIC_WALL_FILLING:	return EL_BD_MAGIC_WALL_FULL;
     case EL_BD_MAGIC_WALL_EMPTYING:	return EL_BD_MAGIC_WALL_ACTIVE;
+    case EL_DC_MAGIC_WALL_FILLING:	return EL_DC_MAGIC_WALL_FULL;
+    case EL_DC_MAGIC_WALL_EMPTYING:	return EL_DC_MAGIC_WALL_ACTIVE;
     case EL_AMOEBA_DROPPING:		return EL_AMOEBA_WET;
 
     default:				return element;
