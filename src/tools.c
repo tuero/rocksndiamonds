@@ -2523,7 +2523,11 @@ boolean Request(char *text, unsigned int req_state)
     if (max_word_len > MAX_REQUEST_LINE_FONT1_LEN)
     {
       max_request_line_len = MAX_REQUEST_LINE_FONT2_LEN;
+#if 1
+      font_nr = FONT_TEXT_1;
+#else
       font_nr = FONT_LEVEL_NUMBER;
+#endif
 
       break;
     }

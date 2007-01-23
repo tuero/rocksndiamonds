@@ -1965,6 +1965,10 @@ struct FileInfo *getFileListFromConfigList(struct ConfigInfo *config_list,
 
       file_list[list_pos].token = config_list[i].token;
       file_list[list_pos].default_filename = config_list[i].value;
+
+#if 0
+      printf("::: '%s' => '%s'\n", config_list[i].token, config_list[i].value);
+#endif
     }
   }
 
@@ -1973,12 +1977,16 @@ struct FileInfo *getFileListFromConfigList(struct ConfigInfo *config_list,
   {
     Error(ERR_RETURN_LINE, "-");
     Error(ERR_RETURN, "inconsistant config list information:");
-    Error(ERR_RETURN, "- should be:   %d (according to 'src/conf_gfx.h')",
+    Error(ERR_RETURN, "- should be:   %d (according to 'src/conf_xxx.h')",
 	  num_file_list_entries);
-    Error(ERR_RETURN, "- found to be: %d (according to 'src/conf_gfx.c')",
+    Error(ERR_RETURN, "- found to be: %d (according to 'src/conf_xxx.c')",
 	  num_file_list_entries_found);
     Error(ERR_EXIT,   "please fix");
   }
+
+#if 0
+  printf("::: ---------- DONE ----------\n");
+#endif
 
   return file_list;
 }

@@ -4157,19 +4157,19 @@ int getMappedElement_DC(int element)
       break;
 
     case 0x0f4f:	/* dynamite (lit 1) */
-      element = EL_DYNAMITE_ACTIVE;
+      element = EL_EM_DYNAMITE_ACTIVE;
       break;
 
     case 0x0f57:	/* dynamite (lit 2) */
-      element = EL_DYNAMITE_ACTIVE;
+      element = EL_EM_DYNAMITE_ACTIVE;
       break;
 
     case 0x0f5f:	/* dynamite (lit 3) */
-      element = EL_DYNAMITE_ACTIVE;
+      element = EL_EM_DYNAMITE_ACTIVE;
       break;
 
     case 0x0f67:	/* dynamite (lit 4) */
-      element = EL_DYNAMITE_ACTIVE;
+      element = EL_EM_DYNAMITE_ACTIVE;
       break;
 
     case 0x0f81:
@@ -4332,7 +4332,7 @@ int getMappedElement_DC(int element)
       break;
 
     case 0x14e9:
-      element = EL_SHIELD_NORMAL;
+      element = EL_SHIELD_DEADLY;
       break;
 
     case 0x1501:
@@ -4362,7 +4362,7 @@ int getMappedElement_DC(int element)
       /* EL_DC_LANDMINE */
 
     case 0x15a0:
-      element = EL_DYNAMITE;
+      element = EL_EM_DYNAMITE;
       break;
 
     case 0x15a1:	/* key (red) */

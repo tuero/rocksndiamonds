@@ -7521,17 +7521,21 @@ static int PrintElementDescriptionFromFile(char *filename, int start_line)
 
 static void DrawPropertiesTabulatorGadgets()
 {
-  struct GadgetInfo *gd_gi = level_editor_gadget[GADGET_ID_PROPERTIES_INFO];
-  struct GadgetDesign *gd = &gd_gi->alt_design[GD_BUTTON_UNPRESSED];
-  int gd_x = gd->x + gd_gi->border.width / 2;
-  int gd_y = gd->y + gd_gi->height - 1;
+  struct GadgetInfo *gd_gi1 = level_editor_gadget[GADGET_ID_PROPERTIES_INFO];
+  struct GadgetInfo *gd_gi4 = level_editor_gadget[GADGET_ID_PROPERTIES_CHANGE];
+  struct GadgetDesign *gd = &gd_gi1->alt_design[GD_BUTTON_UNPRESSED];
+  int gd_x = gd->x + gd_gi1->border.width / 2;
+  int gd_y = gd->y + gd_gi1->height - 1;
   Pixel tab_color = GetPixel(gd->bitmap, gd_x, gd_y);
   int id_first = ED_TEXTBUTTON_ID_PROPERTIES_INFO;
   int id_last  = ED_TEXTBUTTON_ID_PROPERTIES_CONFIG;
+#if 1
+#else
   int max_tabs = 4;
+#endif
   int i;
 
-  /* draw additional "advanced" tabulator for custom elements */
+  /* draw additional "change" tabulator for custom elements */
   if (IS_CUSTOM_ELEMENT(properties_element))
     id_last = ED_TEXTBUTTON_ID_PROPERTIES_CHANGE;
 
@@ -7547,21 +7551,29 @@ static void DrawPropertiesTabulatorGadgets()
       continue;
 
     /* draw background line below tabulator button */
-    ClearRectangleOnBackground(drawto, gi->x, gi->y + gi->height, gi->width,1);
+    ClearRectangleOnBackground(drawto, gi->x, gi->y + gi->height, gi->width, 1);
 
     /* draw solid line below inactive tabulator buttons */
     if (!active && tab_color != BLACK_PIXEL)	/* black => transparent */
-      FillRectangle(drawto, gi->x, gi->y + gi->height, gi->width,1, tab_color);
+      FillRectangle(drawto, gi->x, gi->y + gi->height, gi->width, 1, tab_color);
 
     ModifyGadget(gi, GDI_ACTIVE, active, GDI_END);
     MapTextbuttonGadget(i);
   }
 
+#if 1
   /* draw little border line below tabulator buttons */
   if (tab_color != BLACK_PIXEL)			/* black => transparent */
-    FillRectangle(drawto, gd_gi->x, gd_gi->y + gd_gi->height + 1,
-		  max_tabs * gd_gi->width + (max_tabs -1) * ED_GADGET_DISTANCE,
+    FillRectangle(drawto, gd_gi1->x, gd_gi1->y + gd_gi1->height + 1,
+		  gd_gi4->x - gd_gi1->x + gd_gi4->width, ED_GADGET_DISTANCE,
+		  tab_color);
+#else
+  /* draw little border line below tabulator buttons */
+  if (tab_color != BLACK_PIXEL)			/* black => transparent */
+    FillRectangle(drawto, gd_gi1->x, gd_gi1->y + gd_gi1->height + 1,
+		  max_tabs * gd_gi1->width + (max_tabs -1) * ED_GADGET_DISTANCE,
 		  ED_GADGET_DISTANCE, tab_color);
+#endif
 }
 
 static void DrawPropertiesInfo()

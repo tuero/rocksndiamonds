@@ -1,3 +1,6 @@
+2007-01-21
+	* fixed small cosmetical bug with underlining property tabs in editor
+
 2007-01-20
 	* fixed small drawing bug in X11FadeRectangle
 	* added new elements for newly supported Diamond Caves II levels:

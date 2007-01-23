@@ -88,6 +88,10 @@ font_to_graphic[] =
     IMG_FONT_TEXT_1_ACTIVE_SCORES
   },
   {
+    FONT_TEXT_1,				GFX_SPECIAL_ARG_DOOR,
+    IMG_FONT_TEXT_1_DOOR
+  },
+  {
     FONT_TEXT_2,				-1,
     IMG_FONT_TEXT_2
   },
