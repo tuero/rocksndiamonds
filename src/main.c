@@ -5571,6 +5571,7 @@ struct TokenIntPtrInfo image_config_vars[] =
   { "game.panel.inventory.digits",	&game.panel.inventory.chars	      },
   { "game.panel.keys.x",		&game.panel.keys.x		      },
   { "game.panel.keys.y",		&game.panel.keys.y		      },
+  { "game.panel.keys.align",		&game.panel.keys.align		      },
   { "game.panel.score.x",		&game.panel.score.x		      },
   { "game.panel.score.y",		&game.panel.score.y		      },
   { "game.panel.score.align",		&game.panel.score.align		      },

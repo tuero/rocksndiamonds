@@ -1619,17 +1619,21 @@ static void printSetupFileHash(SetupFileHash *hash)
 }
 #endif
 
+#define ALLOW_TOKEN_VALUE_SEPARATOR_BEING_WHITESPACE		1
+#define CHECK_TOKEN_VALUE_SEPARATOR__WARN_IF_MISSING		0
+
 static void *loadSetupFileData(char *filename, boolean use_hash)
 {
-  char line[MAX_LINE_LEN], previous_line[MAX_LINE_LEN];
+  char line[MAX_LINE_LEN], line_raw[MAX_LINE_LEN], previous_line[MAX_LINE_LEN];
   char *token, *value, *line_ptr;
   void *setup_file_data, *insert_ptr = NULL;
   boolean read_continued_line = FALSE;
   boolean token_value_separator_found;
-#if 1
+#if CHECK_TOKEN_VALUE_SEPARATOR__WARN_IF_MISSING
   boolean token_value_separator_warning = FALSE;
 #endif
   FILE *file;
+  int line_nr = 0;
 
   if (!(file = fopen(filename, MODE_READ)))
   {
@@ -1649,10 +1653,17 @@ static void *loadSetupFileData(char *filename, boolean use_hash)
     if (!fgets(line, MAX_LINE_LEN, file))
       break;
 
-    /* cut trailing newline or carriage return */
+    /* check if line was completely read and is terminated by line break */
+    if (strlen(line) > 0 && line[strlen(line) - 1] == '\n')
+      line_nr++;
+
+    /* cut trailing line break (this can be newline and/or carriage return) */
     for (line_ptr = &line[strlen(line)]; line_ptr >= line; line_ptr--)
       if ((*line_ptr == '\n' || *line_ptr == '\r') && *(line_ptr + 1) == '\0')
 	*line_ptr = '\0';
+
+    /* copy raw input line for later use (mainly debugging output) */
+    strcpy(line_raw, line);
 
     if (read_continued_line)
     {
@@ -1714,6 +1725,7 @@ static void *loadSetupFileData(char *filename, boolean use_hash)
     for (line_ptr = token; *line_ptr; line_ptr++)
     {
 #if 1
+      /* first look for an explicit token/value separator, like ':' or '=' */
       if (*line_ptr == ':' || *line_ptr == '=')
 #else
       if (*line_ptr == ' ' || *line_ptr == '\t' || *line_ptr == ':')
@@ -1728,7 +1740,7 @@ static void *loadSetupFileData(char *filename, boolean use_hash)
       }
     }
 
-#if 1
+#if ALLOW_TOKEN_VALUE_SEPARATOR_BEING_WHITESPACE
     /* fallback: if no token/value separator found, also allow whitespaces */
     if (!token_value_separator_found)
     {
@@ -1745,19 +1757,19 @@ static void *loadSetupFileData(char *filename, boolean use_hash)
 	}
       }
 
-#if 1
+#if CHECK_TOKEN_VALUE_SEPARATOR__WARN_IF_MISSING
       if (token_value_separator_found)
       {
 	if (!token_value_separator_warning)
 	{
 	  Error(ERR_RETURN_LINE, "-");
-	  Error(ERR_WARN, "no valid token/value separator in config file:");
+	  Error(ERR_WARN, "missing token/value separator(s) in config file:");
 	  Error(ERR_RETURN, "- config file: '%s'", filename);
 
 	  token_value_separator_warning = TRUE;
 	}
 
-	Error(ERR_RETURN, "- no separator in line: '%s'", line);
+	Error(ERR_RETURN, "- line %d: '%s'", line_nr, line_raw);
       }
 #endif
     }
@@ -1789,7 +1801,7 @@ static void *loadSetupFileData(char *filename, boolean use_hash)
 
   fclose(file);
 
-#if 1
+#if CHECK_TOKEN_VALUE_SEPARATOR__WARN_IF_MISSING
   if (token_value_separator_warning)
     Error(ERR_RETURN_LINE, "-");
 #endif
@@ -2400,6 +2412,7 @@ static TreeInfo *getArtworkInfoCacheEntry(LevelDirTree *level_node, int type)
 	cached = FALSE;
       }
     }
+
     *artwork_info = ldi;
   }
 

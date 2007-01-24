@@ -85,9 +85,15 @@
 #define EX_TYPE_DYNA		(1 << 4)
 #define EX_TYPE_SINGLE_TILE	(EX_TYPE_CENTER | EX_TYPE_BORDER)
 
+#if 1
+#define	PANEL_DEACTIVATED(p)	((p)->x < 0 || (p)->y < 0)
+#define PANEL_XPOS(p)		(DX + ALIGNED_MENU_XPOS(p))
+#define PANEL_YPOS(p)		(DY + ALIGNED_MENU_YPOS(p))
+#else
 #define	PANEL_DEACTIVATED(p)	((p).x < 0 || (p).y < 0)
 #define PANEL_XPOS(p)		(ALIGNED_XPOS((p).x, (p).width, (p).align))
 #define PANEL_YPOS(p)		((p).y)
+#endif
 
 /* special positions in the game control window (relative to control window) */
 #define XX_LEVEL1		(PANEL_XPOS(game.panel.level))
@@ -1325,148 +1331,151 @@ static inline void InitField_WithBug2(int x, int y, boolean init_game)
 
 #if 1
 
-inline void DrawGameValue_Emeralds(int value)
+void DrawGameValue_Emeralds(int value)
 {
+  struct TextPosInfo *pos = &game.panel.gems;
   int font_nr = FONT_TEXT_2;
   int font_width = getFontWidth(font_nr);
-  int xpos = (3 * 14 - 3 * font_width) / 2;
+  int digits = pos->chars;
 
-  if (PANEL_DEACTIVATED(game.panel.gems))
+  if (PANEL_DEACTIVATED(pos))
     return;
 
-  game.panel.gems.width = game.panel.gems.chars * font_width;
-  xpos = 0;
+  pos->width = digits * font_width;
 
-  DrawText(DX_EMERALDS + xpos, DY_EMERALDS, int2str(value, 3), font_nr);
+  DrawText(PANEL_XPOS(pos), PANEL_YPOS(pos), int2str(value, digits), font_nr);
 }
 
-inline void DrawGameValue_Dynamite(int value)
+void DrawGameValue_Dynamite(int value)
 {
+  struct TextPosInfo *pos = &game.panel.inventory;
   int font_nr = FONT_TEXT_2;
   int font_width = getFontWidth(font_nr);
-  int xpos = (3 * 14 - 3 * font_width) / 2;
+  int digits = pos->chars;
 
-  if (PANEL_DEACTIVATED(game.panel.inventory))
+  if (PANEL_DEACTIVATED(pos))
     return;
 
-  game.panel.inventory.width = game.panel.inventory.chars * font_width;
-  xpos = 0;
+  pos->width = digits * font_width;
 
-  DrawText(DX_DYNAMITE + xpos, DY_DYNAMITE, int2str(value, 3), font_nr);
+  DrawText(PANEL_XPOS(pos), PANEL_YPOS(pos), int2str(value, digits), font_nr);
 }
 
-inline void DrawGameValue_Keys(int key[MAX_NUM_KEYS])
+void DrawGameValue_Score(int value)
 {
-  int base_key_graphic = EL_KEY_1;
-  int i;
-
-  if (PANEL_DEACTIVATED(game.panel.keys))
-    return;
-
-  if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
-    base_key_graphic = EL_EM_KEY_1;
-
-  /* currently only 4 of 8 possible keys are displayed */
-  for (i = 0; i < STD_NUM_KEYS; i++)
-  {
-    int x = XX_KEYS + i * MINI_TILEX;
-    int y = YY_KEYS;
-
-    if (key[i])
-      DrawMiniGraphicExt(drawto, DX + x,DY + y, el2edimg(base_key_graphic + i));
-    else
-      BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
-		 DOOR_GFX_PAGEX5 + x, y, MINI_TILEX, MINI_TILEY, DX + x,DY + y);
-  }
-}
-
-inline void DrawGameValue_Score(int value)
-{
+  struct TextPosInfo *pos = &game.panel.score;
   int font_nr = FONT_TEXT_2;
   int font_width = getFontWidth(font_nr);
-  int xpos = (5 * 14 - 5 * font_width) / 2;
+  int digits = pos->chars;
 
-  if (PANEL_DEACTIVATED(game.panel.score))
+  if (PANEL_DEACTIVATED(pos))
     return;
 
-  game.panel.score.width = game.panel.score.chars * font_width;
-  xpos = 0;
+  pos->width = digits * font_width;
 
-  DrawText(DX_SCORE + xpos, DY_SCORE, int2str(value, 5), font_nr);
+  DrawText(PANEL_XPOS(pos), PANEL_YPOS(pos), int2str(value, digits), font_nr);
 }
 
-inline void DrawGameValue_Time(int value)
+void DrawGameValue_Time(int value)
 {
+  struct TextPosInfo *pos = &game.panel.time;
   static int last_value = -1;
-  int num_digits1 = 3;
-  int num_digits2 = 4;
-  int num_digits = game.panel.time.chars;
+  int digits1 = 3;
+  int digits2 = 4;
+  int digits = pos->chars;
   int font1_nr = FONT_TEXT_2;
   int font2_nr = FONT_TEXT_1;
   int font_nr = font1_nr;
-  int font1_width = getFontWidth(font1_nr);
-  int font2_width = getFontWidth(font2_nr);
-  int xpos3 = (3 * 14 - 3 * font1_width) / 2;
-  int xpos4 = (4 * 10 - 4 * font2_width) / 2;
+  boolean use_dynamic_digits = (digits == -1 ? TRUE : FALSE);
 
-  if (PANEL_DEACTIVATED(game.panel.time))
+  if (PANEL_DEACTIVATED(pos))
     return;
 
-  if (num_digits == -1)			/* use dynamic number of digits */
+  if (use_dynamic_digits)		/* use dynamic number of digits */
   {
-    num_digits = (value < 1000 ? num_digits1 : num_digits2);
-    font_nr    = (value < 1000 ? font1_nr : font2_nr);
+    digits  = (value < 1000 ? digits1  : digits2);
+    font_nr = (value < 1000 ? font1_nr : font2_nr);
   }
 
-  xpos3 = 0;
-  xpos4 = 0;
-
   /* clear background if value just changed its size (dynamic digits only) */
-  if (game.panel.time.chars == -1 && (last_value < 1000) != (value < 1000))
+  if (use_dynamic_digits && (last_value < 1000) != (value < 1000))
   {
-    int width1 = num_digits1 * getFontWidth(font1_nr);
-    int width2 = num_digits2 * getFontWidth(font2_nr);
+    int width1 = digits1 * getFontWidth(font1_nr);
+    int width2 = digits2 * getFontWidth(font2_nr);
     int max_width = MAX(width1, width2);
     int max_height = MAX(getFontHeight(font1_nr), getFontHeight(font2_nr));
 
-    game.panel.time.width = max_width;
+    pos->width = max_width;
 
-    ClearRectangleOnBackground(drawto, DX_TIME, DY_TIME, max_width, max_height);
+    ClearRectangleOnBackground(drawto, PANEL_XPOS(pos), PANEL_YPOS(pos),
+			       max_width, max_height);
   }
 
-  game.panel.time.width = num_digits * getFontWidth(font_nr);
+  pos->width = digits * getFontWidth(font_nr);
 
-  DrawText(DX_TIME, DY_TIME, int2str(value, num_digits), font_nr);
+  DrawText(PANEL_XPOS(pos), PANEL_YPOS(pos), int2str(value, digits), font_nr);
 
   last_value = value;
 }
 
-inline void DrawGameValue_Level(int value)
+void DrawGameValue_Level(int value)
 {
-  int num_digits1 = 2;
-  int num_digits2 = 3;
-  int num_digits = game.panel.level.chars;
+  struct TextPosInfo *pos = &game.panel.level;
+  int digits1 = 2;
+  int digits2 = 3;
+  int digits = pos->chars;
   int font1_nr = FONT_TEXT_2;
   int font2_nr = FONT_TEXT_1;
   int font_nr = font1_nr;
+  boolean use_dynamic_digits = (digits == -1 ? TRUE : FALSE);
 
-  if (PANEL_DEACTIVATED(game.panel.level))
+  if (PANEL_DEACTIVATED(pos))
     return;
 
-  if (num_digits == -1)			/* use dynamic number of digits */
+  if (use_dynamic_digits)		/* use dynamic number of digits */
   {
-    num_digits = (level_nr < 100 ? num_digits1 : num_digits2);
-    font_nr    = (level_nr < 100 ? font1_nr : font2_nr);
+    digits  = (level_nr < 100 ? digits1  : digits2);
+    font_nr = (level_nr < 100 ? font1_nr : font2_nr);
   }
 
-  game.panel.level.width = num_digits * getFontWidth(font_nr);
+  pos->width = digits * getFontWidth(font_nr);
 
-  DrawText(DX_LEVEL, DY_LEVEL, int2str(value, num_digits), font_nr);
+  DrawText(PANEL_XPOS(pos), PANEL_YPOS(pos), int2str(value, digits), font_nr);
+}
+
+void DrawGameValue_Keys(int key[MAX_NUM_KEYS])
+{
+  struct TextPosInfo *pos = &game.panel.keys;
+  int base_key_graphic = EL_KEY_1;
+  int i;
+
+  if (PANEL_DEACTIVATED(pos))
+    return;
+
+  if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
+    base_key_graphic = EL_EM_KEY_1;
+
+  pos->width = 4 * MINI_TILEX;
+
+  /* currently only 4 of 8 possible keys are displayed */
+  for (i = 0; i < STD_NUM_KEYS; i++)
+  {
+    int src_x = DOOR_GFX_PAGEX5 + 18;
+    int src_y = DOOR_GFX_PAGEY1 + 123;
+    int dst_x = PANEL_XPOS(pos) + i * MINI_TILEX;
+    int dst_y = PANEL_YPOS(pos);
+
+    if (key[i])
+      DrawMiniGraphicExt(drawto, dst_x, dst_y, el2edimg(base_key_graphic + i));
+    else
+      BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto, src_x, src_y,
+		 MINI_TILEX, MINI_TILEY, dst_x, dst_y);
+  }
 }
 
 #else
 
-inline void DrawGameValue_Emeralds(int value)
+void DrawGameValue_Emeralds(int value)
 {
   int font_nr = FONT_TEXT_2;
   int xpos = (3 * 14 - 3 * getFontWidth(font_nr)) / 2;
@@ -1477,7 +1486,7 @@ inline void DrawGameValue_Emeralds(int value)
   DrawText(DX_EMERALDS + xpos, DY_EMERALDS, int2str(value, 3), font_nr);
 }
 
-inline void DrawGameValue_Dynamite(int value)
+void DrawGameValue_Dynamite(int value)
 {
   int font_nr = FONT_TEXT_2;
   int xpos = (3 * 14 - 3 * getFontWidth(font_nr)) / 2;
@@ -1488,32 +1497,7 @@ inline void DrawGameValue_Dynamite(int value)
   DrawText(DX_DYNAMITE + xpos, DY_DYNAMITE, int2str(value, 3), font_nr);
 }
 
-inline void DrawGameValue_Keys(int key[MAX_NUM_KEYS])
-{
-  int base_key_graphic = EL_KEY_1;
-  int i;
-
-  if (PANEL_DEACTIVATED(game.panel.keys))
-    return;
-
-  if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
-    base_key_graphic = EL_EM_KEY_1;
-
-  /* currently only 4 of 8 possible keys are displayed */
-  for (i = 0; i < STD_NUM_KEYS; i++)
-  {
-    int x = XX_KEYS + i * MINI_TILEX;
-    int y = YY_KEYS;
-
-    if (key[i])
-      DrawMiniGraphicExt(drawto, DX + x,DY + y, el2edimg(base_key_graphic + i));
-    else
-      BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
-		 DOOR_GFX_PAGEX5 + x, y, MINI_TILEX, MINI_TILEY, DX + x,DY + y);
-  }
-}
-
-inline void DrawGameValue_Score(int value)
+void DrawGameValue_Score(int value)
 {
   int font_nr = FONT_TEXT_2;
   int xpos = (5 * 14 - 5 * getFontWidth(font_nr)) / 2;
@@ -1524,7 +1508,7 @@ inline void DrawGameValue_Score(int value)
   DrawText(DX_SCORE + xpos, DY_SCORE, int2str(value, 5), font_nr);
 }
 
-inline void DrawGameValue_Time(int value)
+void DrawGameValue_Time(int value)
 {
   int font1_nr = FONT_TEXT_2;
 #if 1
@@ -1548,7 +1532,7 @@ inline void DrawGameValue_Time(int value)
     DrawText(DX_TIME2 + xpos4, DY_TIME, int2str(value, 4), font2_nr);
 }
 
-inline void DrawGameValue_Level(int value)
+void DrawGameValue_Level(int value)
 {
   int font1_nr = FONT_TEXT_2;
 #if 1
@@ -1564,6 +1548,31 @@ inline void DrawGameValue_Level(int value)
     DrawText(DX_LEVEL1, DY_LEVEL, int2str(value, 2), font1_nr);
   else
     DrawText(DX_LEVEL2, DY_LEVEL, int2str(value, 3), font2_nr);
+}
+
+void DrawGameValue_Keys(int key[MAX_NUM_KEYS])
+{
+  int base_key_graphic = EL_KEY_1;
+  int i;
+
+  if (PANEL_DEACTIVATED(game.panel.keys))
+    return;
+
+  if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
+    base_key_graphic = EL_EM_KEY_1;
+
+  /* currently only 4 of 8 possible keys are displayed */
+  for (i = 0; i < STD_NUM_KEYS; i++)
+  {
+    int x = XX_KEYS + i * MINI_TILEX;
+    int y = YY_KEYS;
+
+    if (key[i])
+      DrawMiniGraphicExt(drawto, DX + x,DY + y, el2edimg(base_key_graphic + i));
+    else
+      BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
+		 DOOR_GFX_PAGEX5 + x, y, MINI_TILEX, MINI_TILEY, DX + x,DY + y);
+  }
 }
 
 #endif

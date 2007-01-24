@@ -505,8 +505,8 @@ static void DrawCursorAndText_Main_Ext(int nr, boolean active_text,
       if (pos_text != NULL && text != NULL)
       {
 	struct MenuPosInfo *pos = pos_text;
-	int x = mSX + ALIGNED_XPOS(pos->x, pos->width, pos->align);
-	int y = mSY + pos->y;
+	int x = mSX + ALIGNED_MENU_XPOS(pos);
+	int y = mSY + ALIGNED_MENU_YPOS(pos);
 
 	DrawBackgroundForFont(x, y, pos->width, pos->height, font_text);
 	DrawText(x, y, text, font_text);
@@ -515,8 +515,8 @@ static void DrawCursorAndText_Main_Ext(int nr, boolean active_text,
       if (pos_input != NULL && input != NULL)
       {
 	struct MenuPosInfo *pos = pos_input;
-	int x = mSX + ALIGNED_XPOS(pos->x, pos->width, pos->align);
-	int y = mSY + pos->y;
+	int x = mSX + ALIGNED_MENU_XPOS(pos);
+	int y = mSY + ALIGNED_MENU_YPOS(pos);
 
 	DrawBackgroundForFont(x, y, pos->width, pos->height, font_input);
 	DrawText(x, y, input, font_input);
@@ -553,8 +553,8 @@ static boolean insideMenuPosRect(struct MenuPosInfo *rect, int x, int y)
   if (rect == NULL)
     return FALSE;
 
-  int rect_x = ALIGNED_XPOS(rect->x, rect->width, rect->align);
-  int rect_y = rect->y;
+  int rect_x = ALIGNED_MENU_XPOS(rect);
+  int rect_y = ALIGNED_MENU_YPOS(rect);
 
   return (x >= rect_x && x < rect_x + rect->width &&
 	  y >= rect_y && y < rect_y + rect->height);
@@ -2587,8 +2587,8 @@ void HandleTypeName(int newxpos, Key key)
   struct MainControlInfo *mci = getMainControlInfo(MAIN_CONTROL_NAME);
 #if 1
   struct MenuPosInfo *pos = mci->pos_input;
-  int startx = mSX + ALIGNED_XPOS(pos->x, pos->width, pos->align);
-  int starty = mSY + pos->y;
+  int startx = mSX + ALIGNED_MENU_XPOS(pos);
+  int starty = mSY + ALIGNED_MENU_YPOS(pos);
 #endif
 #if 1
   static int xpos = 0;
