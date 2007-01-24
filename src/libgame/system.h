@@ -1008,6 +1008,23 @@ struct Rect
   int width, height;
 };
 
+#if 1
+struct MenuPosInfo
+{
+  int x, y;
+  int width, height;
+  int align;
+};
+
+struct TextPosInfo
+{
+  int x, y;
+  int width, height;
+  int align;
+  int chars;
+};
+#endif
+
 
 /* ========================================================================= */
 /* exported variables                                                        */

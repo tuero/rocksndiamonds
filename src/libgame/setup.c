@@ -1625,6 +1625,10 @@ static void *loadSetupFileData(char *filename, boolean use_hash)
   char *token, *value, *line_ptr;
   void *setup_file_data, *insert_ptr = NULL;
   boolean read_continued_line = FALSE;
+  boolean token_value_separator_found;
+#if 1
+  boolean token_value_separator_warning = FALSE;
+#endif
   FILE *file;
 
   if (!(file = fopen(filename, MODE_READ)))
@@ -1704,6 +1708,8 @@ static void *loadSetupFileData(char *filename, boolean use_hash)
     /* start with empty value as reliable default */
     value = "";
 
+    token_value_separator_found = FALSE;
+
     /* find end of token to determine start of value */
     for (line_ptr = token; *line_ptr; line_ptr++)
     {
@@ -1716,9 +1722,46 @@ static void *loadSetupFileData(char *filename, boolean use_hash)
 	*line_ptr = '\0';		/* terminate token string */
 	value = line_ptr + 1;		/* set beginning of value */
 
+	token_value_separator_found = TRUE;
+
 	break;
       }
     }
+
+#if 1
+    /* fallback: if no token/value separator found, also allow whitespaces */
+    if (!token_value_separator_found)
+    {
+      for (line_ptr = token; *line_ptr; line_ptr++)
+      {
+	if (*line_ptr == ' ' || *line_ptr == '\t')
+	{
+	  *line_ptr = '\0';		/* terminate token string */
+	  value = line_ptr + 1;		/* set beginning of value */
+
+	  token_value_separator_found = TRUE;
+
+	  break;
+	}
+      }
+
+#if 1
+      if (token_value_separator_found)
+      {
+	if (!token_value_separator_warning)
+	{
+	  Error(ERR_RETURN_LINE, "-");
+	  Error(ERR_WARN, "no valid token/value separator in config file:");
+	  Error(ERR_RETURN, "- config file: '%s'", filename);
+
+	  token_value_separator_warning = TRUE;
+	}
+
+	Error(ERR_RETURN, "- no separator in line: '%s'", line);
+      }
+#endif
+    }
+#endif
 
     /* cut trailing whitespaces from token */
     for (line_ptr = &token[strlen(token)]; line_ptr >= token; line_ptr--)
@@ -1745,6 +1788,11 @@ static void *loadSetupFileData(char *filename, boolean use_hash)
   }
 
   fclose(file);
+
+#if 1
+  if (token_value_separator_warning)
+    Error(ERR_RETURN_LINE, "-");
+#endif
 
   if (use_hash)
   {

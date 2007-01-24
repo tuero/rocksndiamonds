@@ -14,12 +14,25 @@
 #ifndef GAME_H
 #define GAME_H
 
+/* (not included here due to collisions with Emerald Mine engine definitions) */
+/* #include "main.h" */
 
 #define MAX_INVENTORY_SIZE	1000
 #define STD_NUM_KEYS		4
 #define MAX_NUM_KEYS		8
 
 
+#if 1
+struct GamePanelInfo
+{
+  struct TextPosInfo level;
+  struct TextPosInfo gems;
+  struct TextPosInfo inventory;
+  struct TextPosInfo keys;
+  struct TextPosInfo score;
+  struct TextPosInfo time;
+};
+#else
 struct GamePanelInfo
 {
   struct XY level;
@@ -29,6 +42,7 @@ struct GamePanelInfo
   struct XY score;
   struct XY time;
 };
+#endif
 
 struct GameInfo
 {

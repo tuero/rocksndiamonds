@@ -88,6 +88,10 @@ font_to_graphic[] =
     IMG_FONT_TEXT_1_ACTIVE_SCORES
   },
   {
+    FONT_TEXT_1,				GFX_SPECIAL_ARG_PLAYING,
+    IMG_FONT_TEXT_1_PLAYING
+  },
+  {
     FONT_TEXT_1,				GFX_SPECIAL_ARG_DOOR,
     IMG_FONT_TEXT_1_DOOR
   },
@@ -216,12 +220,24 @@ font_to_graphic[] =
     IMG_FONT_LEVEL_NUMBER
   },
   {
+    FONT_LEVEL_NUMBER_ACTIVE,			-1,
+    IMG_FONT_LEVEL_NUMBER_ACTIVE
+  },
+  {
     FONT_TAPE_RECORDER,				-1,
     IMG_FONT_TAPE_RECORDER
   },
   {
     FONT_GAME_INFO,				-1,
     IMG_FONT_GAME_INFO
+  },
+  {
+    FONT_INFO_ELEMENTS,				-1,
+    IMG_FONT_INFO_ELEMENTS
+  },
+  {
+    FONT_INFO_LEVELSET,				-1,
+    IMG_FONT_INFO_LEVELSET
   },
   {
     -1,						-1,

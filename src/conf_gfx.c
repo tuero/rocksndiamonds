@@ -4684,6 +4684,8 @@ struct ConfigInfo image_config[] =
   { "font.text_1.active.SCORES.y",		"0"			},
   { "font.text_1.active.SCORES.width",		"16"			},
   { "font.text_1.active.SCORES.height",		"32"			},
+  { "font.text_1.PLAYING",			UNDEFINED_FILENAME	},
+  { "font.text_1.PLAYING.clone_from",		"font.level_number"	},
   { "font.text_1.DOOR",				UNDEFINED_FILENAME	},
   { "font.text_1.DOOR.clone_from",		"font.level_number"	},
   { "font.text_2",				"RocksFontSmall.pcx"	},
@@ -4846,6 +4848,8 @@ struct ConfigInfo image_config[] =
   { "font.level_number.y",			"350"			},
   { "font.level_number.width",			"10"			},
   { "font.level_number.height",			"14"			},
+  { "font.level_number.active",			UNDEFINED_FILENAME	},
+  { "font.level_number.active.clone_from",	"font.level_number"	},
 
   { "font.tape_recorder",			"RocksFontSmall.pcx"	},
   { "font.tape_recorder.x",			"0"			},
@@ -4857,6 +4861,12 @@ struct ConfigInfo image_config[] =
   { "font.game_info.xpos",			"0"			},
   { "font.game_info.ypos",			"0"			},
   { "font.game_info.delay",			"10"			},
+
+  { "font.info.elements",			UNDEFINED_FILENAME	},
+  { "font.info.elements.clone_from",		"font.level_number"	},
+
+  { "font.info.levelset",			UNDEFINED_FILENAME	},
+  { "font.info.levelset.clone_from",		"font.level_number"	},
 
   { "global.border",				"RocksScreen.pcx"	},
   { "global.door",				"RocksDoor.pcx"		},
@@ -5105,32 +5115,52 @@ struct ConfigInfo image_config[] =
   { "door_2.step_delay",			"10"			},
   { "door_2.anim_mode",				"default"		},
 
+#if 1
+  { "game.panel.level.x",			"51"			},
+  { "game.panel.level.y",			"20"			},
+  { "game.panel.level.align",			"center"		},
+  { "game.panel.level.digits",			"-1"			},
+  { "game.panel.gems.x",			"50"			},
+  { "game.panel.gems.y",			"54"			},
+  { "game.panel.gems.align",			"center"		},
+  { "game.panel.gems.digits",			"3"			},
+  { "game.panel.inventory.x",			"50"			},
+  { "game.panel.inventory.y",			"89"			},
+  { "game.panel.inventory.align",		"center"		},
+  { "game.panel.inventory.digits",		"3"			},
+  { "game.panel.keys.x",			"18"			},
+  { "game.panel.keys.y",			"123"			},
+  { "game.panel.score.x",			"50"			},
+  { "game.panel.score.y",			"159"			},
+  { "game.panel.score.align",			"center"		},
+  { "game.panel.score.digits",			"5"			},
+  { "game.panel.time.x",			"50"			},
+  { "game.panel.time.y",			"194"			},
+  { "game.panel.time.align",			"center"		},
+  { "game.panel.time.digits",			"-1"			},
+#else
   { "game.panel.level.x",			"37"			},
   { "game.panel.level.y",			"20"			},
-#if 0
-  { "game.panel.level.digits",			"2"			},
-#endif
+  { "game.panel.level.align",			"left"			},
+  { "game.panel.level.digits",			"-1"			},
   { "game.panel.gems.x",			"29"			},
   { "game.panel.gems.y",			"54"			},
-#if 0
-  { "game.panel.gems.digits",			"3"			},
-#endif
+  { "game.panel.gems.align",			"left"			},
+  { "game.panel.gems.digits",			"-1"			},
   { "game.panel.inventory.x",			"29"			},
   { "game.panel.inventory.y",			"89"			},
-#if 0
-  { "game.panel.inventory.digits",		"3"			},
-#endif
+  { "game.panel.inventory.align",		"left"			},
+  { "game.panel.inventory.digits",		"-1"			},
   { "game.panel.keys.x",			"18"			},
   { "game.panel.keys.y",			"123"			},
   { "game.panel.score.x",			"15"			},
   { "game.panel.score.y",			"159"			},
-#if 0
-  { "game.panel.score.digits",			"5"			},
-#endif
+  { "game.panel.score.align",			"left"			},
+  { "game.panel.score.digits",			"-1"			},
   { "game.panel.time.x",			"29"			},
   { "game.panel.time.y",			"194"			},
-#if 0
-  { "game.panel.time.digits",			"3"			},
+  { "game.panel.time.align",			"left"			},
+  { "game.panel.time.digits",			"-1"			},
 #endif
 
 #if 0
@@ -5138,10 +5168,16 @@ struct ConfigInfo image_config[] =
 
   { "game.panel.time_hh.x",			"-1"			},
   { "game.panel.time_hh.y",			"-1"			},
+  { "game.panel.time_hh.align",			"left"			},
+  { "game.panel.time_hh.digits",		"-1"			},
   { "game.panel.time_mm.x",			"-1"			},
   { "game.panel.time_mm.y",			"-1"			},
+  { "game.panel.time_mm.align",			"left"			},
+  { "game.panel.time_mm.digits",		"-1"			},
   { "game.panel.time_ss.x",			"-1"			},
   { "game.panel.time_ss.y",			"-1"			},
+  { "game.panel.time_ss.align",			"left"			},
+  { "game.panel.time_ss.digits",		"-1"			},
 
   { "game.panel.drop_next_1.x",			"-1"			},
   { "game.panel.drop_next_1.y",			"-1"			},
@@ -5179,18 +5215,21 @@ struct ConfigInfo image_config[] =
   { "game.panel.key_white.y",			"-1"			},
   { "game.panel.num_white_keys.x",		"-1"			},
   { "game.panel.num_white_keys.y",		"-1"			},
+  { "game.panel.num_white_keys.align",		"left"			},
   { "game.panel.num_white_keys.digits",		"-1"			},
 
   { "game.panel.shield_normal.x",		"-1"			},
   { "game.panel.shield_normal.y",		"-1"			},
   { "game.panel.shield_normal_time.x",		"-1"			},
-  { "game.panel.shield_normal.time.y",		"-1"			},
-  { "game.panel.shield_normal.time.digits",	"-1"			},
+  { "game.panel.shield_normal_time.y",		"-1"			},
+  { "game.panel.shield_normal_time.align",	"left"			},
+  { "game.panel.shield_normal_time.digits",	"-1"			},
   { "game.panel.shield_deadly.x",		"-1"			},
   { "game.panel.shield_deadly.y",		"-1"			},
   { "game.panel.shield_deadly_time.x",		"-1"			},
-  { "game.panel.shield_deadly.time.y",		"-1"			},
-  { "game.panel.shield_deadly.time.digits",	"-1"			},
+  { "game.panel.shield_deadly_time.y",		"-1"			},
+  { "game.panel.shield_deadly_time.align",	"left"			},
+  { "game.panel.shield_deadly_time.digits",	"-1"			},
 
   { "game.panel.exit.x",			"-1"			},
   { "game.panel.exit.y",			"-1"			},
@@ -5207,18 +5246,21 @@ struct ConfigInfo image_config[] =
   { "game.panel.emc_magic_ball.y",		"-1"			},
   { "game.panel.emc_magic_ball_time.x",		"-1"			},
   { "game.panel.emc_magic_ball_time.y",		"-1"			},
+  { "game.panel.emc_magic_ball_time.align",	"left"			},
   { "game.panel.emc_magic_ball_time.digits",	"-1"			},
 
   { "game.panel.light_switch.x",		"-1"			},
   { "game.panel.light_switch.y",		"-1"			},
   { "game.panel.light_switch_time.x",		"-1"			},
   { "game.panel.light_switch_time.y",		"-1"			},
+  { "game.panel.light_switch_time.align",	"left"			},
   { "game.panel.light_switch_time.digits",	"-1"			},
 
   { "game.panel.timegate_switch.x",		"-1"			},
   { "game.panel.timegate_switch.y",		"-1"			},
   { "game.panel.timegate_switch_time.x",	"-1"			},
   { "game.panel.timegate_switch_time.y",	"-1"			},
+  { "game.panel.timegate_switch_time.align",	"left"			},
   { "game.panel.timegate_switch_time.digits",	"-1"			},
 
   { "game.panel.switchgate_switch.x",		"-1"			},
@@ -5228,12 +5270,14 @@ struct ConfigInfo image_config[] =
   { "game.panel.emc_lenses.y",			"-1"			},
   { "game.panel.emc_lenses_time.x",		"-1"			},
   { "game.panel.emc_lenses_time.y",		"-1"			},
+  { "game.panel.emc_lenses_time.align",		"left"			},
   { "game.panel.emc_lenses_time.digits",	"-1"			},
 
   { "game.panel.emc_magnifier.x",		"-1"			},
   { "game.panel.emc_magnifier.y",		"-1"			},
   { "game.panel.emc_magnifier_time.x",		"-1"			},
   { "game.panel.emc_magnifier_time.y",		"-1"			},
+  { "game.panel.emc_magnifier_time.align",	"left"			},
   { "game.panel.emc_magnifier_time.digits",	"-1"			},
 
   { "game.panel.balloon_switch.x",		"-1"			},
@@ -5241,22 +5285,27 @@ struct ConfigInfo image_config[] =
 
   { "game.panel.dynabomb_number.x",		"-1"			},
   { "game.panel.dynabomb_number.y",		"-1"			},
+  { "game.panel.dynabomb_number.align",		"left"			},
   { "game.panel.dynabomb_number.digits",	"-1"			},
   { "game.panel.dynabomb_size.x",		"-1"			},
   { "game.panel.dynabomb_size.y",		"-1"			},
+  { "game.panel.dynabomb_size.align",		"left"			},
   { "game.panel.dynabomb_size.digits",		"-1"			},
   { "game.panel.dynabomb_power.x",		"-1"			},
   { "game.panel.dynabomb_power.y",		"-1"			},
 
   { "game.panel.penguins.x",			"-1"			},
   { "game.panel.penguins.y",			"-1"			},
+  { "game.panel.penguins.align",		"left"			},
   { "game.panel.penguins.digits",		"-1"			},
 
   { "game.panel.sokoban_objects.x",		"-1"			},
   { "game.panel.sokoban_objects.y",		"-1"			},
+  { "game.panel.sokoban_objects.align",		"left"			},
   { "game.panel.sokoban_objects.digits",	"-1"			},
   { "game.panel.sokoban_fields.x",		"-1"			},
   { "game.panel.sokoban_fields.y",		"-1"			},
+  { "game.panel.sokoban_fields.align",		"left"			},
   { "game.panel.sokoban_fields.digits",		"-1"			},
 
   { "game.panel.robot_wheel.x",			"-1"			},
@@ -5283,6 +5332,7 @@ struct ConfigInfo image_config[] =
   { "game.panel.magic_wall.y",			"-1"			},
   { "game.panel.magic_wall_time.x",		"-1"			},
   { "game.panel.magic_wall_time.y",		"-1"			},
+  { "game.panel.magic_wall_time.align",		"left"			},
   { "game.panel.magic_wall_time.digits",	"-1"			},
   { "game.panel.bd_magic_wall.x",		"-1"			},
   { "game.panel.bd_magic_wall.y",		"-1"			},
@@ -5291,11 +5341,17 @@ struct ConfigInfo image_config[] =
 
   { "game.panel.player_name.x",			"-1"			},
   { "game.panel.player_name.y",			"-1"			},
+  { "game.panel.player_name.align",		"left"			},
+  { "game.panel.player_name.chars",		"-1"			},
 
   { "game.panel.level_name.x",			"-1"			},
   { "game.panel.level_name.y",			"-1"			},
+  { "game.panel.level_name.align",		"left"			},
+  { "game.panel.level_name.chars",		"-1"			},
   { "game.panel.level_author.x",		"-1"			},
   { "game.panel.level_author.y",		"-1"			},
+  { "game.panel.level_author.align",		"left"			},
+  { "game.panel.level_author.chars",		"-1"			},
 
   { "game.panel.stop.x",			"-1"			},
   { "game.panel.stop.y",			"-1"			},

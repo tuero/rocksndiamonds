@@ -86,26 +86,31 @@
 #define EX_TYPE_SINGLE_TILE	(EX_TYPE_CENTER | EX_TYPE_BORDER)
 
 #define	PANEL_DEACTIVATED(p)	((p).x < 0 || (p).y < 0)
+#define PANEL_XPOS(p)		(ALIGNED_XPOS((p).x, (p).width, (p).align))
+#define PANEL_YPOS(p)		((p).y)
 
 /* special positions in the game control window (relative to control window) */
-#define XX_LEVEL1		(game.panel.level.x)
-#define XX_LEVEL2		(game.panel.level.x - 1)
-#define YY_LEVEL		(game.panel.level.y)
-#define XX_EMERALDS		(game.panel.gems.x)
-#define YY_EMERALDS		(game.panel.gems.y)
-#define XX_DYNAMITE		(game.panel.inventory.x)
-#define YY_DYNAMITE		(game.panel.inventory.y)
-#define XX_KEYS			(game.panel.keys.x)
-#define YY_KEYS			(game.panel.keys.y)
-#define XX_SCORE		(game.panel.score.x)
-#define YY_SCORE		(game.panel.score.y)
-#define XX_TIME1		(game.panel.time.x)
-#define XX_TIME2		(game.panel.time.x + 1)
-#define YY_TIME			(game.panel.time.y)
+#define XX_LEVEL1		(PANEL_XPOS(game.panel.level))
+#define XX_LEVEL2		(PANEL_XPOS(game.panel.level) - 1)
+#define XX_LEVEL		(PANEL_XPOS(game.panel.level))
+#define YY_LEVEL		(PANEL_YPOS(game.panel.level))
+#define XX_EMERALDS		(PANEL_XPOS(game.panel.gems))
+#define YY_EMERALDS		(PANEL_YPOS(game.panel.gems))
+#define XX_DYNAMITE		(PANEL_XPOS(game.panel.inventory))
+#define YY_DYNAMITE		(PANEL_YPOS(game.panel.inventory))
+#define XX_KEYS			(PANEL_XPOS(game.panel.keys))
+#define YY_KEYS			(PANEL_YPOS(game.panel.keys))
+#define XX_SCORE		(PANEL_XPOS(game.panel.score))
+#define YY_SCORE		(PANEL_YPOS(game.panel.score))
+#define XX_TIME1		(PANEL_XPOS(game.panel.time))
+#define XX_TIME2		(PANEL_XPOS(game.panel.time) + 1)
+#define XX_TIME			(PANEL_XPOS(game.panel.time))
+#define YY_TIME			(PANEL_YPOS(game.panel.time))
 
 /* special positions in the game control window (relative to main window) */
 #define DX_LEVEL1		(DX + XX_LEVEL1)
 #define DX_LEVEL2		(DX + XX_LEVEL2)
+#define DX_LEVEL		(DX + XX_LEVEL)
 #define DY_LEVEL		(DY + YY_LEVEL)
 #define DX_EMERALDS		(DX + XX_EMERALDS)
 #define DY_EMERALDS		(DY + YY_EMERALDS)
@@ -117,6 +122,7 @@
 #define DY_SCORE		(DY + YY_SCORE)
 #define DX_TIME1		(DX + XX_TIME1)
 #define DX_TIME2		(DX + XX_TIME2)
+#define DX_TIME			(DX + XX_TIME)
 #define DY_TIME			(DY + YY_TIME)
 
 /* values for delayed check of falling and moving elements and for collision */
@@ -1317,24 +1323,36 @@ static inline void InitField_WithBug2(int x, int y, boolean init_game)
   */
 }
 
+#if 1
+
 inline void DrawGameValue_Emeralds(int value)
 {
-  int xpos = (3 * 14 - 3 * getFontWidth(FONT_TEXT_2)) / 2;
+  int font_nr = FONT_TEXT_2;
+  int font_width = getFontWidth(font_nr);
+  int xpos = (3 * 14 - 3 * font_width) / 2;
 
   if (PANEL_DEACTIVATED(game.panel.gems))
     return;
 
-  DrawText(DX_EMERALDS + xpos, DY_EMERALDS, int2str(value, 3), FONT_TEXT_2);
+  game.panel.gems.width = game.panel.gems.chars * font_width;
+  xpos = 0;
+
+  DrawText(DX_EMERALDS + xpos, DY_EMERALDS, int2str(value, 3), font_nr);
 }
 
 inline void DrawGameValue_Dynamite(int value)
 {
-  int xpos = (3 * 14 - 3 * getFontWidth(FONT_TEXT_2)) / 2;
+  int font_nr = FONT_TEXT_2;
+  int font_width = getFontWidth(font_nr);
+  int xpos = (3 * 14 - 3 * font_width) / 2;
 
   if (PANEL_DEACTIVATED(game.panel.inventory))
     return;
 
-  DrawText(DX_DYNAMITE + xpos, DY_DYNAMITE, int2str(value, 3), FONT_TEXT_2);
+  game.panel.inventory.width = game.panel.inventory.chars * font_width;
+  xpos = 0;
+
+  DrawText(DX_DYNAMITE + xpos, DY_DYNAMITE, int2str(value, 3), font_nr);
 }
 
 inline void DrawGameValue_Keys(int key[MAX_NUM_KEYS])
@@ -1364,18 +1382,158 @@ inline void DrawGameValue_Keys(int key[MAX_NUM_KEYS])
 
 inline void DrawGameValue_Score(int value)
 {
-  int xpos = (5 * 14 - 5 * getFontWidth(FONT_TEXT_2)) / 2;
+  int font_nr = FONT_TEXT_2;
+  int font_width = getFontWidth(font_nr);
+  int xpos = (5 * 14 - 5 * font_width) / 2;
 
   if (PANEL_DEACTIVATED(game.panel.score))
     return;
 
-  DrawText(DX_SCORE + xpos, DY_SCORE, int2str(value, 5), FONT_TEXT_2);
+  game.panel.score.width = game.panel.score.chars * font_width;
+  xpos = 0;
+
+  DrawText(DX_SCORE + xpos, DY_SCORE, int2str(value, 5), font_nr);
 }
 
 inline void DrawGameValue_Time(int value)
 {
-  int xpos3 = (3 * 14 - 3 * getFontWidth(FONT_TEXT_2)) / 2;
-  int xpos4 = (4 * 10 - 4 * getFontWidth(FONT_LEVEL_NUMBER)) / 2;
+  static int last_value = -1;
+  int num_digits1 = 3;
+  int num_digits2 = 4;
+  int num_digits = game.panel.time.chars;
+  int font1_nr = FONT_TEXT_2;
+  int font2_nr = FONT_TEXT_1;
+  int font_nr = font1_nr;
+  int font1_width = getFontWidth(font1_nr);
+  int font2_width = getFontWidth(font2_nr);
+  int xpos3 = (3 * 14 - 3 * font1_width) / 2;
+  int xpos4 = (4 * 10 - 4 * font2_width) / 2;
+
+  if (PANEL_DEACTIVATED(game.panel.time))
+    return;
+
+  if (num_digits == -1)			/* use dynamic number of digits */
+  {
+    num_digits = (value < 1000 ? num_digits1 : num_digits2);
+    font_nr    = (value < 1000 ? font1_nr : font2_nr);
+  }
+
+  xpos3 = 0;
+  xpos4 = 0;
+
+  /* clear background if value just changed its size (dynamic digits only) */
+  if (game.panel.time.chars == -1 && (last_value < 1000) != (value < 1000))
+  {
+    int width1 = num_digits1 * getFontWidth(font1_nr);
+    int width2 = num_digits2 * getFontWidth(font2_nr);
+    int max_width = MAX(width1, width2);
+    int max_height = MAX(getFontHeight(font1_nr), getFontHeight(font2_nr));
+
+    game.panel.time.width = max_width;
+
+    ClearRectangleOnBackground(drawto, DX_TIME, DY_TIME, max_width, max_height);
+  }
+
+  game.panel.time.width = num_digits * getFontWidth(font_nr);
+
+  DrawText(DX_TIME, DY_TIME, int2str(value, num_digits), font_nr);
+
+  last_value = value;
+}
+
+inline void DrawGameValue_Level(int value)
+{
+  int num_digits1 = 2;
+  int num_digits2 = 3;
+  int num_digits = game.panel.level.chars;
+  int font1_nr = FONT_TEXT_2;
+  int font2_nr = FONT_TEXT_1;
+  int font_nr = font1_nr;
+
+  if (PANEL_DEACTIVATED(game.panel.level))
+    return;
+
+  if (num_digits == -1)			/* use dynamic number of digits */
+  {
+    num_digits = (level_nr < 100 ? num_digits1 : num_digits2);
+    font_nr    = (level_nr < 100 ? font1_nr : font2_nr);
+  }
+
+  game.panel.level.width = num_digits * getFontWidth(font_nr);
+
+  DrawText(DX_LEVEL, DY_LEVEL, int2str(value, num_digits), font_nr);
+}
+
+#else
+
+inline void DrawGameValue_Emeralds(int value)
+{
+  int font_nr = FONT_TEXT_2;
+  int xpos = (3 * 14 - 3 * getFontWidth(font_nr)) / 2;
+
+  if (PANEL_DEACTIVATED(game.panel.gems))
+    return;
+
+  DrawText(DX_EMERALDS + xpos, DY_EMERALDS, int2str(value, 3), font_nr);
+}
+
+inline void DrawGameValue_Dynamite(int value)
+{
+  int font_nr = FONT_TEXT_2;
+  int xpos = (3 * 14 - 3 * getFontWidth(font_nr)) / 2;
+
+  if (PANEL_DEACTIVATED(game.panel.inventory))
+    return;
+
+  DrawText(DX_DYNAMITE + xpos, DY_DYNAMITE, int2str(value, 3), font_nr);
+}
+
+inline void DrawGameValue_Keys(int key[MAX_NUM_KEYS])
+{
+  int base_key_graphic = EL_KEY_1;
+  int i;
+
+  if (PANEL_DEACTIVATED(game.panel.keys))
+    return;
+
+  if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
+    base_key_graphic = EL_EM_KEY_1;
+
+  /* currently only 4 of 8 possible keys are displayed */
+  for (i = 0; i < STD_NUM_KEYS; i++)
+  {
+    int x = XX_KEYS + i * MINI_TILEX;
+    int y = YY_KEYS;
+
+    if (key[i])
+      DrawMiniGraphicExt(drawto, DX + x,DY + y, el2edimg(base_key_graphic + i));
+    else
+      BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
+		 DOOR_GFX_PAGEX5 + x, y, MINI_TILEX, MINI_TILEY, DX + x,DY + y);
+  }
+}
+
+inline void DrawGameValue_Score(int value)
+{
+  int font_nr = FONT_TEXT_2;
+  int xpos = (5 * 14 - 5 * getFontWidth(font_nr)) / 2;
+
+  if (PANEL_DEACTIVATED(game.panel.score))
+    return;
+
+  DrawText(DX_SCORE + xpos, DY_SCORE, int2str(value, 5), font_nr);
+}
+
+inline void DrawGameValue_Time(int value)
+{
+  int font1_nr = FONT_TEXT_2;
+#if 1
+  int font2_nr = FONT_TEXT_1;
+#else
+  int font2_nr = FONT_LEVEL_NUMBER;
+#endif
+  int xpos3 = (3 * 14 - 3 * getFontWidth(font1_nr)) / 2;
+  int xpos4 = (4 * 10 - 4 * getFontWidth(font2_nr)) / 2;
 
   if (PANEL_DEACTIVATED(game.panel.time))
     return;
@@ -1385,21 +1543,30 @@ inline void DrawGameValue_Time(int value)
     ClearRectangleOnBackground(drawto, DX_TIME1, DY_TIME, 14 * 3, 14);
 
   if (value < 1000)
-    DrawText(DX_TIME1 + xpos3, DY_TIME, int2str(value, 3), FONT_TEXT_2);
+    DrawText(DX_TIME1 + xpos3, DY_TIME, int2str(value, 3), font1_nr);
   else
-    DrawText(DX_TIME2 + xpos4, DY_TIME, int2str(value, 4), FONT_LEVEL_NUMBER);
+    DrawText(DX_TIME2 + xpos4, DY_TIME, int2str(value, 4), font2_nr);
 }
 
 inline void DrawGameValue_Level(int value)
 {
+  int font1_nr = FONT_TEXT_2;
+#if 1
+  int font2_nr = FONT_TEXT_1;
+#else
+  int font2_nr = FONT_LEVEL_NUMBER;
+#endif
+
   if (PANEL_DEACTIVATED(game.panel.level))
     return;
 
   if (level_nr < 100)
-    DrawText(DX_LEVEL1, DY_LEVEL, int2str(value, 2), FONT_TEXT_2);
+    DrawText(DX_LEVEL1, DY_LEVEL, int2str(value, 2), font1_nr);
   else
-    DrawText(DX_LEVEL2, DY_LEVEL, int2str(value, 3), FONT_LEVEL_NUMBER);
+    DrawText(DX_LEVEL2, DY_LEVEL, int2str(value, 3), font2_nr);
 }
+
+#endif
 
 void DrawAllGameValues(int emeralds, int dynamite, int score, int time,
 		       int key_bits)

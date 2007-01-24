@@ -5323,8 +5323,11 @@ static void CreateCounterButtons()
 	if (i == ED_COUNTER_ID_SELECT_LEVEL)
 	{
 	  font_type = FONT_LEVEL_NUMBER;
+#if 1
+	  font_type_active = FONT_LEVEL_NUMBER_ACTIVE;
+#else
 	  font_type_active = FONT_LEVEL_NUMBER;
-
+#endif
 	  x += 2 * ED_GADGET_DISTANCE;
 	  y -= ED_GADGET_DISTANCE;
 

@@ -1849,7 +1849,11 @@ static char *getHelpText(int element, int action, int direction)
 
 void DrawInfoScreen_HelpText(int element, int action, int direction, int ypos)
 {
+#if 1
+  int font_nr = FONT_INFO_ELEMENTS;
+#else
   int font_nr = FONT_LEVEL_NUMBER;
+#endif
   int font_width = getFontWidth(font_nr);
   int sx = mSX + MINI_TILEX + TILEX + MINI_TILEX;
   int sy = mSY + 65 + 2 * 32 + 1;
@@ -2452,7 +2456,11 @@ void DrawInfoScreen_LevelSet()
   int ystart = 150;
   int ybottom = SYSIZE - 20;
   char *filename = getLevelSetInfoFilename();
+#if 1
+  int font_nr = FONT_INFO_LEVELSET;
+#else
   int font_nr = FONT_LEVEL_NUMBER;
+#endif
   int font_width = getFontWidth(font_nr);
   int font_height = getFontHeight(font_nr);
   int pad_x = 32;

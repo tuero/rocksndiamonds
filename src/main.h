@@ -1820,8 +1820,10 @@
 #define FONT_LEVEL_NUMBER		32
 #define FONT_TAPE_RECORDER		33
 #define FONT_GAME_INFO			34
+#define FONT_INFO_ELEMENTS		35
+#define FONT_INFO_LEVELSET		36
 
-#define NUM_FONTS			35
+#define NUM_FONTS			37
 #define NUM_INITIAL_FONTS		4
 
 #define FONT_ACTIVE(f)							  \
@@ -1963,12 +1965,14 @@ struct BorderInfo
   int draw_masked[NUM_SPECIAL_GFX_ARGS];
 };
 
+#if 0
 struct MenuPosInfo
 {
   int x, y;
   int width, height;
   int align;
 };
+#endif
 
 struct MenuMainButtonInfo
 {
