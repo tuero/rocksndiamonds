@@ -251,7 +251,7 @@ conf_mus.h: conf_mus.c
 	@$(MAKE) auto-conf
 
 $(TIMESTAMP_FILE): $(SRCS) $(LIBGAME) $(GAME_EM)
-	@date '+"[%Y-%m-%d %H:%M]"' \
+	@date '+"%Y-%m-%d %H:%M"' \
 	| sed -e 's/^/#define COMPILE_DATE_STRING /' \
 	> $(TIMESTAMP_FILE)
 

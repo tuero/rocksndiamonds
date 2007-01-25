@@ -1718,9 +1718,10 @@
 #define GFX_SPECIAL_ARG_INFO_MUSIC	3
 #define GFX_SPECIAL_ARG_INFO_CREDITS	4
 #define GFX_SPECIAL_ARG_INFO_PROGRAM	5
-#define GFX_SPECIAL_ARG_INFO_LEVELSET	6
+#define GFX_SPECIAL_ARG_INFO_VERSION	6
+#define GFX_SPECIAL_ARG_INFO_LEVELSET	7
 
-#define NUM_SPECIAL_GFX_INFO_ARGS	7
+#define NUM_SPECIAL_GFX_INFO_ARGS	8
 
 
 /* values for image configuration suffixes */
@@ -2558,6 +2559,7 @@ struct HelpAnimInfo
 
 extern Bitmap		       *bitmap_db_cross;
 extern Bitmap		       *bitmap_db_field;
+extern Bitmap		       *bitmap_db_field2;
 extern Bitmap		       *bitmap_db_panel;
 extern Bitmap		       *bitmap_db_door;
 extern Pixmap			tile_clipmask[];

@@ -23,6 +23,7 @@
 #include "cartoons.h"
 #include "network.h"
 #include "init.h"
+#include "config.h"
 
 /* screens in the setup menu */
 #define SETUP_MODE_MAIN			0
@@ -54,9 +55,10 @@
 #define INFO_MODE_MUSIC			3
 #define INFO_MODE_CREDITS		4
 #define INFO_MODE_PROGRAM		5
-#define INFO_MODE_LEVELSET		6
+#define INFO_MODE_VERSION		6
+#define INFO_MODE_LEVELSET		7
 
-#define MAX_INFO_MODES			7
+#define MAX_INFO_MODES			8
 
 /* for various menu stuff  */
 #define MENU_SCREEN_START_XPOS		1
@@ -153,6 +155,7 @@ static void HandleInfoScreen_Elements(int);
 static void HandleInfoScreen_Music(int);
 static void HandleInfoScreen_Credits(int);
 static void HandleInfoScreen_Program(int);
+static void HandleInfoScreen_Version(int);
 
 static void MapScreenMenuGadgets(int);
 static void MapScreenTreeGadgets(TreeInfo *);
@@ -809,7 +812,7 @@ void DrawMainMenuExt(int redraw_mask, boolean do_fading)
   /* needed if last screen (level choice) changed graphics, sounds or music */
   ReloadCustomArtwork(0);
 
-#ifdef TARGET_SDL
+#if defined(TARGET_SDL)
   SetDrawtoField(DRAW_BACKBUFFER);
 #endif
 
@@ -1506,6 +1509,12 @@ static void execInfoProgram()
   DrawInfoScreen();
 }
 
+static void execInfoVersion()
+{
+  info_mode = INFO_MODE_VERSION;
+  DrawInfoScreen();
+}
+
 static void execInfoLevelSet()
 {
   info_mode = INFO_MODE_LEVELSET;
@@ -1525,6 +1534,7 @@ static struct TokenInfo info_info_main[] =
   { TYPE_ENTER_SCREEN,	execInfoMusic,		"Music Info"		},
   { TYPE_ENTER_SCREEN,	execInfoCredits,	"Credits"		},
   { TYPE_ENTER_SCREEN,	execInfoProgram,	"Program Info"		},
+  { TYPE_ENTER_SCREEN,	execInfoVersion,	"Version Info"		},
   { TYPE_ENTER_SCREEN,	execInfoLevelSet,	"Level Set Info"	},
   { TYPE_EMPTY,		NULL,			""			},
   { TYPE_LEAVE_MENU,	execExitInfo, 		"Exit"			},
@@ -2451,6 +2461,144 @@ void HandleInfoScreen_Program(int button)
   }
 }
 
+void DrawInfoScreen_Version()
+{
+  int font_header = FONT_TEXT_3;
+  int font_text = FONT_TEXT_2;
+  int xstep = getFontWidth(font_text);
+  int ystep = getFontHeight(font_text);
+  int xstart1 = SX + 2 * xstep;
+  int xstart2 = SX + 18 * xstep;
+  int xstart3 = SX + 28 * xstep;
+  int ystart = 150;
+  int ybottom = SYSIZE - 20;
+#if defined(TARGET_SDL)
+  SDL_version sdl_version_compiled;
+  const SDL_version *sdl_version_linked;
+#endif
+
+  SetMainBackgroundImageIfDefined(IMG_BACKGROUND_INFO_PROGRAM);
+
+  FadeOut(REDRAW_FIELD);
+
+  ClearWindow();
+  DrawHeadline();
+
+  DrawTextSCentered(100, FONT_TEXT_1, "Version Information:");
+
+  DrawTextF(xstart1, ystart, font_header, "Name");
+  DrawTextF(xstart2, ystart, font_text, PROGRAM_TITLE_STRING);
+
+  ystart += ystep;
+  DrawTextF(xstart1, ystart, font_header, "Version");
+  DrawTextF(xstart2, ystart, font_text, getProgramFullVersionString());
+
+  ystart += ystep;
+  DrawTextF(xstart1, ystart, font_header, "Platform");
+  DrawTextF(xstart2, ystart, font_text, PLATFORM_STRING);
+
+  ystart += ystep;
+  DrawTextF(xstart1, ystart, font_header, "Target");
+  DrawTextF(xstart2, ystart, font_text, TARGET_STRING);
+
+  ystart += ystep;
+  DrawTextF(xstart1, ystart, font_header, "Compile time");
+  DrawTextF(xstart2, ystart, font_text, getCompileDateString());
+
+#if defined(TARGET_SDL)
+  ystart += 3 * ystep;
+  DrawTextF(xstart1, ystart, font_header, "Library");
+  DrawTextF(xstart2, ystart, font_header, "compiled");
+  DrawTextF(xstart3, ystart, font_header, "linked");
+
+  SDL_VERSION(&sdl_version_compiled);
+  sdl_version_linked = SDL_Linked_Version();
+
+  ystart += 2 * ystep;
+  DrawTextF(xstart1, ystart, font_text, "SDL");
+  DrawTextF(xstart2, ystart, font_text, "%d.%d.%d",
+	    sdl_version_compiled.major,
+	    sdl_version_compiled.minor,
+	    sdl_version_compiled.patch);
+  DrawTextF(xstart3, ystart, font_text, "%d.%d.%d",
+	    sdl_version_linked->major,
+	    sdl_version_linked->minor,
+	    sdl_version_linked->patch);
+
+  SDL_IMAGE_VERSION(&sdl_version_compiled);
+#if 0
+  sdl_version_linked = IMG_Linked_Version();
+#else
+#endif
+
+  ystart += ystep;
+  DrawTextF(xstart1, ystart, font_text, "SDL_image");
+  DrawTextF(xstart2, ystart, font_text, "%d.%d.%d",
+	    sdl_version_compiled.major,
+	    sdl_version_compiled.minor,
+	    sdl_version_compiled.patch);
+#if 0
+  DrawTextF(xstart3, ystart, font_text, "%d.%d.%d",
+	    sdl_version_linked->major,
+	    sdl_version_linked->minor,
+	    sdl_version_linked->patch);
+#else
+  DrawTextF(xstart3, ystart, font_text, "?.?.?");
+#endif
+
+  SDL_MIXER_VERSION(&sdl_version_compiled);
+  sdl_version_linked = Mix_Linked_Version();
+
+  ystart += ystep;
+  DrawTextF(xstart1, ystart, font_text, "SDL_mixer");
+  DrawTextF(xstart2, ystart, font_text, "%d.%d.%d",
+	    sdl_version_compiled.major,
+	    sdl_version_compiled.minor,
+	    sdl_version_compiled.patch);
+  DrawTextF(xstart3, ystart, font_text, "%d.%d.%d",
+	    sdl_version_linked->major,
+	    sdl_version_linked->minor,
+	    sdl_version_linked->patch);
+
+  ystart += ystep;
+  DrawTextF(xstart1, ystart, font_text, "SDL_net");
+  DrawTextF(xstart2, ystart, font_text, "?.?.?");
+  DrawTextF(xstart3, ystart, font_text, "?.?.?");
+#endif
+
+  DrawTextSCentered(ybottom, FONT_TEXT_4,
+		    "Press any key or button for info menu");
+
+  FadeIn(REDRAW_FIELD);
+}
+
+void HandleInfoScreen_Version(int button)
+{
+  if (button == MB_MENU_LEAVE)
+  {
+    PlaySound(SND_MENU_ITEM_SELECTING);
+
+    info_mode = INFO_MODE_MAIN;
+    DrawInfoScreen();
+
+    return;
+  }
+  else if (button == MB_MENU_CHOICE)
+  {
+    PlaySound(SND_MENU_ITEM_SELECTING);
+
+    FadeSoundsAndMusic();
+    FadeOut(REDRAW_FIELD);
+
+    info_mode = INFO_MODE_MAIN;
+    DrawAndFadeInInfoScreen(REDRAW_FIELD);
+  }
+  else
+  {
+    PlayMenuSoundIfLoop();
+  }
+}
+
 void DrawInfoScreen_LevelSet()
 {
   int ystart = 150;
@@ -2533,6 +2681,8 @@ static void DrawInfoScreenExt(int redraw_mask, boolean do_fading)
     DrawInfoScreen_Credits();
   else if (info_mode == INFO_MODE_PROGRAM)
     DrawInfoScreen_Program();
+  else if (info_mode == INFO_MODE_VERSION)
+    DrawInfoScreen_Version();
   else if (info_mode == INFO_MODE_LEVELSET)
     DrawInfoScreen_LevelSet();
   else
@@ -2569,6 +2719,8 @@ void HandleInfoScreen(int mx, int my, int dx, int dy, int button)
     HandleInfoScreen_Credits(button);
   else if (info_mode == INFO_MODE_PROGRAM)
     HandleInfoScreen_Program(button);
+  else if (info_mode == INFO_MODE_VERSION)
+    HandleInfoScreen_Version(button);
   else if (info_mode == INFO_MODE_LEVELSET)
     HandleInfoScreen_LevelSet(button);
   else

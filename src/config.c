@@ -17,20 +17,39 @@
 #include "conftime.h"
 
 
-char *getProgramVersionString()
+char *getCompileDateString()
+{
+  return COMPILE_DATE_STRING;
+}
+
+char *getProgramReleaseVersionString()
 {
   static char program_version_string[32];
 
-#ifdef DEBUG
+  sprintf(program_version_string, "%d.%d.%d",
+	  PROGRAM_VERSION_MAJOR, PROGRAM_VERSION_MINOR, PROGRAM_VERSION_PATCH);
+
+  return program_version_string;
+}
+
+char *getProgramFullVersionString()
+{
+  static char program_version_string[32];
+
   sprintf(program_version_string, "%d.%d.%d-%d",
 	  PROGRAM_VERSION_MAJOR, PROGRAM_VERSION_MINOR, PROGRAM_VERSION_PATCH,
 	  PROGRAM_VERSION_BUILD);
-#else
-  sprintf(program_version_string, "%d.%d.%d",
-	  PROGRAM_VERSION_MAJOR, PROGRAM_VERSION_MINOR, PROGRAM_VERSION_PATCH);
-#endif
 
   return program_version_string;
+}
+
+char *getProgramVersionString()
+{
+#ifdef DEBUG
+  return getProgramFullVersionString();
+#else
+  return getProgramReleaseVersionString();
+#endif
 }
 
 char *getProgramInitString()
@@ -58,10 +77,10 @@ char *getWindowTitleString()
   if (window_title_string == NULL)
   {
     window_title_string = checked_malloc(strlen(getProgramInitString()) + 1 +
-					 strlen(COMPILE_DATE_STRING) + 1);
+					 strlen(getCompileDateString()) + 2 +1);
 
-    sprintf(window_title_string, "%s %s",
-	    getProgramInitString(), COMPILE_DATE_STRING);
+    sprintf(window_title_string, "%s [%s]",
+	    getProgramInitString(), getCompileDateString());
   }
 
   return window_title_string;

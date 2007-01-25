@@ -22,6 +22,7 @@
 
 Bitmap		       *bitmap_db_cross;
 Bitmap		       *bitmap_db_field;
+Bitmap		       *bitmap_db_field2;
 Bitmap		       *bitmap_db_panel;
 Bitmap		       *bitmap_db_door;
 DrawBuffer	       *fieldbuffer;
@@ -5428,6 +5429,10 @@ struct TokenIntPtrInfo image_config_vars[] =
     &menu.draw_xoffset_info[GFX_SPECIAL_ARG_INFO_PROGRAM]		      },
   { "menu.draw_yoffset.INFO[PROGRAM]",
     &menu.draw_yoffset_info[GFX_SPECIAL_ARG_INFO_PROGRAM]		      },
+  { "menu.draw_xoffset.INFO[VERSION]",
+    &menu.draw_xoffset_info[GFX_SPECIAL_ARG_INFO_VERSION]		      },
+  { "menu.draw_yoffset.INFO[VERSION]",
+    &menu.draw_yoffset_info[GFX_SPECIAL_ARG_INFO_VERSION]		      },
   { "menu.draw_xoffset.INFO[LEVELSET]",
     &menu.draw_xoffset_info[GFX_SPECIAL_ARG_INFO_LEVELSET]		      },
   { "menu.draw_yoffset.INFO[LEVELSET]",
