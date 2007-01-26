@@ -22,7 +22,6 @@
 
 Bitmap		       *bitmap_db_cross;
 Bitmap		       *bitmap_db_field;
-Bitmap		       *bitmap_db_field2;
 Bitmap		       *bitmap_db_panel;
 Bitmap		       *bitmap_db_door;
 DrawBuffer	       *fieldbuffer;

@@ -10565,8 +10565,32 @@ static boolean AllPlayersInVisibleScreen()
 
 void ScrollLevel(int dx, int dy)
 {
+  int i, x, y;
+
+  /* only horizontal XOR vertical scroll direction allowed */
+  if ((dx == 0 && dy == 0) || (dx != 0 && dy != 0))
+    return;
+
+#if 1
+  int xsize = (BX2 - BX1 + 1);
+  int ysize = (BY2 - BY1 + 1);
+  int start = (dx != 0 ? (dx == -1 ? BX1 : BX2) : (dy == -1 ? BY1 : BY2));
+  int end   = (dx != 0 ? (dx == -1 ? BX2 : BX1) : (dy == -1 ? BY2 : BY1));
+  int step  = (start < end ? +1 : -1);
+
+  for (i = start; i != end; i += step)
+  {
+    BlitBitmap(drawto_field, drawto_field,
+	       FX + TILEX * (dx != 0 ? i + step : 0),
+	       FY + TILEY * (dy != 0 ? i + step : 0),
+	       TILEX * (dx != 0 ? 1 : xsize),
+	       TILEY * (dy != 0 ? 1 : ysize),
+	       FX + TILEX * (dx != 0 ? i : 0),
+	       FY + TILEY * (dy != 0 ? i : 0));
+  }
+#else
+
   int softscroll_offset = (setup.soft_scrolling ? TILEX : 0);
-  int x, y;
 
 #if 1
   BlitBitmap(drawto_field, bitmap_db_field2,
@@ -10592,15 +10616,16 @@ void ScrollLevel(int dx, int dy)
 	     FX + TILEX * (dx == 1) - softscroll_offset,
 	     FY + TILEY * (dy == 1) - softscroll_offset);
 #endif
+#endif
 
-  if (dx)
+  if (dx != 0)
   {
     x = (dx == 1 ? BX1 : BX2);
     for (y = BY1; y <= BY2; y++)
       DrawScreenField(x, y);
   }
 
-  if (dy)
+  if (dy != 0)
   {
     y = (dy == 1 ? BY1 : BY2);
     for (x = BX1; x <= BX2; x++)
