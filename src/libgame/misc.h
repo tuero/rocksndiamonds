@@ -158,6 +158,7 @@ char *getX11KeyNameFromKey(Key);
 Key getKeyFromKeyName(char *);
 Key getKeyFromX11KeyName(char *);
 char getCharFromKey(Key);
+char getValidConfigValueChar(char);
 
 int get_integer_from_string(char *);
 boolean get_boolean_from_string(char *);

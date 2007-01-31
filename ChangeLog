@@ -1,3 +1,11 @@
+2007-01-31
+	* fixed displaying and typing of player name when it is centered
+	* added special characters to be allowed for player name (not only A-Z)
+
+2007-01-25
+	* fixed blit in ScrollLevel() to same bitmap to not overlap anymore
+	  (newer versions of the SDL library seem to not like this anymore)
+
 2007-01-23
 	* added code for configuration directives for control of game panel
 

@@ -75,7 +75,7 @@ struct X11DrawableInfo
 {
   char *source_filename;
 
-  int width, height;
+  unsigned int width, height;
   Drawable drawable;
   Drawable clip_mask;
   GC gc;		/* GC for normal drawing (inheritated from 'window') */
@@ -198,6 +198,7 @@ struct MouseCursorInfo
 #define KSYM_braceright		XK_braceright
 #define KSYM_asciitilde		XK_asciitilde
 
+#define KSYM_degree		XK_degree
 #define KSYM_Adiaeresis		XK_Adiaeresis
 #define KSYM_Odiaeresis		XK_Odiaeresis
 #define KSYM_Udiaeresis		XK_Udiaeresis

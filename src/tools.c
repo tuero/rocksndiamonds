@@ -1778,7 +1778,7 @@ static void DrawPreviewLevelExt(int from_x, int from_y)
 #define MICROLABEL_IMPORTED_BY_HEAD	6
 #define MICROLABEL_IMPORTED_BY		7
 
-static int getMaxTextLength(struct MenuPosInfo *pos, int font_nr)
+static int getMaxTextLength(struct TextPosInfo *pos, int font_nr)
 {
   int max_text_width = SXSIZE;
   int font_width = getFontWidth(font_nr);
@@ -1795,7 +1795,7 @@ static int getMaxTextLength(struct MenuPosInfo *pos, int font_nr)
 
 static void DrawPreviewLevelLabelExt(int mode)
 {
-  struct MenuPosInfo *pos = &menu.main.text.level_info_2;
+  struct TextPosInfo *pos = &menu.main.text.level_info_2;
   char label_text[MAX_OUTPUT_LINESIZE + 1];
   int max_len_label_text;
   int font_nr = FONT_TEXT_2;
@@ -1810,6 +1810,11 @@ static void DrawPreviewLevelLabelExt(int mode)
   max_len_label_text = getMaxTextLength(pos, font_nr);
 #else
   max_len_label_text = SXSIZE / getFontWidth(font_nr);
+#endif
+
+#if 1
+  if (pos->chars != -1)
+    max_len_label_text = pos->chars;
 #endif
 
   for (i = 0; i < max_len_label_text; i++)
@@ -1898,7 +1903,7 @@ void DrawPreviewLevel(boolean restart)
 
     if (leveldir_current->name)
     {
-      struct MenuPosInfo *pos = &menu.main.text.level_info_1;
+      struct TextPosInfo *pos = &menu.main.text.level_info_1;
       char label_text[MAX_OUTPUT_LINESIZE + 1];
       int font_nr = FONT_TEXT_1;
 #if 1
@@ -1909,6 +1914,11 @@ void DrawPreviewLevel(boolean restart)
 #if 0
       int text_width;
       int lxpos, lypos;
+#endif
+
+#if 1
+      if (pos->chars != -1)
+	max_len_label_text = pos->chars;
 #endif
 
       strncpy(label_text, leveldir_current->name, max_len_label_text);

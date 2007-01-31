@@ -78,8 +78,8 @@ struct MouseCursorInfo
   int width, height;
   int hot_x, hot_y;
 
-  char data[CURSOR_MAX_WIDTH * CURSOR_MAX_HEIGHT / 8];
-  char mask[CURSOR_MAX_WIDTH * CURSOR_MAX_HEIGHT / 8];
+  byte data[CURSOR_MAX_WIDTH * CURSOR_MAX_HEIGHT / 8];
+  byte mask[CURSOR_MAX_WIDTH * CURSOR_MAX_HEIGHT / 8];
 };
 
 
@@ -187,6 +187,7 @@ struct MouseCursorInfo
 #define KSYM_braceright		KSYM_UNDEFINED		/* undefined */
 #define KSYM_asciitilde		KSYM_UNDEFINED		/* undefined */
 
+#define KSYM_degree		SDLK_WORLD_16
 #define KSYM_Adiaeresis		SDLK_WORLD_36
 #define KSYM_Odiaeresis		SDLK_WORLD_54
 #define KSYM_Udiaeresis		SDLK_WORLD_60

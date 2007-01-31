@@ -1992,23 +1992,23 @@ struct MenuMainButtonInfo
 
 struct MenuMainTextInfo
 {
-  struct MenuPosInfo name;
-  struct MenuPosInfo levels;
-  struct MenuPosInfo scores;
-  struct MenuPosInfo editor;
-  struct MenuPosInfo info;
-  struct MenuPosInfo game;
-  struct MenuPosInfo setup;
-  struct MenuPosInfo quit;
+  struct TextPosInfo name;
+  struct TextPosInfo levels;
+  struct TextPosInfo scores;
+  struct TextPosInfo editor;
+  struct TextPosInfo info;
+  struct TextPosInfo game;
+  struct TextPosInfo setup;
+  struct TextPosInfo quit;
 
-  struct MenuPosInfo current_level;
-  struct MenuPosInfo first_level;
-  struct MenuPosInfo last_level;
-  struct MenuPosInfo level_info_1;
-  struct MenuPosInfo level_info_2;
-  struct MenuPosInfo title_1;
-  struct MenuPosInfo title_2;
-  struct MenuPosInfo title_3;
+  struct TextPosInfo current_level;
+  struct TextPosInfo first_level;
+  struct TextPosInfo last_level;
+  struct TextPosInfo level_info_1;
+  struct TextPosInfo level_info_2;
+  struct TextPosInfo title_1;
+  struct TextPosInfo title_2;
+  struct TextPosInfo title_3;
 };
 
 struct MenuMainInputInfo

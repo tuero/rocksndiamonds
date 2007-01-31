@@ -10588,26 +10588,11 @@ void ScrollLevel(int dx, int dy)
 	       FX + TILEX * (dx != 0 ? i : 0),
 	       FY + TILEY * (dy != 0 ? i : 0));
   }
+
 #else
 
   int softscroll_offset = (setup.soft_scrolling ? TILEX : 0);
 
-#if 1
-  BlitBitmap(drawto_field, bitmap_db_field2,
-	     FX + TILEX * (dx == -1) - softscroll_offset,
-	     FY + TILEY * (dy == -1) - softscroll_offset,
-	     SXSIZE - TILEX * (dx != 0) + 2 * softscroll_offset,
-	     SYSIZE - TILEY * (dy != 0) + 2 * softscroll_offset,
-	     FX + TILEX * (dx == 1) - softscroll_offset,
-	     FY + TILEY * (dy == 1) - softscroll_offset);
-  BlitBitmap(bitmap_db_field2, drawto_field,
-	     FX + TILEX * (dx == 1) - softscroll_offset,
-	     FY + TILEY * (dy == 1) - softscroll_offset,
-	     SXSIZE - TILEX * (dx != 0) + 2 * softscroll_offset,
-	     SYSIZE - TILEY * (dy != 0) + 2 * softscroll_offset,
-	     FX + TILEX * (dx == 1) - softscroll_offset,
-	     FY + TILEY * (dy == 1) - softscroll_offset);
-#else
   BlitBitmap(drawto_field, drawto_field,
 	     FX + TILEX * (dx == -1) - softscroll_offset,
 	     FY + TILEY * (dy == -1) - softscroll_offset,
@@ -10615,7 +10600,6 @@ void ScrollLevel(int dx, int dy)
 	     SYSIZE - TILEY * (dy != 0) + 2 * softscroll_offset,
 	     FX + TILEX * (dx == 1) - softscroll_offset,
 	     FY + TILEY * (dy == 1) - softscroll_offset);
-#endif
 #endif
 
   if (dx != 0)

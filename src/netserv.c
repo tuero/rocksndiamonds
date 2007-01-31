@@ -662,7 +662,8 @@ void NetworkServer(int port, int serveronly)
 
     if (FD_ISSET(lfd, &fds))
     {
-      int newfd, slen;
+      int newfd;
+      socklen_t slen;
 
       slen = sizeof(saddr);
       newfd = accept(lfd, (struct sockaddr *)&saddr, &slen);

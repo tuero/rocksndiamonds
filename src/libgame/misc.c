@@ -1219,6 +1219,7 @@ void translate_keyname(Key *keysym, char **x11name, char **name, int mode)
     { KSYM_asciitilde,	"XK_asciitilde",	"~" },
 
     /* special (non-ASCII) keys */
+    { KSYM_degree,	"XK_degree",		"°" },
     { KSYM_Adiaeresis,	"XK_Adiaeresis",	"Ä" },
     { KSYM_Odiaeresis,	"XK_Odiaeresis",	"Ö" },
     { KSYM_Udiaeresis,	"XK_Udiaeresis",	"Ü" },
@@ -1447,16 +1448,23 @@ Key getKeyFromX11KeyName(char *x11name)
 char getCharFromKey(Key key)
 {
   char *keyname = getKeyNameFromKey(key);
-  char letter = 0;
+  char c = 0;
 
   if (strlen(keyname) == 1)
-    letter = keyname[0];
+    c = keyname[0];
   else if (strEqual(keyname, "space"))
-    letter = ' ';
-  else if (strEqual(keyname, "circumflex"))
-    letter = '^';
+    c = ' ';
 
-  return letter;
+  return c;
+}
+
+char getValidConfigValueChar(char c)
+{
+  if (c == '#' ||	/* used to mark comments */
+      c == '\\')	/* used to mark continued lines */
+    c = 0;
+
+  return c;
 }
 
 

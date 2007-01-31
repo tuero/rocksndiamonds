@@ -55,6 +55,7 @@ PLATFORM = unix
 endif
 
 ifeq ($(PLATFORM),macosx)
+EXTRA_LDFLAGS = -lstdc++
 PLATFORM = unix
 TARGET = sdl
 endif

@@ -238,7 +238,7 @@ struct MainControlInfo
   struct MenuPosInfo *pos_button;
   int button_graphic;
 
-  struct MenuPosInfo *pos_text;
+  struct TextPosInfo *pos_text;
   char *text;
   int font_text;
 
@@ -388,7 +388,7 @@ static void InitializeMainControls()
     struct MainControlInfo *mci = &main_controls[i];
     int nr                         = mci->nr;
     struct MenuPosInfo *pos_button = mci->pos_button;
-    struct MenuPosInfo *pos_text   = mci->pos_text;
+    struct TextPosInfo *pos_text   = mci->pos_text;
     struct MenuPosInfo *pos_input  = mci->pos_input;
     char *text                     = mci->text;
     char *input                    = mci->input;
@@ -421,8 +421,13 @@ static void InitializeMainControls()
 	menu.main.input.name.y = menu.main.text.name.y;
 #endif
 
+#if 1
+      menu.main.input.name.width  = input_width;
+      menu.main.input.name.height = input_height;
+#else
       menu.main.input.name.width  = font_input_width * MAX_PLAYER_NAME_LEN;
       menu.main.input.name.height = font_input_height;
+#endif
     }
 
     if (pos_button != NULL)
@@ -476,7 +481,7 @@ static void DrawCursorAndText_Main_Ext(int nr, boolean active_text,
     if (mci->nr == nr || nr == -1)
     {
       struct MenuPosInfo *pos_button = mci->pos_button;
-      struct MenuPosInfo *pos_text   = mci->pos_text;
+      struct TextPosInfo *pos_text   = mci->pos_text;
       struct MenuPosInfo *pos_input  = mci->pos_input;
       char *text                     = mci->text;
       char *input                    = mci->input;
@@ -507,7 +512,7 @@ static void DrawCursorAndText_Main_Ext(int nr, boolean active_text,
 
       if (pos_text != NULL && text != NULL)
       {
-	struct MenuPosInfo *pos = pos_text;
+	struct TextPosInfo *pos = pos_text;
 	int x = mSX + ALIGNED_MENU_XPOS(pos);
 	int y = mSY + ALIGNED_MENU_YPOS(pos);
 
@@ -552,6 +557,18 @@ static struct MainControlInfo *getMainControlInfo(int nr)
 }
 
 static boolean insideMenuPosRect(struct MenuPosInfo *rect, int x, int y)
+{
+  if (rect == NULL)
+    return FALSE;
+
+  int rect_x = ALIGNED_MENU_XPOS(rect);
+  int rect_y = ALIGNED_MENU_YPOS(rect);
+
+  return (x >= rect_x && x < rect_x + rect->width &&
+	  y >= rect_y && y < rect_y + rect->height);
+}
+
+static boolean insideTextPosRect(struct TextPosInfo *rect, int x, int y)
 {
   if (rect == NULL)
     return FALSE;
@@ -1235,7 +1252,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
     for (i = 0; main_controls[i].nr != -1; i++)
     {
       if (insideMenuPosRect(main_controls[i].pos_button, mx - mSX, my - mSY) ||
-	  insideMenuPosRect(main_controls[i].pos_text,   mx - mSX, my - mSY) ||
+	  insideTextPosRect(main_controls[i].pos_text,   mx - mSX, my - mSY) ||
 	  insideMenuPosRect(main_controls[i].pos_input,  mx - mSX, my - mSY))
       {
 	pos = main_controls[i].nr;
@@ -2467,12 +2484,12 @@ void DrawInfoScreen_Version()
   int font_text = FONT_TEXT_2;
   int xstep = getFontWidth(font_text);
   int ystep = getFontHeight(font_text);
-  int xstart1 = SX + 2 * xstep;
-  int xstart2 = SX + 18 * xstep;
-  int xstart3 = SX + 28 * xstep;
   int ystart = 150;
   int ybottom = SYSIZE - 20;
+  int xstart1 = SX + 2 * xstep;
+  int xstart2 = SX + 18 * xstep;
 #if defined(TARGET_SDL)
+  int xstart3 = SX + 28 * xstep;
   SDL_version sdl_version_compiled;
   const SDL_version *sdl_version_linked;
 #endif
@@ -2526,10 +2543,7 @@ void DrawInfoScreen_Version()
 	    sdl_version_linked->patch);
 
   SDL_IMAGE_VERSION(&sdl_version_compiled);
-#if 0
   sdl_version_linked = IMG_Linked_Version();
-#else
-#endif
 
   ystart += ystep;
   DrawTextF(xstart1, ystart, font_text, "SDL_image");
@@ -2537,14 +2551,10 @@ void DrawInfoScreen_Version()
 	    sdl_version_compiled.major,
 	    sdl_version_compiled.minor,
 	    sdl_version_compiled.patch);
-#if 0
   DrawTextF(xstart3, ystart, font_text, "%d.%d.%d",
 	    sdl_version_linked->major,
 	    sdl_version_linked->minor,
 	    sdl_version_linked->patch);
-#else
-  DrawTextF(xstart3, ystart, font_text, "?.?.?");
-#endif
 
   SDL_MIXER_VERSION(&sdl_version_compiled);
   sdl_version_linked = Mix_Linked_Version();
@@ -2560,10 +2570,19 @@ void DrawInfoScreen_Version()
 	    sdl_version_linked->minor,
 	    sdl_version_linked->patch);
 
+  SDL_NET_VERSION(&sdl_version_compiled);
+  sdl_version_linked = SDLNet_Linked_Version();
+
   ystart += ystep;
   DrawTextF(xstart1, ystart, font_text, "SDL_net");
-  DrawTextF(xstart2, ystart, font_text, "?.?.?");
-  DrawTextF(xstart3, ystart, font_text, "?.?.?");
+  DrawTextF(xstart2, ystart, font_text, "%d.%d.%d",
+	    sdl_version_compiled.major,
+	    sdl_version_compiled.minor,
+	    sdl_version_compiled.patch);
+  DrawTextF(xstart3, ystart, font_text, "%d.%d.%d",
+	    sdl_version_linked->major,
+	    sdl_version_linked->minor,
+	    sdl_version_linked->patch);
 #endif
 
   DrawTextSCentered(ybottom, FONT_TEXT_4,
@@ -2736,6 +2755,7 @@ void HandleInfoScreen(int mx, int my, int dx, int dy, int button)
 
 void HandleTypeName(int newxpos, Key key)
 {
+  static char last_player_name[MAX_PLAYER_NAME_LEN + 1];
   struct MainControlInfo *mci = getMainControlInfo(MAIN_CONTROL_NAME);
 #if 1
   struct MenuPosInfo *pos = mci->pos_input;
@@ -2760,35 +2780,42 @@ void HandleTypeName(int newxpos, Key key)
   int startx = mSX + 32 + name_width;
   int starty = mSY + ypos * 32;
 #endif
+  char key_char = getValidConfigValueChar(getCharFromKey(key));
+  boolean is_valid_key_char = (key_char != 0 && (key_char != ' ' || xpos > 0));
+  boolean is_active = TRUE;
+
+  DrawBackgroundForFont(startx,starty, pos->width, pos->height, font_active_nr);
 
   if (newxpos)
   {
+    strcpy(last_player_name, setup.player_name);
+
     xpos = newxpos;
+
+#if 0
+    /* add one character width for added cursor character */
+    pos->width += font_width;
+    startx = mSX + ALIGNED_MENU_XPOS(pos);
 
     DrawText(startx, starty, setup.player_name, font_active_nr);
     DrawText(startx + xpos * font_width, starty, "_", font_active_nr);
-
-    return;
+#endif
   }
-
-  if (((key >= KSYM_A && key <= KSYM_Z) ||
-       (key >= KSYM_a && key <= KSYM_z)) && 
-      xpos < MAX_PLAYER_NAME_LEN)
+  else if (is_valid_key_char && xpos < MAX_PLAYER_NAME_LEN)
   {
-    char ascii;
-
-    if (key >= KSYM_A && key <= KSYM_Z)
-      ascii = 'A' + (char)(key - KSYM_A);
-    else
-      ascii = 'a' + (char)(key - KSYM_a);
-
-    setup.player_name[xpos] = ascii;
+    setup.player_name[xpos] = key_char;
     setup.player_name[xpos + 1] = 0;
 
     xpos++;
 
+#if 0
+    /* add one character width for added name text character */
+    pos->width += font_width;
+    startx = mSX + ALIGNED_MENU_XPOS(pos);
+
     DrawText(startx, starty, setup.player_name, font_active_nr);
     DrawText(startx + xpos * font_width, starty, "_", font_active_nr);
+#endif
   }
   else if ((key == KSYM_Delete || key == KSYM_BackSpace) && xpos > 0)
   {
@@ -2796,16 +2823,55 @@ void HandleTypeName(int newxpos, Key key)
 
     setup.player_name[xpos] = 0;
 
+#if 0
+    /* remove one character width for removed name text character */
+    pos->width -= font_width;
+    startx = mSX + ALIGNED_MENU_XPOS(pos);
+
+    DrawText(startx, starty, setup.player_name, font_active_nr);
     DrawText(startx + xpos * font_width, starty, "_ ", font_active_nr);
+#endif
   }
   else if (key == KSYM_Return && xpos > 0)
   {
+#if 0
+    /* remove one character width for removed cursor text character */
+    pos->width -= font_width;
+    startx = mSX + ALIGNED_MENU_XPOS(pos);
+
     DrawText(startx, starty, setup.player_name, font_nr);
     DrawText(startx + xpos * font_width, starty, " ", font_active_nr);
+#endif
 
     SaveSetup();
 
+    is_active = FALSE;
+
     game_status = GAME_MODE_MAIN;
+  }
+  else if (key == KSYM_Escape)
+  {
+    strcpy(setup.player_name, last_player_name);
+
+    is_active = FALSE;
+
+    game_status = GAME_MODE_MAIN;
+  }
+
+  if (is_active)
+  {
+    pos->width = (strlen(setup.player_name) + 1) * font_width;
+    startx = mSX + ALIGNED_MENU_XPOS(pos);
+
+    DrawText(startx, starty, setup.player_name, font_active_nr);
+    DrawText(startx + xpos * font_width, starty, "_", font_active_nr);
+  }
+  else
+  {
+    pos->width = strlen(setup.player_name) * font_width;
+    startx = mSX + ALIGNED_MENU_XPOS(pos);
+
+    DrawText(startx, starty, setup.player_name, font_nr);
   }
 }
 
