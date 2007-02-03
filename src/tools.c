@@ -1612,9 +1612,17 @@ void AnimateEnvelope(int envelope_nr, int anim_mode, int action)
     for (yy = 0; yy < ysize; yy++) for (xx = 0; xx < xsize; xx++)
       DrawEnvelopeBackground(envelope_nr, sx,sy, xx,yy, xsize, ysize, font_nr);
 
+#if 1
+    DrawTextBuffer(SX + sx + font_width, SY + sy + font_height,
+		   level.envelope[envelope_nr].text, font_nr, max_xsize,
+		   xsize - 2, ysize - 2, mask_mode,
+		   level.envelope[envelope_nr].autowrap,
+		   level.envelope[envelope_nr].centered);
+#else
     DrawTextToTextArea(SX + sx + font_width, SY + sy + font_height,
 		       level.envelope[envelope_nr].text, font_nr, max_xsize,
 		       xsize - 2, ysize - 2, mask_mode);
+#endif
 
     redraw_mask |= REDRAW_FIELD | REDRAW_FROM_BACKBUFFER;
     BackToFront();

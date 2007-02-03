@@ -741,6 +741,17 @@ static struct LevelFileConfigInfo chunk_config_NOTE[] =
 
   {
     -1,					-1,
+    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(3),
+    &xx_envelope.autowrap,		FALSE
+  },
+  {
+    -1,					-1,
+    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(4),
+    &xx_envelope.centered,		FALSE
+  },
+
+  {
+    -1,					-1,
     TYPE_STRING,			CONF_VALUE_BYTES(1),
     &xx_envelope.text,			-1, NULL,
     &xx_string_length_unused,		-1, MAX_ENVELOPE_TEXT_LEN,
@@ -5614,6 +5625,11 @@ static void LoadLevelFromFileInfo_DC(struct LevelInfo *level,
 	header[envelope_content_pos + 1 + i];
 
   level->envelope[0].text[envelope_size] = '\0';
+
+  level->envelope[0].xsize = MAX_ENVELOPE_XSIZE;
+  level->envelope[0].ysize = 10;
+  level->envelope[0].autowrap = TRUE;
+  level->envelope[0].centered = TRUE;
 
   for (i = 0; i < level_name_len; i++)
     level->name[i] = header[level_name_pos + 1 + i];

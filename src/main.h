@@ -2092,6 +2092,9 @@ struct EnvelopeInfo
   int xsize;
   int ysize;
 
+  boolean autowrap;
+  boolean centered;
+
   char text[MAX_ENVELOPE_TEXT_LEN + 1];
 };
 
