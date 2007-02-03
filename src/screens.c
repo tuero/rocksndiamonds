@@ -162,8 +162,6 @@ static void MapScreenTreeGadgets(TreeInfo *);
 
 static struct GadgetInfo *screen_gadget[NUM_SCREEN_GADGETS];
 
-static boolean show_titlescreen_initial = TRUE;
-
 static int setup_mode = SETUP_MODE_MAIN;
 static int info_mode = INFO_MODE_MAIN;
 
@@ -205,6 +203,26 @@ static TreeInfo *screen_mode_current = NULL;
 static Bitmap *scrollbar_bitmap[NUM_SCROLLBAR_BITMAPS];
 #endif
 
+
+/* title display and control definitions */
+
+#define MAX_NUM_TITLE_SCREENS	(2 * MAX_NUM_TITLE_IMAGES +		\
+				 2 * MAX_NUM_TITLE_MESSAGES)
+
+static boolean show_title_initial = TRUE;
+static int num_title_screens = 0;
+
+struct TitleControlInfo
+{
+  boolean is_image;
+  boolean initial;
+  int local_nr;
+};
+
+struct TitleControlInfo title_controls[MAX_NUM_TITLE_SCREENS];
+
+
+/* main menu display and control definitions */
 
 #define MAIN_CONTROL_NAME		0
 #define MAIN_CONTROL_LEVELS		1
@@ -369,6 +387,44 @@ static struct MainControlInfo main_controls[] =
   }
 };
 
+
+static int getTitleScreenGraphic(int nr, boolean initial)
+{
+  return (initial ? IMG_TITLESCREEN_INITIAL_1 : IMG_TITLESCREEN_1) + nr;
+}
+
+static void InitializeTitleControlsExt_AddTitleInfo(boolean is_image,
+						    boolean initial, int nr)
+{
+  title_controls[num_title_screens].is_image = is_image;
+  title_controls[num_title_screens].initial = initial;
+  title_controls[num_title_screens].local_nr = nr;
+
+  num_title_screens++;
+}
+
+static void InitializeTitleControls_CheckTitleInfo(boolean initial)
+{
+  int i;
+
+  for (i = 0; i < MAX_NUM_TITLE_IMAGES; i++)
+    if (graphic_info[getTitleScreenGraphic(i, initial)].bitmap != NULL)
+      InitializeTitleControlsExt_AddTitleInfo(TRUE, initial, i);
+
+  for (i = 0; i < MAX_NUM_TITLE_MESSAGES; i++)
+    if (getLevelSetTitleMessageFilename(i, initial) != NULL)
+      InitializeTitleControlsExt_AddTitleInfo(FALSE, initial, i);
+}
+
+static void InitializeTitleControls()
+{
+  num_title_screens = 0;
+
+  if (show_title_initial)
+    InitializeTitleControls_CheckTitleInfo(TRUE);
+
+  InitializeTitleControls_CheckTitleInfo(FALSE);
+}
 
 static void InitializeMainControls()
 {
@@ -656,12 +712,6 @@ static int getLevelRangeTextPos()
 }
 #endif
 
-static int getTitleScreenGraphic()
-{
-  return (show_titlescreen_initial ? IMG_TITLESCREEN_INITIAL_1 :
-	  IMG_TITLESCREEN_1);
-}
-
 int effectiveGameStatus()
 {
   if (game_status == GAME_MODE_INFO && info_mode == INFO_MODE_TITLE)
@@ -670,9 +720,9 @@ int effectiveGameStatus()
   return game_status;
 }
 
-void DrawTitleScreenImage(int nr)
+void DrawTitleScreenImage(int nr, boolean initial)
 {
-  int graphic = getTitleScreenGraphic() + nr;
+  int graphic = getTitleScreenGraphic(nr, initial);
   Bitmap *bitmap = graphic_info[graphic].bitmap;
 #if 1
   int width  = graphic_info[graphic].width;
@@ -729,8 +779,9 @@ void DrawTitleScreenImage(int nr)
     title.auto_delay_final = graphic_info[graphic].auto_delay;
 }
 
-void DrawTitleScreenMessage(char *filename)
+void DrawTitleScreenMessage(int nr, boolean initial)
 {
+  char *filename = getLevelSetTitleMessageFilename(nr, initial);
   int font_nr = FONT_TEXT_1;
   int font_width;
   int font_height;
@@ -833,12 +884,29 @@ void DrawMainMenuExt(int redraw_mask, boolean do_fading)
   SetDrawtoField(DRAW_BACKBUFFER);
 #endif
 
+#if 1
+  if (setup.show_titlescreen && (show_title_initial || levelset_has_changed))
+  {
+    /* needed to be able to skip title screen, if no image or message defined */
+    InitializeTitleControls();
+
+    if (num_title_screens > 0)
+    {
+      game_status = GAME_MODE_TITLE;
+
+      DrawTitleScreen();
+
+      return;
+    }
+  }
+#else
   if (setup.show_titlescreen &&
       ((levelset_has_changed &&
 	(graphic_info[IMG_TITLESCREEN_1].bitmap != NULL ||
-	 getLevelSetMessageFilename() != NULL)) ||
-       (show_titlescreen_initial &&
-	graphic_info[IMG_TITLESCREEN_INITIAL_1].bitmap != NULL)))
+	 getLevelSetMessageFilename(1, FALSE) != NULL)) ||
+       (show_title_initial &&
+	(graphic_info[IMG_TITLESCREEN_INITIAL_1].bitmap != NULL ||
+	 getLevelSetMessageFilename(1, TRUE) != NULL))))
   {
     game_status = GAME_MODE_TITLE;
 
@@ -846,6 +914,7 @@ void DrawMainMenuExt(int redraw_mask, boolean do_fading)
 
     return;
   }
+#endif
 
   /* level_nr may have been set to value over handicap with level editor */
   if (setup.handicap && level_nr > leveldir_current->handicap_level)
@@ -1000,6 +1069,165 @@ static void gotoTopLevelDir()
 }
 #endif
 
+#if 1
+void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
+{
+  static unsigned long title_delay = 0;
+  static int title_screen_nr = 0;
+  boolean return_to_main_menu = FALSE;
+  boolean use_fading_main_menu = TRUE;
+  boolean use_cross_fading = !show_title_initial;		/* default */
+  struct TitleControlInfo *tci;
+
+  if (button == MB_MENU_INITIALIZE)
+  {
+    int last_game_status = game_status;	/* save current game status */
+
+    title_delay = 0;
+    title_screen_nr = 0;
+    tci = &title_controls[title_screen_nr];
+
+    /* determine number of title screens to display (images and messages) */
+    InitializeTitleControls();
+
+    if (game_status == GAME_MODE_INFO)
+    {
+      if (num_title_screens == 0)
+      {
+	DrawInfoScreen_NotAvailable("Title screen information:",
+				    "No title screen for this level set.");
+
+	title.auto_delay_final = -1;
+
+	return;
+      }
+
+      FadeSoundsAndMusic();
+
+      FadeOut(REDRAW_ALL);
+    }
+
+    /* force TITLE music on title info screen */
+    game_status = GAME_MODE_TITLE;
+
+    PlayMenuSound();
+    PlayMenuMusic();
+
+    game_status = last_game_status;	/* restore current game status */
+
+    if (tci->is_image)
+    {
+      DrawTitleScreenImage(tci->local_nr, tci->initial);
+    }
+    else
+    {
+      DrawTitleScreenMessage(tci->local_nr, tci->initial);
+
+      title.fade_delay_final = title.fade_delay;
+      title.post_delay_final = title.post_delay;
+      title.auto_delay_final = -1;
+    }
+
+    FadeIn(REDRAW_ALL);
+
+    DelayReached(&title_delay, 0);	/* reset delay counter */
+
+    return;
+  }
+
+  if (title.auto_delay_final > -1 &&
+      DelayReached(&title_delay, title.auto_delay_final))
+    button = MB_MENU_CHOICE;
+
+  if (button == MB_MENU_LEAVE)
+  {
+    return_to_main_menu = TRUE;
+    use_fading_main_menu = FALSE;
+  }
+  else if (button == MB_MENU_CHOICE)
+  {
+    int anim_mode;
+
+    if (game_status == GAME_MODE_INFO && num_title_screens == 0)
+    {
+      FadeOut(REDRAW_FIELD);
+
+      info_mode = INFO_MODE_MAIN;
+      DrawAndFadeInInfoScreen(REDRAW_FIELD);
+
+      return;
+    }
+
+    title_screen_nr++;
+    tci = &title_controls[title_screen_nr];
+
+    if (tci->is_image)
+      anim_mode =
+	graphic_info[getTitleScreenGraphic(tci->local_nr,
+					   tci->initial)].anim_mode;
+    else
+      anim_mode = ANIM_FADE;	/* ??? */
+
+    use_cross_fading = (anim_mode == ANIM_FADE ? FALSE :
+			anim_mode == ANIM_CROSSFADE ? TRUE :
+			use_cross_fading);
+
+    if (title_screen_nr < num_title_screens)
+    {
+      if (!use_cross_fading)
+	FadeOut(REDRAW_ALL);
+
+      if (use_cross_fading)
+	FadeCrossSaveBackbuffer();
+
+      if (tci->is_image)
+	DrawTitleScreenImage(tci->local_nr, tci->initial);
+      else
+	DrawTitleScreenMessage(tci->local_nr, tci->initial);
+
+      if (use_cross_fading)
+	FadeCross(REDRAW_ALL);
+      else
+	FadeIn(REDRAW_ALL);
+
+      DelayReached(&title_delay, 0);	/* reset delay counter */
+    }
+    else
+    {
+      FadeSoundsAndMusic();
+
+      FadeOut(REDRAW_ALL);
+
+      return_to_main_menu = TRUE;
+    }
+  }
+
+  if (return_to_main_menu)
+  {
+    /* show initial title images and messages only once at program start */
+    show_title_initial = FALSE;
+
+    RedrawBackground();
+
+    if (game_status == GAME_MODE_INFO)
+    {
+      OpenDoor(DOOR_CLOSE_1 | DOOR_CLOSE_2 | DOOR_NO_DELAY | DOOR_FORCE_REDRAW);
+
+      info_mode = INFO_MODE_MAIN;
+      DrawInfoScreenExt(REDRAW_ALL, use_fading_main_menu);
+    }
+    else	/* default: return to main menu */
+    {
+      OpenDoor(DOOR_CLOSE_1 | DOOR_OPEN_2 | DOOR_NO_DELAY | DOOR_FORCE_REDRAW);
+
+      game_status = GAME_MODE_MAIN;
+      DrawMainMenuExt(REDRAW_ALL, use_fading_main_menu);
+    }
+  }
+}
+
+#else
+
 void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
 {
   static unsigned long title_delay = 0;
@@ -1008,9 +1236,9 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
   char *filename = getLevelSetMessageFilename();
   boolean return_to_main_menu = FALSE;
   boolean use_fading_main_menu = TRUE;
-  boolean use_cross_fading = !show_titlescreen_initial;		/* default */
+  boolean use_cross_fading = !show_title_initial;		/* default */
   boolean no_title_info = (graphic_info[IMG_TITLESCREEN_1].bitmap == NULL &&
-			   filename == NULL);
+			   getLevelSetMessageFilename(1, FALSE) == NULL);
 
   if (button == MB_MENU_INITIALIZE)
   {
@@ -1020,9 +1248,10 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
     title_nr = 0;
     showing_message = FALSE;
 
-    if (show_titlescreen_initial &&
-	graphic_info[IMG_TITLESCREEN_INITIAL_1].bitmap == NULL)
-      show_titlescreen_initial = FALSE;
+    if (show_title_initial &&
+	graphic_info[IMG_TITLESCREEN_INITIAL_1].bitmap == NULL &&
+	getLevelSetMessageFilename(1, TRUE) == NULL)
+      show_title_initial = FALSE;
 
     if (game_status == GAME_MODE_INFO)
     {
@@ -1049,9 +1278,9 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
 
     game_status = last_game_status;	/* restore current game status */
 
-    if (graphic_info[getTitleScreenGraphic()].bitmap != NULL)
+    if (graphic_info[getTitleScreenGraphic(0, show_title_initial)].bitmap != NULL)
     {
-      DrawTitleScreenImage(title_nr);
+      DrawTitleScreenImage(title_nr, show_title_initial);
     }
     else
     {
@@ -1096,16 +1325,16 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
 
     title_nr++;
 
-    if (show_titlescreen_initial &&
-	(title_nr >= MAX_NUM_TITLE_SCREENS ||
+    if (show_title_initial &&
+	(title_nr >= MAX_NUM_TITLE_IMAGES ||
 	 graphic_info[IMG_TITLESCREEN_INITIAL_1 + title_nr].bitmap == NULL))
     {
-      show_titlescreen_initial = FALSE;
+      show_title_initial = FALSE;
 
       title_nr = 0;	/* restart with title screens for current level set */
     }
 
-    anim_mode = graphic_info[getTitleScreenGraphic() + title_nr].anim_mode;
+    anim_mode = graphic_info[getTitleScreenGraphic(title_nr, show_title_initial)].anim_mode;
 
     use_cross_fading = (anim_mode == ANIM_FADE ? FALSE :
 			anim_mode == ANIM_CROSSFADE ? TRUE :
@@ -1114,13 +1343,13 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
     if (!use_cross_fading)
       FadeOut(REDRAW_ALL);
 
-    if (title_nr < MAX_NUM_TITLE_SCREENS &&
-	graphic_info[getTitleScreenGraphic() + title_nr].bitmap != NULL)
+    if (title_nr < MAX_NUM_TITLE_IMAGES &&
+	graphic_info[getTitleScreenGraphic(title_nr, show_title_initial)].bitmap != NULL)
     {
       if (use_cross_fading)
 	FadeCrossSaveBackbuffer();
 
-      DrawTitleScreenImage(title_nr);
+      DrawTitleScreenImage(title_nr, show_title_initial);
 
       if (use_cross_fading)
 	FadeCross(REDRAW_ALL);
@@ -1157,7 +1386,7 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
 
   if (return_to_main_menu)
   {
-    show_titlescreen_initial = FALSE;
+    show_title_initial = FALSE;
 
     RedrawBackground();
 
@@ -1177,6 +1406,7 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
     }
   }
 }
+#endif
 
 void HandleMainMenu_SelectLevel(int step, int direction)
 {

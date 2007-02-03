@@ -230,7 +230,7 @@ char *getEditorSetupFilename(void);
 char *getHelpAnimFilename(void);
 char *getHelpTextFilename(void);
 char *getLevelSetInfoFilename(void);
-char *getLevelSetMessageFilename(void);
+char *getLevelSetTitleMessageFilename(int, boolean);
 char *getImageFilename(char *);
 char *getCustomImageFilename(char *);
 char *getCustomSoundFilename(char *);

@@ -498,31 +498,19 @@ char *getLevelSetInfoFilename()
   return NULL;
 }
 
-char *getLevelSetMessageFilename()
+char *getLevelSetTitleMessageFilename(int nr, boolean initial)
 {
   static char *filename = NULL;
-  char *basenames[] =
-  {
-    "MESSAGE",
-    "MESSAGE.TXT",
-    "MESSAGE.txt",
-    "Message",
-    "Message.txt",
-    "message",
-    "message.txt",
+  char basename[32];
 
-    NULL
-  };
-  int i;
+  sprintf(basename, "%s_%d.txt",
+	  (initial ? "titlemessage_initial" : "titlemessage"), nr + 1);
 
-  for (i = 0; basenames[i] != NULL; i++)
-  {
-    checked_free(filename);
-    filename = getPath2(getCurrentLevelDir(), basenames[i]);
+  checked_free(filename);
+  filename = getPath2(getCurrentLevelDir(), basename);
 
-    if (fileExists(filename))
-      return filename;
-  }
+  if (fileExists(filename))
+    return filename;
 
   return NULL;
 }
