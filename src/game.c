@@ -86,7 +86,8 @@
 #define EX_TYPE_SINGLE_TILE	(EX_TYPE_CENTER | EX_TYPE_BORDER)
 
 #if 1
-#define	PANEL_DEACTIVATED(p)	((p)->x < 0 || (p)->y < 0)
+#define PANEL_OFF()		(local_player->LevelSolved_PanelOff)
+#define	PANEL_DEACTIVATED(p)	((p)->x < 0 || (p)->y < 0 || PANEL_OFF())
 #define PANEL_XPOS(p)		(DX + ALIGNED_MENU_XPOS(p))
 #define PANEL_YPOS(p)		(DY + ALIGNED_MENU_YPOS(p))
 #else
@@ -2242,7 +2243,9 @@ void InitGame()
     player->LevelSolved = FALSE;
     player->GameOver = FALSE;
 
+    player->LevelSolved_GameWon = FALSE;
     player->LevelSolved_GameEnd = FALSE;
+    player->LevelSolved_PanelOff = FALSE;
     player->LevelSolved_SaveTape = FALSE;
     player->LevelSolved_SaveScore = FALSE;
   }
@@ -2974,10 +2977,12 @@ void GameWon()
 {
   static int time, time_final;
   static int score, score_final;
-  static int game_over_delay = 0;
-  int game_over_delay_value = 50;
+  static int game_over_delay_1 = 0;
+  static int game_over_delay_2 = 0;
+  int game_over_delay_value_1 = 50;
+  int game_over_delay_value_2 = 50;
 
-  if (!local_player->LevelSolved_GameEnd)
+  if (!local_player->LevelSolved_GameWon)
   {
     int i;
 
@@ -2985,7 +2990,7 @@ void GameWon()
     if (local_player->MovPos)
       return;
 
-    local_player->LevelSolved_GameEnd = TRUE;
+    local_player->LevelSolved_GameWon = TRUE;
     local_player->LevelSolved_SaveTape = tape.recording;
     local_player->LevelSolved_SaveScore = !tape.playing;
 
@@ -2996,7 +3001,8 @@ void GameWon()
     TapeStop();
 #endif
 
-    game_over_delay = game_over_delay_value;
+    game_over_delay_1 = game_over_delay_value_1;
+    game_over_delay_2 = game_over_delay_value_2;
 
     time = time_final = (level.time == 0 ? TimePlayed : TimeLeft);
     score = score_final = local_player->score_final;
@@ -3078,9 +3084,9 @@ void GameWon()
     PlaySound(SND_GAME_WINNING);
   }
 
-  if (game_over_delay > 0)
+  if (game_over_delay_1 > 0)
   {
-    game_over_delay--;
+    game_over_delay_1--;
 
     return;
   }
@@ -3103,13 +3109,30 @@ void GameWon()
       PlaySoundLoop(SND_GAME_LEVELTIME_BONUS);
     else
       PlaySound(SND_GAME_LEVELTIME_BONUS);
+
+    return;
   }
+
+  local_player->LevelSolved_PanelOff = TRUE;
+
+  if (game_over_delay_2 > 0)
+  {
+    game_over_delay_2--;
+
+    return;
+  }
+
+#if 1
+  GameEnd();
+#endif
 }
 
 void GameEnd()
 {
   int hi_pos;
   boolean raise_level = FALSE;
+
+  local_player->LevelSolved_GameEnd = TRUE;
 
   CloseDoor(DOOR_CLOSE_1);
 
@@ -9870,7 +9893,7 @@ void GameActions()
       AllPlayersGone = TRUE;
   }
 
-  if (local_player->LevelSolved)
+  if (local_player->LevelSolved && !local_player->LevelSolved_GameEnd)
     GameWon();
 
   if (AllPlayersGone && !TAPE_IS_STOPPED(tape))

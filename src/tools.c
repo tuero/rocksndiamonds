@@ -2791,6 +2791,23 @@ boolean Request(char *text, unsigned int req_state)
 	result = 0;
     }
 
+#if 1
+
+    if (game_status == GAME_MODE_PLAYING && local_player->LevelSolved_GameEnd)
+    {
+      HandleGameActions();
+      BackToFront();
+    }
+    else
+    {
+      DoAnimation();
+
+      if (!PendingEvent())	/* delay only if no pending events */
+	Delay(10);
+    }
+
+#else
+
     DoAnimation();
 
 #if 1
@@ -2799,6 +2816,8 @@ boolean Request(char *text, unsigned int req_state)
 #else
     /* don't eat all CPU time */
     Delay(10);
+#endif
+
 #endif
   }
 

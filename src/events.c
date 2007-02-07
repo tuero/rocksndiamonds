@@ -717,9 +717,8 @@ void HandleKey(Key key, int key_status)
     return;
   }
 
-#if 1
-  if (game_status == GAME_MODE_PLAYING &&
-      local_player->LevelSolved_GameEnd &&
+#if 0
+  if (game_status == GAME_MODE_PLAYING && local_player->LevelSolved_GameEnd &&
       (key == KSYM_Return || key == setup.shortcut.toggle_pause))
 #else
   if (game_status == GAME_MODE_PLAYING && AllPlayersGone &&
@@ -1068,7 +1067,7 @@ void HandleJoystick()
       if (tape.playing || keyboard)
 	newbutton = ((joy & JOY_BUTTON) != 0);
 
-#if 1
+#if 0
       if (local_player->LevelSolved_GameEnd && newbutton)
 #else
       if (AllPlayersGone && newbutton)

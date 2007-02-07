@@ -1,3 +1,14 @@
+2007-02-07
+	* changed end of game again: do not wait for the user to press a key
+	  anymore, but directly ask/confirm tape saving and go to hall of fame
+	* re-enabled quitting of lost game by pressing space or return again
+
+2007-02-05
+	* improved handling of title text messages (initial and for level set)
+
+2007-02-03
+	* added new options "auto-wrap" and "centered" for DC2 style envelopes
+
 2007-01-31
 	* fixed displaying and typing of player name when it is centered
 	* added special characters to be allowed for player name (not only A-Z)

@@ -142,7 +142,9 @@ struct PlayerInfo
 
   boolean LevelSolved, GameOver;
 
+  boolean LevelSolved_GameWon;
   boolean LevelSolved_GameEnd;
+  boolean LevelSolved_PanelOff;
   boolean LevelSolved_SaveTape;
   boolean LevelSolved_SaveScore;
 
