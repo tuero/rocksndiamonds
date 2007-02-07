@@ -919,6 +919,8 @@ static void SetPlayerMoveSpeed(struct PlayerInfo *player, int move_stepsize,
 
 void GetPlayerConfig()
 {
+  GameFrameDelay = setup.game_frame_delay;
+
   if (!audio.sound_available)
     setup.sound_simple = FALSE;
 
@@ -10565,11 +10567,38 @@ static boolean AllPlayersInVisibleScreen()
 
 void ScrollLevel(int dx, int dy)
 {
+#if 1
+  static Bitmap *bitmap_db_field2 = NULL;
+  int softscroll_offset = (setup.soft_scrolling ? TILEX : 0);
+  int x, y;
+#else
   int i, x, y;
+#endif
 
   /* only horizontal XOR vertical scroll direction allowed */
   if ((dx == 0 && dy == 0) || (dx != 0 && dy != 0))
     return;
+
+#if 1
+  if (bitmap_db_field2 == NULL)
+    bitmap_db_field2 = CreateBitmap(FXSIZE, FYSIZE, DEFAULT_DEPTH);
+
+  BlitBitmap(drawto_field, bitmap_db_field2,
+	     FX + TILEX * (dx == -1) - softscroll_offset,
+	     FY + TILEY * (dy == -1) - softscroll_offset,
+	     SXSIZE - TILEX * (dx != 0) + 2 * softscroll_offset,
+	     SYSIZE - TILEY * (dy != 0) + 2 * softscroll_offset,
+	     FX + TILEX * (dx == 1) - softscroll_offset,
+	     FY + TILEY * (dy == 1) - softscroll_offset);
+  BlitBitmap(bitmap_db_field2, drawto_field,
+	     FX + TILEX * (dx == 1) - softscroll_offset,
+	     FY + TILEY * (dy == 1) - softscroll_offset,
+	     SXSIZE - TILEX * (dx != 0) + 2 * softscroll_offset,
+	     SYSIZE - TILEY * (dy != 0) + 2 * softscroll_offset,
+	     FX + TILEX * (dx == 1) - softscroll_offset,
+	     FY + TILEY * (dy == 1) - softscroll_offset);
+
+#else
 
 #if 1
   int xsize = (BX2 - BX1 + 1);
@@ -10600,6 +10629,7 @@ void ScrollLevel(int dx, int dy)
 	     SYSIZE - TILEY * (dy != 0) + 2 * softscroll_offset,
 	     FX + TILEX * (dx == 1) - softscroll_offset,
 	     FY + TILEY * (dy == 1) - softscroll_offset);
+#endif
 #endif
 
   if (dx != 0)

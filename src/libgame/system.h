@@ -804,6 +804,7 @@ struct SetupInfo
   boolean quick_switch;
   boolean input_on_focus;
   boolean prefer_aga_graphics;
+  int game_frame_delay;
 
   char *graphics_set;
   char *sounds_set;

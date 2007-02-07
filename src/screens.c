@@ -28,19 +28,20 @@
 /* screens in the setup menu */
 #define SETUP_MODE_MAIN			0
 #define SETUP_MODE_GAME			1
-#define SETUP_MODE_EDITOR		2
-#define SETUP_MODE_INPUT		3
-#define SETUP_MODE_SHORTCUT_1		4
-#define SETUP_MODE_SHORTCUT_2		5
-#define SETUP_MODE_GRAPHICS		6
-#define SETUP_MODE_CHOOSE_SCREEN_MODE	7
-#define SETUP_MODE_SOUND		8
-#define SETUP_MODE_ARTWORK		9
-#define SETUP_MODE_CHOOSE_GRAPHICS	10
-#define SETUP_MODE_CHOOSE_SOUNDS	11
-#define SETUP_MODE_CHOOSE_MUSIC		12
+#define SETUP_MODE_CHOOSE_GAME_SPEED	2
+#define SETUP_MODE_EDITOR		3
+#define SETUP_MODE_INPUT		4
+#define SETUP_MODE_SHORTCUT_1		5
+#define SETUP_MODE_SHORTCUT_2		6
+#define SETUP_MODE_GRAPHICS		7
+#define SETUP_MODE_CHOOSE_SCREEN_MODE	8
+#define SETUP_MODE_SOUND		9
+#define SETUP_MODE_ARTWORK		10
+#define SETUP_MODE_CHOOSE_GRAPHICS	11
+#define SETUP_MODE_CHOOSE_SOUNDS	12
+#define SETUP_MODE_CHOOSE_MUSIC		13
 
-#define MAX_SETUP_MODES			13
+#define MAX_SETUP_MODES			14
 
 /* for input setup functions */
 #define SETUPINPUT_SCREEN_POS_START	0
@@ -136,6 +137,7 @@ static void HandleSetupScreen_Generic(int, int, int, int, int);
 static void HandleSetupScreen_Input(int, int, int, int, int);
 static void CustomizeKeyboard(int);
 static void CalibrateJoystick(int);
+static void execSetupGame(void);
 static void execSetupGraphics(void);
 static void execSetupArtwork(void);
 static void HandleChooseTree(int, int, int, int, int, TreeInfo **);
@@ -167,6 +169,40 @@ static int info_mode = INFO_MODE_MAIN;
 
 static TreeInfo *screen_modes = NULL;
 static TreeInfo *screen_mode_current = NULL;
+
+static TreeInfo *game_speeds = NULL;
+static TreeInfo *game_speed_current = NULL;
+
+static struct
+{
+  int value;
+  char *text;
+} game_speeds_list[] =
+{
+#if 1
+  {	30,	"Very Slow"			},
+  {	25,	"Slow"				},
+  {	20,	"Normal"			},
+  {	15,	"Fast"				},
+  {	10,	"Very Fast"			},
+#else
+  {	1000,	"1/1s (Extremely Slow)"		},
+  {	500,	"1/2s"				},
+  {	200,	"1/5s"				},
+  {	100,	"1/10s"				},
+  {	50,	"1/20s"				},
+  {	29,	"1/35s (Original Supaplex)"	},
+  {	25,	"1/40s"				},
+  {	20,	"1/50s (Normal Speed)"		},
+  {	14,	"1/70s (Maximum Supaplex)"	},
+  {	10,	"1/100s"			},
+  {	5,	"1/200s"			},
+  {	2,	"1/500s"			},
+  {	1,	"1/1000s (Extremely Fast)"	},
+#endif
+
+  {	-1,	NULL				},
+};
 
 #define DRAW_MODE(s)		((s) >= GAME_MODE_MAIN &&		\
 				 (s) <= GAME_MODE_SETUP ? (s) :		\
@@ -785,8 +821,8 @@ void DrawTitleScreenMessage(int nr, boolean initial)
   int font_nr = FONT_TEXT_1;
   int font_width;
   int font_height;
-  int pad_x = 16;
-  int pad_y = 32;
+  int pad_x = 16   + 4;
+  int pad_y = 32   + 14;
   int sx = pad_x;
   int sy = pad_y;
   int max_chars_per_line;
@@ -3103,6 +3139,8 @@ void HandleTypeName(int newxpos, Key key)
 
     DrawText(startx, starty, setup.player_name, font_nr);
   }
+
+  sprintf(main_input_name, "%s", setup.player_name);
 }
 
 
@@ -3308,13 +3346,12 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
     }
     else if (game_status == GAME_MODE_SETUP)
     {
-      if (game_status == GAME_MODE_SETUP)
-      {
-	if (setup_mode == SETUP_MODE_CHOOSE_SCREEN_MODE)
-	  execSetupGraphics();
-	else
-	  execSetupArtwork();
-      }
+      if (setup_mode == SETUP_MODE_CHOOSE_GAME_SPEED)
+	execSetupGame();
+      else if (setup_mode == SETUP_MODE_CHOOSE_SCREEN_MODE)
+	execSetupGraphics();
+      else
+	execSetupArtwork();
     }
     else
     {
@@ -3478,7 +3515,9 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
 
 	if (game_status == GAME_MODE_SETUP)
 	{
-	  if (setup_mode == SETUP_MODE_CHOOSE_SCREEN_MODE)
+	  if (setup_mode == SETUP_MODE_CHOOSE_GAME_SPEED)
+	    execSetupGame();
+	  else if (setup_mode == SETUP_MODE_CHOOSE_SCREEN_MODE)
 	    execSetupGraphics();
 	  else
 	    execSetupArtwork();
@@ -3654,6 +3693,7 @@ static struct TokenInfo *setup_info;
 static int num_setup_info;
 
 static char *screen_mode_text;
+static char *game_speed_text;
 static char *graphics_set_name;
 static char *sounds_set_name;
 static char *music_set_name;
@@ -3666,7 +3706,60 @@ static void execSetupMain()
 
 static void execSetupGame()
 {
+  if (game_speeds == NULL)
+  {
+    int i;
+
+    for (i = 0; game_speeds_list[i].value != -1; i++)
+    {
+      TreeInfo *ti = newTreeInfo_setDefaults(TREE_TYPE_UNDEFINED);
+      char identifier[32], name[32];
+      int value = game_speeds_list[i].value;
+      char *text = game_speeds_list[i].text;
+
+      ti->node_top = &game_speeds;
+      ti->sort_priority = 10000 - value;
+
+      sprintf(identifier, "%d", value);
+      sprintf(name, "%s", text);
+
+      setString(&ti->identifier, identifier);
+      setString(&ti->name, name);
+      setString(&ti->name_sorting, name);
+      setString(&ti->infotext, "Game Speed");
+
+      pushTreeInfo(&game_speeds, ti);
+    }
+
+    /* sort game speed values to start with slowest game speed */
+    sortTreeInfo(&game_speeds);
+
+    /* set current game speed to configured game speed value */
+    game_speed_current =
+      getTreeInfoFromIdentifier(game_speeds, i_to_a(setup.game_frame_delay));
+
+    /* if that fails, set current game speed to reliable default value */
+    if (game_speed_current == NULL)
+      game_speed_current =
+	getTreeInfoFromIdentifier(game_speeds, i_to_a(GAME_FRAME_DELAY));
+
+    /* if that also fails, set current game speed to first available speed */
+    if (game_speed_current == NULL)
+      game_speed_current = game_speeds;
+  }
+
+  setup.game_frame_delay = atoi(game_speed_current->identifier);
+
+  /* needed for displaying game speed text instead of identifier */
+  game_speed_text = game_speed_current->name;
+
   setup_mode = SETUP_MODE_GAME;
+  DrawSetupScreen();
+}
+
+static void execSetupChooseGameSpeed()
+{
+  setup_mode = SETUP_MODE_CHOOSE_GAME_SPEED;
   DrawSetupScreen();
 }
 
@@ -3696,7 +3789,7 @@ static void execSetupGraphics()
       ti->sort_priority = x * 10000 + y;
 
       sprintf(identifier, "%dx%d", x, y);
-      sprintf(name,     "%d x %d [%d:%d]", x, y, xx, yy);
+      sprintf(name, "%d x %d [%d:%d]", x, y, xx, yy);
 
       setString(&ti->identifier, identifier);
       setString(&ti->name, name);
@@ -3844,6 +3937,8 @@ static struct TokenInfo setup_info_game[] =
   { TYPE_SWITCH,	&setup.skip_levels,	"Skip Unsolved Levels:"	},
   { TYPE_SWITCH,	&setup.time_limit,	"Time Limit:"		},
   { TYPE_SWITCH,	&setup.autorecord,	"Auto-Record Tapes:"	},
+  { TYPE_ENTER_LIST,	execSetupChooseGameSpeed, "Game Speed:"		},
+  { TYPE_STRING,	&game_speed_text,	""			},
   { TYPE_EMPTY,		NULL,			""			},
   { TYPE_LEAVE_MENU,	execSetupMain, 		"Back"			},
 
@@ -5063,6 +5158,8 @@ void DrawSetupScreen()
 
   if (setup_mode == SETUP_MODE_INPUT)
     DrawSetupScreen_Input();
+  else if (setup_mode == SETUP_MODE_CHOOSE_GAME_SPEED)
+    DrawChooseTree(&game_speed_current);
   else if (setup_mode == SETUP_MODE_CHOOSE_SCREEN_MODE)
     DrawChooseTree(&screen_mode_current);
   else if (setup_mode == SETUP_MODE_CHOOSE_GRAPHICS)
@@ -5088,6 +5185,8 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
 {
   if (setup_mode == SETUP_MODE_INPUT)
     HandleSetupScreen_Input(mx, my, dx, dy, button);
+  else if (setup_mode == SETUP_MODE_CHOOSE_GAME_SPEED)
+    HandleChooseTree(mx, my, dx, dy, button, &game_speed_current);
   else if (setup_mode == SETUP_MODE_CHOOSE_SCREEN_MODE)
     HandleChooseTree(mx, my, dx, dy, button, &screen_mode_current);
   else if (setup_mode == SETUP_MODE_CHOOSE_GRAPHICS)

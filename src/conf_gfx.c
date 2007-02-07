@@ -4948,6 +4948,20 @@ struct ConfigInfo image_config[] =
   /* the following directives are not associated with an image, but
      probably make sense to be defined in "graphicsinfo.conf", too */
 
+#if 0
+  { "titlemessage_1.x",				"-1"			},
+  { "titlemessage_1.y",				"-1"			},
+  { "titlemessage_1.width",			"-1"			},
+  { "titlemessage_1.height",			"-1"			},
+  { "titlemessage_1.chars",			"-1"			},
+  { "titlemessage_1.lines",			"-1"			},
+  { "titlemessage_1.align",			"-1"			},
+  { "titlemessage_1.autowrap",			"-1"			},
+  { "titlemessage_1.centered",			"-1"			},
+  { "titlemessage_1.skip_comments",		"-1"			},
+  { "titlemessage_1.sort_priority",		"-1"			},
+#endif
+
   { "global.num_toons",				"20"			},
 
   { "border.draw_masked.TITLE",			"false"			},
