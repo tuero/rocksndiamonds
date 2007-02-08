@@ -2000,9 +2000,15 @@ void HandleInfoScreen_Main(int mx, int my, int dx, int dy, int button)
 
 void DrawInfoScreen_NotAvailable(char *text_title, char *text_error)
 {
+#if 1
+  int ystart1 = mSY - SY + 100;
+  int ystart2 = mSY - SY + 150;
+  int ybottom = mSY - SY + SYSIZE - 20;
+#else
   int ystart1 = 100;
   int ystart2 = 150;
   int ybottom = SYSIZE - 20;
+#endif
 
   SetMainBackgroundImageIfDefined(IMG_BACKGROUND_INFO_LEVELSET);
 
@@ -2025,7 +2031,9 @@ void DrawInfoScreen_HelpAnim(int start, int max_anims, boolean init)
   static int infoscreen_step[MAX_INFO_ELEMENTS_ON_SCREEN];
   static int infoscreen_frame[MAX_INFO_ELEMENTS_ON_SCREEN];
   int xstart = mSX + 16;
-  int ystart = mSY + 64 + 2 * 32;
+  int ystart1 = mSY - SY + 100;
+  int ystart2 = mSY + 64 + 2 * 32;
+  int ybottom = mSY - SY + SYSIZE - 20;
   int ystep = TILEY + 4;
   int element, action, direction;
   int graphic;
@@ -2041,9 +2049,9 @@ void DrawInfoScreen_HelpAnim(int start, int max_anims, boolean init)
     ClearWindow();
     DrawHeadline();
 
-    DrawTextSCentered(100, FONT_TEXT_1, "The Game Elements:");
+    DrawTextSCentered(ystart1, FONT_TEXT_1, "The Game Elements:");
 
-    DrawTextSCentered(SYSIZE - 20, FONT_TEXT_4,
+    DrawTextSCentered(ybottom, FONT_TEXT_4,
 		      "Press any key or button for next page");
 
     FrameCounter = 0;
@@ -2115,9 +2123,9 @@ void DrawInfoScreen_HelpAnim(int start, int max_anims, boolean init)
 
     j++;
 
-    ClearRectangleOnBackground(drawto, xstart, ystart + (i - start) * ystep,
+    ClearRectangleOnBackground(drawto, xstart, ystart2 + (i - start) * ystep,
 			       TILEX, TILEY);
-    DrawGraphicAnimationExt(drawto, xstart, ystart + (i - start) * ystep,
+    DrawGraphicAnimationExt(drawto, xstart, ystart2 + (i - start) * ystep,
 			    graphic, sync_frame, USE_MASKING);
 
     if (init)
@@ -2306,8 +2314,10 @@ void DrawInfoScreen_Music()
 void HandleInfoScreen_Music(int button)
 {
   static struct MusicFileInfo *list = NULL;
-  int ystart = 150, dy = 30;
-  int ybottom = SYSIZE - 20;
+  int ystart1 = mSY - SY + 100;
+  int ystart2 = mSY - SY + 150;
+  int ybottom = mSY - SY + SYSIZE - 20;
+  int dy = 30;
 
   if (button == MB_MENU_INITIALIZE)
   {
@@ -2320,7 +2330,8 @@ void HandleInfoScreen_Music(int button)
       ClearWindow();
       DrawHeadline();
 
-      DrawTextSCentered(100, FONT_TEXT_1, "No music info for this level set.");
+      DrawTextSCentered(ystart1, FONT_TEXT_1,
+			"No music info for this level set.");
 
       DrawTextSCentered(ybottom, FONT_TEXT_4,
 			"Press any key or button for info menu");
@@ -2380,51 +2391,51 @@ void HandleInfoScreen_Music(int button)
       else
 	PlaySound(sound);
 
-      DrawTextSCentered(100, FONT_TEXT_1, "The Game Background Sounds:");
+      DrawTextSCentered(ystart1, FONT_TEXT_1, "The Game Background Sounds:");
     }
     else
     {
       PlayMusic(list->music);
 
-      DrawTextSCentered(100, FONT_TEXT_1, "The Game Background Music:");
+      DrawTextSCentered(ystart1, FONT_TEXT_1, "The Game Background Music:");
     }
 
     if (!strEqual(list->title, UNKNOWN_NAME))
     {
       if (!strEqual(list->title_header, UNKNOWN_NAME))
-	DrawTextSCentered(ystart + y++ * dy, FONT_TEXT_2, list->title_header);
+	DrawTextSCentered(ystart2 + y++ * dy, FONT_TEXT_2, list->title_header);
 
-      DrawTextFCentered(ystart + y++ * dy, FONT_TEXT_3, "\"%s\"", list->title);
+      DrawTextFCentered(ystart2 + y++ * dy, FONT_TEXT_3, "\"%s\"", list->title);
     }
 
     if (!strEqual(list->artist, UNKNOWN_NAME))
     {
       if (!strEqual(list->artist_header, UNKNOWN_NAME))
-	DrawTextSCentered(ystart + y++ * dy, FONT_TEXT_2, list->artist_header);
+	DrawTextSCentered(ystart2 + y++ * dy, FONT_TEXT_2, list->artist_header);
       else
-	DrawTextSCentered(ystart + y++ * dy, FONT_TEXT_2, "by");
+	DrawTextSCentered(ystart2 + y++ * dy, FONT_TEXT_2, "by");
 
-      DrawTextFCentered(ystart + y++ * dy, FONT_TEXT_3, "%s", list->artist);
+      DrawTextFCentered(ystart2 + y++ * dy, FONT_TEXT_3, "%s", list->artist);
     }
 
     if (!strEqual(list->album, UNKNOWN_NAME))
     {
       if (!strEqual(list->album_header, UNKNOWN_NAME))
-	DrawTextSCentered(ystart + y++ * dy, FONT_TEXT_2, list->album_header);
+	DrawTextSCentered(ystart2 + y++ * dy, FONT_TEXT_2, list->album_header);
       else
-	DrawTextSCentered(ystart + y++ * dy, FONT_TEXT_2, "from the album");
+	DrawTextSCentered(ystart2 + y++ * dy, FONT_TEXT_2, "from the album");
 
-      DrawTextFCentered(ystart + y++ * dy, FONT_TEXT_3, "\"%s\"", list->album);
+      DrawTextFCentered(ystart2 + y++ * dy, FONT_TEXT_3, "\"%s\"", list->album);
     }
 
     if (!strEqual(list->year, UNKNOWN_NAME))
     {
       if (!strEqual(list->year_header, UNKNOWN_NAME))
-	DrawTextSCentered(ystart + y++ * dy, FONT_TEXT_2, list->year_header);
+	DrawTextSCentered(ystart2 + y++ * dy, FONT_TEXT_2, list->year_header);
       else
-	DrawTextSCentered(ystart + y++ * dy, FONT_TEXT_2, "from the year");
+	DrawTextSCentered(ystart2 + y++ * dy, FONT_TEXT_2, "from the year");
 
-      DrawTextFCentered(ystart + y++ * dy, FONT_TEXT_3, "%s", list->year);
+      DrawTextFCentered(ystart2 + y++ * dy, FONT_TEXT_3, "%s", list->year);
     }
 
     DrawTextSCentered(ybottom, FONT_TEXT_4,
@@ -2440,8 +2451,10 @@ void HandleInfoScreen_Music(int button)
 
 static boolean DrawInfoScreen_CreditsScreen(int screen_nr)
 {
-  int ystart = 150, ystep = 30;
-  int ybottom = SYSIZE - 20;
+  int ystart1 = mSY - SY + 100;
+  int ystart2 = mSY - SY + 150;
+  int ybottom = mSY - SY + SYSIZE - 20;
+  int ystep = 30;
 
   if (screen_nr > 8)
     return FALSE;
@@ -2449,155 +2462,155 @@ static boolean DrawInfoScreen_CreditsScreen(int screen_nr)
   ClearWindow();
   DrawHeadline();
 
-  DrawTextSCentered(100, FONT_TEXT_1, "Credits:");
+  DrawTextSCentered(ystart1, FONT_TEXT_1, "Credits:");
 
   if (screen_nr == 0)
   {
-    DrawTextSCentered(ystart + 0 * ystep, FONT_TEXT_2,
+    DrawTextSCentered(ystart2 + 0 * ystep, FONT_TEXT_2,
 		      "Special thanks to");
-    DrawTextSCentered(ystart + 1 * ystep, FONT_TEXT_3,
+    DrawTextSCentered(ystart2 + 1 * ystep, FONT_TEXT_3,
 		      "Peter Liepa");
-    DrawTextSCentered(ystart + 2 * ystep, FONT_TEXT_2,
+    DrawTextSCentered(ystart2 + 2 * ystep, FONT_TEXT_2,
 		      "for creating");
-    DrawTextSCentered(ystart + 3 * ystep, FONT_TEXT_3,
+    DrawTextSCentered(ystart2 + 3 * ystep, FONT_TEXT_3,
 		      "\"Boulder Dash\"");
-    DrawTextSCentered(ystart + 4 * ystep, FONT_TEXT_2,
+    DrawTextSCentered(ystart2 + 4 * ystep, FONT_TEXT_2,
 		      "in the year");
-    DrawTextSCentered(ystart + 5 * ystep, FONT_TEXT_3,
+    DrawTextSCentered(ystart2 + 5 * ystep, FONT_TEXT_3,
 		      "1984");
-    DrawTextSCentered(ystart + 6 * ystep, FONT_TEXT_2,
+    DrawTextSCentered(ystart2 + 6 * ystep, FONT_TEXT_2,
 		      "published by");
-    DrawTextSCentered(ystart + 7 * ystep, FONT_TEXT_3,
+    DrawTextSCentered(ystart2 + 7 * ystep, FONT_TEXT_3,
 		      "First Star Software");
   }
   else if (screen_nr == 1)
   {
-    DrawTextSCentered(ystart + 0 * ystep, FONT_TEXT_2,
+    DrawTextSCentered(ystart2 + 0 * ystep, FONT_TEXT_2,
 		      "Special thanks to");
-    DrawTextSCentered(ystart + 1 * ystep, FONT_TEXT_3,
+    DrawTextSCentered(ystart2 + 1 * ystep, FONT_TEXT_3,
 		      "Klaus Heinz & Volker Wertich");
-    DrawTextSCentered(ystart + 2 * ystep, FONT_TEXT_2,
+    DrawTextSCentered(ystart2 + 2 * ystep, FONT_TEXT_2,
 		      "for creating");
-    DrawTextSCentered(ystart + 3 * ystep, FONT_TEXT_3,
+    DrawTextSCentered(ystart2 + 3 * ystep, FONT_TEXT_3,
 		      "\"Emerald Mine\"");
-    DrawTextSCentered(ystart + 4 * ystep, FONT_TEXT_2,
+    DrawTextSCentered(ystart2 + 4 * ystep, FONT_TEXT_2,
 		      "in the year");
-    DrawTextSCentered(ystart + 5 * ystep, FONT_TEXT_3,
+    DrawTextSCentered(ystart2 + 5 * ystep, FONT_TEXT_3,
 		      "1987");
-    DrawTextSCentered(ystart + 6 * ystep, FONT_TEXT_2,
+    DrawTextSCentered(ystart2 + 6 * ystep, FONT_TEXT_2,
 		      "published by");
-    DrawTextSCentered(ystart + 7 * ystep, FONT_TEXT_3,
+    DrawTextSCentered(ystart2 + 7 * ystep, FONT_TEXT_3,
 		      "Kingsoft");
   }
   else if (screen_nr == 2)
   {
-    DrawTextSCentered(ystart + 0 * ystep, FONT_TEXT_2,
+    DrawTextSCentered(ystart2 + 0 * ystep, FONT_TEXT_2,
 		      "Special thanks to");
-    DrawTextSCentered(ystart + 1 * ystep, FONT_TEXT_3,
+    DrawTextSCentered(ystart2 + 1 * ystep, FONT_TEXT_3,
 		      "Michael Stopp & Philip Jespersen");
-    DrawTextSCentered(ystart + 2 * ystep, FONT_TEXT_2,
+    DrawTextSCentered(ystart2 + 2 * ystep, FONT_TEXT_2,
 		      "for creating");
-    DrawTextSCentered(ystart + 3 * ystep, FONT_TEXT_3,
+    DrawTextSCentered(ystart2 + 3 * ystep, FONT_TEXT_3,
 		      "\"Supaplex\"");
-    DrawTextSCentered(ystart + 4 * ystep, FONT_TEXT_2,
+    DrawTextSCentered(ystart2 + 4 * ystep, FONT_TEXT_2,
 		      "in the year");
-    DrawTextSCentered(ystart + 5 * ystep, FONT_TEXT_3,
+    DrawTextSCentered(ystart2 + 5 * ystep, FONT_TEXT_3,
 		      "1991");
-    DrawTextSCentered(ystart + 6 * ystep, FONT_TEXT_2,
+    DrawTextSCentered(ystart2 + 6 * ystep, FONT_TEXT_2,
 		      "published by");
-    DrawTextSCentered(ystart + 7 * ystep, FONT_TEXT_3,
+    DrawTextSCentered(ystart2 + 7 * ystep, FONT_TEXT_3,
 		      "Digital Integration");
   }
   else if (screen_nr == 3)
   {
-    DrawTextSCentered(ystart + 0 * ystep, FONT_TEXT_2,
+    DrawTextSCentered(ystart2 + 0 * ystep, FONT_TEXT_2,
 		      "Special thanks to");
-    DrawTextSCentered(ystart + 1 * ystep, FONT_TEXT_3,
+    DrawTextSCentered(ystart2 + 1 * ystep, FONT_TEXT_3,
 		      "Hiroyuki Imabayashi");
-    DrawTextSCentered(ystart + 2 * ystep, FONT_TEXT_2,
+    DrawTextSCentered(ystart2 + 2 * ystep, FONT_TEXT_2,
 		      "for creating");
-    DrawTextSCentered(ystart + 3 * ystep, FONT_TEXT_3,
+    DrawTextSCentered(ystart2 + 3 * ystep, FONT_TEXT_3,
 		      "\"Sokoban\"");
-    DrawTextSCentered(ystart + 4 * ystep, FONT_TEXT_2,
+    DrawTextSCentered(ystart2 + 4 * ystep, FONT_TEXT_2,
 		      "in the year");
-    DrawTextSCentered(ystart + 5 * ystep, FONT_TEXT_3,
+    DrawTextSCentered(ystart2 + 5 * ystep, FONT_TEXT_3,
 		      "1982");
-    DrawTextSCentered(ystart + 6 * ystep, FONT_TEXT_2,
+    DrawTextSCentered(ystart2 + 6 * ystep, FONT_TEXT_2,
 		      "published by");
-    DrawTextSCentered(ystart + 7 * ystep, FONT_TEXT_3,
+    DrawTextSCentered(ystart2 + 7 * ystep, FONT_TEXT_3,
 		      "Thinking Rabbit");
   }
   else if (screen_nr == 4)
   {
-    DrawTextSCentered(ystart + 0 * ystep, FONT_TEXT_2,
+    DrawTextSCentered(ystart2 + 0 * ystep, FONT_TEXT_2,
 		      "Special thanks to");
-    DrawTextSCentered(ystart + 1 * ystep, FONT_TEXT_3,
+    DrawTextSCentered(ystart2 + 1 * ystep, FONT_TEXT_3,
 		      "Alan Bond");
-    DrawTextSCentered(ystart + 2 * ystep, FONT_TEXT_2,
+    DrawTextSCentered(ystart2 + 2 * ystep, FONT_TEXT_2,
 		      "and");
-    DrawTextSCentered(ystart + 3 * ystep, FONT_TEXT_3,
+    DrawTextSCentered(ystart2 + 3 * ystep, FONT_TEXT_3,
 		      "Jürgen Bonhagen");
-    DrawTextSCentered(ystart + 4 * ystep, FONT_TEXT_2,
+    DrawTextSCentered(ystart2 + 4 * ystep, FONT_TEXT_2,
 		      "for the continuous creation");
-    DrawTextSCentered(ystart + 5 * ystep, FONT_TEXT_2,
+    DrawTextSCentered(ystart2 + 5 * ystep, FONT_TEXT_2,
 		      "of outstanding level sets");
   }
   else if (screen_nr == 5)
   {
-    DrawTextSCentered(ystart + 0 * ystep, FONT_TEXT_2,
+    DrawTextSCentered(ystart2 + 0 * ystep, FONT_TEXT_2,
 		      "Thanks to");
-    DrawTextSCentered(ystart + 1 * ystep, FONT_TEXT_3,
+    DrawTextSCentered(ystart2 + 1 * ystep, FONT_TEXT_3,
 		      "Peter Elzner");
-    DrawTextSCentered(ystart + 2 * ystep, FONT_TEXT_2,
+    DrawTextSCentered(ystart2 + 2 * ystep, FONT_TEXT_2,
 		      "for ideas and inspiration by");
-    DrawTextSCentered(ystart + 3 * ystep, FONT_TEXT_3,
+    DrawTextSCentered(ystart2 + 3 * ystep, FONT_TEXT_3,
 		      "Diamond Caves");
 
-    DrawTextSCentered(ystart + 5 * ystep, FONT_TEXT_2,
+    DrawTextSCentered(ystart2 + 5 * ystep, FONT_TEXT_2,
 		      "Thanks to");
-    DrawTextSCentered(ystart + 6 * ystep, FONT_TEXT_3,
+    DrawTextSCentered(ystart2 + 6 * ystep, FONT_TEXT_3,
 		      "Steffest");
-    DrawTextSCentered(ystart + 7 * ystep, FONT_TEXT_2,
+    DrawTextSCentered(ystart2 + 7 * ystep, FONT_TEXT_2,
 		      "for ideas and inspiration by");
-    DrawTextSCentered(ystart + 8 * ystep, FONT_TEXT_3,
+    DrawTextSCentered(ystart2 + 8 * ystep, FONT_TEXT_3,
 		      "DX-Boulderdash");
   }
   else if (screen_nr == 6)
   {
-    DrawTextSCentered(ystart + 0 * ystep, FONT_TEXT_2,
+    DrawTextSCentered(ystart2 + 0 * ystep, FONT_TEXT_2,
 		      "Thanks to");
-    DrawTextSCentered(ystart + 1 * ystep, FONT_TEXT_3,
+    DrawTextSCentered(ystart2 + 1 * ystep, FONT_TEXT_3,
 		      "David Tritscher");
-    DrawTextSCentered(ystart + 2 * ystep, FONT_TEXT_2,
+    DrawTextSCentered(ystart2 + 2 * ystep, FONT_TEXT_2,
 		      "for the new Emerald Mine engine");
   }
   else if (screen_nr == 7)
   {
-    DrawTextSCentered(ystart + 0 * ystep, FONT_TEXT_2,
+    DrawTextSCentered(ystart2 + 0 * ystep, FONT_TEXT_2,
 		      "Thanks to");
-    DrawTextSCentered(ystart + 1 * ystep, FONT_TEXT_3,
+    DrawTextSCentered(ystart2 + 1 * ystep, FONT_TEXT_3,
 		      "Guido Schulz");
-    DrawTextSCentered(ystart + 2 * ystep, FONT_TEXT_2,
+    DrawTextSCentered(ystart2 + 2 * ystep, FONT_TEXT_2,
 		      "for the initial DOS port");
 
-    DrawTextSCentered(ystart + 4 * ystep, FONT_TEXT_2,
+    DrawTextSCentered(ystart2 + 4 * ystep, FONT_TEXT_2,
 		      "Thanks to");
-    DrawTextSCentered(ystart + 5 * ystep, FONT_TEXT_3,
+    DrawTextSCentered(ystart2 + 5 * ystep, FONT_TEXT_3,
 		      "Karl Hörnell");
-    DrawTextSCentered(ystart + 6 * ystep, FONT_TEXT_2,
+    DrawTextSCentered(ystart2 + 6 * ystep, FONT_TEXT_2,
 		      "for some additional toons");
   }
   else if (screen_nr == 8)
   {
-    DrawTextSCentered(ystart + 0 * ystep, FONT_TEXT_2,
+    DrawTextSCentered(ystart2 + 0 * ystep, FONT_TEXT_2,
 		      "And not to forget:");
-    DrawTextSCentered(ystart + 1 * ystep, FONT_TEXT_2,
+    DrawTextSCentered(ystart2 + 1 * ystep, FONT_TEXT_2,
 		      "Many thanks to");
-    DrawTextSCentered(ystart + 2 * ystep, FONT_TEXT_3,
+    DrawTextSCentered(ystart2 + 2 * ystep, FONT_TEXT_3,
 		      "All those who contributed");
-    DrawTextSCentered(ystart + 3 * ystep, FONT_TEXT_3,
+    DrawTextSCentered(ystart2 + 3 * ystep, FONT_TEXT_3,
 		      "levels to this game");
-    DrawTextSCentered(ystart + 4 * ystep, FONT_TEXT_3,
+    DrawTextSCentered(ystart2 + 4 * ystep, FONT_TEXT_3,
 		      "since 1995");
   }
 #if 0
@@ -2678,8 +2691,10 @@ void HandleInfoScreen_Credits(int button)
 
 void DrawInfoScreen_Program()
 {
-  int ystart = 150, ystep = 30;
-  int ybottom = SYSIZE - 20;
+  int ystart1 = mSY - SY + 100;
+  int ystart2 = mSY - SY + 150;
+  int ybottom = mSY - SY + SYSIZE - 20;
+  int ystep = 30;
 
   SetMainBackgroundImageIfDefined(IMG_BACKGROUND_INFO_PROGRAM);
 
@@ -2688,33 +2703,33 @@ void DrawInfoScreen_Program()
   ClearWindow();
   DrawHeadline();
 
-  DrawTextSCentered(100, FONT_TEXT_1, "Program Information:");
+  DrawTextSCentered(ystart1, FONT_TEXT_1, "Program Information:");
 
-  DrawTextSCentered(ystart + 0 * ystep, FONT_TEXT_2,
+  DrawTextSCentered(ystart2 + 0 * ystep, FONT_TEXT_2,
 		    "This game is Freeware!");
-  DrawTextSCentered(ystart + 1 * ystep, FONT_TEXT_2,
+  DrawTextSCentered(ystart2 + 1 * ystep, FONT_TEXT_2,
 		    "If you like it, send e-mail to:");
-  DrawTextSCentered(ystart + 2 * ystep, FONT_TEXT_3,
+  DrawTextSCentered(ystart2 + 2 * ystep, FONT_TEXT_3,
 		    PROGRAM_EMAIL_STRING);
-  DrawTextSCentered(ystart + 3 * ystep, FONT_TEXT_2,
+  DrawTextSCentered(ystart2 + 3 * ystep, FONT_TEXT_2,
 		    "or SnailMail to:");
-  DrawTextSCentered(ystart + 4 * ystep + 0, FONT_TEXT_3,
+  DrawTextSCentered(ystart2 + 4 * ystep + 0, FONT_TEXT_3,
 		    "Holger Schemel");
-  DrawTextSCentered(ystart + 4 * ystep + 20, FONT_TEXT_3,
+  DrawTextSCentered(ystart2 + 4 * ystep + 20, FONT_TEXT_3,
 		    "Detmolder Strasse 189");
-  DrawTextSCentered(ystart + 4 * ystep + 40, FONT_TEXT_3,
+  DrawTextSCentered(ystart2 + 4 * ystep + 40, FONT_TEXT_3,
 		    "33604 Bielefeld");
-  DrawTextSCentered(ystart + 4 * ystep + 60, FONT_TEXT_3,
+  DrawTextSCentered(ystart2 + 4 * ystep + 60, FONT_TEXT_3,
 		    "Germany");
-  DrawTextSCentered(ystart + 7 * ystep, FONT_TEXT_2,
+  DrawTextSCentered(ystart2 + 7 * ystep, FONT_TEXT_2,
 		    "More information and levels:");
-  DrawTextSCentered(ystart + 8 * ystep, FONT_TEXT_3,
+  DrawTextSCentered(ystart2 + 8 * ystep, FONT_TEXT_3,
 		    PROGRAM_WEBSITE_STRING);
-  DrawTextSCentered(ystart + 9 * ystep, FONT_TEXT_2,
+  DrawTextSCentered(ystart2 + 9 * ystep, FONT_TEXT_2,
 		    "If you have created new levels,");
-  DrawTextSCentered(ystart + 10 * ystep, FONT_TEXT_2,
+  DrawTextSCentered(ystart2 + 10 * ystep, FONT_TEXT_2,
 		    "send them to me to include them!");
-  DrawTextSCentered(ystart + 11 * ystep, FONT_TEXT_2,
+  DrawTextSCentered(ystart2 + 11 * ystep, FONT_TEXT_2,
 		    ":-)");
 
   DrawTextSCentered(ybottom, FONT_TEXT_4,
@@ -2756,12 +2771,13 @@ void DrawInfoScreen_Version()
   int font_text = FONT_TEXT_2;
   int xstep = getFontWidth(font_text);
   int ystep = getFontHeight(font_text);
-  int ystart = 150;
-  int ybottom = SYSIZE - 20;
-  int xstart1 = SX + 2 * xstep;
-  int xstart2 = SX + 18 * xstep;
+  int ystart1 = mSY - SY + 100;
+  int ystart2 = mSY - SY + 150;
+  int ybottom = mSY - SY + SYSIZE - 20;
+  int xstart1 = mSX + 2 * xstep;
+  int xstart2 = mSX + 18 * xstep;
 #if defined(TARGET_SDL)
-  int xstart3 = SX + 28 * xstep;
+  int xstart3 = mSX + 28 * xstep;
   SDL_version sdl_version_compiled;
   const SDL_version *sdl_version_linked;
 #endif
@@ -2773,43 +2789,43 @@ void DrawInfoScreen_Version()
   ClearWindow();
   DrawHeadline();
 
-  DrawTextSCentered(100, FONT_TEXT_1, "Version Information:");
+  DrawTextSCentered(ystart1, FONT_TEXT_1, "Version Information:");
 
-  DrawTextF(xstart1, ystart, font_header, "Name");
-  DrawTextF(xstart2, ystart, font_text, PROGRAM_TITLE_STRING);
+  DrawTextF(xstart1, ystart2, font_header, "Name");
+  DrawTextF(xstart2, ystart2, font_text, PROGRAM_TITLE_STRING);
 
-  ystart += ystep;
-  DrawTextF(xstart1, ystart, font_header, "Version");
-  DrawTextF(xstart2, ystart, font_text, getProgramFullVersionString());
+  ystart2 += ystep;
+  DrawTextF(xstart1, ystart2, font_header, "Version");
+  DrawTextF(xstart2, ystart2, font_text, getProgramFullVersionString());
 
-  ystart += ystep;
-  DrawTextF(xstart1, ystart, font_header, "Platform");
-  DrawTextF(xstart2, ystart, font_text, PLATFORM_STRING);
+  ystart2 += ystep;
+  DrawTextF(xstart1, ystart2, font_header, "Platform");
+  DrawTextF(xstart2, ystart2, font_text, PLATFORM_STRING);
 
-  ystart += ystep;
-  DrawTextF(xstart1, ystart, font_header, "Target");
-  DrawTextF(xstart2, ystart, font_text, TARGET_STRING);
+  ystart2 += ystep;
+  DrawTextF(xstart1, ystart2, font_header, "Target");
+  DrawTextF(xstart2, ystart2, font_text, TARGET_STRING);
 
-  ystart += ystep;
-  DrawTextF(xstart1, ystart, font_header, "Compile time");
-  DrawTextF(xstart2, ystart, font_text, getCompileDateString());
+  ystart2 += ystep;
+  DrawTextF(xstart1, ystart2, font_header, "Compile time");
+  DrawTextF(xstart2, ystart2, font_text, getCompileDateString());
 
 #if defined(TARGET_SDL)
-  ystart += 3 * ystep;
-  DrawTextF(xstart1, ystart, font_header, "Library");
-  DrawTextF(xstart2, ystart, font_header, "compiled");
-  DrawTextF(xstart3, ystart, font_header, "linked");
+  ystart2 += 3 * ystep;
+  DrawTextF(xstart1, ystart2, font_header, "Library");
+  DrawTextF(xstart2, ystart2, font_header, "compiled");
+  DrawTextF(xstart3, ystart2, font_header, "linked");
 
   SDL_VERSION(&sdl_version_compiled);
   sdl_version_linked = SDL_Linked_Version();
 
-  ystart += 2 * ystep;
-  DrawTextF(xstart1, ystart, font_text, "SDL");
-  DrawTextF(xstart2, ystart, font_text, "%d.%d.%d",
+  ystart2 += 2 * ystep;
+  DrawTextF(xstart1, ystart2, font_text, "SDL");
+  DrawTextF(xstart2, ystart2, font_text, "%d.%d.%d",
 	    sdl_version_compiled.major,
 	    sdl_version_compiled.minor,
 	    sdl_version_compiled.patch);
-  DrawTextF(xstart3, ystart, font_text, "%d.%d.%d",
+  DrawTextF(xstart3, ystart2, font_text, "%d.%d.%d",
 	    sdl_version_linked->major,
 	    sdl_version_linked->minor,
 	    sdl_version_linked->patch);
@@ -2817,13 +2833,13 @@ void DrawInfoScreen_Version()
   SDL_IMAGE_VERSION(&sdl_version_compiled);
   sdl_version_linked = IMG_Linked_Version();
 
-  ystart += ystep;
-  DrawTextF(xstart1, ystart, font_text, "SDL_image");
-  DrawTextF(xstart2, ystart, font_text, "%d.%d.%d",
+  ystart2 += ystep;
+  DrawTextF(xstart1, ystart2, font_text, "SDL_image");
+  DrawTextF(xstart2, ystart2, font_text, "%d.%d.%d",
 	    sdl_version_compiled.major,
 	    sdl_version_compiled.minor,
 	    sdl_version_compiled.patch);
-  DrawTextF(xstart3, ystart, font_text, "%d.%d.%d",
+  DrawTextF(xstart3, ystart2, font_text, "%d.%d.%d",
 	    sdl_version_linked->major,
 	    sdl_version_linked->minor,
 	    sdl_version_linked->patch);
@@ -2831,13 +2847,13 @@ void DrawInfoScreen_Version()
   SDL_MIXER_VERSION(&sdl_version_compiled);
   sdl_version_linked = Mix_Linked_Version();
 
-  ystart += ystep;
-  DrawTextF(xstart1, ystart, font_text, "SDL_mixer");
-  DrawTextF(xstart2, ystart, font_text, "%d.%d.%d",
+  ystart2 += ystep;
+  DrawTextF(xstart1, ystart2, font_text, "SDL_mixer");
+  DrawTextF(xstart2, ystart2, font_text, "%d.%d.%d",
 	    sdl_version_compiled.major,
 	    sdl_version_compiled.minor,
 	    sdl_version_compiled.patch);
-  DrawTextF(xstart3, ystart, font_text, "%d.%d.%d",
+  DrawTextF(xstart3, ystart2, font_text, "%d.%d.%d",
 	    sdl_version_linked->major,
 	    sdl_version_linked->minor,
 	    sdl_version_linked->patch);
@@ -2845,13 +2861,13 @@ void DrawInfoScreen_Version()
   SDL_NET_VERSION(&sdl_version_compiled);
   sdl_version_linked = SDLNet_Linked_Version();
 
-  ystart += ystep;
-  DrawTextF(xstart1, ystart, font_text, "SDL_net");
-  DrawTextF(xstart2, ystart, font_text, "%d.%d.%d",
+  ystart2 += ystep;
+  DrawTextF(xstart1, ystart2, font_text, "SDL_net");
+  DrawTextF(xstart2, ystart2, font_text, "%d.%d.%d",
 	    sdl_version_compiled.major,
 	    sdl_version_compiled.minor,
 	    sdl_version_compiled.patch);
-  DrawTextF(xstart3, ystart, font_text, "%d.%d.%d",
+  DrawTextF(xstart3, ystart2, font_text, "%d.%d.%d",
 	    sdl_version_linked->major,
 	    sdl_version_linked->minor,
 	    sdl_version_linked->patch);
@@ -2892,8 +2908,9 @@ void HandleInfoScreen_Version(int button)
 
 void DrawInfoScreen_LevelSet()
 {
-  int ystart = 150;
-  int ybottom = SYSIZE - 20;
+  int ystart1 = mSY - SY + 100;
+  int ystart2 = mSY - SY + 150;
+  int ybottom = mSY - SY + SYSIZE - 20;
   char *filename = getLevelSetInfoFilename();
 #if 1
   int font_nr = FONT_INFO_LEVELSET;
@@ -2903,9 +2920,9 @@ void DrawInfoScreen_LevelSet()
   int font_width = getFontWidth(font_nr);
   int font_height = getFontHeight(font_nr);
   int pad_x = 32;
-  int pad_y = ystart;
-  int sx = SX + pad_x;
-  int sy = SY + pad_y;
+  int pad_y = 150;
+  int sx = mSX + pad_x;
+  int sy = mSY + pad_y;
   int max_chars_per_line = (SXSIZE - 2 * pad_x) / font_width;
   int max_lines_per_screen = (SYSIZE - pad_y) / font_height - 1;
 
@@ -2916,7 +2933,7 @@ void DrawInfoScreen_LevelSet()
   ClearWindow();
   DrawHeadline();
 
-  DrawTextSCentered(100, FONT_TEXT_1, "Level Set Information:");
+  DrawTextSCentered(ystart1, FONT_TEXT_1, "Level Set Information:");
 
   DrawTextSCentered(ybottom, FONT_TEXT_4,
 		    "Press any key or button for info menu");
@@ -2925,7 +2942,7 @@ void DrawInfoScreen_LevelSet()
     DrawTextFromFile(sx, sy, filename, font_nr, max_chars_per_line,
 		     max_lines_per_screen, TRUE);
   else
-    DrawTextSCentered(ystart, FONT_TEXT_2,
+    DrawTextSCentered(ystart2, FONT_TEXT_2,
 		      "No information for this level set.");
 
   FadeIn(REDRAW_FIELD);
