@@ -251,7 +251,8 @@
 
 /* values for mouse cursor */
 #define CURSOR_DEFAULT		0
-#define CURSOR_PLAYFIELD	1
+#define CURSOR_NONE		1
+#define CURSOR_PLAYFIELD	2
 
 /* fundamental game speed values */
 #define ONE_SECOND_DELAY	1000	/* delay value for one second */

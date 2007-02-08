@@ -986,8 +986,9 @@ void ScaleBitmap(Bitmap *old_bitmap, int zoom_factor)
 /* ------------------------------------------------------------------------- */
 
 #if !defined(PLATFORM_MSDOS)
-/* XPM */
-static const char *cursor_image_playfield[] =
+#define USE_ONE_PIXEL_PLAYFIELD_MOUSEPOINTER		0
+/* XPM image definitions */
+static const char *cursor_image_none[] =
 {
   /* width height num_colors chars_per_pixel */
   "    16    16        3            1",
@@ -996,10 +997,6 @@ static const char *cursor_image_playfield[] =
   "X c #000000",
   ". c #ffffff",
   "  c None",
-
-#if 1
-  /* some people complained about a "white dot" on the screen and thought it
-     was a graphical error... OK, let's just remove the whole pointer :-) */
 
   /* pixels */
   "                ",
@@ -1021,8 +1018,17 @@ static const char *cursor_image_playfield[] =
 
   /* hot spot */
   "0,0"
+};
+#if defined(USE_ONE_PIXEL_PLAYFIELD_MOUSEPOINTER)
+static const char *cursor_image_dot[] =
+{
+  /* width height num_colors chars_per_pixel */
+  "    16    16        3            1",
 
-#else
+  /* colors */
+  "X c #000000",
+  ". c #ffffff",
+  "  c None",
 
   /* pixels */
   " X              ",
@@ -1044,8 +1050,13 @@ static const char *cursor_image_playfield[] =
 
   /* hot spot */
   "1,1"
-#endif
 };
+static const char **cursor_image_playfield = cursor_image_dot;
+#else
+/* some people complained about a "white dot" on the screen and thought it
+   was a graphical error... OK, let's just remove the whole pointer :-) */
+static const char **cursor_image_playfield = cursor_image_none;
+#endif
 
 #if defined(TARGET_SDL)
 static const int cursor_bit_order = BIT_ORDER_MSB;
@@ -1104,15 +1115,24 @@ static struct MouseCursorInfo *get_cursor_from_image(const char **image)
 void SetMouseCursor(int mode)
 {
 #if !defined(PLATFORM_MSDOS)
+  static struct MouseCursorInfo *cursor_none = NULL;
   static struct MouseCursorInfo *cursor_playfield = NULL;
+  struct MouseCursorInfo *cursor_new;
+
+  if (cursor_none == NULL)
+    cursor_none = get_cursor_from_image(cursor_image_none);
 
   if (cursor_playfield == NULL)
     cursor_playfield = get_cursor_from_image(cursor_image_playfield);
 
+  cursor_new = (mode == CURSOR_DEFAULT   ? NULL :
+		mode == CURSOR_NONE      ? cursor_none :
+		mode == CURSOR_PLAYFIELD ? cursor_playfield : NULL);
+
 #if defined(TARGET_SDL)
-  SDLSetMouseCursor(mode == CURSOR_PLAYFIELD ? cursor_playfield : NULL);
+  SDLSetMouseCursor(cursor_new);
 #elif defined(TARGET_X11_NATIVE)
-  X11SetMouseCursor(mode == CURSOR_PLAYFIELD ? cursor_playfield : NULL);
+  X11SetMouseCursor(cursor_new);
 #endif
 #endif
 }

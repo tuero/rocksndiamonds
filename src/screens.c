@@ -1059,6 +1059,8 @@ void DrawMainMenuExt(int redraw_mask, boolean do_fading)
   else
     BackToFront();
 
+  SetMouseCursor(CURSOR_DEFAULT);
+
   InitAnimation();
 
   OpenDoor(DOOR_CLOSE_1 | DOOR_OPEN_2);
@@ -1164,6 +1166,8 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
       title.auto_delay_final = -1;
     }
 
+    SetMouseCursor(CURSOR_NONE);
+
     FadeIn(REDRAW_ALL);
 
     DelayReached(&title_delay, 0);	/* reset delay counter */
@@ -1244,6 +1248,8 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
     show_title_initial = FALSE;
 
     RedrawBackground();
+
+    SetMouseCursor(CURSOR_DEFAULT);
 
     if (game_status == GAME_MODE_INFO)
     {

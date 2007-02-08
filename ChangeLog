@@ -2,6 +2,7 @@
 	* changed end of game again: do not wait for the user to press a key
 	  anymore, but directly ask/confirm tape saving and go to hall of fame
 	* re-enabled quitting of lost game by pressing space or return again
+	* added blanking of mouse pointer when displaying title screens
 
 2007-02-05
 	* improved handling of title text messages (initial and for level set)
