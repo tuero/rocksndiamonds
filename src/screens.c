@@ -245,7 +245,6 @@ static Bitmap *scrollbar_bitmap[NUM_SCROLLBAR_BITMAPS];
 #define MAX_NUM_TITLE_SCREENS	(2 * MAX_NUM_TITLE_IMAGES +		\
 				 2 * MAX_NUM_TITLE_MESSAGES)
 
-static boolean show_title_initial = TRUE;
 static int num_title_screens = 0;
 
 struct TitleControlInfo
@@ -253,6 +252,7 @@ struct TitleControlInfo
   boolean is_image;
   boolean initial;
   int local_nr;
+  int sort_priority;
 };
 
 struct TitleControlInfo title_controls[MAX_NUM_TITLE_SCREENS];
@@ -429,12 +429,35 @@ static int getTitleScreenGraphic(int nr, boolean initial)
   return (initial ? IMG_TITLESCREEN_INITIAL_1 : IMG_TITLESCREEN_1) + nr;
 }
 
+static struct TitleMessageInfo *getTitleMessageInfo(int nr, boolean initial)
+{
+  return (initial ? &titlemessage_initial[nr] : &titlemessage[nr]);
+}
+
+static int compareTitleControlInfo(const void *object1, const void *object2)
+{
+  const struct TitleControlInfo *tci1 = (struct TitleControlInfo *)object1;
+  const struct TitleControlInfo *tci2 = (struct TitleControlInfo *)object2;
+  int compare_result;
+
+  if (tci1->initial != tci2->initial)
+    compare_result = (tci1->initial ? -1 : +1);
+  else if (tci1->sort_priority != tci2->sort_priority)
+    compare_result = tci1->sort_priority - tci2->sort_priority;
+  else
+    compare_result = tci1->local_nr - tci2->local_nr;
+
+  return compare_result;
+}
+
 static void InitializeTitleControlsExt_AddTitleInfo(boolean is_image,
-						    boolean initial, int nr)
+						    boolean initial,
+						    int nr, int sort_priority)
 {
   title_controls[num_title_screens].is_image = is_image;
   title_controls[num_title_screens].initial = initial;
   title_controls[num_title_screens].local_nr = nr;
+  title_controls[num_title_screens].sort_priority = sort_priority;
 
   num_title_screens++;
 }
@@ -444,15 +467,27 @@ static void InitializeTitleControls_CheckTitleInfo(boolean initial)
   int i;
 
   for (i = 0; i < MAX_NUM_TITLE_IMAGES; i++)
-    if (graphic_info[getTitleScreenGraphic(i, initial)].bitmap != NULL)
-      InitializeTitleControlsExt_AddTitleInfo(TRUE, initial, i);
+  {
+    int graphic = getTitleScreenGraphic(i, initial);
+    Bitmap *bitmap = graphic_info[graphic].bitmap;
+    int sort_priority = graphic_info[graphic].sort_priority;
+
+    if (bitmap != NULL)
+      InitializeTitleControlsExt_AddTitleInfo(TRUE, initial, i, sort_priority);
+  }
 
   for (i = 0; i < MAX_NUM_TITLE_MESSAGES; i++)
-    if (getLevelSetTitleMessageFilename(i, initial) != NULL)
-      InitializeTitleControlsExt_AddTitleInfo(FALSE, initial, i);
+  {
+    struct TitleMessageInfo *tmi = getTitleMessageInfo(i, initial);
+    char *filename = getLevelSetTitleMessageFilename(i, initial);
+    int sort_priority = tmi->sort_priority;
+
+    if (filename != NULL)
+      InitializeTitleControlsExt_AddTitleInfo(FALSE, initial, i, sort_priority);
+  }
 }
 
-static void InitializeTitleControls()
+static void InitializeTitleControls(boolean show_title_initial)
 {
   num_title_screens = 0;
 
@@ -460,6 +495,10 @@ static void InitializeTitleControls()
     InitializeTitleControls_CheckTitleInfo(TRUE);
 
   InitializeTitleControls_CheckTitleInfo(FALSE);
+
+  /* sort title screens according to sort_priority and title number */
+  qsort(title_controls, num_title_screens, sizeof(struct TitleControlInfo),
+	compareTitleControlInfo);
 }
 
 static void InitializeMainControls()
@@ -792,6 +831,9 @@ void DrawTitleScreenImage(int nr, boolean initial)
   dst_x = (WIN_XSIZE - width) / 2;
   dst_y = (WIN_YSIZE - height) / 2;
 
+  SetDrawBackgroundMask(REDRAW_ALL);
+  SetWindowBackgroundImage(IMG_BACKGROUND_TITLE);
+
   ClearRectangleOnBackground(drawto, 0, 0, WIN_XSIZE, WIN_YSIZE);
 
   if (DrawingOnBackground(dst_x, dst_y))
@@ -833,7 +875,7 @@ void DrawTitleScreenMessage(int nr, boolean initial)
     return;
 
   SetDrawBackgroundMask(REDRAW_ALL);
-  SetWindowBackgroundImageIfDefined(IMG_BACKGROUND_MESSAGE);
+  SetWindowBackgroundImage(IMG_BACKGROUND_MESSAGE);
 
   ClearRectangleOnBackground(drawto, 0, 0, WIN_XSIZE, WIN_YSIZE);
 
@@ -855,11 +897,30 @@ void DrawTitleScreen()
 {
   KeyboardAutoRepeatOff();
 
+#if 0
   SetMainBackgroundImage(IMG_BACKGROUND_TITLE);
+#endif
 
   HandleTitleScreen(0, 0, 0, 0, MB_MENU_INITIALIZE);
 
   StopAnimation();
+}
+
+boolean CheckTitleScreen(boolean levelset_has_changed)
+{
+  static boolean show_title_initial = TRUE;
+  boolean show_titlescreen = FALSE;
+
+  /* needed to be able to skip title screen, if no image or message defined */
+  InitializeTitleControls(show_title_initial);
+
+  if (setup.show_titlescreen && (show_title_initial || levelset_has_changed))
+    show_titlescreen = TRUE;
+
+  /* show initial title images and messages only once at program start */
+  show_title_initial = FALSE;
+
+  return (show_titlescreen && num_title_screens > 0);
 }
 
 void DrawMainMenuExt(int redraw_mask, boolean do_fading)
@@ -921,21 +982,17 @@ void DrawMainMenuExt(int redraw_mask, boolean do_fading)
 #endif
 
 #if 1
-  if (setup.show_titlescreen && (show_title_initial || levelset_has_changed))
+  if (CheckTitleScreen(levelset_has_changed))
   {
-    /* needed to be able to skip title screen, if no image or message defined */
-    InitializeTitleControls();
+    game_status = GAME_MODE_TITLE;
 
-    if (num_title_screens > 0)
-    {
-      game_status = GAME_MODE_TITLE;
+    DrawTitleScreen();
 
-      DrawTitleScreen();
-
-      return;
-    }
+    return;
   }
+
 #else
+
   if (setup.show_titlescreen &&
       ((levelset_has_changed &&
 	(graphic_info[IMG_TITLESCREEN_1].bitmap != NULL ||
@@ -1114,7 +1171,11 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
   static int title_screen_nr = 0;
   boolean return_to_main_menu = FALSE;
   boolean use_fading_main_menu = TRUE;
+#if 1
+  boolean use_cross_fading = FALSE;
+#else
   boolean use_cross_fading = !show_title_initial;		/* default */
+#endif
   struct TitleControlInfo *tci;
 
   if (button == MB_MENU_INITIALIZE)
@@ -1125,8 +1186,10 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
     title_screen_nr = 0;
     tci = &title_controls[title_screen_nr];
 
+#if 0
     /* determine number of title screens to display (images and messages) */
     InitializeTitleControls();
+#endif
 
     if (game_status == GAME_MODE_INFO)
     {
@@ -1244,9 +1307,6 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
 
   if (return_to_main_menu)
   {
-    /* show initial title images and messages only once at program start */
-    show_title_initial = FALSE;
-
     RedrawBackground();
 
     SetMouseCursor(CURSOR_DEFAULT);
@@ -2782,7 +2842,7 @@ void DrawInfoScreen_Version()
   const SDL_version *sdl_version_linked;
 #endif
 
-  SetMainBackgroundImageIfDefined(IMG_BACKGROUND_INFO_PROGRAM);
+  SetMainBackgroundImageIfDefined(IMG_BACKGROUND_INFO_VERSION);
 
   FadeOut(REDRAW_FIELD);
 

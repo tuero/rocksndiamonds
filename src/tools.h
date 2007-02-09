@@ -82,6 +82,8 @@ void FadeCrossSaveBackbuffer();
 void ClearWindow();
 void SetWindowBackgroundImageIfDefined(int);
 void SetMainBackgroundImageIfDefined(int);
+void SetDoorBackgroundImageIfDefined(int);
+void SetWindowBackgroundImage(int);
 void SetMainBackgroundImage(int);
 void SetDoorBackgroundImage(int);
 void SetPanelBackground();

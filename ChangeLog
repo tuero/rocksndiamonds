@@ -1,3 +1,6 @@
+2007-02-08
+	* added sort priority for order of title screens and title messages
+
 2007-02-07
 	* changed end of game again: do not wait for the user to press a key
 	  anymore, but directly ask/confirm tape saving and go to hall of fame

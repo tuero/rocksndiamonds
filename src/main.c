@@ -107,6 +107,8 @@ struct GameInfo		game;
 struct GlobalInfo	global;
 struct BorderInfo	border;
 struct TitleInfo	title;
+struct TitleMessageInfo	titlemessage[MAX_NUM_TITLE_MESSAGES];
+struct TitleMessageInfo	titlemessage_initial[MAX_NUM_TITLE_MESSAGES];
 struct MenuInfo		menu;
 struct DoorInfo		door_1, door_2;
 struct PreviewInfo	preview;
@@ -5380,71 +5382,641 @@ struct SpecialSuffixInfo special_suffix_info[NUM_SPECIAL_GFX_ARGS + 1 + 1] =
 
 struct TokenIntPtrInfo image_config_vars[] =
 {
-  { "global.num_toons",		&global.num_toons			      },
+  {
+    "titlemessage_initial_1.x",
+    &titlemessage_initial[0].x
+  },
+  {
+    "titlemessage_initial_1.y",
+    &titlemessage_initial[0].y
+  },
+  {
+    "titlemessage_initial_1.width",
+    &titlemessage_initial[0].width
+  },
+  {
+    "titlemessage_initial_1.height",
+    &titlemessage_initial[0].height
+  },
+  {
+    "titlemessage_initial_1.chars",
+    &titlemessage_initial[0].chars
+  },
+  {
+    "titlemessage_initial_1.lines",
+    &titlemessage_initial[0].lines
+  },
+  {
+    "titlemessage_initial_1.align",
+    &titlemessage_initial[0].align
+  },
+  {
+    "titlemessage_initial_1.autowrap",
+    &titlemessage_initial[0].autowrap
+  },
+  {
+    "titlemessage_initial_1.centered",
+    &titlemessage_initial[0].centered
+  },
+  {
+    "titlemessage_initial_1.skip_comments",
+    &titlemessage_initial[0].skip_comments
+  },
+  {
+    "titlemessage_initial_1.sort_priority",
+    &titlemessage_initial[0].sort_priority
+  },
+  {
+    "titlemessage_initial_2.x",
+    &titlemessage_initial[1].x
+  },
+  {
+    "titlemessage_initial_2.y",
+    &titlemessage_initial[1].y
+  },
+  {
+    "titlemessage_initial_2.width",
+    &titlemessage_initial[1].width
+  },
+  {
+    "titlemessage_initial_2.height",
+    &titlemessage_initial[1].height
+  },
+  {
+    "titlemessage_initial_2.chars",
+    &titlemessage_initial[1].chars
+  },
+  {
+    "titlemessage_initial_2.lines",
+    &titlemessage_initial[1].lines
+  },
+  {
+    "titlemessage_initial_2.align",
+    &titlemessage_initial[1].align
+  },
+  {
+    "titlemessage_initial_2.autowrap",
+    &titlemessage_initial[1].autowrap
+  },
+  {
+    "titlemessage_initial_2.centered",
+    &titlemessage_initial[1].centered
+  },
+  {
+    "titlemessage_initial_2.skip_comments",
+    &titlemessage_initial[1].skip_comments
+  },
+  {
+    "titlemessage_initial_2.sort_priority",
+    &titlemessage_initial[1].sort_priority
+  },
+  {
+    "titlemessage_initial_3.x",
+    &titlemessage_initial[2].x
+  },
+  {
+    "titlemessage_initial_3.y",
+    &titlemessage_initial[2].y
+  },
+  {
+    "titlemessage_initial_3.width",
+    &titlemessage_initial[2].width
+  },
+  {
+    "titlemessage_initial_3.height",
+    &titlemessage_initial[2].height
+  },
+  {
+    "titlemessage_initial_3.chars",
+    &titlemessage_initial[2].chars
+  },
+  {
+    "titlemessage_initial_3.lines",
+    &titlemessage_initial[2].lines
+  },
+  {
+    "titlemessage_initial_3.align",
+    &titlemessage_initial[2].align
+  },
+  {
+    "titlemessage_initial_3.autowrap",
+    &titlemessage_initial[2].autowrap
+  },
+  {
+    "titlemessage_initial_3.centered",
+    &titlemessage_initial[2].centered
+  },
+  {
+    "titlemessage_initial_3.skip_comments",
+    &titlemessage_initial[2].skip_comments
+  },
+  {
+    "titlemessage_initial_3.sort_priority",
+    &titlemessage_initial[2].sort_priority
+  },
+  {
+    "titlemessage_initial_4.x",
+    &titlemessage_initial[3].x
+  },
+  {
+    "titlemessage_initial_4.y",
+    &titlemessage_initial[3].y
+  },
+  {
+    "titlemessage_initial_4.width",
+    &titlemessage_initial[3].width
+  },
+  {
+    "titlemessage_initial_4.height",
+    &titlemessage_initial[3].height
+  },
+  {
+    "titlemessage_initial_4.chars",
+    &titlemessage_initial[3].chars
+  },
+  {
+    "titlemessage_initial_4.lines",
+    &titlemessage_initial[3].lines
+  },
+  {
+    "titlemessage_initial_4.align",
+    &titlemessage_initial[3].align
+  },
+  {
+    "titlemessage_initial_4.autowrap",
+    &titlemessage_initial[3].autowrap
+  },
+  {
+    "titlemessage_initial_4.centered",
+    &titlemessage_initial[3].centered
+  },
+  {
+    "titlemessage_initial_4.skip_comments",
+    &titlemessage_initial[3].skip_comments
+  },
+  {
+    "titlemessage_initial_4.sort_priority",
+    &titlemessage_initial[3].sort_priority
+  },
+  {
+    "titlemessage_initial_5.x",
+    &titlemessage_initial[4].x
+  },
+  {
+    "titlemessage_initial_5.y",
+    &titlemessage_initial[4].y
+  },
+  {
+    "titlemessage_initial_5.width",
+    &titlemessage_initial[4].width
+  },
+  {
+    "titlemessage_initial_5.height",
+    &titlemessage_initial[4].height
+  },
+  {
+    "titlemessage_initial_5.chars",
+    &titlemessage_initial[4].chars
+  },
+  {
+    "titlemessage_initial_5.lines",
+    &titlemessage_initial[4].lines
+  },
+  {
+    "titlemessage_initial_5.align",
+    &titlemessage_initial[4].align
+  },
+  {
+    "titlemessage_initial_5.autowrap",
+    &titlemessage_initial[4].autowrap
+  },
+  {
+    "titlemessage_initial_5.centered",
+    &titlemessage_initial[4].centered
+  },
+  {
+    "titlemessage_initial_5.skip_comments",
+    &titlemessage_initial[4].skip_comments
+  },
+  {
+    "titlemessage_initial_5.sort_priority",
+    &titlemessage_initial[4].sort_priority
+  },
+  {
+    "titlemessage_1.x",
+    &titlemessage[0].x
+  },
+  {
+    "titlemessage_1.y",
+    &titlemessage[0].y
+  },
+  {
+    "titlemessage_1.width",
+    &titlemessage[0].width
+  },
+  {
+    "titlemessage_1.height",
+    &titlemessage[0].height
+  },
+  {
+    "titlemessage_1.chars",
+    &titlemessage[0].chars
+  },
+  {
+    "titlemessage_1.lines",
+    &titlemessage[0].lines
+  },
+  {
+    "titlemessage_1.align",
+    &titlemessage[0].align
+  },
+  {
+    "titlemessage_1.autowrap",
+    &titlemessage[0].autowrap
+  },
+  {
+    "titlemessage_1.centered",
+    &titlemessage[0].centered
+  },
+  {
+    "titlemessage_1.skip_comments",
+    &titlemessage[0].skip_comments
+  },
+  {
+    "titlemessage_1.sort_priority",
+    &titlemessage[0].sort_priority
+  },
+  {
+    "titlemessage_2.x",
+    &titlemessage[1].x
+  },
+  {
+    "titlemessage_2.y",
+    &titlemessage[1].y
+  },
+  {
+    "titlemessage_2.width",
+    &titlemessage[1].width
+  },
+  {
+    "titlemessage_2.height",
+    &titlemessage[1].height
+  },
+  {
+    "titlemessage_2.chars",
+    &titlemessage[1].chars
+  },
+  {
+    "titlemessage_2.lines",
+    &titlemessage[1].lines
+  },
+  {
+    "titlemessage_2.align",
+    &titlemessage[1].align
+  },
+  {
+    "titlemessage_2.autowrap",
+    &titlemessage[1].autowrap
+  },
+  {
+    "titlemessage_2.centered",
+    &titlemessage[1].centered
+  },
+  {
+    "titlemessage_2.skip_comments",
+    &titlemessage[1].skip_comments
+  },
+  {
+    "titlemessage_2.sort_priority",
+    &titlemessage[1].sort_priority
+  },
+  {
+    "titlemessage_3.x",
+    &titlemessage[2].x
+  },
+  {
+    "titlemessage_3.y",
+    &titlemessage[2].y
+  },
+  {
+    "titlemessage_3.width",
+    &titlemessage[2].width
+  },
+  {
+    "titlemessage_3.height",
+    &titlemessage[2].height
+  },
+  {
+    "titlemessage_3.chars",
+    &titlemessage[2].chars
+  },
+  {
+    "titlemessage_3.lines",
+    &titlemessage[2].lines
+  },
+  {
+    "titlemessage_3.align",
+    &titlemessage[2].align
+  },
+  {
+    "titlemessage_3.autowrap",
+    &titlemessage[2].autowrap
+  },
+  {
+    "titlemessage_3.centered",
+    &titlemessage[2].centered
+  },
+  {
+    "titlemessage_3.skip_comments",
+    &titlemessage[2].skip_comments
+  },
+  {
+    "titlemessage_3.sort_priority",
+    &titlemessage[2].sort_priority
+  },
+  {
+    "titlemessage_4.x",
+    &titlemessage[3].x
+  },
+  {
+    "titlemessage_4.y",
+    &titlemessage[3].y
+  },
+  {
+    "titlemessage_4.width",
+    &titlemessage[3].width
+  },
+  {
+    "titlemessage_4.height",
+    &titlemessage[3].height
+  },
+  {
+    "titlemessage_4.chars",
+    &titlemessage[3].chars
+  },
+  {
+    "titlemessage_4.lines",
+    &titlemessage[3].lines
+  },
+  {
+    "titlemessage_4.align",
+    &titlemessage[3].align
+  },
+  {
+    "titlemessage_4.autowrap",
+    &titlemessage[3].autowrap
+  },
+  {
+    "titlemessage_4.centered",
+    &titlemessage[3].centered
+  },
+  {
+    "titlemessage_4.skip_comments",
+    &titlemessage[3].skip_comments
+  },
+  {
+    "titlemessage_4.sort_priority",
+    &titlemessage[3].sort_priority
+  },
+  {
+    "titlemessage_5.x",
+    &titlemessage[4].x
+  },
+  {
+    "titlemessage_5.y",
+    &titlemessage[4].y
+  },
+  {
+    "titlemessage_5.width",
+    &titlemessage[4].width
+  },
+  {
+    "titlemessage_5.height",
+    &titlemessage[4].height
+  },
+  {
+    "titlemessage_5.chars",
+    &titlemessage[4].chars
+  },
+  {
+    "titlemessage_5.lines",
+    &titlemessage[4].lines
+  },
+  {
+    "titlemessage_5.align",
+    &titlemessage[4].align
+  },
+  {
+    "titlemessage_5.autowrap",
+    &titlemessage[4].autowrap
+  },
+  {
+    "titlemessage_5.centered",
+    &titlemessage[4].centered
+  },
+  {
+    "titlemessage_5.skip_comments",
+    &titlemessage[4].skip_comments
+  },
+  {
+    "titlemessage_5.sort_priority",
+    &titlemessage[4].sort_priority
+  },
 
-  { "border.draw_masked.TITLE",	 &border.draw_masked[GFX_SPECIAL_ARG_TITLE]   },
-  { "border.draw_masked.MAIN",	 &border.draw_masked[GFX_SPECIAL_ARG_MAIN]    },
-  { "border.draw_masked.LEVELS", &border.draw_masked[GFX_SPECIAL_ARG_LEVELS]  },
-  { "border.draw_masked.SCORES", &border.draw_masked[GFX_SPECIAL_ARG_SCORES]  },
-  { "border.draw_masked.EDITOR", &border.draw_masked[GFX_SPECIAL_ARG_EDITOR]  },
-  { "border.draw_masked.INFO",	 &border.draw_masked[GFX_SPECIAL_ARG_INFO]    },
-  { "border.draw_masked.SETUP",	 &border.draw_masked[GFX_SPECIAL_ARG_SETUP]   },
-  { "border.draw_masked.PLAYING",&border.draw_masked[GFX_SPECIAL_ARG_PLAYING] },
-  { "border.draw_masked.DOOR",	 &border.draw_masked[GFX_SPECIAL_ARG_DOOR]    },
+  {
+    "global.num_toons",
+    &global.num_toons
+  },
 
-  { "title.fade_delay",		&title.fade_delay			      },
-  { "title.post_delay",		&title.post_delay			      },
-  { "title.auto_delay",		&title.auto_delay			      },
+  {
+    "border.draw_masked.TITLE",
+    &border.draw_masked[GFX_SPECIAL_ARG_TITLE]
+  },
+  {
+    "border.draw_masked.MAIN",
+    &border.draw_masked[GFX_SPECIAL_ARG_MAIN]
+  },
+  {
+    "border.draw_masked.LEVELS",
+    &border.draw_masked[GFX_SPECIAL_ARG_LEVELS]
+  },
+  {
+    "border.draw_masked.SCORES",
+    &border.draw_masked[GFX_SPECIAL_ARG_SCORES]
+  },
+  {
+    "border.draw_masked.EDITOR",
+    &border.draw_masked[GFX_SPECIAL_ARG_EDITOR]
+  },
+  {
+    "border.draw_masked.INFO",
+    &border.draw_masked[GFX_SPECIAL_ARG_INFO]
+  },
+  {
+    "border.draw_masked.SETUP",
+    &border.draw_masked[GFX_SPECIAL_ARG_SETUP]
+  },
+  {
+    "border.draw_masked.PLAYING",
+    &border.draw_masked[GFX_SPECIAL_ARG_PLAYING]
+  },
+  {
+    "border.draw_masked.DOOR",
+    &border.draw_masked[GFX_SPECIAL_ARG_DOOR]
+  },
 
-  { "menu.fade_delay",		&menu.fade_delay			      },
-  { "menu.post_delay",		&menu.post_delay			      },
-  { "menu.auto_delay",		&menu.auto_delay			      },
+  {
+    "title.fade_delay",
+    &title.fade_delay
+  },
+  {
+    "title.post_delay",
+    &title.post_delay
+  },
+  {
+    "title.auto_delay",
+    &title.auto_delay
+  },
 
-  { "menu.draw_xoffset",	&menu.draw_xoffset[GFX_SPECIAL_ARG_DEFAULT]   },
-  { "menu.draw_yoffset",	&menu.draw_yoffset[GFX_SPECIAL_ARG_DEFAULT]   },
-  { "menu.draw_xoffset.MAIN",	&menu.draw_xoffset[GFX_SPECIAL_ARG_MAIN]      },
-  { "menu.draw_yoffset.MAIN",	&menu.draw_yoffset[GFX_SPECIAL_ARG_MAIN]      },
-  { "menu.draw_xoffset.LEVELS",	&menu.draw_xoffset[GFX_SPECIAL_ARG_LEVELS]    },
-  { "menu.draw_yoffset.LEVELS",	&menu.draw_yoffset[GFX_SPECIAL_ARG_LEVELS]    },
-  { "menu.draw_xoffset.SCORES",	&menu.draw_xoffset[GFX_SPECIAL_ARG_SCORES]    },
-  { "menu.draw_yoffset.SCORES",	&menu.draw_yoffset[GFX_SPECIAL_ARG_SCORES]    },
-  { "menu.draw_xoffset.EDITOR",	&menu.draw_xoffset[GFX_SPECIAL_ARG_EDITOR]    },
-  { "menu.draw_yoffset.EDITOR",	&menu.draw_yoffset[GFX_SPECIAL_ARG_EDITOR]    },
-  { "menu.draw_xoffset.INFO",	&menu.draw_xoffset[GFX_SPECIAL_ARG_INFO]      },
-  { "menu.draw_yoffset.INFO",	&menu.draw_yoffset[GFX_SPECIAL_ARG_INFO]      },
-  { "menu.draw_xoffset.INFO[ELEMENTS]",
-    &menu.draw_xoffset_info[GFX_SPECIAL_ARG_INFO_ELEMENTS]		      },
-  { "menu.draw_yoffset.INFO[ELEMENTS]",
-    &menu.draw_yoffset_info[GFX_SPECIAL_ARG_INFO_ELEMENTS]		      },
-  { "menu.draw_xoffset.INFO[MUSIC]",
-    &menu.draw_xoffset_info[GFX_SPECIAL_ARG_INFO_MUSIC]			      },
-  { "menu.draw_yoffset.INFO[MUSIC]",
-    &menu.draw_yoffset_info[GFX_SPECIAL_ARG_INFO_MUSIC]			      },
-  { "menu.draw_xoffset.INFO[CREDITS]",
-    &menu.draw_xoffset_info[GFX_SPECIAL_ARG_INFO_CREDITS]		      },
-  { "menu.draw_yoffset.INFO[CREDITS]",
-    &menu.draw_yoffset_info[GFX_SPECIAL_ARG_INFO_CREDITS]		      },
-  { "menu.draw_xoffset.INFO[PROGRAM]",
-    &menu.draw_xoffset_info[GFX_SPECIAL_ARG_INFO_PROGRAM]		      },
-  { "menu.draw_yoffset.INFO[PROGRAM]",
-    &menu.draw_yoffset_info[GFX_SPECIAL_ARG_INFO_PROGRAM]		      },
-  { "menu.draw_xoffset.INFO[VERSION]",
-    &menu.draw_xoffset_info[GFX_SPECIAL_ARG_INFO_VERSION]		      },
-  { "menu.draw_yoffset.INFO[VERSION]",
-    &menu.draw_yoffset_info[GFX_SPECIAL_ARG_INFO_VERSION]		      },
-  { "menu.draw_xoffset.INFO[LEVELSET]",
-    &menu.draw_xoffset_info[GFX_SPECIAL_ARG_INFO_LEVELSET]		      },
-  { "menu.draw_yoffset.INFO[LEVELSET]",
-    &menu.draw_yoffset_info[GFX_SPECIAL_ARG_INFO_LEVELSET]		      },
-  { "menu.draw_xoffset.SETUP",	&menu.draw_xoffset[GFX_SPECIAL_ARG_SETUP]     },
-  { "menu.draw_yoffset.SETUP",	&menu.draw_yoffset[GFX_SPECIAL_ARG_SETUP]     },
+  {
+    "menu.fade_delay",
+    &menu.fade_delay
+  },
+  {
+    "menu.post_delay",
+    &menu.post_delay
+  },
+  {
+    "menu.auto_delay",
+    &menu.auto_delay
+  },
 
-  { "menu.scrollbar_xoffset",	&menu.scrollbar_xoffset			      },
+  {
+    "menu.draw_xoffset",
+    &menu.draw_xoffset[GFX_SPECIAL_ARG_DEFAULT]
+  },
+  {
+    "menu.draw_yoffset",
+    &menu.draw_yoffset[GFX_SPECIAL_ARG_DEFAULT]
+  },
+  {
+    "menu.draw_xoffset.MAIN",
+    &menu.draw_xoffset[GFX_SPECIAL_ARG_MAIN]
+  },
+  {
+    "menu.draw_yoffset.MAIN",
+    &menu.draw_yoffset[GFX_SPECIAL_ARG_MAIN]
+  },
+  {
+    "menu.draw_xoffset.LEVELS",
+    &menu.draw_xoffset[GFX_SPECIAL_ARG_LEVELS]
+  },
+  {
+    "menu.draw_yoffset.LEVELS",
+    &menu.draw_yoffset[GFX_SPECIAL_ARG_LEVELS]
+  },
+  {
+    "menu.draw_xoffset.SCORES",
+    &menu.draw_xoffset[GFX_SPECIAL_ARG_SCORES]
+  },
+  {
+    "menu.draw_yoffset.SCORES",
+    &menu.draw_yoffset[GFX_SPECIAL_ARG_SCORES]
+  },
+  {
+    "menu.draw_xoffset.EDITOR",
+    &menu.draw_xoffset[GFX_SPECIAL_ARG_EDITOR]
+  },
+  {
+    "menu.draw_yoffset.EDITOR",
+    &menu.draw_yoffset[GFX_SPECIAL_ARG_EDITOR]
+  },
+  {
+    "menu.draw_xoffset.INFO",
+    &menu.draw_xoffset[GFX_SPECIAL_ARG_INFO]
+  },
+  {
+    "menu.draw_yoffset.INFO",
+    &menu.draw_yoffset[GFX_SPECIAL_ARG_INFO]
+  },
+  {
+    "menu.draw_xoffset.INFO[ELEMENTS]",
+    &menu.draw_xoffset_info[GFX_SPECIAL_ARG_INFO_ELEMENTS]
+  },
+  {
+    "menu.draw_yoffset.INFO[ELEMENTS]",
+    &menu.draw_yoffset_info[GFX_SPECIAL_ARG_INFO_ELEMENTS]
+  },
+  {
+    "menu.draw_xoffset.INFO[MUSIC]",
+    &menu.draw_xoffset_info[GFX_SPECIAL_ARG_INFO_MUSIC]
+  },
+  {
+    "menu.draw_yoffset.INFO[MUSIC]",
+    &menu.draw_yoffset_info[GFX_SPECIAL_ARG_INFO_MUSIC]
+  },
+  {
+    "menu.draw_xoffset.INFO[CREDITS]",
+    &menu.draw_xoffset_info[GFX_SPECIAL_ARG_INFO_CREDITS]
+  },
+  {
+    "menu.draw_yoffset.INFO[CREDITS]",
+    &menu.draw_yoffset_info[GFX_SPECIAL_ARG_INFO_CREDITS]
+  },
+  {
+    "menu.draw_xoffset.INFO[PROGRAM]",
+    &menu.draw_xoffset_info[GFX_SPECIAL_ARG_INFO_PROGRAM]
+  },
+  {
+    "menu.draw_yoffset.INFO[PROGRAM]",
+    &menu.draw_yoffset_info[GFX_SPECIAL_ARG_INFO_PROGRAM]
+  },
+  {
+    "menu.draw_xoffset.INFO[VERSION]",
+    &menu.draw_xoffset_info[GFX_SPECIAL_ARG_INFO_VERSION]
+  },
+  {
+    "menu.draw_yoffset.INFO[VERSION]",
+    &menu.draw_yoffset_info[GFX_SPECIAL_ARG_INFO_VERSION]
+  },
+  {
+    "menu.draw_xoffset.INFO[LEVELSET]",
+    &menu.draw_xoffset_info[GFX_SPECIAL_ARG_INFO_LEVELSET]
+  },
+  {
+    "menu.draw_yoffset.INFO[LEVELSET]",
+    &menu.draw_yoffset_info[GFX_SPECIAL_ARG_INFO_LEVELSET]
+  },
+  {
+    "menu.draw_xoffset.SETUP",
+    &menu.draw_xoffset[GFX_SPECIAL_ARG_SETUP]
+  },
+  {
+    "menu.draw_yoffset.SETUP",
+    &menu.draw_yoffset[GFX_SPECIAL_ARG_SETUP]
+  },
 
-  { "menu.list_size",		&menu.list_size[GFX_SPECIAL_ARG_DEFAULT]      },
-  { "menu.list_size.LEVELS",	&menu.list_size[GFX_SPECIAL_ARG_LEVELS]	      },
-  { "menu.list_size.SCORES",	&menu.list_size[GFX_SPECIAL_ARG_SCORES]	      },
-  { "menu.list_size.INFO",	&menu.list_size[GFX_SPECIAL_ARG_INFO]	      },
+  {
+    "menu.scrollbar_xoffset",
+    &menu.scrollbar_xoffset
+  },
+
+  {
+    "menu.list_size",
+    &menu.list_size[GFX_SPECIAL_ARG_DEFAULT]
+  },
+  {
+    "menu.list_size.LEVELS",
+    &menu.list_size[GFX_SPECIAL_ARG_LEVELS]
+  },
+  {
+    "menu.list_size.SCORES",
+    &menu.list_size[GFX_SPECIAL_ARG_SCORES]
+  },
+  {
+    "menu.list_size.INFO",
+    &menu.list_size[GFX_SPECIAL_ARG_INFO]
+  },
 
   { "main.button.name.x",		&menu.main.button.name.x	      },
   { "main.button.name.y",		&menu.main.button.name.y	      },

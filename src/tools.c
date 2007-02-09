@@ -600,6 +600,20 @@ void SetMainBackgroundImageIfDefined(int graphic)
     SetMainBackgroundBitmap(graphic_info[graphic].bitmap);
 }
 
+void SetDoorBackgroundImageIfDefined(int graphic)
+{
+  if (graphic_info[graphic].bitmap)
+    SetDoorBackgroundBitmap(graphic_info[graphic].bitmap);
+}
+
+void SetWindowBackgroundImage(int graphic)
+{
+  SetWindowBackgroundBitmap(graphic == IMG_UNDEFINED ? NULL :
+			    graphic_info[graphic].bitmap ?
+			    graphic_info[graphic].bitmap :
+			    graphic_info[IMG_BACKGROUND].bitmap);
+}
+
 void SetMainBackgroundImage(int graphic)
 {
   SetMainBackgroundBitmap(graphic == IMG_UNDEFINED ? NULL :

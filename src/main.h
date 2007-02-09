@@ -1768,8 +1768,10 @@
 #define GFX_ARG_FADE_DELAY		39
 #define GFX_ARG_POST_DELAY		40
 #define GFX_ARG_AUTO_DELAY		41
+#define GFX_ARG_ALIGN			42
+#define GFX_ARG_SORT_PRIORITY		43
 
-#define NUM_GFX_ARGS			42
+#define NUM_GFX_ARGS			44
 
 
 /* values for sound configuration suffixes */
@@ -1964,7 +1966,7 @@
 
 struct BorderInfo
 {
-  int draw_masked[NUM_SPECIAL_GFX_ARGS];
+  boolean draw_masked[NUM_SPECIAL_GFX_ARGS];
 };
 
 #if 0
@@ -2033,6 +2035,21 @@ struct TitleInfo
   int fade_delay_final;
   int post_delay_final;
   int auto_delay_final;
+};
+
+struct TitleMessageInfo
+{
+  int x;
+  int y;
+  int width;
+  int height;
+  int chars;
+  int lines;
+  int align;
+  boolean autowrap;
+  boolean centered;
+  boolean skip_comments;
+  int sort_priority;
 };
 
 struct MenuInfo
@@ -2484,6 +2501,8 @@ struct GraphicInfo
   int fade_delay;		/* optional setting for drawing title screens */
   int post_delay;		/* optional setting for drawing title screens */
   int auto_delay;		/* optional setting for drawing title screens */
+  int align;			/* optional setting for drawing title screens */
+  int sort_priority;		/* optional setting for drawing title screens */
 
   boolean use_image_size;	/* use image size as default width and height */
 
@@ -2647,6 +2666,7 @@ extern struct TapeInfo		tape;
 extern struct GlobalInfo	global;
 extern struct BorderInfo	border;
 extern struct TitleInfo		title;
+extern struct TitleMessageInfo	titlemessage[], titlemessage_initial[];
 extern struct MenuInfo		menu;
 extern struct DoorInfo		door_1, door_2;
 extern struct PreviewInfo	preview;
