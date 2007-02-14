@@ -404,6 +404,8 @@ void DrawTextExt(DrawBuffer *dst_bitmap, int dst_x, int dst_y, char *text,
 /* text buffer drawing functions                                             */
 /* ========================================================================= */
 
+#define MAX_LINES_FROM_FILE		1024
+
 char *GetTextBufferFromFile(char *filename, int max_lines)
 {
   FILE *file;
@@ -466,9 +468,9 @@ void DrawTextToTextArea_OLD(int x, int y, char *text, int font_nr, int line_leng
   redraw_mask |= REDRAW_FIELD;
 }
 
-boolean RenderLineToBuffer(char **src_buffer_ptr, char *dst_buffer,
-			   int *dst_buffer_len, boolean last_line_was_empty,
-			   int line_length)
+static boolean RenderLineToBuffer(char **src_buffer_ptr, char *dst_buffer,
+				  int *dst_buffer_len, int line_length,
+				  boolean last_line_was_empty)
 {
   char *text_ptr = *src_buffer_ptr;
   char *buffer = dst_buffer;
@@ -560,7 +562,7 @@ void DrawTextWrapped_OLD(int x, int y, char *text, int font_nr, int line_length,
 
     buffer[0] = '\0';
 
-    RenderLineToBuffer(&text_ptr, buffer, &buffer_len, TRUE, line_length);
+    RenderLineToBuffer(&text_ptr, buffer, &buffer_len, line_length, TRUE);
 
     DrawText(x, y + current_line * font_height, buffer, font_nr);
     current_line++;
@@ -626,10 +628,8 @@ int DrawTextFromFile_OLD(int x, int y, char *filename, int font_nr,
 
       if (wrap_text)
       {
-	buffer_filled = RenderLineToBuffer(&line_ptr,
-					   buffer, &buffer_len,
-					   last_line_was_empty,
-					   line_length);
+	buffer_filled = RenderLineToBuffer(&line_ptr, buffer, &buffer_len,
+					   line_length, last_line_was_empty);
       }
       else
       {
@@ -650,10 +650,8 @@ int DrawTextFromFile_OLD(int x, int y, char *filename, int font_nr,
 	buffer_filled = TRUE;
       }
 #else
-      boolean buffer_filled = RenderLineToBuffer(&line_ptr,
-						 buffer, &buffer_len,
-						 last_line_was_empty,
-						 line_length);
+      boolean buffer_filled = RenderLineToBuffer(&line_ptr, buffer, &buffer_len,
+						 line_length, last_line_was_empty);
 #endif
 
       if (buffer_filled)
@@ -683,7 +681,8 @@ int DrawTextFromFile_OLD(int x, int y, char *filename, int font_nr,
 
 int DrawTextBuffer(int x, int y, char *text_buffer, int font_nr,
 		   int line_length, int cut_length, int max_lines,
-		   int mask_mode, boolean formatted, boolean centered)
+		   int mask_mode, boolean autowrap, boolean centered,
+		   boolean skip_comments)
 {
   int font_width = getFontWidth(font_nr);
   int font_height = getFontHeight(font_nr);
@@ -708,7 +707,7 @@ int DrawTextBuffer(int x, int y, char *text_buffer, int font_nr,
     char line[MAX_LINE_LEN + 1];
     char *line_ptr;
     boolean last_line_was_empty = TRUE;
-    int num_line_chars = (formatted ? MAX_LINE_LEN : line_length);
+    int num_line_chars = (autowrap ? MAX_LINE_LEN : line_length);
     int i;
 
     /* copy next line from text buffer to line buffer (nearly fgets() style) */
@@ -718,7 +717,7 @@ int DrawTextBuffer(int x, int y, char *text_buffer, int font_nr,
     line[i] = '\0';
 
     /* skip comments (lines directly beginning with '#') */
-    if (line[0] == '#')
+    if (line[0] == '#' && skip_comments)
       continue;
 
     /* cut trailing newline and carriage return from input line */
@@ -740,12 +739,10 @@ int DrawTextBuffer(int x, int y, char *text_buffer, int font_nr,
     {
       boolean buffer_filled;
 
-      if (formatted)
+      if (autowrap)
       {
-	buffer_filled = RenderLineToBuffer(&line_ptr,
-					   buffer, &buffer_len,
-					   last_line_was_empty,
-					   line_length);
+	buffer_filled = RenderLineToBuffer(&line_ptr, buffer, &buffer_len,
+					   line_length, last_line_was_empty);
       }
       else
       {
@@ -814,28 +811,33 @@ int DrawTextBuffer(int x, int y, char *text_buffer, int font_nr,
   return current_line;
 }
 
-int DrawTextFromFile(int x, int y, char *filename, int font_nr,
-		     int line_length, int max_lines, boolean formatted)
+int DrawTextFile(int x, int y, char *filename, int font_nr,
+		 int line_length, int cut_length, int max_lines,
+		 int mask_mode, boolean autowrap, boolean centered,
+		 boolean skip_comments)
 {
-  char *text_buffer = GetTextBufferFromFile(filename, 1000);
+  char *text_buffer = GetTextBufferFromFile(filename, MAX_LINES_FROM_FILE);
   int num_lines_printed = DrawTextBuffer(x, y, text_buffer, font_nr,
-					 line_length, -1, max_lines, -1,
-					 formatted, FALSE);
+					 line_length, cut_length, max_lines,
+					 mask_mode, autowrap, centered,
+					 skip_comments);
   checked_free(text_buffer);
 
   return num_lines_printed;
 }
 
+#if 0
 void DrawTextWrapped(int x, int y, char *text, int font_nr, int line_length,
 		     int max_lines)
 {
   DrawTextBuffer(x, y, text, font_nr, line_length, -1, max_lines, -1, TRUE,
-		 FALSE);
+		 FALSE, FALSE);
 }
 
 void DrawTextToTextArea(int x, int y, char *text, int font_nr, int line_length,
 			int cut_length, int max_lines, int mask_mode)
 {
   DrawTextBuffer(x, y, text, font_nr, line_length, cut_length, max_lines,
-		 mask_mode, FALSE, FALSE);
+		 mask_mode, FALSE, FALSE, FALSE);
 }
+#endif

@@ -9,6 +9,7 @@
 	* added remaining menu draw offset definitions for info sub-screens
 
 2007-02-05
+	* added setup option to select game speed (from very slow to very fast)
 	* improved handling of title text messages (initial and for level set)
 
 2007-02-03

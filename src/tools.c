@@ -1631,7 +1631,7 @@ void AnimateEnvelope(int envelope_nr, int anim_mode, int action)
 		   level.envelope[envelope_nr].text, font_nr, max_xsize,
 		   xsize - 2, ysize - 2, mask_mode,
 		   level.envelope[envelope_nr].autowrap,
-		   level.envelope[envelope_nr].centered);
+		   level.envelope[envelope_nr].centered, FALSE);
 #else
     DrawTextToTextArea(SX + sx + font_width, SY + sy + font_height,
 		       level.envelope[envelope_nr].text, font_nr, max_xsize,

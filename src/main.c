@@ -107,8 +107,9 @@ struct GameInfo		game;
 struct GlobalInfo	global;
 struct BorderInfo	border;
 struct TitleInfo	title;
-struct TitleMessageInfo	titlemessage[MAX_NUM_TITLE_MESSAGES];
 struct TitleMessageInfo	titlemessage_initial[MAX_NUM_TITLE_MESSAGES];
+struct TitleMessageInfo	titlemessage[MAX_NUM_TITLE_MESSAGES];
+struct TitleMessageInfo	readme;
 struct MenuInfo		menu;
 struct DoorInfo		door_1, door_2;
 struct PreviewInfo	preview;
@@ -5821,6 +5822,51 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "titlemessage_5.sort_priority",
     &titlemessage[4].sort_priority
+  },
+
+  {
+    "readme.x",
+    &readme.x
+  },
+  {
+    "readme.y",
+    &readme.y
+  },
+  {
+    "readme.width",
+    &readme.width
+  },
+  {
+    "readme.height",
+    &readme.height
+  },
+  {
+    "readme.chars",
+    &readme.chars
+  },
+  {
+    "readme.lines",
+    &readme.lines
+  },
+  {
+    "readme.align",
+    &readme.align
+  },
+  {
+    "readme.autowrap",
+    &readme.autowrap
+  },
+  {
+    "readme.centered",
+    &readme.centered
+  },
+  {
+    "readme.skip_comments",
+    &readme.skip_comments
+  },
+  {
+    "readme.sort_priority",
+    &readme.sort_priority
   },
 
   {

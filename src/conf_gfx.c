@@ -5061,6 +5061,18 @@ struct ConfigInfo image_config[] =
   { "titlemessage_5.skip_comments",		"false"			},
   { "titlemessage_5.sort_priority",		"0"			},
 
+  { "readme.x",					"-1"			},
+  { "readme.y",					"-1"			},
+  { "readme.width",				"-1"			},
+  { "readme.height",				"-1"			},
+  { "readme.chars",				"-1"			},
+  { "readme.lines",				"-1"			},
+  { "readme.align",				"center"		},
+  { "readme.autowrap",				"true"			},
+  { "readme.centered",				"false"			},
+  { "readme.skip_comments",			"true"			},
+  { "readme.sort_priority",			"0"			},
+
   { "global.num_toons",				"20"			},
 
   { "border.draw_masked.TITLE",			"false"			},

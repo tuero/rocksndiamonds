@@ -7562,8 +7562,8 @@ static int PrintElementDescriptionFromFile(char *filename, int start_line)
   int max_chars_per_line = (SXSIZE - 2 * pad_x) / font_width;
   int max_lines_per_screen = (SYSIZE - pad_y) / font_height - 1;
 
-  return DrawTextFromFile(sx, sy, filename, font_nr, max_chars_per_line,
-			  max_lines_per_screen, TRUE);
+  return DrawTextFile(sx, sy, filename, font_nr, max_chars_per_line, -1,
+		      max_lines_per_screen, -1, TRUE, FALSE, FALSE);
 }
 
 static void DrawPropertiesTabulatorGadgets()

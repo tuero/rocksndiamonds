@@ -887,8 +887,8 @@ void DrawTitleScreenMessage(int nr, boolean initial)
   max_chars_per_line = (WIN_XSIZE - 2 * pad_x) / font_width;
   max_lines_per_screen = (WIN_YSIZE - pad_y) / font_height - 1;
 
-  DrawTextFromFile(sx, sy, filename, font_nr, max_chars_per_line,
-		   max_lines_per_screen, FALSE);
+  DrawTextFile(sx, sy, filename, font_nr, max_chars_per_line, -1,
+	       max_lines_per_screen, -1, FALSE, FALSE, FALSE);
 
   game_status = last_game_status;	/* restore current game status */
 }
@@ -2248,8 +2248,14 @@ void DrawInfoScreen_HelpText(int element, int action, int direction, int ypos)
   if (strlen(text) <= max_chars_per_line)	/* only one line of text */
     sy += getFontHeight(font_nr) / 2;
 
+#if 1
+  DrawTextBuffer(sx, sy + ypos * ystep, text, font_nr,
+		 max_chars_per_line, -1, max_lines_per_text, -1,
+		 TRUE, FALSE, FALSE);
+#else
   DrawTextWrapped(sx, sy + ypos * ystep, text, font_nr,
 		  max_chars_per_line, max_lines_per_text);
+#endif
 }
 
 void DrawInfoScreen_TitleScreen()
@@ -2999,8 +3005,8 @@ void DrawInfoScreen_LevelSet()
 		    "Press any key or button for info menu");
 
   if (filename != NULL)
-    DrawTextFromFile(sx, sy, filename, font_nr, max_chars_per_line,
-		     max_lines_per_screen, TRUE);
+    DrawTextFile(sx, sy, filename, font_nr, max_chars_per_line, -1,
+		 max_lines_per_screen, -1, TRUE, FALSE, TRUE);
   else
     DrawTextSCentered(ystart2, FONT_TEXT_2,
 		      "No information for this level set.");

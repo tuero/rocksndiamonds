@@ -1019,7 +1019,7 @@ static const char *cursor_image_none[] =
   /* hot spot */
   "0,0"
 };
-#if defined(USE_ONE_PIXEL_PLAYFIELD_MOUSEPOINTER)
+#if USE_ONE_PIXEL_PLAYFIELD_MOUSEPOINTER
 static const char *cursor_image_dot[] =
 {
   /* width height num_colors chars_per_pixel */
