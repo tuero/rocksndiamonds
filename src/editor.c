@@ -3119,7 +3119,11 @@ static int ed_fieldx = MAX_ED_FIELDX - 1, ed_fieldy = MAX_ED_FIELDY - 1;
 /* actual position of level editor drawing area in level playfield */
 static int level_xpos = -1, level_ypos = -1;
 
+#if 1
+#define IN_ED_FIELD(x,y)	IN_FIELD(x, y, ed_fieldx, ed_fieldy)
+#else
 #define IN_ED_FIELD(x,y)  ((x)>=0 && (x)<ed_fieldx && (y)>=0 &&(y)<ed_fieldy)
+#endif
 
 /* drawing elements on the three mouse buttons */
 static int new_element1 = EL_WALL;
@@ -3170,6 +3174,7 @@ static int properties_element = 0;
 
 static short FieldBackup[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 static short UndoBuffer[NUM_UNDO_STEPS][MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+static short IntelliDrawBuffer[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 static int undo_buffer_position = 0;
 static int undo_buffer_steps = 0;
 
@@ -8345,15 +8350,225 @@ static void UpdateCustomElementGraphicGadgets()
   }
 }
 
+static int getDirectionFromTube(int element)
+{
+  switch (element)
+  {
+    case EL_TUBE_LEFT_UP:		return (MV_LEFT | MV_UP);
+    case EL_TUBE_LEFT_DOWN:		return (MV_LEFT | MV_DOWN);
+    case EL_TUBE_RIGHT_UP:		return (MV_RIGHT | MV_UP);
+    case EL_TUBE_RIGHT_DOWN:		return (MV_RIGHT | MV_DOWN);
+    case EL_TUBE_HORIZONTAL:		return (MV_HORIZONTAL);
+    case EL_TUBE_HORIZONTAL_UP:		return (MV_HORIZONTAL | MV_UP);
+    case EL_TUBE_HORIZONTAL_DOWN:	return (MV_HORIZONTAL | MV_DOWN);
+    case EL_TUBE_VERTICAL:		return (MV_VERTICAL);
+    case EL_TUBE_VERTICAL_LEFT:		return (MV_VERTICAL | MV_LEFT);
+    case EL_TUBE_VERTICAL_RIGHT:	return (MV_VERTICAL | MV_RIGHT);
+    case EL_TUBE_ANY:			return (MV_ANY_DIRECTION);
+  }
+
+  return MV_NONE;
+}
+
+static int getTubeFromDirection(int direction)
+{
+  switch (direction)
+  {
+    case (MV_LEFT | MV_UP):		return EL_TUBE_LEFT_UP;
+    case (MV_LEFT | MV_DOWN):		return EL_TUBE_LEFT_DOWN;
+    case (MV_RIGHT | MV_UP):		return EL_TUBE_RIGHT_UP;
+    case (MV_RIGHT | MV_DOWN):		return EL_TUBE_RIGHT_DOWN;
+    case (MV_HORIZONTAL):		return EL_TUBE_HORIZONTAL;
+    case (MV_HORIZONTAL | MV_UP):	return EL_TUBE_HORIZONTAL_UP;
+    case (MV_HORIZONTAL | MV_DOWN):	return EL_TUBE_HORIZONTAL_DOWN;
+    case (MV_VERTICAL):			return EL_TUBE_VERTICAL;
+    case (MV_VERTICAL | MV_LEFT):	return EL_TUBE_VERTICAL_LEFT;
+    case (MV_VERTICAL | MV_RIGHT):	return EL_TUBE_VERTICAL_RIGHT;
+    case (MV_ANY_DIRECTION):		return EL_TUBE_ANY;
+
+    /* if only one direction, fall back to simple tube with that direction */
+    case (MV_LEFT):			return EL_TUBE_HORIZONTAL;
+    case (MV_RIGHT):			return EL_TUBE_HORIZONTAL;
+    case (MV_UP):			return EL_TUBE_VERTICAL;
+    case (MV_DOWN):			return EL_TUBE_VERTICAL;
+  }
+
+  return EL_EMPTY;
+}
+
+static int getTubeFromDirectionNotEmpty(int direction, int element_old)
+{
+  int element_new = getTubeFromDirection(direction);
+
+  return (element_new != EL_EMPTY ? element_new : element_old);
+}
+
+static int getMinimalConnectedTube(int x, int y)
+{
+  static int xy[4][2] =
+  {
+    { -1, 0 },
+    { +1, 0 },
+    { 0, -1 },
+    { 0, +1 }
+  };
+  int element_old = IntelliDrawBuffer[x][y];
+  int tube_direction_old = getDirectionFromTube(element_old);
+  int tube_direction_new = MV_NONE;
+  int i;
+
+  for (i = 0; i < NUM_DIRECTIONS; i++)
+  {
+    int xx = x + xy[i][0];
+    int yy = y + xy[i][1];
+    int dir = MV_DIR_FROM_BIT(i);
+    int dir_opposite = MV_DIR_OPPOSITE(dir);
+
+    if (IN_LEV_FIELD(xx, yy) && IS_TUBE(IntelliDrawBuffer[xx][yy]) &&
+	(tube_direction_old & dir) &&
+	(getDirectionFromTube(IntelliDrawBuffer[xx][yy]) & dir_opposite))
+      tube_direction_new |= dir;
+  }
+
+  return getTubeFromDirectionNotEmpty(tube_direction_new, element_old);
+}
+
+static void SetElementSimple(int x, int y, int element, boolean change_level)
+{
+  if (change_level)
+    Feld[x][y] = element;
+
+  IntelliDrawBuffer[x][y] = element;
+
+  if (IN_ED_FIELD(x - level_xpos, y - level_ypos))
+    DrawMiniElement(x - level_xpos, y - level_ypos, element);
+}
+
+static void SetElementIntelliDraw(int x, int y, int new_element,
+				  boolean change_level)
+{
+  static int last_x = -1;
+  static int last_y = -1;
+  int old_element = IntelliDrawBuffer[x][y];
+
+  if (new_element == EL_UNDEFINED)
+  {
+    last_x = -1;
+    last_y = -1;
+
+    return;
+  }
+
+  if (IS_TUBE(new_element))
+  {
+    static int xy[4][2] =
+    {
+      { -1, 0 },
+      { +1, 0 },
+      { 0, -1 },
+      { 0, +1 }
+    };
+    boolean last_element_is_neighbour = FALSE;
+    int last_element_new;
+    int tube_direction = MV_NONE;
+    int i;
+
+    /* if existing element is tube, keep all existing tube directions */
+    if (IS_TUBE(old_element))
+      tube_direction |= getDirectionFromTube(old_element);
+
+    for (i = 0; i < NUM_DIRECTIONS; i++)
+    {
+      int xx = x + xy[i][0];
+      int yy = y + xy[i][1];
+
+      if (last_x == xx && last_y == yy && IN_LEV_FIELD(last_x, last_y) &&
+	  IS_TUBE(IntelliDrawBuffer[last_x][last_y]))
+      {
+	int dir = MV_DIR_FROM_BIT(i);
+	int dir_opposite = MV_DIR_OPPOSITE(dir);
+	int last_element_old = IntelliDrawBuffer[last_x][last_y];
+	int last_direction_old = getDirectionFromTube(last_element_old);
+	int last_direction_new = last_direction_old | dir_opposite;
+
+	last_element_new = getTubeFromDirection(last_direction_new);
+	last_element_is_neighbour = TRUE;
+
+	tube_direction |= dir;
+      }
+    }
+
+    new_element = getTubeFromDirectionNotEmpty(tube_direction, new_element);
+
+    /* reduce connections of neighbour tube elements to minimal connections */
+    if (last_element_is_neighbour)
+    {
+      /* set neighbour tube elements to newly determined tube connections */
+      SetElementSimple(x, y, new_element, change_level);
+      SetElementSimple(last_x, last_y, last_element_new, change_level);
+
+      /* remove all open tube connections of neighbour tube elements */
+      new_element = getMinimalConnectedTube(x, y);
+      last_element_new = getMinimalConnectedTube(last_x, last_y);
+
+      /* set neighbour tube elements to new, minimized tube connections */
+      SetElementSimple(x, y, new_element, change_level);
+      SetElementSimple(last_x, last_y, last_element_new, change_level);
+    }
+  }
+
+  SetElementSimple(x, y, new_element, change_level);
+
+  last_x = x;
+  last_y = y;
+}
+
+static void ResetIntelliDraw()
+{
+  int x, y;
+
+  for (x = 0; x < lev_fieldx; x++)
+    for (y = 0; y < lev_fieldy; y++)
+      IntelliDrawBuffer[x][y] = Feld[x][y];
+
+  SetElementIntelliDraw(-1, -1, EL_UNDEFINED, FALSE);
+}
+
+static void SetElementExt(int x, int y, int element, boolean change_level)
+{
+  if (element < 0)
+    element = IntelliDrawBuffer[x][y] = Feld[x][y];
+
+  if (GetKeyModState() & KMOD_Shift)
+    SetElementIntelliDraw(x, y, element, change_level);
+  else
+    SetElementSimple(x, y, element, change_level);
+}
+
+static void SetElement(int x, int y, int element)
+{
+  SetElementExt(x, y, element, TRUE);
+}
+
 static void DrawLineElement(int sx, int sy, int element, boolean change_level)
 {
+#if 1
   int lx = sx + level_xpos;
   int ly = sy + level_ypos;
 
-  DrawMiniElement(sx, sy, (element < 0 ? Feld[lx][ly] : element));
+  SetElementExt(lx, ly, element, change_level);
+
+#else
+
+  int lx = sx + level_xpos;
+  int ly = sy + level_ypos;
+  int element_new = (element < 0 ? Feld[lx][ly] : element);
+
+  DrawMiniElement(sx, sy, element_new);
 
   if (change_level)
     Feld[lx][ly] = element;
+#endif
 }
 
 static void DrawLine(int from_x, int from_y, int to_x, int to_y,
@@ -8617,7 +8832,7 @@ static void CopyBrushExt(int from_x, int from_y, int to_x, int to_y,
 
     for (y = 0; y < brush_height; y++)
     {
-      for (x=0; x < brush_width; x++)
+      for (x = 0; x < brush_width; x++)
       {
 	brush_buffer[x][y] = Feld[from_lx + x][from_ly + y];
 
@@ -9047,6 +9262,12 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
     actual_drawing_function = GADGET_ID_PICK_ELEMENT;
   }
 
+  if (GetKeyModState() & KMOD_Shift)
+  {
+    if (button_press_event || button_release_event)
+      ResetIntelliDraw();
+  }
+
   switch (actual_drawing_function)
   {
     case GADGET_ID_SINGLE_ITEMS:
@@ -9059,17 +9280,27 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 	  if (edit_mode == ED_MODE_DRAWING && draw_with_brush &&
 	      !inside_drawing_area)
 	    DeleteBrushFromCursor();
+
+#if 0
+	  ResetIntelliDraw();
+#endif
 	}
 
-	if (!button)
+	if (!button || button_release_event)
 	  break;
 
 	if (draw_with_brush)
 	{
+#if 0
 	  if (!button_release_event)
+#endif
 	    CopyBrushToLevel(sx, sy, button);
 	}
+#if 1
+	else
+#else
 	else if (new_element != Feld[lx][ly])
+#endif
 	{
 	  if (new_element == EL_PLAYER_1)
 	  {
@@ -9080,18 +9311,30 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 	      {
 		if (Feld[x][y] == EL_PLAYER_1)
 		{
+#if 1
+		  SetElement(x, y, EL_EMPTY);
+#else
 		  Feld[x][y] = EL_EMPTY;
+#if 1
+		  if (IN_ED_FIELD(x - level_xpos, y - level_ypos))
+		    DrawMiniElement(x - level_xpos, y - level_ypos, EL_EMPTY);
+#else
 		  if (x - level_xpos >= 0 && x - level_xpos < ed_fieldx &&
 		      y - level_ypos >= 0 && y - level_ypos < ed_fieldy)
-		    DrawMiniElement(x - level_xpos, y - level_ypos,
-				    EL_EMPTY);
+		    DrawMiniElement(x - level_xpos, y - level_ypos, EL_EMPTY);
+#endif
+#endif
 		}
 	      }
 	    }
 	  }
 
+#if 1
+	  SetElement(lx, ly, new_element);
+#else
 	  Feld[lx][ly] = new_element;
 	  DrawMiniElement(sx, sy, new_element);
+#endif
 	}
       }
       else
