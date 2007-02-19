@@ -5673,6 +5673,20 @@ int getBeltElementFromBeltNrAndBeltDir(int belt_nr, int belt_dir)
   return belt_base_element[belt_nr] + belt_dir_nr;
 }
 
+int getBeltSwitchElementFromBeltNrAndBeltDir(int belt_nr, int belt_dir)
+{
+  static int belt_base_element[4] =
+  {
+    EL_CONVEYOR_BELT_1_SWITCH_LEFT,
+    EL_CONVEYOR_BELT_2_SWITCH_LEFT,
+    EL_CONVEYOR_BELT_3_SWITCH_LEFT,
+    EL_CONVEYOR_BELT_4_SWITCH_LEFT
+  };
+  int belt_dir_nr = (belt_dir == MV_LEFT ? 0 : belt_dir == MV_RIGHT ? 2 : 1);
+
+  return belt_base_element[belt_nr] + belt_dir_nr;
+}
+
 int getNumActivePlayers_EM()
 {
   int num_players = 0;

@@ -184,6 +184,7 @@ int getBeltDirNrFromBeltSwitchElement(int);
 int getBeltDirFromBeltElement(int);
 int getBeltDirFromBeltSwitchElement(int);
 int getBeltElementFromBeltNrAndBeltDir(int, int);
+int getBeltSwitchElementFromBeltNrAndBeltDir(int, int);
 
 unsigned int InitRND(long);
 void InitGraphicInfo_EM(void);

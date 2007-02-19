@@ -8676,30 +8676,41 @@ static void SetElementIntelliDraw(int x, int y, int new_element,
   {
     int last_element_new = EL_UNDEFINED;
     int belt_nr = getBeltNrFromBeltElement(new_element);
-    int belt_left  = getBeltElementFromBeltNrAndBeltDir(belt_nr, MV_LEFT);
-    int belt_none  = getBeltElementFromBeltNrAndBeltDir(belt_nr, MV_NONE);
-    int belt_right = getBeltElementFromBeltNrAndBeltDir(belt_nr, MV_RIGHT);
+#if 0
+    int belt_left   = getBeltElementFromBeltNrAndBeltDir(belt_nr, MV_LEFT);
+#endif
+    int belt_middle = getBeltElementFromBeltNrAndBeltDir(belt_nr, MV_NONE);
+#if 0
+    int belt_right  = getBeltElementFromBeltNrAndBeltDir(belt_nr, MV_RIGHT);
+#endif
     boolean last_element_is_neighbour = FALSE;
 
+#if 0
     if (IS_BELT(old_element))
     {
       new_element = old_element;
     }
+#endif
 
     if (last_x == x - 1 && last_y == y && IN_LEV_FIELD(last_x, last_y) &&
 	IS_BELT(IntelliDrawBuffer[last_x][last_y]))
     {
       last_element_new = IntelliDrawBuffer[last_x][last_y];
 
+#if 1
+      last_element_new = belt_middle;
+      new_element = belt_middle;
+#else
       if (IntelliDrawBuffer[last_x][last_y] == belt_left)
       {
 	new_element = belt_right;
       }
       else if (IntelliDrawBuffer[last_x][last_y] == belt_right)
       {
-	last_element_new = belt_none;
+	last_element_new = belt_middle;
 	new_element = belt_right;
       }
+#endif
 
       last_element_is_neighbour = TRUE;
     }
@@ -8708,15 +8719,20 @@ static void SetElementIntelliDraw(int x, int y, int new_element,
     {
       last_element_new = IntelliDrawBuffer[last_x][last_y];
 
+#if 1
+      last_element_new = belt_middle;
+      new_element = belt_middle;
+#else
       if (IntelliDrawBuffer[last_x][last_y] == belt_left)
       {
-	last_element_new = belt_none;
+	last_element_new = belt_middle;
 	new_element = belt_left;
       }
       else if (IntelliDrawBuffer[last_x][last_y] == belt_right)
       {
 	new_element = belt_left;
       }
+#endif
 
       last_element_is_neighbour = TRUE;
     }
@@ -8784,6 +8800,74 @@ static void SetElementIntelliDraw(int x, int y, int new_element,
     if (last_element_new != EL_UNDEFINED)
       SetElementSimple(last_x, last_y, last_element_new, change_level);
   }
+  else if (IS_BELT_SWITCH(old_element))
+  {
+    int belt_nr = getBeltNrFromBeltSwitchElement(old_element);
+    int belt_dir = getBeltDirFromBeltSwitchElement(old_element);
+
+    belt_dir = (belt_dir == MV_LEFT ? MV_NONE :
+		belt_dir == MV_NONE ? MV_RIGHT : MV_LEFT);
+
+    new_element = getBeltSwitchElementFromBeltNrAndBeltDir(belt_nr, belt_dir);
+  }
+  else
+  {
+    static int swappable_elements[][2] =
+    {
+      { EL_EXIT_CLOSED,			EL_EXIT_OPEN			},
+      { EL_DYNAMITE,			EL_DYNAMITE_ACTIVE		},
+      { EL_EM_DYNAMITE,			EL_EM_DYNAMITE_ACTIVE		},
+      { EL_QUICKSAND_EMPTY,		EL_QUICKSAND_FULL		},
+      { EL_EMERALD,			EL_WALL_EMERALD			},
+      { EL_EMERALD_YELLOW,		EL_WALL_EMERALD_YELLOW		},
+      { EL_EMERALD_RED,			EL_WALL_EMERALD_RED		},
+      { EL_EMERALD_PURPLE,		EL_WALL_EMERALD_PURPLE		},
+      { EL_DIAMOND,			EL_WALL_DIAMOND			},
+      { EL_BD_DIAMOND,			EL_WALL_BD_DIAMOND		},
+      { EL_GATE_1,			EL_GATE_1_GRAY			},
+      { EL_GATE_2,			EL_GATE_2_GRAY			},
+      { EL_GATE_3,			EL_GATE_3_GRAY			},
+      { EL_GATE_4,			EL_GATE_4_GRAY			},
+      { EL_EM_GATE_1,			EL_EM_GATE_1_GRAY		},
+      { EL_EM_GATE_2,			EL_EM_GATE_2_GRAY		},
+      { EL_EM_GATE_3,			EL_EM_GATE_3_GRAY		},
+      { EL_EM_GATE_4,			EL_EM_GATE_4_GRAY		},
+      { EL_EMC_GATE_5,			EL_EMC_GATE_5_GRAY		},
+      { EL_EMC_GATE_6,			EL_EMC_GATE_6_GRAY		},
+      { EL_EMC_GATE_7,			EL_EMC_GATE_7_GRAY		},
+      { EL_EMC_GATE_8,			EL_EMC_GATE_8_GRAY		},
+      { EL_DC_GATE_WHITE,		EL_DC_GATE_WHITE_GRAY		},
+      { EL_TIME_ORB_EMPTY,		EL_TIME_ORB_FULL		},
+      { EL_LAMP,			EL_LAMP_ACTIVE			},
+      { EL_SOKOBAN_FIELD_EMPTY,		EL_SOKOBAN_FIELD_FULL		},
+      { EL_SP_BASE,			EL_SP_BUGGY_BASE		},
+      { EL_PEARL,			EL_WALL_PEARL			},
+      { EL_CRYSTAL,			EL_WALL_CRYSTAL			},
+      { EL_TIMEGATE_CLOSED,		EL_TIMEGATE_OPEN		},
+      { EL_SWITCHGATE_CLOSED,		EL_SWITCHGATE_OPEN		},
+      { EL_SWITCHGATE_SWITCH_UP,	EL_SWITCHGATE_SWITCH_DOWN	},
+      { EL_DC_SWITCHGATE_SWITCH_UP,	EL_DC_SWITCHGATE_SWITCH_DOWN	},
+      { EL_LIGHT_SWITCH,		EL_LIGHT_SWITCH_ACTIVE		},
+      { EL_LANDMINE,			EL_DC_LANDMINE			},
+      { EL_SHIELD_NORMAL,		EL_SHIELD_DEADLY		},
+      { EL_STEEL_EXIT_CLOSED,		EL_STEEL_EXIT_OPEN		},
+      { EL_EM_EXIT_CLOSED,		EL_EM_EXIT_OPEN			},
+      { EL_EM_STEEL_EXIT_CLOSED,	EL_EM_STEEL_EXIT_OPEN		},
+      { EL_QUICKSAND_FAST_EMPTY,	EL_QUICKSAND_FAST_FULL		},
+
+      { -1,				-1				},
+    };
+    int i;
+
+    for (i = 0; swappable_elements[i][0] != -1; i++)
+    {
+      int element1 = swappable_elements[i][0];
+      int element2 = swappable_elements[i][1];
+
+      if (old_element == element1 || old_element == element2)
+	new_element = (old_element == element1 ? element2 : element1);
+    }
+  }
 
   SetElementSimple(x, y, new_element, change_level);
 
@@ -8805,7 +8889,12 @@ static void ResetIntelliDraw()
 static void SetElementExt(int x, int y, int element, boolean change_level)
 {
   if (element < 0)
+  {
     element = IntelliDrawBuffer[x][y] = Feld[x][y];
+    SetElementSimple(x, y, element, change_level);
+
+    return;
+  }
 
   if (GetKeyModState() & KMOD_Shift)
     SetElementIntelliDraw(x, y, element, change_level);
