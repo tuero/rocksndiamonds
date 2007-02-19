@@ -8403,7 +8403,25 @@ static int getTubeFromDirectionNotEmpty(int direction, int element_old)
   return (element_new != EL_EMPTY ? element_new : element_old);
 }
 
-static int getMinimalConnectedTube(int x, int y)
+static int getOpenDirectionFromBelt(int element)
+{
+  int belt_dir = getBeltDirFromBeltElement(element);
+
+  return (belt_dir == MV_LEFT ? MV_RIGHT :
+	  belt_dir == MV_RIGHT ? MV_LEFT :
+	  belt_dir == MV_NONE ? MV_HORIZONTAL : belt_dir);
+}
+
+static int getBeltFromNrAndOpenDirection(int nr, int direction)
+{
+  int belt_dir = (direction == MV_LEFT ? MV_RIGHT :
+		  direction == MV_RIGHT ? MV_LEFT :
+		  direction == MV_HORIZONTAL ? MV_NONE : direction);
+
+  return getBeltElementFromBeltNrAndBeltDir(nr, belt_dir);
+}
+
+static int getClosedTube(int x, int y)
 {
   static int xy[4][2] =
   {
@@ -8431,6 +8449,35 @@ static int getMinimalConnectedTube(int x, int y)
   }
 
   return getTubeFromDirectionNotEmpty(tube_direction_new, element_old);
+}
+
+static int getClosedBelt(int x, int y)
+{
+  static int xy[2][2] =
+  {
+    { -1, 0 },
+    { +1, 0 },
+  };
+  int element_old = IntelliDrawBuffer[x][y];
+  int belt_nr = getBeltNrFromBeltElement(element_old);
+  int belt_direction_old = getOpenDirectionFromBelt(element_old);
+  int belt_direction_new = MV_NONE;
+  int i;
+
+  for (i = 0; i < 2; i++)
+  {
+    int xx = x + xy[i][0];
+    int yy = y + xy[i][1];
+    int dir = MV_DIR_FROM_BIT(i);
+    int dir_opposite = MV_DIR_OPPOSITE(dir);
+
+    if (IN_LEV_FIELD(xx, yy) && IS_BELT(IntelliDrawBuffer[xx][yy]) &&
+	(belt_direction_old & dir) &&
+	(getOpenDirectionFromBelt(IntelliDrawBuffer[xx][yy]) & dir_opposite))
+      belt_direction_new |= dir;
+  }
+
+  return getBeltFromNrAndOpenDirection(belt_nr, belt_direction_new);
 }
 
 static void SetElementSimple(int x, int y, int element, boolean change_level)
@@ -8470,12 +8517,12 @@ static void SetElementIntelliDraw(int x, int y, int new_element,
     };
     boolean last_element_is_neighbour = FALSE;
     int last_element_new;
-    int tube_direction = MV_NONE;
+    int direction = MV_NONE;
     int i;
 
     /* if existing element is tube, keep all existing tube directions */
     if (IS_TUBE(old_element))
-      tube_direction |= getDirectionFromTube(old_element);
+      direction |= getDirectionFromTube(old_element);
 
     for (i = 0; i < NUM_DIRECTIONS; i++)
     {
@@ -8494,11 +8541,11 @@ static void SetElementIntelliDraw(int x, int y, int new_element,
 	last_element_new = getTubeFromDirection(last_direction_new);
 	last_element_is_neighbour = TRUE;
 
-	tube_direction |= dir;
+	direction |= dir;
       }
     }
 
-    new_element = getTubeFromDirectionNotEmpty(tube_direction, new_element);
+    new_element = getTubeFromDirectionNotEmpty(direction, new_element);
 
     /* reduce connections of neighbour tube elements to minimal connections */
     if (last_element_is_neighbour)
@@ -8508,13 +8555,234 @@ static void SetElementIntelliDraw(int x, int y, int new_element,
       SetElementSimple(last_x, last_y, last_element_new, change_level);
 
       /* remove all open tube connections of neighbour tube elements */
-      new_element = getMinimalConnectedTube(x, y);
-      last_element_new = getMinimalConnectedTube(last_x, last_y);
+      new_element = getClosedTube(x, y);
+      last_element_new = getClosedTube(last_x, last_y);
 
       /* set neighbour tube elements to new, minimized tube connections */
       SetElementSimple(x, y, new_element, change_level);
       SetElementSimple(last_x, last_y, last_element_new, change_level);
     }
+  }
+  else if (IS_ACID_POOL(new_element))
+  {
+    int last_element_new = EL_UNDEFINED;
+
+    if (IS_ACID_POOL(old_element))
+    {
+      new_element = old_element;
+    }
+
+    if (last_x == x - 1 && last_y == y && IN_LEV_FIELD(last_x, last_y) &&
+	IS_ACID_POOL(IntelliDrawBuffer[last_x][last_y]))
+    {
+      if (IntelliDrawBuffer[last_x][last_y] == EL_ACID_POOL_TOPLEFT)
+      {
+	new_element = EL_ACID_POOL_TOPRIGHT;
+      }
+      else if (IntelliDrawBuffer[last_x][last_y] == EL_ACID_POOL_TOPRIGHT)
+      {
+	last_element_new = EL_ACID;
+	new_element = EL_ACID_POOL_TOPRIGHT;
+      }
+      else if (IntelliDrawBuffer[last_x][last_y] == EL_ACID_POOL_BOTTOMLEFT)
+      {
+	new_element = EL_ACID_POOL_BOTTOMRIGHT;
+      }
+      else if (IntelliDrawBuffer[last_x][last_y] == EL_ACID_POOL_BOTTOMRIGHT)
+      {
+	last_element_new = EL_ACID_POOL_BOTTOM;
+	new_element = EL_ACID_POOL_BOTTOMRIGHT;
+      }
+    }
+    else if (last_x == x + 1 && last_y == y && IN_LEV_FIELD(last_x, last_y) &&
+	     IS_ACID_POOL(IntelliDrawBuffer[last_x][last_y]))
+    {
+      if (IntelliDrawBuffer[last_x][last_y] == EL_ACID_POOL_TOPLEFT)
+      {
+	last_element_new = EL_ACID;
+	new_element = EL_ACID_POOL_TOPLEFT;
+      }
+      else if (IntelliDrawBuffer[last_x][last_y] == EL_ACID_POOL_TOPRIGHT)
+      {
+	new_element = EL_ACID_POOL_TOPLEFT;
+      }
+      else if (IntelliDrawBuffer[last_x][last_y] == EL_ACID_POOL_BOTTOMLEFT)
+      {
+	last_element_new = EL_ACID_POOL_BOTTOM;
+	new_element = EL_ACID_POOL_BOTTOMLEFT;
+      }
+      else if (IntelliDrawBuffer[last_x][last_y] == EL_ACID_POOL_BOTTOMRIGHT)
+      {
+	new_element = EL_ACID_POOL_BOTTOMLEFT;
+      }
+    }
+    else if (last_x == x && last_y == y - 1 && IN_LEV_FIELD(last_x, last_y) &&
+	     IS_ACID_POOL(IntelliDrawBuffer[last_x][last_y]))
+    {
+      if (IntelliDrawBuffer[last_x][last_y] == EL_ACID_POOL_TOPLEFT)
+      {
+	new_element = EL_ACID_POOL_BOTTOMLEFT;
+      }
+      else if (IntelliDrawBuffer[last_x][last_y] == EL_ACID_POOL_TOPRIGHT)
+      {
+	new_element = EL_ACID_POOL_BOTTOMRIGHT;
+      }
+      else if (IntelliDrawBuffer[last_x][last_y] == EL_ACID_POOL_BOTTOMLEFT)
+      {
+	last_element_new = EL_ACID_POOL_TOPLEFT;
+	new_element = EL_ACID_POOL_BOTTOMLEFT;
+      }
+      else if (IntelliDrawBuffer[last_x][last_y] == EL_ACID_POOL_BOTTOMRIGHT)
+      {
+	last_element_new = EL_ACID_POOL_TOPRIGHT;
+	new_element = EL_ACID_POOL_BOTTOMRIGHT;
+      }
+      else
+      {
+	last_element_new = EL_ACID;
+	new_element = EL_ACID_POOL_BOTTOM;
+      }
+    }
+    else if (last_x == x && last_y == y + 1 && IN_LEV_FIELD(last_x, last_y) &&
+	     IS_ACID_POOL(IntelliDrawBuffer[last_x][last_y]))
+    {
+      if (IntelliDrawBuffer[last_x][last_y] == EL_ACID_POOL_TOPLEFT)
+      {
+	new_element = EL_ACID_POOL_TOPLEFT;
+      }
+      else if (IntelliDrawBuffer[last_x][last_y] == EL_ACID_POOL_TOPRIGHT)
+      {
+	new_element = EL_ACID_POOL_TOPRIGHT;
+      }
+      else if (IntelliDrawBuffer[last_x][last_y] == EL_ACID_POOL_BOTTOMLEFT)
+      {
+	new_element = EL_ACID_POOL_TOPLEFT;
+      }
+      else if (IntelliDrawBuffer[last_x][last_y] == EL_ACID_POOL_BOTTOMRIGHT)
+      {
+	new_element = EL_ACID_POOL_TOPRIGHT;
+      }
+      else
+      {
+	last_element_new = EL_ACID;
+	new_element = EL_ACID;
+      }
+    }
+
+    if (last_element_new != EL_UNDEFINED)
+      SetElementSimple(last_x, last_y, last_element_new, change_level);
+  }
+  else if (IS_BELT(new_element))
+  {
+    int last_element_new = EL_UNDEFINED;
+    int belt_nr = getBeltNrFromBeltElement(new_element);
+    int belt_left  = getBeltElementFromBeltNrAndBeltDir(belt_nr, MV_LEFT);
+    int belt_none  = getBeltElementFromBeltNrAndBeltDir(belt_nr, MV_NONE);
+    int belt_right = getBeltElementFromBeltNrAndBeltDir(belt_nr, MV_RIGHT);
+    boolean last_element_is_neighbour = FALSE;
+
+    if (IS_BELT(old_element))
+    {
+      new_element = old_element;
+    }
+
+    if (last_x == x - 1 && last_y == y && IN_LEV_FIELD(last_x, last_y) &&
+	IS_BELT(IntelliDrawBuffer[last_x][last_y]))
+    {
+      last_element_new = IntelliDrawBuffer[last_x][last_y];
+
+      if (IntelliDrawBuffer[last_x][last_y] == belt_left)
+      {
+	new_element = belt_right;
+      }
+      else if (IntelliDrawBuffer[last_x][last_y] == belt_right)
+      {
+	last_element_new = belt_none;
+	new_element = belt_right;
+      }
+
+      last_element_is_neighbour = TRUE;
+    }
+    else if (last_x == x + 1 && last_y == y && IN_LEV_FIELD(last_x, last_y) &&
+	     IS_BELT(IntelliDrawBuffer[last_x][last_y]))
+    {
+      last_element_new = IntelliDrawBuffer[last_x][last_y];
+
+      if (IntelliDrawBuffer[last_x][last_y] == belt_left)
+      {
+	last_element_new = belt_none;
+	new_element = belt_left;
+      }
+      else if (IntelliDrawBuffer[last_x][last_y] == belt_right)
+      {
+	new_element = belt_left;
+      }
+
+      last_element_is_neighbour = TRUE;
+    }
+
+    if (last_element_new != EL_UNDEFINED)
+      SetElementSimple(last_x, last_y, last_element_new, change_level);
+
+    /* reduce connections of neighbour belt elements to minimal connections */
+    if (last_element_is_neighbour)
+    {
+      /* set neighbour belt elements to newly determined belt connections */
+      SetElementSimple(x, y, new_element, change_level);
+      SetElementSimple(last_x, last_y, last_element_new, change_level);
+
+      /* remove all open belt connections of neighbour belt elements */
+      new_element = getClosedBelt(x, y);
+      last_element_new = getClosedBelt(last_x, last_y);
+
+      /* set neighbour belt elements to new, minimized belt connections */
+      SetElementSimple(x, y, new_element, change_level);
+      SetElementSimple(last_x, last_y, last_element_new, change_level);
+    }
+  }
+  else if (new_element == EL_EMC_WALL_1 ||
+	   new_element == EL_EMC_WALL_2 ||
+	   new_element == EL_EMC_WALL_3)
+  {
+    int last_element_new = EL_UNDEFINED;
+
+    if (last_x == x && last_y == y - 1 && IN_LEV_FIELD(last_x, last_y) &&
+	(IntelliDrawBuffer[last_x][last_y] == EL_EMC_WALL_1 ||
+	 IntelliDrawBuffer[last_x][last_y] == EL_EMC_WALL_2 ||
+	 IntelliDrawBuffer[last_x][last_y] == EL_EMC_WALL_3))
+    {
+      if (IN_LEV_FIELD(last_x, last_y - 1))
+      {
+	if (IntelliDrawBuffer[last_x][last_y - 1] != EL_EMC_WALL_1 &&
+	    IntelliDrawBuffer[last_x][last_y - 1] != EL_EMC_WALL_2)
+	  last_element_new = EL_EMC_WALL_1;
+	else if (IntelliDrawBuffer[last_x][last_y - 1] == EL_EMC_WALL_1 ||
+		 IntelliDrawBuffer[last_x][last_y - 1] == EL_EMC_WALL_2)
+	  last_element_new = EL_EMC_WALL_2;
+      }
+
+      new_element = EL_EMC_WALL_3;
+    }
+    else if (last_x == x && last_y == y + 1 && IN_LEV_FIELD(last_x, last_y) &&
+	     (IntelliDrawBuffer[last_x][last_y] == EL_EMC_WALL_1 ||
+	      IntelliDrawBuffer[last_x][last_y] == EL_EMC_WALL_2 ||
+	      IntelliDrawBuffer[last_x][last_y] == EL_EMC_WALL_3))
+    {
+      if (IN_LEV_FIELD(last_x, last_y + 1))
+      {
+	if (IntelliDrawBuffer[last_x][last_y + 1] != EL_EMC_WALL_2 &&
+	    IntelliDrawBuffer[last_x][last_y + 1] != EL_EMC_WALL_3)
+	  last_element_new = EL_EMC_WALL_3;
+	else if (IntelliDrawBuffer[last_x][last_y + 1] == EL_EMC_WALL_2 ||
+		 IntelliDrawBuffer[last_x][last_y + 1] == EL_EMC_WALL_3)
+	  last_element_new = EL_EMC_WALL_2;
+      }
+
+      new_element = EL_EMC_WALL_1;
+    }
+
+    if (last_element_new != EL_UNDEFINED)
+      SetElementSimple(last_x, last_y, last_element_new, change_level);
   }
 
   SetElementSimple(x, y, new_element, change_level);

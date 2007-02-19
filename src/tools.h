@@ -176,6 +176,15 @@ int el2edimg(int);
 int el2preimg(int);
 int font2baseimg(int);
 
+int getBeltNrFromBeltElement(int);
+int getBeltNrFromBeltActiveElement(int);
+int getBeltNrFromBeltSwitchElement(int);
+int getBeltDirNrFromBeltElement(int);
+int getBeltDirNrFromBeltSwitchElement(int);
+int getBeltDirFromBeltElement(int);
+int getBeltDirFromBeltSwitchElement(int);
+int getBeltElementFromBeltNrAndBeltDir(int, int);
+
 unsigned int InitRND(long);
 void InitGraphicInfo_EM(void);
 

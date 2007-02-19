@@ -5578,6 +5578,101 @@ int font2baseimg(int font_nr)
   return font_info[font_nr].special_graphic[GFX_SPECIAL_ARG_DEFAULT];
 }
 
+int getBeltNrFromBeltElement(int element)
+{
+  return (element < EL_CONVEYOR_BELT_2_LEFT ? 0 :
+	  element < EL_CONVEYOR_BELT_3_LEFT ? 1 :
+	  element < EL_CONVEYOR_BELT_4_LEFT ? 2 : 3);
+}
+
+int getBeltNrFromBeltActiveElement(int element)
+{
+  return (element < EL_CONVEYOR_BELT_2_LEFT_ACTIVE ? 0 :
+	  element < EL_CONVEYOR_BELT_3_LEFT_ACTIVE ? 1 :
+	  element < EL_CONVEYOR_BELT_4_LEFT_ACTIVE ? 2 : 3);
+}
+
+int getBeltNrFromBeltSwitchElement(int element)
+{
+  return (element < EL_CONVEYOR_BELT_2_SWITCH_LEFT ? 0 :
+	  element < EL_CONVEYOR_BELT_3_SWITCH_LEFT ? 1 :
+	  element < EL_CONVEYOR_BELT_4_SWITCH_LEFT ? 2 : 3);
+}
+
+int getBeltDirNrFromBeltElement(int element)
+{
+  static int belt_base_element[4] =
+  {
+    EL_CONVEYOR_BELT_1_LEFT,
+    EL_CONVEYOR_BELT_2_LEFT,
+    EL_CONVEYOR_BELT_3_LEFT,
+    EL_CONVEYOR_BELT_4_LEFT
+  };
+
+  int belt_nr = getBeltNrFromBeltElement(element);
+  int belt_dir_nr = element - belt_base_element[belt_nr];
+
+  return (belt_dir_nr % 3);
+}
+
+int getBeltDirNrFromBeltSwitchElement(int element)
+{
+  static int belt_base_element[4] =
+  {
+    EL_CONVEYOR_BELT_1_SWITCH_LEFT,
+    EL_CONVEYOR_BELT_2_SWITCH_LEFT,
+    EL_CONVEYOR_BELT_3_SWITCH_LEFT,
+    EL_CONVEYOR_BELT_4_SWITCH_LEFT
+  };
+
+  int belt_nr = getBeltNrFromBeltSwitchElement(element);
+  int belt_dir_nr = element - belt_base_element[belt_nr];
+
+  return (belt_dir_nr % 3);
+}
+
+int getBeltDirFromBeltElement(int element)
+{
+  static int belt_move_dir[3] =
+  {
+    MV_LEFT,
+    MV_NONE,
+    MV_RIGHT
+  };
+
+  int belt_dir_nr = getBeltDirNrFromBeltElement(element);
+
+  return belt_move_dir[belt_dir_nr];
+}
+
+int getBeltDirFromBeltSwitchElement(int element)
+{
+  static int belt_move_dir[3] =
+  {
+    MV_LEFT,
+    MV_NONE,
+    MV_RIGHT
+  };
+
+  int belt_dir_nr = getBeltDirNrFromBeltSwitchElement(element);
+
+  return belt_move_dir[belt_dir_nr];
+}
+
+int getBeltElementFromBeltNrAndBeltDir(int belt_nr, int belt_dir)
+{
+  static int belt_base_element[4] =
+  {
+    EL_CONVEYOR_BELT_1_LEFT,
+    EL_CONVEYOR_BELT_2_LEFT,
+    EL_CONVEYOR_BELT_3_LEFT,
+    EL_CONVEYOR_BELT_4_LEFT
+  };
+  int belt_dir_nr = (belt_dir == MV_LEFT ? 0 : belt_dir == MV_RIGHT ? 2 : 1);
+
+  return belt_base_element[belt_nr] + belt_dir_nr;
+}
+
 int getNumActivePlayers_EM()
 {
   int num_players = 0;

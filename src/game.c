@@ -940,57 +940,6 @@ void GetPlayerConfig()
   InitJoysticks();
 }
 
-static int getBeltNrFromBeltElement(int element)
-{
-  return (element < EL_CONVEYOR_BELT_2_LEFT ? 0 :
-	  element < EL_CONVEYOR_BELT_3_LEFT ? 1 :
-	  element < EL_CONVEYOR_BELT_4_LEFT ? 2 : 3);
-}
-
-static int getBeltNrFromBeltActiveElement(int element)
-{
-  return (element < EL_CONVEYOR_BELT_2_LEFT_ACTIVE ? 0 :
-	  element < EL_CONVEYOR_BELT_3_LEFT_ACTIVE ? 1 :
-	  element < EL_CONVEYOR_BELT_4_LEFT_ACTIVE ? 2 : 3);
-}
-
-static int getBeltNrFromBeltSwitchElement(int element)
-{
-  return (element < EL_CONVEYOR_BELT_2_SWITCH_LEFT ? 0 :
-	  element < EL_CONVEYOR_BELT_3_SWITCH_LEFT ? 1 :
-	  element < EL_CONVEYOR_BELT_4_SWITCH_LEFT ? 2 : 3);
-}
-
-static int getBeltDirNrFromBeltSwitchElement(int element)
-{
-  static int belt_base_element[4] =
-  {
-    EL_CONVEYOR_BELT_1_SWITCH_LEFT,
-    EL_CONVEYOR_BELT_2_SWITCH_LEFT,
-    EL_CONVEYOR_BELT_3_SWITCH_LEFT,
-    EL_CONVEYOR_BELT_4_SWITCH_LEFT
-  };
-
-  int belt_nr = getBeltNrFromBeltSwitchElement(element);
-  int belt_dir_nr = element - belt_base_element[belt_nr];
-
-  return (belt_dir_nr % 3);
-}
-
-static int getBeltDirFromBeltSwitchElement(int element)
-{
-  static int belt_move_dir[3] =
-  {
-    MV_LEFT,
-    MV_NONE,
-    MV_RIGHT
-  };
-
-  int belt_dir_nr = getBeltDirNrFromBeltSwitchElement(element);
-
-  return belt_move_dir[belt_dir_nr];
-}
-
 static int get_element_from_group_element(int element)
 {
   if (IS_GROUP_ELEMENT(element))

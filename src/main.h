@@ -125,61 +125,62 @@
 #define EP_BELT_ACTIVE			47
 #define EP_BELT_SWITCH			48
 #define EP_TUBE				49
-#define EP_KEYGATE			50
-#define EP_AMOEBOID			51
-#define EP_AMOEBALIVE			52
-#define EP_HAS_EDITOR_CONTENT		53
-#define EP_CAN_TURN_EACH_MOVE		54
-#define EP_CAN_GROW			55
-#define EP_ACTIVE_BOMB			56
-#define EP_INACTIVE			57
+#define EP_ACID_POOL			50
+#define EP_KEYGATE			51
+#define EP_AMOEBOID			52
+#define EP_AMOEBALIVE			53
+#define EP_HAS_EDITOR_CONTENT		54
+#define EP_CAN_TURN_EACH_MOVE		55
+#define EP_CAN_GROW			56
+#define EP_ACTIVE_BOMB			57
+#define EP_INACTIVE			58
 
 /* values for special configurable properties (depending on level settings) */
-#define EP_EM_SLIPPERY_WALL		58
+#define EP_EM_SLIPPERY_WALL		59
 
 /* values for special graphics properties (no effect on game engine) */
-#define EP_GFX_CRUMBLED			59
+#define EP_GFX_CRUMBLED			60
 
 /* values for derived properties (determined from properties above) */
-#define EP_ACCESSIBLE_OVER		60
-#define EP_ACCESSIBLE_INSIDE		61
-#define EP_ACCESSIBLE_UNDER		62
-#define EP_WALKABLE			63
-#define EP_PASSABLE			64
-#define EP_ACCESSIBLE			65
-#define EP_COLLECTIBLE			66
-#define EP_SNAPPABLE			67
-#define EP_WALL				68
-#define EP_SOLID_FOR_PUSHING		69
-#define EP_DRAGONFIRE_PROOF		70
-#define EP_EXPLOSION_PROOF		71
-#define EP_CAN_SMASH			72
-#define EP_EXPLODES_3X3_OLD		73
-#define EP_CAN_EXPLODE_BY_FIRE		74
-#define EP_CAN_EXPLODE_SMASHED		75
-#define EP_CAN_EXPLODE_IMPACT		76
-#define EP_SP_PORT			77
-#define EP_CAN_EXPLODE_BY_DRAGONFIRE	78
-#define EP_CAN_EXPLODE_BY_EXPLOSION	79
-#define EP_COULD_MOVE_INTO_ACID		80
-#define EP_MAYBE_DONT_COLLIDE_WITH	81
-#define EP_CAN_BE_CLONED_BY_ANDROID	82
+#define EP_ACCESSIBLE_OVER		61
+#define EP_ACCESSIBLE_INSIDE		62
+#define EP_ACCESSIBLE_UNDER		63
+#define EP_WALKABLE			64
+#define EP_PASSABLE			65
+#define EP_ACCESSIBLE			66
+#define EP_COLLECTIBLE			67
+#define EP_SNAPPABLE			68
+#define EP_WALL				69
+#define EP_SOLID_FOR_PUSHING		70
+#define EP_DRAGONFIRE_PROOF		71
+#define EP_EXPLOSION_PROOF		72
+#define EP_CAN_SMASH			73
+#define EP_EXPLODES_3X3_OLD		74
+#define EP_CAN_EXPLODE_BY_FIRE		75
+#define EP_CAN_EXPLODE_SMASHED		76
+#define EP_CAN_EXPLODE_IMPACT		77
+#define EP_SP_PORT			78
+#define EP_CAN_EXPLODE_BY_DRAGONFIRE	79
+#define EP_CAN_EXPLODE_BY_EXPLOSION	80
+#define EP_COULD_MOVE_INTO_ACID		81
+#define EP_MAYBE_DONT_COLLIDE_WITH	82
+#define EP_CAN_BE_CLONED_BY_ANDROID	83
 
 /* values for internal purpose only (level editor) */
-#define EP_WALK_TO_OBJECT		83
-#define EP_DEADLY			84
-#define EP_EDITOR_CASCADE		85
-#define EP_EDITOR_CASCADE_ACTIVE	86
-#define EP_EDITOR_CASCADE_INACTIVE	87
+#define EP_WALK_TO_OBJECT		84
+#define EP_DEADLY			85
+#define EP_EDITOR_CASCADE		86
+#define EP_EDITOR_CASCADE_ACTIVE	87
+#define EP_EDITOR_CASCADE_INACTIVE	88
 
 /* values for internal purpose only (game engine) */
-#define EP_HAS_ACTION			88
-#define EP_CAN_CHANGE_OR_HAS_ACTION	89
+#define EP_HAS_ACTION			89
+#define EP_CAN_CHANGE_OR_HAS_ACTION	90
 
 /* values for internal purpose only (other) */
-#define EP_OBSOLETE			90
+#define EP_OBSOLETE			91
 
-#define NUM_ELEMENT_PROPERTIES		91
+#define NUM_ELEMENT_PROPERTIES		92
 
 #define NUM_EP_BITFIELDS		((NUM_ELEMENT_PROPERTIES + 31) / 32)
 #define EP_BITFIELD_BASE_NR		0
@@ -569,6 +570,7 @@
 #define IS_BELT_ACTIVE(e)	HAS_PROPERTY(e, EP_BELT_ACTIVE)
 #define IS_BELT_SWITCH(e)	HAS_PROPERTY(e, EP_BELT_SWITCH)
 #define IS_TUBE(e)		HAS_PROPERTY(e, EP_TUBE)
+#define IS_ACID_POOL(e)		HAS_PROPERTY(e, EP_ACID_POOL)
 #define IS_KEYGATE(e)		HAS_PROPERTY(e, EP_KEYGATE)
 #define IS_AMOEBOID(e)		HAS_PROPERTY(e, EP_AMOEBOID)
 #define IS_AMOEBALIVE(e)	HAS_PROPERTY(e, EP_AMOEBALIVE)

@@ -3457,6 +3457,17 @@ void InitElementPropertiesStatic()
     -1
   };
 
+  static int ep_acid_pool[] =
+  {
+    EL_ACID_POOL_TOPLEFT,
+    EL_ACID_POOL_TOPRIGHT,
+    EL_ACID_POOL_BOTTOMLEFT,
+    EL_ACID_POOL_BOTTOM,
+    EL_ACID_POOL_BOTTOMRIGHT,
+
+    -1
+  };
+
   static int ep_keygate[] =
   {
     EL_GATE_1,
@@ -3926,6 +3937,7 @@ void InitElementPropertiesStatic()
     { ep_belt_active,			EP_BELT_ACTIVE			},
     { ep_belt_switch,			EP_BELT_SWITCH			},
     { ep_tube,				EP_TUBE				},
+    { ep_acid_pool,			EP_ACID_POOL			},
     { ep_keygate,			EP_KEYGATE			},
     { ep_amoeboid,			EP_AMOEBOID			},
     { ep_amoebalive,			EP_AMOEBALIVE			},
