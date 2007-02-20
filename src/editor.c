@@ -8350,7 +8350,7 @@ static void UpdateCustomElementGraphicGadgets()
   }
 }
 
-static int getDirectionFromTube(int element)
+static int getOpenDirectionFromTube(int element)
 {
   switch (element)
   {
@@ -8370,7 +8370,7 @@ static int getDirectionFromTube(int element)
   return MV_NONE;
 }
 
-static int getTubeFromDirection(int direction)
+static int getTubeFromOpenDirection(int direction)
 {
   switch (direction)
   {
@@ -8396,9 +8396,9 @@ static int getTubeFromDirection(int direction)
   return EL_EMPTY;
 }
 
-static int getTubeFromDirectionNotEmpty(int direction, int element_old)
+static int getTubeFromOpenDirectionNotEmpty(int direction, int element_old)
 {
-  int element_new = getTubeFromDirection(direction);
+  int element_new = getTubeFromOpenDirection(direction);
 
   return (element_new != EL_EMPTY ? element_new : element_old);
 }
@@ -8421,6 +8421,65 @@ static int getBeltFromNrAndOpenDirection(int nr, int direction)
   return getBeltElementFromBeltNrAndBeltDir(nr, belt_dir);
 }
 
+static int getOpenDirectionFromPool(int element)
+{
+  switch (element)
+  {
+    case EL_ACID_POOL_TOPLEFT:		return (MV_DOWN | MV_RIGHT);
+    case EL_ACID_POOL_TOPRIGHT:		return (MV_DOWN | MV_LEFT);
+    case EL_ACID_POOL_BOTTOMLEFT:	return (MV_UP | MV_RIGHT);
+    case EL_ACID_POOL_BOTTOMRIGHT:	return (MV_UP | MV_LEFT);
+    case EL_ACID_POOL_BOTTOM:		return (MV_HORIZONTAL | MV_UP);
+    case EL_ACID:			return (MV_HORIZONTAL | MV_DOWN);
+  }
+
+  return MV_NONE;
+}
+
+static int getPoolFromOpenDirection(int direction)
+{
+  switch (direction)
+  {
+    case (MV_DOWN | MV_RIGHT):		return EL_ACID_POOL_TOPLEFT;
+    case (MV_DOWN | MV_LEFT):		return EL_ACID_POOL_TOPRIGHT;
+    case (MV_UP | MV_RIGHT):		return EL_ACID_POOL_BOTTOMLEFT;
+    case (MV_UP | MV_LEFT):		return EL_ACID_POOL_BOTTOMRIGHT;
+    case (MV_HORIZONTAL | MV_UP):	return EL_ACID_POOL_BOTTOM;
+    case (MV_HORIZONTAL | MV_DOWN):	return EL_ACID;
+  }
+
+  return EL_EMPTY;
+}
+
+static int getPoolFromOpenDirection2(int direction, int help_element)
+{
+  int element = getPoolFromOpenDirection(direction);
+  int help_direction = getOpenDirectionFromPool(help_element);
+
+  if (element == EL_EMPTY)
+  {
+    int help_direction_vertical = help_direction & MV_VERTICAL;
+
+    element = getPoolFromOpenDirection(direction | help_direction_vertical);
+  }
+
+  if (element == EL_EMPTY)
+  {
+    int help_direction_horizontal = help_direction & MV_HORIZONTAL;
+
+    element = getPoolFromOpenDirection(direction | help_direction_horizontal);
+  }
+
+  return element;
+}
+
+static int getPoolFromOpenDirectionNotEmpty(int direction, int element_old)
+{
+  int element_new = getPoolFromOpenDirection2(direction, element_old);
+
+  return (element_new != EL_EMPTY ? element_new : element_old);
+}
+
 static int getClosedTube(int x, int y)
 {
   static int xy[4][2] =
@@ -8431,7 +8490,7 @@ static int getClosedTube(int x, int y)
     { 0, +1 }
   };
   int element_old = IntelliDrawBuffer[x][y];
-  int tube_direction_old = getDirectionFromTube(element_old);
+  int tube_direction_old = getOpenDirectionFromTube(element_old);
   int tube_direction_new = MV_NONE;
   int i;
 
@@ -8444,11 +8503,11 @@ static int getClosedTube(int x, int y)
 
     if (IN_LEV_FIELD(xx, yy) && IS_TUBE(IntelliDrawBuffer[xx][yy]) &&
 	(tube_direction_old & dir) &&
-	(getDirectionFromTube(IntelliDrawBuffer[xx][yy]) & dir_opposite))
+	(getOpenDirectionFromTube(IntelliDrawBuffer[xx][yy]) & dir_opposite))
       tube_direction_new |= dir;
   }
 
-  return getTubeFromDirectionNotEmpty(tube_direction_new, element_old);
+  return getTubeFromOpenDirectionNotEmpty(tube_direction_new, element_old);
 }
 
 static int getClosedBelt(int x, int y)
@@ -8478,6 +8537,37 @@ static int getClosedBelt(int x, int y)
   }
 
   return getBeltFromNrAndOpenDirection(belt_nr, belt_direction_new);
+}
+
+static int getClosedPool(int x, int y)
+{
+  static int xy[4][2] =
+  {
+    { -1, 0 },
+    { +1, 0 },
+    { 0, -1 },
+    { 0, +1 }
+  };
+  int element_old = IntelliDrawBuffer[x][y];
+  int pool_direction_old = getOpenDirectionFromPool(element_old);
+  int pool_direction_new = MV_NONE;
+  int i;
+
+  for (i = 0; i < NUM_DIRECTIONS; i++)
+  {
+    int xx = x + xy[i][0];
+    int yy = y + xy[i][1];
+    int dir = MV_DIR_FROM_BIT(i);
+    int dir_opposite = MV_DIR_OPPOSITE(dir);
+
+    if (IN_LEV_FIELD(xx, yy) &&
+	IS_ACID_POOL_OR_ACID(IntelliDrawBuffer[xx][yy]) &&
+	(pool_direction_old & dir) &&
+	(getOpenDirectionFromPool(IntelliDrawBuffer[xx][yy]) & dir_opposite))
+      pool_direction_new |= dir;
+  }
+
+  return getPoolFromOpenDirectionNotEmpty(pool_direction_new, element_old);
 }
 
 static void SetElementSimple(int x, int y, int element, boolean change_level)
@@ -8515,14 +8605,13 @@ static void SetElementIntelliDraw(int x, int y, int new_element,
       { 0, -1 },
       { 0, +1 }
     };
-    boolean last_element_is_neighbour = FALSE;
-    int last_element_new;
+    int last_element_new = EL_UNDEFINED;
     int direction = MV_NONE;
     int i;
 
     /* if existing element is tube, keep all existing tube directions */
     if (IS_TUBE(old_element))
-      direction |= getDirectionFromTube(old_element);
+      direction |= getOpenDirectionFromTube(old_element);
 
     for (i = 0; i < NUM_DIRECTIONS; i++)
     {
@@ -8535,20 +8624,19 @@ static void SetElementIntelliDraw(int x, int y, int new_element,
 	int dir = MV_DIR_FROM_BIT(i);
 	int dir_opposite = MV_DIR_OPPOSITE(dir);
 	int last_element_old = IntelliDrawBuffer[last_x][last_y];
-	int last_direction_old = getDirectionFromTube(last_element_old);
+	int last_direction_old = getOpenDirectionFromTube(last_element_old);
 	int last_direction_new = last_direction_old | dir_opposite;
 
-	last_element_new = getTubeFromDirection(last_direction_new);
-	last_element_is_neighbour = TRUE;
+	last_element_new = getTubeFromOpenDirection(last_direction_new);
 
 	direction |= dir;
       }
     }
 
-    new_element = getTubeFromDirectionNotEmpty(direction, new_element);
+    new_element = getTubeFromOpenDirectionNotEmpty(direction, new_element);
 
     /* reduce connections of neighbour tube elements to minimal connections */
-    if (last_element_is_neighbour)
+    if (last_element_new != EL_UNDEFINED)
     {
       /* set neighbour tube elements to newly determined tube connections */
       SetElementSimple(x, y, new_element, change_level);
@@ -8563,14 +8651,81 @@ static void SetElementIntelliDraw(int x, int y, int new_element,
       SetElementSimple(last_x, last_y, last_element_new, change_level);
     }
   }
-  else if (IS_ACID_POOL(new_element))
+  else if (IS_ACID_POOL_OR_ACID(new_element))
   {
+#if 1
+    static int xy[4][2] =
+    {
+      { -1, 0 },
+      { +1, 0 },
+      { 0, -1 },
+      { 0, +1 }
+    };
+    int last_element_new = EL_UNDEFINED;
+    int direction = MV_NONE;
+    int i;
+
+    /* if existing element is pool, keep all existing pool directions */
+    if (IS_ACID_POOL_OR_ACID(old_element))
+      direction |= getOpenDirectionFromPool(old_element);
+
+    for (i = 0; i < NUM_DIRECTIONS; i++)
+    {
+      int xx = x + xy[i][0];
+      int yy = y + xy[i][1];
+
+      if (last_x == xx && last_y == yy && IN_LEV_FIELD(last_x, last_y) &&
+	  IS_ACID_POOL_OR_ACID(IntelliDrawBuffer[last_x][last_y]))
+      {
+	int dir = MV_DIR_FROM_BIT(i);
+	int dir_opposite = MV_DIR_OPPOSITE(dir);
+	int last_element_old = IntelliDrawBuffer[last_x][last_y];
+	int last_direction_old = getOpenDirectionFromPool(last_element_old);
+	int last_direction_new = last_direction_old | dir_opposite;
+
+	last_element_new = getPoolFromOpenDirection(last_direction_new);
+
+	direction |= dir;
+      }
+    }
+
+#if 1
+    if (last_element_new == EL_EMPTY)
+      last_element_new = EL_ACID;
+#endif
+
+#if 1
+    if (last_element_new != EL_UNDEFINED)
+      new_element = getPoolFromOpenDirectionNotEmpty(direction,
+						     last_element_new);
+    else
+      new_element = getPoolFromOpenDirectionNotEmpty(direction, new_element);
+#else
+    new_element = getPoolFromOpenDirectionNotEmpty(direction, new_element);
+#endif
+
+    /* reduce connections of neighbour pool elements to minimal connections */
+    if (last_element_new != EL_UNDEFINED)
+    {
+      /* set neighbour pool elements to newly determined pool connections */
+      SetElementSimple(x, y, new_element, change_level);
+      SetElementSimple(last_x, last_y, last_element_new, change_level);
+
+      /* remove all open pool connections of neighbour pool elements */
+      new_element = getClosedPool(x, y);
+      last_element_new = getClosedPool(last_x, last_y);
+
+      /* set neighbour pool elements to new, minimized pool connections */
+      SetElementSimple(x, y, new_element, change_level);
+      SetElementSimple(last_x, last_y, last_element_new, change_level);
+    }
+
+#else
+
     int last_element_new = EL_UNDEFINED;
 
     if (IS_ACID_POOL(old_element))
-    {
       new_element = old_element;
-    }
 
     if (last_x == x - 1 && last_y == y && IN_LEV_FIELD(last_x, last_y) &&
 	IS_ACID_POOL(IntelliDrawBuffer[last_x][last_y]))
@@ -8671,77 +8826,25 @@ static void SetElementIntelliDraw(int x, int y, int new_element,
 
     if (last_element_new != EL_UNDEFINED)
       SetElementSimple(last_x, last_y, last_element_new, change_level);
+#endif
   }
   else if (IS_BELT(new_element))
   {
     int last_element_new = EL_UNDEFINED;
-    int belt_nr = getBeltNrFromBeltElement(new_element);
-#if 0
-    int belt_left   = getBeltElementFromBeltNrAndBeltDir(belt_nr, MV_LEFT);
-#endif
-    int belt_middle = getBeltElementFromBeltNrAndBeltDir(belt_nr, MV_NONE);
-#if 0
-    int belt_right  = getBeltElementFromBeltNrAndBeltDir(belt_nr, MV_RIGHT);
-#endif
-    boolean last_element_is_neighbour = FALSE;
 
-#if 0
-    if (IS_BELT(old_element))
-    {
-      new_element = old_element;
-    }
-#endif
-
-    if (last_x == x - 1 && last_y == y && IN_LEV_FIELD(last_x, last_y) &&
+    if (((last_x == x - 1 && last_y == y) ||
+	 (last_x == x + 1 && last_y == y)) && IN_LEV_FIELD(last_x, last_y) &&
 	IS_BELT(IntelliDrawBuffer[last_x][last_y]))
     {
-      last_element_new = IntelliDrawBuffer[last_x][last_y];
+      int belt_nr = getBeltNrFromBeltElement(new_element);
+      int belt_middle = getBeltElementFromBeltNrAndBeltDir(belt_nr, MV_NONE);
 
-#if 1
-      last_element_new = belt_middle;
       new_element = belt_middle;
-#else
-      if (IntelliDrawBuffer[last_x][last_y] == belt_left)
-      {
-	new_element = belt_right;
-      }
-      else if (IntelliDrawBuffer[last_x][last_y] == belt_right)
-      {
-	last_element_new = belt_middle;
-	new_element = belt_right;
-      }
-#endif
-
-      last_element_is_neighbour = TRUE;
-    }
-    else if (last_x == x + 1 && last_y == y && IN_LEV_FIELD(last_x, last_y) &&
-	     IS_BELT(IntelliDrawBuffer[last_x][last_y]))
-    {
-      last_element_new = IntelliDrawBuffer[last_x][last_y];
-
-#if 1
       last_element_new = belt_middle;
-      new_element = belt_middle;
-#else
-      if (IntelliDrawBuffer[last_x][last_y] == belt_left)
-      {
-	last_element_new = belt_middle;
-	new_element = belt_left;
-      }
-      else if (IntelliDrawBuffer[last_x][last_y] == belt_right)
-      {
-	new_element = belt_left;
-      }
-#endif
-
-      last_element_is_neighbour = TRUE;
     }
-
-    if (last_element_new != EL_UNDEFINED)
-      SetElementSimple(last_x, last_y, last_element_new, change_level);
 
     /* reduce connections of neighbour belt elements to minimal connections */
-    if (last_element_is_neighbour)
+    if (last_element_new != EL_UNDEFINED)
     {
       /* set neighbour belt elements to newly determined belt connections */
       SetElementSimple(x, y, new_element, change_level);
@@ -8928,6 +9031,56 @@ static void DrawLineElement(int sx, int sy, int element, boolean change_level)
 #endif
 }
 
+#if 1
+
+static void DrawLine(int from_x, int from_y, int to_x, int to_y,
+		     int element, boolean change_level)
+{
+  int xsize = ABS(to_x - from_x);
+  int ysize = ABS(to_y - from_y);
+  int dx = (to_x < from_x ? -1 : +1);
+  int dy = (to_y < from_y ? -1 : +1);
+  int i;
+
+  if (from_y == to_y)			/* horizontal line */
+  {
+    for (i = 0; i <= xsize; i++)
+      DrawLineElement(from_x + i * dx, from_y, element, change_level);
+  }
+  else if (from_x == to_x)		/* vertical line */
+  {
+    for (i = 0; i <= ysize; i++)
+      DrawLineElement(from_x, from_y + i * dy, element, change_level);
+  }
+  else					/* diagonal line */
+  {
+    int x, y;
+
+    if (ysize < xsize)			/* a < 1 */
+    {
+      float a = (float)ysize / (float)xsize;
+
+      for (i = 0; i <= xsize; i++)
+      {
+	y = (int)(a * i + 0.5) * dy;
+	DrawLineElement(from_x + i * dx, from_y + y, element, change_level);
+      }
+    }
+    else				/* a >= 1 */
+    {
+      float a = (float)xsize / (float)ysize;
+
+      for (i = 0; i <= ysize; i++)
+      {
+	x = (int)(a * i + 0.5) * dx;
+	DrawLineElement(from_x + x, from_y + i * dy, element, change_level);
+      }
+    }
+  }
+}
+
+#else
+
 static void DrawLine(int from_x, int from_y, int to_x, int to_y,
 		     int element, boolean change_level)
 {
@@ -8987,6 +9140,8 @@ static void DrawLine(int from_x, int from_y, int to_x, int to_y,
     }
   }
 }
+
+#endif
 
 static void DrawBox(int from_x, int from_y, int to_x, int to_y,
 		    int element, boolean change_level)

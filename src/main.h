@@ -696,6 +696,8 @@
 				 IS_EM_GATE_GRAY(e) ?  EM_GATE_GRAY_NR(e) :   \
 				 IS_EMC_GATE_GRAY(e) ? EMC_GATE_GRAY_NR(e) : 0)
 
+#define IS_ACID_POOL_OR_ACID(e)	(IS_ACID_POOL(e) || (e) == EL_ACID)
+
 #define GFX_ELEMENT(e)		(element_info[e].use_gfx_element ?	\
 				 element_info[e].gfx_element : e)
 
