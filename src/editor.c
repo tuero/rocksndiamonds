@@ -8572,13 +8572,16 @@ static int getClosedPool(int x, int y)
 
 static void SetElementSimple(int x, int y, int element, boolean change_level)
 {
-  if (change_level)
-    Feld[x][y] = element;
+  int sx = x - level_xpos;
+  int sy = y - level_ypos;
 
   IntelliDrawBuffer[x][y] = element;
 
-  if (IN_ED_FIELD(x - level_xpos, y - level_ypos))
-    DrawMiniElement(x - level_xpos, y - level_ypos, element);
+  if (change_level)
+    Feld[x][y] = element;
+
+  if (IN_ED_FIELD(sx, sy))
+    DrawMiniElement(sx, sy, element);
 }
 
 static void SetElementIntelliDraw(int x, int y, int new_element,
@@ -8653,7 +8656,6 @@ static void SetElementIntelliDraw(int x, int y, int new_element,
   }
   else if (IS_ACID_POOL_OR_ACID(new_element))
   {
-#if 1
     static int xy[4][2] =
     {
       { -1, 0 },
@@ -8719,114 +8721,6 @@ static void SetElementIntelliDraw(int x, int y, int new_element,
       SetElementSimple(x, y, new_element, change_level);
       SetElementSimple(last_x, last_y, last_element_new, change_level);
     }
-
-#else
-
-    int last_element_new = EL_UNDEFINED;
-
-    if (IS_ACID_POOL(old_element))
-      new_element = old_element;
-
-    if (last_x == x - 1 && last_y == y && IN_LEV_FIELD(last_x, last_y) &&
-	IS_ACID_POOL(IntelliDrawBuffer[last_x][last_y]))
-    {
-      if (IntelliDrawBuffer[last_x][last_y] == EL_ACID_POOL_TOPLEFT)
-      {
-	new_element = EL_ACID_POOL_TOPRIGHT;
-      }
-      else if (IntelliDrawBuffer[last_x][last_y] == EL_ACID_POOL_TOPRIGHT)
-      {
-	last_element_new = EL_ACID;
-	new_element = EL_ACID_POOL_TOPRIGHT;
-      }
-      else if (IntelliDrawBuffer[last_x][last_y] == EL_ACID_POOL_BOTTOMLEFT)
-      {
-	new_element = EL_ACID_POOL_BOTTOMRIGHT;
-      }
-      else if (IntelliDrawBuffer[last_x][last_y] == EL_ACID_POOL_BOTTOMRIGHT)
-      {
-	last_element_new = EL_ACID_POOL_BOTTOM;
-	new_element = EL_ACID_POOL_BOTTOMRIGHT;
-      }
-    }
-    else if (last_x == x + 1 && last_y == y && IN_LEV_FIELD(last_x, last_y) &&
-	     IS_ACID_POOL(IntelliDrawBuffer[last_x][last_y]))
-    {
-      if (IntelliDrawBuffer[last_x][last_y] == EL_ACID_POOL_TOPLEFT)
-      {
-	last_element_new = EL_ACID;
-	new_element = EL_ACID_POOL_TOPLEFT;
-      }
-      else if (IntelliDrawBuffer[last_x][last_y] == EL_ACID_POOL_TOPRIGHT)
-      {
-	new_element = EL_ACID_POOL_TOPLEFT;
-      }
-      else if (IntelliDrawBuffer[last_x][last_y] == EL_ACID_POOL_BOTTOMLEFT)
-      {
-	last_element_new = EL_ACID_POOL_BOTTOM;
-	new_element = EL_ACID_POOL_BOTTOMLEFT;
-      }
-      else if (IntelliDrawBuffer[last_x][last_y] == EL_ACID_POOL_BOTTOMRIGHT)
-      {
-	new_element = EL_ACID_POOL_BOTTOMLEFT;
-      }
-    }
-    else if (last_x == x && last_y == y - 1 && IN_LEV_FIELD(last_x, last_y) &&
-	     IS_ACID_POOL(IntelliDrawBuffer[last_x][last_y]))
-    {
-      if (IntelliDrawBuffer[last_x][last_y] == EL_ACID_POOL_TOPLEFT)
-      {
-	new_element = EL_ACID_POOL_BOTTOMLEFT;
-      }
-      else if (IntelliDrawBuffer[last_x][last_y] == EL_ACID_POOL_TOPRIGHT)
-      {
-	new_element = EL_ACID_POOL_BOTTOMRIGHT;
-      }
-      else if (IntelliDrawBuffer[last_x][last_y] == EL_ACID_POOL_BOTTOMLEFT)
-      {
-	last_element_new = EL_ACID_POOL_TOPLEFT;
-	new_element = EL_ACID_POOL_BOTTOMLEFT;
-      }
-      else if (IntelliDrawBuffer[last_x][last_y] == EL_ACID_POOL_BOTTOMRIGHT)
-      {
-	last_element_new = EL_ACID_POOL_TOPRIGHT;
-	new_element = EL_ACID_POOL_BOTTOMRIGHT;
-      }
-      else
-      {
-	last_element_new = EL_ACID;
-	new_element = EL_ACID_POOL_BOTTOM;
-      }
-    }
-    else if (last_x == x && last_y == y + 1 && IN_LEV_FIELD(last_x, last_y) &&
-	     IS_ACID_POOL(IntelliDrawBuffer[last_x][last_y]))
-    {
-      if (IntelliDrawBuffer[last_x][last_y] == EL_ACID_POOL_TOPLEFT)
-      {
-	new_element = EL_ACID_POOL_TOPLEFT;
-      }
-      else if (IntelliDrawBuffer[last_x][last_y] == EL_ACID_POOL_TOPRIGHT)
-      {
-	new_element = EL_ACID_POOL_TOPRIGHT;
-      }
-      else if (IntelliDrawBuffer[last_x][last_y] == EL_ACID_POOL_BOTTOMLEFT)
-      {
-	new_element = EL_ACID_POOL_TOPLEFT;
-      }
-      else if (IntelliDrawBuffer[last_x][last_y] == EL_ACID_POOL_BOTTOMRIGHT)
-      {
-	new_element = EL_ACID_POOL_TOPRIGHT;
-      }
-      else
-      {
-	last_element_new = EL_ACID;
-	new_element = EL_ACID;
-      }
-    }
-
-    if (last_element_new != EL_UNDEFINED)
-      SetElementSimple(last_x, last_y, last_element_new, change_level);
-#endif
   }
   else if (IS_BELT(new_element))
   {
@@ -8992,14 +8886,8 @@ static void ResetIntelliDraw()
 static void SetElementExt(int x, int y, int element, boolean change_level)
 {
   if (element < 0)
-  {
-    element = IntelliDrawBuffer[x][y] = Feld[x][y];
-    SetElementSimple(x, y, element, change_level);
-
-    return;
-  }
-
-  if (GetKeyModState() & KMOD_Shift)
+    SetElementSimple(x, y, Feld[x][y], change_level);
+  else if (GetKeyModState() & KMOD_Shift)
     SetElementIntelliDraw(x, y, element, change_level);
   else
     SetElementSimple(x, y, element, change_level);
@@ -9012,26 +8900,11 @@ static void SetElement(int x, int y, int element)
 
 static void DrawLineElement(int sx, int sy, int element, boolean change_level)
 {
-#if 1
   int lx = sx + level_xpos;
   int ly = sy + level_ypos;
 
   SetElementExt(lx, ly, element, change_level);
-
-#else
-
-  int lx = sx + level_xpos;
-  int ly = sy + level_ypos;
-  int element_new = (element < 0 ? Feld[lx][ly] : element);
-
-  DrawMiniElement(sx, sy, element_new);
-
-  if (change_level)
-    Feld[lx][ly] = element;
-#endif
 }
-
-#if 1
 
 static void DrawLine(int from_x, int from_y, int to_x, int to_y,
 		     int element, boolean change_level)
@@ -9054,16 +8927,16 @@ static void DrawLine(int from_x, int from_y, int to_x, int to_y,
   }
   else					/* diagonal line */
   {
-    int x, y;
-
     if (ysize < xsize)			/* a < 1 */
     {
       float a = (float)ysize / (float)xsize;
 
       for (i = 0; i <= xsize; i++)
       {
-	y = (int)(a * i + 0.5) * dy;
-	DrawLineElement(from_x + i * dx, from_y + y, element, change_level);
+	int x = dx * i;
+	int y = dy * (int)(a * i + 0.5);
+
+	DrawLineElement(from_x + x, from_y + y, element, change_level);
       }
     }
     else				/* a >= 1 */
@@ -9072,76 +8945,14 @@ static void DrawLine(int from_x, int from_y, int to_x, int to_y,
 
       for (i = 0; i <= ysize; i++)
       {
-	x = (int)(a * i + 0.5) * dx;
-	DrawLineElement(from_x + x, from_y + i * dy, element, change_level);
-      }
-    }
-  }
-}
+	int x = dx * (int)(a * i + 0.5);
+	int y = dy * i;
 
-#else
-
-static void DrawLine(int from_x, int from_y, int to_x, int to_y,
-		     int element, boolean change_level)
-{
-  if (from_y == to_y)			/* horizontal line */
-  {
-    int x;
-    int y = from_y;
-
-    if (from_x > to_x)
-      swap_numbers(&from_x, &to_x);
-
-    for (x = from_x; x <= to_x; x++)
-      DrawLineElement(x, y, element, change_level);
-  }
-  else if (from_x == to_x)		/* vertical line */
-  {
-    int x = from_x;
-    int y;
-
-    if (from_y > to_y)
-      swap_numbers(&from_y, &to_y);
-
-    for (y = from_y; y <= to_y; y++)
-      DrawLineElement(x, y, element, change_level);
-  }
-  else					/* diagonal line */
-  {
-    int len_x = ABS(to_x - from_x);
-    int len_y = ABS(to_y - from_y);
-    int x, y;
-
-    if (len_y < len_x)			/* a < 1 */
-    {
-      float a = (float)len_y / (float)len_x;
-
-      if (from_x > to_x)
-	swap_number_pairs(&from_x, &from_y, &to_x, &to_y);
-
-      for (x = 0; x <= len_x; x++)
-      {
-	y = (int)(a * x + 0.5) * (to_y < from_y ? -1 : +1);
-	DrawLineElement(from_x + x, from_y + y, element, change_level);
-      }
-    }
-    else				/* a >= 1 */
-    {
-      float a = (float)len_x / (float)len_y;
-
-      if (from_y > to_y)
-	swap_number_pairs(&from_x, &from_y, &to_x, &to_y);
-
-      for (y = 0; y <= len_y; y++)
-      {
-	x = (int)(a * y + 0.5) * (to_x < from_x ? -1 : +1);
 	DrawLineElement(from_x + x, from_y + y, element, change_level);
       }
     }
   }
 }
-
-#endif
 
 static void DrawBox(int from_x, int from_y, int to_x, int to_y,
 		    int element, boolean change_level)
