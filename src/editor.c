@@ -8730,28 +8730,10 @@ static void SetElementIntelliDraw(int x, int y, int new_element,
 
     new_element = getTubeFromOpenDirectionNotEmpty(direction, new_element);
 
-#if 1
     if (last_element_new != EL_UNDEFINED)
       MergeAndCloseNeighbourElements(x, y, &new_element,
 				     last_x, last_y, &last_element_new,
 				     getClosedTube, change_level);
-#else
-    /* reduce connections of neighbour tube elements to minimal connections */
-    if (last_element_new != EL_UNDEFINED)
-    {
-      /* set neighbour tube elements to newly determined tube connections */
-      SetElementSimple(x, y, new_element, change_level);
-      SetElementSimple(last_x, last_y, last_element_new, change_level);
-
-      /* remove all open tube connections of neighbour tube elements */
-      new_element = getClosedTube(x, y);
-      last_element_new = getClosedTube(last_x, last_y);
-
-      /* set neighbour tube elements to new, minimized tube connections */
-      SetElementSimple(x, y, new_element, change_level);
-      SetElementSimple(last_x, last_y, last_element_new, change_level);
-    }
-#endif
   }
   else if (IS_BELT(new_element))
   {
@@ -8781,36 +8763,16 @@ static void SetElementIntelliDraw(int x, int y, int new_element,
 
 	last_element_new = getBeltFromNrAndOpenDirection(last_belt_nr,
 							 last_direction_new);
-
 	direction |= dir;
       }
     }
 
     new_element = getBeltFromNrAndOpenDirectionNotEmpty(belt_nr, direction,
 							new_element);
-
-#if 1
     if (last_element_new != EL_UNDEFINED)
       MergeAndCloseNeighbourElements(x, y, &new_element,
 				     last_x, last_y, &last_element_new,
 				     getClosedBelt, change_level);
-#else
-    /* reduce connections of neighbour belt elements to minimal connections */
-    if (last_element_new != EL_UNDEFINED)
-    {
-      /* set neighbour belt elements to newly determined belt connections */
-      SetElementSimple(x, y, new_element, change_level);
-      SetElementSimple(last_x, last_y, last_element_new, change_level);
-
-      /* remove all open belt connections of neighbour belt elements */
-      new_element = getClosedBelt(x, y);
-      last_element_new = getClosedBelt(last_x, last_y);
-
-      /* set neighbour belt elements to new, minimized belt connections */
-      SetElementSimple(x, y, new_element, change_level);
-      SetElementSimple(last_x, last_y, last_element_new, change_level);
-    }
-#endif
   }
   else if (IS_ACID_POOL_OR_ACID(new_element))
   {
@@ -8843,6 +8805,26 @@ static void SetElementIntelliDraw(int x, int y, int new_element,
     }
 
 #if 1
+    int foo = last_element_new;
+
+    if (foo == EL_EMPTY)
+      foo = EL_ACID;
+
+    if (last_element_new == EL_EMPTY)
+      last_element_new = old_element;
+
+    if (last_element_new != EL_UNDEFINED)
+      new_element = getPoolFromOpenDirectionNotEmpty(direction,
+						     foo);
+    else
+      new_element = getPoolFromOpenDirectionNotEmpty(direction, new_element);
+
+#else
+
+#if 0
+    if (last_element_new == EL_EMPTY)
+      last_element_new = new_element;
+#else
     if (last_element_new == EL_EMPTY)
       last_element_new = EL_ACID;
 #endif
@@ -8857,28 +8839,12 @@ static void SetElementIntelliDraw(int x, int y, int new_element,
     new_element = getPoolFromOpenDirectionNotEmpty(direction, new_element);
 #endif
 
-#if 1
+#endif
+
     if (last_element_new != EL_UNDEFINED)
       MergeAndCloseNeighbourElements(x, y, &new_element,
 				     last_x, last_y, &last_element_new,
 				     getClosedPool, change_level);
-#else
-    /* reduce connections of neighbour pool elements to minimal connections */
-    if (last_element_new != EL_UNDEFINED)
-    {
-      /* set neighbour pool elements to newly determined pool connections */
-      SetElementSimple(x, y, new_element, change_level);
-      SetElementSimple(last_x, last_y, last_element_new, change_level);
-
-      /* remove all open pool connections of neighbour pool elements */
-      new_element = getClosedPool(x, y);
-      last_element_new = getClosedPool(last_x, last_y);
-
-      /* set neighbour pool elements to new, minimized pool connections */
-      SetElementSimple(x, y, new_element, change_level);
-      SetElementSimple(last_x, last_y, last_element_new, change_level);
-    }
-#endif
   }
   else if (IS_EMC_PILLAR(new_element))
   {
@@ -8912,28 +8878,10 @@ static void SetElementIntelliDraw(int x, int y, int new_element,
 
     new_element = getPillarFromOpenDirectionNotEmpty(direction, new_element);
 
-#if 1
     if (last_element_new != EL_UNDEFINED)
       MergeAndCloseNeighbourElements(x, y, &new_element,
 				     last_x, last_y, &last_element_new,
 				     getClosedPillar, change_level);
-#else
-    /* reduce connections of neighbour pillar elements to minimal connections */
-    if (last_element_new != EL_UNDEFINED)
-    {
-      /* set neighbour pillar elements to newly determined pillar connections */
-      SetElementSimple(x, y, new_element, change_level);
-      SetElementSimple(last_x, last_y, last_element_new, change_level);
-
-      /* remove all open pillar connections of neighbour pillar elements */
-      new_element = getClosedPillar(x, y);
-      last_element_new = getClosedPillar(last_x, last_y);
-
-      /* set neighbour pillar elements to new, minimized pillar connections */
-      SetElementSimple(x, y, new_element, change_level);
-      SetElementSimple(last_x, last_y, last_element_new, change_level);
-    }
-#endif
   }
   else if (IS_BELT_SWITCH(old_element))
   {
