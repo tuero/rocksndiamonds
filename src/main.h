@@ -698,6 +698,8 @@
 
 #define IS_ACID_POOL_OR_ACID(e)	(IS_ACID_POOL(e) || (e) == EL_ACID)
 
+#define IS_EMC_PILLAR(e)	((e) >= EL_EMC_WALL_1 && (e) <= EL_EMC_WALL_3)
+
 #define GFX_ELEMENT(e)		(element_info[e].use_gfx_element ?	\
 				 element_info[e].gfx_element : e)
 

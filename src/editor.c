@@ -8418,7 +8418,18 @@ static int getBeltFromNrAndOpenDirection(int nr, int direction)
 		  direction == MV_RIGHT ? MV_LEFT :
 		  direction == MV_HORIZONTAL ? MV_NONE : direction);
 
+  if (direction == MV_NONE)
+    return EL_EMPTY;
+
   return getBeltElementFromBeltNrAndBeltDir(nr, belt_dir);
+}
+
+static int getBeltFromNrAndOpenDirectionNotEmpty(int nr, int direction,
+						 int element_old)
+{
+  int element_new = getBeltFromNrAndOpenDirection(nr, direction);
+
+  return (element_new != EL_EMPTY ? element_new : element_old);
 }
 
 static int getOpenDirectionFromPool(int element)
@@ -8451,7 +8462,7 @@ static int getPoolFromOpenDirection(int direction)
   return EL_EMPTY;
 }
 
-static int getPoolFromOpenDirection2(int direction, int help_element)
+static int getPoolFromOpenDirectionExt(int direction, int help_element)
 {
   int element = getPoolFromOpenDirection(direction);
   int help_direction = getOpenDirectionFromPool(help_element);
@@ -8475,7 +8486,38 @@ static int getPoolFromOpenDirection2(int direction, int help_element)
 
 static int getPoolFromOpenDirectionNotEmpty(int direction, int element_old)
 {
-  int element_new = getPoolFromOpenDirection2(direction, element_old);
+  int element_new = getPoolFromOpenDirectionExt(direction, element_old);
+
+  return (element_new != EL_EMPTY ? element_new : element_old);
+}
+
+static int getOpenDirectionFromPillar(int element)
+{
+  switch (element)
+  {
+    case EL_EMC_WALL_1:			return (MV_DOWN);
+    case EL_EMC_WALL_2:			return (MV_VERTICAL);
+    case EL_EMC_WALL_3:			return (MV_UP);
+  }
+
+  return MV_NONE;
+}
+
+static int getPillarFromOpenDirection(int direction)
+{
+  switch (direction)
+  {
+    case (MV_DOWN):			return EL_EMC_WALL_1;
+    case (MV_VERTICAL):			return EL_EMC_WALL_2;
+    case (MV_UP):			return EL_EMC_WALL_3;
+  }
+
+  return EL_EMPTY;
+}
+
+static int getPillarFromOpenDirectionNotEmpty(int direction, int element_old)
+{
+  int element_new = getPillarFromOpenDirection(direction);
 
   return (element_new != EL_EMPTY ? element_new : element_old);
 }
@@ -8512,10 +8554,12 @@ static int getClosedTube(int x, int y)
 
 static int getClosedBelt(int x, int y)
 {
-  static int xy[2][2] =
+  static int xy[4][2] =
   {
     { -1, 0 },
     { +1, 0 },
+    { 0, -1 },
+    { 0, +1 }
   };
   int element_old = IntelliDrawBuffer[x][y];
   int belt_nr = getBeltNrFromBeltElement(element_old);
@@ -8523,7 +8567,7 @@ static int getClosedBelt(int x, int y)
   int belt_direction_new = MV_NONE;
   int i;
 
-  for (i = 0; i < 2; i++)
+  for (i = MV_BIT_LEFT; i <= MV_BIT_RIGHT; i++)
   {
     int xx = x + xy[i][0];
     int yy = y + xy[i][1];
@@ -8570,6 +8614,36 @@ static int getClosedPool(int x, int y)
   return getPoolFromOpenDirectionNotEmpty(pool_direction_new, element_old);
 }
 
+static int getClosedPillar(int x, int y)
+{
+  static int xy[4][2] =
+  {
+    { -1, 0 },
+    { +1, 0 },
+    { 0, -1 },
+    { 0, +1 }
+  };
+  int element_old = IntelliDrawBuffer[x][y];
+  int pillar_direction_old = getOpenDirectionFromPillar(element_old);
+  int pillar_direction_new = MV_NONE;
+  int i;
+
+  for (i = MV_BIT_UP; i <= MV_BIT_DOWN; i++)
+  {
+    int xx = x + xy[i][0];
+    int yy = y + xy[i][1];
+    int dir = MV_DIR_FROM_BIT(i);
+    int dir_opposite = MV_DIR_OPPOSITE(dir);
+
+    if (IN_LEV_FIELD(xx, yy) && IS_EMC_PILLAR(IntelliDrawBuffer[xx][yy]) &&
+	(pillar_direction_old & dir) &&
+	(getOpenDirectionFromPillar(IntelliDrawBuffer[xx][yy]) & dir_opposite))
+      pillar_direction_new |= dir;
+  }
+
+  return getPillarFromOpenDirectionNotEmpty(pillar_direction_new, element_old);
+}
+
 static void SetElementSimple(int x, int y, int element, boolean change_level)
 {
   int sx = x - level_xpos;
@@ -8584,9 +8658,34 @@ static void SetElementSimple(int x, int y, int element, boolean change_level)
     DrawMiniElement(sx, sy, element);
 }
 
+static void MergeAndCloseNeighbourElements(int x1, int y1, int *element1,
+					   int x2, int y2, int *element2,
+					   int (*close_function)(int, int),
+					   boolean change_level)
+{
+  /* set neighbour elements to newly determined connections */
+  SetElementSimple(x1, y1, *element1, change_level);
+  SetElementSimple(x2, y2, *element2, change_level);
+
+  /* remove all open connections of neighbour elements */
+  *element1 = close_function(x1, y1);
+  *element2 = close_function(x2, y2);
+
+  /* set neighbour elements to new, minimized connections */
+  SetElementSimple(x1, y1, *element1, change_level);
+  SetElementSimple(x2, y2, *element2, change_level);
+}
+
 static void SetElementIntelliDraw(int x, int y, int new_element,
 				  boolean change_level)
 {
+  static int xy[4][2] =
+  {
+    { -1, 0 },
+    { +1, 0 },
+    { 0, -1 },
+    { 0, +1 }
+  };
   static int last_x = -1;
   static int last_y = -1;
   int old_element = IntelliDrawBuffer[x][y];
@@ -8601,13 +8700,6 @@ static void SetElementIntelliDraw(int x, int y, int new_element,
 
   if (IS_TUBE(new_element))
   {
-    static int xy[4][2] =
-    {
-      { -1, 0 },
-      { +1, 0 },
-      { 0, -1 },
-      { 0, +1 }
-    };
     int last_element_new = EL_UNDEFINED;
     int direction = MV_NONE;
     int i;
@@ -8638,6 +8730,12 @@ static void SetElementIntelliDraw(int x, int y, int new_element,
 
     new_element = getTubeFromOpenDirectionNotEmpty(direction, new_element);
 
+#if 1
+    if (last_element_new != EL_UNDEFINED)
+      MergeAndCloseNeighbourElements(x, y, &new_element,
+				     last_x, last_y, &last_element_new,
+				     getClosedTube, change_level);
+#else
     /* reduce connections of neighbour tube elements to minimal connections */
     if (last_element_new != EL_UNDEFINED)
     {
@@ -8653,16 +8751,69 @@ static void SetElementIntelliDraw(int x, int y, int new_element,
       SetElementSimple(x, y, new_element, change_level);
       SetElementSimple(last_x, last_y, last_element_new, change_level);
     }
+#endif
+  }
+  else if (IS_BELT(new_element))
+  {
+    int belt_nr = getBeltNrFromBeltElement(new_element);
+    int last_element_new = EL_UNDEFINED;
+    int direction = MV_NONE;
+    int i;
+
+    /* if existing element is belt, keep all existing belt directions */
+    if (IS_BELT(old_element))
+      direction |= getOpenDirectionFromBelt(old_element);
+
+    for (i = MV_BIT_LEFT; i <= MV_BIT_RIGHT; i++)
+    {
+      int xx = x + xy[i][0];
+      int yy = y + xy[i][1];
+
+      if (last_x == xx && last_y == yy && IN_LEV_FIELD(last_x, last_y) &&
+	  IS_BELT(IntelliDrawBuffer[last_x][last_y]))
+      {
+	int dir = MV_DIR_FROM_BIT(i);
+	int dir_opposite = MV_DIR_OPPOSITE(dir);
+	int last_element_old = IntelliDrawBuffer[last_x][last_y];
+	int last_belt_nr = getBeltNrFromBeltElement(last_element_old);
+	int last_direction_old = getOpenDirectionFromBelt(last_element_old);
+	int last_direction_new = last_direction_old | dir_opposite;
+
+	last_element_new = getBeltFromNrAndOpenDirection(last_belt_nr,
+							 last_direction_new);
+
+	direction |= dir;
+      }
+    }
+
+    new_element = getBeltFromNrAndOpenDirectionNotEmpty(belt_nr, direction,
+							new_element);
+
+#if 1
+    if (last_element_new != EL_UNDEFINED)
+      MergeAndCloseNeighbourElements(x, y, &new_element,
+				     last_x, last_y, &last_element_new,
+				     getClosedBelt, change_level);
+#else
+    /* reduce connections of neighbour belt elements to minimal connections */
+    if (last_element_new != EL_UNDEFINED)
+    {
+      /* set neighbour belt elements to newly determined belt connections */
+      SetElementSimple(x, y, new_element, change_level);
+      SetElementSimple(last_x, last_y, last_element_new, change_level);
+
+      /* remove all open belt connections of neighbour belt elements */
+      new_element = getClosedBelt(x, y);
+      last_element_new = getClosedBelt(last_x, last_y);
+
+      /* set neighbour belt elements to new, minimized belt connections */
+      SetElementSimple(x, y, new_element, change_level);
+      SetElementSimple(last_x, last_y, last_element_new, change_level);
+    }
+#endif
   }
   else if (IS_ACID_POOL_OR_ACID(new_element))
   {
-    static int xy[4][2] =
-    {
-      { -1, 0 },
-      { +1, 0 },
-      { 0, -1 },
-      { 0, +1 }
-    };
     int last_element_new = EL_UNDEFINED;
     int direction = MV_NONE;
     int i;
@@ -8706,6 +8857,12 @@ static void SetElementIntelliDraw(int x, int y, int new_element,
     new_element = getPoolFromOpenDirectionNotEmpty(direction, new_element);
 #endif
 
+#if 1
+    if (last_element_new != EL_UNDEFINED)
+      MergeAndCloseNeighbourElements(x, y, &new_element,
+				     last_x, last_y, &last_element_new,
+				     getClosedPool, change_level);
+#else
     /* reduce connections of neighbour pool elements to minimal connections */
     if (last_element_new != EL_UNDEFINED)
     {
@@ -8721,81 +8878,62 @@ static void SetElementIntelliDraw(int x, int y, int new_element,
       SetElementSimple(x, y, new_element, change_level);
       SetElementSimple(last_x, last_y, last_element_new, change_level);
     }
+#endif
   }
-  else if (IS_BELT(new_element))
+  else if (IS_EMC_PILLAR(new_element))
   {
     int last_element_new = EL_UNDEFINED;
+    int direction = MV_NONE;
+    int i;
 
-    if (((last_x == x - 1 && last_y == y) ||
-	 (last_x == x + 1 && last_y == y)) && IN_LEV_FIELD(last_x, last_y) &&
-	IS_BELT(IntelliDrawBuffer[last_x][last_y]))
+    /* if existing element is pillar, keep all existing pillar directions */
+    if (IS_EMC_PILLAR(old_element))
+      direction |= getOpenDirectionFromPillar(old_element);
+
+    for (i = MV_BIT_UP; i <= MV_BIT_DOWN; i++)
     {
-      int belt_nr = getBeltNrFromBeltElement(new_element);
-      int belt_middle = getBeltElementFromBeltNrAndBeltDir(belt_nr, MV_NONE);
+      int xx = x + xy[i][0];
+      int yy = y + xy[i][1];
 
-      new_element = belt_middle;
-      last_element_new = belt_middle;
+      if (last_x == xx && last_y == yy && IN_LEV_FIELD(last_x, last_y) &&
+	  IS_EMC_PILLAR(IntelliDrawBuffer[last_x][last_y]))
+      {
+	int dir = MV_DIR_FROM_BIT(i);
+	int dir_opposite = MV_DIR_OPPOSITE(dir);
+	int last_element_old = IntelliDrawBuffer[last_x][last_y];
+	int last_direction_old = getOpenDirectionFromPillar(last_element_old);
+	int last_direction_new = last_direction_old | dir_opposite;
+
+	last_element_new = getPillarFromOpenDirection(last_direction_new);
+
+	direction |= dir;
+      }
     }
 
-    /* reduce connections of neighbour belt elements to minimal connections */
+    new_element = getPillarFromOpenDirectionNotEmpty(direction, new_element);
+
+#if 1
+    if (last_element_new != EL_UNDEFINED)
+      MergeAndCloseNeighbourElements(x, y, &new_element,
+				     last_x, last_y, &last_element_new,
+				     getClosedPillar, change_level);
+#else
+    /* reduce connections of neighbour pillar elements to minimal connections */
     if (last_element_new != EL_UNDEFINED)
     {
-      /* set neighbour belt elements to newly determined belt connections */
+      /* set neighbour pillar elements to newly determined pillar connections */
       SetElementSimple(x, y, new_element, change_level);
       SetElementSimple(last_x, last_y, last_element_new, change_level);
 
-      /* remove all open belt connections of neighbour belt elements */
-      new_element = getClosedBelt(x, y);
-      last_element_new = getClosedBelt(last_x, last_y);
+      /* remove all open pillar connections of neighbour pillar elements */
+      new_element = getClosedPillar(x, y);
+      last_element_new = getClosedPillar(last_x, last_y);
 
-      /* set neighbour belt elements to new, minimized belt connections */
+      /* set neighbour pillar elements to new, minimized pillar connections */
       SetElementSimple(x, y, new_element, change_level);
       SetElementSimple(last_x, last_y, last_element_new, change_level);
     }
-  }
-  else if (new_element == EL_EMC_WALL_1 ||
-	   new_element == EL_EMC_WALL_2 ||
-	   new_element == EL_EMC_WALL_3)
-  {
-    int last_element_new = EL_UNDEFINED;
-
-    if (last_x == x && last_y == y - 1 && IN_LEV_FIELD(last_x, last_y) &&
-	(IntelliDrawBuffer[last_x][last_y] == EL_EMC_WALL_1 ||
-	 IntelliDrawBuffer[last_x][last_y] == EL_EMC_WALL_2 ||
-	 IntelliDrawBuffer[last_x][last_y] == EL_EMC_WALL_3))
-    {
-      if (IN_LEV_FIELD(last_x, last_y - 1))
-      {
-	if (IntelliDrawBuffer[last_x][last_y - 1] != EL_EMC_WALL_1 &&
-	    IntelliDrawBuffer[last_x][last_y - 1] != EL_EMC_WALL_2)
-	  last_element_new = EL_EMC_WALL_1;
-	else if (IntelliDrawBuffer[last_x][last_y - 1] == EL_EMC_WALL_1 ||
-		 IntelliDrawBuffer[last_x][last_y - 1] == EL_EMC_WALL_2)
-	  last_element_new = EL_EMC_WALL_2;
-      }
-
-      new_element = EL_EMC_WALL_3;
-    }
-    else if (last_x == x && last_y == y + 1 && IN_LEV_FIELD(last_x, last_y) &&
-	     (IntelliDrawBuffer[last_x][last_y] == EL_EMC_WALL_1 ||
-	      IntelliDrawBuffer[last_x][last_y] == EL_EMC_WALL_2 ||
-	      IntelliDrawBuffer[last_x][last_y] == EL_EMC_WALL_3))
-    {
-      if (IN_LEV_FIELD(last_x, last_y + 1))
-      {
-	if (IntelliDrawBuffer[last_x][last_y + 1] != EL_EMC_WALL_2 &&
-	    IntelliDrawBuffer[last_x][last_y + 1] != EL_EMC_WALL_3)
-	  last_element_new = EL_EMC_WALL_3;
-	else if (IntelliDrawBuffer[last_x][last_y + 1] == EL_EMC_WALL_2 ||
-		 IntelliDrawBuffer[last_x][last_y + 1] == EL_EMC_WALL_3)
-	  last_element_new = EL_EMC_WALL_2;
-      }
-
-      new_element = EL_EMC_WALL_1;
-    }
-
-    if (last_element_new != EL_UNDEFINED)
-      SetElementSimple(last_x, last_y, last_element_new, change_level);
+#endif
   }
   else if (IS_BELT_SWITCH(old_element))
   {
