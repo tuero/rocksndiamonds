@@ -59,6 +59,8 @@
 #define USE_FIX_KILLED_BY_NON_WALKABLE	(USE_NEW_STUFF		* 1)
 #define USE_FIX_IMPACT_COLLISION	(USE_NEW_STUFF		* 1)
 
+#define USE_GFX_RESET_WHEN_NOT_MOVING	(USE_NEW_STUFF		* 1)
+
 
 /* for DigField() */
 #define DF_NO_PUSH		0
@@ -3309,7 +3311,12 @@ void InitMovingField(int x, int y, int direction)
 
   /* check if element was/is moving or being moved before/after mode change */
 #if 1
+#if 1
+  is_moving_before = (WasJustMoving[x][y] != 0);
+#else
+  /* (!!! this does not work -- WasJustMoving is NOT a boolean value !!!) */
   is_moving_before = WasJustMoving[x][y];
+#endif
 #else
   is_moving_before = (getElementMoveStepsizeExt(x, y, MovDir[x][y]) != 0);
 #endif
@@ -6854,6 +6861,17 @@ void ContinueMoving(int x, int y)
 
   if (ABS(MovPos[x][y]) < TILEX)
   {
+#if 0
+    int ee = Feld[x][y];
+    int gg = el_act_dir2img(element, GfxAction[x][y], GfxDir[x][y]);
+    int ff = getGraphicAnimationFrame(gg, GfxFrame[x][y]);
+
+    printf("::: %d.%d: moving %d ... [%d, %d, %d] [%d, %d, %d]\n",
+	   x, y, ABS(MovPos[x][y]),
+	   ee, gg, ff,
+	   GfxAction[x][y], GfxDir[x][y], GfxFrame[x][y]);
+#endif
+
     DrawLevelField(x, y);
 
     return;	/* element is still moving */
@@ -9046,8 +9064,18 @@ static void HandleElementChange(int x, int y, int page)
 
     if (change->can_change)
     {
-      ResetGfxAnimation(x, y);
-      ResetRandomAnimationValue(x, y);
+#if 0
+      /* !!! not clear why graphic animation should be reset at all here !!! */
+#if USE_GFX_RESET_WHEN_NOT_MOVING
+      /* when a custom element is about to change (for example by change delay),
+	 do not reset graphic animation when the custom element is moving */
+      if (IS_MOVING(x, y))
+#endif
+      {
+	ResetGfxAnimation(x, y);
+	ResetRandomAnimationValue(x, y);
+      }
+#endif
 
       if (change->pre_change_function)
 	change->pre_change_function(x, y);
