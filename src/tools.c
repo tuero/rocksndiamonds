@@ -5725,10 +5725,67 @@ unsigned int InitRND(long seed)
     return InitEngineRandom_RND(seed);
 }
 
+#if 1
+static struct Mapping_EM_to_RND_object object_mapping[TILE_MAX];
+static struct Mapping_EM_to_RND_player player_mapping[MAX_PLAYERS][SPR_MAX];
+#endif
+
+void getGraphicSourceExt_EM(int player_nr, int anim, int frame_em,
+			    Bitmap **src_bitmap, int *src_x, int *src_y)
+{
+  int element = player_mapping[player_nr][anim].element_rnd;
+  int action = player_mapping[player_nr][anim].action;
+  int direction = player_mapping[player_nr][anim].direction;
+
+  int graphic = (direction == MV_NONE ?
+		 el_act2img(element, action) :
+		 el_act_dir2img(element, action, direction));
+  struct GraphicInfo *g = &graphic_info[graphic];
+  // struct GraphicInfo_EM *g_em = &graphic_info_em_player[p][i][7 - j];
+  // Bitmap *src_bitmap;
+  // int src_x, src_y;
+  // int sync_frame = j;
+  int sync_frame = 7 - frame_em;
+
+  InitPlayerGfxAnimation(&stored_player[player_nr], action, direction);
+
+#if 0
+  printf("::: %d: %d, %d [%d]\n",
+	 player_nr,
+	 stored_player[player_nr].Frame,
+	 stored_player[player_nr].StepFrame,
+	 FrameCounter);
+#endif
+
+  sync_frame = stored_player[player_nr].Frame;
+
+  int frame = getAnimationFrame(g->anim_frames,
+				g->anim_delay,
+				g->anim_mode,
+				g->anim_start_frame,
+				sync_frame);
+
+  getGraphicSourceExt(graphic, frame, src_bitmap, src_x, src_y, FALSE);
+
+#if 0
+  g_em->bitmap = src_bitmap;
+  g_em->src_x = src_x;
+  g_em->src_y = src_y;
+  g_em->src_offset_x = 0;
+  g_em->src_offset_y = 0;
+  g_em->dst_offset_x = 0;
+  g_em->dst_offset_y = 0;
+  g_em->width  = TILEX;
+  g_em->height = TILEY;
+#endif
+}
+
 void InitGraphicInfo_EM(void)
 {
+#if 0
   struct Mapping_EM_to_RND_object object_mapping[TILE_MAX];
   struct Mapping_EM_to_RND_player player_mapping[MAX_PLAYERS][SPR_MAX];
+#endif
   int i, j, p;
 
 #if DEBUG_EM_GFX
@@ -6275,7 +6332,7 @@ void InitGraphicInfo_EM(void)
 				      g->anim_start_frame,
 				      sync_frame);
 
-	getGraphicSourceExt(graphic, frame, &src_bitmap, &src_x,&src_y, FALSE);
+	getGraphicSourceExt(graphic, frame, &src_bitmap, &src_x, &src_y, FALSE);
 
 	g_em->bitmap = src_bitmap;
 	g_em->src_x = src_x;

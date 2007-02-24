@@ -248,6 +248,11 @@ static void DrawLevelPlayer_EM(int x1, int y1, int player_nr, int anim,
 {
   struct GraphicInfo_EM *g = &graphic_info_em_player[player_nr][anim][frame];
 
+#if 1
+  getGraphicSourceExt_EM(player_nr, anim, frame,
+			 &g->bitmap, &g->src_x, &g->src_y);
+#endif
+
   int src_x = g->src_x, src_y = g->src_y;
   int dst_x, dst_y;
 
@@ -452,9 +457,14 @@ static void blitplayer(struct PLAYER *ply)
       DrawLevelField_EM(new_x, new_y, new_sx, new_sy, TRUE);
     }
 
-    /* mark screen tiles as dirty */
+    /* redraw screen tiles in the next frame (player may have left the tiles) */
     screentiles[old_sy][old_sx] = -1;
     screentiles[new_sy][new_sx] = -1;
+
+    /* mark screen tiles as dirty (force screen refresh with changed content) */
+    redraw[old_sx][old_sy] = TRUE;
+    redraw[new_sx][new_sy] = TRUE;
+    redraw_tiles += 2;
   }
 }
 
