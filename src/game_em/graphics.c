@@ -148,6 +148,11 @@ static void DrawLevelField_EM(int x, int y, int sx, int sy,
 {
   int tile = Draw[y][x];
   struct GraphicInfo_EM *g = &graphic_info_em_object[tile][frame];
+
+#if 1
+  getGraphicSourceObjectExt_EM(tile, frame, &g->bitmap, &g->src_x, &g->src_y);
+#endif
+
   int src_x = g->src_x + g->src_offset_x;
   int src_y = g->src_y + g->src_offset_y;
   int dst_x = sx * TILEX + g->dst_offset_x;
@@ -249,8 +254,8 @@ static void DrawLevelPlayer_EM(int x1, int y1, int player_nr, int anim,
   struct GraphicInfo_EM *g = &graphic_info_em_player[player_nr][anim][frame];
 
 #if 1
-  getGraphicSourceExt_EM(player_nr, anim, frame,
-			 &g->bitmap, &g->src_x, &g->src_y);
+  getGraphicSourcePlayerExt_EM(player_nr, anim, frame,
+			       &g->bitmap, &g->src_x, &g->src_y);
 #endif
 
   int src_x = g->src_x, src_y = g->src_y;
@@ -362,7 +367,7 @@ static void animscreen(void)
       }
 
       /* only redraw screen tiles if they (or their crumbled state) changed */
-      if (screentiles[sy][sx] != obj || crumbled_state[sy][sx] != crm)
+      // if (screentiles[sy][sx] != obj || crumbled_state[sy][sx] != crm)
       {
 	DrawLevelField_EM(x, y, sx, sy, FALSE);
 	DrawLevelFieldCrumbled_EM(x, y, sx, sy, crm, FALSE);

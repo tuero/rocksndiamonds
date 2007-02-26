@@ -5730,24 +5730,62 @@ static struct Mapping_EM_to_RND_object object_mapping[TILE_MAX];
 static struct Mapping_EM_to_RND_player player_mapping[MAX_PLAYERS][SPR_MAX];
 #endif
 
-void getGraphicSourceExt_EM(int player_nr, int anim, int frame_em,
-			    Bitmap **src_bitmap, int *src_x, int *src_y)
+void ResetGfxAnimation_EM(int x, int y, int tile)
 {
-  int element = player_mapping[player_nr][anim].element_rnd;
-  int action = player_mapping[player_nr][anim].action;
-  int direction = player_mapping[player_nr][anim].direction;
+  GfxFrame[x][y] = 0;
+}
 
+void getGraphicSourceObjectExt_EM(int tile, int frame_em,
+				  Bitmap **src_bitmap, int *src_x, int *src_y)
+{
+  int element         = object_mapping[tile].element_rnd;
+  int action          = object_mapping[tile].action;
+  int direction       = object_mapping[tile].direction;
+  boolean is_backside = object_mapping[tile].is_backside;
+  boolean action_removing = (action == ACTION_DIGGING ||
+			     action == ACTION_SNAPPING ||
+			     action == ACTION_COLLECTING);
+  int effective_element = (frame_em > 0 ? element :
+			   is_backside ? EL_EMPTY :
+			   action_removing ? EL_EMPTY :
+			   element);
+  int graphic = (direction == MV_NONE ?
+		 el_act2img(effective_element, action) :
+		 el_act_dir2img(effective_element, action, direction));
+  struct GraphicInfo *g = &graphic_info[graphic];
+  int sync_frame;
+
+  if (graphic_info[graphic].anim_global_sync)
+    sync_frame = FrameCounter;
+  else
+    sync_frame = 7 - frame_em;
+
+  int frame = getAnimationFrame(g->anim_frames,
+				g->anim_delay,
+				g->anim_mode,
+				g->anim_start_frame,
+				sync_frame);
+
+  getGraphicSourceExt(graphic, frame, src_bitmap, src_x, src_y, FALSE);
+}
+
+void getGraphicSourcePlayerExt_EM(int player_nr, int anim, int frame_em,
+				  Bitmap **src_bitmap, int *src_x, int *src_y)
+{
+  int element   = player_mapping[player_nr][anim].element_rnd;
+  int action    = player_mapping[player_nr][anim].action;
+  int direction = player_mapping[player_nr][anim].direction;
   int graphic = (direction == MV_NONE ?
 		 el_act2img(element, action) :
 		 el_act_dir2img(element, action, direction));
   struct GraphicInfo *g = &graphic_info[graphic];
-  // struct GraphicInfo_EM *g_em = &graphic_info_em_player[p][i][7 - j];
-  // Bitmap *src_bitmap;
-  // int src_x, src_y;
-  // int sync_frame = j;
-  int sync_frame = 7 - frame_em;
+  int sync_frame;
 
   InitPlayerGfxAnimation(&stored_player[player_nr], action, direction);
+
+  stored_player[player_nr].StepFrame = 7 - frame_em;
+
+  sync_frame = stored_player[player_nr].Frame;
 
 #if 0
   printf("::: %d: %d, %d [%d]\n",
@@ -5757,8 +5795,6 @@ void getGraphicSourceExt_EM(int player_nr, int anim, int frame_em,
 	 FrameCounter);
 #endif
 
-  sync_frame = stored_player[player_nr].Frame;
-
   int frame = getAnimationFrame(g->anim_frames,
 				g->anim_delay,
 				g->anim_mode,
@@ -5766,18 +5802,6 @@ void getGraphicSourceExt_EM(int player_nr, int anim, int frame_em,
 				sync_frame);
 
   getGraphicSourceExt(graphic, frame, src_bitmap, src_x, src_y, FALSE);
-
-#if 0
-  g_em->bitmap = src_bitmap;
-  g_em->src_x = src_x;
-  g_em->src_y = src_y;
-  g_em->src_offset_x = 0;
-  g_em->src_offset_y = 0;
-  g_em->dst_offset_x = 0;
-  g_em->dst_offset_y = 0;
-  g_em->width  = TILEX;
-  g_em->height = TILEY;
-#endif
 }
 
 void InitGraphicInfo_EM(void)

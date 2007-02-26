@@ -33,6 +33,7 @@ extern int getGameFrameDelay_EM(int);
 extern void PlayLevelSound_EM(int, int, int, int);
 extern void InitGraphicInfo_EM(void);
 
-void getGraphicSourceExt_EM(int, int, int, Bitmap **, int *, int *);
+void getGraphicSourceObjectExt_EM(int, int, Bitmap **, int *, int *);
+void getGraphicSourcePlayerExt_EM(int, int, int, Bitmap **, int *, int *);
 
 #endif	/* ENGINES_H */
