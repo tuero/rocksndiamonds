@@ -36,8 +36,8 @@
 #define GetSimpleRandom(max)		get_random_number(RANDOM_SIMPLE, max)
 
 /* values for Error() */
-#define ERR_RETURN			0
-#define ERR_RETURN_LINE			(1 << 0)
+#define ERR_INFO			0
+#define ERR_INFO_LINE			(1 << 0)
 #define ERR_WARN			(1 << 1)
 #define ERR_EXIT			(1 << 2)
 #define ERR_HELP			(1 << 3)

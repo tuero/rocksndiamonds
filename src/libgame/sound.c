@@ -913,8 +913,8 @@ static void Mixer_InsertSound(SoundControl snd_ctrl)
     {
       if (!mixer[i].active)
       {
-	Error(ERR_RETURN, "Mixer_InsertSound: Channel %d inactive", i);
-	Error(ERR_RETURN, "Mixer_InsertSound: This should never happen!");
+	Error(ERR_INFO, "Mixer_InsertSound: Channel %d inactive", i);
+	Error(ERR_INFO, "Mixer_InsertSound: This should never happen!");
 
 	mixer_active_channels--;
       }
@@ -933,7 +933,7 @@ static void Mixer_InsertSound(SoundControl snd_ctrl)
     /* print some debugging information about audio channel usage */
     for (i = audio.first_sound_channel; i < audio.num_channels; i++)
     {
-      Error(ERR_RETURN, "Mixer_InsertSound: %d [%d]: %ld (%ld)",
+      Error(ERR_INFO, "Mixer_InsertSound: %d [%d]: %ld (%ld)",
 	    i, mixer[i].active, mixer[i].data_len, (long)mixer[i].data_ptr);
     }
 #endif

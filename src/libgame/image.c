@@ -385,7 +385,7 @@ XImageInfo *Image_to_Pixmap(Display *display, int screen, Visual *visual,
 	  if (!private_cmap)
 	  {
 	    if (options.verbose)
-	      Error(ERR_RETURN, "switching to private colormap");
+	      Error(ERR_INFO, "switching to private colormap");
 
 	    /* we just filled up the default colormap -- get a private one
 	       which contains all already allocated colors */
@@ -486,7 +486,7 @@ XImageInfo *Image_to_Pixmap(Display *display, int screen, Visual *visual,
       break;
   
     default:
-      Error(ERR_RETURN,"DirectColor, TrueColor or PseudoColor display needed");
+      Error(ERR_INFO,"DirectColor, TrueColor or PseudoColor display needed");
       SetError(error, "display class not supported");
 
       return NULL;
@@ -560,7 +560,7 @@ XImageInfo *Image_to_Pixmap(Display *display, int screen, Visual *visual,
 	}
 
         default:
-	  Error(ERR_RETURN, "RGB or TrueColor image needed");
+	  Error(ERR_INFO, "RGB or TrueColor image needed");
 	  SetError(error, "image type not supported");
 
 	  return NULL;
@@ -594,7 +594,7 @@ XImageInfo *Image_to_Pixmap(Display *display, int screen, Visual *visual,
     }
 
     default:
-      Error(ERR_RETURN,"DirectColor, TrueColor or PseudoColor display needed");
+      Error(ERR_INFO,"DirectColor, TrueColor or PseudoColor display needed");
       SetError(error, "display class not supported");
 
       return NULL;

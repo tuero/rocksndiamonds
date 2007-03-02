@@ -8453,19 +8453,19 @@ void LoadUserDefinedEditorElementList(int **elements, int *num_elements)
     {
       if (num_unknown_tokens == 0)
       {
-	Error(ERR_RETURN_LINE, "-");
-	Error(ERR_RETURN, "warning: unknown token(s) found in config file:");
-	Error(ERR_RETURN, "- config file: '%s'", filename);
+	Error(ERR_INFO_LINE, "-");
+	Error(ERR_INFO, "warning: unknown token(s) found in config file:");
+	Error(ERR_INFO, "- config file: '%s'", filename);
 
 	num_unknown_tokens++;
       }
 
-      Error(ERR_RETURN, "- token: '%s'", list->token);
+      Error(ERR_INFO, "- token: '%s'", list->token);
     }
   }
 
   if (num_unknown_tokens > 0)
-    Error(ERR_RETURN_LINE, "-");
+    Error(ERR_INFO_LINE, "-");
 
   while (*num_elements % 4)	/* pad with empty elements, if needed */
     (*elements)[(*num_elements)++] = EL_EMPTY;
@@ -8766,18 +8766,18 @@ void print_unknown_token(char *filename, char *token, int token_nr)
 {
   if (token_nr == 0)
   {
-    Error(ERR_RETURN_LINE, "-");
-    Error(ERR_RETURN, "warning: unknown token(s) found in config file:");
-    Error(ERR_RETURN, "- config file: '%s'", filename);
+    Error(ERR_INFO_LINE, "-");
+    Error(ERR_INFO, "warning: unknown token(s) found in config file:");
+    Error(ERR_INFO, "- config file: '%s'", filename);
   }
 
-  Error(ERR_RETURN, "- token: '%s'", token);
+  Error(ERR_INFO, "- token: '%s'", token);
 }
 
 void print_unknown_token_end(int token_nr)
 {
   if (token_nr > 0)
-    Error(ERR_RETURN_LINE, "-");
+    Error(ERR_INFO_LINE, "-");
 }
 
 void LoadHelpAnimInfo()

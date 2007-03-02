@@ -1,3 +1,12 @@
+2007-03-01
+	* added new (special) "include: <filename>" directive that works in all
+	  configuration files (like "graphicsinfo.conf") and that has the same
+	  effect as if that directive would be replaced with the content of the
+	  specified file (this can be useful to split large configuration files
+	  into several smaller ones and include them from one main file, or to
+	  store configuration settings that always stay the same into a separate
+	  file, while including it and only add those parts that really change)
+
 2007-02-24
 	* fixed minor bug (screen redraw of player tiles) in EMC graphics engine
 

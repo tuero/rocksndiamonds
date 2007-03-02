@@ -1610,11 +1610,13 @@ static void printSetupFileHash(SetupFileHash *hash)
 #define ALLOW_TOKEN_VALUE_SEPARATOR_BEING_WHITESPACE		1
 #define CHECK_TOKEN_VALUE_SEPARATOR__WARN_IF_MISSING		0
 
-static void *loadSetupFileData(char *filename, boolean use_hash)
+static void loadSetupFileData(void *setup_file_data, char *filename,
+			      boolean top_recursion_level, boolean is_hash)
 {
+  static SetupFileHash *include_filename_hash = NULL;
   char line[MAX_LINE_LEN], line_raw[MAX_LINE_LEN], previous_line[MAX_LINE_LEN];
   char *token, *value, *line_ptr;
-  void *setup_file_data, *insert_ptr = NULL;
+  void *insert_ptr = NULL;
   boolean read_continued_line = FALSE;
   boolean token_value_separator_found;
 #if CHECK_TOKEN_VALUE_SEPARATOR__WARN_IF_MISSING
@@ -1622,18 +1624,25 @@ static void *loadSetupFileData(char *filename, boolean use_hash)
 #endif
   FILE *file;
   int line_nr = 0;
+  int token_count = 0;
 
   if (!(file = fopen(filename, MODE_READ)))
   {
     Error(ERR_WARN, "cannot open configuration file '%s'", filename);
 
-    return NULL;
+    return;
   }
 
-  if (use_hash)
-    setup_file_data = newSetupFileHash();
-  else
-    insert_ptr = setup_file_data = newSetupFileList("", "");
+  /* use "insert pointer" to store list end for constant insertion complexity */
+  if (!is_hash)
+    insert_ptr = setup_file_data;
+
+  /* on top invocation, create hash to mark included files (to prevent loops) */
+  if (top_recursion_level)
+    include_filename_hash = newSetupFileHash();
+
+  /* mark this file as already included (to prevent including it again) */
+  setHashEntry(include_filename_hash, getBaseNamePtr(filename), "true");
 
   while (!feof(file))
   {
@@ -1750,14 +1759,14 @@ static void *loadSetupFileData(char *filename, boolean use_hash)
       {
 	if (!token_value_separator_warning)
 	{
-	  Error(ERR_RETURN_LINE, "-");
+	  Error(ERR_INFO_LINE, "-");
 	  Error(ERR_WARN, "missing token/value separator(s) in config file:");
-	  Error(ERR_RETURN, "- config file: '%s'", filename);
+	  Error(ERR_INFO, "- config file: '%s'", filename);
 
 	  token_value_separator_warning = TRUE;
 	}
 
-	Error(ERR_RETURN, "- line %d: '%s'", line_nr, line_raw);
+	Error(ERR_INFO, "- line %d: '%s'", line_nr, line_raw);
       }
 #endif
     }
@@ -1780,10 +1789,38 @@ static void *loadSetupFileData(char *filename, boolean use_hash)
 
     if (*token)
     {
-      if (use_hash)
-	setHashEntry((SetupFileHash *)setup_file_data, token, value);
+      if (strEqual(token, "include"))
+      {
+	if (getHashEntry(include_filename_hash, value) == NULL)
+	{
+	  char *basepath = getBasePath(filename);
+	  char *basename = getBaseName(value);
+	  char *filename_include = getPath2(basepath, basename);
+
+#if 0
+	  Error(ERR_INFO, "[including file '%s']", filename_include);
+#endif
+
+	  loadSetupFileData(setup_file_data, filename_include, FALSE, is_hash);
+
+	  free(basepath);
+	  free(basename);
+	  free(filename_include);
+	}
+	else
+	{
+	  Error(ERR_WARN, "ignoring already processed file '%s'", value);
+	}
+      }
       else
-	insert_ptr = addListEntry((SetupFileList *)insert_ptr, token, value);
+      {
+	if (is_hash)
+	  setHashEntry((SetupFileHash *)setup_file_data, token, value);
+	else
+	  insert_ptr = addListEntry((SetupFileList *)insert_ptr, token, value);
+
+	token_count++;
+      }
     }
   }
 
@@ -1791,29 +1828,14 @@ static void *loadSetupFileData(char *filename, boolean use_hash)
 
 #if CHECK_TOKEN_VALUE_SEPARATOR__WARN_IF_MISSING
   if (token_value_separator_warning)
-    Error(ERR_RETURN_LINE, "-");
+    Error(ERR_INFO_LINE, "-");
 #endif
 
-  if (use_hash)
-  {
-    if (hashtable_count((SetupFileHash *)setup_file_data) == 0)
-      Error(ERR_WARN, "configuration file '%s' is empty", filename);
-  }
-  else
-  {
-    SetupFileList *setup_file_list = (SetupFileList *)setup_file_data;
-    SetupFileList *first_valid_list_entry = setup_file_list->next;
+  if (token_count == 0)
+    Error(ERR_WARN, "configuration file '%s' is empty", filename);
 
-    /* free empty list header */
-    setup_file_list->next = NULL;
-    freeSetupFileList(setup_file_list);
-    setup_file_data = first_valid_list_entry;
-
-    if (first_valid_list_entry == NULL)
-      Error(ERR_WARN, "configuration file '%s' is empty", filename);
-  }
-
-  return setup_file_data;
+  if (top_recursion_level)
+    freeSetupFileHash(include_filename_hash);
 }
 
 void saveSetupFileHash(SetupFileHash *hash, char *filename)
@@ -1839,12 +1861,27 @@ void saveSetupFileHash(SetupFileHash *hash, char *filename)
 
 SetupFileList *loadSetupFileList(char *filename)
 {
-  return (SetupFileList *)loadSetupFileData(filename, FALSE);
+  SetupFileList *setup_file_list = newSetupFileList("", "");
+  SetupFileList *first_valid_list_entry;
+
+  loadSetupFileData(setup_file_list, filename, TRUE, FALSE);
+
+  first_valid_list_entry = setup_file_list->next;
+
+  /* free empty list header */
+  setup_file_list->next = NULL;
+  freeSetupFileList(setup_file_list);
+
+  return first_valid_list_entry;
 }
 
 SetupFileHash *loadSetupFileHash(char *filename)
 {
-  return (SetupFileHash *)loadSetupFileData(filename, TRUE);
+  SetupFileHash *setup_file_hash = newSetupFileHash();
+
+  loadSetupFileData(setup_file_hash, filename, TRUE, TRUE);
+
+  return setup_file_hash;
 }
 
 void checkSetupFileHashIdentifier(SetupFileHash *setup_file_hash,

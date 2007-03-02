@@ -592,10 +592,10 @@ static void Handle_OP_MOVE_PLAYER(unsigned int len)
 
   if (server_frame_counter != FrameCounter)
   {
-    Error(ERR_RETURN, "client and servers frame counters out of sync");
-    Error(ERR_RETURN, "frame counter of client is %d", FrameCounter);
-    Error(ERR_RETURN, "frame counter of server is %d", server_frame_counter);
-    Error(ERR_RETURN, "this should not happen -- please debug");
+    Error(ERR_INFO, "client and servers frame counters out of sync");
+    Error(ERR_INFO, "frame counter of client is %d", FrameCounter);
+    Error(ERR_INFO, "frame counter of server is %d", server_frame_counter);
+    Error(ERR_INFO, "this should not happen -- please debug");
 
     stop_network_game = TRUE;
 

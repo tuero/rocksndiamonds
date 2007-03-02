@@ -815,7 +815,7 @@ void InitElementGraphicInfo()
     for (i = 0; i < MAX_NUM_ELEMENTS; i++)
       if (element_info[i].graphic[ACTION_DEFAULT] == IMG_UNKNOWN &&
 	  i != EL_UNKNOWN)
-	Error(ERR_RETURN, "warning: no graphic for element '%s' (%d)",
+	Error(ERR_INFO, "warning: no graphic for element '%s' (%d)",
 	      element_info[i].token_name, i);
   }
 #endif
@@ -1192,18 +1192,18 @@ static void set_cloned_graphic_parameters(int graphic)
 
   if (num_references_followed >= max_num_images)
   {
-    Error(ERR_RETURN_LINE, "-");
-    Error(ERR_RETURN, "warning: error found in config file:");
-    Error(ERR_RETURN, "- config file: '%s'", getImageConfigFilename());
-    Error(ERR_RETURN, "- config token: '%s'", getTokenFromImageID(graphic));
-    Error(ERR_RETURN, "error: loop discovered when resolving cloned graphics");
-    Error(ERR_RETURN, "custom graphic rejected for this element/action");
+    Error(ERR_INFO_LINE, "-");
+    Error(ERR_INFO, "warning: error found in config file:");
+    Error(ERR_INFO, "- config file: '%s'", getImageConfigFilename());
+    Error(ERR_INFO, "- config token: '%s'", getTokenFromImageID(graphic));
+    Error(ERR_INFO, "error: loop discovered when resolving cloned graphics");
+    Error(ERR_INFO, "custom graphic rejected for this element/action");
 
     if (graphic == fallback_graphic)
       Error(ERR_EXIT, "fatal error: no fallback graphic available");
 
-    Error(ERR_RETURN, "fallback done to 'char_exclam' for this graphic");
-    Error(ERR_RETURN_LINE, "-");
+    Error(ERR_INFO, "fallback done to 'char_exclam' for this graphic");
+    Error(ERR_INFO_LINE, "-");
 
     graphic_info[graphic] = graphic_info[fallback_graphic];
   }
@@ -1344,21 +1344,21 @@ static void InitGraphicInfo()
 	src_x + width  > src_bitmap_width ||
 	src_y + height > src_bitmap_height)
     {
-      Error(ERR_RETURN_LINE, "-");
-      Error(ERR_RETURN, "warning: error found in config file:");
-      Error(ERR_RETURN, "- config file: '%s'", getImageConfigFilename());
-      Error(ERR_RETURN, "- config token: '%s'", getTokenFromImageID(i));
-      Error(ERR_RETURN, "- image file: '%s'", src_bitmap->source_filename);
-      Error(ERR_RETURN,
+      Error(ERR_INFO_LINE, "-");
+      Error(ERR_INFO, "warning: error found in config file:");
+      Error(ERR_INFO, "- config file: '%s'", getImageConfigFilename());
+      Error(ERR_INFO, "- config token: '%s'", getTokenFromImageID(i));
+      Error(ERR_INFO, "- image file: '%s'", src_bitmap->source_filename);
+      Error(ERR_INFO,
 	    "error: first animation frame out of bounds (%d, %d) [%d, %d]",
 	    src_x, src_y, src_bitmap_width, src_bitmap_height);
-      Error(ERR_RETURN, "custom graphic rejected for this element/action");
+      Error(ERR_INFO, "custom graphic rejected for this element/action");
 
       if (i == fallback_graphic)
 	Error(ERR_EXIT, "fatal error: no fallback graphic available");
 
-      Error(ERR_RETURN, "fallback done to 'char_exclam' for this graphic");
-      Error(ERR_RETURN_LINE, "-");
+      Error(ERR_INFO, "fallback done to 'char_exclam' for this graphic");
+      Error(ERR_INFO_LINE, "-");
 
       graphic_info[i] = graphic_info[fallback_graphic];
     }
@@ -1372,21 +1372,21 @@ static void InitGraphicInfo()
 	src_x + width  > src_bitmap_width ||
 	src_y + height > src_bitmap_height)
     {
-      Error(ERR_RETURN_LINE, "-");
-      Error(ERR_RETURN, "warning: error found in config file:");
-      Error(ERR_RETURN, "- config file: '%s'", getImageConfigFilename());
-      Error(ERR_RETURN, "- config token: '%s'", getTokenFromImageID(i));
-      Error(ERR_RETURN, "- image file: '%s'", src_bitmap->source_filename);
-      Error(ERR_RETURN,
+      Error(ERR_INFO_LINE, "-");
+      Error(ERR_INFO, "warning: error found in config file:");
+      Error(ERR_INFO, "- config file: '%s'", getImageConfigFilename());
+      Error(ERR_INFO, "- config token: '%s'", getTokenFromImageID(i));
+      Error(ERR_INFO, "- image file: '%s'", src_bitmap->source_filename);
+      Error(ERR_INFO,
 	    "error: last animation frame (%d) out of bounds (%d, %d) [%d, %d]",
 	    last_frame, src_x, src_y, src_bitmap_width, src_bitmap_height);
-      Error(ERR_RETURN, "custom graphic rejected for this element/action");
+      Error(ERR_INFO, "custom graphic rejected for this element/action");
 
       if (i == fallback_graphic)
 	Error(ERR_EXIT, "fatal error: no fallback graphic available");
 
-      Error(ERR_RETURN, "fallback done to 'char_exclam' for this graphic");
-      Error(ERR_RETURN_LINE, "-");
+      Error(ERR_INFO, "fallback done to 'char_exclam' for this graphic");
+      Error(ERR_INFO_LINE, "-");
 
       graphic_info[i] = graphic_info[fallback_graphic];
     }

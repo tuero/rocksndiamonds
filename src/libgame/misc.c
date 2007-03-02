@@ -808,7 +808,7 @@ void Error(int mode, char *format, ...)
   if (mode & ERR_WARN && !options.verbose)
     return;
 
-  if (mode == ERR_RETURN_LINE)
+  if (mode == ERR_INFO_LINE)
   {
     if (!last_line_was_separator)
       fprintf_line(program.error_file, format, 79);
@@ -1966,7 +1966,7 @@ struct FileInfo *getFileListFromConfigList(struct ConfigInfo *config_list,
 	  !strEqual(&config_list[i].value[len_config_value - 4], ".wav") &&
 	  !strEqual(config_list[i].value, UNDEFINED_FILENAME))
       {
-	Error(ERR_RETURN, "Configuration directive '%s' -> '%s':",
+	Error(ERR_INFO, "Configuration directive '%s' -> '%s':",
 	      config_list[i].token, config_list[i].value);
 	Error(ERR_EXIT, "This seems to be no valid definition -- please fix");
       }
@@ -1983,11 +1983,11 @@ struct FileInfo *getFileListFromConfigList(struct ConfigInfo *config_list,
   num_file_list_entries_found = list_pos + 1;
   if (num_file_list_entries_found != num_file_list_entries)
   {
-    Error(ERR_RETURN_LINE, "-");
-    Error(ERR_RETURN, "inconsistant config list information:");
-    Error(ERR_RETURN, "- should be:   %d (according to 'src/conf_xxx.h')",
+    Error(ERR_INFO_LINE, "-");
+    Error(ERR_INFO, "inconsistant config list information:");
+    Error(ERR_INFO, "- should be:   %d (according to 'src/conf_xxx.h')",
 	  num_file_list_entries);
-    Error(ERR_RETURN, "- found to be: %d (according to 'src/conf_xxx.c')",
+    Error(ERR_INFO, "- found to be: %d (according to 'src/conf_xxx.c')",
 	  num_file_list_entries_found);
     Error(ERR_EXIT,   "please fix");
   }
@@ -2431,53 +2431,53 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
 
     if (options.debug && dynamic_tokens_found)
     {
-      Error(ERR_RETURN_LINE, "-");
-      Error(ERR_RETURN, "dynamic token(s) found in config file:");
-      Error(ERR_RETURN, "- config file: '%s'", filename);
+      Error(ERR_INFO_LINE, "-");
+      Error(ERR_INFO, "dynamic token(s) found in config file:");
+      Error(ERR_INFO, "- config file: '%s'", filename);
 
       for (list = setup_file_list; list != NULL; list = list->next)
       {
 	char *value = getHashEntry(extra_file_hash, list->token);
 
 	if (value != NULL && strEqual(value, known_token_value))
-	  Error(ERR_RETURN, "- dynamic token: '%s'", list->token);
+	  Error(ERR_INFO, "- dynamic token: '%s'", list->token);
       }
 
-      Error(ERR_RETURN_LINE, "-");
+      Error(ERR_INFO_LINE, "-");
     }
 
     if (unknown_tokens_found)
     {
-      Error(ERR_RETURN_LINE, "-");
-      Error(ERR_RETURN, "warning: unknown token(s) found in config file:");
-      Error(ERR_RETURN, "- config file: '%s'", filename);
+      Error(ERR_INFO_LINE, "-");
+      Error(ERR_INFO, "warning: unknown token(s) found in config file:");
+      Error(ERR_INFO, "- config file: '%s'", filename);
 
       for (list = setup_file_list; list != NULL; list = list->next)
       {
 	char *value = getHashEntry(extra_file_hash, list->token);
 
 	if (value != NULL && !strEqual(value, known_token_value))
-	  Error(ERR_RETURN, "- dynamic token: '%s'", list->token);
+	  Error(ERR_INFO, "- dynamic token: '%s'", list->token);
       }
 
-      Error(ERR_RETURN_LINE, "-");
+      Error(ERR_INFO_LINE, "-");
     }
 
     if (undefined_values_found)
     {
-      Error(ERR_RETURN_LINE, "-");
-      Error(ERR_RETURN, "warning: undefined values found in config file:");
-      Error(ERR_RETURN, "- config file: '%s'", filename);
+      Error(ERR_INFO_LINE, "-");
+      Error(ERR_INFO, "warning: undefined values found in config file:");
+      Error(ERR_INFO, "- config file: '%s'", filename);
 
       for (list = setup_file_list; list != NULL; list = list->next)
       {
 	char *value = getHashEntry(empty_file_hash, list->token);
 
 	if (value != NULL)
-	  Error(ERR_RETURN, "- undefined value for token: '%s'", list->token);
+	  Error(ERR_INFO, "- undefined value for token: '%s'", list->token);
       }
 
-      Error(ERR_RETURN_LINE, "-");
+      Error(ERR_INFO_LINE, "-");
     }
 
     freeSetupFileList(setup_file_list);

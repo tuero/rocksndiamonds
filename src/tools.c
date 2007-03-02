@@ -5736,7 +5736,8 @@ void ResetGfxAnimation_EM(int x, int y, int tile)
 }
 
 void getGraphicSourceObjectExt_EM(int tile, int frame_em,
-				  Bitmap **src_bitmap, int *src_x, int *src_y)
+				  Bitmap **src_bitmap, int *src_x, int *src_y,
+				  int x, int y)
 {
   int element         = object_mapping[tile].element_rnd;
   int action          = object_mapping[tile].action;
@@ -5759,6 +5760,8 @@ void getGraphicSourceObjectExt_EM(int tile, int frame_em,
     sync_frame = FrameCounter;
   else
     sync_frame = 7 - frame_em;
+
+  SetRandomAnimationValue(x, y);
 
   int frame = getAnimationFrame(g->anim_frames,
 				g->anim_delay,

@@ -150,7 +150,8 @@ static void DrawLevelField_EM(int x, int y, int sx, int sy,
   struct GraphicInfo_EM *g = &graphic_info_em_object[tile][frame];
 
 #if 1
-  getGraphicSourceObjectExt_EM(tile, frame, &g->bitmap, &g->src_x, &g->src_y);
+  getGraphicSourceObjectExt_EM(tile, frame, &g->bitmap, &g->src_x, &g->src_y,
+			       x - 2, y - 2);
 #endif
 
   int src_x = g->src_x + g->src_offset_x;

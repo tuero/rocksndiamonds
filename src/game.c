@@ -13536,9 +13536,9 @@ static void LoadEngineSnapshotValues_RND()
 
   if (game.num_random_calls != num_random_calls)
   {
-    Error(ERR_RETURN, "number of random calls out of sync");
-    Error(ERR_RETURN, "number of random calls should be %d", num_random_calls);
-    Error(ERR_RETURN, "number of random calls is %d", game.num_random_calls);
+    Error(ERR_INFO, "number of random calls out of sync");
+    Error(ERR_INFO, "number of random calls should be %d", num_random_calls);
+    Error(ERR_INFO, "number of random calls is %d", game.num_random_calls);
     Error(ERR_EXIT, "this should not happen -- please debug");
   }
 }
