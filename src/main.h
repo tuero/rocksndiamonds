@@ -698,7 +698,22 @@
 
 #define IS_ACID_POOL_OR_ACID(e)	(IS_ACID_POOL(e) || (e) == EL_ACID)
 
-#define IS_EMC_PILLAR(e)	((e) >= EL_EMC_WALL_1 && (e) <= EL_EMC_WALL_3)
+#define IS_EMC_PILLAR(e)	((e) >= EL_EMC_WALL_1 &&		\
+				 (e) <= EL_EMC_WALL_3)
+#define IS_SP_CHIP(e)		((e) == EL_SP_CHIP_SINGLE ||		\
+				 (e) == EL_SP_CHIP_LEFT ||		\
+				 (e) == EL_SP_CHIP_RIGHT ||		\
+				 (e) == EL_SP_CHIP_TOP ||		\
+				 (e) == EL_SP_CHIP_BOTTOM)
+#define IS_SP_HARDWARE_BASE(e)	((e) == EL_SP_HARDWARE_BASE_1 ||	\
+				 (e) == EL_SP_HARDWARE_BASE_2 ||	\
+				 (e) == EL_SP_HARDWARE_BASE_3 ||	\
+				 (e) == EL_SP_HARDWARE_BASE_4 ||	\
+				 (e) == EL_SP_HARDWARE_BASE_5 ||	\
+				 (e) == EL_SP_HARDWARE_BASE_6)
+
+#define IS_DC_STEELWALL_2(e)	((e) >= EL_DC_STEELWALL_2_LEFT &&	\
+				 (e) <= EL_DC_STEELWALL_2_SINGLE)
 
 #define GFX_ELEMENT(e)		(element_info[e].use_gfx_element ?	\
 				 element_info[e].gfx_element : e)

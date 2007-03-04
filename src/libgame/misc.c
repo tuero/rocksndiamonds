@@ -2805,10 +2805,46 @@ void NotifyUserAboutErrorFile()
 
 #if DEBUG
 
-#define DEBUG_NUM_TIMESTAMPS	3
+#define DEBUG_NUM_TIMESTAMPS		3
+#define DEBUG_TIME_IN_MICROSECONDS	1
+
+#if DEBUG_TIME_IN_MICROSECONDS
+static double Counter_Microseconds()
+{
+  static struct timeval base_time = { 0, 0 };
+  struct timeval current_time;
+  double counter;
+
+  gettimeofday(&current_time, NULL);
+
+  /* reset base time in case of wrap-around */
+  if (current_time.tv_sec < base_time.tv_sec)
+    base_time = current_time;
+
+  counter =
+    ((double)(current_time.tv_sec  - base_time.tv_sec)) * 1000000 +
+    ((double)(current_time.tv_usec - base_time.tv_usec));
+
+  return counter;		/* return microseconds since last init */
+}
+#endif
 
 void debug_print_timestamp(int counter_nr, char *message)
 {
+#if DEBUG_TIME_IN_MICROSECONDS
+  static double counter[DEBUG_NUM_TIMESTAMPS][2];
+
+  if (counter_nr >= DEBUG_NUM_TIMESTAMPS)
+    Error(ERR_EXIT, "debugging: increase DEBUG_NUM_TIMESTAMPS in misc.c");
+
+  counter[counter_nr][0] = Counter_Microseconds();
+
+  if (message)
+    printf("%s %.3f ms\n", message,
+	   (counter[counter_nr][0] - counter[counter_nr][1]) / 1000);
+
+  counter[counter_nr][1] = counter[counter_nr][0];
+#else
   static long counter[DEBUG_NUM_TIMESTAMPS][2];
 
   if (counter_nr >= DEBUG_NUM_TIMESTAMPS)
@@ -2817,10 +2853,11 @@ void debug_print_timestamp(int counter_nr, char *message)
   counter[counter_nr][0] = Counter();
 
   if (message)
-    printf("%s %.3f seconds\n", message,
+    printf("%s %.3f s\n", message,
 	   (float)(counter[counter_nr][0] - counter[counter_nr][1]) / 1000);
 
   counter[counter_nr][1] = counter[counter_nr][0];
+#endif
 }
 
 void debug_print_parent_only(char *format, ...)

@@ -10107,12 +10107,14 @@ void GameActions_RND()
 
 	/* continue moving after pushing (this is actually a bug) */
 	if (!IS_MOVING(x, y))
-	{
 	  Stop[x][y] = FALSE;
-	}
       }
     }
   }
+
+#if 0
+  debug_print_timestamp(0, "start main loop profiling");
+#endif
 
   SCAN_PLAYFIELD(x, y)
   {
@@ -10188,6 +10190,63 @@ void GameActions_RND()
 #endif
   }
 
+#if 0
+  debug_print_timestamp(0, "- time for pre-main loop:");
+#endif
+
+#if 0	// -------------------- !!! TEST ONLY !!! --------------------
+  SCAN_PLAYFIELD(x, y)
+  {
+    element = Feld[x][y];
+    graphic = el_act_dir2img(element, GfxAction[x][y], GfxDir[x][y]);
+
+#if 1
+    {
+#if 1
+      int element2 = element;
+      int graphic2 = graphic;
+#else
+      int element2 = Feld[x][y];
+      int graphic2 = el_act_dir2img(element2, GfxAction[x][y], GfxDir[x][y]);
+#endif
+      int last_gfx_frame = GfxFrame[x][y];
+
+      if (graphic_info[graphic2].anim_global_sync)
+	GfxFrame[x][y] = FrameCounter;
+      else if (ANIM_MODE(graphic2) == ANIM_CE_VALUE)
+	GfxFrame[x][y] = CustomValue[x][y];
+      else if (ANIM_MODE(graphic2) == ANIM_CE_SCORE)
+	GfxFrame[x][y] = element_info[element2].collect_score;
+      else if (ANIM_MODE(graphic2) == ANIM_CE_DELAY)
+	GfxFrame[x][y] = ChangeDelay[x][y];
+
+      if (redraw && GfxFrame[x][y] != last_gfx_frame)
+	DrawLevelGraphicAnimation(x, y, graphic2);
+    }
+#else
+    ResetGfxFrame(x, y, TRUE);
+#endif
+
+#if 1
+    if (ANIM_MODE(graphic) == ANIM_RANDOM &&
+	IS_NEXT_FRAME(GfxFrame[x][y], graphic))
+      ResetRandomAnimationValue(x, y);
+#endif
+
+#if 1
+    SetRandomAnimationValue(x, y);
+#endif
+
+#if 1
+    PlayLevelSoundActionIfLoop(x, y, GfxAction[x][y]);
+#endif
+  }
+#endif	// -------------------- !!! TEST ONLY !!! --------------------
+
+#if 0
+  debug_print_timestamp(0, "- time for TEST loop:     -->");
+#endif
+
   SCAN_PLAYFIELD(x, y)
   {
     element = Feld[x][y];
@@ -10230,6 +10289,143 @@ void GameActions_RND()
       element = Feld[x][y];
       graphic = el_act_dir2img(element, GfxAction[x][y], GfxDir[x][y]);
     }
+
+#if 0	// ---------------------------------------------------------------------
+
+    if (!IS_MOVING(x, y) && (CAN_FALL(element) || CAN_MOVE(element)))
+    {
+      StartMoving(x, y);
+
+      element = Feld[x][y];
+      graphic = el_act_dir2img(element, GfxAction[x][y], GfxDir[x][y]);
+
+      if (IS_ANIMATED(graphic) &&
+	  !IS_MOVING(x, y) &&
+	  !Stop[x][y])
+	DrawLevelGraphicAnimationIfNeeded(x, y, graphic);
+
+      if (IS_GEM(element) || element == EL_SP_INFOTRON)
+	DrawTwinkleOnField(x, y);
+    }
+    else if (IS_MOVING(x, y))
+      ContinueMoving(x, y);
+    else
+    {
+      switch (element)
+      {
+        case EL_ACID:
+        case EL_EXIT_OPEN:
+        case EL_EM_EXIT_OPEN:
+        case EL_SP_EXIT_OPEN:
+        case EL_STEEL_EXIT_OPEN:
+        case EL_EM_STEEL_EXIT_OPEN:
+        case EL_SP_TERMINAL:
+        case EL_SP_TERMINAL_ACTIVE:
+        case EL_EXTRA_TIME:
+        case EL_SHIELD_NORMAL:
+        case EL_SHIELD_DEADLY:
+	  if (IS_ANIMATED(graphic))
+	    DrawLevelGraphicAnimationIfNeeded(x, y, graphic);
+	  break;
+
+        case EL_DYNAMITE_ACTIVE:
+        case EL_EM_DYNAMITE_ACTIVE:
+        case EL_DYNABOMB_PLAYER_1_ACTIVE:
+        case EL_DYNABOMB_PLAYER_2_ACTIVE:
+        case EL_DYNABOMB_PLAYER_3_ACTIVE:
+        case EL_DYNABOMB_PLAYER_4_ACTIVE:
+        case EL_SP_DISK_RED_ACTIVE:
+	  CheckDynamite(x, y);
+	  break;
+
+        case EL_AMOEBA_GROWING:
+	  AmoebeWaechst(x, y);
+	  break;
+
+        case EL_AMOEBA_SHRINKING:
+	  AmoebaDisappearing(x, y);
+	  break;
+
+#if !USE_NEW_AMOEBA_CODE
+        case EL_AMOEBA_WET:
+        case EL_AMOEBA_DRY:
+        case EL_AMOEBA_FULL:
+        case EL_BD_AMOEBA:
+        case EL_EMC_DRIPPER:
+	  AmoebeAbleger(x, y);
+	  break;
+#endif
+
+        case EL_GAME_OF_LIFE:
+        case EL_BIOMAZE:
+	  Life(x, y);
+	  break;
+
+        case EL_EXIT_CLOSED:
+	  CheckExit(x, y);
+	  break;
+
+        case EL_EM_EXIT_CLOSED:
+	  CheckExitEM(x, y);
+	  break;
+
+        case EL_STEEL_EXIT_CLOSED:
+	  CheckExitSteel(x, y);
+	  break;
+
+        case EL_EM_STEEL_EXIT_CLOSED:
+	  CheckExitSteelEM(x, y);
+	  break;
+
+        case EL_SP_EXIT_CLOSED:
+	  CheckExitSP(x, y);
+	  break;
+
+        case EL_EXPANDABLE_WALL_GROWING:
+        case EL_EXPANDABLE_STEELWALL_GROWING:
+	  MauerWaechst(x, y);
+	  break;
+
+        case EL_EXPANDABLE_WALL:
+        case EL_EXPANDABLE_WALL_HORIZONTAL:
+        case EL_EXPANDABLE_WALL_VERTICAL:
+        case EL_EXPANDABLE_WALL_ANY:
+        case EL_BD_EXPANDABLE_WALL:
+	  MauerAbleger(x, y);
+	  break;
+
+        case EL_EXPANDABLE_STEELWALL_HORIZONTAL:
+        case EL_EXPANDABLE_STEELWALL_VERTICAL:
+        case EL_EXPANDABLE_STEELWALL_ANY:
+	  MauerAblegerStahl(x, y);
+	  break;
+
+        case EL_FLAMES:
+	  CheckForDragon(x, y);
+	  break;
+
+        case EL_EXPLOSION:
+	  break;
+
+        case EL_ELEMENT_SNAPPING:
+        case EL_DIAGONAL_SHRINKING:
+        case EL_DIAGONAL_GROWING:
+	{
+	  graphic =
+	    el_act_dir2img(GfxElement[x][y], GfxAction[x][y],GfxDir[x][y]);
+
+	  DrawLevelGraphicAnimationIfNeeded(x, y, graphic);
+	  break;
+	}
+
+        default:
+	  if (IS_ANIMATED(graphic) && !IS_CHANGING(x, y))
+	    DrawLevelGraphicAnimationIfNeeded(x, y, graphic);
+	  break;
+      }
+    }
+
+#else	// ---------------------------------------------------------------------
 
     if (!IS_MOVING(x, y) && (CAN_FALL(element) || CAN_MOVE(element)))
     {
@@ -10313,6 +10509,8 @@ void GameActions_RND()
     else if (IS_ANIMATED(graphic) && !IS_CHANGING(x, y))
       DrawLevelGraphicAnimationIfNeeded(x, y, graphic);
 
+#endif	// ---------------------------------------------------------------------
+
     if (IS_BELT_ACTIVE(element))
       PlayLevelSoundAction(x, y, ACTION_ACTIVE);
 
@@ -10337,6 +10535,10 @@ void GameActions_RND()
       }
     }
   }
+
+#if 0
+  debug_print_timestamp(0, "- time for MAIN loop:     -->");
+#endif
 
 #if USE_NEW_AMOEBA_CODE
   /* new experimental amoeba growth stuff */
@@ -10520,6 +10722,11 @@ void GameActions_RND()
 
     local_player->show_envelope = 0;
   }
+
+#if 0
+  debug_print_timestamp(0, "stop main loop profiling ");
+  printf("----------------------------------------------------------\n");
+#endif
 
   /* use random number generator in every frame to make it less predictable */
   if (game.engine_version >= VERSION_IDENT(3,1,1,0))

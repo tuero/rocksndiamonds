@@ -8522,6 +8522,82 @@ static int getPillarFromOpenDirectionNotEmpty(int direction, int element_old)
   return (element_new != EL_EMPTY ? element_new : element_old);
 }
 
+static int getOpenDirectionFromSteel2(int element)
+{
+  switch (element)
+  {
+    case EL_DC_STEELWALL_2_LEFT:	return (MV_RIGHT);
+    case EL_DC_STEELWALL_2_RIGHT:	return (MV_LEFT);
+    case EL_DC_STEELWALL_2_TOP:		return (MV_DOWN);
+    case EL_DC_STEELWALL_2_BOTTOM:	return (MV_UP);
+    case EL_DC_STEELWALL_2_HORIZONTAL:	return (MV_HORIZONTAL);
+    case EL_DC_STEELWALL_2_VERTICAL:	return (MV_VERTICAL);
+    case EL_DC_STEELWALL_2_MIDDLE:	return (MV_ANY_DIRECTION);
+    case EL_DC_STEELWALL_2_SINGLE:	return (MV_NONE);
+  }
+
+  return MV_NONE;
+}
+
+static int getSteel2FromOpenDirection(int direction)
+{
+  switch (direction)
+  {
+    case (MV_RIGHT):			return EL_DC_STEELWALL_2_LEFT;
+    case (MV_LEFT):			return EL_DC_STEELWALL_2_RIGHT;
+    case (MV_DOWN):			return EL_DC_STEELWALL_2_TOP;
+    case (MV_UP):			return EL_DC_STEELWALL_2_BOTTOM;
+    case (MV_HORIZONTAL):		return EL_DC_STEELWALL_2_HORIZONTAL;
+    case (MV_VERTICAL):			return EL_DC_STEELWALL_2_VERTICAL;
+    case (MV_ANY_DIRECTION):		return EL_DC_STEELWALL_2_MIDDLE;
+    case (MV_NONE):			return EL_DC_STEELWALL_2_SINGLE;
+  }
+
+  return EL_EMPTY;
+}
+
+static int getSteel2FromOpenDirectionNotEmpty(int direction, int element_old)
+{
+  int element_new = getSteel2FromOpenDirection(direction);
+
+  return (element_new != EL_EMPTY ? element_new : element_old);
+}
+
+static int getOpenDirectionFromChip(int element)
+{
+  switch (element)
+  {
+    case EL_SP_CHIP_SINGLE:		return (MV_NONE);
+    case EL_SP_CHIP_LEFT:		return (MV_RIGHT);
+    case EL_SP_CHIP_RIGHT:		return (MV_LEFT);
+    case EL_SP_CHIP_TOP:		return (MV_DOWN);
+    case EL_SP_CHIP_BOTTOM:		return (MV_UP);
+  }
+
+  return MV_NONE;
+}
+
+static int getChipFromOpenDirection(int direction)
+{
+  switch (direction)
+  {
+    case (MV_NONE):			return EL_SP_CHIP_SINGLE;
+    case (MV_LEFT):			return EL_SP_CHIP_RIGHT;
+    case (MV_RIGHT):			return EL_SP_CHIP_LEFT;
+    case (MV_UP):			return EL_SP_CHIP_BOTTOM;
+    case (MV_DOWN):			return EL_SP_CHIP_TOP;
+  }
+
+  return EL_EMPTY;
+}
+
+static int getChipFromOpenDirectionNotEmpty(int direction, int element_old)
+{
+  int element_new = getChipFromOpenDirection(direction);
+
+  return (element_new != EL_EMPTY ? element_new : element_old);
+}
+
 static int getClosedTube(int x, int y)
 {
   static int xy[4][2] =
@@ -8532,8 +8608,8 @@ static int getClosedTube(int x, int y)
     { 0, +1 }
   };
   int element_old = IntelliDrawBuffer[x][y];
-  int tube_direction_old = getOpenDirectionFromTube(element_old);
-  int tube_direction_new = MV_NONE;
+  int direction_old = getOpenDirectionFromTube(element_old);
+  int direction_new = MV_NONE;
   int i;
 
   for (i = 0; i < NUM_DIRECTIONS; i++)
@@ -8544,12 +8620,12 @@ static int getClosedTube(int x, int y)
     int dir_opposite = MV_DIR_OPPOSITE(dir);
 
     if (IN_LEV_FIELD(xx, yy) && IS_TUBE(IntelliDrawBuffer[xx][yy]) &&
-	(tube_direction_old & dir) &&
+	(direction_old & dir) &&
 	(getOpenDirectionFromTube(IntelliDrawBuffer[xx][yy]) & dir_opposite))
-      tube_direction_new |= dir;
+      direction_new |= dir;
   }
 
-  return getTubeFromOpenDirectionNotEmpty(tube_direction_new, element_old);
+  return getTubeFromOpenDirectionNotEmpty(direction_new, element_old);
 }
 
 static int getClosedBelt(int x, int y)
@@ -8562,9 +8638,9 @@ static int getClosedBelt(int x, int y)
     { 0, +1 }
   };
   int element_old = IntelliDrawBuffer[x][y];
-  int belt_nr = getBeltNrFromBeltElement(element_old);
-  int belt_direction_old = getOpenDirectionFromBelt(element_old);
-  int belt_direction_new = MV_NONE;
+  int nr = getBeltNrFromBeltElement(element_old);
+  int direction_old = getOpenDirectionFromBelt(element_old);
+  int direction_new = MV_NONE;
   int i;
 
   for (i = MV_BIT_LEFT; i <= MV_BIT_RIGHT; i++)
@@ -8575,12 +8651,12 @@ static int getClosedBelt(int x, int y)
     int dir_opposite = MV_DIR_OPPOSITE(dir);
 
     if (IN_LEV_FIELD(xx, yy) && IS_BELT(IntelliDrawBuffer[xx][yy]) &&
-	(belt_direction_old & dir) &&
+	(direction_old & dir) &&
 	(getOpenDirectionFromBelt(IntelliDrawBuffer[xx][yy]) & dir_opposite))
-      belt_direction_new |= dir;
+      direction_new |= dir;
   }
 
-  return getBeltFromNrAndOpenDirection(belt_nr, belt_direction_new);
+  return getBeltFromNrAndOpenDirection(nr, direction_new);
 }
 
 static int getClosedPool(int x, int y)
@@ -8593,8 +8669,8 @@ static int getClosedPool(int x, int y)
     { 0, +1 }
   };
   int element_old = IntelliDrawBuffer[x][y];
-  int pool_direction_old = getOpenDirectionFromPool(element_old);
-  int pool_direction_new = MV_NONE;
+  int direction_old = getOpenDirectionFromPool(element_old);
+  int direction_new = MV_NONE;
   int i;
 
   for (i = 0; i < NUM_DIRECTIONS; i++)
@@ -8606,12 +8682,12 @@ static int getClosedPool(int x, int y)
 
     if (IN_LEV_FIELD(xx, yy) &&
 	IS_ACID_POOL_OR_ACID(IntelliDrawBuffer[xx][yy]) &&
-	(pool_direction_old & dir) &&
+	(direction_old & dir) &&
 	(getOpenDirectionFromPool(IntelliDrawBuffer[xx][yy]) & dir_opposite))
-      pool_direction_new |= dir;
+      direction_new |= dir;
   }
 
-  return getPoolFromOpenDirectionNotEmpty(pool_direction_new, element_old);
+  return getPoolFromOpenDirectionNotEmpty(direction_new, element_old);
 }
 
 static int getClosedPillar(int x, int y)
@@ -8624,8 +8700,8 @@ static int getClosedPillar(int x, int y)
     { 0, +1 }
   };
   int element_old = IntelliDrawBuffer[x][y];
-  int pillar_direction_old = getOpenDirectionFromPillar(element_old);
-  int pillar_direction_new = MV_NONE;
+  int direction_old = getOpenDirectionFromPillar(element_old);
+  int direction_new = MV_NONE;
   int i;
 
   for (i = MV_BIT_UP; i <= MV_BIT_DOWN; i++)
@@ -8636,12 +8712,72 @@ static int getClosedPillar(int x, int y)
     int dir_opposite = MV_DIR_OPPOSITE(dir);
 
     if (IN_LEV_FIELD(xx, yy) && IS_EMC_PILLAR(IntelliDrawBuffer[xx][yy]) &&
-	(pillar_direction_old & dir) &&
+	(direction_old & dir) &&
 	(getOpenDirectionFromPillar(IntelliDrawBuffer[xx][yy]) & dir_opposite))
-      pillar_direction_new |= dir;
+      direction_new |= dir;
   }
 
-  return getPillarFromOpenDirectionNotEmpty(pillar_direction_new, element_old);
+  return getPillarFromOpenDirectionNotEmpty(direction_new, element_old);
+}
+
+static int getClosedSteel2(int x, int y)
+{
+  static int xy[4][2] =
+  {
+    { -1, 0 },
+    { +1, 0 },
+    { 0, -1 },
+    { 0, +1 }
+  };
+  int element_old = IntelliDrawBuffer[x][y];
+  int direction_old = getOpenDirectionFromSteel2(element_old);
+  int direction_new = MV_NONE;
+  int i;
+
+  for (i = 0; i < NUM_DIRECTIONS; i++)
+  {
+    int xx = x + xy[i][0];
+    int yy = y + xy[i][1];
+    int dir = MV_DIR_FROM_BIT(i);
+    int dir_opposite = MV_DIR_OPPOSITE(dir);
+
+    if (IN_LEV_FIELD(xx, yy) && IS_DC_STEELWALL_2(IntelliDrawBuffer[xx][yy]) &&
+	(direction_old & dir) &&
+	(getOpenDirectionFromSteel2(IntelliDrawBuffer[xx][yy]) & dir_opposite))
+      direction_new |= dir;
+  }
+
+  return getSteel2FromOpenDirectionNotEmpty(direction_new, element_old);
+}
+
+static int getClosedChip(int x, int y)
+{
+  static int xy[4][2] =
+  {
+    { -1, 0 },
+    { +1, 0 },
+    { 0, -1 },
+    { 0, +1 }
+  };
+  int element_old = IntelliDrawBuffer[x][y];
+  int direction_old = getOpenDirectionFromChip(element_old);
+  int direction_new = MV_NONE;
+  int i;
+
+  for (i = 0; i < NUM_DIRECTIONS; i++)
+  {
+    int xx = x + xy[i][0];
+    int yy = y + xy[i][1];
+    int dir = MV_DIR_FROM_BIT(i);
+    int dir_opposite = MV_DIR_OPPOSITE(dir);
+
+    if (IN_LEV_FIELD(xx, yy) && IS_SP_CHIP(IntelliDrawBuffer[xx][yy]) &&
+	(direction_old & dir) &&
+	(getOpenDirectionFromChip(IntelliDrawBuffer[xx][yy]) & dir_opposite))
+      direction_new |= dir;
+  }
+
+  return getChipFromOpenDirectionNotEmpty(direction_new, element_old);
 }
 
 static void SetElementSimple(int x, int y, int element, boolean change_level)
@@ -8704,7 +8840,7 @@ static void SetElementIntelliDraw(int x, int y, int new_element,
     int direction = MV_NONE;
     int i;
 
-    /* if existing element is tube, keep all existing tube directions */
+    /* if old element is of same kind, keep all existing directions */
     if (IS_TUBE(old_element))
       direction |= getOpenDirectionFromTube(old_element);
 
@@ -8742,7 +8878,7 @@ static void SetElementIntelliDraw(int x, int y, int new_element,
     int direction = MV_NONE;
     int i;
 
-    /* if existing element is belt, keep all existing belt directions */
+    /* if old element is of same kind, keep all existing directions */
     if (IS_BELT(old_element))
       direction |= getOpenDirectionFromBelt(old_element);
 
@@ -8780,7 +8916,7 @@ static void SetElementIntelliDraw(int x, int y, int new_element,
     int direction = MV_NONE;
     int i;
 
-    /* if existing element is pool, keep all existing pool directions */
+    /* if old element is of same kind, keep all existing directions */
     if (IS_ACID_POOL_OR_ACID(old_element))
       direction |= getOpenDirectionFromPool(old_element);
 
@@ -8804,42 +8940,13 @@ static void SetElementIntelliDraw(int x, int y, int new_element,
       }
     }
 
-#if 1
-    int foo = last_element_new;
-
-    if (foo == EL_EMPTY)
-      foo = EL_ACID;
-
-    if (last_element_new == EL_EMPTY)
-      last_element_new = old_element;
-
-    if (last_element_new != EL_UNDEFINED)
-      new_element = getPoolFromOpenDirectionNotEmpty(direction,
-						     foo);
-    else
-      new_element = getPoolFromOpenDirectionNotEmpty(direction, new_element);
-
-#else
-
-#if 0
+    /* special corrections needed for intuitively correct acid pool drawing */
     if (last_element_new == EL_EMPTY)
       last_element_new = new_element;
-#else
-    if (last_element_new == EL_EMPTY)
-      last_element_new = EL_ACID;
-#endif
+    else if (last_element_new != EL_UNDEFINED)
+      new_element = last_element_new;
 
-#if 1
-    if (last_element_new != EL_UNDEFINED)
-      new_element = getPoolFromOpenDirectionNotEmpty(direction,
-						     last_element_new);
-    else
-      new_element = getPoolFromOpenDirectionNotEmpty(direction, new_element);
-#else
     new_element = getPoolFromOpenDirectionNotEmpty(direction, new_element);
-#endif
-
-#endif
 
     if (last_element_new != EL_UNDEFINED)
       MergeAndCloseNeighbourElements(x, y, &new_element,
@@ -8852,7 +8959,7 @@ static void SetElementIntelliDraw(int x, int y, int new_element,
     int direction = MV_NONE;
     int i;
 
-    /* if existing element is pillar, keep all existing pillar directions */
+    /* if old element is of same kind, keep all existing directions */
     if (IS_EMC_PILLAR(old_element))
       direction |= getOpenDirectionFromPillar(old_element);
 
@@ -8882,6 +8989,107 @@ static void SetElementIntelliDraw(int x, int y, int new_element,
       MergeAndCloseNeighbourElements(x, y, &new_element,
 				     last_x, last_y, &last_element_new,
 				     getClosedPillar, change_level);
+  }
+  else if (IS_DC_STEELWALL_2(new_element))
+  {
+    int last_element_new = EL_UNDEFINED;
+    int direction = MV_NONE;
+    int i;
+
+    /* if old element is of same kind, keep all existing directions */
+    if (IS_DC_STEELWALL_2(old_element))
+      direction |= getOpenDirectionFromSteel2(old_element);
+
+    for (i = 0; i < NUM_DIRECTIONS; i++)
+    {
+      int xx = x + xy[i][0];
+      int yy = y + xy[i][1];
+
+      if (last_x == xx && last_y == yy && IN_LEV_FIELD(last_x, last_y) &&
+	  IS_DC_STEELWALL_2(IntelliDrawBuffer[last_x][last_y]))
+      {
+	int dir = MV_DIR_FROM_BIT(i);
+	int dir_opposite = MV_DIR_OPPOSITE(dir);
+	int last_element_old = IntelliDrawBuffer[last_x][last_y];
+	int last_direction_old = getOpenDirectionFromSteel2(last_element_old);
+	int last_direction_new = last_direction_old | dir_opposite;
+
+	last_element_new = getSteel2FromOpenDirection(last_direction_new);
+
+	direction |= dir;
+      }
+    }
+
+    new_element = getSteel2FromOpenDirectionNotEmpty(direction, new_element);
+
+    if (last_element_new != EL_UNDEFINED)
+      MergeAndCloseNeighbourElements(x, y, &new_element,
+				     last_x, last_y, &last_element_new,
+				     getClosedSteel2, change_level);
+  }
+  else if (IS_SP_CHIP(new_element))
+  {
+    int last_element_new = EL_UNDEFINED;
+    int direction = MV_NONE;
+    int i;
+
+    /* (do not keep existing directions, regardless of kind of old element) */
+
+    for (i = 0; i < NUM_DIRECTIONS; i++)
+    {
+      int xx = x + xy[i][0];
+      int yy = y + xy[i][1];
+
+      if (last_x == xx && last_y == yy && IN_LEV_FIELD(last_x, last_y) &&
+	  IS_SP_CHIP(IntelliDrawBuffer[last_x][last_y]))
+      {
+	int dir = MV_DIR_FROM_BIT(i);
+	int dir_opposite = MV_DIR_OPPOSITE(dir);
+	int last_element_old = IntelliDrawBuffer[last_x][last_y];
+	int last_direction_old = getOpenDirectionFromChip(last_element_old);
+	int last_direction_new = last_direction_old | dir_opposite;
+
+	if (last_direction_old == MV_NONE)
+	{
+	  last_element_new = getChipFromOpenDirection(last_direction_new);
+	  direction |= dir;
+	}
+	else if (last_direction_old & (dir | dir_opposite))
+	{
+	  direction |= MV_DIR_OPPOSITE(last_direction_old);
+	}
+	else
+	{
+	  direction |= MV_DIR_OPPOSITE(dir);
+	}
+      }
+    }
+
+    new_element = getChipFromOpenDirectionNotEmpty(direction, new_element);
+
+    if (last_element_new != EL_UNDEFINED)
+      MergeAndCloseNeighbourElements(x, y, &new_element,
+				     last_x, last_y, &last_element_new,
+				     getClosedChip, change_level);
+  }
+  else if (IS_SP_HARDWARE_BASE(new_element))
+  {
+    int nr = GetSimpleRandom(6);
+
+    new_element = (nr == 0 ? EL_SP_HARDWARE_BASE_1 :
+		   nr == 1 ? EL_SP_HARDWARE_BASE_2 :
+		   nr == 2 ? EL_SP_HARDWARE_BASE_3 :
+		   nr == 3 ? EL_SP_HARDWARE_BASE_4 :
+		   nr == 4 ? EL_SP_HARDWARE_BASE_5 : EL_SP_HARDWARE_BASE_6);
+  }
+  else if (new_element == EL_SP_HARDWARE_GREEN ||
+	   new_element == EL_SP_HARDWARE_BLUE ||
+	   new_element == EL_SP_HARDWARE_RED)
+  {
+    int nr = GetSimpleRandom(3);
+
+    new_element = (nr == 0 ? EL_SP_HARDWARE_GREEN :
+		   nr == 1 ? EL_SP_HARDWARE_BLUE : EL_SP_HARDWARE_RED);
   }
   else if (IS_BELT_SWITCH(old_element))
   {
@@ -9563,8 +9771,8 @@ static void RandomPlacement(int new_element)
   {
     while (num_elements > 0)
     {
-      x = RND(lev_fieldx);
-      y = RND(lev_fieldy);
+      x = GetSimpleRandom(lev_fieldx);
+      y = GetSimpleRandom(lev_fieldy);
 
       /* don't place element at the same position twice */
       if (free_position[x][y])
