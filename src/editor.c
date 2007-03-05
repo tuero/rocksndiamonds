@@ -8813,7 +8813,7 @@ static void MergeAndCloseNeighbourElements(int x1, int y1, int *element1,
 }
 
 static void SetElementIntelliDraw(int x, int y, int new_element,
-				  boolean change_level)
+				  boolean change_level, int button)
 {
   static int xy[4][2] =
   {
@@ -9148,7 +9148,107 @@ static void SetElementIntelliDraw(int x, int y, int new_element,
 
       { -1,				-1				},
     };
-    int i;
+    static int rotatable_elements[][4] =
+    {
+      {
+	EL_BUG_UP,
+	EL_BUG_RIGHT,
+	EL_BUG_DOWN,
+	EL_BUG_LEFT
+      },
+
+      {
+	EL_SPACESHIP_UP,
+	EL_SPACESHIP_RIGHT,
+	EL_SPACESHIP_DOWN,
+	EL_SPACESHIP_LEFT
+      },
+
+      {
+	EL_BD_BUTTERFLY_UP,
+	EL_BD_BUTTERFLY_RIGHT,
+	EL_BD_BUTTERFLY_DOWN,
+	EL_BD_BUTTERFLY_LEFT
+      },
+
+      {
+	EL_BD_FIREFLY_UP,
+	EL_BD_FIREFLY_RIGHT,
+	EL_BD_FIREFLY_DOWN,
+	EL_BD_FIREFLY_LEFT
+      },
+
+      {
+	EL_PACMAN_UP,
+	EL_PACMAN_RIGHT,
+	EL_PACMAN_DOWN,
+	EL_PACMAN_LEFT
+      },
+
+      {
+	EL_YAMYAM_UP,
+	EL_YAMYAM_RIGHT,
+	EL_YAMYAM_DOWN,
+	EL_YAMYAM_LEFT
+      },
+
+      {
+	EL_ARROW_UP,
+	EL_ARROW_RIGHT,
+	EL_ARROW_DOWN,
+	EL_ARROW_LEFT
+      },
+
+      {
+	EL_SP_PORT_UP,
+	EL_SP_PORT_RIGHT,
+	EL_SP_PORT_DOWN,
+	EL_SP_PORT_LEFT
+      },
+
+      {
+	EL_SP_GRAVITY_PORT_UP,
+	EL_SP_GRAVITY_PORT_RIGHT,
+	EL_SP_GRAVITY_PORT_DOWN,
+	EL_SP_GRAVITY_PORT_LEFT
+      },
+
+      {
+	EL_MOLE_UP,
+	EL_MOLE_RIGHT,
+	EL_MOLE_DOWN,
+	EL_MOLE_LEFT
+      },
+
+      {
+	EL_BALLOON_SWITCH_UP,
+	EL_BALLOON_SWITCH_RIGHT,
+	EL_BALLOON_SWITCH_DOWN,
+	EL_BALLOON_SWITCH_LEFT
+      },
+
+      {
+	EL_SP_GRAVITY_ON_PORT_UP,
+	EL_SP_GRAVITY_ON_PORT_RIGHT,
+	EL_SP_GRAVITY_ON_PORT_DOWN,
+	EL_SP_GRAVITY_ON_PORT_LEFT
+      },
+
+      {
+	EL_SP_GRAVITY_OFF_PORT_UP,
+	EL_SP_GRAVITY_OFF_PORT_RIGHT,
+	EL_SP_GRAVITY_OFF_PORT_DOWN,
+	EL_SP_GRAVITY_OFF_PORT_LEFT
+      },
+
+      {
+	-1,
+	-1,
+	-1,
+	-1,
+      },
+    };
+    int i, j;
 
     for (i = 0; swappable_elements[i][0] != -1; i++)
     {
@@ -9157,6 +9257,20 @@ static void SetElementIntelliDraw(int x, int y, int new_element,
 
       if (old_element == element1 || old_element == element2)
 	new_element = (old_element == element1 ? element2 : element1);
+    }
+
+    for (i = 0; rotatable_elements[i][0] != -1; i++)
+    {
+      for (j = 0; j < 4; j++)
+      {
+	int element = rotatable_elements[i][j];
+
+	if (old_element == element)
+	  new_element = (button == 1 ? rotatable_elements[i][(j + 3) % 4] :
+			 button == 2 ? rotatable_elements[i][0]           :
+			 button == 3 ? rotatable_elements[i][(j + 1) % 4] :
+			 old_element);
+      }
     }
   }
 
@@ -9174,22 +9288,28 @@ static void ResetIntelliDraw()
     for (y = 0; y < lev_fieldy; y++)
       IntelliDrawBuffer[x][y] = Feld[x][y];
 
-  SetElementIntelliDraw(-1, -1, EL_UNDEFINED, FALSE);
+  SetElementIntelliDraw(-1, -1, EL_UNDEFINED, FALSE, -1);
 }
 
-static void SetElementExt(int x, int y, int element, boolean change_level)
+static void SetElementExt(int x, int y, int element, boolean change_level,
+			  int button)
 {
   if (element < 0)
     SetElementSimple(x, y, Feld[x][y], change_level);
   else if (GetKeyModState() & KMOD_Shift)
-    SetElementIntelliDraw(x, y, element, change_level);
+    SetElementIntelliDraw(x, y, element, change_level, button);
   else
     SetElementSimple(x, y, element, change_level);
 }
 
 static void SetElement(int x, int y, int element)
 {
-  SetElementExt(x, y, element, TRUE);
+  SetElementExt(x, y, element, TRUE, -1);
+}
+
+static void SetElementButton(int x, int y, int element, int button)
+{
+  SetElementExt(x, y, element, TRUE, button);
 }
 
 static void DrawLineElement(int sx, int sy, int element, boolean change_level)
@@ -9197,7 +9317,7 @@ static void DrawLineElement(int sx, int sy, int element, boolean change_level)
   int lx = sx + level_xpos;
   int ly = sy + level_ypos;
 
-  SetElementExt(lx, ly, element, change_level);
+  SetElementExt(lx, ly, element, change_level, -1);
 }
 
 static void DrawLine(int from_x, int from_y, int to_x, int to_y,
@@ -9947,7 +10067,7 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 	  }
 
 #if 1
-	  SetElement(lx, ly, new_element);
+	  SetElementButton(lx, ly, new_element, button);
 #else
 	  Feld[lx][ly] = new_element;
 	  DrawMiniElement(sx, sy, new_element);
