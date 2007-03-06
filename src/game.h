@@ -229,6 +229,7 @@ void DEBUG_SetMaximumDynamite();
 #endif
 
 void GetPlayerConfig(void);
+int GetElementFromGroupElement(int);
 
 void DrawGameValue_Time(int);
 void DrawGameDoorValues(void);

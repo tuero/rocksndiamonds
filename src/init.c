@@ -1965,7 +1965,7 @@ boolean getBitfieldProperty(int *bitfield, int property_bit_nr, int element)
   return FALSE;
 }
 
-static void resolve_group_element(int group_element, int recursion_depth)
+static void ResolveGroupElementExt(int group_element, int recursion_depth)
 {
   static int group_nr;
   static struct ElementGroupInfo *group;
@@ -1989,10 +1989,13 @@ static void resolve_group_element(int group_element, int recursion_depth)
   if (recursion_depth == 0)			/* initialization */
   {
     group = actual_group;
-    group_nr = group_element - EL_GROUP_START;
+    group_nr = GROUP_NR(group_element);
 
     group->num_elements_resolved = 0;
     group->choice_pos = 0;
+
+    for (i = 0; i < MAX_NUM_ELEMENTS; i++)
+      element_info[i].in_group[group_nr] = FALSE;
   }
 
   for (i = 0; i < actual_group->num_elements; i++)
@@ -2003,13 +2006,18 @@ static void resolve_group_element(int group_element, int recursion_depth)
       break;
 
     if (IS_GROUP_ELEMENT(element))
-      resolve_group_element(element, recursion_depth + 1);
+      ResolveGroupElementExt(element, recursion_depth + 1);
     else
     {
       group->element_resolved[group->num_elements_resolved++] = element;
       element_info[element].in_group[group_nr] = TRUE;
     }
   }
+}
+
+void ResolveGroupElement(int group_element)
+{
+  ResolveGroupElementExt(group_element, 0);
 }
 
 void InitElementPropertiesStatic()
@@ -4023,14 +4031,9 @@ void InitElementPropertiesEngine(int engine_version)
      property (which means that conditional property changes must be set to
      a reliable default value before) */
 
-  /* ---------- recursively resolve group elements ------------------------- */
-
-  for (i = 0; i < MAX_NUM_ELEMENTS; i++)
-    for (j = 0; j < NUM_GROUP_ELEMENTS; j++)
-      element_info[i].in_group[j] = FALSE;
-
+  /* resolve group elements */
   for (i = 0; i < NUM_GROUP_ELEMENTS; i++)
-    resolve_group_element(EL_GROUP_START + i, 0);
+    ResolveGroupElement(EL_GROUP_START + i);
 
   /* set all special, combined or engine dependent element properties */
   for (i = 0; i < MAX_NUM_ELEMENTS; i++)

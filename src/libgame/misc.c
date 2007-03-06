@@ -2806,7 +2806,7 @@ void NotifyUserAboutErrorFile()
 #if DEBUG
 
 #define DEBUG_NUM_TIMESTAMPS		3
-#define DEBUG_TIME_IN_MICROSECONDS	1
+#define DEBUG_TIME_IN_MICROSECONDS	0
 
 #if DEBUG_TIME_IN_MICROSECONDS
 static double Counter_Microseconds()

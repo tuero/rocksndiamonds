@@ -9091,6 +9091,26 @@ static void SetElementIntelliDraw(int x, int y, int new_element,
     new_element = (nr == 0 ? EL_SP_HARDWARE_GREEN :
 		   nr == 1 ? EL_SP_HARDWARE_BLUE : EL_SP_HARDWARE_RED);
   }
+  else if (IS_GROUP_ELEMENT(new_element))
+  {
+    boolean connected_drawing = FALSE;
+    int i;
+
+    for (i = 0; i < NUM_DIRECTIONS; i++)
+    {
+      int xx = x + xy[i][0];
+      int yy = y + xy[i][1];
+
+      if (last_x == xx && last_y == yy && IN_LEV_FIELD(last_x, last_y) &&
+	  IS_IN_GROUP_EL(IntelliDrawBuffer[last_x][last_y], new_element))
+	connected_drawing = TRUE;
+    }
+
+    if (!connected_drawing)
+      ResolveGroupElement(new_element);
+
+    new_element = GetElementFromGroupElement(new_element);
+  }
   else if (IS_BELT_SWITCH(old_element))
   {
     int belt_nr = getBeltNrFromBeltSwitchElement(old_element);
@@ -9862,6 +9882,10 @@ static void RandomPlacement(int new_element)
   int num_percentage, num_elements;
   int x, y;
 
+#if 1
+  ResetIntelliDraw();
+#endif
+
   /* determine number of free positions for randomly placing the new element */
   for (x = 0; x < lev_fieldx; x++) for (y = 0; y < lev_fieldy; y++)
   {
@@ -9885,7 +9909,11 @@ static void RandomPlacement(int new_element)
     for (x = 0; x < lev_fieldx; x++)
       for (y = 0; y < lev_fieldy; y++)
 	if (free_position[x][y])
+#if 1
+	  SetElement(x, y, new_element);
+#else
 	  Feld[x][y] = new_element;
+#endif
   }
   else
   {
@@ -9898,7 +9926,11 @@ static void RandomPlacement(int new_element)
       if (free_position[x][y])
       {
 	free_position[x][y] = FALSE;
+#if 1
+	SetElement(x, y, new_element);
+#else
 	Feld[x][y] = new_element;
+#endif
 	num_elements--;
       }
     }

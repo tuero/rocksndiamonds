@@ -32,6 +32,7 @@
 void setBitfieldProperty(int *, int, int, boolean);
 boolean getBitfieldProperty(int *, int, int);
 
+void ResolveGroupElement(int);
 void InitElementPropertiesStatic(void);
 void InitElementPropertiesEngine(int);
 void InitElementPropertiesAfterLoading(int);

@@ -942,7 +942,7 @@ void GetPlayerConfig()
   InitJoysticks();
 }
 
-static int get_element_from_group_element(int element)
+int GetElementFromGroupElement(int element)
 {
   if (IS_GROUP_ELEMENT(element))
   {
@@ -1240,7 +1240,7 @@ static void InitField(int x, int y, boolean init_game)
       }
       else if (IS_GROUP_ELEMENT(element))
       {
-	Feld[x][y] = get_element_from_group_element(element);
+	Feld[x][y] = GetElementFromGroupElement(element);
 
 	InitField(x, y, init_game);
       }
@@ -8732,7 +8732,7 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
 static void CreateFieldExt(int x, int y, int element, boolean is_change)
 {
   int old_element = Feld[x][y];
-  int new_element = get_element_from_group_element(element);
+  int new_element = GetElementFromGroupElement(element);
   int previous_move_direction = MovDir[x][y];
 #if USE_NEW_CUSTOM_VALUE
   int last_ce_value = CustomValue[x][y];
@@ -9064,12 +9064,13 @@ static void HandleElementChange(int x, int y, int page)
 
     if (change->can_change)
     {
-#if 0
+#if 1
       /* !!! not clear why graphic animation should be reset at all here !!! */
+      /* !!! UPDATE: but is needed for correct Snake Bite tail animation !!! */
 #if USE_GFX_RESET_WHEN_NOT_MOVING
       /* when a custom element is about to change (for example by change delay),
 	 do not reset graphic animation when the custom element is moving */
-      if (IS_MOVING(x, y))
+      if (!IS_MOVING(x, y))
 #endif
       {
 	ResetGfxAnimation(x, y);
@@ -10782,14 +10783,19 @@ void ScrollLevel(int dx, int dy)
   int i, x, y;
 #endif
 
+#if 0
+  /* !!! THIS IS APPARENTLY WRONG FOR PLAYER RELOCATION !!! */
   /* only horizontal XOR vertical scroll direction allowed */
   if ((dx == 0 && dy == 0) || (dx != 0 && dy != 0))
     return;
+#endif
 
 #if 1
   if (bitmap_db_field2 == NULL)
     bitmap_db_field2 = CreateBitmap(FXSIZE, FYSIZE, DEFAULT_DEPTH);
 
+  /* needed when blitting directly to same bitmap -- should not be needed with
+     recent SDL libraries, but apparently does not work in 1.2.11 directly */
   BlitBitmap(drawto_field, bitmap_db_field2,
 	     FX + TILEX * (dx == -1) - softscroll_offset,
 	     FY + TILEY * (dy == -1) - softscroll_offset,
@@ -10808,6 +10814,7 @@ void ScrollLevel(int dx, int dy)
 #else
 
 #if 1
+  /* !!! DOES NOT WORK FOR DIAGONAL PLAYER RELOCATION !!! */
   int xsize = (BX2 - BX1 + 1);
   int ysize = (BY2 - BY1 + 1);
   int start = (dx != 0 ? (dx == -1 ? BX1 : BX2) : (dy == -1 ? BY1 : BY2));
