@@ -2841,11 +2841,13 @@ void DrawInfoScreen_Version()
   int ystart2 = mSY - SY + 150;
   int ybottom = mSY - SY + SYSIZE - 20;
   int xstart1 = mSX + 2 * xstep;
-  int xstart2 = mSX + 18 * xstep;
+  int xstart2 = mSX + 19 * xstep;
 #if defined(TARGET_SDL)
-  int xstart3 = mSX + 28 * xstep;
+  int xstart3 = mSX + 29 * xstep;
   SDL_version sdl_version_compiled;
   const SDL_version *sdl_version_linked;
+  int driver_name_len = 8;
+  char driver_name[driver_name_len];
 #endif
 
   SetMainBackgroundImageIfDefined(IMG_BACKGROUND_INFO_VERSION);
@@ -2937,6 +2939,25 @@ void DrawInfoScreen_Version()
 	    sdl_version_linked->major,
 	    sdl_version_linked->minor,
 	    sdl_version_linked->patch);
+
+  ystart2 += 3 * ystep;
+  DrawTextF(xstart1, ystart2, font_header, "Driver");
+  DrawTextF(xstart2, ystart2, font_header, "Requested");
+  DrawTextF(xstart3, ystart2, font_header, "Active");
+
+  SDL_VideoDriverName(driver_name, driver_name_len);
+
+  ystart2 += 2 * ystep;
+  DrawTextF(xstart1, ystart2, font_text, "SDL_VideoDriver");
+  DrawTextF(xstart2, ystart2, font_text, "%s", setup.system.sdl_videodriver);
+  DrawTextF(xstart3, ystart2, font_text, "%s", driver_name);
+
+  SDL_AudioDriverName(driver_name, driver_name_len);
+
+  ystart2 += ystep;
+  DrawTextF(xstart1, ystart2, font_text, "SDL_AudioDriver");
+  DrawTextF(xstart2, ystart2, font_text, "%s", setup.system.sdl_audiodriver);
+  DrawTextF(xstart3, ystart2, font_text, "%s", driver_name);
 #endif
 
   DrawTextSCentered(ybottom, FONT_TEXT_4,

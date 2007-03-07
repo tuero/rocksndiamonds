@@ -773,6 +773,7 @@ struct SetupShortcutInfo
 
 struct SetupSystemInfo
 {
+  char *sdl_videodriver;
   char *sdl_audiodriver;
   int audio_fragment_size;
 };

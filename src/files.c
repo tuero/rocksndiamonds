@@ -7774,10 +7774,11 @@ void SaveScore(int nr)
 #define NUM_PLAYER_SETUP_TOKENS			16
 
 /* system setup */
-#define SETUP_TOKEN_SYSTEM_SDL_AUDIODRIVER	0
-#define SETUP_TOKEN_SYSTEM_AUDIO_FRAGMENT_SIZE	1
+#define SETUP_TOKEN_SYSTEM_SDL_VIDEODRIVER	0
+#define SETUP_TOKEN_SYSTEM_SDL_AUDIODRIVER	1
+#define SETUP_TOKEN_SYSTEM_AUDIO_FRAGMENT_SIZE	2
 
-#define NUM_SYSTEM_SETUP_TOKENS			2
+#define NUM_SYSTEM_SETUP_TOKENS			3
 
 /* options setup */
 #define SETUP_TOKEN_OPTIONS_VERBOSE		0
@@ -7917,6 +7918,7 @@ static struct TokenInfo player_setup_tokens[] =
 
 static struct TokenInfo system_setup_tokens[] =
 {
+  { TYPE_STRING,  &syi.sdl_videodriver,	"system.sdl_videodriver"	},
   { TYPE_STRING,  &syi.sdl_audiodriver,	"system.sdl_audiodriver"	},
   { TYPE_INTEGER, &syi.audio_fragment_size,"system.audio_fragment_size"	},
 };
@@ -8028,6 +8030,7 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
     si->input[i].key.drop  = (i == 0 ? DEFAULT_KEY_DROP  : KSYM_UNDEFINED);
   }
 
+  si->system.sdl_videodriver = getStringCopy(ARG_DEFAULT);
   si->system.sdl_audiodriver = getStringCopy(ARG_DEFAULT);
   si->system.audio_fragment_size = DEFAULT_AUDIO_FRAGMENT_SIZE;
 

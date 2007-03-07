@@ -94,6 +94,9 @@ static void SDLSetWindowIcon(char *basename)
 
 void SDLInitVideoDisplay(void)
 {
+  if (!strEqual(setup.system.sdl_videodriver, ARG_DEFAULT))
+    putenv(getStringCat2("SDL_VIDEODRIVER=", setup.system.sdl_videodriver));
+
   putenv("SDL_VIDEO_CENTERED=1");
 
   /* initialize SDL video */

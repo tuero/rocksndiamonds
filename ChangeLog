@@ -1,3 +1,12 @@
+2007-03-07
+	* added option "system.sdl_videodriver" to select SDL video driver
+	* added output of SDL video and audio driver to "version info" page
+
+2007-03-06
+	* added group element drawing to IntelliDraw drawing functions
+	* fixed animation resetting problem again (last try broke Snake Bite)
+	* fixed diagonal scrolling in screen scrolling (last try broke Pac Man)
+
 2007-03-01
 	* added new (special) "include: <filename>" directive that works in all
 	  configuration files (like "graphicsinfo.conf") and that has the same
