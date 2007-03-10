@@ -844,8 +844,10 @@ struct TreeInfo
   char *name;		/* tree info name, as displayed in selection menues */
   char *name_sorting;	/* optional sorting name for correct name sorting */
   char *author;		/* level or artwork author name */
+  char *year;		/* optional year of creation for levels or artwork */
   char *imported_from;	/* optional comment for imported levels or artwork */
   char *imported_by;	/* optional comment for imported levels or artwork */
+  char *tested_by;	/* optional comment to name people who tested a set */
 
   char *graphics_set_ecs; /* special EMC custom graphics set (ECS graphics) */
   char *graphics_set_aga; /* special EMC custom graphics set (AGA graphics) */
@@ -1013,7 +1015,6 @@ struct Rect
   int width, height;
 };
 
-#if 1
 struct MenuPosInfo
 {
   int x, y;
@@ -1028,7 +1029,6 @@ struct TextPosInfo
   int align;
   int chars;
 };
-#endif
 
 
 /* ========================================================================= */

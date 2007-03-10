@@ -916,11 +916,11 @@
 
 /* values for elements with score for certain actions */
 #define MIN_SCORE			0
-#define MAX_SCORE			255
+#define MAX_SCORE			999
 
 /* values for elements with count for collecting */
 #define MIN_COLLECT_COUNT		0
-#define MAX_COLLECT_COUNT		255
+#define MAX_COLLECT_COUNT		999
 
 /* values for random placement */
 #define RANDOM_USE_PERCENTAGE		0
@@ -1047,7 +1047,7 @@ static struct
   },
   {
     ED_LEVEL_SETTINGS_XPOS(0),		ED_LEVEL_SETTINGS_YPOS(9),
-    0,					255,
+    0,					999,
     GADGET_ID_LEVEL_TIMESCORE_DOWN,	GADGET_ID_LEVEL_TIMESCORE_UP,
     GADGET_ID_LEVEL_TIMESCORE_TEXT,	GADGET_ID_NONE,
     &level.score[SC_TIME_BONUS],
@@ -1173,7 +1173,7 @@ static struct
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(1),	ED_ELEMENT_SETTINGS_YPOS(7),
-    0,					255,
+    0,					999,
     GADGET_ID_PUSH_DELAY_FIX_DOWN,	GADGET_ID_PUSH_DELAY_FIX_UP,
     GADGET_ID_PUSH_DELAY_FIX_TEXT,	GADGET_ID_NONE,
     &custom_element.push_delay_fixed,
@@ -1181,7 +1181,7 @@ static struct
   },
   {
     -1,					ED_ELEMENT_SETTINGS_YPOS(7),
-    0,					255,
+    0,					999,
     GADGET_ID_PUSH_DELAY_RND_DOWN,	GADGET_ID_PUSH_DELAY_RND_UP,
     GADGET_ID_PUSH_DELAY_RND_TEXT,	GADGET_ID_PUSH_DELAY_FIX_UP,
     &custom_element.push_delay_random,
@@ -1189,7 +1189,7 @@ static struct
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(1),	ED_ELEMENT_SETTINGS_YPOS(8),
-    0,					255,
+    0,					999,
     GADGET_ID_DROP_DELAY_FIX_DOWN,	GADGET_ID_DROP_DELAY_FIX_UP,
     GADGET_ID_DROP_DELAY_FIX_TEXT,	GADGET_ID_NONE,
     &custom_element.drop_delay_fixed,
@@ -1197,7 +1197,7 @@ static struct
   },
   {
     -1,					ED_ELEMENT_SETTINGS_YPOS(8),
-    0,					255,
+    0,					999,
     GADGET_ID_DROP_DELAY_RND_DOWN,	GADGET_ID_DROP_DELAY_RND_UP,
     GADGET_ID_DROP_DELAY_RND_TEXT,	GADGET_ID_DROP_DELAY_FIX_UP,
     &custom_element.drop_delay_random,
@@ -1224,7 +1224,7 @@ static struct
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(1),	ED_ELEMENT_SETTINGS_YPOS(12),
-    0,					255,
+    0,					999,
     GADGET_ID_EXPLOSION_DELAY_DOWN,	GADGET_ID_EXPLOSION_DELAY_UP,
     GADGET_ID_EXPLOSION_DELAY_TEXT,	GADGET_ID_NONE,
     &custom_element.explosion_delay,
@@ -1232,7 +1232,7 @@ static struct
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(1),	ED_ELEMENT_SETTINGS_YPOS(13),
-    0,					255,
+    0,					999,
     GADGET_ID_IGNITION_DELAY_DOWN,	GADGET_ID_IGNITION_DELAY_UP,
     GADGET_ID_IGNITION_DELAY_TEXT,	GADGET_ID_NONE,
     &custom_element.ignition_delay,

@@ -1909,25 +1909,27 @@ void checkSetupFileHashIdentifier(SetupFileHash *setup_file_hash,
 #define LEVELINFO_TOKEN_NAME			1
 #define LEVELINFO_TOKEN_NAME_SORTING		2
 #define LEVELINFO_TOKEN_AUTHOR			3
-#define LEVELINFO_TOKEN_IMPORTED_FROM		4
-#define LEVELINFO_TOKEN_IMPORTED_BY		5
-#define LEVELINFO_TOKEN_LEVELS			6
-#define LEVELINFO_TOKEN_FIRST_LEVEL		7
-#define LEVELINFO_TOKEN_SORT_PRIORITY		8
-#define LEVELINFO_TOKEN_LATEST_ENGINE		9
-#define LEVELINFO_TOKEN_LEVEL_GROUP		10
-#define LEVELINFO_TOKEN_READONLY		11
-#define LEVELINFO_TOKEN_GRAPHICS_SET_ECS	12
-#define LEVELINFO_TOKEN_GRAPHICS_SET_AGA	13
-#define LEVELINFO_TOKEN_GRAPHICS_SET		14
-#define LEVELINFO_TOKEN_SOUNDS_SET		15
-#define LEVELINFO_TOKEN_MUSIC_SET		16
-#define LEVELINFO_TOKEN_FILENAME		17
-#define LEVELINFO_TOKEN_FILETYPE		18
-#define LEVELINFO_TOKEN_HANDICAP		19
-#define LEVELINFO_TOKEN_SKIP_LEVELS		20
+#define LEVELINFO_TOKEN_YEAR			4
+#define LEVELINFO_TOKEN_IMPORTED_FROM		5
+#define LEVELINFO_TOKEN_IMPORTED_BY		6
+#define LEVELINFO_TOKEN_TESTED_BY		7
+#define LEVELINFO_TOKEN_LEVELS			8
+#define LEVELINFO_TOKEN_FIRST_LEVEL		9
+#define LEVELINFO_TOKEN_SORT_PRIORITY		10
+#define LEVELINFO_TOKEN_LATEST_ENGINE		11
+#define LEVELINFO_TOKEN_LEVEL_GROUP		12
+#define LEVELINFO_TOKEN_READONLY		13
+#define LEVELINFO_TOKEN_GRAPHICS_SET_ECS	14
+#define LEVELINFO_TOKEN_GRAPHICS_SET_AGA	15
+#define LEVELINFO_TOKEN_GRAPHICS_SET		16
+#define LEVELINFO_TOKEN_SOUNDS_SET		17
+#define LEVELINFO_TOKEN_MUSIC_SET		18
+#define LEVELINFO_TOKEN_FILENAME		19
+#define LEVELINFO_TOKEN_FILETYPE		20
+#define LEVELINFO_TOKEN_HANDICAP		21
+#define LEVELINFO_TOKEN_SKIP_LEVELS		22
 
-#define NUM_LEVELINFO_TOKENS			21
+#define NUM_LEVELINFO_TOKENS			23
 
 static LevelDirTree ldi;
 
@@ -1938,8 +1940,10 @@ static struct TokenInfo levelinfo_tokens[] =
   { TYPE_STRING,	&ldi.name,		"name"			},
   { TYPE_STRING,	&ldi.name_sorting,	"name_sorting"		},
   { TYPE_STRING,	&ldi.author,		"author"		},
+  { TYPE_STRING,	&ldi.year,		"year"			},
   { TYPE_STRING,	&ldi.imported_from,	"imported_from"		},
   { TYPE_STRING,	&ldi.imported_by,	"imported_by"		},
+  { TYPE_STRING,	&ldi.tested_by,		"tested_by"		},
   { TYPE_INTEGER,	&ldi.levels,		"levels"		},
   { TYPE_INTEGER,	&ldi.first_level,	"first_level"		},
   { TYPE_INTEGER,	&ldi.sort_priority,	"sort_priority"		},
@@ -1999,6 +2003,7 @@ static void setTreeInfoToDefaults(TreeInfo *ti, int type)
   ti->name = getStringCopy(ANONYMOUS_NAME);
   ti->name_sorting = NULL;
   ti->author = getStringCopy(ANONYMOUS_NAME);
+  ti->year = NULL;
 
   ti->sort_priority = LEVELCLASS_UNDEFINED;	/* default: least priority */
   ti->latest_engine = FALSE;			/* default: get from level */
@@ -2014,6 +2019,7 @@ static void setTreeInfoToDefaults(TreeInfo *ti, int type)
   {
     ti->imported_from = NULL;
     ti->imported_by = NULL;
+    ti->tested_by = NULL;
 
     ti->graphics_set_ecs = NULL;
     ti->graphics_set_aga = NULL;
@@ -2068,6 +2074,7 @@ static void setTreeInfoToDefaultsFromParent(TreeInfo *ti, TreeInfo *parent)
   ti->name = getStringCopy(ANONYMOUS_NAME);
   ti->name_sorting = NULL;
   ti->author = getStringCopy(parent->author);
+  ti->year = getStringCopy(parent->year);
 
   ti->sort_priority = parent->sort_priority;
   ti->latest_engine = parent->latest_engine;
@@ -2083,6 +2090,7 @@ static void setTreeInfoToDefaultsFromParent(TreeInfo *ti, TreeInfo *parent)
   {
     ti->imported_from = getStringCopy(parent->imported_from);
     ti->imported_by = getStringCopy(parent->imported_by);
+    ti->tested_by = getStringCopy(parent->tested_by);
 
     ti->graphics_set_ecs = NULL;
     ti->graphics_set_aga = NULL;
@@ -2130,8 +2138,10 @@ static TreeInfo *getTreeInfoCopy(TreeInfo *ti)
   ti_copy->name			= getStringCopy(ti->name);
   ti_copy->name_sorting		= getStringCopy(ti->name_sorting);
   ti_copy->author		= getStringCopy(ti->author);
+  ti_copy->year			= getStringCopy(ti->year);
   ti_copy->imported_from	= getStringCopy(ti->imported_from);
   ti_copy->imported_by		= getStringCopy(ti->imported_by);
+  ti_copy->tested_by		= getStringCopy(ti->tested_by);
 
   ti_copy->graphics_set_ecs	= getStringCopy(ti->graphics_set_ecs);
   ti_copy->graphics_set_aga	= getStringCopy(ti->graphics_set_aga);
@@ -2182,6 +2192,7 @@ static void freeTreeInfo(TreeInfo *ti)
   checked_free(ti->name);
   checked_free(ti->name_sorting);
   checked_free(ti->author);
+  checked_free(ti->year);
 
   checked_free(ti->class_desc);
 
@@ -2191,6 +2202,7 @@ static void freeTreeInfo(TreeInfo *ti)
   {
     checked_free(ti->imported_from);
     checked_free(ti->imported_by);
+    checked_free(ti->tested_by);
 
     checked_free(ti->graphics_set_ecs);
     checked_free(ti->graphics_set_aga);

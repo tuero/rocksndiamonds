@@ -2683,7 +2683,7 @@ static void LoadCustomArtwork(struct ArtworkListInfo *artwork_info,
 			      struct FileInfo *file_list_entry)
 {
 #if 0
-  printf("GOT CUSTOM ARTWORK FILE '%s'\n", filename);
+  printf("GOT CUSTOM ARTWORK FILE '%s'\n", file_list_entry->filename);
 #endif
 
   if (strEqual(file_list_entry->filename, UNDEFINED_FILENAME))

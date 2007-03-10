@@ -2030,6 +2030,12 @@ struct MenuMainTextInfo
   struct TextPosInfo last_level;
   struct TextPosInfo level_info_1;
   struct TextPosInfo level_info_2;
+  struct TextPosInfo level_name;
+  struct TextPosInfo level_author;
+  struct TextPosInfo level_year;
+  struct TextPosInfo level_imported_from;
+  struct TextPosInfo level_imported_by;
+  struct TextPosInfo level_tested_by;
   struct TextPosInfo title_1;
   struct TextPosInfo title_2;
   struct TextPosInfo title_3;
@@ -2037,7 +2043,7 @@ struct MenuMainTextInfo
 
 struct MenuMainInputInfo
 {
-  struct MenuPosInfo name;
+  struct TextPosInfo name;
 };
 
 struct MenuMainInfo

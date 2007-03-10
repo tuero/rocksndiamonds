@@ -260,30 +260,56 @@ struct TitleControlInfo title_controls[MAX_NUM_TITLE_SCREENS];
 
 /* main menu display and control definitions */
 
-#define MAIN_CONTROL_NAME		0
-#define MAIN_CONTROL_LEVELS		1
-#define MAIN_CONTROL_SCORES		2
-#define MAIN_CONTROL_EDITOR		3
-#define MAIN_CONTROL_INFO		4
-#define MAIN_CONTROL_GAME		5
-#define MAIN_CONTROL_SETUP		6
-#define MAIN_CONTROL_QUIT		7
-#define MAIN_CONTROL_PREV_LEVEL		8
-#define MAIN_CONTROL_NEXT_LEVEL		9
-#define MAIN_CONTROL_CURRENT_LEVEL	10
-#define MAIN_CONTROL_FIRST_LEVEL	11
-#define MAIN_CONTROL_LAST_LEVEL		12
-#define MAIN_CONTROL_LEVEL_INFO_1	13
-#define MAIN_CONTROL_LEVEL_INFO_2	14
-#define MAIN_CONTROL_TITLE_1		15
-#define MAIN_CONTROL_TITLE_2		16
-#define MAIN_CONTROL_TITLE_3		17
+#define MAIN_CONTROL_NAME			0
+#define MAIN_CONTROL_LEVELS			1
+#define MAIN_CONTROL_SCORES			2
+#define MAIN_CONTROL_EDITOR			3
+#define MAIN_CONTROL_INFO			4
+#define MAIN_CONTROL_GAME			5
+#define MAIN_CONTROL_SETUP			6
+#define MAIN_CONTROL_QUIT			7
+#define MAIN_CONTROL_PREV_LEVEL			8
+#define MAIN_CONTROL_NEXT_LEVEL			9
+#define MAIN_CONTROL_CURRENT_LEVEL		10
+#define MAIN_CONTROL_FIRST_LEVEL		11
+#define MAIN_CONTROL_LAST_LEVEL			12
+#define MAIN_CONTROL_LEVEL_INFO_1		13
+#define MAIN_CONTROL_LEVEL_INFO_2		14
+#define MAIN_CONTROL_LEVEL_NAME			15
+#define MAIN_CONTROL_LEVEL_AUTHOR		16
+#define MAIN_CONTROL_LEVEL_YEAR			17
+#define MAIN_CONTROL_LEVEL_IMPORTED_FROM	18
+#define MAIN_CONTROL_LEVEL_IMPORTED_BY		19
+#define MAIN_CONTROL_LEVEL_TESTED_BY		20
+#define MAIN_CONTROL_TITLE_1			21
+#define MAIN_CONTROL_TITLE_2			22
+#define MAIN_CONTROL_TITLE_3			23
 
-static char main_text_name[10];
-static char main_text_current_level[10];
-static char main_text_first_level[10];
-static char main_text_last_level[10];
-static char main_input_name[MAX_PLAYER_NAME_LEN + 1];
+static char str_main_text_name[10];
+static char str_main_text_current_level[10];
+static char str_main_text_first_level[10];
+static char str_main_text_last_level[10];
+
+static char *main_text_name			= str_main_text_name;
+static char *main_text_current_level		= str_main_text_current_level;
+static char *main_text_first_level		= str_main_text_first_level;
+static char *main_text_last_level		= str_main_text_last_level;
+static char *main_text_levels			= "Levelset";
+static char *main_text_scores			= "Hall Of Fame";
+static char *main_text_editor			= "Level Creator";
+static char *main_text_info			= "Info Screen";
+static char *main_text_game			= "Start Game";
+static char *main_text_setup			= "Setup";
+static char *main_text_quit			= "Quit";
+static char *main_text_level_name		= level.name;
+static char *main_text_level_author		= level.author;
+static char *main_text_level_year		= NULL;
+static char *main_text_level_imported_from	= NULL;
+static char *main_text_level_imported_by	= NULL;
+static char *main_text_level_tested_by		= NULL;
+static char *main_text_title_1			= PROGRAM_TITLE_STRING;
+static char *main_text_title_2			= PROGRAM_COPYRIGHT_STRING;
+static char *main_text_title_3			= PROGRAM_GAME_BY_STRING;
 
 struct MainControlInfo
 {
@@ -293,11 +319,11 @@ struct MainControlInfo
   int button_graphic;
 
   struct TextPosInfo *pos_text;
-  char *text;
+  char **text;
   int font_text;
 
-  struct MenuPosInfo *pos_input;
-  char *input;
+  struct TextPosInfo *pos_input;
+  char **input;
   int font_input;
 };
 
@@ -306,49 +332,49 @@ static struct MainControlInfo main_controls[] =
   {
     MAIN_CONTROL_NAME,
     &menu.main.button.name,		IMG_MENU_BUTTON,
-    &menu.main.text.name,		main_text_name,		FONT_MENU_1,
-    &menu.main.input.name,		main_input_name,	FONT_INPUT_1,
+    &menu.main.text.name,		&main_text_name,	FONT_MENU_1,
+    &menu.main.input.name,		&setup.player_name,	FONT_INPUT_1,
   },
   {
     MAIN_CONTROL_LEVELS,
     &menu.main.button.levels,		IMG_MENU_BUTTON_ENTER_MENU,
-    &menu.main.text.levels,		"Levelset",		FONT_MENU_1,
+    &menu.main.text.levels,		&main_text_levels,	FONT_MENU_1,
     NULL,				NULL,			-1,
   },
   {
     MAIN_CONTROL_SCORES,
     &menu.main.button.scores,		IMG_MENU_BUTTON,
-    &menu.main.text.scores,		"Hall Of Fame",		FONT_MENU_1,
+    &menu.main.text.scores,		&main_text_scores,	FONT_MENU_1,
     NULL,				NULL,			-1,
   },
   {
     MAIN_CONTROL_EDITOR,
     &menu.main.button.editor,		IMG_MENU_BUTTON,
-    &menu.main.text.editor,		"Level Creator",	FONT_MENU_1,	
+    &menu.main.text.editor,		&main_text_editor,	FONT_MENU_1,	
     NULL,				NULL,			-1,
   },
   {
     MAIN_CONTROL_INFO,
     &menu.main.button.info,		IMG_MENU_BUTTON_ENTER_MENU,
-    &menu.main.text.info,		"Info Screen",		FONT_MENU_1,
+    &menu.main.text.info,		&main_text_info,	FONT_MENU_1,
     NULL,				NULL,			-1,
   },
   {
     MAIN_CONTROL_GAME,
     &menu.main.button.game,		IMG_MENU_BUTTON,
-    &menu.main.text.game,		"Start Game",		FONT_MENU_1,
+    &menu.main.text.game,		&main_text_game,	FONT_MENU_1,
     NULL,				NULL,			-1,
   },
   {
     MAIN_CONTROL_SETUP,
     &menu.main.button.setup,		IMG_MENU_BUTTON_ENTER_MENU,
-    &menu.main.text.setup,		"Setup",		FONT_MENU_1,
+    &menu.main.text.setup,		&main_text_setup,	FONT_MENU_1,
     NULL,				NULL,			-1,
   },
   {
     MAIN_CONTROL_QUIT,
     &menu.main.button.quit,		IMG_MENU_BUTTON,
-    &menu.main.text.quit,		"Quit",			FONT_MENU_1,
+    &menu.main.text.quit,		&main_text_quit,	FONT_MENU_1,
     NULL,				NULL,			-1,
   },
 #if 0
@@ -369,19 +395,19 @@ static struct MainControlInfo main_controls[] =
   {
     MAIN_CONTROL_CURRENT_LEVEL,
     NULL,				-1,
-    &menu.main.text.current_level,	main_text_current_level,FONT_VALUE_1,
+    &menu.main.text.current_level,	&main_text_current_level, FONT_VALUE_1,
     NULL,				NULL,			-1,
   },
   {
     MAIN_CONTROL_FIRST_LEVEL,
     NULL,				-1,
-    &menu.main.text.first_level,	main_text_first_level,	FONT_TEXT_3,
+    &menu.main.text.first_level,	&main_text_first_level,	FONT_TEXT_3,
     NULL,				NULL,			-1,
   },
   {
     MAIN_CONTROL_LAST_LEVEL,
     NULL,				-1,
-    &menu.main.text.last_level,		main_text_last_level,	FONT_TEXT_3,
+    &menu.main.text.last_level,		&main_text_last_level,	FONT_TEXT_3,
     NULL,				NULL,			-1,
   },
   {
@@ -397,21 +423,59 @@ static struct MainControlInfo main_controls[] =
     NULL,				NULL,			-1,
   },
   {
+    MAIN_CONTROL_LEVEL_NAME,
+    NULL,				-1,
+    &menu.main.text.level_name,		&main_text_level_name,	FONT_TEXT_2,
+    NULL,				NULL,			-1,
+  },
+  {
+    MAIN_CONTROL_LEVEL_AUTHOR,
+    NULL,				-1,
+    &menu.main.text.level_author,	&main_text_level_author,FONT_TEXT_2,
+    NULL,				NULL,			-1,
+  },
+  {
+    MAIN_CONTROL_LEVEL_YEAR,
+    NULL,				-1,
+    &menu.main.text.level_year,		&main_text_level_year,	FONT_TEXT_2,
+    NULL,				NULL,			-1,
+  },
+  {
+    MAIN_CONTROL_LEVEL_IMPORTED_FROM,
+    NULL,				-1,
+    &menu.main.text.level_imported_from, &main_text_level_imported_from,
+    FONT_TEXT_2,
+    NULL,				NULL,			-1,
+  },
+  {
+    MAIN_CONTROL_LEVEL_IMPORTED_BY,
+    NULL,				-1,
+    &menu.main.text.level_imported_by,	&main_text_level_imported_by,
+    FONT_TEXT_2,
+    NULL,				NULL,			-1,
+  },
+  {
+    MAIN_CONTROL_LEVEL_TESTED_BY,
+    NULL,				-1,
+    &menu.main.text.level_tested_by,	&main_text_level_tested_by, FONT_TEXT_2,
+    NULL,				NULL,			-1,
+  },
+  {
     MAIN_CONTROL_TITLE_1,
     NULL,				-1,
-    &menu.main.text.title_1,		PROGRAM_TITLE_STRING,	FONT_TITLE_1,
+    &menu.main.text.title_1,		&main_text_title_1,	FONT_TITLE_1,
     NULL,				NULL,			-1,
   },
   {
     MAIN_CONTROL_TITLE_2,
     NULL,				-1,
-    &menu.main.text.title_2,		PROGRAM_COPYRIGHT_STRING, FONT_TITLE_2,
+    &menu.main.text.title_2,		&main_text_title_2,	FONT_TITLE_2,
     NULL,				NULL,			-1,
   },
   {
     MAIN_CONTROL_TITLE_3,
     NULL,				-1,
-    &menu.main.text.title_3,		PROGRAM_GAME_BY_STRING,	FONT_TITLE_2,
+    &menu.main.text.title_3,		&main_text_title_3,	FONT_TITLE_2,
     NULL,				NULL,			-1,
   },
 
@@ -501,6 +565,16 @@ static void InitializeTitleControls(boolean show_title_initial)
 	compareTitleControlInfo);
 }
 
+static boolean visibleMenuPos(struct MenuPosInfo *pos)
+{
+  return (pos != NULL && pos->x != -1 && pos->y != -1);
+}
+
+static boolean visibleTextPos(struct TextPosInfo *pos)
+{
+  return (pos != NULL && pos->x != -1 && pos->y != -1);
+}
+
 static void InitializeMainControls()
 {
   boolean local_team_mode = (!options.network && setup.team_mode);
@@ -511,7 +585,11 @@ static void InitializeMainControls()
   sprintf(main_text_current_level, "%s",   int2str(level_nr, 3));
   sprintf(main_text_first_level,   "%03d", leveldir_current->first_level);
   sprintf(main_text_last_level,    "%03d", leveldir_current->last_level);
-  sprintf(main_input_name,         "%s",   setup.player_name);
+
+  main_text_level_year		= leveldir_current->year;
+  main_text_level_imported_from	= leveldir_current->imported_from;
+  main_text_level_imported_by	= leveldir_current->imported_by;
+  main_text_level_tested_by	= leveldir_current->tested_by;
 
   /* set main control screen positions to dynamically determined values */
   for (i = 0; main_controls[i].nr != -1; i++)
@@ -520,9 +598,9 @@ static void InitializeMainControls()
     int nr                         = mci->nr;
     struct MenuPosInfo *pos_button = mci->pos_button;
     struct TextPosInfo *pos_text   = mci->pos_text;
-    struct MenuPosInfo *pos_input  = mci->pos_input;
-    char *text                     = mci->text;
-    char *input                    = mci->input;
+    struct TextPosInfo *pos_input  = mci->pos_input;
+    char *text                     = (mci->text  ? *mci->text  : NULL);
+    char *input                    = (mci->input ? *mci->input : NULL);
     int button_graphic             = mci->button_graphic;
     int font_text                  = mci->font_text;
     int font_input                 = mci->font_input;
@@ -561,7 +639,7 @@ static void InitializeMainControls()
 #endif
     }
 
-    if (pos_button != NULL)
+    if (pos_button != NULL)		/* (x/y may be -1/-1 here) */
     {
       if (pos_button->width == 0)
 	pos_button->width = button_width;
@@ -569,15 +647,18 @@ static void InitializeMainControls()
 	pos_button->height = button_height;
     }
 
-    if (pos_text != NULL)
+    if (pos_text != NULL)		/* (x/y may be -1/-1 here) */
     {
       /* calculate width for non-clickable text -- needed for text alignment */
       boolean calculate_text_width = (pos_button == NULL && text != NULL);
 
-      if (pos_text->x == -1 && pos_button != NULL)
-	pos_text->x = pos_button->x + pos_button->width;
-      if (pos_text->y == -1 && pos_button != NULL)
-	pos_text->y = pos_button->y;
+      if (visibleMenuPos(pos_button))
+      {
+	if (pos_text->x == -1)
+	  pos_text->x = pos_button->x + pos_button->width;
+	if (pos_text->y == -1)
+	  pos_text->y = pos_button->y;
+      }
 
       if (pos_text->width == -1 || calculate_text_width)
 	pos_text->width = text_width;
@@ -585,12 +666,15 @@ static void InitializeMainControls()
 	pos_text->height = text_height;
     }
 
-    if (pos_input != NULL)
+    if (pos_input != NULL)		/* (x/y may be -1/-1 here) */
     {
-      if (pos_input->x == -1 && pos_text != NULL)
-	pos_input->x = pos_text->x + pos_text->width;
-      if (pos_input->y == -1 && pos_text != NULL)
-	pos_input->y = pos_text->y;
+      if (visibleTextPos(pos_text))
+      {
+	if (pos_input->x == -1)
+	  pos_input->x = pos_text->x + pos_text->width;
+	if (pos_input->y == -1)
+	  pos_input->y = pos_text->y;
+      }
 
       if (pos_input->width == -1)
 	pos_input->width = input_width;
@@ -613,9 +697,9 @@ static void DrawCursorAndText_Main_Ext(int nr, boolean active_text,
     {
       struct MenuPosInfo *pos_button = mci->pos_button;
       struct TextPosInfo *pos_text   = mci->pos_text;
-      struct MenuPosInfo *pos_input  = mci->pos_input;
-      char *text                     = mci->text;
-      char *input                    = mci->input;
+      struct TextPosInfo *pos_input  = mci->pos_input;
+      char *text                     = (mci->text  ? *mci->text  : NULL);
+      char *input                    = (mci->input ? *mci->input : NULL);
       int button_graphic             = mci->button_graphic;
       int font_text                  = mci->font_text;
       int font_input                 = mci->font_input;
@@ -631,7 +715,7 @@ static void DrawCursorAndText_Main_Ext(int nr, boolean active_text,
 	font_input = FONT_ACTIVE(font_input);
       }
 
-      if (pos_button != NULL)
+      if (visibleMenuPos(pos_button))
       {
 	struct MenuPosInfo *pos = pos_button;
 	int x = mSX + pos->x;
@@ -641,7 +725,7 @@ static void DrawCursorAndText_Main_Ext(int nr, boolean active_text,
 	DrawGraphicThruMaskExt(drawto, x, y, button_graphic, 0);
       }
 
-      if (pos_text != NULL && text != NULL)
+      if (visibleTextPos(pos_text) && text != NULL)
       {
 	struct TextPosInfo *pos = pos_text;
 	int x = mSX + ALIGNED_MENU_XPOS(pos);
@@ -651,9 +735,9 @@ static void DrawCursorAndText_Main_Ext(int nr, boolean active_text,
 	DrawText(x, y, text, font_text);
       }
 
-      if (pos_input != NULL && input != NULL)
+      if (visibleTextPos(pos_input) && input != NULL)
       {
-	struct MenuPosInfo *pos = pos_input;
+	struct TextPosInfo *pos = pos_input;
 	int x = mSX + ALIGNED_MENU_XPOS(pos);
 	int y = mSY + ALIGNED_MENU_YPOS(pos);
 
@@ -1585,7 +1669,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
     {
       if (insideMenuPosRect(main_controls[i].pos_button, mx - mSX, my - mSY) ||
 	  insideTextPosRect(main_controls[i].pos_text,   mx - mSX, my - mSY) ||
-	  insideMenuPosRect(main_controls[i].pos_input,  mx - mSX, my - mSY))
+	  insideTextPosRect(main_controls[i].pos_input,  mx - mSX, my - mSY))
       {
 	pos = main_controls[i].nr;
 
@@ -2943,7 +3027,7 @@ void DrawInfoScreen_Version()
   ystart2 += 3 * ystep;
   DrawTextF(xstart1, ystart2, font_header, "Driver");
   DrawTextF(xstart2, ystart2, font_header, "Requested");
-  DrawTextF(xstart3, ystart2, font_header, "Active");
+  DrawTextF(xstart3, ystart2, font_header, "Used");
 
   SDL_VideoDriverName(driver_name, driver_name_len);
 
@@ -3134,7 +3218,7 @@ void HandleTypeName(int newxpos, Key key)
   static char last_player_name[MAX_PLAYER_NAME_LEN + 1];
   struct MainControlInfo *mci = getMainControlInfo(MAIN_CONTROL_NAME);
 #if 1
-  struct MenuPosInfo *pos = mci->pos_input;
+  struct TextPosInfo *pos = mci->pos_input;
   int startx = mSX + ALIGNED_MENU_XPOS(pos);
   int starty = mSY + ALIGNED_MENU_YPOS(pos);
 #endif
@@ -3249,8 +3333,6 @@ void HandleTypeName(int newxpos, Key key)
 
     DrawText(startx, starty, setup.player_name, font_nr);
   }
-
-  sprintf(main_input_name, "%s", setup.player_name);
 }
 
 

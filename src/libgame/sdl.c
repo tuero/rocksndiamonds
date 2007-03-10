@@ -95,9 +95,9 @@ static void SDLSetWindowIcon(char *basename)
 void SDLInitVideoDisplay(void)
 {
   if (!strEqual(setup.system.sdl_videodriver, ARG_DEFAULT))
-    putenv(getStringCat2("SDL_VIDEODRIVER=", setup.system.sdl_videodriver));
+    SDL_putenv(getStringCat2("SDL_VIDEODRIVER=", setup.system.sdl_videodriver));
 
-  putenv("SDL_VIDEO_CENTERED=1");
+  SDL_putenv("SDL_VIDEO_CENTERED=1");
 
   /* initialize SDL video */
   if (SDL_InitSubSystem(SDL_INIT_VIDEO) < 0)
@@ -1587,7 +1587,7 @@ void SDLSetMouseCursor(struct MouseCursorInfo *cursor_info)
 void SDLOpenAudio(void)
 {
   if (!strEqual(setup.system.sdl_audiodriver, ARG_DEFAULT))
-    putenv(getStringCat2("SDL_AUDIODRIVER=", setup.system.sdl_audiodriver));
+    SDL_putenv(getStringCat2("SDL_AUDIODRIVER=", setup.system.sdl_audiodriver));
 
   if (SDL_InitSubSystem(SDL_INIT_AUDIO) < 0)
   {

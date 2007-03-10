@@ -1,3 +1,6 @@
+2007-03-08
+	* changed some numerical limits in the level editor from 255 to 999
+
 2007-03-07
 	* added option "system.sdl_videodriver" to select SDL video driver
 	* added output of SDL video and audio driver to "version info" page

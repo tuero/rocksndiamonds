@@ -15,13 +15,13 @@
 #define PLATFORM_H
 
 /* ========================================================================= */
-/* define keywords for supported main platforms (Unix, DOS and Windows)      */
+/* define main platform keywords                                             */
 /* ========================================================================= */
 
 #if defined(MSDOS)
 #define PLATFORM_MSDOS
 #define PLATFORM_STRING "DOS"
-#elif defined(WIN32)
+#elif defined(WIN32) || defined(_WIN32)
 #define PLATFORM_WIN32
 #define PLATFORM_STRING "Windows"
 #else
@@ -31,41 +31,69 @@
 
 
 /* ========================================================================= */
-/* define additional keywords for MS-DOS platform                            */
+/* define additional platform keywords                                       */
 /* ========================================================================= */
 
-#if defined(PLATFORM_MSDOS)
-
-#ifndef TARGET_ALLEGRO
-#define TARGET_ALLEGRO
+#if defined(_AIX)
+#define PLATFORM_AIX
+#undef  PLATFORM_STRING
+#define PLATFORM_STRING "AIX"
 #endif
 
-#ifndef TARGET_X11
-#define TARGET_X11
+#if defined(AMIGA) || defined(__AMIGA) || defined(__amigados__)
+#define PLATFORM_AMIGA
+#undef  PLATFORM_STRING
+#define PLATFORM_STRING "AmigaOS"
 #endif
 
+#if defined(__BEOS__)
+#define PLATFORM_BEOS
+#undef  PLATFORM_STRING
+#define PLATFORM_STRING "BeOS"
 #endif
 
-
-/* ========================================================================= */
-/* define additional keywords for several Unix platforms                     */
-/* ========================================================================= */
-
-#if defined(PLATFORM_UNIX) && defined(TARGET_X11)
-#define TARGET_X11_NATIVE
+#if defined(bsdi) || defined(__bsdi) || defined(__bsdi__)
+#define PLATFORM_BSDI
+#define PLATFORM_BSD
+#undef  PLATFORM_STRING
+#define PLATFORM_STRING "BSDI"
 #endif
 
-#if defined(linux)
+#if defined(_arch_dreamcast)
+#define PLATFORM_DREAMCAST
+#undef  PLATFORM_STRING
+#define PLATFORM_STRING "Dreamcast"
+#endif
+
+#if defined(__FreeBSD__) || defined(__DragonFly__)
+#define PLATFORM_FREEBSD
+#define PLATFORM_BSD
+#undef  PLATFORM_STRING
+#define PLATFORM_STRING "FreeBSD"
+#endif
+
+#if defined(hpux) || defined(__hpux) || defined(__hpux__)
+#define PLATFORM_HPUX
+#undef  PLATFORM_STRING
+#define PLATFORM_STRING "HP-UX"
+#endif
+
+#if defined(sgi) || defined(__sgi) || defined(__sgi__) || defined(_SGI_SOURCE)
+#define PLATFORM_IRIX
+#undef  PLATFORM_STRING
+#define PLATFORM_STRING "IRIX"
+#endif
+
+#if defined(linux) || defined(__linux) || defined(__linux__)
 #define PLATFORM_LINUX
 #undef  PLATFORM_STRING
 #define PLATFORM_STRING "Linux"
 #endif
 
-#if defined(__FreeBSD__)
-#define PLATFORM_FREEBSD
-#define PLATFORM_BSD
+#if defined(__APPLE__) && defined(__MACH__)
+#define PLATFORM_MACOSX
 #undef  PLATFORM_STRING
-#define PLATFORM_STRING "FreeBSD"
+#define PLATFORM_STRING "Mac OS X"
 #endif
 
 #if defined(__NetBSD__)
@@ -75,41 +103,71 @@
 #define PLATFORM_STRING "NetBSD"
 #endif
 
-#if defined(__bsdi__)
-#define PLATFORM_BSDI
-#define PLATFORM_BSD
-#undef  PLATFORM_STRING
-#define PLATFORM_STRING "BSDI"
-#endif
-
-#if defined(sparc) && defined(sun)
-#define PLATFORM_SUNOS
-#undef  PLATFORM_STRING
-#define PLATFORM_STRING "Solaris"
-#endif
-
-#if defined(__APPLE__) && defined(__MACH__)
-#define PLATFORM_MACOSX
-#undef  PLATFORM_STRING
-#define PLATFORM_STRING "Mac OS X"
-#endif
-
 #if defined(NeXT)
 #define PLATFORM_NEXT
 #undef  PLATFORM_STRING
 #define PLATFORM_STRING "NeXT"
 #endif
 
-/* detecting HP-UX by the following compiler keyword definitions:
-   - in K&R mode (the default), the HP C compiler defines "hpux"
-   - in ANSI mode (-Aa or -Ae), the HP C compiler defines "__hpux"
-   - the gcc (Gnu) C compiler defines "__hpux__"
-   Thanks to Jarkko Hietaniemi  for this note. */
-
-#if defined(__hpux__) || defined(__hpux) || defined(hpux)
-#define PLATFORM_HPUX
+#if defined(__OpenBSD__)
+#define PLATFORM_OPENBSD
+#define PLATFORM_BSD
 #undef  PLATFORM_STRING
-#define PLATFORM_STRING "HP-UX"
+#define PLATFORM_STRING "OpenBSD"
+#endif
+
+#if defined(__OS2__)
+#define PLATFORM_OS2
+#undef  PLATFORM_STRING
+#define PLATFORM_STRING "OS/2"
+#endif
+
+#if defined(osf) || defined(__osf) || defined(__osf__) || defined(_OSF_SOURCE)
+#define PLATFORM_OSF
+#undef  PLATFORM_STRING
+#define PLATFORM_STRING "OSF/1"
+#endif
+
+#if defined(__QNXNTO__)
+#define PLATFORM_QNX
+#undef  PLATFORM_STRING
+#define PLATFORM_STRING "QNX"
+#endif
+
+#if defined(riscos) || defined(__riscos) || defined(__riscos__)
+#define PLATFORM_RISCOS
+#undef  PLATFORM_STRING
+#define PLATFORM_STRING "RISC OS"
+#endif
+
+#if defined(sparc) || defined(sun) || defined(__SVR4)
+#define PLATFORM_SOLARIS
+#undef  PLATFORM_STRING
+#define PLATFORM_STRING "Solaris"
+#endif
+
+#if defined(_WIN32_WCE)
+#define PLATFORM_WINDOWS_CE
+#undef  PLATFORM_STRING
+#define PLATFORM_STRING "Windows CE"
+#endif
+
+
+/* ========================================================================= */
+/* define additional target keywords                                         */
+/* ========================================================================= */
+
+#if defined(PLATFORM_MSDOS)
+#ifndef TARGET_ALLEGRO
+#define TARGET_ALLEGRO
+#endif
+#ifndef TARGET_X11
+#define TARGET_X11
+#endif
+#endif
+
+#if defined(PLATFORM_UNIX) && defined(TARGET_X11)
+#define TARGET_X11_NATIVE
 #endif
 
 
