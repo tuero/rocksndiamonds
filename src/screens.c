@@ -320,11 +320,9 @@ struct MainControlInfo
 
   struct TextPosInfo *pos_text;
   char **text;
-  int font_text;
 
   struct TextPosInfo *pos_input;
   char **input;
-  int font_input;
 };
 
 static struct MainControlInfo main_controls[] =
@@ -332,158 +330,156 @@ static struct MainControlInfo main_controls[] =
   {
     MAIN_CONTROL_NAME,
     &menu.main.button.name,		IMG_MENU_BUTTON,
-    &menu.main.text.name,		&main_text_name,	FONT_MENU_1,
-    &menu.main.input.name,		&setup.player_name,	FONT_INPUT_1,
+    &menu.main.text.name,		&main_text_name,
+    &menu.main.input.name,		&setup.player_name,
   },
   {
     MAIN_CONTROL_LEVELS,
     &menu.main.button.levels,		IMG_MENU_BUTTON_ENTER_MENU,
-    &menu.main.text.levels,		&main_text_levels,	FONT_MENU_1,
-    NULL,				NULL,			-1,
+    &menu.main.text.levels,		&main_text_levels,
+    NULL,				NULL,
   },
   {
     MAIN_CONTROL_SCORES,
     &menu.main.button.scores,		IMG_MENU_BUTTON,
-    &menu.main.text.scores,		&main_text_scores,	FONT_MENU_1,
-    NULL,				NULL,			-1,
+    &menu.main.text.scores,		&main_text_scores,
+    NULL,				NULL,
   },
   {
     MAIN_CONTROL_EDITOR,
     &menu.main.button.editor,		IMG_MENU_BUTTON,
-    &menu.main.text.editor,		&main_text_editor,	FONT_MENU_1,	
-    NULL,				NULL,			-1,
+    &menu.main.text.editor,		&main_text_editor,
+    NULL,				NULL,
   },
   {
     MAIN_CONTROL_INFO,
     &menu.main.button.info,		IMG_MENU_BUTTON_ENTER_MENU,
-    &menu.main.text.info,		&main_text_info,	FONT_MENU_1,
-    NULL,				NULL,			-1,
+    &menu.main.text.info,		&main_text_info,
+    NULL,				NULL,
   },
   {
     MAIN_CONTROL_GAME,
     &menu.main.button.game,		IMG_MENU_BUTTON,
-    &menu.main.text.game,		&main_text_game,	FONT_MENU_1,
-    NULL,				NULL,			-1,
+    &menu.main.text.game,		&main_text_game,
+    NULL,				NULL,
   },
   {
     MAIN_CONTROL_SETUP,
     &menu.main.button.setup,		IMG_MENU_BUTTON_ENTER_MENU,
-    &menu.main.text.setup,		&main_text_setup,	FONT_MENU_1,
-    NULL,				NULL,			-1,
+    &menu.main.text.setup,		&main_text_setup,
+    NULL,				NULL,
   },
   {
     MAIN_CONTROL_QUIT,
     &menu.main.button.quit,		IMG_MENU_BUTTON,
-    &menu.main.text.quit,		&main_text_quit,	FONT_MENU_1,
-    NULL,				NULL,			-1,
+    &menu.main.text.quit,		&main_text_quit,
+    NULL,				NULL,
   },
 #if 0
   /* (these two buttons are real gadgets) */
   {
     MAIN_CONTROL_PREV_LEVEL,
     &menu.main.button.prev_level,	IMG_MENU_BUTTON_PREV_LEVEL,
-    NULL,				NULL,			-1,
-    NULL,				NULL,			-1,
+    NULL,				NULL,
+    NULL,				NULL,
   },
   {
     MAIN_CONTROL_NEXT_LEVEL,
     &menu.main.button.next_level,	IMG_MENU_BUTTON_NEXT_LEVEL,
-    NULL,				NULL,			-1,
-    NULL,				NULL,			-1,
+    NULL,				NULL,
+    NULL,				NULL,
   },
 #endif
   {
     MAIN_CONTROL_CURRENT_LEVEL,
     NULL,				-1,
-    &menu.main.text.current_level,	&main_text_current_level, FONT_VALUE_1,
-    NULL,				NULL,			-1,
+    &menu.main.text.current_level,	&main_text_current_level,
+    NULL,				NULL,
   },
   {
     MAIN_CONTROL_FIRST_LEVEL,
     NULL,				-1,
-    &menu.main.text.first_level,	&main_text_first_level,	FONT_TEXT_3,
-    NULL,				NULL,			-1,
+    &menu.main.text.first_level,	&main_text_first_level,
+    NULL,				NULL,
   },
   {
     MAIN_CONTROL_LAST_LEVEL,
     NULL,				-1,
-    &menu.main.text.last_level,		&main_text_last_level,	FONT_TEXT_3,
-    NULL,				NULL,			-1,
+    &menu.main.text.last_level,		&main_text_last_level,
+    NULL,				NULL,
   },
   {
     MAIN_CONTROL_LEVEL_INFO_1,
     NULL,				-1,
-    &menu.main.text.level_info_1,	NULL,			-1,
-    NULL,				NULL,			-1,
+    &menu.main.text.level_info_1,	NULL,
+    NULL,				NULL,
   },
   {
     MAIN_CONTROL_LEVEL_INFO_2,
     NULL,				-1,
-    &menu.main.text.level_info_2,	NULL,			-1,
-    NULL,				NULL,			-1,
+    &menu.main.text.level_info_2,	NULL,
+    NULL,				NULL,
   },
   {
     MAIN_CONTROL_LEVEL_NAME,
     NULL,				-1,
-    &menu.main.text.level_name,		&main_text_level_name,	FONT_TEXT_2,
-    NULL,				NULL,			-1,
+    &menu.main.text.level_name,		&main_text_level_name,
+    NULL,				NULL,
   },
   {
     MAIN_CONTROL_LEVEL_AUTHOR,
     NULL,				-1,
-    &menu.main.text.level_author,	&main_text_level_author,FONT_TEXT_2,
-    NULL,				NULL,			-1,
+    &menu.main.text.level_author,	&main_text_level_author,
+    NULL,				NULL,
   },
   {
     MAIN_CONTROL_LEVEL_YEAR,
     NULL,				-1,
-    &menu.main.text.level_year,		&main_text_level_year,	FONT_TEXT_2,
-    NULL,				NULL,			-1,
+    &menu.main.text.level_year,		&main_text_level_year,
+    NULL,				NULL,
   },
   {
     MAIN_CONTROL_LEVEL_IMPORTED_FROM,
     NULL,				-1,
     &menu.main.text.level_imported_from, &main_text_level_imported_from,
-    FONT_TEXT_2,
-    NULL,				NULL,			-1,
+    NULL,				NULL,
   },
   {
     MAIN_CONTROL_LEVEL_IMPORTED_BY,
     NULL,				-1,
     &menu.main.text.level_imported_by,	&main_text_level_imported_by,
-    FONT_TEXT_2,
-    NULL,				NULL,			-1,
+    NULL,				NULL,
   },
   {
     MAIN_CONTROL_LEVEL_TESTED_BY,
     NULL,				-1,
-    &menu.main.text.level_tested_by,	&main_text_level_tested_by, FONT_TEXT_2,
-    NULL,				NULL,			-1,
+    &menu.main.text.level_tested_by,	&main_text_level_tested_by,
+    NULL,				NULL,
   },
   {
     MAIN_CONTROL_TITLE_1,
     NULL,				-1,
-    &menu.main.text.title_1,		&main_text_title_1,	FONT_TITLE_1,
-    NULL,				NULL,			-1,
+    &menu.main.text.title_1,		&main_text_title_1,
+    NULL,				NULL,
   },
   {
     MAIN_CONTROL_TITLE_2,
     NULL,				-1,
-    &menu.main.text.title_2,		&main_text_title_2,	FONT_TITLE_2,
-    NULL,				NULL,			-1,
+    &menu.main.text.title_2,		&main_text_title_2,
+    NULL,				NULL,
   },
   {
     MAIN_CONTROL_TITLE_3,
     NULL,				-1,
-    &menu.main.text.title_3,		&main_text_title_3,	FONT_TITLE_2,
-    NULL,				NULL,			-1,
+    &menu.main.text.title_3,		&main_text_title_3,
+    NULL,				NULL,
   },
 
   {
     -1,
     NULL,				-1,
-    NULL,				NULL,			-1,
-    NULL,				NULL,			-1,
+    NULL,				NULL,
+    NULL,				NULL,
   }
 };
 
@@ -602,8 +598,13 @@ static void InitializeMainControls()
     char *text                     = (mci->text  ? *mci->text  : NULL);
     char *input                    = (mci->input ? *mci->input : NULL);
     int button_graphic             = mci->button_graphic;
+#if 1
+    int font_text                  = (pos_text  ? pos_text->font  : -1);
+    int font_input                 = (pos_input ? pos_input->font : -1);
+#else
     int font_text                  = mci->font_text;
     int font_input                 = mci->font_input;
+#endif
 
     int font_text_width   = (font_text  != -1 ? getFontWidth(font_text)   : 0);
     int font_text_height  = (font_text  != -1 ? getFontHeight(font_text)  : 0);
@@ -701,8 +702,13 @@ static void DrawCursorAndText_Main_Ext(int nr, boolean active_text,
       char *text                     = (mci->text  ? *mci->text  : NULL);
       char *input                    = (mci->input ? *mci->input : NULL);
       int button_graphic             = mci->button_graphic;
+#if 1
+      int font_text                  = (pos_text  ? pos_text->font  : -1);
+      int font_input                 = (pos_input ? pos_input->font : -1);
+#else
       int font_text                  = mci->font_text;
       int font_input                 = mci->font_input;
+#endif
 
       if (active_text)
       {
@@ -731,7 +737,10 @@ static void DrawCursorAndText_Main_Ext(int nr, boolean active_text,
 	int x = mSX + ALIGNED_MENU_XPOS(pos);
 	int y = mSY + ALIGNED_MENU_YPOS(pos);
 
+#if 1
+	/* (check why/if this is needed) */
 	DrawBackgroundForFont(x, y, pos->width, pos->height, font_text);
+#endif
 	DrawText(x, y, text, font_text);
       }
 
@@ -741,7 +750,10 @@ static void DrawCursorAndText_Main_Ext(int nr, boolean active_text,
 	int x = mSX + ALIGNED_MENU_XPOS(pos);
 	int y = mSY + ALIGNED_MENU_YPOS(pos);
 
+#if 1
+	/* (check why/if this is needed) */
 	DrawBackgroundForFont(x, y, pos->width, pos->height, font_input);
+#endif
 	DrawText(x, y, input, font_input);
       }
     }
@@ -1628,7 +1640,7 @@ void HandleMainMenu_SelectLevel(int step, int direction)
 
 #if 1
     DrawText(mSX + mci->pos_text->x, mSY + mci->pos_text->y,
-	     int2str(level_nr, 3), mci->font_text);
+	     int2str(level_nr, 3), mci->pos_text->font);
 #else
     DrawText(mSX + 11 * 32, mSY + 3 * 32, int2str(level_nr, 3), FONT_VALUE_1);
 #endif
@@ -3227,7 +3239,7 @@ void HandleTypeName(int newxpos, Key key)
 #else
   static int xpos = 0, ypos = 2;
 #endif
-  int font_nr = mci->font_input;
+  int font_nr = pos->font;
   int font_active_nr = FONT_ACTIVE(font_nr);
   int font_width = getFontWidth(font_active_nr);
 #if 1

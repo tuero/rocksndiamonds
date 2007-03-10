@@ -2073,6 +2073,7 @@ struct TitleMessageInfo
   int chars;
   int lines;
   int align;
+  int font;
   boolean autowrap;
   boolean centered;
   boolean skip_comments;

@@ -8321,6 +8321,33 @@ void LoadCustomElementDescriptions()
   freeSetupFileHash(setup_file_hash);
 }
 
+static int get_token_parameter_value(char *token, char *value_raw)
+{
+  char *suffix;
+
+  if (token == NULL || value_raw == NULL)
+    return ARG_UNDEFINED_VALUE;
+
+  suffix = strrchr(token, '.');
+  if (suffix == NULL)
+    suffix = token;
+
+  if (strncmp(suffix, ".font", 5) == 0)
+  {
+    int i;
+
+    /* !!! OPTIMIZE THIS BY USING HASH !!! */
+    for (i = 0; i < NUM_FONTS; i++)
+      if (strEqual(value_raw, font_info[i].token_name))
+	return i;
+
+    /* if font not found, use reliable default value */
+    return FONT_INITIAL_1;
+  }
+
+  return get_parameter_value(value_raw, suffix, TYPE_INTEGER);
+}
+
 static void LoadSpecialMenuDesignSettingsFromFilename(char *filename)
 {
   SetupFileHash *setup_file_hash;
@@ -8367,7 +8394,7 @@ static void LoadSpecialMenuDesignSettingsFromFilename(char *filename)
 
     if (value != NULL)
       *image_config_vars[i].value =
-	get_auto_parameter_value(image_config_vars[i].token, value);
+	get_token_parameter_value(image_config_vars[i].token, value);
   }
 
   freeSetupFileHash(setup_file_hash);
@@ -8383,8 +8410,8 @@ void LoadSpecialMenuDesignSettings()
     for (j = 0; image_config[j].token != NULL; j++)
       if (strEqual(image_config_vars[i].token, image_config[j].token))
 	*image_config_vars[i].value =
-	  get_auto_parameter_value(image_config_vars[i].token,
-				   image_config[j].value);
+	  get_token_parameter_value(image_config_vars[i].token,
+				    image_config[j].value);
 
   if (!SETUP_OVERRIDE_ARTWORK(setup, ARTWORK_TYPE_GRAPHICS))
   {

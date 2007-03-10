@@ -5412,6 +5412,10 @@ struct TokenIntPtrInfo image_config_vars[] =
     &titlemessage_initial[0].align
   },
   {
+    "titlemessage_initial_1.font",
+    &titlemessage_initial[0].font
+  },
+  {
     "titlemessage_initial_1.autowrap",
     &titlemessage_initial[0].autowrap
   },
@@ -5454,6 +5458,10 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "titlemessage_initial_2.align",
     &titlemessage_initial[1].align
+  },
+  {
+    "titlemessage_initial_2.font",
+    &titlemessage_initial[1].font
   },
   {
     "titlemessage_initial_2.autowrap",
@@ -5500,6 +5508,10 @@ struct TokenIntPtrInfo image_config_vars[] =
     &titlemessage_initial[2].align
   },
   {
+    "titlemessage_initial_3.font",
+    &titlemessage_initial[2].font
+  },
+  {
     "titlemessage_initial_3.autowrap",
     &titlemessage_initial[2].autowrap
   },
@@ -5542,6 +5554,10 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "titlemessage_initial_4.align",
     &titlemessage_initial[3].align
+  },
+  {
+    "titlemessage_initial_4.font",
+    &titlemessage_initial[3].font
   },
   {
     "titlemessage_initial_4.autowrap",
@@ -5588,6 +5604,10 @@ struct TokenIntPtrInfo image_config_vars[] =
     &titlemessage_initial[4].align
   },
   {
+    "titlemessage_initial_5.font",
+    &titlemessage_initial[4].font
+  },
+  {
     "titlemessage_initial_5.autowrap",
     &titlemessage_initial[4].autowrap
   },
@@ -5630,6 +5650,10 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "titlemessage_1.align",
     &titlemessage[0].align
+  },
+  {
+    "titlemessage_1.font",
+    &titlemessage[0].font
   },
   {
     "titlemessage_1.autowrap",
@@ -5676,6 +5700,10 @@ struct TokenIntPtrInfo image_config_vars[] =
     &titlemessage[1].align
   },
   {
+    "titlemessage_2.font",
+    &titlemessage[1].font
+  },
+  {
     "titlemessage_2.autowrap",
     &titlemessage[1].autowrap
   },
@@ -5718,6 +5746,10 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "titlemessage_3.align",
     &titlemessage[2].align
+  },
+  {
+    "titlemessage_3.font",
+    &titlemessage[2].font
   },
   {
     "titlemessage_3.autowrap",
@@ -5764,6 +5796,10 @@ struct TokenIntPtrInfo image_config_vars[] =
     &titlemessage[3].align
   },
   {
+    "titlemessage_4.font",
+    &titlemessage[3].font
+  },
+  {
     "titlemessage_4.autowrap",
     &titlemessage[3].autowrap
   },
@@ -5806,6 +5842,10 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "titlemessage_5.align",
     &titlemessage[4].align
+  },
+  {
+    "titlemessage_5.font",
+    &titlemessage[4].font
   },
   {
     "titlemessage_5.autowrap",
@@ -5851,6 +5891,10 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "readme.align",
     &readme.align
+  },
+  {
+    "readme.font",
+    &readme.font
   },
   {
     "readme.autowrap",
@@ -6091,100 +6135,126 @@ struct TokenIntPtrInfo image_config_vars[] =
   { "main.text.name.width",		&menu.main.text.name.width	      },
   { "main.text.name.height",		&menu.main.text.name.height	      },
   { "main.text.name.align",		&menu.main.text.name.align	      },
+  { "main.text.name.font",		&menu.main.text.name.font	      },
   { "main.text.levels.x",		&menu.main.text.levels.x	      },
   { "main.text.levels.y",		&menu.main.text.levels.y	      },
   { "main.text.levels.width",		&menu.main.text.levels.width	      },
   { "main.text.levels.height",		&menu.main.text.levels.height	      },
   { "main.text.levels.align",		&menu.main.text.levels.align	      },
+  { "main.text.levels.font",		&menu.main.text.levels.font	      },
   { "main.text.scores.x",		&menu.main.text.scores.x	      },
   { "main.text.scores.y",		&menu.main.text.scores.y	      },
   { "main.text.scores.width",		&menu.main.text.scores.width	      },
   { "main.text.scores.height",		&menu.main.text.scores.height	      },
   { "main.text.scores.align",		&menu.main.text.scores.align	      },
+  { "main.text.scores.font",		&menu.main.text.scores.font	      },
   { "main.text.editor.x",		&menu.main.text.editor.x	      },
   { "main.text.editor.y",		&menu.main.text.editor.y	      },
   { "main.text.editor.width",		&menu.main.text.editor.width	      },
   { "main.text.editor.height",		&menu.main.text.editor.height	      },
   { "main.text.editor.align",		&menu.main.text.editor.align	      },
+  { "main.text.editor.font",		&menu.main.text.editor.font	      },
   { "main.text.info.x",			&menu.main.text.info.x		      },
   { "main.text.info.y",			&menu.main.text.info.y		      },
   { "main.text.info.width",		&menu.main.text.info.width	      },
   { "main.text.info.height",		&menu.main.text.info.height	      },
   { "main.text.info.align",		&menu.main.text.info.align	      },
+  { "main.text.info.font",		&menu.main.text.info.font	      },
   { "main.text.game.x",			&menu.main.text.game.x		      },
   { "main.text.game.y",			&menu.main.text.game.y		      },
   { "main.text.game.width",		&menu.main.text.game.width	      },
   { "main.text.game.height",		&menu.main.text.game.height	      },
   { "main.text.game.align",		&menu.main.text.game.align	      },
+  { "main.text.game.font",		&menu.main.text.game.font	      },
   { "main.text.setup.x",		&menu.main.text.setup.x		      },
   { "main.text.setup.y",		&menu.main.text.setup.y		      },
   { "main.text.setup.width",		&menu.main.text.setup.width	      },
   { "main.text.setup.height",		&menu.main.text.setup.height	      },
   { "main.text.setup.align",		&menu.main.text.setup.align	      },
+  { "main.text.setup.font",		&menu.main.text.setup.font	      },
   { "main.text.quit.x",			&menu.main.text.quit.x		      },
   { "main.text.quit.y",			&menu.main.text.quit.y		      },
   { "main.text.quit.width",		&menu.main.text.quit.width	      },
   { "main.text.quit.height",		&menu.main.text.quit.height	      },
   { "main.text.quit.align",		&menu.main.text.quit.align	      },
+  { "main.text.quit.font",		&menu.main.text.quit.font	      },
 
   { "main.text.current_level.x",	&menu.main.text.current_level.x	      },
   { "main.text.current_level.y",	&menu.main.text.current_level.y	      },
   { "main.text.current_level.align",	&menu.main.text.current_level.align   },
+  { "main.text.current_level.font",	&menu.main.text.current_level.font    },
   { "main.text.first_level.x",		&menu.main.text.first_level.x	      },
   { "main.text.first_level.y",		&menu.main.text.first_level.y	      },
   { "main.text.first_level.align",	&menu.main.text.first_level.align     },
+  { "main.text.first_level.font",	&menu.main.text.first_level.font      },
   { "main.text.last_level.x",		&menu.main.text.last_level.x	      },
   { "main.text.last_level.y",		&menu.main.text.last_level.y	      },
   { "main.text.last_level.align",	&menu.main.text.last_level.align      },
+  { "main.text.last_level.font",	&menu.main.text.last_level.font       },
   { "main.text.level_info_1.x",		&menu.main.text.level_info_1.x	      },
   { "main.text.level_info_1.y",		&menu.main.text.level_info_1.y	      },
   { "main.text.level_info_1.align",	&menu.main.text.level_info_1.align    },
   { "main.text.level_info_1.chars",	&menu.main.text.level_info_1.chars    },
+  { "main.text.level_info_1.font",	&menu.main.text.level_info_1.font     },
   { "main.text.level_info_2.x",		&menu.main.text.level_info_2.x	      },
   { "main.text.level_info_2.y",		&menu.main.text.level_info_2.y	      },
   { "main.text.level_info_2.align",	&menu.main.text.level_info_2.align    },
   { "main.text.level_info_2.chars",	&menu.main.text.level_info_2.chars    },
+  { "main.text.level_info_2.font",	&menu.main.text.level_info_2.font     },
+  { "main.text.level_info_2.font_header",&menu.main.text.level_info_2.font_alt},
   { "main.text.level_name.x",		&menu.main.text.level_name.x	      },
   { "main.text.level_name.y",		&menu.main.text.level_name.y	      },
   { "main.text.level_name.align",	&menu.main.text.level_name.align      },
   { "main.text.level_name.chars",	&menu.main.text.level_name.chars      },
+  { "main.text.level_name.font",	&menu.main.text.level_name.font       },
   { "main.text.level_author.x",		&menu.main.text.level_author.x	      },
   { "main.text.level_author.y",		&menu.main.text.level_author.y	      },
   { "main.text.level_author.align",	&menu.main.text.level_author.align    },
   { "main.text.level_author.chars",	&menu.main.text.level_author.chars    },
+  { "main.text.level_author.font",	&menu.main.text.level_author.font     },
   { "main.text.level_year.x",		&menu.main.text.level_year.x	      },
   { "main.text.level_year.y",		&menu.main.text.level_year.y	      },
   { "main.text.level_year.align",	&menu.main.text.level_year.align      },
   { "main.text.level_year.chars",	&menu.main.text.level_year.chars      },
+  { "main.text.level_year.font",	&menu.main.text.level_year.font       },
   { "main.text.level_imported_from.x",	&menu.main.text.level_imported_from.x },
   { "main.text.level_imported_from.y",	&menu.main.text.level_imported_from.y },
   { "main.text.level_imported_from.align",
     &menu.main.text.level_imported_from.align				      },
   { "main.text.level_imported_from.chars",
     &menu.main.text.level_imported_from.chars				      },
+  { "main.text.level_imported_from.font",
+    &menu.main.text.level_imported_from.font				      },
   { "main.text.level_imported_by.x",	&menu.main.text.level_imported_by.x   },
   { "main.text.level_imported_by.y",	&menu.main.text.level_imported_by.y   },
   { "main.text.level_imported_by.align",
     &menu.main.text.level_imported_by.align				      },
   { "main.text.level_imported_by.chars",
     &menu.main.text.level_imported_by.chars				      },
+  { "main.text.level_imported_by.font",
+    &menu.main.text.level_imported_by.font				      },
   { "main.text.level_tested_by.x",	&menu.main.text.level_tested_by.x     },
   { "main.text.level_tested_by.y",	&menu.main.text.level_tested_by.y     },
   { "main.text.level_tested_by.align",	&menu.main.text.level_tested_by.align },
   { "main.text.level_tested_by.chars",	&menu.main.text.level_tested_by.chars },
+  { "main.text.level_tested_by.font",	&menu.main.text.level_tested_by.font  },
   { "main.text.title_1.x",		&menu.main.text.title_1.x	      },
   { "main.text.title_1.y",		&menu.main.text.title_1.y	      },
   { "main.text.title_1.align",		&menu.main.text.title_1.align	      },
+  { "main.text.title_1.font",		&menu.main.text.title_1.font	      },
   { "main.text.title_2.x",		&menu.main.text.title_2.x	      },
   { "main.text.title_2.y",		&menu.main.text.title_2.y	      },
   { "main.text.title_2.align",		&menu.main.text.title_2.align	      },
+  { "main.text.title_2.font",		&menu.main.text.title_2.font	      },
   { "main.text.title_3.x",		&menu.main.text.title_3.x	      },
   { "main.text.title_3.y",		&menu.main.text.title_3.y	      },
   { "main.text.title_3.align",		&menu.main.text.title_3.align	      },
+  { "main.text.title_3.font",		&menu.main.text.title_3.font	      },
 
   { "main.input.name.x",		&menu.main.input.name.x		      },
   { "main.input.name.y",		&menu.main.input.name.y		      },
   { "main.input.name.align",		&menu.main.input.name.align	      },
+  { "main.input.name.font",		&menu.main.input.name.font	      },
 
   { "preview.x",			&preview.x			      },
   { "preview.y",			&preview.y			      },
@@ -6212,26 +6282,33 @@ struct TokenIntPtrInfo image_config_vars[] =
   { "game.panel.level.x",		&game.panel.level.x		      },
   { "game.panel.level.y",		&game.panel.level.y		      },
   { "game.panel.level.align",		&game.panel.level.align		      },
-  { "game.panel.level.digits",		&game.panel.level.chars		      },
+  { "game.panel.level.chars",		&game.panel.level.chars		      },
+  { "game.panel.level.font",		&game.panel.level.font		      },
+  { "game.panel.level.font_narrow",	&game.panel.level.font_alt	      },
   { "game.panel.gems.x",		&game.panel.gems.x		      },
   { "game.panel.gems.y",		&game.panel.gems.y		      },
   { "game.panel.gems.align",		&game.panel.gems.align		      },
-  { "game.panel.gems.digits",		&game.panel.gems.chars		      },
+  { "game.panel.gems.chars",		&game.panel.gems.chars		      },
+  { "game.panel.gems.font",		&game.panel.gems.font		      },
   { "game.panel.inventory.x",		&game.panel.inventory.x		      },
   { "game.panel.inventory.y",		&game.panel.inventory.y		      },
   { "game.panel.inventory.align",	&game.panel.inventory.align	      },
-  { "game.panel.inventory.digits",	&game.panel.inventory.chars	      },
+  { "game.panel.inventory.chars",	&game.panel.inventory.chars	      },
+  { "game.panel.inventory.font",	&game.panel.inventory.font	      },
   { "game.panel.keys.x",		&game.panel.keys.x		      },
   { "game.panel.keys.y",		&game.panel.keys.y		      },
   { "game.panel.keys.align",		&game.panel.keys.align		      },
   { "game.panel.score.x",		&game.panel.score.x		      },
   { "game.panel.score.y",		&game.panel.score.y		      },
   { "game.panel.score.align",		&game.panel.score.align		      },
-  { "game.panel.score.digits",		&game.panel.score.chars		      },
+  { "game.panel.score.chars",		&game.panel.score.chars		      },
+  { "game.panel.score.font",		&game.panel.score.font		      },
   { "game.panel.time.x",		&game.panel.time.x		      },
   { "game.panel.time.y",		&game.panel.time.y		      },
   { "game.panel.time.align",		&game.panel.time.align		      },
-  { "game.panel.time.digits",		&game.panel.time.chars		      },
+  { "game.panel.time.chars",		&game.panel.time.chars		      },
+  { "game.panel.time.font",		&game.panel.time.font		      },
+  { "game.panel.time.font_narrow",	&game.panel.time.font_alt	      },
 
   { "[player].boring_delay_fixed",	&game.player_boring_delay_fixed       },
   { "[player].boring_delay_random",	&game.player_boring_delay_random      },

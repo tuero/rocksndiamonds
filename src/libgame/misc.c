@@ -1824,20 +1824,6 @@ int get_parameter_value(char *value_raw, char *suffix, int type)
   return result;
 }
 
-int get_auto_parameter_value(char *token, char *value_raw)
-{
-  char *suffix;
-
-  if (token == NULL || value_raw == NULL)
-    return ARG_UNDEFINED_VALUE;
-
-  suffix = strrchr(token, '.');
-  if (suffix == NULL)
-    suffix = token;
-
-  return get_parameter_value(value_raw, suffix, TYPE_INTEGER);
-}
-
 struct ScreenModeInfo *get_screen_mode_from_string(char *screen_mode_string)
 {
   static struct ScreenModeInfo screen_mode;

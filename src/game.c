@@ -1290,14 +1290,14 @@ void DrawGameValue_Emeralds(int value)
   struct TextPosInfo *pos = &game.panel.gems;
   int font_nr = FONT_TEXT_2;
   int font_width = getFontWidth(font_nr);
-  int digits = pos->chars;
+  int chars = pos->chars;
 
   if (PANEL_DEACTIVATED(pos))
     return;
 
-  pos->width = digits * font_width;
+  pos->width = chars * font_width;
 
-  DrawText(PANEL_XPOS(pos), PANEL_YPOS(pos), int2str(value, digits), font_nr);
+  DrawText(PANEL_XPOS(pos), PANEL_YPOS(pos), int2str(value, chars), font_nr);
 }
 
 void DrawGameValue_Dynamite(int value)
@@ -1305,14 +1305,14 @@ void DrawGameValue_Dynamite(int value)
   struct TextPosInfo *pos = &game.panel.inventory;
   int font_nr = FONT_TEXT_2;
   int font_width = getFontWidth(font_nr);
-  int digits = pos->chars;
+  int chars = pos->chars;
 
   if (PANEL_DEACTIVATED(pos))
     return;
 
-  pos->width = digits * font_width;
+  pos->width = chars * font_width;
 
-  DrawText(PANEL_XPOS(pos), PANEL_YPOS(pos), int2str(value, digits), font_nr);
+  DrawText(PANEL_XPOS(pos), PANEL_YPOS(pos), int2str(value, chars), font_nr);
 }
 
 void DrawGameValue_Score(int value)
@@ -1320,42 +1320,42 @@ void DrawGameValue_Score(int value)
   struct TextPosInfo *pos = &game.panel.score;
   int font_nr = FONT_TEXT_2;
   int font_width = getFontWidth(font_nr);
-  int digits = pos->chars;
+  int chars = pos->chars;
 
   if (PANEL_DEACTIVATED(pos))
     return;
 
-  pos->width = digits * font_width;
+  pos->width = chars * font_width;
 
-  DrawText(PANEL_XPOS(pos), PANEL_YPOS(pos), int2str(value, digits), font_nr);
+  DrawText(PANEL_XPOS(pos), PANEL_YPOS(pos), int2str(value, chars), font_nr);
 }
 
 void DrawGameValue_Time(int value)
 {
   struct TextPosInfo *pos = &game.panel.time;
   static int last_value = -1;
-  int digits1 = 3;
-  int digits2 = 4;
-  int digits = pos->chars;
+  int chars1 = 3;
+  int chars2 = 4;
+  int chars = pos->chars;
   int font1_nr = FONT_TEXT_2;
   int font2_nr = FONT_TEXT_1;
   int font_nr = font1_nr;
-  boolean use_dynamic_digits = (digits == -1 ? TRUE : FALSE);
+  boolean use_dynamic_chars = (chars == -1 ? TRUE : FALSE);
 
   if (PANEL_DEACTIVATED(pos))
     return;
 
-  if (use_dynamic_digits)		/* use dynamic number of digits */
+  if (use_dynamic_chars)		/* use dynamic number of chars */
   {
-    digits  = (value < 1000 ? digits1  : digits2);
+    chars   = (value < 1000 ? chars1   : chars2);
     font_nr = (value < 1000 ? font1_nr : font2_nr);
   }
 
-  /* clear background if value just changed its size (dynamic digits only) */
-  if (use_dynamic_digits && (last_value < 1000) != (value < 1000))
+  /* clear background if value just changed its size (dynamic chars only) */
+  if (use_dynamic_chars && (last_value < 1000) != (value < 1000))
   {
-    int width1 = digits1 * getFontWidth(font1_nr);
-    int width2 = digits2 * getFontWidth(font2_nr);
+    int width1 = chars1 * getFontWidth(font1_nr);
+    int width2 = chars2 * getFontWidth(font2_nr);
     int max_width = MAX(width1, width2);
     int max_height = MAX(getFontHeight(font1_nr), getFontHeight(font2_nr));
 
@@ -1365,9 +1365,9 @@ void DrawGameValue_Time(int value)
 			       max_width, max_height);
   }
 
-  pos->width = digits * getFontWidth(font_nr);
+  pos->width = chars * getFontWidth(font_nr);
 
-  DrawText(PANEL_XPOS(pos), PANEL_YPOS(pos), int2str(value, digits), font_nr);
+  DrawText(PANEL_XPOS(pos), PANEL_YPOS(pos), int2str(value, chars), font_nr);
 
   last_value = value;
 }
@@ -1375,26 +1375,26 @@ void DrawGameValue_Time(int value)
 void DrawGameValue_Level(int value)
 {
   struct TextPosInfo *pos = &game.panel.level;
-  int digits1 = 2;
-  int digits2 = 3;
-  int digits = pos->chars;
+  int chars1 = 2;
+  int chars2 = 3;
+  int chars = pos->chars;
   int font1_nr = FONT_TEXT_2;
   int font2_nr = FONT_TEXT_1;
   int font_nr = font1_nr;
-  boolean use_dynamic_digits = (digits == -1 ? TRUE : FALSE);
+  boolean use_dynamic_chars = (chars == -1 ? TRUE : FALSE);
 
   if (PANEL_DEACTIVATED(pos))
     return;
 
-  if (use_dynamic_digits)		/* use dynamic number of digits */
+  if (use_dynamic_chars)		/* use dynamic number of chars */
   {
-    digits  = (level_nr < 100 ? digits1  : digits2);
+    chars   = (level_nr < 100 ? chars1   : chars2);
     font_nr = (level_nr < 100 ? font1_nr : font2_nr);
   }
 
-  pos->width = digits * getFontWidth(font_nr);
+  pos->width = chars * getFontWidth(font_nr);
 
-  DrawText(PANEL_XPOS(pos), PANEL_YPOS(pos), int2str(value, digits), font_nr);
+  DrawText(PANEL_XPOS(pos), PANEL_YPOS(pos), int2str(value, chars), font_nr);
 }
 
 void DrawGameValue_Keys(int key[MAX_NUM_KEYS])
