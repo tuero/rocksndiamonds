@@ -171,8 +171,10 @@ static int getFontBitmapID(int font_nr)
     special = game_status;
   else if (game_status == GAME_MODE_PSEUDO_TYPENAME)
     special = GFX_SPECIAL_ARG_MAIN;
+#if 0
   else if (game_status == GAME_MODE_PLAYING)
     special = GFX_SPECIAL_ARG_DOOR;
+#endif
 
   if (special != -1)
     return font_info[font_nr].special_bitmap_id[special];
@@ -232,23 +234,13 @@ void InitFontGraphicInfo()
     int graphic      = font_to_graphic[i].graphic;
     int base_graphic = font2baseimg(font_nr);
 
-    if (special >= 0 && special < NUM_SPECIAL_GFX_ARGS)
+    if (IS_SPECIAL_GFX_ARG(special))
     {
       boolean base_redefined =
 	getImageListEntryFromImageID(base_graphic)->redefined;
       boolean special_redefined =
 	getImageListEntryFromImageID(graphic)->redefined;
       boolean special_cloned = (graphic_info[graphic].clone_from != -1);
-
-#if 0
-      printf("::: %d, %d, %d / %d, %d, %d\n",
-	     font_nr, special, graphic,
-	     base_redefined, special_redefined, special_cloned);
-#endif
-
-#if 0
-      // special_cloned = 0;
-#endif
 
       /* if the base font ("font.title_1", for example) has been redefined,
       	 but not the special font ("font.title_1.LEVELS", for example), do not
@@ -275,7 +267,7 @@ void InitFontGraphicInfo()
     if (font_nr < 0)
       continue;
 
-    if (special >= 0 && special < NUM_SPECIAL_GFX_ARGS)
+    if (IS_SPECIAL_GFX_ARG(special))
     {
       font_info[font_nr].special_graphic[special] = graphic;
       font_info[font_nr].special_bitmap_id[special] = num_font_bitmaps;
@@ -283,34 +275,18 @@ void InitFontGraphicInfo()
     }
   }
 
-#if 0
-  printf("-0- T3.P: %d, %d\n",
-	 font_info[FONT_TEXT_3].special_graphic[GFX_SPECIAL_ARG_PREVIEW],
-	 font_info[FONT_TEXT_3].special_bitmap_id[GFX_SPECIAL_ARG_PREVIEW]);
-
-  printf("-0- T4.M: %d, %d\n",
-	 font_info[FONT_TEXT_4].special_graphic[GFX_SPECIAL_ARG_MAIN],
-	 font_info[FONT_TEXT_4].special_bitmap_id[GFX_SPECIAL_ARG_MAIN]);
-#endif
-
-#if 1
-  /* correct special font/graphic mapping for cloned fonts
-     (per definition only needed for static configuration) */
+  /* correct special font/graphic mapping for cloned fonts for downwards
+     compatibility of PREVIEW fonts -- this is only needed for implicit
+     redefinition of special font by redefined base font, and only if other
+     fonts are cloned from this special font (like in the "Zelda" level set) */
   for (i = 0; font_to_graphic[i].font_nr > -1; i++)
   {
     int font_nr      = font_to_graphic[i].font_nr;
     int special      = font_to_graphic[i].special;
     int graphic      = font_to_graphic[i].graphic;
-#if 0
-    int base_graphic = font2baseimg(font_nr);
-#endif
 
-    if (special >= 0 && special < NUM_SPECIAL_GFX_ARGS)
+    if (IS_SPECIAL_GFX_ARG(special))
     {
-#if 0
-      boolean base_redefined =
-	getImageListEntryFromImageID(base_graphic)->redefined;
-#endif
       boolean special_redefined =
 	getImageListEntryFromImageID(graphic)->redefined;
       boolean special_cloned = (graphic_info[graphic].clone_from != -1);
@@ -319,50 +295,24 @@ void InitFontGraphicInfo()
       {
 	int j;
 
-#if 0
-	printf(":2: %d, %d, %d / %d, %d, %d\n",
-	       font_nr, special, graphic,
-	       base_redefined, special_redefined, special_cloned);
-#endif
-
 	for (j = 0; font_to_graphic[j].font_nr > -1; j++)
 	{
 	  int font_nr2      = font_to_graphic[j].font_nr;
 	  int special2      = font_to_graphic[j].special;
 	  int graphic2      = font_to_graphic[j].graphic;
-#if 0
-	  int base_graphic2 = font2baseimg(font_nr2);
-#endif
 
-	  if (graphic2 == graphic_info[graphic].clone_from)
+	  if (IS_SPECIAL_GFX_ARG(special2) &&
+	      graphic2 == graphic_info[graphic].clone_from)
 	  {
-#if 0
-	    printf(":2.1: %d, %d, %d, %d\n",
-		   font_nr2, special2, graphic2, base_graphic2);
-#endif
-
-#if 1
 	    font_info[font_nr].special_graphic[special] =
 	      font_info[font_nr2].special_graphic[special2];
 	    font_info[font_nr].special_bitmap_id[special] =
 	      font_info[font_nr2].special_bitmap_id[special2];
-#else
-#if 1
-	    font_info[font_nr].special_graphic[special] = graphic2;
-	    font_info[font_nr].special_bitmap_id[special] =
-	      font_info[font_nr2].special_bitmap_id[special2];
-#else
-	    font_info[font_nr].special_graphic[special] = graphic2;
-	    font_info[font_nr].special_bitmap_id[special] = num_font_bitmaps;
-	    num_font_bitmaps++;
-#endif
-#endif
 	  }
 	}
       }
     }
   }
-#endif
 
   /* reset non-redefined ".active" font graphics if normal font is redefined */
   /* (this different treatment is needed because normal and active fonts are
@@ -411,24 +361,6 @@ void InitFontGraphicInfo()
       }
     }
   }
-
-#if 0
-  printf("-1- T4.M: %d, %d\n",
-	 font_info[FONT_TEXT_4].special_graphic[GFX_SPECIAL_ARG_MAIN],
-	 font_info[FONT_TEXT_4].special_bitmap_id[GFX_SPECIAL_ARG_MAIN]);
-
-  font_info[FONT_TEXT_4].special_graphic[GFX_SPECIAL_ARG_MAIN] =
-    IMG_FONT_TEXT_3;
-  font_info[FONT_TEXT_4].special_bitmap_id[GFX_SPECIAL_ARG_MAIN] =
-    FONT_TEXT_3;
-
-#if 0
-  font_info[FONT_TEXT_4].special_graphic[GFX_SPECIAL_ARG_MAIN] =
-    IMG_FONT_TEXT_3_PREVIEW;
-  font_info[FONT_TEXT_4].special_bitmap_id[GFX_SPECIAL_ARG_MAIN] =
-    FONT_TEXT_3;
-#endif
-#endif
 
   /* ---------- initialize font bitmap array ---------- */
 
@@ -480,16 +412,6 @@ void InitFontGraphicInfo()
   }
 
   InitFontInfo(font_bitmap_info, num_font_bitmaps, getFontBitmapID);
-
-#if 0
-  printf("-X- T3.P: %d, %d\n",
-	 font_info[FONT_TEXT_3].special_graphic[GFX_SPECIAL_ARG_PREVIEW],
-	 font_info[FONT_TEXT_3].special_bitmap_id[GFX_SPECIAL_ARG_PREVIEW]);
-
-  printf("-4- T4.M: %d, %d\n",
-	 font_info[FONT_TEXT_4].special_graphic[GFX_SPECIAL_ARG_MAIN],
-	 font_info[FONT_TEXT_4].special_bitmap_id[GFX_SPECIAL_ARG_MAIN]);
-#endif
 }
 
 void InitElementGraphicInfo()
@@ -988,7 +910,7 @@ void InitElementSpecialGraphicInfo()
     if (element >= MAX_NUM_ELEMENTS)
       continue;
 
-    if (special >= 0 && special < NUM_SPECIAL_GFX_ARGS)
+    if (IS_SPECIAL_GFX_ARG(special))
       element_info[element].special_graphic[special] = graphic;
   }
 

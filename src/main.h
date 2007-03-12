@@ -820,6 +820,8 @@
 
 #define IS_LOOP_SOUND(s)	(sound_info[s].loop)
 
+#define IS_SPECIAL_GFX_ARG(a)	((a) >= 0 && (a) < NUM_SPECIAL_GFX_ARGS)
+
 #define EL_CASCADE_ACTIVE(e)	(IS_EDITOR_CASCADE_INACTIVE(e) ? (e) + 1 : (e))
 #define EL_CASCADE_INACTIVE(e)	(IS_EDITOR_CASCADE_ACTIVE(e)   ? (e) - 1 : (e))
 #define EL_CASCADE_TOGGLE(e)	(IS_EDITOR_CASCADE_INACTIVE(e) ? (e) + 1 :    \

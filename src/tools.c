@@ -1838,10 +1838,6 @@ static void DrawPreviewLevelLabelExt(int mode)
     font_nr = FONT_TEXT_3;
 #endif
 
-#if 0
-  printf("??? %d, %d\n", game_status, font_nr);
-#endif
-
 #if 1
   max_len_label_text = getMaxTextLength(pos, font_nr);
 #else
@@ -1908,12 +1904,8 @@ void DrawPreviewLevel(boolean restart)
   int last_game_status = game_status;		/* save current game status */
 
 #if 0
-#if 1
-  game_status = GAME_MODE_MAIN;
-#else
   /* force PREVIEW font on preview level */
   game_status = GAME_MODE_PSEUDO_PREVIEW;
-#endif
 #endif
 
   if (restart)
@@ -2634,7 +2626,7 @@ boolean Request(char *text, unsigned int req_state)
   /* clear door drawing field */
   DrawBackground(DX, DY, DXSIZE, DYSIZE);
 
-  /* force DOOR font on preview level */
+  /* force DOOR font inside door area */
   game_status = GAME_MODE_PSEUDO_DOOR;
 
   /* write text for request */
