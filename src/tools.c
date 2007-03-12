@@ -1820,6 +1820,15 @@ static void DrawPreviewLevelLabelExt(int mode)
   struct TextPosInfo *pos = &menu.main.text.level_info_2;
   char label_text[MAX_OUTPUT_LINESIZE + 1];
   int max_len_label_text;
+#if 1
+  int font_nr = pos->font;
+  int i;
+
+  if (mode == MICROLABEL_LEVEL_AUTHOR_HEAD ||
+      mode == MICROLABEL_IMPORTED_FROM_HEAD ||
+      mode == MICROLABEL_IMPORTED_BY_HEAD)
+    font_nr = pos->font_alt;
+#else
   int font_nr = FONT_TEXT_2;
   int i;
 
@@ -1827,6 +1836,11 @@ static void DrawPreviewLevelLabelExt(int mode)
       mode == MICROLABEL_IMPORTED_FROM_HEAD ||
       mode == MICROLABEL_IMPORTED_BY_HEAD)
     font_nr = FONT_TEXT_3;
+#endif
+
+#if 0
+  printf("??? %d, %d\n", game_status, font_nr);
+#endif
 
 #if 1
   max_len_label_text = getMaxTextLength(pos, font_nr);
@@ -1893,8 +1907,14 @@ void DrawPreviewLevel(boolean restart)
   int level_ysize = lev_fieldy + (show_level_border ? 2 : 0);
   int last_game_status = game_status;		/* save current game status */
 
+#if 0
+#if 1
+  game_status = GAME_MODE_MAIN;
+#else
   /* force PREVIEW font on preview level */
   game_status = GAME_MODE_PSEUDO_PREVIEW;
+#endif
+#endif
 
   if (restart)
   {
@@ -1927,7 +1947,11 @@ void DrawPreviewLevel(boolean restart)
     {
       struct TextPosInfo *pos = &menu.main.text.level_info_1;
       char label_text[MAX_OUTPUT_LINESIZE + 1];
+#if 1
+      int font_nr = pos->font;
+#else
       int font_nr = FONT_TEXT_1;
+#endif
 #if 1
       int max_len_label_text = getMaxTextLength(pos, font_nr);
 #else
