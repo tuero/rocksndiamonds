@@ -1697,24 +1697,24 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.key_white.y
   },
   {
-    "game.panel.white_keys.x",
-    &game.panel.white_keys.x
+    "game.panel.key_white_count.x",
+    &game.panel.key_white_count.x
   },
   {
-    "game.panel.white_keys.y",
-    &game.panel.white_keys.y
+    "game.panel.key_white_count.y",
+    &game.panel.key_white_count.y
   },
   {
-    "game.panel.white_keys.align",
-    &game.panel.white_keys.align
+    "game.panel.key_white_count.align",
+    &game.panel.key_white_count.align
   },
   {
-    "game.panel.white_keys.chars",
-    &game.panel.white_keys.chars
+    "game.panel.key_white_count.chars",
+    &game.panel.key_white_count.chars
   },
   {
-    "game.panel.white_keys.font",
-    &game.panel.white_keys.font
+    "game.panel.key_white_count.font",
+    &game.panel.key_white_count.font
   },
   {
     "game.panel.shield_normal.x",
@@ -1819,6 +1819,14 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "game.panel.emc_magic_ball.y",
     &game.panel.emc_magic_ball.y
+  },
+  {
+    "game.panel.emc_magic_ball_switch.x",
+    &game.panel.emc_magic_ball_switch.x
+  },
+  {
+    "game.panel.emc_magic_ball_switch.y",
+    &game.panel.emc_magic_ball_switch.y
   },
   {
     "game.panel.emc_magic_ball_time.x",
@@ -2093,36 +2101,20 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.conveyor_belt_1.y
   },
   {
-    "game.panel.conveyor_belt_2.x",
-    &game.panel.conveyor_belt_2.x
-  },
-  {
-    "game.panel.conveyor_belt_2.y",
-    &game.panel.conveyor_belt_2.y
-  },
-  {
-    "game.panel.conveyor_belt_3.x",
-    &game.panel.conveyor_belt_3.x
-  },
-  {
-    "game.panel.conveyor_belt_3.y",
-    &game.panel.conveyor_belt_3.y
-  },
-  {
-    "game.panel.conveyor_belt_4.x",
-    &game.panel.conveyor_belt_4.x
-  },
-  {
-    "game.panel.conveyor_belt_4.y",
-    &game.panel.conveyor_belt_4.y
-  },
-  {
     "game.panel.conveyor_belt_1_switch.x",
     &game.panel.conveyor_belt_1_switch.x
   },
   {
     "game.panel.conveyor_belt_1_switch.y",
     &game.panel.conveyor_belt_1_switch.y
+  },
+  {
+    "game.panel.conveyor_belt_2.x",
+    &game.panel.conveyor_belt_2.x
+  },
+  {
+    "game.panel.conveyor_belt_2.y",
+    &game.panel.conveyor_belt_2.y
   },
   {
     "game.panel.conveyor_belt_2_switch.x",
@@ -2133,12 +2125,28 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.conveyor_belt_2_switch.y
   },
   {
+    "game.panel.conveyor_belt_3.x",
+    &game.panel.conveyor_belt_3.x
+  },
+  {
+    "game.panel.conveyor_belt_3.y",
+    &game.panel.conveyor_belt_3.y
+  },
+  {
     "game.panel.conveyor_belt_3_switch.x",
     &game.panel.conveyor_belt_3_switch.x
   },
   {
     "game.panel.conveyor_belt_3_switch.y",
     &game.panel.conveyor_belt_3_switch.y
+  },
+  {
+    "game.panel.conveyor_belt_4.x",
+    &game.panel.conveyor_belt_4.x
+  },
+  {
+    "game.panel.conveyor_belt_4.y",
+    &game.panel.conveyor_belt_4.y
   },
   {
     "game.panel.conveyor_belt_4_switch.x",
@@ -2253,52 +2261,52 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.level_author.font
   },
   {
-    "game.panel.stop.x",
-    &game.panel.stop.x
+    "game.button.stop.x",
+    &game.button.stop.x
   },
   {
-    "game.panel.stop.y",
-    &game.panel.stop.y
+    "game.button.stop.y",
+    &game.button.stop.y
   },
   {
-    "game.panel.pause.x",
-    &game.panel.pause.x
+    "game.button.pause.x",
+    &game.button.pause.x
   },
   {
-    "game.panel.pause.y",
-    &game.panel.pause.y
+    "game.button.pause.y",
+    &game.button.pause.y
   },
   {
-    "game.panel.play.x",
-    &game.panel.play.x
+    "game.button.play.x",
+    &game.button.play.x
   },
   {
-    "game.panel.play.y",
-    &game.panel.play.y
+    "game.button.play.y",
+    &game.button.play.y
   },
   {
-    "game.panel.sound_music.x",
-    &game.panel.sound_music.x
+    "game.button.sound_music.x",
+    &game.button.sound_music.x
   },
   {
-    "game.panel.sound_music.y",
-    &game.panel.sound_music.y
+    "game.button.sound_music.y",
+    &game.button.sound_music.y
   },
   {
-    "game.panel.sound_loops.x",
-    &game.panel.sound_loops.x
+    "game.button.sound_loops.x",
+    &game.button.sound_loops.x
   },
   {
-    "game.panel.sound_loops.y",
-    &game.panel.sound_loops.y
+    "game.button.sound_loops.y",
+    &game.button.sound_loops.y
   },
   {
-    "game.panel.sound_simple.x",
-    &game.panel.sound_simple.x
+    "game.button.sound_simple.x",
+    &game.button.sound_simple.x
   },
   {
-    "game.panel.sound_simple.y",
-    &game.panel.sound_simple.y
+    "game.button.sound_simple.y",
+    &game.button.sound_simple.y
   },
   {
     "[player].boring_delay_fixed",

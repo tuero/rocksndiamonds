@@ -143,228 +143,444 @@
 #define GAME_CONTROL_KEYS			3
 #define GAME_CONTROL_SCORE			4
 #define GAME_CONTROL_TIME			5
-
-
-
-#define GAME_CONTROL_LEVELS			1
-#define GAME_CONTROL_SCORES			2
-#define GAME_CONTROL_EDITOR			3
-#define GAME_CONTROL_INFO			4
-#define GAME_CONTROL_GAME			5
-#define GAME_CONTROL_SETUP			6
-#define GAME_CONTROL_QUIT			7
-#define GAME_CONTROL_PREV_LEVEL			8
-#define GAME_CONTROL_NEXT_LEVEL			9
-#define GAME_CONTROL_CURRENT_LEVEL		10
-#define GAME_CONTROL_FIRST_LEVEL		11
-#define GAME_CONTROL_LAST_LEVEL			12
-#define GAME_CONTROL_LEVEL_INFO_1		13
-#define GAME_CONTROL_LEVEL_INFO_2		14
-#define GAME_CONTROL_LEVEL_NAME			15
-#define GAME_CONTROL_LEVEL_AUTHOR		16
-#define GAME_CONTROL_LEVEL_YEAR			17
-#define GAME_CONTROL_LEVEL_IMPORTED_FROM	18
-#define GAME_CONTROL_LEVEL_IMPORTED_BY		19
-#define GAME_CONTROL_LEVEL_TESTED_BY		20
-#define GAME_CONTROL_TITLE_1			21
-#define GAME_CONTROL_TITLE_2			22
-#define GAME_CONTROL_TITLE_3			23
-
-static char str_game_text_name[10];
-static char str_game_text_current_level[10];
-static char str_game_text_first_level[10];
-static char str_game_text_last_level[10];
-
-static char *game_text_name			= str_game_text_name;
-static char *game_text_current_level		= str_game_text_current_level;
-static char *game_text_first_level		= str_game_text_first_level;
-static char *game_text_last_level		= str_game_text_last_level;
-static char *game_text_levels			= "Levelset";
-static char *game_text_scores			= "Hall Of Fame";
-static char *game_text_editor			= "Level Creator";
-static char *game_text_info			= "Info Screen";
-static char *game_text_game			= "Start Game";
-static char *game_text_setup			= "Setup";
-static char *game_text_quit			= "Quit";
-static char *game_text_level_name		= level.name;
-static char *game_text_level_author		= level.author;
-static char *game_text_level_year		= NULL;
-static char *game_text_level_imported_from	= NULL;
-static char *game_text_level_imported_by	= NULL;
-static char *game_text_level_tested_by		= NULL;
-static char *game_text_title_1			= PROGRAM_TITLE_STRING;
-static char *game_text_title_2			= PROGRAM_COPYRIGHT_STRING;
-static char *game_text_title_3			= PROGRAM_GAME_BY_STRING;
+#define GAME_CONTROL_TIME_HH			6
+#define GAME_CONTROL_TIME_MM			7
+#define GAME_CONTROL_TIME_SS			8
+#define GAME_CONTROL_DROP_NEXT_1		9
+#define GAME_CONTROL_DROP_NEXT_2		10
+#define GAME_CONTROL_DROP_NEXT_3		11
+#define GAME_CONTROL_DROP_NEXT_4		12
+#define GAME_CONTROL_DROP_NEXT_5		13
+#define GAME_CONTROL_DROP_NEXT_6		14
+#define GAME_CONTROL_DROP_NEXT_7		15
+#define GAME_CONTROL_DROP_NEXT_8		16
+#define GAME_CONTROL_EMC_KEYS			17
+#define GAME_CONTROL_KEY_1			18
+#define GAME_CONTROL_KEY_2			19
+#define GAME_CONTROL_KEY_3			20
+#define GAME_CONTROL_KEY_4			21
+#define GAME_CONTROL_KEY_5			22
+#define GAME_CONTROL_KEY_6			23
+#define GAME_CONTROL_KEY_7			24
+#define GAME_CONTROL_KEY_8			25
+#define GAME_CONTROL_KEY_WHITE			26
+#define GAME_CONTROL_KEY_WHITE_COUNT		27
+#define GAME_CONTROL_SHIELD_NORMAL		28
+#define GAME_CONTROL_SHIELD_NORMAL_TIME		29
+#define GAME_CONTROL_SHIELD_DEADLY		30
+#define GAME_CONTROL_SHIELD_DEADLY_TIME		31
+#define GAME_CONTROL_EXIT			32
+#define GAME_CONTROL_EM_EXIT			33
+#define GAME_CONTROL_SP_EXIT			34
+#define GAME_CONTROL_STEEL_EXIT			35
+#define GAME_CONTROL_EM_STEEL_EXIT		36
+#define GAME_CONTROL_EMC_MAGIC_BALL		37
+#define GAME_CONTROL_EMC_MAGIC_BALL_TIME	38
+#define GAME_CONTROL_LIGHT_SWITCH		39
+#define GAME_CONTROL_LIGHT_SWITCH_TIME		40
+#define GAME_CONTROL_TIMEGATE_SWITCH		41
+#define GAME_CONTROL_TIMEGATE_SWITCH_TIME	42
+#define GAME_CONTROL_SWITCHGATE_SWITCH		43
+#define GAME_CONTROL_EMC_LENSES			44
+#define GAME_CONTROL_EMC_LENSES_TIME		45
+#define GAME_CONTROL_EMC_MAGNIFIER		46
+#define GAME_CONTROL_EMC_MAGNIFIER_TIME		47
+#define GAME_CONTROL_BALLOON_SWITCH		48
+#define GAME_CONTROL_DYNABOMB_NUMBER		49
+#define GAME_CONTROL_DYNABOMB_SIZE		50
+#define GAME_CONTROL_DYNABOMB_POWER		51
+#define GAME_CONTROL_PENGUINS			52
+#define GAME_CONTROL_SOKOBAN_OBJECTS		53
+#define GAME_CONTROL_SOKOBAN_FIELDS		54
+#define GAME_CONTROL_ROBOT_WHEEL		55
+#define GAME_CONTROL_CONVEYOR_BELT_1		56
+#define GAME_CONTROL_CONVEYOR_BELT_1_SWITCH	57
+#define GAME_CONTROL_CONVEYOR_BELT_2		58
+#define GAME_CONTROL_CONVEYOR_BELT_2_SWITCH	59
+#define GAME_CONTROL_CONVEYOR_BELT_3		60
+#define GAME_CONTROL_CONVEYOR_BELT_3_SWITCH	61
+#define GAME_CONTROL_CONVEYOR_BELT_4		62
+#define GAME_CONTROL_CONVEYOR_BELT_4_SWITCH	63
+#define GAME_CONTROL_MAGIC_WALL			64
+#define GAME_CONTROL_MAGIC_WALL_TIME		65
+#define GAME_CONTROL_BD_MAGIC_WALL		66
+#define GAME_CONTROL_DC_MAGIC_WALL		67
+#define GAME_CONTROL_PLAYER_NAME		68
+#define GAME_CONTROL_LEVEL_NAME			69
+#define GAME_CONTROL_LEVEL_AUTHOR		70
 
 struct GameControlInfo
 {
   int nr;
 
-  struct MenuPosInfo *pos_button;
-  int button_graphic;
-
   struct TextPosInfo *pos_text;
-  char **text;
-
-  struct TextPosInfo *pos_input;
-  char **input;
+  int type;
+  void *ptr;
 };
 
 static struct GameControlInfo game_controls[] =
 {
   {
-    GAME_CONTROL_NAME,
-    &menu.game.button.name,		IMG_MENU_BUTTON,
-    &menu.game.text.name,		&game_text_name,
-    &menu.game.input.name,		&setup.player_name,
+    GAME_CONTROL_LEVEL,
+    &game.panel.level,
+    TYPE_INTEGER,
   },
   {
-    GAME_CONTROL_LEVELS,
-    &menu.game.button.levels,		IMG_MENU_BUTTON_ENTER_MENU,
-    &menu.game.text.levels,		&game_text_levels,
-    NULL,				NULL,
+    GAME_CONTROL_GEMS,
+    &game.panel.gems,
+    TYPE_INTEGER,
   },
   {
-    GAME_CONTROL_SCORES,
-    &menu.game.button.scores,		IMG_MENU_BUTTON,
-    &menu.game.text.scores,		&game_text_scores,
-    NULL,				NULL,
+    GAME_CONTROL_INVENTORY,
+    &game.panel.inventory,
+    TYPE_INTEGER,
   },
   {
-    GAME_CONTROL_EDITOR,
-    &menu.game.button.editor,		IMG_MENU_BUTTON,
-    &menu.game.text.editor,		&game_text_editor,
-    NULL,				NULL,
+    GAME_CONTROL_KEYS,
+    &game.panel.keys,
+    TYPE_INTEGER,
   },
   {
-    GAME_CONTROL_INFO,
-    &menu.game.button.info,		IMG_MENU_BUTTON_ENTER_MENU,
-    &menu.game.text.info,		&game_text_info,
-    NULL,				NULL,
+    GAME_CONTROL_SCORE,
+    &game.panel.score,
+    TYPE_INTEGER,
   },
   {
-    GAME_CONTROL_GAME,
-    &menu.game.button.game,		IMG_MENU_BUTTON,
-    &menu.game.text.game,		&game_text_game,
-    NULL,				NULL,
+    GAME_CONTROL_TIME,
+    &game.panel.time,
+    TYPE_INTEGER,
   },
   {
-    GAME_CONTROL_SETUP,
-    &menu.game.button.setup,		IMG_MENU_BUTTON_ENTER_MENU,
-    &menu.game.text.setup,		&game_text_setup,
-    NULL,				NULL,
+    GAME_CONTROL_TIME_HH,
+    &game.panel.time_hh,
+    TYPE_INTEGER,
   },
   {
-    GAME_CONTROL_QUIT,
-    &menu.game.button.quit,		IMG_MENU_BUTTON,
-    &menu.game.text.quit,		&game_text_quit,
-    NULL,				NULL,
-  },
-#if 0
-  /* (these two buttons are real gadgets) */
-  {
-    GAME_CONTROL_PREV_LEVEL,
-    &menu.game.button.prev_level,	IMG_MENU_BUTTON_PREV_LEVEL,
-    NULL,				NULL,
-    NULL,				NULL,
+    GAME_CONTROL_TIME_MM,
+    &game.panel.time_mm,
+    TYPE_INTEGER,
   },
   {
-    GAME_CONTROL_NEXT_LEVEL,
-    &menu.game.button.next_level,	IMG_MENU_BUTTON_NEXT_LEVEL,
-    NULL,				NULL,
-    NULL,				NULL,
-  },
-#endif
-  {
-    GAME_CONTROL_CURRENT_LEVEL,
-    NULL,				-1,
-    &menu.game.text.current_level,	&game_text_current_level,
-    NULL,				NULL,
+    GAME_CONTROL_TIME_SS,
+    &game.panel.time_ss,
+    TYPE_INTEGER,
   },
   {
-    GAME_CONTROL_FIRST_LEVEL,
-    NULL,				-1,
-    &menu.game.text.first_level,	&game_text_first_level,
-    NULL,				NULL,
+    GAME_CONTROL_DROP_NEXT_1,
+    &game.panel.drop_next_1,
+    TYPE_INTEGER,
   },
   {
-    GAME_CONTROL_LAST_LEVEL,
-    NULL,				-1,
-    &menu.game.text.last_level,		&game_text_last_level,
-    NULL,				NULL,
+    GAME_CONTROL_DROP_NEXT_2,
+    &game.panel.drop_next_2,
+    TYPE_INTEGER,
   },
   {
-    GAME_CONTROL_LEVEL_INFO_1,
-    NULL,				-1,
-    &menu.game.text.level_info_1,	NULL,
-    NULL,				NULL,
+    GAME_CONTROL_DROP_NEXT_3,
+    &game.panel.drop_next_3,
+    TYPE_INTEGER,
   },
   {
-    GAME_CONTROL_LEVEL_INFO_2,
-    NULL,				-1,
-    &menu.game.text.level_info_2,	NULL,
-    NULL,				NULL,
+    GAME_CONTROL_DROP_NEXT_4,
+    &game.panel.drop_next_4,
+    TYPE_INTEGER,
+  },
+  {
+    GAME_CONTROL_DROP_NEXT_5,
+    &game.panel.drop_next_5,
+    TYPE_INTEGER,
+  },
+  {
+    GAME_CONTROL_DROP_NEXT_6,
+    &game.panel.drop_next_6,
+    TYPE_INTEGER,
+  },
+  {
+    GAME_CONTROL_DROP_NEXT_7,
+    &game.panel.drop_next_7,
+    TYPE_INTEGER,
+  },
+  {
+    GAME_CONTROL_DROP_NEXT_8,
+    &game.panel.drop_next_8,
+    TYPE_INTEGER,
+  },
+  {
+    GAME_CONTROL_EMC_KEYS,
+    &game.panel.emc_keys,
+    TYPE_INTEGER,
+  },
+  {
+    GAME_CONTROL_KEY_1,
+    &game.panel.key_1,
+    TYPE_INTEGER,
+  },
+  {
+    GAME_CONTROL_KEY_2,
+    &game.panel.key_2,
+    TYPE_INTEGER,
+  },
+  {
+    GAME_CONTROL_KEY_3,
+    &game.panel.key_3,
+    TYPE_INTEGER,
+  },
+  {
+    GAME_CONTROL_KEY_4,
+    &game.panel.key_4,
+    TYPE_INTEGER,
+  },
+  {
+    GAME_CONTROL_KEY_5,
+    &game.panel.key_5,
+    TYPE_INTEGER,
+  },
+  {
+    GAME_CONTROL_KEY_6,
+    &game.panel.key_6,
+    TYPE_INTEGER,
+  },
+  {
+    GAME_CONTROL_KEY_7,
+    &game.panel.key_7,
+    TYPE_INTEGER,
+  },
+  {
+    GAME_CONTROL_KEY_8,
+    &game.panel.key_8,
+    TYPE_INTEGER,
+  },
+  {
+    GAME_CONTROL_KEY_WHITE,
+    &game.panel.key_white,
+    TYPE_INTEGER,
+  },
+  {
+    GAME_CONTROL_KEY_WHITE_COUNT,
+    &game.panel.key_white_count,
+    TYPE_INTEGER,
+  },
+  {
+    GAME_CONTROL_SHIELD_NORMAL,
+    &game.panel.shield_normal,
+    TYPE_INTEGER,
+  },
+  {
+    GAME_CONTROL_SHIELD_NORMAL_TIME,
+    &game.panel.shield_normal_time,
+    TYPE_INTEGER,
+  },
+  {
+    GAME_CONTROL_SHIELD_DEADLY,
+    &game.panel.shield_deadly,
+    TYPE_INTEGER,
+  },
+  {
+    GAME_CONTROL_SHIELD_DEADLY_TIME,
+    &game.panel.shield_deadly_time,
+    TYPE_INTEGER,
+  },
+  {
+    GAME_CONTROL_EXIT,
+    &game.panel.exit,
+    TYPE_INTEGER,
+  },
+  {
+    GAME_CONTROL_EM_EXIT,
+    &game.panel.em_exit,
+    TYPE_INTEGER,
+  },
+  {
+    GAME_CONTROL_SP_EXIT,
+    &game.panel.sp_exit,
+    TYPE_INTEGER,
+  },
+  {
+    GAME_CONTROL_STEEL_EXIT,
+    &game.panel.steel_exit,
+    TYPE_INTEGER,
+  },
+  {
+    GAME_CONTROL_EM_STEEL_EXIT,
+    &game.panel.em_steel_exit,
+    TYPE_INTEGER,
+  },
+  {
+    GAME_CONTROL_EMC_MAGIC_BALL,
+    &game.panel.emc_magic_ball,
+    TYPE_INTEGER,
+  },
+  {
+    GAME_CONTROL_EMC_MAGIC_BALL_TIME,
+    &game.panel.emc_magic_ball_time,
+    TYPE_INTEGER,
+  },
+  {
+    GAME_CONTROL_LIGHT_SWITCH,
+    &game.panel.light_switch,
+    TYPE_INTEGER,
+  },
+  {
+    GAME_CONTROL_LIGHT_SWITCH_TIME,
+    &game.panel.light_switch_time,
+    TYPE_INTEGER,
+  },
+  {
+    GAME_CONTROL_TIMEGATE_SWITCH,
+    &game.panel.timegate_switch,
+    TYPE_INTEGER,
+  },
+  {
+    GAME_CONTROL_TIMEGATE_SWITCH_TIME,
+    &game.panel.timegate_switch_time,
+    TYPE_INTEGER,
+  },
+  {
+    GAME_CONTROL_SWITCHGATE_SWITCH,
+    &game.panel.switchgate_switch,
+    TYPE_INTEGER,
+  },
+  {
+    GAME_CONTROL_EMC_LENSES,
+    &game.panel.emc_lenses,
+    TYPE_INTEGER,
+  },
+  {
+    GAME_CONTROL_EMC_LENSES_TIME,
+    &game.panel.emc_lenses_time,
+    TYPE_INTEGER,
+  },
+  {
+    GAME_CONTROL_EMC_MAGNIFIER,
+    &game.panel.emc_magnifier,
+    TYPE_INTEGER,
+  },
+  {
+    GAME_CONTROL_EMC_MAGNIFIER_TIME,
+    &game.panel.emc_magnifier_time,
+    TYPE_INTEGER,
+  },
+  {
+    GAME_CONTROL_BALLOON_SWITCH,
+    &game.panel.balloon_switch,
+    TYPE_INTEGER,
+  },
+  {
+    GAME_CONTROL_DYNABOMB_NUMBER,
+    &game.panel.dynabomb_number,
+    TYPE_INTEGER,
+  },
+  {
+    GAME_CONTROL_DYNABOMB_SIZE,
+    &game.panel.dynabomb_size,
+    TYPE_INTEGER,
+  },
+  {
+    GAME_CONTROL_DYNABOMB_POWER,
+    &game.panel.dynabomb_power,
+    TYPE_INTEGER,
+  },
+  {
+    GAME_CONTROL_PENGUINS,
+    &game.panel.penguins,
+    TYPE_INTEGER,
+  },
+  {
+    GAME_CONTROL_SOKOBAN_OBJECTS,
+    &game.panel.sokoban_objects,
+    TYPE_INTEGER,
+  },
+  {
+    GAME_CONTROL_SOKOBAN_FIELDS,
+    &game.panel.sokoban_fields,
+    TYPE_INTEGER,
+  },
+  {
+    GAME_CONTROL_ROBOT_WHEEL,
+    &game.panel.robot_wheel,
+    TYPE_INTEGER,
+  },
+  {
+    GAME_CONTROL_CONVEYOR_BELT_1,
+    &game.panel.conveyor_belt_1,
+    TYPE_INTEGER,
+  },
+  {
+    GAME_CONTROL_CONVEYOR_BELT_1_SWITCH,
+    &game.panel.conveyor_belt_1_switch,
+    TYPE_INTEGER,
+  },
+  {
+    GAME_CONTROL_CONVEYOR_BELT_2,
+    &game.panel.conveyor_belt_2,
+    TYPE_INTEGER,
+  },
+  {
+    GAME_CONTROL_CONVEYOR_BELT_2_SWITCH,
+    &game.panel.conveyor_belt_2_switch,
+    TYPE_INTEGER,
+  },
+  {
+    GAME_CONTROL_CONVEYOR_BELT_3,
+    &game.panel.conveyor_belt_3,
+    TYPE_INTEGER,
+  },
+  {
+    GAME_CONTROL_CONVEYOR_BELT_3_SWITCH,
+    &game.panel.conveyor_belt_3_switch,
+    TYPE_INTEGER,
+  },
+  {
+    GAME_CONTROL_CONVEYOR_BELT_4,
+    &game.panel.conveyor_belt_4,
+    TYPE_INTEGER,
+  },
+  {
+    GAME_CONTROL_CONVEYOR_BELT_4_SWITCH,
+    &game.panel.conveyor_belt_4_switch,
+    TYPE_INTEGER,
+  },
+  {
+    GAME_CONTROL_MAGIC_WALL,
+    &game.panel.magic_wall,
+    TYPE_INTEGER,
+  },
+  {
+    GAME_CONTROL_MAGIC_WALL_TIME,
+    &game.panel.magic_wall_time,
+    TYPE_INTEGER,
+  },
+  {
+    GAME_CONTROL_BD_MAGIC_WALL,
+    &game.panel.bd_magic_wall,
+    TYPE_INTEGER,
+  },
+  {
+    GAME_CONTROL_DC_MAGIC_WALL,
+    &game.panel.dc_magic_wall,
+    TYPE_INTEGER,
+  },
+  {
+    GAME_CONTROL_PLAYER_NAME,
+    &game.panel.player_name,
+    TYPE_INTEGER,
   },
   {
     GAME_CONTROL_LEVEL_NAME,
-    NULL,				-1,
-    &menu.game.text.level_name,		&game_text_level_name,
-    NULL,				NULL,
+    &game.panel.level_name,
+    TYPE_INTEGER,
   },
   {
     GAME_CONTROL_LEVEL_AUTHOR,
-    NULL,				-1,
-    &menu.game.text.level_author,	&game_text_level_author,
-    NULL,				NULL,
-  },
-  {
-    GAME_CONTROL_LEVEL_YEAR,
-    NULL,				-1,
-    &menu.game.text.level_year,		&game_text_level_year,
-    NULL,				NULL,
-  },
-  {
-    GAME_CONTROL_LEVEL_IMPORTED_FROM,
-    NULL,				-1,
-    &menu.game.text.level_imported_from, &game_text_level_imported_from,
-    NULL,				NULL,
-  },
-  {
-    GAME_CONTROL_LEVEL_IMPORTED_BY,
-    NULL,				-1,
-    &menu.game.text.level_imported_by,	&game_text_level_imported_by,
-    NULL,				NULL,
-  },
-  {
-    GAME_CONTROL_LEVEL_TESTED_BY,
-    NULL,				-1,
-    &menu.game.text.level_tested_by,	&game_text_level_tested_by,
-    NULL,				NULL,
-  },
-  {
-    GAME_CONTROL_TITLE_1,
-    NULL,				-1,
-    &menu.game.text.title_1,		&game_text_title_1,
-    NULL,				NULL,
-  },
-  {
-    GAME_CONTROL_TITLE_2,
-    NULL,				-1,
-    &menu.game.text.title_2,		&game_text_title_2,
-    NULL,				NULL,
-  },
-  {
-    GAME_CONTROL_TITLE_3,
-    NULL,				-1,
-    &menu.game.text.title_3,		&game_text_title_3,
-    NULL,				NULL,
+    &game.panel.level_author,
+    TYPE_INTEGER,
   },
 
   {
     -1,
-    NULL,				-1,
-    NULL,				NULL,
-    NULL,				NULL,
+    NULL,
+    -1,
+    NULL
   }
 };
 #endif
@@ -1677,11 +1893,34 @@ void DrawGameValue_Keys(int key[MAX_NUM_KEYS])
     int dst_x = PANEL_XPOS(pos) + i * MINI_TILEX;
     int dst_y = PANEL_YPOS(pos);
 
+#if 0
+    /* masked blit with tiles from half-size scaled bitmap does not work yet
+       (no mask bitmap created for these sizes after loading and scaling) --
+       solution: load without creating mask, scale, then create final mask */
+
+    BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto, src_x, src_y,
+	       MINI_TILEX, MINI_TILEY, dst_x, dst_y);
+
+    if (key[i])
+    {
+      int graphic = el2edimg(base_key_graphic + i);
+      Bitmap *src_bitmap;
+      int src_x, src_y;
+
+      getMiniGraphicSource(graphic, &src_bitmap, &src_x, &src_y);
+
+      SetClipOrigin(src_bitmap, src_bitmap->stored_clip_gc,
+		    dst_x - src_x, dst_y - src_y);
+      BlitBitmapMasked(src_bitmap, drawto, src_x, src_y, MINI_TILEX, MINI_TILEY,
+		       dst_x, dst_y);
+    }
+#else
     if (key[i])
       DrawMiniGraphicExt(drawto, dst_x, dst_y, el2edimg(base_key_graphic + i));
     else
       BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto, src_x, src_y,
 		 MINI_TILEX, MINI_TILEY, dst_x, dst_y);
+#endif
   }
 }
 

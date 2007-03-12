@@ -53,7 +53,7 @@ struct GamePanelInfo
   struct TextPosInfo key_7;
   struct TextPosInfo key_8;
   struct TextPosInfo key_white;
-  struct TextPosInfo white_keys;
+  struct TextPosInfo key_white_count;
   struct TextPosInfo shield_normal;
   struct TextPosInfo shield_normal_time;
   struct TextPosInfo shield_deadly;
@@ -64,6 +64,7 @@ struct GamePanelInfo
   struct TextPosInfo steel_exit;
   struct TextPosInfo em_steel_exit;
   struct TextPosInfo emc_magic_ball;
+  struct TextPosInfo emc_magic_ball_switch;
   struct TextPosInfo emc_magic_ball_time;
   struct TextPosInfo light_switch;
   struct TextPosInfo light_switch_time;
@@ -83,12 +84,12 @@ struct GamePanelInfo
   struct TextPosInfo sokoban_fields;
   struct TextPosInfo robot_wheel;
   struct TextPosInfo conveyor_belt_1;
-  struct TextPosInfo conveyor_belt_2;
-  struct TextPosInfo conveyor_belt_3;
-  struct TextPosInfo conveyor_belt_4;
   struct TextPosInfo conveyor_belt_1_switch;
+  struct TextPosInfo conveyor_belt_2;
   struct TextPosInfo conveyor_belt_2_switch;
+  struct TextPosInfo conveyor_belt_3;
   struct TextPosInfo conveyor_belt_3_switch;
+  struct TextPosInfo conveyor_belt_4;
   struct TextPosInfo conveyor_belt_4_switch;
   struct TextPosInfo magic_wall;
   struct TextPosInfo magic_wall_time;
@@ -97,14 +98,20 @@ struct GamePanelInfo
   struct TextPosInfo player_name;
   struct TextPosInfo level_name;
   struct TextPosInfo level_author;
-  struct TextPosInfo stop;
-  struct TextPosInfo pause;
-  struct TextPosInfo play;
-  struct TextPosInfo sound_music;
-  struct TextPosInfo sound_loops;
-  struct TextPosInfo sound_simple;
 };
+
+struct GameButtonInfo
+{
+  struct MenuPosInfo stop;
+  struct MenuPosInfo pause;
+  struct MenuPosInfo play;
+  struct MenuPosInfo sound_music;
+  struct MenuPosInfo sound_loops;
+  struct MenuPosInfo sound_simple;
+};
+
 #else
+
 struct GamePanelInfo
 {
   struct XY level;
@@ -120,6 +127,7 @@ struct GameInfo
 {
   /* values for control panel */
   struct GamePanelInfo panel;
+  struct GameButtonInfo button;
 
   /* values for engine initialization */
   int default_push_delay_fixed;
