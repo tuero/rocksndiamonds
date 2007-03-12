@@ -134,6 +134,242 @@
 #define DX_TIME			(DX + XX_TIME)
 #define DY_TIME			(DY + YY_TIME)
 
+#if 0
+/* game panel display and control definitions */
+
+#define GAME_CONTROL_LEVEL			0
+#define GAME_CONTROL_GEMS			1
+#define GAME_CONTROL_INVENTORY			2
+#define GAME_CONTROL_KEYS			3
+#define GAME_CONTROL_SCORE			4
+#define GAME_CONTROL_TIME			5
+
+
+
+#define GAME_CONTROL_LEVELS			1
+#define GAME_CONTROL_SCORES			2
+#define GAME_CONTROL_EDITOR			3
+#define GAME_CONTROL_INFO			4
+#define GAME_CONTROL_GAME			5
+#define GAME_CONTROL_SETUP			6
+#define GAME_CONTROL_QUIT			7
+#define GAME_CONTROL_PREV_LEVEL			8
+#define GAME_CONTROL_NEXT_LEVEL			9
+#define GAME_CONTROL_CURRENT_LEVEL		10
+#define GAME_CONTROL_FIRST_LEVEL		11
+#define GAME_CONTROL_LAST_LEVEL			12
+#define GAME_CONTROL_LEVEL_INFO_1		13
+#define GAME_CONTROL_LEVEL_INFO_2		14
+#define GAME_CONTROL_LEVEL_NAME			15
+#define GAME_CONTROL_LEVEL_AUTHOR		16
+#define GAME_CONTROL_LEVEL_YEAR			17
+#define GAME_CONTROL_LEVEL_IMPORTED_FROM	18
+#define GAME_CONTROL_LEVEL_IMPORTED_BY		19
+#define GAME_CONTROL_LEVEL_TESTED_BY		20
+#define GAME_CONTROL_TITLE_1			21
+#define GAME_CONTROL_TITLE_2			22
+#define GAME_CONTROL_TITLE_3			23
+
+static char str_game_text_name[10];
+static char str_game_text_current_level[10];
+static char str_game_text_first_level[10];
+static char str_game_text_last_level[10];
+
+static char *game_text_name			= str_game_text_name;
+static char *game_text_current_level		= str_game_text_current_level;
+static char *game_text_first_level		= str_game_text_first_level;
+static char *game_text_last_level		= str_game_text_last_level;
+static char *game_text_levels			= "Levelset";
+static char *game_text_scores			= "Hall Of Fame";
+static char *game_text_editor			= "Level Creator";
+static char *game_text_info			= "Info Screen";
+static char *game_text_game			= "Start Game";
+static char *game_text_setup			= "Setup";
+static char *game_text_quit			= "Quit";
+static char *game_text_level_name		= level.name;
+static char *game_text_level_author		= level.author;
+static char *game_text_level_year		= NULL;
+static char *game_text_level_imported_from	= NULL;
+static char *game_text_level_imported_by	= NULL;
+static char *game_text_level_tested_by		= NULL;
+static char *game_text_title_1			= PROGRAM_TITLE_STRING;
+static char *game_text_title_2			= PROGRAM_COPYRIGHT_STRING;
+static char *game_text_title_3			= PROGRAM_GAME_BY_STRING;
+
+struct GameControlInfo
+{
+  int nr;
+
+  struct MenuPosInfo *pos_button;
+  int button_graphic;
+
+  struct TextPosInfo *pos_text;
+  char **text;
+
+  struct TextPosInfo *pos_input;
+  char **input;
+};
+
+static struct GameControlInfo game_controls[] =
+{
+  {
+    GAME_CONTROL_NAME,
+    &menu.game.button.name,		IMG_MENU_BUTTON,
+    &menu.game.text.name,		&game_text_name,
+    &menu.game.input.name,		&setup.player_name,
+  },
+  {
+    GAME_CONTROL_LEVELS,
+    &menu.game.button.levels,		IMG_MENU_BUTTON_ENTER_MENU,
+    &menu.game.text.levels,		&game_text_levels,
+    NULL,				NULL,
+  },
+  {
+    GAME_CONTROL_SCORES,
+    &menu.game.button.scores,		IMG_MENU_BUTTON,
+    &menu.game.text.scores,		&game_text_scores,
+    NULL,				NULL,
+  },
+  {
+    GAME_CONTROL_EDITOR,
+    &menu.game.button.editor,		IMG_MENU_BUTTON,
+    &menu.game.text.editor,		&game_text_editor,
+    NULL,				NULL,
+  },
+  {
+    GAME_CONTROL_INFO,
+    &menu.game.button.info,		IMG_MENU_BUTTON_ENTER_MENU,
+    &menu.game.text.info,		&game_text_info,
+    NULL,				NULL,
+  },
+  {
+    GAME_CONTROL_GAME,
+    &menu.game.button.game,		IMG_MENU_BUTTON,
+    &menu.game.text.game,		&game_text_game,
+    NULL,				NULL,
+  },
+  {
+    GAME_CONTROL_SETUP,
+    &menu.game.button.setup,		IMG_MENU_BUTTON_ENTER_MENU,
+    &menu.game.text.setup,		&game_text_setup,
+    NULL,				NULL,
+  },
+  {
+    GAME_CONTROL_QUIT,
+    &menu.game.button.quit,		IMG_MENU_BUTTON,
+    &menu.game.text.quit,		&game_text_quit,
+    NULL,				NULL,
+  },
+#if 0
+  /* (these two buttons are real gadgets) */
+  {
+    GAME_CONTROL_PREV_LEVEL,
+    &menu.game.button.prev_level,	IMG_MENU_BUTTON_PREV_LEVEL,
+    NULL,				NULL,
+    NULL,				NULL,
+  },
+  {
+    GAME_CONTROL_NEXT_LEVEL,
+    &menu.game.button.next_level,	IMG_MENU_BUTTON_NEXT_LEVEL,
+    NULL,				NULL,
+    NULL,				NULL,
+  },
+#endif
+  {
+    GAME_CONTROL_CURRENT_LEVEL,
+    NULL,				-1,
+    &menu.game.text.current_level,	&game_text_current_level,
+    NULL,				NULL,
+  },
+  {
+    GAME_CONTROL_FIRST_LEVEL,
+    NULL,				-1,
+    &menu.game.text.first_level,	&game_text_first_level,
+    NULL,				NULL,
+  },
+  {
+    GAME_CONTROL_LAST_LEVEL,
+    NULL,				-1,
+    &menu.game.text.last_level,		&game_text_last_level,
+    NULL,				NULL,
+  },
+  {
+    GAME_CONTROL_LEVEL_INFO_1,
+    NULL,				-1,
+    &menu.game.text.level_info_1,	NULL,
+    NULL,				NULL,
+  },
+  {
+    GAME_CONTROL_LEVEL_INFO_2,
+    NULL,				-1,
+    &menu.game.text.level_info_2,	NULL,
+    NULL,				NULL,
+  },
+  {
+    GAME_CONTROL_LEVEL_NAME,
+    NULL,				-1,
+    &menu.game.text.level_name,		&game_text_level_name,
+    NULL,				NULL,
+  },
+  {
+    GAME_CONTROL_LEVEL_AUTHOR,
+    NULL,				-1,
+    &menu.game.text.level_author,	&game_text_level_author,
+    NULL,				NULL,
+  },
+  {
+    GAME_CONTROL_LEVEL_YEAR,
+    NULL,				-1,
+    &menu.game.text.level_year,		&game_text_level_year,
+    NULL,				NULL,
+  },
+  {
+    GAME_CONTROL_LEVEL_IMPORTED_FROM,
+    NULL,				-1,
+    &menu.game.text.level_imported_from, &game_text_level_imported_from,
+    NULL,				NULL,
+  },
+  {
+    GAME_CONTROL_LEVEL_IMPORTED_BY,
+    NULL,				-1,
+    &menu.game.text.level_imported_by,	&game_text_level_imported_by,
+    NULL,				NULL,
+  },
+  {
+    GAME_CONTROL_LEVEL_TESTED_BY,
+    NULL,				-1,
+    &menu.game.text.level_tested_by,	&game_text_level_tested_by,
+    NULL,				NULL,
+  },
+  {
+    GAME_CONTROL_TITLE_1,
+    NULL,				-1,
+    &menu.game.text.title_1,		&game_text_title_1,
+    NULL,				NULL,
+  },
+  {
+    GAME_CONTROL_TITLE_2,
+    NULL,				-1,
+    &menu.game.text.title_2,		&game_text_title_2,
+    NULL,				NULL,
+  },
+  {
+    GAME_CONTROL_TITLE_3,
+    NULL,				-1,
+    &menu.game.text.title_3,		&game_text_title_3,
+    NULL,				NULL,
+  },
+
+  {
+    -1,
+    NULL,				-1,
+    NULL,				NULL,
+    NULL,				NULL,
+  }
+};
+#endif
+
+
 /* values for delayed check of falling and moving elements and for collision */
 #define CHECK_DELAY_MOVING	3
 #define CHECK_DELAY_FALLING	CHECK_DELAY_MOVING
@@ -843,7 +1079,7 @@ static int playfield_scan_delta_y = 1;
 				     (y) += playfield_scan_delta_y)	\
 				for ((x) = playfield_scan_start_x;	\
 				     (x) >= 0 && (x) <= lev_fieldx - 1;	\
-				     (x) += playfield_scan_delta_x)	\
+				     (x) += playfield_scan_delta_x)
 
 #ifdef DEBUG
 void DEBUG_SetMaximumDynamite()
@@ -1288,7 +1524,11 @@ static inline void InitField_WithBug2(int x, int y, boolean init_game)
 void DrawGameValue_Emeralds(int value)
 {
   struct TextPosInfo *pos = &game.panel.gems;
+#if 1
+  int font_nr = pos->font;
+#else
   int font_nr = FONT_TEXT_2;
+#endif
   int font_width = getFontWidth(font_nr);
   int chars = pos->chars;
 
@@ -1303,7 +1543,11 @@ void DrawGameValue_Emeralds(int value)
 void DrawGameValue_Dynamite(int value)
 {
   struct TextPosInfo *pos = &game.panel.inventory;
+#if 1
+  int font_nr = pos->font;
+#else
   int font_nr = FONT_TEXT_2;
+#endif
   int font_width = getFontWidth(font_nr);
   int chars = pos->chars;
 
@@ -1318,7 +1562,11 @@ void DrawGameValue_Dynamite(int value)
 void DrawGameValue_Score(int value)
 {
   struct TextPosInfo *pos = &game.panel.score;
+#if 1
+  int font_nr = pos->font;
+#else
   int font_nr = FONT_TEXT_2;
+#endif
   int font_width = getFontWidth(font_nr);
   int chars = pos->chars;
 
@@ -1337,8 +1585,13 @@ void DrawGameValue_Time(int value)
   int chars1 = 3;
   int chars2 = 4;
   int chars = pos->chars;
+#if 1
+  int font1_nr = pos->font;
+  int font2_nr = pos->font_alt;
+#else
   int font1_nr = FONT_TEXT_2;
   int font2_nr = FONT_TEXT_1;
+#endif
   int font_nr = font1_nr;
   boolean use_dynamic_chars = (chars == -1 ? TRUE : FALSE);
 
@@ -1378,8 +1631,13 @@ void DrawGameValue_Level(int value)
   int chars1 = 2;
   int chars2 = 3;
   int chars = pos->chars;
+#if 1
+  int font1_nr = pos->font;
+  int font2_nr = pos->font_alt;
+#else
   int font1_nr = FONT_TEXT_2;
   int font2_nr = FONT_TEXT_1;
+#endif
   int font_nr = font1_nr;
   boolean use_dynamic_chars = (chars == -1 ? TRUE : FALSE);
 

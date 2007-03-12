@@ -4956,6 +4956,8 @@ struct ConfigInfo image_config[] =
   /* the following directives are not associated with an image, but
      probably make sense to be defined in "graphicsinfo.conf", too */
 
+  /* keyword to start parser: "CONFIG_VARS_START" <-- do not change! */
+
   { "titlemessage_initial_1.x",			"-1"			},
   { "titlemessage_initial_1.y",			"-1"			},
   { "titlemessage_initial_1.width",		"-1"			},
@@ -5341,9 +5343,6 @@ struct ConfigInfo image_config[] =
   { "game.panel.time.font",			"font.text_2"		},
   { "game.panel.time.font_narrow",		"font.text_1"		},
 
-#if 0
-  /* --- not yet available (start) --- */
-
   { "game.panel.time_hh.x",			"-1"			},
   { "game.panel.time_hh.y",			"-1"			},
   { "game.panel.time_hh.align",			"left"			},
@@ -5376,6 +5375,9 @@ struct ConfigInfo image_config[] =
   { "game.panel.drop_next_7.y",			"-1"			},
   { "game.panel.drop_next_8.x",			"-1"			},
   { "game.panel.drop_next_8.y",			"-1"			},
+  { "game.panel.emc_keys.x",			"-1"			},
+  { "game.panel.emc_keys.y",			"-1"			},
+  { "game.panel.emc_keys.align",		"left"			},
   { "game.panel.key_1.x",			"-1"			},
   { "game.panel.key_1.y",			"-1"			},
   { "game.panel.key_2.x",			"-1"			},
@@ -5553,24 +5555,16 @@ struct ConfigInfo image_config[] =
 
   { "game.panel.stop.x",			"-1"			},
   { "game.panel.stop.y",			"-1"			},
-
   { "game.panel.pause.x",			"-1"			},
   { "game.panel.pause.y",			"-1"			},
-
   { "game.panel.play.x",			"-1"			},
   { "game.panel.play.y",			"-1"			},
-
   { "game.panel.sound_music.x",			"-1"			},
   { "game.panel.sound_music.y",			"-1"			},
-
   { "game.panel.sound_loops.x",			"-1"			},
   { "game.panel.sound_loops.y",			"-1"			},
-
   { "game.panel.sound_simple.x",		"-1"			},
   { "game.panel.sound_simple.y",		"-1"			},
-
-  /* --- not yet available (end) --- */
-#endif
 
   { "[player].boring_delay_fixed",		"1000"			},
   { "[player].boring_delay_random",		"1000"			},

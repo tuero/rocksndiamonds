@@ -281,9 +281,9 @@ void InitFontGraphicInfo()
      fonts are cloned from this special font (like in the "Zelda" level set) */
   for (i = 0; font_to_graphic[i].font_nr > -1; i++)
   {
-    int font_nr      = font_to_graphic[i].font_nr;
-    int special      = font_to_graphic[i].special;
-    int graphic      = font_to_graphic[i].graphic;
+    int font_nr = font_to_graphic[i].font_nr;
+    int special = font_to_graphic[i].special;
+    int graphic = font_to_graphic[i].graphic;
 
     if (IS_SPECIAL_GFX_ARG(special))
     {
@@ -297,9 +297,9 @@ void InitFontGraphicInfo()
 
 	for (j = 0; font_to_graphic[j].font_nr > -1; j++)
 	{
-	  int font_nr2      = font_to_graphic[j].font_nr;
-	  int special2      = font_to_graphic[j].special;
-	  int graphic2      = font_to_graphic[j].graphic;
+	  int font_nr2 = font_to_graphic[j].font_nr;
+	  int special2 = font_to_graphic[j].special;
+	  int graphic2 = font_to_graphic[j].graphic;
 
 	  if (IS_SPECIAL_GFX_ARG(special2) &&
 	      graphic2 == graphic_info[graphic].clone_from)

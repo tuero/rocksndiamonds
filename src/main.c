@@ -5381,6 +5381,11 @@ struct SpecialSuffixInfo special_suffix_info[NUM_SPECIAL_GFX_ARGS + 1 + 1] =
   { NULL,		0,				}
 };
 
+#if 1
+
+#include "conf_var.c"	/* include auto-generated data structure definitions */
+
+#else
 struct TokenIntPtrInfo image_config_vars[] =
 {
   {
@@ -6317,6 +6322,7 @@ struct TokenIntPtrInfo image_config_vars[] =
 
   { NULL,				NULL,				      }
 };
+#endif
 
 
 /* ------------------------------------------------------------------------- */
