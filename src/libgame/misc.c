@@ -156,6 +156,11 @@ int log_2(unsigned int x)
   return e;
 }
 
+boolean getTokenValueFromString(char *string, char **token, char **value)
+{
+  return getTokenValueFromSetupLine(string, token, value);
+}
+
 
 /* ------------------------------------------------------------------------- */
 /* counter functions                                                         */

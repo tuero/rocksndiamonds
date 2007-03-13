@@ -1,3 +1,11 @@
+2007-03-14
+	* added internal ad-hoc config settings for displaying text files like
+	  title messages or "readme.txt" style level set info files:
+	  - .autowrap:      true,false (default: true)
+	  - .centered:      true,false (default: false)
+	  - .skip_comments: true,false (default: true)
+	  (the leading '.' and the separating ':' are mandatory here)
+
 2007-03-08
 	* changed some numerical limits in the level editor from 255 to 999
 

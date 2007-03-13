@@ -2027,9 +2027,9 @@ struct MenuMainTextInfo
   struct TextPosInfo setup;
   struct TextPosInfo quit;
 
-  struct TextPosInfo current_level;
   struct TextPosInfo first_level;
   struct TextPosInfo last_level;
+  struct TextPosInfo level_number;
   struct TextPosInfo level_info_1;
   struct TextPosInfo level_info_2;
   struct TextPosInfo level_name;

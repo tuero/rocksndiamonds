@@ -281,6 +281,8 @@ boolean checkCookieString(const char *, const char *);
 
 char *getFormattedSetupEntry(char *, char *);
 
+boolean getTokenValueFromSetupLine(char *, char **, char **);
+
 SetupFileList *newSetupFileList(char *, char *);
 void freeSetupFileList(SetupFileList *);
 char *getListEntry(SetupFileList *, char *);

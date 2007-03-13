@@ -1009,22 +1009,6 @@ struct TokenIntPtrInfo image_config_vars[] =
     &menu.main.text.quit.font
   },
   {
-    "main.text.current_level.x",
-    &menu.main.text.current_level.x
-  },
-  {
-    "main.text.current_level.y",
-    &menu.main.text.current_level.y
-  },
-  {
-    "main.text.current_level.align",
-    &menu.main.text.current_level.align
-  },
-  {
-    "main.text.current_level.font",
-    &menu.main.text.current_level.font
-  },
-  {
     "main.text.first_level.x",
     &menu.main.text.first_level.x
   },
@@ -1055,6 +1039,22 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "main.text.last_level.font",
     &menu.main.text.last_level.font
+  },
+  {
+    "main.text.level_number.x",
+    &menu.main.text.level_number.x
+  },
+  {
+    "main.text.level_number.y",
+    &menu.main.text.level_number.y
+  },
+  {
+    "main.text.level_number.align",
+    &menu.main.text.level_number.align
+  },
+  {
+    "main.text.level_number.font",
+    &menu.main.text.level_number.font
   },
   {
     "main.text.level_info_1.x",
@@ -1369,28 +1369,28 @@ struct TokenIntPtrInfo image_config_vars[] =
     &door_2.anim_mode
   },
   {
-    "game.panel.level.x",
-    &game.panel.level.x
+    "game.panel.level_number.x",
+    &game.panel.level_number.x
   },
   {
-    "game.panel.level.y",
-    &game.panel.level.y
+    "game.panel.level_number.y",
+    &game.panel.level_number.y
   },
   {
-    "game.panel.level.align",
-    &game.panel.level.align
+    "game.panel.level_number.align",
+    &game.panel.level_number.align
   },
   {
-    "game.panel.level.chars",
-    &game.panel.level.chars
+    "game.panel.level_number.chars",
+    &game.panel.level_number.chars
   },
   {
-    "game.panel.level.font",
-    &game.panel.level.font
+    "game.panel.level_number.font",
+    &game.panel.level_number.font
   },
   {
-    "game.panel.level.font_narrow",
-    &game.panel.level.font_alt
+    "game.panel.level_number.font_narrow",
+    &game.panel.level_number.font_alt
   },
   {
     "game.panel.gems.x",
@@ -1433,16 +1433,96 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.inventory.font
   },
   {
-    "game.panel.keys.x",
-    &game.panel.keys.x
+    "game.panel.key_1.x",
+    &game.panel.key[0].x
   },
   {
-    "game.panel.keys.y",
-    &game.panel.keys.y
+    "game.panel.key_1.y",
+    &game.panel.key[0].y
   },
   {
-    "game.panel.keys.align",
-    &game.panel.keys.align
+    "game.panel.key_2.x",
+    &game.panel.key[1].x
+  },
+  {
+    "game.panel.key_2.y",
+    &game.panel.key[1].y
+  },
+  {
+    "game.panel.key_3.x",
+    &game.panel.key[2].x
+  },
+  {
+    "game.panel.key_3.y",
+    &game.panel.key[2].y
+  },
+  {
+    "game.panel.key_4.x",
+    &game.panel.key[3].x
+  },
+  {
+    "game.panel.key_4.y",
+    &game.panel.key[3].y
+  },
+  {
+    "game.panel.key_5.x",
+    &game.panel.key[4].x
+  },
+  {
+    "game.panel.key_5.y",
+    &game.panel.key[4].y
+  },
+  {
+    "game.panel.key_6.x",
+    &game.panel.key[5].x
+  },
+  {
+    "game.panel.key_6.y",
+    &game.panel.key[5].y
+  },
+  {
+    "game.panel.key_7.x",
+    &game.panel.key[6].x
+  },
+  {
+    "game.panel.key_7.y",
+    &game.panel.key[6].y
+  },
+  {
+    "game.panel.key_8.x",
+    &game.panel.key[7].x
+  },
+  {
+    "game.panel.key_8.y",
+    &game.panel.key[7].y
+  },
+  {
+    "game.panel.key_white.x",
+    &game.panel.key_white.x
+  },
+  {
+    "game.panel.key_white.y",
+    &game.panel.key_white.y
+  },
+  {
+    "game.panel.key_white_count.x",
+    &game.panel.key_white_count.x
+  },
+  {
+    "game.panel.key_white_count.y",
+    &game.panel.key_white_count.y
+  },
+  {
+    "game.panel.key_white_count.align",
+    &game.panel.key_white_count.align
+  },
+  {
+    "game.panel.key_white_count.chars",
+    &game.panel.key_white_count.chars
+  },
+  {
+    "game.panel.key_white_count.font",
+    &game.panel.key_white_count.font
   },
   {
     "game.panel.score.x",
@@ -1611,110 +1691,6 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "game.panel.drop_next_8.y",
     &game.panel.drop_next_8.y
-  },
-  {
-    "game.panel.emc_keys.x",
-    &game.panel.emc_keys.x
-  },
-  {
-    "game.panel.emc_keys.y",
-    &game.panel.emc_keys.y
-  },
-  {
-    "game.panel.emc_keys.align",
-    &game.panel.emc_keys.align
-  },
-  {
-    "game.panel.key_1.x",
-    &game.panel.key_1.x
-  },
-  {
-    "game.panel.key_1.y",
-    &game.panel.key_1.y
-  },
-  {
-    "game.panel.key_2.x",
-    &game.panel.key_2.x
-  },
-  {
-    "game.panel.key_2.y",
-    &game.panel.key_2.y
-  },
-  {
-    "game.panel.key_3.x",
-    &game.panel.key_3.x
-  },
-  {
-    "game.panel.key_3.y",
-    &game.panel.key_3.y
-  },
-  {
-    "game.panel.key_4.x",
-    &game.panel.key_4.x
-  },
-  {
-    "game.panel.key_4.y",
-    &game.panel.key_4.y
-  },
-  {
-    "game.panel.key_5.x",
-    &game.panel.key_5.x
-  },
-  {
-    "game.panel.key_5.y",
-    &game.panel.key_5.y
-  },
-  {
-    "game.panel.key_6.x",
-    &game.panel.key_6.x
-  },
-  {
-    "game.panel.key_6.y",
-    &game.panel.key_6.y
-  },
-  {
-    "game.panel.key_7.x",
-    &game.panel.key_7.x
-  },
-  {
-    "game.panel.key_7.y",
-    &game.panel.key_7.y
-  },
-  {
-    "game.panel.key_8.x",
-    &game.panel.key_8.x
-  },
-  {
-    "game.panel.key_8.y",
-    &game.panel.key_8.y
-  },
-  {
-    "game.panel.key_white.x",
-    &game.panel.key_white.x
-  },
-  {
-    "game.panel.key_white.y",
-    &game.panel.key_white.y
-  },
-  {
-    "game.panel.key_white_count.x",
-    &game.panel.key_white_count.x
-  },
-  {
-    "game.panel.key_white_count.y",
-    &game.panel.key_white_count.y
-  },
-  {
-    "game.panel.key_white_count.align",
-    &game.panel.key_white_count.align
-  },
-  {
-    "game.panel.key_white_count.chars",
-    &game.panel.key_white_count.chars
-  },
-  {
-    "game.panel.key_white_count.font",
-    &game.panel.key_white_count.font
   },
   {
     "game.panel.shield_normal.x",

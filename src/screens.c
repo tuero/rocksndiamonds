@@ -270,9 +270,9 @@ struct TitleControlInfo title_controls[MAX_NUM_TITLE_SCREENS];
 #define MAIN_CONTROL_QUIT			7
 #define MAIN_CONTROL_PREV_LEVEL			8
 #define MAIN_CONTROL_NEXT_LEVEL			9
-#define MAIN_CONTROL_CURRENT_LEVEL		10
-#define MAIN_CONTROL_FIRST_LEVEL		11
-#define MAIN_CONTROL_LAST_LEVEL			12
+#define MAIN_CONTROL_FIRST_LEVEL		10
+#define MAIN_CONTROL_LAST_LEVEL			11
+#define MAIN_CONTROL_LEVEL_NUMBER		12
 #define MAIN_CONTROL_LEVEL_INFO_1		13
 #define MAIN_CONTROL_LEVEL_INFO_2		14
 #define MAIN_CONTROL_LEVEL_NAME			15
@@ -286,14 +286,14 @@ struct TitleControlInfo title_controls[MAX_NUM_TITLE_SCREENS];
 #define MAIN_CONTROL_TITLE_3			23
 
 static char str_main_text_name[10];
-static char str_main_text_current_level[10];
 static char str_main_text_first_level[10];
 static char str_main_text_last_level[10];
+static char str_main_text_level_number[10];
 
 static char *main_text_name			= str_main_text_name;
-static char *main_text_current_level		= str_main_text_current_level;
 static char *main_text_first_level		= str_main_text_first_level;
 static char *main_text_last_level		= str_main_text_last_level;
+static char *main_text_level_number		= str_main_text_level_number;
 static char *main_text_levels			= "Levelset";
 static char *main_text_scores			= "Hall Of Fame";
 static char *main_text_editor			= "Level Creator";
@@ -391,12 +391,6 @@ static struct MainControlInfo main_controls[] =
   },
 #endif
   {
-    MAIN_CONTROL_CURRENT_LEVEL,
-    NULL,				-1,
-    &menu.main.text.current_level,	&main_text_current_level,
-    NULL,				NULL,
-  },
-  {
     MAIN_CONTROL_FIRST_LEVEL,
     NULL,				-1,
     &menu.main.text.first_level,	&main_text_first_level,
@@ -406,6 +400,12 @@ static struct MainControlInfo main_controls[] =
     MAIN_CONTROL_LAST_LEVEL,
     NULL,				-1,
     &menu.main.text.last_level,		&main_text_last_level,
+    NULL,				NULL,
+  },
+  {
+    MAIN_CONTROL_LEVEL_NUMBER,
+    NULL,				-1,
+    &menu.main.text.level_number,	&main_text_level_number,
     NULL,				NULL,
   },
   {
@@ -577,10 +577,10 @@ static void InitializeMainControls()
   int i;
 
   /* set main control text values to dynamically determined values */
-  sprintf(main_text_name,          "%s",   local_team_mode ? "Team:" : "Name:");
-  sprintf(main_text_current_level, "%s",   int2str(level_nr, 3));
-  sprintf(main_text_first_level,   "%03d", leveldir_current->first_level);
-  sprintf(main_text_last_level,    "%03d", leveldir_current->last_level);
+  sprintf(main_text_name,         "%s",   local_team_mode ? "Team:" : "Name:");
+  sprintf(main_text_first_level,  "%03d", leveldir_current->first_level);
+  sprintf(main_text_last_level,   "%03d", leveldir_current->last_level);
+  sprintf(main_text_level_number, "%s",   int2str(level_nr, 3));
 
   main_text_level_year		= leveldir_current->year;
   main_text_level_imported_from	= leveldir_current->imported_from;
@@ -1632,7 +1632,7 @@ void HandleMainMenu_SelectLevel(int step, int direction)
 
   if (new_level_nr != old_level_nr)
   {
-    struct MainControlInfo *mci= getMainControlInfo(MAIN_CONTROL_CURRENT_LEVEL);
+    struct MainControlInfo *mci= getMainControlInfo(MAIN_CONTROL_LEVEL_NUMBER);
 
     PlaySound(SND_MENU_ITEM_SELECTING);
 

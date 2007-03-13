@@ -140,74 +140,72 @@
 #define GAME_CONTROL_LEVEL			0
 #define GAME_CONTROL_GEMS			1
 #define GAME_CONTROL_INVENTORY			2
-#define GAME_CONTROL_KEYS			3
-#define GAME_CONTROL_SCORE			4
-#define GAME_CONTROL_TIME			5
-#define GAME_CONTROL_TIME_HH			6
-#define GAME_CONTROL_TIME_MM			7
-#define GAME_CONTROL_TIME_SS			8
-#define GAME_CONTROL_DROP_NEXT_1		9
-#define GAME_CONTROL_DROP_NEXT_2		10
-#define GAME_CONTROL_DROP_NEXT_3		11
-#define GAME_CONTROL_DROP_NEXT_4		12
-#define GAME_CONTROL_DROP_NEXT_5		13
-#define GAME_CONTROL_DROP_NEXT_6		14
-#define GAME_CONTROL_DROP_NEXT_7		15
-#define GAME_CONTROL_DROP_NEXT_8		16
-#define GAME_CONTROL_EMC_KEYS			17
-#define GAME_CONTROL_KEY_1			18
-#define GAME_CONTROL_KEY_2			19
-#define GAME_CONTROL_KEY_3			20
-#define GAME_CONTROL_KEY_4			21
-#define GAME_CONTROL_KEY_5			22
-#define GAME_CONTROL_KEY_6			23
-#define GAME_CONTROL_KEY_7			24
-#define GAME_CONTROL_KEY_8			25
-#define GAME_CONTROL_KEY_WHITE			26
-#define GAME_CONTROL_KEY_WHITE_COUNT		27
-#define GAME_CONTROL_SHIELD_NORMAL		28
-#define GAME_CONTROL_SHIELD_NORMAL_TIME		29
-#define GAME_CONTROL_SHIELD_DEADLY		30
-#define GAME_CONTROL_SHIELD_DEADLY_TIME		31
-#define GAME_CONTROL_EXIT			32
-#define GAME_CONTROL_EM_EXIT			33
-#define GAME_CONTROL_SP_EXIT			34
-#define GAME_CONTROL_STEEL_EXIT			35
-#define GAME_CONTROL_EM_STEEL_EXIT		36
-#define GAME_CONTROL_EMC_MAGIC_BALL		37
-#define GAME_CONTROL_EMC_MAGIC_BALL_TIME	38
-#define GAME_CONTROL_LIGHT_SWITCH		39
-#define GAME_CONTROL_LIGHT_SWITCH_TIME		40
-#define GAME_CONTROL_TIMEGATE_SWITCH		41
-#define GAME_CONTROL_TIMEGATE_SWITCH_TIME	42
-#define GAME_CONTROL_SWITCHGATE_SWITCH		43
-#define GAME_CONTROL_EMC_LENSES			44
-#define GAME_CONTROL_EMC_LENSES_TIME		45
-#define GAME_CONTROL_EMC_MAGNIFIER		46
-#define GAME_CONTROL_EMC_MAGNIFIER_TIME		47
-#define GAME_CONTROL_BALLOON_SWITCH		48
-#define GAME_CONTROL_DYNABOMB_NUMBER		49
-#define GAME_CONTROL_DYNABOMB_SIZE		50
-#define GAME_CONTROL_DYNABOMB_POWER		51
-#define GAME_CONTROL_PENGUINS			52
-#define GAME_CONTROL_SOKOBAN_OBJECTS		53
-#define GAME_CONTROL_SOKOBAN_FIELDS		54
-#define GAME_CONTROL_ROBOT_WHEEL		55
-#define GAME_CONTROL_CONVEYOR_BELT_1		56
-#define GAME_CONTROL_CONVEYOR_BELT_1_SWITCH	57
-#define GAME_CONTROL_CONVEYOR_BELT_2		58
-#define GAME_CONTROL_CONVEYOR_BELT_2_SWITCH	59
-#define GAME_CONTROL_CONVEYOR_BELT_3		60
-#define GAME_CONTROL_CONVEYOR_BELT_3_SWITCH	61
-#define GAME_CONTROL_CONVEYOR_BELT_4		62
-#define GAME_CONTROL_CONVEYOR_BELT_4_SWITCH	63
-#define GAME_CONTROL_MAGIC_WALL			64
-#define GAME_CONTROL_MAGIC_WALL_TIME		65
-#define GAME_CONTROL_BD_MAGIC_WALL		66
-#define GAME_CONTROL_DC_MAGIC_WALL		67
-#define GAME_CONTROL_PLAYER_NAME		68
-#define GAME_CONTROL_LEVEL_NAME			69
-#define GAME_CONTROL_LEVEL_AUTHOR		70
+#define GAME_CONTROL_KEY_1			3
+#define GAME_CONTROL_KEY_2			4
+#define GAME_CONTROL_KEY_3			5
+#define GAME_CONTROL_KEY_4			6
+#define GAME_CONTROL_KEY_5			7
+#define GAME_CONTROL_KEY_6			8
+#define GAME_CONTROL_KEY_7			9
+#define GAME_CONTROL_KEY_8			10
+#define GAME_CONTROL_KEY_WHITE			11
+#define GAME_CONTROL_KEY_WHITE_COUNT		12
+#define GAME_CONTROL_SCORE			13
+#define GAME_CONTROL_TIME			14
+#define GAME_CONTROL_TIME_HH			15
+#define GAME_CONTROL_TIME_MM			16
+#define GAME_CONTROL_TIME_SS			17
+#define GAME_CONTROL_DROP_NEXT_1		18
+#define GAME_CONTROL_DROP_NEXT_2		19
+#define GAME_CONTROL_DROP_NEXT_3		20
+#define GAME_CONTROL_DROP_NEXT_4		21
+#define GAME_CONTROL_DROP_NEXT_5		22
+#define GAME_CONTROL_DROP_NEXT_6		23
+#define GAME_CONTROL_DROP_NEXT_7		24
+#define GAME_CONTROL_DROP_NEXT_8		25
+#define GAME_CONTROL_SHIELD_NORMAL		26
+#define GAME_CONTROL_SHIELD_NORMAL_TIME		27
+#define GAME_CONTROL_SHIELD_DEADLY		28
+#define GAME_CONTROL_SHIELD_DEADLY_TIME		29
+#define GAME_CONTROL_EXIT			30
+#define GAME_CONTROL_EM_EXIT			31
+#define GAME_CONTROL_SP_EXIT			32
+#define GAME_CONTROL_STEEL_EXIT			33
+#define GAME_CONTROL_EM_STEEL_EXIT		34
+#define GAME_CONTROL_EMC_MAGIC_BALL		35
+#define GAME_CONTROL_EMC_MAGIC_BALL_TIME	36
+#define GAME_CONTROL_LIGHT_SWITCH		37
+#define GAME_CONTROL_LIGHT_SWITCH_TIME		38
+#define GAME_CONTROL_TIMEGATE_SWITCH		39
+#define GAME_CONTROL_TIMEGATE_SWITCH_TIME	40
+#define GAME_CONTROL_SWITCHGATE_SWITCH		41
+#define GAME_CONTROL_EMC_LENSES			42
+#define GAME_CONTROL_EMC_LENSES_TIME		43
+#define GAME_CONTROL_EMC_MAGNIFIER		44
+#define GAME_CONTROL_EMC_MAGNIFIER_TIME		45
+#define GAME_CONTROL_BALLOON_SWITCH		46
+#define GAME_CONTROL_DYNABOMB_NUMBER		47
+#define GAME_CONTROL_DYNABOMB_SIZE		48
+#define GAME_CONTROL_DYNABOMB_POWER		49
+#define GAME_CONTROL_PENGUINS			50
+#define GAME_CONTROL_SOKOBAN_OBJECTS		51
+#define GAME_CONTROL_SOKOBAN_FIELDS		52
+#define GAME_CONTROL_ROBOT_WHEEL		53
+#define GAME_CONTROL_CONVEYOR_BELT_1		54
+#define GAME_CONTROL_CONVEYOR_BELT_1_SWITCH	55
+#define GAME_CONTROL_CONVEYOR_BELT_2		56
+#define GAME_CONTROL_CONVEYOR_BELT_2_SWITCH	57
+#define GAME_CONTROL_CONVEYOR_BELT_3		58
+#define GAME_CONTROL_CONVEYOR_BELT_3_SWITCH	59
+#define GAME_CONTROL_CONVEYOR_BELT_4		60
+#define GAME_CONTROL_CONVEYOR_BELT_4_SWITCH	61
+#define GAME_CONTROL_MAGIC_WALL			62
+#define GAME_CONTROL_MAGIC_WALL_TIME		63
+#define GAME_CONTROL_BD_MAGIC_WALL		64
+#define GAME_CONTROL_DC_MAGIC_WALL		65
+#define GAME_CONTROL_PLAYER_NAME		66
+#define GAME_CONTROL_LEVEL_NAME			67
+#define GAME_CONTROL_LEVEL_AUTHOR		68
 
 struct GameControlInfo
 {
@@ -1843,7 +1841,7 @@ void DrawGameValue_Time(int value)
 
 void DrawGameValue_Level(int value)
 {
-  struct TextPosInfo *pos = &game.panel.level;
+  struct TextPosInfo *pos = &game.panel.level_number;
   int chars1 = 2;
   int chars2 = 3;
   int chars = pos->chars;
@@ -1873,25 +1871,59 @@ void DrawGameValue_Level(int value)
 
 void DrawGameValue_Keys(int key[MAX_NUM_KEYS])
 {
+#if 0
   struct TextPosInfo *pos = &game.panel.keys;
+#endif
+#if 0
   int base_key_graphic = EL_KEY_1;
+#endif
   int i;
 
+#if 0
   if (PANEL_DEACTIVATED(pos))
     return;
+#endif
 
+#if 0
   if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
     base_key_graphic = EL_EM_KEY_1;
+#endif
 
+#if 0
   pos->width = 4 * MINI_TILEX;
+#endif
 
+#if 1
+  for (i = 0; i < MAX_NUM_KEYS; i++)
+#else
   /* currently only 4 of 8 possible keys are displayed */
   for (i = 0; i < STD_NUM_KEYS; i++)
+#endif
   {
+#if 1
+    struct TextPosInfo *pos = &game.panel.key[i];
+#endif
     int src_x = DOOR_GFX_PAGEX5 + 18;
     int src_y = DOOR_GFX_PAGEY1 + 123;
+#if 1
+    int dst_x = PANEL_XPOS(pos);
+    int dst_y = PANEL_YPOS(pos);
+#else
     int dst_x = PANEL_XPOS(pos) + i * MINI_TILEX;
     int dst_y = PANEL_YPOS(pos);
+#endif
+
+#if 1
+    int element = (i >= STD_NUM_KEYS ? EL_EMC_KEY_5 - 4 :
+		   level.game_engine_type == GAME_ENGINE_TYPE_EM ? EL_EM_KEY_1 :
+		   EL_KEY_1) + i;
+    int graphic = el2edimg(element);
+#endif
+
+#if 1
+    if (PANEL_DEACTIVATED(pos))
+      continue;
+#endif
 
 #if 0
     /* masked blit with tiles from half-size scaled bitmap does not work yet
@@ -1903,7 +1935,9 @@ void DrawGameValue_Keys(int key[MAX_NUM_KEYS])
 
     if (key[i])
     {
+#if 0
       int graphic = el2edimg(base_key_graphic + i);
+#endif
       Bitmap *src_bitmap;
       int src_x, src_y;
 
@@ -1915,11 +1949,19 @@ void DrawGameValue_Keys(int key[MAX_NUM_KEYS])
 		       dst_x, dst_y);
     }
 #else
+#if 1
+    if (key[i])
+      DrawMiniGraphicExt(drawto, dst_x, dst_y, graphic);
+    else
+      BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto, src_x, src_y,
+		 MINI_TILEX, MINI_TILEY, dst_x, dst_y);
+#else
     if (key[i])
       DrawMiniGraphicExt(drawto, dst_x, dst_y, el2edimg(base_key_graphic + i));
     else
       BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto, src_x, src_y,
 		 MINI_TILEX, MINI_TILEY, dst_x, dst_y);
+#endif
 #endif
   }
 }
@@ -14422,11 +14464,50 @@ boolean CheckEngineSnapshot()
 
 static struct
 {
-  int x, y;
+  int *x, *y;
+  int gd_x, gd_y;
   int gadget_id;
   char *infotext;
 } gamebutton_info[NUM_GAME_BUTTONS] =
 {
+#if 1
+  {
+    &game.button.stop.x,	&game.button.stop.y,
+    GAME_BUTTON_STOP_XPOS,	GAME_BUTTON_YPOS,
+    GAME_CTRL_ID_STOP,
+    "stop game"
+  },
+  {
+    &game.button.pause.x,	&game.button.pause.y,
+    GAME_BUTTON_PAUSE_XPOS,	GAME_BUTTON_YPOS,
+    GAME_CTRL_ID_PAUSE,
+    "pause game"
+  },
+  {
+    &game.button.play.x,	&game.button.play.y,
+    GAME_BUTTON_PLAY_XPOS,	GAME_BUTTON_YPOS,
+    GAME_CTRL_ID_PLAY,
+    "play game"
+  },
+  {
+    &game.button.sound_music.x,	&game.button.sound_music.y,
+    SOUND_BUTTON_MUSIC_XPOS,	SOUND_BUTTON_YPOS,
+    SOUND_CTRL_ID_MUSIC,
+    "background music on/off"
+  },
+  {
+    &game.button.sound_loops.x,	&game.button.sound_loops.y,
+    SOUND_BUTTON_LOOPS_XPOS,	SOUND_BUTTON_YPOS,
+    SOUND_CTRL_ID_LOOPS,
+    "sound loops on/off"
+  },
+  {
+    &game.button.sound_simple.x,&game.button.sound_simple.y,
+    SOUND_BUTTON_SIMPLE_XPOS,	SOUND_BUTTON_YPOS,
+    SOUND_CTRL_ID_SIMPLE,
+    "normal sounds on/off"
+  }
+#else
   {
     GAME_BUTTON_STOP_XPOS,	GAME_BUTTON_YPOS,
     GAME_CTRL_ID_STOP,
@@ -14457,6 +14538,7 @@ static struct
     SOUND_CTRL_ID_SIMPLE,
     "normal sounds on/off"
   }
+#endif
 };
 
 void CreateGameButtons()
@@ -14470,12 +14552,15 @@ void CreateGameButtons()
     int button_type;
     boolean checked;
     unsigned long event_mask;
+    int x, y;
     int gd_xoffset, gd_yoffset;
     int gd_x1, gd_x2, gd_y1, gd_y2;
     int id = i;
 
-    gd_xoffset = gamebutton_info[i].x;
-    gd_yoffset = gamebutton_info[i].y;
+    x = DX + *gamebutton_info[i].x;
+    y = DY + *gamebutton_info[i].y;
+    gd_xoffset = gamebutton_info[i].gd_x;
+    gd_yoffset = gamebutton_info[i].gd_y;
     gd_x1 = DOOR_GFX_PAGEX4 + gd_xoffset;
     gd_x2 = DOOR_GFX_PAGEX3 + gd_xoffset;
 
@@ -14503,8 +14588,13 @@ void CreateGameButtons()
 
     gi = CreateGadget(GDI_CUSTOM_ID, id,
 		      GDI_INFO_TEXT, gamebutton_info[i].infotext,
+#if 1
+		      GDI_X, x,
+		      GDI_Y, y,
+#else
 		      GDI_X, DX + gd_xoffset,
 		      GDI_Y, DY + gd_yoffset,
+#endif
 		      GDI_WIDTH, GAME_BUTTON_XSIZE,
 		      GDI_HEIGHT, GAME_BUTTON_YSIZE,
 		      GDI_TYPE, button_type,

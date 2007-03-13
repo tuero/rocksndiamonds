@@ -1610,6 +1610,156 @@ static void printSetupFileHash(SetupFileHash *hash)
 #define ALLOW_TOKEN_VALUE_SEPARATOR_BEING_WHITESPACE		1
 #define CHECK_TOKEN_VALUE_SEPARATOR__WARN_IF_MISSING		0
 
+static boolean token_value_separator_found = FALSE;
+#if CHECK_TOKEN_VALUE_SEPARATOR__WARN_IF_MISSING
+static boolean token_value_separator_warning = FALSE;
+#endif
+
+static boolean getTokenValueFromSetupLineExt(char *line,
+					     char **token_ptr, char **value_ptr,
+					     char *filename, char *line_raw,
+					     int line_nr,
+					     boolean separator_required)
+{
+  static char line_copy[MAX_LINE_LEN + 1], line_raw_copy[MAX_LINE_LEN + 1];
+  char *token, *value, *line_ptr;
+
+  /* when externally invoked via ReadTokenValueFromLine(), copy line buffers */
+  if (line_raw == NULL)
+  {
+    strncpy(line_copy, line, MAX_LINE_LEN);
+    line_copy[MAX_LINE_LEN] = '\0';
+    line = line_copy;
+
+    strcpy(line_raw_copy, line_copy);
+    line_raw = line_raw_copy;
+  }
+
+  /* cut trailing comment from input line */
+  for (line_ptr = line; *line_ptr; line_ptr++)
+  {
+    if (*line_ptr == '#')
+    {
+      *line_ptr = '\0';
+      break;
+    }
+  }
+
+  /* cut trailing whitespaces from input line */
+  for (line_ptr = &line[strlen(line)]; line_ptr >= line; line_ptr--)
+    if ((*line_ptr == ' ' || *line_ptr == '\t') && *(line_ptr + 1) == '\0')
+      *line_ptr = '\0';
+
+  /* ignore empty lines */
+  if (*line == '\0')
+    return FALSE;
+
+  /* cut leading whitespaces from token */
+  for (token = line; *token; token++)
+    if (*token != ' ' && *token != '\t')
+      break;
+
+  /* start with empty value as reliable default */
+  value = "";
+
+  token_value_separator_found = FALSE;
+
+  /* find end of token to determine start of value */
+  for (line_ptr = token; *line_ptr; line_ptr++)
+  {
+#if 1
+    /* first look for an explicit token/value separator, like ':' or '=' */
+    if (*line_ptr == ':' || *line_ptr == '=')
+#else
+    if (*line_ptr == ' ' || *line_ptr == '\t' || *line_ptr == ':')
+#endif
+    {
+      *line_ptr = '\0';			/* terminate token string */
+      value = line_ptr + 1;		/* set beginning of value */
+
+      token_value_separator_found = TRUE;
+
+      break;
+    }
+  }
+
+#if ALLOW_TOKEN_VALUE_SEPARATOR_BEING_WHITESPACE
+  /* fallback: if no token/value separator found, also allow whitespaces */
+  if (!token_value_separator_found && !separator_required)
+  {
+    for (line_ptr = token; *line_ptr; line_ptr++)
+    {
+      if (*line_ptr == ' ' || *line_ptr == '\t')
+      {
+	*line_ptr = '\0';		/* terminate token string */
+	value = line_ptr + 1;		/* set beginning of value */
+
+	token_value_separator_found = TRUE;
+
+	break;
+      }
+    }
+
+#if CHECK_TOKEN_VALUE_SEPARATOR__WARN_IF_MISSING
+    if (token_value_separator_found)
+    {
+      if (!token_value_separator_warning)
+      {
+	Error(ERR_INFO_LINE, "-");
+
+	if (filename != NULL)
+	{
+	  Error(ERR_WARN, "missing token/value separator(s) in config file:");
+	  Error(ERR_INFO, "- config file: '%s'", filename);
+	}
+	else
+	{
+	  Error(ERR_WARN, "missing token/value separator(s):");
+	}
+
+	token_value_separator_warning = TRUE;
+      }
+
+      if (filename != NULL)
+	Error(ERR_INFO, "- line %d: '%s'", line_nr, line_raw);
+      else
+	Error(ERR_INFO, "- line: '%s'", line_raw);
+    }
+#endif
+  }
+#endif
+
+  /* cut trailing whitespaces from token */
+  for (line_ptr = &token[strlen(token)]; line_ptr >= token; line_ptr--)
+    if ((*line_ptr == ' ' || *line_ptr == '\t') && *(line_ptr + 1) == '\0')
+      *line_ptr = '\0';
+
+  /* cut leading whitespaces from value */
+  for (; *value; value++)
+    if (*value != ' ' && *value != '\t')
+      break;
+
+#if 0
+  if (*value == '\0')
+    value = "true";	/* treat tokens without value as "true" */
+#endif
+
+  *token_ptr = token;
+  *value_ptr = value;
+
+  return TRUE;
+}
+
+boolean getTokenValueFromSetupLine(char *line, char **token, char **value)
+{
+  /* while the internal (old) interface does not require a token/value
+     separator (for downwards compatibility with existing files which
+     don't use them), it is mandatory for the external (new) interface */
+
+  return getTokenValueFromSetupLineExt(line, token, value, NULL, NULL, 0, TRUE);
+}
+
+#if 1
 static void loadSetupFileData(void *setup_file_data, char *filename,
 			      boolean top_recursion_level, boolean is_hash)
 {
@@ -1618,13 +1768,152 @@ static void loadSetupFileData(void *setup_file_data, char *filename,
   char *token, *value, *line_ptr;
   void *insert_ptr = NULL;
   boolean read_continued_line = FALSE;
-  boolean token_value_separator_found;
-#if CHECK_TOKEN_VALUE_SEPARATOR__WARN_IF_MISSING
-  boolean token_value_separator_warning = FALSE;
-#endif
   FILE *file;
   int line_nr = 0;
   int token_count = 0;
+
+#if CHECK_TOKEN_VALUE_SEPARATOR__WARN_IF_MISSING
+  token_value_separator_warning = FALSE;
+#endif
+
+  if (!(file = fopen(filename, MODE_READ)))
+  {
+    Error(ERR_WARN, "cannot open configuration file '%s'", filename);
+
+    return;
+  }
+
+  /* use "insert pointer" to store list end for constant insertion complexity */
+  if (!is_hash)
+    insert_ptr = setup_file_data;
+
+  /* on top invocation, create hash to mark included files (to prevent loops) */
+  if (top_recursion_level)
+    include_filename_hash = newSetupFileHash();
+
+  /* mark this file as already included (to prevent including it again) */
+  setHashEntry(include_filename_hash, getBaseNamePtr(filename), "true");
+
+  while (!feof(file))
+  {
+    /* read next line of input file */
+    if (!fgets(line, MAX_LINE_LEN, file))
+      break;
+
+    /* check if line was completely read and is terminated by line break */
+    if (strlen(line) > 0 && line[strlen(line) - 1] == '\n')
+      line_nr++;
+
+    /* cut trailing line break (this can be newline and/or carriage return) */
+    for (line_ptr = &line[strlen(line)]; line_ptr >= line; line_ptr--)
+      if ((*line_ptr == '\n' || *line_ptr == '\r') && *(line_ptr + 1) == '\0')
+	*line_ptr = '\0';
+
+    /* copy raw input line for later use (mainly debugging output) */
+    strcpy(line_raw, line);
+
+    if (read_continued_line)
+    {
+#if 0
+      /* !!! ??? WHY ??? !!! */
+      /* cut leading whitespaces from input line */
+      for (line_ptr = line; *line_ptr; line_ptr++)
+	if (*line_ptr != ' ' && *line_ptr != '\t')
+	  break;
+#endif
+
+      /* append new line to existing line, if there is enough space */
+      if (strlen(previous_line) + strlen(line_ptr) < MAX_LINE_LEN)
+	strcat(previous_line, line_ptr);
+
+      strcpy(line, previous_line);	/* copy storage buffer to line */
+
+      read_continued_line = FALSE;
+    }
+
+    /* if the last character is '\', continue at next line */
+    if (strlen(line) > 0 && line[strlen(line) - 1] == '\\')
+    {
+      line[strlen(line) - 1] = '\0';	/* cut off trailing backslash */
+      strcpy(previous_line, line);	/* copy line to storage buffer */
+
+      read_continued_line = TRUE;
+
+      continue;
+    }
+
+    if (!getTokenValueFromSetupLineExt(line, &token, &value, filename,
+				       line_raw, line_nr, FALSE))
+      continue;
+
+    if (*token)
+    {
+      if (strEqual(token, "include"))
+      {
+	if (getHashEntry(include_filename_hash, value) == NULL)
+	{
+	  char *basepath = getBasePath(filename);
+	  char *basename = getBaseName(value);
+	  char *filename_include = getPath2(basepath, basename);
+
+#if 0
+	  Error(ERR_INFO, "[including file '%s']", filename_include);
+#endif
+
+	  loadSetupFileData(setup_file_data, filename_include, FALSE, is_hash);
+
+	  free(basepath);
+	  free(basename);
+	  free(filename_include);
+	}
+	else
+	{
+	  Error(ERR_WARN, "ignoring already processed file '%s'", value);
+	}
+      }
+      else
+      {
+	if (is_hash)
+	  setHashEntry((SetupFileHash *)setup_file_data, token, value);
+	else
+	  insert_ptr = addListEntry((SetupFileList *)insert_ptr, token, value);
+
+	token_count++;
+      }
+    }
+  }
+
+  fclose(file);
+
+#if CHECK_TOKEN_VALUE_SEPARATOR__WARN_IF_MISSING
+  if (token_value_separator_warning)
+    Error(ERR_INFO_LINE, "-");
+#endif
+
+  if (token_count == 0)
+    Error(ERR_WARN, "configuration file '%s' is empty", filename);
+
+  if (top_recursion_level)
+    freeSetupFileHash(include_filename_hash);
+}
+
+#else
+
+static void loadSetupFileData(void *setup_file_data, char *filename,
+			      boolean top_recursion_level, boolean is_hash)
+{
+  static SetupFileHash *include_filename_hash = NULL;
+  char line[MAX_LINE_LEN], line_raw[MAX_LINE_LEN], previous_line[MAX_LINE_LEN];
+  char *token, *value, *line_ptr;
+  void *insert_ptr = NULL;
+  boolean read_continued_line = FALSE;
+  FILE *file;
+  int line_nr = 0;
+  int token_count = 0;
+
+#if CHECK_TOKEN_VALUE_SEPARATOR__WARN_IF_MISSING
+  token_value_separator_warning = FALSE;
+#endif
 
   if (!(file = fopen(filename, MODE_READ)))
   {
@@ -1837,6 +2126,7 @@ static void loadSetupFileData(void *setup_file_data, char *filename,
   if (top_recursion_level)
     freeSetupFileHash(include_filename_hash);
 }
+#endif
 
 void saveSetupFileHash(SetupFileHash *hash, char *filename)
 {

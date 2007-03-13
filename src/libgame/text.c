@@ -679,13 +679,59 @@ int DrawTextFromFile_OLD(int x, int y, char *filename, int font_nr,
 }
 #endif
 
+static boolean getCheckedTokenValueFromString(char *string, char **token,
+					      char **value)
+{
+  char *ptr;
+
+  if (!getTokenValueFromString(string, token, value))
+    return FALSE;
+
+  if (**token != '.')			/* token should begin with dot */
+    return FALSE;
+
+  for (ptr = *token; *ptr; ptr++)	/* token should contain no whitespace */
+    if (*ptr == ' ' || *ptr == '\t')
+      return FALSE;
+
+  for (ptr = *value; *ptr; ptr++)	/* value should contain no whitespace */
+    if (*ptr == ' ' || *ptr == '\t')
+      return FALSE;
+
+  return TRUE;
+}
+
+static void DrawTextBuffer_Flush(int x, int y, char *buffer, int font_nr,
+				 int line_length, int cut_length, int mask_mode,
+				 boolean centered, int current_line)
+{
+  int buffer_len = strlen(buffer);
+  int font_width = getFontWidth(font_nr);
+  int font_height = getFontHeight(font_nr);
+  int offset_chars = (centered ? (line_length - buffer_len) / 2 : 0);
+  int offset_xsize =
+    (centered ? font_width * (line_length - buffer_len) / 2 : 0);
+  int final_cut_length = MAX(0, cut_length - offset_chars);
+  int xx = x + offset_xsize;
+  int yy = y + current_line * font_height;
+
+  buffer[final_cut_length] = '\0';
+
+  if (mask_mode != -1)
+    DrawTextExt(drawto, xx, yy, buffer, font_nr, mask_mode);
+  else
+    DrawText(xx, yy, buffer, font_nr);
+}
+
 int DrawTextBuffer(int x, int y, char *text_buffer, int font_nr,
 		   int line_length, int cut_length, int max_lines,
 		   int mask_mode, boolean autowrap, boolean centered,
 		   boolean skip_comments)
 {
+#if 0
   int font_width = getFontWidth(font_nr);
   int font_height = getFontHeight(font_nr);
+#endif
   char buffer[line_length + 1];
   int buffer_len;
   int current_line = 0;
@@ -716,9 +762,40 @@ int DrawTextBuffer(int x, int y, char *text_buffer, int font_nr,
 	break;
     line[i] = '\0';
 
+    /* prevent 'num_line_chars' sized lines to cause additional empty line */
+    if (i == num_line_chars && *text_buffer == '\n')
+      text_buffer++;
+
     /* skip comments (lines directly beginning with '#') */
     if (line[0] == '#' && skip_comments)
+    {
+      char *token, *value;
+
+      /* try to read generic token/value pair definition after comment sign */
+      if (getCheckedTokenValueFromString(line + 1, &token, &value))
+      {
+	/* if found, flush the current buffer, if non-empty */
+	if (buffer_len > 0 && current_line < max_lines)
+	{
+	  DrawTextBuffer_Flush(x, y, buffer, font_nr, line_length, cut_length,
+			       mask_mode, centered, current_line);
+
+	  current_line++;
+
+	  buffer[0] = '\0';
+	  buffer_len = 0;
+	}
+
+	if (strEqual(token, ".autowrap"))
+	  autowrap = get_boolean_from_string(value);
+	else if (strEqual(token, ".centered"))
+	  centered = get_boolean_from_string(value);
+	else if (strEqual(token, ".skip_comments"))
+	  skip_comments = get_boolean_from_string(value);
+      }
+
       continue;
+    }
 
     /* cut trailing newline and carriage return from input line */
     for (line_ptr = line; *line_ptr; line_ptr++)
@@ -753,6 +830,7 @@ int DrawTextBuffer(int x, int y, char *text_buffer, int font_nr,
 	}
 	else
 	{
+	  /* !!! CAN NEVER HAPPEN -- CHECK + CORRECT !!! */
 	  buffer_len = line_length;
 	  strncpy(buffer, line_ptr, line_length);
 	}
@@ -765,6 +843,10 @@ int DrawTextBuffer(int x, int y, char *text_buffer, int font_nr,
 
       if (buffer_filled)
       {
+#if 1
+	DrawTextBuffer_Flush(x, y, buffer, font_nr, line_length, cut_length,
+			     mask_mode, centered, current_line);
+#else
 	int offset_chars = (centered ? (line_length - buffer_len) / 2 : 0);
 	int offset_xsize =
 	  (centered ?  font_width * (line_length - buffer_len) / 2 : 0);
@@ -778,6 +860,7 @@ int DrawTextBuffer(int x, int y, char *text_buffer, int font_nr,
 		      font_nr, mask_mode);
 	else
 	  DrawText(xx, y + current_line * font_height, buffer, font_nr);
+#endif
 
 	current_line++;
 
@@ -791,6 +874,10 @@ int DrawTextBuffer(int x, int y, char *text_buffer, int font_nr,
 
   if (buffer_len > 0 && current_line < max_lines)
   {
+#if 1
+    DrawTextBuffer_Flush(x, y, buffer, font_nr, line_length, cut_length,
+			 mask_mode, centered, current_line);
+#else
     int offset_chars = (centered ? (line_length - buffer_len) / 2 : 0);
 	int offset_xsize =
 	  (centered ?  font_width * (line_length - buffer_len) / 2 : 0);
@@ -804,6 +891,7 @@ int DrawTextBuffer(int x, int y, char *text_buffer, int font_nr,
 		  font_nr, mask_mode);
     else
       DrawText(xx, y + current_line * font_height, buffer, font_nr);
+#endif
 
     current_line++;
   }

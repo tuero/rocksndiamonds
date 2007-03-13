@@ -77,6 +77,8 @@ char *int2str(int, int);
 char *i_to_a(unsigned int);
 int log_2(unsigned int);
 
+boolean getTokenValueFromString(char *, char **, char **);
+
 void InitCounter(void);
 unsigned long Counter(void);
 void Delay(unsigned long);

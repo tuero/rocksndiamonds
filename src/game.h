@@ -25,13 +25,14 @@
 #if 1
 struct GamePanelInfo
 {
-  struct TextPosInfo level;
+  struct TextPosInfo level_number;
   struct TextPosInfo gems;
   struct TextPosInfo inventory;
-  struct TextPosInfo keys;
+  struct TextPosInfo key[MAX_NUM_KEYS];
+  struct TextPosInfo key_white;
+  struct TextPosInfo key_white_count;
   struct TextPosInfo score;
   struct TextPosInfo time;
-
   struct TextPosInfo time_hh;
   struct TextPosInfo time_mm;
   struct TextPosInfo time_ss;
@@ -43,17 +44,6 @@ struct GamePanelInfo
   struct TextPosInfo drop_next_6;
   struct TextPosInfo drop_next_7;
   struct TextPosInfo drop_next_8;
-  struct TextPosInfo emc_keys;
-  struct TextPosInfo key_1;
-  struct TextPosInfo key_2;
-  struct TextPosInfo key_3;
-  struct TextPosInfo key_4;
-  struct TextPosInfo key_5;
-  struct TextPosInfo key_6;
-  struct TextPosInfo key_7;
-  struct TextPosInfo key_8;
-  struct TextPosInfo key_white;
-  struct TextPosInfo key_white_count;
   struct TextPosInfo shield_normal;
   struct TextPosInfo shield_normal_time;
   struct TextPosInfo shield_deadly;
