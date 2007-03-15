@@ -90,8 +90,8 @@
 #if 1
 #define PANEL_OFF()		(local_player->LevelSolved_PanelOff)
 #define	PANEL_DEACTIVATED(p)	((p)->x < 0 || (p)->y < 0 || PANEL_OFF())
-#define PANEL_XPOS(p)		(DX + ALIGNED_MENU_XPOS(p))
-#define PANEL_YPOS(p)		(DY + ALIGNED_MENU_YPOS(p))
+#define PANEL_XPOS(p)		(DX + ALIGNED_TEXT_XPOS(p))
+#define PANEL_YPOS(p)		(DY + ALIGNED_TEXT_YPOS(p))
 #else
 #define	PANEL_DEACTIVATED(p)	((p).x < 0 || (p).y < 0)
 #define PANEL_XPOS(p)		(ALIGNED_XPOS((p).x, (p).width, (p).align))

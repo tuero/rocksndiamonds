@@ -210,8 +210,8 @@
 
 #define ALIGNED_XPOS(x,w,a)	((a) == ALIGN_CENTER ? (x) - (w) / 2 :	\
 				 (a) == ALIGN_RIGHT  ? (x) - (w) : (x))
-#define ALIGNED_MENU_XPOS(p)	ALIGNED_XPOS((p)->x, (p)->width, (p)->align)
-#define ALIGNED_MENU_YPOS(p)	((p)->y)
+#define ALIGNED_TEXT_XPOS(p)	ALIGNED_XPOS((p)->x, (p)->width, (p)->align)
+#define ALIGNED_TEXT_YPOS(p)	((p)->y)
 
 /* values for redraw_mask */
 #define REDRAW_NONE		(0)

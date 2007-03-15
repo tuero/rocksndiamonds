@@ -1760,8 +1760,8 @@ boolean getTokenValueFromSetupLine(char *line, char **token, char **value)
 }
 
 #if 1
-static void loadSetupFileData(void *setup_file_data, char *filename,
-			      boolean top_recursion_level, boolean is_hash)
+static boolean loadSetupFileData(void *setup_file_data, char *filename,
+				 boolean top_recursion_level, boolean is_hash)
 {
   static SetupFileHash *include_filename_hash = NULL;
   char line[MAX_LINE_LEN], line_raw[MAX_LINE_LEN], previous_line[MAX_LINE_LEN];
@@ -1780,7 +1780,7 @@ static void loadSetupFileData(void *setup_file_data, char *filename,
   {
     Error(ERR_WARN, "cannot open configuration file '%s'", filename);
 
-    return;
+    return FALSE;
   }
 
   /* use "insert pointer" to store list end for constant insertion complexity */
@@ -1895,12 +1895,14 @@ static void loadSetupFileData(void *setup_file_data, char *filename,
 
   if (top_recursion_level)
     freeSetupFileHash(include_filename_hash);
+
+  return TRUE;
 }
 
 #else
 
-static void loadSetupFileData(void *setup_file_data, char *filename,
-			      boolean top_recursion_level, boolean is_hash)
+static boolean loadSetupFileData(void *setup_file_data, char *filename,
+				 boolean top_recursion_level, boolean is_hash)
 {
   static SetupFileHash *include_filename_hash = NULL;
   char line[MAX_LINE_LEN], line_raw[MAX_LINE_LEN], previous_line[MAX_LINE_LEN];
@@ -1919,7 +1921,7 @@ static void loadSetupFileData(void *setup_file_data, char *filename,
   {
     Error(ERR_WARN, "cannot open configuration file '%s'", filename);
 
-    return;
+    return FALSE;
   }
 
   /* use "insert pointer" to store list end for constant insertion complexity */
@@ -2125,6 +2127,8 @@ static void loadSetupFileData(void *setup_file_data, char *filename,
 
   if (top_recursion_level)
     freeSetupFileHash(include_filename_hash);
+
+  return TRUE;
 }
 #endif
 
@@ -2154,7 +2158,12 @@ SetupFileList *loadSetupFileList(char *filename)
   SetupFileList *setup_file_list = newSetupFileList("", "");
   SetupFileList *first_valid_list_entry;
 
-  loadSetupFileData(setup_file_list, filename, TRUE, FALSE);
+  if (!loadSetupFileData(setup_file_list, filename, TRUE, FALSE))
+  {
+    freeSetupFileList(setup_file_list);
+
+    return NULL;
+  }
 
   first_valid_list_entry = setup_file_list->next;
 
@@ -2169,7 +2178,12 @@ SetupFileHash *loadSetupFileHash(char *filename)
 {
   SetupFileHash *setup_file_hash = newSetupFileHash();
 
-  loadSetupFileData(setup_file_hash, filename, TRUE, TRUE);
+  if (!loadSetupFileData(setup_file_hash, filename, TRUE, TRUE))
+  {
+    freeSetupFileHash(setup_file_hash);
+
+    return NULL;
+  }
 
   return setup_file_hash;
 }

@@ -504,6 +504,8 @@ static int compareTitleControlInfo(const void *object1, const void *object2)
     compare_result = (tci1->initial ? -1 : +1);
   else if (tci1->sort_priority != tci2->sort_priority)
     compare_result = tci1->sort_priority - tci2->sort_priority;
+  else if (tci1->is_image != tci2->is_image)
+    compare_result = (tci1->is_image ? -1 : +1);
   else
     compare_result = tci1->local_nr - tci2->local_nr;
 
@@ -734,8 +736,8 @@ static void DrawCursorAndText_Main_Ext(int nr, boolean active_text,
       if (visibleTextPos(pos_text) && text != NULL)
       {
 	struct TextPosInfo *pos = pos_text;
-	int x = mSX + ALIGNED_MENU_XPOS(pos);
-	int y = mSY + ALIGNED_MENU_YPOS(pos);
+	int x = mSX + ALIGNED_TEXT_XPOS(pos);
+	int y = mSY + ALIGNED_TEXT_YPOS(pos);
 
 #if 1
 	/* (check why/if this is needed) */
@@ -747,8 +749,8 @@ static void DrawCursorAndText_Main_Ext(int nr, boolean active_text,
       if (visibleTextPos(pos_input) && input != NULL)
       {
 	struct TextPosInfo *pos = pos_input;
-	int x = mSX + ALIGNED_MENU_XPOS(pos);
-	int y = mSY + ALIGNED_MENU_YPOS(pos);
+	int x = mSX + ALIGNED_TEXT_XPOS(pos);
+	int y = mSY + ALIGNED_TEXT_YPOS(pos);
 
 #if 1
 	/* (check why/if this is needed) */
@@ -788,8 +790,8 @@ static boolean insideMenuPosRect(struct MenuPosInfo *rect, int x, int y)
   if (rect == NULL)
     return FALSE;
 
-  int rect_x = ALIGNED_MENU_XPOS(rect);
-  int rect_y = ALIGNED_MENU_YPOS(rect);
+  int rect_x = ALIGNED_TEXT_XPOS(rect);
+  int rect_y = ALIGNED_TEXT_YPOS(rect);
 
   return (x >= rect_x && x < rect_x + rect->width &&
 	  y >= rect_y && y < rect_y + rect->height);
@@ -800,8 +802,8 @@ static boolean insideTextPosRect(struct TextPosInfo *rect, int x, int y)
   if (rect == NULL)
     return FALSE;
 
-  int rect_x = ALIGNED_MENU_XPOS(rect);
-  int rect_y = ALIGNED_MENU_YPOS(rect);
+  int rect_x = ALIGNED_TEXT_XPOS(rect);
+  int rect_y = ALIGNED_TEXT_YPOS(rect);
 
   return (x >= rect_x && x < rect_x + rect->width &&
 	  y >= rect_y && y < rect_y + rect->height);
@@ -956,6 +958,7 @@ void DrawTitleScreenImage(int nr, boolean initial)
 void DrawTitleScreenMessage(int nr, boolean initial)
 {
   char *filename = getLevelSetTitleMessageFilename(nr, initial);
+  struct TitleMessageInfo *tmi = getTitleMessageInfo(nr, initial);
   int font_nr = FONT_TEXT_1;
   int font_width;
   int font_height;
@@ -984,7 +987,8 @@ void DrawTitleScreenMessage(int nr, boolean initial)
   max_lines_per_screen = (WIN_YSIZE - pad_y) / font_height - 1;
 
   DrawTextFile(sx, sy, filename, font_nr, max_chars_per_line, -1,
-	       max_lines_per_screen, -1, FALSE, FALSE, FALSE);
+	       max_lines_per_screen, -1, tmi->autowrap, tmi->centered,
+	       tmi->skip_comments);
 
   game_status = last_game_status;	/* restore current game status */
 }
@@ -3091,23 +3095,66 @@ void HandleInfoScreen_Version(int button)
 
 void DrawInfoScreen_LevelSet()
 {
+  struct TitleMessageInfo *tmi = &readme;
   int ystart1 = mSY - SY + 100;
   int ystart2 = mSY - SY + 150;
   int ybottom = mSY - SY + SYSIZE - 20;
   char *filename = getLevelSetInfoFilename();
 #if 1
+#if 1
+  int font_nr = tmi->font;
+#else
   int font_nr = FONT_INFO_LEVELSET;
+#endif
 #else
   int font_nr = FONT_LEVEL_NUMBER;
 #endif
+#if 0
   int font_width = getFontWidth(font_nr);
   int font_height = getFontHeight(font_nr);
+#endif
+#if 1
+#if 0
+  int sx = mSX + ALIGNED_TEXT_XPOS(tmi);
+  int sy = mSY + ALIGNED_TEXT_YPOS(tmi);
+#endif
+#if 0
+  int width  = tmi->width;
+  int height = tmi->height;
+#endif
+#else
   int pad_x = 32;
   int pad_y = 150;
   int sx = mSX + pad_x;
   int sy = mSY + pad_y;
-  int max_chars_per_line = (SXSIZE - 2 * pad_x) / font_width;
-  int max_lines_per_screen = (SYSIZE - pad_y) / font_height - 1;
+  int width = SXSIZE - 2 * pad_x;
+  int height = SYSIZE - pad_y;
+#endif
+#if 1
+#if 0
+  int max_chars = tmi->chars;
+  int max_lines = tmi->lines;
+#endif
+#else
+  int max_chars_per_line = width / font_width;
+#if 1
+  int max_lines_per_screen = height / font_height;
+#else
+  int max_lines_per_screen = height / font_height - 1;	/* minus footer line */
+#endif
+#endif
+
+  /* if chars set to "-1", automatically determine by text and font width */
+  if (tmi->chars == -1)
+    tmi->chars = tmi->width / getFontWidth(font_nr);
+  else
+    tmi->width = tmi->chars * getFontWidth(font_nr);
+
+  /* if lines set to "-1", automatically determine by text and font height */
+  if (tmi->lines == -1)
+    tmi->lines = tmi->height / getFontHeight(font_nr);
+  else
+    tmi->height = tmi->lines * getFontHeight(font_nr);
 
   SetMainBackgroundImageIfDefined(IMG_BACKGROUND_INFO_LEVELSET);
 
@@ -3122,8 +3169,9 @@ void DrawInfoScreen_LevelSet()
 		    "Press any key or button for info menu");
 
   if (filename != NULL)
-    DrawTextFile(sx, sy, filename, font_nr, max_chars_per_line, -1,
-		 max_lines_per_screen, -1, TRUE, FALSE, TRUE);
+    DrawTextFile(mSX + ALIGNED_TEXT_XPOS(tmi), mSY + ALIGNED_TEXT_YPOS(tmi),
+		 filename, font_nr, tmi->chars, -1, tmi->lines, -1,
+		 tmi->autowrap, tmi->centered, tmi->skip_comments);
   else
     DrawTextSCentered(ystart2, FONT_TEXT_2,
 		      "No information for this level set.");
@@ -3231,8 +3279,8 @@ void HandleTypeName(int newxpos, Key key)
   struct MainControlInfo *mci = getMainControlInfo(MAIN_CONTROL_NAME);
 #if 1
   struct TextPosInfo *pos = mci->pos_input;
-  int startx = mSX + ALIGNED_MENU_XPOS(pos);
-  int starty = mSY + ALIGNED_MENU_YPOS(pos);
+  int startx = mSX + ALIGNED_TEXT_XPOS(pos);
+  int starty = mSY + ALIGNED_TEXT_YPOS(pos);
 #endif
 #if 1
   static int xpos = 0;
@@ -3267,7 +3315,7 @@ void HandleTypeName(int newxpos, Key key)
 #if 0
     /* add one character width for added cursor character */
     pos->width += font_width;
-    startx = mSX + ALIGNED_MENU_XPOS(pos);
+    startx = mSX + ALIGNED_TEXT_XPOS(pos);
 
     DrawText(startx, starty, setup.player_name, font_active_nr);
     DrawText(startx + xpos * font_width, starty, "_", font_active_nr);
@@ -3283,7 +3331,7 @@ void HandleTypeName(int newxpos, Key key)
 #if 0
     /* add one character width for added name text character */
     pos->width += font_width;
-    startx = mSX + ALIGNED_MENU_XPOS(pos);
+    startx = mSX + ALIGNED_TEXT_XPOS(pos);
 
     DrawText(startx, starty, setup.player_name, font_active_nr);
     DrawText(startx + xpos * font_width, starty, "_", font_active_nr);
@@ -3298,7 +3346,7 @@ void HandleTypeName(int newxpos, Key key)
 #if 0
     /* remove one character width for removed name text character */
     pos->width -= font_width;
-    startx = mSX + ALIGNED_MENU_XPOS(pos);
+    startx = mSX + ALIGNED_TEXT_XPOS(pos);
 
     DrawText(startx, starty, setup.player_name, font_active_nr);
     DrawText(startx + xpos * font_width, starty, "_ ", font_active_nr);
@@ -3309,7 +3357,7 @@ void HandleTypeName(int newxpos, Key key)
 #if 0
     /* remove one character width for removed cursor text character */
     pos->width -= font_width;
-    startx = mSX + ALIGNED_MENU_XPOS(pos);
+    startx = mSX + ALIGNED_TEXT_XPOS(pos);
 
     DrawText(startx, starty, setup.player_name, font_nr);
     DrawText(startx + xpos * font_width, starty, " ", font_active_nr);
@@ -3333,7 +3381,7 @@ void HandleTypeName(int newxpos, Key key)
   if (is_active)
   {
     pos->width = (strlen(setup.player_name) + 1) * font_width;
-    startx = mSX + ALIGNED_MENU_XPOS(pos);
+    startx = mSX + ALIGNED_TEXT_XPOS(pos);
 
     DrawText(startx, starty, setup.player_name, font_active_nr);
     DrawText(startx + xpos * font_width, starty, "_", font_active_nr);
@@ -3341,7 +3389,7 @@ void HandleTypeName(int newxpos, Key key)
   else
   {
     pos->width = strlen(setup.player_name) * font_width;
-    startx = mSX + ALIGNED_MENU_XPOS(pos);
+    startx = mSX + ALIGNED_TEXT_XPOS(pos);
 
     DrawText(startx, starty, setup.player_name, font_nr);
   }

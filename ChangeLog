@@ -1,10 +1,34 @@
 2007-03-14
+	* added full configurability of "readme.txt" screen appearance:
+	  - readme.x:             <left position used with alignment>
+	  - readme.y:             <top position>
+	  - readme.width:         <maximim text width in pixels>
+	  - readme.height:        <maximum text height in pixels>
+	  - readme.chars:         <maximum number of chars per line>
+	  - readme.lines:         <maximum number of lines displayed>
+	  - readme.align:         left,center,right (default: center)
+	  - readme.font:          font name
+	  - readme.autowrap:      true,false (default: true)
+	  - readme.centered:      true,false (default: false)
+	  - readme.skip_comments: true,false (default: true)
+	  - readme.sort_priority: (currently not used)
+	  when "readme.chars" and/or "readme.lines" is set to "-1" (this is the
+	  default), they are automatically determined from "readme.width" and
+	  "readme.height" accordingly; when they are not "-1", they have
+	  precedence over "readme.width" and "readme.height"
 	* added internal ad-hoc config settings for displaying text files like
 	  title messages or "readme.txt" style level set info files:
-	  - .autowrap:      true,false (default: true)
-	  - .centered:      true,false (default: false)
-	  - .skip_comments: true,false (default: true)
-	  (the leading '.' and the separating ':' are mandatory here)
+	  - .autowrap:      true,false (default: value of readme.autowrap)
+	  - .centered:      true,false (default: value of readme.autowrap)
+	  - .skip_comments: true,false (default: value of readme.autowrap)
+	  (the leading '.' and the separating ':' are mandatory here); to use
+	  these ad-hoc settings, they have to be written inside a comment, like
+	  "# .autowrap: false" or "# .centered: true"; these settings then
+	  override the above global settings (they can even be used more than
+	  once, like "# .centered: true", then some text that should be drawn
+	  centered, then "# .centered: false" to go back to non-centered text;
+	  only ".skip_comments" can not be used after a ".skip_comments: false"
+	  again, as this generally disables detecting comments at all)
 
 2007-03-08
 	* changed some numerical limits in the level editor from 255 to 999

@@ -753,7 +753,11 @@ int DrawTextBuffer(int x, int y, char *text_buffer, int font_nr,
     char line[MAX_LINE_LEN + 1];
     char *line_ptr;
     boolean last_line_was_empty = TRUE;
+#if 1
+    int num_line_chars = MAX_LINE_LEN;
+#else
     int num_line_chars = (autowrap ? MAX_LINE_LEN : line_length);
+#endif
     int i;
 
     /* copy next line from text buffer to line buffer (nearly fgets() style) */
@@ -830,7 +834,6 @@ int DrawTextBuffer(int x, int y, char *text_buffer, int font_nr,
 	}
 	else
 	{
-	  /* !!! CAN NEVER HAPPEN -- CHECK + CORRECT !!! */
 	  buffer_len = line_length;
 	  strncpy(buffer, line_ptr, line_length);
 	}

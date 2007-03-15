@@ -38,6 +38,27 @@ struct ConfigInfo music_config[] =
   { "background.INFO",			"rhythmloop.wav"		},
   { "background.SETUP",			UNDEFINED_FILENAME		},
 
+  { "titlescreen_initial_1",		UNDEFINED_FILENAME		},
+  { "titlescreen_initial_2",		UNDEFINED_FILENAME		},
+  { "titlescreen_initial_3",		UNDEFINED_FILENAME		},
+  { "titlescreen_initial_4",		UNDEFINED_FILENAME		},
+  { "titlescreen_initial_5",		UNDEFINED_FILENAME		},
+  { "titlescreen_1",			UNDEFINED_FILENAME		},
+  { "titlescreen_2",			UNDEFINED_FILENAME		},
+  { "titlescreen_3",			UNDEFINED_FILENAME		},
+  { "titlescreen_4",			UNDEFINED_FILENAME		},
+  { "titlescreen_5",			UNDEFINED_FILENAME		},
+  { "titlemessage_initial_1",		UNDEFINED_FILENAME		},
+  { "titlemessage_initial_2",		UNDEFINED_FILENAME		},
+  { "titlemessage_initial_3",		UNDEFINED_FILENAME		},
+  { "titlemessage_initial_4",		UNDEFINED_FILENAME		},
+  { "titlemessage_initial_5",		UNDEFINED_FILENAME		},
+  { "titlemessage_1",			UNDEFINED_FILENAME		},
+  { "titlemessage_2",			UNDEFINED_FILENAME		},
+  { "titlemessage_3",			UNDEFINED_FILENAME		},
+  { "titlemessage_4",			UNDEFINED_FILENAME		},
+  { "titlemessage_5",			UNDEFINED_FILENAME		},
+
   /* there is no definition for "background.PLAYING", because this would
      prevent selecting music from music directory that is not defined in
      "musicinfo.conf", when no default music is defined here */
