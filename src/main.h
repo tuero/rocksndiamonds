@@ -1792,9 +1792,10 @@
 #define GFX_ARG_POST_DELAY		40
 #define GFX_ARG_AUTO_DELAY		41
 #define GFX_ARG_ALIGN			42
-#define GFX_ARG_SORT_PRIORITY		43
+#define GFX_ARG_VALIGN			43
+#define GFX_ARG_SORT_PRIORITY		44
 
-#define NUM_GFX_ARGS			44
+#define NUM_GFX_ARGS			45
 
 
 /* values for sound configuration suffixes */
@@ -1992,15 +1993,6 @@ struct BorderInfo
   boolean draw_masked[NUM_SPECIAL_GFX_ARGS];
 };
 
-#if 0
-struct MenuPosInfo
-{
-  int x, y;
-  int width, height;
-  int align;
-};
-#endif
-
 struct MenuMainButtonInfo
 {
   struct MenuPosInfo name;
@@ -2068,13 +2060,10 @@ struct TitleInfo
 
 struct TitleMessageInfo
 {
-  int x;
-  int y;
-  int width;
-  int height;
-  int chars;
-  int lines;
-  int align;
+  int x, y;
+  int width, height;
+  int chars, lines;
+  int align, valign;
   int font;
   boolean autowrap;
   boolean centered;
@@ -2115,7 +2104,7 @@ struct DoorInfo
 struct PreviewInfo
 {
   int x, y;
-  int align;
+  int align, valign;
   int xsize, ysize;
   int xoffset, yoffset;
   int tile_size;
@@ -2531,7 +2520,7 @@ struct GraphicInfo
   int fade_delay;		/* optional setting for drawing title screens */
   int post_delay;		/* optional setting for drawing title screens */
   int auto_delay;		/* optional setting for drawing title screens */
-  int align;			/* optional setting for drawing title screens */
+  int align, valign;		/* optional setting for drawing title screens */
   int sort_priority;		/* optional setting for drawing title screens */
 
   boolean use_image_size;	/* use image size as default width and height */

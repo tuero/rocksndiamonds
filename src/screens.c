@@ -959,6 +959,7 @@ void DrawTitleScreenMessage(int nr, boolean initial)
 {
   char *filename = getLevelSetTitleMessageFilename(nr, initial);
   struct TitleMessageInfo *tmi = getTitleMessageInfo(nr, initial);
+#if 0
   int font_nr = FONT_TEXT_1;
   int font_width;
   int font_height;
@@ -968,27 +969,48 @@ void DrawTitleScreenMessage(int nr, boolean initial)
   int sy = pad_y;
   int max_chars_per_line;
   int max_lines_per_screen;
+#endif
   int last_game_status = game_status;	/* save current game status */
 
   if (filename == NULL)
     return;
+
+  /* force MESSAGE font on title message screen */
+  game_status = GAME_MODE_MESSAGE;
+
+  /* if chars set to "-1", automatically determine by text and font width */
+  if (tmi->chars == -1)
+    tmi->chars = tmi->width / getFontWidth(tmi->font);
+  else
+    tmi->width = tmi->chars * getFontWidth(tmi->font);
+
+  /* if lines set to "-1", automatically determine by text and font height */
+  if (tmi->lines == -1)
+    tmi->lines = tmi->height / getFontHeight(tmi->font);
+  else
+    tmi->height = tmi->lines * getFontHeight(tmi->font);
 
   SetDrawBackgroundMask(REDRAW_ALL);
   SetWindowBackgroundImage(IMG_BACKGROUND_MESSAGE);
 
   ClearRectangleOnBackground(drawto, 0, 0, WIN_XSIZE, WIN_YSIZE);
 
-  /* force MESSAGE font on title message screen */
-  game_status = GAME_MODE_MESSAGE;
-
+#if 0
   font_width = getFontWidth(font_nr);
   font_height = getFontHeight(font_nr);
   max_chars_per_line = (WIN_XSIZE - 2 * pad_x) / font_width;
   max_lines_per_screen = (WIN_YSIZE - pad_y) / font_height - 1;
+#endif
 
+#if 1
+  DrawTextFile(ALIGNED_TEXT_XPOS(tmi), ALIGNED_TEXT_YPOS(tmi),
+	       filename, tmi->font, tmi->chars, -1, tmi->lines, -1,
+	       tmi->autowrap, tmi->centered, tmi->skip_comments);
+#else
   DrawTextFile(sx, sy, filename, font_nr, max_chars_per_line, -1,
 	       max_lines_per_screen, -1, tmi->autowrap, tmi->centered,
 	       tmi->skip_comments);
+#endif
 
   game_status = last_game_status;	/* restore current game status */
 }
@@ -3096,65 +3118,19 @@ void HandleInfoScreen_Version(int button)
 void DrawInfoScreen_LevelSet()
 {
   struct TitleMessageInfo *tmi = &readme;
-  int ystart1 = mSY - SY + 100;
-  int ystart2 = mSY - SY + 150;
-  int ybottom = mSY - SY + SYSIZE - 20;
   char *filename = getLevelSetInfoFilename();
-#if 1
-#if 1
-  int font_nr = tmi->font;
-#else
-  int font_nr = FONT_INFO_LEVELSET;
-#endif
-#else
-  int font_nr = FONT_LEVEL_NUMBER;
-#endif
-#if 0
-  int font_width = getFontWidth(font_nr);
-  int font_height = getFontHeight(font_nr);
-#endif
-#if 1
-#if 0
-  int sx = mSX + ALIGNED_TEXT_XPOS(tmi);
-  int sy = mSY + ALIGNED_TEXT_YPOS(tmi);
-#endif
-#if 0
-  int width  = tmi->width;
-  int height = tmi->height;
-#endif
-#else
-  int pad_x = 32;
-  int pad_y = 150;
-  int sx = mSX + pad_x;
-  int sy = mSY + pad_y;
-  int width = SXSIZE - 2 * pad_x;
-  int height = SYSIZE - pad_y;
-#endif
-#if 1
-#if 0
-  int max_chars = tmi->chars;
-  int max_lines = tmi->lines;
-#endif
-#else
-  int max_chars_per_line = width / font_width;
-#if 1
-  int max_lines_per_screen = height / font_height;
-#else
-  int max_lines_per_screen = height / font_height - 1;	/* minus footer line */
-#endif
-#endif
 
   /* if chars set to "-1", automatically determine by text and font width */
   if (tmi->chars == -1)
-    tmi->chars = tmi->width / getFontWidth(font_nr);
+    tmi->chars = tmi->width / getFontWidth(tmi->font);
   else
-    tmi->width = tmi->chars * getFontWidth(font_nr);
+    tmi->width = tmi->chars * getFontWidth(tmi->font);
 
   /* if lines set to "-1", automatically determine by text and font height */
   if (tmi->lines == -1)
-    tmi->lines = tmi->height / getFontHeight(font_nr);
+    tmi->lines = tmi->height / getFontHeight(tmi->font);
   else
-    tmi->height = tmi->lines * getFontHeight(font_nr);
+    tmi->height = tmi->lines * getFontHeight(tmi->font);
 
   SetMainBackgroundImageIfDefined(IMG_BACKGROUND_INFO_LEVELSET);
 
@@ -3163,18 +3139,18 @@ void DrawInfoScreen_LevelSet()
   ClearWindow();
   DrawHeadline();
 
-  DrawTextSCentered(ystart1, FONT_TEXT_1, "Level Set Information:");
-
-  DrawTextSCentered(ybottom, FONT_TEXT_4,
-		    "Press any key or button for info menu");
+  DrawTextCentered(mSY + 100, FONT_TEXT_1, "Level Set Information:");
 
   if (filename != NULL)
     DrawTextFile(mSX + ALIGNED_TEXT_XPOS(tmi), mSY + ALIGNED_TEXT_YPOS(tmi),
-		 filename, font_nr, tmi->chars, -1, tmi->lines, -1,
+		 filename, tmi->font, tmi->chars, -1, tmi->lines, -1,
 		 tmi->autowrap, tmi->centered, tmi->skip_comments);
   else
-    DrawTextSCentered(ystart2, FONT_TEXT_2,
-		      "No information for this level set.");
+    DrawTextCentered(mSY + ALIGNED_TEXT_YPOS(tmi), FONT_TEXT_2,
+		     "No information for this level set.");
+
+  DrawTextCentered(mSY + SYSIZE - 20, FONT_TEXT_4,
+		   "Press any key or button for info menu");
 
   FadeIn(REDRAW_FIELD);
 }

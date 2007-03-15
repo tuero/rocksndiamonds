@@ -1787,7 +1787,15 @@ int get_parameter_value(char *value_raw, char *suffix, int type)
   {
     result = (strEqual(value, "left")   ? ALIGN_LEFT :
 	      strEqual(value, "right")  ? ALIGN_RIGHT :
-	      strEqual(value, "center") ? ALIGN_CENTER : ALIGN_DEFAULT);
+	      strEqual(value, "center") ? ALIGN_CENTER :
+	      strEqual(value, "middle") ? ALIGN_CENTER : ALIGN_DEFAULT);
+  }
+  else if (strEqual(suffix, ".valign"))
+  {
+    result = (strEqual(value, "top")    ? VALIGN_TOP :
+	      strEqual(value, "bottom") ? VALIGN_BOTTOM :
+	      strEqual(value, "middle") ? VALIGN_MIDDLE :
+	      strEqual(value, "center") ? VALIGN_MIDDLE : VALIGN_DEFAULT);
   }
   else if (strEqual(suffix, ".anim_mode"))
   {

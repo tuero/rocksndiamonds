@@ -1766,7 +1766,11 @@ static void DrawPreviewLevelExt(int from_x, int from_y)
   int real_preview_xsize = MIN(level_xsize, preview.xsize);
   int real_preview_ysize = MIN(level_ysize, preview.ysize);
   int dst_x = SX + ALIGNED_XPOS(preview.x, preview_width, preview.align);
+#if 1
+  int dst_y = SY + ALIGNED_YPOS(preview.y, preview_height, preview.valign);
+#else
   int dst_y = SY + preview.y;
+#endif
   int x, y;
 
   DrawBackground(dst_x, dst_y, preview_width, preview_height);

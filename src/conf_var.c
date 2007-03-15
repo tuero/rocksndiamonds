@@ -49,6 +49,10 @@ struct TokenIntPtrInfo image_config_vars[] =
     &titlemessage_initial[0].align
   },
   {
+    "titlemessage_initial_1.valign",
+    &titlemessage_initial[0].valign
+  },
+  {
     "titlemessage_initial_1.font",
     &titlemessage_initial[0].font
   },
@@ -95,6 +99,10 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "titlemessage_initial_2.align",
     &titlemessage_initial[1].align
+  },
+  {
+    "titlemessage_initial_2.valign",
+    &titlemessage_initial[1].valign
   },
   {
     "titlemessage_initial_2.font",
@@ -145,6 +153,10 @@ struct TokenIntPtrInfo image_config_vars[] =
     &titlemessage_initial[2].align
   },
   {
+    "titlemessage_initial_3.valign",
+    &titlemessage_initial[2].valign
+  },
+  {
     "titlemessage_initial_3.font",
     &titlemessage_initial[2].font
   },
@@ -191,6 +203,10 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "titlemessage_initial_4.align",
     &titlemessage_initial[3].align
+  },
+  {
+    "titlemessage_initial_4.valign",
+    &titlemessage_initial[3].valign
   },
   {
     "titlemessage_initial_4.font",
@@ -241,6 +257,10 @@ struct TokenIntPtrInfo image_config_vars[] =
     &titlemessage_initial[4].align
   },
   {
+    "titlemessage_initial_5.valign",
+    &titlemessage_initial[4].valign
+  },
+  {
     "titlemessage_initial_5.font",
     &titlemessage_initial[4].font
   },
@@ -287,6 +307,10 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "titlemessage_1.align",
     &titlemessage[0].align
+  },
+  {
+    "titlemessage_1.valign",
+    &titlemessage[0].valign
   },
   {
     "titlemessage_1.font",
@@ -337,6 +361,10 @@ struct TokenIntPtrInfo image_config_vars[] =
     &titlemessage[1].align
   },
   {
+    "titlemessage_2.valign",
+    &titlemessage[1].valign
+  },
+  {
     "titlemessage_2.font",
     &titlemessage[1].font
   },
@@ -383,6 +411,10 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "titlemessage_3.align",
     &titlemessage[2].align
+  },
+  {
+    "titlemessage_3.valign",
+    &titlemessage[2].valign
   },
   {
     "titlemessage_3.font",
@@ -433,6 +465,10 @@ struct TokenIntPtrInfo image_config_vars[] =
     &titlemessage[3].align
   },
   {
+    "titlemessage_4.valign",
+    &titlemessage[3].valign
+  },
+  {
     "titlemessage_4.font",
     &titlemessage[3].font
   },
@@ -481,6 +517,10 @@ struct TokenIntPtrInfo image_config_vars[] =
     &titlemessage[4].align
   },
   {
+    "titlemessage_5.valign",
+    &titlemessage[4].valign
+  },
+  {
     "titlemessage_5.font",
     &titlemessage[4].font
   },
@@ -527,6 +567,10 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "readme.align",
     &readme.align
+  },
+  {
+    "readme.valign",
+    &readme.valign
   },
   {
     "readme.font",
@@ -837,6 +881,10 @@ struct TokenIntPtrInfo image_config_vars[] =
     &menu.main.text.name.align
   },
   {
+    "main.text.name.valign",
+    &menu.main.text.name.valign
+  },
+  {
     "main.text.name.font",
     &menu.main.text.name.font
   },
@@ -859,6 +907,10 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "main.text.levels.align",
     &menu.main.text.levels.align
+  },
+  {
+    "main.text.levels.valign",
+    &menu.main.text.levels.valign
   },
   {
     "main.text.levels.font",
@@ -885,6 +937,10 @@ struct TokenIntPtrInfo image_config_vars[] =
     &menu.main.text.scores.align
   },
   {
+    "main.text.scores.valign",
+    &menu.main.text.scores.valign
+  },
+  {
     "main.text.scores.font",
     &menu.main.text.scores.font
   },
@@ -907,6 +963,10 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "main.text.editor.align",
     &menu.main.text.editor.align
+  },
+  {
+    "main.text.editor.valign",
+    &menu.main.text.editor.valign
   },
   {
     "main.text.editor.font",
@@ -933,6 +993,10 @@ struct TokenIntPtrInfo image_config_vars[] =
     &menu.main.text.info.align
   },
   {
+    "main.text.info.valign",
+    &menu.main.text.info.valign
+  },
+  {
     "main.text.info.font",
     &menu.main.text.info.font
   },
@@ -955,6 +1019,10 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "main.text.game.align",
     &menu.main.text.game.align
+  },
+  {
+    "main.text.game.valign",
+    &menu.main.text.game.valign
   },
   {
     "main.text.game.font",
@@ -981,6 +1049,10 @@ struct TokenIntPtrInfo image_config_vars[] =
     &menu.main.text.setup.align
   },
   {
+    "main.text.setup.valign",
+    &menu.main.text.setup.valign
+  },
+  {
     "main.text.setup.font",
     &menu.main.text.setup.font
   },
@@ -1005,6 +1077,10 @@ struct TokenIntPtrInfo image_config_vars[] =
     &menu.main.text.quit.align
   },
   {
+    "main.text.quit.valign",
+    &menu.main.text.quit.valign
+  },
+  {
     "main.text.quit.font",
     &menu.main.text.quit.font
   },
@@ -1019,6 +1095,10 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "main.text.first_level.align",
     &menu.main.text.first_level.align
+  },
+  {
+    "main.text.first_level.valign",
+    &menu.main.text.first_level.valign
   },
   {
     "main.text.first_level.font",
@@ -1037,6 +1117,10 @@ struct TokenIntPtrInfo image_config_vars[] =
     &menu.main.text.last_level.align
   },
   {
+    "main.text.last_level.valign",
+    &menu.main.text.last_level.valign
+  },
+  {
     "main.text.last_level.font",
     &menu.main.text.last_level.font
   },
@@ -1053,6 +1137,10 @@ struct TokenIntPtrInfo image_config_vars[] =
     &menu.main.text.level_number.align
   },
   {
+    "main.text.level_number.valign",
+    &menu.main.text.level_number.valign
+  },
+  {
     "main.text.level_number.font",
     &menu.main.text.level_number.font
   },
@@ -1067,6 +1155,10 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "main.text.level_info_1.align",
     &menu.main.text.level_info_1.align
+  },
+  {
+    "main.text.level_info_1.valign",
+    &menu.main.text.level_info_1.valign
   },
   {
     "main.text.level_info_1.chars",
@@ -1087,6 +1179,10 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "main.text.level_info_2.align",
     &menu.main.text.level_info_2.align
+  },
+  {
+    "main.text.level_info_2.valign",
+    &menu.main.text.level_info_2.valign
   },
   {
     "main.text.level_info_2.chars",
@@ -1113,6 +1209,10 @@ struct TokenIntPtrInfo image_config_vars[] =
     &menu.main.text.level_name.align
   },
   {
+    "main.text.level_name.valign",
+    &menu.main.text.level_name.valign
+  },
+  {
     "main.text.level_name.chars",
     &menu.main.text.level_name.chars
   },
@@ -1131,6 +1231,10 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "main.text.level_author.align",
     &menu.main.text.level_author.align
+  },
+  {
+    "main.text.level_author.valign",
+    &menu.main.text.level_author.valign
   },
   {
     "main.text.level_author.chars",
@@ -1153,6 +1257,10 @@ struct TokenIntPtrInfo image_config_vars[] =
     &menu.main.text.level_year.align
   },
   {
+    "main.text.level_year.valign",
+    &menu.main.text.level_year.valign
+  },
+  {
     "main.text.level_year.chars",
     &menu.main.text.level_year.chars
   },
@@ -1171,6 +1279,10 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "main.text.level_imported_from.align",
     &menu.main.text.level_imported_from.align
+  },
+  {
+    "main.text.level_imported_from.valign",
+    &menu.main.text.level_imported_from.valign
   },
   {
     "main.text.level_imported_from.chars",
@@ -1193,6 +1305,10 @@ struct TokenIntPtrInfo image_config_vars[] =
     &menu.main.text.level_imported_by.align
   },
   {
+    "main.text.level_imported_by.valign",
+    &menu.main.text.level_imported_by.valign
+  },
+  {
     "main.text.level_imported_by.chars",
     &menu.main.text.level_imported_by.chars
   },
@@ -1211,6 +1327,10 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "main.text.level_tested_by.align",
     &menu.main.text.level_tested_by.align
+  },
+  {
+    "main.text.level_tested_by.valign",
+    &menu.main.text.level_tested_by.valign
   },
   {
     "main.text.level_tested_by.chars",
@@ -1233,6 +1353,10 @@ struct TokenIntPtrInfo image_config_vars[] =
     &menu.main.text.title_1.align
   },
   {
+    "main.text.title_1.valign",
+    &menu.main.text.title_1.valign
+  },
+  {
     "main.text.title_1.font",
     &menu.main.text.title_1.font
   },
@@ -1247,6 +1371,10 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "main.text.title_2.align",
     &menu.main.text.title_2.align
+  },
+  {
+    "main.text.title_2.valign",
+    &menu.main.text.title_2.valign
   },
   {
     "main.text.title_2.font",
@@ -1265,6 +1393,10 @@ struct TokenIntPtrInfo image_config_vars[] =
     &menu.main.text.title_3.align
   },
   {
+    "main.text.title_3.valign",
+    &menu.main.text.title_3.valign
+  },
+  {
     "main.text.title_3.font",
     &menu.main.text.title_3.font
   },
@@ -1281,6 +1413,10 @@ struct TokenIntPtrInfo image_config_vars[] =
     &menu.main.input.name.align
   },
   {
+    "main.input.name.valign",
+    &menu.main.input.name.valign
+  },
+  {
     "main.input.name.font",
     &menu.main.input.name.font
   },
@@ -1295,6 +1431,10 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "preview.align",
     &preview.align
+  },
+  {
+    "preview.valign",
+    &preview.valign
   },
   {
     "preview.xsize",
@@ -1381,6 +1521,10 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.level_number.align
   },
   {
+    "game.panel.level_number.valign",
+    &game.panel.level_number.valign
+  },
+  {
     "game.panel.level_number.chars",
     &game.panel.level_number.chars
   },
@@ -1405,6 +1549,10 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.gems.align
   },
   {
+    "game.panel.gems.valign",
+    &game.panel.gems.valign
+  },
+  {
     "game.panel.gems.chars",
     &game.panel.gems.chars
   },
@@ -1423,6 +1571,10 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "game.panel.inventory.align",
     &game.panel.inventory.align
+  },
+  {
+    "game.panel.inventory.valign",
+    &game.panel.inventory.valign
   },
   {
     "game.panel.inventory.chars",
@@ -1517,6 +1669,10 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.key_white_count.align
   },
   {
+    "game.panel.key_white_count.valign",
+    &game.panel.key_white_count.valign
+  },
+  {
     "game.panel.key_white_count.chars",
     &game.panel.key_white_count.chars
   },
@@ -1537,6 +1693,10 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.score.align
   },
   {
+    "game.panel.score.valign",
+    &game.panel.score.valign
+  },
+  {
     "game.panel.score.chars",
     &game.panel.score.chars
   },
@@ -1555,6 +1715,10 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "game.panel.time.align",
     &game.panel.time.align
+  },
+  {
+    "game.panel.time.valign",
+    &game.panel.time.valign
   },
   {
     "game.panel.time.chars",
@@ -1581,6 +1745,10 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.time_hh.align
   },
   {
+    "game.panel.time_hh.valign",
+    &game.panel.time_hh.valign
+  },
+  {
     "game.panel.time_hh.chars",
     &game.panel.time_hh.chars
   },
@@ -1601,6 +1769,10 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.time_mm.align
   },
   {
+    "game.panel.time_mm.valign",
+    &game.panel.time_mm.valign
+  },
+  {
     "game.panel.time_mm.chars",
     &game.panel.time_mm.chars
   },
@@ -1619,6 +1791,10 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "game.panel.time_ss.align",
     &game.panel.time_ss.align
+  },
+  {
+    "game.panel.time_ss.valign",
+    &game.panel.time_ss.valign
   },
   {
     "game.panel.time_ss.chars",
@@ -1713,6 +1889,10 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.shield_normal_time.align
   },
   {
+    "game.panel.shield_normal_time.valign",
+    &game.panel.shield_normal_time.valign
+  },
+  {
     "game.panel.shield_normal_time.chars",
     &game.panel.shield_normal_time.chars
   },
@@ -1739,6 +1919,10 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "game.panel.shield_deadly_time.align",
     &game.panel.shield_deadly_time.align
+  },
+  {
+    "game.panel.shield_deadly_time.valign",
+    &game.panel.shield_deadly_time.valign
   },
   {
     "game.panel.shield_deadly_time.chars",
@@ -1817,6 +2001,10 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.emc_magic_ball_time.align
   },
   {
+    "game.panel.emc_magic_ball_time.valign",
+    &game.panel.emc_magic_ball_time.valign
+  },
+  {
     "game.panel.emc_magic_ball_time.chars",
     &game.panel.emc_magic_ball_time.chars
   },
@@ -1845,6 +2033,10 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.light_switch_time.align
   },
   {
+    "game.panel.light_switch_time.valign",
+    &game.panel.light_switch_time.valign
+  },
+  {
     "game.panel.light_switch_time.chars",
     &game.panel.light_switch_time.chars
   },
@@ -1871,6 +2063,10 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "game.panel.timegate_switch_time.align",
     &game.panel.timegate_switch_time.align
+  },
+  {
+    "game.panel.timegate_switch_time.valign",
+    &game.panel.timegate_switch_time.valign
   },
   {
     "game.panel.timegate_switch_time.chars",
@@ -1909,6 +2105,10 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.emc_lenses_time.align
   },
   {
+    "game.panel.emc_lenses_time.valign",
+    &game.panel.emc_lenses_time.valign
+  },
+  {
     "game.panel.emc_lenses_time.chars",
     &game.panel.emc_lenses_time.chars
   },
@@ -1935,6 +2135,10 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "game.panel.emc_magnifier_time.align",
     &game.panel.emc_magnifier_time.align
+  },
+  {
+    "game.panel.emc_magnifier_time.valign",
+    &game.panel.emc_magnifier_time.valign
   },
   {
     "game.panel.emc_magnifier_time.chars",
@@ -1965,6 +2169,10 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.dynabomb_number.align
   },
   {
+    "game.panel.dynabomb_number.valign",
+    &game.panel.dynabomb_number.valign
+  },
+  {
     "game.panel.dynabomb_number.chars",
     &game.panel.dynabomb_number.chars
   },
@@ -1983,6 +2191,10 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "game.panel.dynabomb_size.align",
     &game.panel.dynabomb_size.align
+  },
+  {
+    "game.panel.dynabomb_size.valign",
+    &game.panel.dynabomb_size.valign
   },
   {
     "game.panel.dynabomb_size.chars",
@@ -2013,6 +2225,10 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.penguins.align
   },
   {
+    "game.panel.penguins.valign",
+    &game.panel.penguins.valign
+  },
+  {
     "game.panel.penguins.chars",
     &game.panel.penguins.chars
   },
@@ -2033,6 +2249,10 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.sokoban_objects.align
   },
   {
+    "game.panel.sokoban_objects.valign",
+    &game.panel.sokoban_objects.valign
+  },
+  {
     "game.panel.sokoban_objects.chars",
     &game.panel.sokoban_objects.chars
   },
@@ -2051,6 +2271,10 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "game.panel.sokoban_fields.align",
     &game.panel.sokoban_fields.align
+  },
+  {
+    "game.panel.sokoban_fields.valign",
+    &game.panel.sokoban_fields.valign
   },
   {
     "game.panel.sokoban_fields.chars",
@@ -2153,6 +2377,10 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.magic_wall_time.align
   },
   {
+    "game.panel.magic_wall_time.valign",
+    &game.panel.magic_wall_time.valign
+  },
+  {
     "game.panel.magic_wall_time.chars",
     &game.panel.magic_wall_time.chars
   },
@@ -2189,6 +2417,10 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.player_name.align
   },
   {
+    "game.panel.player_name.valign",
+    &game.panel.player_name.valign
+  },
+  {
     "game.panel.player_name.chars",
     &game.panel.player_name.chars
   },
@@ -2209,6 +2441,10 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.level_name.align
   },
   {
+    "game.panel.level_name.valign",
+    &game.panel.level_name.valign
+  },
+  {
     "game.panel.level_name.chars",
     &game.panel.level_name.chars
   },
@@ -2227,6 +2463,10 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "game.panel.level_author.align",
     &game.panel.level_author.align
+  },
+  {
+    "game.panel.level_author.valign",
+    &game.panel.level_author.valign
   },
   {
     "game.panel.level_author.chars",

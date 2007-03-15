@@ -1020,6 +1020,7 @@ static void set_graphic_parameters(int graphic)
   graphic_info[graphic].post_delay = -1;
   graphic_info[graphic].auto_delay = -1;
   graphic_info[graphic].align = ALIGN_CENTER;	/* default for title screens */
+  graphic_info[graphic].valign = VALIGN_MIDDLE;	/* default for title screens */
   graphic_info[graphic].sort_priority = 0;	/* default for title screens */
 
 #if 1
@@ -1215,6 +1216,8 @@ static void set_graphic_parameters(int graphic)
     graphic_info[graphic].auto_delay = parameter[GFX_ARG_AUTO_DELAY];
   if (parameter[GFX_ARG_ALIGN] != ARG_UNDEFINED_VALUE)
     graphic_info[graphic].align = parameter[GFX_ARG_ALIGN];
+  if (parameter[GFX_ARG_VALIGN] != ARG_UNDEFINED_VALUE)
+    graphic_info[graphic].valign = parameter[GFX_ARG_VALIGN];
   if (parameter[GFX_ARG_SORT_PRIORITY] != ARG_UNDEFINED_VALUE)
     graphic_info[graphic].sort_priority = parameter[GFX_ARG_SORT_PRIORITY];
 }

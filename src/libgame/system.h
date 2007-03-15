@@ -205,13 +205,19 @@
 #define ALIGN_LEFT		(1 << 0)
 #define ALIGN_RIGHT		(1 << 1)
 #define ALIGN_CENTER		(1 << 2)
-
 #define ALIGN_DEFAULT		ALIGN_LEFT
 
-#define ALIGNED_XPOS(x,w,a)	((a) == ALIGN_CENTER ? (x) - (w) / 2 :	\
-				 (a) == ALIGN_RIGHT  ? (x) - (w) : (x))
-#define ALIGNED_TEXT_XPOS(p)	ALIGNED_XPOS((p)->x, (p)->width, (p)->align)
-#define ALIGNED_TEXT_YPOS(p)	((p)->y)
+#define VALIGN_TOP		(1 << 0)
+#define VALIGN_BOTTOM		(1 << 1)
+#define VALIGN_MIDDLE		(1 << 2)
+#define VALIGN_DEFAULT		VALIGN_TOP
+
+#define ALIGNED_XPOS(x,w,a)	((a) == ALIGN_CENTER  ? (x) - (w) / 2 :	\
+				 (a) == ALIGN_RIGHT   ? (x) - (w) : (x))
+#define ALIGNED_YPOS(y,h,v)	((v) == VALIGN_MIDDLE ? (y) - (h) / 2 :	\
+				 (v) == VALIGN_BOTTOM ? (y) - (h) : (y))
+#define ALIGNED_TEXT_XPOS(p)	ALIGNED_XPOS((p)->x, (p)->width,  (p)->align)
+#define ALIGNED_TEXT_YPOS(p)	ALIGNED_YPOS((p)->y, (p)->height, (p)->valign)
 
 /* values for redraw_mask */
 #define REDRAW_NONE		(0)
@@ -1019,14 +1025,14 @@ struct MenuPosInfo
 {
   int x, y;
   int width, height;
-  int align;
+  int align, valign;
 };
 
 struct TextPosInfo
 {
   int x, y;
   int width, height;
-  int align;
+  int align, valign;
   int chars;
   int font, font_alt;
 };
