@@ -1609,10 +1609,14 @@ static void printSetupFileHash(SetupFileHash *hash)
 
 #define ALLOW_TOKEN_VALUE_SEPARATOR_BEING_WHITESPACE		1
 #define CHECK_TOKEN_VALUE_SEPARATOR__WARN_IF_MISSING		0
+#define CHECK_TOKEN__WARN_IF_ALREADY_EXISTS_IN_HASH		0
 
 static boolean token_value_separator_found = FALSE;
 #if CHECK_TOKEN_VALUE_SEPARATOR__WARN_IF_MISSING
 static boolean token_value_separator_warning = FALSE;
+#endif
+#if CHECK_TOKEN__WARN_IF_ALREADY_EXISTS_IN_HASH
+static boolean token_already_exists_warning = FALSE;
 #endif
 
 static boolean getTokenValueFromSetupLineExt(char *line,
@@ -1776,6 +1780,10 @@ static boolean loadSetupFileData(void *setup_file_data, char *filename,
   token_value_separator_warning = FALSE;
 #endif
 
+#if CHECK_TOKEN__WARN_IF_ALREADY_EXISTS_IN_HASH
+  token_already_exists_warning = FALSE;
+#endif
+
   if (!(file = fopen(filename, MODE_READ)))
   {
     Error(ERR_WARN, "cannot open configuration file '%s'", filename);
@@ -1874,9 +1882,34 @@ static boolean loadSetupFileData(void *setup_file_data, char *filename,
       else
       {
 	if (is_hash)
+	{
+#if CHECK_TOKEN__WARN_IF_ALREADY_EXISTS_IN_HASH
+	  char *old_value =
+	    getHashEntry((SetupFileHash *)setup_file_data, token);
+
+	  if (old_value != NULL)
+	  {
+	    if (!token_already_exists_warning)
+	    {
+	      Error(ERR_INFO_LINE, "-");
+	      Error(ERR_WARN, "duplicate token(s) found in config file:");
+	      Error(ERR_INFO, "- config file: '%s'", filename);
+
+	      token_already_exists_warning = TRUE;
+	    }
+
+	    Error(ERR_INFO, "- token: '%s' (in line %d)", token, line_nr);
+	    Error(ERR_INFO, "  old value: '%s'", old_value);
+	    Error(ERR_INFO, "  new value: '%s'", value);
+	  }
+#endif
+
 	  setHashEntry((SetupFileHash *)setup_file_data, token, value);
+	}
 	else
+	{
 	  insert_ptr = addListEntry((SetupFileList *)insert_ptr, token, value);
+	}
 
 	token_count++;
       }
@@ -1887,6 +1920,11 @@ static boolean loadSetupFileData(void *setup_file_data, char *filename,
 
 #if CHECK_TOKEN_VALUE_SEPARATOR__WARN_IF_MISSING
   if (token_value_separator_warning)
+    Error(ERR_INFO_LINE, "-");
+#endif
+
+#if CHECK_TOKEN__WARN_IF_ALREADY_EXISTS_IN_HASH
+  if (token_already_exists_warning)
     Error(ERR_INFO_LINE, "-");
 #endif
 

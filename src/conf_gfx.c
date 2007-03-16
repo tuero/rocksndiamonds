@@ -4927,7 +4927,9 @@ struct ConfigInfo image_config[] =
   { "background.envelope_4.draw_masked",	"false"			},
 
   { "background",				UNDEFINED_FILENAME	},
+  { "background.TITLE_INITIAL",			UNDEFINED_FILENAME	},
   { "background.TITLE",				UNDEFINED_FILENAME	},
+  { "background.MESSAGE_INITIAL",		UNDEFINED_FILENAME	},
   { "background.MESSAGE",			UNDEFINED_FILENAME	},
   { "background.MAIN",				UNDEFINED_FILENAME	},
   { "background.LEVELS",			UNDEFINED_FILENAME	},

@@ -167,7 +167,8 @@ static int getFontBitmapID(int font_nr)
 {
   int special = -1;
 
-  if (game_status >= GAME_MODE_TITLE && game_status <= GAME_MODE_PSEUDO_PREVIEW)
+  if (game_status >= GAME_MODE_TITLE_INITIAL &&
+      game_status <= GAME_MODE_PSEUDO_PREVIEW)
     special = game_status;
   else if (game_status == GAME_MODE_PSEUDO_TYPENAME)
     special = GFX_SPECIAL_ARG_MAIN;
@@ -1287,7 +1288,9 @@ static void InitGraphicInfo()
     IMG_BACKGROUND_ENVELOPE_4,
 
     IMG_BACKGROUND,
+    IMG_BACKGROUND_TITLE_INITIAL,
     IMG_BACKGROUND_TITLE,
+    IMG_BACKGROUND_MESSAGE_INITIAL,
     IMG_BACKGROUND_MESSAGE,
     IMG_BACKGROUND_MAIN,
     IMG_BACKGROUND_LEVELS,

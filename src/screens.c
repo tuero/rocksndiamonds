@@ -494,6 +494,21 @@ static struct TitleMessageInfo *getTitleMessageInfo(int nr, boolean initial)
   return (initial ? &titlemessage_initial[nr] : &titlemessage[nr]);
 }
 
+static int getTitleMessageGameMode(boolean initial)
+{
+  return (initial ? GAME_MODE_MESSAGE_INITIAL : GAME_MODE_MESSAGE);
+}
+
+static int getTitleScreenBackground(boolean initial)
+{
+  return (initial ? IMG_BACKGROUND_TITLE_INITIAL : IMG_BACKGROUND_TITLE);
+}
+
+static int getTitleMessageBackground(boolean initial)
+{
+  return (initial ? IMG_BACKGROUND_MESSAGE_INITIAL : IMG_BACKGROUND_MESSAGE);
+}
+
 static int compareTitleControlInfo(const void *object1, const void *object2)
 {
   const struct TitleControlInfo *tci1 = (struct TitleControlInfo *)object1;
@@ -926,11 +941,12 @@ void DrawTitleScreenImage(int nr, boolean initial)
     height = WIN_YSIZE;
   }
 
+  /* always display title screens centered */
   dst_x = (WIN_XSIZE - width) / 2;
   dst_y = (WIN_YSIZE - height) / 2;
 
   SetDrawBackgroundMask(REDRAW_ALL);
-  SetWindowBackgroundImage(IMG_BACKGROUND_TITLE);
+  SetWindowBackgroundImage(getTitleScreenBackground(initial));
 
   ClearRectangleOnBackground(drawto, 0, 0, WIN_XSIZE, WIN_YSIZE);
 
@@ -976,7 +992,7 @@ void DrawTitleScreenMessage(int nr, boolean initial)
     return;
 
   /* force MESSAGE font on title message screen */
-  game_status = GAME_MODE_MESSAGE;
+  game_status = getTitleMessageGameMode(initial);
 
   /* if chars set to "-1", automatically determine by text and font width */
   if (tmi->chars == -1)
@@ -991,7 +1007,7 @@ void DrawTitleScreenMessage(int nr, boolean initial)
     tmi->height = tmi->lines * getFontHeight(tmi->font);
 
   SetDrawBackgroundMask(REDRAW_ALL);
-  SetWindowBackgroundImage(IMG_BACKGROUND_MESSAGE);
+  SetWindowBackgroundImage(getTitleMessageBackground(initial));
 
   ClearRectangleOnBackground(drawto, 0, 0, WIN_XSIZE, WIN_YSIZE);
 
