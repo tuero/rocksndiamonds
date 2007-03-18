@@ -6445,10 +6445,8 @@ void InitGraphicInfo_EM(void)
 #endif
 }
 
-void PlayMenuSound()
+void PlayMenuSoundExt(int sound)
 {
-  int sound = menu.sound[game_status];
-
   if (sound == SND_UNDEFINED)
     return;
 
@@ -6460,6 +6458,11 @@ void PlayMenuSound()
     PlaySoundLoop(sound);
   else
     PlaySound(sound);
+}
+
+void PlayMenuSound()
+{
+  PlayMenuSoundExt(menu.sound[game_status]);
 }
 
 void PlayMenuSoundStereo(int sound, int stereo_position)
@@ -6477,10 +6480,8 @@ void PlayMenuSoundStereo(int sound, int stereo_position)
     PlaySoundStereo(sound, stereo_position);
 }
 
-void PlayMenuSoundIfLoop()
+void PlayMenuSoundIfLoopExt(int sound)
 {
-  int sound = menu.sound[game_status];
-
   if (sound == SND_UNDEFINED)
     return;
 
@@ -6492,10 +6493,13 @@ void PlayMenuSoundIfLoop()
     PlaySoundLoop(sound);
 }
 
-void PlayMenuMusic()
+void PlayMenuSoundIfLoop()
 {
-  int music = menu.music[game_status];
+  PlayMenuSoundIfLoopExt(menu.sound[game_status]);
+}
 
+void PlayMenuMusicExt(int music)
+{
   if (music == MUS_UNDEFINED)
     return;
 
@@ -6503,6 +6507,11 @@ void PlayMenuMusic()
     return;
 
   PlayMusic(music);
+}
+
+void PlayMenuMusic()
+{
+  PlayMenuMusicExt(menu.music[game_status]);
 }
 
 void PlaySoundActivating()

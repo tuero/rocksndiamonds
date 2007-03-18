@@ -189,9 +189,12 @@ int getBeltSwitchElementFromBeltNrAndBeltDir(int, int);
 unsigned int InitRND(long);
 void InitGraphicInfo_EM(void);
 
+void PlayMenuSoundExt(int);
 void PlayMenuSound();
 void PlayMenuSoundStereo(int, int);
+void PlayMenuSoundIfLoopExt(int);
 void PlayMenuSoundIfLoop();
+void PlayMenuMusicExt(int);
 void PlayMenuMusic();
 void PlaySoundActivating();
 void PlaySoundSelecting();

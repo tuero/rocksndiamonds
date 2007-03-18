@@ -1640,7 +1640,7 @@ static void set_sound_parameters(int sound, char **parameter_raw)
   sound_info[sound].volume = parameter[SND_ARG_VOLUME];
 
   /* sound priority to give certain sounds a higher or lower priority */
-  sound_info[sound].volume = parameter[SND_ARG_VOLUME];
+  sound_info[sound].priority = parameter[SND_ARG_PRIORITY];
 }
 
 static void InitSoundInfo()

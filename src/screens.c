@@ -494,6 +494,13 @@ static struct TitleMessageInfo *getTitleMessageInfo(int nr, boolean initial)
   return (initial ? &titlemessage_initial[nr] : &titlemessage[nr]);
 }
 
+#if 0
+static int getTitleScreenGameMode(boolean initial)
+{
+  return (initial ? GAME_MODE_TITLE_INITIAL : GAME_MODE_TITLE);
+}
+#endif
+
 static int getTitleMessageGameMode(boolean initial)
 {
   return (initial ? GAME_MODE_MESSAGE_INITIAL : GAME_MODE_MESSAGE);
@@ -507,6 +514,62 @@ static int getTitleScreenBackground(boolean initial)
 static int getTitleMessageBackground(boolean initial)
 {
   return (initial ? IMG_BACKGROUND_MESSAGE_INITIAL : IMG_BACKGROUND_MESSAGE);
+}
+
+static int getTitleSound(int nr, boolean initial, boolean is_image)
+{
+  int mode = (is_image ?
+	      (initial ? GAME_MODE_TITLE_INITIAL   : GAME_MODE_TITLE) :
+	      (initial ? GAME_MODE_MESSAGE_INITIAL : GAME_MODE_MESSAGE));
+  int base = (is_image ?
+	      (initial ? SND_TITLESCREEN_INITIAL_1  : SND_TITLESCREEN_1) :
+	      (initial ? SND_TITLEMESSAGE_INITIAL_1 : SND_TITLEMESSAGE_1));
+
+  int sound_global = menu.sound[mode];
+  int sound_local = base + nr;
+
+#if 0
+  printf("::: %d, %d, %d: %d ['%s'], %d ['%s']\n",
+	 nr, initial, is_image,
+	 sound_global, getSoundListEntry(sound_global)->filename,
+	 sound_local, getSoundListEntry(sound_local)->filename);
+#endif
+
+  if (!strEqual(getSoundListEntry(sound_local)->filename, UNDEFINED_FILENAME))
+    return sound_local;
+
+  if (!strEqual(getSoundListEntry(sound_global)->filename, UNDEFINED_FILENAME))
+    return sound_global;
+
+  return SND_UNDEFINED;
+}
+
+static int getTitleMusic(int nr, boolean initial, boolean is_image)
+{
+  int mode = (is_image ?
+	      (initial ? GAME_MODE_TITLE_INITIAL   : GAME_MODE_TITLE) :
+	      (initial ? GAME_MODE_MESSAGE_INITIAL : GAME_MODE_MESSAGE));
+  int base = (is_image ?
+	      (initial ? MUS_TITLESCREEN_INITIAL_1  : MUS_TITLESCREEN_1) :
+	      (initial ? MUS_TITLEMESSAGE_INITIAL_1 : MUS_TITLEMESSAGE_1));
+
+  int music_global = menu.music[mode];
+  int music_local = base + nr;
+
+#if 0
+  printf("::: %d, %d, %d: %d ['%s'], %d ['%s']\n",
+	 nr, initial, is_image,
+	 music_global, getMusicListEntry(music_global)->filename,
+	 music_local, getMusicListEntry(music_local)->filename);
+#endif
+
+  if (!strEqual(getMusicListEntry(music_local)->filename, UNDEFINED_FILENAME))
+    return music_local;
+
+  if (!strEqual(getMusicListEntry(music_global)->filename, UNDEFINED_FILENAME))
+    return music_global;
+
+  return MUS_UNDEFINED;
 }
 
 static int compareTitleControlInfo(const void *object1, const void *object2)
@@ -1307,6 +1370,7 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
 {
   static unsigned long title_delay = 0;
   static int title_screen_nr = 0;
+  static int last_sound = -1, last_music = -1;
   boolean return_to_main_menu = FALSE;
   boolean use_fading_main_menu = TRUE;
 #if 1
@@ -1315,14 +1379,20 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
   boolean use_cross_fading = !show_title_initial;		/* default */
 #endif
   struct TitleControlInfo *tci;
+  int sound, music;
 
   if (button == MB_MENU_INITIALIZE)
   {
+#if 0
     int last_game_status = game_status;	/* save current game status */
+#endif
 
     title_delay = 0;
     title_screen_nr = 0;
     tci = &title_controls[title_screen_nr];
+
+    last_sound = SND_UNDEFINED;
+    last_music = MUS_UNDEFINED;
 
 #if 0
     /* determine number of title screens to display (images and messages) */
@@ -1346,14 +1416,6 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
       FadeOut(REDRAW_ALL);
     }
 
-    /* force TITLE music on title info screen */
-    game_status = GAME_MODE_TITLE;
-
-    PlayMenuSound();
-    PlayMenuMusic();
-
-    game_status = last_game_status;	/* restore current game status */
-
     if (tci->is_image)
     {
       DrawTitleScreenImage(tci->local_nr, tci->initial);
@@ -1366,6 +1428,19 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
       title.post_delay_final = title.post_delay;
       title.auto_delay_final = -1;
     }
+
+#if 1
+    sound = getTitleSound(tci->local_nr, tci->initial, tci->is_image);
+    music = getTitleMusic(tci->local_nr, tci->initial, tci->is_image);
+
+    if (sound != last_sound)
+      PlayMenuSoundExt(sound);
+    if (music != last_music)
+      PlayMenuMusicExt(music);
+
+    last_sound = sound;
+    last_music = music;
+#endif
 
     SetMouseCursor(CURSOR_NONE);
 
@@ -1415,16 +1490,36 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
 
     if (title_screen_nr < num_title_screens)
     {
-      if (!use_cross_fading)
-	FadeOut(REDRAW_ALL);
+      sound = getTitleSound(tci->local_nr, tci->initial, tci->is_image);
+      music = getTitleMusic(tci->local_nr, tci->initial, tci->is_image);
+
+      if (sound == SND_UNDEFINED || sound != last_sound)
+	FadeSounds();
+      if (music == MUS_UNDEFINED || music != last_music)
+	FadeMusic();
 
       if (use_cross_fading)
 	FadeCrossSaveBackbuffer();
+      else
+	FadeOut(REDRAW_ALL);
 
       if (tci->is_image)
 	DrawTitleScreenImage(tci->local_nr, tci->initial);
       else
 	DrawTitleScreenMessage(tci->local_nr, tci->initial);
+
+#if 1
+      sound = getTitleSound(tci->local_nr, tci->initial, tci->is_image);
+      music = getTitleMusic(tci->local_nr, tci->initial, tci->is_image);
+
+      if (sound != last_sound)
+	PlayMenuSoundExt(sound);
+      if (music != last_music)
+	PlayMenuMusicExt(music);
+
+      last_sound = sound;
+      last_music = music;
+#endif
 
       if (use_cross_fading)
 	FadeCross(REDRAW_ALL);

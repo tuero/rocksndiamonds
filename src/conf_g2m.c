@@ -31,8 +31,16 @@ gamemode_to_music[] =
     MUS_BACKGROUND
   },
   {
+    GFX_SPECIAL_ARG_TITLE_INITIAL,
+    MUS_BACKGROUND_TITLE_INITIAL
+  },
+  {
     GFX_SPECIAL_ARG_TITLE,
     MUS_BACKGROUND_TITLE
+  },
+  {
+    GFX_SPECIAL_ARG_MESSAGE_INITIAL,
+    MUS_BACKGROUND_MESSAGE_INITIAL
   },
   {
     GFX_SPECIAL_ARG_MESSAGE,
@@ -61,86 +69,6 @@ gamemode_to_music[] =
   {
     GFX_SPECIAL_ARG_SETUP,
     MUS_BACKGROUND_SETUP
-  },
-  {
-    -1,
-    MUS_TITLESCREEN_INITIAL_1
-  },
-  {
-    -1,
-    MUS_TITLESCREEN_INITIAL_2
-  },
-  {
-    -1,
-    MUS_TITLESCREEN_INITIAL_3
-  },
-  {
-    -1,
-    MUS_TITLESCREEN_INITIAL_4
-  },
-  {
-    -1,
-    MUS_TITLESCREEN_INITIAL_5
-  },
-  {
-    -1,
-    MUS_TITLESCREEN_1
-  },
-  {
-    -1,
-    MUS_TITLESCREEN_2
-  },
-  {
-    -1,
-    MUS_TITLESCREEN_3
-  },
-  {
-    -1,
-    MUS_TITLESCREEN_4
-  },
-  {
-    -1,
-    MUS_TITLESCREEN_5
-  },
-  {
-    -1,
-    MUS_TITLEMESSAGE_INITIAL_1
-  },
-  {
-    -1,
-    MUS_TITLEMESSAGE_INITIAL_2
-  },
-  {
-    -1,
-    MUS_TITLEMESSAGE_INITIAL_3
-  },
-  {
-    -1,
-    MUS_TITLEMESSAGE_INITIAL_4
-  },
-  {
-    -1,
-    MUS_TITLEMESSAGE_INITIAL_5
-  },
-  {
-    -1,
-    MUS_TITLEMESSAGE_1
-  },
-  {
-    -1,
-    MUS_TITLEMESSAGE_2
-  },
-  {
-    -1,
-    MUS_TITLEMESSAGE_3
-  },
-  {
-    -1,
-    MUS_TITLEMESSAGE_4
-  },
-  {
-    -1,
-    MUS_TITLEMESSAGE_5
   },
   {
     -1,

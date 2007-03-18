@@ -29,7 +29,9 @@ struct ConfigTypeInfo music_config_suffix[] =
 struct ConfigInfo music_config[] =
 {
   { "background",			UNDEFINED_FILENAME		},
+  { "background.TITLE_INITIAL",		UNDEFINED_FILENAME		},
   { "background.TITLE",			UNDEFINED_FILENAME		},
+  { "background.MESSAGE_INITIAL",	UNDEFINED_FILENAME		},
   { "background.MESSAGE",		UNDEFINED_FILENAME		},
   { "background.MAIN",			UNDEFINED_FILENAME		},
   { "background.LEVELS",		UNDEFINED_FILENAME		},

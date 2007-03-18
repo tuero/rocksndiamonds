@@ -1773,8 +1773,7 @@ static boolean loadSetupFileData(void *setup_file_data, char *filename,
   void *insert_ptr = NULL;
   boolean read_continued_line = FALSE;
   FILE *file;
-  int line_nr = 0;
-  int token_count = 0;
+  int line_nr = 0, token_count = 0, include_count = 0;
 
 #if CHECK_TOKEN_VALUE_SEPARATOR__WARN_IF_MISSING
   token_value_separator_warning = FALSE;
@@ -1873,6 +1872,8 @@ static boolean loadSetupFileData(void *setup_file_data, char *filename,
 	  free(basepath);
 	  free(basename);
 	  free(filename_include);
+
+	  include_count++;
 	}
 	else
 	{
@@ -1928,7 +1929,7 @@ static boolean loadSetupFileData(void *setup_file_data, char *filename,
     Error(ERR_INFO_LINE, "-");
 #endif
 
-  if (token_count == 0)
+  if (token_count == 0 && include_count == 0)
     Error(ERR_WARN, "configuration file '%s' is empty", filename);
 
   if (top_recursion_level)
