@@ -1722,20 +1722,18 @@
 #define GFX_SPECIAL_ARG_DEFAULT		0
 #define GFX_SPECIAL_ARG_TITLE_INITIAL	1
 #define GFX_SPECIAL_ARG_TITLE		2
-#define GFX_SPECIAL_ARG_MESSAGE_INITIAL	3
-#define GFX_SPECIAL_ARG_MESSAGE		4
-#define GFX_SPECIAL_ARG_MAIN		5
-#define GFX_SPECIAL_ARG_LEVELS		6
-#define GFX_SPECIAL_ARG_SCORES		7
-#define GFX_SPECIAL_ARG_EDITOR		8
-#define GFX_SPECIAL_ARG_INFO		9
-#define GFX_SPECIAL_ARG_SETUP		10
-#define GFX_SPECIAL_ARG_PLAYING		11
-#define GFX_SPECIAL_ARG_DOOR		12
-#define GFX_SPECIAL_ARG_PREVIEW		13
-#define GFX_SPECIAL_ARG_CRUMBLED	14
+#define GFX_SPECIAL_ARG_MAIN		3
+#define GFX_SPECIAL_ARG_LEVELS		4
+#define GFX_SPECIAL_ARG_SCORES		5
+#define GFX_SPECIAL_ARG_EDITOR		6
+#define GFX_SPECIAL_ARG_INFO		7
+#define GFX_SPECIAL_ARG_SETUP		8
+#define GFX_SPECIAL_ARG_PLAYING		9
+#define GFX_SPECIAL_ARG_DOOR		10
+#define GFX_SPECIAL_ARG_PREVIEW		11
+#define GFX_SPECIAL_ARG_CRUMBLED	12
 
-#define NUM_SPECIAL_GFX_ARGS		15
+#define NUM_SPECIAL_GFX_ARGS		13
 
 /* these additional definitions are currently only used for draw offsets */
 #define GFX_SPECIAL_ARG_INFO_MAIN	0
@@ -1873,22 +1871,20 @@
 #define GAME_MODE_DEFAULT		0
 #define GAME_MODE_TITLE_INITIAL		1
 #define GAME_MODE_TITLE			2
-#define GAME_MODE_MESSAGE_INITIAL	3
-#define GAME_MODE_MESSAGE		4
-#define GAME_MODE_MAIN			5
-#define GAME_MODE_LEVELS		6
-#define GAME_MODE_SCORES		7
-#define GAME_MODE_EDITOR		8
-#define GAME_MODE_INFO			9
-#define GAME_MODE_SETUP			10
-#define GAME_MODE_PLAYING		11
-#define GAME_MODE_PSEUDO_DOOR		12
-#define GAME_MODE_PSEUDO_PREVIEW	13
-#define GAME_MODE_PSEUDO_CRUMBLED	14
+#define GAME_MODE_MAIN			3
+#define GAME_MODE_LEVELS		4
+#define GAME_MODE_SCORES		5
+#define GAME_MODE_EDITOR		6
+#define GAME_MODE_INFO			7
+#define GAME_MODE_SETUP			8
+#define GAME_MODE_PLAYING		9
+#define GAME_MODE_PSEUDO_DOOR		10
+#define GAME_MODE_PSEUDO_PREVIEW	11
+#define GAME_MODE_PSEUDO_CRUMBLED	12
 
 /* there are no special config file suffixes for these modes */
-#define GAME_MODE_PSEUDO_TYPENAME	15
-#define GAME_MODE_QUIT			16
+#define GAME_MODE_PSEUDO_TYPENAME	13
+#define GAME_MODE_QUIT			14
 
 /* special definitions currently only used for custom artwork configuration */
 #define MUSIC_PREFIX_BACKGROUND		0
@@ -2689,7 +2685,9 @@ extern struct TapeInfo		tape;
 extern struct GlobalInfo	global;
 extern struct BorderInfo	border;
 extern struct TitleInfo		title;
+extern struct TitleMessageInfo	titlemessage_initial_default;
 extern struct TitleMessageInfo	titlemessage_initial[];
+extern struct TitleMessageInfo	titlemessage_default;
 extern struct TitleMessageInfo	titlemessage[];
 extern struct TitleMessageInfo	readme;
 extern struct MenuInfo		menu;

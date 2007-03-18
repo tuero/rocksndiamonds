@@ -8350,8 +8350,39 @@ static int get_token_parameter_value(char *token, char *value_raw)
 
 static void LoadSpecialMenuDesignSettingsFromFilename(char *filename)
 {
+  static struct TitleMessageInfo tmi;
+  static struct TokenInfo titlemessage_tokens[] =
+  {
+    { TYPE_INTEGER,	&tmi.x,			".x"			},
+    { TYPE_INTEGER,	&tmi.y,			".y"			},
+    { TYPE_INTEGER,	&tmi.width,		".width"		},
+    { TYPE_INTEGER,	&tmi.height,		".height"		},
+    { TYPE_INTEGER,	&tmi.chars,		".chars"		},
+    { TYPE_INTEGER,	&tmi.lines,		".lines"		},
+    { TYPE_INTEGER,	&tmi.align,		".align"		},
+    { TYPE_INTEGER,	&tmi.valign,		".valign"		},
+    { TYPE_INTEGER,	&tmi.font,		".font"			},
+    { TYPE_BOOLEAN,	&tmi.autowrap,		".autowrap"		},
+    { TYPE_BOOLEAN,	&tmi.centered,		".centered"		},
+    { TYPE_BOOLEAN,	&tmi.skip_comments,	".skip_comments"	},
+    { TYPE_INTEGER,	&tmi.sort_priority,	".sort_priority"	},
+
+    { -1,		NULL,			NULL			}
+  };
+  static struct
+  {
+    struct TitleMessageInfo *array;
+    char *text;
+  }
+  titlemessage_arrays[] =
+  {
+    { titlemessage_initial,		"[titlemessage_initial]"	},
+    { titlemessage,			"[titlemessage]"		},
+
+    { NULL,				NULL				}
+  };
   SetupFileHash *setup_file_hash;
-  int i;
+  int i, j, k;
 
 #if 0
   printf("LoadSpecialMenuDesignSettings from file '%s' ...\n", filename);
@@ -8363,28 +8394,60 @@ static void LoadSpecialMenuDesignSettingsFromFilename(char *filename)
   /* special case: initialize with default values that may be overwritten */
   for (i = 0; i < NUM_SPECIAL_GFX_ARGS; i++)
   {
-    char *value_x = getHashEntry(setup_file_hash, "menu.draw_xoffset");
-    char *value_y = getHashEntry(setup_file_hash, "menu.draw_yoffset");
-    char *list_size = getHashEntry(setup_file_hash, "menu.list_size");
+    char *value_1 = getHashEntry(setup_file_hash, "menu.draw_xoffset");
+    char *value_2 = getHashEntry(setup_file_hash, "menu.draw_yoffset");
+    char *value_3 = getHashEntry(setup_file_hash, "menu.list_size");
 
-    if (value_x != NULL)
-      menu.draw_xoffset[i] = get_integer_from_string(value_x);
-    if (value_y != NULL)
-      menu.draw_yoffset[i] = get_integer_from_string(value_y);
-    if (list_size != NULL)
-      menu.list_size[i] = get_integer_from_string(list_size);
+    if (value_1 != NULL)
+      menu.draw_xoffset[i] = get_integer_from_string(value_1);
+    if (value_2 != NULL)
+      menu.draw_yoffset[i] = get_integer_from_string(value_2);
+    if (value_3 != NULL)
+      menu.list_size[i] = get_integer_from_string(value_3);
   }
 
   /* special case: initialize with default values that may be overwritten */
   for (i = 0; i < NUM_SPECIAL_GFX_INFO_ARGS; i++)
   {
-    char *value_x = getHashEntry(setup_file_hash, "menu.draw_xoffset.INFO");
-    char *value_y = getHashEntry(setup_file_hash, "menu.draw_yoffset.INFO");
+    char *value_1 = getHashEntry(setup_file_hash, "menu.draw_xoffset.INFO");
+    char *value_2 = getHashEntry(setup_file_hash, "menu.draw_yoffset.INFO");
 
-    if (value_x != NULL)
-      menu.draw_xoffset_info[i] = get_integer_from_string(value_x);
-    if (value_y != NULL)
-      menu.draw_yoffset_info[i] = get_integer_from_string(value_y);
+    if (value_1 != NULL)
+      menu.draw_xoffset_info[i] = get_integer_from_string(value_1);
+    if (value_2 != NULL)
+      menu.draw_yoffset_info[i] = get_integer_from_string(value_2);
+  }
+
+  /* special case: initialize with default values that may be overwritten */
+  for (i = 0; titlemessage_arrays[i].array != NULL; i++)
+  {
+    struct TitleMessageInfo *array = titlemessage_arrays[i].array;
+    char *base_token = titlemessage_arrays[i].text;
+
+    for (j = 0; titlemessage_tokens[j].type != -1; j++)
+    {
+      char *token = getStringCat2(base_token, titlemessage_tokens[j].text);
+      char *value = getHashEntry(setup_file_hash, token);
+
+      if (value != NULL)
+      {
+	int parameter_value = get_token_parameter_value(token, value);
+
+	for (k = 0; k < MAX_NUM_TITLE_MESSAGES; k++)
+	{
+	  tmi = array[k];
+
+	  if (titlemessage_tokens[j].type == TYPE_INTEGER)
+	    *(boolean *)titlemessage_tokens[j].value = (boolean)parameter_value;
+	  else
+	    *(int     *)titlemessage_tokens[j].value = (int)parameter_value;
+
+	  array[k] = tmi;
+	}
+      }
+
+      free(token);
+    }
   }
 
   /* read (and overwrite with) values that may be specified in config file */

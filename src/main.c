@@ -107,7 +107,9 @@ struct GameInfo		game;
 struct GlobalInfo	global;
 struct BorderInfo	border;
 struct TitleInfo	title;
+struct TitleMessageInfo	titlemessage_initial_default;
 struct TitleMessageInfo	titlemessage_initial[MAX_NUM_TITLE_MESSAGES];
+struct TitleMessageInfo	titlemessage_default;
 struct TitleMessageInfo	titlemessage[MAX_NUM_TITLE_MESSAGES];
 struct TitleMessageInfo	readme;
 struct MenuInfo		menu;
@@ -5364,8 +5366,6 @@ struct SpecialSuffixInfo special_suffix_info[NUM_SPECIAL_GFX_ARGS + 1 + 1] =
   { ".[DEFAULT]",		GFX_SPECIAL_ARG_DEFAULT,		},
   { ".TITLE_INITIAL",		GFX_SPECIAL_ARG_TITLE_INITIAL,		},
   { ".TITLE",			GFX_SPECIAL_ARG_TITLE,			},
-  { ".MESSAGE_INITIAL",		GFX_SPECIAL_ARG_MESSAGE_INITIAL,	},
-  { ".MESSAGE",			GFX_SPECIAL_ARG_MESSAGE,		},
   { ".MAIN",			GFX_SPECIAL_ARG_MAIN,			},
   { ".LEVELS",			GFX_SPECIAL_ARG_LEVELS			},
   { ".SCORES",			GFX_SPECIAL_ARG_SCORES,			},

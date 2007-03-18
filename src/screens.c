@@ -503,28 +503,51 @@ static int getTitleScreenGameMode(boolean initial)
 
 static int getTitleMessageGameMode(boolean initial)
 {
-  return (initial ? GAME_MODE_MESSAGE_INITIAL : GAME_MODE_MESSAGE);
+  return (initial ? GAME_MODE_TITLE_INITIAL : GAME_MODE_TITLE);
 }
 
+#if 0
 static int getTitleScreenBackground(boolean initial)
 {
   return (initial ? IMG_BACKGROUND_TITLE_INITIAL : IMG_BACKGROUND_TITLE);
 }
+#endif
 
-static int getTitleMessageBackground(boolean initial)
+#if 0
+static int getTitleMessageBackground(int nr, boolean initial)
 {
-  return (initial ? IMG_BACKGROUND_MESSAGE_INITIAL : IMG_BACKGROUND_MESSAGE);
+  return (initial ? IMG_BACKGROUND_TITLE_INITIAL : IMG_BACKGROUND_TITLE);
+}
+#endif
+
+static int getTitleBackground(int nr, boolean initial, boolean is_image)
+{
+  int base = (is_image ?
+	      (initial ? IMG_BACKGROUND_TITLESCREEN_INITIAL_1 :
+	                 IMG_BACKGROUND_TITLESCREEN_1) :
+	      (initial ? IMG_BACKGROUND_TITLEMESSAGE_INITIAL_1 :
+	                 IMG_BACKGROUND_TITLEMESSAGE_1));
+  int graphic_global = (initial ? IMG_BACKGROUND_TITLE_INITIAL :
+			          IMG_BACKGROUND_TITLE);
+  int graphic_local = base + nr;
+
+  if (graphic_info[graphic_local].bitmap != NULL)
+    return graphic_local;
+
+  if (graphic_info[graphic_global].bitmap != NULL)
+    return graphic_global;
+
+  return IMG_UNDEFINED;
 }
 
 static int getTitleSound(int nr, boolean initial, boolean is_image)
 {
-  int mode = (is_image ?
-	      (initial ? GAME_MODE_TITLE_INITIAL   : GAME_MODE_TITLE) :
-	      (initial ? GAME_MODE_MESSAGE_INITIAL : GAME_MODE_MESSAGE));
+  int mode = (initial ? GAME_MODE_TITLE_INITIAL : GAME_MODE_TITLE);
   int base = (is_image ?
-	      (initial ? SND_TITLESCREEN_INITIAL_1  : SND_TITLESCREEN_1) :
-	      (initial ? SND_TITLEMESSAGE_INITIAL_1 : SND_TITLEMESSAGE_1));
-
+	      (initial ? SND_BACKGROUND_TITLESCREEN_INITIAL_1 :
+	                 SND_BACKGROUND_TITLESCREEN_1) :
+	      (initial ? SND_BACKGROUND_TITLEMESSAGE_INITIAL_1 :
+	                 SND_BACKGROUND_TITLEMESSAGE_1));
   int sound_global = menu.sound[mode];
   int sound_local = base + nr;
 
@@ -546,13 +569,12 @@ static int getTitleSound(int nr, boolean initial, boolean is_image)
 
 static int getTitleMusic(int nr, boolean initial, boolean is_image)
 {
-  int mode = (is_image ?
-	      (initial ? GAME_MODE_TITLE_INITIAL   : GAME_MODE_TITLE) :
-	      (initial ? GAME_MODE_MESSAGE_INITIAL : GAME_MODE_MESSAGE));
+  int mode = (initial ? GAME_MODE_TITLE_INITIAL : GAME_MODE_TITLE);
   int base = (is_image ?
-	      (initial ? MUS_TITLESCREEN_INITIAL_1  : MUS_TITLESCREEN_1) :
-	      (initial ? MUS_TITLEMESSAGE_INITIAL_1 : MUS_TITLEMESSAGE_1));
-
+	      (initial ? MUS_BACKGROUND_TITLESCREEN_INITIAL_1 :
+	                 MUS_BACKGROUND_TITLESCREEN_1) :
+	      (initial ? MUS_BACKGROUND_TITLEMESSAGE_INITIAL_1 :
+	                 MUS_BACKGROUND_TITLEMESSAGE_1));
   int music_global = menu.music[mode];
   int music_local = base + nr;
 
@@ -1009,7 +1031,7 @@ void DrawTitleScreenImage(int nr, boolean initial)
   dst_y = (WIN_YSIZE - height) / 2;
 
   SetDrawBackgroundMask(REDRAW_ALL);
-  SetWindowBackgroundImage(getTitleScreenBackground(initial));
+  SetWindowBackgroundImage(getTitleBackground(nr, initial, TRUE));
 
   ClearRectangleOnBackground(drawto, 0, 0, WIN_XSIZE, WIN_YSIZE);
 
@@ -1054,7 +1076,7 @@ void DrawTitleScreenMessage(int nr, boolean initial)
   if (filename == NULL)
     return;
 
-  /* force MESSAGE font on title message screen */
+  /* force TITLE font on title message screen */
   game_status = getTitleMessageGameMode(initial);
 
   /* if chars set to "-1", automatically determine by text and font width */
@@ -1070,7 +1092,7 @@ void DrawTitleScreenMessage(int nr, boolean initial)
     tmi->height = tmi->lines * getFontHeight(tmi->font);
 
   SetDrawBackgroundMask(REDRAW_ALL);
-  SetWindowBackgroundImage(getTitleMessageBackground(initial));
+  SetWindowBackgroundImage(getTitleBackground(nr, initial, FALSE));
 
   ClearRectangleOnBackground(drawto, 0, 0, WIN_XSIZE, WIN_YSIZE);
 

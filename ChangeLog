@@ -1,3 +1,6 @@
+2007-03-18
+	* added configurability of graphics, sounds and music for title screens
+
 2007-03-14
 	* added full configurability of "readme.txt" screen appearance:
 	  - readme.x:             <left position used with alignment>
