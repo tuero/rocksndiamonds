@@ -2067,7 +2067,7 @@ struct TitleMessageInfo
   int font;
   boolean autowrap;
   boolean centered;
-  boolean skip_comments;
+  boolean parse_comments;
   int sort_priority;
 };
 

@@ -65,8 +65,8 @@ struct TokenIntPtrInfo image_config_vars[] =
     &titlemessage_initial_default.centered
   },
   {
-    "[titlemessage_initial].skip_comments",
-    &titlemessage_initial_default.skip_comments
+    "[titlemessage_initial].parse_comments",
+    &titlemessage_initial_default.parse_comments
   },
   {
     "[titlemessage_initial].sort_priority",
@@ -117,8 +117,8 @@ struct TokenIntPtrInfo image_config_vars[] =
     &titlemessage_default.centered
   },
   {
-    "[titlemessage].skip_comments",
-    &titlemessage_default.skip_comments
+    "[titlemessage].parse_comments",
+    &titlemessage_default.parse_comments
   },
   {
     "[titlemessage].sort_priority",
@@ -169,8 +169,8 @@ struct TokenIntPtrInfo image_config_vars[] =
     &titlemessage_initial[0].centered
   },
   {
-    "titlemessage_initial_1.skip_comments",
-    &titlemessage_initial[0].skip_comments
+    "titlemessage_initial_1.parse_comments",
+    &titlemessage_initial[0].parse_comments
   },
   {
     "titlemessage_initial_1.sort_priority",
@@ -221,8 +221,8 @@ struct TokenIntPtrInfo image_config_vars[] =
     &titlemessage_initial[1].centered
   },
   {
-    "titlemessage_initial_2.skip_comments",
-    &titlemessage_initial[1].skip_comments
+    "titlemessage_initial_2.parse_comments",
+    &titlemessage_initial[1].parse_comments
   },
   {
     "titlemessage_initial_2.sort_priority",
@@ -273,8 +273,8 @@ struct TokenIntPtrInfo image_config_vars[] =
     &titlemessage_initial[2].centered
   },
   {
-    "titlemessage_initial_3.skip_comments",
-    &titlemessage_initial[2].skip_comments
+    "titlemessage_initial_3.parse_comments",
+    &titlemessage_initial[2].parse_comments
   },
   {
     "titlemessage_initial_3.sort_priority",
@@ -325,8 +325,8 @@ struct TokenIntPtrInfo image_config_vars[] =
     &titlemessage_initial[3].centered
   },
   {
-    "titlemessage_initial_4.skip_comments",
-    &titlemessage_initial[3].skip_comments
+    "titlemessage_initial_4.parse_comments",
+    &titlemessage_initial[3].parse_comments
   },
   {
     "titlemessage_initial_4.sort_priority",
@@ -377,8 +377,8 @@ struct TokenIntPtrInfo image_config_vars[] =
     &titlemessage_initial[4].centered
   },
   {
-    "titlemessage_initial_5.skip_comments",
-    &titlemessage_initial[4].skip_comments
+    "titlemessage_initial_5.parse_comments",
+    &titlemessage_initial[4].parse_comments
   },
   {
     "titlemessage_initial_5.sort_priority",
@@ -429,8 +429,8 @@ struct TokenIntPtrInfo image_config_vars[] =
     &titlemessage[0].centered
   },
   {
-    "titlemessage_1.skip_comments",
-    &titlemessage[0].skip_comments
+    "titlemessage_1.parse_comments",
+    &titlemessage[0].parse_comments
   },
   {
     "titlemessage_1.sort_priority",
@@ -481,8 +481,8 @@ struct TokenIntPtrInfo image_config_vars[] =
     &titlemessage[1].centered
   },
   {
-    "titlemessage_2.skip_comments",
-    &titlemessage[1].skip_comments
+    "titlemessage_2.parse_comments",
+    &titlemessage[1].parse_comments
   },
   {
     "titlemessage_2.sort_priority",
@@ -533,8 +533,8 @@ struct TokenIntPtrInfo image_config_vars[] =
     &titlemessage[2].centered
   },
   {
-    "titlemessage_3.skip_comments",
-    &titlemessage[2].skip_comments
+    "titlemessage_3.parse_comments",
+    &titlemessage[2].parse_comments
   },
   {
     "titlemessage_3.sort_priority",
@@ -585,8 +585,8 @@ struct TokenIntPtrInfo image_config_vars[] =
     &titlemessage[3].centered
   },
   {
-    "titlemessage_4.skip_comments",
-    &titlemessage[3].skip_comments
+    "titlemessage_4.parse_comments",
+    &titlemessage[3].parse_comments
   },
   {
     "titlemessage_4.sort_priority",
@@ -637,8 +637,8 @@ struct TokenIntPtrInfo image_config_vars[] =
     &titlemessage[4].centered
   },
   {
-    "titlemessage_5.skip_comments",
-    &titlemessage[4].skip_comments
+    "titlemessage_5.parse_comments",
+    &titlemessage[4].parse_comments
   },
   {
     "titlemessage_5.sort_priority",
@@ -689,8 +689,8 @@ struct TokenIntPtrInfo image_config_vars[] =
     &readme.centered
   },
   {
-    "readme.skip_comments",
-    &readme.skip_comments
+    "readme.parse_comments",
+    &readme.parse_comments
   },
   {
     "readme.sort_priority",

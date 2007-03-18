@@ -8321,33 +8321,6 @@ void LoadCustomElementDescriptions()
   freeSetupFileHash(setup_file_hash);
 }
 
-static int get_token_parameter_value(char *token, char *value_raw)
-{
-  char *suffix;
-
-  if (token == NULL || value_raw == NULL)
-    return ARG_UNDEFINED_VALUE;
-
-  suffix = strrchr(token, '.');
-  if (suffix == NULL)
-    suffix = token;
-
-  if (strncmp(suffix, ".font", 5) == 0)
-  {
-    int i;
-
-    /* !!! OPTIMIZE THIS BY USING HASH !!! */
-    for (i = 0; i < NUM_FONTS; i++)
-      if (strEqual(value_raw, font_info[i].token_name))
-	return i;
-
-    /* if font not found, use reliable default value */
-    return FONT_INITIAL_1;
-  }
-
-  return get_parameter_value(value_raw, suffix, TYPE_INTEGER);
-}
-
 static void LoadSpecialMenuDesignSettingsFromFilename(char *filename)
 {
   static struct TitleMessageInfo tmi;
@@ -8364,7 +8337,7 @@ static void LoadSpecialMenuDesignSettingsFromFilename(char *filename)
     { TYPE_INTEGER,	&tmi.font,		".font"			},
     { TYPE_BOOLEAN,	&tmi.autowrap,		".autowrap"		},
     { TYPE_BOOLEAN,	&tmi.centered,		".centered"		},
-    { TYPE_BOOLEAN,	&tmi.skip_comments,	".skip_comments"	},
+    { TYPE_BOOLEAN,	&tmi.parse_comments,	".parse_comments"	},
     { TYPE_INTEGER,	&tmi.sort_priority,	".sort_priority"	},
 
     { -1,		NULL,			NULL			}

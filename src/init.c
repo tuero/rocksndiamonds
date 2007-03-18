@@ -183,6 +183,19 @@ static int getFontBitmapID(int font_nr)
     return font_nr;
 }
 
+static int getFontFromToken(char *token)
+{
+  int i;
+
+  /* !!! OPTIMIZE THIS BY USING HASH !!! */
+  for (i = 0; i < NUM_FONTS; i++)
+    if (strEqual(token, font_info[i].token_name))
+      return i;
+
+  /* if font not found, use reliable default value */
+  return FONT_INITIAL_1;
+}
+
 void InitFontGraphicInfo()
 {
   static struct FontBitmapInfo *font_bitmap_info = NULL;
@@ -193,7 +206,8 @@ void InitFontGraphicInfo()
 
   if (graphic_info == NULL)		/* still at startup phase */
   {
-    InitFontInfo(font_initial, NUM_INITIAL_FONTS, getFontBitmapID);
+    InitFontInfo(font_initial, NUM_INITIAL_FONTS,
+		 getFontBitmapID, getFontFromToken);
 
     return;
   }
@@ -412,7 +426,8 @@ void InitFontGraphicInfo()
     }
   }
 
-  InitFontInfo(font_bitmap_info, num_font_bitmaps, getFontBitmapID);
+  InitFontInfo(font_bitmap_info, num_font_bitmaps,
+	       getFontBitmapID, getFontFromToken);
 }
 
 void InitElementGraphicInfo()

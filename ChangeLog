@@ -1,37 +1,82 @@
 2007-03-18
-	* added configurability of graphics, sounds and music for title screens
+	* added configurability of graphics, sounds and music for title screens,
+	  which are separated into initial title screens (only shown once at
+	  program startup) and title screens shown for a given level set; these
+	  title screens can be composed of up to five title images and up to
+	  five title text messages (each drawn using an optional background
+	  image), also using background music and/or sounds; aspects like
+	  background images, sounds and music of title screens can either be
+	  defined generally (valid for all title screens) or specifically (and
+	  therefore differently for each title screen) using these directives:
+
+	  to define a background image, sound or music file for all screens:
+	  - background.TITLE_INITIAL (for all title screens for game startup)
+	  - background.TITLE         (for all title screens for level sets)
+
+	  to define a background image, sound or music file for a single screen:
+	  - background.titlescreen_initial_x  (with x in 1,2,3,4,5)
+	  - background.titlescreen_x          (with x in 1,2,3,4,5)
+	  - background.titlemessage_initial_x (with x in 1,2,3,4,5)
+	  - background.titlemessage_x         (with x in 1,2,3,4,5)
+
+	  to define the title screen images:
+	  - titlescreen_initial_x             (with x in 1,2,3,4,5)
+	  - titlescreen_x                     (with x in 1,2,3,4,5)
+
+	  to define the title text messages, place text files into the level set
+	  directory that have the following file names:
+	  - titlemessage_initial_x.txt        (with x in 1,2,3,4,5)
+	  - titlemessage_x.txt                (with x in 1,2,3,4,5)
+
+	  to define the properties of the text messages, either use directives
+	  that affect all text messages:
+	  - [titlemessage_initial].<suffix>
+	  - [titlemessage].<suffix>
+	  or use directives affect single text messages:
+	  - titlemessage_initial_x.<suffix>   (with x in 1,2,3,4,5)
+	  - titlemessage_x.<suffix>           (with x in 1,2,3,4,5)
+
+	  valid values for <suffix> are the same as for readme.<suffix> below;
+	  use ".sort_priority" (default: 0) to define an arbitrary order for
+	  title images and title messages (which can therefore be mixed)
 
 2007-03-14
 	* added full configurability of "readme.txt" screen appearance:
-	  - readme.x:             <left position used with alignment>
-	  - readme.y:             <top position>
-	  - readme.width:         <maximim text width in pixels>
-	  - readme.height:        <maximum text height in pixels>
-	  - readme.chars:         <maximum number of chars per line>
-	  - readme.lines:         <maximum number of lines displayed>
-	  - readme.align:         left,center,right (default: center)
-	  - readme.font:          font name
-	  - readme.autowrap:      true,false (default: true)
-	  - readme.centered:      true,false (default: false)
-	  - readme.skip_comments: true,false (default: true)
-	  - readme.sort_priority: (currently not used)
+	  - readme.x:              <left position used with alignment>
+	  - readme.y:              <top position>
+	  - readme.width:          <maximim text width in pixels>
+	  - readme.height:         <maximum text height in pixels>
+	  - readme.chars:          <maximum number of chars per line>
+	  - readme.lines:          <maximum number of lines displayed>
+	  - readme.align:          left,center,right (default: center)
+	  - readme.top:            top,middle,bottom (default: top)
+	  - readme.font:           font name
+	  - readme.autowrap:       true,false (default: true)
+	  - readme.centered:       true,false (default: false)
+	  - readme.parse_comments: true,false (default: true)
+	  - readme.sort_priority:  (not used here, but only for title screens)
 	  when "readme.chars" and/or "readme.lines" is set to "-1" (this is the
 	  default), they are automatically determined from "readme.width" and
 	  "readme.height" accordingly; when they are not "-1", they have
 	  precedence over "readme.width" and "readme.height"
 	* added internal ad-hoc config settings for displaying text files like
 	  title messages or "readme.txt" style level set info files:
-	  - .autowrap:      true,false (default: value of readme.autowrap)
-	  - .centered:      true,false (default: value of readme.autowrap)
-	  - .skip_comments: true,false (default: value of readme.autowrap)
+	  - .font:           font name  (default: readme.font)
+	  - .autowrap:       true,false (default: readme.autowrap)
+	  - .centered:       true,false (default: readme.centered)
+	  - .parse_comments: true,false (default: readme.parse_comments)
 	  (the leading '.' and the separating ':' are mandatory here); to use
 	  these ad-hoc settings, they have to be written inside a comment, like
 	  "# .autowrap: false" or "# .centered: true"; these settings then
 	  override the above global settings (they can even be used more than
 	  once, like "# .centered: true", then some text that should be drawn
 	  centered, then "# .centered: false" to go back to non-centered text;
-	  only ".skip_comments" can not be used after a ".skip_comments: false"
-	  again, as this generally disables detecting comments at all)
+	  important note: after using "# .parse_comments: false", or when using
+	  "readme.parse_comments: false", detecting and parsing comments inside
+	  the file is disabled and comments are just printed like normal text;
+	  also be aware that all automatic text size calculations are done with
+	  the font defined in "readme.font", while using different fonts using
+	  "# .font: <font>" inside the text file may cause unexpected results
 
 2007-03-08
 	* changed some numerical limits in the level editor from 255 to 999

@@ -692,6 +692,7 @@ struct GfxInfo
   int num_fonts;
   struct FontBitmapInfo *font_bitmap_info;
   int (*select_font_function)(int);
+  int (*get_font_from_token_function)(char *);
 
   int anim_random_frame;
 };

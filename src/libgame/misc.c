@@ -1824,6 +1824,10 @@ int get_parameter_value(char *value_raw, char *suffix, int type)
     if (string_has_parameter(value, "static_panel"))
       result |= ANIM_STATIC_PANEL;
   }
+  else if (strEqual(suffix, ".font"))
+  {
+    result = gfx.get_font_from_token_function(value);
+  }
   else		/* generic parameter of type integer or boolean */
   {
     result = (strEqual(value, ARG_UNDEFINED) ? ARG_UNDEFINED_VALUE :
@@ -1835,6 +1839,35 @@ int get_parameter_value(char *value_raw, char *suffix, int type)
   free(value);
 
   return result;
+}
+
+int get_token_parameter_value(char *token, char *value_raw)
+{
+  char *suffix;
+
+  if (token == NULL || value_raw == NULL)
+    return ARG_UNDEFINED_VALUE;
+
+  suffix = strrchr(token, '.');
+  if (suffix == NULL)
+    suffix = token;
+
+#if 0
+  if (strncmp(suffix, ".font", 5) == 0)
+  {
+    int i;
+
+    /* !!! OPTIMIZE THIS BY USING HASH !!! */
+    for (i = 0; i < NUM_FONTS; i++)
+      if (strEqual(value_raw, font_info[i].token_name))
+	return i;
+
+    /* if font not found, use reliable default value */
+    return FONT_INITIAL_1;
+  }
+#endif
+
+  return get_parameter_value(value_raw, suffix, TYPE_INTEGER);
 }
 
 struct ScreenModeInfo *get_screen_mode_from_string(char *screen_mode_string)

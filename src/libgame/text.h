@@ -61,7 +61,8 @@
 
 /* font structure definitions */
 
-void InitFontInfo(struct FontBitmapInfo *, int, int (*function)(int));
+void InitFontInfo(struct FontBitmapInfo *, int,
+		  int (*function1)(int), int (*function2)(char *));
 void FreeFontInfo(struct FontBitmapInfo *);
 
 struct FontBitmapInfo *getFontBitmapInfo(int);

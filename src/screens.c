@@ -1106,11 +1106,11 @@ void DrawTitleScreenMessage(int nr, boolean initial)
 #if 1
   DrawTextFile(ALIGNED_TEXT_XPOS(tmi), ALIGNED_TEXT_YPOS(tmi),
 	       filename, tmi->font, tmi->chars, -1, tmi->lines, -1,
-	       tmi->autowrap, tmi->centered, tmi->skip_comments);
+	       tmi->autowrap, tmi->centered, tmi->parse_comments);
 #else
   DrawTextFile(sx, sy, filename, font_nr, max_chars_per_line, -1,
 	       max_lines_per_screen, -1, tmi->autowrap, tmi->centered,
-	       tmi->skip_comments);
+	       tmi->parse_comments);
 #endif
 
   game_status = last_game_status;	/* restore current game status */
@@ -3277,7 +3277,7 @@ void DrawInfoScreen_LevelSet()
   if (filename != NULL)
     DrawTextFile(mSX + ALIGNED_TEXT_XPOS(tmi), mSY + ALIGNED_TEXT_YPOS(tmi),
 		 filename, tmi->font, tmi->chars, -1, tmi->lines, -1,
-		 tmi->autowrap, tmi->centered, tmi->skip_comments);
+		 tmi->autowrap, tmi->centered, tmi->parse_comments);
   else
     DrawTextCentered(mSY + ALIGNED_TEXT_YPOS(tmi), FONT_TEXT_2,
 		     "No information for this level set.");

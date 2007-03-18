@@ -107,11 +107,13 @@ static void FreeFontClipmasks()
 #endif /* TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND */
 
 void InitFontInfo(struct FontBitmapInfo *font_bitmap_info, int num_fonts,
-		  int (*select_font_function)(int))
+		  int (*select_font_function)(int),
+		  int (*get_font_from_token_function)(char *))
 {
   gfx.num_fonts = num_fonts;
   gfx.font_bitmap_info = font_bitmap_info;
   gfx.select_font_function = select_font_function;
+  gfx.get_font_from_token_function = get_font_from_token_function;
 
 #if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
   InitFontClipmasks();
@@ -731,7 +733,7 @@ static void DrawTextBuffer_Flush(int x, int y, char *buffer, int font_nr,
 int DrawTextBuffer(int x, int y, char *text_buffer, int font_nr,
 		   int line_length, int cut_length, int max_lines,
 		   int mask_mode, boolean autowrap, boolean centered,
-		   boolean skip_comments)
+		   boolean parse_comments)
 {
 #if 0
   int font_width = getFontWidth(font_nr);
@@ -776,7 +778,7 @@ int DrawTextBuffer(int x, int y, char *text_buffer, int font_nr,
       text_buffer++;
 
     /* skip comments (lines directly beginning with '#') */
-    if (line[0] == '#' && skip_comments)
+    if (line[0] == '#' && parse_comments)
     {
       char *token, *value;
 
@@ -795,12 +797,14 @@ int DrawTextBuffer(int x, int y, char *text_buffer, int font_nr,
 	  buffer_len = 0;
 	}
 
-	if (strEqual(token, ".autowrap"))
+	if (strEqual(token, ".font"))
+	  font_nr = gfx.get_font_from_token_function(value);
+	else if (strEqual(token, ".autowrap"))
 	  autowrap = get_boolean_from_string(value);
 	else if (strEqual(token, ".centered"))
 	  centered = get_boolean_from_string(value);
-	else if (strEqual(token, ".skip_comments"))
-	  skip_comments = get_boolean_from_string(value);
+	else if (strEqual(token, ".parse_comments"))
+	  parse_comments = get_boolean_from_string(value);
       }
 
       continue;
@@ -910,13 +914,13 @@ int DrawTextBuffer(int x, int y, char *text_buffer, int font_nr,
 int DrawTextFile(int x, int y, char *filename, int font_nr,
 		 int line_length, int cut_length, int max_lines,
 		 int mask_mode, boolean autowrap, boolean centered,
-		 boolean skip_comments)
+		 boolean parse_comments)
 {
   char *text_buffer = GetTextBufferFromFile(filename, MAX_LINES_FROM_FILE);
   int num_lines_printed = DrawTextBuffer(x, y, text_buffer, font_nr,
 					 line_length, cut_length, max_lines,
 					 mask_mode, autowrap, centered,
-					 skip_comments);
+					 parse_comments);
   checked_free(text_buffer);
 
   return num_lines_printed;
