@@ -8441,13 +8441,20 @@ void LoadSpecialMenuDesignSettings()
   char *filename_base = UNDEFINED_FILENAME, *filename_local;
   int i, j;
 
-  /* always start with reliable default values from default config */
+  /* always start with reliable default values from static default config */
   for (i = 0; image_config_vars[i].token != NULL; i++)
     for (j = 0; image_config[j].token != NULL; j++)
       if (strEqual(image_config_vars[i].token, image_config[j].token))
 	*image_config_vars[i].value =
 	  get_token_parameter_value(image_config_vars[i].token,
 				    image_config[j].value);
+
+  /* special case: initialize with default values that may be overwritten */
+  for (i = 0; i < MAX_NUM_TITLE_MESSAGES; i++)
+  {
+    titlemessage_initial[i] = titlemessage_initial_default;
+    titlemessage[i] = titlemessage_default;
+  }
 
   if (!SETUP_OVERRIDE_ARTWORK(setup, ARTWORK_TYPE_GRAPHICS))
   {
