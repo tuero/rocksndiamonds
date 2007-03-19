@@ -21,6 +21,38 @@
 struct TokenIntPtrInfo image_config_vars[] =
 {
   {
+    "[title_initial].anim_mode",
+    &title_initial_default.anim_mode
+  },
+  {
+    "[title_initial].fade_delay",
+    &title_initial_default.fade_delay
+  },
+  {
+    "[title_initial].post_delay",
+    &title_initial_default.post_delay
+  },
+  {
+    "[title_initial].auto_delay",
+    &title_initial_default.auto_delay
+  },
+  {
+    "[title].anim_mode",
+    &title_default.anim_mode
+  },
+  {
+    "[title].fade_delay",
+    &title_default.fade_delay
+  },
+  {
+    "[title].post_delay",
+    &title_default.post_delay
+  },
+  {
+    "[title].auto_delay",
+    &title_default.auto_delay
+  },
+  {
     "[titlemessage_initial].x",
     &titlemessage_initial_default.x
   },
@@ -71,6 +103,22 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "[titlemessage_initial].sort_priority",
     &titlemessage_initial_default.sort_priority
+  },
+  {
+    "[titlemessage_initial].anim_mode",
+    &titlemessage_initial_default.anim_mode
+  },
+  {
+    "[titlemessage_initial].fade_delay",
+    &titlemessage_initial_default.fade_delay
+  },
+  {
+    "[titlemessage_initial].post_delay",
+    &titlemessage_initial_default.post_delay
+  },
+  {
+    "[titlemessage_initial].auto_delay",
+    &titlemessage_initial_default.auto_delay
   },
   {
     "[titlemessage].x",
@@ -125,6 +173,22 @@ struct TokenIntPtrInfo image_config_vars[] =
     &titlemessage_default.sort_priority
   },
   {
+    "[titlemessage].anim_mode",
+    &titlemessage_default.anim_mode
+  },
+  {
+    "[titlemessage].fade_delay",
+    &titlemessage_default.fade_delay
+  },
+  {
+    "[titlemessage].post_delay",
+    &titlemessage_default.post_delay
+  },
+  {
+    "[titlemessage].auto_delay",
+    &titlemessage_default.auto_delay
+  },
+  {
     "titlemessage_initial_1.x",
     &titlemessage_initial[0].x
   },
@@ -175,6 +239,22 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "titlemessage_initial_1.sort_priority",
     &titlemessage_initial[0].sort_priority
+  },
+  {
+    "titlemessage_initial_1.anim_mode",
+    &titlemessage_initial[0].anim_mode
+  },
+  {
+    "titlemessage_initial_1.fade_delay",
+    &titlemessage_initial[0].fade_delay
+  },
+  {
+    "titlemessage_initial_1.post_delay",
+    &titlemessage_initial[0].post_delay
+  },
+  {
+    "titlemessage_initial_1.auto_delay",
+    &titlemessage_initial[0].auto_delay
   },
   {
     "titlemessage_initial_2.x",
@@ -229,6 +309,22 @@ struct TokenIntPtrInfo image_config_vars[] =
     &titlemessage_initial[1].sort_priority
   },
   {
+    "titlemessage_initial_2.anim_mode",
+    &titlemessage_initial[1].anim_mode
+  },
+  {
+    "titlemessage_initial_2.fade_delay",
+    &titlemessage_initial[1].fade_delay
+  },
+  {
+    "titlemessage_initial_2.post_delay",
+    &titlemessage_initial[1].post_delay
+  },
+  {
+    "titlemessage_initial_2.auto_delay",
+    &titlemessage_initial[1].auto_delay
+  },
+  {
     "titlemessage_initial_3.x",
     &titlemessage_initial[2].x
   },
@@ -279,6 +375,22 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "titlemessage_initial_3.sort_priority",
     &titlemessage_initial[2].sort_priority
+  },
+  {
+    "titlemessage_initial_3.anim_mode",
+    &titlemessage_initial[2].anim_mode
+  },
+  {
+    "titlemessage_initial_3.fade_delay",
+    &titlemessage_initial[2].fade_delay
+  },
+  {
+    "titlemessage_initial_3.post_delay",
+    &titlemessage_initial[2].post_delay
+  },
+  {
+    "titlemessage_initial_3.auto_delay",
+    &titlemessage_initial[2].auto_delay
   },
   {
     "titlemessage_initial_4.x",
@@ -333,6 +445,22 @@ struct TokenIntPtrInfo image_config_vars[] =
     &titlemessage_initial[3].sort_priority
   },
   {
+    "titlemessage_initial_4.anim_mode",
+    &titlemessage_initial[3].anim_mode
+  },
+  {
+    "titlemessage_initial_4.fade_delay",
+    &titlemessage_initial[3].fade_delay
+  },
+  {
+    "titlemessage_initial_4.post_delay",
+    &titlemessage_initial[3].post_delay
+  },
+  {
+    "titlemessage_initial_4.auto_delay",
+    &titlemessage_initial[3].auto_delay
+  },
+  {
     "titlemessage_initial_5.x",
     &titlemessage_initial[4].x
   },
@@ -383,6 +511,22 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "titlemessage_initial_5.sort_priority",
     &titlemessage_initial[4].sort_priority
+  },
+  {
+    "titlemessage_initial_5.anim_mode",
+    &titlemessage_initial[4].anim_mode
+  },
+  {
+    "titlemessage_initial_5.fade_delay",
+    &titlemessage_initial[4].fade_delay
+  },
+  {
+    "titlemessage_initial_5.post_delay",
+    &titlemessage_initial[4].post_delay
+  },
+  {
+    "titlemessage_initial_5.auto_delay",
+    &titlemessage_initial[4].auto_delay
   },
   {
     "titlemessage_1.x",
@@ -437,6 +581,22 @@ struct TokenIntPtrInfo image_config_vars[] =
     &titlemessage[0].sort_priority
   },
   {
+    "titlemessage_1.anim_mode",
+    &titlemessage[0].anim_mode
+  },
+  {
+    "titlemessage_1.fade_delay",
+    &titlemessage[0].fade_delay
+  },
+  {
+    "titlemessage_1.post_delay",
+    &titlemessage[0].post_delay
+  },
+  {
+    "titlemessage_1.auto_delay",
+    &titlemessage[0].auto_delay
+  },
+  {
     "titlemessage_2.x",
     &titlemessage[1].x
   },
@@ -487,6 +647,22 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "titlemessage_2.sort_priority",
     &titlemessage[1].sort_priority
+  },
+  {
+    "titlemessage_2.anim_mode",
+    &titlemessage[1].anim_mode
+  },
+  {
+    "titlemessage_2.fade_delay",
+    &titlemessage[1].fade_delay
+  },
+  {
+    "titlemessage_2.post_delay",
+    &titlemessage[1].post_delay
+  },
+  {
+    "titlemessage_2.auto_delay",
+    &titlemessage[1].auto_delay
   },
   {
     "titlemessage_3.x",
@@ -541,6 +717,22 @@ struct TokenIntPtrInfo image_config_vars[] =
     &titlemessage[2].sort_priority
   },
   {
+    "titlemessage_3.anim_mode",
+    &titlemessage[2].anim_mode
+  },
+  {
+    "titlemessage_3.fade_delay",
+    &titlemessage[2].fade_delay
+  },
+  {
+    "titlemessage_3.post_delay",
+    &titlemessage[2].post_delay
+  },
+  {
+    "titlemessage_3.auto_delay",
+    &titlemessage[2].auto_delay
+  },
+  {
     "titlemessage_4.x",
     &titlemessage[3].x
   },
@@ -593,6 +785,22 @@ struct TokenIntPtrInfo image_config_vars[] =
     &titlemessage[3].sort_priority
   },
   {
+    "titlemessage_4.anim_mode",
+    &titlemessage[3].anim_mode
+  },
+  {
+    "titlemessage_4.fade_delay",
+    &titlemessage[3].fade_delay
+  },
+  {
+    "titlemessage_4.post_delay",
+    &titlemessage[3].post_delay
+  },
+  {
+    "titlemessage_4.auto_delay",
+    &titlemessage[3].auto_delay
+  },
+  {
     "titlemessage_5.x",
     &titlemessage[4].x
   },
@@ -643,6 +851,22 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "titlemessage_5.sort_priority",
     &titlemessage[4].sort_priority
+  },
+  {
+    "titlemessage_5.anim_mode",
+    &titlemessage[4].anim_mode
+  },
+  {
+    "titlemessage_5.fade_delay",
+    &titlemessage[4].fade_delay
+  },
+  {
+    "titlemessage_5.post_delay",
+    &titlemessage[4].post_delay
+  },
+  {
+    "titlemessage_5.auto_delay",
+    &titlemessage[4].auto_delay
   },
   {
     "readme.x",
@@ -737,16 +961,16 @@ struct TokenIntPtrInfo image_config_vars[] =
     &border.draw_masked[GFX_SPECIAL_ARG_DOOR]
   },
   {
-    "title.fade_delay",
-    &title.fade_delay
+    "[title].fade_delay",
+    &title_default.fade_delay
   },
   {
-    "title.post_delay",
-    &title.post_delay
+    "[title].post_delay",
+    &title_default.post_delay
   },
   {
-    "title.auto_delay",
-    &title.auto_delay
+    "[title].auto_delay",
+    &title_default.auto_delay
   },
   {
     "menu.fade_delay",

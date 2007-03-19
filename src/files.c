@@ -8339,6 +8339,10 @@ static void LoadSpecialMenuDesignSettingsFromFilename(char *filename)
     { TYPE_BOOLEAN,	&tmi.centered,		".centered"		},
     { TYPE_BOOLEAN,	&tmi.parse_comments,	".parse_comments"	},
     { TYPE_INTEGER,	&tmi.sort_priority,	".sort_priority"	},
+    { TYPE_INTEGER,	&tmi.anim_mode,		".anim_mode"		},
+    { TYPE_INTEGER,	&tmi.fade_delay,	".fade_delay"		},
+    { TYPE_INTEGER,	&tmi.post_delay,	".post_delay"		},
+    { TYPE_INTEGER,	&tmi.auto_delay,	".auto_delay"		},
 
     { -1,		NULL,			NULL			}
   };
@@ -8364,7 +8368,10 @@ static void LoadSpecialMenuDesignSettingsFromFilename(char *filename)
   if ((setup_file_hash = loadSetupFileHash(filename)) == NULL)
     return;
 
+  /* the following initializes hierarchical values from dynamic configuration */
+
   /* special case: initialize with default values that may be overwritten */
+  /* (e.g., init "menu.draw_xoffset.INFO" from "menu.draw_xoffset") */
   for (i = 0; i < NUM_SPECIAL_GFX_ARGS; i++)
   {
     char *value_1 = getHashEntry(setup_file_hash, "menu.draw_xoffset");
@@ -8380,6 +8387,7 @@ static void LoadSpecialMenuDesignSettingsFromFilename(char *filename)
   }
 
   /* special case: initialize with default values that may be overwritten */
+  /* (eg, init "menu.draw_xoffset.INFO[MUSIC]" from "menu.draw_xoffset.INFO") */
   for (i = 0; i < NUM_SPECIAL_GFX_INFO_ARGS; i++)
   {
     char *value_1 = getHashEntry(setup_file_hash, "menu.draw_xoffset.INFO");
@@ -8392,6 +8400,7 @@ static void LoadSpecialMenuDesignSettingsFromFilename(char *filename)
   }
 
   /* special case: initialize with default values that may be overwritten */
+  /* (e.g., init "titlemessage_1.anim_mode" from "[titlemessage].anim_mode") */
   for (i = 0; titlemessage_arrays[i].array != NULL; i++)
   {
     struct TitleMessageInfo *array = titlemessage_arrays[i].array;
@@ -8449,7 +8458,21 @@ void LoadSpecialMenuDesignSettings()
 	  get_token_parameter_value(image_config_vars[i].token,
 				    image_config[j].value);
 
-  /* special case: initialize with default values that may be overwritten */
+  /* the following initializes hierarchical values from static configuration */
+
+  /* special case: initialize "ARG_DEFAULT" values in static default config */
+  /* (e.g., initialize "[titlemessage].anim_mode" from "[title].anim_mode") */
+  titlemessage_initial_default.anim_mode  = title_initial_default.anim_mode;
+  titlemessage_initial_default.fade_delay = title_initial_default.fade_delay;
+  titlemessage_initial_default.post_delay = title_initial_default.post_delay;
+  titlemessage_initial_default.auto_delay = title_initial_default.auto_delay;
+  titlemessage_default.anim_mode  = title_default.anim_mode;
+  titlemessage_default.fade_delay = title_default.fade_delay;
+  titlemessage_default.post_delay = title_default.post_delay;
+  titlemessage_default.auto_delay = title_default.auto_delay;
+
+  /* special case: initialize "ARG_DEFAULT" values in static default config */
+  /* (e.g., init "titlemessage_1.anim_mode" from "[titlemessage].anim_mode") */
   for (i = 0; i < MAX_NUM_TITLE_MESSAGES; i++)
   {
     titlemessage_initial[i] = titlemessage_initial_default;

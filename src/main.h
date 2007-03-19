@@ -2049,13 +2049,10 @@ struct MenuMainInfo
 
 struct TitleInfo
 {
+  int anim_mode;
   int fade_delay;
   int post_delay;
   int auto_delay;
-
-  int fade_delay_final;
-  int post_delay_final;
-  int auto_delay_final;
 };
 
 struct TitleMessageInfo
@@ -2069,6 +2066,11 @@ struct TitleMessageInfo
   boolean centered;
   boolean parse_comments;
   int sort_priority;
+
+  int anim_mode;
+  int fade_delay;
+  int post_delay;
+  int auto_delay;
 };
 
 struct MenuInfo
@@ -2684,6 +2686,8 @@ extern struct HiScore		highscore[];
 extern struct TapeInfo		tape;
 extern struct GlobalInfo	global;
 extern struct BorderInfo	border;
+extern struct TitleInfo		title_initial_default;
+extern struct TitleInfo		title_default;
 extern struct TitleInfo		title;
 extern struct TitleMessageInfo	titlemessage_initial_default;
 extern struct TitleMessageInfo	titlemessage_initial[];

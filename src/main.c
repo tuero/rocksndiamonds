@@ -106,6 +106,8 @@ struct SetupInfo	setup;
 struct GameInfo		game;
 struct GlobalInfo	global;
 struct BorderInfo	border;
+struct TitleInfo	title_initial_default;
+struct TitleInfo	title_default;
 struct TitleInfo	title;
 struct TitleMessageInfo	titlemessage_initial_default;
 struct TitleMessageInfo	titlemessage_initial[MAX_NUM_TITLE_MESSAGES];

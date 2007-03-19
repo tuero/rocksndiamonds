@@ -257,7 +257,6 @@ struct TitleControlInfo
 
 struct TitleControlInfo title_controls[MAX_NUM_TITLE_SCREENS];
 
-
 /* main menu display and control definitions */
 
 #define MAIN_CONTROL_NAME			0
@@ -540,8 +539,11 @@ static int getTitleBackground(int nr, boolean initial, boolean is_image)
   return IMG_UNDEFINED;
 }
 
-static int getTitleSound(int nr, boolean initial, boolean is_image)
+static int getTitleSound(struct TitleControlInfo *tci)
 {
+  boolean is_image = tci->is_image;
+  int initial = tci->initial;
+  int nr = tci->local_nr;
   int mode = (initial ? GAME_MODE_TITLE_INITIAL : GAME_MODE_TITLE);
   int base = (is_image ?
 	      (initial ? SND_BACKGROUND_TITLESCREEN_INITIAL_1 :
@@ -567,8 +569,11 @@ static int getTitleSound(int nr, boolean initial, boolean is_image)
   return SND_UNDEFINED;
 }
 
-static int getTitleMusic(int nr, boolean initial, boolean is_image)
+static int getTitleMusic(struct TitleControlInfo *tci)
 {
+  boolean is_image = tci->is_image;
+  int initial = tci->initial;
+  int nr = tci->local_nr;
   int mode = (initial ? GAME_MODE_TITLE_INITIAL : GAME_MODE_TITLE);
   int base = (is_image ?
 	      (initial ? MUS_BACKGROUND_TITLESCREEN_INITIAL_1 :
@@ -592,6 +597,54 @@ static int getTitleMusic(int nr, boolean initial, boolean is_image)
     return music_global;
 
   return MUS_UNDEFINED;
+}
+
+static struct TitleInfo getTitleFading(struct TitleControlInfo *tci)
+{
+  boolean is_image = tci->is_image;
+  int initial = tci->initial;
+  int nr = tci->local_nr;
+  struct TitleInfo ti;
+
+  if (is_image)
+  {
+    int graphic = getTitleScreenGraphic(nr, initial);
+
+    /* initialize fading control values to default title config settings */
+    ti = (initial ? title_initial_default : title_default);
+
+    /* override default settings with image config settings, if defined */
+    if (graphic_info[graphic].anim_mode != ANIM_DEFAULT)
+      ti.anim_mode = graphic_info[graphic].anim_mode;
+    if (graphic_info[graphic].fade_delay > -1)
+      ti.fade_delay = graphic_info[graphic].fade_delay;
+    if (graphic_info[graphic].post_delay > -1)
+      ti.post_delay = graphic_info[graphic].post_delay;
+    if (graphic_info[graphic].auto_delay > -1)
+      ti.auto_delay = graphic_info[graphic].auto_delay;
+  }
+  else
+  {
+    if (initial)
+    {
+      ti.anim_mode  = titlemessage_initial[nr].anim_mode;
+      ti.fade_delay = titlemessage_initial[nr].fade_delay;
+      ti.post_delay = titlemessage_initial[nr].post_delay;
+      ti.auto_delay = titlemessage_initial[nr].auto_delay;
+    }
+    else
+    {
+      ti.anim_mode  = titlemessage[nr].anim_mode;
+      ti.fade_delay = titlemessage[nr].fade_delay;
+      ti.post_delay = titlemessage[nr].post_delay;
+      ti.auto_delay = titlemessage[nr].auto_delay;
+    }
+  }
+
+  if (ti.anim_mode == ANIM_NONE)
+    ti.fade_delay = ti.post_delay = 0;
+
+  return ti;
 }
 
 static int compareTitleControlInfo(const void *object1, const void *object2)
@@ -1043,17 +1096,28 @@ void DrawTitleScreenImage(int nr, boolean initial)
   redraw_mask = REDRAW_ALL;
 
   /* reset fading control values to default config settings */
+#if 1
+
+#if 0
+  title = getTitleFading(nr, initial, TRUE);
+#endif
+
+#else
+
   title.fade_delay_final = title.fade_delay;
   title.post_delay_final = title.post_delay;
   title.auto_delay_final = title.auto_delay;
 
   /* override default settings with image config settings, if defined */
+  if (graphic_info[graphic].anim_mode != ANIM_DEFAULT)
+    title.anim_mode = graphic_info[graphic].anim_mode;
   if (graphic_info[graphic].fade_delay > -1)
-    title.fade_delay_final = graphic_info[graphic].fade_delay;
+    title.fade_delay = graphic_info[graphic].fade_delay;
   if (graphic_info[graphic].post_delay > -1)
-    title.post_delay_final = graphic_info[graphic].post_delay;
+    title.post_delay = graphic_info[graphic].post_delay;
   if (graphic_info[graphic].auto_delay > -1)
-    title.auto_delay_final = graphic_info[graphic].auto_delay;
+    title.auto_delay = graphic_info[graphic].auto_delay;
+#endif
 }
 
 void DrawTitleScreenMessage(int nr, boolean initial)
@@ -1159,6 +1223,11 @@ void DrawMainMenuExt(int redraw_mask, boolean do_fading)
   int i;
 #endif
 
+#if 0
+  /* !!! CHANGE THIS !!! */
+  title = title_default;
+#endif
+
   UnmapAllGadgets();
   FadeSoundsAndMusic();
 
@@ -1202,6 +1271,11 @@ void DrawMainMenuExt(int redraw_mask, boolean do_fading)
 
 #if defined(TARGET_SDL)
   SetDrawtoField(DRAW_BACKBUFFER);
+#endif
+
+#if 1
+  if (levelset_has_changed)
+    title = title_default;
 #endif
 
 #if 1
@@ -1334,10 +1408,23 @@ void DrawMainMenuExt(int redraw_mask, boolean do_fading)
 
   DrawMaskedBorder(REDRAW_ALL);
 
+#if 1
+  if (!do_fading)
+    BackToFront();
+  else if (title.anim_mode == ANIM_CROSSFADE)
+    FadeCross(redraw_mask);
+  else
+    FadeIn(redraw_mask);
+#else
   if (do_fading)
     FadeIn(redraw_mask);
   else
     BackToFront();
+#endif
+
+#if 1
+  title = title_default;
+#endif
 
   SetMouseCursor(CURSOR_DEFAULT);
 
@@ -1387,7 +1474,6 @@ static void gotoTopLevelDir()
 }
 #endif
 
-#if 1
 void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
 {
   static unsigned long title_delay = 0;
@@ -1395,12 +1481,15 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
   static int last_sound = -1, last_music = -1;
   boolean return_to_main_menu = FALSE;
   boolean use_fading_main_menu = TRUE;
+#if 0
 #if 1
   boolean use_cross_fading = FALSE;
 #else
   boolean use_cross_fading = !show_title_initial;		/* default */
 #endif
+#endif
   struct TitleControlInfo *tci;
+  struct TitleInfo title_fading_next;
   int sound, music;
 
   if (button == MB_MENU_INITIALIZE)
@@ -1428,7 +1517,9 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
 	DrawInfoScreen_NotAvailable("Title screen information:",
 				    "No title screen for this level set.");
 
-	title.auto_delay_final = -1;
+	/* use default settings for fading, but always disable auto delay */
+	title = title_default;
+	title.auto_delay = -1;
 
 	return;
       }
@@ -1439,21 +1530,15 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
     }
 
     if (tci->is_image)
-    {
       DrawTitleScreenImage(tci->local_nr, tci->initial);
-    }
     else
-    {
       DrawTitleScreenMessage(tci->local_nr, tci->initial);
 
-      title.fade_delay_final = title.fade_delay;
-      title.post_delay_final = title.post_delay;
-      title.auto_delay_final = -1;
-    }
+    title = getTitleFading(tci);
 
 #if 1
-    sound = getTitleSound(tci->local_nr, tci->initial, tci->is_image);
-    music = getTitleMusic(tci->local_nr, tci->initial, tci->is_image);
+    sound = getTitleSound(tci);
+    music = getTitleMusic(tci);
 
     if (sound != last_sound)
       PlayMenuSoundExt(sound);
@@ -1473,8 +1558,7 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
     return;
   }
 
-  if (title.auto_delay_final > -1 &&
-      DelayReached(&title_delay, title.auto_delay_final))
+  if (title.auto_delay > -1 && DelayReached(&title_delay, title.auto_delay))
     button = MB_MENU_CHOICE;
 
   if (button == MB_MENU_LEAVE)
@@ -1484,7 +1568,9 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
   }
   else if (button == MB_MENU_CHOICE)
   {
-    int anim_mode;
+#if 1
+    boolean use_cross_fading = (title.anim_mode == ANIM_CROSSFADE);
+#endif
 
     if (game_status == GAME_MODE_INFO && num_title_screens == 0)
     {
@@ -1499,21 +1585,29 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
     title_screen_nr++;
     tci = &title_controls[title_screen_nr];
 
-    if (tci->is_image)
-      anim_mode =
-	graphic_info[getTitleScreenGraphic(tci->local_nr,
-					   tci->initial)].anim_mode;
-    else
-      anim_mode = ANIM_FADE;	/* ??? */
-
-    use_cross_fading = (anim_mode == ANIM_FADE ? FALSE :
-			anim_mode == ANIM_CROSSFADE ? TRUE :
-			use_cross_fading);
-
     if (title_screen_nr < num_title_screens)
     {
-      sound = getTitleSound(tci->local_nr, tci->initial, tci->is_image);
-      music = getTitleMusic(tci->local_nr, tci->initial, tci->is_image);
+#if 1
+#if 0
+      boolean use_cross_fading = (title.anim_mode == ANIM_CROSSFADE);
+#endif
+#else
+      int anim_mode;
+
+      if (tci->is_image)
+	anim_mode =
+	  graphic_info[getTitleScreenGraphic(tci->local_nr,
+					     tci->initial)].anim_mode;
+      else
+	anim_mode = ANIM_FADE;	/* ??? */
+
+      use_cross_fading = (anim_mode == ANIM_FADE ? FALSE :
+			  anim_mode == ANIM_CROSSFADE ? TRUE :
+			  use_cross_fading);
+#endif
+
+      sound = getTitleSound(tci);
+      music = getTitleMusic(tci);
 
       if (sound == SND_UNDEFINED || sound != last_sound)
 	FadeSounds();
@@ -1530,9 +1624,11 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
       else
 	DrawTitleScreenMessage(tci->local_nr, tci->initial);
 
+      title_fading_next = getTitleFading(tci);
+
 #if 1
-      sound = getTitleSound(tci->local_nr, tci->initial, tci->is_image);
-      music = getTitleMusic(tci->local_nr, tci->initial, tci->is_image);
+      sound = getTitleSound(tci);
+      music = getTitleMusic(tci);
 
       if (sound != last_sound)
 	PlayMenuSoundExt(sound);
@@ -1543,10 +1639,16 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
       last_music = music;
 #endif
 
+      /* last screen already faded out, next screen has no animation */
+      if (!use_cross_fading && title_fading_next.anim_mode == ANIM_NONE)
+	title = title_fading_next;
+
       if (use_cross_fading)
 	FadeCross(REDRAW_ALL);
       else
 	FadeIn(REDRAW_ALL);
+
+      title = title_fading_next;
 
       DelayReached(&title_delay, 0);	/* reset delay counter */
     }
@@ -1554,7 +1656,20 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
     {
       FadeSoundsAndMusic();
 
+#if 1
+      {
+#if 0
+	boolean use_cross_fading = (title.anim_mode == ANIM_CROSSFADE);
+#endif
+
+	if (use_cross_fading)
+	  FadeCrossSaveBackbuffer();
+	else
+	  FadeOut(REDRAW_ALL);
+      }
+#else
       FadeOut(REDRAW_ALL);
+#endif
 
       return_to_main_menu = TRUE;
     }
@@ -1582,188 +1697,6 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
     }
   }
 }
-
-#else
-
-void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
-{
-  static unsigned long title_delay = 0;
-  static int title_nr = 0;
-  static boolean showing_message = FALSE;
-  char *filename = getLevelSetMessageFilename();
-  boolean return_to_main_menu = FALSE;
-  boolean use_fading_main_menu = TRUE;
-  boolean use_cross_fading = !show_title_initial;		/* default */
-  boolean no_title_info = (graphic_info[IMG_TITLESCREEN_1].bitmap == NULL &&
-			   getLevelSetMessageFilename(1, FALSE) == NULL);
-
-  if (button == MB_MENU_INITIALIZE)
-  {
-    int last_game_status = game_status;	/* save current game status */
-
-    title_delay = 0;
-    title_nr = 0;
-    showing_message = FALSE;
-
-    if (show_title_initial &&
-	graphic_info[IMG_TITLESCREEN_INITIAL_1].bitmap == NULL &&
-	getLevelSetMessageFilename(1, TRUE) == NULL)
-      show_title_initial = FALSE;
-
-    if (game_status == GAME_MODE_INFO)
-    {
-      if (no_title_info)
-      {
-	DrawInfoScreen_NotAvailable("Title screen information:",
-				    "No title screen for this level set.");
-
-	title.auto_delay_final = -1;
-
-	return;
-      }
-
-      FadeSoundsAndMusic();
-
-      FadeOut(REDRAW_ALL);
-    }
-
-    /* force TITLE music on title info screen */
-    game_status = GAME_MODE_TITLE;
-
-    PlayMenuSound();
-    PlayMenuMusic();
-
-    game_status = last_game_status;	/* restore current game status */
-
-    if (graphic_info[getTitleScreenGraphic(0, show_title_initial)].bitmap != NULL)
-    {
-      DrawTitleScreenImage(title_nr, show_title_initial);
-    }
-    else
-    {
-      DrawTitleScreenMessage(filename);
-
-      showing_message = TRUE;
-
-      title.fade_delay_final = title.fade_delay;
-      title.post_delay_final = title.post_delay;
-      title.auto_delay_final = -1;
-    }
-
-    FadeIn(REDRAW_ALL);
-
-    DelayReached(&title_delay, 0);	/* reset delay counter */
-
-    return;
-  }
-
-  if (title.auto_delay_final > -1 &&
-      DelayReached(&title_delay, title.auto_delay_final))
-    button = MB_MENU_CHOICE;
-
-  if (button == MB_MENU_LEAVE)
-  {
-    return_to_main_menu = TRUE;
-    use_fading_main_menu = FALSE;
-  }
-  else if (button == MB_MENU_CHOICE)
-  {
-    int anim_mode;
-
-    if (game_status == GAME_MODE_INFO && no_title_info)
-    {
-      FadeOut(REDRAW_FIELD);
-
-      info_mode = INFO_MODE_MAIN;
-      DrawAndFadeInInfoScreen(REDRAW_FIELD);
-
-      return;
-    }
-
-    title_nr++;
-
-    if (show_title_initial &&
-	(title_nr >= MAX_NUM_TITLE_IMAGES ||
-	 graphic_info[IMG_TITLESCREEN_INITIAL_1 + title_nr].bitmap == NULL))
-    {
-      show_title_initial = FALSE;
-
-      title_nr = 0;	/* restart with title screens for current level set */
-    }
-
-    anim_mode = graphic_info[getTitleScreenGraphic(title_nr, show_title_initial)].anim_mode;
-
-    use_cross_fading = (anim_mode == ANIM_FADE ? FALSE :
-			anim_mode == ANIM_CROSSFADE ? TRUE :
-			use_cross_fading);
-
-    if (!use_cross_fading)
-      FadeOut(REDRAW_ALL);
-
-    if (title_nr < MAX_NUM_TITLE_IMAGES &&
-	graphic_info[getTitleScreenGraphic(title_nr, show_title_initial)].bitmap != NULL)
-    {
-      if (use_cross_fading)
-	FadeCrossSaveBackbuffer();
-
-      DrawTitleScreenImage(title_nr, show_title_initial);
-
-      if (use_cross_fading)
-	FadeCross(REDRAW_ALL);
-      else
-	FadeIn(REDRAW_ALL);
-
-      DelayReached(&title_delay, 0);	/* reset delay counter */
-    }
-    else if (!showing_message && filename != NULL)
-    {
-      if (use_cross_fading)
-	FadeCrossSaveBackbuffer();
-
-      DrawTitleScreenMessage(filename);
-
-      if (use_cross_fading)
-	FadeCross(REDRAW_ALL);
-      else
-	FadeIn(REDRAW_ALL);
-
-      DelayReached(&title_delay, 0);	/* reset delay counter */
-
-      showing_message = TRUE;
-    }
-    else
-    {
-      FadeSoundsAndMusic();
-
-      FadeOut(REDRAW_ALL);
-
-      return_to_main_menu = TRUE;
-    }
-  }
-
-  if (return_to_main_menu)
-  {
-    show_title_initial = FALSE;
-
-    RedrawBackground();
-
-    if (game_status == GAME_MODE_INFO)
-    {
-      OpenDoor(DOOR_CLOSE_1 | DOOR_CLOSE_2 | DOOR_NO_DELAY | DOOR_FORCE_REDRAW);
-
-      info_mode = INFO_MODE_MAIN;
-      DrawInfoScreenExt(REDRAW_ALL, use_fading_main_menu);
-    }
-    else	/* default: return to main menu */
-    {
-      OpenDoor(DOOR_CLOSE_1 | DOOR_OPEN_2 | DOOR_NO_DELAY | DOOR_FORCE_REDRAW);
-
-      game_status = GAME_MODE_MAIN;
-      DrawMainMenuExt(REDRAW_ALL, use_fading_main_menu);
-    }
-  }
-}
-#endif
 
 void HandleMainMenu_SelectLevel(int step, int direction)
 {
@@ -2206,10 +2139,19 @@ static void DrawInfoScreen_Main(int redraw_mask, boolean do_fading)
 
   DrawMaskedBorder(REDRAW_ALL);
 
+#if 1
+  if (!do_fading)
+    BackToFront();
+  else if (title.anim_mode == ANIM_CROSSFADE)
+    FadeCross(redraw_mask);
+  else
+    FadeIn(redraw_mask);
+#else
   if (do_fading)
     FadeIn(redraw_mask);
   else
     BackToFront();
+#endif
 
   InitAnimation();
 }

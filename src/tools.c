@@ -545,8 +545,8 @@ void FadeExt(int fade_mask, int fade_mode)
     width  = WIN_XSIZE;
     height = WIN_YSIZE;
 
-    fade_delay = title.fade_delay_final;
-    post_delay = (fade_mode == FADE_MODE_FADE_OUT ? title.post_delay_final : 0);
+    fade_delay = title.fade_delay;
+    post_delay = (fade_mode == FADE_MODE_FADE_OUT ? title.post_delay : 0);
   }
 
   redraw_mask |= fade_mask;
