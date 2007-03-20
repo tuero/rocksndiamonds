@@ -533,8 +533,8 @@ void FadeExt(int fade_mask, int fade_mode)
     width  = FULL_SXSIZE;
     height = FULL_SYSIZE;
 
-    fade_delay = menu.fade_delay;
-    post_delay = (fade_mode == FADE_MODE_FADE_OUT ? menu.post_delay : 0);
+    fade_delay = fading.fade_delay;
+    post_delay = (fade_mode == FADE_MODE_FADE_OUT ? fading.post_delay : 0);
 
     draw_border_function = DrawMaskedBorder_FIELD;
   }
@@ -545,8 +545,8 @@ void FadeExt(int fade_mask, int fade_mode)
     width  = WIN_XSIZE;
     height = WIN_YSIZE;
 
-    fade_delay = title.fade_delay;
-    post_delay = (fade_mode == FADE_MODE_FADE_OUT ? title.post_delay : 0);
+    fade_delay = fading.fade_delay;
+    post_delay = (fade_mode == FADE_MODE_FADE_OUT ? fading.post_delay : 0);
   }
 
   redraw_mask |= fade_mask;

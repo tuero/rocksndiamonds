@@ -5221,15 +5221,12 @@ struct ConfigInfo image_config[] =
   { "border.draw_masked.PLAYING",		"false"			},
   { "border.draw_masked.DOOR",			"false"			},
 
-#if 0
-  { "[title].fade_delay",			"500"			},
-  { "[title].post_delay",			"250"			},
-  { "[title].auto_delay",			"-1"			},
-#endif
-
-  { "menu.fade_delay",				"250"			},
-  { "menu.post_delay",				"125"			},
-  { "menu.auto_delay",				"-1"			},
+  { "menu.navigation.anim_mode",		"none"			},
+  { "menu.navigation.fade_delay",		"250"			},
+  { "menu.navigation.post_delay",		"125"			},
+  { "menu.destination.anim_mode",		"fade"			},
+  { "menu.destination.fade_delay",		"250"			},
+  { "menu.destination.post_delay",		"125"			},
 
   { "menu.draw_xoffset",			"0"			},
   { "menu.draw_yoffset",			"0"			},

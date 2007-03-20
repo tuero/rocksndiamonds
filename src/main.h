@@ -2047,7 +2047,7 @@ struct MenuMainInfo
   struct MenuMainInputInfo input;
 };
 
-struct TitleInfo
+struct TitleFadingInfo
 {
   int anim_mode;
   int fade_delay;
@@ -2084,9 +2084,8 @@ struct MenuInfo
 
   int list_size[NUM_SPECIAL_GFX_ARGS];
 
-  int fade_delay;
-  int post_delay;
-  int auto_delay;
+  struct TitleFadingInfo navigation;
+  struct TitleFadingInfo destination;
 
   int sound[NUM_SPECIAL_GFX_ARGS];
   int music[NUM_SPECIAL_GFX_ARGS];
@@ -2686,9 +2685,9 @@ extern struct HiScore		highscore[];
 extern struct TapeInfo		tape;
 extern struct GlobalInfo	global;
 extern struct BorderInfo	border;
-extern struct TitleInfo		title_initial_default;
-extern struct TitleInfo		title_default;
-extern struct TitleInfo		title;
+extern struct TitleFadingInfo	fading;
+extern struct TitleFadingInfo	title_initial_default;
+extern struct TitleFadingInfo	title_default;
 extern struct TitleMessageInfo	titlemessage_initial_default;
 extern struct TitleMessageInfo	titlemessage_initial[];
 extern struct TitleMessageInfo	titlemessage_default;

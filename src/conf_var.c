@@ -961,28 +961,28 @@ struct TokenIntPtrInfo image_config_vars[] =
     &border.draw_masked[GFX_SPECIAL_ARG_DOOR]
   },
   {
-    "[title].fade_delay",
-    &title_default.fade_delay
+    "menu.navigation.anim_mode",
+    &menu.navigation.anim_mode
   },
   {
-    "[title].post_delay",
-    &title_default.post_delay
+    "menu.navigation.fade_delay",
+    &menu.navigation.fade_delay
   },
   {
-    "[title].auto_delay",
-    &title_default.auto_delay
+    "menu.navigation.post_delay",
+    &menu.navigation.post_delay
   },
   {
-    "menu.fade_delay",
-    &menu.fade_delay
+    "menu.destination.anim_mode",
+    &menu.destination.anim_mode
   },
   {
-    "menu.post_delay",
-    &menu.post_delay
+    "menu.destination.fade_delay",
+    &menu.destination.fade_delay
   },
   {
-    "menu.auto_delay",
-    &menu.auto_delay
+    "menu.destination.post_delay",
+    &menu.destination.post_delay
   },
   {
     "menu.draw_xoffset",

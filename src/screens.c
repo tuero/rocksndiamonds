@@ -599,12 +599,12 @@ static int getTitleMusic(struct TitleControlInfo *tci)
   return MUS_UNDEFINED;
 }
 
-static struct TitleInfo getTitleFading(struct TitleControlInfo *tci)
+static struct TitleFadingInfo getTitleFading(struct TitleControlInfo *tci)
 {
   boolean is_image = tci->is_image;
   int initial = tci->initial;
   int nr = tci->local_nr;
-  struct TitleInfo ti;
+  struct TitleFadingInfo ti;
 
   if (is_image)
   {
@@ -1275,7 +1275,7 @@ void DrawMainMenuExt(int redraw_mask, boolean do_fading)
 
 #if 1
   if (levelset_has_changed)
-    title = title_default;
+    fading = title_default;
 #endif
 
 #if 1
@@ -1411,7 +1411,7 @@ void DrawMainMenuExt(int redraw_mask, boolean do_fading)
 #if 1
   if (!do_fading)
     BackToFront();
-  else if (title.anim_mode == ANIM_CROSSFADE)
+  else if (fading.anim_mode == ANIM_CROSSFADE)
     FadeCross(redraw_mask);
   else
     FadeIn(redraw_mask);
@@ -1423,7 +1423,9 @@ void DrawMainMenuExt(int redraw_mask, boolean do_fading)
 #endif
 
 #if 1
-  title = title_default;
+  fading = menu.navigation;
+#else
+  fading = title_default;
 #endif
 
   SetMouseCursor(CURSOR_DEFAULT);
@@ -1489,11 +1491,15 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
 #endif
 #endif
   struct TitleControlInfo *tci;
-  struct TitleInfo title_fading_next;
+  struct TitleFadingInfo fading_next;
   int sound, music;
 
   if (button == MB_MENU_INITIALIZE)
   {
+#if 1
+    boolean use_cross_fading = (fading.anim_mode == ANIM_CROSSFADE);
+#endif
+
 #if 0
     int last_game_status = game_status;	/* save current game status */
 #endif
@@ -1518,15 +1524,22 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
 				    "No title screen for this level set.");
 
 	/* use default settings for fading, but always disable auto delay */
-	title = title_default;
-	title.auto_delay = -1;
+	fading = title_default;
+	fading.auto_delay = -1;
 
 	return;
       }
 
       FadeSoundsAndMusic();
 
+#if 1
+      if (use_cross_fading)
+	FadeCrossSaveBackbuffer();
+      else
+	FadeOut(REDRAW_ALL);
+#else
       FadeOut(REDRAW_ALL);
+#endif
     }
 
     if (tci->is_image)
@@ -1534,7 +1547,7 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
     else
       DrawTitleScreenMessage(tci->local_nr, tci->initial);
 
-    title = getTitleFading(tci);
+    fading = getTitleFading(tci);
 
 #if 1
     sound = getTitleSound(tci);
@@ -1551,14 +1564,21 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
 
     SetMouseCursor(CURSOR_NONE);
 
+#if 1
+    if (use_cross_fading)
+      FadeCross(REDRAW_ALL);
+    else
+      FadeIn(REDRAW_ALL);
+#else
     FadeIn(REDRAW_ALL);
+#endif
 
     DelayReached(&title_delay, 0);	/* reset delay counter */
 
     return;
   }
 
-  if (title.auto_delay > -1 && DelayReached(&title_delay, title.auto_delay))
+  if (fading.auto_delay > -1 && DelayReached(&title_delay, fading.auto_delay))
     button = MB_MENU_CHOICE;
 
   if (button == MB_MENU_LEAVE)
@@ -1569,7 +1589,7 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
   else if (button == MB_MENU_CHOICE)
   {
 #if 1
-    boolean use_cross_fading = (title.anim_mode == ANIM_CROSSFADE);
+    boolean use_cross_fading = (fading.anim_mode == ANIM_CROSSFADE);
 #endif
 
     if (game_status == GAME_MODE_INFO && num_title_screens == 0)
@@ -1589,7 +1609,7 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
     {
 #if 1
 #if 0
-      boolean use_cross_fading = (title.anim_mode == ANIM_CROSSFADE);
+      boolean use_cross_fading = (fading.anim_mode == ANIM_CROSSFADE);
 #endif
 #else
       int anim_mode;
@@ -1624,7 +1644,7 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
       else
 	DrawTitleScreenMessage(tci->local_nr, tci->initial);
 
-      title_fading_next = getTitleFading(tci);
+      fading_next = getTitleFading(tci);
 
 #if 1
       sound = getTitleSound(tci);
@@ -1640,15 +1660,15 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
 #endif
 
       /* last screen already faded out, next screen has no animation */
-      if (!use_cross_fading && title_fading_next.anim_mode == ANIM_NONE)
-	title = title_fading_next;
+      if (!use_cross_fading && fading_next.anim_mode == ANIM_NONE)
+	fading = fading_next;
 
       if (use_cross_fading)
 	FadeCross(REDRAW_ALL);
       else
 	FadeIn(REDRAW_ALL);
 
-      title = title_fading_next;
+      fading = fading_next;
 
       DelayReached(&title_delay, 0);	/* reset delay counter */
     }
@@ -1659,7 +1679,7 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
 #if 1
       {
 #if 0
-	boolean use_cross_fading = (title.anim_mode == ANIM_CROSSFADE);
+	boolean use_cross_fading = (fading.anim_mode == ANIM_CROSSFADE);
 #endif
 
 	if (use_cross_fading)
@@ -2142,7 +2162,7 @@ static void DrawInfoScreen_Main(int redraw_mask, boolean do_fading)
 #if 1
   if (!do_fading)
     BackToFront();
-  else if (title.anim_mode == ANIM_CROSSFADE)
+  else if (fading.anim_mode == ANIM_CROSSFADE)
     FadeCross(redraw_mask);
   else
     FadeIn(redraw_mask);
@@ -3294,6 +3314,8 @@ void DrawAndFadeInInfoScreen(int redraw_mask)
 
 void DrawInfoScreen()
 {
+  fading = menu.destination;
+
   DrawInfoScreenExt(REDRAW_ALL, FALSE);
 }
 
