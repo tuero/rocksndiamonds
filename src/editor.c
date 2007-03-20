@@ -7051,7 +7051,25 @@ void DrawLevelEd()
 #endif
   MapControlButtons();
 
+#if 0
+  fading = menu.navigation;
+#endif
+
+#if 1
+  if (fading.anim_mode == ANIM_CROSSFADE)
+    FadeCrossSaveBackbuffer();
+  else
+    FadeOut(REDRAW_FIELD);
+#endif
+
   DrawEditModeWindow();
+
+#if 1
+  if (fading.anim_mode == ANIM_CROSSFADE)
+    FadeCross(REDRAW_FIELD);
+  else
+    FadeIn(REDRAW_FIELD);
+#endif
 
   /* copy actual editor door content to door double buffer for OpenDoor() */
   BlitBitmap(drawto, bitmap_db_door,
@@ -10882,7 +10900,7 @@ static void HandleControlButtons(struct GadgetInfo *gi)
       break;
 
     case GADGET_ID_EXIT:
-      RequestExitLevelEditor(TRUE);	/* if level has changed, ask user */
+      RequestExitLevelEditor(TRUE, FALSE);  /* if level has changed, ask user */
       break;
 
     default:
@@ -11061,7 +11079,7 @@ void HandleLevelEditorKeyInput(Key key)
       case KSYM_Escape:
         if (edit_mode == ED_MODE_DRAWING)
 	{
-	  RequestExitLevelEditor(setup.ask_on_escape_editor);
+	  RequestExitLevelEditor(setup.ask_on_escape_editor, TRUE);
 	}
         else if (edit_mode == ED_MODE_INFO)
 	{
@@ -11332,7 +11350,8 @@ static void HandleDrawingAreaInfo(struct GadgetInfo *gi)
     DrawTextS(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2, infotext);
 }
 
-void RequestExitLevelEditor(boolean ask_if_level_has_changed)
+void RequestExitLevelEditor(boolean ask_if_level_has_changed,
+			    boolean quick_quit)
 {
   if (!ask_if_level_has_changed ||
       !LevelChanged() ||
@@ -11341,8 +11360,16 @@ void RequestExitLevelEditor(boolean ask_if_level_has_changed)
   {
     CloseDoor(DOOR_CLOSE_1);
     SetDoorState(DOOR_CLOSE_2);
+
+    if (quick_quit)
+      fading = fading_none;
+
     game_status = GAME_MODE_MAIN;
+#if 1
+    DrawAndFadeInMainMenu(REDRAW_FIELD);
+#else
     DrawMainMenu();
+#endif
   }
   else
   {

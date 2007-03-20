@@ -3155,8 +3155,20 @@ void InitGame()
   if (!game.restart_level)
     CloseDoor(DOOR_CLOSE_1);
 
+  if (level_editor_test_game)
+    fading = fading_none;
+  else
+    fading = menu.destination;
+
+#if 1
+  if (fading.anim_mode == ANIM_CROSSFADE)
+    FadeCrossSaveBackbuffer();
+  else
+    FadeOut(REDRAW_FIELD);
+#else
   if (do_fading)
     FadeOut(REDRAW_FIELD);
+#endif
 
   /* !!! FIX THIS (START) !!! */
   if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
@@ -3183,10 +3195,17 @@ void InitGame()
   }
   /* !!! FIX THIS (END) !!! */
 
+#if 1
+  if (fading.anim_mode == ANIM_CROSSFADE)
+    FadeCross(redraw_mask);
+  else
+    FadeIn(redraw_mask);
+#else
   if (do_fading)
     FadeIn(REDRAW_FIELD);
 
   BackToFront();
+#endif
 
   if (!game.restart_level)
   {
@@ -3637,14 +3656,25 @@ void GameEnd()
   {
     game_status = GAME_MODE_MAIN;
 
+#if 1
+    DrawAndFadeInMainMenu(REDRAW_FIELD);
+#else
     DrawMainMenu();
+#endif
 
     return;
   }
 
   if (!local_player->LevelSolved_SaveScore)
   {
+#if 1
+    if (fading.anim_mode == ANIM_CROSSFADE)
+      FadeCrossSaveBackbuffer();
+    else
+      FadeOut(REDRAW_FIELD);
+#else
     FadeOut(REDRAW_FIELD);
+#endif
 
     game_status = GAME_MODE_MAIN;
 
@@ -3676,7 +3706,14 @@ void GameEnd()
   }
   else
   {
+#if 1
+    if (fading.anim_mode == ANIM_CROSSFADE)
+      FadeCrossSaveBackbuffer();
+    else
+      FadeOut(REDRAW_FIELD);
+#else
     FadeOut(REDRAW_FIELD);
+#endif
 
     game_status = GAME_MODE_MAIN;
 
@@ -14093,13 +14130,32 @@ void RequestQuitGameExt(boolean skip_request, boolean quick_quit, char *message)
     {
       if (quick_quit)
       {
+#if 1
+	fading = fading_none;
+#else
+	OpenDoor(DOOR_CLOSE_1);
+#endif
+
 	game_status = GAME_MODE_MAIN;
 
+#if 1
+	DrawAndFadeInMainMenu(REDRAW_FIELD);
+#else
 	DrawMainMenu();
+#endif
       }
       else
       {
+#if 0
+#if 1
+	if (fading.anim_mode == ANIM_CROSSFADE)
+	  FadeCrossSaveBackbuffer();
+	else
+	  FadeOut(REDRAW_FIELD);
+#else
 	FadeOut(REDRAW_FIELD);
+#endif
+#endif
 
 	game_status = GAME_MODE_MAIN;
 

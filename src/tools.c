@@ -551,7 +551,16 @@ void FadeExt(int fade_mask, int fade_mode)
 
   redraw_mask |= fade_mask;
 
+#if 1
+  if (fading.anim_mode == ANIM_NONE)
+    return;
+#endif
+
+#if 1
   if (!setup.fade_screens || fade_delay == 0)
+#else
+  if (!setup.fade_screens || fade_delay == 0 || fading.anim_mode == ANIM_NONE)
+#endif
   {
     if (fade_mode == FADE_MODE_FADE_OUT)
       ClearRectangle(backbuffer, x, y, width, height);
@@ -2988,7 +2997,7 @@ unsigned int MoveDoor(unsigned int door_state)
 
   if (setup.quick_doors)
   {
-    stepsize = 20;		/* must be choosen to always draw last frame */
+    stepsize = 20;		/* must be chosen to always draw last frame */
     door_delay_value = 0;
   }
 

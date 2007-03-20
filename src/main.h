@@ -2686,6 +2686,7 @@ extern struct TapeInfo		tape;
 extern struct GlobalInfo	global;
 extern struct BorderInfo	border;
 extern struct TitleFadingInfo	fading;
+extern struct TitleFadingInfo	fading_none;
 extern struct TitleFadingInfo	title_initial_default;
 extern struct TitleFadingInfo	title_default;
 extern struct TitleMessageInfo	titlemessage_initial_default;

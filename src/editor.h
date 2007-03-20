@@ -23,7 +23,7 @@ void DrawLevelEd(void);
 void HandleLevelEditorKeyInput(Key);
 void HandleLevelEditorIdle();
 void HandleEditorGadgetInfoText(void *ptr);
-void RequestExitLevelEditor(boolean);
+void RequestExitLevelEditor(boolean, boolean);
 void PrintEditorElementList();
 
 void DumpBrush();

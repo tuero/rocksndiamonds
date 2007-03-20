@@ -5111,6 +5111,8 @@ void ReloadCustomArtwork(int force_reload)
     /* force redraw of (open or closed) door graphics */
     SetDoorState(DOOR_OPEN_ALL);
     CloseDoor(DOOR_CLOSE_ALL | DOOR_NO_DELAY);
+
+    fading = fading_none;
   }
 }
 
@@ -5194,6 +5196,8 @@ void OpenAll()
     ConvertLevels();
     return;
   }
+
+  fading = fading_none;
 
   game_status = GAME_MODE_MAIN;
 

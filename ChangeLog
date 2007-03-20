@@ -1,3 +1,7 @@
+2007-03-20
+	* improved menu fading, adding separate fading definitions for fading
+	  between menu screens and fading between menu and "destination" screens
+
 2007-03-19
 	* titlemessage_initial_x and titlemessage_x set to "[DEFAULT]" in static
 	  configuration (set from "[titlemessage_initial]" and "[titlemessage]")
