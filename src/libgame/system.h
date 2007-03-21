@@ -196,10 +196,25 @@
 #define ANIM_VERTICAL		(1 << 11)
 #define ANIM_CENTERED		(1 << 12)
 #define ANIM_STATIC_PANEL	(1 << 13)
-#define ANIM_FADE		(1 << 14)
-#define ANIM_CROSSFADE		(1 << 15)
 
 #define ANIM_DEFAULT		ANIM_LOOP
+
+/* values for fade mode */
+#define FADE_TYPE_NONE		0
+#define FADE_TYPE_FADE_IN	(1 << 0)
+#define FADE_TYPE_FADE_OUT	(1 << 1)
+#define FADE_TYPE_CROSS		(1 << 2)
+#define FADE_TYPE_SKIP		(1 << 3)
+
+#define FADE_MODE_NONE		(FADE_TYPE_NONE)
+#define FADE_MODE_FADE_IN	(FADE_TYPE_FADE_IN)
+#define FADE_MODE_FADE_OUT	(FADE_TYPE_FADE_OUT)
+#define FADE_MODE_FADE		(FADE_TYPE_FADE_IN | FADE_TYPE_FADE_OUT)
+#define FADE_MODE_CROSSFADE	(FADE_TYPE_FADE_IN | FADE_TYPE_CROSS)
+#define FADE_MODE_SKIP_FADE_IN	(FADE_TYPE_SKIP | FADE_TYPE_FADE_IN)
+#define FADE_MODE_SKIP_FADE_OUT	(FADE_TYPE_SKIP | FADE_TYPE_FADE_OUT)
+
+#define FADE_MODE_DEFAULT	FADE_MODE_FADE
 
 /* values for text alignment */
 #define ALIGN_LEFT		(1 << 0)
@@ -243,10 +258,6 @@
 				 REDRAW_MICROLEVEL)
 #define REDRAW_FPS		(1 << 11)
 #define REDRAWTILES_THRESHOLD	(SCR_FIELDX * SCR_FIELDY / 2)
-
-#define FADE_MODE_FADE_IN	0
-#define FADE_MODE_FADE_OUT	1
-#define FADE_MODE_CROSSFADE	2
 
 #define IN_GFX_SCREEN(x, y)	(x >= gfx.sx && x < gfx.sx + gfx.sxsize && \
 				 y >= gfx.sy && y < gfx.sy + gfx.sysize)

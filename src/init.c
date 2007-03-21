@@ -1032,6 +1032,7 @@ static void set_graphic_parameters(int graphic)
   graphic_info[graphic].anim_delay_random = 0;
   graphic_info[graphic].post_delay_fixed = 0;
   graphic_info[graphic].post_delay_random = 0;
+  graphic_info[graphic].fade_mode = FADE_MODE_DEFAULT;
   graphic_info[graphic].fade_delay = -1;
   graphic_info[graphic].post_delay = -1;
   graphic_info[graphic].auto_delay = -1;
@@ -1223,7 +1224,9 @@ static void set_graphic_parameters(int graphic)
   if (parameter[GFX_ARG_CLONE_FROM] != ARG_UNDEFINED_VALUE)
     graphic_info[graphic].clone_from = parameter[GFX_ARG_CLONE_FROM];
 
-  /* optional settings for drawing title screens */
+  /* optional settings for drawing title screens and title messages */
+  if (parameter[GFX_ARG_FADE_MODE] != ARG_UNDEFINED_VALUE)
+    graphic_info[graphic].fade_mode = parameter[GFX_ARG_FADE_MODE];
   if (parameter[GFX_ARG_FADE_DELAY] != ARG_UNDEFINED_VALUE)
     graphic_info[graphic].fade_delay = parameter[GFX_ARG_FADE_DELAY];
   if (parameter[GFX_ARG_POST_DELAY] != ARG_UNDEFINED_VALUE)
@@ -5112,7 +5115,17 @@ void ReloadCustomArtwork(int force_reload)
     SetDoorState(DOOR_OPEN_ALL);
     CloseDoor(DOOR_CLOSE_ALL | DOOR_NO_DELAY);
 
+#if 1
+#if 1
+    FadeSetStartItem();
+    // FadeSkipNextFadeOut();
+    // FadeSetDisabled();
+#else
+    FadeSkipNext();
+#endif
+#else
     fading = fading_none;
+#endif
   }
 }
 
@@ -5197,7 +5210,13 @@ void OpenAll()
     return;
   }
 
+#if 1
+  FadeSetStartItem();
+  FadeSkipNextFadeOut();
+  // FadeSetDisabled();
+#else
   fading = fading_none;
+#endif
 
   game_status = GAME_MODE_MAIN;
 

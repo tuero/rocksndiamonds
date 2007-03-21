@@ -1788,14 +1788,15 @@
 #define GFX_ARG_NAME			36
 #define GFX_ARG_SCALE_UP_FACTOR		37
 #define GFX_ARG_CLONE_FROM		38
-#define GFX_ARG_FADE_DELAY		39
-#define GFX_ARG_POST_DELAY		40
-#define GFX_ARG_AUTO_DELAY		41
-#define GFX_ARG_ALIGN			42
-#define GFX_ARG_VALIGN			43
-#define GFX_ARG_SORT_PRIORITY		44
+#define GFX_ARG_FADE_MODE		39
+#define GFX_ARG_FADE_DELAY		40
+#define GFX_ARG_POST_DELAY		41
+#define GFX_ARG_AUTO_DELAY		42
+#define GFX_ARG_ALIGN			43
+#define GFX_ARG_VALIGN			44
+#define GFX_ARG_SORT_PRIORITY		45
 
-#define NUM_GFX_ARGS			45
+#define NUM_GFX_ARGS			46
 
 
 /* values for sound configuration suffixes */
@@ -2049,7 +2050,7 @@ struct MenuMainInfo
 
 struct TitleFadingInfo
 {
-  int anim_mode;
+  int fade_mode;
   int fade_delay;
   int post_delay;
   int auto_delay;
@@ -2067,7 +2068,7 @@ struct TitleMessageInfo
   boolean parse_comments;
   int sort_priority;
 
-  int anim_mode;
+  int fade_mode;
   int fade_delay;
   int post_delay;
   int auto_delay;
@@ -2084,8 +2085,9 @@ struct MenuInfo
 
   int list_size[NUM_SPECIAL_GFX_ARGS];
 
-  struct TitleFadingInfo navigation;
-  struct TitleFadingInfo destination;
+  struct TitleFadingInfo enter_menu;
+  struct TitleFadingInfo leave_menu;
+  struct TitleFadingInfo start_item;
 
   int sound[NUM_SPECIAL_GFX_ARGS];
   int music[NUM_SPECIAL_GFX_ARGS];
@@ -2518,6 +2520,7 @@ struct GraphicInfo
 
   int draw_masked;		/* optional setting for drawing envelope gfx */
 
+  int fade_mode;		/* optional setting for drawing title screens */
   int fade_delay;		/* optional setting for drawing title screens */
   int post_delay;		/* optional setting for drawing title screens */
   int auto_delay;		/* optional setting for drawing title screens */

@@ -521,10 +521,38 @@ void FadeToFront()
 
 void FadeExt(int fade_mask, int fade_mode)
 {
+  static int fade_mode_skip = FADE_MODE_NONE;
   void (*draw_border_function)(void) = NULL;
   Bitmap *bitmap = (fade_mode == FADE_MODE_CROSSFADE ? bitmap_db_cross : NULL);
   int x, y, width, height;
   int fade_delay, post_delay;
+
+  redraw_mask |= fade_mask;
+
+  if (fade_mode & FADE_TYPE_SKIP)
+  {
+    fade_mode_skip = fade_mode;
+
+    return;
+  }
+
+  if (fade_mode_skip & FADE_TYPE_SKIP)
+  {
+#if 0
+    printf("::: skipping %d ... [%d]\n", fade_mode, fade_mode_skip);
+#endif
+
+    /* skip all fade operations until specified fade operation */
+    if (fade_mode & fade_mode_skip)
+      fade_mode_skip = FADE_MODE_NONE;
+
+    return;
+  }
+
+#if 1
+  if (fading.fade_mode == FADE_MODE_NONE)
+    return;
+#endif
 
   if (fade_mask & REDRAW_FIELD)
   {
@@ -549,13 +577,6 @@ void FadeExt(int fade_mask, int fade_mode)
     post_delay = (fade_mode == FADE_MODE_FADE_OUT ? fading.post_delay : 0);
   }
 
-  redraw_mask |= fade_mask;
-
-#if 1
-  if (fading.anim_mode == ANIM_NONE)
-    return;
-#endif
-
 #if 1
   if (!setup.fade_screens || fade_delay == 0)
 #else
@@ -578,12 +599,26 @@ void FadeExt(int fade_mask, int fade_mode)
 
 void FadeIn(int fade_mask)
 {
+#if 1
+  if (fading.fade_mode == FADE_MODE_CROSSFADE)
+    FadeExt(fade_mask, FADE_MODE_CROSSFADE);
+  else
+    FadeExt(fade_mask, FADE_MODE_FADE_IN);
+#else
   FadeExt(fade_mask, FADE_MODE_FADE_IN);
+#endif
 }
 
 void FadeOut(int fade_mask)
 {
+#if 1
+  if (fading.fade_mode == FADE_MODE_CROSSFADE)
+    FadeCrossSaveBackbuffer();
+  else
+    FadeExt(fade_mask, FADE_MODE_FADE_OUT);
+#else
   FadeExt(fade_mask, FADE_MODE_FADE_OUT);
+#endif
 }
 
 void FadeCross(int fade_mask)
@@ -594,6 +629,48 @@ void FadeCross(int fade_mask)
 void FadeCrossSaveBackbuffer()
 {
   BlitBitmap(backbuffer, bitmap_db_cross, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
+}
+
+void FadeSetEnterMenu()
+{
+  fading = menu.enter_menu;
+}
+
+void FadeSetLeaveMenu()
+{
+  fading = menu.leave_menu;
+}
+
+void FadeSetStartItem()
+{
+  fading = menu.start_item;
+}
+
+void FadeSetFromType(int type)
+{
+  if (type & TYPE_ENTER_SCREEN)
+    FadeSetStartItem();
+  else if (type & TYPE_ENTER)
+    FadeSetEnterMenu();
+  else if (type & TYPE_LEAVE)
+    FadeSetLeaveMenu();
+}
+
+void FadeSetDisabled()
+{
+  static struct TitleFadingInfo fading_none = { FADE_MODE_NONE, -1, -1, -1 };
+
+  fading = fading_none;
+}
+
+void FadeSkipNextFadeIn()
+{
+  FadeExt(0, FADE_MODE_SKIP_FADE_IN);
+}
+
+void FadeSkipNextFadeOut()
+{
+  FadeExt(0, FADE_MODE_SKIP_FADE_OUT);
 }
 
 void SetWindowBackgroundImageIfDefined(int graphic)

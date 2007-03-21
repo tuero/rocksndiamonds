@@ -204,8 +204,6 @@ static struct
   {	-1,	NULL				},
 };
 
-#define	XFADE	1
-
 #define DRAW_MODE(s)		((s) >= GAME_MODE_MAIN &&		\
 				 (s) <= GAME_MODE_SETUP ? (s) :		\
 				 (s) == GAME_MODE_PSEUDO_TYPENAME ?	\
@@ -616,8 +614,8 @@ static struct TitleFadingInfo getTitleFading(struct TitleControlInfo *tci)
     ti = (initial ? title_initial_default : title_default);
 
     /* override default settings with image config settings, if defined */
-    if (graphic_info[graphic].anim_mode != ANIM_DEFAULT)
-      ti.anim_mode = graphic_info[graphic].anim_mode;
+    if (graphic_info[graphic].fade_mode != FADE_MODE_DEFAULT)
+      ti.fade_mode = graphic_info[graphic].fade_mode;
     if (graphic_info[graphic].fade_delay > -1)
       ti.fade_delay = graphic_info[graphic].fade_delay;
     if (graphic_info[graphic].post_delay > -1)
@@ -629,14 +627,14 @@ static struct TitleFadingInfo getTitleFading(struct TitleControlInfo *tci)
   {
     if (initial)
     {
-      ti.anim_mode  = titlemessage_initial[nr].anim_mode;
+      ti.fade_mode  = titlemessage_initial[nr].fade_mode;
       ti.fade_delay = titlemessage_initial[nr].fade_delay;
       ti.post_delay = titlemessage_initial[nr].post_delay;
       ti.auto_delay = titlemessage_initial[nr].auto_delay;
     }
     else
     {
-      ti.anim_mode  = titlemessage[nr].anim_mode;
+      ti.fade_mode  = titlemessage[nr].fade_mode;
       ti.fade_delay = titlemessage[nr].fade_delay;
       ti.post_delay = titlemessage[nr].post_delay;
       ti.auto_delay = titlemessage[nr].auto_delay;
@@ -1238,12 +1236,7 @@ void DrawMainMenuExt(int redraw_mask, boolean do_fading)
 #endif
 
 #if 1
-#if XFADE
-  if (fading.anim_mode == ANIM_CROSSFADE)
-    FadeCrossSaveBackbuffer();
-  else
-    FadeOut(redraw_mask);
-#endif
+  FadeOut(redraw_mask);
 #endif
 
   UnmapAllGadgets();
@@ -1333,18 +1326,15 @@ void DrawMainMenuExt(int redraw_mask, boolean do_fading)
   SetMainBackgroundImage(IMG_BACKGROUND_MAIN);
 
 #if 0
-#if XFADE
-  if (fading.anim_mode == ANIM_CROSSFADE)
-    FadeCrossSaveBackbuffer();
-  else
-    FadeOut(redraw_mask);
-#endif
+  FadeOut(redraw_mask);
 #endif
 
 #if 1
   if (redraw_mask == REDRAW_ALL)
   {
+#if 0
     int door_state = GetDoorState();
+#endif
 
     RedrawBackground();
 
@@ -1469,11 +1459,8 @@ void DrawMainMenuExt(int redraw_mask, boolean do_fading)
   }
 #endif
 
-#if XFADE
-  if (fading.anim_mode == ANIM_CROSSFADE)
-    FadeCross(redraw_mask);
-  else
-    FadeIn(redraw_mask);
+#if 1
+  FadeIn(redraw_mask);
 #else
 #if 1
   if (!do_fading)
@@ -1491,7 +1478,7 @@ void DrawMainMenuExt(int redraw_mask, boolean do_fading)
 #endif
 
 #if 1
-  fading = menu.navigation;
+  FadeSetEnterMenu();
 #else
   fading = title_default;
 #endif
@@ -1559,12 +1546,13 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
 #endif
 #endif
   struct TitleControlInfo *tci;
+  struct TitleFadingInfo fading_last = fading;
   struct TitleFadingInfo fading_next;
   int sound, music;
 
   if (button == MB_MENU_INITIALIZE)
   {
-#if 1
+#if 0
     boolean use_cross_fading = (fading.anim_mode == ANIM_CROSSFADE);
 #endif
 
@@ -1601,11 +1589,6 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
       FadeSoundsAndMusic();
 
 #if 1
-      if (use_cross_fading)
-	FadeCrossSaveBackbuffer();
-      else
-	FadeOut(REDRAW_ALL);
-#else
       FadeOut(REDRAW_ALL);
 #endif
     }
@@ -1615,7 +1598,11 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
     else
       DrawTitleScreenMessage(tci->local_nr, tci->initial);
 
-    fading = getTitleFading(tci);
+    fading = fading_next = getTitleFading(tci);
+
+    if (fading_last.fade_mode != FADE_MODE_CROSSFADE &&
+	fading_next.fade_mode == FADE_MODE_CROSSFADE)
+      fading.fade_mode = FADE_MODE_FADE;
 
 #if 1
     sound = getTitleSound(tci);
@@ -1633,13 +1620,10 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
     SetMouseCursor(CURSOR_NONE);
 
 #if 1
-    if (use_cross_fading)
-      FadeCross(REDRAW_ALL);
-    else
-      FadeIn(REDRAW_ALL);
-#else
     FadeIn(REDRAW_ALL);
 #endif
+
+    fading = fading_next;
 
     DelayReached(&title_delay, 0);	/* reset delay counter */
 
@@ -1656,24 +1640,17 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
   }
   else if (button == MB_MENU_CHOICE)
   {
-#if 1
+#if 0
     boolean use_cross_fading = (fading.anim_mode == ANIM_CROSSFADE);
 #endif
 
     if (game_status == GAME_MODE_INFO && num_title_screens == 0)
     {
 #if 0
-#if XFADE
-      if (fading.anim_mode == ANIM_CROSSFADE)
-	FadeCrossSaveBackbuffer();
-      else
-	FadeOut(REDRAW_FIELD);
-#else
       FadeOut(REDRAW_FIELD);
 #endif
-#endif
 
-      fading = menu.destination;
+      FadeSetStartItem();
 
       info_mode = INFO_MODE_MAIN;
       DrawAndFadeInInfoScreen(REDRAW_FIELD);
@@ -1713,10 +1690,9 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
       if (music == MUS_UNDEFINED || music != last_music)
 	FadeMusic();
 
-      if (use_cross_fading)
-	FadeCrossSaveBackbuffer();
-      else
-	FadeOut(REDRAW_ALL);
+#if 1
+      FadeOut(REDRAW_ALL);
+#endif
 
       if (tci->is_image)
 	DrawTitleScreenImage(tci->local_nr, tci->initial);
@@ -1738,14 +1714,18 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
       last_music = music;
 #endif
 
+#if 0
+      printf("::: %d -> %d\n", fading.fade_mode, fading_next.fade_mode);
+#endif
+
       /* last screen already faded out, next screen has no animation */
-      if (!use_cross_fading && fading_next.anim_mode == ANIM_NONE)
+      if (fading.fade_mode      != FADE_MODE_CROSSFADE &&
+	  fading_next.fade_mode == FADE_MODE_NONE)
 	fading = fading_next;
 
-      if (use_cross_fading)
-	FadeCross(REDRAW_ALL);
-      else
-	FadeIn(REDRAW_ALL);
+#if 1
+      FadeIn(REDRAW_ALL);
+#endif
 
       fading = fading_next;
 
@@ -1762,10 +1742,9 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
 	boolean use_cross_fading = (fading.anim_mode == ANIM_CROSSFADE);
 #endif
 
-	if (use_cross_fading)
-	  FadeCrossSaveBackbuffer();
-	else
-	  FadeOut(REDRAW_ALL);
+#if 1
+	FadeOut(REDRAW_ALL);
+#endif
       }
 #else
       FadeOut(REDRAW_ALL);
@@ -1955,7 +1934,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 
 	game_status = GAME_MODE_EDITOR;
 
-	fading = menu.destination;
+	FadeSetStartItem();
 
 	DrawLevelEd();
       }
@@ -1964,7 +1943,9 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 	game_status = GAME_MODE_INFO;
 	info_mode = INFO_MODE_MAIN;
 
+#if 0
 	fading = menu.navigation;
+#endif
 
 	DrawInfoScreen();
       }
@@ -2129,7 +2110,9 @@ static int num_info_info;
 
 static void execInfoTitleScreen()
 {
-  fading = menu.destination;
+#if 0
+  FadeSetStartItem();
+#endif
 
   info_mode = INFO_MODE_TITLE;
   DrawInfoScreen();
@@ -2137,7 +2120,9 @@ static void execInfoTitleScreen()
 
 static void execInfoElements()
 {
-  fading = menu.destination;
+#if 0
+  FadeSetStartItem();
+#endif
 
   info_mode = INFO_MODE_ELEMENTS;
   DrawInfoScreen();
@@ -2145,7 +2130,9 @@ static void execInfoElements()
 
 static void execInfoMusic()
 {
-  fading = menu.destination;
+#if 0
+  FadeSetStartItem();
+#endif
 
   info_mode = INFO_MODE_MUSIC;
   DrawInfoScreen();
@@ -2153,7 +2140,9 @@ static void execInfoMusic()
 
 static void execInfoCredits()
 {
-  fading = menu.destination;
+#if 0
+  FadeSetStartItem();
+#endif
 
   info_mode = INFO_MODE_CREDITS;
   DrawInfoScreen();
@@ -2161,7 +2150,9 @@ static void execInfoCredits()
 
 static void execInfoProgram()
 {
-  fading = menu.destination;
+#if 0
+  FadeSetStartItem();
+#endif
 
   info_mode = INFO_MODE_PROGRAM;
   DrawInfoScreen();
@@ -2169,7 +2160,9 @@ static void execInfoProgram()
 
 static void execInfoVersion()
 {
-  fading = menu.destination;
+#if 0
+  FadeSetStartItem();
+#endif
 
   info_mode = INFO_MODE_VERSION;
   DrawInfoScreen();
@@ -2177,7 +2170,9 @@ static void execInfoVersion()
 
 static void execInfoLevelSet()
 {
-  fading = menu.destination;
+#if 0
+  FadeSetStartItem();
+#endif
 
   info_mode = INFO_MODE_LEVELSET;
   DrawInfoScreen();
@@ -2185,7 +2180,9 @@ static void execInfoLevelSet()
 
 static void execExitInfo()
 {
-  fading = menu.navigation;
+#if 0
+  FadeSetLeaveMenu();
+#endif
 
   game_status = GAME_MODE_MAIN;
 #if 1
@@ -2232,11 +2229,8 @@ static void DrawInfoScreen_Main(int redraw_mask, boolean do_fading)
   UnmapAllGadgets();
   CloseDoor(DOOR_CLOSE_2);
 
-#if XFADE
-  if (fading.anim_mode == ANIM_CROSSFADE)
-    FadeCrossSaveBackbuffer();
-  else
-    FadeOut(redraw_mask);
+#if 1
+  FadeOut(redraw_mask);
 #endif
 
 #if 1
@@ -2283,13 +2277,10 @@ static void DrawInfoScreen_Main(int redraw_mask, boolean do_fading)
   PlayMenuSound();
   PlayMenuMusic();
 
-  DrawMaskedBorder(REDRAW_ALL);
+  DrawMaskedBorder(redraw_mask);
 
-#if XFADE
-  if (fading.anim_mode == ANIM_CROSSFADE)
-    FadeCross(redraw_mask);
-  else
-    FadeIn(redraw_mask);
+#if 1
+  FadeIn(redraw_mask);
 #else
 #if 1
   if (!do_fading)
@@ -2339,6 +2330,8 @@ void HandleInfoScreen_Main(int mx, int my, int dx, int dy, int button)
       if (info_info[y].type & TYPE_LEAVE_MENU)
       {
 	void (*menu_callback_function)(void) = info_info[y].value;
+
+	FadeSetLeaveMenu();
 
 	menu_callback_function();
 
@@ -2402,6 +2395,8 @@ void HandleInfoScreen_Main(int mx, int my, int dx, int dy, int button)
       {
 	void (*menu_callback_function)(void) = info_info[choice].value;
 
+	FadeSetFromType(info_info[y].type);
+
 	menu_callback_function();
       }
     }
@@ -2422,12 +2417,7 @@ void DrawInfoScreen_NotAvailable(char *text_title, char *text_error)
 
   SetMainBackgroundImageIfDefined(IMG_BACKGROUND_INFO_LEVELSET);
 
-#if XFADE
-  if (fading.anim_mode == ANIM_CROSSFADE)
-    FadeCrossSaveBackbuffer();
-  else
-    FadeOut(REDRAW_FIELD);
-#else
+#if 1
   FadeOut(REDRAW_FIELD);
 #endif
 
@@ -2440,12 +2430,7 @@ void DrawInfoScreen_NotAvailable(char *text_title, char *text_error)
   DrawTextSCentered(ybottom, FONT_TEXT_4,
 		    "Press any key or button for info menu");
 
-#if XFADE
-  if (fading.anim_mode == ANIM_CROSSFADE)
-    FadeCross(REDRAW_FIELD);
-  else
-    FadeIn(REDRAW_FIELD);
-#else
+#if 1
   FadeIn(REDRAW_FIELD);
 #endif
 }
@@ -2636,12 +2621,7 @@ void DrawInfoScreen_Elements()
 {
   SetMainBackgroundImageIfDefined(IMG_BACKGROUND_INFO_ELEMENTS);
 
-#if XFADE
-  if (fading.anim_mode == ANIM_CROSSFADE)
-    FadeCrossSaveBackbuffer();
-  else
-    FadeOut(REDRAW_FIELD);
-#else
+#if 1
   FadeOut(REDRAW_FIELD);
 #endif
 
@@ -2650,12 +2630,7 @@ void DrawInfoScreen_Elements()
 
   HandleInfoScreen_Elements(MB_MENU_INITIALIZE);
 
-#if XFADE
-  if (fading.anim_mode == ANIM_CROSSFADE)
-    FadeCross(REDRAW_FIELD);
-  else
-    FadeIn(REDRAW_FIELD);
-#else
+#if 1
   FadeIn(REDRAW_FIELD);
 #endif
 
@@ -2715,14 +2690,7 @@ void HandleInfoScreen_Elements(int button)
       FadeSoundsAndMusic();
 
 #if 0
-#if XFADE
-      if (fading.anim_mode == ANIM_CROSSFADE)
-	FadeCrossSaveBackbuffer();
-      else
-	FadeOut(REDRAW_FIELD);
-#else
       FadeOut(REDRAW_FIELD);
-#endif
 #endif
 
       info_mode = INFO_MODE_MAIN;
@@ -2753,12 +2721,7 @@ void DrawInfoScreen_Music()
 {
   SetMainBackgroundImageIfDefined(IMG_BACKGROUND_INFO_MUSIC);
 
-#if XFADE
-  if (fading.anim_mode == ANIM_CROSSFADE)
-    FadeCrossSaveBackbuffer();
-  else
-    FadeOut(REDRAW_FIELD);
-#else
+#if 1
   FadeOut(REDRAW_FIELD);
 #endif
 
@@ -2769,12 +2732,7 @@ void DrawInfoScreen_Music()
 
   HandleInfoScreen_Music(MB_MENU_INITIALIZE);
 
-#if XFADE
-  if (fading.anim_mode == ANIM_CROSSFADE)
-    FadeCross(REDRAW_FIELD);
-  else
-    FadeIn(REDRAW_FIELD);
-#else
+#if 1
   FadeIn(REDRAW_FIELD);
 #endif
 }
@@ -2836,14 +2794,7 @@ void HandleInfoScreen_Music(int button)
       FadeSoundsAndMusic();
 
 #if 0
-#if XFADE
-      if (fading.anim_mode == ANIM_CROSSFADE)
-	FadeCrossSaveBackbuffer();
-      else
-	FadeOut(REDRAW_FIELD);
-#else
       FadeOut(REDRAW_FIELD);
-#endif
 #endif
 
       info_mode = INFO_MODE_MAIN;
@@ -3110,23 +3061,13 @@ void DrawInfoScreen_Credits()
 
   FadeSoundsAndMusic();
 
-#if XFADE
-  if (fading.anim_mode == ANIM_CROSSFADE)
-    FadeCrossSaveBackbuffer();
-  else
-    FadeOut(REDRAW_FIELD);
-#else
+#if 1
   FadeOut(REDRAW_FIELD);
 #endif
 
   HandleInfoScreen_Credits(MB_MENU_INITIALIZE);
 
-#if XFADE
-  if (fading.anim_mode == ANIM_CROSSFADE)
-    FadeCross(REDRAW_FIELD);
-  else
-    FadeIn(REDRAW_FIELD);
-#else
+#if 1
   FadeIn(REDRAW_FIELD);
 #endif
 }
@@ -3171,14 +3112,7 @@ void HandleInfoScreen_Credits(int button)
       FadeSoundsAndMusic();
 
 #if 0
-#if XFADE
-      if (fading.anim_mode == ANIM_CROSSFADE)
-	FadeCrossSaveBackbuffer();
-      else
-	FadeOut(REDRAW_FIELD);
-#else
       FadeOut(REDRAW_FIELD);
-#endif
 #endif
 
       info_mode = INFO_MODE_MAIN;
@@ -3200,12 +3134,7 @@ void DrawInfoScreen_Program()
 
   SetMainBackgroundImageIfDefined(IMG_BACKGROUND_INFO_PROGRAM);
 
-#if XFADE
-  if (fading.anim_mode == ANIM_CROSSFADE)
-    FadeCrossSaveBackbuffer();
-  else
-    FadeOut(REDRAW_FIELD);
-#else
+#if 1
   FadeOut(REDRAW_FIELD);
 #endif
 
@@ -3244,12 +3173,7 @@ void DrawInfoScreen_Program()
   DrawTextSCentered(ybottom, FONT_TEXT_4,
 		    "Press any key or button for info menu");
 
-#if XFADE
-  if (fading.anim_mode == ANIM_CROSSFADE)
-    FadeCross(REDRAW_FIELD);
-  else
-    FadeIn(REDRAW_FIELD);
-#else
+#if 1
   FadeIn(REDRAW_FIELD);
 #endif
 }
@@ -3272,14 +3196,7 @@ void HandleInfoScreen_Program(int button)
     FadeSoundsAndMusic();
 
 #if 0
-#if XFADE
-    if (fading.anim_mode == ANIM_CROSSFADE)
-      FadeCrossSaveBackbuffer();
-    else
-      FadeOut(REDRAW_FIELD);
-#else
     FadeOut(REDRAW_FIELD);
-#endif
 #endif
 
     info_mode = INFO_MODE_MAIN;
@@ -3312,12 +3229,7 @@ void DrawInfoScreen_Version()
 
   SetMainBackgroundImageIfDefined(IMG_BACKGROUND_INFO_VERSION);
 
-#if XFADE
-  if (fading.anim_mode == ANIM_CROSSFADE)
-    FadeCrossSaveBackbuffer();
-  else
-    FadeOut(REDRAW_FIELD);
-#else
+#if 1
   FadeOut(REDRAW_FIELD);
 #endif
 
@@ -3430,12 +3342,7 @@ void DrawInfoScreen_Version()
   DrawTextSCentered(ybottom, FONT_TEXT_4,
 		    "Press any key or button for info menu");
 
-#if XFADE
-  if (fading.anim_mode == ANIM_CROSSFADE)
-    FadeCross(REDRAW_FIELD);
-  else
-    FadeIn(REDRAW_FIELD);
-#else
+#if 1
   FadeIn(REDRAW_FIELD);
 #endif
 }
@@ -3458,14 +3365,7 @@ void HandleInfoScreen_Version(int button)
     FadeSoundsAndMusic();
 
 #if 0
-#if XFADE
-    if (fading.anim_mode == ANIM_CROSSFADE)
-      FadeCrossSaveBackbuffer();
-    else
-      FadeOut(REDRAW_FIELD);
-#else
     FadeOut(REDRAW_FIELD);
-#endif
 #endif
 
     info_mode = INFO_MODE_MAIN;
@@ -3496,12 +3396,7 @@ void DrawInfoScreen_LevelSet()
 
   SetMainBackgroundImageIfDefined(IMG_BACKGROUND_INFO_LEVELSET);
 
-#if XFADE
-  if (fading.anim_mode == ANIM_CROSSFADE)
-    FadeCrossSaveBackbuffer();
-  else
-    FadeOut(REDRAW_FIELD);
-#else
+#if 1
   FadeOut(REDRAW_FIELD);
 #endif
 
@@ -3521,12 +3416,7 @@ void DrawInfoScreen_LevelSet()
   DrawTextCentered(mSY + SYSIZE - 20, FONT_TEXT_4,
 		   "Press any key or button for info menu");
 
-#if XFADE
-  if (fading.anim_mode == ANIM_CROSSFADE)
-    FadeCross(REDRAW_FIELD);
-  else
-    FadeIn(REDRAW_FIELD);
-#else
+#if 1
   FadeIn(REDRAW_FIELD);
 #endif
 }
@@ -3549,14 +3439,7 @@ void HandleInfoScreen_LevelSet(int button)
     FadeSoundsAndMusic();
 
 #if 0
-#if XFADE
-    if (fading.anim_mode == ANIM_CROSSFADE)
-      FadeCrossSaveBackbuffer();
-    else
-      FadeOut(REDRAW_FIELD);
-#else
     FadeOut(REDRAW_FIELD);
-#endif
 #endif
 
     info_mode = INFO_MODE_MAIN;
@@ -3605,7 +3488,7 @@ void DrawAndFadeInInfoScreen(int redraw_mask)
 
 void DrawInfoScreen()
 {
-  DrawInfoScreenExt(REDRAW_ALL, FALSE);
+  DrawInfoScreenExt(REDRAW_FIELD, FALSE);
 }
 
 void HandleInfoScreen(int mx, int my, int dx, int dy, int button)
@@ -3771,11 +3654,8 @@ static void DrawChooseTree(TreeInfo **ti_ptr)
 
   CloseDoor(DOOR_CLOSE_2);
 
-#if XFADE
-  if (fading.anim_mode == ANIM_CROSSFADE)
-    FadeCrossSaveBackbuffer();
-  else
-    FadeOut(REDRAW_FIELD);
+#if 1
+  FadeOut(REDRAW_FIELD);
 #endif
 
   ClearWindow();
@@ -3783,13 +3663,8 @@ static void DrawChooseTree(TreeInfo **ti_ptr)
   HandleChooseTree(0, 0, 0, 0, MB_MENU_INITIALIZE, ti_ptr);
   MapScreenTreeGadgets(*ti_ptr);
 
-#if XFADE
-  if (fading.anim_mode == ANIM_CROSSFADE)
-    FadeCross(redraw_mask);
-  else
-    FadeIn(redraw_mask);
-#else
-  FadeToFront();
+#if 1
+  FadeIn(REDRAW_FIELD);
 #endif
 
   InitAnimation();
@@ -3966,6 +3841,8 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
   }
   else if (button == MB_MENU_LEAVE)
   {
+    FadeSetLeaveMenu();
+
     PlaySound(SND_MENU_ITEM_SELECTING);
 
     if (ti->node_parent)
@@ -4071,6 +3948,8 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
 
     if (node_cursor->node_group)
     {
+      FadeSetEnterMenu();
+
       PlaySound(SND_MENU_ITEM_SELECTING);
 
       node_cursor->cl_first = ti->cl_first;
@@ -4083,6 +3962,8 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
   }
   else if (dx == -1 && ti->node_parent)
   {
+    FadeSetLeaveMenu();
+
     PlaySound(SND_MENU_ITEM_SELECTING);
 
     *ti_ptr = ti->node_parent;
@@ -4121,6 +4002,8 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
 
       if (node_cursor->node_group)
       {
+	FadeSetEnterMenu();
+
 	node_cursor->cl_first = ti->cl_first;
 	node_cursor->cl_cursor = ti->cl_cursor;
 	*ti_ptr = node_cursor->node_group;
@@ -4128,11 +4011,15 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
       }
       else if (node_cursor->parent_link)
       {
+	FadeSetLeaveMenu();
+
 	*ti_ptr = node_cursor->node_parent;
 	DrawChooseTree(ti_ptr);
       }
       else
       {
+	FadeSetStartItem();
+
 	node_cursor->cl_first = ti->cl_first;
 	node_cursor->cl_cursor = ti->cl_cursor;
 	*ti_ptr = node_cursor;
@@ -4200,14 +4087,9 @@ void DrawHallOfFame(int highlight_position)
   if (highlight_position < 0) 
     LoadScore(level_nr);
 
-  fading = menu.destination;
+  FadeSetStartItem();
 
-#if XFADE
-  if (fading.anim_mode == ANIM_CROSSFADE)
-    FadeCrossSaveBackbuffer();
-  else
-    FadeOut(REDRAW_FIELD);
-#else
+#if 1
   FadeOut(REDRAW_FIELD);
 #endif
 
@@ -4218,12 +4100,7 @@ void DrawHallOfFame(int highlight_position)
 
   HandleHallOfFame(highlight_position, 0, 0, 0, MB_MENU_INITIALIZE);
 
-#if XFADE
-  if (fading.anim_mode == ANIM_CROSSFADE)
-    FadeCross(REDRAW_FIELD);
-  else
-    FadeIn(REDRAW_FIELD);
-#else
+#if 1
   FadeIn(REDRAW_FIELD);
 #endif
 }
@@ -4322,14 +4199,7 @@ void HandleHallOfFame(int mx, int my, int dx, int dy, int button)
     FadeSound(SND_BACKGROUND_SCORES);
 
 #if 0
-#if XFADE
-    if (fading.anim_mode == ANIM_CROSSFADE)
-      FadeCrossSaveBackbuffer();
-    else
-      FadeOut(REDRAW_FIELD);
-#else
     FadeOut(REDRAW_FIELD);
-#endif
 #endif
 
     game_status = GAME_MODE_MAIN;
@@ -4359,12 +4229,20 @@ static char *music_set_name;
 
 static void execSetupMain()
 {
+#if 0
+  FadeSetLeaveMenu();
+#endif
+
   setup_mode = SETUP_MODE_MAIN;
   DrawSetupScreen();
 }
 
 static void execSetupGame()
 {
+#if 0
+  FadeSetEnterMenu();
+#endif
+
   if (game_speeds == NULL)
   {
     int i;
@@ -4418,18 +4296,30 @@ static void execSetupGame()
 
 static void execSetupChooseGameSpeed()
 {
+#if 0
+  FadeSetEnterMenu();
+#endif
+
   setup_mode = SETUP_MODE_CHOOSE_GAME_SPEED;
   DrawSetupScreen();
 }
 
 static void execSetupEditor()
 {
+#if 0
+  FadeSetEnterMenu();
+#endif
+
   setup_mode = SETUP_MODE_EDITOR;
   DrawSetupScreen();
 }
 
 static void execSetupGraphics()
 {
+#if 0
+  FadeSetEnterMenu();
+#endif
+
   if (video.fullscreen_available && screen_modes == NULL)
   {
     int i;
@@ -4492,6 +4382,10 @@ static void execSetupGraphics()
 
 static void execSetupChooseScreenMode()
 {
+#if 0
+  FadeSetEnterMenu();
+#endif
+
   if (!video.fullscreen_available)
     return;
 
@@ -4501,12 +4395,20 @@ static void execSetupChooseScreenMode()
 
 static void execSetupSound()
 {
+#if 0
+  FadeSetEnterMenu();
+#endif
+
   setup_mode = SETUP_MODE_SOUND;
   DrawSetupScreen();
 }
 
 static void execSetupArtwork()
 {
+#if 0
+  FadeSetEnterMenu();
+#endif
+
   setup.graphics_set = artwork.gfx_current->identifier;
   setup.sounds_set = artwork.snd_current->identifier;
   setup.music_set = artwork.mus_current->identifier;
@@ -4525,42 +4427,70 @@ static void execSetupArtwork()
 
 static void execSetupChooseGraphics()
 {
+#if 0
+  FadeSetEnterMenu();
+#endif
+
   setup_mode = SETUP_MODE_CHOOSE_GRAPHICS;
   DrawSetupScreen();
 }
 
 static void execSetupChooseSounds()
 {
+#if 0
+  FadeSetEnterMenu();
+#endif
+
   setup_mode = SETUP_MODE_CHOOSE_SOUNDS;
   DrawSetupScreen();
 }
 
 static void execSetupChooseMusic()
 {
+#if 0
+  FadeSetEnterMenu();
+#endif
+
   setup_mode = SETUP_MODE_CHOOSE_MUSIC;
   DrawSetupScreen();
 }
 
 static void execSetupInput()
 {
+#if 0
+  FadeSetEnterMenu();
+#endif
+
   setup_mode = SETUP_MODE_INPUT;
   DrawSetupScreen();
 }
 
 static void execSetupShortcut1()
 {
+#if 0
+  FadeSetEnterMenu();
+#endif
+
   setup_mode = SETUP_MODE_SHORTCUT_1;
   DrawSetupScreen();
 }
 
 static void execSetupShortcut2()
 {
+#if 0
+  FadeSetEnterMenu();
+#endif
+
   setup_mode = SETUP_MODE_SHORTCUT_2;
   DrawSetupScreen();
 }
 
 static void execExitSetup()
 {
+#if 0
+  FadeSetLeaveMenu();
+#endif
+
   game_status = GAME_MODE_MAIN;
 #if 1
   DrawMainMenuExt(REDRAW_FIELD, FALSE);
@@ -4961,11 +4891,8 @@ static void DrawSetupScreen_Generic()
   UnmapAllGadgets();
   CloseDoor(DOOR_CLOSE_2);
 
-#if XFADE
-  if (fading.anim_mode == ANIM_CROSSFADE)
-    FadeCrossSaveBackbuffer();
-  else
-    FadeOut(REDRAW_FIELD);
+#if 1
+  FadeOut(REDRAW_FIELD);
 #endif
 
   ClearWindow();
@@ -5062,13 +4989,8 @@ static void DrawSetupScreen_Generic()
   HandleSetupScreen_Generic(0, 0, 0, 0, MB_MENU_INITIALIZE);
 #endif
 
-#if XFADE
-  if (fading.anim_mode == ANIM_CROSSFADE)
-    FadeCross(redraw_mask);
-  else
-    FadeIn(redraw_mask);
-#else
-  FadeToFront();
+#if 1
+  FadeIn(REDRAW_FIELD);
 #endif
 
   InitAnimation();
@@ -5109,6 +5031,8 @@ void HandleSetupScreen_Generic(int mx, int my, int dx, int dy, int button)
       if (setup_info[y].type & TYPE_LEAVE_MENU)
       {
 	void (*menu_callback_function)(void) = setup_info[y].value;
+
+	FadeSetLeaveMenu();
 
 	menu_callback_function();
 
@@ -5180,6 +5104,8 @@ void HandleSetupScreen_Generic(int mx, int my, int dx, int dy, int button)
       {
 	void (*menu_callback_function)(void) = setup_info[y].value;
 
+	FadeSetFromType(setup_info[y].type);
+
 	menu_callback_function();
       }
       else
@@ -5197,11 +5123,8 @@ void DrawSetupScreen_Input()
   int i;
 #endif
 
-#if XFADE
-  if (fading.anim_mode == ANIM_CROSSFADE)
-    FadeCrossSaveBackbuffer();
-  else
-    FadeOut(REDRAW_FIELD);
+#if 1
+  FadeOut(REDRAW_FIELD);
 #endif
 
   ClearWindow();
@@ -5252,13 +5175,8 @@ void DrawSetupScreen_Input()
 
   HandleSetupScreen_Input(0, 0, 0, 0, MB_MENU_INITIALIZE);
 
-#if XFADE
-  if (fading.anim_mode == ANIM_CROSSFADE)
-    FadeCross(redraw_mask);
-  else
-    FadeIn(redraw_mask);
-#else
-  FadeToFront();
+#if 1
+  FadeIn(REDRAW_FIELD);
 #endif
 
   InitAnimation();
@@ -5502,6 +5420,8 @@ void HandleSetupScreen_Input(int mx, int my, int dx, int dy, int button)
       {
 	InitJoysticks();
 
+	FadeSetLeaveMenu();
+
 	setup_mode = SETUP_MODE_MAIN;
 	DrawSetupScreen();
       }
@@ -5532,12 +5452,17 @@ void CustomizeKeyboard(int player_nr)
   /* read existing key bindings from player setup */
   custom_key = setup.input[player_nr].key;
 
+  FadeSetEnterMenu();
+  FadeOut(REDRAW_FIELD);
+
   ClearWindow();
 
   DrawTextSCentered(mSY - SY + 16, FONT_TITLE_1, "Keyboard Input");
 
+#if 0
   BackToFront();
   InitAnimation();
+#endif
 
   step_nr = 0;
   DrawText(mSX, mSY + (2 + 2 * step_nr) * 32,
@@ -5546,6 +5471,12 @@ void CustomizeKeyboard(int player_nr)
 	   "Key:", FONT_INPUT_1_ACTIVE);
   DrawText(mSX + 4 * 32, mSY + (2 + 2 * step_nr + 1) * 32,
 	   getKeyNameFromKey(*customize_step[step_nr].key), FONT_VALUE_OLD);
+
+#if 1
+  FadeIn(REDRAW_FIELD);
+
+  InitAnimation();
+#endif
 
   while (!finished)
   {
@@ -5563,6 +5494,9 @@ void CustomizeKeyboard(int player_nr)
 
 	    if (key == KSYM_Escape || (key == KSYM_Return && step_nr == 6))
 	    {
+	      if (key == KSYM_Escape)
+		FadeSkipNextFadeIn();
+
 	      finished = TRUE;
 	      break;
 	    }
@@ -5661,6 +5595,9 @@ static boolean CalibrateJoystickMain(int player_nr)
   if (joystick_fd < 0 || !setup.input[player_nr].use_joystick)
     return FALSE;
 
+  FadeSetEnterMenu();
+  FadeOut(REDRAW_FIELD);
+
   ClearWindow();
 
   for (y = 0; y < 3; y++)
@@ -5692,7 +5629,12 @@ static boolean CalibrateJoystickMain(int player_nr)
   new_joystick_ymiddle = joy_y;
 
   DrawGraphic(xpos + last_x, ypos + last_y, IMG_MENU_CALIBRATE_RED, 0);
+
+#if 1
+  FadeIn(REDRAW_FIELD);
+#else
   BackToFront();
+#endif
 
   while (Joystick(player_nr) & JOY_BUTTON);	/* wait for released button */
   InitAnimation();
@@ -5716,6 +5658,7 @@ static boolean CalibrateJoystickMain(int player_nr)
 	      break;
 
 	    case KSYM_Escape:
+	      FadeSkipNextFadeIn();
 	      result = 0;
 	      break;
 

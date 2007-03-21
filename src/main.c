@@ -5449,14 +5449,6 @@ struct MusicPrefixInfo music_prefix_info[NUM_MUSIC_PREFIXES + 1] =
   { NULL,			0	}
 };
 
-struct TitleFadingInfo fading_none =
-{
-  ANIM_NONE,
-  0,
-  0,
-  0
-};
-
 
 /* ========================================================================= */
 /* main()                                                                    */

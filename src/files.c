@@ -8339,7 +8339,7 @@ static void LoadSpecialMenuDesignSettingsFromFilename(char *filename)
     { TYPE_BOOLEAN,	&tmi.centered,		".centered"		},
     { TYPE_BOOLEAN,	&tmi.parse_comments,	".parse_comments"	},
     { TYPE_INTEGER,	&tmi.sort_priority,	".sort_priority"	},
-    { TYPE_INTEGER,	&tmi.anim_mode,		".anim_mode"		},
+    { TYPE_INTEGER,	&tmi.fade_mode,		".fade_mode"		},
     { TYPE_INTEGER,	&tmi.fade_delay,	".fade_delay"		},
     { TYPE_INTEGER,	&tmi.post_delay,	".post_delay"		},
     { TYPE_INTEGER,	&tmi.auto_delay,	".auto_delay"		},
@@ -8400,7 +8400,7 @@ static void LoadSpecialMenuDesignSettingsFromFilename(char *filename)
   }
 
   /* special case: initialize with default values that may be overwritten */
-  /* (e.g., init "titlemessage_1.anim_mode" from "[titlemessage].anim_mode") */
+  /* (e.g., init "titlemessage_1.fade_mode" from "[titlemessage].fade_mode") */
   for (i = 0; titlemessage_arrays[i].array != NULL; i++)
   {
     struct TitleMessageInfo *array = titlemessage_arrays[i].array;
@@ -8461,18 +8461,18 @@ void LoadSpecialMenuDesignSettings()
   /* the following initializes hierarchical values from static configuration */
 
   /* special case: initialize "ARG_DEFAULT" values in static default config */
-  /* (e.g., initialize "[titlemessage].anim_mode" from "[title].anim_mode") */
-  titlemessage_initial_default.anim_mode  = title_initial_default.anim_mode;
+  /* (e.g., initialize "[titlemessage].fade_mode" from "[title].fade_mode") */
+  titlemessage_initial_default.fade_mode  = title_initial_default.fade_mode;
   titlemessage_initial_default.fade_delay = title_initial_default.fade_delay;
   titlemessage_initial_default.post_delay = title_initial_default.post_delay;
   titlemessage_initial_default.auto_delay = title_initial_default.auto_delay;
-  titlemessage_default.anim_mode  = title_default.anim_mode;
+  titlemessage_default.fade_mode  = title_default.fade_mode;
   titlemessage_default.fade_delay = title_default.fade_delay;
   titlemessage_default.post_delay = title_default.post_delay;
   titlemessage_default.auto_delay = title_default.auto_delay;
 
   /* special case: initialize "ARG_DEFAULT" values in static default config */
-  /* (e.g., init "titlemessage_1.anim_mode" from "[titlemessage].anim_mode") */
+  /* (e.g., init "titlemessage_1.fade_mode" from "[titlemessage].fade_mode") */
   for (i = 0; i < MAX_NUM_TITLE_MESSAGES; i++)
   {
     titlemessage_initial[i] = titlemessage_initial_default;

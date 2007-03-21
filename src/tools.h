@@ -78,6 +78,13 @@ void FadeIn(int);
 void FadeOut(int);
 void FadeCross(int);
 void FadeCrossSaveBackbuffer();
+void FadeSetEnterMenu();
+void FadeSetLeaveMenu();
+void FadeSetStartItem();
+void FadeSetFromType(int);
+void FadeSetDisabled();
+void FadeSkipNextFadeIn();
+void FadeSkipNextFadeOut();
 
 void ClearWindow();
 void SetWindowBackgroundImageIfDefined(int);

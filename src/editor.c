@@ -7051,24 +7051,14 @@ void DrawLevelEd()
 #endif
   MapControlButtons();
 
-#if 0
-  fading = menu.navigation;
-#endif
-
 #if 1
-  if (fading.anim_mode == ANIM_CROSSFADE)
-    FadeCrossSaveBackbuffer();
-  else
-    FadeOut(REDRAW_FIELD);
+  FadeOut(REDRAW_FIELD);
 #endif
 
   DrawEditModeWindow();
 
 #if 1
-  if (fading.anim_mode == ANIM_CROSSFADE)
-    FadeCross(REDRAW_FIELD);
-  else
-    FadeIn(REDRAW_FIELD);
+  FadeIn(REDRAW_FIELD);
 #endif
 
   /* copy actual editor door content to door double buffer for OpenDoor() */
@@ -11361,8 +11351,13 @@ void RequestExitLevelEditor(boolean ask_if_level_has_changed,
     CloseDoor(DOOR_CLOSE_1);
     SetDoorState(DOOR_CLOSE_2);
 
+#if 1
+    if (quick_quit)
+      FadeSkipNextFadeIn();
+#else
     if (quick_quit)
       fading = fading_none;
+#endif
 
     game_status = GAME_MODE_MAIN;
 #if 1

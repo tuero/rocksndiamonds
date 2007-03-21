@@ -2596,7 +2596,9 @@ void InitGame()
   boolean emulate_bd = TRUE;	/* unless non-BOULDERDASH elements found */
   boolean emulate_sb = TRUE;	/* unless non-SOKOBAN     elements found */
   boolean emulate_sp = TRUE;	/* unless non-SUPAPLEX    elements found */
+#if 0
   boolean do_fading = (game_status == GAME_MODE_MAIN);
+#endif
   int i, j, x, y;
 
   game_status = GAME_MODE_PLAYING;
@@ -3155,16 +3157,20 @@ void InitGame()
   if (!game.restart_level)
     CloseDoor(DOOR_CLOSE_1);
 
+#if 1
+  if (level_editor_test_game)
+    FadeSkipNextFadeIn();
+  else
+    FadeSetStartItem();
+#else
   if (level_editor_test_game)
     fading = fading_none;
   else
     fading = menu.destination;
+#endif
 
 #if 1
-  if (fading.anim_mode == ANIM_CROSSFADE)
-    FadeCrossSaveBackbuffer();
-  else
-    FadeOut(REDRAW_FIELD);
+  FadeOut(REDRAW_FIELD);
 #else
   if (do_fading)
     FadeOut(REDRAW_FIELD);
@@ -3196,10 +3202,7 @@ void InitGame()
   /* !!! FIX THIS (END) !!! */
 
 #if 1
-  if (fading.anim_mode == ANIM_CROSSFADE)
-    FadeCross(redraw_mask);
-  else
-    FadeIn(redraw_mask);
+  FadeIn(REDRAW_FIELD);
 #else
   if (do_fading)
     FadeIn(REDRAW_FIELD);
@@ -3668,11 +3671,6 @@ void GameEnd()
   if (!local_player->LevelSolved_SaveScore)
   {
 #if 1
-    if (fading.anim_mode == ANIM_CROSSFADE)
-      FadeCrossSaveBackbuffer();
-    else
-      FadeOut(REDRAW_FIELD);
-#else
     FadeOut(REDRAW_FIELD);
 #endif
 
@@ -3707,11 +3705,6 @@ void GameEnd()
   else
   {
 #if 1
-    if (fading.anim_mode == ANIM_CROSSFADE)
-      FadeCrossSaveBackbuffer();
-    else
-      FadeOut(REDRAW_FIELD);
-#else
     FadeOut(REDRAW_FIELD);
 #endif
 
@@ -14131,7 +14124,13 @@ void RequestQuitGameExt(boolean skip_request, boolean quick_quit, char *message)
       if (quick_quit)
       {
 #if 1
+
+#if 1
+	FadeSkipNextFadeIn();
+#else
 	fading = fading_none;
+#endif
+
 #else
 	OpenDoor(DOOR_CLOSE_1);
 #endif
@@ -14147,14 +14146,7 @@ void RequestQuitGameExt(boolean skip_request, boolean quick_quit, char *message)
       else
       {
 #if 0
-#if 1
-	if (fading.anim_mode == ANIM_CROSSFADE)
-	  FadeCrossSaveBackbuffer();
-	else
-	  FadeOut(REDRAW_FIELD);
-#else
 	FadeOut(REDRAW_FIELD);
-#endif
 #endif
 
 	game_status = GAME_MODE_MAIN;

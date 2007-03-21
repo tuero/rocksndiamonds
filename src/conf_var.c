@@ -21,8 +21,8 @@
 struct TokenIntPtrInfo image_config_vars[] =
 {
   {
-    "[title_initial].anim_mode",
-    &title_initial_default.anim_mode
+    "[title_initial].fade_mode",
+    &title_initial_default.fade_mode
   },
   {
     "[title_initial].fade_delay",
@@ -37,8 +37,8 @@ struct TokenIntPtrInfo image_config_vars[] =
     &title_initial_default.auto_delay
   },
   {
-    "[title].anim_mode",
-    &title_default.anim_mode
+    "[title].fade_mode",
+    &title_default.fade_mode
   },
   {
     "[title].fade_delay",
@@ -105,8 +105,8 @@ struct TokenIntPtrInfo image_config_vars[] =
     &titlemessage_initial_default.sort_priority
   },
   {
-    "[titlemessage_initial].anim_mode",
-    &titlemessage_initial_default.anim_mode
+    "[titlemessage_initial].fade_mode",
+    &titlemessage_initial_default.fade_mode
   },
   {
     "[titlemessage_initial].fade_delay",
@@ -173,8 +173,8 @@ struct TokenIntPtrInfo image_config_vars[] =
     &titlemessage_default.sort_priority
   },
   {
-    "[titlemessage].anim_mode",
-    &titlemessage_default.anim_mode
+    "[titlemessage].fade_mode",
+    &titlemessage_default.fade_mode
   },
   {
     "[titlemessage].fade_delay",
@@ -241,8 +241,8 @@ struct TokenIntPtrInfo image_config_vars[] =
     &titlemessage_initial[0].sort_priority
   },
   {
-    "titlemessage_initial_1.anim_mode",
-    &titlemessage_initial[0].anim_mode
+    "titlemessage_initial_1.fade_mode",
+    &titlemessage_initial[0].fade_mode
   },
   {
     "titlemessage_initial_1.fade_delay",
@@ -309,8 +309,8 @@ struct TokenIntPtrInfo image_config_vars[] =
     &titlemessage_initial[1].sort_priority
   },
   {
-    "titlemessage_initial_2.anim_mode",
-    &titlemessage_initial[1].anim_mode
+    "titlemessage_initial_2.fade_mode",
+    &titlemessage_initial[1].fade_mode
   },
   {
     "titlemessage_initial_2.fade_delay",
@@ -377,8 +377,8 @@ struct TokenIntPtrInfo image_config_vars[] =
     &titlemessage_initial[2].sort_priority
   },
   {
-    "titlemessage_initial_3.anim_mode",
-    &titlemessage_initial[2].anim_mode
+    "titlemessage_initial_3.fade_mode",
+    &titlemessage_initial[2].fade_mode
   },
   {
     "titlemessage_initial_3.fade_delay",
@@ -445,8 +445,8 @@ struct TokenIntPtrInfo image_config_vars[] =
     &titlemessage_initial[3].sort_priority
   },
   {
-    "titlemessage_initial_4.anim_mode",
-    &titlemessage_initial[3].anim_mode
+    "titlemessage_initial_4.fade_mode",
+    &titlemessage_initial[3].fade_mode
   },
   {
     "titlemessage_initial_4.fade_delay",
@@ -513,8 +513,8 @@ struct TokenIntPtrInfo image_config_vars[] =
     &titlemessage_initial[4].sort_priority
   },
   {
-    "titlemessage_initial_5.anim_mode",
-    &titlemessage_initial[4].anim_mode
+    "titlemessage_initial_5.fade_mode",
+    &titlemessage_initial[4].fade_mode
   },
   {
     "titlemessage_initial_5.fade_delay",
@@ -581,8 +581,8 @@ struct TokenIntPtrInfo image_config_vars[] =
     &titlemessage[0].sort_priority
   },
   {
-    "titlemessage_1.anim_mode",
-    &titlemessage[0].anim_mode
+    "titlemessage_1.fade_mode",
+    &titlemessage[0].fade_mode
   },
   {
     "titlemessage_1.fade_delay",
@@ -649,8 +649,8 @@ struct TokenIntPtrInfo image_config_vars[] =
     &titlemessage[1].sort_priority
   },
   {
-    "titlemessage_2.anim_mode",
-    &titlemessage[1].anim_mode
+    "titlemessage_2.fade_mode",
+    &titlemessage[1].fade_mode
   },
   {
     "titlemessage_2.fade_delay",
@@ -717,8 +717,8 @@ struct TokenIntPtrInfo image_config_vars[] =
     &titlemessage[2].sort_priority
   },
   {
-    "titlemessage_3.anim_mode",
-    &titlemessage[2].anim_mode
+    "titlemessage_3.fade_mode",
+    &titlemessage[2].fade_mode
   },
   {
     "titlemessage_3.fade_delay",
@@ -785,8 +785,8 @@ struct TokenIntPtrInfo image_config_vars[] =
     &titlemessage[3].sort_priority
   },
   {
-    "titlemessage_4.anim_mode",
-    &titlemessage[3].anim_mode
+    "titlemessage_4.fade_mode",
+    &titlemessage[3].fade_mode
   },
   {
     "titlemessage_4.fade_delay",
@@ -853,8 +853,8 @@ struct TokenIntPtrInfo image_config_vars[] =
     &titlemessage[4].sort_priority
   },
   {
-    "titlemessage_5.anim_mode",
-    &titlemessage[4].anim_mode
+    "titlemessage_5.fade_mode",
+    &titlemessage[4].fade_mode
   },
   {
     "titlemessage_5.fade_delay",
@@ -961,28 +961,40 @@ struct TokenIntPtrInfo image_config_vars[] =
     &border.draw_masked[GFX_SPECIAL_ARG_DOOR]
   },
   {
-    "menu.navigation.anim_mode",
-    &menu.navigation.anim_mode
+    "menu.enter_menu.fade_mode",
+    &menu.enter_menu.fade_mode
   },
   {
-    "menu.navigation.fade_delay",
-    &menu.navigation.fade_delay
+    "menu.enter_menu.fade_delay",
+    &menu.enter_menu.fade_delay
   },
   {
-    "menu.navigation.post_delay",
-    &menu.navigation.post_delay
+    "menu.enter_menu.post_delay",
+    &menu.enter_menu.post_delay
   },
   {
-    "menu.destination.anim_mode",
-    &menu.destination.anim_mode
+    "menu.leave_menu.fade_mode",
+    &menu.leave_menu.fade_mode
   },
   {
-    "menu.destination.fade_delay",
-    &menu.destination.fade_delay
+    "menu.leave_menu.fade_delay",
+    &menu.leave_menu.fade_delay
   },
   {
-    "menu.destination.post_delay",
-    &menu.destination.post_delay
+    "menu.leave_menu.post_delay",
+    &menu.leave_menu.post_delay
+  },
+  {
+    "menu.start_item.fade_mode",
+    &menu.start_item.fade_mode
+  },
+  {
+    "menu.start_item.fade_delay",
+    &menu.start_item.fade_delay
+  },
+  {
+    "menu.start_item.post_delay",
+    &menu.start_item.post_delay
   },
   {
     "menu.draw_xoffset",

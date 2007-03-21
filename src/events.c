@@ -811,6 +811,8 @@ void HandleKey(Key key, int key_status)
 	  break;
 
 	case KSYM_Escape:
+	  FadeSkipNextFadeIn();
+
 	  if (game_status == GAME_MODE_TITLE)
 	    HandleTitleScreen(0, 0, 0, 0, MB_MENU_LEAVE);
           else if (game_status == GAME_MODE_LEVELS)
