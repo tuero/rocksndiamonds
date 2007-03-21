@@ -106,6 +106,7 @@ char *getStringCopy(char *);
 char *getStringToLower(char *);
 void setString(char **, char *);
 boolean strEqual(char *, char *);
+boolean strEqualN(char *, char *, int);
 
 void GetOptions(char **, void (*print_usage_function)(void));
 

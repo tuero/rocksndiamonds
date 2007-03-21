@@ -1,6 +1,7 @@
 2007-03-21
 	* improved menu fading, adding separate fading definitions for entering
 	  and leaving a menu and for fading between menu and "content" screens
+	* fixed small bug with recognizing also ".font_xyz" style definitions
 
 2007-03-20
 	* improved menu fading, adding separate fading definitions for fading

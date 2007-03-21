@@ -584,6 +584,14 @@ boolean strEqual(char *s1, char *s2)
 	  strcmp(s1, s2) == 0);
 }
 
+boolean strEqualN(char *s1, char *s2, int n)
+{
+  return (s1 == NULL && s2 == NULL ? TRUE  :
+	  s1 == NULL && s2 != NULL ? FALSE :
+	  s1 != NULL && s2 == NULL ? FALSE :
+	  strncmp(s1, s2, n) == 0);
+}
+
 
 /* ------------------------------------------------------------------------- */
 /* command line option handling functions                                    */
@@ -1829,7 +1837,7 @@ int get_parameter_value(char *value_raw, char *suffix, int type)
 	      string_has_parameter(value, "crossfade")	? FADE_MODE_CROSSFADE :
 	      FADE_MODE_DEFAULT);
   }
-  else if (strEqual(suffix, ".font"))
+  else if (strEqualN(suffix, ".font", 5))	/* (may also be ".font_xyz") */
   {
     result = gfx.get_font_from_token_function(value);
   }

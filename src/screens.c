@@ -1459,6 +1459,20 @@ void DrawMainMenuExt(int redraw_mask, boolean do_fading)
   }
 #endif
 
+#if 0
+ {
+   game_status = GAME_MODE_PSEUDO_PREVIEW;
+
+   DrawText(20, 400, "text_3.PREVIEW", FONT_TEXT_3);
+   DrawText(20, 420, "text_4.PREVIEW", FONT_TEXT_4);
+
+   game_status = GAME_MODE_MAIN;
+
+   DrawText(20, 440, "text_3.MAIN", FONT_TEXT_3);
+   DrawText(20, 460, "text_4.MAIN", FONT_TEXT_4);
+ }
+#endif
+
 #if 1
   FadeIn(redraw_mask);
 #else
@@ -1579,9 +1593,11 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
 	DrawInfoScreen_NotAvailable("Title screen information:",
 				    "No title screen for this level set.");
 
+#if 0
 	/* use default settings for fading, but always disable auto delay */
 	fading = title_default;
 	fading.auto_delay = -1;
+#endif
 
 	return;
       }
@@ -1630,8 +1646,13 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
     return;
   }
 
+#if 1
+  if (fading.auto_delay > 0 && DelayReached(&title_delay, fading.auto_delay))
+    button = MB_MENU_CHOICE;
+#else
   if (fading.auto_delay > -1 && DelayReached(&title_delay, fading.auto_delay))
     button = MB_MENU_CHOICE;
+#endif
 
   if (button == MB_MENU_LEAVE)
   {
