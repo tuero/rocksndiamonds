@@ -264,6 +264,11 @@ static struct LevelFileConfigInfo chunk_config_ELEM[] =
     TYPE_BOOLEAN,			CONF_VALUE_8_BIT(6),
     &li.continuous_snapping,		TRUE
   },
+  {
+    EL_PLAYER_1,			-1,
+    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(12),
+    &li.shifted_relocation,		FALSE
+  },
 
   /* (these values are different for each player) */
   {
@@ -5948,6 +5953,10 @@ static void LoadLevel_InitVersion(struct LevelInfo *level, char *filename)
 	change->target_element == EL_SOKOBAN_FIELD_PLAYER)
       change->target_element = EL_PLAYER_1;
   }
+
+  /* not centering level after relocating player was default only in 3.2.3 */
+  if (level->game_version == VERSION_IDENT(3,2,3,0))	/* (no pre-releases) */
+    level->shifted_relocation = TRUE;
 }
 
 static void LoadLevel_InitElements(struct LevelInfo *level, char *filename)

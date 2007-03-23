@@ -1,3 +1,9 @@
+2007-03-23
+	* added new player option "no centering when relocating" for "invisible"
+	  teleportations to level areas that look exactly the same, giving the
+	  illusion that the player did not relocate at all (this was the default
+	  since 3.2.3, but caused visual problems with room creation in "Zelda")
+
 2007-03-21
 	* improved menu fading, adding separate fading definitions for entering
 	  and leaving a menu and for fading between menu and "content" screens

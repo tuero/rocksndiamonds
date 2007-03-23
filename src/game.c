@@ -1897,7 +1897,7 @@ void DrawGameValue_Keys(int key[MAX_NUM_KEYS])
 #if 1
     struct TextPosInfo *pos = &game.panel.key[i];
 #endif
-    int src_x = DOOR_GFX_PAGEX5 + 18;
+    int src_x = DOOR_GFX_PAGEX5 + 18 + (i % 4) * MINI_TILEX;
     int src_y = DOOR_GFX_PAGEY1 + 123;
 #if 1
     int dst_x = PANEL_XPOS(pos);
@@ -4191,8 +4191,10 @@ void DrawRelocateScreen(int old_x, int old_y, int x, int y, int move_dir,
 
     if (!IN_VIS_FIELD(SCREENX(x), SCREENY(y)) || center_screen)
     {
-      if (center_screen)
+      if (!level.shifted_relocation || center_screen)
       {
+	/* quick relocation (without scrolling), with centering of screen */
+
 	scroll_x = (x < SBX_Left  + MIDPOSX ? SBX_Left :
 		    x > SBX_Right + MIDPOSX ? SBX_Right :
 		    x - MIDPOSX);
@@ -4227,6 +4229,8 @@ void DrawRelocateScreen(int old_x, int old_y, int x, int y, int move_dir,
     }
     else
     {
+      /* quick relocation (without scrolling), inside visible screen area */
+
       if ((move_dir == MV_LEFT  && scroll_x > x - MIDPOSX + offset) ||
 	  (move_dir == MV_RIGHT && scroll_x < x - MIDPOSX - offset))
 	scroll_x = x - MIDPOSX + (scroll_x < x - MIDPOSX ? -offset : +offset);
@@ -4248,6 +4252,49 @@ void DrawRelocateScreen(int old_x, int old_y, int x, int y, int move_dir,
   }
   else
   {
+#if 1
+    int scroll_xx, scroll_yy;
+
+    if (!level.shifted_relocation || center_screen)
+    {
+      /* visible relocation (with scrolling), with centering of screen */
+
+      scroll_xx = (x < SBX_Left  + MIDPOSX ? SBX_Left :
+		   x > SBX_Right + MIDPOSX ? SBX_Right :
+		   x - MIDPOSX);
+
+      scroll_yy = (y < SBY_Upper + MIDPOSY ? SBY_Upper :
+		   y > SBY_Lower + MIDPOSY ? SBY_Lower :
+		   y - MIDPOSY);
+    }
+    else
+    {
+      /* visible relocation (with scrolling), but do not center screen */
+
+      int center_scroll_x = (old_x < SBX_Left  + MIDPOSX ? SBX_Left :
+			     old_x > SBX_Right + MIDPOSX ? SBX_Right :
+			     old_x - MIDPOSX);
+
+      int center_scroll_y = (old_y < SBY_Upper + MIDPOSY ? SBY_Upper :
+			     old_y > SBY_Lower + MIDPOSY ? SBY_Lower :
+			     old_y - MIDPOSY);
+
+      int offset_x = x + (scroll_x - center_scroll_x);
+      int offset_y = y + (scroll_y - center_scroll_y);
+
+      scroll_xx = (offset_x < SBX_Left  + MIDPOSX ? SBX_Left :
+		   offset_x > SBX_Right + MIDPOSX ? SBX_Right :
+		   offset_x - MIDPOSX);
+
+      scroll_yy = (offset_y < SBY_Upper + MIDPOSY ? SBY_Upper :
+		   offset_y > SBY_Lower + MIDPOSY ? SBY_Lower :
+		   offset_y - MIDPOSY);
+    }
+
+#else
+
+    /* visible relocation (with scrolling), with centering of screen */
+
     int scroll_xx = (x < SBX_Left  + MIDPOSX ? SBX_Left :
 		     x > SBX_Right + MIDPOSX ? SBX_Right :
 		     x - MIDPOSX);
@@ -4255,6 +4302,7 @@ void DrawRelocateScreen(int old_x, int old_y, int x, int y, int move_dir,
     int scroll_yy = (y < SBY_Upper + MIDPOSY ? SBY_Upper :
 		     y > SBY_Lower + MIDPOSY ? SBY_Lower :
 		     y - MIDPOSY);
+#endif
 
     ScrollScreen(NULL, SCROLL_GO_ON);	/* scroll last frame to full tile */
 
