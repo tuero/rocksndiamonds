@@ -1560,6 +1560,7 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
 #endif
 #endif
   struct TitleControlInfo *tci;
+  struct TitleFadingInfo fading_default;
   struct TitleFadingInfo fading_last = fading;
   struct TitleFadingInfo fading_next;
   int sound, music;
@@ -1614,11 +1615,24 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
     else
       DrawTitleScreenMessage(tci->local_nr, tci->initial);
 
+    fading_default = (tci->initial ? title_initial_default : title_default);
+
     fading = fading_next = getTitleFading(tci);
 
+#if 1
+#if 1
+    if (!(fading_last.fade_mode & FADE_TYPE_TRANSFORM) &&
+	fading_next.fade_mode & FADE_TYPE_TRANSFORM)
+    {
+      fading.fade_mode = FADE_MODE_FADE;
+      fading.fade_delay = fading_default.fade_delay;
+    }
+#else
     if (fading_last.fade_mode != FADE_MODE_CROSSFADE &&
 	fading_next.fade_mode == FADE_MODE_CROSSFADE)
       fading.fade_mode = FADE_MODE_FADE;
+#endif
+#endif
 
 #if 1
     sound = getTitleSound(tci);
@@ -1634,6 +1648,8 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
 #endif
 
     SetMouseCursor(CURSOR_NONE);
+
+    // printf("::: mode: %d, delay: %d\n", fading.fade_mode, fading.fade_delay);
 
 #if 1
     FadeIn(REDRAW_ALL);
@@ -1739,10 +1755,17 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
       printf("::: %d -> %d\n", fading.fade_mode, fading_next.fade_mode);
 #endif
 
+#if 1
+      /* last screen already faded out, next screen has no animation */
+      if (!(fading.fade_mode & FADE_TYPE_TRANSFORM) &&
+	  fading_next.fade_mode == FADE_MODE_NONE)
+	fading = fading_next;
+#else
       /* last screen already faded out, next screen has no animation */
       if (fading.fade_mode      != FADE_MODE_CROSSFADE &&
 	  fading_next.fade_mode == FADE_MODE_NONE)
 	fading = fading_next;
+#endif
 
 #if 1
       FadeIn(REDRAW_ALL);
@@ -2249,6 +2272,9 @@ static void DrawInfoScreen_Main(int redraw_mask, boolean do_fading)
 
   UnmapAllGadgets();
   CloseDoor(DOOR_CLOSE_2);
+
+  /* (needed after displaying title screens which disable auto repeat) */
+  KeyboardAutoRepeatOn();
 
 #if 1
   FadeOut(redraw_mask);

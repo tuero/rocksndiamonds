@@ -4851,10 +4851,14 @@ void InitGfxBackground()
   fieldbuffer = bitmap_db_field;
   SetDrawtoField(DRAW_BACKBUFFER);
 
+#if 1
+  ClearRectangle(backbuffer, 0, 0, WIN_XSIZE, WIN_YSIZE);
+#else
   RedrawBackground();
 
   ClearRectangle(backbuffer, REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE);
   ClearRectangle(bitmap_db_door, 0, 0, 3 * DXSIZE, DYSIZE + VYSIZE);
+#endif
 
   for (x = 0; x < MAX_BUF_XSIZE; x++)
     for (y = 0; y < MAX_BUF_YSIZE; y++)
@@ -5212,7 +5216,8 @@ void OpenAll()
 
 #if 1
   FadeSetStartItem();
-  FadeSkipNextFadeOut();
+  if (!(fading.fade_mode & FADE_TYPE_TRANSFORM))
+    FadeSkipNextFadeOut();
   // FadeSetDisabled();
 #else
   fading = fading_none;

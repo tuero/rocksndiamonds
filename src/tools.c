@@ -523,7 +523,11 @@ void FadeExt(int fade_mask, int fade_mode)
 {
   static int fade_mode_skip = FADE_MODE_NONE;
   void (*draw_border_function)(void) = NULL;
-  Bitmap *bitmap = (fade_mode == FADE_MODE_CROSSFADE ? bitmap_db_cross : NULL);
+#if 0
+  Bitmap *bitmap = (fade_mode != FADE_MODE_FADE_IN ? bitmap_db_cross : NULL);
+#else
+  Bitmap *bitmap = (fade_mode & FADE_TYPE_TRANSFORM ? bitmap_db_cross : NULL);
+#endif
   int x, y, width, height;
   int fade_delay, post_delay;
 
@@ -531,6 +535,10 @@ void FadeExt(int fade_mask, int fade_mode)
 
   if (fade_mode & FADE_TYPE_SKIP)
   {
+#if 0
+    printf("::: will skip %d ... [%d]\n", fade_mode, fade_mode_skip);
+#endif
+
     fade_mode_skip = fade_mode;
 
     return;
@@ -600,6 +608,14 @@ void FadeExt(int fade_mask, int fade_mode)
 void FadeIn(int fade_mask)
 {
 #if 1
+  // printf("::: now fading in...\n");
+
+  if (fading.fade_mode & FADE_TYPE_TRANSFORM)
+    FadeExt(fade_mask, fading.fade_mode);
+  else
+    FadeExt(fade_mask, FADE_MODE_FADE_IN);
+#else
+#if 1
   if (fading.fade_mode == FADE_MODE_CROSSFADE)
     FadeExt(fade_mask, FADE_MODE_CROSSFADE);
   else
@@ -607,10 +623,19 @@ void FadeIn(int fade_mask)
 #else
   FadeExt(fade_mask, FADE_MODE_FADE_IN);
 #endif
+#endif
 }
 
 void FadeOut(int fade_mask)
 {
+#if 1
+  // printf("::: fading.fade_mode == %d\n", fading.fade_mode);
+
+  if (fading.fade_mode & FADE_TYPE_TRANSFORM)
+    FadeCrossSaveBackbuffer();
+  else
+    FadeExt(fade_mask, FADE_MODE_FADE_OUT);
+#else
 #if 1
   if (fading.fade_mode == FADE_MODE_CROSSFADE)
     FadeCrossSaveBackbuffer();
@@ -618,6 +643,7 @@ void FadeOut(int fade_mask)
     FadeExt(fade_mask, FADE_MODE_FADE_OUT);
 #else
   FadeExt(fade_mask, FADE_MODE_FADE_OUT);
+#endif
 #endif
 }
 

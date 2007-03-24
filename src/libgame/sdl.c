@@ -415,8 +415,8 @@ void SDLFadeRectangle(Bitmap *bitmap_cross, int x, int y, int width, int height,
 
   dst_rect.x = dst_x;
   dst_rect.y = dst_y;
-  dst_rect.w = width;
-  dst_rect.h = height;
+  dst_rect.w = width;		/* (ignored) */
+  dst_rect.h = height;		/* (ignored) */
 
   if (initialization_needed)
   {
@@ -472,17 +472,17 @@ void SDLFadeRectangle(Bitmap *bitmap_cross, int x, int y, int width, int height,
   }
 
   /* copy source and target surfaces to temporary surfaces for fading */
-  if (fade_mode == FADE_MODE_CROSSFADE)
+  if (fade_mode & FADE_TYPE_TRANSFORM)
   {
     SDL_BlitSurface(surface_cross,  &src_rect, surface_source, &src_rect);
     SDL_BlitSurface(surface_screen, &dst_rect, surface_target, &src_rect);
   }
-  else if (fade_mode == FADE_MODE_FADE_IN)
+  else if (fade_mode & FADE_TYPE_FADE_IN)
   {
     SDL_BlitSurface(surface_black,  &src_rect, surface_source, &src_rect);
     SDL_BlitSurface(surface_screen, &dst_rect, surface_target, &src_rect);
   }
-  else		/* FADE_MODE_FADE_OUT */
+  else		/* FADE_TYPE_FADE_OUT */
   {
     SDL_BlitSurface(surface_screen, &dst_rect, surface_source, &src_rect);
     SDL_BlitSurface(surface_black,  &src_rect, surface_target, &src_rect);
@@ -490,29 +490,145 @@ void SDLFadeRectangle(Bitmap *bitmap_cross, int x, int y, int width, int height,
 
   time_current = SDL_GetTicks();
 
-  for (alpha = 0.0; alpha < 255.0;)
+  if (fade_mode == FADE_MODE_MELT)
   {
-    time_last = time_current;
-    time_current = SDL_GetTicks();
-    alpha += 255 * ((float)(time_current - time_last) / fade_delay);
-    alpha_final = MIN(MAX(0, alpha), 255);
+    boolean done = FALSE;
+    int melt_pixels = 2;
+    int melt_columns = width / melt_pixels;
+    int ypos[melt_columns];
+    int max_steps = height / 8 + 32;
+    int steps_done = 0;
+    int i;
 
-    /* draw existing (source) image to screen buffer */
     SDL_BlitSurface(surface_source, &src_rect, surface_screen, &dst_rect);
+    SDL_SetAlpha(surface_target, 0, 0);		/* disable alpha blending */
 
-    /* draw new (target) image to screen buffer using alpha blending */
-    SDL_SetAlpha(surface_target, SDL_SRCALPHA, alpha_final);
-    SDL_BlitSurface(surface_target, &src_rect, surface_screen, &dst_rect);
+    ypos[0] = -GetSimpleRandom(16);
 
-    if (draw_border_function != NULL)
-      draw_border_function();
+    for (i = 1 ; i < melt_columns; i++)
+    {
+      int r = GetSimpleRandom(3) - 1;	/* randomly choose from { -1, 0, -1 } */
+
+      ypos[i] = ypos[i - 1] + r;
+
+      if (ypos[i] > 0)
+        ypos[i] = 0;
+      else
+        if (ypos[i] == -16)
+          ypos[i] = -15;
+    }
+
+    while (!done)
+    {
+      float steps;
+      int steps_final;
+
+      time_last = time_current;
+      time_current = SDL_GetTicks();
+      steps += max_steps * ((float)(time_current - time_last) / fade_delay);
+      steps_final = MIN(MAX(0, steps), max_steps);
+
+      steps_done++;
+
+      done = (steps_done >= steps_final);
+
+      for (i = 0 ; i < melt_columns; i++)
+      {
+	if (ypos[i] < 0)
+        {
+          ypos[i]++;
+
+          done = FALSE;
+        }
+	else if (ypos[i] < height)
+	{
+	  int y1 = 16;
+	  int y2 = 8;
+	  int y3 = 8;
+	  int dy = (ypos[i] < y1) ? ypos[i] + 1 : y2 + GetSimpleRandom(y3);
+
+	  if (ypos[i] + dy >= height)
+	    dy = height - ypos[i];
+
+	  /* copy part of (appearing) target surface to upper area */
+	  src_rect.x = src_x + i * melt_pixels;
+	  // src_rect.y = src_y + ypos[i];
+	  src_rect.y = src_y;
+	  src_rect.w = melt_pixels;
+	  // src_rect.h = dy;
+	  src_rect.h = ypos[i] + dy;
+
+	  dst_rect.x = dst_x + i * melt_pixels;
+	  // dst_rect.y = dst_y + ypos[i];
+	  dst_rect.y = dst_y;
+
+	  if (steps_done >= steps_final)
+	    SDL_BlitSurface(surface_target, &src_rect,
+			    surface_screen, &dst_rect);
+
+	  ypos[i] += dy;
+
+	  /* copy part of (disappearing) source surface to lower area */
+	  src_rect.x = src_x + i * melt_pixels;
+	  src_rect.y = src_y;
+	  src_rect.w = melt_pixels;
+	  src_rect.h = height - ypos[i];
+
+	  dst_rect.x = dst_x + i * melt_pixels;
+	  dst_rect.y = dst_y + ypos[i];
+
+	  if (steps_done >= steps_final)
+	    SDL_BlitSurface(surface_source, &src_rect,
+			    surface_screen, &dst_rect);
+
+	  done = FALSE;
+	}
+	else
+	{
+	  src_rect.x = src_x + i * melt_pixels;
+	  src_rect.y = src_y;
+	  src_rect.w = melt_pixels;
+	  src_rect.h = height;
+
+	  dst_rect.x = dst_x + i * melt_pixels;
+	  dst_rect.y = dst_y;
+
+	  if (steps_done >= steps_final)
+	    SDL_BlitSurface(surface_target, &src_rect,
+			    surface_screen, &dst_rect);
+	}
+      }
+
+      if (steps_done >= steps_final)
+	SDL_UpdateRect(surface_screen, dst_x, dst_y, width, height);
+    }
+  }
+  else
+  {
+    for (alpha = 0.0; alpha < 255.0;)
+    {
+      time_last = time_current;
+      time_current = SDL_GetTicks();
+      alpha += 255 * ((float)(time_current - time_last) / fade_delay);
+      alpha_final = MIN(MAX(0, alpha), 255);
+
+      /* draw existing (source) image to screen buffer */
+      SDL_BlitSurface(surface_source, &src_rect, surface_screen, &dst_rect);
+
+      /* draw new (target) image to screen buffer using alpha blending */
+      SDL_SetAlpha(surface_target, SDL_SRCALPHA, alpha_final);
+      SDL_BlitSurface(surface_target, &src_rect, surface_screen, &dst_rect);
+
+      if (draw_border_function != NULL)
+	draw_border_function();
 
 #if 1
-    /* only update the region of the screen that is affected from fading */
-    SDL_UpdateRect(surface_screen, dst_x, dst_y, width, height);
+      /* only update the region of the screen that is affected from fading */
+      SDL_UpdateRect(surface_screen, dst_x, dst_y, width, height);
 #else
-    SDL_Flip(surface_screen);
+      SDL_Flip(surface_screen);
 #endif
+    }
   }
 
   Delay(post_delay);
