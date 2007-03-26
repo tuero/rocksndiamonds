@@ -558,6 +558,11 @@ void FadeExt(int fade_mask, int fade_mode)
   }
 
 #if 1
+  if (global.autoplay_leveldir)
+    fading.fade_mode = FADE_MODE_NONE;
+#endif
+
+#if 1
   if (fading.fade_mode == FADE_MODE_NONE)
     return;
 #endif
@@ -1807,15 +1812,29 @@ void getPreviewGraphicSource(int graphic, Bitmap **bitmap, int *x, int *y,
   {
     int width_mult, width_div;
     int height_mult, height_div;
-  } offset_calc[4] =
+#if 1
+  }
+  offset_calc[6] =
+#else
+  offset_calc[4] =
+#endif
   {
     { 0, 1,	0, 1	},
     { 0, 1,	2, 3	},
     { 1, 2,	2, 3	},
     { 3, 4,	2, 3	},
+#if 1
+    { 7, 8,	2, 3	},
+    { 15, 16,	2, 3	},
+#endif
   };
+#if 1
+  int offset_calc_pos = (tilesize < MICRO_TILESIZE / 4 ||
+			 tilesize > TILESIZE ? 5 : 5 - log_2(tilesize));
+#else
   int offset_calc_pos = (tilesize < MICRO_TILESIZE || tilesize > TILESIZE ? 3 :
 			 5 - log_2(tilesize));
+#endif
   Bitmap *src_bitmap = graphic_info[graphic].bitmap;
   int width_mult = offset_calc[offset_calc_pos].width_mult;
   int width_div = offset_calc[offset_calc_pos].width_div;

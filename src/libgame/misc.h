@@ -103,6 +103,7 @@ char *getStringCat3(char *, char *, char *);
 char *getPath2(char *, char *);
 char *getPath3(char *, char *, char*);
 char *getStringCopy(char *);
+char *getStringCopyN(char *, int);
 char *getStringToLower(char *);
 void setString(char **, char *);
 boolean strEqual(char *, char *);

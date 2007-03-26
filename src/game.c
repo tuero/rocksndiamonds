@@ -128,10 +128,10 @@
 #define DX_TIME			(DX + XX_TIME)
 #define DY_TIME			(DY + YY_TIME)
 
-#if 0
+#if 1
 /* game panel display and control definitions */
 
-#define GAME_CONTROL_LEVEL			0
+#define GAME_CONTROL_LEVEL_NUMBER		0
 #define GAME_CONTROL_GEMS			1
 #define GAME_CONTROL_INVENTORY			2
 #define GAME_CONTROL_KEY_1			3
@@ -167,54 +167,59 @@
 #define GAME_CONTROL_STEEL_EXIT			33
 #define GAME_CONTROL_EM_STEEL_EXIT		34
 #define GAME_CONTROL_EMC_MAGIC_BALL		35
-#define GAME_CONTROL_EMC_MAGIC_BALL_TIME	36
-#define GAME_CONTROL_LIGHT_SWITCH		37
-#define GAME_CONTROL_LIGHT_SWITCH_TIME		38
-#define GAME_CONTROL_TIMEGATE_SWITCH		39
-#define GAME_CONTROL_TIMEGATE_SWITCH_TIME	40
-#define GAME_CONTROL_SWITCHGATE_SWITCH		41
-#define GAME_CONTROL_EMC_LENSES			42
-#define GAME_CONTROL_EMC_LENSES_TIME		43
-#define GAME_CONTROL_EMC_MAGNIFIER		44
-#define GAME_CONTROL_EMC_MAGNIFIER_TIME		45
-#define GAME_CONTROL_BALLOON_SWITCH		46
-#define GAME_CONTROL_DYNABOMB_NUMBER		47
-#define GAME_CONTROL_DYNABOMB_SIZE		48
-#define GAME_CONTROL_DYNABOMB_POWER		49
-#define GAME_CONTROL_PENGUINS			50
-#define GAME_CONTROL_SOKOBAN_OBJECTS		51
-#define GAME_CONTROL_SOKOBAN_FIELDS		52
-#define GAME_CONTROL_ROBOT_WHEEL		53
-#define GAME_CONTROL_CONVEYOR_BELT_1		54
-#define GAME_CONTROL_CONVEYOR_BELT_1_SWITCH	55
-#define GAME_CONTROL_CONVEYOR_BELT_2		56
-#define GAME_CONTROL_CONVEYOR_BELT_2_SWITCH	57
-#define GAME_CONTROL_CONVEYOR_BELT_3		58
-#define GAME_CONTROL_CONVEYOR_BELT_3_SWITCH	59
-#define GAME_CONTROL_CONVEYOR_BELT_4		60
-#define GAME_CONTROL_CONVEYOR_BELT_4_SWITCH	61
-#define GAME_CONTROL_MAGIC_WALL			62
-#define GAME_CONTROL_MAGIC_WALL_TIME		63
-#define GAME_CONTROL_BD_MAGIC_WALL		64
-#define GAME_CONTROL_DC_MAGIC_WALL		65
-#define GAME_CONTROL_PLAYER_NAME		66
-#define GAME_CONTROL_LEVEL_NAME			67
-#define GAME_CONTROL_LEVEL_AUTHOR		68
+#define GAME_CONTROL_EMC_MAGIC_BALL_SWITCH	36
+#define GAME_CONTROL_EMC_MAGIC_BALL_TIME	37
+#define GAME_CONTROL_LIGHT_SWITCH		38
+#define GAME_CONTROL_LIGHT_SWITCH_TIME		39
+#define GAME_CONTROL_TIMEGATE_SWITCH		40
+#define GAME_CONTROL_TIMEGATE_SWITCH_TIME	41
+#define GAME_CONTROL_SWITCHGATE_SWITCH		42
+#define GAME_CONTROL_EMC_LENSES			43
+#define GAME_CONTROL_EMC_LENSES_TIME		44
+#define GAME_CONTROL_EMC_MAGNIFIER		45
+#define GAME_CONTROL_EMC_MAGNIFIER_TIME		46
+#define GAME_CONTROL_BALLOON_SWITCH		47
+#define GAME_CONTROL_DYNABOMB_NUMBER		48
+#define GAME_CONTROL_DYNABOMB_SIZE		49
+#define GAME_CONTROL_DYNABOMB_POWER		50
+#define GAME_CONTROL_PENGUINS			51
+#define GAME_CONTROL_SOKOBAN_OBJECTS		52
+#define GAME_CONTROL_SOKOBAN_FIELDS		53
+#define GAME_CONTROL_ROBOT_WHEEL		54
+#define GAME_CONTROL_CONVEYOR_BELT_1		55
+#define GAME_CONTROL_CONVEYOR_BELT_1_SWITCH	56
+#define GAME_CONTROL_CONVEYOR_BELT_2		57
+#define GAME_CONTROL_CONVEYOR_BELT_2_SWITCH	58
+#define GAME_CONTROL_CONVEYOR_BELT_3		59
+#define GAME_CONTROL_CONVEYOR_BELT_3_SWITCH	60
+#define GAME_CONTROL_CONVEYOR_BELT_4		61
+#define GAME_CONTROL_CONVEYOR_BELT_4_SWITCH	62
+#define GAME_CONTROL_MAGIC_WALL			63
+#define GAME_CONTROL_MAGIC_WALL_TIME		64
+#define GAME_CONTROL_BD_MAGIC_WALL		65
+#define GAME_CONTROL_DC_MAGIC_WALL		66
+#define GAME_CONTROL_PLAYER_NAME		67
+#define GAME_CONTROL_LEVEL_NAME			68
+#define GAME_CONTROL_LEVEL_AUTHOR		69
+
+#define NUM_GAME_CONTROLS			70
+
+int game_control_value[NUM_GAME_CONTROLS];
+int last_game_control_value[NUM_GAME_CONTROLS];
 
 struct GameControlInfo
 {
   int nr;
 
-  struct TextPosInfo *pos_text;
+  struct TextPosInfo *pos;
   int type;
-  void *ptr;
 };
 
 static struct GameControlInfo game_controls[] =
 {
   {
-    GAME_CONTROL_LEVEL,
-    &game.panel.level,
+    GAME_CONTROL_LEVEL_NUMBER,
+    &game.panel.level_number,
     TYPE_INTEGER,
   },
   {
@@ -228,8 +233,53 @@ static struct GameControlInfo game_controls[] =
     TYPE_INTEGER,
   },
   {
-    GAME_CONTROL_KEYS,
-    &game.panel.keys,
+    GAME_CONTROL_KEY_1,
+    &game.panel.key[0],
+    TYPE_ELEMENT,
+  },
+  {
+    GAME_CONTROL_KEY_2,
+    &game.panel.key[1],
+    TYPE_ELEMENT,
+  },
+  {
+    GAME_CONTROL_KEY_3,
+    &game.panel.key[2],
+    TYPE_ELEMENT,
+  },
+  {
+    GAME_CONTROL_KEY_4,
+    &game.panel.key[3],
+    TYPE_ELEMENT,
+  },
+  {
+    GAME_CONTROL_KEY_5,
+    &game.panel.key[4],
+    TYPE_ELEMENT,
+  },
+  {
+    GAME_CONTROL_KEY_6,
+    &game.panel.key[5],
+    TYPE_ELEMENT,
+  },
+  {
+    GAME_CONTROL_KEY_7,
+    &game.panel.key[6],
+    TYPE_ELEMENT,
+  },
+  {
+    GAME_CONTROL_KEY_8,
+    &game.panel.key[7],
+    TYPE_ELEMENT,
+  },
+  {
+    GAME_CONTROL_KEY_WHITE,
+    &game.panel.key_white,
+    TYPE_ELEMENT,
+  },
+  {
+    GAME_CONTROL_KEY_WHITE_COUNT,
+    &game.panel.key_white_count,
     TYPE_INTEGER,
   },
   {
@@ -260,102 +310,47 @@ static struct GameControlInfo game_controls[] =
   {
     GAME_CONTROL_DROP_NEXT_1,
     &game.panel.drop_next_1,
-    TYPE_INTEGER,
+    TYPE_ELEMENT,
   },
   {
     GAME_CONTROL_DROP_NEXT_2,
     &game.panel.drop_next_2,
-    TYPE_INTEGER,
+    TYPE_ELEMENT,
   },
   {
     GAME_CONTROL_DROP_NEXT_3,
     &game.panel.drop_next_3,
-    TYPE_INTEGER,
+    TYPE_ELEMENT,
   },
   {
     GAME_CONTROL_DROP_NEXT_4,
     &game.panel.drop_next_4,
-    TYPE_INTEGER,
+    TYPE_ELEMENT,
   },
   {
     GAME_CONTROL_DROP_NEXT_5,
     &game.panel.drop_next_5,
-    TYPE_INTEGER,
+    TYPE_ELEMENT,
   },
   {
     GAME_CONTROL_DROP_NEXT_6,
     &game.panel.drop_next_6,
-    TYPE_INTEGER,
+    TYPE_ELEMENT,
   },
   {
     GAME_CONTROL_DROP_NEXT_7,
     &game.panel.drop_next_7,
-    TYPE_INTEGER,
+    TYPE_ELEMENT,
   },
   {
     GAME_CONTROL_DROP_NEXT_8,
     &game.panel.drop_next_8,
-    TYPE_INTEGER,
-  },
-  {
-    GAME_CONTROL_EMC_KEYS,
-    &game.panel.emc_keys,
-    TYPE_INTEGER,
-  },
-  {
-    GAME_CONTROL_KEY_1,
-    &game.panel.key_1,
-    TYPE_INTEGER,
-  },
-  {
-    GAME_CONTROL_KEY_2,
-    &game.panel.key_2,
-    TYPE_INTEGER,
-  },
-  {
-    GAME_CONTROL_KEY_3,
-    &game.panel.key_3,
-    TYPE_INTEGER,
-  },
-  {
-    GAME_CONTROL_KEY_4,
-    &game.panel.key_4,
-    TYPE_INTEGER,
-  },
-  {
-    GAME_CONTROL_KEY_5,
-    &game.panel.key_5,
-    TYPE_INTEGER,
-  },
-  {
-    GAME_CONTROL_KEY_6,
-    &game.panel.key_6,
-    TYPE_INTEGER,
-  },
-  {
-    GAME_CONTROL_KEY_7,
-    &game.panel.key_7,
-    TYPE_INTEGER,
-  },
-  {
-    GAME_CONTROL_KEY_8,
-    &game.panel.key_8,
-    TYPE_INTEGER,
-  },
-  {
-    GAME_CONTROL_KEY_WHITE,
-    &game.panel.key_white,
-    TYPE_INTEGER,
-  },
-  {
-    GAME_CONTROL_KEY_WHITE_COUNT,
-    &game.panel.key_white_count,
-    TYPE_INTEGER,
+    TYPE_ELEMENT,
   },
   {
     GAME_CONTROL_SHIELD_NORMAL,
     &game.panel.shield_normal,
-    TYPE_INTEGER,
+    TYPE_ELEMENT,
   },
   {
     GAME_CONTROL_SHIELD_NORMAL_TIME,
@@ -365,7 +360,7 @@ static struct GameControlInfo game_controls[] =
   {
     GAME_CONTROL_SHIELD_DEADLY,
     &game.panel.shield_deadly,
-    TYPE_INTEGER,
+    TYPE_ELEMENT,
   },
   {
     GAME_CONTROL_SHIELD_DEADLY_TIME,
@@ -375,32 +370,37 @@ static struct GameControlInfo game_controls[] =
   {
     GAME_CONTROL_EXIT,
     &game.panel.exit,
-    TYPE_INTEGER,
+    TYPE_ELEMENT,
   },
   {
     GAME_CONTROL_EM_EXIT,
     &game.panel.em_exit,
-    TYPE_INTEGER,
+    TYPE_ELEMENT,
   },
   {
     GAME_CONTROL_SP_EXIT,
     &game.panel.sp_exit,
-    TYPE_INTEGER,
+    TYPE_ELEMENT,
   },
   {
     GAME_CONTROL_STEEL_EXIT,
     &game.panel.steel_exit,
-    TYPE_INTEGER,
+    TYPE_ELEMENT,
   },
   {
     GAME_CONTROL_EM_STEEL_EXIT,
     &game.panel.em_steel_exit,
-    TYPE_INTEGER,
+    TYPE_ELEMENT,
   },
   {
     GAME_CONTROL_EMC_MAGIC_BALL,
     &game.panel.emc_magic_ball,
-    TYPE_INTEGER,
+    TYPE_ELEMENT,
+  },
+  {
+    GAME_CONTROL_EMC_MAGIC_BALL_SWITCH,
+    &game.panel.emc_magic_ball_switch,
+    TYPE_ELEMENT,
   },
   {
     GAME_CONTROL_EMC_MAGIC_BALL_TIME,
@@ -410,7 +410,7 @@ static struct GameControlInfo game_controls[] =
   {
     GAME_CONTROL_LIGHT_SWITCH,
     &game.panel.light_switch,
-    TYPE_INTEGER,
+    TYPE_ELEMENT,
   },
   {
     GAME_CONTROL_LIGHT_SWITCH_TIME,
@@ -420,7 +420,7 @@ static struct GameControlInfo game_controls[] =
   {
     GAME_CONTROL_TIMEGATE_SWITCH,
     &game.panel.timegate_switch,
-    TYPE_INTEGER,
+    TYPE_ELEMENT,
   },
   {
     GAME_CONTROL_TIMEGATE_SWITCH_TIME,
@@ -430,12 +430,12 @@ static struct GameControlInfo game_controls[] =
   {
     GAME_CONTROL_SWITCHGATE_SWITCH,
     &game.panel.switchgate_switch,
-    TYPE_INTEGER,
+    TYPE_ELEMENT,
   },
   {
     GAME_CONTROL_EMC_LENSES,
     &game.panel.emc_lenses,
-    TYPE_INTEGER,
+    TYPE_ELEMENT,
   },
   {
     GAME_CONTROL_EMC_LENSES_TIME,
@@ -445,7 +445,7 @@ static struct GameControlInfo game_controls[] =
   {
     GAME_CONTROL_EMC_MAGNIFIER,
     &game.panel.emc_magnifier,
-    TYPE_INTEGER,
+    TYPE_ELEMENT,
   },
   {
     GAME_CONTROL_EMC_MAGNIFIER_TIME,
@@ -455,7 +455,7 @@ static struct GameControlInfo game_controls[] =
   {
     GAME_CONTROL_BALLOON_SWITCH,
     &game.panel.balloon_switch,
-    TYPE_INTEGER,
+    TYPE_ELEMENT,
   },
   {
     GAME_CONTROL_DYNABOMB_NUMBER,
@@ -470,7 +470,7 @@ static struct GameControlInfo game_controls[] =
   {
     GAME_CONTROL_DYNABOMB_POWER,
     &game.panel.dynabomb_power,
-    TYPE_INTEGER,
+    TYPE_ELEMENT,
   },
   {
     GAME_CONTROL_PENGUINS,
@@ -490,52 +490,52 @@ static struct GameControlInfo game_controls[] =
   {
     GAME_CONTROL_ROBOT_WHEEL,
     &game.panel.robot_wheel,
-    TYPE_INTEGER,
+    TYPE_ELEMENT,
   },
   {
     GAME_CONTROL_CONVEYOR_BELT_1,
     &game.panel.conveyor_belt_1,
-    TYPE_INTEGER,
+    TYPE_ELEMENT,
   },
   {
     GAME_CONTROL_CONVEYOR_BELT_1_SWITCH,
     &game.panel.conveyor_belt_1_switch,
-    TYPE_INTEGER,
+    TYPE_ELEMENT,
   },
   {
     GAME_CONTROL_CONVEYOR_BELT_2,
     &game.panel.conveyor_belt_2,
-    TYPE_INTEGER,
+    TYPE_ELEMENT,
   },
   {
     GAME_CONTROL_CONVEYOR_BELT_2_SWITCH,
     &game.panel.conveyor_belt_2_switch,
-    TYPE_INTEGER,
+    TYPE_ELEMENT,
   },
   {
     GAME_CONTROL_CONVEYOR_BELT_3,
     &game.panel.conveyor_belt_3,
-    TYPE_INTEGER,
+    TYPE_ELEMENT,
   },
   {
     GAME_CONTROL_CONVEYOR_BELT_3_SWITCH,
     &game.panel.conveyor_belt_3_switch,
-    TYPE_INTEGER,
+    TYPE_ELEMENT,
   },
   {
     GAME_CONTROL_CONVEYOR_BELT_4,
     &game.panel.conveyor_belt_4,
-    TYPE_INTEGER,
+    TYPE_ELEMENT,
   },
   {
     GAME_CONTROL_CONVEYOR_BELT_4_SWITCH,
     &game.panel.conveyor_belt_4_switch,
-    TYPE_INTEGER,
+    TYPE_ELEMENT,
   },
   {
     GAME_CONTROL_MAGIC_WALL,
     &game.panel.magic_wall,
-    TYPE_INTEGER,
+    TYPE_ELEMENT,
   },
   {
     GAME_CONTROL_MAGIC_WALL_TIME,
@@ -545,34 +545,33 @@ static struct GameControlInfo game_controls[] =
   {
     GAME_CONTROL_BD_MAGIC_WALL,
     &game.panel.bd_magic_wall,
-    TYPE_INTEGER,
+    TYPE_ELEMENT,
   },
   {
     GAME_CONTROL_DC_MAGIC_WALL,
     &game.panel.dc_magic_wall,
-    TYPE_INTEGER,
+    TYPE_ELEMENT,
   },
   {
     GAME_CONTROL_PLAYER_NAME,
     &game.panel.player_name,
-    TYPE_INTEGER,
+    TYPE_STRING,
   },
   {
     GAME_CONTROL_LEVEL_NAME,
     &game.panel.level_name,
-    TYPE_INTEGER,
+    TYPE_STRING,
   },
   {
     GAME_CONTROL_LEVEL_AUTHOR,
     &game.panel.level_author,
-    TYPE_INTEGER,
+    TYPE_STRING,
   },
 
   {
     -1,
     NULL,
     -1,
-    NULL
   }
 };
 #endif
@@ -1729,6 +1728,266 @@ static inline void InitField_WithBug2(int x, int y, boolean init_game)
 
 #if 1
 
+void InitGameControlValues()
+{
+  int i;
+
+  for (i = 0; i < NUM_GAME_CONTROLS; i++)
+    game_control_value[i] = last_game_control_value[i] = -1;
+
+  for (i = 0; game_controls[i].nr != -1; i++)
+  {
+    int nr = game_controls[i].nr;
+    int type = game_controls[i].type;
+    struct TextPosInfo *pos = game_controls[i].pos;
+
+    game_control_value[nr] = last_game_control_value[nr] = -1;
+
+    /* determine panel value width for later calculation of alignment */
+    if (type == TYPE_INTEGER || type == TYPE_STRING)
+      pos->width = pos->chars * getFontWidth(pos->font);
+  }
+}
+
+void UpdateGameControlValues()
+{
+  int i, j;
+
+  game_control_value[GAME_CONTROL_LEVEL_NUMBER] = level_nr;
+  game_control_value[GAME_CONTROL_GEMS] = local_player->gems_still_needed;
+
+  game_control_value[GAME_CONTROL_INVENTORY] = 0;
+  for (i = 0; i < MAX_NUM_KEYS; i++)
+    game_control_value[GAME_CONTROL_KEY_1 + i] = 0;
+  game_control_value[GAME_CONTROL_KEY_WHITE] = 0;
+  game_control_value[GAME_CONTROL_KEY_WHITE_COUNT] = 0;
+
+  if (game.centered_player_nr == -1)
+  {
+    for (i = 0; i < MAX_PLAYERS; i++)
+    {
+      for (j = 0; j < MAX_NUM_KEYS; j++)
+	if (stored_player[i].key[j])
+	  game_control_value[GAME_CONTROL_KEY_1 + j] = 1;
+
+      game_control_value[GAME_CONTROL_INVENTORY] +=
+	stored_player[i].inventory_size;
+
+      if (stored_player[i].num_white_keys > 0)
+	game_control_value[GAME_CONTROL_KEY_WHITE] = 1;
+
+      game_control_value[GAME_CONTROL_KEY_WHITE_COUNT] +=
+	stored_player[i].num_white_keys;
+    }
+  }
+  else
+  {
+    int player_nr = game.centered_player_nr;
+
+    for (i = 0; i < MAX_NUM_KEYS; i++)
+      if (stored_player[player_nr].key[i])
+	game_control_value[GAME_CONTROL_KEY_1 + i] = 1;
+
+    game_control_value[GAME_CONTROL_INVENTORY] +=
+      stored_player[player_nr].inventory_size;
+
+    if (stored_player[player_nr].num_white_keys > 0)
+      game_control_value[GAME_CONTROL_KEY_WHITE] = 1;
+
+    game_control_value[GAME_CONTROL_KEY_WHITE_COUNT] +=
+      stored_player[player_nr].num_white_keys;
+  }
+
+  game_control_value[GAME_CONTROL_SCORE] = (local_player->LevelSolved ?
+					    local_player->score_final :
+					    local_player->score);
+
+  game_control_value[GAME_CONTROL_TIME] = (level.time == 0 ?
+					   TimePlayed :
+					   TimeLeft);
+
+  game_control_value[GAME_CONTROL_TIME_HH] = TapeTime / 3600;
+  game_control_value[GAME_CONTROL_TIME_MM] = (TapeTime / 60) % 60;
+  game_control_value[GAME_CONTROL_TIME_SS] = TapeTime % 60;
+
+  for (i = 0; i < 8; i++)
+    game_control_value[GAME_CONTROL_DROP_NEXT_1 + i] = 0;
+
+  game_control_value[GAME_CONTROL_SHIELD_NORMAL] =
+    (local_player->shield_normal_time_left > 0 ? 1 : 0);
+  game_control_value[GAME_CONTROL_SHIELD_NORMAL_TIME] =
+    local_player->shield_normal_time_left;
+  game_control_value[GAME_CONTROL_SHIELD_DEADLY] =
+    (local_player->shield_deadly_time_left > 0 ? 1 : 0);
+  game_control_value[GAME_CONTROL_SHIELD_DEADLY_TIME] =
+    local_player->shield_deadly_time_left;
+
+  game_control_value[GAME_CONTROL_EXIT] = 0;
+  game_control_value[GAME_CONTROL_EM_EXIT] = 0;
+  game_control_value[GAME_CONTROL_SP_EXIT] = 0;
+  game_control_value[GAME_CONTROL_STEEL_EXIT] = 0;
+  game_control_value[GAME_CONTROL_EM_STEEL_EXIT] = 0;
+
+  game_control_value[GAME_CONTROL_EMC_MAGIC_BALL] = 0;
+  game_control_value[GAME_CONTROL_EMC_MAGIC_BALL_SWITCH] = 0;
+  game_control_value[GAME_CONTROL_EMC_MAGIC_BALL_TIME] = 0;
+
+  game_control_value[GAME_CONTROL_LIGHT_SWITCH] = 0;
+  game_control_value[GAME_CONTROL_LIGHT_SWITCH_TIME] = game.light_time_left;
+
+  game_control_value[GAME_CONTROL_TIMEGATE_SWITCH] = 0;
+  game_control_value[GAME_CONTROL_TIMEGATE_SWITCH_TIME] =
+    game.timegate_time_left;
+
+  game_control_value[GAME_CONTROL_SWITCHGATE_SWITCH] = 0;
+
+  game_control_value[GAME_CONTROL_EMC_LENSES] = 0;
+  game_control_value[GAME_CONTROL_EMC_LENSES_TIME] = game.lenses_time_left;
+
+  game_control_value[GAME_CONTROL_EMC_MAGNIFIER] = 0;
+  game_control_value[GAME_CONTROL_EMC_MAGNIFIER_TIME] = game.magnify_time_left;
+
+  game_control_value[GAME_CONTROL_BALLOON_SWITCH] = 0;
+
+  game_control_value[GAME_CONTROL_DYNABOMB_NUMBER] =
+    local_player->dynabomb_count;
+  game_control_value[GAME_CONTROL_DYNABOMB_SIZE] =
+    local_player->dynabomb_size;
+  game_control_value[GAME_CONTROL_DYNABOMB_POWER] =
+    local_player->dynabomb_xl;
+
+  game_control_value[GAME_CONTROL_PENGUINS] =
+    local_player->friends_still_needed;
+
+  game_control_value[GAME_CONTROL_SOKOBAN_OBJECTS] =
+    local_player->sokobanfields_still_needed;
+  game_control_value[GAME_CONTROL_SOKOBAN_FIELDS] =
+    local_player->sokobanfields_still_needed;
+
+  game_control_value[GAME_CONTROL_ROBOT_WHEEL] = 0;
+
+  game_control_value[GAME_CONTROL_CONVEYOR_BELT_1] = 0;
+  game_control_value[GAME_CONTROL_CONVEYOR_BELT_1_SWITCH] = 0;
+  game_control_value[GAME_CONTROL_CONVEYOR_BELT_2] = 0;
+  game_control_value[GAME_CONTROL_CONVEYOR_BELT_2_SWITCH] = 0;
+  game_control_value[GAME_CONTROL_CONVEYOR_BELT_3] = 0;
+  game_control_value[GAME_CONTROL_CONVEYOR_BELT_3_SWITCH] = 0;
+  game_control_value[GAME_CONTROL_CONVEYOR_BELT_4] = 0;
+  game_control_value[GAME_CONTROL_CONVEYOR_BELT_4_SWITCH] = 0;
+
+  game_control_value[GAME_CONTROL_MAGIC_WALL] = 0;
+  game_control_value[GAME_CONTROL_MAGIC_WALL_TIME] =
+    game.magic_wall_time_left;
+  game_control_value[GAME_CONTROL_BD_MAGIC_WALL] = 0;
+  game_control_value[GAME_CONTROL_DC_MAGIC_WALL] = 0;
+
+  game_control_value[GAME_CONTROL_PLAYER_NAME] = 0;
+  game_control_value[GAME_CONTROL_LEVEL_NAME] = 0;
+  game_control_value[GAME_CONTROL_LEVEL_AUTHOR] = 0;
+}
+
+void DisplayGameControlValues()
+{
+  int i;
+
+  for (i = 0; game_controls[i].nr != -1; i++)
+  {
+    int nr = game_controls[i].nr;
+    int type = game_controls[i].type;
+    struct TextPosInfo *pos = game_controls[i].pos;
+    int value = game_control_value[nr];
+    int last_value = last_game_control_value[nr];
+    int chars = pos->chars;
+    int font = pos->font;
+
+    if (value == last_value)
+      continue;
+
+    last_game_control_value[nr] = value;
+
+#if 0
+    printf("::: value %d changed from %d to %d\n", nr, last_value, value);
+#endif
+
+    if (PANEL_DEACTIVATED(pos))
+      continue;
+
+    if (type == TYPE_INTEGER)
+    {
+      if (nr == GAME_CONTROL_LEVEL_NUMBER || nr == GAME_CONTROL_TIME)
+      {
+	boolean use_dynamic_chars = (pos->chars == -1 ? TRUE : FALSE);
+
+	if (use_dynamic_chars)		/* use dynamic number of chars */
+	{
+	  int value_change = (nr == GAME_CONTROL_LEVEL_NUMBER ? 100 : 1000);
+	  int chars1 = (nr == GAME_CONTROL_LEVEL_NUMBER ? 2 : 3);
+	  int chars2 = chars1 + 1;
+	  int font1 = pos->font;
+	  int font2 = pos->font_alt;
+
+	  chars = (value < value_change ? chars1 : chars2);
+	  font  = (value < value_change ? font1  : font2);
+
+	  /* clear background if value just changed its size (dynamic chars) */
+	  if ((last_value < value_change) != (value < value_change))
+	  {
+	    int width1 = chars1 * getFontWidth(font1);
+	    int width2 = chars2 * getFontWidth(font2);
+	    int max_width = MAX(width1, width2);
+	    int max_height = MAX(getFontHeight(font1), getFontHeight(font2));
+
+	    pos->width = max_width;
+
+	    ClearRectangleOnBackground(drawto, PANEL_XPOS(pos), PANEL_YPOS(pos),
+				       max_width, max_height);
+	  }
+	}
+
+	pos->width = chars * getFontWidth(font);
+      }
+
+      DrawText(PANEL_XPOS(pos), PANEL_YPOS(pos), int2str(value, chars), font);
+    }
+    else if (type == TYPE_ELEMENT)
+    {
+      if (nr >= GAME_CONTROL_KEY_1 && nr <= GAME_CONTROL_KEY_8)
+      {
+	int key_nr = nr - GAME_CONTROL_KEY_1;
+	int src_x = DOOR_GFX_PAGEX5 + 18 + (key_nr % STD_NUM_KEYS) * MINI_TILEX;
+	int src_y = DOOR_GFX_PAGEY1 + 123;
+	int dst_x = PANEL_XPOS(pos);
+	int dst_y = PANEL_YPOS(pos);
+	int element = (key_nr >= STD_NUM_KEYS ? EL_EMC_KEY_5 - STD_NUM_KEYS :
+		       level.game_engine_type == GAME_ENGINE_TYPE_EM ?
+		       EL_EM_KEY_1 : EL_KEY_1) + key_nr;
+	int graphic = el2edimg(element);
+
+	if (value)
+	  DrawMiniGraphicExt(drawto, dst_x, dst_y, graphic);
+	else
+	  BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto, src_x, src_y,
+		     MINI_TILEX, MINI_TILEY, dst_x, dst_y);
+      }
+    }
+    else if (type == TYPE_STRING)
+    {
+      char *s = (nr == GAME_CONTROL_PLAYER_NAME  ? setup.player_name :
+		 nr == GAME_CONTROL_LEVEL_NAME   ? level.name :
+		 nr == GAME_CONTROL_LEVEL_AUTHOR ? level.author : NULL);
+
+      if (s != NULL)
+      {
+	char *s_cut = getStringCopyN(s, pos->chars);
+
+	DrawText(PANEL_XPOS(pos), PANEL_YPOS(pos), s_cut, pos->font);
+
+	free(s_cut);
+      }
+    }
+  }
+}
+
 void DrawGameValue_Emeralds(int value)
 {
   struct TextPosInfo *pos = &game.panel.gems;
@@ -1739,6 +1998,10 @@ void DrawGameValue_Emeralds(int value)
 #endif
   int font_width = getFontWidth(font_nr);
   int chars = pos->chars;
+
+#if 1
+  return;	/* !!! USE NEW STUFF !!! */
+#endif
 
   if (PANEL_DEACTIVATED(pos))
     return;
@@ -1759,6 +2022,10 @@ void DrawGameValue_Dynamite(int value)
   int font_width = getFontWidth(font_nr);
   int chars = pos->chars;
 
+#if 1
+  return;	/* !!! USE NEW STUFF !!! */
+#endif
+
   if (PANEL_DEACTIVATED(pos))
     return;
 
@@ -1777,6 +2044,10 @@ void DrawGameValue_Score(int value)
 #endif
   int font_width = getFontWidth(font_nr);
   int chars = pos->chars;
+
+#if 1
+  return;	/* !!! USE NEW STUFF !!! */
+#endif
 
   if (PANEL_DEACTIVATED(pos))
     return;
@@ -1802,6 +2073,10 @@ void DrawGameValue_Time(int value)
 #endif
   int font_nr = font1_nr;
   boolean use_dynamic_chars = (chars == -1 ? TRUE : FALSE);
+
+#if 1
+  return;	/* !!! USE NEW STUFF !!! */
+#endif
 
   if (PANEL_DEACTIVATED(pos))
     return;
@@ -1849,6 +2124,10 @@ void DrawGameValue_Level(int value)
   int font_nr = font1_nr;
   boolean use_dynamic_chars = (chars == -1 ? TRUE : FALSE);
 
+#if 1
+  return;	/* !!! USE NEW STUFF !!! */
+#endif
+
   if (PANEL_DEACTIVATED(pos))
     return;
 
@@ -1872,6 +2151,10 @@ void DrawGameValue_Keys(int key[MAX_NUM_KEYS])
   int base_key_graphic = EL_KEY_1;
 #endif
   int i;
+
+#if 1
+  return;	/* !!! USE NEW STUFF !!! */
+#endif
 
 #if 0
   if (PANEL_DEACTIVATED(pos))
@@ -2089,6 +2372,12 @@ void DrawAllGameValues(int emeralds, int dynamite, int score, int time,
 }
 
 void DrawGameDoorValues()
+{
+  UpdateGameControlValues();
+  DisplayGameControlValues();
+}
+
+void DrawGameDoorValues_OLD()
 {
   int time_value = (level.time == 0 ? TimePlayed : TimeLeft);
   int dynamite_value = 0;
@@ -2604,6 +2893,7 @@ void InitGame()
   game_status = GAME_MODE_PLAYING;
 
   InitGameEngine();
+  InitGameControlValues();
 
   /* don't play tapes over network */
   network_playing = (options.network && !tape.playing);
@@ -3531,8 +3821,15 @@ void GameWon()
       time = time_final;
       score = score_final;
 
+#if 1
+      game_control_value[GAME_CONTROL_TIME] = time;
+      game_control_value[GAME_CONTROL_SCORE] = score;
+
+      DisplayGameControlValues();
+#else
       DrawGameValue_Time(time);
       DrawGameValue_Score(score);
+#endif
     }
 
     if (level.game_engine_type == GAME_ENGINE_TYPE_RND)
@@ -3606,8 +3903,15 @@ void GameWon()
     time  += time_count_steps * time_count_dir;
     score += time_count_steps * level.score[SC_TIME_BONUS];
 
+#if 1
+    game_control_value[GAME_CONTROL_TIME] = time;
+    game_control_value[GAME_CONTROL_SCORE] = score;
+
+    DisplayGameControlValues();
+#else
     DrawGameValue_Time(time);
     DrawGameValue_Score(score);
+#endif
 
     if (time == time_final)
       StopSound(SND_GAME_LEVELTIME_BONUS);
@@ -9041,7 +9345,13 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
       {
 	TimeLeft = action_arg_number_new;
 
+#if 1
+	game_control_value[GAME_CONTROL_TIME] = TimeLeft;
+
+	DisplayGameControlValues();
+#else
 	DrawGameValue_Time(TimeLeft);
+#endif
 
 	if (!TimeLeft && setup.time_limit)
 	  for (i = 0; i < MAX_PLAYERS; i++)
@@ -9055,7 +9365,13 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
     {
       local_player->score = action_arg_number_new;
 
+#if 1
+      game_control_value[GAME_CONTROL_SCORE] = local_player->score;
+
+      DisplayGameControlValues();
+#else
       DrawGameValue_Score(local_player->score);
+#endif
 
       break;
     }
@@ -9064,7 +9380,13 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
     {
       local_player->gems_still_needed = action_arg_number_new;
 
+#if 1
+      game_control_value[GAME_CONTROL_GEMS] = local_player->gems_still_needed;
+
+      DisplayGameControlValues();
+#else
       DrawGameValue_Emeralds(local_player->gems_still_needed);
+#endif
 
       break;
     }
@@ -10339,7 +10661,13 @@ static void CheckLevelTime()
 	if (TimeLeft <= 10 && setup.time_limit)
 	  PlaySound(SND_GAME_RUNNING_OUT_OF_TIME);
 
+#if 1
+	game_control_value[GAME_CONTROL_TIME] = TimeLeft;
+
+	DisplayGameControlValues();
+#else
 	DrawGameValue_Time(TimeLeft);
+#endif
 
 	if (!TimeLeft && setup.time_limit)
 	{
@@ -10350,8 +10678,17 @@ static void CheckLevelTime()
 	      KillPlayer(&stored_player[i]);
 	}
       }
+#if 1
+      else if (level.time == 0 && !AllPlayersGone) /* level w/o time limit */
+      {
+	game_control_value[GAME_CONTROL_TIME] = TimePlayed;
+
+	DisplayGameControlValues();
+      }
+#else
       else if (level.time == 0 && !AllPlayersGone) /* level w/o time limit */
 	DrawGameValue_Time(TimePlayed);
+#endif
 
       level.native_em_level->lev->time =
 	(level.time == 0 ? TimePlayed : TimeLeft);
@@ -10360,6 +10697,8 @@ static void CheckLevelTime()
     if (tape.recording || tape.playing)
       DrawVideoDisplay(VIDEO_STATE_TIME_ON, TapeTime);
   }
+
+  DrawGameDoorValues();
 }
 
 void AdvanceFrameAndPlayerCounters(int player_nr)
@@ -12075,14 +12414,29 @@ void ScrollPlayer(struct PlayerInfo *player, int mode)
 	if (TimeLeft <= 10 && setup.time_limit)
 	  PlaySound(SND_GAME_RUNNING_OUT_OF_TIME);
 
+#if 1
+	game_control_value[GAME_CONTROL_TIME] = TimeLeft;
+
+	DisplayGameControlValues();
+#else
 	DrawGameValue_Time(TimeLeft);
+#endif
 
 	if (!TimeLeft && setup.time_limit)
 	  for (i = 0; i < MAX_PLAYERS; i++)
 	    KillPlayer(&stored_player[i]);
       }
+#if 1
+      else if (level.time == 0 && !AllPlayersGone) /* level w/o time limit */
+      {
+	game_control_value[GAME_CONTROL_TIME] = TimePlayed;
+
+	DisplayGameControlValues();
+      }
+#else
       else if (level.time == 0 && !AllPlayersGone) /* level w/o time limit */
 	DrawGameValue_Time(TimePlayed);
+#endif
     }
 
     if (tape.single_step && tape.recording && !tape.pausing &&
@@ -13131,7 +13485,14 @@ int DigField(struct PlayerInfo *player,
     else if (element == EL_EXTRA_TIME && level.time > 0)
     {
       TimeLeft += level.extra_time;
+
+#if 1
+      game_control_value[GAME_CONTROL_TIME] = TimeLeft;
+
+      DisplayGameControlValues();
+#else
       DrawGameValue_Time(TimeLeft);
+#endif
     }
     else if (element == EL_SHIELD_NORMAL || element == EL_SHIELD_DEADLY)
     {
@@ -13210,7 +13571,13 @@ int DigField(struct PlayerInfo *player,
       if (local_player->gems_still_needed < 0)
 	local_player->gems_still_needed = 0;
 
+#if 1
+      game_control_value[GAME_CONTROL_GEMS] = local_player->gems_still_needed;
+
+      DisplayGameControlValues();
+#else
       DrawGameValue_Emeralds(local_player->gems_still_needed);
+#endif
     }
 
     RaiseScoreElement(element);
@@ -13454,7 +13821,14 @@ int DigField(struct PlayerInfo *player,
       if (level.time > 0 || level.use_time_orb_bug)
       {
 	TimeLeft += level.time_orb_time;
+
+#if 1
+	game_control_value[GAME_CONTROL_TIME] = TimeLeft;
+
+	DisplayGameControlValues();
+#else
 	DrawGameValue_Time(TimeLeft);
+#endif
       }
 
       ResetGfxAnimation(x, y);
@@ -14076,7 +14450,13 @@ void RaiseScore(int value)
 {
   local_player->score += value;
 
+#if 1
+  game_control_value[GAME_CONTROL_SCORE] = local_player->score;
+
+  DisplayGameControlValues();
+#else
   DrawGameValue_Score(local_player->score);
+#endif
 }
 
 void RaiseScoreElement(int element)

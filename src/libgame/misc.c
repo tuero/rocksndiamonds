@@ -106,7 +106,7 @@ char *int2str(int number, int size)
   if (size > 20)
     size = 20;
 
-  if (size)
+  if (size > 0)
   {
     sprintf(s, "                    %09d", number);
     return &s[strlen(s) - size];
@@ -553,6 +553,21 @@ char *getStringCopy(char *s)
 
   s_copy = checked_malloc(strlen(s) + 1);
   strcpy(s_copy, s);
+
+  return s_copy;
+}
+
+char *getStringCopyN(char *s, int n)
+{
+  char *s_copy;
+  int s_len = MAX(0, n);
+
+  if (s == NULL)
+    return NULL;
+
+  s_copy = checked_malloc(s_len + 1);
+  strncpy(s_copy, s, s_len);
+  s[s_len] = '\0';
 
   return s_copy;
 }
