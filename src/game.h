@@ -55,7 +55,6 @@ struct GamePanelInfo
   struct TextPosInfo em_steel_exit;
   struct TextPosInfo emc_magic_ball;
   struct TextPosInfo emc_magic_ball_switch;
-  struct TextPosInfo emc_magic_ball_time;
   struct TextPosInfo light_switch;
   struct TextPosInfo light_switch_time;
   struct TextPosInfo timegate_switch;

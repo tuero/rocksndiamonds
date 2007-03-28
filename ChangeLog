@@ -1,9 +1,15 @@
+2007-03-28
+	* added displaying of most game panel control elements (not animated)
+
 2007-03-26
 	* added new configuration directives to display additional game engine
 	  values on the game control panel, like the following examples:
 	  - game.panel.time_hh/time_mm/time_ss	- level time in HH/MM/SS format
 	  - game.panel.penguins			- number of penguins to rescue
 	  - game.panel.level_name		- level name of current level
+
+2007-03-24
+	* added support for preview tile sizes "1" and "2" (1x1 and 2x2 pixels)
 
 2007-03-23
 	* added new player option "no centering when relocating" for "invisible"

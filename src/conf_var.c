@@ -2329,30 +2329,6 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.emc_magic_ball_switch.y
   },
   {
-    "game.panel.emc_magic_ball_time.x",
-    &game.panel.emc_magic_ball_time.x
-  },
-  {
-    "game.panel.emc_magic_ball_time.y",
-    &game.panel.emc_magic_ball_time.y
-  },
-  {
-    "game.panel.emc_magic_ball_time.align",
-    &game.panel.emc_magic_ball_time.align
-  },
-  {
-    "game.panel.emc_magic_ball_time.valign",
-    &game.panel.emc_magic_ball_time.valign
-  },
-  {
-    "game.panel.emc_magic_ball_time.chars",
-    &game.panel.emc_magic_ball_time.chars
-  },
-  {
-    "game.panel.emc_magic_ball_time.font",
-    &game.panel.emc_magic_ball_time.font
-  },
-  {
     "game.panel.light_switch.x",
     &game.panel.light_switch.x
   },

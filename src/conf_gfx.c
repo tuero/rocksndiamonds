@@ -5586,12 +5586,6 @@ struct ConfigInfo image_config[] =
   { "game.panel.emc_magic_ball.y",		"-1"			},
   { "game.panel.emc_magic_ball_switch.x",	"-1"			},
   { "game.panel.emc_magic_ball_switch.y",	"-1"			},
-  { "game.panel.emc_magic_ball_time.x",		"-1"			},
-  { "game.panel.emc_magic_ball_time.y",		"-1"			},
-  { "game.panel.emc_magic_ball_time.align",	"left"			},
-  { "game.panel.emc_magic_ball_time.valign",	"top"			},
-  { "game.panel.emc_magic_ball_time.chars",	"-1"			},
-  { "game.panel.emc_magic_ball_time.font",	"font.text_2"		},
 
   { "game.panel.light_switch.x",		"-1"			},
   { "game.panel.light_switch.y",		"-1"			},
