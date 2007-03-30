@@ -8172,6 +8172,17 @@ void LoadSetup()
     player_name_new = get_corrected_login_name(setup.player_name);
     free(setup.player_name);
     setup.player_name = player_name_new;
+
+    /* "scroll_delay: on(3) / off(0)" was replaced by scroll delay value */
+    if (setup.scroll_delay == FALSE)
+    {
+      setup.scroll_delay_value = MIN_SCROLL_DELAY;
+      setup.scroll_delay = TRUE;			/* now always "on" */
+    }
+
+    /* make sure that scroll delay value stays inside valid range */
+    setup.scroll_delay_value =
+      MIN(MAX(MIN_SCROLL_DELAY, setup.scroll_delay_value), MAX_SCROLL_DELAY);
   }
   else
     Error(ERR_WARN, "using default setup values");

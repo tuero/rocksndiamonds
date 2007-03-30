@@ -4,6 +4,8 @@
 	  position in levels without player element (but player from CE etc.)
 	* added option "game.forced_scroll_delay_value" to override user choice
 	  of scroll delay value for certain level sets with "graphicsinfo.conf"
+	* replaced setup option "scroll delay: on/off" by new setup option that
+	  directly allows selecting the desired scroll delay value from 0 to 8
 
 2007-03-28
 	* added displaying of most game panel control elements (not animated)

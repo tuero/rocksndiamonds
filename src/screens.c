@@ -35,13 +35,14 @@
 #define SETUP_MODE_SHORTCUT_2		6
 #define SETUP_MODE_GRAPHICS		7
 #define SETUP_MODE_CHOOSE_SCREEN_MODE	8
-#define SETUP_MODE_SOUND		9
-#define SETUP_MODE_ARTWORK		10
-#define SETUP_MODE_CHOOSE_GRAPHICS	11
-#define SETUP_MODE_CHOOSE_SOUNDS	12
-#define SETUP_MODE_CHOOSE_MUSIC		13
+#define SETUP_MODE_CHOOSE_SCROLL_DELAY	9
+#define SETUP_MODE_SOUND		10
+#define SETUP_MODE_ARTWORK		11
+#define SETUP_MODE_CHOOSE_GRAPHICS	12
+#define SETUP_MODE_CHOOSE_SOUNDS	13
+#define SETUP_MODE_CHOOSE_MUSIC		14
 
-#define MAX_SETUP_MODES			14
+#define MAX_SETUP_MODES			15
 
 /* for input setup functions */
 #define SETUPINPUT_SCREEN_POS_START	0
@@ -170,6 +171,9 @@ static int info_mode = INFO_MODE_MAIN;
 static TreeInfo *screen_modes = NULL;
 static TreeInfo *screen_mode_current = NULL;
 
+static TreeInfo *scroll_delays = NULL;
+static TreeInfo *scroll_delay_current = NULL;
+
 static TreeInfo *game_speeds = NULL;
 static TreeInfo *game_speed_current = NULL;
 
@@ -200,6 +204,25 @@ static struct
   {	2,	"1/500s"			},
   {	1,	"1/1000s (Extremely Fast)"	},
 #endif
+
+  {	-1,	NULL				},
+};
+
+static struct
+{
+  int value;
+  char *text;
+} scroll_delays_list[] =
+{
+  {	0,	"0 Tiles (No Scroll Delay)"	},
+  {	1,	"1 Tile"			},
+  {	2,	"2 Tiles"			},
+  {	3,	"3 Tiles (Default)"		},
+  {	4,	"4 Tiles"			},
+  {	5,	"5 Tiles"			},
+  {	6,	"6 Tiles"			},
+  {	7,	"7 Tiles"			},
+  {	8,	"8 Tiles (Maximum Scroll Delay)"},
 
   {	-1,	NULL				},
 };
@@ -3901,7 +3924,8 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
     {
       if (setup_mode == SETUP_MODE_CHOOSE_GAME_SPEED)
 	execSetupGame();
-      else if (setup_mode == SETUP_MODE_CHOOSE_SCREEN_MODE)
+      else if (setup_mode == SETUP_MODE_CHOOSE_SCREEN_MODE ||
+	       setup_mode == SETUP_MODE_CHOOSE_SCROLL_DELAY)
 	execSetupGraphics();
       else
 	execSetupArtwork();
@@ -4084,7 +4108,8 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
 	{
 	  if (setup_mode == SETUP_MODE_CHOOSE_GAME_SPEED)
 	    execSetupGame();
-	  else if (setup_mode == SETUP_MODE_CHOOSE_SCREEN_MODE)
+	  else if (setup_mode == SETUP_MODE_CHOOSE_SCREEN_MODE ||
+		   setup_mode == SETUP_MODE_CHOOSE_SCROLL_DELAY)
 	    execSetupGraphics();
 	  else
 	    execSetupArtwork();
@@ -4269,6 +4294,7 @@ static struct TokenInfo *setup_info;
 static int num_setup_info;
 
 static char *screen_mode_text;
+static char *scroll_delay_text;
 static char *game_speed_text;
 static char *graphics_set_name;
 static char *sounds_set_name;
@@ -4423,6 +4449,55 @@ static void execSetupGraphics()
     screen_mode_text = screen_mode_current->name;
   }
 
+#if 1
+  if (scroll_delays == NULL)
+  {
+    int i;
+
+    for (i = 0; scroll_delays_list[i].value != -1; i++)
+    {
+      TreeInfo *ti = newTreeInfo_setDefaults(TREE_TYPE_UNDEFINED);
+      char identifier[32], name[32];
+      int value = scroll_delays_list[i].value;
+      char *text = scroll_delays_list[i].text;
+
+      ti->node_top = &scroll_delays;
+      ti->sort_priority = value;
+
+      sprintf(identifier, "%d", value);
+      sprintf(name, "%s", text);
+
+      setString(&ti->identifier, identifier);
+      setString(&ti->name, name);
+      setString(&ti->name_sorting, name);
+      setString(&ti->infotext, "Scroll Delay");
+
+      pushTreeInfo(&scroll_delays, ti);
+    }
+
+    /* sort scroll delay values to start with lowest scroll delay value */
+    sortTreeInfo(&scroll_delays);
+
+    /* set current scroll delay value to configured scroll delay value */
+    scroll_delay_current =
+      getTreeInfoFromIdentifier(scroll_delays,i_to_a(setup.scroll_delay_value));
+
+    /* if that fails, set current scroll delay to reliable default value */
+    if (scroll_delay_current == NULL)
+      scroll_delay_current =
+	getTreeInfoFromIdentifier(scroll_delays, i_to_a(STD_SCROLL_DELAY));
+
+    /* if that also fails, set current scroll delay to first available value */
+    if (scroll_delay_current == NULL)
+      scroll_delay_current = scroll_delays;
+  }
+
+  setup.scroll_delay_value = atoi(scroll_delay_current->identifier);
+
+  /* needed for displaying scroll delay text instead of identifier */
+  scroll_delay_text = scroll_delay_current->name;
+#endif
+
   setup_mode = SETUP_MODE_GRAPHICS;
   DrawSetupScreen();
 }
@@ -4437,6 +4512,16 @@ static void execSetupChooseScreenMode()
     return;
 
   setup_mode = SETUP_MODE_CHOOSE_SCREEN_MODE;
+  DrawSetupScreen();
+}
+
+static void execSetupChooseScrollDelay()
+{
+#if 0
+  FadeSetEnterMenu();
+#endif
+
+  setup_mode = SETUP_MODE_CHOOSE_SCROLL_DELAY;
   DrawSetupScreen();
 }
 
@@ -4623,7 +4708,11 @@ static struct TokenInfo setup_info_graphics[] =
   { TYPE_SWITCH,	&setup.fullscreen,	"Fullscreen:"		},
   { TYPE_ENTER_LIST,	execSetupChooseScreenMode, "Fullscreen Mode:"	},
   { TYPE_STRING,	&screen_mode_text,	""			},
-  { TYPE_SWITCH,	&setup.scroll_delay,	"Delayed Scrolling:"	},
+#if 0
+  { TYPE_SWITCH,	&setup.scroll_delay,	"Scroll Delay:"		},
+#endif
+  { TYPE_ENTER_LIST,	execSetupChooseScrollDelay, "Scroll Delay Value:" },
+  { TYPE_STRING,	&scroll_delay_text,	""			},
 #if 0
   { TYPE_SWITCH,	&setup.soft_scrolling,	"Soft Scrolling:"	},
   { TYPE_SWITCH,	&setup.double_buffering,"Double-Buffering:"	},
@@ -5852,6 +5941,8 @@ void DrawSetupScreen()
     DrawChooseTree(&game_speed_current);
   else if (setup_mode == SETUP_MODE_CHOOSE_SCREEN_MODE)
     DrawChooseTree(&screen_mode_current);
+  else if (setup_mode == SETUP_MODE_CHOOSE_SCROLL_DELAY)
+    DrawChooseTree(&scroll_delay_current);
   else if (setup_mode == SETUP_MODE_CHOOSE_GRAPHICS)
     DrawChooseTree(&artwork.gfx_current);
   else if (setup_mode == SETUP_MODE_CHOOSE_SOUNDS)
@@ -5879,6 +5970,8 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
     HandleChooseTree(mx, my, dx, dy, button, &game_speed_current);
   else if (setup_mode == SETUP_MODE_CHOOSE_SCREEN_MODE)
     HandleChooseTree(mx, my, dx, dy, button, &screen_mode_current);
+  else if (setup_mode == SETUP_MODE_CHOOSE_SCROLL_DELAY)
+    HandleChooseTree(mx, my, dx, dy, button, &scroll_delay_current);
   else if (setup_mode == SETUP_MODE_CHOOSE_GRAPHICS)
     HandleChooseTree(mx, my, dx, dy, button, &artwork.gfx_current);
   else if (setup_mode == SETUP_MODE_CHOOSE_SOUNDS)

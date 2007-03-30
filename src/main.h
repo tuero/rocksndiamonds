@@ -58,7 +58,7 @@
 
 #define MIN_SCROLL_DELAY		0
 #define STD_SCROLL_DELAY		3
-#define MAX_SCROLL_DELAY		9
+#define MAX_SCROLL_DELAY		8
 
 #define SCREENX(a)			((a) - scroll_x)
 #define SCREENY(a)			((a) - scroll_y)
