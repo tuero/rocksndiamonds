@@ -1,3 +1,8 @@
+2007-03-30
+	* added (currently invisible) setup option to define scroll delay value
+	* fixed small bug in priority handling when auto-detecting level start
+	  position in levels without player element (but player from CE etc.)
+
 2007-03-28
 	* added displaying of most game panel control elements (not animated)
 

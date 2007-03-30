@@ -7684,31 +7684,32 @@ void SaveScore(int nr)
 #define SETUP_TOKEN_SOUND_SIMPLE		4
 #define SETUP_TOKEN_TOONS			5
 #define SETUP_TOKEN_SCROLL_DELAY		6
-#define SETUP_TOKEN_SOFT_SCROLLING		7
-#define SETUP_TOKEN_FADE_SCREENS		8
-#define SETUP_TOKEN_AUTORECORD			9
-#define SETUP_TOKEN_SHOW_TITLESCREEN		10
-#define SETUP_TOKEN_QUICK_DOORS			11
-#define SETUP_TOKEN_TEAM_MODE			12
-#define SETUP_TOKEN_HANDICAP			13
-#define SETUP_TOKEN_SKIP_LEVELS			14
-#define SETUP_TOKEN_TIME_LIMIT			15
-#define SETUP_TOKEN_FULLSCREEN			16
-#define SETUP_TOKEN_FULLSCREEN_MODE		17
-#define SETUP_TOKEN_ASK_ON_ESCAPE		18
-#define SETUP_TOKEN_ASK_ON_ESCAPE_EDITOR	19
-#define SETUP_TOKEN_QUICK_SWITCH		20
-#define SETUP_TOKEN_INPUT_ON_FOCUS		21
-#define SETUP_TOKEN_PREFER_AGA_GRAPHICS		22
-#define SETUP_TOKEN_GAME_FRAME_DELAY		23
-#define SETUP_TOKEN_GRAPHICS_SET		24
-#define SETUP_TOKEN_SOUNDS_SET			25
-#define SETUP_TOKEN_MUSIC_SET			26
-#define SETUP_TOKEN_OVERRIDE_LEVEL_GRAPHICS	27
-#define SETUP_TOKEN_OVERRIDE_LEVEL_SOUNDS	28
-#define SETUP_TOKEN_OVERRIDE_LEVEL_MUSIC	29
+#define SETUP_TOKEN_SCROLL_DELAY_VALUE		7
+#define SETUP_TOKEN_SOFT_SCROLLING		8
+#define SETUP_TOKEN_FADE_SCREENS		9
+#define SETUP_TOKEN_AUTORECORD			10
+#define SETUP_TOKEN_SHOW_TITLESCREEN		11
+#define SETUP_TOKEN_QUICK_DOORS			12
+#define SETUP_TOKEN_TEAM_MODE			13
+#define SETUP_TOKEN_HANDICAP			14
+#define SETUP_TOKEN_SKIP_LEVELS			15
+#define SETUP_TOKEN_TIME_LIMIT			16
+#define SETUP_TOKEN_FULLSCREEN			17
+#define SETUP_TOKEN_FULLSCREEN_MODE		18
+#define SETUP_TOKEN_ASK_ON_ESCAPE		19
+#define SETUP_TOKEN_ASK_ON_ESCAPE_EDITOR	20
+#define SETUP_TOKEN_QUICK_SWITCH		21
+#define SETUP_TOKEN_INPUT_ON_FOCUS		22
+#define SETUP_TOKEN_PREFER_AGA_GRAPHICS		23
+#define SETUP_TOKEN_GAME_FRAME_DELAY		24
+#define SETUP_TOKEN_GRAPHICS_SET		25
+#define SETUP_TOKEN_SOUNDS_SET			26
+#define SETUP_TOKEN_MUSIC_SET			27
+#define SETUP_TOKEN_OVERRIDE_LEVEL_GRAPHICS	28
+#define SETUP_TOKEN_OVERRIDE_LEVEL_SOUNDS	29
+#define SETUP_TOKEN_OVERRIDE_LEVEL_MUSIC	30
 
-#define NUM_GLOBAL_SETUP_TOKENS			30
+#define NUM_GLOBAL_SETUP_TOKENS			31
 
 /* editor setup */
 #define SETUP_TOKEN_EDITOR_EL_BOULDERDASH	0
@@ -7812,6 +7813,7 @@ static struct TokenInfo global_setup_tokens[] =
   { TYPE_SWITCH, &si.sound_simple,	"simple_sound_effects"		},
   { TYPE_SWITCH, &si.toons,		"toons"				},
   { TYPE_SWITCH, &si.scroll_delay,	"scroll_delay"			},
+  { TYPE_INTEGER,&si.scroll_delay_value,"scroll_delay_value"		},
   { TYPE_SWITCH, &si.soft_scrolling,	"soft_scrolling"		},
   { TYPE_SWITCH, &si.fade_screens,	"fade_screens"			},
   { TYPE_SWITCH, &si.autorecord,	"automatic_tape_recording"	},
@@ -7966,6 +7968,7 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
   si->double_buffering = TRUE;
   si->direct_draw = !si->double_buffering;
   si->scroll_delay = TRUE;
+  si->scroll_delay_value = 9;
   si->soft_scrolling = TRUE;
   si->fade_screens = TRUE;
   si->autorecord = TRUE;

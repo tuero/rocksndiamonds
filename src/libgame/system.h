@@ -812,6 +812,7 @@ struct SetupInfo
   boolean double_buffering;
   boolean direct_draw;		/* !double_buffering (redundant!) */
   boolean scroll_delay;
+  boolean scroll_delay_value;
   boolean soft_scrolling;
   boolean fade_screens;
   boolean autorecord;

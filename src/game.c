@@ -3403,7 +3403,8 @@ void InitGame()
 	  content = element_info[element].change_page[i].target_element;
 	  is_player = ELEM_IS_PLAYER(content);
 
-	  if (is_player && (found_rating < 3 || element < found_element))
+	  if (is_player && (found_rating < 3 ||
+			    (found_rating == 3 && element < found_element)))
 	  {
 	    start_x = x;
 	    start_y = y;
@@ -3420,7 +3421,8 @@ void InitGame()
 	content = element_info[element].content.e[xx][yy];
 	is_player = ELEM_IS_PLAYER(content);
 
-	if (is_player && (found_rating < 2 || element < found_element))
+	if (is_player && (found_rating < 2 ||
+			  (found_rating == 2 && element < found_element)))
 	{
 	  start_x = x + xx - 1;
 	  start_y = y + yy - 1;
@@ -3440,7 +3442,8 @@ void InitGame()
 
 	  is_player = ELEM_IS_PLAYER(content);
 
-	  if (is_player && (found_rating < 1 || element < found_element))
+	  if (is_player && (found_rating < 1 ||
+			    (found_rating == 1 && element < found_element)))
 	  {
 	    start_x = x + xx - 1;
 	    start_y = y + yy - 1;
@@ -4520,7 +4523,7 @@ void DrawRelocateScreen(int old_x, int old_y, int x, int y, int move_dir,
 
   if (quick_relocation)
   {
-    int offset = (setup.scroll_delay ? 3 : 0);
+    int offset = (setup.scroll_delay ? setup.scroll_delay_value : 0);
 
     if (!IN_VIS_FIELD(SCREENX(x), SCREENY(y)) || center_screen)
     {
@@ -12143,7 +12146,7 @@ boolean MovePlayer(struct PlayerInfo *player, int dx, int dy)
 #endif
   {
     int old_scroll_x = scroll_x, old_scroll_y = scroll_y;
-    int offset = (setup.scroll_delay ? 3 : 0);
+    int offset = (setup.scroll_delay ? setup.scroll_delay_value : 0);
 
     if (!IN_VIS_FIELD(SCREENX(jx), SCREENY(jy)))
     {

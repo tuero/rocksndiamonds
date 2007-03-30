@@ -522,7 +522,7 @@ void DrawRelocatePlayer(struct PlayerInfo *player, boolean quick_relocation)
 
   if (quick_relocation)
   {
-    int offset = (setup.scroll_delay ? 3 : 0);
+    int offset = (setup.scroll_delay ? setup.scroll_delay_value : 0);
 
     if (!IN_VIS_FIELD(SCREENX(jx), SCREENY(jy)))
     {
@@ -726,7 +726,7 @@ void RedrawPlayfield_EM(boolean force_redraw)
   int player_nr = game_em.last_moving_player;
 #endif
   int stepsize = TILEX / 8;
-  int offset = (setup.scroll_delay ? 3 : 0) * TILEX;
+  int offset = (setup.scroll_delay ? setup.scroll_delay_value : 0) * TILEX;
   int offset_x = offset;
   int offset_y = offset;
   int screen_x_old = screen_x;
