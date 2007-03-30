@@ -5730,6 +5730,8 @@ struct ConfigInfo image_config[] =
   { "game.button.sound_simple.x",		"65"			},
   { "game.button.sound_simple.y",		"245"			},
 
+  { "game.forced_scroll_delay_value",		"-1"			},
+
   { "[player].boring_delay_fixed",		"1000"			},
   { "[player].boring_delay_random",		"1000"			},
   { "[player].sleeping_delay_fixed",		"2000"			},

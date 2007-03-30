@@ -2841,6 +2841,10 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.button.sound_simple.y
   },
   {
+    "game.forced_scroll_delay_value",
+    &game.forced_scroll_delay_value
+  },
+  {
     "[player].boring_delay_fixed",
     &game.player_boring_delay_fixed
   },

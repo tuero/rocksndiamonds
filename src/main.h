@@ -56,6 +56,10 @@
 #define MAX_LEV_FIELDX			MAX_PLAYFIELD_WIDTH
 #define MAX_LEV_FIELDY			MAX_PLAYFIELD_HEIGHT
 
+#define MIN_SCROLL_DELAY		0
+#define STD_SCROLL_DELAY		3
+#define MAX_SCROLL_DELAY		9
+
 #define SCREENX(a)			((a) - scroll_x)
 #define SCREENY(a)			((a) - scroll_y)
 #define LEVELX(a)			((a) + scroll_x)

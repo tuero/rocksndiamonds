@@ -118,6 +118,10 @@ struct GameInfo
   struct GamePanelInfo panel;
   struct GameButtonInfo button;
 
+  /* values for graphics engine customization */
+  int forced_scroll_delay_value;
+  int scroll_delay_value;
+
   /* values for engine initialization */
   int default_push_delay_fixed;
   int default_push_delay_random;

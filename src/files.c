@@ -7968,7 +7968,7 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
   si->double_buffering = TRUE;
   si->direct_draw = !si->double_buffering;
   si->scroll_delay = TRUE;
-  si->scroll_delay_value = 9;
+  si->scroll_delay_value = STD_SCROLL_DELAY;
   si->soft_scrolling = TRUE;
   si->fade_screens = TRUE;
   si->autorecord = TRUE;

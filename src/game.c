@@ -2875,6 +2875,13 @@ static void InitGameEngine()
   recursion_loop_depth = 0;
   recursion_loop_detected = FALSE;
   recursion_loop_element = EL_UNDEFINED;
+
+  /* ---------- initialize graphics engine ---------------------------------- */
+  game.scroll_delay_value =
+    (game.forced_scroll_delay_value != -1 ? game.forced_scroll_delay_value :
+     setup.scroll_delay                   ? setup.scroll_delay_value       : 0);
+  game.scroll_delay_value =
+    MIN(MAX(MIN_SCROLL_DELAY, game.scroll_delay_value), MAX_SCROLL_DELAY);
 }
 
 int get_num_special_action(int element, int action_first, int action_last)
@@ -4523,7 +4530,7 @@ void DrawRelocateScreen(int old_x, int old_y, int x, int y, int move_dir,
 
   if (quick_relocation)
   {
-    int offset = (setup.scroll_delay ? setup.scroll_delay_value : 0);
+    int offset = game.scroll_delay_value;
 
     if (!IN_VIS_FIELD(SCREENX(x), SCREENY(y)) || center_screen)
     {
@@ -12146,7 +12153,7 @@ boolean MovePlayer(struct PlayerInfo *player, int dx, int dy)
 #endif
   {
     int old_scroll_x = scroll_x, old_scroll_y = scroll_y;
-    int offset = (setup.scroll_delay ? setup.scroll_delay_value : 0);
+    int offset = game.scroll_delay_value;
 
     if (!IN_VIS_FIELD(SCREENX(jx), SCREENY(jy)))
     {
