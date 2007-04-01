@@ -5121,7 +5121,7 @@ void ReloadCustomArtwork(int force_reload)
 
 #if 1
 #if 1
-    FadeSetStartItem();
+    FadeSetEnterScreen();
     // FadeSkipNextFadeOut();
     // FadeSetDisabled();
 #else
@@ -5214,16 +5214,16 @@ void OpenAll()
     return;
   }
 
+  game_status = GAME_MODE_MAIN;
+
 #if 1
-  FadeSetStartItem();
+  FadeSetEnterScreen();
   if (!(fading.fade_mode & FADE_TYPE_TRANSFORM))
     FadeSkipNextFadeOut();
   // FadeSetDisabled();
 #else
   fading = fading_none;
 #endif
-
-  game_status = GAME_MODE_MAIN;
 
   DrawMainMenu();
 

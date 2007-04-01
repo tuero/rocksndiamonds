@@ -1,3 +1,8 @@
+2007-03-31
+	* improved menu fading, adding separate fading definitions for entering
+	  and leaving a "content" screen (in general), and optional definitions
+	  for the special "content" screens SCORES, EDITOR, INFO and PLAYING
+
 2007-03-30
 	* added (currently invisible) setup option to define scroll delay value
 	* fixed small bug in priority handling when auto-detecting level start

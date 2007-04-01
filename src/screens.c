@@ -1258,6 +1258,8 @@ void DrawMainMenuExt(int redraw_mask, boolean do_fading)
 	 redraw_mask == REDRAW_ALL);
 #endif
 
+  FadeSetLeaveScreen();
+
 #if 1
   FadeOut(redraw_mask);
 #endif
@@ -1710,7 +1712,7 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
       FadeOut(REDRAW_FIELD);
 #endif
 
-      FadeSetStartItem();
+      FadeSetEnterScreen();
 
       info_mode = INFO_MODE_MAIN;
       DrawAndFadeInInfoScreen(REDRAW_FIELD);
@@ -2001,7 +2003,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 
 	game_status = GAME_MODE_EDITOR;
 
-	FadeSetStartItem();
+	FadeSetEnterScreen();
 
 	DrawLevelEd();
       }
@@ -2178,7 +2180,7 @@ static int num_info_info;
 static void execInfoTitleScreen()
 {
 #if 0
-  FadeSetStartItem();
+  FadeSetEnterScreen();
 #endif
 
   info_mode = INFO_MODE_TITLE;
@@ -2188,7 +2190,7 @@ static void execInfoTitleScreen()
 static void execInfoElements()
 {
 #if 0
-  FadeSetStartItem();
+  FadeSetEnterScreen();
 #endif
 
   info_mode = INFO_MODE_ELEMENTS;
@@ -2198,7 +2200,7 @@ static void execInfoElements()
 static void execInfoMusic()
 {
 #if 0
-  FadeSetStartItem();
+  FadeSetEnterScreen();
 #endif
 
   info_mode = INFO_MODE_MUSIC;
@@ -2208,7 +2210,7 @@ static void execInfoMusic()
 static void execInfoCredits()
 {
 #if 0
-  FadeSetStartItem();
+  FadeSetEnterScreen();
 #endif
 
   info_mode = INFO_MODE_CREDITS;
@@ -2218,7 +2220,7 @@ static void execInfoCredits()
 static void execInfoProgram()
 {
 #if 0
-  FadeSetStartItem();
+  FadeSetEnterScreen();
 #endif
 
   info_mode = INFO_MODE_PROGRAM;
@@ -2228,7 +2230,7 @@ static void execInfoProgram()
 static void execInfoVersion()
 {
 #if 0
-  FadeSetStartItem();
+  FadeSetEnterScreen();
 #endif
 
   info_mode = INFO_MODE_VERSION;
@@ -2238,7 +2240,7 @@ static void execInfoVersion()
 static void execInfoLevelSet()
 {
 #if 0
-  FadeSetStartItem();
+  FadeSetEnterScreen();
 #endif
 
   info_mode = INFO_MODE_LEVELSET;
@@ -2298,6 +2300,8 @@ static void DrawInfoScreen_Main(int redraw_mask, boolean do_fading)
 
   /* (needed after displaying title screens which disable auto repeat) */
   KeyboardAutoRepeatOn();
+
+  FadeSetLeaveScreen();
 
 #if 1
   FadeOut(redraw_mask);
@@ -4089,7 +4093,7 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
       }
       else
       {
-	FadeSetStartItem();
+	FadeSetEnterScreen();
 
 	node_cursor->cl_first = ti->cl_first;
 	node_cursor->cl_cursor = ti->cl_cursor;
@@ -4159,7 +4163,9 @@ void DrawHallOfFame(int highlight_position)
   if (highlight_position < 0) 
     LoadScore(level_nr);
 
-  FadeSetStartItem();
+  FadeSetEnterScreen();
+
+  // printf("::: %d: %d\n", game_status, menu.enter_screen[game_status]);
 
 #if 1
   FadeOut(REDRAW_FIELD);

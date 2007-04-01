@@ -8423,6 +8423,43 @@ static void LoadSpecialMenuDesignSettingsFromFilename(char *filename)
   }
 
   /* special case: initialize with default values that may be overwritten */
+  /* (eg, init "menu.enter_screen.SCORES.xyz" from "menu.enter_screen.xyz") */
+  for (i = 0; i < NUM_SPECIAL_GFX_ARGS; i++)
+  {
+    char *token_1 = "menu.enter_screen.fade_mode";
+    char *token_2 = "menu.enter_screen.fade_delay";
+    char *token_3 = "menu.enter_screen.post_delay";
+    char *token_4 = "menu.leave_screen.fade_mode";
+    char *token_5 = "menu.leave_screen.fade_delay";
+    char *token_6 = "menu.leave_screen.post_delay";
+    char *value_1 = getHashEntry(setup_file_hash, token_1);
+    char *value_2 = getHashEntry(setup_file_hash, token_2);
+    char *value_3 = getHashEntry(setup_file_hash, token_3);
+    char *value_4 = getHashEntry(setup_file_hash, token_4);
+    char *value_5 = getHashEntry(setup_file_hash, token_5);
+    char *value_6 = getHashEntry(setup_file_hash, token_6);
+
+    if (value_1 != NULL)
+      menu.enter_screen[i].fade_mode = get_token_parameter_value(token_1,
+								 value_1);
+    if (value_2 != NULL)
+      menu.enter_screen[i].fade_delay = get_token_parameter_value(token_2,
+								  value_2);
+    if (value_3 != NULL)
+      menu.enter_screen[i].post_delay = get_token_parameter_value(token_3,
+								  value_3);
+    if (value_4 != NULL)
+      menu.leave_screen[i].fade_mode = get_token_parameter_value(token_4,
+								 value_4);
+    if (value_5 != NULL)
+      menu.leave_screen[i].fade_delay = get_token_parameter_value(token_5,
+								  value_5);
+    if (value_6 != NULL)
+      menu.leave_screen[i].post_delay = get_token_parameter_value(token_6,
+								  value_6);
+  }
+
+  /* special case: initialize with default values that may be overwritten */
   /* (e.g., init "titlemessage_1.fade_mode" from "[titlemessage].fade_mode") */
   for (i = 0; titlemessage_arrays[i].array != NULL; i++)
   {
@@ -8500,6 +8537,14 @@ void LoadSpecialMenuDesignSettings()
   {
     titlemessage_initial[i] = titlemessage_initial_default;
     titlemessage[i] = titlemessage_default;
+  }
+
+  /* special case: initialize "ARG_DEFAULT" values in static default config */
+  /* (eg, init "menu.enter_screen.SCORES.xyz" from "menu.enter_screen.xyz") */
+  for (i = 0; i < NUM_SPECIAL_GFX_ARGS; i++)
+  {
+    menu.enter_screen[i] = menu.enter_screen[GFX_SPECIAL_ARG_DEFAULT];
+    menu.leave_screen[i] = menu.leave_screen[GFX_SPECIAL_ARG_DEFAULT];
   }
 
   if (!SETUP_OVERRIDE_ARTWORK(setup, ARTWORK_TYPE_GRAPHICS))

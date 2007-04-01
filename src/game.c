@@ -3490,7 +3490,7 @@ void InitGame()
   if (level_editor_test_game)
     FadeSkipNextFadeIn();
   else
-    FadeSetStartItem();
+    FadeSetEnterScreen();
 #else
   if (level_editor_test_game)
     fading = fading_none;

@@ -662,25 +662,46 @@ void FadeCrossSaveBackbuffer()
   BlitBitmap(backbuffer, bitmap_db_cross, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
 }
 
+static void FadeSetLeaveNext(struct TitleFadingInfo fading_leave, boolean set)
+{
+  static struct TitleFadingInfo fading_leave_stored;
+
+  if (set)
+    fading_leave_stored = fading_leave;
+  else
+    fading = fading_leave_stored;
+}
+
 void FadeSetEnterMenu()
 {
   fading = menu.enter_menu;
+
+  FadeSetLeaveNext(fading, TRUE);	/* (keep same fade mode) */
 }
 
 void FadeSetLeaveMenu()
 {
   fading = menu.leave_menu;
+
+  FadeSetLeaveNext(fading, TRUE);	/* (keep same fade mode) */
 }
 
-void FadeSetStartItem()
+void FadeSetEnterScreen()
 {
-  fading = menu.start_item;
+  fading = menu.enter_screen[game_status];
+
+  FadeSetLeaveNext(menu.leave_screen[game_status], TRUE);	/* store */
+}
+
+void FadeSetLeaveScreen()
+{
+  FadeSetLeaveNext(menu.leave_screen[game_status], FALSE);	/* recall */
 }
 
 void FadeSetFromType(int type)
 {
   if (type & TYPE_ENTER_SCREEN)
-    FadeSetStartItem();
+    FadeSetEnterScreen();
   else if (type & TYPE_ENTER)
     FadeSetEnterMenu();
   else if (type & TYPE_LEAVE)
