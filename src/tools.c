@@ -2938,6 +2938,11 @@ boolean Request(char *text, unsigned int req_state)
 	case EVENT_KEYPRESS:
 	  switch (GetEventKey((KeyEvent *)&event, TRUE))
 	  {
+	    case KSYM_space:
+	      if (req_state & REQ_CONFIRM)
+		result = 1;
+	      break;
+
 	    case KSYM_Return:
 	      result = 1;
 	      break;
@@ -2949,6 +2954,7 @@ boolean Request(char *text, unsigned int req_state)
 	    default:
 	      break;
 	  }
+
 	  if (req_state & REQ_PLAYER)
 	    result = 0;
 	  break;

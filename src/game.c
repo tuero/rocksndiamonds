@@ -1722,12 +1722,18 @@ static inline void InitField_WithBug2(int x, int y, boolean init_game)
 
 #if 1
 
+static int get_key_element_from_nr(int key_nr)
+{
+  int key_base_element = (key_nr >= STD_NUM_KEYS ? EL_EMC_KEY_5 - STD_NUM_KEYS :
+			  level.game_engine_type == GAME_ENGINE_TYPE_EM ?
+			  EL_EM_KEY_1 : EL_KEY_1);
+
+  return key_base_element + key_nr;
+}
+
 void InitGameControlValues()
 {
   int i;
-
-  for (i = 0; i < NUM_GAME_CONTROLS; i++)
-    game_control_value[i] = last_game_control_value[i] = -1;
 
   for (i = 0; game_controls[i].nr != -1; i++)
   {
@@ -1735,6 +1741,7 @@ void InitGameControlValues()
     int type = game_controls[i].type;
     struct TextPosInfo *pos = game_controls[i].pos;
 
+    /* force update of game controls after initialization */
     game_control_value[nr] = last_game_control_value[nr] = -1;
 
     /* determine panel value width for later calculation of alignment */
@@ -1747,30 +1754,31 @@ void InitGameControlValues()
 
 void UpdateGameControlValues()
 {
-  int i, j;
+  int i, k;
 
   game_control_value[GAME_CONTROL_LEVEL_NUMBER] = level_nr;
   game_control_value[GAME_CONTROL_GEMS] = local_player->gems_still_needed;
 
   game_control_value[GAME_CONTROL_INVENTORY] = 0;
   for (i = 0; i < MAX_NUM_KEYS; i++)
-    game_control_value[GAME_CONTROL_KEY_1 + i] = 0;
-  game_control_value[GAME_CONTROL_KEY_WHITE] = 0;
+    game_control_value[GAME_CONTROL_KEY_1 + i] = EL_EMPTY;
+  game_control_value[GAME_CONTROL_KEY_WHITE] = EL_EMPTY;
   game_control_value[GAME_CONTROL_KEY_WHITE_COUNT] = 0;
 
   if (game.centered_player_nr == -1)
   {
     for (i = 0; i < MAX_PLAYERS; i++)
     {
-      for (j = 0; j < MAX_NUM_KEYS; j++)
-	if (stored_player[i].key[j])
-	  game_control_value[GAME_CONTROL_KEY_1 + j] = 1;
+      for (k = 0; k < MAX_NUM_KEYS; k++)
+	if (stored_player[i].key[k])
+	  game_control_value[GAME_CONTROL_KEY_1 + k] =
+	    get_key_element_from_nr(k);
 
       game_control_value[GAME_CONTROL_INVENTORY] +=
 	stored_player[i].inventory_size;
 
       if (stored_player[i].num_white_keys > 0)
-	game_control_value[GAME_CONTROL_KEY_WHITE] = 1;
+	game_control_value[GAME_CONTROL_KEY_WHITE] = EL_DC_KEY_WHITE;
 
       game_control_value[GAME_CONTROL_KEY_WHITE_COUNT] +=
 	stored_player[i].num_white_keys;
@@ -1780,15 +1788,16 @@ void UpdateGameControlValues()
   {
     int player_nr = game.centered_player_nr;
 
-    for (i = 0; i < MAX_NUM_KEYS; i++)
-      if (stored_player[player_nr].key[i])
-	game_control_value[GAME_CONTROL_KEY_1 + i] = 1;
+    for (k = 0; k < MAX_NUM_KEYS; k++)
+      if (stored_player[player_nr].key[k])
+	game_control_value[GAME_CONTROL_KEY_1 + k] =
+	  get_key_element_from_nr(k);
 
     game_control_value[GAME_CONTROL_INVENTORY] +=
       stored_player[player_nr].inventory_size;
 
     if (stored_player[player_nr].num_white_keys > 0)
-      game_control_value[GAME_CONTROL_KEY_WHITE] = 1;
+      game_control_value[GAME_CONTROL_KEY_WHITE] = EL_DC_KEY_WHITE;
 
     game_control_value[GAME_CONTROL_KEY_WHITE_COUNT] +=
       stored_player[player_nr].num_white_keys;
@@ -1806,6 +1815,7 @@ void UpdateGameControlValues()
   game_control_value[GAME_CONTROL_TIME_MM] = (TapeTime / 60) % 60;
   game_control_value[GAME_CONTROL_TIME_SS] = TapeTime % 60;
 
+  /* !!! TODO !!! */
   for (i = 0; i < 8; i++)
     game_control_value[GAME_CONTROL_DROP_NEXT_1 + i] = EL_UNDEFINED;
 
@@ -1839,6 +1849,7 @@ void UpdateGameControlValues()
     game_control_value[GAME_CONTROL_EM_STEEL_EXIT] = EL_EM_STEEL_EXIT_OPEN;
   }
 
+  /* !!! TODO !!! */
   game_control_value[GAME_CONTROL_EMC_MAGIC_BALL] = EL_UNDEFINED;
   game_control_value[GAME_CONTROL_EMC_MAGIC_BALL_SWITCH] = EL_UNDEFINED;
 
@@ -1851,6 +1862,7 @@ void UpdateGameControlValues()
   game_control_value[GAME_CONTROL_TIMEGATE_SWITCH_TIME] =
     game.timegate_time_left;
 
+  /* !!! TODO !!! */
   game_control_value[GAME_CONTROL_SWITCHGATE_SWITCH] = EL_UNDEFINED;
 
   game_control_value[GAME_CONTROL_EMC_LENSES] =
@@ -1883,8 +1895,10 @@ void UpdateGameControlValues()
   game_control_value[GAME_CONTROL_SOKOBAN_FIELDS] =
     local_player->sokobanfields_still_needed;
 
+  /* !!! TODO !!! */
   game_control_value[GAME_CONTROL_ROBOT_WHEEL] = EL_UNDEFINED;
 
+  /* !!! TODO !!! */
   game_control_value[GAME_CONTROL_CONVEYOR_BELT_1] = EL_UNDEFINED;
   game_control_value[GAME_CONTROL_CONVEYOR_BELT_1_SWITCH] = EL_UNDEFINED;
   game_control_value[GAME_CONTROL_CONVEYOR_BELT_2] = EL_UNDEFINED;
@@ -1894,6 +1908,7 @@ void UpdateGameControlValues()
   game_control_value[GAME_CONTROL_CONVEYOR_BELT_4] = EL_UNDEFINED;
   game_control_value[GAME_CONTROL_CONVEYOR_BELT_4_SWITCH] = EL_UNDEFINED;
 
+  /* !!! TODO !!! */
   game_control_value[GAME_CONTROL_MAGIC_WALL] = EL_UNDEFINED;
   game_control_value[GAME_CONTROL_MAGIC_WALL_TIME] =
     game.magic_wall_time_left;
@@ -1970,29 +1985,20 @@ void DisplayGameControlValues()
     }
     else if (type == TYPE_ELEMENT)
     {
-      if (nr >= GAME_CONTROL_KEY_1 && nr <= GAME_CONTROL_KEY_8)
-      {
-	int key_nr = nr - GAME_CONTROL_KEY_1;
-	int src_x = DOOR_GFX_PAGEX5 + 18 + (key_nr % STD_NUM_KEYS) * MINI_TILEX;
-	int src_y = DOOR_GFX_PAGEY1 + 123;
-	int dst_x = PANEL_XPOS(pos);
-	int dst_y = PANEL_YPOS(pos);
-	int element = (key_nr >= STD_NUM_KEYS ? EL_EMC_KEY_5 - STD_NUM_KEYS :
-		       level.game_engine_type == GAME_ENGINE_TYPE_EM ?
-		       EL_EM_KEY_1 : EL_KEY_1) + key_nr;
-	int graphic = el2edimg(element);
+      int dst_x = PANEL_XPOS(pos);
+      int dst_y = PANEL_YPOS(pos);
 
-	if (value)
-	  DrawMiniGraphicExt(drawto, dst_x, dst_y, graphic);
-	else
-	  BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto, src_x, src_y,
-		     MINI_TILEX, MINI_TILEY, dst_x, dst_y);
+      if (value == EL_UNDEFINED || value == EL_EMPTY)
+      {
+	int src_x = DOOR_GFX_PAGEX5 + ALIGNED_TEXT_XPOS(pos);
+	int src_y = DOOR_GFX_PAGEY1 + ALIGNED_TEXT_YPOS(pos);
+
+	BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto, src_x, src_y,
+		   MINI_TILEX, MINI_TILEY, dst_x, dst_y);
       }
-      else if (value != EL_UNDEFINED)
+      else
       {
 	int graphic = el2edimg(value);
-	int dst_x = PANEL_XPOS(pos);
-	int dst_y = PANEL_YPOS(pos);
 
 	DrawMiniGraphicExt(drawto, dst_x, dst_y, graphic);
       }

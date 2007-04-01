@@ -1,3 +1,6 @@
+2007-04-01
+	* added <space> key as additional valid key to use for confirm requester
+
 2007-03-31
 	* improved menu fading, adding separate fading definitions for entering
 	  and leaving a "content" screen (in general), and optional definitions

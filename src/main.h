@@ -653,7 +653,7 @@
 #define EM_KEY_NR(e)		((e) - EL_EM_KEY_1)
 #define EMC_KEY_NR(e)		((e) - EL_EMC_KEY_5 + 4)
 #define KEY_NR(e)		(IS_RND_KEY(e) ? RND_KEY_NR(e) :	\
-				 IS_EM_KEY(e) ?  EM_KEY_NR(e) :		\
+				 IS_EM_KEY(e)  ? EM_KEY_NR(e)  :	\
 				 IS_EMC_KEY(e) ? EMC_KEY_NR(e) : 0)
 
 #define IS_RND_GATE(e)		((e) >= EL_GATE_1 &&			\
