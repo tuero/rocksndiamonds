@@ -1437,7 +1437,7 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
   {
     "dc_gate_white",
     "gate",
-    "white gate"
+    "white door"
   },
   {
     "dc_gate_white_gray",
