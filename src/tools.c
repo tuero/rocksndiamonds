@@ -5755,11 +5755,11 @@ int el2preimg(int element)
   return element_info[element].special_graphic[GFX_SPECIAL_ARG_PREVIEW];
 }
 
-int el2doorimg(int element)
+int el2panelimg(int element)
 {
   element = GFX_ELEMENT(element);
 
-  return element_info[element].special_graphic[GFX_SPECIAL_ARG_DOOR];
+  return element_info[element].special_graphic[GFX_SPECIAL_ARG_PANEL];
 }
 
 int font2baseimg(int font_nr)

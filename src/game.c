@@ -2027,6 +2027,8 @@ void DisplayGameControlValues()
 {
   int i;
 
+  game_status = GAME_MODE_PSEUDO_PANEL;
+
   for (i = 0; game_controls[i].nr != -1; i++)
   {
     int nr = game_controls[i].nr;
@@ -2101,7 +2103,7 @@ void DisplayGameControlValues()
       }
       else
       {
-	int graphic = el2doorimg(value);
+	int graphic = el2panelimg(value);
 
 	DrawSizedGraphicExt(drawto, dst_x, dst_y, graphic, size);
       }
@@ -2124,6 +2126,8 @@ void DisplayGameControlValues()
 
     redraw_mask |= REDRAW_DOOR_1;
   }
+
+  game_status = GAME_MODE_PLAYING;
 }
 
 void DrawGameValue_Emeralds(int value)

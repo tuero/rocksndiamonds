@@ -1,3 +1,9 @@
+2007-04-03
+	* added new pseudo game mode "PANEL" to define panel fonts and graphics
+	  - panel fonts now use ".PANEL" suffix instead of ".PLAYING" suffix
+	  - panel graphics now use ".PANEL" suffix instead of ".DOOR" suffix
+	  (else graphics would have to use ".PLAYING", which would be confusing)
+
 2007-04-02
 	* added attribute ".tile_size" for element style game panel controls
 

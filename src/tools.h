@@ -185,7 +185,7 @@ int el2baseimg(int);
 int el2img(int);
 int el2edimg(int);
 int el2preimg(int);
-int el2doorimg(int);
+int el2panelimg(int);
 int font2baseimg(int);
 
 int getBeltNrFromBeltElement(int);

@@ -5376,6 +5376,7 @@ struct SpecialSuffixInfo special_suffix_info[NUM_SPECIAL_GFX_ARGS + 1 + 1] =
   { ".SETUP",			GFX_SPECIAL_ARG_SETUP,			},
   { ".PLAYING",			GFX_SPECIAL_ARG_PLAYING,		},
   { ".DOOR",			GFX_SPECIAL_ARG_DOOR,			},
+  { ".PANEL",			GFX_SPECIAL_ARG_PANEL,			},
   { ".PREVIEW",			GFX_SPECIAL_ARG_PREVIEW,		},
   { ".CRUMBLED",		GFX_SPECIAL_ARG_CRUMBLED,		},
 
