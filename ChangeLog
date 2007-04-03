@@ -3,6 +3,7 @@
 	  - panel fonts now use ".PANEL" suffix instead of ".PLAYING" suffix
 	  - panel graphics now use ".PANEL" suffix instead of ".DOOR" suffix
 	  (else graphics would have to use ".PLAYING", which would be confusing)
+	* fixed bug when fading out to game screen with border mask defined
 
 2007-04-02
 	* added attribute ".tile_size" for element style game panel controls

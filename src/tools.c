@@ -559,12 +559,20 @@ void FadeExt(int fade_mask, int fade_mode)
 
 #if 1
   if (global.autoplay_leveldir)
-    fading.fade_mode = FADE_MODE_NONE;
+  {
+    // fading.fade_mode = FADE_MODE_NONE;
+
+    return;
+  }
 #endif
 
 #if 1
   if (fading.fade_mode == FADE_MODE_NONE)
+  {
+    BackToFront();
+
     return;
+  }
 #endif
 
   if (fade_mask & REDRAW_FIELD)

@@ -3594,6 +3594,9 @@ void InitGame()
 		local_player->jy - MIDPOSY);
   }
 
+  /* do not use PLAYING mask for fading out from main screen */
+  game_status = GAME_MODE_MAIN;
+
   StopAnimation();
 
   if (!game.restart_level)
@@ -3617,6 +3620,8 @@ void InitGame()
   if (do_fading)
     FadeOut(REDRAW_FIELD);
 #endif
+
+  game_status = GAME_MODE_PLAYING;
 
   /* !!! FIX THIS (START) !!! */
   if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
