@@ -133,75 +133,83 @@
 
 #define GAME_CONTROL_LEVEL_NUMBER		0
 #define GAME_CONTROL_GEMS			1
-#define GAME_CONTROL_INVENTORY			2
-#define GAME_CONTROL_KEY_1			3
-#define GAME_CONTROL_KEY_2			4
-#define GAME_CONTROL_KEY_3			5
-#define GAME_CONTROL_KEY_4			6
-#define GAME_CONTROL_KEY_5			7
-#define GAME_CONTROL_KEY_6			8
-#define GAME_CONTROL_KEY_7			9
-#define GAME_CONTROL_KEY_8			10
-#define GAME_CONTROL_KEY_WHITE			11
-#define GAME_CONTROL_KEY_WHITE_COUNT		12
-#define GAME_CONTROL_SCORE			13
-#define GAME_CONTROL_TIME			14
-#define GAME_CONTROL_TIME_HH			15
-#define GAME_CONTROL_TIME_MM			16
-#define GAME_CONTROL_TIME_SS			17
-#define GAME_CONTROL_DROP_NEXT_1		18
-#define GAME_CONTROL_DROP_NEXT_2		19
-#define GAME_CONTROL_DROP_NEXT_3		20
-#define GAME_CONTROL_DROP_NEXT_4		21
-#define GAME_CONTROL_DROP_NEXT_5		22
-#define GAME_CONTROL_DROP_NEXT_6		23
-#define GAME_CONTROL_DROP_NEXT_7		24
-#define GAME_CONTROL_DROP_NEXT_8		25
-#define GAME_CONTROL_SHIELD_NORMAL		26
-#define GAME_CONTROL_SHIELD_NORMAL_TIME		27
-#define GAME_CONTROL_SHIELD_DEADLY		28
-#define GAME_CONTROL_SHIELD_DEADLY_TIME		29
-#define GAME_CONTROL_EXIT			30
-#define GAME_CONTROL_EM_EXIT			31
-#define GAME_CONTROL_SP_EXIT			32
-#define GAME_CONTROL_STEEL_EXIT			33
-#define GAME_CONTROL_EM_STEEL_EXIT		34
-#define GAME_CONTROL_EMC_MAGIC_BALL		35
-#define GAME_CONTROL_EMC_MAGIC_BALL_SWITCH	36
-#define GAME_CONTROL_LIGHT_SWITCH		37
-#define GAME_CONTROL_LIGHT_SWITCH_TIME		38
-#define GAME_CONTROL_TIMEGATE_SWITCH		39
-#define GAME_CONTROL_TIMEGATE_SWITCH_TIME	40
-#define GAME_CONTROL_SWITCHGATE_SWITCH		41
-#define GAME_CONTROL_EMC_LENSES			42
-#define GAME_CONTROL_EMC_LENSES_TIME		43
-#define GAME_CONTROL_EMC_MAGNIFIER		44
-#define GAME_CONTROL_EMC_MAGNIFIER_TIME		45
-#define GAME_CONTROL_BALLOON_SWITCH		46
-#define GAME_CONTROL_DYNABOMB_NUMBER		47
-#define GAME_CONTROL_DYNABOMB_SIZE		48
-#define GAME_CONTROL_DYNABOMB_POWER		49
-#define GAME_CONTROL_PENGUINS			50
-#define GAME_CONTROL_SOKOBAN_OBJECTS		51
-#define GAME_CONTROL_SOKOBAN_FIELDS		52
-#define GAME_CONTROL_ROBOT_WHEEL		53
-#define GAME_CONTROL_CONVEYOR_BELT_1		54
-#define GAME_CONTROL_CONVEYOR_BELT_1_SWITCH	55
-#define GAME_CONTROL_CONVEYOR_BELT_2		56
-#define GAME_CONTROL_CONVEYOR_BELT_2_SWITCH	57
-#define GAME_CONTROL_CONVEYOR_BELT_3		58
-#define GAME_CONTROL_CONVEYOR_BELT_3_SWITCH	59
-#define GAME_CONTROL_CONVEYOR_BELT_4		60
-#define GAME_CONTROL_CONVEYOR_BELT_4_SWITCH	61
-#define GAME_CONTROL_MAGIC_WALL			62
-#define GAME_CONTROL_MAGIC_WALL_TIME		63
-#define GAME_CONTROL_BD_MAGIC_WALL		64
-#define GAME_CONTROL_DC_MAGIC_WALL		65
-#define GAME_CONTROL_PLAYER_NAME		66
-#define GAME_CONTROL_LEVEL_NAME			67
-#define GAME_CONTROL_LEVEL_AUTHOR		68
+#define GAME_CONTROL_INVENTORY_COUNT		2
+#define GAME_CONTROL_INVENTORY_FIRST_1		3
+#define GAME_CONTROL_INVENTORY_FIRST_2		4
+#define GAME_CONTROL_INVENTORY_FIRST_3		5
+#define GAME_CONTROL_INVENTORY_FIRST_4		6
+#define GAME_CONTROL_INVENTORY_FIRST_5		7
+#define GAME_CONTROL_INVENTORY_FIRST_6		8
+#define GAME_CONTROL_INVENTORY_FIRST_7		9
+#define GAME_CONTROL_INVENTORY_FIRST_8		10
+#define GAME_CONTROL_INVENTORY_LAST_1		11
+#define GAME_CONTROL_INVENTORY_LAST_2		12
+#define GAME_CONTROL_INVENTORY_LAST_3		13
+#define GAME_CONTROL_INVENTORY_LAST_4		14
+#define GAME_CONTROL_INVENTORY_LAST_5		15
+#define GAME_CONTROL_INVENTORY_LAST_6		16
+#define GAME_CONTROL_INVENTORY_LAST_7		17
+#define GAME_CONTROL_INVENTORY_LAST_8		18
+#define GAME_CONTROL_KEY_1			19
+#define GAME_CONTROL_KEY_2			20
+#define GAME_CONTROL_KEY_3			21
+#define GAME_CONTROL_KEY_4			22
+#define GAME_CONTROL_KEY_5			23
+#define GAME_CONTROL_KEY_6			24
+#define GAME_CONTROL_KEY_7			25
+#define GAME_CONTROL_KEY_8			26
+#define GAME_CONTROL_KEY_WHITE			27
+#define GAME_CONTROL_KEY_WHITE_COUNT		28
+#define GAME_CONTROL_SCORE			29
+#define GAME_CONTROL_TIME			30
+#define GAME_CONTROL_TIME_HH			31
+#define GAME_CONTROL_TIME_MM			32
+#define GAME_CONTROL_TIME_SS			33
+#define GAME_CONTROL_SHIELD_NORMAL		34
+#define GAME_CONTROL_SHIELD_NORMAL_TIME		35
+#define GAME_CONTROL_SHIELD_DEADLY		36
+#define GAME_CONTROL_SHIELD_DEADLY_TIME		37
+#define GAME_CONTROL_EXIT			38
+#define GAME_CONTROL_EM_EXIT			39
+#define GAME_CONTROL_SP_EXIT			40
+#define GAME_CONTROL_STEEL_EXIT			41
+#define GAME_CONTROL_EM_STEEL_EXIT		42
+#define GAME_CONTROL_EMC_MAGIC_BALL		43
+#define GAME_CONTROL_EMC_MAGIC_BALL_SWITCH	44
+#define GAME_CONTROL_LIGHT_SWITCH		45
+#define GAME_CONTROL_LIGHT_SWITCH_TIME		46
+#define GAME_CONTROL_TIMEGATE_SWITCH		47
+#define GAME_CONTROL_TIMEGATE_SWITCH_TIME	48
+#define GAME_CONTROL_SWITCHGATE_SWITCH		49
+#define GAME_CONTROL_EMC_LENSES			50
+#define GAME_CONTROL_EMC_LENSES_TIME		51
+#define GAME_CONTROL_EMC_MAGNIFIER		52
+#define GAME_CONTROL_EMC_MAGNIFIER_TIME		53
+#define GAME_CONTROL_BALLOON_SWITCH		54
+#define GAME_CONTROL_DYNABOMB_NUMBER		55
+#define GAME_CONTROL_DYNABOMB_SIZE		56
+#define GAME_CONTROL_DYNABOMB_POWER		57
+#define GAME_CONTROL_PENGUINS			58
+#define GAME_CONTROL_SOKOBAN_OBJECTS		59
+#define GAME_CONTROL_SOKOBAN_FIELDS		60
+#define GAME_CONTROL_ROBOT_WHEEL		61
+#define GAME_CONTROL_CONVEYOR_BELT_1		62
+#define GAME_CONTROL_CONVEYOR_BELT_1_SWITCH	63
+#define GAME_CONTROL_CONVEYOR_BELT_2		64
+#define GAME_CONTROL_CONVEYOR_BELT_2_SWITCH	65
+#define GAME_CONTROL_CONVEYOR_BELT_3		66
+#define GAME_CONTROL_CONVEYOR_BELT_3_SWITCH	67
+#define GAME_CONTROL_CONVEYOR_BELT_4		68
+#define GAME_CONTROL_CONVEYOR_BELT_4_SWITCH	69
+#define GAME_CONTROL_MAGIC_WALL			70
+#define GAME_CONTROL_MAGIC_WALL_TIME		71
+#define GAME_CONTROL_BD_MAGIC_WALL		72
+#define GAME_CONTROL_DC_MAGIC_WALL		73
+#define GAME_CONTROL_PLAYER_NAME		74
+#define GAME_CONTROL_LEVEL_NAME			75
+#define GAME_CONTROL_LEVEL_AUTHOR		76
 
-#define NUM_GAME_CONTROLS			69
+#define NUM_GAME_CONTROLS			77
 
 int game_control_value[NUM_GAME_CONTROLS];
 int last_game_control_value[NUM_GAME_CONTROLS];
@@ -227,9 +235,89 @@ static struct GameControlInfo game_controls[] =
     TYPE_INTEGER,
   },
   {
-    GAME_CONTROL_INVENTORY,
-    &game.panel.inventory,
+    GAME_CONTROL_INVENTORY_COUNT,
+    &game.panel.inventory_count,
     TYPE_INTEGER,
+  },
+  {
+    GAME_CONTROL_INVENTORY_FIRST_1,
+    &game.panel.inventory_first_1,
+    TYPE_ELEMENT,
+  },
+  {
+    GAME_CONTROL_INVENTORY_FIRST_2,
+    &game.panel.inventory_first_2,
+    TYPE_ELEMENT,
+  },
+  {
+    GAME_CONTROL_INVENTORY_FIRST_3,
+    &game.panel.inventory_first_3,
+    TYPE_ELEMENT,
+  },
+  {
+    GAME_CONTROL_INVENTORY_FIRST_4,
+    &game.panel.inventory_first_4,
+    TYPE_ELEMENT,
+  },
+  {
+    GAME_CONTROL_INVENTORY_FIRST_5,
+    &game.panel.inventory_first_5,
+    TYPE_ELEMENT,
+  },
+  {
+    GAME_CONTROL_INVENTORY_FIRST_6,
+    &game.panel.inventory_first_6,
+    TYPE_ELEMENT,
+  },
+  {
+    GAME_CONTROL_INVENTORY_FIRST_7,
+    &game.panel.inventory_first_7,
+    TYPE_ELEMENT,
+  },
+  {
+    GAME_CONTROL_INVENTORY_FIRST_8,
+    &game.panel.inventory_first_8,
+    TYPE_ELEMENT,
+  },
+  {
+    GAME_CONTROL_INVENTORY_LAST_1,
+    &game.panel.inventory_last_1,
+    TYPE_ELEMENT,
+  },
+  {
+    GAME_CONTROL_INVENTORY_LAST_2,
+    &game.panel.inventory_last_2,
+    TYPE_ELEMENT,
+  },
+  {
+    GAME_CONTROL_INVENTORY_LAST_3,
+    &game.panel.inventory_last_3,
+    TYPE_ELEMENT,
+  },
+  {
+    GAME_CONTROL_INVENTORY_LAST_4,
+    &game.panel.inventory_last_4,
+    TYPE_ELEMENT,
+  },
+  {
+    GAME_CONTROL_INVENTORY_LAST_5,
+    &game.panel.inventory_last_5,
+    TYPE_ELEMENT,
+  },
+  {
+    GAME_CONTROL_INVENTORY_LAST_6,
+    &game.panel.inventory_last_6,
+    TYPE_ELEMENT,
+  },
+  {
+    GAME_CONTROL_INVENTORY_LAST_7,
+    &game.panel.inventory_last_7,
+    TYPE_ELEMENT,
+  },
+  {
+    GAME_CONTROL_INVENTORY_LAST_8,
+    &game.panel.inventory_last_8,
+    TYPE_ELEMENT,
   },
   {
     GAME_CONTROL_KEY_1,
@@ -305,46 +393,6 @@ static struct GameControlInfo game_controls[] =
     GAME_CONTROL_TIME_SS,
     &game.panel.time_ss,
     TYPE_INTEGER,
-  },
-  {
-    GAME_CONTROL_DROP_NEXT_1,
-    &game.panel.drop_next_1,
-    TYPE_ELEMENT,
-  },
-  {
-    GAME_CONTROL_DROP_NEXT_2,
-    &game.panel.drop_next_2,
-    TYPE_ELEMENT,
-  },
-  {
-    GAME_CONTROL_DROP_NEXT_3,
-    &game.panel.drop_next_3,
-    TYPE_ELEMENT,
-  },
-  {
-    GAME_CONTROL_DROP_NEXT_4,
-    &game.panel.drop_next_4,
-    TYPE_ELEMENT,
-  },
-  {
-    GAME_CONTROL_DROP_NEXT_5,
-    &game.panel.drop_next_5,
-    TYPE_ELEMENT,
-  },
-  {
-    GAME_CONTROL_DROP_NEXT_6,
-    &game.panel.drop_next_6,
-    TYPE_ELEMENT,
-  },
-  {
-    GAME_CONTROL_DROP_NEXT_7,
-    &game.panel.drop_next_7,
-    TYPE_ELEMENT,
-  },
-  {
-    GAME_CONTROL_DROP_NEXT_8,
-    &game.panel.drop_next_8,
-    TYPE_ELEMENT,
   },
   {
     GAME_CONTROL_SHIELD_NORMAL,
@@ -1731,6 +1779,52 @@ static int get_key_element_from_nr(int key_nr)
   return key_base_element + key_nr;
 }
 
+static int get_next_drop_element(struct PlayerInfo *player)
+{
+  return (player->inventory_size > 0 ?
+	  player->inventory_element[player->inventory_size - 1] :
+	  player->inventory_infinite_element != EL_UNDEFINED ?
+	  player->inventory_infinite_element :
+	  player->dynabombs_left > 0 ?
+	  EL_DYNABOMB_PLAYER_1_ACTIVE + player->index_nr :
+	  EL_UNDEFINED);
+}
+
+static int get_drop_element_from_pos(struct PlayerInfo *player, int pos)
+{
+  /* pos >= 0: get element from bottom of the stack;
+     pos <  0: get element from top of the stack */
+
+  if (pos < 0)
+  {
+    int min_inventory_size = -pos;
+    int inventory_pos = player->inventory_size - min_inventory_size;
+    int min_dynabombs_left = min_inventory_size - player->inventory_size;
+
+    return (player->inventory_size >= min_inventory_size ?
+	    player->inventory_element[inventory_pos] :
+	    player->inventory_infinite_element != EL_UNDEFINED ?
+	    player->inventory_infinite_element :
+	    player->dynabombs_left >= min_dynabombs_left ?
+	    EL_DYNABOMB_PLAYER_1_ACTIVE + player->index_nr :
+	    EL_UNDEFINED);
+  }
+  else
+  {
+    int min_dynabombs_left = pos + 1;
+    int min_inventory_size = pos + 1 - player->dynabombs_left;
+    int inventory_pos = pos - player->dynabombs_left;
+
+    return (player->inventory_infinite_element != EL_UNDEFINED ?
+	    player->inventory_infinite_element :
+	    player->dynabombs_left >= min_dynabombs_left ?
+	    EL_DYNABOMB_PLAYER_1_ACTIVE + player->index_nr :
+	    player->inventory_size >= min_inventory_size ?
+	    player->inventory_element[inventory_pos] :
+	    EL_UNDEFINED);
+  }
+}
+
 void InitGameControlValues()
 {
   int i;
@@ -1746,20 +1840,29 @@ void InitGameControlValues()
 
     /* determine panel value width for later calculation of alignment */
     if (type == TYPE_INTEGER || type == TYPE_STRING)
-      pos->width = pos->chars * getFontWidth(pos->font);
+    {
+      pos->width = pos->size * getFontWidth(pos->font);
+      pos->height = getFontHeight(pos->font);
+    }
     else if (type == TYPE_ELEMENT)
-      pos->width = MINI_TILESIZE;
+    {
+      pos->width = pos->size;
+      pos->height = pos->size;
+    }
   }
 }
 
 void UpdateGameControlValues()
 {
   int i, k;
+  int time = (level.time == 0 ? TimePlayed : TimeLeft);
+  int score = (local_player->LevelSolved ? local_player->score_final :
+	       local_player->score);
 
   game_control_value[GAME_CONTROL_LEVEL_NUMBER] = level_nr;
   game_control_value[GAME_CONTROL_GEMS] = local_player->gems_still_needed;
 
-  game_control_value[GAME_CONTROL_INVENTORY] = 0;
+  game_control_value[GAME_CONTROL_INVENTORY_COUNT] = 0;
   for (i = 0; i < MAX_NUM_KEYS; i++)
     game_control_value[GAME_CONTROL_KEY_1 + i] = EL_EMPTY;
   game_control_value[GAME_CONTROL_KEY_WHITE] = EL_EMPTY;
@@ -1774,7 +1877,7 @@ void UpdateGameControlValues()
 	  game_control_value[GAME_CONTROL_KEY_1 + k] =
 	    get_key_element_from_nr(k);
 
-      game_control_value[GAME_CONTROL_INVENTORY] +=
+      game_control_value[GAME_CONTROL_INVENTORY_COUNT] +=
 	stored_player[i].inventory_size;
 
       if (stored_player[i].num_white_keys > 0)
@@ -1793,7 +1896,7 @@ void UpdateGameControlValues()
 	game_control_value[GAME_CONTROL_KEY_1 + k] =
 	  get_key_element_from_nr(k);
 
-    game_control_value[GAME_CONTROL_INVENTORY] +=
+    game_control_value[GAME_CONTROL_INVENTORY_COUNT] +=
       stored_player[player_nr].inventory_size;
 
     if (stored_player[player_nr].num_white_keys > 0)
@@ -1803,21 +1906,21 @@ void UpdateGameControlValues()
       stored_player[player_nr].num_white_keys;
   }
 
-  game_control_value[GAME_CONTROL_SCORE] = (local_player->LevelSolved ?
-					    local_player->score_final :
-					    local_player->score);
-
-  game_control_value[GAME_CONTROL_TIME] = (level.time == 0 ?
-					   TimePlayed :
-					   TimeLeft);
-
-  game_control_value[GAME_CONTROL_TIME_HH] = TapeTime / 3600;
-  game_control_value[GAME_CONTROL_TIME_MM] = (TapeTime / 60) % 60;
-  game_control_value[GAME_CONTROL_TIME_SS] = TapeTime % 60;
-
-  /* !!! TODO !!! */
   for (i = 0; i < 8; i++)
-    game_control_value[GAME_CONTROL_DROP_NEXT_1 + i] = EL_UNDEFINED;
+  {
+    game_control_value[GAME_CONTROL_INVENTORY_FIRST_1 + i] =
+      get_drop_element_from_pos(local_player, i);
+    game_control_value[GAME_CONTROL_INVENTORY_LAST_1 + i] =
+      get_drop_element_from_pos(local_player, -i - 1);
+  }
+
+  game_control_value[GAME_CONTROL_SCORE] = score;
+
+  game_control_value[GAME_CONTROL_TIME] = time;
+
+  game_control_value[GAME_CONTROL_TIME_HH] = time / 3600;
+  game_control_value[GAME_CONTROL_TIME_MM] = (time / 60) % 60;
+  game_control_value[GAME_CONTROL_TIME_SS] = time % 60;
 
   game_control_value[GAME_CONTROL_SHIELD_NORMAL] =
     (local_player->shield_normal_time_left > 0 ? EL_SHIELD_NORMAL_ACTIVE :
@@ -1931,7 +2034,7 @@ void DisplayGameControlValues()
     struct TextPosInfo *pos = game_controls[i].pos;
     int value = game_control_value[nr];
     int last_value = last_game_control_value[nr];
-    int chars = pos->chars;
+    int size = pos->size;
     int font = pos->font;
 
     if (value == last_value)
@@ -1950,24 +2053,24 @@ void DisplayGameControlValues()
     {
       if (nr == GAME_CONTROL_LEVEL_NUMBER || nr == GAME_CONTROL_TIME)
       {
-	boolean use_dynamic_chars = (pos->chars == -1 ? TRUE : FALSE);
+	boolean use_dynamic_size = (size == -1 ? TRUE : FALSE);
 
-	if (use_dynamic_chars)		/* use dynamic number of chars */
+	if (use_dynamic_size)		/* use dynamic number of digits */
 	{
 	  int value_change = (nr == GAME_CONTROL_LEVEL_NUMBER ? 100 : 1000);
-	  int chars1 = (nr == GAME_CONTROL_LEVEL_NUMBER ? 2 : 3);
-	  int chars2 = chars1 + 1;
+	  int size1 = (nr == GAME_CONTROL_LEVEL_NUMBER ? 2 : 3);
+	  int size2 = size1 + 1;
 	  int font1 = pos->font;
 	  int font2 = pos->font_alt;
 
-	  chars = (value < value_change ? chars1 : chars2);
-	  font  = (value < value_change ? font1  : font2);
+	  size = (value < value_change ? size1 : size2);
+	  font = (value < value_change ? font1 : font2);
 
-	  /* clear background if value just changed its size (dynamic chars) */
+	  /* clear background if value just changed its size (dynamic digits) */
 	  if ((last_value < value_change) != (value < value_change))
 	  {
-	    int width1 = chars1 * getFontWidth(font1);
-	    int width2 = chars2 * getFontWidth(font2);
+	    int width1 = size1 * getFontWidth(font1);
+	    int width2 = size2 * getFontWidth(font2);
 	    int max_width = MAX(width1, width2);
 	    int max_height = MAX(getFontHeight(font1), getFontHeight(font2));
 
@@ -1978,10 +2081,10 @@ void DisplayGameControlValues()
 	  }
 	}
 
-	pos->width = chars * getFontWidth(font);
+	pos->width = size * getFontWidth(font);
       }
 
-      DrawText(PANEL_XPOS(pos), PANEL_YPOS(pos), int2str(value, chars), font);
+      DrawText(PANEL_XPOS(pos), PANEL_YPOS(pos), int2str(value, size), font);
     }
     else if (type == TYPE_ELEMENT)
     {
@@ -1994,13 +2097,13 @@ void DisplayGameControlValues()
 	int src_y = DOOR_GFX_PAGEY1 + ALIGNED_TEXT_YPOS(pos);
 
 	BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto, src_x, src_y,
-		   MINI_TILEX, MINI_TILEY, dst_x, dst_y);
+		   size, size, dst_x, dst_y);
       }
       else
       {
-	int graphic = el2edimg(value);
+	int graphic = el2doorimg(value);
 
-	DrawMiniGraphicExt(drawto, dst_x, dst_y, graphic);
+	DrawSizedGraphicExt(drawto, dst_x, dst_y, graphic, size);
       }
     }
     else if (type == TYPE_STRING)
@@ -2011,9 +2114,9 @@ void DisplayGameControlValues()
 
       if (s != NULL)
       {
-	char *s_cut = getStringCopyN(s, pos->chars);
+	char *s_cut = getStringCopyN(s, size);
 
-	DrawText(PANEL_XPOS(pos), PANEL_YPOS(pos), s_cut, pos->font);
+	DrawText(PANEL_XPOS(pos), PANEL_YPOS(pos), s_cut, font);
 
 	free(s_cut);
       }
@@ -2032,7 +2135,7 @@ void DrawGameValue_Emeralds(int value)
   int font_nr = FONT_TEXT_2;
 #endif
   int font_width = getFontWidth(font_nr);
-  int chars = pos->chars;
+  int chars = pos->size;
 
 #if 1
   return;	/* !!! USE NEW STUFF !!! */
@@ -2048,14 +2151,14 @@ void DrawGameValue_Emeralds(int value)
 
 void DrawGameValue_Dynamite(int value)
 {
-  struct TextPosInfo *pos = &game.panel.inventory;
+  struct TextPosInfo *pos = &game.panel.inventory_count;
 #if 1
   int font_nr = pos->font;
 #else
   int font_nr = FONT_TEXT_2;
 #endif
   int font_width = getFontWidth(font_nr);
-  int chars = pos->chars;
+  int chars = pos->size;
 
 #if 1
   return;	/* !!! USE NEW STUFF !!! */
@@ -2078,7 +2181,7 @@ void DrawGameValue_Score(int value)
   int font_nr = FONT_TEXT_2;
 #endif
   int font_width = getFontWidth(font_nr);
-  int chars = pos->chars;
+  int chars = pos->size;
 
 #if 1
   return;	/* !!! USE NEW STUFF !!! */
@@ -2098,7 +2201,7 @@ void DrawGameValue_Time(int value)
   static int last_value = -1;
   int chars1 = 3;
   int chars2 = 4;
-  int chars = pos->chars;
+  int chars = pos->size;
 #if 1
   int font1_nr = pos->font;
   int font2_nr = pos->font_alt;
@@ -2148,7 +2251,7 @@ void DrawGameValue_Level(int value)
   struct TextPosInfo *pos = &game.panel.level_number;
   int chars1 = 2;
   int chars2 = 3;
-  int chars = pos->chars;
+  int chars = pos->size;
 #if 1
   int font1_nr = pos->font;
   int font2_nr = pos->font_alt;
@@ -2296,7 +2399,7 @@ void DrawGameValue_Dynamite(int value)
   int font_nr = FONT_TEXT_2;
   int xpos = (3 * 14 - 3 * getFontWidth(font_nr)) / 2;
 
-  if (PANEL_DEACTIVATED(game.panel.inventory))
+  if (PANEL_DEACTIVATED(game.panel.inventory_count))
     return;
 
   DrawText(DX_DYNAMITE + xpos, DY_DYNAMITE, int2str(value, 3), font_nr);
@@ -14045,6 +14148,9 @@ boolean DropElement(struct PlayerInfo *player)
   int dropx = player->jx, dropy = player->jy;
   int drop_direction = player->MovDir;
   int drop_side = drop_direction;
+#if 1
+  int drop_element = get_next_drop_element(player);
+#else
   int drop_element = (player->inventory_size > 0 ?
 		      player->inventory_element[player->inventory_size - 1] :
 		      player->inventory_infinite_element != EL_UNDEFINED ?
@@ -14052,6 +14158,7 @@ boolean DropElement(struct PlayerInfo *player)
 		      player->dynabombs_left > 0 ?
 		      EL_DYNABOMB_PLAYER_1_ACTIVE + player->index_nr :
 		      EL_UNDEFINED);
+#endif
 
   player->is_dropping_pressed = TRUE;
 

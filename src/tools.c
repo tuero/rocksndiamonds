@@ -912,6 +912,55 @@ inline int getGraphicAnimationFrame(int graphic, int sync_frame)
 			   sync_frame);
 }
 
+void getSizedGraphicSource(int graphic, Bitmap **bitmap, int *x, int *y,
+			   int tilesize_raw)
+{
+  struct
+  {
+    int width_mult, width_div;
+    int height_mult, height_div;
+  }
+  offset_calc[6] =
+  {
+    { 15, 16,	2, 3	},	/* 1 x 1 */
+    { 7, 8,	2, 3	},	/* 2 x 2 */
+    { 3, 4,	2, 3	},	/* 4 x 4 */
+    { 1, 2,	2, 3	},	/* 8 x 8 */
+    { 0, 1,	2, 3	},	/* 16 x 16 */
+    { 0, 1,	0, 1	},	/* 32 x 32 */
+  };
+  int tilesize = MIN(MAX(1, tilesize_raw), TILESIZE);
+  int offset_calc_pos = log_2(tilesize);
+  Bitmap *src_bitmap = graphic_info[graphic].bitmap;
+  int width_mult  = offset_calc[offset_calc_pos].width_mult;
+  int width_div   = offset_calc[offset_calc_pos].width_div;
+  int height_mult = offset_calc[offset_calc_pos].height_mult;
+  int height_div  = offset_calc[offset_calc_pos].height_div;
+  int startx = src_bitmap->width * width_mult / width_div;
+  int starty = src_bitmap->height * height_mult / height_div;
+  int src_x = startx + graphic_info[graphic].src_x * tilesize / TILESIZE;
+  int src_y = starty + graphic_info[graphic].src_y * tilesize / TILESIZE;
+
+  *bitmap = src_bitmap;
+  *x = src_x;
+  *y = src_y;
+}
+
+void getMiniGraphicSource(int graphic, Bitmap **bitmap, int *x, int *y)
+{
+#if 1
+  getSizedGraphicSource(graphic, bitmap, x, y, MINI_TILESIZE);
+#else
+  struct GraphicInfo *g = &graphic_info[graphic];
+  int mini_startx = 0;
+  int mini_starty = g->bitmap->height * 2 / 3;
+
+  *bitmap = g->bitmap;
+  *x = mini_startx + g->src_x / 2;
+  *y = mini_starty + g->src_y / 2;
+#endif
+}
+
 inline void getGraphicSourceExt(int graphic, int frame, Bitmap **bitmap,
 				int *x, int *y, boolean get_backside)
 {
@@ -1003,21 +1052,26 @@ void DrawGraphicThruMaskExt(DrawBuffer *d, int dst_x, int dst_y, int graphic,
   BlitBitmapMasked(src_bitmap, d, src_x, src_y, TILEX, TILEY, dst_x, dst_y);
 }
 
+void DrawSizedGraphic(int x, int y, int graphic, int tilesize)
+{
+  DrawSizedGraphicExt(drawto, SX + x * tilesize, SY + y * tilesize, graphic,
+		      tilesize);
+  MarkTileDirty(x / tilesize, y / tilesize);
+}
+
+void DrawSizedGraphicExt(DrawBuffer *d, int x, int y, int graphic, int tilesize)
+{
+  Bitmap *src_bitmap;
+  int src_x, src_y;
+
+  getSizedGraphicSource(graphic, &src_bitmap, &src_x, &src_y, tilesize);
+  BlitBitmap(src_bitmap, d, src_x, src_y, tilesize, tilesize, x, y);
+}
+
 void DrawMiniGraphic(int x, int y, int graphic)
 {
   DrawMiniGraphicExt(drawto, SX + x * MINI_TILEX,SY + y * MINI_TILEY, graphic);
   MarkTileDirty(x / 2, y / 2);
-}
-
-void getMiniGraphicSource(int graphic, Bitmap **bitmap, int *x, int *y)
-{
-  struct GraphicInfo *g = &graphic_info[graphic];
-  int mini_startx = 0;
-  int mini_starty = g->bitmap->height * 2 / 3;
-
-  *bitmap = g->bitmap;
-  *x = mini_startx + g->src_x / 2;
-  *y = mini_starty + g->src_y / 2;
 }
 
 void DrawMiniGraphicExt(DrawBuffer *d, int x, int y, int graphic)
@@ -1826,58 +1880,13 @@ void ShowEnvelope(int envelope_nr)
   BackToFront();
 }
 
-void getPreviewGraphicSource(int graphic, Bitmap **bitmap, int *x, int *y,
-			     int tilesize)
-{
-  struct
-  {
-    int width_mult, width_div;
-    int height_mult, height_div;
-#if 1
-  }
-  offset_calc[6] =
-#else
-  offset_calc[4] =
-#endif
-  {
-    { 0, 1,	0, 1	},
-    { 0, 1,	2, 3	},
-    { 1, 2,	2, 3	},
-    { 3, 4,	2, 3	},
-#if 1
-    { 7, 8,	2, 3	},
-    { 15, 16,	2, 3	},
-#endif
-  };
-#if 1
-  int offset_calc_pos = (tilesize < MICRO_TILESIZE / 4 ||
-			 tilesize > TILESIZE ? 5 : 5 - log_2(tilesize));
-#else
-  int offset_calc_pos = (tilesize < MICRO_TILESIZE || tilesize > TILESIZE ? 3 :
-			 5 - log_2(tilesize));
-#endif
-  Bitmap *src_bitmap = graphic_info[graphic].bitmap;
-  int width_mult = offset_calc[offset_calc_pos].width_mult;
-  int width_div = offset_calc[offset_calc_pos].width_div;
-  int height_mult = offset_calc[offset_calc_pos].height_mult;
-  int height_div = offset_calc[offset_calc_pos].height_div;
-  int mini_startx = src_bitmap->width * width_mult / width_div;
-  int mini_starty = src_bitmap->height * height_mult / height_div;
-  int src_x = mini_startx + graphic_info[graphic].src_x * tilesize / TILESIZE;
-  int src_y = mini_starty + graphic_info[graphic].src_y * tilesize / TILESIZE;
-
-  *bitmap = src_bitmap;
-  *x = src_x;
-  *y = src_y;
-}
-
 void DrawPreviewElement(int dst_x, int dst_y, int element, int tilesize)
 {
   Bitmap *src_bitmap;
   int src_x, src_y;
   int graphic = el2preimg(element);
 
-  getPreviewGraphicSource(graphic, &src_bitmap, &src_x, &src_y, tilesize);
+  getSizedGraphicSource(graphic, &src_bitmap, &src_x, &src_y, tilesize);
   BlitBitmap(src_bitmap, drawto, src_x, src_y, tilesize, tilesize, dst_x,dst_y);
 }
 
@@ -1996,8 +2005,8 @@ static void DrawPreviewLevelLabelExt(int mode)
 #endif
 
 #if 1
-  if (pos->chars != -1)
-    max_len_label_text = pos->chars;
+  if (pos->size != -1)
+    max_len_label_text = pos->size;
 #endif
 
   for (i = 0; i < max_len_label_text; i++)
@@ -2106,8 +2115,8 @@ void DrawPreviewLevel(boolean restart)
 #endif
 
 #if 1
-      if (pos->chars != -1)
-	max_len_label_text = pos->chars;
+      if (pos->size != -1)
+	max_len_label_text = pos->size;
 #endif
 
       strncpy(label_text, leveldir_current->name, max_len_label_text);
@@ -5744,6 +5753,13 @@ int el2preimg(int element)
   element = GFX_ELEMENT(element);
 
   return element_info[element].special_graphic[GFX_SPECIAL_ARG_PREVIEW];
+}
+
+int el2doorimg(int element)
+{
+  element = GFX_ELEMENT(element);
+
+  return element_info[element].special_graphic[GFX_SPECIAL_ARG_DOOR];
 }
 
 int font2baseimg(int font_nr)

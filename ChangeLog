@@ -1,3 +1,6 @@
+2007-04-02
+	* added attribute ".tile_size" for element style game panel controls
+
 2007-04-01
 	* added <space> key as additional valid key to use for confirm requester
 

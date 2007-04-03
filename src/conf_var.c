@@ -1549,6 +1549,10 @@ struct TokenIntPtrInfo image_config_vars[] =
     &menu.main.text.first_level.valign
   },
   {
+    "main.text.first_level.digits",
+    &menu.main.text.first_level.size
+  },
+  {
     "main.text.first_level.font",
     &menu.main.text.first_level.font
   },
@@ -1569,6 +1573,10 @@ struct TokenIntPtrInfo image_config_vars[] =
     &menu.main.text.last_level.valign
   },
   {
+    "main.text.last_level.digits",
+    &menu.main.text.last_level.size
+  },
+  {
     "main.text.last_level.font",
     &menu.main.text.last_level.font
   },
@@ -1587,6 +1595,10 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "main.text.level_number.valign",
     &menu.main.text.level_number.valign
+  },
+  {
+    "main.text.level_number.digits",
+    &menu.main.text.level_number.size
   },
   {
     "main.text.level_number.font",
@@ -1610,7 +1622,7 @@ struct TokenIntPtrInfo image_config_vars[] =
   },
   {
     "main.text.level_info_1.chars",
-    &menu.main.text.level_info_1.chars
+    &menu.main.text.level_info_1.size
   },
   {
     "main.text.level_info_1.font",
@@ -1634,7 +1646,7 @@ struct TokenIntPtrInfo image_config_vars[] =
   },
   {
     "main.text.level_info_2.chars",
-    &menu.main.text.level_info_2.chars
+    &menu.main.text.level_info_2.size
   },
   {
     "main.text.level_info_2.font",
@@ -1662,7 +1674,7 @@ struct TokenIntPtrInfo image_config_vars[] =
   },
   {
     "main.text.level_name.chars",
-    &menu.main.text.level_name.chars
+    &menu.main.text.level_name.size
   },
   {
     "main.text.level_name.font",
@@ -1686,7 +1698,7 @@ struct TokenIntPtrInfo image_config_vars[] =
   },
   {
     "main.text.level_author.chars",
-    &menu.main.text.level_author.chars
+    &menu.main.text.level_author.size
   },
   {
     "main.text.level_author.font",
@@ -1709,8 +1721,8 @@ struct TokenIntPtrInfo image_config_vars[] =
     &menu.main.text.level_year.valign
   },
   {
-    "main.text.level_year.chars",
-    &menu.main.text.level_year.chars
+    "main.text.level_year.digits",
+    &menu.main.text.level_year.size
   },
   {
     "main.text.level_year.font",
@@ -1734,7 +1746,7 @@ struct TokenIntPtrInfo image_config_vars[] =
   },
   {
     "main.text.level_imported_from.chars",
-    &menu.main.text.level_imported_from.chars
+    &menu.main.text.level_imported_from.size
   },
   {
     "main.text.level_imported_from.font",
@@ -1758,7 +1770,7 @@ struct TokenIntPtrInfo image_config_vars[] =
   },
   {
     "main.text.level_imported_by.chars",
-    &menu.main.text.level_imported_by.chars
+    &menu.main.text.level_imported_by.size
   },
   {
     "main.text.level_imported_by.font",
@@ -1782,7 +1794,7 @@ struct TokenIntPtrInfo image_config_vars[] =
   },
   {
     "main.text.level_tested_by.chars",
-    &menu.main.text.level_tested_by.chars
+    &menu.main.text.level_tested_by.size
   },
   {
     "main.text.level_tested_by.font",
@@ -1973,8 +1985,8 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.level_number.valign
   },
   {
-    "game.panel.level_number.chars",
-    &game.panel.level_number.chars
+    "game.panel.level_number.digits",
+    &game.panel.level_number.size
   },
   {
     "game.panel.level_number.font",
@@ -2001,36 +2013,228 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.gems.valign
   },
   {
-    "game.panel.gems.chars",
-    &game.panel.gems.chars
+    "game.panel.gems.digits",
+    &game.panel.gems.size
   },
   {
     "game.panel.gems.font",
     &game.panel.gems.font
   },
   {
-    "game.panel.inventory.x",
-    &game.panel.inventory.x
+    "game.panel.inventory_count.x",
+    &game.panel.inventory_count.x
   },
   {
-    "game.panel.inventory.y",
-    &game.panel.inventory.y
+    "game.panel.inventory_count.y",
+    &game.panel.inventory_count.y
   },
   {
-    "game.panel.inventory.align",
-    &game.panel.inventory.align
+    "game.panel.inventory_count.align",
+    &game.panel.inventory_count.align
   },
   {
-    "game.panel.inventory.valign",
-    &game.panel.inventory.valign
+    "game.panel.inventory_count.valign",
+    &game.panel.inventory_count.valign
   },
   {
-    "game.panel.inventory.chars",
-    &game.panel.inventory.chars
+    "game.panel.inventory_count.digits",
+    &game.panel.inventory_count.size
   },
   {
-    "game.panel.inventory.font",
-    &game.panel.inventory.font
+    "game.panel.inventory_count.font",
+    &game.panel.inventory_count.font
+  },
+  {
+    "game.panel.inventory_first_1.x",
+    &game.panel.inventory_first_1.x
+  },
+  {
+    "game.panel.inventory_first_1.y",
+    &game.panel.inventory_first_1.y
+  },
+  {
+    "game.panel.inventory_first_1.tile_size",
+    &game.panel.inventory_first_1.size
+  },
+  {
+    "game.panel.inventory_first_2.x",
+    &game.panel.inventory_first_2.x
+  },
+  {
+    "game.panel.inventory_first_2.y",
+    &game.panel.inventory_first_2.y
+  },
+  {
+    "game.panel.inventory_first_2.tile_size",
+    &game.panel.inventory_first_2.size
+  },
+  {
+    "game.panel.inventory_first_3.x",
+    &game.panel.inventory_first_3.x
+  },
+  {
+    "game.panel.inventory_first_3.y",
+    &game.panel.inventory_first_3.y
+  },
+  {
+    "game.panel.inventory_first_3.tile_size",
+    &game.panel.inventory_first_3.size
+  },
+  {
+    "game.panel.inventory_first_4.x",
+    &game.panel.inventory_first_4.x
+  },
+  {
+    "game.panel.inventory_first_4.y",
+    &game.panel.inventory_first_4.y
+  },
+  {
+    "game.panel.inventory_first_4.tile_size",
+    &game.panel.inventory_first_4.size
+  },
+  {
+    "game.panel.inventory_first_5.x",
+    &game.panel.inventory_first_5.x
+  },
+  {
+    "game.panel.inventory_first_5.y",
+    &game.panel.inventory_first_5.y
+  },
+  {
+    "game.panel.inventory_first_5.tile_size",
+    &game.panel.inventory_first_5.size
+  },
+  {
+    "game.panel.inventory_first_6.x",
+    &game.panel.inventory_first_6.x
+  },
+  {
+    "game.panel.inventory_first_6.y",
+    &game.panel.inventory_first_6.y
+  },
+  {
+    "game.panel.inventory_first_6.tile_size",
+    &game.panel.inventory_first_6.size
+  },
+  {
+    "game.panel.inventory_first_7.x",
+    &game.panel.inventory_first_7.x
+  },
+  {
+    "game.panel.inventory_first_7.y",
+    &game.panel.inventory_first_7.y
+  },
+  {
+    "game.panel.inventory_first_7.tile_size",
+    &game.panel.inventory_first_7.size
+  },
+  {
+    "game.panel.inventory_first_8.x",
+    &game.panel.inventory_first_8.x
+  },
+  {
+    "game.panel.inventory_first_8.y",
+    &game.panel.inventory_first_8.y
+  },
+  {
+    "game.panel.inventory_first_8.tile_size",
+    &game.panel.inventory_first_8.size
+  },
+  {
+    "game.panel.inventory_last_1.x",
+    &game.panel.inventory_last_1.x
+  },
+  {
+    "game.panel.inventory_last_1.y",
+    &game.panel.inventory_last_1.y
+  },
+  {
+    "game.panel.inventory_last_1.tile_size",
+    &game.panel.inventory_last_1.size
+  },
+  {
+    "game.panel.inventory_last_2.x",
+    &game.panel.inventory_last_2.x
+  },
+  {
+    "game.panel.inventory_last_2.y",
+    &game.panel.inventory_last_2.y
+  },
+  {
+    "game.panel.inventory_last_2.tile_size",
+    &game.panel.inventory_last_2.size
+  },
+  {
+    "game.panel.inventory_last_3.x",
+    &game.panel.inventory_last_3.x
+  },
+  {
+    "game.panel.inventory_last_3.y",
+    &game.panel.inventory_last_3.y
+  },
+  {
+    "game.panel.inventory_last_3.tile_size",
+    &game.panel.inventory_last_3.size
+  },
+  {
+    "game.panel.inventory_last_4.x",
+    &game.panel.inventory_last_4.x
+  },
+  {
+    "game.panel.inventory_last_4.y",
+    &game.panel.inventory_last_4.y
+  },
+  {
+    "game.panel.inventory_last_4.tile_size",
+    &game.panel.inventory_last_4.size
+  },
+  {
+    "game.panel.inventory_last_5.x",
+    &game.panel.inventory_last_5.x
+  },
+  {
+    "game.panel.inventory_last_5.y",
+    &game.panel.inventory_last_5.y
+  },
+  {
+    "game.panel.inventory_last_5.tile_size",
+    &game.panel.inventory_last_5.size
+  },
+  {
+    "game.panel.inventory_last_6.x",
+    &game.panel.inventory_last_6.x
+  },
+  {
+    "game.panel.inventory_last_6.y",
+    &game.panel.inventory_last_6.y
+  },
+  {
+    "game.panel.inventory_last_6.tile_size",
+    &game.panel.inventory_last_6.size
+  },
+  {
+    "game.panel.inventory_last_7.x",
+    &game.panel.inventory_last_7.x
+  },
+  {
+    "game.panel.inventory_last_7.y",
+    &game.panel.inventory_last_7.y
+  },
+  {
+    "game.panel.inventory_last_7.tile_size",
+    &game.panel.inventory_last_7.size
+  },
+  {
+    "game.panel.inventory_last_8.x",
+    &game.panel.inventory_last_8.x
+  },
+  {
+    "game.panel.inventory_last_8.y",
+    &game.panel.inventory_last_8.y
+  },
+  {
+    "game.panel.inventory_last_8.tile_size",
+    &game.panel.inventory_last_8.size
   },
   {
     "game.panel.key_1.x",
@@ -2041,12 +2245,20 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.key[0].y
   },
   {
+    "game.panel.key_1.tile_size",
+    &game.panel.key[0].size
+  },
+  {
     "game.panel.key_2.x",
     &game.panel.key[1].x
   },
   {
     "game.panel.key_2.y",
     &game.panel.key[1].y
+  },
+  {
+    "game.panel.key_2.tile_size",
+    &game.panel.key[1].size
   },
   {
     "game.panel.key_3.x",
@@ -2057,12 +2269,20 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.key[2].y
   },
   {
+    "game.panel.key_3.tile_size",
+    &game.panel.key[2].size
+  },
+  {
     "game.panel.key_4.x",
     &game.panel.key[3].x
   },
   {
     "game.panel.key_4.y",
     &game.panel.key[3].y
+  },
+  {
+    "game.panel.key_4.tile_size",
+    &game.panel.key[3].size
   },
   {
     "game.panel.key_5.x",
@@ -2073,12 +2293,20 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.key[4].y
   },
   {
+    "game.panel.key_5.tile_size",
+    &game.panel.key[4].size
+  },
+  {
     "game.panel.key_6.x",
     &game.panel.key[5].x
   },
   {
     "game.panel.key_6.y",
     &game.panel.key[5].y
+  },
+  {
+    "game.panel.key_6.tile_size",
+    &game.panel.key[5].size
   },
   {
     "game.panel.key_7.x",
@@ -2089,6 +2317,10 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.key[6].y
   },
   {
+    "game.panel.key_7.tile_size",
+    &game.panel.key[6].size
+  },
+  {
     "game.panel.key_8.x",
     &game.panel.key[7].x
   },
@@ -2097,12 +2329,20 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.key[7].y
   },
   {
+    "game.panel.key_8.tile_size",
+    &game.panel.key[7].size
+  },
+  {
     "game.panel.key_white.x",
     &game.panel.key_white.x
   },
   {
     "game.panel.key_white.y",
     &game.panel.key_white.y
+  },
+  {
+    "game.panel.key_white.tile_size",
+    &game.panel.key_white.size
   },
   {
     "game.panel.key_white_count.x",
@@ -2121,8 +2361,8 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.key_white_count.valign
   },
   {
-    "game.panel.key_white_count.chars",
-    &game.panel.key_white_count.chars
+    "game.panel.key_white_count.digits",
+    &game.panel.key_white_count.size
   },
   {
     "game.panel.key_white_count.font",
@@ -2145,8 +2385,8 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.score.valign
   },
   {
-    "game.panel.score.chars",
-    &game.panel.score.chars
+    "game.panel.score.digits",
+    &game.panel.score.size
   },
   {
     "game.panel.score.font",
@@ -2169,8 +2409,8 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.time.valign
   },
   {
-    "game.panel.time.chars",
-    &game.panel.time.chars
+    "game.panel.time.digits",
+    &game.panel.time.size
   },
   {
     "game.panel.time.font",
@@ -2197,8 +2437,8 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.time_hh.valign
   },
   {
-    "game.panel.time_hh.chars",
-    &game.panel.time_hh.chars
+    "game.panel.time_hh.digits",
+    &game.panel.time_hh.size
   },
   {
     "game.panel.time_hh.font",
@@ -2221,8 +2461,8 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.time_mm.valign
   },
   {
-    "game.panel.time_mm.chars",
-    &game.panel.time_mm.chars
+    "game.panel.time_mm.digits",
+    &game.panel.time_mm.size
   },
   {
     "game.panel.time_mm.font",
@@ -2245,76 +2485,12 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.time_ss.valign
   },
   {
-    "game.panel.time_ss.chars",
-    &game.panel.time_ss.chars
+    "game.panel.time_ss.digits",
+    &game.panel.time_ss.size
   },
   {
     "game.panel.time_ss.font",
     &game.panel.time_ss.font
-  },
-  {
-    "game.panel.drop_next_1.x",
-    &game.panel.drop_next_1.x
-  },
-  {
-    "game.panel.drop_next_1.y",
-    &game.panel.drop_next_1.y
-  },
-  {
-    "game.panel.drop_next_2.x",
-    &game.panel.drop_next_2.x
-  },
-  {
-    "game.panel.drop_next_2.y",
-    &game.panel.drop_next_2.y
-  },
-  {
-    "game.panel.drop_next_3.x",
-    &game.panel.drop_next_3.x
-  },
-  {
-    "game.panel.drop_next_3.y",
-    &game.panel.drop_next_3.y
-  },
-  {
-    "game.panel.drop_next_4.x",
-    &game.panel.drop_next_4.x
-  },
-  {
-    "game.panel.drop_next_4.y",
-    &game.panel.drop_next_4.y
-  },
-  {
-    "game.panel.drop_next_5.x",
-    &game.panel.drop_next_5.x
-  },
-  {
-    "game.panel.drop_next_5.y",
-    &game.panel.drop_next_5.y
-  },
-  {
-    "game.panel.drop_next_6.x",
-    &game.panel.drop_next_6.x
-  },
-  {
-    "game.panel.drop_next_6.y",
-    &game.panel.drop_next_6.y
-  },
-  {
-    "game.panel.drop_next_7.x",
-    &game.panel.drop_next_7.x
-  },
-  {
-    "game.panel.drop_next_7.y",
-    &game.panel.drop_next_7.y
-  },
-  {
-    "game.panel.drop_next_8.x",
-    &game.panel.drop_next_8.x
-  },
-  {
-    "game.panel.drop_next_8.y",
-    &game.panel.drop_next_8.y
   },
   {
     "game.panel.shield_normal.x",
@@ -2323,6 +2499,10 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "game.panel.shield_normal.y",
     &game.panel.shield_normal.y
+  },
+  {
+    "game.panel.shield_normal.tile_size",
+    &game.panel.shield_normal.size
   },
   {
     "game.panel.shield_normal_time.x",
@@ -2341,8 +2521,8 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.shield_normal_time.valign
   },
   {
-    "game.panel.shield_normal_time.chars",
-    &game.panel.shield_normal_time.chars
+    "game.panel.shield_normal_time.digits",
+    &game.panel.shield_normal_time.size
   },
   {
     "game.panel.shield_normal_time.font",
@@ -2355,6 +2535,10 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "game.panel.shield_deadly.y",
     &game.panel.shield_deadly.y
+  },
+  {
+    "game.panel.shield_deadly.tile_size",
+    &game.panel.shield_deadly.size
   },
   {
     "game.panel.shield_deadly_time.x",
@@ -2373,8 +2557,8 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.shield_deadly_time.valign
   },
   {
-    "game.panel.shield_deadly_time.chars",
-    &game.panel.shield_deadly_time.chars
+    "game.panel.shield_deadly_time.digits",
+    &game.panel.shield_deadly_time.size
   },
   {
     "game.panel.shield_deadly_time.font",
@@ -2389,12 +2573,20 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.exit.y
   },
   {
+    "game.panel.exit.tile_size",
+    &game.panel.exit.size
+  },
+  {
     "game.panel.em_exit.x",
     &game.panel.em_exit.x
   },
   {
     "game.panel.em_exit.y",
     &game.panel.em_exit.y
+  },
+  {
+    "game.panel.em_exit.tile_size",
+    &game.panel.em_exit.size
   },
   {
     "game.panel.sp_exit.x",
@@ -2405,12 +2597,20 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.sp_exit.y
   },
   {
+    "game.panel.sp_exit.tile_size",
+    &game.panel.sp_exit.size
+  },
+  {
     "game.panel.steel_exit.x",
     &game.panel.steel_exit.x
   },
   {
     "game.panel.steel_exit.y",
     &game.panel.steel_exit.y
+  },
+  {
+    "game.panel.steel_exit.tile_size",
+    &game.panel.steel_exit.size
   },
   {
     "game.panel.em_steel_exit.x",
@@ -2421,12 +2621,20 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.em_steel_exit.y
   },
   {
+    "game.panel.em_steel_exit.tile_size",
+    &game.panel.em_steel_exit.size
+  },
+  {
     "game.panel.emc_magic_ball.x",
     &game.panel.emc_magic_ball.x
   },
   {
     "game.panel.emc_magic_ball.y",
     &game.panel.emc_magic_ball.y
+  },
+  {
+    "game.panel.emc_magic_ball.tile_size",
+    &game.panel.emc_magic_ball.size
   },
   {
     "game.panel.emc_magic_ball_switch.x",
@@ -2437,12 +2645,20 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.emc_magic_ball_switch.y
   },
   {
+    "game.panel.emc_magic_ball_switch.tile_size",
+    &game.panel.emc_magic_ball_switch.size
+  },
+  {
     "game.panel.light_switch.x",
     &game.panel.light_switch.x
   },
   {
     "game.panel.light_switch.y",
     &game.panel.light_switch.y
+  },
+  {
+    "game.panel.light_switch.tile_size",
+    &game.panel.light_switch.size
   },
   {
     "game.panel.light_switch_time.x",
@@ -2461,8 +2677,8 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.light_switch_time.valign
   },
   {
-    "game.panel.light_switch_time.chars",
-    &game.panel.light_switch_time.chars
+    "game.panel.light_switch_time.digits",
+    &game.panel.light_switch_time.size
   },
   {
     "game.panel.light_switch_time.font",
@@ -2475,6 +2691,10 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "game.panel.timegate_switch.y",
     &game.panel.timegate_switch.y
+  },
+  {
+    "game.panel.timegate_switch.tile_size",
+    &game.panel.timegate_switch.size
   },
   {
     "game.panel.timegate_switch_time.x",
@@ -2493,8 +2713,8 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.timegate_switch_time.valign
   },
   {
-    "game.panel.timegate_switch_time.chars",
-    &game.panel.timegate_switch_time.chars
+    "game.panel.timegate_switch_time.digits",
+    &game.panel.timegate_switch_time.size
   },
   {
     "game.panel.timegate_switch_time.font",
@@ -2509,12 +2729,20 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.switchgate_switch.y
   },
   {
+    "game.panel.switchgate_switch.tile_size",
+    &game.panel.switchgate_switch.size
+  },
+  {
     "game.panel.emc_lenses.x",
     &game.panel.emc_lenses.x
   },
   {
     "game.panel.emc_lenses.y",
     &game.panel.emc_lenses.y
+  },
+  {
+    "game.panel.emc_lenses.tile_size",
+    &game.panel.emc_lenses.size
   },
   {
     "game.panel.emc_lenses_time.x",
@@ -2533,8 +2761,8 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.emc_lenses_time.valign
   },
   {
-    "game.panel.emc_lenses_time.chars",
-    &game.panel.emc_lenses_time.chars
+    "game.panel.emc_lenses_time.digits",
+    &game.panel.emc_lenses_time.size
   },
   {
     "game.panel.emc_lenses_time.font",
@@ -2547,6 +2775,10 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "game.panel.emc_magnifier.y",
     &game.panel.emc_magnifier.y
+  },
+  {
+    "game.panel.emc_magnifier.tile_size",
+    &game.panel.emc_magnifier.size
   },
   {
     "game.panel.emc_magnifier_time.x",
@@ -2565,8 +2797,8 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.emc_magnifier_time.valign
   },
   {
-    "game.panel.emc_magnifier_time.chars",
-    &game.panel.emc_magnifier_time.chars
+    "game.panel.emc_magnifier_time.digits",
+    &game.panel.emc_magnifier_time.size
   },
   {
     "game.panel.emc_magnifier_time.font",
@@ -2579,6 +2811,10 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "game.panel.balloon_switch.y",
     &game.panel.balloon_switch.y
+  },
+  {
+    "game.panel.balloon_switch.tile_size",
+    &game.panel.balloon_switch.size
   },
   {
     "game.panel.dynabomb_number.x",
@@ -2597,8 +2833,8 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.dynabomb_number.valign
   },
   {
-    "game.panel.dynabomb_number.chars",
-    &game.panel.dynabomb_number.chars
+    "game.panel.dynabomb_number.digits",
+    &game.panel.dynabomb_number.size
   },
   {
     "game.panel.dynabomb_number.font",
@@ -2621,8 +2857,8 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.dynabomb_size.valign
   },
   {
-    "game.panel.dynabomb_size.chars",
-    &game.panel.dynabomb_size.chars
+    "game.panel.dynabomb_size.digits",
+    &game.panel.dynabomb_size.size
   },
   {
     "game.panel.dynabomb_size.font",
@@ -2635,6 +2871,10 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "game.panel.dynabomb_power.y",
     &game.panel.dynabomb_power.y
+  },
+  {
+    "game.panel.dynabomb_power.tile_size",
+    &game.panel.dynabomb_power.size
   },
   {
     "game.panel.penguins.x",
@@ -2653,8 +2893,8 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.penguins.valign
   },
   {
-    "game.panel.penguins.chars",
-    &game.panel.penguins.chars
+    "game.panel.penguins.digits",
+    &game.panel.penguins.size
   },
   {
     "game.panel.penguins.font",
@@ -2677,8 +2917,8 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.sokoban_objects.valign
   },
   {
-    "game.panel.sokoban_objects.chars",
-    &game.panel.sokoban_objects.chars
+    "game.panel.sokoban_objects.digits",
+    &game.panel.sokoban_objects.size
   },
   {
     "game.panel.sokoban_objects.font",
@@ -2701,8 +2941,8 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.sokoban_fields.valign
   },
   {
-    "game.panel.sokoban_fields.chars",
-    &game.panel.sokoban_fields.chars
+    "game.panel.sokoban_fields.digits",
+    &game.panel.sokoban_fields.size
   },
   {
     "game.panel.sokoban_fields.font",
@@ -2717,12 +2957,20 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.robot_wheel.y
   },
   {
+    "game.panel.robot_wheel.tile_size",
+    &game.panel.robot_wheel.size
+  },
+  {
     "game.panel.conveyor_belt_1.x",
     &game.panel.conveyor_belt_1.x
   },
   {
     "game.panel.conveyor_belt_1.y",
     &game.panel.conveyor_belt_1.y
+  },
+  {
+    "game.panel.conveyor_belt_1.tile_size",
+    &game.panel.conveyor_belt_1.size
   },
   {
     "game.panel.conveyor_belt_1_switch.x",
@@ -2733,12 +2981,20 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.conveyor_belt_1_switch.y
   },
   {
+    "game.panel.conveyor_belt_1_switch.tile_size",
+    &game.panel.conveyor_belt_1_switch.size
+  },
+  {
     "game.panel.conveyor_belt_2.x",
     &game.panel.conveyor_belt_2.x
   },
   {
     "game.panel.conveyor_belt_2.y",
     &game.panel.conveyor_belt_2.y
+  },
+  {
+    "game.panel.conveyor_belt_2.tile_size",
+    &game.panel.conveyor_belt_2.size
   },
   {
     "game.panel.conveyor_belt_2_switch.x",
@@ -2749,12 +3005,20 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.conveyor_belt_2_switch.y
   },
   {
+    "game.panel.conveyor_belt_2_switch.tile_size",
+    &game.panel.conveyor_belt_2_switch.size
+  },
+  {
     "game.panel.conveyor_belt_3.x",
     &game.panel.conveyor_belt_3.x
   },
   {
     "game.panel.conveyor_belt_3.y",
     &game.panel.conveyor_belt_3.y
+  },
+  {
+    "game.panel.conveyor_belt_3.tile_size",
+    &game.panel.conveyor_belt_3.size
   },
   {
     "game.panel.conveyor_belt_3_switch.x",
@@ -2765,12 +3029,20 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.conveyor_belt_3_switch.y
   },
   {
+    "game.panel.conveyor_belt_3_switch.tile_size",
+    &game.panel.conveyor_belt_3_switch.size
+  },
+  {
     "game.panel.conveyor_belt_4.x",
     &game.panel.conveyor_belt_4.x
   },
   {
     "game.panel.conveyor_belt_4.y",
     &game.panel.conveyor_belt_4.y
+  },
+  {
+    "game.panel.conveyor_belt_4.tile_size",
+    &game.panel.conveyor_belt_4.size
   },
   {
     "game.panel.conveyor_belt_4_switch.x",
@@ -2781,12 +3053,20 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.conveyor_belt_4_switch.y
   },
   {
+    "game.panel.conveyor_belt_4_switch.tile_size",
+    &game.panel.conveyor_belt_4_switch.size
+  },
+  {
     "game.panel.magic_wall.x",
     &game.panel.magic_wall.x
   },
   {
     "game.panel.magic_wall.y",
     &game.panel.magic_wall.y
+  },
+  {
+    "game.panel.magic_wall.tile_size",
+    &game.panel.magic_wall.size
   },
   {
     "game.panel.magic_wall_time.x",
@@ -2805,8 +3085,8 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.magic_wall_time.valign
   },
   {
-    "game.panel.magic_wall_time.chars",
-    &game.panel.magic_wall_time.chars
+    "game.panel.magic_wall_time.digits",
+    &game.panel.magic_wall_time.size
   },
   {
     "game.panel.magic_wall_time.font",
@@ -2821,12 +3101,20 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.bd_magic_wall.y
   },
   {
+    "game.panel.bd_magic_wall.tile_size",
+    &game.panel.bd_magic_wall.size
+  },
+  {
     "game.panel.dc_magic_wall.x",
     &game.panel.dc_magic_wall.x
   },
   {
     "game.panel.dc_magic_wall.y",
     &game.panel.dc_magic_wall.y
+  },
+  {
+    "game.panel.dc_magic_wall.tile_size",
+    &game.panel.dc_magic_wall.size
   },
   {
     "game.panel.player_name.x",
@@ -2846,7 +3134,7 @@ struct TokenIntPtrInfo image_config_vars[] =
   },
   {
     "game.panel.player_name.chars",
-    &game.panel.player_name.chars
+    &game.panel.player_name.size
   },
   {
     "game.panel.player_name.font",
@@ -2870,7 +3158,7 @@ struct TokenIntPtrInfo image_config_vars[] =
   },
   {
     "game.panel.level_name.chars",
-    &game.panel.level_name.chars
+    &game.panel.level_name.size
   },
   {
     "game.panel.level_name.font",
@@ -2894,7 +3182,7 @@ struct TokenIntPtrInfo image_config_vars[] =
   },
   {
     "game.panel.level_author.chars",
-    &game.panel.level_author.chars
+    &game.panel.level_author.size
   },
   {
     "game.panel.level_author.font",

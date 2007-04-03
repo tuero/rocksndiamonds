@@ -758,9 +758,13 @@ static void InitializeMainControls()
 
   /* set main control text values to dynamically determined values */
   sprintf(main_text_name,         "%s",   local_team_mode ? "Team:" : "Name:");
-  sprintf(main_text_first_level,  "%03d", leveldir_current->first_level);
-  sprintf(main_text_last_level,   "%03d", leveldir_current->last_level);
-  sprintf(main_text_level_number, "%s",   int2str(level_nr, 3));
+
+  strcpy(main_text_first_level,  int2str(leveldir_current->first_level,
+					 menu.main.text.first_level.size));
+  strcpy(main_text_last_level,   int2str(leveldir_current->last_level,
+					 menu.main.text.last_level.size));
+  strcpy(main_text_level_number, int2str(level_nr,
+					 menu.main.text.level_number.size));
 
   main_text_level_year		= leveldir_current->year;
   main_text_level_imported_from	= leveldir_current->imported_from;
@@ -1887,7 +1891,8 @@ void HandleMainMenu_SelectLevel(int step, int direction)
 
 #if 1
     DrawText(mSX + mci->pos_text->x, mSY + mci->pos_text->y,
-	     int2str(level_nr, 3), mci->pos_text->font);
+	     int2str(level_nr, menu.main.text.level_number.size),
+	     mci->pos_text->font);
 #else
     DrawText(mSX + 11 * 32, mSY + 3 * 32, int2str(level_nr, 3), FONT_VALUE_1);
 #endif

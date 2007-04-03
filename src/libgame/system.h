@@ -1050,7 +1050,7 @@ struct TextPosInfo
   int x, y;
   int width, height;
   int align, valign;
-  int chars;
+  int size;
   int font, font_alt;
 };
 
