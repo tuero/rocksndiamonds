@@ -170,46 +170,41 @@
 #define GAME_CONTROL_SHIELD_DEADLY		36
 #define GAME_CONTROL_SHIELD_DEADLY_TIME		37
 #define GAME_CONTROL_EXIT			38
-#define GAME_CONTROL_EM_EXIT			39
-#define GAME_CONTROL_SP_EXIT			40
-#define GAME_CONTROL_STEEL_EXIT			41
-#define GAME_CONTROL_EM_STEEL_EXIT		42
-#define GAME_CONTROL_EMC_MAGIC_BALL		43
-#define GAME_CONTROL_EMC_MAGIC_BALL_SWITCH	44
-#define GAME_CONTROL_LIGHT_SWITCH		45
-#define GAME_CONTROL_LIGHT_SWITCH_TIME		46
-#define GAME_CONTROL_TIMEGATE_SWITCH		47
-#define GAME_CONTROL_TIMEGATE_SWITCH_TIME	48
-#define GAME_CONTROL_SWITCHGATE_SWITCH		49
-#define GAME_CONTROL_EMC_LENSES			50
-#define GAME_CONTROL_EMC_LENSES_TIME		51
-#define GAME_CONTROL_EMC_MAGNIFIER		52
-#define GAME_CONTROL_EMC_MAGNIFIER_TIME		53
-#define GAME_CONTROL_BALLOON_SWITCH		54
-#define GAME_CONTROL_DYNABOMB_NUMBER		55
-#define GAME_CONTROL_DYNABOMB_SIZE		56
-#define GAME_CONTROL_DYNABOMB_POWER		57
-#define GAME_CONTROL_PENGUINS			58
-#define GAME_CONTROL_SOKOBAN_OBJECTS		59
-#define GAME_CONTROL_SOKOBAN_FIELDS		60
-#define GAME_CONTROL_ROBOT_WHEEL		61
-#define GAME_CONTROL_CONVEYOR_BELT_1		62
-#define GAME_CONTROL_CONVEYOR_BELT_1_SWITCH	63
-#define GAME_CONTROL_CONVEYOR_BELT_2		64
-#define GAME_CONTROL_CONVEYOR_BELT_2_SWITCH	65
-#define GAME_CONTROL_CONVEYOR_BELT_3		66
-#define GAME_CONTROL_CONVEYOR_BELT_3_SWITCH	67
-#define GAME_CONTROL_CONVEYOR_BELT_4		68
-#define GAME_CONTROL_CONVEYOR_BELT_4_SWITCH	69
-#define GAME_CONTROL_MAGIC_WALL			70
-#define GAME_CONTROL_MAGIC_WALL_TIME		71
-#define GAME_CONTROL_BD_MAGIC_WALL		72
-#define GAME_CONTROL_DC_MAGIC_WALL		73
-#define GAME_CONTROL_PLAYER_NAME		74
-#define GAME_CONTROL_LEVEL_NAME			75
-#define GAME_CONTROL_LEVEL_AUTHOR		76
+#define GAME_CONTROL_EMC_MAGIC_BALL		39
+#define GAME_CONTROL_EMC_MAGIC_BALL_SWITCH	40
+#define GAME_CONTROL_LIGHT_SWITCH		41
+#define GAME_CONTROL_LIGHT_SWITCH_TIME		42
+#define GAME_CONTROL_TIMEGATE_SWITCH		43
+#define GAME_CONTROL_TIMEGATE_SWITCH_TIME	44
+#define GAME_CONTROL_SWITCHGATE_SWITCH		45
+#define GAME_CONTROL_EMC_LENSES			46
+#define GAME_CONTROL_EMC_LENSES_TIME		47
+#define GAME_CONTROL_EMC_MAGNIFIER		48
+#define GAME_CONTROL_EMC_MAGNIFIER_TIME		49
+#define GAME_CONTROL_BALLOON_SWITCH		50
+#define GAME_CONTROL_DYNABOMB_NUMBER		51
+#define GAME_CONTROL_DYNABOMB_SIZE		52
+#define GAME_CONTROL_DYNABOMB_POWER		53
+#define GAME_CONTROL_PENGUINS			54
+#define GAME_CONTROL_SOKOBAN_OBJECTS		55
+#define GAME_CONTROL_SOKOBAN_FIELDS		56
+#define GAME_CONTROL_ROBOT_WHEEL		57
+#define GAME_CONTROL_CONVEYOR_BELT_1		58
+#define GAME_CONTROL_CONVEYOR_BELT_1_SWITCH	59
+#define GAME_CONTROL_CONVEYOR_BELT_2		60
+#define GAME_CONTROL_CONVEYOR_BELT_2_SWITCH	61
+#define GAME_CONTROL_CONVEYOR_BELT_3		62
+#define GAME_CONTROL_CONVEYOR_BELT_3_SWITCH	63
+#define GAME_CONTROL_CONVEYOR_BELT_4		64
+#define GAME_CONTROL_CONVEYOR_BELT_4_SWITCH	65
+#define GAME_CONTROL_MAGIC_WALL			66
+#define GAME_CONTROL_MAGIC_WALL_TIME		67
+#define GAME_CONTROL_GRAVITY_STATE		68
+#define GAME_CONTROL_PLAYER_NAME		69
+#define GAME_CONTROL_LEVEL_NAME			70
+#define GAME_CONTROL_LEVEL_AUTHOR		71
 
-#define NUM_GAME_CONTROLS			77
+#define NUM_GAME_CONTROLS			72
 
 int game_control_value[NUM_GAME_CONTROLS];
 int last_game_control_value[NUM_GAME_CONTROLS];
@@ -420,26 +415,6 @@ static struct GameControlInfo game_controls[] =
     TYPE_ELEMENT,
   },
   {
-    GAME_CONTROL_EM_EXIT,
-    &game.panel.em_exit,
-    TYPE_ELEMENT,
-  },
-  {
-    GAME_CONTROL_SP_EXIT,
-    &game.panel.sp_exit,
-    TYPE_ELEMENT,
-  },
-  {
-    GAME_CONTROL_STEEL_EXIT,
-    &game.panel.steel_exit,
-    TYPE_ELEMENT,
-  },
-  {
-    GAME_CONTROL_EM_STEEL_EXIT,
-    &game.panel.em_steel_exit,
-    TYPE_ELEMENT,
-  },
-  {
     GAME_CONTROL_EMC_MAGIC_BALL,
     &game.panel.emc_magic_ball,
     TYPE_ELEMENT,
@@ -585,14 +560,9 @@ static struct GameControlInfo game_controls[] =
     TYPE_INTEGER,
   },
   {
-    GAME_CONTROL_BD_MAGIC_WALL,
-    &game.panel.bd_magic_wall,
-    TYPE_ELEMENT,
-  },
-  {
-    GAME_CONTROL_DC_MAGIC_WALL,
-    &game.panel.dc_magic_wall,
-    TYPE_ELEMENT,
+    GAME_CONTROL_GRAVITY_STATE,
+    &game.panel.gravity_state,
+    TYPE_STRING,
   },
   {
     GAME_CONTROL_PLAYER_NAME,
@@ -1858,6 +1828,9 @@ void UpdateGameControlValues()
   int time = (level.time == 0 ? TimePlayed : TimeLeft);
   int score = (local_player->LevelSolved ? local_player->score_final :
 	       local_player->score);
+  int exit_closed = (local_player->gems_still_needed > 0 ||
+		     local_player->sokobanfields_still_needed > 0 ||
+		     local_player->lights_still_needed > 0);
 
   game_control_value[GAME_CONTROL_LEVEL_NUMBER] = level_nr;
   game_control_value[GAME_CONTROL_GEMS] = local_player->gems_still_needed;
@@ -1933,28 +1906,15 @@ void UpdateGameControlValues()
   game_control_value[GAME_CONTROL_SHIELD_DEADLY_TIME] =
     local_player->shield_deadly_time_left;
 
-  if (local_player->gems_still_needed > 0 ||
-      local_player->sokobanfields_still_needed > 0 ||
-      local_player->lights_still_needed > 0)
-  {
-    game_control_value[GAME_CONTROL_EXIT]          = EL_EXIT_CLOSED;
-    game_control_value[GAME_CONTROL_EM_EXIT]       = EL_EM_EXIT_CLOSED;
-    game_control_value[GAME_CONTROL_SP_EXIT]       = EL_SP_EXIT_CLOSED;
-    game_control_value[GAME_CONTROL_STEEL_EXIT]    = EL_STEEL_EXIT_CLOSED;
-    game_control_value[GAME_CONTROL_EM_STEEL_EXIT] = EL_EM_STEEL_EXIT_CLOSED;
-  }
-  else
-  {
-    game_control_value[GAME_CONTROL_EXIT]          = EL_EXIT_OPEN;
-    game_control_value[GAME_CONTROL_EM_EXIT]       = EL_EM_EXIT_OPEN;
-    game_control_value[GAME_CONTROL_SP_EXIT]       = EL_SP_EXIT_OPEN;
-    game_control_value[GAME_CONTROL_STEEL_EXIT]    = EL_STEEL_EXIT_OPEN;
-    game_control_value[GAME_CONTROL_EM_STEEL_EXIT] = EL_EM_STEEL_EXIT_OPEN;
-  }
+  game_control_value[GAME_CONTROL_EXIT] =
+    (exit_closed ? EL_EXIT_CLOSED : EL_EXIT_OPEN);
 
   /* !!! TODO !!! */
-  game_control_value[GAME_CONTROL_EMC_MAGIC_BALL] = EL_UNDEFINED;
-  game_control_value[GAME_CONTROL_EMC_MAGIC_BALL_SWITCH] = EL_UNDEFINED;
+  game_control_value[GAME_CONTROL_EMC_MAGIC_BALL] =
+    (game.ball_state ? EL_EMC_MAGIC_BALL_ACTIVE : EL_EMC_MAGIC_BALL);
+  game_control_value[GAME_CONTROL_EMC_MAGIC_BALL_SWITCH] =
+    (game.ball_state ? EL_EMC_MAGIC_BALL_SWITCH_ACTIVE :
+     EL_EMC_MAGIC_BALL_SWITCH);
 
   game_control_value[GAME_CONTROL_LIGHT_SWITCH] =
     (game.light_time_left > 0 ? EL_LIGHT_SWITCH_ACTIVE : EL_LIGHT_SWITCH);
@@ -1966,7 +1926,8 @@ void UpdateGameControlValues()
     game.timegate_time_left;
 
   /* !!! TODO !!! */
-  game_control_value[GAME_CONTROL_SWITCHGATE_SWITCH] = EL_UNDEFINED;
+  game_control_value[GAME_CONTROL_SWITCHGATE_SWITCH] =
+    EL_SWITCHGATE_SWITCH_UP + game.switchgate_pos;
 
   game_control_value[GAME_CONTROL_EMC_LENSES] =
     (game.lenses_time_left > 0 ? EL_EMC_LENSES : EL_EMPTY);
@@ -2012,11 +1973,15 @@ void UpdateGameControlValues()
   game_control_value[GAME_CONTROL_CONVEYOR_BELT_4_SWITCH] = EL_UNDEFINED;
 
   /* !!! TODO !!! */
-  game_control_value[GAME_CONTROL_MAGIC_WALL] = EL_UNDEFINED;
-  game_control_value[GAME_CONTROL_MAGIC_WALL_TIME] =
-    game.magic_wall_time_left;
-  game_control_value[GAME_CONTROL_BD_MAGIC_WALL] = EL_UNDEFINED;
-  game_control_value[GAME_CONTROL_DC_MAGIC_WALL] = EL_UNDEFINED;
+  game_control_value[GAME_CONTROL_MAGIC_WALL] =
+    (game.magic_wall_active ? EL_MAGIC_WALL_ACTIVE : EL_MAGIC_WALL);
+  game_control_value[GAME_CONTROL_MAGIC_WALL_TIME] = game.magic_wall_time_left;
+
+#if USE_PLAYER_GRAVITY
+  game_control_value[GAME_CONTROL_GRAVITY_STATE] = local_player->gravity;
+#else
+  game_control_value[GAME_CONTROL_GRAVITY_STATE] = game.gravity;
+#endif
 
   game_control_value[GAME_CONTROL_PLAYER_NAME] = 0;
   game_control_value[GAME_CONTROL_LEVEL_NAME] = 0;
@@ -2110,13 +2075,41 @@ void DisplayGameControlValues()
     }
     else if (type == TYPE_STRING)
     {
-      char *s = (nr == GAME_CONTROL_PLAYER_NAME  ? setup.player_name :
-		 nr == GAME_CONTROL_LEVEL_NAME   ? level.name :
-		 nr == GAME_CONTROL_LEVEL_AUTHOR ? level.author : NULL);
+      boolean active = (value != 0);
+      char *state_normal = "off";
+      char *state_active = "on";
+      char *state = (active ? state_active : state_normal);
+      char *s = (nr == GAME_CONTROL_GRAVITY_STATE ? state :
+		 nr == GAME_CONTROL_PLAYER_NAME   ? setup.player_name :
+		 nr == GAME_CONTROL_LEVEL_NAME    ? level.name :
+		 nr == GAME_CONTROL_LEVEL_AUTHOR  ? level.author : NULL);
+
+      if (nr == GAME_CONTROL_GRAVITY_STATE)
+      {
+	int font1 = pos->font;		/* (used for normal state) */
+	int font2 = pos->font_alt;	/* (used for active state) */
+	int size1 = strlen(state_normal);
+	int size2 = strlen(state_active);
+	int width1 = size1 * getFontWidth(font1);
+	int width2 = size2 * getFontWidth(font2);
+	int max_width = MAX(width1, width2);
+	int max_height = MAX(getFontHeight(font1), getFontHeight(font2));
+
+	pos->width = max_width;
+
+	/* clear background for values that may have changed its size */
+	ClearRectangleOnBackground(drawto, PANEL_XPOS(pos), PANEL_YPOS(pos),
+				   max_width, max_height);
+
+	font = (active ? font2 : font1);
+      }
 
       if (s != NULL)
       {
 	char *s_cut = getStringCopyN(s, size);
+
+	size = strlen(s_cut);	/* string size may be smaller than "chars" */
+	pos->width = size * getFontWidth(font);
 
 	DrawText(PANEL_XPOS(pos), PANEL_YPOS(pos), s_cut, font);
 

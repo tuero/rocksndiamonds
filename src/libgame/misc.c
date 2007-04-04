@@ -567,7 +567,7 @@ char *getStringCopyN(char *s, int n)
 
   s_copy = checked_malloc(s_len + 1);
   strncpy(s_copy, s, s_len);
-  s[s_len] = '\0';
+  s_copy[s_len] = '\0';
 
   return s_copy;
 }

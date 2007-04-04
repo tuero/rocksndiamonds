@@ -2577,54 +2577,6 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.exit.size
   },
   {
-    "game.panel.em_exit.x",
-    &game.panel.em_exit.x
-  },
-  {
-    "game.panel.em_exit.y",
-    &game.panel.em_exit.y
-  },
-  {
-    "game.panel.em_exit.tile_size",
-    &game.panel.em_exit.size
-  },
-  {
-    "game.panel.sp_exit.x",
-    &game.panel.sp_exit.x
-  },
-  {
-    "game.panel.sp_exit.y",
-    &game.panel.sp_exit.y
-  },
-  {
-    "game.panel.sp_exit.tile_size",
-    &game.panel.sp_exit.size
-  },
-  {
-    "game.panel.steel_exit.x",
-    &game.panel.steel_exit.x
-  },
-  {
-    "game.panel.steel_exit.y",
-    &game.panel.steel_exit.y
-  },
-  {
-    "game.panel.steel_exit.tile_size",
-    &game.panel.steel_exit.size
-  },
-  {
-    "game.panel.em_steel_exit.x",
-    &game.panel.em_steel_exit.x
-  },
-  {
-    "game.panel.em_steel_exit.y",
-    &game.panel.em_steel_exit.y
-  },
-  {
-    "game.panel.em_steel_exit.tile_size",
-    &game.panel.em_steel_exit.size
-  },
-  {
     "game.panel.emc_magic_ball.x",
     &game.panel.emc_magic_ball.x
   },
@@ -3093,28 +3045,32 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.magic_wall_time.font
   },
   {
-    "game.panel.bd_magic_wall.x",
-    &game.panel.bd_magic_wall.x
+    "game.panel.gravity_state.x",
+    &game.panel.gravity_state.x
   },
   {
-    "game.panel.bd_magic_wall.y",
-    &game.panel.bd_magic_wall.y
+    "game.panel.gravity_state.y",
+    &game.panel.gravity_state.y
   },
   {
-    "game.panel.bd_magic_wall.tile_size",
-    &game.panel.bd_magic_wall.size
+    "game.panel.gravity_state.align",
+    &game.panel.gravity_state.align
   },
   {
-    "game.panel.dc_magic_wall.x",
-    &game.panel.dc_magic_wall.x
+    "game.panel.gravity_state.valign",
+    &game.panel.gravity_state.valign
   },
   {
-    "game.panel.dc_magic_wall.y",
-    &game.panel.dc_magic_wall.y
+    "game.panel.gravity_state.chars",
+    &game.panel.gravity_state.size
   },
   {
-    "game.panel.dc_magic_wall.tile_size",
-    &game.panel.dc_magic_wall.size
+    "game.panel.gravity_state.font",
+    &game.panel.gravity_state.font
+  },
+  {
+    "game.panel.gravity_state.font_active",
+    &game.panel.gravity_state.font_alt
   },
   {
     "game.panel.player_name.x",

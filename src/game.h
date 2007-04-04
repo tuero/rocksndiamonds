@@ -57,10 +57,6 @@ struct GamePanelInfo
   struct TextPosInfo shield_deadly;
   struct TextPosInfo shield_deadly_time;
   struct TextPosInfo exit;
-  struct TextPosInfo em_exit;
-  struct TextPosInfo sp_exit;
-  struct TextPosInfo steel_exit;
-  struct TextPosInfo em_steel_exit;
   struct TextPosInfo emc_magic_ball;
   struct TextPosInfo emc_magic_ball_switch;
   struct TextPosInfo light_switch;
@@ -90,8 +86,7 @@ struct GamePanelInfo
   struct TextPosInfo conveyor_belt_4_switch;
   struct TextPosInfo magic_wall;
   struct TextPosInfo magic_wall_time;
-  struct TextPosInfo bd_magic_wall;
-  struct TextPosInfo dc_magic_wall;
+  struct TextPosInfo gravity_state;
   struct TextPosInfo player_name;
   struct TextPosInfo level_name;
   struct TextPosInfo level_author;

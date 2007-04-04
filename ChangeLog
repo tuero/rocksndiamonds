@@ -1,3 +1,7 @@
+2007-04-04
+	* cleanup of game panel elements (some elements were not really needed)
+	* added displaying of gravity state (on/off) as new game panel control
+
 2007-04-03
 	* added new pseudo game mode "PANEL" to define panel fonts and graphics
 	  - panel fonts now use ".PANEL" suffix instead of ".PLAYING" suffix
