@@ -920,8 +920,8 @@ inline int getGraphicAnimationFrame(int graphic, int sync_frame)
 			   sync_frame);
 }
 
-void getSizedGraphicSource(int graphic, Bitmap **bitmap, int *x, int *y,
-			   int tilesize_raw)
+void getSizedGraphicSource(int graphic, int frame, int tilesize_raw,
+			   Bitmap **bitmap, int *x, int *y)
 {
   struct
   {
@@ -937,27 +937,54 @@ void getSizedGraphicSource(int graphic, Bitmap **bitmap, int *x, int *y,
     { 0, 1,	2, 3	},	/* 16 x 16 */
     { 0, 1,	0, 1	},	/* 32 x 32 */
   };
+  struct GraphicInfo *g = &graphic_info[graphic];
+  Bitmap *src_bitmap = g->bitmap;
   int tilesize = MIN(MAX(1, tilesize_raw), TILESIZE);
   int offset_calc_pos = log_2(tilesize);
-  Bitmap *src_bitmap = graphic_info[graphic].bitmap;
   int width_mult  = offset_calc[offset_calc_pos].width_mult;
   int width_div   = offset_calc[offset_calc_pos].width_div;
   int height_mult = offset_calc[offset_calc_pos].height_mult;
   int height_div  = offset_calc[offset_calc_pos].height_div;
   int startx = src_bitmap->width * width_mult / width_div;
   int starty = src_bitmap->height * height_mult / height_div;
-  int src_x = startx + graphic_info[graphic].src_x * tilesize / TILESIZE;
-  int src_y = starty + graphic_info[graphic].src_y * tilesize / TILESIZE;
+  int src_x = g->src_x * tilesize / TILESIZE;
+  int src_y = g->src_y * tilesize / TILESIZE;
+  int width = g->width * tilesize / TILESIZE;
+  int height = g->height * tilesize / TILESIZE;
+  int offset_x = g->offset_x * tilesize / TILESIZE;
+  int offset_y = g->offset_y * tilesize / TILESIZE;
+
+  if (g->offset_y == 0)		/* frames are ordered horizontally */
+  {
+    int max_width = g->anim_frames_per_line * width;
+    int pos = (src_y / height) * max_width + src_x + frame * offset_x;
+
+    src_x = pos % max_width;
+    src_y = src_y % height + pos / max_width * height;
+  }
+  else if (g->offset_x == 0)	/* frames are ordered vertically */
+  {
+    int max_height = g->anim_frames_per_line * height;
+    int pos = (src_x / width) * max_height + src_y + frame * offset_y;
+
+    src_x = src_x % width + pos / max_height * width;
+    src_y = pos % max_height;
+  }
+  else				/* frames are ordered diagonally */
+  {
+    src_x = src_x + frame * offset_x;
+    src_y = src_y + frame * offset_y;
+  }
 
   *bitmap = src_bitmap;
-  *x = src_x;
-  *y = src_y;
+  *x = startx + src_x;
+  *y = starty + src_y;
 }
 
 void getMiniGraphicSource(int graphic, Bitmap **bitmap, int *x, int *y)
 {
 #if 1
-  getSizedGraphicSource(graphic, bitmap, x, y, MINI_TILESIZE);
+  getSizedGraphicSource(graphic, 0, MINI_TILESIZE, bitmap, x, y);
 #else
   struct GraphicInfo *g = &graphic_info[graphic];
   int mini_startx = 0;
@@ -1060,19 +1087,20 @@ void DrawGraphicThruMaskExt(DrawBuffer *d, int dst_x, int dst_y, int graphic,
   BlitBitmapMasked(src_bitmap, d, src_x, src_y, TILEX, TILEY, dst_x, dst_y);
 }
 
-void DrawSizedGraphic(int x, int y, int graphic, int tilesize)
+void DrawSizedGraphic(int x, int y, int graphic, int frame, int tilesize)
 {
   DrawSizedGraphicExt(drawto, SX + x * tilesize, SY + y * tilesize, graphic,
-		      tilesize);
+		      frame, tilesize);
   MarkTileDirty(x / tilesize, y / tilesize);
 }
 
-void DrawSizedGraphicExt(DrawBuffer *d, int x, int y, int graphic, int tilesize)
+void DrawSizedGraphicExt(DrawBuffer *d, int x, int y, int graphic, int frame,
+			 int tilesize)
 {
   Bitmap *src_bitmap;
   int src_x, src_y;
 
-  getSizedGraphicSource(graphic, &src_bitmap, &src_x, &src_y, tilesize);
+  getSizedGraphicSource(graphic, frame, tilesize, &src_bitmap, &src_x, &src_y);
   BlitBitmap(src_bitmap, d, src_x, src_y, tilesize, tilesize, x, y);
 }
 
@@ -1894,7 +1922,7 @@ void DrawPreviewElement(int dst_x, int dst_y, int element, int tilesize)
   int src_x, src_y;
   int graphic = el2preimg(element);
 
-  getSizedGraphicSource(graphic, &src_bitmap, &src_x, &src_y, tilesize);
+  getSizedGraphicSource(graphic, 0, tilesize, &src_bitmap, &src_x, &src_y);
   BlitBitmap(src_bitmap, drawto, src_x, src_y, tilesize, tilesize, dst_x,dst_y);
 }
 
@@ -5856,7 +5884,7 @@ int getBeltDirFromBeltSwitchElement(int element)
   return belt_move_dir[belt_dir_nr];
 }
 
-int getBeltElementFromBeltNrAndBeltDir(int belt_nr, int belt_dir)
+int getBeltElementFromBeltNrAndBeltDirNr(int belt_nr, int belt_dir_nr)
 {
   static int belt_base_element[4] =
   {
@@ -5865,12 +5893,18 @@ int getBeltElementFromBeltNrAndBeltDir(int belt_nr, int belt_dir)
     EL_CONVEYOR_BELT_3_LEFT,
     EL_CONVEYOR_BELT_4_LEFT
   };
-  int belt_dir_nr = (belt_dir == MV_LEFT ? 0 : belt_dir == MV_RIGHT ? 2 : 1);
 
   return belt_base_element[belt_nr] + belt_dir_nr;
 }
 
-int getBeltSwitchElementFromBeltNrAndBeltDir(int belt_nr, int belt_dir)
+int getBeltElementFromBeltNrAndBeltDir(int belt_nr, int belt_dir)
+{
+  int belt_dir_nr = (belt_dir == MV_LEFT ? 0 : belt_dir == MV_RIGHT ? 2 : 1);
+
+  return getBeltElementFromBeltNrAndBeltDirNr(belt_nr, belt_dir_nr);
+}
+
+int getBeltSwitchElementFromBeltNrAndBeltDirNr(int belt_nr, int belt_dir_nr)
 {
   static int belt_base_element[4] =
   {
@@ -5879,9 +5913,15 @@ int getBeltSwitchElementFromBeltNrAndBeltDir(int belt_nr, int belt_dir)
     EL_CONVEYOR_BELT_3_SWITCH_LEFT,
     EL_CONVEYOR_BELT_4_SWITCH_LEFT
   };
-  int belt_dir_nr = (belt_dir == MV_LEFT ? 0 : belt_dir == MV_RIGHT ? 2 : 1);
 
   return belt_base_element[belt_nr] + belt_dir_nr;
+}
+
+int getBeltSwitchElementFromBeltNrAndBeltDir(int belt_nr, int belt_dir)
+{
+  int belt_dir_nr = (belt_dir == MV_LEFT ? 0 : belt_dir == MV_RIGHT ? 2 : 1);
+
+  return getBeltSwitchElementFromBeltNrAndBeltDirNr(belt_nr, belt_dir_nr);
 }
 
 int getNumActivePlayers_EM()

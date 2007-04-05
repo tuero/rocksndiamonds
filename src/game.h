@@ -145,6 +145,7 @@ struct GameInfo
 
   /* variable within running game */
   int yamyam_content_nr;
+  boolean robot_wheel_active;
   boolean magic_wall_active;
   int magic_wall_time_left;
   int light_time_left;

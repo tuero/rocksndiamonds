@@ -117,7 +117,7 @@ void DrawAllPlayers(void);
 void DrawPlayerField(int, int);
 void DrawPlayer(struct PlayerInfo *);
 
-void getSizedGraphicSource(int, Bitmap **, int *, int *, int);
+void getSizedGraphicSource(int, int, int, Bitmap **, int *, int *);
 void getMiniGraphicSource(int, Bitmap **, int *, int *);
 void getGraphicSourceExt(int, int, Bitmap **, int *, int *, boolean);
 void getGraphicSource(int, int, Bitmap **, int *, int *);
@@ -126,8 +126,8 @@ void DrawGraphicExt(DrawBuffer *, int, int, int, int);
 void DrawGraphicThruMask(int, int, int, int);
 void DrawGraphicThruMaskExt(DrawBuffer *, int, int, int, int);
 
-void DrawSizedGraphic(int, int, int, int);
-void DrawSizedGraphicExt(DrawBuffer *, int, int, int, int);
+void DrawSizedGraphic(int, int, int, int, int);
+void DrawSizedGraphicExt(DrawBuffer *, int, int, int, int, int);
 void DrawMiniGraphic(int, int, int);
 void DrawMiniGraphicExt(DrawBuffer *, int, int, int);
 
@@ -195,7 +195,9 @@ int getBeltDirNrFromBeltElement(int);
 int getBeltDirNrFromBeltSwitchElement(int);
 int getBeltDirFromBeltElement(int);
 int getBeltDirFromBeltSwitchElement(int);
+int getBeltElementFromBeltNrAndBeltDirNr(int, int);
 int getBeltElementFromBeltNrAndBeltDir(int, int);
+int getBeltSwitchElementFromBeltNrAndBeltDirNr(int, int);
 int getBeltSwitchElementFromBeltNrAndBeltDir(int, int);
 
 unsigned int InitRND(long);
