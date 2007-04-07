@@ -200,27 +200,35 @@
 #define GAME_PANEL_MAGIC_WALL			66
 #define GAME_PANEL_MAGIC_WALL_TIME		67
 #define GAME_PANEL_GRAVITY_STATE		68
-#define GAME_PANEL_CE_SCORE_1			69
-#define GAME_PANEL_CE_SCORE_2			70
-#define GAME_PANEL_CE_SCORE_3			71
-#define GAME_PANEL_CE_SCORE_4			72
-#define GAME_PANEL_CE_SCORE_5			73
-#define GAME_PANEL_CE_SCORE_6			74
-#define GAME_PANEL_CE_SCORE_7			75
-#define GAME_PANEL_CE_SCORE_8			76
-#define GAME_PANEL_CE_SCORE_1_ELEMENT		77
-#define GAME_PANEL_CE_SCORE_2_ELEMENT		78
-#define GAME_PANEL_CE_SCORE_3_ELEMENT		79
-#define GAME_PANEL_CE_SCORE_4_ELEMENT		80
-#define GAME_PANEL_CE_SCORE_5_ELEMENT		81
-#define GAME_PANEL_CE_SCORE_6_ELEMENT		82
-#define GAME_PANEL_CE_SCORE_7_ELEMENT		83
-#define GAME_PANEL_CE_SCORE_8_ELEMENT		84
-#define GAME_PANEL_PLAYER_NAME			85
-#define GAME_PANEL_LEVEL_NAME			86
-#define GAME_PANEL_LEVEL_AUTHOR			87
+#define GAME_PANEL_ELEMENT_1			69
+#define GAME_PANEL_ELEMENT_2			70
+#define GAME_PANEL_ELEMENT_3			71
+#define GAME_PANEL_ELEMENT_4			72
+#define GAME_PANEL_ELEMENT_5			73
+#define GAME_PANEL_ELEMENT_6			74
+#define GAME_PANEL_ELEMENT_7			75
+#define GAME_PANEL_ELEMENT_8			76
+#define GAME_PANEL_CE_SCORE_1			77
+#define GAME_PANEL_CE_SCORE_2			78
+#define GAME_PANEL_CE_SCORE_3			79
+#define GAME_PANEL_CE_SCORE_4			80
+#define GAME_PANEL_CE_SCORE_5			81
+#define GAME_PANEL_CE_SCORE_6			82
+#define GAME_PANEL_CE_SCORE_7			83
+#define GAME_PANEL_CE_SCORE_8			84
+#define GAME_PANEL_CE_SCORE_1_ELEMENT		85
+#define GAME_PANEL_CE_SCORE_2_ELEMENT		86
+#define GAME_PANEL_CE_SCORE_3_ELEMENT		87
+#define GAME_PANEL_CE_SCORE_4_ELEMENT		88
+#define GAME_PANEL_CE_SCORE_5_ELEMENT		89
+#define GAME_PANEL_CE_SCORE_6_ELEMENT		90
+#define GAME_PANEL_CE_SCORE_7_ELEMENT		91
+#define GAME_PANEL_CE_SCORE_8_ELEMENT		92
+#define GAME_PANEL_PLAYER_NAME			93
+#define GAME_PANEL_LEVEL_NAME			94
+#define GAME_PANEL_LEVEL_AUTHOR			95
 
-#define NUM_GAME_PANEL_CONTROLS			88
+#define NUM_GAME_PANEL_CONTROLS			96
 
 struct GamePanelOrderInfo
 {
@@ -240,6 +248,7 @@ struct GamePanelControlInfo
   int value, last_value;
   int frame, last_frame;
   int gfx_frame;
+  int gfx_random;
 };
 
 static struct GamePanelControlInfo game_panel_controls[] =
@@ -590,6 +599,46 @@ static struct GamePanelControlInfo game_panel_controls[] =
     TYPE_STRING,
   },
   {
+    GAME_PANEL_ELEMENT_1,
+    &game.panel.element[0],
+    TYPE_ELEMENT,
+  },
+  {
+    GAME_PANEL_ELEMENT_2,
+    &game.panel.element[1],
+    TYPE_ELEMENT,
+  },
+  {
+    GAME_PANEL_ELEMENT_3,
+    &game.panel.element[2],
+    TYPE_ELEMENT,
+  },
+  {
+    GAME_PANEL_ELEMENT_4,
+    &game.panel.element[3],
+    TYPE_ELEMENT,
+  },
+  {
+    GAME_PANEL_ELEMENT_5,
+    &game.panel.element[4],
+    TYPE_ELEMENT,
+  },
+  {
+    GAME_PANEL_ELEMENT_6,
+    &game.panel.element[5],
+    TYPE_ELEMENT,
+  },
+  {
+    GAME_PANEL_ELEMENT_7,
+    &game.panel.element[6],
+    TYPE_ELEMENT,
+  },
+  {
+    GAME_PANEL_ELEMENT_8,
+    &game.panel.element[7],
+    TYPE_ELEMENT,
+  },
+  {
     GAME_PANEL_CE_SCORE_1,
     &game.panel.ce_score[0],
     TYPE_INTEGER,
@@ -868,6 +917,8 @@ static struct GamePanelControlInfo game_panel_controls[] =
 /* forward declaration for internal use */
 
 static void CreateField(int, int, int);
+
+static void ResetGfxAnimation(int, int);
 
 static void SetPlayerWaiting(struct PlayerInfo *, boolean);
 static void AdvanceFrameAndPlayerCounters(int);
@@ -2123,21 +2174,21 @@ void UpdateGameControlValues()
   game_panel_controls[GAME_PANEL_GRAVITY_STATE].value = game.gravity;
 #endif
 
-  for (i = 0; i < NUM_PANEL_CE_SCORE; i++)
-  {
-    if (IS_CUSTOM_ELEMENT(game.panel.ce_score[i].id))
-    {
-      int ce_score = element_info[game.panel.ce_score[i].id].collect_score;
+  for (i = 0; i < NUM_PANEL_ELEMENTS; i++)
+    game_panel_controls[GAME_PANEL_ELEMENT_1 + i].value =
+      (IS_DRAWABLE_ELEMENT(game.panel.element[i].id) ?
+       game.panel.element[i].id : EL_UNDEFINED);
 
-      game_panel_controls[GAME_PANEL_CE_SCORE_1 + i].value = ce_score;
-      game_panel_controls[GAME_PANEL_CE_SCORE_1_ELEMENT + i].value = ce_score;
-    }
-    else
-    {
-      game_panel_controls[GAME_PANEL_CE_SCORE_1 + i].value = 0;
-      game_panel_controls[GAME_PANEL_CE_SCORE_1_ELEMENT + i].value = 0;
-    }
-  }
+  for (i = 0; i < NUM_PANEL_CE_SCORE; i++)
+    game_panel_controls[GAME_PANEL_CE_SCORE_1 + i].value =
+      (IS_CUSTOM_ELEMENT(game.panel.ce_score[i].id) ?
+       element_info[game.panel.ce_score[i].id].collect_score : 0);
+
+  for (i = 0; i < NUM_PANEL_CE_SCORE; i++)
+    game_panel_controls[GAME_PANEL_CE_SCORE_1_ELEMENT + i].value =
+      (IS_CUSTOM_ELEMENT(game.panel.ce_score_element[i].id) ?
+       element_info[game.panel.ce_score_element[i].id].collect_score :
+       EL_UNDEFINED);
 
   game_panel_controls[GAME_PANEL_PLAYER_NAME].value = 0;
   game_panel_controls[GAME_PANEL_LEVEL_NAME].value = 0;
@@ -2149,13 +2200,35 @@ void UpdateGameControlValues()
 
     if (gpc->type == TYPE_ELEMENT)
     {
+      int last_anim_random_frame = gfx.anim_random_frame;
+      int element = gpc->value;
+      int graphic = el2panelimg(element);
+
       if (gpc->value != gpc->last_value)
+      {
 	gpc->gfx_frame = 0;
+	gpc->gfx_random = INIT_GFX_RANDOM();
+      }
       else
+      {
 	gpc->gfx_frame++;
+
+	if (ANIM_MODE(graphic) == ANIM_RANDOM &&
+	    IS_NEXT_FRAME(gpc->gfx_frame, graphic))
+	  gpc->gfx_random = INIT_GFX_RANDOM();
+      }
+
+      if (ANIM_MODE(graphic) == ANIM_RANDOM)
+	gfx.anim_random_frame = gpc->gfx_random;
+
+      if (ANIM_MODE(graphic) == ANIM_CE_SCORE)
+	gpc->gfx_frame = element_info[element].collect_score;
 
       gpc->frame = getGraphicAnimationFrame(el2panelimg(gpc->value),
 					    gpc->gfx_frame);
+
+      if (ANIM_MODE(graphic) == ANIM_RANDOM)
+	gfx.anim_random_frame = last_anim_random_frame;
     }
   }
 }
@@ -3568,6 +3641,8 @@ void InitGame()
       emulate_sp = FALSE;
 
     InitField(x, y, TRUE);
+
+    ResetGfxAnimation(x, y);
   }
 
   InitBeltMovement();

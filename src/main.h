@@ -625,6 +625,18 @@
 #define IS_OBSOLETE(e)		HAS_PROPERTY(e, EP_OBSOLETE)
 
 /* special macros used in game engine */
+#define IS_FILE_ELEMENT(e)	((e) >= 0 &&				\
+	 			 (e) <= NUM_FILE_ELEMENTS)
+
+#define IS_DRAWABLE_ELEMENT(e)	((e) >= 0 &&				\
+	 			 (e) <= NUM_DRAWABLE_ELEMENTS)
+
+#define IS_RUNTIME_ELEMENT(e)	((e) >= 0 &&				\
+	 			 (e) <= NUM_RUNTIME_ELEMENTS)
+
+#define IS_VALID_ELEMENT(e)	((e) >= 0 &&				\
+	 			 (e) <= MAX_NUM_ELEMENTS)
+
 #define IS_CUSTOM_ELEMENT(e)	((e) >= EL_CUSTOM_START &&		\
 	 			 (e) <= EL_CUSTOM_END)
 
@@ -1526,8 +1538,10 @@
 #define EL_EMC_DRIPPER_ACTIVE		(EL_FIRST_RUNTIME_REAL + 70)
 #define EL_EMC_SPRING_BUMPER_ACTIVE	(EL_FIRST_RUNTIME_REAL + 71)
 
+#define NUM_DRAWABLE_ELEMENTS		(EL_FIRST_RUNTIME_REAL + 72)
+
 /* "unreal" (and therefore not drawable) runtime elements */
-#define EL_FIRST_RUNTIME_UNREAL		(EL_FIRST_RUNTIME_REAL + 72)
+#define EL_FIRST_RUNTIME_UNREAL		(NUM_DRAWABLE_ELEMENTS)
 
 #define EL_BLOCKED			(EL_FIRST_RUNTIME_UNREAL + 0)
 #define EL_EXPLOSION			(EL_FIRST_RUNTIME_UNREAL + 1)

@@ -1,4 +1,5 @@
 2007-04-07
+	* added game panel control to display arbitrary elements on game panel
 	* added game panel control to display custom element score (globally
 	  unique for identical custom elements) either as value or as element
 	* added ".draw_masked" and ".draw_order" to game panel control drawing

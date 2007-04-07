@@ -26,6 +26,7 @@
 #define NUM_BELT_PARTS		3
 
 #define NUM_PANEL_INVENTORY	8
+#define NUM_PANEL_ELEMENTS	8
 #define NUM_PANEL_CE_SCORE	8
 
 #if 1
@@ -73,6 +74,7 @@ struct GamePanelInfo
   struct TextPosInfo magic_wall;
   struct TextPosInfo magic_wall_time;
   struct TextPosInfo gravity_state;
+  struct TextPosInfo element[NUM_PANEL_ELEMENTS];
   struct TextPosInfo ce_score[NUM_PANEL_CE_SCORE];
   struct TextPosInfo ce_score_element[NUM_PANEL_CE_SCORE];
   struct TextPosInfo player_name;
