@@ -1,3 +1,6 @@
+2007-04-05
+	* fixed some general bugs with handling of ".active" elements and fonts
+
 2007-04-04
 	* cleanup of game panel elements (some elements were not really needed)
 	* added displaying of gravity state (on/off) as new game panel control

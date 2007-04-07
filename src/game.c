@@ -5465,12 +5465,19 @@ static void InitBeltMovement()
     for (j = 0; j < NUM_BELT_PARTS; j++)
     {
       int element = belt_base_active_element[belt_nr] + j;
-      int graphic = el2img(element);
+      int graphic_1 = el2img(element);
+      int graphic_2 = el2panelimg(element);
 
       if (game.belt_dir[i] == MV_LEFT)
-	graphic_info[graphic].anim_mode &= ~ANIM_REVERSE;
+      {
+	graphic_info[graphic_1].anim_mode &= ~ANIM_REVERSE;
+	graphic_info[graphic_2].anim_mode &= ~ANIM_REVERSE;
+      }
       else
-	graphic_info[graphic].anim_mode |=  ANIM_REVERSE;
+      {
+	graphic_info[graphic_1].anim_mode |=  ANIM_REVERSE;
+	graphic_info[graphic_2].anim_mode |=  ANIM_REVERSE;
+      }
     }
   }
 
@@ -5546,12 +5553,19 @@ static void ToggleBeltSwitch(int x, int y)
   for (i = 0; i < NUM_BELT_PARTS; i++)
   {
     int element = belt_base_active_element[belt_nr] + i;
-    int graphic = el2img(element);
+    int graphic_1 = el2img(element);
+    int graphic_2 = el2panelimg(element);
 
     if (belt_dir == MV_LEFT)
-      graphic_info[graphic].anim_mode &= ~ANIM_REVERSE;
+    {
+      graphic_info[graphic_1].anim_mode &= ~ANIM_REVERSE;
+      graphic_info[graphic_2].anim_mode &= ~ANIM_REVERSE;
+    }
     else
-      graphic_info[graphic].anim_mode |=  ANIM_REVERSE;
+    {
+      graphic_info[graphic_1].anim_mode |=  ANIM_REVERSE;
+      graphic_info[graphic_2].anim_mode |=  ANIM_REVERSE;
+    }
   }
 
   SCAN_PLAYFIELD(xx, yy)

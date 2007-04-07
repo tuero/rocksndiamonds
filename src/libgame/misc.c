@@ -2322,9 +2322,19 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
 
       base_index = i;
 
+#if 0
+      if (IS_PARENT_PROCESS())
+	printf("===> MATCH: '%s', '%s'\n", token, base_prefix);
+#endif
+
       if (start_pos + len_base_prefix == len_token)	/* exact match */
       {
 	exact_match = TRUE;
+
+#if 0
+	if (IS_PARENT_PROCESS())
+	  printf("===> EXACT MATCH: '%s', '%s'\n", token, base_prefix);
+#endif
 
 	add_dynamic_file_list_entry(dynamic_file_list,
 				    num_dynamic_file_list_entries,
@@ -2359,9 +2369,19 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
 
 	ext1_index = j;
 
+#if 0
+	if (IS_PARENT_PROCESS())
+	  printf("===> MATCH: '%s', '%s'\n", token, ext1_suffix);
+#endif
+
 	if (start_pos + len_ext1_suffix == len_token)	/* exact match */
 	{
 	  exact_match = TRUE;
+
+#if 0
+	if (IS_PARENT_PROCESS())
+	  printf("===> EXACT MATCH: '%s', '%s'\n", token, ext1_suffix);
+#endif
 
 	  add_dynamic_file_list_entry(dynamic_file_list,
 				      num_dynamic_file_list_entries,
@@ -2401,9 +2421,19 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
 
 	ext2_index = k;
 
+#if 0
+	if (IS_PARENT_PROCESS())
+	  printf("===> MATCH: '%s', '%s'\n", token, ext2_suffix);
+#endif
+
 	if (start_pos + len_ext2_suffix == len_token)	/* exact match */
 	{
 	  exact_match = TRUE;
+
+#if 0
+	  if (IS_PARENT_PROCESS())
+	    printf("===> EXACT MATCH: '%s', '%s'\n", token, ext2_suffix);
+#endif
 
 	  add_dynamic_file_list_entry(dynamic_file_list,
 				      num_dynamic_file_list_entries,
@@ -2443,9 +2473,19 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
 
 	ext3_index = l;
 
+#if 0
+	if (IS_PARENT_PROCESS())
+	  printf("===> MATCH: '%s', '%s'\n", token, ext3_suffix);
+#endif
+
 	if (start_pos + len_ext3_suffix == len_token) /* exact match */
 	{
 	  exact_match = TRUE;
+
+#if 0
+	  if (IS_PARENT_PROCESS())
+	    printf("===> EXACT MATCH: '%s', '%s'\n", token, ext3_suffix);
+#endif
 
 	  add_dynamic_file_list_entry(dynamic_file_list,
 				      num_dynamic_file_list_entries,

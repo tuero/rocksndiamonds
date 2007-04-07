@@ -32,6 +32,7 @@
 #include "conf_fnt.c"	/* include auto-generated data structure definitions */
 #include "conf_g2s.c"	/* include auto-generated data structure definitions */
 #include "conf_g2m.c"	/* include auto-generated data structure definitions */
+#include "conf_act.c"	/* include auto-generated data structure definitions */
 
 
 #define CONFIG_TOKEN_FONT_INITIAL		"font.initial"
@@ -513,6 +514,16 @@ void InitElementGraphicInfo()
     int graphic   = property_mapping[i].artwork_index;
     boolean crumbled = FALSE;
 
+#if 0
+    if ((element == EL_EM_DYNAMITE ||
+	 element == EL_EM_DYNAMITE_ACTIVE) &&
+	action == ACTION_ACTIVE &&
+	(special == GFX_SPECIAL_ARG_EDITOR ||
+	 special == GFX_SPECIAL_ARG_PANEL))
+      printf("::: DYNAMIC: %d, %d, %d -> %d\n",
+	     element, action, special, graphic);
+#endif
+
     if (special == GFX_SPECIAL_ARG_CRUMBLED)
     {
       special = -1;
@@ -906,6 +917,15 @@ void InitElementSpecialGraphicInfo()
     boolean special_redefined =
       getImageListEntryFromImageID(graphic)->redefined;
 
+#if 0
+    if ((element == EL_EM_DYNAMITE ||
+	 element == EL_EM_DYNAMITE_ACTIVE) &&
+	(special == GFX_SPECIAL_ARG_EDITOR ||
+	 special == GFX_SPECIAL_ARG_PANEL))
+      printf("::: SPECIAL STATIC: %d, %d -> %d\n",
+	     element, special, graphic);
+#endif
+
     /* if the base graphic ("emerald", for example) has been redefined,
        but not the special graphic ("emerald.EDITOR", for example), do not
        use an existing (in this case considered obsolete) special graphic
@@ -919,11 +939,55 @@ void InitElementSpecialGraphicInfo()
   /* initialize special element/graphic mapping from dynamic configuration */
   for (i = 0; i < num_property_mappings; i++)
   {
-    int element = property_mapping[i].base_index;
-    int special = property_mapping[i].ext3_index;
-    int graphic = property_mapping[i].artwork_index;
+    int element   = property_mapping[i].base_index;
+    int action    = property_mapping[i].ext1_index;
+    int direction = property_mapping[i].ext2_index;
+    int special   = property_mapping[i].ext3_index;
+    int graphic   = property_mapping[i].artwork_index;
+
+#if 0
+    if ((element == EL_EM_DYNAMITE ||
+	 element == EL_EM_DYNAMITE_ACTIVE ||
+	 element == EL_CONVEYOR_BELT_1_MIDDLE ||
+	 element == EL_CONVEYOR_BELT_1_MIDDLE_ACTIVE) &&
+	(special == GFX_SPECIAL_ARG_EDITOR ||
+	 special == GFX_SPECIAL_ARG_PANEL))
+      printf("::: SPECIAL DYNAMIC: %d, %d -> %d [%d]\n",
+	     element, special, graphic, property_mapping[i].ext1_index);
+#endif
+
+#if 0
+    if (element == EL_CONVEYOR_BELT_1_MIDDLE &&
+	action == ACTION_ACTIVE)
+    {
+      element = EL_CONVEYOR_BELT_1_MIDDLE_ACTIVE;
+      action = -1;
+    }
+#endif
+
+#if 0
+    if (element == EL_MAGIC_WALL &&
+	action == ACTION_ACTIVE)
+    {
+      element = EL_MAGIC_WALL_ACTIVE;
+      action = -1;
+    }
+#endif
+
+#if 1
+    /* for action ".active", replace element with active element, if exists */
+    if (action == ACTION_ACTIVE && element != ELEMENT_ACTIVE(element))
+    {
+      element = ELEMENT_ACTIVE(element);
+      action = -1;
+    }
+#endif
 
     if (element >= MAX_NUM_ELEMENTS)
+      continue;
+
+    /* do not change special graphic if action or direction was specified */
+    if (action != -1 || direction != -1)
       continue;
 
     if (IS_SPECIAL_GFX_ARG(special))
@@ -4349,6 +4413,32 @@ static void InitGlobal()
 #if 0
     printf("%04d: %s\n", i, element_name_info[i].token_name);
 #endif
+  }
+
+  /* always start with reliable default values (all elements) */
+  for (i = 0; i < MAX_NUM_ELEMENTS; i++)
+    ActiveElement[i] = i;
+
+  /* now add all entries that have an active state (active elements) */
+  for (i = 0; element_with_active_state[i].element != -1; i++)
+  {
+    int element = element_with_active_state[i].element;
+    int element_active = element_with_active_state[i].element_active;
+
+    ActiveElement[element] = element_active;
+  }
+
+  /* always start with reliable default values (all fonts) */
+  for (i = 0; i < NUM_FONTS; i++)
+    ActiveFont[i] = i;
+
+  /* now add all entries that have an active state (active fonts) */
+  for (i = 0; font_with_active_state[i].font_nr != -1; i++)
+  {
+    int font = font_with_active_state[i].font_nr;
+    int font_active = font_with_active_state[i].font_nr_active;
+
+    ActiveFont[font] = font_active;
   }
 
   global.autoplay_leveldir = NULL;

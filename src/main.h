@@ -838,6 +838,11 @@
 				 (d) == MV_UP    ? "MV_UP"    :		\
 				 (d) == MV_DOWN  ? "MV_DOWN"  : "(various)")
 
+#define ELEMENT_ACTIVE(e)	(ActiveElement[e])
+
+#define FONT_ACTIVE(f)		(ActiveFont[f])
+
+
 /* fundamental game speed values */
 #define MICROLEVEL_SCROLL_DELAY	50	/* delay for scrolling micro level */
 #define MICROLEVEL_LABEL_DELAY	250	/* delay for micro level label */
@@ -1860,6 +1865,7 @@
 #define NUM_FONTS			37
 #define NUM_INITIAL_FONTS		4
 
+#if 0
 #define FONT_ACTIVE(f)							  \
 	((f) == FONT_MENU_1		? FONT_MENU_1_ACTIVE		: \
 	 (f) == FONT_MENU_2		? FONT_MENU_2_ACTIVE		: \
@@ -1871,7 +1877,7 @@
 	 (f) == FONT_INPUT_2		? FONT_INPUT_2_ACTIVE		: \
 	 (f) == FONT_LEVEL_NUMBER	? FONT_LEVEL_NUMBER_ACTIVE	: \
 	 (f))
-
+#endif
 
 /* values for game_status (must match special image configuration suffixes) */
 #define GAME_MODE_DEFAULT		0
@@ -2666,6 +2672,9 @@ extern int			GfxRandom[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern int 			GfxElement[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern int			GfxAction[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern int 			GfxDir[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+
+extern int			ActiveElement[MAX_NUM_ELEMENTS];
+extern int			ActiveFont[NUM_FONTS];
 
 extern int			lev_fieldx, lev_fieldy;
 extern int			scroll_x, scroll_y;

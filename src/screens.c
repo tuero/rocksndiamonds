@@ -1258,6 +1258,21 @@ void DrawMainMenuExt(int redraw_mask, boolean do_fading)
 #endif
 
 #if 0
+  {
+    int graphicA = element_info[EL_EM_DYNAMITE_ACTIVE].special_graphic[GFX_SPECIAL_ARG_EDITOR];
+    int graphicB = element_info[EL_EM_DYNAMITE_ACTIVE].special_graphic[GFX_SPECIAL_ARG_PANEL];
+    int graphic1 = element_info[EL_CONVEYOR_BELT_1_MIDDLE].special_graphic[GFX_SPECIAL_ARG_EDITOR];
+    int graphic2 = element_info[EL_CONVEYOR_BELT_1_MIDDLE_ACTIVE].special_graphic[GFX_SPECIAL_ARG_EDITOR];
+
+    printf("::: %d [%d] -> %d, %d [%d, %d]\n",
+	   graphicA, graphicB,
+	   graphic_info[graphicA].src_x,
+	   graphic_info[graphicA].src_y,
+	   graphic1, graphic2);
+  }
+#endif
+
+#if 0
   printf("::: %d, %d\n", fading.anim_mode == ANIM_CROSSFADE,
 	 redraw_mask == REDRAW_ALL);
 #endif

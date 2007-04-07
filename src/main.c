@@ -75,6 +75,9 @@ int 			GfxElement[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 int			GfxAction[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 int 			GfxDir[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 
+int			ActiveElement[MAX_NUM_ELEMENTS];
+int			ActiveFont[NUM_FONTS];
+
 int			lev_fieldx, lev_fieldy;
 int			scroll_x, scroll_y;
 
