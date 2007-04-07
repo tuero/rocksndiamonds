@@ -3028,7 +3028,6 @@ boolean Request(char *text, unsigned int req_state)
     if (game_status == GAME_MODE_PLAYING && local_player->LevelSolved_GameEnd)
     {
       HandleGameActions();
-      BackToFront();
     }
     else
     {
@@ -3037,6 +3036,8 @@ boolean Request(char *text, unsigned int req_state)
       if (!PendingEvent())	/* delay only if no pending events */
 	Delay(10);
     }
+
+    BackToFront();
 
 #else
 

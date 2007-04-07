@@ -1997,6 +1997,14 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.level_number.font_alt
   },
   {
+    "game.panel.level_number.draw_masked",
+    &game.panel.level_number.draw_masked
+  },
+  {
+    "game.panel.level_number.draw_order",
+    &game.panel.level_number.sort_priority
+  },
+  {
     "game.panel.gems.x",
     &game.panel.gems.x
   },
@@ -2019,6 +2027,14 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "game.panel.gems.font",
     &game.panel.gems.font
+  },
+  {
+    "game.panel.gems.draw_masked",
+    &game.panel.gems.draw_masked
+  },
+  {
+    "game.panel.gems.draw_order",
+    &game.panel.gems.sort_priority
   },
   {
     "game.panel.inventory_count.x",
@@ -2045,6 +2061,14 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.inventory_count.font
   },
   {
+    "game.panel.inventory_count.draw_masked",
+    &game.panel.inventory_count.draw_masked
+  },
+  {
+    "game.panel.inventory_count.draw_order",
+    &game.panel.inventory_count.sort_priority
+  },
+  {
     "game.panel.inventory_first_1.x",
     &game.panel.inventory_first[0].x
   },
@@ -2055,6 +2079,14 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "game.panel.inventory_first_1.tile_size",
     &game.panel.inventory_first[0].size
+  },
+  {
+    "game.panel.inventory_first_1.draw_masked",
+    &game.panel.inventory_first[0].draw_masked
+  },
+  {
+    "game.panel.inventory_first_1.draw_order",
+    &game.panel.inventory_first[0].sort_priority
   },
   {
     "game.panel.inventory_first_2.x",
@@ -2069,6 +2101,14 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.inventory_first[1].size
   },
   {
+    "game.panel.inventory_first_2.draw_masked",
+    &game.panel.inventory_first[1].draw_masked
+  },
+  {
+    "game.panel.inventory_first_2.draw_order",
+    &game.panel.inventory_first[1].sort_priority
+  },
+  {
     "game.panel.inventory_first_3.x",
     &game.panel.inventory_first[2].x
   },
@@ -2079,6 +2119,14 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "game.panel.inventory_first_3.tile_size",
     &game.panel.inventory_first[2].size
+  },
+  {
+    "game.panel.inventory_first_3.draw_masked",
+    &game.panel.inventory_first[2].draw_masked
+  },
+  {
+    "game.panel.inventory_first_3.draw_order",
+    &game.panel.inventory_first[2].sort_priority
   },
   {
     "game.panel.inventory_first_4.x",
@@ -2093,6 +2141,14 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.inventory_first[3].size
   },
   {
+    "game.panel.inventory_first_4.draw_masked",
+    &game.panel.inventory_first[3].draw_masked
+  },
+  {
+    "game.panel.inventory_first_4.draw_order",
+    &game.panel.inventory_first[3].sort_priority
+  },
+  {
     "game.panel.inventory_first_5.x",
     &game.panel.inventory_first[4].x
   },
@@ -2103,6 +2159,14 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "game.panel.inventory_first_5.tile_size",
     &game.panel.inventory_first[4].size
+  },
+  {
+    "game.panel.inventory_first_5.draw_masked",
+    &game.panel.inventory_first[4].draw_masked
+  },
+  {
+    "game.panel.inventory_first_5.draw_order",
+    &game.panel.inventory_first[4].sort_priority
   },
   {
     "game.panel.inventory_first_6.x",
@@ -2117,6 +2181,14 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.inventory_first[5].size
   },
   {
+    "game.panel.inventory_first_6.draw_masked",
+    &game.panel.inventory_first[5].draw_masked
+  },
+  {
+    "game.panel.inventory_first_6.draw_order",
+    &game.panel.inventory_first[5].sort_priority
+  },
+  {
     "game.panel.inventory_first_7.x",
     &game.panel.inventory_first[6].x
   },
@@ -2127,6 +2199,14 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "game.panel.inventory_first_7.tile_size",
     &game.panel.inventory_first[6].size
+  },
+  {
+    "game.panel.inventory_first_7.draw_masked",
+    &game.panel.inventory_first[6].draw_masked
+  },
+  {
+    "game.panel.inventory_first_7.draw_order",
+    &game.panel.inventory_first[6].sort_priority
   },
   {
     "game.panel.inventory_first_8.x",
@@ -2141,6 +2221,14 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.inventory_first[7].size
   },
   {
+    "game.panel.inventory_first_8.draw_masked",
+    &game.panel.inventory_first[7].draw_masked
+  },
+  {
+    "game.panel.inventory_first_8.draw_order",
+    &game.panel.inventory_first[7].sort_priority
+  },
+  {
     "game.panel.inventory_last_1.x",
     &game.panel.inventory_last[0].x
   },
@@ -2151,6 +2239,14 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "game.panel.inventory_last_1.tile_size",
     &game.panel.inventory_last[0].size
+  },
+  {
+    "game.panel.inventory_last_1.draw_masked",
+    &game.panel.inventory_last[0].draw_masked
+  },
+  {
+    "game.panel.inventory_last_1.draw_order",
+    &game.panel.inventory_last[0].sort_priority
   },
   {
     "game.panel.inventory_last_2.x",
@@ -2165,6 +2261,14 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.inventory_last[1].size
   },
   {
+    "game.panel.inventory_last_2.draw_masked",
+    &game.panel.inventory_last[1].draw_masked
+  },
+  {
+    "game.panel.inventory_last_2.draw_order",
+    &game.panel.inventory_last[1].sort_priority
+  },
+  {
     "game.panel.inventory_last_3.x",
     &game.panel.inventory_last[2].x
   },
@@ -2175,6 +2279,14 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "game.panel.inventory_last_3.tile_size",
     &game.panel.inventory_last[2].size
+  },
+  {
+    "game.panel.inventory_last_3.draw_masked",
+    &game.panel.inventory_last[2].draw_masked
+  },
+  {
+    "game.panel.inventory_last_3.draw_order",
+    &game.panel.inventory_last[2].sort_priority
   },
   {
     "game.panel.inventory_last_4.x",
@@ -2189,6 +2301,14 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.inventory_last[3].size
   },
   {
+    "game.panel.inventory_last_4.draw_masked",
+    &game.panel.inventory_last[3].draw_masked
+  },
+  {
+    "game.panel.inventory_last_4.draw_order",
+    &game.panel.inventory_last[3].sort_priority
+  },
+  {
     "game.panel.inventory_last_5.x",
     &game.panel.inventory_last[4].x
   },
@@ -2199,6 +2319,14 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "game.panel.inventory_last_5.tile_size",
     &game.panel.inventory_last[4].size
+  },
+  {
+    "game.panel.inventory_last_5.draw_masked",
+    &game.panel.inventory_last[4].draw_masked
+  },
+  {
+    "game.panel.inventory_last_5.draw_order",
+    &game.panel.inventory_last[4].sort_priority
   },
   {
     "game.panel.inventory_last_6.x",
@@ -2213,6 +2341,14 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.inventory_last[5].size
   },
   {
+    "game.panel.inventory_last_6.draw_masked",
+    &game.panel.inventory_last[5].draw_masked
+  },
+  {
+    "game.panel.inventory_last_6.draw_order",
+    &game.panel.inventory_last[5].sort_priority
+  },
+  {
     "game.panel.inventory_last_7.x",
     &game.panel.inventory_last[6].x
   },
@@ -2223,6 +2359,14 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "game.panel.inventory_last_7.tile_size",
     &game.panel.inventory_last[6].size
+  },
+  {
+    "game.panel.inventory_last_7.draw_masked",
+    &game.panel.inventory_last[6].draw_masked
+  },
+  {
+    "game.panel.inventory_last_7.draw_order",
+    &game.panel.inventory_last[6].sort_priority
   },
   {
     "game.panel.inventory_last_8.x",
@@ -2237,6 +2381,14 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.inventory_last[7].size
   },
   {
+    "game.panel.inventory_last_8.draw_masked",
+    &game.panel.inventory_last[7].draw_masked
+  },
+  {
+    "game.panel.inventory_last_8.draw_order",
+    &game.panel.inventory_last[7].sort_priority
+  },
+  {
     "game.panel.key_1.x",
     &game.panel.key[0].x
   },
@@ -2247,6 +2399,14 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "game.panel.key_1.tile_size",
     &game.panel.key[0].size
+  },
+  {
+    "game.panel.key_1.draw_masked",
+    &game.panel.key[0].draw_masked
+  },
+  {
+    "game.panel.key_1.draw_order",
+    &game.panel.key[0].sort_priority
   },
   {
     "game.panel.key_2.x",
@@ -2261,6 +2421,14 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.key[1].size
   },
   {
+    "game.panel.key_2.draw_masked",
+    &game.panel.key[1].draw_masked
+  },
+  {
+    "game.panel.key_2.draw_order",
+    &game.panel.key[1].sort_priority
+  },
+  {
     "game.panel.key_3.x",
     &game.panel.key[2].x
   },
@@ -2271,6 +2439,14 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "game.panel.key_3.tile_size",
     &game.panel.key[2].size
+  },
+  {
+    "game.panel.key_3.draw_masked",
+    &game.panel.key[2].draw_masked
+  },
+  {
+    "game.panel.key_3.draw_order",
+    &game.panel.key[2].sort_priority
   },
   {
     "game.panel.key_4.x",
@@ -2285,6 +2461,14 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.key[3].size
   },
   {
+    "game.panel.key_4.draw_masked",
+    &game.panel.key[3].draw_masked
+  },
+  {
+    "game.panel.key_4.draw_order",
+    &game.panel.key[3].sort_priority
+  },
+  {
     "game.panel.key_5.x",
     &game.panel.key[4].x
   },
@@ -2295,6 +2479,14 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "game.panel.key_5.tile_size",
     &game.panel.key[4].size
+  },
+  {
+    "game.panel.key_5.draw_masked",
+    &game.panel.key[4].draw_masked
+  },
+  {
+    "game.panel.key_5.draw_order",
+    &game.panel.key[4].sort_priority
   },
   {
     "game.panel.key_6.x",
@@ -2309,6 +2501,14 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.key[5].size
   },
   {
+    "game.panel.key_6.draw_masked",
+    &game.panel.key[5].draw_masked
+  },
+  {
+    "game.panel.key_6.draw_order",
+    &game.panel.key[5].sort_priority
+  },
+  {
     "game.panel.key_7.x",
     &game.panel.key[6].x
   },
@@ -2319,6 +2519,14 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "game.panel.key_7.tile_size",
     &game.panel.key[6].size
+  },
+  {
+    "game.panel.key_7.draw_masked",
+    &game.panel.key[6].draw_masked
+  },
+  {
+    "game.panel.key_7.draw_order",
+    &game.panel.key[6].sort_priority
   },
   {
     "game.panel.key_8.x",
@@ -2333,6 +2541,14 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.key[7].size
   },
   {
+    "game.panel.key_8.draw_masked",
+    &game.panel.key[7].draw_masked
+  },
+  {
+    "game.panel.key_8.draw_order",
+    &game.panel.key[7].sort_priority
+  },
+  {
     "game.panel.key_white.x",
     &game.panel.key_white.x
   },
@@ -2343,6 +2559,14 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "game.panel.key_white.tile_size",
     &game.panel.key_white.size
+  },
+  {
+    "game.panel.key_white.draw_masked",
+    &game.panel.key_white.draw_masked
+  },
+  {
+    "game.panel.key_white.draw_order",
+    &game.panel.key_white.sort_priority
   },
   {
     "game.panel.key_white_count.x",
@@ -2369,6 +2593,14 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.key_white_count.font
   },
   {
+    "game.panel.key_white_count.draw_masked",
+    &game.panel.key_white_count.draw_masked
+  },
+  {
+    "game.panel.key_white_count.draw_order",
+    &game.panel.key_white_count.sort_priority
+  },
+  {
     "game.panel.score.x",
     &game.panel.score.x
   },
@@ -2391,6 +2623,14 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "game.panel.score.font",
     &game.panel.score.font
+  },
+  {
+    "game.panel.score.draw_masked",
+    &game.panel.score.draw_masked
+  },
+  {
+    "game.panel.score.draw_order",
+    &game.panel.score.sort_priority
   },
   {
     "game.panel.time.x",
@@ -2421,6 +2661,14 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.time.font_alt
   },
   {
+    "game.panel.time.draw_masked",
+    &game.panel.time.draw_masked
+  },
+  {
+    "game.panel.time.draw_order",
+    &game.panel.time.sort_priority
+  },
+  {
     "game.panel.time_hh.x",
     &game.panel.time_hh.x
   },
@@ -2443,6 +2691,14 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "game.panel.time_hh.font",
     &game.panel.time_hh.font
+  },
+  {
+    "game.panel.time_hh.draw_masked",
+    &game.panel.time_hh.draw_masked
+  },
+  {
+    "game.panel.time_hh.draw_order",
+    &game.panel.time_hh.sort_priority
   },
   {
     "game.panel.time_mm.x",
@@ -2469,6 +2725,14 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.time_mm.font
   },
   {
+    "game.panel.time_mm.draw_masked",
+    &game.panel.time_mm.draw_masked
+  },
+  {
+    "game.panel.time_mm.draw_order",
+    &game.panel.time_mm.sort_priority
+  },
+  {
     "game.panel.time_ss.x",
     &game.panel.time_ss.x
   },
@@ -2493,6 +2757,14 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.time_ss.font
   },
   {
+    "game.panel.time_ss.draw_masked",
+    &game.panel.time_ss.draw_masked
+  },
+  {
+    "game.panel.time_ss.draw_order",
+    &game.panel.time_ss.sort_priority
+  },
+  {
     "game.panel.shield_normal.x",
     &game.panel.shield_normal.x
   },
@@ -2503,6 +2775,14 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "game.panel.shield_normal.tile_size",
     &game.panel.shield_normal.size
+  },
+  {
+    "game.panel.shield_normal.draw_masked",
+    &game.panel.shield_normal.draw_masked
+  },
+  {
+    "game.panel.shield_normal.draw_order",
+    &game.panel.shield_normal.sort_priority
   },
   {
     "game.panel.shield_normal_time.x",
@@ -2529,6 +2809,14 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.shield_normal_time.font
   },
   {
+    "game.panel.shield_normal_time.draw_masked",
+    &game.panel.shield_normal_time.draw_masked
+  },
+  {
+    "game.panel.shield_normal_time.draw_order",
+    &game.panel.shield_normal_time.sort_priority
+  },
+  {
     "game.panel.shield_deadly.x",
     &game.panel.shield_deadly.x
   },
@@ -2539,6 +2827,14 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "game.panel.shield_deadly.tile_size",
     &game.panel.shield_deadly.size
+  },
+  {
+    "game.panel.shield_deadly.draw_masked",
+    &game.panel.shield_deadly.draw_masked
+  },
+  {
+    "game.panel.shield_deadly.draw_order",
+    &game.panel.shield_deadly.sort_priority
   },
   {
     "game.panel.shield_deadly_time.x",
@@ -2565,6 +2861,14 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.shield_deadly_time.font
   },
   {
+    "game.panel.shield_deadly_time.draw_masked",
+    &game.panel.shield_deadly_time.draw_masked
+  },
+  {
+    "game.panel.shield_deadly_time.draw_order",
+    &game.panel.shield_deadly_time.sort_priority
+  },
+  {
     "game.panel.exit.x",
     &game.panel.exit.x
   },
@@ -2575,6 +2879,14 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "game.panel.exit.tile_size",
     &game.panel.exit.size
+  },
+  {
+    "game.panel.exit.draw_masked",
+    &game.panel.exit.draw_masked
+  },
+  {
+    "game.panel.exit.draw_order",
+    &game.panel.exit.sort_priority
   },
   {
     "game.panel.emc_magic_ball.x",
@@ -2589,6 +2901,14 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.emc_magic_ball.size
   },
   {
+    "game.panel.emc_magic_ball.draw_masked",
+    &game.panel.emc_magic_ball.draw_masked
+  },
+  {
+    "game.panel.emc_magic_ball.draw_order",
+    &game.panel.emc_magic_ball.sort_priority
+  },
+  {
     "game.panel.emc_magic_ball_switch.x",
     &game.panel.emc_magic_ball_switch.x
   },
@@ -2601,6 +2921,14 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.emc_magic_ball_switch.size
   },
   {
+    "game.panel.emc_magic_ball_switch.draw_masked",
+    &game.panel.emc_magic_ball_switch.draw_masked
+  },
+  {
+    "game.panel.emc_magic_ball_switch.draw_order",
+    &game.panel.emc_magic_ball_switch.sort_priority
+  },
+  {
     "game.panel.light_switch.x",
     &game.panel.light_switch.x
   },
@@ -2611,6 +2939,14 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "game.panel.light_switch.tile_size",
     &game.panel.light_switch.size
+  },
+  {
+    "game.panel.light_switch.draw_masked",
+    &game.panel.light_switch.draw_masked
+  },
+  {
+    "game.panel.light_switch.draw_order",
+    &game.panel.light_switch.sort_priority
   },
   {
     "game.panel.light_switch_time.x",
@@ -2637,6 +2973,14 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.light_switch_time.font
   },
   {
+    "game.panel.light_switch_time.draw_masked",
+    &game.panel.light_switch_time.draw_masked
+  },
+  {
+    "game.panel.light_switch_time.draw_order",
+    &game.panel.light_switch_time.sort_priority
+  },
+  {
     "game.panel.timegate_switch.x",
     &game.panel.timegate_switch.x
   },
@@ -2647,6 +2991,14 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "game.panel.timegate_switch.tile_size",
     &game.panel.timegate_switch.size
+  },
+  {
+    "game.panel.timegate_switch.draw_masked",
+    &game.panel.timegate_switch.draw_masked
+  },
+  {
+    "game.panel.timegate_switch.draw_order",
+    &game.panel.timegate_switch.sort_priority
   },
   {
     "game.panel.timegate_switch_time.x",
@@ -2673,6 +3025,14 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.timegate_switch_time.font
   },
   {
+    "game.panel.timegate_switch_time.draw_masked",
+    &game.panel.timegate_switch_time.draw_masked
+  },
+  {
+    "game.panel.timegate_switch_time.draw_order",
+    &game.panel.timegate_switch_time.sort_priority
+  },
+  {
     "game.panel.switchgate_switch.x",
     &game.panel.switchgate_switch.x
   },
@@ -2685,6 +3045,14 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.switchgate_switch.size
   },
   {
+    "game.panel.switchgate_switch.draw_masked",
+    &game.panel.switchgate_switch.draw_masked
+  },
+  {
+    "game.panel.switchgate_switch.draw_order",
+    &game.panel.switchgate_switch.sort_priority
+  },
+  {
     "game.panel.emc_lenses.x",
     &game.panel.emc_lenses.x
   },
@@ -2695,6 +3063,14 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "game.panel.emc_lenses.tile_size",
     &game.panel.emc_lenses.size
+  },
+  {
+    "game.panel.emc_lenses.draw_masked",
+    &game.panel.emc_lenses.draw_masked
+  },
+  {
+    "game.panel.emc_lenses.draw_order",
+    &game.panel.emc_lenses.sort_priority
   },
   {
     "game.panel.emc_lenses_time.x",
@@ -2721,6 +3097,14 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.emc_lenses_time.font
   },
   {
+    "game.panel.emc_lenses_time.draw_masked",
+    &game.panel.emc_lenses_time.draw_masked
+  },
+  {
+    "game.panel.emc_lenses_time.draw_order",
+    &game.panel.emc_lenses_time.sort_priority
+  },
+  {
     "game.panel.emc_magnifier.x",
     &game.panel.emc_magnifier.x
   },
@@ -2731,6 +3115,14 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "game.panel.emc_magnifier.tile_size",
     &game.panel.emc_magnifier.size
+  },
+  {
+    "game.panel.emc_magnifier.draw_masked",
+    &game.panel.emc_magnifier.draw_masked
+  },
+  {
+    "game.panel.emc_magnifier.draw_order",
+    &game.panel.emc_magnifier.sort_priority
   },
   {
     "game.panel.emc_magnifier_time.x",
@@ -2757,6 +3149,14 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.emc_magnifier_time.font
   },
   {
+    "game.panel.emc_magnifier_time.draw_masked",
+    &game.panel.emc_magnifier_time.draw_masked
+  },
+  {
+    "game.panel.emc_magnifier_time.draw_order",
+    &game.panel.emc_magnifier_time.sort_priority
+  },
+  {
     "game.panel.balloon_switch.x",
     &game.panel.balloon_switch.x
   },
@@ -2767,6 +3167,14 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "game.panel.balloon_switch.tile_size",
     &game.panel.balloon_switch.size
+  },
+  {
+    "game.panel.balloon_switch.draw_masked",
+    &game.panel.balloon_switch.draw_masked
+  },
+  {
+    "game.panel.balloon_switch.draw_order",
+    &game.panel.balloon_switch.sort_priority
   },
   {
     "game.panel.dynabomb_number.x",
@@ -2793,6 +3201,14 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.dynabomb_number.font
   },
   {
+    "game.panel.dynabomb_number.draw_masked",
+    &game.panel.dynabomb_number.draw_masked
+  },
+  {
+    "game.panel.dynabomb_number.draw_order",
+    &game.panel.dynabomb_number.sort_priority
+  },
+  {
     "game.panel.dynabomb_size.x",
     &game.panel.dynabomb_size.x
   },
@@ -2817,6 +3233,14 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.dynabomb_size.font
   },
   {
+    "game.panel.dynabomb_size.draw_masked",
+    &game.panel.dynabomb_size.draw_masked
+  },
+  {
+    "game.panel.dynabomb_size.draw_order",
+    &game.panel.dynabomb_size.sort_priority
+  },
+  {
     "game.panel.dynabomb_power.x",
     &game.panel.dynabomb_power.x
   },
@@ -2827,6 +3251,14 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "game.panel.dynabomb_power.tile_size",
     &game.panel.dynabomb_power.size
+  },
+  {
+    "game.panel.dynabomb_power.draw_masked",
+    &game.panel.dynabomb_power.draw_masked
+  },
+  {
+    "game.panel.dynabomb_power.draw_order",
+    &game.panel.dynabomb_power.sort_priority
   },
   {
     "game.panel.penguins.x",
@@ -2853,6 +3285,14 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.penguins.font
   },
   {
+    "game.panel.penguins.draw_masked",
+    &game.panel.penguins.draw_masked
+  },
+  {
+    "game.panel.penguins.draw_order",
+    &game.panel.penguins.sort_priority
+  },
+  {
     "game.panel.sokoban_objects.x",
     &game.panel.sokoban_objects.x
   },
@@ -2875,6 +3315,14 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "game.panel.sokoban_objects.font",
     &game.panel.sokoban_objects.font
+  },
+  {
+    "game.panel.sokoban_objects.draw_masked",
+    &game.panel.sokoban_objects.draw_masked
+  },
+  {
+    "game.panel.sokoban_objects.draw_order",
+    &game.panel.sokoban_objects.sort_priority
   },
   {
     "game.panel.sokoban_fields.x",
@@ -2901,6 +3349,14 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.sokoban_fields.font
   },
   {
+    "game.panel.sokoban_fields.draw_masked",
+    &game.panel.sokoban_fields.draw_masked
+  },
+  {
+    "game.panel.sokoban_fields.draw_order",
+    &game.panel.sokoban_fields.sort_priority
+  },
+  {
     "game.panel.robot_wheel.x",
     &game.panel.robot_wheel.x
   },
@@ -2911,6 +3367,14 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "game.panel.robot_wheel.tile_size",
     &game.panel.robot_wheel.size
+  },
+  {
+    "game.panel.robot_wheel.draw_masked",
+    &game.panel.robot_wheel.draw_masked
+  },
+  {
+    "game.panel.robot_wheel.draw_order",
+    &game.panel.robot_wheel.sort_priority
   },
   {
     "game.panel.conveyor_belt_1.x",
@@ -2925,6 +3389,14 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.conveyor_belt[0].size
   },
   {
+    "game.panel.conveyor_belt_1.draw_masked",
+    &game.panel.conveyor_belt[0].draw_masked
+  },
+  {
+    "game.panel.conveyor_belt_1.draw_order",
+    &game.panel.conveyor_belt[0].sort_priority
+  },
+  {
     "game.panel.conveyor_belt_1_switch.x",
     &game.panel.conveyor_belt_switch[0].x
   },
@@ -2935,6 +3407,14 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "game.panel.conveyor_belt_1_switch.tile_size",
     &game.panel.conveyor_belt_switch[0].size
+  },
+  {
+    "game.panel.conveyor_belt_1_switch.draw_masked",
+    &game.panel.conveyor_belt_switch[0].draw_masked
+  },
+  {
+    "game.panel.conveyor_belt_1_switch.draw_order",
+    &game.panel.conveyor_belt_switch[0].sort_priority
   },
   {
     "game.panel.conveyor_belt_2.x",
@@ -2949,6 +3429,14 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.conveyor_belt[1].size
   },
   {
+    "game.panel.conveyor_belt_2.draw_masked",
+    &game.panel.conveyor_belt[1].draw_masked
+  },
+  {
+    "game.panel.conveyor_belt_2.draw_order",
+    &game.panel.conveyor_belt[1].sort_priority
+  },
+  {
     "game.panel.conveyor_belt_2_switch.x",
     &game.panel.conveyor_belt_switch[1].x
   },
@@ -2959,6 +3447,14 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "game.panel.conveyor_belt_2_switch.tile_size",
     &game.panel.conveyor_belt_switch[1].size
+  },
+  {
+    "game.panel.conveyor_belt_2_switch.draw_masked",
+    &game.panel.conveyor_belt_switch[1].draw_masked
+  },
+  {
+    "game.panel.conveyor_belt_2_switch.draw_order",
+    &game.panel.conveyor_belt_switch[1].sort_priority
   },
   {
     "game.panel.conveyor_belt_3.x",
@@ -2973,6 +3469,14 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.conveyor_belt[2].size
   },
   {
+    "game.panel.conveyor_belt_3.draw_masked",
+    &game.panel.conveyor_belt[2].draw_masked
+  },
+  {
+    "game.panel.conveyor_belt_3.draw_order",
+    &game.panel.conveyor_belt[2].sort_priority
+  },
+  {
     "game.panel.conveyor_belt_3_switch.x",
     &game.panel.conveyor_belt_switch[2].x
   },
@@ -2983,6 +3487,14 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "game.panel.conveyor_belt_3_switch.tile_size",
     &game.panel.conveyor_belt_switch[2].size
+  },
+  {
+    "game.panel.conveyor_belt_3_switch.draw_masked",
+    &game.panel.conveyor_belt_switch[2].draw_masked
+  },
+  {
+    "game.panel.conveyor_belt_3_switch.draw_order",
+    &game.panel.conveyor_belt_switch[2].sort_priority
   },
   {
     "game.panel.conveyor_belt_4.x",
@@ -2997,6 +3509,14 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.conveyor_belt[3].size
   },
   {
+    "game.panel.conveyor_belt_4.draw_masked",
+    &game.panel.conveyor_belt[3].draw_masked
+  },
+  {
+    "game.panel.conveyor_belt_4.draw_order",
+    &game.panel.conveyor_belt[3].sort_priority
+  },
+  {
     "game.panel.conveyor_belt_4_switch.x",
     &game.panel.conveyor_belt_switch[3].x
   },
@@ -3009,6 +3529,14 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.conveyor_belt_switch[3].size
   },
   {
+    "game.panel.conveyor_belt_4_switch.draw_masked",
+    &game.panel.conveyor_belt_switch[3].draw_masked
+  },
+  {
+    "game.panel.conveyor_belt_4_switch.draw_order",
+    &game.panel.conveyor_belt_switch[3].sort_priority
+  },
+  {
     "game.panel.magic_wall.x",
     &game.panel.magic_wall.x
   },
@@ -3019,6 +3547,14 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "game.panel.magic_wall.tile_size",
     &game.panel.magic_wall.size
+  },
+  {
+    "game.panel.magic_wall.draw_masked",
+    &game.panel.magic_wall.draw_masked
+  },
+  {
+    "game.panel.magic_wall.draw_order",
+    &game.panel.magic_wall.sort_priority
   },
   {
     "game.panel.magic_wall_time.x",
@@ -3043,6 +3579,14 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "game.panel.magic_wall_time.font",
     &game.panel.magic_wall_time.font
+  },
+  {
+    "game.panel.magic_wall_time.draw_masked",
+    &game.panel.magic_wall_time.draw_masked
+  },
+  {
+    "game.panel.magic_wall_time.draw_order",
+    &game.panel.magic_wall_time.sort_priority
   },
   {
     "game.panel.gravity_state.x",
@@ -3073,6 +3617,14 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.gravity_state.font_alt
   },
   {
+    "game.panel.gravity_state.draw_masked",
+    &game.panel.gravity_state.draw_masked
+  },
+  {
+    "game.panel.gravity_state.draw_order",
+    &game.panel.gravity_state.sort_priority
+  },
+  {
     "game.panel.ce_score_1.x",
     &game.panel.ce_score[0].x
   },
@@ -3101,6 +3653,14 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.ce_score[0].id
   },
   {
+    "game.panel.ce_score_1.draw_masked",
+    &game.panel.ce_score[0].draw_masked
+  },
+  {
+    "game.panel.ce_score_1.draw_order",
+    &game.panel.ce_score[0].sort_priority
+  },
+  {
     "game.panel.ce_score_1_element.x",
     &game.panel.ce_score_element[0].x
   },
@@ -3115,6 +3675,14 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "game.panel.ce_score_1_element.element",
     &game.panel.ce_score_element[0].id
+  },
+  {
+    "game.panel.ce_score_1_element.draw_masked",
+    &game.panel.ce_score_element[0].draw_masked
+  },
+  {
+    "game.panel.ce_score_1_element.draw_order",
+    &game.panel.ce_score_element[0].sort_priority
   },
   {
     "game.panel.ce_score_2.x",
@@ -3145,6 +3713,14 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.ce_score[1].id
   },
   {
+    "game.panel.ce_score_2.draw_masked",
+    &game.panel.ce_score[1].draw_masked
+  },
+  {
+    "game.panel.ce_score_2.draw_order",
+    &game.panel.ce_score[1].sort_priority
+  },
+  {
     "game.panel.ce_score_2_element.x",
     &game.panel.ce_score_element[1].x
   },
@@ -3159,6 +3735,14 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "game.panel.ce_score_2_element.element",
     &game.panel.ce_score_element[1].id
+  },
+  {
+    "game.panel.ce_score_2_element.draw_masked",
+    &game.panel.ce_score_element[1].draw_masked
+  },
+  {
+    "game.panel.ce_score_2_element.draw_order",
+    &game.panel.ce_score_element[1].sort_priority
   },
   {
     "game.panel.ce_score_3.x",
@@ -3189,6 +3773,14 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.ce_score[2].id
   },
   {
+    "game.panel.ce_score_3.draw_masked",
+    &game.panel.ce_score[2].draw_masked
+  },
+  {
+    "game.panel.ce_score_3.draw_order",
+    &game.panel.ce_score[2].sort_priority
+  },
+  {
     "game.panel.ce_score_3_element.x",
     &game.panel.ce_score_element[2].x
   },
@@ -3203,6 +3795,14 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "game.panel.ce_score_3_element.element",
     &game.panel.ce_score_element[2].id
+  },
+  {
+    "game.panel.ce_score_3_element.draw_masked",
+    &game.panel.ce_score_element[2].draw_masked
+  },
+  {
+    "game.panel.ce_score_3_element.draw_order",
+    &game.panel.ce_score_element[2].sort_priority
   },
   {
     "game.panel.ce_score_4.x",
@@ -3233,6 +3833,14 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.ce_score[3].id
   },
   {
+    "game.panel.ce_score_4.draw_masked",
+    &game.panel.ce_score[3].draw_masked
+  },
+  {
+    "game.panel.ce_score_4.draw_order",
+    &game.panel.ce_score[3].sort_priority
+  },
+  {
     "game.panel.ce_score_4_element.x",
     &game.panel.ce_score_element[3].x
   },
@@ -3247,6 +3855,14 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "game.panel.ce_score_4_element.element",
     &game.panel.ce_score_element[3].id
+  },
+  {
+    "game.panel.ce_score_4_element.draw_masked",
+    &game.panel.ce_score_element[3].draw_masked
+  },
+  {
+    "game.panel.ce_score_4_element.draw_order",
+    &game.panel.ce_score_element[3].sort_priority
   },
   {
     "game.panel.ce_score_5.x",
@@ -3277,6 +3893,14 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.ce_score[4].id
   },
   {
+    "game.panel.ce_score_5.draw_masked",
+    &game.panel.ce_score[4].draw_masked
+  },
+  {
+    "game.panel.ce_score_5.draw_order",
+    &game.panel.ce_score[4].sort_priority
+  },
+  {
     "game.panel.ce_score_5_element.x",
     &game.panel.ce_score_element[4].x
   },
@@ -3291,6 +3915,14 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "game.panel.ce_score_5_element.element",
     &game.panel.ce_score_element[4].id
+  },
+  {
+    "game.panel.ce_score_5_element.draw_masked",
+    &game.panel.ce_score_element[4].draw_masked
+  },
+  {
+    "game.panel.ce_score_5_element.draw_order",
+    &game.panel.ce_score_element[4].sort_priority
   },
   {
     "game.panel.ce_score_6.x",
@@ -3321,6 +3953,14 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.ce_score[5].id
   },
   {
+    "game.panel.ce_score_6.draw_masked",
+    &game.panel.ce_score[5].draw_masked
+  },
+  {
+    "game.panel.ce_score_6.draw_order",
+    &game.panel.ce_score[5].sort_priority
+  },
+  {
     "game.panel.ce_score_6_element.x",
     &game.panel.ce_score_element[5].x
   },
@@ -3335,6 +3975,14 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "game.panel.ce_score_6_element.element",
     &game.panel.ce_score_element[5].id
+  },
+  {
+    "game.panel.ce_score_6_element.draw_masked",
+    &game.panel.ce_score_element[5].draw_masked
+  },
+  {
+    "game.panel.ce_score_6_element.draw_order",
+    &game.panel.ce_score_element[5].sort_priority
   },
   {
     "game.panel.ce_score_7.x",
@@ -3365,6 +4013,14 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.ce_score[6].id
   },
   {
+    "game.panel.ce_score_7.draw_masked",
+    &game.panel.ce_score[6].draw_masked
+  },
+  {
+    "game.panel.ce_score_7.draw_order",
+    &game.panel.ce_score[6].sort_priority
+  },
+  {
     "game.panel.ce_score_7_element.x",
     &game.panel.ce_score_element[6].x
   },
@@ -3379,6 +4035,14 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "game.panel.ce_score_7_element.element",
     &game.panel.ce_score_element[6].id
+  },
+  {
+    "game.panel.ce_score_7_element.draw_masked",
+    &game.panel.ce_score_element[6].draw_masked
+  },
+  {
+    "game.panel.ce_score_7_element.draw_order",
+    &game.panel.ce_score_element[6].sort_priority
   },
   {
     "game.panel.ce_score_8.x",
@@ -3409,6 +4073,14 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.ce_score[7].id
   },
   {
+    "game.panel.ce_score_8.draw_masked",
+    &game.panel.ce_score[7].draw_masked
+  },
+  {
+    "game.panel.ce_score_8.draw_order",
+    &game.panel.ce_score[7].sort_priority
+  },
+  {
     "game.panel.ce_score_8_element.x",
     &game.panel.ce_score_element[7].x
   },
@@ -3423,6 +4095,14 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "game.panel.ce_score_8_element.element",
     &game.panel.ce_score_element[7].id
+  },
+  {
+    "game.panel.ce_score_8_element.draw_masked",
+    &game.panel.ce_score_element[7].draw_masked
+  },
+  {
+    "game.panel.ce_score_8_element.draw_order",
+    &game.panel.ce_score_element[7].sort_priority
   },
   {
     "game.panel.player_name.x",
@@ -3449,6 +4129,14 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.player_name.font
   },
   {
+    "game.panel.player_name.draw_masked",
+    &game.panel.player_name.draw_masked
+  },
+  {
+    "game.panel.player_name.draw_order",
+    &game.panel.player_name.sort_priority
+  },
+  {
     "game.panel.level_name.x",
     &game.panel.level_name.x
   },
@@ -3473,6 +4161,14 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.level_name.font
   },
   {
+    "game.panel.level_name.draw_masked",
+    &game.panel.level_name.draw_masked
+  },
+  {
+    "game.panel.level_name.draw_order",
+    &game.panel.level_name.sort_priority
+  },
+  {
     "game.panel.level_author.x",
     &game.panel.level_author.x
   },
@@ -3495,6 +4191,14 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "game.panel.level_author.font",
     &game.panel.level_author.font
+  },
+  {
+    "game.panel.level_author.draw_masked",
+    &game.panel.level_author.draw_masked
+  },
+  {
+    "game.panel.level_author.draw_order",
+    &game.panel.level_author.sort_priority
   },
   {
     "game.button.stop.x",

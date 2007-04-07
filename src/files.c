@@ -8389,6 +8389,7 @@ static int get_token_parameter_value(char *token, char *value_raw)
   }
 #endif
 
+  /* !!! USE CORRECT VALUE TYPE (currently works also for TYPE_BOOLEAN) !!! */
   return get_parameter_value(value_raw, suffix, TYPE_INTEGER);
 }
 

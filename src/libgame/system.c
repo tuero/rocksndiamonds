@@ -1023,6 +1023,32 @@ static void CreateScaledBitmaps(Bitmap *old_bitmap, int zoom_factor,
   old_bitmap->width  = new_bitmap->width;
   old_bitmap->height = new_bitmap->height;
 
+#if 1
+  /* !!! THIS URGENTLY NEEDS OPTIMIZATION -- DO NOT CREATE MASKS BEFORE !!! */
+  {
+#if defined(TARGET_X11)
+    if (old_bitmap->clip_mask)
+      XFreePixmap(display, old_bitmap->clip_mask);
+
+    old_bitmap->clip_mask =
+      Pixmap_to_Mask(old_bitmap->drawable, new_width, new_height);
+
+    XSetClipMask(display, old_bitmap->stored_clip_gc, old_bitmap->clip_mask);
+#else
+    SDL_Surface *old_surface = old_bitmap->surface;
+
+    if (old_bitmap->surface_masked)
+      SDL_FreeSurface(old_bitmap->surface_masked);
+
+    SDL_SetColorKey(old_surface, SDL_SRCCOLORKEY,
+		    SDL_MapRGB(old_surface->format, 0x00, 0x00, 0x00));
+    if ((old_bitmap->surface_masked = SDL_DisplayFormat(old_surface)) ==NULL)
+      Error(ERR_EXIT, "SDL_DisplayFormat() failed");
+    SDL_SetColorKey(old_surface, 0, 0);		/* reset transparent pixel */
+#endif
+  }
+#endif
+
   FreeBitmap(new_bitmap);	/* this actually frees the _old_ bitmap now */
 }
 

@@ -1549,9 +1549,13 @@ int get_integer_from_string(char *s)
 
   if (result == -1)
   {
-    if (strEqual(s_lower, "false"))
+    if (strEqual(s_lower, "false") ||
+	strEqual(s_lower, "no") ||
+	strEqual(s_lower, "off"))
       result = 0;
-    else if (strEqual(s_lower, "true"))
+    else if (strEqual(s_lower, "true") ||
+	     strEqual(s_lower, "yes") ||
+	     strEqual(s_lower, "on"))
       result = 1;
     else
       result = atoi(s);

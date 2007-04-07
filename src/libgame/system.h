@@ -1052,6 +1052,8 @@ struct TextPosInfo
   int align, valign;
   int size;
   int font, font_alt;
+  boolean draw_masked;
+  int sort_priority;
   int id;
 };
 

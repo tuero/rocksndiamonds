@@ -339,5 +339,6 @@ boolean CheckEngineSnapshot();
 void CreateGameButtons();
 void FreeGameButtons();
 void UnmapGameButtons();
+void RedrawGameButtons();
 
 #endif

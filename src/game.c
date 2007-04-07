@@ -222,6 +222,14 @@
 
 #define NUM_GAME_PANEL_CONTROLS			88
 
+struct GamePanelOrderInfo
+{
+  int nr;
+  int sort_priority;
+};
+
+static struct GamePanelOrderInfo game_panel_order[NUM_GAME_PANEL_CONTROLS];
+
 struct GamePanelControlInfo
 {
   int nr;
@@ -1892,6 +1900,20 @@ static int get_inventory_element_from_pos(struct PlayerInfo *player, int pos)
   }
 }
 
+static int compareGamePanelOrderInfo(const void *object1, const void *object2)
+{
+  const struct GamePanelOrderInfo *gpo1 = (struct GamePanelOrderInfo *)object1;
+  const struct GamePanelOrderInfo *gpo2 = (struct GamePanelOrderInfo *)object2;
+  int compare_result;
+
+  if (gpo1->sort_priority != gpo2->sort_priority)
+    compare_result = gpo1->sort_priority - gpo2->sort_priority;
+  else
+    compare_result = gpo1->nr - gpo2->nr;
+
+  return compare_result;
+}
+
 void InitGameControlValues()
 {
   int i;
@@ -1899,9 +1921,10 @@ void InitGameControlValues()
   for (i = 0; game_panel_controls[i].nr != -1; i++)
   {
     struct GamePanelControlInfo *gpc = &game_panel_controls[i];
+    struct GamePanelOrderInfo *gpo = &game_panel_order[i];
+    struct TextPosInfo *pos = gpc->pos;
     int nr = gpc->nr;
     int type = gpc->type;
-    struct TextPosInfo *pos = gpc->pos;
 
     if (nr != i)
     {
@@ -1925,7 +1948,15 @@ void InitGameControlValues()
       pos->width = pos->size;
       pos->height = pos->size;
     }
+
+    /* fill structure for game panel draw order */
+    gpo->nr = gpc->nr;
+    gpo->sort_priority = pos->sort_priority;
   }
+
+  /* sort game panel controls according to sort_priority and control number */
+  qsort(game_panel_order, NUM_GAME_PANEL_CONTROLS,
+	sizeof(struct GamePanelOrderInfo), compareGamePanelOrderInfo);
 }
 
 void UpdateGameControlValues()
@@ -2094,7 +2125,7 @@ void UpdateGameControlValues()
 
   for (i = 0; i < NUM_PANEL_CE_SCORE; i++)
   {
-    if (game.panel.ce_score[i].id != EL_UNDEFINED)
+    if (IS_CUSTOM_ELEMENT(game.panel.ce_score[i].id))
     {
       int ce_score = element_info[game.panel.ce_score[i].id].collect_score;
 
@@ -2131,25 +2162,73 @@ void UpdateGameControlValues()
 
 void DisplayGameControlValues()
 {
+  boolean redraw_panel = FALSE;
   int i;
-
-  game_status = GAME_MODE_PSEUDO_PANEL;
 
   for (i = 0; game_panel_controls[i].nr != -1; i++)
   {
     struct GamePanelControlInfo *gpc = &game_panel_controls[i];
+
+    if (PANEL_DEACTIVATED(gpc->pos))
+      continue;
+
+    if (gpc->value == gpc->last_value &&
+	gpc->frame == gpc->last_frame)
+      continue;
+
+    redraw_panel = TRUE;
+  }
+
+  if (!redraw_panel)
+    return;
+
+  /* copy default game door content to main double buffer */
+  BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
+	     DOOR_GFX_PAGEX5, DOOR_GFX_PAGEY1, DXSIZE, DYSIZE, DX, DY);
+
+  /* redraw game control buttons */
+#if 1
+  RedrawGameButtons();
+#else
+  UnmapGameButtons();
+  MapGameButtons();
+#endif
+
+  game_status = GAME_MODE_PSEUDO_PANEL;
+
+#if 1
+  for (i = 0; i < NUM_GAME_PANEL_CONTROLS; i++)
+#else
+  for (i = 0; game_panel_controls[i].nr != -1; i++)
+#endif
+  {
+#if 1
+    int nr = game_panel_order[i].nr;
+    struct GamePanelControlInfo *gpc = &game_panel_controls[nr];
+#else
+    struct GamePanelControlInfo *gpc = &game_panel_controls[i];
     int nr = gpc->nr;
-    int type = gpc->type;
+#endif
     struct TextPosInfo *pos = gpc->pos;
+    int type = gpc->type;
     int value = gpc->value;
     int frame = gpc->frame;
+#if 0
     int last_value = gpc->last_value;
     int last_frame = gpc->last_frame;
+#endif
     int size = pos->size;
     int font = pos->font;
+    boolean draw_masked = pos->draw_masked;
+    int mask_mode = (draw_masked ? BLIT_MASKED : BLIT_OPAQUE);
 
+    if (PANEL_DEACTIVATED(pos))
+      continue;
+
+#if 0
     if (value == last_value && frame == last_frame)
       continue;
+#endif
 
     gpc->last_value = value;
     gpc->last_frame = frame;
@@ -2157,9 +2236,6 @@ void DisplayGameControlValues()
 #if 0
     printf("::: value %d changed from %d to %d\n", nr, last_value, value);
 #endif
-
-    if (PANEL_DEACTIVATED(pos))
-      continue;
 
     if (type == TYPE_INTEGER)
     {
@@ -2179,6 +2255,7 @@ void DisplayGameControlValues()
 	  size = (value < value_change ? size1 : size2);
 	  font = (value < value_change ? font1 : font2);
 
+#if 0
 	  /* clear background if value just changed its size (dynamic digits) */
 	  if ((last_value < value_change) != (value < value_change))
 	  {
@@ -2192,6 +2269,7 @@ void DisplayGameControlValues()
 	    ClearRectangleOnBackground(drawto, PANEL_XPOS(pos), PANEL_YPOS(pos),
 				       max_width, max_height);
 	  }
+#endif
 	}
       }
 
@@ -2204,7 +2282,8 @@ void DisplayGameControlValues()
       pos->width = size * getFontWidth(font);
 #endif
 
-      DrawText(PANEL_XPOS(pos), PANEL_YPOS(pos), int2str(value, size), font);
+      DrawTextExt(drawto, PANEL_XPOS(pos), PANEL_YPOS(pos),
+		  int2str(value, size), font, mask_mode);
     }
     else if (type == TYPE_ELEMENT)
     {
@@ -2215,6 +2294,32 @@ void DisplayGameControlValues()
       int dst_x = PANEL_XPOS(pos);
       int dst_y = PANEL_YPOS(pos);
 
+#if 1
+      if (value != EL_UNDEFINED && value != EL_EMPTY)
+      {
+	element = value;
+	graphic = el2panelimg(value);
+
+	getSizedGraphicSource(graphic, frame, size, &src_bitmap,
+			      &src_x, &src_y);
+
+	width  = graphic_info[graphic].width  * size / TILESIZE;
+	height = graphic_info[graphic].height * size / TILESIZE;
+
+	if (draw_masked)
+	{
+	  SetClipOrigin(src_bitmap, src_bitmap->stored_clip_gc,
+			dst_x - src_x, dst_y - src_y);
+	  BlitBitmapMasked(src_bitmap, drawto, src_x, src_y, width, height,
+			   dst_x, dst_y);
+	}
+	else
+	{
+	  BlitBitmap(src_bitmap, drawto, src_x, src_y, width, height,
+		     dst_x, dst_y);
+	}
+      }
+#else
       if (value == EL_UNDEFINED || value == EL_EMPTY)
       {
 	element = (last_value == EL_UNDEFINED ? EL_EMPTY : last_value);
@@ -2236,6 +2341,7 @@ void DisplayGameControlValues()
       height = graphic_info[graphic].height * size / TILESIZE;
 
       BlitBitmap(src_bitmap, drawto, src_x, src_y, width, height, dst_x, dst_y);
+#endif
     }
     else if (type == TYPE_STRING)
     {
@@ -2252,6 +2358,7 @@ void DisplayGameControlValues()
       {
 	int font1 = pos->font;		/* (used for normal state) */
 	int font2 = pos->font_alt;	/* (used for active state) */
+#if 0
 	int size1 = strlen(state_normal);
 	int size2 = strlen(state_active);
 	int width1 = size1 * getFontWidth(font1);
@@ -2264,6 +2371,7 @@ void DisplayGameControlValues()
 	/* clear background for values that may have changed its size */
 	ClearRectangleOnBackground(drawto, PANEL_XPOS(pos), PANEL_YPOS(pos),
 				   max_width, max_height);
+#endif
 
 	font = (active ? font2 : font1);
       }
@@ -2285,7 +2393,8 @@ void DisplayGameControlValues()
 
 	s_cut = getStringCopyN(s, size);
 
-	DrawText(PANEL_XPOS(pos), PANEL_YPOS(pos), s_cut, font);
+	DrawTextExt(drawto, PANEL_XPOS(pos), PANEL_YPOS(pos),
+		    s_cut, font, mask_mode);
 
 	free(s_cut);
       }
@@ -15430,6 +15539,7 @@ void CreateGameButtons()
 		      GDI_DESIGN_PRESSED, gd_bitmap, gd_x2, gd_y1,
 		      GDI_ALT_DESIGN_UNPRESSED, gd_bitmap, gd_x1, gd_y2,
 		      GDI_ALT_DESIGN_PRESSED, gd_bitmap, gd_x2, gd_y2,
+		      GDI_DIRECT_DRAW, FALSE,
 		      GDI_EVENT_MASK, event_mask,
 		      GDI_CALLBACK_ACTION, HandleGameButtons,
 		      GDI_END);
@@ -15463,6 +15573,14 @@ void UnmapGameButtons()
 
   for (i = 0; i < NUM_GAME_BUTTONS; i++)
     UnmapGadget(game_gadget[i]);
+}
+
+void RedrawGameButtons()
+{
+  int i;
+
+  for (i = 0; i < NUM_GAME_BUTTONS; i++)
+    RedrawGadget(game_gadget[i]);
 }
 
 static void HandleGameButtons(struct GadgetInfo *gi)
