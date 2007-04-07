@@ -2046,195 +2046,195 @@ struct TokenIntPtrInfo image_config_vars[] =
   },
   {
     "game.panel.inventory_first_1.x",
-    &game.panel.inventory_first_1.x
+    &game.panel.inventory_first[0].x
   },
   {
     "game.panel.inventory_first_1.y",
-    &game.panel.inventory_first_1.y
+    &game.panel.inventory_first[0].y
   },
   {
     "game.panel.inventory_first_1.tile_size",
-    &game.panel.inventory_first_1.size
+    &game.panel.inventory_first[0].size
   },
   {
     "game.panel.inventory_first_2.x",
-    &game.panel.inventory_first_2.x
+    &game.panel.inventory_first[1].x
   },
   {
     "game.panel.inventory_first_2.y",
-    &game.panel.inventory_first_2.y
+    &game.panel.inventory_first[1].y
   },
   {
     "game.panel.inventory_first_2.tile_size",
-    &game.panel.inventory_first_2.size
+    &game.panel.inventory_first[1].size
   },
   {
     "game.panel.inventory_first_3.x",
-    &game.panel.inventory_first_3.x
+    &game.panel.inventory_first[2].x
   },
   {
     "game.panel.inventory_first_3.y",
-    &game.panel.inventory_first_3.y
+    &game.panel.inventory_first[2].y
   },
   {
     "game.panel.inventory_first_3.tile_size",
-    &game.panel.inventory_first_3.size
+    &game.panel.inventory_first[2].size
   },
   {
     "game.panel.inventory_first_4.x",
-    &game.panel.inventory_first_4.x
+    &game.panel.inventory_first[3].x
   },
   {
     "game.panel.inventory_first_4.y",
-    &game.panel.inventory_first_4.y
+    &game.panel.inventory_first[3].y
   },
   {
     "game.panel.inventory_first_4.tile_size",
-    &game.panel.inventory_first_4.size
+    &game.panel.inventory_first[3].size
   },
   {
     "game.panel.inventory_first_5.x",
-    &game.panel.inventory_first_5.x
+    &game.panel.inventory_first[4].x
   },
   {
     "game.panel.inventory_first_5.y",
-    &game.panel.inventory_first_5.y
+    &game.panel.inventory_first[4].y
   },
   {
     "game.panel.inventory_first_5.tile_size",
-    &game.panel.inventory_first_5.size
+    &game.panel.inventory_first[4].size
   },
   {
     "game.panel.inventory_first_6.x",
-    &game.panel.inventory_first_6.x
+    &game.panel.inventory_first[5].x
   },
   {
     "game.panel.inventory_first_6.y",
-    &game.panel.inventory_first_6.y
+    &game.panel.inventory_first[5].y
   },
   {
     "game.panel.inventory_first_6.tile_size",
-    &game.panel.inventory_first_6.size
+    &game.panel.inventory_first[5].size
   },
   {
     "game.panel.inventory_first_7.x",
-    &game.panel.inventory_first_7.x
+    &game.panel.inventory_first[6].x
   },
   {
     "game.panel.inventory_first_7.y",
-    &game.panel.inventory_first_7.y
+    &game.panel.inventory_first[6].y
   },
   {
     "game.panel.inventory_first_7.tile_size",
-    &game.panel.inventory_first_7.size
+    &game.panel.inventory_first[6].size
   },
   {
     "game.panel.inventory_first_8.x",
-    &game.panel.inventory_first_8.x
+    &game.panel.inventory_first[7].x
   },
   {
     "game.panel.inventory_first_8.y",
-    &game.panel.inventory_first_8.y
+    &game.panel.inventory_first[7].y
   },
   {
     "game.panel.inventory_first_8.tile_size",
-    &game.panel.inventory_first_8.size
+    &game.panel.inventory_first[7].size
   },
   {
     "game.panel.inventory_last_1.x",
-    &game.panel.inventory_last_1.x
+    &game.panel.inventory_last[0].x
   },
   {
     "game.panel.inventory_last_1.y",
-    &game.panel.inventory_last_1.y
+    &game.panel.inventory_last[0].y
   },
   {
     "game.panel.inventory_last_1.tile_size",
-    &game.panel.inventory_last_1.size
+    &game.panel.inventory_last[0].size
   },
   {
     "game.panel.inventory_last_2.x",
-    &game.panel.inventory_last_2.x
+    &game.panel.inventory_last[1].x
   },
   {
     "game.panel.inventory_last_2.y",
-    &game.panel.inventory_last_2.y
+    &game.panel.inventory_last[1].y
   },
   {
     "game.panel.inventory_last_2.tile_size",
-    &game.panel.inventory_last_2.size
+    &game.panel.inventory_last[1].size
   },
   {
     "game.panel.inventory_last_3.x",
-    &game.panel.inventory_last_3.x
+    &game.panel.inventory_last[2].x
   },
   {
     "game.panel.inventory_last_3.y",
-    &game.panel.inventory_last_3.y
+    &game.panel.inventory_last[2].y
   },
   {
     "game.panel.inventory_last_3.tile_size",
-    &game.panel.inventory_last_3.size
+    &game.panel.inventory_last[2].size
   },
   {
     "game.panel.inventory_last_4.x",
-    &game.panel.inventory_last_4.x
+    &game.panel.inventory_last[3].x
   },
   {
     "game.panel.inventory_last_4.y",
-    &game.panel.inventory_last_4.y
+    &game.panel.inventory_last[3].y
   },
   {
     "game.panel.inventory_last_4.tile_size",
-    &game.panel.inventory_last_4.size
+    &game.panel.inventory_last[3].size
   },
   {
     "game.panel.inventory_last_5.x",
-    &game.panel.inventory_last_5.x
+    &game.panel.inventory_last[4].x
   },
   {
     "game.panel.inventory_last_5.y",
-    &game.panel.inventory_last_5.y
+    &game.panel.inventory_last[4].y
   },
   {
     "game.panel.inventory_last_5.tile_size",
-    &game.panel.inventory_last_5.size
+    &game.panel.inventory_last[4].size
   },
   {
     "game.panel.inventory_last_6.x",
-    &game.panel.inventory_last_6.x
+    &game.panel.inventory_last[5].x
   },
   {
     "game.panel.inventory_last_6.y",
-    &game.panel.inventory_last_6.y
+    &game.panel.inventory_last[5].y
   },
   {
     "game.panel.inventory_last_6.tile_size",
-    &game.panel.inventory_last_6.size
+    &game.panel.inventory_last[5].size
   },
   {
     "game.panel.inventory_last_7.x",
-    &game.panel.inventory_last_7.x
+    &game.panel.inventory_last[6].x
   },
   {
     "game.panel.inventory_last_7.y",
-    &game.panel.inventory_last_7.y
+    &game.panel.inventory_last[6].y
   },
   {
     "game.panel.inventory_last_7.tile_size",
-    &game.panel.inventory_last_7.size
+    &game.panel.inventory_last[6].size
   },
   {
     "game.panel.inventory_last_8.x",
-    &game.panel.inventory_last_8.x
+    &game.panel.inventory_last[7].x
   },
   {
     "game.panel.inventory_last_8.y",
-    &game.panel.inventory_last_8.y
+    &game.panel.inventory_last[7].y
   },
   {
     "game.panel.inventory_last_8.tile_size",
-    &game.panel.inventory_last_8.size
+    &game.panel.inventory_last[7].size
   },
   {
     "game.panel.key_1.x",
@@ -2914,99 +2914,99 @@ struct TokenIntPtrInfo image_config_vars[] =
   },
   {
     "game.panel.conveyor_belt_1.x",
-    &game.panel.conveyor_belt_1.x
+    &game.panel.conveyor_belt[0].x
   },
   {
     "game.panel.conveyor_belt_1.y",
-    &game.panel.conveyor_belt_1.y
+    &game.panel.conveyor_belt[0].y
   },
   {
     "game.panel.conveyor_belt_1.tile_size",
-    &game.panel.conveyor_belt_1.size
+    &game.panel.conveyor_belt[0].size
   },
   {
     "game.panel.conveyor_belt_1_switch.x",
-    &game.panel.conveyor_belt_1_switch.x
+    &game.panel.conveyor_belt_switch[0].x
   },
   {
     "game.panel.conveyor_belt_1_switch.y",
-    &game.panel.conveyor_belt_1_switch.y
+    &game.panel.conveyor_belt_switch[0].y
   },
   {
     "game.panel.conveyor_belt_1_switch.tile_size",
-    &game.panel.conveyor_belt_1_switch.size
+    &game.panel.conveyor_belt_switch[0].size
   },
   {
     "game.panel.conveyor_belt_2.x",
-    &game.panel.conveyor_belt_2.x
+    &game.panel.conveyor_belt[1].x
   },
   {
     "game.panel.conveyor_belt_2.y",
-    &game.panel.conveyor_belt_2.y
+    &game.panel.conveyor_belt[1].y
   },
   {
     "game.panel.conveyor_belt_2.tile_size",
-    &game.panel.conveyor_belt_2.size
+    &game.panel.conveyor_belt[1].size
   },
   {
     "game.panel.conveyor_belt_2_switch.x",
-    &game.panel.conveyor_belt_2_switch.x
+    &game.panel.conveyor_belt_switch[1].x
   },
   {
     "game.panel.conveyor_belt_2_switch.y",
-    &game.panel.conveyor_belt_2_switch.y
+    &game.panel.conveyor_belt_switch[1].y
   },
   {
     "game.panel.conveyor_belt_2_switch.tile_size",
-    &game.panel.conveyor_belt_2_switch.size
+    &game.panel.conveyor_belt_switch[1].size
   },
   {
     "game.panel.conveyor_belt_3.x",
-    &game.panel.conveyor_belt_3.x
+    &game.panel.conveyor_belt[2].x
   },
   {
     "game.panel.conveyor_belt_3.y",
-    &game.panel.conveyor_belt_3.y
+    &game.panel.conveyor_belt[2].y
   },
   {
     "game.panel.conveyor_belt_3.tile_size",
-    &game.panel.conveyor_belt_3.size
+    &game.panel.conveyor_belt[2].size
   },
   {
     "game.panel.conveyor_belt_3_switch.x",
-    &game.panel.conveyor_belt_3_switch.x
+    &game.panel.conveyor_belt_switch[2].x
   },
   {
     "game.panel.conveyor_belt_3_switch.y",
-    &game.panel.conveyor_belt_3_switch.y
+    &game.panel.conveyor_belt_switch[2].y
   },
   {
     "game.panel.conveyor_belt_3_switch.tile_size",
-    &game.panel.conveyor_belt_3_switch.size
+    &game.panel.conveyor_belt_switch[2].size
   },
   {
     "game.panel.conveyor_belt_4.x",
-    &game.panel.conveyor_belt_4.x
+    &game.panel.conveyor_belt[3].x
   },
   {
     "game.panel.conveyor_belt_4.y",
-    &game.panel.conveyor_belt_4.y
+    &game.panel.conveyor_belt[3].y
   },
   {
     "game.panel.conveyor_belt_4.tile_size",
-    &game.panel.conveyor_belt_4.size
+    &game.panel.conveyor_belt[3].size
   },
   {
     "game.panel.conveyor_belt_4_switch.x",
-    &game.panel.conveyor_belt_4_switch.x
+    &game.panel.conveyor_belt_switch[3].x
   },
   {
     "game.panel.conveyor_belt_4_switch.y",
-    &game.panel.conveyor_belt_4_switch.y
+    &game.panel.conveyor_belt_switch[3].y
   },
   {
     "game.panel.conveyor_belt_4_switch.tile_size",
-    &game.panel.conveyor_belt_4_switch.size
+    &game.panel.conveyor_belt_switch[3].size
   },
   {
     "game.panel.magic_wall.x",
@@ -3071,6 +3071,358 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "game.panel.gravity_state.font_active",
     &game.panel.gravity_state.font_alt
+  },
+  {
+    "game.panel.ce_score_1.x",
+    &game.panel.ce_score[0].x
+  },
+  {
+    "game.panel.ce_score_1.y",
+    &game.panel.ce_score[0].y
+  },
+  {
+    "game.panel.ce_score_1.align",
+    &game.panel.ce_score[0].align
+  },
+  {
+    "game.panel.ce_score_1.valign",
+    &game.panel.ce_score[0].valign
+  },
+  {
+    "game.panel.ce_score_1.digits",
+    &game.panel.ce_score[0].size
+  },
+  {
+    "game.panel.ce_score_1.font",
+    &game.panel.ce_score[0].font
+  },
+  {
+    "game.panel.ce_score_1.element",
+    &game.panel.ce_score[0].id
+  },
+  {
+    "game.panel.ce_score_1_element.x",
+    &game.panel.ce_score_element[0].x
+  },
+  {
+    "game.panel.ce_score_1_element.y",
+    &game.panel.ce_score_element[0].y
+  },
+  {
+    "game.panel.ce_score_1_element.tile_size",
+    &game.panel.ce_score_element[0].size
+  },
+  {
+    "game.panel.ce_score_1_element.element",
+    &game.panel.ce_score_element[0].id
+  },
+  {
+    "game.panel.ce_score_2.x",
+    &game.panel.ce_score[1].x
+  },
+  {
+    "game.panel.ce_score_2.y",
+    &game.panel.ce_score[1].y
+  },
+  {
+    "game.panel.ce_score_2.align",
+    &game.panel.ce_score[1].align
+  },
+  {
+    "game.panel.ce_score_2.valign",
+    &game.panel.ce_score[1].valign
+  },
+  {
+    "game.panel.ce_score_2.digits",
+    &game.panel.ce_score[1].size
+  },
+  {
+    "game.panel.ce_score_2.font",
+    &game.panel.ce_score[1].font
+  },
+  {
+    "game.panel.ce_score_2.element",
+    &game.panel.ce_score[1].id
+  },
+  {
+    "game.panel.ce_score_2_element.x",
+    &game.panel.ce_score_element[1].x
+  },
+  {
+    "game.panel.ce_score_2_element.y",
+    &game.panel.ce_score_element[1].y
+  },
+  {
+    "game.panel.ce_score_2_element.tile_size",
+    &game.panel.ce_score_element[1].size
+  },
+  {
+    "game.panel.ce_score_2_element.element",
+    &game.panel.ce_score_element[1].id
+  },
+  {
+    "game.panel.ce_score_3.x",
+    &game.panel.ce_score[2].x
+  },
+  {
+    "game.panel.ce_score_3.y",
+    &game.panel.ce_score[2].y
+  },
+  {
+    "game.panel.ce_score_3.align",
+    &game.panel.ce_score[2].align
+  },
+  {
+    "game.panel.ce_score_3.valign",
+    &game.panel.ce_score[2].valign
+  },
+  {
+    "game.panel.ce_score_3.digits",
+    &game.panel.ce_score[2].size
+  },
+  {
+    "game.panel.ce_score_3.font",
+    &game.panel.ce_score[2].font
+  },
+  {
+    "game.panel.ce_score_3.element",
+    &game.panel.ce_score[2].id
+  },
+  {
+    "game.panel.ce_score_3_element.x",
+    &game.panel.ce_score_element[2].x
+  },
+  {
+    "game.panel.ce_score_3_element.y",
+    &game.panel.ce_score_element[2].y
+  },
+  {
+    "game.panel.ce_score_3_element.tile_size",
+    &game.panel.ce_score_element[2].size
+  },
+  {
+    "game.panel.ce_score_3_element.element",
+    &game.panel.ce_score_element[2].id
+  },
+  {
+    "game.panel.ce_score_4.x",
+    &game.panel.ce_score[3].x
+  },
+  {
+    "game.panel.ce_score_4.y",
+    &game.panel.ce_score[3].y
+  },
+  {
+    "game.panel.ce_score_4.align",
+    &game.panel.ce_score[3].align
+  },
+  {
+    "game.panel.ce_score_4.valign",
+    &game.panel.ce_score[3].valign
+  },
+  {
+    "game.panel.ce_score_4.digits",
+    &game.panel.ce_score[3].size
+  },
+  {
+    "game.panel.ce_score_4.font",
+    &game.panel.ce_score[3].font
+  },
+  {
+    "game.panel.ce_score_4.element",
+    &game.panel.ce_score[3].id
+  },
+  {
+    "game.panel.ce_score_4_element.x",
+    &game.panel.ce_score_element[3].x
+  },
+  {
+    "game.panel.ce_score_4_element.y",
+    &game.panel.ce_score_element[3].y
+  },
+  {
+    "game.panel.ce_score_4_element.tile_size",
+    &game.panel.ce_score_element[3].size
+  },
+  {
+    "game.panel.ce_score_4_element.element",
+    &game.panel.ce_score_element[3].id
+  },
+  {
+    "game.panel.ce_score_5.x",
+    &game.panel.ce_score[4].x
+  },
+  {
+    "game.panel.ce_score_5.y",
+    &game.panel.ce_score[4].y
+  },
+  {
+    "game.panel.ce_score_5.align",
+    &game.panel.ce_score[4].align
+  },
+  {
+    "game.panel.ce_score_5.valign",
+    &game.panel.ce_score[4].valign
+  },
+  {
+    "game.panel.ce_score_5.digits",
+    &game.panel.ce_score[4].size
+  },
+  {
+    "game.panel.ce_score_5.font",
+    &game.panel.ce_score[4].font
+  },
+  {
+    "game.panel.ce_score_5.element",
+    &game.panel.ce_score[4].id
+  },
+  {
+    "game.panel.ce_score_5_element.x",
+    &game.panel.ce_score_element[4].x
+  },
+  {
+    "game.panel.ce_score_5_element.y",
+    &game.panel.ce_score_element[4].y
+  },
+  {
+    "game.panel.ce_score_5_element.tile_size",
+    &game.panel.ce_score_element[4].size
+  },
+  {
+    "game.panel.ce_score_5_element.element",
+    &game.panel.ce_score_element[4].id
+  },
+  {
+    "game.panel.ce_score_6.x",
+    &game.panel.ce_score[5].x
+  },
+  {
+    "game.panel.ce_score_6.y",
+    &game.panel.ce_score[5].y
+  },
+  {
+    "game.panel.ce_score_6.align",
+    &game.panel.ce_score[5].align
+  },
+  {
+    "game.panel.ce_score_6.valign",
+    &game.panel.ce_score[5].valign
+  },
+  {
+    "game.panel.ce_score_6.digits",
+    &game.panel.ce_score[5].size
+  },
+  {
+    "game.panel.ce_score_6.font",
+    &game.panel.ce_score[5].font
+  },
+  {
+    "game.panel.ce_score_6.element",
+    &game.panel.ce_score[5].id
+  },
+  {
+    "game.panel.ce_score_6_element.x",
+    &game.panel.ce_score_element[5].x
+  },
+  {
+    "game.panel.ce_score_6_element.y",
+    &game.panel.ce_score_element[5].y
+  },
+  {
+    "game.panel.ce_score_6_element.tile_size",
+    &game.panel.ce_score_element[5].size
+  },
+  {
+    "game.panel.ce_score_6_element.element",
+    &game.panel.ce_score_element[5].id
+  },
+  {
+    "game.panel.ce_score_7.x",
+    &game.panel.ce_score[6].x
+  },
+  {
+    "game.panel.ce_score_7.y",
+    &game.panel.ce_score[6].y
+  },
+  {
+    "game.panel.ce_score_7.align",
+    &game.panel.ce_score[6].align
+  },
+  {
+    "game.panel.ce_score_7.valign",
+    &game.panel.ce_score[6].valign
+  },
+  {
+    "game.panel.ce_score_7.digits",
+    &game.panel.ce_score[6].size
+  },
+  {
+    "game.panel.ce_score_7.font",
+    &game.panel.ce_score[6].font
+  },
+  {
+    "game.panel.ce_score_7.element",
+    &game.panel.ce_score[6].id
+  },
+  {
+    "game.panel.ce_score_7_element.x",
+    &game.panel.ce_score_element[6].x
+  },
+  {
+    "game.panel.ce_score_7_element.y",
+    &game.panel.ce_score_element[6].y
+  },
+  {
+    "game.panel.ce_score_7_element.tile_size",
+    &game.panel.ce_score_element[6].size
+  },
+  {
+    "game.panel.ce_score_7_element.element",
+    &game.panel.ce_score_element[6].id
+  },
+  {
+    "game.panel.ce_score_8.x",
+    &game.panel.ce_score[7].x
+  },
+  {
+    "game.panel.ce_score_8.y",
+    &game.panel.ce_score[7].y
+  },
+  {
+    "game.panel.ce_score_8.align",
+    &game.panel.ce_score[7].align
+  },
+  {
+    "game.panel.ce_score_8.valign",
+    &game.panel.ce_score[7].valign
+  },
+  {
+    "game.panel.ce_score_8.digits",
+    &game.panel.ce_score[7].size
+  },
+  {
+    "game.panel.ce_score_8.font",
+    &game.panel.ce_score[7].font
+  },
+  {
+    "game.panel.ce_score_8.element",
+    &game.panel.ce_score[7].id
+  },
+  {
+    "game.panel.ce_score_8_element.x",
+    &game.panel.ce_score_element[7].x
+  },
+  {
+    "game.panel.ce_score_8_element.y",
+    &game.panel.ce_score_element[7].y
+  },
+  {
+    "game.panel.ce_score_8_element.tile_size",
+    &game.panel.ce_score_element[7].size
+  },
+  {
+    "game.panel.ce_score_8_element.element",
+    &game.panel.ce_score_element[7].id
   },
   {
     "game.panel.player_name.x",

@@ -18,9 +18,15 @@
 /* #include "main.h" */
 
 #define MAX_INVENTORY_SIZE	1000
+
 #define STD_NUM_KEYS		4
 #define MAX_NUM_KEYS		8
 
+#define NUM_BELTS		4
+#define NUM_BELT_PARTS		3
+
+#define NUM_PANEL_INVENTORY	8
+#define NUM_PANEL_CE_SCORE	8
 
 #if 1
 struct GamePanelInfo
@@ -28,22 +34,8 @@ struct GamePanelInfo
   struct TextPosInfo level_number;
   struct TextPosInfo gems;
   struct TextPosInfo inventory_count;
-  struct TextPosInfo inventory_first_1;
-  struct TextPosInfo inventory_first_2;
-  struct TextPosInfo inventory_first_3;
-  struct TextPosInfo inventory_first_4;
-  struct TextPosInfo inventory_first_5;
-  struct TextPosInfo inventory_first_6;
-  struct TextPosInfo inventory_first_7;
-  struct TextPosInfo inventory_first_8;
-  struct TextPosInfo inventory_last_1;
-  struct TextPosInfo inventory_last_2;
-  struct TextPosInfo inventory_last_3;
-  struct TextPosInfo inventory_last_4;
-  struct TextPosInfo inventory_last_5;
-  struct TextPosInfo inventory_last_6;
-  struct TextPosInfo inventory_last_7;
-  struct TextPosInfo inventory_last_8;
+  struct TextPosInfo inventory_first[NUM_PANEL_INVENTORY];
+  struct TextPosInfo inventory_last[NUM_PANEL_INVENTORY];
   struct TextPosInfo key[MAX_NUM_KEYS];
   struct TextPosInfo key_white;
   struct TextPosInfo key_white_count;
@@ -76,17 +68,13 @@ struct GamePanelInfo
   struct TextPosInfo sokoban_objects;
   struct TextPosInfo sokoban_fields;
   struct TextPosInfo robot_wheel;
-  struct TextPosInfo conveyor_belt_1;
-  struct TextPosInfo conveyor_belt_1_switch;
-  struct TextPosInfo conveyor_belt_2;
-  struct TextPosInfo conveyor_belt_2_switch;
-  struct TextPosInfo conveyor_belt_3;
-  struct TextPosInfo conveyor_belt_3_switch;
-  struct TextPosInfo conveyor_belt_4;
-  struct TextPosInfo conveyor_belt_4_switch;
+  struct TextPosInfo conveyor_belt[NUM_BELTS];
+  struct TextPosInfo conveyor_belt_switch[NUM_BELTS];
   struct TextPosInfo magic_wall;
   struct TextPosInfo magic_wall_time;
   struct TextPosInfo gravity_state;
+  struct TextPosInfo ce_score[NUM_PANEL_CE_SCORE];
+  struct TextPosInfo ce_score_element[NUM_PANEL_CE_SCORE];
   struct TextPosInfo player_name;
   struct TextPosInfo level_name;
   struct TextPosInfo level_author;

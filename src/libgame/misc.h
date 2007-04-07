@@ -108,6 +108,8 @@ char *getStringToLower(char *);
 void setString(char **, char *);
 boolean strEqual(char *, char *);
 boolean strEqualN(char *, char *, int);
+boolean strEqualPrefix(char *, char *);
+boolean strEqualSuffix(char *, char *);
 
 void GetOptions(char **, void (*print_usage_function)(void));
 
@@ -182,7 +184,6 @@ boolean FileIsArtworkType(char *, int);
 char *get_mapped_token(char *);
 
 int get_parameter_value(char *, char *, int);
-int get_token_parameter_value(char *, char *);
 
 struct ScreenModeInfo *get_screen_mode_from_string(char *);
 void get_aspect_ratio_from_screen_mode(struct ScreenModeInfo *, int *x, int *y);

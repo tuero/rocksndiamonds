@@ -858,8 +858,6 @@
 
 #define MAX_NUM_AMOEBA		100
 
-#define NUM_BELTS		4
-#define NUM_BELT_PARTS		3
 #define NUM_ENVELOPES		4
 #define MIN_ENVELOPE_XSIZE	1
 #define MIN_ENVELOPE_YSIZE	1

@@ -131,8 +131,8 @@
 #if 1
 /* game panel display and control definitions */
 
-#define GAME_PANEL_LEVEL_NUMBER		0
-#define GAME_PANEL_GEMS			1
+#define GAME_PANEL_LEVEL_NUMBER			0
+#define GAME_PANEL_GEMS				1
 #define GAME_PANEL_INVENTORY_COUNT		2
 #define GAME_PANEL_INVENTORY_FIRST_1		3
 #define GAME_PANEL_INVENTORY_FIRST_2		4
@@ -161,7 +161,7 @@
 #define GAME_PANEL_KEY_WHITE			27
 #define GAME_PANEL_KEY_WHITE_COUNT		28
 #define GAME_PANEL_SCORE			29
-#define GAME_PANEL_TIME			30
+#define GAME_PANEL_TIME				30
 #define GAME_PANEL_TIME_HH			31
 #define GAME_PANEL_TIME_MM			32
 #define GAME_PANEL_TIME_SS			33
@@ -169,13 +169,13 @@
 #define GAME_PANEL_SHIELD_NORMAL_TIME		35
 #define GAME_PANEL_SHIELD_DEADLY		36
 #define GAME_PANEL_SHIELD_DEADLY_TIME		37
-#define GAME_PANEL_EXIT			38
+#define GAME_PANEL_EXIT				38
 #define GAME_PANEL_EMC_MAGIC_BALL		39
 #define GAME_PANEL_EMC_MAGIC_BALL_SWITCH	40
-#define GAME_PANEL_LIGHT_SWITCH		41
+#define GAME_PANEL_LIGHT_SWITCH			41
 #define GAME_PANEL_LIGHT_SWITCH_TIME		42
 #define GAME_PANEL_TIMEGATE_SWITCH		43
-#define GAME_PANEL_TIMEGATE_SWITCH_TIME	44
+#define GAME_PANEL_TIMEGATE_SWITCH_TIME		44
 #define GAME_PANEL_SWITCHGATE_SWITCH		45
 #define GAME_PANEL_EMC_LENSES			46
 #define GAME_PANEL_EMC_LENSES_TIME		47
@@ -188,23 +188,39 @@
 #define GAME_PANEL_PENGUINS			54
 #define GAME_PANEL_SOKOBAN_OBJECTS		55
 #define GAME_PANEL_SOKOBAN_FIELDS		56
-#define GAME_PANEL_ROBOT_WHEEL		57
+#define GAME_PANEL_ROBOT_WHEEL			57
 #define GAME_PANEL_CONVEYOR_BELT_1		58
-#define GAME_PANEL_CONVEYOR_BELT_1_SWITCH	59
-#define GAME_PANEL_CONVEYOR_BELT_2		60
-#define GAME_PANEL_CONVEYOR_BELT_2_SWITCH	61
-#define GAME_PANEL_CONVEYOR_BELT_3		62
-#define GAME_PANEL_CONVEYOR_BELT_3_SWITCH	63
-#define GAME_PANEL_CONVEYOR_BELT_4		64
+#define GAME_PANEL_CONVEYOR_BELT_2		59
+#define GAME_PANEL_CONVEYOR_BELT_3		60
+#define GAME_PANEL_CONVEYOR_BELT_4		61
+#define GAME_PANEL_CONVEYOR_BELT_1_SWITCH	62
+#define GAME_PANEL_CONVEYOR_BELT_2_SWITCH	63
+#define GAME_PANEL_CONVEYOR_BELT_3_SWITCH	64
 #define GAME_PANEL_CONVEYOR_BELT_4_SWITCH	65
 #define GAME_PANEL_MAGIC_WALL			66
 #define GAME_PANEL_MAGIC_WALL_TIME		67
 #define GAME_PANEL_GRAVITY_STATE		68
-#define GAME_PANEL_PLAYER_NAME		69
-#define GAME_PANEL_LEVEL_NAME			70
-#define GAME_PANEL_LEVEL_AUTHOR		71
+#define GAME_PANEL_CE_SCORE_1			69
+#define GAME_PANEL_CE_SCORE_2			70
+#define GAME_PANEL_CE_SCORE_3			71
+#define GAME_PANEL_CE_SCORE_4			72
+#define GAME_PANEL_CE_SCORE_5			73
+#define GAME_PANEL_CE_SCORE_6			74
+#define GAME_PANEL_CE_SCORE_7			75
+#define GAME_PANEL_CE_SCORE_8			76
+#define GAME_PANEL_CE_SCORE_1_ELEMENT		77
+#define GAME_PANEL_CE_SCORE_2_ELEMENT		78
+#define GAME_PANEL_CE_SCORE_3_ELEMENT		79
+#define GAME_PANEL_CE_SCORE_4_ELEMENT		80
+#define GAME_PANEL_CE_SCORE_5_ELEMENT		81
+#define GAME_PANEL_CE_SCORE_6_ELEMENT		82
+#define GAME_PANEL_CE_SCORE_7_ELEMENT		83
+#define GAME_PANEL_CE_SCORE_8_ELEMENT		84
+#define GAME_PANEL_PLAYER_NAME			85
+#define GAME_PANEL_LEVEL_NAME			86
+#define GAME_PANEL_LEVEL_AUTHOR			87
 
-#define NUM_GAME_PANEL_CONTROLS			72
+#define NUM_GAME_PANEL_CONTROLS			88
 
 struct GamePanelControlInfo
 {
@@ -237,82 +253,82 @@ static struct GamePanelControlInfo game_panel_controls[] =
   },
   {
     GAME_PANEL_INVENTORY_FIRST_1,
-    &game.panel.inventory_first_1,
+    &game.panel.inventory_first[0],
     TYPE_ELEMENT,
   },
   {
     GAME_PANEL_INVENTORY_FIRST_2,
-    &game.panel.inventory_first_2,
+    &game.panel.inventory_first[1],
     TYPE_ELEMENT,
   },
   {
     GAME_PANEL_INVENTORY_FIRST_3,
-    &game.panel.inventory_first_3,
+    &game.panel.inventory_first[2],
     TYPE_ELEMENT,
   },
   {
     GAME_PANEL_INVENTORY_FIRST_4,
-    &game.panel.inventory_first_4,
+    &game.panel.inventory_first[3],
     TYPE_ELEMENT,
   },
   {
     GAME_PANEL_INVENTORY_FIRST_5,
-    &game.panel.inventory_first_5,
+    &game.panel.inventory_first[4],
     TYPE_ELEMENT,
   },
   {
     GAME_PANEL_INVENTORY_FIRST_6,
-    &game.panel.inventory_first_6,
+    &game.panel.inventory_first[5],
     TYPE_ELEMENT,
   },
   {
     GAME_PANEL_INVENTORY_FIRST_7,
-    &game.panel.inventory_first_7,
+    &game.panel.inventory_first[6],
     TYPE_ELEMENT,
   },
   {
     GAME_PANEL_INVENTORY_FIRST_8,
-    &game.panel.inventory_first_8,
+    &game.panel.inventory_first[7],
     TYPE_ELEMENT,
   },
   {
     GAME_PANEL_INVENTORY_LAST_1,
-    &game.panel.inventory_last_1,
+    &game.panel.inventory_last[0],
     TYPE_ELEMENT,
   },
   {
     GAME_PANEL_INVENTORY_LAST_2,
-    &game.panel.inventory_last_2,
+    &game.panel.inventory_last[1],
     TYPE_ELEMENT,
   },
   {
     GAME_PANEL_INVENTORY_LAST_3,
-    &game.panel.inventory_last_3,
+    &game.panel.inventory_last[2],
     TYPE_ELEMENT,
   },
   {
     GAME_PANEL_INVENTORY_LAST_4,
-    &game.panel.inventory_last_4,
+    &game.panel.inventory_last[3],
     TYPE_ELEMENT,
   },
   {
     GAME_PANEL_INVENTORY_LAST_5,
-    &game.panel.inventory_last_5,
+    &game.panel.inventory_last[4],
     TYPE_ELEMENT,
   },
   {
     GAME_PANEL_INVENTORY_LAST_6,
-    &game.panel.inventory_last_6,
+    &game.panel.inventory_last[5],
     TYPE_ELEMENT,
   },
   {
     GAME_PANEL_INVENTORY_LAST_7,
-    &game.panel.inventory_last_7,
+    &game.panel.inventory_last[6],
     TYPE_ELEMENT,
   },
   {
     GAME_PANEL_INVENTORY_LAST_8,
-    &game.panel.inventory_last_8,
+    &game.panel.inventory_last[7],
     TYPE_ELEMENT,
   },
   {
@@ -512,42 +528,42 @@ static struct GamePanelControlInfo game_panel_controls[] =
   },
   {
     GAME_PANEL_CONVEYOR_BELT_1,
-    &game.panel.conveyor_belt_1,
-    TYPE_ELEMENT,
-  },
-  {
-    GAME_PANEL_CONVEYOR_BELT_1_SWITCH,
-    &game.panel.conveyor_belt_1_switch,
+    &game.panel.conveyor_belt[0],
     TYPE_ELEMENT,
   },
   {
     GAME_PANEL_CONVEYOR_BELT_2,
-    &game.panel.conveyor_belt_2,
-    TYPE_ELEMENT,
-  },
-  {
-    GAME_PANEL_CONVEYOR_BELT_2_SWITCH,
-    &game.panel.conveyor_belt_2_switch,
+    &game.panel.conveyor_belt[1],
     TYPE_ELEMENT,
   },
   {
     GAME_PANEL_CONVEYOR_BELT_3,
-    &game.panel.conveyor_belt_3,
-    TYPE_ELEMENT,
-  },
-  {
-    GAME_PANEL_CONVEYOR_BELT_3_SWITCH,
-    &game.panel.conveyor_belt_3_switch,
+    &game.panel.conveyor_belt[2],
     TYPE_ELEMENT,
   },
   {
     GAME_PANEL_CONVEYOR_BELT_4,
-    &game.panel.conveyor_belt_4,
+    &game.panel.conveyor_belt[3],
+    TYPE_ELEMENT,
+  },
+  {
+    GAME_PANEL_CONVEYOR_BELT_1_SWITCH,
+    &game.panel.conveyor_belt_switch[0],
+    TYPE_ELEMENT,
+  },
+  {
+    GAME_PANEL_CONVEYOR_BELT_2_SWITCH,
+    &game.panel.conveyor_belt_switch[1],
+    TYPE_ELEMENT,
+  },
+  {
+    GAME_PANEL_CONVEYOR_BELT_3_SWITCH,
+    &game.panel.conveyor_belt_switch[2],
     TYPE_ELEMENT,
   },
   {
     GAME_PANEL_CONVEYOR_BELT_4_SWITCH,
-    &game.panel.conveyor_belt_4_switch,
+    &game.panel.conveyor_belt_switch[3],
     TYPE_ELEMENT,
   },
   {
@@ -564,6 +580,86 @@ static struct GamePanelControlInfo game_panel_controls[] =
     GAME_PANEL_GRAVITY_STATE,
     &game.panel.gravity_state,
     TYPE_STRING,
+  },
+  {
+    GAME_PANEL_CE_SCORE_1,
+    &game.panel.ce_score[0],
+    TYPE_INTEGER,
+  },
+  {
+    GAME_PANEL_CE_SCORE_2,
+    &game.panel.ce_score[1],
+    TYPE_INTEGER,
+  },
+  {
+    GAME_PANEL_CE_SCORE_3,
+    &game.panel.ce_score[2],
+    TYPE_INTEGER,
+  },
+  {
+    GAME_PANEL_CE_SCORE_4,
+    &game.panel.ce_score[3],
+    TYPE_INTEGER,
+  },
+  {
+    GAME_PANEL_CE_SCORE_5,
+    &game.panel.ce_score[4],
+    TYPE_INTEGER,
+  },
+  {
+    GAME_PANEL_CE_SCORE_6,
+    &game.panel.ce_score[5],
+    TYPE_INTEGER,
+  },
+  {
+    GAME_PANEL_CE_SCORE_7,
+    &game.panel.ce_score[6],
+    TYPE_INTEGER,
+  },
+  {
+    GAME_PANEL_CE_SCORE_8,
+    &game.panel.ce_score[7],
+    TYPE_INTEGER,
+  },
+  {
+    GAME_PANEL_CE_SCORE_1_ELEMENT,
+    &game.panel.ce_score_element[0],
+    TYPE_ELEMENT,
+  },
+  {
+    GAME_PANEL_CE_SCORE_2_ELEMENT,
+    &game.panel.ce_score_element[1],
+    TYPE_ELEMENT,
+  },
+  {
+    GAME_PANEL_CE_SCORE_3_ELEMENT,
+    &game.panel.ce_score_element[2],
+    TYPE_ELEMENT,
+  },
+  {
+    GAME_PANEL_CE_SCORE_4_ELEMENT,
+    &game.panel.ce_score_element[3],
+    TYPE_ELEMENT,
+  },
+  {
+    GAME_PANEL_CE_SCORE_5_ELEMENT,
+    &game.panel.ce_score_element[4],
+    TYPE_ELEMENT,
+  },
+  {
+    GAME_PANEL_CE_SCORE_6_ELEMENT,
+    &game.panel.ce_score_element[5],
+    TYPE_ELEMENT,
+  },
+  {
+    GAME_PANEL_CE_SCORE_7_ELEMENT,
+    &game.panel.ce_score_element[6],
+    TYPE_ELEMENT,
+  },
+  {
+    GAME_PANEL_CE_SCORE_8_ELEMENT,
+    &game.panel.ce_score_element[7],
+    TYPE_ELEMENT,
   },
   {
     GAME_PANEL_PLAYER_NAME,
@@ -1891,7 +1987,7 @@ void UpdateGameControlValues()
       stored_player[player_nr].num_white_keys;
   }
 
-  for (i = 0; i < 8; i++)
+  for (i = 0; i < NUM_PANEL_INVENTORY; i++)
   {
     game_panel_controls[GAME_PANEL_INVENTORY_FIRST_1 + i].value =
       get_inventory_element_from_pos(local_player, i);
@@ -1975,26 +2071,14 @@ void UpdateGameControlValues()
   game_panel_controls[GAME_PANEL_ROBOT_WHEEL].value =
     (game.robot_wheel_active ? EL_ROBOT_WHEEL_ACTIVE : EL_ROBOT_WHEEL);
 
-  game_panel_controls[GAME_PANEL_CONVEYOR_BELT_1].value =
-    (game.belt_dir[0] != MV_NONE ? EL_CONVEYOR_BELT_1_MIDDLE_ACTIVE :
-     EL_CONVEYOR_BELT_1_MIDDLE);
-  game_panel_controls[GAME_PANEL_CONVEYOR_BELT_1_SWITCH].value =
-    getBeltSwitchElementFromBeltNrAndBeltDir(0, game.belt_dir[0]);
-  game_panel_controls[GAME_PANEL_CONVEYOR_BELT_2].value =
-    (game.belt_dir[1] != MV_NONE ? EL_CONVEYOR_BELT_2_MIDDLE_ACTIVE :
-     EL_CONVEYOR_BELT_2_MIDDLE);
-  game_panel_controls[GAME_PANEL_CONVEYOR_BELT_2_SWITCH].value =
-    getBeltSwitchElementFromBeltNrAndBeltDir(1, game.belt_dir[1]);
-  game_panel_controls[GAME_PANEL_CONVEYOR_BELT_3].value =
-    (game.belt_dir[2] != MV_NONE ? EL_CONVEYOR_BELT_3_MIDDLE_ACTIVE :
-     EL_CONVEYOR_BELT_3_MIDDLE);
-  game_panel_controls[GAME_PANEL_CONVEYOR_BELT_3_SWITCH].value =
-    getBeltSwitchElementFromBeltNrAndBeltDir(2, game.belt_dir[2]);
-  game_panel_controls[GAME_PANEL_CONVEYOR_BELT_4].value =
-    (game.belt_dir[3] != MV_NONE ? EL_CONVEYOR_BELT_4_MIDDLE_ACTIVE :
-     EL_CONVEYOR_BELT_4_MIDDLE);
-  game_panel_controls[GAME_PANEL_CONVEYOR_BELT_4_SWITCH].value =
-    getBeltSwitchElementFromBeltNrAndBeltDir(3, game.belt_dir[3]);
+  for (i = 0; i < NUM_BELTS; i++)
+  {
+    game_panel_controls[GAME_PANEL_CONVEYOR_BELT_1 + i].value =
+      (game.belt_dir[i] != MV_NONE ? EL_CONVEYOR_BELT_1_MIDDLE_ACTIVE :
+       EL_CONVEYOR_BELT_1_MIDDLE) + i;
+    game_panel_controls[GAME_PANEL_CONVEYOR_BELT_1_SWITCH + i].value =
+      getBeltSwitchElementFromBeltNrAndBeltDir(i, game.belt_dir[i]);
+  }
 
   game_panel_controls[GAME_PANEL_MAGIC_WALL].value =
     (game.magic_wall_active ? EL_MAGIC_WALL_ACTIVE : EL_MAGIC_WALL);
@@ -2007,6 +2091,22 @@ void UpdateGameControlValues()
 #else
   game_panel_controls[GAME_PANEL_GRAVITY_STATE].value = game.gravity;
 #endif
+
+  for (i = 0; i < NUM_PANEL_CE_SCORE; i++)
+  {
+    if (game.panel.ce_score[i].id != EL_UNDEFINED)
+    {
+      int ce_score = element_info[game.panel.ce_score[i].id].collect_score;
+
+      game_panel_controls[GAME_PANEL_CE_SCORE_1 + i].value = ce_score;
+      game_panel_controls[GAME_PANEL_CE_SCORE_1_ELEMENT + i].value = ce_score;
+    }
+    else
+    {
+      game_panel_controls[GAME_PANEL_CE_SCORE_1 + i].value = 0;
+      game_panel_controls[GAME_PANEL_CE_SCORE_1_ELEMENT + i].value = 0;
+    }
+  }
 
   game_panel_controls[GAME_PANEL_PLAYER_NAME].value = 0;
   game_panel_controls[GAME_PANEL_LEVEL_NAME].value = 0;
@@ -2093,31 +2193,49 @@ void DisplayGameControlValues()
 				       max_width, max_height);
 	  }
 	}
-
-	pos->width = size * getFontWidth(font);
       }
+
+#if 1
+      /* correct text size if "digits" is zero or less */
+      if (size <= 0)
+	size = strlen(int2str(value, size));
+
+      /* dynamically correct text alignment */
+      pos->width = size * getFontWidth(font);
+#endif
 
       DrawText(PANEL_XPOS(pos), PANEL_YPOS(pos), int2str(value, size), font);
     }
     else if (type == TYPE_ELEMENT)
     {
+      int element, graphic;
+      Bitmap *src_bitmap;
+      int src_x, src_y;
+      int width, height;
       int dst_x = PANEL_XPOS(pos);
       int dst_y = PANEL_YPOS(pos);
 
       if (value == EL_UNDEFINED || value == EL_EMPTY)
       {
-	int src_x = DOOR_GFX_PAGEX5 + ALIGNED_TEXT_XPOS(pos);
-	int src_y = DOOR_GFX_PAGEY1 + ALIGNED_TEXT_YPOS(pos);
+	element = (last_value == EL_UNDEFINED ? EL_EMPTY : last_value);
+	graphic = el2panelimg(element);
 
-	BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto, src_x, src_y,
-		   size, size, dst_x, dst_y);
+	src_bitmap = graphic_info[IMG_GLOBAL_DOOR].bitmap;
+	src_x = DOOR_GFX_PAGEX5 + ALIGNED_TEXT_XPOS(pos);
+	src_y = DOOR_GFX_PAGEY1 + ALIGNED_TEXT_YPOS(pos);
       }
       else
       {
-	int graphic = el2panelimg(value);
+	element = value;
+	graphic = el2panelimg(value);
 
-	DrawSizedGraphicExt(drawto, dst_x, dst_y, graphic, frame, size);
+	getSizedGraphicSource(graphic, frame, size, &src_bitmap, &src_x,&src_y);
       }
+
+      width  = graphic_info[graphic].width  * size / TILESIZE;
+      height = graphic_info[graphic].height * size / TILESIZE;
+
+      BlitBitmap(src_bitmap, drawto, src_x, src_y, width, height, dst_x, dst_y);
     }
     else if (type == TYPE_STRING)
     {
@@ -2150,21 +2268,22 @@ void DisplayGameControlValues()
 	font = (active ? font2 : font1);
       }
 
-#if 1
-      /* as with numbers, don't truncate output if "chars" is zero or less */
-      size = (size > 0 ? size : strlen(s));
-#endif
-
       if (s != NULL)
       {
-	char *s_cut = getStringCopyN(s, size);
+	char *s_cut;
 
-#if 0
-	/* (not needed anymore with above correction of "size" value) */
-	size = strlen(s_cut);	/* string size may be smaller than "chars" */
+#if 1
+	if (size <= 0)
+	{
+	  /* don't truncate output if "chars" is zero or less */
+	  size = strlen(s);
+
+	  /* dynamically correct text alignment */
+	  pos->width = size * getFontWidth(font);
+	}
 #endif
 
-	pos->width = size * getFontWidth(font);
+	s_cut = getStringCopyN(s, size);
 
 	DrawText(PANEL_XPOS(pos), PANEL_YPOS(pos), s_cut, font);
 

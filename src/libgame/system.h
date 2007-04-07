@@ -1052,6 +1052,7 @@ struct TextPosInfo
   int align, valign;
   int size;
   int font, font_alt;
+  int id;
 };
 
 

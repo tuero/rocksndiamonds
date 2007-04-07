@@ -8344,6 +8344,54 @@ void LoadCustomElementDescriptions()
   freeSetupFileHash(setup_file_hash);
 }
 
+static int getElementFromToken(char *token)
+{
+  int i;
+
+  /* !!! OPTIMIZE THIS BY USING HASH !!! */
+  for (i = 0; i < MAX_NUM_ELEMENTS; i++)
+    if (strEqual(token, element_info[i].token_name))
+      return i;
+
+  Error(ERR_WARN, "unknown element token '%s'", token);
+
+  return EL_UNDEFINED;
+}
+
+static int get_token_parameter_value(char *token, char *value_raw)
+{
+  char *suffix;
+
+  if (token == NULL || value_raw == NULL)
+    return ARG_UNDEFINED_VALUE;
+
+  suffix = strrchr(token, '.');
+  if (suffix == NULL)
+    suffix = token;
+
+#if 1
+  if (strEqual(suffix, ".element"))
+    return getElementFromToken(value_raw);
+#endif
+
+#if 0
+  if (strncmp(suffix, ".font", 5) == 0)
+  {
+    int i;
+
+    /* !!! OPTIMIZE THIS BY USING HASH !!! */
+    for (i = 0; i < NUM_FONTS; i++)
+      if (strEqual(value_raw, font_info[i].token_name))
+	return i;
+
+    /* if font not found, use reliable default value */
+    return FONT_INITIAL_1;
+  }
+#endif
+
+  return get_parameter_value(value_raw, suffix, TYPE_INTEGER);
+}
+
 static void LoadSpecialMenuDesignSettingsFromFilename(char *filename)
 {
   static struct TitleMessageInfo tmi;

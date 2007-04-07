@@ -607,6 +607,23 @@ boolean strEqualN(char *s1, char *s2, int n)
 	  strncmp(s1, s2, n) == 0);
 }
 
+boolean strEqualPrefix(char *s, char *prefix)
+{
+  return (s == NULL && prefix == NULL ? TRUE  :
+	  s == NULL && prefix != NULL ? FALSE :
+	  s != NULL && prefix == NULL ? FALSE :
+	  strncmp(s, prefix, strlen(prefix)) == 0);
+}
+
+boolean strEqualSuffix(char *s, char *suffix)
+{
+  return (s == NULL && suffix == NULL ? TRUE  :
+	  s == NULL && suffix != NULL ? FALSE :
+	  s != NULL && suffix == NULL ? FALSE :
+	  strlen(s) < strlen(suffix)  ? FALSE :
+	  strncmp(&s[strlen(s) - strlen(suffix)], suffix, strlen(suffix)) == 0);
+}
+
 
 /* ------------------------------------------------------------------------- */
 /* command line option handling functions                                    */
@@ -1853,7 +1870,11 @@ int get_parameter_value(char *value_raw, char *suffix, int type)
 	      string_has_parameter(value, "melt")	? FADE_MODE_MELT :
 	      FADE_MODE_DEFAULT);
   }
+#if 1
+  else if (strEqualPrefix(suffix, ".font"))	/* (may also be ".font_xyz") */
+#else
   else if (strEqualN(suffix, ".font", 5))	/* (may also be ".font_xyz") */
+#endif
   {
     result = gfx.get_font_from_token_function(value);
   }
@@ -1868,35 +1889,6 @@ int get_parameter_value(char *value_raw, char *suffix, int type)
   free(value);
 
   return result;
-}
-
-int get_token_parameter_value(char *token, char *value_raw)
-{
-  char *suffix;
-
-  if (token == NULL || value_raw == NULL)
-    return ARG_UNDEFINED_VALUE;
-
-  suffix = strrchr(token, '.');
-  if (suffix == NULL)
-    suffix = token;
-
-#if 0
-  if (strncmp(suffix, ".font", 5) == 0)
-  {
-    int i;
-
-    /* !!! OPTIMIZE THIS BY USING HASH !!! */
-    for (i = 0; i < NUM_FONTS; i++)
-      if (strEqual(value_raw, font_info[i].token_name))
-	return i;
-
-    /* if font not found, use reliable default value */
-    return FONT_INITIAL_1;
-  }
-#endif
-
-  return get_parameter_value(value_raw, suffix, TYPE_INTEGER);
 }
 
 struct ScreenModeInfo *get_screen_mode_from_string(char *screen_mode_string)
