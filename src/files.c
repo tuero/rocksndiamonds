@@ -1693,6 +1693,10 @@ static int getFileTypeFromBasename(char *basename)
 				 strncmp(basename, "LEVELS.D", 8) == 0))
     return LEVEL_FILE_TYPE_SP;
 
+  /* check for typical filename of a Diamond Caves II level package file */
+  if (strEqualSuffix(basename, ".dc2"))
+    return LEVEL_FILE_TYPE_DC;
+
   /* ---------- try to determine file type from filesize ---------- */
 
   checked_free(filename);
@@ -3926,7 +3930,7 @@ static void LoadLevelFromFileInfo_SP(struct LevelInfo *level,
   {
     level->no_valid_file = TRUE;
 
-    Error(ERR_WARN, "cannot fseek level '%s' -- using empty level", filename);
+    Error(ERR_WARN, "cannot fseek in file '%s' -- using empty level", filename);
 
     return;
   }
@@ -5546,6 +5550,270 @@ int getMappedElement_DC(int element)
   return getMappedElement(element);
 }
 
+#if 1
+
+static void LoadLevelFromFileStream_DC(FILE *file, struct LevelInfo *level,
+				       int nr)
+{
+  byte header[DC_LEVEL_HEADER_SIZE];
+  int envelope_size;
+  int envelope_header_pos = 62;
+  int envelope_content_pos = 94;
+  int level_name_pos = 251;
+  int level_author_pos = 292;
+  int envelope_header_len;
+  int envelope_content_len;
+  int level_name_len;
+  int level_author_len;
+  int fieldx, fieldy;
+  int num_yamyam_contents;
+  int i, x, y;
+
+  getDecodedWord_DC(0, TRUE);		/* initialize DC2 decoding engine */
+
+  for (i = 0; i < DC_LEVEL_HEADER_SIZE / 2; i++)
+  {
+    unsigned short header_word = getDecodedWord_DC(getFile16BitBE(file), FALSE);
+
+    header[i * 2 + 0] = header_word >> 8;
+    header[i * 2 + 1] = header_word & 0xff;
+  }
+
+  /* read some values from level header to check level decoding integrity */
+  fieldx = header[6] | (header[7] << 8);
+  fieldy = header[8] | (header[9] << 8);
+  num_yamyam_contents = header[60] | (header[61] << 8);
+
+  /* do some simple sanity checks to ensure that level was correctly decoded */
+  if (fieldx < 1 || fieldx > 256 ||
+      fieldy < 1 || fieldy > 256 ||
+      num_yamyam_contents < 1 || num_yamyam_contents > 8)
+  {
+    level->no_valid_file = TRUE;
+
+    Error(ERR_WARN, "cannot decode level from stream -- using empty level");
+
+    return;
+  }
+
+  /* maximum envelope header size is 31 bytes */
+  envelope_header_len	= header[envelope_header_pos];
+  /* maximum envelope content size is 110 (156?) bytes */
+  envelope_content_len	= header[envelope_content_pos];
+
+  /* maximum level title size is 40 bytes */
+  level_name_len	= MIN(header[level_name_pos],   MAX_LEVEL_NAME_LEN);
+  /* maximum level author size is 30 (51?) bytes */
+  level_author_len	= MIN(header[level_author_pos], MAX_LEVEL_AUTHOR_LEN);
+
+  envelope_size = 0;
+
+  for (i = 0; i < envelope_header_len; i++)
+    if (envelope_size < MAX_ENVELOPE_TEXT_LEN)
+      level->envelope[0].text[envelope_size++] =
+	header[envelope_header_pos + 1 + i];
+
+  if (envelope_header_len > 0 && envelope_content_len > 0)
+  {
+    if (envelope_size < MAX_ENVELOPE_TEXT_LEN)
+      level->envelope[0].text[envelope_size++] = '\n';
+    if (envelope_size < MAX_ENVELOPE_TEXT_LEN)
+      level->envelope[0].text[envelope_size++] = '\n';
+  }
+
+  for (i = 0; i < envelope_content_len; i++)
+    if (envelope_size < MAX_ENVELOPE_TEXT_LEN)
+      level->envelope[0].text[envelope_size++] =
+	header[envelope_content_pos + 1 + i];
+
+  level->envelope[0].text[envelope_size] = '\0';
+
+  level->envelope[0].xsize = MAX_ENVELOPE_XSIZE;
+  level->envelope[0].ysize = 10;
+  level->envelope[0].autowrap = TRUE;
+  level->envelope[0].centered = TRUE;
+
+  for (i = 0; i < level_name_len; i++)
+    level->name[i] = header[level_name_pos + 1 + i];
+  level->name[level_name_len] = '\0';
+
+  for (i = 0; i < level_author_len; i++)
+    level->author[i] = header[level_author_pos + 1 + i];
+  level->author[level_author_len] = '\0';
+
+  num_yamyam_contents = header[60] | (header[61] << 8);
+  level->num_yamyam_contents =
+    MIN(MAX(MIN_ELEMENT_CONTENTS, num_yamyam_contents), MAX_ELEMENT_CONTENTS);
+
+  for (i = 0; i < num_yamyam_contents; i++)
+  {
+    for (y = 0; y < 3; y++) for (x = 0; x < 3; x++)
+    {
+      unsigned short word = getDecodedWord_DC(getFile16BitBE(file), FALSE);
+#if 1
+      int element_dc = ((word & 0xff) << 8) | ((word >> 8) & 0xff);
+#else
+      int element_dc = word;
+#endif
+
+      if (i < MAX_ELEMENT_CONTENTS)
+	level->yamyam_content[i].e[x][y] = getMappedElement_DC(element_dc);
+    }
+  }
+
+  fieldx = header[6] | (header[7] << 8);
+  fieldy = header[8] | (header[9] << 8);
+  level->fieldx = MIN(MAX(MIN_LEV_FIELDX, fieldx), MAX_LEV_FIELDX);
+  level->fieldy = MIN(MAX(MIN_LEV_FIELDY, fieldy), MAX_LEV_FIELDY);
+
+  for (y = 0; y < fieldy; y++) for (x = 0; x < fieldx; x++)
+  {
+    unsigned short word = getDecodedWord_DC(getFile16BitBE(file), FALSE);
+#if 1
+    int element_dc = ((word & 0xff) << 8) | ((word >> 8) & 0xff);
+#else
+    int element_dc = word;
+#endif
+
+    if (x < MAX_LEV_FIELDX && y < MAX_LEV_FIELDY)
+      level->field[x][y] = getMappedElement_DC(element_dc);
+  }
+
+  x = MIN(MAX(0, (header[10] | (header[11] << 8)) - 1), MAX_LEV_FIELDX - 1);
+  y = MIN(MAX(0, (header[12] | (header[13] << 8)) - 1), MAX_LEV_FIELDY - 1);
+  level->field[x][y] = EL_PLAYER_1;
+
+  x = MIN(MAX(0, (header[14] | (header[15] << 8)) - 1), MAX_LEV_FIELDX - 1);
+  y = MIN(MAX(0, (header[16] | (header[17] << 8)) - 1), MAX_LEV_FIELDY - 1);
+  level->field[x][y] = EL_PLAYER_2;
+
+  level->gems_needed		= header[18] | (header[19] << 8);
+
+  level->score[SC_EMERALD]	= header[20] | (header[21] << 8);
+  level->score[SC_DIAMOND]	= header[22] | (header[23] << 8);
+  level->score[SC_PEARL]	= header[24] | (header[25] << 8);
+  level->score[SC_CRYSTAL]	= header[26] | (header[27] << 8);
+  level->score[SC_NUT]		= header[28] | (header[29] << 8);
+  level->score[SC_ROBOT]	= header[30] | (header[31] << 8);
+  level->score[SC_SPACESHIP]	= header[32] | (header[33] << 8);
+  level->score[SC_BUG]		= header[34] | (header[35] << 8);
+  level->score[SC_YAMYAM]	= header[36] | (header[37] << 8);
+  level->score[SC_DYNAMITE]	= header[38] | (header[39] << 8);
+  level->score[SC_KEY]		= header[40] | (header[41] << 8);
+  level->score[SC_TIME_BONUS]	= header[42] | (header[43] << 8);
+
+  level->time			= header[44] | (header[45] << 8);
+
+  level->amoeba_speed		= header[46] | (header[47] << 8);
+  level->time_light		= header[48] | (header[49] << 8);
+  level->time_timegate		= header[50] | (header[51] << 8);
+  level->time_wheel		= header[52] | (header[53] << 8);
+  level->time_magic_wall	= header[54] | (header[55] << 8);
+  level->extra_time		= header[56] | (header[57] << 8);
+  level->shield_normal_time	= header[58] | (header[59] << 8);
+
+  /* Diamond Caves has the same (strange) behaviour as Emerald Mine that gems
+     can slip down from flat walls, like normal walls and steel walls */
+  level->em_slippery_gems = TRUE;
+
+#if 0
+  /* Diamond Caves II levels are always surrounded by indestructible wall, but
+     not necessarily in a rectangular way -- fill with invisible steel wall */
+
+  /* !!! not always true !!! keep level and set BorderElement instead !!! */
+
+  for (y = 0; y < level->fieldy; y++) for (x = 0; x < level->fieldx; x++)
+  {
+#if 1
+    if ((x == 0 || x == level->fieldx - 1 ||
+	 y == 0 || y == level->fieldy - 1) &&
+	level->field[x][y] == EL_EMPTY)
+      level->field[x][y] = EL_INVISIBLE_STEELWALL;
+#else
+    if ((x == 0 || x == level->fieldx - 1 ||
+	 y == 0 || y == level->fieldy - 1) &&
+	level->field[x][y] == EL_EMPTY)
+      FloodFillLevel(x, y, EL_INVISIBLE_STEELWALL,
+		     level->field, level->fieldx, level->fieldy);
+#endif
+  }
+#endif
+}
+
+static void LoadLevelFromFileInfo_DC(struct LevelInfo *level,
+				     struct LevelFileInfo *level_file_info)
+{
+  char *filename = level_file_info->filename;
+  FILE *file;
+  int num_magic_bytes = 8;
+  char magic_bytes[num_magic_bytes + 1];
+  int num_levels_to_skip = level_file_info->nr - leveldir_current->first_level;
+
+  if (!(file = fopen(filename, MODE_READ)))
+  {
+    level->no_valid_file = TRUE;
+
+    Error(ERR_WARN, "cannot read level '%s' -- using empty level", filename);
+
+    return;
+  }
+
+  if (level_file_info->packed)
+  {
+    int position_first_level = 0x00fa;
+    int extra_bytes = 4;
+    int skip_bytes;
+
+    /* read "magic bytes" from start of file */
+    fgets(magic_bytes, num_magic_bytes + 1, file);
+
+    /* check "magic bytes" for correct file format */
+    if (!strEqualPrefix(magic_bytes, "DC2"))
+    {
+      level->no_valid_file = TRUE;
+
+      Error(ERR_WARN, "unknown level file '%s' -- using empty level", filename);
+
+      return;
+    }
+
+    /* advance file stream to first level inside the level package */
+    skip_bytes = position_first_level - num_magic_bytes - extra_bytes;
+
+    /* each block of level data is followed by block of non-level data */
+    num_levels_to_skip *= 2;
+
+    /* at least skip header bytes, therefore use ">= 0" instead of "> 0" */
+    while (num_levels_to_skip >= 0)
+    {
+      /* advance file stream to next level inside the level package */
+      if (fseek(file, skip_bytes, SEEK_CUR) != 0)
+      {
+	level->no_valid_file = TRUE;
+
+	Error(ERR_WARN, "cannot fseek in file '%s' -- using empty level",
+	      filename);
+
+	return;
+      }
+
+      /* skip apparently unused extra bytes following each level */
+      ReadUnusedBytesFromFile(file, extra_bytes);
+
+      /* read size of next level in level package */
+      skip_bytes = getFile32BitLE(file);
+
+      num_levels_to_skip--;
+    }
+  }
+
+  LoadLevelFromFileStream_DC(file, level, level_file_info->nr);
+
+  fclose(file);
+}
+
+#else
+
 static void LoadLevelFromFileInfo_DC(struct LevelInfo *level,
 				     struct LevelFileInfo *level_file_info)
 {
@@ -5583,7 +5851,7 @@ static void LoadLevelFromFileInfo_DC(struct LevelInfo *level,
   {
     level->no_valid_file = TRUE;
 
-    Error(ERR_WARN, "cannot fseek level '%s' -- using empty level", filename);
+    Error(ERR_WARN, "cannot fseek in file '%s' -- using empty level", filename);
 
     return;
   }
@@ -5597,6 +5865,24 @@ static void LoadLevelFromFileInfo_DC(struct LevelInfo *level,
 
     header[i * 2 + 0] = header_word >> 8;
     header[i * 2 + 1] = header_word & 0xff;
+  }
+
+  /* read some values from level header to check level decoding integrity */
+  fieldx = header[6] | (header[7] << 8);
+  fieldy = header[8] | (header[9] << 8);
+  num_yamyam_contents = header[60] | (header[61] << 8);
+
+  /* do some simple sanity checks to ensure that level was correctly decoded */
+  if (fieldx < 1 || fieldx > 256 ||
+      fieldy < 1 || fieldy > 256 ||
+      num_yamyam_contents < 1 || num_yamyam_contents > 8)
+  {
+    level->no_valid_file = TRUE;
+
+    Error(ERR_WARN, "cannot read level from file '%s' -- using empty level",
+	  filename);
+
+    return;
   }
 
   /* maximum envelope header size is 31 bytes */
@@ -5744,6 +6030,8 @@ static void LoadLevelFromFileInfo_DC(struct LevelInfo *level,
   }
 #endif
 }
+
+#endif
 
 
 /* ------------------------------------------------------------------------- */

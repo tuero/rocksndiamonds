@@ -7000,6 +7000,11 @@ void CheckElementDescriptions()
 void DrawLevelEd()
 {
   CloseDoor(DOOR_CLOSE_ALL);
+
+#if 1
+  FadeOut(REDRAW_FIELD);
+#endif
+
   OpenDoor(DOOR_OPEN_2 | DOOR_NO_DELAY);
 
 #if DEBUG
@@ -7047,7 +7052,7 @@ void DrawLevelEd()
 #endif
   MapControlButtons();
 
-#if 1
+#if 0
   FadeOut(REDRAW_FIELD);
 #endif
 
