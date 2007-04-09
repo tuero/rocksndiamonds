@@ -1,5 +1,7 @@
 2007-04-08
 	* added support for accessing native Diamond Caves II level packages
+	* fixed displaying of game panel values for Emerald Mine game engine
+	* fixed displaying end-of-level time and score values on new game panel
 
 2007-04-07
 	* added game panel control to display arbitrary elements on game panel

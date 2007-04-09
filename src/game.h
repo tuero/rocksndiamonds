@@ -214,6 +214,8 @@ struct PlayerInfo
   boolean LevelSolved_PanelOff;
   boolean LevelSolved_SaveTape;
   boolean LevelSolved_SaveScore;
+  int LevelSolved_CountingTime;
+  int LevelSolved_CountingScore;
 
   int last_move_dir;
 

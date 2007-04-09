@@ -1694,7 +1694,8 @@ static int getFileTypeFromBasename(char *basename)
     return LEVEL_FILE_TYPE_SP;
 
   /* check for typical filename of a Diamond Caves II level package file */
-  if (strEqualSuffix(basename, ".dc2"))
+  if (strEqualSuffix(basename, ".dc") ||
+      strEqualSuffix(basename, ".dc2"))
     return LEVEL_FILE_TYPE_DC;
 
   /* ---------- try to determine file type from filesize ---------- */
@@ -5758,12 +5759,10 @@ static void LoadLevelFromFileInfo_DC(struct LevelInfo *level,
     return;
   }
 
+  // fseek(file, 0x0000, SEEK_SET);
+
   if (level_file_info->packed)
   {
-    int position_first_level = 0x00fa;
-    int extra_bytes = 4;
-    int skip_bytes;
-
     /* read "magic bytes" from start of file */
     fgets(magic_bytes, num_magic_bytes + 1, file);
 
@@ -5772,38 +5771,56 @@ static void LoadLevelFromFileInfo_DC(struct LevelInfo *level,
     {
       level->no_valid_file = TRUE;
 
-      Error(ERR_WARN, "unknown level file '%s' -- using empty level", filename);
+      Error(ERR_WARN, "unknown DC level file '%s' -- using empty level",
+	    filename);
 
       return;
     }
 
-    /* advance file stream to first level inside the level package */
-    skip_bytes = position_first_level - num_magic_bytes - extra_bytes;
-
-    /* each block of level data is followed by block of non-level data */
-    num_levels_to_skip *= 2;
-
-    /* at least skip header bytes, therefore use ">= 0" instead of "> 0" */
-    while (num_levels_to_skip >= 0)
+    if (strEqualPrefix(magic_bytes, "DC2Win95") ||
+	strEqualPrefix(magic_bytes, "DC2Win98"))
     {
-      /* advance file stream to next level inside the level package */
-      if (fseek(file, skip_bytes, SEEK_CUR) != 0)
+      int position_first_level = 0x00fa;
+      int extra_bytes = 4;
+      int skip_bytes;
+
+      /* advance file stream to first level inside the level package */
+      skip_bytes = position_first_level - num_magic_bytes - extra_bytes;
+
+      /* each block of level data is followed by block of non-level data */
+      num_levels_to_skip *= 2;
+
+      /* at least skip header bytes, therefore use ">= 0" instead of "> 0" */
+      while (num_levels_to_skip >= 0)
       {
-	level->no_valid_file = TRUE;
+	/* advance file stream to next level inside the level package */
+	if (fseek(file, skip_bytes, SEEK_CUR) != 0)
+	{
+	  level->no_valid_file = TRUE;
 
-	Error(ERR_WARN, "cannot fseek in file '%s' -- using empty level",
-	      filename);
+	  Error(ERR_WARN, "cannot fseek in file '%s' -- using empty level",
+		filename);
 
-	return;
+	  return;
+	}
+
+	/* skip apparently unused extra bytes following each level */
+	ReadUnusedBytesFromFile(file, extra_bytes);
+
+	/* read size of next level in level package */
+	skip_bytes = getFile32BitLE(file);
+
+	num_levels_to_skip--;
       }
+    }
+    else
+    {
+      level->no_valid_file = TRUE;
 
-      /* skip apparently unused extra bytes following each level */
-      ReadUnusedBytesFromFile(file, extra_bytes);
+      Error(ERR_WARN, "unknown DC2 level file '%s' -- using empty level",
+	    filename);
 
-      /* read size of next level in level package */
-      skip_bytes = getFile32BitLE(file);
-
-      num_levels_to_skip--;
+      return;
     }
   }
 

@@ -2013,16 +2013,27 @@ void InitGameControlValues()
 void UpdateGameControlValues()
 {
   int i, k;
-  int time = (level.time == 0 ? TimePlayed : TimeLeft);
-  int score = (local_player->LevelSolved ? local_player->score_final :
+  int time = (local_player->LevelSolved ?
+	      local_player->LevelSolved_CountingTime :
+	      level.game_engine_type == GAME_ENGINE_TYPE_EM ?
+	      level.native_em_level->lev->time :
+	      level.time == 0 ? TimePlayed : TimeLeft);
+  int score = (local_player->LevelSolved ?
+	       local_player->LevelSolved_CountingScore :
+	       level.game_engine_type == GAME_ENGINE_TYPE_EM ?
+	       level.native_em_level->lev->score :
 	       local_player->score);
-  int exit_closed = (local_player->gems_still_needed > 0 ||
+  int gems = (level.game_engine_type == GAME_ENGINE_TYPE_EM ?
+	      level.native_em_level->lev->required :
+	      local_player->gems_still_needed);
+  int exit_closed = (level.game_engine_type == GAME_ENGINE_TYPE_EM ?
+		     level.native_em_level->lev->required > 0 :
+		     local_player->gems_still_needed > 0 ||
 		     local_player->sokobanfields_still_needed > 0 ||
 		     local_player->lights_still_needed > 0);
 
   game_panel_controls[GAME_PANEL_LEVEL_NUMBER].value = level_nr;
-  game_panel_controls[GAME_PANEL_GEMS].value =
-    local_player->gems_still_needed;
+  game_panel_controls[GAME_PANEL_GEMS].value = gems;
 
   game_panel_controls[GAME_PANEL_INVENTORY_COUNT].value = 0;
   for (i = 0; i < MAX_NUM_KEYS; i++)
@@ -2035,12 +2046,24 @@ void UpdateGameControlValues()
     for (i = 0; i < MAX_PLAYERS; i++)
     {
       for (k = 0; k < MAX_NUM_KEYS; k++)
-	if (stored_player[i].key[k])
+      {
+	if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
+	{
+	  if (level.native_em_level->ply[i]->keys & (1 << k))
+	    game_panel_controls[GAME_PANEL_KEY_1 + k].value =
+	      get_key_element_from_nr(k);
+	}
+	else if (stored_player[i].key[k])
 	  game_panel_controls[GAME_PANEL_KEY_1 + k].value =
 	    get_key_element_from_nr(k);
+      }
 
-      game_panel_controls[GAME_PANEL_INVENTORY_COUNT].value +=
-	stored_player[i].inventory_size;
+      if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
+	game_panel_controls[GAME_PANEL_INVENTORY_COUNT].value +=
+	  level.native_em_level->ply[i]->dynamite;
+      else
+	game_panel_controls[GAME_PANEL_INVENTORY_COUNT].value +=
+	  stored_player[i].inventory_size;
 
       if (stored_player[i].num_white_keys > 0)
 	game_panel_controls[GAME_PANEL_KEY_WHITE].value =
@@ -2055,12 +2078,24 @@ void UpdateGameControlValues()
     int player_nr = game.centered_player_nr;
 
     for (k = 0; k < MAX_NUM_KEYS; k++)
-      if (stored_player[player_nr].key[k])
+    {
+      if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
+      {
+	if (level.native_em_level->ply[player_nr]->keys & (1 << k))
+	  game_panel_controls[GAME_PANEL_KEY_1 + k].value =
+	    get_key_element_from_nr(k);
+      }
+      else if (stored_player[player_nr].key[k])
 	game_panel_controls[GAME_PANEL_KEY_1 + k].value =
 	  get_key_element_from_nr(k);
+    }
 
-    game_panel_controls[GAME_PANEL_INVENTORY_COUNT].value +=
-      stored_player[player_nr].inventory_size;
+    if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
+      game_panel_controls[GAME_PANEL_INVENTORY_COUNT].value +=
+	level.native_em_level->ply[player_nr]->dynamite;
+    else
+      game_panel_controls[GAME_PANEL_INVENTORY_COUNT].value +=
+	stored_player[player_nr].inventory_size;
 
     if (stored_player[player_nr].num_white_keys > 0)
       game_panel_controls[GAME_PANEL_KEY_WHITE].value = EL_DC_KEY_WHITE;
@@ -3526,6 +3561,8 @@ void InitGame()
     player->LevelSolved_PanelOff = FALSE;
     player->LevelSolved_SaveTape = FALSE;
     player->LevelSolved_SaveScore = FALSE;
+    player->LevelSolved_CountingTime = 0;
+    player->LevelSolved_CountingScore = 0;
   }
 
   network_player_action_received = FALSE;
@@ -4281,6 +4318,9 @@ static void PlayerWins(struct PlayerInfo *player)
 
   player->score_final = (level.game_engine_type == GAME_ENGINE_TYPE_EM ?
 			 level.native_em_level->lev->score : player->score);
+
+  player->LevelSolved_CountingTime = (level.time == 0 ? TimePlayed : TimeLeft);
+  player->LevelSolved_CountingScore = player->score_final;
 }
 
 void GameWon()
@@ -4336,6 +4376,9 @@ void GameWon()
       score = score_final;
 
 #if 1
+      local_player->LevelSolved_CountingTime = time;
+      local_player->LevelSolved_CountingScore = score;
+
       game_panel_controls[GAME_PANEL_TIME].value = time;
       game_panel_controls[GAME_PANEL_SCORE].value = score;
 
@@ -4418,6 +4461,9 @@ void GameWon()
     score += time_count_steps * level.score[SC_TIME_BONUS];
 
 #if 1
+    local_player->LevelSolved_CountingTime = time;
+    local_player->LevelSolved_CountingScore = score;
+
     game_panel_controls[GAME_PANEL_TIME].value = time;
     game_panel_controls[GAME_PANEL_SCORE].value = score;
 
