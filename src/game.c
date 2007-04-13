@@ -208,27 +208,35 @@
 #define GAME_PANEL_ELEMENT_6			74
 #define GAME_PANEL_ELEMENT_7			75
 #define GAME_PANEL_ELEMENT_8			76
-#define GAME_PANEL_CE_SCORE_1			77
-#define GAME_PANEL_CE_SCORE_2			78
-#define GAME_PANEL_CE_SCORE_3			79
-#define GAME_PANEL_CE_SCORE_4			80
-#define GAME_PANEL_CE_SCORE_5			81
-#define GAME_PANEL_CE_SCORE_6			82
-#define GAME_PANEL_CE_SCORE_7			83
-#define GAME_PANEL_CE_SCORE_8			84
-#define GAME_PANEL_CE_SCORE_1_ELEMENT		85
-#define GAME_PANEL_CE_SCORE_2_ELEMENT		86
-#define GAME_PANEL_CE_SCORE_3_ELEMENT		87
-#define GAME_PANEL_CE_SCORE_4_ELEMENT		88
-#define GAME_PANEL_CE_SCORE_5_ELEMENT		89
-#define GAME_PANEL_CE_SCORE_6_ELEMENT		90
-#define GAME_PANEL_CE_SCORE_7_ELEMENT		91
-#define GAME_PANEL_CE_SCORE_8_ELEMENT		92
-#define GAME_PANEL_PLAYER_NAME			93
-#define GAME_PANEL_LEVEL_NAME			94
-#define GAME_PANEL_LEVEL_AUTHOR			95
+#define GAME_PANEL_ELEMENT_COUNT_1		77
+#define GAME_PANEL_ELEMENT_COUNT_2		78
+#define GAME_PANEL_ELEMENT_COUNT_3		79
+#define GAME_PANEL_ELEMENT_COUNT_4		80
+#define GAME_PANEL_ELEMENT_COUNT_5		81
+#define GAME_PANEL_ELEMENT_COUNT_6		82
+#define GAME_PANEL_ELEMENT_COUNT_7		83
+#define GAME_PANEL_ELEMENT_COUNT_8		84
+#define GAME_PANEL_CE_SCORE_1			85
+#define GAME_PANEL_CE_SCORE_2			86
+#define GAME_PANEL_CE_SCORE_3			87
+#define GAME_PANEL_CE_SCORE_4			88
+#define GAME_PANEL_CE_SCORE_5			89
+#define GAME_PANEL_CE_SCORE_6			90
+#define GAME_PANEL_CE_SCORE_7			91
+#define GAME_PANEL_CE_SCORE_8			92
+#define GAME_PANEL_CE_SCORE_1_ELEMENT		93
+#define GAME_PANEL_CE_SCORE_2_ELEMENT		94
+#define GAME_PANEL_CE_SCORE_3_ELEMENT		95
+#define GAME_PANEL_CE_SCORE_4_ELEMENT		96
+#define GAME_PANEL_CE_SCORE_5_ELEMENT		97
+#define GAME_PANEL_CE_SCORE_6_ELEMENT		98
+#define GAME_PANEL_CE_SCORE_7_ELEMENT		99
+#define GAME_PANEL_CE_SCORE_8_ELEMENT		100
+#define GAME_PANEL_PLAYER_NAME			101
+#define GAME_PANEL_LEVEL_NAME			102
+#define GAME_PANEL_LEVEL_AUTHOR			103
 
-#define NUM_GAME_PANEL_CONTROLS			96
+#define NUM_GAME_PANEL_CONTROLS			104
 
 struct GamePanelOrderInfo
 {
@@ -637,6 +645,46 @@ static struct GamePanelControlInfo game_panel_controls[] =
     GAME_PANEL_ELEMENT_8,
     &game.panel.element[7],
     TYPE_ELEMENT,
+  },
+  {
+    GAME_PANEL_ELEMENT_COUNT_1,
+    &game.panel.element_count[0],
+    TYPE_INTEGER,
+  },
+  {
+    GAME_PANEL_ELEMENT_COUNT_2,
+    &game.panel.element_count[1],
+    TYPE_INTEGER,
+  },
+  {
+    GAME_PANEL_ELEMENT_COUNT_3,
+    &game.panel.element_count[2],
+    TYPE_INTEGER,
+  },
+  {
+    GAME_PANEL_ELEMENT_COUNT_4,
+    &game.panel.element_count[3],
+    TYPE_INTEGER,
+  },
+  {
+    GAME_PANEL_ELEMENT_COUNT_5,
+    &game.panel.element_count[4],
+    TYPE_INTEGER,
+  },
+  {
+    GAME_PANEL_ELEMENT_COUNT_6,
+    &game.panel.element_count[5],
+    TYPE_INTEGER,
+  },
+  {
+    GAME_PANEL_ELEMENT_COUNT_7,
+    &game.panel.element_count[6],
+    TYPE_INTEGER,
+  },
+  {
+    GAME_PANEL_ELEMENT_COUNT_8,
+    &game.panel.element_count[7],
+    TYPE_INTEGER,
   },
   {
     GAME_PANEL_CE_SCORE_1,
@@ -2010,6 +2058,25 @@ void InitGameControlValues()
 	sizeof(struct GamePanelOrderInfo), compareGamePanelOrderInfo);
 }
 
+void UpdatePlayfieldElementCount()
+{
+  int i, j, x, y;
+
+  for (i = 0; i < MAX_NUM_ELEMENTS; i++)
+    element_info[i].element_count = 0;
+
+  SCAN_PLAYFIELD(x, y)
+  {
+    element_info[Feld[x][y]].element_count++;
+  }
+
+  for (i = 0; i < NUM_GROUP_ELEMENTS; i++)
+    for (j = 0; j < MAX_NUM_ELEMENTS; j++)
+      if (IS_IN_GROUP(j, i))
+	element_info[EL_GROUP_START + i].element_count +=
+	  element_info[j].element_count;
+}
+
 void UpdateGameControlValues()
 {
   int i, k;
@@ -2031,6 +2098,10 @@ void UpdateGameControlValues()
 		     local_player->gems_still_needed > 0 ||
 		     local_player->sokobanfields_still_needed > 0 ||
 		     local_player->lights_still_needed > 0);
+
+  UpdatePlayfieldElementCount();
+
+  /* update game panel control values */
 
   game_panel_controls[GAME_PANEL_LEVEL_NUMBER].value = level_nr;
   game_panel_controls[GAME_PANEL_GEMS].value = gems;
@@ -2214,6 +2285,12 @@ void UpdateGameControlValues()
       (IS_DRAWABLE_ELEMENT(game.panel.element[i].id) ?
        game.panel.element[i].id : EL_UNDEFINED);
 
+  for (i = 0; i < NUM_PANEL_ELEMENTS; i++)
+    game_panel_controls[GAME_PANEL_ELEMENT_COUNT_1 + i].value =
+      (IS_VALID_ELEMENT(game.panel.element_count[i].id) ?
+       element_info[game.panel.element_count[i].id].element_count :
+       EL_UNDEFINED);
+
   for (i = 0; i < NUM_PANEL_CE_SCORE; i++)
     game_panel_controls[GAME_PANEL_CE_SCORE_1 + i].value =
       (IS_CUSTOM_ELEMENT(game.panel.ce_score[i].id) ?
@@ -2228,6 +2305,8 @@ void UpdateGameControlValues()
   game_panel_controls[GAME_PANEL_PLAYER_NAME].value = 0;
   game_panel_controls[GAME_PANEL_LEVEL_NAME].value = 0;
   game_panel_controls[GAME_PANEL_LEVEL_AUTHOR].value = 0;
+
+  /* update game panel control frames */
 
   for (i = 0; game_panel_controls[i].nr != -1; i++)
   {

@@ -3649,6 +3649,42 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.element[0].sort_priority
   },
   {
+    "game.panel.element_1_count.x",
+    &game.panel.element_count[0].x
+  },
+  {
+    "game.panel.element_1_count.y",
+    &game.panel.element_count[0].y
+  },
+  {
+    "game.panel.element_1_count.align",
+    &game.panel.element_count[0].align
+  },
+  {
+    "game.panel.element_1_count.valign",
+    &game.panel.element_count[0].valign
+  },
+  {
+    "game.panel.element_1_count.digits",
+    &game.panel.element_count[0].size
+  },
+  {
+    "game.panel.element_1_count.font",
+    &game.panel.element_count[0].font
+  },
+  {
+    "game.panel.element_1_count.element",
+    &game.panel.element_count[0].id
+  },
+  {
+    "game.panel.element_1_count.draw_masked",
+    &game.panel.element_count[0].draw_masked
+  },
+  {
+    "game.panel.element_1_count.draw_order",
+    &game.panel.element_count[0].sort_priority
+  },
+  {
     "game.panel.element_2.x",
     &game.panel.element[1].x
   },
@@ -3671,6 +3707,42 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "game.panel.element_2.draw_order",
     &game.panel.element[1].sort_priority
+  },
+  {
+    "game.panel.element_2_count.x",
+    &game.panel.element_count[1].x
+  },
+  {
+    "game.panel.element_2_count.y",
+    &game.panel.element_count[1].y
+  },
+  {
+    "game.panel.element_2_count.align",
+    &game.panel.element_count[1].align
+  },
+  {
+    "game.panel.element_2_count.valign",
+    &game.panel.element_count[1].valign
+  },
+  {
+    "game.panel.element_2_count.digits",
+    &game.panel.element_count[1].size
+  },
+  {
+    "game.panel.element_2_count.font",
+    &game.panel.element_count[1].font
+  },
+  {
+    "game.panel.element_2_count.element",
+    &game.panel.element_count[1].id
+  },
+  {
+    "game.panel.element_2_count.draw_masked",
+    &game.panel.element_count[1].draw_masked
+  },
+  {
+    "game.panel.element_2_count.draw_order",
+    &game.panel.element_count[1].sort_priority
   },
   {
     "game.panel.element_3.x",
@@ -3697,6 +3769,42 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.element[2].sort_priority
   },
   {
+    "game.panel.element_3_count.x",
+    &game.panel.element_count[2].x
+  },
+  {
+    "game.panel.element_3_count.y",
+    &game.panel.element_count[2].y
+  },
+  {
+    "game.panel.element_3_count.align",
+    &game.panel.element_count[2].align
+  },
+  {
+    "game.panel.element_3_count.valign",
+    &game.panel.element_count[2].valign
+  },
+  {
+    "game.panel.element_3_count.digits",
+    &game.panel.element_count[2].size
+  },
+  {
+    "game.panel.element_3_count.font",
+    &game.panel.element_count[2].font
+  },
+  {
+    "game.panel.element_3_count.element",
+    &game.panel.element_count[2].id
+  },
+  {
+    "game.panel.element_3_count.draw_masked",
+    &game.panel.element_count[2].draw_masked
+  },
+  {
+    "game.panel.element_3_count.draw_order",
+    &game.panel.element_count[2].sort_priority
+  },
+  {
     "game.panel.element_4.x",
     &game.panel.element[3].x
   },
@@ -3719,6 +3827,42 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "game.panel.element_4.draw_order",
     &game.panel.element[3].sort_priority
+  },
+  {
+    "game.panel.element_4_count.x",
+    &game.panel.element_count[3].x
+  },
+  {
+    "game.panel.element_4_count.y",
+    &game.panel.element_count[3].y
+  },
+  {
+    "game.panel.element_4_count.align",
+    &game.panel.element_count[3].align
+  },
+  {
+    "game.panel.element_4_count.valign",
+    &game.panel.element_count[3].valign
+  },
+  {
+    "game.panel.element_4_count.digits",
+    &game.panel.element_count[3].size
+  },
+  {
+    "game.panel.element_4_count.font",
+    &game.panel.element_count[3].font
+  },
+  {
+    "game.panel.element_4_count.element",
+    &game.panel.element_count[3].id
+  },
+  {
+    "game.panel.element_4_count.draw_masked",
+    &game.panel.element_count[3].draw_masked
+  },
+  {
+    "game.panel.element_4_count.draw_order",
+    &game.panel.element_count[3].sort_priority
   },
   {
     "game.panel.element_5.x",
@@ -3745,6 +3889,42 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.element[4].sort_priority
   },
   {
+    "game.panel.element_5_count.x",
+    &game.panel.element_count[4].x
+  },
+  {
+    "game.panel.element_5_count.y",
+    &game.panel.element_count[4].y
+  },
+  {
+    "game.panel.element_5_count.align",
+    &game.panel.element_count[4].align
+  },
+  {
+    "game.panel.element_5_count.valign",
+    &game.panel.element_count[4].valign
+  },
+  {
+    "game.panel.element_5_count.digits",
+    &game.panel.element_count[4].size
+  },
+  {
+    "game.panel.element_5_count.font",
+    &game.panel.element_count[4].font
+  },
+  {
+    "game.panel.element_5_count.element",
+    &game.panel.element_count[4].id
+  },
+  {
+    "game.panel.element_5_count.draw_masked",
+    &game.panel.element_count[4].draw_masked
+  },
+  {
+    "game.panel.element_5_count.draw_order",
+    &game.panel.element_count[4].sort_priority
+  },
+  {
     "game.panel.element_6.x",
     &game.panel.element[5].x
   },
@@ -3767,6 +3947,42 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "game.panel.element_6.draw_order",
     &game.panel.element[5].sort_priority
+  },
+  {
+    "game.panel.element_6_count.x",
+    &game.panel.element_count[5].x
+  },
+  {
+    "game.panel.element_6_count.y",
+    &game.panel.element_count[5].y
+  },
+  {
+    "game.panel.element_6_count.align",
+    &game.panel.element_count[5].align
+  },
+  {
+    "game.panel.element_6_count.valign",
+    &game.panel.element_count[5].valign
+  },
+  {
+    "game.panel.element_6_count.digits",
+    &game.panel.element_count[5].size
+  },
+  {
+    "game.panel.element_6_count.font",
+    &game.panel.element_count[5].font
+  },
+  {
+    "game.panel.element_6_count.element",
+    &game.panel.element_count[5].id
+  },
+  {
+    "game.panel.element_6_count.draw_masked",
+    &game.panel.element_count[5].draw_masked
+  },
+  {
+    "game.panel.element_6_count.draw_order",
+    &game.panel.element_count[5].sort_priority
   },
   {
     "game.panel.element_7.x",
@@ -3793,6 +4009,42 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.element[6].sort_priority
   },
   {
+    "game.panel.element_7_count.x",
+    &game.panel.element_count[6].x
+  },
+  {
+    "game.panel.element_7_count.y",
+    &game.panel.element_count[6].y
+  },
+  {
+    "game.panel.element_7_count.align",
+    &game.panel.element_count[6].align
+  },
+  {
+    "game.panel.element_7_count.valign",
+    &game.panel.element_count[6].valign
+  },
+  {
+    "game.panel.element_7_count.digits",
+    &game.panel.element_count[6].size
+  },
+  {
+    "game.panel.element_7_count.font",
+    &game.panel.element_count[6].font
+  },
+  {
+    "game.panel.element_7_count.element",
+    &game.panel.element_count[6].id
+  },
+  {
+    "game.panel.element_7_count.draw_masked",
+    &game.panel.element_count[6].draw_masked
+  },
+  {
+    "game.panel.element_7_count.draw_order",
+    &game.panel.element_count[6].sort_priority
+  },
+  {
     "game.panel.element_8.x",
     &game.panel.element[7].x
   },
@@ -3815,6 +4067,42 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "game.panel.element_8.draw_order",
     &game.panel.element[7].sort_priority
+  },
+  {
+    "game.panel.element_8_count.x",
+    &game.panel.element_count[7].x
+  },
+  {
+    "game.panel.element_8_count.y",
+    &game.panel.element_count[7].y
+  },
+  {
+    "game.panel.element_8_count.align",
+    &game.panel.element_count[7].align
+  },
+  {
+    "game.panel.element_8_count.valign",
+    &game.panel.element_count[7].valign
+  },
+  {
+    "game.panel.element_8_count.digits",
+    &game.panel.element_count[7].size
+  },
+  {
+    "game.panel.element_8_count.font",
+    &game.panel.element_count[7].font
+  },
+  {
+    "game.panel.element_8_count.element",
+    &game.panel.element_count[7].id
+  },
+  {
+    "game.panel.element_8_count.draw_masked",
+    &game.panel.element_count[7].draw_masked
+  },
+  {
+    "game.panel.element_8_count.draw_order",
+    &game.panel.element_count[7].sort_priority
   },
   {
     "game.panel.ce_score_1.x",

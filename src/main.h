@@ -2474,6 +2474,9 @@ struct ElementInfo
 
   int collect_score;		/* runtime score value for collecting */
 
+  /* count of this element on playfield, calculated after each frame */
+  int element_count;
+
   /* ---------- internal values used in level editor ---------- */
 
   int access_type;		/* walkable or passable */

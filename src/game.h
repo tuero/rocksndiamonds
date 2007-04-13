@@ -75,6 +75,7 @@ struct GamePanelInfo
   struct TextPosInfo magic_wall_time;
   struct TextPosInfo gravity_state;
   struct TextPosInfo element[NUM_PANEL_ELEMENTS];
+  struct TextPosInfo element_count[NUM_PANEL_ELEMENTS];
   struct TextPosInfo ce_score[NUM_PANEL_CE_SCORE];
   struct TextPosInfo ce_score_element[NUM_PANEL_CE_SCORE];
   struct TextPosInfo player_name;
