@@ -25,31 +25,6 @@
 #include "init.h"
 #include "config.h"
 
-/* screens in the setup menu */
-#define SETUP_MODE_MAIN			0
-#define SETUP_MODE_GAME			1
-#define SETUP_MODE_CHOOSE_GAME_SPEED	2
-#define SETUP_MODE_EDITOR		3
-#define SETUP_MODE_INPUT		4
-#define SETUP_MODE_SHORTCUT_1		5
-#define SETUP_MODE_SHORTCUT_2		6
-#define SETUP_MODE_GRAPHICS		7
-#define SETUP_MODE_CHOOSE_SCREEN_MODE	8
-#define SETUP_MODE_CHOOSE_SCROLL_DELAY	9
-#define SETUP_MODE_SOUND		10
-#define SETUP_MODE_ARTWORK		11
-#define SETUP_MODE_CHOOSE_GRAPHICS	12
-#define SETUP_MODE_CHOOSE_SOUNDS	13
-#define SETUP_MODE_CHOOSE_MUSIC		14
-
-#define MAX_SETUP_MODES			15
-
-/* for input setup functions */
-#define SETUPINPUT_SCREEN_POS_START	0
-#define SETUPINPUT_SCREEN_POS_END	(SCR_FIELDY - 4)
-#define SETUPINPUT_SCREEN_POS_EMPTY1	(SETUPINPUT_SCREEN_POS_START + 3)
-#define SETUPINPUT_SCREEN_POS_EMPTY2	(SETUPINPUT_SCREEN_POS_END - 1)
-
 /* screens on the info screen */
 #define INFO_MODE_MAIN			0
 #define INFO_MODE_TITLE			1
@@ -61,6 +36,37 @@
 #define INFO_MODE_LEVELSET		7
 
 #define MAX_INFO_MODES			8
+
+/* screens on the setup screen */
+#define SETUP_MODE_MAIN			0
+#define SETUP_MODE_GAME			1
+#define SETUP_MODE_EDITOR		2
+#define SETUP_MODE_GRAPHICS		3
+#define SETUP_MODE_SOUND		4
+#define SETUP_MODE_ARTWORK		5
+#define SETUP_MODE_INPUT		6
+#define SETUP_MODE_SHORTCUTS_1		7
+#define SETUP_MODE_SHORTCUTS_2		8
+
+/* sub-screens on the setup screen (generic) */
+#define SETUP_MODE_CHOOSE_ARTWORK	9
+#define SETUP_MODE_CHOOSE_OTHER		10
+
+/* sub-screens on the setup screen (specific) */
+#define SETUP_MODE_CHOOSE_GAME_SPEED	11
+#define SETUP_MODE_CHOOSE_SCREEN_MODE	12
+#define SETUP_MODE_CHOOSE_SCROLL_DELAY	13
+#define SETUP_MODE_CHOOSE_GRAPHICS	14
+#define SETUP_MODE_CHOOSE_SOUNDS	15
+#define SETUP_MODE_CHOOSE_MUSIC		16
+
+#define MAX_SETUP_MODES			17
+
+/* for input setup functions */
+#define SETUPINPUT_SCREEN_POS_START	0
+#define SETUPINPUT_SCREEN_POS_END	(SCR_FIELDY - 4)
+#define SETUPINPUT_SCREEN_POS_EMPTY1	(SETUPINPUT_SCREEN_POS_START + 3)
+#define SETUPINPUT_SCREEN_POS_EMPTY2	(SETUPINPUT_SCREEN_POS_END - 1)
 
 /* for various menu stuff  */
 #define MENU_SCREEN_START_XPOS		1
@@ -165,8 +171,8 @@ static void MapScreenTreeGadgets(TreeInfo *);
 
 static struct GadgetInfo *screen_gadget[NUM_SCREEN_GADGETS];
 
-static int setup_mode = SETUP_MODE_MAIN;
 static int info_mode = INFO_MODE_MAIN;
+static int setup_mode = SETUP_MODE_MAIN;
 
 static TreeInfo *screen_modes = NULL;
 static TreeInfo *screen_mode_current = NULL;
@@ -232,9 +238,17 @@ static struct
 				 (s) == GAME_MODE_PSEUDO_TYPENAME ?	\
 				 GAME_MODE_MAIN : GAME_MODE_DEFAULT)
 
+/* (there are no draw offset definitions needed for INFO_MODE_TITLE) */
 #define DRAW_MODE_INFO(i)	((i) >= INFO_MODE_ELEMENTS &&		\
 				 (i) <= INFO_MODE_LEVELSET ? (i) :	\
 				 INFO_MODE_MAIN)
+
+#define DRAW_MODE_SETUP(i)	((i) >= SETUP_MODE_MAIN &&		\
+				 (i) <= SETUP_MODE_SHORTCUTS_2 ? (i) :	\
+				 (i) >= SETUP_MODE_CHOOSE_GRAPHICS &&	\
+				 (i) <= SETUP_MODE_CHOOSE_MUSIC ?	\
+				 SETUP_MODE_CHOOSE_ARTWORK :		\
+				 SETUP_MODE_CHOOSE_OTHER)
 
 #define DRAW_XOFFSET_INFO(i)	(DRAW_MODE_INFO(i) == INFO_MODE_MAIN ?	\
 				 menu.draw_xoffset[GAME_MODE_INFO] :	\
@@ -243,11 +257,22 @@ static struct
 				 menu.draw_yoffset[GAME_MODE_INFO] :	\
 				 menu.draw_yoffset_info[DRAW_MODE_INFO(i)])
 
+#define DRAW_XOFFSET_SETUP(i)	(DRAW_MODE_SETUP(i) == SETUP_MODE_MAIN ? \
+				 menu.draw_xoffset[GAME_MODE_SETUP] :	\
+				 menu.draw_xoffset_setup[DRAW_MODE_SETUP(i)])
+#define DRAW_YOFFSET_SETUP(i)	(DRAW_MODE_SETUP(i) == SETUP_MODE_MAIN ? \
+				 menu.draw_yoffset[GAME_MODE_SETUP] :	\
+				 menu.draw_yoffset_setup[DRAW_MODE_SETUP(i)])
+
 #define DRAW_XOFFSET(s)		((s) == GAME_MODE_INFO ?		\
 				 DRAW_XOFFSET_INFO(info_mode) :		\
+				 (s) == GAME_MODE_SETUP ?		\
+				 DRAW_XOFFSET_SETUP(setup_mode) :	\
 				 menu.draw_xoffset[DRAW_MODE(s)])
 #define DRAW_YOFFSET(s)		((s) == GAME_MODE_INFO ?		\
 				 DRAW_YOFFSET_INFO(info_mode) :		\
+				 (s) == GAME_MODE_SETUP ?		\
+				 DRAW_YOFFSET_SETUP(setup_mode) :	\
 				 menu.draw_yoffset[DRAW_MODE(s)])
 
 #define mSX			(SX + DRAW_XOFFSET(game_status))
@@ -1031,8 +1056,10 @@ static void drawChooseTreeCursor(int ypos, boolean active)
 {
   int last_game_status = game_status;	/* save current game status */
 
+#if 0
   /* force LEVELS draw offset on artwork setup screen */
   game_status = GAME_MODE_LEVELS;
+#endif
 
   drawCursorExt(0, ypos, active, -1);
 
@@ -2129,6 +2156,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 	if (leveldir_first)
 	{
 	  game_status = GAME_MODE_LEVELS;
+
 	  SaveLevelSetup_LastSeries();
 	  SaveLevelSetup_SeriesInfo();
 
@@ -3796,8 +3824,10 @@ static void drawChooseTreeList(int first_entry, int num_page_entries,
 
   DrawTextSCentered(mSY - SY + yoffset, FONT_TITLE_1, title_string);
 
+#if 0
   /* force LEVELS font on artwork setup screen */
   game_status = GAME_MODE_LEVELS;
+#endif
 
 #if 1
   /* clear tree list area, but not title or scrollbar */
@@ -3891,8 +3921,10 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
   int last_game_status = game_status;	/* save current game status */
   boolean position_set_by_scrollbar = (dx == 999);
 
+#if 0
   /* force LEVELS draw offset on choose level and artwork setup screen */
   game_status = GAME_MODE_LEVELS;
+#endif
 
   if (num_entries <= NUM_MENU_ENTRIES_ON_SCREEN)
     num_page_entries = num_entries;
@@ -3971,8 +4003,10 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
   {
     int last_game_status = game_status;	/* save current game status */
 
+#if 0
     /* force LEVELS draw offset on artwork setup screen */
     game_status = GAME_MODE_LEVELS;
+#endif
 
     x = (mx - mSX) / 32;
     y = (my - mSY) / 32 - MENU_SCREEN_START_YPOS;
@@ -4623,23 +4657,23 @@ static void execSetupInput()
   DrawSetupScreen();
 }
 
-static void execSetupShortcut1()
+static void execSetupShortcuts1()
 {
 #if 0
   FadeSetEnterMenu();
 #endif
 
-  setup_mode = SETUP_MODE_SHORTCUT_1;
+  setup_mode = SETUP_MODE_SHORTCUTS_1;
   DrawSetupScreen();
 }
 
-static void execSetupShortcut2()
+static void execSetupShortcuts2()
 {
 #if 0
   FadeSetEnterMenu();
 #endif
 
-  setup_mode = SETUP_MODE_SHORTCUT_2;
+  setup_mode = SETUP_MODE_SHORTCUTS_2;
   DrawSetupScreen();
 }
 
@@ -4671,8 +4705,8 @@ static struct TokenInfo setup_info_main[] =
   { TYPE_ENTER_MENU,	execSetupSound,		"Sound & Music"		},
   { TYPE_ENTER_MENU,	execSetupArtwork,	"Custom Artwork"	},
   { TYPE_ENTER_MENU,	execSetupInput,		"Input Devices"		},
-  { TYPE_ENTER_MENU,	execSetupShortcut1,	"Key Shortcuts 1"	},
-  { TYPE_ENTER_MENU,	execSetupShortcut2,	"Key Shortcuts 2"	},
+  { TYPE_ENTER_MENU,	execSetupShortcuts1,	"Key Shortcuts 1"	},
+  { TYPE_ENTER_MENU,	execSetupShortcuts2,	"Key Shortcuts 2"	},
   { TYPE_EMPTY,		NULL,			""			},
   { TYPE_LEAVE_MENU,	execExitSetup, 		"Exit"			},
   { TYPE_LEAVE_MENU,	execSaveAndExitSetup,	"Save and Exit"		},
@@ -4811,7 +4845,7 @@ static struct TokenInfo setup_info_input[] =
   { 0,			NULL,			NULL			}
 };
 
-static struct TokenInfo setup_info_shortcut_1[] =
+static struct TokenInfo setup_info_shortcuts_1[] =
 {
   { TYPE_KEYTEXT,	NULL,		"Quick Save Game to Tape:",	},
   { TYPE_KEY,		&setup.shortcut.save_game, ""			},
@@ -4828,7 +4862,7 @@ static struct TokenInfo setup_info_shortcut_1[] =
   { 0,			NULL,			NULL			}
 };
 
-static struct TokenInfo setup_info_shortcut_2[] =
+static struct TokenInfo setup_info_shortcuts_2[] =
 {
   { TYPE_KEYTEXT,	NULL,		"Set Focus to Player 1:",	},
   { TYPE_KEY,		&setup.shortcut.focus_player[0], ""		},
@@ -5089,14 +5123,14 @@ static void DrawSetupScreen_Generic()
     setup_info = setup_info_artwork;
     title_string = "Custom Artwork";
   }
-  else if (setup_mode == SETUP_MODE_SHORTCUT_1)
+  else if (setup_mode == SETUP_MODE_SHORTCUTS_1)
   {
-    setup_info = setup_info_shortcut_1;
+    setup_info = setup_info_shortcuts_1;
     title_string = "Setup Shortcuts";
   }
-  else if (setup_mode == SETUP_MODE_SHORTCUT_2)
+  else if (setup_mode == SETUP_MODE_SHORTCUTS_2)
   {
-    setup_info = setup_info_shortcut_2;
+    setup_info = setup_info_shortcuts_2;
     title_string = "Setup Shortcuts";
   }
 
@@ -6379,8 +6413,10 @@ void CreateScreenGadgets()
 
   CreateScreenMenubuttons();
 
+#if 0
   /* force LEVELS draw offset for scrollbar / scrollbutton gadgets */
   game_status = GAME_MODE_LEVELS;
+#endif
 
   CreateScreenScrollbuttons();
   CreateScreenScrollbars();

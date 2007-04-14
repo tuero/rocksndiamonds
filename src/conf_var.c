@@ -1209,6 +1209,86 @@ struct TokenIntPtrInfo image_config_vars[] =
     &menu.draw_yoffset[GFX_SPECIAL_ARG_SETUP]
   },
   {
+    "menu.draw_xoffset.SETUP[GAME]",
+    &menu.draw_xoffset_setup[GFX_SPECIAL_ARG_SETUP_GAME]
+  },
+  {
+    "menu.draw_yoffset.SETUP[GAME]",
+    &menu.draw_yoffset_setup[GFX_SPECIAL_ARG_SETUP_GAME]
+  },
+  {
+    "menu.draw_xoffset.SETUP[EDITOR]",
+    &menu.draw_xoffset_setup[GFX_SPECIAL_ARG_SETUP_EDITOR]
+  },
+  {
+    "menu.draw_yoffset.SETUP[EDITOR]",
+    &menu.draw_yoffset_setup[GFX_SPECIAL_ARG_SETUP_EDITOR]
+  },
+  {
+    "menu.draw_xoffset.SETUP[GRAPHICS]",
+    &menu.draw_xoffset_setup[GFX_SPECIAL_ARG_SETUP_GRAPHICS]
+  },
+  {
+    "menu.draw_yoffset.SETUP[GRAPHICS]",
+    &menu.draw_yoffset_setup[GFX_SPECIAL_ARG_SETUP_GRAPHICS]
+  },
+  {
+    "menu.draw_xoffset.SETUP[SOUND]",
+    &menu.draw_xoffset_setup[GFX_SPECIAL_ARG_SETUP_SOUND]
+  },
+  {
+    "menu.draw_yoffset.SETUP[SOUND]",
+    &menu.draw_yoffset_setup[GFX_SPECIAL_ARG_SETUP_SOUND]
+  },
+  {
+    "menu.draw_xoffset.SETUP[ARTWORK]",
+    &menu.draw_xoffset_setup[GFX_SPECIAL_ARG_SETUP_ARTWORK]
+  },
+  {
+    "menu.draw_yoffset.SETUP[ARTWORK]",
+    &menu.draw_yoffset_setup[GFX_SPECIAL_ARG_SETUP_ARTWORK]
+  },
+  {
+    "menu.draw_xoffset.SETUP[INPUT]",
+    &menu.draw_xoffset_setup[GFX_SPECIAL_ARG_SETUP_INPUT]
+  },
+  {
+    "menu.draw_yoffset.SETUP[INPUT]",
+    &menu.draw_yoffset_setup[GFX_SPECIAL_ARG_SETUP_INPUT]
+  },
+  {
+    "menu.draw_xoffset.SETUP[SHORTCUTS_1]",
+    &menu.draw_xoffset_setup[GFX_SPECIAL_ARG_SETUP_SHORTCUTS_1]
+  },
+  {
+    "menu.draw_yoffset.SETUP[SHORTCUTS_1]",
+    &menu.draw_yoffset_setup[GFX_SPECIAL_ARG_SETUP_SHORTCUTS_1]
+  },
+  {
+    "menu.draw_xoffset.SETUP[SHORTCUTS_2]",
+    &menu.draw_xoffset_setup[GFX_SPECIAL_ARG_SETUP_SHORTCUTS_2]
+  },
+  {
+    "menu.draw_yoffset.SETUP[SHORTCUTS_2]",
+    &menu.draw_yoffset_setup[GFX_SPECIAL_ARG_SETUP_SHORTCUTS_2]
+  },
+  {
+    "menu.draw_xoffset.SETUP[CHOOSE_ARTWORK]",
+    &menu.draw_xoffset_setup[GFX_SPECIAL_ARG_SETUP_CHOOSE_ARTWORK]
+  },
+  {
+    "menu.draw_yoffset.SETUP[CHOOSE_ARTWORK]",
+    &menu.draw_yoffset_setup[GFX_SPECIAL_ARG_SETUP_CHOOSE_ARTWORK]
+  },
+  {
+    "menu.draw_xoffset.SETUP[CHOOSE_OTHER]",
+    &menu.draw_xoffset_setup[GFX_SPECIAL_ARG_SETUP_CHOOSE_OTHER]
+  },
+  {
+    "menu.draw_yoffset.SETUP[CHOOSE_OTHER]",
+    &menu.draw_yoffset_setup[GFX_SPECIAL_ARG_SETUP_CHOOSE_OTHER]
+  },
+  {
     "menu.scrollbar_xoffset",
     &menu.scrollbar_xoffset
   },
@@ -1227,6 +1307,10 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "menu.list_size.INFO",
     &menu.list_size[GFX_SPECIAL_ARG_INFO]
+  },
+  {
+    "menu.list_size.SETUP",
+    &menu.list_size[GFX_SPECIAL_ARG_SETUP]
   },
   {
     "main.button.name.x",

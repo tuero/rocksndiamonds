@@ -1,3 +1,12 @@
+2007-04-14
+	* added additional configuration directives for setup screen draw offset
+	  menu.draw_xoffset.SETUP[XXX] and menu.draw_yoffset.SETUP[XXX] with XXX
+	  in GAME, EDITOR, GRAPHICS, SOUND, ARTWORK, INPUT, SHORTCUTS_1,
+	  SHORTCUTS_2, CHOOSE_ARTWORK, CHOOSE_OTHER (where "CHOOSE_ARTWORK" is
+	  used to define draw offset on custom artwork selection screens and
+	  "CHOOSE_OTHER" is used on all other list style selection screens, like
+	  choosing game speed or screen mode for fullscreen mode)
+
 2007-04-08
 	* added support for accessing native Diamond Caves II level packages
 	* fixed displaying of game panel values for Emerald Mine game engine

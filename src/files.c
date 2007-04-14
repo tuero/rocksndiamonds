@@ -8764,7 +8764,7 @@ static void LoadSpecialMenuDesignSettingsFromFilename(char *filename)
   }
 
   /* special case: initialize with default values that may be overwritten */
-  /* (eg, init "menu.draw_xoffset.INFO[MUSIC]" from "menu.draw_xoffset.INFO") */
+  /* (eg, init "menu.draw_xoffset.INFO[XXX]" from "menu.draw_xoffset.INFO") */
   for (i = 0; i < NUM_SPECIAL_GFX_INFO_ARGS; i++)
   {
     char *value_1 = getHashEntry(setup_file_hash, "menu.draw_xoffset.INFO");
@@ -8774,6 +8774,19 @@ static void LoadSpecialMenuDesignSettingsFromFilename(char *filename)
       menu.draw_xoffset_info[i] = get_integer_from_string(value_1);
     if (value_2 != NULL)
       menu.draw_yoffset_info[i] = get_integer_from_string(value_2);
+  }
+
+  /* special case: initialize with default values that may be overwritten */
+  /* (eg, init "menu.draw_xoffset.SETUP[XXX]" from "menu.draw_xoffset.SETUP") */
+  for (i = 0; i < NUM_SPECIAL_GFX_SETUP_ARGS; i++)
+  {
+    char *value_1 = getHashEntry(setup_file_hash, "menu.draw_xoffset.SETUP");
+    char *value_2 = getHashEntry(setup_file_hash, "menu.draw_yoffset.SETUP");
+
+    if (value_1 != NULL)
+      menu.draw_xoffset_setup[i] = get_integer_from_string(value_1);
+    if (value_2 != NULL)
+      menu.draw_yoffset_setup[i] = get_integer_from_string(value_2);
   }
 
   /* special case: initialize with default values that may be overwritten */
@@ -8859,18 +8872,9 @@ static void LoadSpecialMenuDesignSettingsFromFilename(char *filename)
   freeSetupFileHash(setup_file_hash);
 }
 
-void LoadSpecialMenuDesignSettings()
+static void LoadSpecialMenuDesignSettings_SpecialPreProcessing()
 {
-  char *filename_base = UNDEFINED_FILENAME, *filename_local;
-  int i, j;
-
-  /* always start with reliable default values from static default config */
-  for (i = 0; image_config_vars[i].token != NULL; i++)
-    for (j = 0; image_config[j].token != NULL; j++)
-      if (strEqual(image_config_vars[i].token, image_config[j].token))
-	*image_config_vars[i].value =
-	  get_token_parameter_value(image_config_vars[i].token,
-				    image_config[j].value);
+  int i;
 
   /* the following initializes hierarchical values from static configuration */
 
@@ -8900,6 +8904,29 @@ void LoadSpecialMenuDesignSettings()
     menu.enter_screen[i] = menu.enter_screen[GFX_SPECIAL_ARG_DEFAULT];
     menu.leave_screen[i] = menu.leave_screen[GFX_SPECIAL_ARG_DEFAULT];
   }
+}
+
+static void LoadSpecialMenuDesignSettings_SpecialPostProcessing()
+{
+  /* special case: initialize later added SETUP list size from LEVELS value */
+  if (menu.list_size[GAME_MODE_SETUP] == -1)
+    menu.list_size[GAME_MODE_SETUP] = menu.list_size[GAME_MODE_LEVELS];
+}
+
+void LoadSpecialMenuDesignSettings()
+{
+  char *filename_base = UNDEFINED_FILENAME, *filename_local;
+  int i, j;
+
+  /* always start with reliable default values from static default config */
+  for (i = 0; image_config_vars[i].token != NULL; i++)
+    for (j = 0; image_config[j].token != NULL; j++)
+      if (strEqual(image_config_vars[i].token, image_config[j].token))
+	*image_config_vars[i].value =
+	  get_token_parameter_value(image_config_vars[i].token,
+				    image_config[j].value);
+
+  LoadSpecialMenuDesignSettings_SpecialPreProcessing();
 
   if (!SETUP_OVERRIDE_ARTWORK(setup, ARTWORK_TYPE_GRAPHICS))
   {
@@ -8914,6 +8941,8 @@ void LoadSpecialMenuDesignSettings()
 
   if (filename_local != NULL && !strEqual(filename_base, filename_local))
     LoadSpecialMenuDesignSettingsFromFilename(filename_local);
+
+  LoadSpecialMenuDesignSettings_SpecialPostProcessing();
 }
 
 void LoadUserDefinedEditorElementList(int **elements, int *num_elements)

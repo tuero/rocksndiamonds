@@ -1769,6 +1769,21 @@
 
 #define NUM_SPECIAL_GFX_INFO_ARGS	8
 
+/* these additional definitions are currently only used for draw offsets */
+#define GFX_SPECIAL_ARG_SETUP_MAIN		0
+#define GFX_SPECIAL_ARG_SETUP_GAME		1
+#define GFX_SPECIAL_ARG_SETUP_EDITOR		2
+#define GFX_SPECIAL_ARG_SETUP_GRAPHICS		3
+#define GFX_SPECIAL_ARG_SETUP_SOUND		4
+#define GFX_SPECIAL_ARG_SETUP_ARTWORK		5
+#define GFX_SPECIAL_ARG_SETUP_INPUT		6
+#define GFX_SPECIAL_ARG_SETUP_SHORTCUTS_1	7
+#define GFX_SPECIAL_ARG_SETUP_SHORTCUTS_2	8
+#define GFX_SPECIAL_ARG_SETUP_CHOOSE_ARTWORK	9
+#define GFX_SPECIAL_ARG_SETUP_CHOOSE_OTHER	10
+
+#define NUM_SPECIAL_GFX_SETUP_ARGS		11
+
 
 /* values for image configuration suffixes */
 #define GFX_ARG_X			0
@@ -2104,6 +2119,8 @@ struct MenuInfo
   int draw_yoffset[NUM_SPECIAL_GFX_ARGS];
   int draw_xoffset_info[NUM_SPECIAL_GFX_INFO_ARGS];
   int draw_yoffset_info[NUM_SPECIAL_GFX_INFO_ARGS];
+  int draw_xoffset_setup[NUM_SPECIAL_GFX_SETUP_ARGS];
+  int draw_yoffset_setup[NUM_SPECIAL_GFX_SETUP_ARGS];
 
   int scrollbar_xoffset;
 
