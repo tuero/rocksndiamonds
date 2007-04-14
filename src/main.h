@@ -851,7 +851,7 @@
 				 (d) == MV_DOWN  ? "MV_DOWN"  : "(various)")
 
 #define ELEMENT_ACTIVE(e)	(ActiveElement[e])
-
+#define BUTTON_ACTIVE(b)	(ActiveButton[b])
 #define FONT_ACTIVE(f)		(ActiveFont[f])
 
 
@@ -2706,6 +2706,7 @@ extern int			GfxAction[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern int 			GfxDir[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 
 extern int			ActiveElement[MAX_NUM_ELEMENTS];
+extern int			ActiveButton[NUM_IMAGE_FILES];
 extern int			ActiveFont[NUM_FONTS];
 
 extern int			lev_fieldx, lev_fieldy;

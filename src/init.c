@@ -4408,7 +4408,7 @@ static void InitGlobal()
 
     element_info[i].token_name = element_name_info[i].token_name;
     element_info[i].class_name = element_name_info[i].class_name;
-    element_info[i].editor_description=element_name_info[i].editor_description;
+    element_info[i].editor_description= element_name_info[i].editor_description;
 
 #if 0
     printf("%04d: %s\n", i, element_name_info[i].token_name);
@@ -4426,6 +4426,19 @@ static void InitGlobal()
     int element_active = element_with_active_state[i].element_active;
 
     ActiveElement[element] = element_active;
+  }
+
+  /* always start with reliable default values (all buttons) */
+  for (i = 0; i < NUM_IMAGE_FILES; i++)
+    ActiveButton[i] = i;
+
+  /* now add all entries that have an active state (active buttons) */
+  for (i = 0; button_with_active_state[i].button != -1; i++)
+  {
+    int button = button_with_active_state[i].button;
+    int button_active = button_with_active_state[i].button_active;
+
+    ActiveButton[button] = button_active;
   }
 
   /* always start with reliable default values (all fonts) */

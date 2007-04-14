@@ -310,6 +310,88 @@ element_with_active_state[] =
 
 static struct
 {
+  int button;
+  int button_active;
+}
+button_with_active_state[] =
+{
+  {
+    IMG_MENU_BUTTON,
+    IMG_MENU_BUTTON_ACTIVE
+  },
+  {
+    IMG_MENU_BUTTON_DOWN,
+    IMG_MENU_BUTTON_DOWN_ACTIVE
+  },
+  {
+    IMG_MENU_BUTTON_EDITOR,
+    IMG_MENU_BUTTON_EDITOR_ACTIVE
+  },
+  {
+    IMG_MENU_BUTTON_ENTER_MENU,
+    IMG_MENU_BUTTON_ENTER_MENU_ACTIVE
+  },
+  {
+    IMG_MENU_BUTTON_GAME,
+    IMG_MENU_BUTTON_GAME_ACTIVE
+  },
+  {
+    IMG_MENU_BUTTON_INFO,
+    IMG_MENU_BUTTON_INFO_ACTIVE
+  },
+  {
+    IMG_MENU_BUTTON_LEAVE_MENU,
+    IMG_MENU_BUTTON_LEAVE_MENU_ACTIVE
+  },
+  {
+    IMG_MENU_BUTTON_LEFT,
+    IMG_MENU_BUTTON_LEFT_ACTIVE
+  },
+  {
+    IMG_MENU_BUTTON_LEVELS,
+    IMG_MENU_BUTTON_LEVELS_ACTIVE
+  },
+  {
+    IMG_MENU_BUTTON_NAME,
+    IMG_MENU_BUTTON_NAME_ACTIVE
+  },
+  {
+    IMG_MENU_BUTTON_NEXT_LEVEL,
+    IMG_MENU_BUTTON_NEXT_LEVEL_ACTIVE
+  },
+  {
+    IMG_MENU_BUTTON_PREV_LEVEL,
+    IMG_MENU_BUTTON_PREV_LEVEL_ACTIVE
+  },
+  {
+    IMG_MENU_BUTTON_QUIT,
+    IMG_MENU_BUTTON_QUIT_ACTIVE
+  },
+  {
+    IMG_MENU_BUTTON_RIGHT,
+    IMG_MENU_BUTTON_RIGHT_ACTIVE
+  },
+  {
+    IMG_MENU_BUTTON_SCORES,
+    IMG_MENU_BUTTON_SCORES_ACTIVE
+  },
+  {
+    IMG_MENU_BUTTON_SETUP,
+    IMG_MENU_BUTTON_SETUP_ACTIVE
+  },
+  {
+    IMG_MENU_BUTTON_UP,
+    IMG_MENU_BUTTON_UP_ACTIVE
+  },
+  {
+    -1,
+    -1
+  },
+};
+
+
+static struct
+{
   int font_nr;
   int font_nr_active;
 }

@@ -125,6 +125,7 @@
 
 #define SC_BORDER_SIZE			14
 
+#if 0
 /* other useful macro definitions */
 #define BUTTON_GRAPHIC_ACTIVE(g)					       \
 	(g == IMG_MENU_BUTTON_LEFT       ? IMG_MENU_BUTTON_LEFT_ACTIVE       : \
@@ -135,7 +136,16 @@
          g == IMG_MENU_BUTTON_ENTER_MENU ? IMG_MENU_BUTTON_ENTER_MENU_ACTIVE : \
          g == IMG_MENU_BUTTON_PREV_LEVEL ? IMG_MENU_BUTTON_PREV_LEVEL_ACTIVE : \
          g == IMG_MENU_BUTTON_NEXT_LEVEL ? IMG_MENU_BUTTON_NEXT_LEVEL_ACTIVE : \
+         g == IMG_MENU_BUTTON_NAME       ? IMG_MENU_BUTTON_NAME_ACTIVE       : \
+         g == IMG_MENU_BUTTON_LEVELS     ? IMG_MENU_BUTTON_LEVELS_ACTIVE     : \
+         g == IMG_MENU_BUTTON_SCORES     ? IMG_MENU_BUTTON_SCORES_ACTIVE     : \
+         g == IMG_MENU_BUTTON_EDITOR     ? IMG_MENU_BUTTON_EDITOR_ACTIVE     : \
+         g == IMG_MENU_BUTTON_INFO       ? IMG_MENU_BUTTON_INFO_ACTIVE       : \
+         g == IMG_MENU_BUTTON_GAME       ? IMG_MENU_BUTTON_GAME_ACTIVE       : \
+         g == IMG_MENU_BUTTON_SETUP      ? IMG_MENU_BUTTON_SETUP_ACTIVE      : \
+         g == IMG_MENU_BUTTON_QUIT       ? IMG_MENU_BUTTON_QUIT_ACTIVE       : \
          IMG_MENU_BUTTON_ACTIVE)
+#endif
 
 
 /* forward declarations of internal functions */
@@ -376,49 +386,49 @@ static struct MainControlInfo main_controls[] =
 {
   {
     MAIN_CONTROL_NAME,
-    &menu.main.button.name,		IMG_MENU_BUTTON,
+    &menu.main.button.name,		IMG_MENU_BUTTON_NAME,
     &menu.main.text.name,		&main_text_name,
     &menu.main.input.name,		&setup.player_name,
   },
   {
     MAIN_CONTROL_LEVELS,
-    &menu.main.button.levels,		IMG_MENU_BUTTON_ENTER_MENU,
+    &menu.main.button.levels,		IMG_MENU_BUTTON_LEVELS,
     &menu.main.text.levels,		&main_text_levels,
     NULL,				NULL,
   },
   {
     MAIN_CONTROL_SCORES,
-    &menu.main.button.scores,		IMG_MENU_BUTTON,
+    &menu.main.button.scores,		IMG_MENU_BUTTON_SCORES,
     &menu.main.text.scores,		&main_text_scores,
     NULL,				NULL,
   },
   {
     MAIN_CONTROL_EDITOR,
-    &menu.main.button.editor,		IMG_MENU_BUTTON,
+    &menu.main.button.editor,		IMG_MENU_BUTTON_EDITOR,
     &menu.main.text.editor,		&main_text_editor,
     NULL,				NULL,
   },
   {
     MAIN_CONTROL_INFO,
-    &menu.main.button.info,		IMG_MENU_BUTTON_ENTER_MENU,
+    &menu.main.button.info,		IMG_MENU_BUTTON_INFO,
     &menu.main.text.info,		&main_text_info,
     NULL,				NULL,
   },
   {
     MAIN_CONTROL_GAME,
-    &menu.main.button.game,		IMG_MENU_BUTTON,
+    &menu.main.button.game,		IMG_MENU_BUTTON_GAME,
     &menu.main.text.game,		&main_text_game,
     NULL,				NULL,
   },
   {
     MAIN_CONTROL_SETUP,
-    &menu.main.button.setup,		IMG_MENU_BUTTON_ENTER_MENU,
+    &menu.main.button.setup,		IMG_MENU_BUTTON_SETUP,
     &menu.main.text.setup,		&main_text_setup,
     NULL,				NULL,
   },
   {
     MAIN_CONTROL_QUIT,
-    &menu.main.button.quit,		IMG_MENU_BUTTON,
+    &menu.main.button.quit,		IMG_MENU_BUTTON_QUIT,
     &menu.main.text.quit,		&main_text_quit,
     NULL,				NULL,
   },
@@ -921,7 +931,7 @@ static void DrawCursorAndText_Main_Ext(int nr, boolean active_text,
 
       if (active_text)
       {
-	button_graphic = BUTTON_GRAPHIC_ACTIVE(button_graphic);
+	button_graphic = BUTTON_ACTIVE(button_graphic);
 	font_text = FONT_ACTIVE(font_text);
       }
 
@@ -1031,7 +1041,7 @@ static void drawCursorExt(int xpos, int ypos, boolean active, int graphic)
   }
 
   if (active)
-    graphic = BUTTON_GRAPHIC_ACTIVE(graphic);
+    graphic = BUTTON_ACTIVE(graphic);
 
   DrawBackgroundForGraphic(x, y, TILEX, TILEY, graphic);
   DrawGraphicThruMaskExt(drawto, x, y, graphic, 0);

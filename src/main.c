@@ -76,6 +76,7 @@ int			GfxAction[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 int 			GfxDir[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 
 int			ActiveElement[MAX_NUM_ELEMENTS];
+int			ActiveButton[NUM_IMAGE_FILES];
 int			ActiveFont[NUM_FONTS];
 
 int			lev_fieldx, lev_fieldy;

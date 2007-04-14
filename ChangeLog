@@ -6,6 +6,15 @@
 	  used to define draw offset on custom artwork selection screens and
 	  "CHOOSE_OTHER" is used on all other list style selection screens, like
 	  choosing game speed or screen mode for fullscreen mode)
+	* added additional configuration directives to define main menu buttons:
+	  - menu.button_name	and menu.button_name.active
+	  - menu.button_levels	and menu.button_levels.active
+	  - menu.button_scores	and menu.button_scores.active
+	  - menu.button_editor	and menu.button_editor.active
+	  - menu.button_info	and menu.button_info.active
+	  - menu.button_game	and menu.button_game.active
+	  - menu.button_setup	and menu.button_setup.active
+	  - menu.button_quit	and menu.button_quit.active
 
 2007-04-08
 	* added support for accessing native Diamond Caves II level packages
