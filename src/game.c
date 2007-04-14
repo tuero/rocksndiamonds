@@ -200,43 +200,51 @@
 #define GAME_PANEL_MAGIC_WALL			66
 #define GAME_PANEL_MAGIC_WALL_TIME		67
 #define GAME_PANEL_GRAVITY_STATE		68
-#define GAME_PANEL_ELEMENT_1			69
-#define GAME_PANEL_ELEMENT_2			70
-#define GAME_PANEL_ELEMENT_3			71
-#define GAME_PANEL_ELEMENT_4			72
-#define GAME_PANEL_ELEMENT_5			73
-#define GAME_PANEL_ELEMENT_6			74
-#define GAME_PANEL_ELEMENT_7			75
-#define GAME_PANEL_ELEMENT_8			76
-#define GAME_PANEL_ELEMENT_COUNT_1		77
-#define GAME_PANEL_ELEMENT_COUNT_2		78
-#define GAME_PANEL_ELEMENT_COUNT_3		79
-#define GAME_PANEL_ELEMENT_COUNT_4		80
-#define GAME_PANEL_ELEMENT_COUNT_5		81
-#define GAME_PANEL_ELEMENT_COUNT_6		82
-#define GAME_PANEL_ELEMENT_COUNT_7		83
-#define GAME_PANEL_ELEMENT_COUNT_8		84
-#define GAME_PANEL_CE_SCORE_1			85
-#define GAME_PANEL_CE_SCORE_2			86
-#define GAME_PANEL_CE_SCORE_3			87
-#define GAME_PANEL_CE_SCORE_4			88
-#define GAME_PANEL_CE_SCORE_5			89
-#define GAME_PANEL_CE_SCORE_6			90
-#define GAME_PANEL_CE_SCORE_7			91
-#define GAME_PANEL_CE_SCORE_8			92
-#define GAME_PANEL_CE_SCORE_1_ELEMENT		93
-#define GAME_PANEL_CE_SCORE_2_ELEMENT		94
-#define GAME_PANEL_CE_SCORE_3_ELEMENT		95
-#define GAME_PANEL_CE_SCORE_4_ELEMENT		96
-#define GAME_PANEL_CE_SCORE_5_ELEMENT		97
-#define GAME_PANEL_CE_SCORE_6_ELEMENT		98
-#define GAME_PANEL_CE_SCORE_7_ELEMENT		99
-#define GAME_PANEL_CE_SCORE_8_ELEMENT		100
-#define GAME_PANEL_PLAYER_NAME			101
-#define GAME_PANEL_LEVEL_NAME			102
-#define GAME_PANEL_LEVEL_AUTHOR			103
+#define GAME_PANEL_GRAPHIC_1			69
+#define GAME_PANEL_GRAPHIC_2			70
+#define GAME_PANEL_GRAPHIC_3			71
+#define GAME_PANEL_GRAPHIC_4			72
+#define GAME_PANEL_GRAPHIC_5			73
+#define GAME_PANEL_GRAPHIC_6			74
+#define GAME_PANEL_GRAPHIC_7			75
+#define GAME_PANEL_GRAPHIC_8			76
+#define GAME_PANEL_ELEMENT_1			77
+#define GAME_PANEL_ELEMENT_2			78
+#define GAME_PANEL_ELEMENT_3			79
+#define GAME_PANEL_ELEMENT_4			80
+#define GAME_PANEL_ELEMENT_5			81
+#define GAME_PANEL_ELEMENT_6			82
+#define GAME_PANEL_ELEMENT_7			83
+#define GAME_PANEL_ELEMENT_8			84
+#define GAME_PANEL_ELEMENT_COUNT_1		85
+#define GAME_PANEL_ELEMENT_COUNT_2		86
+#define GAME_PANEL_ELEMENT_COUNT_3		87
+#define GAME_PANEL_ELEMENT_COUNT_4		88
+#define GAME_PANEL_ELEMENT_COUNT_5		89
+#define GAME_PANEL_ELEMENT_COUNT_6		90
+#define GAME_PANEL_ELEMENT_COUNT_7		91
+#define GAME_PANEL_ELEMENT_COUNT_8		92
+#define GAME_PANEL_CE_SCORE_1			93
+#define GAME_PANEL_CE_SCORE_2			94
+#define GAME_PANEL_CE_SCORE_3			95
+#define GAME_PANEL_CE_SCORE_4			96
+#define GAME_PANEL_CE_SCORE_5			97
+#define GAME_PANEL_CE_SCORE_6			98
+#define GAME_PANEL_CE_SCORE_7			99
+#define GAME_PANEL_CE_SCORE_8			100
+#define GAME_PANEL_CE_SCORE_1_ELEMENT		101
+#define GAME_PANEL_CE_SCORE_2_ELEMENT		102
+#define GAME_PANEL_CE_SCORE_3_ELEMENT		103
+#define GAME_PANEL_CE_SCORE_4_ELEMENT		104
+#define GAME_PANEL_CE_SCORE_5_ELEMENT		105
+#define GAME_PANEL_CE_SCORE_6_ELEMENT		106
+#define GAME_PANEL_CE_SCORE_7_ELEMENT		107
+#define GAME_PANEL_CE_SCORE_8_ELEMENT		108
+#define GAME_PANEL_PLAYER_NAME			109
+#define GAME_PANEL_LEVEL_NAME			110
+#define GAME_PANEL_LEVEL_AUTHOR			111
 
-#define NUM_GAME_PANEL_CONTROLS			104
+#define NUM_GAME_PANEL_CONTROLS			112
 
 struct GamePanelOrderInfo
 {
@@ -605,6 +613,46 @@ static struct GamePanelControlInfo game_panel_controls[] =
     GAME_PANEL_GRAVITY_STATE,
     &game.panel.gravity_state,
     TYPE_STRING,
+  },
+  {
+    GAME_PANEL_GRAPHIC_1,
+    &game.panel.graphic[0],
+    TYPE_ELEMENT,
+  },
+  {
+    GAME_PANEL_GRAPHIC_2,
+    &game.panel.graphic[1],
+    TYPE_ELEMENT,
+  },
+  {
+    GAME_PANEL_GRAPHIC_3,
+    &game.panel.graphic[2],
+    TYPE_ELEMENT,
+  },
+  {
+    GAME_PANEL_GRAPHIC_4,
+    &game.panel.graphic[3],
+    TYPE_ELEMENT,
+  },
+  {
+    GAME_PANEL_GRAPHIC_5,
+    &game.panel.graphic[4],
+    TYPE_ELEMENT,
+  },
+  {
+    GAME_PANEL_GRAPHIC_6,
+    &game.panel.graphic[5],
+    TYPE_ELEMENT,
+  },
+  {
+    GAME_PANEL_GRAPHIC_7,
+    &game.panel.graphic[6],
+    TYPE_ELEMENT,
+  },
+  {
+    GAME_PANEL_GRAPHIC_8,
+    &game.panel.graphic[7],
+    TYPE_ELEMENT,
   },
   {
     GAME_PANEL_ELEMENT_1,
@@ -2280,6 +2328,9 @@ void UpdateGameControlValues()
   game_panel_controls[GAME_PANEL_GRAVITY_STATE].value = game.gravity;
 #endif
 
+  for (i = 0; i < NUM_PANEL_GRAPHICS; i++)
+    game_panel_controls[GAME_PANEL_GRAPHIC_1 + i].value = EL_GRAPHIC_1 + i;
+
   for (i = 0; i < NUM_PANEL_ELEMENTS; i++)
     game_panel_controls[GAME_PANEL_ELEMENT_1 + i].value =
       (IS_DRAWABLE_ELEMENT(game.panel.element[i].id) ?
@@ -2486,6 +2537,13 @@ void DisplayGameControlValues()
       {
 	element = value;
 	graphic = el2panelimg(value);
+
+	// printf("::: %d, '%s' [%d]\n", element, EL_NAME(element), size);
+
+#if 1
+	if (element >= EL_GRAPHIC_1 && element <= EL_GRAPHIC_8 && size == 0)
+	  size = TILESIZE;
+#endif
 
 	getSizedGraphicSource(graphic, frame, size, &src_bitmap,
 			      &src_x, &src_y);

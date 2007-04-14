@@ -3554,6 +3554,38 @@ element_to_graphic[] =
     IMG_EMC_DRIPPER_ACTIVE
   },
   {
+    EL_GRAPHIC_1,			-1, -1, FALSE,
+    IMG_GRAPHIC_1
+  },
+  {
+    EL_GRAPHIC_2,			-1, -1, FALSE,
+    IMG_GRAPHIC_2
+  },
+  {
+    EL_GRAPHIC_3,			-1, -1, FALSE,
+    IMG_GRAPHIC_3
+  },
+  {
+    EL_GRAPHIC_4,			-1, -1, FALSE,
+    IMG_GRAPHIC_4
+  },
+  {
+    EL_GRAPHIC_5,			-1, -1, FALSE,
+    IMG_GRAPHIC_5
+  },
+  {
+    EL_GRAPHIC_6,			-1, -1, FALSE,
+    IMG_GRAPHIC_6
+  },
+  {
+    EL_GRAPHIC_7,			-1, -1, FALSE,
+    IMG_GRAPHIC_7
+  },
+  {
+    EL_GRAPHIC_8,			-1, -1, FALSE,
+    IMG_GRAPHIC_8
+  },
+  {
     EL_BD_BUTTERFLY_DOWN,		-1, -1, FALSE,
     IMG_BD_BUTTERFLY
   },

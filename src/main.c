@@ -5075,6 +5075,46 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
     "-"
   },
   {
+    "graphic_1",
+    "graphic",
+    "-"
+  },
+  {
+    "graphic_2",
+    "graphic",
+    "-"
+  },
+  {
+    "graphic_3",
+    "graphic",
+    "-"
+  },
+  {
+    "graphic_4",
+    "graphic",
+    "-"
+  },
+  {
+    "graphic_5",
+    "graphic",
+    "-"
+  },
+  {
+    "graphic_6",
+    "graphic",
+    "-"
+  },
+  {
+    "graphic_7",
+    "graphic",
+    "-"
+  },
+  {
+    "graphic_8",
+    "graphic",
+    "-"
+  },
+  {
     "internal_clipboard_custom",
     "internal",
     "empty custom element"

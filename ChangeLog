@@ -15,6 +15,7 @@
 	  - menu.button_game	and menu.button_game.active
 	  - menu.button_setup	and menu.button_setup.active
 	  - menu.button_quit	and menu.button_quit.active
+	* added eight pure decoration graphic definitions for the game panel
 
 2007-04-08
 	* added support for accessing native Diamond Caves II level packages
