@@ -4460,6 +4460,10 @@ static void InitGlobal()
   global.frames_per_second = 0;
   global.fps_slowdown = FALSE;
   global.fps_slowdown_factor = 1;
+
+  global.border_status = GAME_MODE_MAIN;
+  global.fading_status = GAME_MODE_MAIN;
+  global.fading_type = TYPE_ENTER_MENU;
 }
 
 void Execute_Command(char *command)

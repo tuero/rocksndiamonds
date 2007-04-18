@@ -205,16 +205,16 @@ void DrawMaskedBorder_Rect(int x, int y, int width, int height)
 
 void DrawMaskedBorder_FIELD()
 {
-  if (game_status >= GAME_MODE_TITLE &&
-      game_status <= GAME_MODE_PLAYING &&
-      border.draw_masked[game_status])
+  if (global.border_status >= GAME_MODE_TITLE &&
+      global.border_status <= GAME_MODE_PLAYING &&
+      border.draw_masked[global.border_status])
     DrawMaskedBorder_Rect(REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE);
 }
 
 void DrawMaskedBorder_DOOR_1()
 {
   if (border.draw_masked[GFX_SPECIAL_ARG_DOOR] &&
-      (game_status != GAME_MODE_EDITOR ||
+      (global.border_status != GAME_MODE_EDITOR ||
        border.draw_masked[GFX_SPECIAL_ARG_EDITOR]))
     DrawMaskedBorder_Rect(DX, DY, DXSIZE, DYSIZE);
 }
@@ -222,7 +222,7 @@ void DrawMaskedBorder_DOOR_1()
 void DrawMaskedBorder_DOOR_2()
 {
   if (border.draw_masked[GFX_SPECIAL_ARG_DOOR] &&
-      game_status != GAME_MODE_EDITOR)
+      global.border_status != GAME_MODE_EDITOR)
     DrawMaskedBorder_Rect(VX, VY, VXSIZE, VYSIZE);
 }
 
@@ -620,6 +620,29 @@ void FadeExt(int fade_mask, int fade_mode)
 
 void FadeIn(int fade_mask)
 {
+  global.border_status = game_status;
+
+#if 0
+  global.fading_status = game_status;
+
+  if (global.fading_type == TYPE_ENTER_MENU)
+    fading = menu.enter_menu;
+  else if (global.fading_type == TYPE_LEAVE_MENU)
+    fading = menu.leave_menu;
+  else if (global.fading_type == TYPE_ENTER_SCREEN)
+    fading = menu.enter_screen[global.fading_status];
+  else if (global.fading_type == TYPE_LEAVE_SCREEN)
+    fading = menu.leave_screen[global.fading_status];
+
+  printf("::: FadeIn: %s [0x%08x] [%d]\n",
+	 global.fading_type == TYPE_ENTER_MENU ? "enter_menu" :
+	 global.fading_type == TYPE_LEAVE_MENU ? "leave_menu" :
+	 global.fading_type == TYPE_ENTER_SCREEN ? "enter_screen" :
+	 global.fading_type == TYPE_LEAVE_SCREEN ? "leave_screen" : "(?)",
+	 global.fading_type,
+	 global.fading_status);
+#endif
+
 #if 1
   // printf("::: now fading in...\n");
 
@@ -641,6 +664,25 @@ void FadeIn(int fade_mask)
 
 void FadeOut(int fade_mask)
 {
+#if 0
+  if (global.fading_type == TYPE_ENTER_MENU)
+    fading = menu.enter_menu;
+  else if (global.fading_type == TYPE_LEAVE_MENU)
+    fading = menu.leave_menu;
+  else if (global.fading_type == TYPE_ENTER_SCREEN)
+    fading = menu.enter_screen[global.fading_status];
+  else if (global.fading_type == TYPE_LEAVE_SCREEN)
+    fading = menu.leave_screen[global.fading_status];
+
+  printf("::: FadeOut: %s [0x%08x] [%d]\n",
+	 global.fading_type == TYPE_ENTER_MENU ? "enter_menu" :
+	 global.fading_type == TYPE_LEAVE_MENU ? "leave_menu" :
+	 global.fading_type == TYPE_ENTER_SCREEN ? "enter_screen" :
+	 global.fading_type == TYPE_LEAVE_SCREEN ? "leave_screen" : "(?)",
+	 global.fading_type,
+	 global.fading_status);
+#endif
+
 #if 1
   // printf("::: fading.fade_mode == %d\n", fading.fade_mode);
 
@@ -670,6 +712,32 @@ void FadeCrossSaveBackbuffer()
   BlitBitmap(backbuffer, bitmap_db_cross, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
 }
 
+#if 0
+void FadeSetEnterMenu()
+{
+  global.fading_type = TYPE_ENTER_MENU;
+}
+
+void FadeSetLeaveMenu()
+{
+  global.fading_type = TYPE_LEAVE_MENU;
+}
+
+void FadeSetEnterScreen()
+{
+  global.fading_type = TYPE_ENTER_SCREEN;
+}
+
+void FadeSetLeaveScreen()
+{
+  // global.fading_type = TYPE_LEAVE_SCREEN;
+
+  global.fading_type = (global.fading_type == TYPE_ENTER_SCREEN ?
+			TYPE_LEAVE_SCREEN : TYPE_LEAVE_MENU);
+}
+
+#else
+
 static void FadeSetLeaveNext(struct TitleFadingInfo fading_leave, boolean set)
 {
   static struct TitleFadingInfo fading_leave_stored;
@@ -684,12 +752,20 @@ void FadeSetEnterMenu()
 {
   fading = menu.enter_menu;
 
+#if 0
+  printf("::: storing enter_menu\n");
+#endif
+
   FadeSetLeaveNext(fading, TRUE);	/* (keep same fade mode) */
 }
 
 void FadeSetLeaveMenu()
 {
   fading = menu.leave_menu;
+
+#if 0
+  printf("::: storing leave_menu\n");
+#endif
 
   FadeSetLeaveNext(fading, TRUE);	/* (keep same fade mode) */
 }
@@ -698,13 +774,31 @@ void FadeSetEnterScreen()
 {
   fading = menu.enter_screen[game_status];
 
+#if 0
+  printf("::: storing leave_screen[%d]\n", game_status);
+#endif
+
+#if 0
+  printf("::: - %d, %d / %d, %d\n",
+	 menu.enter_screen[game_status].fade_mode,
+	 menu.enter_screen[game_status].fade_delay,
+	 menu.leave_screen[game_status].fade_mode,
+	 menu.leave_screen[game_status].fade_delay);
+#endif
+
   FadeSetLeaveNext(menu.leave_screen[game_status], TRUE);	/* store */
 }
 
 void FadeSetLeaveScreen()
 {
+#if 0
+  printf("::: recalling last stored value\n");
+#endif
+
   FadeSetLeaveNext(menu.leave_screen[game_status], FALSE);	/* recall */
 }
+
+#endif
 
 void FadeSetFromType(int type)
 {

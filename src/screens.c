@@ -6065,6 +6065,21 @@ void HandleGameActions()
     AutoPlayTape();	/* continue automatically playing next tape */
 }
 
+#if 0
+void ChangeGameStatus(int new_game_status)
+{
+  /* for fading out last screen, use the last game status */
+  global.border_status = game_status;
+  global.fading_status = game_status;
+
+  /* ... */
+
+  /* for fading in next screen, use the new game status */
+  global.border_status = new_game_status;
+  global.fading_status = new_game_status;
+}
+#endif
+
 
 /* ---------- new screen button stuff -------------------------------------- */
 

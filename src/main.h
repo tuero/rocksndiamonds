@@ -2334,6 +2334,11 @@ struct GlobalInfo
   float frames_per_second;
   boolean fps_slowdown;
   int fps_slowdown_factor;
+
+  /* global values for fading screens and masking borders */
+  int border_status;
+  int fading_status;
+  int fading_type;
 };
 
 struct ElementChangeInfo

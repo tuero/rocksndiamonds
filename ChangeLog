@@ -1,3 +1,6 @@
+2007-04-18
+	* fixed small problem with separate fading definition for game screen
+
 2007-04-14
 	* added additional configuration directives for setup screen draw offset
 	  menu.draw_xoffset.SETUP[XXX] and menu.draw_yoffset.SETUP[XXX] with XXX
