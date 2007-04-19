@@ -961,6 +961,10 @@ struct TokenIntPtrInfo image_config_vars[] =
     &border.draw_masked[GFX_SPECIAL_ARG_DOOR]
   },
   {
+    "border.draw_masked_when_fading",
+    &border.draw_masked_when_fading
+  },
+  {
     "menu.enter_menu.fade_mode",
     &menu.enter_menu.fade_mode
   },

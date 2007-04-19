@@ -585,7 +585,10 @@ void FadeExt(int fade_mask, int fade_mode)
     fade_delay = fading.fade_delay;
     post_delay = (fade_mode == FADE_MODE_FADE_OUT ? fading.post_delay : 0);
 
-    draw_border_function = DrawMaskedBorder_FIELD;
+    if (border.draw_masked_when_fading)
+      draw_border_function = DrawMaskedBorder_FIELD;	/* update when fading */
+    else
+      DrawMaskedBorder_FIELD();				/* draw once */
   }
   else		/* REDRAW_ALL */
   {
@@ -620,7 +623,9 @@ void FadeExt(int fade_mask, int fade_mode)
 
 void FadeIn(int fade_mask)
 {
+#if 0
   global.border_status = game_status;
+#endif
 
 #if 0
   global.fading_status = game_status;
@@ -699,6 +704,10 @@ void FadeOut(int fade_mask)
 #else
   FadeExt(fade_mask, FADE_MODE_FADE_OUT);
 #endif
+#endif
+
+#if 1
+  global.border_status = game_status;
 #endif
 }
 

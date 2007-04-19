@@ -600,7 +600,12 @@ void SDLFadeRectangle(Bitmap *bitmap_cross, int x, int y, int width, int height,
       }
 
       if (steps_done >= steps_final)
+      {
+	if (draw_border_function != NULL)
+	  draw_border_function();
+
 	SDL_UpdateRect(surface_screen, dst_x, dst_y, width, height);
+      }
     }
   }
   else

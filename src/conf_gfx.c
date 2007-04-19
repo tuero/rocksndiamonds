@@ -5273,6 +5273,8 @@ struct ConfigInfo image_config[] =
   { "border.draw_masked.PLAYING",		"false"			},
   { "border.draw_masked.DOOR",			"false"			},
 
+  { "border.draw_masked_when_fading",		"true"			},
+
   { "menu.enter_menu.fade_mode",		"none"			},
   { "menu.enter_menu.fade_delay",		"250"			},
   { "menu.enter_menu.post_delay",		"125"			},

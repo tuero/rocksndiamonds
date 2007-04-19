@@ -2039,6 +2039,7 @@
 struct BorderInfo
 {
   boolean draw_masked[NUM_SPECIAL_GFX_ARGS];
+  boolean draw_masked_when_fading;
 };
 
 struct MenuMainButtonInfo
