@@ -1529,7 +1529,9 @@ void DrawMainMenuExt(int redraw_mask, boolean do_fading)
   MapTapeButtons();
   MapScreenMenuGadgets(SCREEN_MASK_MAIN);
 
+#if 0
   DrawMaskedBorder(REDRAW_ALL);
+#endif
 
 #if 1
   if (redraw_mask == REDRAW_ALL)
@@ -6064,21 +6066,6 @@ void HandleGameActions()
   if (tape.auto_play && !tape.playing)
     AutoPlayTape();	/* continue automatically playing next tape */
 }
-
-#if 0
-void ChangeGameStatus(int new_game_status)
-{
-  /* for fading out last screen, use the last game status */
-  global.border_status = game_status;
-  global.fading_status = game_status;
-
-  /* ... */
-
-  /* for fading in next screen, use the new game status */
-  global.border_status = new_game_status;
-  global.fading_status = new_game_status;
-}
-#endif
 
 
 /* ---------- new screen button stuff -------------------------------------- */

@@ -1,3 +1,7 @@
+2007-04-19
+	* added graphics engine directive "border.draw_masked_when_fading" that
+	  enables/disables drawing of border mask over screen that is just faded
+
 2007-04-18
 	* fixed small problem with separate fading definition for game screen
 

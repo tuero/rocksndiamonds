@@ -839,13 +839,10 @@ Bitmap *ZoomBitmap(Bitmap *src_bitmap, int zoom_width, int zoom_height)
   return dst_bitmap;
 }
 
-#define MORE_ZOOM	1
-
 static void CreateScaledBitmaps(Bitmap *old_bitmap, int zoom_factor,
 				boolean create_small_bitmaps)
 {
   Bitmap swap_bitmap;
-#if MORE_ZOOM
   Bitmap *new_bitmap;
   Bitmap *tmp_bitmap_1;
   Bitmap *tmp_bitmap_2;
@@ -859,10 +856,6 @@ static void CreateScaledBitmaps(Bitmap *old_bitmap, int zoom_factor,
   int width_8, height_8;
   int width_16, height_16;
   int width_32, height_32;
-#else
-  Bitmap *new_bitmap, *tmp_bitmap_1, *tmp_bitmap_2, *tmp_bitmap_4,*tmp_bitmap_8;
-  int width_1, height_1, width_2, height_2, width_4, height_4, width_8,height_8;
-#endif
   int new_width, new_height;
 
   /* calculate new image dimensions for normal sized image */
@@ -876,12 +869,11 @@ static void CreateScaledBitmaps(Bitmap *old_bitmap, int zoom_factor,
     tmp_bitmap_1 = old_bitmap;
 
   /* this is only needed to make compilers happy */
-#if MORE_ZOOM
-  tmp_bitmap_2 = tmp_bitmap_4 = tmp_bitmap_8 = tmp_bitmap_16 = NULL;
+  tmp_bitmap_2 = NULL;
+  tmp_bitmap_4 = NULL;
+  tmp_bitmap_8 = NULL;
+  tmp_bitmap_16 = NULL;
   tmp_bitmap_32 = NULL;
-#else
-  tmp_bitmap_2 = tmp_bitmap_4 = tmp_bitmap_8 = NULL;
-#endif
 
   if (create_small_bitmaps)
   {
@@ -892,12 +884,10 @@ static void CreateScaledBitmaps(Bitmap *old_bitmap, int zoom_factor,
     height_4 = height_1 / 4;
     width_8  = width_1  / 8;
     height_8 = height_1 / 8;
-#if MORE_ZOOM
     width_16  = width_1  / 16;
     height_16 = height_1 / 16;
     width_32  = width_1  / 32;
     height_32 = height_1 / 32;
-#endif
 
     /* get image with 1/2 of normal size (for use in the level editor) */
     if (zoom_factor != 2)
@@ -917,7 +907,6 @@ static void CreateScaledBitmaps(Bitmap *old_bitmap, int zoom_factor,
     else
       tmp_bitmap_8 = old_bitmap;
 
-#if MORE_ZOOM
     /* get image with 1/16 of normal size (for use on the preview screen) */
     if (zoom_factor != 16)
       tmp_bitmap_16 = ZoomBitmap(tmp_bitmap_8, width_8 / 2, height_8 / 2);
@@ -929,9 +918,9 @@ static void CreateScaledBitmaps(Bitmap *old_bitmap, int zoom_factor,
       tmp_bitmap_32 = ZoomBitmap(tmp_bitmap_16, width_16 / 2, height_16 / 2);
     else
       tmp_bitmap_32 = old_bitmap;
-#endif
   }
 
+#if 0
   /* if image was scaled up, create new clipmask for normal size image */
   if (zoom_factor != 1)
   {
@@ -956,6 +945,7 @@ static void CreateScaledBitmaps(Bitmap *old_bitmap, int zoom_factor,
     SDL_SetColorKey(tmp_surface_1, 0, 0);	/* reset transparent pixel */
 #endif
   }
+#endif
 
   if (create_small_bitmaps)
   {
@@ -971,12 +961,10 @@ static void CreateScaledBitmaps(Bitmap *old_bitmap, int zoom_factor,
 	       width_1 / 2, height_1);
     BlitBitmap(tmp_bitmap_8, new_bitmap, 0, 0, width_1 / 8, height_1 / 8,
 	       3 * width_1 / 4, height_1);
-#if MORE_ZOOM
     BlitBitmap(tmp_bitmap_16, new_bitmap, 0, 0, width_1 / 16, height_1 / 16,
 	       7 * width_1 / 8, height_1);
     BlitBitmap(tmp_bitmap_32, new_bitmap, 0, 0, width_1 / 32, height_1 / 32,
 	       15 * width_1 / 16, height_1);
-#endif
   }
   else
   {
@@ -1001,12 +989,11 @@ static void CreateScaledBitmaps(Bitmap *old_bitmap, int zoom_factor,
     if (zoom_factor != 8)
       FreeBitmap(tmp_bitmap_8);
 
-#if MORE_ZOOM
     if (zoom_factor != 16)
       FreeBitmap(tmp_bitmap_16);
+
     if (zoom_factor != 32)
       FreeBitmap(tmp_bitmap_32);
-#endif
   }
 
   /* replace image with extended image (containing 1/1, 1/2, 1/4, 1/8 size) */
@@ -1024,7 +1011,7 @@ static void CreateScaledBitmaps(Bitmap *old_bitmap, int zoom_factor,
   old_bitmap->height = new_bitmap->height;
 
 #if 1
-  /* !!! THIS URGENTLY NEEDS OPTIMIZATION -- DO NOT CREATE MASKS BEFORE !!! */
+  /* this replaces all blit masks created when loading -- maybe optimize this */
   {
 #if defined(TARGET_X11)
     if (old_bitmap->clip_mask)
