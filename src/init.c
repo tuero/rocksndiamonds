@@ -112,6 +112,12 @@ void InitGadgets()
 
 inline void InitElementSmallImagesScaledUp(int graphic)
 {
+#if 0
+  struct FileInfo *fi = getImageListEntryFromImageID(graphic);
+
+  printf("::: '%s' -> '%s'\n", fi->token, fi->filename);
+#endif
+
   CreateImageWithSmallImages(graphic, graphic_info[graphic].scale_up_factor);
 }
 

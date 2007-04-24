@@ -1529,7 +1529,7 @@ void DrawMainMenuExt(int redraw_mask, boolean do_fading)
   MapTapeButtons();
   MapScreenMenuGadgets(SCREEN_MASK_MAIN);
 
-#if 0
+#if 1
   DrawMaskedBorder(REDRAW_ALL);
 #endif
 

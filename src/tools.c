@@ -6076,6 +6076,67 @@ void ResetGfxAnimation_EM(int x, int y, int tile)
   GfxFrame[x][y] = 0;
 }
 
+void SetGfxAnimation_EM(int tile, int frame_em, int x, int y)
+{
+  int element         = object_mapping[tile].element_rnd;
+  int action          = object_mapping[tile].action;
+  int direction       = object_mapping[tile].direction;
+  boolean is_backside = object_mapping[tile].is_backside;
+  boolean action_removing = (action == ACTION_DIGGING ||
+			     action == ACTION_SNAPPING ||
+			     action == ACTION_COLLECTING);
+
+#if 0
+  printf("::: SET: %d, %d: '%s'\n", x, y, EL_NAME(element));
+#endif
+
+#if 1
+  if (action_removing)
+  {
+#if 0
+    printf("::: %d, %d: action_removing [%s]\n", x, y, EL_NAME(element));
+#endif
+
+    GfxFrame[x][y] = 7 - frame_em;
+  }
+  else if (action == ACTION_FALLING ||
+	   action == ACTION_MOVING ||
+	   action == ACTION_PUSHING ||
+	   action == ACTION_EATING ||
+	   action == ACTION_FILLING ||
+	   action == ACTION_EMPTYING)
+  {
+    int move_dir =
+      (action == ACTION_FALLING ||
+       action == ACTION_FILLING ||
+       action == ACTION_EMPTYING ? MV_DOWN : direction);
+
+    if (is_backside)
+    {
+      GfxFrame[x][y]++;
+
+      if (move_dir == MV_LEFT)
+	GfxFrame[x - 1][y] = GfxFrame[x][y];
+      else if (move_dir == MV_RIGHT)
+	GfxFrame[x + 1][y] = GfxFrame[x][y];
+      else if (move_dir == MV_UP)
+	GfxFrame[x][y - 1] = GfxFrame[x][y];
+      else if (move_dir == MV_DOWN)
+	GfxFrame[x][y + 1] = GfxFrame[x][y];
+    }
+
+#if 0
+    printf("::: %d, %d: %s, %d, %d [%d]\n", x, y, EL_NAME(element), is_backside,
+	   move_dir, GfxFrame[x][y]);
+#endif
+  }
+  else
+    GfxFrame[x][y]++;
+#else
+  GfxFrame[x][y] = 7 - frame_em;
+#endif
+}
+
 void getGraphicSourceObjectExt_EM(int tile, int frame_em,
 				  Bitmap **src_bitmap, int *src_x, int *src_y,
 				  int x, int y)
@@ -6097,10 +6158,28 @@ void getGraphicSourceObjectExt_EM(int tile, int frame_em,
   struct GraphicInfo *g = &graphic_info[graphic];
   int sync_frame;
 
+#if 0
+  printf("::: GET: %d, %d: '%s'\n", x, y, EL_NAME(element));
+#endif
+
+#if 0
+  if (GfxFrame[x][y] < 8)
+    printf("::: %d, %d: %d [%s]\n", x, y, GfxFrame[x][y], EL_NAME(element));
+#endif
+
+#if 1
+  if (graphic_info[graphic].anim_global_sync)
+    sync_frame = FrameCounter;
+  else if (IN_FIELD(x, y, MAX_LEV_FIELDX, MAX_LEV_FIELDY))
+    sync_frame = GfxFrame[x][y];
+  else
+    sync_frame = 0;	/* steel border */
+#else
   if (graphic_info[graphic].anim_global_sync)
     sync_frame = FrameCounter;
   else
     sync_frame = 7 - frame_em;
+#endif
 
   SetRandomAnimationValue(x, y);
 

@@ -48,6 +48,9 @@
 #define FULLSCREEN_NOT_AVAILABLE	FALSE
 #define FULLSCREEN_AVAILABLE		TRUE
 
+#define CREATE_SPECIAL_EDITION		FALSE
+#define CREATE_SPECIAL_EDITION_RND_JUE	FALSE
+
 /* default input keys */
 #define DEFAULT_KEY_LEFT		KSYM_Left
 #define DEFAULT_KEY_RIGHT		KSYM_Right
@@ -339,13 +342,25 @@
 #define CACHE_DIRECTORY		"cache"
 
 #if !defined(PLATFORM_MSDOS)
+#if CREATE_SPECIAL_EDITION_RND_JUE
+#define GFX_CLASSIC_SUBDIR	"jue0"
+#define SND_CLASSIC_SUBDIR	"jue0"
+#define MUS_CLASSIC_SUBDIR	"jue0"
+#else
 #define GFX_CLASSIC_SUBDIR	"gfx_classic"
 #define SND_CLASSIC_SUBDIR	"snd_classic"
 #define MUS_CLASSIC_SUBDIR	"mus_classic"
+#endif
 #else
 #define GFX_CLASSIC_SUBDIR	"gfx_orig"
 #define SND_CLASSIC_SUBDIR	"snd_orig"
 #define MUS_CLASSIC_SUBDIR	"mus_orig"
+#endif
+
+#if CREATE_SPECIAL_EDITION
+#define GFX_FALLBACK_FILENAME	"fallback.pcx"
+#define SND_FALLBACK_FILENAME	"fallback.wav"
+#define MUS_FALLBACK_FILENAME	"fallback.wav"
 #endif
 
 /* file names and filename extensions */

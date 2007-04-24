@@ -27,7 +27,7 @@
 				  (8 - frame) * ply[p].y) * TILEY / 8	\
 				 - ((SCR_FIELDY - 1) * TILEY) / 2)
 
-#define USE_EXTENDED_GRAPHICS_ENGINE		0
+#define USE_EXTENDED_GRAPHICS_ENGINE		1
 
 int frame;			/* current screen frame */
 int screen_x;			/* current scroll position */
@@ -195,6 +195,12 @@ static void DrawLevelFieldCrumbled_EM(int x, int y, int sx, int sy,
 {
   int tile = Draw[y][x];
   struct GraphicInfo_EM *g = &graphic_info_em_object[tile][frame];
+
+#if USE_EXTENDED_GRAPHICS_ENGINE
+  getGraphicSourceObjectExt_EM(tile, frame, &g->bitmap, &g->src_x, &g->src_y,
+			       x - 2, y - 2);
+#endif
+
   int left = screen_x / TILEX;
   int top  = screen_y / TILEY;
   int i;
@@ -336,6 +342,12 @@ static void animscreen(void)
     { +1, 0 },
     { 0, +1 }
   };
+
+#if USE_EXTENDED_GRAPHICS_ENGINE
+  for (y = 2; y < EM_MAX_CAVE_HEIGHT - 2; y++)
+    for (x = 2; x < EM_MAX_CAVE_WIDTH - 2; x++)
+      SetGfxAnimation_EM(Draw[y][x], frame, x - 2, y - 2);
+#endif
 
   for (y = top; y < top + MAX_BUF_YSIZE; y++)
   {

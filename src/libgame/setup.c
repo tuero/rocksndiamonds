@@ -602,6 +602,15 @@ char *getCustomImageFilename(char *basename)
   if (fileExists(filename))
     return filename;
 
+#if CREATE_SPECIAL_EDITION
+  free(filename);
+
+  /* 6th try: look for fallback artwork in old default artwork directory */
+  filename = getPath2(options.graphics_directory, GFX_FALLBACK_FILENAME);
+  if (fileExists(filename))
+    return filename;
+#endif
+
   return NULL;		/* cannot find specified artwork file anywhere */
 }
 
@@ -660,6 +669,15 @@ char *getCustomSoundFilename(char *basename)
   if (fileExists(filename))
     return filename;
 
+#if CREATE_SPECIAL_EDITION
+  free(filename);
+
+  /* 6th try: look for fallback artwork in old default artwork directory */
+  filename = getPath2(options.sounds_directory, SND_FALLBACK_FILENAME);
+  if (fileExists(filename))
+    return filename;
+#endif
+
   return NULL;		/* cannot find specified artwork file anywhere */
 }
 
@@ -717,6 +735,15 @@ char *getCustomMusicFilename(char *basename)
   filename = getPath2(options.music_directory, basename);
   if (fileExists(filename))
     return filename;
+
+#if CREATE_SPECIAL_EDITION
+  free(filename);
+
+  /* 6th try: look for fallback artwork in old default artwork directory */
+  filename = getPath2(options.music_directory, MUS_FALLBACK_FILENAME);
+  if (fileExists(filename))
+    return filename;
+#endif
 
   return NULL;		/* cannot find specified artwork file anywhere */
 }

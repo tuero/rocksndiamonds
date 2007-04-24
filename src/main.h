@@ -1952,10 +1952,18 @@
 
 #define PROGRAM_TITLE_STRING		"Rocks'n'Diamonds"
 #define PROGRAM_AUTHOR_STRING		"Holger Schemel"
-#define PROGRAM_COPYRIGHT_STRING	"Copyright ©1995-2006 by Holger Schemel"
+#define PROGRAM_COPYRIGHT_STRING	"Copyright ©1995-2007 by Holger Schemel"
 #define PROGRAM_EMAIL_STRING		"info@artsoft.org"
 #define PROGRAM_WEBSITE_STRING		"http://www.artsoft.org/"
 #define PROGRAM_GAME_BY_STRING		"A Game by Artsoft Entertainment"
+#define PROGRAM_UNIX_DATADIR_STRING	".rocksndiamonds"
+
+#if CREATE_SPECIAL_EDITION_RND_JUE
+#undef  PROGRAM_TITLE_STRING
+#define PROGRAM_TITLE_STRING		"Rocks'n'Diamonds - Version Jue"
+#undef  PROGRAM_UNIX_DATADIR_STRING
+#define PROGRAM_UNIX_DATADIR_STRING	".rocksndiamonds-jue"
+#endif
 
 #define ICON_TITLE_STRING		PROGRAM_TITLE_STRING
 #define COOKIE_PREFIX			"ROCKSNDIAMONDS"
@@ -1963,7 +1971,7 @@
 
 #define USERDATA_DIRECTORY_WIN32	PROGRAM_TITLE_STRING
 #define USERDATA_DIRECTORY_MACOSX	PROGRAM_TITLE_STRING
-#define USERDATA_DIRECTORY_UNIX		".rocksndiamonds"
+#define USERDATA_DIRECTORY_UNIX		PROGRAM_UNIX_DATADIR_STRING
 #define USERDATA_DIRECTORY_DOS		"userdata"
 
 #if defined(PLATFORM_WIN32)
