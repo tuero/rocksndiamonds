@@ -483,7 +483,7 @@ static void WriteReloadInfoToPipe(char *set_identifier, int type)
   if (leveldir_current == NULL)		/* should never happen */
     Error(ERR_EXIT, "leveldir_current == NULL");
 
-  memset(&snd_ctrl, 0, sizeof(SoundControl));	/* to make valgrind happy */
+  clear_mem(&snd_ctrl, sizeof(SoundControl));	/* to make valgrind happy */
 
   snd_ctrl.active = FALSE;
   snd_ctrl.state = type;
@@ -1147,8 +1147,8 @@ static void Mixer_Main_DSP()
   max_sample_size = fragment_size / (num_output_channels * sample_bytes);
 
   /* first clear the last premixing buffer */
-  memset(premix_last_buffer, 0,
-	 max_sample_size * num_output_channels * sizeof(long));
+  clear_mem(premix_last_buffer,
+	    max_sample_size * num_output_channels * sizeof(long));
 
   for (i = 0; i < audio.num_channels; i++)
   {
@@ -2171,7 +2171,7 @@ void StopSoundExt(int nr, int state)
   if (!audio.sound_available)
     return;
 
-  memset(&snd_ctrl, 0, sizeof(SoundControl));	/* to make valgrind happy */
+  clear_mem(&snd_ctrl, sizeof(SoundControl));	/* to make valgrind happy */
 
   snd_ctrl.active = FALSE;
   snd_ctrl.nr = nr;

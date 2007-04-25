@@ -1,3 +1,8 @@
+2007-04-26
+	* fixed(?) very strange bug apparently triggered by memset() when code
+	  was cross-compiled with MinGW cross-compiler for Windows XP platform
+	  (this only happened when using SDL.dll also self-compiled with MinGW)
+
 2007-04-19
 	* added graphics engine directive "border.draw_masked_when_fading" that
 	  enables/disables drawing of border mask over screen that is just faded

@@ -9100,7 +9100,7 @@ static struct MusicFileInfo *get_music_file_info_ext(char *basename, int music,
 
   /* ---------- music file info found ---------- */
 
-  memset(&tmp_music_file_info, 0, sizeof(struct MusicFileInfo));
+  clear_mem(&tmp_music_file_info, sizeof(struct MusicFileInfo));
 
   for (i = 0; token_to_value_ptr[i].token != NULL; i++)
   {

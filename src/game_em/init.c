@@ -366,7 +366,7 @@ void sound_play(void)
 
 #endif
 
-  memset(play, 0, sizeof(play));
+  clear_mem(play, sizeof(play));
 }
 
 unsigned int InitEngineRandom_EM(long seed)

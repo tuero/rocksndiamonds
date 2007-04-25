@@ -98,26 +98,27 @@
 /*****************************************************************************/
 struct entry
 {
-    void *k, *v;
-    unsigned int h;
-    struct entry *next;
+  void *k, *v;
+  unsigned int h;
+  struct entry *next;
 };
 
-struct hashtable {
-    unsigned int tablelength;
-    struct entry **table;
-    unsigned int entrycount;
-    unsigned int loadlimit;
-    unsigned int (*hashfn) (void *k);
-    int (*eqfn) (void *k1, void *k2);
+struct hashtable
+{
+  unsigned int tablelength;
+  struct entry **table;
+  unsigned int entrycount;
+  unsigned int loadlimit;
+  unsigned int (*hashfn) (void *k);
+  int (*eqfn) (void *k1, void *k2);
 };
 
 /*****************************************************************************/
 struct hashtable_itr
 {
-    struct hashtable *h;
-    struct entry *e;
-    unsigned int index;
+  struct hashtable *h;
+  struct entry *e;
+  unsigned int index;
 };
 
 
@@ -162,7 +163,7 @@ hashtable_insert(struct hashtable *h, void *k, void *v);
 #define DEFINE_HASHTABLE_INSERT(fnname, keytype, valuetype) \
 int fnname (struct hashtable *h, keytype *k, valuetype *v) \
 { \
-    return hashtable_insert(h,k,v); \
+  return hashtable_insert(h,k,v); \
 }
 
 /*****************************************************************************
@@ -181,7 +182,7 @@ hashtable_change(struct hashtable *h, void *k, void *v);
 #define DEFINE_HASHTABLE_CHANGE(fnname, keytype, valuetype) \
 int fnname (struct hashtable *h, keytype *k, valuetype *v) \
 { \
-    return hashtable_change(h,k,v); \
+  return hashtable_change(h,k,v); \
 }
 
 /*****************************************************************************
@@ -199,7 +200,7 @@ hashtable_search(struct hashtable *h, void *k);
 #define DEFINE_HASHTABLE_SEARCH(fnname, keytype, valuetype) \
 valuetype * fnname (struct hashtable *h, keytype *k) \
 { \
-    return (valuetype *) (hashtable_search(h,k)); \
+  return (valuetype *) (hashtable_search(h,k)); \
 }
 
 /*****************************************************************************
@@ -217,7 +218,7 @@ hashtable_remove(struct hashtable *h, void *k);
 #define DEFINE_HASHTABLE_REMOVE(fnname, keytype, valuetype) \
 valuetype * fnname (struct hashtable *h, keytype *k) \
 { \
-    return (valuetype *) (hashtable_remove(h,k)); \
+  return (valuetype *) (hashtable_remove(h,k)); \
 }
 
 
@@ -256,7 +257,7 @@ hashtable_iterator(struct hashtable *h);
 extern inline void *
 hashtable_iterator_key(struct hashtable_itr *i)
 {
-    return i->e->k;
+  return i->e->k;
 }
 
 /*****************************************************************************/
@@ -265,7 +266,7 @@ hashtable_iterator_key(struct hashtable_itr *i)
 extern inline void *
 hashtable_iterator_value(struct hashtable_itr *i)
 {
-    return i->e->v;
+  return i->e->v;
 }
 
 /*****************************************************************************/

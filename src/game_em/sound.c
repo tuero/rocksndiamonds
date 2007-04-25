@@ -86,7 +86,7 @@ int sound_thread(void)
   mix_buffer = 0;
   mix_count = 0;
 
-  memset(sound_play, 0, sizeof(sound_play)); /* not playing any sounds */
+  clear_mem(sound_play, sizeof(sound_play)); /* not playing any sounds */
 
   for (;;)
   {
@@ -294,7 +294,7 @@ int sound_thread(void)
     if (mix_count && audio_fd != -1)
     {
       /* prepare mix buffer */
-      memset(mix_buffer, 0, fragment_size * sizeof(*mix_buffer));
+      clear_mem(mix_buffer, fragment_size * sizeof(*mix_buffer));
 
       for (i = 0; i < mix_count; i++)
       {
