@@ -950,6 +950,19 @@ void checked_free(void *ptr)
     free(ptr);
 }
 
+void clear_mem(void *ptr, unsigned long size)
+{
+#if defined(PLATFORM_WIN32)
+  /* for unknown reason, memset() sometimes crashes when compiled with MinGW */
+  char *cptr = (char *)ptr;
+
+  while (size--)
+    *cptr++ = 0;
+#else
+  memset(ptr, 0, size);
+#endif
+}
+
 
 /* ------------------------------------------------------------------------- */
 /* various helper functions                                                  */

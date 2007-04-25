@@ -115,6 +115,7 @@ struct GameInfo
   struct GameButtonInfo button;
 
   /* values for graphics engine customization */
+  boolean use_native_emc_graphics_engine;
   int forced_scroll_delay_value;
   int scroll_delay_value;
 

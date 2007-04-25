@@ -144,17 +144,31 @@ void blitscreen(void)
   BackToFront_EM();
 }
 
-static void DrawLevelField_EM(int x, int y, int sx, int sy,
-			      boolean draw_masked)
+static struct GraphicInfo_EM *getObjectGraphic(int x, int y)
 {
   int tile = Draw[y][x];
   struct GraphicInfo_EM *g = &graphic_info_em_object[tile][frame];
 
-#if USE_EXTENDED_GRAPHICS_ENGINE
-  getGraphicSourceObjectExt_EM(tile, frame, &g->bitmap, &g->src_x, &g->src_y,
-			       x - 2, y - 2);
-#endif
+  if (!game.use_native_emc_graphics_engine)
+    getGraphicSourceObjectExt_EM(tile, frame, &g->bitmap, &g->src_x, &g->src_y,
+				 x - 2, y - 2);
+  return g;
+}
 
+static struct GraphicInfo_EM *getPlayerGraphic(int player_nr, int anim)
+{
+  struct GraphicInfo_EM *g = &graphic_info_em_player[player_nr][anim][frame];
+
+  if (!game.use_native_emc_graphics_engine)
+    getGraphicSourcePlayerExt_EM(player_nr, anim, frame,
+				 &g->bitmap, &g->src_x, &g->src_y);
+  return g;
+}
+
+static void DrawLevelField_EM(int x, int y, int sx, int sy,
+			      boolean draw_masked)
+{
+  struct GraphicInfo_EM *g = getObjectGraphic(x, y);
   int src_x = g->src_x + g->src_offset_x;
   int src_y = g->src_y + g->src_offset_y;
   int dst_x = sx * TILEX + g->dst_offset_x;
@@ -193,14 +207,7 @@ static void DrawLevelField_EM(int x, int y, int sx, int sy,
 static void DrawLevelFieldCrumbled_EM(int x, int y, int sx, int sy,
 				      int crm, boolean draw_masked)
 {
-  int tile = Draw[y][x];
-  struct GraphicInfo_EM *g = &graphic_info_em_object[tile][frame];
-
-#if USE_EXTENDED_GRAPHICS_ENGINE
-  getGraphicSourceObjectExt_EM(tile, frame, &g->bitmap, &g->src_x, &g->src_y,
-			       x - 2, y - 2);
-#endif
-
+  struct GraphicInfo_EM *g = getObjectGraphic(x, y);
   int left = screen_x / TILEX;
   int top  = screen_y / TILEY;
   int i;
@@ -259,13 +266,7 @@ static void DrawLevelFieldCrumbled_EM(int x, int y, int sx, int sy,
 static void DrawLevelPlayer_EM(int x1, int y1, int player_nr, int anim,
 			       boolean draw_masked)
 {
-  struct GraphicInfo_EM *g = &graphic_info_em_player[player_nr][anim][frame];
-
-#if USE_EXTENDED_GRAPHICS_ENGINE
-  getGraphicSourcePlayerExt_EM(player_nr, anim, frame,
-			       &g->bitmap, &g->src_x, &g->src_y);
-#endif
-
+  struct GraphicInfo_EM *g = getPlayerGraphic(player_nr, anim);
   int src_x = g->src_x, src_y = g->src_y;
   int dst_x, dst_y;
 
@@ -343,11 +344,10 @@ static void animscreen(void)
     { 0, +1 }
   };
 
-#if USE_EXTENDED_GRAPHICS_ENGINE
-  for (y = 2; y < EM_MAX_CAVE_HEIGHT - 2; y++)
-    for (x = 2; x < EM_MAX_CAVE_WIDTH - 2; x++)
-      SetGfxAnimation_EM(Draw[y][x], frame, x - 2, y - 2);
-#endif
+  if (!game.use_native_emc_graphics_engine)
+    for (y = 2; y < EM_MAX_CAVE_HEIGHT - 2; y++)
+      for (x = 2; x < EM_MAX_CAVE_WIDTH - 2; x++)
+	SetGfxAnimation_EM(Draw[y][x], frame, x - 2, y - 2);
 
   for (y = top; y < top + MAX_BUF_YSIZE; y++)
   {
@@ -359,6 +359,7 @@ static void animscreen(void)
       struct GraphicInfo_EM *g = &graphic_info_em_object[tile][frame];
       int obj = g->unique_identifier;
       int crm = 0;
+      boolean redraw_screen_tile = FALSE;
 
       /* re-calculate crumbled state of this tile */
       if (g->has_crumbled_graphics)
@@ -380,12 +381,15 @@ static void animscreen(void)
 	}
       }
 
+      redraw_screen_tile = (screentiles[sy][sx]    != obj ||
+			    crumbled_state[sy][sx] != crm);
+
+      /* !!! TEST ONLY -- CHANGE THIS !!! */
+      if (!game.use_native_emc_graphics_engine)
+	redraw_screen_tile = TRUE;
+
       /* only redraw screen tiles if they (or their crumbled state) changed */
-#if USE_EXTENDED_GRAPHICS_ENGINE
-      // if (screentiles[sy][sx] != obj || crumbled_state[sy][sx] != crm)
-#else
-      if (screentiles[sy][sx] != obj || crumbled_state[sy][sx] != crm)
-#endif
+      if (redraw_screen_tile)
       {
 	DrawLevelField_EM(x, y, sx, sy, FALSE);
 	DrawLevelFieldCrumbled_EM(x, y, sx, sy, crm, FALSE);

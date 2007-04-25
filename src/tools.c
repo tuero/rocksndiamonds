@@ -6078,7 +6078,9 @@ void ResetGfxAnimation_EM(int x, int y, int tile)
 
 void SetGfxAnimation_EM(int tile, int frame_em, int x, int y)
 {
+#if 0
   int element         = object_mapping[tile].element_rnd;
+#endif
   int action          = object_mapping[tile].action;
   int direction       = object_mapping[tile].direction;
   boolean is_backside = object_mapping[tile].is_backside;

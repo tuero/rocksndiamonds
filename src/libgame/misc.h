@@ -121,6 +121,7 @@ void *checked_malloc(unsigned long);
 void *checked_calloc(unsigned long);
 void *checked_realloc(void *, unsigned long);
 void checked_free(void *);
+void clear_mem(void *, unsigned long);
 
 void swap_numbers(int *, int *);
 void swap_number_pairs(int *, int *, int *, int *);

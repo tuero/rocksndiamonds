@@ -1316,7 +1316,8 @@ void DrawMainMenuExt(int redraw_mask, boolean do_fading)
 
   FadeSetLeaveScreen();
 
-#if 1
+  /* (does not work well when changing to editor, which fades out itself) */
+#if 0
   FadeOut(redraw_mask);
 #endif
 
@@ -1341,6 +1342,10 @@ void DrawMainMenuExt(int redraw_mask, boolean do_fading)
 
     return;
   }
+
+#if 1
+  FadeOut(redraw_mask);
+#endif
 
   /* needed if last screen was the editor screen */
   UndrawSpecialEditorDoor();

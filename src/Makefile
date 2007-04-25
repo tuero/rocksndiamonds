@@ -214,7 +214,12 @@ RNDLIBS = $(LIBGAME) $(GAME_EM)
 
 ICONBASE = windows_icon
 ifeq ($(PLATFORM),cross-win32)
-ICON32X32 = ../graphics/$(ICONBASE)_32x32.bmp
+ifdef SPECIAL_ICON
+ICONSUFFIX = 32x32_$(SPECIAL_ICON)
+else
+ICONSUFFIX = 32x32
+endif
+ICON32X32 = ../graphics/$(ICONBASE)_$(ICONSUFFIX).bmp
 ICON = $(ICONBASE).o
 endif
 

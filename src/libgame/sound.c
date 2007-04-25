@@ -2110,7 +2110,7 @@ void PlaySoundExt(int nr, int volume, int stereo_position, int state)
   else if (stereo_position > SOUND_MAX_RIGHT)
     stereo_position = SOUND_MAX_RIGHT;
 
-  memset(&snd_ctrl, 0, sizeof(SoundControl));	/* to make valgrind happy */
+  clear_mem(&snd_ctrl, sizeof(SoundControl));	/* to make valgrind happy */
 
   snd_ctrl.active = TRUE;
   snd_ctrl.nr = nr;

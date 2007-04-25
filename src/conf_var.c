@@ -4949,6 +4949,10 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.forced_scroll_delay_value
   },
   {
+    "game.use_native_emc_graphics_engine",
+    &game.use_native_emc_graphics_engine
+  },
+  {
     "[player].boring_delay_fixed",
     &game.player_boring_delay_fixed
   },

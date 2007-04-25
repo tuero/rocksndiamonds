@@ -91,6 +91,10 @@ cross-msdos:
 cross-win32:
 	@PATH=$(CROSS_PATH_WIN32)/bin:${PATH} $(MAKE_CMD) PLATFORM=cross-win32
 
+cross-win32-jue:
+	@PATH=$(CROSS_PATH_WIN32)/bin:${PATH} $(MAKE_CMD) PLATFORM=cross-win32 \
+							  SPECIAL_ICON=jue
+
 clean:
 	@$(MAKE_CMD) clean
 
