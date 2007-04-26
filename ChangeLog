@@ -1,4 +1,8 @@
 2007-04-26
+	* added "busy" animation when initializing program and loading artwork
+	* added initialization profiling for program startup (debugging only)
+
+2007-04-25
 	* fixed(?) very strange bug apparently triggered by memset() when code
 	  was cross-compiled with MinGW cross-compiler for Windows XP platform
 	  (this only happened when using SDL.dll also self-compiled with MinGW)

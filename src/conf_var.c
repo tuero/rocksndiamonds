@@ -965,6 +965,22 @@ struct TokenIntPtrInfo image_config_vars[] =
     &border.draw_masked_when_fading
   },
   {
+    "init.busy.x",
+    &init.busy.x
+  },
+  {
+    "init.busy.y",
+    &init.busy.y
+  },
+  {
+    "init.busy.align",
+    &init.busy.align
+  },
+  {
+    "init.busy.valign",
+    &init.busy.valign
+  },
+  {
     "menu.enter_menu.fade_mode",
     &menu.enter_menu.fade_mode
   },

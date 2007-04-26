@@ -192,8 +192,16 @@ void getFontCharSource(int font_nr, char c, Bitmap **bitmap, int *x, int *y)
 /* simple text drawing functions                                             */
 /* ========================================================================= */
 
-void DrawInitText(char *text, int ypos, int font_nr)
+void DrawInitTextExt(char *text, int ypos, int font_nr, boolean force)
 {
+  static unsigned long progress_delay = 0;
+  unsigned long progress_delay_value = 100;	/* (in milliseconds) */
+
+  UPDATE_BUSY_STATE();
+
+  if (!force && !DelayReached(&progress_delay, progress_delay_value))
+    return;
+
   if (window != NULL &&
       gfx.num_fonts > 0 &&
       gfx.font_bitmap_info[font_nr].bitmap != NULL)
@@ -209,6 +217,16 @@ void DrawInitText(char *text, int ypos, int font_nr)
     /* this makes things significantly faster than directly drawing to window */
     BlitBitmap(drawto, window, 0, y, width, height, 0, y);
   }
+}
+
+void DrawInitText(char *text, int ypos, int font_nr)
+{
+  DrawInitTextExt(text, ypos, font_nr, TRUE);
+}
+
+void DrawInitTextIfNeeded(char *text, int ypos, int font_nr)
+{
+  DrawInitTextExt(text, ypos, font_nr, FALSE);
 }
 
 void DrawTextF(int x, int y, int font_nr, char *format, ...)

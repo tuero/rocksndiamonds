@@ -4932,6 +4932,15 @@ struct ConfigInfo image_config[] =
   { "global.border",				"RocksScreen.pcx"	},
   { "global.door",				"RocksDoor.pcx"		},
 
+  { "global.busy",				"RocksBusy.pcx"		},
+  { "global.busy.x",				"0"			},
+  { "global.busy.y",				"0"			},
+  { "global.busy.width",			"32"			},
+  { "global.busy.height",			"32"			},
+  { "global.busy.frames",			"28"			},
+  { "global.busy.frames_per_line",		"7"			},
+  { "global.busy.delay",			"2"			},
+
   { "editor.element_border",			"RocksElements.pcx"	},
   { "editor.element_border.xpos",		"0"			},
   { "editor.element_border.ypos",		"0"			},
@@ -5274,6 +5283,11 @@ struct ConfigInfo image_config[] =
   { "border.draw_masked.DOOR",			"false"			},
 
   { "border.draw_masked_when_fading",		"true"			},
+
+  { "init.busy.x",				"336"			},
+  { "init.busy.y",				"280"			},
+  { "init.busy.align",				"center"		},
+  { "init.busy.valign",				"middle"		},
 
   { "menu.enter_menu.fade_mode",		"none"			},
   { "menu.enter_menu.fade_delay",		"250"			},
@@ -6314,7 +6328,6 @@ struct ConfigInfo image_config[] =
   { "game.button.sound_simple.y",		"245"			},
 
   { "game.forced_scroll_delay_value",		"-1"			},
-
   { "game.use_native_emc_graphics_engine",	"false"			},
 
   { "[player].boring_delay_fixed",		"1000"			},

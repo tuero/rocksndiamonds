@@ -48,8 +48,8 @@
 #define FULLSCREEN_NOT_AVAILABLE	FALSE
 #define FULLSCREEN_AVAILABLE		TRUE
 
-#define CREATE_SPECIAL_EDITION		TRUE
-#define CREATE_SPECIAL_EDITION_RND_JUE	TRUE
+#define CREATE_SPECIAL_EDITION		FALSE
+#define CREATE_SPECIAL_EDITION_RND_JUE	FALSE
 
 /* default input keys */
 #define DEFAULT_KEY_LEFT		KSYM_Left
@@ -585,6 +585,12 @@
 				 (type) == ARTWORK_TYPE_MUSIC ?		\
 				 options.music_directory : "")
 
+#define UPDATE_BUSY_STATE()			\
+{						\
+  if (gfx.draw_busy_anim_function != NULL)	\
+    gfx.draw_busy_anim_function();		\
+}
+
 
 /* type definitions */
 typedef int (*EventFilter)(const Event *);
@@ -725,6 +731,8 @@ struct GfxInfo
   int (*get_font_from_token_function)(char *);
 
   int anim_random_frame;
+
+  void (*draw_busy_anim_function)(void);
 };
 
 struct JoystickInfo
@@ -1123,6 +1131,7 @@ void InitGfxFieldInfo(int, int, int, int, int, int, int, int, Bitmap *);
 void InitGfxDoor1Info(int, int, int, int);
 void InitGfxDoor2Info(int, int, int, int);
 void InitGfxScrollbufferInfo(int, int);
+void InitGfxDrawBusyAnimFunction(void (*draw_busy_anim_function)(void));
 void SetDrawDeactivationMask(int);
 void SetDrawBackgroundMask(int);
 void SetWindowBackgroundBitmap(Bitmap *);

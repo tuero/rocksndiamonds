@@ -2915,7 +2915,7 @@ void NotifyUserAboutErrorFile()
 
 #if DEBUG
 
-#define DEBUG_NUM_TIMESTAMPS		3
+#define DEBUG_NUM_TIMESTAMPS		5
 #define DEBUG_TIME_IN_MICROSECONDS	0
 
 #if DEBUG_TIME_IN_MICROSECONDS
@@ -2939,35 +2939,53 @@ static double Counter_Microseconds()
 }
 #endif
 
+char *debug_print_timestamp_get_padding(int padding_size)
+{
+  static char *padding = NULL;
+  int max_padding_size = 100;
+
+  if (padding == NULL)
+  {
+    padding = checked_calloc(max_padding_size + 1);
+    memset(padding, ' ', max_padding_size);
+  }
+
+  return &padding[MAX(0, max_padding_size - padding_size)];
+}
+
 void debug_print_timestamp(int counter_nr, char *message)
 {
+  int indent_size = 8;
+  int padding_size = 40;
+  float timestamp_interval;
+
+  if (counter_nr < 0)
+    Error(ERR_EXIT, "debugging: invalid negative counter");
+  else if (counter_nr >= DEBUG_NUM_TIMESTAMPS)
+    Error(ERR_EXIT, "debugging: increase DEBUG_NUM_TIMESTAMPS in misc.c");
+
 #if DEBUG_TIME_IN_MICROSECONDS
   static double counter[DEBUG_NUM_TIMESTAMPS][2];
-
-  if (counter_nr >= DEBUG_NUM_TIMESTAMPS)
-    Error(ERR_EXIT, "debugging: increase DEBUG_NUM_TIMESTAMPS in misc.c");
+  char *unit = "ms";
 
   counter[counter_nr][0] = Counter_Microseconds();
-
-  if (message)
-    printf("%s %.3f ms\n", message,
-	   (counter[counter_nr][0] - counter[counter_nr][1]) / 1000);
-
-  counter[counter_nr][1] = counter[counter_nr][0];
 #else
   static long counter[DEBUG_NUM_TIMESTAMPS][2];
-
-  if (counter_nr >= DEBUG_NUM_TIMESTAMPS)
-    Error(ERR_EXIT, "debugging: increase DEBUG_NUM_TIMESTAMPS in misc.c");
+  char *unit = "s";
 
   counter[counter_nr][0] = Counter();
+#endif
+
+  timestamp_interval = counter[counter_nr][0] - counter[counter_nr][1];
+  counter[counter_nr][1] = counter[counter_nr][0];
 
   if (message)
-    printf("%s %.3f s\n", message,
-	   (float)(counter[counter_nr][0] - counter[counter_nr][1]) / 1000);
-
-  counter[counter_nr][1] = counter[counter_nr][0];
-#endif
+    printf("%s%s%s %.3f %s\n",
+	   debug_print_timestamp_get_padding(counter_nr * indent_size),
+	   message,
+	   debug_print_timestamp_get_padding(padding_size - strlen(message)),
+	   timestamp_interval / 1000,
+	   unit);
 }
 
 void debug_print_parent_only(char *format, ...)

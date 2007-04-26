@@ -8698,7 +8698,84 @@ static int get_token_parameter_value(char *token, char *value_raw)
   return get_parameter_value(value_raw, suffix, TYPE_INTEGER);
 }
 
-static void LoadSpecialMenuDesignSettingsFromFilename(char *filename)
+void InitMenuDesignSettings_Static()
+{
+  static SetupFileHash *image_config_hash = NULL;
+  int i;
+
+  if (image_config_hash == NULL)
+  {
+    image_config_hash = newSetupFileHash();
+
+    for (i = 0; image_config[i].token != NULL; i++)
+      setHashEntry(image_config_hash,
+		   image_config[i].token,
+		   image_config[i].value);
+  }
+
+#if 1
+  /* always start with reliable default values from static default config */
+  for (i = 0; image_config_vars[i].token != NULL; i++)
+  {
+    char *value = getHashEntry(image_config_hash, image_config_vars[i].token);
+
+    if (value != NULL)
+      *image_config_vars[i].value =
+	get_token_parameter_value(image_config_vars[i].token, value);
+  }
+#else
+  /* always start with reliable default values from static default config */
+  for (i = 0; image_config_vars[i].token != NULL; i++)
+    for (j = 0; image_config[j].token != NULL; j++)
+      if (strEqual(image_config_vars[i].token, image_config[j].token))
+	*image_config_vars[i].value =
+	  get_token_parameter_value(image_config_vars[i].token,
+				    image_config[j].value);
+#endif
+}
+
+static void InitMenuDesignSettings_SpecialPreProcessing()
+{
+  int i;
+
+  /* the following initializes hierarchical values from static configuration */
+
+  /* special case: initialize "ARG_DEFAULT" values in static default config */
+  /* (e.g., initialize "[titlemessage].fade_mode" from "[title].fade_mode") */
+  titlemessage_initial_default.fade_mode  = title_initial_default.fade_mode;
+  titlemessage_initial_default.fade_delay = title_initial_default.fade_delay;
+  titlemessage_initial_default.post_delay = title_initial_default.post_delay;
+  titlemessage_initial_default.auto_delay = title_initial_default.auto_delay;
+  titlemessage_default.fade_mode  = title_default.fade_mode;
+  titlemessage_default.fade_delay = title_default.fade_delay;
+  titlemessage_default.post_delay = title_default.post_delay;
+  titlemessage_default.auto_delay = title_default.auto_delay;
+
+  /* special case: initialize "ARG_DEFAULT" values in static default config */
+  /* (e.g., init "titlemessage_1.fade_mode" from "[titlemessage].fade_mode") */
+  for (i = 0; i < MAX_NUM_TITLE_MESSAGES; i++)
+  {
+    titlemessage_initial[i] = titlemessage_initial_default;
+    titlemessage[i] = titlemessage_default;
+  }
+
+  /* special case: initialize "ARG_DEFAULT" values in static default config */
+  /* (eg, init "menu.enter_screen.SCORES.xyz" from "menu.enter_screen.xyz") */
+  for (i = 0; i < NUM_SPECIAL_GFX_ARGS; i++)
+  {
+    menu.enter_screen[i] = menu.enter_screen[GFX_SPECIAL_ARG_DEFAULT];
+    menu.leave_screen[i] = menu.leave_screen[GFX_SPECIAL_ARG_DEFAULT];
+  }
+}
+
+static void InitMenuDesignSettings_SpecialPostProcessing()
+{
+  /* special case: initialize later added SETUP list size from LEVELS value */
+  if (menu.list_size[GAME_MODE_SETUP] == -1)
+    menu.list_size[GAME_MODE_SETUP] = menu.list_size[GAME_MODE_LEVELS];
+}
+
+static void LoadMenuDesignSettingsFromFilename(char *filename)
 {
   static struct TitleMessageInfo tmi;
   static struct TokenInfo titlemessage_tokens[] =
@@ -8739,7 +8816,7 @@ static void LoadSpecialMenuDesignSettingsFromFilename(char *filename)
   int i, j, k;
 
 #if 0
-  printf("LoadSpecialMenuDesignSettings from file '%s' ...\n", filename);
+  printf("LoadMenuDesignSettings from file '%s' ...\n", filename);
 #endif
 
   if ((setup_file_hash = loadSetupFileHash(filename)) == NULL)
@@ -8872,61 +8949,12 @@ static void LoadSpecialMenuDesignSettingsFromFilename(char *filename)
   freeSetupFileHash(setup_file_hash);
 }
 
-static void LoadSpecialMenuDesignSettings_SpecialPreProcessing()
-{
-  int i;
-
-  /* the following initializes hierarchical values from static configuration */
-
-  /* special case: initialize "ARG_DEFAULT" values in static default config */
-  /* (e.g., initialize "[titlemessage].fade_mode" from "[title].fade_mode") */
-  titlemessage_initial_default.fade_mode  = title_initial_default.fade_mode;
-  titlemessage_initial_default.fade_delay = title_initial_default.fade_delay;
-  titlemessage_initial_default.post_delay = title_initial_default.post_delay;
-  titlemessage_initial_default.auto_delay = title_initial_default.auto_delay;
-  titlemessage_default.fade_mode  = title_default.fade_mode;
-  titlemessage_default.fade_delay = title_default.fade_delay;
-  titlemessage_default.post_delay = title_default.post_delay;
-  titlemessage_default.auto_delay = title_default.auto_delay;
-
-  /* special case: initialize "ARG_DEFAULT" values in static default config */
-  /* (e.g., init "titlemessage_1.fade_mode" from "[titlemessage].fade_mode") */
-  for (i = 0; i < MAX_NUM_TITLE_MESSAGES; i++)
-  {
-    titlemessage_initial[i] = titlemessage_initial_default;
-    titlemessage[i] = titlemessage_default;
-  }
-
-  /* special case: initialize "ARG_DEFAULT" values in static default config */
-  /* (eg, init "menu.enter_screen.SCORES.xyz" from "menu.enter_screen.xyz") */
-  for (i = 0; i < NUM_SPECIAL_GFX_ARGS; i++)
-  {
-    menu.enter_screen[i] = menu.enter_screen[GFX_SPECIAL_ARG_DEFAULT];
-    menu.leave_screen[i] = menu.leave_screen[GFX_SPECIAL_ARG_DEFAULT];
-  }
-}
-
-static void LoadSpecialMenuDesignSettings_SpecialPostProcessing()
-{
-  /* special case: initialize later added SETUP list size from LEVELS value */
-  if (menu.list_size[GAME_MODE_SETUP] == -1)
-    menu.list_size[GAME_MODE_SETUP] = menu.list_size[GAME_MODE_LEVELS];
-}
-
-void LoadSpecialMenuDesignSettings()
+void LoadMenuDesignSettings()
 {
   char *filename_base = UNDEFINED_FILENAME, *filename_local;
-  int i, j;
 
-  /* always start with reliable default values from static default config */
-  for (i = 0; image_config_vars[i].token != NULL; i++)
-    for (j = 0; image_config[j].token != NULL; j++)
-      if (strEqual(image_config_vars[i].token, image_config[j].token))
-	*image_config_vars[i].value =
-	  get_token_parameter_value(image_config_vars[i].token,
-				    image_config[j].value);
-
-  LoadSpecialMenuDesignSettings_SpecialPreProcessing();
+  InitMenuDesignSettings_Static();
+  InitMenuDesignSettings_SpecialPreProcessing();
 
   if (!SETUP_OVERRIDE_ARTWORK(setup, ARTWORK_TYPE_GRAPHICS))
   {
@@ -8934,15 +8962,15 @@ void LoadSpecialMenuDesignSettings()
     filename_base = getCustomArtworkLevelConfigFilename(ARTWORK_TYPE_GRAPHICS);
 
     if (fileExists(filename_base))
-      LoadSpecialMenuDesignSettingsFromFilename(filename_base);
+      LoadMenuDesignSettingsFromFilename(filename_base);
   }
 
   filename_local = getCustomArtworkConfigFilename(ARTWORK_TYPE_GRAPHICS);
 
   if (filename_local != NULL && !strEqual(filename_base, filename_local))
-    LoadSpecialMenuDesignSettingsFromFilename(filename_local);
+    LoadMenuDesignSettingsFromFilename(filename_local);
 
-  LoadSpecialMenuDesignSettings_SpecialPostProcessing();
+  InitMenuDesignSettings_SpecialPostProcessing();
 }
 
 void LoadUserDefinedEditorElementList(int **elements, int *num_elements)

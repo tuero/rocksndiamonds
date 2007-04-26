@@ -1636,6 +1636,8 @@ Bitmap *SDLLoadImage(char *filename)
     return NULL;
   }
 
+  UPDATE_BUSY_STATE();
+
   /* create native non-transparent surface for current image */
   if ((new_bitmap->surface = SDL_DisplayFormat(sdl_image_tmp)) == NULL)
   {
@@ -1643,6 +1645,8 @@ Bitmap *SDLLoadImage(char *filename)
 
     return NULL;
   }
+
+  UPDATE_BUSY_STATE();
 
   /* create native transparent surface for current image */
   SDL_SetColorKey(sdl_image_tmp, SDL_SRCCOLORKEY,
@@ -1653,6 +1657,8 @@ Bitmap *SDLLoadImage(char *filename)
 
     return NULL;
   }
+
+  UPDATE_BUSY_STATE();
 
   /* free temporary surface */
   SDL_FreeSurface(sdl_image_tmp);

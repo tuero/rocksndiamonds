@@ -118,6 +118,7 @@ struct TitleMessageInfo	titlemessage_initial[MAX_NUM_TITLE_MESSAGES];
 struct TitleMessageInfo	titlemessage_default;
 struct TitleMessageInfo	titlemessage[MAX_NUM_TITLE_MESSAGES];
 struct TitleMessageInfo	readme;
+struct InitInfo		init;
 struct MenuInfo		menu;
 struct DoorInfo		door_1, door_2;
 struct PreviewInfo	preview;

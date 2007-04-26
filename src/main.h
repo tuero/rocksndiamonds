@@ -2130,6 +2130,11 @@ struct TitleMessageInfo
   int auto_delay;
 };
 
+struct InitInfo
+{
+  struct MenuPosInfo busy;
+};
+
 struct MenuInfo
 {
   int draw_xoffset[NUM_SPECIAL_GFX_ARGS];
@@ -2771,6 +2776,7 @@ extern struct TitleMessageInfo	titlemessage_initial[];
 extern struct TitleMessageInfo	titlemessage_default;
 extern struct TitleMessageInfo	titlemessage[];
 extern struct TitleMessageInfo	readme;
+extern struct InitInfo		init;
 extern struct MenuInfo		menu;
 extern struct DoorInfo		door_1, door_2;
 extern struct PreviewInfo	preview;

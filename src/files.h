@@ -61,7 +61,8 @@ void LoadSetup_EditorCascade();
 void SaveSetup_EditorCascade();
 
 void LoadCustomElementDescriptions();
-void LoadSpecialMenuDesignSettings();
+void InitMenuDesignSettings_Static();
+void LoadMenuDesignSettings();
 void LoadUserDefinedEditorElementList(int **, int *);
 void LoadMusicInfo();
 void LoadHelpAnimInfo();

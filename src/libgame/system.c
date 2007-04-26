@@ -196,6 +196,11 @@ void InitGfxScrollbufferInfo(int scrollbuffer_width, int scrollbuffer_height)
   gfx.scrollbuffer_height = scrollbuffer_height;
 }
 
+void InitGfxDrawBusyAnimFunction(void (*draw_busy_anim_function)(void))
+{
+  gfx.draw_busy_anim_function = draw_busy_anim_function;
+}
+
 void SetDrawDeactivationMask(int draw_deactivation_mask)
 {
   gfx.draw_deactivation_mask = draw_deactivation_mask;
@@ -889,11 +894,15 @@ static void CreateScaledBitmaps(Bitmap *old_bitmap, int zoom_factor,
     width_32  = width_1  / 32;
     height_32 = height_1 / 32;
 
+    UPDATE_BUSY_STATE();
+
     /* get image with 1/2 of normal size (for use in the level editor) */
     if (zoom_factor != 2)
       tmp_bitmap_2 = ZoomBitmap(tmp_bitmap_1, width_1 / 2, height_1 / 2);
     else
       tmp_bitmap_2 = old_bitmap;
+
+    UPDATE_BUSY_STATE();
 
     /* get image with 1/4 of normal size (for use in the level editor) */
     if (zoom_factor != 4)
@@ -901,11 +910,15 @@ static void CreateScaledBitmaps(Bitmap *old_bitmap, int zoom_factor,
     else
       tmp_bitmap_4 = old_bitmap;
 
+    UPDATE_BUSY_STATE();
+
     /* get image with 1/8 of normal size (for use on the preview screen) */
     if (zoom_factor != 8)
       tmp_bitmap_8 = ZoomBitmap(tmp_bitmap_4, width_4 / 2, height_4 / 2);
     else
       tmp_bitmap_8 = old_bitmap;
+
+    UPDATE_BUSY_STATE();
 
     /* get image with 1/16 of normal size (for use on the preview screen) */
     if (zoom_factor != 16)
@@ -913,11 +926,15 @@ static void CreateScaledBitmaps(Bitmap *old_bitmap, int zoom_factor,
     else
       tmp_bitmap_16 = old_bitmap;
 
+    UPDATE_BUSY_STATE();
+
     /* get image with 1/32 of normal size (for use on the preview screen) */
     if (zoom_factor != 32)
       tmp_bitmap_32 = ZoomBitmap(tmp_bitmap_16, width_16 / 2, height_16 / 2);
     else
       tmp_bitmap_32 = old_bitmap;
+
+    UPDATE_BUSY_STATE();
   }
 
 #if 0
@@ -965,6 +982,8 @@ static void CreateScaledBitmaps(Bitmap *old_bitmap, int zoom_factor,
 	       7 * width_1 / 8, height_1);
     BlitBitmap(tmp_bitmap_32, new_bitmap, 0, 0, width_1 / 32, height_1 / 32,
 	       15 * width_1 / 16, height_1);
+
+    UPDATE_BUSY_STATE();
   }
   else
   {
@@ -1035,6 +1054,8 @@ static void CreateScaledBitmaps(Bitmap *old_bitmap, int zoom_factor,
 #endif
   }
 #endif
+
+  UPDATE_BUSY_STATE();
 
   FreeBitmap(new_bitmap);	/* this actually frees the _old_ bitmap now */
 }
