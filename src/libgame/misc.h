@@ -108,8 +108,8 @@ char *getStringToLower(char *);
 void setString(char **, char *);
 boolean strEqual(char *, char *);
 boolean strEqualN(char *, char *, int);
-boolean strEqualPrefix(char *, char *);
-boolean strEqualSuffix(char *, char *);
+boolean strPrefix(char *, char *);
+boolean strSuffix(char *, char *);
 
 void GetOptions(char **, void (*print_usage_function)(void));
 

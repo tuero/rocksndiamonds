@@ -128,6 +128,10 @@ struct MusicInfo       *music_info = NULL;
 struct MusicFileInfo   *music_file_info = NULL;
 struct HelpAnimInfo    *helpanim_info = NULL;
 SetupFileHash          *helptext_info = NULL;
+SetupFileHash	       *image_config_hash = NULL;
+SetupFileHash	       *element_token_hash = NULL;
+SetupFileHash	       *graphic_token_hash = NULL;
+SetupFileHash	       *font_token_hash = NULL;
 
 
 /* ------------------------------------------------------------------------- */
@@ -5481,6 +5485,8 @@ struct FontInfo font_info[NUM_FONTS + 1] =
   { "font.game_info"		},
   { "font.info.elements"	},
   { "font.info.levelset"	},
+
+  { NULL			}
 };
 
 

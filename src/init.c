@@ -39,7 +39,7 @@
 #define CONFIG_TOKEN_GLOBAL_BUSY		"global.busy"
 
 #define DEBUG_PRINT_INIT_TIMESTAMPS		TRUE
-#define DEBUG_PRINT_INIT_TIMESTAMPS_DEPTH	5
+#define DEBUG_PRINT_INIT_TIMESTAMPS_DEPTH	3
 
 
 static struct FontBitmapInfo font_initial[NUM_INITIAL_FONTS];
@@ -97,7 +97,7 @@ static void print_init_timestamp(char *message)
   static int counter_nr = 0;
   int max_depth = DEBUG_PRINT_INIT_TIMESTAMPS_DEPTH;
 
-  if (strEqualPrefix(message, "INIT"))
+  if (strPrefix(message, "INIT"))
   {
     if (counter_nr + 1 < max_depth)
     {
@@ -109,19 +109,20 @@ static void print_init_timestamp(char *message)
 
     debug_print_timestamp(counter_nr, NULL);
   }
-  else if (strEqualPrefix(message, "DONE"))
+  else if (strPrefix(message, "DONE"))
   {
     counter_nr--;
 
-    if (counter_nr + 1 < max_depth)
+    if (counter_nr + 1 < max_depth ||
+	(counter_nr == 0 && max_depth == 1))
     {
       last_message = &message[4];
 
       debug_print_timestamp(counter_nr, message);
     }
   }
-  else if (!strEqualPrefix(message, "TIME") ||
-	   !strEqualSuffix(message, last_message))
+  else if (!strPrefix(message, "TIME") ||
+	   !strSuffix(message, last_message))
   {
     if (counter_nr < max_depth)
       debug_print_timestamp(counter_nr, message);
@@ -306,12 +307,19 @@ static int getFontBitmapID(int font_nr)
 
 static int getFontFromToken(char *token)
 {
+#if 1
+  char *value = getHashEntry(font_token_hash, token);
+
+  if (value != NULL)
+    return atoi(value);
+#else
   int i;
 
   /* !!! OPTIMIZE THIS BY USING HASH !!! */
   for (i = 0; i < NUM_FONTS; i++)
     if (strEqual(token, font_info[i].token_name))
       return i;
+#endif
 
   /* if font not found, use reliable default value */
   return FONT_INITIAL_1;
@@ -1132,14 +1140,30 @@ void InitElementSpecialGraphicInfo()
 
 static int get_graphic_parameter_value(char *value_raw, char *suffix, int type)
 {
-  int i;
-  int x = 0;
-
-  if (type != TYPE_TOKEN)
+  if (type != TYPE_ELEMENT && type != TYPE_GRAPHIC)
     return get_parameter_value(value_raw, suffix, type);
 
   if (strEqual(value_raw, ARG_UNDEFINED))
     return ARG_UNDEFINED_VALUE;
+
+#if 1
+  if (type == TYPE_ELEMENT)
+  {
+    char *value = getHashEntry(element_token_hash, value_raw);
+
+    return (value != NULL ? atoi(value) : EL_UNDEFINED);
+  }
+  else if (type == TYPE_GRAPHIC)
+  {
+    char *value = getHashEntry(graphic_token_hash, value_raw);
+
+    return (value != NULL ? atoi(value) : IMG_UNDEFINED);
+  }
+
+#else
+
+  int i;
+  int x = 0;
 
   /* !!! THIS IS BUGGY !!! NOT SURE IF YOU GET ELEMENT ID OR GRAPHIC ID !!! */
   /* !!! (possible reason why ".clone_from" with elements doesn't work) !!! */
@@ -1164,6 +1188,7 @@ static int get_graphic_parameter_value(char *value_raw, char *suffix, int type)
 
     x++;
   }
+#endif
 
   return -1;
 }
@@ -4798,6 +4823,7 @@ void InitElementPropertiesAfterLoading(int engine_version)
 
 static void InitGlobal()
 {
+  int graphic;
   int i;
 
   for (i = 0; i < MAX_NUM_ELEMENTS + 1; i++)
@@ -4814,6 +4840,37 @@ static void InitGlobal()
     printf("%04d: %s\n", i, element_name_info[i].token_name);
 #endif
   }
+
+  /* create hash from image config list */
+  image_config_hash = newSetupFileHash();
+  for (i = 0; image_config[i].token != NULL; i++)
+    setHashEntry(image_config_hash,
+		 image_config[i].token,
+		 image_config[i].value);
+
+  /* create hash from element token list */
+  element_token_hash = newSetupFileHash();
+  for (i = 0; element_name_info[i].token_name != NULL; i++)
+    setHashEntry(element_token_hash,
+		 element_name_info[i].token_name,
+		 int2str(i, 0));
+
+  /* create hash from graphic token list */
+  graphic_token_hash = newSetupFileHash();
+  for (graphic = 0, i = 0; image_config[i].token != NULL; i++)
+    if (strSuffix(image_config[i].value, ".pcx") ||
+	strSuffix(image_config[i].value, ".wav") ||
+	strEqual(image_config[i].value, UNDEFINED_FILENAME))
+      setHashEntry(graphic_token_hash,
+		   image_config[i].token,
+		   int2str(graphic++, 0));
+
+  /* create hash from font token list */
+  font_token_hash = newSetupFileHash();
+  for (i = 0; font_info[i].token_name != NULL; i++)
+    setHashEntry(font_token_hash,
+		 font_info[i].token_name,
+		 int2str(i, 0));
 
   /* always start with reliable default values (all elements) */
   for (i = 0; i < MAX_NUM_ELEMENTS; i++)

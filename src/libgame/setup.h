@@ -27,24 +27,24 @@
 #define TYPE_KEY_X11			(1 << 5)
 #define TYPE_INTEGER			(1 << 6)
 #define TYPE_STRING			(1 << 7)
-#define TYPE_TOKEN			(1 << 8)
+#define TYPE_ELEMENT			(1 << 8)
+#define TYPE_GRAPHIC			(1 << 9)
 
 /* additional values for setup screen */
-#define TYPE_ENTER_SCREEN		(1 << 9)
-#define TYPE_LEAVE_SCREEN		(1 << 10)
-#define TYPE_ENTER_MENU			(1 << 11)
-#define TYPE_LEAVE_MENU			(1 << 12)
-#define TYPE_ENTER_LIST			(1 << 13)
-#define TYPE_LEAVE_LIST			(1 << 14)
-#define TYPE_EMPTY			(1 << 15)
-#define TYPE_KEYTEXT			(1 << 16)
+#define TYPE_ENTER_SCREEN		(1 << 10)
+#define TYPE_LEAVE_SCREEN		(1 << 11)
+#define TYPE_ENTER_MENU			(1 << 12)
+#define TYPE_LEAVE_MENU			(1 << 13)
+#define TYPE_ENTER_LIST			(1 << 14)
+#define TYPE_LEAVE_LIST			(1 << 15)
+#define TYPE_EMPTY			(1 << 16)
+#define TYPE_KEYTEXT			(1 << 17)
 
-#define TYPE_GHOSTED			(1 << 17)
-#define TYPE_QUERY			(1 << 18)
+#define TYPE_GHOSTED			(1 << 18)
+#define TYPE_QUERY			(1 << 19)
 
 /* additional values for internal purposes */
-#define TYPE_BITFIELD			(1 << 19)
-#define TYPE_ELEMENT			(1 << 20)
+#define TYPE_BITFIELD			(1 << 20)
 #define TYPE_CONTENT			(1 << 21)
 #define TYPE_ELEMENT_LIST		(1 << 22)
 #define TYPE_CONTENT_LIST		(1 << 23)
@@ -61,7 +61,8 @@
 					 TYPE_KEY_X11		| \
 					 TYPE_INTEGER		| \
 					 TYPE_STRING		| \
-					 TYPE_TOKEN)
+					 TYPE_ELEMENT		| \
+					 TYPE_GRAPHIC)
 
 #define TYPE_SKIP_ENTRY			(TYPE_EMPTY		| \
 					 TYPE_KEY		| \

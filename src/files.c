@@ -1694,8 +1694,8 @@ static int getFileTypeFromBasename(char *basename)
     return LEVEL_FILE_TYPE_SP;
 
   /* check for typical filename of a Diamond Caves II level package file */
-  if (strEqualSuffix(basename, ".dc") ||
-      strEqualSuffix(basename, ".dc2"))
+  if (strSuffix(basename, ".dc") ||
+      strSuffix(basename, ".dc2"))
     return LEVEL_FILE_TYPE_DC;
 
   /* ---------- try to determine file type from filesize ---------- */
@@ -5767,7 +5767,7 @@ static void LoadLevelFromFileInfo_DC(struct LevelInfo *level,
     fgets(magic_bytes, num_magic_bytes + 1, file);
 
     /* check "magic bytes" for correct file format */
-    if (!strEqualPrefix(magic_bytes, "DC2"))
+    if (!strPrefix(magic_bytes, "DC2"))
     {
       level->no_valid_file = TRUE;
 
@@ -5777,8 +5777,8 @@ static void LoadLevelFromFileInfo_DC(struct LevelInfo *level,
       return;
     }
 
-    if (strEqualPrefix(magic_bytes, "DC2Win95") ||
-	strEqualPrefix(magic_bytes, "DC2Win98"))
+    if (strPrefix(magic_bytes, "DC2Win95") ||
+	strPrefix(magic_bytes, "DC2Win98"))
     {
       int position_first_level = 0x00fa;
       int extra_bytes = 4;
@@ -8651,12 +8651,19 @@ void LoadCustomElementDescriptions()
 
 static int getElementFromToken(char *token)
 {
+#if 1
+  char *value = getHashEntry(element_token_hash, token);
+
+  if (value != NULL)
+    return atoi(value);
+#else
   int i;
 
   /* !!! OPTIMIZE THIS BY USING HASH !!! */
   for (i = 0; i < MAX_NUM_ELEMENTS; i++)
     if (strEqual(token, element_info[i].token_name))
       return i;
+#endif
 
   Error(ERR_WARN, "unknown element token '%s'", token);
 
@@ -8700,9 +8707,12 @@ static int get_token_parameter_value(char *token, char *value_raw)
 
 void InitMenuDesignSettings_Static()
 {
+#if 0
   static SetupFileHash *image_config_hash = NULL;
+#endif
   int i;
 
+#if 0
   if (image_config_hash == NULL)
   {
     image_config_hash = newSetupFileHash();
@@ -8712,6 +8722,7 @@ void InitMenuDesignSettings_Static()
 		   image_config[i].token,
 		   image_config[i].value);
   }
+#endif
 
 #if 1
   /* always start with reliable default values from static default config */

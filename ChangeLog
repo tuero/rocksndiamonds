@@ -1,3 +1,8 @@
+2007-04-27
+	* added use of hashes created from static lists (element tokens, image
+	  config, font tokens) to speed up lookup of configuration parameters
+	* fixed bug where element and graphic config token lookup was mixed up
+
 2007-04-26
 	* added "busy" animation when initializing program and loading artwork
 	* added initialization profiling for program startup (debugging only)

@@ -607,7 +607,7 @@ boolean strEqualN(char *s1, char *s2, int n)
 	  strncmp(s1, s2, n) == 0);
 }
 
-boolean strEqualPrefix(char *s, char *prefix)
+boolean strPrefix(char *s, char *prefix)
 {
   return (s == NULL && prefix == NULL ? TRUE  :
 	  s == NULL && prefix != NULL ? FALSE :
@@ -615,7 +615,7 @@ boolean strEqualPrefix(char *s, char *prefix)
 	  strncmp(s, prefix, strlen(prefix)) == 0);
 }
 
-boolean strEqualSuffix(char *s, char *suffix)
+boolean strSuffix(char *s, char *suffix)
 {
   return (s == NULL && suffix == NULL ? TRUE  :
 	  s == NULL && suffix != NULL ? FALSE :
@@ -1888,7 +1888,7 @@ int get_parameter_value(char *value_raw, char *suffix, int type)
 	      FADE_MODE_DEFAULT);
   }
 #if 1
-  else if (strEqualPrefix(suffix, ".font"))	/* (may also be ".font_xyz") */
+  else if (strPrefix(suffix, ".font"))		/* (may also be ".font_xyz") */
 #else
   else if (strEqualN(suffix, ".font", 5))	/* (may also be ".font_xyz") */
 #endif
