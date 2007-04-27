@@ -8723,7 +8723,11 @@ void InitMenuDesignSettings_Static()
       *image_config_vars[i].value =
 	get_token_parameter_value(image_config_vars[i].token, value);
   }
+
 #else
+
+  int j;
+
   /* always start with reliable default values from static default config */
   for (i = 0; image_config_vars[i].token != NULL; i++)
     for (j = 0; image_config[j].token != NULL; j++)

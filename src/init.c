@@ -158,15 +158,36 @@ void DrawInitAnim()
   }
 #endif
 
+#if 0
   anim_initial.anim_mode = ANIM_LOOP;
   anim_initial.anim_start_frame = 0;
   anim_initial.offset_x = anim_initial.width;
   anim_initial.offset_y = 0;
+#endif
 
+#if 1
+  x = ALIGNED_TEXT_XPOS(&init.busy);
+  y = ALIGNED_TEXT_YPOS(&init.busy);
+#else
   x = WIN_XSIZE / 2 - TILESIZE / 2;
   y = WIN_YSIZE / 2 - TILESIZE / 2;
+#endif
 
-  graphic_info = &anim_initial;
+#if 0
+  {
+    static boolean done = FALSE;
+
+    if (!done)
+      printf("::: %d, %d, %d, %d => %d, %d\n",
+	     init.busy.x, init.busy.y,
+	     init.busy.align, init.busy.valign,
+	     x, y);
+
+    done = TRUE;
+  }
+#endif
+
+  graphic_info = &anim_initial;		/* graphic == 0 => anim_initial */
 
   if (sync_frame % anim_initial.anim_delay == 0)
     DrawGraphicAnimationExt(window, x, y, graphic, sync_frame, NO_MASKING);
@@ -1120,6 +1141,9 @@ static int get_graphic_parameter_value(char *value_raw, char *suffix, int type)
   if (strEqual(value_raw, ARG_UNDEFINED))
     return ARG_UNDEFINED_VALUE;
 
+  /* !!! THIS IS BUGGY !!! NOT SURE IF YOU GET ELEMENT ID OR GRAPHIC ID !!! */
+  /* !!! (possible reason why ".clone_from" with elements doesn't work) !!! */
+
   /* !!! OPTIMIZE THIS BY USING HASH !!! */
   for (i = 0; i < MAX_NUM_ELEMENTS; i++)
     if (strEqual(element_info[i].token_name, value_raw))
@@ -1160,8 +1184,259 @@ static int get_scaled_graphic_height(int graphic)
   return original_height * scale_up_factor;
 }
 
+static void set_graphic_parameters_ext(int graphic, struct GraphicInfo *g,
+				       int *parameter, Bitmap *src_bitmap)
+{
+  int anim_frames_per_row = 1, anim_frames_per_col = 1;
+  int anim_frames_per_line = 1;
+
+  /* always start with reliable default values */
+  g->src_image_width = 0;
+  g->src_image_height = 0;
+  g->src_x = 0;
+  g->src_y = 0;
+  g->width  = TILEX;			/* default for element graphics */
+  g->height = TILEY;			/* default for element graphics */
+  g->offset_x = 0;			/* one or both of these values ... */
+  g->offset_y = 0;			/* ... will be corrected later */
+  g->offset2_x = 0;			/* one or both of these values ... */
+  g->offset2_y = 0;			/* ... will be corrected later */
+  g->swap_double_tiles = -1;		/* auto-detect tile swapping */
+  g->crumbled_like = -1;		/* do not use clone element */
+  g->diggable_like = -1;		/* do not use clone element */
+  g->border_size = TILEX / 8;		/* "CRUMBLED" border size */
+  g->scale_up_factor = 1;		/* default: no scaling up */
+  g->clone_from = -1;			/* do not use clone graphic */
+  g->anim_delay_fixed = 0;
+  g->anim_delay_random = 0;
+  g->post_delay_fixed = 0;
+  g->post_delay_random = 0;
+  g->fade_mode = FADE_MODE_DEFAULT;
+  g->fade_delay = -1;
+  g->post_delay = -1;
+  g->auto_delay = -1;
+  g->align = ALIGN_CENTER;		/* default for title screens */
+  g->valign = VALIGN_MIDDLE;		/* default for title screens */
+  g->sort_priority = 0;			/* default for title screens */
+
+  g->bitmap = src_bitmap;
+
+#if 1
+  /* optional zoom factor for scaling up the image to a larger size */
+  if (parameter[GFX_ARG_SCALE_UP_FACTOR] != ARG_UNDEFINED_VALUE)
+    g->scale_up_factor = parameter[GFX_ARG_SCALE_UP_FACTOR];
+  if (g->scale_up_factor < 1)
+    g->scale_up_factor = 1;		/* no scaling */
+#endif
+
+#if 1
+  if (g->use_image_size)
+  {
+    /* set new default bitmap size (with scaling, but without small images) */
+    g->width  = get_scaled_graphic_width(graphic);
+    g->height = get_scaled_graphic_height(graphic);
+  }
+#endif
+
+  /* optional x and y tile position of animation frame sequence */
+  if (parameter[GFX_ARG_XPOS] != ARG_UNDEFINED_VALUE)
+    g->src_x = parameter[GFX_ARG_XPOS] * TILEX;
+  if (parameter[GFX_ARG_YPOS] != ARG_UNDEFINED_VALUE)
+    g->src_y = parameter[GFX_ARG_YPOS] * TILEY;
+
+  /* optional x and y pixel position of animation frame sequence */
+  if (parameter[GFX_ARG_X] != ARG_UNDEFINED_VALUE)
+    g->src_x = parameter[GFX_ARG_X];
+  if (parameter[GFX_ARG_Y] != ARG_UNDEFINED_VALUE)
+    g->src_y = parameter[GFX_ARG_Y];
+
+  /* optional width and height of each animation frame */
+  if (parameter[GFX_ARG_WIDTH] != ARG_UNDEFINED_VALUE)
+    g->width = parameter[GFX_ARG_WIDTH];
+  if (parameter[GFX_ARG_HEIGHT] != ARG_UNDEFINED_VALUE)
+    g->height = parameter[GFX_ARG_HEIGHT];
+
+#if 0
+  /* optional zoom factor for scaling up the image to a larger size */
+  if (parameter[GFX_ARG_SCALE_UP_FACTOR] != ARG_UNDEFINED_VALUE)
+    g->scale_up_factor = parameter[GFX_ARG_SCALE_UP_FACTOR];
+  if (g->scale_up_factor < 1)
+    g->scale_up_factor = 1;		/* no scaling */
+#endif
+
+  if (src_bitmap)
+  {
+    /* get final bitmap size (with scaling, but without small images) */
+    int src_image_width  = get_scaled_graphic_width(graphic);
+    int src_image_height = get_scaled_graphic_height(graphic);
+
+    anim_frames_per_row = src_image_width  / g->width;
+    anim_frames_per_col = src_image_height / g->height;
+
+    g->src_image_width  = src_image_width;
+    g->src_image_height = src_image_height;
+  }
+
+  /* correct x or y offset dependent of vertical or horizontal frame order */
+  if (parameter[GFX_ARG_VERTICAL])	/* frames are ordered vertically */
+  {
+    g->offset_y = (parameter[GFX_ARG_OFFSET] != ARG_UNDEFINED_VALUE ?
+		   parameter[GFX_ARG_OFFSET] : g->height);
+    anim_frames_per_line = anim_frames_per_col;
+  }
+  else					/* frames are ordered horizontally */
+  {
+    g->offset_x = (parameter[GFX_ARG_OFFSET] != ARG_UNDEFINED_VALUE ?
+		   parameter[GFX_ARG_OFFSET] : g->width);
+    anim_frames_per_line = anim_frames_per_row;
+  }
+
+  /* optionally, the x and y offset of frames can be specified directly */
+  if (parameter[GFX_ARG_XOFFSET] != ARG_UNDEFINED_VALUE)
+    g->offset_x = parameter[GFX_ARG_XOFFSET];
+  if (parameter[GFX_ARG_YOFFSET] != ARG_UNDEFINED_VALUE)
+    g->offset_y = parameter[GFX_ARG_YOFFSET];
+
+  /* optionally, moving animations may have separate start and end graphics */
+  g->double_movement = parameter[GFX_ARG_2ND_MOVEMENT_TILE];
+
+  if (parameter[GFX_ARG_2ND_VERTICAL] == ARG_UNDEFINED_VALUE)
+    parameter[GFX_ARG_2ND_VERTICAL] = !parameter[GFX_ARG_VERTICAL];
+
+  /* correct x or y offset2 dependent of vertical or horizontal frame order */
+  if (parameter[GFX_ARG_2ND_VERTICAL])	/* frames are ordered vertically */
+    g->offset2_y = (parameter[GFX_ARG_2ND_OFFSET] != ARG_UNDEFINED_VALUE ?
+		    parameter[GFX_ARG_2ND_OFFSET] : g->height);
+  else					/* frames are ordered horizontally */
+    g->offset2_x = (parameter[GFX_ARG_2ND_OFFSET] != ARG_UNDEFINED_VALUE ?
+		    parameter[GFX_ARG_2ND_OFFSET] : g->width);
+
+  /* optionally, the x and y offset of 2nd graphic can be specified directly */
+  if (parameter[GFX_ARG_2ND_XOFFSET] != ARG_UNDEFINED_VALUE)
+    g->offset2_x = parameter[GFX_ARG_2ND_XOFFSET];
+  if (parameter[GFX_ARG_2ND_YOFFSET] != ARG_UNDEFINED_VALUE)
+    g->offset2_y = parameter[GFX_ARG_2ND_YOFFSET];
+
+  /* optionally, the second movement tile can be specified as start tile */
+  if (parameter[GFX_ARG_2ND_SWAP_TILES] != ARG_UNDEFINED_VALUE)
+    g->swap_double_tiles= parameter[GFX_ARG_2ND_SWAP_TILES];
+
+  /* automatically determine correct number of frames, if not defined */
+  if (parameter[GFX_ARG_FRAMES] != ARG_UNDEFINED_VALUE)
+    g->anim_frames = parameter[GFX_ARG_FRAMES];
+  else if (parameter[GFX_ARG_XPOS] == 0 && !parameter[GFX_ARG_VERTICAL])
+    g->anim_frames = anim_frames_per_row;
+  else if (parameter[GFX_ARG_YPOS] == 0 && parameter[GFX_ARG_VERTICAL])
+    g->anim_frames = anim_frames_per_col;
+  else
+    g->anim_frames = 1;
+
+  if (g->anim_frames == 0)		/* frames must be at least 1 */
+    g->anim_frames = 1;
+
+  g->anim_frames_per_line =
+    (parameter[GFX_ARG_FRAMES_PER_LINE] != ARG_UNDEFINED_VALUE ?
+     parameter[GFX_ARG_FRAMES_PER_LINE] : anim_frames_per_line);
+
+  g->anim_delay = parameter[GFX_ARG_DELAY];
+  if (g->anim_delay == 0)		/* delay must be at least 1 */
+    g->anim_delay = 1;
+
+  g->anim_mode = parameter[GFX_ARG_ANIM_MODE];
+#if 0
+  if (g->anim_frames == 1)
+    g->anim_mode = ANIM_NONE;
+#endif
+
+  /* automatically determine correct start frame, if not defined */
+  if (parameter[GFX_ARG_START_FRAME] == ARG_UNDEFINED_VALUE)
+    g->anim_start_frame = 0;
+  else if (g->anim_mode & ANIM_REVERSE)
+    g->anim_start_frame = g->anim_frames - parameter[GFX_ARG_START_FRAME] - 1;
+  else
+    g->anim_start_frame = parameter[GFX_ARG_START_FRAME];
+
+  /* animation synchronized with global frame counter, not move position */
+  g->anim_global_sync = parameter[GFX_ARG_GLOBAL_SYNC];
+
+  /* optional element for cloning crumble graphics */
+  if (parameter[GFX_ARG_CRUMBLED_LIKE] != ARG_UNDEFINED_VALUE)
+    g->crumbled_like = parameter[GFX_ARG_CRUMBLED_LIKE];
+
+  /* optional element for cloning digging graphics */
+  if (parameter[GFX_ARG_DIGGABLE_LIKE] != ARG_UNDEFINED_VALUE)
+    g->diggable_like = parameter[GFX_ARG_DIGGABLE_LIKE];
+
+  /* optional border size for "crumbling" diggable graphics */
+  if (parameter[GFX_ARG_BORDER_SIZE] != ARG_UNDEFINED_VALUE)
+    g->border_size = parameter[GFX_ARG_BORDER_SIZE];
+
+  /* this is only used for player "boring" and "sleeping" actions */
+  if (parameter[GFX_ARG_ANIM_DELAY_FIXED] != ARG_UNDEFINED_VALUE)
+    g->anim_delay_fixed = parameter[GFX_ARG_ANIM_DELAY_FIXED];
+  if (parameter[GFX_ARG_ANIM_DELAY_RANDOM] != ARG_UNDEFINED_VALUE)
+    g->anim_delay_random = parameter[GFX_ARG_ANIM_DELAY_RANDOM];
+  if (parameter[GFX_ARG_POST_DELAY_FIXED] != ARG_UNDEFINED_VALUE)
+    g->post_delay_fixed = parameter[GFX_ARG_POST_DELAY_FIXED];
+  if (parameter[GFX_ARG_POST_DELAY_RANDOM] != ARG_UNDEFINED_VALUE)
+    g->post_delay_random = parameter[GFX_ARG_POST_DELAY_RANDOM];
+
+  /* this is only used for toon animations */
+  g->step_offset = parameter[GFX_ARG_STEP_OFFSET];
+  g->step_delay  = parameter[GFX_ARG_STEP_DELAY];
+
+  /* this is only used for drawing font characters */
+  g->draw_xoffset = parameter[GFX_ARG_DRAW_XOFFSET];
+  g->draw_yoffset = parameter[GFX_ARG_DRAW_YOFFSET];
+
+  /* this is only used for drawing envelope graphics */
+  g->draw_masked = parameter[GFX_ARG_DRAW_MASKED];
+
+  /* optional graphic for cloning all graphics settings */
+  if (parameter[GFX_ARG_CLONE_FROM] != ARG_UNDEFINED_VALUE)
+    g->clone_from = parameter[GFX_ARG_CLONE_FROM];
+
+  /* optional settings for drawing title screens and title messages */
+  if (parameter[GFX_ARG_FADE_MODE] != ARG_UNDEFINED_VALUE)
+    g->fade_mode = parameter[GFX_ARG_FADE_MODE];
+  if (parameter[GFX_ARG_FADE_DELAY] != ARG_UNDEFINED_VALUE)
+    g->fade_delay = parameter[GFX_ARG_FADE_DELAY];
+  if (parameter[GFX_ARG_POST_DELAY] != ARG_UNDEFINED_VALUE)
+    g->post_delay = parameter[GFX_ARG_POST_DELAY];
+  if (parameter[GFX_ARG_AUTO_DELAY] != ARG_UNDEFINED_VALUE)
+    g->auto_delay = parameter[GFX_ARG_AUTO_DELAY];
+  if (parameter[GFX_ARG_ALIGN] != ARG_UNDEFINED_VALUE)
+    g->align = parameter[GFX_ARG_ALIGN];
+  if (parameter[GFX_ARG_VALIGN] != ARG_UNDEFINED_VALUE)
+    g->valign = parameter[GFX_ARG_VALIGN];
+  if (parameter[GFX_ARG_SORT_PRIORITY] != ARG_UNDEFINED_VALUE)
+    g->sort_priority = parameter[GFX_ARG_SORT_PRIORITY];
+}
+
 static void set_graphic_parameters(int graphic)
 {
+#if 1
+  struct FileInfo *image = getImageListEntryFromImageID(graphic);
+  char **parameter_raw = image->parameter;
+  Bitmap *src_bitmap = getBitmapFromImageID(graphic);
+  int parameter[NUM_GFX_ARGS];
+  int i;
+
+  /* if fallback to default artwork is done, also use the default parameters */
+  if (image->fallback_to_default)
+    parameter_raw = image->default_parameter;
+
+  /* get integer values from string parameters */
+  for (i = 0; i < NUM_GFX_ARGS; i++)
+    parameter[i] = get_graphic_parameter_value(parameter_raw[i],
+					       image_config_suffix[i].token,
+					       image_config_suffix[i].type);
+
+  set_graphic_parameters_ext(graphic, &graphic_info[graphic],
+			     parameter, src_bitmap);
+
+#else
+
   struct FileInfo *image = getImageListEntryFromImageID(graphic);
   char **parameter_raw = image->parameter;
   Bitmap *src_bitmap = getBitmapFromImageID(graphic);
@@ -1410,6 +1685,7 @@ static void set_graphic_parameters(int graphic)
     graphic_info[graphic].valign = parameter[GFX_ARG_VALIGN];
   if (parameter[GFX_ARG_SORT_PRIORITY] != ARG_UNDEFINED_VALUE)
     graphic_info[graphic].sort_priority = parameter[GFX_ARG_SORT_PRIORITY];
+#endif
 
   UPDATE_BUSY_STATE();
 }
@@ -5070,6 +5346,19 @@ void InitGfx()
   DrawInitText("Loading graphics", 120, FC_GREEN);
 
 #if 1
+#if 1
+  /* initialize busy animation with default values */
+  int parameter[NUM_GFX_ARGS];
+  for (i = 0; i < NUM_GFX_ARGS; i++)
+    parameter[i] = get_graphic_parameter_value(image_config_suffix[i].value,
+                                               image_config_suffix[i].token,
+                                               image_config_suffix[i].type);
+#if 0
+  for (i = 0; i < NUM_GFX_ARGS; i++)
+    printf("::: '%s' => %d\n", image_config_suffix[i].token, parameter[i]);
+#endif
+#endif
+
   /* determine settings for busy animation (when displaying startup messages) */
   for (i = 0; image_config[i].token != NULL; i++)
   {
@@ -5081,6 +5370,17 @@ void InitGfx()
     else if (strlen(image_config[i].token) > len_anim_token &&
 	     strncmp(image_config[i].token, anim_token, len_anim_token) == 0)
     {
+#if 1
+      for (j = 0; image_config_suffix[j].token != NULL; j++)
+      {
+	if (strEqual(&image_config[i].token[len_anim_token],
+		     image_config_suffix[j].token))
+	  parameter[j] =
+	    get_graphic_parameter_value(image_config[i].value,
+					image_config_suffix[j].token,
+					image_config_suffix[j].type);
+      }
+#else
       if (strEqual(&image_config[i].token[len_anim_token], ".x"))
 	anim_initial.src_x = atoi(image_config[i].value);
       else if (strEqual(&image_config[i].token[len_anim_token], ".y"))
@@ -5096,14 +5396,21 @@ void InitGfx()
 	anim_initial.anim_frames_per_line = atoi(image_config[i].value);
       else if (strEqual(&image_config[i].token[len_anim_token], ".delay"))
 	anim_initial.anim_delay = atoi(image_config[i].value);
+#endif
     }
   }
+
+  set_graphic_parameters_ext(0, &anim_initial, parameter, NULL);
 
   if (filename_anim_initial == NULL)	/* should not happen */
     Error(ERR_EXIT, "cannot get filename for '%s'", CONFIG_TOKEN_GLOBAL_BUSY);
 
   anim_initial.bitmap = LoadCustomImage(filename_anim_initial);
 
+  init.busy.width  = anim_initial.width;
+  init.busy.height = anim_initial.height;
+
+  InitMenuDesignSettings_Static();
   InitGfxDrawBusyAnimFunction(DrawInitAnim);
 #endif
 }
