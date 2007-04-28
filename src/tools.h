@@ -72,15 +72,13 @@ void DrawMaskedBorder(int);
 void SetDrawtoField(int);
 void RedrawPlayfield(boolean, int, int, int, int);
 void BackToFront();
-void FadeToFront();
 
 void FadeIn(int);
 void FadeOut(int);
-void FadeCross(int);
-void FadeCrossSaveBackbuffer();
 void FadeSetEnterMenu();
 void FadeSetLeaveMenu();
 void FadeSetEnterScreen();
+void FadeSetNextScreen();
 void FadeSetLeaveScreen();
 void FadeSetFromType(int);
 void FadeSetDisabled();

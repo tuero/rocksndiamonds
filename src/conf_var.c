@@ -1017,6 +1017,18 @@ struct TokenIntPtrInfo image_config_vars[] =
     &menu.enter_screen[GFX_SPECIAL_ARG_DEFAULT].post_delay
   },
   {
+    "menu.next_screen.fade_mode",
+    &menu.next_screen.fade_mode
+  },
+  {
+    "menu.next_screen.fade_delay",
+    &menu.next_screen.fade_delay
+  },
+  {
+    "menu.next_screen.post_delay",
+    &menu.next_screen.post_delay
+  },
+  {
     "menu.leave_screen.fade_mode",
     &menu.leave_screen[GFX_SPECIAL_ARG_DEFAULT].fade_mode
   },

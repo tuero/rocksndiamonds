@@ -39,7 +39,7 @@
 #define CONFIG_TOKEN_GLOBAL_BUSY		"global.busy"
 
 #define DEBUG_PRINT_INIT_TIMESTAMPS		TRUE
-#define DEBUG_PRINT_INIT_TIMESTAMPS_DEPTH	3
+#define DEBUG_PRINT_INIT_TIMESTAMPS_DEPTH	1
 
 
 static struct FontBitmapInfo font_initial[NUM_INITIAL_FONTS];
@@ -89,46 +89,70 @@ static int copy_properties[][5] =
 };
 
 
-static void print_init_timestamp(char *message)
+static void print_timestamp_ext(char *message, char *mode)
 {
 #if DEBUG
 #if DEBUG_PRINT_INIT_TIMESTAMPS
+  static char *debug_message = NULL;
   static char *last_message = NULL;
   static int counter_nr = 0;
   int max_depth = DEBUG_PRINT_INIT_TIMESTAMPS_DEPTH;
 
-  if (strPrefix(message, "INIT"))
+  checked_free(debug_message);
+  debug_message = getStringCat3(mode, " ", message);
+
+  if (strEqual(mode, "INIT"))
   {
+    debug_print_timestamp(counter_nr, NULL);
+
     if (counter_nr + 1 < max_depth)
-    {
-      debug_print_timestamp(counter_nr, NULL);
-      debug_print_timestamp(counter_nr, message);
-    }
+      debug_print_timestamp(counter_nr, debug_message);
 
     counter_nr++;
 
     debug_print_timestamp(counter_nr, NULL);
   }
-  else if (strPrefix(message, "DONE"))
+  else if (strEqual(mode, "DONE"))
   {
     counter_nr--;
 
     if (counter_nr + 1 < max_depth ||
 	(counter_nr == 0 && max_depth == 1))
     {
-      last_message = &message[4];
+      last_message = message;
 
-      debug_print_timestamp(counter_nr, message);
+      if (counter_nr == 0 && max_depth == 1)
+      {
+	checked_free(debug_message);
+	debug_message = getStringCat3("TIME", " ", message);
+      }
+
+      debug_print_timestamp(counter_nr, debug_message);
     }
   }
-  else if (!strPrefix(message, "TIME") ||
-	   !strSuffix(message, last_message))
+  else if (!strEqual(mode, "TIME") ||
+	   !strEqual(message, last_message))
   {
     if (counter_nr < max_depth)
-      debug_print_timestamp(counter_nr, message);
+      debug_print_timestamp(counter_nr, debug_message);
   }
 #endif
 #endif
+}
+
+static void print_timestamp_init(char *message)
+{
+  print_timestamp_ext(message, "INIT");
+}
+
+static void print_timestamp_time(char *message)
+{
+  print_timestamp_ext(message, "TIME");
+}
+
+static void print_timestamp_done(char *message)
+{
+  print_timestamp_ext(message, "DONE");
 }
 
 void DrawInitAnim()
@@ -139,6 +163,9 @@ void DrawInitAnim()
   unsigned long action_delay_value = GameFrameDelay;
   int sync_frame = FrameCounter;
   int x, y;
+
+  if (game_status != GAME_MODE_LOADING)
+    return;
 
   if (anim_initial.bitmap == NULL || window == NULL)
     return;
@@ -289,6 +316,7 @@ static int getFontBitmapID(int font_nr)
 {
   int special = -1;
 
+  /* (special case: do not use special font for GAME_MODE_LOADING) */
   if (game_status >= GAME_MODE_TITLE_INITIAL &&
       game_status <= GAME_MODE_PSEUDO_PREVIEW)
     special = game_status;
@@ -2343,36 +2371,36 @@ static void InitMusicInfo()
 
 static void ReinitializeGraphics()
 {
-  print_init_timestamp("INIT ReinitializeGraphics");
+  print_timestamp_init("ReinitializeGraphics");
 
   InitGraphicInfo();			/* graphic properties mapping */
-  print_init_timestamp("TIME InitGraphicInfo");
+  print_timestamp_time("InitGraphicInfo");
   InitElementGraphicInfo();		/* element game graphic mapping */
-  print_init_timestamp("TIME InitElementGraphicInfo");
+  print_timestamp_time("InitElementGraphicInfo");
   InitElementSpecialGraphicInfo();	/* element special graphic mapping */
-  print_init_timestamp("TIME InitElementSpecialGraphicInfo");
+  print_timestamp_time("InitElementSpecialGraphicInfo");
 
   InitElementSmallImages();		/* scale elements to all needed sizes */
-  print_init_timestamp("TIME InitElementSmallImages");
+  print_timestamp_time("InitElementSmallImages");
   InitScaledImages();			/* scale all other images, if needed */
-  print_init_timestamp("TIME InitScaledImages");
+  print_timestamp_time("InitScaledImages");
   InitFontGraphicInfo();		/* initialize text drawing functions */
-  print_init_timestamp("TIME InitFontGraphicInfo");
+  print_timestamp_time("InitFontGraphicInfo");
 
   InitGraphicInfo_EM();			/* graphic mapping for EM engine */
-  print_init_timestamp("TIME InitGraphicInfo_EM");
+  print_timestamp_time("InitGraphicInfo_EM");
 
   SetMainBackgroundImage(IMG_BACKGROUND);
-  print_init_timestamp("TIME SetMainBackgroundImage");
+  print_timestamp_time("SetMainBackgroundImage");
   SetDoorBackgroundImage(IMG_BACKGROUND_DOOR);
-  print_init_timestamp("TIME SetDoorBackgroundImage");
+  print_timestamp_time("SetDoorBackgroundImage");
 
   InitGadgets();
-  print_init_timestamp("TIME InitGadgets");
+  print_timestamp_time("InitGadgets");
   InitToons();
-  print_init_timestamp("TIME InitToons");
+  print_timestamp_time("InitToons");
 
-  print_init_timestamp("DONE ReinitializeGraphics");
+  print_timestamp_done("ReinitializeGraphics");
 }
 
 static void ReinitializeSounds()
@@ -5517,7 +5545,7 @@ void InitLevelArtworkInfo()
 
 static void InitImages()
 {
-  print_init_timestamp("INIT InitImages");
+  print_timestamp_init("InitImages");
 
   setLevelArtworkDir(artwork.gfx_first);
 
@@ -5533,31 +5561,31 @@ static void InitImages()
   UPDATE_BUSY_STATE();
 
   ReloadCustomImages();
-  print_init_timestamp("TIME ReloadCustomImages");
+  print_timestamp_time("ReloadCustomImages");
 
   UPDATE_BUSY_STATE();
 
   LoadCustomElementDescriptions();
-  print_init_timestamp("TIME LoadCustomElementDescriptions");
+  print_timestamp_time("LoadCustomElementDescriptions");
 
   UPDATE_BUSY_STATE();
 
   LoadMenuDesignSettings();
-  print_init_timestamp("TIME LoadMenuDesignSettings");
+  print_timestamp_time("LoadMenuDesignSettings");
 
   UPDATE_BUSY_STATE();
 
   ReinitializeGraphics();
-  print_init_timestamp("TIME ReinitializeGraphics");
+  print_timestamp_time("ReinitializeGraphics");
 
   UPDATE_BUSY_STATE();
 
-  print_init_timestamp("DONE InitImages");
+  print_timestamp_done("InitImages");
 }
 
 static void InitSound(char *identifier)
 {
-  print_init_timestamp("INIT InitSound");
+  print_timestamp_init("InitSound");
 
   if (identifier == NULL)
     identifier = artwork.snd_current->identifier;
@@ -5566,17 +5594,17 @@ static void InitSound(char *identifier)
   setLevelArtworkDir(artwork.snd_first);
 
   InitReloadCustomSounds(identifier);
-  print_init_timestamp("TIME InitReloadCustomSounds");
+  print_timestamp_time("InitReloadCustomSounds");
 
   ReinitializeSounds();
-  print_init_timestamp("TIME ReinitializeSounds");
+  print_timestamp_time("ReinitializeSounds");
 
-  print_init_timestamp("DONE InitSound");
+  print_timestamp_done("InitSound");
 }
 
 static void InitMusic(char *identifier)
 {
-  print_init_timestamp("INIT InitMusic");
+  print_timestamp_init("InitMusic");
 
   if (identifier == NULL)
     identifier = artwork.mus_current->identifier;
@@ -5585,12 +5613,12 @@ static void InitMusic(char *identifier)
   setLevelArtworkDir(artwork.mus_first);
 
   InitReloadCustomMusic(identifier);
-  print_init_timestamp("TIME InitReloadCustomMusic");
+  print_timestamp_time("InitReloadCustomMusic");
 
   ReinitializeMusic();
-  print_init_timestamp("TIME ReinitializeMusic");
+  print_timestamp_time("ReinitializeMusic");
 
-  print_init_timestamp("DONE InitMusic");
+  print_timestamp_done("InitMusic");
 }
 
 void InitNetworkServer()
@@ -5731,6 +5759,7 @@ static char *getNewArtworkIdentifier(int type)
 
 void ReloadCustomArtwork(int force_reload)
 {
+  int last_game_status = game_status;	/* save current game status */
   char *gfx_new_identifier;
   char *snd_new_identifier;
   char *mus_new_identifier;
@@ -5752,10 +5781,24 @@ void ReloadCustomArtwork(int force_reload)
   if (!reload_needed)
     return;
 
-  print_init_timestamp("INIT ReloadCustomArtwork");
+  print_timestamp_init("ReloadCustomArtwork");
 
+  game_status = GAME_MODE_LOADING;
+
+  FadeOut(REDRAW_ALL);
+
+#if 1
+  ClearRectangle(drawto, 0, 0, WIN_XSIZE, WIN_YSIZE);
+#else
   ClearRectangle(window, 0, 0, WIN_XSIZE, WIN_YSIZE);
-  print_init_timestamp("TIME ClearRectangle");
+#endif
+  print_timestamp_time("ClearRectangle");
+
+  printf("::: fading in ... %d\n", fading.fade_mode);
+
+  FadeIn(REDRAW_ALL);
+
+  printf("::: done\n");
 
   if (gfx_new_identifier != NULL || force_reload_gfx)
   {
@@ -5768,20 +5811,26 @@ void ReloadCustomArtwork(int force_reload)
 #endif
 
     InitImages();
-    print_init_timestamp("TIME InitImages");
+    print_timestamp_time("InitImages");
   }
 
   if (snd_new_identifier != NULL || force_reload_snd)
   {
     InitSound(snd_new_identifier);
-    print_init_timestamp("TIME InitSound");
+    print_timestamp_time("InitSound");
   }
 
   if (mus_new_identifier != NULL || force_reload_mus)
   {
     InitMusic(mus_new_identifier);
-    print_init_timestamp("TIME InitMusic");
+    print_timestamp_time("InitMusic");
   }
+
+  game_status = last_game_status;	/* restore current game status */
+
+  printf("::: FadeOut @ ReloadCustomArtwork ...\n");
+  FadeOut(REDRAW_ALL);
+  printf("::: FadeOut @ ReloadCustomArtwork done\n");
 
   RedrawBackground();
 
@@ -5792,7 +5841,7 @@ void ReloadCustomArtwork(int force_reload)
 #if 1
 #if 1
   FadeSetEnterScreen();
-  // FadeSkipNextFadeOut();
+  FadeSkipNextFadeOut();
   // FadeSetDisabled();
 #else
   FadeSkipNext();
@@ -5801,7 +5850,7 @@ void ReloadCustomArtwork(int force_reload)
   fading = fading_none;
 #endif
 
-  print_init_timestamp("DONE ReloadCustomArtwork");
+  print_timestamp_done("ReloadCustomArtwork");
 }
 
 void KeyboardAutoRepeatOffUnlessAutoplay()
@@ -5817,7 +5866,9 @@ void KeyboardAutoRepeatOffUnlessAutoplay()
 
 void OpenAll()
 {
-  print_init_timestamp("INIT OpenAll");
+  print_timestamp_init("OpenAll");
+
+  game_status = GAME_MODE_LOADING;
 
   InitGlobal();			/* initialize some global variables */
 
@@ -5850,7 +5901,7 @@ void OpenAll()
 
   InitJoysticks();
 
-  print_init_timestamp("TIME [pre-video]");
+  print_timestamp_time("[pre-video]");
 
   InitVideoDisplay();
   InitVideoBuffer(WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH, setup.fullscreen);
@@ -5860,26 +5911,26 @@ void OpenAll()
   InitElementPropertiesStatic();
   InitElementPropertiesEngine(GAME_VERSION_ACTUAL);
 
-  print_init_timestamp("TIME [post-video]");
+  print_timestamp_time("[post-video]");
 
   InitGfx();
 
-  print_init_timestamp("TIME InitGfx");
+  print_timestamp_time("InitGfx");
 
   InitLevelInfo();
-  print_init_timestamp("TIME InitLevelInfo");
+  print_timestamp_time("InitLevelInfo");
 
   InitLevelArtworkInfo();
-  print_init_timestamp("TIME InitLevelArtworkInfo");
+  print_timestamp_time("InitLevelArtworkInfo");
 
   InitImages();			/* needs to know current level directory */
-  print_init_timestamp("TIME InitImages");
+  print_timestamp_time("InitImages");
 
   InitSound(NULL);		/* needs to know current level directory */
-  print_init_timestamp("TIME InitSound");
+  print_timestamp_time("InitSound");
 
   InitMusic(NULL);		/* needs to know current level directory */
-  print_init_timestamp("TIME InitMusic");
+  print_timestamp_time("InitMusic");
 
   InitGfxBackground();
 
@@ -5909,9 +5960,9 @@ void OpenAll()
   fading = fading_none;
 #endif
 
-  print_init_timestamp("TIME [post-artwork]");
+  print_timestamp_time("[post-artwork]");
 
-  print_init_timestamp("DONE OpenAll");
+  print_timestamp_done("OpenAll");
 
   DrawMainMenu();
 

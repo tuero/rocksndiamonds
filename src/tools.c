@@ -448,111 +448,62 @@ void BackToFront()
   redraw_mask = REDRAW_NONE;
 }
 
-void FadeToFront()
+static void FadeCrossSaveBackbuffer()
 {
-#if 0
-  long fading_delay = 300;
-
-  if (setup.fading && (redraw_mask & REDRAW_FIELD))
-  {
-#endif
-
-#if 0
-    int x,y;
-
-    ClearRectangle(window, REAL_SX,REAL_SY,FULL_SXSIZE,FULL_SYSIZE);
-    FlushDisplay();
-
-    for (i = 0; i < 2 * FULL_SYSIZE; i++)
-    {
-      for (y = 0; y < FULL_SYSIZE; y++)
-      {
-	BlitBitmap(backbuffer, window,
-		   REAL_SX,REAL_SY+i, FULL_SXSIZE,1, REAL_SX,REAL_SY+i);
-      }
-      FlushDisplay();
-      Delay(10);
-    }
-#endif
-
-#if 0
-    for (i = 1; i < FULL_SYSIZE; i+=2)
-      BlitBitmap(backbuffer, window,
-		 REAL_SX,REAL_SY+i, FULL_SXSIZE,1, REAL_SX,REAL_SY+i);
-    FlushDisplay();
-    Delay(fading_delay);
-#endif
-
-#if 0
-    SetClipOrigin(clip_gc[PIX_FADEMASK], 0, 0);
-    BlitBitmapMasked(backbuffer, window,
-		     REAL_SX,REAL_SY, FULL_SXSIZE,FULL_SYSIZE,
-		     REAL_SX,REAL_SY);
-    FlushDisplay();
-    Delay(fading_delay);
-
-    SetClipOrigin(clip_gc[PIX_FADEMASK], -1, -1);
-    BlitBitmapMasked(backbuffer, window,
-		     REAL_SX,REAL_SY, FULL_SXSIZE,FULL_SYSIZE,
-		     REAL_SX,REAL_SY);
-    FlushDisplay();
-    Delay(fading_delay);
-
-    SetClipOrigin(clip_gc[PIX_FADEMASK], 0, -1);
-    BlitBitmapMasked(backbuffer, window,
-		     REAL_SX,REAL_SY, FULL_SXSIZE,FULL_SYSIZE,
-		     REAL_SX,REAL_SY);
-    FlushDisplay();
-    Delay(fading_delay);
-
-    SetClipOrigin(clip_gc[PIX_FADEMASK], -1, 0);
-    BlitBitmapMasked(backbuffer, window,
-		     REAL_SX,REAL_SY, FULL_SXSIZE,FULL_SYSIZE,
-		     REAL_SX,REAL_SY);
-    FlushDisplay();
-    Delay(fading_delay);
-
-    redraw_mask &= ~REDRAW_MAIN;
-  }
-#endif
-
-  BackToFront();
+  BlitBitmap(backbuffer, bitmap_db_cross, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
 }
 
-void FadeExt(int fade_mask, int fade_mode)
+static void FadeExt(int fade_mask, int fade_mode, int fade_type)
 {
-  static int fade_mode_skip = FADE_MODE_NONE;
+  static int fade_type_skip = FADE_TYPE_NONE;
   void (*draw_border_function)(void) = NULL;
-#if 0
-  Bitmap *bitmap = (fade_mode != FADE_MODE_FADE_IN ? bitmap_db_cross : NULL);
-#else
   Bitmap *bitmap = (fade_mode & FADE_TYPE_TRANSFORM ? bitmap_db_cross : NULL);
-#endif
   int x, y, width, height;
   int fade_delay, post_delay;
 
-  redraw_mask |= fade_mask;
-
-  if (fade_mode & FADE_TYPE_SKIP)
+  if (fade_type == FADE_TYPE_FADE_OUT)
   {
-#if 0
-    printf("::: will skip %d ... [%d]\n", fade_mode, fade_mode_skip);
+    if (fade_type_skip != FADE_TYPE_NONE)
+    {
+#if 1
+      printf("::: skipping %d ... [%d] (X)\n", fade_mode, fade_type_skip);
 #endif
 
-    fade_mode_skip = fade_mode;
+      /* skip all fade operations until specified fade operation */
+      if (fade_type & fade_type_skip)
+	fade_type_skip = FADE_TYPE_NONE;
+
+      return;
+    }
+
+    if (fading.fade_mode & FADE_TYPE_TRANSFORM)
+      FadeCrossSaveBackbuffer();
 
     return;
   }
 
-  if (fade_mode_skip & FADE_TYPE_SKIP)
+  redraw_mask |= fade_mask;
+
+  if (fade_type == FADE_TYPE_SKIP)
   {
-#if 0
-    printf("::: skipping %d ... [%d]\n", fade_mode, fade_mode_skip);
+#if 1
+    printf("::: will skip %d ... [%d]\n", fade_mode, fade_type_skip);
+#endif
+
+    fade_type_skip = fade_mode;
+
+    return;
+  }
+
+  if (fade_type_skip != FADE_TYPE_NONE)
+  {
+#if 1
+    printf("::: skipping %d ... [%d]\n", fade_mode, fade_type_skip);
 #endif
 
     /* skip all fade operations until specified fade operation */
-    if (fade_mode & fade_mode_skip)
-      fade_mode_skip = FADE_MODE_NONE;
+    if (fade_type & fade_type_skip)
+      fade_type_skip = FADE_TYPE_NONE;
 
     return;
   }
@@ -573,6 +524,12 @@ void FadeExt(int fade_mask, int fade_mode)
 
     return;
   }
+#endif
+
+  /* !!! what abount fade_mask == REDRAW_FIELD | REDRAW_ALL ??? !!! */
+
+#if 1
+  printf("::: NOW FADING %d ... [%d]\n", fade_mode, fade_type);
 #endif
 
   if (fade_mask & REDRAW_FIELD)
@@ -627,34 +584,13 @@ void FadeIn(int fade_mask)
   global.border_status = game_status;
 #endif
 
-#if 0
-  global.fading_status = game_status;
-
-  if (global.fading_type == TYPE_ENTER_MENU)
-    fading = menu.enter_menu;
-  else if (global.fading_type == TYPE_LEAVE_MENU)
-    fading = menu.leave_menu;
-  else if (global.fading_type == TYPE_ENTER_SCREEN)
-    fading = menu.enter_screen[global.fading_status];
-  else if (global.fading_type == TYPE_LEAVE_SCREEN)
-    fading = menu.leave_screen[global.fading_status];
-
-  printf("::: FadeIn: %s [0x%08x] [%d]\n",
-	 global.fading_type == TYPE_ENTER_MENU ? "enter_menu" :
-	 global.fading_type == TYPE_LEAVE_MENU ? "leave_menu" :
-	 global.fading_type == TYPE_ENTER_SCREEN ? "enter_screen" :
-	 global.fading_type == TYPE_LEAVE_SCREEN ? "leave_screen" : "(?)",
-	 global.fading_type,
-	 global.fading_status);
-#endif
-
 #if 1
   // printf("::: now fading in...\n");
 
   if (fading.fade_mode & FADE_TYPE_TRANSFORM)
-    FadeExt(fade_mask, fading.fade_mode);
+    FadeExt(fade_mask, fading.fade_mode, FADE_TYPE_FADE_IN);
   else
-    FadeExt(fade_mask, FADE_MODE_FADE_IN);
+    FadeExt(fade_mask, FADE_MODE_FADE_IN, FADE_TYPE_FADE_IN);
 #else
 #if 1
   if (fading.fade_mode == FADE_MODE_CROSSFADE)
@@ -669,32 +605,21 @@ void FadeIn(int fade_mask)
 
 void FadeOut(int fade_mask)
 {
-#if 0
-  if (global.fading_type == TYPE_ENTER_MENU)
-    fading = menu.enter_menu;
-  else if (global.fading_type == TYPE_LEAVE_MENU)
-    fading = menu.leave_menu;
-  else if (global.fading_type == TYPE_ENTER_SCREEN)
-    fading = menu.enter_screen[global.fading_status];
-  else if (global.fading_type == TYPE_LEAVE_SCREEN)
-    fading = menu.leave_screen[global.fading_status];
-
-  printf("::: FadeOut: %s [0x%08x] [%d]\n",
-	 global.fading_type == TYPE_ENTER_MENU ? "enter_menu" :
-	 global.fading_type == TYPE_LEAVE_MENU ? "leave_menu" :
-	 global.fading_type == TYPE_ENTER_SCREEN ? "enter_screen" :
-	 global.fading_type == TYPE_LEAVE_SCREEN ? "leave_screen" : "(?)",
-	 global.fading_type,
-	 global.fading_status);
-#endif
-
 #if 1
   // printf("::: fading.fade_mode == %d\n", fading.fade_mode);
 
+#if 1
+  if (fading.fade_mode & FADE_TYPE_TRANSFORM)
+    FadeExt(fade_mask, fading.fade_mode, FADE_TYPE_FADE_OUT);
+  else
+    FadeExt(fade_mask, FADE_MODE_FADE_OUT, FADE_TYPE_FADE_OUT);
+#else
   if (fading.fade_mode & FADE_TYPE_TRANSFORM)
     FadeCrossSaveBackbuffer();
   else
-    FadeExt(fade_mask, FADE_MODE_FADE_OUT);
+    FadeExt(fade_mask, FADE_MODE_FADE_OUT, FADE_TYPE_FADE_OUT);
+#endif
+
 #else
 #if 1
   if (fading.fade_mode == FADE_MODE_CROSSFADE)
@@ -711,41 +636,12 @@ void FadeOut(int fade_mask)
 #endif
 }
 
+#if 0
 void FadeCross(int fade_mask)
 {
   FadeExt(fade_mask, FADE_MODE_CROSSFADE);
 }
-
-void FadeCrossSaveBackbuffer()
-{
-  BlitBitmap(backbuffer, bitmap_db_cross, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
-}
-
-#if 0
-void FadeSetEnterMenu()
-{
-  global.fading_type = TYPE_ENTER_MENU;
-}
-
-void FadeSetLeaveMenu()
-{
-  global.fading_type = TYPE_LEAVE_MENU;
-}
-
-void FadeSetEnterScreen()
-{
-  global.fading_type = TYPE_ENTER_SCREEN;
-}
-
-void FadeSetLeaveScreen()
-{
-  // global.fading_type = TYPE_LEAVE_SCREEN;
-
-  global.fading_type = (global.fading_type == TYPE_ENTER_SCREEN ?
-			TYPE_LEAVE_SCREEN : TYPE_LEAVE_MENU);
-}
-
-#else
+#endif
 
 static void FadeSetLeaveNext(struct TitleFadingInfo fading_leave, boolean set)
 {
@@ -787,15 +683,19 @@ void FadeSetEnterScreen()
   printf("::: storing leave_screen[%d]\n", game_status);
 #endif
 
+  FadeSetLeaveNext(menu.leave_screen[game_status], TRUE);	/* store */
+}
+
+void FadeSetNextScreen()
+{
+  fading = menu.next_screen;
+
 #if 0
-  printf("::: - %d, %d / %d, %d\n",
-	 menu.enter_screen[game_status].fade_mode,
-	 menu.enter_screen[game_status].fade_delay,
-	 menu.leave_screen[game_status].fade_mode,
-	 menu.leave_screen[game_status].fade_delay);
+  printf("::: storing next_screen\n");
 #endif
 
-  FadeSetLeaveNext(menu.leave_screen[game_status], TRUE);	/* store */
+  // (do not overwrite fade mode set by FadeSetEnterScreen)
+  // FadeSetLeaveNext(fading, TRUE);	/* (keep same fade mode) */
 }
 
 void FadeSetLeaveScreen()
@@ -806,8 +706,6 @@ void FadeSetLeaveScreen()
 
   FadeSetLeaveNext(menu.leave_screen[game_status], FALSE);	/* recall */
 }
-
-#endif
 
 void FadeSetFromType(int type)
 {
@@ -828,12 +726,12 @@ void FadeSetDisabled()
 
 void FadeSkipNextFadeIn()
 {
-  FadeExt(0, FADE_MODE_SKIP_FADE_IN);
+  FadeExt(0, FADE_MODE_SKIP_FADE_IN, FADE_TYPE_SKIP);
 }
 
 void FadeSkipNextFadeOut()
 {
-  FadeExt(0, FADE_MODE_SKIP_FADE_OUT);
+  FadeExt(0, FADE_MODE_SKIP_FADE_OUT, FADE_TYPE_SKIP);
 }
 
 void SetWindowBackgroundImageIfDefined(int graphic)

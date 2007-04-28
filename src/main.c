@@ -5415,6 +5415,7 @@ struct ElementDirectionInfo element_direction_info[NUM_DIRECTIONS_FULL + 1] =
 struct SpecialSuffixInfo special_suffix_info[NUM_SPECIAL_GFX_ARGS + 1 + 1] =
 {
   { ".[DEFAULT]",		GFX_SPECIAL_ARG_DEFAULT,		},
+  { ".LOADING",			GFX_SPECIAL_ARG_LOADING,		},
   { ".TITLE_INITIAL",		GFX_SPECIAL_ARG_TITLE_INITIAL,		},
   { ".TITLE",			GFX_SPECIAL_ARG_TITLE,			},
   { ".MAIN",			GFX_SPECIAL_ARG_MAIN,			},
