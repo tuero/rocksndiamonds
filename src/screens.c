@@ -1280,6 +1280,7 @@ void DrawMainMenuExt(int redraw_mask, boolean do_fading)
 {
   static LevelDirTree *leveldir_last_valid = NULL;
   boolean levelset_has_changed = FALSE;
+  boolean redraw_all = FALSE;
 
   FadeSetLeaveScreen();
 
@@ -1333,10 +1334,17 @@ void DrawMainMenuExt(int redraw_mask, boolean do_fading)
   /* needed if last screen (level choice) changed graphics, sounds or music */
   ReloadCustomArtwork(0);
 
+  if (redraw_mask & REDRAW_ALL)
+    redraw_all = TRUE;
+
 #if 1
+#if 0
   printf("::: FadeOut @ DrawMainMenuExt ...\n");
+#endif
   FadeOut(redraw_mask);
+#if 0
   printf("::: FadeOut @ DrawMainMenuExt done\n");
+#endif
 
   /* needed if last screen was the editor screen */
   UndrawSpecialEditorDoor();
@@ -1416,6 +1424,11 @@ void DrawMainMenuExt(int redraw_mask, boolean do_fading)
 
     OpenDoor(door_state | DOOR_NO_DELAY | DOOR_FORCE_REDRAW);
   }
+#endif
+
+#if 0
+  if (redraw_all)
+    redraw_mask = REDRAW_ALL;
 #endif
 
   FadeIn(redraw_mask);
@@ -4915,9 +4928,11 @@ static void DrawSetupScreen_Generic()
   if (redraw_mask & REDRAW_ALL)
     redraw_all = TRUE;
 
+#if 0
   printf("::: %s\n", (redraw_mask & REDRAW_FIELD ? "REDRAW_FIELD" :
 		      redraw_mask & REDRAW_ALL ? "REDRAW_ALL" :
 		      int2str(0, redraw_mask)));
+#endif
 
 #if 1
   FadeOut(redraw_mask);

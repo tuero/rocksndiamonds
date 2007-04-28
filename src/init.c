@@ -5794,11 +5794,13 @@ void ReloadCustomArtwork(int force_reload)
 #endif
   print_timestamp_time("ClearRectangle");
 
+#if 0
   printf("::: fading in ... %d\n", fading.fade_mode);
-
+#endif
   FadeIn(REDRAW_ALL);
-
+#if 0
   printf("::: done\n");
+#endif
 
   if (gfx_new_identifier != NULL || force_reload_gfx)
   {
@@ -5828,9 +5830,13 @@ void ReloadCustomArtwork(int force_reload)
 
   game_status = last_game_status;	/* restore current game status */
 
+#if 0
   printf("::: FadeOut @ ReloadCustomArtwork ...\n");
+#endif
   FadeOut(REDRAW_ALL);
+#if 0
   printf("::: FadeOut @ ReloadCustomArtwork done\n");
+#endif
 
   RedrawBackground();
 

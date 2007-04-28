@@ -241,8 +241,9 @@ void DrawMaskedBorder_ALL()
 
 void DrawMaskedBorder(int redraw_mask)
 {
-  /* do not draw masked screen borders when displaying title screens */
-  if (effectiveGameStatus() == GAME_MODE_TITLE)
+  /* never draw masked screen borders on borderless screens */
+  if (effectiveGameStatus() == GAME_MODE_LOADING ||
+      effectiveGameStatus() == GAME_MODE_TITLE)
     return;
 
   if (redraw_mask & REDRAW_ALL)
@@ -465,7 +466,7 @@ static void FadeExt(int fade_mask, int fade_mode, int fade_type)
   {
     if (fade_type_skip != FADE_TYPE_NONE)
     {
-#if 1
+#if 0
       printf("::: skipping %d ... [%d] (X)\n", fade_mode, fade_type_skip);
 #endif
 
@@ -477,16 +478,18 @@ static void FadeExt(int fade_mask, int fade_mode, int fade_type)
     }
 
     if (fading.fade_mode & FADE_TYPE_TRANSFORM)
+    {
       FadeCrossSaveBackbuffer();
 
-    return;
+      return;
+    }
   }
 
   redraw_mask |= fade_mask;
 
   if (fade_type == FADE_TYPE_SKIP)
   {
-#if 1
+#if 0
     printf("::: will skip %d ... [%d]\n", fade_mode, fade_type_skip);
 #endif
 
@@ -497,7 +500,7 @@ static void FadeExt(int fade_mask, int fade_mode, int fade_type)
 
   if (fade_type_skip != FADE_TYPE_NONE)
   {
-#if 1
+#if 0
     printf("::: skipping %d ... [%d]\n", fade_mode, fade_type_skip);
 #endif
 
@@ -528,7 +531,7 @@ static void FadeExt(int fade_mask, int fade_mode, int fade_type)
 
   /* !!! what abount fade_mask == REDRAW_FIELD | REDRAW_ALL ??? !!! */
 
-#if 1
+#if 0
   printf("::: NOW FADING %d ... [%d]\n", fade_mode, fade_type);
 #endif
 
