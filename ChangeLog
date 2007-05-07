@@ -1,3 +1,6 @@
+2007-05-07
+	* fixed invisible "joysticks deactivated ..." text on setup input screen
+
 2007-04-27
 	* added use of hashes created from static lists (element tokens, image
 	  config, font tokens) to speed up lookup of configuration parameters

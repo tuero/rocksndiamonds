@@ -52,6 +52,10 @@ font_to_graphic[] =
     IMG_FONT_TITLE_2
   },
   {
+    FONT_TITLE_2,				GFX_SPECIAL_ARG_SETUP,
+    IMG_FONT_TITLE_2_SETUP
+  },
+  {
     FONT_MENU_1,				-1,
     IMG_FONT_MENU_1
   },

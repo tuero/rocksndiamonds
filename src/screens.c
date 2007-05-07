@@ -2238,7 +2238,11 @@ static void DrawInfoScreen_Main(int redraw_mask, boolean do_fading)
   info_info = info_info_main;
   num_info_info = 0;
 
+#if 1
+  for (i = 0; info_info[i].type != 0 && i < MAX_MENU_ENTRIES_ON_SCREEN; i++)
+#else
   for (i = 0; info_info[i].type != 0 && i < NUM_MENU_ENTRIES_ON_SCREEN; i++)
+#endif
   {
     if (info_info[i].type & (TYPE_ENTER_MENU|TYPE_ENTER_LIST))
       initCursor(i, IMG_MENU_BUTTON_ENTER_MENU);
@@ -4986,7 +4990,11 @@ static void DrawSetupScreen_Generic()
   DrawTextSCentered(mSY - SY + 16, FONT_TITLE_1, title_string);
 
   num_setup_info = 0;
+#if 1
+  for (i = 0; setup_info[i].type != 0 && i < MAX_MENU_ENTRIES_ON_SCREEN; i++)
+#else
   for (i = 0; setup_info[i].type != 0 && i < NUM_MENU_ENTRIES_ON_SCREEN; i++)
+#endif
   {
     void *value_ptr = setup_info[i].value;
 #if 1
@@ -5186,7 +5194,21 @@ void DrawSetupScreen_Input()
   DrawTextSCentered(mSY - SY + 16, FONT_TITLE_1, "Setup Input");
 
 #if 1
+#if 1
+  DrawTextSCentered(SYSIZE - 20, FONT_TITLE_2,
+		    "Joysticks deactivated on this screen");
+#else
+  DrawTextSCentered(SYSIZE - 20, FONT_TEXT_4,
+		    "Joysticks deactivated on this screen");
+#endif
+#endif
+
+#if 1
+#if 1
+  for (i = 0; setup_info[i].type != 0 && i < MAX_MENU_ENTRIES_ON_SCREEN; i++)
+#else
   for (i = 0; setup_info[i].type != 0 && i < NUM_MENU_ENTRIES_ON_SCREEN; i++)
+#endif
   {
     if (setup_info[i].type & (TYPE_ENTER_MENU|TYPE_ENTER_LIST))
       initCursor(i, IMG_MENU_BUTTON_ENTER_MENU);
@@ -5211,9 +5233,15 @@ void DrawSetupScreen_Input()
 #if 0
   DeactivateJoystickForCalibration();
 #endif
+
+#if 0
 #if 1
+  DrawTextSCentered(SYSIZE - 20, FONT_TITLE_2,
+		    "Joysticks deactivated on this screen");
+#else
   DrawTextSCentered(SYSIZE - 20, FONT_TEXT_4,
 		    "Joysticks deactivated on this screen");
+#endif
 #endif
 
   /* create gadgets for setup input menu screen */
