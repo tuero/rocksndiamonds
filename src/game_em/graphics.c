@@ -151,6 +151,8 @@ static struct GraphicInfo_EM *getObjectGraphic(int x, int y)
 
   if (!game.use_native_emc_graphics_engine)
     getGraphicSourceObjectExt_EM(tile, frame, &g->bitmap, &g->src_x, &g->src_y,
+				 &g->crumbled_bitmap,
+				 &g->crumbled_src_x, &g->crumbled_src_y,
 				 x - 2, y - 2);
   return g;
 }
@@ -219,6 +221,13 @@ static void DrawLevelFieldCrumbled_EM(int x, int y, int sx, int sy,
 
   if (crm == 0)		/* no crumbled edges for this tile */
     return;
+
+#if 0
+  if (x == 3 && y == 3 && frame == 0)
+    printf("::: %d, %d\n",
+	   graphic_info_em_object[207][0].crumbled_src_x,
+	   graphic_info_em_object[207][0].crumbled_src_y);
+#endif
 
   for (i = 0; i < 4; i++)
   {

@@ -1962,7 +1962,7 @@
 
 #if CREATE_SPECIAL_EDITION_RND_JUE
 #undef  PROGRAM_TITLE_STRING
-#define PROGRAM_TITLE_STRING		"R'n'D - Version Jue"
+#define PROGRAM_TITLE_STRING		"R'n'D - jue"
 #undef  PROGRAM_UNIX_DATADIR_STRING
 #define PROGRAM_UNIX_DATADIR_STRING	".rocksndiamonds-jue"
 #endif

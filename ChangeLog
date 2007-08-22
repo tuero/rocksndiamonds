@@ -1,4 +1,8 @@
 2007-05-07
+	* fixed problem with broken crumbled graphics after level set changes
+	  when using R'n'D custom artwork with level sets using the EMC engine
+
+2007-05-07
 	* fixed invisible "joysticks deactivated ..." text on setup input screen
 
 2007-04-27

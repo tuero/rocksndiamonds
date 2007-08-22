@@ -6042,6 +6042,8 @@ void SetGfxAnimation_EM(int tile, int frame_em, int x, int y)
 
 void getGraphicSourceObjectExt_EM(int tile, int frame_em,
 				  Bitmap **src_bitmap, int *src_x, int *src_y,
+				  Bitmap **crumbled_src_bitmap,
+				  int *crumbled_src_x, int *crumbled_src_y,
 				  int x, int y)
 {
   int element         = object_mapping[tile].element_rnd;
@@ -6058,6 +6060,12 @@ void getGraphicSourceObjectExt_EM(int tile, int frame_em,
   int graphic = (direction == MV_NONE ?
 		 el_act2img(effective_element, action) :
 		 el_act_dir2img(effective_element, action, direction));
+  int crumbled = (direction == MV_NONE ?
+		  el_act2crm(effective_element, action) :
+		  el_act_dir2crm(effective_element, action, direction));
+  int base_graphic = el_act2img(effective_element, ACTION_DEFAULT);
+  int base_crumbled = el_act2crm(effective_element, ACTION_DEFAULT);
+  boolean has_crumbled_graphics = (base_crumbled != base_graphic);
   struct GraphicInfo *g = &graphic_info[graphic];
   int sync_frame;
 
@@ -6093,6 +6101,28 @@ void getGraphicSourceObjectExt_EM(int tile, int frame_em,
 				sync_frame);
 
   getGraphicSourceExt(graphic, frame, src_bitmap, src_x, src_y, FALSE);
+
+#if 0
+  if (x == 1 && y == 1 && frame == 0)
+    printf("--> %d, %d, %d\n", *crumbled_src_x, *crumbled_src_y, tile);
+#endif
+
+#if 0
+  getGraphicSource(crumbled, frame, crumbled_src_bitmap,
+		   crumbled_src_x, crumbled_src_y);
+#endif
+
+#if 0
+  *crumbled_src_bitmap = NULL;
+  *crumbled_src_x = 0;
+  *crumbled_src_y = 0;
+
+  if (has_crumbled_graphics && crumbled != IMG_EMPTY_SPACE)
+  {
+    getGraphicSource(crumbled, frame, crumbled_src_bitmap,
+		     crumbled_src_x, crumbled_src_y);
+  }
+#endif
 }
 
 void getGraphicSourcePlayerExt_EM(int player_nr, int anim, int frame_em,
@@ -6292,6 +6322,7 @@ void InitGraphicInfo_EM(void)
       boolean has_action_graphics = (graphic != base_graphic);
       boolean has_crumbled_graphics = (base_crumbled != base_graphic);
       struct GraphicInfo *g = &graphic_info[graphic];
+      struct GraphicInfo *g_crumbled = &graphic_info[crumbled];
       struct GraphicInfo_EM *g_em = &graphic_info_em_object[i][7 - j];
       Bitmap *src_bitmap;
       int src_x, src_y;
@@ -6444,17 +6475,43 @@ void InitGraphicInfo_EM(void)
 #endif
 
       /* if element can be crumbled, but certain action graphics are just empty
-	 space (like snapping sand with the original R'n'D graphics), do not
+	 space (like instantly snapping sand to empty space in 1 frame), do not
 	 treat these empty space graphics as crumbled graphics in EMC engine */
       if (has_crumbled_graphics && crumbled != IMG_EMPTY_SPACE)
       {
-	getGraphicSource(crumbled, frame, &src_bitmap, &src_x, &src_y);
+	int frame_crumbled = getAnimationFrame(g_crumbled->anim_frames,
+					       g_crumbled->anim_delay,
+					       g_crumbled->anim_mode,
+					       g_crumbled->anim_start_frame,
+					       sync_frame);
+
+	getGraphicSource(crumbled, frame_crumbled, &src_bitmap, &src_x, &src_y);
 
 	g_em->has_crumbled_graphics = TRUE;
 	g_em->crumbled_bitmap = src_bitmap;
 	g_em->crumbled_src_x = src_x;
 	g_em->crumbled_src_y = src_y;
 	g_em->crumbled_border_size = graphic_info[crumbled].border_size;
+
+
+#if 0
+	if (g_em == &graphic_info_em_object[207][0])
+	  printf("... %d, %d [%d, %d, %d, %d] [%d, %d, %d, %d, %d, %d => %d]\n",
+		 graphic_info_em_object[207][0].crumbled_src_x,
+		 graphic_info_em_object[207][0].crumbled_src_y,
+
+		 crumbled, frame, src_x, src_y,
+
+		 g->anim_frames,
+		 g->anim_delay,
+		 g->anim_mode,
+		 g->anim_start_frame,
+		 sync_frame,
+		 gfx.anim_random_frame,
+		 frame);
+#endif
+
+
       }
 
 #if 0
