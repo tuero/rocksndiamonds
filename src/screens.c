@@ -4956,7 +4956,8 @@ static void DrawSetupScreen_Generic()
 		      int2str(0, redraw_mask)));
 #endif
 
-#if 1
+#if 0
+  /* !!! usually REDRAW_NONE => DOES NOT WORK (with fade) => CHECK THIS !!! */
   FadeOut(redraw_mask);
 #else
   FadeOut(REDRAW_FIELD);

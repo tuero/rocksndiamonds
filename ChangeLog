@@ -15,6 +15,7 @@
 	  value -- solution: simply ignore such entries, which results in this
 	  value keeping its previous (real) default value (in general, entries
 	  that should use their default value should just not be defined here)
+	* fixed problem with wrong fading area size from main menu to setup menu
 
 2007-08-22
 	* fixed problem with broken crumbled graphics after level set changes
