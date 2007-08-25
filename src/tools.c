@@ -535,6 +535,11 @@ static void FadeExt(int fade_mask, int fade_mode, int fade_type)
   printf("::: NOW FADING %d ... [%d]\n", fade_mode, fade_type);
 #endif
 
+#if 1
+  if (fade_mask == REDRAW_NONE)
+    fade_mask = REDRAW_FIELD;
+#endif
+
   if (fade_mask & REDRAW_FIELD)
   {
     x = REAL_SX;
@@ -6067,6 +6072,7 @@ void getGraphicSourceObjectExt_EM(int tile, int frame_em,
   int base_crumbled = el_act2crm(effective_element, ACTION_DEFAULT);
   boolean has_crumbled_graphics = (base_crumbled != base_graphic);
   struct GraphicInfo *g = &graphic_info[graphic];
+  struct GraphicInfo *g_crumbled = &graphic_info[crumbled];
   int sync_frame;
 
 #if 0
@@ -6112,14 +6118,23 @@ void getGraphicSourceObjectExt_EM(int tile, int frame_em,
 		   crumbled_src_x, crumbled_src_y);
 #endif
 
-#if 0
+#if 1
+  /* (updating the "crumbled" graphic definitions is probably not really needed,
+     as animations for crumbled graphics can't be longer than one EMC cycle) */
+
   *crumbled_src_bitmap = NULL;
   *crumbled_src_x = 0;
   *crumbled_src_y = 0;
 
   if (has_crumbled_graphics && crumbled != IMG_EMPTY_SPACE)
   {
-    getGraphicSource(crumbled, frame, crumbled_src_bitmap,
+    int frame_crumbled = getAnimationFrame(g_crumbled->anim_frames,
+					   g_crumbled->anim_delay,
+					   g_crumbled->anim_mode,
+					   g_crumbled->anim_start_frame,
+					   sync_frame);
+
+    getGraphicSource(crumbled, frame_crumbled, crumbled_src_bitmap,
 		     crumbled_src_x, crumbled_src_y);
   }
 #endif

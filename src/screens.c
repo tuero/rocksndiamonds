@@ -747,6 +747,12 @@ static void InitializeTitleControls_CheckTitleInfo(boolean initial)
     Bitmap *bitmap = graphic_info[graphic].bitmap;
     int sort_priority = graphic_info[graphic].sort_priority;
 
+#if 0
+    /* skip images and messages (fonts!) when using forced custom graphics */
+    if (setup.override_level_graphics && !initial)
+      continue;
+#endif
+
     if (bitmap != NULL)
       InitializeTitleControlsExt_AddTitleInfo(TRUE, initial, i, sort_priority);
   }
@@ -756,6 +762,12 @@ static void InitializeTitleControls_CheckTitleInfo(boolean initial)
     struct TitleMessageInfo *tmi = getTitleMessageInfo(i, initial);
     char *filename = getLevelSetTitleMessageFilename(i, initial);
     int sort_priority = tmi->sort_priority;
+
+#if 0
+    /* skip images and messages (fonts!) when using forced custom graphics */
+    if (setup.override_level_graphics)
+      continue;
+#endif
 
     if (filename != NULL)
       InitializeTitleControlsExt_AddTitleInfo(FALSE, initial, i, sort_priority);
@@ -1411,7 +1423,7 @@ void DrawMainMenuExt(int redraw_mask, boolean do_fading)
   MapTapeButtons();
   MapScreenMenuGadgets(SCREEN_MASK_MAIN);
 
-#if 1
+#if 0
   DrawMaskedBorder(REDRAW_ALL);
 #endif
 
@@ -1424,6 +1436,10 @@ void DrawMainMenuExt(int redraw_mask, boolean do_fading)
 
     OpenDoor(door_state | DOOR_NO_DELAY | DOOR_FORCE_REDRAW);
   }
+#endif
+
+#if 1
+  DrawMaskedBorder(REDRAW_ALL);
 #endif
 
 #if 0

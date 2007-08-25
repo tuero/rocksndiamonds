@@ -1,4 +1,17 @@
-2007-05-07
+2007-08-25
+	* title messages are now also searched in graphics artwork directory;
+	  those found in graphics directory have precendence over those found
+	  in level directory -- this handles title messages stored in graphics
+	  directories as part of the artwork set, just like title images; this
+	  makes sense, as corresponding special font definitions for messages
+	  are usually defined in the same graphics artwork directory, and also
+	  because title images and title messages that are combined in a level
+	  set introduction should usually not be separated when the level set
+	  is used with a different artwork set (e.g. using "override graphics")
+	* fixed problem with door borders on main screen by first drawing doors
+	  and then the corresponding border masks, but not vice versa
+
+2007-08-22
 	* fixed problem with broken crumbled graphics after level set changes
 	  when using R'n'D custom artwork with level sets using the EMC engine
 

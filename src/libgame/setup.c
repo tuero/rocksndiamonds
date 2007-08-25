@@ -501,16 +501,33 @@ char *getLevelSetInfoFilename()
 char *getLevelSetTitleMessageFilename(int nr, boolean initial)
 {
   static char *filename = NULL;
+#if 1
+  char *filename_from_artwork;
+#endif
   char basename[32];
 
   sprintf(basename, "%s_%d.txt",
 	  (initial ? "titlemessage_initial" : "titlemessage"), nr + 1);
 
-  checked_free(filename);
-  filename = getPath2(getCurrentLevelDir(), basename);
+#if 1
+  /* 1st try: look for message file in all relevant graphics directories */
+  if ((filename_from_artwork = getCustomImageFilename(basename)) != NULL)
+    return filename_from_artwork;
+#endif
 
-  if (fileExists(filename))
-    return filename;
+#if 1
+  /* forced custom graphics also override messages in level set directory */
+  if (!setup.override_level_graphics)
+#endif
+  {
+    checked_free(filename);
+
+    /* 2nd try: look for message file in current level set directory */
+    filename = getPath2(getCurrentLevelDir(), basename);
+
+    if (fileExists(filename))
+      return filename;
+  }
 
   return NULL;
 }
