@@ -535,7 +535,7 @@ static void FadeExt(int fade_mask, int fade_mode, int fade_type)
   printf("::: NOW FADING %d ... [%d]\n", fade_mode, fade_type);
 #endif
 
-#if 1
+#if 0
   if (fade_mask == REDRAW_NONE)
     fade_mask = REDRAW_FIELD;
 #endif

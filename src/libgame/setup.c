@@ -664,6 +664,11 @@ char *getCustomImageFilename(char *basename)
 #if CREATE_SPECIAL_EDITION
   free(filename);
 
+  /* !!! INSERT WARNING HERE TO REPORT MISSING ARTWORK FILES !!! */
+#if 0
+  printf("::: MISSING ARTWORK FILE '%s'\n", basename);
+#endif
+
   /* 6th try: look for fallback artwork in old default artwork directory */
   /* (needed to prevent errors when trying to access unused artwork files) */
   filename = getPath2(options.graphics_directory, GFX_FALLBACK_FILENAME);

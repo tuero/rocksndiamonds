@@ -10,6 +10,11 @@
 	  is used with a different artwork set (e.g. using "override graphics")
 	* fixed problem with door borders on main screen by first drawing doors
 	  and then the corresponding border masks, but not vice versa
+	* fixed problem with artwork config entries using the value "[DEFAULT]";
+	  this does not what one might expect, but sets the value to an invalid
+	  value -- solution: simply ignore such entries, which results in this
+	  value keeping its previous (real) default value (in general, entries
+	  that should use their default value should just not be defined here)
 
 2007-08-22
 	* fixed problem with broken crumbled graphics after level set changes

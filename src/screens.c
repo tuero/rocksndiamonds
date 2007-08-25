@@ -778,8 +778,10 @@ static void InitializeTitleControls(boolean show_title_initial)
 {
   num_title_screens = 0;
 
+#if 0
   if (show_title_initial)
     InitializeTitleControls_CheckTitleInfo(TRUE);
+#endif
 
   InitializeTitleControls_CheckTitleInfo(FALSE);
 

@@ -8956,7 +8956,8 @@ static void LoadMenuDesignSettingsFromFilename(char *filename)
   {
     char *value = getHashEntry(setup_file_hash, image_config_vars[i].token);
 
-    if (value != NULL)
+    /* (ignore definitions set to "[DEFAULT]" which are already initialized) */
+    if (value != NULL && !strEqual(value, ARG_DEFAULT))
       *image_config_vars[i].value =
 	get_token_parameter_value(image_config_vars[i].token, value);
   }
