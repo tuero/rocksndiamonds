@@ -498,38 +498,80 @@ char *getLevelSetInfoFilename()
   return NULL;
 }
 
-char *getLevelSetTitleMessageFilename(int nr, boolean initial)
+char *getLevelSetTitleMessageBasename(int nr, boolean initial)
 {
-  static char *filename = NULL;
-#if 1
-  char *filename_from_artwork;
-#endif
-  char basename[32];
+  static char basename[32];
 
   sprintf(basename, "%s_%d.txt",
 	  (initial ? "titlemessage_initial" : "titlemessage"), nr + 1);
 
-#if 1
-  /* 1st try: look for message file in all relevant graphics directories */
-  if ((filename_from_artwork = getCustomImageFilename(basename)) != NULL)
-    return filename_from_artwork;
-#endif
+  return basename;
+}
 
-#if 1
-  /* forced custom graphics also override messages in level set directory */
+char *getLevelSetTitleMessageFilename(int nr, boolean initial)
+{
+  static char *filename = NULL;
+  char *basename;
+  boolean skip_setup_artwork = FALSE;
+
+  checked_free(filename);
+
+  basename = getLevelSetTitleMessageBasename(nr, initial);
+
   if (!setup.override_level_graphics)
-#endif
   {
-    checked_free(filename);
+    /* 1st try: look for special artwork in current level series directory */
+    filename = getPath3(getCurrentLevelDir(), GRAPHICS_DIRECTORY, basename);
+    if (fileExists(filename))
+      return filename;
+
+    free(filename);
 
     /* 2nd try: look for message file in current level set directory */
     filename = getPath2(getCurrentLevelDir(), basename);
-
     if (fileExists(filename))
       return filename;
+
+    free(filename);
+
+    /* check if there is special artwork configured in level series config */
+    if (getLevelArtworkSet(ARTWORK_TYPE_GRAPHICS) != NULL)
+    {
+      /* 3rd try: look for special artwork configured in level series config */
+      filename = getPath2(getLevelArtworkDir(ARTWORK_TYPE_GRAPHICS), basename);
+      if (fileExists(filename))
+	return filename;
+
+      free(filename);
+
+      /* take missing artwork configured in level set config from default */
+      skip_setup_artwork = TRUE;
+    }
   }
 
-  return NULL;
+  if (!skip_setup_artwork)
+  {
+    /* 4th try: look for special artwork in configured artwork directory */
+    filename = getPath2(getSetupArtworkDir(artwork.gfx_current), basename);
+    if (fileExists(filename))
+      return filename;
+
+    free(filename);
+  }
+
+  /* 5th try: look for default artwork in new default artwork directory */
+  filename = getPath2(getDefaultGraphicsDir(GFX_CLASSIC_SUBDIR), basename);
+  if (fileExists(filename))
+    return filename;
+
+  free(filename);
+
+  /* 6th try: look for default artwork in old default artwork directory */
+  filename = getPath2(options.graphics_directory, basename);
+  if (fileExists(filename))
+    return filename;
+
+  return NULL;		/* cannot find specified artwork file anywhere */
 }
 
 static char *getCorrectedArtworkBasename(char *basename)
@@ -623,6 +665,7 @@ char *getCustomImageFilename(char *basename)
   free(filename);
 
   /* 6th try: look for fallback artwork in old default artwork directory */
+  /* (needed to prevent errors when trying to access unused artwork files) */
   filename = getPath2(options.graphics_directory, GFX_FALLBACK_FILENAME);
   if (fileExists(filename))
     return filename;
@@ -690,6 +733,7 @@ char *getCustomSoundFilename(char *basename)
   free(filename);
 
   /* 6th try: look for fallback artwork in old default artwork directory */
+  /* (needed to prevent errors when trying to access unused artwork files) */
   filename = getPath2(options.sounds_directory, SND_FALLBACK_FILENAME);
   if (fileExists(filename))
     return filename;
@@ -757,6 +801,7 @@ char *getCustomMusicFilename(char *basename)
   free(filename);
 
   /* 6th try: look for fallback artwork in old default artwork directory */
+  /* (needed to prevent errors when trying to access unused artwork files) */
   filename = getPath2(options.music_directory, MUS_FALLBACK_FILENAME);
   if (fileExists(filename))
     return filename;
