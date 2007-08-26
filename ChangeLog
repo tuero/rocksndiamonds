@@ -1,3 +1,6 @@
+2007-08-26
+	* fixed broken editor copy and paste for custom elements between levels
+
 2007-08-25
 	* title messages are now also searched in graphics artwork directory;
 	  those found in graphics directory have precendence over those found

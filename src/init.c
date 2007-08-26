@@ -2605,6 +2605,8 @@ void ResolveGroupElement(int group_element)
 
 void InitElementPropertiesStatic()
 {
+  static boolean clipboard_elements_initialized = FALSE;
+
   static int ep_diggable[] =
   {
     EL_SAND,
@@ -4553,9 +4555,12 @@ void InitElementPropertiesStatic()
   int i, j, k;
 
   /* always start with reliable default values (element has no properties) */
+  /* (but never initialize clipboard elements after the very first time) */
+  /* (to be able to use clipboard elements between several levels) */
   for (i = 0; i < MAX_NUM_ELEMENTS; i++)
-    for (j = 0; j < NUM_ELEMENT_PROPERTIES; j++)
-      SET_PROPERTY(i, j, FALSE);
+    if (!IS_CLIPBOARD_ELEMENT(i) || !clipboard_elements_initialized)
+      for (j = 0; j < NUM_ELEMENT_PROPERTIES; j++)
+	SET_PROPERTY(i, j, FALSE);
 
   /* set all base element properties from above array definitions */
   for (i = 0; element_properties[i].elements != NULL; i++)
@@ -4573,6 +4578,8 @@ void InitElementPropertiesStatic()
   /* set static element properties that are not listed in array definitions */
   for (i = EL_STEEL_CHAR_START; i <= EL_STEEL_CHAR_END; i++)
     SET_PROPERTY(i, EP_INDESTRUCTIBLE, TRUE);
+
+  clipboard_elements_initialized = TRUE;
 }
 
 void InitElementPropertiesEngine(int engine_version)
@@ -4621,6 +4628,10 @@ void InitElementPropertiesEngine(int engine_version)
   /* set all special, combined or engine dependent element properties */
   for (i = 0; i < MAX_NUM_ELEMENTS; i++)
   {
+    /* do not change (already initialized) clipboard elements here */
+    if (IS_CLIPBOARD_ELEMENT(i))
+      continue;
+
     /* ---------- INACTIVE ------------------------------------------------- */
     SET_PROPERTY(i, EP_INACTIVE, ((i >= EL_CHAR_START &&
 				   i <= EL_CHAR_END) ||
