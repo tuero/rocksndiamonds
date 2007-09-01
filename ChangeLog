@@ -1,3 +1,10 @@
+2007-09-01
+	* fixed bug with CE action "move player" always resulting in player 4
+	  if there was a CE action with no trigger player (because the player
+	  element was calculated by using log_2() from trigger player bits with
+	  the value PLAYER_BITS_ANY) -- this is now fixed by also storing the
+	  triggering player bit mask and handling all players in "move player"
+
 2007-08-26
 	* fixed broken editor copy and paste for custom elements between levels
 

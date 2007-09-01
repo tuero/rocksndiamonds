@@ -2403,6 +2403,7 @@ struct ElementChangeInfo
   short actual_trigger_element;	/* element that actually triggered change */
   int actual_trigger_side;	/* element side that triggered the change */
   int actual_trigger_player;	/* player which actually triggered change */
+  int actual_trigger_player_bits; /* player bits of triggering players */
   int actual_trigger_ce_value;	/* CE value of element that triggered change */
   int actual_trigger_ce_score;	/* CE score of element that triggered change */
 

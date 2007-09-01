@@ -896,6 +896,9 @@ static struct GamePanelControlInfo game_panel_controls[] =
 	 (be) + (e) - EL_SELF > EL_CUSTOM_END   ? EL_CUSTOM_END :	\
 	 (be) + (e) - EL_SELF)
 
+#define GET_PLAYER_FROM_BITS(p)						\
+	(EL_PLAYER_1 + ((p) != PLAYER_BITS_ANY ? log_2(p) : 0))
+
 #define GET_TARGET_ELEMENT(be, e, ch, cv, cs)				\
 	((e) == EL_TRIGGER_PLAYER   ? (ch)->actual_trigger_player    :	\
 	 (e) == EL_TRIGGER_ELEMENT  ? (ch)->actual_trigger_element   :	\
@@ -3334,6 +3337,7 @@ static void InitGameEngine()
     {
       ei->change_page[j].actual_trigger_element = EL_EMPTY;
       ei->change_page[j].actual_trigger_player = EL_PLAYER_1;
+      ei->change_page[j].actual_trigger_player_bits = CH_PLAYER_1;
       ei->change_page[j].actual_trigger_side = CH_SIDE_NONE;
       ei->change_page[j].actual_trigger_ce_value = 0;
       ei->change_page[j].actual_trigger_ce_score = 0;
@@ -10017,11 +10021,15 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
 			    action_mode, action_arg_number,
 			    action_arg_number_min, action_arg_number_max);
 
+#if 1
+  int trigger_player_bits = change->actual_trigger_player_bits;
+#else
   int trigger_player_bits =
     (change->actual_trigger_player >= EL_PLAYER_1 &&
      change->actual_trigger_player <= EL_PLAYER_4 ?
      (1 << (change->actual_trigger_player - EL_PLAYER_1)) :
      PLAYER_BITS_ANY);
+#endif
 
   int action_arg_player_bits =
     (action_arg >= CA_ARG_PLAYER_1 &&
@@ -10527,6 +10535,7 @@ static boolean ChangeElement(int x, int y, int element, int page)
     /* reset actual trigger element, trigger player and action element */
     change->actual_trigger_element = EL_EMPTY;
     change->actual_trigger_player = EL_PLAYER_1;
+    change->actual_trigger_player_bits = CH_PLAYER_1;
     change->actual_trigger_side = CH_SIDE_NONE;
     change->actual_trigger_ce_value = 0;
     change->actual_trigger_ce_score = 0;
@@ -10907,7 +10916,8 @@ static boolean CheckTriggeredElementChangeExt(int trigger_x, int trigger_y,
 	  IS_EQUAL_OR_IN_GROUP(trigger_element, change->trigger_element))
       {
 	change->actual_trigger_element = trigger_element;
-	change->actual_trigger_player = EL_PLAYER_1 + log_2(trigger_player);
+	change->actual_trigger_player = GET_PLAYER_FROM_BITS(trigger_player);
+	change->actual_trigger_player_bits = trigger_player;
 	change->actual_trigger_side = trigger_side;
 	change->actual_trigger_ce_value = CustomValue[trigger_x][trigger_y];
 	change->actual_trigger_ce_score = GET_CE_SCORE(trigger_element);
@@ -11026,7 +11036,8 @@ static boolean CheckElementChangeExt(int x, int y,
 	 IS_EQUAL_OR_IN_GROUP(trigger_element, change->trigger_element)))
     {
       change->actual_trigger_element = trigger_element;
-      change->actual_trigger_player = EL_PLAYER_1 + log_2(trigger_player);
+      change->actual_trigger_player = GET_PLAYER_FROM_BITS(trigger_player);
+      change->actual_trigger_player_bits = trigger_player;
       change->actual_trigger_side = trigger_side;
       change->actual_trigger_ce_value = CustomValue[x][y];
       change->actual_trigger_ce_score = GET_CE_SCORE(trigger_element);
