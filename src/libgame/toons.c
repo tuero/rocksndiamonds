@@ -337,15 +337,9 @@ void HandleAnimation(int mode)
       if (anim_running)
       {
 #if 1
-	int draw_mode;
-
 	redraw_mask |= (REDRAW_FIELD | REDRAW_FROM_BACKBUFFER);
 
-	/* Redraw background even when in direct drawing mode */
-	draw_mode = setup.direct_draw;
-	setup.direct_draw = FALSE;
 	screen_info.update_function();
-	setup.direct_draw = draw_mode;
 #endif
 
 	anim_running = FALSE;

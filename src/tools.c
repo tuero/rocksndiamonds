@@ -118,7 +118,7 @@ void SetDrawtoField(int mode)
 
     drawto_field = fieldbuffer;
   }
-  else	/* DRAW_DIRECT, DRAW_BACKBUFFER */
+  else	/* DRAW_BACKBUFFER */
   {
     FX = SX;
     FY = SY;
@@ -129,7 +129,7 @@ void SetDrawtoField(int mode)
     redraw_x1 = 0;
     redraw_y1 = 0;
 
-    drawto_field = (mode == DRAW_DIRECT ? window :  backbuffer);
+    drawto_field = backbuffer;
   }
 }
 
@@ -154,23 +154,17 @@ void RedrawPlayfield(boolean force_redraw, int x, int y, int width, int height)
       height = gfx.sysize + 2 * TILEY;
     }
 
-    if (force_redraw || setup.direct_draw)
+    if (force_redraw)
     {
       int xx, yy;
       int x1 = (x - SX) / TILEX, y1 = (y - SY) / TILEY;
       int x2 = (x - SX + width) / TILEX, y2 = (y - SY + height) / TILEY;
-
-      if (setup.direct_draw)
-	SetDrawtoField(DRAW_BACKBUFFER);
 
       for (xx = BX1; xx <= BX2; xx++)
 	for (yy = BY1; yy <= BY2; yy++)
 	  if (xx >= x1 && xx <= x2 && yy >= y1 && yy <= y2)
 	    DrawScreenField(xx, yy);
       DrawAllPlayers();
-
-      if (setup.direct_draw)
-	SetDrawtoField(DRAW_DIRECT);
     }
 
     if (setup.soft_scrolling)
@@ -265,9 +259,6 @@ void BackToFront()
 {
   int x,y;
   DrawBuffer *buffer = (drawto_field == window ? backbuffer : drawto_field);
-
-  if (setup.direct_draw && game_status == GAME_MODE_PLAYING)
-    redraw_mask &= ~REDRAW_MAIN;
 
   if (redraw_mask & REDRAW_TILES && redraw_tiles > REDRAWTILES_THRESHOLD)
     redraw_mask |= REDRAW_FIELD;
@@ -520,7 +511,7 @@ static void FadeExt(int fade_mask, int fade_mode, int fade_type)
   }
 #endif
 
-#if 1
+#if 0
   if (fading.fade_mode == FADE_MODE_NONE)
   {
     BackToFront();
@@ -540,7 +531,8 @@ static void FadeExt(int fade_mask, int fade_mode, int fade_type)
     fade_mask = REDRAW_FIELD;
 #endif
 
-  if (fade_mask & REDRAW_FIELD)
+  // if (fade_mask & REDRAW_FIELD)
+  if (fade_mask == REDRAW_FIELD)
   {
     x = REAL_SX;
     y = REAL_SY;
@@ -567,15 +559,28 @@ static void FadeExt(int fade_mask, int fade_mode, int fade_type)
   }
 
 #if 1
-  if (!setup.fade_screens || fade_delay == 0)
+  if (!setup.fade_screens ||
+      fade_delay == 0 ||
+      fading.fade_mode == FADE_MODE_NONE)
 #else
-  if (!setup.fade_screens || fade_delay == 0 || fading.anim_mode == ANIM_NONE)
+  if (!setup.fade_screens || fade_delay == 0)
 #endif
   {
     if (fade_mode == FADE_MODE_FADE_OUT)
-      ClearRectangle(backbuffer, x, y, width, height);
+      return;
 
+#if 0
+    if (fade_mode == FADE_MODE_FADE_OUT &&
+	fading.fade_mode != FADE_MODE_NONE)
+      ClearRectangle(backbuffer, x, y, width, height);
+#endif
+
+#if 1
+    BlitBitmap(backbuffer, window, x, y, width, height, x, y);
+    redraw_mask = REDRAW_NONE;
+#else
     BackToFront();
+#endif
 
     return;
   }
@@ -588,68 +593,21 @@ static void FadeExt(int fade_mask, int fade_mode, int fade_type)
 
 void FadeIn(int fade_mask)
 {
-#if 0
-  global.border_status = game_status;
-#endif
-
-#if 1
-  // printf("::: now fading in...\n");
-
   if (fading.fade_mode & FADE_TYPE_TRANSFORM)
     FadeExt(fade_mask, fading.fade_mode, FADE_TYPE_FADE_IN);
   else
     FadeExt(fade_mask, FADE_MODE_FADE_IN, FADE_TYPE_FADE_IN);
-#else
-#if 1
-  if (fading.fade_mode == FADE_MODE_CROSSFADE)
-    FadeExt(fade_mask, FADE_MODE_CROSSFADE);
-  else
-    FadeExt(fade_mask, FADE_MODE_FADE_IN);
-#else
-  FadeExt(fade_mask, FADE_MODE_FADE_IN);
-#endif
-#endif
 }
 
 void FadeOut(int fade_mask)
 {
-#if 1
-  // printf("::: fading.fade_mode == %d\n", fading.fade_mode);
-
-#if 1
   if (fading.fade_mode & FADE_TYPE_TRANSFORM)
     FadeExt(fade_mask, fading.fade_mode, FADE_TYPE_FADE_OUT);
   else
     FadeExt(fade_mask, FADE_MODE_FADE_OUT, FADE_TYPE_FADE_OUT);
-#else
-  if (fading.fade_mode & FADE_TYPE_TRANSFORM)
-    FadeCrossSaveBackbuffer();
-  else
-    FadeExt(fade_mask, FADE_MODE_FADE_OUT, FADE_TYPE_FADE_OUT);
-#endif
 
-#else
-#if 1
-  if (fading.fade_mode == FADE_MODE_CROSSFADE)
-    FadeCrossSaveBackbuffer();
-  else
-    FadeExt(fade_mask, FADE_MODE_FADE_OUT);
-#else
-  FadeExt(fade_mask, FADE_MODE_FADE_OUT);
-#endif
-#endif
-
-#if 1
   global.border_status = game_status;
-#endif
 }
-
-#if 0
-void FadeCross(int fade_mask)
-{
-  FadeExt(fade_mask, FADE_MODE_CROSSFADE);
-}
-#endif
 
 static void FadeSetLeaveNext(struct TitleFadingInfo fading_leave, boolean set)
 {
@@ -825,7 +783,7 @@ void DrawBackgroundForGraphic(int x, int y, int width, int height, int graphic)
   DrawBackground(x, y, width, height);
 }
 
-void ClearWindow()
+void ClearField()
 {
   /* !!! "drawto" might still point to playfield buffer here (see above) !!! */
   /* (when entering hall of fame after playing) */
@@ -839,12 +797,6 @@ void ClearWindow()
   }
   else
     SetDrawtoField(DRAW_BACKBUFFER);
-
-  if (setup.direct_draw && game_status == GAME_MODE_PLAYING)
-  {
-    ClearRectangle(window, REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE);
-    SetDrawtoField(DRAW_DIRECT);
-  }
 }
 
 void MarkTileDirty(int x, int y)
@@ -1940,7 +1892,7 @@ void DrawLevel()
   int x,y;
 
   SetDrawBackgroundMask(REDRAW_NONE);
-  ClearWindow();
+  ClearField();
 
   for (x = BX1; x <= BX2; x++)
     for (y = BY1; y <= BY2; y++)
@@ -2507,9 +2459,6 @@ void DrawPlayer(struct PlayerInfo *player)
   if (!IN_SCR_FIELD(sx, sy))
     return;
 
-  if (setup.direct_draw)
-    SetDrawtoField(DRAW_BUFFERED);
-
   /* ----------------------------------------------------------------------- */
   /* draw things behind the player, if needed                                */
   /* ----------------------------------------------------------------------- */
@@ -2686,18 +2635,6 @@ void DrawPlayer(struct PlayerInfo *player)
       DrawLevelField(jx, jy);
     else if (IS_ACCESSIBLE_UNDER(element))
       DrawLevelFieldThruMask(jx, jy);
-  }
-
-  if (setup.direct_draw)
-  {
-    int dst_x = SX + SCREENX(MIN(jx, last_jx)) * TILEX;
-    int dst_y = SY + SCREENY(MIN(jy, last_jy)) * TILEY;
-    int x_size = TILEX * (1 + ABS(jx - last_jx));
-    int y_size = TILEY * (1 + ABS(jy - last_jy));
-
-    BlitBitmap(drawto_field, window,
-	       dst_x, dst_y, x_size, y_size, dst_x, dst_y);
-    SetDrawtoField(DRAW_DIRECT);
   }
 
   MarkTileDirty(sx, sy);

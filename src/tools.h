@@ -18,7 +18,6 @@
 #include "game.h"
 
 /* for SetDrawtoField */
-#define DRAW_DIRECT		0
 #define DRAW_BUFFERED		1
 #define DRAW_BACKBUFFER		2
 
@@ -85,7 +84,7 @@ void FadeSetDisabled();
 void FadeSkipNextFadeIn();
 void FadeSkipNextFadeOut();
 
-void ClearWindow();
+void ClearField();
 void SetWindowBackgroundImageIfDefined(int);
 void SetMainBackgroundImageIfDefined(int);
 void SetDoorBackgroundImageIfDefined(int);

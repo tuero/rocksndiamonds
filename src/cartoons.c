@@ -31,21 +31,6 @@ static void PrepareBackbuffer()
     return;
   }
 
-  /* fill empty backbuffer for animation functions */
-  if (setup.direct_draw && game_status == GAME_MODE_PLAYING)
-  {
-    int xx, yy;
-
-    SetDrawtoField(DRAW_BACKBUFFER);
-
-    for (xx = 0; xx < SCR_FIELDX; xx++)
-      for (yy = 0; yy < SCR_FIELDY; yy++)
-	DrawScreenField(xx, yy);
-    DrawAllPlayers();
-
-    SetDrawtoField(DRAW_DIRECT);
-  }
-
   if (setup.soft_scrolling && game_status == GAME_MODE_PLAYING)
   {
     int fx = FX, fy = FY;

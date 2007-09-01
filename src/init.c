@@ -5842,6 +5842,11 @@ void ReloadCustomArtwork(int force_reload)
   game_status = last_game_status;	/* restore current game status */
 
 #if 0
+  printf("::: ----------------DELAY 1 ...\n");
+  Delay(3000);
+#endif
+
+#if 0
   printf("::: FadeOut @ ReloadCustomArtwork ...\n");
 #endif
   FadeOut(REDRAW_ALL);
@@ -5857,6 +5862,7 @@ void ReloadCustomArtwork(int force_reload)
 
 #if 1
 #if 1
+#if 1
   FadeSetEnterScreen();
   FadeSkipNextFadeOut();
   // FadeSetDisabled();
@@ -5865,6 +5871,11 @@ void ReloadCustomArtwork(int force_reload)
 #endif
 #else
   fading = fading_none;
+#endif
+#endif
+
+#if 0
+  redraw_mask = REDRAW_ALL;
 #endif
 
   print_timestamp_done("ReloadCustomArtwork");

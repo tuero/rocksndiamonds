@@ -832,8 +832,6 @@ struct SetupInfo
   boolean sound_music;
   boolean sound_simple;
   boolean toons;
-  boolean double_buffering;
-  boolean direct_draw;		/* !double_buffering (redundant!) */
   boolean scroll_delay;
   boolean scroll_delay_value;
   boolean soft_scrolling;

@@ -7318,7 +7318,7 @@ static void DrawDrawingWindow()
   stick_element_properties_window = FALSE;
 
   SetMainBackgroundImage(IMG_UNDEFINED);
-  ClearWindow();
+  ClearField();
 
   UnmapLevelEditorWindowGadgets();
   UnmapLevelEditorToolboxCustomGadgets();
@@ -7341,7 +7341,7 @@ static void DrawLevelInfoWindow()
   stick_element_properties_window = FALSE;
 
   SetMainBackgroundImage(IMG_BACKGROUND_EDITOR);
-  ClearWindow();
+  ClearField();
   UnmapLevelEditorWindowGadgets();
 
 #if 0
@@ -8311,7 +8311,7 @@ static void DrawPropertiesWindow()
     MapLevelEditorToolboxCustomGadgets();
 
   SetMainBackgroundImage(IMG_BACKGROUND_EDITOR);
-  ClearWindow();
+  ClearField();
 
 #if 0
   DrawTextSCentered(ED_SETTINGS1_YPOS, FONT_TITLE_1, "Element Settings");

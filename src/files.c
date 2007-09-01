@@ -8270,8 +8270,6 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
   si->sound_music = TRUE;
   si->sound_simple = TRUE;
   si->toons = TRUE;
-  si->double_buffering = TRUE;
-  si->direct_draw = !si->double_buffering;
   si->scroll_delay = TRUE;
   si->scroll_delay_value = STD_SCROLL_DELAY;
   si->soft_scrolling = TRUE;
@@ -8468,8 +8466,6 @@ void LoadSetup()
 
     checkSetupFileHashIdentifier(setup_file_hash, filename,getCookie("SETUP"));
     decodeSetupFileHash(setup_file_hash);
-
-    setup.direct_draw = !setup.double_buffering;
 
     freeSetupFileHash(setup_file_hash);
 

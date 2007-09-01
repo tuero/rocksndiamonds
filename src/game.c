@@ -9505,9 +9505,6 @@ void DrawTwinkleOnField(int x, int y)
   {
     MovDelay[x][y]--;
 
-    if (setup.direct_draw && MovDelay[x][y])
-      SetDrawtoField(DRAW_BUFFERED);
-
     DrawLevelElementAnimation(x, y, Feld[x][y]);
 
     if (MovDelay[x][y] != 0)
@@ -9516,18 +9513,6 @@ void DrawTwinkleOnField(int x, int y)
 					   10 - MovDelay[x][y]);
 
       DrawGraphicThruMask(SCREENX(x), SCREENY(y), IMG_TWINKLE_WHITE, frame);
-
-      if (setup.direct_draw)
-      {
-	int dest_x, dest_y;
-
-	dest_x = FX + SCREENX(x) * TILEX;
-	dest_y = FY + SCREENY(y) * TILEY;
-
-	BlitBitmap(drawto_field, window,
-		   dest_x, dest_y, TILEX, TILEY, dest_x, dest_y);
-	SetDrawtoField(DRAW_DIRECT);
-      }
     }
   }
 }
