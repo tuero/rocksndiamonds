@@ -15,6 +15,7 @@
 #define ENGINES_H
 
 #include "libgame/libgame.h"
+#include "game_em/export.h"
 
 
 /* ========================================================================= */
@@ -34,8 +35,7 @@ extern void PlayLevelSound_EM(int, int, int, int);
 extern void InitGraphicInfo_EM(void);
 
 void SetGfxAnimation_EM(int, int, int, int);
-void getGraphicSourceObjectExt_EM(int, int, Bitmap **, int *, int *,
-				  Bitmap **, int *, int *, int, int);
+void getGraphicSourceObjectExt_EM(struct GraphicInfo_EM *, int, int, int, int);
 void getGraphicSourcePlayerExt_EM(int, int, int, Bitmap **, int *, int *);
 
 #endif	/* ENGINES_H */

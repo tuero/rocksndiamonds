@@ -5982,6 +5982,210 @@ void SetGfxAnimation_EM(int tile, int frame_em, int x, int y)
 #endif
 }
 
+#if 1
+
+int get_effective_element_EM(int tile, int frame)
+{
+  int i = tile;
+  int j = 7 - frame;
+
+  int element         = object_mapping[tile].element_rnd;
+  int action          = object_mapping[tile].action;
+  int direction       = object_mapping[tile].direction;
+  boolean is_backside = object_mapping[tile].is_backside;
+  boolean action_removing = (action == ACTION_DIGGING ||
+			     action == ACTION_SNAPPING ||
+			     action == ACTION_COLLECTING);
+#if 0
+  boolean action_exploding = ((action == ACTION_EXPLODING ||
+			       action == ACTION_SMASHED_BY_ROCK ||
+			       action == ACTION_SMASHED_BY_SPRING) &&
+			      element != EL_DIAMOND);
+  boolean action_active = (action == ACTION_ACTIVE);
+  boolean action_other = (action == ACTION_OTHER);
+#endif
+
+  {
+    {
+      int effective_element = (j > 5 && i == Yacid_splash_eB ? EL_EMPTY :
+			       j > 5 && i == Yacid_splash_wB ? EL_EMPTY :
+			       j < 7 ? element :
+			       i == Xdrip_stretch ? element :
+			       i == Xdrip_stretchB ? element :
+			       i == Ydrip_s1 ? element :
+			       i == Ydrip_s1B ? element :
+			       i == Xball_1B ? element :
+			       i == Xball_2 ? element :
+			       i == Xball_2B ? element :
+			       i == Yball_eat ? element :
+			       i == Ykey_1_eat ? element :
+			       i == Ykey_2_eat ? element :
+			       i == Ykey_3_eat ? element :
+			       i == Ykey_4_eat ? element :
+			       i == Ykey_5_eat ? element :
+			       i == Ykey_6_eat ? element :
+			       i == Ykey_7_eat ? element :
+			       i == Ykey_8_eat ? element :
+			       i == Ylenses_eat ? element :
+			       i == Ymagnify_eat ? element :
+			       i == Ygrass_eat ? element :
+			       i == Ydirt_eat ? element :
+			       i == Yemerald_stone ? EL_EMERALD :
+			       i == Ydiamond_stone ? EL_ROCK :
+			       i == Xsand_stonein_1 ? element :
+			       i == Xsand_stonein_2 ? element :
+			       i == Xsand_stonein_3 ? element :
+			       i == Xsand_stonein_4 ? element :
+			       is_backside ? EL_EMPTY :
+			       action_removing ? EL_EMPTY :
+			       element);
+
+      return effective_element;
+    }
+  }
+}
+
+void getGraphicSourceObjectExt_EM(struct GraphicInfo_EM *g_em,
+				  int tile, int frame_em, int x, int y)
+{
+  int element         = object_mapping[tile].element_rnd;
+  int action          = object_mapping[tile].action;
+  int direction       = object_mapping[tile].direction;
+  boolean is_backside = object_mapping[tile].is_backside;
+  boolean action_removing = (action == ACTION_DIGGING ||
+			     action == ACTION_SNAPPING ||
+			     action == ACTION_COLLECTING);
+#if 1
+  int effective_element = get_effective_element_EM(tile, frame_em);
+#else
+  int effective_element = (frame_em > 0 ? element :
+			   is_backside ? EL_EMPTY :
+			   action_removing ? EL_EMPTY :
+			   element);
+#endif
+  int graphic = (direction == MV_NONE ?
+		 el_act2img(effective_element, action) :
+		 el_act_dir2img(effective_element, action, direction));
+  int crumbled = (direction == MV_NONE ?
+		  el_act2crm(effective_element, action) :
+		  el_act_dir2crm(effective_element, action, direction));
+  int base_graphic = el_act2img(effective_element, ACTION_DEFAULT);
+  int base_crumbled = el_act2crm(effective_element, ACTION_DEFAULT);
+  boolean has_crumbled_graphics = (base_crumbled != base_graphic);
+  struct GraphicInfo *g = &graphic_info[graphic];
+  struct GraphicInfo *g_crumbled = &graphic_info[crumbled];
+  int sync_frame;
+
+#if 0
+  printf("::: GET: %d, %d: '%s'\n", x, y, EL_NAME(element));
+#endif
+
+#if 0
+  if (GfxFrame[x][y] < 8)
+    printf("::: %d, %d: %d [%s]\n", x, y, GfxFrame[x][y], EL_NAME(element));
+#endif
+
+#if 1
+  if (frame_em == 7)	/* reset animation frame for certain elements */
+  {
+    if (tile == Xboom_1 ||
+	tile == Xdynamite_1 ||
+	tile == Ybug_w_n ||
+	tile == Ybug_n_e ||
+	tile == Ybug_e_s ||
+	tile == Ybug_s_w ||
+	tile == Ybug_e_n ||
+	tile == Ybug_s_e ||
+	tile == Ybug_w_s ||
+	tile == Ybug_n_w ||
+	tile == Ytank_w_n ||
+	tile == Ytank_n_e ||
+	tile == Ytank_e_s ||
+	tile == Ytank_s_w ||
+	tile == Ytank_e_n ||
+	tile == Ytank_s_e ||
+	tile == Ytank_w_s ||
+	tile == Ytank_n_w)
+      GfxFrame[x][y] = 0;
+  }
+#endif
+
+#if 1
+  if (graphic_info[graphic].anim_global_sync)
+    sync_frame = FrameCounter;
+  else if (IN_FIELD(x, y, MAX_LEV_FIELDX, MAX_LEV_FIELDY))
+    sync_frame = GfxFrame[x][y];
+  else
+    sync_frame = 0;	/* steel border */
+#else
+  if (graphic_info[graphic].anim_global_sync)
+    sync_frame = FrameCounter;
+  else
+    sync_frame = 7 - frame_em;
+#endif
+
+  SetRandomAnimationValue(x, y);
+
+  int frame = getAnimationFrame(g->anim_frames,
+				g->anim_delay,
+				g->anim_mode,
+				g->anim_start_frame,
+				sync_frame);
+
+#if 0
+  if (graphic == IMG_DEFAULT_EXPLODING)
+    printf("::: IMG_DEFAULT_EXPLODING: (%d, %d), %d => %d [%d]\n",
+	   tile, frame_em, sync_frame, frame, Xboom_1);
+#endif
+
+  getGraphicSourceExt(graphic, frame, &g_em->bitmap,
+		      &g_em->src_x, &g_em->src_y, FALSE);
+
+#if 0
+  if (x == 1 && y == 1 && frame == 0)
+    printf("--> %d, %d, %d\n", *crumbled_src_x, *crumbled_src_y, tile);
+#endif
+
+#if 0
+  getGraphicSource(crumbled, frame, crumbled_src_bitmap,
+		   crumbled_src_x, crumbled_src_y);
+#endif
+
+#if 1
+  /* (updating the "crumbled" graphic definitions is probably not really needed,
+     as animations for crumbled graphics can't be longer than one EMC cycle) */
+
+#if 0
+  if (g_em->crumbled_bitmap != NULL &&
+      !(has_crumbled_graphics && crumbled != IMG_EMPTY_SPACE))
+    printf("::: CRUMBLED CHANGES FOR tile %d [%s] [%d]\n",
+	   tile, EL_NAME(element), Ydirt_eat);
+#endif
+
+  g_em->crumbled_bitmap = NULL;
+  g_em->crumbled_src_x = 0;
+  g_em->crumbled_src_y = 0;
+
+  g_em->has_crumbled_graphics = FALSE;
+
+  if (has_crumbled_graphics && crumbled != IMG_EMPTY_SPACE)
+  {
+    int frame_crumbled = getAnimationFrame(g_crumbled->anim_frames,
+					   g_crumbled->anim_delay,
+					   g_crumbled->anim_mode,
+					   g_crumbled->anim_start_frame,
+					   sync_frame);
+
+    getGraphicSource(crumbled, frame_crumbled, &g_em->crumbled_bitmap,
+		     &g_em->crumbled_src_x, &g_em->crumbled_src_y);
+
+    g_em->has_crumbled_graphics = TRUE;
+  }
+#endif
+}
+
+#else
+
 void getGraphicSourceObjectExt_EM(int tile, int frame_em,
 				  Bitmap **src_bitmap, int *src_x, int *src_y,
 				  Bitmap **crumbled_src_bitmap,
@@ -6022,6 +6226,30 @@ void getGraphicSourceObjectExt_EM(int tile, int frame_em,
 #endif
 
 #if 1
+  if (frame_em == 7)	/* reset animation frame for certain elements */
+  {
+    if (tile == Xboom_1 ||
+	tile == Ybug_w_n ||
+	tile == Ybug_n_e ||
+	tile == Ybug_e_s ||
+	tile == Ybug_s_w ||
+	tile == Ybug_e_n ||
+	tile == Ybug_s_e ||
+	tile == Ybug_w_s ||
+	tile == Ybug_n_w ||
+	tile == Ytank_w_n ||
+	tile == Ytank_n_e ||
+	tile == Ytank_e_s ||
+	tile == Ytank_s_w ||
+	tile == Ytank_e_n ||
+	tile == Ytank_s_e ||
+	tile == Ytank_w_s ||
+	tile == Ytank_n_w)
+      GfxFrame[x][y] = 0;
+  }
+#endif
+
+#if 1
   if (graphic_info[graphic].anim_global_sync)
     sync_frame = FrameCounter;
   else if (IN_FIELD(x, y, MAX_LEV_FIELDX, MAX_LEV_FIELDY))
@@ -6042,6 +6270,12 @@ void getGraphicSourceObjectExt_EM(int tile, int frame_em,
 				g->anim_mode,
 				g->anim_start_frame,
 				sync_frame);
+
+#if 0
+  if (graphic == IMG_DEFAULT_EXPLODING)
+    printf("::: IMG_DEFAULT_EXPLODING: (%d, %d), %d => %d [%d]\n",
+	   tile, frame_em, sync_frame, frame, Xboom_1);
+#endif
 
   getGraphicSourceExt(graphic, frame, src_bitmap, src_x, src_y, FALSE);
 
@@ -6076,6 +6310,8 @@ void getGraphicSourceObjectExt_EM(int tile, int frame_em,
   }
 #endif
 }
+
+#endif
 
 void getGraphicSourcePlayerExt_EM(int player_nr, int anim, int frame_em,
 				  Bitmap **src_bitmap, int *src_x, int *src_y)
@@ -6463,7 +6699,9 @@ void InitGraphicInfo_EM(void)
 		 frame);
 #endif
 
-
+#if 0
+	printf("::: EMC tile %d is crumbled\n", i);
+#endif
       }
 
 #if 0

@@ -6,6 +6,7 @@
 	  triggering player bit mask and handling all players in "move player"
 	* fixed bug when defined artwork cannot be found for artwork that has
 	  default artwork cloned from other artwork (without default filename)
+	* added several fixes to the extended (R'n'D based) EMC graphics engine
 
 2007-08-26
 	* fixed broken editor copy and paste for custom elements between levels
