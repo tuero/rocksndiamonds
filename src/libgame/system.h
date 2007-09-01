@@ -987,6 +987,7 @@ struct FileInfo
 
   boolean redefined;
   boolean fallback_to_default;
+  boolean default_is_cloned;
 };
 
 struct SetupFileList

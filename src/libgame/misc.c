@@ -1992,6 +1992,7 @@ struct FileInfo *getFileListFromConfigList(struct ConfigInfo *config_list,
 
       file_list[i].redefined = FALSE;
       file_list[i].fallback_to_default = FALSE;
+      file_list[i].default_is_cloned = FALSE;
     }
   }
 
@@ -2048,6 +2049,9 @@ struct FileInfo *getFileListFromConfigList(struct ConfigInfo *config_list,
       printf("::: '%s' => '%s'\n", config_list[i].token, config_list[i].value);
 #endif
     }
+
+    if (strSuffix(config_list[i].token, ".clone_from"))
+      file_list[list_pos].default_is_cloned = TRUE;
   }
 
   num_file_list_entries_found = list_pos + 1;
@@ -2156,6 +2160,7 @@ static void add_dynamic_file_list_entry(struct FileInfo **list,
 
   new_list_entry->redefined = FALSE;
   new_list_entry->fallback_to_default = FALSE;
+  new_list_entry->default_is_cloned = FALSE;
 
   read_token_parameters(extra_file_hash, suffix_list, new_list_entry);
 }
@@ -2708,6 +2713,22 @@ static void replaceArtworkListEntry(struct ArtworkListInfo *artwork_info,
 
     basename = file_list_entry->default_filename;
 
+    /* fail for cloned default artwork that has no default filename defined */
+    if (file_list_entry->default_is_cloned &&
+	strEqual(basename, UNDEFINED_FILENAME))
+    {
+      int error_mode = ERR_WARN;
+
+      /* we can get away without sounds and music, but not without graphics */
+      if (*listnode == NULL && artwork_info->type == ARTWORK_TYPE_GRAPHICS)
+	error_mode = ERR_EXIT;
+
+      Error(error_mode, "token '%s' was cloned and has no default filename",
+	    file_list_entry->token);
+
+      return;
+    }
+
     /* dynamic artwork has no default filename / skip empty default artwork */
     if (basename == NULL || strEqual(basename, UNDEFINED_FILENAME))
       return;
@@ -2784,6 +2805,7 @@ static void replaceArtworkListEntry(struct ArtworkListInfo *artwork_info,
       error_mode = ERR_EXIT;
 
     Error(error_mode, "cannot load artwork file '%s'", basename);
+
     return;
   }
 }
