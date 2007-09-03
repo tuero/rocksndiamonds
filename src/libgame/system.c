@@ -267,17 +267,24 @@ void SetBackgroundBitmap(Bitmap *background_bitmap_tile, int mask)
 
 void SetWindowBackgroundBitmap(Bitmap *background_bitmap_tile)
 {
+  /* remove every mask before setting mask for window */
+  /* (!!! TO BE FIXED: The whole REDRAW_* system really sucks! !!!) */
+  SetBackgroundBitmap(NULL, 0xffff);		/* !!! FIX THIS !!! */
   SetBackgroundBitmap(background_bitmap_tile, REDRAW_ALL);
 }
 
 void SetMainBackgroundBitmap(Bitmap *background_bitmap_tile)
 {
+  /* remove window area mask before setting mask for main area */
+  /* (!!! TO BE FIXED: The whole REDRAW_* system really sucks! !!!) */
   SetBackgroundBitmap(NULL, REDRAW_ALL);	/* !!! FIX THIS !!! */
   SetBackgroundBitmap(background_bitmap_tile, REDRAW_FIELD);
 }
 
 void SetDoorBackgroundBitmap(Bitmap *background_bitmap_tile)
 {
+  /* remove window area mask before setting mask for door area */
+  /* (!!! TO BE FIXED: The whole REDRAW_* system really sucks! !!!) */
   SetBackgroundBitmap(NULL, REDRAW_ALL);	/* !!! FIX THIS !!! */
   SetBackgroundBitmap(background_bitmap_tile, REDRAW_DOOR_1);
 }

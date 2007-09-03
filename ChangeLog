@@ -1,3 +1,6 @@
+2007-09-03
+	* fixed bug with displaying background for title messages on info screen
+
 2007-09-01
 	* fixed bug with CE action "move player" always resulting in player 4
 	  if there was a CE action with no trigger player (because the player
