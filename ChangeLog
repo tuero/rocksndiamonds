@@ -1,5 +1,6 @@
 2007-09-03
 	* fixed bug with displaying background for title messages on info screen
+	* some code cleanup for the extended (R'n'D based) EMC graphics engine
 
 2007-09-01
 	* fixed bug with CE action "move player" always resulting in player 4

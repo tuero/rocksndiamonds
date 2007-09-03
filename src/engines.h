@@ -36,6 +36,6 @@ extern void InitGraphicInfo_EM(void);
 
 void SetGfxAnimation_EM(int, int, int, int);
 void getGraphicSourceObjectExt_EM(struct GraphicInfo_EM *, int, int, int, int);
-void getGraphicSourcePlayerExt_EM(int, int, int, Bitmap **, int *, int *);
+void getGraphicSourcePlayerExt_EM(struct GraphicInfo_EM *, int, int, int);
 
 #endif	/* ENGINES_H */

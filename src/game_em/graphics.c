@@ -149,25 +149,8 @@ static struct GraphicInfo_EM *getObjectGraphic(int x, int y)
   int tile = Draw[y][x];
   struct GraphicInfo_EM *g = &graphic_info_em_object[tile][frame];
 
-#if 0
-  int foo = (int)g->crumbled_bitmap;
-#endif
-
-#if 1
   if (!game.use_native_emc_graphics_engine)
-    getGraphicSourceObjectExt_EM(g, tile, frame, x - 2, y - 2);
-#else
-  if (!game.use_native_emc_graphics_engine)
-    getGraphicSourceObjectExt_EM(tile, frame, &g->bitmap, &g->src_x, &g->src_y,
-				 &g->crumbled_bitmap,
-				 &g->crumbled_src_x, &g->crumbled_src_y,
-				 x - 2, y - 2);
-#endif
-
-#if 0
-  if (foo != g->crumbled_bitmap)
-    printf("::: tile %d, %08x --> %08x\n", tile, foo, g->crumbled_bitmap);
-#endif
+    getGraphicSourceObjectExt_EM(g, tile, 7 - frame, x - 2, y - 2);
 
   return g;
 }
@@ -177,8 +160,8 @@ static struct GraphicInfo_EM *getPlayerGraphic(int player_nr, int anim)
   struct GraphicInfo_EM *g = &graphic_info_em_player[player_nr][anim][frame];
 
   if (!game.use_native_emc_graphics_engine)
-    getGraphicSourcePlayerExt_EM(player_nr, anim, frame,
-				 &g->bitmap, &g->src_x, &g->src_y);
+    getGraphicSourcePlayerExt_EM(g, player_nr, anim, 7 - frame);
+
   return g;
 }
 
@@ -371,7 +354,7 @@ static void animscreen(void)
   if (!game.use_native_emc_graphics_engine)
     for (y = 2; y < EM_MAX_CAVE_HEIGHT - 2; y++)
       for (x = 2; x < EM_MAX_CAVE_WIDTH - 2; x++)
-	SetGfxAnimation_EM(Draw[y][x], frame, x - 2, y - 2);
+	SetGfxAnimation_EM(Draw[y][x], 7 - frame, x - 2, y - 2);
 
   for (y = top; y < top + MAX_BUF_YSIZE; y++)
   {
