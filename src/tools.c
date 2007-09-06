@@ -4796,6 +4796,24 @@ em_object_mapping_list[] =
     Xsand_stonein_4,			FALSE,	TRUE,
     EL_ROCK,				ACTION_FILLING, -1
   },
+#if 1
+  {
+    Xsand_stonesand_1,			FALSE,	FALSE,
+    EL_QUICKSAND_EMPTYING,		-1, -1
+  },
+  {
+    Xsand_stonesand_2,			FALSE,	FALSE,
+    EL_QUICKSAND_EMPTYING,		-1, -1
+  },
+  {
+    Xsand_stonesand_3,			FALSE,	FALSE,
+    EL_QUICKSAND_EMPTYING,		-1, -1
+  },
+  {
+    Xsand_stonesand_4,			FALSE,	FALSE,
+    EL_QUICKSAND_EMPTYING,		-1, -1
+  },
+#else
   {
     Xsand_stonesand_1,			FALSE,	FALSE,
     EL_QUICKSAND_FULL,			-1, -1
@@ -4812,6 +4830,7 @@ em_object_mapping_list[] =
     Xsand_stonesand_4,			FALSE,	FALSE,
     EL_QUICKSAND_FULL,			-1, -1
   },
+#endif
   {
     Xsand_stoneout_1,			FALSE,	FALSE,
     EL_ROCK,				ACTION_EMPTYING, -1
@@ -4820,6 +4839,24 @@ em_object_mapping_list[] =
     Xsand_stoneout_2,			FALSE,	FALSE,
     EL_ROCK,				ACTION_EMPTYING, -1
   },
+#if 1
+  {
+    Xsand_sandstone_1,			FALSE,	FALSE,
+    EL_QUICKSAND_FILLING,		-1, -1
+  },
+  {
+    Xsand_sandstone_2,			FALSE,	FALSE,
+    EL_QUICKSAND_FILLING,		-1, -1
+  },
+  {
+    Xsand_sandstone_3,			FALSE,	FALSE,
+    EL_QUICKSAND_FILLING,		-1, -1
+  },
+  {
+    Xsand_sandstone_4,			FALSE,	FALSE,
+    EL_QUICKSAND_FILLING,		-1, -1
+  },
+#else
   {
     Xsand_sandstone_1,			FALSE,	FALSE,
     EL_QUICKSAND_FULL,			-1, -1
@@ -4836,6 +4873,7 @@ em_object_mapping_list[] =
     Xsand_sandstone_4,			FALSE,	FALSE,
     EL_QUICKSAND_FULL,			-1, -1
   },
+#endif
   {
     Xplant,				TRUE,	FALSE,
     EL_EMC_PLANT,			-1, -1
@@ -5985,6 +6023,8 @@ inline static boolean check_linear_animation_EM(int tile)
 {
   switch (tile)
   {
+    case Xsand_stonesand_1:
+    case Xsand_sandstone_1:
     case Xboom_1:
     case Xdynamite_1:
     case Ybug_w_n:
