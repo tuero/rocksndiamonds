@@ -7066,6 +7066,12 @@ void DrawLevelEd()
   BlitBitmap(drawto, bitmap_db_door,
 	     DX, DY, DXSIZE, DYSIZE, DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1);
 
+#if 1
+  /* draw new control window (with border) to window */
+  redraw_mask |= REDRAW_ALL;
+  BackToFront();
+#endif
+
   OpenDoor(DOOR_OPEN_1);
 }
 

@@ -354,7 +354,8 @@ static void animscreen(void)
   if (!game.use_native_emc_graphics_engine)
     for (y = 2; y < EM_MAX_CAVE_HEIGHT - 2; y++)
       for (x = 2; x < EM_MAX_CAVE_WIDTH - 2; x++)
-	SetGfxAnimation_EM(Draw[y][x], 7 - frame, x - 2, y - 2);
+	SetGfxAnimation_EM(&graphic_info_em_object[Draw[y][x]][frame],
+			   Draw[y][x], 7 - frame, x - 2, y - 2);
 
   for (y = top; y < top + MAX_BUF_YSIZE; y++)
   {
@@ -391,9 +392,11 @@ static void animscreen(void)
       redraw_screen_tile = (screentiles[sy][sx]    != obj ||
 			    crumbled_state[sy][sx] != crm);
 
+#if 0
       /* !!! TEST ONLY -- CHANGE THIS !!! */
       if (!game.use_native_emc_graphics_engine)
 	redraw_screen_tile = TRUE;
+#endif
 
       /* only redraw screen tiles if they (or their crumbled state) changed */
       if (redraw_screen_tile)

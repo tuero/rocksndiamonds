@@ -1,3 +1,7 @@
+2007-09-07
+	* fixed (experimental only) redrawing of every tile per frame (even if
+	  unneeded) for the extended (R'n'D based) EMC graphics engine
+
 2007-09-03
 	* fixed bug with displaying background for title messages on info screen
 	* some code cleanup for the extended (R'n'D based) EMC graphics engine

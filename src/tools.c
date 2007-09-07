@@ -6091,9 +6091,19 @@ void ResetGfxAnimation_EM(int x, int y, int tile)
   GfxFrame[x][y] = 0;
 }
 
-void SetGfxAnimation_EM(int tile, int frame_em, int x, int y)
+void SetGfxAnimation_EM(struct GraphicInfo_EM *g_em,
+			int tile, int frame_em, int x, int y)
 {
   int action = object_mapping[tile].action;
+#if 1
+  int direction = object_mapping[tile].direction;
+  int effective_element = get_effective_element_EM(tile, frame_em);
+  int graphic = (direction == MV_NONE ?
+		 el_act2img(effective_element, action) :
+		 el_act_dir2img(effective_element, action, direction));
+  struct GraphicInfo *g = &graphic_info[graphic];
+  int sync_frame;
+#endif
   boolean action_removing = (action == ACTION_DIGGING ||
 			     action == ACTION_SNAPPING ||
 			     action == ACTION_COLLECTING);
@@ -6136,13 +6146,33 @@ void SetGfxAnimation_EM(int tile, int frame_em, int x, int y)
   {
     GfxFrame[x][y]++;
   }
+
+#if 1
+  if (graphic_info[graphic].anim_global_sync)
+    sync_frame = FrameCounter;
+  else if (IN_FIELD(x, y, MAX_LEV_FIELDX, MAX_LEV_FIELDY))
+    sync_frame = GfxFrame[x][y];
+  else
+    sync_frame = 0;	/* playfield border (pseudo steel) */
+
+  SetRandomAnimationValue(x, y);
+
+  int frame = getAnimationFrame(g->anim_frames,
+				g->anim_delay,
+				g->anim_mode,
+				g->anim_start_frame,
+				sync_frame);
+
+  g_em->unique_identifier =
+    (graphic << 16) | ((frame % 8) << 12) | (g_em->width << 6) | g_em->height;
+#endif
 }
 
 void getGraphicSourceObjectExt_EM(struct GraphicInfo_EM *g_em,
 				  int tile, int frame_em, int x, int y)
 {
-  int action          = object_mapping[tile].action;
-  int direction       = object_mapping[tile].direction;
+  int action = object_mapping[tile].action;
+  int direction = object_mapping[tile].direction;
   int effective_element = get_effective_element_EM(tile, frame_em);
   int graphic = (direction == MV_NONE ?
 		 el_act2img(effective_element, action) :
