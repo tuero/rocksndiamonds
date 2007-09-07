@@ -2111,7 +2111,16 @@ void InitGameControlValues()
 
 void UpdatePlayfieldElementCount()
 {
+  boolean use_element_count = FALSE;
   int i, j, x, y;
+
+  /* first check if it is needed at all to calculate playfield element count */
+  for (i = GAME_PANEL_ELEMENT_COUNT_1; i <= GAME_PANEL_ELEMENT_COUNT_8; i++)
+    if (!PANEL_DEACTIVATED(game_panel_controls[i].pos))
+      use_element_count = TRUE;
+
+  if (!use_element_count)
+    return;
 
   for (i = 0; i < MAX_NUM_ELEMENTS; i++)
     element_info[i].element_count = 0;
@@ -2342,8 +2351,7 @@ void UpdateGameControlValues()
   for (i = 0; i < NUM_PANEL_ELEMENTS; i++)
     game_panel_controls[GAME_PANEL_ELEMENT_COUNT_1 + i].value =
       (IS_VALID_ELEMENT(game.panel.element_count[i].id) ?
-       element_info[game.panel.element_count[i].id].element_count :
-       EL_UNDEFINED);
+       element_info[game.panel.element_count[i].id].element_count : 0);
 
   for (i = 0; i < NUM_PANEL_CE_SCORE; i++)
     game_panel_controls[GAME_PANEL_CE_SCORE_1 + i].value =
