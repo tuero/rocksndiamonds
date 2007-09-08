@@ -3,6 +3,7 @@
 	  unneeded) for the extended (R'n'D based) EMC graphics engine
 	* added optimization to only calculate element count for panel display
 	  if really needed (that is, if element count values defined on panel)
+	* fixed problem with special editor door redraw when entering main menu
 
 2007-09-03
 	* fixed bug with displaying background for title messages on info screen
