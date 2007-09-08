@@ -1269,6 +1269,8 @@ void DrawMainMenuExt(int fade_mask, boolean do_fading)
 
   /* needed if last screen was the editor screen */
   UndrawSpecialEditorDoor();
+  if (fade_mask == REDRAW_FIELD)
+    BackToFront();
 #endif
 
 #if defined(TARGET_SDL)

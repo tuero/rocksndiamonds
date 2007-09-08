@@ -12488,7 +12488,7 @@ void ScrollLevel(int dx, int dy)
 
 #else
 
-#if 1
+#if 0
   /* !!! DOES NOT WORK FOR DIAGONAL PLAYER RELOCATION !!! */
   int xsize = (BX2 - BX1 + 1);
   int ysize = (BY2 - BY1 + 1);
