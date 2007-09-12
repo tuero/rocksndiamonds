@@ -2662,6 +2662,15 @@ void DisplayGameControlValues()
   game_status = GAME_MODE_PLAYING;
 }
 
+void UpdateAndDisplayGameControlValues()
+{
+  if (tape.warp_forward)
+    return;
+
+  UpdateGameControlValues();
+  DisplayGameControlValues();
+}
+
 void DrawGameValue_Emeralds(int value)
 {
   struct TextPosInfo *pos = &game.panel.gems;
@@ -4213,8 +4222,12 @@ void InitGame()
   SetPanelBackground();
   SetDrawBackgroundMask(REDRAW_DOOR_1);
 
+#if 1
+  UpdateAndDisplayGameControlValues();
+#else
   UpdateGameDoorValues();
   DrawGameDoorValues();
+#endif
 
   if (!game.restart_level)
   {
@@ -11421,8 +11434,12 @@ static void CheckLevelTime()
       DrawVideoDisplay(VIDEO_STATE_TIME_ON, TapeTime);
   }
 
+#if 1
+  UpdateAndDisplayGameControlValues();
+#else
   UpdateGameDoorValues();
   DrawGameDoorValues();
+#endif
 }
 
 void AdvanceFrameAndPlayerCounters(int player_nr)

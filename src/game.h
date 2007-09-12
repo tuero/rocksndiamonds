@@ -307,6 +307,8 @@ int GetElementFromGroupElement(int);
 void DrawGameValue_Time(int);
 void DrawGameDoorValues(void);
 
+void UpdateAndDisplayGameControlValues();
+
 void InitGameSound();
 void InitGame();
 

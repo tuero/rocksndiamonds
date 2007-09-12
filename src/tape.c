@@ -566,6 +566,10 @@ static void TapeAppendRecording()
 
   DrawVideoDisplay(VIDEO_STATE_DATE_ON, tape.date);
   DrawVideoDisplay(VIDEO_STATE_PLAY_OFF | VIDEO_STATE_REC_ON, 0);
+
+#if 1
+  UpdateAndDisplayGameControlValues();
+#endif
 }
 
 void TapeHaltRecording()

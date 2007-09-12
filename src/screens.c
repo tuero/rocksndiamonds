@@ -1269,8 +1269,10 @@ void DrawMainMenuExt(int fade_mask, boolean do_fading)
 
   /* needed if last screen was the editor screen */
   UndrawSpecialEditorDoor();
+#if 0
   if (fade_mask == REDRAW_FIELD)
     BackToFront();
+#endif
 #endif
 
 #if defined(TARGET_SDL)
@@ -1345,6 +1347,12 @@ void DrawMainMenuExt(int fade_mask, boolean do_fading)
 
   FadeIn(fade_mask);
   FadeSetEnterMenu();
+
+#if 1
+  /* update screen area with special editor door */
+  redraw_mask |= REDRAW_ALL;
+  BackToFront();
+#endif
 
   SetMouseCursor(CURSOR_DEFAULT);
 

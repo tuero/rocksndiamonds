@@ -1,3 +1,6 @@
+2007-09-12
+	* fixed some problems with displaying game panel when quick-loading tape
+
 2007-09-07
 	* fixed (experimental only) redrawing of every tile per frame (even if
 	  unneeded) for the extended (R'n'D based) EMC graphics engine

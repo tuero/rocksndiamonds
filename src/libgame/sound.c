@@ -1559,6 +1559,8 @@ static void *Load_WAV(char *filename)
 
 #else /* AUDIO_UNIX_NATIVE */
 
+  clear_mem(&header, sizeof(struct SoundHeader_WAV));	/* to make gcc happy */
+
   if ((file = fopen(filename, MODE_READ)) == NULL)
   {
     Error(ERR_WARN, "cannot open sound file '%s'", filename);
