@@ -125,21 +125,64 @@ void DrawAnim(Bitmap *toon_bitmap, GC toon_clip_gc,
 	      int src_x, int src_y, int width, int height,
 	      int dest_x, int dest_y, int pad_x, int pad_y)
 {
-  int buf_x = DOOR_GFX_PAGEX3, buf_y = DOOR_GFX_PAGEY1;
+  int pad_dest_x = dest_x - pad_x;
+  int pad_dest_y = dest_y - pad_y;
+  int pad_width  = width  + 2 * pad_x;
+  int pad_height = height + 2 * pad_y;
+#if 1
+  int buffer_x = 0;
+  int buffer_y = 0;
+#else
+  int buffer_x = DOOR_GFX_PAGEX3;
+  int buffer_y = DOOR_GFX_PAGEY1;
+#endif
+
+#if 0
+  printf("::: (%d, %d), (%d, %d), (%d, %d), (%d, %d) -> (%d, %d), (%d, %d), (%d, %d)\n",
+	 src_x, src_y,
+	 width, height,
+	 dest_x, dest_y,
+	 pad_x, pad_y,
+
+	 pad_dest_x, pad_dest_y,
+	 pad_width, pad_height,
+	 buffer_x, buffer_y);
+#endif
+
+  if (width == 0 || height == 0)
+    return;
+
+  /* correct values to avoid off-screen blitting (start position) */
+  if (pad_dest_x < screen_info.startx)
+  {
+    pad_width -= (screen_info.startx - pad_dest_x);
+    pad_dest_x = screen_info.startx;
+  }
+  if (pad_dest_y < screen_info.starty)
+  {
+    pad_height -= (screen_info.starty - pad_dest_y);
+    pad_dest_y = screen_info.starty;
+  }
+
+  /* correct values to avoid off-screen blitting (blit size) */
+  if (pad_width > screen_info.width)
+    pad_width = screen_info.width;
+  if (pad_height > screen_info.height)
+    pad_height = screen_info.height;
 
   /* special method to avoid flickering interference with BackToFront() */
-  BlitBitmap(backbuffer, screen_info.save_buffer, dest_x-pad_x, dest_y-pad_y,
-	     width+2*pad_x, height+2*pad_y, buf_x, buf_y);
-  SetClipOrigin(toon_bitmap, toon_clip_gc, dest_x-src_x, dest_y-src_y);
-  BlitBitmapMasked(toon_bitmap, backbuffer,
-		   src_x, src_y, width, height, dest_x, dest_y);
-  BlitBitmap(backbuffer, window, dest_x-pad_x, dest_y-pad_y,
-	     width+2*pad_x, height+2*pad_y, dest_x-pad_x, dest_y-pad_y);
+  BlitBitmap(backbuffer, screen_info.save_buffer, pad_dest_x, pad_dest_y,
+	     pad_width, pad_height, buffer_x, buffer_y);
+  SetClipOrigin(toon_bitmap, toon_clip_gc, dest_x - src_x, dest_y - src_y);
+  BlitBitmapMasked(toon_bitmap, backbuffer, src_x, src_y, width, height,
+		   dest_x, dest_y);
+  BlitBitmap(backbuffer, window, pad_dest_x, pad_dest_y, pad_width, pad_height,
+	     pad_dest_x, pad_dest_y);
 
   screen_info.update_function();
 
-  BlitBitmap(screen_info.save_buffer, backbuffer, buf_x, buf_y,
-	    width+2*pad_x, height+2*pad_y, dest_x-pad_x, dest_y-pad_y);
+  BlitBitmap(screen_info.save_buffer, backbuffer, buffer_x, buffer_y,
+	     pad_width, pad_height, pad_dest_x, pad_dest_y);
 
   FlushDisplay();
 }
@@ -220,7 +263,7 @@ boolean AnimateToon(int toon_nr, boolean restart)
       else
       {
 	delta_y = -anim->step_offset;
-	pos_y = screen_info.width + delta_y;
+	pos_y = screen_info.height + delta_y;
       }
 
       delta_x = 0;

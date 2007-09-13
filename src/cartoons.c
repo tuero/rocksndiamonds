@@ -80,7 +80,11 @@ void InitToons()
     toons[i].position = image->parameter[GFX_ARG_POSITION];
   }
 
+#if 1
+  InitToonScreen(bitmap_db_toons,
+#else
   InitToonScreen(bitmap_db_door,
+#endif
 		 BackToFront, PrepareBackbuffer, ToonNeedsRedraw,
 		 toons, num_toons,
 		 REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE,

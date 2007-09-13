@@ -1949,8 +1949,8 @@
 /* program information and versioning definitions */
 #define PROGRAM_VERSION_MAJOR		3
 #define PROGRAM_VERSION_MINOR		2
-#define PROGRAM_VERSION_PATCH		5
-#define PROGRAM_VERSION_BUILD		0
+#define PROGRAM_VERSION_PATCH		4
+#define PROGRAM_VERSION_BUILD		3
 
 #define PROGRAM_TITLE_STRING		"Rocks'n'Diamonds"
 #define PROGRAM_AUTHOR_STRING		"Holger Schemel"
@@ -2686,6 +2686,7 @@ extern Bitmap		       *bitmap_db_cross;
 extern Bitmap		       *bitmap_db_field;
 extern Bitmap		       *bitmap_db_panel;
 extern Bitmap		       *bitmap_db_door;
+extern Bitmap		       *bitmap_db_toons;
 extern Pixmap			tile_clipmask[];
 extern DrawBuffer	       *fieldbuffer;
 extern DrawBuffer	       *drawto_field;
