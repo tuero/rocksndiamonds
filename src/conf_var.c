@@ -2749,6 +2749,38 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.score.sort_priority
   },
   {
+    "game.panel.highscore.x",
+    &game.panel.highscore.x
+  },
+  {
+    "game.panel.highscore.y",
+    &game.panel.highscore.y
+  },
+  {
+    "game.panel.highscore.align",
+    &game.panel.highscore.align
+  },
+  {
+    "game.panel.highscore.valign",
+    &game.panel.highscore.valign
+  },
+  {
+    "game.panel.highscore.digits",
+    &game.panel.highscore.size
+  },
+  {
+    "game.panel.highscore.font",
+    &game.panel.highscore.font
+  },
+  {
+    "game.panel.highscore.draw_masked",
+    &game.panel.highscore.draw_masked
+  },
+  {
+    "game.panel.highscore.draw_order",
+    &game.panel.highscore.sort_priority
+  },
+  {
     "game.panel.time.x",
     &game.panel.time.x
   },

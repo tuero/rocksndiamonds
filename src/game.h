@@ -42,6 +42,7 @@ struct GamePanelInfo
   struct TextPosInfo key_white;
   struct TextPosInfo key_white_count;
   struct TextPosInfo score;
+  struct TextPosInfo highscore;
   struct TextPosInfo time;
   struct TextPosInfo time_hh;
   struct TextPosInfo time_mm;

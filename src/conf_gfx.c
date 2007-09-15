@@ -5752,6 +5752,15 @@ struct ConfigInfo image_config[] =
   { "game.panel.score.draw_masked",		"true"			},
   { "game.panel.score.draw_order",		"0"			},
 
+  { "game.panel.highscore.x",			"-1"			},
+  { "game.panel.highscore.y",			"-1"			},
+  { "game.panel.highscore.align",		"left"			},
+  { "game.panel.highscore.valign",		"top"			},
+  { "game.panel.highscore.digits",		"5"			},
+  { "game.panel.highscore.font",		"font.text_2"		},
+  { "game.panel.highscore.draw_masked",		"true"			},
+  { "game.panel.highscore.draw_order",		"0"			},
+
   { "game.panel.time.x",			"50"			},
   { "game.panel.time.y",			"194"			},
   { "game.panel.time.align",			"center"		},

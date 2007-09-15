@@ -149,9 +149,6 @@ void DrawAnim(Bitmap *toon_bitmap, GC toon_clip_gc,
 	 buffer_x, buffer_y);
 #endif
 
-  if (width == 0 || height == 0)
-    return;
-
   /* correct values to avoid off-screen blitting (start position) */
   if (pad_dest_x < screen_info.startx)
   {

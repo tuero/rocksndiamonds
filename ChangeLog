@@ -1,3 +1,10 @@
+2007-09-16
+	* fixed small bug in toon drawing (introduced when fixing the crash bug)
+
+2007-09-15
+	* added graphics definition "game.panel.highscore" to display the
+	  current levels current high score in the game panel
+
 2007-09-13
 	* version number set to 3.2.5
 

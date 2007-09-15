@@ -10300,7 +10300,10 @@ static void HandleCounterButtons(struct GadgetInfo *gi)
   if (counter_id == ED_COUNTER_ID_SELECT_LEVEL)
   {
       LoadLevel(level_nr);
+      LoadScore(level_nr);
+
       TapeErase();
+
       ResetUndoBuffer();
       DrawEditModeWindow();
 

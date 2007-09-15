@@ -1293,6 +1293,7 @@ void DrawMainMenuExt(int fade_mask, boolean do_fading)
     level_nr = leveldir_current->handicap_level;
 
   LoadLevel(level_nr);
+  LoadScore(level_nr);
 
   SetMainBackgroundImage(IMG_BACKGROUND_MAIN);
 
