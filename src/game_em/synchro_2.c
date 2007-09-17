@@ -4716,6 +4716,16 @@ void synchro_2(void)
   	case Xacid_6:
   	case Xacid_7:
   	case Xacid_8:
+#if 1
+  	  Cave[y][x] = Xsand_stonesand_quickout_1;
+  	  if (Cave[y][x+1] == Xblank)
+	    Cave[y][x+1] = Yacid_splash_eB;
+  	  if (Cave[y][x-1] == Xblank)
+	    Cave[y][x-1] = Yacid_splash_wB;
+  	  Next[y][x] = Xsand_stonesand_quickout_2;
+  	  play_element_sound(x, y, SAMPLE_acid, Xacid_1);
+  	  goto loop;
+#else
   	  Cave[y][x] = Xsand_stonesand_3;
   	  if (Cave[y][x+1] == Xblank)
 	    Cave[y][x+1] = Yacid_splash_eB;
@@ -4724,15 +4734,24 @@ void synchro_2(void)
   	  Next[y][x] = Xsand_stonesand_4;
   	  play_element_sound(x, y, SAMPLE_acid, Xacid_1);
   	  goto loop;
+#endif
 
   	case Xblank:
   	case Yacid_splash_eB:
   	case Yacid_splash_wB:
+#if 1
+  	  Cave[y][x] = Xsand_stonesand_quickout_1;
+  	  Cave[y+1][x] = Xsand_stoneout_1;
+  	  Next[y][x] = Xsand_stonesand_quickout_2;
+  	  Next[y+1][x] = Xsand_stoneout_2;
+  	  goto loop;
+#else
   	  Cave[y][x] = Xsand_stonesand_3;
   	  Cave[y+1][x] = Xsand_stoneout_1;
   	  Next[y][x] = Xsand_stonesand_4;
   	  Next[y+1][x] = Xsand_stoneout_2;
   	  goto loop;
+#endif
 
   	case Xsand:
   	  Cave[y][x] = Xsand_stonesand_1;
@@ -4776,6 +4795,16 @@ void synchro_2(void)
     case Xsand_stonesand_4:
       Next[y][x] = Xsand;
       goto loop;
+
+#if 1
+    case Xsand_stonesand_quickout_1:
+      Next[y][x] = Xsand_stonesand_quickout_2;
+      goto loop;
+
+    case Xsand_stonesand_quickout_2:
+      Next[y][x] = Xsand;
+      goto loop;
+#endif
 
     case Xsand_stoneout_1:
       Next[y][x] = Xsand_stoneout_2;

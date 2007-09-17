@@ -353,6 +353,12 @@ enum
   Xsand_stonesand_2,
   Xsand_stonesand_3,
   Xsand_stonesand_4,
+
+#ifdef EM_ENGINE_USE_ADDITIONAL_ELEMENTS
+  Xsand_stonesand_quickout_1,
+  Xsand_stonesand_quickout_2,
+#endif
+
   Xsand_stoneout_1,
   Xsand_stoneout_2,
   Xsand_sandstone_1,

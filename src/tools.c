@@ -4813,6 +4813,14 @@ em_object_mapping_list[] =
     Xsand_stonesand_4,			FALSE,	FALSE,
     EL_QUICKSAND_EMPTYING,		-1, -1
   },
+  {
+    Xsand_stonesand_quickout_1,		FALSE,	FALSE,
+    EL_QUICKSAND_EMPTYING,		-1, -1
+  },
+  {
+    Xsand_stonesand_quickout_2,		FALSE,	FALSE,
+    EL_QUICKSAND_EMPTYING,		-1, -1
+  },
 #else
   {
     Xsand_stonesand_1,			FALSE,	FALSE,
@@ -6024,7 +6032,10 @@ inline static boolean check_linear_animation_EM(int tile)
   switch (tile)
   {
     case Xsand_stonesand_1:
+    case Xsand_stonesand_quickout_1:
     case Xsand_sandstone_1:
+    case Xsand_stonein_1:
+    case Xsand_stoneout_1:
     case Xboom_1:
     case Xdynamite_1:
     case Ybug_w_n:
@@ -6117,10 +6128,29 @@ void SetGfxAnimation_EM(struct GraphicInfo_EM *g_em,
 			     action == ACTION_FILLING ||
 			     action == ACTION_EMPTYING);
 
+#if 0
+  if (tile == Xsand_stonesand_1 ||
+      tile == Xsand_stonesand_2 ||
+      tile == Xsand_stonesand_3 ||
+      tile == Xsand_stonesand_4)
+    printf("::: 1: quicksand frame %d [%d]\n", GfxFrame[x][y], tile);
+#endif
+
+#if 1
+  if ((action_removing || check_linear_animation_EM(tile)) && frame_em == 0)
+  {
+    GfxFrame[x][y] = 0;
+
+    // printf("::: resetting... [%d]\n", tile);
+  }
+#else
   if (action_removing || check_linear_animation_EM(tile))
   {
     GfxFrame[x][y] = frame_em;
+
+    // printf("::: resetting... [%d]\n", tile);
   }
+#endif
   else if (action_moving)
   {
     boolean is_backside = object_mapping[tile].is_backside;
@@ -6145,7 +6175,20 @@ void SetGfxAnimation_EM(struct GraphicInfo_EM *g_em,
   else
   {
     GfxFrame[x][y]++;
+
+    /* special case: animation for Xsand_stonesand_quickout_1/2 twice as fast */
+    if (tile == Xsand_stonesand_quickout_1 ||
+	tile == Xsand_stonesand_quickout_2)
+      GfxFrame[x][y]++;
   }
+
+#if 0
+  if (tile == Xsand_stonesand_1 ||
+      tile == Xsand_stonesand_2 ||
+      tile == Xsand_stonesand_3 ||
+      tile == Xsand_stonesand_4)
+    printf("::: 2: quicksand frame %d [%d]\n", GfxFrame[x][y], tile);
+#endif
 
 #if 1
   if (graphic_info[graphic].anim_global_sync)

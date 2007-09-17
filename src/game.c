@@ -8662,7 +8662,7 @@ void ContinueMoving(int x, int y)
   }
 
 #if USE_NEW_CUSTOM_VALUE
-    CustomValue[newx][newy] = CustomValue[x][y];
+  CustomValue[newx][newy] = CustomValue[x][y];
 #endif
 
   ChangeDelay[x][y] = 0;

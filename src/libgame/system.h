@@ -858,6 +858,9 @@ struct SetupInfo
   boolean override_level_graphics;
   boolean override_level_sounds;
   boolean override_level_music;
+#if 0
+  boolean override_classic_artwork;
+#endif
 
   struct SetupEditorInfo editor;
   struct SetupEditorCascadeInfo editor_cascade;
