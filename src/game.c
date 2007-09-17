@@ -7565,10 +7565,18 @@ void StartMoving(int x, int y)
       else if (Feld[x][y + 1] == EL_QUICKSAND_EMPTY)
       {
 	if (!MovDelay[x][y])
+	{
 	  MovDelay[x][y] = TILEY + 1;
+
+	  ResetGfxAnimation(x, y);
+	  ResetGfxAnimation(x, y + 1);
+	}
 
 	if (MovDelay[x][y])
 	{
+	  DrawLevelElement(x, y, EL_QUICKSAND_EMPTYING);
+	  DrawLevelElement(x, y + 1, EL_QUICKSAND_FILLING);
+
 	  MovDelay[x][y]--;
 	  if (MovDelay[x][y])
 	    return;
@@ -7602,10 +7610,18 @@ void StartMoving(int x, int y)
       else if (Feld[x][y + 1] == EL_QUICKSAND_FAST_EMPTY)
       {
 	if (!MovDelay[x][y])
+	{
 	  MovDelay[x][y] = TILEY + 1;
+
+	  ResetGfxAnimation(x, y);
+	  ResetGfxAnimation(x, y + 1);
+	}
 
 	if (MovDelay[x][y])
 	{
+	  DrawLevelElement(x, y, EL_QUICKSAND_FAST_EMPTYING);
+	  DrawLevelElement(x, y + 1, EL_QUICKSAND_FAST_FILLING);
+
 	  MovDelay[x][y]--;
 	  if (MovDelay[x][y])
 	    return;

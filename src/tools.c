@@ -1364,6 +1364,13 @@ void DrawLevelFieldThruMask(int x, int y)
   DrawLevelElementExt(x, y, 0, 0, Feld[x][y], NO_CUTTING, USE_MASKING);
 }
 
+/* !!! implementation of quicksand is totally broken !!! */
+#define IS_CRUMBLED_TILE(x, y, e)					\
+	(GFX_CRUMBLED(e) && (!IN_LEV_FIELD(x, y) ||			\
+			     !IS_MOVING(x, y) ||			\
+			     (e) == EL_QUICKSAND_EMPTYING ||		\
+			     (e) == EL_QUICKSAND_FAST_EMPTYING))
+
 static void DrawLevelFieldCrumbledSandExt(int x, int y, int graphic, int frame)
 {
   Bitmap *src_bitmap;
@@ -1386,7 +1393,11 @@ static void DrawLevelFieldCrumbledSandExt(int x, int y, int graphic, int frame)
   element = TILE_GFX_ELEMENT(x, y);
 
   /* crumble field itself */
+#if 1
+  if (IS_CRUMBLED_TILE(x, y, element))
+#else
   if (GFX_CRUMBLED(element) && !IS_MOVING(x, y))
+#endif
   {
     if (!IN_SCR_FIELD(sx, sy))
       return;
@@ -1402,8 +1413,13 @@ static void DrawLevelFieldCrumbledSandExt(int x, int y, int graphic, int frame)
 		 BorderElement);
 
       /* check if neighbour field is of same type */
+#if 1
+      if (IS_CRUMBLED_TILE(xx, yy, element))
+	continue;
+#else
       if (GFX_CRUMBLED(element) && !IS_MOVING(xx, yy))
 	continue;
+#endif
 
       if (i == 1 || i == 2)
       {
@@ -1435,18 +1451,29 @@ static void DrawLevelFieldCrumbledSandExt(int x, int y, int graphic, int frame)
       int sxx = sx + xy[i][0];
       int syy = sy + xy[i][1];
 
+#if 1
+      if (!IN_LEV_FIELD(xx, yy) ||
+	  !IN_SCR_FIELD(sxx, syy))
+	continue;
+#else
       if (!IN_LEV_FIELD(xx, yy) ||
 	  !IN_SCR_FIELD(sxx, syy) ||
 	  IS_MOVING(xx, yy))
 	continue;
+#endif
 
       if (Feld[xx][yy] == EL_ELEMENT_SNAPPING)
 	continue;
 
       element = TILE_GFX_ELEMENT(xx, yy);
 
+#if 1
+      if (!IS_CRUMBLED_TILE(xx, yy, element))
+	continue;
+#else
       if (!GFX_CRUMBLED(element))
 	continue;
+#endif
 
       graphic = el_act2crm(element, ACTION_DEFAULT);
       crumbled_border_size = graphic_info[graphic].border_size;
@@ -1600,6 +1627,7 @@ void DrawScreenField(int x, int y)
       element = getBorderElement(lx, ly);
 
     DrawScreenElement(x, y, element);
+
     return;
   }
 
@@ -1625,8 +1653,22 @@ void DrawScreenField(int x, int y)
 	     element == EL_DC_MAGIC_WALL_FILLING)
       cut_mode = CUT_BELOW;
 
+#if 0
+    if (lx == 9 && ly == 1)
+      printf("::: %s [%d] [%d, %d] [%d]\n",
+	     EL_NAME(TILE_GFX_ELEMENT(lx, ly)),
+	     el_act2crm(TILE_GFX_ELEMENT(lx, ly), ACTION_DEFAULT),
+	     element_info[EL_QUICKSAND_EMPTYING].graphic[ACTION_DEFAULT],
+	     element_info[EL_QUICKSAND_EMPTYING].crumbled[ACTION_DEFAULT],
+	     GFX_CRUMBLED(TILE_GFX_ELEMENT(lx, ly)));
+#endif
+
     if (cut_mode == CUT_ABOVE)
+#if 1
+      DrawScreenElement(x, y, element);
+#else
       DrawScreenElementShifted(x, y, 0, 0, element, NO_CUTTING);
+#endif
     else
       DrawScreenElement(x, y, EL_EMPTY);
 
@@ -1635,7 +1677,15 @@ void DrawScreenField(int x, int y)
     else if (cut_mode == NO_CUTTING)
       DrawScreenElementShifted(x, y, 0, MovPos[lx][ly], element, cut_mode);
     else
+    {
       DrawScreenElementShifted(x, y, 0, MovPos[lx][ly], content, cut_mode);
+
+#if 1
+      if (cut_mode == CUT_BELOW &&
+	  IN_LEV_FIELD(lx, ly + 1) && IN_SCR_FIELD(x, y + 1))
+	DrawLevelElement(lx, ly + 1, element);
+#endif
+    }
 
     if (content == EL_ACID)
     {
