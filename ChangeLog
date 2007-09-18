@@ -3,6 +3,7 @@
 	  for both EMC and R'n'D graphics engine (heavy workarounds needed due
 	  to massively broken handling of quicksand in R'n'D game engine)
 	* fixed off-limits access to array in DrawLevelFieldCrumbledSandExt()
+	* fixed crash bug (hopefully) when scrolling with cursor keys in editor
 
 2007-09-16
 	* fixed small bug in toon drawing (introduced when fixing the crash bug)
