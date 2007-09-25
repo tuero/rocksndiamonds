@@ -89,6 +89,7 @@ struct PropertyMapping *getImageListPropertyMapping();
 void InitImageList(struct ConfigInfo *, int, struct ConfigTypeInfo *,
 		   char **, char **, char **, char **, char **);
 
+void LoadImageConfig();
 void ReloadCustomImages();
 void CreateImageWithSmallImages(int, int);
 void ScaleImage(int, int);

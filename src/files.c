@@ -8013,8 +8013,9 @@ void SaveScore(int nr)
 #define SETUP_TOKEN_OVERRIDE_LEVEL_GRAPHICS	28
 #define SETUP_TOKEN_OVERRIDE_LEVEL_SOUNDS	29
 #define SETUP_TOKEN_OVERRIDE_LEVEL_MUSIC	30
+#define SETUP_TOKEN_OVERRIDE_CLASSIC_ARTWORK	31
 
-#define NUM_GLOBAL_SETUP_TOKENS			31
+#define NUM_GLOBAL_SETUP_TOKENS			32
 
 /* editor setup */
 #define SETUP_TOKEN_EDITOR_EL_BOULDERDASH	0
@@ -8142,6 +8143,7 @@ static struct TokenInfo global_setup_tokens[] =
   { TYPE_SWITCH, &si.override_level_graphics, "override_level_graphics"	},
   { TYPE_SWITCH, &si.override_level_sounds,   "override_level_sounds"	},
   { TYPE_SWITCH, &si.override_level_music,    "override_level_music"	},
+  { TYPE_SWITCH, &si.override_classic_artwork,"override_classic_artwork"},
 };
 
 static boolean not_used = FALSE;
@@ -8296,6 +8298,7 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
   si->override_level_graphics = FALSE;
   si->override_level_sounds = FALSE;
   si->override_level_music = FALSE;
+  si->override_classic_artwork = FALSE;
 
   si->editor.el_boulderdash		= TRUE;
   si->editor.el_emerald_mine		= TRUE;
@@ -8968,7 +8971,11 @@ void LoadMenuDesignSettings()
   InitMenuDesignSettings_Static();
   InitMenuDesignSettings_SpecialPreProcessing();
 
+#if 1
+  if (!GFX_OVERRIDE_ARTWORK(ARTWORK_TYPE_GRAPHICS))
+#else
   if (!SETUP_OVERRIDE_ARTWORK(setup, ARTWORK_TYPE_GRAPHICS))
+#endif
   {
     /* first look for special settings configured in level series config */
     filename_base = getCustomArtworkLevelConfigFilename(ARTWORK_TYPE_GRAPHICS);

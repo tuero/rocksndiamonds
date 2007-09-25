@@ -474,8 +474,8 @@ static void WriteReloadInfoToPipe(char *set_identifier, int type)
   unsigned long str_size4 = strlen(ti->basepath) + 1;
   unsigned long str_size5 = strlen(ti->fullpath) + 1;
   boolean override_level_artwork = (type == SND_CTRL_RELOAD_SOUNDS ?
-				    setup.override_level_sounds :
-				    setup.override_level_music);
+				    gfx.override_level_sounds :
+				    gfx.override_level_music);
 
   if (IS_CHILD_PROCESS())
     return;
@@ -534,8 +534,8 @@ static void ReadReloadInfoFromPipe(SoundControl *snd_ctrl)
   unsigned long str_size1, str_size2, str_size3, str_size4, str_size5;
   static char *set_identifier = NULL;
   boolean *override_level_artwork = (snd_ctrl->state & SND_CTRL_RELOAD_SOUNDS ?
-				     &setup.override_level_sounds :
-				     &setup.override_level_music);
+				     &gfx.override_level_sounds :
+				     &gfx.override_level_music);
 
   checked_free(set_identifier);
 

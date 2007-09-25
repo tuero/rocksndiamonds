@@ -587,6 +587,58 @@ void InitFontGraphicInfo()
 	       getFontBitmapID, getFontFromToken);
 }
 
+static void CheckArtworkConfigForCustomElements(char *filename)
+{
+  SetupFileHash *setup_file_hash;
+  boolean redefined_ce_found = FALSE;
+
+  if ((setup_file_hash = loadSetupFileHash(filename)) != NULL)
+  {
+    BEGIN_HASH_ITERATION(setup_file_hash, itr)
+    {
+      char *token = HASH_ITERATION_TOKEN(itr);
+
+      if (strPrefix(token, "custom_"))
+	redefined_ce_found = TRUE;
+    }
+    END_HASH_ITERATION(setup_file_hash, itr)
+
+    freeSetupFileHash(setup_file_hash);
+  }
+
+  printf("::: redefined_ce_found == %d [%s]\n", redefined_ce_found, filename);
+}
+
+static void CheckCustomElementGraphicInfo()
+{
+  struct PropertyMapping *property_mapping = getImageListPropertyMapping();
+  int num_property_mappings = getImageListPropertyMappingSize();
+  boolean redefined_ce_found = FALSE;
+  int i;
+
+  /* check normal element/graphic mapping from static configuration */
+  for (i = 0; element_to_graphic[i].element > -1; i++)
+  {
+    int element = element_to_graphic[i].element;
+    int graphic = element_to_graphic[i].graphic;
+
+    if (IS_CUSTOM_ELEMENT(element))
+      if (getImageListEntryFromImageID(graphic)->redefined)
+	redefined_ce_found = TRUE;
+  }
+
+  /* check normal element/graphic mapping from dynamic configuration */
+  for (i = 0; i < num_property_mappings; i++)
+  {
+    int element = property_mapping[i].base_index;
+
+    if (IS_CUSTOM_ELEMENT(element))
+      redefined_ce_found = TRUE;
+  }
+
+  printf("::: redefined_ce_found == %d\n", redefined_ce_found);
+}
+
 void InitElementGraphicInfo()
 {
   struct PropertyMapping *property_mapping = getImageListPropertyMapping();
@@ -5422,6 +5474,7 @@ void InitGfx()
   InitGfxDoor1Info(DX, DY, DXSIZE, DYSIZE);
   InitGfxDoor2Info(VX, VY, VXSIZE, VYSIZE);
   InitGfxScrollbufferInfo(FXSIZE, FYSIZE);
+  InitGfxCustomArtworkInfo();
 
   bitmap_font_initial = LoadCustomImage(filename_font_initial);
 
@@ -5663,7 +5716,11 @@ static char *getNewArtworkIdentifier(int type)
   static boolean last_has_level_artwork_set[3] = { FALSE, FALSE, FALSE };
   static boolean initialized[3] = { FALSE, FALSE, FALSE };
   TreeInfo *artwork_first_node = ARTWORK_FIRST_NODE(artwork, type);
+#if 1
+  boolean setup_override_artwork = GFX_OVERRIDE_ARTWORK(type);
+#else
   boolean setup_override_artwork = SETUP_OVERRIDE_ARTWORK(setup, type);
+#endif
   char *setup_artwork_set = SETUP_ARTWORK_SET(setup, type);
   char *leveldir_identifier = leveldir_current->identifier;
 #if 1
@@ -5779,6 +5836,44 @@ void ReloadCustomArtwork(int force_reload)
   boolean force_reload_snd = (force_reload & (1 << ARTWORK_TYPE_SOUNDS));
   boolean force_reload_mus = (force_reload & (1 << ARTWORK_TYPE_MUSIC));
   boolean reload_needed;
+
+#if 1
+  gfx.draw_init_text = FALSE;
+
+  gfx.override_level_graphics = FALSE;
+  gfx.override_level_sounds   = FALSE;
+  gfx.override_level_music    = FALSE;
+
+#if 0
+  LoadImageConfig();
+#endif
+#if 0
+  CheckCustomElementGraphicInfo();
+#endif
+
+#if 1
+  {
+    char *filename_base, *filename_local;
+
+    /* first look for special artwork configured in level series config */
+    filename_base = getCustomArtworkLevelConfigFilename(ARTWORK_TYPE_GRAPHICS);
+
+    if (fileExists(filename_base))
+      CheckArtworkConfigForCustomElements(filename_base);
+
+    filename_local = getCustomArtworkConfigFilename(ARTWORK_TYPE_GRAPHICS);
+
+    if (filename_local != NULL && !strEqual(filename_base, filename_local))
+      CheckArtworkConfigForCustomElements(filename_local);
+  }
+#endif
+
+  gfx.override_level_graphics = setup.override_level_graphics;
+  gfx.override_level_sounds   = setup.override_level_sounds;
+  gfx.override_level_music    = setup.override_level_music;
+
+  gfx.draw_init_text = TRUE;
+#endif
 
   force_reload_gfx |= AdjustGraphicsForEMC();
 

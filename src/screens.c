@@ -4203,6 +4203,7 @@ static struct TokenInfo setup_info_artwork[] =
   { TYPE_YES_NO, &setup.override_level_graphics,"Override Level Graphics:" },
   { TYPE_YES_NO, &setup.override_level_sounds,	"Override Level Sounds:"   },
   { TYPE_YES_NO, &setup.override_level_music,	"Override Level Music:"    },
+  { TYPE_YES_NO, &setup.override_classic_artwork,"Override Classic Artwork:" },
 #else
   { TYPE_STRING,	NULL,			"Override Level Artwork:"},
   { TYPE_YES_NO,	&setup.override_level_graphics,	"Graphics:"	},

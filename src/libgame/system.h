@@ -540,6 +540,13 @@
 				 (setup).override_level_sounds :	\
 				 (setup).override_level_music)
 
+#define GFX_OVERRIDE_ARTWORK(type)					\
+				((type) == ARTWORK_TYPE_GRAPHICS ?	\
+				 gfx.override_level_graphics :		\
+				 (type) == ARTWORK_TYPE_SOUNDS ?	\
+				 gfx.override_level_sounds :		\
+				 gfx.override_level_music)
+
 #define ARTWORK_FIRST_NODE(artwork, type)				\
 				((type) == ARTWORK_TYPE_GRAPHICS ?	\
 				 (artwork).gfx_first :			\
@@ -725,6 +732,12 @@ struct GfxInfo
   Bitmap *background_bitmap;
   int background_bitmap_mask;
 
+  boolean override_level_graphics;
+  boolean override_level_sounds;
+  boolean override_level_music;
+
+  boolean draw_init_text;
+
   int num_fonts;
   struct FontBitmapInfo *font_bitmap_info;
   int (*select_font_function)(int);
@@ -858,7 +871,7 @@ struct SetupInfo
   boolean override_level_graphics;
   boolean override_level_sounds;
   boolean override_level_music;
-#if 0
+#if 1
   boolean override_classic_artwork;
 #endif
 
@@ -1134,6 +1147,7 @@ void InitGfxDoor1Info(int, int, int, int);
 void InitGfxDoor2Info(int, int, int, int);
 void InitGfxScrollbufferInfo(int, int);
 void InitGfxDrawBusyAnimFunction(void (*draw_busy_anim_function)(void));
+void InitGfxCustomArtworkInfo();
 void SetDrawDeactivationMask(int);
 void SetDrawBackgroundMask(int);
 void SetWindowBackgroundBitmap(Bitmap *);

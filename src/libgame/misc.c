@@ -2662,7 +2662,11 @@ void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
     artwork_info->num_property_mapping_entries = 0;
   }
 
+#if 1
+  if (!GFX_OVERRIDE_ARTWORK(artwork_info->type))
+#else
   if (!SETUP_OVERRIDE_ARTWORK(setup, artwork_info->type))
+#endif
   {
     /* first look for special artwork configured in level series config */
     filename_base = getCustomArtworkLevelConfigFilename(artwork_info->type);

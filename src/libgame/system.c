@@ -201,6 +201,15 @@ void InitGfxDrawBusyAnimFunction(void (*draw_busy_anim_function)(void))
   gfx.draw_busy_anim_function = draw_busy_anim_function;
 }
 
+void InitGfxCustomArtworkInfo()
+{
+  gfx.override_level_graphics = FALSE;
+  gfx.override_level_sounds = FALSE;
+  gfx.override_level_music = FALSE;
+
+  gfx.draw_init_text = TRUE;
+}
+
 void SetDrawDeactivationMask(int draw_deactivation_mask)
 {
   gfx.draw_deactivation_mask = draw_deactivation_mask;

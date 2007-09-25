@@ -518,7 +518,7 @@ char *getLevelSetTitleMessageFilename(int nr, boolean initial)
 
   basename = getLevelSetTitleMessageBasename(nr, initial);
 
-  if (!setup.override_level_graphics)
+  if (!gfx.override_level_graphics)
   {
     /* 1st try: look for special artwork in current level series directory */
     filename = getPath3(getCurrentLevelDir(), GRAPHICS_DIRECTORY, basename);
@@ -615,7 +615,7 @@ char *getCustomImageFilename(char *basename)
 
   basename = getCorrectedArtworkBasename(basename);
 
-  if (!setup.override_level_graphics)
+  if (!gfx.override_level_graphics)
   {
     /* 1st try: look for special artwork in current level series directory */
     filename = getPath3(getCurrentLevelDir(), GRAPHICS_DIRECTORY, basename);
@@ -688,7 +688,7 @@ char *getCustomSoundFilename(char *basename)
 
   basename = getCorrectedArtworkBasename(basename);
 
-  if (!setup.override_level_sounds)
+  if (!gfx.override_level_sounds)
   {
     /* 1st try: look for special artwork in current level series directory */
     filename = getPath3(getCurrentLevelDir(), SOUNDS_DIRECTORY, basename);
@@ -756,7 +756,7 @@ char *getCustomMusicFilename(char *basename)
 
   basename = getCorrectedArtworkBasename(basename);
 
-  if (!setup.override_level_music)
+  if (!gfx.override_level_music)
   {
     /* 1st try: look for special artwork in current level series directory */
     filename = getPath3(getCurrentLevelDir(), MUSIC_DIRECTORY, basename);
@@ -850,7 +850,7 @@ char *getCustomMusicDirectory(void)
 
   checked_free(directory);
 
-  if (!setup.override_level_music)
+  if (!gfx.override_level_music)
   {
     /* 1st try: look for special artwork in current level series directory */
     directory = getPath2(getCurrentLevelDir(), MUSIC_DIRECTORY);

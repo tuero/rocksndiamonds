@@ -203,6 +203,7 @@ void DrawInitTextExt(char *text, int ypos, int font_nr, boolean force)
     return;
 
   if (window != NULL &&
+      gfx.draw_init_text &&
       gfx.num_fonts > 0 &&
       gfx.font_bitmap_info[font_nr].bitmap != NULL)
   {
