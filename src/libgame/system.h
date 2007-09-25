@@ -48,8 +48,8 @@
 #define FULLSCREEN_NOT_AVAILABLE	FALSE
 #define FULLSCREEN_AVAILABLE		TRUE
 
-#define CREATE_SPECIAL_EDITION		FALSE
-#define CREATE_SPECIAL_EDITION_RND_JUE	FALSE
+#define CREATE_SPECIAL_EDITION		TRUE
+#define CREATE_SPECIAL_EDITION_RND_JUE	TRUE
 
 /* default input keys */
 #define DEFAULT_KEY_LEFT		KSYM_Left
@@ -871,9 +871,7 @@ struct SetupInfo
   boolean override_level_graphics;
   boolean override_level_sounds;
   boolean override_level_music;
-#if 1
-  boolean override_classic_artwork;
-#endif
+  boolean auto_override_artwork;
 
   struct SetupEditorInfo editor;
   struct SetupEditorCascadeInfo editor_cascade;

@@ -1026,11 +1026,6 @@ void InitImageList(struct ConfigInfo *config_list, int num_file_list_entries,
   image_info->free_artwork = FreeImage;
 }
 
-void LoadImageConfig()
-{
-  LoadArtworkConfig(image_info);
-}
-
 void ReloadCustomImages()
 {
 #if 0
