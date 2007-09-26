@@ -262,6 +262,26 @@ static char *getDefaultMusicDir(char *music_subdir)
   return music_dir;
 }
 
+#if 1
+static char *getDefaultArtworkSet(int type)
+{
+  return (type == TREE_TYPE_GRAPHICS_DIR ? "gfx_classic" :
+	  type == TREE_TYPE_SOUNDS_DIR   ? "snd_classic" :
+	  type == TREE_TYPE_MUSIC_DIR    ? "mus_classic" : "");
+}
+
+static char *getDefaultArtworkDir(int type)
+{
+  return (type == TREE_TYPE_GRAPHICS_DIR ?
+	  getDefaultGraphicsDir("gfx_classic") :
+	  type == TREE_TYPE_SOUNDS_DIR ?
+	  getDefaultSoundsDir("snd_classic") :
+	  type == TREE_TYPE_MUSIC_DIR ?
+	  getDefaultMusicDir("mus_classic") : "");
+}
+
+#else
+
 static char *getDefaultArtworkSet(int type)
 {
   return (type == TREE_TYPE_GRAPHICS_DIR ? GFX_CLASSIC_SUBDIR :
@@ -278,6 +298,7 @@ static char *getDefaultArtworkDir(int type)
 	  type == TREE_TYPE_MUSIC_DIR ?
 	  getDefaultMusicDir(MUS_CLASSIC_SUBDIR) : "");
 }
+#endif
 
 static char *getUserGraphicsDir()
 {

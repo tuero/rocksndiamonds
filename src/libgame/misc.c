@@ -2211,7 +2211,7 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
   if (filename == NULL)
     return;
 
-#if 1
+#if 0
   printf("LoadArtworkConfigFromFilename '%s' ...\n", filename);
 #endif
 
@@ -2671,9 +2671,11 @@ void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
     /* first look for special artwork configured in level series config */
     filename_base = getCustomArtworkLevelConfigFilename(artwork_info->type);
 
+#if 0
     printf("::: filename_base == '%s' [%s, %s]\n", filename_base,
 	   leveldir_current->graphics_set,
 	   leveldir_current->graphics_path);
+#endif
 
     if (fileExists(filename_base))
       LoadArtworkConfigFromFilename(artwork_info, filename_base);

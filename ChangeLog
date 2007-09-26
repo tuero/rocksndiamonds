@@ -1,3 +1,16 @@
+2007-09-26
+	* added new custom artwork setup option "auto-override non-CE sets" for
+	  automatic artwork override that is only used for level sets without
+	  custom element artwork (as it does not make much sense to override
+	  any artwork that redefines custom element artwork for sets using CEs)
+	* fixed default artwork for "special" R'n'D versions always using the
+	  "classic" artwork as the base if base artwork is not explicitly
+	  defined in "levelinfo.conf", regardless of different default artwork
+	  used by the special R'n'D version -- this is needed because any such
+	  custom artwork is designed using the "classic" artwork definitions as
+	  the base (including menu definitions and screen positions etc., which
+	  would otherwise be taken from the different special default artwork)
+
 2007-09-17
 	* fixed drawing of animated "quicksand.filling" and "quicksand.emptying"
 	  for both EMC and R'n'D graphics engine (heavy workarounds needed due
