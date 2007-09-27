@@ -1941,7 +1941,13 @@ void DrawLevel()
 {
   int x,y;
 
+#if 1
+  SetMainBackgroundImage(IMG_BACKGROUND_PLAYING);
+  SetDrawBackgroundMask(REDRAW_FIELD);
+#else
   SetDrawBackgroundMask(REDRAW_NONE);
+#endif
+
   ClearField();
 
   for (x = BX1; x <= BX2; x++)
@@ -3197,6 +3203,11 @@ unsigned int MoveDoor(unsigned int door_state)
     door_state |= DOOR_NO_DELAY;
     door_state &= ~DOOR_CLOSE_ALL;
   }
+
+#if 1
+  if (game_status == GAME_MODE_EDITOR)
+    door_state |= DOOR_NO_DELAY;
+#endif
 
   if (door_state & DOOR_ACTION)
   {

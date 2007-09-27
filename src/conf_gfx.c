@@ -4975,6 +4975,7 @@ struct ConfigInfo image_config[] =
   { "background.INFO[VERSION]",			UNDEFINED_FILENAME	},
   { "background.INFO[LEVELSET]",		UNDEFINED_FILENAME	},
   { "background.SETUP",				UNDEFINED_FILENAME	},
+  { "background.PLAYING",			UNDEFINED_FILENAME	},
   { "background.DOOR",				UNDEFINED_FILENAME	},
 
   { "background.titlescreen_initial_1",		UNDEFINED_FILENAME	},

@@ -1,3 +1,8 @@
+2007-09-27
+	* added "background.PLAYING" (only visible as two-pixel border in game)
+	* added default level set for first start of special R'n'D version
+	* changed door animations for editor always behaving like "quick doors"
+
 2007-09-26
 	* added new custom artwork setup option "auto-override non-CE sets" for
 	  automatic artwork override that is only used for level sets without

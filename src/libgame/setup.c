@@ -3846,6 +3846,13 @@ void LoadLevelSetup_LastSeries()
   /* always start with reliable default values */
   leveldir_current = getFirstValidTreeInfoEntry(leveldir_first);
 
+#if CREATE_SPECIAL_EDITION_RND_JUE
+  leveldir_current = getTreeInfoFromIdentifier(leveldir_first,
+					       "jue_start");
+  if (leveldir_current == NULL)
+    leveldir_current = getFirstValidTreeInfoEntry(leveldir_first);
+#endif
+
   if ((level_setup_hash = loadSetupFileHash(filename)))
   {
     char *last_level_series =
