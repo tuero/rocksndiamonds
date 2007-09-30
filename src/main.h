@@ -1960,11 +1960,11 @@
 #define PROGRAM_GAME_BY_STRING		"A Game by Artsoft Entertainment"
 #define PROGRAM_UNIX_DATADIR_STRING	".rocksndiamonds"
 
-#if CREATE_SPECIAL_EDITION_RND_JUE
+#if defined(CREATE_SPECIAL_EDITION_RND_JUE)
 #undef  PROGRAM_TITLE_STRING
-#define PROGRAM_TITLE_STRING		"R'n'D - jue"
+#define PROGRAM_TITLE_STRING		"R'n'D jue"
 #undef  PROGRAM_UNIX_DATADIR_STRING
-#define PROGRAM_UNIX_DATADIR_STRING	".rocksndiamonds-jue"
+#define PROGRAM_UNIX_DATADIR_STRING	".rnd_jue"
 #endif
 
 #define ICON_TITLE_STRING		PROGRAM_TITLE_STRING

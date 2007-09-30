@@ -402,8 +402,6 @@ void SDLFadeRectangle(Bitmap *bitmap_cross, int x, int y, int width, int height,
   int src_x = x, src_y = y;
   int dst_x = x, dst_y = y;
   unsigned int time_last, time_current;
-  float alpha;
-  int alpha_final;
 
   src_rect.x = src_x;
   src_rect.y = src_y;
@@ -498,6 +496,7 @@ void SDLFadeRectangle(Bitmap *bitmap_cross, int x, int y, int width, int height,
     int ypos[melt_columns];
     int max_steps = height / 8 + 32;
     int steps_done = 0;
+    float steps = 0;
     int i;
 
     SDL_BlitSurface(surface_source, &src_rect, surface_screen, &dst_rect);
@@ -520,7 +519,6 @@ void SDLFadeRectangle(Bitmap *bitmap_cross, int x, int y, int width, int height,
 
     while (!done)
     {
-      float steps;
       int steps_final;
 
       time_last = time_current;
@@ -610,6 +608,9 @@ void SDLFadeRectangle(Bitmap *bitmap_cross, int x, int y, int width, int height,
   }
   else
   {
+    float alpha;
+    int alpha_final;
+
     for (alpha = 0.0; alpha < 255.0;)
     {
       time_last = time_current;

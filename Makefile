@@ -1,7 +1,7 @@
 # =============================================================================
 # Rocks'n'Diamonds Makefile
 # -----------------------------------------------------------------------------
-# (c) 1995-2006 Holger Schemel <info@artsoft.org>
+# (c) 1995-2007 Holger Schemel <info@artsoft.org>
 # =============================================================================
 
 # -----------------------------------------------------------------------------
@@ -38,8 +38,12 @@ X11_PATH = /usr/X11R6
 # SCORE_ENTRIES = MANY_PER_NAME
 
 # paths for cross-compiling (only needed for non-native MS-DOS and Win32 build)
-CROSS_PATH_MSDOS=/usr/local/cross-msdos/i386-msdosdjgpp
-CROSS_PATH_WIN32=/usr/local/cross-tools/i386-mingw32msvc
+CROSS_PATH_MSDOS = /usr/local/cross-msdos/i386-msdosdjgpp
+CROSS_PATH_WIN32 = /usr/local/cross-tools/i386-mingw32msvc
+
+# compile special edition of R'n'D instead of the normal (classic) version
+# SPECIAL_EDITION = rnd_jue
+
 
 # -----------------------------------------------------------------------------
 # there should be no need to change anything below
@@ -90,10 +94,6 @@ cross-msdos:
 
 cross-win32:
 	@PATH=$(CROSS_PATH_WIN32)/bin:${PATH} $(MAKE_CMD) PLATFORM=cross-win32
-
-cross-win32-jue:
-	@PATH=$(CROSS_PATH_WIN32)/bin:${PATH} $(MAKE_CMD) PLATFORM=cross-win32 \
-							  SPECIAL_ICON=jue
 
 clean:
 	@$(MAKE_CMD) clean

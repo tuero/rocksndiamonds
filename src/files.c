@@ -8292,9 +8292,9 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
   si->prefer_aga_graphics = TRUE;
   si->game_frame_delay = GAME_FRAME_DELAY;
 
-  si->graphics_set = getStringCopy(GFX_CLASSIC_SUBDIR);
-  si->sounds_set = getStringCopy(SND_CLASSIC_SUBDIR);
-  si->music_set = getStringCopy(MUS_CLASSIC_SUBDIR);
+  si->graphics_set = getStringCopy(GFX_DEFAULT_SUBDIR);
+  si->sounds_set = getStringCopy(SND_DEFAULT_SUBDIR);
+  si->music_set = getStringCopy(MUS_DEFAULT_SUBDIR);
   si->override_level_graphics = FALSE;
   si->override_level_sounds = FALSE;
   si->override_level_music = FALSE;
@@ -8353,6 +8353,12 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
   si->system.audio_fragment_size = DEFAULT_AUDIO_FRAGMENT_SIZE;
 
   si->options.verbose = FALSE;
+
+#if defined(CREATE_SPECIAL_EDITION_RND_JUE)
+  si->handicap = FALSE;
+  si->fullscreen = TRUE;
+  si->auto_override_artwork = TRUE;
+#endif
 }
 
 static void setSetupInfoToDefaults_EditorCascade(struct SetupInfo *si)

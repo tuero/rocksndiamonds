@@ -10,7 +10,7 @@
 
 .EXPORT_ALL_VARIABLES:
 
-ifndef PLATFORM			# no platform specified -- try auto detection
+ifndef PLATFORM				# unknown platform -- try auto detection
 ifdef COMSPEC
 PLATFORM = msdos
 else
@@ -18,7 +18,7 @@ PLATFORM = unix
 endif
 endif
 
-ifdef X11_PATH			# path to X11 specified by top level Makefile
+ifdef X11_PATH				# path to X11 from top level Makefile
 XINC_PATH = $(X11_PATH)/include
 XLIB_PATH = $(X11_PATH)/lib
 X11_INCL = -I$(XINC_PATH)
@@ -28,39 +28,36 @@ endif
 AR = ar
 RANLIB = ranlib
 ETAGS = etags
+RM = rm -f
 
 BMP2ICO = bmp2ico
 WINDRES = windres
 
-ifeq ($(PLATFORM),msdos)	# MS-DOS native compiling
-
-RM = del
-
-PROGBASE = rocks
-PROGNAME = ../$(PROGBASE).exe
-
-SYS_CFLAGS = -DTARGET_X11
-SYS_LDFLAGS = -s -lalleg
-
-else				# Unix or cross-compiling for MS-DOS and Win32
-
-RM = rm -f
-
 PROGBASE = rocksndiamonds
+
+ifdef SPECIAL_EDITION			# create special edition
+PROGBASE = $(SPECIAL_EDITION)
+endif
+
 PROGNAME = ../$(PROGBASE)
 
-ifeq ($(PLATFORM),solaris)
+
+# -----------------------------------------------------------------------------
+# configuring platform
+# -----------------------------------------------------------------------------
+
+ifeq ($(PLATFORM),solaris)		# native compiling to Solaris
 EXTRA_LDFLAGS = -lnsl -lsocket -R$(XLIB_PATH)
 PLATFORM = unix
 endif
 
-ifeq ($(PLATFORM),macosx)
+ifeq ($(PLATFORM),macosx)		# native compiling to Mac OS X
 EXTRA_LDFLAGS = -lstdc++
 PLATFORM = unix
 TARGET = sdl
 endif
 
-ifeq ($(PLATFORM),os2)
+ifeq ($(PLATFORM),os2)			# native compiling to OS/2
 RANLIB = echo
 PROGNAME = ../$(PROGBASE).exe
 EXTRA_CFLAGS = -Zbin-files -D__ST_MT_ERRNO__ -Zmtd -fomit-frame-pointer
@@ -69,63 +66,84 @@ PLATFORM = unix
 TARGET = x11
 endif
 
-ifeq ($(PLATFORM),unix)
+ifeq ($(PLATFORM),unix)			# native compiling to Unix (generic)
 PROFILING_FLAGS = -pg
 endif
 
-ifeq ($(PLATFORM),cross-msdos)
+ifeq ($(PLATFORM),cross-win32)		# cross-compiling to Windows
+PROGNAME = ../$(PROGBASE).exe
+EXTRA_LDFLAGS = -lshfolder -lwsock32
+TARGET = sdl
+endif
+
+ifeq ($(PLATFORM),cross-msdos)		# cross-compiling to MS-DOS
 PROGBASE = rocks
 PROGNAME = ../$(PROGBASE).exe
 TARGET = allegro
 endif
 
-ifeq ($(PLATFORM),cross-win32)
-EXTRA_LDFLAGS = -lshfolder -lwsock32
+ifeq ($(PLATFORM),msdos)		# native compiling to MS-DOS
+PROGBASE = rocks
 PROGNAME = ../$(PROGBASE).exe
-TARGET = sdl
+SYS_CFLAGS = -DTARGET_X11
+SYS_LDFLAGS = -s -lalleg
+RM = del
 endif
 
-ifeq ($(TARGET),x11)
+
+# -----------------------------------------------------------------------------
+# configuring target
+# -----------------------------------------------------------------------------
+
+ifeq ($(TARGET),x11)			# compiling for X11 target
 SYS_CFLAGS  = -DTARGET_X11 $(X11_INCL)
 SYS_LDFLAGS = $(X11_LIBS)
 endif
 
-ifeq ($(TARGET),sdl)
+ifeq ($(TARGET),sdl)			# compiling for SDL target
 SYS_CFLAGS  = -DTARGET_SDL $(shell sdl-config --cflags)
 SDL_LIBS = -lSDL_image -lSDL_mixer -lSDL_net -lsmpeg
 SYS_LDFLAGS = $(SDL_LIBS) $(shell sdl-config --libs)
 endif
 
-ifeq ($(TARGET),sdl-static)
+ifeq ($(TARGET),sdl-static)		# compiling for SDL target (static)
 SYS_CFLAGS  = -DTARGET_SDL $(shell sdl-config --cflags)
 SDL_LIBS = -lSDL_image -lSDL_mixer -lSDL_net -lsmpeg
 SYS_LDFLAGS = $(SDL_LIBS) $(shell sdl-config --static-libs)
 endif
 
-ifeq ($(TARGET),allegro)
+ifeq ($(TARGET),allegro)		# compiling for Allegro target
 SYS_CFLAGS = -DTARGET_ALLEGRO -I$(CROSS_PATH_MSDOS)/include
 SYS_LDFLAGS = -lalleg
 endif
 
-endif				# (PLATFORM != msdos)
 
+# -----------------------------------------------------------------------------
+# configuring compile-time definitions
+# -----------------------------------------------------------------------------
 
-ifdef RO_GAME_DIR		# path to read-only game data specified
+ifdef RO_GAME_DIR			# path to read-only game data specified
 CONFIG_RO_GAME_DIR = -DRO_GAME_DIR="\"$(RO_GAME_DIR)\""
 endif
 
-ifdef RW_GAME_DIR		# path to writable game data specified
+ifdef RW_GAME_DIR			# path to writable game data specified
 CONFIG_RW_GAME_DIR = -DRW_GAME_DIR="\"$(RW_GAME_DIR)\""
 endif
 
-ifdef SCORE_ENTRIES		# number of score entries per player specified
+ifdef SCORE_ENTRIES			# number of score entries per player
 CONFIG_SCORE_ENTRIES = -D$(SCORE_ENTRIES)
 endif
 
+ifdef SPECIAL_EDITION
+ifeq ($(SPECIAL_EDITION),rnd_jue)	# create special edition
+CONFIG_SPECIAL = -DCREATE_SPECIAL_EDITION -DCREATE_SPECIAL_EDITION_RND_JUE
+endif
+endif
+
 CONFIG_GAME_DIR = $(CONFIG_RO_GAME_DIR) $(CONFIG_RW_GAME_DIR)
+CONFIG_GAME = $(CONFIG_GAME_DIR) $(CONFIG_SCORE_ENTRIES) $(CONFIG_SPECIAL)
 
-
-CONFIG = $(CONFIG_GAME_DIR) $(CONFIG_SCORE_ENTRIES) $(JOYSTICK)
+CONFIG = $(CONFIG_GAME) $(JOYSTICK)
 DEBUG = -DDEBUG -g
 # PROFILING = $(PROFILING_FLAGS)
 
@@ -136,9 +154,9 @@ OPTIONS = $(DEBUG) -Wall			# only for debugging purposes
 # OPTIONS = -O3 -Wall -ansi -pedantic
 # OPTIONS = -O3 -Wall
 # OPTIONS = -O3
-# OPTIONS = -DSYSV -Ae				# may be needed for HP-UX
+# OPTIONS = -DSYSV -Ae			# may be needed for HP-UX
 
-ifdef BUILD_DIST				# distribution build
+ifdef BUILD_DIST			# distribution build
 OPTIONS = -O3 -Wall
 endif
 
@@ -214,8 +232,8 @@ RNDLIBS = $(LIBGAME) $(GAME_EM)
 
 ICONBASE = windows_icon
 ifeq ($(PLATFORM),cross-win32)
-ifdef SPECIAL_ICON
-ICONSUFFIX = 32x32_$(SPECIAL_ICON)
+ifdef SPECIAL_EDITION
+ICONSUFFIX = 32x32_$(SPECIAL_EDITION)
 else
 ICONSUFFIX = 32x32
 endif

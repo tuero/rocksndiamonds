@@ -262,34 +262,14 @@ static char *getDefaultMusicDir(char *music_subdir)
   return music_dir;
 }
 
-#if 1
-static char *getDefaultArtworkSet(int type)
-{
-  return (type == TREE_TYPE_GRAPHICS_DIR ? "gfx_classic" :
-	  type == TREE_TYPE_SOUNDS_DIR   ? "snd_classic" :
-	  type == TREE_TYPE_MUSIC_DIR    ? "mus_classic" : "");
-}
-
-static char *getDefaultArtworkDir(int type)
-{
-  return (type == TREE_TYPE_GRAPHICS_DIR ?
-	  getDefaultGraphicsDir("gfx_classic") :
-	  type == TREE_TYPE_SOUNDS_DIR ?
-	  getDefaultSoundsDir("snd_classic") :
-	  type == TREE_TYPE_MUSIC_DIR ?
-	  getDefaultMusicDir("mus_classic") : "");
-}
-
-#else
-
-static char *getDefaultArtworkSet(int type)
+static char *getClassicArtworkSet(int type)
 {
   return (type == TREE_TYPE_GRAPHICS_DIR ? GFX_CLASSIC_SUBDIR :
 	  type == TREE_TYPE_SOUNDS_DIR   ? SND_CLASSIC_SUBDIR :
 	  type == TREE_TYPE_MUSIC_DIR    ? MUS_CLASSIC_SUBDIR : "");
 }
 
-static char *getDefaultArtworkDir(int type)
+static char *getClassicArtworkDir(int type)
 {
   return (type == TREE_TYPE_GRAPHICS_DIR ?
 	  getDefaultGraphicsDir(GFX_CLASSIC_SUBDIR) :
@@ -298,7 +278,6 @@ static char *getDefaultArtworkDir(int type)
 	  type == TREE_TYPE_MUSIC_DIR ?
 	  getDefaultMusicDir(MUS_CLASSIC_SUBDIR) : "");
 }
-#endif
 
 static char *getUserGraphicsDir()
 {
@@ -358,12 +337,18 @@ char *setLevelArtworkDir(TreeInfo *ti)
     *artwork_path_ptr = getStringCopy(getSetupArtworkDir(level_artwork));
   else
   {
-    /* No (or non-existing) artwork configured in "levelinfo.conf". This would
-       normally result in using the artwork configured in the setup menu. But
-       if an artwork subdirectory exists (which might contain custom artwork
-       or an artwork configuration file), this level artwork must be treated
-       as relative to the default "classic" artwork, not to the artwork that
-       is currently configured in the setup menu. */
+    /*
+      No (or non-existing) artwork configured in "levelinfo.conf". This would
+      normally result in using the artwork configured in the setup menu. But
+      if an artwork subdirectory exists (which might contain custom artwork
+      or an artwork configuration file), this level artwork must be treated
+      as relative to the default "classic" artwork, not to the artwork that
+      is currently configured in the setup menu.
+
+      Update: For "special" versions of R'n'D (like "R'n'D jue"), do not use
+      the "default" artwork (which would be "jue0" for "R'n'D jue"), but use
+      the real "classic" artwork from the original R'n'D (like "gfx_classic").
+    */
 
     char *dir = getPath2(getCurrentLevelDir(), ARTWORK_DIRECTORY(ti->type));
 
@@ -371,8 +356,8 @@ char *setLevelArtworkDir(TreeInfo *ti)
 
     if (fileExists(dir))
     {
-      *artwork_path_ptr = getStringCopy(getDefaultArtworkDir(ti->type));
-      *artwork_set_ptr = getStringCopy(getDefaultArtworkSet(ti->type));
+      *artwork_path_ptr = getStringCopy(getClassicArtworkDir(ti->type));
+      *artwork_set_ptr = getStringCopy(getClassicArtworkSet(ti->type));
     }
     else
     {
@@ -581,7 +566,7 @@ char *getLevelSetTitleMessageFilename(int nr, boolean initial)
   }
 
   /* 5th try: look for default artwork in new default artwork directory */
-  filename = getPath2(getDefaultGraphicsDir(GFX_CLASSIC_SUBDIR), basename);
+  filename = getPath2(getDefaultGraphicsDir(GFX_DEFAULT_SUBDIR), basename);
   if (fileExists(filename))
     return filename;
 
@@ -671,7 +656,7 @@ char *getCustomImageFilename(char *basename)
   }
 
   /* 4th try: look for default artwork in new default artwork directory */
-  filename = getPath2(getDefaultGraphicsDir(GFX_CLASSIC_SUBDIR), basename);
+  filename = getPath2(getDefaultGraphicsDir(GFX_DEFAULT_SUBDIR), basename);
   if (fileExists(filename))
     return filename;
 
@@ -682,7 +667,7 @@ char *getCustomImageFilename(char *basename)
   if (fileExists(filename))
     return filename;
 
-#if CREATE_SPECIAL_EDITION
+#if defined(CREATE_SPECIAL_EDITION)
   free(filename);
 
   /* !!! INSERT WARNING HERE TO REPORT MISSING ARTWORK FILES !!! */
@@ -744,7 +729,7 @@ char *getCustomSoundFilename(char *basename)
   }
 
   /* 4th try: look for default artwork in new default artwork directory */
-  filename = getPath2(getDefaultSoundsDir(SND_CLASSIC_SUBDIR), basename);
+  filename = getPath2(getDefaultSoundsDir(SND_DEFAULT_SUBDIR), basename);
   if (fileExists(filename))
     return filename;
 
@@ -755,7 +740,7 @@ char *getCustomSoundFilename(char *basename)
   if (fileExists(filename))
     return filename;
 
-#if CREATE_SPECIAL_EDITION
+#if defined(CREATE_SPECIAL_EDITION)
   free(filename);
 
   /* 6th try: look for fallback artwork in old default artwork directory */
@@ -812,7 +797,7 @@ char *getCustomMusicFilename(char *basename)
   }
 
   /* 4th try: look for default artwork in new default artwork directory */
-  filename = getPath2(getDefaultMusicDir(MUS_CLASSIC_SUBDIR), basename);
+  filename = getPath2(getDefaultMusicDir(MUS_DEFAULT_SUBDIR), basename);
   if (fileExists(filename))
     return filename;
 
@@ -823,7 +808,7 @@ char *getCustomMusicFilename(char *basename)
   if (fileExists(filename))
     return filename;
 
-#if CREATE_SPECIAL_EDITION
+#if defined(CREATE_SPECIAL_EDITION)
   free(filename);
 
   /* 6th try: look for fallback artwork in old default artwork directory */
@@ -906,7 +891,7 @@ char *getCustomMusicDirectory(void)
   }
 
   /* 4th try: look for default artwork in new default artwork directory */
-  directory = getStringCopy(getDefaultMusicDir(MUS_CLASSIC_SUBDIR));
+  directory = getStringCopy(getDefaultMusicDir(MUS_DEFAULT_SUBDIR));
   if (fileExists(directory))
     return directory;
 
@@ -3522,7 +3507,7 @@ void LoadArtworkInfo()
     getTreeInfoFromIdentifier(artwork.gfx_first, setup.graphics_set);
   if (artwork.gfx_current == NULL)
     artwork.gfx_current =
-      getTreeInfoFromIdentifier(artwork.gfx_first, GFX_CLASSIC_SUBDIR);
+      getTreeInfoFromIdentifier(artwork.gfx_first, GFX_DEFAULT_SUBDIR);
   if (artwork.gfx_current == NULL)
     artwork.gfx_current = getFirstValidTreeInfoEntry(artwork.gfx_first);
 
@@ -3530,7 +3515,7 @@ void LoadArtworkInfo()
     getTreeInfoFromIdentifier(artwork.snd_first, setup.sounds_set);
   if (artwork.snd_current == NULL)
     artwork.snd_current =
-      getTreeInfoFromIdentifier(artwork.snd_first, SND_CLASSIC_SUBDIR);
+      getTreeInfoFromIdentifier(artwork.snd_first, SND_DEFAULT_SUBDIR);
   if (artwork.snd_current == NULL)
     artwork.snd_current = getFirstValidTreeInfoEntry(artwork.snd_first);
 
@@ -3538,7 +3523,7 @@ void LoadArtworkInfo()
     getTreeInfoFromIdentifier(artwork.mus_first, setup.music_set);
   if (artwork.mus_current == NULL)
     artwork.mus_current =
-      getTreeInfoFromIdentifier(artwork.mus_first, MUS_CLASSIC_SUBDIR);
+      getTreeInfoFromIdentifier(artwork.mus_first, MUS_DEFAULT_SUBDIR);
   if (artwork.mus_current == NULL)
     artwork.mus_current = getFirstValidTreeInfoEntry(artwork.mus_first);
 
@@ -3648,7 +3633,7 @@ void LoadLevelArtworkInfo()
       getTreeInfoFromIdentifier(artwork.gfx_first, setup.graphics_set);
     if (artwork.gfx_current == NULL)
       artwork.gfx_current =
-	getTreeInfoFromIdentifier(artwork.gfx_first, GFX_CLASSIC_SUBDIR);
+	getTreeInfoFromIdentifier(artwork.gfx_first, GFX_DEFAULT_SUBDIR);
     if (artwork.gfx_current == NULL)
       artwork.gfx_current = getFirstValidTreeInfoEntry(artwork.gfx_first);
   }
@@ -3659,7 +3644,7 @@ void LoadLevelArtworkInfo()
       getTreeInfoFromIdentifier(artwork.snd_first, setup.sounds_set);
     if (artwork.snd_current == NULL)
       artwork.snd_current =
-	getTreeInfoFromIdentifier(artwork.snd_first, SND_CLASSIC_SUBDIR);
+	getTreeInfoFromIdentifier(artwork.snd_first, SND_DEFAULT_SUBDIR);
     if (artwork.snd_current == NULL)
       artwork.snd_current = getFirstValidTreeInfoEntry(artwork.snd_first);
   }
@@ -3670,7 +3655,7 @@ void LoadLevelArtworkInfo()
       getTreeInfoFromIdentifier(artwork.mus_first, setup.music_set);
     if (artwork.mus_current == NULL)
       artwork.mus_current =
-	getTreeInfoFromIdentifier(artwork.mus_first, MUS_CLASSIC_SUBDIR);
+	getTreeInfoFromIdentifier(artwork.mus_first, MUS_DEFAULT_SUBDIR);
     if (artwork.mus_current == NULL)
       artwork.mus_current = getFirstValidTreeInfoEntry(artwork.mus_first);
   }
@@ -3846,7 +3831,7 @@ void LoadLevelSetup_LastSeries()
   /* always start with reliable default values */
   leveldir_current = getFirstValidTreeInfoEntry(leveldir_first);
 
-#if CREATE_SPECIAL_EDITION_RND_JUE
+#if defined(CREATE_SPECIAL_EDITION_RND_JUE)
   leveldir_current = getTreeInfoFromIdentifier(leveldir_first,
 					       "jue_start");
   if (leveldir_current == NULL)

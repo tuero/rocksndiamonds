@@ -427,8 +427,12 @@ void BackToFront()
     if (!global.fps_slowdown)
       info1[0] = '\0';
 
-    sprintf(text, "%.1f fps%s", global.frames_per_second, info1);
+    sprintf(text, "%04.1f fps%s", global.frames_per_second, info1);
+#if 1
+    DrawTextExt(window, SX + SXSIZE + SX, 0, text, FONT_TEXT_2, BLIT_OPAQUE);
+#else
     DrawTextExt(window, SX, SY, text, FONT_TEXT_2, BLIT_OPAQUE);
+#endif
   }
 
   FlushDisplay();
