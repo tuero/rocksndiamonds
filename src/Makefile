@@ -307,6 +307,20 @@ clean: clean-obj clean-ico clean-bin
 
 
 # -----------------------------------------------------------------------------
+# run and test targets
+# -----------------------------------------------------------------------------
+
+run: all
+	$(PROGNAME) --verbose
+
+gdb: all
+	gdb -batch -x ../GDB_COMMANDS $(PROGNAME)
+
+valgrind: all
+	valgrind -v --leak-check=yes $(PROGNAME) 2> ../valgrind.out
+
+
+# -----------------------------------------------------------------------------
 # development only
 # -----------------------------------------------------------------------------
 

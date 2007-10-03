@@ -201,24 +201,41 @@ void DrawInitAnim()
   y = WIN_YSIZE / 2 - TILESIZE / 2;
 #endif
 
+  graphic_info = &anim_initial;		/* graphic == 0 => anim_initial */
+
 #if 0
   {
     static boolean done = FALSE;
 
-    if (!done)
-      printf("::: %d, %d, %d, %d => %d, %d\n",
+    // if (!done)
+      printf("::: %d, %d, %d, %d => %d, %d [%d, %d] [%d, %d]\n",
 	     init.busy.x, init.busy.y,
 	     init.busy.align, init.busy.valign,
-	     x, y);
+	     x, y,
+	     graphic_info[graphic].width,
+	     graphic_info[graphic].height,
+	     sync_frame, anim_initial.anim_delay);
 
     done = TRUE;
   }
 #endif
 
-  graphic_info = &anim_initial;		/* graphic == 0 => anim_initial */
-
   if (sync_frame % anim_initial.anim_delay == 0)
+  {
+#if 1
+    Bitmap *src_bitmap;
+    int src_x, src_y;
+    int width = graphic_info[graphic].width;
+    int height = graphic_info[graphic].height;
+    int frame = getGraphicAnimationFrame(graphic, sync_frame);
+
+    getGraphicSource(graphic, frame, &src_bitmap, &src_x, &src_y);
+    BlitBitmap(src_bitmap, window, src_x, src_y, width, height, x, y);
+#else
+    /* !!! this can only draw TILEX/TILEY size animations !!! */
     DrawGraphicAnimationExt(window, x, y, graphic, sync_frame, NO_MASKING);
+#endif
+  }
 
   graphic_info = graphic_info_last;
 
@@ -1237,9 +1254,10 @@ static int get_scaled_graphic_height(int graphic)
   return original_height * scale_up_factor;
 }
 
-static void set_graphic_parameters_ext(int graphic, struct GraphicInfo *g,
-				       int *parameter, Bitmap *src_bitmap)
+static void set_graphic_parameters_ext(int graphic, int *parameter,
+				       Bitmap *src_bitmap)
 {
+  struct GraphicInfo *g = &graphic_info[graphic];
   int anim_frames_per_row = 1, anim_frames_per_col = 1;
   int anim_frames_per_line = 1;
 
@@ -1322,6 +1340,13 @@ static void set_graphic_parameters_ext(int graphic, struct GraphicInfo *g,
     /* get final bitmap size (with scaling, but without small images) */
     int src_image_width  = get_scaled_graphic_width(graphic);
     int src_image_height = get_scaled_graphic_height(graphic);
+
+    if (src_image_width == 0 || src_image_height == 0)
+    {
+      /* only happens when loaded outside artwork system (like "global.busy") */
+      src_image_width  = src_bitmap->width;
+      src_image_height = src_bitmap->height;
+    }
 
     anim_frames_per_row = src_image_width  / g->width;
     anim_frames_per_col = src_image_height / g->height;
@@ -1485,8 +1510,7 @@ static void set_graphic_parameters(int graphic)
 					       image_config_suffix[i].token,
 					       image_config_suffix[i].type);
 
-  set_graphic_parameters_ext(graphic, &graphic_info[graphic],
-			     parameter, src_bitmap);
+  set_graphic_parameters_ext(graphic, parameter, src_bitmap);
 
 #else
 
@@ -5365,6 +5389,7 @@ static void InitMixer()
 
 void InitGfx()
 {
+  struct GraphicInfo *graphic_info_last = graphic_info;
   char *filename_font_initial = NULL;
   char *filename_anim_initial = NULL;
   Bitmap *bitmap_font_initial = NULL;
@@ -5498,12 +5523,37 @@ void InitGfx()
     }
   }
 
-  set_graphic_parameters_ext(0, &anim_initial, parameter, NULL);
+#if defined(CREATE_SPECIAL_EDITION_RND_JUE)
+  filename_anim_initial = "loading.pcx";
+
+  parameter[GFX_ARG_X] = 0;
+  parameter[GFX_ARG_Y] = 0;
+  parameter[GFX_ARG_WIDTH] = 128;
+  parameter[GFX_ARG_HEIGHT] = 40;
+  parameter[GFX_ARG_FRAMES] = 32;
+  parameter[GFX_ARG_DELAY] = 4;
+  parameter[GFX_ARG_FRAMES_PER_LINE] = ARG_UNDEFINED_VALUE;
+#endif
 
   if (filename_anim_initial == NULL)	/* should not happen */
     Error(ERR_EXIT, "cannot get filename for '%s'", CONFIG_TOKEN_GLOBAL_BUSY);
 
   anim_initial.bitmap = LoadCustomImage(filename_anim_initial);
+
+  graphic_info = &anim_initial;		/* graphic == 0 => anim_initial */
+
+  set_graphic_parameters_ext(0, parameter, anim_initial.bitmap);
+
+#if 0
+  printf("::: INIT_GFX: anim_frames_per_line == %d [%d / %d] [%d, %d]\n",
+	 graphic_info[0].anim_frames_per_line,
+	 get_scaled_graphic_width(0),
+	 graphic_info[0].width,
+	 getOriginalImageWidthFromImageID(0),
+	 graphic_info[0].scale_up_factor);
+#endif
+
+  graphic_info = graphic_info_last;
 
   init.busy.width  = anim_initial.width;
   init.busy.height = anim_initial.height;

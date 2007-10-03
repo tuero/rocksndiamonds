@@ -1,3 +1,10 @@
+2007-10-04
+	* version 3.2.5 released as special edition "R'n'D jue"
+
+2007-10-04
+	* changed build system to support special editions (like "R'n'D jue")
+	* added (hardcoded) loading graphics for "R'n'D jue" special edition
+
 2007-09-27
 	* added "background.PLAYING" (only visible as two-pixel border in game)
 	* added default level set for first start of special R'n'D version

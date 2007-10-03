@@ -42,7 +42,7 @@ CROSS_PATH_MSDOS = /usr/local/cross-msdos/i386-msdosdjgpp
 CROSS_PATH_WIN32 = /usr/local/cross-tools/i386-mingw32msvc
 
 # compile special edition of R'n'D instead of the normal (classic) version
-# SPECIAL_EDITION = rnd_jue
+SPECIAL_EDITION = rnd_jue
 
 
 # -----------------------------------------------------------------------------
@@ -107,13 +107,13 @@ auto-conf:
 	@$(MAKE_CMD) auto-conf
 
 run: all
-	@./rocksndiamonds --verbose
+	@$(MAKE_CMD) run
 
 gdb: all
-	@gdb -batch -x GDB_COMMANDS ./rocksndiamonds
+	@$(MAKE_CMD) gdb
 
 valgrind: all
-	@valgrind -v --leak-check=yes ./rocksndiamonds 2> valgrind.out
+	@$(MAKE_CMD) valgrind
 
 enginetest: all
 	./Scripts/make_enginetest.sh
