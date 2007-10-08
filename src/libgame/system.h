@@ -656,6 +656,7 @@ struct OptionInfo
   boolean network;
   boolean verbose;
   boolean debug;
+  boolean debug_x11_sync;
 };
 
 struct ScreenModeInfo

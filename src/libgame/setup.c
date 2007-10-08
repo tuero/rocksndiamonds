@@ -670,10 +670,8 @@ char *getCustomImageFilename(char *basename)
 #if defined(CREATE_SPECIAL_EDITION)
   free(filename);
 
-  /* !!! INSERT WARNING HERE TO REPORT MISSING ARTWORK FILES !!! */
-#if 0
-  printf("::: MISSING ARTWORK FILE '%s'\n", basename);
-#endif
+  if (options.debug)
+    Error(ERR_WARN, "cannot find artwork file '%s' (using fallback)", basename);
 
   /* 6th try: look for fallback artwork in old default artwork directory */
   /* (needed to prevent errors when trying to access unused artwork files) */
@@ -743,6 +741,9 @@ char *getCustomSoundFilename(char *basename)
 #if defined(CREATE_SPECIAL_EDITION)
   free(filename);
 
+  if (options.debug)
+    Error(ERR_WARN, "cannot find artwork file '%s' (using fallback)", basename);
+
   /* 6th try: look for fallback artwork in old default artwork directory */
   /* (needed to prevent errors when trying to access unused artwork files) */
   filename = getPath2(options.sounds_directory, SND_FALLBACK_FILENAME);
@@ -810,6 +811,9 @@ char *getCustomMusicFilename(char *basename)
 
 #if defined(CREATE_SPECIAL_EDITION)
   free(filename);
+
+  if (options.debug)
+    Error(ERR_WARN, "cannot find artwork file '%s' (using fallback)", basename);
 
   /* 6th try: look for fallback artwork in old default artwork directory */
   /* (needed to prevent errors when trying to access unused artwork files) */

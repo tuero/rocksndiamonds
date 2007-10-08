@@ -100,7 +100,7 @@ clean:
 
 
 # -----------------------------------------------------------------------------
-# development only
+# development, test, distribution build and packaging targets
 # -----------------------------------------------------------------------------
 
 auto-conf:
@@ -148,41 +148,44 @@ backup_gfx:
 # prerelease:
 #	./Scripts/make_prerelease.sh
 
-dist-unix:
-	./Scripts/make_dist.sh unix .
-
-dist-msdos:
-	./Scripts/make_dist.sh dos .
-
-dist-win32:
-	./Scripts/make_dist.sh win .
-
-dist-macosx:
-	./Scripts/make_dist.sh mac . $(MAKE)
-
-upload-unix:
-	./Scripts/make_dist.sh unix . upload
-
-upload-msdos:
-	./Scripts/make_dist.sh dos . upload
-
-upload-win32:
-	./Scripts/make_dist.sh win . upload
-
-upload-macosx:
-	./Scripts/make_dist.sh mac . upload
-
 dist-clean:
 	@$(MAKE_CMD) dist-clean
 
 dist-build-unix:
 	@BUILD_DIST=TRUE $(MAKE) x11
 
+dist-build-msdos:
+	@BUILD_DIST=TRUE $(MAKE) cross-msdos
+
 dist-build-win32:
 	@BUILD_DIST=TRUE $(MAKE) cross-win32
 
-dist-build-msdos:
-	@BUILD_DIST=TRUE $(MAKE) cross-msdos
+dist-build-macosx:
+	# (this is done by "dist-package-macosx" target)
+
+dist-package-unix:
+	./Scripts/make_dist.sh unix .
+
+dist-package-msdos:
+	./Scripts/make_dist.sh dos .
+
+dist-package-win32:
+	./Scripts/make_dist.sh win .
+
+dist-package-macosx:
+	./Scripts/make_dist.sh mac . $(MAKE)
+
+dist-upload-unix:
+	./Scripts/make_dist.sh unix . upload
+
+dist-upload-msdos:
+	./Scripts/make_dist.sh dos . upload
+
+dist-upload-win32:
+	./Scripts/make_dist.sh win . upload
+
+dist-upload-macosx:
+	./Scripts/make_dist.sh mac . upload
 
 dist-build-all:
 	$(MAKE) clean
@@ -190,11 +193,21 @@ dist-build-all:
 	$(MAKE) dist-build-win32	; $(MAKE) dist-clean
 #	$(MAKE) dist-build-msdos	; $(MAKE) dist-clean
 
-# dist-all: dist-build-all dist-unix dist-msdos dist-win32 dist-macosx
-dist-all: dist-build-all dist-unix dist-win32 dist-macosx
+dist-package-all:
+	$(MAKE) dist-package-unix
+	$(MAKE) dist-package-win32
+	$(MAKE) dist-package-macosx
+#	$(MAKE) dist-package-msdos
 
-# upload-all: upload-unix upload-msdos upload-win32 upload-macosx
-upload-all: upload-unix upload-win32 upload-macosx
+dist-upload-all:
+	$(MAKE) dist-upload-unix
+	$(MAKE) dist-upload-win32
+	$(MAKE) dist-upload-macosx
+#	$(MAKE) dist-upload-msdos
+
+dist-all: dist-build-all dist-package-all
+
+upload-all: dist-upload-all
 
 tags:
 	$(MAKE_CMD) tags

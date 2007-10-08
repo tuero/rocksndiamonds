@@ -257,8 +257,18 @@ void DrawMaskedBorder(int redraw_mask)
 
 void BackToFront()
 {
-  int x,y;
+  int x, y;
   DrawBuffer *buffer = (drawto_field == window ? backbuffer : drawto_field);
+
+#if 0
+  printf("::: TILES TO REFRESH: %d\n", redraw_tiles);
+  for (x = 0; x < SCR_FIELDX; x++)
+    for (y = 0 ; y < SCR_FIELDY; y++)
+      if (redraw[redraw_x1 + x][redraw_y1 + y])
+	printf("::: - %d, %d [%s]\n",
+	       LEVELX(x), LEVELY(y),
+	       EL_NAME(Feld[LEVELX(x)][LEVELY(y)]));
+#endif
 
   if (redraw_mask & REDRAW_TILES && redraw_tiles > REDRAWTILES_THRESHOLD)
     redraw_mask |= REDRAW_FIELD;

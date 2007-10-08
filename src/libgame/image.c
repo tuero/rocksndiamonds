@@ -649,7 +649,11 @@ void ZoomPixmap(Display *display, GC gc, Pixmap src_pixmap, Pixmap dst_pixmap,
 
   if (scale_down)
   {
+#if 1
+    zoom_factor = MIN(src_width / dst_width, src_height / dst_height);
+#else
     zoom_factor = src_width / dst_width;
+#endif
 
     /* adjust source image size to integer multiple of destination size */
     src_width  = dst_width  * zoom_factor;
@@ -657,7 +661,11 @@ void ZoomPixmap(Display *display, GC gc, Pixmap src_pixmap, Pixmap dst_pixmap,
   }
   else
   {
+#if 1
+    zoom_factor = MIN(dst_width / src_width, dst_height / src_height);
+#else
     zoom_factor = dst_width / src_width;
+#endif
 
     /* no adjustment needed when scaling up (some pixels may be left blank) */
   }

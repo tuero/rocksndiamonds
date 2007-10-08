@@ -5524,6 +5524,7 @@ static void print_usage()
 	 "      --serveronly                 only start network server\n"
 	 "  -v, --verbose                    verbose mode\n"
 	 "      --debug                      display debugging information\n"
+	 "      --debug-x11-sync             enable X11 synchronous mode\n"
 	 "  -e, --execute COMMAND            execute batch COMMAND\n"
 	 "\n"
 	 "Valid commands for '--execute' option:\n"

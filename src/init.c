@@ -5384,6 +5384,7 @@ static void InitArtworkConfig()
 static void InitMixer()
 {
   OpenAudio();
+
   StartMixer();
 }
 
@@ -5601,7 +5602,7 @@ static void InitLevelInfo()
   LoadLevelSetup_SeriesInfo();			/* last played level info */
 }
 
-void InitLevelArtworkInfo()
+static void InitLevelArtworkInfo()
 {
   LoadLevelArtworkInfo();
 }
@@ -5712,6 +5713,8 @@ static boolean CheckArtworkConfigForCustomElements(char *filename)
   SetupFileHash *setup_file_hash;
   boolean redefined_ce_found = FALSE;
 
+  /* !!! CACHE THIS BY USING HASH 'filename' => 'true/false' !!! */
+
   if ((setup_file_hash = loadSetupFileHash(filename)) != NULL)
   {
     BEGIN_HASH_ITERATION(setup_file_hash, itr)
@@ -5756,10 +5759,6 @@ static void InitOverrideArtwork()
 
     if (filename_local != NULL && !strEqual(filename_base, filename_local))
       redefined_ce_found |= CheckArtworkConfigForCustomElements(filename_local);
-
-#if 0
-    printf("::: redefined_ce_found == %d\n", redefined_ce_found);
-#endif
 
     if (!redefined_ce_found)
     {
@@ -6080,6 +6079,9 @@ void OpenAll()
 
   InitLevelArtworkInfo();
   print_timestamp_time("InitLevelArtworkInfo");
+
+  InitOverrideArtwork();	/* needs to know current level directory */
+  print_timestamp_time("InitOverrideArtwork");
 
   InitImages();			/* needs to know current level directory */
   print_timestamp_time("InitImages");

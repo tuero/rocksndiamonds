@@ -1,9 +1,17 @@
-2007-10-04
+2007-10-09
+	* fixed nasty bug with auto-override and normal override not working on
+	  program startup (especially when current level set has custom artwork)
+
+2007-10-05
 	* version 3.2.5 released as special edition "R'n'D jue"
+
+2007-10-05
+	* fixed X11 crash bug when blitting masked title screens over background
 
 2007-10-04
 	* changed build system to support special editions (like "R'n'D jue")
 	* added (hardcoded) loading graphics for "R'n'D jue" special edition
+	* fixed X11 crash bug when scaling images with width/height less than 32
 
 2007-09-27
 	* added "background.PLAYING" (only visible as two-pixel border in game)

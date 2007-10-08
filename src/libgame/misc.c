@@ -664,6 +664,7 @@ void GetOptions(char *argv[], void (*print_usage_function)(void))
   options.network = FALSE;
   options.verbose = FALSE;
   options.debug = FALSE;
+  options.debug_x11_sync = FALSE;
 
 #if !defined(PLATFORM_UNIX)
   if (*options_left == NULL)	/* no options given -- enable verbose mode */
@@ -788,6 +789,10 @@ void GetOptions(char *argv[], void (*print_usage_function)(void))
     else if (strncmp(option, "-debug", option_len) == 0)
     {
       options.debug = TRUE;
+    }
+    else if (strncmp(option, "-debug-x11-sync", option_len) == 0)
+    {
+      options.debug_x11_sync = TRUE;
     }
     else if (strncmp(option, "-execute", option_len) == 0)
     {

@@ -384,16 +384,18 @@ Bitmap *CreateBitmapStruct(void)
 Bitmap *CreateBitmap(int width, int height, int depth)
 {
   Bitmap *new_bitmap = CreateBitmapStruct();
-  int real_depth = GetRealDepth(depth);
+  int real_width  = MAX(1, width);	/* prevent zero bitmap width */
+  int real_height = MAX(1, height);	/* prevent zero bitmap height */
+  int real_depth  = GetRealDepth(depth);
 
 #if defined(TARGET_SDL)
-  SDLCreateBitmapContent(new_bitmap, width, height, real_depth);
+  SDLCreateBitmapContent(new_bitmap, real_width, real_height, real_depth);
 #else
-  X11CreateBitmapContent(new_bitmap, width, height, real_depth);
+  X11CreateBitmapContent(new_bitmap, real_width, real_height, real_depth);
 #endif
 
-  new_bitmap->width = width;
-  new_bitmap->height = height;
+  new_bitmap->width  = real_width;
+  new_bitmap->height = real_height;
 
   return new_bitmap;
 }

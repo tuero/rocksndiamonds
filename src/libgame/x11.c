@@ -22,6 +22,13 @@
 static void X11InitDisplay();
 static DrawWindow *X11InitWindow();
 
+static int X11DebugErrorHandler(Display *display, XErrorEvent *event)
+{
+  int x = 0;
+
+  return 1 / x;		/* !!! crash program to give backtrace in gdb !!! */
+}
+
 void X11InitVideoDisplay(void)
 {
   /* initialize X11 video */
@@ -54,6 +61,14 @@ static void X11InitDisplay()
   if (!(display = XOpenDisplay(options.display_name)))
     Error(ERR_EXIT, "cannot connect to X server %s",
 	  XDisplayName(options.display_name));
+
+  if (options.debug_x11_sync)
+  {
+    Error(ERR_WARN, "running in X11 synchronous mode (debug only)");
+
+    XSynchronize(display, True);
+    XSetErrorHandler(X11DebugErrorHandler);
+  }
 
   screen = DefaultScreen(display);
   visual = DefaultVisual(display, screen);
