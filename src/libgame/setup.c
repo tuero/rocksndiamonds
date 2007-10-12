@@ -334,7 +334,9 @@ char *setLevelArtworkDir(TreeInfo *ti)
   checked_free(*artwork_path_ptr);
 
   if ((level_artwork = getTreeInfoFromIdentifier(ti, *artwork_set_ptr)))
+  {
     *artwork_path_ptr = getStringCopy(getSetupArtworkDir(level_artwork));
+  }
   else
   {
     /*

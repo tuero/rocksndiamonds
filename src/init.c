@@ -5611,7 +5611,29 @@ static void InitImages()
 {
   print_timestamp_init("InitImages");
 
+#if 0
+  printf("::: leveldir_current->identifier == '%s'\n",
+	 leveldir_current == NULL ? "[NULL]" : leveldir_current->identifier);
+  printf("::: leveldir_current->graphics_path == '%s'\n",
+	 leveldir_current == NULL ? "[NULL]" : leveldir_current->graphics_path);
+  printf("::: leveldir_current->graphics_set == '%s'\n",
+	 leveldir_current == NULL ? "[NULL]" : leveldir_current->graphics_set);
+  printf("::: getLevelArtworkSet(ARTWORK_TYPE_GRAPHICS) == '%s'\n",
+	 leveldir_current == NULL ? "[NULL]" : LEVELDIR_ARTWORK_SET(leveldir_current, ARTWORK_TYPE_GRAPHICS));
+#endif
+
   setLevelArtworkDir(artwork.gfx_first);
+
+#if 0
+  printf("::: leveldir_current->identifier == '%s'\n",
+	 leveldir_current == NULL ? "[NULL]" : leveldir_current->identifier);
+  printf("::: leveldir_current->graphics_path == '%s'\n",
+	 leveldir_current == NULL ? "[NULL]" : leveldir_current->graphics_path);
+  printf("::: leveldir_current->graphics_set == '%s'\n",
+	 leveldir_current == NULL ? "[NULL]" : leveldir_current->graphics_set);
+  printf("::: getLevelArtworkSet(ARTWORK_TYPE_GRAPHICS) == '%s'\n",
+	 leveldir_current == NULL ? "[NULL]" : LEVELDIR_ARTWORK_SET(leveldir_current, ARTWORK_TYPE_GRAPHICS));
+#endif
 
 #if 0
   printf("::: InitImages for '%s' ['%s', '%s'] ['%s', '%s']\n",
@@ -5749,16 +5771,41 @@ static void InitOverrideArtwork()
     char *filename_base, *filename_local;
     boolean redefined_ce_found = FALSE;
 
+    setLevelArtworkDir(artwork.gfx_first);
+
+#if 0
+    printf("::: leveldir_current->identifier == '%s'\n",
+	   leveldir_current == NULL ? "[NULL]" : leveldir_current->identifier);
+    printf("::: leveldir_current->graphics_path == '%s'\n",
+	   leveldir_current == NULL ? "[NULL]" : leveldir_current->graphics_path);
+    printf("::: leveldir_current->graphics_set == '%s'\n",
+	   leveldir_current == NULL ? "[NULL]" : leveldir_current->graphics_set);
+    printf("::: getLevelArtworkSet(ARTWORK_TYPE_GRAPHICS) == '%s'\n",
+	   leveldir_current == NULL ? "[NULL]" : LEVELDIR_ARTWORK_SET(leveldir_current, ARTWORK_TYPE_GRAPHICS));
+#endif
+
     /* first look for special artwork configured in level series config */
     filename_base = getCustomArtworkLevelConfigFilename(ARTWORK_TYPE_GRAPHICS);
+
+#if 0
+    printf("::: filename_base == '%s'\n", filename_base);
+#endif
 
     if (fileExists(filename_base))
       redefined_ce_found |= CheckArtworkConfigForCustomElements(filename_base);
 
     filename_local = getCustomArtworkConfigFilename(ARTWORK_TYPE_GRAPHICS);
 
+#if 0
+    printf("::: filename_local == '%s'\n", filename_local);
+#endif
+
     if (filename_local != NULL && !strEqual(filename_base, filename_local))
       redefined_ce_found |= CheckArtworkConfigForCustomElements(filename_local);
+
+#if 0
+    printf("::: redefined_ce_found == %d\n", redefined_ce_found);
+#endif
 
     if (!redefined_ce_found)
     {
