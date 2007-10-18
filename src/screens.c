@@ -4019,6 +4019,13 @@ static void execSetupSound()
 
 static void execSetupArtwork()
 {
+#if 0
+  printf("::: '%s', '%s', '%s'\n",
+	 artwork.gfx_current->subdir,
+	 artwork.gfx_current->fullpath,
+	 artwork.gfx_current->basepath);
+#endif
+
   setup.graphics_set = artwork.gfx_current->identifier;
   setup.sounds_set = artwork.snd_current->identifier;
   setup.music_set = artwork.mus_current->identifier;

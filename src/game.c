@@ -9815,7 +9815,7 @@ void MauerAblegerStahl(int ax, int ay)
        element == EL_EXPANDABLE_STEELWALL_HORIZONTAL) &&
       ((links_massiv && rechts_massiv) ||
        element == EL_EXPANDABLE_STEELWALL_VERTICAL))
-    Feld[ax][ay] = EL_WALL;
+    Feld[ax][ay] = EL_STEELWALL;
 
   if (new_wall)
     PlayLevelSoundAction(ax, ay, ACTION_GROWING);

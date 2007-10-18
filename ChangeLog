@@ -1,3 +1,6 @@
+2007-10-18
+	* fixed growing steel wall to leave steel wall instead of normal wall
+
 2007-10-09
 	* fixed nasty bug with auto-override and normal override not working on
 	  program startup (especially when current level set has custom artwork)
