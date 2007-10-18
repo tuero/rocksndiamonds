@@ -1,5 +1,8 @@
 2007-10-18
-	* fixed growing steel wall to leave steel wall instead of normal wall
+	* fixed growing steel wall to also leave behind steel wall instead of
+	  normal, destructible wall
+	* fixed handling of rocks falling through stacks of quicksand with
+	  different speed (before, the rocks just got stuck in the quicksand)
 
 2007-10-09
 	* fixed nasty bug with auto-override and normal override not working on

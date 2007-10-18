@@ -7589,6 +7589,33 @@ void StartMoving(int x, int y)
 
 	PlayLevelSoundAction(x, y, ACTION_FILLING);
       }
+      else if (Feld[x][y + 1] == EL_QUICKSAND_FAST_EMPTY)
+      {
+	if (!MovDelay[x][y])
+	{
+	  MovDelay[x][y] = TILEY + 1;
+
+	  ResetGfxAnimation(x, y);
+	  ResetGfxAnimation(x, y + 1);
+	}
+
+	if (MovDelay[x][y])
+	{
+	  DrawLevelElement(x, y, EL_QUICKSAND_EMPTYING);
+	  DrawLevelElement(x, y + 1, EL_QUICKSAND_FAST_FILLING);
+
+	  MovDelay[x][y]--;
+	  if (MovDelay[x][y])
+	    return;
+	}
+
+	Feld[x][y] = EL_QUICKSAND_EMPTY;
+	Feld[x][y + 1] = EL_QUICKSAND_FAST_FULL;
+	Store[x][y + 1] = Store[x][y];
+	Store[x][y] = 0;
+
+	PlayLevelSoundAction(x, y, ACTION_FILLING);
+      }
     }
     else if (element == EL_QUICKSAND_FAST_FULL)
     {
@@ -7629,6 +7656,33 @@ void StartMoving(int x, int y)
 
 	Feld[x][y] = EL_QUICKSAND_FAST_EMPTY;
 	Feld[x][y + 1] = EL_QUICKSAND_FAST_FULL;
+	Store[x][y + 1] = Store[x][y];
+	Store[x][y] = 0;
+
+	PlayLevelSoundAction(x, y, ACTION_FILLING);
+      }
+      else if (Feld[x][y + 1] == EL_QUICKSAND_EMPTY)
+      {
+	if (!MovDelay[x][y])
+	{
+	  MovDelay[x][y] = TILEY + 1;
+
+	  ResetGfxAnimation(x, y);
+	  ResetGfxAnimation(x, y + 1);
+	}
+
+	if (MovDelay[x][y])
+	{
+	  DrawLevelElement(x, y, EL_QUICKSAND_FAST_EMPTYING);
+	  DrawLevelElement(x, y + 1, EL_QUICKSAND_FILLING);
+
+	  MovDelay[x][y]--;
+	  if (MovDelay[x][y])
+	    return;
+	}
+
+	Feld[x][y] = EL_QUICKSAND_FAST_EMPTY;
+	Feld[x][y + 1] = EL_QUICKSAND_FULL;
 	Store[x][y + 1] = Store[x][y];
 	Store[x][y] = 0;
 
