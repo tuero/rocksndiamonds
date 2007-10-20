@@ -5758,71 +5758,94 @@ static boolean CheckArtworkConfigForCustomElements(char *filename)
   return redefined_ce_found;
 }
 
+static boolean CheckArtworkTypeForRedefinedCustomElements(int type)
+{
+  char *filename_base, *filename_local;
+  boolean redefined_ce_found = FALSE;
+
+  setLevelArtworkDir(ARTWORK_FIRST_NODE(artwork, type));
+
+#if 0
+  printf("::: leveldir_current->identifier == '%s'\n",
+	 leveldir_current == NULL ? "[NULL]" : leveldir_current->identifier);
+  printf("::: leveldir_current->graphics_path == '%s'\n",
+	 leveldir_current == NULL ? "[NULL]" : leveldir_current->graphics_path);
+  printf("::: leveldir_current->graphics_set == '%s'\n",
+	 leveldir_current == NULL ? "[NULL]" : leveldir_current->graphics_set);
+  printf("::: getLevelArtworkSet(ARTWORK_TYPE_GRAPHICS) == '%s'\n",
+	 leveldir_current == NULL ? "[NULL]" :
+	 LEVELDIR_ARTWORK_SET(leveldir_current, type));
+#endif
+
+  /* first look for special artwork configured in level series config */
+  filename_base = getCustomArtworkLevelConfigFilename(type);
+
+#if 0
+  printf("::: filename_base == '%s'\n", filename_base);
+#endif
+
+  if (fileExists(filename_base))
+    redefined_ce_found |= CheckArtworkConfigForCustomElements(filename_base);
+
+  filename_local = getCustomArtworkConfigFilename(type);
+
+#if 0
+  printf("::: filename_local == '%s'\n", filename_local);
+#endif
+
+  if (filename_local != NULL && !strEqual(filename_base, filename_local))
+    redefined_ce_found |= CheckArtworkConfigForCustomElements(filename_local);
+
+#if 0
+  printf("::: redefined_ce_found == %d\n", redefined_ce_found);
+#endif
+
+  return redefined_ce_found;
+}
+
 static void InitOverrideArtwork()
 {
-  boolean init_override_from_setup = TRUE;
+  boolean redefined_ce_found = FALSE;
 
+  /* to check if this level set redefines any CEs, do not use overriding */
   gfx.override_level_graphics = FALSE;
   gfx.override_level_sounds   = FALSE;
   gfx.override_level_music    = FALSE;
 
-  if (setup.auto_override_artwork)
+  /* now check if this level set has definitions for custom elements */
+  if (setup.override_level_graphics == AUTO ||
+      setup.override_level_sounds   == AUTO ||
+      setup.override_level_music    == AUTO)
+    redefined_ce_found =
+      (CheckArtworkTypeForRedefinedCustomElements(ARTWORK_TYPE_GRAPHICS) |
+       CheckArtworkTypeForRedefinedCustomElements(ARTWORK_TYPE_SOUNDS) |
+       CheckArtworkTypeForRedefinedCustomElements(ARTWORK_TYPE_MUSIC));
+
+#if 0
+  printf("::: redefined_ce_found == %d\n", redefined_ce_found);
+#endif
+
+  if (redefined_ce_found)
   {
-    char *filename_base, *filename_local;
-    boolean redefined_ce_found = FALSE;
-
-    setLevelArtworkDir(artwork.gfx_first);
-
-#if 0
-    printf("::: leveldir_current->identifier == '%s'\n",
-	   leveldir_current == NULL ? "[NULL]" : leveldir_current->identifier);
-    printf("::: leveldir_current->graphics_path == '%s'\n",
-	   leveldir_current == NULL ? "[NULL]" : leveldir_current->graphics_path);
-    printf("::: leveldir_current->graphics_set == '%s'\n",
-	   leveldir_current == NULL ? "[NULL]" : leveldir_current->graphics_set);
-    printf("::: getLevelArtworkSet(ARTWORK_TYPE_GRAPHICS) == '%s'\n",
-	   leveldir_current == NULL ? "[NULL]" : LEVELDIR_ARTWORK_SET(leveldir_current, ARTWORK_TYPE_GRAPHICS));
-#endif
-
-    /* first look for special artwork configured in level series config */
-    filename_base = getCustomArtworkLevelConfigFilename(ARTWORK_TYPE_GRAPHICS);
-
-#if 0
-    printf("::: filename_base == '%s'\n", filename_base);
-#endif
-
-    if (fileExists(filename_base))
-      redefined_ce_found |= CheckArtworkConfigForCustomElements(filename_base);
-
-    filename_local = getCustomArtworkConfigFilename(ARTWORK_TYPE_GRAPHICS);
-
-#if 0
-    printf("::: filename_local == '%s'\n", filename_local);
-#endif
-
-    if (filename_local != NULL && !strEqual(filename_base, filename_local))
-      redefined_ce_found |= CheckArtworkConfigForCustomElements(filename_local);
-
-#if 0
-    printf("::: redefined_ce_found == %d\n", redefined_ce_found);
-#endif
-
-    if (!redefined_ce_found)
-    {
-      gfx.override_level_graphics = TRUE;
-      gfx.override_level_sounds   = TRUE;
-      gfx.override_level_music    = TRUE;
-
-      init_override_from_setup = FALSE;
-    }
+    /* this level set has CE definitions: change "AUTO" to "FALSE" */
+    gfx.override_level_graphics = (setup.override_level_graphics == TRUE);
+    gfx.override_level_sounds   = (setup.override_level_sounds   == TRUE);
+    gfx.override_level_music    = (setup.override_level_music    == TRUE);
+  }
+  else
+  {
+    /* this level set has no CE definitions: change "AUTO" to "TRUE" */
+    gfx.override_level_graphics = (setup.override_level_graphics != FALSE);
+    gfx.override_level_sounds   = (setup.override_level_sounds   != FALSE);
+    gfx.override_level_music    = (setup.override_level_music    != FALSE);
   }
 
-  if (init_override_from_setup)
-  {
-    gfx.override_level_graphics = setup.override_level_graphics;
-    gfx.override_level_sounds   = setup.override_level_sounds;
-    gfx.override_level_music    = setup.override_level_music;
-  }
+#if 0
+  printf("::: => %d, %d, %d\n",
+	 gfx.override_level_graphics,
+	 gfx.override_level_sounds,
+	 gfx.override_level_music);
+#endif
 }
 
 static char *getNewArtworkIdentifier(int type)

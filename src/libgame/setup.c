@@ -2687,6 +2687,10 @@ void setSetupInfo(struct TokenInfo *token_info,
       *(boolean *)setup_value = get_boolean_from_string(token_value);
       break;
 
+    case TYPE_SWITCH3:
+      *(int *)setup_value = get_switch3_from_string(token_value);
+      break;
+
     case TYPE_KEY:
       *(Key *)setup_value = getKeyFromKeyName(token_value);
       break;
@@ -3749,8 +3753,18 @@ char *getSetupValue(int type, void *value)
       strcpy(value_string, (*(boolean *)value ? "on" : "off"));
       break;
 
+    case TYPE_SWITCH3:
+      strcpy(value_string, (*(int *)value == AUTO  ? "auto" :
+			    *(int *)value == FALSE ? "off" : "on"));
+      break;
+
     case TYPE_YES_NO:
       strcpy(value_string, (*(boolean *)value ? "yes" : "no"));
+      break;
+
+    case TYPE_YES_NO_AUTO:
+      strcpy(value_string, (*(int *)value == AUTO  ? "auto" :
+			    *(int *)value == FALSE ? "no" : "yes"));
       break;
 
     case TYPE_ECS_AGA:

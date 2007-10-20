@@ -2010,7 +2010,8 @@ void HandleInfoScreen_Main(int mx, int my, int dx, int dy, int button)
 
       if (info_info[choice].type & menu_navigation_type ||
 	  info_info[choice].type & TYPE_ENTER_SCREEN ||
-	  info_info[choice].type & TYPE_BOOLEAN_STYLE)
+	  info_info[choice].type & TYPE_BOOLEAN_STYLE ||
+	  info_info[choice].type & TYPE_YES_NO_AUTO)
 	button = MB_MENU_CHOICE;
     }
     else if (dy)
@@ -4210,10 +4211,16 @@ static struct TokenInfo setup_info_artwork[] =
   { TYPE_STRING,	&music_set_name,	""			},
   { TYPE_EMPTY,		NULL,			""			},
 #if 1
+#if 1
+  { TYPE_YES_NO_AUTO,&setup.override_level_graphics,"Override Level Graphics:"},
+  { TYPE_YES_NO_AUTO,&setup.override_level_sounds,  "Override Level Sounds:"  },
+  { TYPE_YES_NO_AUTO,&setup.override_level_music,   "Override Level Music:"   },
+#else
   { TYPE_YES_NO, &setup.override_level_graphics,"Override Level Graphics:" },
   { TYPE_YES_NO, &setup.override_level_sounds,	"Override Level Sounds:"   },
   { TYPE_YES_NO, &setup.override_level_music,	"Override Level Music:"    },
   { TYPE_YES_NO, &setup.auto_override_artwork,	"Auto-Override Non-CE Sets:" },
+#endif
 #else
   { TYPE_STRING,	NULL,			"Override Level Artwork:"},
   { TYPE_YES_NO,	&setup.override_level_graphics,	"Graphics:"	},
@@ -4330,11 +4337,12 @@ static Key getSetupKey()
 
 static int getSetupTextFont(int type)
 {
-  if (type & (TYPE_SWITCH |
-	      TYPE_YES_NO |
-	      TYPE_STRING |
-	      TYPE_ECS_AGA |
-	      TYPE_KEYTEXT |
+  if (type & (TYPE_SWITCH	|
+	      TYPE_YES_NO	|
+	      TYPE_YES_NO_AUTO	|
+	      TYPE_STRING	|
+	      TYPE_ECS_AGA	|
+	      TYPE_KEYTEXT	|
 	      TYPE_ENTER_LIST))
     return FONT_MENU_2;
   else
@@ -4351,6 +4359,9 @@ static int getSetupValueFont(int type, void *value)
     return FONT_VALUE_1;
   else if (type & TYPE_BOOLEAN_STYLE)
     return (*(boolean *)value ? FONT_OPTION_ON : FONT_OPTION_OFF);
+  else if (type & TYPE_YES_NO_AUTO)
+    return (*(int *)value == AUTO  ? FONT_OPTION_ON :
+	    *(int *)value == FALSE ? FONT_OPTION_OFF : FONT_OPTION_ON);
   else
     return FONT_VALUE_1;
 }
@@ -4363,11 +4374,13 @@ static void drawSetupValue(int pos)
   int ypos = MENU_SCREEN_START_YPOS + pos;
   int startx = mSX + xpos * 32;
   int starty = mSY + ypos * 32;
-  int font_nr, font_width;
+  int font_nr, font_width, font_height;
   int type = setup_info[pos].type;
   void *value = setup_info[pos].value;
   char *value_string = getSetupValue(type, value);
+#if 1
   int i;
+#endif
 
   if (value_string == NULL)
     return;
@@ -4377,9 +4390,7 @@ static void drawSetupValue(int pos)
     xpos = MENU_SCREEN_START_XPOS;
 
     if (type & TYPE_QUERY)
-    {
       value_string = "<press key>";
-    }
   }
   else if (type & TYPE_STRING)
   {
@@ -4390,11 +4401,16 @@ static void drawSetupValue(int pos)
     if (strlen(value_string) > max_value_len)
       value_string[max_value_len] = '\0';
   }
+  else if (type & TYPE_YES_NO_AUTO)
+  {
+    xpos = MENU_SCREEN_VALUE_XPOS - 1;
+  }
 
   startx = mSX + xpos * 32;
   starty = mSY + ypos * 32;
   font_nr = getSetupValueFont(type, value);
   font_width = getFontWidth(font_nr);
+  font_height = getFontHeight(font_nr);
 
   /* downward compatibility correction for Juergen Bonhagen's menu settings */
   if (setup_mode != SETUP_MODE_INPUT)
@@ -4431,8 +4447,12 @@ static void drawSetupValue(int pos)
     }
   }
 
+#if 0
+  DrawBackground(startx, starty, SX + SXSIZE - startx, font_height);
+#else
   for (i = 0; i <= MENU_SCREEN_MAX_XPOS - xpos; i++)
     DrawText(startx + i * font_width, starty, " ", font_nr);
+#endif
 
   DrawText(startx, starty, value_string, font_nr);
 
@@ -4440,11 +4460,20 @@ static void drawSetupValue(int pos)
     getFontBitmapInfo(font_nr)->draw_xoffset = font_draw_xoffset_old;
 }
 
-static void changeSetupValue(int pos)
+static void changeSetupValue(int pos, int dx)
 {
   if (setup_info[pos].type & TYPE_BOOLEAN_STYLE)
   {
     *(boolean *)setup_info[pos].value ^= TRUE;
+  }
+  else if (setup_info[pos].type & TYPE_YES_NO_AUTO)
+  {
+    *(int *)setup_info[pos].value =
+      (dx == -1 ?
+       (*(int *)setup_info[pos].value == AUTO ? TRUE :
+	*(int *)setup_info[pos].value == TRUE ? FALSE : AUTO) :
+       (*(int *)setup_info[pos].value == TRUE ? AUTO :
+	*(int *)setup_info[pos].value == AUTO ? FALSE : TRUE));
   }
   else if (setup_info[pos].type & TYPE_KEY)
   {
@@ -4658,7 +4687,8 @@ void HandleSetupScreen_Generic(int mx, int my, int dx, int dy, int button)
       int menu_navigation_type = (dx < 0 ? TYPE_LEAVE : TYPE_ENTER);
 
       if (setup_info[choice].type & menu_navigation_type ||
-	  setup_info[choice].type & TYPE_BOOLEAN_STYLE)
+	  setup_info[choice].type & TYPE_BOOLEAN_STYLE ||
+	  setup_info[choice].type & TYPE_YES_NO_AUTO)
 	button = MB_MENU_CHOICE;
     }
     else if (dy)
@@ -4709,7 +4739,7 @@ void HandleSetupScreen_Generic(int mx, int my, int dx, int dy, int button)
       else
       {
 	if (setup_info[y].type & TYPE_VALUE)
-	  changeSetupValue(y);
+	  changeSetupValue(y, dx);
       }
     }
   }

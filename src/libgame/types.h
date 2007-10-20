@@ -26,10 +26,21 @@ typedef int boolean;
 typedef unsigned char byte;
 #endif
 
-#ifndef FALSE
-#define FALSE		0
-#define TRUE		(!FALSE)
+#ifdef TRUE
+#undef TRUE
 #endif
+
+#ifdef FALSE
+#undef FALSE
+#endif
+
+#ifdef AUTO
+#undef AUTO
+#endif
+
+#define TRUE		1
+#define FALSE		0
+#define AUTO		-1
 
 #ifndef MIN
 #define MIN(a,b) 	((a) < (b) ? (a) : (b))

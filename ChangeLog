@@ -1,3 +1,7 @@
+2007-10-20
+	* merged override and auto-override options into new override options
+	  with a new data type than can take the values "no", "yes" and "auto"
+
 2007-10-18
 	* fixed growing steel wall to also leave behind steel wall instead of
 	  normal, destructible wall

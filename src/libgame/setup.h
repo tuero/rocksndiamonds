@@ -21,33 +21,35 @@
 /* values for setup file handling */
 #define TYPE_BOOLEAN			(1 << 0)
 #define TYPE_SWITCH			(1 << 1)
-#define TYPE_YES_NO			(1 << 2)
-#define TYPE_ECS_AGA			(1 << 3)
-#define TYPE_KEY			(1 << 4)
-#define TYPE_KEY_X11			(1 << 5)
-#define TYPE_INTEGER			(1 << 6)
-#define TYPE_STRING			(1 << 7)
-#define TYPE_ELEMENT			(1 << 8)
-#define TYPE_GRAPHIC			(1 << 9)
+#define TYPE_SWITCH3			(1 << 2)
+#define TYPE_YES_NO			(1 << 3)
+#define TYPE_YES_NO_AUTO		(1 << 4)
+#define TYPE_ECS_AGA			(1 << 5)
+#define TYPE_KEY			(1 << 6)
+#define TYPE_KEY_X11			(1 << 7)
+#define TYPE_INTEGER			(1 << 8)
+#define TYPE_STRING			(1 << 9)
+#define TYPE_ELEMENT			(1 << 10)
+#define TYPE_GRAPHIC			(1 << 11)
 
 /* additional values for setup screen */
-#define TYPE_ENTER_SCREEN		(1 << 10)
-#define TYPE_LEAVE_SCREEN		(1 << 11)
-#define TYPE_ENTER_MENU			(1 << 12)
-#define TYPE_LEAVE_MENU			(1 << 13)
-#define TYPE_ENTER_LIST			(1 << 14)
-#define TYPE_LEAVE_LIST			(1 << 15)
-#define TYPE_EMPTY			(1 << 16)
-#define TYPE_KEYTEXT			(1 << 17)
+#define TYPE_ENTER_SCREEN		(1 << 12)
+#define TYPE_LEAVE_SCREEN		(1 << 13)
+#define TYPE_ENTER_MENU			(1 << 14)
+#define TYPE_LEAVE_MENU			(1 << 15)
+#define TYPE_ENTER_LIST			(1 << 16)
+#define TYPE_LEAVE_LIST			(1 << 17)
+#define TYPE_EMPTY			(1 << 18)
+#define TYPE_KEYTEXT			(1 << 19)
 
-#define TYPE_GHOSTED			(1 << 18)
-#define TYPE_QUERY			(1 << 19)
+#define TYPE_GHOSTED			(1 << 20)
+#define TYPE_QUERY			(1 << 21)
 
 /* additional values for internal purposes */
-#define TYPE_BITFIELD			(1 << 20)
-#define TYPE_CONTENT			(1 << 21)
-#define TYPE_ELEMENT_LIST		(1 << 22)
-#define TYPE_CONTENT_LIST		(1 << 23)
+#define TYPE_BITFIELD			(1 << 22)
+#define TYPE_CONTENT			(1 << 23)
+#define TYPE_ELEMENT_LIST		(1 << 24)
+#define TYPE_CONTENT_LIST		(1 << 25)
 
 /* derived values for setup file handling */
 #define TYPE_BOOLEAN_STYLE		(TYPE_BOOLEAN | \
@@ -57,6 +59,8 @@
 
 /* derived values for setup screen */
 #define TYPE_VALUE			(TYPE_BOOLEAN_STYLE	| \
+					 TYPE_SWITCH3		| \
+					 TYPE_YES_NO_AUTO	| \
 					 TYPE_KEY		| \
 					 TYPE_KEY_X11		| \
 					 TYPE_INTEGER		| \

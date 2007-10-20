@@ -8013,9 +8013,8 @@ void SaveScore(int nr)
 #define SETUP_TOKEN_OVERRIDE_LEVEL_GRAPHICS	28
 #define SETUP_TOKEN_OVERRIDE_LEVEL_SOUNDS	29
 #define SETUP_TOKEN_OVERRIDE_LEVEL_MUSIC	30
-#define SETUP_TOKEN_AUTO_OVERRIDE_ARTWORK	31
 
-#define NUM_GLOBAL_SETUP_TOKENS			32
+#define NUM_GLOBAL_SETUP_TOKENS			31
 
 /* editor setup */
 #define SETUP_TOKEN_EDITOR_EL_BOULDERDASH	0
@@ -8140,10 +8139,9 @@ static struct TokenInfo global_setup_tokens[] =
   { TYPE_STRING, &si.graphics_set,	"graphics_set"			},
   { TYPE_STRING, &si.sounds_set,	"sounds_set"			},
   { TYPE_STRING, &si.music_set,		"music_set"			},
-  { TYPE_SWITCH, &si.override_level_graphics, "override_level_graphics"	},
-  { TYPE_SWITCH, &si.override_level_sounds,   "override_level_sounds"	},
-  { TYPE_SWITCH, &si.override_level_music,    "override_level_music"	},
-  { TYPE_SWITCH, &si.auto_override_artwork,   "auto_override_artwork"	},
+  { TYPE_SWITCH3,&si.override_level_graphics, "override_level_graphics"	},
+  { TYPE_SWITCH3,&si.override_level_sounds,   "override_level_sounds"	},
+  { TYPE_SWITCH3,&si.override_level_music,    "override_level_music"	},
 };
 
 static boolean not_used = FALSE;
@@ -8298,7 +8296,6 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
   si->override_level_graphics = FALSE;
   si->override_level_sounds = FALSE;
   si->override_level_music = FALSE;
-  si->auto_override_artwork = FALSE;
 
   si->editor.el_boulderdash		= TRUE;
   si->editor.el_emerald_mine		= TRUE;
@@ -8357,7 +8354,9 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
 #if defined(CREATE_SPECIAL_EDITION_RND_JUE)
   si->handicap = FALSE;
   si->fullscreen = TRUE;
-  si->auto_override_artwork = TRUE;
+  si->override_level_graphics = AUTO;
+  si->override_level_sounds = AUTO;
+  si->override_level_music = AUTO;
 #endif
 }
 

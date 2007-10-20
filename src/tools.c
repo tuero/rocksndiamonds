@@ -503,6 +503,16 @@ static void FadeExt(int fade_mask, int fade_mode, int fade_type)
     return;
   }
 
+#if 0
+  printf("::: !!! FADING %d ... [%d] [%d]\n", fade_mode, fade_type,
+	 fade_type_skip);
+#endif
+
+#if 1
+  fade_delay = fading.fade_delay;
+  post_delay = (fade_mode == FADE_MODE_FADE_OUT ? fading.post_delay : 0);
+#endif
+
   if (fade_type_skip != FADE_TYPE_NONE)
   {
 #if 0
@@ -513,7 +523,11 @@ static void FadeExt(int fade_mask, int fade_mode, int fade_type)
     if (fade_type & fade_type_skip)
       fade_type_skip = FADE_TYPE_NONE;
 
+#if 1
+    fade_delay = 0;
+#else
     return;
+#endif
   }
 
 #if 1
@@ -553,8 +567,10 @@ static void FadeExt(int fade_mask, int fade_mode, int fade_type)
     width  = FULL_SXSIZE;
     height = FULL_SYSIZE;
 
+#if 0
     fade_delay = fading.fade_delay;
     post_delay = (fade_mode == FADE_MODE_FADE_OUT ? fading.post_delay : 0);
+#endif
 
     if (border.draw_masked_when_fading)
       draw_border_function = DrawMaskedBorder_FIELD;	/* update when fading */
@@ -568,8 +584,10 @@ static void FadeExt(int fade_mask, int fade_mode, int fade_type)
     width  = WIN_XSIZE;
     height = WIN_YSIZE;
 
+#if 0
     fade_delay = fading.fade_delay;
     post_delay = (fade_mode == FADE_MODE_FADE_OUT ? fading.post_delay : 0);
+#endif
   }
 
 #if 1

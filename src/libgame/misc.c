@@ -1600,6 +1600,24 @@ boolean get_boolean_from_string(char *s)
   return result;
 }
 
+int get_switch3_from_string(char *s)
+{
+  char *s_lower = getStringToLower(s);
+  int result = FALSE;
+
+  if (strEqual(s_lower, "true") ||
+      strEqual(s_lower, "yes") ||
+      strEqual(s_lower, "on") ||
+      get_integer_from_string(s) == 1)
+    result = TRUE;
+  else if (strEqual(s_lower, "auto"))
+    result = AUTO;
+
+  free(s_lower);
+
+  return result;
+}
+
 
 /* ------------------------------------------------------------------------- */
 /* functions for generic lists                                               */

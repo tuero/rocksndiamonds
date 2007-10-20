@@ -870,10 +870,9 @@ struct SetupInfo
   char *graphics_set;
   char *sounds_set;
   char *music_set;
-  boolean override_level_graphics;
-  boolean override_level_sounds;
-  boolean override_level_music;
-  boolean auto_override_artwork;
+  int override_level_graphics;		/* not boolean -- can also be "AUTO" */
+  int override_level_sounds;		/* not boolean -- can also be "AUTO" */
+  int override_level_music;		/* not boolean -- can also be "AUTO" */
 
   struct SetupEditorInfo editor;
   struct SetupEditorCascadeInfo editor_cascade;
