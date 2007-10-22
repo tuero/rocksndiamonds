@@ -42,7 +42,7 @@ CROSS_PATH_MSDOS = /usr/local/cross-msdos/i386-msdosdjgpp
 CROSS_PATH_WIN32 = /usr/local/cross-tools/i386-mingw32msvc
 
 # compile special edition of R'n'D instead of the normal (classic) version
-SPECIAL_EDITION = rnd_jue
+# SPECIAL_EDITION = rnd_jue
 
 
 # -----------------------------------------------------------------------------
@@ -129,6 +129,9 @@ enginetestnew: all
 
 leveltest: all
 	./Scripts/make_enginetest.sh leveltest
+
+levelsketch_images: all
+	./Scripts/make_levelsketch_images.sh
 
 backup:
 	./Scripts/make_backup.sh src 1

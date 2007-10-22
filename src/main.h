@@ -2346,6 +2346,8 @@ struct GlobalInfo
   char *convert_leveldir;
   int convert_level_nr;
 
+  char *create_images_dir;
+
   int num_toons;
 
   float frames_per_second;

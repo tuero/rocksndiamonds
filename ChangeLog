@@ -1,3 +1,6 @@
+2007-10-23
+	* added command line function to write level sketch images to directory
+
 2007-10-20
 	* merged override and auto-override options into new override options
 	  with a new data type than can take the values "no", "yes" and "auto"

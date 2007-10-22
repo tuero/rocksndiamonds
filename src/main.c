@@ -5538,6 +5538,7 @@ static void print_usage()
 	 "  \"dump tape FILE\"                 dump tape data from FILE\n"
 	 "  \"autoplay LEVELDIR [NR ...]\"     play level tapes for LEVELDIR\n"
 	 "  \"convert LEVELDIR [NR]\"          convert levels in LEVELDIR\n"
+	 "  \"create images DIRECTORY\"        write BMP images to DIRECTORY\n"
 	 "\n",
 	 program.command_basename);
 }

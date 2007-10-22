@@ -9625,9 +9625,9 @@ void LoadHelpTextInfo()
 }
 
 
-/* ------------------------------------------------------------------------- *
- * convert levels
- * ------------------------------------------------------------------------- */
+/* ------------------------------------------------------------------------- */
+/* convert levels                                                            */
+/* ------------------------------------------------------------------------- */
 
 #define MAX_NUM_CONVERT_LEVELS		1000
 
@@ -9736,4 +9736,66 @@ void ConvertLevels()
   printf_line("=", 79);
 
   CloseAllAndExit(0);
+}
+
+
+/* ------------------------------------------------------------------------- */
+/* create images for use in level sketches (raw BMP format)                  */
+/* ------------------------------------------------------------------------- */
+
+void CreateLevelSketchImages()
+{
+#if defined(TARGET_SDL)
+  Bitmap *bitmap1;
+  Bitmap *bitmap2;
+  int i;
+
+  bitmap1 = CreateBitmap(TILEX, TILEY, DEFAULT_DEPTH);
+  bitmap2 = CreateBitmap(MINI_TILEX, MINI_TILEY, DEFAULT_DEPTH);
+
+  for (i = 0; i < NUM_FILE_ELEMENTS; i++)
+  {
+    Bitmap *src_bitmap;
+    int src_x, src_y;
+    int graphic = el2edimg(i);
+    char basename1[16];
+    char basename2[16];
+    char *filename1;
+    char *filename2;
+
+    sprintf(basename1, "%03d.bmp", i);
+    sprintf(basename2, "%03ds.bmp", i);
+
+    filename1 = getPath2(global.create_images_dir, basename1);
+    filename2 = getPath2(global.create_images_dir, basename2);
+
+    getGraphicSource(graphic, 0, &src_bitmap, &src_x, &src_y);
+    BlitBitmap(src_bitmap, bitmap1, src_x, src_y, TILEX, TILEY, 0, 0);
+
+    if (SDL_SaveBMP(bitmap1->surface, filename1) != 0)
+      Error(ERR_EXIT, "cannot save level sketch image file '%s'", filename1);
+
+    getMiniGraphicSource(graphic, &src_bitmap, &src_x, &src_y);
+    BlitBitmap(src_bitmap, bitmap2, src_x, src_y, MINI_TILEX, MINI_TILEY, 0, 0);
+
+    if (SDL_SaveBMP(bitmap2->surface, filename2) != 0)
+      Error(ERR_EXIT, "cannot save level sketch image file '%s'", filename2);
+
+    free(filename1);
+    free(filename2);
+
+    if (options.debug)
+      printf("%03d `%03d%c", i, i, (i % 10 < 9 ? ' ' : '\n'));
+  }
+
+  FreeBitmap(bitmap1);
+  FreeBitmap(bitmap2);
+
+  if (options.debug)
+    printf("\n");
+
+  Error(ERR_INFO, "%d normal and small images created", NUM_FILE_ELEMENTS);
+
+  CloseAllAndExit(0);
+#endif
 }

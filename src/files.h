@@ -68,6 +68,7 @@ void LoadMusicInfo();
 void LoadHelpAnimInfo();
 void LoadHelpTextInfo();
 
-void ConvertLevels(void);
+void ConvertLevels();
+void CreateLevelSketchImages();
 
 #endif	/* FILES_H */

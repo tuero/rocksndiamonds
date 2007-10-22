@@ -4976,6 +4976,7 @@ static void InitGlobal()
 
   global.autoplay_leveldir = NULL;
   global.convert_leveldir = NULL;
+  global.create_images_dir = NULL;
 
   global.frames_per_second = 0;
   global.fps_slowdown = FALSE;
@@ -5156,6 +5157,18 @@ void Execute_Command(char *command)
       *str_ptr++ = '\0';			/* terminate leveldir string */
       global.convert_level_nr = atoi(str_ptr);	/* get level_nr value */
     }
+  }
+  else if (strncmp(command, "create images ", 14) == 0)
+  {
+#if defined(TARGET_SDL)
+    global.create_images_dir = getStringCopy(&command[14]);
+
+    if (access(global.create_images_dir, W_OK) != 0)
+      Error(ERR_EXIT, "image target directory '%s' not found or not writable",
+	    global.create_images_dir);
+#else
+    Error(ERR_EXIT, "command only available for SDL target");
+#endif
   }
 
 #if DEBUG
@@ -6176,6 +6189,11 @@ void OpenAll()
   else if (global.convert_leveldir)
   {
     ConvertLevels();
+    return;
+  }
+  else if (global.create_images_dir)
+  {
+    CreateLevelSketchImages();
     return;
   }
 
