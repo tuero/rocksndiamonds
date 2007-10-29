@@ -3092,7 +3092,7 @@ static struct
   {
     -1,					ED_AREA_1X1_SETTINGS_YPOS(5),
     GADGET_ID_CUSTOM_CHANGE_TRIGGER,	GADGET_ID_CHANGE_OTHER_ACTION,
-    &custom_element_change.trigger_element, 1, 1,
+    &custom_element_change.initial_trigger_element, 1, 1,
     NULL, NULL, NULL,			"other element triggering change"
   },
 
@@ -6594,8 +6594,8 @@ static void replace_custom_element_in_settings(int element_from,
       if (change->target_element == element_from)
 	change->target_element = element_to;
 
-      if (change->trigger_element == element_from)
-	change->trigger_element = element_to;
+      if (change->initial_trigger_element == element_from)
+	change->initial_trigger_element = element_to;
 
       for (y = 0; y < 3; y++)
 	for (x = 0; x < 3; x++)

@@ -311,13 +311,13 @@ clean: clean-obj clean-ico clean-bin
 # -----------------------------------------------------------------------------
 
 run: all
-	$(PROGNAME) --verbose
+	cd .. && ./$(PROGBASE) --verbose
 
 gdb: all
-	gdb -batch -x ../GDB_COMMANDS $(PROGNAME)
+	cd .. && gdb -batch -x GDB_COMMANDS ./$(PROGBASE)
 
 valgrind: all
-	valgrind -v --leak-check=yes $(PROGNAME) 2> ../valgrind.out
+	cd .. && valgrind -v --leak-check=yes ./$(PROGBASE) 2> valgrind.out
 
 
 # -----------------------------------------------------------------------------

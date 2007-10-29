@@ -2378,7 +2378,7 @@ struct ElementChangeInfo
   int delay_random;		/* added frame delay before changed (random) */
   int delay_frames;		/* either 1 (frames) or 50 (seconds; 50 fps) */
 
-  int trigger_element;		/* element triggering change */
+  int initial_trigger_element;	/* initial element triggering change */
 
   struct Content target_content;/* elements for extended change target */
   boolean use_target_content;	/* use extended change target */
@@ -2395,6 +2395,8 @@ struct ElementChangeInfo
   int action_arg;		/* parameter of action */
 
   /* ---------- internal values used at runtime when playing ---------- */
+
+  int trigger_element;		/* element triggering change */
 
   /* functions that are called before, while and after the change of an
      element -- currently only used for non-custom elements */

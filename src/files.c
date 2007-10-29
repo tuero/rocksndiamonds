@@ -1045,7 +1045,7 @@ static struct LevelFileConfigInfo chunk_config_CUSX_change[] =
   {
     -1,					-1,
     TYPE_ELEMENT,			CONF_VALUE_16_BIT(5),
-    &xx_change.trigger_element,		EL_EMPTY_SPACE
+    &xx_change.initial_trigger_element,	EL_EMPTY_SPACE
   },
 
   {
@@ -2384,7 +2384,7 @@ static int LoadLevel_CUS3(FILE *file, int chunk_size, struct LevelInfo *level)
     ei->change->delay_random = getFile16BitBE(file);
     ei->change->delay_frames = getFile16BitBE(file);
 
-    ei->change->trigger_element = getMappedElement(getFile16BitBE(file));
+    ei->change->initial_trigger_element= getMappedElement(getFile16BitBE(file));
 
     ei->change->explode = getFile8Bit(file);
     ei->change->use_target_content = getFile8Bit(file);
@@ -2517,7 +2517,7 @@ static int LoadLevel_CUS4(FILE *file, int chunk_size, struct LevelInfo *level)
     change->delay_random = getFile16BitBE(file);
     change->delay_frames = getFile16BitBE(file);
 
-    change->trigger_element = getMappedElement(getFile16BitBE(file));
+    change->initial_trigger_element = getMappedElement(getFile16BitBE(file));
 
     change->explode = getFile8Bit(file);
     change->use_target_content = getFile8Bit(file);
@@ -6797,7 +6797,7 @@ static void SaveLevel_CUS3(FILE *file, struct LevelInfo *level,
 	putFile16BitBE(file, ei->change->delay_random);
 	putFile16BitBE(file, ei->change->delay_frames);
 
-	putFile16BitBE(file, ei->change->trigger_element);
+	putFile16BitBE(file, ei->change->initial_trigger_element);
 
 	putFile8Bit(file, ei->change->explode);
 	putFile8Bit(file, ei->change->use_target_content);
@@ -6909,7 +6909,7 @@ static void SaveLevel_CUS4(FILE *file, struct LevelInfo *level, int element)
     putFile16BitBE(file, change->delay_random);
     putFile16BitBE(file, change->delay_frames);
 
-    putFile16BitBE(file, change->trigger_element);
+    putFile16BitBE(file, change->initial_trigger_element);
 
     putFile8Bit(file, change->explode);
     putFile8Bit(file, change->use_target_content);
@@ -9740,7 +9740,7 @@ void ConvertLevels()
 
 
 /* ------------------------------------------------------------------------- */
-/* create images for use in level sketches (raw BMP format)                  */
+/* create and save images for use in level sketches (raw BMP format)         */
 /* ------------------------------------------------------------------------- */
 
 void CreateLevelSketchImages()
@@ -9799,3 +9799,100 @@ void CreateLevelSketchImages()
   CloseAllAndExit(0);
 #endif
 }
+
+
+/* ------------------------------------------------------------------------- */
+/* create and save images for custom and group elements (raw BMP format)     */
+/* ------------------------------------------------------------------------- */
+
+void CreateCustomElementImages()
+{
+#if defined(TARGET_SDL)
+  char *filename = "graphics.classic/RocksCE.bmp";
+  Bitmap *bitmap;
+  Bitmap *src_bitmap;
+  int dummy_graphic = IMG_CUSTOM_99;
+  int yoffset_ce = 0;
+  int yoffset_ge = (TILEY * NUM_CUSTOM_ELEMENTS / 16);
+  int src_x, src_y;
+  int i;
+
+  bitmap = CreateBitmap(TILEX * 16 * 2,
+			TILEY * (NUM_CUSTOM_ELEMENTS + NUM_GROUP_ELEMENTS) / 16,
+			DEFAULT_DEPTH);
+
+  getGraphicSource(dummy_graphic, 0, &src_bitmap, &src_x, &src_y);
+
+  for (i = 0; i < NUM_CUSTOM_ELEMENTS; i++)
+  {
+    int x = i % 16;
+    int y = i / 16;
+    int ii = i + 1;
+    int j;
+
+    BlitBitmap(src_bitmap, bitmap, 0, 0, TILEX, TILEY,
+	       TILEX * x, TILEY * y + yoffset_ce);
+
+    BlitBitmap(src_bitmap, bitmap, 0, TILEY, TILEX, TILEY,
+	       TILEX * x + TILEX * 16, TILEY * y + yoffset_ce);
+
+    for (j = 2; j >= 0; j--)
+    {
+      int c = ii % 10;
+
+      BlitBitmap(src_bitmap, bitmap, TILEX + c * 7, 0, 6, 10,
+		 TILEX * x + 6 + j * 7,
+		 TILEY * y + 11 + yoffset_ce);
+
+      BlitBitmap(src_bitmap, bitmap, TILEX + c * 8, TILEY, 6, 10,
+		 TILEX * 16 + TILEX * x + 6 + j * 8,
+		 TILEY * y + 10 + yoffset_ce);
+
+      ii /= 10;
+    }
+  }
+
+  for (i = 0; i < NUM_GROUP_ELEMENTS; i++)
+  {
+    int x = i % 16;
+    int y = i / 16;
+    int ii = i + 1;
+    int j;
+
+    BlitBitmap(src_bitmap, bitmap, 0, 0, TILEX, TILEY,
+	       TILEX * x, TILEY * y + yoffset_ge);
+
+    BlitBitmap(src_bitmap, bitmap, 0, TILEY, TILEX, TILEY,
+	       TILEX * x + TILEX * 16, TILEY * y + yoffset_ge);
+
+    for (j = 1; j >= 0; j--)
+    {
+      int c = ii % 10;
+
+      BlitBitmap(src_bitmap, bitmap, TILEX + c * 10, 11, 10, 10,
+		 TILEX * x + 6 + j * 10,
+		 TILEY * y + 11 + yoffset_ge);
+
+      BlitBitmap(src_bitmap, bitmap, TILEX + c * 8, TILEY + 12, 6, 10,
+		 TILEX * 16 + TILEX * x + 10 + j * 8,
+		 TILEY * y + 10 + yoffset_ge);
+
+      ii /= 10;
+    }
+  }
+
+  if (SDL_SaveBMP(bitmap->surface, filename) != 0)
+    Error(ERR_EXIT, "cannot save CE graphics file '%s'", filename);
+
+  FreeBitmap(bitmap);
+
+  CloseAllAndExit(0);
+#endif
+}
+
+#if 0
+void CreateLevelSketchImages_TEST()
+{
+  void CreateCustomElementImages()
+}
+#endif

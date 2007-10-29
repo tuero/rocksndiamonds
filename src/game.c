@@ -1943,6 +1943,34 @@ static void InitField(int x, int y, boolean init_game)
 	Feld[x][y] = EL_EMC_MAGIC_BALL_SWITCH_ACTIVE;
       break;
 
+    case EL_TRIGGER_PLAYER:
+    case EL_TRIGGER_ELEMENT:
+    case EL_TRIGGER_CE_VALUE:
+    case EL_TRIGGER_CE_SCORE:
+    case EL_SELF:
+    case EL_ANY_ELEMENT:
+    case EL_CURRENT_CE_VALUE:
+    case EL_CURRENT_CE_SCORE:
+    case EL_PREV_CE_1:
+    case EL_PREV_CE_2:
+    case EL_PREV_CE_3:
+    case EL_PREV_CE_4:
+    case EL_PREV_CE_5:
+    case EL_PREV_CE_6:
+    case EL_PREV_CE_7:
+    case EL_PREV_CE_8:
+    case EL_NEXT_CE_1:
+    case EL_NEXT_CE_2:
+    case EL_NEXT_CE_3:
+    case EL_NEXT_CE_4:
+    case EL_NEXT_CE_5:
+    case EL_NEXT_CE_6:
+    case EL_NEXT_CE_7:
+    case EL_NEXT_CE_8:
+      /* reference elements should not be used on the playfield */
+      Feld[x][y] = EL_EMPTY;
+      break;
+
     default:
       if (IS_CUSTOM_ELEMENT(element))
       {
@@ -3313,7 +3341,7 @@ static void InitGameEngine()
     SET_PROPERTY(ch_delay->element, EP_CAN_CHANGE_OR_HAS_ACTION, TRUE);
   }
 
-  /* ---------- initialize internal run-time variables ------------- */
+  /* ---------- initialize internal run-time variables --------------------- */
 
   for (i = 0; i < NUM_CUSTOM_ELEMENTS; i++)
   {
@@ -3350,6 +3378,27 @@ static void InitGameEngine()
       }
     }
   }
+
+#if 1
+  /* ---------- initialize reference elements in change conditions --------- */
+
+  for (i = 0; i < NUM_CUSTOM_ELEMENTS; i++)
+  {
+    int element = EL_CUSTOM_START + i;
+    struct ElementInfo *ei = &element_info[element];
+
+    for (j = 0; j < ei->num_change_pages; j++)
+    {
+      int trigger_element = ei->change_page[j].initial_trigger_element;
+
+      if (trigger_element >= EL_PREV_CE_8 &&
+	  trigger_element <= EL_NEXT_CE_8)
+	trigger_element = RESOLVED_REFERENCE_ELEMENT(element, trigger_element);
+
+      ei->change_page[j].trigger_element = trigger_element;
+    }
+  }
+#endif
 
   /* ---------- initialize run-time trigger player and element ------------- */
 

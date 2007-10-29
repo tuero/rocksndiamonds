@@ -1,3 +1,8 @@
+2007-10-29
+	* fixed bug with reference elements used as trigger elements on custom
+	  element change pages not being recognized
+	* fixed bug with reference elements not being removed from the playfield
+
 2007-10-23
 	* added command line function to write level sketch images to directory
 
