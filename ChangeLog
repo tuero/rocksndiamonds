@@ -2,6 +2,10 @@
 	* fixed bug with reference elements used as trigger elements on custom
 	  element change pages not being recognized
 	* fixed bug with reference elements not being removed from the playfield
+	* added engine functionality that allows custom elements that "can dig"
+	  other elements not only to do so when moving by themselves, but also
+	  when being pushed by the player (therefore adding the functionality to
+	  push one element over another element, replacing it with the new one)
 
 2007-10-23
 	* added command line function to write level sketch images to directory

@@ -1033,7 +1033,10 @@ static boolean MovePlayer(struct PlayerInfo *, int, int);
 static void ScrollPlayer(struct PlayerInfo *, int);
 static void ScrollScreen(struct PlayerInfo *, int);
 
-int DigField(struct PlayerInfo *, int, int, int, int, int, int, int);
+static int DigField(struct PlayerInfo *, int, int, int, int, int, int, int);
+static boolean DigFieldByCE(int, int, int);
+static boolean SnapField(struct PlayerInfo *, int, int);
+static boolean DropElement(struct PlayerInfo *);
 
 static void InitBeltMovement(void);
 static void CloseAllOpenTimegates(void);
@@ -1104,9 +1107,6 @@ void TestIfBadThingTouchesOtherBadThing(int, int);
 void KillPlayer(struct PlayerInfo *);
 void BuryPlayer(struct PlayerInfo *);
 void RemovePlayer(struct PlayerInfo *);
-
-boolean SnapField(struct PlayerInfo *, int, int);
-boolean DropElement(struct PlayerInfo *);
 
 static int getInvisibleActiveFromInvisibleElement(int);
 static int getInvisibleFromInvisibleActiveElement(int);
@@ -8377,6 +8377,10 @@ void StartMoving(int x, int y)
     else if (IS_CUSTOM_ELEMENT(element) &&
 	     CUSTOM_ELEMENT_CAN_ENTER_FIELD(element, newx, newy))
     {
+#if 1
+      if (!DigFieldByCE(newx, newy, element))
+	return;
+#else
       int new_element = Feld[newx][newy];
 
       if (!IS_FREE(newx, newy))
@@ -8415,6 +8419,7 @@ void StartMoving(int x, int y)
       }
 
       Store[newx][newy] = EL_EMPTY;
+
 #if 1
       /* this makes it possible to leave the removed element again */
       if (IS_EQUAL_OR_IN_GROUP(new_element, MOVE_ENTER_EL(element)))
@@ -8428,6 +8433,8 @@ void StartMoving(int x, int y)
 	Store[newx][newy] = (move_leave_element == EL_TRIGGER_ELEMENT ?
 			     new_element : move_leave_element);
       }
+#endif
+
 #endif
 
       if (move_pattern & MV_MAZE_RUNNER_STYLE)
@@ -14040,9 +14047,9 @@ static boolean checkDiagonalPushing(struct PlayerInfo *player,
   =============================================================================
 */
 
-int DigField(struct PlayerInfo *player,
-	     int oldx, int oldy, int x, int y,
-	     int real_dx, int real_dy, int mode)
+static int DigField(struct PlayerInfo *player,
+		    int oldx, int oldy, int x, int y,
+		    int real_dx, int real_dy, int mode)
 {
   boolean is_player = (IS_PLAYER(oldx, oldy) || mode != DF_DIG);
   boolean player_was_pushing = player->is_pushing;
@@ -14521,9 +14528,18 @@ int DigField(struct PlayerInfo *player,
 
     if (!(IN_LEV_FIELD(nextx, nexty) &&
 	  (IS_FREE(nextx, nexty) ||
-	   (Feld[nextx][nexty] == EL_SOKOBAN_FIELD_EMPTY &&
-	    IS_SB_ELEMENT(element)))))
+	   (IS_SB_ELEMENT(element) &&
+	    Feld[nextx][nexty] == EL_SOKOBAN_FIELD_EMPTY) ||
+	   (IS_CUSTOM_ELEMENT(element) &&
+	    CUSTOM_ELEMENT_CAN_ENTER_FIELD(element, nextx, nexty)))))
       return MP_NO_ACTION;
+
+    if (IS_CUSTOM_ELEMENT(element) &&
+	CUSTOM_ELEMENT_CAN_ENTER_FIELD(element, nextx, nexty))
+    {
+      if (!DigFieldByCE(nextx, nexty, element))
+	return MP_NO_ACTION;
+    }
 
     if (!checkDiagonalPushing(player, x, y, real_dx, real_dy))
       return MP_NO_ACTION;
@@ -14784,7 +14800,66 @@ int DigField(struct PlayerInfo *player,
   return MP_MOVING;
 }
 
-boolean SnapField(struct PlayerInfo *player, int dx, int dy)
+static boolean DigFieldByCE(int x, int y, int digging_element)
+{
+  int element = Feld[x][y];
+
+  if (!IS_FREE(x, y))
+  {
+    int action = (IS_DIGGABLE(element) ? ACTION_DIGGING :
+		  IS_COLLECTIBLE(element) ? ACTION_COLLECTING :
+		  ACTION_BREAKING);
+
+    /* no element can dig solid indestructible elements */
+    if (IS_INDESTRUCTIBLE(element) &&
+	!IS_DIGGABLE(element) &&
+	!IS_COLLECTIBLE(element))
+      return FALSE;
+
+    if (AmoebaNr[x][y] &&
+	(element == EL_AMOEBA_FULL ||
+	 element == EL_BD_AMOEBA ||
+	 element == EL_AMOEBA_GROWING))
+    {
+      AmoebaCnt[AmoebaNr[x][y]]--;
+      AmoebaCnt2[AmoebaNr[x][y]]--;
+    }
+
+    if (IS_MOVING(x, y))
+      RemoveMovingField(x, y);
+    else
+    {
+      RemoveField(x, y);
+      DrawLevelField(x, y);
+    }
+
+    /* if digged element was about to explode, prevent the explosion */
+    ExplodeField[x][y] = EX_TYPE_NONE;
+
+    PlayLevelSoundAction(x, y, action);
+  }
+
+  Store[x][y] = EL_EMPTY;
+
+#if 1
+  /* this makes it possible to leave the removed element again */
+  if (IS_EQUAL_OR_IN_GROUP(element, MOVE_ENTER_EL(digging_element)))
+    Store[x][y] = element;
+#else
+  if (IS_EQUAL_OR_IN_GROUP(element, MOVE_ENTER_EL(digging_element)))
+  {
+    int move_leave_element = element_info[digging_element].move_leave_element;
+
+    /* this makes it possible to leave the removed element again */
+    Store[x][y] = (move_leave_element == EL_TRIGGER_ELEMENT ?
+		   element : move_leave_element);
+  }
+#endif
+
+  return TRUE;
+}
+
+static boolean SnapField(struct PlayerInfo *player, int dx, int dy)
 {
   int jx = player->jx, jy = player->jy;
   int x = jx + dx, y = jy + dy;
@@ -14864,7 +14939,7 @@ boolean SnapField(struct PlayerInfo *player, int dx, int dy)
   return TRUE;
 }
 
-boolean DropElement(struct PlayerInfo *player)
+static boolean DropElement(struct PlayerInfo *player)
 {
   int old_element, new_element;
   int dropx = player->jx, dropy = player->jy;
