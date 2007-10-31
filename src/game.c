@@ -14534,13 +14534,6 @@ static int DigField(struct PlayerInfo *player,
 	    CUSTOM_ELEMENT_CAN_ENTER_FIELD(element, nextx, nexty)))))
       return MP_NO_ACTION;
 
-    if (IS_CUSTOM_ELEMENT(element) &&
-	CUSTOM_ELEMENT_CAN_ENTER_FIELD(element, nextx, nexty))
-    {
-      if (!DigFieldByCE(nextx, nexty, element))
-	return MP_NO_ACTION;
-    }
-
     if (!checkDiagonalPushing(player, x, y, real_dx, real_dy))
       return MP_NO_ACTION;
 
@@ -14556,6 +14549,13 @@ static int DigField(struct PlayerInfo *player,
 	player->move_delay = 0;
 
       return MP_NO_ACTION;
+    }
+
+    if (IS_CUSTOM_ELEMENT(element) &&
+	CUSTOM_ELEMENT_CAN_ENTER_FIELD(element, nextx, nexty))
+    {
+      if (!DigFieldByCE(nextx, nexty, element))
+	return MP_NO_ACTION;
     }
 
     if (IS_SB_ELEMENT(element))

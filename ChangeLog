@@ -1,3 +1,7 @@
+2007-10-31
+	* fixed bug in new "can dig" feature (see below) so that an unsuccessful
+	  try to push something (due to push delay) does not cause a dig action
+
 2007-10-29
 	* fixed bug with reference elements used as trigger elements on custom
 	  element change pages not being recognized
