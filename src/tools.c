@@ -6255,6 +6255,16 @@ void SetGfxAnimation_EM(struct GraphicInfo_EM *g_em,
 
       GfxFrame[x][y]++;
 
+#if 0
+      /* !!! TEST !!! NEW !!! DOES NOT WORK RIGHT YET !!! */
+      if (g->double_movement && frame_em == 0)
+      {
+	GfxFrame[x][y] = 0;
+
+	// printf("::: resetting... [%d]\n", tile);
+      }
+#endif
+
       if (move_dir == MV_LEFT)
 	GfxFrame[x - 1][y] = GfxFrame[x][y];
       else if (move_dir == MV_RIGHT)
@@ -6309,6 +6319,7 @@ void getGraphicSourceObjectExt_EM(struct GraphicInfo_EM *g_em,
 {
   int action = object_mapping[tile].action;
   int direction = object_mapping[tile].direction;
+  boolean is_backside = object_mapping[tile].is_backside;
   int effective_element = get_effective_element_EM(tile, frame_em);
   int graphic = (direction == MV_NONE ?
 		 el_act2img(effective_element, action) :
@@ -6348,8 +6359,13 @@ void getGraphicSourceObjectExt_EM(struct GraphicInfo_EM *g_em,
 				g->anim_start_frame,
 				sync_frame);
 
+#if 0
+  getGraphicSourceExt(graphic, frame, &g_em->bitmap, &g_em->src_x, &g_em->src_y,
+		      g->double_movement && is_backside);
+#else
   getGraphicSourceExt(graphic, frame, &g_em->bitmap,
 		      &g_em->src_x, &g_em->src_y, FALSE);
+#endif
 
   /* (updating the "crumbled" graphic definitions is probably not really needed,
      as animations for crumbled graphics can't be longer than one EMC cycle) */

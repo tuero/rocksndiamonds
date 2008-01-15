@@ -75,6 +75,7 @@ int 			GfxRandom[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 int 			GfxElement[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 int			GfxAction[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 int 			GfxDir[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+int 			GfxRedraw[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 
 int			ActiveElement[MAX_NUM_ELEMENTS];
 int			ActiveButton[NUM_IMAGE_FILES];

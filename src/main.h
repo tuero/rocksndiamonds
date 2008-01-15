@@ -929,6 +929,12 @@
 #define MICROLABEL1_YPOS	(MICROLEVEL_YPOS - 36)
 #define MICROLABEL2_YPOS	(MICROLEVEL_YPOS + MICROLEVEL_YSIZE + 7)
 
+/* values for GfxRedraw */
+#define GFX_REDRAW_NONE				(0)
+#define GFX_REDRAW_TILE				(1 << 0)
+#define GFX_REDRAW_TILE_CRUMBLED		(1 << 1)
+#define GFX_REDRAW_TILE_CRUMBLED_NEIGHBOURS	(1 << 2)
+#define GFX_REDRAW_TILE_TWINKLED		(1 << 3)
 
 /* score for elements */
 #define SC_EMERALD		0
@@ -2742,6 +2748,7 @@ extern int			GfxRandom[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern int 			GfxElement[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern int			GfxAction[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern int 			GfxDir[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern int 			GfxRedraw[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 
 extern int			ActiveElement[MAX_NUM_ELEMENTS];
 extern int			ActiveButton[NUM_IMAGE_FILES];
