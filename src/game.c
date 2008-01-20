@@ -2433,35 +2433,38 @@ void UpdateGameControlValues()
 
     if (gpc->type == TYPE_ELEMENT)
     {
-      int last_anim_random_frame = gfx.anim_random_frame;
-      int element = gpc->value;
-      int graphic = el2panelimg(element);
-
-      if (gpc->value != gpc->last_value)
+      if (gpc->value != EL_UNDEFINED && gpc->value != EL_EMPTY)
       {
-	gpc->gfx_frame = 0;
-	gpc->gfx_random = INIT_GFX_RANDOM();
-      }
-      else
-      {
-	gpc->gfx_frame++;
+	int last_anim_random_frame = gfx.anim_random_frame;
+	int element = gpc->value;
+	int graphic = el2panelimg(element);
 
-	if (ANIM_MODE(graphic) == ANIM_RANDOM &&
-	    IS_NEXT_FRAME(gpc->gfx_frame, graphic))
+	if (gpc->value != gpc->last_value)
+	{
+	  gpc->gfx_frame = 0;
 	  gpc->gfx_random = INIT_GFX_RANDOM();
+	}
+	else
+	{
+	  gpc->gfx_frame++;
+
+	  if (ANIM_MODE(graphic) == ANIM_RANDOM &&
+	      IS_NEXT_FRAME(gpc->gfx_frame, graphic))
+	    gpc->gfx_random = INIT_GFX_RANDOM();
+	}
+
+	if (ANIM_MODE(graphic) == ANIM_RANDOM)
+	  gfx.anim_random_frame = gpc->gfx_random;
+
+	if (ANIM_MODE(graphic) == ANIM_CE_SCORE)
+	  gpc->gfx_frame = element_info[element].collect_score;
+
+	gpc->frame = getGraphicAnimationFrame(el2panelimg(gpc->value),
+					      gpc->gfx_frame);
+
+	if (ANIM_MODE(graphic) == ANIM_RANDOM)
+	  gfx.anim_random_frame = last_anim_random_frame;
       }
-
-      if (ANIM_MODE(graphic) == ANIM_RANDOM)
-	gfx.anim_random_frame = gpc->gfx_random;
-
-      if (ANIM_MODE(graphic) == ANIM_CE_SCORE)
-	gpc->gfx_frame = element_info[element].collect_score;
-
-      gpc->frame = getGraphicAnimationFrame(el2panelimg(gpc->value),
-					    gpc->gfx_frame);
-
-      if (ANIM_MODE(graphic) == ANIM_RANDOM)
-	gfx.anim_random_frame = last_anim_random_frame;
     }
   }
 }

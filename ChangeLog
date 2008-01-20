@@ -1,3 +1,9 @@
+2008-01-20
+	* fixed crash bug caused by accessing invalid element (with value -1)
+	  in UpdateGameControlValues()
+	* fixed graphical bug when using two-tile movement animations with EMC
+	  game engine without explicitly using native EMC graphics engine
+
 2007-10-31
 	* fixed bug in new "can dig" feature (see below) so that an unsuccessful
 	  try to push something (due to push delay) does not cause a dig action

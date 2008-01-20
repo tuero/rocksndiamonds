@@ -6221,6 +6221,19 @@ void SetGfxAnimation_EM(struct GraphicInfo_EM *g_em,
 			     action == ACTION_FILLING ||
 			     action == ACTION_EMPTYING);
 
+  /* special case: graphic uses "2nd movement tile" and has defined
+     7 frames for movement animation (or less) => use default graphic
+     for last (8th) frame which ends the movement animation */
+  if (g->double_movement && g->anim_frames < 8 && frame_em == 7)
+  {
+    action = ACTION_DEFAULT;	/* (keep action_* unchanged for now) */
+    graphic = (direction == MV_NONE ?
+	       el_act2img(effective_element, action) :
+	       el_act_dir2img(effective_element, action, direction));
+
+    g = &graphic_info[graphic];
+  }
+
 #if 0
   if (tile == Xsand_stonesand_1 ||
       tile == Xsand_stonesand_2 ||
@@ -6255,7 +6268,7 @@ void SetGfxAnimation_EM(struct GraphicInfo_EM *g_em,
 
       GfxFrame[x][y]++;
 
-#if 0
+#if 1
       /* !!! TEST !!! NEW !!! DOES NOT WORK RIGHT YET !!! */
       if (g->double_movement && frame_em == 0)
       {
@@ -6321,12 +6334,19 @@ void getGraphicSourceObjectExt_EM(struct GraphicInfo_EM *g_em,
   int direction = object_mapping[tile].direction;
   boolean is_backside = object_mapping[tile].is_backside;
   int effective_element = get_effective_element_EM(tile, frame_em);
+#if 1
+  int effective_action = action;
+#else
+  int effective_action = (frame_em < 7 ? action : ACTION_DEFAULT);
+#endif
   int graphic = (direction == MV_NONE ?
-		 el_act2img(effective_element, action) :
-		 el_act_dir2img(effective_element, action, direction));
+		 el_act2img(effective_element, effective_action) :
+		 el_act_dir2img(effective_element, effective_action,
+				direction));
   int crumbled = (direction == MV_NONE ?
-		  el_act2crm(effective_element, action) :
-		  el_act_dir2crm(effective_element, action, direction));
+		  el_act2crm(effective_element, effective_action) :
+		  el_act_dir2crm(effective_element, effective_action,
+				 direction));
   int base_graphic = el_act2img(effective_element, ACTION_DEFAULT);
   int base_crumbled = el_act2crm(effective_element, ACTION_DEFAULT);
   boolean has_crumbled_graphics = (base_crumbled != base_graphic);
@@ -6335,6 +6355,30 @@ void getGraphicSourceObjectExt_EM(struct GraphicInfo_EM *g_em,
   struct GraphicInfo *g_crumbled = &graphic_info[crumbled];
 #endif
   int sync_frame;
+
+  /* special case: graphic uses "2nd movement tile" and has defined
+     7 frames for movement animation (or less) => use default graphic
+     for last (8th) frame which ends the movement animation */
+  if (g->double_movement && g->anim_frames < 8 && frame_em == 7)
+  {
+    effective_action = ACTION_DEFAULT;
+    graphic = (direction == MV_NONE ?
+	       el_act2img(effective_element, effective_action) :
+	       el_act_dir2img(effective_element, effective_action,
+			      direction));
+    crumbled = (direction == MV_NONE ?
+		el_act2crm(effective_element, effective_action) :
+		el_act_dir2crm(effective_element, effective_action,
+			       direction));
+
+    g = &graphic_info[graphic];
+  }
+
+#if 0
+  if (frame_em == 7)
+    return;
+#endif
+
 
 #if 0
   if (frame_em == 0)	/* reset animation frame for certain elements */
@@ -6353,18 +6397,390 @@ void getGraphicSourceObjectExt_EM(struct GraphicInfo_EM *g_em,
 
   SetRandomAnimationValue(x, y);
 
+#if 0
+  int i = tile;
+  int j = frame_em;
+  int xxx_sync_frame = (i == Xdrip_stretch ? 7 :
+			i == Xdrip_stretchB ? 7 :
+			i == Ydrip_s2 ? j + 8 :
+			i == Ydrip_s2B ? j + 8 :
+			i == Xacid_1 ? 0 :
+			i == Xacid_2 ? 10 :
+			i == Xacid_3 ? 20 :
+			i == Xacid_4 ? 30 :
+			i == Xacid_5 ? 40 :
+			i == Xacid_6 ? 50 :
+			i == Xacid_7 ? 60 :
+			i == Xacid_8 ? 70 :
+			i == Xfake_acid_1 ? 0 :
+			i == Xfake_acid_2 ? 10 :
+			i == Xfake_acid_3 ? 20 :
+			i == Xfake_acid_4 ? 30 :
+			i == Xfake_acid_5 ? 40 :
+			i == Xfake_acid_6 ? 50 :
+			i == Xfake_acid_7 ? 60 :
+			i == Xfake_acid_8 ? 70 :
+			i == Xball_2 ? 7 :
+			i == Xball_2B ? j + 8 :
+			i == Yball_eat ? j + 1 :
+			i == Ykey_1_eat ? j + 1 :
+			i == Ykey_2_eat ? j + 1 :
+			i == Ykey_3_eat ? j + 1 :
+			i == Ykey_4_eat ? j + 1 :
+			i == Ykey_5_eat ? j + 1 :
+			i == Ykey_6_eat ? j + 1 :
+			i == Ykey_7_eat ? j + 1 :
+			i == Ykey_8_eat ? j + 1 :
+			i == Ylenses_eat ? j + 1 :
+			i == Ymagnify_eat ? j + 1 :
+			i == Ygrass_eat ? j + 1 :
+			i == Ydirt_eat ? j + 1 :
+			i == Xamoeba_1 ? 0 :
+			i == Xamoeba_2 ? 1 :
+			i == Xamoeba_3 ? 2 :
+			i == Xamoeba_4 ? 3 :
+			i == Xamoeba_5 ? 0 :
+			i == Xamoeba_6 ? 1 :
+			i == Xamoeba_7 ? 2 :
+			i == Xamoeba_8 ? 3 :
+			i == Xexit_2 ? j + 8 :
+			i == Xexit_3 ? j + 16 :
+			i == Xdynamite_1 ? 0 :
+			i == Xdynamite_2 ? 8 :
+			i == Xdynamite_3 ? 16 :
+			i == Xdynamite_4 ? 24 :
+			i == Xsand_stonein_1 ? j + 1 :
+			i == Xsand_stonein_2 ? j + 9 :
+			i == Xsand_stonein_3 ? j + 17 :
+			i == Xsand_stonein_4 ? j + 25 :
+			i == Xsand_stoneout_1 && j == 0 ? 0 :
+			i == Xsand_stoneout_1 && j == 1 ? 0 :
+			i == Xsand_stoneout_1 && j == 2 ? 1 :
+			i == Xsand_stoneout_1 && j == 3 ? 2 :
+			i == Xsand_stoneout_1 && j == 4 ? 2 :
+			i == Xsand_stoneout_1 && j == 5 ? 3 :
+			i == Xsand_stoneout_1 && j == 6 ? 4 :
+			i == Xsand_stoneout_1 && j == 7 ? 4 :
+			i == Xsand_stoneout_2 && j == 0 ? 5 :
+			i == Xsand_stoneout_2 && j == 1 ? 6 :
+			i == Xsand_stoneout_2 && j == 2 ? 7 :
+			i == Xsand_stoneout_2 && j == 3 ? 8 :
+			i == Xsand_stoneout_2 && j == 4 ? 9 :
+			i == Xsand_stoneout_2 && j == 5 ? 11 :
+			i == Xsand_stoneout_2 && j == 6 ? 13 :
+			i == Xsand_stoneout_2 && j == 7 ? 15 :
+			i == Xboom_bug && j == 1 ? 2 :
+			i == Xboom_bug && j == 2 ? 2 :
+			i == Xboom_bug && j == 3 ? 4 :
+			i == Xboom_bug && j == 4 ? 4 :
+			i == Xboom_bug && j == 5 ? 2 :
+			i == Xboom_bug && j == 6 ? 2 :
+			i == Xboom_bug && j == 7 ? 0 :
+			i == Xboom_bomb && j == 1 ? 2 :
+			i == Xboom_bomb && j == 2 ? 2 :
+			i == Xboom_bomb && j == 3 ? 4 :
+			i == Xboom_bomb && j == 4 ? 4 :
+			i == Xboom_bomb && j == 5 ? 2 :
+			i == Xboom_bomb && j == 6 ? 2 :
+			i == Xboom_bomb && j == 7 ? 0 :
+			i == Xboom_android && j == 7 ? 6 :
+			i == Xboom_1 && j == 1 ? 2 :
+			i == Xboom_1 && j == 2 ? 2 :
+			i == Xboom_1 && j == 3 ? 4 :
+			i == Xboom_1 && j == 4 ? 4 :
+			i == Xboom_1 && j == 5 ? 6 :
+			i == Xboom_1 && j == 6 ? 6 :
+			i == Xboom_1 && j == 7 ? 8 :
+			i == Xboom_2 && j == 0 ? 8 :
+			i == Xboom_2 && j == 1 ? 8 :
+			i == Xboom_2 && j == 2 ? 10 :
+			i == Xboom_2 && j == 3 ? 10 :
+			i == Xboom_2 && j == 4 ? 10 :
+			i == Xboom_2 && j == 5 ? 12 :
+			i == Xboom_2 && j == 6 ? 12 :
+			i == Xboom_2 && j == 7 ? 12 :
+#if 0
+			special_animation && j == 4 ? 3 :
+			effective_action != action ? 0 :
+#endif
+			j);
+#endif
+
+#if 0
+  int xxx_effective_action;
+  int xxx_has_action_graphics;
+
+  {
+    int element = object_mapping[i].element_rnd;
+    int action = object_mapping[i].action;
+    int direction = object_mapping[i].direction;
+    boolean is_backside = object_mapping[i].is_backside;
+#if 0
+    boolean action_removing = (action == ACTION_DIGGING ||
+			       action == ACTION_SNAPPING ||
+			       action == ACTION_COLLECTING);
+#endif
+    boolean action_exploding = ((action == ACTION_EXPLODING ||
+				 action == ACTION_SMASHED_BY_ROCK ||
+				 action == ACTION_SMASHED_BY_SPRING) &&
+				element != EL_DIAMOND);
+    boolean action_active = (action == ACTION_ACTIVE);
+    boolean action_other = (action == ACTION_OTHER);
+
+    {
+#if 1
+      int effective_element = get_effective_element_EM(i, j);
+#else
+      int effective_element = (j > 5 && i == Yacid_splash_eB ? EL_EMPTY :
+			       j > 5 && i == Yacid_splash_wB ? EL_EMPTY :
+			       j < 7 ? element :
+			       i == Xdrip_stretch ? element :
+			       i == Xdrip_stretchB ? element :
+			       i == Ydrip_s1 ? element :
+			       i == Ydrip_s1B ? element :
+			       i == Xball_1B ? element :
+			       i == Xball_2 ? element :
+			       i == Xball_2B ? element :
+			       i == Yball_eat ? element :
+			       i == Ykey_1_eat ? element :
+			       i == Ykey_2_eat ? element :
+			       i == Ykey_3_eat ? element :
+			       i == Ykey_4_eat ? element :
+			       i == Ykey_5_eat ? element :
+			       i == Ykey_6_eat ? element :
+			       i == Ykey_7_eat ? element :
+			       i == Ykey_8_eat ? element :
+			       i == Ylenses_eat ? element :
+			       i == Ymagnify_eat ? element :
+			       i == Ygrass_eat ? element :
+			       i == Ydirt_eat ? element :
+			       i == Yemerald_stone ? EL_EMERALD :
+			       i == Ydiamond_stone ? EL_ROCK :
+			       i == Xsand_stonein_1 ? element :
+			       i == Xsand_stonein_2 ? element :
+			       i == Xsand_stonein_3 ? element :
+			       i == Xsand_stonein_4 ? element :
+			       is_backside ? EL_EMPTY :
+			       action_removing ? EL_EMPTY :
+			       element);
+#endif
+      int effective_action = (j < 7 ? action :
+			      i == Xdrip_stretch ? action :
+			      i == Xdrip_stretchB ? action :
+			      i == Ydrip_s1 ? action :
+			      i == Ydrip_s1B ? action :
+			      i == Xball_1B ? action :
+			      i == Xball_2 ? action :
+			      i == Xball_2B ? action :
+			      i == Yball_eat ? action :
+			      i == Ykey_1_eat ? action :
+			      i == Ykey_2_eat ? action :
+			      i == Ykey_3_eat ? action :
+			      i == Ykey_4_eat ? action :
+			      i == Ykey_5_eat ? action :
+			      i == Ykey_6_eat ? action :
+			      i == Ykey_7_eat ? action :
+			      i == Ykey_8_eat ? action :
+			      i == Ylenses_eat ? action :
+			      i == Ymagnify_eat ? action :
+			      i == Ygrass_eat ? action :
+			      i == Ydirt_eat ? action :
+			      i == Xsand_stonein_1 ? action :
+			      i == Xsand_stonein_2 ? action :
+			      i == Xsand_stonein_3 ? action :
+			      i == Xsand_stonein_4 ? action :
+			      i == Xsand_stoneout_1 ? action :
+			      i == Xsand_stoneout_2 ? action :
+			      i == Xboom_android ? ACTION_EXPLODING :
+			      action_exploding ? ACTION_EXPLODING :
+			      action_active ? action :
+			      action_other ? action :
+			      ACTION_DEFAULT);
+      int graphic = (el_act_dir2img(effective_element, effective_action,
+				    direction));
+      int crumbled = (el_act_dir2crm(effective_element, effective_action,
+				     direction));
+      int base_graphic = el_act2img(effective_element, ACTION_DEFAULT);
+      int base_crumbled = el_act2crm(effective_element, ACTION_DEFAULT);
+      boolean has_action_graphics = (graphic != base_graphic);
+      boolean has_crumbled_graphics = (base_crumbled != base_graphic);
+      struct GraphicInfo *g = &graphic_info[graphic];
+#if 0
+      struct GraphicInfo *g_crumbled = &graphic_info[crumbled];
+#endif
+      struct GraphicInfo_EM *g_em = &graphic_info_em_object[i][7 - j];
+      Bitmap *src_bitmap;
+      int src_x, src_y;
+      /* ensure to get symmetric 3-frame, 2-delay animations as used in EM */
+      boolean special_animation = (action != ACTION_DEFAULT &&
+				   g->anim_frames == 3 &&
+				   g->anim_delay == 2 &&
+				   g->anim_mode & ANIM_LINEAR);
+      xxx_sync_frame = (i == Xdrip_stretch ? 7 :
+			i == Xdrip_stretchB ? 7 :
+			i == Ydrip_s2 ? j + 8 :
+			i == Ydrip_s2B ? j + 8 :
+			i == Xacid_1 ? 0 :
+			i == Xacid_2 ? 10 :
+			i == Xacid_3 ? 20 :
+			i == Xacid_4 ? 30 :
+			i == Xacid_5 ? 40 :
+			i == Xacid_6 ? 50 :
+			i == Xacid_7 ? 60 :
+			i == Xacid_8 ? 70 :
+			i == Xfake_acid_1 ? 0 :
+			i == Xfake_acid_2 ? 10 :
+			i == Xfake_acid_3 ? 20 :
+			i == Xfake_acid_4 ? 30 :
+			i == Xfake_acid_5 ? 40 :
+			i == Xfake_acid_6 ? 50 :
+			i == Xfake_acid_7 ? 60 :
+			i == Xfake_acid_8 ? 70 :
+			i == Xball_2 ? 7 :
+			i == Xball_2B ? j + 8 :
+			i == Yball_eat ? j + 1 :
+			i == Ykey_1_eat ? j + 1 :
+			i == Ykey_2_eat ? j + 1 :
+			i == Ykey_3_eat ? j + 1 :
+			i == Ykey_4_eat ? j + 1 :
+			i == Ykey_5_eat ? j + 1 :
+			i == Ykey_6_eat ? j + 1 :
+			i == Ykey_7_eat ? j + 1 :
+			i == Ykey_8_eat ? j + 1 :
+			i == Ylenses_eat ? j + 1 :
+			i == Ymagnify_eat ? j + 1 :
+			i == Ygrass_eat ? j + 1 :
+			i == Ydirt_eat ? j + 1 :
+			i == Xamoeba_1 ? 0 :
+			i == Xamoeba_2 ? 1 :
+			i == Xamoeba_3 ? 2 :
+			i == Xamoeba_4 ? 3 :
+			i == Xamoeba_5 ? 0 :
+			i == Xamoeba_6 ? 1 :
+			i == Xamoeba_7 ? 2 :
+			i == Xamoeba_8 ? 3 :
+			i == Xexit_2 ? j + 8 :
+			i == Xexit_3 ? j + 16 :
+			i == Xdynamite_1 ? 0 :
+			i == Xdynamite_2 ? 8 :
+			i == Xdynamite_3 ? 16 :
+			i == Xdynamite_4 ? 24 :
+			i == Xsand_stonein_1 ? j + 1 :
+			i == Xsand_stonein_2 ? j + 9 :
+			i == Xsand_stonein_3 ? j + 17 :
+			i == Xsand_stonein_4 ? j + 25 :
+			i == Xsand_stoneout_1 && j == 0 ? 0 :
+			i == Xsand_stoneout_1 && j == 1 ? 0 :
+			i == Xsand_stoneout_1 && j == 2 ? 1 :
+			i == Xsand_stoneout_1 && j == 3 ? 2 :
+			i == Xsand_stoneout_1 && j == 4 ? 2 :
+			i == Xsand_stoneout_1 && j == 5 ? 3 :
+			i == Xsand_stoneout_1 && j == 6 ? 4 :
+			i == Xsand_stoneout_1 && j == 7 ? 4 :
+			i == Xsand_stoneout_2 && j == 0 ? 5 :
+			i == Xsand_stoneout_2 && j == 1 ? 6 :
+			i == Xsand_stoneout_2 && j == 2 ? 7 :
+			i == Xsand_stoneout_2 && j == 3 ? 8 :
+			i == Xsand_stoneout_2 && j == 4 ? 9 :
+			i == Xsand_stoneout_2 && j == 5 ? 11 :
+			i == Xsand_stoneout_2 && j == 6 ? 13 :
+			i == Xsand_stoneout_2 && j == 7 ? 15 :
+			i == Xboom_bug && j == 1 ? 2 :
+			i == Xboom_bug && j == 2 ? 2 :
+			i == Xboom_bug && j == 3 ? 4 :
+			i == Xboom_bug && j == 4 ? 4 :
+			i == Xboom_bug && j == 5 ? 2 :
+			i == Xboom_bug && j == 6 ? 2 :
+			i == Xboom_bug && j == 7 ? 0 :
+			i == Xboom_bomb && j == 1 ? 2 :
+			i == Xboom_bomb && j == 2 ? 2 :
+			i == Xboom_bomb && j == 3 ? 4 :
+			i == Xboom_bomb && j == 4 ? 4 :
+			i == Xboom_bomb && j == 5 ? 2 :
+			i == Xboom_bomb && j == 6 ? 2 :
+			i == Xboom_bomb && j == 7 ? 0 :
+			i == Xboom_android && j == 7 ? 6 :
+			i == Xboom_1 && j == 1 ? 2 :
+			i == Xboom_1 && j == 2 ? 2 :
+			i == Xboom_1 && j == 3 ? 4 :
+			i == Xboom_1 && j == 4 ? 4 :
+			i == Xboom_1 && j == 5 ? 6 :
+			i == Xboom_1 && j == 6 ? 6 :
+			i == Xboom_1 && j == 7 ? 8 :
+			i == Xboom_2 && j == 0 ? 8 :
+			i == Xboom_2 && j == 1 ? 8 :
+			i == Xboom_2 && j == 2 ? 10 :
+			i == Xboom_2 && j == 3 ? 10 :
+			i == Xboom_2 && j == 4 ? 10 :
+			i == Xboom_2 && j == 5 ? 12 :
+			i == Xboom_2 && j == 6 ? 12 :
+			i == Xboom_2 && j == 7 ? 12 :
+			special_animation && j == 4 ? 3 :
+			effective_action != action ? 0 :
+			j);
+
+      xxx_effective_action = effective_action;
+      xxx_has_action_graphics = has_action_graphics;
+    }
+  }
+#endif
+
   int frame = getAnimationFrame(g->anim_frames,
 				g->anim_delay,
 				g->anim_mode,
 				g->anim_start_frame,
 				sync_frame);
 
+
 #if 0
+  return;
+#endif
+
+#if 0
+  if (frame_em == 7)
+    return;
+#endif
+
+#if 0
+  int old_src_x = g_em->src_x;
+  int old_src_y = g_em->src_y;
+#endif
+
+#if 1
   getGraphicSourceExt(graphic, frame, &g_em->bitmap, &g_em->src_x, &g_em->src_y,
 		      g->double_movement && is_backside);
 #else
   getGraphicSourceExt(graphic, frame, &g_em->bitmap,
 		      &g_em->src_x, &g_em->src_y, FALSE);
+#endif
+
+
+#if 0
+  return;
+#endif
+
+#if 0
+  if (frame_em == 7)
+  {
+    if (graphic == IMG_BUG_MOVING_RIGHT)
+      printf("::: %d, %d, %d: %d, %d [%d, %d -> %d, %d]\n", graphic, x, y,
+	     g->double_movement, is_backside,
+	     old_src_x, old_src_y, g_em->src_x, g_em->src_y);
+
+    return;
+  }
+#endif
+
+
+#if 0
+  g_em->src_offset_x = 0;
+  g_em->src_offset_y = 0;
+  g_em->dst_offset_x = 0;
+  g_em->dst_offset_y = 0;
+  g_em->width  = TILEX;
+  g_em->height = TILEY;
+
+  g_em->preserve_background = FALSE;
 #endif
 
   /* (updating the "crumbled" graphic definitions is probably not really needed,
@@ -6395,6 +6811,86 @@ void getGraphicSourceObjectExt_EM(struct GraphicInfo_EM *g_em,
     g_em->has_crumbled_graphics = TRUE;
   }
 #endif
+
+#if 0
+ {
+   int effective_action = xxx_effective_action;
+   int has_action_graphics = xxx_has_action_graphics;
+
+      if ((!g->double_movement && (effective_action == ACTION_FALLING ||
+				   effective_action == ACTION_MOVING  ||
+				   effective_action == ACTION_PUSHING ||
+				   effective_action == ACTION_EATING)) ||
+	  (!has_action_graphics && (effective_action == ACTION_FILLING ||
+				    effective_action == ACTION_EMPTYING)))
+      {
+	int move_dir =
+	  (effective_action == ACTION_FALLING ||
+	   effective_action == ACTION_FILLING ||
+	   effective_action == ACTION_EMPTYING ? MV_DOWN : direction);
+	int dx = (move_dir == MV_LEFT ? -1 : move_dir == MV_RIGHT ? 1 : 0);
+	int dy = (move_dir == MV_UP   ? -1 : move_dir == MV_DOWN  ? 1 : 0);
+	int num_steps = (i == Ydrip_s1  ? 16 :
+			 i == Ydrip_s1B ? 16 :
+			 i == Ydrip_s2  ? 16 :
+			 i == Ydrip_s2B ? 16 :
+			 i == Xsand_stonein_1 ? 32 :
+			 i == Xsand_stonein_2 ? 32 :
+			 i == Xsand_stonein_3 ? 32 :
+			 i == Xsand_stonein_4 ? 32 :
+			 i == Xsand_stoneout_1 ? 16 :
+			 i == Xsand_stoneout_2 ? 16 : 8);
+	int cx = ABS(dx) * (TILEX / num_steps);
+	int cy = ABS(dy) * (TILEY / num_steps);
+	int step_frame = (i == Ydrip_s2         ? j + 8 :
+			  i == Ydrip_s2B        ? j + 8 :
+			  i == Xsand_stonein_2  ? j + 8 :
+			  i == Xsand_stonein_3  ? j + 16 :
+			  i == Xsand_stonein_4  ? j + 24 :
+			  i == Xsand_stoneout_2 ? j + 8 : j) + 1;
+	int step = (is_backside ? step_frame : num_steps - step_frame);
+
+	if (is_backside)	/* tile where movement starts */
+	{
+	  if (dx < 0 || dy < 0)
+	  {
+	    g_em->src_offset_x = cx * step;
+	    g_em->src_offset_y = cy * step;
+	  }
+	  else
+	  {
+	    g_em->dst_offset_x = cx * step;
+	    g_em->dst_offset_y = cy * step;
+	  }
+	}
+	else			/* tile where movement ends */
+	{
+	  if (dx < 0 || dy < 0)
+	  {
+	    g_em->dst_offset_x = cx * step;
+	    g_em->dst_offset_y = cy * step;
+	  }
+	  else
+	  {
+	    g_em->src_offset_x = cx * step;
+	    g_em->src_offset_y = cy * step;
+	  }
+	}
+
+	g_em->width  = TILEX - cx * step;
+	g_em->height = TILEY - cy * step;
+      }
+
+      /* create unique graphic identifier to decide if tile must be redrawn */
+      /* bit 31 - 16 (16 bit): EM style graphic
+	 bit 15 - 12 ( 4 bit): EM style frame
+	 bit 11 -  6 ( 6 bit): graphic width
+	 bit  5 -  0 ( 6 bit): graphic height */
+      g_em->unique_identifier =
+	(graphic << 16) | (frame << 12) | (g_em->width << 6) | g_em->height;
+ }
+#endif
+
 }
 
 void getGraphicSourcePlayerExt_EM(struct GraphicInfo_EM *g_em,
