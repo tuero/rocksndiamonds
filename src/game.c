@@ -58,6 +58,7 @@
 
 #define USE_FIX_KILLED_BY_NON_WALKABLE	(USE_NEW_STUFF		* 1)
 #define USE_FIX_IMPACT_COLLISION	(USE_NEW_STUFF		* 1)
+#define USE_FIX_CE_ACTION_WITH_PLAYER	(USE_NEW_STUFF		* 1)
 
 #define USE_GFX_RESET_WHEN_NOT_MOVING	(USE_NEW_STUFF		* 1)
 
@@ -1720,6 +1721,7 @@ static void InitPlayerField(int x, int y, int element, boolean init_game)
       }
       else
       {
+	stored_player[0].initial_element = element;
 	stored_player[0].use_murphy = TRUE;
 
 	if (!level.use_artwork_element[0])
@@ -3716,10 +3718,11 @@ void InitGame()
     player->Frame = 0;
     player->StepFrame = 0;
 
-    player->use_murphy = FALSE;
+    player->initial_element = player->element_nr;
     player->artwork_element =
       (level.use_artwork_element[i] ? level.artwork_element[i] :
        player->element_nr);
+    player->use_murphy = FALSE;
 
     player->block_last_field = FALSE;	/* initialized in InitPlayerField() */
     player->block_delay_adjustment = 0;	/* initialized in InitPlayerField() */
@@ -4015,6 +4018,7 @@ void InitGame()
 	  some_player->present = FALSE;
 	  some_player->active = FALSE;
 
+	  player->initial_element = some_player->initial_element;
 	  player->artwork_element = some_player->artwork_element;
 
 	  player->block_last_field       = some_player->block_last_field;
@@ -5951,8 +5955,12 @@ void Bang(int x, int y)
   {
     struct PlayerInfo *player = PLAYERINFO(x, y);
 
+#if USE_FIX_CE_ACTION_WITH_PLAYER
+    element = Feld[x][y] = player->initial_element;
+#else
     element = Feld[x][y] = (player->use_murphy ? EL_SP_MURPHY :
 			    player->element_nr);
+#endif
 
     if (level.use_explosion_element[player->index_nr])
     {
@@ -13312,8 +13320,13 @@ void ScrollPlayer(struct PlayerInfo *player, int mode)
 					  CE_PLAYER_ENTERS_X,
 					  player->index_bit, enter_side);
 
+#if USE_FIX_CE_ACTION_WITH_PLAYER
+      CheckTriggeredElementChangeBySide(jx, jy, player->initial_element,
+					CE_MOVE_OF_X, move_direction);
+#else
       CheckTriggeredElementChangeBySide(jx, jy, player->element_nr,
 					CE_MOVE_OF_X, move_direction);
+#endif
     }
 
     if (game.engine_version >= VERSION_IDENT(3,0,7,0))
@@ -13440,7 +13453,7 @@ void TestIfPlayerTouchesCustomElement(int x, int y)
     if (!IN_LEV_FIELD(xx, yy))
       continue;
 
-    if (IS_PLAYER(x, y))
+    if (IS_PLAYER(x, y))		/* player found at center element */
     {
       struct PlayerInfo *player = PLAYERINFO(x, y);
 
@@ -13458,8 +13471,21 @@ void TestIfPlayerTouchesCustomElement(int x, int y)
       CheckTriggeredElementChangeByPlayer(xx, yy, border_element,
 					  CE_PLAYER_TOUCHES_X,
 					  player->index_bit, border_side);
+
+#if USE_FIX_CE_ACTION_WITH_PLAYER
+      {
+	/* use player element that is initially defined in the level playfield,
+	   not the player element that corresponds to the runtime player number
+	   (example: a level that contains EL_PLAYER_3 as the only player would
+	   incorrectly give EL_PLAYER_1 for "player->element_nr") */
+	int player_element = PLAYERINFO(x, y)->initial_element;
+
+	CheckElementChangeBySide(xx, yy, border_element, player_element,
+				 CE_TOUCHING_X, border_side);
+      }
+#endif
     }
-    else if (IS_PLAYER(xx, yy))
+    else if (IS_PLAYER(xx, yy))		/* player found at border element */
     {
       struct PlayerInfo *player = PLAYERINFO(xx, yy);
 
@@ -13474,6 +13500,20 @@ void TestIfPlayerTouchesCustomElement(int x, int y)
       CheckTriggeredElementChangeByPlayer(x, y, center_element,
 					  CE_PLAYER_TOUCHES_X,
 					  player->index_bit, center_side);
+
+#if USE_FIX_CE_ACTION_WITH_PLAYER
+      {
+	/* use player element that is initially defined in the level playfield,
+	   not the player element that corresponds to the runtime player number
+	   (example: a level that contains EL_PLAYER_3 as the only player would
+	   incorrectly give EL_PLAYER_1 for "player->element_nr") */
+	int player_element = PLAYERINFO(xx, yy)->initial_element;
+
+	CheckElementChangeBySide(x, y, center_element, player_element,
+				 CE_TOUCHING_X, center_side);
+      }
+#endif
+
       break;
     }
   }
@@ -13550,6 +13590,8 @@ void TestIfElementTouchesCustomElement(int x, int y)
 
   for (i = 0; i < NUM_DIRECTIONS; i++)
   {
+    int xx = x + xy[i][0];
+    int yy = y + xy[i][1];
     int border_side = trigger_sides[i][1];
     int border_element = border_element_old[i];
 
@@ -13561,6 +13603,20 @@ void TestIfElementTouchesCustomElement(int x, int y)
       change_center_element =
 	CheckElementChangeBySide(x, y, center_element, border_element,
 				 CE_TOUCHING_X, border_side);
+
+#if USE_FIX_CE_ACTION_WITH_PLAYER
+    if (IS_PLAYER(xx, yy))
+    {
+      /* use player element that is initially defined in the level playfield,
+	 not the player element that corresponds to the runtime player number
+	 (example: a level that contains EL_PLAYER_3 as the only player would
+	 incorrectly give EL_PLAYER_1 for "player->element_nr") */
+      int player_element = PLAYERINFO(xx, yy)->initial_element;
+
+      CheckElementChangeBySide(x, y, center_element, player_element,
+			       CE_TOUCHING_X, border_side);
+    }
+#endif
   }
 }
 
@@ -13658,11 +13714,25 @@ void TestIfElementHitsCustomElement(int x, int y, int direction)
       CheckElementChangeBySide(x, y, hitting_element, touched_element,
 			       CE_HITTING_X, touched_side);
 
-      CheckElementChangeBySide(hitx, hity, touched_element,
-			       hitting_element, CE_HIT_BY_X, hitting_side);
+      CheckElementChangeBySide(hitx, hity, touched_element, hitting_element,
+			       CE_HIT_BY_X, hitting_side);
 
       CheckElementChangeBySide(hitx, hity, touched_element, hitting_element,
 			       CE_HIT_BY_SOMETHING, opposite_direction);
+
+#if USE_FIX_CE_ACTION_WITH_PLAYER
+      if (IS_PLAYER(hitx, hity))
+      {
+	/* use player element that is initially defined in the level playfield,
+	   not the player element that corresponds to the runtime player number
+	   (example: a level that contains EL_PLAYER_3 as the only player would
+	   incorrectly give EL_PLAYER_1 for "player->element_nr") */
+	int player_element = PLAYERINFO(hitx, hity)->initial_element;
+
+	CheckElementChangeBySide(x, y, hitting_element, player_element,
+				 CE_HITTING_X, touched_side);
+      }
+#endif
     }
   }
 

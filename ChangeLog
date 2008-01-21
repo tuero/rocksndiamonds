@@ -1,3 +1,13 @@
+2008-01-21
+	* fixed the following change conditions where a player element is used
+	  as the "element that is triggering the custom element change":
+	  - touching <element>
+	  - hitting <element>
+	  - explosion of <element>
+	  - move of <element>
+	  (the last two conditions already worked partially, but only for the
+	  first player, and not for the "Murphy" player when using "move of")
+
 2008-01-20
 	* fixed crash bug caused by accessing invalid element (with value -1)
 	  in UpdateGameControlValues()

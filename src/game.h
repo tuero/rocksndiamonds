@@ -202,8 +202,9 @@ struct PlayerInfo
 
   int GfxAction;
 
-  boolean use_murphy;
+  int initial_element;		/* EL_PLAYER_1 to EL_PLAYER_4 or EL_SP_MURPHY */
   int artwork_element;
+  boolean use_murphy;
 
   boolean block_last_field;
   int block_delay_adjustment;	/* needed for different engine versions */
