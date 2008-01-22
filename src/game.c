@@ -62,7 +62,7 @@
 
 #define USE_GFX_RESET_WHEN_NOT_MOVING	(USE_NEW_STUFF		* 1)
 
-#define USE_DELAYED_GFX_REDRAW		(USE_NEW_STUFF		* 1)
+#define USE_DELAYED_GFX_REDRAW		(USE_NEW_STUFF		* 0)
 
 #if USE_DELAYED_GFX_REDRAW
 #define TEST_DrawLevelField(x, y)				\
@@ -1126,6 +1126,7 @@ void TestIfBadThingRunsIntoPlayer(int, int, int);
 void TestIfFriendTouchesBadThing(int, int);
 void TestIfBadThingTouchesFriend(int, int);
 void TestIfBadThingTouchesOtherBadThing(int, int);
+void TestIfGoodThingGetsHitByBadThing(int, int, int);
 
 void KillPlayer(struct PlayerInfo *);
 void BuryPlayer(struct PlayerInfo *);
@@ -5140,7 +5141,10 @@ static void RemoveField(int x, int y)
   GfxElement[x][y] = EL_UNDEFINED;
   GfxAction[x][y] = ACTION_DEFAULT;
   GfxDir[x][y] = MV_NONE;
+#if 0
+  /* !!! this would prevent the removed tile from being redrawn !!! */
   GfxRedraw[x][y] = GFX_REDRAW_NONE;
+#endif
 }
 
 void RemoveMovingField(int x, int y)
@@ -8943,6 +8947,11 @@ void ContinueMoving(int x, int y)
   else if (element == EL_PENGUIN)
     TestIfFriendTouchesBadThing(newx, newy);
 
+  if (DONT_GET_HIT_BY(element))
+  {
+    TestIfGoodThingGetsHitByBadThing(newx, newy, direction);
+  }
+
   /* give the player one last chance (one more frame) to move away */
   if (CAN_FALL(element) && direction == MV_DOWN &&
       (last_line || (!IS_FREE(x, newy + 1) &&
@@ -12561,6 +12570,9 @@ void GameActions_RND()
 	GfxRedraw[x][y] != GFX_REDRAW_NONE)
 #endif
     {
+      /* !!! PROBLEM: THIS REDRAWS THE PLAYFIELD _AFTER_ THE SCAN, BUT TILES
+	 !!! MAY HAVE CHANGED AFTER BEING DRAWN DURING PLAYFIELD SCAN !!! */
+
       if (GfxRedraw[x][y] & GFX_REDRAW_TILE)
 	DrawLevelField(x, y);
 
@@ -13905,6 +13917,7 @@ void TestIfBadThingHitsGoodThing(int bad_x, int bad_y, int bad_move_dir)
 
     test_x = bad_x + test_xy[i][0];
     test_y = bad_y + test_xy[i][1];
+
     if (!IN_LEV_FIELD(test_x, test_y))
       continue;
 
@@ -13935,14 +13948,73 @@ void TestIfBadThingHitsGoodThing(int bad_x, int bad_y, int bad_move_dir)
 
 	kill_x = test_x;
 	kill_y = test_y;
+
 	break;
       }
       else if (test_element == EL_PENGUIN)
       {
 	kill_x = test_x;
 	kill_y = test_y;
+
 	break;
       }
+    }
+  }
+
+  if (kill_x != -1 || kill_y != -1)
+  {
+    if (IS_PLAYER(kill_x, kill_y))
+    {
+      struct PlayerInfo *player = PLAYERINFO(kill_x, kill_y);
+
+      if (player->shield_deadly_time_left > 0 &&
+	  !IS_INDESTRUCTIBLE(bad_element))
+	Bang(bad_x, bad_y);
+      else if (!PLAYER_ENEMY_PROTECTED(kill_x, kill_y))
+	KillPlayer(player);
+    }
+    else
+      Bang(kill_x, kill_y);
+  }
+}
+
+void TestIfGoodThingGetsHitByBadThing(int bad_x, int bad_y, int bad_move_dir)
+{
+  int bad_element = Feld[bad_x][bad_y];
+  int dx = (bad_move_dir == MV_LEFT ? -1 : bad_move_dir == MV_RIGHT ? +1 : 0);
+  int dy = (bad_move_dir == MV_UP   ? -1 : bad_move_dir == MV_DOWN  ? +1 : 0);
+  int test_x = bad_x + dx, test_y = bad_y + dy;
+  int test_move_dir, test_element;
+  int kill_x = -1, kill_y = -1;
+
+  if (!IN_LEV_FIELD(test_x, test_y))
+    return;
+
+  test_move_dir =
+    (IS_MOVING(test_x, test_y) ? MovDir[test_x][test_y] : MV_NONE);
+
+  test_element = Feld[test_x][test_y];
+
+  if (test_move_dir != bad_move_dir)
+  {
+    /* good thing can be player or penguin that does not move away */
+    if (IS_PLAYER(test_x, test_y))
+    {
+      struct PlayerInfo *player = PLAYERINFO(test_x, test_y);
+
+      /* (note: in comparison to DONT_RUN_TO and DONT_TOUCH, also handle the
+	 player as being hit when he is moving towards the bad thing, because
+	 the "get hit by" condition would be lost after the player stops) */
+      if (player->MovPos != 0 && player->MovDir == bad_move_dir)
+	return;		/* player moves away from bad thing */
+
+      kill_x = test_x;
+      kill_y = test_y;
+    }
+    else if (test_element == EL_PENGUIN)
+    {
+      kill_x = test_x;
+      kill_y = test_y;
     }
   }
 

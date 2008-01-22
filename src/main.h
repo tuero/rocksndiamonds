@@ -108,6 +108,7 @@
 #define EP_THROWABLE			28
 #define EP_CAN_EXPLODE			29
 #define EP_GRAVITY_REACHABLE		30
+#define EP_DONT_GET_HIT_BY		31
 
 /* values for pre-defined properties */
 /* (from here on, values can be changed by inserting new values) */
@@ -548,6 +549,7 @@
 #define IS_THROWABLE(e)		HAS_PROPERTY(e, EP_THROWABLE)
 #define CAN_EXPLODE(e)		HAS_PROPERTY(e, EP_CAN_EXPLODE)
 #define IS_GRAVITY_REACHABLE(e)	HAS_PROPERTY(e, EP_GRAVITY_REACHABLE)
+#define DONT_GET_HIT_BY(e)	HAS_PROPERTY(e, EP_DONT_GET_HIT_BY)
 
 /* macros for special configurable properties */
 #define IS_EM_SLIPPERY_WALL(e)	HAS_PROPERTY(e, EP_EM_SLIPPERY_WALL)

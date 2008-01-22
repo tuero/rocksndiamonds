@@ -1515,6 +1515,7 @@ static struct ValueTextInfo options_deadliness[] =
 {
   { EP_DONT_RUN_INTO,		"running into"			},
   { EP_DONT_COLLIDE_WITH,	"colliding with"		},
+  { EP_DONT_GET_HIT_BY,		"getting hit by"		},
   { EP_DONT_TOUCH,		"touching"			},
 
   { -1,				NULL				}
@@ -6771,11 +6772,13 @@ static void CopyCustomElementPropertiesToEditor(int element)
   /* set deadliness selectbox help value */
   custom_element.deadliness =
     (DONT_TOUCH(element) ? EP_DONT_TOUCH :
+     DONT_GET_HIT_BY(element) ? EP_DONT_GET_HIT_BY :
      DONT_COLLIDE_WITH(element) ? EP_DONT_COLLIDE_WITH :
      DONT_RUN_INTO(element) ? EP_DONT_RUN_INTO :
      custom_element.deadliness);
   custom_element_properties[EP_DEADLY] =
     (DONT_TOUCH(element) ||
+     DONT_GET_HIT_BY(element) ||
      DONT_COLLIDE_WITH(element) ||
      DONT_RUN_INTO(element));
 
@@ -6923,6 +6926,7 @@ static void CopyCustomElementPropertiesToGame(int element)
   /* set deadliness property from checkbox and selectbox */
   custom_element_properties[EP_DONT_RUN_INTO] = FALSE;
   custom_element_properties[EP_DONT_COLLIDE_WITH] = FALSE;
+  custom_element_properties[EP_DONT_GET_HIT_BY] = FALSE;
   custom_element_properties[EP_DONT_TOUCH] = FALSE;
   custom_element_properties[custom_element.deadliness] =
     custom_element_properties[EP_DEADLY];
@@ -7714,6 +7718,7 @@ static void DrawPropertiesInfo()
 
     { EP_DONT_RUN_INTO,		"- deadly when running into"		},
     { EP_DONT_COLLIDE_WITH,	"- deadly when colliding with"		},
+    { EP_DONT_GET_HIT_BY,	"- deadly when getting hit by"		},
     { EP_DONT_TOUCH,		"- deadly when touching"		},
 
     { EP_INDESTRUCTIBLE,	"- indestructible"			},

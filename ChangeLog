@@ -1,3 +1,10 @@
+2008-01-22
+	* added condition "deadly when <getting hit by>" for custom elements
+	  that behaves a bit like the existing "deadly when <colliding with>",
+	  but with the following differences:
+	  - it only kills players or friends when it was moving before it hits
+	  - it does not kill players or friends that try to run into it
+
 2008-01-21
 	* fixed the following change conditions where a player element is used
 	  as the "element that is triggering the custom element change":
