@@ -12674,7 +12674,8 @@ static boolean AllPlayersInVisibleScreen()
 
 void ScrollLevel(int dx, int dy)
 {
-#if 1
+#if 0
+  /* (directly solved in BlitBitmap() now) */
   static Bitmap *bitmap_db_field2 = NULL;
   int softscroll_offset = (setup.soft_scrolling ? TILEX : 0);
   int x, y;
@@ -12689,7 +12690,8 @@ void ScrollLevel(int dx, int dy)
     return;
 #endif
 
-#if 1
+#if 0
+  /* (directly solved in BlitBitmap() now) */
   if (bitmap_db_field2 == NULL)
     bitmap_db_field2 = CreateBitmap(FXSIZE, FYSIZE, DEFAULT_DEPTH);
 

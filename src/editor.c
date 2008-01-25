@@ -4989,14 +4989,16 @@ static void DrawDrawingArea(int id)
 
 static void ScrollMiniLevel(int from_x, int from_y, int scroll)
 {
-#if 1
+#if 0
+  /* (directly solved in BlitBitmap() now) */
   static Bitmap *tmp_backbuffer = NULL;
 #endif
   int x, y;
   int dx = (scroll == ED_SCROLL_LEFT ? -1 : scroll == ED_SCROLL_RIGHT ? 1 : 0);
   int dy = (scroll == ED_SCROLL_UP   ? -1 : scroll == ED_SCROLL_DOWN  ? 1 : 0);
 
-#if 1
+#if 0
+  /* (directly solved in BlitBitmap() now) */
   if (tmp_backbuffer == NULL)
     tmp_backbuffer = CreateBitmap(WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH);
 
@@ -5028,8 +5030,6 @@ static void ScrollMiniLevel(int from_x, int from_y, int scroll)
 	     SY + (dy == +1 ? MINI_TILEY : 0));
 #endif
 
-  printf("::: ScrollMiniLevel: A.1\n");
-
   if (dx)
   {
     x = (dx == 1 ? 0 : ed_fieldx - 1);
@@ -5042,8 +5042,6 @@ static void ScrollMiniLevel(int from_x, int from_y, int scroll)
     for (x = 0; x < ed_fieldx; x++)
       DrawMiniElementOrWall(x, y, from_x, from_y);
   }
-
-  printf("::: ScrollMiniLevel: Z\n");
 
   redraw_mask |= REDRAW_FIELD;
   BackToFront();

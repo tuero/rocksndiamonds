@@ -491,8 +491,34 @@ void BlitBitmap(Bitmap *src_bitmap, Bitmap *dst_bitmap,
   if (DrawingDeactivated(dst_x, dst_y, width, height))
     return;
 
-  sysCopyArea(src_bitmap, dst_bitmap, src_x, src_y, width, height,
-	      dst_x, dst_y, BLIT_OPAQUE);
+#if 0
+  /* !!! APPARENTLY THIS HAS BEEN FIXED IN SDL 1.2.12 !!! */
+#if defined(TARGET_SDL) && defined(PLATFORM_WIN32)
+  if (src_bitmap == dst_bitmap)
+  {
+    /* !!! THIS IS A BUG (IN THE SDL LIBRARY?) AND SHOULD BE FIXED !!! */
+
+    /* needed when blitting directly to same bitmap -- should not be needed with
+       recent SDL libraries, but apparently does not work in 1.2.11 directly */
+
+    static Bitmap *tmp_bitmap = NULL;
+
+    if (tmp_bitmap == NULL)
+      tmp_bitmap = CreateBitmap(MAX(FXSIZE, WIN_XSIZE),
+				MAX(FYSIZE, WIN_YSIZE), DEFAULT_DEPTH);
+
+    sysCopyArea(src_bitmap, tmp_bitmap,
+		src_x, src_y, width, height, dst_x, dst_y, BLIT_OPAQUE);
+    sysCopyArea(tmp_bitmap, dst_bitmap,
+		src_x, src_y, width, height, dst_x, dst_y, BLIT_OPAQUE);
+
+    return;
+  }
+#endif
+#endif
+
+  sysCopyArea(src_bitmap, dst_bitmap,
+	      src_x, src_y, width, height, dst_x, dst_y, BLIT_OPAQUE);
 }
 
 void FadeRectangle(Bitmap *bitmap_cross, int x, int y, int width, int height,
