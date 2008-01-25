@@ -676,9 +676,11 @@
 	 			 (e) <= EL_EM_GATE_4)
 #define IS_EMC_GATE(e)		((e) >= EL_EMC_GATE_5 &&		\
 	 			 (e) <= EL_EMC_GATE_8)
+#define IS_DC_GATE(e)		((e) == EL_DC_GATE_WHITE)
 #define IS_GATE(e)		(IS_RND_GATE(e) ||			\
 				 IS_EM_GATE(e) ||			\
-				 IS_EMC_GATE(e))
+				 IS_EMC_GATE(e) ||			\
+				 IS_DC_GATE(e))
 #define RND_GATE_NR(e)		((e) - EL_GATE_1)
 #define EM_GATE_NR(e)		((e) - EL_EM_GATE_1)
 #define EMC_GATE_NR(e)		((e) - EL_EMC_GATE_5 + 4)
@@ -698,12 +700,17 @@
 	 			 (e) <= EL_EMC_GATE_8_GRAY)
 #define IS_EMC_GATE_GRAY_ACTIVE(e) ((e) >= EL_EMC_GATE_5_GRAY_ACTIVE &&	\
 	 			 (e) <= EL_EMC_GATE_8_GRAY_ACTIVE)
+#define IS_DC_GATE_GRAY(e)	((e) == EL_DC_GATE_WHITE_GRAY)
+#define IS_DC_GATE_GRAY_ACTIVE(e) ((e) == EL_DC_GATE_WHITE_GRAY_ACTIVE)
+
 #define IS_GATE_GRAY(e)		(IS_RND_GATE_GRAY(e) ||			\
 				 IS_EM_GATE_GRAY(e) ||			\
-				 IS_EMC_GATE_GRAY(e))
+				 IS_EMC_GATE_GRAY(e) ||			\
+				 IS_DC_GATE_GRAY(e))
 #define IS_GATE_GRAY_ACTIVE(e)	(IS_RND_GATE_GRAY_ACTIVE(e) ||		\
 				 IS_EM_GATE_GRAY_ACTIVE(e) ||		\
-				 IS_EMC_GATE_GRAY_ACTIVE(e))
+				 IS_EMC_GATE_GRAY_ACTIVE(e) ||		\
+				 IS_DC_GATE_GRAY_ACTIVE(e))
 #define RND_GATE_GRAY_NR(e)	((e) - EL_GATE_1_GRAY)
 #define RND_GATE_GRAY_ACTIVE_NR(e) ((e) - EL_GATE_1_GRAY_ACTIVE)
 #define EM_GATE_GRAY_NR(e)	((e) - EL_EM_GATE_1_GRAY)

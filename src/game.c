@@ -6436,6 +6436,8 @@ static void RedrawAllInvisibleElementsForMagnifier()
 		    element - EL_EM_GATE_1_GRAY + EL_EM_GATE_1_GRAY_ACTIVE :
 		    IS_EMC_GATE_GRAY(element) ?
 		    element - EL_EMC_GATE_5_GRAY + EL_EMC_GATE_5_GRAY_ACTIVE :
+		    IS_DC_GATE_GRAY(element) ?
+		    EL_DC_GATE_WHITE_GRAY_ACTIVE :
 		    element);
       TEST_DrawLevelField(x, y);
     }
@@ -6448,6 +6450,8 @@ static void RedrawAllInvisibleElementsForMagnifier()
 		    element - EL_EM_GATE_1_GRAY_ACTIVE + EL_EM_GATE_1_GRAY :
 		    IS_EMC_GATE_GRAY_ACTIVE(element) ?
 		    element - EL_EMC_GATE_5_GRAY_ACTIVE + EL_EMC_GATE_5_GRAY :
+		    IS_DC_GATE_GRAY_ACTIVE(element) ?
+		    EL_DC_GATE_WHITE_GRAY :
 		    element);
       TEST_DrawLevelField(x, y);
     }

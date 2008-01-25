@@ -1,3 +1,6 @@
+2008-01-25
+	* fixed bug with "gray" white door not being uncovered by magnifier
+
 2008-01-22
 	* added condition "deadly when <getting hit by>" for custom elements
 	  that behaves a bit like the existing "deadly when <colliding with>",
