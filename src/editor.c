@@ -7890,6 +7890,7 @@ static struct
   { EL_EMC_KEY_6,	&level.score[SC_KEY],		TEXT_COLLECTING	},
   { EL_EMC_KEY_7,	&level.score[SC_KEY],		TEXT_COLLECTING	},
   { EL_EMC_KEY_8,	&level.score[SC_KEY],		TEXT_COLLECTING	},
+  { EL_DC_KEY_WHITE,	&level.score[SC_KEY],		TEXT_COLLECTING	},
   { EL_AMOEBA_WET,	&level.amoeba_speed,		TEXT_AMOEBA_SPEED },
   { EL_AMOEBA_DRY,	&level.amoeba_speed,		TEXT_AMOEBA_SPEED },
   { EL_AMOEBA_FULL,	&level.amoeba_speed,		TEXT_AMOEBA_SPEED },
