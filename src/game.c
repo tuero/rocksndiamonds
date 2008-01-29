@@ -60,6 +60,8 @@
 #define USE_FIX_IMPACT_COLLISION	(USE_NEW_STUFF		* 1)
 #define USE_FIX_CE_ACTION_WITH_PLAYER	(USE_NEW_STUFF		* 1)
 
+#define USE_PLAYER_REANIMATION		(USE_NEW_STUFF		* 1)
+
 #define USE_GFX_RESET_WHEN_NOT_MOVING	(USE_NEW_STUFF		* 1)
 
 #define USE_DELAYED_GFX_REDRAW		(USE_NEW_STUFF		* 0)
@@ -1781,6 +1783,17 @@ static void InitPlayerField(int x, int y, int element, boolean init_game)
     player->jx = player->last_jx = x;
     player->jy = player->last_jy = y;
   }
+
+#if USE_PLAYER_REANIMATION
+  if (!init_game)
+  {
+    int player_nr = GET_PLAYER_NR(element);
+    struct PlayerInfo *player = &stored_player[player_nr];
+
+    if (player->active)
+      player->killed = FALSE;	/* if player was just killed, reanimate him */
+  }
+#endif
 }
 
 static void InitField(int x, int y, boolean init_game)
@@ -12684,7 +12697,7 @@ void ScrollLevel(int dx, int dy)
   int softscroll_offset = (setup.soft_scrolling ? TILEX : 0);
   int x, y;
 #else
-  int i, x, y;
+  int x, y;
 #endif
 
 #if 0
@@ -13604,6 +13617,8 @@ void TestIfElementTouchesCustomElement(int x, int y)
     /* check for change of border element */
     CheckElementChangeBySide(xx, yy, border_element, center_element,
 			     CE_TOUCHING_X, center_side);
+
+    /* (center element cannot be player, so we dont have to check this here) */
   }
 
   for (i = 0; i < NUM_DIRECTIONS; i++)
@@ -14137,7 +14152,13 @@ void KillPlayer(struct PlayerInfo *player)
   player->shield_deadly_time_left = 0;
 
   Bang(jx, jy);
+
+#if USE_PLAYER_REANIMATION
+  if (player->killed)		/* player may have been reanimated */
+    BuryPlayer(player);
+#else
   BuryPlayer(player);
+#endif
 }
 
 static void KillPlayerUnlessEnemyProtected(int x, int y)

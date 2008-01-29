@@ -1,3 +1,7 @@
+2008-01-27
+	* added possibility to reanimate player immediately after his death
+	  (for example, by "change to <player> when explosion of <player>")
+
 2008-01-25
 	* fixed bug with "gray" white door not being uncovered by magnifier
 	* added score for collecting (any) key to the white key config page
