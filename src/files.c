@@ -311,6 +311,22 @@ static struct LevelFileConfigInfo chunk_config_ELEM[] =
     TYPE_ELEMENT,			CONF_VALUE_16_BIT(3),
     &li.explosion_element[0],		EL_PLAYER_1
   },
+  {
+    EL_PLAYER_1,			-1,
+    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(13),
+    &li.use_initial_inventory[0],	FALSE
+  },
+  {
+    EL_PLAYER_1,			-1,
+    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(14),
+    &li.initial_inventory_size[0],	1
+  },
+  {
+    EL_PLAYER_1,			-1,
+    TYPE_ELEMENT_LIST,			CONF_VALUE_BYTES(1),
+    &li.initial_inventory_content[0][0],EL_EMPTY, NULL,
+    &li.initial_inventory_size[0],	1, MAX_INITIAL_INVENTORY_SIZE
+  },
 
   {
     EL_PLAYER_2,			-1,
@@ -351,6 +367,22 @@ static struct LevelFileConfigInfo chunk_config_ELEM[] =
     EL_PLAYER_2,			-1,
     TYPE_ELEMENT,			CONF_VALUE_16_BIT(3),
     &li.explosion_element[1],		EL_PLAYER_2
+  },
+  {
+    EL_PLAYER_2,			-1,
+    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(13),
+    &li.use_initial_inventory[1],	FALSE
+  },
+  {
+    EL_PLAYER_2,			-1,
+    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(14),
+    &li.initial_inventory_size[1],	1
+  },
+  {
+    EL_PLAYER_2,			-1,
+    TYPE_ELEMENT_LIST,			CONF_VALUE_BYTES(1),
+    &li.initial_inventory_content[1][0],EL_EMPTY, NULL,
+    &li.initial_inventory_size[1],	1, MAX_INITIAL_INVENTORY_SIZE
   },
 
   {
@@ -393,6 +425,22 @@ static struct LevelFileConfigInfo chunk_config_ELEM[] =
     TYPE_ELEMENT,			CONF_VALUE_16_BIT(3),
     &li.explosion_element[2],		EL_PLAYER_3
   },
+  {
+    EL_PLAYER_3,			-1,
+    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(13),
+    &li.use_initial_inventory[2],	FALSE
+  },
+  {
+    EL_PLAYER_3,			-1,
+    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(14),
+    &li.initial_inventory_size[2],	1
+  },
+  {
+    EL_PLAYER_3,			-1,
+    TYPE_ELEMENT_LIST,			CONF_VALUE_BYTES(1),
+    &li.initial_inventory_content[2][0],EL_EMPTY, NULL,
+    &li.initial_inventory_size[2],	1, MAX_INITIAL_INVENTORY_SIZE
+  },
 
   {
     EL_PLAYER_4,			-1,
@@ -433,6 +481,22 @@ static struct LevelFileConfigInfo chunk_config_ELEM[] =
     EL_PLAYER_4,			-1,
     TYPE_ELEMENT,			CONF_VALUE_16_BIT(3),
     &li.explosion_element[3],		EL_PLAYER_4
+  },
+  {
+    EL_PLAYER_4,			-1,
+    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(13),
+    &li.use_initial_inventory[3],	FALSE
+  },
+  {
+    EL_PLAYER_4,			-1,
+    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(14),
+    &li.initial_inventory_size[3],	1
+  },
+  {
+    EL_PLAYER_4,			-1,
+    TYPE_ELEMENT_LIST,			CONF_VALUE_BYTES(1),
+    &li.initial_inventory_content[3][0],EL_EMPTY, NULL,
+    &li.initial_inventory_size[3],	1, MAX_INITIAL_INVENTORY_SIZE
   },
 
   {
@@ -1102,6 +1166,12 @@ static struct LevelFileConfigInfo chunk_config_CUSX_change[] =
 
   {
     -1,					-1,
+    TYPE_ELEMENT,			CONF_VALUE_16_BIT(7),
+    &xx_change.action_element,		EL_EMPTY_SPACE
+  },
+
+  {
+    -1,					-1,
     TYPE_CONTENT_LIST,			CONF_VALUE_BYTES(1),
     &xx_change.target_content,		EL_EMPTY_SPACE, NULL,
     &xx_num_contents,			1, 1
@@ -1619,6 +1689,9 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
   level->no_valid_file = FALSE;
 
   level->changed = FALSE;
+
+  /* set all bug compatibility flags to "false" => do not emulate this bug */
+  level->use_action_after_change_bug = FALSE;
 
   if (leveldir_current == NULL)		/* only when dumping level */
     return;
@@ -6239,7 +6312,7 @@ static void LoadLevel_InitVersion(struct LevelInfo *level, char *filename)
 
   /* try to detect and fix "Snake Bite" levels, which are broken with 3.2.0 */
   {
-    int element = EL_CUSTOM_START + 255;
+    int element = EL_CUSTOM_256;
     struct ElementInfo *ei = &element_info[element];
     struct ElementChangeInfo *change = &ei->change_page[0];
 
@@ -6257,6 +6330,33 @@ static void LoadLevel_InitVersion(struct LevelInfo *level, char *filename)
 	 strncmp(ei->description, "pause b4 death", 14) == 0) &&
 	change->target_element == EL_SOKOBAN_FIELD_PLAYER)
       change->target_element = EL_PLAYER_1;
+  }
+
+  /* try to detect and fix "Zelda II" levels, which are broken with 3.2.5 */
+  {
+    int element = EL_CUSTOM_16;
+    struct ElementInfo *ei = &element_info[element];
+
+    /* This is needed to fix a problem that was caused by a bugfix in function
+       game.c/CheckTriggeredElementChangeExt() introduced with 3.2.5 that
+       corrects the behaviour when a custom element changes to another custom
+       element with a higher element number that has change actions defined.
+       Normally, only one change per frame is allowed for custom elements.
+       Therefore, it is checked if a custom element already changed in the
+       current frame; if it did, subsequent changes are suppressed.
+       Unfortunately, this is only checked for element changes, but not for
+       change actions, which are still executed. As the function above loops
+       through all custom elements from lower to higher, an element change
+       resulting in a lower CE number won't be checked again, while a target
+       element with a higher number will also be checked, and potential change
+       actions will get executed for this CE, too (which is wrong), while
+       further changes are ignored (which is correct). As this bugfix breaks
+       Zelda II (but no other levels), allow the previous, incorrect behaviour
+       for this outstanding level set to not break the game or existing tapes */
+
+    if (strncmp(leveldir_current->identifier, "zelda2", 6) == 0 ||
+	strncmp(ei->description, "scanline - row 1", 16) == 0)
+      level->use_action_after_change_bug = TRUE;
   }
 
   /* not centering level after relocating player was default only in 3.2.3 */

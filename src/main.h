@@ -281,6 +281,7 @@
 					 PLAYER_BITS_3 | \
 					 PLAYER_BITS_4)
 #define PLAYER_BITS_TRIGGER		(1 << 4)
+#define PLAYER_BITS_ACTION		(1 << 5)
 
 /* values for move directions (bits 0 - 3: basic move directions) */
 #define MV_BIT_PREVIOUS			4
@@ -337,7 +338,7 @@
 #define CP_WHEN_REMOVABLE		4
 #define CP_WHEN_WALKABLE		5
 
-/* values for change actions for custom elements */
+/* values for change actions for custom elements (stored in level file) */
 #define CA_NO_ACTION			0
 #define CA_EXIT_PLAYER			1
 #define CA_KILL_PLAYER			2
@@ -356,6 +357,7 @@
 #define CA_SET_CE_SCORE			15
 #define CA_SET_CE_VALUE			16
 #define CA_SET_ENGINE_SCAN_MODE		17
+#define CA_SET_PLAYER_INVENTORY		18
 
 #define CA_HEADLINE_LEVEL_ACTIONS	250
 #define CA_HEADLINE_PLAYER_ACTIONS	251
@@ -395,6 +397,7 @@
 #define CA_ARG_PLAYER_4			(CA_ARG_PLAYER + PLAYER_BITS_4)
 #define CA_ARG_PLAYER_ANY		(CA_ARG_PLAYER + PLAYER_BITS_ANY)
 #define CA_ARG_PLAYER_TRIGGER		(CA_ARG_PLAYER + PLAYER_BITS_TRIGGER)
+#define CA_ARG_PLAYER_ACTION		(CA_ARG_PLAYER + PLAYER_BITS_ACTION)
 #define CA_ARG_PLAYER_HEADLINE		(CA_ARG_PLAYER + 999)
 #define CA_ARG_NUMBER			11000
 #define CA_ARG_NUMBER_MIN		(CA_ARG_NUMBER + 0)
@@ -411,15 +414,19 @@
 #define CA_ARG_ELEMENT_RESET		(CA_ARG_ELEMENT + 0)
 #define CA_ARG_ELEMENT_TARGET		(CA_ARG_ELEMENT + 1)
 #define CA_ARG_ELEMENT_TRIGGER		(CA_ARG_ELEMENT + 2)
+#define CA_ARG_ELEMENT_ACTION		(CA_ARG_ELEMENT + 7)
 #define CA_ARG_ELEMENT_HEADLINE		(CA_ARG_ELEMENT + 997)
 #define CA_ARG_ELEMENT_CV_TARGET	(CA_ARG_ELEMENT_TARGET)
 #define CA_ARG_ELEMENT_CV_TRIGGER	(CA_ARG_ELEMENT_TRIGGER)
+#define CA_ARG_ELEMENT_CV_ACTION	(CA_ARG_ELEMENT_ACTION)
 #define CA_ARG_ELEMENT_CV_HEADLINE	(CA_ARG_ELEMENT_HEADLINE)
 #define CA_ARG_ELEMENT_NR_TARGET	(CA_ARG_ELEMENT + 3)
 #define CA_ARG_ELEMENT_NR_TRIGGER	(CA_ARG_ELEMENT + 4)
+#define CA_ARG_ELEMENT_NR_ACTION	(CA_ARG_ELEMENT + 8)
 #define CA_ARG_ELEMENT_NR_HEADLINE	(CA_ARG_ELEMENT + 998)
 #define CA_ARG_ELEMENT_CS_TARGET	(CA_ARG_ELEMENT + 5)
 #define CA_ARG_ELEMENT_CS_TRIGGER	(CA_ARG_ELEMENT + 6)
+#define CA_ARG_ELEMENT_CS_ACTION	(CA_ARG_ELEMENT + 9)
 #define CA_ARG_ELEMENT_CS_HEADLINE	(CA_ARG_ELEMENT + 999)
 #define CA_ARG_SPEED			13000
 #define CA_ARG_SPEED_NOT_MOVING		(CA_ARG_SPEED + STEPSIZE_NOT_MOVING)
@@ -456,6 +463,13 @@
 #define CA_ARG_SCAN_MODE_NORMAL		(CA_ARG_SCAN_MODE + MV_NORMAL)
 #define CA_ARG_SCAN_MODE_REVERSE	(CA_ARG_SCAN_MODE + MV_REVERSE)
 #define CA_ARG_SCAN_MODE_HEADLINE	(CA_ARG_SCAN_MODE + 999)
+#define CA_ARG_INVENTORY		18000
+#define CA_ARG_INVENTORY_RESET		(CA_ARG_INVENTORY + 0)
+#define CA_ARG_INVENTORY_RM_FIRST	(CA_ARG_INVENTORY + 1)
+#define CA_ARG_INVENTORY_RM_LAST	(CA_ARG_INVENTORY + 2)
+#define CA_ARG_INVENTORY_RM_ALL		(CA_ARG_INVENTORY + 3)
+#define CA_ARG_INVENTORY_HEADLINE	(CA_ARG_INVENTORY + 998)
+#define CA_ARG_INVENTORY_RM_HEADLINE	(CA_ARG_INVENTORY + 999)
 #define CA_ARG_UNDEFINED		65535
 
 /* values for custom move patterns (bits 0 - 3: basic move directions) */
@@ -896,6 +910,10 @@
 #define MIN_ELEMENT_CONTENTS	1
 #define STD_ELEMENT_CONTENTS	4
 #define MAX_ELEMENT_CONTENTS	8
+
+/* values for initial player inventory */
+#define MIN_INITIAL_INVENTORY_SIZE	1
+#define MAX_INITIAL_INVENTORY_SIZE	8
 
 /* often used screen positions */
 #define SX			8
@@ -2327,6 +2345,10 @@ struct LevelInfo
   int initial_player_stepsize[MAX_PLAYERS];	/* initial player speed */
   boolean initial_player_gravity[MAX_PLAYERS];
 
+  boolean use_initial_inventory[MAX_PLAYERS];
+  int initial_inventory_size[MAX_PLAYERS];
+  int initial_inventory_content[MAX_PLAYERS][MAX_INITIAL_INVENTORY_SIZE];
+
   boolean em_slippery_gems;	/* EM style "gems slip from wall" behaviour */
   boolean use_spring_bug;	/* for compatibility with old levels */
   boolean use_time_orb_bug;	/* for compatibility with old levels */
@@ -2350,6 +2372,9 @@ struct LevelInfo
   boolean no_valid_file;	/* set when level file missing or invalid */
 
   boolean changed;		/* set when level was changed in the editor */
+
+  /* runtime flags to handle bugs in old levels (not stored in level file) */
+  boolean use_action_after_change_bug;
 };
 
 struct GlobalInfo
@@ -2408,6 +2433,7 @@ struct ElementChangeInfo
   int action_type;		/* type of action */
   int action_mode;		/* mode of action */
   int action_arg;		/* parameter of action */
+  int action_element;		/* element related to action */
 
   /* ---------- internal values used at runtime when playing ---------- */
 

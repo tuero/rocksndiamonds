@@ -1,3 +1,7 @@
+2008-02-03
+	* changed design and size of element drawing area in level editor
+	* added "element used as action parameter" to element change actions
+
 2008-01-27
 	* added possibility to reanimate player immediately after his death
 	  (for example, by "change to <player> when explosion of <player>")

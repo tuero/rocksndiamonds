@@ -4944,12 +4944,12 @@ struct ConfigInfo image_config[] =
   { "global.busy.delay",			"2"			},
 
   { "editor.element_border",			"RocksElements.pcx"	},
-  { "editor.element_border.xpos",		"0"			},
-  { "editor.element_border.ypos",		"0"			},
+  { "editor.element_border.x",			"0"			},
+  { "editor.element_border.y",			"0"			},
 
-  { "editor.element_border_input",		"RocksElements.pcx"	},
-  { "editor.element_border_input.xpos",		"0"			},
-  { "editor.element_border_input.ypos",		"0"			},
+  { "editor.element_border_input",		"RocksDoor.pcx"		},
+  { "editor.element_border_input.x",		"740"			},
+  { "editor.element_border_input.y",		"48"			},
 
   { "editor.cascade_list",			"RocksDoor.pcx"		},
   { "editor.cascade_list.x",			"708"			},

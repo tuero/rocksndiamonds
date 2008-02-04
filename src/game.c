@@ -59,6 +59,7 @@
 #define USE_FIX_KILLED_BY_NON_WALKABLE	(USE_NEW_STUFF		* 1)
 #define USE_FIX_IMPACT_COLLISION	(USE_NEW_STUFF		* 1)
 #define USE_FIX_CE_ACTION_WITH_PLAYER	(USE_NEW_STUFF		* 1)
+#define USE_FIX_NO_ACTION_AFTER_CHANGE	(USE_NEW_STUFF		* 1)
 
 #define USE_PLAYER_REANIMATION		(USE_NEW_STUFF		* 1)
 
@@ -3680,6 +3681,11 @@ void InitGame()
 #if 0
   boolean do_fading = (game_status == GAME_MODE_MAIN);
 #endif
+#if 1
+  int initial_move_dir = MV_DOWN;
+#else
+  int initial_move_dir = MV_NONE;
+#endif
   int i, j, x, y;
 
   game_status = GAME_MODE_PLAYING;
@@ -3724,10 +3730,10 @@ void InitGame()
     player->dynabombs_left = 0;
     player->dynabomb_xl = FALSE;
 
-    player->MovDir = MV_NONE;
+    player->MovDir = initial_move_dir;
     player->MovPos = 0;
     player->GfxPos = 0;
-    player->GfxDir = MV_NONE;
+    player->GfxDir = initial_move_dir;
     player->GfxAction = ACTION_DEFAULT;
     player->Frame = 0;
     player->StepFrame = 0;
@@ -3749,7 +3755,7 @@ void InitGame()
 
     player->step_counter = 0;
 
-    player->last_move_dir = MV_NONE;
+    player->last_move_dir = initial_move_dir;
 
     player->is_active = FALSE;
 
@@ -3773,7 +3779,7 @@ void InitGame()
     player->anim_delay_counter = 0;
     player->post_delay_counter = 0;
 
-    player->dir_waiting = MV_NONE;
+    player->dir_waiting = initial_move_dir;
     player->action_waiting = ACTION_DEFAULT;
     player->last_action_waiting = ACTION_DEFAULT;
     player->special_action_bored = ACTION_DEFAULT;
@@ -3805,6 +3811,26 @@ void InitGame()
 
     player->inventory_infinite_element = EL_UNDEFINED;
     player->inventory_size = 0;
+
+    if (level.use_initial_inventory[i])
+    {
+      for (j = 0; j < level.initial_inventory_size[i]; j++)
+      {
+	int element = level.initial_inventory_content[i][j];
+	int collect_count = element_info[element].collect_count_initial;
+	int k;
+
+	if (!IS_CUSTOM_ELEMENT(element))
+	  collect_count = 1;
+
+	if (collect_count == 0)
+	  player->inventory_infinite_element = element;
+	else
+	  for (k = 0; k < collect_count; k++)
+	    if (player->inventory_size < MAX_INVENTORY_SIZE)
+	      player->inventory_element[player->inventory_size++] = element;
+      }
+    }
 
     DigField(player, 0, 0, 0, 0, 0, 0, DF_NO_PUSH);
     SnapField(player, 0, 0);
@@ -10130,6 +10156,7 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
   int action_type = change->action_type;
   int action_mode = change->action_mode;
   int action_arg = change->action_arg;
+  int action_element = change->action_element;
   int i;
 
   if (!change->has_action)
@@ -10145,6 +10172,7 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
     (action_arg == CA_ARG_PLAYER_TRIGGER  ? change->actual_trigger_player :
      action_arg == CA_ARG_ELEMENT_TRIGGER ? change->actual_trigger_element :
      action_arg == CA_ARG_ELEMENT_TARGET  ? change->target_element :
+     action_arg == CA_ARG_ELEMENT_ACTION  ? change->action_element :
      EL_EMPTY);
 
   int action_arg_direction =
@@ -10202,10 +10230,13 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
      action_arg == CA_ARG_NUMBER_LEVEL_SCORE ? local_player->score :
      action_arg == CA_ARG_ELEMENT_CV_TARGET ? GET_NEW_CE_VALUE(target_element):
      action_arg == CA_ARG_ELEMENT_CV_TRIGGER ? change->actual_trigger_ce_value:
+     action_arg == CA_ARG_ELEMENT_CV_ACTION ? GET_NEW_CE_VALUE(action_element):
      action_arg == CA_ARG_ELEMENT_CS_TARGET ? GET_CE_SCORE(target_element) :
      action_arg == CA_ARG_ELEMENT_CS_TRIGGER ? change->actual_trigger_ce_score:
+     action_arg == CA_ARG_ELEMENT_CS_ACTION ? GET_CE_SCORE(action_element) :
      action_arg == CA_ARG_ELEMENT_NR_TARGET  ? change->target_element :
      action_arg == CA_ARG_ELEMENT_NR_TRIGGER ? change->actual_trigger_element :
+     action_arg == CA_ARG_ELEMENT_NR_ACTION  ? change->action_element :
      -1);
 
   int action_arg_number_old =
@@ -10235,6 +10266,7 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
     (action_arg >= CA_ARG_PLAYER_1 &&
      action_arg <= CA_ARG_PLAYER_4 ? action_arg - CA_ARG_PLAYER :
      action_arg == CA_ARG_PLAYER_TRIGGER ? trigger_player_bits :
+     action_arg == CA_ARG_PLAYER_ACTION ? 1 << GET_PLAYER_NR(action_element) :
      PLAYER_BITS_ANY);
 
   /* ---------- execute action  -------------------------------------------- */
@@ -11122,6 +11154,11 @@ static boolean CheckTriggeredElementChangeExt(int trigger_x, int trigger_y,
 	change->actual_trigger_ce_value = CustomValue[trigger_x][trigger_y];
 	change->actual_trigger_ce_score = GET_CE_SCORE(trigger_element);
 
+#if 0
+	printf("::: TRIGGERED CHANGE FOUND: %d ['%s'], %d\n",
+	       element, EL_NAME(element), p);
+#endif
+
 	if ((change->can_change && !change_done) || change->has_action)
 	{
 	  int x, y;
@@ -11132,6 +11169,12 @@ static boolean CheckTriggeredElementChangeExt(int trigger_x, int trigger_y,
 	    {
 	      if (change->can_change && !change_done)
 	      {
+
+#if 0
+		printf("::: TRIGGERED CHANGE FOUND: %d ['%s'], %d -- CHANGE\n",
+		       element, EL_NAME(element), p);
+#endif
+
 		ChangeDelay[x][y] = 1;
 		ChangeEvent[x][y] = trigger_event;
 
@@ -11140,6 +11183,22 @@ static boolean CheckTriggeredElementChangeExt(int trigger_x, int trigger_y,
 #if USE_NEW_DELAYED_ACTION
 	      else if (change->has_action)
 	      {
+#if USE_FIX_NO_ACTION_AFTER_CHANGE
+		/* if element already changed in this frame, not only prevent
+		   another element change (checked in ChangeElement()), but
+		   also prevent additional element actions for this element */
+
+		if (ChangeCount[x][y] >= game.max_num_changes_per_frame &&
+		    !level.use_action_after_change_bug)
+		  continue;
+#endif
+
+
+#if 0
+		printf("::: TRIGGERED CHANGE FOUND: %d ['%s'], %d -- ACTION\n",
+		       element, EL_NAME(element), p);
+#endif
+
 		ExecuteCustomElementAction(x, y, element, p);
 		PlayLevelSoundElementAction(x, y, element, ACTION_PAGE_1 + p);
 	      }
@@ -11157,6 +11216,12 @@ static boolean CheckTriggeredElementChangeExt(int trigger_x, int trigger_y,
 	  {
 	    change_done = TRUE;
 	    change_done_any = TRUE;
+
+#if 0
+	    printf("::: TRIGGERED CHANGE FOUND: %d ['%s'], %d -- DONE\n",
+		   element, EL_NAME(element), p);
+#endif
+
 	  }
 	}
       }
