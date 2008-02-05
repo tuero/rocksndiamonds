@@ -10168,12 +10168,18 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
     (level.time > 0 ? TimeLeft :
      TimePlayed);
 
-  int action_arg_element =
+  int action_arg_element_raw =
     (action_arg == CA_ARG_PLAYER_TRIGGER  ? change->actual_trigger_player :
      action_arg == CA_ARG_ELEMENT_TRIGGER ? change->actual_trigger_element :
      action_arg == CA_ARG_ELEMENT_TARGET  ? change->target_element :
      action_arg == CA_ARG_ELEMENT_ACTION  ? change->action_element :
      EL_EMPTY);
+  int action_arg_element = GetElementFromGroupElement(action_arg_element_raw);
+
+#if 0
+  if (action_arg_element_raw == EL_GROUP_START)
+    printf("::: %d,%d: %d ('%s')\n", x, y, element, EL_NAME(element));
+#endif
 
   int action_arg_direction =
     (action_arg >= CA_ARG_DIRECTION_LEFT &&
@@ -10603,6 +10609,38 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
 	}
       }
 #endif
+
+      break;
+    }
+
+    case CA_SET_CE_ARTWORK:
+    {
+      int artwork_element = action_arg_element;
+      boolean reset_frame = FALSE;
+      int xx, yy;
+
+      if (action_arg == CA_ARG_ELEMENT_RESET)
+	artwork_element = (ei->use_gfx_element ? ei->gfx_element_initial :
+			   element);
+
+      if (ei->gfx_element != artwork_element)
+	reset_frame = TRUE;
+
+      ei->gfx_element = artwork_element;
+
+      SCAN_PLAYFIELD(xx, yy)
+      {
+	if (Feld[xx][yy] == element)
+	{
+	  if (reset_frame)
+	  {
+	    ResetGfxAnimation(xx, yy);
+	    ResetRandomAnimationValue(xx, yy);
+	  }
+
+	  TEST_DrawLevelField(xx, yy);
+	}
+      }
 
       break;
     }
@@ -11169,6 +11207,15 @@ static boolean CheckTriggeredElementChangeExt(int trigger_x, int trigger_y,
 	    {
 	      if (change->can_change && !change_done)
 	      {
+#if USE_FIX_NO_ACTION_AFTER_CHANGE
+		/* if element already changed in this frame, not only prevent
+		   another element change (checked in ChangeElement()), but
+		   also prevent additional element actions for this element */
+
+		if (ChangeCount[x][y] >= game.max_num_changes_per_frame &&
+		    !level.use_action_after_change_bug)
+		  continue;
+#endif
 
 #if 0
 		printf("::: TRIGGERED CHANGE FOUND: %d ['%s'], %d -- CHANGE\n",

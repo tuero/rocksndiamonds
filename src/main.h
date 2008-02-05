@@ -358,6 +358,7 @@
 #define CA_SET_CE_VALUE			16
 #define CA_SET_ENGINE_SCAN_MODE		17
 #define CA_SET_PLAYER_INVENTORY		18
+#define CA_SET_CE_ARTWORK		19
 
 #define CA_HEADLINE_LEVEL_ACTIONS	250
 #define CA_HEADLINE_PLAYER_ACTIONS	251
@@ -754,8 +755,12 @@
 #define IS_DC_STEELWALL_2(e)	((e) >= EL_DC_STEELWALL_2_LEFT &&	\
 				 (e) <= EL_DC_STEELWALL_2_SINGLE)
 
+#if 1
+#define GFX_ELEMENT(e)		(element_info[e].gfx_element)
+#else
 #define GFX_ELEMENT(e)		(element_info[e].use_gfx_element ?	\
 				 element_info[e].gfx_element : e)
+#endif
 
 /* !!! CHECK THIS !!! */
 #if 1
@@ -2516,7 +2521,7 @@ struct ElementInfo
   unsigned long properties[NUM_EP_BITFIELDS];	/* element base properties */
 
   boolean use_gfx_element;	/* use custom graphic element */
-  int gfx_element;		/* optional custom graphic element */
+  int gfx_element_initial;	/* initial optional custom graphic element */
 
   int access_direction;		/* accessible from which direction */
 
@@ -2566,6 +2571,8 @@ struct ElementInfo
   struct ElementChangeInfo *event_page[NUM_CHANGE_EVENTS]; /* page for event */
 
   boolean in_group[NUM_GROUP_ELEMENTS];
+
+  int gfx_element;		/* runtime optional custom graphic element */
 
   int collect_score;		/* runtime score value for collecting */
 

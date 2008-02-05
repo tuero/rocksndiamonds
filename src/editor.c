@@ -1714,6 +1714,7 @@ static struct ValueTextInfo options_action_type[] =
   { CA_HEADLINE_CE_ACTIONS,	"[CE]"				},
   { CA_SET_CE_VALUE,		"set CE value"			},
   { CA_SET_CE_SCORE,		"set CE score"			},
+  { CA_SET_CE_ARTWORK,		"set artwork"			},
   { CA_UNDEFINED,		" "				},
   { CA_HEADLINE_ENGINE_ACTIONS,	"[engine]"			},
   { CA_SET_ENGINE_SCAN_MODE,	"set scan mode"			},
@@ -2037,6 +2038,7 @@ action_arg_options[] =
   { CA_SET_PLAYER_INVENTORY,	0,	options_action_arg_inventory,	},
   { CA_SET_CE_VALUE,		3,	options_action_arg_value,	},
   { CA_SET_CE_SCORE,		3,	options_action_arg_value,	},
+  { CA_SET_CE_ARTWORK,		1,	options_action_arg_artwork,	},
   { CA_SET_ENGINE_SCAN_MODE,	1,	options_action_arg_scan_mode,	},
 
   { -1,				FALSE,	NULL				}
@@ -3100,7 +3102,7 @@ static struct
   {
     -1,					ED_AREA_1X1_SETTINGS_YPOS(1),
     GADGET_ID_CUSTOM_GRAPHIC,		GADGET_ID_CUSTOM_USE_GRAPHIC,
-    &custom_element.gfx_element,	1, 1,
+    &custom_element.gfx_element_initial,1, 1,
     NULL, NULL, NULL,			"custom graphic element"
   },
 
@@ -7166,6 +7168,8 @@ void DrawLevelEd()
   ReinitializeElementList();		/* update dynamic level element list */
   ReinitializeElementListButtons();	/* custom element may look different */
 
+  InitElementPropertiesGfxElement();
+
 #if 1
   UnmapAllGadgets();
 #else
@@ -8538,7 +8542,11 @@ static void DrawPropertiesWindow()
 
 static void UpdateCustomElementGraphicGadgets()
 {
+  struct ElementInfo *ei = &element_info[properties_element];
   int i;
+
+  ei->gfx_element = (ei->use_gfx_element ? ei->gfx_element_initial :
+		     properties_element);
 
   ModifyEditorElementList();
   RedrawDrawingElements();

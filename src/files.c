@@ -870,8 +870,8 @@ static struct LevelFileConfigInfo chunk_config_CUSX_base[] =
   {
     -1,					-1,
     TYPE_ELEMENT,			CONF_VALUE_16_BIT(1),
-    &xx_ei.gfx_element,			EL_EMPTY_SPACE,
-    &yy_ei.gfx_element
+    &xx_ei.gfx_element_initial,		EL_EMPTY_SPACE,
+    &yy_ei.gfx_element_initial
   },
 
   {
@@ -1202,7 +1202,7 @@ static struct LevelFileConfigInfo chunk_config_GRPX[] =
   {
     -1,					-1,
     TYPE_ELEMENT,			CONF_VALUE_16_BIT(1),
-    &xx_ei.gfx_element,			EL_EMPTY_SPACE
+    &xx_ei.gfx_element_initial,		EL_EMPTY_SPACE
   },
 
   {
@@ -2428,7 +2428,7 @@ static int LoadLevel_CUS3(FILE *file, int chunk_size, struct LevelInfo *level)
     ReadUnusedBytesFromFile(file, 7);
 
     ei->use_gfx_element = getFile8Bit(file);
-    ei->gfx_element = getMappedElement(getFile16BitBE(file));
+    ei->gfx_element_initial = getMappedElement(getFile16BitBE(file));
 
     ei->collect_score_initial = getFile8Bit(file);
     ei->collect_count_initial = getFile8Bit(file);
@@ -2527,7 +2527,7 @@ static int LoadLevel_CUS4(FILE *file, int chunk_size, struct LevelInfo *level)
   ei->use_last_ce_value = getFile8Bit(file);
 
   ei->use_gfx_element = getFile8Bit(file);
-  ei->gfx_element = getMappedElement(getFile16BitBE(file));
+  ei->gfx_element_initial = getMappedElement(getFile16BitBE(file));
 
   ei->collect_score_initial = getFile8Bit(file);
   ei->collect_count_initial = getFile8Bit(file);
@@ -2660,7 +2660,7 @@ static int LoadLevel_GRP1(FILE *file, int chunk_size, struct LevelInfo *level)
   group->num_elements = getFile8Bit(file);
 
   ei->use_gfx_element = getFile8Bit(file);
-  ei->gfx_element = getMappedElement(getFile16BitBE(file));
+  ei->gfx_element_initial = getMappedElement(getFile16BitBE(file));
 
   group->choice_mode = getFile8Bit(file);
 
@@ -6493,6 +6493,7 @@ static void LoadLevel_InitElements(struct LevelInfo *level, char *filename)
   /* initialize element properties for level editor etc. */
   InitElementPropertiesEngine(level->game_version);
   InitElementPropertiesAfterLoading(level->game_version);
+  InitElementPropertiesGfxElement();
 }
 
 static void LoadLevel_InitPlayfield(struct LevelInfo *level, char *filename)
@@ -6871,7 +6872,7 @@ static void SaveLevel_CUS3(FILE *file, struct LevelInfo *level,
 	WriteUnusedBytesToFile(file, 7);
 
 	putFile8Bit(file, ei->use_gfx_element);
-	putFile16BitBE(file, ei->gfx_element);
+	putFile16BitBE(file, ei->gfx_element_initial);
 
 	putFile8Bit(file, ei->collect_score_initial);
 	putFile8Bit(file, ei->collect_count_initial);
@@ -6950,7 +6951,7 @@ static void SaveLevel_CUS4(FILE *file, struct LevelInfo *level, int element)
   putFile8Bit(file, ei->use_last_ce_value);
 
   putFile8Bit(file, ei->use_gfx_element);
-  putFile16BitBE(file, ei->gfx_element);
+  putFile16BitBE(file, ei->gfx_element_initial);
 
   putFile8Bit(file, ei->collect_score_initial);
   putFile8Bit(file, ei->collect_count_initial);
@@ -7061,7 +7062,7 @@ static void SaveLevel_GRP1(FILE *file, struct LevelInfo *level, int element)
   putFile8Bit(file, group->num_elements);
 
   putFile8Bit(file, ei->use_gfx_element);
-  putFile16BitBE(file, ei->gfx_element);
+  putFile16BitBE(file, ei->gfx_element_initial);
 
   putFile8Bit(file, group->choice_mode);
 

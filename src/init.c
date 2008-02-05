@@ -4884,6 +4884,18 @@ void InitElementPropertiesAfterLoading(int engine_version)
   }
 }
 
+void InitElementPropertiesGfxElement()
+{
+  int i;
+
+  for (i = 0; i < MAX_NUM_ELEMENTS; i++)
+  {
+    struct ElementInfo *ei = &element_info[i];
+
+    ei->gfx_element = (ei->use_gfx_element ? ei->gfx_element_initial : i);
+  }
+}
+
 static void InitGlobal()
 {
   int graphic;

@@ -36,6 +36,7 @@ void ResolveGroupElement(int);
 void InitElementPropertiesStatic(void);
 void InitElementPropertiesEngine(int);
 void InitElementPropertiesAfterLoading(int);
+void InitElementPropertiesGfxElement();
 
 void ReloadCustomArtwork(int);
 void RedrawBackground();
