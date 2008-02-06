@@ -1791,8 +1791,8 @@ static void InitPlayerField(int x, int y, int element, boolean init_game)
     int player_nr = GET_PLAYER_NR(element);
     struct PlayerInfo *player = &stored_player[player_nr];
 
-    if (player->active)
-      player->killed = FALSE;	/* if player was just killed, reanimate him */
+    if (player->active && player->killed)
+      player->reanimated = TRUE; /* if player was just killed, reanimate him */
   }
 #endif
 }
@@ -3451,8 +3451,8 @@ static void InitGameEngine()
     for (j = 0; j < ei->num_change_pages; j++)
     {
       ei->change_page[j].actual_trigger_element = EL_EMPTY;
-      ei->change_page[j].actual_trigger_player = EL_PLAYER_1;
-      ei->change_page[j].actual_trigger_player_bits = CH_PLAYER_1;
+      ei->change_page[j].actual_trigger_player = EL_EMPTY;
+      ei->change_page[j].actual_trigger_player_bits = CH_PLAYER_NONE;
       ei->change_page[j].actual_trigger_side = CH_SIDE_NONE;
       ei->change_page[j].actual_trigger_ce_value = 0;
       ei->change_page[j].actual_trigger_ce_score = 0;
@@ -3707,6 +3707,7 @@ void InitGame()
     player->present = FALSE;
     player->active = FALSE;
     player->killed = FALSE;
+    player->reanimated = FALSE;
 
     player->action = 0;
     player->effective_action = 0;
@@ -10259,7 +10260,9 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
 			    action_arg_number_min, action_arg_number_max);
 
 #if 1
-  int trigger_player_bits = change->actual_trigger_player_bits;
+  int trigger_player_bits =
+    (change->actual_trigger_player_bits != CH_PLAYER_NONE ?
+     change->actual_trigger_player_bits : change->trigger_player);
 #else
   int trigger_player_bits =
     (change->actual_trigger_player >= EL_PLAYER_1 &&
@@ -10428,6 +10431,10 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
 
     case CA_SET_PLAYER_SPEED:
     {
+#if 0
+      printf("::: trigger_player_bits == %d\n", trigger_player_bits);
+#endif
+
       for (i = 0; i < MAX_PLAYERS; i++)
       {
 	if (trigger_player_bits & (1 << i))
@@ -10539,6 +10546,104 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
 	  stored_player[i].num_special_action_sleeping =
 	    get_num_special_action(artwork_element,
 				   ACTION_SLEEPING_1, ACTION_SLEEPING_LAST);
+	}
+      }
+
+      break;
+    }
+
+    case CA_SET_PLAYER_INVENTORY:
+    {
+      for (i = 0; i < MAX_PLAYERS; i++)
+      {
+	struct PlayerInfo *player = &stored_player[i];
+	int j, k;
+
+	if (trigger_player_bits & (1 << i))
+	{
+	  int inventory_element = action_arg_element;
+
+	  if (action_arg == CA_ARG_ELEMENT_TARGET ||
+	      action_arg == CA_ARG_ELEMENT_TRIGGER ||
+	      action_arg == CA_ARG_ELEMENT_ACTION)
+	  {
+	    int element = inventory_element;
+	    int collect_count = element_info[element].collect_count_initial;
+
+	    if (!IS_CUSTOM_ELEMENT(element))
+	      collect_count = 1;
+
+	    if (collect_count == 0)
+	      player->inventory_infinite_element = element;
+	    else
+	      for (k = 0; k < collect_count; k++)
+		if (player->inventory_size < MAX_INVENTORY_SIZE)
+		  player->inventory_element[player->inventory_size++] =
+		    element;
+	  }
+	  else if (action_arg == CA_ARG_INVENTORY_RM_TARGET ||
+		   action_arg == CA_ARG_INVENTORY_RM_TRIGGER ||
+		   action_arg == CA_ARG_INVENTORY_RM_ACTION)
+	  {
+	    if (player->inventory_infinite_element != EL_UNDEFINED &&
+		IS_EQUAL_OR_IN_GROUP(player->inventory_infinite_element,
+				     action_arg_element_raw))
+	      player->inventory_infinite_element = EL_UNDEFINED;
+
+	    for (k = 0, j = 0; j < player->inventory_size; j++)
+	    {
+	      if (!IS_EQUAL_OR_IN_GROUP(player->inventory_element[j],
+					action_arg_element_raw))
+		player->inventory_element[k++] = player->inventory_element[j];
+	    }
+
+	    player->inventory_size = k;
+	  }
+	  else if (action_arg == CA_ARG_INVENTORY_RM_FIRST)
+	  {
+	    if (player->inventory_size > 0)
+	    {
+	      for (j = 0; j < player->inventory_size - 1; j++)
+		player->inventory_element[j] = player->inventory_element[j + 1];
+
+	      player->inventory_size--;
+	    }
+	  }
+	  else if (action_arg == CA_ARG_INVENTORY_RM_LAST)
+	  {
+	    if (player->inventory_size > 0)
+	      player->inventory_size--;
+	  }
+	  else if (action_arg == CA_ARG_INVENTORY_RM_ALL)
+	  {
+	    player->inventory_infinite_element = EL_UNDEFINED;
+	    player->inventory_size = 0;
+	  }
+	  else if (action_arg == CA_ARG_ELEMENT_RESET)
+	  {
+	    player->inventory_infinite_element = EL_UNDEFINED;
+	    player->inventory_size = 0;
+
+	    if (level.use_initial_inventory[i])
+	    {
+	      for (j = 0; j < level.initial_inventory_size[i]; j++)
+	      {
+		int element = level.initial_inventory_content[i][j];
+		int collect_count = element_info[element].collect_count_initial;
+
+		if (!IS_CUSTOM_ELEMENT(element))
+		  collect_count = 1;
+
+		if (collect_count == 0)
+		  player->inventory_infinite_element = element;
+		else
+		  for (k = 0; k < collect_count; k++)
+		    if (player->inventory_size < MAX_INVENTORY_SIZE)
+		      player->inventory_element[player->inventory_size++] =
+			element;
+	      }
+	    }
+	  }
 	}
       }
 
@@ -10804,8 +10909,8 @@ static boolean ChangeElement(int x, int y, int element, int page)
   {
     /* reset actual trigger element, trigger player and action element */
     change->actual_trigger_element = EL_EMPTY;
-    change->actual_trigger_player = EL_PLAYER_1;
-    change->actual_trigger_player_bits = CH_PLAYER_1;
+    change->actual_trigger_player = EL_EMPTY;
+    change->actual_trigger_player_bits = CH_PLAYER_NONE;
     change->actual_trigger_side = CH_SIDE_NONE;
     change->actual_trigger_ce_value = 0;
     change->actual_trigger_ce_score = 0;
@@ -11322,6 +11427,10 @@ static boolean CheckElementChangeExt(int x, int y,
 #endif
 
   RECURSION_LOOP_DETECTION_START(trigger_element, FALSE);
+
+#if 0
+  printf("::: X: trigger_player_bits == %d\n", trigger_player);
+#endif
 
   for (p = 0; p < element_info[element].num_change_pages; p++)
   {
@@ -14239,6 +14348,11 @@ void KillPlayer(struct PlayerInfo *player)
   if (!player->active)
     return;
 
+#if 0
+  printf("::: 0: killed == %d, active == %d, reanimated == %d\n",
+	 player->killed, player->active, player->reanimated);
+#endif
+
   /* the following code was introduced to prevent an infinite loop when calling
      -> Bang()
      -> CheckTriggeredElementChangeExt()
@@ -14263,11 +14377,28 @@ void KillPlayer(struct PlayerInfo *player)
   player->shield_normal_time_left = 0;
   player->shield_deadly_time_left = 0;
 
+#if 0
+  printf("::: 1: killed == %d, active == %d, reanimated == %d\n",
+	 player->killed, player->active, player->reanimated);
+#endif
+
   Bang(jx, jy);
 
+#if 0
+  printf("::: 2: killed == %d, active == %d, reanimated == %d\n",
+	 player->killed, player->active, player->reanimated);
+#endif
+
 #if USE_PLAYER_REANIMATION
+#if 1
+  if (player->reanimated)	/* killed player may have been reanimated */
+    player->killed = player->reanimated = FALSE;
+  else
+    BuryPlayer(player);
+#else
   if (player->killed)		/* player may have been reanimated */
     BuryPlayer(player);
+#endif
 #else
   BuryPlayer(player);
 #endif
