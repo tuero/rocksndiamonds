@@ -1,3 +1,13 @@
+2008-02-05
+	* added optional initial inventory for players (pre-collected elements)
+	* added change page actions "set player inventory" and "set CE artwork"
+	* added recognition of "player" parameter on change pages when player
+	  actions are defined, but no trigger player in corresponding condition
+	  (this resulted in actions that only affected the first player before)
+	* fixed bug with change actions being executed for newly created custom
+	  elements resulting from custom element changes, when the intention was
+	  only to check for change actions for the previous custom element
+
 2008-02-03
 	* changed design and size of element drawing area in level editor
 	* added "element used as action parameter" to element change actions

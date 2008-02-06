@@ -10174,6 +10174,9 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
      action_arg == CA_ARG_ELEMENT_TRIGGER ? change->actual_trigger_element :
      action_arg == CA_ARG_ELEMENT_TARGET  ? change->target_element :
      action_arg == CA_ARG_ELEMENT_ACTION  ? change->action_element :
+     action_arg == CA_ARG_INVENTORY_RM_TRIGGER ? change->actual_trigger_element:
+     action_arg == CA_ARG_INVENTORY_RM_TARGET  ? change->target_element :
+     action_arg == CA_ARG_INVENTORY_RM_ACTION  ? change->action_element :
      EL_EMPTY);
   int action_arg_element = GetElementFromGroupElement(action_arg_element_raw);
 
@@ -10619,7 +10622,7 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
 	    player->inventory_infinite_element = EL_UNDEFINED;
 	    player->inventory_size = 0;
 	  }
-	  else if (action_arg == CA_ARG_ELEMENT_RESET)
+	  else if (action_arg == CA_ARG_INVENTORY_RESET)
 	  {
 	    player->inventory_infinite_element = EL_UNDEFINED;
 	    player->inventory_size = 0;
