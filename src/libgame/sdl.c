@@ -296,6 +296,26 @@ boolean SDLSetVideoMode(DrawBuffer **backbuffer, boolean fullscreen)
     }
   }
 
+
+#if 1
+  SDL_EventState(SDL_SYSWMEVENT, SDL_ENABLE);
+
+#if defined(PLATFORM_WIN32)
+  {
+    SDL_SysWMinfo wminfo;
+    HWND hwnd;
+
+    SDL_VERSION(&wminfo.version);
+    SDL_GetWMInfo(&wminfo);
+
+    hwnd = wminfo.window;
+
+    DragAcceptFiles(hwnd, TRUE);
+  }
+#endif
+#endif
+
+
   return success;
 }
 
@@ -1785,6 +1805,36 @@ void SDLNextEvent(Event *event)
     else
       ((MotionEvent *)event)->y = 0;
   }
+}
+
+void SDLHandleWindowManagerEvent(Event *event)
+{
+#if defined(PLATFORM_WIN32)
+  SDL_SysWMEvent *syswmevent = (SDL_SysWMEvent *)event;
+  SDL_SysWMmsg *syswmmsg = (SDL_SysWMmsg *)(syswmevent->msg);
+
+  if (syswmmsg->msg == WM_DROPFILES)
+  {
+    HDROP hdrop = (HDROP)syswmmsg->wParam;
+    int i, num_files;
+
+    printf("::: SDL_SYSWMEVENT:\n");
+
+    num_files = DragQueryFile(hdrop, 0xffffffff, NULL, 0);
+
+    for (i = 0; i < num_files; i++)
+    {
+      int buffer_len = DragQueryFile(hdrop, i, NULL, 0);
+      char buffer[buffer_len + 1];
+
+      DragQueryFile(hdrop, i, buffer, buffer_len + 1);
+
+      printf("::: - '%s'\n", buffer);
+    }
+
+    DragFinish((HDROP)syswmmsg->wParam);
+  }
+#endif
 }
 
 

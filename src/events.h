@@ -28,7 +28,8 @@ void HandleButtonEvent(ButtonEvent *);
 void HandleMotionEvent(MotionEvent *);
 void HandleKeyEvent(KeyEvent *);
 void HandleFocusEvent(FocusChangeEvent *);
-void HandleClientMessageEvent(ClientMessageEvent *event);
+void HandleClientMessageEvent(ClientMessageEvent *);
+void HandleWindowManagerEvent(Event *);
 
 void HandleNoEvent(void);
 

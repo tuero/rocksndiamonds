@@ -223,6 +223,10 @@ void HandleOtherEvents(Event *event)
     case SDL_JOYBUTTONUP:
       HandleJoystickEvent(event);
       break;
+
+    case SDL_SYSWMEVENT:
+      HandleWindowManagerEvent(event);
+      break;
 #endif
 
     default:
@@ -411,6 +415,13 @@ void HandleClientMessageEvent(ClientMessageEvent *event)
 {
   if (CheckCloseWindowEvent(event))
     CloseAllAndExit(0);
+}
+
+void HandleWindowManagerEvent(Event *event)
+{
+#if defined(TARGET_SDL)
+  SDLHandleWindowManagerEvent(event);
+#endif
 }
 
 void HandleButton(int mx, int my, int button, int button_nr)

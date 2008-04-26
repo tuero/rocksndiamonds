@@ -65,6 +65,8 @@
 
 #define USE_GFX_RESET_WHEN_NOT_MOVING	(USE_NEW_STUFF		* 1)
 
+#define USE_NEW_PLAYER_ASSIGNMENTS	(USE_NEW_STUFF		* 1)
+
 #define USE_DELAYED_GFX_REDRAW		(USE_NEW_STUFF		* 0)
 
 #if USE_DELAYED_GFX_REDRAW
@@ -4038,6 +4040,52 @@ void InitGame()
     if (game.belt_dir[i] == MV_NONE)
       game.belt_dir_nr[i] = 3;		/* not moving, next moving left */
 
+#if USE_NEW_PLAYER_ASSIGNMENTS
+  /* check if any connected player was not found in playfield */
+  for (i = 0; i < MAX_PLAYERS; i++)
+  {
+    struct PlayerInfo *player = &stored_player[i];
+
+    if (player->connected && !player->present)
+    {
+      for (j = 0; j < MAX_PLAYERS; j++)
+      {
+	struct PlayerInfo *some_player = &stored_player[j];
+	int jx = some_player->jx, jy = some_player->jy;
+
+	/* assign first free player found that is present in the playfield */
+	if (some_player->present && !some_player->connected)
+	{
+	  player->present = FALSE;
+	  player->active = FALSE;
+
+	  some_player->present = TRUE;
+	  some_player->active = TRUE;
+
+	  /*
+	  player->initial_element = some_player->initial_element;
+	  player->artwork_element = some_player->artwork_element;
+
+	  player->block_last_field       = some_player->block_last_field;
+	  player->block_delay_adjustment = some_player->block_delay_adjustment;
+	  */
+
+	  StorePlayer[jx][jy] = some_player->element_nr;
+
+	  some_player->jx = some_player->last_jx = jx;
+	  some_player->jy = some_player->last_jy = jy;
+
+	  if (local_player == player)
+	    local_player = some_player;
+
+	  break;
+	}
+      }
+    }
+  }
+
+#else
+
   /* check if any connected player was not found in playfield */
   for (i = 0; i < MAX_PLAYERS; i++)
   {
@@ -4066,6 +4114,7 @@ void InitGame()
 	  player->block_delay_adjustment = some_player->block_delay_adjustment;
 
 	  StorePlayer[jx][jy] = player->element_nr;
+
 	  player->jx = player->last_jx = jx;
 	  player->jy = player->last_jy = jy;
 
@@ -4074,6 +4123,7 @@ void InitGame()
       }
     }
   }
+#endif
 
   if (tape.playing)
   {

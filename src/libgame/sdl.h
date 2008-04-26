@@ -19,7 +19,9 @@
 #include <SDL_mixer.h>
 #include <SDL_net.h>
 #include <SDL_thread.h>
-
+#if defined(PLATFORM_WIN32)
+#include <SDL_syswm.h>
+#endif
 
 /* definitions needed for "system.c" */
 
@@ -375,6 +377,7 @@ void SDLOpenAudio(void);
 void SDLCloseAudio(void);
 
 void SDLNextEvent(Event *);
+void SDLHandleWindowManagerEvent(Event *);
 
 void HandleJoystickEvent(Event *);
 void SDLInitJoysticks(void);
