@@ -2029,6 +2029,7 @@ int getMappedElement(int element)
 
     case EL_KEY_OBSOLETE:
       element = EL_KEY_1;
+      break;
 
     case EL_EM_KEY_1_FILE_OBSOLETE:
       element = EL_EM_KEY_1;
@@ -9861,6 +9862,8 @@ void CreateLevelSketchImages()
   Bitmap *bitmap2;
   int i;
 
+  InitElementPropertiesGfxElement();
+
   bitmap1 = CreateBitmap(TILEX, TILEY, DEFAULT_DEPTH);
   bitmap2 = CreateBitmap(MINI_TILEX, MINI_TILEY, DEFAULT_DEPTH);
 
@@ -9868,7 +9871,8 @@ void CreateLevelSketchImages()
   {
     Bitmap *src_bitmap;
     int src_x, src_y;
-    int graphic = el2edimg(i);
+    int element = getMappedElement(i);
+    int graphic = el2edimg(element);
     char basename1[16];
     char basename2[16];
     char *filename1;

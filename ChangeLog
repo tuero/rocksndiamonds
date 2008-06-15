@@ -1,3 +1,6 @@
+2008-06-16
+	* fixed initialization of gfx_element for level sketch image creation
+
 2008-06-15
 	* added switch for EM style dynamite "[ ] explodes with chain reaction"
 	  (with default set to "on" for existing levels, but "off" for all new
