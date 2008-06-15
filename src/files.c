@@ -220,6 +220,12 @@ static struct LevelFileConfigInfo chunk_config_INFO[] =
 
   {
     -1,					-1,
+    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(8),
+    &li.em_explodes_by_fire,		FALSE
+  },
+
+  {
+    -1,					-1,
     TYPE_INTEGER,			CONF_VALUE_16_BIT(5),
     &li.score[SC_TIME_BONUS],		1
   },
@@ -6362,6 +6368,10 @@ static void LoadLevel_InitVersion(struct LevelInfo *level, char *filename)
   /* not centering level after relocating player was default only in 3.2.3 */
   if (level->game_version == VERSION_IDENT(3,2,3,0))	/* (no pre-releases) */
     level->shifted_relocation = TRUE;
+
+  /* EM style elements always chain-exploded in R'n'D engine before 3.2.6 */
+  if (level->game_version < VERSION_IDENT(3,2,6,0))
+    level->em_explodes_by_fire = TRUE;
 }
 
 static void LoadLevel_InitElements(struct LevelInfo *level, char *filename)

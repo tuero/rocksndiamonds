@@ -1990,7 +1990,7 @@
 /* program information and versioning definitions */
 #define PROGRAM_VERSION_MAJOR		3
 #define PROGRAM_VERSION_MINOR		2
-#define PROGRAM_VERSION_PATCH		5
+#define PROGRAM_VERSION_PATCH		6
 #define PROGRAM_VERSION_BUILD		0
 
 #define PROGRAM_TITLE_STRING		"Rocks'n'Diamonds"
@@ -2358,6 +2358,7 @@ struct LevelInfo
   int initial_inventory_content[MAX_PLAYERS][MAX_INITIAL_INVENTORY_SIZE];
 
   boolean em_slippery_gems;	/* EM style "gems slip from wall" behaviour */
+  boolean em_explodes_by_fire;	/* EM style chain explosion behaviour */
   boolean use_spring_bug;	/* for compatibility with old levels */
   boolean use_time_orb_bug;	/* for compatibility with old levels */
   boolean instant_relocation;	/* no visual delay when relocating player */

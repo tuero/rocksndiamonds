@@ -344,6 +344,15 @@ static int getFontBitmapID(int font_nr)
     special = GFX_SPECIAL_ARG_DOOR;
 #endif
 
+#if 0
+  if (special != -1)
+  {
+    printf("%s%s\n",
+	   font_info[font_nr].token_name,
+	   special_suffix_info[special].suffix);
+  }
+#endif
+
   if (special != -1)
     return font_info[font_nr].special_bitmap_id[special];
   else
@@ -4849,6 +4858,14 @@ void InitElementPropertiesEngine(int engine_version)
       -1
     };
 
+    static int ep_em_explodes_by_fire[] =
+    {
+      EL_EM_DYNAMITE,
+      EL_EM_DYNAMITE_ACTIVE,
+      EL_MOLE,
+      -1
+    };
+
     /* special EM style gems behaviour */
     for (i = 0; ep_em_slippery_wall[i] != -1; i++)
       SET_PROPERTY(ep_em_slippery_wall[i], EP_EM_SLIPPERY_WALL,
@@ -4858,6 +4875,11 @@ void InitElementPropertiesEngine(int engine_version)
     SET_PROPERTY(EL_EXPANDABLE_WALL_GROWING, EP_EM_SLIPPERY_WALL,
 		 (level.em_slippery_gems &&
 		  engine_version > VERSION_IDENT(2,0,1,0)));
+
+    /* special EM style explosion behaviour regarding chain reactions */
+    for (i = 0; ep_em_explodes_by_fire[i] != -1; i++)
+      SET_PROPERTY(ep_em_explodes_by_fire[i], EP_EXPLODES_BY_FIRE,
+		   level.em_explodes_by_fire);
   }
 
   /* this is needed because some graphics depend on element properties */
