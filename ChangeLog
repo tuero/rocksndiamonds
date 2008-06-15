@@ -1,3 +1,8 @@
+2008-06-15
+	* added switch for EM style dynamite "[ ] explodes with chain reaction"
+	  (with default set to "on" for existing levels, but "off" for all new
+	  levels), as EM style dynamite does not chain-explode in original EM
+
 2008-02-05
 	* added optional initial inventory for players (pre-collected elements)
 	* added change page actions "set player inventory" and "set CE artwork"
