@@ -7134,6 +7134,8 @@ void CheckElementDescriptions()
 
 void DrawLevelEd()
 {
+  StopAnimation();
+
   CloseDoor(DOOR_CLOSE_ALL);
 
 #if 1
@@ -11105,6 +11107,8 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 	UndrawSpecialEditorDoor();
 
 	CloseDoor(DOOR_CLOSE_ALL);
+
+	BackToFront();		/* force redraw of undrawn special door */
 
 	DrawCompleteVideoDisplay();
 

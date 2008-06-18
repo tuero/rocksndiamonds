@@ -548,7 +548,7 @@ static void FadeExt(int fade_mask, int fade_mode, int fade_type)
   }
 #endif
 
-  /* !!! what abount fade_mask == REDRAW_FIELD | REDRAW_ALL ??? !!! */
+  /* !!! what about fade_mask == REDRAW_FIELD | REDRAW_ALL ??? !!! */
 
 #if 0
   printf("::: NOW FADING %d ... [%d]\n", fade_mode, fade_type);
