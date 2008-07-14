@@ -1,3 +1,7 @@
+2008-07-14
+	* moved "level settings" and "editor settings" to two tabbed screens in
+	  level editor to gain space for additional level property settings
+
 2008-06-16
 	* fixed redraw problem of special editor door when playing from editor
 

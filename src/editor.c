@@ -111,7 +111,7 @@
 
 /* values for the settings windows */
 #define ED_LEVEL_SETTINGS_XSTART	(3 * MINI_TILEX / 2)
-#define ED_LEVEL_SETTINGS_YSTART	(5 * MINI_TILEY)
+#define ED_LEVEL_SETTINGS_YSTART	(7 * MINI_TILEY)
 
 #define ED_ELEMENT_SETTINGS_XSTART	(3 * MINI_TILEX / 2)
 #define ED_ELEMENT_SETTINGS_YSTART	(10 * MINI_TILEY)
@@ -121,6 +121,7 @@
 
 #define ED_SETTINGS_XOFFSET		ED_XOFFSET_CHECKBOX
 #define ED_SETTINGS_YOFFSET		(3 * MINI_TILEY / 2)
+#define ED_SETTINGS_TAB_XOFFSET		124
 
 #define ED_LEVEL_SETTINGS_XPOS(n)	(ED_LEVEL_SETTINGS_XSTART +	\
 	 				 (n) * ED_SETTINGS_XOFFSET)
@@ -131,6 +132,16 @@
 	 				 (n) * ED_SETTINGS_XOFFSET)
 #define ED_ELEMENT_SETTINGS_YPOS(n)	(ED_ELEMENT_SETTINGS_YSTART +	\
 					 (n) * ED_SETTINGS_YOFFSET)
+
+#define ED_LEVEL_SETTINGS_TABS_XPOS(n)	(ED_LEVEL_SETTINGS_XPOS(0) +	\
+	 				(n) * ED_SETTINGS_TAB_XOFFSET)
+#define ED_LEVEL_SETTINGS_TABS_YPOS(n)	(ED_LEVEL_SETTINGS_YSTART -	\
+					 3 * MINI_TILEY)
+
+#define ED_ELEMENT_SETTINGS_TABS_XPOS(n) (ED_ELEMENT_SETTINGS_XPOS(0) +	\
+	 				 (n) * ED_SETTINGS_TAB_XOFFSET)
+#define ED_ELEMENT_SETTINGS_TABS_YPOS(n) (ED_ELEMENT_SETTINGS_YSTART -	\
+					 2 * MINI_TILEY)
 
 #define ED_SETTINGS1_YPOS		MINI_TILEY
 #define ED_SETTINGS2_XPOS		MINI_TILEX
@@ -512,17 +523,19 @@
 /* textbutton identifiers */
 #define GADGET_ID_TEXTBUTTON_FIRST	(GADGET_ID_SELECTBOX_FIRST + 29)
 
-#define GADGET_ID_PROPERTIES_INFO	(GADGET_ID_TEXTBUTTON_FIRST + 0)
-#define GADGET_ID_PROPERTIES_CONFIG	(GADGET_ID_TEXTBUTTON_FIRST + 1)
-#define GADGET_ID_PROPERTIES_CONFIG_1	(GADGET_ID_TEXTBUTTON_FIRST + 2)
-#define GADGET_ID_PROPERTIES_CONFIG_2	(GADGET_ID_TEXTBUTTON_FIRST + 3)
-#define GADGET_ID_PROPERTIES_CHANGE	(GADGET_ID_TEXTBUTTON_FIRST + 4)
-#define GADGET_ID_SAVE_AS_TEMPLATE	(GADGET_ID_TEXTBUTTON_FIRST + 5)
-#define GADGET_ID_ADD_CHANGE_PAGE	(GADGET_ID_TEXTBUTTON_FIRST + 6)
-#define GADGET_ID_DEL_CHANGE_PAGE	(GADGET_ID_TEXTBUTTON_FIRST + 7)
+#define GADGET_ID_LEVELINFO_LEVEL	(GADGET_ID_TEXTBUTTON_FIRST + 0)
+#define GADGET_ID_LEVELINFO_EDITOR	(GADGET_ID_TEXTBUTTON_FIRST + 1)
+#define GADGET_ID_PROPERTIES_INFO	(GADGET_ID_TEXTBUTTON_FIRST + 2)
+#define GADGET_ID_PROPERTIES_CONFIG	(GADGET_ID_TEXTBUTTON_FIRST + 3)
+#define GADGET_ID_PROPERTIES_CONFIG_1	(GADGET_ID_TEXTBUTTON_FIRST + 4)
+#define GADGET_ID_PROPERTIES_CONFIG_2	(GADGET_ID_TEXTBUTTON_FIRST + 5)
+#define GADGET_ID_PROPERTIES_CHANGE	(GADGET_ID_TEXTBUTTON_FIRST + 6)
+#define GADGET_ID_SAVE_AS_TEMPLATE	(GADGET_ID_TEXTBUTTON_FIRST + 7)
+#define GADGET_ID_ADD_CHANGE_PAGE	(GADGET_ID_TEXTBUTTON_FIRST + 8)
+#define GADGET_ID_DEL_CHANGE_PAGE	(GADGET_ID_TEXTBUTTON_FIRST + 9)
 
 /* graphicbutton identifiers */
-#define GADGET_ID_GRAPHICBUTTON_FIRST	(GADGET_ID_TEXTBUTTON_FIRST + 8)
+#define GADGET_ID_GRAPHICBUTTON_FIRST	(GADGET_ID_TEXTBUTTON_FIRST + 10)
 
 #define GADGET_ID_PREV_CHANGE_PAGE	(GADGET_ID_GRAPHICBUTTON_FIRST + 0)
 #define GADGET_ID_NEXT_CHANGE_PAGE	(GADGET_ID_GRAPHICBUTTON_FIRST + 1)
@@ -653,7 +666,9 @@
 #define ED_NUM_COUNTERBUTTONS		33
 
 #define ED_COUNTER_ID_LEVEL_FIRST	ED_COUNTER_ID_LEVEL_XSIZE
-#define ED_COUNTER_ID_LEVEL_LAST	ED_COUNTER_ID_LEVEL_RANDOM
+#define ED_COUNTER_ID_LEVEL_LAST	ED_COUNTER_ID_LEVEL_TIMESCORE
+#define ED_COUNTER_ID_EDITOR_FIRST	ED_COUNTER_ID_LEVEL_RANDOM
+#define ED_COUNTER_ID_EDITOR_LAST	ED_COUNTER_ID_LEVEL_RANDOM
 
 #define ED_COUNTER_ID_CUSTOM1_FIRST	ED_COUNTER_ID_CUSTOM_SCORE
 #define ED_COUNTER_ID_CUSTOM1_LAST	ED_COUNTER_ID_DROP_DELAY_RND
@@ -753,16 +768,21 @@
 #define ED_SELECTBOX_ID_CHANGE_LAST	ED_SELECTBOX_ID_SELECT_CHANGE_PAGE
 
 /* values for textbutton gadgets */
-#define ED_TEXTBUTTON_ID_PROPERTIES_INFO	0
-#define ED_TEXTBUTTON_ID_PROPERTIES_CONFIG	1
-#define ED_TEXTBUTTON_ID_PROPERTIES_CONFIG_1	2
-#define ED_TEXTBUTTON_ID_PROPERTIES_CONFIG_2	3
-#define ED_TEXTBUTTON_ID_PROPERTIES_CHANGE	4
-#define ED_TEXTBUTTON_ID_SAVE_AS_TEMPLATE	5
-#define ED_TEXTBUTTON_ID_ADD_CHANGE_PAGE	6
-#define ED_TEXTBUTTON_ID_DEL_CHANGE_PAGE	7
+#define ED_TEXTBUTTON_ID_LEVELINFO_LEVEL	0
+#define ED_TEXTBUTTON_ID_LEVELINFO_EDITOR	1
+#define ED_TEXTBUTTON_ID_PROPERTIES_INFO	2
+#define ED_TEXTBUTTON_ID_PROPERTIES_CONFIG	3
+#define ED_TEXTBUTTON_ID_PROPERTIES_CONFIG_1	4
+#define ED_TEXTBUTTON_ID_PROPERTIES_CONFIG_2	5
+#define ED_TEXTBUTTON_ID_PROPERTIES_CHANGE	6
+#define ED_TEXTBUTTON_ID_SAVE_AS_TEMPLATE	7
+#define ED_TEXTBUTTON_ID_ADD_CHANGE_PAGE	8
+#define ED_TEXTBUTTON_ID_DEL_CHANGE_PAGE	9
 
-#define ED_NUM_TEXTBUTTONS			8
+#define ED_NUM_TEXTBUTTONS			10
+
+#define ED_TEXTBUTTON_ID_LEVELINFO_FIRST ED_TEXTBUTTON_ID_LEVELINFO_LEVEL
+#define ED_TEXTBUTTON_ID_LEVELINFO_LAST  ED_TEXTBUTTON_ID_LEVELINFO_EDITOR
 
 #define ED_TEXTBUTTON_ID_PROPERTIES_FIRST ED_TEXTBUTTON_ID_PROPERTIES_INFO
 #define ED_TEXTBUTTON_ID_PROPERTIES_LAST  ED_TEXTBUTTON_ID_PROPERTIES_CHANGE
@@ -836,8 +856,8 @@
 
 #define ED_NUM_CHECKBUTTONS			51
 
-#define ED_CHECKBUTTON_ID_LEVEL_FIRST	ED_CHECKBUTTON_ID_RANDOM_RESTRICTED
-#define ED_CHECKBUTTON_ID_LEVEL_LAST	ED_CHECKBUTTON_ID_RANDOM_RESTRICTED
+#define ED_CHECKBUTTON_ID_EDITOR_FIRST	ED_CHECKBUTTON_ID_RANDOM_RESTRICTED
+#define ED_CHECKBUTTON_ID_EDITOR_LAST	ED_CHECKBUTTON_ID_RANDOM_RESTRICTED
 
 #define ED_CHECKBUTTON_ID_CUSTOM1_FIRST	ED_CHECKBUTTON_ID_CUSTOM_USE_GRAPHIC
 #define ED_CHECKBUTTON_ID_CUSTOM1_LAST	ED_CHECKBUTTON_ID_CUSTOM_INDESTRUCTIBLE
@@ -855,8 +875,8 @@
 
 #define ED_NUM_RADIOBUTTONS		2
 
-#define ED_RADIOBUTTON_ID_LEVEL_FIRST	ED_RADIOBUTTON_ID_PERCENTAGE
-#define ED_RADIOBUTTON_ID_LEVEL_LAST	ED_RADIOBUTTON_ID_QUANTITY
+#define ED_RADIOBUTTON_ID_EDITOR_FIRST	ED_RADIOBUTTON_ID_PERCENTAGE
+#define ED_RADIOBUTTON_ID_EDITOR_LAST	ED_RADIOBUTTON_ID_QUANTITY
 
 /* values for drawing area gadgets */
 #define ED_DRAWING_ID_DRAWING_LEVEL		0
@@ -918,6 +938,10 @@
 #define ED_MODE_INFO			1
 #define ED_MODE_PROPERTIES		2
 
+/* sub-screens in the global settings section */
+#define ED_MODE_LEVELINFO_LEVEL		ED_TEXTBUTTON_ID_LEVELINFO_LEVEL
+#define ED_MODE_LEVELINFO_EDITOR	ED_TEXTBUTTON_ID_LEVELINFO_EDITOR
+
 /* sub-screens in the element properties section */
 #define ED_MODE_PROPERTIES_INFO		ED_TEXTBUTTON_ID_PROPERTIES_INFO
 #define ED_MODE_PROPERTIES_CONFIG	ED_TEXTBUTTON_ID_PROPERTIES_CONFIG
@@ -978,7 +1002,7 @@ static struct
   { ',',	"pick drawing element"			},
 
   { 'U',	"undo last operation"			},
-  { 'I',	"level properties"			},
+  { 'I',	"properties of level"			},
   { 'S',	"save level"				},
   { 'C',	"clear level"				},
   { 'T',	"test level"				},
@@ -1068,7 +1092,7 @@ static struct
     "score for each second/step left:",	NULL, NULL
   },
   {
-    ED_LEVEL_SETTINGS_XPOS(0),		ED_COUNTER2_YPOS(8),
+    ED_LEVEL_SETTINGS_XPOS(0),		ED_LEVEL_SETTINGS_YPOS(0),
     1,					100,
     GADGET_ID_LEVEL_RANDOM_DOWN,	GADGET_ID_LEVEL_RANDOM_UP,
     GADGET_ID_LEVEL_RANDOM_TEXT,	GADGET_ID_NONE,
@@ -2322,31 +2346,43 @@ static struct
 } textbutton_info[ED_NUM_TEXTBUTTONS] =
 {
   {
-    ED_ELEMENT_SETTINGS_XPOS(0),	ED_COUNTER_YPOS(1),
+    ED_LEVEL_SETTINGS_TABS_XPOS(0),	ED_LEVEL_SETTINGS_TABS_YPOS(0),
+    GADGET_ID_LEVELINFO_LEVEL,		GADGET_ID_NONE,
+    8,					"Level",			
+    NULL, NULL,				"Configure level properties"
+  },
+  {
+    ED_LEVEL_SETTINGS_TABS_XPOS(1),	ED_LEVEL_SETTINGS_TABS_YPOS(0),
+    GADGET_ID_LEVELINFO_EDITOR,		GADGET_ID_NONE,
+    8,					"Editor",			
+    NULL, NULL,				"Configure editor properties"
+  },
+  {
+    ED_ELEMENT_SETTINGS_TABS_XPOS(0),	ED_ELEMENT_SETTINGS_TABS_YPOS(0),
     GADGET_ID_PROPERTIES_INFO,		GADGET_ID_NONE,
     8,					"Info",			
     NULL, NULL,				"Show information about element"
   },
   {
-    ED_ELEMENT_SETTINGS_XPOS(0) + 124,	ED_COUNTER_YPOS(1),
+    ED_ELEMENT_SETTINGS_TABS_XPOS(1),	ED_ELEMENT_SETTINGS_TABS_YPOS(0),
     GADGET_ID_PROPERTIES_CONFIG,	GADGET_ID_NONE,
     8,					"Config",
     NULL, NULL,				"Configure element properties"
   },
   {
-    ED_ELEMENT_SETTINGS_XPOS(0) + 124,	ED_COUNTER_YPOS(1),
+    ED_ELEMENT_SETTINGS_TABS_XPOS(1),	ED_ELEMENT_SETTINGS_TABS_YPOS(0),
     GADGET_ID_PROPERTIES_CONFIG_1,	GADGET_ID_NONE,
     8,					"Config 1",
     NULL, NULL,				"Configure element properties, part 1"
   },
   {
-    ED_ELEMENT_SETTINGS_XPOS(0) + 248,	ED_COUNTER_YPOS(1),
+    ED_ELEMENT_SETTINGS_TABS_XPOS(2),	ED_ELEMENT_SETTINGS_TABS_YPOS(0),
     GADGET_ID_PROPERTIES_CONFIG_2,	GADGET_ID_NONE,
     8,					"Config 2",
     NULL, NULL,				"Configure element properties, part 2"
   },
   {
-    ED_ELEMENT_SETTINGS_XPOS(0) + 372,	ED_COUNTER_YPOS(1),
+    ED_ELEMENT_SETTINGS_TABS_XPOS(3),	ED_ELEMENT_SETTINGS_TABS_YPOS(0),
     GADGET_ID_PROPERTIES_CHANGE,	GADGET_ID_NONE,
     8,					"Change",
     NULL, NULL,				"Configure custom element change pages"
@@ -2528,14 +2564,14 @@ static struct
 } radiobutton_info[ED_NUM_RADIOBUTTONS] =
 {
   {
-    -1,					ED_COUNTER2_YPOS(8),
+    -1,					ED_LEVEL_SETTINGS_YPOS(0),
     GADGET_ID_RANDOM_PERCENTAGE,	GADGET_ID_LEVEL_RANDOM_UP,
     RADIO_NR_RANDOM_ELEMENTS,
     &random_placement_method,		RANDOM_USE_PERCENTAGE,
     " ", "percentage",			"use percentage for random elements"
   },
   {
-    -1,					ED_COUNTER2_YPOS(8),
+    -1,					ED_LEVEL_SETTINGS_YPOS(0),
     GADGET_ID_RANDOM_QUANTITY,		GADGET_ID_RANDOM_PERCENTAGE,
     RADIO_NR_RANDOM_ELEMENTS,
     &random_placement_method,		RANDOM_USE_QUANTITY,
@@ -2555,7 +2591,7 @@ static struct
   /* ---------- level and editor settings ---------------------------------- */
 
   {
-    ED_LEVEL_SETTINGS_XPOS(0),		ED_COUNTER2_YPOS(9) - MINI_TILEY,
+    ED_LEVEL_SETTINGS_XPOS(0),		ED_LEVEL_SETTINGS_YPOS(1),
     GADGET_ID_RANDOM_RESTRICTED,	GADGET_ID_NONE,
     &random_placement_background_restricted,
     NULL,
@@ -3194,7 +3230,7 @@ static struct
   /* ---------- random background (for random painting) -------------------- */
 
   {
-    -1,					ED_ELEMENT_SETTINGS_YPOS(14),
+    -1,					ED_AREA_1X1_SETTINGS_YPOS(-1),
     GADGET_ID_RANDOM_BACKGROUND,	GADGET_ID_RANDOM_RESTRICTED,
     &random_placement_background_element, 1, 1,
     NULL, NULL, NULL,			"random placement background"
@@ -3274,6 +3310,7 @@ static int undo_buffer_position = 0;
 static int undo_buffer_steps = 0;
 
 static int edit_mode;
+static int edit_mode_levelinfo;
 static int edit_mode_properties;
 
 static int element_shift = 0;
@@ -5792,7 +5829,8 @@ static void CreateTextbuttonGadgets()
 
     event_mask = GD_EVENT_RELEASED;
 
-    if (id >= GADGET_ID_PROPERTIES_INFO && id <= GADGET_ID_PROPERTIES_CHANGE)
+    if ((id >= GADGET_ID_LEVELINFO_LEVEL && id <= GADGET_ID_LEVELINFO_EDITOR) ||
+	(id >= GADGET_ID_PROPERTIES_INFO && id <= GADGET_ID_PROPERTIES_CHANGE))
     {
       gd_x1 = DOOR_GFX_PAGEX4 + ED_TEXTBUTTON_TAB_XPOS;
       gd_x2 = DOOR_GFX_PAGEX3 + ED_TEXTBUTTON_TAB_XPOS;
@@ -7158,6 +7196,7 @@ void DrawLevelEd()
   else
   {
     edit_mode = ED_MODE_DRAWING;
+    edit_mode_levelinfo = ED_MODE_LEVELINFO_LEVEL;
     edit_mode_properties = ED_MODE_PROPERTIES_INFO;
 
     ResetUndoBuffer();
@@ -7479,25 +7518,125 @@ static void DrawDrawingWindow()
   MapLevelEditorToolboxDrawingGadgets();
 }
 
-static void DrawLevelInfoWindow()
+static int getTabulatorBarWidth()
 {
+  struct GadgetInfo *gd_gi1 = level_editor_gadget[GADGET_ID_PROPERTIES_INFO];
+  struct GadgetInfo *gd_gi4 = level_editor_gadget[GADGET_ID_PROPERTIES_CHANGE];
+
+  return gd_gi4->x - gd_gi1->x + gd_gi4->width;
+}
+
+static void DrawLevelInfoTabulatorGadgets()
+{
+  struct GadgetInfo *gd_gi1 = level_editor_gadget[GADGET_ID_LEVELINFO_LEVEL];
+  struct GadgetDesign *gd = &gd_gi1->alt_design[GD_BUTTON_UNPRESSED];
+  int gd_x = gd->x + gd_gi1->border.width / 2;
+  int gd_y = gd->y + gd_gi1->height - 1;
+  Pixel tab_color = GetPixel(gd->bitmap, gd_x, gd_y);
+  int id_first = ED_TEXTBUTTON_ID_LEVELINFO_LEVEL;
+  int id_last  = ED_TEXTBUTTON_ID_LEVELINFO_EDITOR;
+#if 1
+#else
+  int max_tabs = 2;
+#endif
   int i;
 
-  stick_element_properties_window = FALSE;
+  for (i = id_first; i <= id_last; i++)
+  {
+    int gadget_id = textbutton_info[i].gadget_id;
+    struct GadgetInfo *gi = level_editor_gadget[gadget_id];
+    boolean active = (i != edit_mode_levelinfo);
 
-  SetMainBackgroundImage(IMG_BACKGROUND_EDITOR);
-  ClearField();
-  UnmapLevelEditorWindowGadgets();
+    /* draw background line below tabulator button */
+    ClearRectangleOnBackground(drawto, gi->x, gi->y + gi->height, gi->width, 1);
 
-#if 0
-  DrawTextSCentered(ED_SETTINGS1_YPOS, FONT_TITLE_1, "Level Settings");
-  DrawTextSCentered(ED_SETTINGS2_YPOS, FONT_TITLE_1, "Editor Settings");
+    /* draw solid line below inactive tabulator buttons */
+    if (!active && tab_color != BLACK_PIXEL)	/* black => transparent */
+      FillRectangle(drawto, gi->x, gi->y + gi->height, gi->width, 1, tab_color);
+
+    ModifyGadget(gi, GDI_ACTIVE, active, GDI_END);
+    MapTextbuttonGadget(i);
+  }
+
+#if 1
+  /* draw little border line below tabulator buttons */
+  if (tab_color != BLACK_PIXEL)			/* black => transparent */
+    FillRectangle(drawto, gd_gi1->x, gd_gi1->y + gd_gi1->height + 1,
+		  getTabulatorBarWidth(), ED_GADGET_DISTANCE,
+		  tab_color);
 #else
-  DrawText(SX + ED_SETTINGS2_XPOS, SY + ED_SETTINGS1_YPOS,
-	   "Level Settings", FONT_TITLE_1);
-  DrawText(SX + ED_SETTINGS2_XPOS, SY + ED_SETTINGS2_YPOS,
-	   "Editor Settings", FONT_TITLE_1);
+  /* draw little border line below tabulator buttons */
+  if (tab_color != BLACK_PIXEL)			/* black => transparent */
+    FillRectangle(drawto, gd_gi1->x, gd_gi1->y + gd_gi1->height + 1,
+		  max_tabs * gd_gi1->width + (max_tabs -1) * ED_GADGET_DISTANCE,
+		  ED_GADGET_DISTANCE, tab_color);
 #endif
+}
+
+static void DrawPropertiesTabulatorGadgets()
+{
+  struct GadgetInfo *gd_gi1 = level_editor_gadget[GADGET_ID_PROPERTIES_INFO];
+  struct GadgetDesign *gd = &gd_gi1->alt_design[GD_BUTTON_UNPRESSED];
+  int gd_x = gd->x + gd_gi1->border.width / 2;
+  int gd_y = gd->y + gd_gi1->height - 1;
+  Pixel tab_color = GetPixel(gd->bitmap, gd_x, gd_y);
+  int id_first = ED_TEXTBUTTON_ID_PROPERTIES_INFO;
+  int id_last  = ED_TEXTBUTTON_ID_PROPERTIES_CONFIG;
+#if 1
+#else
+  int max_tabs = 4;
+#endif
+  int i;
+
+  /* draw two config tabulators for player elements */
+  if (ELEM_IS_PLAYER(properties_element))
+    id_last = ED_TEXTBUTTON_ID_PROPERTIES_CONFIG_2;
+
+  /* draw two config and one "change" tabulator for custom elements */
+  if (IS_CUSTOM_ELEMENT(properties_element))
+    id_last = ED_TEXTBUTTON_ID_PROPERTIES_CHANGE;
+
+  for (i = id_first; i <= id_last; i++)
+  {
+    int gadget_id = textbutton_info[i].gadget_id;
+    struct GadgetInfo *gi = level_editor_gadget[gadget_id];
+    boolean active = (i != edit_mode_properties);
+
+    /* use "config 1" and "config 2" instead of "config" for players and CEs */
+    if (i == ED_TEXTBUTTON_ID_PROPERTIES_CONFIG &&
+	(ELEM_IS_PLAYER(properties_element) ||
+	 IS_CUSTOM_ELEMENT(properties_element)))
+      continue;
+
+    /* draw background line below tabulator button */
+    ClearRectangleOnBackground(drawto, gi->x, gi->y + gi->height, gi->width, 1);
+
+    /* draw solid line below inactive tabulator buttons */
+    if (!active && tab_color != BLACK_PIXEL)	/* black => transparent */
+      FillRectangle(drawto, gi->x, gi->y + gi->height, gi->width, 1, tab_color);
+
+    ModifyGadget(gi, GDI_ACTIVE, active, GDI_END);
+    MapTextbuttonGadget(i);
+  }
+
+#if 1
+  /* draw little border line below tabulator buttons */
+  if (tab_color != BLACK_PIXEL)			/* black => transparent */
+    FillRectangle(drawto, gd_gi1->x, gd_gi1->y + gd_gi1->height + 1,
+		  getTabulatorBarWidth(), ED_GADGET_DISTANCE,
+		  tab_color);
+#else
+  /* draw little border line below tabulator buttons */
+  if (tab_color != BLACK_PIXEL)			/* black => transparent */
+    FillRectangle(drawto, gd_gi1->x, gd_gi1->y + gd_gi1->height + 1,
+		  max_tabs * gd_gi1->width + (max_tabs -1) * ED_GADGET_DISTANCE,
+		  ED_GADGET_DISTANCE, tab_color);
+#endif
+}
+
+static void DrawLevelInfoLevel()
+{
+  int i;
 
   /* draw counter gadgets */
   for (i = ED_COUNTER_ID_LEVEL_FIRST; i <= ED_COUNTER_ID_LEVEL_LAST; i++)
@@ -7507,20 +7646,60 @@ static void DrawLevelInfoWindow()
   for (i = ED_SELECTBOX_ID_LEVEL_FIRST; i <= ED_SELECTBOX_ID_LEVEL_LAST; i++)
     MapSelectboxGadget(i);
 
-  /* draw checkbutton gadgets */
-  for (i=ED_CHECKBUTTON_ID_LEVEL_FIRST; i <= ED_CHECKBUTTON_ID_LEVEL_LAST; i++)
-    MapCheckbuttonGadget(i);
-
-  /* draw radiobutton gadgets */
-  for (i=ED_RADIOBUTTON_ID_LEVEL_FIRST; i <= ED_RADIOBUTTON_ID_LEVEL_LAST; i++)
-    MapRadiobuttonGadget(i);
-
   /* draw text input gadgets */
   for (i = ED_TEXTINPUT_ID_LEVEL_FIRST; i <= ED_TEXTINPUT_ID_LEVEL_LAST; i++)
     MapTextInputGadget(i);
+}
+
+static void DrawLevelInfoEditor()
+{
+  int i;
+
+  /* draw counter gadgets */
+  for (i = ED_COUNTER_ID_EDITOR_FIRST; i <= ED_COUNTER_ID_EDITOR_LAST; i++)
+    MapCounterButtons(i);
+
+  /* draw checkbutton gadgets */
+  for (i=ED_CHECKBUTTON_ID_EDITOR_FIRST; i<= ED_CHECKBUTTON_ID_EDITOR_LAST; i++)
+    MapCheckbuttonGadget(i);
+
+  /* draw radiobutton gadgets */
+  for (i=ED_RADIOBUTTON_ID_EDITOR_FIRST; i<= ED_RADIOBUTTON_ID_EDITOR_LAST; i++)
+    MapRadiobuttonGadget(i);
 
   /* draw drawing area */
   MapDrawingArea(ED_DRAWING_ID_RANDOM_BACKGROUND);
+}
+
+static void DrawLevelInfoWindow()
+{
+  stick_element_properties_window = FALSE;
+
+  UnmapLevelEditorWindowGadgets();
+
+  SetMainBackgroundImage(IMG_BACKGROUND_EDITOR);
+  ClearField();
+
+#if 1
+#if 1
+  DrawTextSCentered(ED_SETTINGS1_YPOS, FONT_TITLE_1, "Global Settings");
+#else
+  DrawTextSCentered(ED_SETTINGS1_YPOS, FONT_TITLE_1, "Level Settings");
+  DrawTextSCentered(ED_SETTINGS2_YPOS, FONT_TITLE_1, "Editor Settings");
+#endif
+#else
+  DrawText(SX + ED_SETTINGS2_XPOS, SY + ED_SETTINGS1_YPOS,
+	   "Level Settings", FONT_TITLE_1);
+  DrawText(SX + ED_SETTINGS2_XPOS, SY + ED_SETTINGS2_YPOS,
+	   "Editor Settings", FONT_TITLE_1);
+#endif
+
+  DrawLevelInfoTabulatorGadgets();
+
+  if (edit_mode_levelinfo == ED_MODE_LEVELINFO_LEVEL)
+    DrawLevelInfoLevel();
+  else	/* (edit_mode_levelinfo == ED_MODE_LEVELINFO_EDITOR) */
+    DrawLevelInfoEditor();
 }
 
 static void DrawCustomContentArea()
@@ -7752,68 +7931,6 @@ static int PrintElementDescriptionFromFile(char *filename, int start_line)
 
   return DrawTextFile(sx, sy, filename, font_nr, max_chars_per_line, -1,
 		      max_lines_per_screen, -1, TRUE, FALSE, FALSE);
-}
-
-static void DrawPropertiesTabulatorGadgets()
-{
-  struct GadgetInfo *gd_gi1 = level_editor_gadget[GADGET_ID_PROPERTIES_INFO];
-  struct GadgetInfo *gd_gi4 = level_editor_gadget[GADGET_ID_PROPERTIES_CHANGE];
-  struct GadgetDesign *gd = &gd_gi1->alt_design[GD_BUTTON_UNPRESSED];
-  int gd_x = gd->x + gd_gi1->border.width / 2;
-  int gd_y = gd->y + gd_gi1->height - 1;
-  Pixel tab_color = GetPixel(gd->bitmap, gd_x, gd_y);
-  int id_first = ED_TEXTBUTTON_ID_PROPERTIES_INFO;
-  int id_last  = ED_TEXTBUTTON_ID_PROPERTIES_CONFIG;
-#if 1
-#else
-  int max_tabs = 4;
-#endif
-  int i;
-
-  /* draw two config tabulators for player elements */
-  if (ELEM_IS_PLAYER(properties_element))
-    id_last = ED_TEXTBUTTON_ID_PROPERTIES_CONFIG_2;
-
-  /* draw two config and one "change" tabulator for custom elements */
-  if (IS_CUSTOM_ELEMENT(properties_element))
-    id_last = ED_TEXTBUTTON_ID_PROPERTIES_CHANGE;
-
-  for (i = id_first; i <= id_last; i++)
-  {
-    int gadget_id = textbutton_info[i].gadget_id;
-    struct GadgetInfo *gi = level_editor_gadget[gadget_id];
-    boolean active = (i != edit_mode_properties);
-
-    /* use "config 1" and "config 2" instead of "config" for players and CEs */
-    if (i == ED_TEXTBUTTON_ID_PROPERTIES_CONFIG &&
-	(ELEM_IS_PLAYER(properties_element) ||
-	 IS_CUSTOM_ELEMENT(properties_element)))
-      continue;
-
-    /* draw background line below tabulator button */
-    ClearRectangleOnBackground(drawto, gi->x, gi->y + gi->height, gi->width, 1);
-
-    /* draw solid line below inactive tabulator buttons */
-    if (!active && tab_color != BLACK_PIXEL)	/* black => transparent */
-      FillRectangle(drawto, gi->x, gi->y + gi->height, gi->width, 1, tab_color);
-
-    ModifyGadget(gi, GDI_ACTIVE, active, GDI_END);
-    MapTextbuttonGadget(i);
-  }
-
-#if 1
-  /* draw little border line below tabulator buttons */
-  if (tab_color != BLACK_PIXEL)			/* black => transparent */
-    FillRectangle(drawto, gd_gi1->x, gd_gi1->y + gd_gi1->height + 1,
-		  gd_gi4->x - gd_gi1->x + gd_gi4->width, ED_GADGET_DISTANCE,
-		  tab_color);
-#else
-  /* draw little border line below tabulator buttons */
-  if (tab_color != BLACK_PIXEL)			/* black => transparent */
-    FillRectangle(drawto, gd_gi1->x, gd_gi1->y + gd_gi1->height + 1,
-		  max_tabs * gd_gi1->width + (max_tabs -1) * ED_GADGET_DISTANCE,
-		  ED_GADGET_DISTANCE, tab_color);
-#endif
 }
 
 static void DrawPropertiesInfo()
@@ -8527,7 +8644,7 @@ static void DrawPropertiesWindow()
   SetMainBackgroundImage(IMG_BACKGROUND_EDITOR);
   ClearField();
 
-#if 0
+#if 1
   DrawTextSCentered(ED_SETTINGS1_YPOS, FONT_TITLE_1, "Element Settings");
 #else
   DrawText(SX + ED_SETTINGS2_XPOS, SY + ED_SETTINGS1_YPOS,
@@ -10641,8 +10758,15 @@ static void HandleTextbuttonGadgets(struct GadgetInfo *gi)
   int type_id = gi->custom_type_id;
   int i;
 
-  if (type_id >= ED_TEXTBUTTON_ID_PROPERTIES_FIRST &&
-      type_id <= ED_TEXTBUTTON_ID_PROPERTIES_LAST)
+  if (type_id >= ED_TEXTBUTTON_ID_LEVELINFO_FIRST &&
+      type_id <= ED_TEXTBUTTON_ID_LEVELINFO_LAST)
+  {
+    edit_mode_levelinfo = gi->custom_type_id;
+
+    DrawLevelInfoWindow();
+  }
+  else if (type_id >= ED_TEXTBUTTON_ID_PROPERTIES_FIRST &&
+	   type_id <= ED_TEXTBUTTON_ID_PROPERTIES_LAST)
   {
     edit_mode_properties = gi->custom_type_id;
 
