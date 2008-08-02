@@ -359,6 +359,7 @@
 #define CA_SET_ENGINE_SCAN_MODE		17
 #define CA_SET_PLAYER_INVENTORY		18
 #define CA_SET_CE_ARTWORK		19
+#define CA_SET_LEVEL_RANDOM_SEED	20
 
 #define CA_HEADLINE_LEVEL_ACTIONS	250
 #define CA_HEADLINE_PLAYER_ACTIONS	251
@@ -2292,6 +2293,8 @@ struct LevelInfo
 
   char name[MAX_LEVEL_NAME_LEN + 1];
   char author[MAX_LEVEL_AUTHOR_LEN + 1];
+
+  int random_seed;
 
   struct EnvelopeInfo envelope[NUM_ENVELOPES];
 

@@ -744,7 +744,7 @@ void HandleKey(Key key, int key_status)
   if (game_status == GAME_MODE_MAIN &&
       (key == setup.shortcut.toggle_pause || key == KSYM_space))
   {
-    StartGameActions(options.network, setup.autorecord, NEW_RANDOMIZE);
+    StartGameActions(options.network, setup.autorecord, level.random_seed);
 
     return;
   }

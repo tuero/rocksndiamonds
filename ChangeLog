@@ -1,6 +1,13 @@
+2008-08-02
+	* fixed some bugs regarding the new level/CE random seed reset options
+
 2008-07-14
 	* moved "level settings" and "editor settings" to two tabbed screens in
 	  level editor to gain space for additional level property settings
+	* added level setting to start a level with always the same random seed
+	* added CE action "set random seed" to re-initialize random seed in game
+	  (this is the only CE action that gets executed before the CE changes,
+	  which is needed to use the newly set random seed during the CE change)
 
 2008-06-16
 	* fixed redraw problem of special editor door when playing from editor

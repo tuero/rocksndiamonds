@@ -475,7 +475,7 @@ void TapeErase()
   tape.pos[tape.counter].delay = 0;
   tape.changed = TRUE;
 
-  tape.random_seed = InitRND(NEW_RANDOMIZE);
+  tape.random_seed = InitRND(level.random_seed);
 
   tape.file_version = FILE_VERSION_ACTUAL;
   tape.game_version = GAME_VERSION_ACTUAL;
@@ -538,7 +538,7 @@ void TapeStartRecording(long random_seed)
 
 static void TapeStartGameRecording()
 {
-  TapeStartRecording(NEW_RANDOMIZE);
+  TapeStartRecording(level.random_seed);
 
 #if defined(NETWORK_AVALIABLE)
   if (options.network)

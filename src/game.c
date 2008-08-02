@@ -10430,6 +10430,33 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
       break;
     }
 
+    case CA_SET_LEVEL_RANDOM_SEED:
+    {
+#if 1
+      /* ensure that setting a new random seed while playing is predictable */
+      InitRND(action_arg_number_new ? action_arg_number_new : RND(1000000) + 1);
+#else
+      InitRND(action_arg_number_new);
+#endif
+
+#if 0
+      printf("::: %d -> %d\n", action_arg_number_new, RND(10));
+#endif
+
+#if 0
+      {
+	int i;
+
+	printf("::: ");
+	for (i = 0; i < 9; i++)
+	  printf("%d, ", RND(2));
+	printf("\n");
+      }
+#endif
+
+      break;
+    }
+
     /* ---------- player actions  ------------------------------------------ */
 
     case CA_MOVE_PLAYER:
@@ -11123,6 +11150,7 @@ static void HandleElementChange(int x, int y, int page)
   int element = MovingOrBlocked2Element(x, y);
   struct ElementInfo *ei = &element_info[element];
   struct ElementChangeInfo *change = &ei->change_page[page];
+  boolean handle_action_before_change = FALSE;
 
 #ifdef DEBUG
   if (!CAN_CHANGE_OR_HAS_ACTION(element) &&
@@ -11205,6 +11233,15 @@ static void HandleElementChange(int x, int y, int page)
       return;
     }
 
+#if 1
+    /* special case: set new level random seed before changing element */
+    if (change->has_action && change->action_type == CA_SET_LEVEL_RANDOM_SEED)
+      handle_action_before_change = TRUE;
+
+    if (change->has_action && handle_action_before_change)
+      ExecuteCustomElementAction(x, y, element, page);
+#endif
+
     if (change->can_change)
     {
       if (ChangeElement(x, y, element, page))
@@ -11214,7 +11251,7 @@ static void HandleElementChange(int x, int y, int page)
       }
     }
 
-    if (change->has_action)
+    if (change->has_action && !handle_action_before_change)
       ExecuteCustomElementAction(x, y, element, page);
   }
 }
@@ -12010,7 +12047,7 @@ void GameActions()
   }
 
   if (game.restart_level)
-    StartGameActions(options.network, setup.autorecord, NEW_RANDOMIZE);
+    StartGameActions(options.network, setup.autorecord, level.random_seed);
 
   if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
   {

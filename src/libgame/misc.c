@@ -337,13 +337,26 @@ unsigned int init_random_number(int nr, long seed)
 {
   if (seed == NEW_RANDOMIZE)
   {
-#if defined(TARGET_SDL)
-    seed = (long)SDL_GetTicks();
-#else
+    /* default random seed */
+    seed = (long)time(NULL);			// seconds since the epoch
+
+#if !defined(PLATFORM_WIN32)
+    /* add some more randomness */
     struct timeval current_time;
 
     gettimeofday(&current_time, NULL);
-    seed = (long)current_time.tv_usec;
+
+    seed += (long)current_time.tv_usec;		// microseconds since the epoch
+#endif
+
+#if defined(TARGET_SDL)
+    /* add some more randomness */
+    seed += (long)SDL_GetTicks();		// milliseconds since SDL init
+#endif
+
+#if 1
+    /* add some more randomness */
+    seed += GetSimpleRandom(1000000);
 #endif
   }
 

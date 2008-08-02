@@ -25,7 +25,7 @@
 #define READ_COUNTER			1
 
 /* values for InitRND() */
-#define NEW_RANDOMIZE			-1
+#define NEW_RANDOMIZE			0
 
 #define RANDOM_ENGINE			0
 #define RANDOM_SIMPLE			1

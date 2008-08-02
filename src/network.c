@@ -308,7 +308,7 @@ void SendToServer_NrWanted(int nr_wanted)
 
 void SendToServer_StartPlaying()
 {
-  unsigned long new_random_seed = InitRND(NEW_RANDOMIZE);
+  unsigned long new_random_seed = InitRND(level.random_seed);
 
   int dummy = 0;		/* !!! HAS NO MEANING ANYMORE !!! */
 				/* the name of the level must be enough */

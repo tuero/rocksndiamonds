@@ -184,6 +184,12 @@ static struct LevelFileConfigInfo chunk_config_INFO[] =
 
   {
     -1,					-1,
+    TYPE_INTEGER,			CONF_VALUE_32_BIT(2),
+    &li.random_seed,			0
+  },
+
+  {
+    -1,					-1,
     TYPE_BOOLEAN,			CONF_VALUE_8_BIT(2),
     &li.use_step_counter,		FALSE
   },

@@ -1776,7 +1776,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
       }
       else if (pos == MAIN_CONTROL_GAME)
       {
-	StartGameActions(options.network, setup.autorecord, NEW_RANDOMIZE);
+	StartGameActions(options.network, setup.autorecord, level.random_seed);
       }
       else if (pos == MAIN_CONTROL_SETUP)
       {
