@@ -5641,6 +5641,21 @@ void RelocatePlayer(int jx, int jy, int el_player_raw)
 
   CheckTriggeredElementChangeByPlayer(jx, jy, element, CE_PLAYER_ENTERS_X,
 				      player->index_bit, enter_side);
+
+#if 1
+  if (player->is_switching)
+  {
+    /* ensure that relocation while still switching an element does not cause
+       a new element to be treated as also switched directly after relocation
+       (this is important for teleporter switches that teleport the player to
+       a place where another teleporter switch is in the same direction, which
+       would then incorrectly be treated as immediately switched before the
+       direction key that caused the switch was released) */
+
+    player->switch_x += jx - old_jx;
+    player->switch_y += jy - old_jy;
+  }
+#endif
 }
 
 void Explode(int ex, int ey, int phase, int mode)
@@ -13622,8 +13637,14 @@ void ScrollPlayer(struct PlayerInfo *player, int mode)
 
     if (Feld[jx][jy] == EL_EXIT_OPEN ||
 	Feld[jx][jy] == EL_EM_EXIT_OPEN ||
+#if 1
+	Feld[jx][jy] == EL_EM_EXIT_OPENING ||
+#endif
 	Feld[jx][jy] == EL_STEEL_EXIT_OPEN ||
 	Feld[jx][jy] == EL_EM_STEEL_EXIT_OPEN ||
+#if 1
+	Feld[jx][jy] == EL_EM_STEEL_EXIT_OPENING ||
+#endif
 	Feld[jx][jy] == EL_SP_EXIT_OPEN ||
 	Feld[jx][jy] == EL_SP_EXIT_OPENING)	/* <-- special case */
     {
@@ -14760,8 +14781,14 @@ static int DigField(struct PlayerInfo *player,
     }
     else if (element == EL_EXIT_OPEN ||
 	     element == EL_EM_EXIT_OPEN ||
+#if 1
+	     element == EL_EM_EXIT_OPENING ||
+#endif
 	     element == EL_STEEL_EXIT_OPEN ||
 	     element == EL_EM_STEEL_EXIT_OPEN ||
+#if 1
+	     element == EL_EM_STEEL_EXIT_OPENING ||
+#endif
 	     element == EL_SP_EXIT_OPEN ||
 	     element == EL_SP_EXIT_OPENING)
     {

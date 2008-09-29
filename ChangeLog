@@ -1,3 +1,12 @@
+2008-09-29
+	* fixed bug with player relocation while the player switches an element
+
+2008-09-24
+	* fixed bug with EM/DC style exit and EM/DC style steel exit which was
+	  not walkable (and did not let the player enter) when in process of
+	  opening, but not fully open yet (which can cause the player not being
+	  able to enter the exit in EM/DC style levels in time)
+
 2008-08-02
 	* fixed some bugs regarding the new level/CE random seed reset options
 

@@ -3153,10 +3153,16 @@ void InitElementPropertiesStatic()
     EL_SOKOBAN_FIELD_EMPTY,
     EL_EXIT_OPEN,
     EL_EM_EXIT_OPEN,
+#if 1
+    EL_EM_EXIT_OPENING,
+#endif
     EL_SP_EXIT_OPEN,
     EL_SP_EXIT_OPENING,
     EL_STEEL_EXIT_OPEN,
     EL_EM_STEEL_EXIT_OPEN,
+#if 1
+    EL_EM_STEEL_EXIT_OPENING,
+#endif
     EL_GATE_1,
     EL_GATE_2,
     EL_GATE_3,
