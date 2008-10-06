@@ -1169,6 +1169,8 @@ static int recursion_loop_depth;
 static boolean recursion_loop_detected;
 static boolean recursion_loop_element;
 
+static int map_player_action[MAX_PLAYERS];
+
 
 /* ------------------------------------------------------------------------- */
 /* definition of elements that automatically change to other elements after  */
@@ -3708,6 +3710,8 @@ void InitGame()
 
     player->present = FALSE;
     player->active = FALSE;
+    player->mapped = FALSE;
+
     player->killed = FALSE;
     player->reanimated = FALSE;
 
@@ -3848,6 +3852,8 @@ void InitGame()
     player->LevelSolved_SaveScore = FALSE;
     player->LevelSolved_CountingTime = 0;
     player->LevelSolved_CountingScore = 0;
+
+    map_player_action[i] = i;
   }
 
   network_player_action_received = FALSE;
@@ -4041,6 +4047,46 @@ void InitGame()
       game.belt_dir_nr[i] = 3;		/* not moving, next moving left */
 
 #if USE_NEW_PLAYER_ASSIGNMENTS
+  /* !!! SAME AS init.c:InitPlayerInfo() -- FIX THIS !!! */
+  /* choose default local player */
+  local_player = &stored_player[0];
+
+  for (i = 0; i < MAX_PLAYERS; i++)
+    stored_player[i].connected = FALSE;
+
+  local_player->connected = TRUE;
+  /* !!! SAME AS init.c:InitPlayerInfo() -- FIX THIS !!! */
+
+  if (tape.playing)
+  {
+    /* try to guess locally connected team mode players (needed for correct
+       assignment of player figures from level to locally playing players) */
+
+    for (i = 0; i < MAX_PLAYERS; i++)
+      if (tape.player_participates[i])
+	stored_player[i].connected = TRUE;
+  }
+  else if (setup.team_mode && !options.network)
+  {
+    /* try to guess locally connected team mode players (needed for correct
+       assignment of player figures from level to locally playing players) */
+
+    for (i = 0; i < MAX_PLAYERS; i++)
+      if (setup.input[i].use_joystick ||
+	  setup.input[i].key.left != KSYM_UNDEFINED)
+	stored_player[i].connected = TRUE;
+  }
+
+#if 0
+  for (i = 0; i < MAX_PLAYERS; i++)
+    printf("::: player %d: %s\n", i,
+	   (stored_player[i].connected ? "connected" : "not connected"));
+
+  for (i = 0; i < MAX_PLAYERS; i++)
+    printf("::: player %d: %s\n", i,
+	   (stored_player[i].present ? "present" : "not present"));
+#endif
+
   /* check if any connected player was not found in playfield */
   for (i = 0; i < MAX_PLAYERS; i++)
   {
@@ -4048,40 +4094,72 @@ void InitGame()
 
     if (player->connected && !player->present)
     {
-      for (j = 0; j < MAX_PLAYERS; j++)
+      struct PlayerInfo *field_player = NULL;
+
+#if 0
+      printf("::: looking for field player for player %d ...\n", i);
+#endif
+
+      /* assign first free player found that is present in the playfield */
+
+      /* first try: look for unmapped playfield player that is not connected */
+      if (field_player == NULL)
+	for (j = 0; j < MAX_PLAYERS; j++)
+	  if (stored_player[j].present &&
+	      !stored_player[j].mapped &&
+	      !stored_player[j].connected)
+	    field_player = &stored_player[j];
+
+      /* second try: look for *any* unmapped playfield player */
+      if (field_player == NULL)
+	for (j = 0; j < MAX_PLAYERS; j++)
+	  if (stored_player[j].present &&
+	      !stored_player[j].mapped)
+	    field_player = &stored_player[j];
+
+      if (field_player != NULL)
       {
-	struct PlayerInfo *some_player = &stored_player[j];
-	int jx = some_player->jx, jy = some_player->jy;
+	int jx = field_player->jx, jy = field_player->jy;
 
-	/* assign first free player found that is present in the playfield */
-	if (some_player->present && !some_player->connected)
-	{
-	  player->present = FALSE;
-	  player->active = FALSE;
+#if 0
+	printf("::: found player figure %d\n", field_player->index_nr);
+#endif
 
-	  some_player->present = TRUE;
-	  some_player->active = TRUE;
+	player->present = FALSE;
+	player->active = FALSE;
 
-	  /*
-	  player->initial_element = some_player->initial_element;
-	  player->artwork_element = some_player->artwork_element;
+	field_player->present = TRUE;
+	field_player->active = TRUE;
 
-	  player->block_last_field       = some_player->block_last_field;
-	  player->block_delay_adjustment = some_player->block_delay_adjustment;
-	  */
+	/*
+	player->initial_element = field_player->initial_element;
+	player->artwork_element = field_player->artwork_element;
 
-	  StorePlayer[jx][jy] = some_player->element_nr;
+	player->block_last_field       = field_player->block_last_field;
+	player->block_delay_adjustment = field_player->block_delay_adjustment;
+	*/
 
-	  some_player->jx = some_player->last_jx = jx;
-	  some_player->jy = some_player->last_jy = jy;
+	StorePlayer[jx][jy] = field_player->element_nr;
 
-	  if (local_player == player)
-	    local_player = some_player;
+	field_player->jx = field_player->last_jx = jx;
+	field_player->jy = field_player->last_jy = jy;
 
-	  break;
-	}
+	if (local_player == player)
+	  local_player = field_player;
+
+	map_player_action[field_player->index_nr] = i;
+
+	field_player->mapped = TRUE;
+
+#if 0
+	printf("::: map_player_action[%d] == %d\n",
+	       field_player->index_nr, i);
+#endif
       }
     }
+
+    if (player->connected && player->present)
+      player->mapped = TRUE;
   }
 
 #else
@@ -4095,23 +4173,23 @@ void InitGame()
     {
       for (j = 0; j < MAX_PLAYERS; j++)
       {
-	struct PlayerInfo *some_player = &stored_player[j];
-	int jx = some_player->jx, jy = some_player->jy;
+	struct PlayerInfo *field_player = &stored_player[j];
+	int jx = field_player->jx, jy = field_player->jy;
 
 	/* assign first free player found that is present in the playfield */
-	if (some_player->present && !some_player->connected)
+	if (field_player->present && !field_player->connected)
 	{
 	  player->present = TRUE;
 	  player->active = TRUE;
 
-	  some_player->present = FALSE;
-	  some_player->active = FALSE;
+	  field_player->present = FALSE;
+	  field_player->active = FALSE;
 
-	  player->initial_element = some_player->initial_element;
-	  player->artwork_element = some_player->artwork_element;
+	  player->initial_element = field_player->initial_element;
+	  player->artwork_element = field_player->artwork_element;
 
-	  player->block_last_field       = some_player->block_last_field;
-	  player->block_delay_adjustment = some_player->block_delay_adjustment;
+	  player->block_last_field       = field_player->block_last_field;
+	  player->block_delay_adjustment = field_player->block_delay_adjustment;
 
 	  StorePlayer[jx][jy] = player->element_nr;
 
@@ -4125,10 +4203,29 @@ void InitGame()
   }
 #endif
 
+#if 0
+  printf("::: local_player->present == %d\n", local_player->present);
+#endif
+
   if (tape.playing)
   {
     /* when playing a tape, eliminate all players who do not participate */
 
+#if USE_NEW_PLAYER_ASSIGNMENTS
+    for (i = 0; i < MAX_PLAYERS; i++)
+    {
+      if (stored_player[i].active &&
+	  !tape.player_participates[map_player_action[i]])
+      {
+	struct PlayerInfo *player = &stored_player[i];
+	int jx = player->jx, jy = player->jy;
+
+	player->active = FALSE;
+	StorePlayer[jx][jy] = 0;
+	Feld[jx][jy] = EL_EMPTY;
+      }
+    }
+#else
     for (i = 0; i < MAX_PLAYERS; i++)
     {
       if (stored_player[i].active && !tape.player_participates[i])
@@ -4141,6 +4238,7 @@ void InitGame()
 	Feld[jx][jy] = EL_EMPTY;
       }
     }
+#endif
   }
   else if (!options.network && !setup.team_mode)	/* && !tape.playing */
   {
@@ -4171,9 +4269,15 @@ void InitGame()
   /* when recording the game, store which players take part in the game */
   if (tape.recording)
   {
+#if USE_NEW_PLAYER_ASSIGNMENTS
+    for (i = 0; i < MAX_PLAYERS; i++)
+      if (stored_player[i].connected)
+	tape.player_participates[i] = TRUE;
+#else
     for (i = 0; i < MAX_PLAYERS; i++)
       if (stored_player[i].active)
 	tape.player_participates[i] = TRUE;
+#endif
   }
 
   if (options.debug)
@@ -12142,6 +12246,15 @@ void GameActions()
     game.set_centered_player = TRUE;
   }
 
+#if 0 /* USE_NEW_PLAYER_ASSIGNMENTS */
+  for (i = 0; i < MAX_PLAYERS; i++)
+  {
+    summarized_player_action |= stored_player[i].mapped_action;
+
+    if (!network_playing)
+      stored_player[i].effective_action = stored_player[i].mapped_action;
+  }
+#else
   for (i = 0; i < MAX_PLAYERS; i++)
   {
     summarized_player_action |= stored_player[i].action;
@@ -12149,6 +12262,7 @@ void GameActions()
     if (!network_playing)
       stored_player[i].effective_action = stored_player[i].action;
   }
+#endif
 
 #if defined(NETWORK_AVALIABLE)
   if (network_playing)
@@ -12165,13 +12279,25 @@ void GameActions()
 	(i == game.centered_player_nr ? summarized_player_action : 0);
   }
 
+#if 0 /* USE_NEW_PLAYER_ASSIGNMENTS */
   if (recorded_player_action != NULL)
     for (i = 0; i < MAX_PLAYERS; i++)
-      stored_player[i].effective_action = recorded_player_action[i];
+      stored_player[i].effective_action =
+	recorded_player_action[map_player_action[i]];
+#else
+  if (recorded_player_action != NULL)
+    for (i = 0; i < MAX_PLAYERS; i++)
+      stored_player[i].effective_action =
+	recorded_player_action[i];
+#endif
 
   for (i = 0; i < MAX_PLAYERS; i++)
   {
+#if 0 /* USE_NEW_PLAYER_ASSIGNMENTS */
+    tape_action[i] = stored_player[i].action;
+#else
     tape_action[i] = stored_player[i].effective_action;
+#endif
 
     /* (this can only happen in the R'n'D game engine) */
     if (tape.recording && tape_action[i] && !tape.player_participates[i])
@@ -12181,6 +12307,37 @@ void GameActions()
   /* only record actions from input devices, but not programmed actions */
   if (tape.recording)
     TapeRecordAction(tape_action);
+
+#if USE_NEW_PLAYER_ASSIGNMENTS
+  {
+#if 0
+
+  for (i = 0; i < MAX_PLAYERS; i++)
+    stored_player[i].mapped_action = stored_player[map_player_action[i]].action;
+
+#else
+
+#if 1
+    byte unmapped_action[MAX_PLAYERS];
+
+    for (i = 0; i < MAX_PLAYERS; i++)
+      unmapped_action[i] = stored_player[i].effective_action;
+
+    for (i = 0; i < MAX_PLAYERS; i++)
+      stored_player[i].effective_action = unmapped_action[map_player_action[i]];
+#endif
+
+#if 0
+    for (i = 0; i < MAX_PLAYERS; i++)
+      printf("::: %d: %d [%d]\n", i, stored_player[i].effective_action,
+	     map_player_action[i]);
+#endif
+#endif
+  }
+#else
+  for (i = 0; i < MAX_PLAYERS; i++)
+    stored_player[i].mapped_action = stored_player[i].action;
+#endif
 
   if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
   {

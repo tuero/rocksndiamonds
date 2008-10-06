@@ -182,6 +182,8 @@ struct PlayerInfo
   boolean present;		/* player present in level playfield */
   boolean connected;		/* player connected (locally or via network) */
   boolean active;		/* player present and connected */
+  boolean mapped;		/* player already mapped to input device */
+
   boolean killed;		/* player maybe present/active, but killed */
   boolean reanimated;		/* player maybe killed, but reanimated */
 
@@ -191,6 +193,7 @@ struct PlayerInfo
   int client_nr;		/* network client identifier */
 
   byte action;			/* action from local input device */
+  byte mapped_action;		/* action mapped from device to player */
   byte effective_action;	/* action acknowledged from network server
 				   or summarized over all configured input
 				   devices when in single player mode */
