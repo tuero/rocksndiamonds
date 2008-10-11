@@ -4228,7 +4228,8 @@ void InitGame()
 #else
     for (i = 0; i < MAX_PLAYERS; i++)
     {
-      if (stored_player[i].active && !tape.player_participates[i])
+      if (stored_player[i].active &&
+	  !tape.player_participates[i])
       {
 	struct PlayerInfo *player = &stored_player[i];
 	int jx = player->jx, jy = player->jy;
@@ -5502,8 +5503,6 @@ void DrawRelocateScreen(int old_x, int old_y, int x, int y, int move_dir,
 
   if (quick_relocation)
   {
-    int offset = game.scroll_delay_value;
-
     if (!IN_VIS_FIELD(SCREENX(x), SCREENY(y)) || center_screen)
     {
       if (!level.shifted_relocation || center_screen)
@@ -5544,7 +5543,46 @@ void DrawRelocateScreen(int old_x, int old_y, int x, int y, int move_dir,
     }
     else
     {
+#if 1
+      if (!level.shifted_relocation || center_screen)
+      {
+	/* quick relocation (without scrolling), with centering of screen */
+
+	scroll_x = (x < SBX_Left  + MIDPOSX ? SBX_Left :
+		    x > SBX_Right + MIDPOSX ? SBX_Right :
+		    x - MIDPOSX);
+
+	scroll_y = (y < SBY_Upper + MIDPOSY ? SBY_Upper :
+		    y > SBY_Lower + MIDPOSY ? SBY_Lower :
+		    y - MIDPOSY);
+      }
+      else
+      {
+	/* quick relocation (without scrolling), but do not center screen */
+
+	int center_scroll_x = (old_x < SBX_Left  + MIDPOSX ? SBX_Left :
+			       old_x > SBX_Right + MIDPOSX ? SBX_Right :
+			       old_x - MIDPOSX);
+
+	int center_scroll_y = (old_y < SBY_Upper + MIDPOSY ? SBY_Upper :
+			       old_y > SBY_Lower + MIDPOSY ? SBY_Lower :
+			       old_y - MIDPOSY);
+
+	int offset_x = x + (scroll_x - center_scroll_x);
+	int offset_y = y + (scroll_y - center_scroll_y);
+
+	scroll_x = (offset_x < SBX_Left  + MIDPOSX ? SBX_Left :
+		    offset_x > SBX_Right + MIDPOSX ? SBX_Right :
+		    offset_x - MIDPOSX);
+
+	scroll_y = (offset_y < SBY_Upper + MIDPOSY ? SBY_Upper :
+		    offset_y > SBY_Lower + MIDPOSY ? SBY_Lower :
+		    offset_y - MIDPOSY);
+      }
+#else
       /* quick relocation (without scrolling), inside visible screen area */
+
+      int offset = game.scroll_delay_value;
 
       if ((move_dir == MV_LEFT  && scroll_x > x - MIDPOSX + offset) ||
 	  (move_dir == MV_RIGHT && scroll_x < x - MIDPOSX - offset))
@@ -5561,6 +5599,7 @@ void DrawRelocateScreen(int old_x, int old_y, int x, int y, int move_dir,
       /* don't scroll over playfield boundaries */
       if (scroll_y < SBY_Upper || scroll_y > SBY_Lower)
 	scroll_y = (scroll_y < SBY_Upper ? SBY_Upper : SBY_Lower);
+#endif
     }
 
     RedrawPlayfield(TRUE, 0,0,0,0);
@@ -12246,15 +12285,6 @@ void GameActions()
     game.set_centered_player = TRUE;
   }
 
-#if 0 /* USE_NEW_PLAYER_ASSIGNMENTS */
-  for (i = 0; i < MAX_PLAYERS; i++)
-  {
-    summarized_player_action |= stored_player[i].mapped_action;
-
-    if (!network_playing)
-      stored_player[i].effective_action = stored_player[i].mapped_action;
-  }
-#else
   for (i = 0; i < MAX_PLAYERS; i++)
   {
     summarized_player_action |= stored_player[i].action;
@@ -12262,7 +12292,6 @@ void GameActions()
     if (!network_playing)
       stored_player[i].effective_action = stored_player[i].action;
   }
-#endif
 
 #if defined(NETWORK_AVALIABLE)
   if (network_playing)
@@ -12279,25 +12308,13 @@ void GameActions()
 	(i == game.centered_player_nr ? summarized_player_action : 0);
   }
 
-#if 0 /* USE_NEW_PLAYER_ASSIGNMENTS */
   if (recorded_player_action != NULL)
     for (i = 0; i < MAX_PLAYERS; i++)
-      stored_player[i].effective_action =
-	recorded_player_action[map_player_action[i]];
-#else
-  if (recorded_player_action != NULL)
-    for (i = 0; i < MAX_PLAYERS; i++)
-      stored_player[i].effective_action =
-	recorded_player_action[i];
-#endif
+      stored_player[i].effective_action = recorded_player_action[i];
 
   for (i = 0; i < MAX_PLAYERS; i++)
   {
-#if 0 /* USE_NEW_PLAYER_ASSIGNMENTS */
-    tape_action[i] = stored_player[i].action;
-#else
     tape_action[i] = stored_player[i].effective_action;
-#endif
 
     /* (this can only happen in the R'n'D game engine) */
     if (tape.recording && tape_action[i] && !tape.player_participates[i])
@@ -12310,33 +12327,14 @@ void GameActions()
 
 #if USE_NEW_PLAYER_ASSIGNMENTS
   {
-#if 0
-
-  for (i = 0; i < MAX_PLAYERS; i++)
-    stored_player[i].mapped_action = stored_player[map_player_action[i]].action;
-
-#else
-
-#if 1
-    byte unmapped_action[MAX_PLAYERS];
+    byte mapped_action[MAX_PLAYERS];
 
     for (i = 0; i < MAX_PLAYERS; i++)
-      unmapped_action[i] = stored_player[i].effective_action;
+      mapped_action[i] = stored_player[map_player_action[i]].effective_action;
 
     for (i = 0; i < MAX_PLAYERS; i++)
-      stored_player[i].effective_action = unmapped_action[map_player_action[i]];
-#endif
-
-#if 0
-    for (i = 0; i < MAX_PLAYERS; i++)
-      printf("::: %d: %d [%d]\n", i, stored_player[i].effective_action,
-	     map_player_action[i]);
-#endif
-#endif
+      stored_player[i].effective_action = mapped_action[i];
   }
-#else
-  for (i = 0; i < MAX_PLAYERS; i++)
-    stored_player[i].mapped_action = stored_player[i].action;
 #endif
 
   if (level.game_engine_type == GAME_ENGINE_TYPE_EM)

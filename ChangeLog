@@ -1,5 +1,23 @@
+2008-10-11
+	* fixed behaviour of player option "no centering when relocating" which
+	  was incorrect when disabled and relocation target inside visible area
+	  and "no scrolling when relocating" enabled at the same time
+
 2008-10-06
-	* fixed problems with re-mapping players on playfield to input devices
+	* fixed problems with re-mapping players on playfield to input devices:
+	  previously, players found on the level playfield were changed to the
+	  players connected to input devices (for example, player 3 in the level
+	  was changed to player 1 (using artwork of player 3, to be able to use
+	  a player with a different color)); this had the disadvantage that CE
+	  conditions using player elements did not work (because the players in
+	  the level definition are different to those effectively used in-game);
+	  the new system uses the same player elements as defined in the level
+	  playfield and re-maps the input devices of connected players to the
+	  corresponding player elements when playing the level (in the above
+	  example, player 3 now really exists in the game and is moved using the
+	  events from input device 1); level tapes still store the events from
+	  input devices 1 to 4, which are then re-mapped to players accordingly
+	  when re-playing the tape (just as it is done when playing the level)
 
 2008-09-29
 	* fixed bug with player relocation while the player switches an element
