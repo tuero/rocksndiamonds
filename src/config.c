@@ -17,6 +17,9 @@
 #include "conftime.h"
 
 
+#define USE_EXTENDED_VERSION	1
+
+
 char *getCompileDateString()
 {
   return COMPILE_DATE_STRING;
@@ -26,8 +29,14 @@ char *getProgramReleaseVersionString()
 {
   static char program_version_string[32];
 
+#if USE_EXTENDED_VERSION
+  sprintf(program_version_string, "%d.%d.%d.%d",
+	  PROGRAM_VERSION_MAJOR, PROGRAM_VERSION_MINOR, PROGRAM_VERSION_PATCH,
+	  PROGRAM_VERSION_BUILD);
+#else
   sprintf(program_version_string, "%d.%d.%d",
 	  PROGRAM_VERSION_MAJOR, PROGRAM_VERSION_MINOR, PROGRAM_VERSION_PATCH);
+#endif
 
   return program_version_string;
 }
@@ -36,9 +45,15 @@ char *getProgramFullVersionString()
 {
   static char program_version_string[32];
 
+#if USE_EXTENDED_VERSION
+  sprintf(program_version_string, "%d.%d.%d.%d",
+	  PROGRAM_VERSION_MAJOR, PROGRAM_VERSION_MINOR, PROGRAM_VERSION_PATCH,
+	  PROGRAM_VERSION_BUILD);
+#else
   sprintf(program_version_string, "%d.%d.%d-%d",
 	  PROGRAM_VERSION_MAJOR, PROGRAM_VERSION_MINOR, PROGRAM_VERSION_PATCH,
 	  PROGRAM_VERSION_BUILD);
+#endif
 
   return program_version_string;
 }
