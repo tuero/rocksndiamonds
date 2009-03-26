@@ -726,6 +726,8 @@ struct GfxInfo
   int vx, vy;
   int vxsize, vysize;
 
+  int win_xsize, win_ysize;
+
   int draw_deactivation_mask;
   int draw_background_mask;
 
@@ -1144,6 +1146,7 @@ void ClosePlatformDependentStuff(void);
 void InitGfxFieldInfo(int, int, int, int, int, int, int, int, Bitmap *);
 void InitGfxDoor1Info(int, int, int, int);
 void InitGfxDoor2Info(int, int, int, int);
+void InitGfxWindowInfo(int, int);
 void InitGfxScrollbufferInfo(int, int);
 void InitGfxDrawBusyAnimFunction(void (*draw_busy_anim_function)(void));
 void InitGfxCustomArtworkInfo();

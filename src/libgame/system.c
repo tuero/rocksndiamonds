@@ -189,9 +189,16 @@ void InitGfxDoor2Info(int vx, int vy, int vxsize, int vysize)
   gfx.vysize = vysize;
 }
 
+void InitGfxWindowInfo(int win_xsize, int win_ysize)
+{
+  gfx.win_xsize = win_xsize;
+  gfx.win_ysize = win_ysize;
+}
+
 void InitGfxScrollbufferInfo(int scrollbuffer_width, int scrollbuffer_height)
 {
   /* currently only used by MSDOS code to alloc VRAM buffer, if available */
+  /* 2009-03-24: also (temporarily?) used for overlapping blit workaround */
   gfx.scrollbuffer_width = scrollbuffer_width;
   gfx.scrollbuffer_height = scrollbuffer_height;
 }
@@ -491,8 +498,8 @@ void BlitBitmap(Bitmap *src_bitmap, Bitmap *dst_bitmap,
   if (DrawingDeactivated(dst_x, dst_y, width, height))
     return;
 
-#if 0
-  /* !!! APPARENTLY THIS HAS BEEN FIXED IN SDL 1.2.12 !!! */
+#if 1
+  /* !!! 2009-03-24: It seems that this problem still exists with 1.2.12 !!! */
 #if defined(TARGET_SDL) && defined(PLATFORM_WIN32)
   if (src_bitmap == dst_bitmap)
   {
@@ -502,15 +509,36 @@ void BlitBitmap(Bitmap *src_bitmap, Bitmap *dst_bitmap,
        recent SDL libraries, but apparently does not work in 1.2.11 directly */
 
     static Bitmap *tmp_bitmap = NULL;
+    static int tmp_bitmap_xsize = 0;
+    static int tmp_bitmap_ysize = 0;
+
+    /* start with largest static bitmaps for initial bitmap size ... */
+    if (tmp_bitmap_xsize == 0 && tmp_bitmap_ysize == 0)
+    {
+      tmp_bitmap_xsize = MAX(gfx.win_xsize, gfx.scrollbuffer_width);
+      tmp_bitmap_ysize = MAX(gfx.win_ysize, gfx.scrollbuffer_height);
+    }
+
+    /* ... and allow for later re-adjustments due to custom artwork bitmaps */
+    if (src_bitmap->width > tmp_bitmap_xsize ||
+	src_bitmap->height > tmp_bitmap_ysize)
+    {
+      tmp_bitmap_xsize = MAX(tmp_bitmap_xsize, src_bitmap->width);
+      tmp_bitmap_ysize = MAX(tmp_bitmap_ysize, src_bitmap->height);
+
+      FreeBitmap(tmp_bitmap);
+
+      tmp_bitmap = NULL;
+    }
 
     if (tmp_bitmap == NULL)
-      tmp_bitmap = CreateBitmap(MAX(FXSIZE, WIN_XSIZE),
-				MAX(FYSIZE, WIN_YSIZE), DEFAULT_DEPTH);
+      tmp_bitmap = CreateBitmap(tmp_bitmap_xsize, tmp_bitmap_ysize,
+				DEFAULT_DEPTH);
 
     sysCopyArea(src_bitmap, tmp_bitmap,
 		src_x, src_y, width, height, dst_x, dst_y, BLIT_OPAQUE);
     sysCopyArea(tmp_bitmap, dst_bitmap,
-		src_x, src_y, width, height, dst_x, dst_y, BLIT_OPAQUE);
+		dst_x, dst_y, width, height, dst_x, dst_y, BLIT_OPAQUE);
 
     return;
   }

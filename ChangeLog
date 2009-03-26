@@ -1,3 +1,19 @@
+2009-03-26
+	* extended backwards compatibility mode to allow already fixed bug with
+	  change actions (see "2008-02-05") for existing levels (especially the
+	  Zelda and Zelda II levels and other cool stuff by Alan Bond like FMV)
+
+2009-03-24
+	* reactivated workaround to prevent program crashes due to blitting to
+	  the same SDL surface that apparently only occurs on Windows systems
+	  (this is no final solution; this problem needs further investigation)
+
+2008-11-05
+	* version number set to 3.2.6.1
+
+2008-11-04
+	* version 3.2.6.0 released
+
 2008-10-11
 	* fixed behaviour of player option "no centering when relocating" which
 	  was incorrect when disabled and relocation target inside visible area

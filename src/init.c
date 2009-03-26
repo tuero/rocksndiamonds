@@ -5500,6 +5500,7 @@ void InitGfx()
 		   bitmap_db_field);
   InitGfxDoor1Info(DX, DY, DXSIZE, DYSIZE);
   InitGfxDoor2Info(VX, VY, VXSIZE, VYSIZE);
+  InitGfxWindowInfo(WIN_XSIZE, WIN_YSIZE);
   InitGfxScrollbufferInfo(FXSIZE, FYSIZE);
   InitGfxCustomArtworkInfo();
 

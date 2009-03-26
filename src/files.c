@@ -6345,6 +6345,32 @@ static void LoadLevel_InitVersion(struct LevelInfo *level, char *filename)
       change->target_element = EL_PLAYER_1;
   }
 
+#if 1
+  /* try to detect and fix "Zelda" style levels, which are broken with 3.2.5 */
+  if (level->game_version < VERSION_IDENT(3,2,5,0))
+  {
+    /* This is needed to fix a problem that was caused by a bugfix in function
+       game.c/CheckTriggeredElementChangeExt() introduced with 3.2.5 that
+       corrects the behaviour when a custom element changes to another custom
+       element with a higher element number that has change actions defined.
+       Normally, only one change per frame is allowed for custom elements.
+       Therefore, it is checked if a custom element already changed in the
+       current frame; if it did, subsequent changes are suppressed.
+       Unfortunately, this is only checked for element changes, but not for
+       change actions, which are still executed. As the function above loops
+       through all custom elements from lower to higher, an element change
+       resulting in a lower CE number won't be checked again, while a target
+       element with a higher number will also be checked, and potential change
+       actions will get executed for this CE, too (which is wrong), while
+       further changes are ignored (which is correct). As this bugfix breaks
+       Zelda II (and introduces graphical bugs to Zelda I, and also breaks a
+       few other levels like Alan Bond's "FMV"), allow the previous, incorrect
+       behaviour for existing levels and tapes that make use of this bug */
+
+    level->use_action_after_change_bug = TRUE;
+  }
+#else
+  /* !!! THIS DOES NOT FIX "Zelda I" (GRAPHICALLY) AND "Alan's FMV" LEVELS */
   /* try to detect and fix "Zelda II" levels, which are broken with 3.2.5 */
   {
     int element = EL_CUSTOM_16;
@@ -6371,6 +6397,7 @@ static void LoadLevel_InitVersion(struct LevelInfo *level, char *filename)
 	strncmp(ei->description, "scanline - row 1", 16) == 0)
       level->use_action_after_change_bug = TRUE;
   }
+#endif
 
   /* not centering level after relocating player was default only in 3.2.3 */
   if (level->game_version == VERSION_IDENT(3,2,3,0))	/* (no pre-releases) */
