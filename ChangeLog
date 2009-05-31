@@ -1,3 +1,10 @@
+2009-05-31
+	* fixed bug with element_info[e].gfx_element not being initialized in
+	  early game stage, causing native graphics in EMC level sets to be
+	  mapped completely to EL_EMPTY (causing a blank screen when playing)
+	  (this only happened when starting the program with an EMC set with
+	  native graphics, but not when switching to such a set at runtime)
+
 2009-03-26
 	* extended backwards compatibility mode to allow already fixed bug with
 	  change actions (see "2008-02-05") for existing levels (especially the

@@ -498,7 +498,7 @@ void BlitBitmap(Bitmap *src_bitmap, Bitmap *dst_bitmap,
   if (DrawingDeactivated(dst_x, dst_y, width, height))
     return;
 
-#if 1
+#if 0
   /* !!! 2009-03-24: It seems that this problem still exists with 1.2.12 !!! */
 #if defined(TARGET_SDL) && defined(PLATFORM_WIN32)
   if (src_bitmap == dst_bitmap)

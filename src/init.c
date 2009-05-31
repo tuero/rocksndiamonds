@@ -6191,6 +6191,7 @@ void OpenAll()
 
   InitElementPropertiesStatic();
   InitElementPropertiesEngine(GAME_VERSION_ACTUAL);
+  InitElementPropertiesGfxElement();
 
   print_timestamp_time("[post-video]");
 

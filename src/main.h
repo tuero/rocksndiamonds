@@ -760,7 +760,22 @@
 				 (e) <= EL_DC_STEELWALL_2_SINGLE)
 
 #if 1
+
+#if 1
 #define GFX_ELEMENT(e)		(element_info[e].gfx_element)
+#else
+#define GFX_ELEMENT(e)		(element_info[e].gfx_element ==		\
+				 (element_info[e].use_gfx_element ?	\
+				  element_info[e].gfx_element : e)  ?	\
+				 element_info[e].gfx_element :		\
+				 element_info[e].gfx_element +		\
+				 0 * printf("::: %d: %d <-> %d\n",	\
+					    e,				\
+					    element_info[e].gfx_element,      \
+					    element_info[e].use_gfx_element ? \
+					    element_info[e].gfx_element : e))
+#endif
+
 #else
 #define GFX_ELEMENT(e)		(element_info[e].use_gfx_element ?	\
 				 element_info[e].gfx_element : e)
