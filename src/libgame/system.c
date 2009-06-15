@@ -499,7 +499,12 @@ void BlitBitmap(Bitmap *src_bitmap, Bitmap *dst_bitmap,
     return;
 
 #if 0
-  /* !!! 2009-03-24: It seems that this problem still exists with 1.2.12 !!! */
+  /* !!! 2009-03-30: Fixed by using self-compiled, patched SDL.dll !!! */
+  /* (This bug still exists in the actual (as of 2009-06-15) version 1.2.13,
+     but is already fixed in SVN and should therefore finally be fixed with
+     the next official SDL release, which is probably version 1.2.14.) */
+#if 1
+  /* !!! 2009-03-24: It seems that this problem still exists in 1.2.12 !!! */
 #if defined(TARGET_SDL) && defined(PLATFORM_WIN32)
   if (src_bitmap == dst_bitmap)
   {
@@ -542,6 +547,7 @@ void BlitBitmap(Bitmap *src_bitmap, Bitmap *dst_bitmap,
 
     return;
   }
+#endif
 #endif
 #endif
 
