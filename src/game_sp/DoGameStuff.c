@@ -7,7 +7,8 @@
 static void CallAnimation(int si, byte bl);
 static boolean IsToBeAnimated(int bl);
 
-static char *VB_Name = "modDoGameStuff";
+// static char *VB_Name = "modDoGameStuff";
+
 // --- Option Explicit
 
 int *AnimationPosTable;

@@ -4,7 +4,8 @@
 
 #include "Infotrons.h"
 
-static char *VB_Name = "modInfotron";
+// static char *VB_Name = "modInfotron";
+
 // --- Option Explicit
 
 // ==========================================================================
@@ -19,8 +20,10 @@ int subAnimateInfotrons(int si)
   int tFld;
 
   // PseudoRegisters:
-  int ax, bx, cx, dx, di, X, Y;
-  int ah, bh, ch, dh, al, bl, cl, dl;
+  // int ax, bx, cx, dx, di, X, Y;
+  // int ah, bh, ch, dh, al, bl, cl, dl;
+  int ax, bx, dx, X, Y;
+  int al, bl;
 
   tFld = PlayField16[si];
   if ((tFld & 0xFF) != fiInfotron)

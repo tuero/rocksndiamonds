@@ -17,7 +17,8 @@ static int subSnikSnakFromRight(int si, int bx);
 static int subSnikSnakTurnLeft(int si, int bx);
 static int subSnikSnakTurnRight(int si, int bx);
 
-static char *VB_Name = "modSnikSnak";
+// static char *VB_Name = "modSnikSnak";
+
 // --- Option Explicit
 // ==========================================================================
 //                              SUBROUTINE
@@ -117,7 +118,8 @@ static int subSnikSnakTurnLeft(int si, int bx)
 {
   static int subSnikSnakTurnLeft;
 
-  int ax, ah, bl, dx, X, Y;
+  // int ax, ah, bl, dx, X, Y;
+  int ax, ah, bl, X, Y;
 
   ax = (TimerVar & 3);
   if (ax != 0)
@@ -240,7 +242,8 @@ static int subSnikSnakTurnRight(int si, int bx)
 {
   static int subSnikSnakTurnRight;
 
-  int ax, ah, bl, dx, X, Y;
+  // int ax, ah, bl, dx, X, Y;
+  int ax, ah, bl, X, Y;
 
   ax = (TimerVar & 3);
   if (ax != 0)
@@ -363,7 +366,8 @@ static int subSnikSnakFromBelow(int si, int bx)
 {
   static int subSnikSnakFromBelow;
 
-  int ax, ah, bl, dx, X, Y;
+  // int ax, ah, bl, dx, X, Y;
+  int ax, bl, X, Y;
 
   bx = bx - 0xF;  // get and increment sequence#
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -425,7 +429,8 @@ static int subSnikSnakFromRight(int si, int bx)
 {
   static int subSnikSnakFromRight;
 
-  int ax, ah, bl, dx, X, Y;
+  // int ax, ah, bl, dx, X, Y;
+  int ax, bl, X, Y;
 
   bx = bx - 0x17;  // get and increment sequence#
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -486,7 +491,8 @@ static int subSnikSnakFromAbove(int si, int bx)
 {
   static int subSnikSnakFromAbove;
 
-  int ax, ah, bl, dx, X, Y;
+  // int ax, ah, bl, dx, X, Y;
+  int ax, bl, X, Y;
 
   bx = bx - 0x1F;  // get and increment sequence#
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -547,7 +553,8 @@ static int subSnikSnakFromLeft(int si, int bx)
 {
   static int subSnikSnakFromLeft;
 
-  int ax, ah, bl, dx, X, Y;
+  // int ax, ah, bl, dx, X, Y;
+  int ax, bl, X, Y;
 
   bx = bx - 0x27;  // get and increment sequence#
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++

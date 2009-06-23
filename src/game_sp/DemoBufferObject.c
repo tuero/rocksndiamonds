@@ -4,8 +4,8 @@
 
 #include "DemoBufferObject.h"
 
-static void Class_Terminate();
-static int RemoveLastDemoKey();
+// static void Class_Terminate();
+// static int RemoveLastDemoKey();
 
 // --- VERSION 1.0 CLASS
 // --- BEGIN
@@ -16,11 +16,12 @@ static int RemoveLastDemoKey();
 // ---   MTSTransactionMode  = 0  'NotAnMTSObject  // NotAnMTSObject
 // --- END
 
-static char *VB_Name = "DemoBufferObject";
-static boolean VB_GlobalNameSpace = False;
-static boolean VB_Creatable = True;
-static boolean VB_PredeclaredId = False;
-static boolean VB_Exposed = False;
+// static char *VB_Name = "DemoBufferObject";
+// static boolean VB_GlobalNameSpace = False;
+// static boolean VB_Creatable = True;
+// static boolean VB_PredeclaredId = False;
+// static boolean VB_Exposed = False;
+
 // --- Option Explicit
 
 #define MaxPos 			((long)1024)
@@ -38,6 +39,8 @@ long WritePos;
 int LastKey;
 int CheckSum;
 long nSize;
+
+#if 0
 
 static void Class_Initialize()
 {
@@ -59,6 +62,8 @@ static void Class_Terminate()
   SET_TO_NOTHING(&SubBuffer, sizeof(SubBuffer));
 }
 
+#endif
+
 void DemoBufferObject_Reset()
 {
   nSize = 0;
@@ -77,7 +82,7 @@ long DemoBufferObject_Get_Size()
 
   Size = (nSize < 1 ?  0 :  0);
   if (! IS_NOTHING(&SubBuffer, sizeof(SubBuffer)))
-    Size = Size + SubBuffer_Size();
+    Size = Size + SubBuffer.Size;
 
   return Size;
 }
@@ -134,7 +139,7 @@ void DemoBufferObject_Let_FirstByte(byte NewVal)
 //  End If
 // End Property
 
-boolean DemoBufferObject_Serialize(int FNum)
+boolean DemoBufferObject_Serialize(FILE *FNum)
 {
   boolean Serialize;
 
@@ -142,7 +147,7 @@ boolean DemoBufferObject_Serialize(int FNum)
 
   Serialize = True;
   if (! IS_NOTHING(&SubBuffer, sizeof(SubBuffer)))
-    Serialize = SubBuffer_Serialize(FNum);
+    Serialize = SubBuffer.Serialize(FNum);
 
   if (nSize == 0)
     return Serialize;
@@ -172,7 +177,7 @@ boolean DemoBufferObject_Serialize(int FNum)
   // AddDemoKey LKey
   return Serialize;
 
-SerializeEH:
+  // SerializeEH:
   Serialize = False;
 
   return Serialize;
@@ -220,6 +225,8 @@ void DemoBufferObject_SetSubBuffer(DemoBufferObject SBuf)
   SubBuffer = SBuf;
 }
 
+#if 0
+
 static int RemoveLastDemoKey()
 {
   static int RemoveLastDemoKey;
@@ -238,3 +245,5 @@ static int RemoveLastDemoKey()
 
   return RemoveLastDemoKey;
 }
+
+#endif

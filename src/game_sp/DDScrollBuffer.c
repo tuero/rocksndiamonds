@@ -16,11 +16,12 @@
 // ---   MTSTransactionMode  = 0  'NotAnMTSObject  // NotAnMTSObject
 // --- END
 
-static char *VB_Name = "DDScrollBuffer";
-static boolean VB_GlobalNameSpace = False;
-static boolean VB_Creatable = True;
-static boolean VB_PredeclaredId = False;
-static boolean VB_Exposed = False;
+// static char *VB_Name = "DDScrollBuffer";
+// static boolean VB_GlobalNameSpace = False;
+// static boolean VB_Creatable = True;
+// static boolean VB_PredeclaredId = False;
+// static boolean VB_Exposed = False;
+
 // --- Option Explicit
 
 // needs reference to: DirectX7 for Visual Basic Type Library
@@ -178,7 +179,7 @@ void DDScrollBuffer_Blt()
   if (IS_NOTHING(&PrimarySurface, sizeof(PrimarySurface)))
     return;
 
-  L = PrimarySurface_Blt(DR, Buffer, SR, DDBLT_WAIT);
+  L = PrimarySurface.Blt(DR, &Buffer, SR, DDBLT_WAIT);
   if (L != DD_OK)
   {
     switch (L)

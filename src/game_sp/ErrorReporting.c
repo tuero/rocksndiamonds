@@ -7,7 +7,8 @@
 static char * GetErrLogPath();
 static char * GetTraceLogPath();
 
-static char *VB_Name = "modErrorReporting";
+// static char *VB_Name = "modErrorReporting";
+
 // --- Option Explicit
 
 static char *GetErrLogPath()
@@ -48,7 +49,7 @@ void Trace(char *Source, char *Message)
 void ReportError(char *Source, char *Message)
 {
   char *Path;
-  int FNum;
+  FILE *FNum;
   boolean bIsOpen;
 
   Path = GetErrLogPath();
@@ -62,7 +63,7 @@ void ReportError(char *Source, char *Message)
   // --- On Error GoTo 0
 
 
-ReportErrorEH:
+  // ReportErrorEH:
   if (bIsOpen)
     fclose(FNum);
 }

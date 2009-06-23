@@ -4,7 +4,8 @@
 
 #include "Electrons.h"
 
-static char *VB_Name = "modElectron";
+// static char *VB_Name = "modElectron";
+
 // --- Option Explicit
 // ==========================================================================
 //                              SUBROUTINE
@@ -101,7 +102,8 @@ int subElectronTurnLeft(int si, int bx)
 {
   int subElectronTurnLeft;
 
-  int ax, ah, bl, dx, X, Y;
+  // int ax, ah, bl, dx, X, Y;
+  int ax, bl, X, Y;
 
   ax = (TimerVar & 3);
   if (ax != 0)
@@ -207,7 +209,8 @@ int subElectronTurnRight(int si, int bx)
 {
   int subElectronTurnRight;
 
-  int ax, ah, bl, dx, X, Y;
+  // int ax, ah, bl, dx, X, Y;
+  int ax, bl, X, Y;
 
   ax = (TimerVar & 3);
   if (ax != 0)
@@ -313,7 +316,8 @@ int subElectronFromBelow(int si, int bx)
 {
   int subElectronFromBelow;
 
-  int ax, ah, bl, dx, X, Y;
+  // int ax, ah, bl, dx, X, Y;
+  int ax, bl, X, Y;
 
   bx = bx - 0xF;  // get and increment sequence#
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -375,7 +379,8 @@ int subElectronFromRight(int si, int bx)
 {
   int subElectronFromRight;
 
-  int ax, ah, bl, dx, X, Y;
+  // int ax, ah, bl, dx, X, Y;
+  int ax, bl, X, Y;
 
   bx = bx - 0x17;  // get and increment sequence#
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -436,7 +441,8 @@ int subElectronFromAbove(int si, int bx)
 {
   int subElectronFromAbove;
 
-  int ax, ah, bl, dx, X, Y;
+  // int ax, ah, bl, dx, X, Y;
+  int ax, bl, X, Y;
 
   bx = bx - 0x1F;  // get and increment sequence#
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -497,7 +503,8 @@ int subElectronFromLeft(int si, int bx)
 {
   int subElectronFromLeft;
 
-  int ax, ah, bl, dx, X, Y;
+  // int ax, ah, bl, dx, X, Y;
+  int ax, bl, X, Y;
 
   bx = bx - 0x27;  // get and increment sequence#
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++

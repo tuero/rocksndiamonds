@@ -4,7 +4,8 @@
 
 #include "InitGameConditions.h"
 
-static char *VB_Name = "modInitGameConditions";
+// static char *VB_Name = "modInitGameConditions";
+
 // --- Option Explicit
 
 // ==========================================================================
@@ -125,8 +126,10 @@ int subConvertToEasySymbols()
 {
   int subConvertToEasySymbols;
 
-  int ax, bx, cx, dx, di, X, Y, i;
-  int ah, bh, ch, dh, al, bl, cl, dl, ZF;
+  // int ax, bx, cx, dx, di, X, Y, i;
+  // int ah, bh, ch, dh, al, bl, cl, dl, ZF;
+  int ax, bx, cx, dx, i;
+  int al;
 
   bx = 0;
   dx = 0;

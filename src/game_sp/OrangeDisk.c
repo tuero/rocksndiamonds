@@ -4,7 +4,8 @@
 
 #include "OrangeDisk.h"
 
-static char *VB_Name = "modOrangeDisk";
+// static char *VB_Name = "modOrangeDisk";
+
 // --- Option Explicit
 // ==========================================================================
 //                              SUBROUTINE

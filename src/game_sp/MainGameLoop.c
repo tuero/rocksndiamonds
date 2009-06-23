@@ -4,7 +4,8 @@
 
 #include "MainGameLoop.h"
 
-static char *VB_Name = "modMainGameLoop";
+// static char *VB_Name = "modMainGameLoop";
+
 // --- Option Explicit
 
 int GameLoopRunning;
@@ -25,7 +26,8 @@ int subMainGameLoop()
 {
   int subMainGameLoop;
 
-  int al, bx;
+  // int al, bx;
+  int bx;
   TickCountObject Clock;
   currency LastFrame;
 
@@ -112,7 +114,8 @@ locRepeatMainGameLoop:                           // start repeating game loop
   //    Call subConvertToEasySymbols ' Convert to easy symbols
   //  End If
 
-loc_g_186F:
+  // loc_g_186F:
+
   subProcessKeyboardInput();                 // Check keyboard, act on keys
   // 'HACK:
   //  TimerVar = TimerVar + 1

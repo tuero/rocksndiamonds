@@ -4,7 +4,8 @@
 
 #include "BugsTerminals.h"
 
-static char *VB_Name = "modBugTerminal";
+// static char *VB_Name = "modBugTerminal";
+
 // --- Option Explicit
 
 long GetTickCount();
@@ -22,8 +23,10 @@ int subAnimateBugs(int si)
 {
   int subAnimateBugs;
 
-  int ax, bx, cx, dx, di;
-  int ah, bh, ch, dh, al, bl, cl, dl;
+  // int ax, bx, cx, dx, di;
+  // int ah, bh, ch, dh, al, bl, cl, dl;
+  int cx;
+  int bl;
 
   if (fiBug != LowByte(PlayField16[si]))
     return subAnimateBugs;
@@ -90,7 +93,8 @@ int subAnimateTerminals(int si)
 {
   int subAnimateTerminals;
 
-  int bl, ax, al, X, Y;
+  // int bl, ax, al, X, Y;
+  int bl, al, X, Y;
 
   if (LowByte(PlayField16[si]) != fiTerminal)
     return subAnimateTerminals;

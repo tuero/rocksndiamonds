@@ -4,7 +4,8 @@
 
 #include "GeneralTricks.h"
 
-static char *VB_Name = "GeneralTricks_Module";
+// static char *VB_Name = "GeneralTricks_Module";
+
 // --- Option Explicit
 // --- Option Compare Text
 
@@ -21,7 +22,7 @@ double ValEx(char *TS)
   if (i != 0)
   {
     LS = Left(TS, i - 1);
-    RS = Right(TS, Len(TS) - i);
+    RS = Right(TS, strlen(TS) - i);
     ValEx = Val(CAT(LS, ".", RS));
   }
   else
@@ -42,6 +43,8 @@ void DEC(int *VAR, int Delta)
   *VAR = *VAR - Delta;
 }
 
+#if 0
+
 char *MySplit(char *TS, char *Sep, long SCount)
 {
   char *MySplit;
@@ -51,8 +54,8 @@ char *MySplit(char *TS, char *Sep, long SCount)
   char *RA;
 
   T = TS;
-  L = Len(TS);
-  SL = Len(Sep);
+  L = strlen(TS);
+  SL = strlen(Sep);
   J = SCount;
   if (J < 1)
   {
@@ -93,7 +96,10 @@ char *MySplit(char *TS, char *Sep, long SCount)
         break;
 
       q = q + 1;
+#if 0
+      /* !!! CHECK IF THIS IS REALLY NEEDED !!! */
       RA[q] = Mid(T, i, k - i);
+#endif
     }
 
     i = k + SL;
@@ -127,13 +133,15 @@ char *MySplit(char *TS, char *Sep, long SCount)
   return MySplit;
 }
 
+#endif
+
 void MyReplace(char *TS, char *Pat1, char *Pat2)
 {
   long k, SL1, SL2, TL;
 
-  TL = Len(TS);
-  SL1 = Len(Pat1);
-  SL2 = Len(Pat2);
+  TL = strlen(TS);
+  SL1 = strlen(Pat1);
+  SL2 = strlen(Pat2);
   k = InStr(1, TS, Pat1);
   if (k == 0)
     return;

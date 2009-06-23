@@ -7,7 +7,8 @@
 static void subEatRedDisk(int si);
 static boolean subMoveKillsMurphy(int si, int ax, int bl);
 
-static char *VB_Name = "modMurphy";
+// static char *VB_Name = "modMurphy";
+
 // --- Option Explicit
 
 #define LocalStretch 			(1)
@@ -21,8 +22,10 @@ int subAnimateMurphy(int si)
 {
   int subAnimateMurphy;
 
-  int ax, al, ah, bx, bl, i, X, Y;
-  int tX, tY, tDeltaX, tDeltaY, tPos, Tmp;
+  // int ax, al, ah, bx, bl, i, X, Y;
+  // int tX, tY, tDeltaX, tDeltaY, tPos, Tmp;
+  int ax, al, bx, bl, i, X, Y;
+  int tDeltaX, tDeltaY, tPos, Tmp;
 
   // Variables that hold information about the animation sequence
   int *dx; // an array of image positions in moving.mpx, finalized with -1

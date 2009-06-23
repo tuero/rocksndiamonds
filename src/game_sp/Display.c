@@ -4,7 +4,8 @@
 
 #include "Display.h"
 
-static char *VB_Name = "modDisplay";
+// static char *VB_Name = "modDisplay";
+
 // --- Option Explicit
 
 int ScreenScrollXPos, ScreenScrollYPos;

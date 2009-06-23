@@ -4,7 +4,8 @@
 
 #include "PathTools.h"
 
-static char *VB_Name = "PathTools_Module";
+// static char *VB_Name = "PathTools_Module";
+
 // --- Option Explicit
 // --- Option Compare Text
 
@@ -166,7 +167,7 @@ char *StripExtensionlessFileName(char *Path)
   char *StripExtensionlessFileName;
 
   char *T, *T2;
-  long i, iSlash;
+  // long i, iSlash;
 
   T = StripFileName(Path);
   T2 = StripExtension(Path);
@@ -245,7 +246,7 @@ boolean FilesEqual(char *Path1, char *Path2)
 {
   boolean FilesEqual;
 
-  int FNum1, FNum2;
+  FILE *FNum1, *FNum2;
   long nSize, i;
   boolean b1Open, b2Open;
   byte *bin1, *bin2;
@@ -289,12 +290,15 @@ boolean FilesEqual(char *Path1, char *Path2)
   FilesEqual = True;
   return FilesEqual;
 
+#if 0
 FilesEqualEH:
   if (b1Open)
-    Close(FNum1);
+    fclose(FNum1);
 
   if (b2Open)
-    Close(FNum2);
+    fclose(FNum2);
 
   return FilesEqual;
+#endif
+
 }

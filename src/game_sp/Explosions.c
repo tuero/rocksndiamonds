@@ -8,7 +8,7 @@ static void LetExplodeFieldSP(int tsi, int cx, int dh);
 static int subExplodeInfotron(int tsi, int cx);
 static int subExplodeZonk(int tsi, int cx);
 
-static char *VB_Name = "modExplosions";
+// static char *VB_Name = "modExplosions";
 // --- Option Explicit
 
 // ==========================================================================
@@ -19,7 +19,8 @@ int subAnimateExplosion(int si)
 {
   int subAnimateExplosion;
 
-  int ax, bx, bl, X, Y;
+  // int ax, bx, bl, X, Y;
+  int ax, bl, X, Y;
 
   if (LowByte(PlayField16[si]) != fiExplosion)
     return subAnimateExplosion;
@@ -73,7 +74,8 @@ loc_g_28D0: // explosion produces infotron
 
 void ExplodeFieldSP(int si)
 {
-  int ax, al, cx, dl, dh;
+  // int ax, al, cx, dl, dh;
+  int ax, cx, dl;
 
   ax = LowByte(PlayField16[si]);
   if (ax == fiHardWare)
@@ -104,7 +106,7 @@ void ExplodeFieldSP(int si)
   LetExplodeFieldSP(si + FieldWidth, cx, dl);
   LetExplodeFieldSP(si + FieldWidth + 1, cx, dl);
 
-loc_g_2C3B:
+  // loc_g_2C3B:
   subSoundFXExplosion();
 } // ExplodeFieldSP
 
@@ -306,7 +308,7 @@ int subFollowUpExplosions()
 
   int ax, si;
 
-locloop_g_2919:
+  // locloop_g_2919:
   for (si = 0; si <= LevelMax; si++)
   {
     ax = ByteToInt(PlayField8[si]);

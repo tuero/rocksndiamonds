@@ -661,11 +661,12 @@ void DrawFieldNoAnimated(int X, int Y);
 // ---    End
 // --- End
 
-static char *VB_Name = "MainForm";
-static boolean VB_GlobalNameSpace = False;
-static boolean VB_Creatable = False;
-static boolean VB_PredeclaredId = True;
-static boolean VB_Exposed = False;
+// static char *VB_Name = "MainForm";
+// static boolean VB_GlobalNameSpace = False;
+// static boolean VB_Creatable = False;
+// static boolean VB_PredeclaredId = True;
+// static boolean VB_Exposed = False;
+
 // --- Option Explicit
 // --- Option Compare Text
 
@@ -698,6 +699,8 @@ currency LastTick, LastFrame;
 TickCountObject T;
 
 const char *AppTitle = "MegaPlex";
+
+#if 0
 
 static char *GetSpeedDescriptionFPS(currency FrameDelayUS)
 {
@@ -774,8 +777,6 @@ static int GetSpeedIndex(long DelayUS)
 
   return GetSpeedIndex;
 }
-
-#if 0
 
 static long Get_LastOpenFilter()
 {
@@ -858,6 +859,8 @@ static void CountDown(long HalfSeconds, int bDisplayBar)
   // lblFrameCount = 0
 }
 
+#if 0
+
 static char *GetValidTempPath()
 {
   static char *GetValidTempPath;
@@ -903,8 +906,6 @@ static char *GetValidTempPath()
 
   return GetValidTempPath;
 }
-
-#if 0
 
 static char *GetMyTempFileName()
 {
@@ -1298,8 +1299,6 @@ static void Form_KeyUp(int KeyCode, int Shift)
   picPane_KeyUp(KeyCode, Shift);
 }
 
-#endif
-
 static void Form_Load()
 {
 #if 0
@@ -1359,8 +1358,6 @@ static void Form_Load()
 
 #endif
 }
-
-#if 0
 
 static void FillLevelList(char *Path, int LevelIndex)
 {
@@ -1617,6 +1614,8 @@ static void DrawFrame(int Delta)
   }
 }
 
+#if 0
+
 static void RestoreFrame()
 {
   int i, LX, tY, RX, BY;
@@ -1637,8 +1636,6 @@ static void RestoreFrame()
     DrawField(RX, i);
   }
 }
-
-#if 0
 
 static void Form_Unload(int Cancel)
 {

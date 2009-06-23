@@ -4,7 +4,8 @@
 
 #include "Input.h"
 
-static char *VB_Name = "modInput";
+// static char *VB_Name = "modInput";
+
 // --- Option Explicit
 
 boolean KeyState[255 + 1];
@@ -148,7 +149,7 @@ int subProcessKeyboardInput()
   //  Call DKeyboard.Unacquire
   return subProcessKeyboardInput;
 
-NoKeyboardAccessEH:
+  // NoKeyboardAccessEH:
   Debug.Print("! Keyboard access");
 
   return subProcessKeyboardInput;

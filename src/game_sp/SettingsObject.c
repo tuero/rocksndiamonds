@@ -13,13 +13,16 @@
 // ---   MTSTransactionMode  = 0  'NotAnMTSObject  // NotAnMTSObject
 // --- END
 
-static char *VB_Name = "SettingsObject";
-static boolean VB_GlobalNameSpace = False;
-static boolean VB_Creatable = True;
-static boolean VB_PredeclaredId = False;
-static boolean VB_Exposed = False;
+// static char *VB_Name = "SettingsObject";
+// static boolean VB_GlobalNameSpace = False;
+// static boolean VB_Creatable = True;
+// static boolean VB_PredeclaredId = False;
+// static boolean VB_Exposed = False;
+
 // --- Option Explicit
 // --- Option Compare Text
+
+#if 0
 
 const char *AppName = "MegaPlex";
 const char *Config = "Config";
@@ -38,3 +41,4 @@ int SettingsObject_Read(char *ValName, int Default)
   return Read;
 }
 
+#endif

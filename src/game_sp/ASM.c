@@ -4,7 +4,8 @@
 
 #include "ASM.h"
 
-static char *VB_Name = "modASM";
+// static char *VB_Name = "modASM";
+
 // --- Option Explicit
 
 // PseudoRegisters:

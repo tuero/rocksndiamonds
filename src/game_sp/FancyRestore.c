@@ -4,7 +4,8 @@
 
 #include "FancyRestore.h"
 
-static char *VB_Name = "modFancy";
+// static char *VB_Name = "modFancy";
+
 // --- Option Explicit
 
 // ==========================================================================

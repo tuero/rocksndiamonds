@@ -7,7 +7,8 @@
 static void ReadDemo();
 void ReadLevel();
 
-static char *VB_Name = "modGlobals";
+// static char *VB_Name = "modGlobals";
+
 // --- Option Explicit
 // --- Option Compare Text
 // --- Option Base 0

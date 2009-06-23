@@ -4,7 +4,8 @@
 
 #include "Capture.h"
 
-static char *VB_Name = "CaptureModule";
+// static char *VB_Name = "CaptureModule";
+
 // --------------------------------------------------------------------
 // ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 //
@@ -209,7 +210,7 @@ Picture CreateBitmapPicture(int hBmp, int hPal)
 
   // Fill Pic with necessary parts.
   {
-    pic.Size = Len(pic);          // Length of structure.
+    pic.Size = sizeof(pic);       // Length of structure.
     pic.Type = vbPicTypeBitmap;   // Type of Picture (bitmap).
     pic.hBmp = hBmp;              // Handle to bitmap.
     pic.hPal = hPal;              // Handle to palette (may be null).
@@ -522,7 +523,9 @@ void PrintPictureToFitPage(Printer Prn, Picture pic)
   }
 
   // Print the picture using the PaintPicture method.
-  Prn_PaintPicture(pic, 0, 0, PrnPicWidth, PrnPicHeight);
+#if 0
+  Prn.PaintPicture(pic, 0, 0, PrnPicWidth, PrnPicHeight);
+#endif
 }
 
 // --------------------------------------------------------------------

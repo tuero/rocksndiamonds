@@ -4,7 +4,7 @@
 
 #include "BitMapObject.h"
 
-static void ConvertToVBPalette();
+// static void ConvertToVBPalette();
 static long Get_ByteWidth();
 static long Get_LineLength();
 static void ReDimArrays();
@@ -18,11 +18,12 @@ static void ReDimArrays();
 // ---   MTSTransactionMode  = 0  'NotAnMTSObject  // NotAnMTSObject
 // --- END
 
-static char *VB_Name = "BitMapObject";
-static boolean VB_GlobalNameSpace = False;
-static boolean VB_Creatable = True;
-static boolean VB_PredeclaredId = False;
-static boolean VB_Exposed = False;
+// static char *VB_Name = "BitMapObject";
+// static boolean VB_GlobalNameSpace = False;
+// static boolean VB_Creatable = True;
+// static boolean VB_PredeclaredId = False;
+// static boolean VB_Exposed = False;
+
 // --- Option Explicit
 
 // info von http://web.usxchange.net/elmo/bmp.htm
@@ -170,6 +171,8 @@ void BitMapObject_CreateAtSize(long XPixels, long YPixels, long BitsPerPixel)
   ReDimArrays();
 }
 
+#if 0
+
 void BitMapObject_CreateFromFile(char *Path)
 {
   long FNum;
@@ -207,7 +210,7 @@ void BitMapObject_CreateFromFile(char *Path)
 
 void BitMapObject_SaveToFile(char *Path)
 {
-  long FNum;
+  FILE *FNum;
 
   BMFH.bfOffBits = Len(BMFH) + Len(BMIH);
   if (BMIH.biBitCount < 9)
@@ -215,7 +218,7 @@ void BitMapObject_SaveToFile(char *Path)
 
   BMIH.biSizeImage = Get_LineLength() * BMIH.biHeight;
   BMFH.bfSize = BMFH.bfOffBits + BMIH.biSizeImage;
-  FNum = FreeFile();
+  // FNum = FreeFile();
   FNum = fopen(Path, "wb");
   FILE_PUT(FNum, -1, &BMFH, sizeof(BMFH));
   FILE_PUT(FNum, -1, &BMIH, sizeof(BMIH));
@@ -240,6 +243,8 @@ static void ConvertToVBPalette()
     }
   }
 }
+
+#endif
 
 static void ReDimArrays()
 {
@@ -293,6 +298,8 @@ long BitMapObject_Get_ColorsUsed()
 
   return ColorsUsed;
 }
+
+#if 0
 
 long BitMapObject_Get_ColorIndex(long X, long Y)
 {
@@ -472,7 +479,7 @@ void BitMapObject_Let_Point(long X, long Y, long NewColor)
   {
     case 1:
       ColIndex = GetPaletteIndex(NewColor);
-      ByteVal = ImageDataBytes[X / 8, nY];
+      ByteVal = ImageDataBytes[X / 8][nY];
       BitPos = 7 - (X % 8);
       NewX = (1 << BitPos);
       ColIndex = ColIndex * NewX;
@@ -485,12 +492,12 @@ void BitMapObject_Let_Point(long X, long Y, long NewColor)
         ByteVal = (ByteVal | NewX);
       }
 
-      ImageDataBytes[X / 8, nY] = ByteVal;
+      ImageDataBytes[X / 8][nY] = ByteVal;
       break;
 
     case 4:
       ColIndex = GetPaletteIndex(NewColor);
-      ByteVal = ImageDataBytes[X / 2, nY];
+      ByteVal = ImageDataBytes[X / 2][nY];
       if ((X % 2) == 0)
       {
         ByteVal = (ByteVal & 0xF) + ColIndex * 0x10;
@@ -500,18 +507,18 @@ void BitMapObject_Let_Point(long X, long Y, long NewColor)
         ByteVal = (ByteVal & 0xF0) + ColIndex;
       }
 
-      ImageDataBytes[X / 2, nY] = ByteVal;
+      ImageDataBytes[X / 2][nY] = ByteVal;
       break;
 
     case 8:
-      ImageDataBytes[X, nY] = GetPaletteIndex(NewColor);
+      ImageDataBytes[X][nY] = GetPaletteIndex(NewColor);
       break;
 
     case 24:
       NewX = 3 * X;
-      ImageDataBytes[NewX, nY] = (NewColor & 0xFF0000) / 0x10000;  // B
-      ImageDataBytes[NewX + 1, nY] = (NewColor & 0xFF00) / 0x100;  // G
-      ImageDataBytes[NewX + 2, nY] = (NewColor & 0xFF);  // R
+      ImageDataBytes[NewX][nY] = (NewColor & 0xFF0000) / 0x10000;  // B
+      ImageDataBytes[NewX + 1][nY] = (NewColor & 0xFF00) / 0x100;  // G
+      ImageDataBytes[NewX + 2][nY] = (NewColor & 0xFF);  // R
       break;
 
     default:
@@ -541,6 +548,8 @@ int BitMapObject_GetPaletteIndex(long Color)
   return GetPaletteIndex;
 }
 
+#endif
+
 long BitMapObject_Get_Width()
 {
   long Width;
@@ -558,6 +567,8 @@ long BitMapObject_Get_Height()
 
   return Height;
 }
+
+#if 0
 
 BitMapObject BitMapObject_GetStretchCopy(float StretchVal)
 {
@@ -580,9 +591,11 @@ BitMapObject BitMapObject_GetStretchCopy(float StretchVal)
   {
     for (iX = 0; iX <= nWidth; iX++)
     {
-      GetStretchCopy.Let_ColorIndex(iX, iY, ColorIndex(Int(iX / StretchVal), Int(iY / StretchVal)));
+      GetStretchCopy.Let_ColorIndex(iX, iY, ColorIndex((int)(iX / StretchVal), (int)(iY / StretchVal)));
     }
   }
 
   return GetStretchCopy;
 }
+
+#endif

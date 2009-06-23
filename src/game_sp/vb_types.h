@@ -106,6 +106,7 @@ typedef struct
   void (*GetSurfaceDesc)(DDSURFACEDESC2);
   void (*SetClipper)(DirectDrawClipper);
   // long (*Blt)(RECT, DirectDrawSurface7, RECT, int);
+  long (*Blt)(RECT, void *, RECT, int);
   void (*BltColorFill)(RECT, int);
 } DirectDrawSurface7;
 

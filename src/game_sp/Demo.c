@@ -4,7 +4,8 @@
 
 #include "Demo.h"
 
-static char *VB_Name = "modDemo";
+// static char *VB_Name = "modDemo";
+
 // --- Option Explicit
 //
 // Public Function subCloseDemoRecordingFile()
@@ -74,7 +75,7 @@ currency GetTotalFramesOfDemo()
   GetTotalFramesOfDemo = nFrames;
   return GetTotalFramesOfDemo;
 
-GetTotalFramesOfDemoEH:
+  // GetTotalFramesOfDemoEH:
   // ReportError "GetTotalFramesOfDemo()", "invalid data detected in file " & OrigPath
   GetTotalFramesOfDemo = 0;
   DemoAvailable = False;

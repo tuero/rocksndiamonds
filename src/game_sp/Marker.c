@@ -4,7 +4,7 @@
 
 #include "Marker.h"
 
-static boolean IsPort(long i);
+// static boolean IsPort(long i);
 static void LimitXY(int *X, int *Y);
 static void SortData();
 
@@ -17,11 +17,12 @@ static void SortData();
 // ---   MTSTransactionMode  = 0  'NotAnMTSObject  // NotAnMTSObject
 // --- END
 
-static char *VB_Name = "MarkerObject";
-static boolean VB_GlobalNameSpace = False;
-static boolean VB_Creatable = True;
-static boolean VB_PredeclaredId = False;
-static boolean VB_Exposed = False;
+// static char *VB_Name = "MarkerObject";
+// static boolean VB_GlobalNameSpace = False;
+// static boolean VB_Creatable = True;
+// static boolean VB_PredeclaredId = False;
+// static boolean VB_Exposed = False;
+
 // --- Option Explicit
 
 long mIndex1, mIndex2;
@@ -106,11 +107,13 @@ void Marker_SetPoint2(int X, int Y)
 
 static void SortData()
 {
-  int Tmp;
+  // int Tmp;
 
   XMin = (X2 < X1 ?  X2 :  X2);
   YMin = (Y2 < Y1 ?  Y2 :  Y2);
 }
+
+#if 0
 
 void Marker_ShowMarker(boolean ShowFlag)
 {
@@ -213,7 +216,7 @@ void Marker_Copy()
   SelectionData = REDIM_1D(sizeof(byte), 0, 1 - 1);
   return;
 
-CopyEH:
+  // CopyEH:
   Beep();
 }
 
@@ -256,15 +259,15 @@ void Marker_Paste()
       Tmp = FieldWidth * (YMin + Y) + XMin + X;
 
       // --- On Error GoTo PasteEH
-      DisPlayField[Tmp] = SelectionData[X, Y];
-      PlayField16[Tmp] = UnEdSprite(SelectionData[X, Y]);
+      DisPlayField[Tmp] = SelectionData[X][Y];
+      PlayField16[Tmp] = UnEdSprite(SelectionData[X][Y]);
       // --- On Error GoTo 0
 
     }
   }
 
   Let_ModifiedFlag(True);
-PasteEH:
+  // PasteEH:
   Beep();
 }
 
@@ -272,3 +275,5 @@ static void Class_Initialize()
 {
   mVisible = False;
 }
+
+#endif

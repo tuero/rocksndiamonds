@@ -4,7 +4,8 @@
 
 #include "DirectDrawGlobals.h"
 
-static char *VB_Name = "DirectDrawGlobals";
+// static char *VB_Name = "DirectDrawGlobals";
+
 // --- Option Explicit
 
 DirectX7 DirectX;

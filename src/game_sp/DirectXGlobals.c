@@ -4,7 +4,8 @@
 
 #include "DirectXGlobals.h"
 
-static char *VB_Name = "DirectXGlobals";
+// static char *VB_Name = "DirectXGlobals";
+
 // --- Option Explicit
 
 DirectX7 DirectX;

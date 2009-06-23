@@ -4,7 +4,8 @@
 
 #include "Sound.h"
 
-static char *VB_Name = "modSound";
+// static char *VB_Name = "modSound";
+
 // --- Option Explicit
 
 int MusicOnFlag;

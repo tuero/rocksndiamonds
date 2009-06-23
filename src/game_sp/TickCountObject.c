@@ -20,8 +20,8 @@
 // static boolean VB_Exposed = False;
 // --- Option Explicit
 
-#define LongMin 			(-(double)2147483648) // the "#" sign is a bug of the VB environment AutoFormat function but causes no real problems; don't  worry 'bout it!
-#define LongMax 			(2147483647)
+#define LongMin 			(-(double)2147483648UL) // the "#" sign is a bug of the VB environment AutoFormat function but causes no real problems; don't  worry 'bout it!
+#define LongMax 			(2147483647UL)
 
 long GetTickCount();
 long QueryPerformanceCounter(currency lpPerformanceCount);
@@ -60,14 +60,14 @@ void TickCountObject_DelayMS(long MSInterval, boolean DoEventsFlag) // in ms
 {
   currency Start;
 
-  Start = TickNow();
+  Start = TickCountObject_Get_TickNow();
   DelayLoopActive = True;
   do
   {
     if (DoEventsFlag)
       DoEvents();
 
-    if (MSInterval <= TickDiffMS(Start) && ! MPause)
+    if (MSInterval <= TickCountObject_TickDiffMS(Start) && ! MPause)
       break;
   }
   while (1);
@@ -130,7 +130,7 @@ long TickCountObject_TickDiffS(currency TickStart)
       TickDiffS = NewTick - TickStart;
     }
 
-    TickDiffS = Int(TickDiffS / 1000);
+    TickDiffS = (int)(TickDiffS / 1000);
   }
 
   return TickDiffS;

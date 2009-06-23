@@ -27,5 +27,6 @@ extern void menDemoSpeed_Click(int Index);
 extern void menEdit_Click();
 extern void menPlaySpeed_Click(int Index);
 extern void menStop_Click();
+extern void menPlay_Click();
 
 #endif /* MAINFORM_H */

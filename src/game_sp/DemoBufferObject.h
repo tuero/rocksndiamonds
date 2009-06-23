@@ -18,7 +18,7 @@ extern byte DemoBufferObject_Get_FirstByte();
 extern long DemoBufferObject_Get_Size();
 extern void DemoBufferObject_Let_FirstByte(byte NewVal);
 extern void DemoBufferObject_Reset();
-extern boolean DemoBufferObject_Serialize(int FNum);
+extern boolean DemoBufferObject_Serialize(FILE *FNum);
 extern void DemoBufferObject_SetSubBuffer(DemoBufferObject SBuf);
 
 #endif /* DEMOBUFFEROBJECT_H */

@@ -32,10 +32,11 @@
 // ---    End
 // --- End
 
-static char *VB_Name = "LevelSetPreviewForm";
-static boolean VB_GlobalNameSpace = False;
-static boolean VB_Creatable = False;
-static boolean VB_PredeclaredId = True;
-static boolean VB_Exposed = False;
+// static char *VB_Name = "LevelSetPreviewForm";
+// static boolean VB_GlobalNameSpace = False;
+// static boolean VB_Creatable = False;
+// static boolean VB_PredeclaredId = True;
+// static boolean VB_Exposed = False;
+
 // --- Option Explicit
 

@@ -15,11 +15,11 @@ static void Blt(int pX, int pY, int SpriteX, int SpriteY);
 // ---   MTSTransactionMode  = 0  'NotAnMTSObject  // NotAnMTSObject
 // --- END
 
-static char *VB_Name = "DDSpriteBuffer";
-static boolean VB_GlobalNameSpace = False;
-static boolean VB_Creatable = True;
-static boolean VB_PredeclaredId = False;
-static boolean VB_Exposed = False;
+// static char *VB_Name = "DDSpriteBuffer";
+// static boolean VB_GlobalNameSpace = False;
+// static boolean VB_Creatable = True;
+// static boolean VB_PredeclaredId = False;
+// static boolean VB_Exposed = False;
 // --- Option Explicit
 
 // needs reference to: DirectX7 for Visual Basic Type Library
@@ -117,7 +117,7 @@ boolean DDSpriteBuffer_CreateFromFile(char *Path, long xSprites, long ySprites)
   CreateFromFile = True;
   return CreateFromFile;
 
-CreateFromFileEH:
+  // CreateFromFileEH:
   CreateFromFile = False;
 
   return CreateFromFile;
@@ -148,7 +148,7 @@ boolean DDSpriteBuffer_CreateAtSize(long Width, long Height, long xSprites, long
   CreateAtSize = True;
   return CreateAtSize;
 
-CreateAtSizeEH:
+  // CreateAtSizeEH:
   CreateAtSize = False;
 
   return CreateAtSize;
@@ -181,7 +181,7 @@ static void Blt(int pX, int pY, int SpriteX, int SpriteY)
     SR.right = SR.left + mSpriteWidth;
     SR.bottom = SR.top + mSpriteHeight;
   }
-  Tmp = mDest_Blt(DR, Buffer, SR, DDBLT_WAIT);
+  Tmp = mDest.Blt(DR, &Buffer, SR, DDBLT_WAIT);
 }
 
 void DDSpriteBuffer_BltEx(int pX, int pY, int SpritePos)
@@ -225,8 +225,12 @@ void DDSpriteBuffer_BltEx(int pX, int pY, int SpritePos)
 //  End If
 // End Function
 
+#if 0
+
 static void Class_Initialize()
 {
   mDestXOff = 0;
   mDestYOff = 0;
 }
+
+#endif

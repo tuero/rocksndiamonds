@@ -4,9 +4,10 @@
 
 #include "FakeDeclares.h"
 
-static void subUpdateHallOfFame();
+// static void subUpdateHallOfFame();
 
-static char *VB_Name = "FakeDeclares";
+// static char *VB_Name = "FakeDeclares";
+
 // --- Option Explicit
 // --- Option Compare Binary
 
@@ -71,9 +72,13 @@ int UpdateTimeFlag;
 // boolean bModified;
 boolean ModifiedFlag;
 
+#if 0
+
 static void subUpdateHallOfFame()
 {
 }
+
+#endif
 
 boolean Get_ModifiedFlag()
 {
