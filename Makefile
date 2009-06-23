@@ -134,13 +134,12 @@ levelsketch_images: all
 	./Scripts/make_levelsketch_images.sh
 
 backup:
-	./Scripts/make_backup.sh src 1
+	./Scripts/make_backup.sh src tar
 
-backup2:
-	./Scripts/make_backup.sh src 2
+backup-net-copy:
+	./Scripts/make_backup.sh src scp
 
-backup3:
-	./Scripts/make_backup.sh src 3
+backup-net: backup backup-net-copy
 
 backup_lev:
 	./Scripts/make_backup.sh lev
