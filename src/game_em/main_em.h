@@ -77,7 +77,6 @@
 /* often used screen positions */
 #define ORIG_MENU_SX		((ORIG_SCR_MENUX - SCR_MENUX) * TILEX / 2)
 #define ORIG_MENU_SY		0
-#define SY			8
 #define SX			8
 #define SY			8
 #define SXSIZE			(SCR_FIELDX * TILEX)

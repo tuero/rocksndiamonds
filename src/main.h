@@ -24,6 +24,7 @@
 
 #include "libgame/libgame.h"
 #include "game_em/game_em.h"
+#include "game_sp/game_sp.h"
 
 #include "conf_gfx.h"	/* include auto-generated data structure definitions */
 #include "conf_snd.h"	/* include auto-generated data structure definitions */
@@ -2007,11 +2008,11 @@
 #define PROGRAM_VERSION_MAJOR		3
 #define PROGRAM_VERSION_MINOR		2
 #define PROGRAM_VERSION_PATCH		6
-#define PROGRAM_VERSION_BUILD		1
+#define PROGRAM_VERSION_BUILD		2
 
 #define PROGRAM_TITLE_STRING		"Rocks'n'Diamonds"
 #define PROGRAM_AUTHOR_STRING		"Holger Schemel"
-#define PROGRAM_COPYRIGHT_STRING	"Copyright ©1995-2008 by Holger Schemel"
+#define PROGRAM_COPYRIGHT_STRING	"Copyright ©1995-2009 by Holger Schemel"
 #define PROGRAM_EMAIL_STRING		"info@artsoft.org"
 #define PROGRAM_WEBSITE_STRING		"http://www.artsoft.org/"
 #define PROGRAM_GAME_BY_STRING		"A Game by Artsoft Entertainment"
@@ -2099,8 +2100,9 @@
 #define GAME_ENGINE_TYPE_UNKNOWN	LEVEL_FILE_TYPE_UNKNOWN
 #define GAME_ENGINE_TYPE_RND		LEVEL_FILE_TYPE_RND
 #define GAME_ENGINE_TYPE_EM		LEVEL_FILE_TYPE_EM
+#define GAME_ENGINE_TYPE_SP		LEVEL_FILE_TYPE_SP
 
-#define NUM_ENGINE_TYPES		3
+#define NUM_ENGINE_TYPES		4
 
 
 struct BorderInfo

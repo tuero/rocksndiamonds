@@ -144,7 +144,7 @@ CONFIG_GAME_DIR = $(CONFIG_RO_GAME_DIR) $(CONFIG_RW_GAME_DIR)
 CONFIG_GAME = $(CONFIG_GAME_DIR) $(CONFIG_SCORE_ENTRIES) $(CONFIG_SPECIAL)
 
 CONFIG = $(CONFIG_GAME) $(JOYSTICK)
-# DEBUG = -DDEBUG -g
+DEBUG = -DDEBUG -g
 # PROFILING = $(PROFILING_FLAGS)
 
 # OPTIONS = $(DEBUG) -Wall			# only for debugging purposes
@@ -228,7 +228,10 @@ LIBGAME = $(LIBGAME_DIR)/libgame.a
 GAME_EM_DIR = game_em
 GAME_EM = $(GAME_EM_DIR)/game_em.a
 
-RNDLIBS = $(LIBGAME) $(GAME_EM)
+GAME_SP_DIR = game_sp
+GAME_SP = $(GAME_SP_DIR)/game_sp.a
+
+RNDLIBS = $(LIBGAME) $(GAME_EM) $(GAME_SP)
 
 ICONBASE = windows_icon
 ifeq ($(PLATFORM),cross-win32)
@@ -246,7 +249,7 @@ endif
 # build targets
 # -----------------------------------------------------------------------------
 
-all: libgame_dir game_em_dir $(PROGNAME)
+all: libgame_dir game_em_dir game_sp_dir $(PROGNAME)
 
 $(PROGNAME): $(RNDLIBS) $(TIMESTAMP_FILE) $(OBJS) $(ICON)
 	$(CC) $(PROFILING) $(OBJS) $(ICON) $(RNDLIBS) $(LDFLAGS) -o $(PROGNAME)
@@ -260,6 +263,11 @@ game_em_dir:
 	@$(MAKE) -C $(GAME_EM_DIR)
 $(GAME_EM):
 	@$(MAKE) -C $(GAME_EM_DIR)
+
+game_sp_dir:
+	@$(MAKE) -C $(GAME_SP_DIR)
+$(GAME_SP):
+	@$(MAKE) -C $(GAME_SP_DIR)
 
 auto-conf:
 	@for i in $(CNFS); do			\
@@ -276,7 +284,7 @@ conf_snd.h: conf_snd.c
 conf_mus.h: conf_mus.c
 	@$(MAKE) auto-conf
 
-$(TIMESTAMP_FILE): $(SRCS) $(LIBGAME) $(GAME_EM)
+$(TIMESTAMP_FILE): $(SRCS) $(LIBGAME) $(GAME_EM) $(GAME_SP)
 	@date '+"%Y-%m-%d %H:%M"' \
 	| sed -e 's/^/#define COMPILE_DATE_STRING /' \
 	> $(TIMESTAMP_FILE)
@@ -291,9 +299,11 @@ $(ICON):
 clean-obj:
 	$(MAKE) -C $(LIBGAME_DIR) clean
 	$(MAKE) -C $(GAME_EM_DIR) clean
+	$(MAKE) -C $(GAME_SP_DIR) clean
 	$(RM) $(OBJS)
 	$(RM) $(LIBGAME)
 	$(RM) $(GAME_EM)
+	$(RM) $(GAME_SP)
 
 clean-ico:
 	$(RM) $(ICONBASE).ico
@@ -327,11 +337,12 @@ valgrind: all
 dist-clean: clean-obj
 
 tags:
-	$(ETAGS) *.[ch] $(LIBGAME_DIR)/*.[ch] $(GAME_EM_DIR)/*.[ch]
+	$(ETAGS) *.[ch] $(LIBGAME_DIR)/*.[ch] $(GAME_EM_DIR)/*.[ch] $(GAME_SP_DIR)/*.[ch]
 
 depend:
 	$(MAKE) -C $(LIBGAME_DIR) depend
 	$(MAKE) -C $(GAME_EM_DIR) depend
+	$(MAKE) -C $(GAME_SP_DIR) depend
 	for i in $(SRCS); do $(CPP) $(CFLAGS) -M $$i; done > .depend
 
 ifeq (.depend,$(wildcard .depend))

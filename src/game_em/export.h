@@ -1,5 +1,5 @@
-#ifndef EXPORT_H
-#define EXPORT_H
+#ifndef GAME_SP_EXPORT_H
+#define GAME_SP_EXPORT_H
 
 /* ========================================================================= */
 /* functions and definitions exported from game_em to main program           */
@@ -743,4 +743,4 @@ extern void DrawGameDoorValues_EM();
 extern void LoadEngineSnapshotValues_EM();
 extern void SaveEngineSnapshotValues_EM();
 
-#endif	/* EXPORT_H */
+#endif	/* GAME_SP_EXPORT_H */

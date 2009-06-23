@@ -16,6 +16,7 @@
 
 #include "libgame/libgame.h"
 #include "game_em/export.h"
+#include "game_sp/export.h"
 
 
 /* ========================================================================= */

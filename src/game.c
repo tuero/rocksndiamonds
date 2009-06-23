@@ -4468,6 +4468,13 @@ void InitGame()
     /* blit playfield from scroll buffer to normal back buffer for fading in */
     BlitScreenToBitmap_EM(backbuffer);
   }
+  else if (level.game_engine_type == GAME_ENGINE_TYPE_SP)
+  {
+    InitGameEngine_SP();
+
+    /* blit playfield from scroll buffer to normal back buffer for fading in */
+    BlitScreenToBitmap_SP(backbuffer);
+  }
   else
   {
     DrawLevel();
@@ -12341,6 +12348,10 @@ void GameActions()
   {
     GameActions_EM_Main();
   }
+  else if (level.game_engine_type == GAME_ENGINE_TYPE_SP)
+  {
+    GameActions_SP_Main();
+  }
   else
   {
     GameActions_RND();
@@ -12357,6 +12368,22 @@ void GameActions_EM_Main()
     effective_action[i] = stored_player[i].effective_action;
 
   GameActions_EM(effective_action, warp_mode);
+
+  CheckLevelTime();
+
+  AdvanceFrameAndPlayerCounters(-1);	/* advance counters for all players */
+}
+
+void GameActions_SP_Main()
+{
+  byte effective_action[MAX_PLAYERS];
+  boolean warp_mode = (tape.playing && tape.warp_forward && !tape.pausing);
+  int i;
+
+  for (i = 0; i < MAX_PLAYERS; i++)
+    effective_action[i] = stored_player[i].effective_action;
+
+  GameActions_SP(effective_action, warp_mode);
 
   CheckLevelTime();
 

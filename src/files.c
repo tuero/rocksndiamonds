@@ -6160,6 +6160,9 @@ void LoadLevelFromFileInfo(struct LevelInfo *level,
 
     case LEVEL_FILE_TYPE_SP:
       LoadLevelFromFileInfo_SP(level, level_file_info);
+#if 1
+      level->game_engine_type = GAME_ENGINE_TYPE_SP;
+#endif
       break;
 
     case LEVEL_FILE_TYPE_DC:
