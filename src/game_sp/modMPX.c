@@ -144,7 +144,11 @@ void ReadMPX()
   PlayField8 = REDIM_1D(sizeof(byte), 0, FileMax + 1 - 1);
   DisPlayField = REDIM_1D(sizeof(byte), 0, FieldMax + 1 - 1);
   i = LDesc[LevelNumber].OffSet;
+#if 1
+  FILE_GET(FNum, i, PlayField8, FileMax + 1);
+#else
   FILE_GET(FNum, i, &PlayField8, sizeof(PlayField8));
+#endif
   i = i + LevelMax + 1;
   FILE_GET(FNum, i, &LInfo, sizeof(LInfo)); // store level info in an extra structure
   fclose(FNum);

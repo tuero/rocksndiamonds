@@ -44,4 +44,8 @@
 #include "modGeneralTricks.h"
 #include "modMPX.h"
 
+
+#include "main_sp.h"
+
+
 #endif /* GAME_SP_GLOBAL_H */

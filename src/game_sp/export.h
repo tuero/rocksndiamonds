@@ -1,5 +1,5 @@
-#ifndef EXPORT_H
-#define EXPORT_H
+#ifndef GAME_SP_EXPORT_H
+#define GAME_SP_EXPORT_H
 
 /* ========================================================================= */
 /* functions and definitions exported from game_sp to main program           */
@@ -61,6 +61,9 @@ extern struct GraphicInfo_SP graphic_info_sp_object[TILE_MAX][8];
 extern struct GraphicInfo_SP graphic_info_sp_player[MAX_PLAYERS][SPR_MAX][8];
 extern struct EngineSnapshotInfo_SP engine_snapshot_sp;
 
+extern void sp_open_all();
+extern void sp_close_all();
+
 extern void InitGameEngine_SP();
 extern void GameActions_SP(byte *, boolean);
 
@@ -77,4 +80,4 @@ extern void DrawGameDoorValues_SP();
 extern void LoadEngineSnapshotValues_SP();
 extern void SaveEngineSnapshotValues_SP();
 
-#endif	/* EXPORT_H */
+#endif	/* GAME_SP_EXPORT_H */

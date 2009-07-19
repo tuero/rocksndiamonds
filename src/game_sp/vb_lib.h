@@ -25,7 +25,7 @@ extern char *INT_TO_STR(int);
 
 extern boolean STRING_IS_LIKE(char *, char *);
 
-extern int FILE_GET(FILE *, int, void *, int);
+extern void FILE_GET(FILE *, int, void *, int);
 extern int FILE_PUT(FILE *, int, void *, int);
 
 /* this is just a workaround -- handle array definitions later */

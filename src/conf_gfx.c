@@ -4337,6 +4337,10 @@ struct ConfigInfo image_config[] =
   /* keyword to stop parser: "NO_MORE_ELEMENT_IMAGES" <-- do not change! */
 
 #if 1
+  { "sp_objects",				"sp_objects.pcx"	},
+#endif
+
+#if 1
   /* !!! TEMPORARILY STORED HERE -- PROBABLY TO BE CHANGED !!! */
 
   /* (for testing, change filename back to "emc_objects dot pcx") */

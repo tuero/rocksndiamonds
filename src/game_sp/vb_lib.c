@@ -7,11 +7,13 @@
 #include "vb_vars.h"
 #include "vb_lib.h"
 
+#include "main_sp.h"
+
 
 /* helper functions for constructs not supported by C */
 void *REDIM_1D(int a, int b, int c)
 {
-  return 0;
+  return checked_calloc(a * (c - b + 1));
 }
 
 void *REDIM_2D(int a, int b, int c, int d, int e)
@@ -57,9 +59,12 @@ boolean STRING_IS_LIKE(char *a, char *b)
 }
 
 
-int FILE_GET(FILE *a, int b, void *c, int d)
+void FILE_GET(FILE *a, int b, void *c, int d)
 {
-  return 0;
+  fseek(a, b, SEEK_SET);
+
+  while (d--)
+    *(byte *)c++ = fgetc(a);
 }
 
 int FILE_PUT(FILE *a, int b, void *c, int d)

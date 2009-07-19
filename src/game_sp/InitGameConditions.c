@@ -309,8 +309,11 @@ int subFetchAndInitLevelA(boolean UpdatePlayTime)
     DemoFlag = 1;
 
   GameBusyFlag = 0; // restore scissors too
+
   subFetchAndInitLevel();   // Fetch and initialize a level
+
   GameBusyFlag = 1; // no free screen write
+
   if (1 <= demo_stopped)
   {
     if (1 == demo_stopped)
@@ -343,7 +346,9 @@ int subFetchAndInitLevel()
 
   Trace("modInitGameConditions", "--> subFetchAndInitLevel");
   Trace("modInitGameConditions", "Call ReadLevel");
+
   ReadLevel();                   // Read LEVELS.DAT
+
   Trace("modInitGameConditions", "ReadLevel return subFetchAndInitLeveled");
 
   if (RecordDemoFlag == 1)
@@ -356,17 +361,27 @@ int subFetchAndInitLevel()
   // Debug.Print "FetchPlay: " & Hex(RandomSeed)
   //  End If
   GameBusyFlag = -GameBusyFlag;   // make <>1
+
   Trace("modInitGameConditions", "subConvertToEasySymbols");
+
   InfoCountInLevel = subConvertToEasySymbols(); // Convert to easy symbols
   GameBusyFlag = -GameBusyFlag;     // restore
+
   Trace("modInitGameConditions", "subDisplayLevel");
+
   subDisplayLevel();               // Paint (Init) game field
   subDisplayPanel();                 // Paint (Init) Panel
+
   ResetInfotronsNeeded(InfoCountInLevel);  // and reset Infotron count
+
   Data_SubRstFlg = 1;
+
   Trace("modInitGameConditions", "subInitGameConditions");
+
   subInitGameConditions();                 // Init game conditions (vars)
+
   InitMurphyPos();                 // Locate Murphy + screen pos
+
   Trace("modInitGameConditions", "<-- subFetchAndInitLevel");
 
   return subFetchAndInitLevel;

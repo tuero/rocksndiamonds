@@ -18,12 +18,12 @@
 #include "game_em/export.h"
 #include "game_sp/export.h"
 
+#include "game.h"
+
 
 /* ========================================================================= */
 /* functions and definitions exported from main program to game_em           */
 /* ========================================================================= */
-
-#include "game.h"
 
 extern void SetBitmaps_EM(Bitmap **);
 extern void UpdateEngineValues(int, int);
@@ -38,5 +38,13 @@ extern void InitGraphicInfo_EM(void);
 void SetGfxAnimation_EM(struct GraphicInfo_EM *, int, int, int, int);
 void getGraphicSourceObjectExt_EM(struct GraphicInfo_EM *, int, int, int, int);
 void getGraphicSourcePlayerExt_EM(struct GraphicInfo_EM *, int, int, int);
+
+
+/* ========================================================================= */
+/* functions and definitions exported from main program to game_em           */
+/* ========================================================================= */
+
+extern void SetBitmaps_SP(Bitmap **);
+
 
 #endif	/* ENGINES_H */

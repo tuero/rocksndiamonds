@@ -12,7 +12,8 @@
 # configuration
 # -----------------------------------------------------------------------------
 
-SRCS =	main.c			\
+SRCS =	init.c			\
+	main.c			\
 	vb_lib.c		\
 	vb_vars.c		\
 				\
@@ -55,7 +56,8 @@ SRCS =	main.c			\
 	modGeneralTricks.c	\
 	modMPX.c
 
-OBJS =	main.o			\
+OBJS =	init.o			\
+	main.o			\
 	vb_lib.o		\
 	vb_vars.o		\
 				\

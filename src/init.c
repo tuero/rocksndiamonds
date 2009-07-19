@@ -329,6 +329,14 @@ void SetBitmaps_EM(Bitmap **em_bitmap)
 }
 #endif
 
+#if 1
+/* !!! FIX THIS (CHANGE TO USING NORMAL ELEMENT GRAPHIC DEFINITIONS) !!! */
+void SetBitmaps_SP(Bitmap **sp_bitmap)
+{
+  *sp_bitmap = graphic_info[IMG_SP_OBJECTS].bitmap;
+}
+#endif
+
 static int getFontBitmapID(int font_nr)
 {
   int special = -1;
@@ -6223,6 +6231,10 @@ void OpenAll()
   em_open_all();
 #endif
 
+#if 1
+  sp_open_all();
+#endif
+
   if (global.autoplay_leveldir)
   {
     AutoPlayTape();
@@ -6268,6 +6280,10 @@ void CloseAllAndExit(int exit_value)
 
 #if 1
   em_close_all();
+#endif
+
+#if 1
+  sp_close_all();
 #endif
 
   FreeAllImages();

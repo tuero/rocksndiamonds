@@ -63,10 +63,12 @@ int subMainGameLoop()
   // This was a bug in the original Supaplex: sometimes red disks could not
   // be released.  This happened If Murphy was killed DURING a red disk release
   // and the next try started.
+
   RedDiskReleasePhase = 0; // (re-)enable red disk release
   UpdatedFlag = 0;
   GameLoopRunning = 1;
   LevelStatus = 0;
+
   // ----------------------------------------------------------------------------
   // --------------------- START OF GAME-BUSY LOOP ------------------------------
   // ----------------------------------------------------------------------------
@@ -117,6 +119,7 @@ locRepeatMainGameLoop:                           // start repeating game loop
   // loc_g_186F:
 
   subProcessKeyboardInput();                 // Check keyboard, act on keys
+
   // 'HACK:
   //  TimerVar = TimerVar + 1
   //  DoEvents
@@ -126,18 +129,23 @@ locRepeatMainGameLoop:                           // start repeating game loop
 
   // ----------------------------------------------------------------------------
   //
+
   subDoGameStuff();                 // do all game stuff
+
   //
   // ----------------------------------------------------------------------------
 
   //  Call subDisplayPlayingTime                 ' playing time on screen
+
   subCheckRestoreRedDiskCountDisplay();    // Restore panel: red-disk hole
 
   subRedDiskReleaseExplosion();       // Red Disk release and explode
   subFollowUpExplosions();  // every explosion may cause up to 8 following explosions
 
   bx = subCalculateScreenScrollPos();     // calculate screen start addrs
+
   ScreenPosition = bx;
+
   // Now new X and new Y are calculated, and bx = screen position = ScreenPosition
   data_h_Ytmp = ScreenScrollYPos; // copy Y for next soft scroll
   data_h_Xtmp = ScreenScrollXPos; // copy X for next soft scroll

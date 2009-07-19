@@ -34,8 +34,14 @@
 #define TILEX			(ORIG_TILEX		* ZOOM_FACTOR)
 #define TILEY			(ORIG_TILEY		* ZOOM_FACTOR)
 
+#define ORIG_SCR_MENUX		20
+#define ORIG_SCR_MENUY		12
+#define SCR_MENUX		17
+#define SCR_MENUY		12
 #define SCR_FIELDX		17
 #define SCR_FIELDY		17
+#define MAX_BUF_XSIZE		(SCR_FIELDX + 2)
+#define MAX_BUF_YSIZE		(SCR_FIELDY + 2)
 
 /* often used screen positions */
 #define SX			8
@@ -55,6 +61,10 @@
 extern struct LevelInfo_SP native_sp_level;
 
 extern struct GameInfo_SP game_sp;
+
+extern Bitmap *screenBitmap;
+
+extern Bitmap *sp_objects;
 
 
 /* ------------------------------------------------------------------------- */

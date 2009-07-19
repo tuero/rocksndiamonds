@@ -2422,10 +2422,13 @@ void menPlay_Click()
 #endif
 
   subFetchAndInitLevelB();
+
   // Trace "MainForm", "CountDown 1"
   CountDown(2, (0 == DemoFlag));
   // Trace "MainForm", "Call GoPlay"
+
   GoPlay();
+
   // Trace "MainForm", "GoPlay returned"
 
 #if 0
@@ -2451,8 +2454,11 @@ void menPlay_Click()
 
   bPlaying = False;
   // Trace "MainForm", "Call subFetchAndInitLevel"
+
   subFetchAndInitLevel();
+
   // Trace "MainForm", "subFetchAndInitLevel returned"
+
   Stage.Blt();
 
 #if 0
