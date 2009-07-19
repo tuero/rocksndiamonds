@@ -10,6 +10,8 @@ void InitGameEngine_SP()
 
 void BlitScreenToBitmap_SP(Bitmap *target_bitmap)
 {
+  BlitBitmap(screenBitmap, target_bitmap, 0, 0,
+	     SCR_FIELDX * TILEX, SCR_FIELDY * TILEY, SX, SY);
 }
 
 void GameActions_SP(byte action[MAX_PLAYERS], boolean warp_mode)

@@ -164,7 +164,7 @@ typedef struct
 {
   void (*DelayMS)(long, boolean);
   double (*TickDiffUS)(double);
-  double TickNow;
+  double (*TickNow)();
 } TickCountObject;
 
 typedef struct

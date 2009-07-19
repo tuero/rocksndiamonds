@@ -28,8 +28,10 @@ int subMainGameLoop()
 
   // int al, bx;
   int bx;
+#if 0
   TickCountObject Clock;
   currency LastFrame;
+#endif
 
   if (DemoFlag != 0)
   {
@@ -86,10 +88,16 @@ locRepeatMainGameLoop:                           // start repeating game loop
   {
     DoEvents(); // user may klick on menus or move the window here ...
   }
+#if 1
+  while (0);
+#else
   while (Clock.TickDiffUS(LastFrame) < DeltaT); // wait till its time for the next frame
+#endif
 
   //   never any additional code between here!
-  LastFrame = Clock.TickNow; // store the frame time
+#if 0
+  LastFrame = Clock.TickNow(); // store the frame time
+#endif
   //   never any additional code between here!
   if (! NoDisplayFlag) // copy the BackBuffer(=Stage) to visible screen
     Stage.Blt();
@@ -189,7 +197,11 @@ locExitMainGameLoop:
   {
     DoEvents(); // user may klick on menus or move the window here ...
   }
+#if 1
+  while (0);
+#else
   while (Clock.TickDiffUS(LastFrame) < DeltaT); // wait till its time for the next frame
+#endif
 
   Stage.Blt(); // blit the last frame
   GameLoopRunning = 0;

@@ -139,6 +139,7 @@ int FreezeZonks;
 // --- const int keySpaceRight = 8;
 // --- const int keySpace = 9;
 
+#if 0
 int *aniBug, *aniZonkRollRight, *aniZonkRollLeft;
 int *aniInfotronRollRight, *aniInfotronRollLeft;
 int *aniSnikSnak, *aniElectron, *aniExplosion;
@@ -163,9 +164,37 @@ int *aniEatInfotronLeft, *aniEatInfotronRight;
 // --- const int aniPushLeft = 45;
 // --- const int aniPushRight = 44;
 // --- const int aniPushUpDown = 79;
+#endif
+
+#if 1
+int aniBug[] = { 74, 75, 76, 77, 78, 77, 76, 77, 78, 77, 76, 75, 74, 25 };
+int aniZonkRollRight[] = { 198, 197, 196, 195, 194, 193, 192, 1, -1 };
+int aniZonkRollLeft[] = { 192, 193, 194, 195, 196, 197, 198, 1, -1 };
+int aniInfotronRollRight[] = { 206, 205, 204, 203, 202, 201, 200, 4 };
+int aniInfotronRollLeft[] = { 200, 201, 202, 203, 204, 205, 206, 4 };
+int aniSnikSnak[] = { 121, 122, 123, 124, 125, 126, 127, 120, 121 };
+int aniElectron[] = { 144, 145, 146, 147, 148, 149, 150, 151, 144 };
+int aniExplosion[] = { 3, 103, 104, 105, 106, 107, 108, 109, 0 };
+int aniTouchBase[] = { 80, 81, 82, 83, 84, 85, 86, 0, -1 };
+int aniTouchInfotron[] = { 87, 88, 89, 91, 92, 93, 0, -1 }; // Only seven frames!!!!
+int aniTouchRedDisk[] = { 96, 97, 98, 99, 100, 101, 102, 0, -1 };
+int aniMurphyExit[] = { 46, 46, 46, 46, 47, 47, 47, 47, 48, 48, 48, 48, 49, 49, 49, 49, 50, 50, 50, 50, 51, 51, 51, 51, 52, 52, 52, 52, 53, 53, 53, 53, 54, 54, 54, 54, 0, 0, 0, 0, -1 };
+int aniMurphyEatLeft[] = { 176, 177, 178, 179, 180, 181, 182, 183, -1 };
+int aniMurphyEatRight[] = { 184, 185, 186, 187, 188, 189, 190, 191, -1 };
+int aniMurphyEatUpLeft[] = { 183, 182, 181, 180, 179, 178, 177, 176, -1 };
+int aniMurphyEatUpRight[] = { 191, 190, 189, 188, 187, 186, 185, 184, -1 };
+  // aniMurphyEatRightRedDisk = { 184, 184, 185, 186, 187, 188, 189, 190, 191, -1) '9 frames!
+int aniEatInfotronLeft[] = { 209, 211, 213, 215, 217, 219, 221, 223, -1 };
+int aniEatInfotronRight[] = { 224, 226, 228, 230, 232, 234, 236, 238, -1 };
+int aniSplitUpDown[] = { 3, 3, 3, 3, 3, 3, 3, 3, -1 };
+int aniYellowDisk[] = { 18, 18, 18, 18, 18, 18, 18, 18, -1 };
+int aniOrangeDisk[] = { 8, 8, 8, 8, 8, 8, 8, 8, -1 };
+int aniRedDisk[] = { 20, -1 };
+#endif
 
 void InitGlobals()
 {
+#if 0
   aniBug = Array(74, 75, 76, 77, 78, 77, 76, 77, 78, 77, 76, 75, 74, 25);
   aniZonkRollRight = Array(198, 197, 196, 195, 194, 193, 192, 1, -1);
   aniZonkRollLeft = Array(192, 193, 194, 195, 196, 197, 198, 1, -1);
@@ -189,6 +218,8 @@ void InitGlobals()
   aniYellowDisk = Array(18, 18, 18, 18, 18, 18, 18, 18, -1);
   aniOrangeDisk = Array(8, 8, 8, 8, 8, 8, 8, 8, -1);
   aniRedDisk = Array(20, -1);
+#endif
+
   InitPseudoCompileFlags();
   UserDragFlag = False;
   AutoScrollFlag = True;

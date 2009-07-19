@@ -818,6 +818,9 @@ static void Let_LastSaveFilter(long NewVal)
 
 static void CountDown(long HalfSeconds, int bDisplayBar)
 {
+
+#if 0
+
   long i;
   int k;
   long dT, Delta;
@@ -857,6 +860,9 @@ static void CountDown(long HalfSeconds, int bDisplayBar)
 
   shpProgress.Visible = False;
   // lblFrameCount = 0
+
+#endif
+
 }
 
 #if 0
@@ -2404,7 +2410,9 @@ void menPlay_Click()
 #endif
 
   LastFrame = 0;
-  LastTick = T.TickNow;
+#if 0
+  LastTick = T.TickNow();
+#endif
 
 #if 0
 

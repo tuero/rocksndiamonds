@@ -19,10 +19,11 @@ DirectSoundBuffer PushFX;
 DirectSoundBuffer ExitFX;
 DirectSoundBuffer BaseFX;
 
-#if 0
-
 void LoadSoundFX()
 {
+
+#if 0
+
   DSBUFFERDESC bufferDesc;
   WAVEFORMATEX waveFormat;
   char *FName;
@@ -48,9 +49,10 @@ void LoadSoundFX()
   ExitFX = DSound.CreateSoundBufferFromFile(CAT(FName, "Exit.wav"), bufferDesc, waveFormat);
   PushFX = DSound.CreateSoundBufferFromFile(CAT(FName, "Push.wav"), bufferDesc, waveFormat);
   //  FXOnFlag = 0
-}
 
 #endif
+
+}
 
 void subSoundFXZonk()
 {

@@ -106,14 +106,23 @@ boolean DDSpriteBuffer_CreateFromFile(char *Path, long xSprites, long ySprites)
   }
 
   // --- On Error GoTo CreateFromFileEH
+#if 1
+  SD.LWidth  = 16 * TILEX;
+  SD.LHeight = 16 * TILEY;
+#else
   Buffer = DDraw.CreateSurfaceFromFile(Path, SD);
+#endif
   // --- On Error GoTo 0
 
+#if 0
   Buffer.GetSurfaceDesc(SD);
+#endif
+
   mSpriteWidth = SD.LWidth / xSprites;
   mSpriteHeight = SD.LHeight / ySprites;
   mXSpriteCount = xSprites;
   mYSpriteCount = ySprites;
+
   CreateFromFile = True;
   return CreateFromFile;
 
@@ -164,7 +173,9 @@ void DDSpriteBuffer_Cls(int BackColor)
 static void Blt(int pX, int pY, int SpriteX, int SpriteY)
 {
   RECT DR, SR;
+#if 0
   long Tmp;
+#endif
 
   if (NoDisplayFlag)
     return;
@@ -181,7 +192,15 @@ static void Blt(int pX, int pY, int SpriteX, int SpriteY)
     SR.right = SR.left + mSpriteWidth;
     SR.bottom = SR.top + mSpriteHeight;
   }
+
+#if 1
+  BlitBitmap(sp_objects, screenBitmap,
+	     SR.left, SR.top,
+	     mSpriteWidth, mSpriteHeight,
+	     DR.left, DR.top);
+#else
   Tmp = mDest.Blt(DR, &Buffer, SR, DDBLT_WAIT);
+#endif
 }
 
 void DDSpriteBuffer_BltEx(int pX, int pY, int SpritePos)

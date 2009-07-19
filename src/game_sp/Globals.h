@@ -129,6 +129,18 @@ extern byte *PlayField8;
 extern char *CurPath, *OrigPath, *TmpPath;
 extern currency DeltaT;
 extern int *PlayField16;
+
+#if 1
+extern int aniBug[], aniZonkRollRight[], aniZonkRollLeft[];
+extern int aniEatInfotronLeft[], aniEatInfotronRight[];
+extern int aniInfotronRollRight[], aniInfotronRollLeft[];
+extern int aniMurphyEatLeft[], aniMurphyEatRight[];
+extern int aniMurphyEatUpLeft[], aniMurphyEatUpRight[], aniSplitUpDown[];
+extern int aniMurphyExit[];
+extern int aniSnikSnak[], aniElectron[], aniExplosion[];
+extern int aniTouchBase[], aniTouchInfotron[], aniTouchRedDisk[];
+extern int aniYellowDisk[], aniOrangeDisk[], aniRedDisk[];
+#else
 extern int *aniBug, *aniZonkRollRight, *aniZonkRollLeft;
 extern int *aniEatInfotronLeft, *aniEatInfotronRight;
 extern int *aniInfotronRollRight, *aniInfotronRollLeft;
@@ -138,6 +150,8 @@ extern int *aniMurphyExit;
 extern int *aniSnikSnak, *aniElectron, *aniExplosion;
 extern int *aniTouchBase, *aniTouchInfotron, *aniTouchRedDisk;
 extern int *aniYellowDisk, *aniOrangeDisk, *aniRedDisk;
+#endif
+
 extern int FieldHeight;
 extern int FieldMax, LevelMax;
 extern int FieldWidth;
