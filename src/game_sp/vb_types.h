@@ -214,7 +214,9 @@ typedef struct
 {
   int DestXOff;
   int DestYOff;
+  void *Surface;
 
+  void (*Cls)();
   void (*Blt)();
   void (*ScrollTo)(int, int);
   void (*ScrollTowards)(int, int, double);
@@ -224,6 +226,12 @@ typedef struct
 
 typedef struct
 {
+  int DestXOff;
+  int DestYOff;
+  void *DestinationSurface;
+  void *Surface;
+
+  void (*Cls)();
   void (*BltEx)(int, int, int);
 } DDSpriteBuffer;
 

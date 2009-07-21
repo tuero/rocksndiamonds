@@ -8,6 +8,8 @@
 
 // --- Option Explicit
 
+#if 0
+
 DirectX7 DirectX;
 DirectDraw7 DirectDraw;
 DirectDrawSurface7 PrimarySurface;
@@ -46,3 +48,5 @@ void ClipToWindow(long hWnd)
   PrimarySurface.SetClipper(Clipper);
   SET_TO_NOTHING(&Clipper, sizeof(Clipper));
 }
+
+#endif

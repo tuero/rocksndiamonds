@@ -334,7 +334,7 @@ void DDScrollBuffer_SoftScrollTo(int X, int Y, long TimeMS, int FPS)
   static boolean AlreadyRunning = False;
 
 #if 1
-  printf("::: 3: X,Y ==  %d, %d [%f]\n", X, Y, Stretch);
+  printf("::: 1: DDScrollBuffer.c: DDScrollBuffer_SoftScrollTo: X,Y ==  %d, %d [%f]\n", X, Y, Stretch);
 #endif
 
   if (NoDisplayFlag)
@@ -359,7 +359,7 @@ void DDScrollBuffer_SoftScrollTo(int X, int Y, long TimeMS, int FPS)
     StepCount = 1;
 
 #if 1
-  printf("::: MARK 1: %f, %d, %ld, %ld [%d, %d, %ld, %ld]\n",
+  printf("::: 2: DDScrollBuffer.c: DDScrollBuffer_SoftScrollTo: %f, %d, %ld, %ld [%d, %d, %ld, %ld]\n",
 	 tStep, FPS, TimeMS, maxD,
 	 X, Y, mScrollX, mScrollY);
 #endif
@@ -387,10 +387,6 @@ void DDScrollBuffer_SoftScrollTo(int X, int Y, long TimeMS, int FPS)
     ScrollY = mScrollY;
     // Blt();
   }
-
-#if 1
-  printf("::: MARK 2\n");
-#endif
 
   if (UserDragFlag)
     goto SoftScrollEH;

@@ -397,10 +397,6 @@ void ReadLevel()
 
   for (i = 0; i <= FieldMax; i++)
   {
-#if 0
-    printf("::: %d: %d\n", i, PlayField8[i]);
-#endif
-
     PlayField16[i] = PlayField8[i];
     DisPlayField[i] = PlayField8[i];
     PlayField8[i] = 0;
