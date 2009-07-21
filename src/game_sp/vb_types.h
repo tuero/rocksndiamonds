@@ -287,4 +287,14 @@ typedef struct
   boolean Checked;
 } menBorderObject;
 
+typedef struct
+{
+  boolean Checked;
+} menPanelObject;
+
+typedef struct
+{
+  boolean Checked;
+} menAutoScrollObject;
+
 #endif /* VB_TYPES_H */

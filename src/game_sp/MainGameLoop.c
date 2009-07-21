@@ -248,9 +248,16 @@ int subCalculateScreenScrollPos()
     ax = MainForm.picPane.Width / 2;
     Ay = MainForm.picPane.Height / 2;
   }
+
   ScreenScrollXPos = Stretch * (MurphyScreenXPos + 8) - ax;
   ScreenScrollYPos = Stretch * (MurphyScreenYPos + 8) - Ay;
 
+#if 0
+  printf("::: MainGameLoop.c: subCalculateScreenScrollPos(): %d, %d [%d, %d] -> %d, %d\n",
+	 MainForm.picPane.Width, MainForm.picPane.Height,
+	 MurphyScreenXPos, MurphyScreenYPos,
+	 ScreenScrollXPos, ScreenScrollYPos);
+#endif
+
   return subCalculateScreenScrollPos;
 }
-

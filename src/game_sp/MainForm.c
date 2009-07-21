@@ -10,6 +10,7 @@ static void DrawFrame(int Delta);
 static void ReStretch(float NewStretch);
 static void picPane_Paint();
 static void picViewPort_Resize();
+static void menBorder_Click();
 
 #else
 
@@ -1007,7 +1008,7 @@ void DisplayLevel()
   int X, Y;
 
 #if 1
-  printf("::: MainForm.c: DisplayLevel: %d, %d, %d\n",
+  printf("::: MainForm.c: DisplayLevel(): %d, %d, %d\n",
 	 Loaded, LevelLoaded, bPlaying);
 #endif
 
@@ -1031,8 +1032,9 @@ void DisplayLevel()
   if (bPlaying)
   {
 #if 1
-    printf("::: MainForm.c: DisplayLevel: [%ld, %ld, %ld, %ld]...\n",
-	   DisplayMinY, DisplayMaxY, DisplayMinX, DisplayMaxX);
+    printf("::: MainForm.c: DisplayLevel(): [%ld, %ld, %ld, %ld] [%d, %d]...\n",
+	   DisplayMinX, DisplayMinY, DisplayMaxX, DisplayMaxY,
+	   FieldWidth, FieldHeight);
 #endif
 
     for (Y = DisplayMinY; Y <= DisplayMaxY; Y++)
@@ -1335,6 +1337,7 @@ void Form_Load()
   EditFlag = False;
   EditMode = edMove;
   // FMark = New MarkerObject; // (handle this later, if needed)
+
   InitGlobals();
 
 #if 0
@@ -1366,17 +1369,11 @@ void Form_Load()
   PauseMode = 0;
   //  BaseWidth = 16
 
-#if 0
   menBorder_Click();
-#endif
 
   Loaded = True;
 
-#if 1
-
   ReStretch(Stretch);
-
-#endif
 
 #if 0
 
@@ -1755,6 +1752,8 @@ static void menAutoScroll_Click()
   }
 }
 
+#endif
+
 static void menBorder_Click()
 {
   if (menBorder.Checked)
@@ -1766,6 +1765,7 @@ static void menBorder_Click()
     DisplayMinY = 1;
     DisplayMaxY = FieldHeight - 2;
     DisplayHeight = FieldHeight;
+
     if (Loaded && LevelLoaded)
       DrawFrame(1);
 
@@ -1779,6 +1779,7 @@ static void menBorder_Click()
     DisplayMinY = 0;
     DisplayMaxY = FieldHeight - 1;
     DisplayHeight = FieldHeight + 2;
+
     if (Loaded && LevelLoaded)
       RestoreFrame();
   }
@@ -1787,15 +1788,9 @@ static void menBorder_Click()
   // DisplayLevel True
 }
 
-#endif
-
 void SetDisplayRegion()
 {
-#if 1
-  if (0)
-#else
   if (! menBorder.Checked)
-#endif
   {
     DisplayMinX = 1;
     DisplayMaxX = FieldWidth - 2;
@@ -2450,30 +2445,33 @@ void menPlay_Click()
 #endif
 
   LastFrame = 0;
+
 #if 0
   LastTick = T.TickNow();
 #endif
 
 #if 0
-
   fpsTim.Enabled = True;
-
 #endif
 
   // DimPrimary 100
   bPlaying = True;
 
 #if 0
-
   UpdateDeltaT();
+#endif
 
+#if 1
+  printf("::: MainForm.c: menPlay_Click(): subFetchAndInitLevelB(): ...\n");
 #endif
 
   subFetchAndInitLevelB();
 
 #if 1
-  ReStretch(Stretch);
+  printf("::: MainForm.c: menPlay_Click(): subFetchAndInitLevelB(): done\n");
 #endif
+
+  ReStretch(Stretch);
 
   // Trace "MainForm", "CountDown 1"
   CountDown(2, (0 == DemoFlag));
@@ -2967,7 +2965,7 @@ static void ReStretch(float NewStretch)
 #endif
 
 #if 1
-  printf("::: MainForm.c: ReStretch: %d, %d\n", Loaded, LevelLoaded);
+  printf("::: MainForm.c: ReStretch(): %d, %d\n", Loaded, LevelLoaded);
 #endif
 
   if (! Loaded)
@@ -3029,14 +3027,25 @@ static void ReStretch(float NewStretch)
 
     if (Loaded && LevelLoaded)
     {
+#if 1
+      printf("::: MainForm.c: ReStretch(): ...\n");
+#endif
+
       SetDisplayRegion();
       picViewPort_Resize();
       DisplayLevel();
     }
 
     subCalculateScreenScrollPos();
+
+#if 1
+  printf("::: MainForm.c: ReStretch(): %d, %d\n", ScreenScrollXPos, ScreenScrollYPos);
+#endif
+
     ScrollTo(ScreenScrollXPos, ScreenScrollYPos);
+
     Stage.Blt();
+
     picPane_Paint();
   }
 
@@ -3048,7 +3057,7 @@ static void ReStretch(float NewStretch)
 static void SetScrollEdges()
 {
 #if 1
-  printf("::: SetScrollEdges ... [%ld, %ld, %ld, %ld] [%f, %d] [%d, %d, %d, %d]\n",
+  printf("::: MainForm.c: SetScrollEdges() ... [%ld, %ld, %ld, %ld] [%f, %d] [%d, %d, %d, %d]\n",
 	 DisplayMinX, DisplayMinY, DisplayMaxX, DisplayMaxY,
 	 Stretch, BaseWidth,
 	 ScrollMinX, ScrollMinY, ScrollMaxX, ScrollMaxY);
@@ -3065,7 +3074,7 @@ static void SetScrollEdges()
 #endif
 
 #if 1
-  printf("::: SetScrollEdges done [%d, %d, %d, %d]\n",
+  printf("::: MainForm.c: SetScrollEdges() done [%d, %d, %d, %d]\n",
 	 ScrollMinX, ScrollMinY, ScrollMaxX, ScrollMaxY);
 #endif
 }
@@ -3154,6 +3163,11 @@ void DrawFieldNoAnimated(int X, int Y)
           Tmp = DisPlayField[tsi];
       }
 
+#if 0
+      printf("::: MainForm.c: DrawFieldNoAnimated(): %d, %d [%d]\n",
+	     X, Y, StretchWidth);
+#endif
+
       StretchedSprites.BltEx(StretchWidth * X, StretchWidth * Y, Tmp);
       break;
   }
@@ -3218,7 +3232,13 @@ static void picViewPort_Resize()
 #endif
 
   SetScrollEdges();
+
+#if 1
+  printf("::: MainForm.c: picViewPort_Resize(): %d, %d\n", ScrollX, ScrollY);
+#endif
+
   ScrollTo(ScrollX, ScrollY);
+
   //  SizeTim.Interval = 1
 }
 

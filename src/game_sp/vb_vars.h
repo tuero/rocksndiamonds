@@ -17,6 +17,10 @@ extern cmbFileObject cmbFile;
 extern shpProgressObject shpProgress;
 extern lblFrameCountObject lblFrameCount;
 extern menBorderObject menBorder;
+extern menPanelObject menPanel;
+extern menAutoScrollObject menAutoScroll;
+
+extern MainForm_picPane picPane;
 
 extern int hWnd;
 

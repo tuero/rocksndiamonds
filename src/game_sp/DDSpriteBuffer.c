@@ -177,6 +177,10 @@ static void Blt(int pX, int pY, int SpriteX, int SpriteY)
   long Tmp;
 #endif
 
+#if 0
+  printf("::: DDSpriteBuffer.c: Blt(): %d, %d\n", pX, pY);
+#endif
+
   if (NoDisplayFlag)
     return;
 
@@ -192,6 +196,10 @@ static void Blt(int pX, int pY, int SpriteX, int SpriteY)
     SR.right = SR.left + mSpriteWidth;
     SR.bottom = SR.top + mSpriteHeight;
   }
+
+#if 0
+  printf("::: DDSpriteBuffer.c: Blt(): %d, %d\n", DR.left, DR.top);
+#endif
 
 #if 1
   BlitBitmap(sp_objects, screenBitmap,

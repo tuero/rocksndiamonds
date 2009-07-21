@@ -13,3 +13,8 @@ MainFormObject MainForm;
 lblFrameCountObject lblFrameCount;
 cmbFileObject cmbFile;
 shpProgressObject shpProgress;
+menBorderObject menBorder;
+menPanelObject menPanel;
+menAutoScrollObject menAutoScroll;
+
+MainForm_picPane picPane;

@@ -106,6 +106,10 @@ void ScrollTo(int X, int Y)
 {
   long oldX, oldY;
 
+#if 1
+  printf("::: Display.c: ScrollTo(): %d, %d\n", X, Y);
+#endif
+
   if (NoDisplayFlag)
     return;
 
@@ -148,14 +152,6 @@ void SoftScrollTo(int X, int Y, long TimeMS, int FPS)
 {
   long oldX, oldY;
 
-#if 1
-  printf("::: 1: Display.c: SoftScrollTo: X,Y == %d, %d\n", X, Y);
-  printf("::: %d, %d, %d, %d [%ld]\n",
-	 ScrollMinX, ScrollMaxX,
-	 ScrollMinY, ScrollMaxY,
-	 ScrollDelta);
-#endif
-
   if (NoDisplayFlag)
     return;
 
@@ -169,10 +165,6 @@ void SoftScrollTo(int X, int Y, long TimeMS, int FPS)
   Y = Min(Y, ScrollMaxY);
   //  ScrollX = X
   //  ScrollY = Y
-
-#if 1
-  printf("::: 2: Display.c: SoftScrollTo: X,Y == %d, %d\n", X, Y);
-#endif
 
   Stage.SoftScrollTo(X, Y, TimeMS, FPS);
 }

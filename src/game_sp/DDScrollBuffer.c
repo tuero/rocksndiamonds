@@ -141,10 +141,11 @@ void DDScrollBuffer_Blt()
   if (NoDisplayFlag)
     return;
 
-
+#if 0
   // --- On Error GoTo BltEH
   DirectX.GetWindowRect(mhWnd, DR);
   // --- On Error GoTo 0
+#endif
 
   {
     tX = (DR.right - DR.left) / Stretch;
@@ -172,6 +173,20 @@ void DDScrollBuffer_Blt()
     //      DR.top = DR.top - Stretch * (mScrollY + mDestYOff)
     //    End If
   }
+
+#if 1
+#if 0
+  printf("::: DDScrollBuffer.c: DDScrollBuffer_Blt(): blit from %d, %d [%ld, %ld] [%ld, %ld]\n",
+	 SR.left, SR.top, mScrollX, mScrollY, mDestXOff, mDestYOff);
+#endif
+
+  BlitBitmap(screenBitmap, window,
+	     SR.left, SR.top,
+             SCR_FIELDX * TILEX, SCR_FIELDY * TILEY, SX, SY);
+
+  return;
+#endif
+
   // DDraw.WaitForVerticalBlank DDWAITVB_BLOCKBEGIN, 0
   if (IS_NOTHING(&Buffer, sizeof(Buffer)))
     return;
@@ -294,6 +309,11 @@ void DDScrollBuffer_ScrollTo(int X, int Y)
   mScrollY = Y;
   ScrollX = mScrollX;
   ScrollY = mScrollY;
+
+#if 1
+  printf("::: DDScrollBuffer.c: DDScrollBuffer_ScrollTo():  mScroll: %ld, %ld [%d, %d]\n",
+	 mScrollX, mScrollY, X, Y);
+#endif
 }
 
 void DDScrollBuffer_ScrollTowards(int X, int Y, double Step)
@@ -320,6 +340,11 @@ void DDScrollBuffer_ScrollTowards(int X, int Y, double Step)
   mScrollY = mScrollY + dY * r;
   ScrollX = mScrollX;
   ScrollY = mScrollY;
+
+#if 1
+  printf("::: DDScrollBuffer.c: DDScrollBuffer_ScrollTowards():  mScroll: %ld, %ld\n",
+	 mScrollX, mScrollY);
+#endif
 }
 
 void DDScrollBuffer_SoftScrollTo(int X, int Y, long TimeMS, int FPS)
@@ -332,10 +357,6 @@ void DDScrollBuffer_SoftScrollTo(int X, int Y, long TimeMS, int FPS)
   double T, tStep;
   long oldX, oldY, maxD;
   static boolean AlreadyRunning = False;
-
-#if 1
-  printf("::: 1: DDScrollBuffer.c: DDScrollBuffer_SoftScrollTo: X,Y ==  %d, %d [%f]\n", X, Y, Stretch);
-#endif
 
   if (NoDisplayFlag)
     return;
@@ -357,12 +378,6 @@ void DDScrollBuffer_SoftScrollTo(int X, int Y, long TimeMS, int FPS)
 
   if (StepCount == 0)
     StepCount = 1;
-
-#if 1
-  printf("::: 2: DDScrollBuffer.c: DDScrollBuffer_SoftScrollTo: %f, %d, %ld, %ld [%d, %d, %ld, %ld]\n",
-	 tStep, FPS, TimeMS, maxD,
-	 X, Y, mScrollX, mScrollY);
-#endif
 
   dT = 1000 / FPS;
   tStep = (double)1 / StepCount;
@@ -403,4 +418,9 @@ void DDScrollBuffer_SoftScrollTo(int X, int Y, long TimeMS, int FPS)
 
 SoftScrollEH:
   AlreadyRunning = False;
+
+#if 1
+  printf("::: DDScrollBuffer.c: DDScrollBuffer_SoftScrollTo(): mScroll: %ld, %ld\n",
+	 mScrollX, mScrollY);
+#endif
 }

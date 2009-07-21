@@ -10,7 +10,7 @@ void InitGameEngine_SP()
 
 void BlitScreenToBitmap_SP(Bitmap *target_bitmap)
 {
-  BlitBitmap(screenBitmap, target_bitmap, 0, 0,
+  BlitBitmap(screenBitmap, target_bitmap, 15 * 32, 7 * 32,
 	     SCR_FIELDX * TILEX, SCR_FIELDY * TILEY, SX, SY);
 }
 
