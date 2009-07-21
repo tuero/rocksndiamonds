@@ -48,7 +48,11 @@ DDScrollBuffer Stage;
 byte LData[59 + 1][23 + 1];
 LevelInfoType LInfo;
 
+#if 1
+float Stretch = 1; // , StretchWidth%, TwoPixels!
+#else
 float Stretch; // , StretchWidth%, TwoPixels!
+#endif
 
 int ScrollMinX, ScrollMaxX, ScrollMinY, ScrollMaxY;
 int ScrollX, ScrollY;

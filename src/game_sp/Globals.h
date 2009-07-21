@@ -12,29 +12,44 @@
 
 #include "global.h"
 
+#if 1
+
+#define ZoomFactor			(2)
+
+#define BaseWidth 			(ZoomFactor * 16)
+#define StretchWidth 			(ZoomFactor * 16)
+#define StretchWidth2 			(StretchWidth / 2)
+#define TwoPixels 			(ZoomFactor * 2)
+
+#else
+
 #define BaseWidth 			(16)
 #define StretchWidth 			(16)
 #define StretchWidth2 			(StretchWidth / 2)
 #define TwoPixels 			(2)
-#define aniExplosionInfo 			(111)
-#define aniMurphySleepLeft 			(71)
-#define aniMurphySleepRight 			(68)
-#define aniMurphyTouchDown 			(47)
-#define aniMurphyTouchLeft 			(95)
-#define aniMurphyTouchRight 			(94)
-#define aniMurphyTouchUp 			(46)
+
+#endif
+
+#define aniExplosionInfo 		(111)
+#define aniMurphySleepLeft 		(71)
+#define aniMurphySleepRight 		(68)
+#define aniMurphyTouchDown 		(47)
+#define aniMurphyTouchLeft 		(95)
+#define aniMurphyTouchRight 		(94)
+#define aniMurphyTouchUp 		(46)
 #define aniMurphyYawn 			(56)
 #define aniPushLeft 			(45)
 #define aniPushRight 			(44)
 #define aniPushUpDown 			(79)
-#define aniSnikSnakDown 			(167)
-#define aniSnikSnakLeft 			(239)
-#define aniSnikSnakRight 			(247)
+#define aniSnikSnakDown 		(167)
+#define aniSnikSnakLeft 		(239)
+#define aniSnikSnakRight 		(247)
 #define aniSnikSnakUp 			(159)
-#define fiBase 			(2)
-#define fiBug 			(25)
+
+#define fiBase 				(2)
+#define fiBug 				(25)
 #define fiElectron 			(24)
-#define fiExit 			(7)
+#define fiExit 				(7)
 #define fiExplosion 			(0x1F)
 #define fiHWFirst 			(28)
 #define fiHWLast 			(37)
@@ -45,14 +60,14 @@
 #define fiInfotron 			(4)
 #define fiMurphy 			(3)
 #define fiOrangeDisk 			(8)
-#define fiPortAllDirections 			(23)
+#define fiPortAllDirections 		(23)
 #define fiPortDown 			(10)
 #define fiPortLeft 			(11)
-#define fiPortLeftAndRight 			(22)
+#define fiPortLeftAndRight 		(22)
 #define fiPortRight 			(9)
 #define fiPortUp 			(12)
-#define fiPortUpAndDown 			(21)
-#define fiRAM 			(5)
+#define fiPortUpAndDown 		(21)
+#define fiRAM 				(5)
 #define fiRAMBottom 			(39)
 #define fiRAMLeft 			(26)
 #define fiRAMRight 			(27)
@@ -67,7 +82,8 @@
 #define fiTerminal 			(19)
 #define fiWallSpace 			(40)
 #define fiYellowDisk 			(18)
-#define fiZonk 			(1)
+#define fiZonk 				(1)
+
 #define keyDown 			(3)
 #define keyLeft 			(2)
 #define keyNone 			(0)
@@ -77,10 +93,11 @@
 #define keySpaceLeft 			(6)
 #define keySpaceRight 			(8)
 #define keySpaceUp 			(5)
-#define keyUp 			(1)
+#define keyUp 				(1)
+
 #define posFrameCorner 			(55)
-#define posFrameHorizontal 			(111)
-#define posFrameVertical 			(110)
+#define posFrameHorizontal 		(111)
+#define posFrameVertical 		(110)
 
 extern int GetSI(int X, int Y);
 extern int GetStretchX(int si);

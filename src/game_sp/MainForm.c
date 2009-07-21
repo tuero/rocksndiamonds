@@ -1003,13 +1003,17 @@ void DisplayLevel()
 {
   int X, Y;
 
+#if 1
+  printf("::: DisplayLevel (%d, %d, %d)\n", Loaded, LevelLoaded, bPlaying);
+#endif
+
   if (! Loaded)
     return;
 
   if (! LevelLoaded)
     return;
 
-#if 0
+#if 1
   SetDisplayRegion();
 #endif
 
@@ -1022,10 +1026,18 @@ void DisplayLevel()
 
   if (bPlaying)
   {
+#if 1
+    printf("::: DisplayLevel [%ld, %ld, %ld, %ld]...\n",
+	   DisplayMinY, DisplayMaxY, DisplayMinX, DisplayMaxX);
+#endif
+
     for (Y = DisplayMinY; Y <= DisplayMaxY; Y++)
     {
       for (X = DisplayMinX; X <= DisplayMaxX; X++)
       {
+#if 0
+	printf("::: DrawFieldNoAnimated(%d, %d)\n", X, Y);
+#endif
         DrawFieldNoAnimated(X, Y);
       }
     }
@@ -1034,6 +1046,9 @@ void DisplayLevel()
     {
       for (X = DisplayMinX; X <= DisplayMaxX; X++)
       {
+#if 0
+	printf("::: DrawFieldAnimated(%d, %d)\n", X, Y);
+#endif
         DrawFieldAnimated(X, Y);
       }
     }
@@ -1045,6 +1060,9 @@ void DisplayLevel()
     {
       for (X = DisplayMinX; X <= DisplayMaxX; X++)
       {
+#if 0
+	printf("::: DrawField(%d, %d)\n", X, Y);
+#endif
         DrawField(X, Y);
       }
     }
@@ -1100,8 +1118,8 @@ static void cmbLevel_Click()
   long InfoCount;
   boolean Oldflag;
   int Msg;
-  long LastIndex;
-  boolean bBlock;
+  static long LastIndex = 0;
+  static boolean bBlock = False;
 
   if (bBlock)
     return;
@@ -1305,7 +1323,9 @@ static void Form_KeyUp(int KeyCode, int Shift)
   picPane_KeyUp(KeyCode, Shift);
 }
 
-static void Form_Load()
+#endif
+
+void Form_Load()
 {
 #if 0
 
@@ -1346,14 +1366,23 @@ static void Form_Load()
 
   picViewPort.ScaleMode = vbPixels;
 
+#endif
+
   PauseMode = 0;
   //  BaseWidth = 16
+
+#if 0
   menBorder_Click();
+#endif
+
   Loaded = True;
+
+#if 0
+
   ReStretch(Stretch);
   LoadKeyIndicators();
 
-  Show;
+  Show();
 
   FillFileList(CurPath);
   if (s.Read("ShowSplash", True))
@@ -1364,6 +1393,8 @@ static void Form_Load()
 
 #endif
 }
+
+#if 0
 
 static void FillLevelList(char *Path, int LevelIndex)
 {
@@ -1620,8 +1651,6 @@ static void DrawFrame(int Delta)
   }
 }
 
-#if 0
-
 static void RestoreFrame()
 {
   int i, LX, tY, RX, BY;
@@ -1642,6 +1671,8 @@ static void RestoreFrame()
     DrawField(RX, i);
   }
 }
+
+#if 0
 
 static void Form_Unload(int Cancel)
 {
@@ -1695,7 +1726,7 @@ static void Form_Unload(int Cancel)
 static void fpsTim_Timer()
 {
   currency TickDiff;
-  int count5;
+  static int count5 = 0;
 
   count5 = count5 + 1;
   if (4 < count5)
@@ -1756,9 +1787,15 @@ static void menBorder_Click()
   // DisplayLevel True
 }
 
+#endif
+
 void SetDisplayRegion()
 {
+#if 1
+  if (0)
+#else
   if (! menBorder.Checked)
+#endif
   {
     DisplayMinX = 1;
     DisplayMaxX = FieldWidth - 2;
@@ -1766,6 +1803,7 @@ void SetDisplayRegion()
     DisplayMinY = 1;
     DisplayMaxY = FieldHeight - 2;
     DisplayHeight = FieldHeight;
+
     if (LevelLoaded)
       DrawFrame(1);
 
@@ -1778,10 +1816,13 @@ void SetDisplayRegion()
     DisplayMinY = 0;
     DisplayMaxY = FieldHeight - 1;
     DisplayHeight = FieldHeight + 2;
+
     if (LevelLoaded)
       RestoreFrame();
   }
 }
+
+#if 0
 
 static void menCopy_Click()
 {
@@ -2089,7 +2130,7 @@ static void menPanel_Click()
 
 void Let_PanelVisible(boolean NewVal)
 {
-  boolean HidePanel;
+  static boolean HidePanel = False;
 
   if (HidePanel != NewVal)
     return;
@@ -2125,8 +2166,8 @@ static void menPaste_Click()
 
 static void menPause_Click()
 {
-  StdPicture OldPic;
-  char *OldText;
+  static StdPicture OldPic;
+  static char *OldText = 0;
 
   PauseMode = (PauseMode != 0 ?  0 :  0);
   if (PauseMode != 0)
@@ -2151,7 +2192,7 @@ static void menPlayAll_Click()
   int FNum;
   char *LogPath, *OutStr, *ReRecPath, *SPPath;
   boolean bEqual;
-  boolean QuitFlag;
+  static boolean QuitFlag = False;
 
   if (cmdPlayAll.STRING_IS_LIKE(Caption, "Play) All Demos")
   {
@@ -2364,7 +2405,6 @@ static void menSoundFX_Click()
 // static void menPlay_Click()
 void menPlay_Click()
 {
-
 #if 0
 
   boolean OldEditFlag;
@@ -2918,6 +2958,10 @@ static void ReStretch(float NewStretch)
 
   if (! Loaded)
   {
+#if 1
+    printf("::: NewStretch == %d\n", NewStretch);
+#endif
+
     Stretch = NewStretch;
     return;
   }
@@ -3168,7 +3212,7 @@ void ShowKey(int KeyVar)
   int i;
   boolean Tmp;
   long Col;
-  boolean LastState[5 + 1];
+  static boolean LastState[5 + 1];
 
   //  For i = 1 To 5
   //    State(i) = False

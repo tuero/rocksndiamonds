@@ -28,13 +28,13 @@ int subAnimateMurphy(int si)
   int tDeltaX, tDeltaY, tPos, Tmp;
 
   // Variables that hold information about the animation sequence
-  int *dx; // an array of image positions in moving.mpx, finalized with -1
-  int dx2; // an additional image position of a second sprite, for instance: yellow disk if pushed
-  int MurphyDX, MurphyDY; // murphys move steps
-  int SeqPos; // index into dx()
-  int ClearPos; // Position to clear before blitting sprites, none=-1
-  int dxPos; // field-position  to draw dx(SeqPos)
-  int dx2Step; // position of dx2 relative to dx-position
+  static int *dx = 0; // an array of image positions in moving.mpx, finalized with -1
+  static int dx2 = 0; // an additional image position of a second sprite, for instance: yellow disk if pushed
+  static int MurphyDX = 0, MurphyDY = 0; // murphys move steps
+  static int SeqPos = 0; // index into dx()
+  static int ClearPos = 0; // Position to clear before blitting sprites, none=-1
+  static int dxPos = 0; // field-position  to draw dx(SeqPos)
+  static int dx2Step = 0; // position of dx2 relative to dx-position
 
   ax = PlayField16[si];
   al = LowByte(ax);

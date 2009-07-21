@@ -184,6 +184,7 @@ void DDScrollBuffer_Blt()
   {
     switch (L)
     {
+#if 0
       case DDERR_GENERIC:
         Debug.Assert(False);
         break;
@@ -243,6 +244,7 @@ void DDScrollBuffer_Blt()
       case DDERR_SURFACEBUSY:
         Debug.Assert(False);
         break;
+#endif
 
       case DDERR_SURFACELOST:
         DDraw.RestoreAllSurfaces();
@@ -256,6 +258,7 @@ void DDScrollBuffer_Blt()
         // ClipToWindow 0
         break;
 
+#if 0
       case DDERR_UNSUPPORTED:
         Debug.Assert(False);
         break;
@@ -267,6 +270,7 @@ void DDScrollBuffer_Blt()
       default:
         Debug.Assert(False);
         break;
+#endif
     }
   }
 
@@ -321,11 +325,17 @@ void DDScrollBuffer_ScrollTowards(int X, int Y, double Step)
 void DDScrollBuffer_SoftScrollTo(int X, int Y, long TimeMS, int FPS)
 {
   double dx, dY;
+#if 0
   TickCountObject Tick;
+#endif
   long dT, StepCount;
   double T, tStep;
   long oldX, oldY, maxD;
-  boolean AlreadyRunning;
+  static boolean AlreadyRunning = False;
+
+#if 1
+  printf("::: 3: X,Y ==  %d, %d [%f]\n", X, Y, Stretch);
+#endif
 
   if (NoDisplayFlag)
     return;
@@ -348,6 +358,12 @@ void DDScrollBuffer_SoftScrollTo(int X, int Y, long TimeMS, int FPS)
   if (StepCount == 0)
     StepCount = 1;
 
+#if 1
+  printf("::: MARK 1: %f, %d, %ld, %ld [%d, %d, %ld, %ld]\n",
+	 tStep, FPS, TimeMS, maxD,
+	 X, Y, mScrollX, mScrollY);
+#endif
+
   dT = 1000 / FPS;
   tStep = (double)1 / StepCount;
   oldX = mScrollX;
@@ -360,7 +376,11 @@ void DDScrollBuffer_SoftScrollTo(int X, int Y, long TimeMS, int FPS)
       goto SoftScrollEH;
 
     // If Claim Then Exit For
+
+#if 0
     Tick.DelayMS(dT, False);
+#endif
+
     mScrollX = oldX + T * dx;
     mScrollY = oldY + T * dY;
     ScrollX = mScrollX;
@@ -368,10 +388,17 @@ void DDScrollBuffer_SoftScrollTo(int X, int Y, long TimeMS, int FPS)
     // Blt();
   }
 
+#if 1
+  printf("::: MARK 2\n");
+#endif
+
   if (UserDragFlag)
     goto SoftScrollEH;
 
+#if 0
   Tick.DelayMS(dT, False);
+#endif
+
   mScrollX = X;
   mScrollY = Y;
   ScrollX = mScrollX;

@@ -41,7 +41,7 @@ int subProcessKeyboardInput()
 {
   int subProcessKeyboardInput;
 
-  int LastKey;
+  static int LastKey = 0;
 
   //  On Error GoTo NoKeyboardAccessEH
   //    Call DKeyboard.Acquire

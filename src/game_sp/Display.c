@@ -51,7 +51,9 @@ int subDisplayLevel()
   if (NoDisplayFlag || ! LevelLoaded)
     return subDisplayLevel;
 
-#if 0
+#if 1
+  DisplayLevel();
+#else
   MainForm.DisplayLevel();
 #endif
 
@@ -117,7 +119,12 @@ void ScrollTo(int X, int Y)
   Y = Min(Y, ScrollMaxY);
   //  ScrollX = X
   //  ScrollY = Y
+
+#if 1
+  DDScrollBuffer_ScrollTo(X, Y);
+#else
   Stage.ScrollTo(X, Y);
+#endif
 }
 
 void ScrollTowards(int X, int Y)
@@ -137,12 +144,21 @@ void ScrollTowards(int X, int Y)
   Y = Min(Y, ScrollMaxY);
   //  ScrollX = X
   //  ScrollY = Y
+
+#if 1
+  DDScrollBuffer_ScrollTowards(X, Y, 2 * Stretch);
+#else
   Stage.ScrollTowards(X, Y, 2 * Stretch);
+#endif
 }
 
 void SoftScrollTo(int X, int Y, long TimeMS, int FPS)
 {
   long oldX, oldY;
+
+#if 1
+  printf("::: 1: X,Y ==  %d, %d (1)\n", X, Y);
+#endif
 
   if (NoDisplayFlag)
     return;
@@ -157,5 +173,14 @@ void SoftScrollTo(int X, int Y, long TimeMS, int FPS)
   Y = Min(Y, ScrollMaxY);
   //  ScrollX = X
   //  ScrollY = Y
+
+#if 1
+  printf("::: 2: X,Y ==  %d, %d\n", X, Y);
+#endif
+
+#if 1
+  DDScrollBuffer_SoftScrollTo(X, Y, TimeMS, FPS);
+#else
   Stage.SoftScrollTo(X, Y, TimeMS, FPS);
+#endif
 }

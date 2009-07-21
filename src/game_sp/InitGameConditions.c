@@ -102,6 +102,10 @@ int InitMurphyPosB(int si)
   MurphyScreenYPos = MurphyScreenYPos / Stretch;
 
   subCalculateScreenScrollPos();           // calculate screen start addrs
+
+  printf("::: InitGameConditions.c: ScreenScroll{X,Y}Pos %d, %d\n",
+	 ScreenScrollXPos, ScreenScrollYPos);
+
   if (AutoScrollFlag)
   {
     if (bPlaying)

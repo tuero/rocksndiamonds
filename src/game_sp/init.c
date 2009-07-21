@@ -15,6 +15,12 @@ static void BlitScreenToBitmap_SP__Stage_Blt()
 
 void sp_open_all()
 {
+#if 1
+  printf("::: sp_open_all ...\n");
+#endif
+
+  Form_Load();
+
   SetBitmaps_SP(&sp_objects);
 
   screenBitmap = CreateBitmap(MAX_BUF_XSIZE * TILEX, MAX_BUF_YSIZE * TILEY,
@@ -25,6 +31,10 @@ void sp_open_all()
   DDSpriteBuffer_CreateFromFile("[NONE]", 16, 16);
 
   Stage.Blt = &BlitScreenToBitmap_SP__Stage_Blt;
+
+#if 1
+  printf("::: sp_open_all done\n");
+#endif
 }
 
 void sp_close_all()
