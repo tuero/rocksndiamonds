@@ -35,8 +35,8 @@ static void init_global_values()
   menPanel.Checked = True;
   menAutoScroll.Checked = True;
 
-  MainForm.picPane.Width = picPane.Width = 1935;
-  MainForm.picPane.Height = picPane.Height = 1635;
+  MainForm.picPane.Width  = picPane.Width  = SCR_FIELDX * TILEX;
+  MainForm.picPane.Height = picPane.Height = SCR_FIELDY * TILEY;
 }
 
 void sp_open_all()

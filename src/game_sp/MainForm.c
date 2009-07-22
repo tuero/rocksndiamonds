@@ -3065,13 +3065,8 @@ static void SetScrollEdges()
 
   ScrollMinX = (int)(DisplayMinX - 0.5) * Stretch * BaseWidth;
   ScrollMinY = (int)(DisplayMinY - 0.5) * Stretch * BaseWidth;
-#if 1
-  ScrollMaxX = (int)(DisplayMaxX + 1.5) * Stretch * BaseWidth;
-  ScrollMaxY = (int)(DisplayMaxY + 1.5) * Stretch * BaseWidth;
-#else
   ScrollMaxX = (int)(DisplayMaxX + 1.5) * Stretch * BaseWidth - picPane.Width;
   ScrollMaxY = (int)(DisplayMaxY + 1.5) * Stretch * BaseWidth - picPane.Height;
-#endif
 
 #if 1
   printf("::: MainForm.c: SetScrollEdges() done [%d, %d, %d, %d]\n",
@@ -3165,7 +3160,7 @@ void DrawFieldNoAnimated(int X, int Y)
 
 #if 0
       printf("::: MainForm.c: DrawFieldNoAnimated(): %d, %d [%d]\n",
-	     X, Y, StretchWidth);
+	     X, Y, Tmp);
 #endif
 
       StretchedSprites.BltEx(StretchWidth * X, StretchWidth * Y, Tmp);

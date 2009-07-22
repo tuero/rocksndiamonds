@@ -59,12 +59,12 @@ boolean STRING_IS_LIKE(char *a, char *b)
 }
 
 
-void FILE_GET(FILE *a, int b, void *c, int d)
+void FILE_GET(FILE *file, int offset, void *buffer, int num_bytes)
 {
-  fseek(a, b, SEEK_SET);
+  fseek(file, offset - 1, SEEK_SET);
 
-  while (d--)
-    *(byte *)c++ = fgetc(a);
+  while (num_bytes--)
+    *(byte *)buffer++ = fgetc(file);
 }
 
 int FILE_PUT(FILE *a, int b, void *c, int d)

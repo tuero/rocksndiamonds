@@ -397,10 +397,34 @@ void ReadLevel()
 
   for (i = 0; i <= FieldMax; i++)
   {
-    PlayField16[i] = PlayField8[i];
+    PlayField16[i]  = PlayField8[i];
     DisPlayField[i] = PlayField8[i];
     PlayField8[i] = 0;
   }
+
+#if 0
+ {
+   int x, y;
+
+   for (x = 0; x < 60; x++)
+     printf("%02d.", x);
+   printf("\n");
+
+   for (x = 0; x < 60; x++)
+     printf("...");
+   printf("\n");
+
+   for (y = 0; y < 24; y++)
+   {
+     for (x = 0; x < 60; x++)
+     {
+       printf("%02d.", PlayField16[y * 60 + x]);
+     }
+
+     printf("\n");
+   }
+ }
+#endif
 
   AnimationPosTable = REDIM_1D(sizeof(int), 0, LevelMax - 2 *FieldWidth);
   AnimationSubTable = REDIM_1D(sizeof(byte), 0, LevelMax - 2 *FieldWidth);
