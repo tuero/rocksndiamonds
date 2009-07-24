@@ -5,7 +5,11 @@
 
 void InitGameEngine_SP()
 {
+#if 0
   menPlay_Click();
+#else
+  menPlayDemo_Click();
+#endif
 }
 
 void BlitScreenToBitmap_SP(Bitmap *target_bitmap)

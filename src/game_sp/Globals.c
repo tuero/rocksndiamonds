@@ -331,25 +331,39 @@ void ReadLevel()
   long i;
   // byte T;
 
+#if 1
+  // CurPath = "/home/aeglos/projects/rocksndiamonds/levels/TEST_supaplex/supaplex/levels.dat";
+  CurPath = "/home/aeglos/projects/rocksndiamonds/supaplex_demo_JENS0001.sp";
+  LevelNumber = 1;
+#endif
+
   DemoAvailable = False;
 
   if (STRING_IS_LIKE(CurPath, "*.mpx"))
   {
+    printf("::: reading MPX file ...\n");
+
     ReadMPX();
     return;
   }
 
   if (STRING_IS_LIKE(CurPath, "*.sp"))
   {
+    printf("::: reading SP file ...\n");
+
     ReadDemo();
     return;
   }
 
   if (DemoFlag != 0)
   {
+    printf("::: reading demo file ...\n");
+
     ReadDemo();
     return;
   }
+
+  printf("::: reading level file ...\n");
 
   FileMax = 0;
   FieldWidth = 60;
@@ -366,11 +380,6 @@ void ReadLevel()
 
   // --- On Error GoTo ReadLevelEH
 
-#if 1
-  CurPath = "/home/aeglos/projects/rocksndiamonds/levels/TEST_supaplex/supaplex/levels.dat";
-  LevelNumber = 1;
-#endif
-
   printf("::: '%s', %d\n", CurPath, LevelNumber);
 
   FNum = fopen(CurPath, "rb");
@@ -381,6 +390,7 @@ void ReadLevel()
 #else
   FILE_GET(FNum, i, &PlayField8, sizeof(PlayField8));
 #endif
+
   i = (LevelNumber) * ((long)(FieldMax) + 1) + 1 - HeaderSize;
   FILE_GET(FNum, i, &LInfo, sizeof(LInfo)); // store level info in an extra structure
 
@@ -426,8 +436,8 @@ void ReadLevel()
  }
 #endif
 
-  AnimationPosTable = REDIM_1D(sizeof(int), 0, LevelMax - 2 *FieldWidth);
-  AnimationSubTable = REDIM_1D(sizeof(byte), 0, LevelMax - 2 *FieldWidth);
+  AnimationPosTable = REDIM_1D(sizeof(int), 0, LevelMax - 2 * FieldWidth);
+  AnimationSubTable = REDIM_1D(sizeof(byte), 0, LevelMax - 2 * FieldWidth);
   TerminalState = REDIM_1D(sizeof(byte), FieldWidth, LevelMax - FieldWidth);
 
   GravityFlag = LInfo.InitialGravity;
@@ -455,31 +465,42 @@ static void ReadDemo()
   FieldWidth = 60;
   FieldHeight = 24;
   HeaderSize = 96;
+
   FieldMax = (FieldWidth * FieldHeight) + HeaderSize - 1;
   LevelMax = (FieldWidth * FieldHeight) - 1;
 
   // --- On Error GoTo ReadDemoEH
+
   FileMax = FileLen(CurPath) - 1;
+
   PlayField8 = REDIM_1D(sizeof(byte), 0, FileMax + 1 - 1);
   DisPlayField = REDIM_1D(sizeof(byte), 0, FieldMax + 1 - 1);
+
   // FNum = FreeFile();
+
   FNum = fopen(CurPath, "rb");
+
   i = (LevelNumber - 1) * ((long)(FieldMax) + 1) + 1;
 #if 1
   FILE_GET(FNum, i, PlayField8, FileMax + 1);
 #else
   FILE_GET(FNum, i, &PlayField8, sizeof(PlayField8));
 #endif
+
   i = (LevelNumber) * ((long)(FieldMax) + 1) + 1 - HeaderSize;
   FILE_GET(FNum, i, &LInfo, sizeof(LInfo)); // store level info in an extra structure
+
   fclose(FNum);
+
   // --- On Error GoTo 0
 
   if (FieldMax < FileMax)
     DemoAvailable = True;
 
   ReadSignature();
+
   PlayField16 = REDIM_1D(sizeof(int), -FieldWidth, FieldMax);
+
   for (i = 0; i <= FieldMax; i++)
   {
     PlayField16[i] = PlayField8[i];
@@ -487,18 +508,24 @@ static void ReadDemo()
     PlayField8[i] = 0;
   }
 
-  AnimationPosTable = REDIM_1D(sizeof(int), 0, LevelMax - 2 *FieldWidth);
-  AnimationSubTable = REDIM_1D(sizeof(byte), 0, LevelMax - 2 *FieldWidth);
+  AnimationPosTable = REDIM_1D(sizeof(int), 0, LevelMax - 2 * FieldWidth);
+  AnimationSubTable = REDIM_1D(sizeof(byte), 0, LevelMax - 2 * FieldWidth);
   TerminalState = REDIM_1D(sizeof(byte), 0, FieldMax + 1 - 1);
+
   DemoPointer = FieldMax + 1;
   DemoOffset = DemoPointer;
   DemoKeyRepeatCounter = 0;
+
   // DemoFlag = 1
   // DemoAvailable = True
+
   GravityFlag = LInfo.InitialGravity;
   FreezeZonks = LInfo.InitialFreezeZonks;
+
   RandomSeed = LInfo.DemoRandomSeed;
+
   LevelLoaded = True;
+
   return;
 
 #if 0

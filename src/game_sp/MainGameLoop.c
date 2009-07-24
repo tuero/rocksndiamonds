@@ -35,12 +35,16 @@ int subMainGameLoop()
 
   if (DemoFlag != 0)
   {
+    printf("::: playing demo ...\n");
+
     // EP set level success byte: demo, not game
     WasDemoFlag = 1;
     EP_GameDemoVar0DAA = 0; // demo
   }
   else // loc_g_1836:
   {
+    printf("::: playing game ...\n");
+
     // EP set level success byte: game, not demo
     WasDemoFlag = 0;
     EP_GameDemoVar0DAA = 1; // game
@@ -249,8 +253,13 @@ int subCalculateScreenScrollPos()
     Ay = MainForm.picPane.Height / 2;
   }
 
+#if 1
+  ScreenScrollXPos = Stretch * (MurphyScreenXPos + 16) - ax;
+  ScreenScrollYPos = Stretch * (MurphyScreenYPos + 16) - Ay;
+#else
   ScreenScrollXPos = Stretch * (MurphyScreenXPos + 8) - ax;
   ScreenScrollYPos = Stretch * (MurphyScreenYPos + 8) - Ay;
+#endif
 
 #if 0
   printf("::: MainGameLoop.c: subCalculateScreenScrollPos(): %d, %d [%d, %d] -> %d, %d\n",

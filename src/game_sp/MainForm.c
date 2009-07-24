@@ -2523,19 +2523,27 @@ void menPlay_Click()
 
 }
 
-#if 0
-
-static void menPlayDemo_Click()
+// static void menPlayDemo_Click()
+void menPlayDemo_Click()
 {
   DemoFlag = 1;
   RecordDemoFlag = 0;
+
+#if 0
   lblStatus = "Demo Playback";
+#endif
+
   menPlay_Click();
+
+#if 0
   if (LevelStatus != 1)
     lblStatus = "Demo Failed";
+#endif
 
   DemoFlag = 0;
 }
+
+#if 0
 
 static void menRec_Click()
 {

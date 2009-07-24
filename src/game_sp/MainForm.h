@@ -28,6 +28,7 @@ extern void menEdit_Click();
 extern void menPlaySpeed_Click(int Index);
 extern void menStop_Click();
 extern void menPlay_Click();
+extern void menPlayDemo_Click();
 extern void Form_Load();
 
 #endif /* MAINFORM_H */

@@ -9,6 +9,8 @@
 
 #include "main_sp.h"
 
+#include <sys/stat.h>
+
 
 /* helper functions for constructs not supported by C */
 void *REDIM_1D(int a, int b, int c)
@@ -55,7 +57,16 @@ char *INT_TO_STR(int a)
 
 boolean STRING_IS_LIKE(char *a, char *b)
 {
-  return 0;
+  if (*b == '*')		// something like "*.sp"
+  {
+    return (strSuffix(a, &b[1]));
+  }
+  else
+  {
+    // more sophisticated patterns currently not supported
+
+    return 0;
+  }
 }
 
 
@@ -154,7 +165,16 @@ char *Hex(int a)
 
 int FileLen(char *a)
 {
-  return 0;
+  struct stat buffer;
+
+  if (stat(a, &buffer) == 0)
+  {
+    return buffer.st_size;
+  }
+  else
+  {
+    return 0;
+  }
 }
 
 long GetTickCount()
