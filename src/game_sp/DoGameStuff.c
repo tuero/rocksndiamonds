@@ -25,7 +25,7 @@ int subDoGameStuff()
 
   int si, cx, dx, bl;
 
-  subAnimateMurphy(MurphyPosIndex);       // move Murphy in any direction
+  subAnimateMurphy(&MurphyPosIndex);       // move Murphy in any direction
 
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   // Build a database of locations and subs-to-call of animatable fields only:
@@ -66,12 +66,21 @@ int subDoGameStuff()
     } // loop    locloop_g_22B8          ' until all animatables done
   }
 
+#if 1
+  printf("::: DoGameStuff.c: KillMurphyFlag == %d [%d]\n",
+	 KillMurphyFlag, MurphyMoveCounter);
+#endif
+
   // All animations are done now
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   if (KillMurphyFlag == 1 || MurphyMoveCounter == 0)
   {
     if (LeadOutCounter == 0)
     {
+#if 1
+      printf("::: DoGameStuff.c: killing murphy [%d] ...\n", KillMurphyFlag);
+#endif
+
       KillMurphyFlag = 0;             // no more "kill Murphy"
       ExplodeFieldSP(MurphyExplodePos);                 // Explode
       LeadOutCounter = 0x40;           // quit: start lead-out

@@ -142,7 +142,11 @@ locRepeatMainGameLoop:                           // start repeating game loop
   // ----------------------------------------------------------------------------
   //
 
+  printf("::: MainGameLoop.c: subDoGameStuff() START\n");
+
   subDoGameStuff();                 // do all game stuff
+
+  printf("::: MainGameLoop.c: subDoGameStuff() END\n");
 
   //
   // ----------------------------------------------------------------------------

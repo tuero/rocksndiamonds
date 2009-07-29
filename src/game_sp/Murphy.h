@@ -13,7 +13,7 @@
 #include "global.h"
 
 extern int subAdjustZonksInfotronsAboveMurphy(int si);
-extern int subAnimateMurphy(int si);
+extern int subAnimateMurphy(int *si);
 extern void subCopyFieldToScreen(int si, int fi);
 extern int subExplodeSnikSnaksBelow(int si);
 extern int subSpPortTest(int si);

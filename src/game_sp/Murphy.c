@@ -18,7 +18,7 @@ static boolean subMoveKillsMurphy(int si, int ax, int bl);
 // Move Murphy in any direction
 // ==========================================================================
 
-int subAnimateMurphy(int si)
+int subAnimateMurphy(int *si)
 {
   int subAnimateMurphy;
 
@@ -36,8 +36,14 @@ int subAnimateMurphy(int si)
   static int dxPos = 0; // field-position  to draw dx(SeqPos)
   static int dx2Step = 0; // position of dx2 relative to dx-position
 
-  ax = PlayField16[si];
+  ax = PlayField16[*si];
   al = LowByte(ax);
+
+#if 1
+  printf("::: Murphy.c: subAnimateMurphy(): %d [%d, %d] %d, %d [%d]\n",
+	 *si, *si % 60, *si / 60, ax, al, (al == fiMurphy));
+#endif
+
   if (al != fiMurphy)
   {
     MurphyMoveCounter = 0;             // We have no Murphy! Exit!
@@ -45,25 +51,25 @@ int subAnimateMurphy(int si)
   }
 
   MurphyMoveCounter = 1;             // We have a Murphy!
-  MurphyExplodePos = si;
+  MurphyExplodePos = *si;
   if (ax != 3) // yes--go proceed moving murphy?
     goto locProceedMovingMurphy;
 
   // FS: reset moving sequence variables
   MurphyDX = 0;
   MurphyDY = 0;
-  ClearPos = si;
-  dxPos = si;
+  ClearPos = *si;
+  dxPos = *si;
   dx2 = -1;
   SeqPos = 0;
   // end of FS
   ScratchGravity = 0; // scratch gravity off
   if (GravityFlag != 0) // Gravity? (1=gravity on)
   {
-    bl = LowByte(PlayField16[si - FieldWidth]); // check above
+    bl = LowByte(PlayField16[*si - FieldWidth]); // check above
     if (! (bl == fiPortUp || bl == fiPortUpAndDown || bl == fiPortAllDirections))
     {
-      if (PlayField16[si + FieldWidth] == 0) // gravity on and space below!
+      if (PlayField16[*si + FieldWidth] == 0) // gravity on and space below!
         ScratchGravity = 1;
     }
   } // loc_g_5E8B:
@@ -88,7 +94,7 @@ int subAnimateMurphy(int si)
   YawnSleepCounter = YawnSleepCounter + 1;
   if (YawnSleepCounter == 4)
   {
-    subCopyFieldToScreen(si, fiMurphy); // normal grin
+    subCopyFieldToScreen(*si, fiMurphy); // normal grin
     return subAnimateMurphy;
   } // loc_g_5ECE:
 
@@ -98,7 +104,7 @@ int subAnimateMurphy(int si)
   if (YawnSleepCounter <= 522)
   {
     bx = (YawnSleepCounter - 500) / 2;
-    subCopyFieldToScreen(si, aniMurphyYawn + bx); // yawn! and look depressed afterwards...
+    subCopyFieldToScreen(*si, aniMurphyYawn + bx); // yawn! and look depressed afterwards...
     return subAnimateMurphy;
   } // loc_g_5F00:
 
@@ -108,7 +114,7 @@ int subAnimateMurphy(int si)
   if (YawnSleepCounter <= 1022)
   {
     bx = (YawnSleepCounter - 1000) / 2;
-    subCopyFieldToScreen(si, aniMurphyYawn + bx); // yawn again!
+    subCopyFieldToScreen(*si, aniMurphyYawn + bx); // yawn again!
     return subAnimateMurphy;
   } // loc_g_5F32:
 
@@ -118,16 +124,16 @@ int subAnimateMurphy(int si)
   if (YawnSleepCounter <= 1622)
   {
     bx = (YawnSleepCounter - 1600) / 2;
-    subCopyFieldToScreen(si, aniMurphyYawn + bx); // yawn again! - third time
+    subCopyFieldToScreen(*si, aniMurphyYawn + bx); // yawn again! - third time
     return subAnimateMurphy;
   } // loc_g_5F64:
 
   if (YawnSleepCounter > 1654)
     return subAnimateMurphy;
 
-  if (PlayField16[si - 1] == 0)
+  if (PlayField16[*si - 1] == 0)
   {
-    if (PlayField16[si + 1] == 0)
+    if (PlayField16[*si + 1] == 0)
     {
       YawnSleepCounter = 36;
       return subAnimateMurphy;
@@ -136,13 +142,13 @@ int subAnimateMurphy(int si)
     else
     {
       bx = (YawnSleepCounter - 1622) / 16;
-      subCopyFieldToScreen(si, aniMurphySleepRight + bx); // go to sleep
+      subCopyFieldToScreen(*si, aniMurphySleepRight + bx); // go to sleep
       return subAnimateMurphy;
     }
   } // loc_g_5F81:
 
   bx = (YawnSleepCounter - 1622) / 16;
-  subCopyFieldToScreen(si, aniMurphySleepLeft + bx); // go to sleep
+  subCopyFieldToScreen(*si, aniMurphySleepLeft + bx); // go to sleep
   return subAnimateMurphy;
 
   // end of YAWN-SLEEP-Sequence
@@ -155,24 +161,24 @@ locKeyPressed5FCF:
   if (ScratchGravity == 0)
     goto loc_g_6003;
 
-  if (PlayField16[si + FieldWidth] != 0)
+  if (PlayField16[*si + FieldWidth] != 0)
     goto loc_g_6003;
 
   if (bl == keyUp)
   {
-    if (PlayField16[si - FieldWidth] == fiBase)
+    if (PlayField16[*si - FieldWidth] == fiBase)
       goto loc_g_6003;
 
   }
   else if (bl == keyLeft)
   {
-    if (PlayField16[si - 1] == fiBase)
+    if (PlayField16[*si - 1] == fiBase)
       goto loc_g_6003;
 
   }
   else if (bl == keyRight)
   {
-    if (PlayField16[si + 1] == fiBase)
+    if (PlayField16[*si + 1] == fiBase)
       goto loc_g_6003;
   } // loc_g_6001:
 
@@ -247,7 +253,7 @@ loc_g_6078:
   // FS:
   MurphyDY = -2;
   // end of FS
-  ax = PlayField16[si - FieldWidth];
+  ax = PlayField16[*si - FieldWidth];
   al = LowByte(ax);
   if (ax == fiSpace)
     goto loc_g_6312;
@@ -276,7 +282,7 @@ loc_g_6078:
   if (al == fiYellowDisk)
     goto loc_g_6AB8;
 
-  if (! subMoveKillsMurphy(si - FieldWidth, ax, bl))
+  if (! subMoveKillsMurphy(*si - FieldWidth, ax, bl))
     goto loc_g_6078;
 
   return subAnimateMurphy;
@@ -290,7 +296,7 @@ loc_g_60DA:
   MurphyDX = -2;
   // end of FS
   MurphyVarFaceLeft = 1;
-  ax = PlayField16[si - 1];
+  ax = PlayField16[*si - 1];
   al = LowByte(ax);
   if (ax == fiSpace)
     goto loc_g_6341;
@@ -325,7 +331,7 @@ loc_g_60DA:
   if (ax == fiOrangeDisk)
     goto loc_g_6B9B;
 
-  if (! subMoveKillsMurphy(si - 1, ax, bl))
+  if (! subMoveKillsMurphy(*si - 1, ax, bl))
     goto loc_g_60DA;
 
   return subAnimateMurphy;
@@ -338,7 +344,7 @@ loc_g_6154:
   // FS:
   MurphyDY = 2;
   // end of FS
-  ax = PlayField16[si + FieldWidth];
+  ax = PlayField16[*si + FieldWidth];
   al = LowByte(ax);
   if (ax == fiSpace)
     goto loc_g_6364;
@@ -367,7 +373,7 @@ loc_g_6154:
   if (al == fiYellowDisk)
     goto loc_g_6B2A;
 
-  if (! subMoveKillsMurphy(si + FieldWidth, ax, bl))
+  if (! subMoveKillsMurphy(*si + FieldWidth, ax, bl))
     goto loc_g_6154;
 
   return subAnimateMurphy;
@@ -381,7 +387,7 @@ loc_g_61B6:
   MurphyDX = 2;
   // end of FS
   MurphyVarFaceLeft = 0;
-  ax = PlayField16[si + 1];
+  ax = PlayField16[*si + 1];
   al = LowByte(ax);
   if (ax == fiSpace)
     goto loc_g_6399;
@@ -416,7 +422,7 @@ loc_g_61B6:
   if (ax == fiOrangeDisk)
     goto loc_g_6BD3;
 
-  if (! subMoveKillsMurphy(si + 1, ax, bl))
+  if (! subMoveKillsMurphy(*si + 1, ax, bl))
     goto loc_g_61B6;
 
   return subAnimateMurphy;
@@ -428,9 +434,9 @@ loc_g_61B6:
 loc_g_622E:
   // FS:
   ClearPos = -1;
-  dxPos = si - FieldWidth;
+  dxPos = *si - FieldWidth;
   // end of FS
-  ax = PlayField16[si - FieldWidth];
+  ax = PlayField16[*si - FieldWidth];
   al = LowByte(ax);
   al = LowByte(ax);
   if (ax == fiBase)
@@ -457,10 +463,10 @@ loc_g_622E:
 loc_g_6258:
   // FS:
   ClearPos = -1;
-  dxPos = si - 1;
+  dxPos = *si - 1;
   // end of FS
   MurphyVarFaceLeft = 1;
-  ax = PlayField16[si - 1];
+  ax = PlayField16[*si - 1];
   al = LowByte(ax);
   if (ax == fiBase)
     goto loc_g_651D;
@@ -486,9 +492,9 @@ loc_g_6258:
 loc_g_6288:
   // FS:
   ClearPos = -1;
-  dxPos = si + FieldWidth;
+  dxPos = *si + FieldWidth;
   // end of FS
-  ax = PlayField16[si + FieldWidth];
+  ax = PlayField16[*si + FieldWidth];
   al = LowByte(ax);
   if (ax == fiBase)
     goto loc_g_655B;
@@ -514,10 +520,10 @@ loc_g_6288:
 loc_g_62B2:
   // FS:
   ClearPos = -1;
-  dxPos = si + 1;
+  dxPos = *si + 1;
   // end of FS
   MurphyVarFaceLeft = 0;
-  ax = PlayField16[si + 1];
+  ax = PlayField16[*si + 1];
   al = LowByte(ax);
   if (ax == fiBase)
     goto loc_g_6599;
@@ -553,11 +559,11 @@ loc_g_62E2:
   if (LowByte(RedDiskReleaseFlag) != 1)
     return subAnimateMurphy;
 
-  MovHighByte(&PlayField16[si], 0x2A);
+  MovHighByte(&PlayField16[*si], 0x2A);
   MovingPictureSequencePhase = 0x40; // init picture move sequence
   dx = aniRedDisk;
   MovLowByte(&RedDiskReleasePhase, 1);
-  Mov(&RedDiskReleaseMurphyPos, si);             // remember Murphy's location
+  Mov(&RedDiskReleaseMurphyPos, *si);             // remember Murphy's location
   goto loc_Split;
 
   // ==========================================================================
@@ -566,9 +572,9 @@ loc_g_62E2:
 
 loc_g_6312:
   dx = (MurphyVarFaceLeft == 0 ?  aniMurphyEatUpRight :  aniMurphyEatUpRight);
-  PlayField16[si - FieldWidth] = 0x103;
-  PlayField16[si] = 0x300;
-  si = si - FieldWidth;
+  PlayField16[*si - FieldWidth] = 0x103;
+  PlayField16[*si] = 0x300;
+  *si = *si - FieldWidth;
   goto loc_StopNoSplit;
 
   // ==========================================================================
@@ -577,9 +583,9 @@ loc_g_6312:
 
 loc_g_6341:
   dx = aniMurphyEatLeft;
-  PlayField16[si - 1] = 0x203;
-  PlayField16[si] = 0x300;
-  si = si - 1;
+  PlayField16[*si - 1] = 0x203;
+  PlayField16[*si] = 0x300;
+  *si = *si - 1;
   goto loc_StopNoSplit;
 
   // ==========================================================================
@@ -588,9 +594,9 @@ loc_g_6341:
 
 loc_g_6364:
   dx = (MurphyVarFaceLeft == 0 ?  aniMurphyEatUpRight :  aniMurphyEatUpRight);
-  PlayField16[si + FieldWidth] = 0x303;
-  PlayField16[si] = 0x300;
-  si = si + FieldWidth;
+  PlayField16[*si + FieldWidth] = 0x303;
+  PlayField16[*si] = 0x300;
+  *si = *si + FieldWidth;
   goto loc_StopNoSplit;
 
   // ==========================================================================
@@ -599,9 +605,9 @@ loc_g_6364:
 
 loc_g_6399:
   dx = aniMurphyEatRight;
-  PlayField16[si + 1] = 0x403;
-  PlayField16[si] = 0x300;
-  si = si + 1;
+  PlayField16[*si + 1] = 0x403;
+  PlayField16[*si] = 0x300;
+  *si = *si + 1;
   goto loc_StopNoSplit;
 
   // ==========================================================================
@@ -609,13 +615,13 @@ loc_g_6399:
   // ==========================================================================
 
 loc_g_63C2:
-  if (SgnHighByte(PlayField16[si - FieldWidth]) >= 0)
+  if (SgnHighByte(PlayField16[*si - FieldWidth]) >= 0)
   {
-    ExplodeFieldSP(si);                 // Explode
+    ExplodeFieldSP(*si);                 // Explode
     return subAnimateMurphy;
   }
 
-  PlayField16[si - FieldWidth] = fiBase;
+  PlayField16[*si - FieldWidth] = fiBase;
   // ==========================================================================
   // BASE moving down to up
   // ==========================================================================
@@ -623,9 +629,9 @@ loc_g_63C2:
 loc_g_63D3:
   subSoundFXBase();
   dx = (MurphyVarFaceLeft == 0 ?  aniMurphyEatUpRight :  aniMurphyEatUpRight);
-  PlayField16[si - FieldWidth] = 0x503;
-  PlayField16[si] = 0x300;
-  si = si - FieldWidth;
+  PlayField16[*si - FieldWidth] = 0x503;
+  PlayField16[*si] = 0x300;
+  *si = *si - FieldWidth;
   goto loc_StopNoSplit;
 
   // ==========================================================================
@@ -633,13 +639,13 @@ loc_g_63D3:
   // ==========================================================================
 
 loc_g_640B:
-  if (SgnHighByte(PlayField16[si - 1]) >= 0)
+  if (SgnHighByte(PlayField16[*si - 1]) >= 0)
   {
-    ExplodeFieldSP(si);                 // Explode
+    ExplodeFieldSP(*si);                 // Explode
     return subAnimateMurphy;
   }
 
-  PlayField16[si - 1] = fiBase;
+  PlayField16[*si - 1] = fiBase;
   // ==========================================================================
   // BASE moving right to left
   // ==========================================================================
@@ -647,9 +653,9 @@ loc_g_640B:
 loc_g_641C:
   subSoundFXBase();
   dx = aniMurphyEatLeft;
-  PlayField16[si - 1] = 0x203;
-  PlayField16[si] = 0x300;
-  si = si - 1;
+  PlayField16[*si - 1] = 0x203;
+  PlayField16[*si] = 0x300;
+  *si = *si - 1;
   goto loc_StopNoSplit;
 
   // ==========================================================================
@@ -657,13 +663,13 @@ loc_g_641C:
   // ==========================================================================
 
 loc_g_6448:
-  if (SgnHighByte(PlayField16[si + FieldWidth]) >= 0)
+  if (SgnHighByte(PlayField16[*si + FieldWidth]) >= 0)
   {
-    ExplodeFieldSP(si);                 // Explode
+    ExplodeFieldSP(*si);                 // Explode
     return subAnimateMurphy;
   }
 
-  PlayField16[si + FieldWidth] = fiBase;
+  PlayField16[*si + FieldWidth] = fiBase;
   // ==========================================================================
   // BASE moving up to down
   // ==========================================================================
@@ -671,9 +677,9 @@ loc_g_6448:
 loc_g_6459:
   subSoundFXBase();
   dx = (MurphyVarFaceLeft == 0 ?  aniMurphyEatUpRight :  aniMurphyEatUpRight);
-  PlayField16[si + FieldWidth] = 0x703;
-  PlayField16[si] = 0x300;
-  si = si + FieldWidth;
+  PlayField16[*si + FieldWidth] = 0x703;
+  PlayField16[*si] = 0x300;
+  *si = *si + FieldWidth;
   goto loc_StopNoSplit;
 
   // ==========================================================================
@@ -681,13 +687,13 @@ loc_g_6459:
   // ==========================================================================
 
 loc_g_6491:
-  if (SgnHighByte(PlayField16[si + 1]) >= 0)
+  if (SgnHighByte(PlayField16[*si + 1]) >= 0)
   {
-    ExplodeFieldSP(si);                 // Explode
+    ExplodeFieldSP(*si);                 // Explode
     return subAnimateMurphy;
   }
 
-  PlayField16[si + 1] = fiBase;
+  PlayField16[*si + 1] = fiBase;
   // ==========================================================================
   // BASE moving left to right
   // ==========================================================================
@@ -695,9 +701,9 @@ loc_g_6491:
 loc_g_64A2:
   subSoundFXBase();
   dx = aniMurphyEatRight;
-  PlayField16[si + 1] = 0x803;
-  PlayField16[si] = 0x300;
-  si = si + 1;
+  PlayField16[*si + 1] = 0x803;
+  PlayField16[*si] = 0x300;
+  *si = *si + 1;
   goto loc_StopNoSplit;
 
   // ==========================================================================
@@ -705,23 +711,23 @@ loc_g_64A2:
   // ==========================================================================
 
 loc_g_64CE:
-  if (SgnHighByte(PlayField16[si - FieldWidth]) >= 0)
+  if (SgnHighByte(PlayField16[*si - FieldWidth]) >= 0)
   {
-    ExplodeFieldSP(si);                 // Explode
+    ExplodeFieldSP(*si);                 // Explode
     return subAnimateMurphy;
   }
 
-  PlayField16[si - FieldWidth] = fiBase;
+  PlayField16[*si - FieldWidth] = fiBase;
   // ==========================================================================
   // BASE touching down to up
   // ==========================================================================
 
 loc_g_64DF:
-  subCopyFieldToScreen(si, aniMurphyTouchUp);
+  subCopyFieldToScreen(*si, aniMurphyTouchUp);
   subSoundFXBase();
   dx = aniTouchBase;
-  dxPos = si - FieldWidth;
-  MovHighByte(&PlayField16[si], 0x10);
+  dxPos = *si - FieldWidth;
+  MovHighByte(&PlayField16[*si], 0x10);
   goto loc_StopNoSplit;
 
   // ==========================================================================
@@ -729,23 +735,23 @@ loc_g_64DF:
   // ==========================================================================
 
 loc_g_650C:
-  if (SgnHighByte(PlayField16[si - 1]) >= 0)
+  if (SgnHighByte(PlayField16[*si - 1]) >= 0)
   {
-    ExplodeFieldSP(si);                 // Explode
+    ExplodeFieldSP(*si);                 // Explode
     return subAnimateMurphy;
   }
 
-  PlayField16[si - 1] = fiBase;
+  PlayField16[*si - 1] = fiBase;
   // ==========================================================================
   // BASE touching right to left
   // ==========================================================================
 
 loc_g_651D:
-  subCopyFieldToScreen(si, aniMurphyTouchLeft);
+  subCopyFieldToScreen(*si, aniMurphyTouchLeft);
   subSoundFXBase();
   dx = aniTouchBase;
-  dxPos = si - 1;
-  MovHighByte(&PlayField16[si], 0x11);
+  dxPos = *si - 1;
+  MovHighByte(&PlayField16[*si], 0x11);
   goto loc_StopNoSplit;
 
   // ==========================================================================
@@ -753,23 +759,23 @@ loc_g_651D:
   // ==========================================================================
 
 loc_g_654A:
-  if (SgnHighByte(PlayField16[si + FieldWidth]) >= 0)
+  if (SgnHighByte(PlayField16[*si + FieldWidth]) >= 0)
   {
-    ExplodeFieldSP(si);                 // Explode
+    ExplodeFieldSP(*si);                 // Explode
     return subAnimateMurphy;
   }
 
-  PlayField16[si + FieldWidth] = fiBase;
+  PlayField16[*si + FieldWidth] = fiBase;
   // ==========================================================================
   // BASE touching up to down
   // ==========================================================================
 
 loc_g_655B:
-  subCopyFieldToScreen(si, aniMurphyTouchDown);
+  subCopyFieldToScreen(*si, aniMurphyTouchDown);
   subSoundFXBase();
   dx = aniTouchBase;
-  dxPos = si + FieldWidth;
-  MovHighByte(&PlayField16[si], 0x12);
+  dxPos = *si + FieldWidth;
+  MovHighByte(&PlayField16[*si], 0x12);
   goto loc_StopNoSplit;
 
   // ==========================================================================
@@ -777,23 +783,23 @@ loc_g_655B:
   // ==========================================================================
 
 loc_g_6588:
-  if (SgnHighByte(PlayField16[si + 1]) >= 0)
+  if (SgnHighByte(PlayField16[*si + 1]) >= 0)
   {
-    ExplodeFieldSP(si);                 // Explode
+    ExplodeFieldSP(*si);                 // Explode
     return subAnimateMurphy;
   }
 
-  PlayField16[si + 1] = fiBase;
+  PlayField16[*si + 1] = fiBase;
   // ==========================================================================
   // BASE touching left to right
   // ==========================================================================
 
 loc_g_6599:
-  subCopyFieldToScreen(si, aniMurphyTouchRight);
+  subCopyFieldToScreen(*si, aniMurphyTouchRight);
   subSoundFXBase();
   dx = aniTouchBase;
-  dxPos = si + 1;
-  MovHighByte(&PlayField16[si], 0x13);
+  dxPos = *si + 1;
+  MovHighByte(&PlayField16[*si], 0x13);
   goto loc_StopNoSplit;
 
   // ==========================================================================
@@ -803,9 +809,9 @@ loc_g_6599:
 loc_g_65C6:
   subSoundFXInfotron();
   dx = (MurphyVarFaceLeft == 0 ?  aniMurphyEatUpRight :  aniMurphyEatUpRight);
-  PlayField16[si - FieldWidth] = 0x903;
-  PlayField16[si] = 0x300;
-  si = si - FieldWidth;
+  PlayField16[*si - FieldWidth] = 0x903;
+  PlayField16[*si] = 0x300;
+  *si = *si - FieldWidth;
   goto loc_StopNoSplit;
 
   // ==========================================================================
@@ -818,9 +824,9 @@ loc_g_65FE:
   dx2 = fiInfotron;
   dx2Step = -1;
   ClearPos = -1;
-  PlayField16[si - 1] = 0xA03;
-  PlayField16[si] = 0x300;
-  si = si - 1;
+  PlayField16[*si - 1] = 0xA03;
+  PlayField16[*si] = 0x300;
+  *si = *si - 1;
   goto loc_StopNoSplit;
 
   // ==========================================================================
@@ -830,9 +836,9 @@ loc_g_65FE:
 loc_g_662A:
   subSoundFXInfotron();
   dx = (MurphyVarFaceLeft == 0 ?  aniMurphyEatUpRight :  aniMurphyEatUpRight);
-  PlayField16[si + FieldWidth] = 0xB03;
-  PlayField16[si] = 0x300;
-  si = si + FieldWidth;
+  PlayField16[*si + FieldWidth] = 0xB03;
+  PlayField16[*si] = 0x300;
+  *si = *si + FieldWidth;
   goto loc_StopNoSplit;
 
   // ==========================================================================
@@ -845,9 +851,9 @@ loc_g_6662:
   dx2 = fiInfotron;
   dx2Step = 1;
   ClearPos = -1;
-  PlayField16[si + 1] = 0xC03;
-  PlayField16[si] = 0x300;
-  si = si + 1;
+  PlayField16[*si + 1] = 0xC03;
+  PlayField16[*si] = 0x300;
+  *si = *si + 1;
   goto loc_StopNoSplit;
 
   // ==========================================================================
@@ -855,11 +861,11 @@ loc_g_6662:
   // ==========================================================================
 
 loc_g_668E:
-  subCopyFieldToScreen(si, aniMurphyTouchUp);
+  subCopyFieldToScreen(*si, aniMurphyTouchUp);
   subSoundFXInfotron();
   dx = aniTouchInfotron;
-  MovHighByte(&PlayField16[si], 0x14);
-  MovHighByte(&PlayField16[si - FieldWidth], 0xFF);
+  MovHighByte(&PlayField16[*si], 0x14);
+  MovHighByte(&PlayField16[*si - FieldWidth], 0xFF);
   goto loc_StopNoSplit;
 
   // ==========================================================================
@@ -867,11 +873,11 @@ loc_g_668E:
   // ==========================================================================
 
 loc_g_66C0:
-  subCopyFieldToScreen(si, aniMurphyTouchLeft);
+  subCopyFieldToScreen(*si, aniMurphyTouchLeft);
   subSoundFXInfotron();
   dx = aniTouchInfotron;
-  MovHighByte(&PlayField16[si], 0x15);
-  MovHighByte(&PlayField16[si - 1], 0xFF);
+  MovHighByte(&PlayField16[*si], 0x15);
+  MovHighByte(&PlayField16[*si - 1], 0xFF);
   goto loc_StopNoSplit;
 
   // ==========================================================================
@@ -879,11 +885,11 @@ loc_g_66C0:
   // ==========================================================================
 
 loc_g_66F2:
-  subCopyFieldToScreen(si, aniMurphyTouchDown);
+  subCopyFieldToScreen(*si, aniMurphyTouchDown);
   subSoundFXInfotron();
   dx = aniTouchInfotron;
-  MovHighByte(&PlayField16[si], 0x16);
-  MovHighByte(&PlayField16[si + FieldWidth], 0xFF);
+  MovHighByte(&PlayField16[*si], 0x16);
+  MovHighByte(&PlayField16[*si + FieldWidth], 0xFF);
   goto loc_StopNoSplit;
 
   // ==========================================================================
@@ -891,11 +897,11 @@ loc_g_66F2:
   // ==========================================================================
 
 loc_g_6724:
-  subCopyFieldToScreen(si, aniMurphyTouchRight);
+  subCopyFieldToScreen(*si, aniMurphyTouchRight);
   subSoundFXInfotron();
   dx = aniTouchInfotron;
-  MovHighByte(&PlayField16[si], 0x17);
-  MovHighByte(&PlayField16[si + 1], 0xFF);
+  MovHighByte(&PlayField16[*si], 0x17);
+  MovHighByte(&PlayField16[*si + 1], 0xFF);
   goto loc_StopNoSplit;
 
   // ==========================================================================
@@ -930,7 +936,7 @@ loc_g_6756:
 
   LeadOutCounter = 0x40;          // quit: start lead-out
   dx = aniMurphyExit;
-  MovHighByte(&PlayField16[si], 0xD);
+  MovHighByte(&PlayField16[*si], 0xD);
   goto loc_StopNoSplit;
 
   // ==========================================================================
@@ -938,17 +944,17 @@ loc_g_6756:
   // ==========================================================================
 
 loc_g_679B:
-  ax = PlayField16[si - 2];
+  ax = PlayField16[*si - 2];
   if (ax != 0)
     return subAnimateMurphy;
 
-  MovHighByte(&PlayField16[si - 2], 1);
-  subCopyFieldToScreen(si, aniPushLeft); // draw pushing murphy
+  MovHighByte(&PlayField16[*si - 2], 1);
+  subCopyFieldToScreen(*si, aniPushLeft); // draw pushing murphy
   dx = aniZonkRollLeft;
-  dxPos = si - 1;
+  dxPos = *si - 1;
   dx2 = aniPushLeft;
   dx2Step = 1;
-  MovHighByte(&PlayField16[si], 0xE);
+  MovHighByte(&PlayField16[*si], 0xE);
   goto loc_MoveNoSplit;
 
   // ==========================================================================
@@ -956,21 +962,21 @@ loc_g_679B:
   // ==========================================================================
 
 loc_g_67D4:
-  ax = PlayField16[si + 2];
+  ax = PlayField16[*si + 2];
   if (ax != 0)
     return subAnimateMurphy;
 
-  ax = PlayField16[si + FieldWidth + 1];
+  ax = PlayField16[*si + FieldWidth + 1];
   if (ax == 0) // zonk falls
     return subAnimateMurphy;
 
-  MovHighByte(&PlayField16[si + 2], 1);
-  subCopyFieldToScreen(si, aniPushRight); // draw pushing murphy
+  MovHighByte(&PlayField16[*si + 2], 1);
+  subCopyFieldToScreen(*si, aniPushRight); // draw pushing murphy
   dx = aniZonkRollRight;
-  dxPos = si + 1;
+  dxPos = *si + 1;
   dx2 = aniPushRight;
   dx2Step = -1;
-  MovHighByte(&PlayField16[si], 0xF);
+  MovHighByte(&PlayField16[*si], 0xF);
   goto loc_MoveNoSplit;
 
   // ==========================================================================
@@ -978,15 +984,15 @@ loc_g_67D4:
   // ==========================================================================
 
 loc_g_6817:
-  subCopyFieldToScreen(si, aniMurphyTouchUp);
+  subCopyFieldToScreen(*si, aniMurphyTouchUp);
   if (YellowDisksExploded != 0)
   {
     YawnSleepCounter = 10; // stay hypnotized
     return subAnimateMurphy;
   } // loc_g_6838:
 
-  subCopyFieldToScreen(si - FieldWidth, 0x88); // draw new terminal type
-  TerminalState[si - FieldWidth] = 8;
+  subCopyFieldToScreen(*si - FieldWidth, 0x88); // draw new terminal type
+  TerminalState[*si - FieldWidth] = 8;
   goto loc_g_68F0;
 
   // ==========================================================================
@@ -994,15 +1000,15 @@ loc_g_6817:
   // ==========================================================================
 
 loc_g_684E:
-  subCopyFieldToScreen(si, aniMurphyTouchLeft);
+  subCopyFieldToScreen(*si, aniMurphyTouchLeft);
   if (YellowDisksExploded != 0)
   {
     YawnSleepCounter = 10; // stay hypnotized
     return subAnimateMurphy;
   } // loc_g_6838:
 
-  subCopyFieldToScreen(si - 1, 0x88); // draw new terminal type
-  TerminalState[si - 1] = 8;
+  subCopyFieldToScreen(*si - 1, 0x88); // draw new terminal type
+  TerminalState[*si - 1] = 8;
   goto loc_g_68F0;
 
   // ==========================================================================
@@ -1010,15 +1016,15 @@ loc_g_684E:
   // ==========================================================================
 
 loc_g_6884:
-  subCopyFieldToScreen(si, aniMurphyTouchDown);
+  subCopyFieldToScreen(*si, aniMurphyTouchDown);
   if (YellowDisksExploded != 0)
   {
     YawnSleepCounter = 10; // stay hypnotized
     return subAnimateMurphy;
   } // loc_g_6838:
 
-  subCopyFieldToScreen(si + FieldWidth, 0x88); // draw new terminal type
-  TerminalState[si + FieldWidth] = 8;
+  subCopyFieldToScreen(*si + FieldWidth, 0x88); // draw new terminal type
+  TerminalState[*si + FieldWidth] = 8;
   goto loc_g_68F0;
 
   // ==========================================================================
@@ -1026,15 +1032,15 @@ loc_g_6884:
   // ==========================================================================
 
 loc_g_68BA:
-  subCopyFieldToScreen(si, aniMurphyTouchRight);
+  subCopyFieldToScreen(*si, aniMurphyTouchRight);
   if (YellowDisksExploded != 0)
   {
     YawnSleepCounter = 10; // stay hypnotized
     return subAnimateMurphy;
   } // loc_g_6838:
 
-  subCopyFieldToScreen(si + 1, 0x88); // draw new terminal type
-  TerminalState[si + 1] = 8;
+  subCopyFieldToScreen(*si + 1, 0x88); // draw new terminal type
+  TerminalState[*si + 1] = 8;
   // ==========================================================================
   // common TERMINAL stuff moving/touching from all directions
   // ==========================================================================
@@ -1055,13 +1061,13 @@ loc_g_68F0:
   // ==========================================================================
 
 loc_g_6916:
-  if (PlayField16[si - 2 * FieldWidth] != 0)
+  if (PlayField16[*si - 2 * FieldWidth] != 0)
     return subAnimateMurphy;
 
   dx = aniSplitUpDown;
   dx2Step = -FieldWidth;
-  PlayField16[si] = 0x1803;
-  PlayField16[si - 2 * FieldWidth] = 0x300;
+  PlayField16[*si] = 0x1803;
+  PlayField16[*si - 2 * FieldWidth] = 0x300;
   goto loc_StopSplit;
 
   // ==========================================================================
@@ -1069,13 +1075,13 @@ loc_g_6916:
   // ==========================================================================
 
 loc_g_693A:
-  if (PlayField16[si - 2] != 0)
+  if (PlayField16[*si - 2] != 0)
     return subAnimateMurphy;
 
   dx = aniMurphyEatLeft;
   dx2Step = -1;
-  PlayField16[si] = 0x1903;
-  PlayField16[si - 2] = 0x300;
+  PlayField16[*si] = 0x1903;
+  PlayField16[*si - 2] = 0x300;
   goto loc_StopSplit;
 
   // ==========================================================================
@@ -1083,13 +1089,13 @@ loc_g_693A:
   // ==========================================================================
 
 loc_g_695E:
-  if (PlayField16[si + 2 * FieldWidth] != 0)
+  if (PlayField16[*si + 2 * FieldWidth] != 0)
     return subAnimateMurphy;
 
   dx = aniSplitUpDown;
   dx2Step = FieldWidth;
-  PlayField16[si] = 0x1A03;
-  PlayField16[si + 2 * FieldWidth] = 0x300;
+  PlayField16[*si] = 0x1A03;
+  PlayField16[*si + 2 * FieldWidth] = 0x300;
   goto loc_StopSplit;
 
   // ==========================================================================
@@ -1097,13 +1103,13 @@ loc_g_695E:
   // ==========================================================================
 
 loc_g_6982:
-  if (PlayField16[si + 2] != 0)
+  if (PlayField16[*si + 2] != 0)
     return subAnimateMurphy;
 
   dx = aniMurphyEatRight;
   dx2Step = 1;
-  PlayField16[si] = 0x1B03;
-  PlayField16[si + 2] = 0x300;
+  PlayField16[*si] = 0x1B03;
+  PlayField16[*si + 2] = 0x300;
 
 loc_StopSplit:
   MovingPictureSequencePhase = 0; // stop picture move sequence
@@ -1116,8 +1122,8 @@ loc_StopSplit:
 
 loc_g_69A6:
   dx = (MurphyVarFaceLeft == 0 ?  aniMurphyEatUpRight :  aniMurphyEatUpRight);
-  PlayField16[si] = 0x1C03;
-  PlayField16[si - FieldWidth] = 0x300;
+  PlayField16[*si] = 0x1C03;
+  PlayField16[*si - FieldWidth] = 0x300;
   goto loc_StopNoSplit;
 
   // ==========================================================================
@@ -1126,9 +1132,9 @@ loc_g_69A6:
 
 loc_g_69CE:
   dx = aniMurphyEatLeft;
-  PlayField16[si] = 0x300; // !!!!!! this time we move murphy at sequence-start!
-  PlayField16[si - 1] = 0x1D03;
-  si = si - 1;
+  PlayField16[*si] = 0x300; // !!!!!! this time we move murphy at sequence-start!
+  PlayField16[*si - 1] = 0x1D03;
+  *si = *si - 1;
   goto loc_StopNoSplit;
 
   // ==========================================================================
@@ -1137,8 +1143,8 @@ loc_g_69CE:
 
 loc_g_69F7:
   dx = (MurphyVarFaceLeft == 0 ?  aniMurphyEatUpRight :  aniMurphyEatUpRight);
-  PlayField16[si] = 0x1E03;
-  PlayField16[si + FieldWidth] = 0x300;
+  PlayField16[*si] = 0x1E03;
+  PlayField16[*si + FieldWidth] = 0x300;
   goto loc_StopNoSplit;
 
   // ==========================================================================
@@ -1165,9 +1171,9 @@ loc_g_6A1F:
   // FS: for me this means to blit the first animation frame twice
   // end of BugFix
   // --------------------------------------------------------------------------
-  PlayField16[si] = 0x300; // !!!!!! this time we move murphy at sequence-start!
-  PlayField16[si + 1] = 0x1F03;
-  si = si + 1;
+  PlayField16[*si] = 0x300; // !!!!!! this time we move murphy at sequence-start!
+  PlayField16[*si + 1] = 0x1F03;
+  *si = *si + 1;
   goto loc_StopNoSplit;
 
   // ==========================================================================
@@ -1176,8 +1182,8 @@ loc_g_6A1F:
 
 loc_g_6A48:
   dx = aniTouchRedDisk;
-  MovHighByte(&PlayField16[si], 0x20);
-  MovHighByte(&PlayField16[si - FieldWidth], 3);
+  MovHighByte(&PlayField16[*si], 0x20);
+  MovHighByte(&PlayField16[*si - FieldWidth], 3);
   goto loc_StopNoSplit;
 
   // ==========================================================================
@@ -1186,8 +1192,8 @@ loc_g_6A48:
 
 loc_g_6A64:
   dx = aniTouchRedDisk;
-  MovHighByte(&PlayField16[si], 0x21);
-  MovHighByte(&PlayField16[si - 1], 3);
+  MovHighByte(&PlayField16[*si], 0x21);
+  MovHighByte(&PlayField16[*si - 1], 3);
   goto loc_StopNoSplit;
 
   // ==========================================================================
@@ -1196,8 +1202,8 @@ loc_g_6A64:
 
 loc_g_6A80:
   dx = aniTouchRedDisk;
-  MovHighByte(&PlayField16[si], 0x22);
-  MovHighByte(&PlayField16[si + FieldWidth], 3);
+  MovHighByte(&PlayField16[*si], 0x22);
+  MovHighByte(&PlayField16[*si + FieldWidth], 3);
   goto loc_StopNoSplit;
 
   // ==========================================================================
@@ -1206,8 +1212,8 @@ loc_g_6A80:
 
 loc_g_6A9C:
   dx = aniTouchRedDisk;
-  MovHighByte(&PlayField16[si], 0x23);
-  MovHighByte(&PlayField16[si + 1], 3);
+  MovHighByte(&PlayField16[*si], 0x23);
+  MovHighByte(&PlayField16[*si + 1], 3);
 
 loc_StopNoSplit:
   MovingPictureSequencePhase = 0; // stop picture move sequence
@@ -1218,16 +1224,16 @@ loc_StopNoSplit:
   // ==========================================================================
 
 loc_g_6AB8:
-  if (PlayField16[si - 2 * FieldWidth] != 0)
+  if (PlayField16[*si - 2 * FieldWidth] != 0)
     return subAnimateMurphy;
 
-  PlayField16[si - 2 * FieldWidth] = 0x1200;
-  subCopyFieldToScreen(si, aniPushRight);
+  PlayField16[*si - 2 * FieldWidth] = 0x1200;
+  subCopyFieldToScreen(*si, aniPushRight);
   dx = aniYellowDisk;
-  dxPos = si - FieldWidth;
+  dxPos = *si - FieldWidth;
   dx2 = aniPushUpDown;
   dx2Step = FieldWidth;
-  PlayField16[si] = 0x2403;
+  PlayField16[*si] = 0x2403;
   goto loc_MoveNoSplit;
 
   // ==========================================================================
@@ -1235,16 +1241,16 @@ loc_g_6AB8:
   // ==========================================================================
 
 loc_g_6AF1:
-  if (PlayField16[si - 2] != 0)
+  if (PlayField16[*si - 2] != 0)
     return subAnimateMurphy;
 
-  PlayField16[si - 2] = 0x1200;
-  subCopyFieldToScreen(si, aniPushLeft);
+  PlayField16[*si - 2] = 0x1200;
+  subCopyFieldToScreen(*si, aniPushLeft);
   dx = aniYellowDisk;
-  dxPos = si - 1;
+  dxPos = *si - 1;
   dx2 = aniPushLeft;
   dx2Step = 1;
-  PlayField16[si] = 0x2503;
+  PlayField16[*si] = 0x2503;
   goto loc_MoveNoSplit;
 
   // ==========================================================================
@@ -1252,16 +1258,16 @@ loc_g_6AF1:
   // ==========================================================================
 
 loc_g_6B2A:
-  if (PlayField16[si + 2 * FieldWidth] != 0)
+  if (PlayField16[*si + 2 * FieldWidth] != 0)
     return subAnimateMurphy;
 
-  PlayField16[si + 2 * FieldWidth] = 0x1200;
-  subCopyFieldToScreen(si, aniPushRight);
+  PlayField16[*si + 2 * FieldWidth] = 0x1200;
+  subCopyFieldToScreen(*si, aniPushRight);
   dx = aniYellowDisk;
-  dxPos = si + FieldWidth;
+  dxPos = *si + FieldWidth;
   dx2 = aniPushUpDown;
   dx2Step = -FieldWidth;
-  PlayField16[si] = 0x2703;
+  PlayField16[*si] = 0x2703;
   goto loc_MoveNoSplit;
 
   // ==========================================================================
@@ -1269,16 +1275,16 @@ loc_g_6B2A:
   // ==========================================================================
 
 loc_g_6B63:
-  if (PlayField16[si + 2] != 0)
+  if (PlayField16[*si + 2] != 0)
     return subAnimateMurphy;
 
-  PlayField16[si + 2] = 0x1200;
-  subCopyFieldToScreen(si, aniPushRight);
+  PlayField16[*si + 2] = 0x1200;
+  subCopyFieldToScreen(*si, aniPushRight);
   dx = aniYellowDisk;
-  dxPos = si + 1;
+  dxPos = *si + 1;
   dx2 = aniPushRight;
   dx2Step = -1;
-  PlayField16[si] = 0x2603;
+  PlayField16[*si] = 0x2603;
   goto loc_MoveNoSplit;
 
   // ==========================================================================
@@ -1286,16 +1292,16 @@ loc_g_6B63:
   // ==========================================================================
 
 loc_g_6B9B:
-  if (PlayField16[si - 2] != 0)
+  if (PlayField16[*si - 2] != 0)
     return subAnimateMurphy;
 
-  PlayField16[si - 2] = 0x800;
-  subCopyFieldToScreen(si, aniPushLeft);
+  PlayField16[*si - 2] = 0x800;
+  subCopyFieldToScreen(*si, aniPushLeft);
   dx = aniOrangeDisk;
-  dxPos = si - 1;
+  dxPos = *si - 1;
   dx2 = aniPushLeft;
   dx2Step = 1;
-  PlayField16[si] = 0x2803;
+  PlayField16[*si] = 0x2803;
   goto loc_MoveNoSplit;
 
   // ==========================================================================
@@ -1303,19 +1309,19 @@ loc_g_6B9B:
   // ==========================================================================
 
 loc_g_6BD3:
-  if (PlayField16[si + 2] != 0)
+  if (PlayField16[*si + 2] != 0)
     return subAnimateMurphy;
 
-  if (PlayField16[si + FieldWidth + 1] == 0) // falling goes before pushing
+  if (PlayField16[*si + FieldWidth + 1] == 0) // falling goes before pushing
     return subAnimateMurphy;
 
-  PlayField16[si + 2] = 0x100;
-  subCopyFieldToScreen(si, aniPushRight);
+  PlayField16[*si + 2] = 0x100;
+  subCopyFieldToScreen(*si, aniPushRight);
   dx = aniOrangeDisk;
-  dxPos = si + 1;
+  dxPos = *si + 1;
   dx2 = aniPushRight;
   dx2Step = -1;
-  PlayField16[si] = 0x2903;
+  PlayField16[*si] = 0x2903;
   // ==========================================================================
   // Copy screen animation action table to action work space
   // (To paint sequence: Push Zonk/Disk / release red disk / Port passing)
@@ -1345,7 +1351,7 @@ locProceedMovingMurphy: // proceed moving murphy
   if (ax == 0) // Sound effects
     subSoundFXPush();
 
-  bl = HighByte(PlayField16[si]);
+  bl = HighByte(PlayField16[*si]);
   if (bl == 0xE)        // Push Zonk to left
     goto loc_g_6F7E;
 
@@ -1450,8 +1456,8 @@ loc_g_6C8F:
   // Follow-up after movement completed     'loc_g_6D35:
   MurphyXPos = MurphyXPos + MurphyDX;
   MurphyYPos = MurphyYPos + MurphyDY;
-  bl = HighByte(PlayField16[si]);  // animation phase
-  MovHighByte(&PlayField16[si], 0);
+  bl = HighByte(PlayField16[*si]);  // animation phase
+  MovHighByte(&PlayField16[*si], 0);
 
   if (bl == 0x1)    // space, moving up
     goto loc_g_6EC8;
@@ -1592,8 +1598,8 @@ loc_g_6EBA:
 
   subDisplayInfotronsNeeded();
 loc_g_6EC8: // space, base
-  PlayField16[si] = fiMurphy;
-  subAdjustZonksInfotronsAboveMurphy(si + FieldWidth);
+  PlayField16[*si] = fiMurphy;
+  subAdjustZonksInfotronsAboveMurphy(*si + FieldWidth);
   return subAnimateMurphy;
 
   // ==========================================================================
@@ -1606,8 +1612,8 @@ loc_g_6ED8:
 
   subDisplayInfotronsNeeded();
 loc_g_6EE6: // space, base
-  PlayField16[si] = fiMurphy;
-  subAdjustZonksInfotronsAboveMurphy(si + 1);
+  PlayField16[*si] = fiMurphy;
+  subAdjustZonksInfotronsAboveMurphy(*si + 1);
   return subAnimateMurphy;
 
   // ==========================================================================
@@ -1620,10 +1626,10 @@ loc_g_6EF6:
 
   subDisplayInfotronsNeeded();
 loc_g_6F04: // space, base
-  if (LowByte(PlayField16[si - FieldWidth]) != fiExplosion)
-    PlayField16[si - FieldWidth] = 0;
+  if (LowByte(PlayField16[*si - FieldWidth]) != fiExplosion)
+    PlayField16[*si - FieldWidth] = 0;
 
-  PlayField16[si] = fiMurphy;
+  PlayField16[*si] = fiMurphy;
   return subAnimateMurphy;
 
   // ==========================================================================
@@ -1636,8 +1642,8 @@ loc_g_71B6:
 
   subDisplayInfotronsNeeded();
 loc_g_71C4: // space, base
-  subAdjustZonksInfotronsAboveMurphy(si - 1);
-  PlayField16[si] = fiMurphy;
+  subAdjustZonksInfotronsAboveMurphy(*si - 1);
+  PlayField16[*si] = fiMurphy;
   return subAnimateMurphy;
 
   // ==========================================================================
@@ -1650,8 +1656,8 @@ loc_g_71D4:
 
   subDisplayInfotronsNeeded();
 loc_g_71E2: // base
-  if (LowByte(PlayField16[si - FieldWidth]) != fiExplosion)
-    PlayField16[si - FieldWidth] = 0;
+  if (LowByte(PlayField16[*si - FieldWidth]) != fiExplosion)
+    PlayField16[*si - FieldWidth] = 0;
 
   return subAnimateMurphy;
 
@@ -1665,8 +1671,8 @@ loc_g_71F0:
 
   subDisplayInfotronsNeeded();
 loc_g_71FE: // base
-  if (LowByte(PlayField16[si - 1]) != fiExplosion)
-    PlayField16[si - 1] = 0;
+  if (LowByte(PlayField16[*si - 1]) != fiExplosion)
+    PlayField16[*si - 1] = 0;
 
   return subAnimateMurphy;
 
@@ -1680,8 +1686,8 @@ loc_g_720C:
 
   subDisplayInfotronsNeeded();
 loc_g_721A: // base
-  if (LowByte(PlayField16[si + FieldWidth]) != fiExplosion)
-    PlayField16[si + FieldWidth] = 0;
+  if (LowByte(PlayField16[*si + FieldWidth]) != fiExplosion)
+    PlayField16[*si + FieldWidth] = 0;
 
   return subAnimateMurphy;
 
@@ -1695,8 +1701,8 @@ loc_g_7228:
 
   subDisplayInfotronsNeeded();
 loc_g_7236: // base
-  if (LowByte(PlayField16[si + 1]) != fiExplosion)
-    PlayField16[si + 1] = 0;
+  if (LowByte(PlayField16[*si + 1]) != fiExplosion)
+    PlayField16[*si + 1] = 0;
 
   return subAnimateMurphy;
 
@@ -1705,13 +1711,13 @@ loc_g_7236: // base
   // ==========================================================================
 
 loc_g_6F18:
-  if (LowByte(PlayField16[si]) != fiExplosion)
-    PlayField16[si] = 0;
+  if (LowByte(PlayField16[*si]) != fiExplosion)
+    PlayField16[*si] = 0;
 
-  PlayField16[si - 1] = fiMurphy;
-  PlayField16[si - 2] = fiZonk;
-  subExplodeSnikSnaksBelow(si - 2);
-  si = si - 1;
+  PlayField16[*si - 1] = fiMurphy;
+  PlayField16[*si - 2] = fiZonk;
+  subExplodeSnikSnaksBelow(*si - 2);
+  *si = *si - 1;
   return subAnimateMurphy;
 
   // ==========================================================================
@@ -1719,13 +1725,13 @@ loc_g_6F18:
   // ==========================================================================
 
 loc_g_6F3B:
-  if (LowByte(PlayField16[si]) != fiExplosion)
-    PlayField16[si] = 0;
+  if (LowByte(PlayField16[*si]) != fiExplosion)
+    PlayField16[*si] = 0;
 
-  PlayField16[si + 1] = fiMurphy;
-  PlayField16[si + 2] = fiZonk;
-  subExplodeSnikSnaksBelow(si + 2);
-  si = si + 1;
+  PlayField16[*si + 1] = fiMurphy;
+  PlayField16[*si + 2] = fiZonk;
+  subExplodeSnikSnaksBelow(*si + 2);
+  *si = *si + 1;
   return subAnimateMurphy;
 
   // ==========================================================================
@@ -1741,15 +1747,15 @@ loc_g_6F77:
   // ==========================================================================
 
 loc_g_6F7E:
-  if (DemoKeyCode == keyLeft && PlayField16[si - 1] == fiZonk)
+  if (DemoKeyCode == keyLeft && PlayField16[*si - 1] == fiZonk)
     return subAnimateMurphy;
 
-  PlayField16[si] = fiMurphy; // else restore - no more zonk pushing!
-  PlayField16[si - 1] = fiZonk;
-  if (LowByte(PlayField16[si - 2]) != fiExplosion)
-    PlayField16[si - 2] = 0;
+  PlayField16[*si] = fiMurphy; // else restore - no more zonk pushing!
+  PlayField16[*si - 1] = fiZonk;
+  if (LowByte(PlayField16[*si - 2]) != fiExplosion)
+    PlayField16[*si - 2] = 0;
 
-  subCopyFieldToScreen(si, fiMurphy);
+  subCopyFieldToScreen(*si, fiMurphy);
   return subAnimateMurphy;
 
   // ==========================================================================
@@ -1757,15 +1763,15 @@ loc_g_6F7E:
   // ==========================================================================
 
 loc_g_6FBC:
-  if (DemoKeyCode == keyRight && PlayField16[si + 1] == fiZonk)
+  if (DemoKeyCode == keyRight && PlayField16[*si + 1] == fiZonk)
     return subAnimateMurphy;
 
-  PlayField16[si] = fiMurphy; // else restore - no more zonk pushing!
-  PlayField16[si + 1] = fiZonk;
-  if (LowByte(PlayField16[si + 2]) != fiExplosion)
-    PlayField16[si + 2] = 0;
+  PlayField16[*si] = fiMurphy; // else restore - no more zonk pushing!
+  PlayField16[*si + 1] = fiZonk;
+  if (LowByte(PlayField16[*si + 2]) != fiExplosion)
+    PlayField16[*si + 2] = 0;
 
-  subCopyFieldToScreen(si, fiMurphy);
+  subCopyFieldToScreen(*si, fiMurphy);
   return subAnimateMurphy;
 
   // ==========================================================================
@@ -1773,15 +1779,15 @@ loc_g_6FBC:
   // ==========================================================================
 
 loc_g_6FFA:
-  if (DemoKeyCode == keyLeft && PlayField16[si - 1] == fiOrangeDisk)
+  if (DemoKeyCode == keyLeft && PlayField16[*si - 1] == fiOrangeDisk)
     return subAnimateMurphy;
 
-  PlayField16[si] = fiMurphy; // else restore - no more pushing!
-  PlayField16[si - 1] = fiOrangeDisk;
-  if (LowByte(PlayField16[si - 2]) != fiExplosion)
-    PlayField16[si - 2] = 0;
+  PlayField16[*si] = fiMurphy; // else restore - no more pushing!
+  PlayField16[*si - 1] = fiOrangeDisk;
+  if (LowByte(PlayField16[*si - 2]) != fiExplosion)
+    PlayField16[*si - 2] = 0;
 
-  subCopyFieldToScreen(si, fiMurphy);
+  subCopyFieldToScreen(*si, fiMurphy);
   return subAnimateMurphy;
 
   // ==========================================================================
@@ -1789,15 +1795,15 @@ loc_g_6FFA:
   // ==========================================================================
 
 loc_g_7038:
-  if (DemoKeyCode == keyRight && PlayField16[si + 1] == fiOrangeDisk)
+  if (DemoKeyCode == keyRight && PlayField16[*si + 1] == fiOrangeDisk)
     return subAnimateMurphy;
 
-  PlayField16[si] = fiMurphy; // else restore - no more pushing!
-  PlayField16[si + 1] = fiOrangeDisk;
-  if (LowByte(PlayField16[si + 2]) != fiExplosion)
-    PlayField16[si + 2] = 0;
+  PlayField16[*si] = fiMurphy; // else restore - no more pushing!
+  PlayField16[*si + 1] = fiOrangeDisk;
+  if (LowByte(PlayField16[*si + 2]) != fiExplosion)
+    PlayField16[*si + 2] = 0;
 
-  subCopyFieldToScreen(si, fiMurphy);
+  subCopyFieldToScreen(*si, fiMurphy);
   return subAnimateMurphy;
 
   // ==========================================================================
@@ -1805,15 +1811,15 @@ loc_g_7038:
   // ==========================================================================
 
 loc_g_7076:
-  if (DemoKeyCode == keyUp && PlayField16[si - FieldWidth] == fiYellowDisk)
+  if (DemoKeyCode == keyUp && PlayField16[*si - FieldWidth] == fiYellowDisk)
     return subAnimateMurphy;
 
-  PlayField16[si] = fiMurphy; // else restore - no more pushing!
-  PlayField16[si - FieldWidth] = fiYellowDisk;
-  if (LowByte(PlayField16[si - 2 * FieldWidth]) != fiExplosion)
-    PlayField16[si - 2 * FieldWidth] = 0;
+  PlayField16[*si] = fiMurphy; // else restore - no more pushing!
+  PlayField16[*si - FieldWidth] = fiYellowDisk;
+  if (LowByte(PlayField16[*si - 2 * FieldWidth]) != fiExplosion)
+    PlayField16[*si - 2 * FieldWidth] = 0;
 
-  subCopyFieldToScreen(si, fiMurphy);
+  subCopyFieldToScreen(*si, fiMurphy);
   return subAnimateMurphy;
 
   // ==========================================================================
@@ -1821,15 +1827,15 @@ loc_g_7076:
   // ==========================================================================
 
 loc_g_70B4:
-  if (DemoKeyCode == keyLeft && PlayField16[si - 1] == fiYellowDisk)
+  if (DemoKeyCode == keyLeft && PlayField16[*si - 1] == fiYellowDisk)
     return subAnimateMurphy;
 
-  PlayField16[si] = fiMurphy; // else restore - no more pushing!
-  PlayField16[si - 1] = fiYellowDisk;
-  if (LowByte(PlayField16[si - 2]) != fiExplosion)
-    PlayField16[si - 2] = 0;
+  PlayField16[*si] = fiMurphy; // else restore - no more pushing!
+  PlayField16[*si - 1] = fiYellowDisk;
+  if (LowByte(PlayField16[*si - 2]) != fiExplosion)
+    PlayField16[*si - 2] = 0;
 
-  subCopyFieldToScreen(si, fiMurphy);
+  subCopyFieldToScreen(*si, fiMurphy);
   return subAnimateMurphy;
 
   // ==========================================================================
@@ -1837,15 +1843,15 @@ loc_g_70B4:
   // ==========================================================================
 
 loc_g_70F2:
-  if (DemoKeyCode == keyDown && PlayField16[si + FieldWidth] == fiYellowDisk)
+  if (DemoKeyCode == keyDown && PlayField16[*si + FieldWidth] == fiYellowDisk)
     return subAnimateMurphy;
 
-  PlayField16[si] = fiMurphy; // else restore - no more pushing!
-  PlayField16[si + FieldWidth] = fiYellowDisk;
-  if (LowByte(PlayField16[si + 2 * FieldWidth]) != fiExplosion)
-    PlayField16[si + 2 * FieldWidth] = 0;
+  PlayField16[*si] = fiMurphy; // else restore - no more pushing!
+  PlayField16[*si + FieldWidth] = fiYellowDisk;
+  if (LowByte(PlayField16[*si + 2 * FieldWidth]) != fiExplosion)
+    PlayField16[*si + 2 * FieldWidth] = 0;
 
-  subCopyFieldToScreen(si, fiMurphy);
+  subCopyFieldToScreen(*si, fiMurphy);
   return subAnimateMurphy;
 
   // ==========================================================================
@@ -1853,15 +1859,15 @@ loc_g_70F2:
   // ==========================================================================
 
 loc_g_7130:
-  if (DemoKeyCode == keyRight && PlayField16[si + 1] == fiYellowDisk)
+  if (DemoKeyCode == keyRight && PlayField16[*si + 1] == fiYellowDisk)
     return subAnimateMurphy;
 
-  PlayField16[si] = fiMurphy; // else restore - no more pushing!
-  PlayField16[si + 1] = fiYellowDisk;
-  if (LowByte(PlayField16[si + 2]) != fiExplosion)
-    PlayField16[si + 2] = 0;
+  PlayField16[*si] = fiMurphy; // else restore - no more pushing!
+  PlayField16[*si + 1] = fiYellowDisk;
+  if (LowByte(PlayField16[*si + 2]) != fiExplosion)
+    PlayField16[*si + 2] = 0;
 
-  subCopyFieldToScreen(si, fiMurphy);
+  subCopyFieldToScreen(*si, fiMurphy);
   return subAnimateMurphy;
 
   // ==========================================================================
@@ -1871,13 +1877,13 @@ loc_g_7130:
 loc_g_716E:
   if (DemoKeyCode != keySpace)
   {
-    PlayField16[si] = fiMurphy;
-    subCopyFieldToScreen(si, fiMurphy);
+    PlayField16[*si] = fiMurphy;
+    subCopyFieldToScreen(*si, fiMurphy);
     RedDiskReleasePhase = 0;
   }
   else if (MovingPictureSequencePhase == 0x20)
   {
-    subCopyFieldToScreen(si, 43);  // anxious murphy
+    subCopyFieldToScreen(*si, 43);  // anxious murphy
     RedDiskReleasePhase = 1;
   }
 
@@ -1888,16 +1894,16 @@ loc_g_716E:
   // ==========================================================================
 
 loc_g_7244:
-  if (LowByte(PlayField16[si]) != fiExplosion)
-    PlayField16[si] = 0;
+  if (LowByte(PlayField16[*si]) != fiExplosion)
+    PlayField16[*si] = 0;
 
-  PlayField16[si - 2 * FieldWidth] = fiMurphy;
+  PlayField16[*si - 2 * FieldWidth] = fiMurphy;
   SplitMoveFlag = 0;
-  si = si - FieldWidth;
-  if (HighByte(PlayField16[si]) == 1)
-    subSpPortTest(si);
+  *si = *si - FieldWidth;
+  if (HighByte(PlayField16[*si]) == 1)
+    subSpPortTest(*si);
 
-  si = si - FieldWidth;
+  *si = *si - FieldWidth;
   return subAnimateMurphy;
 
   // ==========================================================================
@@ -1905,16 +1911,16 @@ loc_g_7244:
   // ==========================================================================
 
 loc_g_7272:
-  if (LowByte(PlayField16[si]) != fiExplosion)
-    PlayField16[si] = 0;
+  if (LowByte(PlayField16[*si]) != fiExplosion)
+    PlayField16[*si] = 0;
 
-  PlayField16[si - 2] = fiMurphy;
+  PlayField16[*si - 2] = fiMurphy;
   SplitMoveFlag = 0;
-  si = si - 1;
-  if (HighByte(PlayField16[si]) == 1)
-    subSpPortTest(si);
+  *si = *si - 1;
+  if (HighByte(PlayField16[*si]) == 1)
+    subSpPortTest(*si);
 
-  si = si - 1;
+  *si = *si - 1;
   return subAnimateMurphy;
 
   // ==========================================================================
@@ -1922,16 +1928,16 @@ loc_g_7272:
   // ==========================================================================
 
 loc_g_729F:
-  if (LowByte(PlayField16[si]) != fiExplosion)
-    PlayField16[si] = 0;
+  if (LowByte(PlayField16[*si]) != fiExplosion)
+    PlayField16[*si] = 0;
 
-  PlayField16[si + 2 * FieldWidth] = fiMurphy;
+  PlayField16[*si + 2 * FieldWidth] = fiMurphy;
   SplitMoveFlag = 0;
-  si = si + FieldWidth;
-  if (HighByte(PlayField16[si]) == 1)
-    subSpPortTest(si);
+  *si = *si + FieldWidth;
+  if (HighByte(PlayField16[*si]) == 1)
+    subSpPortTest(*si);
 
-  si = si + FieldWidth;
+  *si = *si + FieldWidth;
   return subAnimateMurphy;
 
   // ==========================================================================
@@ -1939,16 +1945,16 @@ loc_g_729F:
   // ==========================================================================
 
 loc_g_72CD:
-  if (LowByte(PlayField16[si]) != fiExplosion)
-    PlayField16[si] = 0;
+  if (LowByte(PlayField16[*si]) != fiExplosion)
+    PlayField16[*si] = 0;
 
-  PlayField16[si + 2] = fiMurphy;
+  PlayField16[*si + 2] = fiMurphy;
   SplitMoveFlag = 0;
-  si = si + 1;
-  if (HighByte(PlayField16[si]) == 1)
-    subSpPortTest(si);
+  *si = *si + 1;
+  if (HighByte(PlayField16[*si]) == 1)
+    subSpPortTest(*si);
 
-  si = si + 1;
+  *si = *si + 1;
   return subAnimateMurphy;
 
   // ==========================================================================
@@ -1956,12 +1962,12 @@ loc_g_72CD:
   // ==========================================================================
 
 loc_g_72FA:
-  if (LowByte(PlayField16[si]) != fiExplosion)
-    PlayField16[si] = 0;
+  if (LowByte(PlayField16[*si]) != fiExplosion)
+    PlayField16[*si] = 0;
 
-  si = si - FieldWidth;
-  PlayField16[si] = fiMurphy;
-  subEatRedDisk(si); // inc+show Murphy's red disks
+  *si = *si - FieldWidth;
+  PlayField16[*si] = fiMurphy;
+  subEatRedDisk(*si); // inc+show Murphy's red disks
   return subAnimateMurphy;
 
   // ==========================================================================
@@ -1969,11 +1975,11 @@ loc_g_72FA:
   // ==========================================================================
 
 loc_g_7318:
-  if (LowByte(PlayField16[si + 1]) != fiExplosion)
-    PlayField16[si + 1] = 0;
+  if (LowByte(PlayField16[*si + 1]) != fiExplosion)
+    PlayField16[*si + 1] = 0;
 
-  PlayField16[si] = fiMurphy;
-  subEatRedDisk(si); // inc+show Murphy's red disks
+  PlayField16[*si] = fiMurphy;
+  subEatRedDisk(*si); // inc+show Murphy's red disks
   return subAnimateMurphy;
 
   // ==========================================================================
@@ -1981,12 +1987,12 @@ loc_g_7318:
   // ==========================================================================
 
 loc_g_7333:
-  if (LowByte(PlayField16[si]) != fiExplosion)
-    PlayField16[si] = 0;
+  if (LowByte(PlayField16[*si]) != fiExplosion)
+    PlayField16[*si] = 0;
 
-  si = si + FieldWidth;
-  PlayField16[si] = fiMurphy;
-  subEatRedDisk(si); // inc+show Murphy's red disks
+  *si = *si + FieldWidth;
+  PlayField16[*si] = fiMurphy;
+  subEatRedDisk(*si); // inc+show Murphy's red disks
   return subAnimateMurphy;
 
   // ==========================================================================
@@ -1994,11 +2000,11 @@ loc_g_7333:
   // ==========================================================================
 
 loc_g_7351:
-  if (LowByte(PlayField16[si - 1]) != fiExplosion)
-    PlayField16[si - 1] = 0;
+  if (LowByte(PlayField16[*si - 1]) != fiExplosion)
+    PlayField16[*si - 1] = 0;
 
-  PlayField16[si] = fiMurphy;
-  subEatRedDisk(si); // inc+show Murphy's red disks
+  PlayField16[*si] = fiMurphy;
+  subEatRedDisk(*si); // inc+show Murphy's red disks
   return subAnimateMurphy;
 
   // ==========================================================================
@@ -2006,10 +2012,10 @@ loc_g_7351:
   // ==========================================================================
 
 loc_g_736C:
-  if (LowByte(PlayField16[si - FieldWidth]) != fiExplosion)
-    PlayField16[si - FieldWidth] = 0;
+  if (LowByte(PlayField16[*si - FieldWidth]) != fiExplosion)
+    PlayField16[*si - FieldWidth] = 0;
 
-  subEatRedDisk(si - FieldWidth); // inc+show Murphy's red disks
+  subEatRedDisk(*si - FieldWidth); // inc+show Murphy's red disks
   return subAnimateMurphy;
 
   // ==========================================================================
@@ -2017,10 +2023,10 @@ loc_g_736C:
   // ==========================================================================
 
 loc_g_7381:
-  if (LowByte(PlayField16[si - 1]) != fiExplosion)
-    PlayField16[si - 1] = 0;
+  if (LowByte(PlayField16[*si - 1]) != fiExplosion)
+    PlayField16[*si - 1] = 0;
 
-  subEatRedDisk(si - 1); // inc+show Murphy's red disks
+  subEatRedDisk(*si - 1); // inc+show Murphy's red disks
   return subAnimateMurphy;
 
   // ==========================================================================
@@ -2028,10 +2034,10 @@ loc_g_7381:
   // ==========================================================================
 
 loc_g_7396:
-  if (LowByte(PlayField16[si + FieldWidth]) != fiExplosion)
-    PlayField16[si + FieldWidth] = 0;
+  if (LowByte(PlayField16[*si + FieldWidth]) != fiExplosion)
+    PlayField16[*si + FieldWidth] = 0;
 
-  subEatRedDisk(si + FieldWidth); // inc+show Murphy's red disks
+  subEatRedDisk(*si + FieldWidth); // inc+show Murphy's red disks
   return subAnimateMurphy;
 
   // ==========================================================================
@@ -2039,10 +2045,10 @@ loc_g_7396:
   // ==========================================================================
 
 loc_g_73AB:
-  if (LowByte(PlayField16[si + 1]) != fiExplosion)
-    PlayField16[si + 1] = 0;
+  if (LowByte(PlayField16[*si + 1]) != fiExplosion)
+    PlayField16[*si + 1] = 0;
 
-  subEatRedDisk(si + 1); // inc+show Murphy's red disks
+  subEatRedDisk(*si + 1); // inc+show Murphy's red disks
   return subAnimateMurphy;
 
   // ==========================================================================
@@ -2050,12 +2056,12 @@ loc_g_73AB:
   // ==========================================================================
 
 loc_g_73C0:
-  if (LowByte(PlayField16[si]) != fiExplosion)
-    PlayField16[si] = 0;
+  if (LowByte(PlayField16[*si]) != fiExplosion)
+    PlayField16[*si] = 0;
 
-  si = si - FieldWidth;
-  PlayField16[si] = fiMurphy;
-  PlayField16[si - FieldWidth] = fiYellowDisk;
+  *si = *si - FieldWidth;
+  PlayField16[*si] = fiMurphy;
+  PlayField16[*si - FieldWidth] = fiYellowDisk;
   return subAnimateMurphy;
 
   // ==========================================================================
@@ -2063,12 +2069,12 @@ loc_g_73C0:
   // ==========================================================================
 
 loc_g_73DD:
-  if (LowByte(PlayField16[si]) != fiExplosion)
-    PlayField16[si] = 0;
+  if (LowByte(PlayField16[*si]) != fiExplosion)
+    PlayField16[*si] = 0;
 
-  si = si - 1;
-  PlayField16[si] = fiMurphy;
-  PlayField16[si - 1] = fiYellowDisk;
+  *si = *si - 1;
+  PlayField16[*si] = fiMurphy;
+  PlayField16[*si - 1] = fiYellowDisk;
   return subAnimateMurphy;
 
   // ==========================================================================
@@ -2076,12 +2082,12 @@ loc_g_73DD:
   // ==========================================================================
 
 loc_g_73FA:
-  if (LowByte(PlayField16[si]) != fiExplosion)
-    PlayField16[si] = 0;
+  if (LowByte(PlayField16[*si]) != fiExplosion)
+    PlayField16[*si] = 0;
 
-  si = si + FieldWidth;
-  PlayField16[si] = fiMurphy;
-  PlayField16[si + FieldWidth] = fiYellowDisk;
+  *si = *si + FieldWidth;
+  PlayField16[*si] = fiMurphy;
+  PlayField16[*si + FieldWidth] = fiYellowDisk;
   return subAnimateMurphy;
 
   // ==========================================================================
@@ -2089,12 +2095,12 @@ loc_g_73FA:
   // ==========================================================================
 
 loc_g_7417:
-  if (LowByte(PlayField16[si]) != fiExplosion)
-    PlayField16[si] = 0;
+  if (LowByte(PlayField16[*si]) != fiExplosion)
+    PlayField16[*si] = 0;
 
-  si = si + 1;
-  PlayField16[si] = fiMurphy;
-  PlayField16[si + 1] = fiYellowDisk;
+  *si = *si + 1;
+  PlayField16[*si] = fiMurphy;
+  PlayField16[*si + 1] = fiYellowDisk;
   return subAnimateMurphy;
 
   // ==========================================================================
@@ -2102,12 +2108,12 @@ loc_g_7417:
   // ==========================================================================
 
 loc_g_7434:
-  if (LowByte(PlayField16[si]) != fiExplosion)
-    PlayField16[si] = 0;
+  if (LowByte(PlayField16[*si]) != fiExplosion)
+    PlayField16[*si] = 0;
 
-  si = si - 1;
-  PlayField16[si] = fiMurphy;
-  PlayField16[si - 1] = fiOrangeDisk;
+  *si = *si - 1;
+  PlayField16[*si] = fiMurphy;
+  PlayField16[*si - 1] = fiOrangeDisk;
   return subAnimateMurphy;
 
   // ==========================================================================
@@ -2115,16 +2121,16 @@ loc_g_7434:
   // ==========================================================================
 
 loc_g_7451:
-  if (LowByte(PlayField16[si]) != fiExplosion)
-    PlayField16[si] = 0;
+  if (LowByte(PlayField16[*si]) != fiExplosion)
+    PlayField16[*si] = 0;
 
-  si = si + 1;
-  PlayField16[si] = fiMurphy;
-  PlayField16[si + 1] = fiOrangeDisk;
-  if (PlayField16[si + FieldWidth + 1] == 0) // make it fall down if below is empty
+  *si = *si + 1;
+  PlayField16[*si] = fiMurphy;
+  PlayField16[*si + 1] = fiOrangeDisk;
+  if (PlayField16[*si + FieldWidth + 1] == 0) // make it fall down if below is empty
   {
-    MovHighByte(&PlayField16[si + 1], 0x20);
-    MovHighByte(&PlayField16[si + FieldWidth + 1], fiOrangeDisk);
+    MovHighByte(&PlayField16[*si + 1], 0x20);
+    MovHighByte(&PlayField16[*si + FieldWidth + 1], fiOrangeDisk);
   }
 
   return subAnimateMurphy;
@@ -2134,7 +2140,7 @@ loc_g_7451:
   // ==========================================================================
 
 loc_g_747F:
-  PlayField16[si] = fiMurphy;
+  PlayField16[*si] = fiMurphy;
   RedDiskReleasePhase = 2;
   RedDiskCount = RedDiskCount - 1;
   subDisplayRedDiskCount();

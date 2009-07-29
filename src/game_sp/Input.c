@@ -126,6 +126,10 @@ int subProcessKeyboardInput()
     }
     else
     {
+#if 1
+      printf("::: Input.c: subProcessKeyboardInput(): kill murphy\n");
+#endif
+
       KillMurphyFlag = 1;
       //        ExplodeFieldSP MurphyPosIndex
       //        LeadOutCounter = &H20

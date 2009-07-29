@@ -83,7 +83,13 @@ void ExplodeFieldSP(int si)
 
   ExplosionShake = 1; // something explodes
   if (ax == fiMurphy)
+  {
+#if 1
+    printf("::: Explosions.c: ExplodeFieldSP(): kill murphy\n");
+#endif
+
     KillMurphyFlag = 1;
+  }
 
   if (ax == fiElectron)
   {
@@ -146,6 +152,10 @@ static void LetExplodeFieldSP(int tsi, int cx, int dh)
       break;
 
     case fiMurphy:
+#if 1
+      printf("::: Explosions.c: LetExplodeFieldSP(): kill murphy\n");
+#endif
+
       KillMurphyFlag = 1;
       PlayField8[tsi] = dh;
       PlayField16[tsi] = cx;
