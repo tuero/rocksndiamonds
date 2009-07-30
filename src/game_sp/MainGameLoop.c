@@ -35,7 +35,9 @@ int subMainGameLoop()
 
   if (DemoFlag != 0)
   {
+#if 1
     printf("::: playing demo ...\n");
+#endif
 
     // EP set level success byte: demo, not game
     WasDemoFlag = 1;
@@ -43,7 +45,9 @@ int subMainGameLoop()
   }
   else // loc_g_1836:
   {
+#if 1
     printf("::: playing game ...\n");
+#endif
 
     // EP set level success byte: game, not demo
     WasDemoFlag = 0;
@@ -142,11 +146,15 @@ locRepeatMainGameLoop:                           // start repeating game loop
   // ----------------------------------------------------------------------------
   //
 
-  printf("::: MainGameLoop.c: subDoGameStuff() START\n");
+#if 0
+  printf("::: >>>>>>>>>> MainGameLoop.c: subDoGameStuff() START\n");
+#endif
 
   subDoGameStuff();                 // do all game stuff
 
-  printf("::: MainGameLoop.c: subDoGameStuff() END\n");
+#if 0
+  printf("::: <<<<<<<<<< MainGameLoop.c: subDoGameStuff() END\n");
+#endif
 
   //
   // ----------------------------------------------------------------------------
@@ -166,7 +174,13 @@ locRepeatMainGameLoop:                           // start repeating game loop
   data_h_Ytmp = ScreenScrollYPos; // copy Y for next soft scroll
   data_h_Xtmp = ScreenScrollXPos; // copy X for next soft scroll
   if ((! UserDragFlag) && AutoScrollFlag)
+  {
+#if 0
+    printf("::: MainGameLoop.c: subMainGameLoop(): %d, %d\n", ScreenScrollXPos, ScreenScrollYPos);
+#endif
+
     ScrollTowards(ScreenScrollXPos, ScreenScrollYPos);
+  }
 
   if (ForcedExitFlag != 0) // Forced Exit?' yes--exit!
     goto locExitMainGameLoop;

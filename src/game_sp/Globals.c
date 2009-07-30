@@ -522,6 +522,10 @@ static void ReadDemo()
   GravityFlag = LInfo.InitialGravity;
   FreezeZonks = LInfo.InitialFreezeZonks;
 
+#if 1
+  printf("::: Globals.c: ReadDemo(): %d / %d\n", GravityFlag, FreezeZonks);
+#endif
+
   RandomSeed = LInfo.DemoRandomSeed;
 
   LevelLoaded = True;

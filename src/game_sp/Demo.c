@@ -46,6 +46,26 @@ void subGetNextDemoKey()
       ExitToMenuFlag = 1;
     }
   }
+
+#if 1
+  printf("::: %04d [%03ld, %02d] ----------> %s [%d] [%d, %d] [%d, %d]\n",
+	 TimerVar,
+	 DemoOffset - DemoPointer, DemoKeyRepeatCounter,
+	 (DemoKeyCode == keyNone	? "(none)"		:
+	  DemoKeyCode == keyLeft	? "left"		:
+	  DemoKeyCode == keyRight	? "right"		:
+	  DemoKeyCode == keyUp		? "up"			:
+	  DemoKeyCode == keyDown	? "down"		:
+	  DemoKeyCode == keySpace	? "space"		:
+	  DemoKeyCode == keySpaceLeft	? "space + left"	:
+	  DemoKeyCode == keySpaceRight	? "space + right"	:
+	  DemoKeyCode == keySpaceUp	? "space + up"		:
+	  DemoKeyCode == keySpaceDown	? "space + down"	: "(unknown)"),
+	 DemoKeyCode,
+	 MurphyScreenXPos, MurphyScreenYPos,
+	 MurphyPosIndex % 60, MurphyPosIndex / 60);
+#endif
+
 }
 
 currency GetTotalFramesOfDemo()

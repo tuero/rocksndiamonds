@@ -11,7 +11,17 @@ static boolean subMoveKillsMurphy(int si, int ax, int bl);
 
 // --- Option Explicit
 
+#if 1
+
+#define LocalStretch 			(2)
+#define MurphyZoomFactor		(ZoomFactor)
+
+#else
+
 #define LocalStretch 			(1)
+#define MurphyZoomFactor		(1)
+
+#endif
 
 // ==========================================================================
 //                              SUBROUTINE
@@ -39,7 +49,7 @@ int subAnimateMurphy(int *si)
   ax = PlayField16[*si];
   al = LowByte(ax);
 
-#if 1
+#if 0
   printf("::: Murphy.c: subAnimateMurphy(): %d [%d, %d] %d, %d [%d]\n",
 	 *si, *si % 60, *si / 60, ax, al, (al == fiMurphy));
 #endif
@@ -77,6 +87,10 @@ int subAnimateMurphy(int *si)
   bl = DemoKeyCode;
   if (bl != 0) // a key was pressed!
     goto locKeyPressed5FCF;
+
+#if 1
+  printf("::: !!! %d [%d]\n", DemoKeyCode, GravityFlag);
+#endif
 
   RedDiskReleaseFlag = 1;
   if (ScratchGravity != 0) // gravity pulls & space below?'-> force Space up to down
@@ -1164,8 +1178,14 @@ loc_g_6A1F:
   // We only correct Murphies x-location here, when the sequence starts.
   // Remember that this is not the real bug-fix, but we must live with
   // this existing bug and correct for the consequences of it.
+
+#if 1
+  if (0 == AllowEatRightRedDiskBug) // Murphy's screen x-position
+    MurphyScreenXPos = MurphyScreenXPos - 2 * MurphyZoomFactor;
+#else
   if (0 == AllowEatRightRedDiskBug) // Murphy's screen x-position
     MurphyScreenXPos = MurphyScreenXPos - 2;
+#endif
 
   SeqPos = -1;
   // FS: for me this means to blit the first animation frame twice
@@ -1390,10 +1410,20 @@ loc_g_6C8F:
   {
     // ++++++++++++++++++++++++++
     // Begin of normal movement
+#if 1
+    MurphyScreenXPos = MurphyScreenXPos + MurphyDX * MurphyZoomFactor;
+    MurphyScreenYPos = MurphyScreenYPos + MurphyDY * MurphyZoomFactor;
+#else
     MurphyScreenXPos = MurphyScreenXPos + MurphyDX;
     MurphyScreenYPos = MurphyScreenYPos + MurphyDY;
+#endif
     if (! ClearPos < 0) // clear field that murphy is leaving
       subCopyFieldToScreen(ClearPos, 0);
+
+#if 0
+    printf("::: ---------------> %d, %d [%d, %d]\n",
+	   MurphyScreenXPos, MurphyScreenYPos, MurphyDX, MurphyDY);
+#endif
 
     if (dx2 == fiInfotron) // special case of infotron moving left or right
     {
@@ -1432,8 +1462,13 @@ loc_g_6C8F:
   {
     // ++++++++++++++++++++++++++++++++
     // Begin of split movement (port)
+#if 1
+    MurphyScreenXPos = MurphyScreenXPos + 2 * MurphyDX * MurphyZoomFactor;
+    MurphyScreenYPos = MurphyScreenYPos + 2 * MurphyDY * MurphyZoomFactor;
+#else
     MurphyScreenXPos = MurphyScreenXPos + 2 * MurphyDX;
     MurphyScreenYPos = MurphyScreenYPos + 2 * MurphyDY;
+#endif
     subCopyFieldToScreen(ClearPos, 0); // clear the field that murphy leaves
     tDeltaX = MurphyDX * LocalStretch * (SeqPos + 1);
     tDeltaY = MurphyDY * LocalStretch * (SeqPos + 1);

@@ -27,7 +27,7 @@ typedef struct
 #ifndef HAS_LevelInfoType
 typedef struct
 {
-  byte UnUsed[4 + 1];
+  byte UnUsed[4];
   byte InitialGravity; // 1=on, anything else (0) = off
   byte Version; // SpeedFixVersion XOR &H20
   char LevelTitle[23];

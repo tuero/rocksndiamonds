@@ -175,6 +175,7 @@ void DDScrollBuffer_Blt()
   }
 
 #if 1
+
 #if 0
   printf("::: DDScrollBuffer.c: DDScrollBuffer_Blt(): blit from %d, %d [%ld, %ld] [%ld, %ld]\n",
 	 SR.left, SR.top, mScrollX, mScrollY, mDestXOff, mDestYOff);
@@ -329,6 +330,11 @@ void DDScrollBuffer_ScrollTowards(int X, int Y, double Step)
   if (NoDisplayFlag)
     return;
 
+#if 0
+  printf("::: DDScrollBuffer.c: DDScrollBuffer_ScrollTowards(): (1) mScroll: %ld, %ld [%d, %d, %f]\n",
+	 mScrollX, mScrollY, X, Y, Step);
+#endif
+
   X = X / Stretch;
   Y = Y / Stretch;
   dx = X - mScrollX;
@@ -347,9 +353,9 @@ void DDScrollBuffer_ScrollTowards(int X, int Y, double Step)
   ScrollX = mScrollX;
   ScrollY = mScrollY;
 
-#if 1
-  printf("::: DDScrollBuffer.c: DDScrollBuffer_ScrollTowards():  mScroll: %ld, %ld\n",
-	 mScrollX, mScrollY);
+#if 0
+  printf("::: DDScrollBuffer.c: DDScrollBuffer_ScrollTowards(): (2) mScroll: %ld, %ld [%d, %d, %f]\n",
+	 mScrollX, mScrollY, X, Y, Step);
 #endif
 }
 

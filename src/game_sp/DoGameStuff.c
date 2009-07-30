@@ -66,7 +66,7 @@ int subDoGameStuff()
     } // loop    locloop_g_22B8          ' until all animatables done
   }
 
-#if 1
+#if 0
   printf("::: DoGameStuff.c: KillMurphyFlag == %d [%d]\n",
 	 KillMurphyFlag, MurphyMoveCounter);
 #endif
@@ -77,7 +77,7 @@ int subDoGameStuff()
   {
     if (LeadOutCounter == 0)
     {
-#if 1
+#if 0
       printf("::: DoGameStuff.c: killing murphy [%d] ...\n", KillMurphyFlag);
 #endif
 
