@@ -383,7 +383,7 @@ void DDScrollBuffer_SoftScrollTo(int X, int Y, long TimeMS, int FPS)
   Y = Y / Stretch;
   dx = X - mScrollX;
   dY = Y - mScrollY;
-  maxD = (Abs(dx) < Abs(dY) ?  Abs(dY) :  Abs(dY));
+  maxD = (Abs(dx) < Abs(dY) ? Abs(dY) : Abs(dx));
   StepCount = FPS * (TimeMS / (double)1000);
   if (StepCount > maxD)
     StepCount = maxD;

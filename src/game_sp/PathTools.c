@@ -171,7 +171,7 @@ char *StripExtensionlessFileName(char *Path)
 
   T = StripFileName(Path);
   T2 = StripExtension(Path);
-  StripExtensionlessFileName = Left(T, strlen(T) - strlen(T2) - (0 < strlen(T2) ?  1 :  1));
+  StripExtensionlessFileName = Left(T, strlen(T) - strlen(T2) - (0 < strlen(T2) ? 1 : 0));
 
   return StripExtensionlessFileName;
 }

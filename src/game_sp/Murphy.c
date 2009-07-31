@@ -585,7 +585,7 @@ loc_g_62E2:
   // ==========================================================================
 
 loc_g_6312:
-  dx = (MurphyVarFaceLeft == 0 ?  aniMurphyEatUpRight :  aniMurphyEatUpRight);
+  dx = (MurphyVarFaceLeft == 0 ? aniMurphyEatUpRight : aniMurphyEatUpLeft);
   PlayField16[*si - FieldWidth] = 0x103;
   PlayField16[*si] = 0x300;
   *si = *si - FieldWidth;
@@ -607,7 +607,7 @@ loc_g_6341:
   // ==========================================================================
 
 loc_g_6364:
-  dx = (MurphyVarFaceLeft == 0 ?  aniMurphyEatUpRight :  aniMurphyEatUpRight);
+  dx = (MurphyVarFaceLeft == 0 ? aniMurphyEatUpRight : aniMurphyEatUpLeft);
   PlayField16[*si + FieldWidth] = 0x303;
   PlayField16[*si] = 0x300;
   *si = *si + FieldWidth;
@@ -642,7 +642,7 @@ loc_g_63C2:
 
 loc_g_63D3:
   subSoundFXBase();
-  dx = (MurphyVarFaceLeft == 0 ?  aniMurphyEatUpRight :  aniMurphyEatUpRight);
+  dx = (MurphyVarFaceLeft == 0 ? aniMurphyEatUpRight : aniMurphyEatUpLeft);
   PlayField16[*si - FieldWidth] = 0x503;
   PlayField16[*si] = 0x300;
   *si = *si - FieldWidth;
@@ -690,7 +690,7 @@ loc_g_6448:
 
 loc_g_6459:
   subSoundFXBase();
-  dx = (MurphyVarFaceLeft == 0 ?  aniMurphyEatUpRight :  aniMurphyEatUpRight);
+  dx = (MurphyVarFaceLeft == 0 ? aniMurphyEatUpRight : aniMurphyEatUpLeft);
   PlayField16[*si + FieldWidth] = 0x703;
   PlayField16[*si] = 0x300;
   *si = *si + FieldWidth;
@@ -822,7 +822,7 @@ loc_g_6599:
 
 loc_g_65C6:
   subSoundFXInfotron();
-  dx = (MurphyVarFaceLeft == 0 ?  aniMurphyEatUpRight :  aniMurphyEatUpRight);
+  dx = (MurphyVarFaceLeft == 0 ? aniMurphyEatUpRight : aniMurphyEatUpLeft);
   PlayField16[*si - FieldWidth] = 0x903;
   PlayField16[*si] = 0x300;
   *si = *si - FieldWidth;
@@ -849,7 +849,7 @@ loc_g_65FE:
 
 loc_g_662A:
   subSoundFXInfotron();
-  dx = (MurphyVarFaceLeft == 0 ?  aniMurphyEatUpRight :  aniMurphyEatUpRight);
+  dx = (MurphyVarFaceLeft == 0 ? aniMurphyEatUpRight : aniMurphyEatUpLeft);
   PlayField16[*si + FieldWidth] = 0xB03;
   PlayField16[*si] = 0x300;
   *si = *si + FieldWidth;
@@ -1139,7 +1139,7 @@ loc_StopSplit:
   // ==========================================================================
 
 loc_g_69A6:
-  dx = (MurphyVarFaceLeft == 0 ?  aniMurphyEatUpRight :  aniMurphyEatUpRight);
+  dx = (MurphyVarFaceLeft == 0 ? aniMurphyEatUpRight : aniMurphyEatUpLeft);
   PlayField16[*si] = 0x1C03;
   PlayField16[*si - FieldWidth] = 0x300;
   goto loc_StopNoSplit;
@@ -1160,7 +1160,7 @@ loc_g_69CE:
   // ==========================================================================
 
 loc_g_69F7:
-  dx = (MurphyVarFaceLeft == 0 ?  aniMurphyEatUpRight :  aniMurphyEatUpRight);
+  dx = (MurphyVarFaceLeft == 0 ? aniMurphyEatUpRight : aniMurphyEatUpLeft);
   PlayField16[*si] = 0x1E03;
   PlayField16[*si + FieldWidth] = 0x300;
   goto loc_StopNoSplit;
@@ -1422,6 +1422,31 @@ loc_g_6C8F:
     MurphyScreenYPos = MurphyScreenYPos + MurphyDY;
 #endif
 
+
+#if 0
+  printf("::: %04d [%03ld, %02d] ----------> %s [%d] [%d, %d] [%d, %d] [%d]\n",
+	 TimerVar,
+	 DemoOffset - DemoPointer, DemoKeyRepeatCounter,
+	 (DemoKeyCode == keyNone	? "(none)"		:
+	  DemoKeyCode == keyLeft	? "left"		:
+	  DemoKeyCode == keyRight	? "right"		:
+	  DemoKeyCode == keyUp		? "up"			:
+	  DemoKeyCode == keyDown	? "down"		:
+	  DemoKeyCode == keySpace	? "space"		:
+	  DemoKeyCode == keySpaceLeft	? "space + left"	:
+	  DemoKeyCode == keySpaceRight	? "space + right"	:
+	  DemoKeyCode == keySpaceUp	? "space + up"		:
+	  DemoKeyCode == keySpaceDown	? "space + down"	: "(unknown)"),
+	 DemoKeyCode,
+	 MurphyScreenXPos, MurphyScreenYPos,
+	 MurphyPosIndex % 60, MurphyPosIndex / 60,
+	 ClearPos);
+#endif
+
+#if 0
+  Delay(500);
+#endif
+
 #if 1
     if (!(ClearPos < 0)) // clear field that murphy is leaving
       subCopyFieldToScreen(ClearPos, 0);
@@ -1448,7 +1473,7 @@ loc_g_6C8F:
 
     X = GetStretchX(dxPos) + tDeltaX;
     Y = GetStretchY(dxPos) + tDeltaY;
-    Tmp = (SeqPos < 0 ?  0 :  0); // 9StepBugFix!(red disk move right)
+    Tmp = (SeqPos < 0 ? 0 : SeqPos); // 9StepBugFix!(red disk move right)
     StretchedSprites.BltEx(X, Y, dx[Tmp]);
 
 #if 1

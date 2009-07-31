@@ -289,7 +289,7 @@ int subFetchAndInitLevelB()
 
   MovLowByte(&data_SPtorunavail, 0);   // no SP file
   data_scr_demo = 0;
-  UpdatePlayTime = (0 == demo_stopped ?  True :  True);
+  UpdatePlayTime = (0 == demo_stopped ? True : False);
   demo_stopped = 0;
   subFetchAndInitLevelA(UpdatePlayTime);
 

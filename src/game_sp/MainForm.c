@@ -1604,7 +1604,7 @@ static void Form_Resize()
   //  NW = ScaleWidth - 2 * Space: If NW < 0 Then NW = 0
   //  NH = ScaleHeight - 3 * Space - cmbLevel.Height: If NH < 0 Then NH = 0
   //  picViewPort.Move Space, Space, NW, NH
-  Tmp = (ShowPanel != 0 ?  ScaleHeight - Panel.Height :  ScaleHeight - Panel.Height);
+  Tmp = (ShowPanel != 0 ? ScaleHeight - Panel.Height : ScaleHeight);
   if (Tmp < 0)
     Tmp = 0;
 
@@ -2022,7 +2022,7 @@ static void UpdateDeltaT()
   if (! bPlaying)
     return;
 
-  DeltaT = (DemoFlag != 0 ?  DeltaTDemo :  DeltaTDemo);
+  DeltaT = (DemoFlag != 0 ? DeltaTDemo : DeltaTPlay);
   if (DeltaT < 0)
   {
     Stage.Blt();
@@ -2087,7 +2087,7 @@ static void menOpen_Click()
     */
 
     LFilt = LastOpenFilter;
-    cmDlg.FilterIndex = (0 < LFilt & LFilt < 5 ?  LFilt :  LFilt);
+    cmDlg.FilterIndex = (0 < LFilt & LFilt < 5 ? LFilt : 1);
     if (FileExists(CurPath))
       cmDlg.InitDir = WithSlash(StripDir(CurPath));
 
@@ -2164,7 +2164,7 @@ static void menPause_Click()
   static StdPicture OldPic;
   static char *OldText = 0;
 
-  PauseMode = (PauseMode != 0 ?  0 :  0);
+  PauseMode = (PauseMode != 0 ? 0 : 1);
   if (PauseMode != 0)
   {
     if (IS_NOTHING(&OldPic, sizeof(OldPic)))
@@ -2391,7 +2391,7 @@ static void menSoundFX_Click()
 {
   {
     menSoundFX.Checked = ! menSoundFX.Checked;
-    FXOnFlag = (menSoundFX.Checked ?  -1 :  -1);
+    FXOnFlag = (menSoundFX.Checked ? -1 : 0);
   }
 }
 
@@ -2725,7 +2725,7 @@ static void PanelTim_Timer()
   Tmp = Panel.Height;
   if (PanelSeq < Panel.Height && -1 < PanelSeq)
   {
-    PanelSeq = (ShowPanel != 0 ?  PanelSeq + 2 :  PanelSeq + 2);
+    PanelSeq = (ShowPanel != 0 ? PanelSeq + 2 : PanelSeq - 2);
     Tmp = ScaleHeight - Tmp + PanelSeq;
     Panel.top = Tmp;
     picViewPort.Height = Tmp;
@@ -2733,8 +2733,8 @@ static void PanelTim_Timer()
   else
   {
     PanelTim.Enabled = False;
-    PanelSeq = (PanelSeq < 0 ?  0 :  0);
-    ShowPanel = (ShowPanel == 0 ?  1 :  1);
+    PanelSeq = (PanelSeq < 0 ? 0 : PanelSeq - );
+    ShowPanel = (ShowPanel == 0 ? 1 : 0);
     menPanel.Checked = (ShowPanel != 0);
   }
 }
@@ -3314,8 +3314,8 @@ void ShowKey(int KeyVar)
     Tmp = State[i];
     if (Tmp ^ LastState[i])
     {
-      Col = (i == 5 ?  vbRed :  vbRed);
-      shpKey(i).FillColor = (Tmp ?  Col :  Col);
+      Col = (i == 5 ? vbRed : vbGreen);
+      shpKey(i).FillColor = (Tmp ? Col : vbButtonFace);
       shpKey(i).Refresh;
       LastState[i] = Tmp;
     }
@@ -3378,7 +3378,7 @@ static void GetSettings()
     }
 
     Flag = CBool(s.Read("SoundFX", True));
-    FXOnFlag = (Flag ?  -1 :  -1);
+    FXOnFlag = (Flag ? -1 : 0);
     menSoundFX.Checked = Flag;
     SignatureDelay = CLng(s.Read("SignatureDelay", 3000));
     AllowRedDiskCheat = CInt(s.Read("AllowRedDiskCheat", 1));
@@ -3406,7 +3406,7 @@ static void SaveSettings()
   int i;
 
   {
-    s.Save "LastPath", (ModifiedFlag ?  OrigPath :  OrigPath);
+    s.Save "LastPath", (ModifiedFlag ? OrigPath : CurPath);
     if (WindowState != vbMinimized)
     {
       s.Save "Width", Width;

@@ -109,8 +109,8 @@ static void SortData()
 {
   // int Tmp;
 
-  XMin = (X2 < X1 ?  X2 :  X2);
-  YMin = (Y2 < Y1 ?  Y2 :  Y2);
+  XMin = (X2 < X1 ? X2 : X1);
+  YMin = (Y2 < Y1 ? Y2 : Y1);
 }
 
 #if 0

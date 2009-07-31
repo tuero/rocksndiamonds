@@ -80,7 +80,7 @@ long DemoBufferObject_Get_Size()
 {
   long Size;
 
-  Size = (nSize < 1 ?  0 :  0);
+  Size = (nSize < 1 ? 0 : nSize);
   if (! IS_NOTHING(&SubBuffer, sizeof(SubBuffer)))
     Size = Size + SubBuffer.Size;
 
