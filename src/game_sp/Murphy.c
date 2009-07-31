@@ -88,8 +88,8 @@ int subAnimateMurphy(int *si)
   if (bl != 0) // a key was pressed!
     goto locKeyPressed5FCF;
 
-#if 1
-  printf("::: !!! %d [%d]\n", DemoKeyCode, GravityFlag);
+#if 0
+  printf("::: Murphy.c: !!! %d [%d]\n", DemoKeyCode, GravityFlag);
 #endif
 
   RedDiskReleaseFlag = 1;
@@ -931,6 +931,10 @@ loc_g_6756:
   if (LowByte(InfotronsNeeded) != 0)
     return subAnimateMurphy;
 
+#if 1
+  printf("::: Murphy.c: !!!!!!!!!! GAME SOLVED !!!!!!!!!!\n");
+#endif
+
   subSoundFXExit();
   data_h_DemoDone = 1; // EP set level success bytes
   LevelStatus = 1; // set Level Status DONE
@@ -1417,8 +1421,14 @@ loc_g_6C8F:
     MurphyScreenXPos = MurphyScreenXPos + MurphyDX;
     MurphyScreenYPos = MurphyScreenYPos + MurphyDY;
 #endif
+
+#if 1
+    if (!(ClearPos < 0)) // clear field that murphy is leaving
+      subCopyFieldToScreen(ClearPos, 0);
+#else
     if (! ClearPos < 0) // clear field that murphy is leaving
       subCopyFieldToScreen(ClearPos, 0);
+#endif
 
 #if 0
     printf("::: ---------------> %d, %d [%d, %d]\n",
@@ -1440,7 +1450,12 @@ loc_g_6C8F:
     Y = GetStretchY(dxPos) + tDeltaY;
     Tmp = (SeqPos < 0 ?  0 :  0); // 9StepBugFix!(red disk move right)
     StretchedSprites.BltEx(X, Y, dx[Tmp]);
+
+#if 1
+    if (!(dx2 < 0))
+#else
     if (! dx2 < 0)
+#endif
     {
       tPos = dxPos + dx2Step;
       X = GetStretchX(tPos);

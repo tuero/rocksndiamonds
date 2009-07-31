@@ -106,7 +106,7 @@ void ScrollTo(int X, int Y)
 {
   long oldX, oldY;
 
-#if 1
+#if 0
   printf("::: Display.c: ScrollTo(): %d, %d\n", X, Y);
 #endif
 

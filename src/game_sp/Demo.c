@@ -47,7 +47,7 @@ void subGetNextDemoKey()
     }
   }
 
-#if 1
+#if 0
   printf("::: %04d [%03ld, %02d] ----------> %s [%d] [%d, %d] [%d, %d]\n",
 	 TimerVar,
 	 DemoOffset - DemoPointer, DemoKeyRepeatCounter,

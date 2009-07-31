@@ -1007,7 +1007,7 @@ void DisplayLevel()
 {
   int X, Y;
 
-#if 1
+#if 0
   printf("::: MainForm.c: DisplayLevel(): %d, %d, %d\n",
 	 Loaded, LevelLoaded, bPlaying);
 #endif
@@ -1031,7 +1031,7 @@ void DisplayLevel()
 
   if (bPlaying)
   {
-#if 1
+#if 0
     printf("::: MainForm.c: DisplayLevel(): [%ld, %ld, %ld, %ld] [%d, %d]...\n",
 	   DisplayMinX, DisplayMinY, DisplayMaxX, DisplayMaxY,
 	   FieldWidth, FieldHeight);
@@ -2461,13 +2461,13 @@ void menPlay_Click()
   UpdateDeltaT();
 #endif
 
-#if 1
+#if 0
   printf("::: MainForm.c: menPlay_Click(): subFetchAndInitLevelB(): ...\n");
 #endif
 
   subFetchAndInitLevelB();
 
-#if 1
+#if 0
   printf("::: MainForm.c: menPlay_Click(): subFetchAndInitLevelB(): done\n");
 #endif
 
@@ -2972,13 +2972,13 @@ static void ReStretch(float NewStretch)
   long BW2, LW, LH, i;
 #endif
 
-#if 1
+#if 0
   printf("::: MainForm.c: ReStretch(): %d, %d\n", Loaded, LevelLoaded);
 #endif
 
   if (! Loaded)
   {
-#if 1
+#if 0
     printf("::: NewStretch == %f\n", NewStretch);
 #endif
 
@@ -3035,7 +3035,7 @@ static void ReStretch(float NewStretch)
 
     if (Loaded && LevelLoaded)
     {
-#if 1
+#if 0
       printf("::: MainForm.c: ReStretch(): ...\n");
 #endif
 
@@ -3046,7 +3046,7 @@ static void ReStretch(float NewStretch)
 
     subCalculateScreenScrollPos();
 
-#if 1
+#if 0
   printf("::: MainForm.c: ReStretch(): %d, %d\n", ScreenScrollXPos, ScreenScrollYPos);
 #endif
 
@@ -3064,7 +3064,7 @@ static void ReStretch(float NewStretch)
 
 static void SetScrollEdges()
 {
-#if 1
+#if 0
   printf("::: MainForm.c: SetScrollEdges() ... [%ld, %ld, %ld, %ld] [%f, %d] [%d, %d, %d, %d]\n",
 	 DisplayMinX, DisplayMinY, DisplayMaxX, DisplayMaxY,
 	 Stretch, BaseWidth,
@@ -3076,7 +3076,7 @@ static void SetScrollEdges()
   ScrollMaxX = (int)(DisplayMaxX + 1.5) * Stretch * BaseWidth - picPane.Width;
   ScrollMaxY = (int)(DisplayMaxY + 1.5) * Stretch * BaseWidth - picPane.Height;
 
-#if 1
+#if 0
   printf("::: MainForm.c: SetScrollEdges() done [%d, %d, %d, %d]\n",
 	 ScrollMinX, ScrollMinY, ScrollMaxX, ScrollMaxY);
 #endif
@@ -3236,7 +3236,7 @@ static void picViewPort_Resize()
 
   SetScrollEdges();
 
-#if 1
+#if 0
   printf("::: MainForm.c: picViewPort_Resize(): %d, %d\n", ScrollX, ScrollY);
 #endif
 

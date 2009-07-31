@@ -317,7 +317,7 @@ void DDScrollBuffer_ScrollTo(int X, int Y)
   ScrollX = mScrollX;
   ScrollY = mScrollY;
 
-#if 1
+#if 0
   printf("::: DDScrollBuffer.c: DDScrollBuffer_ScrollTo():  mScroll: %ld, %ld [%d, %d]\n",
 	 mScrollX, mScrollY, X, Y);
 #endif
@@ -431,7 +431,7 @@ void DDScrollBuffer_SoftScrollTo(int X, int Y, long TimeMS, int FPS)
 SoftScrollEH:
   AlreadyRunning = False;
 
-#if 1
+#if 0
   printf("::: DDScrollBuffer.c: DDScrollBuffer_SoftScrollTo(): mScroll: %ld, %ld\n",
 	 mScrollX, mScrollY);
 #endif
