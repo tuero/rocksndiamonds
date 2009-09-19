@@ -150,6 +150,15 @@ int subRandomize()
   if ((Tmp & 0x8000) != 0)
     RandomSeed = RandomSeed | 0x8000;
 
+#if 0
+  {
+    int i;
+
+    for (i = 0; i < 10; i++)
+      printf("::: TEST random number: %d\n", subGetRandomNumber());
+  }
+#endif
+
   return subRandomize;
 } // subRandomize
 
@@ -175,6 +184,7 @@ int subGetRandomNumber()
     RandomSeed = RandomSeed | 0x8000;
 
   subGetRandomNumber = Tmp / 2;
+
   //  Mov ax, randomseed
   //  Mov bx, &H5E5
   //  mul bx                          ' dx:ax = reg * ax

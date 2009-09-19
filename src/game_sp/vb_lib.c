@@ -179,7 +179,7 @@ int FileLen(char *a)
 
 long GetTickCount()
 {
-  return 0;
+  return random_linux_libc(RANDOM_SIMPLE);
 }
 
 int GetAttr(char *a)

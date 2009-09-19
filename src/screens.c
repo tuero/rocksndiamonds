@@ -2637,8 +2637,15 @@ static void DrawInfoScreen_CreditsScreen(int screen_nr)
 		      "Thanks to");
     DrawTextSCentered(ystart2 + 1 * ystep, FONT_TEXT_3,
 		      "David Tritscher");
+#if 1
+    DrawTextSCentered(ystart2 + 2 * ystep, FONT_TEXT_2,
+		      "for the code base used for the");
+    DrawTextSCentered(ystart2 + 3 * ystep, FONT_TEXT_2,
+		      "native Emerald Mine engine");
+#else
     DrawTextSCentered(ystart2 + 2 * ystep, FONT_TEXT_2,
 		      "for the new Emerald Mine engine");
+#endif
   }
   else if (screen_nr == 7)
   {

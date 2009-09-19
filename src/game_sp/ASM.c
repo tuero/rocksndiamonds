@@ -69,7 +69,11 @@ int HighByte(int Var)
 
 int SgnHighByte(int Var) // extends the signum to 16 bit
 {
+#if 1
+  short SgnHighByte;
+#else
   int SgnHighByte;
+#endif
 
   if (Var & 0x8000)
   {

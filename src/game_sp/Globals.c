@@ -326,6 +326,10 @@ int GetStretchY(int si)
 
 void ReadLevel()
 {
+#if 1
+  static char CurPathTEST[1024];
+#endif
+
   // int FNum;
   FILE *FNum;
   long i;
@@ -333,13 +337,22 @@ void ReadLevel()
 
 #if 1
   // CurPath = "/home/aeglos/projects/rocksndiamonds/levels/TEST_supaplex/supaplex/levels.dat";
+
+#if 0
   CurPath = "/home/aeglos/projects/rocksndiamonds/supaplex_demo_JENS0001.sp";
   LevelNumber = 1;
+#else
+  sprintf(CurPathTEST, "/home/aeglos/projects/Level_Stuff/SUPAPLEX/SUPAPLEX_LEVELS/solve00/JENS%04d.SP", level_nr);
+  CurPath = CurPathTEST;
+  LevelNumber = level_nr;
+#endif
+
 #endif
 
   DemoAvailable = False;
 
-  if (STRING_IS_LIKE(CurPath, "*.mpx"))
+  if (STRING_IS_LIKE(CurPath, "*.mpx") ||
+      STRING_IS_LIKE(CurPath, "*.MPX"))
   {
     printf("::: reading MPX file ...\n");
 
@@ -347,7 +360,8 @@ void ReadLevel()
     return;
   }
 
-  if (STRING_IS_LIKE(CurPath, "*.sp"))
+  if (STRING_IS_LIKE(CurPath, "*.sp") ||
+      STRING_IS_LIKE(CurPath, "*.SP"))
   {
     printf("::: reading SP file ...\n");
 
@@ -462,6 +476,12 @@ static void ReadDemo()
   int i;
   // byte T;
 
+  int RecordNumber = LevelNumber;
+
+#if 1
+  RecordNumber = 1;	// always "1" for "*.sp" style one level/demo files
+#endif
+
   FieldWidth = 60;
   FieldHeight = 24;
   HeaderSize = 96;
@@ -480,14 +500,14 @@ static void ReadDemo()
 
   FNum = fopen(CurPath, "rb");
 
-  i = (LevelNumber - 1) * ((long)(FieldMax) + 1) + 1;
+  i = (RecordNumber - 1) * ((long)(FieldMax) + 1) + 1;
 #if 1
   FILE_GET(FNum, i, PlayField8, FileMax + 1);
 #else
   FILE_GET(FNum, i, &PlayField8, sizeof(PlayField8));
 #endif
 
-  i = (LevelNumber) * ((long)(FieldMax) + 1) + 1 - HeaderSize;
+  i = (RecordNumber) * ((long)(FieldMax) + 1) + 1 - HeaderSize;
   FILE_GET(FNum, i, &LInfo, sizeof(LInfo)); // store level info in an extra structure
 
   fclose(FNum);
@@ -527,6 +547,27 @@ static void ReadDemo()
 #endif
 
   RandomSeed = LInfo.DemoRandomSeed;
+
+#if 1
+  printf("::: RandomSeed == %d\n", RandomSeed);
+
+#if 1
+  {
+    int i;
+
+    for (i = 0; i < 10; i++)
+      printf("::: TEST random number: %d\n", subGetRandomNumber());
+
+    int buffer, value = -3;
+
+    MovHighByte(&buffer, value);
+    value = SgnHighByte(buffer);
+
+    printf("::: TEST: 0x%08x / %d\n", value, value);
+  }
+#endif
+
+#endif
 
   LevelLoaded = True;
 
