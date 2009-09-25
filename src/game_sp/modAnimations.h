@@ -15,7 +15,11 @@
 #ifndef HAS_SpecialPortType
 typedef struct
 {
+#if 1
+  short PortLocation; // = 2*(x+(y*60))
+#else
   int PortLocation; // = 2*(x+(y*60))
+#endif
   byte Gravity; // 1 = turn on, anything else (0) = turn off
   byte FreezeZonks; // 2 = turn on, anything else (0) = turn off  (1=off!)
   byte FreezeEnemies; // 1 = turn on, anything else (0) = turn off
@@ -38,10 +42,14 @@ typedef struct
   // amount of Infotrons in the level, and use the low byte of that number.
   // (A multiple of 256 Infotrons will then result in 0-to-eat, etc.!)
   byte SpecialPortCount; // Maximum 10 allowed!
-  SpecialPortType SpecialPort[10 + 1];
+  SpecialPortType SpecialPort[10];
   byte SpeedByte; // = Speed XOR Highbyte(RandomSeed)
   byte CheckSumByte; // = CheckSum XOR SpeedByte
+#if 1
+  short DemoRandomSeed;
+#else
   int DemoRandomSeed;
+#endif
 } LevelInfoType;
 #define HAS_LevelInfoType
 #endif

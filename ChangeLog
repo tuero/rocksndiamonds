@@ -1,3 +1,7 @@
+2009-09-23
+	* fixed bug when reading Supaplex single level files (preventing loader
+	  from seeking to level position like in Supaplex level package files)
+
 2009-08-01
 	* first classic Supaplex level running and solved by solution/demo tape
 

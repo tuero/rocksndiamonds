@@ -66,7 +66,12 @@ byte *DisPlayField;
 
 // Public DisplayMin%, DisplayMax%, DisplayWidth%, DisplayHeight%
 
-int TimerVar, RandomSeed;
+int TimerVar;
+#if 1
+short RandomSeed;
+#else
+int RandomSeed;
+#endif
 currency DeltaT; // Interval between two frames (in ms)
 long DeltaTPlay, DeltaTDemo;
 boolean BlockingSpeed;
@@ -342,7 +347,15 @@ void ReadLevel()
   CurPath = "/home/aeglos/projects/rocksndiamonds/supaplex_demo_JENS0001.sp";
   LevelNumber = 1;
 #else
+
+#if 0
+  // sprintf(CurPathTEST, "/home/aeglos/projects/rocksndiamonds/levels/TEST_supaplex/test_solutions/%03d.sp", level_nr);
+
+  sprintf(CurPathTEST, "/home/aeglos/projects/Level_Stuff/SUPAPLEX/SUPAPLEX_LEVELS/Set77/77S%03d.SP", level_nr);
+#else
   sprintf(CurPathTEST, "/home/aeglos/projects/Level_Stuff/SUPAPLEX/SUPAPLEX_LEVELS/solve00/JENS%04d.SP", level_nr);
+#endif
+
   CurPath = CurPathTEST;
   LevelNumber = level_nr;
 #endif
@@ -546,24 +559,40 @@ static void ReadDemo()
   printf("::: Globals.c: ReadDemo(): %d / %d\n", GravityFlag, FreezeZonks);
 #endif
 
+
+
+#if 0
+  /* !!! TESTING BIG / LITTLE ENDIAN STUFF !!! */
+  LInfo.DemoRandomSeed =
+    LowByte(LInfo.DemoRandomSeed) << 8 |
+    HighByte(LInfo.DemoRandomSeed);
+  for (i = 0; i < 10; i++)
+    LInfo.SpecialPort[i].PortLocation =
+      LowByte(LInfo.SpecialPort[i].PortLocation) << 8 |
+      HighByte(LInfo.SpecialPort[i].PortLocation);
+
+  printf("::: swapping file bytes for DemoRandomSeed etc.\n");
+#else
+  printf("::: keeping file bytes in (maybe wrong) 'native' order.\n");
+#endif
+
+#if 1
+  printf("::: LInfo.DemoRandomSeed == %d\n", LInfo.DemoRandomSeed);
+#endif
+
   RandomSeed = LInfo.DemoRandomSeed;
 
-#if 1
+#if 0
+  printf("::: SpeedByte == %d\n", LInfo.SpeedByte);
+  printf("::: CheckSumByte == %d\n", LInfo.CheckSumByte);
   printf("::: RandomSeed == %d\n", RandomSeed);
 
-#if 1
+#if 0
   {
     int i;
 
     for (i = 0; i < 10; i++)
       printf("::: TEST random number: %d\n", subGetRandomNumber());
-
-    int buffer, value = -3;
-
-    MovHighByte(&buffer, value);
-    value = SgnHighByte(buffer);
-
-    printf("::: TEST: 0x%08x / %d\n", value, value);
   }
 #endif
 

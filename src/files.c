@@ -4013,7 +4013,8 @@ static void LoadLevelFromFileInfo_SP(struct LevelInfo *level,
   }
 
   /* position file stream to the requested level inside the level package */
-  if (fseek(file, nr * SP_LEVEL_SIZE, SEEK_SET) != 0)
+  if (level_file_info->packed &&
+      fseek(file, nr * SP_LEVEL_SIZE, SEEK_SET) != 0)
   {
     level->no_valid_file = TRUE;
 

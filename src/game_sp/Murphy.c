@@ -932,7 +932,7 @@ loc_g_6756:
     return subAnimateMurphy;
 
 #if 1
-  printf("::: Murphy.c: !!!!!!!!!! GAME SOLVED !!!!!!!!!!\n");
+  printf("::: Murphy.c: !!!!!!!!!! LEVEL %d SOLVED !!!!!!!!!!\n", LevelNumber);
 #endif
 
   subSoundFXExit();
@@ -2328,6 +2328,28 @@ int subSpPortTest(int si)
 
   int i, cx, bx;
 
+#if 1
+  cx = LInfo.SpecialPortCount; // number of special ports
+
+  for (i = 0; i < cx; i++)
+  {
+    bx = HighByte(LInfo.SpecialPort[i].PortLocation);
+    MovHighByte(&bx, LowByte(LInfo.SpecialPort[i].PortLocation));
+
+    if (bx / 2 == si)
+    {
+      GravityFlag = LInfo.SpecialPort[i].Gravity;
+      FreezeZonks = LInfo.SpecialPort[i].FreezeZonks;
+      SnikSnaksElectronsFrozen = LInfo.SpecialPort[i].FreezeEnemies;
+
+      // RandomTime = RandomTime Xor RandomSeed 'is RandomTime used at all? no!
+
+      break;
+    }
+  }
+
+#else
+
   cx = LInfo.SpecialPortCount; // number of special ports
   for (i = 1; i <= cx; i++)
   {
@@ -2342,9 +2364,9 @@ int subSpPortTest(int si)
         //        RandomTime = RandomTime Xor RandomSeed 'is RandomTime used at all? no!
         i = cx + 1;
       }
-
     }
   }
+#endif
 
   return subSpPortTest;
 } // subSpPortTest

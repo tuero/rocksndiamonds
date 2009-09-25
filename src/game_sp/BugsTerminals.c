@@ -94,7 +94,11 @@ int subAnimateTerminals(int si)
   int subAnimateTerminals;
 
   // int bl, ax, al, X, Y;
+#if 1
+  short bl, al, X, Y;
+#else
   int bl, al, X, Y;
+#endif
 
   if (LowByte(PlayField16[si]) != fiTerminal)
     return subAnimateTerminals;
@@ -159,6 +163,10 @@ int subRandomize()
   }
 #endif
 
+#if 1
+  printf("::: BugsTerminals.c: ========== subRandomize()\n");
+#endif
+
   return subRandomize;
 } // subRandomize
 
@@ -178,7 +186,12 @@ int subGetRandomNumber()
   if (0x8000 == (RandomSeed & 0x8000))
     RSeed = RSeed | 0x8000;
 
+#if 0
+  /* !!! TEST !!! */
+  Tmp = 0xFFFF & (((0x5E5 * RSeed) & 0xFFFF) + 0x31);
+#else
   Tmp = 0xFFFF & (((0x5E5 * RandomSeed) & 0xFFFF) + 0x31);
+#endif
   RandomSeed = 0x7FFF & Tmp;
   if ((Tmp & 0x8000) != 0)
     RandomSeed = RandomSeed | 0x8000;
@@ -192,6 +205,10 @@ int subGetRandomNumber()
   //  Mov randomseed, ax
   //  shr ax,1
 
+#if 0
+  printf("::: BugsTerminals.c: ---------- subGetRandomNumber(): %d\n",
+	 subGetRandomNumber);
+#endif
+
   return subGetRandomNumber;
 } // subGetRandomNumber
-
