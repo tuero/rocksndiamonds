@@ -70,7 +70,7 @@ void GoPlay()
   //  Call subFetchAndInitLevelB
   EndFlag = False;
 
-#if 0
+#if 1
   subMainGameLoop_Init();
 #else
   subMainGameLoop();

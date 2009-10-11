@@ -12037,6 +12037,18 @@ static void CheckLevelTime()
 	level.native_em_level->ply[3]->alive == 0)	/* all dead */
       AllPlayersGone = TRUE;
   }
+  else if (level.game_engine_type == GAME_ENGINE_TYPE_SP)
+  {
+    if (game_sp_info.LevelSolved)			/* game won */
+    {
+      PlayerWins(local_player);
+
+      AllPlayersGone = TRUE;
+    }
+
+    if (game_sp_info.GameOver)				/* game lost */
+      AllPlayersGone = TRUE;
+  }
 
   if (TimeFrames >= FRAMES_PER_SECOND)
   {

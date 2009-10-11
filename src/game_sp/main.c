@@ -3,10 +3,14 @@
 #include "global.h"
 
 
+struct GameInfo_SP game_sp_info;
 struct LevelInfo_SP native_sp_level;
 
 void InitGameEngine_SP()
 {
+  game_sp_info.LevelSolved = FALSE;
+  game_sp_info.GameOver = FALSE;
+
 #if 0
   menPlay_Click();
 #else
@@ -22,4 +26,5 @@ void BlitScreenToBitmap_SP(Bitmap *target_bitmap)
 
 void GameActions_SP(byte action[MAX_PLAYERS], boolean warp_mode)
 {
+  subMainGameLoop_Main();
 }

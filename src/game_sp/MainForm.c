@@ -2523,7 +2523,7 @@ void menPlay_Click()
 
 }
 
-#if 0
+#if 1
 
 // static void menPlayDemo_Click()
 void menPlayDemo_Click()
@@ -2538,7 +2538,7 @@ void menPlayDemo_Click()
   menPlay_Click();
 
 #if 1
-  return;
+  return;	/* return after initialization phase */
 #endif
 
 #if 0

@@ -932,8 +932,11 @@ loc_g_6756:
     return subAnimateMurphy;
 
 #if 1
-  printf("::: Murphy.c: !!!!!!!!!! LEVEL %d SOLVED !!!!!!!!!!\n", LevelNumber);
+  if (!game_sp_info.LevelSolved)
+    printf("::: Murphy.c: !!!!!!!!!! LEVEL %d SOLVED !!!!!!!!!!\n",LevelNumber);
 #endif
+
+  game_sp_info.LevelSolved = TRUE;
 
   subSoundFXExit();
   data_h_DemoDone = 1; // EP set level success bytes

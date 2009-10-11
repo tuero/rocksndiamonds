@@ -206,11 +206,17 @@ locRepeatMainGameLoop:                           // start repeating game loop
   //      .Refresh
   //    End With
   //  End If
+
   if (ExitToMenuFlag == 1)
     goto locExitMainGameLoop;
 
+#if 1
+  if (LeadOutCounter == 0) // no lead-out: game busy
+    return subMainGameLoop;
+#else
   if (LeadOutCounter == 0) // no lead-out: game busy
     goto locRepeatMainGameLoop;
+#endif
 
   // ----------------------------------------------------------------------------
   // ---------------------- END OF GAME-BUSY LOOP -------------------------------

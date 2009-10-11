@@ -60,8 +60,6 @@
 
 extern struct LevelInfo_SP native_sp_level;
 
-extern struct GameInfo_SP game_sp;
-
 extern Bitmap *screenBitmap;
 
 extern Bitmap *sp_objects;

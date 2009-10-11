@@ -80,6 +80,8 @@ struct GlobalInfo_SP
 
 struct GameInfo_SP
 {
+  boolean LevelSolved;
+  boolean GameOver;
 };
 
 struct LevelInfo_SP
@@ -125,6 +127,7 @@ struct EngineSnapshotInfo_SP
 /* ------------------------------------------------------------------------- */
 
 extern struct GlobalInfo_SP global_sp_info;
+extern struct GameInfo_SP game_sp_info;
 extern struct LevelInfo_SP native_sp_level;
 extern struct GraphicInfo_SP graphic_info_sp_object[TILE_MAX][8];
 extern struct GraphicInfo_SP graphic_info_sp_player[MAX_PLAYERS][SPR_MAX][8];

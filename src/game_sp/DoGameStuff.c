@@ -85,6 +85,21 @@ int subDoGameStuff()
       ExplodeFieldSP(MurphyExplodePos);                 // Explode
       LeadOutCounter = 0x40;           // quit: start lead-out
     }
+
+#if 1
+    if (KillMurphyFlag == 1 &&
+	!game_sp_info.LevelSolved &&
+	!game_sp_info.GameOver)
+    {
+#if 1
+      printf("::: DoGameStuff.c: !!!!!!!!!! GAME OVER !!!!!!!!!!\n");
+#endif
+
+      game_sp_info.GameOver = TRUE;
+    }
+#endif
+
+
   } //  loc_g_22FB:
 
 
