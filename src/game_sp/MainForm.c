@@ -2523,6 +2523,34 @@ void menPlay_Click()
 
 }
 
+#if 0
+
+// static void menPlayDemo_Click()
+void menPlayDemo_Click()
+{
+  DemoFlag = 1;
+  RecordDemoFlag = 0;
+
+#if 0
+  lblStatus = "Demo Playback";
+#endif
+
+  menPlay_Click();
+
+#if 1
+  return;
+#endif
+
+#if 0
+  if (LevelStatus != 1)
+    lblStatus = "Demo Failed";
+#endif
+
+  DemoFlag = 0;
+}
+
+#else
+
 // static void menPlayDemo_Click()
 void menPlayDemo_Click()
 {
@@ -2542,6 +2570,8 @@ void menPlayDemo_Click()
 
   DemoFlag = 0;
 }
+
+#endif
 
 #if 0
 

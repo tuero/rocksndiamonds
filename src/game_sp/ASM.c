@@ -129,30 +129,30 @@ void MySub(int *A, int B)
   *A = *A - B;
 }
 
-int SHR(int Var, int Count)
+int SHR(int *Var, int Count)
 {
   int SHR;
 
   int i;
 
-  if (Var & 0x8000)
+  if (*Var & 0x8000)
   {
-    Var = ((Var & 0x7FFF) / 2) | 0x4000;
+    *Var = ((*Var & 0x7FFF) / 2) | 0x4000;
   }
   else
   {
-    Var = Var / 2;
+    *Var = *Var / 2;
   }
 
   for (i = 2; i <= Count; i++)
   {
-    Var = Var / 2;
+    *Var = *Var / 2;
   }
 
   return SHR;
 }
 
-int SHL(int Var, int Count)
+int SHL(int *Var, int Count)
 {
   int SHL;
 
@@ -160,14 +160,14 @@ int SHL(int Var, int Count)
 
   for (i = 1; i <= Count; i++)
   {
-    Var = Var & 0x7FFF;
-    if ((Var & 0x4000) != 0)
+    *Var = *Var & 0x7FFF;
+    if ((*Var & 0x4000) != 0)
     {
-      Var = (2 * (Var & 0x3FFF)) | 0x8000;
+      *Var = (2 * (*Var & 0x3FFF)) | 0x8000;
     }
     else
     {
-      Var = 2 * Var;
+      *Var = 2 * *Var;
     }
   }
 

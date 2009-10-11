@@ -13,6 +13,7 @@
 # -----------------------------------------------------------------------------
 
 SRCS =	init.c			\
+	file.c			\
 	main.c			\
 	vb_lib.c		\
 	vb_vars.c		\
@@ -57,6 +58,7 @@ SRCS =	init.c			\
 	modMPX.c
 
 OBJS =	init.o			\
+	file.o			\
 	main.o			\
 	vb_lib.o		\
 	vb_vars.o		\

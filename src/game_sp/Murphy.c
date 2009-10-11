@@ -2333,8 +2333,14 @@ int subSpPortTest(int si)
 
   for (i = 0; i < cx; i++)
   {
+#if 1
+    /* this assumes that PortLocation is stored as big endian */
+    bx = LInfo.SpecialPort[i].PortLocation;
+#else
+    /* this assumes that PortLocation is stored as little endian */
     bx = HighByte(LInfo.SpecialPort[i].PortLocation);
     MovHighByte(&bx, LowByte(LInfo.SpecialPort[i].PortLocation));
+#endif
 
     if (bx / 2 == si)
     {

@@ -2293,6 +2293,7 @@ struct LevelInfo
 
   /* level stored in native format for the alternative native game engines */
   struct LevelInfo_EM *native_em_level;
+  struct LevelInfo_SP *native_sp_level;
 
   int file_version;	/* file format version the level is stored with    */
   int game_version;	/* game release version the level was created with */

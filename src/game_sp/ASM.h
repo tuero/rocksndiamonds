@@ -28,8 +28,8 @@ extern void MovHighByte(int *Var, int Val);
 extern void MovLowByte(int *Var, int Val);
 extern void MySub(int *A, int B);
 extern void Neg(int *Val);
-extern int SHL(int Var, int Count);
-extern int SHR(int Var, int Count);
+extern int SHL(int *Var, int Count);
+extern int SHR(int *Var, int Count);
 extern int SgnHighByte(int Var);
 extern void XCHG(int A, int B);
 

@@ -3,6 +3,8 @@
 #include "global.h"
 
 
+struct LevelInfo_SP native_sp_level;
+
 void InitGameEngine_SP()
 {
 #if 0

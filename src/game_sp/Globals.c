@@ -329,7 +329,7 @@ int GetStretchY(int si)
   return GetStretchY;
 }
 
-void ReadLevel()
+void OLD_ReadLevel()
 {
 #if 1
   static char CurPathTEST[1024];
@@ -580,6 +580,18 @@ static void ReadDemo()
   printf("::: LInfo.DemoRandomSeed == %d\n", LInfo.DemoRandomSeed);
 #endif
 
+#if 0
+  printf("::: LInfo.SpecialPortCount == %d\n", LInfo.SpecialPortCount);
+  for (i = 0; i < LInfo.SpecialPortCount; i++)
+  {
+    int port_x = (LInfo.SpecialPort[i].PortLocation / 2) % FieldWidth;
+    int port_y = (LInfo.SpecialPort[i].PortLocation / 2) / FieldWidth;
+
+    printf("::: %d: port_location == %d => (%d, %d)\n",
+	   i, LInfo.SpecialPort[i].PortLocation, port_x, port_y);
+  }
+#endif
+
   RandomSeed = LInfo.DemoRandomSeed;
 
 #if 0
@@ -606,4 +618,22 @@ static void ReadDemo()
 ReadDemoEH:
   Close();
 #endif
+}
+
+void ReadLevel()
+{
+#if 0
+  OLD_ReadLevel();
+
+  // return;
+#endif
+
+  copyInternalEngineVars_SP();
+
+  LevelNumber = level_nr;
+
+  if (!DemoFlag || !DemoAvailable)
+    subRandomize();
+
+  LevelLoaded = True;
 }

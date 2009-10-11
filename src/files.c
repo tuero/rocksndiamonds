@@ -1587,8 +1587,10 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
   *level = li;		/* copy temporary buffer back to level data */
 
   setLevelInfoToDefaults_EM();
+  setLevelInfoToDefaults_SP();
 
   level->native_em_level = &native_em_level;
+  level->native_sp_level = &native_sp_level;
 
   level->file_version = FILE_VERSION_ACTUAL;
   level->game_version = GAME_VERSION_ACTUAL;
@@ -3799,29 +3801,12 @@ void CopyNativeLevel_EM_to_RND(struct LevelInfo *level)
   }
 }
 
-static void LoadLevelFromFileInfo_EM(struct LevelInfo *level,
-				     struct LevelFileInfo *level_file_info)
-{
-  if (!LoadNativeLevel_EM(level_file_info->filename))
-    level->no_valid_file = TRUE;
-}
-
-void CopyNativeLevel_RND_to_Native(struct LevelInfo *level)
-{
-  if (level->game_engine_type == GAME_ENGINE_TYPE_EM)
-    CopyNativeLevel_RND_to_EM(level);
-}
-
-void CopyNativeLevel_Native_to_RND(struct LevelInfo *level)
-{
-  if (level->game_engine_type == GAME_ENGINE_TYPE_EM)
-    CopyNativeLevel_EM_to_RND(level);
-}
-
 
 /* ------------------------------------------------------------------------- */
 /* functions for loading SP level                                            */
 /* ------------------------------------------------------------------------- */
+
+#if 0
 
 #define NUM_SUPAPLEX_LEVELS_PER_PACKAGE	111
 #define SP_LEVEL_SIZE			1536
@@ -4168,6 +4153,121 @@ static void LoadLevelFromFileInfo_SP(struct LevelInfo *level,
     *level = multipart_level;
 }
 
+#endif
+
+void CopyNativeLevel_RND_to_SP(struct LevelInfo *level)
+{
+  /* ... yet to be written ... */
+}
+
+void CopyNativeLevel_SP_to_RND(struct LevelInfo *level)
+{
+  LevelInfoType *header = &native_sp_level.header;
+  int i, x, y;
+
+  level->fieldx = native_sp_level.width;
+  level->fieldy = native_sp_level.height;
+
+  for (x = 0; x < level->fieldx; x++)
+  {
+    for (y = 0; y < level->fieldy; y++)
+    {
+      int element_old = native_sp_level.playfield[x][y];
+      int element_new;
+
+      if (element_old <= 0x27)
+	element_new = getMappedElement(EL_SP_START + element_old);
+      else if (element_old == 0x28)
+	element_new = EL_INVISIBLE_WALL;
+      else
+      {
+	Error(ERR_WARN, "invalid element %d at position %d, %d",
+	      element_old, x, y);
+
+	element_new = EL_UNKNOWN;
+      }
+
+      level->field[x][y] = element_new;
+    }
+  }
+
+  for (i = 0; i < MAX_PLAYERS; i++)
+    level->initial_player_gravity[i] =
+      (header->InitialGravity == 1 ? TRUE : FALSE);
+
+  for (i = 0; i < SP_LEVEL_NAME_LEN; i++)
+    level->name[i] = header->LevelTitle[i];
+  level->name[SP_LEVEL_NAME_LEN] = '\0';
+
+  level->gems_needed = header->InfotronsNeeded;
+
+  for (i = 0; i < header->SpecialPortCount; i++)
+  {
+    SpecialPortType *port = &header->SpecialPort[i];
+    int port_location = port->PortLocation;
+    int gravity = port->Gravity;
+    int port_x, port_y, port_element;
+
+    port_x = (port_location / 2) % level->fieldx;
+    port_y = (port_location / 2) / level->fieldx;
+
+    if (port_x < 0 || port_x >= level->fieldx ||
+	port_y < 0 || port_y >= level->fieldy)
+    {
+      Error(ERR_WARN, "special port position (%d, %d) out of bounds",
+	    port_x, port_y);
+
+      continue;
+    }
+
+    port_element = level->field[port_x][port_y];
+
+    if (port_element < EL_SP_GRAVITY_PORT_RIGHT ||
+	port_element > EL_SP_GRAVITY_PORT_UP)
+    {
+      Error(ERR_WARN, "no special port at position (%d, %d)", port_x, port_y);
+
+      continue;
+    }
+
+    /* change previous (wrong) gravity inverting special port to either
+       gravity enabling special port or gravity disabling special port */
+    level->field[port_x][port_y] +=
+      (gravity == 1 ? EL_SP_GRAVITY_ON_PORT_RIGHT :
+       EL_SP_GRAVITY_OFF_PORT_RIGHT) - EL_SP_GRAVITY_PORT_RIGHT;
+  }
+
+  /* change special gravity ports without database entries to normal ports */
+  for (x = 0; x < level->fieldx; x++)
+    for (y = 0; y < level->fieldy; y++)
+      if (level->field[x][y] >= EL_SP_GRAVITY_PORT_RIGHT &&
+	  level->field[x][y] <= EL_SP_GRAVITY_PORT_UP)
+	level->field[x][y] += EL_SP_PORT_RIGHT - EL_SP_GRAVITY_PORT_RIGHT;
+
+  level->time = 0;			/* no time limit */
+  level->amoeba_speed = 0;
+  level->time_magic_wall = 0;
+  level->time_wheel = 0;
+  level->amoeba_content = EL_EMPTY;
+
+#if 1
+  /* original Supaplex does not use score values -- use default values */
+#else
+  for (i = 0; i < LEVEL_SCORE_ELEMENTS; i++)
+    level->score[i] = 0;
+#endif
+
+  /* there are no yamyams in supaplex levels */
+  for (i = 0; i < level->num_yamyam_contents; i++)
+    for (x = 0; x < 3; x++)
+      for (y = 0; y < 3; y++)
+	level->yamyam_content[i].e[x][y] = EL_EMPTY;
+}
+
+
+/* ------------------------------------------------------------------------- */
+/* functions for loading DC level                                            */
+/* ------------------------------------------------------------------------- */
 
 #define DC_LEVEL_HEADER_SIZE		344
 
@@ -6136,6 +6236,47 @@ static void LoadLevelFromFileInfo_DC(struct LevelInfo *level,
 }
 
 #endif
+
+
+/* ------------------------------------------------------------------------- */
+/* functions for handling native levels                                      */
+/* ------------------------------------------------------------------------- */
+
+static void LoadLevelFromFileInfo_EM(struct LevelInfo *level,
+				     struct LevelFileInfo *level_file_info)
+{
+  if (!LoadNativeLevel_EM(level_file_info->filename))
+    level->no_valid_file = TRUE;
+}
+
+static void LoadLevelFromFileInfo_SP(struct LevelInfo *level,
+				     struct LevelFileInfo *level_file_info)
+{
+  int pos = 0;
+
+  /* determine position of requested level inside level package */
+  if (level_file_info->packed)
+    pos = level_file_info->nr - leveldir_current->first_level;
+
+  if (!LoadNativeLevel_SP(level_file_info->filename, pos))
+    level->no_valid_file = TRUE;
+}
+
+void CopyNativeLevel_RND_to_Native(struct LevelInfo *level)
+{
+  if (level->game_engine_type == GAME_ENGINE_TYPE_EM)
+    CopyNativeLevel_RND_to_EM(level);
+  else if (level->game_engine_type == GAME_ENGINE_TYPE_SP)
+    CopyNativeLevel_RND_to_SP(level);
+}
+
+void CopyNativeLevel_Native_to_RND(struct LevelInfo *level)
+{
+  if (level->game_engine_type == GAME_ENGINE_TYPE_EM)
+    CopyNativeLevel_EM_to_RND(level);
+  else if (level->game_engine_type == GAME_ENGINE_TYPE_SP)
+    CopyNativeLevel_SP_to_RND(level);
+}
 
 
 /* ------------------------------------------------------------------------- */

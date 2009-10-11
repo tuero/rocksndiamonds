@@ -9,10 +9,70 @@
 /* constant definitions                                                      */
 /* ------------------------------------------------------------------------- */
 
+#define SP_MAX_PLAYFIELD_WIDTH		MAX_PLAYFIELD_WIDTH
+#define SP_MAX_PLAYFIELD_HEIGHT		MAX_PLAYFIELD_HEIGHT
+
+#define SP_NUM_LEVELS_PER_PACKAGE	111
+
+#define SP_PLAYFIELD_WIDTH		60
+#define SP_PLAYFIELD_HEIGHT		24
+#define SP_LEVEL_NAME_LEN		23
+#define SP_MAX_SPECIAL_PORTS		10
+
+#define SP_HEADER_SIZE			96
+#define SP_PLAYFIELD_SIZE		(SP_PLAYFIELD_WIDTH *		\
+					 SP_PLAYFIELD_HEIGHT)
+#define SP_LEVEL_SIZE			(SP_HEADER_SIZE + SP_PLAYFIELD_SIZE)
+
+#define SP_FRAMES_PER_SECOND		35
+#define SP_MAX_TAPE_LEN			64010	/* (see "spfix63.doc") */
+
 
 /* ------------------------------------------------------------------------- */
 /* data structure definitions                                                */
 /* ------------------------------------------------------------------------- */
+
+#ifndef HAS_SpecialPortType
+typedef struct
+{
+#if 1
+  short PortLocation; // = 2*(x+(y*60))		/* big endian format */
+#else
+  int PortLocation; // = 2*(x+(y*60))
+#endif
+  byte Gravity; // 1 = turn on, anything else (0) = turn off
+  byte FreezeZonks; // 2 = turn on, anything else (0) = turn off  (1=off!)
+  byte FreezeEnemies; // 1 = turn on, anything else (0) = turn off
+  byte UnUsed;
+} SpecialPortType;
+#define HAS_SpecialPortType
+#endif
+
+#ifndef HAS_LevelInfoType
+typedef struct
+{
+  byte UnUsed[4];
+  byte InitialGravity; // 1=on, anything else (0) = off
+  byte Version; // SpeedFixVersion XOR &H20
+  char LevelTitle[23];
+  byte InitialFreezeZonks; // 2=on, anything else (0) = off.  (1=off too!)
+  byte InfotronsNeeded;
+
+  // Number of Infotrons needed. 0 means that Supaplex will count the total
+  // amount of Infotrons in the level, and use the low byte of that number.
+  // (A multiple of 256 Infotrons will then result in 0-to-eat, etc.!)
+  byte SpecialPortCount; // Maximum 10 allowed!
+  SpecialPortType SpecialPort[10];
+  byte SpeedByte; // = Speed XOR Highbyte(RandomSeed)
+  byte CheckSumByte; // = CheckSum XOR SpeedByte
+#if 1
+  short DemoRandomSeed;				/* little endian format */
+#else
+  int DemoRandomSeed;
+#endif
+} LevelInfoType;
+#define HAS_LevelInfoType
+#endif
 
 struct GlobalInfo_SP
 {
@@ -24,7 +84,16 @@ struct GameInfo_SP
 
 struct LevelInfo_SP
 {
-  int file_version;
+  LevelInfoType header;
+
+  byte playfield[SP_MAX_PLAYFIELD_WIDTH][SP_MAX_PLAYFIELD_HEIGHT];
+
+  int width, height;
+
+  boolean demo_available;
+
+  byte demo[SP_MAX_TAPE_LEN];
+  int demo_length;
 };
 
 struct GraphicInfo_SP
@@ -70,7 +139,8 @@ extern void GameActions_SP(byte *, boolean);
 extern unsigned int InitEngineRandom_SP(long);
 
 extern void setLevelInfoToDefaults_SP();
-extern boolean LoadNativeLevel_SP(char *);
+extern void copyInternalEngineVars_SP();
+extern boolean LoadNativeLevel_SP(char *, int);
 
 extern void BackToFront_SP(void);
 extern void BlitScreenToBitmap_SP(Bitmap *);

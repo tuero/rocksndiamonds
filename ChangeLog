@@ -1,3 +1,8 @@
+2009-09-25
+	* fixed another translation problem from VisualBasic to C (where "int"
+	  should be "short") causing unsolvable demos with bugs and terminals
+	  ("bugs" being related to the Supaplex "buggy base" element here ;-) )
+
 2009-09-23
 	* fixed bug when reading Supaplex single level files (preventing loader
 	  from seeking to level position like in Supaplex level package files)
