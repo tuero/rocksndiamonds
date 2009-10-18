@@ -91,7 +91,9 @@ int subMainGameLoop_Main()
   // --------------------- START OF GAME-BUSY LOOP ------------------------------
   // ----------------------------------------------------------------------------
 
+#if 0
 locRepeatMainGameLoop:                           // start repeating game loop
+#endif
 
   // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   // FS   synchronization
@@ -120,8 +122,19 @@ locRepeatMainGameLoop:                           // start repeating game loop
 
   // FS   end of synchronization
   // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#if 1
+  if (EndFlag)
+  {
+    // (should never happen)
+
+    // printf("::: EndFlag == True\n");
+
+    goto locExitMainGameLoop;
+  }
+#else
   if (EndFlag)
     goto locExitMainGameLoop;
+#endif
 
   // If DemoFlag = 0 Then Call subCheckJoystick    ' check joystick
   // bx = subCheckRightMouseButton()                ' check (right) mouse button
@@ -190,8 +203,19 @@ locRepeatMainGameLoop:                           // start repeating game loop
     ScrollTowards(ScreenScrollXPos, ScreenScrollYPos);
   }
 
+#if 1
+  if (ForcedExitFlag != 0) // Forced Exit?' yes--exit!
+  {
+    // (should never happen)
+
+    // printf("::: ForcedExitFlag == True\n");
+
+    goto locExitMainGameLoop;
+  }
+#else
   if (ForcedExitFlag != 0) // Forced Exit?' yes--exit!
     goto locExitMainGameLoop;
+#endif
 
   TimerVar = TimerVar + 1;
 
@@ -207,8 +231,19 @@ locRepeatMainGameLoop:                           // start repeating game loop
   //    End With
   //  End If
 
+#if 1
+  if (ExitToMenuFlag == 1)
+  {
+    // happens when demo ends or when Murphy enters exit (to be checked)
+
+    printf("::: ExitToMenuFlag == True\n");
+
+    goto locExitMainGameLoop;
+  }
+#else
   if (ExitToMenuFlag == 1)
     goto locExitMainGameLoop;
+#endif
 
 #if 1
   if (LeadOutCounter == 0) // no lead-out: game busy
@@ -222,13 +257,23 @@ locRepeatMainGameLoop:                           // start repeating game loop
   // ---------------------- END OF GAME-BUSY LOOP -------------------------------
   // ----------------------------------------------------------------------------
   LeadOutCounter = LeadOutCounter - 1;             // do more lead-out after quit
+#if 1
+  if (LeadOutCounter != 0) // lead-out not ready: more
+    return subMainGameLoop;
+#else
   if (LeadOutCounter != 0) // lead-out not ready: more
     goto locRepeatMainGameLoop;
+#endif
 
   // lead-out done: exit now
   // ---------------------- END OF GAME-BUSY LOOP (including lead-out) ----------
 
 locExitMainGameLoop:
+
+#if 0
+  printf("::: locExitMainGameLoop reached [%d]\n", LeadOutCounter);
+#endif
+
   do
   {
     DoEvents(); // user may klick on menus or move the window here ...

@@ -12020,6 +12020,7 @@ static void CheckLevelTime()
 {
   int i;
 
+  /* !!! SAME CODE AS IN "GameActions()" -- FIX THIS !!! */
   if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
   {
     if (level.native_em_level->lev->home == 0)	/* all players at home */
@@ -12039,9 +12040,12 @@ static void CheckLevelTime()
   }
   else if (level.game_engine_type == GAME_ENGINE_TYPE_SP)
   {
-    if (game_sp_info.LevelSolved)			/* game won */
+    if (game_sp_info.LevelSolved &&
+	!game_sp_info.GameOver)				/* game won */
     {
       PlayerWins(local_player);
+
+      game_sp_info.GameOver = TRUE;
 
       AllPlayersGone = TRUE;
     }
@@ -12226,6 +12230,7 @@ void GameActions()
   if (game.restart_level)
     StartGameActions(options.network, setup.autorecord, level.random_seed);
 
+  /* !!! SAME CODE AS IN "CheckLevelTime()" -- FIX THIS !!! */
   if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
   {
     if (level.native_em_level->lev->home == 0)	/* all players at home */
@@ -12241,6 +12246,21 @@ void GameActions()
 	level.native_em_level->ply[1]->alive == 0 &&
 	level.native_em_level->ply[2]->alive == 0 &&
 	level.native_em_level->ply[3]->alive == 0)	/* all dead */
+      AllPlayersGone = TRUE;
+  }
+  else if (level.game_engine_type == GAME_ENGINE_TYPE_SP)
+  {
+    if (game_sp_info.LevelSolved &&
+	!game_sp_info.GameOver)				/* game won */
+    {
+      PlayerWins(local_player);
+
+      game_sp_info.GameOver = TRUE;
+
+      AllPlayersGone = TRUE;
+    }
+
+    if (game_sp_info.GameOver)				/* game lost */
       AllPlayersGone = TRUE;
   }
 

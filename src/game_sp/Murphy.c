@@ -936,7 +936,9 @@ loc_g_6756:
     printf("::: Murphy.c: !!!!!!!!!! LEVEL %d SOLVED !!!!!!!!!!\n",LevelNumber);
 #endif
 
+#if 0
   game_sp_info.LevelSolved = TRUE;
+#endif
 
   subSoundFXExit();
   data_h_DemoDone = 1; // EP set level success bytes
