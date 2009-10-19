@@ -236,7 +236,9 @@ locRepeatMainGameLoop:                           // start repeating game loop
   {
     // happens when demo ends or when Murphy enters exit (to be checked)
 
+#if 0
     printf("::: ExitToMenuFlag == True\n");
+#endif
 
     goto locExitMainGameLoop;
   }
@@ -269,6 +271,14 @@ locRepeatMainGameLoop:                           // start repeating game loop
   // ---------------------- END OF GAME-BUSY LOOP (including lead-out) ----------
 
 locExitMainGameLoop:
+
+
+
+#if 1
+  return subMainGameLoop;
+#endif
+
+
 
 #if 0
   printf("::: locExitMainGameLoop reached [%d]\n", LeadOutCounter);
@@ -305,7 +315,6 @@ locExitMainGameLoop:
 
   if (UpdatedFlag == 0) // update playing time
     subUpdatePlayingTime();
-
 
   return subMainGameLoop;
 } // subMainGameLoop

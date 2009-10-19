@@ -936,7 +936,7 @@ loc_g_6756:
     printf("::: Murphy.c: !!!!!!!!!! LEVEL %d SOLVED !!!!!!!!!!\n",LevelNumber);
 #endif
 
-#if 0
+#if 1
   game_sp_info.LevelSolved = TRUE;
 #endif
 

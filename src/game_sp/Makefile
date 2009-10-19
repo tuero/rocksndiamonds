@@ -1,12 +1,11 @@
 # =============================================================================
-# Makefile for Rocks'n'Diamonds native Supaplex engine (game_sp)
+# Makefile for native Supaplex engine for Rocks'n'Diamonds (game_sp)
 # -----------------------------------------------------------------------------
 # (c) 1995-2009 Holger Schemel <info@artsoft.org>
 # -----------------------------------------------------------------------------
-# MegaPlex version 0.5 beta release xmas 2001 by Frank Schindler,
+# based on MegaPlex version 0.5 beta release xmas 2001 by Frank Schindler,
 # based on the Speed Fix 6.3+ by Herman Perk,
 # based on original Supaplex by Michael Stopp & Philip Jespersen
-# (code automatically converted from VisualBasic to C by vb2c.pl).
 # =============================================================================
 
 # -----------------------------------------------------------------------------

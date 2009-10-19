@@ -159,7 +159,7 @@ static void LoadNativeLevelFromFileStream_SP(FILE *file, boolean demo_available)
        the 16 bit value here calculates as 2 * (x + (y * 60)) (this is twice
        of what may be expected: Supaplex works with a game field in memory
        which is 2 bytes per tile) */
-    port->PortLocation = getFile16BitBE(file);
+    port->PortLocation = getFile16BitBE(file);		/* yes, big endian */
 
 #if 0
     {
@@ -190,9 +190,9 @@ static void LoadNativeLevelFromFileStream_SP(FILE *file, boolean demo_available)
   header->CheckSumByte = getFile8Bit(file);
 
   /* random seed used for recorded demos */
-  header->DemoRandomSeed = getFile16BitLE(file);
+  header->DemoRandomSeed = getFile16BitLE(file);	/* yes, little endian */
 
-#if 1
+#if 0
   printf("::: file.c: DemoRandomSeed == %d\n", header->DemoRandomSeed);
 #endif
 
