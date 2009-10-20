@@ -75,9 +75,13 @@ int subDoGameStuff()
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   if (KillMurphyFlag == 1 || MurphyMoveCounter == 0)
   {
+#if 1
+    if (LeadOutCounter == 0 && !game_sp_info.LevelSolved)
+#else
     if (LeadOutCounter == 0)
+#endif
     {
-#if 0
+#if 1
       printf("::: DoGameStuff.c: killing murphy [%d] ...\n", KillMurphyFlag);
 #endif
 

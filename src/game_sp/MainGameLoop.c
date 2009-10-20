@@ -240,7 +240,9 @@ locRepeatMainGameLoop:                           // start repeating game loop
     printf("::: ExitToMenuFlag == True\n");
 #endif
 
+#if 0
     goto locExitMainGameLoop;
+#endif
   }
 #else
   if (ExitToMenuFlag == 1)
@@ -259,6 +261,11 @@ locRepeatMainGameLoop:                           // start repeating game loop
   // ---------------------- END OF GAME-BUSY LOOP -------------------------------
   // ----------------------------------------------------------------------------
   LeadOutCounter = LeadOutCounter - 1;             // do more lead-out after quit
+
+#if 0
+  printf("::: LeadOutCounter == %d\n", LeadOutCounter);
+#endif
+
 #if 1
   if (LeadOutCounter != 0) // lead-out not ready: more
     return subMainGameLoop;
@@ -272,6 +279,10 @@ locRepeatMainGameLoop:                           // start repeating game loop
 
 locExitMainGameLoop:
 
+#if 1
+  printf("::: locExitMainGameLoop reached [%d]\n", LeadOutCounter);
+#endif
+
 
 
 #if 1
@@ -279,10 +290,6 @@ locExitMainGameLoop:
 #endif
 
 
-
-#if 0
-  printf("::: locExitMainGameLoop reached [%d]\n", LeadOutCounter);
-#endif
 
   do
   {

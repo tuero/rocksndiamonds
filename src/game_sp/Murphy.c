@@ -1820,6 +1820,11 @@ loc_g_6F3B:
 
 loc_g_6F77:
   ExitToMenuFlag = 1;
+
+#if 1
+  PlayField16[*si] = fiSpace;	// remove Murphy from playfield after exiting
+#endif
+
   return subAnimateMurphy;
 
   // ==========================================================================
