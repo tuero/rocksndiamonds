@@ -14,7 +14,7 @@
 
 extern void subCheckJoystick();
 extern int subCheckRightMouseButton();
-extern int subProcessKeyboardInput();
+extern int subProcessKeyboardInput(byte);
 
 extern DemoBufferObject DemoBuffer;
 extern boolean KeyState[255 + 1];

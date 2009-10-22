@@ -26,5 +26,7 @@ void BlitScreenToBitmap_SP(Bitmap *target_bitmap)
 
 void GameActions_SP(byte action[MAX_PLAYERS], boolean warp_mode)
 {
-  subMainGameLoop_Main();
+  byte single_player_action = action[0];
+
+  subMainGameLoop_Main(single_player_action, warp_mode);
 }

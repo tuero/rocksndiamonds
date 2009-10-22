@@ -76,21 +76,37 @@ int subDoGameStuff()
   if (KillMurphyFlag == 1 || MurphyMoveCounter == 0)
   {
 #if 1
-    if (LeadOutCounter == 0 && !game_sp_info.LevelSolved)
+    if (LeadOutCounter == 0 &&
+	!game_sp_info.LevelSolved &&
+	!game_sp_info.GameOver)
 #else
     if (LeadOutCounter == 0)
 #endif
     {
-#if 1
+#if 0
       printf("::: DoGameStuff.c: killing murphy [%d] ...\n", KillMurphyFlag);
 #endif
 
       KillMurphyFlag = 0;             // no more "kill Murphy"
       ExplodeFieldSP(MurphyExplodePos);                 // Explode
       LeadOutCounter = 0x40;           // quit: start lead-out
+
+#if 1
+#if 1
+      printf("::: DoGameStuff.c: !!!!!!!!!! GAME OVER !!!!!!!!!!\n");
+#endif
+
+      game_sp_info.GameOver = TRUE;
+#endif
     }
 
 #if 1
+#if 0
+    printf("::: *** %d, %d, %d\n", KillMurphyFlag,
+	   game_sp_info.LevelSolved, game_sp_info.GameOver);
+#endif
+
+#if 0
     if (KillMurphyFlag == 1 &&
 	!game_sp_info.LevelSolved &&
 	!game_sp_info.GameOver)
@@ -102,7 +118,7 @@ int subDoGameStuff()
       game_sp_info.GameOver = TRUE;
     }
 #endif
-
+#endif
 
   } //  loc_g_22FB:
 

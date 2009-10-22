@@ -82,7 +82,7 @@ int subMainGameLoop_Init()
   return subMainGameLoop;
 }
 
-int subMainGameLoop_Main()
+int subMainGameLoop_Main(byte action, boolean warp_mode)
 {
   int subMainGameLoop;
   int bx;
@@ -155,7 +155,7 @@ locRepeatMainGameLoop:                           // start repeating game loop
 
   // loc_g_186F:
 
-  subProcessKeyboardInput();                 // Check keyboard, act on keys
+  subProcessKeyboardInput(action);		// Check keyboard, act on keys
 
   // 'HACK:
   //  TimerVar = TimerVar + 1
@@ -325,6 +325,8 @@ locExitMainGameLoop:
 
   return subMainGameLoop;
 } // subMainGameLoop
+
+#if 0
 
 int subMainGameLoop()
 {
@@ -554,6 +556,8 @@ locExitMainGameLoop:
 
   return subMainGameLoop;
 } // subMainGameLoop
+
+#endif
 
 void subUpdatePlayingTime()
 {

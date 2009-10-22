@@ -37,11 +37,32 @@ int subCheckRightMouseButton()
   return subCheckRightMouseButton;
 }
 
-int subProcessKeyboardInput()
+int subProcessKeyboardInput(byte action)
 {
   int subProcessKeyboardInput;
 
   static int LastKey = 0;
+
+#if 1
+
+  if (action & KEY_BUTTON)
+  {
+    DemoKeyCode = (action & MV_UP	? keySpaceUp	:
+		   action & MV_LEFT	? keySpaceLeft	:
+		   action & MV_DOWN	? keySpaceDown	:
+		   action & MV_RIGHT	? keySpaceRight	: keySpace);
+  }
+  else
+  {
+    DemoKeyCode = (action & MV_UP	? keyUp		:
+		   action & MV_LEFT	? keyLeft	:
+		   action & MV_DOWN	? keyDown	:
+		   action & MV_RIGHT	? keyRight	: keyNone);
+  }
+
+  return subProcessKeyboardInput;
+
+#else
 
   //  On Error GoTo NoKeyboardAccessEH
   //    Call DKeyboard.Acquire
@@ -51,9 +72,9 @@ int subProcessKeyboardInput()
   if (DemoFlag != 0)
   {
     subGetNextDemoKey();
+
     if (ExitToMenuFlag != 0)
       return subProcessKeyboardInput;
-
   }
   else
   {
@@ -105,6 +126,8 @@ int subProcessKeyboardInput()
       }
     }
   }
+
+#endif
 
   // demo recording
   if (RecordDemoFlag == 1)

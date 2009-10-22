@@ -15,7 +15,7 @@
 extern int subCalculateScreenScrollPos();
 extern int subMainGameLoop();
 extern int subMainGameLoop_Init();
-extern int subMainGameLoop_Main();
+extern int subMainGameLoop_Main(byte, boolean);
 extern void subUpdatePlayingTime();
 
 extern boolean AutoScrollFlag;
