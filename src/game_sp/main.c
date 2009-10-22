@@ -30,3 +30,8 @@ void GameActions_SP(byte action[MAX_PLAYERS], boolean warp_mode)
 
   subMainGameLoop_Main(single_player_action, warp_mode);
 }
+
+void RedrawPlayfield_SP(boolean force_redraw)
+{
+  subDisplayLevel();
+}

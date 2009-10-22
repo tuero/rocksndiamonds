@@ -23,15 +23,18 @@ static struct ToonInfo toons[MAX_NUM_TOONS];
 
 static void PrepareBackbuffer()
 {
-  if (game_status == GAME_MODE_PLAYING &&
-      level.game_engine_type == GAME_ENGINE_TYPE_EM)
+  if (game_status != GAME_MODE_PLAYING)
+    return;
+
+  if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
   {
     BlitScreenToBitmap_EM(backbuffer);
-
-    return;
   }
-
-  if (setup.soft_scrolling && game_status == GAME_MODE_PLAYING)
+  else if (level.game_engine_type == GAME_ENGINE_TYPE_SP)
+  {
+    BlitScreenToBitmap_SP(backbuffer);
+  }
+  else if (setup.soft_scrolling)	/* GAME_ENGINE_TYPE_RND */
   {
     int fx = FX, fy = FY;
 

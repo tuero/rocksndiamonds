@@ -4157,7 +4157,40 @@ static void LoadLevelFromFileInfo_SP(struct LevelInfo *level,
 
 void CopyNativeLevel_RND_to_SP(struct LevelInfo *level)
 {
-  /* ... yet to be written ... */
+  LevelInfoType *header = &native_sp_level.header;
+  int i, x, y;
+
+  native_sp_level.width = level->fieldx;
+  native_sp_level.height = level->fieldy;
+
+  for (x = 0; x < level->fieldx; x++)
+  {
+    for (y = 0; y < level->fieldy; y++)
+    {
+      int element_old = level->field[x][y];
+      int element_new;
+
+      if (element_old >= EL_SP_START &&
+	  element_old <= EL_SP_END)
+	element_new = element_old - EL_SP_START;
+      else if (element_old == EL_INVISIBLE_WALL)
+	element_new = 0x28;
+      else
+	element_new = EL_SP_HARDWARE_YELLOW;	/* unknown to Supaplex engine */
+
+      native_sp_level.playfield[x][y] = element_new;
+    }
+  }
+
+  header->InitialGravity = (level->initial_player_gravity[0] ? 1 : 0);
+
+  for (i = 0; i < SP_LEVEL_NAME_LEN; i++)
+    header->LevelTitle[i] = level->name[i];
+  /* !!! NO STRING TERMINATION IN SUPAPLEX VB CODE YET -- FIX THIS !!! */
+
+  header->InfotronsNeeded = level->gems_needed;
+
+  /* !!! ADD SPECIAL PORT DATABASE STUFF !!! */
 }
 
 void CopyNativeLevel_SP_to_RND(struct LevelInfo *level)
@@ -6302,9 +6335,7 @@ void LoadLevelFromFileInfo(struct LevelInfo *level,
 
     case LEVEL_FILE_TYPE_SP:
       LoadLevelFromFileInfo_SP(level, level_file_info);
-#if 1
       level->game_engine_type = GAME_ENGINE_TYPE_SP;
-#endif
       break;
 
     case LEVEL_FILE_TYPE_DC:

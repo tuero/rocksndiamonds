@@ -144,7 +144,17 @@ void RedrawPlayfield(boolean force_redraw, int x, int y, int width, int height)
     /* blit playfield from scroll buffer to normal back buffer for fading in */
     BlitScreenToBitmap_EM(backbuffer);
   }
-  else if (game_status == GAME_MODE_PLAYING && !game.envelope_active)
+  else if (game_status == GAME_MODE_PLAYING &&
+	   level.game_engine_type == GAME_ENGINE_TYPE_SP)
+  {
+    /* currently there is no partial redraw -- always redraw whole playfield */
+    RedrawPlayfield_SP(TRUE);
+
+    /* blit playfield from scroll buffer to normal back buffer for fading in */
+    BlitScreenToBitmap_SP(backbuffer);
+  }
+  else if (game_status == GAME_MODE_PLAYING &&
+	   !game.envelope_active)
   {
     if (force_redraw)
     {
@@ -2811,9 +2821,13 @@ boolean Request(char *text, unsigned int req_state)
     }
   }
 
-  if (game_status == GAME_MODE_PLAYING &&
-      level.game_engine_type == GAME_ENGINE_TYPE_EM)
-    BlitScreenToBitmap_EM(backbuffer);
+  if (game_status == GAME_MODE_PLAYING)
+  {
+    if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
+      BlitScreenToBitmap_EM(backbuffer);
+    else if (level.game_engine_type == GAME_ENGINE_TYPE_SP)
+      BlitScreenToBitmap_SP(backbuffer);
+  }
 
   /* disable deactivated drawing when quick-loading level tape recording */
   if (tape.playing && tape.deactivate_display)
@@ -6044,6 +6058,8 @@ unsigned int InitRND(long seed)
 {
   if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
     return InitEngineRandom_EM(seed);
+  else if (level.game_engine_type == GAME_ENGINE_TYPE_SP)
+    return InitEngineRandom_SP(seed);
   else
     return InitEngineRandom_RND(seed);
 }

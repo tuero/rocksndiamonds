@@ -62,3 +62,17 @@ void sp_open_all()
 void sp_close_all()
 {
 }
+
+unsigned int InitEngineRandom_SP(long seed)
+{
+  if (seed == NEW_RANDOMIZE)
+  {
+    subRandomize();
+
+    seed = (long)RandomSeed;
+  }
+
+  RandomSeed = (short)seed;
+
+  return (unsigned int) seed;
+}
