@@ -43,8 +43,8 @@ void setLevelInfoToDefaults_SP()
     port->FreezeEnemies = 0;
   }
 
-  native_sp_level.demo_available = FALSE;
-  native_sp_level.demo_length = 0;
+  native_sp_level.demo.is_available = FALSE;
+  native_sp_level.demo.length = 0;
 }
 
 void copyInternalEngineVars_SP()
@@ -60,7 +60,7 @@ void copyInternalEngineVars_SP()
   FieldMax = (FieldWidth * FieldHeight) + HeaderSize - 1;
   LevelMax = (FieldWidth * FieldHeight) - 1;
 
-  FileMax = FieldMax + native_sp_level.demo_length;
+  FileMax = FieldMax + native_sp_level.demo.length;
 
   PlayField8 = REDIM_1D(sizeof(byte), 0, FileMax + 1 - 1);
   DisPlayField = REDIM_1D(sizeof(byte), 0, FieldMax + 1 - 1);
@@ -80,12 +80,14 @@ void copyInternalEngineVars_SP()
     }
   }
 
-  if (native_sp_level.demo_available)
+  if (native_sp_level.demo.is_available)
   {
     DemoAvailable = True;
 
-    for (i = 0; i < native_sp_level.demo_length; i++)
-      PlayField8[FieldMax + i + 1] = native_sp_level.demo[i];
+    PlayField8[FieldMax + 1] = native_sp_level.demo.level_nr;
+
+    for (i = 0; i < native_sp_level.demo.length; i++)
+      PlayField8[FieldMax + i + 2] = native_sp_level.demo.data[i];
   }
 
   AnimationPosTable = REDIM_1D(sizeof(int), 0, LevelMax - 2 * FieldWidth);
@@ -211,11 +213,19 @@ static void LoadNativeLevelFromFileStream_SP(FILE *file, boolean demo_available)
 
   if (demo_available)
   {
+    int level_nr = getFile8Bit(file);
+
+    level_nr &= 0x7f;			/* clear highest bit */
+    level_nr = (level_nr < 1   ? 1   :
+		level_nr > 111 ? 111 : level_nr);
+
+    native_sp_level.demo.level_nr = level_nr;
+
     for (i = 0; i < SP_MAX_TAPE_LEN && !feof(file); i++)
     {
-      native_sp_level.demo[i] = getFile8Bit(file);
+      native_sp_level.demo.data[i] = getFile8Bit(file);
 
-      if (native_sp_level.demo[i] == 0xff)	/* "end of demo" byte */
+      if (native_sp_level.demo.data[i] == 0xff)	/* "end of demo" byte */
       {
 	i++;
 
@@ -223,8 +233,8 @@ static void LoadNativeLevelFromFileStream_SP(FILE *file, boolean demo_available)
       }
     }
 
-    native_sp_level.demo_length = i;
-    native_sp_level.demo_available = (native_sp_level.demo_length > 0);
+    native_sp_level.demo.length = i;
+    native_sp_level.demo.is_available = (native_sp_level.demo.length > 0);
   }
 }
 

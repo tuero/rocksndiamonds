@@ -163,7 +163,7 @@ int subRandomize()
   }
 #endif
 
-#if 1
+#if 0
   printf("::: BugsTerminals.c: ========== subRandomize()\n");
 #endif
 

@@ -84,18 +84,25 @@ struct GameInfo_SP
   boolean GameOver;
 };
 
+struct DemoInfo_SP
+{
+  boolean is_available;		/* structure contains valid demo */
+
+  int level_nr;			/* number of corresponding level */
+
+  int length;			/* number of demo entries */
+  byte data[SP_MAX_TAPE_LEN];	/* array of demo entries */
+};
+
 struct LevelInfo_SP
 {
   LevelInfoType header;
 
-  byte playfield[SP_MAX_PLAYFIELD_WIDTH][SP_MAX_PLAYFIELD_HEIGHT];
-
   int width, height;
 
-  boolean demo_available;
+  byte playfield[SP_MAX_PLAYFIELD_WIDTH][SP_MAX_PLAYFIELD_HEIGHT];
 
-  byte demo[SP_MAX_TAPE_LEN];
-  int demo_length;
+  struct DemoInfo_SP demo;
 };
 
 struct GraphicInfo_SP
@@ -152,5 +159,8 @@ extern void DrawGameDoorValues_SP();
 
 extern void LoadEngineSnapshotValues_SP();
 extern void SaveEngineSnapshotValues_SP();
+
+extern int map_key_RND_to_SP(int);
+extern int map_key_SP_to_RND(int);
 
 #endif	/* GAME_SP_EXPORT_H */

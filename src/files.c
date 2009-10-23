@@ -4157,11 +4157,12 @@ static void LoadLevelFromFileInfo_SP(struct LevelInfo *level,
 
 void CopyNativeLevel_RND_to_SP(struct LevelInfo *level)
 {
-  LevelInfoType *header = &native_sp_level.header;
+  struct LevelInfo_SP *level_sp = level->native_sp_level;
+  LevelInfoType *header = &level_sp->header;
   int i, x, y;
 
-  native_sp_level.width = level->fieldx;
-  native_sp_level.height = level->fieldy;
+  level_sp->width = level->fieldx;
+  level_sp->height = level->fieldy;
 
   for (x = 0; x < level->fieldx; x++)
   {
@@ -4176,9 +4177,9 @@ void CopyNativeLevel_RND_to_SP(struct LevelInfo *level)
       else if (element_old == EL_INVISIBLE_WALL)
 	element_new = 0x28;
       else
-	element_new = EL_SP_HARDWARE_YELLOW;	/* unknown to Supaplex engine */
+	element_new = 0x20;	/* map unknown elements to yellow "hardware" */
 
-      native_sp_level.playfield[x][y] = element_new;
+      level_sp->playfield[x][y] = element_new;
     }
   }
 
@@ -4195,17 +4196,18 @@ void CopyNativeLevel_RND_to_SP(struct LevelInfo *level)
 
 void CopyNativeLevel_SP_to_RND(struct LevelInfo *level)
 {
-  LevelInfoType *header = &native_sp_level.header;
+  struct LevelInfo_SP *level_sp = level->native_sp_level;
+  LevelInfoType *header = &level_sp->header;
   int i, x, y;
 
-  level->fieldx = native_sp_level.width;
-  level->fieldy = native_sp_level.height;
+  level->fieldx = level_sp->width;
+  level->fieldy = level_sp->height;
 
   for (x = 0; x < level->fieldx; x++)
   {
     for (y = 0; y < level->fieldy; y++)
     {
-      int element_old = native_sp_level.playfield[x][y];
+      int element_old = level_sp->playfield[x][y];
       int element_new;
 
       if (element_old <= 0x27)
@@ -4295,6 +4297,35 @@ void CopyNativeLevel_SP_to_RND(struct LevelInfo *level)
     for (x = 0; x < 3; x++)
       for (y = 0; y < 3; y++)
 	level->yamyam_content[i].e[x][y] = EL_EMPTY;
+}
+
+static void setTapeInfoToDefaults();
+
+static void CopyNativeTape_SP_to_RND(struct LevelInfo *level)
+{
+  struct LevelInfo_SP *level_sp = level->native_sp_level;
+  struct DemoInfo_SP *demo = &level_sp->demo;
+  int i;
+
+  /* always start with reliable default values */
+  setTapeInfoToDefaults();
+
+  tape.level_nr = demo->level_nr;	/* (currently not used) */
+  tape.length = demo->length - 1;	/* without "end of demo" byte */
+  tape.random_seed = level_sp->header.DemoRandomSeed;
+
+  // tape.date = <SET FROM FILE DATE OF *.SP FILE>
+
+  for (i = 0; i < demo->length - 1; i++)
+  {
+    int demo_action = demo->data[i] & 0x0f;
+    int demo_repeat = (demo->data[i] & 0xf0) >> 4;
+
+    tape.pos[i].action[0] = map_key_SP_to_RND(demo_action);
+    tape.pos[i].delay = demo_repeat + 1;
+  }
+
+  tape.length_seconds = GetTapeLength();
 }
 
 
@@ -8014,6 +8045,13 @@ void LoadSolutionTape(int nr)
   char *filename = getSolutionTapeFilename(nr);
 
   LoadTapeFromFilename(filename);
+
+#if 1
+  if (TAPE_IS_EMPTY(tape) &&
+      level.game_engine_type == GAME_ENGINE_TYPE_SP &&
+      level.native_sp_level->demo.is_available)
+    CopyNativeTape_SP_to_RND(&level);
+#endif
 }
 
 static void SaveTape_VERS(FILE *file, struct TapeInfo *tape)
