@@ -5,6 +5,8 @@
 #ifndef GAME_SP_GLOBAL_H
 #define GAME_SP_GLOBAL_H
 
+#include "main_sp.h"
+
 #include "ASM.h"
 #include "BitMapObject.h"
 #include "BugsTerminals.h"
@@ -43,9 +45,5 @@
 #include "modAnimations.h"
 #include "modGeneralTricks.h"
 #include "modMPX.h"
-
-
-#include "main_sp.h"
-
 
 #endif /* GAME_SP_GLOBAL_H */

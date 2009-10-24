@@ -201,6 +201,13 @@ static void Blt(int pX, int pY, int SpriteX, int SpriteY)
   printf("::: DDSpriteBuffer.c: Blt(): %d, %d\n", DR.left, DR.top);
 #endif
 
+#if 0
+  if (pX == 0 * StretchWidth && pY == 0 * StretchWidth)
+    printf("::: TEST: drawing topleft corner ...\n");
+  if (pX == 59 * StretchWidth && pY == 23 * StretchWidth)
+    printf("::: TEST: drawing bottomright corner ...\n");
+#endif
+
 #if 1
   BlitBitmap(sp_objects, screenBitmap,
 	     SR.left, SR.top,

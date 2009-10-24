@@ -2,8 +2,8 @@
 // Sound.h
 // ----------------------------------------------------------------------------
 
-#ifndef SOUND_H
-#define SOUND_H
+#ifndef GAME_SP_SOUND_H
+#define GAME_SP_SOUND_H
 
 #include "vb_types.h"
 #include "vb_defs.h"
@@ -25,4 +25,4 @@ extern void subSoundFXZonk();
 extern int FXOnFlag;
 extern int MusicOnFlag;
 
-#endif /* SOUND_H */
+#endif /* GAME_SP_SOUND_H */

@@ -12,6 +12,7 @@
 
 #include "global.h"
 
+extern void DDScrollBuffer_Blt_Ext(Bitmap *);
 extern void DDScrollBuffer_Blt();
 extern void DDScrollBuffer_Cls(int BackColor);
 extern long DDScrollBuffer_CreateAtSize(long Width, long Height, long hWndViewPort);

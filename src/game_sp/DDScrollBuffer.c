@@ -131,7 +131,7 @@ void DDScrollBuffer_Cls(int BackColor)
   Buffer.BltColorFill(EmptyRect, BackColor);
 }
 
-void DDScrollBuffer_Blt()
+void DDScrollBuffer_Blt_Ext(Bitmap *target_bitmap)
 {
   RECT DR, SR;
   long tX, tY, L;
@@ -181,12 +181,8 @@ void DDScrollBuffer_Blt()
 	 SR.left, SR.top, mScrollX, mScrollY, mDestXOff, mDestYOff);
 #endif
 
-#if 0
-  BlitBitmap(screenBitmap, window,
-	     1600, 320,
-             SCR_FIELDX * TILEX, SCR_FIELDY * TILEY, SX, SY);
-#else
-  BlitBitmap(screenBitmap, window,
+#if 1
+  BlitBitmap(screenBitmap, target_bitmap,
 	     SR.left, SR.top,
              SCR_FIELDX * TILEX, SCR_FIELDY * TILEY, SX, SY);
 #endif
@@ -303,6 +299,11 @@ void DDScrollBuffer_Blt()
 #endif
 
   // BltEH:
+}
+
+void DDScrollBuffer_Blt()
+{
+  DDScrollBuffer_Blt_Ext(window);
 }
 
 void DDScrollBuffer_ScrollTo(int X, int Y)

@@ -11,7 +11,7 @@ void InitGameEngine_SP()
   game_sp_info.LevelSolved = FALSE;
   game_sp_info.GameOver = FALSE;
 
-#if 0
+#if 1
   menPlay_Click();
 #else
   menPlayDemo_Click();
@@ -20,8 +20,7 @@ void InitGameEngine_SP()
 
 void BlitScreenToBitmap_SP(Bitmap *target_bitmap)
 {
-  BlitBitmap(screenBitmap, target_bitmap, 15 * 32, 7 * 32,
-	     SCR_FIELDX * TILEX, SCR_FIELDY * TILEY, SX, SY);
+  DDScrollBuffer_Blt_Ext(target_bitmap);
 }
 
 void GameActions_SP(byte action[MAX_PLAYERS], boolean warp_mode)

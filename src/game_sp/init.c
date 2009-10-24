@@ -7,21 +7,9 @@ Bitmap *sp_objects;
 
 Bitmap *screenBitmap;
 
-#if 0
-static void BlitScreenToBitmap_SP__Stage_Blt()
-{
-  BlitScreenToBitmap_SP(window);
-}
-#endif
-
 static void init_struct_functions()
 {
-#if 1
-  Stage.Blt = &DDScrollBuffer_Blt;
-#else
-  Stage.Blt = &BlitScreenToBitmap_SP__Stage_Blt;
-#endif
-
+  Stage.Blt           = &DDScrollBuffer_Blt;
   Stage.ScrollTo      = &DDScrollBuffer_ScrollTo;
   Stage.ScrollTowards = &DDScrollBuffer_ScrollTowards;
   Stage.SoftScrollTo  = &DDScrollBuffer_SoftScrollTo;
@@ -49,6 +37,9 @@ void sp_open_all()
   SetBitmaps_SP(&sp_objects);
 
 #if 1
+  /* too small for oversized levels, but too big for graphics performance */
+  /* (the whole playfield is drawn/updated, not only visible/scrolled area) */
+  /* !!! FIX THIS !!! */
   screenBitmap = CreateBitmap(60 * TILEX, 24 * TILEY,
                               DEFAULT_DEPTH);
 #else
@@ -67,12 +58,20 @@ unsigned int InitEngineRandom_SP(long seed)
 {
   if (seed == NEW_RANDOMIZE)
   {
+#if 1
+  printf("::: init.c: InitEngineRandom_SP(): subRandomize()\n");
+#endif
+
     subRandomize();
 
     seed = (long)RandomSeed;
   }
 
   RandomSeed = (short)seed;
+
+#if 1
+  printf("::: init.c: InitEngineRandom_SP(): RandomSeed == %d\n", RandomSeed);
+#endif
 
   return (unsigned int) seed;
 }

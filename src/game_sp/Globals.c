@@ -632,8 +632,10 @@ void ReadLevel()
 
   LevelNumber = level_nr;
 
+#if 0
   if (!DemoFlag || !DemoAvailable)
     subRandomize();
+#endif
 
   LevelLoaded = True;
 }

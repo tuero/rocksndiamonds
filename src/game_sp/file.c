@@ -101,7 +101,17 @@ void copyInternalEngineVars_SP()
   GravityFlag = LInfo.InitialGravity;
   FreezeZonks = LInfo.InitialFreezeZonks;
 
+#if 1
+  /* set by main game tape code directly */
+#else
+
+#if 1
+  printf("::: file.c: copyInternalEngineVars_SP(): RandomSeed = LInfo.DemoRandomSeed\n");
+#endif
+
   RandomSeed = LInfo.DemoRandomSeed;
+
+#endif
 
   LevelLoaded = True;
 }
