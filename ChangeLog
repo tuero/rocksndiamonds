@@ -1,3 +1,11 @@
+2009-10-24
+	* most important parts of native Supaplex engine integration working:
+	  - native Supaplex levels can be played in native Supaplex engine
+	  - native Supaplex level/demo files ("*.sp" files) can be re-played
+	  - all 111 classic original Supaplex levels automatically solvable
+	  - native Supaplex engine can be selected and used from level editor
+	  - logic of re-playing Supaplex demos migrated to R'n'D tape logic
+
 2009-09-25
 	* fixed another translation problem from VisualBasic to C (where "int"
 	  should be "short") causing unsolvable demos with bugs and terminals
