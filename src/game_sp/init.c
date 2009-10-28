@@ -58,7 +58,7 @@ unsigned int InitEngineRandom_SP(long seed)
 {
   if (seed == NEW_RANDOMIZE)
   {
-#if 1
+#if 0
   printf("::: init.c: InitEngineRandom_SP(): subRandomize()\n");
 #endif
 
@@ -69,7 +69,7 @@ unsigned int InitEngineRandom_SP(long seed)
 
   RandomSeed = (short)seed;
 
-#if 1
+#if 0
   printf("::: init.c: InitEngineRandom_SP(): RandomSeed == %d\n", RandomSeed);
 #endif
 

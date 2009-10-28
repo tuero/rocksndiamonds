@@ -24,6 +24,9 @@
 					 SP_PLAYFIELD_HEIGHT)
 #define SP_LEVEL_SIZE			(SP_HEADER_SIZE + SP_PLAYFIELD_SIZE)
 
+#define SP_SCREEN_BUFFER_XSIZE		(SCR_FIELDX + 2)
+#define SP_SCREEN_BUFFER_YSIZE		(SCR_FIELDY + 2)
+
 #define SP_FRAMES_PER_SECOND		35
 #define SP_MAX_TAPE_LEN			64010	/* (see "spfix63.doc") */
 
@@ -97,6 +100,7 @@ struct DemoInfo_SP
 struct LevelInfo_SP
 {
   LevelInfoType header;
+  byte header_raw_bytes[SP_HEADER_SIZE];
 
   int width, height;
 

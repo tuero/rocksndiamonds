@@ -4174,6 +4174,8 @@ void CopyNativeLevel_RND_to_SP(struct LevelInfo *level)
       if (element_old >= EL_SP_START &&
 	  element_old <= EL_SP_END)
 	element_new = element_old - EL_SP_START;
+      else if (element_old == EL_EMPTY_SPACE)
+	element_new = 0x00;
       else if (element_old == EL_INVISIBLE_WALL)
 	element_new = 0x28;
       else

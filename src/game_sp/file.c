@@ -43,6 +43,10 @@ void setLevelInfoToDefaults_SP()
     port->FreezeEnemies = 0;
   }
 
+  /* set raw header bytes (used for subsequent buffer zone) to "hardware" */
+  for (i = 0; i < SP_HEADER_SIZE; i++)
+    native_sp_level.header_raw_bytes[i] = 0x20;
+
   native_sp_level.demo.is_available = FALSE;
   native_sp_level.demo.length = 0;
 }
@@ -50,6 +54,7 @@ void setLevelInfoToDefaults_SP()
 void copyInternalEngineVars_SP()
 {
   int i, x, y;
+  int count;
 
   LInfo = native_sp_level.header;
 
@@ -66,7 +71,27 @@ void copyInternalEngineVars_SP()
   DisPlayField = REDIM_1D(sizeof(byte), 0, FieldMax + 1 - 1);
   PlayField16 = REDIM_1D(sizeof(int), -FieldWidth, FieldMax);
 
-  for (i = 0, y = 0; y < native_sp_level.height; y++)
+#if 1
+
+  count = 0;
+  for (y = 0; y < native_sp_level.height; y++)
+    for (x = 0; x < native_sp_level.width; x++)
+      PlayField8[count++] = native_sp_level.playfield[x][y];
+
+  /* add raw header bytes to subsequent playfield buffer zone */
+  for (i = 0; i < SP_HEADER_SIZE; i++)
+    PlayField8[count++] = native_sp_level.header_raw_bytes[i];
+
+  for (i = 0; i < count; i++)
+  {
+    PlayField16[i] = PlayField8[i];
+    DisPlayField[i] = PlayField8[i];
+    PlayField8[i] = 0;
+  }
+
+#else
+
+  for (i = 0; y = 0; y < native_sp_level.height; y++)
   {
     for (x = 0; x < native_sp_level.width; x++)
     {
@@ -79,6 +104,8 @@ void copyInternalEngineVars_SP()
       i++;
     }
   }
+
+#endif
 
   if (native_sp_level.demo.is_available)
   {
@@ -218,6 +245,12 @@ static void LoadNativeLevelFromFileStream_SP(FILE *file, boolean demo_available)
 
     header->InfotronsNeeded &= 0xff;	/* only use low byte -- see above */
   }
+
+  /* read raw level header bytes (96 bytes) */
+
+  fseek(file, -(SP_HEADER_SIZE), SEEK_CUR);	/* rewind file */
+  for (i = 0; i < SP_HEADER_SIZE; i++)
+    native_sp_level.header_raw_bytes[i] = fgetc(file);
 
   /* also load demo tape, if available */
 

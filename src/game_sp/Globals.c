@@ -64,6 +64,8 @@ int *PlayField16;
 byte *PlayField8;
 byte *DisPlayField;
 
+long ScreenBuffer[SP_SCREEN_BUFFER_XSIZE][SP_SCREEN_BUFFER_YSIZE];
+
 // Public DisplayMin%, DisplayMax%, DisplayWidth%, DisplayHeight%
 
 int TimerVar;

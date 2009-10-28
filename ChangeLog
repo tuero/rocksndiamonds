@@ -1,3 +1,9 @@
+2009-10-28
+	* fixed array allocation in native Supaplex engine to correctly handle
+	  preceding scratch buffers (needed because of missing border checking)
+	* fixed playfield initialization to correctly add raw header bytes as
+	  subsequent scratch buffer (needed because of missing border checking)
+
 2009-10-24
 	* most important parts of native Supaplex engine integration working:
 	  - native Supaplex levels can be played in native Supaplex engine

@@ -153,7 +153,8 @@ static void LetExplodeFieldSP(int tsi, int cx, int dh)
 
     case fiMurphy:
 #if 1
-      printf("::: Explosions.c: LetExplodeFieldSP(): killing murphy\n");
+      printf("::: Explosions.c: LetExplodeFieldSP(): killing murphy [%d]\n",
+	     tsi);
 #endif
 
       KillMurphyFlag = 1;

@@ -181,13 +181,30 @@ void DDScrollBuffer_Blt_Ext(Bitmap *target_bitmap)
 	 SR.left, SR.top, mScrollX, mScrollY, mDestXOff, mDestYOff);
 #endif
 
+#if 0
+  /* !!! quick and dirty -- FIX THIS !!! */
+  if (tape.playing && tape.fast_forward &&
+      target_bitmap == window &&
+      (FrameCounter % 2) != 0)
+    printf("::: FrameCounter == %d\n", FrameCounter);
+#endif
+
+#if 1
+  SyncDisplay();
+#endif
+
 #if 1
   BlitBitmap(screenBitmap, target_bitmap,
 	     SR.left, SR.top,
              SCR_FIELDX * TILEX, SCR_FIELDY * TILEY, SX, SY);
 #endif
 
+#if 1
+  FlushDisplay();
+#endif
+
   return;
+
 #endif
 
   // DDraw.WaitForVerticalBlank DDWAITVB_BLOCKBEGIN, 0

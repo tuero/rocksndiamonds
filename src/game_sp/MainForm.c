@@ -2509,7 +2509,9 @@ void menPlay_Click()
 
   // Trace "MainForm", "subFetchAndInitLevel returned"
 
+#if 0
   Stage.Blt();
+#endif
 
 #if 0
 
@@ -2520,7 +2522,6 @@ void menPlay_Click()
   // Trace "MainForm", "<-- menPlay_Click()"
 
 #endif
-
 }
 
 #if 1
@@ -2990,7 +2991,11 @@ static void picPane_Paint()
 
   Oldflag = NoDisplayFlag;
   NoDisplayFlag = False;
+
+#if 0
   Stage.Blt();
+#endif
+
   NoDisplayFlag = Oldflag;
 }
 
@@ -3082,7 +3087,9 @@ static void ReStretch(float NewStretch)
 
     ScrollTo(ScreenScrollXPos, ScreenScrollYPos);
 
+#if 0
     Stage.Blt();
+#endif
 
     picPane_Paint();
   }

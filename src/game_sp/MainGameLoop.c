@@ -35,7 +35,7 @@ int subMainGameLoop_Init()
 
   if (DemoFlag != 0)
   {
-#if 1
+#if 0
     printf("::: playing demo ...\n");
 #endif
 
@@ -45,7 +45,7 @@ int subMainGameLoop_Init()
   }
   else // loc_g_1836:
   {
-#if 1
+#if 0
     printf("::: playing game ...\n");
 #endif
 
@@ -279,7 +279,7 @@ locRepeatMainGameLoop:                           // start repeating game loop
 
 locExitMainGameLoop:
 
-#if 1
+#if 0
   printf("::: locExitMainGameLoop reached [%d]\n", LeadOutCounter);
 #endif
 
