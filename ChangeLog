@@ -1,3 +1,7 @@
+2009-10-30
+	* fixed (potential) compile error when using GCC option "-std=gnu99"
+	  (thanks to Tom "spot" Callaway)
+
 2009-10-28
 	* fixed array allocation in native Supaplex engine to correctly handle
 	  preceding scratch buffers (needed because of missing border checking)

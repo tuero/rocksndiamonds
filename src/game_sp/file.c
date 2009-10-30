@@ -129,7 +129,7 @@ void copyInternalEngineVars_SP()
   FreezeZonks = LInfo.InitialFreezeZonks;
 
 #if 1
-  /* set by main game tape code directly */
+  /* this is set by main game tape code to native random generator directly */
 #else
 
 #if 1
@@ -230,6 +230,7 @@ static void LoadNativeLevelFromFileStream_SP(FILE *file, boolean demo_available)
 
   /* random seed used for recorded demos */
   header->DemoRandomSeed = getFile16BitLE(file);	/* yes, little endian */
+  // header->DemoRandomSeed = getFile16BitBE(file);	/* !!! TEST ONLY !!! */
 
 #if 0
   printf("::: file.c: DemoRandomSeed == %d\n", header->DemoRandomSeed);
