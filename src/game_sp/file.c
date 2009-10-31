@@ -73,6 +73,12 @@ void copyInternalEngineVars_SP()
 
 #if 1
 
+#if 0
+  /* fill preceding playfield buffer zone with (indestructible) "hardware" */
+  for (i = -FieldWidth; i < 0; i++)
+    PlayField16[i] = 0x20;
+#endif
+
   count = 0;
   for (y = 0; y < native_sp_level.height; y++)
     for (x = 0; x < native_sp_level.width; x++)
@@ -341,13 +347,20 @@ boolean LoadNativeLevel_SP(char *filename, int pos)
       ((name_first == '?' || name_first == '1') &&
        (name_last  == '?' || name_last  == '1'));
 
-    /* correct leading multipart level meta information in level name */
-    for (i = 0; i < SP_LEVEL_NAME_LEN && header->LevelTitle[i] == name_first; i++)
-      header->LevelTitle[i] = '-';
+    if (is_multipart_level)
+    {
+      /* correct leading multipart level meta information in level name */
+      for (i = 0;
+	   i < SP_LEVEL_NAME_LEN && header->LevelTitle[i] == name_first;
+	   i++)
+	header->LevelTitle[i] = '-';
 
-    /* correct trailing multipart level meta information in level name */
-    for (i = SP_LEVEL_NAME_LEN - 1; i >= 0 && header->LevelTitle[i] == name_last; i--)
-      header->LevelTitle[i] = '-';
+      /* correct trailing multipart level meta information in level name */
+      for (i = SP_LEVEL_NAME_LEN - 1;
+	   i >= 0 && header->LevelTitle[i] == name_last;
+	   i--)
+	header->LevelTitle[i] = '-';
+    }
 
     /* ---------- check for normal single level ---------- */
 

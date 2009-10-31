@@ -1,3 +1,6 @@
+2009-10-31
+	* fixed SP engine to set "game over" not before lead out counter done
+
 2009-10-30
 	* fixed (potential) compile error when using GCC option "-std=gnu99"
 	  (thanks to Tom "spot" Callaway)

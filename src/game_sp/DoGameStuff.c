@@ -83,7 +83,7 @@ int subDoGameStuff()
     if (LeadOutCounter == 0)
 #endif
     {
-#if 0
+#if 1
       printf("::: DoGameStuff.c: killing murphy [%d] ...\n", KillMurphyFlag);
 #endif
 
@@ -92,11 +92,18 @@ int subDoGameStuff()
       LeadOutCounter = 0x40;           // quit: start lead-out
 
 #if 1
+
 #if 1
       printf("::: DoGameStuff.c: !!!!!!!!!! GAME OVER !!!!!!!!!!\n");
+      printf("::: [KillMurphyFlag == %d]\n", KillMurphyFlag);
 #endif
 
+#if 1
+      /* give Murphy some more time (LeadOutCounter) to reach the exit */
+#else
       game_sp_info.GameOver = TRUE;
+#endif
+
 #endif
     }
 

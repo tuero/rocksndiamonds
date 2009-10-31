@@ -279,11 +279,16 @@ locRepeatMainGameLoop:                           // start repeating game loop
 
 locExitMainGameLoop:
 
-#if 0
+#if 1
   printf("::: locExitMainGameLoop reached [%d]\n", LeadOutCounter);
+  printf("::: [KillMurphyFlag == %d]\n", KillMurphyFlag);
 #endif
 
-
+#if 1
+  /* if the game is not won when reaching this point, then it is lost */
+  if (!game_sp_info.LevelSolved)
+    game_sp_info.GameOver = TRUE;
+#endif
 
 #if 1
   return subMainGameLoop;
