@@ -1770,19 +1770,26 @@ static char *getLevelFilenameFromBasename(char *basename)
 
 static int getFileTypeFromBasename(char *basename)
 {
+  /* !!! ALSO SEE COMMENT IN checkForPackageFromBasename() !!! */
+
   static char *filename = NULL;
   struct stat file_status;
 
   /* ---------- try to determine file type from filename ---------- */
 
   /* check for typical filename of a Supaplex level package file */
+#if 1
+  if (strlen(basename) == 10 && strPrefixLower(basename, "levels.d"))
+    return LEVEL_FILE_TYPE_SP;
+#else
   if (strlen(basename) == 10 && (strncmp(basename, "levels.d", 8) == 0 ||
 				 strncmp(basename, "LEVELS.D", 8) == 0))
     return LEVEL_FILE_TYPE_SP;
+#endif
 
   /* check for typical filename of a Diamond Caves II level package file */
-  if (strSuffix(basename, ".dc") ||
-      strSuffix(basename, ".dc2"))
+  if (strSuffixLower(basename, ".dc") ||
+      strSuffixLower(basename, ".dc2"))
     return LEVEL_FILE_TYPE_DC;
 
   /* ---------- try to determine file type from filesize ---------- */
@@ -1798,6 +1805,14 @@ static int getFileTypeFromBasename(char *basename)
   }
 
   return LEVEL_FILE_TYPE_UNKNOWN;
+}
+
+static boolean checkForPackageFromBasename(char *basename)
+{
+  /* !!! WON'T WORK ANYMORE IF getFileTypeFromBasename() ALSO DETECTS !!!
+     !!! SINGLE LEVELS (CURRENTLY ONLY DETECTS LEVEL PACKAGES         !!! */
+
+  return (getFileTypeFromBasename(basename) != LEVEL_FILE_TYPE_UNKNOWN);
 }
 
 static char *getSingleLevelBasename(int nr)
@@ -1953,6 +1968,9 @@ static void determineLevelFileInfo_Filename(struct LevelFileInfo *lfi)
 
     setLevelFileInfo_FormatLevelFilename(lfi, filetype,
 					 leveldir_current->level_filename, nr);
+
+    lfi->packed = checkForPackageFromBasename(leveldir_current->level_filename);
+
     if (fileExists(lfi->filename))
       return;
   }

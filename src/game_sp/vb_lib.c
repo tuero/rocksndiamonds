@@ -91,7 +91,8 @@ boolean STRING_IS_LIKE(char *a, char *b)
 
 void FILE_GET(FILE *file, int offset, void *buffer, int num_bytes)
 {
-  fseek(file, offset - 1, SEEK_SET);
+  if (offset != -1)
+    fseek(file, offset - 1, SEEK_SET);
 
   while (num_bytes--)
     *(byte *)buffer++ = fgetc(file);

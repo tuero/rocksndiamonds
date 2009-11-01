@@ -1,3 +1,6 @@
+2009-11-01
+	* added support for loading Supaplex levels in MPX level file format
+
 2009-10-31
 	* fixed SP engine to set "game over" not before lead out counter done
 

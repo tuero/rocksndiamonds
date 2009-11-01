@@ -149,7 +149,8 @@ void copyInternalEngineVars_SP()
   LevelLoaded = True;
 }
 
-static void LoadNativeLevelFromFileStream_SP(FILE *file, boolean demo_available)
+static void LoadNativeLevelFromFileStream_SP(FILE *file, int width, int height,
+					     boolean demo_available)
 {
   LevelInfoType *header = &native_sp_level.header;
   int i, x, y;
@@ -157,8 +158,8 @@ static void LoadNativeLevelFromFileStream_SP(FILE *file, boolean demo_available)
   /* for details of the Supaplex level format, see Herman Perk's Supaplex
      documentation file "SPFIX63.DOC" from his Supaplex "SpeedFix" package */
 
-  native_sp_level.width  = SP_PLAYFIELD_WIDTH;
-  native_sp_level.height = SP_PLAYFIELD_HEIGHT;
+  native_sp_level.width  = width;
+  native_sp_level.height = height;
 
   /* read level playfield (width * height == 60 * 24 tiles == 1440 bytes) */
   for (y = 0; y < native_sp_level.height; y++)
@@ -259,7 +260,7 @@ static void LoadNativeLevelFromFileStream_SP(FILE *file, boolean demo_available)
   for (i = 0; i < SP_HEADER_SIZE; i++)
     native_sp_level.header_raw_bytes[i] = fgetc(file);
 
-  /* also load demo tape, if available */
+  /* also load demo tape, if available (only in single level files) */
 
   if (demo_available)
   {
@@ -288,7 +289,7 @@ static void LoadNativeLevelFromFileStream_SP(FILE *file, boolean demo_available)
   }
 }
 
-boolean LoadNativeLevel_SP(char *filename, int pos)
+boolean LoadNativeLevel_SP(char *filename, int level_pos)
 {
   FILE *file;
   int i, l, x, y;
@@ -300,8 +301,13 @@ boolean LoadNativeLevel_SP(char *filename, int pos)
   boolean reading_multipart_level = FALSE;
   boolean use_empty_level = FALSE;
   LevelInfoType *header = &native_sp_level.header;
-  boolean demo_available = (strSuffix(filename, ".sp") ||
-			    strSuffix(filename, ".SP"));
+  boolean is_single_level_file = (strSuffixLower(filename, ".sp") ||
+				  strSuffixLower(filename, ".mpx"));
+  boolean demo_available = is_single_level_file;
+  boolean is_mpx_file = strSuffixLower(filename, ".mpx");
+  int file_seek_pos = level_pos * SP_LEVEL_SIZE;
+  int level_width  = SP_PLAYFIELD_WIDTH;
+  int level_height = SP_PLAYFIELD_HEIGHT;
 
   /* always start with reliable default values */
   setLevelInfoToDefaults_SP();
@@ -309,13 +315,76 @@ boolean LoadNativeLevel_SP(char *filename, int pos)
 
   if (!(file = fopen(filename, MODE_READ)))
   {
-    Error(ERR_WARN, "cannot open level '%s' -- using empty level", filename);
+    Error(ERR_WARN, "cannot open file '%s' -- using empty level", filename);
 
     return FALSE;
   }
 
+  if (is_mpx_file)
+  {
+    char mpx_chunk_name[4 + 1];
+    int mpx_version;
+    int mpx_level_count;
+    LevelDescriptor *mpx_level_desc;
+
+    getFileChunkBE(file, mpx_chunk_name, NULL);
+
+    if (!strEqual(mpx_chunk_name, "MPX "))
+    {
+      Error(ERR_WARN, "cannot find MPX ID in file '%s' -- using empty level",
+	    filename);
+
+      return FALSE;
+    }
+
+    mpx_version = getFile16BitLE(file);
+
+    if (mpx_version != 1)
+    {
+      Error(ERR_WARN, "unknown MPX version in file '%s' -- using empty level",
+	    filename);
+
+      return FALSE;
+    }
+
+    mpx_level_count = getFile16BitLE(file);
+
+    if (mpx_level_count < 1)
+    {
+      Error(ERR_WARN, "no MPX levels found in file '%s' -- using empty level",
+	    filename);
+
+      return FALSE;
+    }
+
+    if (level_pos >= mpx_level_count)
+    {
+      Error(ERR_WARN, "MPX level not found in file '%s' -- using empty level",
+	    filename);
+
+      return FALSE;
+    }
+
+    mpx_level_desc = checked_calloc(mpx_level_count * sizeof(LevelDescriptor));
+
+    for (i = 0; i < mpx_level_count; i++)
+    {
+      LevelDescriptor *ldesc = &mpx_level_desc[i];
+
+      ldesc->Width  = getFile16BitLE(file);
+      ldesc->Height = getFile16BitLE(file);
+      ldesc->OffSet = getFile32BitLE(file);	/* starts with 1, not with 0 */
+      ldesc->Size   = getFile32BitLE(file);
+    }
+
+    level_width  = mpx_level_desc[level_pos].Width;
+    level_height = mpx_level_desc[level_pos].Height;
+
+    file_seek_pos = mpx_level_desc[level_pos].OffSet - 1;
+  }
+
   /* position file stream to the requested level (in case of level package) */
-  if (fseek(file, pos * SP_LEVEL_SIZE, SEEK_SET) != 0)
+  if (fseek(file, file_seek_pos, SEEK_SET) != 0)
   {
     Error(ERR_WARN, "cannot fseek in file '%s' -- using empty level", filename);
 
@@ -330,11 +399,15 @@ boolean LoadNativeLevel_SP(char *filename, int pos)
      of the level name, the multi-part level consists of only horizontal or
      vertical parts */
 
-  for (l = pos; l < SP_NUM_LEVELS_PER_PACKAGE; l++)
+  for (l = level_pos; l < SP_NUM_LEVELS_PER_PACKAGE; l++)
   {
-    LoadNativeLevelFromFileStream_SP(file, demo_available);
+    LoadNativeLevelFromFileStream_SP(file, level_width, level_height,
+				     demo_available);
 
     /* check if this level is a part of a bigger multi-part level */
+
+    if (is_single_level_file)
+      break;
 
     name_first = header->LevelTitle[0];
     name_last  = header->LevelTitle[SP_LEVEL_NAME_LEN - 1];

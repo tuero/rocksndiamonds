@@ -637,6 +637,26 @@ boolean strSuffix(char *s, char *suffix)
 	  strncmp(&s[strlen(s) - strlen(suffix)], suffix, strlen(suffix)) == 0);
 }
 
+boolean strPrefixLower(char *s, char *prefix)
+{
+  char *s_lower = getStringToLower(s);
+  boolean match = strPrefix(s_lower, prefix);
+
+  free(s_lower);
+
+  return match;
+}
+
+boolean strSuffixLower(char *s, char *suffix)
+{
+  char *s_lower = getStringToLower(s);
+  boolean match = strSuffix(s_lower, suffix);
+
+  free(s_lower);
+
+  return match;
+}
+
 
 /* ------------------------------------------------------------------------- */
 /* command line option handling functions                                    */
