@@ -135,13 +135,19 @@ void DDScrollBuffer_Blt_Ext(Bitmap *target_bitmap)
 {
   RECT DR, SR;
   long tX, tY, L;
+  int sX, sY;
   // RECT ERect;
   // long Restore;
 
   if (NoDisplayFlag)
     return;
 
-#if 0
+#if 1
+  DR.left = 0;
+  DR.top = 0;
+  DR.right = SCR_FIELDX * TILEX;
+  DR.bottom = SCR_FIELDY * TILEY;
+#else
   // --- On Error GoTo BltEH
   DirectX.GetWindowRect(mhWnd, DR);
   // --- On Error GoTo 0
@@ -175,10 +181,37 @@ void DDScrollBuffer_Blt_Ext(Bitmap *target_bitmap)
   }
 
 #if 1
+  SR.left = (SR.left < 0 ? 0 : SR.left);
+  SR.top  = (SR.top  < 0 ? 0 : SR.top);
+#endif
 
-#if 0
-  printf("::: DDScrollBuffer.c: DDScrollBuffer_Blt(): blit from %d, %d [%ld, %ld] [%ld, %ld]\n",
-	 SR.left, SR.top, mScrollX, mScrollY, mDestXOff, mDestYOff);
+#if 1
+  {
+    int full_xsize = (FieldWidth  - (menBorder.Checked ? 0 : 1)) * TILEX;
+    int full_ysize = (FieldHeight - (menBorder.Checked ? 0 : 1)) * TILEY;
+    int sxsize = SCR_FIELDX * TILEX;
+    int sysize = SCR_FIELDY * TILEY;
+
+    tX = (full_xsize < sxsize ? full_xsize : tX);
+    tY = (full_ysize < sysize ? full_ysize : tY);
+    sX = SX + (full_xsize < sxsize ? (sxsize - full_xsize) / 2 : 0);
+    sY = SY + (full_ysize < sysize ? (sysize - full_ysize) / 2 : 0);
+  }
+#endif
+
+#if 1
+  if (!menBorder.Checked)
+  {
+    SR.left += 16;
+    SR.top  += 16;
+  }
+#endif
+
+#if 1
+
+#if 1
+  printf("::: DDScrollBuffer.c: DDScrollBuffer_Blt(): blit from %d, %d [%ld, %ld] [%ld, %ld] [%ld, %ld]\n",
+	 SR.left, SR.top, mScrollX, mScrollY, mDestXOff, mDestYOff, tX, tY);
 #endif
 
 #if 0
@@ -194,6 +227,9 @@ void DDScrollBuffer_Blt_Ext(Bitmap *target_bitmap)
 #endif
 
 #if 1
+  BlitBitmap(screenBitmap, target_bitmap,
+	     SR.left, SR.top, tX, tY, sX, sY);
+#else
   BlitBitmap(screenBitmap, target_bitmap,
 	     SR.left, SR.top,
              SCR_FIELDX * TILEX, SCR_FIELDY * TILEY, SX, SY);
