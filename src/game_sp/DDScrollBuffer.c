@@ -33,6 +33,83 @@ long mhWnd;
 long mScrollX, mScrollY;
 long mDestXOff, mDestYOff;
 
+long ScreenBuffer[MAX_BUF_XSIZE][MAX_BUF_YSIZE];
+boolean redraw[MAX_BUF_XSIZE][MAX_BUF_YSIZE];
+
+
+void UpdatePlayfield()
+{
+  int x, y;
+  int sx1 = mScrollX - TILEX;
+  int sy1 = mScrollY - TILEY;
+  int sx2 = mScrollX + SXSIZE + TILEX;
+  int sy2 = mScrollY + SYSIZE + TILEY;
+  int x1 = sx1 / TILEX;
+  int y1 = sy1 / TILEY;
+  int x2 = sx2 / TILEX;
+  int y2 = sy2 / TILEY;
+
+  for (y = DisplayMinY; y <= DisplayMaxY; y++)
+  {
+    for (x = DisplayMinX; x <= DisplayMaxX; x++)
+    {
+      if (x >= x1 && x < x2 && y >= y1 && y < y2)
+      {
+	int sx = x - x1;
+	int sy = y - y1;
+	int tsi = GetSI(x, y);
+	long id = ((PlayField16[tsi]) |
+		   (PlayField8[tsi] << 16) |
+		   (DisPlayField[tsi] << 24));
+	boolean redraw_screen_tile = (ScreenBuffer[sx][sy] != id);
+
+	if (redraw_screen_tile)
+	{
+	  DrawFieldNoAnimated(x, y);
+	  DrawFieldAnimated(x, y);
+
+	  ScreenBuffer[sx][sy] = id;
+
+	  redraw[sx][sy] = TRUE;
+	  redraw_tiles++;
+	}
+      }
+    }
+  }
+}
+
+void OLD_UpdatePlayfield()
+{
+  int x, y;
+  int left = mScrollX / TILEX;
+  int top  = mScrollY / TILEY;
+
+  for (y = top; y < top + MAX_BUF_YSIZE; y++)
+  {
+    for (x = left; x < left + MAX_BUF_XSIZE; x++)
+    {
+      int sx = x % MAX_BUF_XSIZE;
+      int sy = y % MAX_BUF_YSIZE;
+      int tsi = GetSI(x, y);
+      long id = ((PlayField16[tsi]) |
+		 (PlayField8[tsi] << 16) |
+		 (DisPlayField[tsi] << 24));
+      boolean redraw_screen_tile = (ScreenBuffer[sx][sy] != id);
+
+      if (redraw_screen_tile)
+      {
+        DrawFieldNoAnimated(x, y);
+        DrawFieldAnimated(x, y);
+
+	ScreenBuffer[sx][sy] = id;
+
+	redraw[sx][sy] = TRUE;
+	redraw_tiles++;
+      }
+    }
+  }
+}
+
 void DDScrollBuffer_Let_DestXOff(long NewVal)
 {
   mDestXOff = NewVal;
@@ -131,6 +208,110 @@ void DDScrollBuffer_Cls(int BackColor)
   Buffer.BltColorFill(EmptyRect, BackColor);
 }
 
+
+/* copy the entire screen to the window at the scroll position */
+
+void BlitScreenToBitmap_SP(Bitmap *target_bitmap)
+{
+  int sx = TILEX + mScrollX % TILEX;
+  int sy = TILEY + mScrollY % TILEY;
+
+  BlitBitmap(screenBitmap, target_bitmap, sx, sy,
+	     SCR_FIELDX * TILEX, SCR_FIELDY * TILEY, SX, SY);
+}
+
+void OLD_BlitScreenToBitmap_SP(Bitmap *target_bitmap)
+{
+  int x = mScrollX % (MAX_BUF_XSIZE * TILEX);
+  int y = mScrollY % (MAX_BUF_YSIZE * TILEY);
+
+  if (x < 2 * TILEX && y < 2 * TILEY)
+  {
+    BlitBitmap(screenBitmap, target_bitmap, x, y,
+	       SCR_FIELDX * TILEX, SCR_FIELDY * TILEY, SX, SY);
+  }
+  else if (x < 2 * TILEX && y >= 2 * TILEY)
+  {
+    BlitBitmap(screenBitmap, target_bitmap, x, y,
+	       SCR_FIELDX * TILEX, MAX_BUF_YSIZE * TILEY - y,
+	       SX, SY);
+    BlitBitmap(screenBitmap, target_bitmap, x, 0,
+	       SCR_FIELDX * TILEX, y - 2 * TILEY,
+	       SX, SY + MAX_BUF_YSIZE * TILEY - y);
+  }
+  else if (x >= 2 * TILEX && y < 2 * TILEY)
+  {
+    BlitBitmap(screenBitmap, target_bitmap, x, y,
+	       MAX_BUF_XSIZE * TILEX - x, SCR_FIELDY * TILEY,
+	       SX, SY);
+    BlitBitmap(screenBitmap, target_bitmap, 0, y,
+	       x - 2 * TILEX, SCR_FIELDY * TILEY,
+	       SX + MAX_BUF_XSIZE * TILEX - x, SY);
+  }
+  else
+  {
+    BlitBitmap(screenBitmap, target_bitmap, x, y,
+	       MAX_BUF_XSIZE * TILEX - x, MAX_BUF_YSIZE * TILEY - y,
+	       SX, SY);
+    BlitBitmap(screenBitmap, target_bitmap, 0, y,
+	       x - 2 * TILEX, MAX_BUF_YSIZE * TILEY - y,
+	       SX + MAX_BUF_XSIZE * TILEX - x, SY);
+    BlitBitmap(screenBitmap, target_bitmap, x, 0,
+	       MAX_BUF_XSIZE * TILEX - x, y - 2 * TILEY,
+	       SX, SY + MAX_BUF_YSIZE * TILEY - y);
+    BlitBitmap(screenBitmap, target_bitmap, 0, 0,
+	       x - 2 * TILEX, y - 2 * TILEY,
+	       SX + MAX_BUF_XSIZE * TILEX - x, SY + MAX_BUF_YSIZE * TILEY - y);
+  }
+}
+
+void BackToFront_SP(void)
+{
+  static boolean scrolling_last = FALSE;
+  int left = mScrollX / TILEX;
+  int top  = mScrollY / TILEY;
+  boolean scrolling = (mScrollX % TILEX != 0 || mScrollY % TILEY != 0);
+  int x, y;
+
+  SyncDisplay();
+
+  if (1 ||
+      redraw_tiles > REDRAWTILES_THRESHOLD || scrolling || scrolling_last)
+  {
+    /* blit all (up to four) parts of the scroll buffer to the backbuffer */
+    BlitScreenToBitmap_SP(backbuffer);
+
+    /* blit the completely updated backbuffer to the window (in one blit) */
+    BlitBitmap(backbuffer, window, SX, SY, SXSIZE, SYSIZE, SX, SY);
+  }
+  else
+  {
+    for (x = 0; x < SCR_FIELDX; x++)
+    {
+      for (y = 0; y < SCR_FIELDY; y++)
+      {
+	int xx = (left + x) % MAX_BUF_XSIZE;
+	int yy = (top  + y) % MAX_BUF_YSIZE;
+
+	if (redraw[xx][yy])
+	  BlitBitmap(screenBitmap, window,
+		     xx * TILEX, yy * TILEY, TILEX, TILEY,
+		     SX + x * TILEX, SY + y * TILEY);
+      }
+    }
+  }
+
+  FlushDisplay();
+
+  for (x = 0; x < MAX_BUF_XSIZE; x++)
+    for (y = 0; y < MAX_BUF_YSIZE; y++)
+      redraw[x][y] = FALSE;
+  redraw_tiles = 0;
+
+  scrolling_last = scrolling;
+}
+
+
 void DDScrollBuffer_Blt_Ext(Bitmap *target_bitmap)
 {
   RECT DR, SR;
@@ -157,11 +338,14 @@ void DDScrollBuffer_Blt_Ext(Bitmap *target_bitmap)
     tX = (DR.right - DR.left) / Stretch;
     tY = (DR.bottom - DR.top) / Stretch;
   }
+
   {
     SR.left = mScrollX + mDestXOff;
     SR.top = mScrollY + mDestYOff;
+
     SR.right = SR.left + tX;
     SR.bottom = SR.top + tY;
+
     //    If mWidth < SR.right Then
     //      SR.right = mWidth
     //      DR.right = DR.left + Stretch * (SR.right - SR.left)
@@ -356,7 +540,19 @@ void DDScrollBuffer_Blt_Ext(Bitmap *target_bitmap)
 
 void DDScrollBuffer_Blt()
 {
+#if 1
+
+#if 1
+  BackToFront_SP();
+#else
+  /* !!! TEST ONLY !!! */
+  BlitBitmap(screenBitmap, window,
+	     0, 0, SCR_FIELDX * TILEX, SCR_FIELDY * TILEY, SX, SY);
+#endif
+
+#else
   DDScrollBuffer_Blt_Ext(window);
+#endif
 }
 
 void DDScrollBuffer_ScrollTo(int X, int Y)

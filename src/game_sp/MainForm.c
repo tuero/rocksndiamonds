@@ -1370,8 +1370,9 @@ void Form_Load()
   PauseMode = 0;
   //  BaseWidth = 16
 
-#if 0
-  menBorder_Click();
+#if 1
+  if (0)
+    menBorder_Click();
 #endif
 
   Loaded = True;

@@ -117,8 +117,15 @@ locRepeatMainGameLoop:                           // start repeating game loop
   LastFrame = Clock.TickNow(); // store the frame time
 #endif
   //   never any additional code between here!
+
+
+
+#if 0
   if (! NoDisplayFlag) // copy the BackBuffer(=Stage) to visible screen
     Stage.Blt();
+#endif
+
+
 
   // FS   end of synchronization
   // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

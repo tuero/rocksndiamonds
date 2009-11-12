@@ -18,9 +18,20 @@ void InitGameEngine_SP()
 #endif
 }
 
+#if 0
 void BlitScreenToBitmap_SP(Bitmap *target_bitmap)
 {
   DDScrollBuffer_Blt_Ext(target_bitmap);
+}
+#endif
+
+void RedrawPlayfield_SP(boolean force_redraw)
+{
+  // subDisplayLevel();
+
+  UpdatePlayfield();
+
+  BackToFront_SP();
 }
 
 void GameActions_SP(byte action[MAX_PLAYERS], boolean warp_mode)
@@ -28,9 +39,6 @@ void GameActions_SP(byte action[MAX_PLAYERS], boolean warp_mode)
   byte single_player_action = action[0];
 
   subMainGameLoop_Main(single_player_action, warp_mode);
-}
 
-void RedrawPlayfield_SP(boolean force_redraw)
-{
-  subDisplayLevel();
+  RedrawPlayfield_SP(FALSE);
 }

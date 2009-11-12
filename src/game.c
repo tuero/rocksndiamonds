@@ -11983,7 +11983,16 @@ static byte PlayerActions(struct PlayerInfo *player, byte player_action)
 
     if (tape.single_step && tape.recording && !tape.pausing)
     {
+#if 1
+      /* as it is called "single step mode", just return to pause mode when the
+	 player stopped moving after one tile (or never starts moving at all) */
+      if (!player->is_moving)
+#else
+      /* this is buggy: there are quite some cases where the single step mode
+	 does not return to pause mode (like pushing things that don't move
+	 or simply by trying to run against a wall) */
       if (button1 || (dropped && !moved))
+#endif
       {
 	TapeTogglePause(TAPE_TOGGLE_AUTOMATIC);
 	SnapField(player, 0, 0);		/* stop snapping */

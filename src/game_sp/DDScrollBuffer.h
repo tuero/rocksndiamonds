@@ -12,6 +12,12 @@
 
 #include "global.h"
 
+extern long mScrollX, mScrollY;
+
+extern boolean redraw[MAX_BUF_XSIZE][MAX_BUF_YSIZE];
+
+extern void UpdatePlayfield();
+
 extern void DDScrollBuffer_Blt_Ext(Bitmap *);
 extern void DDScrollBuffer_Blt();
 extern void DDScrollBuffer_Cls(int BackColor);

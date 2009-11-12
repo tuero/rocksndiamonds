@@ -40,8 +40,8 @@
 #define SCR_MENUY		12
 #define SCR_FIELDX		17
 #define SCR_FIELDY		17
-#define MAX_BUF_XSIZE		(SCR_FIELDX + 2)
-#define MAX_BUF_YSIZE		(SCR_FIELDY + 2)
+#define MAX_BUF_XSIZE		(2 + SCR_FIELDX + 2)
+#define MAX_BUF_YSIZE		(2 + SCR_FIELDY + 2)
 
 /* often used screen positions */
 #define SX			8

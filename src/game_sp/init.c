@@ -36,7 +36,7 @@ void sp_open_all()
 
   SetBitmaps_SP(&sp_objects);
 
-#if 1
+#if 0
   /* too small for oversized levels, but too big for graphics performance */
   /* (the whole playfield is drawn/updated, not only visible/scrolled area) */
   /* !!! FIX THIS !!! */
