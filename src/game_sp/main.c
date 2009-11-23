@@ -11,6 +11,8 @@ void InitGameEngine_SP()
   game_sp_info.LevelSolved = FALSE;
   game_sp_info.GameOver = FALSE;
 
+  InitScrollPlayfield();
+
 #if 1
   menPlay_Click();
 #else

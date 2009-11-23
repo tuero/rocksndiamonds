@@ -16,6 +16,10 @@ extern long mScrollX, mScrollY;
 
 extern boolean redraw[MAX_BUF_XSIZE][MAX_BUF_YSIZE];
 
+extern int TEST_flag;
+
+
+extern void InitScrollPlayfield();
 extern void UpdatePlayfield();
 
 extern void DDScrollBuffer_Blt_Ext(Bitmap *);

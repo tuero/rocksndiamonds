@@ -31,11 +31,139 @@ DirectDrawSurface7 mPrimary;
 long mWidth, mHeight;
 long mhWnd;
 long mScrollX, mScrollY;
+long mScrollX_last, mScrollY_last;
 long mDestXOff, mDestYOff;
 
 long ScreenBuffer[MAX_BUF_XSIZE][MAX_BUF_YSIZE];
 boolean redraw[MAX_BUF_XSIZE][MAX_BUF_YSIZE];
 
+int TEST_flag = 0;
+
+
+static void ScrollPlayfield()
+{
+  int sx_last = mScrollX_last / TILEX;
+  int sy_last = mScrollY_last / TILEY;
+  int sx = mScrollX / TILEX;
+  int sy = mScrollY / TILEY;
+  int dx = (sx < sx_last ? +1 : sx > sx_last ? -1 : 0);
+  int dy = (sy < sy_last ? +1 : sy > sy_last ? -1 : 0);
+  int x, y;
+  int sx1 = mScrollX - TILEX;
+  int sy1 = mScrollY - TILEY;
+  int sx2 = mScrollX + SXSIZE + TILEX;
+  int sy2 = mScrollY + SYSIZE + TILEY;
+  int x1 = sx1 / TILEX;
+  int y1 = sy1 / TILEY;
+  int x2 = sx2 / TILEX;
+  int y2 = sy2 / TILEY;
+#if 1
+  int buf_xsize = SCR_FIELDX + 2;
+  int buf_ysize = SCR_FIELDY + 2;
+#else
+  int buf_xsize = MAX_BUF_XSIZE;
+  int buf_ysize = MAX_BUF_YSIZE;
+#endif
+
+  BlitBitmap(screenBitmap, screenBitmap,
+             TILEX * (dx == -1),
+             TILEY * (dy == -1),
+             (MAX_BUF_XSIZE * TILEX) - TILEX * (dx != 0),
+             (MAX_BUF_YSIZE * TILEY) - TILEY * (dy != 0),
+             TILEX * (dx == 1),
+             TILEY * (dy == 1));
+
+  /* when scrolling the whole playfield, do not redraw single tiles */
+  for (x = 0; x < MAX_BUF_XSIZE; x++)
+    for (y = 0; y < MAX_BUF_YSIZE; y++)
+      redraw[x][y] = FALSE;
+  redraw_tiles = 0;
+
+  for (y = DisplayMinY; y <= DisplayMaxY; y++)
+  {
+    for (x = DisplayMinX; x <= DisplayMaxX; x++)
+    {
+      if (x >= x1 && x < x2 && y >= y1 && y < y2)
+      {
+	int sx = x - x1;
+	int sy = y - y1;
+	int tsi = GetSI(x, y);
+	long id = ((PlayField16[tsi]) |
+		   (PlayField8[tsi] << 16) |
+		   (DisPlayField[tsi] << 24));
+
+#if 0
+#if 1
+	printf("::: [%d] %d [%d, %d] [%d]\n", dx, sx, x, y, buf_xsize);
+#else
+	if (sx == 0 || sx == MAX_BUF_XSIZE - 1)
+	  printf("::: %d, %d\n", dx, sx);
+#endif
+#endif
+
+	if ((dx == -1 && sx == buf_xsize - 1) ||
+	    (dx == +1 && sx == 0) ||
+	    (dy == -1 && sy == buf_ysize - 1) ||
+	    (dy == +1 && sy == 0))
+	{
+	  printf("::: %d, %d\n", sx, sy);
+
+	  TEST_flag = 1;
+
+	  DrawFieldNoAnimated(x, y);
+	  DrawFieldAnimated(x, y);
+
+	  TEST_flag = 0;
+	}
+
+	ScreenBuffer[sx][sy] = id;
+      }
+    }
+  }
+}
+
+static void ScrollPlayfieldIfNeededExt(boolean reset)
+{
+  int sx_last = mScrollX_last / TILEX;
+  int sy_last = mScrollY_last / TILEY;
+  int sx = mScrollX / TILEX;
+  int sy = mScrollY / TILEY;
+  boolean initialized = (mScrollX_last != -1 && mScrollY_last != -1);
+
+  if (reset)
+  {
+    mScrollX_last = -1;
+    mScrollY_last = -1;
+
+    return;
+  }
+
+#if 0
+  if (mScrollX_last == -1 || mScrollY_last == -1)
+  {
+    mScrollX_last = mScrollX;
+    mScrollY_last = mScrollY;
+
+    return;
+  }
+#endif
+
+  if (initialized && (sx != sx_last || sy != sy_last))
+    ScrollPlayfield();
+
+  mScrollX_last = mScrollX;
+  mScrollY_last = mScrollY;
+}
+
+static void ScrollPlayfieldIfNeeded()
+{
+  ScrollPlayfieldIfNeededExt(FALSE);
+}
+
+void InitScrollPlayfield()
+{
+  ScrollPlayfieldIfNeededExt(TRUE);
+}
 
 void UpdatePlayfield()
 {
@@ -63,10 +191,17 @@ void UpdatePlayfield()
 		   (DisPlayField[tsi] << 24));
 	boolean redraw_screen_tile = (ScreenBuffer[sx][sy] != id);
 
+#if 0
+	if (LowByte(PlayField16[tsi]) == fiMurphy)
+	  continue;
+#endif
+
 	if (redraw_screen_tile)
 	{
+#if 0
 	  DrawFieldNoAnimated(x, y);
 	  DrawFieldAnimated(x, y);
+#endif
 
 	  ScreenBuffer[sx][sy] = id;
 
@@ -571,6 +706,10 @@ void DDScrollBuffer_ScrollTo(int X, int Y)
   printf("::: DDScrollBuffer.c: DDScrollBuffer_ScrollTo():  mScroll: %ld, %ld [%d, %d]\n",
 	 mScrollX, mScrollY, X, Y);
 #endif
+
+#if 1
+  ScrollPlayfieldIfNeeded();
+#endif
 }
 
 void DDScrollBuffer_ScrollTowards(int X, int Y, double Step)
@@ -606,6 +745,10 @@ void DDScrollBuffer_ScrollTowards(int X, int Y, double Step)
 #if 0
   printf("::: DDScrollBuffer.c: DDScrollBuffer_ScrollTowards(): (2) mScroll: %ld, %ld [%d, %d, %f]\n",
 	 mScrollX, mScrollY, X, Y, Step);
+#endif
+
+#if 1
+  ScrollPlayfieldIfNeeded();
 #endif
 }
 
@@ -684,5 +827,9 @@ SoftScrollEH:
 #if 0
   printf("::: DDScrollBuffer.c: DDScrollBuffer_SoftScrollTo(): mScroll: %ld, %ld\n",
 	 mScrollX, mScrollY);
+#endif
+
+#if 1
+  ScrollPlayfieldIfNeeded();
 #endif
 }

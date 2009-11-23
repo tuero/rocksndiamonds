@@ -1,7 +1,7 @@
 2009-11-12
 	* fixed bug with single step mode (there were some cases where the game
 	  did not automatically return to pause mode, e.g. when trying to push
-	  things that don't move or when trying to run against a wall)
+	  things that cannot be pushed or when trying to run against a wall)
 
 2009-11-01
 	* added support for loading Supaplex levels in MPX level file format

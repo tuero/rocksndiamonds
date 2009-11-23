@@ -3208,8 +3208,9 @@ void DrawFieldNoAnimated(int X, int Y)
       }
 
 #if 0
-      printf("::: MainForm.c: DrawFieldNoAnimated(): %d, %d [%d]\n",
-	     X, Y, Tmp);
+      if (TEST_flag)
+	printf("::: MainForm.c: DrawFieldNoAnimated(): %d, %d [%d]\n",
+	       X, Y, Tmp);
 #endif
 
       StretchedSprites.BltEx(StretchWidth * X, StretchWidth * Y, Tmp);
