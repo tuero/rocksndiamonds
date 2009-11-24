@@ -177,12 +177,25 @@ static void Blt(int pX, int pY, int SpriteX, int SpriteY)
   long Tmp;
 #endif
 
+#if 1
+
+  int sx1 = mScrollX_last - 2 * TILEX;
+  int sy1 = mScrollY_last - 2 * TILEY;
+  int sx2 = mScrollX_last + SXSIZE + 1 * TILEX;
+  int sy2 = mScrollY_last + SYSIZE + 1 * TILEY;
+
+  int sx = pX - sx1;
+  int sy = pY - sy1;
+
+#else
+
   int sx1 = mScrollX - TILEX;
   int sy1 = mScrollY - TILEY;
   int sx2 = mScrollX + SXSIZE + TILEX;
   int sy2 = mScrollY + SYSIZE + TILEY;
   int x1 = sx1 / TILEX;
   int y1 = sy1 / TILEY;
+
 #if 0
   int x2 = sx2 / TILEX;
   int y2 = sy2 / TILEY;
@@ -190,6 +203,8 @@ static void Blt(int pX, int pY, int SpriteX, int SpriteY)
 
   int sx = pX - x1 * TILEX;
   int sy = pY - y1 * TILEY;
+
+#endif
 
 #if 0
   printf(":1: DDSpriteBuffer.c: Blt(): %d, %d [%ld, %ld]\n",
@@ -199,20 +214,20 @@ static void Blt(int pX, int pY, int SpriteX, int SpriteY)
   if (NoDisplayFlag)
     return;
 
-#if 1
+#if 0
   if (TEST_flag)
   {
-    if (pX < sx1 || pX >= sx2 || pY < sy1 || pY >= sy2)
-      printf("::: DDSpriteBuffer.c: Blt(): %d, %d [%d..%d, %d..%d] (%d, %d) [SKIPPED]\n",
-	     pX, pY, sx1, sx2, sy1, sy2, mScrollX, mScrollY);
+    if (pX < sx1 || pX > sx2 || pY < sy1 || pY > sy2)
+      printf("::: DDSpriteBuffer.c: Blt(): %d, %d [%d..%d, %d..%d] (%ld, %ld) (%ld, %ld) [SKIPPED]\n",
+	     pX, pY, sx1, sx2, sy1, sy2, mScrollX, mScrollY, mScrollX_last, mScrollY_last);
     else
-      printf("::: DDSpriteBuffer.c: Blt(): %d, %d [%d..%d, %d..%d] (%d, %d)\n",
-	     pX, pY, sx1, sx2, sy1, sy2, mScrollX, mScrollY);
+      printf("::: DDSpriteBuffer.c: Blt(): %d, %d [%d..%d, %d..%d] (%ld, %ld) (%ld, %ld)\n",
+	     pX, pY, sx1, sx2, sy1, sy2, mScrollX, mScrollY, mScrollX_last, mScrollY_last);
   }
 #endif
 
   /* do not draw fields that are outside the visible screen area */
-  if (pX < sx1 || pX >= sx2 || pY < sy1 || pY >= sy2)
+  if (pX < sx1 || pX > sx2 || pY < sy1 || pY > sy2)
     return;
 
 #if 0

@@ -12,6 +12,8 @@
 
 #include "global.h"
 
+extern void DrawFrameIfNeeded();
+
 extern void DisplayLevel();
 extern void DrawField(int X, int Y);
 extern void DrawFieldAnimated(int X, int Y);

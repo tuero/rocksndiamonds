@@ -13,6 +13,7 @@
 #include "global.h"
 
 extern long mScrollX, mScrollY;
+extern long mScrollX_last, mScrollY_last;
 
 extern boolean redraw[MAX_BUF_XSIZE][MAX_BUF_YSIZE];
 

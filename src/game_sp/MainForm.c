@@ -1003,6 +1003,17 @@ static boolean InstanceStillRunning(char *TmpFile)
 
 #endif
 
+void DrawFrameIfNeeded()
+{
+  DrawFrame(0);
+
+  /* !!! CHECK THIS !!! */
+#if 1
+  if (! menBorder.Checked)
+    DrawFrame(1);
+#endif
+}
+
 void DisplayLevel()
 {
   int X, Y;

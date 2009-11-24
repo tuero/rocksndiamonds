@@ -1,3 +1,11 @@
+2009-11-24
+	* changed internal playfield bitmap handling from playfield sized bitmap
+	  to screen sized bitmap (visible scrolling area), therefore speeding up
+	  graphics operations (by eliminating bitmap updates in invisible areas)
+	  and removing playfield size limitations due to increasing bitmap size
+	  for larger playfield sizes (while the new implementation always uses
+	  a fixed playfield bitmap size for arbitrary internal playfield sizes)
+
 2009-11-12
 	* fixed bug with single step mode (there were some cases where the game
 	  did not automatically return to pause mode, e.g. when trying to push

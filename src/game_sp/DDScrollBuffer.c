@@ -40,30 +40,13 @@ boolean redraw[MAX_BUF_XSIZE][MAX_BUF_YSIZE];
 int TEST_flag = 0;
 
 
-static void ScrollPlayfield()
+static void ScrollPlayfield(int dx, int dy)
 {
-  int sx_last = mScrollX_last / TILEX;
-  int sy_last = mScrollY_last / TILEY;
-  int sx = mScrollX / TILEX;
-  int sy = mScrollY / TILEY;
-  int dx = (sx < sx_last ? +1 : sx > sx_last ? -1 : 0);
-  int dy = (sy < sy_last ? +1 : sy > sy_last ? -1 : 0);
+  int x1 = mScrollX_last / TILEX - 2;
+  int y1 = mScrollY_last / TILEY - 2;
+  int x2 = mScrollX_last / TILEX + (SCR_FIELDX - 1) + 2;
+  int y2 = mScrollY_last / TILEY + (SCR_FIELDY - 1) + 2;
   int x, y;
-  int sx1 = mScrollX - TILEX;
-  int sy1 = mScrollY - TILEY;
-  int sx2 = mScrollX + SXSIZE + TILEX;
-  int sy2 = mScrollY + SYSIZE + TILEY;
-  int x1 = sx1 / TILEX;
-  int y1 = sy1 / TILEY;
-  int x2 = sx2 / TILEX;
-  int y2 = sy2 / TILEY;
-#if 1
-  int buf_xsize = SCR_FIELDX + 2;
-  int buf_ysize = SCR_FIELDY + 2;
-#else
-  int buf_xsize = MAX_BUF_XSIZE;
-  int buf_ysize = MAX_BUF_YSIZE;
-#endif
 
   BlitBitmap(screenBitmap, screenBitmap,
              TILEX * (dx == -1),
@@ -79,11 +62,15 @@ static void ScrollPlayfield()
       redraw[x][y] = FALSE;
   redraw_tiles = 0;
 
+#if 1
+  DrawFrameIfNeeded();
+#endif
+
   for (y = DisplayMinY; y <= DisplayMaxY; y++)
   {
     for (x = DisplayMinX; x <= DisplayMaxX; x++)
     {
-      if (x >= x1 && x < x2 && y >= y1 && y < y2)
+      if (x >= x1 && x <= x2 && y >= y1 && y <= y2)
       {
 	int sx = x - x1;
 	int sy = y - y1;
@@ -101,12 +88,14 @@ static void ScrollPlayfield()
 #endif
 #endif
 
-	if ((dx == -1 && sx == buf_xsize - 1) ||
-	    (dx == +1 && sx == 0) ||
-	    (dy == -1 && sy == buf_ysize - 1) ||
-	    (dy == +1 && sy == 0))
+	if ((dx == -1 && x == x2) ||
+	    (dx == +1 && x == x1) ||
+	    (dy == -1 && y == y2) ||
+	    (dy == +1 && y == y1))
 	{
+#if 0
 	  printf("::: %d, %d\n", sx, sy);
+#endif
 
 	  TEST_flag = 1;
 
@@ -124,12 +113,6 @@ static void ScrollPlayfield()
 
 static void ScrollPlayfieldIfNeededExt(boolean reset)
 {
-  int sx_last = mScrollX_last / TILEX;
-  int sy_last = mScrollY_last / TILEY;
-  int sx = mScrollX / TILEX;
-  int sy = mScrollY / TILEY;
-  boolean initialized = (mScrollX_last != -1 && mScrollY_last != -1);
-
   if (reset)
   {
     mScrollX_last = -1;
@@ -138,7 +121,6 @@ static void ScrollPlayfieldIfNeededExt(boolean reset)
     return;
   }
 
-#if 0
   if (mScrollX_last == -1 || mScrollY_last == -1)
   {
     mScrollX_last = mScrollX;
@@ -146,13 +128,19 @@ static void ScrollPlayfieldIfNeededExt(boolean reset)
 
     return;
   }
-#endif
 
-  if (initialized && (sx != sx_last || sy != sy_last))
-    ScrollPlayfield();
+  /* check if scrolling the playfield reached the destination tile position */
+  if ((mScrollX != mScrollX_last || mScrollY != mScrollY_last) &&
+      mScrollX % TILEX == 0 && mScrollY % TILEY == 0)
+  {
+    int dx = (mScrollX < mScrollX_last ? 1 : mScrollX > mScrollX_last ? -1 : 0);
+    int dy = (mScrollY < mScrollY_last ? 1 : mScrollY > mScrollY_last ? -1 : 0);
 
-  mScrollX_last = mScrollX;
-  mScrollY_last = mScrollY;
+    mScrollX_last = mScrollX;
+    mScrollY_last = mScrollY;
+
+    ScrollPlayfield(dx, dy);
+  }
 }
 
 static void ScrollPlayfieldIfNeeded()
@@ -167,21 +155,17 @@ void InitScrollPlayfield()
 
 void UpdatePlayfield()
 {
+  int x1 = mScrollX_last / TILEX - 2;
+  int y1 = mScrollY_last / TILEY - 2;
+  int x2 = mScrollX_last / TILEX + (SCR_FIELDX - 1) + 2;
+  int y2 = mScrollY_last / TILEY + (SCR_FIELDY - 1) + 2;
   int x, y;
-  int sx1 = mScrollX - TILEX;
-  int sy1 = mScrollY - TILEY;
-  int sx2 = mScrollX + SXSIZE + TILEX;
-  int sy2 = mScrollY + SYSIZE + TILEY;
-  int x1 = sx1 / TILEX;
-  int y1 = sy1 / TILEY;
-  int x2 = sx2 / TILEX;
-  int y2 = sy2 / TILEY;
 
   for (y = DisplayMinY; y <= DisplayMaxY; y++)
   {
     for (x = DisplayMinX; x <= DisplayMaxX; x++)
     {
-      if (x >= x1 && x < x2 && y >= y1 && y < y2)
+      if (x >= x1 && x <= x2 && y >= y1 && y <= y2)
       {
 	int sx = x - x1;
 	int sy = y - y1;
@@ -348,11 +332,31 @@ void DDScrollBuffer_Cls(int BackColor)
 
 void BlitScreenToBitmap_SP(Bitmap *target_bitmap)
 {
-  int sx = TILEX + mScrollX % TILEX;
-  int sy = TILEY + mScrollY % TILEY;
+  int px = 2 * TILEX + (mScrollX - mScrollX_last) % TILEX;
+  int py = 2 * TILEY + (mScrollY - mScrollY_last) % TILEY;
+  int sx, sy, sxsize, sysize;
 
-  BlitBitmap(screenBitmap, target_bitmap, sx, sy,
-	     SCR_FIELDX * TILEX, SCR_FIELDY * TILEY, SX, SY);
+#if 1
+  int xsize = SXSIZE;
+  int ysize = SYSIZE;
+  int full_xsize = (FieldWidth  - (menBorder.Checked ? 0 : 1)) * TILEX;
+  int full_ysize = (FieldHeight - (menBorder.Checked ? 0 : 1)) * TILEY;
+
+  sxsize = (full_xsize < xsize ? full_xsize : xsize);
+  sysize = (full_ysize < ysize ? full_ysize : ysize);
+  sx = SX + (full_xsize < xsize ? (xsize - full_xsize) / 2 : 0);
+  sy = SY + (full_ysize < ysize ? (ysize - full_ysize) / 2 : 0);
+#endif
+
+#if 1
+  if (!menBorder.Checked)
+  {
+    px += TILEX / 2;
+    py += TILEY / 2;
+  }
+#endif
+
+  BlitBitmap(screenBitmap, target_bitmap, px, py, sxsize, sysize, sx, sy);
 }
 
 void OLD_BlitScreenToBitmap_SP(Bitmap *target_bitmap)
@@ -413,11 +417,15 @@ void BackToFront_SP(void)
   if (1 ||
       redraw_tiles > REDRAWTILES_THRESHOLD || scrolling || scrolling_last)
   {
+#if 1
+    BlitScreenToBitmap_SP(window);
+#else
     /* blit all (up to four) parts of the scroll buffer to the backbuffer */
     BlitScreenToBitmap_SP(backbuffer);
 
     /* blit the completely updated backbuffer to the window (in one blit) */
     BlitBitmap(backbuffer, window, SX, SY, SXSIZE, SYSIZE, SX, SY);
+#endif
   }
   else
   {
@@ -521,8 +529,8 @@ void DDScrollBuffer_Blt_Ext(Bitmap *target_bitmap)
 #if 1
   if (!menBorder.Checked)
   {
-    SR.left += 16;
-    SR.top  += 16;
+    SR.left += TILEX / 2;
+    SR.top  += TILEY / 2;
   }
 #endif
 
