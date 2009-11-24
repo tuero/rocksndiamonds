@@ -49,6 +49,11 @@
 #define SXSIZE			(SCR_FIELDX * TILEX)
 #define SYSIZE			(SCR_FIELDY * TILEY)
 
+#define REAL_SX			(SX - 2)
+#define REAL_SY			(SY - 2)
+#define FULL_SXSIZE		(2 + SXSIZE + 2)
+#define FULL_SYSIZE		(2 + SYSIZE + 2)
+
 
 /* ------------------------------------------------------------------------- */
 /* data structure definitions                                                */

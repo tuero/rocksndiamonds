@@ -179,10 +179,12 @@ static void Blt(int pX, int pY, int SpriteX, int SpriteY)
 
 #if 1
 
-  int sx1 = mScrollX_last - 2 * TILEX;
-  int sy1 = mScrollY_last - 2 * TILEY;
-  int sx2 = mScrollX_last + SXSIZE + 1 * TILEX;
-  int sy2 = mScrollY_last + SYSIZE + 1 * TILEY;
+  int scx = (mScrollX_last < 0 ? 0 : mScrollX_last);
+  int scy = (mScrollY_last < 0 ? 0 : mScrollY_last);
+  int sx1 = scx - 2 * TILEX;
+  int sy1 = scy - 2 * TILEY;
+  int sx2 = scx + SXSIZE + 1 * TILEX;
+  int sy2 = scy + SYSIZE + 1 * TILEY;
 
   int sx = pX - sx1;
   int sy = pY - sy1;

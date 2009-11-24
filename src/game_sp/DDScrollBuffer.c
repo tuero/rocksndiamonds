@@ -348,12 +348,65 @@ void BlitScreenToBitmap_SP(Bitmap *target_bitmap)
   sy = SY + (full_ysize < ysize ? (ysize - full_ysize) / 2 : 0);
 #endif
 
+#if 0
+  {
+    static int mScrollX_tmp = -1;
+    static int mScrollY_tmp = -1;
+
+    if (mScrollX != mScrollX_tmp || mScrollY != mScrollY_tmp)
+    {
+      printf("::: %ld, %ld\n", mScrollX, mScrollY);
+
+      mScrollX_tmp = mScrollX;
+      mScrollY_tmp = mScrollY;
+    }
+  }
+#endif
+
+#if 0
+  {
+    static boolean x = 0;
+
+    if (x == 0)
+    {
+      printf("::: %d, %d (%d, %d) (%d, %d) [%ld, %ld] [%ld, %ld] \n",
+	     sx, sy, xsize, ysize, full_xsize, full_ysize,
+	     mScrollX, mScrollY, mScrollX_last, mScrollY_last);
+
+      x = 1;
+    }
+  }
+#endif
+
 #if 1
   if (!menBorder.Checked)
   {
     px += TILEX / 2;
     py += TILEY / 2;
   }
+#endif
+
+#if 0
+  if (mScrollX >= 0 && mScrollX <= 16)
+  {
+    px -= mScrollX;
+  }
+#if 0
+  else if (mScrollX >= 352 && mScrollX <= 368)
+  {
+    px -= mScrollX;
+  }
+#endif
+  else if (mScrollX >= 16) // && mScrollX <= 352)
+  {
+    px -= TILEX / 2;
+  }
+#endif
+
+#if 0
+  /* !!! TEST ONLY !!! */
+  px = py = 0;
+  sx = sy = SX;
 #endif
 
   BlitBitmap(screenBitmap, target_bitmap, px, py, sxsize, sysize, sx, sy);

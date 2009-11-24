@@ -1029,6 +1029,10 @@ void DisplayLevel()
   if (! LevelLoaded)
     return;
 
+  ClearRectangle(backbuffer, REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE);
+  ClearRectangle(screenBitmap, 0, 0,
+		 MAX_BUF_XSIZE * TILEX, MAX_BUF_YSIZE * TILEY);
+
 #if 1
   SetDisplayRegion();
 #endif
