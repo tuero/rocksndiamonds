@@ -129,6 +129,31 @@ static void ScrollPlayfieldIfNeededExt(boolean reset)
     return;
   }
 
+#if 1
+
+  /* check if scrolling the playfield requires redrawing the viewport bitmap */
+  if ((mScrollX != mScrollX_last ||
+       mScrollY != mScrollY_last) &&
+      (ABS(mScrollX - mScrollX_last) >= TILEX ||
+       ABS(mScrollY - mScrollY_last) >= TILEY))
+  {
+    int dx = (ABS(mScrollX - mScrollX_last) < TILEX ? 0 :
+	      mScrollX < mScrollX_last ? 1 : mScrollX > mScrollX_last ? -1 : 0);
+    int dy = (ABS(mScrollY - mScrollY_last) < TILEY ? 0 :
+	      mScrollY < mScrollY_last ? 1 : mScrollY > mScrollY_last ? -1 : 0);
+
+    mScrollX_last -= dx * TILEX;
+    mScrollY_last -= dy * TILEY;
+
+    ScrollPlayfield(dx, dy);
+
+#if 0
+    printf("::: %ld, %ld\n", mScrollX, mScrollY);
+#endif
+  }
+
+#else
+
   /* check if scrolling the playfield reached the destination tile position */
   if ((mScrollX != mScrollX_last || mScrollY != mScrollY_last) &&
       mScrollX % TILEX == 0 && mScrollY % TILEY == 0)
@@ -140,7 +165,13 @@ static void ScrollPlayfieldIfNeededExt(boolean reset)
     mScrollY_last = mScrollY;
 
     ScrollPlayfield(dx, dy);
+
+#if 0
+    printf("::: %ld, %ld\n", mScrollX, mScrollY);
+#endif
   }
+
+#endif
 }
 
 static void ScrollPlayfieldIfNeeded()
@@ -332,9 +363,21 @@ void DDScrollBuffer_Cls(int BackColor)
 
 void BlitScreenToBitmap_SP(Bitmap *target_bitmap)
 {
+#if 0
+  int px = 2 * TILEX + mScrollX % TILEX;
+  int py = 2 * TILEY + mScrollY % TILEY;
+#else
   int px = 2 * TILEX + (mScrollX - mScrollX_last) % TILEX;
   int py = 2 * TILEY + (mScrollY - mScrollY_last) % TILEY;
+#endif
   int sx, sy, sxsize, sysize;
+
+#if 0
+  if (mScrollX % TILEX != (mScrollX - mScrollX_last) % TILEX ||
+      mScrollY % TILEY != (mScrollY - mScrollY_last) % TILEY)
+    printf("::: %ld, %ld / %ld, %ld\n",
+	   mScrollX, mScrollY, mScrollX_last, mScrollY_last);
+#endif
 
 #if 1
   int xsize = SXSIZE;
@@ -781,8 +824,8 @@ void DDScrollBuffer_ScrollTowards(int X, int Y, double Step)
     return;
 
 #if 0
-  printf("::: DDScrollBuffer.c: DDScrollBuffer_ScrollTowards(): (1) mScroll: %ld, %ld [%d, %d, %f]\n",
-	 mScrollX, mScrollY, X, Y, Step);
+  printf("::: DDScrollBuffer.c: DDScrollBuffer_ScrollTowards(): (1) mScroll: %ld, %ld [%d, %d, %f, %f]\n",
+	 mScrollX, mScrollY, X, Y, Step, Stretch);
 #endif
 
   X = X / Stretch;

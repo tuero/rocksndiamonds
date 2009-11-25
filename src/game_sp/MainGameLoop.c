@@ -581,6 +581,21 @@ int subCalculateScreenScrollPos()
 
   int ax, Ay;
 
+#if 1
+  int jump_pos = TILEX / 2;
+
+  if (MurphyScreenXPos < -jump_pos)
+  {
+    MurphyScreenXPos = FieldWidth * TILEX + MurphyScreenXPos;
+    MurphyScreenYPos -= TILEY;
+  }
+  else if (MurphyScreenXPos >= FieldWidth * TILEX - jump_pos)
+  {
+    MurphyScreenXPos = MurphyScreenXPos - FieldWidth * TILEX;
+    MurphyScreenYPos += TILEY;
+  }
+#endif
+
   if (ExplosionShake != 0)
   {
     subGetRandomNumber();
