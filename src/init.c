@@ -5132,7 +5132,7 @@ void Execute_Command(char *command)
 
     exit(0);
   }
-  else if (strncmp(command, "dump level ", 11) == 0)
+  else if (strPrefix(command, "dump level "))
   {
     char *filename = &command[11];
 
@@ -5144,7 +5144,7 @@ void Execute_Command(char *command)
 
     exit(0);
   }
-  else if (strncmp(command, "dump tape ", 10) == 0)
+  else if (strPrefix(command, "dump tape "))
   {
     char *filename = &command[10];
 
@@ -5156,7 +5156,7 @@ void Execute_Command(char *command)
 
     exit(0);
   }
-  else if (strncmp(command, "autoplay ", 9) == 0)
+  else if (strPrefix(command, "autoplay "))
   {
     char *str_ptr = getStringCopy(&command[9]);	/* read command parameters */
 
@@ -5192,13 +5192,15 @@ void Execute_Command(char *command)
 	str_ptr++;
     }
   }
-  else if (strncmp(command, "convert ", 8) == 0)
+  else if (strPrefix(command, "convert ") ||
+	   strPrefix(command, "convert_special_1 "))
   {
     char *str_copy = getStringCopy(&command[8]);
     char *str_ptr = strchr(str_copy, ' ');
 
     global.convert_leveldir = str_copy;
     global.convert_level_nr = -1;
+    global.convert_mode_special_1 = strPrefix(command, "convert_special_1 ");
 
     if (str_ptr != NULL)			/* level number follows */
     {
@@ -5206,7 +5208,7 @@ void Execute_Command(char *command)
       global.convert_level_nr = atoi(str_ptr);	/* get level_nr value */
     }
   }
-  else if (strncmp(command, "create images ", 14) == 0)
+  else if (strPrefix(command, "create images "))
   {
 #if defined(TARGET_SDL)
     global.create_images_dir = getStringCopy(&command[14]);

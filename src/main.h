@@ -2415,6 +2415,7 @@ struct GlobalInfo
 
   char *convert_leveldir;
   int convert_level_nr;
+  boolean convert_mode_special_1;
 
   char *create_images_dir;
 

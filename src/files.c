@@ -6331,6 +6331,39 @@ static void LoadLevelFromFileInfo_DC(struct LevelInfo *level,
 /* functions for loading SB level                                            */
 /* ------------------------------------------------------------------------- */
 
+int getMappedElement_SB(int element_ascii, boolean use_special_1)
+{
+  static struct
+  {
+    int ascii;
+    int rnd;
+    int special_1;
+  }
+  sb_element_mapping[] =
+  {
+    { ' ', EL_EMPTY,                EL_CUSTOM_1 },  /* floor (space) */
+    { '#', EL_STEELWALL,            EL_CUSTOM_2 },  /* wall */
+    { '@', EL_PLAYER_1,             EL_CUSTOM_3 },  /* player */
+    { '$', EL_SOKOBAN_OBJECT,       EL_CUSTOM_4 },  /* box */
+    { '.', EL_SOKOBAN_FIELD_EMPTY,  EL_CUSTOM_5 },  /* goal square */
+    { '*', EL_SOKOBAN_FIELD_FULL,   EL_CUSTOM_6 },  /* box on goal square */
+    { '+', EL_SOKOBAN_FIELD_PLAYER, EL_CUSTOM_7 },  /* player on goal square */
+    { '_', EL_INVISIBLE_STEELWALL,  EL_CUSTOM_8 },  /* floor beyond border */
+
+    { 0,   -1,                      -1          },
+  };
+
+  int i;
+
+  for (i = 0; sb_element_mapping[i].ascii != 0; i++)
+    if (element_ascii == sb_element_mapping[i].ascii)
+      return (use_special_1 ?
+	      sb_element_mapping[i].special_1 :
+	      sb_element_mapping[i].rnd);
+
+  return EL_UNDEFINED;
+}
+
 static void LoadLevelFromFileInfo_SB(struct LevelInfo *level,
 				     struct LevelFileInfo *level_file_info)
 {
@@ -6345,9 +6378,19 @@ static void LoadLevelFromFileInfo_SB(struct LevelInfo *level,
   boolean reading_playfield = FALSE;
   boolean got_valid_playfield_line = FALSE;
   boolean invalid_playfield_char = FALSE;
+  boolean convert_mode_special_1 = (global.convert_leveldir &&
+				    global.convert_mode_special_1);
   int file_level_nr = 0;
   int line_nr = 0;
   int x, y;
+
+#if 0
+  printf("::: looking for level number %d [%d]\n",
+	 level_file_info->nr, num_levels_to_skip);
+#endif
+
+  last_comment[0] = '\0';
+  level_name[0] = '\0';
 
   if (!(file = fopen(filename, MODE_READ)))
   {
@@ -6357,14 +6400,6 @@ static void LoadLevelFromFileInfo_SB(struct LevelInfo *level,
 
     return;
   }
-
-#if 0
-  printf("::: looking for level number %d [%d]\n",
-	 level_file_info->nr, num_levels_to_skip);
-#endif
-
-  last_comment[0] = '\0';
-  level_name[0] = '\0';
 
   while (!feof(file))
   {
@@ -6506,47 +6541,21 @@ static void LoadLevelFromFileInfo_SB(struct LevelInfo *level,
     /* read playfield elements from line */
     for (line_ptr = line; *line_ptr; line_ptr++)
     {
+      int mapped_sb_element = getMappedElement_SB(*line_ptr,
+						  convert_mode_special_1);
+
       /* stop parsing playfield line if larger column than allowed */
       if (x >= MAX_LEV_FIELDX)
 	break;
 
-      switch (*line_ptr)
+      if (mapped_sb_element == EL_UNDEFINED)
       {
-        case '#':		/* wall */
-	  level->field[x][y] = EL_STEELWALL;
-	  break;
+	invalid_playfield_char = TRUE;
 
-        case '@':		/* player */
-	  level->field[x][y] = EL_PLAYER_1;
-	  break;
-
-        case '+':		/* player on goal square */
-	  level->field[x][y] = EL_SOKOBAN_FIELD_PLAYER;
-	  break;
-
-        case '$':		/* box */
-	  level->field[x][y] = EL_SOKOBAN_OBJECT;
-	  break;
-
-        case '*':		/* box on goal square */
-	  level->field[x][y] = EL_SOKOBAN_FIELD_FULL;
-	  break;
-
-        case '.':		/* goal square */
-	  level->field[x][y] = EL_SOKOBAN_FIELD_EMPTY;
-	  break;
-
-        case ' ':		/* floor (space) */
-	  level->field[x][y] = EL_EMPTY;
-	  break;
-
-        default:
-	  invalid_playfield_char = TRUE;
-	  break;
+	break;
       }
 
-      if (invalid_playfield_char)
-	break;
+      level->field[x][y] = mapped_sb_element;
 
       /* continue with next tile column */
       x++;
@@ -6567,12 +6576,12 @@ static void LoadLevelFromFileInfo_SB(struct LevelInfo *level,
     y++;
   }
 
+  fclose(file);
+
   level->fieldy = y;
 
   level->fieldx = MIN(MAX(MIN_LEV_FIELDX, level->fieldx), MAX_LEV_FIELDX);
   level->fieldy = MIN(MAX(MIN_LEV_FIELDY, level->fieldy), MAX_LEV_FIELDY);
-
-  fclose(file);
 
   if (!reading_playfield)
   {
@@ -6604,6 +6613,15 @@ static void LoadLevelFromFileInfo_SB(struct LevelInfo *level,
   else
   {
     sprintf(level->name, "--> Level %d <--", level_file_info->nr);
+  }
+
+  for (y = 0; y < level->fieldy; y++) for (x = 0; x < level->fieldx; x++)
+  {
+    if ((x == 0 || x == level->fieldx - 1 ||
+	 y == 0 || y == level->fieldy - 1) &&
+	level->field[x][y] == getMappedElement_SB(' ', convert_mode_special_1))
+      FloodFillLevel(x, y, getMappedElement_SB('_', convert_mode_special_1),
+		     level->field, level->fieldx, level->fieldy);
   }
 }
 
@@ -7077,8 +7095,7 @@ static void LoadLevel_InitPlayfield(struct LevelInfo *level, char *filename)
   lev_fieldy = level->fieldy;
 
   /* determine border element for this level */
-  if (level->file_info.type == LEVEL_FILE_TYPE_DC ||
-      level->file_info.type == LEVEL_FILE_TYPE_SB)
+  if (level->file_info.type == LEVEL_FILE_TYPE_DC)
     BorderElement = EL_EMPTY;	/* (in editor, SetBorderElement() is used) */
   else
     SetBorderElement();

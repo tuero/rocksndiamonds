@@ -721,7 +721,7 @@ void GetOptions(char *argv[], void (*print_usage_function)(void))
     if (strEqual(option, "--"))			/* stop scanning arguments */
       break;
 
-    if (strncmp(option, "--", 2) == 0)		/* treat '--' like '-' */
+    if (strPrefix(option, "--"))		/* treat '--' like '-' */
       option++;
 
     option_arg = strchr(option, '=');
@@ -1429,7 +1429,7 @@ void translate_keyname(Key *keysym, char **x11name, char **name, int mode)
     Key key = KSYM_UNDEFINED;
     char *name_ptr = *x11name;
 
-    if (strncmp(name_ptr, "XK_", 3) == 0 && strlen(name_ptr) == 4)
+    if (strPrefix(name_ptr, "XK_") && strlen(name_ptr) == 4)
     {
       char c = name_ptr[3];
 
@@ -1440,14 +1440,14 @@ void translate_keyname(Key *keysym, char **x11name, char **name, int mode)
       else if (c >= '0' && c <= '9')
 	key = KSYM_0 + (Key)(c - '0');
     }
-    else if (strncmp(name_ptr, "XK_KP_", 6) == 0 && strlen(name_ptr) == 7)
+    else if (strPrefix(name_ptr, "XK_KP_") && strlen(name_ptr) == 7)
     {
       char c = name_ptr[6];
 
       if (c >= '0' && c <= '9')
 	key = KSYM_KP_0 + (Key)(c - '0');
     }
-    else if (strncmp(name_ptr, "XK_F", 4) == 0 && strlen(name_ptr) <= 6)
+    else if (strPrefix(name_ptr, "XK_F") && strlen(name_ptr) <= 6)
     {
       char c1 = name_ptr[4];
       char c2 = name_ptr[5];
@@ -1460,7 +1460,7 @@ void translate_keyname(Key *keysym, char **x11name, char **name, int mode)
       if (d >= 1 && d <= KSYM_NUM_FKEYS)
 	key = KSYM_F1 + (Key)(d - 1);
     }
-    else if (strncmp(name_ptr, "XK_", 3) == 0)
+    else if (strPrefix(name_ptr, "XK_"))
     {
       i = 0;
 
@@ -1474,7 +1474,7 @@ void translate_keyname(Key *keysym, char **x11name, char **name, int mode)
       }
       while (translate_key[++i].x11name);
     }
-    else if (strncmp(name_ptr, "0x", 2) == 0)
+    else if (strPrefix(name_ptr, "0x"))
     {
       unsigned long value = 0;
 
