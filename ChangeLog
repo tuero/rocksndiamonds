@@ -1,3 +1,6 @@
+2009-12-01
+	* added reading native Sokoban levels and level packages (XSB files)
+
 2009-11-25
 	* fixed bugs in (auto)scrolling behaviour when passing ports or when
 	  wrapping around the playfield through "holes" in the playfield border

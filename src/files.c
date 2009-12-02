@@ -1792,6 +1792,11 @@ static int getFileTypeFromBasename(char *basename)
       strSuffixLower(basename, ".dc2"))
     return LEVEL_FILE_TYPE_DC;
 
+  /* check for typical filename of a Sokoban level package file */
+  if (strSuffixLower(basename, ".xsb") &&
+      strchr(basename, '%') == NULL)
+    return LEVEL_FILE_TYPE_SB;
+
   /* ---------- try to determine file type from filesize ---------- */
 
   checked_free(filename);
@@ -6323,6 +6328,287 @@ static void LoadLevelFromFileInfo_DC(struct LevelInfo *level,
 
 
 /* ------------------------------------------------------------------------- */
+/* functions for loading SB level                                            */
+/* ------------------------------------------------------------------------- */
+
+static void LoadLevelFromFileInfo_SB(struct LevelInfo *level,
+				     struct LevelFileInfo *level_file_info)
+{
+  char *filename = level_file_info->filename;
+  char line[MAX_LINE_LEN], line_raw[MAX_LINE_LEN], previous_line[MAX_LINE_LEN];
+  char last_comment[MAX_LINE_LEN];
+  char level_name[MAX_LINE_LEN];
+  char *line_ptr;
+  FILE *file;
+  int num_levels_to_skip = level_file_info->nr - leveldir_current->first_level;
+  boolean read_continued_line = FALSE;
+  boolean reading_playfield = FALSE;
+  boolean got_valid_playfield_line = FALSE;
+  boolean invalid_playfield_char = FALSE;
+  int file_level_nr = 0;
+  int line_nr = 0;
+  int x, y;
+
+  if (!(file = fopen(filename, MODE_READ)))
+  {
+    level->no_valid_file = TRUE;
+
+    Error(ERR_WARN, "cannot read level '%s' -- using empty level", filename);
+
+    return;
+  }
+
+#if 0
+  printf("::: looking for level number %d [%d]\n",
+	 level_file_info->nr, num_levels_to_skip);
+#endif
+
+  last_comment[0] = '\0';
+  level_name[0] = '\0';
+
+  while (!feof(file))
+  {
+    /* level successfully read, but next level may follow here */
+    if (!got_valid_playfield_line && reading_playfield)
+    {
+#if 0
+      printf("::: read complete playfield\n");
+#endif
+
+      /* read playfield from single level file -- skip remaining file */
+      if (!level_file_info->packed)
+	break;
+
+      if (file_level_nr >= num_levels_to_skip)
+	break;
+
+      file_level_nr++;
+
+      last_comment[0] = '\0';
+      level_name[0] = '\0';
+
+      reading_playfield = FALSE;
+    }
+
+    got_valid_playfield_line = FALSE;
+
+    /* read next line of input file */
+    if (!fgets(line, MAX_LINE_LEN, file))
+      break;
+
+    /* check if line was completely read and is terminated by line break */
+    if (strlen(line) > 0 && line[strlen(line) - 1] == '\n')
+      line_nr++;
+
+    /* cut trailing line break (this can be newline and/or carriage return) */
+    for (line_ptr = &line[strlen(line)]; line_ptr >= line; line_ptr--)
+      if ((*line_ptr == '\n' || *line_ptr == '\r') && *(line_ptr + 1) == '\0')
+        *line_ptr = '\0';
+
+    /* copy raw input line for later use (mainly debugging output) */
+    strcpy(line_raw, line);
+
+    if (read_continued_line)
+    {
+      /* append new line to existing line, if there is enough space */
+      if (strlen(previous_line) + strlen(line_ptr) < MAX_LINE_LEN)
+        strcat(previous_line, line_ptr);
+
+      strcpy(line, previous_line);      /* copy storage buffer to line */
+
+      read_continued_line = FALSE;
+    }
+
+    /* if the last character is '\', continue at next line */
+    if (strlen(line) > 0 && line[strlen(line) - 1] == '\\')
+    {
+      line[strlen(line) - 1] = '\0';    /* cut off trailing backslash */
+      strcpy(previous_line, line);      /* copy line to storage buffer */
+
+      read_continued_line = TRUE;
+
+      continue;
+    }
+
+    /* skip empty lines */
+    if (line[0] == '\0')
+      continue;
+
+    /* extract comment text from comment line */
+    if (line[0] == ';')
+    {
+      for (line_ptr = line; *line_ptr; line_ptr++)
+        if (*line_ptr != ' ' && *line_ptr != '\t' && *line_ptr != ';')
+          break;
+
+      strcpy(last_comment, line_ptr);
+
+#if 0
+      printf("::: found comment '%s' in line %d\n", last_comment, line_nr);
+#endif
+
+      continue;
+    }
+
+    /* extract level title text from line containing level title */
+    if (line[0] == '\'')
+    {
+      strcpy(level_name, &line[1]);
+
+      if (strlen(level_name) > 0 && level_name[strlen(level_name) - 1] == '\'')
+	level_name[strlen(level_name) - 1] = '\0';
+
+#if 0
+      printf("::: found level name '%s' in line %d\n", level_name, line_nr);
+#endif
+
+      continue;
+    }
+
+    /* skip lines containing only spaces (or empty lines) */
+    for (line_ptr = line; *line_ptr; line_ptr++)
+      if (*line_ptr != ' ')
+	break;
+    if (*line_ptr == '\0')
+      continue;
+
+    /* at this point, we have found a line containing part of a playfield */
+
+#if 0
+    printf("::: found playfield row in line %d\n", line_nr);
+#endif
+
+    got_valid_playfield_line = TRUE;
+
+    if (!reading_playfield)
+    {
+      reading_playfield = TRUE;
+      invalid_playfield_char = FALSE;
+
+      for (x = 0; x < MAX_LEV_FIELDX; x++)
+	for (y = 0; y < MAX_LEV_FIELDY; y++)
+	  level->field[x][y] = EL_EMPTY;
+
+      level->fieldx = 0;
+      level->fieldy = 0;
+
+      /* start with topmost tile row */
+      y = 0;
+    }
+
+    /* skip playfield line if larger row than allowed */
+    if (y >= MAX_LEV_FIELDY)
+      continue;
+
+    /* start with leftmost tile column */
+    x = 0;
+
+    /* read playfield elements from line */
+    for (line_ptr = line; *line_ptr; line_ptr++)
+    {
+      /* stop parsing playfield line if larger column than allowed */
+      if (x >= MAX_LEV_FIELDX)
+	break;
+
+      switch (*line_ptr)
+      {
+        case '#':		/* wall */
+	  level->field[x][y] = EL_STEELWALL;
+	  break;
+
+        case '@':		/* player */
+	  level->field[x][y] = EL_PLAYER_1;
+	  break;
+
+        case '+':		/* player on goal square */
+	  level->field[x][y] = EL_SOKOBAN_FIELD_PLAYER;
+	  break;
+
+        case '$':		/* box */
+	  level->field[x][y] = EL_SOKOBAN_OBJECT;
+	  break;
+
+        case '*':		/* box on goal square */
+	  level->field[x][y] = EL_SOKOBAN_FIELD_FULL;
+	  break;
+
+        case '.':		/* goal square */
+	  level->field[x][y] = EL_SOKOBAN_FIELD_EMPTY;
+	  break;
+
+        case ' ':		/* floor (space) */
+	  level->field[x][y] = EL_EMPTY;
+	  break;
+
+        default:
+	  invalid_playfield_char = TRUE;
+	  break;
+      }
+
+      if (invalid_playfield_char)
+	break;
+
+      /* continue with next tile column */
+      x++;
+
+      level->fieldx = MAX(x, level->fieldx);
+    }
+
+    if (invalid_playfield_char)
+    {
+      /* if first playfield line, treat invalid lines as comment lines */
+      if (y == 0)
+	reading_playfield = FALSE;
+
+      continue;
+    }
+
+    /* continue with next tile row */
+    y++;
+  }
+
+  level->fieldy = y;
+
+  level->fieldx = MIN(MAX(MIN_LEV_FIELDX, level->fieldx), MAX_LEV_FIELDX);
+  level->fieldy = MIN(MAX(MIN_LEV_FIELDY, level->fieldy), MAX_LEV_FIELDY);
+
+  fclose(file);
+
+  if (!reading_playfield)
+  {
+    level->no_valid_file = TRUE;
+
+    Error(ERR_WARN, "cannot read level '%s' -- using empty level", filename);
+
+    return;
+  }
+
+  if (*level_name != '\0')
+  {
+    strncpy(level->name, level_name, MAX_LEVEL_NAME_LEN);
+    level->name[MAX_LEVEL_NAME_LEN] = '\0';
+
+#if 0
+    printf(":1: level name: '%s'\n", level->name);
+#endif
+  }
+  else if (*last_comment != '\0')
+  {
+    strncpy(level->name, last_comment, MAX_LEVEL_NAME_LEN);
+    level->name[MAX_LEVEL_NAME_LEN] = '\0';
+
+#if 0
+    printf(":2: level name: '%s'\n", level->name);
+#endif
+  }
+  else
+  {
+    sprintf(level->name, "--> Level %d <--", level_file_info->nr);
+  }
+}
+
+
+/* ------------------------------------------------------------------------- */
 /* functions for handling native levels                                      */
 /* ------------------------------------------------------------------------- */
 
@@ -6391,6 +6677,10 @@ void LoadLevelFromFileInfo(struct LevelInfo *level,
 
     case LEVEL_FILE_TYPE_DC:
       LoadLevelFromFileInfo_DC(level, level_file_info);
+      break;
+
+    case LEVEL_FILE_TYPE_SB:
+      LoadLevelFromFileInfo_SB(level, level_file_info);
       break;
 
     default:
@@ -6787,7 +7077,8 @@ static void LoadLevel_InitPlayfield(struct LevelInfo *level, char *filename)
   lev_fieldy = level->fieldy;
 
   /* determine border element for this level */
-  if (level->file_info.type == LEVEL_FILE_TYPE_DC)
+  if (level->file_info.type == LEVEL_FILE_TYPE_DC ||
+      level->file_info.type == LEVEL_FILE_TYPE_SB)
     BorderElement = EL_EMPTY;	/* (in editor, SetBorderElement() is used) */
   else
     SetBorderElement();
