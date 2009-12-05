@@ -5509,6 +5509,16 @@ struct MusicPrefixInfo music_prefix_info[NUM_MUSIC_PREFIXES + 1] =
 /* main()                                                                    */
 /* ========================================================================= */
 
+static unsigned long get_cmd_switch(char *switch_string)
+{
+  unsigned long switch_value = 0;
+
+  if (strEqual(switch_string, "load_xsb_to_ces"))
+    switch_value = CMD_SWITCH_LOAD_XSB_TO_CES;
+
+  return switch_value;
+}
+
 static void print_usage()
 {
   printf("\n"
@@ -5557,7 +5567,7 @@ int main(int argc, char *argv[])
   InitExitFunction(CloseAllAndExit);
   InitPlatformDependentStuff();
 
-  GetOptions(argv, print_usage);
+  GetOptions(argv, print_usage, get_cmd_switch);
   OpenAll();
 
   EventLoop();

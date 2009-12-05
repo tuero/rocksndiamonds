@@ -657,6 +657,8 @@ struct OptionInfo
   boolean verbose;
   boolean debug;
   boolean debug_x11_sync;
+
+  unsigned long cmd_switches;
 };
 
 struct ScreenModeInfo

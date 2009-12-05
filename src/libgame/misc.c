@@ -662,7 +662,8 @@ boolean strSuffixLower(char *s, char *suffix)
 /* command line option handling functions                                    */
 /* ------------------------------------------------------------------------- */
 
-void GetOptions(char *argv[], void (*print_usage_function)(void))
+void GetOptions(char *argv[], void (*print_usage_function)(void),
+		unsigned long (*get_cmd_switch_function)(char *))
 {
   char *ro_base_path = RO_BASE_PATH;
   char *rw_base_path = RW_BASE_PATH;
@@ -685,6 +686,7 @@ void GetOptions(char *argv[], void (*print_usage_function)(void))
   options.display_name = NULL;
   options.server_host = NULL;
   options.server_port = 0;
+
   options.ro_base_directory = ro_base_path;
   options.rw_base_directory = rw_base_path;
   options.level_directory    = getPath2(ro_base_path, LEVELS_DIRECTORY);
@@ -693,11 +695,14 @@ void GetOptions(char *argv[], void (*print_usage_function)(void))
   options.music_directory    = getPath2(ro_base_path, MUSIC_DIRECTORY);
   options.docs_directory     = getPath2(ro_base_path, DOCS_DIRECTORY);
   options.execute_command = NULL;
+
   options.serveronly = FALSE;
   options.network = FALSE;
   options.verbose = FALSE;
   options.debug = FALSE;
   options.debug_x11_sync = FALSE;
+
+  options.cmd_switches = 0;
 
 #if !defined(PLATFORM_UNIX)
   if (*options_left == NULL)	/* no options given -- enable verbose mode */
@@ -826,6 +831,21 @@ void GetOptions(char *argv[], void (*print_usage_function)(void))
     else if (strncmp(option, "-debug-x11-sync", option_len) == 0)
     {
       options.debug_x11_sync = TRUE;
+    }
+    else if (strPrefix(option, "-D"))
+    {
+      char *switch_string = &option[2];
+      unsigned long switch_value;
+
+      if (*switch_string == '\0')
+	Error(ERR_EXIT_HELP, "empty switch ignored");
+
+      switch_value = get_cmd_switch_function(switch_string);
+
+      if (switch_value == 0)
+	Error(ERR_EXIT_HELP, "unknown switch '%s'", switch_string);
+
+      options.cmd_switches |= switch_value;
     }
     else if (strncmp(option, "-execute", option_len) == 0)
     {

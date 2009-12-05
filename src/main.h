@@ -30,6 +30,9 @@
 #include "conf_snd.h"	/* include auto-generated data structure definitions */
 #include "conf_mus.h"	/* include auto-generated data structure definitions */
 
+
+#define CMD_SWITCH_LOAD_XSB_TO_CES	(1 << 0)
+
 #define IMG_UNDEFINED			(-1)
 #define IMG_EMPTY			IMG_EMPTY_SPACE
 #define IMG_SP_EMPTY			IMG_SP_EMPTY_SPACE
@@ -2415,7 +2418,6 @@ struct GlobalInfo
 
   char *convert_leveldir;
   int convert_level_nr;
-  boolean convert_mode_special_1;
 
   char *create_images_dir;
 

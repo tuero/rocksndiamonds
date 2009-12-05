@@ -5192,15 +5192,13 @@ void Execute_Command(char *command)
 	str_ptr++;
     }
   }
-  else if (strPrefix(command, "convert ") ||
-	   strPrefix(command, "convert_special_1 "))
+  else if (strPrefix(command, "convert "))
   {
-    char *str_copy = getStringCopy(&command[8]);
+    char *str_copy = getStringCopy(strchr(command, ' ') + 1);
     char *str_ptr = strchr(str_copy, ' ');
 
     global.convert_leveldir = str_copy;
     global.convert_level_nr = -1;
-    global.convert_mode_special_1 = strPrefix(command, "convert_special_1 ");
 
     if (str_ptr != NULL)			/* level number follows */
     {

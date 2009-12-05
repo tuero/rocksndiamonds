@@ -6331,13 +6331,13 @@ static void LoadLevelFromFileInfo_DC(struct LevelInfo *level,
 /* functions for loading SB level                                            */
 /* ------------------------------------------------------------------------- */
 
-int getMappedElement_SB(int element_ascii, boolean use_special_1)
+int getMappedElement_SB(int element_ascii, boolean use_ces)
 {
   static struct
   {
     int ascii;
-    int rnd;
-    int special_1;
+    int sb;
+    int ce;
   }
   sb_element_mapping[] =
   {
@@ -6357,9 +6357,7 @@ int getMappedElement_SB(int element_ascii, boolean use_special_1)
 
   for (i = 0; sb_element_mapping[i].ascii != 0; i++)
     if (element_ascii == sb_element_mapping[i].ascii)
-      return (use_special_1 ?
-	      sb_element_mapping[i].special_1 :
-	      sb_element_mapping[i].rnd);
+      return (use_ces ? sb_element_mapping[i].ce : sb_element_mapping[i].sb);
 
   return EL_UNDEFINED;
 }
@@ -6378,8 +6376,7 @@ static void LoadLevelFromFileInfo_SB(struct LevelInfo *level,
   boolean reading_playfield = FALSE;
   boolean got_valid_playfield_line = FALSE;
   boolean invalid_playfield_char = FALSE;
-  boolean convert_mode_special_1 = (global.convert_leveldir &&
-				    global.convert_mode_special_1);
+  boolean load_xsb_to_ces = options.cmd_switches & CMD_SWITCH_LOAD_XSB_TO_CES;
   int file_level_nr = 0;
   int line_nr = 0;
   int x, y;
@@ -6522,7 +6519,7 @@ static void LoadLevelFromFileInfo_SB(struct LevelInfo *level,
 
       for (x = 0; x < MAX_LEV_FIELDX; x++)
 	for (y = 0; y < MAX_LEV_FIELDY; y++)
-	  level->field[x][y] = EL_EMPTY;
+	  level->field[x][y] = getMappedElement_SB(' ', load_xsb_to_ces);
 
       level->fieldx = 0;
       level->fieldy = 0;
@@ -6541,8 +6538,7 @@ static void LoadLevelFromFileInfo_SB(struct LevelInfo *level,
     /* read playfield elements from line */
     for (line_ptr = line; *line_ptr; line_ptr++)
     {
-      int mapped_sb_element = getMappedElement_SB(*line_ptr,
-						  convert_mode_special_1);
+      int mapped_sb_element = getMappedElement_SB(*line_ptr, load_xsb_to_ces);
 
       /* stop parsing playfield line if larger column than allowed */
       if (x >= MAX_LEV_FIELDX)
@@ -6615,13 +6611,24 @@ static void LoadLevelFromFileInfo_SB(struct LevelInfo *level,
     sprintf(level->name, "--> Level %d <--", level_file_info->nr);
   }
 
+  /* set all empty fields beyond the border walls to invisible steel wall */
   for (y = 0; y < level->fieldy; y++) for (x = 0; x < level->fieldx; x++)
   {
     if ((x == 0 || x == level->fieldx - 1 ||
 	 y == 0 || y == level->fieldy - 1) &&
-	level->field[x][y] == getMappedElement_SB(' ', convert_mode_special_1))
-      FloodFillLevel(x, y, getMappedElement_SB('_', convert_mode_special_1),
+	level->field[x][y] == getMappedElement_SB(' ', load_xsb_to_ces))
+      FloodFillLevel(x, y, getMappedElement_SB('_', load_xsb_to_ces),
 		     level->field, level->fieldx, level->fieldy);
+  }
+
+  if (load_xsb_to_ces)
+  {
+    level->time = 0;
+    level->use_step_counter = TRUE;
+
+    level->initial_player_stepsize[0] = STEPSIZE_SLOW;
+
+    level->use_custom_template = TRUE;
   }
 }
 
