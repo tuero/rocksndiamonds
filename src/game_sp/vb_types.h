@@ -34,7 +34,7 @@ typedef struct
   int top;
   int right;
   int bottom;
-} RECT;
+} MyRECT;
 #define HAS_RECT
 #endif
 
@@ -105,9 +105,9 @@ typedef struct
   boolean (*isLost)(void);
   void (*GetSurfaceDesc)(DDSURFACEDESC2);
   void (*SetClipper)(DirectDrawClipper);
-  // long (*Blt)(RECT, DirectDrawSurface7, RECT, int);
-  long (*Blt)(RECT, void *, RECT, int);
-  void (*BltColorFill)(RECT, int);
+  // long (*Blt)(MyRECT, DirectDrawSurface7, MyRECT, int);
+  long (*Blt)(MyRECT, void *, MyRECT, int);
+  void (*BltColorFill)(MyRECT, int);
 } DirectDrawSurface7;
 
 typedef struct
@@ -123,6 +123,8 @@ typedef struct
 {
   int lFlags;
 } DSBUFFERDESC;
+
+#if 0
 
 typedef struct
 {
@@ -150,8 +152,10 @@ typedef struct
 {
   DirectDraw7 (*DirectDrawCreate)(char *);
   DirectSound (*DirectSoundCreate)(char *);
-  void (*GetWindowRect)(long, RECT);
+  void (*GetWindowRect)(long, MyRECT);
 } DirectX7;
+
+#endif
 
 typedef struct
 {

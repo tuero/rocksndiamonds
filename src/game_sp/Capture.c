@@ -4,6 +4,8 @@
 
 #include "Capture.h"
 
+#if 0
+
 // static char *VB_Name = "CaptureModule";
 
 // --------------------------------------------------------------------
@@ -95,7 +97,9 @@ long SelectPalette(long hDC, long hPalette, long bForceBackground);
 long RealizePalette(long hDC);
 long GetWindowDC(long hWnd);
 long GetDC(long hWnd);
+#if 0
 long GetWindowRect(long hWnd, RECT lpRect);
+#endif
 long ReleaseDC(long hWnd, long hDC);
 long GetDesktopWindow();
 
@@ -143,7 +147,9 @@ int SelectPalette(int hDC, int hPalette, int bForceBackground);
 int RealizePalette(int hDC);
 int GetWindowDC(int hWnd);
 int GetDC(int hWnd);
+#if 0
 int GetWindowRect(int hWnd, RECT lpRect);
+#endif
 int ReleaseDC(int hWnd, int hDC);
 int GetDesktopWindow();
 
@@ -427,6 +433,8 @@ Picture CaptureClient(Form frmSrc)
   return CaptureClient;
 }
 
+#if 0
+
 // ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 //
 // CaptureActiveWindow
@@ -464,6 +472,8 @@ Picture CaptureActiveWindow()
 
   return CaptureActiveWindow;
 }
+
+#endif
 
 // ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
@@ -530,3 +540,4 @@ void PrintPictureToFitPage(Printer Prn, Picture pic)
 
 // --------------------------------------------------------------------
 
+#endif

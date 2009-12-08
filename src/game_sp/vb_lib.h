@@ -50,7 +50,7 @@ extern char *Hex(int);
 
 extern int FileLen(char *);
 
-extern long GetTickCount();
+extern long MyGetTickCount();
 
 extern int GetAttr(char *);
 
@@ -58,6 +58,8 @@ extern void DoEvents();
 
 extern void SaveSetting(const char *, const char *, char *, int);
 
+#if 0
 extern long GetTempPath(long, char *);
+#endif
 
 #endif /* VB_LIB_H */

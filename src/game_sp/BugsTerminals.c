@@ -8,7 +8,7 @@
 
 // --- Option Explicit
 
-long GetTickCount();
+long MyGetTickCount();
 
 byte *TerminalState;
 int TerminalMaxCycles;
@@ -148,7 +148,7 @@ int subRandomize()
 
   long Tick, Tmp;
 
-  Tick = GetTickCount();
+  Tick = MyGetTickCount();
   Tmp = ((Tick ^ (long)(Tick / (1 << 16))) & 0xFFFF);
   RandomSeed = 0x7FFF & Tmp;
   if ((Tmp & 0x8000) != 0)

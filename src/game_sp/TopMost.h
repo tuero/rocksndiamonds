@@ -12,6 +12,8 @@
 
 #include "global.h"
 
+#if 0
+
 #define HWND_BOTTOM 			(1)
 #define HWND_BROADCAST 			(0xFFFF)
 #define HWND_DESKTOP 			(0)
@@ -34,5 +36,7 @@
 extern void HideWindow(long hWnd);
 extern void TopMost(Object obj);
 extern void UnTopMost(Object obj);
+
+#endif
 
 #endif /* TOPMOST_H */

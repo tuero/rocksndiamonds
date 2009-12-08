@@ -197,7 +197,7 @@ int FileLen(char *a)
   }
 }
 
-long GetTickCount()
+long MyGetTickCount()
 {
   return random_linux_libc(RANDOM_SIMPLE);
 }
@@ -217,7 +217,11 @@ void SaveSetting(const char * a, const char *b, char *c, int d)
   return;
 }
 
+#if 0
+
 long GetTempPath(long a, char *b)
 {
   return 0;
 }
+
+#endif

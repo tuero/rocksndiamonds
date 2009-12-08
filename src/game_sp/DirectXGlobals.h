@@ -12,6 +12,8 @@
 
 #include "global.h"
 
+#if 0
+
 extern void ClipToWindow(long hWnd);
 extern void InitDirectX(long hWndForm, long hWndClip);
 extern void ReleaseDirectDraw();
@@ -22,5 +24,7 @@ extern DirectDrawSurface7 PrimarySurface;
 extern DirectSound DSound;
 extern DirectX7 DirectX;
 extern DirectX7 DirectXS;
+
+#endif
 
 #endif /* DIRECTXGLOBALS_H */

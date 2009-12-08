@@ -132,6 +132,8 @@ boolean DDSpriteBuffer_CreateFromFile(char *Path, long xSprites, long ySprites)
   return CreateFromFile;
 }
 
+#if 0
+
 boolean DDSpriteBuffer_CreateAtSize(long Width, long Height, long xSprites, long ySprites)
 {
   boolean CreateAtSize;
@@ -163,6 +165,10 @@ boolean DDSpriteBuffer_CreateAtSize(long Width, long Height, long xSprites, long
   return CreateAtSize;
 }
 
+#endif
+
+#if 0
+
 void DDSpriteBuffer_Cls(int BackColor)
 {
   RECT EmptyRect;
@@ -170,9 +176,11 @@ void DDSpriteBuffer_Cls(int BackColor)
   Buffer.BltColorFill(EmptyRect, BackColor);
 }
 
+#endif
+
 static void Blt(int pX, int pY, int SpriteX, int SpriteY)
 {
-  RECT DR, SR;
+  MyRECT DR, SR;
 #if 0
   long Tmp;
 #endif

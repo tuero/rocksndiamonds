@@ -11,6 +11,8 @@
 int MusicOnFlag;
 int FXOnFlag;
 
+#if 0
+
 DirectSoundBuffer ZonkFX[1 + 1];
 DirectSoundBuffer InfotronFX[1 + 1];
 DirectSoundBuffer BugFX[1 + 1];
@@ -18,6 +20,8 @@ DirectSoundBuffer ExplosionFX[1 + 1];
 DirectSoundBuffer PushFX;
 DirectSoundBuffer ExitFX;
 DirectSoundBuffer BaseFX;
+
+#endif
 
 void LoadSoundFX()
 {
@@ -56,6 +60,8 @@ void LoadSoundFX()
 
 void subSoundFXZonk()
 {
+#if 0
+
   int i;
 
   if (FXOnFlag == 0)
@@ -72,10 +78,14 @@ void subSoundFXZonk()
       }
     }
   }
+
+#endif
 }
 
 void subSoundFXBug()
 {
+#if 0
+
   int i;
 
   if (FXOnFlag == 0)
@@ -92,10 +102,14 @@ void subSoundFXBug()
       }
     }
   }
+
+#endif
 }
 
 void subSoundFXInfotron()
 {
+#if 0
+
   int i;
 
   if (FXOnFlag == 0)
@@ -112,10 +126,14 @@ void subSoundFXInfotron()
       }
     }
   }
+
+#endif
 }
 
 void subSoundFXExplosion()
 {
+#if 0
+
   int i;
 
   if (FXOnFlag == 0)
@@ -132,10 +150,14 @@ void subSoundFXExplosion()
       }
     }
   }
+
+#endif
 }
 
 void subSoundFXBase()
 {
+#if 0
+
   if (FXOnFlag == 0)
     return;
 
@@ -146,10 +168,14 @@ void subSoundFXBase()
   {
     BaseFX.Play DSBPLAY_DEFAULT;
   }
+
+#endif
 }
 
 void subSoundFXPush()
 {
+#if 0
+
   if (FXOnFlag == 0)
     return;
 
@@ -160,10 +186,14 @@ void subSoundFXPush()
   {
     PushFX.Play DSBPLAY_DEFAULT;
   }
+
+#endif
 }
 
 void subSoundFXExit()
 {
+#if 0
+
   if (FXOnFlag == 0)
     return;
 
@@ -174,6 +204,8 @@ void subSoundFXExit()
   {
     ExitFX.Play DSBPLAY_DEFAULT;
   }
+
+#endif
 }
 
 void subMusicInit()

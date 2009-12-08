@@ -19,7 +19,9 @@ extern void DrawField(int X, int Y);
 extern void DrawFieldAnimated(int X, int Y);
 extern void DrawFieldNoAnimated(int X, int Y);
 extern void DrawSprite(int X, int Y, int SpritePos);
+#if 0
 extern void InvalidateRect(long XMin, long YMin, long XMax, long YMax);
+#endif
 extern void Let_PanelVisible(boolean NewVal);
 extern void ReLoadStretchSprites();
 extern void SaveSnapshot(currency Number);

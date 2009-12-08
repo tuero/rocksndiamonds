@@ -4,6 +4,8 @@
 
 #include "TopMost.h"
 
+#if 0
+
 // static char *VB_Name = "TopMost_Module";
 // --- Option Explicit
 // --- const int SWP_FRAMECHANGED = 0x20;
@@ -49,3 +51,4 @@ void HideWindow(long hWnd)
   i = SetWindowPos(hWnd, HWND_BOTTOM, 100, 100, 200, 200, SWP_HIDEWINDOW);
 }
 
+#endif

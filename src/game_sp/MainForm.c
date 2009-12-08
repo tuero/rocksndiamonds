@@ -674,15 +674,25 @@ void DrawFieldNoAnimated(int X, int Y);
 // --- Option Explicit
 // --- Option Compare Text
 
+#if 0
+
 long SetParent(long hWndChild, long hWndNewParent);
 long SetWindowLong(long hWnd, long nIndex, long dwNewLong);
 long GetWindowLong(long hWnd, long nIndex);
+#if 0
 long GetTempPath(long nBufferLength, char *lpBuffer);
+#endif
 long GetWindowText(long hWnd, char *lpString, long cch);
+
+#endif
+
+#if 0
 
 #define GWL_STYLE 			((-16))
 #define WS_CHILD 			(0x40000000)
 #define WS_POPUP 			(0x80000000)
+
+#endif
 
 // [UNCOMMENTED] Dim StretchWidth2&
 

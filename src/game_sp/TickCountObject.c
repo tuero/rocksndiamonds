@@ -23,15 +23,21 @@
 #define LongMin 			(-(double)2147483648UL) // the "#" sign is a bug of the VB environment AutoFormat function but causes no real problems; don't  worry 'bout it!
 #define LongMax 			(2147483647UL)
 
-long GetTickCount();
+#if 0
+
+long MyGetTickCount();
 long QueryPerformanceCounter(currency lpPerformanceCount);
 long QueryPerformanceFrequency(currency lpFrequency);
+
+#endif
 
 boolean DelayLoopActive;
 
 boolean MPause, bHighPerf;
 currency PFreq; // LARGE_INTEGER
 double sFactor, msFactor, usFactor;
+
+#if 0
 
 boolean TickCountObject_Get_Active()
 {
@@ -99,7 +105,7 @@ currency TickCountObject_Get_TickNow()
   }
   else
   {
-    TickNow = GetTickCount();
+    TickNow = MyGetTickCount();
   }
 
   return TickNow;
@@ -119,7 +125,7 @@ long TickCountObject_TickDiffS(currency TickStart)
   }
   else
   {
-    NewTick = GetTickCount();
+    NewTick = MyGetTickCount();
     if (NewTick < TickStart)
     {
       // Overflow occured and needs to be handled
@@ -150,7 +156,7 @@ long TickCountObject_TickDiffMS(currency TickStart)
   }
   else
   {
-    NewTick = GetTickCount();
+    NewTick = MyGetTickCount();
     if (NewTick < TickStart)
     {
       // Overflow occured and needs to be handled
@@ -179,7 +185,7 @@ currency TickCountObject_TickDiffUS(currency TickStart)
   }
   else
   {
-    NewTick = GetTickCount();
+    NewTick = MyGetTickCount();
     if (NewTick < TickStart)
     {
       // Overflow occured and needs to be handled
@@ -193,6 +199,8 @@ currency TickCountObject_TickDiffUS(currency TickStart)
 
   return TickDiffUS;
 }
+
+#endif
 
 #if 0
 

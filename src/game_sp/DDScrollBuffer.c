@@ -315,6 +315,8 @@ int DDScrollBuffer_Get_Height()
   return Height;
 }
 
+#if 0
+
 long DDScrollBuffer_CreateAtSize(long Width, long Height, long hWndViewPort)
 {
   long CreateAtSize;
@@ -358,6 +360,7 @@ void DDScrollBuffer_Cls(int BackColor)
   Buffer.BltColorFill(EmptyRect, BackColor);
 }
 
+#endif
 
 /* copy the entire screen to the window at the scroll position */
 
@@ -553,8 +556,12 @@ void BackToFront_SP(void)
 
 void DDScrollBuffer_Blt_Ext(Bitmap *target_bitmap)
 {
-  RECT DR, SR;
+  MyRECT DR, SR;
+#if 1
+  long tX, tY;
+#else
   long tX, tY, L;
+#endif
   int sX, sY;
   // RECT ERect;
   // long Restore;
@@ -670,8 +677,12 @@ void DDScrollBuffer_Blt_Ext(Bitmap *target_bitmap)
   if (IS_NOTHING(&Buffer, sizeof(Buffer)))
     return;
 
+#if 0
   if (IS_NOTHING(&PrimarySurface, sizeof(PrimarySurface)))
     return;
+#endif
+
+#if 0
 
   L = PrimarySurface.Blt(DR, &Buffer, SR, DDBLT_WAIT);
   if (L != DD_OK)
@@ -740,6 +751,7 @@ void DDScrollBuffer_Blt_Ext(Bitmap *target_bitmap)
         break;
 #endif
 
+#if 0
       case DDERR_SURFACELOST:
         DDraw.RestoreAllSurfaces();
         if (! PrimarySurface.isLost())
@@ -751,6 +763,7 @@ void DDScrollBuffer_Blt_Ext(Bitmap *target_bitmap)
         // RestorePrimarySurface
         // ClipToWindow 0
         break;
+#endif
 
 #if 0
       case DDERR_UNSUPPORTED:
@@ -767,6 +780,8 @@ void DDScrollBuffer_Blt_Ext(Bitmap *target_bitmap)
 #endif
     }
   }
+
+#endif
 
 #if 0
   //  Buffer.UpdateOverlay SR, PrimarySurface, DR, DDOVER_SHOW

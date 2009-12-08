@@ -12,6 +12,8 @@
 
 #include "global.h"
 
+#if 0
+
 #ifndef HAS_PALETTEENTRY
 typedef struct
 {
@@ -143,5 +145,7 @@ extern Picture CaptureScreen();
 extern Picture CaptureWindow(int hWndSrc, boolean Client, int LeftSrc, int TopSrc, long WidthSrc, long HeightSrc);
 extern Picture CreateBitmapPicture(int hBmp, int hPal);
 extern void PrintPictureToFitPage(Printer Prn, Picture pic);
+
+#endif
 
 #endif /* CAPTURE_H */

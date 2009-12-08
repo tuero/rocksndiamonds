@@ -8,6 +8,8 @@
 
 // --- Option Explicit
 
+#if 0
+
 DirectX7 DirectX;
 DirectX7 DirectXS;
 DirectDraw7 DDraw;
@@ -16,6 +18,10 @@ DirectSound DSound;
 // Public DInput As DirectInput
 // Public DKeyboard As DirectInputDevice
 DirectDrawSurface7 PrimarySurface;
+
+#endif
+
+#if 0
 
 void InitDirectX(long hWndForm, long hWndClip)
 {
@@ -93,3 +99,4 @@ void ClipToWindow(long hWnd)
 //  Set Pal = PrimarySurface.GetPalette()
 // End Sub
 
+#endif
