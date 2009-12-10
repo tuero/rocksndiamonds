@@ -8701,14 +8701,15 @@ void SaveScore(int nr)
 #define SETUP_TOKEN_INPUT_ON_FOCUS		22
 #define SETUP_TOKEN_PREFER_AGA_GRAPHICS		23
 #define SETUP_TOKEN_GAME_FRAME_DELAY		24
-#define SETUP_TOKEN_GRAPHICS_SET		25
-#define SETUP_TOKEN_SOUNDS_SET			26
-#define SETUP_TOKEN_MUSIC_SET			27
-#define SETUP_TOKEN_OVERRIDE_LEVEL_GRAPHICS	28
-#define SETUP_TOKEN_OVERRIDE_LEVEL_SOUNDS	29
-#define SETUP_TOKEN_OVERRIDE_LEVEL_MUSIC	30
+#define SETUP_TOKEN_SP_SHOW_BORDER_ELEMENTS	25
+#define SETUP_TOKEN_GRAPHICS_SET		26
+#define SETUP_TOKEN_SOUNDS_SET			27
+#define SETUP_TOKEN_MUSIC_SET			28
+#define SETUP_TOKEN_OVERRIDE_LEVEL_GRAPHICS	29
+#define SETUP_TOKEN_OVERRIDE_LEVEL_SOUNDS	30
+#define SETUP_TOKEN_OVERRIDE_LEVEL_MUSIC	31
 
-#define NUM_GLOBAL_SETUP_TOKENS			31
+#define NUM_GLOBAL_SETUP_TOKENS			32
 
 /* editor setup */
 #define SETUP_TOKEN_EDITOR_EL_BOULDERDASH	0
@@ -8805,34 +8806,35 @@ static struct OptionInfo soi;
 
 static struct TokenInfo global_setup_tokens[] =
 {
-  { TYPE_STRING, &si.player_name,	"player_name"			},
-  { TYPE_SWITCH, &si.sound,		"sound"				},
-  { TYPE_SWITCH, &si.sound_loops,	"repeating_sound_loops"		},
-  { TYPE_SWITCH, &si.sound_music,	"background_music"		},
-  { TYPE_SWITCH, &si.sound_simple,	"simple_sound_effects"		},
-  { TYPE_SWITCH, &si.toons,		"toons"				},
-  { TYPE_SWITCH, &si.scroll_delay,	"scroll_delay"			},
-  { TYPE_INTEGER,&si.scroll_delay_value,"scroll_delay_value"		},
-  { TYPE_SWITCH, &si.soft_scrolling,	"soft_scrolling"		},
-  { TYPE_SWITCH, &si.fade_screens,	"fade_screens"			},
-  { TYPE_SWITCH, &si.autorecord,	"automatic_tape_recording"	},
-  { TYPE_SWITCH, &si.show_titlescreen,	"show_titlescreen"		},
-  { TYPE_SWITCH, &si.quick_doors,	"quick_doors"			},
-  { TYPE_SWITCH, &si.team_mode,		"team_mode"			},
-  { TYPE_SWITCH, &si.handicap,		"handicap"			},
-  { TYPE_SWITCH, &si.skip_levels,	"skip_levels"			},
-  { TYPE_SWITCH, &si.time_limit,	"time_limit"			},
-  { TYPE_SWITCH, &si.fullscreen,	"fullscreen"			},
-  { TYPE_STRING, &si.fullscreen_mode,	"fullscreen_mode"		},
-  { TYPE_SWITCH, &si.ask_on_escape,	"ask_on_escape"			},
-  { TYPE_SWITCH, &si.ask_on_escape_editor, "ask_on_escape_editor"	},
-  { TYPE_SWITCH, &si.quick_switch,	"quick_player_switch"		},
-  { TYPE_SWITCH, &si.input_on_focus,	"input_on_focus"		},
-  { TYPE_SWITCH, &si.prefer_aga_graphics, "prefer_aga_graphics"		},
-  { TYPE_INTEGER,&si.game_frame_delay,	"game_frame_delay"		},
-  { TYPE_STRING, &si.graphics_set,	"graphics_set"			},
-  { TYPE_STRING, &si.sounds_set,	"sounds_set"			},
-  { TYPE_STRING, &si.music_set,		"music_set"			},
+  { TYPE_STRING, &si.player_name,             "player_name"		},
+  { TYPE_SWITCH, &si.sound,                   "sound"			},
+  { TYPE_SWITCH, &si.sound_loops,             "repeating_sound_loops"	},
+  { TYPE_SWITCH, &si.sound_music,             "background_music"	},
+  { TYPE_SWITCH, &si.sound_simple,            "simple_sound_effects"	},
+  { TYPE_SWITCH, &si.toons,                   "toons"			},
+  { TYPE_SWITCH, &si.scroll_delay,            "scroll_delay"		},
+  { TYPE_INTEGER,&si.scroll_delay_value,      "scroll_delay_value"	},
+  { TYPE_SWITCH, &si.soft_scrolling,          "soft_scrolling"		},
+  { TYPE_SWITCH, &si.fade_screens,            "fade_screens"		},
+  { TYPE_SWITCH, &si.autorecord,              "automatic_tape_recording"},
+  { TYPE_SWITCH, &si.show_titlescreen,        "show_titlescreen"	},
+  { TYPE_SWITCH, &si.quick_doors,             "quick_doors"		},
+  { TYPE_SWITCH, &si.team_mode,               "team_mode"		},
+  { TYPE_SWITCH, &si.handicap,                "handicap"		},
+  { TYPE_SWITCH, &si.skip_levels,             "skip_levels"		},
+  { TYPE_SWITCH, &si.time_limit,              "time_limit"		},
+  { TYPE_SWITCH, &si.fullscreen,              "fullscreen"		},
+  { TYPE_STRING, &si.fullscreen_mode,         "fullscreen_mode"		},
+  { TYPE_SWITCH, &si.ask_on_escape,           "ask_on_escape"		},
+  { TYPE_SWITCH, &si.ask_on_escape_editor,    "ask_on_escape_editor"	},
+  { TYPE_SWITCH, &si.quick_switch,            "quick_player_switch"	},
+  { TYPE_SWITCH, &si.input_on_focus,          "input_on_focus"		},
+  { TYPE_SWITCH, &si.prefer_aga_graphics,     "prefer_aga_graphics"	},
+  { TYPE_INTEGER,&si.game_frame_delay,        "game_frame_delay"	},
+  { TYPE_SWITCH, &si.sp_show_border_elements, "sp_show_border_elements"	},
+  { TYPE_STRING, &si.graphics_set,            "graphics_set"		},
+  { TYPE_STRING, &si.sounds_set,              "sounds_set"		},
+  { TYPE_STRING, &si.music_set,               "music_set"		},
   { TYPE_SWITCH3,&si.override_level_graphics, "override_level_graphics"	},
   { TYPE_SWITCH3,&si.override_level_sounds,   "override_level_sounds"	},
   { TYPE_SWITCH3,&si.override_level_music,    "override_level_music"	},
@@ -8983,6 +8985,7 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
   si->input_on_focus = FALSE;
   si->prefer_aga_graphics = TRUE;
   si->game_frame_delay = GAME_FRAME_DELAY;
+  si->sp_show_border_elements = FALSE;
 
   si->graphics_set = getStringCopy(GFX_DEFAULT_SUBDIR);
   si->sounds_set = getStringCopy(SND_DEFAULT_SUBDIR);

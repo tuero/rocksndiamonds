@@ -1,3 +1,6 @@
+2009-12-10
+	* fixed bug with steel exit being destructible during opening phase
+
 2009-12-08
 	* fixed some problems with Supaplex engine when compiling for Windows
 

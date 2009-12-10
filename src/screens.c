@@ -4191,6 +4191,7 @@ static struct TokenInfo setup_info_graphics[] =
   { TYPE_SWITCH,	&setup.show_titlescreen,"Show Title Screens:"	},
   { TYPE_SWITCH,	&setup.toons,		"Show Toons:"		},
   { TYPE_ECS_AGA,	&setup.prefer_aga_graphics,"EMC graphics preference:" },
+  { TYPE_SWITCH, &setup.sp_show_border_elements,"Supaplex Border Elements:" },
   { TYPE_EMPTY,		NULL,			""			},
   { TYPE_LEAVE_MENU,	execSetupMain, 		"Back"			},
 

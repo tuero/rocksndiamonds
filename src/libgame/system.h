@@ -870,6 +870,7 @@ struct SetupInfo
   boolean input_on_focus;
   boolean prefer_aga_graphics;
   int game_frame_delay;
+  boolean sp_show_border_elements;
 
   char *graphics_set;
   char *sounds_set;
