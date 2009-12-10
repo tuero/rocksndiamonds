@@ -1,11 +1,17 @@
 2009-12-10
 	* fixed bug with steel exit being destructible during opening phase
+	* added token "special_flags" to "levelinfo.conf" (currently with the
+	  only recognized value "load_xsb_to_ces", doing the same as the flag
+	  "-Dload_xsb_to_ces" on the command line, but as a permanent flag for
+	  converting all elements in native (XSB) Sokoban level files to CEs)
 
 2009-12-08
 	* fixed some problems with Supaplex engine when compiling for Windows
 
 2009-12-05
 	* added special mode to convert elements of Sokoban XSB levels to CEs
+	  by adding "-Dload_xsb_to_ces" to the command line starting the game
+	  (also adding a dependency to a template level file "template.level")
 
 2009-12-01
 	* added reading native Sokoban levels and level packages (XSB files)

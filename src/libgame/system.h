@@ -650,15 +650,16 @@ struct OptionInfo
   char *sounds_directory;
   char *music_directory;
   char *docs_directory;
+
   char *execute_command;
+
+  char *special_flags;
 
   boolean serveronly;
   boolean network;
   boolean verbose;
   boolean debug;
   boolean debug_x11_sync;
-
-  unsigned long cmd_switches;
 };
 
 struct ScreenModeInfo
@@ -924,6 +925,8 @@ struct TreeInfo
 
   char *level_filename;	/* filename of level file (for packed level file) */
   char *level_filetype;	/* type of levels in level directory or level file */
+
+  char *special_flags;	/* flags for special actions performed on level file */
 
   int levels;		/* number of levels in level series */
   int first_level;	/* first level number (to allow start with 0 or 1) */

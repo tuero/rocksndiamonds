@@ -662,8 +662,7 @@ boolean strSuffixLower(char *s, char *suffix)
 /* command line option handling functions                                    */
 /* ------------------------------------------------------------------------- */
 
-void GetOptions(char *argv[], void (*print_usage_function)(void),
-		unsigned long (*get_cmd_switch_function)(char *))
+void GetOptions(char *argv[], void (*print_usage_function)(void))
 {
   char *ro_base_path = RO_BASE_PATH;
   char *rw_base_path = RW_BASE_PATH;
@@ -694,15 +693,15 @@ void GetOptions(char *argv[], void (*print_usage_function)(void),
   options.sounds_directory   = getPath2(ro_base_path, SOUNDS_DIRECTORY);
   options.music_directory    = getPath2(ro_base_path, MUSIC_DIRECTORY);
   options.docs_directory     = getPath2(ro_base_path, DOCS_DIRECTORY);
+
   options.execute_command = NULL;
+  options.special_flags = NULL;
 
   options.serveronly = FALSE;
   options.network = FALSE;
   options.verbose = FALSE;
   options.debug = FALSE;
   options.debug_x11_sync = FALSE;
-
-  options.cmd_switches = 0;
 
 #if !defined(PLATFORM_UNIX)
   if (*options_left == NULL)	/* no options given -- enable verbose mode */
@@ -834,18 +833,22 @@ void GetOptions(char *argv[], void (*print_usage_function)(void),
     }
     else if (strPrefix(option, "-D"))
     {
-      char *switch_string = &option[2];
-      unsigned long switch_value;
+#if 1
+      options.special_flags = getStringCopy(&option[2]);
+#else
+      char *flags_string = &option[2];
+      unsigned long flags_value;
 
-      if (*switch_string == '\0')
-	Error(ERR_EXIT_HELP, "empty switch ignored");
+      if (*flags_string == '\0')
+	Error(ERR_EXIT_HELP, "empty flag ignored");
 
-      switch_value = get_cmd_switch_function(switch_string);
+      flags_value = get_special_flags_function(flags_string);
 
-      if (switch_value == 0)
-	Error(ERR_EXIT_HELP, "unknown switch '%s'", switch_string);
+      if (flags_value == 0)
+	Error(ERR_EXIT_HELP, "unknown flag '%s'", flags_string);
 
-      options.cmd_switches |= switch_value;
+      options.special_flags |= flags_value;
+#endif
     }
     else if (strncmp(option, "-execute", option_len) == 0)
     {

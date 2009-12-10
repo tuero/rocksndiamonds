@@ -6331,6 +6331,40 @@ static void LoadLevelFromFileInfo_DC(struct LevelInfo *level,
 /* functions for loading SB level                                            */
 /* ------------------------------------------------------------------------- */
 
+#if 1
+
+static boolean check_special_flags(char *flag)
+{
+#if 0
+  printf("::: '%s', '%s', '%s'\n",
+	 flag,
+	 options.special_flags,
+	 leveldir_current->special_flags);
+#endif
+
+  if (strEqual(options.special_flags, flag) ||
+      strEqual(leveldir_current->special_flags, flag))
+    return TRUE;
+
+  return FALSE;
+}
+
+#else
+
+#define SPECIAL_FLAG_LOAD_XSB_TO_CES	(1 << 0)
+
+static unsigned long get_special_flags(char *flags_string)
+{
+  unsigned long flags_value = 0;
+
+  if (strEqual(flags_string, "load_xsb_to_ces"))
+    flags_value = SPECIAL_FLAG_LOAD_XSB_TO_CES;
+
+  return flags_value;
+}
+
+#endif
+
 int getMappedElement_SB(int element_ascii, boolean use_ces)
 {
   static struct
@@ -6376,7 +6410,11 @@ static void LoadLevelFromFileInfo_SB(struct LevelInfo *level,
   boolean reading_playfield = FALSE;
   boolean got_valid_playfield_line = FALSE;
   boolean invalid_playfield_char = FALSE;
-  boolean load_xsb_to_ces = options.cmd_switches & CMD_SWITCH_LOAD_XSB_TO_CES;
+#if 1
+  boolean load_xsb_to_ces = check_special_flags("load_xsb_to_ces");
+#else
+  boolean load_xsb_to_ces = options.special_flags & SPECIAL_FLAG_LOAD_XSB_TO_CES;
+#endif
   int file_level_nr = 0;
   int line_nr = 0;
   int x, y;

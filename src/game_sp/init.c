@@ -19,7 +19,7 @@ static void init_struct_functions()
 
 static void init_global_values()
 {
-  menBorder.Checked = True * 0;
+  menBorder.Checked = False;
   menPanel.Checked = True;
   menAutoScroll.Checked = True;
 

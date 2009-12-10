@@ -11,6 +11,8 @@ void InitGameEngine_SP()
   game_sp_info.LevelSolved = FALSE;
   game_sp_info.GameOver = FALSE;
 
+  menBorder.Checked = setup.sp_show_border_elements;
+
   InitScrollPlayfield();
 
 #if 1

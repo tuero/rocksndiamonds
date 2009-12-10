@@ -2375,10 +2375,11 @@ void checkSetupFileHashIdentifier(SetupFileHash *setup_file_hash,
 #define LEVELINFO_TOKEN_MUSIC_SET		18
 #define LEVELINFO_TOKEN_FILENAME		19
 #define LEVELINFO_TOKEN_FILETYPE		20
-#define LEVELINFO_TOKEN_HANDICAP		21
-#define LEVELINFO_TOKEN_SKIP_LEVELS		22
+#define LEVELINFO_TOKEN_SPECIAL_FLAGS		21
+#define LEVELINFO_TOKEN_HANDICAP		22
+#define LEVELINFO_TOKEN_SKIP_LEVELS		23
 
-#define NUM_LEVELINFO_TOKENS			23
+#define NUM_LEVELINFO_TOKENS			24
 
 static LevelDirTree ldi;
 
@@ -2406,6 +2407,7 @@ static struct TokenInfo levelinfo_tokens[] =
   { TYPE_STRING,	&ldi.music_set,		"music_set"		},
   { TYPE_STRING,	&ldi.level_filename,	"filename"		},
   { TYPE_STRING,	&ldi.level_filetype,	"filetype"		},
+  { TYPE_STRING,	&ldi.special_flags,	"special_flags"		},
   { TYPE_BOOLEAN,	&ldi.handicap,		"handicap"		},
   { TYPE_BOOLEAN,	&ldi.skip_levels,	"skip_levels"		}
 };
@@ -2482,6 +2484,8 @@ static void setTreeInfoToDefaults(TreeInfo *ti, int type)
     ti->level_filename = NULL;
     ti->level_filetype = NULL;
 
+    ti->special_flags = NULL;
+
     ti->levels = 0;
     ti->first_level = 0;
     ti->last_level = 0;
@@ -2553,6 +2557,8 @@ static void setTreeInfoToDefaultsFromParent(TreeInfo *ti, TreeInfo *parent)
     ti->level_filename = NULL;
     ti->level_filetype = NULL;
 
+    ti->special_flags = getStringCopy(parent->special_flags);
+
     ti->levels = 0;
     ti->first_level = 0;
     ti->last_level = 0;
@@ -2603,6 +2609,8 @@ static TreeInfo *getTreeInfoCopy(TreeInfo *ti)
 
   ti_copy->level_filename	= getStringCopy(ti->level_filename);
   ti_copy->level_filetype	= getStringCopy(ti->level_filetype);
+
+  ti_copy->special_flags	= getStringCopy(ti->special_flags);
 
   ti_copy->levels		= ti->levels;
   ti_copy->first_level		= ti->first_level;
@@ -2665,6 +2673,8 @@ static void freeTreeInfo(TreeInfo *ti)
 
     checked_free(ti->level_filename);
     checked_free(ti->level_filetype);
+
+    checked_free(ti->special_flags);
   }
 
   checked_free(ti);

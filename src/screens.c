@@ -757,10 +757,12 @@ static void InitializeTitleControls(boolean show_title_initial)
   num_title_screens = 0;
 
 #if 1
+  /* 1st step: initialize title screens for game start (only when starting) */
   if (show_title_initial)
     InitializeTitleControls_CheckTitleInfo(TRUE);
 #endif
 
+  /* 2nd step: initialize title screens for current level set */
   InitializeTitleControls_CheckTitleInfo(FALSE);
 
   /* sort title screens according to sort_priority and title number */

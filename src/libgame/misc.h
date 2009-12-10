@@ -113,8 +113,7 @@ boolean strSuffix(char *, char *);
 boolean strPrefixLower(char *, char *);
 boolean strSuffixLower(char *, char *);
 
-void GetOptions(char **, void (*print_usage_function)(void),
-		unsigned long (*get_cmd_switch_function)(char *));
+void GetOptions(char **, void (*print_usage_function)(void));
 
 void SetError(char *, ...);
 char *GetError(void);
