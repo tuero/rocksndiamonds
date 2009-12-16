@@ -1959,8 +1959,32 @@ static void determineLevelFileInfo_Filename(struct LevelFileInfo *lfi)
   /* special case: level number is negative => check for level template file */
   if (nr < 0)
   {
+#if 1
+    /* global variable "leveldir_current" must be modified in the loop below */
+    LevelDirTree *leveldir_current_last = leveldir_current;
+
+    /* check for template level in path from current to topmost tree node */
+
+    while (leveldir_current != NULL)
+    {
+      setLevelFileInfo_FormatLevelFilename(lfi, LEVEL_FILE_TYPE_RND,
+					   "template.%s", LEVELFILE_EXTENSION);
+
+      if (fileExists(lfi->filename))
+	break;
+
+      leveldir_current = leveldir_current->node_parent;
+    }
+
+    /* restore global variable "leveldir_current" modified in above loop */
+    leveldir_current = leveldir_current_last;
+
+#else
+
     setLevelFileInfo_FormatLevelFilename(lfi, LEVEL_FILE_TYPE_RND,
 					 "template.%s", LEVELFILE_EXTENSION);
+
+#endif
 
     /* no fallback if template file not existing */
     return;
@@ -3042,8 +3066,12 @@ static void LoadLevelFromFileInfo_RND(struct LevelInfo *level,
   {
     level->no_valid_file = TRUE;
 
+#if 1
+    Error(ERR_WARN, "cannot read level '%s' -- using empty level", filename);
+#else
     if (level != &level_template)
       Error(ERR_WARN, "cannot read level '%s' -- using empty level", filename);
+#endif
 
     return;
   }
@@ -6659,12 +6687,40 @@ static void LoadLevelFromFileInfo_SB(struct LevelInfo *level,
 		     level->field, level->fieldx, level->fieldy);
   }
 
+  /* set special level settings for Sokoban levels */
+
+  level->time = 0;
+  level->use_step_counter = TRUE;
+
   if (load_xsb_to_ces)
   {
-    level->time = 0;
-    level->use_step_counter = TRUE;
-
     level->initial_player_stepsize[0] = STEPSIZE_SLOW;
+
+    /* fill smaller playfields with padding "beyond border wall" elements */
+    if (level->fieldx < SCR_FIELDX ||
+	level->fieldy < SCR_FIELDY)
+    {
+      short field[level->fieldx][level->fieldy];
+      int new_fieldx = MAX(level->fieldx, SCR_FIELDX);
+      int new_fieldy = MAX(level->fieldy, SCR_FIELDY);
+      int pos_fieldx = (new_fieldx - level->fieldx) / 2;
+      int pos_fieldy = (new_fieldy - level->fieldy) / 2;
+
+      /* copy old playfield (which is smaller than the visible area) */
+      for (y = 0; y < level->fieldy; y++) for (x = 0; x < level->fieldx; x++)
+	field[x][y] = level->field[x][y];
+
+      /* fill new, larger playfield with "beyond border wall" elements */
+      for (y = 0; y < new_fieldy; y++) for (x = 0; x < new_fieldx; x++)
+	level->field[x][y] = getMappedElement_SB('_', load_xsb_to_ces);
+
+      /* copy the old playfield to the middle of the new playfield */
+      for (y = 0; y < level->fieldy; y++) for (x = 0; x < level->fieldx; x++)
+	level->field[pos_fieldx + x][pos_fieldy + y] = field[x][y];
+
+      level->fieldx = new_fieldx;
+      level->fieldy = new_fieldy;
+    }
 
     level->use_custom_template = TRUE;
   }
