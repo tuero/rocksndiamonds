@@ -1,3 +1,17 @@
+2009-12-17
+	* fixed EMC style pushing animations in the R'n'D graphics engine (when
+	  using ".2nd_movement_tile" for animations having start and end tile)
+	* for this to work (look) properly for two-tile pushing animations with
+	  non-black (i.e. opaque) background, the pushing graphics drawing order
+	  was changed to first draw the pushed element, then the player (maybe
+	  this should be controlled by an ".anim_mode" flag yet to be added)
+
+2009-12-16
+	* added searching for template level (file "template.level") not only
+	  inside the level set directory, but also in above level directories;
+	  this makes is possible to use the same single template level file
+	  (placed in a level group directory) for many level sub-directories
+
 2009-12-10
 	* fixed bug with steel exit being destructible during opening phase
 	* added token "special_flags" to "levelinfo.conf" (currently with the

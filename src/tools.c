@@ -1243,12 +1243,26 @@ inline static void DrawGraphicShiftedDouble(int x, int y, int dx, int dy,
   int x2 = x + SIGN(dx);
   int y2 = y + SIGN(dy);
   int anim_frames = graphic_info[graphic].anim_frames;
+  /* !!! THIS ONLY REALLY WORKS WITH anim_frames == 7 (MOVEMENT FRAMES) !!! */
+  /* !!! (ELSE sync_frame DOES NOT START WITH 0 AND MOVEMENT LOOK WRONG !!! */
+  /* !!! (AND anim_frames == 15 FOR SLOW MOVEMENT AND SO ON)             !!! */
+#if 1
+  /* (we also need anim_delay here for movement animations with less frames) */
+  int anim_delay = graphic_info[graphic].anim_delay;
+  int anim_pos = (dx ? ABS(dx) : ABS(dy));
+  int sync_frame = anim_pos * anim_frames * anim_delay / TILESIZE;
+#else
   int sync_frame = (dx ? ABS(dx) : ABS(dy)) * anim_frames / TILESIZE;
+#endif
   boolean draw_start_tile = (cut_mode != CUT_ABOVE);	/* only for falling! */
   boolean draw_end_tile   = (cut_mode != CUT_BELOW);	/* only for falling! */
 
   /* re-calculate animation frame for two-tile movement animation */
   frame = getGraphicAnimationFrame(graphic, sync_frame);
+
+#if 0
+  printf("::: %d [%d, %d]\n", frame, sync_frame, dy);
+#endif
 
   /* check if movement start graphic inside screen area and should be drawn */
   if (draw_start_tile && IN_SCR_FIELD(x1, y1))
@@ -2461,6 +2475,8 @@ void DrawPlayerField(int x, int y)
   DrawPlayer(PLAYERINFO(x, y));
 }
 
+#define TEST_DRAW_PLAYER_OVER_PUSHED_ELEMENT	1
+
 void DrawPlayer(struct PlayerInfo *player)
 {
   int jx = player->jx;
@@ -2600,6 +2616,7 @@ void DrawPlayer(struct PlayerInfo *player)
     }
   }
 
+#if !TEST_DRAW_PLAYER_OVER_PUSHED_ELEMENT
   /* ----------------------------------------------------------------------- */
   /* draw player himself                                                     */
   /* ----------------------------------------------------------------------- */
@@ -2637,6 +2654,17 @@ void DrawPlayer(struct PlayerInfo *player)
 
     DrawGraphicShiftedThruMask(sx, sy, sxx, syy, graphic, frame, NO_CUTTING);
   }
+#endif
+
+#if TEST_DRAW_PLAYER_OVER_PUSHED_ELEMENT
+  if (player->GfxPos)
+  {
+    if (move_dir == MV_LEFT || move_dir == MV_RIGHT)
+      sxx = player->GfxPos;
+    else
+      syy = player->GfxPos;
+  }
+#endif
 
   /* ----------------------------------------------------------------------- */
   /* draw things the player is pushing, if needed                            */
@@ -2679,8 +2707,63 @@ void DrawPlayer(struct PlayerInfo *player)
     if (Back[next_jx][next_jy])
       DrawLevelElement(next_jx, next_jy, Back[next_jx][next_jy]);
 
+#if 0
+    printf("::: %d, %d, %d [%d] [%d, %d, %d] [%d] [%d, %d]\n",
+	   jx, px, player->GfxPos, player->is_pushing, dx, sxx, pxx,
+	   IS_MOVING(jx, jy), graphic, frame);
+#endif
+
+#if 1
+    /* do not draw (EM style) pushing animation when pushing is finished */
+    if (graphic_info[graphic].double_movement && !IS_MOVING(jx, jy))
+      DrawLevelElement(next_jx, next_jy, Feld[next_jx][next_jy]);
+    else
+      DrawGraphicShiftedThruMask(px, py, pxx, pyy, graphic, frame, NO_CUTTING);
+#else
     /* masked drawing is needed for EMC style (double) movement graphics */
+    /* !!! (ONLY WHEN DRAWING PUSHED ELEMENT OVER THE PLAYER) !!! */
     DrawGraphicShiftedThruMask(px, py, pxx, pyy, graphic, frame, NO_CUTTING);
+#endif
+  }
+#endif
+
+#if TEST_DRAW_PLAYER_OVER_PUSHED_ELEMENT
+  /* ----------------------------------------------------------------------- */
+  /* draw player himself                                                     */
+  /* ----------------------------------------------------------------------- */
+
+  graphic = getPlayerGraphic(player, move_dir);
+
+  /* in the case of changed player action or direction, prevent the current
+     animation frame from being restarted for identical animations */
+  if (player->Frame == 0 && equalGraphics(graphic, last_player_graphic))
+    player->Frame = last_player_frame;
+
+  frame = getGraphicAnimationFrame(graphic, player->Frame);
+
+  if (player->GfxPos)
+  {
+    if (move_dir == MV_LEFT || move_dir == MV_RIGHT)
+      sxx = player->GfxPos;
+    else
+      syy = player->GfxPos;
+  }
+
+  if (!setup.soft_scrolling && ScreenMovPos)
+    sxx = syy = 0;
+
+  if (player_is_opaque)
+    DrawGraphicShifted(sx, sy, sxx, syy, graphic, frame,NO_CUTTING,NO_MASKING);
+  else
+    DrawGraphicShiftedThruMask(sx, sy, sxx, syy, graphic, frame, NO_CUTTING);
+
+  if (SHIELD_ON(player))
+  {
+    int graphic = (player->shield_deadly_time_left ? IMG_SHIELD_DEADLY_ACTIVE :
+		   IMG_SHIELD_NORMAL_ACTIVE);
+    int frame = getGraphicAnimationFrame(graphic, -1);
+
+    DrawGraphicShiftedThruMask(sx, sy, sxx, syy, graphic, frame, NO_CUTTING);
   }
 #endif
 
