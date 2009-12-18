@@ -1242,17 +1242,21 @@ inline static void DrawGraphicShiftedDouble(int x, int y, int dx, int dy,
   int y1 = y;
   int x2 = x + SIGN(dx);
   int y2 = y + SIGN(dy);
+#if 0
+  /* !!! DOES NOT WORK FOR SLOW MOVEMENT !!! */
+  int sync_frame = GfxFrame[LEVELX(x)][LEVELY(y)];
+#else
+  /* movement with two-tile animations must be sync'ed with movement position,
+     not with current GfxFrame (which can be higher when using slow movement) */
+  int anim_pos = (dx ? ABS(dx) : ABS(dy));
   int anim_frames = graphic_info[graphic].anim_frames;
-  /* !!! THIS ONLY REALLY WORKS WITH anim_frames == 7 (MOVEMENT FRAMES) !!! */
-  /* !!! (ELSE sync_frame DOES NOT START WITH 0 AND MOVEMENT LOOK WRONG !!! */
-  /* !!! (AND anim_frames == 15 FOR SLOW MOVEMENT AND SO ON)             !!! */
 #if 1
   /* (we also need anim_delay here for movement animations with less frames) */
   int anim_delay = graphic_info[graphic].anim_delay;
-  int anim_pos = (dx ? ABS(dx) : ABS(dy));
   int sync_frame = anim_pos * anim_frames * anim_delay / TILESIZE;
 #else
-  int sync_frame = (dx ? ABS(dx) : ABS(dy)) * anim_frames / TILESIZE;
+  int sync_frame = anim_pos * anim_frames / TILESIZE;
+#endif
 #endif
   boolean draw_start_tile = (cut_mode != CUT_ABOVE);	/* only for falling! */
   boolean draw_end_tile   = (cut_mode != CUT_BELOW);	/* only for falling! */
@@ -1261,7 +1265,18 @@ inline static void DrawGraphicShiftedDouble(int x, int y, int dx, int dy,
   frame = getGraphicAnimationFrame(graphic, sync_frame);
 
 #if 0
-  printf("::: %d [%d, %d]\n", frame, sync_frame, dy);
+#if 0
+  printf("::: %d, %d, %d => %d [%d]\n",
+	 anim_pos, anim_frames, anim_delay, sync_frame, graphic);
+#else
+  printf("::: %d, %d => %d\n",
+	 anim_pos, anim_frames, sync_frame);
+#endif
+#endif
+
+#if 0
+  printf("::: %d [%d, %d] [%d] [%d]\n", frame, sync_frame, dy,
+	 GfxFrame[LEVELX(x)][LEVELY(y)], mask_mode);
 #endif
 
   /* check if movement start graphic inside screen area and should be drawn */
@@ -2475,7 +2490,7 @@ void DrawPlayerField(int x, int y)
   DrawPlayer(PLAYERINFO(x, y));
 }
 
-#define TEST_DRAW_PLAYER_OVER_PUSHED_ELEMENT	1
+#define DRAW_PLAYER_OVER_PUSHED_ELEMENT	1
 
 void DrawPlayer(struct PlayerInfo *player)
 {
@@ -2616,7 +2631,7 @@ void DrawPlayer(struct PlayerInfo *player)
     }
   }
 
-#if !TEST_DRAW_PLAYER_OVER_PUSHED_ELEMENT
+#if !DRAW_PLAYER_OVER_PUSHED_ELEMENT
   /* ----------------------------------------------------------------------- */
   /* draw player himself                                                     */
   /* ----------------------------------------------------------------------- */
@@ -2656,7 +2671,7 @@ void DrawPlayer(struct PlayerInfo *player)
   }
 #endif
 
-#if TEST_DRAW_PLAYER_OVER_PUSHED_ELEMENT
+#if DRAW_PLAYER_OVER_PUSHED_ELEMENT
   if (player->GfxPos)
   {
     if (move_dir == MV_LEFT || move_dir == MV_RIGHT)
@@ -2708,13 +2723,18 @@ void DrawPlayer(struct PlayerInfo *player)
       DrawLevelElement(next_jx, next_jy, Back[next_jx][next_jy]);
 
 #if 0
-    printf("::: %d, %d, %d [%d] [%d, %d, %d] [%d] [%d, %d]\n",
-	   jx, px, player->GfxPos, player->is_pushing, dx, sxx, pxx,
-	   IS_MOVING(jx, jy), graphic, frame);
+    printf("::: %d, %d, %d, %d [%d] [%d, %d, %d] [%d] [%d, %d] [%d, %d]\n",
+	   jx, px, player->GfxPos, player->StepFrame,
+	   player->is_pushing,
+	   dx, sxx, pxx,
+	   IS_MOVING(jx, jy),
+	   graphic, frame,
+	   GfxFrame[jx][jy], GfxFrame[next_jx][next_jy]);
 #endif
 
 #if 1
     /* do not draw (EM style) pushing animation when pushing is finished */
+    /* (two-tile animations usually do not contain start and end frame) */
     if (graphic_info[graphic].double_movement && !IS_MOVING(jx, jy))
       DrawLevelElement(next_jx, next_jy, Feld[next_jx][next_jy]);
     else
@@ -2727,7 +2747,7 @@ void DrawPlayer(struct PlayerInfo *player)
   }
 #endif
 
-#if TEST_DRAW_PLAYER_OVER_PUSHED_ELEMENT
+#if DRAW_PLAYER_OVER_PUSHED_ELEMENT
   /* ----------------------------------------------------------------------- */
   /* draw player himself                                                     */
   /* ----------------------------------------------------------------------- */

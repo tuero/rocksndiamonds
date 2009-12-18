@@ -5,6 +5,10 @@
 	  non-black (i.e. opaque) background, the pushing graphics drawing order
 	  was changed to first draw the pushed element, then the player (maybe
 	  this should be controlled by an ".anim_mode" flag yet to be added)
+	* two-tile animations for moving or pushing should have 7 frames for
+	  normal speed, 15 frames for half speed etc. to display correct frames
+	* two-tile animations are also displayed correctly with different speed
+	  settings for the player (for pushing animations) or moving elements
 
 2009-12-16
 	* added searching for template level (file "template.level") not only
