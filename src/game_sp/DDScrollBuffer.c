@@ -882,6 +882,14 @@ void DDScrollBuffer_SoftScrollTo(int X, int Y, long TimeMS, int FPS)
   long oldX, oldY, maxD;
   static boolean AlreadyRunning = False;
 
+#if 0
+  printf(":a: %d, %d [%d, %d] [%d, %d] [%d, %d]\n",
+	 mScrollX, mScrollY,
+	 mScrollX_last, mScrollY_last,
+	 ScreenScrollXPos, ScreenScrollYPos,
+	 ScrollX, ScrollY);
+#endif
+
   if (NoDisplayFlag)
     return;
 
@@ -924,8 +932,19 @@ void DDScrollBuffer_SoftScrollTo(int X, int Y, long TimeMS, int FPS)
     mScrollY = oldY + T * dY;
     ScrollX = mScrollX;
     ScrollY = mScrollY;
-    // Blt();
+
+#if 0
+    Blt();
+#endif
   }
+
+#if 0
+  printf(":x: %d, %d [%d, %d] [%d, %d] [%d, %d]\n",
+	 mScrollX, mScrollY,
+	 mScrollX_last, mScrollY_last,
+	 ScreenScrollXPos, ScreenScrollYPos,
+	 ScrollX, ScrollY);
+#endif
 
   if (UserDragFlag)
     goto SoftScrollEH;
@@ -938,7 +957,10 @@ void DDScrollBuffer_SoftScrollTo(int X, int Y, long TimeMS, int FPS)
   mScrollY = Y;
   ScrollX = mScrollX;
   ScrollY = mScrollY;
-  // Blt();
+
+#if 0
+  Blt();
+#endif
 
 SoftScrollEH:
   AlreadyRunning = False;
@@ -948,7 +970,23 @@ SoftScrollEH:
 	 mScrollX, mScrollY);
 #endif
 
+#if 0
+  printf(":y: %d, %d [%d, %d] [%d, %d] [%d, %d]\n",
+	 mScrollX, mScrollY,
+	 mScrollX_last, mScrollY_last,
+	 ScreenScrollXPos, ScreenScrollYPos,
+	 ScrollX, ScrollY);
+#endif
+
 #if 1
   ScrollPlayfieldIfNeeded();
+#endif
+
+#if 0
+  printf(":z: %d, %d [%d, %d] [%d, %d] [%d, %d]\n",
+	 mScrollX, mScrollY,
+	 mScrollX_last, mScrollY_last,
+	 ScreenScrollXPos, ScreenScrollYPos,
+	 ScrollX, ScrollY);
 #endif
 }

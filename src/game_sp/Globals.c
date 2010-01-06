@@ -630,6 +630,11 @@ void ReadLevel()
 
   copyInternalEngineVars_SP();
 
+#if 1
+  SetDisplayRegion();
+  SetScrollEdges();
+#endif
+
   LevelNumber = level_nr;
 
 #if 0

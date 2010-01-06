@@ -26,6 +26,7 @@ extern void Let_PanelVisible(boolean NewVal);
 extern void ReLoadStretchSprites();
 extern void SaveSnapshot(currency Number);
 extern void SetDisplayRegion();
+extern void SetScrollEdges();
 extern void ShowKey(int KeyVar);
 extern void menDemoSpeed_Click(int Index);
 extern void menEdit_Click();

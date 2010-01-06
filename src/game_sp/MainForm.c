@@ -2490,6 +2490,9 @@ void menPlay_Click()
   UpdateDeltaT();
 #endif
 
+#if 1
+#endif
+
 #if 0
   printf("::: MainForm.c: menPlay_Click(): subFetchAndInitLevelB(): ...\n");
 #endif
@@ -3128,7 +3131,11 @@ static void ReStretch(float NewStretch)
 #endif
 }
 
+#if 0
 static void SetScrollEdges()
+#else
+void SetScrollEdges()
+#endif
 {
 #if 0
   printf("::: MainForm.c: SetScrollEdges() ... [%ld, %ld, %ld, %ld] [%f, %d] [%d, %d, %d, %d]\n",

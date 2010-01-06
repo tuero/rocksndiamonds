@@ -1,3 +1,6 @@
+2010-01-06
+	* fixed bug in Supaplex engine regarding initial screen scroll position
+
 2009-12-17
 	* fixed EMC style pushing animations in the R'n'D graphics engine (when
 	  using ".2nd_movement_tile" for animations having start and end tile)

@@ -15,10 +15,20 @@ void InitGameEngine_SP()
 
   InitScrollPlayfield();
 
+#if 0
+  printf(":A: %d, %d [%d, %d]\n",
+	 mScrollX, mScrollY, mScrollX_last, mScrollY_last);
+#endif
+
 #if 1
   menPlay_Click();
 #else
   menPlayDemo_Click();
+#endif
+
+#if 0
+  printf(":B: %d, %d [%d, %d]\n",
+	 mScrollX, mScrollY, mScrollX_last, mScrollY_last);
 #endif
 }
 

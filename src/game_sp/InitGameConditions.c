@@ -103,6 +103,14 @@ int InitMurphyPosB(int si)
 
   subCalculateScreenScrollPos();           // calculate screen start addrs
 
+#if 0
+  printf(":1: %d, %d [%d, %d] [%d, %d] [%d, %d]\n",
+	 mScrollX, mScrollY,
+	 mScrollX_last, mScrollY_last,
+	 ScreenScrollXPos, ScreenScrollYPos,
+	 ScrollX, ScrollY);
+#endif
+
   if (AutoScrollFlag)
   {
     if (bPlaying)
@@ -114,6 +122,14 @@ int InitMurphyPosB(int si)
       ScrollTo(ScreenScrollXPos, ScreenScrollYPos);
     }
   }
+
+#if 0
+  printf(":2: %d, %d [%d, %d] [%d, %d] [%d, %d]\n",
+	 mScrollX, mScrollY,
+	 mScrollX_last, mScrollY_last,
+	 ScreenScrollXPos, ScreenScrollYPos,
+	 ScrollX, ScrollY);
+#endif
 
   return InitMurphyPosB;
 } // InitMurphyPosB
