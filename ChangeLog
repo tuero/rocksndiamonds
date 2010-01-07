@@ -1,3 +1,7 @@
+2010-01-07
+	* added handling of gravity ports when converting Supaplex style R'n'D
+	  levels to native Supaplex levels for playing with Supaplex engine
+
 2010-01-06
 	* fixed bug in Supaplex engine regarding initial screen scroll position
 

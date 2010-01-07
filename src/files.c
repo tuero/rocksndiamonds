@@ -4212,7 +4212,7 @@ void CopyNativeLevel_RND_to_SP(struct LevelInfo *level)
   LevelInfoType *header = &level_sp->header;
   int i, x, y;
 
-  level_sp->width = level->fieldx;
+  level_sp->width  = level->fieldx;
   level_sp->height = level->fieldy;
 
   for (x = 0; x < level->fieldx; x++)
@@ -4244,7 +4244,67 @@ void CopyNativeLevel_RND_to_SP(struct LevelInfo *level)
 
   header->InfotronsNeeded = level->gems_needed;
 
-  /* !!! ADD SPECIAL PORT DATABASE STUFF !!! */
+  header->SpecialPortCount = 0;
+
+  for (x = 0; x < level->fieldx; x++) for (y = 0; y < level->fieldy; y++)
+  {
+    boolean gravity_port_found = FALSE;
+    boolean gravity_port_valid = FALSE;
+    int gravity_port_flag;
+    int gravity_port_base_element;
+    int element = level->field[x][y];
+
+    if (element >= EL_SP_GRAVITY_ON_PORT_RIGHT &&
+	element <= EL_SP_GRAVITY_ON_PORT_UP)
+    {
+      gravity_port_found = TRUE;
+      gravity_port_valid = TRUE;
+      gravity_port_flag = 1;
+      gravity_port_base_element = EL_SP_GRAVITY_ON_PORT_RIGHT;
+    }
+    else if (element >= EL_SP_GRAVITY_OFF_PORT_RIGHT &&
+	     element <= EL_SP_GRAVITY_OFF_PORT_UP)
+    {
+      gravity_port_found = TRUE;
+      gravity_port_valid = TRUE;
+      gravity_port_flag = 0;
+      gravity_port_base_element = EL_SP_GRAVITY_OFF_PORT_RIGHT;
+    }
+    else if (element >= EL_SP_GRAVITY_PORT_RIGHT &&
+	     element <= EL_SP_GRAVITY_PORT_UP)
+    {
+      /* change R'n'D style gravity inverting special port to normal port
+	 (there are no gravity inverting ports in native Supaplex engine) */
+
+      gravity_port_found = TRUE;
+      gravity_port_valid = FALSE;
+      gravity_port_base_element = EL_SP_GRAVITY_PORT_RIGHT;
+    }
+
+    if (gravity_port_found)
+    {
+      if (gravity_port_valid &&
+	  header->SpecialPortCount < SP_MAX_SPECIAL_PORTS)
+      {
+	SpecialPortType *port = &header->SpecialPort[header->SpecialPortCount];
+
+	port->PortLocation = (y * level->fieldx + x) * 2;
+	port->Gravity = gravity_port_flag;
+
+	element += EL_SP_GRAVITY_PORT_RIGHT - gravity_port_base_element;
+
+	header->SpecialPortCount++;
+      }
+      else
+      {
+	/* change special gravity port to normal port */
+
+	element += EL_SP_PORT_RIGHT - gravity_port_base_element;
+      }
+
+      level_sp->playfield[x][y] = element - EL_SP_START;
+    }
+  }
 }
 
 void CopyNativeLevel_SP_to_RND(struct LevelInfo *level)
