@@ -1518,7 +1518,9 @@
 #define EL_QUICKSAND_FAST_EMPTY		861
 #define EL_QUICKSAND_FAST_FULL		862
 
-#define NUM_FILE_ELEMENTS		863
+#define EL_FROM_LEVEL_TEMPLATE		863
+
+#define NUM_FILE_ELEMENTS		864
 
 
 /* "real" (and therefore drawable) runtime elements */

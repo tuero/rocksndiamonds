@@ -4460,6 +4460,11 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
     "quicksand",
     "fast quicksand (with rock)"
   },
+  {
+    "from_level_template",
+    "from_level_template",
+    "element taken from level template"
+  },
 
   /* ----------------------------------------------------------------------- */
   /* "real" (and therefore drawable) runtime elements                        */

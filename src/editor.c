@@ -10792,12 +10792,21 @@ static void HandleTextbuttonGadgets(struct GadgetInfo *gi)
     char *template_filename = getDefaultLevelFilename(-1);
     boolean new_template = !fileExists(template_filename);
 
+    /* backup original "level.field" (needed to track playfield changes) */
+    CopyPlayfield(level.field, FieldBackup);
+
+    /* "SaveLevelTemplate()" uses "level.field", so copy editor playfield */
+    CopyPlayfield(Feld, level.field);
+
     if (new_template ||
 	Request("Save this template and kill the old ?", REQ_ASK))
       SaveLevelTemplate();
 
     if (new_template)
       Request("Template saved !", REQ_CONFIRM);
+
+    /* restore original "level.field" (needed to track playfield changes) */
+    CopyPlayfield(FieldBackup, level.field);
   }
   else if (type_id == ED_TEXTBUTTON_ID_ADD_CHANGE_PAGE &&
 	   custom_element.num_change_pages < MAX_CHANGE_PAGES)

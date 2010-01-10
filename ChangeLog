@@ -1,3 +1,9 @@
+2010-01-10
+	* added new element "from_level_template" that is replaced by element
+	  from level template at same playfield position when loaded (currently
+	  not accessible from level editor, but only used for special Sokoban
+	  level conversion when using "special_flags: load_xsb_to_ces")
+
 2010-01-07
 	* added handling of gravity ports when converting Supaplex style R'n'D
 	  levels to native Supaplex levels for playing with Supaplex engine

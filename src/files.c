@@ -1752,9 +1752,26 @@ static void setFileInfoToDefaults(struct LevelFileInfo *level_file_info)
 
 static void ActivateLevelTemplate()
 {
+  int x, y;
+
   /* Currently there is no special action needed to activate the template
      data, because 'element_info' property settings overwrite the original
      level data, while all other variables do not change. */
+
+  /* Exception: 'from_level_template' elements in the original level playfield
+     are overwritten with the corresponding elements at the same position in
+     playfield from the level template. */
+
+  for (x = 0; x < level.fieldx; x++)
+    for (y = 0; y < level.fieldy; y++)
+      if (level.field[x][y] == EL_FROM_LEVEL_TEMPLATE)
+      {
+	level.field[x][y] = level_template.field[x][y];
+
+#if 0
+	printf("::: found EL_FROM_LEVEL_TEMPLATE at %d, %d\n", x, y);
+#endif
+      }
 }
 
 static char *getLevelFilenameFromBasename(char *basename)
@@ -6470,7 +6487,11 @@ int getMappedElement_SB(int element_ascii, boolean use_ces)
     { '.', EL_SOKOBAN_FIELD_EMPTY,  EL_CUSTOM_5 },  /* goal square */
     { '*', EL_SOKOBAN_FIELD_FULL,   EL_CUSTOM_6 },  /* box on goal square */
     { '+', EL_SOKOBAN_FIELD_PLAYER, EL_CUSTOM_7 },  /* player on goal square */
+#if 0
     { '_', EL_INVISIBLE_STEELWALL,  EL_CUSTOM_8 },  /* floor beyond border */
+#else
+    { '_', EL_INVISIBLE_STEELWALL,  EL_FROM_LEVEL_TEMPLATE },  /* floor beyond border */
+#endif
 
     { 0,   -1,                      -1          },
   };
