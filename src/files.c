@@ -1314,6 +1314,22 @@ filetype_id_list[] =
 /* level file functions                                                      */
 /* ========================================================================= */
 
+static boolean check_special_flags(char *flag)
+{
+#if 0
+  printf("::: '%s', '%s', '%s'\n",
+	 flag,
+	 options.special_flags,
+	 leveldir_current->special_flags);
+#endif
+
+  if (strEqual(options.special_flags, flag) ||
+      strEqual(leveldir_current->special_flags, flag))
+    return TRUE;
+
+  return FALSE;
+}
+
 static struct DateInfo getCurrentDate()
 {
   time_t epoch_seconds = time(NULL);
@@ -1765,13 +1781,25 @@ static void ActivateLevelTemplate()
   for (x = 0; x < level.fieldx; x++)
     for (y = 0; y < level.fieldy; y++)
       if (level.field[x][y] == EL_FROM_LEVEL_TEMPLATE)
-      {
 	level.field[x][y] = level_template.field[x][y];
 
-#if 0
-	printf("::: found EL_FROM_LEVEL_TEMPLATE at %d, %d\n", x, y);
-#endif
-      }
+  if (check_special_flags("load_xsb_to_ces"))
+  {
+    short FieldBackup[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+
+    /* backup playfield from individual level */
+    for (x = 0; x < level.fieldx; x++)
+      for (y = 0; y < level.fieldy; y++)
+	FieldBackup[x][y] = level.field[x][y];
+
+    /* set all individual level settings to template level settings */
+    level = level_template;
+
+    /* restore playfield from individual level */
+    for (x = 0; x < level.fieldx; x++)
+      for (y = 0; y < level.fieldy; y++)
+	level.field[x][y] = FieldBackup[x][y];
+  }
 }
 
 static char *getLevelFilenameFromBasename(char *basename)
@@ -6436,40 +6464,6 @@ static void LoadLevelFromFileInfo_DC(struct LevelInfo *level,
 /* functions for loading SB level                                            */
 /* ------------------------------------------------------------------------- */
 
-#if 1
-
-static boolean check_special_flags(char *flag)
-{
-#if 0
-  printf("::: '%s', '%s', '%s'\n",
-	 flag,
-	 options.special_flags,
-	 leveldir_current->special_flags);
-#endif
-
-  if (strEqual(options.special_flags, flag) ||
-      strEqual(leveldir_current->special_flags, flag))
-    return TRUE;
-
-  return FALSE;
-}
-
-#else
-
-#define SPECIAL_FLAG_LOAD_XSB_TO_CES	(1 << 0)
-
-static unsigned long get_special_flags(char *flags_string)
-{
-  unsigned long flags_value = 0;
-
-  if (strEqual(flags_string, "load_xsb_to_ces"))
-    flags_value = SPECIAL_FLAG_LOAD_XSB_TO_CES;
-
-  return flags_value;
-}
-
-#endif
-
 int getMappedElement_SB(int element_ascii, boolean use_ces)
 {
   static struct
@@ -6519,11 +6513,7 @@ static void LoadLevelFromFileInfo_SB(struct LevelInfo *level,
   boolean reading_playfield = FALSE;
   boolean got_valid_playfield_line = FALSE;
   boolean invalid_playfield_char = FALSE;
-#if 1
   boolean load_xsb_to_ces = check_special_flags("load_xsb_to_ces");
-#else
-  boolean load_xsb_to_ces = options.special_flags & SPECIAL_FLAG_LOAD_XSB_TO_CES;
-#endif
   int file_level_nr = 0;
   int line_nr = 0;
   int x, y;
@@ -6775,7 +6765,11 @@ static void LoadLevelFromFileInfo_SB(struct LevelInfo *level,
 
   if (load_xsb_to_ces)
   {
+#if 1
+    /* !!! special global settings can now be set in level template !!! */
+#else
     level->initial_player_stepsize[0] = STEPSIZE_SLOW;
+#endif
 
     /* fill smaller playfields with padding "beyond border wall" elements */
     if (level->fieldx < SCR_FIELDX ||

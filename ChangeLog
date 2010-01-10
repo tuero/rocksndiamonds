@@ -3,6 +3,8 @@
 	  from level template at same playfield position when loaded (currently
 	  not accessible from level editor, but only used for special Sokoban
 	  level conversion when using "special_flags: load_xsb_to_ces")
+	* added special behaviour for "special_flags: load_xsb_to_ces": global
+	  settings of individual level files are overwritten by template level
 
 2010-01-07
 	* added handling of gravity ports when converting Supaplex style R'n'D
