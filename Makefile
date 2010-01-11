@@ -150,6 +150,10 @@ backup_gfx:
 # prerelease:
 #	./Scripts/make_prerelease.sh
 
+jue:
+	sed -e 's/# SPECIAL_EDITION/SPECIAL_EDITION/' Makefile > Makefile.jue
+	$(MAKE) -f Makefile.jue cross-win32
+
 dist-clean:
 	@$(MAKE_CMD) dist-clean
 

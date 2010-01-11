@@ -1785,20 +1785,26 @@ static void ActivateLevelTemplate()
 
   if (check_special_flags("load_xsb_to_ces"))
   {
-    short FieldBackup[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+    struct LevelInfo level_backup = level;
 
-    /* backup playfield from individual level */
-    for (x = 0; x < level.fieldx; x++)
-      for (y = 0; y < level.fieldy; y++)
-	FieldBackup[x][y] = level.field[x][y];
-
-    /* set all individual level settings to template level settings */
+    /* overwrite all individual level settings from template level settings */
     level = level_template;
 
-    /* restore playfield from individual level */
+    /* restore playfield size */
+    level.fieldx = level_backup.fieldx;
+    level.fieldy = level_backup.fieldy;
+
+    /* restore playfield content */
     for (x = 0; x < level.fieldx; x++)
       for (y = 0; y < level.fieldy; y++)
-	level.field[x][y] = FieldBackup[x][y];
+	level.field[x][y] = level_backup.field[x][y];
+
+    /* restore name and author from individual level */
+    strcpy(level.name,   level_backup.name);
+    strcpy(level.author, level_backup.author);
+
+    /* restore flag "use_custom_template" */
+    level.use_custom_template = level_backup.use_custom_template;
   }
 }
 
