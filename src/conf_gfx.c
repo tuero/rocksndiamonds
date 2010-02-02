@@ -6348,6 +6348,7 @@ struct ConfigInfo image_config[] =
 
   { "game.forced_scroll_delay_value",		"-1"			},
   { "game.use_native_emc_graphics_engine",	"false"			},
+  { "game.use_masked_pushing",			"false"			},
 
   { "[player].boring_delay_fixed",		"1000"			},
   { "[player].boring_delay_random",		"1000"			},

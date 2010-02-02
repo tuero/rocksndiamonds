@@ -2720,9 +2720,10 @@ void DrawPlayer(struct PlayerInfo *player)
 
     /* draw background element under pushed element (like the Sokoban field) */
 #if 1
-    /* this allows transparent pushing animation over non-black background */
-    if (IS_MOVING(jx, jy))
+    if (game.use_masked_pushing && IS_MOVING(jx, jy))
     {
+      /* this allows transparent pushing animation over non-black background */
+
       if (Back[jx][jy])
 	DrawLevelElement(jx, jy, Back[jx][jy]);
       else
@@ -2733,6 +2734,8 @@ void DrawPlayer(struct PlayerInfo *player)
       else
 	DrawLevelElement(next_jx, next_jy, EL_EMPTY);
     }
+    else if (Back[next_jx][next_jy])
+      DrawLevelElement(next_jx, next_jy, Back[next_jx][next_jy]);
 #else
     if (Back[next_jx][next_jy])
       DrawLevelElement(next_jx, next_jy, Back[next_jx][next_jy]);

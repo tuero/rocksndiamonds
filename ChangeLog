@@ -1,6 +1,6 @@
 2010-02-02
 	* added small kludge that allows transparent pushing animation over
-	  non-black background
+	  non-black background (by using "game.use_masked_pushing: true")
 	* added editor flag to Sokoban field/object elements to automatically
 	  finish solved Sokoban style levels (even if they contain non-Sokoban
 	  elements, which prevents auto-enabling this feature for such levels)

@@ -5013,6 +5013,10 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.use_native_emc_graphics_engine
   },
   {
+    "game.use_masked_pushing",
+    &game.use_masked_pushing
+  },
+  {
     "[player].boring_delay_fixed",
     &game.player_boring_delay_fixed
   },

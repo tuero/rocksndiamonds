@@ -117,6 +117,7 @@ struct GameInfo
 
   /* values for graphics engine customization */
   boolean use_native_emc_graphics_engine;
+  boolean use_masked_pushing;
   int forced_scroll_delay_value;
   int scroll_delay_value;
 
