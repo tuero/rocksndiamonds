@@ -238,6 +238,12 @@ static struct LevelFileConfigInfo chunk_config_INFO[] =
 
   {
     -1,					-1,
+    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(9),
+    &li.auto_exit_sokoban,		FALSE
+  },
+
+  {
+    -1,					-1,
     -1,					-1,
     NULL,				-1
   }

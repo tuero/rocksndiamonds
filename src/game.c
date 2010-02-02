@@ -15389,8 +15389,13 @@ static int DigField(struct PlayerInfo *player,
 	PlayLevelSoundElementAction(nextx, nexty, EL_SOKOBAN_FIELD_EMPTY,
 				    ACTION_FILLING);
 
+#if 1
+      if (local_player->sokobanfields_still_needed == 0 &&
+	  (game.emulation == EMU_SOKOBAN || level.auto_exit_sokoban))
+#else
       if (local_player->sokobanfields_still_needed == 0 &&
 	  game.emulation == EMU_SOKOBAN)
+#endif
       {
 	PlayerWins(player);
 

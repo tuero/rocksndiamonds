@@ -4186,6 +4186,7 @@ void InitElementPropertiesStatic()
     EL_PLAYER_2,
     EL_PLAYER_3,
     EL_PLAYER_4,
+    EL_SOKOBAN_FIELD_PLAYER,
     EL_SP_MURPHY,
     EL_YAMYAM,
     EL_YAMYAM_LEFT,

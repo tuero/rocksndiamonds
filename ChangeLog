@@ -1,3 +1,10 @@
+2010-02-02
+	* added small kludge that allows transparent pushing animation over
+	  non-black background
+	* added editor flag to Sokoban field/object elements to automatically
+	  finish solved Sokoban style levels (even if they contain non-Sokoban
+	  elements, which prevents auto-enabling this feature for such levels)
+
 2010-01-10
 	* added new element "from_level_template" which is replaced by element
 	  from level template at same playfield position when loaded (currently

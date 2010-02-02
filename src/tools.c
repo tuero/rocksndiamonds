@@ -2719,8 +2719,24 @@ void DrawPlayer(struct PlayerInfo *player)
 #endif
 
     /* draw background element under pushed element (like the Sokoban field) */
+#if 1
+    /* this allows transparent pushing animation over non-black background */
+    if (IS_MOVING(jx, jy))
+    {
+      if (Back[jx][jy])
+	DrawLevelElement(jx, jy, Back[jx][jy]);
+      else
+	DrawLevelElement(jx, jy, EL_EMPTY);
+
+      if (Back[next_jx][next_jy])
+	DrawLevelElement(next_jx, next_jy, Back[next_jx][next_jy]);
+      else
+	DrawLevelElement(next_jx, next_jy, EL_EMPTY);
+    }
+#else
     if (Back[next_jx][next_jy])
       DrawLevelElement(next_jx, next_jy, Back[next_jx][next_jy]);
+#endif
 
 #if 0
     printf("::: %d, %d, %d, %d [%d] [%d, %d, %d] [%d] [%d, %d] [%d, %d]\n",
