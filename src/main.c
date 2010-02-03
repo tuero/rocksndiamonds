@@ -1262,23 +1262,23 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
   },
   {
     "sp_gravity_port_right",
-    "sp_port",
-    "gravity port (leading right)"
+    "sp_gravity_port",
+    "gravity-on/off port (leading right)"
   },
   {
     "sp_gravity_port_down",
-    "sp_port",
-    "gravity port (leading down)"
+    "sp_gravity_port",
+    "gravity-on/off port (leading down)"
   },
   {
     "sp_gravity_port_left",
-    "sp_port",
-    "gravity port (leading left)"
+    "sp_gravity_port",
+    "gravity-on/off port (leading left)"
   },
   {
     "sp_gravity_port_up",
-    "sp_port",
-    "gravity port (leading up)"
+    "sp_gravity_port",
+    "gravity-on/off port (leading up)"
   },
   {
     "sp_sniksnak",
@@ -3442,43 +3442,43 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
   },
   {
     "sp_gravity_on_port_right",
-    "sp_port",
-    "gravity on port (leading right)"
+    "sp_gravity_on_port",
+    "gravity-on port (leading right)"
   },
   {
     "sp_gravity_on_port_down",
-    "sp_port",
-    "gravity on port (leading down)"
+    "sp_gravity_on_port",
+    "gravity-on port (leading down)"
   },
   {
     "sp_gravity_on_port_left",
-    "sp_port",
-    "gravity on port (leading left)"
+    "sp_gravity_on_port",
+    "gravity-on port (leading left)"
   },
   {
     "sp_gravity_on_port_up",
-    "sp_port",
-    "gravity on port (leading up)"
+    "sp_gravity_on_port",
+    "gravity-on port (leading up)"
   },
   {
     "sp_gravity_off_port_right",
-    "sp_port",
-    "gravity off port (leading right)"
+    "sp_gravity_off_port",
+    "gravity-off port (leading right)"
   },
   {
     "sp_gravity_off_port_down",
-    "sp_port",
-    "gravity off port (leading down)"
+    "sp_gravity_off_port",
+    "gravity-off port (leading down)"
   },
   {
     "sp_gravity_off_port_left",
-    "sp_port",
-    "gravity off port (leading left)"
+    "sp_gravity_off_port",
+    "gravity-off port (leading left)"
   },
   {
     "sp_gravity_off_port_up",
-    "sp_port",
-    "gravity off port (leading up)"
+    "sp_gravity_off_port",
+    "gravity-off port (leading up)"
   },
   {
     "balloon_switch_none",
