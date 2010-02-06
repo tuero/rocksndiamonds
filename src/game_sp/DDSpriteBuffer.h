@@ -13,6 +13,7 @@
 #include "global.h"
 
 extern void DDSpriteBuffer_BltEx(int pX, int pY, int SpritePos);
+extern void DDSpriteBuffer_BltImg(int pX, int pY, int graphic, int sync_frame);
 extern void DDSpriteBuffer_Cls(int BackColor);
 extern boolean DDSpriteBuffer_CreateAtSize(long Width, long Height, long xSprites, long ySprites);
 extern boolean DDSpriteBuffer_CreateFromFile(char *Path, long xSprites, long ySprites);

@@ -418,6 +418,10 @@ struct ConfigInfo image_config[] =
   { "sp_murphy.sleeping.right.frames",		"3"			},
   { "sp_murphy.sleeping.right.delay",		"100"			},
   { "sp_murphy.sleeping.right.anim_mode",	"linear"		},
+  { "sp_murphy.shrinking",			"RocksSP.pcx"		},
+  { "sp_murphy.shrinking.xpos",			"8"			},
+  { "sp_murphy.shrinking.ypos",			"14"			},
+  { "sp_murphy.shrinking.frames",		"8"			},
 
   { "sp_murphy_clone",				"RocksSP.pcx"		},
   { "sp_murphy_clone.xpos",			"3"			},

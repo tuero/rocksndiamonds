@@ -237,6 +237,7 @@ typedef struct
 
   void (*Cls)();
   void (*BltEx)(int, int, int);
+  void (*BltImg)(int, int, int, int);
 } DDSpriteBuffer;
 
 typedef struct

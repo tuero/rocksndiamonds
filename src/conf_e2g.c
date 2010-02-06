@@ -282,6 +282,10 @@ element_to_graphic[] =
     IMG_SP_MURPHY_SLEEPING_RIGHT
   },
   {
+    EL_SP_MURPHY,			ACTION_SHRINKING, -1, FALSE,
+    IMG_SP_MURPHY_SHRINKING
+  },
+  {
     EL_SP_MURPHY_CLONE,			-1, -1, FALSE,
     IMG_SP_MURPHY_CLONE
   },

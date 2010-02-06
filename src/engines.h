@@ -41,10 +41,12 @@ void getGraphicSourcePlayerExt_EM(struct GraphicInfo_EM *, int, int, int);
 
 
 /* ========================================================================= */
-/* functions and definitions exported from main program to game_em           */
+/* functions and definitions exported from main program to game_sp           */
 /* ========================================================================= */
 
 extern void SetBitmaps_SP(Bitmap **);
+
+void getGraphicSource_SP(struct GraphicInfo_SP *, int, int, int, int);
 
 
 #endif	/* ENGINES_H */

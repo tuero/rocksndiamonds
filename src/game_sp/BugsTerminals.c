@@ -131,7 +131,13 @@ int subAnimateTerminals(int si)
   al = aniTerminal + bl;
   X = GetStretchX(si);
   Y = GetStretchY(si);
+#if 1
+  StretchedSprites.BltImg(X, Y,
+			  bl < 8 ? IMG_SP_TERMINAL : IMG_SP_TERMINAL_ACTIVE,
+			  FrameCounter);
+#else
   StretchedSprites.BltEx(X, Y, al);
+#endif
   // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
   return subAnimateTerminals;

@@ -14,7 +14,8 @@ static void init_struct_functions()
   Stage.ScrollTowards = &DDScrollBuffer_ScrollTowards;
   Stage.SoftScrollTo  = &DDScrollBuffer_SoftScrollTo;
 
-  StretchedSprites.BltEx = &DDSpriteBuffer_BltEx;
+  StretchedSprites.BltEx  = &DDSpriteBuffer_BltEx;
+  StretchedSprites.BltImg = &DDSpriteBuffer_BltImg;
 }
 
 static void init_global_values()

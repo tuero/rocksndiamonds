@@ -4,7 +4,7 @@
 
 #include "DDSpriteBuffer.h"
 
-static void Blt(int pX, int pY, int SpriteX, int SpriteY);
+static void Blt(int pX, int pY, Bitmap *bitmap, int SpriteX, int SpriteY);
 
 // --- VERSION 1.0 CLASS
 // --- BEGIN
@@ -178,7 +178,7 @@ void DDSpriteBuffer_Cls(int BackColor)
 
 #endif
 
-static void Blt(int pX, int pY, int SpriteX, int SpriteY)
+static void Blt(int pX, int pY, Bitmap *bitmap, int SpriteX, int SpriteY)
 {
   MyRECT DR, SR;
 #if 0
@@ -252,14 +252,23 @@ static void Blt(int pX, int pY, int SpriteX, int SpriteY)
     DR.bottom = pY + mSpriteHeight + mDestYOff;
   }
   {
+#if 1
+    SR.left = SpriteX;
+    SR.top = SpriteY;
+#else
     SR.left = mSpriteWidth * (SpriteX - 1);
     SR.top = mSpriteHeight * (SpriteY - 1);
+#endif
     SR.right = SR.left + mSpriteWidth;
     SR.bottom = SR.top + mSpriteHeight;
   }
 
 #if 0
   printf("::: DDSpriteBuffer.c: Blt(): %d, %d\n", DR.left, DR.top);
+#endif
+
+#if 0
+  printf("::: DDSpriteBuffer.c: Blt(): %d, %d\n", sx, sy);
 #endif
 
 #if 0
@@ -272,7 +281,7 @@ static void Blt(int pX, int pY, int SpriteX, int SpriteY)
 #if 1
 
 #if 1
-  BlitBitmap(sp_objects, screenBitmap,
+  BlitBitmap(bitmap, screenBitmap,
 	     SR.left, SR.top,
 	     mSpriteWidth, mSpriteHeight,
 	     sx, sy);
@@ -373,8 +382,17 @@ void DDSpriteBuffer_BltEx(int pX, int pY, int SpritePos)
   if (NoDisplayFlag)
     return;
 
+#if 1
+  XPos = mSpriteWidth  * (SpritePos % mXSpriteCount);
+  YPos = mSpriteHeight * (SpritePos / mXSpriteCount);
+#else
   XPos = (SpritePos % mXSpriteCount) + 1;
   YPos = (SpritePos / mXSpriteCount) + 1;
+#endif
+
+#if 0
+  printf("::: BltEx: %d, %d, %d, %d\n", pX, pY, XPos, YPos);
+#endif
 
 #if 0
   if (TEST_flag)
@@ -382,7 +400,23 @@ void DDSpriteBuffer_BltEx(int pX, int pY, int SpritePos)
 	   pX, pY, SpritePos);
 #endif
 
-  Blt(pX, pY, XPos, YPos);
+  Blt(pX, pY, sp_objects, XPos, YPos);
+}
+
+void DDSpriteBuffer_BltImg(int pX, int pY, int graphic, int sync_frame)
+{
+  struct GraphicInfo_SP g;
+
+  if (NoDisplayFlag)
+    return;
+
+  getGraphicSource_SP(&g, graphic, sync_frame, -1, -1);
+
+#if 0
+  printf("::: BltImg: %d, %d, %d, %d\n", pX, pY, g.src_x, g.src_y);
+#endif
+
+  Blt(pX, pY, g.bitmap, g.src_x, g.src_y);
 }
 
 // Public Function GetStretchCopy(Stretch!) As DDSpriteBuffer
