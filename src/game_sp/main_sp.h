@@ -70,6 +70,8 @@ extern Bitmap *screenBitmap;
 
 extern Bitmap *sp_objects;
 
+extern int GfxFrame[SP_MAX_PLAYFIELD_WIDTH][SP_MAX_PLAYFIELD_HEIGHT];
+
 
 /* ------------------------------------------------------------------------- */
 /* exported functions                                                        */

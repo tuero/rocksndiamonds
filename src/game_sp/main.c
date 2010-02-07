@@ -6,12 +6,21 @@
 struct GameInfo_SP game_sp_info;
 struct LevelInfo_SP native_sp_level;
 
+int GfxFrame[SP_MAX_PLAYFIELD_WIDTH][SP_MAX_PLAYFIELD_HEIGHT];
+
+
 void InitGameEngine_SP()
 {
+  int x, y;
+
   game_sp_info.LevelSolved = FALSE;
   game_sp_info.GameOver = FALSE;
 
   menBorder.Checked = setup.sp_show_border_elements;
+
+  for (x = 0; x < SP_MAX_PLAYFIELD_WIDTH; x++)
+    for (y = 0; y < SP_MAX_PLAYFIELD_HEIGHT; y++)
+      GfxFrame[x][y] = 0;
 
   InitScrollPlayfield();
 
@@ -51,8 +60,13 @@ void RedrawPlayfield_SP(boolean force_redraw)
 void GameActions_SP(byte action[MAX_PLAYERS], boolean warp_mode)
 {
   byte single_player_action = action[0];
+  int x, y;
 
   subMainGameLoop_Main(single_player_action, warp_mode);
 
   RedrawPlayfield_SP(FALSE);
+
+  for (x = 0; x < SP_MAX_PLAYFIELD_WIDTH; x++)
+    for (y = 0; y < SP_MAX_PLAYFIELD_HEIGHT; y++)
+      GfxFrame[x][y]++;
 }

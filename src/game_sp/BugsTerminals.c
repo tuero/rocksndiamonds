@@ -100,8 +100,18 @@ int subAnimateTerminals(int si)
   int bl, al, X, Y;
 #endif
 
+#if 1
+  int lx = GetX(si);
+  int ly = GetY(si);
+  int graphic;
+#endif
+
   if (LowByte(PlayField16[si]) != fiTerminal)
     return subAnimateTerminals;
+
+  /* use native frame handling (undo frame incrementation in main loop) */
+  if (game.use_native_sp_graphics_engine)
+    GfxFrame[lx][ly]--;
 
   bl = HighByte(PlayField16[si]);
   if ((bl & 0x80) == 0x80)
@@ -111,7 +121,13 @@ int subAnimateTerminals(int si)
   if (bl <= 0)
   {
     MovHighByte(&PlayField16[si], bl);
+
+#if 1
+    if (game.use_native_sp_graphics_engine)
+      return subAnimateTerminals;
+#else
     return subAnimateTerminals;
+#endif
   }
 
   bl = -(subGetRandomNumber() & TerminalMaxCycles); // generate new random number
@@ -126,15 +142,20 @@ int subAnimateTerminals(int si)
     bl = 8;
   }
 
+#if 1
+  graphic = (bl < 8 ? IMG_SP_TERMINAL : IMG_SP_TERMINAL_ACTIVE);
+
+  if (game.use_native_sp_graphics_engine)
+    GfxFrame[lx][ly] += getGraphicInfo_Delay(graphic);
+#endif
+
   TerminalState[si] = bl;
   // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   al = aniTerminal + bl;
   X = GetStretchX(si);
   Y = GetStretchY(si);
 #if 1
-  StretchedSprites.BltImg(X, Y,
-			  bl < 8 ? IMG_SP_TERMINAL : IMG_SP_TERMINAL_ACTIVE,
-			  FrameCounter);
+  StretchedSprites.BltImg(X, Y, graphic, GfxFrame[lx][ly]);
 #else
   StretchedSprites.BltEx(X, Y, al);
 #endif

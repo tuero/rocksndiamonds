@@ -7749,6 +7749,11 @@ void getGraphicSource_SP(struct GraphicInfo_SP *g_sp,
   getGraphicSource(graphic, frame, &g_sp->bitmap, &g_sp->src_x, &g_sp->src_y);
 }
 
+int getGraphicInfo_Delay(int graphic)
+{
+  return graphic_info[graphic].anim_delay;
+}
+
 void PlayMenuSoundExt(int sound)
 {
   if (sound == SND_UNDEFINED)

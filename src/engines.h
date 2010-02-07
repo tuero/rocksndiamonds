@@ -47,6 +47,7 @@ void getGraphicSourcePlayerExt_EM(struct GraphicInfo_EM *, int, int, int);
 extern void SetBitmaps_SP(Bitmap **);
 
 void getGraphicSource_SP(struct GraphicInfo_SP *, int, int, int, int);
+int getGraphicInfo_Delay(int);
 
 
 #endif	/* ENGINES_H */
