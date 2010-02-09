@@ -15,6 +15,7 @@
 extern int subAdjustZonksInfotronsAboveMurphy(int si);
 extern int subAnimateMurphy(int *si);
 extern void subCopyFieldToScreen(int si, int fi);
+extern void subCopyImageToScreen(int si, int graphic, int sync_frame);
 extern int subExplodeSnikSnaksBelow(int si);
 extern int subSpPortTest(int si);
 

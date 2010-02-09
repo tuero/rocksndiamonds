@@ -34,7 +34,12 @@ int subAnimateMurphy(int *si)
 
   // int ax, al, ah, bx, bl, i, X, Y;
   // int tX, tY, tDeltaX, tDeltaY, tPos, Tmp;
+#if 1
+  int ax, al, bl, i, X, Y;
+  int time1, time2;
+#else
   int ax, al, bx, bl, i, X, Y;
+#endif
   int tDeltaX, tDeltaY, tPos, Tmp;
 
   // Variables that hold information about the animation sequence
@@ -52,6 +57,11 @@ int subAnimateMurphy(int *si)
 #if 0
   printf("::: Murphy.c: subAnimateMurphy(): %d [%d, %d] %d, %d [%d]\n",
 	 *si, *si % 60, *si / 60, ax, al, (al == fiMurphy));
+#endif
+
+#if 0
+  printf("::: Murphy.c: subAnimateMurphy(): %d [%d] [%d]\n",
+	 YawnSleepCounter, FrameCounter, TimerVar);
 #endif
 
   if (al != fiMurphy)
@@ -98,6 +108,96 @@ int subAnimateMurphy(int *si)
     MurphyDY = 2;
     goto loc_g_6364;
   }
+
+#if 1
+
+#if 0
+  ax = (TimerVar & 3);
+  if (ax != 0)
+    return subAnimateMurphy;
+#endif
+
+  // ------------------------------------------------------------------
+  // Murphy's YAWN & SLEEP sequence, counted down by YawnSleepCounter:
+
+  YawnSleepCounter = YawnSleepCounter + 1;
+
+  if (YawnSleepCounter < 16)
+    return subAnimateMurphy;
+
+  if (YawnSleepCounter < 2000)
+  {
+    // normal grin
+    // (default: single graphic, no animation)
+    subCopyImageToScreen(*si, aniMurphy, YawnSleepCounter - 16);
+
+    return subAnimateMurphy;
+  }
+
+  if (YawnSleepCounter < 4000)
+  {
+    // yawn! and look depressed afterwards...
+    // (default: 12 animation frames with delay of 8)
+    subCopyImageToScreen(*si, aniMurphyYawn, YawnSleepCounter - 2000);
+
+    return subAnimateMurphy;
+  }
+
+  if (YawnSleepCounter < 6400)
+  {
+    // yawn again!
+    // (default: 12 animation frames with delay of 8)
+    subCopyImageToScreen(*si, aniMurphyYawn, YawnSleepCounter - 4000);
+
+    return subAnimateMurphy;
+  }
+
+  // time1 = 6400 + 12 * 8;	// (default: 6496 == 6400 + 12 * 8)
+  time1 = 6400 + 12 * 10;
+
+  if (YawnSleepCounter < time1)
+  {
+    // yawn again! - third time
+    // (default: 12 animation frames with delay of 8)
+    subCopyImageToScreen(*si, aniMurphyYawn, YawnSleepCounter - 6400);
+
+    return subAnimateMurphy;
+  }
+
+  // time2 = 6496 + 3 * 64;	// (default: 6688 == 6496 + 3 * 64)
+  time2 = 6496 + 3 * 100;
+
+  if (YawnSleepCounter > time2)		// Murphy already went to sleep
+    return subAnimateMurphy;
+
+  if (PlayField16[*si - 1] == 0)
+  {
+    if (PlayField16[*si + 1] == 0)
+    {
+      // no sleep -- go back to "wait and start yawning" phase
+      YawnSleepCounter = 144;
+
+      return subAnimateMurphy;
+    }
+    else
+    {
+      // go to sleep (right side)
+      // (default: 3 animation frames with delay of 64)
+      subCopyImageToScreen(*si, aniMurphySleepRight, YawnSleepCounter - time1);
+
+      return subAnimateMurphy;
+    }
+  }
+
+  // go to sleep (left side)
+  // (default: 3 animation frames with delay of 64)
+  subCopyImageToScreen(*si, aniMurphySleepLeft, YawnSleepCounter - time1);
+
+  return subAnimateMurphy;
+
+  // end of YAWN-SLEEP-Sequence
+
+#else
 
   ax = (TimerVar & 3);
   if (ax != 0)
@@ -163,9 +263,13 @@ int subAnimateMurphy(int *si)
 
   bx = (YawnSleepCounter - 1622) / 16;
   subCopyFieldToScreen(*si, aniMurphySleepLeft + bx); // go to sleep
+
   return subAnimateMurphy;
 
   // end of YAWN-SLEEP-Sequence
+
+#endif
+
   // ------------------------------------------------------------------
   // ==========================================================================
   //                       (Direct Jump) a key was pressed
@@ -1010,7 +1114,7 @@ loc_g_6817:
   subCopyFieldToScreen(*si, aniMurphyTouchUp);
   if (YellowDisksExploded != 0)
   {
-    YawnSleepCounter = 10; // stay hypnotized
+    YawnSleepCounter = 40; // stay hypnotized
     return subAnimateMurphy;
   } // loc_g_6838:
 
@@ -1026,7 +1130,7 @@ loc_g_684E:
   subCopyFieldToScreen(*si, aniMurphyTouchLeft);
   if (YellowDisksExploded != 0)
   {
-    YawnSleepCounter = 10; // stay hypnotized
+    YawnSleepCounter = 40; // stay hypnotized
     return subAnimateMurphy;
   } // loc_g_6838:
 
@@ -1042,7 +1146,7 @@ loc_g_6884:
   subCopyFieldToScreen(*si, aniMurphyTouchDown);
   if (YellowDisksExploded != 0)
   {
-    YawnSleepCounter = 10; // stay hypnotized
+    YawnSleepCounter = 40; // stay hypnotized
     return subAnimateMurphy;
   } // loc_g_6838:
 
@@ -1058,7 +1162,7 @@ loc_g_68BA:
   subCopyFieldToScreen(*si, aniMurphyTouchRight);
   if (YellowDisksExploded != 0)
   {
-    YawnSleepCounter = 10; // stay hypnotized
+    YawnSleepCounter = 40; // stay hypnotized
     return subAnimateMurphy;
   } // loc_g_6838:
 
@@ -2395,6 +2499,17 @@ void subCopyFieldToScreen(int si, int fi)
   X = GetStretchX(si);
   Y = GetStretchY(si);
   StretchedSprites.BltEx(X, Y, fi);
+  // +++++++++++++++++++++++++++++++++++++++++
+}
+
+void subCopyImageToScreen(int si, int graphic, int sync_frame)
+{
+  int X, Y;
+
+  // +++++++++++++++++++++++++++++++++++++++++
+  X = GetStretchX(si);
+  Y = GetStretchY(si);
+  StretchedSprites.BltImg(X, Y, graphic, sync_frame);
   // +++++++++++++++++++++++++++++++++++++++++
 }
 

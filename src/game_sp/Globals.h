@@ -31,6 +31,29 @@
 #endif
 
 #define aniExplosionInfo 		(111)
+
+#if 1
+
+#define aniMurphy 			(IMG_SP_MURPHY)
+
+#define aniMurphySleepLeft 		(IMG_SP_MURPHY_SLEEPING_LEFT)
+#define aniMurphySleepRight 		(IMG_SP_MURPHY_SLEEPING_RIGHT)
+#define aniMurphyTouchDown 		(IMG_SP_MURPHY_SNAPPING_DOWN)
+#define aniMurphyTouchLeft 		(IMG_SP_MURPHY_SNAPPING_LEFT)
+#define aniMurphyTouchRight 		(IMG_SP_MURPHY_SNAPPING_RIGHT)
+#define aniMurphyTouchUp 		(IMG_SP_MURPHY_SNAPPING_UP)
+#define aniMurphyYawn 			(IMG_SP_MURPHY_BORING_1)
+#define aniPushLeft 			(IMG_SP_MURPHY_PUSHING_LEFT)
+#define aniPushRight 			(IMG_SP_MURPHY_PUSHING_RIGHT)
+#define aniPushUpDown 			(IMG_SP_MURPHY_PUSHING_RIGHT)
+
+#define aniSnikSnakDown 		(167)
+#define aniSnikSnakLeft 		(239)
+#define aniSnikSnakRight 		(247)
+#define aniSnikSnakUp 			(159)
+
+#else
+
 #define aniMurphySleepLeft 		(71)
 #define aniMurphySleepRight 		(68)
 #define aniMurphyTouchDown 		(47)
@@ -41,10 +64,13 @@
 #define aniPushLeft 			(45)
 #define aniPushRight 			(44)
 #define aniPushUpDown 			(79)
+
 #define aniSnikSnakDown 		(167)
 #define aniSnikSnakLeft 		(239)
 #define aniSnikSnakRight 		(247)
 #define aniSnikSnakUp 			(159)
+
+#endif
 
 #define fiBase 				(2)
 #define fiBug 				(25)
