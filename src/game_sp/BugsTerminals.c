@@ -12,7 +12,10 @@ long MyGetTickCount();
 
 byte *TerminalState;
 int TerminalMaxCycles;
+
+#if 0
 #define aniTerminal 			(0x80)
+#endif
 
 // ==========================================================================
 //                              SUBROUTINE
@@ -95,7 +98,7 @@ int subAnimateTerminals(int si)
 
   // int bl, ax, al, X, Y;
 #if 1
-  short bl, al, X, Y;
+  short bl;
 #else
   int bl, al, X, Y;
 #endif
@@ -146,22 +149,36 @@ int subAnimateTerminals(int si)
     bl = 8;
   }
 
+  TerminalState[si] = bl;
+
+  // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #if 1
-  graphic = (bl < 8 ? IMG_SP_TERMINAL : IMG_SP_TERMINAL_ACTIVE);
+
+  graphic = (bl < 8 ? aniTerminal : aniTerminalActive);
 
   if (game.use_native_sp_graphics_engine)
     GfxFrame[lx][ly] += getGraphicInfo_Delay(graphic);
-#endif
 
-  TerminalState[si] = bl;
-  // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-  al = aniTerminal + bl;
+#if 1
+  subCopyAnimToScreen(si, graphic, GfxFrame[lx][ly]);
+#else
   X = GetStretchX(si);
   Y = GetStretchY(si);
-#if 1
   StretchedSprites.BltImg(X, Y, graphic, GfxFrame[lx][ly]);
+#endif
+
 #else
+
+  al = aniTerminal + bl;
+
+#if 1
+  subCopyFieldToScreen(si, al);
+#else
+  X = GetStretchX(si);
+  Y = GetStretchY(si);
   StretchedSprites.BltEx(X, Y, al);
+#endif
+
 #endif
   // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 

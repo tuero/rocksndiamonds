@@ -30,47 +30,65 @@
 
 #endif
 
-#define aniExplosionInfo 		(111)
+
+// ----------------------------------------------------------------------------
+// elements (stored in file and playfield)
+// ----------------------------------------------------------------------------
 
 #if 1
 
-#define aniMurphy 			(IMG_SP_MURPHY)
+#define fiSpace 			(0)
+#define fiZonk 				(1)
+#define fiBase 				(2)
+#define fiMurphy 			(3)
+#define fiInfotron 			(4)
+#define fiRAM 				(5)
+#define fiHardWare 			(6)
+#define fiExit 				(7)
+#define fiOrangeDisk 			(8)
+#define fiPortRight 			(9)
+#define fiPortDown 			(10)
+#define fiPortLeft 			(11)
+#define fiPortUp 			(12)
+#define fiSpPortRight 			(13)
+#define fiSpPortDown 			(14)
+#define fiSpPortLeft 			(15)
+#define fiSpPortUp 			(16)
+#define fiSnikSnak 			(17)
+#define fiYellowDisk 			(18)
+#define fiTerminal 			(19)
+#define fiRedDisk 			(20)
+#define fiPortUpAndDown 		(21)
+#define fiPortLeftAndRight 		(22)
+#define fiPortAllDirections 		(23)
+#define fiElectron 			(24)
+#define fiBug 				(25)
+#define fiRAMLeft 			(26)
+#define fiRAMRight 			(27)
+#define fiHWFirst 			(28)
 
-#define aniMurphySleepLeft 		(IMG_SP_MURPHY_SLEEPING_LEFT)
-#define aniMurphySleepRight 		(IMG_SP_MURPHY_SLEEPING_RIGHT)
-#define aniMurphyTouchDown 		(IMG_SP_MURPHY_SNAPPING_DOWN)
-#define aniMurphyTouchLeft 		(IMG_SP_MURPHY_SNAPPING_LEFT)
-#define aniMurphyTouchRight 		(IMG_SP_MURPHY_SNAPPING_RIGHT)
-#define aniMurphyTouchUp 		(IMG_SP_MURPHY_SNAPPING_UP)
-#define aniMurphyYawn 			(IMG_SP_MURPHY_BORING_1)
-#define aniPushLeft 			(IMG_SP_MURPHY_PUSHING_LEFT)
-#define aniPushRight 			(IMG_SP_MURPHY_PUSHING_RIGHT)
-#define aniPushUpDown 			(IMG_SP_MURPHY_PUSHING_RIGHT)
+#define fiHW_0				(fiHWFirst + 0)
+#define fiHW_1				(fiHWFirst + 1)
+#define fiHW_2				(fiHWFirst + 2)
+#define fiHW_3				(fiHWFirst + 3)
+#define fiHW_4				(fiHWFirst + 4)
+#define fiHW_5				(fiHWFirst + 5)
+#define fiHW_6				(fiHWFirst + 6)
+#define fiHW_7				(fiHWFirst + 7)
+#define fiHW_8				(fiHWFirst + 8)
+#define fiHW_9				(fiHWFirst + 9)
 
-#define aniSnikSnakDown 		(167)
-#define aniSnikSnakLeft 		(239)
-#define aniSnikSnakRight 		(247)
-#define aniSnikSnakUp 			(159)
+#define fiHWLast 			(37)
+#define fiRAMTop 			(38)
+#define fiRAMBottom 			(39)
+#define fiWallSpace 			(40)
+#define fiHWTrash1 			(41)
+#define fiHWTrash2 			(42)
+#define fiHWMurphy 			(43)
+
+#define fiExplosion 			(0x1F)
 
 #else
-
-#define aniMurphySleepLeft 		(71)
-#define aniMurphySleepRight 		(68)
-#define aniMurphyTouchDown 		(47)
-#define aniMurphyTouchLeft 		(95)
-#define aniMurphyTouchRight 		(94)
-#define aniMurphyTouchUp 		(46)
-#define aniMurphyYawn 			(56)
-#define aniPushLeft 			(45)
-#define aniPushRight 			(44)
-#define aniPushUpDown 			(79)
-
-#define aniSnikSnakDown 		(167)
-#define aniSnikSnakLeft 		(239)
-#define aniSnikSnakRight 		(247)
-#define aniSnikSnakUp 			(159)
-
-#endif
 
 #define fiBase 				(2)
 #define fiBug 				(25)
@@ -110,6 +128,117 @@
 #define fiYellowDisk 			(18)
 #define fiZonk 				(1)
 
+#endif
+
+
+// ----------------------------------------------------------------------------
+// graphics and animations (used at runtime to display the elements)
+// ----------------------------------------------------------------------------
+
+#if 1
+
+#define aniSpace 			IMG_EMPTY_SPACE
+
+#define aniMurphy 			IMG_SP_MURPHY
+#define aniMurphyDropping		IMG_SP_MURPHY_DROPPING
+
+#define aniMurphySleepLeft 		IMG_SP_MURPHY_SLEEPING_LEFT
+#define aniMurphySleepRight 		IMG_SP_MURPHY_SLEEPING_RIGHT
+#define aniMurphyTouchDown 		IMG_SP_MURPHY_SNAPPING_DOWN
+#define aniMurphyTouchLeft 		IMG_SP_MURPHY_SNAPPING_LEFT
+#define aniMurphyTouchRight 		IMG_SP_MURPHY_SNAPPING_RIGHT
+#define aniMurphyTouchUp 		IMG_SP_MURPHY_SNAPPING_UP
+#define aniMurphyYawn 			IMG_SP_MURPHY_BORING_1
+#define aniPushLeft 			IMG_SP_MURPHY_PUSHING_LEFT
+#define aniPushRight 			IMG_SP_MURPHY_PUSHING_RIGHT
+#define aniPushUpDown 			IMG_SP_MURPHY_PUSHING_RIGHT
+
+#define aniSnikSnakDown 		167
+#define aniSnikSnakLeft 		239
+#define aniSnikSnakRight 		247
+#define aniSnikSnakUp 			159
+
+#define aniTerminal			IMG_SP_TERMINAL
+#define aniTerminalActive		IMG_SP_TERMINAL_ACTIVE
+
+#define aniExplosionInfo 		(111)
+
+#else
+
+#define aniMurphySleepLeft 		(71)
+#define aniMurphySleepRight 		(68)
+#define aniMurphyTouchDown 		(47)
+#define aniMurphyTouchLeft 		(95)
+#define aniMurphyTouchRight 		(94)
+#define aniMurphyTouchUp 		(46)
+#define aniMurphyYawn 			(56)
+#define aniPushLeft 			(45)
+#define aniPushRight 			(44)
+#define aniPushUpDown 			(79)
+
+#define aniSnikSnakDown 		(167)
+#define aniSnikSnakLeft 		(239)
+#define aniSnikSnakRight 		(247)
+#define aniSnikSnakUp 			(159)
+
+#define aniTerminal			(0x80)
+#define aniTerminalActive		(0x88)
+
+#define aniExplosionInfo 		(111)
+
+#endif
+
+#define posFrameCorner 			(55)
+#define posFrameHorizontal 		(111)
+#define posFrameVertical 		(110)
+
+
+#if 1
+
+extern int aniBug[], aniZonkRollRight[], aniZonkRollLeft[];
+extern int aniEatInfotronLeft[], aniEatInfotronRight[];
+extern int aniInfotronRollRight[], aniInfotronRollLeft[];
+extern int aniMurphyEatLeft[], aniMurphyEatRight[];
+extern int aniMurphyEatUpLeft[], aniMurphyEatUpRight[], aniSplitUpDown[];
+extern int aniMurphyExit[];
+extern int aniSnikSnak[], aniElectron[], aniExplosion[];
+extern int aniTouchBase[], aniTouchInfotron[], aniTouchRedDisk[];
+extern int aniYellowDisk[], aniOrangeDisk[], aniRedDisk[];
+
+#else
+
+extern int *aniBug, *aniZonkRollRight, *aniZonkRollLeft;
+extern int *aniEatInfotronLeft, *aniEatInfotronRight;
+extern int *aniInfotronRollRight, *aniInfotronRollLeft;
+extern int *aniMurphyEatLeft, *aniMurphyEatRight;
+extern int *aniMurphyEatUpLeft, *aniMurphyEatUpRight, *aniSplitUpDown;
+extern int *aniMurphyExit;
+extern int *aniSnikSnak, *aniElectron, *aniExplosion;
+extern int *aniTouchBase, *aniTouchInfotron, *aniTouchRedDisk;
+extern int *aniYellowDisk, *aniOrangeDisk, *aniRedDisk;
+
+#endif
+
+
+// ----------------------------------------------------------------------------
+// input keys
+// ----------------------------------------------------------------------------
+
+#if 1
+
+#define keyNone 			(0)
+#define keyUp 				(1)
+#define keyLeft 			(2)
+#define keyDown 			(3)
+#define keyRight 			(4)
+#define keySpaceUp 			(5)
+#define keySpaceLeft 			(6)
+#define keySpaceDown 			(7)
+#define keySpaceRight 			(8)
+#define keySpace 			(9)
+
+#else
+
 #define keyDown 			(3)
 #define keyLeft 			(2)
 #define keyNone 			(0)
@@ -121,9 +250,8 @@
 #define keySpaceUp 			(5)
 #define keyUp 				(1)
 
-#define posFrameCorner 			(55)
-#define posFrameHorizontal 		(111)
-#define posFrameVertical 		(110)
+#endif
+
 
 extern int GetSI(int X, int Y);
 extern int GetStretchX(int si);
@@ -172,28 +300,6 @@ extern byte *PlayField8;
 extern char *CurPath, *OrigPath, *TmpPath;
 extern currency DeltaT;
 extern int *PlayField16;
-
-#if 1
-extern int aniBug[], aniZonkRollRight[], aniZonkRollLeft[];
-extern int aniEatInfotronLeft[], aniEatInfotronRight[];
-extern int aniInfotronRollRight[], aniInfotronRollLeft[];
-extern int aniMurphyEatLeft[], aniMurphyEatRight[];
-extern int aniMurphyEatUpLeft[], aniMurphyEatUpRight[], aniSplitUpDown[];
-extern int aniMurphyExit[];
-extern int aniSnikSnak[], aniElectron[], aniExplosion[];
-extern int aniTouchBase[], aniTouchInfotron[], aniTouchRedDisk[];
-extern int aniYellowDisk[], aniOrangeDisk[], aniRedDisk[];
-#else
-extern int *aniBug, *aniZonkRollRight, *aniZonkRollLeft;
-extern int *aniEatInfotronLeft, *aniEatInfotronRight;
-extern int *aniInfotronRollRight, *aniInfotronRollLeft;
-extern int *aniMurphyEatLeft, *aniMurphyEatRight;
-extern int *aniMurphyEatUpLeft, *aniMurphyEatUpRight, *aniSplitUpDown;
-extern int *aniMurphyExit;
-extern int *aniSnikSnak, *aniElectron, *aniExplosion;
-extern int *aniTouchBase, *aniTouchInfotron, *aniTouchRedDisk;
-extern int *aniYellowDisk, *aniOrangeDisk, *aniRedDisk;
-#endif
 
 extern int FieldHeight;
 extern int FieldMax, LevelMax;

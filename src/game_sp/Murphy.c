@@ -28,10 +28,8 @@ static boolean subMoveKillsMurphy(int si, int ax, int bl);
 // Move Murphy in any direction
 // ==========================================================================
 
-int subAnimateMurphy(int *si)
+void subAnimateMurphy(int *si)
 {
-  int subAnimateMurphy;
-
   // int ax, al, ah, bx, bl, i, X, Y;
   // int tX, tY, tDeltaX, tDeltaY, tPos, Tmp;
 #if 1
@@ -67,7 +65,8 @@ int subAnimateMurphy(int *si)
   if (al != fiMurphy)
   {
     MurphyMoveCounter = 0;             // We have no Murphy! Exit!
-    return subAnimateMurphy;
+
+    return;
   }
 
   MurphyMoveCounter = 1;             // We have a Murphy!
@@ -114,7 +113,7 @@ int subAnimateMurphy(int *si)
 #if 0
   ax = (TimerVar & 3);
   if (ax != 0)
-    return subAnimateMurphy;
+    return;
 #endif
 
   // ------------------------------------------------------------------
@@ -123,33 +122,33 @@ int subAnimateMurphy(int *si)
   YawnSleepCounter = YawnSleepCounter + 1;
 
   if (YawnSleepCounter < 16)
-    return subAnimateMurphy;
+    return;
 
   if (YawnSleepCounter < 2000)
   {
     // normal grin
     // (default: single graphic, no animation)
-    subCopyImageToScreen(*si, aniMurphy, YawnSleepCounter - 16);
+    subCopyAnimToScreen(*si, aniMurphy, YawnSleepCounter - 16);
 
-    return subAnimateMurphy;
+    return;
   }
 
   if (YawnSleepCounter < 4000)
   {
     // yawn! and look depressed afterwards...
     // (default: 12 animation frames with delay of 8)
-    subCopyImageToScreen(*si, aniMurphyYawn, YawnSleepCounter - 2000);
+    subCopyAnimToScreen(*si, aniMurphyYawn, YawnSleepCounter - 2000);
 
-    return subAnimateMurphy;
+    return;
   }
 
   if (YawnSleepCounter < 6400)
   {
     // yawn again!
     // (default: 12 animation frames with delay of 8)
-    subCopyImageToScreen(*si, aniMurphyYawn, YawnSleepCounter - 4000);
+    subCopyAnimToScreen(*si, aniMurphyYawn, YawnSleepCounter - 4000);
 
-    return subAnimateMurphy;
+    return;
   }
 
   // time1 = 6400 + 12 * 8;	// (default: 6496 == 6400 + 12 * 8)
@@ -159,16 +158,16 @@ int subAnimateMurphy(int *si)
   {
     // yawn again! - third time
     // (default: 12 animation frames with delay of 8)
-    subCopyImageToScreen(*si, aniMurphyYawn, YawnSleepCounter - 6400);
+    subCopyAnimToScreen(*si, aniMurphyYawn, YawnSleepCounter - 6400);
 
-    return subAnimateMurphy;
+    return;
   }
 
   // time2 = 6496 + 3 * 64;	// (default: 6688 == 6496 + 3 * 64)
   time2 = 6496 + 3 * 100;
 
   if (YawnSleepCounter > time2)		// Murphy already went to sleep
-    return subAnimateMurphy;
+    return;
 
   if (PlayField16[*si - 1] == 0)
   {
@@ -177,23 +176,23 @@ int subAnimateMurphy(int *si)
       // no sleep -- go back to "wait and start yawning" phase
       YawnSleepCounter = 144;
 
-      return subAnimateMurphy;
+      return;
     }
     else
     {
       // go to sleep (right side)
       // (default: 3 animation frames with delay of 64)
-      subCopyImageToScreen(*si, aniMurphySleepRight, YawnSleepCounter - time1);
+      subCopyAnimToScreen(*si, aniMurphySleepRight, YawnSleepCounter - time1);
 
-      return subAnimateMurphy;
+      return;
     }
   }
 
   // go to sleep (left side)
   // (default: 3 animation frames with delay of 64)
-  subCopyImageToScreen(*si, aniMurphySleepLeft, YawnSleepCounter - time1);
+  subCopyAnimToScreen(*si, aniMurphySleepLeft, YawnSleepCounter - time1);
 
-  return subAnimateMurphy;
+  return;
 
   // end of YAWN-SLEEP-Sequence
 
@@ -201,7 +200,7 @@ int subAnimateMurphy(int *si)
 
   ax = (TimerVar & 3);
   if (ax != 0)
-    return subAnimateMurphy;
+    return;
 
   // ------------------------------------------------------------------
   // Murphy's YAWN & SLEEP sequence, counted down by YawnSleepCounter:
@@ -209,62 +208,62 @@ int subAnimateMurphy(int *si)
   if (YawnSleepCounter == 4)
   {
     subCopyFieldToScreen(*si, fiMurphy); // normal grin
-    return subAnimateMurphy;
+    return;
   } // loc_g_5ECE:
 
   if (YawnSleepCounter <= 500) // loc_g_5ED7:
-    return subAnimateMurphy;
+    return;
 
   if (YawnSleepCounter <= 522)
   {
     bx = (YawnSleepCounter - 500) / 2;
     subCopyFieldToScreen(*si, aniMurphyYawn + bx); // yawn! and look depressed afterwards...
-    return subAnimateMurphy;
+    return;
   } // loc_g_5F00:
 
   if (YawnSleepCounter <= 1000)
-    return subAnimateMurphy;
+    return;
 
   if (YawnSleepCounter <= 1022)
   {
     bx = (YawnSleepCounter - 1000) / 2;
     subCopyFieldToScreen(*si, aniMurphyYawn + bx); // yawn again!
-    return subAnimateMurphy;
+    return;
   } // loc_g_5F32:
 
   if (YawnSleepCounter <= 1600) // loc_g_5F3B:
-    return subAnimateMurphy;
+    return;
 
   if (YawnSleepCounter <= 1622)
   {
     bx = (YawnSleepCounter - 1600) / 2;
     subCopyFieldToScreen(*si, aniMurphyYawn + bx); // yawn again! - third time
-    return subAnimateMurphy;
+    return;
   } // loc_g_5F64:
 
   if (YawnSleepCounter > 1654)
-    return subAnimateMurphy;
+    return;
 
   if (PlayField16[*si - 1] == 0)
   {
     if (PlayField16[*si + 1] == 0)
     {
       YawnSleepCounter = 36;
-      return subAnimateMurphy;
+      return;
 
     }
     else
     {
       bx = (YawnSleepCounter - 1622) / 16;
       subCopyFieldToScreen(*si, aniMurphySleepRight + bx); // go to sleep
-      return subAnimateMurphy;
+      return;
     }
   } // loc_g_5F81:
 
   bx = (YawnSleepCounter - 1622) / 16;
   subCopyFieldToScreen(*si, aniMurphySleepLeft + bx); // go to sleep
 
-  return subAnimateMurphy;
+  return;
 
   // end of YAWN-SLEEP-Sequence
 
@@ -359,7 +358,7 @@ loc_g_6003:
 
     default:
       RedDiskReleaseFlag = 0;
-      return subAnimateMurphy;
+      return;
       break;
   }
 
@@ -403,7 +402,7 @@ loc_g_6078:
   if (! subMoveKillsMurphy(*si - FieldWidth, ax, bl))
     goto loc_g_6078;
 
-  return subAnimateMurphy;
+  return;
 
   // ==========================================================================
   // moving right to left ...
@@ -452,7 +451,7 @@ loc_g_60DA:
   if (! subMoveKillsMurphy(*si - 1, ax, bl))
     goto loc_g_60DA;
 
-  return subAnimateMurphy;
+  return;
 
   // ==========================================================================
   // moving up to down ...
@@ -494,7 +493,7 @@ loc_g_6154:
   if (! subMoveKillsMurphy(*si + FieldWidth, ax, bl))
     goto loc_g_6154;
 
-  return subAnimateMurphy;
+  return;
 
   // ==========================================================================
   // moving left to right ...
@@ -543,7 +542,7 @@ loc_g_61B6:
   if (! subMoveKillsMurphy(*si + 1, ax, bl))
     goto loc_g_61B6;
 
-  return subAnimateMurphy;
+  return;
 
   // ==========================================================================
   // touching down to up ...
@@ -572,7 +571,7 @@ loc_g_622E:
   if (al == fiRedDisk)
     goto loc_g_6A48;
 
-  return subAnimateMurphy;
+  return;
 
   // ==========================================================================
   // touching right to left ...
@@ -601,7 +600,7 @@ loc_g_6258:
   if (al == fiRedDisk)
     goto loc_g_6A64;
 
-  return subAnimateMurphy;
+  return;
 
   // ==========================================================================
   // touching up to down ...
@@ -629,7 +628,7 @@ loc_g_6288:
   if (al == fiRedDisk)
     goto loc_g_6A80;
 
-  return subAnimateMurphy;
+  return;
 
   // ==========================================================================
   // touching left to right ...
@@ -658,7 +657,7 @@ loc_g_62B2:
   if (al == fiRedDisk)
     goto loc_g_6A9C;
 
-  return subAnimateMurphy;
+  return;
 
   // ==========================================================================
   // Release Red disk: no move ...
@@ -669,13 +668,13 @@ loc_g_62E2:
   ClearPos = -1;
   // end of FS
   if (LowByte(RedDiskCount) == 0)
-    return subAnimateMurphy;
+    return;
 
   if (LowByte(RedDiskReleasePhase) != 0)
-    return subAnimateMurphy;
+    return;
 
   if (LowByte(RedDiskReleaseFlag) != 1)
-    return subAnimateMurphy;
+    return;
 
   MovHighByte(&PlayField16[*si], 0x2A);
   MovingPictureSequencePhase = 0x40; // init picture move sequence
@@ -736,7 +735,8 @@ loc_g_63C2:
   if (SgnHighByte(PlayField16[*si - FieldWidth]) >= 0)
   {
     ExplodeFieldSP(*si);                 // Explode
-    return subAnimateMurphy;
+
+    return;
   }
 
   PlayField16[*si - FieldWidth] = fiBase;
@@ -760,7 +760,8 @@ loc_g_640B:
   if (SgnHighByte(PlayField16[*si - 1]) >= 0)
   {
     ExplodeFieldSP(*si);                 // Explode
-    return subAnimateMurphy;
+
+    return;
   }
 
   PlayField16[*si - 1] = fiBase;
@@ -784,7 +785,8 @@ loc_g_6448:
   if (SgnHighByte(PlayField16[*si + FieldWidth]) >= 0)
   {
     ExplodeFieldSP(*si);                 // Explode
-    return subAnimateMurphy;
+
+    return;
   }
 
   PlayField16[*si + FieldWidth] = fiBase;
@@ -808,7 +810,8 @@ loc_g_6491:
   if (SgnHighByte(PlayField16[*si + 1]) >= 0)
   {
     ExplodeFieldSP(*si);                 // Explode
-    return subAnimateMurphy;
+
+    return;
   }
 
   PlayField16[*si + 1] = fiBase;
@@ -832,7 +835,8 @@ loc_g_64CE:
   if (SgnHighByte(PlayField16[*si - FieldWidth]) >= 0)
   {
     ExplodeFieldSP(*si);                 // Explode
-    return subAnimateMurphy;
+
+    return;
   }
 
   PlayField16[*si - FieldWidth] = fiBase;
@@ -841,7 +845,7 @@ loc_g_64CE:
   // ==========================================================================
 
 loc_g_64DF:
-  subCopyFieldToScreen(*si, aniMurphyTouchUp);
+  subCopyImageToScreen(*si, aniMurphyTouchUp);
   subSoundFXBase();
   dx = aniTouchBase;
   dxPos = *si - FieldWidth;
@@ -856,7 +860,8 @@ loc_g_650C:
   if (SgnHighByte(PlayField16[*si - 1]) >= 0)
   {
     ExplodeFieldSP(*si);                 // Explode
-    return subAnimateMurphy;
+
+    return;
   }
 
   PlayField16[*si - 1] = fiBase;
@@ -865,7 +870,7 @@ loc_g_650C:
   // ==========================================================================
 
 loc_g_651D:
-  subCopyFieldToScreen(*si, aniMurphyTouchLeft);
+  subCopyImageToScreen(*si, aniMurphyTouchLeft);
   subSoundFXBase();
   dx = aniTouchBase;
   dxPos = *si - 1;
@@ -880,7 +885,8 @@ loc_g_654A:
   if (SgnHighByte(PlayField16[*si + FieldWidth]) >= 0)
   {
     ExplodeFieldSP(*si);                 // Explode
-    return subAnimateMurphy;
+
+    return;
   }
 
   PlayField16[*si + FieldWidth] = fiBase;
@@ -889,7 +895,7 @@ loc_g_654A:
   // ==========================================================================
 
 loc_g_655B:
-  subCopyFieldToScreen(*si, aniMurphyTouchDown);
+  subCopyImageToScreen(*si, aniMurphyTouchDown);
   subSoundFXBase();
   dx = aniTouchBase;
   dxPos = *si + FieldWidth;
@@ -904,7 +910,8 @@ loc_g_6588:
   if (SgnHighByte(PlayField16[*si + 1]) >= 0)
   {
     ExplodeFieldSP(*si);                 // Explode
-    return subAnimateMurphy;
+
+    return;
   }
 
   PlayField16[*si + 1] = fiBase;
@@ -913,7 +920,7 @@ loc_g_6588:
   // ==========================================================================
 
 loc_g_6599:
-  subCopyFieldToScreen(*si, aniMurphyTouchRight);
+  subCopyImageToScreen(*si, aniMurphyTouchRight);
   subSoundFXBase();
   dx = aniTouchBase;
   dxPos = *si + 1;
@@ -979,7 +986,7 @@ loc_g_6662:
   // ==========================================================================
 
 loc_g_668E:
-  subCopyFieldToScreen(*si, aniMurphyTouchUp);
+  subCopyImageToScreen(*si, aniMurphyTouchUp);
   subSoundFXInfotron();
   dx = aniTouchInfotron;
   MovHighByte(&PlayField16[*si], 0x14);
@@ -991,7 +998,7 @@ loc_g_668E:
   // ==========================================================================
 
 loc_g_66C0:
-  subCopyFieldToScreen(*si, aniMurphyTouchLeft);
+  subCopyImageToScreen(*si, aniMurphyTouchLeft);
   subSoundFXInfotron();
   dx = aniTouchInfotron;
   MovHighByte(&PlayField16[*si], 0x15);
@@ -1003,7 +1010,7 @@ loc_g_66C0:
   // ==========================================================================
 
 loc_g_66F2:
-  subCopyFieldToScreen(*si, aniMurphyTouchDown);
+  subCopyImageToScreen(*si, aniMurphyTouchDown);
   subSoundFXInfotron();
   dx = aniTouchInfotron;
   MovHighByte(&PlayField16[*si], 0x16);
@@ -1015,7 +1022,7 @@ loc_g_66F2:
   // ==========================================================================
 
 loc_g_6724:
-  subCopyFieldToScreen(*si, aniMurphyTouchRight);
+  subCopyImageToScreen(*si, aniMurphyTouchRight);
   subSoundFXInfotron();
   dx = aniTouchInfotron;
   MovHighByte(&PlayField16[*si], 0x17);
@@ -1033,7 +1040,7 @@ loc_g_6756:
   MurphyDY = 0;
   // end of FS
   if (LowByte(InfotronsNeeded) != 0)
-    return subAnimateMurphy;
+    return;
 
 #if 1
   if (!game_sp_info.LevelSolved)
@@ -1073,10 +1080,10 @@ loc_g_6756:
 loc_g_679B:
   ax = PlayField16[*si - 2];
   if (ax != 0)
-    return subAnimateMurphy;
+    return;
 
   MovHighByte(&PlayField16[*si - 2], 1);
-  subCopyFieldToScreen(*si, aniPushLeft); // draw pushing murphy
+  subCopyImageToScreen(*si, aniPushLeft); // draw pushing murphy
   dx = aniZonkRollLeft;
   dxPos = *si - 1;
   dx2 = aniPushLeft;
@@ -1091,14 +1098,14 @@ loc_g_679B:
 loc_g_67D4:
   ax = PlayField16[*si + 2];
   if (ax != 0)
-    return subAnimateMurphy;
+    return;
 
   ax = PlayField16[*si + FieldWidth + 1];
   if (ax == 0) // zonk falls
-    return subAnimateMurphy;
+    return;
 
   MovHighByte(&PlayField16[*si + 2], 1);
-  subCopyFieldToScreen(*si, aniPushRight); // draw pushing murphy
+  subCopyImageToScreen(*si, aniPushRight); // draw pushing murphy
   dx = aniZonkRollRight;
   dxPos = *si + 1;
   dx2 = aniPushRight;
@@ -1111,14 +1118,20 @@ loc_g_67D4:
   // ==========================================================================
 
 loc_g_6817:
-  subCopyFieldToScreen(*si, aniMurphyTouchUp);
+  subCopyImageToScreen(*si, aniMurphyTouchUp);
   if (YellowDisksExploded != 0)
   {
     YawnSleepCounter = 40; // stay hypnotized
-    return subAnimateMurphy;
+
+    return;
   } // loc_g_6838:
 
+#if 1
+  // draw new terminal type
+  subCopyImageToScreen(*si - FieldWidth, aniTerminalActive);
+#else
   subCopyFieldToScreen(*si - FieldWidth, 0x88); // draw new terminal type
+#endif
   TerminalState[*si - FieldWidth] = 8;
   goto loc_g_68F0;
 
@@ -1127,14 +1140,20 @@ loc_g_6817:
   // ==========================================================================
 
 loc_g_684E:
-  subCopyFieldToScreen(*si, aniMurphyTouchLeft);
+  subCopyImageToScreen(*si, aniMurphyTouchLeft);
   if (YellowDisksExploded != 0)
   {
     YawnSleepCounter = 40; // stay hypnotized
-    return subAnimateMurphy;
+
+    return;
   } // loc_g_6838:
 
+#if 1
+  // draw new terminal type
+  subCopyImageToScreen(*si - 1, aniTerminalActive);
+#else
   subCopyFieldToScreen(*si - 1, 0x88); // draw new terminal type
+#endif
   TerminalState[*si - 1] = 8;
   goto loc_g_68F0;
 
@@ -1143,14 +1162,20 @@ loc_g_684E:
   // ==========================================================================
 
 loc_g_6884:
-  subCopyFieldToScreen(*si, aniMurphyTouchDown);
+  subCopyImageToScreen(*si, aniMurphyTouchDown);
   if (YellowDisksExploded != 0)
   {
     YawnSleepCounter = 40; // stay hypnotized
-    return subAnimateMurphy;
+
+    return;
   } // loc_g_6838:
 
+#if 1
+  // draw new terminal type
+  subCopyImageToScreen(*si + FieldWidth, aniTerminalActive);
+#else
   subCopyFieldToScreen(*si + FieldWidth, 0x88); // draw new terminal type
+#endif
   TerminalState[*si + FieldWidth] = 8;
   goto loc_g_68F0;
 
@@ -1159,14 +1184,20 @@ loc_g_6884:
   // ==========================================================================
 
 loc_g_68BA:
-  subCopyFieldToScreen(*si, aniMurphyTouchRight);
+  subCopyImageToScreen(*si, aniMurphyTouchRight);
   if (YellowDisksExploded != 0)
   {
     YawnSleepCounter = 40; // stay hypnotized
-    return subAnimateMurphy;
+
+    return;
   } // loc_g_6838:
 
+#if 1
+  // draw new terminal type
+  subCopyImageToScreen(*si + 1, aniTerminalActive);
+#else
   subCopyFieldToScreen(*si + 1, 0x88); // draw new terminal type
+#endif
   TerminalState[*si + 1] = 8;
   // ==========================================================================
   // common TERMINAL stuff moving/touching from all directions
@@ -1181,7 +1212,7 @@ loc_g_68F0:
       ExplodeFieldSP (i);
   }
 
-  return subAnimateMurphy;
+  return;
 
   // ==========================================================================
   // PORT down to up, VERTICAL PORT, CROSS PORT all moving down to up
@@ -1189,7 +1220,7 @@ loc_g_68F0:
 
 loc_g_6916:
   if (PlayField16[*si - 2 * FieldWidth] != 0)
-    return subAnimateMurphy;
+    return;
 
   dx = aniSplitUpDown;
   dx2Step = -FieldWidth;
@@ -1203,7 +1234,7 @@ loc_g_6916:
 
 loc_g_693A:
   if (PlayField16[*si - 2] != 0)
-    return subAnimateMurphy;
+    return;
 
   dx = aniMurphyEatLeft;
   dx2Step = -1;
@@ -1217,7 +1248,7 @@ loc_g_693A:
 
 loc_g_695E:
   if (PlayField16[*si + 2 * FieldWidth] != 0)
-    return subAnimateMurphy;
+    return;
 
   dx = aniSplitUpDown;
   dx2Step = FieldWidth;
@@ -1231,7 +1262,7 @@ loc_g_695E:
 
 loc_g_6982:
   if (PlayField16[*si + 2] != 0)
-    return subAnimateMurphy;
+    return;
 
   dx = aniMurphyEatRight;
   dx2Step = 1;
@@ -1358,10 +1389,10 @@ loc_StopNoSplit:
 
 loc_g_6AB8:
   if (PlayField16[*si - 2 * FieldWidth] != 0)
-    return subAnimateMurphy;
+    return;
 
   PlayField16[*si - 2 * FieldWidth] = 0x1200;
-  subCopyFieldToScreen(*si, aniPushRight);
+  subCopyImageToScreen(*si, aniPushRight);
   dx = aniYellowDisk;
   dxPos = *si - FieldWidth;
   dx2 = aniPushUpDown;
@@ -1375,10 +1406,10 @@ loc_g_6AB8:
 
 loc_g_6AF1:
   if (PlayField16[*si - 2] != 0)
-    return subAnimateMurphy;
+    return;
 
   PlayField16[*si - 2] = 0x1200;
-  subCopyFieldToScreen(*si, aniPushLeft);
+  subCopyImageToScreen(*si, aniPushLeft);
   dx = aniYellowDisk;
   dxPos = *si - 1;
   dx2 = aniPushLeft;
@@ -1392,10 +1423,10 @@ loc_g_6AF1:
 
 loc_g_6B2A:
   if (PlayField16[*si + 2 * FieldWidth] != 0)
-    return subAnimateMurphy;
+    return;
 
   PlayField16[*si + 2 * FieldWidth] = 0x1200;
-  subCopyFieldToScreen(*si, aniPushRight);
+  subCopyImageToScreen(*si, aniPushRight);
   dx = aniYellowDisk;
   dxPos = *si + FieldWidth;
   dx2 = aniPushUpDown;
@@ -1409,10 +1440,10 @@ loc_g_6B2A:
 
 loc_g_6B63:
   if (PlayField16[*si + 2] != 0)
-    return subAnimateMurphy;
+    return;
 
   PlayField16[*si + 2] = 0x1200;
-  subCopyFieldToScreen(*si, aniPushRight);
+  subCopyImageToScreen(*si, aniPushRight);
   dx = aniYellowDisk;
   dxPos = *si + 1;
   dx2 = aniPushRight;
@@ -1426,10 +1457,10 @@ loc_g_6B63:
 
 loc_g_6B9B:
   if (PlayField16[*si - 2] != 0)
-    return subAnimateMurphy;
+    return;
 
   PlayField16[*si - 2] = 0x800;
-  subCopyFieldToScreen(*si, aniPushLeft);
+  subCopyImageToScreen(*si, aniPushLeft);
   dx = aniOrangeDisk;
   dxPos = *si - 1;
   dx2 = aniPushLeft;
@@ -1443,13 +1474,13 @@ loc_g_6B9B:
 
 loc_g_6BD3:
   if (PlayField16[*si + 2] != 0)
-    return subAnimateMurphy;
+    return;
 
   if (PlayField16[*si + FieldWidth + 1] == 0) // falling goes before pushing
-    return subAnimateMurphy;
+    return;
 
   PlayField16[*si + 2] = 0x100;
-  subCopyFieldToScreen(*si, aniPushRight);
+  subCopyImageToScreen(*si, aniPushRight);
   dx = aniOrangeDisk;
   dxPos = *si + 1;
   dx2 = aniPushRight;
@@ -1512,7 +1543,7 @@ locProceedMovingMurphy: // proceed moving murphy
   if (bl == 0x2A)       // Red disk release timer
     goto loc_g_716E;
 
-  return subAnimateMurphy;
+  return;
 
   // ==========================================================================
   // Paint frame of MOVING.DAT sequence
@@ -1558,7 +1589,7 @@ loc_g_6C8F:
 
 #if 1
     if (!(ClearPos < 0)) // clear field that murphy is leaving
-      subCopyFieldToScreen(ClearPos, 0);
+      subCopyImageToScreen(ClearPos, aniSpace);
 #else
     if (! ClearPos < 0) // clear field that murphy is leaving
       subCopyFieldToScreen(ClearPos, 0);
@@ -1600,7 +1631,12 @@ loc_g_6C8F:
       }
       else // pushing something
       {
+#if 1
+	// (SeqPos iterates from 0 to 7 while pushing)
+        StretchedSprites.BltImg(X + tDeltaX, Y + tDeltaY, dx2, SeqPos);
+#else
         StretchedSprites.BltEx(X + tDeltaX, Y + tDeltaY, dx2);
+#endif
       }
     }
 
@@ -1618,7 +1654,7 @@ loc_g_6C8F:
     MurphyScreenXPos = MurphyScreenXPos + 2 * MurphyDX;
     MurphyScreenYPos = MurphyScreenYPos + 2 * MurphyDY;
 #endif
-    subCopyFieldToScreen(ClearPos, 0); // clear the field that murphy leaves
+    subCopyImageToScreen(ClearPos, aniSpace); // clear the field that murphy leaves
     tDeltaX = MurphyDX * LocalStretch * (SeqPos + 1);
     tDeltaY = MurphyDY * LocalStretch * (SeqPos + 1);
     X = GetStretchX(dxPos) + tDeltaX;
@@ -1635,7 +1671,7 @@ loc_g_6C8F:
 
   SeqPos = SeqPos + 1;
   if (dx[SeqPos] > -1)
-    return subAnimateMurphy;
+    return;
 
   // Follow-up after movement completed     'loc_g_6D35:
   MurphyXPos = MurphyXPos + MurphyDX;
@@ -1770,7 +1806,8 @@ loc_g_6C8F:
     goto loc_g_747F;
 
   ExitToMenuFlag = 1;
-  return subAnimateMurphy;
+
+  return;
 
   // ==========================================================================
   //                       infotron, moving up
@@ -1784,7 +1821,8 @@ loc_g_6EBA:
 loc_g_6EC8: // space, base
   PlayField16[*si] = fiMurphy;
   subAdjustZonksInfotronsAboveMurphy(*si + FieldWidth);
-  return subAnimateMurphy;
+
+  return;
 
   // ==========================================================================
   //                       infotron, moving left
@@ -1798,7 +1836,8 @@ loc_g_6ED8:
 loc_g_6EE6: // space, base
   PlayField16[*si] = fiMurphy;
   subAdjustZonksInfotronsAboveMurphy(*si + 1);
-  return subAnimateMurphy;
+
+  return;
 
   // ==========================================================================
   //                       infotron, moving down
@@ -1814,7 +1853,8 @@ loc_g_6F04: // space, base
     PlayField16[*si - FieldWidth] = 0;
 
   PlayField16[*si] = fiMurphy;
-  return subAnimateMurphy;
+
+  return;
 
   // ==========================================================================
   //                       infotron, moving right
@@ -1828,7 +1868,8 @@ loc_g_71B6:
 loc_g_71C4: // space, base
   subAdjustZonksInfotronsAboveMurphy(*si - 1);
   PlayField16[*si] = fiMurphy;
-  return subAnimateMurphy;
+
+  return;
 
   // ==========================================================================
   //                       infotron, touching up
@@ -1843,7 +1884,7 @@ loc_g_71E2: // base
   if (LowByte(PlayField16[*si - FieldWidth]) != fiExplosion)
     PlayField16[*si - FieldWidth] = 0;
 
-  return subAnimateMurphy;
+  return;
 
   // ==========================================================================
   //                       infotron, touching left
@@ -1858,7 +1899,7 @@ loc_g_71FE: // base
   if (LowByte(PlayField16[*si - 1]) != fiExplosion)
     PlayField16[*si - 1] = 0;
 
-  return subAnimateMurphy;
+  return;
 
   // ==========================================================================
   //                       infotron, touching down
@@ -1873,7 +1914,7 @@ loc_g_721A: // base
   if (LowByte(PlayField16[*si + FieldWidth]) != fiExplosion)
     PlayField16[*si + FieldWidth] = 0;
 
-  return subAnimateMurphy;
+  return;
 
   // ==========================================================================
   //                       infotron, touching right
@@ -1888,7 +1929,7 @@ loc_g_7236: // base
   if (LowByte(PlayField16[*si + 1]) != fiExplosion)
     PlayField16[*si + 1] = 0;
 
-  return subAnimateMurphy;
+  return;
 
   // ==========================================================================
   //                       zonk, pushing left
@@ -1902,7 +1943,8 @@ loc_g_6F18:
   PlayField16[*si - 2] = fiZonk;
   subExplodeSnikSnaksBelow(*si - 2);
   *si = *si - 1;
-  return subAnimateMurphy;
+
+  return;
 
   // ==========================================================================
   //                       zonk, pushing right
@@ -1916,7 +1958,8 @@ loc_g_6F3B:
   PlayField16[*si + 2] = fiZonk;
   subExplodeSnikSnaksBelow(*si + 2);
   *si = *si + 1;
-  return subAnimateMurphy;
+
+  return;
 
   // ==========================================================================
   //                       exit
@@ -1929,7 +1972,7 @@ loc_g_6F77:
   PlayField16[*si] = fiSpace;	// remove Murphy from playfield after exiting
 #endif
 
-  return subAnimateMurphy;
+  return;
 
   // ==========================================================================
   //               Push Zonk from right to left
@@ -1937,15 +1980,16 @@ loc_g_6F77:
 
 loc_g_6F7E:
   if (DemoKeyCode == keyLeft && PlayField16[*si - 1] == fiZonk)
-    return subAnimateMurphy;
+    return;
 
   PlayField16[*si] = fiMurphy; // else restore - no more zonk pushing!
   PlayField16[*si - 1] = fiZonk;
   if (LowByte(PlayField16[*si - 2]) != fiExplosion)
     PlayField16[*si - 2] = 0;
 
-  subCopyFieldToScreen(*si, fiMurphy);
-  return subAnimateMurphy;
+  subCopyImageToScreen(*si, aniMurphy);
+
+  return;
 
   // ==========================================================================
   //                       Push Zonk from left to right
@@ -1953,15 +1997,16 @@ loc_g_6F7E:
 
 loc_g_6FBC:
   if (DemoKeyCode == keyRight && PlayField16[*si + 1] == fiZonk)
-    return subAnimateMurphy;
+    return;
 
   PlayField16[*si] = fiMurphy; // else restore - no more zonk pushing!
   PlayField16[*si + 1] = fiZonk;
   if (LowByte(PlayField16[*si + 2]) != fiExplosion)
     PlayField16[*si + 2] = 0;
 
-  subCopyFieldToScreen(*si, fiMurphy);
-  return subAnimateMurphy;
+  subCopyImageToScreen(*si, aniMurphy);
+
+  return;
 
   // ==========================================================================
   //               Push orange disk from right to left
@@ -1969,15 +2014,16 @@ loc_g_6FBC:
 
 loc_g_6FFA:
   if (DemoKeyCode == keyLeft && PlayField16[*si - 1] == fiOrangeDisk)
-    return subAnimateMurphy;
+    return;
 
   PlayField16[*si] = fiMurphy; // else restore - no more pushing!
   PlayField16[*si - 1] = fiOrangeDisk;
   if (LowByte(PlayField16[*si - 2]) != fiExplosion)
     PlayField16[*si - 2] = 0;
 
-  subCopyFieldToScreen(*si, fiMurphy);
-  return subAnimateMurphy;
+  subCopyImageToScreen(*si, aniMurphy);
+
+  return;
 
   // ==========================================================================
   //               Push orange disk from left to right
@@ -1985,15 +2031,16 @@ loc_g_6FFA:
 
 loc_g_7038:
   if (DemoKeyCode == keyRight && PlayField16[*si + 1] == fiOrangeDisk)
-    return subAnimateMurphy;
+    return;
 
   PlayField16[*si] = fiMurphy; // else restore - no more pushing!
   PlayField16[*si + 1] = fiOrangeDisk;
   if (LowByte(PlayField16[*si + 2]) != fiExplosion)
     PlayField16[*si + 2] = 0;
 
-  subCopyFieldToScreen(*si, fiMurphy);
-  return subAnimateMurphy;
+  subCopyImageToScreen(*si, aniMurphy);
+
+  return;
 
   // ==========================================================================
   //               Push yellow disk from down to up
@@ -2001,15 +2048,16 @@ loc_g_7038:
 
 loc_g_7076:
   if (DemoKeyCode == keyUp && PlayField16[*si - FieldWidth] == fiYellowDisk)
-    return subAnimateMurphy;
+    return;
 
   PlayField16[*si] = fiMurphy; // else restore - no more pushing!
   PlayField16[*si - FieldWidth] = fiYellowDisk;
   if (LowByte(PlayField16[*si - 2 * FieldWidth]) != fiExplosion)
     PlayField16[*si - 2 * FieldWidth] = 0;
 
-  subCopyFieldToScreen(*si, fiMurphy);
-  return subAnimateMurphy;
+  subCopyImageToScreen(*si, aniMurphy);
+
+  return;
 
   // ==========================================================================
   //               Push yellow disk from right to left
@@ -2017,15 +2065,16 @@ loc_g_7076:
 
 loc_g_70B4:
   if (DemoKeyCode == keyLeft && PlayField16[*si - 1] == fiYellowDisk)
-    return subAnimateMurphy;
+    return;
 
   PlayField16[*si] = fiMurphy; // else restore - no more pushing!
   PlayField16[*si - 1] = fiYellowDisk;
   if (LowByte(PlayField16[*si - 2]) != fiExplosion)
     PlayField16[*si - 2] = 0;
 
-  subCopyFieldToScreen(*si, fiMurphy);
-  return subAnimateMurphy;
+  subCopyImageToScreen(*si, aniMurphy);
+
+  return;
 
   // ==========================================================================
   //               Push yellow disk from up to down
@@ -2033,15 +2082,16 @@ loc_g_70B4:
 
 loc_g_70F2:
   if (DemoKeyCode == keyDown && PlayField16[*si + FieldWidth] == fiYellowDisk)
-    return subAnimateMurphy;
+    return;
 
   PlayField16[*si] = fiMurphy; // else restore - no more pushing!
   PlayField16[*si + FieldWidth] = fiYellowDisk;
   if (LowByte(PlayField16[*si + 2 * FieldWidth]) != fiExplosion)
     PlayField16[*si + 2 * FieldWidth] = 0;
 
-  subCopyFieldToScreen(*si, fiMurphy);
-  return subAnimateMurphy;
+  subCopyImageToScreen(*si, aniMurphy);
+
+  return;
 
   // ==========================================================================
   //               Push yellow disk from left to right
@@ -2049,15 +2099,16 @@ loc_g_70F2:
 
 loc_g_7130:
   if (DemoKeyCode == keyRight && PlayField16[*si + 1] == fiYellowDisk)
-    return subAnimateMurphy;
+    return;
 
   PlayField16[*si] = fiMurphy; // else restore - no more pushing!
   PlayField16[*si + 1] = fiYellowDisk;
   if (LowByte(PlayField16[*si + 2]) != fiExplosion)
     PlayField16[*si + 2] = 0;
 
-  subCopyFieldToScreen(*si, fiMurphy);
-  return subAnimateMurphy;
+  subCopyImageToScreen(*si, aniMurphy);
+
+  return;
 
   // ==========================================================================
   //               time red disk release (space)
@@ -2067,16 +2118,21 @@ loc_g_716E:
   if (DemoKeyCode != keySpace)
   {
     PlayField16[*si] = fiMurphy;
-    subCopyFieldToScreen(*si, fiMurphy);
+    subCopyImageToScreen(*si, aniMurphy);
     RedDiskReleasePhase = 0;
   }
   else if (MovingPictureSequencePhase == 0x20)
   {
+#if 1
+    // anxious murphy, dropping red disk
+    subCopyImageToScreen(*si, aniMurphyDropping);
+#else
     subCopyFieldToScreen(*si, 43);  // anxious murphy
+#endif
     RedDiskReleasePhase = 1;
   }
 
-  return subAnimateMurphy;
+  return;
 
   // ==========================================================================
   // Special port down to up
@@ -2093,7 +2149,8 @@ loc_g_7244:
     subSpPortTest(*si);
 
   *si = *si - FieldWidth;
-  return subAnimateMurphy;
+
+  return;
 
   // ==========================================================================
   // Special port right to left
@@ -2110,7 +2167,8 @@ loc_g_7272:
     subSpPortTest(*si);
 
   *si = *si - 1;
-  return subAnimateMurphy;
+
+  return;
 
   // ==========================================================================
   // Special port up to down
@@ -2127,7 +2185,8 @@ loc_g_729F:
     subSpPortTest(*si);
 
   *si = *si + FieldWidth;
-  return subAnimateMurphy;
+
+  return;
 
   // ==========================================================================
   // Special port left to right
@@ -2144,7 +2203,8 @@ loc_g_72CD:
     subSpPortTest(*si);
 
   *si = *si + 1;
-  return subAnimateMurphy;
+
+  return;
 
   // ==========================================================================
   // Move Red Disk up
@@ -2157,7 +2217,8 @@ loc_g_72FA:
   *si = *si - FieldWidth;
   PlayField16[*si] = fiMurphy;
   subEatRedDisk(*si); // inc+show Murphy's red disks
-  return subAnimateMurphy;
+
+  return;
 
   // ==========================================================================
   // Move Red Disk left
@@ -2169,7 +2230,8 @@ loc_g_7318:
 
   PlayField16[*si] = fiMurphy;
   subEatRedDisk(*si); // inc+show Murphy's red disks
-  return subAnimateMurphy;
+
+  return;
 
   // ==========================================================================
   // Move Red Disk down
@@ -2182,7 +2244,8 @@ loc_g_7333:
   *si = *si + FieldWidth;
   PlayField16[*si] = fiMurphy;
   subEatRedDisk(*si); // inc+show Murphy's red disks
-  return subAnimateMurphy;
+
+  return;
 
   // ==========================================================================
   // Move Red Disk right
@@ -2194,7 +2257,8 @@ loc_g_7351:
 
   PlayField16[*si] = fiMurphy;
   subEatRedDisk(*si); // inc+show Murphy's red disks
-  return subAnimateMurphy;
+
+  return;
 
   // ==========================================================================
   // Eat Red Disk up
@@ -2205,7 +2269,8 @@ loc_g_736C:
     PlayField16[*si - FieldWidth] = 0;
 
   subEatRedDisk(*si - FieldWidth); // inc+show Murphy's red disks
-  return subAnimateMurphy;
+
+  return;
 
   // ==========================================================================
   // Eat Red Disk left
@@ -2216,7 +2281,8 @@ loc_g_7381:
     PlayField16[*si - 1] = 0;
 
   subEatRedDisk(*si - 1); // inc+show Murphy's red disks
-  return subAnimateMurphy;
+
+  return;
 
   // ==========================================================================
   // Eat Red Disk down
@@ -2227,7 +2293,8 @@ loc_g_7396:
     PlayField16[*si + FieldWidth] = 0;
 
   subEatRedDisk(*si + FieldWidth); // inc+show Murphy's red disks
-  return subAnimateMurphy;
+
+  return;
 
   // ==========================================================================
   // Eat Red Disk right
@@ -2238,7 +2305,8 @@ loc_g_73AB:
     PlayField16[*si + 1] = 0;
 
   subEatRedDisk(*si + 1); // inc+show Murphy's red disks
-  return subAnimateMurphy;
+
+  return;
 
   // ==========================================================================
   //                       yellow disk, pushing up
@@ -2251,7 +2319,8 @@ loc_g_73C0:
   *si = *si - FieldWidth;
   PlayField16[*si] = fiMurphy;
   PlayField16[*si - FieldWidth] = fiYellowDisk;
-  return subAnimateMurphy;
+
+  return;
 
   // ==========================================================================
   //                       yellow disk, pushing left
@@ -2264,7 +2333,8 @@ loc_g_73DD:
   *si = *si - 1;
   PlayField16[*si] = fiMurphy;
   PlayField16[*si - 1] = fiYellowDisk;
-  return subAnimateMurphy;
+
+  return;
 
   // ==========================================================================
   //                       yellow disk, pushing down
@@ -2277,7 +2347,8 @@ loc_g_73FA:
   *si = *si + FieldWidth;
   PlayField16[*si] = fiMurphy;
   PlayField16[*si + FieldWidth] = fiYellowDisk;
-  return subAnimateMurphy;
+
+  return;
 
   // ==========================================================================
   //                       yellow disk pushing right
@@ -2290,7 +2361,8 @@ loc_g_7417:
   *si = *si + 1;
   PlayField16[*si] = fiMurphy;
   PlayField16[*si + 1] = fiYellowDisk;
-  return subAnimateMurphy;
+
+  return;
 
   // ==========================================================================
   //                       orange disk, pushing left
@@ -2303,7 +2375,8 @@ loc_g_7434:
   *si = *si - 1;
   PlayField16[*si] = fiMurphy;
   PlayField16[*si - 1] = fiOrangeDisk;
-  return subAnimateMurphy;
+
+  return;
 
   // ==========================================================================
   //                       orange disk, pushing right
@@ -2322,7 +2395,7 @@ loc_g_7451:
     MovHighByte(&PlayField16[*si + FieldWidth + 1], fiOrangeDisk);
   }
 
-  return subAnimateMurphy;
+  return;
 
   // ==========================================================================
   //                     Release a red disk
@@ -2334,24 +2407,18 @@ loc_g_747F:
   RedDiskCount = RedDiskCount - 1;
   subDisplayRedDiskCount();
   subSoundFXPush();                 // Sound effects
-
-  return subAnimateMurphy;
 } // subAnimateMurphy
 
 // ==========================================================================
 //                              SUBROUTINE
 // ==========================================================================
-int subExplodeSnikSnaksBelow(int si)
+void subExplodeSnikSnaksBelow(int si)
 {
-  int subExplodeSnikSnaksBelow;
-
   int ax;
 
   ax = LowByte(PlayField16[si + FieldWidth]);
   if (ax == 0x11 || ax == 0xBB)
     ExplodeFieldSP(si + FieldWidth);
-
-  return subExplodeSnikSnaksBelow;
 } // subExplodeSnikSnaksBelow
 
 // ==========================================================================
@@ -2502,7 +2569,7 @@ void subCopyFieldToScreen(int si, int fi)
   // +++++++++++++++++++++++++++++++++++++++++
 }
 
-void subCopyImageToScreen(int si, int graphic, int sync_frame)
+void subCopyAnimToScreen(int si, int graphic, int sync_frame)
 {
   int X, Y;
 
@@ -2511,6 +2578,11 @@ void subCopyImageToScreen(int si, int graphic, int sync_frame)
   Y = GetStretchY(si);
   StretchedSprites.BltImg(X, Y, graphic, sync_frame);
   // +++++++++++++++++++++++++++++++++++++++++
+}
+
+void subCopyImageToScreen(int si, int graphic)
+{
+  subCopyAnimToScreen(si, graphic, 0);
 }
 
 static void subEatRedDisk(int si)
@@ -2528,10 +2600,8 @@ static void subEatRedDisk(int si)
   subDisplayRedDiskCount();
 }
 
-int subAdjustZonksInfotronsAboveMurphy(int si)
+void subAdjustZonksInfotronsAboveMurphy(int si)
 {
-  int subAdjustZonksInfotronsAboveMurphy;
-
   int ax;
 
   if (LowByte(PlayField16[si]) != fiExplosion)
@@ -2546,7 +2616,7 @@ int subAdjustZonksInfotronsAboveMurphy(int si)
     MovHighByte(&PlayField16[si - FieldWidth], 0x40); // make falling straigt down
   }
 
-  return subAdjustZonksInfotronsAboveMurphy;
+  return;
 
 loc_g_15A8: // empty above
   ax = PlayField16[si - FieldWidth - 1];
@@ -2558,7 +2628,7 @@ loc_g_15B6:
   if (ax == fiZonk || ax == fiInfotron)
     goto loc_g_15E8;
 
-  return subAdjustZonksInfotronsAboveMurphy;
+  return;
 
 loc_g_15C5: // zonk/infotron above left
   ax = PlayField16[si - 1];
@@ -2567,7 +2637,8 @@ loc_g_15C5: // zonk/infotron above left
 
   MovHighByte(&PlayField16[si - FieldWidth - 1], 0x60); // make roll right
   PlayField16[si - FieldWidth] = 0x8888;
-  return subAdjustZonksInfotronsAboveMurphy;
+
+  return;
 
 loc_g_15E8: // zonk/infotron above right
   ax = PlayField16[si + 1];
@@ -2576,6 +2647,4 @@ loc_g_15E8: // zonk/infotron above right
     MovHighByte(&PlayField16[si - FieldWidth + 1], 0x50); // make roll left
     PlayField16[si - FieldWidth] = 0x8888;
   }
-
-  return subAdjustZonksInfotronsAboveMurphy;
 } // subAdjustZonksInfotronsAboveMurphy
