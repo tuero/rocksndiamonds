@@ -28,16 +28,33 @@ int subAnimateBugs(int si)
 
   // int ax, bx, cx, dx, di;
   // int ah, bh, ch, dh, al, bl, cl, dl;
-  int cx;
+  // int cx;
+  int graphic, sync_frame;
   int bl;
 
   if (fiBug != LowByte(PlayField16[si]))
     return subAnimateBugs;
 
+#if 0
   if (0 != (TimerVar & 3))
     return subAnimateBugs;
+#endif
 
   bl = SgnHighByte(PlayField16[si]); // get and increment sequence#
+
+#if 1
+  if ((TimerVar & 3) == 0)
+  {
+    bl = bl + 1;
+    if (bl >= 0xE)
+    {
+      bl = subGetRandomNumber(); // generate new random number
+      bl = -((bl & 0x3F) + 0x20);
+    }
+
+    MovHighByte(&PlayField16[si], bl); // save sequence#
+  }
+#else
   bl = bl + 1;
   if (bl >= 0xE)
   {
@@ -46,8 +63,14 @@ int subAnimateBugs(int si)
   }
 
   MovHighByte(&PlayField16[si], bl); // save sequence#
+#endif
   if (bl < 0) // bug sleeps / is inactive
     return subAnimateBugs;
+
+#if 1
+  if ((TimerVar & 3) != 0)
+    goto markDisplay;
+#endif
 
   // now the bug is active! Beware Murphy!
   if ((ByteMask && PlayField16[si - FieldWidth - 1]) == fiMurphy)
@@ -81,8 +104,32 @@ markPlaySound:
 
 markDisplay:
   // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#if 1
+
+#if 1
+
+  graphic = (bl == 0  ? aniBugActivating :
+	     bl == 12 ? aniBugDeactivating :
+	     bl == 13 ? aniBug : aniBugActive);
+  sync_frame = (bl >= 1 && bl <= 11 ? (bl - 1) * 4 : 0) + (TimerVar & 3);
+
+  // printf("::: %d [%d]\n", sync_frame, gfx.anim_random_frame);
+
+  /* a general random frame treatment would be needed for _all_ animations */
+  if (isRandomAnimation_SP(graphic) &&
+      !isNextAnimationFrame_SP(graphic, sync_frame))
+    return subAnimateBugs;
+
+  subCopyAnimToScreen(si, graphic, sync_frame);
+
+#else
+  subCopyFieldToScreen(si, aniFramesBug[bl]);
+#endif
+
+#else
   cx = aniFramesBug[bl];
   StretchedSprites.BltEx(GetStretchX(si), GetStretchY(si), cx);
+#endif
   // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
   return subAnimateBugs;

@@ -785,7 +785,8 @@ struct ConfigInfo image_config[] =
   { "sp_buggy_base.active.xpos",		"8"			},
   { "sp_buggy_base.active.ypos",		"6"			},
   { "sp_buggy_base.active.frames",		"4"			},
-  { "sp_buggy_base.active.anim_mode",		"random"		},
+  { "sp_buggy_base.active.delay",		"4"			},
+  { "sp_buggy_base.active.anim_mode",		"pingpong"		},
 
   { "sp_hardware_base_1",			"RocksSP.pcx"		},
   { "sp_hardware_base_1.xpos",			"4"			},

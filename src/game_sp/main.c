@@ -13,6 +13,8 @@ void InitGameEngine_SP()
 {
   int x, y;
 
+  gfx.anim_random_frame = -1;	// (use simple, ad-hoc random numbers)
+
   game_sp_info.LevelSolved = FALSE;
   game_sp_info.GameOver = FALSE;
 

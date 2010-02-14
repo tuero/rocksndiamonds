@@ -48,6 +48,8 @@ extern void SetBitmaps_SP(Bitmap **);
 
 void getGraphicSource_SP(struct GraphicInfo_SP *, int, int, int, int);
 int getGraphicInfo_Delay(int);
+boolean isRandomAnimation_SP(int);
+boolean isNextAnimationFrame_SP(int, int);
 
 
 #endif	/* ENGINES_H */

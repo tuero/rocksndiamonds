@@ -7738,15 +7738,19 @@ void InitGraphicInfo_EM(void)
 void getGraphicSource_SP(struct GraphicInfo_SP *g_sp,
 			 int graphic, int sync_frame, int x, int y)
 {
-#if 0
-  /* currently we get the actual graphic animation frame */
-  int frame = sync_frame;
-#else
-  /* (future implementations may provide a synchronization frame instead) */
   int frame = getGraphicAnimationFrame(graphic, sync_frame);
-#endif
 
   getGraphicSource(graphic, frame, &g_sp->bitmap, &g_sp->src_x, &g_sp->src_y);
+}
+
+boolean isRandomAnimation_SP(int graphic)
+{
+  return (ANIM_MODE(graphic) == ANIM_RANDOM);
+}
+
+boolean isNextAnimationFrame_SP(int graphic, int sync_frame)
+{
+  return (IS_NEXT_FRAME(sync_frame, graphic));
 }
 
 int getGraphicInfo_Delay(int graphic)

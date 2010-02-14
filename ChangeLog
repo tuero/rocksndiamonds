@@ -1,5 +1,6 @@
 2010-02-14
 	* done integrating R'n'D graphics engine into file "Murphy.c"
+	* done integrating R'n'D graphics engine into file "BugsTerminals.c"
 
 2010-02-07
 	* started integrating R'n'D graphics engine into Supaplex game engine

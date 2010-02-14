@@ -135,9 +135,58 @@
 
 #if 1
 
-#define aniSpace 			IMG_EMPTY_SPACE
+// graphics and animations directly related to file elements
 
+#define aniSpace 			IMG_EMPTY_SPACE
+#define aniZonk 			IMG_SP_ZONK
+#define aniBase 			IMG_SP_BASE
 #define aniMurphy 			IMG_SP_MURPHY
+#define aniInfotron 			IMG_SP_INFOTRON
+#define aniRAM 				IMG_SP_CHIP_SINGLE
+#define aniHardWare 			IMG_SP_HARDWARE_GRAY
+#define aniExit 			IMG_SP_EXIT_CLOSED
+#define aniOrangeDisk 			IMG_SP_DISK_ORANGE
+#define aniPortRight 			IMG_SP_PORT_RIGHT
+#define aniPortDown 			IMG_SP_PORT_DOWN
+#define aniPortLeft 			IMG_SP_PORT_LEFT
+#define aniPortUp 			IMG_SP_PORT_UP
+#define aniSpPortRight 			IMG_SP_GRAVITY_PORT_RIGHT
+#define aniSpPortDown 			IMG_SP_GRAVITY_PORT_DOWN
+#define aniSpPortLeft 			IMG_SP_GRAVITY_PORT_LEFT
+#define aniSpPortUp 			IMG_SP_GRAVITY_PORT_UP
+#define aniSnikSnak 			IMG_SP_SNIKSNAK
+#define aniYellowDisk 			IMG_SP_DISK_YELLOW
+#define aniTerminal 			IMG_SP_TERMINAL
+#define aniRedDisk 			IMG_SP_DISK_RED
+#define aniPortUpAndDown 		IMG_SP_PORT_VERTICAL
+#define aniPortLeftAndRight 		IMG_SP_PORT_HORIZONTAL
+#define aniPortAllDirections 		IMG_SP_PORT_ANY
+#define aniElectron 			IMG_SP_ELECTRON
+#define aniBug 				IMG_SP_BUGGY_BASE
+#define aniRAMLeft 			IMG_SP_CHIP_LEFT
+#define aniRAMRight 			IMG_SP_CHIP_RIGHT
+#define aniHWFirst 			IMG_SP_HARDWARE_BASE_1
+#define aniHW0				IMG_SP_HARDWARE_BASE_1
+#define aniHW1				IMG_SP_HARDWARE_GREEN
+#define aniHW2				IMG_SP_HARDWARE_BLUE
+#define aniHW3				IMG_SP_HARDWARE_RED
+#define aniHW4				IMG_SP_HARDWARE_YELLOW
+#define aniHW5				IMG_SP_HARDWARE_BASE_2
+#define aniHW6				IMG_SP_HARDWARE_BASE_3
+#define aniHW7				IMG_SP_HARDWARE_BASE_4
+#define aniHW8				IMG_SP_HARDWARE_BASE_5
+#define aniHW9				IMG_SP_HARDWARE_BASE_6
+#define aniHWLast 			IMG_SP_HARDWARE_BASE_6
+#define aniRAMTop 			IMG_SP_CHIP_TOP
+#define aniRAMBottom 			IMG_SP_CHIP_BOTTOM
+#define aniWallSpace 			IMG_INVISIBLE_WALL
+#define aniHWTrash1 			
+#define aniHWTrash2 			
+#define aniHWMurphy 			
+
+
+// graphics and animations related to in-game animations for element actions
+
 #define aniMurphyDropping		IMG_SP_MURPHY_DROPPING
 
 #define aniMurphySleepLeft 		IMG_SP_MURPHY_SLEEPING_LEFT
@@ -151,7 +200,8 @@
 #define aniPushRight 			IMG_SP_MURPHY_PUSHING_RIGHT
 #define aniPushUpDown 			IMG_SP_MURPHY_PUSHING_RIGHT
 
-#define aniBug				IMG_SP_BUGGY_BASE
+#define aniBugActivating		IMG_SP_BUGGY_BASE_ACTIVATING
+#define aniBugDeactivating		IMG_SP_BUGGY_BASE_ACTIVATING
 #define aniBugActive			IMG_SP_BUGGY_BASE_ACTIVE
 #define aniZonkRollLeft			IMG_SP_ZONK_MOVING_LEFT
 #define aniZonkRollRight		IMG_SP_ZONK_MOVING_RIGHT
@@ -187,7 +237,6 @@
 #define aniSnikSnakRight 		247
 #define aniSnikSnakUp 			159
 
-#define aniTerminal			IMG_SP_TERMINAL
 #define aniTerminalActive		IMG_SP_TERMINAL_ACTIVE
 
 #define aniExplosionInfo 		(111)
