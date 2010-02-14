@@ -38,7 +38,7 @@ int subAnimateExplosion(int si)
   // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   X = GetStretchX(si);
   Y = GetStretchY(si);
-  StretchedSprites.BltEx(X, Y, aniExplosion[bl]);
+  StretchedSprites.BltEx(X, Y, aniFramesExplosion[bl]);
   // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   if (bl == 8)
   {

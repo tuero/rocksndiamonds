@@ -133,7 +133,7 @@ static int subSnikSnakTurnLeft(int si, int bx)
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
   X = GetStretchX(si);
   Y = GetStretchY(si);
-  StretchedSprites.BltEx(X, Y, aniSnikSnak[bx]);
+  StretchedSprites.BltEx(X, Y, aniFramesSnikSnak[bx]);
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
   bx = (bx + 1) & 0x7;
   MovHighByte(&PlayField16[si], bx);
@@ -257,7 +257,7 @@ static int subSnikSnakTurnRight(int si, int bx)
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
   X = GetStretchX(si);
   Y = GetStretchY(si);
-  StretchedSprites.BltEx(X, Y, aniSnikSnak[0x10 - bx]);
+  StretchedSprites.BltEx(X, Y, aniFramesSnikSnak[0x10 - bx]);
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
   bx = ((bx + 1) & 0x7) | 8;
   MovHighByte(&PlayField16[si], bx);
@@ -620,7 +620,7 @@ static int subDrawSnikSnakTurnLeft(int si, int bx)
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
   X = GetStretchX(si);
   Y = GetStretchY(si);
-  StretchedSprites.BltEx(X, Y, aniSnikSnak[bx]);
+  StretchedSprites.BltEx(X, Y, aniFramesSnikSnak[bx]);
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
 
   return subDrawSnikSnakTurnLeft;
@@ -635,7 +635,7 @@ static int subDrawSnikSnakTurnRight(int si, int bx)
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
   X = GetStretchX(si);
   Y = GetStretchY(si);
-  StretchedSprites.BltEx(X, Y, aniSnikSnak[0x10 - bx]);
+  StretchedSprites.BltEx(X, Y, aniFramesSnikSnak[0x10 - bx]);
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
 
   return subDrawSnikSnakTurnRight;

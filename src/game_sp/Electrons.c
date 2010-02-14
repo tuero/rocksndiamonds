@@ -117,7 +117,7 @@ int subElectronTurnLeft(int si, int bx)
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
   X = GetStretchX(si);
   Y = GetStretchY(si);
-  StretchedSprites.BltEx(X, Y, aniElectron[bx]);
+  StretchedSprites.BltEx(X, Y, aniFramesElectron[bx]);
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
   bx = (bx + 1) & 0x7;
   MovHighByte(&PlayField16[si], bx);
@@ -224,7 +224,7 @@ int subElectronTurnRight(int si, int bx)
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
   X = GetStretchX(si);
   Y = GetStretchY(si);
-  StretchedSprites.BltEx(X, Y, aniElectron[0x10 - bx]);
+  StretchedSprites.BltEx(X, Y, aniFramesElectron[0x10 - bx]);
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
   bx = ((bx + 1) & 0x7) | 8;
   MovHighByte(&PlayField16[si], bx);
@@ -324,7 +324,7 @@ int subElectronFromBelow(int si, int bx)
   X = GetStretchX(si);
   Y = GetStretchY(si + FieldWidth);
   StretchedSprites.BltEx(X, Y, 0);
-  StretchedSprites.BltEx(X, Y - bx * TwoPixels, aniElectron[bx]);
+  StretchedSprites.BltEx(X, Y - bx * TwoPixels, aniFramesElectron[bx]);
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
   bl = LowByte(bx);
   if (bl == 7 && LowByte(PlayField16[si + FieldWidth]) != fiExplosion)
@@ -387,7 +387,7 @@ int subElectronFromRight(int si, int bx)
   X = GetStretchX(si + 1);
   Y = GetStretchY(si);
   StretchedSprites.BltEx(X, Y, 0);
-  StretchedSprites.BltEx(X - bx * TwoPixels, Y, aniElectron[bx]);
+  StretchedSprites.BltEx(X - bx * TwoPixels, Y, aniFramesElectron[bx]);
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
   bl = LowByte(bx);
   if (bl == 7 && LowByte(PlayField16[si + 1]) != fiExplosion)
@@ -449,7 +449,7 @@ int subElectronFromAbove(int si, int bx)
   X = GetStretchX(si);
   Y = GetStretchY(si - FieldWidth);
   StretchedSprites.BltEx(X, Y, 0);
-  StretchedSprites.BltEx(X, Y + bx * TwoPixels, aniElectron[bx]);
+  StretchedSprites.BltEx(X, Y + bx * TwoPixels, aniFramesElectron[bx]);
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
   bl = LowByte(bx);
   if (bl == 7 && LowByte(PlayField16[si - FieldWidth]) != fiExplosion)
@@ -511,7 +511,7 @@ int subElectronFromLeft(int si, int bx)
   X = GetStretchX(si - 1);
   Y = GetStretchY(si);
   StretchedSprites.BltEx(X, Y, 0);
-  StretchedSprites.BltEx(X + bx * TwoPixels, Y, aniElectron[bx]);
+  StretchedSprites.BltEx(X + bx * TwoPixels, Y, aniFramesElectron[bx]);
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
   bl = LowByte(bx);
   if (bl == 7 && LowByte(PlayField16[si - 1]) != fiExplosion)
@@ -570,7 +570,7 @@ int subDrawElectronTurnLeft(int si, int bx)
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
   X = GetStretchX(si);
   Y = GetStretchY(si);
-  StretchedSprites.BltEx(X, Y, aniElectron[bx]);
+  StretchedSprites.BltEx(X, Y, aniFramesElectron[bx]);
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
 
   return subDrawElectronTurnLeft;
@@ -585,7 +585,7 @@ int subDrawElectronTurnRight(int si, int bx)
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
   X = GetStretchX(si);
   Y = GetStretchY(si);
-  StretchedSprites.BltEx(X, Y, aniElectron[0x10 - bx]);
+  StretchedSprites.BltEx(X, Y, aniFramesElectron[0x10 - bx]);
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
 
   return subDrawElectronTurnRight;
@@ -602,7 +602,7 @@ int subDrawElectronFromBelow(int si, int bx)
   X = GetStretchX(si);
   Y = GetStretchY(si + FieldWidth);
   StretchedSprites.BltEx(X, Y, 0);
-  StretchedSprites.BltEx(X, Y - bx * TwoPixels, aniElectron[bx]);
+  StretchedSprites.BltEx(X, Y - bx * TwoPixels, aniFramesElectron[bx]);
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
 
   return subDrawElectronFromBelow;
@@ -619,7 +619,7 @@ int subDrawElectronFromRight(int si, int bx)
   X = GetStretchX(si + 1);
   Y = GetStretchY(si);
   StretchedSprites.BltEx(X, Y, 0);
-  StretchedSprites.BltEx(X - bx * TwoPixels, Y, aniElectron[bx]);
+  StretchedSprites.BltEx(X - bx * TwoPixels, Y, aniFramesElectron[bx]);
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
 
   return subDrawElectronFromRight;
@@ -636,7 +636,7 @@ int subDrawElectronFromAbove(int si, int bx)
   X = GetStretchX(si);
   Y = GetStretchY(si - FieldWidth);
   StretchedSprites.BltEx(X, Y, 0);
-  StretchedSprites.BltEx(X, Y + bx * TwoPixels, aniElectron[bx]);
+  StretchedSprites.BltEx(X, Y + bx * TwoPixels, aniFramesElectron[bx]);
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
 
   return subDrawElectronFromAbove;
@@ -653,7 +653,7 @@ int subDrawElectronFromLeft(int si, int bx)
   X = GetStretchX(si - 1);
   Y = GetStretchY(si);
   StretchedSprites.BltEx(X, Y, 0);
-  StretchedSprites.BltEx(X + bx * TwoPixels, Y, aniElectron[bx]);
+  StretchedSprites.BltEx(X + bx * TwoPixels, Y, aniFramesElectron[bx]);
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
 
   return subDrawElectronFromLeft;

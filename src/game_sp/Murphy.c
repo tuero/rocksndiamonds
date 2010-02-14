@@ -42,12 +42,14 @@ void subAnimateMurphy(int *si)
 
   // Variables that hold information about the animation sequence
   static int *dx = 0; // an array of image positions in moving.mpx, finalized with -1
+  static int dx1 = 0; // same as "*dx" above, but as image/animation token
   static int dx2 = 0; // an additional image position of a second sprite, for instance: yellow disk if pushed
   static int MurphyDX = 0, MurphyDY = 0; // murphys move steps
   static int SeqPos = 0; // index into dx()
   static int ClearPos = 0; // Position to clear before blitting sprites, none=-1
   static int dxPos = 0; // field-position  to draw dx(SeqPos)
   static int dx2Step = 0; // position of dx2 relative to dx-position
+  static int dx1SequenceLength = 0;
 
   ax = PlayField16[*si];
   al = LowByte(ax);
@@ -71,7 +73,9 @@ void subAnimateMurphy(int *si)
 
   MurphyMoveCounter = 1;             // We have a Murphy!
   MurphyExplodePos = *si;
-  if (ax != 3) // yes--go proceed moving murphy?
+
+  // (check if high byte of PlayField16 has stored movement information)
+  if (ax != fiMurphy) // yes--go proceed moving murphy?
     goto locProceedMovingMurphy;
 
   // FS: reset moving sequence variables
@@ -79,6 +83,7 @@ void subAnimateMurphy(int *si)
   MurphyDY = 0;
   ClearPos = *si;
   dxPos = *si;
+  dx1 = -1;
   dx2 = -1;
   SeqPos = 0;
   // end of FS
@@ -678,7 +683,8 @@ loc_g_62E2:
 
   MovHighByte(&PlayField16[*si], 0x2A);
   MovingPictureSequencePhase = 0x40; // init picture move sequence
-  dx = aniRedDisk;
+  dx = aniFramesRedDisk;
+  dx1 = aniRedDisk;
   MovLowByte(&RedDiskReleasePhase, 1);
   Mov(&RedDiskReleaseMurphyPos, *si);             // remember Murphy's location
   goto loc_Split;
@@ -688,7 +694,8 @@ loc_g_62E2:
   // ==========================================================================
 
 loc_g_6312:
-  dx = (MurphyVarFaceLeft == 0 ? aniMurphyEatUpRight : aniMurphyEatUpLeft);
+  dx = (MurphyVarFaceLeft == 0 ? aniFramesMurphyEatUpRight : aniFramesMurphyEatUpLeft);
+  dx1 = (MurphyVarFaceLeft == 0 ? aniMurphyMoveUpRight : aniMurphyMoveUpLeft);
   PlayField16[*si - FieldWidth] = 0x103;
   PlayField16[*si] = 0x300;
   *si = *si - FieldWidth;
@@ -699,7 +706,8 @@ loc_g_6312:
   // ==========================================================================
 
 loc_g_6341:
-  dx = aniMurphyEatLeft;
+  dx = aniFramesMurphyEatLeft;
+  dx1 = aniMurphyMoveLeft;
   PlayField16[*si - 1] = 0x203;
   PlayField16[*si] = 0x300;
   *si = *si - 1;
@@ -710,7 +718,8 @@ loc_g_6341:
   // ==========================================================================
 
 loc_g_6364:
-  dx = (MurphyVarFaceLeft == 0 ? aniMurphyEatUpRight : aniMurphyEatUpLeft);
+  dx = (MurphyVarFaceLeft == 0 ? aniFramesMurphyEatUpRight : aniFramesMurphyEatUpLeft);
+  dx1 = (MurphyVarFaceLeft == 0 ? aniMurphyMoveUpRight : aniMurphyMoveUpLeft);
   PlayField16[*si + FieldWidth] = 0x303;
   PlayField16[*si] = 0x300;
   *si = *si + FieldWidth;
@@ -721,7 +730,8 @@ loc_g_6364:
   // ==========================================================================
 
 loc_g_6399:
-  dx = aniMurphyEatRight;
+  dx = aniFramesMurphyEatRight;
+  dx1 = aniMurphyMoveRight;
   PlayField16[*si + 1] = 0x403;
   PlayField16[*si] = 0x300;
   *si = *si + 1;
@@ -746,7 +756,8 @@ loc_g_63C2:
 
 loc_g_63D3:
   subSoundFXBase();
-  dx = (MurphyVarFaceLeft == 0 ? aniMurphyEatUpRight : aniMurphyEatUpLeft);
+  dx = (MurphyVarFaceLeft == 0 ? aniFramesMurphyEatUpRight : aniFramesMurphyEatUpLeft);
+  dx1 = (MurphyVarFaceLeft == 0 ? aniMurphyDigUpRight : aniMurphyDigUpLeft);
   PlayField16[*si - FieldWidth] = 0x503;
   PlayField16[*si] = 0x300;
   *si = *si - FieldWidth;
@@ -771,7 +782,8 @@ loc_g_640B:
 
 loc_g_641C:
   subSoundFXBase();
-  dx = aniMurphyEatLeft;
+  dx = aniFramesMurphyEatLeft;
+  dx1 = aniMurphyDigLeft;
   PlayField16[*si - 1] = 0x203;
   PlayField16[*si] = 0x300;
   *si = *si - 1;
@@ -796,7 +808,8 @@ loc_g_6448:
 
 loc_g_6459:
   subSoundFXBase();
-  dx = (MurphyVarFaceLeft == 0 ? aniMurphyEatUpRight : aniMurphyEatUpLeft);
+  dx = (MurphyVarFaceLeft == 0 ? aniFramesMurphyEatUpRight : aniFramesMurphyEatUpLeft);
+  dx1 = (MurphyVarFaceLeft == 0 ? aniMurphyDigUpRight : aniMurphyDigUpLeft);
   PlayField16[*si + FieldWidth] = 0x703;
   PlayField16[*si] = 0x300;
   *si = *si + FieldWidth;
@@ -821,7 +834,8 @@ loc_g_6491:
 
 loc_g_64A2:
   subSoundFXBase();
-  dx = aniMurphyEatRight;
+  dx = aniFramesMurphyEatRight;
+  dx1 = aniMurphyDigRight;
   PlayField16[*si + 1] = 0x803;
   PlayField16[*si] = 0x300;
   *si = *si + 1;
@@ -847,7 +861,8 @@ loc_g_64CE:
 loc_g_64DF:
   subCopyImageToScreen(*si, aniMurphyTouchUp);
   subSoundFXBase();
-  dx = aniTouchBase;
+  dx = aniFramesTouchBase;
+  dx1 = aniTouchBase;
   dxPos = *si - FieldWidth;
   MovHighByte(&PlayField16[*si], 0x10);
   goto loc_StopNoSplit;
@@ -872,7 +887,8 @@ loc_g_650C:
 loc_g_651D:
   subCopyImageToScreen(*si, aniMurphyTouchLeft);
   subSoundFXBase();
-  dx = aniTouchBase;
+  dx = aniFramesTouchBase;
+  dx1 = aniTouchBase;
   dxPos = *si - 1;
   MovHighByte(&PlayField16[*si], 0x11);
   goto loc_StopNoSplit;
@@ -897,7 +913,8 @@ loc_g_654A:
 loc_g_655B:
   subCopyImageToScreen(*si, aniMurphyTouchDown);
   subSoundFXBase();
-  dx = aniTouchBase;
+  dx = aniFramesTouchBase;
+  dx1 = aniTouchBase;
   dxPos = *si + FieldWidth;
   MovHighByte(&PlayField16[*si], 0x12);
   goto loc_StopNoSplit;
@@ -922,7 +939,8 @@ loc_g_6588:
 loc_g_6599:
   subCopyImageToScreen(*si, aniMurphyTouchRight);
   subSoundFXBase();
-  dx = aniTouchBase;
+  dx = aniFramesTouchBase;
+  dx1 = aniTouchBase;
   dxPos = *si + 1;
   MovHighByte(&PlayField16[*si], 0x13);
   goto loc_StopNoSplit;
@@ -933,7 +951,8 @@ loc_g_6599:
 
 loc_g_65C6:
   subSoundFXInfotron();
-  dx = (MurphyVarFaceLeft == 0 ? aniMurphyEatUpRight : aniMurphyEatUpLeft);
+  dx = (MurphyVarFaceLeft == 0 ? aniFramesMurphyEatUpRight : aniFramesMurphyEatUpLeft);
+  dx1 = (MurphyVarFaceLeft == 0 ? aniMurphyEatUpRight : aniMurphyEatUpLeft);
   PlayField16[*si - FieldWidth] = 0x903;
   PlayField16[*si] = 0x300;
   *si = *si - FieldWidth;
@@ -945,10 +964,13 @@ loc_g_65C6:
 
 loc_g_65FE:
   subSoundFXInfotron();
-  dx = aniEatInfotronLeft;
+  dx = aniFramesEatInfotronLeft;
+  dx1 = aniEatInfotronLeft;
+#if 0
   dx2 = fiInfotron;
   dx2Step = -1;
   ClearPos = -1;
+#endif
   PlayField16[*si - 1] = 0xA03;
   PlayField16[*si] = 0x300;
   *si = *si - 1;
@@ -960,7 +982,8 @@ loc_g_65FE:
 
 loc_g_662A:
   subSoundFXInfotron();
-  dx = (MurphyVarFaceLeft == 0 ? aniMurphyEatUpRight : aniMurphyEatUpLeft);
+  dx = (MurphyVarFaceLeft == 0 ? aniFramesMurphyEatUpRight : aniFramesMurphyEatUpLeft);
+  dx1 = (MurphyVarFaceLeft == 0 ? aniMurphyEatUpRight : aniMurphyEatUpLeft);
   PlayField16[*si + FieldWidth] = 0xB03;
   PlayField16[*si] = 0x300;
   *si = *si + FieldWidth;
@@ -972,10 +995,13 @@ loc_g_662A:
 
 loc_g_6662:
   subSoundFXInfotron();
-  dx = aniEatInfotronRight;
+  dx = aniFramesEatInfotronRight;
+  dx1 = aniEatInfotronRight;
+#if 0
   dx2 = fiInfotron;
   dx2Step = 1;
   ClearPos = -1;
+#endif
   PlayField16[*si + 1] = 0xC03;
   PlayField16[*si] = 0x300;
   *si = *si + 1;
@@ -988,7 +1014,8 @@ loc_g_6662:
 loc_g_668E:
   subCopyImageToScreen(*si, aniMurphyTouchUp);
   subSoundFXInfotron();
-  dx = aniTouchInfotron;
+  dx = aniFramesTouchInfotron;
+  dx1 = aniTouchInfotron;
   MovHighByte(&PlayField16[*si], 0x14);
   MovHighByte(&PlayField16[*si - FieldWidth], 0xFF);
   goto loc_StopNoSplit;
@@ -1000,7 +1027,8 @@ loc_g_668E:
 loc_g_66C0:
   subCopyImageToScreen(*si, aniMurphyTouchLeft);
   subSoundFXInfotron();
-  dx = aniTouchInfotron;
+  dx = aniFramesTouchInfotron;
+  dx1 = aniTouchInfotron;
   MovHighByte(&PlayField16[*si], 0x15);
   MovHighByte(&PlayField16[*si - 1], 0xFF);
   goto loc_StopNoSplit;
@@ -1012,7 +1040,8 @@ loc_g_66C0:
 loc_g_66F2:
   subCopyImageToScreen(*si, aniMurphyTouchDown);
   subSoundFXInfotron();
-  dx = aniTouchInfotron;
+  dx = aniFramesTouchInfotron;
+  dx1 = aniTouchInfotron;
   MovHighByte(&PlayField16[*si], 0x16);
   MovHighByte(&PlayField16[*si + FieldWidth], 0xFF);
   goto loc_StopNoSplit;
@@ -1024,7 +1053,8 @@ loc_g_66F2:
 loc_g_6724:
   subCopyImageToScreen(*si, aniMurphyTouchRight);
   subSoundFXInfotron();
-  dx = aniTouchInfotron;
+  dx = aniFramesTouchInfotron;
+  dx1 = aniTouchInfotron;
   MovHighByte(&PlayField16[*si], 0x17);
   MovHighByte(&PlayField16[*si + 1], 0xFF);
   goto loc_StopNoSplit;
@@ -1069,7 +1099,8 @@ loc_g_6756:
 #endif
 
   LeadOutCounter = 0x40;          // quit: start lead-out
-  dx = aniMurphyExit;
+  dx = aniFramesMurphyExit;
+  dx1 = aniMurphyExit;
   MovHighByte(&PlayField16[*si], 0xD);
   goto loc_StopNoSplit;
 
@@ -1084,7 +1115,8 @@ loc_g_679B:
 
   MovHighByte(&PlayField16[*si - 2], 1);
   subCopyImageToScreen(*si, aniPushLeft); // draw pushing murphy
-  dx = aniZonkRollLeft;
+  dx = aniFramesZonkRollLeft;
+  dx1 = aniZonkRollLeft;
   dxPos = *si - 1;
   dx2 = aniPushLeft;
   dx2Step = 1;
@@ -1106,7 +1138,8 @@ loc_g_67D4:
 
   MovHighByte(&PlayField16[*si + 2], 1);
   subCopyImageToScreen(*si, aniPushRight); // draw pushing murphy
-  dx = aniZonkRollRight;
+  dx = aniFramesZonkRollRight;
+  dx1 = aniZonkRollRight;
   dxPos = *si + 1;
   dx2 = aniPushRight;
   dx2Step = -1;
@@ -1222,7 +1255,8 @@ loc_g_6916:
   if (PlayField16[*si - 2 * FieldWidth] != 0)
     return;
 
-  dx = aniSplitUpDown;
+  dx = aniFramesSplitUpDown;
+  dx1 = aniSplitUpDown;
   dx2Step = -FieldWidth;
   PlayField16[*si] = 0x1803;
   PlayField16[*si - 2 * FieldWidth] = 0x300;
@@ -1236,7 +1270,8 @@ loc_g_693A:
   if (PlayField16[*si - 2] != 0)
     return;
 
-  dx = aniMurphyEatLeft;
+  dx = aniFramesMurphyEatLeft;
+  dx1 = aniMurphyMoveLeft;
   dx2Step = -1;
   PlayField16[*si] = 0x1903;
   PlayField16[*si - 2] = 0x300;
@@ -1250,7 +1285,8 @@ loc_g_695E:
   if (PlayField16[*si + 2 * FieldWidth] != 0)
     return;
 
-  dx = aniSplitUpDown;
+  dx = aniFramesSplitUpDown;
+  dx1 = aniSplitUpDown;
   dx2Step = FieldWidth;
   PlayField16[*si] = 0x1A03;
   PlayField16[*si + 2 * FieldWidth] = 0x300;
@@ -1264,7 +1300,8 @@ loc_g_6982:
   if (PlayField16[*si + 2] != 0)
     return;
 
-  dx = aniMurphyEatRight;
+  dx = aniFramesMurphyEatRight;
+  dx1 = aniMurphyMoveRight;
   dx2Step = 1;
   PlayField16[*si] = 0x1B03;
   PlayField16[*si + 2] = 0x300;
@@ -1279,7 +1316,8 @@ loc_StopSplit:
   // ==========================================================================
 
 loc_g_69A6:
-  dx = (MurphyVarFaceLeft == 0 ? aniMurphyEatUpRight : aniMurphyEatUpLeft);
+  dx = (MurphyVarFaceLeft == 0 ? aniFramesMurphyEatUpRight : aniFramesMurphyEatUpLeft);
+  dx1 = (MurphyVarFaceLeft == 0 ? aniMurphyEatUpRight : aniMurphyEatUpLeft);
   PlayField16[*si] = 0x1C03;
   PlayField16[*si - FieldWidth] = 0x300;
   goto loc_StopNoSplit;
@@ -1289,7 +1327,8 @@ loc_g_69A6:
   // ==========================================================================
 
 loc_g_69CE:
-  dx = aniMurphyEatLeft;
+  dx = aniFramesMurphyEatLeft;
+  dx1 = aniMurphyEatLeft;
   PlayField16[*si] = 0x300; // !!!!!! this time we move murphy at sequence-start!
   PlayField16[*si - 1] = 0x1D03;
   *si = *si - 1;
@@ -1300,7 +1339,8 @@ loc_g_69CE:
   // ==========================================================================
 
 loc_g_69F7:
-  dx = (MurphyVarFaceLeft == 0 ? aniMurphyEatUpRight : aniMurphyEatUpLeft);
+  dx = (MurphyVarFaceLeft == 0 ? aniFramesMurphyEatUpRight : aniFramesMurphyEatUpLeft);
+  dx1 = (MurphyVarFaceLeft == 0 ? aniMurphyEatUpRight : aniMurphyEatUpLeft);
   PlayField16[*si] = 0x1E03;
   PlayField16[*si + FieldWidth] = 0x300;
   goto loc_StopNoSplit;
@@ -1310,8 +1350,9 @@ loc_g_69F7:
   // ==========================================================================
 
 loc_g_6A1F:
-  //  dx = aniMurphyEatRightRedDisk 'this sequence is 9 steps long!
-  dx = aniMurphyEatRight;
+  //  dx = aniFramesMurphyEatRightRedDisk 'this sequence is 9 steps long!
+  dx = aniFramesMurphyEatRight;
+  dx1 = aniMurphyEatRight;
   // --------------------------------------------------------------------------
   // BugFix
   // Table data_h_145A, pointed to by table data_h_105E, has a severe bug:
@@ -1345,7 +1386,8 @@ loc_g_6A1F:
   // ==========================================================================
 
 loc_g_6A48:
-  dx = aniTouchRedDisk;
+  dx = aniFramesTouchRedDisk;
+  dx1 = aniTouchRedDisk;
   MovHighByte(&PlayField16[*si], 0x20);
   MovHighByte(&PlayField16[*si - FieldWidth], 3);
   goto loc_StopNoSplit;
@@ -1355,7 +1397,8 @@ loc_g_6A48:
   // ==========================================================================
 
 loc_g_6A64:
-  dx = aniTouchRedDisk;
+  dx = aniFramesTouchRedDisk;
+  dx1 = aniTouchRedDisk;
   MovHighByte(&PlayField16[*si], 0x21);
   MovHighByte(&PlayField16[*si - 1], 3);
   goto loc_StopNoSplit;
@@ -1365,7 +1408,8 @@ loc_g_6A64:
   // ==========================================================================
 
 loc_g_6A80:
-  dx = aniTouchRedDisk;
+  dx = aniFramesTouchRedDisk;
+  dx1 = aniTouchRedDisk;
   MovHighByte(&PlayField16[*si], 0x22);
   MovHighByte(&PlayField16[*si + FieldWidth], 3);
   goto loc_StopNoSplit;
@@ -1375,7 +1419,8 @@ loc_g_6A80:
   // ==========================================================================
 
 loc_g_6A9C:
-  dx = aniTouchRedDisk;
+  dx = aniFramesTouchRedDisk;
+  dx1 = aniTouchRedDisk;
   MovHighByte(&PlayField16[*si], 0x23);
   MovHighByte(&PlayField16[*si + 1], 3);
 
@@ -1392,12 +1437,22 @@ loc_g_6AB8:
     return;
 
   PlayField16[*si - 2 * FieldWidth] = 0x1200;
+#if 0
   subCopyImageToScreen(*si, aniPushRight);
-  dx = aniYellowDisk;
+#endif
+  dx = aniFramesYellowDisk;
+  dx1 = aniYellowDisk;
   dxPos = *si - FieldWidth;
+#if 1
+  dx2 = (MurphyVarFaceLeft == 0 ? aniPushRight : aniPushLeft);
+#else
   dx2 = aniPushUpDown;
+#endif
   dx2Step = FieldWidth;
   PlayField16[*si] = 0x2403;
+#if 1
+  subCopyImageToScreen(*si, dx2);
+#endif
   goto loc_MoveNoSplit;
 
   // ==========================================================================
@@ -1410,7 +1465,8 @@ loc_g_6AF1:
 
   PlayField16[*si - 2] = 0x1200;
   subCopyImageToScreen(*si, aniPushLeft);
-  dx = aniYellowDisk;
+  dx = aniFramesYellowDisk;
+  dx1 = aniYellowDisk;
   dxPos = *si - 1;
   dx2 = aniPushLeft;
   dx2Step = 1;
@@ -1426,12 +1482,22 @@ loc_g_6B2A:
     return;
 
   PlayField16[*si + 2 * FieldWidth] = 0x1200;
+#if 0
   subCopyImageToScreen(*si, aniPushRight);
-  dx = aniYellowDisk;
+#endif
+  dx = aniFramesYellowDisk;
+  dx1 = aniYellowDisk;
   dxPos = *si + FieldWidth;
+#if 1
+  dx2 = (MurphyVarFaceLeft == 0 ? aniPushRight : aniPushLeft);
+#else
   dx2 = aniPushUpDown;
+#endif
   dx2Step = -FieldWidth;
   PlayField16[*si] = 0x2703;
+#if 1
+  subCopyImageToScreen(*si, dx2);
+#endif
   goto loc_MoveNoSplit;
 
   // ==========================================================================
@@ -1444,7 +1510,8 @@ loc_g_6B63:
 
   PlayField16[*si + 2] = 0x1200;
   subCopyImageToScreen(*si, aniPushRight);
-  dx = aniYellowDisk;
+  dx = aniFramesYellowDisk;
+  dx1 = aniYellowDisk;
   dxPos = *si + 1;
   dx2 = aniPushRight;
   dx2Step = -1;
@@ -1461,7 +1528,8 @@ loc_g_6B9B:
 
   PlayField16[*si - 2] = 0x800;
   subCopyImageToScreen(*si, aniPushLeft);
-  dx = aniOrangeDisk;
+  dx = aniFramesOrangeDisk;
+  dx1 = aniOrangeDisk;
   dxPos = *si - 1;
   dx2 = aniPushLeft;
   dx2Step = 1;
@@ -1481,7 +1549,8 @@ loc_g_6BD3:
 
   PlayField16[*si + 2] = 0x100;
   subCopyImageToScreen(*si, aniPushRight);
-  dx = aniOrangeDisk;
+  dx = aniFramesOrangeDisk;
+  dx1 = aniOrangeDisk;
   dxPos = *si + 1;
   dx2 = aniPushRight;
   dx2Step = -1;
@@ -1550,6 +1619,12 @@ locProceedMovingMurphy: // proceed moving murphy
   // ==========================================================================
 
 loc_g_6C8F:
+
+#if 1
+  if (SeqPos <= 0)
+    dx1SequenceLength = getSequenceLength(dx1);
+#endif
+
   if (SplitMoveFlag == 0)
   {
     // ++++++++++++++++++++++++++
@@ -1614,7 +1689,18 @@ loc_g_6C8F:
     X = GetStretchX(dxPos) + tDeltaX;
     Y = GetStretchY(dxPos) + tDeltaY;
     Tmp = (SeqPos < 0 ? 0 : SeqPos); // 9StepBugFix!(red disk move right)
+
+#if 1
+    if (isSnappingSequence(dx1) && SeqPos == dx1SequenceLength - 1)
+      dx1 = aniSpace;
+#endif
+
+#if 1
+    StretchedSprites.BltImg(X, Y, dx1, Tmp);
+    // printf("::: Tmp: %d\n", Tmp);
+#else
     StretchedSprites.BltEx(X, Y, dx[Tmp]);
+#endif
 
 #if 1
     if (!(dx2 < 0))
@@ -1634,6 +1720,7 @@ loc_g_6C8F:
 #if 1
 	// (SeqPos iterates from 0 to 7 while pushing)
         StretchedSprites.BltImg(X + tDeltaX, Y + tDeltaY, dx2, SeqPos);
+	// printf("::: SeqPos: %d\n", SeqPos);
 #else
         StretchedSprites.BltEx(X + tDeltaX, Y + tDeltaY, dx2);
 #endif
@@ -1670,8 +1757,13 @@ loc_g_6C8F:
   } // loc_g_6D1E:'loc_g_6D28:
 
   SeqPos = SeqPos + 1;
+#if 1
+  if (SeqPos < dx1SequenceLength)
+    return;
+#else
   if (dx[SeqPos] > -1)
     return;
+#endif
 
   // Follow-up after movement completed     'loc_g_6D35:
   MurphyXPos = MurphyXPos + MurphyDX;

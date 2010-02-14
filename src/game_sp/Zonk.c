@@ -263,7 +263,7 @@ loc_g_0F83: // zonk comes rolling from right to left
   Y = GetStretchY(si);
   dx = (bl & 0x7) + 1;
   StretchedSprites.BltEx(X, Y, 0);
-  StretchedSprites.BltEx(X - (TwoPixels * dx), Y, aniZonkRollLeft[dx - 1]);
+  StretchedSprites.BltEx(X - (TwoPixels * dx), Y, aniFramesZonkRollLeft[dx - 1]);
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
   bl = HighByte(PlayField16[si]) + 1; // get and increment sequence#
   if (bl == 0x24)
@@ -295,7 +295,7 @@ loc_g_0FE8: // zonk comes rolling from left to right
   Y = GetStretchY(si);
   dx = (bl & 0x7) + 1;
   StretchedSprites.BltEx(X, Y, 0);
-  StretchedSprites.BltEx(X + (TwoPixels * dx), Y, aniZonkRollRight[dx - 1]);
+  StretchedSprites.BltEx(X + (TwoPixels * dx), Y, aniFramesZonkRollRight[dx - 1]);
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
   bl = HighByte(PlayField16[si]) + 1;
   if (bl == 0x34)
@@ -347,7 +347,7 @@ loc_g_107B: // zonk rolls left
   Y = GetStretchY(si);
   dx = (bl & 0xF) + 1;
   StretchedSprites.BltEx(X, Y, 0);
-  StretchedSprites.BltEx(X - (TwoPixels * dx), Y, aniZonkRollLeft[dx - 1]);
+  StretchedSprites.BltEx(X - (TwoPixels * dx), Y, aniFramesZonkRollLeft[dx - 1]);
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
   bl = HighByte(PlayField16[si]) + 1; // retrieve and increment sequence#
   if (bl < 0x52)
@@ -384,7 +384,7 @@ loc_g_10E9: // zonk rolls right
   Y = GetStretchY(si);
   dx = (bl & 0x7) + 1;
   StretchedSprites.BltEx(X, Y, 0);
-  StretchedSprites.BltEx(X + (TwoPixels * dx), Y, aniZonkRollRight[dx - 1]);
+  StretchedSprites.BltEx(X + (TwoPixels * dx), Y, aniFramesZonkRollRight[dx - 1]);
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
   bl = HighByte(PlayField16[si]) + 1;
   if (bl < 0x62)

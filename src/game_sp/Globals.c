@@ -172,29 +172,72 @@ int *aniEatInfotronLeft, *aniEatInfotronRight;
 #endif
 
 #if 1
-int aniBug[] = { 74, 75, 76, 77, 78, 77, 76, 77, 78, 77, 76, 75, 74, 25 };
-int aniZonkRollRight[] = { 198, 197, 196, 195, 194, 193, 192, 1, -1 };
-int aniZonkRollLeft[] = { 192, 193, 194, 195, 196, 197, 198, 1, -1 };
-int aniInfotronRollRight[] = { 206, 205, 204, 203, 202, 201, 200, 4 };
-int aniInfotronRollLeft[] = { 200, 201, 202, 203, 204, 205, 206, 4 };
-int aniSnikSnak[] = { 121, 122, 123, 124, 125, 126, 127, 120, 121 };
-int aniElectron[] = { 144, 145, 146, 147, 148, 149, 150, 151, 144 };
-int aniExplosion[] = { 3, 103, 104, 105, 106, 107, 108, 109, 0 };
-int aniTouchBase[] = { 80, 81, 82, 83, 84, 85, 86, 0, -1 };
-int aniTouchInfotron[] = { 87, 88, 89, 91, 92, 93, 0, -1 }; // Only seven frames!!!!
-int aniTouchRedDisk[] = { 96, 97, 98, 99, 100, 101, 102, 0, -1 };
-int aniMurphyExit[] = { 46, 46, 46, 46, 47, 47, 47, 47, 48, 48, 48, 48, 49, 49, 49, 49, 50, 50, 50, 50, 51, 51, 51, 51, 52, 52, 52, 52, 53, 53, 53, 53, 54, 54, 54, 54, 0, 0, 0, 0, -1 };
-int aniMurphyEatLeft[] = { 176, 177, 178, 179, 180, 181, 182, 183, -1 };
-int aniMurphyEatRight[] = { 184, 185, 186, 187, 188, 189, 190, 191, -1 };
-int aniMurphyEatUpLeft[] = { 183, 182, 181, 180, 179, 178, 177, 176, -1 };
-int aniMurphyEatUpRight[] = { 191, 190, 189, 188, 187, 186, 185, 184, -1 };
-  // aniMurphyEatRightRedDisk = { 184, 184, 185, 186, 187, 188, 189, 190, 191, -1) '9 frames!
-int aniEatInfotronLeft[] = { 209, 211, 213, 215, 217, 219, 221, 223, -1 };
-int aniEatInfotronRight[] = { 224, 226, 228, 230, 232, 234, 236, 238, -1 };
-int aniSplitUpDown[] = { 3, 3, 3, 3, 3, 3, 3, 3, -1 };
-int aniYellowDisk[] = { 18, 18, 18, 18, 18, 18, 18, 18, -1 };
-int aniOrangeDisk[] = { 8, 8, 8, 8, 8, 8, 8, 8, -1 };
-int aniRedDisk[] = { 20, -1 };
+int aniFramesBug[] = { 74, 75, 76, 77, 78, 77, 76, 77, 78, 77, 76, 75, 74, 25 };
+int aniFramesZonkRollRight[] = { 198, 197, 196, 195, 194, 193, 192, 1, -1 };
+int aniFramesZonkRollLeft[] = { 192, 193, 194, 195, 196, 197, 198, 1, -1 };
+int aniFramesInfotronRollRight[] = { 206, 205, 204, 203, 202, 201, 200, 4 };
+int aniFramesInfotronRollLeft[] = { 200, 201, 202, 203, 204, 205, 206, 4 };
+int aniFramesSnikSnak[] = { 121, 122, 123, 124, 125, 126, 127, 120, 121 };
+int aniFramesElectron[] = { 144, 145, 146, 147, 148, 149, 150, 151, 144 };
+int aniFramesExplosion[] = { 3, 103, 104, 105, 106, 107, 108, 109, 0 };
+int aniFramesTouchBase[] = { 80, 81, 82, 83, 84, 85, 86, 0, -1 };
+int aniFramesTouchInfotron[] = { 87, 88, 89, 91, 92, 93, 0, -1 }; // Only seven frames!!!!
+int aniFramesTouchRedDisk[] = { 96, 97, 98, 99, 100, 101, 102, 0, -1 };
+int aniFramesMurphyExit[] = { 46, 46, 46, 46, 47, 47, 47, 47, 48, 48, 48, 48, 49, 49, 49, 49, 50, 50, 50, 50, 51, 51, 51, 51, 52, 52, 52, 52, 53, 53, 53, 53, 54, 54, 54, 54, 0, 0, 0, 0, -1 };
+int aniFramesMurphyEatLeft[] = { 176, 177, 178, 179, 180, 181, 182, 183, -1 };
+int aniFramesMurphyEatRight[] = { 184, 185, 186, 187, 188, 189, 190, 191, -1 };
+int aniFramesMurphyEatUpLeft[] = { 183, 182, 181, 180, 179, 178, 177, 176, -1 };
+int aniFramesMurphyEatUpRight[] = { 191, 190, 189, 188, 187, 186, 185, 184, -1 };
+  // aniFramesMurphyEatRightRedDisk = { 184, 184, 185, 186, 187, 188, 189, 190, 191, -1) '9 frames!
+int aniFramesEatInfotronLeft[] = { 209, 211, 213, 215, 217, 219, 221, 223, -1 };
+int aniFramesEatInfotronRight[] = { 224, 226, 228, 230, 232, 234, 236, 238, -1 };
+int aniFramesSplitUpDown[] = { 3, 3, 3, 3, 3, 3, 3, 3, -1 };
+int aniFramesYellowDisk[] = { 18, 18, 18, 18, 18, 18, 18, 18, -1 };
+int aniFramesOrangeDisk[] = { 8, 8, 8, 8, 8, 8, 8, 8, -1 };
+int aniFramesRedDisk[] = { 20, -1 };
+#endif
+
+#if 1
+
+int getSequenceLength(int sequence)
+{
+  switch (sequence)
+  {
+    case aniBug:
+      return 14;
+
+    case aniElectron:
+    case aniExplosion:
+      return 9;
+
+    case aniTouchInfotron:
+      return 7;
+
+    case aniMurphyExit:
+      return 40;
+
+    case aniRedDisk:
+      return 1;
+
+    default:
+      return 8;
+  }
+}
+
+boolean isSnappingSequence(int sequence)
+{
+  switch (sequence)
+  {
+    case aniTouchBase:
+    case aniTouchInfotron:
+    case aniTouchRedDisk:
+      return TRUE;
+
+    default:
+      return FALSE;
+  }
+}
+
 #endif
 
 void InitGlobals()

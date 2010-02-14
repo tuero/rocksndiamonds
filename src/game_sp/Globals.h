@@ -66,18 +66,16 @@
 #define fiRAMLeft 			(26)
 #define fiRAMRight 			(27)
 #define fiHWFirst 			(28)
-
-#define fiHW_0				(fiHWFirst + 0)
-#define fiHW_1				(fiHWFirst + 1)
-#define fiHW_2				(fiHWFirst + 2)
-#define fiHW_3				(fiHWFirst + 3)
-#define fiHW_4				(fiHWFirst + 4)
-#define fiHW_5				(fiHWFirst + 5)
-#define fiHW_6				(fiHWFirst + 6)
-#define fiHW_7				(fiHWFirst + 7)
-#define fiHW_8				(fiHWFirst + 8)
-#define fiHW_9				(fiHWFirst + 9)
-
+#define fiHW0				(fiHWFirst + 0)		// fiHWFirst
+#define fiHW1				(fiHWFirst + 1)
+#define fiHW2				(fiHWFirst + 2)
+#define fiHW3				(fiHWFirst + 3)
+#define fiHW4				(fiHWFirst + 4)
+#define fiHW5				(fiHWFirst + 5)
+#define fiHW6				(fiHWFirst + 6)
+#define fiHW7				(fiHWFirst + 7)
+#define fiHW8				(fiHWFirst + 8)
+#define fiHW9				(fiHWFirst + 9)		// fiHWLast
 #define fiHWLast 			(37)
 #define fiRAMTop 			(38)
 #define fiRAMBottom 			(39)
@@ -144,14 +142,45 @@
 
 #define aniMurphySleepLeft 		IMG_SP_MURPHY_SLEEPING_LEFT
 #define aniMurphySleepRight 		IMG_SP_MURPHY_SLEEPING_RIGHT
-#define aniMurphyTouchDown 		IMG_SP_MURPHY_SNAPPING_DOWN
 #define aniMurphyTouchLeft 		IMG_SP_MURPHY_SNAPPING_LEFT
 #define aniMurphyTouchRight 		IMG_SP_MURPHY_SNAPPING_RIGHT
 #define aniMurphyTouchUp 		IMG_SP_MURPHY_SNAPPING_UP
+#define aniMurphyTouchDown 		IMG_SP_MURPHY_SNAPPING_DOWN
 #define aniMurphyYawn 			IMG_SP_MURPHY_BORING_1
 #define aniPushLeft 			IMG_SP_MURPHY_PUSHING_LEFT
 #define aniPushRight 			IMG_SP_MURPHY_PUSHING_RIGHT
 #define aniPushUpDown 			IMG_SP_MURPHY_PUSHING_RIGHT
+
+#define aniBug				IMG_SP_BUGGY_BASE
+#define aniBugActive			IMG_SP_BUGGY_BASE_ACTIVE
+#define aniZonkRollLeft			IMG_SP_ZONK_MOVING_LEFT
+#define aniZonkRollRight		IMG_SP_ZONK_MOVING_RIGHT
+#define aniEatInfotronLeft		IMG_SP_MURPHY_COLLECTING_LEFT
+#define aniEatInfotronRight		IMG_SP_MURPHY_COLLECTING_RIGHT
+#define aniInfotronRollLeft		IMG_SP_INFOTRON_MOVING_LEFT
+#define aniInfotronRollRight		IMG_SP_INFOTRON_MOVING_RIGHT
+#define aniMurphyMoveLeft		IMG_SP_MURPHY_MOVING_LEFT
+#define aniMurphyMoveRight		IMG_SP_MURPHY_MOVING_RIGHT
+#define aniMurphyMoveUpLeft		IMG_SP_MURPHY_MOVING_LEFT
+#define aniMurphyMoveUpRight		IMG_SP_MURPHY_MOVING_RIGHT
+#define aniMurphyDigLeft		IMG_SP_MURPHY_DIGGING_LEFT
+#define aniMurphyDigRight		IMG_SP_MURPHY_DIGGING_RIGHT
+#define aniMurphyDigUpLeft		IMG_SP_MURPHY_DIGGING_LEFT
+#define aniMurphyDigUpRight		IMG_SP_MURPHY_DIGGING_RIGHT
+#define aniMurphyEatLeft		IMG_SP_MURPHY_COLLECTING_LEFT
+#define aniMurphyEatRight		IMG_SP_MURPHY_COLLECTING_RIGHT
+#define aniMurphyEatUpLeft		IMG_SP_MURPHY_COLLECTING_LEFT
+#define aniMurphyEatUpRight		IMG_SP_MURPHY_COLLECTING_RIGHT
+#define aniSplitUpDown			IMG_SP_MURPHY
+#define aniMurphyExit			IMG_SP_MURPHY_SHRINKING
+#define aniElectron			IMG_SP_ELECTRON
+#define aniExplosion			IMG_SP_DEFAULT_EXPLODING
+#define aniTouchBase			IMG_SP_BASE_SNAPPING
+#define aniTouchInfotron		IMG_SP_INFOTRON_COLLECTING
+#define aniTouchRedDisk			IMG_SP_DISK_RED_COLLECTING
+#define aniYellowDisk			IMG_SP_DISK_YELLOW
+#define aniOrangeDisk			IMG_SP_DISK_ORANGE
+#define aniRedDisk			IMG_SP_DISK_RED
 
 #define aniSnikSnakDown 		167
 #define aniSnikSnakLeft 		239
@@ -195,15 +224,15 @@
 
 #if 1
 
-extern int aniBug[], aniZonkRollRight[], aniZonkRollLeft[];
-extern int aniEatInfotronLeft[], aniEatInfotronRight[];
-extern int aniInfotronRollRight[], aniInfotronRollLeft[];
-extern int aniMurphyEatLeft[], aniMurphyEatRight[];
-extern int aniMurphyEatUpLeft[], aniMurphyEatUpRight[], aniSplitUpDown[];
-extern int aniMurphyExit[];
-extern int aniSnikSnak[], aniElectron[], aniExplosion[];
-extern int aniTouchBase[], aniTouchInfotron[], aniTouchRedDisk[];
-extern int aniYellowDisk[], aniOrangeDisk[], aniRedDisk[];
+extern int aniFramesBug[], aniFramesZonkRollRight[], aniFramesZonkRollLeft[];
+extern int aniFramesEatInfotronLeft[], aniFramesEatInfotronRight[];
+extern int aniFramesInfotronRollRight[], aniFramesInfotronRollLeft[];
+extern int aniFramesMurphyEatLeft[], aniFramesMurphyEatRight[];
+extern int aniFramesMurphyEatUpLeft[], aniFramesMurphyEatUpRight[], aniFramesSplitUpDown[];
+extern int aniFramesMurphyExit[];
+extern int aniFramesSnikSnak[], aniFramesElectron[], aniFramesExplosion[];
+extern int aniFramesTouchBase[], aniFramesTouchInfotron[], aniFramesTouchRedDisk[];
+extern int aniFramesYellowDisk[], aniFramesOrangeDisk[], aniFramesRedDisk[];
 
 #else
 
@@ -262,6 +291,9 @@ extern void InitGlobals();
 extern void InitPseudoCompileFlags();
 
 extern void ReadLevel();
+
+extern int getSequenceLength(int sequence);
+extern boolean isSnappingSequence(int sequence);
 
 extern boolean Alignments;
 extern boolean BlockingSpeed;

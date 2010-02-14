@@ -81,7 +81,7 @@ markPlaySound:
 
 markDisplay:
   // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-  cx = aniBug[bl];
+  cx = aniFramesBug[bl];
   StretchedSprites.BltEx(GetStretchX(si), GetStretchY(si), cx);
   // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
