@@ -131,8 +131,13 @@ loc_g_0DE8: // zonk comes falling from above
   X = GetStretchX(si);
   Y = GetStretchY(si - FieldWidth);
   dx = bl & 0x7;
+#if 1
+  StretchedSprites.BltImg(X, Y, aniSpace, 0);
+  StretchedSprites.BltImg(X, Y + TwoPixels * (dx + 1), aniZonk, dx);
+#else
   StretchedSprites.BltEx(X, Y, 0);
   StretchedSprites.BltEx(X, Y + TwoPixels * (dx + 1), fiZonk);
+#endif
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
   bl = HighByte(PlayField16[si]) + 1;
   if (bl == 0x16)
@@ -262,8 +267,13 @@ loc_g_0F83: // zonk comes rolling from right to left
   X = GetStretchX(si + 1);
   Y = GetStretchY(si);
   dx = (bl & 0x7) + 1;
+#if 1
+  StretchedSprites.BltImg(X, Y, aniSpace, 0);
+  StretchedSprites.BltImg(X - (TwoPixels * dx), Y, aniZonkRollLeft, dx - 1);
+#else
   StretchedSprites.BltEx(X, Y, 0);
   StretchedSprites.BltEx(X - (TwoPixels * dx), Y, aniFramesZonkRollLeft[dx - 1]);
+#endif
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
   bl = HighByte(PlayField16[si]) + 1; // get and increment sequence#
   if (bl == 0x24)
@@ -294,8 +304,13 @@ loc_g_0FE8: // zonk comes rolling from left to right
   X = GetStretchX(si - 1);
   Y = GetStretchY(si);
   dx = (bl & 0x7) + 1;
+#if 1
+  StretchedSprites.BltImg(X, Y, aniSpace, 0);
+  StretchedSprites.BltImg(X + (TwoPixels * dx), Y, aniZonkRollRight, dx - 1);
+#else
   StretchedSprites.BltEx(X, Y, 0);
   StretchedSprites.BltEx(X + (TwoPixels * dx), Y, aniFramesZonkRollRight[dx - 1]);
+#endif
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
   bl = HighByte(PlayField16[si]) + 1;
   if (bl == 0x34)
@@ -346,8 +361,13 @@ loc_g_107B: // zonk rolls left
   X = GetStretchX(si);
   Y = GetStretchY(si);
   dx = (bl & 0xF) + 1;
+#if 1
+  StretchedSprites.BltImg(X, Y, aniSpace, 0);
+  StretchedSprites.BltImg(X - (TwoPixels * dx), Y, aniZonkRollLeft, dx - 1);
+#else
   StretchedSprites.BltEx(X, Y, 0);
   StretchedSprites.BltEx(X - (TwoPixels * dx), Y, aniFramesZonkRollLeft[dx - 1]);
+#endif
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
   bl = HighByte(PlayField16[si]) + 1; // retrieve and increment sequence#
   if (bl < 0x52)
@@ -383,8 +403,13 @@ loc_g_10E9: // zonk rolls right
   X = GetStretchX(si);
   Y = GetStretchY(si);
   dx = (bl & 0x7) + 1;
+#if 1
+  StretchedSprites.BltImg(X, Y, aniSpace, 0);
+  StretchedSprites.BltImg(X + (TwoPixels * dx), Y, aniZonkRollRight, dx - 1);
+#else
   StretchedSprites.BltEx(X, Y, 0);
   StretchedSprites.BltEx(X + (TwoPixels * dx), Y, aniFramesZonkRollRight[dx - 1]);
+#endif
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
   bl = HighByte(PlayField16[si]) + 1;
   if (bl < 0x62)

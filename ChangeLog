@@ -2,6 +2,7 @@
 	* fixed bug in native Supaplex engine that broke several demo solutions
 	* done integrating R'n'D graphics engine into file "SnikSnaks.c"
 	* done integrating R'n'D graphics engine into file "Electrons.c"
+	* done integrating R'n'D graphics engine into file "Zonk.c"
 
 2010-02-14
 	* done integrating R'n'D graphics engine into file "Murphy.c"
