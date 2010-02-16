@@ -237,6 +237,15 @@
 #define aniSnikSnakRight		IMG_SP_SNIKSNAK_RIGHT
 #define aniSnikSnakUp			IMG_SP_SNIKSNAK_UP
 
+#define aniSnikSnakTurnLeftToUp		IMG_SP_SNIKSNAK_TURNING_FROM_LEFT_UP
+#define aniSnikSnakTurnLeftToDown	IMG_SP_SNIKSNAK_TURNING_FROM_LEFT_DOWN
+#define aniSnikSnakTurnRightToUp	IMG_SP_SNIKSNAK_TURNING_FROM_RIGHT_UP
+#define aniSnikSnakTurnRightToDown	IMG_SP_SNIKSNAK_TURNING_FROM_RIGHT_DOWN
+#define aniSnikSnakTurnUpToLeft		IMG_SP_SNIKSNAK_TURNING_FROM_UP_LEFT
+#define aniSnikSnakTurnUpToRight	IMG_SP_SNIKSNAK_TURNING_FROM_UP_RIGHT
+#define aniSnikSnakTurnDownToLeft	IMG_SP_SNIKSNAK_TURNING_FROM_DOWN_LEFT
+#define aniSnikSnakTurnDownToRight	IMG_SP_SNIKSNAK_TURNING_FROM_DOWN_RIGHT
+
 #define aniTerminalActive		IMG_SP_TERMINAL_ACTIVE
 
 #define aniExplosionInfo		(111)
@@ -345,6 +354,8 @@ extern int getSequenceLength(int sequence);
 extern boolean isSnappingSequence(int sequence);
 
 extern int fiGraphic[];
+extern int aniSnikSnakTurningLeft[];
+extern int aniSnikSnakTurningRight[];
 
 extern boolean Alignments;
 extern boolean BlockingSpeed;

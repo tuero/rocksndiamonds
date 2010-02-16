@@ -655,6 +655,12 @@ static int subDrawSnikSnakTurnLeft(int si, int bx)
 {
   static int subDrawSnikSnakTurnLeft;
 
+#if 1
+  // int pos = bx / 2;
+  int pos = ((bx + 7) % 8) / 2;
+
+  GfxGraphic[GetX(si)][GetY(si)] = aniSnikSnakTurningLeft[pos];
+#else
   int X, Y;
 
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -662,6 +668,7 @@ static int subDrawSnikSnakTurnLeft(int si, int bx)
   Y = GetStretchY(si);
   StretchedSprites.BltEx(X, Y, aniFramesSnikSnak[bx]);
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
+#endif
 
   return subDrawSnikSnakTurnLeft;
 }
@@ -670,6 +677,12 @@ static int subDrawSnikSnakTurnRight(int si, int bx)
 {
   static int subDrawSnikSnakTurnRight;
 
+#if 1
+  // int pos = (bx - 8) / 2;
+  int pos = ((bx - 1) % 8) / 2;
+
+  GfxGraphic[GetX(si)][GetY(si)] = aniSnikSnakTurningRight[pos];
+#else
   int X, Y;
 
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -677,6 +690,7 @@ static int subDrawSnikSnakTurnRight(int si, int bx)
   Y = GetStretchY(si);
   StretchedSprites.BltEx(X, Y, aniFramesSnikSnak[0x10 - bx]);
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
+#endif
 
   return subDrawSnikSnakTurnRight;
 }

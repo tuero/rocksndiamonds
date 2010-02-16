@@ -244,6 +244,23 @@ int fiGraphic[] =
   aniWallSpace
 };
 
+int aniSnikSnakTurningLeft[] =
+{
+  aniSnikSnakTurnUpToLeft,
+  aniSnikSnakTurnLeftToDown,
+  aniSnikSnakTurnDownToRight,
+  aniSnikSnakTurnRightToUp
+};
+
+int aniSnikSnakTurningRight[] =
+{
+  aniSnikSnakTurnUpToRight,
+  aniSnikSnakTurnRightToDown,
+  aniSnikSnakTurnDownToLeft,
+  aniSnikSnakTurnLeftToUp
+};
+
+
 int getSequenceLength(int sequence)
 {
   switch (sequence)
