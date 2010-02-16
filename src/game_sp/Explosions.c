@@ -30,6 +30,10 @@ int subAnimateExplosion(int si)
     return subAnimateExplosion;
 
   bl = HighByte(PlayField16[si]);
+#if 0
+  printf("::: subAnimateExplosion: %d [%d, %d] [%d]\n",
+	 bl, PlayField16[si], si, FrameCounter);
+#endif
   if ((bl & 0x80) != 0) // infotron explosion!
     goto loc_g_28D0;
 
@@ -124,6 +128,10 @@ static void LetExplodeFieldSP(int tsi, int cx, int dh)
     return;
 
   al = LowByte(PlayField16[tsi]);
+#if 0
+  printf("::: LetExplodeFieldSP: got %d [%d, %d] [%d]\n",
+	 al, PlayField16[tsi], tsi, FrameCounter);
+#endif
   switch (al)
   {
     case fiHardWare:
@@ -166,6 +174,8 @@ static void LetExplodeFieldSP(int tsi, int cx, int dh)
       PlayField16[tsi] = cx;
       break;
   }
+
+  GfxGraphic[GetX(tsi)][GetY(tsi)] = -1;
 }
 
 static int subExplodeZonk(int tsi, int cx)

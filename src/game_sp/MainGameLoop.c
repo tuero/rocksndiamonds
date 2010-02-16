@@ -599,6 +599,8 @@ int subCalculateScreenScrollPos()
   if (ExplosionShake != 0)
   {
     subGetRandomNumber();
+
+    // printf("::: ExplosionShake [%d]\n", FrameCounter);
   }
 
   {

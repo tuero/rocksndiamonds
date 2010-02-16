@@ -1161,7 +1161,11 @@ loc_g_6817:
 
 #if 1
   // draw new terminal type
+#if 1
+  GfxGraphic[GetX(*si - FieldWidth)][GetY(*si - FieldWidth)] = aniTerminalActive;
+#else
   subCopyImageToScreen(*si - FieldWidth, aniTerminalActive);
+#endif
 #else
   subCopyFieldToScreen(*si - FieldWidth, 0x88); // draw new terminal type
 #endif
@@ -1183,7 +1187,11 @@ loc_g_684E:
 
 #if 1
   // draw new terminal type
+#if 1
+  GfxGraphic[GetX(*si - 1)][GetY(*si - 1)] = aniTerminalActive;
+#else
   subCopyImageToScreen(*si - 1, aniTerminalActive);
+#endif
 #else
   subCopyFieldToScreen(*si - 1, 0x88); // draw new terminal type
 #endif
@@ -1205,7 +1213,11 @@ loc_g_6884:
 
 #if 1
   // draw new terminal type
+#if 1
+  GfxGraphic[GetX(*si + FieldWidth)][GetY(*si + FieldWidth)] = aniTerminalActive;
+#else
   subCopyImageToScreen(*si + FieldWidth, aniTerminalActive);
+#endif
 #else
   subCopyFieldToScreen(*si + FieldWidth, 0x88); // draw new terminal type
 #endif
@@ -1227,7 +1239,11 @@ loc_g_68BA:
 
 #if 1
   // draw new terminal type
+#if 1
+  GfxGraphic[GetX(*si + 1)][GetY(*si + 1)] = aniTerminalActive;
+#else
   subCopyImageToScreen(*si + 1, aniTerminalActive);
+#endif
 #else
   subCopyFieldToScreen(*si + 1, 0x88); // draw new terminal type
 #endif
@@ -1697,6 +1713,8 @@ loc_g_6C8F:
 
 #if 1
     StretchedSprites.BltImg(X, Y, dx1, Tmp);
+    GfxGraphic[GetX(*si)][GetY(*si)] = -1;	// (Murphy's position)
+    GfxGraphic[GetX(dxPos)][GetY(dxPos)] = -1;	// (snapping position)
     // printf("::: Tmp: %d\n", Tmp);
 #else
     StretchedSprites.BltEx(X, Y, dx[Tmp]);

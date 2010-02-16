@@ -29,7 +29,9 @@ int subAnimateBugs(int si)
   // int ax, bx, cx, dx, di;
   // int ah, bh, ch, dh, al, bl, cl, dl;
   // int cx;
+#if 0
   int graphic, sync_frame;
+#endif
   int bl;
 
   if (fiBug != LowByte(PlayField16[si]))
@@ -108,19 +110,32 @@ markDisplay:
 
 #if 1
 
+#if 0
   graphic = (bl == 0  ? aniBugActivating :
 	     bl == 12 ? aniBugDeactivating :
 	     bl == 13 ? aniBug : aniBugActive);
   sync_frame = (bl >= 1 && bl <= 11 ? (bl - 1) * 4 : 0) + (TimerVar & 3);
+#endif
 
   // printf("::: %d [%d]\n", sync_frame, gfx.anim_random_frame);
 
+#if 0
   /* a general random frame treatment would be needed for _all_ animations */
+  /* (DONE) */
   if (isRandomAnimation_SP(graphic) &&
       !isNextAnimationFrame_SP(graphic, sync_frame))
     return subAnimateBugs;
+#endif
 
+#if 1
+
+  GfxGraphic[GetX(si)][GetY(si)] = (bl == 0  ? aniBugActivating :
+				    bl == 12 ? aniBugDeactivating :
+				    bl == 13 ? aniBug : aniBugActive);
+
+#else
   subCopyAnimToScreen(si, graphic, sync_frame);
+#endif
 
 #else
   subCopyFieldToScreen(si, aniFramesBug[bl]);
@@ -207,7 +222,15 @@ int subAnimateTerminals(int si)
     GfxFrame[lx][ly] += getGraphicInfo_Delay(graphic);
 
 #if 1
+
+#if 1
+
+  GfxGraphic[GetX(si)][GetY(si)] = (bl < 8 ? aniTerminal : aniTerminalActive);
+
+#else
   subCopyAnimToScreen(si, graphic, GfxFrame[lx][ly]);
+#endif
+
 #else
   X = GetStretchX(si);
   Y = GetStretchY(si);
@@ -276,6 +299,9 @@ int subGetRandomNumber()
   int subGetRandomNumber;
 
   long Tmp, RSeed;
+#if 0
+  long Tst;
+#endif
 
   RSeed = (long)(0x7FFF & RandomSeed);
   if (0x8000 == (RandomSeed & 0x8000))
@@ -287,6 +313,15 @@ int subGetRandomNumber()
 #else
   Tmp = 0xFFFF & (((0x5E5 * RandomSeed) & 0xFFFF) + 0x31);
 #endif
+
+#if 0
+  Tst = 0xFFFF & (((0x5E5 * RSeed) & 0xFFFF) + 0x31);
+  printf("::: BugsTerminals.c: subGetRandomNumber(): %d [%ld] [%ld, %ld]\n",
+	 RandomSeed, RSeed, Tmp, Tst);
+  if (Tmp != Tst)
+    printf("::: !!!!!!!!!!\n");
+#endif
+
   RandomSeed = 0x7FFF & Tmp;
   if ((Tmp & 0x8000) != 0)
     RandomSeed = RandomSeed | 0x8000;
@@ -303,6 +338,11 @@ int subGetRandomNumber()
 #if 0
   printf("::: BugsTerminals.c: ---------- subGetRandomNumber(): %d\n",
 	 subGetRandomNumber);
+#endif
+
+#if 0
+  printf("::: BugsTerminals.c: subGetRandomNumber(): %d [%ld, %d]\n",
+	 subGetRandomNumber, Tmp, RandomSeed);
 #endif
 
   return subGetRandomNumber;

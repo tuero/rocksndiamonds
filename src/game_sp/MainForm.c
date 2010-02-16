@@ -3161,7 +3161,7 @@ void DrawField(int X, int Y)
 
   tsi = GetSI(X, Y);
   Tmp = LowByte(PlayField16[tsi]);
-  if (40 < Tmp)
+  if (Tmp > 40)
     Tmp = 0;
 
   if (Tmp == fiRAM || Tmp == fiHardWare)
@@ -3172,11 +3172,23 @@ void DrawField(int X, int Y)
 
   if (EditFlag)
   {
-    if (fiOrangeDisk < Tmp && Tmp < fiSnikSnak)
+    if (Tmp > fiOrangeDisk && Tmp < fiSnikSnak)
       Tmp = DisPlayField[tsi];
   }
 
+#if 1
+  if (Tmp >= 0 && Tmp <= 40)
+  {
+    subCopyImageToScreen(tsi, fiGraphic[Tmp]);
+
+#if 1
+    if (Tmp != fiSpace && Tmp != fiSnikSnak && Tmp != fiElectron)
+      GfxGraphic[X][Y] = fiGraphic[Tmp];
+#endif
+  }
+#else
   StretchedSprites.BltEx(StretchWidth * X, StretchWidth * Y, Tmp);
+#endif
 }
 
 void DrawFieldAnimated(int X, int Y)
@@ -3216,15 +3228,23 @@ void DrawFieldNoAnimated(int X, int Y)
   switch (Tmp)
   {
     case fiSnikSnak:
+#if 1
+      subCopyImageToScreen(tsi, aniSpace);
+#else
       StretchedSprites.BltEx(StretchWidth * X, StretchWidth * Y, fiSpace);
+#endif
       break;
 
     case fiElectron:
+#if 1
+      subCopyImageToScreen(tsi, aniSpace);
+#else
       StretchedSprites.BltEx(StretchWidth * X, StretchWidth * Y, fiSpace);
+#endif
       break;
 
     default:
-      if (40 < Tmp)
+      if (Tmp > 40)
         Tmp = 0;
 
       if (Tmp == fiRAM || Tmp == fiHardWare)
@@ -3235,7 +3255,7 @@ void DrawFieldNoAnimated(int X, int Y)
 
       if (EditFlag)
       {
-        if (fiOrangeDisk < Tmp && Tmp < fiSnikSnak)
+        if (Tmp > fiOrangeDisk && Tmp < fiSnikSnak)
           Tmp = DisPlayField[tsi];
       }
 
@@ -3245,7 +3265,20 @@ void DrawFieldNoAnimated(int X, int Y)
 	       X, Y, Tmp);
 #endif
 
+#if 1
+      if (Tmp >= 0 && Tmp <= 40)
+      {
+	subCopyImageToScreen(tsi, fiGraphic[Tmp]);
+
+#if 1
+	if (Tmp != fiSpace && Tmp != fiSnikSnak && Tmp != fiElectron)
+	  GfxGraphic[X][Y] = fiGraphic[Tmp];
+#endif
+      }
+#else
       StretchedSprites.BltEx(StretchWidth * X, StretchWidth * Y, Tmp);
+#endif
+
       break;
   }
 }

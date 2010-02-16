@@ -186,6 +186,76 @@ void InitScrollPlayfield()
 
 void UpdatePlayfield()
 {
+  int x, y;
+#if 1
+  int num_redrawn = 0;
+#endif
+
+  for (y = DisplayMinY; y <= DisplayMaxY; y++)
+  {
+    for (x = DisplayMinX; x <= DisplayMaxX; x++)
+    {
+      int element = LowByte(PlayField16[GetSI(x, y)]);
+      int graphic = GfxGraphic[x][y];
+      int sync_frame = GfxFrame[x][y];
+#if 1
+      boolean redraw = FALSE;
+#else
+      boolean redraw = TRUE;	// !!! TEST ONLY -- ALWAYS REDRAW !!!
+#endif
+
+      if (graphic < 0)
+	continue;
+
+      if (element != GfxElementLast[x][y] &&
+	  graphic == GfxGraphicLast[x][y])
+      {
+	/* element changed, but not graphic => disable updating graphic */
+
+	GfxElementLast[x][y] = element;
+	GfxGraphicLast[x][y] = GfxGraphic[x][y] = -1;
+
+	continue;
+      }
+
+      if (graphic != GfxGraphicLast[x][y])			// new graphic
+      {
+	redraw = TRUE;
+
+	GfxElementLast[x][y] = element;
+	GfxGraphicLast[x][y] = GfxGraphic[x][y];
+	sync_frame = GfxFrame[x][y] = 0;
+      }
+      else if (isNextAnimationFrame_SP(graphic, sync_frame))	// new frame
+      {
+	redraw = TRUE;
+      }
+
+      if (redraw)
+      {
+	int sx = x * StretchWidth;
+	int sy = y * StretchWidth;
+
+#if 0
+	printf("::: REDRAW (%d, %d): %d, %d\n", x, y, graphic, sync_frame);
+#endif
+
+	StretchedSprites.BltImg(sx, sy, graphic, sync_frame);
+
+#if 1
+	num_redrawn++;
+#endif
+      }
+    }
+  }
+
+#if 0
+  printf("::: FRAME %d: %d redrawn\n", FrameCounter, num_redrawn);
+#endif
+}
+
+void UpdatePlayfield_TMP()
+{
   int x1 = mScrollX_last / TILEX - 2;
   int y1 = mScrollY_last / TILEY - 2;
   int x2 = mScrollX_last / TILEX + (SCR_FIELDX - 1) + 2;

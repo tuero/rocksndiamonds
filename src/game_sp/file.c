@@ -69,9 +69,19 @@ void copyInternalEngineVars_SP()
 
   PlayField8 = REDIM_1D(sizeof(byte), 0, FileMax + 1 - 1);
   DisPlayField = REDIM_1D(sizeof(byte), 0, FieldMax + 1 - 1);
+#if 0
   PlayField16 = REDIM_1D(sizeof(int), -FieldWidth, FieldMax);
+#else
+  PlayField16 = REDIM_1D(sizeof(int), -FieldWidth * 2, FieldMax);
+#endif
 
 #if 1
+
+#if 1
+  /* fill preceding playfield buffer zone with (indestructible) "hardware" */
+  for (i = -FieldWidth * 2; i < -FieldWidth; i++)
+    PlayField16[i] = 0x20;
+#endif
 
 #if 0
   /* fill preceding playfield buffer zone with (indestructible) "hardware" */

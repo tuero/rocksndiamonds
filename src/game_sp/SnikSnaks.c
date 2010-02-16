@@ -34,6 +34,12 @@ int subAnimateSnikSnaks(int si)
   if (SnikSnaksElectronsFrozen == 1)
     return subAnimateSnikSnaks;
 
+#if 1
+  /* (not sure why this was removed -- this broke several level solutions) */
+  if (LowByte(PlayField16[si]) != fiSnikSnak)
+    return subAnimateSnikSnaks;
+#endif
+
   //  If LowByte(PlayField16(si)) <> fiSnikSnak Then Exit Function
   // Debug.Assert (LowByte(PlayField16[si]) == fiSnikSnak);
   bx = HighByte(PlayField16[si]);
@@ -119,7 +125,7 @@ static int subSnikSnakTurnLeft(int si, int bx)
   static int subSnikSnakTurnLeft;
 
   // int ax, ah, bl, dx, X, Y;
-  int ax, ah, bl, X, Y;
+  int ax, ah, bl;
 
   ax = (TimerVar & 3);
   if (ax != 0)
@@ -130,11 +136,16 @@ static int subSnikSnakTurnLeft(int si, int bx)
     return subSnikSnakTurnLeft;
   } // loc_g_75E0:
 
+#if 1
+  subDrawSnikSnakTurnLeft(si, bx);
+#else
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
   X = GetStretchX(si);
   Y = GetStretchY(si);
   StretchedSprites.BltEx(X, Y, aniFramesSnikSnak[bx]);
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
+#endif
+
   bx = (bx + 1) & 0x7;
   MovHighByte(&PlayField16[si], bx);
   return subSnikSnakTurnLeft;
@@ -243,7 +254,7 @@ static int subSnikSnakTurnRight(int si, int bx)
   static int subSnikSnakTurnRight;
 
   // int ax, ah, bl, dx, X, Y;
-  int ax, ah, bl, X, Y;
+  int ax, ah, bl;
 
   ax = (TimerVar & 3);
   if (ax != 0)
@@ -254,11 +265,16 @@ static int subSnikSnakTurnRight(int si, int bx)
     return subSnikSnakTurnRight;
   } // loc_g_76DB:
 
+#if 1
+  subDrawSnikSnakTurnRight(si, bx);
+#else
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
   X = GetStretchX(si);
   Y = GetStretchY(si);
   StretchedSprites.BltEx(X, Y, aniFramesSnikSnak[0x10 - bx]);
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
+#endif
+
   bx = ((bx + 1) & 0x7) | 8;
   MovHighByte(&PlayField16[si], bx);
   return subSnikSnakTurnRight;
@@ -367,8 +383,12 @@ static int subSnikSnakFromBelow(int si, int bx)
   static int subSnikSnakFromBelow;
 
   // int ax, ah, bl, dx, X, Y;
-  int ax, bl, X, Y;
+  int ax, bl;
 
+#if 1
+  subDrawSnikSnakFromBelow(si, bx);
+  bx = bx - 0xF;  // get and increment sequence#
+#else
   bx = bx - 0xF;  // get and increment sequence#
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
   X = GetStretchX(si);
@@ -376,6 +396,8 @@ static int subSnikSnakFromBelow(int si, int bx)
   StretchedSprites.BltEx(X, Y, 0);
   StretchedSprites.BltEx(X, Y - bx * TwoPixels, aniSnikSnakUp + bx);
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
+#endif
+
   bl = LowByte(bx);
   if (bl == 7 && LowByte(PlayField16[si + FieldWidth]) != fiExplosion)
   {
@@ -430,8 +452,12 @@ static int subSnikSnakFromRight(int si, int bx)
   static int subSnikSnakFromRight;
 
   // int ax, ah, bl, dx, X, Y;
-  int ax, bl, X, Y;
+  int ax, bl;
 
+#if 1
+  subDrawSnikSnakFromRight(si, bx);
+  bx = bx - 0x17;  // get and increment sequence#
+#else
   bx = bx - 0x17;  // get and increment sequence#
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
   X = GetStretchX(si + 1);
@@ -439,6 +465,8 @@ static int subSnikSnakFromRight(int si, int bx)
   StretchedSprites.BltEx(X, Y, 0);
   StretchedSprites.BltEx(X - bx * TwoPixels, Y, aniSnikSnakLeft + bx);
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
+#endif
+
   bl = LowByte(bx);
   if (bl == 7 && LowByte(PlayField16[si + 1]) != fiExplosion)
   {
@@ -492,8 +520,12 @@ static int subSnikSnakFromAbove(int si, int bx)
   static int subSnikSnakFromAbove;
 
   // int ax, ah, bl, dx, X, Y;
-  int ax, bl, X, Y;
+  int ax, bl;
 
+#if 1
+  subDrawSnikSnakFromAbove(si, bx);
+  bx = bx - 0x1F;  // get and increment sequence#
+#else
   bx = bx - 0x1F;  // get and increment sequence#
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
   X = GetStretchX(si);
@@ -501,6 +533,8 @@ static int subSnikSnakFromAbove(int si, int bx)
   StretchedSprites.BltEx(X, Y, 0);
   StretchedSprites.BltEx(X, Y + bx * TwoPixels, aniSnikSnakDown + bx);
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
+#endif
+
   bl = LowByte(bx);
   if (bl == 7 && LowByte(PlayField16[si - FieldWidth]) != fiExplosion)
   {
@@ -554,8 +588,12 @@ static int subSnikSnakFromLeft(int si, int bx)
   static int subSnikSnakFromLeft;
 
   // int ax, ah, bl, dx, X, Y;
-  int ax, bl, X, Y;
+  int ax, bl;
 
+#if 1
+  subDrawSnikSnakFromLeft(si, bx);
+  bx = bx - 0x27;  // get and increment sequence#
+#else
   bx = bx - 0x27;  // get and increment sequence#
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
   X = GetStretchX(si - 1);
@@ -563,6 +601,8 @@ static int subSnikSnakFromLeft(int si, int bx)
   StretchedSprites.BltEx(X, Y, 0);
   StretchedSprites.BltEx(X + bx * TwoPixels, Y, aniSnikSnakRight + bx);
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
+#endif
+
   bl = LowByte(bx);
   if (bl == 7 && LowByte(PlayField16[si - 1]) != fiExplosion)
   {
@@ -651,8 +691,13 @@ static int subDrawSnikSnakFromBelow(int si, int bx)
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
   X = GetStretchX(si);
   Y = GetStretchY(si + FieldWidth);
+#if 1
+  StretchedSprites.BltImg(X, Y, aniSpace, 0);
+  StretchedSprites.BltImg(X, Y - bx * TwoPixels, aniSnikSnakUp, bx);
+#else
   StretchedSprites.BltEx(X, Y, 0);
   StretchedSprites.BltEx(X, Y - bx * TwoPixels, aniSnikSnakUp + bx);
+#endif
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
 
   return subDrawSnikSnakFromBelow;
@@ -668,8 +713,13 @@ static int subDrawSnikSnakFromRight(int si, int bx)
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
   X = GetStretchX(si + 1);
   Y = GetStretchY(si);
+#if 1
+  StretchedSprites.BltImg(X, Y, aniSpace, 0);
+  StretchedSprites.BltImg(X - bx * TwoPixels, Y, aniSnikSnakLeft, bx);
+#else
   StretchedSprites.BltEx(X, Y, 0);
   StretchedSprites.BltEx(X - bx * TwoPixels, Y, aniSnikSnakLeft + bx);
+#endif
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
 
   return subDrawSnikSnakFromRight;
@@ -685,8 +735,13 @@ static int subDrawSnikSnakFromAbove(int si, int bx)
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
   X = GetStretchX(si);
   Y = GetStretchY(si - FieldWidth);
+#if 1
+  StretchedSprites.BltImg(X, Y, aniSpace, 0);
+  StretchedSprites.BltImg(X, Y + bx * TwoPixels, aniSnikSnakDown, bx);
+#else
   StretchedSprites.BltEx(X, Y, 0);
   StretchedSprites.BltEx(X, Y + bx * TwoPixels, aniSnikSnakDown + bx);
+#endif
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
 
   return subDrawSnikSnakFromAbove;
@@ -702,8 +757,13 @@ static int subDrawSnikSnakFromLeft(int si, int bx)
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
   X = GetStretchX(si - 1);
   Y = GetStretchY(si);
+#if 1
+  StretchedSprites.BltImg(X, Y, aniSpace, 0);
+  StretchedSprites.BltImg(X + bx * TwoPixels, Y, aniSnikSnakRight, bx);
+#else
   StretchedSprites.BltEx(X, Y, 0);
   StretchedSprites.BltEx(X + bx * TwoPixels, Y, aniSnikSnakRight + bx);
+#endif
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
 
   return subDrawSnikSnakFromLeft;

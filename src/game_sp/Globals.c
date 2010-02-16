@@ -199,6 +199,51 @@ int aniFramesRedDisk[] = { 20, -1 };
 
 #if 1
 
+int fiGraphic[] =
+{
+  aniSpace,
+  aniZonk,
+  aniBase,
+  aniMurphy,
+  aniInfotron,
+  aniRAM,
+  aniHardWare,
+  aniExit,
+  aniOrangeDisk,
+  aniPortRight,
+  aniPortDown,
+  aniPortLeft,
+  aniPortUp,
+  aniSpPortRight,
+  aniSpPortDown,
+  aniSpPortLeft,
+  aniSpPortUp,
+  aniSnikSnak,
+  aniYellowDisk,
+  aniTerminal,
+  aniRedDisk,
+  aniPortUpAndDown,
+  aniPortLeftAndRight,
+  aniPortAllDirections,
+  aniElectron,
+  aniBug,
+  aniRAMLeft,
+  aniRAMRight,
+  aniHW0,
+  aniHW1,
+  aniHW2,
+  aniHW3,
+  aniHW4,
+  aniHW5,
+  aniHW6,
+  aniHW7,
+  aniHW8,
+  aniHW9,
+  aniRAMTop,
+  aniRAMBottom,
+  aniWallSpace
+};
+
 int getSequenceLength(int sequence)
 {
   switch (sequence)

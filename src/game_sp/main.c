@@ -6,6 +6,10 @@
 struct GameInfo_SP game_sp_info;
 struct LevelInfo_SP native_sp_level;
 
+
+int GfxElementLast[SP_MAX_PLAYFIELD_WIDTH][SP_MAX_PLAYFIELD_HEIGHT];
+int GfxGraphicLast[SP_MAX_PLAYFIELD_WIDTH][SP_MAX_PLAYFIELD_HEIGHT];
+int GfxGraphic[SP_MAX_PLAYFIELD_WIDTH][SP_MAX_PLAYFIELD_HEIGHT];
 int GfxFrame[SP_MAX_PLAYFIELD_WIDTH][SP_MAX_PLAYFIELD_HEIGHT];
 
 
@@ -21,8 +25,15 @@ void InitGameEngine_SP()
   menBorder.Checked = setup.sp_show_border_elements;
 
   for (x = 0; x < SP_MAX_PLAYFIELD_WIDTH; x++)
+  {
     for (y = 0; y < SP_MAX_PLAYFIELD_HEIGHT; y++)
+    {
+      GfxElementLast[x][y] = -1;
+      GfxGraphicLast[x][y] = -1;
+      GfxGraphic[x][y] = -1;
       GfxFrame[x][y] = 0;
+    }
+  }
 
   InitScrollPlayfield();
 
@@ -68,7 +79,7 @@ void GameActions_SP(byte action[MAX_PLAYERS], boolean warp_mode)
 
   RedrawPlayfield_SP(FALSE);
 
-  for (x = 0; x < SP_MAX_PLAYFIELD_WIDTH; x++)
-    for (y = 0; y < SP_MAX_PLAYFIELD_HEIGHT; y++)
+  for (x = DisplayMinX; x <= DisplayMaxX; x++)
+    for (y = DisplayMinY; y <= DisplayMaxY; y++)
       GfxFrame[x][y]++;
 }
