@@ -5772,10 +5772,19 @@ void RelocatePlayer(int jx, int jy, int el_player_raw)
   Feld[jx][jy] = el_player;
   InitPlayerField(jx, jy, el_player, TRUE);
 
+  /* "InitPlayerField()" above sets Feld[jx][jy] to EL_EMPTY, but it may be
+     possible that the relocation target field did not contain a player element,
+     but a walkable element, to which the new player was relocated -- in this
+     case, restore that (already initialized!) element on the player field */
   if (!ELEM_IS_PLAYER(element))	/* player may be set on walkable element */
   {
-    Feld[jx][jy] = element;
+    Feld[jx][jy] = element;	/* restore previously existing element */
+#if 0
+    /* !!! do not initialize already initialized element a second time !!! */
+    /* (this causes at least problems with "element creation" CE trigger for
+       already existing elements, and existing Sokoban fields counted twice) */
     InitField(jx, jy, FALSE);
+#endif
   }
 
   /* only visually relocate centered player */
