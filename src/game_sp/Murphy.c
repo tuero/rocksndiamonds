@@ -1073,12 +1073,12 @@ loc_g_6756:
     return;
 
 #if 1
-  if (!game_sp_info.LevelSolved)
+  if (!game_sp.LevelSolved)
     printf("::: Murphy.c: !!!!!!!!!! LEVEL %d SOLVED !!!!!!!!!!\n",LevelNumber);
 #endif
 
 #if 1
-  game_sp_info.LevelSolved = TRUE;
+  game_sp.LevelSolved = TRUE;
 #endif
 
   subSoundFXExit();

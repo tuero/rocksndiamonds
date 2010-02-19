@@ -12058,17 +12058,17 @@ static void CheckLevelTime()
   }
   else if (level.game_engine_type == GAME_ENGINE_TYPE_SP)
   {
-    if (game_sp_info.LevelSolved &&
-	!game_sp_info.GameOver)				/* game won */
+    if (game_sp.LevelSolved &&
+	!game_sp.GameOver)				/* game won */
     {
       PlayerWins(local_player);
 
-      game_sp_info.GameOver = TRUE;
+      game_sp.GameOver = TRUE;
 
       AllPlayersGone = TRUE;
     }
 
-    if (game_sp_info.GameOver)				/* game lost */
+    if (game_sp.GameOver)				/* game lost */
       AllPlayersGone = TRUE;
   }
 
@@ -12268,17 +12268,17 @@ void GameActions()
   }
   else if (level.game_engine_type == GAME_ENGINE_TYPE_SP)
   {
-    if (game_sp_info.LevelSolved &&
-	!game_sp_info.GameOver)				/* game won */
+    if (game_sp.LevelSolved &&
+	!game_sp.GameOver)				/* game won */
     {
       PlayerWins(local_player);
 
-      game_sp_info.GameOver = TRUE;
+      game_sp.GameOver = TRUE;
 
       AllPlayersGone = TRUE;
     }
 
-    if (game_sp_info.GameOver)				/* game lost */
+    if (game_sp.GameOver)				/* game lost */
       AllPlayersGone = TRUE;
   }
 
@@ -16413,8 +16413,6 @@ unsigned int RND(int max)
 /* game engine snapshot handling functions                                   */
 /* ------------------------------------------------------------------------- */
 
-#define ARGS_ADDRESS_AND_SIZEOF(x)		(&(x)), (sizeof(x))
-
 struct EngineSnapshotInfo
 {
   /* runtime values for custom element collect score */
@@ -16428,27 +16426,9 @@ struct EngineSnapshotInfo
   int belt_anim_mode[4 * NUM_BELT_PARTS];
 };
 
-struct EngineSnapshotNodeInfo
-{
-  void *buffer_orig;
-  void *buffer_copy;
-  int size;
-};
-
 static struct EngineSnapshotInfo engine_snapshot_rnd;
-static ListNode *engine_snapshot_list = NULL;
 static char *snapshot_level_identifier = NULL;
 static int snapshot_level_nr = -1;
-
-void FreeEngineSnapshot()
-{
-  while (engine_snapshot_list != NULL)
-    deleteNodeFromList(&engine_snapshot_list, engine_snapshot_list->key,
-		       checked_free);
-
-  setString(&snapshot_level_identifier, NULL);
-  snapshot_level_nr = -1;
-}
 
 static void SaveEngineSnapshotValues_RND()
 {
@@ -16535,36 +16515,26 @@ static void LoadEngineSnapshotValues_RND()
   }
 }
 
-static void SaveEngineSnapshotBuffer(void *buffer, int size)
-{
-  struct EngineSnapshotNodeInfo *bi =
-    checked_calloc(sizeof(struct EngineSnapshotNodeInfo));
-
-  bi->buffer_orig = buffer;
-  bi->buffer_copy = checked_malloc(size);
-  bi->size = size;
-
-  memcpy(bi->buffer_copy, buffer, size);
-
-  addNodeToList(&engine_snapshot_list, NULL, bi);
-}
-
 void SaveEngineSnapshot()
 {
-  FreeEngineSnapshot();		/* free previous snapshot, if needed */
-
-  if (level_editor_test_game)	/* do not save snapshots from editor */
+  /* do not save snapshots from editor */
+  if (level_editor_test_game)
     return;
+
+  /* free previous snapshot buffers, if needed */
+  FreeEngineSnapshotBuffers();
 
   /* copy some special values to a structure better suited for the snapshot */
 
   SaveEngineSnapshotValues_RND();
   SaveEngineSnapshotValues_EM();
+  SaveEngineSnapshotValues_SP();
 
   /* save values stored in special snapshot structure */
 
   SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(engine_snapshot_rnd));
   SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(engine_snapshot_em));
+  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(engine_snapshot_sp));
 
   /* save further RND engine values */
 
@@ -16638,7 +16608,7 @@ void SaveEngineSnapshot()
   snapshot_level_nr = level_nr;
 
 #if 0
-  ListNode *node = engine_snapshot_list;
+  ListNode *node = engine_snapshot_list_rnd;
   int num_bytes = 0;
 
   while (node != NULL)
@@ -16652,29 +16622,17 @@ void SaveEngineSnapshot()
 #endif
 }
 
-static void LoadEngineSnapshotBuffer(struct EngineSnapshotNodeInfo *bi)
-{
-  memcpy(bi->buffer_orig, bi->buffer_copy, bi->size);
-}
-
 void LoadEngineSnapshot()
 {
-  ListNode *node = engine_snapshot_list;
+  /* restore generically stored snapshot buffers */
 
-  if (engine_snapshot_list == NULL)
-    return;
-
-  while (node != NULL)
-  {
-    LoadEngineSnapshotBuffer((struct EngineSnapshotNodeInfo *)node->content);
-
-    node = node->next;
-  }
+  LoadEngineSnapshotBuffers();
 
   /* restore special values from snapshot structure */
 
   LoadEngineSnapshotValues_RND();
   LoadEngineSnapshotValues_EM();
+  LoadEngineSnapshotValues_SP();
 }
 
 boolean CheckEngineSnapshot()

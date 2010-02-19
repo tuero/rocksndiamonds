@@ -39,6 +39,28 @@ boolean redraw[MAX_BUF_XSIZE][MAX_BUF_YSIZE];
 
 int TEST_flag = 0;
 
+void RestorePlayfield()
+{
+  int x1 = mScrollX / TILEX - 2;
+  int y1 = mScrollY / TILEY - 2;
+  int x2 = mScrollX / TILEX + (SCR_FIELDX - 1) + 2;
+  int y2 = mScrollY / TILEY + (SCR_FIELDY - 1) + 2;
+  int x, y;
+
+  DrawFrameIfNeeded();
+
+  for (y = DisplayMinY; y <= DisplayMaxY; y++)
+  {
+    for (x = DisplayMinX; x <= DisplayMaxX; x++)
+    {
+      if (x >= x1 && x <= x2 && y >= y1 && y <= y2)
+      {
+	DrawFieldNoAnimated(x, y);
+	DrawFieldAnimated(x, y);
+      }
+    }
+  }
+}
 
 static void ScrollPlayfield(int dx, int dy)
 {
@@ -184,7 +206,7 @@ void InitScrollPlayfield()
   ScrollPlayfieldIfNeededExt(TRUE);
 }
 
-void UpdatePlayfield()
+void UpdatePlayfield(boolean force_redraw)
 {
   int x, y;
 #if 1
@@ -198,10 +220,10 @@ void UpdatePlayfield()
       int element = LowByte(PlayField16[GetSI(x, y)]);
       int graphic = GfxGraphic[x][y];
       int sync_frame = GfxFrame[x][y];
-#if 1
-      boolean redraw = FALSE;
-#else
-      boolean redraw = TRUE;	// !!! TEST ONLY -- ALWAYS REDRAW !!!
+      boolean redraw = force_redraw;
+
+#if 0
+      redraw = TRUE;	// !!! TEST ONLY -- ALWAYS REDRAW !!!
 #endif
 
       if (graphic < 0)

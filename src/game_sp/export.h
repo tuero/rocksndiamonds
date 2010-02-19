@@ -14,15 +14,17 @@
 
 #define SP_NUM_LEVELS_PER_PACKAGE	111
 
-#define SP_PLAYFIELD_WIDTH		60
-#define SP_PLAYFIELD_HEIGHT		24
+#define SP_STD_PLAYFIELD_WIDTH		60
+#define SP_STD_PLAYFIELD_HEIGHT		24
 #define SP_LEVEL_NAME_LEN		23
 #define SP_MAX_SPECIAL_PORTS		10
 
 #define SP_HEADER_SIZE			96
-#define SP_PLAYFIELD_SIZE		(SP_PLAYFIELD_WIDTH *		\
-					 SP_PLAYFIELD_HEIGHT)
-#define SP_LEVEL_SIZE			(SP_HEADER_SIZE + SP_PLAYFIELD_SIZE)
+#define SP_STD_PLAYFIELD_SIZE		(SP_STD_PLAYFIELD_WIDTH *	\
+					 SP_STD_PLAYFIELD_HEIGHT)
+#define SP_MAX_PLAYFIELD_SIZE		(SP_MAX_PLAYFIELD_WIDTH *	\
+					 SP_MAX_PLAYFIELD_HEIGHT)
+#define SP_STD_LEVEL_SIZE		(SP_HEADER_SIZE + SP_STD_PLAYFIELD_SIZE)
 
 #if 0
 #define SP_SCREEN_BUFFER_XSIZE		(SCR_FIELDX + 2)
@@ -87,6 +89,9 @@ struct GameInfo_SP
 {
   boolean LevelSolved;
   boolean GameOver;
+
+  /* needed for engine snapshots */
+  int preceding_buffer_size;
 };
 
 struct DemoInfo_SP
@@ -132,6 +137,14 @@ struct GraphicInfo_SP
 struct EngineSnapshotInfo_SP
 {
   struct GameInfo_SP game_sp;
+
+  int PlayField16[SP_MAX_PLAYFIELD_SIZE + SP_HEADER_SIZE];
+  byte PlayField8[SP_MAX_PLAYFIELD_SIZE + SP_HEADER_SIZE];
+  byte DisPlayField[SP_MAX_PLAYFIELD_SIZE + SP_HEADER_SIZE];
+
+  int AnimationPosTable[SP_MAX_PLAYFIELD_SIZE];
+  byte AnimationSubTable[SP_MAX_PLAYFIELD_SIZE];
+  byte TerminalState[SP_MAX_PLAYFIELD_SIZE + SP_HEADER_SIZE];
 };
 
 
@@ -140,7 +153,7 @@ struct EngineSnapshotInfo_SP
 /* ------------------------------------------------------------------------- */
 
 extern struct GlobalInfo_SP global_sp_info;
-extern struct GameInfo_SP game_sp_info;
+extern struct GameInfo_SP game_sp;
 extern struct LevelInfo_SP native_sp_level;
 extern struct GraphicInfo_SP graphic_info_sp_object[TILE_MAX][8];
 extern struct GraphicInfo_SP graphic_info_sp_player[MAX_PLAYERS][SPR_MAX][8];

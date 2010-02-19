@@ -1,3 +1,6 @@
+2010-02-19
+	* started integrating snapshot functionality into Supaplex game engine
+
 2010-02-16
 	* fixed bug in native Supaplex engine that broke several demo solutions
 	* fixed bug with re-initializing already existing elements in function

@@ -3,7 +3,7 @@
 #include "global.h"
 
 
-struct GameInfo_SP game_sp_info;
+struct GameInfo_SP game_sp;
 struct LevelInfo_SP native_sp_level;
 
 
@@ -19,8 +19,8 @@ void InitGameEngine_SP()
 
   gfx.anim_random_frame = -1;	// (use simple, ad-hoc random numbers)
 
-  game_sp_info.LevelSolved = FALSE;
-  game_sp_info.GameOver = FALSE;
+  game_sp.LevelSolved = FALSE;
+  game_sp.GameOver = FALSE;
 
   menBorder.Checked = setup.sp_show_border_elements;
 
@@ -65,7 +65,10 @@ void RedrawPlayfield_SP(boolean force_redraw)
 {
   // subDisplayLevel();
 
-  UpdatePlayfield();
+  if (force_redraw)
+    RestorePlayfield();
+
+  UpdatePlayfield(force_redraw);
 
   BackToFront_SP();
 }

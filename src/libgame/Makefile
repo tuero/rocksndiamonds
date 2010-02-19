@@ -13,6 +13,7 @@ SRCS =	system.c	\
 	text.c		\
 	sound.c		\
 	joystick.c	\
+	snapshot.c	\
 	toons.c		\
 	pcx.c		\
 	image.c		\
@@ -28,6 +29,7 @@ OBJS =	system.o	\
 	gadgets.o	\
 	text.o		\
 	sound.o		\
+	snapshot.o	\
 	joystick.o	\
 	toons.o		\
 	pcx.o		\

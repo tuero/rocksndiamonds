@@ -13,8 +13,8 @@ void setLevelInfoToDefaults_SP()
   char *empty_title = "-------- EMPTY --------";
   int i, x, y;
 
-  native_sp_level.width  = SP_PLAYFIELD_WIDTH;
-  native_sp_level.height = SP_PLAYFIELD_HEIGHT;
+  native_sp_level.width  = SP_STD_PLAYFIELD_WIDTH;
+  native_sp_level.height = SP_STD_PLAYFIELD_HEIGHT;
 
   for (x = 0; x < native_sp_level.width; x++)
     for (y = 0; y < native_sp_level.height; y++)
@@ -109,6 +109,9 @@ void copyInternalEngineVars_SP()
   for (i = 0; preceding_playfield_memory[i] != NULL; i++)
     preceding_buffer_size += 8;		/* eight 16-bit integer values */
 #endif
+
+  /* needed for engine snapshots */
+  game_sp.preceding_buffer_size = preceding_buffer_size;
 
   LInfo = native_sp_level.header;
 
@@ -416,9 +419,9 @@ boolean LoadNativeLevel_SP(char *filename, int level_pos)
 				  strSuffixLower(filename, ".mpx"));
   boolean demo_available = is_single_level_file;
   boolean is_mpx_file = strSuffixLower(filename, ".mpx");
-  int file_seek_pos = level_pos * SP_LEVEL_SIZE;
-  int level_width  = SP_PLAYFIELD_WIDTH;
-  int level_height = SP_PLAYFIELD_HEIGHT;
+  int file_seek_pos = level_pos * SP_STD_LEVEL_SIZE;
+  int level_width  = SP_STD_PLAYFIELD_WIDTH;
+  int level_height = SP_STD_PLAYFIELD_HEIGHT;
 
   /* always start with reliable default values */
   setLevelInfoToDefaults_SP();
@@ -611,8 +614,8 @@ boolean LoadNativeLevel_SP(char *filename, int level_pos)
 	   multipart_xpos, multipart_ypos, multipart_level.header.LevelTitle);
 #endif
 
-    if (multipart_xpos * SP_PLAYFIELD_WIDTH  > SP_MAX_PLAYFIELD_WIDTH ||
-	multipart_ypos * SP_PLAYFIELD_HEIGHT > SP_MAX_PLAYFIELD_HEIGHT)
+    if (multipart_xpos * SP_STD_PLAYFIELD_WIDTH  > SP_MAX_PLAYFIELD_WIDTH ||
+	multipart_ypos * SP_STD_PLAYFIELD_HEIGHT > SP_MAX_PLAYFIELD_HEIGHT)
     {
       Error(ERR_WARN, "multi-part level is too big -- ignoring part of it");
 
@@ -620,17 +623,17 @@ boolean LoadNativeLevel_SP(char *filename, int level_pos)
     }
 
     multipart_level.width  = MAX(multipart_level.width,
-				 multipart_xpos * SP_PLAYFIELD_WIDTH);
+				 multipart_xpos * SP_STD_PLAYFIELD_WIDTH);
     multipart_level.height = MAX(multipart_level.height,
-				 multipart_ypos * SP_PLAYFIELD_HEIGHT);
+				 multipart_ypos * SP_STD_PLAYFIELD_HEIGHT);
 
     /* copy level part at the right position of multi-part level */
-    for (x = 0; x < SP_PLAYFIELD_WIDTH; x++)
+    for (x = 0; x < SP_STD_PLAYFIELD_WIDTH; x++)
     {
-      for (y = 0; y < SP_PLAYFIELD_HEIGHT; y++)
+      for (y = 0; y < SP_STD_PLAYFIELD_HEIGHT; y++)
       {
-	int start_x = (multipart_xpos - 1) * SP_PLAYFIELD_WIDTH;
-	int start_y = (multipart_ypos - 1) * SP_PLAYFIELD_HEIGHT;
+	int start_x = (multipart_xpos - 1) * SP_STD_PLAYFIELD_WIDTH;
+	int start_y = (multipart_ypos - 1) * SP_STD_PLAYFIELD_HEIGHT;
 
 	multipart_level.playfield[start_x + x][start_y + y] =
 	  native_sp_level.playfield[x][y];

@@ -77,8 +77,8 @@ int subDoGameStuff()
   {
 #if 1
     if (LeadOutCounter == 0 &&
-	!game_sp_info.LevelSolved &&
-	!game_sp_info.GameOver)
+	!game_sp.LevelSolved &&
+	!game_sp.GameOver)
 #else
     if (LeadOutCounter == 0)
 #endif
@@ -101,7 +101,7 @@ int subDoGameStuff()
 #if 1
       /* give Murphy some more time (LeadOutCounter) to reach the exit */
 #else
-      game_sp_info.GameOver = TRUE;
+      game_sp.GameOver = TRUE;
 #endif
 
 #endif
@@ -110,19 +110,19 @@ int subDoGameStuff()
 #if 1
 #if 0
     printf("::: *** %d, %d, %d\n", KillMurphyFlag,
-	   game_sp_info.LevelSolved, game_sp_info.GameOver);
+	   game_sp.LevelSolved, game_sp.GameOver);
 #endif
 
 #if 0
     if (KillMurphyFlag == 1 &&
-	!game_sp_info.LevelSolved &&
-	!game_sp_info.GameOver)
+	!game_sp.LevelSolved &&
+	!game_sp.GameOver)
     {
 #if 1
       printf("::: DoGameStuff.c: !!!!!!!!!! GAME OVER !!!!!!!!!!\n");
 #endif
 
-      game_sp_info.GameOver = TRUE;
+      game_sp.GameOver = TRUE;
     }
 #endif
 #endif

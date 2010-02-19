@@ -22,6 +22,7 @@ extern int TEST_flag;
 
 extern void InitScrollPlayfield();
 extern void UpdatePlayfield();
+extern void RestorePlayfield();
 
 extern void DDScrollBuffer_Blt_Ext(Bitmap *);
 extern void DDScrollBuffer_Blt();
