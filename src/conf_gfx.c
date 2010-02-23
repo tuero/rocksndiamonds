@@ -281,7 +281,7 @@ struct ConfigInfo image_config[] =
   { "[sp_default].exploding.xpos",		"8"			},
   { "[sp_default].exploding.ypos",		"3"			},
   { "[sp_default].exploding.frames",		"8"			},
-  { "[sp_default].exploding.delay",		"3"			},
+  { "[sp_default].exploding.delay",		"4"			},
   { "[sp_default].exploding.anim_mode",		"linear"		},
 
   { "sp_zonk",					"RocksSP.pcx"		},
@@ -753,7 +753,7 @@ struct ConfigInfo image_config[] =
   { "sp_electron.exploding.xpos",		"8"			},
   { "sp_electron.exploding.ypos",		"4"			},
   { "sp_electron.exploding.frames",		"8"			},
-  { "sp_electron.exploding.delay",		"3"			},
+  { "sp_electron.exploding.delay",		"4"			},
   { "sp_electron.exploding.anim_mode",		"linear"		},
 
   { "sp_terminal",				"RocksSP.pcx"		},
@@ -4364,10 +4364,6 @@ struct ConfigInfo image_config[] =
   /* keyword to stop parser: "NO_MORE_ELEMENT_IMAGES" <-- do not change! */
 
 #if 1
-  { "sp_objects",				"sp_objects.pcx"	},
-#endif
-
-#if 1
   /* !!! TEMPORARILY STORED HERE -- PROBABLY TO BE CHANGED !!! */
 
   /* (for testing, change filename back to "emc_objects dot pcx") */
@@ -4382,6 +4378,16 @@ struct ConfigInfo image_config[] =
   { "emc_sprite.scale_up_factor",		"2"			},
 #endif
 #endif
+
+  { "sp_frame_horizontal",			"RocksSP.pcx"		},
+  { "sp_frame_horizontal.xpos",			"7"			},
+  { "sp_frame_horizontal.ypos",			"14"			},
+  { "sp_frame_vertical",			"RocksSP.pcx"		},
+  { "sp_frame_vertical.xpos",			"6"			},
+  { "sp_frame_vertical.ypos",			"14"			},
+  { "sp_frame_corner",				"RocksSP.pcx"		},
+  { "sp_frame_corner.xpos",			"5"			},
+  { "sp_frame_corner.ypos",			"14"			},
 
   { "toon_1",					"RocksToons.pcx"	},
   { "toon_1.x",					"2"			},

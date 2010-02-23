@@ -122,8 +122,13 @@ loc_g_1242: // infotron comes falling from above
   X = GetStretchX(si);
   Y = GetStretchY(si - FieldWidth);
   dx = bl & 0x7;
+#if 1
+  StretchedSprites.BltImg(X, Y, aniSpace, 0);
+  StretchedSprites.BltImg(X, Y + TwoPixels * (dx + 1), aniInfotron, dx);
+#else
   StretchedSprites.BltEx(X, Y, 0);
   StretchedSprites.BltEx(X, Y + TwoPixels * (dx + 1), fiInfotron);
+#endif
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
   bl = HighByte(PlayField16[si]) + 1;
   if (bl == 0x16)
@@ -215,24 +220,10 @@ loc_g_1364:     // Murphy dies, but not in any case
   if (bl == 0x29 || bl == 0x25 || bl == 0x26)
     return subAnimateInfotrons;
 
-
-
-
-
-
-
-
-
-
-
 loc_g_1386:     // someone dies/explodes immediately
   si = si + FieldWidth;                 // 1 field down
   ExplodeFieldSP(si);               // Explode
   return subAnimateInfotrons;
-
-
-
-
 
 loc_g_138D: // infotron comes rolling from right to left
   //  To Do: draw infotron rolling from right
@@ -241,8 +232,13 @@ loc_g_138D: // infotron comes rolling from right to left
   X = GetStretchX(si + 1);
   Y = GetStretchY(si);
   dx = (bl & 0x7) + 1;
+#if 1
+  StretchedSprites.BltImg(X, Y, aniSpace, 0);
+  StretchedSprites.BltImg(X - (TwoPixels * dx), Y, aniInfotronRollLeft, dx - 1);
+#else
   StretchedSprites.BltEx(X, Y, 0);
   StretchedSprites.BltEx(X - (TwoPixels * dx), Y, aniFramesInfotronRollLeft[dx - 1]);
+#endif
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
   bl = HighByte(PlayField16[si]) + 1; // get and increment sequence#
   if (bl == 0x24)
@@ -271,8 +267,13 @@ loc_g_13E9: // infotron comes rolling from left to right
   X = GetStretchX(si - 1);
   Y = GetStretchY(si);
   dx = (bl & 0x7) + 1;
+#if 1
+  StretchedSprites.BltImg(X, Y, aniSpace, 0);
+  StretchedSprites.BltImg(X + (TwoPixels * dx), Y, aniInfotronRollRight, dx - 1);
+#else
   StretchedSprites.BltEx(X, Y, 0);
   StretchedSprites.BltEx(X + (TwoPixels * dx), Y, aniFramesInfotronRollRight[dx - 1]);
+#endif
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
   bl = HighByte(PlayField16[si]) + 1;
   if (bl == 0x34)
@@ -321,8 +322,13 @@ loc_g_1472: // infotron rolls left
   X = GetStretchX(si);
   Y = GetStretchY(si);
   dx = (bl & 0xF) + 1;
+#if 1
+  StretchedSprites.BltImg(X, Y, aniSpace, 0);
+  StretchedSprites.BltImg(X - (TwoPixels * dx), Y, aniInfotronRollLeft, dx - 1);
+#else
   StretchedSprites.BltEx(X, Y, 0);
   StretchedSprites.BltEx(X - (TwoPixels * dx), Y, aniFramesInfotronRollLeft[dx - 1]);
+#endif
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
   bl = HighByte(PlayField16[si]) + 1; // retrieve and increment sequence#
   if (bl < 0x52)
@@ -358,8 +364,13 @@ loc_g_14E0: // infotron rolls right
   X = GetStretchX(si);
   Y = GetStretchY(si);
   dx = (bl & 0x7) + 1;
+#if 1
+  StretchedSprites.BltImg(X, Y, aniSpace, 0);
+  StretchedSprites.BltImg(X + (TwoPixels * dx), Y, aniInfotronRollRight, dx - 1);
+#else
   StretchedSprites.BltEx(X, Y, 0);
   StretchedSprites.BltEx(X + (TwoPixels * dx), Y, aniFramesInfotronRollRight[dx - 1]);
+#endif
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
   bl = HighByte(PlayField16[si]) + 1;
   if (bl < 0x62)
@@ -449,4 +460,3 @@ loc_g_1722:
 
   return subCleanUpForInfotronsAbove;
 } // subCleanUpForInfotronsAbove
-

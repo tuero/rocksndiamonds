@@ -1691,12 +1691,15 @@ loc_g_6C8F:
 	   MurphyScreenXPos, MurphyScreenYPos, MurphyDX, MurphyDY);
 #endif
 
+#if 0
+    // !!! special two-tile animation currently not used !!!
     if (dx2 == fiInfotron) // special case of infotron moving left or right
     {
       tDeltaX = 0;
       tDeltaY = 0;
     }
     else
+#endif
     {
       tDeltaX = MurphyDX * LocalStretch * (SeqPos + 1);
       tDeltaY = MurphyDY * LocalStretch * (SeqPos + 1);
@@ -1729,11 +1732,14 @@ loc_g_6C8F:
       tPos = dxPos + dx2Step;
       X = GetStretchX(tPos);
       Y = GetStretchY(tPos);
+#if 0
+    // !!! special two-tile animation currently not used !!!
       if (dx2 == fiInfotron) // special case of infotron moving left or right
       {
         StretchedSprites.BltEx(X, Y, dx[SeqPos] + dx2Step);
       }
       else // pushing something
+#endif
       {
 #if 1
 	// (SeqPos iterates from 0 to 7 while pushing)
@@ -1764,12 +1770,21 @@ loc_g_6C8F:
     tDeltaY = MurphyDY * LocalStretch * (SeqPos + 1);
     X = GetStretchX(dxPos) + tDeltaX;
     Y = GetStretchY(dxPos) + tDeltaY;
+#if 1
+    StretchedSprites.BltImg(X, Y, dx1, SeqPos); // plot first murphy
+#else
     StretchedSprites.BltEx(X, Y, dx[SeqPos]); // plot first murphy
+#endif
     tPos = dxPos + dx2Step;
     X = GetStretchX(tPos);
     Y = GetStretchY(tPos);
+#if 1
+    StretchedSprites.BltImg(X + tDeltaX, Y + tDeltaY, dx1, SeqPos); // plot second murphy
+    StretchedSprites.BltImg(X, Y, fiGraphic[LowByte(PlayField16[tPos])], 0); // replot the port on top
+#else
     StretchedSprites.BltEx(X + tDeltaX, Y + tDeltaY, dx[SeqPos]); // plot second murphy
     StretchedSprites.BltEx(X, Y, LowByte(PlayField16[tPos])); // replot the port on top
+#endif
     // End of split movement (port)
     // ------------------------------
   } // loc_g_6D1E:'loc_g_6D28:
@@ -2668,6 +2683,8 @@ int subSpPortTest(int si)
   return subSpPortTest;
 } // subSpPortTest
 
+#if 0
+
 void subCopyFieldToScreen(int si, int fi)
 {
   int X, Y;
@@ -2678,6 +2695,8 @@ void subCopyFieldToScreen(int si, int fi)
   StretchedSprites.BltEx(X, Y, fi);
   // +++++++++++++++++++++++++++++++++++++++++
 }
+
+#endif
 
 void subCopyAnimToScreen(int si, int graphic, int sync_frame)
 {

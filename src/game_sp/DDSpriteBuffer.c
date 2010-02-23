@@ -375,6 +375,8 @@ static void OLD_Blt(int pX, int pY, int SpriteX, int SpriteY)
 
 #endif
 
+#if 0
+
 void DDSpriteBuffer_BltEx(int pX, int pY, int SpritePos)
 {
   int XPos, YPos;
@@ -402,6 +404,8 @@ void DDSpriteBuffer_BltEx(int pX, int pY, int SpritePos)
 
   Blt(pX, pY, sp_objects, XPos, YPos);
 }
+
+#endif
 
 void DDSpriteBuffer_BltImg(int pX, int pY, int graphic, int sync_frame)
 {

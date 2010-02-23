@@ -248,7 +248,12 @@
 
 #define aniTerminalActive		IMG_SP_TERMINAL_ACTIVE
 
-#define aniExplosionInfo		(111)
+#define aniDefaultExplosion		IMG_SP_DEFAULT_EXPLODING
+#define aniElectronExplosion		IMG_SP_ELECTRON_EXPLODING
+
+#define imgFrameCorner			IMG_SP_FRAME_CORNER
+#define imgFrameHorizontal		IMG_SP_FRAME_HORIZONTAL
+#define imgFrameVertical		IMG_SP_FRAME_VERTICAL
 
 #else
 
@@ -273,11 +278,11 @@
 
 #define aniExplosionInfo		(111)
 
-#endif
-
 #define posFrameCorner			(55)
 #define posFrameHorizontal		(111)
 #define posFrameVertical		(110)
+
+#endif
 
 
 #if 1

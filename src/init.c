@@ -329,7 +329,7 @@ void SetBitmaps_EM(Bitmap **em_bitmap)
 }
 #endif
 
-#if 1
+#if 0
 /* !!! FIX THIS (CHANGE TO USING NORMAL ELEMENT GRAPHIC DEFINITIONS) !!! */
 void SetBitmaps_SP(Bitmap **sp_bitmap)
 {

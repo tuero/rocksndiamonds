@@ -3,7 +3,10 @@
 #include "global.h"
 
 
+#if 0
 Bitmap *sp_objects;
+
+#endif
 
 Bitmap *screenBitmap;
 
@@ -16,7 +19,7 @@ static void init_struct_functions()
   Stage.ScrollTowards = &DDScrollBuffer_ScrollTowards;
   Stage.SoftScrollTo  = &DDScrollBuffer_SoftScrollTo;
 
-  StretchedSprites.BltEx  = &DDSpriteBuffer_BltEx;
+  // StretchedSprites.BltEx  = &DDSpriteBuffer_BltEx;
   StretchedSprites.BltImg = &DDSpriteBuffer_BltImg;
 }
 
@@ -37,7 +40,9 @@ void sp_open_all()
 
   Form_Load();
 
+#if 0
   SetBitmaps_SP(&sp_objects);
+#endif
 
 #if 0
   /* too small for oversized levels, but too big for graphics performance */
@@ -83,8 +88,6 @@ unsigned int InitEngineRandom_SP(long seed)
 /* ------------------------------------------------------------------------- */
 /* Supaplex game engine snapshot handling functions                          */
 /* ------------------------------------------------------------------------- */
-
-static ListNode *engine_snapshot_list_sp = NULL;
 
 void SaveEngineSnapshotValues_SP()
 {

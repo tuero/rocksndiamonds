@@ -227,7 +227,11 @@ void UpdatePlayfield(boolean force_redraw)
 #endif
 
       if (graphic < 0)
+      {
+	GfxGraphicLast[x][y] = GfxGraphic[x][y];
+
 	continue;
+      }
 
       if (element != GfxElementLast[x][y] &&
 	  graphic == GfxGraphicLast[x][y])

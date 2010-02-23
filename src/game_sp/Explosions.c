@@ -42,12 +42,28 @@ int subAnimateExplosion(int si)
   // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   X = GetStretchX(si);
   Y = GetStretchY(si);
+#if 1
+
+#if 1
+  GfxGraphic[GetX(si)][GetY(si)] = aniDefaultExplosion;
+#else
+  StretchedSprites.BltImg(X, Y, aniDefaultExplosion, bl);
+#endif
+
+#else
   StretchedSprites.BltEx(X, Y, aniFramesExplosion[bl]);
+#endif
   // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   if (bl == 8)
   {
     PlayField16[si] = 0;
     ExplosionShake = 0; // nothing explodes
+
+#if 1
+    GfxGraphic[GetX(si)][GetY(si)] = aniSpace;
+#else
+    StretchedSprites.BltImg(X, Y, aniSpace, 0);
+#endif
   } // loc_ret_g_28CF:
 
   return subAnimateExplosion;
@@ -58,6 +74,15 @@ loc_g_28D0: // explosion produces infotron
   {
     PlayField16[si] = fiInfotron;
     MovLowByte(&ExplosionShake, 0); // nothing explodes
+
+#if 1
+    GfxGraphic[GetX(si)][GetY(si)] = aniInfotron;
+#else
+    X = GetStretchX(si);
+    Y = GetStretchY(si);
+    StretchedSprites.BltImg(X, Y, aniInfotron, 0);
+#endif
+
     return subAnimateExplosion;
   } // loc_g_28E3:
 
@@ -65,7 +90,17 @@ loc_g_28D0: // explosion produces infotron
   // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   X = GetStretchX(si);
   Y = GetStretchY(si);
+#if 1
+
+#if 1
+  GfxGraphic[GetX(si)][GetY(si)] = aniElectronExplosion;
+#else
+  StretchedSprites.BltImg(X, Y, aniElectronExplosion, bl - 0x80);
+#endif
+
+#else
   StretchedSprites.BltEx(X, Y, aniExplosionInfo + bl - 0x80);
+#endif
   // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
   return subAnimateExplosion;
@@ -115,6 +150,8 @@ void ExplodeFieldSP(int si)
   LetExplodeFieldSP(si + FieldWidth - 1, cx, dl);
   LetExplodeFieldSP(si + FieldWidth, cx, dl);
   LetExplodeFieldSP(si + FieldWidth + 1, cx, dl);
+
+  GfxGraphic[GetX(si)][GetY(si)] = -1;		// restart for chain-explosions
 
   // loc_g_2C3B:
   subSoundFXExplosion();
@@ -175,7 +212,7 @@ static void LetExplodeFieldSP(int tsi, int cx, int dh)
       break;
   }
 
-  GfxGraphic[GetX(tsi)][GetY(tsi)] = -1;
+  GfxGraphic[GetX(tsi)][GetY(tsi)] = -1;	// restart for chain-explosions
 }
 
 static int subExplodeZonk(int tsi, int cx)
@@ -287,7 +324,17 @@ int subClearFieldDueToExplosion(int si)
   // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   X = GetStretchX(si);
   Y = GetStretchY(si);
+#if 1
+
+#if 1
+  GfxGraphic[GetX(si)][GetY(si)] = aniSpace;
+#else
+  StretchedSprites.BltImg(X, Y, aniSpace, 0);
+#endif
+
+#else
   StretchedSprites.BltEx(X, Y, fiSpace);
+#endif
   // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
   return subClearFieldDueToExplosion;
@@ -310,7 +357,18 @@ int subRedDiskReleaseExplosion()
   // +++++++++++++++++++++++++++++++++++++++++
   X = GetStretchX(si);
   Y = GetStretchY(si);
+#if 1
+
+#if 0
+  // !!! causes flicker -- fix in Murphy.c !!!
+  GfxGraphic[GetX(si)][GetY(si)] = aniRedDisk;
+#else
+  StretchedSprites.BltImg(X, Y, aniRedDisk, 0);
+#endif
+
+#else
   StretchedSprites.BltEx(X, Y, fiRedDisk);
+#endif
   // +++++++++++++++++++++++++++++++++++++++++
   RedDiskReleasePhase = RedDiskReleasePhase + 1;
   if (RedDiskReleasePhase >= 0x28)

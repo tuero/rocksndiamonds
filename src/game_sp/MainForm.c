@@ -1652,6 +1652,35 @@ static void Form_Resize()
 
 #endif
 
+#if 1
+
+static void DrawFrame(int Delta)
+{
+  int i, LX, tY, RX, BY;
+
+  LX = -1 + Delta;
+  tY = -1 + Delta;
+  RX = FieldWidth - Delta;
+  BY = FieldHeight - Delta;
+  DrawImage(LX, tY, imgFrameCorner);
+  DrawImage(LX, BY, imgFrameCorner);
+  DrawImage(RX, tY, imgFrameCorner);
+  DrawImage(RX, BY, imgFrameCorner);
+  for (i = LX + 1; i <= RX - 1; i++)
+  {
+    DrawImage(i, tY, imgFrameHorizontal);
+    DrawImage(i, BY, imgFrameHorizontal);
+  }
+
+  for (i = tY + 1; i <= BY - 1; i++)
+  {
+    DrawImage(LX, i, imgFrameVertical);
+    DrawImage(RX, i, imgFrameVertical);
+  }
+}
+
+#else
+
 static void DrawFrame(int Delta)
 {
   int i, LX, tY, RX, BY;
@@ -1676,6 +1705,8 @@ static void DrawFrame(int Delta)
     DrawSprite(RX, i, posFrameVertical);
   }
 }
+
+#endif
 
 static void RestoreFrame()
 {
@@ -3283,10 +3314,21 @@ void DrawFieldNoAnimated(int X, int Y)
   }
 }
 
+#if 1
+
+void DrawImage(int X, int Y, int graphic)
+{
+  StretchedSprites.BltImg(StretchWidth * X, StretchWidth * Y, graphic, 0);
+}
+
+#else
+
 void DrawSprite(int X, int Y, int SpritePos)
 {
   StretchedSprites.BltEx(StretchWidth * X, StretchWidth * Y, SpritePos);
 }
+
+#endif
 
 #if 0
 

@@ -19,6 +19,7 @@ extern void DrawField(int X, int Y);
 extern void DrawFieldAnimated(int X, int Y);
 extern void DrawFieldNoAnimated(int X, int Y);
 extern void DrawSprite(int X, int Y, int SpritePos);
+extern void DrawImage(int X, int Y, int graphic);
 #if 0
 extern void InvalidateRect(long XMin, long YMin, long XMax, long YMax);
 #endif

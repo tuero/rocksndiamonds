@@ -44,7 +44,9 @@ void getGraphicSourcePlayerExt_EM(struct GraphicInfo_EM *, int, int, int);
 /* functions and definitions exported from main program to game_sp           */
 /* ========================================================================= */
 
+#if 0
 extern void SetBitmaps_SP(Bitmap **);
+#endif
 
 void getGraphicSource_SP(struct GraphicInfo_SP *, int, int, int, int);
 int getGraphicInfo_Delay(int);

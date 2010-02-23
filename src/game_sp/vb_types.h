@@ -236,7 +236,7 @@ typedef struct
   void *Surface;
 
   void (*Cls)();
-  void (*BltEx)(int, int, int);
+  // void (*BltEx)(int, int, int);
   void (*BltImg)(int, int, int, int);
 } DDSpriteBuffer;
 

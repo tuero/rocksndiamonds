@@ -96,7 +96,11 @@ int InitMurphyPosB(int si)
   MurphyScreenYPos = GetStretchY(si);         // Murphy's screen y-position
 
   // To Do: draw Murphy in location ax
+#if 1
+  StretchedSprites.BltImg(MurphyScreenXPos, MurphyScreenYPos, fiMurphy, 0);
+#else
   StretchedSprites.BltEx(MurphyScreenXPos, MurphyScreenYPos, fiMurphy);
+#endif
 
   MurphyScreenXPos = MurphyScreenXPos / Stretch;
   MurphyScreenYPos = MurphyScreenYPos / Stretch;
