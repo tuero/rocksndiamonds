@@ -22,6 +22,11 @@ void InitGameEngine_SP()
   game_sp.LevelSolved = FALSE;
   game_sp.GameOver = FALSE;
 
+  game_sp.time_played = 0;
+  game_sp.infotrons_still_needed = native_sp_level.header.InfotronsNeeded;
+  game_sp.red_disk_count = 0;
+  game_sp.score = 0;
+
   menBorder.Checked = setup.sp_show_border_elements;
 
   for (x = 0; x < SP_MAX_PLAYFIELD_WIDTH; x++)
@@ -73,6 +78,32 @@ void RedrawPlayfield_SP(boolean force_redraw)
   BackToFront_SP();
 }
 
+void DrawGameDoorValues_SP()
+{
+#if 1
+
+  game_sp.time_played = TimerVar / setup.game_frame_delay;
+  game_sp.infotrons_still_needed = InfotronsNeeded;
+  game_sp.red_disk_count = RedDiskCount;
+  game_sp.score = 0;		// (currently no score in Supaplex engine)
+
+#else
+
+  int infotrons_still_needed = InfotronsNeeded;
+  int red_disks = RedDiskCount;
+  int no_score_in_supaplex = 0;
+#if 1
+  int level_time_played = TimerVar / setup.game_frame_delay;
+#else
+  int level_time_played = TimerVar / 35;	/* !!! CHECK THIS !!! */
+#endif
+  int no_keys_in_supaplex = 0;
+
+  DrawAllGameValues(infotrons_still_needed, red_disks, no_score_in_supaplex,
+		    level_time_played, no_keys_in_supaplex);
+#endif
+}
+
 void GameActions_SP(byte action[MAX_PLAYERS], boolean warp_mode)
 {
   byte single_player_action = action[0];
@@ -81,6 +112,9 @@ void GameActions_SP(byte action[MAX_PLAYERS], boolean warp_mode)
   subMainGameLoop_Main(single_player_action, warp_mode);
 
   RedrawPlayfield_SP(FALSE);
+
+  if (!warp_mode)		/* do not redraw values in warp mode */
+    DrawGameDoorValues_SP();
 
   for (x = DisplayMinX; x <= DisplayMaxX; x++)
     for (y = DisplayMinY; y <= DisplayMaxY; y++)

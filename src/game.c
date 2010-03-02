@@ -2221,17 +2221,25 @@ void UpdateGameControlValues()
 	      local_player->LevelSolved_CountingTime :
 	      level.game_engine_type == GAME_ENGINE_TYPE_EM ?
 	      level.native_em_level->lev->time :
+	      level.game_engine_type == GAME_ENGINE_TYPE_SP ?
+	      level.native_sp_level->game_sp->time_played :
 	      level.time == 0 ? TimePlayed : TimeLeft);
   int score = (local_player->LevelSolved ?
 	       local_player->LevelSolved_CountingScore :
 	       level.game_engine_type == GAME_ENGINE_TYPE_EM ?
 	       level.native_em_level->lev->score :
+	       level.game_engine_type == GAME_ENGINE_TYPE_SP ?
+	       level.native_sp_level->game_sp->score :
 	       local_player->score);
   int gems = (level.game_engine_type == GAME_ENGINE_TYPE_EM ?
 	      level.native_em_level->lev->required :
+	      level.game_engine_type == GAME_ENGINE_TYPE_SP ?
+	      level.native_sp_level->game_sp->infotrons_still_needed :
 	      local_player->gems_still_needed);
   int exit_closed = (level.game_engine_type == GAME_ENGINE_TYPE_EM ?
 		     level.native_em_level->lev->required > 0 :
+		     level.game_engine_type == GAME_ENGINE_TYPE_SP ?
+		     level.native_sp_level->game_sp->infotrons_still_needed > 0 :
 		     local_player->gems_still_needed > 0 ||
 		     local_player->sokobanfields_still_needed > 0 ||
 		     local_player->lights_still_needed > 0);
@@ -2253,6 +2261,10 @@ void UpdateGameControlValues()
   {
     for (i = 0; i < MAX_PLAYERS; i++)
     {
+      /* only one player in Supaplex game engine */
+      if (level.game_engine_type == GAME_ENGINE_TYPE_SP && i > 0)
+	break;
+
       for (k = 0; k < MAX_NUM_KEYS; k++)
       {
 	if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
@@ -2269,6 +2281,9 @@ void UpdateGameControlValues()
       if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
 	game_panel_controls[GAME_PANEL_INVENTORY_COUNT].value +=
 	  level.native_em_level->ply[i]->dynamite;
+      else if (level.game_engine_type == GAME_ENGINE_TYPE_SP)
+	game_panel_controls[GAME_PANEL_INVENTORY_COUNT].value +=
+	  level.native_sp_level->game_sp->red_disk_count;
       else
 	game_panel_controls[GAME_PANEL_INVENTORY_COUNT].value +=
 	  stored_player[i].inventory_size;
@@ -2301,6 +2316,9 @@ void UpdateGameControlValues()
     if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
       game_panel_controls[GAME_PANEL_INVENTORY_COUNT].value +=
 	level.native_em_level->ply[player_nr]->dynamite;
+    else if (level.game_engine_type == GAME_ENGINE_TYPE_SP)
+      game_panel_controls[GAME_PANEL_INVENTORY_COUNT].value +=
+	level.native_sp_level->game_sp->red_disk_count;
     else
       game_panel_controls[GAME_PANEL_INVENTORY_COUNT].value +=
 	stored_player[player_nr].inventory_size;

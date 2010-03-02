@@ -97,7 +97,7 @@ int InitMurphyPosB(int si)
 
   // To Do: draw Murphy in location ax
 #if 1
-  StretchedSprites.BltImg(MurphyScreenXPos, MurphyScreenYPos, fiMurphy, 0);
+  StretchedSprites.BltImg(MurphyScreenXPos, MurphyScreenYPos, aniMurphy, 0);
 #else
   StretchedSprites.BltEx(MurphyScreenXPos, MurphyScreenYPos, fiMurphy);
 #endif

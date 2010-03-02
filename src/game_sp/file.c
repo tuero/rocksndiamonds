@@ -13,6 +13,8 @@ void setLevelInfoToDefaults_SP()
   char *empty_title = "-------- EMPTY --------";
   int i, x, y;
 
+  native_sp_level.game_sp = &game_sp;
+
   native_sp_level.width  = SP_STD_PLAYFIELD_WIDTH;
   native_sp_level.height = SP_STD_PLAYFIELD_HEIGHT;
 
