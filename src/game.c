@@ -16440,8 +16440,8 @@ struct EngineSnapshotInfo
   int choice_pos[NUM_GROUP_ELEMENTS];
 
   /* runtime values for belt position animations */
-  int belt_graphic[4 * NUM_BELT_PARTS];
-  int belt_anim_mode[4 * NUM_BELT_PARTS];
+  int belt_graphic[4][NUM_BELT_PARTS];
+  int belt_anim_mode[4][NUM_BELT_PARTS];
 };
 
 static struct EngineSnapshotInfo engine_snapshot_rnd;
@@ -16481,8 +16481,8 @@ static void SaveEngineSnapshotValues_RND()
       int graphic = el2img(element);
       int anim_mode = graphic_info[graphic].anim_mode;
 
-      engine_snapshot_rnd.belt_graphic[i * 4 + j] = graphic;
-      engine_snapshot_rnd.belt_anim_mode[i * 4 + j] = anim_mode;
+      engine_snapshot_rnd.belt_graphic[i][j] = graphic;
+      engine_snapshot_rnd.belt_anim_mode[i][j] = anim_mode;
     }
   }
 }
@@ -16510,8 +16510,8 @@ static void LoadEngineSnapshotValues_RND()
   {
     for (j = 0; j < NUM_BELT_PARTS; j++)
     {
-      int graphic = engine_snapshot_rnd.belt_graphic[i * 4 + j];
-      int anim_mode = engine_snapshot_rnd.belt_anim_mode[i * 4 + j];
+      int graphic = engine_snapshot_rnd.belt_graphic[i][j];
+      int anim_mode = engine_snapshot_rnd.belt_anim_mode[i][j];
 
       graphic_info[graphic].anim_mode = anim_mode;
     }

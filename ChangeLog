@@ -5,6 +5,17 @@
 	  ".level"); to use this functionality, enter ":save-native-level" or
 	  ":snl" from the main menu with the native Supaplex level loaded and
 	  the appropriate tape loaded to the tape recorder
+	* fixed potential crash bug caused by illegal array access in engine
+	  snapshot loading and saving code
+	* changed setting permissions of score files to be world-writable if
+	  the program is not installed and running setgid to allow the program
+	  to modify existing score files when run as a different user (which
+	  allows cheating, of course, as the score files are not protected
+	  against modification in this case)
+	* added (commented out) suggestions for RO_GAME_DIR and RW_GAME_DIR to
+	  the top level Makefile for Debian / Ubuntu installations
+	* added saving read-only levels from editor into personal level set
+	  (thanks to Bela Lubkin for the above four patches)
 
 2010-03-03
 	* added updating of game values on the panel to Supaplex game engine

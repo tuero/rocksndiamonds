@@ -1410,21 +1410,41 @@ static int posix_mkdir(const char *pathname, mode_t mode)
 #endif
 }
 
+static boolean posix_process_running_setgid()
+{
+#if defined(PLATFORM_UNIX)
+  return (getgid() != getegid());
+#else
+  return FALSE;
+#endif
+}
+
 void createDirectory(char *dir, char *text, int permission_class)
 {
   /* leave "other" permissions in umask untouched, but ensure group parts
      of USERDATA_DIR_MODE are not masked */
   mode_t dir_mode = (permission_class == PERMS_PRIVATE ?
 		     DIR_PERMS_PRIVATE : DIR_PERMS_PUBLIC);
-  mode_t normal_umask = posix_umask(0);
+  mode_t last_umask = posix_umask(0);
   mode_t group_umask = ~(dir_mode & S_IRWXG);
-  posix_umask(normal_umask & group_umask);
+  int running_setgid = posix_process_running_setgid();
+
+  /* if we're setgid, protect files against "other" */
+  /* else keep umask(0) to make the dir world-writable */
+
+  if (running_setgid)
+    posix_umask(last_umask & group_umask);
+  else
+    dir_mode |= MODE_W_ALL;
 
   if (!fileExists(dir))
     if (posix_mkdir(dir, dir_mode) != 0)
       Error(ERR_WARN, "cannot create %s directory '%s'", text, dir);
 
-  posix_umask(normal_umask);		/* reset normal umask */
+  if (permission_class == PERMS_PUBLIC && !running_setgid)
+    chmod(dir, dir_mode);
+
+  posix_umask(last_umask);		/* restore previous umask */
 }
 
 void InitUserDataDirectory()
@@ -1434,8 +1454,14 @@ void InitUserDataDirectory()
 
 void SetFilePermissions(char *filename, int permission_class)
 {
-  chmod(filename, (permission_class == PERMS_PRIVATE ?
-		   FILE_PERMS_PRIVATE : FILE_PERMS_PUBLIC));
+  int running_setgid = posix_process_running_setgid();
+  int perms = (permission_class == PERMS_PRIVATE ?
+	       FILE_PERMS_PRIVATE : FILE_PERMS_PUBLIC);
+
+  if (permission_class == PERMS_PUBLIC && !running_setgid)
+    perms |= MODE_W_ALL;
+
+  chmod(filename, perms);
 }
 
 char *getCookie(char *file_type)

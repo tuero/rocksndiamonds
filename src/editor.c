@@ -6630,8 +6630,12 @@ static boolean LevelChanged()
   boolean field_changed = FALSE;
   int x, y;
 
+#if 1
+  /* changed read-only levels can now be saved in personal level set */
+#else
   if (leveldir_current->readonly)
     return FALSE;
+#endif
 
   for (y = 0; y < lev_fieldy; y++) 
     for (x = 0; x < lev_fieldx; x++)
@@ -6641,21 +6645,151 @@ static boolean LevelChanged()
   return (level.changed || field_changed);
 }
 
-static boolean LevelContainsPlayer()
+static boolean PrepareSavingIntoPersonalLevelSet()
 {
-  boolean player_found = FALSE;
-  int x, y;
+  static LevelDirTree *last_copied_leveldir = NULL;
+  static LevelDirTree *last_written_leveldir = NULL;
+  static int last_copied_level_nr = -1;
+  static int last_written_level_nr = -1;
+  LevelDirTree *leveldir_former = leveldir_current;
+  int level_nr_former = level_nr;
+  int new_level_nr;
 
-  return TRUE;		/* !!! CURRENTLY DEACTIVATED !!! */
-
-  for (y = 0; y < lev_fieldy; y++) for (x = 0; x < lev_fieldx; x++)
+  // remember last mod/save so that for current session, we write
+  // back to the same personal copy, asking only about overwrite.
+  if (leveldir_current == last_copied_leveldir &&
+      level_nr == last_copied_level_nr)
   {
-    if (Feld[x][y] == EL_PLAYER_1 ||
-	Feld[x][y] == EL_SP_MURPHY) 
-      player_found = TRUE;
+    // "cd" to personal level set dir (as used when writing last copy)
+    leveldir_current = last_written_leveldir;
+    level_nr = last_written_level_nr;
+
+    return TRUE;
   }
 
-  return player_found;
+  if (!Request("This level is read only ! "
+	       "Save into personal level set ?", REQ_ASK))
+    return FALSE;
+
+  // "cd" to personal level set dir (for writing copy the first time)
+  leveldir_current =
+    getTreeInfoFromIdentifier(leveldir_first, getLoginName());
+
+  // find unused level number
+  for (new_level_nr = leveldir_current->first_level; ; new_level_nr++)
+  {
+    static char *level_filename = NULL;
+
+    setString(&level_filename, getDefaultLevelFilename(new_level_nr));
+
+    if (!fileExists(level_filename))
+      break;
+  }
+
+  last_copied_leveldir = leveldir_former;
+  last_copied_level_nr = level_nr_former;
+
+  last_written_leveldir = leveldir_current;
+  last_written_level_nr = level_nr = new_level_nr;
+
+  return TRUE;
+}
+
+static void ModifyLevelInfoForSavingIntoPersonalLevelSet(char *former_name)
+{
+  static char *filename_levelinfo = NULL, *mod_name = NULL;
+  FILE *file;
+
+  // annotate this copy-and-mod in personal levelinfo.conf
+  setString(&filename_levelinfo,
+	    getPath2(getCurrentLevelDir(), LEVELINFO_FILENAME));
+
+  if ((file = fopen(filename_levelinfo, MODE_APPEND)))
+  {
+    fprintf(file, "\n");
+    fprintf(file, "# level %d was modified from:\n", level_nr);
+    fprintf(file, "# - previous level set name:    %s\n",
+	    former_name);
+    fprintf(file, "# - level within previous set:  %d \"%s\"\n",
+	    level.file_info.nr, level.name);
+    fprintf(file, "# - previous author:            %s\n",
+	    level.author);
+    fprintf(file, "# - previous save date:         ");
+
+    if (level.creation_date.src == DATE_SRC_LEVELFILE)
+    {
+      fprintf(file, "%04d-%02d-%02d\n",
+	      level.creation_date.year,
+	      level.creation_date.month,
+	      level.creation_date.day);
+    }
+    else
+    {
+      fprintf(file, "not recorded\n");
+    }
+
+    fclose(file);
+  }
+
+  if (level_nr > leveldir_current->last_level)
+  {
+    static char *temp_levelinfo = NULL;
+    FILE *temp_file = NULL;
+    char line[MAX_LINE_LEN];
+
+    setString(&temp_levelinfo,
+	      getPath2(getCurrentLevelDir(),
+		       getStringCat2(LEVELINFO_FILENAME, ".new")));
+
+    if ((file = fopen(filename_levelinfo, MODE_READ)) &&
+	(temp_file = fopen(temp_levelinfo, MODE_WRITE)))
+    {
+      while (fgets(line, MAX_LINE_LEN, file))
+      {
+	if (!strPrefix(line, "levels:"))
+	  fputs(line, temp_file);
+	else
+	  fprintf(temp_file, "%-32s%d\n", "levels:", level_nr + 9);
+      }
+    }
+
+    if (temp_file)
+      fclose(temp_file);
+
+    if (file)
+      fclose(file);
+
+    // needs error handling; also, ok on dos/win?
+    unlink(filename_levelinfo);
+    rename(temp_levelinfo, filename_levelinfo);
+  }
+
+  // else: allow the save even if annotation failed
+
+  // now... spray graffiti on the old level vital statistics
+  // user can change these; just trying to set a good baseline
+
+  // don't truncate names for fear of making offensive or silly:
+  // long-named original author only recorded in levelinfo.conf.
+  // try to fit "Joe after Bob", "Joe (ed.)", then just "Joe"
+  if (!strEqual(level.author, leveldir_current->author))
+  {
+    setString(&mod_name, getStringCat3(leveldir_current->author,
+				       " after ", level.author));
+
+    if (strlen(mod_name) > MAX_LEVEL_AUTHOR_LEN)
+      setString(&mod_name,
+		getStringCat2(leveldir_current->author, " (ed.)"));
+
+    if (strlen(mod_name) > MAX_LEVEL_AUTHOR_LEN)
+      setString(&mod_name, leveldir_current->author);
+
+    strncpy(level.author, mod_name, MAX_LEVEL_AUTHOR_LEN);
+
+    // less worried about truncation here
+    setString(&mod_name, getStringCat2("Mod: ", level.name));
+    strncpy(level.name, mod_name, MAX_LEVEL_NAME_LEN);
+  }
 }
 
 static void CopyPlayfield(short src[MAX_LEV_FIELDX][MAX_LEV_FIELDY],
@@ -11237,60 +11371,76 @@ static void HandleControlButtons(struct GadgetInfo *gi)
       break;
 
     case GADGET_ID_SAVE:
-      if (leveldir_current->readonly)
-      {
-	Request("This level is read only !", REQ_CONFIRM);
+    {
+      /* saving read-only levels into personal level set modifies global vars
+	 "leveldir_current" and "level_nr"; restore them after saving level */
+      LevelDirTree *leveldir_former = leveldir_current;
+      int level_nr_former = level_nr;
+      char *level_filename;
+      boolean new_level;
+
+      if (leveldir_current->readonly &&
+	  !PrepareSavingIntoPersonalLevelSet())
 	break;
-      }
 
-      if (!LevelContainsPlayer())
-	Request("No Level without Gregor Mc Duffin please !", REQ_CONFIRM);
-      else
+      level_filename = getDefaultLevelFilename(level_nr);
+      new_level = !fileExists(level_filename);
+
+      if (new_level ||
+	  Request("Save this level and kill the old ?", REQ_ASK))
       {
-	char *level_filename = getDefaultLevelFilename(level_nr);
-	boolean new_level = !fileExists(level_filename);
+	if (leveldir_former->readonly)
+	  ModifyLevelInfoForSavingIntoPersonalLevelSet(leveldir_former->name);
 
-	if (new_level ||
-	    Request("Save this level and kill the old ?", REQ_ASK))
-	{
-	  CopyPlayfield(Feld, level.field);
-
-	  SaveLevel(level_nr);
-	}
-
-	if (new_level)
-	  Request("Level saved !", REQ_CONFIRM);
+	CopyPlayfield(Feld, level.field);
+	SaveLevel(level_nr);
 
 	level.changed = FALSE;
+
+	if (new_level)
+	{
+	  char level_saved_msg[64];
+
+	  if (leveldir_former->readonly)
+	    sprintf(level_saved_msg,
+		    "Level saved as level %d into personal level set !",
+		    level_nr);
+	  else
+	    strcpy(level_saved_msg, "Level saved !");
+
+	  Request(level_saved_msg, REQ_CONFIRM);
+	}
       }
+
+      /* "cd" back to copied-from levelset (in case of saved read-only level) */
+      leveldir_current = leveldir_former;
+      level_nr = level_nr_former;
+
       break;
+    }
 
     case GADGET_ID_TEST:
-      if (!LevelContainsPlayer())
-	Request("No Level without Gregor Mc Duffin please !", REQ_CONFIRM);
-      else
-      {
-	if (LevelChanged())
-	  level.game_version = GAME_VERSION_ACTUAL;
+      if (LevelChanged())
+	level.game_version = GAME_VERSION_ACTUAL;
 
-	CopyPlayfield(level.field, FieldBackup);
-	CopyPlayfield(Feld, level.field);
+      CopyPlayfield(level.field, FieldBackup);
+      CopyPlayfield(Feld, level.field);
 
-	CopyNativeLevel_RND_to_Native(&level);
+      CopyNativeLevel_RND_to_Native(&level);
 
-	UnmapLevelEditorGadgets();
-	UndrawSpecialEditorDoor();
+      UnmapLevelEditorGadgets();
+      UndrawSpecialEditorDoor();
 
-	CloseDoor(DOOR_CLOSE_ALL);
+      CloseDoor(DOOR_CLOSE_ALL);
 
-	BackToFront();		/* force redraw of undrawn special door */
+      BackToFront();		/* force redraw of undrawn special door */
 
-	DrawCompleteVideoDisplay();
+      DrawCompleteVideoDisplay();
 
-	level_editor_test_game = TRUE;
+      level_editor_test_game = TRUE;
 
-	StartGameActions(FALSE, setup.autorecord, level.random_seed);
-      }
+      StartGameActions(FALSE, setup.autorecord, level.random_seed);
+
       break;
 
     case GADGET_ID_EXIT:

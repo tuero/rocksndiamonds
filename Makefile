@@ -22,10 +22,14 @@ X11_PATH = /usr/X11R6
 # directory for read-only game data (like graphics, sounds, levels)
 # default is '.' to be able to run program without installation
 # RO_GAME_DIR = /usr/games
+# use the following setting for Debian / Ubuntu installations:
+# RO_GAME_DIR = /usr/share/games/rocksndiamonds
 
 # directory for writable game data (like highscore files)
 # default is '.' to be able to run program without installation
 # RW_GAME_DIR = /var/games
+# use the following setting for Debian / Ubuntu installations:
+# RW_GAME_DIR = /var/games/rocksndiamonds
 
 # uncomment if system has no joystick include file
 # JOYSTICK = -DNO_JOYSTICK

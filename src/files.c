@@ -1346,6 +1346,8 @@ static struct DateInfo getCurrentDate()
   date.month = now->tm_mon  + 1;
   date.day   = now->tm_mday;
 
+  date.src   = DATE_SRC_CLOCK;
+
   return date;
 }
 
@@ -2224,6 +2226,8 @@ static int LoadLevel_DATE(FILE *file, int chunk_size, struct LevelInfo *level)
   level->creation_date.year  = getFile16BitBE(file);
   level->creation_date.month = getFile8Bit(file);
   level->creation_date.day   = getFile8Bit(file);
+
+  level->creation_date.src   = DATE_SRC_LEVELFILE;
 
   return chunk_size;
 }

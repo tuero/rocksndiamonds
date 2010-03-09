@@ -2287,6 +2287,12 @@ struct DateInfo
   int year;
   int month;
   int day;
+
+  enum
+  {
+    DATE_SRC_CLOCK,
+    DATE_SRC_LEVELFILE
+  } src;
 };
 
 struct LevelInfo
