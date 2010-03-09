@@ -1,3 +1,14 @@
+2010-03-09
+	* added (hidden) function to save native Supaplex levels with tape as
+	  native *.sp file containing level with demo (saved with a file name
+	  similar to native R'n'D levels, but with ".sp" extension instead of
+	  ".level"); to use this functionality, enter ":save-native-level" or
+	  ":snl" from the main menu with the native Supaplex level loaded and
+	  the appropriate tape loaded to the tape recorder
+
+2010-03-03
+	* added updating of game values on the panel to Supaplex game engine
+
 2010-02-23
 	* finished integrating R'n'D graphics engine into Supaplex game engine
 	  (although some animations do not support full customizability yet)

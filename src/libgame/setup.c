@@ -2850,14 +2850,18 @@ static char *getCacheToken(char *prefix, char *suffix)
   return token;
 }
 
-static char *getFileTimestamp(char *filename)
+static char *getFileTimestampString(char *filename)
 {
+#if 1
+  return getStringCopy(i_to_a(getFileTimestampEpochSeconds(filename)));
+#else
   struct stat file_status;
 
   if (stat(filename, &file_status) != 0)	/* cannot stat file */
     return getStringCopy(i_to_a(0));
 
   return getStringCopy(i_to_a(file_status.st_mtime));
+#endif
 }
 
 static boolean modifiedFileTimestamp(char *filename, char *timestamp_string)
@@ -2974,8 +2978,8 @@ static void setArtworkInfoCacheEntry(TreeInfo *artwork_info,
 					LEVELINFO_FILENAME);
     char *filename_artworkinfo = getPath2(getSetupArtworkDir(artwork_info),
 					  ARTWORKINFO_FILENAME(type));
-    char *timestamp_levelinfo = getFileTimestamp(filename_levelinfo);
-    char *timestamp_artworkinfo = getFileTimestamp(filename_artworkinfo);
+    char *timestamp_levelinfo = getFileTimestampString(filename_levelinfo);
+    char *timestamp_artworkinfo = getFileTimestampString(filename_artworkinfo);
 
     token_main = getCacheToken(token_prefix, "TIMESTAMP_LEVELINFO");
     setHashEntry(artworkinfo_cache_new, token_main, timestamp_levelinfo);

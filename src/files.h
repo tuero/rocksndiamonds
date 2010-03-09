@@ -38,6 +38,7 @@ void LoadLevel(int);
 void LoadLevelTemplate(int);
 void SaveLevel(int);
 void SaveLevelTemplate();
+void SaveNativeLevel(struct LevelInfo *);
 void DumpLevel(struct LevelInfo *);
 boolean SaveLevelChecked(int);
 

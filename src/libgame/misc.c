@@ -14,6 +14,7 @@
 #include <time.h>
 #include <sys/time.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <stdarg.h>
 #include <ctype.h>
 #include <string.h>
@@ -466,6 +467,16 @@ char *getRealName()
 #endif
 
   return real_name;
+}
+
+time_t getFileTimestampEpochSeconds(char *filename)
+{
+  struct stat file_status;
+
+  if (stat(filename, &file_status) != 0)	/* cannot stat file */
+    return 0;
+
+  return file_status.st_mtime;
 }
 
 

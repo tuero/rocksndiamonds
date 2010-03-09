@@ -453,12 +453,16 @@ void TapeDeactivateDisplayOff(boolean redraw_display)
 /* tape control functions                                                    */
 /* ========================================================================= */
 
-static void TapeSetDate()
+void TapeSetDateFromEpochSeconds(time_t epoch_seconds)
 {
-  time_t epoch_seconds = time(NULL);
-  struct tm *now = localtime(&epoch_seconds);
+  struct tm *lt = localtime(&epoch_seconds);
 
-  tape.date = 10000 * (now->tm_year % 100) + 100 * now->tm_mon + now->tm_mday;
+  tape.date = 10000 * (lt->tm_year % 100) + 100 * lt->tm_mon + lt->tm_mday;
+}
+
+void TapeSetDateFromNow()
+{
+  TapeSetDateFromEpochSeconds(time(NULL));
 }
 
 void TapeErase()
@@ -481,7 +485,7 @@ void TapeErase()
   tape.game_version = GAME_VERSION_ACTUAL;
   tape.engine_version = level.game_version;
 
-  TapeSetDate();
+  TapeSetDateFromNow();
 
   for (i = 0; i < MAX_PLAYERS; i++)
     tape.player_participates[i] = FALSE;
@@ -562,7 +566,7 @@ static void TapeAppendRecording()
   tape.recording = TRUE;
   tape.changed = TRUE;
 
-  TapeSetDate();
+  TapeSetDateFromNow();
 
   DrawVideoDisplay(VIDEO_STATE_DATE_ON, tape.date);
   DrawVideoDisplay(VIDEO_STATE_PLAY_OFF | VIDEO_STATE_REC_ON, 0);

@@ -7,6 +7,12 @@
 /* functions for loading Supaplex level                                      */
 /* ------------------------------------------------------------------------- */
 
+void setTapeInfoToDefaults_SP()
+{
+  native_sp_level.demo.is_available = FALSE;
+  native_sp_level.demo.length = 0;
+}
+
 void setLevelInfoToDefaults_SP()
 {
   LevelInfoType *header = &native_sp_level.header;
@@ -49,8 +55,7 @@ void setLevelInfoToDefaults_SP()
   for (i = 0; i < SP_HEADER_SIZE; i++)
     native_sp_level.header_raw_bytes[i] = 0x20;
 
-  native_sp_level.demo.is_available = FALSE;
-  native_sp_level.demo.length = 0;
+  setTapeInfoToDefaults_SP();
 }
 
 void copyInternalEngineVars_SP()
@@ -658,4 +663,65 @@ boolean LoadNativeLevel_SP(char *filename, int level_pos)
   copyInternalEngineVars_SP();
 
   return TRUE;
+}
+
+void SaveNativeLevel_SP(char *filename)
+{
+  LevelInfoType *header = &native_sp_level.header;
+  FILE *file;
+  int i, x, y;
+
+  if (!(file = fopen(filename, MODE_WRITE)))
+  {
+    Error(ERR_WARN, "cannot save native level file '%s'", filename);
+
+    return;
+  }
+
+  /* write level playfield (width * height == 60 * 24 tiles == 1440 bytes) */
+  for (y = 0; y < native_sp_level.height; y++)
+    for (x = 0; x < native_sp_level.width; x++)
+      putFile8Bit(file, native_sp_level.playfield[x][y]);
+
+  /* write level header (96 bytes) */
+
+  WriteUnusedBytesToFile(file, 4);
+
+  putFile8Bit(file, header->InitialGravity);
+  putFile8Bit(file, header->Version);
+
+  for (i = 0; i < SP_LEVEL_NAME_LEN; i++)
+    putFile8Bit(file, header->LevelTitle[i]);
+
+  putFile8Bit(file, header->InitialFreezeZonks);
+  putFile8Bit(file, header->InfotronsNeeded);
+  putFile8Bit(file, header->SpecialPortCount);
+
+  for (i = 0; i < SP_MAX_SPECIAL_PORTS; i++)
+  {
+    SpecialPortType *port = &header->SpecialPort[i];
+
+    putFile16BitBE(file, port->PortLocation);
+    putFile8Bit(file, port->Gravity);
+    putFile8Bit(file, port->FreezeZonks);
+    putFile8Bit(file, port->FreezeEnemies);
+
+    WriteUnusedBytesToFile(file, 1);
+  }
+
+  putFile8Bit(file, header->SpeedByte);
+  putFile8Bit(file, header->CheckSumByte);
+  putFile16BitLE(file, header->DemoRandomSeed);
+
+  /* also save demo tape, if available */
+
+  if (native_sp_level.demo.is_available)
+  {
+    putFile8Bit(file, native_sp_level.demo.level_nr);
+
+    for (i = 0; i < native_sp_level.demo.length; i++)
+      putFile8Bit(file, native_sp_level.demo.data[i]);
+  }
+
+  fclose(file);
 }

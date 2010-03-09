@@ -92,6 +92,8 @@ unsigned int get_random_number(int, int);
 char *getLoginName(void);
 char *getRealName(void);
 
+time_t getFileTimestampEpochSeconds(char *);
+
 char *getBasePath(char *);
 char *getBaseName(char *);
 char *getBaseNamePtr(char *);

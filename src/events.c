@@ -577,6 +577,11 @@ static void HandleKeysSpecial(Key key)
     {
       DumpTape(&tape);
     }
+    else if (is_string_suffix(cheat_input, ":save-native-level") ||
+	     is_string_suffix(cheat_input, ":snl"))
+    {
+      SaveNativeLevel(&level);
+    }
   }
   else if (game_status == GAME_MODE_PLAYING)
   {

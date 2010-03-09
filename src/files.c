@@ -1877,16 +1877,21 @@ static boolean checkForPackageFromBasename(char *basename)
   return (getFileTypeFromBasename(basename) != LEVEL_FILE_TYPE_UNKNOWN);
 }
 
-static char *getSingleLevelBasename(int nr)
+static char *getSingleLevelBasenameExt(int nr, char *extension)
 {
   static char basename[MAX_FILENAME_LEN];
 
   if (nr < 0)
-    sprintf(basename, "template.%s", LEVELFILE_EXTENSION);
+    sprintf(basename, "template.%s", extension);
   else
-    sprintf(basename, "%03d.%s", nr, LEVELFILE_EXTENSION);
+    sprintf(basename, "%03d.%s", nr, extension);
 
   return basename;
+}
+
+static char *getSingleLevelBasename(int nr)
+{
+  return getSingleLevelBasenameExt(nr, LEVELFILE_EXTENSION);
 }
 
 static char *getPackedLevelBasename(int type)
@@ -4469,22 +4474,61 @@ void CopyNativeLevel_SP_to_RND(struct LevelInfo *level)
 	level->yamyam_content[i].e[x][y] = EL_EMPTY;
 }
 
+static void CopyNativeTape_RND_to_SP(struct LevelInfo *level)
+{
+  struct LevelInfo_SP *level_sp = level->native_sp_level;
+  struct DemoInfo_SP *demo = &level_sp->demo;
+  int i, j;
+
+  /* always start with reliable default values */
+  demo->is_available = FALSE;
+  demo->length = 0;
+
+  if (TAPE_IS_EMPTY(tape))
+    return;
+
+  demo->level_nr = tape.level_nr;	/* (currently not used) */
+
+  level_sp->header.DemoRandomSeed = tape.random_seed;
+
+  demo->length = 0;
+  for (i = 0; i < tape.length; i++)
+  {
+    int demo_action = map_key_RND_to_SP(tape.pos[i].action[0]);
+    int demo_repeat = tape.pos[i].delay;
+
+    for (j = 0; j < demo_repeat / 16; j++)
+      demo->data[demo->length++] = 0xf0 | demo_action;
+
+    if (demo_repeat % 16)
+      demo->data[demo->length++] = ((demo_repeat % 16 - 1) << 4) | demo_action;
+  }
+
+  demo->data[demo->length++] = 0xff;
+
+  demo->is_available = TRUE;
+}
+
 static void setTapeInfoToDefaults();
 
 static void CopyNativeTape_SP_to_RND(struct LevelInfo *level)
 {
   struct LevelInfo_SP *level_sp = level->native_sp_level;
   struct DemoInfo_SP *demo = &level_sp->demo;
+  char *filename = level->file_info.filename;
   int i;
 
   /* always start with reliable default values */
   setTapeInfoToDefaults();
 
+  if (!demo->is_available)
+    return;
+
   tape.level_nr = demo->level_nr;	/* (currently not used) */
   tape.length = demo->length - 1;	/* without "end of demo" byte */
   tape.random_seed = level_sp->header.DemoRandomSeed;
 
-  // tape.date = <SET FROM FILE DATE OF *.SP FILE>
+  TapeSetDateFromEpochSeconds(getFileTimestampEpochSeconds(filename));
 
   for (i = 0; i < demo->length - 1; i++)
   {
@@ -6852,6 +6896,20 @@ void CopyNativeLevel_Native_to_RND(struct LevelInfo *level)
     CopyNativeLevel_EM_to_RND(level);
   else if (level->game_engine_type == GAME_ENGINE_TYPE_SP)
     CopyNativeLevel_SP_to_RND(level);
+}
+
+void SaveNativeLevel(struct LevelInfo *level)
+{
+  if (level->game_engine_type == GAME_ENGINE_TYPE_SP)
+  {
+    char *basename = getSingleLevelBasenameExt(level->file_info.nr, "sp");
+    char *filename = getLevelFilenameFromBasename(basename);
+
+    CopyNativeLevel_RND_to_SP(level);
+    CopyNativeTape_RND_to_SP(level);
+
+    SaveNativeLevel_SP(filename);
+  }
 }
 
 
