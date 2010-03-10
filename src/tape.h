@@ -165,4 +165,6 @@ void MapTapeWarpButton();
 void MapTapeButtons();
 void UnmapTapeButtons();
 
+void HandleTapeButtonKeys(Key);
+
 #endif

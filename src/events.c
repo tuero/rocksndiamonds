@@ -762,6 +762,8 @@ void HandleKey(Key key, int key_status)
       TapeQuickLoad();
     else if (key == setup.shortcut.toggle_pause)
       TapeTogglePause(TAPE_TOGGLE_MANUAL);
+
+    HandleTapeButtonKeys(key);
   }
 
   if (game_status == GAME_MODE_PLAYING && !network_playing)

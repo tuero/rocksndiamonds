@@ -9003,8 +9003,13 @@ void SaveScore(int nr)
 #define SETUP_TOKEN_SHORTCUT_FOCUS_PLAYER_3	5
 #define SETUP_TOKEN_SHORTCUT_FOCUS_PLAYER_4	6
 #define SETUP_TOKEN_SHORTCUT_FOCUS_PLAYER_ALL	7
+#define SETUP_TOKEN_SHORTCUT_TAPE_EJECT		8
+#define SETUP_TOKEN_SHORTCUT_TAPE_STOP		9
+#define SETUP_TOKEN_SHORTCUT_TAPE_PAUSE		10
+#define SETUP_TOKEN_SHORTCUT_TAPE_RECORD	11
+#define SETUP_TOKEN_SHORTCUT_TAPE_PLAY		12
 
-#define NUM_SHORTCUT_SETUP_TOKENS		8
+#define NUM_SHORTCUT_SETUP_TOKENS		13
 
 /* player setup */
 #define SETUP_TOKEN_PLAYER_USE_JOYSTICK		0
@@ -9149,6 +9154,11 @@ static struct TokenInfo shortcut_setup_tokens[] =
   { TYPE_KEY_X11, &ssi.focus_player[2],	"shortcut.focus_player_3"	},
   { TYPE_KEY_X11, &ssi.focus_player[3],	"shortcut.focus_player_4"	},
   { TYPE_KEY_X11, &ssi.focus_player_all,"shortcut.focus_player_all"	},
+  { TYPE_KEY_X11, &ssi.tape_eject,	"shortcut.tape_eject"		},
+  { TYPE_KEY_X11, &ssi.tape_stop,	"shortcut.tape_stop"		},
+  { TYPE_KEY_X11, &ssi.tape_pause,	"shortcut.tape_pause"		},
+  { TYPE_KEY_X11, &ssi.tape_record,	"shortcut.tape_record"		},
+  { TYPE_KEY_X11, &ssi.tape_play,	"shortcut.tape_play"		},
 };
 
 static struct TokenInfo player_setup_tokens[] =
@@ -9264,6 +9274,12 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
   si->shortcut.focus_player[2]	= DEFAULT_KEY_FOCUS_PLAYER_3;
   si->shortcut.focus_player[3]	= DEFAULT_KEY_FOCUS_PLAYER_4;
   si->shortcut.focus_player_all	= DEFAULT_KEY_FOCUS_PLAYER_ALL;
+
+  si->shortcut.tape_eject	= DEFAULT_KEY_TAPE_EJECT;
+  si->shortcut.tape_stop	= DEFAULT_KEY_TAPE_STOP;
+  si->shortcut.tape_pause	= DEFAULT_KEY_TAPE_PAUSE;
+  si->shortcut.tape_record	= DEFAULT_KEY_TAPE_RECORD;
+  si->shortcut.tape_play	= DEFAULT_KEY_TAPE_PLAY;
 
   for (i = 0; i < MAX_PLAYERS; i++)
   {

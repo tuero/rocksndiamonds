@@ -1299,10 +1299,8 @@ void UnmapTapeButtons()
     UnmapGadget(tape_gadget[i]);
 }
 
-static void HandleTapeButtons(struct GadgetInfo *gi)
+static void HandleTapeButtonsExt(int id)
 {
-  int id = gi->custom_id;
-
   if (game_status != GAME_MODE_MAIN && game_status != GAME_MODE_PLAYING)
     return;
 
@@ -1406,4 +1404,25 @@ static void HandleTapeButtons(struct GadgetInfo *gi)
     default:
       break;
   }
+}
+
+static void HandleTapeButtons(struct GadgetInfo *gi)
+{
+  HandleTapeButtonsExt(gi->custom_id);
+}
+
+void HandleTapeButtonKeys(Key key)
+{
+  boolean use_extra = (tape.recording || tape.playing);
+
+  if (key == setup.shortcut.tape_eject)
+    HandleTapeButtonsExt(use_extra ? TAPE_CTRL_ID_EXTRA : TAPE_CTRL_ID_EJECT);
+  else if (key == setup.shortcut.tape_stop)
+    HandleTapeButtonsExt(TAPE_CTRL_ID_STOP);
+  else if (key == setup.shortcut.tape_pause)
+    HandleTapeButtonsExt(TAPE_CTRL_ID_PAUSE);
+  else if (key == setup.shortcut.tape_record)
+    HandleTapeButtonsExt(TAPE_CTRL_ID_RECORD);
+  else if (key == setup.shortcut.tape_play)
+    HandleTapeButtonsExt(TAPE_CTRL_ID_PLAY);
 }

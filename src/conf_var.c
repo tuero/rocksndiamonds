@@ -1289,6 +1289,14 @@ struct TokenIntPtrInfo image_config_vars[] =
     &menu.draw_yoffset_setup[GFX_SPECIAL_ARG_SETUP_INPUT]
   },
   {
+    "menu.draw_xoffset.SETUP[SHORTCUTS]",
+    &menu.draw_xoffset_setup[GFX_SPECIAL_ARG_SETUP_SHORTCUTS]
+  },
+  {
+    "menu.draw_yoffset.SETUP[SHORTCUTS]",
+    &menu.draw_yoffset_setup[GFX_SPECIAL_ARG_SETUP_SHORTCUTS]
+  },
+  {
     "menu.draw_xoffset.SETUP[SHORTCUTS_1]",
     &menu.draw_xoffset_setup[GFX_SPECIAL_ARG_SETUP_SHORTCUTS_1]
   },
@@ -1303,6 +1311,14 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "menu.draw_yoffset.SETUP[SHORTCUTS_2]",
     &menu.draw_yoffset_setup[GFX_SPECIAL_ARG_SETUP_SHORTCUTS_2]
+  },
+  {
+    "menu.draw_xoffset.SETUP[SHORTCUTS_3]",
+    &menu.draw_xoffset_setup[GFX_SPECIAL_ARG_SETUP_SHORTCUTS_3]
+  },
+  {
+    "menu.draw_yoffset.SETUP[SHORTCUTS_3]",
+    &menu.draw_yoffset_setup[GFX_SPECIAL_ARG_SETUP_SHORTCUTS_3]
   },
   {
     "menu.draw_xoffset.SETUP[CHOOSE_ARTWORK]",
