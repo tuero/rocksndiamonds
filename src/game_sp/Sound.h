@@ -22,6 +22,8 @@ extern void subSoundFXInfotron();
 extern void subSoundFXPush();
 extern void subSoundFXZonk();
 
+extern void subSoundFX(int, int, int);
+
 extern int FXOnFlag;
 extern int MusicOnFlag;
 

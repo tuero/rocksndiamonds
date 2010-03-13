@@ -49,20 +49,21 @@
 #define SETUP_MODE_SHORTCUTS_1		8
 #define SETUP_MODE_SHORTCUTS_2		9
 #define SETUP_MODE_SHORTCUTS_3		10
+#define SETUP_MODE_SHORTCUTS_4		11
 
 /* sub-screens on the setup screen (generic) */
-#define SETUP_MODE_CHOOSE_ARTWORK	11
-#define SETUP_MODE_CHOOSE_OTHER		12
+#define SETUP_MODE_CHOOSE_ARTWORK	12
+#define SETUP_MODE_CHOOSE_OTHER		13
 
 /* sub-screens on the setup screen (specific) */
-#define SETUP_MODE_CHOOSE_GAME_SPEED	13
-#define SETUP_MODE_CHOOSE_SCREEN_MODE	14
-#define SETUP_MODE_CHOOSE_SCROLL_DELAY	15
-#define SETUP_MODE_CHOOSE_GRAPHICS	16
-#define SETUP_MODE_CHOOSE_SOUNDS	17
-#define SETUP_MODE_CHOOSE_MUSIC		18
+#define SETUP_MODE_CHOOSE_GAME_SPEED	14
+#define SETUP_MODE_CHOOSE_SCREEN_MODE	15
+#define SETUP_MODE_CHOOSE_SCROLL_DELAY	16
+#define SETUP_MODE_CHOOSE_GRAPHICS	17
+#define SETUP_MODE_CHOOSE_SOUNDS	18
+#define SETUP_MODE_CHOOSE_MUSIC		19
 
-#define MAX_SETUP_MODES			19
+#define MAX_SETUP_MODES			20
 
 /* for input setup functions */
 #define SETUPINPUT_SCREEN_POS_START	0
@@ -234,7 +235,7 @@ static struct
 				 INFO_MODE_MAIN)
 
 #define DRAW_MODE_SETUP(i)	((i) >= SETUP_MODE_MAIN &&		\
-				 (i) <= SETUP_MODE_SHORTCUTS_3 ? (i) :	\
+				 (i) <= SETUP_MODE_SHORTCUTS_4 ? (i) :	\
 				 (i) >= SETUP_MODE_CHOOSE_GRAPHICS &&	\
 				 (i) <= SETUP_MODE_CHOOSE_MUSIC ?	\
 				 SETUP_MODE_CHOOSE_ARTWORK :		\
@@ -4111,6 +4112,13 @@ static void execSetupShortcuts3()
   DrawSetupScreen();
 }
 
+static void execSetupShortcuts4()
+{
+  setup_mode = SETUP_MODE_SHORTCUTS_4;
+
+  DrawSetupScreen();
+}
+
 static void execExitSetup()
 {
   game_status = GAME_MODE_MAIN;
@@ -4283,6 +4291,7 @@ static struct TokenInfo setup_info_shortcuts[] =
   { TYPE_ENTER_MENU,	execSetupShortcuts1,	"Various Keys"	},
   { TYPE_ENTER_MENU,	execSetupShortcuts2,	"Player Focus"	},
   { TYPE_ENTER_MENU,	execSetupShortcuts3,	"Tape Buttons"	},
+  { TYPE_ENTER_MENU,	execSetupShortcuts4,	"Sound & Music"	},
   { TYPE_EMPTY,		NULL,			""			},
   { TYPE_LEAVE_MENU,	execSetupMain, 		"Back"			},
 
@@ -4326,16 +4335,30 @@ static struct TokenInfo setup_info_shortcuts_2[] =
 
 static struct TokenInfo setup_info_shortcuts_3[] =
 {
-  { TYPE_KEYTEXT,	NULL,		"Tape Eject:",			},
+  { TYPE_KEYTEXT,	NULL,			"Tape Eject:",		},
   { TYPE_KEY,		&setup.shortcut.tape_eject, ""			},
-  { TYPE_KEYTEXT,	NULL,		"Tape Stop:",			},
+  { TYPE_KEYTEXT,	NULL,			"Tape Stop:",		},
   { TYPE_KEY,		&setup.shortcut.tape_stop, ""			},
-  { TYPE_KEYTEXT,	NULL,		"Tape Pause:",			},
+  { TYPE_KEYTEXT,	NULL,			"Tape Pause:",		},
   { TYPE_KEY,		&setup.shortcut.tape_pause, ""			},
-  { TYPE_KEYTEXT,	NULL,		"Tape Record:",			},
+  { TYPE_KEYTEXT,	NULL,			"Tape Record:",		},
   { TYPE_KEY,		&setup.shortcut.tape_record, ""			},
-  { TYPE_KEYTEXT,	NULL,		"Tape Play:",			},
+  { TYPE_KEYTEXT,	NULL,			"Tape Play:",		},
   { TYPE_KEY,		&setup.shortcut.tape_play, ""			},
+  { TYPE_EMPTY,		NULL,			""			},
+  { TYPE_LEAVE_MENU,	execSetupShortcuts,	"Back"			},
+
+  { 0,			NULL,			NULL			}
+};
+
+static struct TokenInfo setup_info_shortcuts_4[] =
+{
+  { TYPE_KEYTEXT,	NULL,		"Sound Effects (Normal):",	},
+  { TYPE_KEY,		&setup.shortcut.sound_simple, ""		},
+  { TYPE_KEYTEXT,	NULL,		"Sound Effects (Looping):",	},
+  { TYPE_KEY,		&setup.shortcut.sound_loops, ""			},
+  { TYPE_KEYTEXT,	NULL,		"Music:",			},
+  { TYPE_KEY,		&setup.shortcut.sound_music, ""			},
   { TYPE_EMPTY,		NULL,			""			},
   { TYPE_LEAVE_MENU,	execSetupShortcuts,	"Back"			},
 
@@ -4638,6 +4661,11 @@ static void DrawSetupScreen_Generic()
   else if (setup_mode == SETUP_MODE_SHORTCUTS_3)
   {
     setup_info = setup_info_shortcuts_3;
+    title_string = "Setup Shortcuts";
+  }
+  else if (setup_mode == SETUP_MODE_SHORTCUTS_4)
+  {
+    setup_info = setup_info_shortcuts_4;
     title_string = "Setup Shortcuts";
   }
 

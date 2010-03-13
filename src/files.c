@@ -4282,25 +4282,8 @@ void CopyNativeLevel_RND_to_SP(struct LevelInfo *level)
   level_sp->height = level->fieldy;
 
   for (x = 0; x < level->fieldx; x++)
-  {
     for (y = 0; y < level->fieldy; y++)
-    {
-      int element_old = level->field[x][y];
-      int element_new;
-
-      if (element_old >= EL_SP_START &&
-	  element_old <= EL_SP_END)
-	element_new = element_old - EL_SP_START;
-      else if (element_old == EL_EMPTY_SPACE)
-	element_new = 0x00;
-      else if (element_old == EL_INVISIBLE_WALL)
-	element_new = 0x28;
-      else
-	element_new = 0x20;	/* map unknown elements to yellow "hardware" */
-
-      level_sp->playfield[x][y] = element_new;
-    }
-  }
+      level_sp->playfield[x][y] = map_element_RND_to_SP(level->field[x][y]);
 
   header->InitialGravity = (level->initial_player_gravity[0] ? 1 : 0);
 
@@ -4387,19 +4370,11 @@ void CopyNativeLevel_SP_to_RND(struct LevelInfo *level)
     for (y = 0; y < level->fieldy; y++)
     {
       int element_old = level_sp->playfield[x][y];
-      int element_new;
+      int element_new = getMappedElement(map_element_SP_to_RND(element_old));
 
-      if (element_old <= 0x27)
-	element_new = getMappedElement(EL_SP_START + element_old);
-      else if (element_old == 0x28)
-	element_new = EL_INVISIBLE_WALL;
-      else
-      {
+      if (element_new == EL_UNKNOWN)
 	Error(ERR_WARN, "invalid element %d at position %d, %d",
 	      element_old, x, y);
-
-	element_new = EL_UNKNOWN;
-      }
 
       level->field[x][y] = element_new;
     }
@@ -9008,8 +8983,11 @@ void SaveScore(int nr)
 #define SETUP_TOKEN_SHORTCUT_TAPE_PAUSE		10
 #define SETUP_TOKEN_SHORTCUT_TAPE_RECORD	11
 #define SETUP_TOKEN_SHORTCUT_TAPE_PLAY		12
+#define SETUP_TOKEN_SHORTCUT_SOUND_SIMPLE	13
+#define SETUP_TOKEN_SHORTCUT_SOUND_LOOPS	14
+#define SETUP_TOKEN_SHORTCUT_SOUND_MUSIC	15
 
-#define NUM_SHORTCUT_SETUP_TOKENS		13
+#define NUM_SHORTCUT_SETUP_TOKENS		16
 
 /* player setup */
 #define SETUP_TOKEN_PLAYER_USE_JOYSTICK		0
@@ -9159,6 +9137,9 @@ static struct TokenInfo shortcut_setup_tokens[] =
   { TYPE_KEY_X11, &ssi.tape_pause,	"shortcut.tape_pause"		},
   { TYPE_KEY_X11, &ssi.tape_record,	"shortcut.tape_record"		},
   { TYPE_KEY_X11, &ssi.tape_play,	"shortcut.tape_play"		},
+  { TYPE_KEY_X11, &ssi.sound_simple,	"shortcut.sound_simple"		},
+  { TYPE_KEY_X11, &ssi.sound_loops,	"shortcut.sound_loops"		},
+  { TYPE_KEY_X11, &ssi.sound_music,	"shortcut.sound_music"		},
 };
 
 static struct TokenInfo player_setup_tokens[] =
@@ -9280,6 +9261,10 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
   si->shortcut.tape_pause	= DEFAULT_KEY_TAPE_PAUSE;
   si->shortcut.tape_record	= DEFAULT_KEY_TAPE_RECORD;
   si->shortcut.tape_play	= DEFAULT_KEY_TAPE_PLAY;
+
+  si->shortcut.sound_simple	= DEFAULT_KEY_SOUND_SIMPLE;
+  si->shortcut.sound_loops	= DEFAULT_KEY_SOUND_LOOPS;
+  si->shortcut.sound_music	= DEFAULT_KEY_SOUND_MUSIC;
 
   for (i = 0; i < MAX_PLAYERS; i++)
   {

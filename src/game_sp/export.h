@@ -35,6 +35,19 @@
 #define SP_MAX_TAPE_LEN			64010	/* (see "spfix63.doc") */
 
 
+/* sound actions */
+
+#define actActive			0
+#define actImpact			1
+#define actExploding			2
+#define actDigging			3
+#define actSnapping			4
+#define actCollecting			5
+#define actPassing			6
+#define actPushing			7
+#define actDropping			8
+
+
 /* ------------------------------------------------------------------------- */
 /* data structure definitions                                                */
 /* ------------------------------------------------------------------------- */

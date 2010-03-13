@@ -16208,6 +16208,21 @@ void PlayLevelSound_EM(int xx, int yy, int element_em, int sample)
   }
 }
 
+void PlayLevelSound_SP(int xx, int yy, int element_sp, int action_sp)
+{
+  int element = map_element_SP_to_RND(element_sp);
+  int action = map_action_SP_to_RND(action_sp);
+  int offset = (setup.sp_show_border_elements ? 0 : 1);
+  int x = xx - offset;
+  int y = yy - offset;
+
+#if 0
+  printf("::: %d -> %d\n", element_sp, action_sp);
+#endif
+
+  PlayLevelSoundElementAction(x, y, element, action);
+}
+
 #if 0
 void ChangeTime(int value)
 {
@@ -16863,10 +16878,8 @@ void RedrawGameButtons()
     RedrawGadget(game_gadget[i]);
 }
 
-static void HandleGameButtons(struct GadgetInfo *gi)
+static void HandleGameButtonsExt(int id)
 {
-  int id = gi->custom_id;
-
   if (game_status != GAME_MODE_PLAYING)
     return;
 
@@ -16912,6 +16925,7 @@ static void HandleGameButtons(struct GadgetInfo *gi)
       if (setup.sound_music)
       { 
 	setup.sound_music = FALSE;
+
 	FadeMusic();
       }
       else if (audio.music_available)
@@ -16930,6 +16944,7 @@ static void HandleGameButtons(struct GadgetInfo *gi)
       else if (audio.loops_available)
       {
 	setup.sound = setup.sound_loops = TRUE;
+
 	SetAudioMode(setup.sound);
       }
       break;
@@ -16940,6 +16955,7 @@ static void HandleGameButtons(struct GadgetInfo *gi)
       else if (audio.sound_available)
       {
 	setup.sound = setup.sound_simple = TRUE;
+
 	SetAudioMode(setup.sound);
       }
       break;
@@ -16947,4 +16963,28 @@ static void HandleGameButtons(struct GadgetInfo *gi)
     default:
       break;
   }
+}
+
+static void HandleGameButtons(struct GadgetInfo *gi)
+{
+  HandleGameButtonsExt(gi->custom_id);
+}
+
+void HandleSoundButtonKeys(Key key)
+{
+#if 1
+  if (key == setup.shortcut.sound_simple)
+    ClickOnGadget(game_gadget[SOUND_CTRL_ID_SIMPLE], MB_LEFTBUTTON);
+  else if (key == setup.shortcut.sound_loops)
+    ClickOnGadget(game_gadget[SOUND_CTRL_ID_LOOPS], MB_LEFTBUTTON);
+  else if (key == setup.shortcut.sound_music)
+    ClickOnGadget(game_gadget[SOUND_CTRL_ID_MUSIC], MB_LEFTBUTTON);
+#else
+  if (key == setup.shortcut.sound_simple)
+    HandleGameButtonsExt(SOUND_CTRL_ID_SIMPLE);
+  else if (key == setup.shortcut.sound_loops)
+    HandleGameButtonsExt(SOUND_CTRL_ID_LOOPS);
+  else if (key == setup.shortcut.sound_music)
+    HandleGameButtonsExt(SOUND_CTRL_ID_MUSIC);
+#endif
 }

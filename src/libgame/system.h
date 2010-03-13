@@ -77,6 +77,9 @@
 #define DEFAULT_KEY_TAPE_PAUSE		KSYM_UNDEFINED
 #define DEFAULT_KEY_TAPE_RECORD		KSYM_UNDEFINED
 #define DEFAULT_KEY_TAPE_PLAY		KSYM_UNDEFINED
+#define DEFAULT_KEY_SOUND_SIMPLE	KSYM_UNDEFINED
+#define DEFAULT_KEY_SOUND_LOOPS		KSYM_UNDEFINED
+#define DEFAULT_KEY_SOUND_MUSIC		KSYM_UNDEFINED
 
 /* values for key_status */
 #define KEY_NOT_PRESSED			FALSE
@@ -845,6 +848,10 @@ struct SetupShortcutInfo
   Key tape_pause;
   Key tape_record;
   Key tape_play;
+
+  Key sound_simple;
+  Key sound_loops;
+  Key sound_music;
 };
 
 struct SetupSystemInfo

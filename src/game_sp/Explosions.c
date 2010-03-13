@@ -154,7 +154,11 @@ void ExplodeFieldSP(int si)
   GfxGraphic[GetX(si)][GetY(si)] = -1;		// restart for chain-explosions
 
   // loc_g_2C3B:
+#if 1
+  subSoundFX(si, ax, actExploding);
+#else
   subSoundFXExplosion();
+#endif
 } // ExplodeFieldSP
 
 static void LetExplodeFieldSP(int tsi, int cx, int dh)

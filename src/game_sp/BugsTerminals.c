@@ -75,34 +75,38 @@ int subAnimateBugs(int si)
 #endif
 
   // now the bug is active! Beware Murphy!
-  if ((ByteMask && PlayField16[si - FieldWidth - 1]) == fiMurphy)
+  if ((ByteMask & PlayField16[si - FieldWidth - 1]) == fiMurphy)
     goto markPlaySound;
 
-  if ((ByteMask && PlayField16[si - FieldWidth]) == fiMurphy)
+  if ((ByteMask & PlayField16[si - FieldWidth]) == fiMurphy)
     goto markPlaySound;
 
-  if ((ByteMask && PlayField16[si - FieldWidth + 1]) == fiMurphy)
+  if ((ByteMask & PlayField16[si - FieldWidth + 1]) == fiMurphy)
     goto markPlaySound;
 
-  if ((ByteMask && PlayField16[si - 1]) == fiMurphy)
+  if ((ByteMask & PlayField16[si - 1]) == fiMurphy)
     goto markPlaySound;
 
-  if ((ByteMask && PlayField16[si + 1]) == fiMurphy)
+  if ((ByteMask & PlayField16[si + 1]) == fiMurphy)
     goto markPlaySound;
 
-  if ((ByteMask && PlayField16[si + FieldWidth - 1]) == fiMurphy)
+  if ((ByteMask & PlayField16[si + FieldWidth - 1]) == fiMurphy)
     goto markPlaySound;
 
-  if ((ByteMask && PlayField16[si + FieldWidth]) == fiMurphy)
+  if ((ByteMask & PlayField16[si + FieldWidth]) == fiMurphy)
     goto markPlaySound;
 
-  if ((ByteMask && PlayField16[si + FieldWidth + 1]) == fiMurphy)
+  if ((ByteMask & PlayField16[si + FieldWidth + 1]) == fiMurphy)
     goto markPlaySound;
 
   goto markDisplay;
 
 markPlaySound:
+#if 1
+  subSoundFX(si, fiBug, actActive);	// play dangerous sound
+#else
   subSoundFXBug(); // play dangerous sound
+#endif
 
 markDisplay:
   // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++

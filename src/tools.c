@@ -5900,6 +5900,52 @@ int map_direction_EM_to_RND(int direction)
 	  MV_NONE);
 }
 
+int map_element_RND_to_SP(int element_rnd)
+{
+  int element_sp = 0x20;	/* map unknown elements to yellow "hardware" */
+
+  if (element_rnd >= EL_SP_START &&
+      element_rnd <= EL_SP_END)
+    element_sp = element_rnd - EL_SP_START;
+  else if (element_rnd == EL_EMPTY_SPACE)
+    element_sp = 0x00;
+  else if (element_rnd == EL_INVISIBLE_WALL)
+    element_sp = 0x28;
+
+  return element_sp;
+}
+
+int map_element_SP_to_RND(int element_sp)
+{
+  int element_rnd = EL_UNKNOWN;
+
+  if (element_sp >= 0x00 &&
+      element_sp <= 0x27)
+    element_rnd = EL_SP_START + element_sp;
+  else if (element_sp == 0x28)
+    element_rnd = EL_INVISIBLE_WALL;
+
+  return element_rnd;
+}
+
+int map_action_SP_to_RND(int action_sp)
+{
+  switch (action_sp)
+  {
+    case actActive:		return ACTION_ACTIVE;
+    case actImpact:		return ACTION_IMPACT;
+    case actExploding:		return ACTION_EXPLODING;
+    case actDigging:		return ACTION_DIGGING;
+    case actSnapping:		return ACTION_SNAPPING;
+    case actCollecting:		return ACTION_COLLECTING;
+    case actPassing:		return ACTION_PASSING;
+    case actPushing:		return ACTION_PUSHING;
+    case actDropping:		return ACTION_DROPPING;
+
+    default:			return ACTION_DEFAULT;
+  }
+}
+
 int get_next_element(int element)
 {
   switch (element)

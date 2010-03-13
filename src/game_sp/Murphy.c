@@ -755,7 +755,12 @@ loc_g_63C2:
   // ==========================================================================
 
 loc_g_63D3:
+#if 1
+  subSoundFX(*si, fiBase, actDigging);
+#else
   subSoundFXBase();
+#endif
+
   dx = (MurphyVarFaceLeft == 0 ? aniFramesMurphyEatUpRight : aniFramesMurphyEatUpLeft);
   dx1 = (MurphyVarFaceLeft == 0 ? aniMurphyDigUpRight : aniMurphyDigUpLeft);
   PlayField16[*si - FieldWidth] = 0x503;
@@ -781,7 +786,12 @@ loc_g_640B:
   // ==========================================================================
 
 loc_g_641C:
+#if 1
+  subSoundFX(*si, fiBase, actDigging);
+#else
   subSoundFXBase();
+#endif
+
   dx = aniFramesMurphyEatLeft;
   dx1 = aniMurphyDigLeft;
   PlayField16[*si - 1] = 0x203;
@@ -807,7 +817,12 @@ loc_g_6448:
   // ==========================================================================
 
 loc_g_6459:
+#if 1
+  subSoundFX(*si, fiBase, actDigging);
+#else
   subSoundFXBase();
+#endif
+
   dx = (MurphyVarFaceLeft == 0 ? aniFramesMurphyEatUpRight : aniFramesMurphyEatUpLeft);
   dx1 = (MurphyVarFaceLeft == 0 ? aniMurphyDigUpRight : aniMurphyDigUpLeft);
   PlayField16[*si + FieldWidth] = 0x703;
@@ -833,7 +848,12 @@ loc_g_6491:
   // ==========================================================================
 
 loc_g_64A2:
+#if 1
+  subSoundFX(*si, fiBase, actDigging);
+#else
   subSoundFXBase();
+#endif
+
   dx = aniFramesMurphyEatRight;
   dx1 = aniMurphyDigRight;
   PlayField16[*si + 1] = 0x803;
@@ -860,7 +880,12 @@ loc_g_64CE:
 
 loc_g_64DF:
   subCopyImageToScreen(*si, aniMurphyTouchUp);
+#if 1
+  subSoundFX(*si, fiBase, actDigging);
+#else
   subSoundFXBase();
+#endif
+
   dx = aniFramesTouchBase;
   dx1 = aniTouchBase;
   dxPos = *si - FieldWidth;
@@ -886,7 +911,12 @@ loc_g_650C:
 
 loc_g_651D:
   subCopyImageToScreen(*si, aniMurphyTouchLeft);
+#if 1
+  subSoundFX(*si, fiBase, actDigging);
+#else
   subSoundFXBase();
+#endif
+
   dx = aniFramesTouchBase;
   dx1 = aniTouchBase;
   dxPos = *si - 1;
@@ -912,7 +942,12 @@ loc_g_654A:
 
 loc_g_655B:
   subCopyImageToScreen(*si, aniMurphyTouchDown);
+#if 1
+  subSoundFX(*si, fiBase, actDigging);
+#else
   subSoundFXBase();
+#endif
+
   dx = aniFramesTouchBase;
   dx1 = aniTouchBase;
   dxPos = *si + FieldWidth;
@@ -938,7 +973,12 @@ loc_g_6588:
 
 loc_g_6599:
   subCopyImageToScreen(*si, aniMurphyTouchRight);
+#if 1
+  subSoundFX(*si, fiBase, actDigging);
+#else
   subSoundFXBase();
+#endif
+
   dx = aniFramesTouchBase;
   dx1 = aniTouchBase;
   dxPos = *si + 1;
@@ -950,7 +990,12 @@ loc_g_6599:
   // ==========================================================================
 
 loc_g_65C6:
+#if 1
+  subSoundFX(*si, fiInfotron, actCollecting);
+#else
   subSoundFXInfotron();
+#endif
+
   dx = (MurphyVarFaceLeft == 0 ? aniFramesMurphyEatUpRight : aniFramesMurphyEatUpLeft);
   dx1 = (MurphyVarFaceLeft == 0 ? aniMurphyEatUpRight : aniMurphyEatUpLeft);
   PlayField16[*si - FieldWidth] = 0x903;
@@ -963,7 +1008,12 @@ loc_g_65C6:
   // ==========================================================================
 
 loc_g_65FE:
+#if 1
+  subSoundFX(*si, fiInfotron, actCollecting);
+#else
   subSoundFXInfotron();
+#endif
+
   dx = aniFramesEatInfotronLeft;
   dx1 = aniEatInfotronLeft;
 #if 0
@@ -981,7 +1031,12 @@ loc_g_65FE:
   // ==========================================================================
 
 loc_g_662A:
+#if 1
+  subSoundFX(*si, fiInfotron, actCollecting);
+#else
   subSoundFXInfotron();
+#endif
+
   dx = (MurphyVarFaceLeft == 0 ? aniFramesMurphyEatUpRight : aniFramesMurphyEatUpLeft);
   dx1 = (MurphyVarFaceLeft == 0 ? aniMurphyEatUpRight : aniMurphyEatUpLeft);
   PlayField16[*si + FieldWidth] = 0xB03;
@@ -994,7 +1049,12 @@ loc_g_662A:
   // ==========================================================================
 
 loc_g_6662:
+#if 1
+  subSoundFX(*si, fiInfotron, actCollecting);
+#else
   subSoundFXInfotron();
+#endif
+
   dx = aniFramesEatInfotronRight;
   dx1 = aniEatInfotronRight;
 #if 0
@@ -1013,7 +1073,12 @@ loc_g_6662:
 
 loc_g_668E:
   subCopyImageToScreen(*si, aniMurphyTouchUp);
+#if 1
+  subSoundFX(*si, fiInfotron, actCollecting);
+#else
   subSoundFXInfotron();
+#endif
+
   dx = aniFramesTouchInfotron;
   dx1 = aniTouchInfotron;
   MovHighByte(&PlayField16[*si], 0x14);
@@ -1026,7 +1091,12 @@ loc_g_668E:
 
 loc_g_66C0:
   subCopyImageToScreen(*si, aniMurphyTouchLeft);
+#if 1
+  subSoundFX(*si, fiInfotron, actCollecting);
+#else
   subSoundFXInfotron();
+#endif
+
   dx = aniFramesTouchInfotron;
   dx1 = aniTouchInfotron;
   MovHighByte(&PlayField16[*si], 0x15);
@@ -1039,7 +1109,12 @@ loc_g_66C0:
 
 loc_g_66F2:
   subCopyImageToScreen(*si, aniMurphyTouchDown);
+#if 1
+  subSoundFX(*si, fiInfotron, actCollecting);
+#else
   subSoundFXInfotron();
+#endif
+
   dx = aniFramesTouchInfotron;
   dx1 = aniTouchInfotron;
   MovHighByte(&PlayField16[*si], 0x16);
@@ -1052,7 +1127,12 @@ loc_g_66F2:
 
 loc_g_6724:
   subCopyImageToScreen(*si, aniMurphyTouchRight);
+#if 1
+  subSoundFX(*si, fiInfotron, actCollecting);
+#else
   subSoundFXInfotron();
+#endif
+
   dx = aniFramesTouchInfotron;
   dx1 = aniTouchInfotron;
   MovHighByte(&PlayField16[*si], 0x17);
@@ -1081,7 +1161,12 @@ loc_g_6756:
   game_sp.LevelSolved = TRUE;
 #endif
 
+#if 1
+  subSoundFX(*si, fiExit, actPassing);
+#else
   subSoundFXExit();
+#endif
+
   data_h_DemoDone = 1; // EP set level success bytes
   LevelStatus = 1; // set Level Status DONE
   EP_GameDemoVar0DAA = 0; // force demo for lead-out
@@ -1597,8 +1682,36 @@ locProceedMovingMurphy: // proceed moving murphy
 
   ax = ax - 1;   // next picture of sequence
   MovingPictureSequencePhase = ax;            // store for later
+
   if (ax == 0) // Sound effects
+#if 1
+  {
+    switch (HighByte(PlayField16[*si]))
+    {
+      case 0xE:
+      case 0xF:
+	subSoundFX(*si, fiZonk, actPushing);
+	break;
+
+      case 0x28:
+      case 0x29:
+	subSoundFX(*si, fiOrangeDisk, actPushing);
+	break;
+
+      case 0x24:
+      case 0x25:
+      case 0x26:
+      case 0x27:
+	subSoundFX(*si, fiYellowDisk, actPushing);
+	break;
+
+      default:
+	break;
+    }
+  }
+#else
     subSoundFXPush();
+#endif
 
   bl = HighByte(PlayField16[*si]);
   if (bl == 0xE)        // Push Zonk to left
@@ -2531,7 +2644,12 @@ loc_g_747F:
   RedDiskReleasePhase = 2;
   RedDiskCount = RedDiskCount - 1;
   subDisplayRedDiskCount();
+
+#if 1
+  subSoundFX(*si, fiRedDisk, actDropping);
+#else
   subSoundFXPush();                 // Sound effects
+#endif
 } // subAnimateMurphy
 
 // ==========================================================================

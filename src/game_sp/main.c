@@ -109,6 +109,8 @@ void GameActions_SP(byte action[MAX_PLAYERS], boolean warp_mode)
   byte single_player_action = action[0];
   int x, y;
 
+  UpdateEngineValues(mScrollX / TILEX, mScrollY / TILEY);
+
   subMainGameLoop_Main(single_player_action, warp_mode);
 
   RedrawPlayfield_SP(FALSE);

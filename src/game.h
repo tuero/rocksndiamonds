@@ -340,6 +340,7 @@ void ScrollLevel(int, int);
 
 void InitPlayLevelSound();
 void PlayLevelSound_EM(int, int, int, int);
+void PlayLevelSound_SP(int, int, int, int);
 
 void RaiseScore(int);
 void RaiseScoreElement(int);
@@ -359,5 +360,7 @@ void CreateGameButtons();
 void FreeGameButtons();
 void UnmapGameButtons();
 void RedrawGameButtons();
+
+void HandleSoundButtonKeys(Key);
 
 #endif
