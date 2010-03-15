@@ -19,9 +19,7 @@ SRCS =	init.c			\
 	vb_vars.c		\
 				\
 	ASM.c			\
-	BitMapObject.c		\
 	BugsTerminals.c		\
-	Capture.c		\
 	DDScrollBuffer.c	\
 	DDSpriteBuffer.c	\
 	Demo.c			\
@@ -64,9 +62,7 @@ OBJS =	init.o			\
 	vb_vars.o		\
 				\
 	ASM.o			\
-	BitMapObject.o		\
 	BugsTerminals.o		\
-	Capture.o		\
 	DDScrollBuffer.o	\
 	DDSpriteBuffer.o	\
 	Demo.o			\

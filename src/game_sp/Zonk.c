@@ -216,7 +216,7 @@ loc_g_0EEA:     // test if zonk may roll left
     goto loc_g_0D4C;
 
   MovHighByte(&PlayField16[si], 0x50); // zonk rolls left
-  Mov(&PlayField16[si - 1], 0x8888); // mark as zonk accessing?
+  PlayField16[si - 1] = 0x8888; // mark as zonk accessing?
   return subAnimateZonks;
 
 loc_g_0F00:     // test if zonk may roll right
@@ -224,7 +224,7 @@ loc_g_0F00:     // test if zonk may roll right
     return subAnimateZonks;
 
   MovHighByte(&PlayField16[si], 0x60); // zonk rolls right
-  Mov(&PlayField16[si + 1], 0x8888); // mark as zonk accessing?
+  PlayField16[si + 1] = 0x8888; // mark as zonk accessing?
   return subAnimateZonks;
 
 loc_g_0F14:     // Murphy dies, but not in any case

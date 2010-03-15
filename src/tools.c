@@ -7789,11 +7789,6 @@ void getGraphicSource_SP(struct GraphicInfo_SP *g_sp,
   getGraphicSource(graphic, frame, &g_sp->bitmap, &g_sp->src_x, &g_sp->src_y);
 }
 
-boolean isRandomAnimation_SP(int graphic)
-{
-  return (ANIM_MODE(graphic) == ANIM_RANDOM);
-}
-
 boolean isNextAnimationFrame_SP(int graphic, int sync_frame)
 {
   return (IS_NEXT_FRAME(sync_frame, graphic));

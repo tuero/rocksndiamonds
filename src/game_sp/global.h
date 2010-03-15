@@ -8,9 +8,7 @@
 #include "main_sp.h"
 
 #include "ASM.h"
-#include "BitMapObject.h"
 #include "BugsTerminals.h"
-#include "Capture.h"
 #include "DDScrollBuffer.h"
 #include "DDSpriteBuffer.h"
 #include "Demo.h"

@@ -686,7 +686,7 @@ loc_g_62E2:
   dx = aniFramesRedDisk;
   dx1 = aniRedDisk;
   MovLowByte(&RedDiskReleasePhase, 1);
-  Mov(&RedDiskReleaseMurphyPos, *si);             // remember Murphy's location
+  RedDiskReleaseMurphyPos = *si;             // remember Murphy's location
   goto loc_Split;
 
   // ==========================================================================

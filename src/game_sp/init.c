@@ -3,11 +3,6 @@
 #include "global.h"
 
 
-#if 0
-Bitmap *sp_objects;
-
-#endif
-
 Bitmap *screenBitmap;
 
 struct EngineSnapshotInfo_SP engine_snapshot_sp;
@@ -40,22 +35,10 @@ void sp_open_all()
 
   Form_Load();
 
-#if 0
-  SetBitmaps_SP(&sp_objects);
-#endif
-
-#if 0
-  /* too small for oversized levels, but too big for graphics performance */
-  /* (the whole playfield is drawn/updated, not only visible/scrolled area) */
-  /* !!! FIX THIS !!! */
-  screenBitmap = CreateBitmap(60 * TILEX, 24 * TILEY,
-                              DEFAULT_DEPTH);
-#else
   screenBitmap = CreateBitmap(MAX_BUF_XSIZE * TILEX, MAX_BUF_YSIZE * TILEY,
                               DEFAULT_DEPTH);
-#endif
 
-  DDSpriteBuffer_CreateFromFile("[NONE]", 16, 16);
+  DDSpriteBuffer_Init();
 }
 
 void sp_close_all()

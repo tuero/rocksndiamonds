@@ -6,7 +6,6 @@
 struct GameInfo_SP game_sp;
 struct LevelInfo_SP native_sp_level;
 
-
 int GfxElementLast[SP_MAX_PLAYFIELD_WIDTH][SP_MAX_PLAYFIELD_HEIGHT];
 int GfxGraphicLast[SP_MAX_PLAYFIELD_WIDTH][SP_MAX_PLAYFIELD_HEIGHT];
 int GfxGraphic[SP_MAX_PLAYFIELD_WIDTH][SP_MAX_PLAYFIELD_HEIGHT];
@@ -42,34 +41,11 @@ void InitGameEngine_SP()
 
   InitScrollPlayfield();
 
-#if 0
-  printf(":A: %d, %d [%d, %d]\n",
-	 mScrollX, mScrollY, mScrollX_last, mScrollY_last);
-#endif
-
-#if 1
   menPlay_Click();
-#else
-  menPlayDemo_Click();
-#endif
-
-#if 0
-  printf(":B: %d, %d [%d, %d]\n",
-	 mScrollX, mScrollY, mScrollX_last, mScrollY_last);
-#endif
 }
-
-#if 0
-void BlitScreenToBitmap_SP(Bitmap *target_bitmap)
-{
-  DDScrollBuffer_Blt_Ext(target_bitmap);
-}
-#endif
 
 void RedrawPlayfield_SP(boolean force_redraw)
 {
-  // subDisplayLevel();
-
   if (force_redraw)
     RestorePlayfield();
 
@@ -80,28 +56,10 @@ void RedrawPlayfield_SP(boolean force_redraw)
 
 void DrawGameDoorValues_SP()
 {
-#if 1
-
   game_sp.time_played = TimerVar / setup.game_frame_delay;
   game_sp.infotrons_still_needed = InfotronsNeeded;
   game_sp.red_disk_count = RedDiskCount;
   game_sp.score = 0;		// (currently no score in Supaplex engine)
-
-#else
-
-  int infotrons_still_needed = InfotronsNeeded;
-  int red_disks = RedDiskCount;
-  int no_score_in_supaplex = 0;
-#if 1
-  int level_time_played = TimerVar / setup.game_frame_delay;
-#else
-  int level_time_played = TimerVar / 35;	/* !!! CHECK THIS !!! */
-#endif
-  int no_keys_in_supaplex = 0;
-
-  DrawAllGameValues(infotrons_still_needed, red_disks, no_score_in_supaplex,
-		    level_time_played, no_keys_in_supaplex);
-#endif
 }
 
 void GameActions_SP(byte action[MAX_PLAYERS], boolean warp_mode)

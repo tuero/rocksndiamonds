@@ -12,12 +12,13 @@
 
 #include "global.h"
 
-extern int subAnimateBugs(int si);
-extern int subAnimateTerminals(int si);
-extern int subGetRandomNumber();
-extern int subRandomize();
 
 extern byte *TerminalState;
 extern int TerminalMaxCycles;
+
+extern void subAnimateBugs(int si);
+extern void subAnimateTerminals(int si);
+extern void subRandomize();
+extern int subGetRandomNumber();
 
 #endif /* BUGSTERMINALS_H */

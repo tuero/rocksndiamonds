@@ -213,7 +213,8 @@ loc_g_133A:     // test if infotron may roll left
     goto loc_g_11BD;
 
   MovHighByte(&PlayField16[si], 0x50); // infotron rolls left
-  Mov(&PlayField16[si - 1], 0x8888);
+  PlayField16[si - 1] = 0x8888;
+
   return subAnimateInfotrons;
 
 loc_g_1350:     // test if infotron may roll right
@@ -221,7 +222,8 @@ loc_g_1350:     // test if infotron may roll right
     return subAnimateInfotrons;
 
   MovHighByte(&PlayField16[si], 0x60); // infotron rolls right
-  Mov(&PlayField16[si + 1], 0x8888);
+  PlayField16[si + 1] = 0x8888;
+
   return subAnimateInfotrons;
 
 loc_g_1364:     // Murphy dies, but not in any case

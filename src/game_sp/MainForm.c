@@ -3290,12 +3290,6 @@ void DrawFieldNoAnimated(int X, int Y)
           Tmp = DisPlayField[tsi];
       }
 
-#if 0
-      if (TEST_flag)
-	printf("::: MainForm.c: DrawFieldNoAnimated(): %d, %d [%d]\n",
-	       X, Y, Tmp);
-#endif
-
 #if 1
       if (Tmp >= 0 && Tmp <= 40)
       {
