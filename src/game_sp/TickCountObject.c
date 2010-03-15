@@ -62,39 +62,6 @@ void TickCountObject_Let_Pause(boolean NewVal)
   MPause = NewVal;
 }
 
-void TickCountObject_DelayMS(long MSInterval, boolean DoEventsFlag) // in ms
-{
-  currency Start;
-
-  Start = TickCountObject_Get_TickNow();
-  DelayLoopActive = True;
-  do
-  {
-    if (DoEventsFlag)
-      DoEvents();
-
-    if (MSInterval <= TickCountObject_TickDiffMS(Start) && ! MPause)
-      break;
-  }
-  while (1);
-
-  DelayLoopActive = False;
-}
-
-// for compatibility with old code:
-void TickCountObject_DelayS(long SInterval, boolean DoEventsFlag) // in s
-{
-  // check if SInterval is less than 25 days ...
-  if ((int)(LongMax / 1000) <= SInterval)
-  {
-    Err.Raise(513, "Delay()", "Value Overflow");
-  }
-  else
-  {
-    TickCountObject_DelayMS((long)1000 * SInterval, DoEventsFlag);
-  }
-}
-
 currency TickCountObject_Get_TickNow()
 {
   currency TickNow;

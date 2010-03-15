@@ -207,11 +207,6 @@ int GetAttr(char *a)
   return 0;
 }
 
-void DoEvents()
-{
-  return;
-}
-
 void SaveSetting(const char * a, const char *b, char *c, int d)
 {
   return;

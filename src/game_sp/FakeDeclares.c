@@ -10,8 +10,6 @@ int MurphyScreenXPos, MurphyScreenYPos;
 int MurphyExplodePos, SplitMoveFlag, RedDiskReleaseMurphyPos;
 int KillMurphyFlag, MurphyMoveCounter;
 long YawnSleepCounter;
-int MurphyVar0DAC;
-int MurphyVar0DAE;
 int MurphyVarFaceLeft;
 int ScratchGravity, GravityFlag;
 int RedDiskReleaseFlag, MovingPictureSequencePhase;
@@ -43,7 +41,6 @@ int RedDiskReleasePhase;
 int UpdatedFlag;
 
 int DebugVersionFlag, D_ModeFlag;
-int Data_SubRest, Data_SubRstFlg;
 int keyEnter;
 
 int UpdateTimeFlag;

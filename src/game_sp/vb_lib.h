@@ -54,8 +54,6 @@ extern long MyGetTickCount();
 
 extern int GetAttr(char *);
 
-extern void DoEvents();
-
 extern void SaveSetting(const char *, const char *, char *, int);
 
 #if 0

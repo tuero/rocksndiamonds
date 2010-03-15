@@ -12,6 +12,7 @@
 
 #include "global.h"
 
-extern int subAnimateOrangeDisks(int si);
+
+extern void subAnimateOrangeDisks(int);
 
 #endif /* ORANGEDISK_H */

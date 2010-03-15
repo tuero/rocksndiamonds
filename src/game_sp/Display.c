@@ -6,7 +6,6 @@
 
 
 int ScreenScrollXPos, ScreenScrollYPos;
-int ScreenPosition;
 
 int ShowPanel;
 int ExplosionShake;

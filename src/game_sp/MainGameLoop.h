@@ -12,11 +12,6 @@
 
 #include "global.h"
 
-extern int subCalculateScreenScrollPos();
-extern int subMainGameLoop();
-extern int subMainGameLoop_Init();
-extern int subMainGameLoop_Main(byte, boolean);
-extern void subUpdatePlayingTime();
 
 extern boolean AutoScrollFlag;
 extern boolean UserDragFlag;
@@ -26,5 +21,9 @@ extern int ForcedExitFlag;
 extern int GameLoopRunning;
 extern int LeadOutCounter, EnterRepeatCounter;
 extern int SavedGameFlag;
+
+extern void subMainGameLoop_Init();
+extern void subMainGameLoop_Main(byte, boolean);
+extern void subCalculateScreenScrollPos();
 
 #endif /* MAINGAMELOOP_H */

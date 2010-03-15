@@ -33,8 +33,6 @@ extern int KillMurphyFlag, MurphyMoveCounter;
 extern int MurphyExplodePos, SplitMoveFlag, RedDiskReleaseMurphyPos;
 extern int MurphyPosIndex, MurphyXPos, MurphyYPos;
 extern int MurphyScreenXPos, MurphyScreenYPos;
-extern int MurphyVar0DAC;
-extern int MurphyVar0DAE;
 extern int MurphyVarFaceLeft;
 extern int RecordDemoFlag;
 extern int RedDiskCount;

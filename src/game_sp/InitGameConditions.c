@@ -14,34 +14,27 @@ void subInitGameConditions()
 {
   bCapturePane = False;
 
-  MurphyVar0DAC = MurphyYPos;
-  MurphyVar0DAE = MurphyXPos;
   MurphyVarFaceLeft = 0;
-  KillMurphyFlag = 0;            // no "kill Murphy"
+  KillMurphyFlag = 0;			// no "kill Murphy"
   ExitToMenuFlag = 0;
-  LeadOutCounter = 0;           // quit flag: lead-out counter
-  RedDiskCount = 0; // Red disk counter
+  LeadOutCounter = 0;			// quit flag: lead-out counter
+  RedDiskCount = 0;			// Red disk counter
 
-  // ShowRedDiskCounter = 0; // show-red-disk time-out
+  YawnSleepCounter = 0;			// Wake up sleeping Murphy
 
-  YawnSleepCounter = 0; // Wake up sleeping Murphy
-
-  ExplosionShake = 0; // Force explosion flag off
+  ExplosionShake = 0;			// Force explosion flag off
 
   TerminalMaxCycles = 0x7F;
   YellowDisksExploded = 0;
 
   TimerVar = 0;
 
-  // ShowPanel = 1 ' Force Panel on
-  // MainForm.PanelVisible = True;
+  EnterRepeatCounter = 0;		// restart Enter repeat counter
+  SnikSnaksElectronsFrozen = 0;		// Snik-Snaks and Electrons move!
 
-  EnterRepeatCounter = 0; // restart Enter repeat counter
-  SnikSnaksElectronsFrozen = 0; // Snik-Snaks and Electr. move!
-
-  SplitMoveFlag = 0; // Reset Split-through-ports
-  RedDiskReleasePhase = 0; // (re-)enable red disk release
-  RedDiskReleaseMurphyPos = 0; // Red disk was released here
+  SplitMoveFlag = 0;			// Reset Split-through-ports
+  RedDiskReleasePhase = 0;		// (re-)enable red disk release
+  RedDiskReleaseMurphyPos = 0;		// Red disk was released here
 }
 
 
@@ -227,13 +220,11 @@ loc_g_2778:
 
 void ResetInfotronsNeeded(int dx)
 {
-  if (LInfo.InfotronsNeeded != 0) // Jump If equal (autodetect)
-  {
+  if (LInfo.InfotronsNeeded != 0)		// Jump If equal (autodetect)
     dx = LInfo.InfotronsNeeded;
-  }                            // loc_g_278D:
 
-  InfotronsNeeded = LowByte(dx);           // Remaining Infotrons needed
-  TotalInfotronsNeeded = InfotronsNeeded;          // Number of Infotrons needed
+  InfotronsNeeded = LowByte(dx);		// Remaining Infotrons needed
+  TotalInfotronsNeeded = InfotronsNeeded;	// Number of Infotrons needed
 }
 
 
@@ -255,11 +246,6 @@ void subFetchAndInitLevelB()
 
 void subFetchAndInitLevelA(boolean UpdatePlayTime)
 {
-  if (UpdatePlayTime && (0 == demo_stopped))
-  {
-    subUpdatePlayingTime();                 // update playing time
-  }
-
   D_ModeFlag = 0; // 1=debug D pressed (CPU use)
   if (0 != demo_stopped) // 1=demo, 0=game
     DemoFlag = 1;
@@ -296,36 +282,21 @@ void subFetchAndInitLevel()
 {
   int InfoCountInLevel;
 
-  Trace("modInitGameConditions", "--> subFetchAndInitLevel");
-  Trace("modInitGameConditions", "Call ReadLevel");
-
   ReadLevel();                   // Read LEVELS.DAT
-
-  Trace("modInitGameConditions", "ReadLevel return subFetchAndInitLeveled");
 
   if (RecordDemoFlag == 1)
     RecDemoRandomSeed = RandomSeed;
 
   GameBusyFlag = -GameBusyFlag;   // make <>1
 
-  Trace("modInitGameConditions", "subConvertToEasySymbols");
-
   InfoCountInLevel = subConvertToEasySymbols(); // Convert to easy symbols
   GameBusyFlag = -GameBusyFlag;     // restore
-
-  Trace("modInitGameConditions", "subDisplayLevel");
 
   subDisplayLevel();               // Paint (Init) game field
 
   ResetInfotronsNeeded(InfoCountInLevel);  // and reset Infotron count
 
-  Data_SubRstFlg = 1;
-
-  Trace("modInitGameConditions", "subInitGameConditions");
-
   subInitGameConditions();                 // Init game conditions (vars)
 
   InitMurphyPos();                 // Locate Murphy + screen pos
-
-  Trace("modInitGameConditions", "<-- subFetchAndInitLevel");
 }

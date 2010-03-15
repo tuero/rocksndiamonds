@@ -14,7 +14,6 @@
 
 
 extern int ScreenScrollXPos, ScreenScrollYPos;
-extern int ScreenPosition;
 
 extern int ShowPanel;
 extern int ExplosionShake;

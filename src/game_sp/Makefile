@@ -32,10 +32,8 @@ SRCS =	init.c			\
 	Infotrons.c		\
 	InitGameConditions.c	\
 	Input.c			\
-	LevelSetPreviewForm.c	\
 	MainForm.c		\
 	MainGameLoop.c		\
-	Marker.c		\
 	Murphy.c		\
 	OrangeDisk.c		\
 	PathTools.c		\
@@ -68,10 +66,8 @@ OBJS =	init.o			\
 	Infotrons.o		\
 	InitGameConditions.o	\
 	Input.o			\
-	LevelSetPreviewForm.o	\
 	MainForm.o		\
 	MainGameLoop.o		\
-	Marker.o		\
 	Murphy.o		\
 	OrangeDisk.o		\
 	PathTools.o		\

@@ -4,12 +4,9 @@
 
 #include "Murphy.h"
 
+
 static void subEatRedDisk(int si);
 static boolean subMoveKillsMurphy(int si, int ax, int bl);
-
-// static char *VB_Name = "modMurphy";
-
-// --- Option Explicit
 
 #if 1
 
@@ -30,14 +27,8 @@ static boolean subMoveKillsMurphy(int si, int ax, int bl);
 
 void subAnimateMurphy(int *si)
 {
-  // int ax, al, ah, bx, bl, i, X, Y;
-  // int tX, tY, tDeltaX, tDeltaY, tPos, Tmp;
-#if 1
   int ax, al, bl, i, X, Y;
   int time1, time2;
-#else
-  int ax, al, bx, bl, i, X, Y;
-#endif
   int tDeltaX, tDeltaY, tPos, Tmp;
 
   // Variables that hold information about the animation sequence
@@ -53,16 +44,6 @@ void subAnimateMurphy(int *si)
 
   ax = PlayField16[*si];
   al = LowByte(ax);
-
-#if 0
-  printf("::: Murphy.c: subAnimateMurphy(): %d [%d, %d] %d, %d [%d]\n",
-	 *si, *si % 60, *si / 60, ax, al, (al == fiMurphy));
-#endif
-
-#if 0
-  printf("::: Murphy.c: subAnimateMurphy(): %d [%d] [%d]\n",
-	 YawnSleepCounter, FrameCounter, TimerVar);
-#endif
 
   if (al != fiMurphy)
   {
@@ -87,11 +68,14 @@ void subAnimateMurphy(int *si)
   dx2 = -1;
   SeqPos = 0;
   // end of FS
+
   ScratchGravity = 0; // scratch gravity off
   if (GravityFlag != 0) // Gravity? (1=gravity on)
   {
     bl = LowByte(PlayField16[*si - FieldWidth]); // check above
-    if (! (bl == fiPortUp || bl == fiPortUpAndDown || bl == fiPortAllDirections))
+    if (! (bl == fiPortUp ||
+	   bl == fiPortUpAndDown ||
+	   bl == fiPortAllDirections))
     {
       if (PlayField16[*si + FieldWidth] == 0) // gravity on and space below!
         ScratchGravity = 1;
@@ -1175,7 +1159,6 @@ loc_g_6756:
     if (UpdateTimeFlag != 0)    // update time?
     {
       UpdatedFlag = 1; // prevent double update
-      subUpdatePlayingTime();    // update playing time
     }
   }
 
