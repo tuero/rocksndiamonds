@@ -4,19 +4,14 @@
 
 #include "InitGameConditions.h"
 
-// static char *VB_Name = "modInitGameConditions";
-
-// --- Option Explicit
 
 // ==========================================================================
 //                              SUBROUTINE
 // Init game conditions (variables)
 // ==========================================================================
 
-int subInitGameConditions()
+void subInitGameConditions()
 {
-  int subInitGameConditions;
-
   bCapturePane = False;
 
   MurphyVar0DAC = MurphyYPos;
@@ -26,21 +21,10 @@ int subInitGameConditions()
   ExitToMenuFlag = 0;
   LeadOutCounter = 0;           // quit flag: lead-out counter
   RedDiskCount = 0; // Red disk counter
-  ShowRedDiskCounter = 0; // show-red-disk time-out
+
+  // ShowRedDiskCounter = 0; // show-red-disk time-out
 
   YawnSleepCounter = 0; // Wake up sleeping Murphy
-
-  data_h_0DA7 = 0xFF;
-  data_h_0DA8 = 0xFF;
-  data_h_0DA9 = 0xFF;
-  data_h_0D9E = 1;
-  data_h_0D9F = 0;
-  data_h_0DA0 = 0;
-  data_h_0DA1 = 0;
-  data_h_0DA2 = 0;
-  data_h_0DA4 = 0;
-  data_h_0DA5 = 0;
-  data_h_0DA6 = 0;
 
   ExplosionShake = 0; // Force explosion flag off
 
@@ -48,18 +32,17 @@ int subInitGameConditions()
   YellowDisksExploded = 0;
 
   TimerVar = 0;
+
   // ShowPanel = 1 ' Force Panel on
   // MainForm.PanelVisible = True;
+
   EnterRepeatCounter = 0; // restart Enter repeat counter
   SnikSnaksElectronsFrozen = 0; // Snik-Snaks and Electr. move!
 
   SplitMoveFlag = 0; // Reset Split-through-ports
   RedDiskReleasePhase = 0; // (re-)enable red disk release
   RedDiskReleaseMurphyPos = 0; // Red disk was released here
-
-
-  return subInitGameConditions;
-} // subInitGameConditions
+}
 
 
 // ==========================================================================
@@ -67,28 +50,21 @@ int subInitGameConditions()
 // Locate Murphy and init location.
 // ==========================================================================
 
-int InitMurphyPos()
+void InitMurphyPos()
 {
-  int InitMurphyPos;
-
   int si;
 
   for (si = 0; si <= LevelMax - 1; si++)
-  {
     if (PlayField16[si] == fiMurphy)
       break;
-  }
 
   InitMurphyPosB(si);
+
   MurphyPosIndex = si;
+}
 
-  return InitMurphyPos;
-} // InitMurphyPos
-
-int InitMurphyPosB(int si)
+void InitMurphyPosB(int si)
 {
-  int InitMurphyPosB;
-
   MurphyYPos = GetStretchY(si) / Stretch;
   MurphyXPos = GetStretchX(si) / Stretch;
 
@@ -96,47 +72,22 @@ int InitMurphyPosB(int si)
   MurphyScreenYPos = GetStretchY(si);         // Murphy's screen y-position
 
   // To Do: draw Murphy in location ax
-#if 1
   StretchedSprites.BltImg(MurphyScreenXPos, MurphyScreenYPos, aniMurphy, 0);
-#else
-  StretchedSprites.BltEx(MurphyScreenXPos, MurphyScreenYPos, fiMurphy);
-#endif
 
   MurphyScreenXPos = MurphyScreenXPos / Stretch;
   MurphyScreenYPos = MurphyScreenYPos / Stretch;
 
   subCalculateScreenScrollPos();           // calculate screen start addrs
 
-#if 0
-  printf(":1: %d, %d [%d, %d] [%d, %d] [%d, %d]\n",
-	 mScrollX, mScrollY,
-	 mScrollX_last, mScrollY_last,
-	 ScreenScrollXPos, ScreenScrollYPos,
-	 ScrollX, ScrollY);
-#endif
-
   if (AutoScrollFlag)
   {
     if (bPlaying)
-    {
       SoftScrollTo(ScreenScrollXPos, ScreenScrollYPos, 1000, 25);
-    }
     else
-    {
       ScrollTo(ScreenScrollXPos, ScreenScrollYPos);
-    }
   }
+}
 
-#if 0
-  printf(":2: %d, %d [%d, %d] [%d, %d] [%d, %d]\n",
-	 mScrollX, mScrollY,
-	 mScrollX_last, mScrollY_last,
-	 ScreenScrollXPos, ScreenScrollYPos,
-	 ScrollX, ScrollY);
-#endif
-
-  return InitMurphyPosB;
-} // InitMurphyPosB
 
 // ==========================================================================
 //                              SUBROUTINE
@@ -145,10 +96,6 @@ int InitMurphyPosB(int si)
 
 int subConvertToEasySymbols()
 {
-  int subConvertToEasySymbols;
-
-  // int ax, bx, cx, dx, di, X, Y, i;
-  // int ah, bh, ch, dh, al, bl, cl, dl, ZF;
   int ax, bx, cx, dx, i;
   int al;
 
@@ -269,20 +216,17 @@ loc_g_2778:
   if (0 < cx) // Until all done 'loc_g_2782:
     goto loc_g_26C9;
 
-  subConvertToEasySymbols = dx; // return InfotronCount
+  return dx;	// return InfotronCount
+}
 
-  return subConvertToEasySymbols;
-} // subConvertToEasySymbols
 
 // ==========================================================================
 //                              SUBROUTINE
 // Reset Infotron count.  Call immediately after subConvertToEasySymbols
 // ==========================================================================
 
-int ResetInfotronsNeeded(int dx)
+void ResetInfotronsNeeded(int dx)
 {
-  int ResetInfotronsNeeded;
-
   if (LInfo.InfotronsNeeded != 0) // Jump If equal (autodetect)
   {
     dx = LInfo.InfotronsNeeded;
@@ -290,10 +234,7 @@ int ResetInfotronsNeeded(int dx)
 
   InfotronsNeeded = LowByte(dx);           // Remaining Infotrons needed
   TotalInfotronsNeeded = InfotronsNeeded;          // Number of Infotrons needed
-  subDisplayInfotronsNeeded();
-
-  return ResetInfotronsNeeded;
-} // ResetInfotronsNeeded
+}
 
 
 // ==========================================================================
@@ -301,25 +242,19 @@ int ResetInfotronsNeeded(int dx)
 // Fetch and initialize a level
 // ==========================================================================
 
-int subFetchAndInitLevelB()
+void subFetchAndInitLevelB()
 {
-  int subFetchAndInitLevelB;
-
   boolean UpdatePlayTime;
 
-  MovLowByte(&data_SPtorunavail, 0);   // no SP file
   data_scr_demo = 0;
   UpdatePlayTime = (0 == demo_stopped ? True : False);
   demo_stopped = 0;
+
   subFetchAndInitLevelA(UpdatePlayTime);
+}
 
-  return subFetchAndInitLevelB;
-} // subFetchAndInitLevelb
-
-int subFetchAndInitLevelA(boolean UpdatePlayTime)
+void subFetchAndInitLevelA(boolean UpdatePlayTime)
 {
-  int subFetchAndInitLevelA;
-
   if (UpdatePlayTime && (0 == demo_stopped))
   {
     subUpdatePlayingTime();                 // update playing time
@@ -355,14 +290,10 @@ int subFetchAndInitLevelA(boolean UpdatePlayTime)
     DemoKeyRepeatCounter = 1;
     subGetNextDemoKey();                 // get next demo byte
   }
+}
 
-  return subFetchAndInitLevelA;
-} // subFetchAndInitLevela
-
-int subFetchAndInitLevel()
+void subFetchAndInitLevel()
 {
-  int subFetchAndInitLevel;
-
   int InfoCountInLevel;
 
   Trace("modInitGameConditions", "--> subFetchAndInitLevel");
@@ -373,14 +304,8 @@ int subFetchAndInitLevel()
   Trace("modInitGameConditions", "ReadLevel return subFetchAndInitLeveled");
 
   if (RecordDemoFlag == 1)
-  {
     RecDemoRandomSeed = RandomSeed;
-    // Debug.Print "FetchRec: " & Hex(RandomSeed)
-  }
 
-  //  If DemoFlag = 1 Then
-  // Debug.Print "FetchPlay: " & Hex(RandomSeed)
-  //  End If
   GameBusyFlag = -GameBusyFlag;   // make <>1
 
   Trace("modInitGameConditions", "subConvertToEasySymbols");
@@ -391,7 +316,6 @@ int subFetchAndInitLevel()
   Trace("modInitGameConditions", "subDisplayLevel");
 
   subDisplayLevel();               // Paint (Init) game field
-  subDisplayPanel();                 // Paint (Init) Panel
 
   ResetInfotronsNeeded(InfoCountInLevel);  // and reset Infotron count
 
@@ -404,6 +328,4 @@ int subFetchAndInitLevel()
   InitMurphyPos();                 // Locate Murphy + screen pos
 
   Trace("modInitGameConditions", "<-- subFetchAndInitLevel");
-
-  return subFetchAndInitLevel;
-} // subFetchAndInitLevel
+}

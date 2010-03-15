@@ -12,19 +12,20 @@
 
 #include "global.h"
 
-extern int subAnimateElectrons(int si);
-extern int subDrawAnimatedElectrons(int si);
-extern int subDrawElectronFromAbove(int si, int bx);
-extern int subDrawElectronFromBelow(int si, int bx);
-extern int subDrawElectronFromLeft(int si, int bx);
-extern int subDrawElectronFromRight(int si, int bx);
-extern int subDrawElectronTurnLeft(int si, int bx);
-extern int subDrawElectronTurnRight(int si, int bx);
-extern int subElectronFromAbove(int si, int bx);
-extern int subElectronFromBelow(int si, int bx);
-extern int subElectronFromLeft(int si, int bx);
-extern int subElectronFromRight(int si, int bx);
-extern int subElectronTurnLeft(int si, int bx);
-extern int subElectronTurnRight(int si, int bx);
+
+extern void subAnimateElectrons(int);
+extern void subDrawAnimatedElectrons(int);
+extern void subDrawElectronFromAbove(int, int);
+extern void subDrawElectronFromBelow(int, int);
+extern void subDrawElectronFromLeft(int, int);
+extern void subDrawElectronFromRight(int, int);
+extern void subDrawElectronTurnLeft(int, int);
+extern void subDrawElectronTurnRight(int, int);
+extern void subElectronFromAbove(int, int);
+extern void subElectronFromBelow(int, int);
+extern void subElectronFromLeft(int, int);
+extern void subElectronFromRight(int, int);
+extern void subElectronTurnLeft(int, int);
+extern void subElectronTurnRight(int, int);
 
 #endif /* ELECTRONS_H */

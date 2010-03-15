@@ -12,9 +12,10 @@
 
 #include "global.h"
 
-extern int subDoGameStuff();
 
 extern byte *AnimationSubTable;
 extern int *AnimationPosTable;
+
+extern void subDoGameStuff();
 
 #endif /* DOGAMESTUFF_H */

@@ -4,27 +4,24 @@
 
 #include "Electrons.h"
 
-// static char *VB_Name = "modElectron";
 
-// --- Option Explicit
 // ==========================================================================
 //                              SUBROUTINE
 // Animate/move Electrons
 // ==========================================================================
 
-int subAnimateElectrons(int si)
+void subAnimateElectrons(int si)
 {
-  int subAnimateElectrons;
-
   int bx, Tmp;
 
   if (SnikSnaksElectronsFrozen == 1)
-    return subAnimateElectrons;
+    return;
 
   if (LowByte(PlayField16[si]) != fiElectron)
-    return subAnimateElectrons;
+    return;
 
   bx = HighByte(PlayField16[si]);
+
   Tmp = bx / 8;
   switch (Tmp)
   {
@@ -52,21 +49,18 @@ int subAnimateElectrons(int si)
       subElectronFromLeft(si, bx); // access si from left
       break;
   }
+}
 
-  return subAnimateElectrons;
-} // subAnimateElectrons
-
-int subDrawAnimatedElectrons(int si)
+void subDrawAnimatedElectrons(int si)
 {
-  int subDrawAnimatedElectrons;
-
   int bx, Tmp;
 
   // If SnikSnaksElectronsFrozen = 1 Then Exit Function
   if (LowByte(PlayField16[si]) != fiElectron)
-    return subDrawAnimatedElectrons;
+    return;
 
   bx = HighByte(PlayField16[si]);
+
   Tmp = bx / 8;
   switch (Tmp)
   {
@@ -94,15 +88,10 @@ int subDrawAnimatedElectrons(int si)
       subDrawElectronFromLeft(si, bx); // access si from left
       break;
   }
+}
 
-  return subDrawAnimatedElectrons;
-} // subDrawAnimatedElectrons
-
-int subElectronTurnLeft(int si, int bx)
+void subElectronTurnLeft(int si, int bx)
 {
-  int subElectronTurnLeft;
-
-  // int ax, ah, bl, dx, X, Y;
   int ax, bl;
 
   ax = (TimerVar & 3);
@@ -111,22 +100,17 @@ int subElectronTurnLeft(int si, int bx)
     if (ax == 3)
       goto loc_g_7ACD;
 
-    return subElectronTurnLeft;
+    return;
   } // loc_g_7A9F:
 
-#if 1
+  // +++++++++++++++++++++++++++++++++++++++++++++++++++++
   subDrawElectronTurnLeft(si, bx);
-#else
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
-  X = GetStretchX(si);
-  Y = GetStretchY(si);
-  StretchedSprites.BltEx(X, Y, aniFramesElectron[bx]);
-  // +++++++++++++++++++++++++++++++++++++++++++++++++++++
-#endif
 
   bx = (bx + 1) & 0x7;
   MovHighByte(&PlayField16[si], bx);
-  return subElectronTurnLeft;
+
+  return;
 
 loc_g_7ACD:
   bl = HighByte(PlayField16[si]);
@@ -142,7 +126,7 @@ loc_g_7ACD:
   if (bl == 6)
     goto loc_g_7B43;
 
-  return subElectronTurnLeft;
+  return;
 
 loc_g_7AE6: // pointing up
   ax = PlayField16[si - FieldWidth];
@@ -152,13 +136,14 @@ loc_g_7AE6: // pointing up
   if (LowByte(ax) == fiMurphy) // above is murphy -> explode
     ExplodeFieldSP(si);
 
-  return subElectronTurnLeft;
+  return;
 
 loc_g_7AF5: // above is empty -> go up
   PlayField16[si] = 0x1BB;
   si = si - FieldWidth; // 1 field up
   PlayField16[si] = 0x1018;
-  return subElectronTurnLeft;
+
+  return;
 
 loc_g_7B05: // pointing left
   ax = PlayField16[si - 1];
@@ -168,13 +153,14 @@ loc_g_7B05: // pointing left
   if (LowByte(ax) == fiMurphy) // left is murphy -> explode
     ExplodeFieldSP(si);
 
-  return subElectronTurnLeft;
+  return;
 
 loc_g_7B14: // left is empty -> go there
   PlayField16[si] = 0x2BB;
   si = si - 1; // 1 field left
   PlayField16[si] = 0x1818;
-  return subElectronTurnLeft;
+
+  return;
 
 loc_g_7B24: // pointing down
   ax = PlayField16[si + FieldWidth];
@@ -184,13 +170,14 @@ loc_g_7B24: // pointing down
   if (LowByte(ax) == fiMurphy) // below is murphy -> explode
     ExplodeFieldSP(si);
 
-  return subElectronTurnLeft;
+  return;
 
 loc_g_7B33: // below is empty -> go down
   PlayField16[si] = 0x3BB;
   si = si + FieldWidth; // 1 field down
   PlayField16[si] = 0x2018;
-  return subElectronTurnLeft;
+
+  return;
 
 loc_g_7B43: // pointing Right
   ax = PlayField16[si + 1];
@@ -200,21 +187,16 @@ loc_g_7B43: // pointing Right
   if (LowByte(ax) == fiMurphy) // right is murphy -> explode
     ExplodeFieldSP(si);
 
-  return subElectronTurnLeft;
+  return;
 
 loc_g_7B55: // right is empty -> go there
   PlayField16[si] = 0x4BB;
   si = si + 1; // 1 field right
   PlayField16[si] = 0x2818;
+}
 
-  return subElectronTurnLeft;
-} // subElectronTurnLeft
-
-int subElectronTurnRight(int si, int bx)
+void subElectronTurnRight(int si, int bx)
 {
-  int subElectronTurnRight;
-
-  // int ax, ah, bl, dx, X, Y;
   int ax, bl;
 
   ax = (TimerVar & 3);
@@ -223,22 +205,17 @@ int subElectronTurnRight(int si, int bx)
     if (ax == 3)
       goto loc_g_7BA3;
 
-    return subElectronTurnRight;
+    return;
   } // loc_g_7B73:
 
-#if 1
+  // +++++++++++++++++++++++++++++++++++++++++++++++++++++
   subDrawElectronTurnRight(si, bx);
-#else
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
-  X = GetStretchX(si);
-  Y = GetStretchY(si);
-  StretchedSprites.BltEx(X, Y, aniFramesElectron[0x10 - bx]);
-  // +++++++++++++++++++++++++++++++++++++++++++++++++++++
-#endif
 
   bx = ((bx + 1) & 0x7) | 8;
   MovHighByte(&PlayField16[si], bx);
-  return subElectronTurnRight;
+
+  return;
 
 loc_g_7BA3:
   bl = HighByte(PlayField16[si]);
@@ -254,7 +231,7 @@ loc_g_7BA3:
   if (bl == 0xE)
     goto loc_g_7BDB;
 
-  return subElectronTurnRight;
+  return;
 
 loc_g_7BBC: // pointing up
   ax = PlayField16[si - FieldWidth];
@@ -264,13 +241,14 @@ loc_g_7BBC: // pointing up
   if (LowByte(ax) == fiMurphy) // above is murphy -> explode
     ExplodeFieldSP(si);
 
-  return subElectronTurnRight;
+  return;
 
 loc_g_7BCB: // above is empty -> go up
   PlayField16[si] = 0x1BB;
   si = si - FieldWidth; // 1 field up
   PlayField16[si] = 0x1018;
-  return subElectronTurnRight;
+
+  return;
 
 loc_g_7BDB: // pointing left
   ax = PlayField16[si - 1];
@@ -280,13 +258,14 @@ loc_g_7BDB: // pointing left
   if (LowByte(ax) == fiMurphy) // left is murphy -> explode
     ExplodeFieldSP(si);
 
-  return subElectronTurnRight;
+  return;
 
 loc_g_7BEA: // left is empty -> go there
   PlayField16[si] = 0x2BB;
   si = si - 1; // 1 field left
   PlayField16[si] = 0x1818;
-  return subElectronTurnRight;
+
+  return;
 
 loc_g_7BFA: // pointing down
   ax = PlayField16[si + FieldWidth];
@@ -296,13 +275,14 @@ loc_g_7BFA: // pointing down
   if (LowByte(ax) == fiMurphy) // below is murphy -> explode
     ExplodeFieldSP(si);
 
-  return subElectronTurnRight;
+  return;
 
 loc_g_7C09: // below is empty -> go down
   PlayField16[si] = 0x3BB;
   si = si + FieldWidth; // 1 field down
   PlayField16[si] = 0x2018;
-  return subElectronTurnRight;
+
+  return;
 
 loc_g_7C19: // pointing Right
   ax = PlayField16[si + 1];
@@ -312,35 +292,22 @@ loc_g_7C19: // pointing Right
   if (LowByte(ax) == fiMurphy) // right is murphy -> explode
     ExplodeFieldSP(si);
 
-  return subElectronTurnRight;
+  return;
 
 loc_g_7C2B: // right is empty -> go there
   PlayField16[si] = 0x4BB;
   si = si + 1; // 1 field right
   PlayField16[si] = 0x2818;
+}
 
-  return subElectronTurnRight;
-} // subElectronTurnRight
-
-int subElectronFromBelow(int si, int bx)
+void subElectronFromBelow(int si, int bx)
 {
-  int subElectronFromBelow;
-
-  // int ax, ah, bl, dx, X, Y;
   int ax, bl;
 
-#if 1
+  // +++++++++++++++++++++++++++++++++++++++++++++++++++++
   subDrawElectronFromBelow(si, bx);
-  bx = bx - 0xF;  // get and increment sequence#
-#else
-  bx = bx - 0xF;  // get and increment sequence#
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
-  X = GetStretchX(si);
-  Y = GetStretchY(si + FieldWidth);
-  StretchedSprites.BltEx(X, Y, 0);
-  StretchedSprites.BltEx(X, Y - bx * TwoPixels, aniFramesElectron[bx]);
-  // +++++++++++++++++++++++++++++++++++++++++++++++++++++
-#endif
+  bx = bx - 0xF;  // get and increment sequence#
 
   bl = LowByte(bx);
   if (bl == 7 && LowByte(PlayField16[si + FieldWidth]) != fiExplosion)
@@ -352,7 +319,8 @@ int subElectronFromBelow(int si, int bx)
   {
     bl = bl + 0x10;
     MovHighByte(&PlayField16[si], bl);
-    return subElectronFromBelow;
+
+    return;
   } // loc_g_7C84
 
   PlayField16[si] = 0x18; // sequence#=8 -> arrived at the new field
@@ -360,7 +328,8 @@ int subElectronFromBelow(int si, int bx)
   if (ax == 0 || LowByte(ax) == fiMurphy) // check for empty or murphy
   {
     MovHighByte(&PlayField16[si], 1); // start to turn left
-    return subElectronFromBelow;
+
+    return;
   } // loc_g_7CA4:
 
   ax = PlayField16[si - FieldWidth]; // cannot turn left -> check above
@@ -369,47 +338,37 @@ int subElectronFromBelow(int si, int bx)
     PlayField16[si] = 0x1BB; // mark as "electron leaving"
     si = si - FieldWidth; // go up!
     PlayField16[si] = 0x1018;
-    return subElectronFromBelow;
+
+    return;
   }
 
   if (LowByte(ax) == fiMurphy) // check for murphy above
   {
     ExplodeFieldSP(si); // Explode
-    return subElectronFromBelow;
+
+    return;
   } // loc_g_7CC6:
 
   ax = PlayField16[si + 1]; // check right field
   if (ax == 0 || LowByte(ax) == fiMurphy) // check for empty or murphy
   {
     MovHighByte(&PlayField16[si], 9); // start to turn right
-    return subElectronFromBelow;
+
+    return;
   } // loc_g_7CE0:
 
   // else: no way to go, start turning around
   MovHighByte(&PlayField16[si], 1);
+}
 
-  return subElectronFromBelow;
-} // subElectronFromBelow
-
-int subElectronFromRight(int si, int bx)
+void subElectronFromRight(int si, int bx)
 {
-  int subElectronFromRight;
-
-  // int ax, ah, bl, dx, X, Y;
   int ax, bl;
 
-#if 1
+  // +++++++++++++++++++++++++++++++++++++++++++++++++++++
   subDrawElectronFromRight(si, bx);
-  bx = bx - 0x17;  // get and increment sequence#
-#else
-  bx = bx - 0x17;  // get and increment sequence#
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
-  X = GetStretchX(si + 1);
-  Y = GetStretchY(si);
-  StretchedSprites.BltEx(X, Y, 0);
-  StretchedSprites.BltEx(X - bx * TwoPixels, Y, aniFramesElectron[bx]);
-  // +++++++++++++++++++++++++++++++++++++++++++++++++++++
-#endif
+  bx = bx - 0x17;  // get and increment sequence#
 
   bl = LowByte(bx);
   if (bl == 7 && LowByte(PlayField16[si + 1]) != fiExplosion)
@@ -421,7 +380,8 @@ int subElectronFromRight(int si, int bx)
   {
     bl = bl + 0x18;
     MovHighByte(&PlayField16[si], bl);
-    return subElectronFromRight;
+
+    return;
   } // loc_g_7D2A:
 
   PlayField16[si] = 0x18; // sequence#=8 -> arrived at the new field
@@ -429,7 +389,8 @@ int subElectronFromRight(int si, int bx)
   if (ax == 0 || LowByte(ax) == fiMurphy) // empty or murphy?
   {
     MovHighByte(&PlayField16[si], 3); // yes -> turn left down
-    return subElectronFromRight;
+
+    return;
   } // loc_g_7D4A:
 
   ax = PlayField16[si - 1]; // check left, etc ... see the comments on subElectronFromBelow()
@@ -438,46 +399,36 @@ int subElectronFromRight(int si, int bx)
     PlayField16[si] = 0x2BB;
     si = si - 1;                // 1 field left
     PlayField16[si] = 0x1818;
-    return subElectronFromRight;
+
+    return;
   } // loc_g_7D61:
 
   if (LowByte(ax) == fiMurphy)
   {
     ExplodeFieldSP(si);      // Explode
-    return subElectronFromRight;
+
+    return;
   } // loc_g_7D6C:
 
   ax = PlayField16[si - FieldWidth]; // check above
   if (ax == 0 || LowByte(ax) == fiMurphy)
   {
     MovHighByte(&PlayField16[si], 0xF);
-    return subElectronFromRight;
+
+    return;
   } // loc_g_7D86:
 
   MovHighByte(&PlayField16[si], 3);
+}
 
-  return subElectronFromRight;
-} // subElectronFromRight
-
-int subElectronFromAbove(int si, int bx)
+void subElectronFromAbove(int si, int bx)
 {
-  int subElectronFromAbove;
-
-  // int ax, ah, bl, dx, X, Y;
   int ax, bl;
 
-#if 1
+  // +++++++++++++++++++++++++++++++++++++++++++++++++++++
   subDrawElectronFromAbove(si, bx);
-  bx = bx - 0x1F;  // get and increment sequence#
-#else
-  bx = bx - 0x1F;  // get and increment sequence#
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
-  X = GetStretchX(si);
-  Y = GetStretchY(si - FieldWidth);
-  StretchedSprites.BltEx(X, Y, 0);
-  StretchedSprites.BltEx(X, Y + bx * TwoPixels, aniFramesElectron[bx]);
-  // +++++++++++++++++++++++++++++++++++++++++++++++++++++
-#endif
+  bx = bx - 0x1F;  // get and increment sequence#
 
   bl = LowByte(bx);
   if (bl == 7 && LowByte(PlayField16[si - FieldWidth]) != fiExplosion)
@@ -489,7 +440,8 @@ int subElectronFromAbove(int si, int bx)
   {
     bl = bl + 0x20;
     MovHighByte(&PlayField16[si], bl);
-    return subElectronFromAbove;
+
+    return;
   } // loc_g_7DD7
 
   PlayField16[si] = 0x18; // sequence#=8 -> arrived at the new field
@@ -497,7 +449,8 @@ int subElectronFromAbove(int si, int bx)
   if (ax == 0 || LowByte(ax) == fiMurphy)
   {
     MovHighByte(&PlayField16[si], 5);
-    return subElectronFromAbove;
+
+    return;
   } // loc_g_7DF7:
 
   ax = PlayField16[si + FieldWidth]; // check below
@@ -506,46 +459,36 @@ int subElectronFromAbove(int si, int bx)
     PlayField16[si] = 0x3BB;
     si = si + FieldWidth;                 // 1 field down
     PlayField16[si] = 0x2018;
-    return subElectronFromAbove;
+
+    return;
   } // loc_g_7E0E:
 
   if (LowByte(ax) == fiMurphy)
   {
     ExplodeFieldSP(si);        // Explode
-    return subElectronFromAbove;
+
+    return;
   } // loc_g_7E19:
 
   ax = PlayField16[si - 1]; // check left
   if (ax == 0 || LowByte(ax) == fiMurphy)
   {
     MovHighByte(&PlayField16[si], 0xD);
-    return subElectronFromAbove;
+
+    return;
   } // loc_g_7E33:
 
   MovHighByte(&PlayField16[si], 5);
+}
 
-  return subElectronFromAbove;
-} // subElectronFromAbove
-
-int subElectronFromLeft(int si, int bx)
+void subElectronFromLeft(int si, int bx)
 {
-  int subElectronFromLeft;
-
-  // int ax, ah, bl, dx, X, Y;
   int ax, bl;
 
-#if 1
+  // +++++++++++++++++++++++++++++++++++++++++++++++++++++
   subDrawElectronFromLeft(si, bx);
-  bx = bx - 0x27;  // get and increment sequence#
-#else
-  bx = bx - 0x27;  // get and increment sequence#
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
-  X = GetStretchX(si - 1);
-  Y = GetStretchY(si);
-  StretchedSprites.BltEx(X, Y, 0);
-  StretchedSprites.BltEx(X + bx * TwoPixels, Y, aniFramesElectron[bx]);
-  // +++++++++++++++++++++++++++++++++++++++++++++++++++++
-#endif
+  bx = bx - 0x27;  // get and increment sequence#
 
   bl = LowByte(bx);
   if (bl == 7 && LowByte(PlayField16[si - 1]) != fiExplosion)
@@ -557,7 +500,8 @@ int subElectronFromLeft(int si, int bx)
   {
     bl = bl + 0x28;
     MovHighByte(&PlayField16[si], bl);
-    return subElectronFromLeft;
+
+    return;
   } // loc_g_7E7E:
 
   PlayField16[si] = 0x18; // sequence#=8 -> arrived at the new field
@@ -565,7 +509,8 @@ int subElectronFromLeft(int si, int bx)
   if (ax == 0 || LowByte(ax) == fiMurphy)
   {
     MovHighByte(&PlayField16[si], 7);
-    return subElectronFromLeft;
+
+    return;
   } // loc_g_7E9E:
 
   ax = PlayField16[si + 1]; // check right(straight on)
@@ -574,149 +519,102 @@ int subElectronFromLeft(int si, int bx)
     PlayField16[si] = 0x4BB;
     si = si + 1;                   // 1 field right
     PlayField16[si] = 0x2818;
-    return subElectronFromLeft;
+
+    return;
   } // loc_g_7EB5:
 
   if (LowByte(ax) == fiMurphy)
   {
     ExplodeFieldSP(si);    // Explode
-    return subElectronFromLeft;
+
+    return;
   } // loc_g_7EC0:
 
   ax = PlayField16[si + FieldWidth]; // check below
   if (ax == 0 || LowByte(ax) == fiMurphy)
   {
     MovHighByte(&PlayField16[si], 0xB);
-    return subElectronFromLeft;
+
+    return;
   } // loc_g_7A69:
 
   MovHighByte(&PlayField16[si], 7);
+}
 
-  return subElectronFromLeft;
-} // subElectronFromLeft
-
-int subDrawElectronTurnLeft(int si, int bx)
+void subDrawElectronTurnLeft(int si, int bx)
 {
-  int subDrawElectronTurnLeft;
-
   int X, Y;
 
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
   X = GetStretchX(si);
   Y = GetStretchY(si);
-#if 1
   StretchedSprites.BltImg(X, Y, aniElectron, bx);
-#else
-  StretchedSprites.BltEx(X, Y, aniFramesElectron[bx]);
-#endif
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-  return subDrawElectronTurnLeft;
 }
 
-int subDrawElectronTurnRight(int si, int bx)
+void subDrawElectronTurnRight(int si, int bx)
 {
-  int subDrawElectronTurnRight;
-
   int X, Y;
 
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
   X = GetStretchX(si);
   Y = GetStretchY(si);
-#if 1
   StretchedSprites.BltImg(X, Y, aniElectron, 0x10 - bx);
-#else
-  StretchedSprites.BltEx(X, Y, aniFramesElectron[0x10 - bx]);
-#endif
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-  return subDrawElectronTurnRight;
 }
 
-int subDrawElectronFromBelow(int si, int bx)
+void subDrawElectronFromBelow(int si, int bx)
 {
-  int subDrawElectronFromBelow;
-
   int X, Y;
 
   bx = bx - 0xF;  // get and increment sequence#
+
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
   X = GetStretchX(si);
   Y = GetStretchY(si + FieldWidth);
-#if 1
   StretchedSprites.BltImg(X, Y, aniSpace, 0);
   StretchedSprites.BltImg(X, Y - bx * TwoPixels, aniElectron, bx);
-#else
-  StretchedSprites.BltEx(X, Y, 0);
-  StretchedSprites.BltEx(X, Y - bx * TwoPixels, aniFramesElectron[bx]);
-#endif
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-  return subDrawElectronFromBelow;
 }
 
-int subDrawElectronFromRight(int si, int bx)
+void subDrawElectronFromRight(int si, int bx)
 {
-  int subDrawElectronFromRight;
-
   int X, Y;
 
   bx = bx - 0x17;  // get and increment sequence#
+
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
   X = GetStretchX(si + 1);
   Y = GetStretchY(si);
-#if 1
   StretchedSprites.BltImg(X, Y, aniSpace, 0);
   StretchedSprites.BltImg(X - bx * TwoPixels, Y, aniElectron, bx);
-#else
-  StretchedSprites.BltEx(X, Y, 0);
-  StretchedSprites.BltEx(X - bx * TwoPixels, Y, aniFramesElectron[bx]);
-#endif
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-  return subDrawElectronFromRight;
 }
 
-int subDrawElectronFromAbove(int si, int bx)
+void subDrawElectronFromAbove(int si, int bx)
 {
-  int subDrawElectronFromAbove;
-
   int X, Y;
 
   bx = bx - 0x1F;  // get and increment sequence#
+
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
   X = GetStretchX(si);
   Y = GetStretchY(si - FieldWidth);
-#if 1
   StretchedSprites.BltImg(X, Y, aniSpace, 0);
   StretchedSprites.BltImg(X, Y + bx * TwoPixels, aniElectron, bx);
-#else
-  StretchedSprites.BltEx(X, Y, 0);
-  StretchedSprites.BltEx(X, Y + bx * TwoPixels, aniFramesElectron[bx]);
-#endif
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-  return subDrawElectronFromAbove;
 }
 
-int subDrawElectronFromLeft(int si, int bx)
+void subDrawElectronFromLeft(int si, int bx)
 {
-  int subDrawElectronFromLeft;
-
   int X, Y;
 
   bx = bx - 0x27;  // get and increment sequence#
+
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
   X = GetStretchX(si - 1);
   Y = GetStretchY(si);
-#if 1
   StretchedSprites.BltImg(X, Y, aniSpace, 0);
   StretchedSprites.BltImg(X + bx * TwoPixels, Y, aniElectron, bx);
-#else
-  StretchedSprites.BltEx(X, Y, 0);
-  StretchedSprites.BltEx(X + bx * TwoPixels, Y, aniFramesElectron[bx]);
-#endif
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-  return subDrawElectronFromLeft;
 }

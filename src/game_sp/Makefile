@@ -23,17 +23,11 @@ SRCS =	init.c			\
 	DDScrollBuffer.c	\
 	DDSpriteBuffer.c	\
 	Demo.c			\
-	DemoBufferObject.c	\
-	DirectDrawGlobals.c	\
-	DirectXGlobals.c	\
 	Display.c		\
 	DoGameStuff.c		\
 	Electrons.c		\
-	ErrorReporting.c	\
 	Explosions.c		\
 	FakeDeclares.c		\
-	FancyRestore.c		\
-	GeneralTricks.c		\
 	Globals.c		\
 	Infotrons.c		\
 	InitGameConditions.c	\
@@ -52,7 +46,6 @@ SRCS =	init.c			\
 	TopMost.c		\
 	Zonk.c			\
 	modAnimations.c		\
-	modGeneralTricks.c	\
 	modMPX.c
 
 OBJS =	init.o			\
@@ -66,17 +59,11 @@ OBJS =	init.o			\
 	DDScrollBuffer.o	\
 	DDSpriteBuffer.o	\
 	Demo.o			\
-	DemoBufferObject.o	\
-	DirectDrawGlobals.o	\
-	DirectXGlobals.o	\
 	Display.o		\
 	DoGameStuff.o		\
 	Electrons.o		\
-	ErrorReporting.o	\
 	Explosions.o		\
 	FakeDeclares.o		\
-	FancyRestore.o		\
-	GeneralTricks.o		\
 	Globals.o		\
 	Infotrons.o		\
 	InitGameConditions.o	\
@@ -95,7 +82,6 @@ OBJS =	init.o			\
 	TopMost.o		\
 	Zonk.o			\
 	modAnimations.o		\
-	modGeneralTricks.o	\
 	modMPX.o
 
 GAME_SP = game_sp.a

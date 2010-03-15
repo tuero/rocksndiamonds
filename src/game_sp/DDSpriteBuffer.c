@@ -19,8 +19,6 @@ void DDSpriteBuffer_Init()
 
 static void Blt(int pX, int pY, Bitmap *bitmap, int SpriteX, int SpriteY)
 {
-  MyRECT DR, SR;
-
   int scx = (mScrollX_last < 0 ? 0 : mScrollX_last);
   int scy = (mScrollY_last < 0 ? 0 : mScrollY_last);
   int sx1 = scx - 2 * TILEX;
@@ -38,20 +36,8 @@ static void Blt(int pX, int pY, Bitmap *bitmap, int SpriteX, int SpriteY)
   if (pX < sx1 || pX > sx2 || pY < sy1 || pY > sy2)
     return;
 
-  DR.left = pX + mDestXOff;
-  DR.top = pY + mDestYOff;
-  DR.right = pX + mSpriteWidth + mDestXOff;
-  DR.bottom = pY + mSpriteHeight + mDestYOff;
-
-  SR.left = SpriteX;
-  SR.top = SpriteY;
-  SR.right = SR.left + mSpriteWidth;
-  SR.bottom = SR.top + mSpriteHeight;
-
-  BlitBitmap(bitmap, screenBitmap,
-	     SR.left, SR.top,
-	     mSpriteWidth, mSpriteHeight,
-	     sx, sy);
+  BlitBitmap(bitmap, screenBitmap, SpriteX, SpriteY,
+	     mSpriteWidth, mSpriteHeight, sx, sy);
 }
 
 void DDSpriteBuffer_BltImg(int pX, int pY, int graphic, int sync_frame)

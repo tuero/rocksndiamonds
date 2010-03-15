@@ -52,6 +52,7 @@ int LevelNumber;
 char *CurPath, *OrigPath, *TmpPath;
 boolean LevelLoaded;
 long SignatureDelay;
+boolean bSignatureAvailable;
 
 boolean bCapturePane;
 
@@ -347,7 +348,6 @@ void InitGlobals()
   bSignatureAvailable = False;
   FirstDemoByte = 0x81;
   MySignature = "";
-  InitErrorReporting();
 }
 
 void InitPseudoCompileFlags()
@@ -748,4 +748,38 @@ void ReadLevel()
 #endif
 
   LevelLoaded = True;
+}
+
+void Trace(char *Source, char *Message)
+{
+  printf("::: Trace: Source == '%s', Message == '%s'\n", Source, Message);
+}
+
+void ReportError(char *Source, char *Message)
+{
+  printf("::: ReportError: Source == '%s', Message == '%s'\n", Source, Message);
+}
+
+int Min(int A, int B)
+{
+  int Min;
+
+  if (A < B)
+    Min = A;
+  else
+    Min = B;
+
+  return Min;
+}
+
+int Max(int A, int B)
+{
+  int Max;
+
+  if (A < B)
+    Max = B;
+  else
+    Max = A;
+
+  return Max;
 }

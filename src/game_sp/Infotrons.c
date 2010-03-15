@@ -4,30 +4,22 @@
 
 #include "Infotrons.h"
 
-// static char *VB_Name = "modInfotron";
-
-// --- Option Explicit
 
 // ==========================================================================
 //                              SUBROUTINE
 // Animate Infotrons (falling)
 // ==========================================================================
 
-int subAnimateInfotrons(int si)
+void subAnimateInfotrons(int si)
 {
-  int subAnimateInfotrons;
-
   int tFld;
 
-  // PseudoRegisters:
-  // int ax, bx, cx, dx, di, X, Y;
-  // int ah, bh, ch, dh, al, bl, cl, dl;
   int ax, bx, dx, X, Y;
   int al, bl;
 
   tFld = PlayField16[si];
   if ((tFld & 0xFF) != fiInfotron)
-    return subAnimateInfotrons;
+    return;
 
   if (tFld == fiInfotron)
   {
@@ -44,7 +36,7 @@ int subAnimateInfotrons(int si)
     if (ax == fiRAM)
       goto loc_g_11A6;
 
-    return subAnimateInfotrons;
+    return;
 
 loc_g_11A6: //        Case fiZonk, fiInfotron, fiRAM
     ax = PlayField16[si + FieldWidth - 1];
@@ -56,7 +48,7 @@ loc_g_11BD:
     if (ax == 0 || ax == 0x8888 || ax == 0xAAAA)
       goto loc_g_11F2;
 
-    return subAnimateInfotrons;
+    return;
 
 loc_g_11D5: //       Case fiSpace
     MovHighByte(&PlayField16[si], 0x40);
@@ -77,7 +69,7 @@ loc_g_11F2: // roll right?
     if (PlayField16[si + 1] == 0)
       goto loc_g_11FA;
 
-    return subAnimateInfotrons;
+    return;
 
 loc_g_11FA:
     MovHighByte(&PlayField16[si], 0x60);
@@ -91,6 +83,7 @@ loc_g_1207:
   bl = HighByte(PlayField16[si]);
   bx = 0;
   MovLowByte(&bx, bl);
+
   al = bl & 0xF0;
   if (al == 0x10) // infotron comes falling from above
     goto loc_g_1242;
@@ -113,7 +106,7 @@ loc_g_1207:
   if (al == 0x70) // intermediate state
     goto loc_g_154E;
 
-  return subAnimateInfotrons;
+  return;
 
 loc_g_1242: // infotron comes falling from above
   //      To Do: draw infotron falling from above
@@ -122,26 +115,24 @@ loc_g_1242: // infotron comes falling from above
   X = GetStretchX(si);
   Y = GetStretchY(si - FieldWidth);
   dx = bl & 0x7;
-#if 1
   StretchedSprites.BltImg(X, Y, aniSpace, 0);
   StretchedSprites.BltImg(X, Y + TwoPixels * (dx + 1), aniInfotron, dx);
-#else
-  StretchedSprites.BltEx(X, Y, 0);
-  StretchedSprites.BltEx(X, Y + TwoPixels * (dx + 1), fiInfotron);
-#endif
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
+
   bl = HighByte(PlayField16[si]) + 1;
   if (bl == 0x16)
   {
     MovHighByte(&PlayField16[si], bl);
     subCleanUpForInfotronsAbove(si - FieldWidth);
-    return subAnimateInfotrons;
+
+    return;
   } // loc_g_1285:
 
   if (bl < 0x18)
   {
     MovHighByte(&PlayField16[si], bl);
-    return subAnimateInfotrons;
+
+    return;
   } // loc_g_128F:
 
   MovHighByte(&PlayField16[si], 0); // infotron arrived at the field
@@ -188,7 +179,7 @@ loc_g_1242: // infotron comes falling from above
 #endif
 
   if (! (ax == fiZonk || ax == fiInfotron || ax == fiRAM))
-    return subAnimateInfotrons;
+    return;
 
   // infotron rolls somewhere
   ax = PlayField16[si + FieldWidth - 1];
@@ -199,12 +190,13 @@ loc_g_1242: // infotron comes falling from above
   if (ax == 0 || ax == 0x8888 || ax == 0xAAAA) // may roll right
     goto loc_g_1350;
 
-  return subAnimateInfotrons;
+  return;
 
 loc_g_132D:     // go on falling down?
   PlayField16[si] = 0x7004; // go into intermediate waitstate
   PlayField16[si + FieldWidth] = 0x9999; // mark as "zonk waiting to access"
-  return subAnimateInfotrons;
+
+  return;
 
 loc_g_133A:     // test if infotron may roll left
   // This if(if true) jumps up far above
@@ -215,29 +207,30 @@ loc_g_133A:     // test if infotron may roll left
   MovHighByte(&PlayField16[si], 0x50); // infotron rolls left
   PlayField16[si - 1] = 0x8888;
 
-  return subAnimateInfotrons;
+  return;
 
 loc_g_1350:     // test if infotron may roll right
   if (PlayField16[si + 1] != 0)
-    return subAnimateInfotrons;
+    return;
 
   MovHighByte(&PlayField16[si], 0x60); // infotron rolls right
   PlayField16[si + 1] = 0x8888;
 
-  return subAnimateInfotrons;
+  return;
 
 loc_g_1364:     // Murphy dies, but not in any case
   bl = HighByte(PlayField16[si + FieldWidth]);
   if (bl == 0xE || bl == 0xF || bl == 0x28)
-    return subAnimateInfotrons;
+    return;
 
   if (bl == 0x29 || bl == 0x25 || bl == 0x26)
-    return subAnimateInfotrons;
+    return;
 
 loc_g_1386:     // someone dies/explodes immediately
   si = si + FieldWidth;                 // 1 field down
   ExplodeFieldSP(si);               // Explode
-  return subAnimateInfotrons;
+
+  return;
 
 loc_g_138D: // infotron comes rolling from right to left
   //  To Do: draw infotron rolling from right
@@ -246,14 +239,10 @@ loc_g_138D: // infotron comes rolling from right to left
   X = GetStretchX(si + 1);
   Y = GetStretchY(si);
   dx = (bl & 0x7) + 1;
-#if 1
   StretchedSprites.BltImg(X, Y, aniSpace, 0);
   StretchedSprites.BltImg(X - (TwoPixels * dx), Y, aniInfotronRollLeft, dx - 1);
-#else
-  StretchedSprites.BltEx(X, Y, 0);
-  StretchedSprites.BltEx(X - (TwoPixels * dx), Y, aniFramesInfotronRollLeft[dx - 1]);
-#endif
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
+
   bl = HighByte(PlayField16[si]) + 1; // get and increment sequence#
   if (bl == 0x24)
     PlayField16[si + 1] = 0xAAAA;
@@ -272,7 +261,7 @@ loc_g_138D: // infotron comes rolling from right to left
     PlayField16[si] = 0x7004; // go into intermediate state
   }
 
-  return subAnimateInfotrons;
+  return;
 
 loc_g_13E9: // infotron comes rolling from left to right
   //  To Do: draw infotron rolling from left
@@ -281,14 +270,10 @@ loc_g_13E9: // infotron comes rolling from left to right
   X = GetStretchX(si - 1);
   Y = GetStretchY(si);
   dx = (bl & 0x7) + 1;
-#if 1
   StretchedSprites.BltImg(X, Y, aniSpace, 0);
   StretchedSprites.BltImg(X + (TwoPixels * dx), Y, aniInfotronRollRight, dx - 1);
-#else
-  StretchedSprites.BltEx(X, Y, 0);
-  StretchedSprites.BltEx(X + (TwoPixels * dx), Y, aniFramesInfotronRollRight[dx - 1]);
-#endif
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
+
   bl = HighByte(PlayField16[si]) + 1;
   if (bl == 0x34)
     PlayField16[si - 1] = 0xAAAA;
@@ -307,7 +292,7 @@ loc_g_13E9: // infotron comes rolling from left to right
     PlayField16[si] = 0x7004; // go into intermediate state
   }
 
-  return subAnimateInfotrons;
+  return;
 
 loc_g_1444: // infotron falls straight down
   bl = bl + 1;
@@ -327,7 +312,7 @@ loc_g_1444: // infotron falls straight down
     PlayField16[si] = 0x1004; // go falling
   }
 
-  return subAnimateInfotrons;
+  return;
 
 loc_g_1472: // infotron rolls left
   //  To Do: draw infotron rolling to left
@@ -336,19 +321,16 @@ loc_g_1472: // infotron rolls left
   X = GetStretchX(si);
   Y = GetStretchY(si);
   dx = (bl & 0xF) + 1;
-#if 1
   StretchedSprites.BltImg(X, Y, aniSpace, 0);
   StretchedSprites.BltImg(X - (TwoPixels * dx), Y, aniInfotronRollLeft, dx - 1);
-#else
-  StretchedSprites.BltEx(X, Y, 0);
-  StretchedSprites.BltEx(X - (TwoPixels * dx), Y, aniFramesInfotronRollLeft[dx - 1]);
-#endif
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
+
   bl = HighByte(PlayField16[si]) + 1; // retrieve and increment sequence#
   if (bl < 0x52)
   {
     MovHighByte(&PlayField16[si], bl);
-    return subAnimateInfotrons;
+
+    return;
   }
 
   if (PlayField16[si + FieldWidth - 1] != 0)
@@ -364,12 +346,14 @@ loc_g_1472: // infotron rolls left
   si = si - 1;                   // 1 field left
   PlayField16[si] = 0x2204;
   PlayField16[si + FieldWidth] = 0x9999;
-  return subAnimateInfotrons;
+
+  return;
 
 loc_g_14D9: // stay waiting
   bl = bl - 1;
   MovHighByte(&PlayField16[si], bl);
-  return subAnimateInfotrons;
+
+  return;
 
 loc_g_14E0: // infotron rolls right
   //  To Do: draw infotron rolling to right
@@ -378,19 +362,16 @@ loc_g_14E0: // infotron rolls right
   X = GetStretchX(si);
   Y = GetStretchY(si);
   dx = (bl & 0x7) + 1;
-#if 1
   StretchedSprites.BltImg(X, Y, aniSpace, 0);
   StretchedSprites.BltImg(X + (TwoPixels * dx), Y, aniInfotronRollRight, dx - 1);
-#else
-  StretchedSprites.BltEx(X, Y, 0);
-  StretchedSprites.BltEx(X + (TwoPixels * dx), Y, aniFramesInfotronRollRight[dx - 1]);
-#endif
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
+
   bl = HighByte(PlayField16[si]) + 1;
   if (bl < 0x62)
   {
     MovHighByte(&PlayField16[si], bl);
-    return subAnimateInfotrons;
+
+    return;
   }
 
   if (PlayField16[si + FieldWidth + 1] != 0)
@@ -406,12 +387,14 @@ loc_g_14E0: // infotron rolls right
   si = si + 1;
   PlayField16[si] = 0x3204;
   PlayField16[si + FieldWidth] = 0x9999;
-  return subAnimateInfotrons;
+
+  return;
 
 loc_g_1547: // stay waiting
   bl = bl - 1;
   MovHighByte(&PlayField16[si], bl);
-  return subAnimateInfotrons;
+
+  return;
 
 loc_g_154E: // intermediate state
   ax = PlayField16[si + FieldWidth];
@@ -422,14 +405,10 @@ loc_g_154E: // intermediate state
     PlayField16[si] = 0x1004; // start falling down
     goto loc_g_1242;
   }
+}
 
-  return subAnimateInfotrons;
-} // subAnimateInfotrons
-
-int subCleanUpForInfotronsAbove(int si)
+void subCleanUpForInfotronsAbove(int si)
 {
-  int subCleanUpForInfotronsAbove;
-
   int ax;
 
   if (LowByte(PlayField16[si]) != fiExplosion)
@@ -438,10 +417,10 @@ int subCleanUpForInfotronsAbove(int si)
   if (PlayField16[si - FieldWidth] != 0)
   {
     if (PlayField16[si - FieldWidth] != 0x9999)
-      return subCleanUpForInfotronsAbove;
+      return;
 
     if (LowByte(PlayField16[si - 2 * FieldWidth]) != fiZonk)
-      return subCleanUpForInfotronsAbove;
+      return;
   }
 
   if (PlayField16[si - FieldWidth - 1] == fiInfotron)
@@ -451,7 +430,7 @@ loc_g_16F6:
   if (PlayField16[si - FieldWidth + 1] == fiInfotron)
     goto loc_g_1722;
 
-  return subCleanUpForInfotronsAbove;
+  return;
 
 loc_g_16FE:
   ax = PlayField16[si - 1];
@@ -459,7 +438,8 @@ loc_g_16FE:
   {
     PlayField16[si - FieldWidth - 1] = 0x6004;
     PlayField16[si - FieldWidth] = 0x8888;
-    return subCleanUpForInfotronsAbove;
+
+    return;
   }
 
   goto loc_g_16F6;
@@ -471,6 +451,4 @@ loc_g_1722:
     PlayField16[si - FieldWidth + 1] = 0x5004;
     PlayField16[si - FieldWidth] = 0x8888;
   }
-
-  return subCleanUpForInfotronsAbove;
-} // subCleanUpForInfotronsAbove
+}

@@ -189,7 +189,7 @@ locRepeatMainGameLoop:                           // start repeating game loop
 
   //  Call subDisplayPlayingTime                 ' playing time on screen
 
-  subCheckRestoreRedDiskCountDisplay();    // Restore panel: red-disk hole
+  // subCheckRestoreRedDiskCountDisplay();    // Restore panel: red-disk hole
 
   subRedDiskReleaseExplosion();       // Red Disk release and explode
   subFollowUpExplosions();  // every explosion may cause up to 8 following explosions
@@ -199,8 +199,8 @@ locRepeatMainGameLoop:                           // start repeating game loop
   ScreenPosition = bx;
 
   // Now new X and new Y are calculated, and bx = screen position = ScreenPosition
-  data_h_Ytmp = ScreenScrollYPos; // copy Y for next soft scroll
-  data_h_Xtmp = ScreenScrollXPos; // copy X for next soft scroll
+  // data_h_Ytmp = ScreenScrollYPos; // copy Y for next soft scroll
+  // data_h_Xtmp = ScreenScrollXPos; // copy X for next soft scroll
   if ((! UserDragFlag) && AutoScrollFlag)
   {
 #if 0
@@ -479,7 +479,7 @@ locRepeatMainGameLoop:                           // start repeating game loop
 
   //  Call subDisplayPlayingTime                 ' playing time on screen
 
-  subCheckRestoreRedDiskCountDisplay();    // Restore panel: red-disk hole
+  // subCheckRestoreRedDiskCountDisplay();    // Restore panel: red-disk hole
 
   subRedDiskReleaseExplosion();       // Red Disk release and explode
   subFollowUpExplosions();  // every explosion may cause up to 8 following explosions
@@ -489,8 +489,8 @@ locRepeatMainGameLoop:                           // start repeating game loop
   ScreenPosition = bx;
 
   // Now new X and new Y are calculated, and bx = screen position = ScreenPosition
-  data_h_Ytmp = ScreenScrollYPos; // copy Y for next soft scroll
-  data_h_Xtmp = ScreenScrollXPos; // copy X for next soft scroll
+  // data_h_Ytmp = ScreenScrollYPos; // copy Y for next soft scroll
+  // data_h_Xtmp = ScreenScrollXPos; // copy X for next soft scroll
   if ((! UserDragFlag) && AutoScrollFlag)
   {
 #if 0

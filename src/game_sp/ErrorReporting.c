@@ -4,6 +4,8 @@
 
 #include "ErrorReporting.h"
 
+
+
 static char * GetErrLogPath();
 static char * GetTraceLogPath();
 
@@ -29,51 +31,4 @@ static char *GetTraceLogPath()
   GetTraceLogPath = "Trace.log";
 
   return GetTraceLogPath;
-}
-
-void Trace(char *Source, char *Message)
-{
-  // Dim Path$, FNum%, bIsOpen As Boolean
-  //  Path = GetTraceLogPath()
-  //  FNum = FreeFile
-  //  bIsOpen = False
-  //  On Error GoTo TraceEH
-  //  Open Path For Append Access Write As FNum
-  //    bIsOpen = True
-  //    ' --- Print #FNum, Now & "  " & Source & " :  " & Message
-  //  On Error GoTo 0
-  // TraceEH:
-  //  If bIsOpen Then Close FNum
-}
-
-void ReportError(char *Source, char *Message)
-{
-  char *Path;
-  FILE *FNum;
-  boolean bIsOpen;
-
-  Path = GetErrLogPath();
-  // FNum = FreeFile();
-  bIsOpen = False;
-
-  // --- On Error GoTo ReportErrorEH
-  FNum = fopen(Path, "ab");
-  bIsOpen = True;
-  // --- Print #FNum, Now & "    SOURCE = " & Source & "    ErrMessage = " & Message
-  // --- On Error GoTo 0
-
-
-  // ReportErrorEH:
-  if (bIsOpen)
-    fclose(FNum);
-}
-
-void InitErrorReporting()
-{
-  char *Path;
-
-  Path = GetErrLogPath();
-  MayKill(Path);
-  Path = GetTraceLogPath();
-  MayKill(Path);
 }

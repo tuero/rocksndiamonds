@@ -26,7 +26,7 @@ void subAnimateBugs(int si)
   if ((TimerVar & 3) == 0)
   {
     bl = bl + 1;
-    if (bl >= 0xE)
+    if (bl >= 14)			// bugs animation has 14 frames
     {
       bl = subGetRandomNumber();	// generate new random number
       bl = -((bl & 0x3F) + 0x20);
@@ -65,7 +65,7 @@ void subAnimateBugs(int si)
 
 void subAnimateTerminals(int si)
 {
-  short bl;
+  int bl;
 
   int lx = GetX(si);
   int ly = GetY(si);
@@ -79,9 +79,7 @@ void subAnimateTerminals(int si)
     GfxFrame[lx][ly]--;
 
   /* get last random animation delay */
-  bl = HighByte(PlayField16[si]);
-  if ((bl & 0x80) == 0x80)
-    bl = (bl | 0xFF00);
+  bl = SgnHighByte(PlayField16[si]);
 
   bl = bl + 1;
   if (bl <= 0)		/* return if random animation delay not yet reached */

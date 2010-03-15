@@ -12,13 +12,15 @@
 
 #include "global.h"
 
-extern int InitMurphyPos();
-extern int InitMurphyPosB(int si);
-extern int ResetInfotronsNeeded(int dx);
+
 extern int subConvertToEasySymbols();
-extern int subFetchAndInitLevel();
-extern int subFetchAndInitLevelA(boolean UpdatePlayTime);
-extern int subFetchAndInitLevelB();
-extern int subInitGameConditions();
+
+extern void InitMurphyPos();
+extern void InitMurphyPosB(int);
+extern void ResetInfotronsNeeded(int);
+extern void subFetchAndInitLevel();
+extern void subFetchAndInitLevelA(boolean);
+extern void subFetchAndInitLevelB();
+extern void subInitGameConditions();
 
 #endif /* INITGAMECONDITIONS_H */

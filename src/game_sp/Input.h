@@ -12,12 +12,10 @@
 
 #include "global.h"
 
-extern void subCheckJoystick();
-extern int subCheckRightMouseButton();
-extern int subProcessKeyboardInput(byte);
 
 extern DemoBufferObject DemoBuffer;
 extern boolean KeyState[255 + 1];
-extern int KeyScanCode7;
+
+extern void subProcessKeyboardInput(byte);
 
 #endif /* INPUT_H */

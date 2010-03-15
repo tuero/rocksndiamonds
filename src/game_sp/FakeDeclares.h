@@ -12,10 +12,10 @@
 
 #include "global.h"
 
+
 #define edDraw 			(1)
 
 extern boolean ModifiedFlag;
-extern boolean Get_ModifiedFlag();
 extern void Let_ModifiedFlag(boolean NewVal);
 
 extern boolean EditFlag;
@@ -46,19 +46,6 @@ extern int UpdateTimeFlag;
 extern int UpdatedFlag;
 extern int WasDemoFlag;
 extern int YellowDisksExploded;
-extern int data_SPtorunavail;
-extern int data_h_0D9E;
-extern int data_h_0D9F;
-extern int data_h_0DA0;
-extern int data_h_0DA1;
-extern int data_h_0DA2;
-extern int data_h_0DA4;
-extern int data_h_0DA5;
-extern int data_h_0DA6;
-extern int data_h_0DA7;
-extern int data_h_0DA8;
-extern int data_h_0DA9;
-extern int data_h_165A;
 extern int data_h_DemoDone, LevelStatus;
 extern int edMove;
 extern int edSelect;

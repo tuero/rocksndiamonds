@@ -2055,7 +2055,6 @@ loc_g_6EBA:
   if (0 < LowByte(InfotronsNeeded))
     InfotronsNeeded = InfotronsNeeded - 1;
 
-  subDisplayInfotronsNeeded();
 loc_g_6EC8: // space, base
   PlayField16[*si] = fiMurphy;
   subAdjustZonksInfotronsAboveMurphy(*si + FieldWidth);
@@ -2070,7 +2069,6 @@ loc_g_6ED8:
   if (0 < LowByte(InfotronsNeeded))
     InfotronsNeeded = InfotronsNeeded - 1;
 
-  subDisplayInfotronsNeeded();
 loc_g_6EE6: // space, base
   PlayField16[*si] = fiMurphy;
   subAdjustZonksInfotronsAboveMurphy(*si + 1);
@@ -2085,7 +2083,6 @@ loc_g_6EF6:
   if (0 < LowByte(InfotronsNeeded))
     InfotronsNeeded = InfotronsNeeded - 1;
 
-  subDisplayInfotronsNeeded();
 loc_g_6F04: // space, base
   if (LowByte(PlayField16[*si - FieldWidth]) != fiExplosion)
     PlayField16[*si - FieldWidth] = 0;
@@ -2102,7 +2099,6 @@ loc_g_71B6:
   if (0 < LowByte(InfotronsNeeded))
     InfotronsNeeded = InfotronsNeeded - 1;
 
-  subDisplayInfotronsNeeded();
 loc_g_71C4: // space, base
   subAdjustZonksInfotronsAboveMurphy(*si - 1);
   PlayField16[*si] = fiMurphy;
@@ -2117,7 +2113,6 @@ loc_g_71D4:
   if (0 < LowByte(InfotronsNeeded))
     InfotronsNeeded = InfotronsNeeded - 1;
 
-  subDisplayInfotronsNeeded();
 loc_g_71E2: // base
   if (LowByte(PlayField16[*si - FieldWidth]) != fiExplosion)
     PlayField16[*si - FieldWidth] = 0;
@@ -2132,7 +2127,6 @@ loc_g_71F0:
   if (0 < LowByte(InfotronsNeeded))
     InfotronsNeeded = InfotronsNeeded - 1;
 
-  subDisplayInfotronsNeeded();
 loc_g_71FE: // base
   if (LowByte(PlayField16[*si - 1]) != fiExplosion)
     PlayField16[*si - 1] = 0;
@@ -2147,7 +2141,6 @@ loc_g_720C:
   if (0 < LowByte(InfotronsNeeded))
     InfotronsNeeded = InfotronsNeeded - 1;
 
-  subDisplayInfotronsNeeded();
 loc_g_721A: // base
   if (LowByte(PlayField16[*si + FieldWidth]) != fiExplosion)
     PlayField16[*si + FieldWidth] = 0;
@@ -2162,7 +2155,6 @@ loc_g_7228:
   if (0 < LowByte(InfotronsNeeded))
     InfotronsNeeded = InfotronsNeeded - 1;
 
-  subDisplayInfotronsNeeded();
 loc_g_7236: // base
   if (LowByte(PlayField16[*si + 1]) != fiExplosion)
     PlayField16[*si + 1] = 0;
@@ -2643,7 +2635,6 @@ loc_g_747F:
   PlayField16[*si] = fiMurphy;
   RedDiskReleasePhase = 2;
   RedDiskCount = RedDiskCount - 1;
-  subDisplayRedDiskCount();
 
 #if 1
   subSoundFX(*si, fiRedDisk, actDropping);
@@ -2844,7 +2835,6 @@ static void subEatRedDisk(int si)
   }
 
   RedDiskCount = (RedDiskCount + 1) % 256;
-  subDisplayRedDiskCount();
 }
 
 void subAdjustZonksInfotronsAboveMurphy(int si)

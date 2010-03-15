@@ -13,7 +13,5 @@
 #include "global.h"
 
 extern void InitErrorReporting();
-extern void ReportError(char *Source, char *Message);
-extern void Trace(char *Source, char *Message);
 
 #endif /* ERRORREPORTING_H */

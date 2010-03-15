@@ -62,9 +62,7 @@ static void ScrollPlayfield(int dx, int dy)
       redraw[x][y] = FALSE;
   redraw_tiles = 0;
 
-#if 1
   DrawFrameIfNeeded();
-#endif
 
   for (y = DisplayMinY; y <= DisplayMaxY; y++)
   {
@@ -300,9 +298,7 @@ void DDScrollBuffer_ScrollTo(int X, int Y)
   ScrollX = mScrollX;
   ScrollY = mScrollY;
 
-#if 1
   ScrollPlayfieldIfNeeded();
-#endif
 }
 
 void DDScrollBuffer_ScrollTowards(int X, int Y, double Step)
@@ -316,8 +312,9 @@ void DDScrollBuffer_ScrollTowards(int X, int Y, double Step)
   Y = Y / Stretch;
   dx = X - mScrollX;
   dY = Y - mScrollY;
+
   r = Sqr(dx * dx + dY * dY);
-  if (r == 0) // we are there already
+  if (r == 0)	// we are there already
     return;
 
   if (Step < r)
@@ -330,9 +327,7 @@ void DDScrollBuffer_ScrollTowards(int X, int Y, double Step)
   ScrollX = mScrollX;
   ScrollY = mScrollY;
 
-#if 1
   ScrollPlayfieldIfNeeded();
-#endif
 }
 
 void DDScrollBuffer_SoftScrollTo(int X, int Y, long TimeMS, int FPS)
@@ -347,9 +342,7 @@ void DDScrollBuffer_SoftScrollTo(int X, int Y, long TimeMS, int FPS)
     return;
 
   if (AlreadyRunning)
-  {
     return;
-  }
 
   AlreadyRunning = True;
   X = X / Stretch;
@@ -357,6 +350,7 @@ void DDScrollBuffer_SoftScrollTo(int X, int Y, long TimeMS, int FPS)
   dx = X - mScrollX;
   dY = Y - mScrollY;
   maxD = (Abs(dx) < Abs(dY) ? Abs(dY) : Abs(dx));
+
   StepCount = FPS * (TimeMS / (double)1000);
   if (StepCount > maxD)
     StepCount = maxD;
@@ -368,8 +362,7 @@ void DDScrollBuffer_SoftScrollTo(int X, int Y, long TimeMS, int FPS)
   tStep = (double)1 / StepCount;
   oldX = mScrollX;
   oldY = mScrollY;
-  // R = Sqr(dX * dX + dY * dY)
-  // If R = 0 Then Exit Sub 'we are there already
+
   for (T = (double)tStep; T <= (double)1; T += tStep)
   {
     if (UserDragFlag)
@@ -392,7 +385,5 @@ void DDScrollBuffer_SoftScrollTo(int X, int Y, long TimeMS, int FPS)
 SoftScrollEH:
   AlreadyRunning = False;
 
-#if 1
   ScrollPlayfieldIfNeeded();
-#endif
 }

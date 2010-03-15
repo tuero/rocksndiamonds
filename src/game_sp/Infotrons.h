@@ -12,7 +12,8 @@
 
 #include "global.h"
 
-extern int subAnimateInfotrons(int si);
-extern int subCleanUpForInfotronsAbove(int si);
+
+extern void subAnimateInfotrons(int);
+extern void subCleanUpForInfotronsAbove(int);
 
 #endif /* INFOTRONS_H */

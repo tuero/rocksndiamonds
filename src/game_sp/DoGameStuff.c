@@ -4,30 +4,26 @@
 
 #include "DoGameStuff.h"
 
+
 static void CallAnimation(int si, byte bl);
 static boolean IsToBeAnimated(int bl);
 
-// static char *VB_Name = "modDoGameStuff";
-
-// --- Option Explicit
-
 int *AnimationPosTable;
 byte *AnimationSubTable;
+
 
 // ==========================================================================
 //                              SUBROUTINE
 // Do game stuff
 // ==========================================================================
 
-int subDoGameStuff()
+void subDoGameStuff()
 {
-  int subDoGameStuff;
-
   int si, cx, dx, bl;
 
   subAnimateMurphy(&MurphyPosIndex);       // move Murphy in any direction
 
-  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   // Build a database of locations and subs-to-call of animatable fields only:
   // Make a snapshot from the field before the animation cycle starts.
   // first and last line are not animated.
@@ -52,7 +48,7 @@ int subDoGameStuff()
   }
   while (0 < cx); // locloop_g_2282' until all lines scanned(not top- and bottom edge)
 
-  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   // Now use the database to animate all animatables the fastest way.
   // All the other fields are not checked anymore: those have no database entry.
   // The field from before animation is frozen in the database in order not to
@@ -66,72 +62,31 @@ int subDoGameStuff()
     } // loop    locloop_g_22B8          ' until all animatables done
   }
 
-#if 0
-  printf("::: DoGameStuff.c: KillMurphyFlag == %d [%d]\n",
-	 KillMurphyFlag, MurphyMoveCounter);
-#endif
-
   // All animations are done now
-  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   if (KillMurphyFlag == 1 || MurphyMoveCounter == 0)
   {
-#if 1
     if (LeadOutCounter == 0 &&
 	!game_sp.LevelSolved &&
 	!game_sp.GameOver)
-#else
-    if (LeadOutCounter == 0)
-#endif
     {
 #if 1
       printf("::: DoGameStuff.c: killing murphy [%d] ...\n", KillMurphyFlag);
 #endif
 
-      KillMurphyFlag = 0;             // no more "kill Murphy"
-      ExplodeFieldSP(MurphyExplodePos);                 // Explode
-      LeadOutCounter = 0x40;           // quit: start lead-out
-
-#if 1
+      KillMurphyFlag = 0;			// no more "kill Murphy"
+      ExplodeFieldSP(MurphyExplodePos);		// Explode
+      LeadOutCounter = 0x40;			// quit: start lead-out
 
 #if 1
       printf("::: DoGameStuff.c: !!!!!!!!!! GAME OVER !!!!!!!!!!\n");
       printf("::: [KillMurphyFlag == %d]\n", KillMurphyFlag);
 #endif
 
-#if 1
       /* give Murphy some more time (LeadOutCounter) to reach the exit */
-#else
-      game_sp.GameOver = TRUE;
-#endif
-
-#endif
     }
-
-#if 1
-#if 0
-    printf("::: *** %d, %d, %d\n", KillMurphyFlag,
-	   game_sp.LevelSolved, game_sp.GameOver);
-#endif
-
-#if 0
-    if (KillMurphyFlag == 1 &&
-	!game_sp.LevelSolved &&
-	!game_sp.GameOver)
-    {
-#if 1
-      printf("::: DoGameStuff.c: !!!!!!!!!! GAME OVER !!!!!!!!!!\n");
-#endif
-
-      game_sp.GameOver = TRUE;
-    }
-#endif
-#endif
-
   } //  loc_g_22FB:
-
-
-  return subDoGameStuff;
-} // subDoGameStuff
+}
 
 static boolean IsToBeAnimated(int bl)
 {

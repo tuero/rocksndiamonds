@@ -4,13 +4,7 @@
 
 #include "Demo.h"
 
-// static char *VB_Name = "modDemo";
 
-// --- Option Explicit
-//
-// Public Function subCloseDemoRecordingFile()
-//
-// End Function
 int RecDemoRandomSeed;
 byte FirstDemoByte;
 char *MySignature;
@@ -95,8 +89,6 @@ currency GetTotalFramesOfDemo()
   GetTotalFramesOfDemo = nFrames;
   return GetTotalFramesOfDemo;
 
-  // GetTotalFramesOfDemoEH:
-  // ReportError "GetTotalFramesOfDemo()", "invalid data detected in file " & OrigPath
   GetTotalFramesOfDemo = 0;
   DemoAvailable = False;
 

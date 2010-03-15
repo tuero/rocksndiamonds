@@ -12,10 +12,11 @@
 
 #include "global.h"
 
-extern void ExplodeFieldSP(int si);
-extern int subAnimateExplosion(int si);
-extern int subClearFieldDueToExplosion(int si);
-extern int subFollowUpExplosions();
-extern int subRedDiskReleaseExplosion();
+
+extern void ExplodeFieldSP(int);
+extern void subAnimateExplosion(int);
+extern void subClearFieldDueToExplosion(int);
+extern void subFollowUpExplosions();
+extern void subRedDiskReleaseExplosion();
 
 #endif /* EXPLOSIONS_H */

@@ -358,6 +358,12 @@ extern void ReadLevel();
 extern int getSequenceLength(int sequence);
 extern boolean isSnappingSequence(int sequence);
 
+extern void Trace(char *Source, char *Message);
+extern void ReportError(char *Source, char *Message);
+
+extern int Min(int A, int B);
+extern int Max(int A, int B);
+
 extern int fiGraphic[];
 extern int aniSnikSnakTurningLeft[];
 extern int aniSnikSnakTurningRight[];
