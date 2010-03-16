@@ -6,7 +6,7 @@
 
 
 boolean bPlaying;
-int LeadOutCounter, EnterRepeatCounter;
+int LeadOutCounter;
 int ExitToMenuFlag;
 boolean AutoScrollFlag;
 
@@ -98,7 +98,7 @@ locExitMainGameLoop:
 
 void subCalculateScreenScrollPos()
 {
-  int ax, Ay;
+  int ax, ay;
 
 #if 1
   int jump_pos = TILEX / 2;
@@ -124,9 +124,9 @@ void subCalculateScreenScrollPos()
 
   {
     ax = SXSIZE / 2;
-    Ay = SYSIZE / 2;
+    ay = SYSIZE / 2;
   }
 
-  ScreenScrollXPos = Stretch * (MurphyScreenXPos + TILEX / 2) - ax;
-  ScreenScrollYPos = Stretch * (MurphyScreenYPos + TILEY / 2) - Ay;
+  ScreenScrollXPos = (MurphyScreenXPos + TILEX / 2) - ax;
+  ScreenScrollYPos = (MurphyScreenYPos + TILEY / 2) - ay;
 }

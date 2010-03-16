@@ -11,7 +11,7 @@
 extern boolean AutoScrollFlag;
 extern boolean bPlaying;
 extern int ExitToMenuFlag;
-extern int LeadOutCounter, EnterRepeatCounter;
+extern int LeadOutCounter;
 
 extern void subMainGameLoop_Init();
 extern void subMainGameLoop_Main(byte, boolean);

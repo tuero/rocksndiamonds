@@ -7,12 +7,11 @@
 
 int ScreenScrollXPos, ScreenScrollYPos;
 
-int ShowPanel;
 int ExplosionShake;
 boolean NoDisplayFlag;
 
-long DisplayMinX, DisplayMaxX, DisplayWidth;
-long DisplayMinY, DisplayMaxY, DisplayHeight;
+long DisplayMinX, DisplayMaxX;
+long DisplayMinY, DisplayMaxY;
 
 
 void subDisplayLevel()
@@ -50,7 +49,7 @@ void ScrollTowards(int X, int Y)
   Y = Max(Y, ScrollMinY);
   Y = Min(Y, ScrollMaxY);
 
-  DDScrollBuffer_ScrollTowards(X, Y, 2 * Stretch * ZoomFactor);
+  DDScrollBuffer_ScrollTowards(X, Y, 2 * ZoomFactor);
 }
 
 void SoftScrollTo(int X, int Y, long TimeMS, int FPS)

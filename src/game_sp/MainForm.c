@@ -6,14 +6,11 @@
 
 
 static void DrawFrame(int Delta);
-static void ReStretch(float NewStretch);
-static void picViewPort_Resize();
+static void ReStretch();
 
 void DrawField(int X, int Y);
 void DrawFieldAnimated(int X, int Y);
 void DrawFieldNoAnimated(int X, int Y);
-
-boolean Loaded;
 
 void DrawFrameIfNeeded()
 {
@@ -30,9 +27,6 @@ void DisplayLevel()
 {
   int X, Y;
 
-  if (! Loaded)
-    return;
-
   if (! LevelLoaded)
     return;
 
@@ -44,60 +38,31 @@ void DisplayLevel()
   SetDisplayRegion();
 #endif
 
-  DrawFrame(0);
-
-  /* !!! CHECK THIS !!! */
-#if 1
-  if (! menBorder)
-    DrawFrame(1);
-#endif
+  DrawFrameIfNeeded();
 
   if (bPlaying)
   {
-#if 0
-    printf("::: MainForm.c: DisplayLevel(): [%ld, %ld, %ld, %ld] [%d, %d]...\n",
-	   DisplayMinX, DisplayMinY, DisplayMaxX, DisplayMaxY,
-	   FieldWidth, FieldHeight);
-#endif
-
     for (Y = DisplayMinY; Y <= DisplayMaxY; Y++)
-    {
       for (X = DisplayMinX; X <= DisplayMaxX; X++)
-      {
         DrawFieldNoAnimated(X, Y);
-      }
-    }
 
     for (Y = DisplayMinY; Y <= DisplayMaxY; Y++)
-    {
       for (X = DisplayMinX; X <= DisplayMaxX; X++)
-      {
         DrawFieldAnimated(X, Y);
-      }
-    }
-
   }
   else
   {
     for (Y = DisplayMinY; Y <= DisplayMaxY; Y++)
-    {
       for (X = DisplayMinX; X <= DisplayMaxX; X++)
-      {
         DrawField(X, Y);
-      }
-    }
   }
 }
 
 void Form_Load()
 {
-  Loaded = False;
-
   InitGlobals();
 
-  Loaded = True;
-
-  ReStretch(Stretch);
+  ReStretch();
 }
 
 static void DrawFrame(int Delta)
@@ -108,10 +73,12 @@ static void DrawFrame(int Delta)
   tY = -1 + Delta;
   RX = FieldWidth - Delta;
   BY = FieldHeight - Delta;
+
   DrawImage(LX, tY, imgFrameCorner);
   DrawImage(LX, BY, imgFrameCorner);
   DrawImage(RX, tY, imgFrameCorner);
   DrawImage(RX, BY, imgFrameCorner);
+
   for (i = LX + 1; i <= RX - 1; i++)
   {
     DrawImage(i, tY, imgFrameHorizontal);
@@ -152,11 +119,9 @@ void SetDisplayRegion()
   if (! menBorder)
   {
     DisplayMinX = 1;
-    DisplayMaxX = FieldWidth - 2;
-    DisplayWidth = FieldWidth;
     DisplayMinY = 1;
+    DisplayMaxX = FieldWidth - 2;
     DisplayMaxY = FieldHeight - 2;
-    DisplayHeight = FieldHeight;
 
     if (LevelLoaded)
       DrawFrame(1);
@@ -164,11 +129,9 @@ void SetDisplayRegion()
   else
   {
     DisplayMinX = 0;
-    DisplayMaxX = FieldWidth - 1;
-    DisplayWidth = FieldWidth + 2;
     DisplayMinY = 0;
+    DisplayMaxX = FieldWidth - 1;
     DisplayMaxY = FieldHeight - 1;
-    DisplayHeight = FieldHeight + 2;
 
     if (LevelLoaded)
       RestoreFrame();
@@ -181,7 +144,7 @@ void menPlay_Click()
 
   subFetchAndInitLevelB();
 
-  ReStretch(Stretch);
+  ReStretch();
 
   subMainGameLoop_Init();
 
@@ -194,27 +157,16 @@ void menPlay_Click()
   subFetchAndInitLevel();
 }
 
-static void ReStretch(float NewStretch)
+static void ReStretch()
 {
-  long BW2, LW, LH;
-
-  if (! Loaded)
-  {
-    Stretch = NewStretch;
-
-    return;
-  }
-
-  Stretch = NewStretch;
-
-  BW2 = StretchWidth / 2;
-  LW = (FieldWidth + 2) * BaseWidth; // StretchWidth
-  LH = (FieldHeight + 2) * BaseWidth; // StretchWidth
-
-  if (Loaded && LevelLoaded)
+  if (LevelLoaded)
   {
     SetDisplayRegion();
-    picViewPort_Resize();
+
+    SetScrollEdges();
+
+    ScrollTo(ScrollX, ScrollY);
+
     DisplayLevel();
   }
 
@@ -225,48 +177,39 @@ static void ReStretch(float NewStretch)
 
 void SetScrollEdges()
 {
-  ScrollMinX = (int)(DisplayMinX - 0.5) * Stretch * BaseWidth;
-  ScrollMinY = (int)(DisplayMinY - 0.5) * Stretch * BaseWidth;
-  ScrollMaxX = (int)(DisplayMaxX + 1.5) * Stretch * BaseWidth - SXSIZE;
-  ScrollMaxY = (int)(DisplayMaxY + 1.5) * Stretch * BaseWidth - SYSIZE;
+  ScrollMinX = (int)(DisplayMinX - 0.5) * BaseWidth;
+  ScrollMinY = (int)(DisplayMinY - 0.5) * BaseWidth;
+  ScrollMaxX = (int)(DisplayMaxX + 1.5) * BaseWidth - SXSIZE;
+  ScrollMaxY = (int)(DisplayMaxY + 1.5) * BaseWidth - SYSIZE;
 }
 
 void DrawField(int X, int Y)
 {
-  int Tmp, tsi;
+  int tsi = GetSI(X, Y);
+  int Tmp = LowByte(PlayField16[tsi]);
 
-  tsi = GetSI(X, Y);
-  Tmp = LowByte(PlayField16[tsi]);
-  if (Tmp > 40)
-    Tmp = 0;
+  if (Tmp < fiFirst || Tmp > fiLast)
+    Tmp = fiSpace;
 
-  if (Tmp == fiRAM || Tmp == fiHardWare)
+  if (Tmp == fiRAM ||
+      Tmp == fiHardWare ||
+      Tmp == fiBug ||
+      Tmp == fiWallSpace)
     Tmp = DisPlayField[tsi];
 
-  if (Tmp == fiBug || Tmp == 40)
-    Tmp = DisPlayField[tsi];
+  subCopyImageToScreen(tsi, fiGraphic[Tmp]);
 
-#if 1
-  if (Tmp >= 0 && Tmp <= 40)
-  {
-    subCopyImageToScreen(tsi, fiGraphic[Tmp]);
-
-#if 1
-    if (Tmp != fiSpace && Tmp != fiSnikSnak && Tmp != fiElectron)
-      GfxGraphic[X][Y] = fiGraphic[Tmp];
-#endif
-  }
-#else
-  DDSpriteBuffer_BltEx(StretchWidth * X, StretchWidth * Y, Tmp);
-#endif
+  if (Tmp != fiSpace &&
+      Tmp != fiSnikSnak &&
+      Tmp != fiElectron)
+    GfxGraphic[X][Y] = fiGraphic[Tmp];
 }
 
 void DrawFieldAnimated(int X, int Y)
 {
-  int Tmp, tsi;
+  int tsi = GetSI(X, Y);
+  int Tmp = LowByte(PlayField16[tsi]);
 
-  tsi = GetSI(X, Y);
-  Tmp = LowByte(PlayField16[tsi]);
   switch (Tmp)
   {
     case fiSnikSnak:
@@ -278,23 +221,15 @@ void DrawFieldAnimated(int X, int Y)
       break;
 
     default:
-      //      If 40 < Tmp Then Tmp = 0
-      //      If Tmp = fiRAM Or Tmp = fiHardWare Then Tmp = DisPlayField(tsi)
-      //      If Tmp = fiBug Or Tmp = 40 Then Tmp = DisPlayField(tsi)
-      //      If EditFlag Then
-      //        If fiOrangeDisk < Tmp And Tmp < fiSnikSnak Then Tmp = DisPlayField(tsi)
-      //      End If
-      //      DDSpriteBuffer_BltEx StretchWidth * X, StretchWidth * Y, Tmp
       break;
   }
 }
 
 void DrawFieldNoAnimated(int X, int Y)
 {
-  int Tmp, tsi;
+  int tsi = GetSI(X, Y);
+  int Tmp = LowByte(PlayField16[tsi]);
 
-  tsi = GetSI(X, Y);
-  Tmp = LowByte(PlayField16[tsi]);
   switch (Tmp)
   {
     case fiSnikSnak:
@@ -306,29 +241,25 @@ void DrawFieldNoAnimated(int X, int Y)
       break;
 
     default:
-      if (Tmp > 40)
-        Tmp = 0;
-
-      if (Tmp == fiRAM || Tmp == fiHardWare)
-        Tmp = DisPlayField[tsi];
-
-      if (Tmp == fiBug || Tmp == 40)
-        Tmp = DisPlayField[tsi];
-
 #if 1
-      if (Tmp >= 0 && Tmp <= 40)
-      {
-	subCopyImageToScreen(tsi, fiGraphic[Tmp]);
-
-#if 1
-	if (Tmp != fiSpace && Tmp != fiSnikSnak && Tmp != fiElectron)
-	  GfxGraphic[X][Y] = fiGraphic[Tmp];
-#endif
-      }
+      DrawField(X, Y);
 #else
-      DDSpriteBuffer_BltEx(StretchWidth * X, StretchWidth * Y, Tmp);
-#endif
+      if (Tmp < fiFirst || Tmp > fiLast)
+	Tmp = fiSpace;
 
+      if (Tmp == fiRAM ||
+	  Tmp == fiHardWare ||
+	  Tmp == fiBug ||
+	  Tmp == fiWallSpace)
+	Tmp = DisPlayField[tsi];
+
+      subCopyImageToScreen(tsi, fiGraphic[Tmp]);
+
+      if (Tmp != fiSpace &&
+	  Tmp != fiSnikSnak &&
+	  Tmp != fiElectron)
+	GfxGraphic[X][Y] = fiGraphic[Tmp];
+#endif
       break;
   }
 }
@@ -336,11 +267,4 @@ void DrawFieldNoAnimated(int X, int Y)
 void DrawImage(int X, int Y, int graphic)
 {
   DDSpriteBuffer_BltImg(StretchWidth * X, StretchWidth * Y, graphic, 0);
-}
-
-static void picViewPort_Resize()
-{
-  SetScrollEdges();
-
-  ScrollTo(ScrollX, ScrollY);
 }

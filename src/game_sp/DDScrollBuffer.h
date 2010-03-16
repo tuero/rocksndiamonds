@@ -20,7 +20,6 @@ extern void InitScrollPlayfield();
 extern void UpdatePlayfield();
 extern void RestorePlayfield();
 
-extern void DDScrollBuffer_Blt();
 extern void DDScrollBuffer_ScrollTo(int X, int Y);
 extern void DDScrollBuffer_ScrollTowards(int X, int Y, double Step);
 extern void DDScrollBuffer_SoftScrollTo(int X, int Y, long TimeMS, int FPS);

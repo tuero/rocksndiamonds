@@ -10,12 +10,11 @@
 
 extern int ScreenScrollXPos, ScreenScrollYPos;
 
-extern int ShowPanel;
 extern int ExplosionShake;
 extern boolean NoDisplayFlag;
 
-extern long DisplayMinX, DisplayMaxX, DisplayWidth;
-extern long DisplayMinY, DisplayMaxY, DisplayHeight;
+extern long DisplayMinX, DisplayMaxX;
+extern long DisplayMinY, DisplayMaxY;
 
 extern void subDisplayLevel();
 extern void ScrollTo(int, int);

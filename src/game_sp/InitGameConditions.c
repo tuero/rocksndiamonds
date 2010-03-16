@@ -27,7 +27,6 @@ void subInitGameConditions()
 
   TimerVar = 0;
 
-  EnterRepeatCounter = 0;		// restart Enter repeat counter
   SnikSnaksElectronsFrozen = 0;		// Snik-Snaks and Electrons move!
 
   SplitMoveFlag = 0;			// Reset Split-through-ports
@@ -45,7 +44,7 @@ void InitMurphyPos()
 {
   int si;
 
-  for (si = 0; si <= LevelMax - 1; si++)
+  for (si = 0; si < LevelMax; si++)
     if (PlayField16[si] == fiMurphy)
       break;
 
@@ -56,17 +55,11 @@ void InitMurphyPos()
 
 void InitMurphyPosB(int si)
 {
-  MurphyYPos = GetStretchY(si) / Stretch;
-  MurphyXPos = GetStretchX(si) / Stretch;
-
-  MurphyScreenXPos = GetStretchX(si);          // Murphy's screen x-position
-  MurphyScreenYPos = GetStretchY(si);         // Murphy's screen y-position
+  MurphyScreenXPos = MurphyXPos = GetStretchX(si); // Murphy's screen x-position
+  MurphyScreenYPos = MurphyYPos = GetStretchY(si); // Murphy's screen y-position
 
   // To Do: draw Murphy in location ax
   DDSpriteBuffer_BltImg(MurphyScreenXPos, MurphyScreenYPos, aniMurphy, 0);
-
-  MurphyScreenXPos = MurphyScreenXPos / Stretch;
-  MurphyScreenYPos = MurphyScreenYPos / Stretch;
 
   subCalculateScreenScrollPos();           // calculate screen start addrs
 
@@ -238,32 +231,28 @@ void subFetchAndInitLevelB()
 
 void subFetchAndInitLevelA()
 {
-  GameBusyFlag = 0; // restore scissors too
+  GameBusyFlag = 0;				// restore scissors too
+  subFetchAndInitLevel();			// fetch and initialize a level
+  GameBusyFlag = 1;				// no free screen write
 
-  subFetchAndInitLevel();   // Fetch and initialize a level
-
-  GameBusyFlag = 1; // no free screen write
-
-  DemoKeyCode = 0; // delete last demo key!
+  DemoKeyCode = 0;				// delete last demo key!
 }
 
 void subFetchAndInitLevel()
 {
   int InfoCountInLevel;
 
-  ReadLevel();                   // Read LEVELS.DAT
+  PrepareLevel();				// initialize level data
 
-  GameBusyFlag = -GameBusyFlag;   // make <>1
+  GameBusyFlag = -GameBusyFlag;			// make != 1
+  InfoCountInLevel = subConvertToEasySymbols();	// convert to easy symbols
+  GameBusyFlag = -GameBusyFlag;			// restore
 
-  InfoCountInLevel = subConvertToEasySymbols(); // Convert to easy symbols
+  subDisplayLevel();				// paint (init) game field
 
-  GameBusyFlag = -GameBusyFlag;     // restore
+  ResetInfotronsNeeded(InfoCountInLevel);	// and reset Infotron count
 
-  subDisplayLevel();               // Paint (Init) game field
+  subInitGameConditions();			// init game conditions (vars)
 
-  ResetInfotronsNeeded(InfoCountInLevel);  // and reset Infotron count
-
-  subInitGameConditions();                 // Init game conditions (vars)
-
-  InitMurphyPos();                 // Locate Murphy + screen pos
+  InitMurphyPos();				// locate Murphy + screen pos
 }

@@ -7,21 +7,12 @@ Bitmap *screenBitmap;
 
 struct EngineSnapshotInfo_SP engine_snapshot_sp;
 
-static void init_global_values()
-{
-  menBorder = False;
-}
-
 void sp_open_all()
 {
-  init_global_values();
-
   Form_Load();
 
   screenBitmap = CreateBitmap(MAX_BUF_XSIZE * TILEX, MAX_BUF_YSIZE * TILEY,
                               DEFAULT_DEPTH);
-
-  DDSpriteBuffer_Init();
 }
 
 void sp_close_all()
@@ -93,8 +84,6 @@ void SaveEngineSnapshotValues_SP()
   SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(DisplayMinY));
   SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(DisplayMaxX));
   SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(DisplayMaxY));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(DisplayWidth));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(DisplayHeight));
 
   SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(InfotronsNeeded));
   SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(KillMurphyFlag));

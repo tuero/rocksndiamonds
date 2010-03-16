@@ -7,12 +7,12 @@
 
 #include "global.h"
 
-extern void subAdjustZonksInfotronsAboveMurphy(int si);
-extern void subAnimateMurphy(int *si);
-extern void subCopyFieldToScreen(int si, int fi);
-extern void subCopyImageToScreen(int si, int graphic);
-extern void subCopyAnimToScreen(int si, int graphic, int sync_frame);
-extern void subExplodeSnikSnaksBelow(int si);
-extern int subSpPortTest(int si);
+extern void subAdjustZonksInfotronsAboveMurphy(int);
+extern void subAnimateMurphy(int *);
+extern void subCopyFieldToScreen(int, int);
+extern void subCopyImageToScreen(int, int);
+extern void subCopyAnimToScreen(int, int, int);
+extern void subExplodeSnikSnaksBelow(int);
+extern void subSpPortTest(int);
 
 #endif /* MURPHY_H */

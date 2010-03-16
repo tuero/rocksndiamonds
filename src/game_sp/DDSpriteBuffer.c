@@ -5,18 +5,6 @@
 #include "DDSpriteBuffer.h"
 
 
-long mXSpriteCount, mYSpriteCount;
-long mSpriteWidth, mSpriteHeight;
-long mDestXOff, mDestYOff;
-
-void DDSpriteBuffer_Init()
-{
-  mSpriteWidth  = TILEX;
-  mSpriteHeight = TILEY;
-  mXSpriteCount = 16;
-  mYSpriteCount = 16;
-}
-
 static void Blt(int pX, int pY, Bitmap *bitmap, int SpriteX, int SpriteY)
 {
   int scx = (mScrollX_last < 0 ? 0 : mScrollX_last);
@@ -37,7 +25,7 @@ static void Blt(int pX, int pY, Bitmap *bitmap, int SpriteX, int SpriteY)
     return;
 
   BlitBitmap(bitmap, screenBitmap, SpriteX, SpriteY,
-	     mSpriteWidth, mSpriteHeight, sx, sy);
+	     TILEX, TILEY, sx, sy);
 }
 
 void DDSpriteBuffer_BltImg(int pX, int pY, int graphic, int sync_frame)

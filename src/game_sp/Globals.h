@@ -18,6 +18,7 @@
 #define ZoomFactor			(2)
 #define BaseWidth			(ZoomFactor * 16)
 #define StretchWidth			(ZoomFactor * 16)
+#define TileSize			(ZoomFactor * 16)
 #define TwoPixels			(ZoomFactor * 2)
 
 
@@ -68,11 +69,11 @@
 #define fiRAMTop			(38)
 #define fiRAMBottom			(39)
 #define fiWallSpace			(40)
-#define fiHWTrash1			(41)
-#define fiHWTrash2			(42)
-#define fiHWMurphy			(43)
 
 #define fiExplosion			(0x1F)
+
+#define fiFirst				(0)
+#define fiLast				(40)
 
 
 // ----------------------------------------------------------------------------
@@ -142,7 +143,6 @@
 #define aniMurphyYawn			IMG_SP_MURPHY_BORING_1
 #define aniPushLeft			IMG_SP_MURPHY_PUSHING_LEFT
 #define aniPushRight			IMG_SP_MURPHY_PUSHING_RIGHT
-#define aniPushUpDown			IMG_SP_MURPHY_PUSHING_RIGHT
 
 #define aniBugActivating		IMG_SP_BUGGY_BASE_ACTIVATING
 #define aniBugDeactivating		IMG_SP_BUGGY_BASE_ACTIVATING
@@ -198,17 +198,6 @@
 #define imgFrameCorner			IMG_SP_FRAME_CORNER
 #define imgFrameHorizontal		IMG_SP_FRAME_HORIZONTAL
 #define imgFrameVertical		IMG_SP_FRAME_VERTICAL
-
-
-extern int aniFramesBug[], aniFramesZonkRollRight[], aniFramesZonkRollLeft[];
-extern int aniFramesEatInfotronLeft[], aniFramesEatInfotronRight[];
-extern int aniFramesInfotronRollRight[], aniFramesInfotronRollLeft[];
-extern int aniFramesMurphyEatLeft[], aniFramesMurphyEatRight[];
-extern int aniFramesMurphyEatUpLeft[], aniFramesMurphyEatUpRight[], aniFramesSplitUpDown[];
-extern int aniFramesMurphyExit[];
-extern int aniFramesSnikSnak[], aniFramesElectron[], aniFramesExplosion[];
-extern int aniFramesTouchBase[], aniFramesTouchInfotron[], aniFramesTouchRedDisk[];
-extern int aniFramesYellowDisk[], aniFramesOrangeDisk[], aniFramesRedDisk[];
 
 
 // ----------------------------------------------------------------------------
@@ -284,7 +273,7 @@ extern int GetX(int si);
 extern int GetY(int si);
 extern void InitGlobals();
 
-extern void ReadLevel();
+extern void PrepareLevel();
 
 extern int getSequenceLength(int sequence);
 extern boolean isSnappingSequence(int sequence);
@@ -313,14 +302,12 @@ extern int FieldMax, LevelMax;
 extern int FieldWidth;
 extern int FreezeZonks;
 extern int HeaderSize;
-extern int LevelNumber;
 extern int TimerVar;
 extern short RandomSeed;
 
 extern long FileMax;
 
 extern LevelInfoType LInfo;
-extern float Stretch;
 extern int ScrollMinX, ScrollMaxX, ScrollMinY, ScrollMaxY;
 extern int ScrollX, ScrollY;
 

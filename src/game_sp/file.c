@@ -112,10 +112,8 @@ void copyInternalEngineVars_SP()
   int count;
   int i, x, y;
 
-#if 1
   for (i = 0; preceding_playfield_memory[i] != NULL; i++)
     preceding_buffer_size += 8;		/* eight 16-bit integer values */
-#endif
 
   /* needed for engine snapshots */
   game_sp.preceding_buffer_size = preceding_buffer_size;
@@ -131,23 +129,10 @@ void copyInternalEngineVars_SP()
 
   FileMax = FieldMax + native_sp_level.demo.length;
 
-  PlayField8 = REDIM_1D(sizeof(byte), 0, FileMax + 1 - 1);
-  DisPlayField = REDIM_1D(sizeof(byte), 0, FieldMax + 1 - 1);
-#if 1
+  PlayField8 = REDIM_1D(sizeof(byte), 0, FileMax);
+  DisPlayField = REDIM_1D(sizeof(byte), 0, FieldMax);
   PlayField16 = REDIM_1D(sizeof(int), -preceding_buffer_size, FieldMax);
-#else
-  PlayField16 = REDIM_1D(sizeof(int), -FieldWidth, FieldMax);
-#endif
 
-#if 1
-
-#if 0
-  /* fill preceding playfield buffer zone with (indestructible) "hardware" */
-  for (i = -FieldWidth; i < 0; i++)
-    PlayField16[i] = 0x20;
-#endif
-
-#if 1
   count = 0;
   for (i = 0; preceding_playfield_memory[i] != NULL; i++)
   {
@@ -176,7 +161,6 @@ void copyInternalEngineVars_SP()
 	s++;
     }
   }
-#endif
 
   count = 0;
   for (y = 0; y < native_sp_level.height; y++)
@@ -193,46 +177,6 @@ void copyInternalEngineVars_SP()
     DisPlayField[i] = PlayField8[i];
     PlayField8[i] = 0;
   }
-
-#if 0
-  {
-    static int x = 0;
-
-    if (x == 1)
-    {
-      printf("++++++++");
-      printf("----------\n");
-      for (i = 0; i < preceding_buffer_size + FieldMax; i++)
-      {
-	int x = PlayField16[-preceding_buffer_size + i];
-
-	printf("%c%c", x & 0xff, x >> 8);
-      }
-      printf("----------\n");
-      exit(0);
-    }
-
-    x++;
-  }
-#endif
-
-#else
-
-  for (i = 0; y = 0; y < native_sp_level.height; y++)
-  {
-    for (x = 0; x < native_sp_level.width; x++)
-    {
-      PlayField8[i] = native_sp_level.playfield[x][y];
-
-      PlayField16[i] = PlayField8[i];
-      DisPlayField[i] = PlayField8[i];
-      PlayField8[i] = 0;
-
-      i++;
-    }
-  }
-
-#endif
 
   if (native_sp_level.demo.is_available)
   {
@@ -254,13 +198,7 @@ void copyInternalEngineVars_SP()
 #if 1
   /* this is set by main game tape code to native random generator directly */
 #else
-
-#if 1
-  printf("::: file.c: copyInternalEngineVars_SP(): RandomSeed = LInfo.DemoRandomSeed\n");
-#endif
-
   RandomSeed = LInfo.DemoRandomSeed;
-
 #endif
 
   LevelLoaded = True;
@@ -308,10 +246,6 @@ static void LoadNativeLevelFromFileStream_SP(FILE *file, int width, int height,
   /* number of special ("gravity") port entries below (maximum 10 allowed) */
   header->SpecialPortCount = getFile8Bit(file);
 
-#if 0
-  printf("::: num_special_ports == %d\n", header->SpecialPortCount);
-#endif
-
   /* database of properties of up to 10 special ports (6 bytes per port) */
   for (i = 0; i < SP_MAX_SPECIAL_PORTS; i++)
   {
@@ -323,16 +257,6 @@ static void LoadNativeLevelFromFileStream_SP(FILE *file, int width, int height,
        of what may be expected: Supaplex works with a game field in memory
        which is 2 bytes per tile) */
     port->PortLocation = getFile16BitBE(file);		/* yes, big endian */
-
-#if 0
-    {
-      int port_x = (port->PortLocation / 2) % SP_PLAYFIELD_WIDTH;
-      int port_y = (port->PortLocation / 2) / SP_PLAYFIELD_WIDTH;
-
-      printf("::: %d: port_location == %d => (%d, %d)\n",
-	     i, port->PortLocation, port_x, port_y);
-    }
-#endif
 
     /* change gravity: 1 == "turn on", anything else (0) == "turn off" */
     port->Gravity = getFile8Bit(file);
@@ -354,11 +278,6 @@ static void LoadNativeLevelFromFileStream_SP(FILE *file, int width, int height,
 
   /* random seed used for recorded demos */
   header->DemoRandomSeed = getFile16BitLE(file);	/* yes, little endian */
-  // header->DemoRandomSeed = getFile16BitBE(file);	/* !!! TEST ONLY !!! */
-
-#if 0
-  printf("::: file.c: DemoRandomSeed == %d\n", header->DemoRandomSeed);
-#endif
 
   /* auto-determine number of infotrons if it was stored as "0" -- see above */
   if (header->InfotronsNeeded == 0)
