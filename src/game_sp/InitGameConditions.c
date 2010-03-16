@@ -12,8 +12,6 @@
 
 void subInitGameConditions()
 {
-  bCapturePane = False;
-
   MurphyVarFaceLeft = 0;
   KillMurphyFlag = 0;			// no "kill Murphy"
   ExitToMenuFlag = 0;
@@ -65,7 +63,7 @@ void InitMurphyPosB(int si)
   MurphyScreenYPos = GetStretchY(si);         // Murphy's screen y-position
 
   // To Do: draw Murphy in location ax
-  StretchedSprites.BltImg(MurphyScreenXPos, MurphyScreenYPos, aniMurphy, 0);
+  DDSpriteBuffer_BltImg(MurphyScreenXPos, MurphyScreenYPos, aniMurphy, 0);
 
   MurphyScreenXPos = MurphyScreenXPos / Stretch;
   MurphyScreenYPos = MurphyScreenYPos / Stretch;
@@ -235,47 +233,18 @@ void ResetInfotronsNeeded(int dx)
 
 void subFetchAndInitLevelB()
 {
-  boolean UpdatePlayTime;
-
-  data_scr_demo = 0;
-  UpdatePlayTime = (0 == demo_stopped ? True : False);
-  demo_stopped = 0;
-
-  subFetchAndInitLevelA(UpdatePlayTime);
+  subFetchAndInitLevelA();
 }
 
-void subFetchAndInitLevelA(boolean UpdatePlayTime)
+void subFetchAndInitLevelA()
 {
-  D_ModeFlag = 0; // 1=debug D pressed (CPU use)
-  if (0 != demo_stopped) // 1=demo, 0=game
-    DemoFlag = 1;
-
   GameBusyFlag = 0; // restore scissors too
 
   subFetchAndInitLevel();   // Fetch and initialize a level
 
   GameBusyFlag = 1; // no free screen write
 
-  if (1 <= demo_stopped)
-  {
-    if (1 == demo_stopped)
-    {
-      DemoFlag = 0; // 1=demo, 0=game
-      demo_stopped = demo_stopped + 1;
-    }
-    else
-    {
-      DemoFlag = 0; // 1=demo, 0=game
-    }
-  }
-
   DemoKeyCode = 0; // delete last demo key!
-  if (DemoFlag != 0) // don't allow during game! only in Demo
-  {
-    DemoOffset = DemoPointer;           // init demo pointer
-    DemoKeyRepeatCounter = 1;
-    subGetNextDemoKey();                 // get next demo byte
-  }
 }
 
 void subFetchAndInitLevel()
@@ -284,12 +253,10 @@ void subFetchAndInitLevel()
 
   ReadLevel();                   // Read LEVELS.DAT
 
-  if (RecordDemoFlag == 1)
-    RecDemoRandomSeed = RandomSeed;
-
   GameBusyFlag = -GameBusyFlag;   // make <>1
 
   InfoCountInLevel = subConvertToEasySymbols(); // Convert to easy symbols
+
   GameBusyFlag = -GameBusyFlag;     // restore
 
   subDisplayLevel();               // Paint (Init) game field

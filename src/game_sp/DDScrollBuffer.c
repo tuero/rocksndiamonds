@@ -8,7 +8,6 @@
 
 
 long mWidth, mHeight;
-long mhWnd;
 long mScrollX, mScrollY;
 long mScrollX_last, mScrollY_last;
 long mDestXOff, mDestYOff;
@@ -198,7 +197,7 @@ void UpdatePlayfield(boolean force_redraw)
 	printf("::: REDRAW (%d, %d): %d, %d\n", x, y, graphic, sync_frame);
 #endif
 
-	StretchedSprites.BltImg(sx, sy, graphic, sync_frame);
+	DDSpriteBuffer_BltImg(sx, sy, graphic, sync_frame);
 
 #if 1
 	num_redrawn++;
@@ -222,15 +221,15 @@ void BlitScreenToBitmap_SP(Bitmap *target_bitmap)
 
   int xsize = SXSIZE;
   int ysize = SYSIZE;
-  int full_xsize = (FieldWidth  - (menBorder.Checked ? 0 : 1)) * TILEX;
-  int full_ysize = (FieldHeight - (menBorder.Checked ? 0 : 1)) * TILEY;
+  int full_xsize = (FieldWidth  - (menBorder ? 0 : 1)) * TILEX;
+  int full_ysize = (FieldHeight - (menBorder ? 0 : 1)) * TILEY;
 
   sxsize = (full_xsize < xsize ? full_xsize : xsize);
   sysize = (full_ysize < ysize ? full_ysize : ysize);
   sx = SX + (full_xsize < xsize ? (xsize - full_xsize) / 2 : 0);
   sy = SY + (full_ysize < ysize ? (ysize - full_ysize) / 2 : 0);
 
-  if (!menBorder.Checked)
+  if (!menBorder)
   {
     px += TILEX / 2;
     py += TILEY / 2;
@@ -365,24 +364,17 @@ void DDScrollBuffer_SoftScrollTo(int X, int Y, long TimeMS, int FPS)
 
   for (T = (double)tStep; T <= (double)1; T += tStep)
   {
-    if (UserDragFlag)
-      goto SoftScrollEH;
-
     mScrollX = oldX + T * dx;
     mScrollY = oldY + T * dY;
     ScrollX = mScrollX;
     ScrollY = mScrollY;
   }
 
-  if (UserDragFlag)
-    goto SoftScrollEH;
-
   mScrollX = X;
   mScrollY = Y;
   ScrollX = mScrollX;
   ScrollY = mScrollY;
 
-SoftScrollEH:
   AlreadyRunning = False;
 
   ScrollPlayfieldIfNeeded();

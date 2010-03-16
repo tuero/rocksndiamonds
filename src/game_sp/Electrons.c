@@ -548,7 +548,7 @@ void subDrawElectronTurnLeft(int si, int bx)
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
   X = GetStretchX(si);
   Y = GetStretchY(si);
-  StretchedSprites.BltImg(X, Y, aniElectron, bx);
+  DDSpriteBuffer_BltImg(X, Y, aniElectron, bx);
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
 }
 
@@ -559,7 +559,7 @@ void subDrawElectronTurnRight(int si, int bx)
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
   X = GetStretchX(si);
   Y = GetStretchY(si);
-  StretchedSprites.BltImg(X, Y, aniElectron, 0x10 - bx);
+  DDSpriteBuffer_BltImg(X, Y, aniElectron, 0x10 - bx);
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
 }
 
@@ -572,8 +572,8 @@ void subDrawElectronFromBelow(int si, int bx)
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
   X = GetStretchX(si);
   Y = GetStretchY(si + FieldWidth);
-  StretchedSprites.BltImg(X, Y, aniSpace, 0);
-  StretchedSprites.BltImg(X, Y - bx * TwoPixels, aniElectron, bx);
+  DDSpriteBuffer_BltImg(X, Y, aniSpace, 0);
+  DDSpriteBuffer_BltImg(X, Y - bx * TwoPixels, aniElectron, bx);
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
 }
 
@@ -586,8 +586,8 @@ void subDrawElectronFromRight(int si, int bx)
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
   X = GetStretchX(si + 1);
   Y = GetStretchY(si);
-  StretchedSprites.BltImg(X, Y, aniSpace, 0);
-  StretchedSprites.BltImg(X - bx * TwoPixels, Y, aniElectron, bx);
+  DDSpriteBuffer_BltImg(X, Y, aniSpace, 0);
+  DDSpriteBuffer_BltImg(X - bx * TwoPixels, Y, aniElectron, bx);
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
 }
 
@@ -600,8 +600,8 @@ void subDrawElectronFromAbove(int si, int bx)
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
   X = GetStretchX(si);
   Y = GetStretchY(si - FieldWidth);
-  StretchedSprites.BltImg(X, Y, aniSpace, 0);
-  StretchedSprites.BltImg(X, Y + bx * TwoPixels, aniElectron, bx);
+  DDSpriteBuffer_BltImg(X, Y, aniSpace, 0);
+  DDSpriteBuffer_BltImg(X, Y + bx * TwoPixels, aniElectron, bx);
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
 }
 
@@ -614,7 +614,7 @@ void subDrawElectronFromLeft(int si, int bx)
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
   X = GetStretchX(si - 1);
   Y = GetStretchY(si);
-  StretchedSprites.BltImg(X, Y, aniSpace, 0);
-  StretchedSprites.BltImg(X + bx * TwoPixels, Y, aniElectron, bx);
+  DDSpriteBuffer_BltImg(X, Y, aniSpace, 0);
+  DDSpriteBuffer_BltImg(X + bx * TwoPixels, Y, aniElectron, bx);
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
 }

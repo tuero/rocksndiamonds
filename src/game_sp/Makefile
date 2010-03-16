@@ -16,13 +16,11 @@ SRCS =	init.c			\
 	file.c			\
 	main.c			\
 	vb_lib.c		\
-	vb_vars.c		\
 				\
 	ASM.c			\
 	BugsTerminals.c		\
 	DDScrollBuffer.c	\
 	DDSpriteBuffer.c	\
-	Demo.c			\
 	Display.c		\
 	DoGameStuff.c		\
 	Electrons.c		\
@@ -36,27 +34,19 @@ SRCS =	init.c			\
 	MainGameLoop.c		\
 	Murphy.c		\
 	OrangeDisk.c		\
-	PathTools.c		\
-	SettingsObject.c	\
 	SnikSnaks.c		\
 	Sound.c			\
-	TickCountObject.c	\
-	TopMost.c		\
-	Zonk.c			\
-	modAnimations.c		\
-	modMPX.c
+	Zonk.c
 
 OBJS =	init.o			\
 	file.o			\
 	main.o			\
 	vb_lib.o		\
-	vb_vars.o		\
 				\
 	ASM.o			\
 	BugsTerminals.o		\
 	DDScrollBuffer.o	\
 	DDSpriteBuffer.o	\
-	Demo.o			\
 	Display.o		\
 	DoGameStuff.o		\
 	Electrons.o		\
@@ -70,15 +60,9 @@ OBJS =	init.o			\
 	MainGameLoop.o		\
 	Murphy.o		\
 	OrangeDisk.o		\
-	PathTools.o		\
-	SettingsObject.o	\
 	SnikSnaks.o		\
 	Sound.o			\
-	TickCountObject.o	\
-	TopMost.o		\
-	Zonk.o			\
-	modAnimations.o		\
-	modMPX.o
+	Zonk.o
 
 GAME_SP = game_sp.a
 

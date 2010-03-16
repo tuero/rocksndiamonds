@@ -7,11 +7,12 @@
 
 #include "main_sp.h"
 
+#include "vb_lib.h"
+
 #include "ASM.h"
 #include "BugsTerminals.h"
 #include "DDScrollBuffer.h"
 #include "DDSpriteBuffer.h"
-#include "Demo.h"
 #include "Display.h"
 #include "DoGameStuff.h"
 #include "Electrons.h"
@@ -25,14 +26,8 @@
 #include "MainGameLoop.h"
 #include "Murphy.h"
 #include "OrangeDisk.h"
-#include "PathTools.h"
-#include "SettingsObject.h"
 #include "SnikSnaks.h"
 #include "Sound.h"
-#include "TickCountObject.h"
-#include "TopMost.h"
 #include "Zonk.h"
-#include "modAnimations.h"
-#include "modMPX.h"
 
 #endif /* GAME_SP_GLOBAL_H */

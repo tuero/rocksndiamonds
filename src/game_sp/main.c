@@ -26,7 +26,7 @@ void InitGameEngine_SP()
   game_sp.red_disk_count = 0;
   game_sp.score = 0;
 
-  menBorder.Checked = setup.sp_show_border_elements;
+  menBorder = setup.sp_show_border_elements;
 
   for (x = 0; x < SP_MAX_PLAYFIELD_WIDTH; x++)
   {

@@ -5,37 +5,25 @@
 #ifndef GLOBALS_H
 #define GLOBALS_H
 
-#include "vb_types.h"
-#include "vb_defs.h"
-#include "vb_vars.h"
-#include "vb_lib.h"
-
 #include "global.h"
 
-#if 1
+
+#ifndef False
+#define False				0
+#define True				(!False)
+#endif
+
+#define ScrollDelta			((long)1)
 
 #define ZoomFactor			(2)
-
 #define BaseWidth			(ZoomFactor * 16)
 #define StretchWidth			(ZoomFactor * 16)
-#define StretchWidth2			(StretchWidth / 2)
 #define TwoPixels			(ZoomFactor * 2)
-
-#else
-
-#define BaseWidth			(16)
-#define StretchWidth			(16)
-#define StretchWidth2			(StretchWidth / 2)
-#define TwoPixels			(2)
-
-#endif
 
 
 // ----------------------------------------------------------------------------
 // elements (stored in file and playfield)
 // ----------------------------------------------------------------------------
-
-#if 1
 
 #define fiSpace				(0)
 #define fiZonk				(1)
@@ -86,54 +74,10 @@
 
 #define fiExplosion			(0x1F)
 
-#else
-
-#define fiBase				(2)
-#define fiBug				(25)
-#define fiElectron			(24)
-#define fiExit				(7)
-#define fiExplosion			(0x1F)
-#define fiHWFirst			(28)
-#define fiHWLast			(37)
-#define fiHWMurphy			(43)
-#define fiHWTrash1			(41)
-#define fiHWTrash2			(42)
-#define fiHardWare			(6)
-#define fiInfotron			(4)
-#define fiMurphy			(3)
-#define fiOrangeDisk			(8)
-#define fiPortAllDirections		(23)
-#define fiPortDown			(10)
-#define fiPortLeft			(11)
-#define fiPortLeftAndRight		(22)
-#define fiPortRight			(9)
-#define fiPortUp			(12)
-#define fiPortUpAndDown			(21)
-#define fiRAM				(5)
-#define fiRAMBottom			(39)
-#define fiRAMLeft			(26)
-#define fiRAMRight			(27)
-#define fiRAMTop			(38)
-#define fiRedDisk			(20)
-#define fiSnikSnak			(17)
-#define fiSpPortDown			(14)
-#define fiSpPortLeft			(15)
-#define fiSpPortRight			(13)
-#define fiSpPortUp			(16)
-#define fiSpace				(0)
-#define fiTerminal			(19)
-#define fiWallSpace			(40)
-#define fiYellowDisk			(18)
-#define fiZonk				(1)
-
-#endif
-
 
 // ----------------------------------------------------------------------------
 // graphics and animations (used at runtime to display the elements)
 // ----------------------------------------------------------------------------
-
-#if 1
 
 // graphics and animations directly related to file elements
 
@@ -255,37 +199,6 @@
 #define imgFrameHorizontal		IMG_SP_FRAME_HORIZONTAL
 #define imgFrameVertical		IMG_SP_FRAME_VERTICAL
 
-#else
-
-#define aniMurphySleepLeft		(71)
-#define aniMurphySleepRight		(68)
-#define aniMurphyTouchDown		(47)
-#define aniMurphyTouchLeft		(95)
-#define aniMurphyTouchRight		(94)
-#define aniMurphyTouchUp		(46)
-#define aniMurphyYawn			(56)
-#define aniPushLeft			(45)
-#define aniPushRight			(44)
-#define aniPushUpDown			(79)
-
-#define aniSnikSnakDown			(167)
-#define aniSnikSnakLeft			(239)
-#define aniSnikSnakRight		(247)
-#define aniSnikSnakUp			(159)
-
-#define aniTerminal			(0x80)
-#define aniTerminalActive		(0x88)
-
-#define aniExplosionInfo		(111)
-
-#define posFrameCorner			(55)
-#define posFrameHorizontal		(111)
-#define posFrameVertical		(110)
-
-#endif
-
-
-#if 1
 
 extern int aniFramesBug[], aniFramesZonkRollRight[], aniFramesZonkRollLeft[];
 extern int aniFramesEatInfotronLeft[], aniFramesEatInfotronRight[];
@@ -297,27 +210,11 @@ extern int aniFramesSnikSnak[], aniFramesElectron[], aniFramesExplosion[];
 extern int aniFramesTouchBase[], aniFramesTouchInfotron[], aniFramesTouchRedDisk[];
 extern int aniFramesYellowDisk[], aniFramesOrangeDisk[], aniFramesRedDisk[];
 
-#else
-
-extern int *aniBug, *aniZonkRollRight, *aniZonkRollLeft;
-extern int *aniEatInfotronLeft, *aniEatInfotronRight;
-extern int *aniInfotronRollRight, *aniInfotronRollLeft;
-extern int *aniMurphyEatLeft, *aniMurphyEatRight;
-extern int *aniMurphyEatUpLeft, *aniMurphyEatUpRight, *aniSplitUpDown;
-extern int *aniMurphyExit;
-extern int *aniSnikSnak, *aniElectron, *aniExplosion;
-extern int *aniTouchBase, *aniTouchInfotron, *aniTouchRedDisk;
-extern int *aniYellowDisk, *aniOrangeDisk, *aniRedDisk;
-
-#endif
-
 
 // ----------------------------------------------------------------------------
 // input keys
 // ----------------------------------------------------------------------------
 
-#if 1
-
 #define keyNone				(0)
 #define keyUp				(1)
 #define keyLeft				(2)
@@ -329,19 +226,54 @@ extern int *aniYellowDisk, *aniOrangeDisk, *aniRedDisk;
 #define keySpaceRight			(8)
 #define keySpace			(9)
 
-#else
 
-#define keyDown				(3)
-#define keyLeft				(2)
-#define keyNone				(0)
-#define keyRight			(4)
-#define keySpace			(9)
-#define keySpaceDown			(7)
-#define keySpaceLeft			(6)
-#define keySpaceRight			(8)
-#define keySpaceUp			(5)
-#define keyUp				(1)
+// ----------------------------------------------------------------------------
+// data structures
+// ----------------------------------------------------------------------------
 
+#ifndef HAS_LevelDescriptor
+typedef struct
+{
+  int Width;
+  int Height;
+  long OffSet;
+  long Size;
+} LevelDescriptor;
+#define HAS_LevelDescriptor
+#endif
+
+#ifndef HAS_SpecialPortType
+typedef struct
+{
+  short PortLocation; // = 2*(x+(y*60))
+  byte Gravity; // 1 = turn on, anything else (0) = turn off
+  byte FreezeZonks; // 2 = turn on, anything else (0) = turn off  (1=off!)
+  byte FreezeEnemies; // 1 = turn on, anything else (0) = turn off
+  byte UnUsed;
+} SpecialPortType;
+#define HAS_SpecialPortType
+#endif
+
+#ifndef HAS_LevelInfoType
+typedef struct
+{
+  byte UnUsed[4];
+  byte InitialGravity; // 1=on, anything else (0) = off
+  byte Version; // SpeedFixVersion XOR &H20
+  char LevelTitle[23];
+  byte InitialFreezeZonks; // 2=on, anything else (0) = off.  (1=off too!)
+  byte InfotronsNeeded;
+
+  // Number of Infotrons needed. 0 means that Supaplex will count the total
+  // amount of Infotrons in the level, and use the low byte of that number.
+  // (A multiple of 256 Infotrons will then result in 0-to-eat, etc.!)
+  byte SpecialPortCount; // Maximum 10 allowed!
+  SpecialPortType SpecialPort[10];
+  byte SpeedByte; // = Speed XOR Highbyte(RandomSeed)
+  byte CheckSumByte; // = CheckSum XOR SpeedByte
+  short DemoRandomSeed;
+} LevelInfoType;
+#define HAS_LevelInfoType
 #endif
 
 
@@ -351,7 +283,6 @@ extern int GetStretchY(int si);
 extern int GetX(int si);
 extern int GetY(int si);
 extern void InitGlobals();
-extern void InitPseudoCompileFlags();
 
 extern void ReadLevel();
 
@@ -368,43 +299,14 @@ extern int fiGraphic[];
 extern int aniSnikSnakTurningLeft[];
 extern int aniSnikSnakTurningRight[];
 
-extern boolean Alignments;
-extern boolean BlockingSpeed;
-extern boolean Cracked;
-extern boolean Ctrl_Alt_Fix;
-extern boolean Dead_Code;
-extern boolean DebugSwitch;
-extern boolean DemoRecordFix;
-extern boolean EGA_Arg;
-extern boolean EP_DEBUG;
-extern boolean EP_DEMO;
-extern boolean EP_ENHANCE;
-extern boolean EP_OLD8;
-extern boolean EXTRASPEED;
-extern boolean HP_DEMO;
 extern boolean LevelLoaded;
-extern boolean Level_Arg;
-extern boolean Level_Fix;
-extern boolean Norm_Time;
-extern boolean Original;
-extern boolean Protection;
-extern boolean Record_Fix;
-extern boolean Redundant;
-extern boolean SAVEGAME;
-extern boolean SafeRecord;
-extern boolean ScreenFix;
-extern boolean SpeedKeys;
-extern boolean TIMINGFIX;
-extern boolean Ver62;
-extern boolean Ver62test;
-extern boolean Ver63;
-extern boolean Ver64;
-extern boolean bCapturePane;
-extern byte *DisPlayField;
-extern byte *PlayField8;
-extern char *CurPath, *OrigPath, *TmpPath;
-extern currency DeltaT;
+
+extern boolean DemoAvailable;
+extern boolean menBorder;
+
 extern int *PlayField16;
+extern byte *PlayField8;
+extern byte *DisPlayField;
 
 extern int FieldHeight;
 extern int FieldMax, LevelMax;
@@ -414,8 +316,12 @@ extern int HeaderSize;
 extern int LevelNumber;
 extern int TimerVar;
 extern short RandomSeed;
-extern long DeltaTPlay, DeltaTDemo;
+
 extern long FileMax;
-extern long SignatureDelay;
+
+extern LevelInfoType LInfo;
+extern float Stretch;
+extern int ScrollMinX, ScrollMaxX, ScrollMinY, ScrollMaxY;
+extern int ScrollX, ScrollY;
 
 #endif /* GLOBALS_H */

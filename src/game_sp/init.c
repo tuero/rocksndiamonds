@@ -7,30 +7,13 @@ Bitmap *screenBitmap;
 
 struct EngineSnapshotInfo_SP engine_snapshot_sp;
 
-static void init_struct_functions()
-{
-  Stage.Blt           = &DDScrollBuffer_Blt;
-  Stage.ScrollTo      = &DDScrollBuffer_ScrollTo;
-  Stage.ScrollTowards = &DDScrollBuffer_ScrollTowards;
-  Stage.SoftScrollTo  = &DDScrollBuffer_SoftScrollTo;
-
-  // StretchedSprites.BltEx  = &DDSpriteBuffer_BltEx;
-  StretchedSprites.BltImg = &DDSpriteBuffer_BltImg;
-}
-
 static void init_global_values()
 {
-  menBorder.Checked = False;
-  menPanel.Checked = True;
-  menAutoScroll.Checked = True;
-
-  MainForm.picPane.Width  = picPane.Width  = SCR_FIELDX * TILEX;
-  MainForm.picPane.Height = picPane.Height = SCR_FIELDY * TILEY;
+  menBorder = False;
 }
 
 void sp_open_all()
 {
-  init_struct_functions();
   init_global_values();
 
   Form_Load();
@@ -49,20 +32,12 @@ unsigned int InitEngineRandom_SP(long seed)
 {
   if (seed == NEW_RANDOMIZE)
   {
-#if 0
-  printf("::: init.c: InitEngineRandom_SP(): subRandomize()\n");
-#endif
-
     subRandomize();
 
     seed = (long)RandomSeed;
   }
 
   RandomSeed = (short)seed;
-
-#if 0
-  printf("::: init.c: InitEngineRandom_SP(): RandomSeed == %d\n", RandomSeed);
-#endif
 
   return (unsigned int) seed;
 }
@@ -140,8 +115,6 @@ void SaveEngineSnapshotValues_SP()
   SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(ScratchGravity));
   SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(GravityFlag));
   SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(SnikSnaksElectronsFrozen));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(UpdateTimeFlag));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(UpdatedFlag));
   SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(YellowDisksExploded));
   SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(YawnSleepCounter));
 

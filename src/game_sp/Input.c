@@ -5,9 +5,6 @@
 #include "Input.h"
 
 
-DemoBufferObject DemoBuffer;
-boolean KeyState[255 + 1];
-
 int map_key_RND_to_SP(int key)
 {
   if (key & KEY_BUTTON)

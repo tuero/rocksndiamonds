@@ -5,13 +5,9 @@
 #include "MainGameLoop.h"
 
 
-int GameLoopRunning;
 boolean bPlaying;
 int LeadOutCounter, EnterRepeatCounter;
-int ForcedExitFlag;
 int ExitToMenuFlag;
-int SavedGameFlag;
-boolean UserDragFlag;
 boolean AutoScrollFlag;
 
 
@@ -22,27 +18,11 @@ boolean AutoScrollFlag;
 
 void subMainGameLoop_Init()
 {
-  if (DemoFlag != 0)
-  {
-    // EP set level success byte: demo, not game
-    WasDemoFlag = 1;
-    EP_GameDemoVar0DAA = 0; // demo
-  }
-  else // loc_g_1836:
-  {
-    // EP set level success byte: game, not demo
-    WasDemoFlag = 0;
-    EP_GameDemoVar0DAA = 1; // game
-  }
-
   // This was a bug in the original Supaplex: sometimes red disks could not
   // be released.  This happened if Murphy was killed DURING a red disk release
   // and the next try started.
 
   RedDiskReleasePhase = 0; // (re-)enable red disk release
-  UpdatedFlag = 0;
-  GameLoopRunning = 1;
-  LevelStatus = 0;
 }
 
 void subMainGameLoop_Main(byte action, boolean warp_mode)
@@ -50,15 +30,6 @@ void subMainGameLoop_Main(byte action, boolean warp_mode)
   // ---------------------------------------------------------------------------
   // --------------------- START OF GAME-BUSY LOOP -----------------------------
   // ---------------------------------------------------------------------------
-
-  if (EndFlag)
-  {
-    // (should never happen)
-
-    // printf("::: EndFlag == True\n");
-
-    goto locExitMainGameLoop;
-  }
 
   subProcessKeyboardInput(action);	// check keyboard, act on keys
 
@@ -75,17 +46,8 @@ void subMainGameLoop_Main(byte action, boolean warp_mode)
 
   subCalculateScreenScrollPos();	// calculate screen start addrs
 
-  if ((! UserDragFlag) && AutoScrollFlag)
+  if (AutoScrollFlag)
     ScrollTowards(ScreenScrollXPos, ScreenScrollYPos);
-
-  if (ForcedExitFlag != 0)		// Forced Exit?' yes--exit!
-  {
-    // (should never happen)
-
-    // printf("::: ForcedExitFlag == True\n");
-
-    goto locExitMainGameLoop;
-  }
 
   TimerVar = TimerVar + 1;
 
@@ -118,7 +80,9 @@ void subMainGameLoop_Main(byte action, boolean warp_mode)
   // lead-out done: exit now
   // ---------------------- END OF GAME-BUSY LOOP (including lead-out) ---------
 
+#if 0
 locExitMainGameLoop:
+#endif
 
 #if 1
   printf("::: locExitMainGameLoop reached [%d]\n", LeadOutCounter);
@@ -159,8 +123,8 @@ void subCalculateScreenScrollPos()
   }
 
   {
-    ax = MainForm.picPane.Width / 2;
-    Ay = MainForm.picPane.Height / 2;
+    ax = SXSIZE / 2;
+    Ay = SYSIZE / 2;
   }
 
   ScreenScrollXPos = Stretch * (MurphyScreenXPos + TILEX / 2) - ax;

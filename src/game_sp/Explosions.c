@@ -301,7 +301,7 @@ void subRedDiskReleaseExplosion()
   // !!! causes flicker -- fix in Murphy.c !!!
   GfxGraphic[GetX(si)][GetY(si)] = aniRedDisk;
 #else
-  StretchedSprites.BltImg(X, Y, aniRedDisk, 0);
+  DDSpriteBuffer_BltImg(X, Y, aniRedDisk, 0);
 #endif
   // +++++++++++++++++++++++++++++++++++++++++
 

@@ -248,10 +248,6 @@ void copyInternalEngineVars_SP()
   AnimationSubTable = REDIM_1D(sizeof(byte), 0, LevelMax - 2 * FieldWidth);
   TerminalState = REDIM_1D(sizeof(byte), 0, FieldMax + 1 - 1);
 
-  DemoPointer = FieldMax + 1;
-  DemoOffset = DemoPointer;
-  DemoKeyRepeatCounter = 0;
-
   GravityFlag = LInfo.InitialGravity;
   FreezeZonks = LInfo.InitialFreezeZonks;
 

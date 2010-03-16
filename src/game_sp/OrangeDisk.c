@@ -56,8 +56,8 @@ loc_g_2804: // disk is falling
   dx = HighByte(PlayField16[si]) & 0x7;
   X = GetStretchX(si);
   Y = GetStretchY(si);
-  StretchedSprites.BltImg(X, Y, aniSpace, 0);
-  StretchedSprites.BltImg(X, Y + TwoPixels * (dx + 1), aniOrangeDisk, dx);
+  DDSpriteBuffer_BltImg(X, Y, aniSpace, 0);
+  DDSpriteBuffer_BltImg(X, Y + TwoPixels * (dx + 1), aniOrangeDisk, dx);
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
   bl = HighByte(PlayField16[si]) + 1;
