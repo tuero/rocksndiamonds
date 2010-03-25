@@ -306,6 +306,8 @@ void setSetupInfo(struct TokenInfo *, int, char *);
 char *getSetupValue(int, void *);
 char *getSetupLine(struct TokenInfo *, char *, int);
 
+unsigned int get_hash_from_key(void *);
+
 boolean AdjustGraphicsForEMC();
 
 void LoadLevelInfo(void);

@@ -1906,8 +1906,10 @@
 #define GFX_ARG_ALIGN			43
 #define GFX_ARG_VALIGN			44
 #define GFX_ARG_SORT_PRIORITY		45
+#define GFX_ARG_CLASS			46
+#define GFX_ARG_STYLE			47
 
-#define NUM_GFX_ARGS			46
+#define NUM_GFX_ARGS			48
 
 
 /* values for sound configuration suffixes */
@@ -2696,6 +2698,9 @@ struct GraphicInfo
   int auto_delay;		/* optional setting for drawing title screens */
   int align, valign;		/* optional setting for drawing title screens */
   int sort_priority;		/* optional setting for drawing title screens */
+
+  int class;
+  int style;
 
   boolean use_image_size;	/* use image size as default width and height */
 

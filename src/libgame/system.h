@@ -207,6 +207,13 @@
 
 #define ANIM_DEFAULT		ANIM_LOOP
 
+/* values for special drawing styles (currently only for crumbled graphics) */
+#define STYLE_NONE		0
+#define STYLE_ACCURATE_BORDERS	 (1 << 0)
+#define STYLE_WITH_INNER_CORNERS (1 << 1)
+
+#define STYLE_DEFAULT		STYLE_NONE
+
 /* values for fade mode */
 #define FADE_TYPE_NONE		0
 #define FADE_TYPE_FADE_IN	(1 << 0)

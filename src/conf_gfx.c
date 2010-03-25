@@ -67,6 +67,8 @@ struct ConfigTypeInfo image_config_suffix[] =
   { ".align",				ARG_UNDEFINED,	TYPE_INTEGER	},
   { ".valign",				ARG_UNDEFINED,	TYPE_INTEGER	},
   { ".sort_priority",			ARG_UNDEFINED,	TYPE_INTEGER	},
+  { ".class",				ARG_UNDEFINED,	TYPE_STRING	},
+  { ".style",				ARG_UNDEFINED,	TYPE_STRING	},
 
   { NULL,				NULL,		0		}
 };

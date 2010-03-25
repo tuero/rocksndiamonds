@@ -1642,7 +1642,7 @@ DEFINE_HASHTABLE_REMOVE(remove_hash_entry, char, char);
 #define remove_hash_entry hashtable_remove
 #endif
 
-static unsigned int get_hash_from_key(void *key)
+unsigned int get_hash_from_key(void *key)
 {
   /*
     djb2

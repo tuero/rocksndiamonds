@@ -1306,6 +1306,8 @@ static void set_graphic_parameters_ext(int graphic, int *parameter,
   g->align = ALIGN_CENTER;		/* default for title screens */
   g->valign = VALIGN_MIDDLE;		/* default for title screens */
   g->sort_priority = 0;			/* default for title screens */
+  g->class = 0;
+  g->style = STYLE_DEFAULT;
 
   g->bitmap = src_bitmap;
 
@@ -1506,6 +1508,11 @@ static void set_graphic_parameters_ext(int graphic, int *parameter,
     g->valign = parameter[GFX_ARG_VALIGN];
   if (parameter[GFX_ARG_SORT_PRIORITY] != ARG_UNDEFINED_VALUE)
     g->sort_priority = parameter[GFX_ARG_SORT_PRIORITY];
+
+  if (parameter[GFX_ARG_CLASS] != ARG_UNDEFINED_VALUE)
+    g->class = parameter[GFX_ARG_CLASS];
+  if (parameter[GFX_ARG_STYLE] != ARG_UNDEFINED_VALUE)
+    g->style = parameter[GFX_ARG_STYLE];
 }
 
 static void set_graphic_parameters(int graphic)

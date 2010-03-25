@@ -1969,6 +1969,20 @@ int get_parameter_value(char *value_raw, char *suffix, int type)
     if (string_has_parameter(value, "static_panel"))
       result |= ANIM_STATIC_PANEL;
   }
+  else if (strEqual(suffix, ".class"))
+  {
+    result = get_hash_from_key(value);
+  }
+  else if (strEqual(suffix, ".style"))
+  {
+    result = STYLE_DEFAULT;
+
+    if (string_has_parameter(value, "accurate_borders"))
+      result |= STYLE_ACCURATE_BORDERS;
+
+    if (string_has_parameter(value, "with_inner_corners"))
+      result |= STYLE_WITH_INNER_CORNERS;
+  }
   else if (strEqual(suffix, ".fade_mode"))
   {
     result = (string_has_parameter(value, "none")	? FADE_MODE_NONE :
