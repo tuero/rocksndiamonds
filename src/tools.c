@@ -1442,9 +1442,52 @@ void DrawLevelFieldThruMask(int x, int y)
 			     (e) == EL_QUICKSAND_EMPTYING ||		\
 			     (e) == EL_QUICKSAND_FAST_EMPTYING))
 
-inline static void DrawLevelFieldCrumbledSandExtBlit(int x, int y,
-						     int graphic, int frame,
-						     int dir)
+static void DrawLevelFieldCrumbledSandExtBlitInner(int x, int y, int dx, int dy,
+						   int graphic)
+{
+  Bitmap *src_bitmap;
+  int src_x, src_y;
+  int width, height, cx, cy;
+  int sx = SCREENX(x), sy = SCREENY(y);
+  int crumbled_border_size = graphic_info[graphic].border_size;
+  int i;
+
+  getGraphicSource(graphic, 0, &src_bitmap, &src_x, &src_y);
+
+  for (i = 1; i < 4; i++)
+  {
+    int dxx = (i & 1 ? dx : 0);
+    int dyy = (i & 2 ? dy : 0);
+    int xx = x + dxx;
+    int yy = y + dyy;
+    int element = (IN_LEV_FIELD(xx, yy) ? TILE_GFX_ELEMENT(xx, yy) :
+		   BorderElement);
+
+    /* check if neighbour field is of same crumble type */
+    boolean same = (IS_CRUMBLED_TILE(xx, yy, element) &&
+		    graphic_info[graphic].class ==
+		    graphic_info[el_act2crm(element, ACTION_DEFAULT)].class);
+
+    /* return if check prevents inner corner */
+    if (same == (dxx == dx && dyy == dy))
+      return;
+  }
+
+  /* if we reach this point, we have an inner corner */
+
+  getGraphicSource(graphic, 1, &src_bitmap, &src_x, &src_y);
+
+  width  = crumbled_border_size;
+  height = crumbled_border_size;
+  cx = (dx > 0 ? TILEX - crumbled_border_size : 0);
+  cy = (dy > 0 ? TILEY - crumbled_border_size : 0);
+
+  BlitBitmap(src_bitmap, drawto_field, src_x + cx, src_y + cy,
+	     width, height, FX + sx * TILEX + cx, FY + sy * TILEY + cy);
+}
+
+static void DrawLevelFieldCrumbledSandExtBlit(int x, int y,
+					      int graphic, int frame, int dir)
 {
   Bitmap *src_bitmap;
   int src_x, src_y;
@@ -1457,6 +1500,12 @@ inline static void DrawLevelFieldCrumbledSandExtBlit(int x, int y,
 
   /* draw simple, sloppy, non-corner-accurate crumbled border */
 
+#if 0
+  width  = (dir == 1 || dir == 2 ? crumbled_border_size : TILEX);
+  height = (dir == 0 || dir == 3 ? crumbled_border_size : TILEY);
+  cx = (dir == 2 ? TILEX - crumbled_border_size : 0);
+  cy = (dir == 3 ? TILEY - crumbled_border_size : 0);
+#else
   if (dir == 1 || dir == 2)		/* left or right crumbled border */
   {
     width = crumbled_border_size;
@@ -1471,6 +1520,7 @@ inline static void DrawLevelFieldCrumbledSandExtBlit(int x, int y,
     cx = 0;
     cy = (dir == 3 ? TILEY - crumbled_border_size : 0);
   }
+#endif
 
   BlitBitmap(src_bitmap, drawto_field, src_x + cx, src_y + cy,
 	     width, height, FX + sx * TILEX + cx, FY + sy * TILEY + cy);
@@ -1482,6 +1532,36 @@ inline static void DrawLevelFieldCrumbledSandExtBlit(int x, int y,
 
   /* correct corners of crumbled border, if needed */
 
+#if 0
+  for (i = -1; i <= 1; i+=2)
+  {
+    int xx = x + (dir == 0 || dir == 3 ? i : 0);
+    int yy = y + (dir == 1 || dir == 2 ? i : 0);
+    int element = (IN_LEV_FIELD(xx, yy) ? TILE_GFX_ELEMENT(xx, yy) :
+		   BorderElement);
+
+    /* ... */
+
+    /* check if neighbour field is of same crumble type */
+    if (IS_CRUMBLED_TILE(xx, yy, element) &&
+	graphic_info[graphic].class ==
+	graphic_info[el_act2crm(element, ACTION_DEFAULT)].class)
+    {
+      /* no crumbled corner, but continued crumbled border */
+
+      width  = crumbled_border_size;
+      height = crumbled_border_size;
+      cx = (dir == 2 ? TILEX - crumbled_border_size : 0);
+      cy = (i == 1 ? TILEX - crumbled_border_size : 0);
+      bx = cx;
+      by = (i == 1 ? crumbled_border_size :
+	    TILEY - 2 * crumbled_border_size);
+
+      BlitBitmap(src_bitmap, drawto_field, src_x + bx, src_y + by,
+		 width, height, FX + sx * TILEX + cx, FY + sy * TILEY + cy);
+    }
+  }
+#else
   if (dir == 1 || dir == 2)		/* left or right crumbled border */
   {
     for (i = -1; i <= 1; i+=2)
@@ -1540,6 +1620,7 @@ inline static void DrawLevelFieldCrumbledSandExtBlit(int x, int y,
       }
     }
   }
+#endif
 }
 
 static void DrawLevelFieldCrumbledSandExt(int x, int y, int graphic, int frame)
@@ -1586,6 +1667,18 @@ static void DrawLevelFieldCrumbledSandExt(int x, int y, int graphic, int frame)
 #endif
 
       DrawLevelFieldCrumbledSandExtBlit(x, y, graphic, frame, i);
+    }
+
+    if ((graphic_info[graphic].style & STYLE_WITH_INNER_CORNERS) &&
+	graphic_info[graphic].anim_frames == 2)
+    {
+      for (i = 0; i < 4; i++)
+      {
+	int dx = (i & 1 ? +1 : -1);
+	int dy = (i & 2 ? +1 : -1);
+
+	DrawLevelFieldCrumbledSandExtBlitInner(x, y, dx, dy, graphic);
+      }
     }
 
     MarkTileDirty(sx, sy);
@@ -1679,6 +1772,55 @@ void DrawLevelFieldCrumbledSandNeighbours(int x, int y)
   };
   int i;
 
+#if 0
+  int element = TILE_GFX_ELEMENT(x, y);
+  int graphic = el_act2crm(element, ACTION_DEFAULT);
+
+  if (graphic_info[graphic].style & STYLE_WITH_INNER_CORNERS)
+  {
+    int dx, dy;
+
+    for (dy = -1; dy < 2; dy++)
+    {
+      for (dx = -1; dx < 2; dx++)
+      {
+	if (dx != 0 || dy != 0)
+	{
+	  int xx = x + dx;
+	  int yy = y + dy;
+	  int sxx = sx + dx;
+	  int syy = sy + dy;
+
+	  if (!IN_LEV_FIELD(xx, yy) ||
+	      !IN_SCR_FIELD(sxx, syy) ||
+	      !GFX_CRUMBLED(Feld[xx][yy]) ||
+	      IS_MOVING(xx, yy))
+	    continue;
+
+	  DrawLevelField(xx, yy);
+	}
+      }
+    }
+  }
+  else
+  {
+    for (i = 0; i < 4; i++)
+    {
+      int xx = x + xy[i][0];
+      int yy = y + xy[i][1];
+      int sxx = sx + xy[i][0];
+      int syy = sy + xy[i][1];
+
+      if (!IN_LEV_FIELD(xx, yy) ||
+	  !IN_SCR_FIELD(sxx, syy) ||
+	  !GFX_CRUMBLED(Feld[xx][yy]) ||
+	  IS_MOVING(xx, yy))
+	continue;
+
+      DrawLevelField(xx, yy);
+    }
+  }
+#else
   for (i = 0; i < 4; i++)
   {
     int xx = x + xy[i][0];
@@ -1694,6 +1836,7 @@ void DrawLevelFieldCrumbledSandNeighbours(int x, int y)
 
     DrawLevelField(xx, yy);
   }
+#endif
 }
 
 static int getBorderElement(int x, int y)
