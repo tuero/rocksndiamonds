@@ -72,19 +72,19 @@
 #if USE_DELAYED_GFX_REDRAW
 #define TEST_DrawLevelField(x, y)				\
 	GfxRedraw[x][y] |= GFX_REDRAW_TILE
-#define TEST_DrawLevelFieldCrumbledSand(x, y)			\
+#define TEST_DrawLevelFieldCrumbled(x, y)			\
 	GfxRedraw[x][y] |= GFX_REDRAW_TILE_CRUMBLED
-#define TEST_DrawLevelFieldCrumbledSandNeighbours(x, y)		\
+#define TEST_DrawLevelFieldCrumbledNeighbours(x, y)		\
 	GfxRedraw[x][y] |= GFX_REDRAW_TILE_CRUMBLED_NEIGHBOURS
 #define TEST_DrawTwinkleOnField(x, y)				\
 	GfxRedraw[x][y] |= GFX_REDRAW_TILE_TWINKLED
 #else
 #define TEST_DrawLevelField(x, y)				\
 	     DrawLevelField(x, y)
-#define TEST_DrawLevelFieldCrumbledSand(x, y)			\
-	     DrawLevelFieldCrumbledSand(x, y)
-#define TEST_DrawLevelFieldCrumbledSandNeighbours(x, y)		\
-	     DrawLevelFieldCrumbledSandNeighbours(x, y)
+#define TEST_DrawLevelFieldCrumbled(x, y)			\
+	     DrawLevelFieldCrumbled(x, y)
+#define TEST_DrawLevelFieldCrumbledNeighbours(x, y)		\
+	     DrawLevelFieldCrumbledNeighbours(x, y)
 #define TEST_DrawTwinkleOnField(x, y)				\
 	     DrawTwinkleOnField(x, y)
 #endif
@@ -6150,7 +6150,7 @@ void Explode(int ex, int ey, int phase, int mode)
     TestIfElementTouchesCustomElement(x, y);
 
     if (GFX_CRUMBLED(element))
-      TEST_DrawLevelFieldCrumbledSandNeighbours(x, y);
+      TEST_DrawLevelFieldCrumbledNeighbours(x, y);
 
     if (IS_PLAYER(x, y) && !PLAYERINFO(x, y)->present)
       StorePlayer[x][y] = 0;
@@ -6164,7 +6164,7 @@ void Explode(int ex, int ey, int phase, int mode)
     int frame = getGraphicAnimationFrame(graphic, GfxFrame[x][y]);
 
     if (phase == delay)
-      TEST_DrawLevelFieldCrumbledSand(x, y);
+      TEST_DrawLevelFieldCrumbled(x, y);
 
     if (IS_WALKABLE_OVER(Back[x][y]) && Back[x][y] != EL_EMPTY)
     {
@@ -6622,7 +6622,7 @@ static void RedrawAllLightSwitchesAndInvisibleElements()
 
       /* uncrumble neighbour fields, if needed */
       if (element == EL_INVISIBLE_SAND)
-	TEST_DrawLevelFieldCrumbledSandNeighbours(x, y);
+	TEST_DrawLevelFieldCrumbledNeighbours(x, y);
     }
     else if (element == EL_INVISIBLE_STEELWALL_ACTIVE ||
 	     element == EL_INVISIBLE_WALL_ACTIVE ||
@@ -6635,7 +6635,7 @@ static void RedrawAllLightSwitchesAndInvisibleElements()
 
       /* re-crumble neighbour fields, if needed */
       if (element == EL_INVISIBLE_SAND)
-	TEST_DrawLevelFieldCrumbledSandNeighbours(x, y);
+	TEST_DrawLevelFieldCrumbledNeighbours(x, y);
     }
   }
 }
@@ -6671,7 +6671,7 @@ static void RedrawAllInvisibleElementsForLenses()
 
       /* uncrumble neighbour fields, if needed */
       if (element == EL_INVISIBLE_SAND)
-	TEST_DrawLevelFieldCrumbledSandNeighbours(x, y);
+	TEST_DrawLevelFieldCrumbledNeighbours(x, y);
     }
     else if (element == EL_INVISIBLE_STEELWALL_ACTIVE ||
 	     element == EL_INVISIBLE_WALL_ACTIVE ||
@@ -6684,7 +6684,7 @@ static void RedrawAllInvisibleElementsForLenses()
 
       /* re-crumble neighbour fields, if needed */
       if (element == EL_INVISIBLE_SAND)
-	TEST_DrawLevelFieldCrumbledSandNeighbours(x, y);
+	TEST_DrawLevelFieldCrumbledNeighbours(x, y);
     }
   }
 }
@@ -8501,7 +8501,7 @@ void StartMoving(int x, int y)
 
 	    if (IN_SCR_FIELD(sx, sy))
 	    {
-	      TEST_DrawLevelFieldCrumbledSand(xx, yy);
+	      TEST_DrawLevelFieldCrumbled(xx, yy);
 	      DrawGraphic(sx, sy, flame_graphic, frame);
 	    }
 	  }
@@ -9004,7 +9004,7 @@ void ContinueMoving(int x, int y)
   {
     Feld[x][y] = EL_SAND;
 
-    TEST_DrawLevelFieldCrumbledSandNeighbours(x, y);
+    TEST_DrawLevelFieldCrumbledNeighbours(x, y);
   }
   else if (element == EL_QUICKSAND_FILLING)
   {
@@ -9171,7 +9171,7 @@ void ContinueMoving(int x, int y)
     InitField(x, y, FALSE);
 
     if (GFX_CRUMBLED(Feld[x][y]))
-      TEST_DrawLevelFieldCrumbledSandNeighbours(x, y);
+      TEST_DrawLevelFieldCrumbledNeighbours(x, y);
 
     if (ELEM_IS_PLAYER(move_leave_element))
       RelocatePlayer(x, y, move_leave_element);
@@ -10365,7 +10365,7 @@ static void ChangeActiveTrap(int x, int y)
 
   /* if new animation frame was drawn, correct crumbled sand border */
   if (IS_NEW_FRAME(GfxFrame[x][y], graphic))
-    TEST_DrawLevelFieldCrumbledSand(x, y);
+    TEST_DrawLevelFieldCrumbled(x, y);
 }
 
 static int getSpecialActionElement(int element, int number, int base_element)
@@ -11101,7 +11101,7 @@ static void CreateFieldExt(int x, int y, int element, boolean is_change)
     TEST_DrawLevelField(x, y);
 
     if (GFX_CRUMBLED(new_element))
-      TEST_DrawLevelFieldCrumbledSandNeighbours(x, y);
+      TEST_DrawLevelFieldCrumbledNeighbours(x, y);
   }
 
 #if 1
@@ -13170,10 +13170,10 @@ void GameActions_RND()
 	DrawLevelField(x, y);
 
       if (GfxRedraw[x][y] & GFX_REDRAW_TILE_CRUMBLED)
-	DrawLevelFieldCrumbledSand(x, y);
+	DrawLevelFieldCrumbled(x, y);
 
       if (GfxRedraw[x][y] & GFX_REDRAW_TILE_CRUMBLED_NEIGHBOURS)
-	DrawLevelFieldCrumbledSandNeighbours(x, y);
+	DrawLevelFieldCrumbledNeighbours(x, y);
 
       if (GfxRedraw[x][y] & GFX_REDRAW_TILE_TWINKLED)
 	DrawTwinkleOnField(x, y);

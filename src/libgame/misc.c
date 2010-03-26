@@ -1980,8 +1980,8 @@ int get_parameter_value(char *value_raw, char *suffix, int type)
     if (string_has_parameter(value, "accurate_borders"))
       result |= STYLE_ACCURATE_BORDERS;
 
-    if (string_has_parameter(value, "with_inner_corners"))
-      result |= STYLE_WITH_INNER_CORNERS;
+    if (string_has_parameter(value, "inner_corners"))
+      result |= STYLE_INNER_CORNERS;
   }
   else if (strEqual(suffix, ".fade_mode"))
   {

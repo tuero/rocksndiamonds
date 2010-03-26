@@ -209,8 +209,8 @@
 
 /* values for special drawing styles (currently only for crumbled graphics) */
 #define STYLE_NONE		0
-#define STYLE_ACCURATE_BORDERS	 (1 << 0)
-#define STYLE_WITH_INNER_CORNERS (1 << 1)
+#define STYLE_ACCURATE_BORDERS	(1 << 0)
+#define STYLE_INNER_CORNERS	(1 << 1)
 
 #define STYLE_DEFAULT		STYLE_NONE
 

@@ -1442,8 +1442,8 @@ void DrawLevelFieldThruMask(int x, int y)
 			     (e) == EL_QUICKSAND_EMPTYING ||		\
 			     (e) == EL_QUICKSAND_FAST_EMPTYING))
 
-static void DrawLevelFieldCrumbledSandExtBlitInner(int x, int y, int dx, int dy,
-						   int graphic)
+static void DrawLevelFieldCrumbledInnerCorners(int x, int y, int dx, int dy,
+					       int graphic)
 {
   Bitmap *src_bitmap;
   int src_x, src_y;
@@ -1486,8 +1486,8 @@ static void DrawLevelFieldCrumbledSandExtBlitInner(int x, int y, int dx, int dy,
 	     width, height, FX + sx * TILEX + cx, FY + sy * TILEY + cy);
 }
 
-static void DrawLevelFieldCrumbledSandExtBlit(int x, int y,
-					      int graphic, int frame, int dir)
+static void DrawLevelFieldCrumbledBorders(int x, int y, int graphic, int frame,
+					  int dir)
 {
   Bitmap *src_bitmap;
   int src_x, src_y;
@@ -1500,7 +1500,7 @@ static void DrawLevelFieldCrumbledSandExtBlit(int x, int y,
 
   /* draw simple, sloppy, non-corner-accurate crumbled border */
 
-#if 0
+#if 1
   width  = (dir == 1 || dir == 2 ? crumbled_border_size : TILEX);
   height = (dir == 0 || dir == 3 ? crumbled_border_size : TILEY);
   cx = (dir == 2 ? TILEX - crumbled_border_size : 0);
@@ -1532,15 +1532,13 @@ static void DrawLevelFieldCrumbledSandExtBlit(int x, int y,
 
   /* correct corners of crumbled border, if needed */
 
-#if 0
+#if 1
   for (i = -1; i <= 1; i+=2)
   {
     int xx = x + (dir == 0 || dir == 3 ? i : 0);
     int yy = y + (dir == 1 || dir == 2 ? i : 0);
     int element = (IN_LEV_FIELD(xx, yy) ? TILE_GFX_ELEMENT(xx, yy) :
 		   BorderElement);
-
-    /* ... */
 
     /* check if neighbour field is of same crumble type */
     if (IS_CRUMBLED_TILE(xx, yy, element) &&
@@ -1549,13 +1547,28 @@ static void DrawLevelFieldCrumbledSandExtBlit(int x, int y,
     {
       /* no crumbled corner, but continued crumbled border */
 
+      int c1 = (dir == 2 || dir == 3 ? TILESIZE - crumbled_border_size : 0);
+      int c2 = (i == 1 ? TILESIZE - crumbled_border_size : 0);
+      int b1 = (i == 1 ? crumbled_border_size :
+		TILESIZE - 2 * crumbled_border_size);
+
       width  = crumbled_border_size;
       height = crumbled_border_size;
-      cx = (dir == 2 ? TILEX - crumbled_border_size : 0);
-      cy = (i == 1 ? TILEX - crumbled_border_size : 0);
-      bx = cx;
-      by = (i == 1 ? crumbled_border_size :
-	    TILEY - 2 * crumbled_border_size);
+
+      if (dir == 1 || dir == 2)
+      {
+	cx = c1;
+	cy = c2;
+	bx = cx;
+	by = b1;
+      }
+      else
+      {
+	cx = c2;
+	cy = c1;
+	bx = b1;
+	by = cy;
+      }
 
       BlitBitmap(src_bitmap, drawto_field, src_x + bx, src_y + by,
 		 width, height, FX + sx * TILEX + cx, FY + sy * TILEY + cy);
@@ -1581,7 +1594,7 @@ static void DrawLevelFieldCrumbledSandExtBlit(int x, int y,
 	width  = crumbled_border_size;
 	height = crumbled_border_size;
 	cx = (dir == 2 ? TILEX - crumbled_border_size : 0);
-	cy = (i == 1 ? TILEX - crumbled_border_size : 0);
+	cy = (i == 1 ? TILEY - crumbled_border_size : 0);
 	bx = cx;
 	by = (i == 1 ? crumbled_border_size :
 	      TILEY - 2 * crumbled_border_size);
@@ -1612,7 +1625,7 @@ static void DrawLevelFieldCrumbledSandExtBlit(int x, int y,
 	cx = (i == 1 ? TILEX - crumbled_border_size : 0);
 	cy = (dir == 3 ? TILEY - crumbled_border_size : 0);
 	bx = (i == 1 ? crumbled_border_size :
-	      TILEY - 2 * crumbled_border_size);
+	      TILEX - 2 * crumbled_border_size);
 	by = cy;
 
 	BlitBitmap(src_bitmap, drawto_field, src_x + bx, src_y + by,
@@ -1623,7 +1636,7 @@ static void DrawLevelFieldCrumbledSandExtBlit(int x, int y,
 #endif
 }
 
-static void DrawLevelFieldCrumbledSandExt(int x, int y, int graphic, int frame)
+static void DrawLevelFieldCrumbledExt(int x, int y, int graphic, int frame)
 {
   int sx = SCREENX(x), sy = SCREENY(y);
   int element;
@@ -1666,10 +1679,10 @@ static void DrawLevelFieldCrumbledSandExt(int x, int y, int graphic, int frame)
 	continue;
 #endif
 
-      DrawLevelFieldCrumbledSandExtBlit(x, y, graphic, frame, i);
+      DrawLevelFieldCrumbledBorders(x, y, graphic, frame, i);
     }
 
-    if ((graphic_info[graphic].style & STYLE_WITH_INNER_CORNERS) &&
+    if ((graphic_info[graphic].style & STYLE_INNER_CORNERS) &&
 	graphic_info[graphic].anim_frames == 2)
     {
       for (i = 0; i < 4; i++)
@@ -1677,7 +1690,7 @@ static void DrawLevelFieldCrumbledSandExt(int x, int y, int graphic, int frame)
 	int dx = (i & 1 ? +1 : -1);
 	int dy = (i & 2 ? +1 : -1);
 
-	DrawLevelFieldCrumbledSandExtBlitInner(x, y, dx, dy, graphic);
+	DrawLevelFieldCrumbledInnerCorners(x, y, dx, dy, graphic);
       }
     }
 
@@ -1706,14 +1719,14 @@ static void DrawLevelFieldCrumbledSandExt(int x, int y, int graphic, int frame)
 
       graphic = el_act2crm(element, ACTION_DEFAULT);
 
-      DrawLevelFieldCrumbledSandExtBlit(xx, yy, graphic, 0, 3 - i);
+      DrawLevelFieldCrumbledBorders(xx, yy, graphic, 0, 3 - i);
 
       MarkTileDirty(sxx, syy);
     }
   }
 }
 
-void DrawLevelFieldCrumbledSand(int x, int y)
+void DrawLevelFieldCrumbled(int x, int y)
 {
   int graphic;
 
@@ -1732,7 +1745,7 @@ void DrawLevelFieldCrumbledSand(int x, int y)
       GfxElement[x][y] != EL_UNDEFINED &&
       GFX_CRUMBLED(GfxElement[x][y]))
   {
-    DrawLevelFieldCrumbledSandDigging(x, y, GfxDir[x][y], GfxFrame[x][y]);
+    DrawLevelFieldCrumbledDigging(x, y, GfxDir[x][y], GfxFrame[x][y]);
 
     return;
   }
@@ -1744,11 +1757,11 @@ void DrawLevelFieldCrumbledSand(int x, int y)
   graphic = el_act2crm(Feld[x][y], ACTION_DEFAULT);
 #endif
 
-  DrawLevelFieldCrumbledSandExt(x, y, graphic, 0);
+  DrawLevelFieldCrumbledExt(x, y, graphic, 0);
 }
 
-void DrawLevelFieldCrumbledSandDigging(int x, int y, int direction,
-				       int step_frame)
+void DrawLevelFieldCrumbledDigging(int x, int y, int direction,
+				   int step_frame)
 {
   int graphic1 = el_act_dir2img(GfxElement[x][y], ACTION_DIGGING, direction);
   int graphic2 = el_act_dir2crm(GfxElement[x][y], ACTION_DIGGING, direction);
@@ -1757,10 +1770,10 @@ void DrawLevelFieldCrumbledSandDigging(int x, int y, int direction,
   int sx = SCREENX(x), sy = SCREENY(y);
 
   DrawGraphic(sx, sy, graphic1, frame1);
-  DrawLevelFieldCrumbledSandExt(x, y, graphic2, frame2);
+  DrawLevelFieldCrumbledExt(x, y, graphic2, frame2);
 }
 
-void DrawLevelFieldCrumbledSandNeighbours(int x, int y)
+void DrawLevelFieldCrumbledNeighbours(int x, int y)
 {
   int sx = SCREENX(x), sy = SCREENY(y);
   static int xy[4][2] =
@@ -1772,55 +1785,6 @@ void DrawLevelFieldCrumbledSandNeighbours(int x, int y)
   };
   int i;
 
-#if 0
-  int element = TILE_GFX_ELEMENT(x, y);
-  int graphic = el_act2crm(element, ACTION_DEFAULT);
-
-  if (graphic_info[graphic].style & STYLE_WITH_INNER_CORNERS)
-  {
-    int dx, dy;
-
-    for (dy = -1; dy < 2; dy++)
-    {
-      for (dx = -1; dx < 2; dx++)
-      {
-	if (dx != 0 || dy != 0)
-	{
-	  int xx = x + dx;
-	  int yy = y + dy;
-	  int sxx = sx + dx;
-	  int syy = sy + dy;
-
-	  if (!IN_LEV_FIELD(xx, yy) ||
-	      !IN_SCR_FIELD(sxx, syy) ||
-	      !GFX_CRUMBLED(Feld[xx][yy]) ||
-	      IS_MOVING(xx, yy))
-	    continue;
-
-	  DrawLevelField(xx, yy);
-	}
-      }
-    }
-  }
-  else
-  {
-    for (i = 0; i < 4; i++)
-    {
-      int xx = x + xy[i][0];
-      int yy = y + xy[i][1];
-      int sxx = sx + xy[i][0];
-      int syy = sy + xy[i][1];
-
-      if (!IN_LEV_FIELD(xx, yy) ||
-	  !IN_SCR_FIELD(sxx, syy) ||
-	  !GFX_CRUMBLED(Feld[xx][yy]) ||
-	  IS_MOVING(xx, yy))
-	continue;
-
-      DrawLevelField(xx, yy);
-    }
-  }
-#else
   for (i = 0; i < 4; i++)
   {
     int xx = x + xy[i][0];
@@ -1836,7 +1800,6 @@ void DrawLevelFieldCrumbledSandNeighbours(int x, int y)
 
     DrawLevelField(xx, yy);
   }
-#endif
 }
 
 static int getBorderElement(int x, int y)
@@ -1865,7 +1828,7 @@ static int getBorderElement(int x, int y)
 void DrawScreenElement(int x, int y, int element)
 {
   DrawScreenElementExt(x, y, 0, 0, element, NO_CUTTING, NO_MASKING);
-  DrawLevelFieldCrumbledSand(LEVELX(x), LEVELY(y));
+  DrawLevelFieldCrumbled(LEVELX(x), LEVELY(y));
 }
 
 void DrawLevelElement(int x, int y, int element)
@@ -2599,10 +2562,10 @@ inline void DrawLevelGraphicAnimationIfNeeded(int x, int y, int graphic)
 
 #if 1
   if (GFX_CRUMBLED(TILE_GFX_ELEMENT(x, y)))
-    DrawLevelFieldCrumbledSand(x, y);
+    DrawLevelFieldCrumbled(x, y);
 #else
   if (GFX_CRUMBLED(Feld[x][y]))
-    DrawLevelFieldCrumbledSand(x, y);
+    DrawLevelFieldCrumbled(x, y);
 #endif
 }
 
@@ -2622,7 +2585,7 @@ void DrawLevelElementAnimationIfNeeded(int x, int y, int element)
   DrawGraphicAnimation(sx, sy, graphic);
 
   if (GFX_CRUMBLED(element))
-    DrawLevelFieldCrumbledSand(x, y);
+    DrawLevelFieldCrumbled(x, y);
 }
 
 static int getPlayerGraphic(struct PlayerInfo *player, int move_dir)
@@ -2794,7 +2757,7 @@ void DrawPlayer(struct PlayerInfo *player)
       int frame = getGraphicAnimationFrame(old_graphic, player->StepFrame);
 
       if (GFX_CRUMBLED(old_element))
-	DrawLevelFieldCrumbledSandDigging(jx, jy, move_dir, player->StepFrame);
+	DrawLevelFieldCrumbledDigging(jx, jy, move_dir, player->StepFrame);
       else
 	DrawGraphic(sx, sy, old_graphic, frame);
 

@@ -1,3 +1,18 @@
+2010-03-26
+	* added image config suffix ".class" to be able to define classes of
+	  crumbled elements which are then separated against each others when
+	  drawing crumbled borders (class names can freely be defined)
+	* added image config suffix ".style" to use two new features for
+	  crumbled graphics:
+	  - "accurate_borders": try to draw correctly crumbled corners
+	  - "inner_corners": also draw inner corners -- this is a big kludge:
+	    number of frames for crumbled graphic must be "2", with the first
+	    frame as usual (crumbled graphic), while the second frame contains
+	    the inner corners for the crumbled graphic
+	  (These two features are mainly intended for bevelled walls, not for
+	  diggable elements like sand; "inner_corners" only reliably works for
+	  static walls, not for dynamically changing walls using CEs.)
+
 2010-03-16
 	* continued code cleanup of native Supaplex game engine
 
