@@ -412,6 +412,19 @@ char *getSolutionTapeFilename(int nr)
   sprintf(basename, "%03d.%s", nr, TAPEFILE_EXTENSION);
   filename = getPath2(getSolutionTapeDir(), basename);
 
+  if (!fileExists(filename))
+  {
+    static char *filename_sln = NULL;
+
+    checked_free(filename_sln);
+
+    sprintf(basename, "%03d.sln", nr);
+    filename_sln = getPath2(getSolutionTapeDir(), basename);
+
+    if (fileExists(filename_sln))
+      return filename_sln;
+  }
+
   return filename;
 }
 

@@ -8452,6 +8452,79 @@ static int LoadTape_BODY(FILE *file, int chunk_size, struct TapeInfo *tape)
   return chunk_size;
 }
 
+void LoadTape_SokobanSolution(char *filename)
+{
+  FILE *file;
+  int move_delay = TILESIZE / level.initial_player_stepsize[0];
+
+  if (!(file = fopen(filename, MODE_READ)))
+  {
+    tape.no_valid_file = TRUE;
+
+    return;
+  }
+
+  while (!feof(file))
+  {
+    unsigned char c = fgetc(file);
+
+    if (feof(file))
+      break;
+
+    switch (c)
+    {
+      case 'u':
+      case 'U':
+	tape.pos[tape.length].action[0] = MV_UP;
+	tape.pos[tape.length].delay = move_delay + (c < 'a' ? 2 : 0);
+	tape.length++;
+	break;
+
+      case 'd':
+      case 'D':
+	tape.pos[tape.length].action[0] = MV_DOWN;
+	tape.pos[tape.length].delay = move_delay + (c < 'a' ? 2 : 0);
+	tape.length++;
+	break;
+
+      case 'l':
+      case 'L':
+	tape.pos[tape.length].action[0] = MV_LEFT;
+	tape.pos[tape.length].delay = move_delay + (c < 'a' ? 2 : 0);
+	tape.length++;
+	break;
+
+      case 'r':
+      case 'R':
+	tape.pos[tape.length].action[0] = MV_RIGHT;
+	tape.pos[tape.length].delay = move_delay + (c < 'a' ? 2 : 0);
+	tape.length++;
+	break;
+
+      case '\n':
+      case '\r':
+      case '\t':
+      case ' ':
+	/* ignore white-space characters */
+	break;
+
+      default:
+	tape.no_valid_file = TRUE;
+
+	Error(ERR_WARN, "unsupported Sokoban solution file '%s' ['%d']", filename, c);
+
+	break;
+    }
+  }
+
+  fclose(file);
+
+  if (tape.no_valid_file)
+    return;
+
+  tape.length_seconds = GetTapeLength();
+}
+
 void LoadTapeFromFilename(char *filename)
 {
   char cookie[MAX_LINE_LEN];
@@ -8461,6 +8534,13 @@ void LoadTapeFromFilename(char *filename)
 
   /* always start with reliable default values */
   setTapeInfoToDefaults();
+
+  if (strSuffix(filename, ".sln"))
+  {
+    LoadTape_SokobanSolution(filename);
+
+    return;
+  }
 
   if (!(file = fopen(filename, MODE_READ)))
   {
@@ -8506,6 +8586,7 @@ void LoadTapeFromFilename(char *filename)
 
       Error(ERR_WARN, "unsupported version of tape file '%s'", filename);
       fclose(file);
+
       return;
     }
 
