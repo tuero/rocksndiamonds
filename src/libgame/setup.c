@@ -2603,7 +2603,11 @@ static void setTreeInfoToDefaultsFromParent(TreeInfo *ti, TreeInfo *parent)
     ti->last_level = 0;
     ti->level_group = FALSE;
     ti->handicap_level = 0;
+#if 1
+    ti->readonly = parent->readonly;
+#else
     ti->readonly = TRUE;
+#endif
     ti->handicap = TRUE;
     ti->skip_levels = FALSE;
   }
@@ -3136,6 +3140,12 @@ static boolean LoadLevelInfoFromLevelConf(TreeInfo **node_first,
 
   leveldir_new->in_user_dir =
     (!strEqual(leveldir_new->basepath, options.level_directory));
+
+#if 0
+  printf("::: '%s' -> %d\n",
+	 leveldir_new->identifier,
+	 leveldir_new->in_user_dir);
+#endif
 
   /* adjust some settings if user's private level directory was detected */
   if (leveldir_new->sort_priority == LEVELCLASS_UNDEFINED &&

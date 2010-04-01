@@ -2937,6 +2937,38 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.time_ss.sort_priority
   },
   {
+    "game.panel.frame.x",
+    &game.panel.frame.x
+  },
+  {
+    "game.panel.frame.y",
+    &game.panel.frame.y
+  },
+  {
+    "game.panel.frame.align",
+    &game.panel.frame.align
+  },
+  {
+    "game.panel.frame.valign",
+    &game.panel.frame.valign
+  },
+  {
+    "game.panel.frame.digits",
+    &game.panel.frame.size
+  },
+  {
+    "game.panel.frame.font",
+    &game.panel.frame.font
+  },
+  {
+    "game.panel.frame.draw_masked",
+    &game.panel.frame.draw_masked
+  },
+  {
+    "game.panel.frame.draw_order",
+    &game.panel.frame.sort_priority
+  },
+  {
     "game.panel.shield_normal.x",
     &game.panel.shield_normal.x
   },

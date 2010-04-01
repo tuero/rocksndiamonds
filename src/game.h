@@ -47,6 +47,7 @@ struct GamePanelInfo
   struct TextPosInfo time_hh;
   struct TextPosInfo time_mm;
   struct TextPosInfo time_ss;
+  struct TextPosInfo frame;
   struct TextPosInfo shield_normal;
   struct TextPosInfo shield_normal_time;
   struct TextPosInfo shield_deadly;

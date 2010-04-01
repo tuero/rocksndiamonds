@@ -39,7 +39,7 @@
 #define CONFIG_TOKEN_GLOBAL_BUSY		"global.busy"
 
 #define DEBUG_PRINT_INIT_TIMESTAMPS		TRUE
-#define DEBUG_PRINT_INIT_TIMESTAMPS_DEPTH	1
+#define DEBUG_PRINT_INIT_TIMESTAMPS_DEPTH	10
 
 
 static struct FontBitmapInfo font_initial[NUM_INITIAL_FONTS];
@@ -6171,7 +6171,13 @@ void OpenAll()
 
   game_status = GAME_MODE_LOADING;
 
+#if 1
+  InitCounter();
+#endif
+
   InitGlobal();			/* initialize some global variables */
+
+  print_timestamp_time("[init global stuff]");
 
   if (options.execute_command)
     Execute_Command(options.execute_command);
@@ -6195,25 +6201,29 @@ void OpenAll()
   InitArtworkConfig();		/* needed before forking sound child process */
   InitMixer();
 
+#if 0
   InitCounter();
+#endif
 
   InitRND(NEW_RANDOMIZE);
   InitSimpleRandom(NEW_RANDOMIZE);
 
   InitJoysticks();
 
-  print_timestamp_time("[pre-video]");
+  print_timestamp_time("[init setup/config stuff]");
 
   InitVideoDisplay();
   InitVideoBuffer(WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH, setup.fullscreen);
 
   InitEventFilter(FilterMouseMotionEvents);
 
+  print_timestamp_time("[init video stuff]");
+
   InitElementPropertiesStatic();
   InitElementPropertiesEngine(GAME_VERSION_ACTUAL);
   InitElementPropertiesGfxElement();
 
-  print_timestamp_time("[post-video]");
+  print_timestamp_time("[init element properties stuff]");
 
   InitGfx();
 

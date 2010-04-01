@@ -182,6 +182,46 @@ END_OF_FUNCTION(increment_counter);
 /* maximal allowed length of a command line option */
 #define MAX_OPTION_LEN		256
 
+#if 1
+
+#ifdef TARGET_SDL
+static unsigned long getCurrentMS()
+{
+  return SDL_GetTicks();
+}
+
+#else /* !TARGET_SDL */
+
+#if defined(PLATFORM_UNIX)
+static unsigned long getCurrentMS()
+{
+  struct timeval current_time;
+
+  gettimeofday(&current_time, NULL);
+
+  return current_time.tv_sec * 1000 + current_time.tv_usec / 1000;
+}
+#endif /* PLATFORM_UNIX */
+#endif /* !TARGET_SDL */
+
+static unsigned long mainCounter(int mode)
+{
+  static unsigned long base_ms = 0;
+  unsigned long current_ms;
+
+  /* get current system milliseconds */
+  current_ms = getCurrentMS();
+
+  /* reset base timestamp in case of counter reset or wrap-around */
+  if (mode == INIT_COUNTER || current_ms < base_ms)
+    base_ms = current_ms;
+
+  /* return milliseconds since last counter reset */
+  return current_ms - base_ms;
+}
+
+#else
+
 #ifdef TARGET_SDL
 static unsigned long mainCounter(int mode)
 {
@@ -222,6 +262,8 @@ static unsigned long mainCounter(int mode)
 }
 #endif /* PLATFORM_UNIX */
 #endif /* !TARGET_SDL */
+
+#endif
 
 void InitCounter()		/* set counter back to zero */
 {

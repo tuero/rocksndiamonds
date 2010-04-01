@@ -5842,6 +5842,15 @@ struct ConfigInfo image_config[] =
   { "game.panel.time_ss.draw_masked",		"true"			},
   { "game.panel.time_ss.draw_order",		"0"			},
 
+  { "game.panel.frame.x",			"-1"			},
+  { "game.panel.frame.y",			"-1"			},
+  { "game.panel.frame.align",			"left"			},
+  { "game.panel.frame.valign",			"top"			},
+  { "game.panel.frame.digits",			"-1"			},
+  { "game.panel.frame.font",			"font.text_2"		},
+  { "game.panel.frame.draw_masked",		"true"			},
+  { "game.panel.frame.draw_order",		"0"			},
+
   { "game.panel.shield_normal.x",		"-1"			},
   { "game.panel.shield_normal.y",		"-1"			},
   { "game.panel.shield_normal.tile_size",	"16"			},
