@@ -1,3 +1,6 @@
+2010-04-02
+	* added initial, experimental support for different screen sizes
+
 2010-03-27
 	* added support for native Sokoban solution files in pure 'udlrUDLR'
 	  format with extension ".sln" instead of ".tape" for solution tapes
@@ -25,10 +28,7 @@
 	  static walls, not for in-game dynamically changing walls using CEs.)
 
 2010-03-16
-	* continued code cleanup of native Supaplex game engine
-
-2010-03-15
-	* continued code cleanup of native Supaplex game engine
+	* finished code cleanup of native Supaplex game engine
 
 2010-03-14
 	* started code cleanup of native Supaplex game engine

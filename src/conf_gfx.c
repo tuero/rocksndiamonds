@@ -6406,5 +6406,8 @@ struct ConfigInfo image_config[] =
   { "[player].sleeping_delay_fixed",		"2000"			},
   { "[player].sleeping_delay_random",		"2000"			},
 
+  { "global.screen.width",			"672"			},
+  { "global.screen.height",			"560"			},
+
   { NULL,					NULL			}
 };

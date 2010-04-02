@@ -43,8 +43,10 @@
 #define SND_UNDEFINED			(-1)
 #define MUS_UNDEFINED			(-1)
 
+#if 0
 #define WIN_XSIZE			672
 #define WIN_YSIZE			560
+#endif
 
 #define DEFAULT_FULLSCREEN_MODE		"800x600"
 
@@ -2446,6 +2448,8 @@ struct GlobalInfo
   int fading_status;
   int fading_type;
 #endif
+
+  struct Rect screen;
 };
 
 struct ElementChangeInfo
@@ -2843,6 +2847,8 @@ extern int			ActiveFont[NUM_FONTS];
 extern int			lev_fieldx, lev_fieldy;
 extern int			scroll_x, scroll_y;
 
+extern int			WIN_XSIZE, WIN_YSIZE;
+
 extern int			FX, FY;
 extern int			ScrollStepSize;
 extern int			ScreenMovDir, ScreenMovPos, ScreenGfxPos;
@@ -2878,7 +2884,7 @@ extern struct TitleMessageInfo	titlemessage_initial[];
 extern struct TitleMessageInfo	titlemessage_default;
 extern struct TitleMessageInfo	titlemessage[];
 extern struct TitleMessageInfo	readme;
-extern struct InitInfo		init;
+extern struct InitInfo		init, init_last;
 extern struct MenuInfo		menu;
 extern struct DoorInfo		door_1, door_2;
 extern struct PreviewInfo	preview;

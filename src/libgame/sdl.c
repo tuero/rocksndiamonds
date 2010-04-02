@@ -140,6 +140,13 @@ void SDLInitVideoBuffer(DrawBuffer **backbuffer, DrawWindow **window,
   fullscreen_xoffset = (fullscreen_width  - video.width)  / 2;
   fullscreen_yoffset = (fullscreen_height - video.height) / 2;
 
+#if 1
+  checked_free(video.fullscreen_modes);
+
+  video.fullscreen_modes = NULL;
+  video.fullscreen_mode_current = NULL;
+#endif
+
   /* get available hardware supported fullscreen modes */
   modes = SDL_ListModes(NULL, SDL_FULLSCREEN | SDL_HWSURFACE);
 
@@ -228,7 +235,11 @@ void SDLInitVideoBuffer(DrawBuffer **backbuffer, DrawWindow **window,
      should never be drawn to directly, it would do no harm nevertheless. */
 
   /* create additional (symbolic) buffer for double-buffering */
+#if 1
+  ReCreateBitmap(window, video.width, video.height, video.depth);
+#else
   *window = CreateBitmap(video.width, video.height, video.depth);
+#endif
 }
 
 boolean SDLSetVideoMode(DrawBuffer **backbuffer, boolean fullscreen)
@@ -240,6 +251,10 @@ boolean SDLSetVideoMode(DrawBuffer **backbuffer, boolean fullscreen)
 
   if (*backbuffer == NULL)
     *backbuffer = CreateBitmapStruct();
+
+  /* (real bitmap might be larger in fullscreen mode with video offsets) */
+  (*backbuffer)->width  = video.width;
+  (*backbuffer)->height = video.height;
 
   if (fullscreen && !video.fullscreen_enabled && video.fullscreen_available)
   {
@@ -292,10 +307,10 @@ boolean SDLSetVideoMode(DrawBuffer **backbuffer, boolean fullscreen)
       (*backbuffer)->surface = new_surface;
 
       video.fullscreen_enabled = FALSE;
+
       success = TRUE;
     }
   }
-
 
 #if 1
   SDL_EventState(SDL_SYSWMEVENT, SDL_ENABLE);
@@ -422,6 +437,17 @@ void SDLFadeRectangle(Bitmap *bitmap_cross, int x, int y, int width, int height,
   int src_x = x, src_y = y;
   int dst_x = x, dst_y = y;
   unsigned int time_last, time_current;
+
+  /* check if screen size has changed */
+  if (surface_source != NULL && (video.width  != surface_source->w ||
+				 video.height != surface_source->h))
+  {
+    SDL_FreeSurface(surface_source);
+    SDL_FreeSurface(surface_target);
+    SDL_FreeSurface(surface_black);
+
+    initialization_needed = TRUE;
+  }
 
   src_rect.x = src_x;
   src_rect.y = src_y;

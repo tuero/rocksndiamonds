@@ -39,7 +39,7 @@
 #define CONFIG_TOKEN_GLOBAL_BUSY		"global.busy"
 
 #define DEBUG_PRINT_INIT_TIMESTAMPS		TRUE
-#define DEBUG_PRINT_INIT_TIMESTAMPS_DEPTH	10
+#define DEBUG_PRINT_INIT_TIMESTAMPS_DEPTH	1
 
 
 static struct FontBitmapInfo font_initial[NUM_INITIAL_FONTS];
@@ -186,20 +186,8 @@ void DrawInitAnim()
   }
 #endif
 
-#if 0
-  anim_initial.anim_mode = ANIM_LOOP;
-  anim_initial.anim_start_frame = 0;
-  anim_initial.offset_x = anim_initial.width;
-  anim_initial.offset_y = 0;
-#endif
-
-#if 1
-  x = ALIGNED_TEXT_XPOS(&init.busy);
-  y = ALIGNED_TEXT_YPOS(&init.busy);
-#else
-  x = WIN_XSIZE / 2 - TILESIZE / 2;
-  y = WIN_YSIZE / 2 - TILESIZE / 2;
-#endif
+  x = ALIGNED_TEXT_XPOS(&init_last.busy);
+  y = ALIGNED_TEXT_YPOS(&init_last.busy);
 
   graphic_info = &anim_initial;		/* graphic == 0 => anim_initial */
 
@@ -5461,6 +5449,24 @@ static void InitMixer()
   StartMixer();
 }
 
+void InitGfxBuffers()
+{
+  ReCreateBitmap(&bitmap_db_cross, WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH);
+  ReCreateBitmap(&bitmap_db_field, FXSIZE, FYSIZE, DEFAULT_DEPTH);
+  ReCreateBitmap(&bitmap_db_panel, DXSIZE, DYSIZE, DEFAULT_DEPTH);
+  ReCreateBitmap(&bitmap_db_door, 3 * DXSIZE, DYSIZE + VYSIZE, DEFAULT_DEPTH);
+  ReCreateBitmap(&bitmap_db_toons, FULL_SXSIZE, FULL_SYSIZE, DEFAULT_DEPTH);
+
+  /* initialize screen properties */
+  InitGfxFieldInfo(SX, SY, SXSIZE, SYSIZE,
+		   REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE,
+		   bitmap_db_field);
+  InitGfxDoor1Info(DX, DY, DXSIZE, DYSIZE);
+  InitGfxDoor2Info(VX, VY, VXSIZE, VYSIZE);
+  InitGfxWindowInfo(WIN_XSIZE, WIN_YSIZE);
+  InitGfxScrollbufferInfo(FXSIZE, FYSIZE);
+}
+
 void InitGfx()
 {
   struct GraphicInfo *graphic_info_last = graphic_info;
@@ -5507,6 +5513,9 @@ void InitGfx()
   if (filename_font_initial == NULL)	/* should not happen */
     Error(ERR_EXIT, "cannot get filename for '%s'", CONFIG_TOKEN_FONT_INITIAL);
 
+#if 1
+  InitGfxBuffers();
+#else
   /* create additional image buffers for double-buffering and cross-fading */
   bitmap_db_cross = CreateBitmap(WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH);
   bitmap_db_field = CreateBitmap(FXSIZE, FYSIZE, DEFAULT_DEPTH);
@@ -5522,6 +5531,8 @@ void InitGfx()
   InitGfxDoor2Info(VX, VY, VXSIZE, VYSIZE);
   InitGfxWindowInfo(WIN_XSIZE, WIN_YSIZE);
   InitGfxScrollbufferInfo(FXSIZE, FYSIZE);
+#endif
+
   InitGfxCustomArtworkInfo();
 
   bitmap_font_initial = LoadCustomImage(filename_font_initial);
@@ -5635,6 +5646,9 @@ void InitGfx()
 
   InitMenuDesignSettings_Static();
   InitGfxDrawBusyAnimFunction(DrawInitAnim);
+
+  /* use copy of busy animation to prevent change while reloading artwork */
+  init_last = init;
 #endif
 }
 
@@ -6113,6 +6127,8 @@ void ReloadCustomArtwork(int force_reload)
   }
 
   game_status = last_game_status;	/* restore current game status */
+
+  init_last = init;			/* switch to new busy animation */
 
 #if 0
   printf("::: ----------------DELAY 1 ...\n");

@@ -5093,6 +5093,14 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.player_sleeping_delay_random
   },
   {
+    "global.screen.width",
+    &global.screen.width
+  },
+  {
+    "global.screen.height",
+    &global.screen.height
+  },
+  {
     NULL,
     NULL
   },

@@ -166,8 +166,10 @@ void InitGfxFieldInfo(int sx, int sy, int sxsize, int sysize,
 
   gfx.field_save_buffer = field_save_buffer;
 
+#if 0
   gfx.background_bitmap = NULL;
   gfx.background_bitmap_mask = REDRAW_NONE;
+#endif
 
   SetDrawDeactivationMask(REDRAW_NONE);		/* do not deactivate drawing */
   SetDrawBackgroundMask(REDRAW_NONE);		/* deactivate masked drawing */
@@ -193,6 +195,12 @@ void InitGfxWindowInfo(int win_xsize, int win_ysize)
 {
   gfx.win_xsize = win_xsize;
   gfx.win_ysize = win_ysize;
+
+#if 1
+  gfx.background_bitmap_mask = REDRAW_NONE;
+
+  ReCreateBitmap(&gfx.background_bitmap, win_xsize, win_ysize, DEFAULT_DEPTH);
+#endif
 }
 
 void InitGfxScrollbufferInfo(int scrollbuffer_width, int scrollbuffer_height)
@@ -259,9 +267,11 @@ void SetBackgroundBitmap(Bitmap *background_bitmap_tile, int mask)
   else
     gfx.background_bitmap_mask &= ~mask;
 
+#if 0
   if (gfx.background_bitmap == NULL)
     gfx.background_bitmap = CreateBitmap(video.width, video.height,
 					 DEFAULT_DEPTH);
+#endif
 
   if (background_bitmap_tile == NULL)	/* empty background requested */
     return;
@@ -367,8 +377,10 @@ void InitVideoBuffer(int width, int height, int depth, boolean fullscreen)
 
   video.fullscreen_available = FULLSCREEN_STATUS;
   video.fullscreen_enabled = FALSE;
-  video.fullscreen_modes = NULL;
+#if 0
   video.fullscreen_mode_current = NULL;
+  video.fullscreen_modes = NULL;
+#endif
 
 #if defined(TARGET_SDL)
   SDLInitVideoBuffer(&backbuffer, &window, fullscreen);
@@ -377,34 +389,6 @@ void InitVideoBuffer(int width, int height, int depth, boolean fullscreen)
 #endif
 
   drawto = backbuffer;
-}
-
-Bitmap *CreateBitmapStruct(void)
-{
-#if defined(TARGET_SDL)
-  return checked_calloc(sizeof(struct SDLSurfaceInfo));
-#else
-  return checked_calloc(sizeof(struct X11DrawableInfo));
-#endif
-}
-
-Bitmap *CreateBitmap(int width, int height, int depth)
-{
-  Bitmap *new_bitmap = CreateBitmapStruct();
-  int real_width  = MAX(1, width);	/* prevent zero bitmap width */
-  int real_height = MAX(1, height);	/* prevent zero bitmap height */
-  int real_depth  = GetRealDepth(depth);
-
-#if defined(TARGET_SDL)
-  SDLCreateBitmapContent(new_bitmap, real_width, real_height, real_depth);
-#else
-  X11CreateBitmapContent(new_bitmap, real_width, real_height, real_depth);
-#endif
-
-  new_bitmap->width  = real_width;
-  new_bitmap->height = real_height;
-
-  return new_bitmap;
 }
 
 inline static void FreeBitmapPointers(Bitmap *bitmap)
@@ -443,16 +427,53 @@ void FreeBitmap(Bitmap *bitmap)
   free(bitmap);
 }
 
+Bitmap *CreateBitmapStruct(void)
+{
+#if defined(TARGET_SDL)
+  return checked_calloc(sizeof(struct SDLSurfaceInfo));
+#else
+  return checked_calloc(sizeof(struct X11DrawableInfo));
+#endif
+}
+
+Bitmap *CreateBitmap(int width, int height, int depth)
+{
+  Bitmap *new_bitmap = CreateBitmapStruct();
+  int real_width  = MAX(1, width);	/* prevent zero bitmap width */
+  int real_height = MAX(1, height);	/* prevent zero bitmap height */
+  int real_depth  = GetRealDepth(depth);
+
+#if defined(TARGET_SDL)
+  SDLCreateBitmapContent(new_bitmap, real_width, real_height, real_depth);
+#else
+  X11CreateBitmapContent(new_bitmap, real_width, real_height, real_depth);
+#endif
+
+  new_bitmap->width  = real_width;
+  new_bitmap->height = real_height;
+
+  return new_bitmap;
+}
+
+void ReCreateBitmap(Bitmap **bitmap, int width, int height, int depth)
+{
+  Bitmap *new_bitmap = CreateBitmap(width, height, depth);
+
+  if (*bitmap == NULL)
+  {
+    *bitmap = new_bitmap;
+  }
+  else
+  {
+    TransferBitmapPointers(new_bitmap, *bitmap);
+    free(new_bitmap);
+  }
+}
+
 void CloseWindow(DrawWindow *window)
 {
 #if defined(TARGET_X11)
-  if (window->drawable)
-  {
-    XUnmapWindow(display, window->drawable);
-    XDestroyWindow(display, window->drawable);
-  }
-  if (window->gc)
-    XFreeGC(display, window->gc);
+  X11CloseWindow(window);
 #endif
 }
 
@@ -497,6 +518,25 @@ void BlitBitmap(Bitmap *src_bitmap, Bitmap *dst_bitmap,
 {
   if (DrawingDeactivated(dst_x, dst_y, width, height))
     return;
+
+#if 1
+  /* skip if rectangle starts outside bitmap */
+  if (src_x >= src_bitmap->width ||
+      src_y >= src_bitmap->height ||
+      dst_x >= dst_bitmap->width ||
+      dst_y >= dst_bitmap->height)
+    return;
+
+  /* clip if rectangle overlaps bitmap */
+  if (src_x + width > src_bitmap->width)
+    width = src_bitmap->width - src_x;
+  if (src_y + height > src_bitmap->height)
+    height = src_bitmap->height - src_y;
+  if (dst_x + width > dst_bitmap->width)
+    width = dst_bitmap->width - dst_x;
+  if (dst_y + height > dst_bitmap->height)
+    height = dst_bitmap->height - dst_y;
+#endif
 
 #if 0
   /* !!! 2009-03-30: Fixed by using self-compiled, patched SDL.dll !!! */
@@ -573,6 +613,19 @@ void FillRectangle(Bitmap *bitmap, int x, int y, int width, int height,
 {
   if (DrawingDeactivated(x, y, width, height))
     return;
+
+#if 1
+  /* skip if rectangle starts outside bitmap */
+  if (x >= bitmap->width ||
+      y >= bitmap->height)
+    return;
+
+  /* clip if rectangle overlaps bitmap */
+  if (x + width > bitmap->width)
+    width = bitmap->width - x;
+  if (y + height > bitmap->height)
+    height = bitmap->height - y;
+#endif
 
   sysFillRectangle(bitmap, x, y, width, height, color);
 }

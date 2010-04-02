@@ -14,6 +14,7 @@
 #include "libgame/libgame.h"
 
 #include "tools.h"
+#include "init.h"
 #include "game.h"
 #include "events.h"
 #include "cartoons.h"
@@ -8045,30 +8046,16 @@ void ToggleFullscreenIfNeeded()
   if (!video.fullscreen_available)
     return;
 
-#if 1
   if (change_fullscreen || change_fullscreen_mode)
-#else
-  if (setup.fullscreen != video.fullscreen_enabled ||
-      setup.fullscreen_mode != video.fullscreen_mode_current)
-#endif
   {
     Bitmap *tmp_backbuffer = CreateBitmap(WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH);
 
     /* save backbuffer content which gets lost when toggling fullscreen mode */
     BlitBitmap(backbuffer, tmp_backbuffer, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
 
-#if 1
     if (change_fullscreen_mode)
-#else
-    if (setup.fullscreen && video.fullscreen_enabled)
-#endif
     {
       /* keep fullscreen, but change fullscreen mode (screen resolution) */
-#if 1
-      /* (this is now set in sdl.c) */
-#else
-      video.fullscreen_mode_current = setup.fullscreen_mode;
-#endif
       video.fullscreen_enabled = FALSE;		/* force new fullscreen mode */
     }
 
@@ -8089,4 +8076,24 @@ void ToggleFullscreenIfNeeded()
     redraw_mask = REDRAW_ALL;
 #endif
   }
+}
+
+void ChangeScreenModeIfNeeded()
+{
+  if (global.screen.width  == WIN_XSIZE &&
+      global.screen.height == WIN_YSIZE)
+    return;
+
+  WIN_XSIZE = global.screen.width;
+  WIN_YSIZE = global.screen.height;
+
+  InitVideoBuffer(WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH, setup.fullscreen);
+  InitGfxBuffers();
+
+#if 1
+  SetDrawDeactivationMask(REDRAW_NONE);
+  SetDrawBackgroundMask(REDRAW_FIELD);
+
+  // RedrawBackground();
+#endif
 }

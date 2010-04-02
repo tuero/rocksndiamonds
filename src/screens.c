@@ -1266,6 +1266,8 @@ void DrawMainMenuExt(int fade_mask, boolean do_fading)
   /* store valid level series information */
   leveldir_last_valid = leveldir_current;
 
+  init_last = init;			/* switch to new busy animation */
+
   /* needed if last screen (level choice) changed graphics, sounds or music */
   ReloadCustomArtwork(0);
 
@@ -1281,6 +1283,11 @@ void DrawMainMenuExt(int fade_mask, boolean do_fading)
   if (fade_mask == REDRAW_FIELD)
     BackToFront();
 #endif
+#endif
+
+#if 1
+  /* needed if newly loaded custom artwork requires a different screen mode */
+  ChangeScreenModeIfNeeded();
 #endif
 
 #if defined(TARGET_SDL)

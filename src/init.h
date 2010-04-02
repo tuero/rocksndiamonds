@@ -43,6 +43,8 @@ void RedrawBackground();
 
 void KeyboardAutoRepeatOffUnlessAutoplay();
 
+void InitGfxBuffers();
+
 void OpenAll(void);
 void CloseAllAndExit(int);
 

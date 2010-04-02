@@ -2526,13 +2526,8 @@ static struct
     ED_SCROLLBAR_XPOS,			ED_SCROLLBAR_YPOS,
     SX + ED_SCROLL_HORIZONTAL_XPOS,	SY + ED_SCROLL_HORIZONTAL_YPOS,
     ED_SCROLL_HORIZONTAL_XSIZE,		ED_SCROLL_HORIZONTAL_YSIZE,
-#if 1
     SX,					SY,
     SXSIZE,				SYSIZE,
-#else
-    0,					0,
-    SX + SXSIZE + SX,			WIN_YSIZE,
-#endif
     GD_TYPE_SCROLLBAR_HORIZONTAL,
     GADGET_ID_SCROLL_HORIZONTAL,
     "scroll level editing area horizontally"
@@ -2541,13 +2536,8 @@ static struct
     ED_SCROLLBAR_XPOS,			ED_SCROLLBAR_YPOS,
     SX + ED_SCROLL_VERTICAL_XPOS,	SY + ED_SCROLL_VERTICAL_YPOS,
     ED_SCROLL_VERTICAL_XSIZE,		ED_SCROLL_VERTICAL_YSIZE,
-#if 1
     SX,					SY,
     SXSIZE,				SYSIZE,
-#else
-    0,					0,
-    SX + SXSIZE + SX,			WIN_YSIZE,
-#endif
     GD_TYPE_SCROLLBAR_VERTICAL,
     GADGET_ID_SCROLL_VERTICAL,
     "scroll level editing area vertically"
@@ -2556,13 +2546,8 @@ static struct
     ED_SCROLLBAR2_XPOS,			ED_SCROLLBAR2_YPOS,
     DX + ED_SCROLL2_VERTICAL_XPOS,	DY + ED_SCROLL2_VERTICAL_YPOS,
     ED_SCROLL2_VERTICAL_XSIZE,		ED_SCROLL2_VERTICAL_YSIZE,
-#if 1
     DX,					DY,
     DXSIZE,				DYSIZE,
-#else
-    SX + SXSIZE + SX,			0,
-    WIN_XSIZE - (SX + SXSIZE + SX),	WIN_YSIZE,
-#endif
     GD_TYPE_SCROLLBAR_VERTICAL,
     GADGET_ID_SCROLL_LIST_VERTICAL,
     "scroll element list vertically"
@@ -5158,37 +5143,9 @@ static void DrawDrawingArea(int id)
 
 static void ScrollMiniLevel(int from_x, int from_y, int scroll)
 {
-#if 0
-  /* (directly solved in BlitBitmap() now) */
-  static Bitmap *tmp_backbuffer = NULL;
-#endif
   int x, y;
   int dx = (scroll == ED_SCROLL_LEFT ? -1 : scroll == ED_SCROLL_RIGHT ? 1 : 0);
   int dy = (scroll == ED_SCROLL_UP   ? -1 : scroll == ED_SCROLL_DOWN  ? 1 : 0);
-
-#if 0
-  /* (directly solved in BlitBitmap() now) */
-  if (tmp_backbuffer == NULL)
-    tmp_backbuffer = CreateBitmap(WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH);
-
-  /* needed when blitting directly to same bitmap -- should not be needed with
-     recent SDL libraries, but apparently does not work in 1.2.11 directly */
-  BlitBitmap(drawto, tmp_backbuffer,
-	     SX + (dx == -1 ? MINI_TILEX : 0),
-	     SY + (dy == -1 ? MINI_TILEY : 0),
-	     (ed_fieldx * MINI_TILEX) - (dx != 0 ? MINI_TILEX : 0),
-	     (ed_fieldy * MINI_TILEY) - (dy != 0 ? MINI_TILEY : 0),
-	     SX + (dx == +1 ? MINI_TILEX : 0),
-	     SY + (dy == +1 ? MINI_TILEY : 0));
-  BlitBitmap(tmp_backbuffer, drawto,
-	     SX + (dx == +1 ? MINI_TILEX : 0),
-	     SY + (dy == +1 ? MINI_TILEY : 0),
-	     (ed_fieldx * MINI_TILEX) - (dx != 0 ? MINI_TILEX : 0),
-	     (ed_fieldy * MINI_TILEY) - (dy != 0 ? MINI_TILEY : 0),
-	     SX + (dx == +1 ? MINI_TILEX : 0),
-	     SY + (dy == +1 ? MINI_TILEY : 0));
-
-#else
 
   BlitBitmap(drawto, drawto,
 	     SX + (dx == -1 ? MINI_TILEX : 0),
@@ -5197,7 +5154,6 @@ static void ScrollMiniLevel(int from_x, int from_y, int scroll)
 	     (ed_fieldy * MINI_TILEY) - (dy != 0 ? MINI_TILEY : 0),
 	     SX + (dx == +1 ? MINI_TILEX : 0),
 	     SY + (dy == +1 ? MINI_TILEY : 0));
-#endif
 
   if (dx)
   {

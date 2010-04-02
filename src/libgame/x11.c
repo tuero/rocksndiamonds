@@ -40,13 +40,21 @@ void X11InitVideoDisplay(void)
 
 void X11InitVideoBuffer(DrawBuffer **backbuffer, DrawWindow **window)
 {
+  if (*window != NULL)
+    X11CloseWindow(*window);
+
   *window = X11InitWindow();
 
   XMapWindow(display, (*window)->drawable);
+
   FlushDisplay();
 
   /* create additional (off-screen) buffer for double-buffering */
+#if 1
+  ReCreateBitmap(backbuffer, video.width, video.height, video.depth);
+#else
   *backbuffer = CreateBitmap(video.width, video.height, video.depth);
+#endif
 }
 
 static void X11InitDisplay()
@@ -128,6 +136,9 @@ static DrawWindow *X11InitWindow()
 
   win_xpos = (screen_width - width) / 2;
   win_ypos = (screen_height - height) / 2;
+
+  new_window->width = width;
+  new_window->height = height;
 
   new_window->drawable = XCreateSimpleWindow(display,
 					     RootWindow(display, screen),
@@ -225,6 +236,20 @@ static DrawWindow *X11InitWindow()
   }
 
   return new_window;
+}
+
+void X11CloseWindow(DrawWindow *window)
+{
+  if (window->drawable)
+  {
+    XUnmapWindow(display, window->drawable);
+    XDestroyWindow(display, window->drawable);
+  }
+
+  if (window->gc)
+    XFreeGC(display, window->gc);
+
+  free(window);
 }
 
 void X11ZoomBitmap(Bitmap *src_bitmap, Bitmap *dst_bitmap)

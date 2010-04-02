@@ -333,6 +333,8 @@ struct MouseCursorInfo
 void X11InitVideoDisplay(void);
 void X11InitVideoBuffer(DrawBuffer **, DrawWindow **);
 
+void X11CloseWindow(DrawWindow *);
+
 void X11ZoomBitmap(Bitmap *, Bitmap *);
 Bitmap *X11LoadImage(char *);
 

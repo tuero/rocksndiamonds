@@ -84,6 +84,9 @@ int			ActiveFont[NUM_FONTS];
 int			lev_fieldx, lev_fieldy;
 int			scroll_x, scroll_y;
 
+int			WIN_XSIZE = 672;
+int			WIN_YSIZE = 560;
+
 int			FX = SX, FY = SY;
 int			ScrollStepSize;
 int			ScreenMovDir = MV_NONE, ScreenMovPos = 0;
@@ -120,7 +123,7 @@ struct TitleMessageInfo	titlemessage_initial[MAX_NUM_TITLE_MESSAGES];
 struct TitleMessageInfo	titlemessage_default;
 struct TitleMessageInfo	titlemessage[MAX_NUM_TITLE_MESSAGES];
 struct TitleMessageInfo	readme;
-struct InitInfo		init;
+struct InitInfo		init, init_last;
 struct MenuInfo		menu;
 struct DoorInfo		door_1, door_2;
 struct PreviewInfo	preview;
