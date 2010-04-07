@@ -1047,7 +1047,11 @@ static struct
   /* ---------- current level number --------------------------------------- */
 
   {
+#if 1
+    -1, -1,	/* these values are not constant, but can change at runtime */
+#else
     DX + 5 - SX,			DY + 3 - SY,
+#endif
     1,					100,
     GADGET_ID_SELECT_LEVEL_DOWN,	GADGET_ID_SELECT_LEVEL_UP,
     GADGET_ID_SELECT_LEVEL_TEXT,	GADGET_ID_NONE,
@@ -2474,25 +2478,41 @@ static struct
 {
   {
     ED_SCROLLBUTTON_XPOS,   ED_SCROLLBUTTON_YPOS + 0 * ED_SCROLLBUTTON_YSIZE,
+#if 1
+    -1, -1,	/* these values are not constant, but can change at runtime */
+#else
     ED_SCROLL_UP_XPOS,      ED_SCROLL_UP_YPOS,
+#endif
     GADGET_ID_SCROLL_UP,
     "scroll level editing area up"
   },
   {
     ED_SCROLLBUTTON_XPOS,   ED_SCROLLBUTTON_YPOS + 1 * ED_SCROLLBUTTON_YSIZE,
+#if 1
+    -1, -1,	/* these values are not constant, but can change at runtime */
+#else
     ED_SCROLL_DOWN_XPOS,    ED_SCROLL_DOWN_YPOS,
+#endif
     GADGET_ID_SCROLL_DOWN,
     "scroll level editing area down"
   },
   {
     ED_SCROLLBUTTON_XPOS,   ED_SCROLLBUTTON_YPOS + 2 * ED_SCROLLBUTTON_YSIZE,
+#if 1
+    -1, -1,	/* these values are not constant, but can change at runtime */
+#else
     ED_SCROLL_LEFT_XPOS,    ED_SCROLL_LEFT_YPOS,
+#endif
     GADGET_ID_SCROLL_LEFT,
     "scroll level editing area left"
   },
   {
     ED_SCROLLBUTTON_XPOS,   ED_SCROLLBUTTON_YPOS + 3 * ED_SCROLLBUTTON_YSIZE,
+#if 1
+    -1, -1,	/* these values are not constant, but can change at runtime */
+#else
     ED_SCROLL_RIGHT_XPOS,   ED_SCROLL_RIGHT_YPOS,
+#endif
     GADGET_ID_SCROLL_RIGHT,
     "scroll level editing area right"
   },
@@ -2524,29 +2544,49 @@ static struct
 {
   {
     ED_SCROLLBAR_XPOS,			ED_SCROLLBAR_YPOS,
+#if 1
+    -1, -1,	/* these values are not constant, but can change at runtime */
+    -1, -1,	/* these values are not constant, but can change at runtime */
+    -1, -1,	/* these values are not constant, but can change at runtime */
+    -1, -1,	/* these values are not constant, but can change at runtime */
+#else
     SX + ED_SCROLL_HORIZONTAL_XPOS,	SY + ED_SCROLL_HORIZONTAL_YPOS,
     ED_SCROLL_HORIZONTAL_XSIZE,		ED_SCROLL_HORIZONTAL_YSIZE,
     SX,					SY,
     SXSIZE,				SYSIZE,
+#endif
     GD_TYPE_SCROLLBAR_HORIZONTAL,
     GADGET_ID_SCROLL_HORIZONTAL,
     "scroll level editing area horizontally"
   },
   {
     ED_SCROLLBAR_XPOS,			ED_SCROLLBAR_YPOS,
+#if 1
+    -1, -1,	/* these values are not constant, but can change at runtime */
+    -1, -1,	/* these values are not constant, but can change at runtime */
+    -1, -1,	/* these values are not constant, but can change at runtime */
+    -1, -1,	/* these values are not constant, but can change at runtime */
+#else
     SX + ED_SCROLL_VERTICAL_XPOS,	SY + ED_SCROLL_VERTICAL_YPOS,
     ED_SCROLL_VERTICAL_XSIZE,		ED_SCROLL_VERTICAL_YSIZE,
     SX,					SY,
     SXSIZE,				SYSIZE,
+#endif
     GD_TYPE_SCROLLBAR_VERTICAL,
     GADGET_ID_SCROLL_VERTICAL,
     "scroll level editing area vertically"
   },
   {
     ED_SCROLLBAR2_XPOS,			ED_SCROLLBAR2_YPOS,
+#if 1
+    -1, -1,	/* these values are not constant, but can change at runtime */
+    ED_SCROLL2_VERTICAL_XSIZE,		ED_SCROLL2_VERTICAL_YSIZE,
+    -1, -1,	/* these values are not constant, but can change at runtime */
+#else
     DX + ED_SCROLL2_VERTICAL_XPOS,	DY + ED_SCROLL2_VERTICAL_YPOS,
     ED_SCROLL2_VERTICAL_XSIZE,		ED_SCROLL2_VERTICAL_YSIZE,
     DX,					DY,
+#endif
     DXSIZE,				DYSIZE,
     GD_TYPE_SCROLLBAR_VERTICAL,
     GADGET_ID_SCROLL_LIST_VERTICAL,
@@ -2992,7 +3032,12 @@ static struct
   {
     0,					0,
     GADGET_ID_DRAWING_LEVEL,		GADGET_ID_NONE,
-    NULL,				MAX_ED_FIELDX, MAX_ED_FIELDY,
+    NULL,
+#if 1
+    -1, -1,	/* these values are not constant, but can change at runtime */
+#else
+    MAX_ED_FIELDX, MAX_ED_FIELDY,
+#endif
     NULL, NULL, NULL,			NULL
   },
 
@@ -3254,7 +3299,11 @@ static struct
 */
 
 /* actual size of level editor drawing area */
+#if 1
+static int ed_fieldx, ed_fieldy;
+#else
 static int ed_fieldx = MAX_ED_FIELDX - 1, ed_fieldy = MAX_ED_FIELDY - 1;
+#endif
 
 /* actual position of level editor drawing area in level playfield */
 static int level_xpos = -1, level_ypos = -1;
@@ -5311,6 +5360,16 @@ static void CreateControlButtons()
     level_editor_gadget[id] = gi;
   }
 
+  /* these values are not constant, but can change at runtime */
+  scrollbutton_info[ED_SCROLLBUTTON_ID_AREA_UP].x    = ED_SCROLL_UP_XPOS;
+  scrollbutton_info[ED_SCROLLBUTTON_ID_AREA_UP].y    = ED_SCROLL_UP_YPOS;
+  scrollbutton_info[ED_SCROLLBUTTON_ID_AREA_DOWN].x  = ED_SCROLL_DOWN_XPOS;
+  scrollbutton_info[ED_SCROLLBUTTON_ID_AREA_DOWN].y  = ED_SCROLL_DOWN_YPOS;
+  scrollbutton_info[ED_SCROLLBUTTON_ID_AREA_LEFT].x  = ED_SCROLL_LEFT_XPOS;
+  scrollbutton_info[ED_SCROLLBUTTON_ID_AREA_LEFT].y  = ED_SCROLL_LEFT_YPOS;
+  scrollbutton_info[ED_SCROLLBUTTON_ID_AREA_RIGHT].x = ED_SCROLL_RIGHT_XPOS;
+  scrollbutton_info[ED_SCROLLBUTTON_ID_AREA_RIGHT].y = ED_SCROLL_RIGHT_YPOS;
+
   /* create buttons for scrolling of drawing area and element list */
   for (i = 0; i < ED_NUM_SCROLLBUTTONS; i++)
   {
@@ -5425,6 +5484,10 @@ static void CreateCounterButtons()
 {
   int max_infotext_len = getMaxInfoTextLength();
   int i;
+
+  /* these values are not constant, but can change at runtime */
+  counterbutton_info[ED_COUNTER_ID_SELECT_LEVEL].x = DX + 5 - SX;
+  counterbutton_info[ED_COUNTER_ID_SELECT_LEVEL].y = DY + 3 - SY;
 
   for (i = 0; i < ED_NUM_COUNTERBUTTONS; i++)
   {
@@ -5579,6 +5642,10 @@ static void CreateCounterButtons()
 static void CreateDrawingAreas()
 {
   int i;
+
+  /* these values are not constant, but can change at runtime */
+  drawingarea_info[ED_DRAWING_ID_DRAWING_LEVEL].area_xsize = MAX_ED_FIELDX;
+  drawingarea_info[ED_DRAWING_ID_DRAWING_LEVEL].area_ysize = MAX_ED_FIELDY;
 
   for (i = 0; i < ED_NUM_DRAWING_AREAS; i++)
   {
@@ -5947,6 +6014,40 @@ static void CreateScrollbarGadgets()
 {
   int i;
 
+  /* these values are not constant, but can change at runtime */
+  scrollbar_info[ED_SCROLLBAR_ID_AREA_HORIZONTAL].x =
+    SX + ED_SCROLL_HORIZONTAL_XPOS;
+  scrollbar_info[ED_SCROLLBAR_ID_AREA_HORIZONTAL].y =
+    SY + ED_SCROLL_HORIZONTAL_YPOS;
+  scrollbar_info[ED_SCROLLBAR_ID_AREA_HORIZONTAL].width =
+    ED_SCROLL_HORIZONTAL_XSIZE;
+  scrollbar_info[ED_SCROLLBAR_ID_AREA_HORIZONTAL].height =
+    ED_SCROLL_HORIZONTAL_YSIZE;
+  scrollbar_info[ED_SCROLLBAR_ID_AREA_HORIZONTAL].wheel_x      = SX;
+  scrollbar_info[ED_SCROLLBAR_ID_AREA_HORIZONTAL].wheel_y      = SY;
+  scrollbar_info[ED_SCROLLBAR_ID_AREA_HORIZONTAL].wheel_width  = SXSIZE;
+  scrollbar_info[ED_SCROLLBAR_ID_AREA_HORIZONTAL].wheel_height = SYSIZE;
+
+  scrollbar_info[ED_SCROLLBAR_ID_AREA_VERTICAL].x =
+    SX + ED_SCROLL_VERTICAL_XPOS;
+  scrollbar_info[ED_SCROLLBAR_ID_AREA_VERTICAL].y =
+    SY + ED_SCROLL_VERTICAL_YPOS;
+  scrollbar_info[ED_SCROLLBAR_ID_AREA_VERTICAL].width =
+    ED_SCROLL_VERTICAL_XSIZE;
+  scrollbar_info[ED_SCROLLBAR_ID_AREA_VERTICAL].height =
+    ED_SCROLL_VERTICAL_YSIZE;
+  scrollbar_info[ED_SCROLLBAR_ID_AREA_VERTICAL].wheel_x      = SX;
+  scrollbar_info[ED_SCROLLBAR_ID_AREA_VERTICAL].wheel_y      = SY;
+  scrollbar_info[ED_SCROLLBAR_ID_AREA_VERTICAL].wheel_width  = SXSIZE;
+  scrollbar_info[ED_SCROLLBAR_ID_AREA_VERTICAL].wheel_height = SYSIZE;
+
+  scrollbar_info[ED_SCROLLBAR_ID_LIST_VERTICAL].x =
+    DX + ED_SCROLL2_VERTICAL_XPOS;
+  scrollbar_info[ED_SCROLLBAR_ID_LIST_VERTICAL].y =
+    DY + ED_SCROLL2_VERTICAL_YPOS;
+  scrollbar_info[ED_SCROLLBAR_ID_LIST_VERTICAL].wheel_x = DX;
+  scrollbar_info[ED_SCROLLBAR_ID_LIST_VERTICAL].wheel_y = DY;
+
   for (i = 0; i < ED_NUM_SCROLLBARS; i++)
   {
     int id = scrollbar_info[i].gadget_id;
@@ -6148,6 +6249,10 @@ void CreateLevelEditorGadgets()
 
   /* setting 'game_status' is needed to get the right fonts for the editor */
   game_status = GAME_MODE_EDITOR;
+
+  /* these values are not constant, but can change at runtime */
+  ed_fieldx = MAX_ED_FIELDX - 1;
+  ed_fieldy = MAX_ED_FIELDY - 1;
 
   ReinitializeElementList();
 
@@ -7341,6 +7446,11 @@ void DrawLevelEd()
 	     DOOR_GFX_PAGEX8, 236, EXSIZE, EYSIZE, EX, EY);
 
   redraw_mask |= REDRAW_ALL;
+
+#if 1
+  FreeLevelEditorGadgets();
+  CreateLevelEditorGadgets();
+#endif
 
   ReinitializeElementList();		/* update dynamic level element list */
   ReinitializeElementListButtons();	/* custom element may look different */
@@ -10005,7 +10115,11 @@ static void SelectArea(int from_x, int from_y, int to_x, int to_y,
 static void CopyBrushExt(int from_x, int from_y, int to_x, int to_y,
 			 int button, int mode)
 {
+#if 1
+  static short brush_buffer[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+#else
   static short brush_buffer[MAX_ED_FIELDX][MAX_ED_FIELDY];
+#endif
   static int brush_width, brush_height;
   static int last_cursor_x = -1, last_cursor_y = -1;
   static boolean delete_old_brush;

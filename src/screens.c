@@ -1025,7 +1025,11 @@ static boolean insideTextPosRect(struct TextPosInfo *rect, int x, int y)
 
 static void drawCursorExt(int xpos, int ypos, boolean active, int graphic)
 {
+#if 1
+  static int cursor_array[MAX_LEV_FIELDY];
+#else
   static int cursor_array[SCR_FIELDY];
+#endif
   int x = mSX + TILEX * xpos;
   int y = mSY + TILEY * (MENU_SCREEN_START_YPOS + ypos);
 
@@ -1286,8 +1290,8 @@ void DrawMainMenuExt(int fade_mask, boolean do_fading)
 #endif
 
 #if 1
-  /* needed if newly loaded custom artwork requires a different screen mode */
-  ChangeScreenModeIfNeeded();
+  /* needed if different viewport properties defined for menues */
+  ChangeViewportPropertiesIfNeeded();
 #endif
 
 #if defined(TARGET_SDL)
@@ -1776,6 +1780,11 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 	game_status = GAME_MODE_EDITOR;
 
 	FadeSetEnterScreen();
+
+#if 1
+	/* needed if different viewport properties defined for editor */
+	ChangeViewportPropertiesIfNeeded();
+#endif
 
 	DrawLevelEd();
       }
@@ -5673,13 +5682,21 @@ static struct
 {
   {
     IMG_MENU_BUTTON_UP, IMG_MENU_BUTTON_UP_ACTIVE,
+#if 1
+    -1, -1,	/* these values are not constant, but can change at runtime */
+#else
     SC_SCROLL_UP_XPOS, SC_SCROLL_UP_YPOS,
+#endif
     SCREEN_CTRL_ID_SCROLL_UP,
     "scroll up"
   },
   {
     IMG_MENU_BUTTON_DOWN, IMG_MENU_BUTTON_DOWN_ACTIVE,
+#if 1
+    -1, -1,	/* these values are not constant, but can change at runtime */
+#else
     SC_SCROLL_DOWN_XPOS, SC_SCROLL_DOWN_YPOS,
+#endif
     SCREEN_CTRL_ID_SCROLL_DOWN,
     "scroll down"
   }
@@ -5705,8 +5722,13 @@ static struct
 #else
     IMG_MENU_SCROLLBAR, IMG_MENU_SCROLLBAR_ACTIVE,
 #endif
+#if 1
+    -1, -1,	/* these values are not constant, but can change at runtime */
+    -1, -1,	/* these values are not constant, but can change at runtime */
+#else
     SC_SCROLL_VERTICAL_XPOS, SC_SCROLL_VERTICAL_YPOS,
     SC_SCROLL_VERTICAL_XSIZE, SC_SCROLL_VERTICAL_YSIZE,
+#endif
     GD_TYPE_SCROLLBAR_VERTICAL,
     SCREEN_CTRL_ID_SCROLL_VERTICAL,
     "scroll level series vertically"
@@ -5772,6 +5794,12 @@ static void CreateScreenScrollbuttons()
   unsigned long event_mask;
   int i;
 
+  /* these values are not constant, but can change at runtime */
+  scrollbutton_info[0].x = SC_SCROLL_UP_XPOS;
+  scrollbutton_info[0].y = SC_SCROLL_UP_YPOS;
+  scrollbutton_info[1].x = SC_SCROLL_DOWN_XPOS;
+  scrollbutton_info[1].y = SC_SCROLL_DOWN_YPOS;
+
   for (i = 0; i < NUM_SCREEN_SCROLLBUTTONS; i++)
   {
     Bitmap *gd_bitmap_unpressed, *gd_bitmap_pressed;
@@ -5826,6 +5854,12 @@ static void CreateScreenScrollbuttons()
 static void CreateScreenScrollbars()
 {
   int i;
+
+  /* these values are not constant, but can change at runtime */
+  scrollbar_info[0].x = SC_SCROLL_VERTICAL_XPOS;
+  scrollbar_info[0].y = SC_SCROLL_VERTICAL_YPOS;
+  scrollbar_info[0].width  = SC_SCROLL_VERTICAL_XSIZE;
+  scrollbar_info[0].height = SC_SCROLL_VERTICAL_YSIZE;
 
   for (i = 0; i < NUM_SCREEN_SCROLLBARS; i++)
   {

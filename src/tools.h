@@ -215,6 +215,6 @@ void PlaySoundActivating();
 void PlaySoundSelecting();
 
 void ToggleFullscreenIfNeeded();
-void ChangeScreenModeIfNeeded();
+void ChangeViewportPropertiesIfNeeded();
 
 #endif	/* TOOLS_H */

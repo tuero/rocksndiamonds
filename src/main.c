@@ -39,7 +39,11 @@ SDL_Thread	       *server_thread;
 
 int			key_joystick_mapping = 0;
 
+#if 1
+boolean			redraw[MAX_LEV_FIELDX + 2][MAX_LEV_FIELDY + 2];
+#else
 boolean			redraw[MAX_BUF_XSIZE][MAX_BUF_YSIZE];
+#endif
 int			redraw_x1 = 0, redraw_y1 = 0;
 
 short			Feld[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
@@ -84,8 +88,11 @@ int			ActiveFont[NUM_FONTS];
 int			lev_fieldx, lev_fieldy;
 int			scroll_x, scroll_y;
 
-int			WIN_XSIZE = 672;
-int			WIN_YSIZE = 560;
+int			WIN_XSIZE = 672, WIN_YSIZE = 560;
+int			SCR_FIELDX = 17, SCR_FIELDY = 17;
+int			DX = 566, DY = 60;
+int			VX = 566, VY = 400;
+int			EX = 566, EY = 356;
 
 int			FX = SX, FY = SY;
 int			ScrollStepSize;
@@ -94,8 +101,13 @@ int			ScreenGfxPos = 0;
 int			BorderElement = EL_STEELWALL;
 int			GameFrameDelay = GAME_FRAME_DELAY;
 int			FfwdFrameDelay = FFWD_FRAME_DELAY;
+#if 1
+int			BX1, BY1;
+int			BX2, BY2;
+#else
 int			BX1 = 0, BY1 = 0;
 int			BX2 = SCR_FIELDX - 1, BY2 = SCR_FIELDY - 1;
+#endif
 int			SBX_Left, SBX_Right;
 int			SBY_Upper, SBY_Lower;
 int			ZX, ZY;
@@ -115,6 +127,7 @@ struct SetupInfo	setup;
 struct GameInfo		game;
 struct GlobalInfo	global;
 struct BorderInfo	border;
+struct ViewportInfo	viewport;
 struct TitleFadingInfo	fading;
 struct TitleFadingInfo	title_initial_default;
 struct TitleFadingInfo	title_default;

@@ -44,6 +44,7 @@ void RedrawBackground();
 void KeyboardAutoRepeatOffUnlessAutoplay();
 
 void InitGfxBuffers();
+void InitGadgets();
 
 void OpenAll(void);
 void CloseAllAndExit(int);

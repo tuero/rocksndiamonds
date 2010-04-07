@@ -6406,8 +6406,26 @@ struct ConfigInfo image_config[] =
   { "[player].sleeping_delay_fixed",		"2000"			},
   { "[player].sleeping_delay_random",		"2000"			},
 
-  { "global.screen.width",			"672"			},
-  { "global.screen.height",			"560"			},
+  { "viewport.window.width",			"672"			},
+  { "viewport.window.height",			"560"			},
+  { "viewport.playfield.menu.width",		"17"			},
+  { "viewport.playfield.menu.height",		"17"			},
+  { "viewport.playfield.game.width",		"17"			},
+  { "viewport.playfield.game.height",		"17"			},
+  { "viewport.playfield.editor.width",		"17"			},
+  { "viewport.playfield.editor.height",		"17"			},
+  { "viewport.door_1.menu.x",			"566"			},
+  { "viewport.door_1.menu.y",			"60"			},
+  { "viewport.door_1.game.x",			"566"			},
+  { "viewport.door_1.game.y",			"60"			},
+  { "viewport.door_1.editor.x",			"566"			},
+  { "viewport.door_1.editor.y",			"60"			},
+  { "viewport.door_2.menu.x",			"566"			},
+  { "viewport.door_2.menu.y",			"400"			},
+  { "viewport.door_2.game.x",			"566"			},
+  { "viewport.door_2.game.y",			"400"			},
+  { "viewport.door_2.editor.x",			"566"			},
+  { "viewport.door_2.editor.y",			"356"			},
 
   { NULL,					NULL			}
 };

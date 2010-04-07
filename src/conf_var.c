@@ -5093,12 +5093,84 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.player_sleeping_delay_random
   },
   {
-    "global.screen.width",
-    &global.screen.width
+    "viewport.window.width",
+    &viewport.window.width
   },
   {
-    "global.screen.height",
-    &global.screen.height
+    "viewport.window.height",
+    &viewport.window.height
+  },
+  {
+    "viewport.playfield.menu.width",
+    &viewport.playfield.menu.width
+  },
+  {
+    "viewport.playfield.menu.height",
+    &viewport.playfield.menu.height
+  },
+  {
+    "viewport.playfield.game.width",
+    &viewport.playfield.game.width
+  },
+  {
+    "viewport.playfield.game.height",
+    &viewport.playfield.game.height
+  },
+  {
+    "viewport.playfield.editor.width",
+    &viewport.playfield.editor.width
+  },
+  {
+    "viewport.playfield.editor.height",
+    &viewport.playfield.editor.height
+  },
+  {
+    "viewport.door_1.menu.x",
+    &viewport.door_1.menu.x
+  },
+  {
+    "viewport.door_1.menu.y",
+    &viewport.door_1.menu.y
+  },
+  {
+    "viewport.door_1.game.x",
+    &viewport.door_1.game.x
+  },
+  {
+    "viewport.door_1.game.y",
+    &viewport.door_1.game.y
+  },
+  {
+    "viewport.door_1.editor.x",
+    &viewport.door_1.editor.x
+  },
+  {
+    "viewport.door_1.editor.y",
+    &viewport.door_1.editor.y
+  },
+  {
+    "viewport.door_2.menu.x",
+    &viewport.door_2.menu.x
+  },
+  {
+    "viewport.door_2.menu.y",
+    &viewport.door_2.menu.y
+  },
+  {
+    "viewport.door_2.game.x",
+    &viewport.door_2.game.x
+  },
+  {
+    "viewport.door_2.game.y",
+    &viewport.door_2.game.y
+  },
+  {
+    "viewport.door_2.editor.x",
+    &viewport.door_2.editor.x
+  },
+  {
+    "viewport.door_2.editor.y",
+    &viewport.door_2.editor.y
   },
   {
     NULL,

@@ -3720,6 +3720,11 @@ void InitGame()
 
   game_status = GAME_MODE_PLAYING;
 
+#if 1
+  /* needed if different viewport properties defined for playing */
+  ChangeViewportPropertiesIfNeeded();
+#endif
+
   InitGameEngine();
   InitGameControlValues();
 

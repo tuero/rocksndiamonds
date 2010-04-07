@@ -349,6 +349,10 @@ void BackToFront()
 
   if (redraw_mask & REDRAW_FIELD)
   {
+#if 0
+    printf("::: REDRAW_FIELD\n");
+#endif
+
     if (game_status != GAME_MODE_PLAYING ||
 	redraw_mask & REDRAW_FROM_BACKBUFFER)
     {
@@ -431,6 +435,10 @@ void BackToFront()
 
   if (redraw_mask & REDRAW_TILES)
   {
+#if 0
+    printf("::: REDRAW_TILES\n");
+#endif
+
     for (x = 0; x < SCR_FIELDX; x++)
       for (y = 0 ; y < SCR_FIELDY; y++)
 	if (redraw[redraw_x1 + x][redraw_y1 + y])
@@ -8078,22 +8086,85 @@ void ToggleFullscreenIfNeeded()
   }
 }
 
-void ChangeScreenModeIfNeeded()
+void ChangeViewportPropertiesIfNeeded()
 {
-  if (global.screen.width  == WIN_XSIZE &&
-      global.screen.height == WIN_YSIZE)
-    return;
+  if (viewport.window.width  != WIN_XSIZE ||
+      viewport.window.height != WIN_YSIZE)
+  {
+    WIN_XSIZE = viewport.window.width;
+    WIN_YSIZE = viewport.window.height;
 
-  WIN_XSIZE = global.screen.width;
-  WIN_YSIZE = global.screen.height;
-
-  InitVideoBuffer(WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH, setup.fullscreen);
-  InitGfxBuffers();
+    InitVideoBuffer(WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH, setup.fullscreen);
+    InitGfxBuffers();
 
 #if 1
-  SetDrawDeactivationMask(REDRAW_NONE);
-  SetDrawBackgroundMask(REDRAW_FIELD);
+    SetDrawDeactivationMask(REDRAW_NONE);
+    SetDrawBackgroundMask(REDRAW_FIELD);
 
-  // RedrawBackground();
+    // RedrawBackground();
 #endif
+  }
+
+  if (game_status == GAME_MODE_PLAYING)
+  {
+    if (viewport.playfield.game.width  != SCR_FIELDX ||
+	viewport.playfield.game.height != SCR_FIELDY ||
+	viewport.door_1.game.x != DX ||
+	viewport.door_1.game.y != DY ||
+	viewport.door_2.game.x != VX ||
+	viewport.door_2.game.y != VY)
+    {
+      SCR_FIELDX = viewport.playfield.game.width;
+      SCR_FIELDY = viewport.playfield.game.height;
+
+      DX = viewport.door_1.game.x;
+      DY = viewport.door_1.game.y;
+      VX = viewport.door_2.game.x;
+      VY = viewport.door_2.game.y;
+
+      InitGfxBuffers();
+    }
+  }
+  else if (game_status == GAME_MODE_EDITOR)
+  {
+    if (viewport.playfield.editor.width  != SCR_FIELDX ||
+	viewport.playfield.editor.height != SCR_FIELDY ||
+	viewport.door_1.editor.x != DX ||
+	viewport.door_1.editor.y != DY ||
+	viewport.door_2.editor.x != EX ||
+	viewport.door_2.editor.y != EY)
+    {
+      SCR_FIELDX = viewport.playfield.editor.width;
+      SCR_FIELDY = viewport.playfield.editor.height;
+
+      DX = viewport.door_1.editor.x;
+      DY = viewport.door_1.editor.y;
+      EX = viewport.door_2.editor.x;
+      EY = viewport.door_2.editor.y;
+
+      InitGfxBuffers();
+    }
+  }
+  else		/* any menu screen */
+  {
+    if (viewport.playfield.menu.width  != SCR_FIELDX ||
+	viewport.playfield.menu.height != SCR_FIELDY ||
+	viewport.door_1.menu.x != DX ||
+	viewport.door_1.menu.y != DY ||
+	viewport.door_2.menu.x != VX ||
+	viewport.door_2.menu.y != VY)
+    {
+      SCR_FIELDX = viewport.playfield.menu.width;
+      SCR_FIELDY = viewport.playfield.menu.height;
+
+      DX = viewport.door_1.menu.x;
+      DY = viewport.door_1.menu.y;
+      VX = viewport.door_2.menu.x;
+      VY = viewport.door_2.menu.y;
+
+      InitGfxBuffers();
+      InitGadgets();
+      InitToons();
+    }
+  }
 }

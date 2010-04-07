@@ -50,8 +50,10 @@
 
 #define DEFAULT_FULLSCREEN_MODE		"800x600"
 
+#if 0
 #define SCR_FIELDX			17
 #define SCR_FIELDY			17
+#endif
 #define MAX_BUF_XSIZE			(SCR_FIELDX + 2)
 #define MAX_BUF_YSIZE			(SCR_FIELDY + 2)
 #define MIN_LEV_FIELDX			3
@@ -949,12 +951,14 @@
 #define SY			8
 #define REAL_SX			(SX - 2)
 #define REAL_SY			(SY - 2)
+#if 0
 #define DX			566
 #define DY			60
 #define VX			DX
 #define VY			400
 #define EX			DX
 #define EY			(VY - 44)
+#endif
 #define TILESIZE		32
 #define TILEX			TILESIZE
 #define TILEY			TILESIZE
@@ -2448,8 +2452,21 @@ struct GlobalInfo
   int fading_status;
   int fading_type;
 #endif
+};
 
-  struct Rect screen;
+struct SubViewportInfo
+{
+  struct Rect menu;
+  struct Rect game;
+  struct Rect editor;
+};
+
+struct ViewportInfo
+{
+  struct Rect window;
+  struct SubViewportInfo playfield;
+  struct SubViewportInfo door_1;
+  struct SubViewportInfo door_2;
 };
 
 struct ElementChangeInfo
@@ -2802,7 +2819,11 @@ extern SDL_Thread	       *server_thread;
 
 extern int			key_joystick_mapping;
 
+#if 1
+extern boolean			redraw[MAX_LEV_FIELDX + 2][MAX_LEV_FIELDY + 2];
+#else
 extern boolean			redraw[MAX_BUF_XSIZE][MAX_BUF_YSIZE];
+#endif
 extern int			redraw_x1, redraw_y1;
 
 extern short			Feld[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
@@ -2848,6 +2869,10 @@ extern int			lev_fieldx, lev_fieldy;
 extern int			scroll_x, scroll_y;
 
 extern int			WIN_XSIZE, WIN_YSIZE;
+extern int			SCR_FIELDX, SCR_FIELDY;
+extern int			DX, DY;
+extern int			VX, VY;
+extern int			EX, EY;
 
 extern int			FX, FY;
 extern int			ScrollStepSize;
@@ -2875,6 +2900,7 @@ extern struct HiScore		highscore[];
 extern struct TapeInfo		tape;
 extern struct GlobalInfo	global;
 extern struct BorderInfo	border;
+extern struct ViewportInfo	viewport;
 extern struct TitleFadingInfo	fading;
 extern struct TitleFadingInfo	fading_none;
 extern struct TitleFadingInfo	title_initial_default;
