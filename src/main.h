@@ -2257,6 +2257,14 @@ struct PreviewInfo
   int anim_mode;
 };
 
+struct ViewportInfo
+{
+  struct Rect window;
+  struct Rect playfield[NUM_SPECIAL_GFX_ARGS];
+  struct Rect door_1[NUM_SPECIAL_GFX_ARGS];
+  struct Rect door_2[NUM_SPECIAL_GFX_ARGS];
+};
+
 struct HiScore
 {
   char Name[MAX_PLAYER_NAME_LEN + 1];
@@ -2452,21 +2460,6 @@ struct GlobalInfo
   int fading_status;
   int fading_type;
 #endif
-};
-
-struct SubViewportInfo
-{
-  struct Rect menu;
-  struct Rect game;
-  struct Rect editor;
-};
-
-struct ViewportInfo
-{
-  struct Rect window;
-  struct SubViewportInfo playfield;
-  struct SubViewportInfo door_1;
-  struct SubViewportInfo door_2;
 };
 
 struct ElementChangeInfo

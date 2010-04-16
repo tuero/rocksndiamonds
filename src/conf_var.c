@@ -5101,76 +5101,100 @@ struct TokenIntPtrInfo image_config_vars[] =
     &viewport.window.height
   },
   {
-    "viewport.playfield.menu.width",
-    &viewport.playfield.menu.width
+    "viewport.playfield.width",
+    &viewport.playfield[GFX_SPECIAL_ARG_DEFAULT].width
   },
   {
-    "viewport.playfield.menu.height",
-    &viewport.playfield.menu.height
+    "viewport.playfield.height",
+    &viewport.playfield[GFX_SPECIAL_ARG_DEFAULT].height
   },
   {
-    "viewport.playfield.game.width",
-    &viewport.playfield.game.width
+    "viewport.playfield.MAIN.width",
+    &viewport.playfield[GFX_SPECIAL_ARG_MAIN].width
   },
   {
-    "viewport.playfield.game.height",
-    &viewport.playfield.game.height
+    "viewport.playfield.MAIN.height",
+    &viewport.playfield[GFX_SPECIAL_ARG_MAIN].height
   },
   {
-    "viewport.playfield.editor.width",
-    &viewport.playfield.editor.width
+    "viewport.playfield.PLAYING.width",
+    &viewport.playfield[GFX_SPECIAL_ARG_PLAYING].width
   },
   {
-    "viewport.playfield.editor.height",
-    &viewport.playfield.editor.height
+    "viewport.playfield.PLAYING.height",
+    &viewport.playfield[GFX_SPECIAL_ARG_PLAYING].height
   },
   {
-    "viewport.door_1.menu.x",
-    &viewport.door_1.menu.x
+    "viewport.playfield.EDITOR.width",
+    &viewport.playfield[GFX_SPECIAL_ARG_EDITOR].width
   },
   {
-    "viewport.door_1.menu.y",
-    &viewport.door_1.menu.y
+    "viewport.playfield.EDITOR.height",
+    &viewport.playfield[GFX_SPECIAL_ARG_EDITOR].height
   },
   {
-    "viewport.door_1.game.x",
-    &viewport.door_1.game.x
+    "viewport.door_1.x",
+    &viewport.door_1[GFX_SPECIAL_ARG_DEFAULT].x
   },
   {
-    "viewport.door_1.game.y",
-    &viewport.door_1.game.y
+    "viewport.door_1.y",
+    &viewport.door_1[GFX_SPECIAL_ARG_DEFAULT].y
   },
   {
-    "viewport.door_1.editor.x",
-    &viewport.door_1.editor.x
+    "viewport.door_1.MAIN.x",
+    &viewport.door_1[GFX_SPECIAL_ARG_MAIN].x
   },
   {
-    "viewport.door_1.editor.y",
-    &viewport.door_1.editor.y
+    "viewport.door_1.MAIN.y",
+    &viewport.door_1[GFX_SPECIAL_ARG_MAIN].y
   },
   {
-    "viewport.door_2.menu.x",
-    &viewport.door_2.menu.x
+    "viewport.door_1.PLAYING.x",
+    &viewport.door_1[GFX_SPECIAL_ARG_PLAYING].x
   },
   {
-    "viewport.door_2.menu.y",
-    &viewport.door_2.menu.y
+    "viewport.door_1.PLAYING.y",
+    &viewport.door_1[GFX_SPECIAL_ARG_PLAYING].y
   },
   {
-    "viewport.door_2.game.x",
-    &viewport.door_2.game.x
+    "viewport.door_1.EDITOR.x",
+    &viewport.door_1[GFX_SPECIAL_ARG_EDITOR].x
   },
   {
-    "viewport.door_2.game.y",
-    &viewport.door_2.game.y
+    "viewport.door_1.EDITOR.y",
+    &viewport.door_1[GFX_SPECIAL_ARG_EDITOR].y
   },
   {
-    "viewport.door_2.editor.x",
-    &viewport.door_2.editor.x
+    "viewport.door_2.x",
+    &viewport.door_2[GFX_SPECIAL_ARG_DEFAULT].x
   },
   {
-    "viewport.door_2.editor.y",
-    &viewport.door_2.editor.y
+    "viewport.door_2.y",
+    &viewport.door_2[GFX_SPECIAL_ARG_DEFAULT].y
+  },
+  {
+    "viewport.door_2.MAIN.x",
+    &viewport.door_2[GFX_SPECIAL_ARG_MAIN].x
+  },
+  {
+    "viewport.door_2.MAIN.y",
+    &viewport.door_2[GFX_SPECIAL_ARG_MAIN].y
+  },
+  {
+    "viewport.door_2.PLAYING.x",
+    &viewport.door_2[GFX_SPECIAL_ARG_PLAYING].x
+  },
+  {
+    "viewport.door_2.PLAYING.y",
+    &viewport.door_2[GFX_SPECIAL_ARG_PLAYING].y
+  },
+  {
+    "viewport.door_2.EDITOR.x",
+    &viewport.door_2[GFX_SPECIAL_ARG_EDITOR].x
+  },
+  {
+    "viewport.door_2.EDITOR.y",
+    &viewport.door_2[GFX_SPECIAL_ARG_EDITOR].y
   },
   {
     NULL,

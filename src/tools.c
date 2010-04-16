@@ -8088,6 +8088,14 @@ void ToggleFullscreenIfNeeded()
 
 void ChangeViewportPropertiesIfNeeded()
 {
+  int *door_1_x = &DX;
+  int *door_1_y = &DY;
+  int *door_2_x = (game_status == GAME_MODE_EDITOR ? &EX : &VX);
+  int *door_2_y = (game_status == GAME_MODE_EDITOR ? &EY : &VY);
+  int gfx_game_mode = (game_status == GAME_MODE_PLAYING ||
+		       game_status == GAME_MODE_EDITOR ? game_status :
+		       GAME_MODE_MAIN);
+
   if (viewport.window.width  != WIN_XSIZE ||
       viewport.window.height != WIN_YSIZE)
   {
@@ -8105,64 +8113,25 @@ void ChangeViewportPropertiesIfNeeded()
 #endif
   }
 
-  if (game_status == GAME_MODE_PLAYING)
+  if (viewport.playfield[gfx_game_mode].width  != SCR_FIELDX ||
+      viewport.playfield[gfx_game_mode].height != SCR_FIELDY ||
+      viewport.door_1[gfx_game_mode].x != *door_1_x ||
+      viewport.door_1[gfx_game_mode].y != *door_1_y ||
+      viewport.door_2[gfx_game_mode].x != *door_2_x ||
+      viewport.door_2[gfx_game_mode].y != *door_2_y)
   {
-    if (viewport.playfield.game.width  != SCR_FIELDX ||
-	viewport.playfield.game.height != SCR_FIELDY ||
-	viewport.door_1.game.x != DX ||
-	viewport.door_1.game.y != DY ||
-	viewport.door_2.game.x != VX ||
-	viewport.door_2.game.y != VY)
+    SCR_FIELDX = viewport.playfield[gfx_game_mode].width;
+    SCR_FIELDY = viewport.playfield[gfx_game_mode].height;
+
+    *door_1_x = viewport.door_1[gfx_game_mode].x;
+    *door_1_y = viewport.door_1[gfx_game_mode].y;
+    *door_2_x = viewport.door_2[gfx_game_mode].x;
+    *door_2_y = viewport.door_2[gfx_game_mode].y;
+
+    InitGfxBuffers();
+
+    if (gfx_game_mode == GAME_MODE_MAIN)
     {
-      SCR_FIELDX = viewport.playfield.game.width;
-      SCR_FIELDY = viewport.playfield.game.height;
-
-      DX = viewport.door_1.game.x;
-      DY = viewport.door_1.game.y;
-      VX = viewport.door_2.game.x;
-      VY = viewport.door_2.game.y;
-
-      InitGfxBuffers();
-    }
-  }
-  else if (game_status == GAME_MODE_EDITOR)
-  {
-    if (viewport.playfield.editor.width  != SCR_FIELDX ||
-	viewport.playfield.editor.height != SCR_FIELDY ||
-	viewport.door_1.editor.x != DX ||
-	viewport.door_1.editor.y != DY ||
-	viewport.door_2.editor.x != EX ||
-	viewport.door_2.editor.y != EY)
-    {
-      SCR_FIELDX = viewport.playfield.editor.width;
-      SCR_FIELDY = viewport.playfield.editor.height;
-
-      DX = viewport.door_1.editor.x;
-      DY = viewport.door_1.editor.y;
-      EX = viewport.door_2.editor.x;
-      EY = viewport.door_2.editor.y;
-
-      InitGfxBuffers();
-    }
-  }
-  else		/* any menu screen */
-  {
-    if (viewport.playfield.menu.width  != SCR_FIELDX ||
-	viewport.playfield.menu.height != SCR_FIELDY ||
-	viewport.door_1.menu.x != DX ||
-	viewport.door_1.menu.y != DY ||
-	viewport.door_2.menu.x != VX ||
-	viewport.door_2.menu.y != VY)
-    {
-      SCR_FIELDX = viewport.playfield.menu.width;
-      SCR_FIELDY = viewport.playfield.menu.height;
-
-      DX = viewport.door_1.menu.x;
-      DY = viewport.door_1.menu.y;
-      VX = viewport.door_2.menu.x;
-      VY = viewport.door_2.menu.y;
-
-      InitGfxBuffers();
       InitGadgets();
       InitToons();
     }

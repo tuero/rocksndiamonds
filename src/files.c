@@ -9807,6 +9807,15 @@ static void InitMenuDesignSettings_SpecialPreProcessing()
     menu.enter_screen[i] = menu.enter_screen[GFX_SPECIAL_ARG_DEFAULT];
     menu.leave_screen[i] = menu.leave_screen[GFX_SPECIAL_ARG_DEFAULT];
   }
+
+  /* special case: initialize "ARG_DEFAULT" values in static default config */
+  /* (eg, init "viewport.door_1.MAIN.xyz" from "viewport.door_1.xyz") */
+  for (i = 0; i < NUM_SPECIAL_GFX_ARGS; i++)
+  {
+    viewport.playfield[i] = viewport.playfield[GFX_SPECIAL_ARG_DEFAULT];
+    viewport.door_1[i] = viewport.door_1[GFX_SPECIAL_ARG_DEFAULT];
+    viewport.door_2[i] = viewport.door_2[GFX_SPECIAL_ARG_DEFAULT];
+  }
 }
 
 static void InitMenuDesignSettings_SpecialPostProcessing()
@@ -9942,6 +9951,37 @@ static void LoadMenuDesignSettingsFromFilename(char *filename)
     if (value_6 != NULL)
       menu.leave_screen[i].post_delay = get_token_parameter_value(token_6,
 								  value_6);
+  }
+
+  /* special case: initialize with default values that may be overwritten */
+  /* (eg, init "viewport.door_1.MAIN.xyz" from "viewport.door_1.xyz") */
+  for (i = 0; i < NUM_SPECIAL_GFX_ARGS; i++)
+  {
+    char *token_1 = "viewport.playfield.width";
+    char *token_2 = "viewport.playfield.height";
+    char *token_3 = "viewport.door_1.x";
+    char *token_4 = "viewport.door_1.y";
+    char *token_5 = "viewport.door_2.x";
+    char *token_6 = "viewport.door_2.y";
+    char *value_1 = getHashEntry(setup_file_hash, token_1);
+    char *value_2 = getHashEntry(setup_file_hash, token_2);
+    char *value_3 = getHashEntry(setup_file_hash, token_3);
+    char *value_4 = getHashEntry(setup_file_hash, token_4);
+    char *value_5 = getHashEntry(setup_file_hash, token_5);
+    char *value_6 = getHashEntry(setup_file_hash, token_6);
+
+    if (value_1 != NULL)
+      viewport.playfield[i].width = get_token_parameter_value(token_1,value_1);
+    if (value_2 != NULL)
+      viewport.playfield[i].height = get_token_parameter_value(token_2,value_2);
+    if (value_3 != NULL)
+      viewport.door_1[i].x = get_token_parameter_value(token_3, value_3);
+    if (value_4 != NULL)
+      viewport.door_1[i].y = get_token_parameter_value(token_4, value_4);
+    if (value_5 != NULL)
+      viewport.door_2[i].x = get_token_parameter_value(token_5, value_5);
+    if (value_6 != NULL)
+      viewport.door_2[i].y = get_token_parameter_value(token_6, value_6);
   }
 
   /* special case: initialize with default values that may be overwritten */
