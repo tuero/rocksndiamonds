@@ -871,6 +871,12 @@ void HandleKey(Key key, int key_status)
 	case KSYM_0:
 	  GameFrameDelay = (GameFrameDelay == 500 ? GAME_FRAME_DELAY : 500);
 	  break;
+
+	case KSYM_b:
+	  setup.sp_show_border_elements = !setup.sp_show_border_elements;
+	  printf("Supaplex border elements %s\n",
+		 setup.sp_show_border_elements ? "enabled" : "disabled");
+	  break;
 #endif
 
 	default:

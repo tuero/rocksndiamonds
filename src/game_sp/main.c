@@ -28,6 +28,9 @@ void InitGameEngine_SP()
 
   menBorder = setup.sp_show_border_elements;
 
+  game_sp.scroll_xoffset = (EVEN(SCR_FIELDX) ? TILEX / 2 : 0);
+  game_sp.scroll_yoffset = (EVEN(SCR_FIELDY) ? TILEY / 2 : 0);
+
   for (x = 0; x < SP_MAX_PLAYFIELD_WIDTH; x++)
   {
     for (y = 0; y < SP_MAX_PLAYFIELD_HEIGHT; y++)

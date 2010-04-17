@@ -197,6 +197,30 @@ void SetScrollEdges()
     ScrollMaxX -= TILEX / 2;
     ScrollMaxY -= TILEY / 2;
   }
+#if 1
+  {
+    ScrollMinX -= game_sp.scroll_xoffset;
+    ScrollMaxX -= game_sp.scroll_xoffset;
+    ScrollMinY -= game_sp.scroll_yoffset;
+    ScrollMaxY -= game_sp.scroll_yoffset;
+  }
+#else
+  if (1)
+  {
+    ScrollMinX -= TILEX / 2;
+    ScrollMaxX -= TILEX / 2;
+    ScrollMinY -= TILEY / 2;
+    ScrollMaxY -= TILEY / 2;
+  }
+#endif
+#else
+  if (!menBorder)
+  {
+    ScrollMinX += TILEX / 2;
+    ScrollMinY += TILEY / 2;
+    ScrollMaxX -= TILEX / 2;
+    ScrollMaxY -= TILEY / 2;
+  }
 #endif
 
 #else

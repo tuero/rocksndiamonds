@@ -106,8 +106,13 @@ static void ScrollPlayfieldIfNeededExt(boolean reset)
 
   if (mScrollX_last == -1 || mScrollY_last == -1)
   {
+#if 1
+    mScrollX_last = (mScrollX / TILESIZE) * TILESIZE;
+    mScrollY_last = (mScrollY / TILESIZE) * TILESIZE;
+#else
     mScrollX_last = mScrollX;
     mScrollY_last = mScrollY;
+#endif
 
     return;
   }
@@ -223,10 +228,12 @@ void BlitScreenToBitmap_SP(Bitmap *target_bitmap)
   int sx, sy, sxsize, sysize;
 
 #if 1
-  printf("::: %d, %d - %d, %d - %ld, %ld\n",
+  printf("::: %d, %d / %d, %d / %ld, %ld (%ld, %ld) / %d, %d\n",
 	 MurphyScreenXPos, MurphyScreenYPos,
 	 ScreenScrollXPos, ScreenScrollYPos,
-	 mScrollX, mScrollY);
+	 mScrollX, mScrollY,
+	 mScrollX_last, mScrollY_last,
+	 px, py);
 #endif
 
   int xsize = SXSIZE;
@@ -239,6 +246,20 @@ void BlitScreenToBitmap_SP(Bitmap *target_bitmap)
   sx = SX + (full_xsize < xsize ? (xsize - full_xsize) / 2 : 0);
   sy = SY + (full_ysize < ysize ? (ysize - full_ysize) / 2 : 0);
 
+#if 1
+#if 1
+  {
+    px += game_sp.scroll_xoffset;
+    py += game_sp.scroll_yoffset;
+  }
+#else
+  if (1)
+  {
+    px += TILEX / 2;
+    py += TILEY / 2;
+  }
+#endif
+#else
 #if 1
   if (0 && !menBorder)
   {
@@ -257,6 +278,7 @@ void BlitScreenToBitmap_SP(Bitmap *target_bitmap)
     px += TILEX / 2;
     py += TILEY / 2;
   }
+#endif
 #endif
 
   BlitBitmap(bitmap_db_field_sp, target_bitmap, px, py, sxsize, sysize, sx, sy);

@@ -111,6 +111,8 @@ struct GameInfo_SP
 
   /* needed for engine snapshots */
   int preceding_buffer_size;
+
+  int scroll_xoffset, scroll_yoffset;
 };
 
 struct DemoInfo_SP
