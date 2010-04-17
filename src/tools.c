@@ -8095,6 +8095,14 @@ void ChangeViewportPropertiesIfNeeded()
   int gfx_game_mode = (game_status == GAME_MODE_PLAYING ||
 		       game_status == GAME_MODE_EDITOR ? game_status :
 		       GAME_MODE_MAIN);
+  struct RectWithBorder *vp_playfield = &viewport.playfield[gfx_game_mode];
+  struct RectWithBorder *vp_door_1 = &viewport.door_1[gfx_game_mode];
+  struct RectWithBorder *vp_door_2 = &viewport.door_2[gfx_game_mode];
+  int border_size = vp_playfield->border_size;
+  int new_sx = vp_playfield->x + border_size;
+  int new_sy = vp_playfield->y + border_size;
+  int new_scr_fieldx = (vp_playfield->width  - 2 * border_size) / TILESIZE;
+  int new_scr_fieldy = (vp_playfield->height - 2 * border_size) / TILESIZE;
 
   if (viewport.window.width  != WIN_XSIZE ||
       viewport.window.height != WIN_YSIZE)
@@ -8113,20 +8121,28 @@ void ChangeViewportPropertiesIfNeeded()
 #endif
   }
 
-  if (viewport.playfield[gfx_game_mode].width  != SCR_FIELDX ||
-      viewport.playfield[gfx_game_mode].height != SCR_FIELDY ||
-      viewport.door_1[gfx_game_mode].x != *door_1_x ||
-      viewport.door_1[gfx_game_mode].y != *door_1_y ||
-      viewport.door_2[gfx_game_mode].x != *door_2_x ||
-      viewport.door_2[gfx_game_mode].y != *door_2_y)
+  if (new_scr_fieldx != SCR_FIELDX ||
+      new_scr_fieldy != SCR_FIELDY ||
+      new_sx != SX ||
+      new_sy != SY ||
+      vp_playfield->x != REAL_SX ||
+      vp_playfield->y != REAL_SY ||
+      vp_door_1->x != *door_1_x ||
+      vp_door_1->y != *door_1_y ||
+      vp_door_2->x != *door_2_x ||
+      vp_door_2->y != *door_2_y)
   {
-    SCR_FIELDX = viewport.playfield[gfx_game_mode].width;
-    SCR_FIELDY = viewport.playfield[gfx_game_mode].height;
+    SCR_FIELDX = new_scr_fieldx;
+    SCR_FIELDY = new_scr_fieldy;
+    SX = new_sx;
+    SY = new_sy;
+    REAL_SX = vp_playfield->x;
+    REAL_SY = vp_playfield->y;
 
-    *door_1_x = viewport.door_1[gfx_game_mode].x;
-    *door_1_y = viewport.door_1[gfx_game_mode].y;
-    *door_2_x = viewport.door_2[gfx_game_mode].x;
-    *door_2_y = viewport.door_2[gfx_game_mode].y;
+    *door_1_x = vp_door_1->x;
+    *door_1_y = vp_door_1->y;
+    *door_2_x = vp_door_2->x;
+    *door_2_y = vp_door_2->y;
 
     InitGfxBuffers();
 

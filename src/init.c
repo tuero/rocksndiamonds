@@ -5465,6 +5465,8 @@ void InitGfxBuffers()
   InitGfxDoor2Info(VX, VY, VXSIZE, VYSIZE);
   InitGfxWindowInfo(WIN_XSIZE, WIN_YSIZE);
   InitGfxScrollbufferInfo(FXSIZE, FYSIZE);
+
+  InitGfxBuffers_SP();
 }
 
 void InitGfx()

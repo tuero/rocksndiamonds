@@ -90,11 +90,17 @@ int			scroll_x, scroll_y;
 
 int			WIN_XSIZE = 672, WIN_YSIZE = 560;
 int			SCR_FIELDX = 17, SCR_FIELDY = 17;
+int			SX = 8, SY = 8;
+int			REAL_SX = 6, REAL_SY = 6;
 int			DX = 566, DY = 60;
 int			VX = 566, VY = 400;
 int			EX = 566, EY = 356;
 
+#if 1
+int			FX, FY;
+#else
 int			FX = SX, FY = SY;
+#endif
 int			ScrollStepSize;
 int			ScreenMovDir = MV_NONE, ScreenMovPos = 0;
 int			ScreenGfxPos = 0;

@@ -5101,12 +5101,32 @@ struct TokenIntPtrInfo image_config_vars[] =
     &viewport.window.height
   },
   {
+    "viewport.playfield.x",
+    &viewport.playfield[GFX_SPECIAL_ARG_DEFAULT].x
+  },
+  {
+    "viewport.playfield.y",
+    &viewport.playfield[GFX_SPECIAL_ARG_DEFAULT].y
+  },
+  {
     "viewport.playfield.width",
     &viewport.playfield[GFX_SPECIAL_ARG_DEFAULT].width
   },
   {
     "viewport.playfield.height",
     &viewport.playfield[GFX_SPECIAL_ARG_DEFAULT].height
+  },
+  {
+    "viewport.playfield.border_size",
+    &viewport.playfield[GFX_SPECIAL_ARG_DEFAULT].border_size
+  },
+  {
+    "viewport.playfield.MAIN.x",
+    &viewport.playfield[GFX_SPECIAL_ARG_MAIN].x
+  },
+  {
+    "viewport.playfield.MAIN.y",
+    &viewport.playfield[GFX_SPECIAL_ARG_MAIN].y
   },
   {
     "viewport.playfield.MAIN.width",
@@ -5117,6 +5137,18 @@ struct TokenIntPtrInfo image_config_vars[] =
     &viewport.playfield[GFX_SPECIAL_ARG_MAIN].height
   },
   {
+    "viewport.playfield.MAIN.border_size",
+    &viewport.playfield[GFX_SPECIAL_ARG_MAIN].border_size
+  },
+  {
+    "viewport.playfield.PLAYING.x",
+    &viewport.playfield[GFX_SPECIAL_ARG_PLAYING].x
+  },
+  {
+    "viewport.playfield.PLAYING.y",
+    &viewport.playfield[GFX_SPECIAL_ARG_PLAYING].y
+  },
+  {
     "viewport.playfield.PLAYING.width",
     &viewport.playfield[GFX_SPECIAL_ARG_PLAYING].width
   },
@@ -5125,12 +5157,28 @@ struct TokenIntPtrInfo image_config_vars[] =
     &viewport.playfield[GFX_SPECIAL_ARG_PLAYING].height
   },
   {
+    "viewport.playfield.PLAYING.border_size",
+    &viewport.playfield[GFX_SPECIAL_ARG_PLAYING].border_size
+  },
+  {
+    "viewport.playfield.EDITOR.x",
+    &viewport.playfield[GFX_SPECIAL_ARG_EDITOR].x
+  },
+  {
+    "viewport.playfield.EDITOR.y",
+    &viewport.playfield[GFX_SPECIAL_ARG_EDITOR].y
+  },
+  {
     "viewport.playfield.EDITOR.width",
     &viewport.playfield[GFX_SPECIAL_ARG_EDITOR].width
   },
   {
     "viewport.playfield.EDITOR.height",
     &viewport.playfield[GFX_SPECIAL_ARG_EDITOR].height
+  },
+  {
+    "viewport.playfield.EDITOR.border_size",
+    &viewport.playfield[GFX_SPECIAL_ARG_EDITOR].border_size
   },
   {
     "viewport.door_1.x",

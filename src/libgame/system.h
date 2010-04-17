@@ -1108,6 +1108,13 @@ struct Rect
   int width, height;
 };
 
+struct RectWithBorder
+{
+  int x, y;
+  int width, height;
+  int border_size;
+};
+
 struct MenuPosInfo
 {
   int x, y;

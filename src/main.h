@@ -947,11 +947,11 @@
 #define MAX_INITIAL_INVENTORY_SIZE	8
 
 /* often used screen positions */
+#if 0
 #define SX			8
 #define SY			8
 #define REAL_SX			(SX - 2)
 #define REAL_SY			(SY - 2)
-#if 0
 #define DX			566
 #define DY			60
 #define VX			DX
@@ -2259,10 +2259,10 @@ struct PreviewInfo
 
 struct ViewportInfo
 {
-  struct Rect window;
-  struct Rect playfield[NUM_SPECIAL_GFX_ARGS];
-  struct Rect door_1[NUM_SPECIAL_GFX_ARGS];
-  struct Rect door_2[NUM_SPECIAL_GFX_ARGS];
+  struct RectWithBorder window;
+  struct RectWithBorder playfield[NUM_SPECIAL_GFX_ARGS];
+  struct RectWithBorder door_1[NUM_SPECIAL_GFX_ARGS];
+  struct RectWithBorder door_2[NUM_SPECIAL_GFX_ARGS];
 };
 
 struct HiScore
@@ -2863,6 +2863,8 @@ extern int			scroll_x, scroll_y;
 
 extern int			WIN_XSIZE, WIN_YSIZE;
 extern int			SCR_FIELDX, SCR_FIELDY;
+extern int			SX, SY;
+extern int			REAL_SX, REAL_SY;
 extern int			DX, DY;
 extern int			VX, VY;
 extern int			EX, EY;

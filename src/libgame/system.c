@@ -512,6 +512,38 @@ boolean DrawingOnBackground(int x, int y)
 	  CheckDrawingArea(x, y, 1, 1, gfx.draw_background_mask));
 }
 
+static boolean ValidClippedRectangle(Bitmap *bitmap, int *x, int *y,
+				     int *width, int *height)
+{
+  /* skip if rectangle completely outside bitmap */
+
+  if (*x + *width <= 0 ||
+      *y + *height <= 0 ||
+      *x >= bitmap->width ||
+      *y >= bitmap->height)
+    return FALSE;
+
+  /* clip if rectangle overlaps bitmap */
+
+  if (*x < 0)
+  {
+    *x = 0;
+    *width += *x;
+  }
+  else if (*x + *width > bitmap->width)
+    *width = bitmap->width - *x;
+
+  if (*y < 0)
+  {
+    *y = 0;
+    *height += *y;
+  }
+  else if (*y + *height > bitmap->height)
+    *height = bitmap->height - *y;
+
+  return TRUE;
+}
+
 void BlitBitmap(Bitmap *src_bitmap, Bitmap *dst_bitmap,
 		int src_x, int src_y, int width, int height,
 		int dst_x, int dst_y)
@@ -520,6 +552,10 @@ void BlitBitmap(Bitmap *src_bitmap, Bitmap *dst_bitmap,
     return;
 
 #if 1
+  if (!ValidClippedRectangle(src_bitmap, &src_x, &src_y, &width, &height) ||
+      !ValidClippedRectangle(dst_bitmap, &dst_x, &dst_y, &width, &height))
+    return;
+#else
   /* skip if rectangle starts outside bitmap */
   if (src_x >= src_bitmap->width ||
       src_y >= src_bitmap->height ||
@@ -599,6 +635,12 @@ void FadeRectangle(Bitmap *bitmap_cross, int x, int y, int width, int height,
 		   int fade_mode, int fade_delay, int post_delay,
 		   void (*draw_border_function)(void))
 {
+#if 1
+  /* (use bitmap "backbuffer" -- "bitmap_cross" may be undefined) */
+  if (!ValidClippedRectangle(backbuffer, &x, &y, &width, &height))
+    return;
+#endif
+
 #if defined(TARGET_SDL)
   SDLFadeRectangle(bitmap_cross, x, y, width, height,
 		   fade_mode, fade_delay, post_delay, draw_border_function);
@@ -615,6 +657,9 @@ void FillRectangle(Bitmap *bitmap, int x, int y, int width, int height,
     return;
 
 #if 1
+  if (!ValidClippedRectangle(bitmap, &x, &y, &width, &height))
+    return;
+#else
   /* skip if rectangle starts outside bitmap */
   if (x >= bitmap->width ||
       y >= bitmap->height)

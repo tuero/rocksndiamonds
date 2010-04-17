@@ -10,8 +10,13 @@
 long mScrollX, mScrollY;
 long mScrollX_last, mScrollY_last;
 
+#if 1
+long ScreenBuffer[2 + MAX_PLAYFIELD_WIDTH + 2][2 + MAX_PLAYFIELD_HEIGHT + 2];
+boolean redraw[2 + MAX_PLAYFIELD_WIDTH + 2][2 + MAX_PLAYFIELD_HEIGHT + 2];
+#else
 long ScreenBuffer[MAX_BUF_XSIZE][MAX_BUF_YSIZE];
 boolean redraw[MAX_BUF_XSIZE][MAX_BUF_YSIZE];
+#endif
 
 
 void RestorePlayfield()
@@ -45,7 +50,7 @@ static void ScrollPlayfield(int dx, int dy)
   int y2 = mScrollY_last / TILEY + (SCR_FIELDY - 1) + 2;
   int x, y;
 
-  BlitBitmap(screenBitmap, screenBitmap,
+  BlitBitmap(bitmap_db_field_sp, bitmap_db_field_sp,
              TILEX * (dx == -1),
              TILEY * (dy == -1),
              (MAX_BUF_XSIZE * TILEX) - TILEX * (dx != 0),
@@ -217,6 +222,13 @@ void BlitScreenToBitmap_SP(Bitmap *target_bitmap)
   int py = 2 * TILEY + (mScrollY - mScrollY_last) % TILEY;
   int sx, sy, sxsize, sysize;
 
+#if 1
+  printf("::: %d, %d - %d, %d - %ld, %ld\n",
+	 MurphyScreenXPos, MurphyScreenYPos,
+	 ScreenScrollXPos, ScreenScrollYPos,
+	 mScrollX, mScrollY);
+#endif
+
   int xsize = SXSIZE;
   int ysize = SYSIZE;
   int full_xsize = (FieldWidth  - (menBorder ? 0 : 1)) * TILEX;
@@ -227,13 +239,27 @@ void BlitScreenToBitmap_SP(Bitmap *target_bitmap)
   sx = SX + (full_xsize < xsize ? (xsize - full_xsize) / 2 : 0);
   sy = SY + (full_ysize < ysize ? (ysize - full_ysize) / 2 : 0);
 
+#if 1
+  if (0 && !menBorder)
+  {
+    if (mScrollX < ScrollMinX + TILEX / 2)
+      px += ScrollMinX + TILEX / 2 - mScrollX;
+    else if (mScrollX > ScrollMaxX - TILEX / 2)
+      px -= mScrollX - (ScrollMaxX - TILEX / 2);
+    if (mScrollY < ScrollMinY + TILEY / 2)
+      py += ScrollMinY + TILEY / 2 - mScrollY;
+    else if (mScrollY > ScrollMaxY - TILEY / 2)
+      py -= mScrollY - (ScrollMaxY - TILEY / 2);
+  }
+#else
   if (!menBorder)
   {
     px += TILEX / 2;
     py += TILEY / 2;
   }
+#endif
 
-  BlitBitmap(screenBitmap, target_bitmap, px, py, sxsize, sysize, sx, sy);
+  BlitBitmap(bitmap_db_field_sp, target_bitmap, px, py, sxsize, sysize, sx, sy);
 }
 
 void BackToFront_SP(void)
@@ -261,7 +287,7 @@ void BackToFront_SP(void)
 	int yy = (top  + y) % MAX_BUF_YSIZE;
 
 	if (redraw[xx][yy])
-	  BlitBitmap(screenBitmap, window,
+	  BlitBitmap(bitmap_db_field_sp, window,
 		     xx * TILEX, yy * TILEY, TILEX, TILEY,
 		     SX + x * TILEX, SY + y * TILEY);
       }

@@ -31,8 +31,12 @@ void DisplayLevel()
     return;
 
   ClearRectangle(backbuffer, REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE);
-  ClearRectangle(screenBitmap, 0, 0,
+#if 1
+  ClearRectangle(bitmap_db_field_sp, 0, 0, FXSIZE, FYSIZE);
+#else
+  ClearRectangle(bitmap_db_field_sp, 0, 0,
 		 MAX_BUF_XSIZE * TILEX, MAX_BUF_YSIZE * TILEY);
+#endif
 
 #if 1
   SetDisplayRegion();
@@ -177,10 +181,36 @@ static void ReStretch()
 
 void SetScrollEdges()
 {
+#if 1
+  int border_offset = (menBorder ? 1 : 2);
+
+  ScrollMinX = 0;
+  ScrollMinY = 0;
+  ScrollMaxX = (DisplayMaxX + border_offset) * BaseWidth - SXSIZE;
+  ScrollMaxY = (DisplayMaxY + border_offset) * BaseWidth - SYSIZE;
+
+#if 1
+  if (!menBorder)
+  {
+    ScrollMinX += TILEX / 2;
+    ScrollMinY += TILEY / 2;
+    ScrollMaxX -= TILEX / 2;
+    ScrollMaxY -= TILEY / 2;
+  }
+#endif
+
+#else
   ScrollMinX = (int)(DisplayMinX - 0.5) * BaseWidth;
   ScrollMinY = (int)(DisplayMinY - 0.5) * BaseWidth;
   ScrollMaxX = (int)(DisplayMaxX + 1.5) * BaseWidth - SXSIZE;
   ScrollMaxY = (int)(DisplayMaxY + 1.5) * BaseWidth - SYSIZE;
+#endif
+
+#if 1
+  printf("::: (%ld, %ld), (%ld, %ld) -> (%d, %d), (%d, %d)\n",
+	 DisplayMinX, DisplayMinY, DisplayMaxX, DisplayMaxY,
+	 ScrollMinX, ScrollMinY, ScrollMaxX, ScrollMaxY);
+#endif
 }
 
 void DrawField(int X, int Y)

@@ -184,6 +184,8 @@ extern struct EngineSnapshotInfo_SP engine_snapshot_sp;
 extern void sp_open_all();
 extern void sp_close_all();
 
+extern void InitGfxBuffers_SP();
+
 extern void InitGameEngine_SP();
 extern void GameActions_SP(byte *, boolean);
 

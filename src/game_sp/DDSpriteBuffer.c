@@ -24,7 +24,7 @@ static void Blt(int pX, int pY, Bitmap *bitmap, int SpriteX, int SpriteY)
   if (pX < sx1 || pX > sx2 || pY < sy1 || pY > sy2)
     return;
 
-  BlitBitmap(bitmap, screenBitmap, SpriteX, SpriteY,
+  BlitBitmap(bitmap, bitmap_db_field_sp, SpriteX, SpriteY,
 	     TILEX, TILEY, sx, sy);
 }
 
