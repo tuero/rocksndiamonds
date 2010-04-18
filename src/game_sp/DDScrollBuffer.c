@@ -227,7 +227,7 @@ void BlitScreenToBitmap_SP(Bitmap *target_bitmap)
   int py = 2 * TILEY + (mScrollY - mScrollY_last) % TILEY;
   int sx, sy, sxsize, sysize;
 
-#if 1
+#if 0
   printf("::: %d, %d / %d, %d / %ld, %ld (%ld, %ld) / %d, %d\n",
 	 MurphyScreenXPos, MurphyScreenYPos,
 	 ScreenScrollXPos, ScreenScrollYPos,
@@ -246,40 +246,9 @@ void BlitScreenToBitmap_SP(Bitmap *target_bitmap)
   sx = SX + (full_xsize < xsize ? (xsize - full_xsize) / 2 : 0);
   sy = SY + (full_ysize < ysize ? (ysize - full_ysize) / 2 : 0);
 
-#if 1
-#if 1
-  {
-    px += game_sp.scroll_xoffset;
-    py += game_sp.scroll_yoffset;
-  }
-#else
-  if (1)
-  {
-    px += TILEX / 2;
-    py += TILEY / 2;
-  }
-#endif
-#else
-#if 1
-  if (0 && !menBorder)
-  {
-    if (mScrollX < ScrollMinX + TILEX / 2)
-      px += ScrollMinX + TILEX / 2 - mScrollX;
-    else if (mScrollX > ScrollMaxX - TILEX / 2)
-      px -= mScrollX - (ScrollMaxX - TILEX / 2);
-    if (mScrollY < ScrollMinY + TILEY / 2)
-      py += ScrollMinY + TILEY / 2 - mScrollY;
-    else if (mScrollY > ScrollMaxY - TILEY / 2)
-      py -= mScrollY - (ScrollMaxY - TILEY / 2);
-  }
-#else
-  if (!menBorder)
-  {
-    px += TILEX / 2;
-    py += TILEY / 2;
-  }
-#endif
-#endif
+  /* scroll correction for even number of visible tiles (half tile shifted) */
+  px += game_sp.scroll_xoffset;
+  py += game_sp.scroll_yoffset;
 
   BlitBitmap(bitmap_db_field_sp, target_bitmap, px, py, sxsize, sysize, sx, sy);
 }

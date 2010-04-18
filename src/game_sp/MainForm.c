@@ -181,56 +181,28 @@ static void ReStretch()
 
 void SetScrollEdges()
 {
-#if 1
-  int border_offset = (menBorder ? 1 : 2);
+  int border1_offset = (menBorder ? 1 : 2);
+  int border2_offset = (menBorder ? 0 : TILESIZE / 2);
 
+  /* scroll correction for border frame (1 tile) or border element (2 tiles) */
   ScrollMinX = 0;
   ScrollMinY = 0;
-  ScrollMaxX = (DisplayMaxX + border_offset) * BaseWidth - SXSIZE;
-  ScrollMaxY = (DisplayMaxY + border_offset) * BaseWidth - SYSIZE;
+  ScrollMaxX = (DisplayMaxX + border1_offset) * TILEX - SXSIZE;
+  ScrollMaxY = (DisplayMaxY + border1_offset) * TILEY - SYSIZE;
 
-#if 1
-  if (!menBorder)
-  {
-    ScrollMinX += TILEX / 2;
-    ScrollMinY += TILEY / 2;
-    ScrollMaxX -= TILEX / 2;
-    ScrollMaxY -= TILEY / 2;
-  }
-#if 1
-  {
-    ScrollMinX -= game_sp.scroll_xoffset;
-    ScrollMaxX -= game_sp.scroll_xoffset;
-    ScrollMinY -= game_sp.scroll_yoffset;
-    ScrollMaxY -= game_sp.scroll_yoffset;
-  }
-#else
-  if (1)
-  {
-    ScrollMinX -= TILEX / 2;
-    ScrollMaxX -= TILEX / 2;
-    ScrollMinY -= TILEY / 2;
-    ScrollMaxY -= TILEY / 2;
-  }
-#endif
-#else
-  if (!menBorder)
-  {
-    ScrollMinX += TILEX / 2;
-    ScrollMinY += TILEY / 2;
-    ScrollMaxX -= TILEX / 2;
-    ScrollMaxY -= TILEY / 2;
-  }
-#endif
+  /* scroll correction for border element (half tile on left and right side) */
+  ScrollMinX += border2_offset;
+  ScrollMinY += border2_offset;
+  ScrollMaxX -= border2_offset;
+  ScrollMaxY -= border2_offset;
 
-#else
-  ScrollMinX = (int)(DisplayMinX - 0.5) * BaseWidth;
-  ScrollMinY = (int)(DisplayMinY - 0.5) * BaseWidth;
-  ScrollMaxX = (int)(DisplayMaxX + 1.5) * BaseWidth - SXSIZE;
-  ScrollMaxY = (int)(DisplayMaxY + 1.5) * BaseWidth - SYSIZE;
-#endif
+  /* scroll correction for even number of visible tiles (half tile shifted) */
+  ScrollMinX -= game_sp.scroll_xoffset;
+  ScrollMaxX -= game_sp.scroll_xoffset;
+  ScrollMinY -= game_sp.scroll_yoffset;
+  ScrollMaxY -= game_sp.scroll_yoffset;
 
-#if 1
+#if 0
   printf("::: (%ld, %ld), (%ld, %ld) -> (%d, %d), (%d, %d)\n",
 	 DisplayMinX, DisplayMinY, DisplayMaxX, DisplayMaxY,
 	 ScrollMinX, ScrollMinY, ScrollMaxX, ScrollMaxY);

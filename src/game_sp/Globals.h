@@ -16,9 +16,8 @@
 #define ScrollDelta			((long)1)
 
 #define ZoomFactor			(2)
-#define BaseWidth			(ZoomFactor * 16)
+
 #define StretchWidth			(ZoomFactor * 16)
-#define TileSize			(ZoomFactor * 16)
 #define TwoPixels			(ZoomFactor * 2)
 
 

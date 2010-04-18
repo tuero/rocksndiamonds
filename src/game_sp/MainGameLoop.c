@@ -98,11 +98,10 @@ locExitMainGameLoop:
 
 void subCalculateScreenScrollPos()
 {
-  int ax, ay;
-
 #if 1
   int jump_pos = TILEX / 2;
 
+  /* handle wrap-around */
   if (MurphyScreenXPos < -jump_pos)
   {
     MurphyScreenXPos = FieldWidth * TILEX + MurphyScreenXPos;
@@ -122,17 +121,6 @@ void subCalculateScreenScrollPos()
     // printf("::: ExplosionShake [%d]\n", FrameCounter);
   }
 
-#if 1
-  ax = (SCR_FIELDX / 2) * TILESIZE;
-  ay = (SCR_FIELDY / 2) * TILESIZE;
-
-  ScreenScrollXPos = MurphyScreenXPos - ax;
-  ScreenScrollYPos = MurphyScreenYPos - ay;
-#else
-  ax = SXSIZE / 2;
-  ay = SYSIZE / 2;
-
-  ScreenScrollXPos = (MurphyScreenXPos + TILEX / 2) - ax;
-  ScreenScrollYPos = (MurphyScreenYPos + TILEY / 2) - ay;
-#endif
+  ScreenScrollXPos = MurphyScreenXPos - (SCR_FIELDX / 2) * TILESIZE;
+  ScreenScrollYPos = MurphyScreenYPos - (SCR_FIELDY / 2) * TILESIZE;
 }

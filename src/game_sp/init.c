@@ -10,20 +10,6 @@ struct EngineSnapshotInfo_SP engine_snapshot_sp;
 void sp_open_all()
 {
   Form_Load();
-
-#if 0
-  printf("::: open 1: %d, %d [%08x]\n", FXSIZE, FYSIZE, bitmap_db_field_sp);
-
-  /*
-  bitmap_db_field_sp = CreateBitmap(FXSIZE, FYSIZE, DEFAULT_DEPTH);
-  bitmap_db_field_sp = CreateBitmap(MAX_BUF_XSIZE * TILEX, MAX_BUF_YSIZE * TILEY,
-			      DEFAULT_DEPTH);
-  */
-
-  ReCreateBitmap(&bitmap_db_field_sp, FXSIZE, FYSIZE, DEFAULT_DEPTH);
-
-  printf("::: open 2: %d, %d [%08x]\n", FXSIZE, FYSIZE, bitmap_db_field_sp);
-#endif
 }
 
 void sp_close_all()
@@ -32,18 +18,7 @@ void sp_close_all()
 
 void InitGfxBuffers_SP()
 {
-#if 1
-  printf("::: init 1: %d, %d [%08x]\n", FXSIZE, FYSIZE, bitmap_db_field_sp);
-
-  /*
-  ReCreateBitmap(&bitmap_db_field_sp, MAX_BUF_XSIZE * TILEX, MAX_BUF_YSIZE * TILEY,
-		 DEFAULT_DEPTH);
-  */
-
   ReCreateBitmap(&bitmap_db_field_sp, FXSIZE, FYSIZE, DEFAULT_DEPTH);
-
-  printf("::: init 2: %d, %d [%08x]\n", FXSIZE, FYSIZE, bitmap_db_field_sp);
-#endif
 }
 
 unsigned int InitEngineRandom_SP(long seed)
