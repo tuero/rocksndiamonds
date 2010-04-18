@@ -9814,7 +9814,8 @@ static void InitMenuDesignSettings_SpecialPreProcessing()
   {
     viewport.playfield[i] = viewport.playfield[GFX_SPECIAL_ARG_DEFAULT];
     viewport.door_1[i] = viewport.door_1[GFX_SPECIAL_ARG_DEFAULT];
-    viewport.door_2[i] = viewport.door_2[GFX_SPECIAL_ARG_DEFAULT];
+    if (i != GFX_SPECIAL_ARG_EDITOR)	/* editor value already initialized */
+      viewport.door_2[i] = viewport.door_2[GFX_SPECIAL_ARG_DEFAULT];
   }
 }
 

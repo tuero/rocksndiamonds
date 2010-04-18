@@ -8104,6 +8104,12 @@ void ChangeViewportPropertiesIfNeeded()
   int new_scr_fieldx = (vp_playfield->width  - 2 * border_size) / TILESIZE;
   int new_scr_fieldy = (vp_playfield->height - 2 * border_size) / TILESIZE;
 
+#if 0
+  /* !!! TEST ONLY !!! */
+  // InitGfxBuffers();
+  return;
+#endif
+
   if (viewport.window.width  != WIN_XSIZE ||
       viewport.window.height != WIN_YSIZE)
   {
@@ -8152,4 +8158,8 @@ void ChangeViewportPropertiesIfNeeded()
       InitToons();
     }
   }
+
+#if 0
+  printf("::: %d, %d  /  %d, %d [%d]\n", VX, VY, EX, EY, game_status);
+#endif
 }

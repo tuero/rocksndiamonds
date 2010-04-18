@@ -7409,6 +7409,11 @@ void DrawLevelEd()
   FadeOut(REDRAW_FIELD);
 #endif
 
+#if 1
+  /* needed if different viewport properties defined for editor */
+  ChangeViewportPropertiesIfNeeded();
+#endif
+
   OpenDoor(DOOR_OPEN_2 | DOOR_NO_DELAY);
 
 #if DEBUG
@@ -7437,6 +7442,10 @@ void DrawLevelEd()
   /* copy default editor door content to main double buffer */
   BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
 	     DOOR_GFX_PAGEX6, DOOR_GFX_PAGEY1, DXSIZE, DYSIZE, DX, DY);
+
+#if 0
+  printf("::: %d, %d  /  %d, %d\n", VX, VY, EX, EY);
+#endif
 
   /* draw bigger door */
   DrawSpecialEditorDoor();
@@ -11505,7 +11514,9 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 
       BackToFront();		/* force redraw of undrawn special door */
 
+#if 0
       DrawCompleteVideoDisplay();
+#endif
 
       level_editor_test_game = TRUE;
 

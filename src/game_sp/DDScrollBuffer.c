@@ -250,6 +250,16 @@ void BlitScreenToBitmap_SP(Bitmap *target_bitmap)
   px += game_sp.scroll_xoffset;
   py += game_sp.scroll_yoffset;
 
+#if 1
+  if (ExplosionShakeMurphy != 0)
+  {
+    printf("::: ExplosionShakeMurphy\n");
+
+    px += TILEX / 2 - GetSimpleRandom(TILEX + 1);
+    py += TILEY / 2 - GetSimpleRandom(TILEX + 1);
+  }
+#endif
+
   BlitBitmap(bitmap_db_field_sp, target_bitmap, px, py, sxsize, sysize, sx, sy);
 }
 

@@ -127,7 +127,8 @@ void copyInternalEngineVars_SP()
   FieldMax = (FieldWidth * FieldHeight) + HeaderSize - 1;
   LevelMax = (FieldWidth * FieldHeight) - 1;
 
-  FileMax = FieldMax + native_sp_level.demo.length;
+  /* (add one byte for the level number stored as first byte of demo data) */
+  FileMax = FieldMax + native_sp_level.demo.length + 1;
 
   PlayField8 = REDIM_1D(sizeof(byte), 0, FileMax);
   DisPlayField = REDIM_1D(sizeof(byte), 0, FieldMax);
@@ -185,7 +186,7 @@ void copyInternalEngineVars_SP()
     PlayField8[FieldMax + 1] = native_sp_level.demo.level_nr;
 
     for (i = 0; i < native_sp_level.demo.length; i++)
-      PlayField8[FieldMax + i + 2] = native_sp_level.demo.data[i];
+      PlayField8[FieldMax + 2 + i] = native_sp_level.demo.data[i];
   }
 
   AnimationPosTable = REDIM_1D(sizeof(int), 0, LevelMax - 2 * FieldWidth);

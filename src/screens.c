@@ -1781,7 +1781,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 
 	FadeSetEnterScreen();
 
-#if 1
+#if 0
 	/* needed if different viewport properties defined for editor */
 	ChangeViewportPropertiesIfNeeded();
 #endif

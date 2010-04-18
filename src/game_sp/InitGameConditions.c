@@ -21,6 +21,7 @@ void subInitGameConditions()
   YawnSleepCounter = 0;			// Wake up sleeping Murphy
 
   ExplosionShake = 0;			// Force explosion flag off
+  ExplosionShakeMurphy = 0;		// Force explosion flag off
 
   TerminalMaxCycles = 0x7F;
   YellowDisksExploded = 0;

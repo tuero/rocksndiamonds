@@ -78,21 +78,27 @@ static void DrawFrame(int Delta)
   RX = FieldWidth - Delta;
   BY = FieldHeight - Delta;
 
-  DrawImage(LX, tY, imgFrameCorner);
-  DrawImage(LX, BY, imgFrameCorner);
-  DrawImage(RX, tY, imgFrameCorner);
-  DrawImage(RX, BY, imgFrameCorner);
+  DrawImage(LX, tY, (Delta > 0 ? imgFrameCorner : aniSpace));
+  DrawImage(LX, BY, (Delta > 0 ? imgFrameCorner : aniSpace));
+  DrawImage(RX, tY, (Delta > 0 ? imgFrameCorner : aniSpace));
+  DrawImage(RX, BY, (Delta > 0 ? imgFrameCorner : aniSpace));
 
   for (i = LX + 1; i <= RX - 1; i++)
   {
-    DrawImage(i, tY, imgFrameHorizontal);
-    DrawImage(i, BY, imgFrameHorizontal);
+    DrawImage(i, tY, (Delta > 0 ? imgFrameHorizontal : aniSpace));
+    DrawImage(i, BY, (Delta > 0 ? imgFrameHorizontal : aniSpace));
   }
 
   for (i = tY + 1; i <= BY - 1; i++)
   {
-    DrawImage(LX, i, imgFrameVertical);
-    DrawImage(RX, i, imgFrameVertical);
+    DrawImage(LX, i, (Delta > 0 ? imgFrameVertical : aniSpace));
+    DrawImage(RX, i, (Delta > 0 ? imgFrameVertical : aniSpace));
+  }
+
+  if (Delta > 0)
+  {
+    // ...
+    // ClearRectangle(bitmap_db_field_sp, 
   }
 }
 

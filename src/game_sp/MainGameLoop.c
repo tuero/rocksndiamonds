@@ -52,6 +52,11 @@ void subMainGameLoop_Main(byte action, boolean warp_mode)
   TimerVar = TimerVar + 1;
 
 #if 1
+  if (ExplosionShakeMurphy > 0)
+    ExplosionShakeMurphy--;
+#endif
+
+#if 1
   if (ExitToMenuFlag == 1)
   {
     // happens when demo ends or when Murphy enters exit (to be checked)

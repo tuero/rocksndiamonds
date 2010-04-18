@@ -10,7 +10,7 @@
 
 extern int ScreenScrollXPos, ScreenScrollYPos;
 
-extern int ExplosionShake;
+extern int ExplosionShake, ExplosionShakeMurphy;
 extern boolean NoDisplayFlag;
 
 extern long DisplayMinX, DisplayMaxX;

@@ -410,6 +410,12 @@ void DrawVideoDisplay(unsigned long state, unsigned long value)
 
 void DrawCompleteVideoDisplay()
 {
+#if 0
+  printf("::: %d, %d  /  %d, %d [%d] [%d, %d] [%d/%d]\n",
+	 VX, VY, EX, EY, game_status, gfx.vx, gfx.vy,
+	 tape.date, tape.length);
+#endif
+
   BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
 	     DOOR_GFX_PAGEX3, DOOR_GFX_PAGEY2,
 	     gfx.vxsize, gfx.vysize, gfx.vx, gfx.vy);
@@ -420,11 +426,38 @@ void DrawCompleteVideoDisplay()
 	     gfx.vx + VIDEO_CONTROL_XPOS, gfx.vy + VIDEO_CONTROL_YPOS);
 
   DrawVideoDisplay(VIDEO_ALL_OFF, 0);
+
+#if 1
+  if (tape.recording)
+  {
+    DrawVideoDisplay(VIDEO_STATE_REC_ON, 0);
+    DrawVideoDisplay(VIDEO_STATE_DATE_ON, tape.date);
+    DrawVideoDisplay(VIDEO_STATE_TIME_ON, tape.length_seconds);
+
+    if (tape.pausing)
+      DrawVideoDisplay(VIDEO_STATE_PAUSE_ON, 0);
+  }
+  else if (tape.playing)
+  {
+    DrawVideoDisplay(VIDEO_STATE_PLAY_ON, 0);
+    DrawVideoDisplay(VIDEO_STATE_DATE_ON, tape.date);
+    DrawVideoDisplay(VIDEO_STATE_TIME_ON, 0);
+
+    if (tape.pausing)
+      DrawVideoDisplay(VIDEO_STATE_PAUSE_ON, 0);
+  }
+  else if (tape.date && tape.length)
+  {
+    DrawVideoDisplay(VIDEO_STATE_DATE_ON, tape.date);
+    DrawVideoDisplay(VIDEO_STATE_TIME_ON, tape.length_seconds);
+  }
+#else
   if (tape.date && tape.length)
   {
     DrawVideoDisplay(VIDEO_STATE_DATE_ON, tape.date);
     DrawVideoDisplay(VIDEO_STATE_TIME_ON, tape.length_seconds);
   }
+#endif
 
   BlitBitmap(drawto, bitmap_db_door, gfx.vx, gfx.vy, gfx.vxsize, gfx.vysize,
 	     DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY2);
@@ -469,8 +502,9 @@ void TapeErase()
 {
   int i;
 
-  tape.length = 0;
   tape.counter = 0;
+  tape.length = 0;
+  tape.length_seconds = 0;
 
   if (leveldir_current)
     setString(&tape.level_identifier, leveldir_current->identifier);
@@ -534,6 +568,7 @@ void TapeStartRecording(long random_seed)
   DrawVideoDisplay(VIDEO_STATE_REC_ON, 0);
   DrawVideoDisplay(VIDEO_STATE_DATE_ON, tape.date);
   DrawVideoDisplay(VIDEO_STATE_TIME_ON, 0);
+
   MapTapeWarpButton();
 
   SetDrawDeactivationMask(REDRAW_NONE);
@@ -707,6 +742,7 @@ void TapeStartPlaying()
   DrawVideoDisplay(VIDEO_STATE_PLAY_ON, 0);
   DrawVideoDisplay(VIDEO_STATE_DATE_ON, tape.date);
   DrawVideoDisplay(VIDEO_STATE_TIME_ON, 0);
+
   MapTapeWarpButton();
 
   SetDrawDeactivationMask(REDRAW_NONE);

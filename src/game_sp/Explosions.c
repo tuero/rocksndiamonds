@@ -43,7 +43,8 @@ void subAnimateExplosion(int si)
   if (bl == 8)
   {
     PlayField16[si] = 0;
-    ExplosionShake = 0; // nothing explodes
+    ExplosionShake = 0;		// nothing explodes
+    // ExplosionShakeMurphy = 0;	// nothing explodes
 
     // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     GfxGraphic[GetX(si)][GetY(si)] = aniSpace;
@@ -57,7 +58,8 @@ loc_g_28D0: // explosion produces infotron
   if (bl == 0x89)
   {
     PlayField16[si] = fiInfotron;
-    MovLowByte(&ExplosionShake, 0); // nothing explodes
+    MovLowByte(&ExplosionShake, 0);		// nothing explodes
+    // MovLowByte(&ExplosionShakeMurphy, 0);	// nothing explodes
 
     // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     GfxGraphic[GetX(si)][GetY(si)] = aniInfotron;
@@ -88,7 +90,8 @@ void ExplodeFieldSP(int si)
   if (ax == fiHardWare)
     return;
 
-  ExplosionShake = 1; // something explodes
+  ExplosionShake = 1;		// something explodes
+
   if (ax == fiMurphy)
   {
 #if 1
@@ -96,6 +99,10 @@ void ExplodeFieldSP(int si)
 #endif
 
     KillMurphyFlag = 1;
+
+#if 1
+    ExplosionShakeMurphy = 30;	// Murphy explodes
+#endif
   }
 
   if (ax == fiElectron)

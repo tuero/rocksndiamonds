@@ -3725,6 +3725,10 @@ void InitGame()
   ChangeViewportPropertiesIfNeeded();
 #endif
 
+#if 1
+  DrawCompleteVideoDisplay();
+#endif
+
   InitGameEngine();
   InitGameControlValues();
 

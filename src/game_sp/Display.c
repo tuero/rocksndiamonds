@@ -7,7 +7,7 @@
 
 int ScreenScrollXPos, ScreenScrollYPos;
 
-int ExplosionShake;
+int ExplosionShake, ExplosionShakeMurphy;
 boolean NoDisplayFlag;
 
 long DisplayMinX, DisplayMaxX;
