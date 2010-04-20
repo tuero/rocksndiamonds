@@ -69,16 +69,24 @@
 #define ORIG_SCR_MENUY		12
 #define SCR_MENUX		17
 #define SCR_MENUY		12
+#if 1
+extern int			SCR_FIELDX, SCR_FIELDY;
+#else
 #define SCR_FIELDX		17
 #define SCR_FIELDY		17
+#endif
 #define MAX_BUF_XSIZE		(SCR_FIELDX + 2)
 #define MAX_BUF_YSIZE		(SCR_FIELDY + 2)
 
 /* often used screen positions */
 #define ORIG_MENU_SX		((ORIG_SCR_MENUX - SCR_MENUX) * TILEX / 2)
 #define ORIG_MENU_SY		0
+#if 1
+extern int			SX, SY;
+#else
 #define SX			8
 #define SY			8
+#endif
 #define SXSIZE			(SCR_FIELDX * TILEX)
 #define SYSIZE			(SCR_FIELDY * TILEY)
 

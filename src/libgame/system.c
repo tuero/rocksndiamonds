@@ -211,6 +211,15 @@ void InitGfxScrollbufferInfo(int scrollbuffer_width, int scrollbuffer_height)
   gfx.scrollbuffer_height = scrollbuffer_height;
 }
 
+void InitGfxClipRegion(boolean enabled, int x, int y, int width, int height)
+{
+  gfx.clipping_enabled = enabled;
+  gfx.clip_x = x;
+  gfx.clip_y = y;
+  gfx.clip_width = width;
+  gfx.clip_height = height;
+}
+
 void InitGfxDrawBusyAnimFunction(void (*draw_busy_anim_function)(void))
 {
   gfx.draw_busy_anim_function = draw_busy_anim_function;
@@ -512,9 +521,61 @@ boolean DrawingOnBackground(int x, int y)
 	  CheckDrawingArea(x, y, 1, 1, gfx.draw_background_mask));
 }
 
-static boolean ValidClippedRectangle(Bitmap *bitmap, int *x, int *y,
-				     int *width, int *height)
+static boolean InClippedRectangle(Bitmap *bitmap, int *x, int *y,
+				  int *width, int *height, boolean is_dest)
 {
+#if 1
+  int clip_x, clip_y, clip_width, clip_height;
+
+  if (gfx.clipping_enabled && is_dest)	/* only clip destination bitmap */
+  {
+    clip_x = MIN(MAX(0, gfx.clip_x), bitmap->width);
+    clip_y = MIN(MAX(0, gfx.clip_y), bitmap->height);
+    clip_width = MIN(MAX(0, gfx.clip_width), bitmap->width - clip_x);
+    clip_height = MIN(MAX(0, gfx.clip_height), bitmap->height - clip_y);
+  }
+  else
+  {
+    clip_x = 0;
+    clip_y = 0;
+    clip_width = bitmap->width;
+    clip_height = bitmap->height;
+  }
+
+  /* skip if rectangle completely outside bitmap */
+
+  if (*x + *width  <= clip_x ||
+      *y + *height <= clip_y ||
+      *x >= clip_x + clip_width ||
+      *y >= clip_y + clip_height)
+    return FALSE;
+
+  /* clip if rectangle overlaps bitmap */
+
+  if (*x < clip_x)
+  {
+    *width -= clip_x - *x;
+    *x = clip_x;
+  }
+  else if (*x + *width > clip_x + clip_width)
+  {
+    *width = clip_x + clip_width - *x;
+  }
+
+  if (*y < clip_y)
+  {
+    *height -= clip_y - *y;
+    *y = clip_y;
+  }
+  else if (*y + *height > clip_y + clip_height)
+  {
+    *height = clip_y + clip_height - *y;
+  }
+
+  return TRUE;
+
+#else
+
   /* skip if rectangle completely outside bitmap */
 
   if (*x + *width <= 0 ||
@@ -546,6 +607,7 @@ static boolean ValidClippedRectangle(Bitmap *bitmap, int *x, int *y,
   }
 
   return TRUE;
+#endif
 }
 
 void BlitBitmap(Bitmap *src_bitmap, Bitmap *dst_bitmap,
@@ -559,8 +621,8 @@ void BlitBitmap(Bitmap *src_bitmap, Bitmap *dst_bitmap,
     return;
 
 #if 1
-  if (!ValidClippedRectangle(src_bitmap, &src_x, &src_y, &width, &height) ||
-      !ValidClippedRectangle(dst_bitmap, &dst_x, &dst_y, &width, &height))
+  if (!InClippedRectangle(src_bitmap, &src_x, &src_y, &width, &height, FALSE) ||
+      !InClippedRectangle(dst_bitmap, &dst_x, &dst_y, &width, &height, TRUE))
     return;
 
   /* source x/y might need adjustment if destination x/y was clipped top/left */
@@ -648,8 +710,8 @@ void FadeRectangle(Bitmap *bitmap_cross, int x, int y, int width, int height,
 		   void (*draw_border_function)(void))
 {
 #if 1
-  /* (use bitmap "backbuffer" -- "bitmap_cross" may be undefined) */
-  if (!ValidClippedRectangle(backbuffer, &x, &y, &width, &height))
+  /* (use destination bitmap "backbuffer" -- "bitmap_cross" may be undefined) */
+  if (!InClippedRectangle(backbuffer, &x, &y, &width, &height, TRUE))
     return;
 #endif
 
@@ -669,7 +731,7 @@ void FillRectangle(Bitmap *bitmap, int x, int y, int width, int height,
     return;
 
 #if 1
-  if (!ValidClippedRectangle(bitmap, &x, &y, &width, &height))
+  if (!InClippedRectangle(bitmap, &x, &y, &width, &height, TRUE))
     return;
 #else
   /* skip if rectangle starts outside bitmap */

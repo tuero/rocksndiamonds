@@ -1,3 +1,9 @@
+2010-04-20
+	* changed native Emerald Mine engine to support different viewport sizes
+
+2010-04-19
+	* changed native Supaplex engine to support different viewport sizes
+
 2010-04-07
 	* added initial, experimental support for different viewport properties
 	  (with "viewports" being menu/playfield area and doors; currently the

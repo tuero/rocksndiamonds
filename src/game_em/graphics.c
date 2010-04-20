@@ -29,15 +29,21 @@
 
 #define USE_EXTENDED_GRAPHICS_ENGINE		1
 
-int frame;			/* current screen frame */
-int screen_x;			/* current scroll position */
-int screen_y;
+int frame;				/* current screen frame */
+int screen_x, screen_y;			/* current scroll position */
 
 /* tiles currently on screen */
+#if 1
+static int screentiles[MAX_PLAYFIELD_HEIGHT + 2][MAX_PLAYFIELD_WIDTH + 2];
+static int crumbled_state[MAX_PLAYFIELD_HEIGHT + 2][MAX_PLAYFIELD_WIDTH + 2];
+
+static boolean redraw[MAX_PLAYFIELD_WIDTH + 2][MAX_PLAYFIELD_HEIGHT + 2];
+#else
 static int screentiles[MAX_BUF_YSIZE][MAX_BUF_XSIZE];
 static int crumbled_state[MAX_BUF_YSIZE][MAX_BUF_XSIZE];
 
 static boolean redraw[MAX_BUF_XSIZE][MAX_BUF_YSIZE];
+#endif
 
 #if 0
 #if 1
@@ -96,11 +102,20 @@ void BlitScreenToBitmap_EM(Bitmap *target_bitmap)
 
 void BackToFront_EM(void)
 {
+  static int screen_x_last = -1, screen_y_last = -1;
   static boolean scrolling_last = FALSE;
   int left = screen_x / TILEX;
   int top  = screen_y / TILEY;
+#if 1
+  boolean scrolling = (screen_x != screen_x_last || screen_y != screen_y_last);
+#else
   boolean scrolling = (screen_x % TILEX != 0 || screen_y % TILEY != 0);
+#endif
   int x, y;
+
+#if 0
+  printf("::: %d, %d\n", screen_x, screen_y);
+#endif
 
   SyncDisplay();
 
@@ -114,6 +129,35 @@ void BackToFront_EM(void)
   }
   else
   {
+#if 1
+    boolean half_shifted_x = (EVEN(SCR_FIELDX) && screen_x % TILEX);
+    boolean half_shifted_y = (EVEN(SCR_FIELDY) && screen_y % TILEY);
+    int x1 = 0, x2 = SCR_FIELDX - (half_shifted_x ? 0 : 1);
+    int y1 = 0, y2 = SCR_FIELDY - (half_shifted_y ? 0 : 1);
+    int scroll_xoffset = (half_shifted_x ? TILEX / 2 : 0);
+    int scroll_yoffset = (half_shifted_y ? TILEY / 2 : 0);
+
+    InitGfxClipRegion(TRUE, SX, SY, SXSIZE, SYSIZE);
+
+    for (x = x1; x <= x2; x++)
+    {
+      for (y = y1; y <= y2; y++)
+      {
+	int xx = (left + x) % MAX_BUF_XSIZE;
+	int yy = (top  + y) % MAX_BUF_YSIZE;
+
+	if (redraw[xx][yy])
+	  BlitBitmap(screenBitmap, window,
+		     xx * TILEX, yy * TILEY, TILEX, TILEY,
+		     SX + x * TILEX - scroll_xoffset,
+		     SY + y * TILEY - scroll_yoffset);
+      }
+    }
+
+    InitGfxClipRegion(FALSE, -1, -1, -1, -1);
+
+#else
+
     for (x = 0; x < SCR_FIELDX; x++)
     {
       for (y = 0; y < SCR_FIELDY; y++)
@@ -127,6 +171,7 @@ void BackToFront_EM(void)
 		     SX + x * TILEX, SY + y * TILEY);
       }
     }
+#endif
   }
 
   FlushDisplay();
@@ -136,6 +181,8 @@ void BackToFront_EM(void)
       redraw[x][y] = FALSE;
   redraw_tiles = 0;
 
+  screen_x_last = screen_x;
+  screen_y_last = screen_y;
   scrolling_last = scrolling;
 }
 
@@ -432,6 +479,10 @@ static void blitplayer(struct PLAYER *ply)
   y1 = (frame * ply->oldy + (8 - frame) * ply->y) * TILEY / 8;
   x2 = x1 + TILEX - 1;
   y2 = y1 + TILEY - 1;
+
+#if 0
+  printf("::: %d, %d\n", x1, y1);
+#endif
 
   if ((int)(x2 - screen_x) < ((MAX_BUF_XSIZE - 1) * TILEX - 1) &&
       (int)(y2 - screen_y) < ((MAX_BUF_YSIZE - 1) * TILEY - 1))

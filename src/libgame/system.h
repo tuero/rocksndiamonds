@@ -754,6 +754,10 @@ struct GfxInfo
   Bitmap *background_bitmap;
   int background_bitmap_mask;
 
+  boolean clipping_enabled;
+  int clip_x, clip_y;
+  int clip_width, clip_height;
+
   boolean override_level_graphics;
   boolean override_level_sounds;
   boolean override_level_music;
@@ -1186,6 +1190,7 @@ void InitGfxDoor1Info(int, int, int, int);
 void InitGfxDoor2Info(int, int, int, int);
 void InitGfxWindowInfo(int, int);
 void InitGfxScrollbufferInfo(int, int);
+void InitGfxClipRegion(boolean, int, int, int, int);
 void InitGfxDrawBusyAnimFunction(void (*draw_busy_anim_function)(void));
 void InitGfxCustomArtworkInfo();
 void SetDrawDeactivationMask(int);
