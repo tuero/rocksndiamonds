@@ -253,8 +253,6 @@ void BlitScreenToBitmap_SP(Bitmap *target_bitmap)
 #if 1
   if (ExplosionShakeMurphy != 0)
   {
-    printf("::: ExplosionShakeMurphy\n");
-
     px += TILEX / 2 - GetSimpleRandom(TILEX + 1);
     py += TILEY / 2 - GetSimpleRandom(TILEX + 1);
   }

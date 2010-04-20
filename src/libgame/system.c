@@ -527,19 +527,23 @@ static boolean ValidClippedRectangle(Bitmap *bitmap, int *x, int *y,
 
   if (*x < 0)
   {
-    *x = 0;
     *width += *x;
+    *x = 0;
   }
   else if (*x + *width > bitmap->width)
+  {
     *width = bitmap->width - *x;
+  }
 
   if (*y < 0)
   {
-    *y = 0;
     *height += *y;
+    *y = 0;
   }
   else if (*y + *height > bitmap->height)
+  {
     *height = bitmap->height - *y;
+  }
 
   return TRUE;
 }
@@ -548,6 +552,9 @@ void BlitBitmap(Bitmap *src_bitmap, Bitmap *dst_bitmap,
 		int src_x, int src_y, int width, int height,
 		int dst_x, int dst_y)
 {
+  int dst_x_unclipped = dst_x;
+  int dst_y_unclipped = dst_y;
+
   if (DrawingDeactivated(dst_x, dst_y, width, height))
     return;
 
@@ -555,6 +562,11 @@ void BlitBitmap(Bitmap *src_bitmap, Bitmap *dst_bitmap,
   if (!ValidClippedRectangle(src_bitmap, &src_x, &src_y, &width, &height) ||
       !ValidClippedRectangle(dst_bitmap, &dst_x, &dst_y, &width, &height))
     return;
+
+  /* source x/y might need adjustment if destination x/y was clipped top/left */
+  src_x += dst_x - dst_x_unclipped;
+  src_y += dst_y - dst_y_unclipped;
+
 #else
   /* skip if rectangle starts outside bitmap */
   if (src_x >= src_bitmap->width ||
