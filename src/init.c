@@ -5451,6 +5451,7 @@ static void InitMixer()
 
 void InitGfxBuffers()
 {
+  ReCreateBitmap(&bitmap_db_store, WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH);
   ReCreateBitmap(&bitmap_db_cross, WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH);
   ReCreateBitmap(&bitmap_db_field, FXSIZE, FYSIZE, DEFAULT_DEPTH);
   ReCreateBitmap(&bitmap_db_panel, DXSIZE, DYSIZE, DEFAULT_DEPTH);
@@ -5520,6 +5521,7 @@ void InitGfx()
   InitGfxBuffers();
 #else
   /* create additional image buffers for double-buffering and cross-fading */
+  bitmap_db_store = CreateBitmap(WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH);
   bitmap_db_cross = CreateBitmap(WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH);
   bitmap_db_field = CreateBitmap(FXSIZE, FYSIZE, DEFAULT_DEPTH);
   bitmap_db_panel = CreateBitmap(DXSIZE, DYSIZE, DEFAULT_DEPTH);

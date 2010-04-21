@@ -146,7 +146,8 @@ void DrawLevelField(int, int);
 void DrawMiniElement(int, int, int);
 void DrawMiniElementOrWall(int, int, int, int);
 
-void ShowEnvelope();
+void ShowEnvelope(int);
+void ShowEnvelopeDoor(char *text);
 
 void DrawLevel(void);
 void DrawMiniLevel(int, int, int, int);

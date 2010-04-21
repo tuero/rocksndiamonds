@@ -20,6 +20,7 @@
 #include "events.h"
 #include "config.h"
 
+Bitmap		       *bitmap_db_store;
 Bitmap		       *bitmap_db_cross;
 Bitmap		       *bitmap_db_field;
 Bitmap		       *bitmap_db_panel;
