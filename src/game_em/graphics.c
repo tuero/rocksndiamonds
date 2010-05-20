@@ -130,8 +130,23 @@ void BackToFront_EM(void)
   else
   {
 #if 1
-    boolean half_shifted_x = (EVEN(SCR_FIELDX) && screen_x % TILEX);
-    boolean half_shifted_y = (EVEN(SCR_FIELDY) && screen_y % TILEY);
+#if 1
+    boolean half_shifted_x = (screen_x % TILEX != 0);
+    boolean half_shifted_y = (screen_y % TILEY != 0);
+#else
+    boolean half_shifted_x = (EVEN(SCR_FIELDX) && screen_x % TILEX != 0);
+    boolean half_shifted_y = (EVEN(SCR_FIELDY) && screen_y % TILEY != 0);
+#endif
+
+#if 0
+#if 1
+    printf("::: %d, %d\n", EVEN(SCR_FIELDX), screen_x);
+#else
+    half_shifted_x = TRUE;
+    half_shifted_y = FALSE;
+#endif
+#endif
+
     int x1 = 0, x2 = SCR_FIELDX - (half_shifted_x ? 0 : 1);
     int y1 = 0, y2 = SCR_FIELDY - (half_shifted_y ? 0 : 1);
     int scroll_xoffset = (half_shifted_x ? TILEX / 2 : 0);
@@ -254,7 +269,11 @@ static void DrawLevelField_EM(int x, int y, int sx, int sy,
 static void DrawLevelFieldCrumbled_EM(int x, int y, int sx, int sy,
 				      int crm, boolean draw_masked)
 {
+#if 1
+  struct GraphicInfo_EM *g;
+#else
   struct GraphicInfo_EM *g = getObjectGraphic(x, y);
+#endif
   int left = screen_x / TILEX;
   int top  = screen_y / TILEY;
   int i;
@@ -266,6 +285,10 @@ static void DrawLevelFieldCrumbled_EM(int x, int y, int sx, int sy,
 
   if (crm == 0)		/* no crumbled edges for this tile */
     return;
+
+#if 1
+  g = getObjectGraphic(x, y);
+#endif
 
 #if 0
   if (x == 3 && y == 3 && frame == 0)

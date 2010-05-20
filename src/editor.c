@@ -8173,7 +8173,7 @@ static int PrintElementDescriptionFromFile(char *filename, int start_line)
   int max_lines_per_screen = (SYSIZE - pad_y) / font_height - 1;
 
   return DrawTextFile(sx, sy, filename, font_nr, max_chars_per_line, -1,
-		      max_lines_per_screen, -1, TRUE, FALSE, FALSE);
+		      max_lines_per_screen, 0, -1, TRUE, FALSE, FALSE);
 }
 
 static void DrawPropertiesInfo()

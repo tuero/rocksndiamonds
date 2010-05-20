@@ -189,6 +189,22 @@ void getFontCharSource(int font_nr, char c, Bitmap **bitmap, int *x, int *y)
 
 
 /* ========================================================================= */
+/* text string helper functions                                              */
+/* ========================================================================= */
+
+int maxWordLengthInString(char *text)
+{
+  char *text_ptr;
+  int max_word_len = 0;
+
+  for (text_ptr = text; *text_ptr; text_ptr++)
+    max_word_len = (*text_ptr != ' ' ? max_word_len + 1 : 0);
+
+  return max_word_len;
+}
+
+
+/* ========================================================================= */
 /* simple text drawing functions                                             */
 /* ========================================================================= */
 
@@ -728,7 +744,8 @@ static boolean getCheckedTokenValueFromString(char *string, char **token,
 }
 
 static void DrawTextBuffer_Flush(int x, int y, char *buffer, int font_nr,
-				 int line_length, int cut_length, int mask_mode,
+				 int line_length, int cut_length,
+				 int line_spacing, int mask_mode,
 				 boolean centered, int current_line)
 {
   int buffer_len = strlen(buffer);
@@ -739,7 +756,7 @@ static void DrawTextBuffer_Flush(int x, int y, char *buffer, int font_nr,
     (centered ? font_width * (line_length - buffer_len) / 2 : 0);
   int final_cut_length = MAX(0, cut_length - offset_chars);
   int xx = x + offset_xsize;
-  int yy = y + current_line * font_height;
+  int yy = y + current_line * (font_height + line_spacing);
 
   buffer[final_cut_length] = '\0';
 
@@ -751,8 +768,8 @@ static void DrawTextBuffer_Flush(int x, int y, char *buffer, int font_nr,
 
 int DrawTextBuffer(int x, int y, char *text_buffer, int font_nr,
 		   int line_length, int cut_length, int max_lines,
-		   int mask_mode, boolean autowrap, boolean centered,
-		   boolean parse_comments)
+		   int line_spacing, int mask_mode, boolean autowrap,
+		   boolean centered, boolean parse_comments)
 {
 #if 0
   int font_width = getFontWidth(font_nr);
@@ -808,7 +825,7 @@ int DrawTextBuffer(int x, int y, char *text_buffer, int font_nr,
 	if (buffer_len > 0 && current_line < max_lines)
 	{
 	  DrawTextBuffer_Flush(x, y, buffer, font_nr, line_length, cut_length,
-			       mask_mode, centered, current_line);
+			       line_spacing, mask_mode, centered, current_line);
 
 	  current_line++;
 
@@ -876,7 +893,7 @@ int DrawTextBuffer(int x, int y, char *text_buffer, int font_nr,
       {
 #if 1
 	DrawTextBuffer_Flush(x, y, buffer, font_nr, line_length, cut_length,
-			     mask_mode, centered, current_line);
+			     line_spacing, mask_mode, centered, current_line);
 #else
 	int offset_chars = (centered ? (line_length - buffer_len) / 2 : 0);
 	int offset_xsize =
@@ -907,7 +924,7 @@ int DrawTextBuffer(int x, int y, char *text_buffer, int font_nr,
   {
 #if 1
     DrawTextBuffer_Flush(x, y, buffer, font_nr, line_length, cut_length,
-			 mask_mode, centered, current_line);
+			 line_spacing, mask_mode, centered, current_line);
 #else
     int offset_chars = (centered ? (line_length - buffer_len) / 2 : 0);
 	int offset_xsize =
@@ -932,14 +949,14 @@ int DrawTextBuffer(int x, int y, char *text_buffer, int font_nr,
 
 int DrawTextFile(int x, int y, char *filename, int font_nr,
 		 int line_length, int cut_length, int max_lines,
-		 int mask_mode, boolean autowrap, boolean centered,
-		 boolean parse_comments)
+		 int line_spacing, int mask_mode, boolean autowrap,
+		 boolean centered, boolean parse_comments)
 {
   char *text_buffer = GetTextBufferFromFile(filename, MAX_LINES_FROM_FILE);
   int num_lines_printed = DrawTextBuffer(x, y, text_buffer, font_nr,
 					 line_length, cut_length, max_lines,
-					 mask_mode, autowrap, centered,
-					 parse_comments);
+					 line_spacing, mask_mode, autowrap,
+					 centered, parse_comments);
   checked_free(text_buffer);
 
   return num_lines_printed;

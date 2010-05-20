@@ -91,6 +91,7 @@ void GameActions_EM(byte action[MAX_PLAYERS], boolean warp_mode)
     printf("::: %05d: %lu, %d\n", FrameCounter, RandomEM, frame);
 #endif
 
+#if 0
   game_animscreen();
 
 #if 1
@@ -99,6 +100,7 @@ void GameActions_EM(byte action[MAX_PLAYERS], boolean warp_mode)
 #endif
 
   blitscreen();
+#endif
 #endif
 
   RandomEM = RandomEM * 129 + 1;
@@ -124,6 +126,20 @@ void GameActions_EM(byte action[MAX_PLAYERS], boolean warp_mode)
     if (!warp_mode)		/* do not redraw values in warp mode */
       DrawGameDoorValues_EM();
   }
+
+  CheckSingleStepMode_EM(action, frame, game_em.any_player_moving);
+
+#if 1
+  game_animscreen();
+
+#if 1
+#if 0
+  SyncDisplay();
+#endif
+
+  blitscreen();
+#endif
+#endif
 }
 
 /* read input device for players */

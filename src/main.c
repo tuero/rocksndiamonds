@@ -96,6 +96,7 @@ int			REAL_SX = 6, REAL_SY = 6;
 int			DX = 566, DY = 60;
 int			VX = 566, VY = 400;
 int			EX = 566, EY = 356;
+int			dDX, dDY;
 
 #if 1
 int			FX, FY;

@@ -1190,7 +1190,7 @@ void DrawTitleScreenMessage(int nr, boolean initial)
   ClearRectangleOnBackground(drawto, 0, 0, WIN_XSIZE, WIN_YSIZE);
 
   DrawTextFile(ALIGNED_TEXT_XPOS(tmi), ALIGNED_TEXT_YPOS(tmi),
-	       filename, tmi->font, tmi->chars, -1, tmi->lines, -1,
+	       filename, tmi->font, tmi->chars, -1, tmi->lines, 0, -1,
 	       tmi->autowrap, tmi->centered, tmi->parse_comments);
 
   game_status = last_game_status;	/* restore current game status */
@@ -2256,7 +2256,7 @@ void DrawInfoScreen_HelpText(int element, int action, int direction, int ypos)
     sy += getFontHeight(font_nr) / 2;
 
   DrawTextBuffer(sx, sy + ypos * ystep, text, font_nr,
-		 max_chars_per_line, -1, max_lines_per_text, -1,
+		 max_chars_per_line, -1, max_lines_per_text, 0, -1,
 		 TRUE, FALSE, FALSE);
 }
 
@@ -3060,7 +3060,7 @@ void DrawInfoScreen_LevelSet()
 
   if (filename != NULL)
     DrawTextFile(mSX + ALIGNED_TEXT_XPOS(tmi), mSY + ALIGNED_TEXT_YPOS(tmi),
-		 filename, tmi->font, tmi->chars, -1, tmi->lines, -1,
+		 filename, tmi->font, tmi->chars, -1, tmi->lines, 0, -1,
 		 tmi->autowrap, tmi->centered, tmi->parse_comments);
   else
     DrawTextCentered(mSY + ALIGNED_TEXT_YPOS(tmi), FONT_TEXT_2,

@@ -73,6 +73,8 @@ int getTextWidth(char *, int);
 
 void getFontCharSource(int, char, Bitmap **, int *, int *);
 
+int maxWordLengthInString(char *);
+
 void DrawInitText(char *, int, int);
 void DrawInitTextIfNeeded(char *, int, int);
 void DrawInitTextExt(char *, int, int, boolean);
@@ -87,9 +89,9 @@ void DrawText(int, int, char *, int);
 void DrawTextExt(DrawBuffer *, int, int, char *, int, int);
 
 char *GetTextBufferFromFile(char *, int);
-int DrawTextBuffer(int, int, char *, int, int, int, int, int, boolean, boolean,
-		   boolean);
-int DrawTextFile(int, int, char *, int, int, int, int, int, boolean, boolean,
-		 boolean);
+int DrawTextBuffer(int, int, char *, int, int, int, int, int, int,
+		   boolean, boolean, boolean);
+int DrawTextFile(int, int, char *, int, int, int, int, int, int,
+		 boolean, boolean, boolean);
 
 #endif	/* TEXT_H */

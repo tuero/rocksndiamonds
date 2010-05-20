@@ -2099,7 +2099,7 @@ void AnimateEnvelope(int envelope_nr, int anim_mode, int action)
 #if 1
     DrawTextBuffer(SX + sx + font_width, SY + sy + font_height,
 		   level.envelope[envelope_nr].text, font_nr, max_xsize,
-		   xsize - 2, ysize - 2, mask_mode,
+		   xsize - 2, ysize - 2, 0, mask_mode,
 		   level.envelope[envelope_nr].autowrap,
 		   level.envelope[envelope_nr].centered, FALSE);
 #else
@@ -2128,12 +2128,24 @@ void AnimateEnvelopeDoor(char *text, int anim_mode, int action)
   unsigned long anim_delay = 0;
   int frame_delay_value = (ffwd_delay ? FfwdFrameDelay : GameFrameDelay);
   int anim_delay_value = (no_delay ? 0 : frame_delay_value);
+#if 1
+  int max_word_len = maxWordLengthInString(text);
+  int font_nr = (max_word_len > 7 ? FONT_TEXT_1 : FONT_TEXT_2);
+#else
   int font_nr = FONT_ENVELOPE_1 + envelope_nr;
+#endif
   int font_width = getFontWidth(font_nr);
   int font_height = getFontHeight(font_nr);
 #if 1
+
+#if 1
+  int max_xsize = DXSIZE / font_width;
+  int max_ysize = DYSIZE / font_height;
+#else
   int max_xsize = 7;	/* tools.c: MAX_REQUEST_LINE_FONT1_LEN == 7 */
   int max_ysize = 13;	/* tools.c: MAX_REQUEST_LINES == 13 */
+#endif
+
 #else
   int max_xsize = level.envelope[envelope_nr].xsize;
   int max_ysize = level.envelope[envelope_nr].ysize;
@@ -2147,6 +2159,18 @@ void AnimateEnvelopeDoor(char *text, int anim_mode, int action)
   int x, y;
 
 #if 1
+  char *text_ptr;
+  char *text_copy = getStringCopy(text);
+#else
+#if 1
+  font_nr = FONT_TEXT_2;
+
+  if (maxWordLengthInString(text) > 7)	/* MAX_REQUEST_LINE_FONT1_LEN == 7 */
+  {
+    max_xsize = 10;	/* tools.c: MAX_REQUEST_LINE_FONT2_LEN == 10 */
+    font_nr = FONT_TEXT_1;
+  }
+#else
   int max_word_len = 0;
   char *text_ptr;
   char *text_copy = getStringCopy(text);
@@ -2165,10 +2189,21 @@ void AnimateEnvelopeDoor(char *text, int anim_mode, int action)
       break;
     }
   }
+#endif
+#endif
 
+#if 1
   for (text_ptr = text_copy; *text_ptr; text_ptr++)
     if (*text_ptr == ' ')
       *text_ptr = '\n';
+#endif
+
+#if 1
+  dDX = SX + (SXSIZE - DXSIZE) / 2 - DX;
+  dDY = SY + (SYSIZE - DYSIZE) / 2 - DY;
+#else
+  dDX = SX + SXSIZE / 2 - max_xsize * font_width  / 2 - DX;
+  dDY = SY + SYSIZE / 2 - max_ysize * font_height / 2 - DY;
 #endif
 
   for (x = xstart, y = ystart; x <= xend && y <= yend; x += xstep, y += ystep)
@@ -2195,14 +2230,14 @@ void AnimateEnvelopeDoor(char *text, int anim_mode, int action)
 #if 1
 
 #if 1
-    DrawTextBuffer(SX + sx + font_width, SY + sy + font_height,
+    DrawTextBuffer(SX + sx + font_width, SY + sy + font_height + 8,
 		   text_copy, font_nr, max_xsize,
-		   xsize - 2, ysize - 2, mask_mode,
+		   xsize - 2, ysize - 2, 2, mask_mode,
 		   FALSE, TRUE, FALSE);
 #else
     DrawTextBuffer(SX + sx + font_width, SY + sy + font_height,
 		   level.envelope[envelope_nr].text, font_nr, max_xsize,
-		   xsize - 2, ysize - 2, mask_mode,
+		   xsize - 2, ysize - 2, 0, mask_mode,
 		   level.envelope[envelope_nr].autowrap,
 		   level.envelope[envelope_nr].centered, FALSE);
 #endif
@@ -2213,8 +2248,30 @@ void AnimateEnvelopeDoor(char *text, int anim_mode, int action)
 		       xsize - 2, ysize - 2, mask_mode);
 #endif
 
+    /* copy request gadgets to door backbuffer */
 #if 1
-    redraw_mask |= REDRAW_ALL | REDRAW_FROM_BACKBUFFER;
+    if ((ysize - 2) > 13)
+      BlitBitmap(bitmap_db_door, drawto,
+		 DOOR_GFX_PAGEX1 + (DXSIZE - (xsize - 2) * font_width) / 2,
+		 DOOR_GFX_PAGEY1 + 13 * font_height,
+		 (xsize - 2) * font_width,
+		 (ysize - 2 - 13) * font_height,
+		 SX + sx + font_width,
+		 SY + sy + font_height * (1 + 13));
+#else
+    if ((ysize - 2) > 13)
+      BlitBitmap(bitmap_db_door, drawto,
+		 DOOR_GFX_PAGEX1 + (DXSIZE - (xsize - 2) * font_width) / 2,
+		 DOOR_GFX_PAGEY1 + 13 * font_height,
+		 (xsize - 2) * font_width,
+		 (ysize - 2 - 13) * font_height,
+		 SX + sx + font_width,
+		 SY + sy + font_height * (1 + 13));
+#endif
+
+#if 1
+    redraw_mask = REDRAW_FIELD | REDRAW_FROM_BACKBUFFER;
+    // redraw_mask |= REDRAW_ALL | REDRAW_FROM_BACKBUFFER;
 #else
     redraw_mask |= REDRAW_FIELD | REDRAW_FROM_BACKBUFFER;
 #endif
@@ -2229,7 +2286,9 @@ void AnimateEnvelopeDoor(char *text, int anim_mode, int action)
     WaitUntilDelayReached(&anim_delay, anim_delay_value / 2);
   }
 
+#if 1
   free(text_copy);
+#endif
 }
 
 void ShowEnvelope(int envelope_nr)
@@ -2276,20 +2335,23 @@ void ShowEnvelope(int envelope_nr)
   BackToFront();
 }
 
-void ShowEnvelopeDoor(char *text)
+void ShowEnvelopeDoor(char *text, int action)
 {
 #if 1
   int last_game_status = game_status;	/* save current game status */
+  // int last_draw_background_mask = gfx.draw_background_mask;
   int envelope_nr = 0;
 #endif
   int element = EL_ENVELOPE_1 + envelope_nr;
   int graphic = IMG_BACKGROUND_ENVELOPE_1 + envelope_nr;
   int sound_opening = element_info[element].sound[ACTION_OPENING];
   int sound_closing = element_info[element].sound[ACTION_CLOSING];
+#if 0
   boolean ffwd_delay = (tape.playing && tape.fast_forward);
   boolean no_delay = (tape.warp_forward);
   int normal_delay_value = ONE_SECOND_DELAY / (ffwd_delay ? 2 : 1);
   int wait_delay_value = (no_delay ? 0 : normal_delay_value);
+#endif
   int anim_mode = graphic_info[graphic].anim_mode;
   int main_anim_mode = (anim_mode == ANIM_NONE ? ANIM_VERTICAL|ANIM_HORIZONTAL:
 			anim_mode == ANIM_DEFAULT ? ANIM_VERTICAL : anim_mode);
@@ -2309,10 +2371,15 @@ void ShowEnvelopeDoor(char *text)
 
   SetDrawtoField(DRAW_BACKBUFFER);
 
-  BlitBitmap(backbuffer, bitmap_db_store, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
+  // SetDrawBackgroundMask(REDRAW_NONE);
 
-  if (game_status != GAME_MODE_MAIN)
-    InitAnimation();
+  if (action == ACTION_OPENING)
+  {
+    BlitBitmap(backbuffer, bitmap_db_store, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
+
+    if (game_status != GAME_MODE_MAIN)
+      InitAnimation();
+  }
 
   /* force DOOR font inside door area */
   game_status = GAME_MODE_PSEUDO_DOOR;
@@ -2320,41 +2387,54 @@ void ShowEnvelopeDoor(char *text)
 
   game.envelope_active = TRUE;	/* needed for RedrawPlayfield() events */
 
-  PlayMenuSoundStereo(sound_opening, SOUND_MIDDLE);
+  if (action == ACTION_OPENING)
+  {
+    PlayMenuSoundStereo(sound_opening, SOUND_MIDDLE);
 
-  if (anim_mode == ANIM_DEFAULT)
-    AnimateEnvelopeDoor(text, ANIM_DEFAULT, ACTION_OPENING);
+    if (anim_mode == ANIM_DEFAULT)
+      AnimateEnvelopeDoor(text, ANIM_DEFAULT, ACTION_OPENING);
 
-  AnimateEnvelopeDoor(text, main_anim_mode, ACTION_OPENING);
+    AnimateEnvelopeDoor(text, main_anim_mode, ACTION_OPENING);
 
-  if (tape.playing)
-    Delay(wait_delay_value);
+#if 0
+    if (tape.playing)
+      Delay(wait_delay_value);
+    else
+      WaitForEventToContinue();
+#endif
+  }
   else
-    WaitForEventToContinue();
+  {
+    PlayMenuSoundStereo(sound_closing, SOUND_MIDDLE);
 
-  PlayMenuSoundStereo(sound_closing, SOUND_MIDDLE);
+    if (anim_mode != ANIM_NONE)
+      AnimateEnvelopeDoor(text, main_anim_mode, ACTION_CLOSING);
 
-  if (anim_mode != ANIM_NONE)
-    AnimateEnvelopeDoor(text, main_anim_mode, ACTION_CLOSING);
-
-  if (anim_mode == ANIM_DEFAULT)
-    AnimateEnvelopeDoor(text, ANIM_DEFAULT, ACTION_CLOSING);
+    if (anim_mode == ANIM_DEFAULT)
+      AnimateEnvelopeDoor(text, ANIM_DEFAULT, ACTION_CLOSING);
+  }
 
   game.envelope_active = FALSE;
 
 #if 1
   game_status = last_game_status;	/* restore current game status */
 
-  if (game_status != GAME_MODE_MAIN)
-    StopAnimation();
+  if (action == ACTION_CLOSING)
+  {
+    if (game_status != GAME_MODE_MAIN)
+      StopAnimation();
 
-  BlitBitmap(bitmap_db_store, backbuffer, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
+    BlitBitmap(bitmap_db_store, backbuffer, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
+  }
 #else
   SetDrawtoField(DRAW_BUFFERED);
 #endif
 
+  // SetDrawBackgroundMask(last_draw_background_mask);
+
 #if 1
-  redraw_mask |= REDRAW_ALL;
+  redraw_mask = REDRAW_FIELD;
+  // redraw_mask |= REDRAW_ALL;
 #else
   redraw_mask |= REDRAW_FIELD;
 #endif
@@ -3298,13 +3378,20 @@ boolean Request(char *text, unsigned int req_state)
   int last_game_status = game_status;	/* save current game status */
   int max_request_line_len = MAX_REQUEST_LINE_FONT1_LEN;
   int font_nr = FONT_TEXT_2;
+  boolean use_envelope_request = TRUE  * 0;
+#if 0
   int max_word_len = 0;
+#endif
   char *text_ptr;
+  int i;
 
 #if 1
-  ShowEnvelopeDoor(text);
-#endif
-
+  if (maxWordLengthInString(text) > MAX_REQUEST_LINE_FONT1_LEN)
+  {
+    max_request_line_len = MAX_REQUEST_LINE_FONT2_LEN;
+    font_nr = FONT_TEXT_1;
+  }
+#else
   for (text_ptr = text; *text_ptr; text_ptr++)
   {
     max_word_len = (*text_ptr != ' ' ? max_word_len + 1 : 0);
@@ -3321,6 +3408,7 @@ boolean Request(char *text, unsigned int req_state)
       break;
     }
   }
+#endif
 
   if (game_status == GAME_MODE_PLAYING)
   {
@@ -3352,7 +3440,11 @@ boolean Request(char *text, unsigned int req_state)
 
   UnmapAllGadgets();
 
+#if 1
+  if (old_door_state & DOOR_OPEN_1 && !use_envelope_request)
+#else
   if (old_door_state & DOOR_OPEN_1)
+#endif
   {
     CloseDoor(DOOR_CLOSE_1);
 
@@ -3375,39 +3467,48 @@ boolean Request(char *text, unsigned int req_state)
   game_status = GAME_MODE_PSEUDO_DOOR;
 
   /* write text for request */
-  for (ty = 0; ty < MAX_REQUEST_LINES; ty++)
+  for (text_ptr = text, ty = 0; ty < MAX_REQUEST_LINES; ty++)
   {
     char text_line[max_request_line_len + 1];
     int tx, tl, tc = 0;
 
-    if (!*text)
+    if (!*text_ptr)
       break;
 
     for (tl = 0, tx = 0; tx < max_request_line_len; tl++, tx++)
     {
-      tc = *(text + tx);
+      tc = *(text_ptr + tx);
       if (!tc || tc == ' ')
 	break;
     }
 
     if (!tl)
     { 
-      text++; 
+      text_ptr++; 
       ty--; 
       continue; 
     }
 
-    strncpy(text_line, text, tl);
+    strncpy(text_line, text_ptr, tl);
     text_line[tl] = 0;
 
     DrawText(DX + (DXSIZE - tl * getFontWidth(font_nr)) / 2,
 	     DY + 8 + ty * (getFontHeight(font_nr) + 2),
 	     text_line, font_nr);
 
-    text += tl + (tc == ' ' ? 1 : 0);
+    text_ptr += tl + (tc == ' ' ? 1 : 0);
   }
 
   game_status = last_game_status;	/* restore current game status */
+
+#if 1
+  if (use_envelope_request)
+  {
+    /* !!! TMP !!! */
+    FreeToolButtons();
+    CreateToolButtons();
+  }
+#endif
 
   if (req_state & REQ_ASK)
   {
@@ -3431,7 +3532,36 @@ boolean Request(char *text, unsigned int req_state)
 	     DX, DY, DXSIZE, DYSIZE,
 	     DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1);
 
+#if 1
+  if (use_envelope_request)
+  {
+    ShowEnvelopeDoor(text, ACTION_OPENING);
+
+    for (i = 0; i < NUM_TOOL_BUTTONS; i++)
+    {
+      if ((req_state & REQ_ASK && (i == TOOL_CTRL_ID_YES ||
+				   i == TOOL_CTRL_ID_NO)) ||
+	  (req_state & REQ_CONFIRM && i == TOOL_CTRL_ID_CONFIRM) ||
+	  (req_state & REQ_PLAYER && (i == TOOL_CTRL_ID_PLAYER_1 &&
+				      i == TOOL_CTRL_ID_PLAYER_2 &&
+				      i == TOOL_CTRL_ID_PLAYER_3 &&
+				      i == TOOL_CTRL_ID_PLAYER_4)))
+      {
+	int x = tool_gadget[i]->x + dDX;
+	int y = tool_gadget[i]->y + dDY;
+
+	ModifyGadget(tool_gadget[i], GDI_X, x, GDI_Y, y, GDI_END);
+      }
+    }
+  }
+#endif
+
+#if 1
+  if (!use_envelope_request)
+    OpenDoor(DOOR_OPEN_1);
+#else
   OpenDoor(DOOR_OPEN_1);
+#endif
 
   if (!(req_state & REQUEST_WAIT_FOR_INPUT))
   {
@@ -3448,8 +3578,13 @@ boolean Request(char *text, unsigned int req_state)
     return FALSE;
   }
 
+#if 1
+  if (game_status != GAME_MODE_MAIN && !use_envelope_request)
+    InitAnimation();
+#else
   if (game_status != GAME_MODE_MAIN)
     InitAnimation();
+#endif
 
   button_status = MB_RELEASED;
 
@@ -3608,7 +3743,16 @@ boolean Request(char *text, unsigned int req_state)
 
   UnmapToolButtons();
 
+#if 1
+  if (use_envelope_request)
+    ShowEnvelopeDoor(text, ACTION_CLOSING);
+#endif
+
+#if 1
+  if (!(req_state & REQ_STAY_OPEN) && !use_envelope_request)
+#else
   if (!(req_state & REQ_STAY_OPEN))
+#endif
   {
     CloseDoor(DOOR_CLOSE_1);
 
@@ -6633,6 +6777,12 @@ inline static int get_effective_element_EM(int tile, int frame_em)
       case Yacid_splash_wB:
 	return (frame_em > 5 ? EL_EMPTY : element);
 
+#if 0
+      case Ydiamond_stone:
+	//  if (!game.use_native_emc_graphics_engine)
+	return EL_ROCK;
+#endif
+
       default:
 	return element;
     }
@@ -6710,6 +6860,11 @@ inline static boolean check_linear_animation_EM(int tile)
     case Ytank_s_e:
     case Ytank_w_s:
     case Ytank_n_w:
+#if 1
+    case Yacid_splash_eB:
+    case Yacid_splash_wB:
+    case Yemerald_stone:
+#endif
       return TRUE;
   }
 
@@ -7315,6 +7470,23 @@ void getGraphicSourceObjectExt_EM(struct GraphicInfo_EM *g_em,
 #else
   getGraphicSourceExt(graphic, frame, &g_em->bitmap,
 		      &g_em->src_x, &g_em->src_y, FALSE);
+#endif
+
+
+#if 1
+  if (tile == Ydiamond_stone)
+    printf("::: stone smashing diamond... %d: %d, %d, %d, %d, %d -> %d [%d, %d, %d, %d, %d, %d] [%d]\n",
+	   frame_em,
+	   g->anim_frames,
+	   g->anim_delay,
+	   g->anim_mode,
+	   g->anim_start_frame,
+	   sync_frame,
+	   frame,
+	   g_em->src_x, g_em->src_y,
+	   g_em->src_offset_x, g_em->src_offset_y,
+	   g_em->dst_offset_x, g_em->dst_offset_y,
+	   graphic);
 #endif
 
 
@@ -8158,6 +8330,33 @@ void InitGraphicInfo_EM(void)
 
   exit(0);
 #endif
+}
+
+void CheckSingleStepMode_EM(byte action[MAX_PLAYERS], int frame,
+			    boolean any_player_moving)
+{
+  int i;
+
+  if (tape.single_step && tape.recording && !tape.pausing)
+  {
+    boolean active_players = FALSE;
+
+    for (i = 0; i < MAX_PLAYERS; i++)
+      if (action[i] != JOY_NO_ACTION)
+	active_players = TRUE;
+
+    if (frame == 0)
+      TapeTogglePause(TAPE_TOGGLE_AUTOMATIC);
+  }
+}
+
+void CheckSingleStepMode_SP(boolean murphy_is_moving)
+{
+  if (tape.single_step && tape.recording && !tape.pausing)
+  {
+    if (!murphy_is_moving)
+      TapeTogglePause(TAPE_TOGGLE_AUTOMATIC);
+  }
 }
 
 void getGraphicSource_SP(struct GraphicInfo_SP *g_sp,

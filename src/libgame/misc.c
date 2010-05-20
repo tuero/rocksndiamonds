@@ -1873,7 +1873,7 @@ boolean FileIsMusic(char *filename)
     return TRUE;
 
 #if defined(TARGET_SDL)
-  if (fileHasPrefix(basename, "mod") ||
+  if ((fileHasPrefix(basename, "mod") && !fileHasSuffix(basename, "txt")) ||
       fileHasSuffix(basename, "mod") ||
       fileHasSuffix(basename, "s3m") ||
       fileHasSuffix(basename, "it") ||

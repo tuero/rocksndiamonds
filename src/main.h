@@ -2869,6 +2869,7 @@ extern int			REAL_SX, REAL_SY;
 extern int			DX, DY;
 extern int			VX, VY;
 extern int			EX, EY;
+extern int			dDX, dDY;
 
 extern int			FX, FY;
 extern int			ScrollStepSize;

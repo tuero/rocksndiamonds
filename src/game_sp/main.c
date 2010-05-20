@@ -86,6 +86,8 @@ void GameActions_SP(byte action[MAX_PLAYERS], boolean warp_mode)
   if (!warp_mode)		/* do not redraw values in warp mode */
     DrawGameDoorValues_SP();
 
+  CheckSingleStepMode_SP(PlayField16[MurphyPosIndex] != fiMurphy);
+
   for (x = DisplayMinX; x <= DisplayMaxX; x++)
     for (y = DisplayMinY; y <= DisplayMaxY; y++)
       GfxFrame[x][y]++;

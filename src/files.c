@@ -10334,6 +10334,10 @@ void LoadMusicInfo()
     if (!music_info_listed(music_file_info, music->filename))
     {
       *new = get_music_file_info(music->filename, i);
+#if 0
+      if (*new != NULL)
+	printf(":1: adding '%s' ['%s'] ...\n", (*new)->title, music->filename);
+#endif
       if (*new != NULL)
 	new = &(*new)->next;
     }
@@ -10379,6 +10383,10 @@ void LoadMusicInfo()
     if (!music_info_listed(music_file_info, basename))
     {
       *new = get_music_file_info(basename, MAP_NOCONF_MUSIC(num_music_noconf));
+#if 0
+      if (*new != NULL)
+	printf(":2: adding '%s' ['%s'] ...\n", (*new)->title, basename);
+#endif
       if (*new != NULL)
 	new = &(*new)->next;
     }
