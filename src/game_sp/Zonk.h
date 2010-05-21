@@ -7,7 +7,6 @@
 
 #include "global.h"
 
-extern int subAnimateZonks(int si);
-extern int subCleanUpForZonksAbove(int si);
+extern void subAnimateZonks(int si);
 
 #endif /* ZONK_H */

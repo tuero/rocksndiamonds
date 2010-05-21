@@ -9374,6 +9374,7 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
   si->options.verbose = FALSE;
 
 #if defined(CREATE_SPECIAL_EDITION_RND_JUE)
+  si->toons = FALSE;
   si->handicap = FALSE;
   si->fullscreen = TRUE;
   si->override_level_graphics = AUTO;

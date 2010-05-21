@@ -4,6 +4,10 @@
 
 #include "Zonk.h"
 
+
+void subCleanUpForZonksAbove(int si);
+
+
 // static char *VB_Name = "modZonk";
 // --- Option Explicit
 
@@ -12,10 +16,8 @@
 // Animate Zonks (falling)
 // ==========================================================================
 
-int subAnimateZonks(int si)
+void subAnimateZonks(int si)
 {
-  int subAnimateZonks;
-
   int tFld;
 
   // PseudoRegisters:
@@ -26,12 +28,12 @@ int subAnimateZonks(int si)
 
   tFld = PlayField16[si];
   if ((tFld & 0xFF) != fiZonk)
-    return subAnimateZonks;
+    return;
 
   if (tFld == fiZonk)
   {
     if (FreezeZonks == 2) // Do Zonks fall? (debug)
-      return subAnimateZonks;
+      return;
 
     ax = PlayField16[si + FieldWidth]; // select case playfield16(si+60)
     if (ax == 0)
@@ -46,7 +48,7 @@ int subAnimateZonks(int si)
     if (ax == fiRAM)
       goto loc_g_0D35;
 
-    return subAnimateZonks;
+    return;
 
 loc_g_0D35: //        Case fiZonk, fiInfotron, fiRAM
     ax = PlayField16[si + FieldWidth - 1];
@@ -58,7 +60,7 @@ loc_g_0D4C:
     if (ax == 0 || ax == 0x8888 || ax == 0xAAAA)
       goto loc_g_0D81;
 
-    return subAnimateZonks;
+    return;
 
 loc_g_0D64: //       Case fiSpace
     MovHighByte(&PlayField16[si], 0x40);
@@ -80,10 +82,10 @@ loc_g_0D81: // roll right?
       goto loc_g_0D98;
 
     if (PlayField16[si + 1] != 0x9999) // wow right is different from left!
-      return subAnimateZonks;
+      return;
 
     if (LowByte(PlayField16[si - FieldWidth + 1]) != 1)
-      return subAnimateZonks;
+      return;
 
 loc_g_0D98:
     MovHighByte(&PlayField16[si], 0x60);
@@ -108,7 +110,7 @@ loc_g_0DA5:
     goto loc_g_0FE8;
 
   if (FreezeZonks == 2)
-    return subAnimateZonks;
+    return;
 
   if (al == 0x40) // zonk falls straight down
     goto loc_g_104D;
@@ -122,7 +124,7 @@ loc_g_0DA5:
   if (al == 0x70) // intermediate state
     goto loc_g_1157;
 
-  return subAnimateZonks;
+  return;
 
 loc_g_0DE8: // zonk comes falling from above
   //      To Do: draw zonk falling from above
@@ -140,18 +142,18 @@ loc_g_0DE8: // zonk comes falling from above
   {
     MovHighByte(&PlayField16[si], bl);
     subCleanUpForZonksAbove(si - FieldWidth);
-    return subAnimateZonks;
+    return;
   } // loc_g_0E2B:
 
   if (bl < 0x18)
   {
     MovHighByte(&PlayField16[si], bl);
-    return subAnimateZonks;
+    return;
   } // loc_g_0E35:
 
   MovHighByte(&PlayField16[si], 0); // zonk arrived at the field
   if ((FreezeZonks & 0xFF) == 2)
-    return subAnimateZonks;
+    return;
 
   // loc_g_0E42:     // now check if the zonk may go on falling somehow
   ax = PlayField16[si + FieldWidth];
@@ -187,7 +189,7 @@ loc_g_0DE8: // zonk comes falling from above
 #endif
 
   if (! (ax == fiZonk || ax == fiInfotron || ax == fiRAM))
-    return subAnimateZonks;
+    return;
 
   // loc_g_0EAE: ' Zonk rolls somewhere
   ax = PlayField16[si + FieldWidth - 1];
@@ -198,12 +200,12 @@ loc_g_0DE8: // zonk comes falling from above
   if (ax == 0 || ax == 0x8888 || ax == 0xAAAA) // may roll right
     goto loc_g_0F00;
 
-  return subAnimateZonks;
+  return;
 
 loc_g_0EDD:     // go on falling down?
   PlayField16[si] = 0x7001; // go into intermediate waitstate
   PlayField16[si + FieldWidth] = 0x9999; // mark as "zonk waiting to access"
-  return subAnimateZonks;
+  return;
 
 loc_g_0EEA:     // test if zonk may roll left
   // This if(if true) jumps up far above
@@ -213,23 +215,23 @@ loc_g_0EEA:     // test if zonk may roll left
 
   MovHighByte(&PlayField16[si], 0x50); // zonk rolls left
   PlayField16[si - 1] = 0x8888; // mark as zonk accessing?
-  return subAnimateZonks;
+  return;
 
 loc_g_0F00:     // test if zonk may roll right
   if (PlayField16[si + 1] != 0) // loc_g_0F08:
-    return subAnimateZonks;
+    return;
 
   MovHighByte(&PlayField16[si], 0x60); // zonk rolls right
   PlayField16[si + 1] = 0x8888; // mark as zonk accessing?
-  return subAnimateZonks;
+  return;
 
 loc_g_0F14:     // Murphy dies, but not in any case
   bl = HighByte(PlayField16[si + FieldWidth]);
   if (bl == 0xE || bl == 0xF || bl == 0x28)
-    return subAnimateZonks;
+    return;
 
   if (bl == 0x29 || bl == 0x25 || bl == 0x26)
-    return subAnimateZonks;
+    return;
 
 loc_g_0F36:     // ??
   ax = LowByte(PlayField16[si + FieldWidth - 1]);
@@ -254,12 +256,12 @@ loc_g_0F52:     // ??
 loc_g_0F6E:     // someone dies/explodes
   si = si + FieldWidth;                 // 1 field down
   ExplodeFieldSP(si);               // Explode
-  return subAnimateZonks;
+  return;
 
 loc_g_0F75:     // OrangeDisk explodes next cycle
   si = si + FieldWidth;                 // 1 field down
   PlayField8[si] = fiHardWare;
-  return subAnimateZonks;
+  return;
 
 loc_g_0F83: // zonk comes rolling from right to left
   //  To Do: draw zonk rolling from right
@@ -292,7 +294,7 @@ loc_g_0F83: // zonk comes rolling from right to left
     PlayField16[si] = 0x1001; // convert rolling zonk to a falling zonk
   }
 
-  return subAnimateZonks;
+  return;
 
 loc_g_0FE8: // zonk comes rolling from left to right
   //  To Do: draw zonk rolling from left
@@ -325,7 +327,7 @@ loc_g_0FE8: // zonk comes rolling from left to right
     PlayField16[si] = 0x1001; // convert rolling zonk to a falling zonk
   }
 
-  return subAnimateZonks;
+  return;
 
 loc_g_104D: // zonk falls straight down
   bl = bl + 1;
@@ -345,7 +347,7 @@ loc_g_104D: // zonk falls straight down
     PlayField16[si] = 0x1001; // go falling
   }
 
-  return subAnimateZonks;
+  return;
 
 loc_g_107B: // zonk rolls left
   //  To Do: draw zonk rolling to left
@@ -362,7 +364,7 @@ loc_g_107B: // zonk rolls left
   if (bl < 0x52)
   {
     MovHighByte(&PlayField16[si], bl);
-    return subAnimateZonks;
+    return;
   }
 
   if (PlayField16[si + FieldWidth - 1] != 0)
@@ -378,12 +380,12 @@ loc_g_107B: // zonk rolls left
   si = si - 1;                   // 1 field left
   PlayField16[si] = 0x2201;
   PlayField16[si + FieldWidth] = 0xFFFF;
-  return subAnimateZonks;
+  return;
 
 loc_g_10E2: // stay waiting
   bl = bl - 1;
   MovHighByte(&PlayField16[si], bl);
-  return subAnimateZonks;
+  return;
 
 loc_g_10E9: // zonk rolls right
   //  To Do: draw zonk rolling to right
@@ -400,7 +402,7 @@ loc_g_10E9: // zonk rolls right
   if (bl < 0x62)
   {
     MovHighByte(&PlayField16[si], bl);
-    return subAnimateZonks;
+    return;
   }
 
   if (PlayField16[si + FieldWidth + 1] != 0)
@@ -416,12 +418,12 @@ loc_g_10E9: // zonk rolls right
   si = si + 1;
   PlayField16[si] = 0x3201;
   PlayField16[si + FieldWidth] = 0xFFFF;
-  return subAnimateZonks;
+  return;
 
 loc_g_1150: // stay waiting
   bl = bl - 1;
   MovHighByte(&PlayField16[si], bl);
-  return subAnimateZonks;
+  return;
 
 loc_g_1157: // intermediate state
   ax = PlayField16[si + FieldWidth];
@@ -433,13 +435,11 @@ loc_g_1157: // intermediate state
     goto loc_g_0DE8;
   }
 
-  return subAnimateZonks;
+  return;
 } // subAnimateZonks endp
 
-int subCleanUpForZonksAbove(int si)
+void subCleanUpForZonksAbove(int si)
 {
-  int subCleanUpForZonksAbove;
-
   int ax;
 
   if (LowByte(PlayField16[si]) != fiExplosion)
@@ -448,16 +448,16 @@ int subCleanUpForZonksAbove(int si)
   if (PlayField16[si - FieldWidth] != 0)
   {
     if (PlayField16[si - FieldWidth] != 0x9999)
-      return subCleanUpForZonksAbove;
+      return;
 
     if (LowByte(PlayField16[si - 2 * FieldWidth]) != fiInfotron)
-      return subCleanUpForZonksAbove;
+      return;
   } // loc_g_1674:
 
   if (PlayField16[si - FieldWidth - 1] != fiZonk)
   {
     if (PlayField16[si - FieldWidth + 1] != fiZonk)
-      return subCleanUpForZonksAbove;
+      return;
 
     goto loc_g_16A7;
   }
@@ -467,11 +467,11 @@ int subCleanUpForZonksAbove(int si)
   {
     PlayField16[si - FieldWidth - 1] = 0x6001;
     PlayField16[si - FieldWidth] = 0x8888;
-    return subCleanUpForZonksAbove;
+    return;
   }
 
   if (PlayField16[si - FieldWidth + 1] != fiZonk)
-    return subCleanUpForZonksAbove;
+    return;
 
 loc_g_16A7:
   ax = PlayField16[si + 1];
@@ -481,5 +481,5 @@ loc_g_16A7:
     PlayField16[si - FieldWidth] = 0x8888;
   }
 
-  return subCleanUpForZonksAbove;
+  return;
 } // subCleanUpForZonksAbove
