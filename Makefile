@@ -46,7 +46,7 @@ CROSS_PATH_MSDOS = /usr/local/cross-msdos/i386-msdosdjgpp
 CROSS_PATH_WIN32 = /usr/local/cross-tools/i386-mingw32msvc
 
 # compile special edition of R'n'D instead of the normal (classic) version
-SPECIAL_EDITION = rnd_jue
+# SPECIAL_EDITION = rnd_jue
 
 
 # -----------------------------------------------------------------------------
@@ -155,8 +155,10 @@ backup_gfx:
 #	./Scripts/make_prerelease.sh
 
 jue:
-	sed -e 's/# SPECIAL_EDITION/SPECIAL_EDITION/' Makefile > Makefile.jue
-	$(MAKE) -f Makefile.jue cross-win32
+	@$(MAKE) SPECIAL_EDITION=rnd_jue all
+
+jue-win:
+	@$(MAKE) SPECIAL_EDITION=rnd_jue cross-win32
 
 dist-clean:
 	@$(MAKE_CMD) dist-clean

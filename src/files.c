@@ -6551,7 +6551,7 @@ static void LoadLevelFromFileInfo_SB(struct LevelInfo *level,
   boolean load_xsb_to_ces = check_special_flags("load_xsb_to_ces");
   int file_level_nr = 0;
   int line_nr = 0;
-  int x, y;
+  int x = 0, y = 0;		/* initialized to make compilers happy */
 
 #if 0
   printf("::: looking for level number %d [%d]\n",

@@ -7473,7 +7473,7 @@ void getGraphicSourceObjectExt_EM(struct GraphicInfo_EM *g_em,
 #endif
 
 
-#if 1
+#if 0
   if (tile == Ydiamond_stone)
     printf("::: stone smashing diamond... %d: %d, %d, %d, %d, %d -> %d [%d, %d, %d, %d, %d, %d] [%d]\n",
 	   frame_em,

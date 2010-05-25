@@ -10,7 +10,10 @@
 
 
 /* helper functions for constructs not supported by C */
+
+#if 0
 extern void *REDIM_1D(int, int, int);
+#endif
 
 extern long MyGetTickCount();
 

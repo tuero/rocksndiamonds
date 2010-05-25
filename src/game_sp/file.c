@@ -130,9 +130,11 @@ void copyInternalEngineVars_SP()
   /* (add one byte for the level number stored as first byte of demo data) */
   FileMax = FieldMax + native_sp_level.demo.length + 1;
 
+#if 0
   PlayField8 = REDIM_1D(sizeof(byte), 0, FileMax);
   DisPlayField = REDIM_1D(sizeof(byte), 0, FieldMax);
   PlayField16 = REDIM_1D(sizeof(int), -preceding_buffer_size, FieldMax);
+#endif
 
   count = 0;
   for (i = 0; preceding_playfield_memory[i] != NULL; i++)
@@ -183,15 +185,21 @@ void copyInternalEngineVars_SP()
   {
     DemoAvailable = True;
 
+#if 0
+    /* !!! NEVER USED !!! */
     PlayField8[FieldMax + 1] = native_sp_level.demo.level_nr;
 
+    /* !!! NEVER USED !!! */
     for (i = 0; i < native_sp_level.demo.length; i++)
       PlayField8[FieldMax + 2 + i] = native_sp_level.demo.data[i];
+#endif
   }
 
+#if 0
   AnimationPosTable = REDIM_1D(sizeof(int), 0, LevelMax - 2 * FieldWidth);
   AnimationSubTable = REDIM_1D(sizeof(byte), 0, LevelMax - 2 * FieldWidth);
-  TerminalState = REDIM_1D(sizeof(byte), 0, FieldMax + 1 - 1);
+  TerminalState = REDIM_1D(sizeof(byte), 0, FieldMax);
+#endif
 
   GravityFlag = LInfo.InitialGravity;
   FreezeZonks = LInfo.InitialFreezeZonks;
@@ -214,13 +222,22 @@ static void LoadNativeLevelFromFileStream_SP(FILE *file, int width, int height,
   /* for details of the Supaplex level format, see Herman Perk's Supaplex
      documentation file "SPFIX63.DOC" from his Supaplex "SpeedFix" package */
 
-  native_sp_level.width  = width;
-  native_sp_level.height = height;
+  native_sp_level.width  = MIN(width,  SP_MAX_PLAYFIELD_WIDTH);
+  native_sp_level.height = MIN(height, SP_MAX_PLAYFIELD_HEIGHT);
 
   /* read level playfield (width * height == 60 * 24 tiles == 1440 bytes) */
-  for (y = 0; y < native_sp_level.height; y++)
-    for (x = 0; x < native_sp_level.width; x++)
-      native_sp_level.playfield[x][y] = getFile8Bit(file);
+  /* (MPX levels may have non-standard playfield size -- check max. size) */
+  for (y = 0; y < height; y++)
+  {
+    for (x = 0; x < width; x++)
+    {
+      byte element = getFile8Bit(file);
+
+      if (x < SP_MAX_PLAYFIELD_WIDTH &&
+	  y < SP_MAX_PLAYFIELD_HEIGHT)
+	native_sp_level.playfield[x][y] = element;
+    }
+  }
 
   /* read level header (96 bytes) */
 

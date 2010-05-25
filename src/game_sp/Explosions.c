@@ -94,7 +94,7 @@ void ExplodeFieldSP(int si)
 
   if (ax == fiMurphy)
   {
-#if 1
+#if 0
     printf("::: Explosions.c: ExplodeFieldSP(): killing murphy\n");
 #endif
 
@@ -168,7 +168,7 @@ static void LetExplodeFieldSP(int tsi, int cx, int dh)
       break;
 
     case fiMurphy:
-#if 1
+#if 0
       printf("::: Explosions.c: LetExplodeFieldSP(): killing murphy [%d]\n",
 	     tsi);
 #endif

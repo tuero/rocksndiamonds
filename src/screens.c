@@ -1391,7 +1391,7 @@ void DrawMainMenu()
   DrawMainMenuExt(REDRAW_ALL, FALSE);
 }
 
-#if 0
+#if defined(CREATE_SPECIAL_EDITION_RND_JUE)
 static void gotoTopLevelDir()
 {
   /* move upwards to top level directory */
@@ -1758,7 +1758,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 	  SaveLevelSetup_LastSeries();
 	  SaveLevelSetup_SeriesInfo();
 
-#if 0
+#if defined(CREATE_SPECIAL_EDITION_RND_JUE)
 	  gotoTopLevelDir();
 #endif
 

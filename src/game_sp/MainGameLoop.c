@@ -89,7 +89,7 @@ void subMainGameLoop_Main(byte action, boolean warp_mode)
 locExitMainGameLoop:
 #endif
 
-#if 1
+#if 0
   printf("::: locExitMainGameLoop reached [%d]\n", LeadOutCounter);
   printf("::: [KillMurphyFlag == %d]\n", KillMurphyFlag);
 #endif

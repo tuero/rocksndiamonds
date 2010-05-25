@@ -277,8 +277,10 @@ extern void PrepareLevel();
 extern int getSequenceLength(int sequence);
 extern boolean isSnappingSequence(int sequence);
 
+#if 0
 extern void Trace(char *Source, char *Message);
 extern void ReportError(char *Source, char *Message);
+#endif
 
 extern int Min(int A, int B);
 extern int Max(int A, int B);
@@ -292,9 +294,15 @@ extern boolean LevelLoaded;
 extern boolean DemoAvailable;
 extern boolean menBorder;
 
+#if 1
+extern int PlayField16[SP_MAX_PLAYFIELD_SIZE + SP_HEADER_SIZE];
+extern byte PlayField8[SP_MAX_PLAYFIELD_SIZE + SP_HEADER_SIZE];
+extern byte DisPlayField[SP_MAX_PLAYFIELD_SIZE + SP_HEADER_SIZE];
+#else
 extern int *PlayField16;
 extern byte *PlayField8;
 extern byte *DisPlayField;
+#endif
 
 extern int FieldHeight;
 extern int FieldMax, LevelMax;
@@ -309,5 +317,23 @@ extern long FileMax;
 extern LevelInfoType LInfo;
 extern int ScrollMinX, ScrollMaxX, ScrollMinY, ScrollMaxY;
 extern int ScrollX, ScrollY;
+
+extern int AllowRedDiskCheat, AllowEatRightRedDiskBug;
+extern int Data_SubRest, Data_SubRstFlg;
+extern int DemoKeyCode;
+extern int GameBusyFlag;
+extern int InfotronsNeeded, TotalInfotronsNeeded;
+extern int KillMurphyFlag, MurphyMoveCounter;
+extern int MurphyExplodePos, SplitMoveFlag, RedDiskReleaseMurphyPos;
+extern int MurphyPosIndex, MurphyXPos, MurphyYPos;
+extern int MurphyScreenXPos, MurphyScreenYPos;
+extern int MurphyVarFaceLeft;
+extern int RedDiskCount;
+extern int RedDiskReleaseFlag, MovingPictureSequencePhase;
+extern int RedDiskReleasePhase;
+extern int ScratchGravity, GravityFlag;
+extern int SnikSnaksElectronsFrozen;
+extern int YellowDisksExploded;
+extern long YawnSleepCounter;
 
 #endif /* GLOBALS_H */

@@ -1046,7 +1046,7 @@ loc_g_6756:
   if (LowByte(InfotronsNeeded) != 0)
     return;
 
-#if 1
+#if 0
   if (!game_sp.LevelSolved)
     printf("::: Murphy.c: !!!!!!!!!! LEVEL %d SOLVED !!!!!!!!!!\n", level_nr);
 #endif

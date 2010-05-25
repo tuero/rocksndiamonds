@@ -1,3 +1,7 @@
+2010-05-22
+	* fixed missing memory allocation in SP engine when saving engine data
+	  for non-SP game engine snapshots (which also stores SP engine part)
+
 2010-05-21
 	* fixed problem with scrolling in native EM engine in multi-user mode
 	  (this bug was just introduced with the experimental viewport stuff)
@@ -6,6 +10,7 @@
 	* fixed (implemented) single step mode in native EM and SP engines
 	* fixed "latest_engine" flag in classic levels (moved to single sets)
 	* updated SDL library DLLs for Windows to the latest release versions
+	  (this fixed some mysterious crashes of the game on Windows systems)
 	* replaced EM and SP set in classic level set with native level files
 	* finally added a newly written "CREDITS" file to the game package
 	* removed sampled music loops from classic music set

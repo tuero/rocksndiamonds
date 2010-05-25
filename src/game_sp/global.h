@@ -17,7 +17,6 @@
 #include "DoGameStuff.h"
 #include "Electrons.h"
 #include "Explosions.h"
-#include "FakeDeclares.h"
 #include "Globals.h"
 #include "Infotrons.h"
 #include "InitGameConditions.h"

@@ -9,6 +9,7 @@
 
 /* helper functions for constructs not supported by C */
 
+#if 0
 void *REDIM_1D(int data_size, int first_data_pos, int last_data_pos)
 {
   /* for a buffer of n elements, first_data_pos is 0 and last_data_pos is n-1 */
@@ -20,6 +21,7 @@ void *REDIM_1D(int data_size, int first_data_pos, int last_data_pos)
 
   return (checked_calloc(buffer_size) - buffer_start);
 }
+#endif
 
 long MyGetTickCount()
 {

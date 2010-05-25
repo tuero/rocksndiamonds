@@ -25,7 +25,6 @@ SRCS =	init.c			\
 	DoGameStuff.c		\
 	Electrons.c		\
 	Explosions.c		\
-	FakeDeclares.c		\
 	Globals.c		\
 	Infotrons.c		\
 	InitGameConditions.c	\
@@ -51,7 +50,6 @@ OBJS =	init.o			\
 	DoGameStuff.o		\
 	Electrons.o		\
 	Explosions.o		\
-	FakeDeclares.o		\
 	Globals.o		\
 	Infotrons.o		\
 	InitGameConditions.o	\

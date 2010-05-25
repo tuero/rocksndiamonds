@@ -15,9 +15,16 @@ int FieldHeight;	// standard size = 24
 int HeaderSize;		// standard size = 96
 int FieldMax, LevelMax;
 long FileMax;
+
+#if 1
+int PlayField16[SP_MAX_PLAYFIELD_SIZE + SP_HEADER_SIZE];
+byte PlayField8[SP_MAX_PLAYFIELD_SIZE + SP_HEADER_SIZE];
+byte DisPlayField[SP_MAX_PLAYFIELD_SIZE + SP_HEADER_SIZE];
+#else
 int *PlayField16;
 byte *PlayField8;
 byte *DisPlayField;
+#endif
 
 int TimerVar;
 #if 1
@@ -32,6 +39,27 @@ LevelInfoType LInfo;
 
 int ScrollMinX, ScrollMaxX, ScrollMinY, ScrollMaxY;
 int ScrollX, ScrollY;
+
+int MurphyPosIndex, MurphyXPos, MurphyYPos;
+int MurphyScreenXPos, MurphyScreenYPos;
+int MurphyExplodePos, SplitMoveFlag, RedDiskReleaseMurphyPos;
+int KillMurphyFlag, MurphyMoveCounter;
+long YawnSleepCounter;
+int MurphyVarFaceLeft;
+int ScratchGravity, GravityFlag;
+int RedDiskReleaseFlag, MovingPictureSequencePhase;
+
+int YellowDisksExploded;
+int AllowRedDiskCheat, AllowEatRightRedDiskBug;
+
+int GameBusyFlag;
+int InfotronsNeeded, TotalInfotronsNeeded;
+int RedDiskCount;
+int SnikSnaksElectronsFrozen;
+
+int DemoKeyCode;
+
+int RedDiskReleasePhase;
 
 int fiGraphic[] =
 {
@@ -146,6 +174,17 @@ void InitGlobals()
   LevelMax = (FieldWidth * FieldHeight) - 1;
   bPlaying = False;
   menBorder = False;
+
+#if 0
+  /* these defaults will be changed after reading a Supaplex level file */
+  PlayField8 = REDIM_1D(sizeof(byte), 0, FieldMax);
+  DisPlayField = REDIM_1D(sizeof(byte), 0, FieldMax);
+  PlayField16 = REDIM_1D(sizeof(int), 0, FieldMax);
+
+  AnimationPosTable = REDIM_1D(sizeof(int), 0, LevelMax);
+  AnimationSubTable = REDIM_1D(sizeof(byte), 0, LevelMax);
+  TerminalState = REDIM_1D(sizeof(byte), 0, FieldMax);
+#endif
 }
 
 int GetSI(int X, int Y)
@@ -185,6 +224,7 @@ void PrepareLevel()
   LevelLoaded = True;
 }
 
+#if 0
 void Trace(char *Source, char *Message)
 {
   printf("::: Trace: Source == '%s', Message == '%s'\n", Source, Message);
@@ -194,6 +234,7 @@ void ReportError(char *Source, char *Message)
 {
   printf("::: ReportError: Source == '%s', Message == '%s'\n", Source, Message);
 }
+#endif
 
 int Min(int A, int B)
 {
