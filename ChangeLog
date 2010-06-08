@@ -1,4 +1,7 @@
 2010-06-08
+	* version 3.3.0.1 released
+
+2010-06-08
 	* added configurable key shortcuts for snap+direction player actions
 	  (probably most useful for recording tool-assisted speedrun (TAS)
 	  tapes using the single-step mode of the tape recorder)
