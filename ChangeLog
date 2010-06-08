@@ -1,3 +1,14 @@
+2010-06-08
+	* added configurable key shortcuts for snap+direction player actions
+	  (probably most useful for recording tool-assisted speedrun (TAS)
+	  tapes using the single-step mode of the tape recorder)
+
+2010-05-28
+	* version number set to 3.3.0.1
+
+2010-05-25
+	* version 3.3.0.0 released
+
 2010-05-22
 	* fixed missing memory allocation in SP engine when saving engine data
 	  for non-SP game engine snapshots (which also stores SP engine part)

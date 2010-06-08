@@ -80,6 +80,10 @@
 #define DEFAULT_KEY_SOUND_SIMPLE	KSYM_UNDEFINED
 #define DEFAULT_KEY_SOUND_LOOPS		KSYM_UNDEFINED
 #define DEFAULT_KEY_SOUND_MUSIC		KSYM_UNDEFINED
+#define DEFAULT_KEY_SNAP_LEFT		KSYM_UNDEFINED
+#define DEFAULT_KEY_SNAP_RIGHT		KSYM_UNDEFINED
+#define DEFAULT_KEY_SNAP_UP		KSYM_UNDEFINED
+#define DEFAULT_KEY_SNAP_DOWN		KSYM_UNDEFINED
 
 /* values for key_status */
 #define KEY_NOT_PRESSED			FALSE
@@ -130,6 +134,8 @@
 #define BUTTON_1			4
 #define BUTTON_2			5
 
+#define NUM_PLAYER_ACTIONS		6
+
 /* values for special "focus player" bitmasks */
 #define BIT_SET_FOCUS			6
 
@@ -153,6 +159,8 @@
 
 #define KEY_BUTTON_1		(1 << BUTTON_1)
 #define KEY_BUTTON_2		(1 << BUTTON_2)
+#define KEY_BUTTON_SNAP		KEY_BUTTON_1
+#define KEY_BUTTON_DROP		KEY_BUTTON_2
 #define KEY_MOTION		(MV_LEFT | MV_RIGHT | MV_UP | MV_DOWN)
 #define KEY_BUTTON		(KEY_BUTTON_1 | KEY_BUTTON_2)
 #define KEY_ACTION		(KEY_MOTION | KEY_BUTTON)
@@ -863,6 +871,11 @@ struct SetupShortcutInfo
   Key sound_simple;
   Key sound_loops;
   Key sound_music;
+
+  Key snap_left;
+  Key snap_right;
+  Key snap_up;
+  Key snap_down;
 };
 
 struct SetupSystemInfo

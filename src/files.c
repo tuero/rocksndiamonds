@@ -9067,8 +9067,12 @@ void SaveScore(int nr)
 #define SETUP_TOKEN_SHORTCUT_SOUND_SIMPLE	13
 #define SETUP_TOKEN_SHORTCUT_SOUND_LOOPS	14
 #define SETUP_TOKEN_SHORTCUT_SOUND_MUSIC	15
+#define SETUP_TOKEN_SHORTCUT_SNAP_LEFT		16
+#define SETUP_TOKEN_SHORTCUT_SNAP_RIGHT		17
+#define SETUP_TOKEN_SHORTCUT_SNAP_UP		18
+#define SETUP_TOKEN_SHORTCUT_SNAP_DOWN		19
 
-#define NUM_SHORTCUT_SETUP_TOKENS		16
+#define NUM_SHORTCUT_SETUP_TOKENS		20
 
 /* player setup */
 #define SETUP_TOKEN_PLAYER_USE_JOYSTICK		0
@@ -9221,6 +9225,10 @@ static struct TokenInfo shortcut_setup_tokens[] =
   { TYPE_KEY_X11, &ssi.sound_simple,	"shortcut.sound_simple"		},
   { TYPE_KEY_X11, &ssi.sound_loops,	"shortcut.sound_loops"		},
   { TYPE_KEY_X11, &ssi.sound_music,	"shortcut.sound_music"		},
+  { TYPE_KEY_X11, &ssi.snap_left,	"shortcut.snap_left"		},
+  { TYPE_KEY_X11, &ssi.snap_right,	"shortcut.snap_right"		},
+  { TYPE_KEY_X11, &ssi.snap_up,		"shortcut.snap_up"		},
+  { TYPE_KEY_X11, &ssi.snap_down,	"shortcut.snap_down"		},
 };
 
 static struct TokenInfo player_setup_tokens[] =
@@ -9346,6 +9354,11 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
   si->shortcut.sound_simple	= DEFAULT_KEY_SOUND_SIMPLE;
   si->shortcut.sound_loops	= DEFAULT_KEY_SOUND_LOOPS;
   si->shortcut.sound_music	= DEFAULT_KEY_SOUND_MUSIC;
+
+  si->shortcut.snap_left	= DEFAULT_KEY_SNAP_LEFT;
+  si->shortcut.snap_right	= DEFAULT_KEY_SNAP_RIGHT;
+  si->shortcut.snap_up		= DEFAULT_KEY_SNAP_UP;
+  si->shortcut.snap_down	= DEFAULT_KEY_SNAP_DOWN;
 
   for (i = 0; i < MAX_PLAYERS; i++)
   {

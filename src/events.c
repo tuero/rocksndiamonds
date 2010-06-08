@@ -607,20 +607,22 @@ static void HandleKeysSpecial(Key key)
 void HandleKey(Key key, int key_status)
 {
   boolean anyTextGadgetActiveOrJustFinished = anyTextGadgetActive();
-  static struct SetupKeyboardInfo custom_key;
+  static struct SetupKeyboardInfo ski;
+  static struct SetupShortcutInfo ssi;
   static struct
   {
     Key *key_custom;
+    Key *key_snap;
     Key key_default;
     byte action;
   } key_info[] =
   {
-    { &custom_key.left,  DEFAULT_KEY_LEFT,  JOY_LEFT     },
-    { &custom_key.right, DEFAULT_KEY_RIGHT, JOY_RIGHT    },
-    { &custom_key.up,    DEFAULT_KEY_UP,    JOY_UP       },
-    { &custom_key.down,  DEFAULT_KEY_DOWN,  JOY_DOWN     },
-    { &custom_key.snap,  DEFAULT_KEY_SNAP,  JOY_BUTTON_1 },
-    { &custom_key.drop,  DEFAULT_KEY_DROP,  JOY_BUTTON_2 }
+    { &ski.left,  &ssi.snap_left,  DEFAULT_KEY_LEFT,  JOY_LEFT        },
+    { &ski.right, &ssi.snap_right, DEFAULT_KEY_RIGHT, JOY_RIGHT       },
+    { &ski.up,    &ssi.snap_up,    DEFAULT_KEY_UP,    JOY_UP          },
+    { &ski.down,  &ssi.snap_down,  DEFAULT_KEY_DOWN,  JOY_DOWN        },
+    { &ski.snap,  NULL,            DEFAULT_KEY_SNAP,  JOY_BUTTON_SNAP },
+    { &ski.drop,  NULL,            DEFAULT_KEY_DROP,  JOY_BUTTON_DROP }
   };
   int joy = 0;
   int i;
@@ -632,6 +634,8 @@ void HandleKey(Key key, int key_status)
     static boolean element_dropped[MAX_PLAYERS] = { FALSE,FALSE,FALSE,FALSE };
     int pnr;
 
+    ssi = setup.shortcut;
+
     for (pnr = 0; pnr < MAX_PLAYERS; pnr++)
     {
       byte key_action = 0;
@@ -639,11 +643,15 @@ void HandleKey(Key key, int key_status)
       if (setup.input[pnr].use_joystick)
 	continue;
 
-      custom_key = setup.input[pnr].key;
+      ski = setup.input[pnr].key;
 
-      for (i = 0; i < 6; i++)
+      for (i = 0; i < NUM_PLAYER_ACTIONS; i++)
 	if (key == *key_info[i].key_custom)
 	  key_action |= key_info[i].action;
+
+      for (i = 0; i < NUM_DIRECTIONS; i++)
+	if (key == *key_info[i].key_snap)
+	  key_action |= key_info[i].action | JOY_BUTTON_SNAP;
 
       if (tape.single_step && clear_button_2[pnr])
       {
@@ -699,7 +707,7 @@ void HandleKey(Key key, int key_status)
   }
   else
   {
-    for (i = 0; i < 6; i++)
+    for (i = 0; i < NUM_PLAYER_ACTIONS; i++)
       if (key == key_info[i].key_default)
 	joy |= key_info[i].action;
   }
