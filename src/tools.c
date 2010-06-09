@@ -8333,7 +8333,8 @@ void InitGraphicInfo_EM(void)
 }
 
 void CheckSingleStepMode_EM(byte action[MAX_PLAYERS], int frame,
-			    boolean any_player_moving)
+			    boolean any_player_moving,
+			    boolean player_is_dropping)
 {
   int i;
 
@@ -8345,17 +8346,31 @@ void CheckSingleStepMode_EM(byte action[MAX_PLAYERS], int frame,
       if (action[i] != JOY_NO_ACTION)
 	active_players = TRUE;
 
-    if (frame == 0)
+    // if (frame == 0)
+    if (frame == 0 && !player_is_dropping)
       TapeTogglePause(TAPE_TOGGLE_AUTOMATIC);
   }
 }
 
-void CheckSingleStepMode_SP(boolean murphy_is_moving)
+void CheckSingleStepMode_SP(boolean murphy_is_waiting,
+			    boolean murphy_is_dropping)
 {
+#if 0
+  printf("::: waiting: %d, dropping: %d\n",
+	 murphy_is_waiting, murphy_is_dropping);
+#endif
+
   if (tape.single_step && tape.recording && !tape.pausing)
   {
-    if (!murphy_is_moving)
+    // if (murphy_is_waiting || murphy_is_dropping)
+    if (murphy_is_waiting)
+    {
+#if 0
+      printf("::: murphy is waiting -> pause mode\n");
+#endif
+
       TapeTogglePause(TAPE_TOGGLE_AUTOMATIC);
+    }
   }
 }
 

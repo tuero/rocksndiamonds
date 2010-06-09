@@ -209,4 +209,6 @@ extern void SaveEngineSnapshotValues_SP();
 extern int map_key_RND_to_SP(int);
 extern int map_key_SP_to_RND(int);
 
+extern int getRedDiskReleaseFlag_SP();
+
 #endif	/* GAME_SP_EXPORT_H */

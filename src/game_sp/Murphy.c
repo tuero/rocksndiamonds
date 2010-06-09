@@ -81,6 +81,10 @@ void subAnimateMurphy(int *si)
     }
   } // loc_g_5E8B:
 
+#if 0
+  printf("::: RedDiskReleaseFlag == %d\n", RedDiskReleaseFlag);
+#endif
+
   bl = DemoKeyCode;
   if (bl != 0) // a key was pressed!
     goto locKeyPressed5FCF;

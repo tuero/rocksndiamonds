@@ -34,7 +34,7 @@ extern int getGameFrameDelay_EM(int);
 
 extern void PlayLevelSound_EM(int, int, int, int);
 extern void InitGraphicInfo_EM(void);
-extern void CheckSingleStepMode_EM(byte action[], int, boolean);
+extern void CheckSingleStepMode_EM(byte action[], int, boolean, boolean);
 
 void SetGfxAnimation_EM(struct GraphicInfo_EM *, int, int, int, int);
 void getGraphicSourceObjectExt_EM(struct GraphicInfo_EM *, int, int, int, int);
@@ -49,7 +49,7 @@ void getGraphicSourcePlayerExt_EM(struct GraphicInfo_EM *, int, int, int);
 extern void SetBitmaps_SP(Bitmap **);
 #endif
 
-void CheckSingleStepMode_SP(boolean);
+void CheckSingleStepMode_SP(boolean, boolean);
 
 void getGraphicSource_SP(struct GraphicInfo_SP *, int, int, int, int);
 int getGraphicInfo_Delay(int);

@@ -11998,6 +11998,20 @@ static void SetPlayerWaiting(struct PlayerInfo *player, boolean is_waiting)
   }
 }
 
+static void CheckSingleStepMode(struct PlayerInfo *player)
+{
+  if (tape.single_step && tape.recording && !tape.pausing)
+  {
+    /* as it is called "single step mode", just return to pause mode when the
+       player stopped moving after one tile (or never starts moving at all) */
+    if (!player->is_moving && !player->is_pushing)
+    {
+      TapeTogglePause(TAPE_TOGGLE_AUTOMATIC);
+      SnapField(player, 0, 0);			/* stop snapping */
+    }
+  }
+}
+
 static byte PlayerActions(struct PlayerInfo *player, byte player_action)
 {
   boolean moved = FALSE, snapped = FALSE, dropped = FALSE;
@@ -12025,23 +12039,7 @@ static byte PlayerActions(struct PlayerInfo *player, byte player_action)
       moved = MovePlayer(player, dx, dy);
     }
 
-    if (tape.single_step && tape.recording && !tape.pausing)
-    {
-#if 1
-      /* as it is called "single step mode", just return to pause mode when the
-	 player stopped moving after one tile (or never starts moving at all) */
-      if (!player->is_moving)
-#else
-      /* this is buggy: there are quite some cases where the single step mode
-	 does not return to pause mode (like pushing things that don't move
-	 or simply by trying to run against a wall) */
-      if (button1 || (dropped && !moved))
-#endif
-      {
-	TapeTogglePause(TAPE_TOGGLE_AUTOMATIC);
-	SnapField(player, 0, 0);		/* stop snapping */
-      }
-    }
+    CheckSingleStepMode(player);
 
     SetPlayerWaiting(player, FALSE);
 
@@ -12064,6 +12062,8 @@ static byte PlayerActions(struct PlayerInfo *player, byte player_action)
     player->is_dropping = FALSE;
     player->is_dropping_pressed = FALSE;
     player->drop_pressed_delay = 0;
+
+    CheckSingleStepMode(player);
 
     return 0;
   }

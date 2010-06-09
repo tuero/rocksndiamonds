@@ -86,9 +86,15 @@ void GameActions_SP(byte action[MAX_PLAYERS], boolean warp_mode)
   if (!warp_mode)		/* do not redraw values in warp mode */
     DrawGameDoorValues_SP();
 
-  CheckSingleStepMode_SP(PlayField16[MurphyPosIndex] != fiMurphy);
+  CheckSingleStepMode_SP(PlayField16[MurphyPosIndex] == fiMurphy,
+			 HighByte(PlayField16[MurphyPosIndex]) == 0x2A);
 
   for (x = DisplayMinX; x <= DisplayMaxX; x++)
     for (y = DisplayMinY; y <= DisplayMaxY; y++)
       GfxFrame[x][y]++;
+}
+
+int getRedDiskReleaseFlag_SP()
+{
+  return RedDiskReleaseFlag;
 }

@@ -74,6 +74,7 @@ void InitGameEngine_EM()
 void GameActions_EM(byte action[MAX_PLAYERS], boolean warp_mode)
 {
   int i;
+  boolean player_is_dropping = FALSE;
 
 #if 0
   static int foo = -1;
@@ -127,7 +128,15 @@ void GameActions_EM(byte action[MAX_PLAYERS], boolean warp_mode)
       DrawGameDoorValues_EM();
   }
 
-  CheckSingleStepMode_EM(action, frame, game_em.any_player_moving);
+  for (i = 0; i < MAX_PLAYERS; i++)
+    if (ply[i].joy_drop &&
+	ply[i].dynamite &&
+	ply[i].dynamite_cnt > 0 &&
+	ply[i].dynamite_cnt < 5)
+      player_is_dropping = TRUE;
+
+  CheckSingleStepMode_EM(action, frame, game_em.any_player_moving,
+			 player_is_dropping);
 
 #if 1
   game_animscreen();
