@@ -1212,38 +1212,73 @@ void AutoPlayTape()
 
 static struct
 {
+#if 1
+  struct Rect *tbi;
+  int graphic;
+#else
   int x, y;
+#endif
   int gadget_id;
   char *infotext;
 } tapebutton_info[NUM_TAPE_BUTTONS] =
 {
   {
+#if 1
+    &tape.button.eject,
+    IMG_TAPE_BUTTON_GFX_EJECT,
+#else
     TAPE_BUTTON_EJECT_XPOS,	TAPE_BUTTON_YPOS,
+#endif
     TAPE_CTRL_ID_EJECT,
     "eject tape"
   },
   {
+#if 1
+    &tape.button.eject,		/* (same position as "eject" button) */
+    IMG_TAPE_BUTTON_GFX_EXTRA,
+#else
     TAPE_BUTTON_EXTRA_XPOS,	TAPE_BUTTON_YPOS,
+#endif
     TAPE_CTRL_ID_EXTRA,
     "extra functions"
   },
   {
+#if 1
+    &tape.button.stop,
+    IMG_TAPE_BUTTON_GFX_STOP,
+#else
     TAPE_BUTTON_STOP_XPOS,	TAPE_BUTTON_YPOS,
+#endif
     TAPE_CTRL_ID_STOP,
     "stop tape"
   },
   {
+#if 1
+    &tape.button.pause,
+    IMG_TAPE_BUTTON_GFX_PAUSE,
+#else
     TAPE_BUTTON_PAUSE_XPOS,	TAPE_BUTTON_YPOS,
+#endif
     TAPE_CTRL_ID_PAUSE,
     "pause tape"
   },
   {
+#if 1
+    &tape.button.record,
+    IMG_TAPE_BUTTON_GFX_RECORD,
+#else
     TAPE_BUTTON_RECORD_XPOS,	TAPE_BUTTON_YPOS,
+#endif
     TAPE_CTRL_ID_RECORD,
     "record tape"
   },
   {
+#if 1
+    &tape.button.play,
+    IMG_TAPE_BUTTON_GFX_PLAY,
+#else
     TAPE_BUTTON_PLAY_XPOS,	TAPE_BUTTON_YPOS,
+#endif
     TAPE_CTRL_ID_PLAY,
     "play tape"
   }
@@ -1255,12 +1290,30 @@ void CreateTapeButtons()
 
   for (i = 0; i < NUM_TAPE_BUTTONS; i++)
   {
+#if 1
+    // struct TapeButtonInfo *tbi = tapebutton_info[i].tbi;
+    int graphic = tapebutton_info[i].graphic;
+    Bitmap *gd_bitmap = graphic_info[graphic].bitmap;
+#else
     Bitmap *gd_bitmap = graphic_info[IMG_GLOBAL_DOOR].bitmap;
+#endif
     struct GadgetInfo *gi;
     int gd_xoffset, gd_yoffset;
+#if 1
+    int gd_x1, gd_x2, gd_y1, gd_y2;
+#else
     int gd_x1, gd_x2, gd_y;
+#endif
     int id = i;
 
+#if 1
+    gd_x1 = graphic_info[graphic].src_x;
+    gd_y1 = graphic_info[graphic].src_y;
+    gd_x2 = gd_x1 + graphic_info[graphic].pressed_xoffset;
+    gd_y2 = gd_y1 + graphic_info[graphic].pressed_yoffset;
+    gd_xoffset = tapebutton_info[i].tbi->x;
+    gd_yoffset = tapebutton_info[i].tbi->y;
+#else
     gd_xoffset = tapebutton_info[i].x;
     gd_yoffset = tapebutton_info[i].y;
     gd_x1 = DOOR_GFX_PAGEX4 + gd_xoffset;
@@ -1272,6 +1325,7 @@ void CreateTapeButtons()
       gd_x1 = DOOR_GFX_PAGEX6 + gd_xoffset;
       gd_x2 = DOOR_GFX_PAGEX5 + gd_xoffset;
     }
+#endif
 
     gi = CreateGadget(GDI_CUSTOM_ID, id,
 		      GDI_INFO_TEXT, tapebutton_info[i].infotext,
@@ -1281,8 +1335,13 @@ void CreateTapeButtons()
 		      GDI_HEIGHT, TAPE_BUTTON_YSIZE,
 		      GDI_TYPE, GD_TYPE_NORMAL_BUTTON,
 		      GDI_STATE, GD_BUTTON_UNPRESSED,
+#if 1
+		      GDI_DESIGN_UNPRESSED, gd_bitmap, gd_x1, gd_y1,
+		      GDI_DESIGN_PRESSED, gd_bitmap, gd_x2, gd_y2,
+#else
 		      GDI_DESIGN_UNPRESSED, gd_bitmap, gd_x1, gd_y,
 		      GDI_DESIGN_PRESSED, gd_bitmap, gd_x2, gd_y,
+#endif
 		      GDI_DIRECT_DRAW, FALSE,
 		      GDI_EVENT_MASK, GD_EVENT_RELEASED,
 		      GDI_CALLBACK_ACTION, HandleTapeButtons,

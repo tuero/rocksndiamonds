@@ -5061,6 +5061,46 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.button.sound_simple.y
   },
   {
+    "tape.button.eject.x",
+    &tape.button.eject.x
+  },
+  {
+    "tape.button.eject.y",
+    &tape.button.eject.y
+  },
+  {
+    "tape.button.stop.x",
+    &tape.button.stop.x
+  },
+  {
+    "tape.button.stop.y",
+    &tape.button.stop.y
+  },
+  {
+    "tape.button.pause.x",
+    &tape.button.pause.x
+  },
+  {
+    "tape.button.pause.y",
+    &tape.button.pause.y
+  },
+  {
+    "tape.button.record.x",
+    &tape.button.record.x
+  },
+  {
+    "tape.button.record.y",
+    &tape.button.record.y
+  },
+  {
+    "tape.button.play.x",
+    &tape.button.play.x
+  },
+  {
+    "tape.button.play.y",
+    &tape.button.play.y
+  },
+  {
     "game.forced_scroll_delay_value",
     &game.forced_scroll_delay_value
   },

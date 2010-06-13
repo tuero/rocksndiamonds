@@ -1914,8 +1914,12 @@
 #define GFX_ARG_SORT_PRIORITY		45
 #define GFX_ARG_CLASS			46
 #define GFX_ARG_STYLE			47
+#define GFX_ARG_ACTIVE_XOFFSET		48
+#define GFX_ARG_ACTIVE_YOFFSET		49
+#define GFX_ARG_PRESSED_XOFFSET		50
+#define GFX_ARG_PRESSED_YOFFSET		51
 
-#define NUM_GFX_ARGS			48
+#define NUM_GFX_ARGS			52
 
 
 /* values for sound configuration suffixes */
@@ -2715,6 +2719,11 @@ struct GraphicInfo
 
   int class;
   int style;
+
+  int active_xoffset;
+  int active_yoffset;
+  int pressed_xoffset;
+  int pressed_yoffset;
 
   boolean use_image_size;	/* use image size as default width and height */
 

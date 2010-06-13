@@ -1501,6 +1501,12 @@ static void set_graphic_parameters_ext(int graphic, int *parameter,
     g->class = parameter[GFX_ARG_CLASS];
   if (parameter[GFX_ARG_STYLE] != ARG_UNDEFINED_VALUE)
     g->style = parameter[GFX_ARG_STYLE];
+
+  /* this is only used for drawing menu buttons and text */
+  g->active_xoffset = parameter[GFX_ARG_ACTIVE_XOFFSET];
+  g->active_yoffset = parameter[GFX_ARG_ACTIVE_YOFFSET];
+  g->pressed_xoffset = parameter[GFX_ARG_PRESSED_XOFFSET];
+  g->pressed_yoffset = parameter[GFX_ARG_PRESSED_YOFFSET];
 }
 
 static void set_graphic_parameters(int graphic)

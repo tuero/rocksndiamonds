@@ -93,6 +93,15 @@
 #define VIDEO_DISPLAY_SYMBOL_ONLY	-2
 
 
+struct TapeButtonInfo
+{
+  struct Rect eject;
+  struct Rect stop;
+  struct Rect pause;
+  struct Rect record;
+  struct Rect play;
+};
+
 struct TapeInfo
 {
   int file_version;	/* file format version the tape is stored with    */
@@ -127,6 +136,8 @@ struct TapeInfo
     byte action[MAX_PLAYERS];
     byte delay;
   } pos[MAX_TAPE_LEN];
+
+  struct TapeButtonInfo button;
 
   boolean no_valid_file;	/* set when tape file missing or invalid */
 };
