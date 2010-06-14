@@ -16694,98 +16694,38 @@ boolean CheckEngineSnapshot()
 
 /* ---------- new game button stuff ---------------------------------------- */
 
-/* graphic position values for game buttons */
-#define GAME_BUTTON_XSIZE	30
-#define GAME_BUTTON_YSIZE	30
-#define GAME_BUTTON_XPOS	5
-#define GAME_BUTTON_YPOS	215
-#define SOUND_BUTTON_XPOS	5
-#define SOUND_BUTTON_YPOS	(GAME_BUTTON_YPOS + GAME_BUTTON_YSIZE)
-
-#define GAME_BUTTON_STOP_XPOS	(GAME_BUTTON_XPOS + 0 * GAME_BUTTON_XSIZE)
-#define GAME_BUTTON_PAUSE_XPOS	(GAME_BUTTON_XPOS + 1 * GAME_BUTTON_XSIZE)
-#define GAME_BUTTON_PLAY_XPOS	(GAME_BUTTON_XPOS + 2 * GAME_BUTTON_XSIZE)
-#define SOUND_BUTTON_MUSIC_XPOS	(SOUND_BUTTON_XPOS + 0 * GAME_BUTTON_XSIZE)
-#define SOUND_BUTTON_LOOPS_XPOS	(SOUND_BUTTON_XPOS + 1 * GAME_BUTTON_XSIZE)
-#define SOUND_BUTTON_SIMPLE_XPOS (SOUND_BUTTON_XPOS + 2 * GAME_BUTTON_XSIZE)
-
 static struct
 {
-  int *x, *y;
-  int gd_x, gd_y;
+  int graphic;
+  struct Rect *pos;
   int gadget_id;
   char *infotext;
 } gamebutton_info[NUM_GAME_BUTTONS] =
 {
-#if 1
   {
-    &game.button.stop.x,	&game.button.stop.y,
-    GAME_BUTTON_STOP_XPOS,	GAME_BUTTON_YPOS,
-    GAME_CTRL_ID_STOP,
-    "stop game"
+    IMG_GAME_BUTTON_GFX_STOP,		&game.button.stop,
+    GAME_CTRL_ID_STOP,			"stop game"
   },
   {
-    &game.button.pause.x,	&game.button.pause.y,
-    GAME_BUTTON_PAUSE_XPOS,	GAME_BUTTON_YPOS,
-    GAME_CTRL_ID_PAUSE,
-    "pause game"
+    IMG_GAME_BUTTON_GFX_PAUSE,		&game.button.pause,
+    GAME_CTRL_ID_PAUSE,			"pause game"
   },
   {
-    &game.button.play.x,	&game.button.play.y,
-    GAME_BUTTON_PLAY_XPOS,	GAME_BUTTON_YPOS,
-    GAME_CTRL_ID_PLAY,
-    "play game"
+    IMG_GAME_BUTTON_GFX_PLAY,		&game.button.play,
+    GAME_CTRL_ID_PLAY,			"play game"
   },
   {
-    &game.button.sound_music.x,	&game.button.sound_music.y,
-    SOUND_BUTTON_MUSIC_XPOS,	SOUND_BUTTON_YPOS,
-    SOUND_CTRL_ID_MUSIC,
-    "background music on/off"
+    IMG_GAME_BUTTON_GFX_SOUND_MUSIC,	&game.button.sound_music,
+    SOUND_CTRL_ID_MUSIC,		"background music on/off"
   },
   {
-    &game.button.sound_loops.x,	&game.button.sound_loops.y,
-    SOUND_BUTTON_LOOPS_XPOS,	SOUND_BUTTON_YPOS,
-    SOUND_CTRL_ID_LOOPS,
-    "sound loops on/off"
+    IMG_GAME_BUTTON_GFX_SOUND_LOOPS,	&game.button.sound_loops,
+    SOUND_CTRL_ID_LOOPS,		"sound loops on/off"
   },
   {
-    &game.button.sound_simple.x,&game.button.sound_simple.y,
-    SOUND_BUTTON_SIMPLE_XPOS,	SOUND_BUTTON_YPOS,
-    SOUND_CTRL_ID_SIMPLE,
-    "normal sounds on/off"
+    IMG_GAME_BUTTON_GFX_SOUND_SIMPLE,	&game.button.sound_simple,
+    SOUND_CTRL_ID_SIMPLE,		"normal sounds on/off"
   }
-#else
-  {
-    GAME_BUTTON_STOP_XPOS,	GAME_BUTTON_YPOS,
-    GAME_CTRL_ID_STOP,
-    "stop game"
-  },
-  {
-    GAME_BUTTON_PAUSE_XPOS,	GAME_BUTTON_YPOS,
-    GAME_CTRL_ID_PAUSE,
-    "pause game"
-  },
-  {
-    GAME_BUTTON_PLAY_XPOS,	GAME_BUTTON_YPOS,
-    GAME_CTRL_ID_PLAY,
-    "play game"
-  },
-  {
-    SOUND_BUTTON_MUSIC_XPOS,	SOUND_BUTTON_YPOS,
-    SOUND_CTRL_ID_MUSIC,
-    "background music on/off"
-  },
-  {
-    SOUND_BUTTON_LOOPS_XPOS,	SOUND_BUTTON_YPOS,
-    SOUND_CTRL_ID_LOOPS,
-    "sound loops on/off"
-  },
-  {
-    SOUND_BUTTON_SIMPLE_XPOS,	SOUND_BUTTON_YPOS,
-    SOUND_CTRL_ID_SIMPLE,
-    "normal sounds on/off"
-  }
-#endif
 };
 
 void CreateGameButtons()
@@ -16794,22 +16734,21 @@ void CreateGameButtons()
 
   for (i = 0; i < NUM_GAME_BUTTONS; i++)
   {
-    Bitmap *gd_bitmap = graphic_info[IMG_GLOBAL_DOOR].bitmap;
+    struct GraphicInfo *gfx = &graphic_info[gamebutton_info[i].graphic];
+    struct Rect *pos = gamebutton_info[i].pos;
     struct GadgetInfo *gi;
     int button_type;
     boolean checked;
     unsigned long event_mask;
-    int x, y;
-    int gd_xoffset, gd_yoffset;
-    int gd_x1, gd_x2, gd_y1, gd_y2;
+    int gd_x   = gfx->src_x;
+    int gd_y   = gfx->src_y;
+    int gd_xp  = gfx->src_x + gfx->pressed_xoffset;
+    int gd_yp  = gfx->src_y + gfx->pressed_yoffset;
+    int gd_xa  = gfx->src_x + gfx->active_xoffset;
+    int gd_ya  = gfx->src_y + gfx->active_yoffset;
+    int gd_xap = gfx->src_x + gfx->active_xoffset + gfx->pressed_xoffset;
+    int gd_yap = gfx->src_y + gfx->active_yoffset + gfx->pressed_yoffset;
     int id = i;
-
-    x = DX + *gamebutton_info[i].x;
-    y = DY + *gamebutton_info[i].y;
-    gd_xoffset = gamebutton_info[i].gd_x;
-    gd_yoffset = gamebutton_info[i].gd_y;
-    gd_x1 = DOOR_GFX_PAGEX4 + gd_xoffset;
-    gd_x2 = DOOR_GFX_PAGEX3 + gd_xoffset;
 
     if (id == GAME_CTRL_ID_STOP ||
 	id == GAME_CTRL_ID_PAUSE ||
@@ -16818,8 +16757,6 @@ void CreateGameButtons()
       button_type = GD_TYPE_NORMAL_BUTTON;
       checked = FALSE;
       event_mask = GD_EVENT_RELEASED;
-      gd_y1  = DOOR_GFX_PAGEY1 + gd_yoffset - GAME_BUTTON_YSIZE;
-      gd_y2  = DOOR_GFX_PAGEY1 + gd_yoffset - GAME_BUTTON_YSIZE;
     }
     else
     {
@@ -16829,28 +16766,21 @@ void CreateGameButtons()
 	 (id == SOUND_CTRL_ID_LOOPS && setup.sound_loops) ||
 	 (id == SOUND_CTRL_ID_SIMPLE && setup.sound_simple) ? TRUE : FALSE);
       event_mask = GD_EVENT_PRESSED;
-      gd_y1  = DOOR_GFX_PAGEY1 + gd_yoffset;
-      gd_y2  = DOOR_GFX_PAGEY1 + gd_yoffset - GAME_BUTTON_YSIZE;
     }
 
     gi = CreateGadget(GDI_CUSTOM_ID, id,
 		      GDI_INFO_TEXT, gamebutton_info[i].infotext,
-#if 1
-		      GDI_X, x,
-		      GDI_Y, y,
-#else
-		      GDI_X, DX + gd_xoffset,
-		      GDI_Y, DY + gd_yoffset,
-#endif
-		      GDI_WIDTH, GAME_BUTTON_XSIZE,
-		      GDI_HEIGHT, GAME_BUTTON_YSIZE,
+		      GDI_X, DX + pos->x,
+		      GDI_Y, DY + pos->y,
+		      GDI_WIDTH, gfx->width,
+		      GDI_HEIGHT, gfx->height,
 		      GDI_TYPE, button_type,
 		      GDI_STATE, GD_BUTTON_UNPRESSED,
 		      GDI_CHECKED, checked,
-		      GDI_DESIGN_UNPRESSED, gd_bitmap, gd_x1, gd_y1,
-		      GDI_DESIGN_PRESSED, gd_bitmap, gd_x2, gd_y1,
-		      GDI_ALT_DESIGN_UNPRESSED, gd_bitmap, gd_x1, gd_y2,
-		      GDI_ALT_DESIGN_PRESSED, gd_bitmap, gd_x2, gd_y2,
+		      GDI_DESIGN_UNPRESSED, gfx->bitmap, gd_x, gd_y,
+		      GDI_DESIGN_PRESSED, gfx->bitmap, gd_xp, gd_yp,
+		      GDI_ALT_DESIGN_UNPRESSED, gfx->bitmap, gd_xa, gd_ya,
+		      GDI_ALT_DESIGN_PRESSED, gfx->bitmap, gd_xap, gd_yap,
 		      GDI_DIRECT_DRAW, FALSE,
 		      GDI_EVENT_MASK, event_mask,
 		      GDI_CALLBACK_ACTION, HandleGameButtons,

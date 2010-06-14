@@ -232,6 +232,7 @@ GAME_SP_DIR = game_sp
 GAME_SP = $(GAME_SP_DIR)/game_sp.a
 
 RNDLIBS = $(LIBGAME) $(GAME_EM) $(GAME_SP)
+AUTOCONF = conf_gfx.h conf_snd.h conf_mus.h
 
 ICONBASE = windows_icon
 ifeq ($(PLATFORM),cross-win32)
@@ -249,7 +250,7 @@ endif
 # build targets
 # -----------------------------------------------------------------------------
 
-all: libgame_dir game_em_dir game_sp_dir $(PROGNAME)
+all: $(AUTOCONF) libgame_dir game_em_dir game_sp_dir $(PROGNAME)
 
 $(PROGNAME): $(RNDLIBS) $(TIMESTAMP_FILE) $(OBJS) $(ICON)
 	$(CC) $(PROFILING) $(OBJS) $(ICON) $(RNDLIBS) $(LDFLAGS) -o $(PROGNAME)

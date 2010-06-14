@@ -89,12 +89,12 @@ struct GamePanelInfo
 
 struct GameButtonInfo
 {
-  struct MenuPosInfo stop;
-  struct MenuPosInfo pause;
-  struct MenuPosInfo play;
-  struct MenuPosInfo sound_music;
-  struct MenuPosInfo sound_loops;
-  struct MenuPosInfo sound_simple;
+  struct Rect stop;
+  struct Rect pause;
+  struct Rect play;
+  struct Rect sound_music;
+  struct Rect sound_loops;
+  struct Rect sound_simple;
 };
 
 #else
