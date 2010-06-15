@@ -2037,6 +2037,60 @@ static void InitGraphicInfo()
 #endif
 }
 
+static void InitGraphicCompatibilityInfo()
+{
+  struct FileInfo *fi_global_door =
+    getImageListEntryFromImageID(IMG_GLOBAL_DOOR);
+  int num_images = getImageListSize();
+  int i;
+
+  /* the following compatibility handling is needed for the following case:
+     versions up to 3.3.0.0 used one large bitmap "global.door" for various
+     graphics mainly used for door and panel graphics, like editor, tape and
+     in-game buttons with hard-coded bitmap positions and button sizes; as
+     these graphics now have individual definitions, redefining "global.door"
+     to change all these graphics at once like before does not work anymore
+     (because all those individual definitions still have their default values);
+     to solve this, remap all those individual definitions that are not
+     redefined to the new bitmap of "global.door" if it was redefined */
+
+  /* special compatibility handling if image "global.door" was redefined */
+  if (fi_global_door->redefined)
+  {
+    for (i = 0; i < num_images; i++)
+    {
+      struct FileInfo *fi = getImageListEntryFromImageID(i);
+
+      /* process only those images that still use the default settings */
+      if (!fi->redefined)
+      {
+	/* process all images which default to same image as "global.door" */
+	if (strEqual(fi->default_filename, fi_global_door->default_filename))
+	{
+	  // printf("::: special treatment needed for token '%s'\n", fi->token);
+
+	  graphic_info[i].bitmap = graphic_info[IMG_GLOBAL_DOOR].bitmap;
+	}
+      }
+    }
+  }
+
+#if 0
+  for (i = 0; i < num_images; i++)
+  {
+    struct FileInfo *fi = getImageListEntryFromImageID(i);
+
+    if (i == IMG_GLOBAL_DOOR)
+    {
+      printf("::: %s, %s, %d\n",
+	     fi->default_filename,
+	     fi->filename,
+	     fi->redefined);
+    }
+  }
+#endif
+}
+
 static void InitElementSoundInfo()
 {
   struct PropertyMapping *property_mapping = getSoundListPropertyMapping();
@@ -2431,6 +2485,9 @@ static void ReinitializeGraphics()
 
   InitGraphicInfo_EM();			/* graphic mapping for EM engine */
   print_timestamp_time("InitGraphicInfo_EM");
+
+  InitGraphicCompatibilityInfo();
+  print_timestamp_time("InitGraphicCompatibilityInfo");
 
   SetMainBackgroundImage(IMG_BACKGROUND);
   print_timestamp_time("SetMainBackgroundImage");
