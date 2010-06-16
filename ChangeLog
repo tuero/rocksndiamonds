@@ -1,3 +1,6 @@
+2010-06-16
+	* added tape panel graphics and screen positions to graphics config
+
 2010-06-15
 	* added compatibility stuff for redefined "global.door" (which affects
 	  all parts of that image that have their own graphics definition now)

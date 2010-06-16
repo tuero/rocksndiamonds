@@ -194,6 +194,8 @@ void DrawVideoDisplay(unsigned long state, unsigned long value)
     "JAN", "FEB", "MAR", "APR", "MAY", "JUN",
     "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"
   };
+
+#if 0
   static struct
   {
     int gd_x1, gd_y1;
@@ -344,9 +346,129 @@ void DrawVideoDisplay(unsigned long state, unsigned long value)
       }
     },
   };
+#endif
+
+#if 1
+  static struct
+  {
+    int graphic;
+    struct Rect *pos;
+  }
+  video_pos[NUM_TAPE_FUNCTIONS][NUM_TAPE_FUNCTION_PARTS] =
+  {
+    {
+      { IMG_TAPE_LABEL_GFX_PLAY,		&tape.label.play	},
+      { IMG_TAPE_SYMBOL_GFX_PLAY,		&tape.symbol.play	},
+    },
+    {
+      { IMG_TAPE_LABEL_GFX_RECORD,		&tape.label.record	},
+      { IMG_TAPE_SYMBOL_GFX_RECORD,		&tape.symbol.record	},
+    },
+    {
+      { IMG_TAPE_LABEL_GFX_PAUSE,		&tape.label.pause	},
+      { IMG_TAPE_SYMBOL_GFX_PAUSE,		&tape.symbol.pause	},
+    },
+    {
+      { IMG_TAPE_LABEL_GFX_DATE,		&tape.label.date	},
+      { -1,					NULL			},
+    },
+    {
+      { IMG_TAPE_LABEL_GFX_TIME,		&tape.label.time	},
+      { -1,					NULL			},
+    },
+    {
+      { IMG_TAPE_LABEL_GFX_FAST_FORWARD,	&tape.label.fast_forward  },
+      { IMG_TAPE_SYMBOL_GFX_FAST_FORWARD,	&tape.symbol.fast_forward },
+    },
+    {
+      { IMG_TAPE_LABEL_GFX_PAUSE_BEFORE_END,	&tape.label.pause_before_end  },
+      { IMG_TAPE_SYMBOL_GFX_PAUSE_BEFORE_END,	&tape.symbol.pause_before_end },
+    },
+    {
+      { IMG_TAPE_LABEL_GFX_WARP_FORWARD_BLIND,	&tape.label.warp_forward_blind},
+      { IMG_TAPE_SYMBOL_GFX_WARP_FORWARD_BLIND, &tape.symbol.warp_forward_blind},
+    },
+    {
+      { IMG_TAPE_LABEL_GFX_WARP_FORWARD,	&tape.label.warp_forward  },
+      { IMG_TAPE_SYMBOL_GFX_WARP_FORWARD,	&tape.symbol.warp_forward },
+    },
+    {
+      { IMG_TAPE_LABEL_GFX_SINGLE_STEP,		&tape.label.single_step	 },
+      { IMG_TAPE_SYMBOL_GFX_SINGLE_STEP,	&tape.symbol.single_step },
+    },
+  };
+
+  for (k = 0; k < NUM_TAPE_FUNCTION_STATES; k++)	/* on or off states */
+  {
+    for (i = 0; i < NUM_TAPE_FUNCTIONS; i++)		/* record, play, ... */
+    {
+      for (j = 0; j < NUM_TAPE_FUNCTION_PARTS; j++)	/* label or symbol */
+      {
+	if (video_pos[i][j].graphic == -1 ||
+	    video_pos[i][j].pos->x < 0 ||
+	    video_pos[i][j].pos->y < 0)
+	  continue;
 
 #if 0
-  /* !!! ADD NEW STUFF HERE :-) !!! */
+	printf("::: %d: %d, %ld\n",
+	       i,
+	       video_pos[i][j].graphic,
+	       graphic_info[video_pos[i][j].graphic].bitmap);
+#endif
+
+#if 0
+	if (i < 9)
+	  continue;
+#endif
+
+	if (state & (1 << (i * 2 + k)))
+	{
+	  struct GraphicInfo *gfx_bg = &graphic_info[IMG_BACKGROUND_TAPE];
+	  struct GraphicInfo *gfx = &graphic_info[video_pos[i][j].graphic];
+	  struct Rect *pos = video_pos[i][j].pos;
+	  Bitmap *gd_bitmap;
+	  int gd_x, gd_y;
+	  int skip_value =
+	    (j == 0 ? VIDEO_DISPLAY_SYMBOL_ONLY : VIDEO_DISPLAY_LABEL_ONLY);
+
+	  if (value == skip_value)
+	    continue;
+
+	  if (k == 1)		/* on */
+	  {
+	    gd_bitmap = gfx->bitmap;
+	    gd_x = gfx->src_x;
+	    gd_y = gfx->src_y;
+	  }
+	  else			/* off */
+	  {
+	    gd_bitmap = gfx_bg->bitmap;
+	    gd_x = gfx_bg->src_x + pos->x;
+	    gd_y = gfx_bg->src_y + pos->y;
+	  }
+
+#if 0
+	  printf("::: %d (%d): %d, %ld - %d [%d] [%d] [%d]\n",
+		 i, k,
+		 video_pos[i][j].graphic,
+		 graphic_info[video_pos[i][j].graphic].bitmap,
+		 gfx->bitmap,
+		 gd_bitmap,
+		 (gd_bitmap == NULL),
+		 0);
+
+	  if (gd_bitmap == NULL)
+	    printf("::: gfx %d skipped\n", video_pos[i][j].graphic);
+#endif
+
+	  /* some tape graphics may be undefined -- only draw if defined */
+	  if (gd_bitmap != NULL)
+	    BlitBitmap(gd_bitmap, drawto, gd_x, gd_y, gfx->width, gfx->height,
+		       VX + pos->x, VY + pos->y);
+	}
+      }
+    }
+  }
 
 #else
 
@@ -386,6 +508,31 @@ void DrawVideoDisplay(unsigned long state, unsigned long value)
   }
 #endif
 
+#if 1
+  if (state & VIDEO_STATE_DATE_ON)
+  {
+    struct TextPosInfo *pos = &tape.text.date;
+    int tag = value % 100;
+    int monat = (value/100) % 100;
+    int jahr = (value/10000);
+
+    DrawText(VX + pos->x,      VY + pos->y, int2str(tag, 2),   pos->font);
+    DrawText(VX + pos->x + 27, VY + pos->y, monatsname[monat], pos->font);
+    DrawText(VX + pos->x + 64, VY + pos->y, int2str(jahr, 2),  pos->font);
+  }
+
+  if (state & VIDEO_STATE_TIME_ON)
+  {
+    struct TextPosInfo *pos = &tape.text.time;
+    int min = value / 60;
+    int sec = value % 60;
+
+    DrawText(VX + pos->x,      VY + pos->y, int2str(min, 2), pos->font);
+    DrawText(VX + pos->x + 27, VY + pos->y, int2str(sec, 2), pos->font);
+  }
+
+#else
+
   if (state & VIDEO_STATE_DATE_ON)
   {
     int tag = value % 100;
@@ -410,6 +557,7 @@ void DrawVideoDisplay(unsigned long state, unsigned long value)
     DrawText(VX + VIDEO_TIME_XPOS + 27, VY + VIDEO_TIME_YPOS,
 	     int2str(sec, 2), FONT_TAPE_RECORDER);
   }
+#endif
 
   redraw_mask |= REDRAW_DOOR_2;
 }
