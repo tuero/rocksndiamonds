@@ -4312,11 +4312,11 @@ static struct TokenInfo setup_info_input[] =
 
 static struct TokenInfo setup_info_shortcuts[] =
 {
-  { TYPE_ENTER_MENU,	execSetupShortcuts1,	"Various Keys"	},
-  { TYPE_ENTER_MENU,	execSetupShortcuts2,	"Player Focus"	},
-  { TYPE_ENTER_MENU,	execSetupShortcuts3,	"Tape Buttons"	},
-  { TYPE_ENTER_MENU,	execSetupShortcuts4,	"Sound & Music"	},
-  { TYPE_ENTER_MENU,	execSetupShortcuts5,	"TAS Snap Keys"	},
+  { TYPE_ENTER_MENU,	execSetupShortcuts1,	"Various Keys"		},
+  { TYPE_ENTER_MENU,	execSetupShortcuts2,	"Player Focus"		},
+  { TYPE_ENTER_MENU,	execSetupShortcuts3,	"Tape Buttons"		},
+  { TYPE_ENTER_MENU,	execSetupShortcuts4,	"Sound & Music"		},
+  { TYPE_ENTER_MENU,	execSetupShortcuts5,	"TAS Snap Keys"		},
   { TYPE_EMPTY,		NULL,			""			},
   { TYPE_LEAVE_MENU,	execSetupMain, 		"Back"			},
 
@@ -4360,15 +4360,17 @@ static struct TokenInfo setup_info_shortcuts_2[] =
 
 static struct TokenInfo setup_info_shortcuts_3[] =
 {
-  { TYPE_KEYTEXT,	NULL,			"Tape Eject:",		},
+  { TYPE_KEYTEXT,	NULL,			"Eject Tape:",		},
   { TYPE_KEY,		&setup.shortcut.tape_eject, ""			},
-  { TYPE_KEYTEXT,	NULL,			"Tape Stop:",		},
+  { TYPE_KEYTEXT,	NULL,			"Warp / Single Step:",	},
+  { TYPE_KEY,		&setup.shortcut.tape_extra, ""			},
+  { TYPE_KEYTEXT,	NULL,			"Stop Tape:",		},
   { TYPE_KEY,		&setup.shortcut.tape_stop, ""			},
-  { TYPE_KEYTEXT,	NULL,			"Tape Pause:",		},
+  { TYPE_KEYTEXT,	NULL,			"Pause / Unpause Tape:",},
   { TYPE_KEY,		&setup.shortcut.tape_pause, ""			},
-  { TYPE_KEYTEXT,	NULL,			"Tape Record:",		},
+  { TYPE_KEYTEXT,	NULL,			"Record Tape:",		},
   { TYPE_KEY,		&setup.shortcut.tape_record, ""			},
-  { TYPE_KEYTEXT,	NULL,			"Tape Play:",		},
+  { TYPE_KEYTEXT,	NULL,			"Play Tape:",		},
   { TYPE_KEY,		&setup.shortcut.tape_play, ""			},
   { TYPE_EMPTY,		NULL,			""			},
   { TYPE_LEAVE_MENU,	execSetupShortcuts,	"Back"			},
@@ -4378,11 +4380,11 @@ static struct TokenInfo setup_info_shortcuts_3[] =
 
 static struct TokenInfo setup_info_shortcuts_4[] =
 {
-  { TYPE_KEYTEXT,	NULL,		"Sound Effects (Normal):",	},
+  { TYPE_KEYTEXT,	NULL,		"Toggle Sound Effects (Normal):", },
   { TYPE_KEY,		&setup.shortcut.sound_simple, ""		},
-  { TYPE_KEYTEXT,	NULL,		"Sound Effects (Looping):",	},
+  { TYPE_KEYTEXT,	NULL,		"Toggle Sound Effects (Looping):", },
   { TYPE_KEY,		&setup.shortcut.sound_loops, ""			},
-  { TYPE_KEYTEXT,	NULL,		"Music:",			},
+  { TYPE_KEYTEXT,	NULL,		"Toggle Music:",		},
   { TYPE_KEY,		&setup.shortcut.sound_music, ""			},
   { TYPE_EMPTY,		NULL,			""			},
   { TYPE_LEAVE_MENU,	execSetupShortcuts,	"Back"			},

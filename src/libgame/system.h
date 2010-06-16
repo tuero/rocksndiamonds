@@ -73,6 +73,7 @@
 #define DEFAULT_KEY_FOCUS_PLAYER_4	KSYM_F8
 #define DEFAULT_KEY_FOCUS_PLAYER_ALL	KSYM_F9
 #define DEFAULT_KEY_TAPE_EJECT		KSYM_UNDEFINED
+#define DEFAULT_KEY_TAPE_EXTRA		KSYM_UNDEFINED
 #define DEFAULT_KEY_TAPE_STOP		KSYM_UNDEFINED
 #define DEFAULT_KEY_TAPE_PAUSE		KSYM_UNDEFINED
 #define DEFAULT_KEY_TAPE_RECORD		KSYM_UNDEFINED
@@ -863,6 +864,7 @@ struct SetupShortcutInfo
   Key focus_player_all;
 
   Key tape_eject;
+  Key tape_extra;
   Key tape_stop;
   Key tape_pause;
   Key tape_record;

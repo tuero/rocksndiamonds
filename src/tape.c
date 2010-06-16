@@ -345,6 +345,11 @@ void DrawVideoDisplay(unsigned long state, unsigned long value)
     },
   };
 
+#if 0
+  /* !!! ADD NEW STUFF HERE :-) !!! */
+
+#else
+
   for (k = 0; k < NUM_TAPE_FUNCTION_STATES; k++)	/* on or off states */
   {
     for (i = 0; i < NUM_TAPE_FUNCTIONS; i++)		/* record, play, ... */
@@ -379,6 +384,7 @@ void DrawVideoDisplay(unsigned long state, unsigned long value)
       }
     }
   }
+#endif
 
   if (state & VIDEO_STATE_DATE_ON)
   {
@@ -1423,10 +1429,13 @@ static void HandleTapeButtons(struct GadgetInfo *gi)
 
 void HandleTapeButtonKeys(Key key)
 {
-  boolean use_extra = (tape.recording || tape.playing);
+  boolean eject_button_is_active = TAPE_IS_STOPPED(tape);
+  boolean extra_button_is_active = !eject_button_is_active;
 
-  if (key == setup.shortcut.tape_eject)
-    HandleTapeButtonsExt(use_extra ? TAPE_CTRL_ID_EXTRA : TAPE_CTRL_ID_EJECT);
+  if (key == setup.shortcut.tape_eject && eject_button_is_active)
+    HandleTapeButtonsExt(TAPE_CTRL_ID_EJECT);
+  else if (key == setup.shortcut.tape_extra && extra_button_is_active)
+    HandleTapeButtonsExt(TAPE_CTRL_ID_EXTRA);
   else if (key == setup.shortcut.tape_stop)
     HandleTapeButtonsExt(TAPE_CTRL_ID_STOP);
   else if (key == setup.shortcut.tape_pause)

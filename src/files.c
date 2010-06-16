@@ -9060,19 +9060,20 @@ void SaveScore(int nr)
 #define SETUP_TOKEN_SHORTCUT_FOCUS_PLAYER_4	6
 #define SETUP_TOKEN_SHORTCUT_FOCUS_PLAYER_ALL	7
 #define SETUP_TOKEN_SHORTCUT_TAPE_EJECT		8
-#define SETUP_TOKEN_SHORTCUT_TAPE_STOP		9
-#define SETUP_TOKEN_SHORTCUT_TAPE_PAUSE		10
-#define SETUP_TOKEN_SHORTCUT_TAPE_RECORD	11
-#define SETUP_TOKEN_SHORTCUT_TAPE_PLAY		12
-#define SETUP_TOKEN_SHORTCUT_SOUND_SIMPLE	13
-#define SETUP_TOKEN_SHORTCUT_SOUND_LOOPS	14
-#define SETUP_TOKEN_SHORTCUT_SOUND_MUSIC	15
-#define SETUP_TOKEN_SHORTCUT_SNAP_LEFT		16
-#define SETUP_TOKEN_SHORTCUT_SNAP_RIGHT		17
-#define SETUP_TOKEN_SHORTCUT_SNAP_UP		18
-#define SETUP_TOKEN_SHORTCUT_SNAP_DOWN		19
+#define SETUP_TOKEN_SHORTCUT_TAPE_EXTRA		9
+#define SETUP_TOKEN_SHORTCUT_TAPE_STOP		10
+#define SETUP_TOKEN_SHORTCUT_TAPE_PAUSE		11
+#define SETUP_TOKEN_SHORTCUT_TAPE_RECORD	12
+#define SETUP_TOKEN_SHORTCUT_TAPE_PLAY		13
+#define SETUP_TOKEN_SHORTCUT_SOUND_SIMPLE	14
+#define SETUP_TOKEN_SHORTCUT_SOUND_LOOPS	15
+#define SETUP_TOKEN_SHORTCUT_SOUND_MUSIC	16
+#define SETUP_TOKEN_SHORTCUT_SNAP_LEFT		17
+#define SETUP_TOKEN_SHORTCUT_SNAP_RIGHT		18
+#define SETUP_TOKEN_SHORTCUT_SNAP_UP		19
+#define SETUP_TOKEN_SHORTCUT_SNAP_DOWN		20
 
-#define NUM_SHORTCUT_SETUP_TOKENS		20
+#define NUM_SHORTCUT_SETUP_TOKENS		21
 
 /* player setup */
 #define SETUP_TOKEN_PLAYER_USE_JOYSTICK		0
@@ -9218,6 +9219,7 @@ static struct TokenInfo shortcut_setup_tokens[] =
   { TYPE_KEY_X11, &ssi.focus_player[3],	"shortcut.focus_player_4"	},
   { TYPE_KEY_X11, &ssi.focus_player_all,"shortcut.focus_player_all"	},
   { TYPE_KEY_X11, &ssi.tape_eject,	"shortcut.tape_eject"		},
+  { TYPE_KEY_X11, &ssi.tape_extra,	"shortcut.tape_extra"		},
   { TYPE_KEY_X11, &ssi.tape_stop,	"shortcut.tape_stop"		},
   { TYPE_KEY_X11, &ssi.tape_pause,	"shortcut.tape_pause"		},
   { TYPE_KEY_X11, &ssi.tape_record,	"shortcut.tape_record"		},
@@ -9346,6 +9348,7 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
   si->shortcut.focus_player_all	= DEFAULT_KEY_FOCUS_PLAYER_ALL;
 
   si->shortcut.tape_eject	= DEFAULT_KEY_TAPE_EJECT;
+  si->shortcut.tape_extra	= DEFAULT_KEY_TAPE_EXTRA;
   si->shortcut.tape_stop	= DEFAULT_KEY_TAPE_STOP;
   si->shortcut.tape_pause	= DEFAULT_KEY_TAPE_PAUSE;
   si->shortcut.tape_record	= DEFAULT_KEY_TAPE_RECORD;

@@ -1334,6 +1334,29 @@ static void set_graphic_parameters_ext(int graphic, int *parameter,
   if (parameter[GFX_ARG_HEIGHT] != ARG_UNDEFINED_VALUE)
     g->height = parameter[GFX_ARG_HEIGHT];
 
+  if (src_bitmap)
+  {
+    if (g->width <= 0)
+    {
+      Error(ERR_INFO_LINE, "-");
+      Error(ERR_WARN, "invalid value %d for '%s.width' (fallback done to %d)",
+	    g->width, getTokenFromImageID(graphic), TILEX);
+      Error(ERR_INFO_LINE, "-");
+
+      g->width = TILEX;		/* will be checked to be inside bitmap later */
+    }
+
+    if (g->height <= 0)
+    {
+      Error(ERR_INFO_LINE, "-");
+      Error(ERR_WARN, "invalid value %d for '%s.height' (fallback done to %d)",
+	    g->height, getTokenFromImageID(graphic), TILEY);
+      Error(ERR_INFO_LINE, "-");
+
+      g->height = TILEY;	/* will be checked to be inside bitmap later */
+    }
+  }
+
 #if 0
   /* optional zoom factor for scaling up the image to a larger size */
   if (parameter[GFX_ARG_SCALE_UP_FACTOR] != ARG_UNDEFINED_VALUE)
@@ -1864,6 +1887,8 @@ static void InitGraphicInfo()
     IMG_BACKGROUND_INFO_LEVELSET,
     IMG_BACKGROUND_SETUP,
     IMG_BACKGROUND_DOOR,
+    IMG_BACKGROUND_TAPE,
+    IMG_BACKGROUND_PANEL,
 
     IMG_TITLESCREEN_INITIAL_1,
     IMG_TITLESCREEN_INITIAL_2,

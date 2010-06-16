@@ -102,6 +102,42 @@ struct TapeButtonInfo
   struct Rect play;
 };
 
+struct TapeSymbolInfo
+{
+  struct Rect eject;
+  struct Rect stop;
+  struct Rect pause;
+  struct Rect record;
+  struct Rect play;
+  struct Rect fast_forward;
+  struct Rect warp_forward;
+  struct Rect warp_forward_blind;
+  struct Rect pause_before_end;
+  struct Rect single_step;
+};
+
+struct TapeLabelInfo
+{
+  struct Rect eject;
+  struct Rect stop;
+  struct Rect pause;
+  struct Rect record;
+  struct Rect play;
+  struct Rect fast_forward;
+  struct Rect warp_forward;
+  struct Rect warp_forward_blind;
+  struct Rect pause_before_end;
+  struct Rect single_step;
+  struct Rect date;
+  struct Rect time;
+};
+
+struct TapeTextInfo
+{
+  struct TextPosInfo date;
+  struct TextPosInfo time;
+};
+
 struct TapeInfo
 {
   int file_version;	/* file format version the tape is stored with    */
@@ -138,6 +174,9 @@ struct TapeInfo
   } pos[MAX_TAPE_LEN];
 
   struct TapeButtonInfo button;
+  struct TapeSymbolInfo symbol;
+  struct TapeLabelInfo label;
+  struct TapeTextInfo text;
 
   boolean no_valid_file;	/* set when tape file missing or invalid */
 };
