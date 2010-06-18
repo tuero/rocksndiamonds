@@ -304,6 +304,7 @@
 #define GAME_FRAME_DELAY	20	/* frame delay in milliseconds */
 #define FFWD_FRAME_DELAY	10	/* 200% speed for fast forward */
 #define FRAMES_PER_SECOND	(ONE_SECOND_DELAY / GAME_FRAME_DELAY)
+#define FRAMES_PER_SECOND_SP	35
 
 /* maximum playfield size supported by libgame functions */
 #define MAX_PLAYFIELD_WIDTH	128
@@ -1222,6 +1223,7 @@ Bitmap *CreateBitmap(int, int, int);
 void ReCreateBitmap(Bitmap **, int, int, int);
 void FreeBitmap(Bitmap *);
 void BlitBitmap(Bitmap *, Bitmap *, int, int, int, int, int, int);
+void BlitBitmapTiled(Bitmap *, Bitmap *, int, int, int, int, int, int, int,int);
 void FadeRectangle(Bitmap *bitmap, int, int, int, int, int, int, int,
 		   void (*draw_border_function)(void));
 void FillRectangle(Bitmap *, int, int, int, int, Pixel);

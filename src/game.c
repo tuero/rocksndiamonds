@@ -2539,8 +2539,15 @@ void DisplayGameControlValues()
     return;
 
   /* copy default game door content to main double buffer */
+#if 1
+  /* !!! CHECK AGAIN !!! */
+  SetPanelBackground();
+  // SetDoorBackgroundImage(IMG_BACKGROUND_PANEL);
+  DrawBackground(DX, DY, DXSIZE, DYSIZE);
+#else
   BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
 	     DOOR_GFX_PAGEX5, DOOR_GFX_PAGEY1, DXSIZE, DYSIZE, DX, DY);
+#endif
 
   /* redraw game control buttons */
 #if 1
@@ -4539,8 +4546,24 @@ void InitGame()
   if (!game.restart_level)
   {
     /* copy default game door content to main double buffer */
+#if 1
+#if 1
+    /* !!! CHECK AGAIN !!! */
+    SetPanelBackground();
+    // SetDoorBackgroundImage(IMG_BACKGROUND_PANEL);
+    DrawBackground(DX, DY, DXSIZE, DYSIZE);
+#else
+    struct GraphicInfo *gfx = &graphic_info[IMG_BACKGROUND_PANEL];
+
+    /* (ClearRectangle() only needed if panel bitmap is smaller than panel) */
+    ClearRectangle(drawto, DX, DY, DXSIZE, DYSIZE);
+    BlitBitmap(gfx->bitmap, drawto, gfx->src_x, gfx->src_y,
+	       MIN(gfx->width, DXSIZE), MIN(gfx->height, DYSIZE), DX, DY);
+#endif
+#else
     BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
 	       DOOR_GFX_PAGEX5, DOOR_GFX_PAGEY1, DXSIZE, DYSIZE, DX, DY);
+#endif
   }
 
   SetPanelBackground();

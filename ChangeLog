@@ -1,3 +1,7 @@
+2010-06-18
+	* added separately configurable game panel background to graphics config
+	* fixed displaying Supaplex time (now based on 35 fps instead of 50 fps)
+
 2010-06-16
 	* added tape panel graphics and screen positions to graphics config
 

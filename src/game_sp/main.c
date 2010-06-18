@@ -66,10 +66,19 @@ void RedrawPlayfield_SP(boolean force_redraw)
 
 void DrawGameDoorValues_SP()
 {
-  game_sp.time_played = TimerVar / setup.game_frame_delay;
+#if 1
+  game_sp.time_played = TimerVar / FRAMES_PER_SECOND_SP;
+#else
+  game_sp.time_played = TimerVar * setup.game_frame_delay / 1000;
+#endif
   game_sp.infotrons_still_needed = InfotronsNeeded;
   game_sp.red_disk_count = RedDiskCount;
   game_sp.score = 0;		// (currently no score in Supaplex engine)
+
+#if 0
+  printf("::: %d, %d => %d\n",
+	 TimerVar, setup.game_frame_delay, game_sp.time_played);
+#endif
 }
 
 void GameActions_SP(byte action[MAX_PLAYERS], boolean warp_mode)

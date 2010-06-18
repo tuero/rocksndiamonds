@@ -795,8 +795,22 @@ void SetDoorBackgroundImage(int graphic)
 
 void SetPanelBackground()
 {
+#if 1
+  struct GraphicInfo *gfx = &graphic_info[IMG_BACKGROUND_PANEL];
+
+#if 1
+  BlitBitmapTiled(gfx->bitmap, bitmap_db_panel, gfx->src_x, gfx->src_y,
+		  gfx->width, gfx->height, 0, 0, DXSIZE, DYSIZE);
+#else
+  /* (ClearRectangle() only needed if panel bitmap is smaller than panel) */
+  ClearRectangle(bitmap_db_panel, DX, DY, DXSIZE, DYSIZE);
+  BlitBitmap(gfx->bitmap, bitmap_db_panel, gfx->src_x, gfx->src_y,
+	     MIN(gfx->width, DXSIZE), MIN(gfx->height, DYSIZE), 0, 0);
+#endif
+#else
   BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, bitmap_db_panel,
              DOOR_GFX_PAGEX5, DOOR_GFX_PAGEY1, DXSIZE, DYSIZE, 0, 0);
+#endif
 
   SetDoorBackgroundBitmap(bitmap_db_panel);
 }

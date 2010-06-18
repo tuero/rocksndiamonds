@@ -409,18 +409,6 @@ void DrawVideoDisplay(unsigned long state, unsigned long value)
 	    video_pos[i][j].pos->y < 0)
 	  continue;
 
-#if 0
-	printf("::: %d: %d, %ld\n",
-	       i,
-	       video_pos[i][j].graphic,
-	       graphic_info[video_pos[i][j].graphic].bitmap);
-#endif
-
-#if 0
-	if (i < 9)
-	  continue;
-#endif
-
 	if (state & (1 << (i * 2 + k)))
 	{
 	  struct GraphicInfo *gfx_bg = &graphic_info[IMG_BACKGROUND_TAPE];
@@ -446,20 +434,6 @@ void DrawVideoDisplay(unsigned long state, unsigned long value)
 	    gd_x = gfx_bg->src_x + pos->x;
 	    gd_y = gfx_bg->src_y + pos->y;
 	  }
-
-#if 0
-	  printf("::: %d (%d): %d, %ld - %d [%d] [%d] [%d]\n",
-		 i, k,
-		 video_pos[i][j].graphic,
-		 graphic_info[video_pos[i][j].graphic].bitmap,
-		 gfx->bitmap,
-		 gd_bitmap,
-		 (gd_bitmap == NULL),
-		 0);
-
-	  if (gd_bitmap == NULL)
-	    printf("::: gfx %d skipped\n", video_pos[i][j].graphic);
-#endif
 
 	  /* some tape graphics may be undefined -- only draw if defined */
 	  if (gd_bitmap != NULL)
