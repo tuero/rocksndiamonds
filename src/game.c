@@ -13368,7 +13368,11 @@ void ScrollLevel(int dx, int dy)
 
 #else
 
+#if NEW_SCROLL
+  int softscroll_offset = (setup.soft_scrolling ? 2 * TILEX : 0);
+#else
   int softscroll_offset = (setup.soft_scrolling ? TILEX : 0);
+#endif
 
   BlitBitmap(drawto_field, drawto_field,
 	     FX + TILEX * (dx == -1) - softscroll_offset,

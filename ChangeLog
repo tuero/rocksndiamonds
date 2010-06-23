@@ -1,6 +1,9 @@
 2010-06-23
 	* added graphics performance optimization to native Supaplex game engine
 	* fixed bug with accidentally removing preceding buffer in SP engine
+	* moved some editor graphics from "RocksDoor.pcx" to "RocksMore.pcx"
+	  (to prevent compatibility mapping of these newer graphics to older
+	  (custom) versions of "RocksDoor.pcx" which did not contain them yet)
 
 2010-06-18
 	* added separately configurable game panel background to graphics config

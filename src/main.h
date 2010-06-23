@@ -31,6 +31,8 @@
 #include "conf_mus.h"	/* include auto-generated data structure definitions */
 
 
+#define NEW_SCROLL			0
+
 #define IMG_UNDEFINED			(-1)
 #define IMG_EMPTY			IMG_EMPTY_SPACE
 #define IMG_SP_EMPTY			IMG_EMPTY_SPACE
@@ -2827,7 +2829,11 @@ extern SDL_Thread	       *server_thread;
 extern int			key_joystick_mapping;
 
 #if 1
+#if NEW_SCROLL
+extern boolean			redraw[2 + MAX_LEV_FIELDX + 2][2 + MAX_LEV_FIELDY + 2];
+#else
 extern boolean			redraw[MAX_LEV_FIELDX + 2][MAX_LEV_FIELDY + 2];
+#endif
 #else
 extern boolean			redraw[MAX_BUF_XSIZE][MAX_BUF_YSIZE];
 #endif

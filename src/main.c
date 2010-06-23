@@ -41,7 +41,11 @@ SDL_Thread	       *server_thread;
 int			key_joystick_mapping = 0;
 
 #if 1
+#if NEW_SCROLL
+boolean			redraw[2 + MAX_LEV_FIELDX + 2][2 + MAX_LEV_FIELDY + 2];
+#else
 boolean			redraw[MAX_LEV_FIELDX + 2][MAX_LEV_FIELDY + 2];
+#endif
 #else
 boolean			redraw[MAX_BUF_XSIZE][MAX_BUF_YSIZE];
 #endif

@@ -108,6 +108,16 @@ void SetDrawtoField(int mode)
 {
   if (mode == DRAW_BUFFERED && setup.soft_scrolling)
   {
+#if NEW_SCROLL
+    FX = 2 * TILEX;
+    FY = 2 * TILEY;
+    BX1 = -2;
+    BY1 = -2;
+    BX2 = SCR_FIELDX + 1;
+    BY2 = SCR_FIELDY + 1;
+    redraw_x1 = 2;
+    redraw_y1 = 2;
+#else
     FX = TILEX;
     FY = TILEY;
     BX1 = -1;
@@ -116,6 +126,7 @@ void SetDrawtoField(int mode)
     BY2 = SCR_FIELDY;
     redraw_x1 = 1;
     redraw_y1 = 1;
+#endif
 
     drawto_field = fieldbuffer;
   }
