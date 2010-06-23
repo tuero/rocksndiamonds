@@ -5123,6 +5123,8 @@ static void InitGlobal()
   global.fading_status = GAME_MODE_MAIN;
   global.fading_type = TYPE_ENTER_MENU;
 #endif
+
+  global.use_envelope_request = FALSE;	/* !!! MOVE TO ARTWORK CONFIG !!! */
 }
 
 void Execute_Command(char *command)
@@ -6304,11 +6306,18 @@ void OpenAll()
 
   InitSetup();
 
+  print_timestamp_time("[init setup/config stuff (1)]");
+
   InitGameInfo();
+  print_timestamp_time("[init setup/config stuff (2)]");
   InitPlayerInfo();
+  print_timestamp_time("[init setup/config stuff (3)]");
   InitArtworkInfo();		/* needed before loading gfx, sound & music */
+  print_timestamp_time("[init setup/config stuff (4)]");
   InitArtworkConfig();		/* needed before forking sound child process */
+  print_timestamp_time("[init setup/config stuff (5)]");
   InitMixer();
+  print_timestamp_time("[init setup/config stuff (6)]");
 
 #if 0
   InitCounter();

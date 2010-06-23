@@ -13,9 +13,12 @@ static void Blt(int pX, int pY, Bitmap *bitmap, int SpriteX, int SpriteY)
   int sy1 = scy - 2 * TILEY;
   int sx2 = scx + SXSIZE + 1 * TILEX;
   int sy2 = scy + SYSIZE + 1 * TILEY;
-
   int sx = pX - sx1;
   int sy = pY - sy1;
+  int tile_x = sx / TILESIZE;
+  int tile_y = sy / TILESIZE;
+  int move_x = (sx + TILESIZE - 1) / TILESIZE;
+  int move_y = (sy + TILESIZE - 1) / TILESIZE;
 
   if (NoDisplayFlag)
     return;
@@ -26,6 +29,20 @@ static void Blt(int pX, int pY, Bitmap *bitmap, int SpriteX, int SpriteY)
 
   BlitBitmap(bitmap, bitmap_db_field_sp, SpriteX, SpriteY,
 	     TILEX, TILEY, sx, sy);
+
+  redraw[tile_x][tile_y] = TRUE;
+  redraw_tiles++;
+
+  if (move_x != tile_x)
+  {
+    redraw[move_x][tile_y] = TRUE;
+    redraw_tiles++;
+  }
+  else if (move_y != tile_y)
+  {
+    redraw[tile_x][move_y] = TRUE;
+    redraw_tiles++;
+  }
 }
 
 void DDSpriteBuffer_BltImg(int pX, int pY, int graphic, int sync_frame)

@@ -2466,6 +2466,8 @@ struct GlobalInfo
   int fading_status;
   int fading_type;
 #endif
+
+  boolean use_envelope_request;
 };
 
 struct ElementChangeInfo

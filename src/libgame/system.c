@@ -736,6 +736,12 @@ void BlitBitmap(Bitmap *src_bitmap, Bitmap *dst_bitmap,
 #endif
 #endif
 
+#if 0
+  if (dst_x < gfx.sx + gfx.sxsize)
+    printf("::: %d: BlitBitmap(%d, %d, %d, %d)\n",
+	   FrameCounter, dst_x, dst_y, width, height);
+#endif
+
   sysCopyArea(src_bitmap, dst_bitmap,
 	      src_x, src_y, width, height, dst_x, dst_y, BLIT_OPAQUE);
 }

@@ -67,7 +67,8 @@ void RedrawPlayfield_SP(boolean force_redraw)
 void DrawGameDoorValues_SP()
 {
 #if 1
-  game_sp.time_played = TimerVar / FRAMES_PER_SECOND_SP;
+  // game_sp.time_played = TimerVar / FRAMES_PER_SECOND_SP;
+  game_sp.time_played = TimerVar / FRAMES_PER_SECOND;
 #else
   game_sp.time_played = TimerVar * setup.game_frame_delay / 1000;
 #endif

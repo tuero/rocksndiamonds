@@ -251,6 +251,11 @@ void DrawMaskedBorder(int redraw_mask)
       effectiveGameStatus() == GAME_MODE_TITLE)
     return;
 
+  /* never draw masked screen borders when displaying request outside door */
+  if (effectiveGameStatus() == GAME_MODE_PSEUDO_DOOR &&
+      global.use_envelope_request)
+    return;
+
   if (redraw_mask & REDRAW_ALL)
     DrawMaskedBorder_ALL();
   else
@@ -332,7 +337,7 @@ void BackToFront()
 
   SyncDisplay();
 
-  /* prevent drawing masked border to backbuffer when using playfield buffer */
+  /* never draw masked border to backbuffer when using playfield buffer */
   if (game_status != GAME_MODE_PLAYING ||
       redraw_mask & REDRAW_FROM_BACKBUFFER ||
       buffer == backbuffer)
@@ -2431,7 +2436,7 @@ void ShowEnvelopeDoor(char *text, int action)
   game.envelope_active = FALSE;
 
 #if 1
-  game_status = last_game_status;	/* restore current game status */
+  // game_status = last_game_status;	/* restore current game status */
 
   if (action == ACTION_CLOSING)
   {
@@ -2458,6 +2463,9 @@ void ShowEnvelopeDoor(char *text, int action)
     DoAnimation();
 
   BackToFront();
+
+  /* (important: after "BackToFront()", but before "SetDrawtoField()") */
+  game_status = last_game_status;	/* restore current game status */
 
   if (game_status == GAME_MODE_PLAYING &&
       level.game_engine_type == GAME_ENGINE_TYPE_RND)
@@ -3392,12 +3400,13 @@ boolean Request(char *text, unsigned int req_state)
   int last_game_status = game_status;	/* save current game status */
   int max_request_line_len = MAX_REQUEST_LINE_FONT1_LEN;
   int font_nr = FONT_TEXT_2;
-  boolean use_envelope_request = TRUE  * 0;
 #if 0
   int max_word_len = 0;
 #endif
   char *text_ptr;
   int i;
+
+  global.use_envelope_request = TRUE  * 1;
 
 #if 1
   if (maxWordLengthInString(text) > MAX_REQUEST_LINE_FONT1_LEN)
@@ -3454,13 +3463,21 @@ boolean Request(char *text, unsigned int req_state)
 
   UnmapAllGadgets();
 
-#if 1
-  if (old_door_state & DOOR_OPEN_1 && !use_envelope_request)
+  /* draw released gadget before proceeding */
+  // BackToFront();
+
+#if 0
+  if (old_door_state & DOOR_OPEN_1 && !global.use_envelope_request)
 #else
   if (old_door_state & DOOR_OPEN_1)
 #endif
   {
+#if 1
+    if (!global.use_envelope_request)
+      CloseDoor(DOOR_CLOSE_1);
+#else
     CloseDoor(DOOR_CLOSE_1);
+#endif
 
     /* save old door content */
     BlitBitmap(bitmap_db_door, bitmap_db_door,
@@ -3516,7 +3533,7 @@ boolean Request(char *text, unsigned int req_state)
   game_status = last_game_status;	/* restore current game status */
 
 #if 1
-  if (use_envelope_request)
+  if (global.use_envelope_request)
   {
     /* !!! TMP !!! */
     FreeToolButtons();
@@ -3547,7 +3564,7 @@ boolean Request(char *text, unsigned int req_state)
 	     DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1);
 
 #if 1
-  if (use_envelope_request)
+  if (global.use_envelope_request)
   {
     ShowEnvelopeDoor(text, ACTION_OPENING);
 
@@ -3571,7 +3588,7 @@ boolean Request(char *text, unsigned int req_state)
 #endif
 
 #if 1
-  if (!use_envelope_request)
+  if (!global.use_envelope_request)
     OpenDoor(DOOR_OPEN_1);
 #else
   OpenDoor(DOOR_OPEN_1);
@@ -3593,7 +3610,7 @@ boolean Request(char *text, unsigned int req_state)
   }
 
 #if 1
-  if (game_status != GAME_MODE_MAIN && !use_envelope_request)
+  if (game_status != GAME_MODE_MAIN && !global.use_envelope_request)
     InitAnimation();
 #else
   if (game_status != GAME_MODE_MAIN)
@@ -3735,7 +3752,15 @@ boolean Request(char *text, unsigned int req_state)
 	Delay(10);
     }
 
+#if 1
+    game_status = GAME_MODE_PSEUDO_DOOR;
+#endif
+
     BackToFront();
+
+#if 1
+    game_status = last_game_status;	/* restore current game status */
+#endif
 
 #else
 
@@ -3758,12 +3783,12 @@ boolean Request(char *text, unsigned int req_state)
   UnmapToolButtons();
 
 #if 1
-  if (use_envelope_request)
+  if (global.use_envelope_request)
     ShowEnvelopeDoor(text, ACTION_CLOSING);
 #endif
 
 #if 1
-  if (!(req_state & REQ_STAY_OPEN) && !use_envelope_request)
+  if (!(req_state & REQ_STAY_OPEN) && !global.use_envelope_request)
 #else
   if (!(req_state & REQ_STAY_OPEN))
 #endif

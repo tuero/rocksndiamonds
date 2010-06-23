@@ -1,3 +1,6 @@
+2010-06-23
+	* added graphics performance optimization to native Supaplex game engine
+
 2010-06-18
 	* added separately configurable game panel background to graphics config
 	* fixed displaying Supaplex time (now based on 35 fps instead of 50 fps)
