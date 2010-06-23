@@ -17,7 +17,8 @@ int FieldMax, LevelMax;
 long FileMax;
 
 #if 1
-int PlayField16[SP_MAX_PLAYFIELD_SIZE + SP_HEADER_SIZE];
+int *PlayField16;
+// int PlayField16[SP_MAX_PLAYFIELD_SIZE + SP_HEADER_SIZE];
 byte PlayField8[SP_MAX_PLAYFIELD_SIZE + SP_HEADER_SIZE];
 byte DisPlayField[SP_MAX_PLAYFIELD_SIZE + SP_HEADER_SIZE];
 #else
@@ -164,6 +165,8 @@ boolean isSnappingSequence(int sequence)
 
 void InitGlobals()
 {
+  InitPrecedingPlayfieldMemory();
+
   AutoScrollFlag = True;
   FreezeZonks = 0;
   LevelLoaded = False;
@@ -174,6 +177,11 @@ void InitGlobals()
   LevelMax = (FieldWidth * FieldHeight) - 1;
   bPlaying = False;
   menBorder = False;
+
+  PlayField16 = checked_calloc((game_sp.preceding_buffer_size +
+				SP_MAX_PLAYFIELD_SIZE +
+				SP_HEADER_SIZE) * sizeof(int));
+  PlayField16 = &PlayField16[game_sp.preceding_buffer_size];
 
 #if 0
   /* these defaults will be changed after reading a Supaplex level file */

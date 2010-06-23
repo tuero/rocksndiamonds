@@ -295,7 +295,8 @@ extern boolean DemoAvailable;
 extern boolean menBorder;
 
 #if 1
-extern int PlayField16[SP_MAX_PLAYFIELD_SIZE + SP_HEADER_SIZE];
+extern int *PlayField16;
+// extern int PlayField16[SP_MAX_PLAYFIELD_SIZE + SP_HEADER_SIZE];
 extern byte PlayField8[SP_MAX_PLAYFIELD_SIZE + SP_HEADER_SIZE];
 extern byte DisPlayField[SP_MAX_PLAYFIELD_SIZE + SP_HEADER_SIZE];
 #else

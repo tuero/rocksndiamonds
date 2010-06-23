@@ -110,6 +110,7 @@ struct GameInfo_SP
   int score;
 
   /* needed for engine snapshots */
+  char **preceding_buffer;
   int preceding_buffer_size;
 
   int scroll_xoffset, scroll_yoffset;
@@ -186,6 +187,7 @@ extern struct EngineSnapshotInfo_SP engine_snapshot_sp;
 extern void sp_open_all();
 extern void sp_close_all();
 
+extern void InitPrecedingPlayfieldMemory();
 extern void InitGfxBuffers_SP();
 
 extern void InitGameEngine_SP();

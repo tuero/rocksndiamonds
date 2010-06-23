@@ -1,5 +1,6 @@
 2010-06-23
 	* added graphics performance optimization to native Supaplex game engine
+	* fixed bug with accidentally removing preceding buffer in SP engine
 
 2010-06-18
 	* added separately configurable game panel background to graphics config
