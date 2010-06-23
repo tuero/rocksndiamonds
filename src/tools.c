@@ -108,6 +108,27 @@ void SetDrawtoField(int mode)
 {
   if (mode == DRAW_BUFFERED && setup.soft_scrolling)
   {
+#if NEW_TILESIZE
+#if NEW_SCROLL
+    FX = 2 * TILEX_VAR;
+    FY = 2 * TILEY_VAR;
+    BX1 = -2;
+    BY1 = -2;
+    BX2 = SCR_FIELDX + 1;
+    BY2 = SCR_FIELDY + 1;
+    redraw_x1 = 2;
+    redraw_y1 = 2;
+#else
+    FX = TILEX_VAR;
+    FY = TILEY_VAR;
+    BX1 = -1;
+    BY1 = -1;
+    BX2 = SCR_FIELDX;
+    BY2 = SCR_FIELDY;
+    redraw_x1 = 1;
+    redraw_y1 = 1;
+#endif
+#else
 #if NEW_SCROLL
     FX = 2 * TILEX;
     FY = 2 * TILEY;
@@ -126,6 +147,7 @@ void SetDrawtoField(int mode)
     BY2 = SCR_FIELDY;
     redraw_x1 = 1;
     redraw_y1 = 1;
+#endif
 #endif
 
     drawto_field = fieldbuffer;
@@ -381,8 +403,28 @@ void BackToFront()
 
       if (setup.soft_scrolling)
       {
+#if NEW_TILESIZE
+	int dx = (ScreenMovDir & (MV_LEFT | MV_RIGHT) ? ScreenGfxPos : 0);
+	int dy = (ScreenMovDir & (MV_UP | MV_DOWN)    ? ScreenGfxPos : 0);
+
+	fx += dx * TILESIZE_VAR / TILESIZE;
+	fy += dy * TILESIZE_VAR / TILESIZE;
+#else
 	fx += (ScreenMovDir & (MV_LEFT | MV_RIGHT) ? ScreenGfxPos : 0);
 	fy += (ScreenMovDir & (MV_UP | MV_DOWN)    ? ScreenGfxPos : 0);
+#endif
+
+#if 0
+	printf("::: %d, %d [%d, %d] [%d, %d]\n",
+	       fx, fy, FX, FY, ScreenMovDir, ScreenGfxPos);
+#endif
+
+#if 0
+#if NEW_TILESIZE
+	fx = fx * TILESIZE_VAR / TILESIZE;
+	fy = fy * TILESIZE_VAR / TILESIZE;
+#endif
+#endif
       }
 
       if (setup.soft_scrolling ||
@@ -455,12 +497,22 @@ void BackToFront()
     printf("::: REDRAW_TILES\n");
 #endif
 
+#if NEW_TILESIZE
+    for (x = 0; x < SCR_FIELDX; x++)
+      for (y = 0 ; y < SCR_FIELDY; y++)
+	if (redraw[redraw_x1 + x][redraw_y1 + y])
+	  BlitBitmap(buffer, window,
+		     FX + x * TILEX_VAR, FY + y * TILEY_VAR,
+		     TILEX_VAR, TILEY_VAR,
+		     SX + x * TILEX_VAR, SY + y * TILEY_VAR);
+#else
     for (x = 0; x < SCR_FIELDX; x++)
       for (y = 0 ; y < SCR_FIELDY; y++)
 	if (redraw[redraw_x1 + x][redraw_y1 + y])
 	  BlitBitmap(buffer, window,
 		     FX + x * TILEX, FY + y * TILEY, TILEX, TILEY,
 		     SX + x * TILEX, SY + y * TILEY);
+#endif
   }
 
   if (redraw_mask & REDRAW_FPS)		/* display frames per second */
@@ -962,8 +1014,9 @@ inline int getGraphicAnimationFrame(int graphic, int sync_frame)
 			   sync_frame);
 }
 
-void getSizedGraphicSource(int graphic, int frame, int tilesize_raw,
-			   Bitmap **bitmap, int *x, int *y)
+void getSizedGraphicSourceExt(int graphic, int frame, int tilesize_raw,
+			      Bitmap **bitmap, int *x, int *y,
+			      boolean get_backside)
 {
   struct
   {
@@ -989,8 +1042,15 @@ void getSizedGraphicSource(int graphic, int frame, int tilesize_raw,
   int height_div  = offset_calc[offset_calc_pos].height_div;
   int startx = src_bitmap->width * width_mult / width_div;
   int starty = src_bitmap->height * height_mult / height_div;
+#if NEW_TILESIZE
+  int src_x = (g->src_x + (get_backside ? g->offset2_x : 0)) *
+    tilesize / TILESIZE;
+  int src_y = (g->src_y + (get_backside ? g->offset2_y : 0)) *
+    tilesize / TILESIZE;
+#else
   int src_x = g->src_x * tilesize / TILESIZE;
   int src_y = g->src_y * tilesize / TILESIZE;
+#endif
   int width = g->width * tilesize / TILESIZE;
   int height = g->height * tilesize / TILESIZE;
   int offset_x = g->offset_x * tilesize / TILESIZE;
@@ -1023,6 +1083,25 @@ void getSizedGraphicSource(int graphic, int frame, int tilesize_raw,
   *y = starty + src_y;
 }
 
+void getFixedGraphicSourceExt(int graphic, int frame, Bitmap **bitmap,
+			      int *x, int *y, boolean get_backside)
+{
+  getSizedGraphicSourceExt(graphic, frame, TILESIZE, bitmap, x, y,
+			   get_backside);
+}
+
+void getSizedGraphicSource(int graphic, int frame, int tilesize_raw,
+			   Bitmap **bitmap, int *x, int *y)
+{
+  getSizedGraphicSourceExt(graphic, frame, tilesize_raw, bitmap, x, y, FALSE);
+}
+
+void getFixedGraphicSource(int graphic, int frame,
+			   Bitmap **bitmap, int *x, int *y)
+{
+  getSizedGraphicSourceExt(graphic, frame, TILESIZE, bitmap, x, y, FALSE);
+}
+
 void getMiniGraphicSource(int graphic, Bitmap **bitmap, int *x, int *y)
 {
 #if 1
@@ -1044,6 +1123,12 @@ inline void getGraphicSourceExt(int graphic, int frame, Bitmap **bitmap,
   struct GraphicInfo *g = &graphic_info[graphic];
   int src_x = g->src_x + (get_backside ? g->offset2_x : 0);
   int src_y = g->src_y + (get_backside ? g->offset2_y : 0);
+
+#if NEW_TILESIZE
+  if (TILESIZE_VAR != TILESIZE)
+    return getSizedGraphicSourceExt(graphic, frame, TILESIZE_VAR, bitmap, x, y,
+				    get_backside);
+#endif
 
   *bitmap = g->bitmap;
 
@@ -1086,7 +1171,28 @@ void DrawGraphic(int x, int y, int graphic, int frame)
   }
 #endif
 
+#if NEW_TILESIZE
+  DrawGraphicExt(drawto_field, FX + x * TILEX_VAR, FY + y * TILEY_VAR, graphic,
+		 frame);
+#else
   DrawGraphicExt(drawto_field, FX + x * TILEX, FY + y * TILEY, graphic, frame);
+#endif
+  MarkTileDirty(x, y);
+}
+
+void DrawFixedGraphic(int x, int y, int graphic, int frame)
+{
+#if DEBUG
+  if (!IN_SCR_FIELD(x, y))
+  {
+    printf("DrawGraphic(): x = %d, y = %d, graphic = %d\n", x, y, graphic);
+    printf("DrawGraphic(): This should never happen!\n");
+    return;
+  }
+#endif
+
+  DrawFixedGraphicExt(drawto_field, FX + x * TILEX, FY + y * TILEY, graphic,
+		      frame);
   MarkTileDirty(x, y);
 }
 
@@ -1097,6 +1203,20 @@ void DrawGraphicExt(DrawBuffer *dst_bitmap, int x, int y, int graphic,
   int src_x, src_y;
 
   getGraphicSource(graphic, frame, &src_bitmap, &src_x, &src_y);
+#if NEW_TILESIZE
+  BlitBitmap(src_bitmap, dst_bitmap, src_x, src_y, TILEX_VAR, TILEY_VAR, x, y);
+#else
+  BlitBitmap(src_bitmap, dst_bitmap, src_x, src_y, TILEX, TILEY, x, y);
+#endif
+}
+
+void DrawFixedGraphicExt(DrawBuffer *dst_bitmap, int x, int y, int graphic,
+			 int frame)
+{
+  Bitmap *src_bitmap;
+  int src_x, src_y;
+
+  getFixedGraphicSource(graphic, frame, &src_bitmap, &src_x, &src_y);
   BlitBitmap(src_bitmap, dst_bitmap, src_x, src_y, TILEX, TILEY, x, y);
 }
 
@@ -1111,8 +1231,29 @@ void DrawGraphicThruMask(int x, int y, int graphic, int frame)
   }
 #endif
 
-  DrawGraphicThruMaskExt(drawto_field, FX + x * TILEX, FY + y *TILEY, graphic,
+#if NEW_TILESIZE
+  DrawGraphicThruMaskExt(drawto_field, FX + x * TILEX_VAR, FY + y * TILEY_VAR,
+			 graphic, frame);
+#else
+  DrawGraphicThruMaskExt(drawto_field, FX + x * TILEX, FY + y * TILEY, graphic,
 			 frame);
+#endif
+  MarkTileDirty(x, y);
+}
+
+void DrawFixedGraphicThruMask(int x, int y, int graphic, int frame)
+{
+#if DEBUG
+  if (!IN_SCR_FIELD(x, y))
+  {
+    printf("DrawGraphicThruMask(): x = %d,y = %d, graphic = %d\n",x,y,graphic);
+    printf("DrawGraphicThruMask(): This should never happen!\n");
+    return;
+  }
+#endif
+
+  DrawFixedGraphicThruMaskExt(drawto_field, FX + x * TILEX, FY + y * TILEY,
+			      graphic, frame);
   MarkTileDirty(x, y);
 }
 
@@ -1123,6 +1264,24 @@ void DrawGraphicThruMaskExt(DrawBuffer *d, int dst_x, int dst_y, int graphic,
   int src_x, src_y;
 
   getGraphicSource(graphic, frame, &src_bitmap, &src_x, &src_y);
+
+  SetClipOrigin(src_bitmap, src_bitmap->stored_clip_gc,
+		dst_x - src_x, dst_y - src_y);
+#if NEW_TILESIZE
+  BlitBitmapMasked(src_bitmap, d, src_x, src_y, TILEX_VAR, TILEY_VAR,
+		   dst_x, dst_y);
+#else
+  BlitBitmapMasked(src_bitmap, d, src_x, src_y, TILEX, TILEY, dst_x, dst_y);
+#endif
+}
+
+void DrawFixedGraphicThruMaskExt(DrawBuffer *d, int dst_x, int dst_y,
+				 int graphic, int frame)
+{
+  Bitmap *src_bitmap;
+  int src_x, src_y;
+
+  getFixedGraphicSource(graphic, frame, &src_bitmap, &src_x, &src_y);
 
   SetClipOrigin(src_bitmap, src_bitmap->stored_clip_gc,
 		dst_x - src_x, dst_y - src_y);
@@ -1244,6 +1403,15 @@ inline static void DrawGraphicShiftedNormal(int x, int y, int dx, int dy,
   }
 #endif
 
+#if NEW_TILESIZE
+  width = width * TILESIZE_VAR / TILESIZE;
+  height = height * TILESIZE_VAR / TILESIZE;
+  cx = cx * TILESIZE_VAR / TILESIZE;
+  cy = cy * TILESIZE_VAR / TILESIZE;
+  dx = dx * TILESIZE_VAR / TILESIZE;
+  dy = dy * TILESIZE_VAR / TILESIZE;
+#endif
+
   if (width > 0 && height > 0)
   {
     getGraphicSource(graphic, frame, &src_bitmap, &src_x, &src_y);
@@ -1251,8 +1419,13 @@ inline static void DrawGraphicShiftedNormal(int x, int y, int dx, int dy,
     src_x += cx;
     src_y += cy;
 
+#if NEW_TILESIZE
+    dst_x = FX + x * TILEX_VAR + dx;
+    dst_y = FY + y * TILEY_VAR + dy;
+#else
     dst_x = FX + x * TILEX + dx;
     dst_y = FY + y * TILEY + dy;
+#endif
 
     if (mask_mode == USE_MASKING)
     {
@@ -1276,7 +1449,11 @@ inline static void DrawGraphicShiftedDouble(int x, int y, int dx, int dy,
   Bitmap *src_bitmap;
   int src_x, src_y;
   int dst_x, dst_y;
+#if NEW_TILESIZE
+  int width = TILEX_VAR, height = TILEY_VAR;
+#else
   int width = TILEX, height = TILEY;
+#endif
   int x1 = x;
   int y1 = y;
   int x2 = x + SIGN(dx);
@@ -1323,8 +1500,13 @@ inline static void DrawGraphicShiftedDouble(int x, int y, int dx, int dy,
   {
     getGraphicSourceExt(graphic, frame, &src_bitmap, &src_x, &src_y, TRUE);
 
+#if NEW_TILESIZE
+    dst_x = FX + x1 * TILEX_VAR;
+    dst_y = FY + y1 * TILEY_VAR;
+#else
     dst_x = FX + x1 * TILEX;
     dst_y = FY + y1 * TILEY;
+#endif
 
     if (mask_mode == USE_MASKING)
     {
@@ -1345,8 +1527,13 @@ inline static void DrawGraphicShiftedDouble(int x, int y, int dx, int dy,
   {
     getGraphicSourceExt(graphic, frame, &src_bitmap, &src_x, &src_y, FALSE);
 
+#if NEW_TILESIZE
+    dst_x = FX + x2 * TILEX_VAR;
+    dst_y = FY + y2 * TILEY_VAR;
+#else
     dst_x = FX + x2 * TILEX;
     dst_y = FY + y2 * TILEY;
+#endif
 
     if (mask_mode == USE_MASKING)
     {
@@ -1516,6 +1703,15 @@ static void DrawLevelFieldCrumbledInnerCorners(int x, int y, int dx, int dy,
 
   getGraphicSource(graphic, 1, &src_bitmap, &src_x, &src_y);
 
+#if NEW_TILESIZE
+  width  = crumbled_border_size * TILESIZE_VAR / TILESIZE;
+  height = crumbled_border_size * TILESIZE_VAR / TILESIZE;
+  cx = (dx > 0 ? TILEX - crumbled_border_size : 0) * TILESIZE_VAR / TILESIZE;
+  cy = (dy > 0 ? TILEY - crumbled_border_size : 0) * TILESIZE_VAR / TILESIZE;
+
+  BlitBitmap(src_bitmap, drawto_field, src_x + cx, src_y + cy,
+	     width, height, FX + sx * TILEX_VAR + cx, FY + sy * TILEY_VAR + cy);
+#else
   width  = crumbled_border_size;
   height = crumbled_border_size;
   cx = (dx > 0 ? TILEX - crumbled_border_size : 0);
@@ -1523,6 +1719,7 @@ static void DrawLevelFieldCrumbledInnerCorners(int x, int y, int dx, int dy,
 
   BlitBitmap(src_bitmap, drawto_field, src_x + cx, src_y + cy,
 	     width, height, FX + sx * TILEX + cx, FY + sy * TILEY + cy);
+#endif
 }
 
 static void DrawLevelFieldCrumbledBorders(int x, int y, int graphic, int frame,
@@ -1561,8 +1758,18 @@ static void DrawLevelFieldCrumbledBorders(int x, int y, int graphic, int frame,
   }
 #endif
 
+#if NEW_TILESIZE
+  BlitBitmap(src_bitmap, drawto_field,
+	     src_x + cx * TILESIZE_VAR / TILESIZE,
+	     src_y + cy * TILESIZE_VAR / TILESIZE,
+	     width * TILESIZE_VAR / TILESIZE,
+	     height * TILESIZE_VAR / TILESIZE,
+	     FX + sx * TILEX_VAR + cx * TILESIZE_VAR / TILESIZE,
+	     FY + sy * TILEY_VAR + cy * TILESIZE_VAR / TILESIZE);
+#else
   BlitBitmap(src_bitmap, drawto_field, src_x + cx, src_y + cy,
 	     width, height, FX + sx * TILEX + cx, FY + sy * TILEY + cy);
+#endif
 
   /* (remaining middle border part must be at least as big as corner part) */
   if (!(graphic_info[graphic].style & STYLE_ACCURATE_BORDERS) ||
@@ -1609,8 +1816,18 @@ static void DrawLevelFieldCrumbledBorders(int x, int y, int graphic, int frame,
 	by = cy;
       }
 
+#if NEW_TILESIZE
+      BlitBitmap(src_bitmap, drawto_field,
+		 src_x + bx * TILESIZE_VAR / TILESIZE,
+		 src_y + by * TILESIZE_VAR / TILESIZE,
+		 width * TILESIZE_VAR / TILESIZE,
+		 height * TILESIZE_VAR / TILESIZE,
+		 FX + sx * TILEX_VAR + cx * TILESIZE_VAR / TILESIZE,
+		 FY + sy * TILEY_VAR + cy * TILESIZE_VAR / TILESIZE);
+#else
       BlitBitmap(src_bitmap, drawto_field, src_x + bx, src_y + by,
 		 width, height, FX + sx * TILEX + cx, FY + sy * TILEY + cy);
+#endif
     }
   }
 #else
@@ -2061,7 +2278,7 @@ void DrawEnvelopeBackground(int envelope_nr, int startx, int starty,
   int inner_sy = (height >= 3 * font_height ? font_height : 0);
   boolean draw_masked = graphic_info[graphic].draw_masked;
 
-  getGraphicSource(graphic, 0, &src_bitmap, &src_x, &src_y);
+  getFixedGraphicSource(graphic, 0, &src_bitmap, &src_x, &src_y);
 
   if (src_bitmap == NULL || width < font_width || height < font_height)
   {
@@ -2860,7 +3077,36 @@ inline void DrawGraphicAnimationExt(DrawBuffer *dst_bitmap, int x, int y,
     DrawGraphicExt(dst_bitmap, x, y, graphic, frame);
 }
 
+inline void DrawFixedGraphicAnimationExt(DrawBuffer *dst_bitmap, int x, int y,
+					 int graphic, int sync_frame,
+					 int mask_mode)
+{
+  int frame = getGraphicAnimationFrame(graphic, sync_frame);
+
+  if (mask_mode == USE_MASKING)
+    DrawFixedGraphicThruMaskExt(dst_bitmap, x, y, graphic, frame);
+  else
+    DrawFixedGraphicExt(dst_bitmap, x, y, graphic, frame);
+}
+
 inline void DrawGraphicAnimation(int x, int y, int graphic)
+{
+  int lx = LEVELX(x), ly = LEVELY(y);
+
+  if (!IN_SCR_FIELD(x, y))
+    return;
+
+#if NEW_TILESIZE
+  DrawGraphicAnimationExt(drawto_field, FX + x * TILEX_VAR, FY + y * TILEY_VAR,
+			  graphic, GfxFrame[lx][ly], NO_MASKING);
+#else
+  DrawGraphicAnimationExt(drawto_field, FX + x * TILEX, FY + y * TILEY,
+			  graphic, GfxFrame[lx][ly], NO_MASKING);
+#endif
+  MarkTileDirty(x, y);
+}
+
+inline void DrawFixedGraphicAnimation(int x, int y, int graphic)
 {
   int lx = LEVELX(x), ly = LEVELY(y);
 
@@ -8583,8 +8829,17 @@ void ChangeViewportPropertiesIfNeeded()
   int border_size = vp_playfield->border_size;
   int new_sx = vp_playfield->x + border_size;
   int new_sy = vp_playfield->y + border_size;
+  int tilesize = (gfx_game_mode == GAME_MODE_PLAYING ? TILESIZE_VAR :
+		  gfx_game_mode == GAME_MODE_EDITOR ? MINI_TILESIZE : TILESIZE);
+  int new_sxsize = vp_playfield->width  - 2 * border_size;
+  int new_sysize = vp_playfield->height - 2 * border_size;
+#if NEW_TILESIZE
+  int new_scr_fieldx = new_sxsize / tilesize;
+  int new_scr_fieldy = new_sysize / tilesize;
+#else
   int new_scr_fieldx = (vp_playfield->width  - 2 * border_size) / TILESIZE;
   int new_scr_fieldy = (vp_playfield->height - 2 * border_size) / TILESIZE;
+#endif
 
 #if 0
   /* !!! TEST ONLY !!! */
@@ -8626,6 +8881,11 @@ void ChangeViewportPropertiesIfNeeded()
     SY = new_sy;
     REAL_SX = vp_playfield->x;
     REAL_SY = vp_playfield->y;
+
+    SXSIZE = new_sxsize;
+    SYSIZE = new_sysize;
+    FULL_SXSIZE = vp_playfield->width;
+    FULL_SYSIZE = vp_playfield->width;
 
     *door_1_x = vp_door_1->x;
     *door_1_y = vp_door_1->y;

@@ -217,7 +217,7 @@ void DrawInitAnim()
     int height = graphic_info[graphic].height;
     int frame = getGraphicAnimationFrame(graphic, sync_frame);
 
-    getGraphicSource(graphic, frame, &src_bitmap, &src_x, &src_y);
+    getFixedGraphicSource(graphic, frame, &src_bitmap, &src_x, &src_y);
     BlitBitmap(src_bitmap, window, src_x, src_y, width, height, x, y);
 #else
     /* !!! this can only draw TILEX/TILEY size animations !!! */
@@ -862,8 +862,8 @@ void InitElementGraphicInfo()
 	  if (swap_movement_tiles_always || swap_movement_tiles_autodetected)
 	  {
 	    /* get current (wrong) backside tile coordinates */
-	    getGraphicSourceExt(graphic, 0, &dummy, &src_x_back, &src_y_back,
-				TRUE);
+	    getFixedGraphicSourceExt(graphic, 0, &dummy,
+				     &src_x_back, &src_y_back, TRUE);
 
 	    /* set frontside tile coordinates to backside tile coordinates */
 	    g->src_x = src_x_back;
@@ -1967,7 +1967,7 @@ static void InitGraphicInfo()
     /* check if first animation frame is inside specified bitmap */
 
     first_frame = 0;
-    getGraphicSource(i, first_frame, &src_bitmap, &src_x, &src_y);
+    getFixedGraphicSource(i, first_frame, &src_bitmap, &src_x, &src_y);
 
 #if 1
     /* this avoids calculating wrong start position for out-of-bounds frame */
@@ -2001,7 +2001,7 @@ static void InitGraphicInfo()
     /* check if last animation frame is inside specified bitmap */
 
     last_frame = graphic_info[i].anim_frames - 1;
-    getGraphicSource(i, last_frame, &src_bitmap, &src_x, &src_y);
+    getFixedGraphicSource(i, last_frame, &src_bitmap, &src_x, &src_y);
 
     if (src_x < 0 || src_y < 0 ||
 	src_x + width  > src_bitmap_width ||
@@ -2015,6 +2015,7 @@ static void InitGraphicInfo()
       Error(ERR_INFO,
 	    "error: last animation frame (%d) out of bounds (%d, %d) [%d, %d]",
 	    last_frame, src_x, src_y, src_bitmap_width, src_bitmap_height);
+      Error(ERR_INFO, "::: %d, %d", width, height);
       Error(ERR_INFO, "custom graphic rejected for this element/action");
 
       if (i == fallback_graphic)
@@ -2028,7 +2029,7 @@ static void InitGraphicInfo()
 
 #if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
     /* currently we only need a tile clip mask from the first frame */
-    getGraphicSource(i, first_frame, &src_bitmap, &src_x, &src_y);
+    getFixedGraphicSource(i, first_frame, &src_bitmap, &src_x, &src_y);
 
     if (copy_clipmask_gc == None)
     {

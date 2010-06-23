@@ -101,6 +101,11 @@ int			DX = 566, DY = 60;
 int			VX = 566, VY = 400;
 int			EX = 566, EY = 356;
 int			dDX, dDY;
+int			SXSIZE = 17 * TILEX;	/* SCR_FIELDX * TILEX */
+int			SYSIZE = 17 * TILEY;	/* SCR_FIELDY * TILEY */
+int			FULL_SXSIZE = 2 + 17 * TILEX + 2; /* 2 + SXSIZE + 2 */
+int			FULL_SYSIZE = 2 + 17 * TILEY + 2; /* 2 + SYSIZE + 2 */
+int			TILESIZE_VAR = TILESIZE / 2;
 
 #if 1
 int			FX, FY;

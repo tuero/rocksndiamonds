@@ -122,6 +122,7 @@ struct GameInfo
   boolean use_masked_pushing;
   int forced_scroll_delay_value;
   int scroll_delay_value;
+  int tile_size;
 
   /* values for engine initialization */
   int default_push_delay_fixed;

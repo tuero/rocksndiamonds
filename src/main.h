@@ -31,6 +31,7 @@
 #include "conf_mus.h"	/* include auto-generated data structure definitions */
 
 
+#define NEW_TILESIZE			1
 #define NEW_SCROLL			0
 
 #define IMG_UNDEFINED			(-1)
@@ -964,6 +965,8 @@
 #define TILESIZE		32
 #define TILEX			TILESIZE
 #define TILEY			TILESIZE
+#define TILEX_VAR		TILESIZE_VAR
+#define TILEY_VAR		TILESIZE_VAR
 #define MINI_TILESIZE		(TILESIZE / 2)
 #define MINI_TILEX		MINI_TILESIZE
 #define MINI_TILEY		MINI_TILESIZE
@@ -972,18 +975,49 @@
 #define MICRO_TILEY		MICRO_TILESIZE
 #define MIDPOSX			(SCR_FIELDX / 2)
 #define MIDPOSY			(SCR_FIELDY / 2)
+#if NEW_TILESIZE
+#if NEW_SCROLL
+#if 0
+#define SXSIZE			(SCR_FIELDX * TILEX_VAR)
+#define SYSIZE			(SCR_FIELDY * TILEY_VAR)
+#endif
+#define FXSIZE			((2 + SCR_FIELDX + 2) * TILEX_VAR)
+#define FYSIZE			((2 + SCR_FIELDY + 2) * TILEY_VAR)
+#else
+#if 0
+#define SXSIZE			(SCR_FIELDX * TILEX_VAR)
+#define SYSIZE			(SCR_FIELDY * TILEY_VAR)
+#endif
+#define FXSIZE			((SCR_FIELDX + 2) * TILEX_VAR)
+#define FYSIZE			((SCR_FIELDY + 2) * TILEY_VAR)
+#endif
+#else
+#if NEW_SCROLL
+#if 0
 #define SXSIZE			(SCR_FIELDX * TILEX)
 #define SYSIZE			(SCR_FIELDY * TILEY)
+#endif
+#define FXSIZE			((2 + SCR_FIELDX + 2) * TILEX)
+#define FYSIZE			((2 + SCR_FIELDY + 2) * TILEY)
+#else
+#if 0
+#define SXSIZE			(SCR_FIELDX * TILEX)
+#define SYSIZE			(SCR_FIELDY * TILEY)
+#endif
 #define FXSIZE			((SCR_FIELDX + 2) * TILEX)
 #define FYSIZE			((SCR_FIELDY + 2) * TILEY)
+#endif
+#endif
 #define DXSIZE			100
 #define DYSIZE			280
 #define VXSIZE			DXSIZE
 #define VYSIZE			100
 #define EXSIZE			DXSIZE
 #define EYSIZE			(VYSIZE + 44)
+#if 0
 #define FULL_SXSIZE		(2 + SXSIZE + 2)
 #define FULL_SYSIZE		(2 + SYSIZE + 2)
+#endif
 #define MICROLEVEL_XSIZE	((STD_LEV_FIELDX + 2) * MICRO_TILEX)
 #define MICROLEVEL_YSIZE	((STD_LEV_FIELDY + 2) * MICRO_TILEY)
 #define MICROLEVEL_XPOS		(SX + (SXSIZE - MICROLEVEL_XSIZE) / 2)
@@ -2889,6 +2923,9 @@ extern int			DX, DY;
 extern int			VX, VY;
 extern int			EX, EY;
 extern int			dDX, dDY;
+extern int			SXSIZE, SYSIZE;
+extern int			FULL_SXSIZE, FULL_SYSIZE;
+extern int			TILESIZE_VAR;
 
 extern int			FX, FY;
 extern int			ScrollStepSize;

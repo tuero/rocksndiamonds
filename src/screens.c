@@ -945,7 +945,7 @@ static void DrawCursorAndText_Main_Ext(int nr, boolean active_text,
 	int y = mSY + pos->y;
 
 	DrawBackgroundForGraphic(x, y, pos->width, pos->height, button_graphic);
-	DrawGraphicThruMaskExt(drawto, x, y, button_graphic, 0);
+	DrawFixedGraphicThruMaskExt(drawto, x, y, button_graphic, 0);
       }
 
       if (visibleTextPos(pos_text) && text != NULL)
@@ -1046,7 +1046,7 @@ static void drawCursorExt(int xpos, int ypos, boolean active, int graphic)
     graphic = BUTTON_ACTIVE(graphic);
 
   DrawBackgroundForGraphic(x, y, TILEX, TILEY, graphic);
-  DrawGraphicThruMaskExt(drawto, x, y, graphic, 0);
+  DrawFixedGraphicThruMaskExt(drawto, x, y, graphic, 0);
 }
 
 static void initCursor(int ypos, int graphic)
@@ -2197,8 +2197,8 @@ void DrawInfoScreen_HelpAnim(int start, int max_anims, boolean init)
 
     ClearRectangleOnBackground(drawto, xstart, ystart2 + (i - start) * ystep,
 			       TILEX, TILEY);
-    DrawGraphicAnimationExt(drawto, xstart, ystart2 + (i - start) * ystep,
-			    graphic, sync_frame, USE_MASKING);
+    DrawFixedGraphicAnimationExt(drawto, xstart, ystart2 + (i - start) * ystep,
+				 graphic, sync_frame, USE_MASKING);
 
     if (init)
       DrawInfoScreen_HelpText(element, action, direction, i - start);
@@ -5013,8 +5013,8 @@ static void drawPlayerSetupInputInfo(int player_nr, boolean active)
 
   ClearRectangleOnBackground(drawto, mSX + 8 * TILEX, mSY + 2 * TILEY,
 			     TILEX, TILEY);
-  DrawGraphicThruMaskExt(drawto, mSX + 8 * TILEX, mSY + 2 * TILEY,
-			 PLAYER_NR_GFX(IMG_PLAYER_1, player_nr), 0);
+  DrawFixedGraphicThruMaskExt(drawto, mSX + 8 * TILEX, mSY + 2 * TILEY,
+			      PLAYER_NR_GFX(IMG_PLAYER_1, player_nr), 0);
 
   if (setup.input[player_nr].use_joystick)
   {
@@ -5370,7 +5370,7 @@ static boolean CalibrateJoystickMain(int player_nr)
   {
     for (x = 0; x < 3; x++)
     {
-      DrawGraphic(xpos + x - 1, ypos + y - 1, IMG_MENU_CALIBRATE_BLUE, 0);
+      DrawFixedGraphic(xpos + x - 1, ypos + y - 1, IMG_MENU_CALIBRATE_BLUE, 0);
       check[x][y] = FALSE;
     }
   }
@@ -5394,7 +5394,7 @@ static boolean CalibrateJoystickMain(int player_nr)
   new_joystick_xmiddle = joy_x;
   new_joystick_ymiddle = joy_y;
 
-  DrawGraphic(xpos + last_x, ypos + last_y, IMG_MENU_CALIBRATE_RED, 0);
+  DrawFixedGraphic(xpos + last_x, ypos + last_y, IMG_MENU_CALIBRATE_RED, 0);
 
   FadeIn(REDRAW_FIELD);
 
@@ -5466,8 +5466,10 @@ static boolean CalibrateJoystickMain(int player_nr)
 
     if (x != last_x || y != last_y)
     {
-      DrawGraphic(xpos + last_x, ypos + last_y, IMG_MENU_CALIBRATE_YELLOW, 0);
-      DrawGraphic(xpos + x,      ypos + y,      IMG_MENU_CALIBRATE_RED,    0);
+      DrawFixedGraphic(xpos + last_x, ypos + last_y,
+		       IMG_MENU_CALIBRATE_YELLOW, 0);
+      DrawFixedGraphic(xpos + x,      ypos + y,
+		       IMG_MENU_CALIBRATE_RED,    0);
 
       last_x = x;
       last_y = y;

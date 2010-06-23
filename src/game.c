@@ -8138,7 +8138,7 @@ void StartMoving(int x, int y)
       else if (Feld[x][y + 1] == EL_MAGIC_WALL_ACTIVE)
       {
 	if (!MovDelay[x][y])
-	  MovDelay[x][y] = TILEY/4 + 1;
+	  MovDelay[x][y] = TILEY / 4 + 1;
 
 	if (MovDelay[x][y])
 	{
@@ -8166,7 +8166,7 @@ void StartMoving(int x, int y)
       else if (Feld[x][y + 1] == EL_BD_MAGIC_WALL_ACTIVE)
       {
 	if (!MovDelay[x][y])
-	  MovDelay[x][y] = TILEY/4 + 1;
+	  MovDelay[x][y] = TILEY / 4 + 1;
 
 	if (MovDelay[x][y])
 	{
@@ -8194,7 +8194,7 @@ void StartMoving(int x, int y)
       else if (Feld[x][y + 1] == EL_DC_MAGIC_WALL_ACTIVE)
       {
 	if (!MovDelay[x][y])
-	  MovDelay[x][y] = TILEY/4 + 1;
+	  MovDelay[x][y] = TILEY / 4 + 1;
 
 	if (MovDelay[x][y])
 	{
@@ -13368,12 +13368,29 @@ void ScrollLevel(int dx, int dy)
 
 #else
 
+#if NEW_TILESIZE
+#if NEW_SCROLL
+  int softscroll_offset = (setup.soft_scrolling ? 2 * TILEX_VAR : 0);
+#else
+  int softscroll_offset = (setup.soft_scrolling ? TILEX_VAR : 0);
+#endif
+#else
 #if NEW_SCROLL
   int softscroll_offset = (setup.soft_scrolling ? 2 * TILEX : 0);
 #else
   int softscroll_offset = (setup.soft_scrolling ? TILEX : 0);
 #endif
+#endif
 
+#if NEW_TILESIZE
+  BlitBitmap(drawto_field, drawto_field,
+	     FX + TILEX_VAR * (dx == -1) - softscroll_offset,
+	     FY + TILEY_VAR * (dy == -1) - softscroll_offset,
+	     SXSIZE - TILEX_VAR * (dx != 0) + 2 * softscroll_offset,
+	     SYSIZE - TILEY_VAR * (dy != 0) + 2 * softscroll_offset,
+	     FX + TILEX_VAR * (dx == 1) - softscroll_offset,
+	     FY + TILEY_VAR * (dy == 1) - softscroll_offset);
+#else
   BlitBitmap(drawto_field, drawto_field,
 	     FX + TILEX * (dx == -1) - softscroll_offset,
 	     FY + TILEY * (dy == -1) - softscroll_offset,
@@ -13381,6 +13398,8 @@ void ScrollLevel(int dx, int dy)
 	     SYSIZE - TILEY * (dy != 0) + 2 * softscroll_offset,
 	     FX + TILEX * (dx == 1) - softscroll_offset,
 	     FY + TILEY * (dy == 1) - softscroll_offset);
+#endif
+
 #endif
 #endif
 

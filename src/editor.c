@@ -971,8 +971,13 @@
 #define RANDOM_USE_QUANTITY		1
 
 /* maximal size of level editor drawing area */
+#if NEW_TILESIZE
+#define MAX_ED_FIELDX		(SCR_FIELDX)
+#define MAX_ED_FIELDY		(SCR_FIELDY - 1)
+#else
 #define MAX_ED_FIELDX		(2 * SCR_FIELDX)
 #define MAX_ED_FIELDY		(2 * SCR_FIELDY - 1)
+#endif
 
 
 /*
@@ -5143,7 +5148,7 @@ static void DrawElementBorder(int dest_x, int dest_y, int width, int height,
   int by2 = TILEY - by;
   int i;
 
-  getGraphicSource(border_graphic, 0, &src_bitmap, &src_x, &src_y);
+  getFixedGraphicSource(border_graphic, 0, &src_bitmap, &src_x, &src_y);
 
   BlitBitmap(src_bitmap, drawto, src_x, src_y,
 	     bx, by, dest_x - bx, dest_y - by);
@@ -8812,7 +8817,7 @@ static void DrawEditorElementAnimation(int x, int y)
 	       ANIM_MODE(graphic) == ANIM_CE_SCORE ?
 	       custom_element.collect_score_initial : FrameCounter);
 
-  DrawGraphicAnimationExt(drawto, x, y, graphic, frame, NO_MASKING);
+  DrawFixedGraphicAnimationExt(drawto, x, y, graphic, frame, NO_MASKING);
 }
 
 static void DrawEditorElementName(int x, int y, int element)
@@ -10717,10 +10722,10 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 			     gi->y + sy * MINI_TILEY,
 			     el2edimg(new_element));
 	else
-	  DrawGraphicExt(drawto,
-			 gi->x + sx * TILEX,
-			 gi->y + sy * TILEY,
-			 el2img(new_element), 0);
+	  DrawFixedGraphicExt(drawto,
+			      gi->x + sx * TILEX,
+			      gi->y + sy * TILEY,
+			      el2img(new_element), 0);
 
 	if (id == GADGET_ID_CUSTOM_GRAPHIC)
 	  new_element = GFX_ELEMENT(new_element);

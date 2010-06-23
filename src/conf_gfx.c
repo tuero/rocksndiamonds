@@ -6652,6 +6652,7 @@ struct ConfigInfo image_config[] =
   { "game.use_native_emc_graphics_engine",	"false"			},
   { "game.use_native_sp_graphics_engine",	"true"			},
   { "game.use_masked_pushing",			"false"			},
+  { "game.tile_size",				"32"			},
 
   { "[player].boring_delay_fixed",		"1000"			},
   { "[player].boring_delay_random",		"1000"			},

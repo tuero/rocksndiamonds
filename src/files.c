@@ -10873,8 +10873,9 @@ void CreateLevelSketchImages()
     filename1 = getPath2(global.create_images_dir, basename1);
     filename2 = getPath2(global.create_images_dir, basename2);
 
-    getGraphicSource(graphic, 0, &src_bitmap, &src_x, &src_y);
-    BlitBitmap(src_bitmap, bitmap1, src_x, src_y, TILEX, TILEY, 0, 0);
+    getFixedGraphicSource(graphic, 0, &src_bitmap, &src_x, &src_y);
+    BlitBitmap(src_bitmap, bitmap1, src_x, src_y, TILEX, TILEY,
+	       0, 0);
 
     if (SDL_SaveBMP(bitmap1->surface, filename1) != 0)
       Error(ERR_EXIT, "cannot save level sketch image file '%s'", filename1);
@@ -10925,7 +10926,7 @@ void CreateCustomElementImages()
 			TILEY * (NUM_CUSTOM_ELEMENTS + NUM_GROUP_ELEMENTS) / 16,
 			DEFAULT_DEPTH);
 
-  getGraphicSource(dummy_graphic, 0, &src_bitmap, &src_x, &src_y);
+  getFixedGraphicSource(dummy_graphic, 0, &src_bitmap, &src_x, &src_y);
 
   for (i = 0; i < NUM_CUSTOM_ELEMENTS; i++)
   {
@@ -10937,18 +10938,22 @@ void CreateCustomElementImages()
     BlitBitmap(src_bitmap, bitmap, 0, 0, TILEX, TILEY,
 	       TILEX * x, TILEY * y + yoffset_ce);
 
-    BlitBitmap(src_bitmap, bitmap, 0, TILEY, TILEX, TILEY,
-	       TILEX * x + TILEX * 16, TILEY * y + yoffset_ce);
+    BlitBitmap(src_bitmap, bitmap, 0, TILEY,
+	       TILEX, TILEY,
+	       TILEX * x + TILEX * 16,
+	       TILEY * y + yoffset_ce);
 
     for (j = 2; j >= 0; j--)
     {
       int c = ii % 10;
 
-      BlitBitmap(src_bitmap, bitmap, TILEX + c * 7, 0, 6, 10,
+      BlitBitmap(src_bitmap, bitmap,
+		 TILEX + c * 7, 0, 6, 10,
 		 TILEX * x + 6 + j * 7,
 		 TILEY * y + 11 + yoffset_ce);
 
-      BlitBitmap(src_bitmap, bitmap, TILEX + c * 8, TILEY, 6, 10,
+      BlitBitmap(src_bitmap, bitmap,
+		 TILEX + c * 8, TILEY, 6, 10,
 		 TILEX * 16 + TILEX * x + 6 + j * 8,
 		 TILEY * y + 10 + yoffset_ce);
 
@@ -10966,8 +10971,10 @@ void CreateCustomElementImages()
     BlitBitmap(src_bitmap, bitmap, 0, 0, TILEX, TILEY,
 	       TILEX * x, TILEY * y + yoffset_ge);
 
-    BlitBitmap(src_bitmap, bitmap, 0, TILEY, TILEX, TILEY,
-	       TILEX * x + TILEX * 16, TILEY * y + yoffset_ge);
+    BlitBitmap(src_bitmap, bitmap, 0, TILEY,
+	       TILEX, TILEY,
+	       TILEX * x + TILEX * 16,
+	       TILEY * y + yoffset_ge);
 
     for (j = 1; j >= 0; j--)
     {
@@ -10977,7 +10984,8 @@ void CreateCustomElementImages()
 		 TILEX * x + 6 + j * 10,
 		 TILEY * y + 11 + yoffset_ge);
 
-      BlitBitmap(src_bitmap, bitmap, TILEX + c * 8, TILEY + 12, 6, 10,
+      BlitBitmap(src_bitmap, bitmap,
+		 TILEX + c * 8, TILEY + 12, 6, 10,
 		 TILEX * 16 + TILEX * x + 10 + j * 8,
 		 TILEY * y + 10 + yoffset_ge);
 

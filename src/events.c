@@ -1020,17 +1020,17 @@ void HandleKey(Key key, int key_status)
 	  break;
 
 	case KSYM_f:
-	  ScrollStepSize = TILEX/8;
+	  ScrollStepSize = TILEX / 8;
 	  printf("ScrollStepSize == %d (1/8)\n", ScrollStepSize);
 	  break;
 
 	case KSYM_g:
-	  ScrollStepSize = TILEX/4;
+	  ScrollStepSize = TILEX / 4;
 	  printf("ScrollStepSize == %d (1/4)\n", ScrollStepSize);
 	  break;
 
 	case KSYM_h:
-	  ScrollStepSize = TILEX/2;
+	  ScrollStepSize = TILEX / 2;
 	  printf("ScrollStepSize == %d (1/2)\n", ScrollStepSize);
 	  break;
 
