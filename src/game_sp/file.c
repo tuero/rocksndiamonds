@@ -72,14 +72,24 @@ void copyInternalEngineVars_SP()
   FieldMax = (FieldWidth * FieldHeight) + HeaderSize - 1;
   LevelMax = (FieldWidth * FieldHeight) - 1;
 
+#if 0
   /* (add one byte for the level number stored as first byte of demo data) */
   FileMax = FieldMax + native_sp_level.demo.length + 1;
+#endif
 
 #if 0
   PlayField8 = REDIM_1D(sizeof(byte), 0, FileMax);
   DisPlayField = REDIM_1D(sizeof(byte), 0, FieldMax);
   PlayField16 = REDIM_1D(sizeof(int), -game_sp.preceding_buffer_size, FieldMax);
 #endif
+
+  /* initialize preceding playfield buffer */
+  for (i = -game_sp.preceding_buffer_size; i < 0; i++)
+    PlayField16[i] = 0;
+
+  /* initialize preceding playfield buffer */
+  for (i = -SP_MAX_PLAYFIELD_WIDTH; i < 0; i++)
+    PlayField8[i] = 0;
 
   count = 0;
   for (i = 0; game_sp.preceding_buffer[i] != NULL; i++)

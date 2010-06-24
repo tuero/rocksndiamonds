@@ -296,8 +296,9 @@ extern boolean menBorder;
 
 #if 1
 extern int *PlayField16;
+extern byte *PlayField8;
 // extern int PlayField16[SP_MAX_PLAYFIELD_SIZE + SP_HEADER_SIZE];
-extern byte PlayField8[SP_MAX_PLAYFIELD_SIZE + SP_HEADER_SIZE];
+// extern byte PlayField8[SP_MAX_PLAYFIELD_SIZE + SP_HEADER_SIZE];
 extern byte DisPlayField[SP_MAX_PLAYFIELD_SIZE + SP_HEADER_SIZE];
 #else
 extern int *PlayField16;
@@ -313,7 +314,9 @@ extern int HeaderSize;
 extern int TimerVar;
 extern short RandomSeed;
 
+#if 0
 extern long FileMax;
+#endif
 
 extern LevelInfoType LInfo;
 extern int ScrollMinX, ScrollMaxX, ScrollMinY, ScrollMaxY;

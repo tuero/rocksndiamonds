@@ -136,7 +136,7 @@ static void LetExplodeFieldSP(int tsi, int cx, int dh)
 {
   int al;
 
-  if (tsi < (-FieldWidth))
+  if (tsi < -FieldWidth)
     return;
 
   al = LowByte(PlayField16[tsi]);

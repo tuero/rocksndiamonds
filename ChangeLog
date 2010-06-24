@@ -1,5 +1,11 @@
 2010-06-24
 	* started adding alternative (smaller) tile size option for playing game
+	* fixed another memory violation bug in the native Supaplex game engine
+	  (this potential memory bug was also in the original Megaplex code, but
+	  apparently only occured under rare conditions triggered by using the
+	  additional added preceding playfield memory area to make a few strange
+	  levels using dirty off-playfield tricks (bugs) like "12s033.sp" also
+	  solvable (this all worked fine in the classic DOS version, of course))
 
 2010-06-23
 	* added graphics performance optimization to native Supaplex game engine
