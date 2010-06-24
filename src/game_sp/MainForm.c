@@ -187,14 +187,23 @@ static void ReStretch()
 
 void SetScrollEdges()
 {
+#if NEW_TILESIZE
+  int pseudo_sxsize = SXSIZE * TILESIZE / TILESIZE_VAR;
+  int pseudo_sysize = SYSIZE * TILESIZE / TILESIZE_VAR;
+#endif
   int border1_offset = (menBorder ? 1 : 2);
   int border2_offset = (menBorder ? 0 : TILESIZE / 2);
 
   /* scroll correction for border frame (1 tile) or border element (2 tiles) */
   ScrollMinX = 0;
   ScrollMinY = 0;
+#if NEW_TILESIZE
+  ScrollMaxX = (DisplayMaxX + border1_offset) * TILEX - pseudo_sxsize;
+  ScrollMaxY = (DisplayMaxY + border1_offset) * TILEY - pseudo_sysize;
+#else
   ScrollMaxX = (DisplayMaxX + border1_offset) * TILEX - SXSIZE;
   ScrollMaxY = (DisplayMaxY + border1_offset) * TILEY - SYSIZE;
+#endif
 
   /* scroll correction for border element (half tile on left and right side) */
   ScrollMinX += border2_offset;

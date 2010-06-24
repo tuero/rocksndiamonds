@@ -1,5 +1,5 @@
 2010-06-24
-	* started adding alternative (smaller) tile size option for playing game
+	* added alternative game mode for playing with half size playfield tiles
 	* fixed another memory violation bug in the native Supaplex game engine
 	  (this potential memory bug was also in the original Megaplex code, but
 	  apparently only occured under rare conditions triggered by using the

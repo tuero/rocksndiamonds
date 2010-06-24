@@ -3663,7 +3663,9 @@ boolean Request(char *text, unsigned int req_state)
   char *text_ptr;
   int i;
 
-  global.use_envelope_request = TRUE  * 1;
+#if 1
+  global.use_envelope_request = 0;
+#endif
 
 #if 1
   if (maxWordLengthInString(text) > MAX_REQUEST_LINE_FONT1_LEN)

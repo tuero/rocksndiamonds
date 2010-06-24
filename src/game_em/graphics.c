@@ -29,6 +29,12 @@
 
 #define USE_EXTENDED_GRAPHICS_ENGINE		1
 
+
+#if 0
+int TILEX = ORIG_TILEX * ZOOM_FACTOR;
+int TILEY = ORIG_TILEY * ZOOM_FACTOR;
+#endif
+
 int frame;				/* current screen frame */
 int screen_x, screen_y;			/* current scroll position */
 
@@ -59,6 +65,12 @@ void BlitScreenToBitmap_EM(Bitmap *target_bitmap)
 {
   int x = screen_x % (MAX_BUF_XSIZE * TILEX);
   int y = screen_y % (MAX_BUF_YSIZE * TILEY);
+
+#if 0
+  printf("::: %d, %d\n", screenBitmap->width, screenBitmap->height);
+  BlitBitmap(screenBitmap, target_bitmap, 0, 0, 544, 544, SX, SY);
+  return;
+#endif
 
   if (x < 2 * TILEX && y < 2 * TILEY)
   {
@@ -231,12 +243,21 @@ static void DrawLevelField_EM(int x, int y, int sx, int sy,
 			      boolean draw_masked)
 {
   struct GraphicInfo_EM *g = getObjectGraphic(x, y);
+#if NEW_TILESIZE
+  int src_x = g->src_x + g->src_offset_x * TILESIZE_VAR / TILESIZE;
+  int src_y = g->src_y + g->src_offset_y * TILESIZE_VAR / TILESIZE;
+  int dst_x = sx * TILEX + g->dst_offset_x * TILESIZE_VAR / TILESIZE;
+  int dst_y = sy * TILEY + g->dst_offset_y * TILESIZE_VAR / TILESIZE;
+  int width = g->width * TILESIZE_VAR / TILESIZE;
+  int height = g->height * TILESIZE_VAR / TILESIZE;
+#else
   int src_x = g->src_x + g->src_offset_x;
   int src_y = g->src_y + g->src_offset_y;
   int dst_x = sx * TILEX + g->dst_offset_x;
   int dst_y = sy * TILEY + g->dst_offset_y;
   int width = g->width;
   int height = g->height;
+#endif
   int left = screen_x / TILEX;
   int top  = screen_y / TILEY;
 
@@ -274,6 +295,7 @@ static void DrawLevelFieldCrumbled_EM(int x, int y, int sx, int sy,
 #else
   struct GraphicInfo_EM *g = getObjectGraphic(x, y);
 #endif
+  int crumbled_border_size;
   int left = screen_x / TILEX;
   int top  = screen_y / TILEY;
   int i;
@@ -288,6 +310,12 @@ static void DrawLevelFieldCrumbled_EM(int x, int y, int sx, int sy,
 
 #if 1
   g = getObjectGraphic(x, y);
+#endif
+
+  crumbled_border_size = g->crumbled_border_size;
+
+#if NEW_TILESIZE
+  crumbled_border_size = crumbled_border_size * TILESIZE_VAR / TILESIZE;
 #endif
 
 #if 0
@@ -305,17 +333,17 @@ static void DrawLevelFieldCrumbled_EM(int x, int y, int sx, int sy,
 
       if (i == 1 || i == 2)
       {
-	width = g->crumbled_border_size;
+	width = crumbled_border_size;
 	height = TILEY;
-	cx = (i == 2 ? TILEX - g->crumbled_border_size : 0);
+	cx = (i == 2 ? TILEX - crumbled_border_size : 0);
 	cy = 0;
       }
       else
       {
 	width = TILEX;
-	height = g->crumbled_border_size;
+	height = crumbled_border_size;
 	cx = 0;
-	cy = (i == 3 ? TILEY - g->crumbled_border_size : 0);
+	cy = (i == 3 ? TILEY - crumbled_border_size : 0);
       }
 
       if (width > 0 && height > 0)

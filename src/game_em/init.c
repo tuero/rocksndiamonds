@@ -154,10 +154,15 @@ int open_all(void)
   sprmaskBitmap = emc_bitmaps[1]->clip_mask;
 #endif
 
+#if 0
+  printf("::: CreateBitmap: %d, %d => %d\n",
+	 MAX_BUF_XSIZE, TILEX, MAX_BUF_XSIZE * TILEX);
+
   screenBitmap = CreateBitmap(MAX_BUF_XSIZE * TILEX, MAX_BUF_YSIZE * TILEY,
 			      DEFAULT_DEPTH);
 
   global_em_info.screenbuffer = screenBitmap;
+#endif
 
 #endif
 
@@ -243,6 +248,33 @@ int open_all(void)
 #endif	/* AUDIO_UNIX_NATIVE */
 
   return(0);
+}
+
+void InitGfxBuffers_EM()
+{
+
+#if 1
+
+#if 0
+  printf("::: InitGfxBuffers_EM: %d, %d => %d\n",
+	 MAX_BUF_XSIZE, TILEX, MAX_BUF_XSIZE * TILEX);
+#endif
+
+  ReCreateBitmap(&screenBitmap, MAX_BUF_XSIZE * TILEX, MAX_BUF_YSIZE * TILEY,
+		 DEFAULT_DEPTH);
+
+  global_em_info.screenbuffer = screenBitmap;
+
+#else
+
+  printf("::: CreateBitmap: %d, %d => %d\n",
+	 MAX_BUF_XSIZE, TILEX, MAX_BUF_XSIZE * TILEX);
+
+  screenBitmap = CreateBitmap(MAX_BUF_XSIZE * TILEX, MAX_BUF_YSIZE * TILEY,
+			      DEFAULT_DEPTH);
+
+  global_em_info.screenbuffer = screenBitmap;
+#endif
 }
 
 void em_open_all()

@@ -5559,6 +5559,7 @@ void InitGfxBuffers()
   InitGfxScrollbufferInfo(FXSIZE, FYSIZE);
   InitGfxClipRegion(FALSE, -1, -1, -1, -1);
 
+  InitGfxBuffers_EM();
   InitGfxBuffers_SP();
 }
 

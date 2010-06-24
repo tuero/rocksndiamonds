@@ -727,6 +727,8 @@ extern struct EngineSnapshotInfo_EM engine_snapshot_em;
 extern void em_open_all();
 extern void em_close_all();
 
+extern void InitGfxBuffers_EM();
+
 extern void InitGameEngine_EM();
 extern void GameActions_EM(byte *, boolean);
 

@@ -14,6 +14,10 @@ extern int debug;
 extern char *progname;
 extern char *arg_basedir;
 
+#if 0
+extern int TILEX, TILEY;
+#endif
+
 extern int frame;
 
 extern short ulaw_to_linear[256];

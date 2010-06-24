@@ -45,6 +45,10 @@
 
 /* screen sizes and positions for EM engine */
 
+#define NEW_TILESIZE		1
+
+#define ORIG_TILESIZE		16
+
 #define ORIG_TILEX		16
 #define ORIG_TILEY		16
 #define ORIG_SCOREX		8
@@ -54,10 +58,22 @@
 #define ORIG_MENUFONTX		12
 #define ORIG_MENUFONTY		16
 
+#if NEW_TILESIZE
+#define ZOOM_FACTOR		(2 * TILESIZE_VAR / TILESIZE)
+#else
 #define ZOOM_FACTOR		2
+#endif
 
+#define TILESIZE		32
+
+#if NEW_TILESIZE
+extern int			TILESIZE_VAR;
+#define TILEX			TILESIZE_VAR
+#define TILEY			TILESIZE_VAR
+#else
 #define TILEX			(ORIG_TILEX		* ZOOM_FACTOR)
 #define TILEY			(ORIG_TILEY		* ZOOM_FACTOR)
+#endif
 #define SCOREX			(ORIG_SCOREX		* ZOOM_FACTOR)
 #define SCOREY			(ORIG_SCOREY		* ZOOM_FACTOR)
 #define GFXMENUFONTX		(ORIG_GFXMENUFONTX	* ZOOM_FACTOR)

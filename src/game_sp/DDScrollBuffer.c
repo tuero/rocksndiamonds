@@ -50,6 +50,15 @@ static void ScrollPlayfield(int dx, int dy)
   int y2 = mScrollY_last / TILEY + (SCR_FIELDY - 1) + 2;
   int x, y;
 
+#if NEW_TILESIZE
+  BlitBitmap(bitmap_db_field_sp, bitmap_db_field_sp,
+             TILEX_VAR * (dx == -1),
+             TILEY_VAR * (dy == -1),
+             (MAX_BUF_XSIZE * TILEX_VAR) - TILEX_VAR * (dx != 0),
+             (MAX_BUF_YSIZE * TILEY_VAR) - TILEY_VAR * (dy != 0),
+             TILEX_VAR * (dx == 1),
+             TILEY_VAR * (dy == 1));
+#else
   BlitBitmap(bitmap_db_field_sp, bitmap_db_field_sp,
              TILEX * (dx == -1),
              TILEY * (dy == -1),
@@ -57,6 +66,7 @@ static void ScrollPlayfield(int dx, int dy)
              (MAX_BUF_YSIZE * TILEY) - TILEY * (dy != 0),
              TILEX * (dx == 1),
              TILEY * (dy == 1));
+#endif
 
   /* when scrolling the whole playfield, do not redraw single tiles */
 #if 1
@@ -251,8 +261,17 @@ void BlitScreenToBitmap_SP(Bitmap *target_bitmap)
 
   int xsize = SXSIZE;
   int ysize = SYSIZE;
+#if NEW_TILESIZE
+  int full_xsize = (FieldWidth  - (menBorder ? 0 : 1)) * TILEX_VAR;
+  int full_ysize = (FieldHeight - (menBorder ? 0 : 1)) * TILEY_VAR;
+#else
   int full_xsize = (FieldWidth  - (menBorder ? 0 : 1)) * TILEX;
   int full_ysize = (FieldHeight - (menBorder ? 0 : 1)) * TILEY;
+#endif
+
+#if NEW_TILESIZE
+
+#endif
 
   sxsize = (full_xsize < xsize ? full_xsize : xsize);
   sysize = (full_ysize < ysize ? full_ysize : ysize);
@@ -269,6 +288,22 @@ void BlitScreenToBitmap_SP(Bitmap *target_bitmap)
     px += TILEX / 2 - GetSimpleRandom(TILEX + 1);
     py += TILEY / 2 - GetSimpleRandom(TILEX + 1);
   }
+#endif
+
+#if NEW_TILESIZE
+  px = px * TILESIZE_VAR / TILESIZE;
+  py = py * TILESIZE_VAR / TILESIZE;
+#endif
+
+#if 0
+  printf("::: (%d, %d) (%d, %d) (%d, %d) [%d / %d]\n",
+	 px, py, sxsize, sysize, sx, sy,
+	 FieldHeight, menBorder);
+#endif
+
+#if 0
+  printf("::: (%d, %d)\n",
+	 bitmap_db_field_sp->width, bitmap_db_field_sp->height);
 #endif
 
   BlitBitmap(bitmap_db_field_sp, target_bitmap, px, py, sxsize, sysize, sx, sy);
@@ -307,12 +342,22 @@ void BackToFront_SP(void)
     int scroll_yoffset = mScrollY - mScrollY_last + game_sp.scroll_yoffset;
     int x1 = 0, x2 = SCR_FIELDX - (scroll_xoffset != 0 ? 0 : 1);
     int y1 = 0, y2 = SCR_FIELDY - (scroll_yoffset != 0 ? 0 : 1);
+#if NEW_TILESIZE
+    int full_xsize = (FieldWidth  - (menBorder ? 0 : 1)) * TILEX_VAR;
+    int full_ysize = (FieldHeight - (menBorder ? 0 : 1)) * TILEY_VAR;
+#else
     int full_xsize = (FieldWidth  - (menBorder ? 0 : 1)) * TILEX;
     int full_ysize = (FieldHeight - (menBorder ? 0 : 1)) * TILEY;
+#endif
     int sx = SX + (full_xsize < SXSIZE ? (SXSIZE - full_xsize) / 2 : 0);
     int sy = SY + (full_ysize < SYSIZE ? (SYSIZE - full_ysize) / 2 : 0);
 
     InitGfxClipRegion(TRUE, SX, SY, SXSIZE, SYSIZE);
+
+#if NEW_TILESIZE
+    scroll_xoffset = scroll_xoffset * TILESIZE_VAR / TILESIZE;
+    scroll_yoffset = scroll_yoffset * TILESIZE_VAR / TILESIZE;
+#endif
 
     for (x = x1; x <= x2; x++)
     {
@@ -321,11 +366,19 @@ void BackToFront_SP(void)
 	int xx = 2 + x;
 	int yy = 2 + y;
 
+#if NEW_TILESIZE
+	if (redraw[xx][yy])
+	  BlitBitmap(bitmap_db_field_sp, window,
+		     xx * TILEX_VAR, yy * TILEY_VAR, TILEX_VAR, TILEY_VAR,
+		     sx + x * TILEX_VAR - scroll_xoffset,
+		     sy + y * TILEY_VAR - scroll_yoffset);
+#else
 	if (redraw[xx][yy])
 	  BlitBitmap(bitmap_db_field_sp, window,
 		     xx * TILEX, yy * TILEY, TILEX, TILEY,
 		     sx + x * TILEX - scroll_xoffset,
 		     sy + y * TILEY - scroll_yoffset);
+#endif
       }
     }
 

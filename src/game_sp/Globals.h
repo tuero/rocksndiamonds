@@ -15,7 +15,12 @@
 
 #define ScrollDelta			((long)1)
 
+#if NEW_TILESIZE
+// #define ZoomFactor			(ZOOM_FACTOR)
 #define ZoomFactor			(2)
+#else
+#define ZoomFactor			(2)
+#endif
 
 #define StretchWidth			(ZoomFactor * 16)
 #define TwoPixels			(ZoomFactor * 2)
