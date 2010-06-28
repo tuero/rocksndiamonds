@@ -331,7 +331,8 @@ void BackToFront_SP(void)
 
   SyncDisplay();
 
-  if (redraw_tiles > REDRAWTILES_THRESHOLD || scrolling || scrolling_last ||
+  if (0 ||
+      redraw_tiles > REDRAWTILES_THRESHOLD || scrolling || scrolling_last ||
       ExplosionShakeMurphy != 0 || ExplosionShakeMurphy_last != 0)
   {
     BlitScreenToBitmap_SP(window);
@@ -349,10 +350,23 @@ void BackToFront_SP(void)
     int full_xsize = (FieldWidth  - (menBorder ? 0 : 1)) * TILEX;
     int full_ysize = (FieldHeight - (menBorder ? 0 : 1)) * TILEY;
 #endif
+#if 1
+    int xsize = SXSIZE;
+    int ysize = SYSIZE;
+    int sxsize = (full_xsize < xsize ? full_xsize : xsize);
+    int sysize = (full_ysize < ysize ? full_ysize : ysize);
+    int sx = SX + (full_xsize < xsize ? (xsize - full_xsize) / 2 : 0);
+    int sy = SY + (full_ysize < ysize ? (ysize - full_ysize) / 2 : 0);
+#else
     int sx = SX + (full_xsize < SXSIZE ? (SXSIZE - full_xsize) / 2 : 0);
     int sy = SY + (full_ysize < SYSIZE ? (SYSIZE - full_ysize) / 2 : 0);
+#endif
 
+#if 1
+    InitGfxClipRegion(TRUE, sx, sy, sxsize, sysize);
+#else
     InitGfxClipRegion(TRUE, SX, SY, SXSIZE, SYSIZE);
+#endif
 
 #if NEW_TILESIZE
     scroll_xoffset = scroll_xoffset * TILESIZE_VAR / TILESIZE;
