@@ -917,6 +917,7 @@ struct SetupInfo
   boolean prefer_aga_graphics;
   int game_frame_delay;
   boolean sp_show_border_elements;
+  boolean small_game_graphics;
 
   char *graphics_set;
   char *sounds_set;

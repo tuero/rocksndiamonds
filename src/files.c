@@ -9001,14 +9001,15 @@ void SaveScore(int nr)
 #define SETUP_TOKEN_PREFER_AGA_GRAPHICS		23
 #define SETUP_TOKEN_GAME_FRAME_DELAY		24
 #define SETUP_TOKEN_SP_SHOW_BORDER_ELEMENTS	25
-#define SETUP_TOKEN_GRAPHICS_SET		26
-#define SETUP_TOKEN_SOUNDS_SET			27
-#define SETUP_TOKEN_MUSIC_SET			28
-#define SETUP_TOKEN_OVERRIDE_LEVEL_GRAPHICS	29
-#define SETUP_TOKEN_OVERRIDE_LEVEL_SOUNDS	30
-#define SETUP_TOKEN_OVERRIDE_LEVEL_MUSIC	31
+#define SETUP_TOKEN_SMALL_GAME_GRAPHICS		26
+#define SETUP_TOKEN_GRAPHICS_SET		27
+#define SETUP_TOKEN_SOUNDS_SET			28
+#define SETUP_TOKEN_MUSIC_SET			29
+#define SETUP_TOKEN_OVERRIDE_LEVEL_GRAPHICS	30
+#define SETUP_TOKEN_OVERRIDE_LEVEL_SOUNDS	31
+#define SETUP_TOKEN_OVERRIDE_LEVEL_MUSIC	32
 
-#define NUM_GLOBAL_SETUP_TOKENS			32
+#define NUM_GLOBAL_SETUP_TOKENS			33
 
 /* editor setup */
 #define SETUP_TOKEN_EDITOR_EL_BOULDERDASH	0
@@ -9144,6 +9145,7 @@ static struct TokenInfo global_setup_tokens[] =
   { TYPE_SWITCH, &si.prefer_aga_graphics,     "prefer_aga_graphics"	},
   { TYPE_INTEGER,&si.game_frame_delay,        "game_frame_delay"	},
   { TYPE_SWITCH, &si.sp_show_border_elements, "sp_show_border_elements"	},
+  { TYPE_SWITCH, &si.small_game_graphics,     "small_game_graphics"	},
   { TYPE_STRING, &si.graphics_set,            "graphics_set"		},
   { TYPE_STRING, &si.sounds_set,              "sounds_set"		},
   { TYPE_STRING, &si.music_set,               "music_set"		},
@@ -9311,6 +9313,7 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
   si->prefer_aga_graphics = TRUE;
   si->game_frame_delay = GAME_FRAME_DELAY;
   si->sp_show_border_elements = FALSE;
+  si->small_game_graphics = FALSE;
 
   si->graphics_set = getStringCopy(GFX_DEFAULT_SUBDIR);
   si->sounds_set = getStringCopy(SND_DEFAULT_SUBDIR);

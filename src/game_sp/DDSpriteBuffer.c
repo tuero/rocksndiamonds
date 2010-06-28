@@ -8,16 +8,23 @@
 static void Blt(int pX, int pY, Bitmap *bitmap, int SpriteX, int SpriteY)
 {
 #if NEW_TILESIZE
+#if 0
   int pseudo_sxsize = SXSIZE * TILESIZE / TILESIZE_VAR;
   int pseudo_sysize = SYSIZE * TILESIZE / TILESIZE_VAR;
+#endif
 #endif
   int scx = (mScrollX_last < 0 ? 0 : mScrollX_last);
   int scy = (mScrollY_last < 0 ? 0 : mScrollY_last);
   int sx1 = scx - 2 * TILEX;
   int sy1 = scy - 2 * TILEY;
 #if NEW_TILESIZE
+#if 1
+  int sx2 = scx + (SCR_FIELDX + 1) * TILEX;
+  int sy2 = scy + (SCR_FIELDY + 1) * TILEY;
+#else
   int sx2 = scx + pseudo_sxsize + 1 * TILEX;
   int sy2 = scy + pseudo_sysize + 1 * TILEY;
+#endif
 #else
   int sx2 = scx + SXSIZE + 1 * TILEX;
   int sy2 = scy + SYSIZE + 1 * TILEY;

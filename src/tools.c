@@ -8831,17 +8831,27 @@ void ChangeViewportPropertiesIfNeeded()
   int border_size = vp_playfield->border_size;
   int new_sx = vp_playfield->x + border_size;
   int new_sy = vp_playfield->y + border_size;
-  int tilesize = (gfx_game_mode == GAME_MODE_PLAYING ? TILESIZE_VAR :
-		  gfx_game_mode == GAME_MODE_EDITOR ? MINI_TILESIZE : TILESIZE);
   int new_sxsize = vp_playfield->width  - 2 * border_size;
   int new_sysize = vp_playfield->height - 2 * border_size;
+  int new_real_sx = vp_playfield->x;
+  int new_real_sy = vp_playfield->y;
+  int new_full_sxsize = vp_playfield->width;
+  int new_full_sysize = vp_playfield->height;
 #if NEW_TILESIZE
+  int new_tilesize_var = TILESIZE / (setup.small_game_graphics ? 2 : 1);
+  int tilesize = (gfx_game_mode == GAME_MODE_PLAYING ? new_tilesize_var :
+		  gfx_game_mode == GAME_MODE_EDITOR ? MINI_TILESIZE : TILESIZE);
   int new_scr_fieldx = new_sxsize / tilesize;
   int new_scr_fieldy = new_sysize / tilesize;
+  int new_scr_fieldx_buffers = new_sxsize / new_tilesize_var;
+  int new_scr_fieldy_buffers = new_sysize / new_tilesize_var;
 #else
   int new_scr_fieldx = (vp_playfield->width  - 2 * border_size) / TILESIZE;
   int new_scr_fieldy = (vp_playfield->height - 2 * border_size) / TILESIZE;
 #endif
+  boolean init_gfx_buffers = FALSE;
+  boolean init_video_buffer = FALSE;
+  boolean init_gadgets_and_toons = FALSE;
 
 #if 0
   /* !!! TEST ONLY !!! */
@@ -8855,6 +8865,10 @@ void ChangeViewportPropertiesIfNeeded()
     WIN_XSIZE = viewport.window.width;
     WIN_YSIZE = viewport.window.height;
 
+#if 1
+    init_video_buffer = TRUE;
+    init_gfx_buffers = TRUE;
+#else
     InitVideoBuffer(WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH, setup.fullscreen);
     InitGfxBuffers();
 
@@ -8864,43 +8878,121 @@ void ChangeViewportPropertiesIfNeeded()
 
     // RedrawBackground();
 #endif
+#endif
+
+    // printf("::: video: init_video_buffer, init_gfx_buffers\n");
   }
 
   if (new_scr_fieldx != SCR_FIELDX ||
-      new_scr_fieldy != SCR_FIELDY ||
-      new_sx != SX ||
+      new_scr_fieldy != SCR_FIELDY)
+  {
+    /* this always toggles between MAIN and GAME when using small tile size */
+
+    SCR_FIELDX = new_scr_fieldx;
+    SCR_FIELDY = new_scr_fieldy;
+
+    // printf("::: new_scr_fieldx != SCR_FIELDX ...\n");
+  }
+
+#if 0
+  if (new_tilesize_var != TILESIZE_VAR &&
+      gfx_game_mode == GAME_MODE_PLAYING)
+  {
+    /* doing this outside GAME_MODE_PLAYING would give wrong playfield size */
+
+    TILESIZE_VAR = new_tilesize_var;
+
+    init_gfx_buffers = TRUE;
+
+    // printf("::: tilesize: init_gfx_buffers\n");
+  }
+#endif
+
+  if (new_sx != SX ||
       new_sy != SY ||
-      vp_playfield->x != REAL_SX ||
-      vp_playfield->y != REAL_SY ||
+      new_sxsize != SXSIZE ||
+      new_sysize != SYSIZE ||
+      new_real_sx != REAL_SX ||
+      new_real_sy != REAL_SY ||
+      new_full_sxsize != FULL_SXSIZE ||
+      new_full_sysize != FULL_SYSIZE ||
+      new_tilesize_var != TILESIZE_VAR ||
       vp_door_1->x != *door_1_x ||
       vp_door_1->y != *door_1_y ||
       vp_door_2->x != *door_2_x ||
       vp_door_2->y != *door_2_y)
   {
-    SCR_FIELDX = new_scr_fieldx;
-    SCR_FIELDY = new_scr_fieldy;
     SX = new_sx;
     SY = new_sy;
-    REAL_SX = vp_playfield->x;
-    REAL_SY = vp_playfield->y;
-
     SXSIZE = new_sxsize;
     SYSIZE = new_sysize;
-    FULL_SXSIZE = vp_playfield->width;
-    FULL_SYSIZE = vp_playfield->width;
+    REAL_SX = new_real_sx;
+    REAL_SY = new_real_sy;
+    FULL_SXSIZE = new_full_sxsize;
+    FULL_SYSIZE = new_full_sysize;
+    TILESIZE_VAR = new_tilesize_var;
+
+#if 0
+    printf("::: %d, %d, %d [%d]\n",
+	   SCR_FIELDX, SCR_FIELDY, TILESIZE_VAR,
+	   setup.small_game_graphics);
+#endif
 
     *door_1_x = vp_door_1->x;
     *door_1_y = vp_door_1->y;
     *door_2_x = vp_door_2->x;
     *door_2_y = vp_door_2->y;
 
+#if 1
+    init_gfx_buffers = TRUE;
+
+    // printf("::: viewports: init_gfx_buffers\n");
+#else
     InitGfxBuffers();
+#endif
 
     if (gfx_game_mode == GAME_MODE_MAIN)
     {
+#if 1
+      init_gadgets_and_toons = TRUE;
+
+      // printf("::: viewports: init_gadgets_and_toons\n");
+#else
       InitGadgets();
       InitToons();
+#endif
     }
+  }
+
+  if (init_gfx_buffers)
+  {
+    // printf("::: init_gfx_buffers\n");
+
+    SCR_FIELDX = new_scr_fieldx_buffers;
+    SCR_FIELDY = new_scr_fieldy_buffers;
+
+    InitGfxBuffers();
+
+    SCR_FIELDX = new_scr_fieldx;
+    SCR_FIELDY = new_scr_fieldy;
+  }
+
+  if (init_video_buffer)
+  {
+    // printf("::: init_video_buffer\n");
+
+    InitVideoBuffer(WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH, setup.fullscreen);
+
+    SetDrawDeactivationMask(REDRAW_NONE);
+    SetDrawBackgroundMask(REDRAW_FIELD);
+  }
+
+  if (init_gadgets_and_toons)
+  {
+    // printf("::: init_gadgets_and_toons\n");
+
+    InitGadgets();
+    InitToons();
   }
 
 #if 0

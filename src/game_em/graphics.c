@@ -65,6 +65,16 @@ void BlitScreenToBitmap_EM(Bitmap *target_bitmap)
 {
   int x = screen_x % (MAX_BUF_XSIZE * TILEX);
   int y = screen_y % (MAX_BUF_YSIZE * TILEY);
+  int sx, sy, sxsize, sysize;
+  int xsize = SXSIZE;
+  int ysize = SYSIZE;
+  int full_xsize = lev.width  * TILEX;
+  int full_ysize = lev.height * TILEY;
+
+  sxsize = (full_xsize < xsize ? full_xsize : xsize);
+  sysize = (full_ysize < ysize ? full_ysize : ysize);
+  sx = SX + (full_xsize < xsize ? (xsize - full_xsize) / 2 : 0);
+  sy = SY + (full_ysize < ysize ? (ysize - full_ysize) / 2 : 0);
 
 #if 0
   printf("::: %d, %d\n", screenBitmap->width, screenBitmap->height);
@@ -72,6 +82,46 @@ void BlitScreenToBitmap_EM(Bitmap *target_bitmap)
   return;
 #endif
 
+#if 1
+  if (x < 2 * TILEX && y < 2 * TILEY)
+  {
+    BlitBitmap(screenBitmap, target_bitmap, x, y,
+	       sxsize, sysize, sx, sy);
+  }
+  else if (x < 2 * TILEX && y >= 2 * TILEY)
+  {
+    BlitBitmap(screenBitmap, target_bitmap, x, y,
+	       sxsize, MAX_BUF_YSIZE * TILEY - y,
+	       sx, sy);
+    BlitBitmap(screenBitmap, target_bitmap, x, 0,
+	       sxsize, y - 2 * TILEY,
+	       sx, sy + MAX_BUF_YSIZE * TILEY - y);
+  }
+  else if (x >= 2 * TILEX && y < 2 * TILEY)
+  {
+    BlitBitmap(screenBitmap, target_bitmap, x, y,
+	       MAX_BUF_XSIZE * TILEX - x, sysize,
+	       sx, sy);
+    BlitBitmap(screenBitmap, target_bitmap, 0, y,
+	       x - 2 * TILEX, sysize,
+	       sx + MAX_BUF_XSIZE * TILEX - x, sy);
+  }
+  else
+  {
+    BlitBitmap(screenBitmap, target_bitmap, x, y,
+	       MAX_BUF_XSIZE * TILEX - x, MAX_BUF_YSIZE * TILEY - y,
+	       sx, sy);
+    BlitBitmap(screenBitmap, target_bitmap, 0, y,
+	       x - 2 * TILEX, MAX_BUF_YSIZE * TILEY - y,
+	       sx + MAX_BUF_XSIZE * TILEX - x, sy);
+    BlitBitmap(screenBitmap, target_bitmap, x, 0,
+	       MAX_BUF_XSIZE * TILEX - x, y - 2 * TILEY,
+	       sx, sy + MAX_BUF_YSIZE * TILEY - y);
+    BlitBitmap(screenBitmap, target_bitmap, 0, 0,
+	       x - 2 * TILEX, y - 2 * TILEY,
+	       sx + MAX_BUF_XSIZE * TILEX - x, sy + MAX_BUF_YSIZE * TILEY - y);
+  }
+#else
   if (x < 2 * TILEX && y < 2 * TILEY)
   {
     BlitBitmap(screenBitmap, target_bitmap, x, y,
@@ -110,6 +160,7 @@ void BlitScreenToBitmap_EM(Bitmap *target_bitmap)
 	       x - 2 * TILEX, y - 2 * TILEY,
 	       SX + MAX_BUF_XSIZE * TILEX - x, SY + MAX_BUF_YSIZE * TILEY - y);
   }
+#endif
 }
 
 void BackToFront_EM(void)
@@ -150,6 +201,17 @@ void BackToFront_EM(void)
     boolean half_shifted_y = (EVEN(SCR_FIELDY) && screen_y % TILEY != 0);
 #endif
 
+    int sx, sy, sxsize, sysize;
+    int xsize = SXSIZE;
+    int ysize = SYSIZE;
+    int full_xsize = lev.width  * TILEX;
+    int full_ysize = lev.height * TILEY;
+
+    sxsize = (full_xsize < xsize ? full_xsize : xsize);
+    sysize = (full_ysize < ysize ? full_ysize : ysize);
+    sx = SX + (full_xsize < xsize ? (xsize - full_xsize) / 2 : 0);
+    sy = SY + (full_ysize < ysize ? (ysize - full_ysize) / 2 : 0);
+
 #if 0
 #if 1
     printf("::: %d, %d\n", EVEN(SCR_FIELDX), screen_x);
@@ -176,8 +238,8 @@ void BackToFront_EM(void)
 	if (redraw[xx][yy])
 	  BlitBitmap(screenBitmap, window,
 		     xx * TILEX, yy * TILEY, TILEX, TILEY,
-		     SX + x * TILEX - scroll_xoffset,
-		     SY + y * TILEY - scroll_yoffset);
+		     sx + x * TILEX - scroll_xoffset,
+		     sy + y * TILEY - scroll_yoffset);
       }
     }
 
