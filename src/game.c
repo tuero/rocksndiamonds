@@ -4358,8 +4358,8 @@ void InitGame()
 #if 1
   if (TILESIZE_VAR < TILESIZE && EVEN(SCR_FIELDX))
   {
-    // SBX_Left--;
-    SBX_Right++;
+    SBX_Left--;
+    // SBX_Right++;
   }
 #endif
 #endif

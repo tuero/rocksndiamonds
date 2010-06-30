@@ -439,6 +439,8 @@ void BackToFront()
 #endif
 
 #else
+
+#if 0
 	ffx = (scroll_x - SBX_Left) * TILEX_VAR + dx * TILESIZE_VAR / TILESIZE;
 
 	if (EVEN(SCR_FIELDX))
@@ -451,6 +453,54 @@ void BackToFront()
 	  printf("::: %d (%d, %d) [%d] [%d] => %d\n",
 		 ffx, SBX_Left * TILEX_VAR, SBX_Right * TILEX_VAR, dx, FX, fx);
 	}
+#else
+
+#if 0
+	ffx = (scroll_x - SBX_Left) * TILEX_VAR + dx * TILESIZE_VAR / TILESIZE;
+
+	if (EVEN(SCR_FIELDX))
+	{
+	  if (ffx < SBX_Right * TILEX_VAR + TILEX_VAR / 2 + 0 * TILEX_VAR / 2)
+	  {
+	    fx = fx + dx * TILESIZE_VAR / TILESIZE - MIN(ffx, TILEX_VAR / 2) +
+	      1 * TILEX_VAR;
+	  }
+	  else
+	  {
+	    fx = fx - (dx <= 0 ? TILEX_VAR : 0) + 1 * TILEX_VAR;
+
+	    printf("::: STOPPED\n");
+	  }
+
+	  printf("::: %d (%d, %d) [%d] [%d] => %d\n",
+		 ffx, SBX_Left * TILEX_VAR, SBX_Right * TILEX_VAR, dx, FX, fx);
+	}
+#else
+	/* !!! THIS WORKS !!! */
+
+	ffx = (scroll_x - SBX_Left) * TILEX_VAR + dx * TILESIZE_VAR / TILESIZE;
+
+	if (EVEN(SCR_FIELDX))
+	{
+	  if (ffx < SBX_Right * TILEX_VAR + TILEX_VAR / 2 + 2 * TILEX_VAR / 2)
+	  {
+	    fx = fx + dx * TILESIZE_VAR / TILESIZE - MIN(ffx, TILEX_VAR / 2) +
+	      1 * TILEX_VAR;
+	  }
+	  else
+	  {
+	    fx = fx - (dx <= 0 ? TILEX_VAR : 0) + 1 * TILEX_VAR;
+
+	    printf("::: STOPPED\n");
+	  }
+
+	  printf("::: %d (%d, %d) [%d] [%d] => %d\n",
+		 ffx, SBX_Left * TILEX_VAR, SBX_Right * TILEX_VAR, dx, FX, fx);
+	}
+#endif
+
+#endif
+
 #endif
 
 #if 0
