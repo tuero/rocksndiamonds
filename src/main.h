@@ -32,7 +32,7 @@
 
 
 #define NEW_TILESIZE			1
-#define NEW_SCROLL			0
+#define NEW_SCROLL			1
 
 #define IMG_UNDEFINED			(-1)
 #define IMG_EMPTY			IMG_EMPTY_SPACE

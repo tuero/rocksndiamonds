@@ -407,16 +407,60 @@ void BackToFront()
 	int dx = (ScreenMovDir & (MV_LEFT | MV_RIGHT) ? ScreenGfxPos : 0);
 	int dy = (ScreenMovDir & (MV_UP | MV_DOWN)    ? ScreenGfxPos : 0);
 
-	fx += dx * TILESIZE_VAR / TILESIZE;
-	fy += dy * TILESIZE_VAR / TILESIZE;
+	int bx1, bx2, ffx, ffy;
+
+	// fx += dx * TILESIZE_VAR / TILESIZE;
+	// fy += dy * TILESIZE_VAR / TILESIZE;
 #else
 	fx += (ScreenMovDir & (MV_LEFT | MV_RIGHT) ? ScreenGfxPos : 0);
 	fy += (ScreenMovDir & (MV_UP | MV_DOWN)    ? ScreenGfxPos : 0);
 #endif
 
+#if 1
+
 #if 0
-	printf("::: %d, %d [%d, %d] [%d, %d]\n",
-	       fx, fy, FX, FY, ScreenMovDir, ScreenGfxPos);
+	bx1 = SBX_Left * TILEX_VAR  + TILEX_VAR / 2;
+	// bx1 = SBX_Left * TILEX_VAR;
+	bx2 = SBX_Right * TILEX_VAR - TILEX_VAR / 2;
+	ffx = scroll_x * TILEX_VAR + dx * TILESIZE_VAR / TILESIZE;
+
+	if (ffx > bx1) // && ffx < bx2)
+	  fx += dx * TILESIZE_VAR / TILESIZE;
+
+	// fx += TILEX_VAR - (ffx - bx1) % TILEX_VAR;
+
+	printf("::: %d (%d, %d) (%d)\n", ffx, bx1, bx2, dx);
+
+#if 0
+	if (ffx > SBX_Left * TILEX_VAR)
+	  fx -= MIN(ffx, TILEX_VAR / 2);
+	if (ffx > SBX_Left * TILEX_VAR && ffx < (SBX_Right + 1) * TILEX_VAR)
+	  fx -= MIN(ffx, TILEX_VAR / 2);
+#endif
+
+#else
+	ffx = (scroll_x - SBX_Left) * TILEX_VAR + dx * TILESIZE_VAR / TILESIZE;
+
+	if (EVEN(SCR_FIELDX))
+	{
+	  if (ffx < SBX_Right * TILEX_VAR + TILEX_VAR / 2)
+	    fx = fx + dx * TILESIZE_VAR / TILESIZE - MIN(ffx, TILEX_VAR / 2);
+	  else
+	    fx = fx - (dx <= 0 ? TILEX_VAR : 0);
+
+	  printf("::: %d (%d, %d) [%d] [%d] => %d\n",
+		 ffx, SBX_Left * TILEX_VAR, SBX_Right * TILEX_VAR, dx, FX, fx);
+	}
+#endif
+
+#if 0
+	printf("::: %d, %d [%d, %d] [%d, %d] [%d, %d] [%d] [%d, %d]\n",
+	       fx, fy, FX, FY, ScreenMovDir, ScreenGfxPos,
+	       scroll_x, scroll_y,
+	       ffx,
+	       SBX_Left, SBX_Right);
+#endif
+
 #endif
 
 #if 0

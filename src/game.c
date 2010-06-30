@@ -4354,6 +4354,16 @@ void InitGame()
     SBY_Lower = lev_fieldy - SCR_FIELDY + 1;
   }
 
+#if NEW_TILESIZE
+#if 1
+  if (TILESIZE_VAR < TILESIZE && EVEN(SCR_FIELDX))
+  {
+    // SBX_Left--;
+    SBX_Right++;
+  }
+#endif
+#endif
+
   if (lev_fieldx + (SBX_Left == -1 ? 2 : 0) <= SCR_FIELDX)
     SBX_Left = SBX_Right = -1 * (SCR_FIELDX - lev_fieldx) / 2;
 
