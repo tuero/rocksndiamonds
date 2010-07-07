@@ -304,6 +304,65 @@ void DrawMaskedBorder(int redraw_mask)
   }
 }
 
+void BlitScreenToBitmap(Bitmap *target_bitmap)
+{
+  DrawBuffer *buffer = (drawto_field == window ? backbuffer : drawto_field);
+  int fx = FX, fy = FY;
+
+#if NEW_TILESIZE
+  int dx = (ScreenMovDir & (MV_LEFT | MV_RIGHT) ? ScreenGfxPos : 0);
+  int dy = (ScreenMovDir & (MV_UP | MV_DOWN)    ? ScreenGfxPos : 0);
+
+  int bx1, bx2, ffx, ffy;
+
+  // fx += dx * TILESIZE_VAR / TILESIZE;
+  // fy += dy * TILESIZE_VAR / TILESIZE;
+#else
+  fx += (ScreenMovDir & (MV_LEFT | MV_RIGHT) ? ScreenGfxPos : 0);
+  fy += (ScreenMovDir & (MV_UP | MV_DOWN)    ? ScreenGfxPos : 0);
+#endif
+
+  /* !!! THIS WORKS !!! */
+
+  ffx = (scroll_x - SBX_Left) * TILEX_VAR + dx * TILESIZE_VAR / TILESIZE;
+
+  if (EVEN(SCR_FIELDX))
+  {
+    if (ffx < SBX_Right * TILEX_VAR + TILEX_VAR / 2 + 2 * TILEX_VAR / 2)
+    {
+      fx = fx + dx * TILESIZE_VAR / TILESIZE - MIN(ffx, TILEX_VAR / 2) +
+	1 * TILEX_VAR;
+    }
+    else
+    {
+      fx = fx - (dx <= 0 ? TILEX_VAR : 0) + 1 * TILEX_VAR;
+
+      printf("::: STOPPED\n");
+    }
+
+    printf("::: %d (%d, %d) [%d] [%d] => %d\n",
+	   ffx, SBX_Left * TILEX_VAR, SBX_Right * TILEX_VAR, dx, FX, fx);
+  }
+
+  if (border.draw_masked[GAME_MODE_PLAYING])
+  {
+    if (buffer != backbuffer)
+    {
+      /* copy playfield buffer to backbuffer to add masked border */
+      BlitBitmap(buffer, backbuffer, fx, fy, SXSIZE, SYSIZE, SX, SY);
+      DrawMaskedBorder(REDRAW_FIELD);
+    }
+
+    BlitBitmap(backbuffer, target_bitmap,
+	       REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE,
+	       REAL_SX, REAL_SY);
+  }
+  else
+  {
+    BlitBitmap(buffer, target_bitmap, fx, fy, SXSIZE, SYSIZE, SX, SY);
+  }
+}
+
 void BackToFront()
 {
   int x, y;
@@ -494,9 +553,16 @@ void BackToFront()
 	    printf("::: STOPPED\n");
 	  }
 
-	  printf("::: %d (%d, %d) [%d] [%d] => %d\n",
-		 ffx, SBX_Left * TILEX_VAR, SBX_Right * TILEX_VAR, dx, FX, fx);
+	  printf("::: %d (%d, %d) [%d] [%d] [%d, %d] => %d\n",
+		 ffx, SBX_Left * TILEX_VAR, SBX_Right * TILEX_VAR,
+		 dx, FX, ScreenMovDir, ScreenGfxPos, fx);
 	}
+	else
+	{
+	  fx += dx;
+	}
+
+	fy += dy;
 #endif
 
 #endif
@@ -592,6 +658,49 @@ void BackToFront()
 #endif
 
 #if NEW_TILESIZE
+
+#if 1
+    InitGfxClipRegion(TRUE, SX, SY, SXSIZE, SYSIZE);
+
+    {
+      int sx = SX; // - (EVEN(SCR_FIELDX) ? TILEX_VAR / 2 : 0);
+      int sy = SY; // + (EVEN(SCR_FIELDY) ? TILEY_VAR / 2 : 0);
+
+      int dx = 0, dy = 0;
+      int ffx, ffy;
+      int fx = FX, fy = FY;
+
+      ffx = (scroll_x - SBX_Left) * TILEX_VAR + dx * TILESIZE_VAR / TILESIZE;
+
+      if (EVEN(SCR_FIELDX))
+      {
+	if (ffx < SBX_Right * TILEX_VAR + TILEX_VAR / 2 + 2 * TILEX_VAR / 2)
+	{
+	  fx = fx + dx * TILESIZE_VAR / TILESIZE - MIN(ffx, TILEX_VAR / 2) +
+	    1 * TILEX_VAR;
+
+	  if (fx % TILEX_VAR)
+	    sx -= TILEX_VAR / 2;
+	  else
+	    sx -= TILEX_VAR;
+	}
+	else
+	{
+	  fx = fx - (dx <= 0 ? TILEX_VAR : 0) + 1 * TILEX_VAR;
+	}
+      }
+
+      for (x = 0; x < SCR_FIELDX; x++)
+	for (y = 0 ; y < SCR_FIELDY; y++)
+	  if (redraw[redraw_x1 + x][redraw_y1 + y])
+	    BlitBitmap(buffer, window,
+		       FX + x * TILEX_VAR, FY + y * TILEY_VAR,
+		       TILEX_VAR, TILEY_VAR,
+		       sx + x * TILEX_VAR, sy + y * TILEY_VAR);
+    }
+
+    InitGfxClipRegion(FALSE, -1, -1, -1, -1);
+#else
     for (x = 0; x < SCR_FIELDX; x++)
       for (y = 0 ; y < SCR_FIELDY; y++)
 	if (redraw[redraw_x1 + x][redraw_y1 + y])
@@ -599,6 +708,8 @@ void BackToFront()
 		     FX + x * TILEX_VAR, FY + y * TILEY_VAR,
 		     TILEX_VAR, TILEY_VAR,
 		     SX + x * TILEX_VAR, SY + y * TILEY_VAR);
+#endif
+
 #else
     for (x = 0; x < SCR_FIELDX; x++)
       for (y = 0 ; y < SCR_FIELDY; y++)

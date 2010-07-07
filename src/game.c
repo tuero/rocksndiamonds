@@ -4356,7 +4356,8 @@ void InitGame()
 
 #if NEW_TILESIZE
 #if 1
-  if (TILESIZE_VAR < TILESIZE && EVEN(SCR_FIELDX))
+  // if (TILESIZE_VAR < TILESIZE && EVEN(SCR_FIELDX))
+  if (EVEN(SCR_FIELDX))
   {
     SBX_Left--;
     // SBX_Right++;
@@ -4536,9 +4537,13 @@ void InitGame()
     if (game.timegate_time_left == 0)
       CloseAllOpenTimegates();
 
+#if NEW_TILESIZE
+    BlitScreenToBitmap(backbuffer);
+#else
     /* blit playfield from scroll buffer to normal back buffer for fading in */
     if (setup.soft_scrolling)
       BlitBitmap(fieldbuffer, backbuffer, FX, FY, SXSIZE, SYSIZE, SX, SY);
+#endif
 
     redraw_mask |= REDRAW_FROM_BACKBUFFER;
   }

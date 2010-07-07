@@ -70,6 +70,7 @@ void DrawMaskedBorder(int);
 
 void SetDrawtoField(int);
 void RedrawPlayfield(boolean, int, int, int, int);
+void BlitScreenToBitmap(Bitmap *);
 void BackToFront();
 
 void FadeIn(int);
