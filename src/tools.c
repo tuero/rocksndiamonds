@@ -312,8 +312,9 @@ void BlitScreenToBitmap(Bitmap *target_bitmap)
 #if NEW_TILESIZE
   int dx = (ScreenMovDir & (MV_LEFT | MV_RIGHT) ? ScreenGfxPos : 0);
   int dy = (ScreenMovDir & (MV_UP | MV_DOWN)    ? ScreenGfxPos : 0);
-
-  int bx1, bx2, ffx, ffy;
+  int dx_var = dx * TILESIZE_VAR / TILESIZE;
+  int dy_var = dy * TILESIZE_VAR / TILESIZE;
+  int ffx, ffy;
 
   // fx += dx * TILESIZE_VAR / TILESIZE;
   // fy += dy * TILESIZE_VAR / TILESIZE;
@@ -324,24 +325,36 @@ void BlitScreenToBitmap(Bitmap *target_bitmap)
 
   /* !!! THIS WORKS !!! */
 
-  ffx = (scroll_x - SBX_Left) * TILEX_VAR + dx * TILESIZE_VAR / TILESIZE;
+  printf("::: (%d, %d) [(%d / %d, %d / %d)]\n",
+	 scroll_x, scroll_y,
+	 SBX_Left, SBX_Right,
+	 SBY_Upper, SBY_Lower);
+
+  ffx = (scroll_x - SBX_Left)  * TILEX_VAR + dx_var;
+  ffy = (scroll_y - SBY_Upper) * TILEY_VAR + dy_var;
 
   if (EVEN(SCR_FIELDX))
   {
-    if (ffx < SBX_Right * TILEX_VAR + TILEX_VAR / 2 + 2 * TILEX_VAR / 2)
-    {
-      fx = fx + dx * TILESIZE_VAR / TILESIZE - MIN(ffx, TILEX_VAR / 2) +
-	1 * TILEX_VAR;
-    }
+    if (ffx < SBX_Right * TILEX_VAR + TILEX_VAR / 2 + TILEX_VAR)
+      fx += dx_var - MIN(ffx, TILEX_VAR / 2) + TILEX_VAR;
     else
-    {
-      fx = fx - (dx <= 0 ? TILEX_VAR : 0) + 1 * TILEX_VAR;
+      fx += (dx > 0 ? TILEX_VAR : 0);
+  }
+  else
+  {
+    fx += dx;
+  }
 
-      printf("::: STOPPED\n");
-    }
-
-    printf("::: %d (%d, %d) [%d] [%d] => %d\n",
-	   ffx, SBX_Left * TILEX_VAR, SBX_Right * TILEX_VAR, dx, FX, fx);
+  if (EVEN(SCR_FIELDY))
+  {
+    if (ffy < SBY_Lower * TILEY_VAR + TILEY_VAR / 2 + TILEY_VAR)
+      fy += dy_var - MIN(ffy, TILEY_VAR / 2) + TILEY_VAR;
+    else
+      fy += (dy > 0 ? TILEY_VAR : 0);
+  }
+  else
+  {
+    fy += dy;
   }
 
   if (border.draw_masked[GAME_MODE_PLAYING])
@@ -458,172 +471,88 @@ void BackToFront()
     }
     else
     {
+#if 1
+      BlitScreenToBitmap(window);
+#else
       int fx = FX, fy = FY;
 
-      if (setup.soft_scrolling)
+#if NEW_TILESIZE
+      int dx = (ScreenMovDir & (MV_LEFT | MV_RIGHT) ? ScreenGfxPos : 0);
+      int dy = (ScreenMovDir & (MV_UP | MV_DOWN)    ? ScreenGfxPos : 0);
+      int dx_var = dx * TILESIZE_VAR / TILESIZE;
+      int dy_var = dy * TILESIZE_VAR / TILESIZE;
+      int ffx, ffy;
+
+      // fx += dx * TILESIZE_VAR / TILESIZE;
+      // fy += dy * TILESIZE_VAR / TILESIZE;
+#else
+      fx += (ScreenMovDir & (MV_LEFT | MV_RIGHT) ? ScreenGfxPos : 0);
+      fy += (ScreenMovDir & (MV_UP | MV_DOWN)    ? ScreenGfxPos : 0);
+#endif
+
+      /* !!! THIS WORKS !!! */
+
+      printf("::: %d, %d\n", scroll_x, scroll_y);
+
+      ffx = (scroll_x - SBX_Left)  * TILEX_VAR + dx_var;
+      ffy = (scroll_y - SBY_Upper) * TILEY_VAR + dy_var;
+
+      if (EVEN(SCR_FIELDX))
       {
-#if NEW_TILESIZE
-	int dx = (ScreenMovDir & (MV_LEFT | MV_RIGHT) ? ScreenGfxPos : 0);
-	int dy = (ScreenMovDir & (MV_UP | MV_DOWN)    ? ScreenGfxPos : 0);
-
-	int bx1, bx2, ffx, ffy;
-
-	// fx += dx * TILESIZE_VAR / TILESIZE;
-	// fy += dy * TILESIZE_VAR / TILESIZE;
-#else
-	fx += (ScreenMovDir & (MV_LEFT | MV_RIGHT) ? ScreenGfxPos : 0);
-	fy += (ScreenMovDir & (MV_UP | MV_DOWN)    ? ScreenGfxPos : 0);
-#endif
-
-#if 1
-
-#if 0
-	bx1 = SBX_Left * TILEX_VAR  + TILEX_VAR / 2;
-	// bx1 = SBX_Left * TILEX_VAR;
-	bx2 = SBX_Right * TILEX_VAR - TILEX_VAR / 2;
-	ffx = scroll_x * TILEX_VAR + dx * TILESIZE_VAR / TILESIZE;
-
-	if (ffx > bx1) // && ffx < bx2)
-	  fx += dx * TILESIZE_VAR / TILESIZE;
-
-	// fx += TILEX_VAR - (ffx - bx1) % TILEX_VAR;
-
-	printf("::: %d (%d, %d) (%d)\n", ffx, bx1, bx2, dx);
-
-#if 0
-	if (ffx > SBX_Left * TILEX_VAR)
-	  fx -= MIN(ffx, TILEX_VAR / 2);
-	if (ffx > SBX_Left * TILEX_VAR && ffx < (SBX_Right + 1) * TILEX_VAR)
-	  fx -= MIN(ffx, TILEX_VAR / 2);
-#endif
-
-#else
-
-#if 0
-	ffx = (scroll_x - SBX_Left) * TILEX_VAR + dx * TILESIZE_VAR / TILESIZE;
-
-	if (EVEN(SCR_FIELDX))
-	{
-	  if (ffx < SBX_Right * TILEX_VAR + TILEX_VAR / 2)
-	    fx = fx + dx * TILESIZE_VAR / TILESIZE - MIN(ffx, TILEX_VAR / 2);
-	  else
-	    fx = fx - (dx <= 0 ? TILEX_VAR : 0);
-
-	  printf("::: %d (%d, %d) [%d] [%d] => %d\n",
-		 ffx, SBX_Left * TILEX_VAR, SBX_Right * TILEX_VAR, dx, FX, fx);
-	}
-#else
-
-#if 0
-	ffx = (scroll_x - SBX_Left) * TILEX_VAR + dx * TILESIZE_VAR / TILESIZE;
-
-	if (EVEN(SCR_FIELDX))
-	{
-	  if (ffx < SBX_Right * TILEX_VAR + TILEX_VAR / 2 + 0 * TILEX_VAR / 2)
-	  {
-	    fx = fx + dx * TILESIZE_VAR / TILESIZE - MIN(ffx, TILEX_VAR / 2) +
-	      1 * TILEX_VAR;
-	  }
-	  else
-	  {
-	    fx = fx - (dx <= 0 ? TILEX_VAR : 0) + 1 * TILEX_VAR;
-
-	    printf("::: STOPPED\n");
-	  }
-
-	  printf("::: %d (%d, %d) [%d] [%d] => %d\n",
-		 ffx, SBX_Left * TILEX_VAR, SBX_Right * TILEX_VAR, dx, FX, fx);
-	}
-#else
-	/* !!! THIS WORKS !!! */
-
-	ffx = (scroll_x - SBX_Left) * TILEX_VAR + dx * TILESIZE_VAR / TILESIZE;
-
-	if (EVEN(SCR_FIELDX))
-	{
-	  if (ffx < SBX_Right * TILEX_VAR + TILEX_VAR / 2 + 2 * TILEX_VAR / 2)
-	  {
-	    fx = fx + dx * TILESIZE_VAR / TILESIZE - MIN(ffx, TILEX_VAR / 2) +
-	      1 * TILEX_VAR;
-	  }
-	  else
-	  {
-	    fx = fx - (dx <= 0 ? TILEX_VAR : 0) + 1 * TILEX_VAR;
-
-	    printf("::: STOPPED\n");
-	  }
-
-	  printf("::: %d (%d, %d) [%d] [%d] [%d, %d] => %d\n",
-		 ffx, SBX_Left * TILEX_VAR, SBX_Right * TILEX_VAR,
-		 dx, FX, ScreenMovDir, ScreenGfxPos, fx);
-	}
+	if (ffx < SBX_Right * TILEX_VAR + TILEX_VAR / 2 + TILEX_VAR)
+	  fx += dx_var - MIN(ffx, TILEX_VAR / 2) + TILEX_VAR;
 	else
-	{
-	  fx += dx;
-	}
-
-	fy += dy;
-#endif
-
-#endif
-
-#endif
-
-#if 0
-	printf("::: %d, %d [%d, %d] [%d, %d] [%d, %d] [%d] [%d, %d]\n",
-	       fx, fy, FX, FY, ScreenMovDir, ScreenGfxPos,
-	       scroll_x, scroll_y,
-	       ffx,
-	       SBX_Left, SBX_Right);
-#endif
-
-#endif
-
-#if 0
-#if NEW_TILESIZE
-	fx = fx * TILESIZE_VAR / TILESIZE;
-	fy = fy * TILESIZE_VAR / TILESIZE;
-#endif
-#endif
+	  fx += (dx > 0 ? TILEX_VAR : 0);
+      }
+      else
+      {
+	fx += dx;
       }
 
-      if (setup.soft_scrolling ||
-	  ABS(ScreenMovPos) + ScrollStepSize == TILEX ||
-	  ABS(ScreenMovPos) == ScrollStepSize ||
-	  redraw_tiles > REDRAWTILES_THRESHOLD)
+      if (EVEN(SCR_FIELDY))
       {
-	if (border.draw_masked[GAME_MODE_PLAYING])
-	{
-	  if (buffer != backbuffer)
-	  {
-	    /* copy playfield buffer to backbuffer to add masked border */
-	    BlitBitmap(buffer, backbuffer, fx, fy, SXSIZE, SYSIZE, SX, SY);
-	    DrawMaskedBorder(REDRAW_FIELD);
-	  }
-
-	  BlitBitmap(backbuffer, window,
-		     REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE,
-		     REAL_SX, REAL_SY);
-	}
+	if (ffy < SBY_Lower * TILEY_VAR + TILEY_VAR / 2 + TILEY_VAR)
+	  fy += dy_var - MIN(ffy, TILEY_VAR / 2) + TILEY_VAR;
 	else
+	  fy += (dy > 0 ? TILEY_VAR : 0);
+      }
+      else
+      {
+	fy += dy;
+      }
+
+      if (border.draw_masked[GAME_MODE_PLAYING])
+      {
+	if (buffer != backbuffer)
 	{
-	  BlitBitmap(buffer, window, fx, fy, SXSIZE, SYSIZE, SX, SY);
+	  /* copy playfield buffer to backbuffer to add masked border */
+	  BlitBitmap(buffer, backbuffer, fx, fy, SXSIZE, SYSIZE, SX, SY);
+	  DrawMaskedBorder(REDRAW_FIELD);
 	}
+
+	BlitBitmap(backbuffer, window,
+		   REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE,
+		   REAL_SX, REAL_SY);
+      }
+      else
+      {
+	BlitBitmap(buffer, window, fx, fy, SXSIZE, SYSIZE, SX, SY);
+      }
+#endif
 
 #if 0
 #ifdef DEBUG
-	printf("redrawing all (ScreenGfxPos == %d) because %s\n",
-	       ScreenGfxPos,
-	       (setup.soft_scrolling ?
-		"setup.soft_scrolling" :
-		ABS(ScreenGfxPos) + ScrollStepSize == TILEX ?
-		"ABS(ScreenGfxPos) + ScrollStepSize == TILEX" :
-		ABS(ScreenGfxPos) == ScrollStepSize ?
-		"ABS(ScreenGfxPos) == ScrollStepSize" :
-		"redraw_tiles > REDRAWTILES_THRESHOLD"));
+      printf("redrawing all (ScreenGfxPos == %d) because %s\n",
+	     ScreenGfxPos,
+	     (setup.soft_scrolling ?
+	      "setup.soft_scrolling" :
+	      ABS(ScreenGfxPos) + ScrollStepSize == TILEX ?
+	      "ABS(ScreenGfxPos) + ScrollStepSize == TILEX" :
+	      ABS(ScreenGfxPos) == ScrollStepSize ?
+	      "ABS(ScreenGfxPos) == ScrollStepSize" :
+	      "redraw_tiles > REDRAWTILES_THRESHOLD"));
 #endif
 #endif
-      }
     }
 
     redraw_mask &= ~REDRAW_MAIN;
@@ -670,14 +599,15 @@ void BackToFront()
       int ffx, ffy;
       int fx = FX, fy = FY;
 
-      ffx = (scroll_x - SBX_Left) * TILEX_VAR + dx * TILESIZE_VAR / TILESIZE;
+      ffx = (scroll_x - SBX_Left)  * TILEX_VAR + dx * TILESIZE_VAR / TILESIZE;
+      ffy = (scroll_y - SBY_Upper) * TILEY_VAR + dy * TILESIZE_VAR / TILESIZE;
 
       if (EVEN(SCR_FIELDX))
       {
-	if (ffx < SBX_Right * TILEX_VAR + TILEX_VAR / 2 + 2 * TILEX_VAR / 2)
+	if (ffx < SBX_Right * TILEX_VAR + TILEX_VAR / 2 + TILEX_VAR)
 	{
 	  fx = fx + dx * TILESIZE_VAR / TILESIZE - MIN(ffx, TILEX_VAR / 2) +
-	    1 * TILEX_VAR;
+	    TILEX_VAR;
 
 	  if (fx % TILEX_VAR)
 	    sx -= TILEX_VAR / 2;
@@ -686,7 +616,25 @@ void BackToFront()
 	}
 	else
 	{
-	  fx = fx - (dx <= 0 ? TILEX_VAR : 0) + 1 * TILEX_VAR;
+	  fx = fx - (dx <= 0 ? TILEX_VAR : 0) + TILEX_VAR;
+	}
+      }
+
+      if (EVEN(SCR_FIELDY))
+      {
+	if (ffy < SBY_Lower * TILEY_VAR + TILEY_VAR / 2 + TILEY_VAR)
+	{
+	  fy = fy + dy * TILESIZE_VAR / TILESIZE - MIN(ffy, TILEY_VAR / 2) +
+	    TILEY_VAR;
+
+	  if (fy % TILEY_VAR)
+	    sy -= TILEY_VAR / 2;
+	  else
+	    sy -= TILEY_VAR;
+	}
+	else
+	{
+	  fy = fy - (dy <= 0 ? TILEY_VAR : 0) + TILEY_VAR;
 	}
       }
 
@@ -7281,6 +7229,7 @@ inline static int get_effective_element_EM(int tile, int frame_em)
 	return (frame_em > 5 ? EL_EMPTY : element);
 
 #if 0
+	/* !!! FIX !!! */
       case Ydiamond_stone:
 	//  if (!game.use_native_emc_graphics_engine)
 	return EL_ROCK;

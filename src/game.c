@@ -4355,21 +4355,26 @@ void InitGame()
   }
 
 #if NEW_TILESIZE
-#if 1
-  // if (TILESIZE_VAR < TILESIZE && EVEN(SCR_FIELDX))
+
+  if (lev_fieldx + (SBX_Left < 0 ? 2 : 0) <= SCR_FIELDX)
+    SBX_Left = SBX_Right = -1 * (SCR_FIELDX - lev_fieldx) / 2;
+
+  if (lev_fieldy + (SBY_Upper < 0 ? 2 : 0) <= SCR_FIELDY)
+    SBY_Upper = SBY_Lower = -1 * (SCR_FIELDY - lev_fieldy) / 2;
+
   if (EVEN(SCR_FIELDX))
-  {
     SBX_Left--;
-    // SBX_Right++;
-  }
-#endif
-#endif
+  if (EVEN(SCR_FIELDY))
+    SBY_Upper--;
+
+#else
 
   if (lev_fieldx + (SBX_Left == -1 ? 2 : 0) <= SCR_FIELDX)
     SBX_Left = SBX_Right = -1 * (SCR_FIELDX - lev_fieldx) / 2;
 
   if (lev_fieldy + (SBY_Upper == -1 ? 2 : 0) <= SCR_FIELDY)
     SBY_Upper = SBY_Lower = -1 * (SCR_FIELDY - lev_fieldy) / 2;
+#endif
 
   /* if local player not found, look for custom element that might create
      the player (make some assumptions about the right custom element) */
@@ -4479,6 +4484,8 @@ void InitGame()
 		local_player->jy > SBY_Lower + MIDPOSY ? SBY_Lower :
 		local_player->jy - MIDPOSY);
   }
+
+  printf("::: %d, %d (initial)\n", scroll_x, scroll_y);
 
 #if 0
   /* do not use PLAYING mask for fading out from main screen */
