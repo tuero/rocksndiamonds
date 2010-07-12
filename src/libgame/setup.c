@@ -2679,7 +2679,7 @@ static TreeInfo *getTreeInfoCopy(TreeInfo *ti)
   return ti_copy;
 }
 
-static void freeTreeInfo(TreeInfo *ti)
+void freeTreeInfo(TreeInfo *ti)
 {
   if (ti == NULL)
     return;

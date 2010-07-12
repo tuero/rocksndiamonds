@@ -1596,10 +1596,202 @@ void setElementChangeInfoToDefaults(struct ElementChangeInfo *change)
   change->post_change_function = NULL;
 }
 
-static void setLevelInfoToDefaults(struct LevelInfo *level)
+#if 1
+
+static void setLevelInfoToDefaults_Level(struct LevelInfo *level)
+{
+  int i, x, y;
+
+  li = *level;		/* copy level data into temporary buffer */
+  setConfigToDefaultsFromConfigList(chunk_config_INFO);
+  *level = li;		/* copy temporary buffer back to level data */
+
+  setLevelInfoToDefaults_EM();
+  setLevelInfoToDefaults_SP();
+
+  level->native_em_level = &native_em_level;
+  level->native_sp_level = &native_sp_level;
+
+  level->file_version = FILE_VERSION_ACTUAL;
+  level->game_version = GAME_VERSION_ACTUAL;
+
+  level->creation_date = getCurrentDate();
+
+  level->encoding_16bit_field  = TRUE;
+  level->encoding_16bit_yamyam = TRUE;
+  level->encoding_16bit_amoeba = TRUE;
+
+  for (x = 0; x < MAX_LEV_FIELDX; x++)
+    for (y = 0; y < MAX_LEV_FIELDY; y++)
+      level->field[x][y] = EL_SAND;
+
+  for (i = 0; i < MAX_LEVEL_NAME_LEN; i++)
+    level->name[i] = '\0';
+  for (i = 0; i < MAX_LEVEL_AUTHOR_LEN; i++)
+    level->author[i] = '\0';
+
+  strcpy(level->name, NAMELESS_LEVEL_NAME);
+  strcpy(level->author, ANONYMOUS_NAME);
+
+  level->field[0][0] = EL_PLAYER_1;
+  level->field[STD_LEV_FIELDX - 1][STD_LEV_FIELDY - 1] = EL_EXIT_CLOSED;
+
+  BorderElement = EL_STEELWALL;
+
+  /* set all bug compatibility flags to "false" => do not emulate this bug */
+  level->use_action_after_change_bug = FALSE;
+
+  if (leveldir_current)
+  {
+    /* try to determine better author name than 'anonymous' */
+    if (!strEqual(leveldir_current->author, ANONYMOUS_NAME))
+    {
+      strncpy(level->author, leveldir_current->author, MAX_LEVEL_AUTHOR_LEN);
+      level->author[MAX_LEVEL_AUTHOR_LEN] = '\0';
+    }
+    else
+    {
+      switch (LEVELCLASS(leveldir_current))
+      {
+	case LEVELCLASS_TUTORIAL:
+	  strcpy(level->author, PROGRAM_AUTHOR_STRING);
+	  break;
+
+        case LEVELCLASS_CONTRIB:
+	  strncpy(level->author, leveldir_current->name, MAX_LEVEL_AUTHOR_LEN);
+	  level->author[MAX_LEVEL_AUTHOR_LEN] = '\0';
+	  break;
+
+        case LEVELCLASS_PRIVATE:
+	  strncpy(level->author, getRealName(), MAX_LEVEL_AUTHOR_LEN);
+	  level->author[MAX_LEVEL_AUTHOR_LEN] = '\0';
+	  break;
+
+        default:
+	  /* keep default value */
+	  break;
+      }
+    }
+  }
+}
+
+static void setLevelInfoToDefaults_Elements(struct LevelInfo *level)
+{
+  static boolean clipboard_elements_initialized = FALSE;
+  int i;
+
+  InitElementPropertiesStatic();
+
+  li = *level;		/* copy level data into temporary buffer */
+  setConfigToDefaultsFromConfigList(chunk_config_ELEM);
+  *level = li;		/* copy temporary buffer back to level data */
+
+  for (i = 0; i < MAX_NUM_ELEMENTS; i++)
+  {
+    int element = i;
+    struct ElementInfo *ei = &element_info[element];
+
+    /* never initialize clipboard elements after the very first time */
+    /* (to be able to use clipboard elements between several levels) */
+    if (IS_CLIPBOARD_ELEMENT(element) && clipboard_elements_initialized)
+      continue;
+
+    if (IS_ENVELOPE(element))
+    {
+      int envelope_nr = element - EL_ENVELOPE_1;
+
+      setConfigToDefaultsFromConfigList(chunk_config_NOTE);
+
+      level->envelope[envelope_nr] = xx_envelope;
+    }
+
+    if (IS_CUSTOM_ELEMENT(element) ||
+	IS_GROUP_ELEMENT(element) ||
+	IS_INTERNAL_ELEMENT(element))
+    {
+      xx_ei = *ei;	/* copy element data into temporary buffer */
+
+      setConfigToDefaultsFromConfigList(chunk_config_CUSX_base);
+
+      *ei = xx_ei;
+    }
+
+    setElementChangePages(ei, 1);
+    setElementChangeInfoToDefaults(ei->change);
+
+    if (IS_CUSTOM_ELEMENT(element) ||
+	IS_GROUP_ELEMENT(element) ||
+	IS_INTERNAL_ELEMENT(element))
+    {
+      setElementDescriptionToDefault(ei);
+
+      ei->modified_settings = FALSE;
+    }
+
+    if (IS_CUSTOM_ELEMENT(element) ||
+	IS_INTERNAL_ELEMENT(element))
+    {
+      /* internal values used in level editor */
+
+      ei->access_type = 0;
+      ei->access_layer = 0;
+      ei->access_protected = 0;
+      ei->walk_to_action = 0;
+      ei->smash_targets = 0;
+      ei->deadliness = 0;
+
+      ei->can_explode_by_fire = FALSE;
+      ei->can_explode_smashed = FALSE;
+      ei->can_explode_impact = FALSE;
+
+      ei->current_change_page = 0;
+    }
+
+    if (IS_GROUP_ELEMENT(element) ||
+	IS_INTERNAL_ELEMENT(element))
+    {
+      struct ElementGroupInfo *group;
+
+      /* initialize memory for list of elements in group */
+      if (ei->group == NULL)
+	ei->group = checked_malloc(sizeof(struct ElementGroupInfo));
+
+      group = ei->group;
+
+      xx_group = *group;	/* copy group data into temporary buffer */
+
+      setConfigToDefaultsFromConfigList(chunk_config_GRPX);
+
+      *group = xx_group;
+    }
+  }
+
+  clipboard_elements_initialized = TRUE;
+}
+
+static void setLevelInfoToDefaults(struct LevelInfo *level,
+				   boolean level_info_only)
+{
+  setLevelInfoToDefaults_Level(level);
+
+  if (!level_info_only)
+    setLevelInfoToDefaults_Elements(level);
+
+  level->no_valid_file = FALSE;
+
+  level->changed = FALSE;
+}
+
+#else
+
+static void setLevelInfoToDefaults(struct LevelInfo *level,
+				   boolean level_info_only)
 {
   static boolean clipboard_elements_initialized = FALSE;
   int i, x, y;
+
+  if (level_info_only)
+    return;
 
   InitElementPropertiesStatic();
 
@@ -1731,39 +1923,41 @@ static void setLevelInfoToDefaults(struct LevelInfo *level)
   /* set all bug compatibility flags to "false" => do not emulate this bug */
   level->use_action_after_change_bug = FALSE;
 
-  if (leveldir_current == NULL)		/* only when dumping level */
-    return;
-
-  /* try to determine better author name than 'anonymous' */
-  if (!strEqual(leveldir_current->author, ANONYMOUS_NAME))
+  if (leveldir_current)
   {
-    strncpy(level->author, leveldir_current->author, MAX_LEVEL_AUTHOR_LEN);
-    level->author[MAX_LEVEL_AUTHOR_LEN] = '\0';
-  }
-  else
-  {
-    switch (LEVELCLASS(leveldir_current))
+    /* try to determine better author name than 'anonymous' */
+    if (!strEqual(leveldir_current->author, ANONYMOUS_NAME))
     {
-      case LEVELCLASS_TUTORIAL:
-	strcpy(level->author, PROGRAM_AUTHOR_STRING);
-	break;
+      strncpy(level->author, leveldir_current->author, MAX_LEVEL_AUTHOR_LEN);
+      level->author[MAX_LEVEL_AUTHOR_LEN] = '\0';
+    }
+    else
+    {
+      switch (LEVELCLASS(leveldir_current))
+      {
+	case LEVELCLASS_TUTORIAL:
+	  strcpy(level->author, PROGRAM_AUTHOR_STRING);
+	  break;
 
-      case LEVELCLASS_CONTRIB:
-	strncpy(level->author, leveldir_current->name, MAX_LEVEL_AUTHOR_LEN);
-	level->author[MAX_LEVEL_AUTHOR_LEN] = '\0';
-	break;
+        case LEVELCLASS_CONTRIB:
+	  strncpy(level->author, leveldir_current->name, MAX_LEVEL_AUTHOR_LEN);
+	  level->author[MAX_LEVEL_AUTHOR_LEN] = '\0';
+	  break;
 
-      case LEVELCLASS_PRIVATE:
-	strncpy(level->author, getRealName(), MAX_LEVEL_AUTHOR_LEN);
-	level->author[MAX_LEVEL_AUTHOR_LEN] = '\0';
-	break;
+        case LEVELCLASS_PRIVATE:
+	  strncpy(level->author, getRealName(), MAX_LEVEL_AUTHOR_LEN);
+	  level->author[MAX_LEVEL_AUTHOR_LEN] = '\0';
+	  break;
 
-      default:
-	/* keep default value */
-	break;
+        default:
+	  /* keep default value */
+	  break;
+      }
     }
   }
 }
+
+#endif
 
 static void setFileInfoToDefaults(struct LevelFileInfo *level_file_info)
 {
@@ -3120,7 +3314,8 @@ static int LoadLevel_GRPX(FILE *file, int chunk_size, struct LevelInfo *level)
 }
 
 static void LoadLevelFromFileInfo_RND(struct LevelInfo *level,
-				      struct LevelFileInfo *level_file_info)
+				      struct LevelFileInfo *level_file_info,
+				      boolean level_info_only)
 {
   char *filename = level_file_info->filename;
   char cookie[MAX_LINE_LEN];
@@ -3133,7 +3328,8 @@ static void LoadLevelFromFileInfo_RND(struct LevelInfo *level,
     level->no_valid_file = TRUE;
 
 #if 1
-    Error(ERR_WARN, "cannot read level '%s' -- using empty level", filename);
+    if (!level_info_only)
+      Error(ERR_WARN, "cannot read level '%s' -- using empty level", filename);
 #else
     if (level != &level_template)
       Error(ERR_WARN, "cannot read level '%s' -- using empty level", filename);
@@ -4091,7 +4287,8 @@ static void LoadLevelFromFileStream_SP(FILE *file, struct LevelInfo *level,
 }
 
 static void LoadLevelFromFileInfo_SP(struct LevelInfo *level,
-				     struct LevelFileInfo *level_file_info)
+				     struct LevelFileInfo *level_file_info,
+				     boolean level_info_only)
 {
   char *filename = level_file_info->filename;
   FILE *file;
@@ -4109,7 +4306,8 @@ static void LoadLevelFromFileInfo_SP(struct LevelInfo *level,
   {
     level->no_valid_file = TRUE;
 
-    Error(ERR_WARN, "cannot read level '%s' -- using empty level", filename);
+    if (!level_info_only)
+      Error(ERR_WARN, "cannot read level '%s' -- using empty level", filename);
 
     return;
   }
@@ -6186,7 +6384,8 @@ static void LoadLevelFromFileStream_DC(FILE *file, struct LevelInfo *level,
 }
 
 static void LoadLevelFromFileInfo_DC(struct LevelInfo *level,
-				     struct LevelFileInfo *level_file_info)
+				     struct LevelFileInfo *level_file_info,
+				     boolean level_info_only)
 {
   char *filename = level_file_info->filename;
   FILE *file;
@@ -6198,7 +6397,8 @@ static void LoadLevelFromFileInfo_DC(struct LevelInfo *level,
   {
     level->no_valid_file = TRUE;
 
-    Error(ERR_WARN, "cannot read level '%s' -- using empty level", filename);
+    if (!level_info_only)
+      Error(ERR_WARN, "cannot read level '%s' -- using empty level", filename);
 
     return;
   }
@@ -6301,7 +6501,8 @@ static void LoadLevelFromFileInfo_DC(struct LevelInfo *level,
   {
     level->no_valid_file = TRUE;
 
-    Error(ERR_WARN, "cannot read level '%s' -- using empty level", filename);
+    if (!level_info_only)
+      Error(ERR_WARN, "cannot read level '%s' -- using empty level", filename);
 
     return;
   }
@@ -6535,7 +6736,8 @@ int getMappedElement_SB(int element_ascii, boolean use_ces)
 }
 
 static void LoadLevelFromFileInfo_SB(struct LevelInfo *level,
-				     struct LevelFileInfo *level_file_info)
+				     struct LevelFileInfo *level_file_info,
+				     boolean level_info_only)
 {
   char *filename = level_file_info->filename;
   char line[MAX_LINE_LEN], line_raw[MAX_LINE_LEN], previous_line[MAX_LINE_LEN];
@@ -6565,7 +6767,8 @@ static void LoadLevelFromFileInfo_SB(struct LevelInfo *level,
   {
     level->no_valid_file = TRUE;
 
-    Error(ERR_WARN, "cannot read level '%s' -- using empty level", filename);
+    if (!level_info_only)
+      Error(ERR_WARN, "cannot read level '%s' -- using empty level", filename);
 
     return;
   }
@@ -6842,14 +7045,16 @@ static void LoadLevelFromFileInfo_SB(struct LevelInfo *level,
 /* ------------------------------------------------------------------------- */
 
 static void LoadLevelFromFileInfo_EM(struct LevelInfo *level,
-				     struct LevelFileInfo *level_file_info)
+				     struct LevelFileInfo *level_file_info,
+				     boolean level_info_only)
 {
-  if (!LoadNativeLevel_EM(level_file_info->filename))
+  if (!LoadNativeLevel_EM(level_file_info->filename, level_info_only))
     level->no_valid_file = TRUE;
 }
 
 static void LoadLevelFromFileInfo_SP(struct LevelInfo *level,
-				     struct LevelFileInfo *level_file_info)
+				     struct LevelFileInfo *level_file_info,
+				     boolean level_info_only)
 {
   int pos = 0;
 
@@ -6857,7 +7062,7 @@ static void LoadLevelFromFileInfo_SP(struct LevelInfo *level,
   if (level_file_info->packed)
     pos = level_file_info->nr - leveldir_current->first_level;
 
-  if (!LoadNativeLevel_SP(level_file_info->filename, pos))
+  if (!LoadNativeLevel_SP(level_file_info->filename, pos, level_info_only))
     level->no_valid_file = TRUE;
 }
 
@@ -6896,44 +7101,45 @@ void SaveNativeLevel(struct LevelInfo *level)
 /* functions for loading generic level                                       */
 /* ------------------------------------------------------------------------- */
 
-void LoadLevelFromFileInfo(struct LevelInfo *level,
-			   struct LevelFileInfo *level_file_info)
+static void LoadLevelFromFileInfo(struct LevelInfo *level,
+				  struct LevelFileInfo *level_file_info,
+				  boolean level_info_only)
 {
   /* always start with reliable default values */
-  setLevelInfoToDefaults(level);
+  setLevelInfoToDefaults(level, level_info_only);
 
   switch (level_file_info->type)
   {
     case LEVEL_FILE_TYPE_RND:
-      LoadLevelFromFileInfo_RND(level, level_file_info);
+      LoadLevelFromFileInfo_RND(level, level_file_info, level_info_only);
       break;
 
     case LEVEL_FILE_TYPE_EM:
-      LoadLevelFromFileInfo_EM(level, level_file_info);
+      LoadLevelFromFileInfo_EM(level, level_file_info, level_info_only);
       level->game_engine_type = GAME_ENGINE_TYPE_EM;
       break;
 
     case LEVEL_FILE_TYPE_SP:
-      LoadLevelFromFileInfo_SP(level, level_file_info);
+      LoadLevelFromFileInfo_SP(level, level_file_info, level_info_only);
       level->game_engine_type = GAME_ENGINE_TYPE_SP;
       break;
 
     case LEVEL_FILE_TYPE_DC:
-      LoadLevelFromFileInfo_DC(level, level_file_info);
+      LoadLevelFromFileInfo_DC(level, level_file_info, level_info_only);
       break;
 
     case LEVEL_FILE_TYPE_SB:
-      LoadLevelFromFileInfo_SB(level, level_file_info);
+      LoadLevelFromFileInfo_SB(level, level_file_info, level_info_only);
       break;
 
     default:
-      LoadLevelFromFileInfo_RND(level, level_file_info);
+      LoadLevelFromFileInfo_RND(level, level_file_info, level_info_only);
       break;
   }
 
   /* if level file is invalid, restore level structure to default values */
   if (level->no_valid_file)
-    setLevelInfoToDefaults(level);
+    setLevelInfoToDefaults(level, level_info_only);
 
   if (level->game_engine_type == GAME_ENGINE_TYPE_UNKNOWN)
     level->game_engine_type = GAME_ENGINE_TYPE_RND;
@@ -6953,7 +7159,7 @@ void LoadLevelFromFilename(struct LevelInfo *level, char *filename)
   level_file_info.type = LEVEL_FILE_TYPE_RND;	/* no others supported yet */
   level_file_info.filename = filename;
 
-  LoadLevelFromFileInfo(level, &level_file_info);
+  LoadLevelFromFileInfo(level, &level_file_info, FALSE);
 }
 
 static void LoadLevel_InitVersion(struct LevelInfo *level, char *filename)
@@ -7341,7 +7547,7 @@ void LoadLevelTemplate(int nr)
   setLevelFileInfo(&level_template.file_info, nr);
   filename = level_template.file_info.filename;
 
-  LoadLevelFromFileInfo(&level_template, &level_template.file_info);
+  LoadLevelFromFileInfo(&level_template, &level_template.file_info, FALSE);
 
   LoadLevel_InitVersion(&level_template, filename);
   LoadLevel_InitElements(&level_template, filename);
@@ -7356,7 +7562,7 @@ void LoadLevel(int nr)
   setLevelFileInfo(&level.file_info, nr);
   filename = level.file_info.filename;
 
-  LoadLevelFromFileInfo(&level, &level.file_info);
+  LoadLevelFromFileInfo(&level, &level.file_info, FALSE);
 
   if (level.use_custom_template)
     LoadLevelTemplate(-1);
@@ -7366,6 +7572,16 @@ void LoadLevel(int nr)
   LoadLevel_InitPlayfield(&level, filename);
 
   LoadLevel_InitNativeEngines(&level, filename);
+}
+
+void LoadLevelInfoOnly(int nr)
+{
+  char *filename;
+
+  setLevelFileInfo(&level.file_info, nr);
+  filename = level.file_info.filename;
+
+  LoadLevelFromFileInfo(&level, &level.file_info, TRUE);
 }
 
 static int SaveLevel_VERS(FILE *file, struct LevelInfo *level)

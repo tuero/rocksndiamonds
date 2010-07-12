@@ -141,7 +141,8 @@ static void execSetupGraphics(void);
 static void execSetupArtwork(void);
 static void HandleChooseTree(int, int, int, int, int, TreeInfo **);
 
-static void DrawChooseLevel(void);
+static void DrawChooseLevelSet(void);
+static void DrawChooseLevelNr(void);
 static void DrawInfoScreen(void);
 static void DrawAndFadeInInfoScreen(int);
 static void DrawSetupScreen(void);
@@ -174,6 +175,9 @@ static TreeInfo *scroll_delay_current = NULL;
 
 static TreeInfo *game_speeds = NULL;
 static TreeInfo *game_speed_current = NULL;
+
+static TreeInfo *level_number = NULL;
+static TreeInfo *level_number_current = NULL;
 
 static struct
 {
@@ -867,8 +871,13 @@ static void InitializeMainControls()
 
     if (pos_text != NULL)		/* (x/y may be -1/-1 here) */
     {
+#if 1
+      /* calculate size for non-clickable text -- needed for text alignment */
+      boolean calculate_text_size = (pos_button == NULL && text != NULL);
+#else
       /* calculate width for non-clickable text -- needed for text alignment */
       boolean calculate_text_width = (pos_button == NULL && text != NULL);
+#endif
 
       if (visibleMenuPos(pos_button))
       {
@@ -878,10 +887,17 @@ static void InitializeMainControls()
 	  pos_text->y = pos_button->y;
       }
 
+#if 1
+      if (pos_text->width == -1 || calculate_text_size)
+	pos_text->width = text_width;
+      if (pos_text->height == -1 || calculate_text_size)
+	pos_text->height = text_height;
+#else
       if (pos_text->width == -1 || calculate_text_width)
 	pos_text->width = text_width;
       if (pos_text->height == -1)
 	pos_text->height = text_height;
+#endif
     }
 
     if (pos_input != NULL)		/* (x/y may be -1/-1 here) */
@@ -1019,6 +1035,13 @@ static boolean insideTextPosRect(struct TextPosInfo *rect, int x, int y)
 
   int rect_x = ALIGNED_TEXT_XPOS(rect);
   int rect_y = ALIGNED_TEXT_YPOS(rect);
+
+#if 0
+  printf("::: insideTextPosRect: (%d, %d), (%d, %d) [%d, %d] (%d, %d) => %d\n",
+	 x, y, rect_x, rect_y, rect->x, rect->y, rect->width, rect->height,
+	 (x >= rect_x && x < rect_x + rect->width &&
+	  y >= rect_y && y < rect_y + rect->height));
+#endif
 
   return (x >= rect_x && x < rect_x + rect->width &&
 	  y >= rect_y && y < rect_y + rect->height);
@@ -1703,10 +1726,19 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 
     for (i = 0; main_controls[i].nr != -1; i++)
     {
+#if 0
+      printf("::: check click (%d, %d) for %d [%d] ...\n",
+	     mx - mSX, my - mSY, i, main_controls[i].nr);
+#endif
+
       if (insideMenuPosRect(main_controls[i].pos_button, mx - mSX, my - mSY) ||
 	  insideTextPosRect(main_controls[i].pos_text,   mx - mSX, my - mSY) ||
 	  insideTextPosRect(main_controls[i].pos_input,  mx - mSX, my - mSY))
       {
+#if 0
+	printf("::: inside %d\n", i);
+#endif
+
 	pos = main_controls[i].nr;
 
 	break;
@@ -1725,6 +1757,20 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
   if (pos == MAIN_CONTROL_LEVELS && dx != 0 && button)
   {
     HandleMainMenu_SelectLevel(1, dx < 0 ? -1 : +1);
+  }
+  else if (pos == MAIN_CONTROL_FIRST_LEVEL && !button)
+  {
+    HandleMainMenu_SelectLevel(MAX_LEVELS, -1);
+  }
+  else if (pos == MAIN_CONTROL_LAST_LEVEL && !button)
+  {
+    HandleMainMenu_SelectLevel(MAX_LEVELS, +1);
+  }
+  else if (pos == MAIN_CONTROL_LEVEL_NUMBER && !button)
+  {
+    game_status = GAME_MODE_LEVELNR;
+
+    DrawChooseLevelNr();
   }
   else if (pos >= MAIN_CONTROL_NAME && pos <= MAIN_CONTROL_QUIT)
   {
@@ -1763,7 +1809,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 	  gotoTopLevelDir();
 #endif
 
-	  DrawChooseLevel();
+	  DrawChooseLevelSet();
 	}
       }
       else if (pos == MAIN_CONTROL_SCORES)
@@ -3296,8 +3342,8 @@ static void drawChooseTreeList(int first_entry, int num_page_entries,
   char *title_string = NULL;
   int yoffset_sets = MENU_TITLE1_YPOS;
   int yoffset_setup = 16;
-  int yoffset = (ti->type == TREE_TYPE_LEVEL_DIR ? yoffset_sets :
-		 yoffset_setup);
+  int yoffset = (ti->type == TREE_TYPE_LEVEL_DIR ||
+		 ti->type == TREE_TYPE_LEVEL_NR ? yoffset_sets : yoffset_setup);
   int last_game_status = game_status;	/* save current game status */
 
   title_string = ti->infotext;
@@ -3365,6 +3411,9 @@ static void drawChooseTreeInfo(int entry_pos, TreeInfo *ti)
   int ypos = MENU_TITLE2_YPOS;
   int font_nr = FONT_TITLE_2;
 
+  if (ti->type == TREE_TYPE_LEVEL_NR)
+    DrawTextFCentered(ypos, font_nr, leveldir_current->name);
+
   if (ti->type != TREE_TYPE_LEVEL_DIR)
     return;
 
@@ -3373,6 +3422,18 @@ static void drawChooseTreeInfo(int entry_pos, TreeInfo *ti)
 
   DrawBackgroundForFont(SX, SY + ypos, SXSIZE, getFontHeight(font_nr), font_nr);
 
+#if 1
+  if (node->parent_link)
+    DrawTextFCentered(ypos, font_nr, "leave \"%s\"",
+		      node->node_parent->name);
+  else if (node->level_group)
+    DrawTextFCentered(ypos, font_nr, "enter \"%s\"",
+		      node->name);
+  else if (ti->type == TREE_TYPE_LEVEL_DIR)
+    DrawTextFCentered(ypos, font_nr, "%3d %s (%s)",
+		      node->levels, (node->levels > 1 ? "levels" : "level"),
+		      node->class_desc);
+#else
   if (node->parent_link)
     DrawTextFCentered(ypos, font_nr, "leave group \"%s\"",
 		      node->class_desc);
@@ -3382,6 +3443,7 @@ static void drawChooseTreeInfo(int entry_pos, TreeInfo *ti)
   else if (ti->type == TREE_TYPE_LEVEL_DIR)
     DrawTextFCentered(ypos, font_nr, "%3d levels (%s)",
 		      node->levels, node->class_desc);
+#endif
 
   /* let BackToFront() redraw only what is needed */
   redraw_mask = last_redraw_mask | REDRAW_TILES;
@@ -3468,6 +3530,9 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
     }
     else
     {
+      if (game_status == GAME_MODE_LEVELNR)
+	level_nr = atoi(level_number_current->identifier);
+
       game_status = GAME_MODE_MAIN;
 
       DrawMainMenuExt(REDRAW_FIELD, FALSE);
@@ -3651,7 +3716,11 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
 	}
 	else
 	{
+	  if (game_status == GAME_MODE_LEVELNR)
+	    level_nr = atoi(level_number_current->identifier);
+
 	  game_status = GAME_MODE_MAIN;
+
 	  DrawMainMenu();
 	}
       }
@@ -3659,7 +3728,7 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
   }
 }
 
-void DrawChooseLevel()
+void DrawChooseLevelSet()
 {
   SetMainBackgroundImage(IMG_BACKGROUND_LEVELS);
 
@@ -3669,9 +3738,76 @@ void DrawChooseLevel()
   PlayMenuMusic();
 }
 
-void HandleChooseLevel(int mx, int my, int dx, int dy, int button)
+void HandleChooseLevelSet(int mx, int my, int dx, int dy, int button)
 {
   HandleChooseTree(mx, my, dx, dy, button, &leveldir_current);
+
+  DoAnimation();
+}
+
+void DrawChooseLevelNr()
+{
+  int i;
+
+  if (level_number != NULL)
+  {
+    freeTreeInfo(level_number);
+
+    level_number = NULL;
+  }
+
+  for (i = leveldir_current->first_level; i <= leveldir_current->last_level;i++)
+  {
+    TreeInfo *ti = newTreeInfo_setDefaults(TREE_TYPE_LEVEL_NR);
+    char identifier[32], name[32];
+    int value = i;
+
+    /* temporarily load level info to get level name */
+    LoadLevelInfoOnly(i);
+
+    ti->node_top = &level_number;
+    ti->sort_priority = 10000 + value;
+
+    sprintf(identifier, "%d", value);
+    sprintf(name, "%03d: %s", value, level.name);
+
+    setString(&ti->identifier, identifier);
+    setString(&ti->name, name);
+    setString(&ti->name_sorting, name);
+
+    pushTreeInfo(&level_number, ti);
+  }
+
+  /* sort level number values to start with lowest level number */
+  sortTreeInfo(&level_number);
+
+  /* set current level number to current level number */
+  level_number_current =
+    getTreeInfoFromIdentifier(level_number, i_to_a(level_nr));
+
+  /* if that also fails, set current level number to first available level */
+  if (level_number_current == NULL)
+    level_number_current = level_number;
+
+  SetMainBackgroundImage(IMG_BACKGROUND_LEVELNR);
+
+#if 1
+  DrawChooseTree(&level_number_current);
+#else
+  DrawChooseTree(&leveldir_current);
+#endif
+
+  PlayMenuSound();
+  PlayMenuMusic();
+}
+
+void HandleChooseLevelNr(int mx, int my, int dx, int dy, int button)
+{
+#if 1
+  HandleChooseTree(mx, my, dx, dy, button, &level_number_current);
+#else
+  HandleChooseTree(mx, my, dx, dy, button, &leveldir_current);
+#endif
 
   DoAnimation();
 }
@@ -6087,21 +6223,27 @@ static void HandleScreenGadgets(struct GadgetInfo *gi)
 
     case SCREEN_CTRL_ID_SCROLL_UP:
       if (game_status == GAME_MODE_LEVELS)
-	HandleChooseLevel(0,0, 0, -1 * SCROLL_LINE, MB_MENU_MARK);
+	HandleChooseLevelSet(0,0, 0, -1 * SCROLL_LINE, MB_MENU_MARK);
+      else if (game_status == GAME_MODE_LEVELNR)
+	HandleChooseLevelNr(0,0, 0, -1 * SCROLL_LINE, MB_MENU_MARK);
       else if (game_status == GAME_MODE_SETUP)
 	HandleSetupScreen(0,0, 0, -1 * SCROLL_LINE, MB_MENU_MARK);
       break;
 
     case SCREEN_CTRL_ID_SCROLL_DOWN:
       if (game_status == GAME_MODE_LEVELS)
-	HandleChooseLevel(0,0, 0, +1 * SCROLL_LINE, MB_MENU_MARK);
+	HandleChooseLevelSet(0,0, 0, +1 * SCROLL_LINE, MB_MENU_MARK);
+      else if (game_status == GAME_MODE_LEVELNR)
+	HandleChooseLevelNr(0,0, 0, +1 * SCROLL_LINE, MB_MENU_MARK);
       else if (game_status == GAME_MODE_SETUP)
 	HandleSetupScreen(0,0, 0, +1 * SCROLL_LINE, MB_MENU_MARK);
       break;
 
     case SCREEN_CTRL_ID_SCROLL_VERTICAL:
       if (game_status == GAME_MODE_LEVELS)
-	HandleChooseLevel(0,0, 999,gi->event.item_position,MB_MENU_INITIALIZE);
+	HandleChooseLevelSet(0,0,999,gi->event.item_position,MB_MENU_INITIALIZE);
+      else if (game_status == GAME_MODE_LEVELNR)
+	HandleChooseLevelNr(0,0,999,gi->event.item_position,MB_MENU_INITIALIZE);
       else if (game_status == GAME_MODE_SETUP)
 	HandleSetupScreen(0,0, 999,gi->event.item_position,MB_MENU_INITIALIZE);
       break;

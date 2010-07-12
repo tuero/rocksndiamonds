@@ -298,7 +298,8 @@ static void LoadNativeLevelFromFileStream_SP(FILE *file, int width, int height,
   }
 }
 
-boolean LoadNativeLevel_SP(char *filename, int level_pos)
+boolean LoadNativeLevel_SP(char *filename, int level_pos,
+			   boolean level_info_only)
 {
   FILE *file;
   int i, l, x, y;
@@ -324,7 +325,8 @@ boolean LoadNativeLevel_SP(char *filename, int level_pos)
 
   if (!(file = fopen(filename, MODE_READ)))
   {
-    Error(ERR_WARN, "cannot open file '%s' -- using empty level", filename);
+    if (!level_info_only)
+      Error(ERR_WARN, "cannot open file '%s' -- using empty level", filename);
 
     return FALSE;
   }

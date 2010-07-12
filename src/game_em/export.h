@@ -735,7 +735,7 @@ extern void GameActions_EM(byte *, boolean);
 extern unsigned int InitEngineRandom_EM(long);
 
 extern void setLevelInfoToDefaults_EM();
-extern boolean LoadNativeLevel_EM(char *);
+extern boolean LoadNativeLevel_EM(char *, boolean);
 
 extern void BackToFront_EM(void);
 extern void BlitScreenToBitmap_EM(Bitmap *);

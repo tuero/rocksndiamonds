@@ -5460,6 +5460,7 @@ struct SpecialSuffixInfo special_suffix_info[NUM_SPECIAL_GFX_ARGS + 1 + 1] =
   { ".TITLE",			GFX_SPECIAL_ARG_TITLE,			},
   { ".MAIN",			GFX_SPECIAL_ARG_MAIN,			},
   { ".LEVELS",			GFX_SPECIAL_ARG_LEVELS			},
+  { ".LEVELNR",			GFX_SPECIAL_ARG_LEVELNR			},
   { ".SCORES",			GFX_SPECIAL_ARG_SCORES,			},
   { ".EDITOR",			GFX_SPECIAL_ARG_EDITOR,			},
   { ".INFO",			GFX_SPECIAL_ARG_INFO,			},

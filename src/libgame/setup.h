@@ -266,6 +266,7 @@ void sortTreeInfoBySortFunction(TreeInfo **,
 				int (*compare_function)(const void *,
 							const void *));
 void sortTreeInfo(TreeInfo **);
+void freeTreeInfo(TreeInfo *);
 
 char *getHomeDir(void);
 char *getCommonDataDir(void);

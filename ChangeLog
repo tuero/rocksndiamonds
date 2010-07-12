@@ -1,3 +1,6 @@
+2010-07-12
+	* added level selection screen (when clicking on main menu level number)
+
 2010-06-24
 	* added alternative game mode for playing with half size playfield tiles
 	* fixed another memory violation bug in the native Supaplex game engine

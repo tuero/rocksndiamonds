@@ -465,7 +465,11 @@ void HandleButton(int mx, int my, int button, int button_nr)
       break;
 
     case GAME_MODE_LEVELS:
-      HandleChooseLevel(mx, my, 0, 0, button);
+      HandleChooseLevelSet(mx, my, 0, 0, button);
+      break;
+
+    case GAME_MODE_LEVELNR:
+      HandleChooseLevelNr(mx, my, 0, 0, button);
       break;
 
     case GAME_MODE_SCORES:
@@ -871,6 +875,7 @@ void HandleKey(Key key, int key_status)
     case GAME_MODE_TITLE:
     case GAME_MODE_MAIN:
     case GAME_MODE_LEVELS:
+    case GAME_MODE_LEVELNR:
     case GAME_MODE_SETUP:
     case GAME_MODE_INFO:
     case GAME_MODE_SCORES:
@@ -883,7 +888,9 @@ void HandleKey(Key key, int key_status)
 	  else if (game_status == GAME_MODE_MAIN)
 	    HandleMainMenu(0, 0, 0, 0, MB_MENU_CHOICE);
           else if (game_status == GAME_MODE_LEVELS)
-            HandleChooseLevel(0, 0, 0, 0, MB_MENU_CHOICE);
+            HandleChooseLevelSet(0, 0, 0, 0, MB_MENU_CHOICE);
+          else if (game_status == GAME_MODE_LEVELNR)
+            HandleChooseLevelNr(0, 0, 0, 0, MB_MENU_CHOICE);
 	  else if (game_status == GAME_MODE_SETUP)
 	    HandleSetupScreen(0, 0, 0, 0, MB_MENU_CHOICE);
 	  else if (game_status == GAME_MODE_INFO)
@@ -899,7 +906,9 @@ void HandleKey(Key key, int key_status)
 	  if (game_status == GAME_MODE_TITLE)
 	    HandleTitleScreen(0, 0, 0, 0, MB_MENU_LEAVE);
           else if (game_status == GAME_MODE_LEVELS)
-            HandleChooseLevel(0, 0, 0, 0, MB_MENU_LEAVE);
+            HandleChooseLevelSet(0, 0, 0, 0, MB_MENU_LEAVE);
+          else if (game_status == GAME_MODE_LEVELNR)
+            HandleChooseLevelNr(0, 0, 0, 0, MB_MENU_LEAVE);
 	  else if (game_status == GAME_MODE_SETUP)
 	    HandleSetupScreen(0, 0, 0, 0, MB_MENU_LEAVE);
 	  else if (game_status == GAME_MODE_INFO)
@@ -910,7 +919,9 @@ void HandleKey(Key key, int key_status)
 
         case KSYM_Page_Up:
           if (game_status == GAME_MODE_LEVELS)
-            HandleChooseLevel(0, 0, 0, -1 * SCROLL_PAGE, MB_MENU_MARK);
+            HandleChooseLevelSet(0, 0, 0, -1 * SCROLL_PAGE, MB_MENU_MARK);
+          else if (game_status == GAME_MODE_LEVELNR)
+            HandleChooseLevelNr(0, 0, 0, -1 * SCROLL_PAGE, MB_MENU_MARK);
 	  else if (game_status == GAME_MODE_SETUP)
 	    HandleSetupScreen(0, 0, 0, -1 * SCROLL_PAGE, MB_MENU_MARK);
 	  else if (game_status == GAME_MODE_INFO)
@@ -921,7 +932,9 @@ void HandleKey(Key key, int key_status)
 
         case KSYM_Page_Down:
           if (game_status == GAME_MODE_LEVELS)
-            HandleChooseLevel(0, 0, 0, +1 * SCROLL_PAGE, MB_MENU_MARK);
+            HandleChooseLevelSet(0, 0, 0, +1 * SCROLL_PAGE, MB_MENU_MARK);
+          else if (game_status == GAME_MODE_LEVELNR)
+            HandleChooseLevelNr(0, 0, 0, +1 * SCROLL_PAGE, MB_MENU_MARK);
 	  else if (game_status == GAME_MODE_SETUP)
 	    HandleSetupScreen(0, 0, 0, +1 * SCROLL_PAGE, MB_MENU_MARK);
 	  else if (game_status == GAME_MODE_INFO)
@@ -1124,6 +1137,7 @@ void HandleJoystick()
     case GAME_MODE_TITLE:
     case GAME_MODE_MAIN:
     case GAME_MODE_LEVELS:
+    case GAME_MODE_LEVELNR:
     case GAME_MODE_SETUP:
     case GAME_MODE_INFO:
     {
@@ -1138,7 +1152,9 @@ void HandleJoystick()
       else if (game_status == GAME_MODE_MAIN)
 	HandleMainMenu(0,0,dx,dy, newbutton ? MB_MENU_CHOICE : MB_MENU_MARK);
       else if (game_status == GAME_MODE_LEVELS)
-        HandleChooseLevel(0,0,dx,dy, newbutton ? MB_MENU_CHOICE : MB_MENU_MARK);
+        HandleChooseLevelSet(0,0,dx,dy,newbutton?MB_MENU_CHOICE : MB_MENU_MARK);
+      else if (game_status == GAME_MODE_LEVELNR)
+        HandleChooseLevelNr(0,0,dx,dy,newbutton? MB_MENU_CHOICE : MB_MENU_MARK);
       else if (game_status == GAME_MODE_SETUP)
 	HandleSetupScreen(0,0,dx,dy, newbutton ? MB_MENU_CHOICE : MB_MENU_MARK);
       else if (game_status == GAME_MODE_INFO)

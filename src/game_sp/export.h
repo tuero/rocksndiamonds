@@ -197,7 +197,7 @@ extern unsigned int InitEngineRandom_SP(long);
 
 extern void setLevelInfoToDefaults_SP();
 extern void copyInternalEngineVars_SP();
-extern boolean LoadNativeLevel_SP(char *, int);
+extern boolean LoadNativeLevel_SP(char *, int, boolean);
 extern void SaveNativeLevel_SP(char *);
 
 extern void BackToFront_SP(void);

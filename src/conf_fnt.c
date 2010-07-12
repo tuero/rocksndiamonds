@@ -84,6 +84,10 @@ font_to_graphic[] =
     IMG_FONT_TEXT_1_LEVELS
   },
   {
+    FONT_TEXT_1,				GFX_SPECIAL_ARG_LEVELNR,
+    IMG_FONT_TEXT_1_LEVELNR
+  },
+  {
     FONT_TEXT_1,				GFX_SPECIAL_ARG_SETUP,
     IMG_FONT_TEXT_1_SETUP
   },
@@ -120,6 +124,10 @@ font_to_graphic[] =
     IMG_FONT_TEXT_2_LEVELS
   },
   {
+    FONT_TEXT_2,				GFX_SPECIAL_ARG_LEVELNR,
+    IMG_FONT_TEXT_2_LEVELNR
+  },
+  {
     FONT_TEXT_2,				GFX_SPECIAL_ARG_SETUP,
     IMG_FONT_TEXT_2_SETUP
   },
@@ -142,6 +150,10 @@ font_to_graphic[] =
   {
     FONT_TEXT_3,				GFX_SPECIAL_ARG_LEVELS,
     IMG_FONT_TEXT_3_LEVELS
+  },
+  {
+    FONT_TEXT_3,				GFX_SPECIAL_ARG_LEVELNR,
+    IMG_FONT_TEXT_3_LEVELNR
   },
   {
     FONT_TEXT_3,				GFX_SPECIAL_ARG_SETUP,
@@ -170,6 +182,10 @@ font_to_graphic[] =
   {
     FONT_TEXT_4,				GFX_SPECIAL_ARG_LEVELS,
     IMG_FONT_TEXT_4_LEVELS
+  },
+  {
+    FONT_TEXT_4,				GFX_SPECIAL_ARG_LEVELNR,
+    IMG_FONT_TEXT_4_LEVELNR
   },
   {
     FONT_TEXT_4,				GFX_SPECIAL_ARG_SETUP,

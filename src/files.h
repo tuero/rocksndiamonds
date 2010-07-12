@@ -36,6 +36,7 @@ char *getDefaultLevelFilename(int);
 void LoadLevelFromFilename(struct LevelInfo *, char *);
 void LoadLevel(int);
 void LoadLevelTemplate(int);
+void LoadLevelInfoOnly(int);
 void SaveLevel(int);
 void SaveLevelTemplate();
 void SaveNativeLevel(struct LevelInfo *);

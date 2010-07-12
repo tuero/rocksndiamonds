@@ -937,6 +937,10 @@ struct TokenIntPtrInfo image_config_vars[] =
     &border.draw_masked[GFX_SPECIAL_ARG_LEVELS]
   },
   {
+    "border.draw_masked.LEVELNR",
+    &border.draw_masked[GFX_SPECIAL_ARG_LEVELNR]
+  },
+  {
     "border.draw_masked.SCORES",
     &border.draw_masked[GFX_SPECIAL_ARG_SCORES]
   },
@@ -1161,6 +1165,14 @@ struct TokenIntPtrInfo image_config_vars[] =
     &menu.draw_yoffset[GFX_SPECIAL_ARG_LEVELS]
   },
   {
+    "menu.draw_xoffset.LEVELNR",
+    &menu.draw_xoffset[GFX_SPECIAL_ARG_LEVELNR]
+  },
+  {
+    "menu.draw_yoffset.LEVELNR",
+    &menu.draw_yoffset[GFX_SPECIAL_ARG_LEVELNR]
+  },
+  {
     "menu.draw_xoffset.SCORES",
     &menu.draw_xoffset[GFX_SPECIAL_ARG_SCORES]
   },
@@ -1355,6 +1367,10 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "menu.list_size.LEVELS",
     &menu.list_size[GFX_SPECIAL_ARG_LEVELS]
+  },
+  {
+    "menu.list_size.LEVELNR",
+    &menu.list_size[GFX_SPECIAL_ARG_LEVELNR]
   },
   {
     "menu.list_size.SCORES",

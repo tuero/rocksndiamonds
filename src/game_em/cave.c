@@ -74,7 +74,7 @@ void setLevelInfoToDefaults_EM(void)
 
 #define MAX_EM_LEVEL_SIZE		16384
 
-boolean LoadNativeLevel_EM(char *filename)
+boolean LoadNativeLevel_EM(char *filename, boolean level_info_only)
 {
   unsigned char raw_leveldata[MAX_EM_LEVEL_SIZE];
   int raw_leveldata_length;
@@ -86,7 +86,8 @@ boolean LoadNativeLevel_EM(char *filename)
 
   if (!(file = fopen(filename, MODE_READ)))
   {
-    Error(ERR_WARN, "cannot open level '%s' -- using empty level", filename);
+    if (!level_info_only)
+      Error(ERR_WARN, "cannot open level '%s' -- using empty level", filename);
 
     return FALSE;
   }

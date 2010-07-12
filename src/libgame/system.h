@@ -504,16 +504,20 @@
 #define TREE_TYPE_SOUNDS_DIR	ARTWORK_TYPE_SOUNDS
 #define TREE_TYPE_MUSIC_DIR	ARTWORK_TYPE_MUSIC
 #define TREE_TYPE_LEVEL_DIR	3
+#define TREE_TYPE_LEVEL_NR	4
 
-#define NUM_TREE_TYPES		4
+#define NUM_TREE_TYPES		5
 
 #define INFOTEXT_UNDEFINED	""
 #define INFOTEXT_GRAPHICS_DIR	"Custom Graphics"
 #define INFOTEXT_SOUNDS_DIR	"Custom Sounds"
 #define INFOTEXT_MUSIC_DIR	"Custom Music"
 #define INFOTEXT_LEVEL_DIR	"Level Sets"
+#define INFOTEXT_LEVEL_NR	"Levels"
 
-#define TREE_INFOTEXT(t)	((t) == TREE_TYPE_LEVEL_DIR ?		\
+#define TREE_INFOTEXT(t)	((t) == TREE_TYPE_LEVEL_NR ?		\
+				 INFOTEXT_LEVEL_NR :			\
+				 (t) == TREE_TYPE_LEVEL_DIR ?		\
 				 INFOTEXT_LEVEL_DIR :			\
 				 (t) == TREE_TYPE_GRAPHICS_DIR ?	\
 				 INFOTEXT_GRAPHICS_DIR :		\

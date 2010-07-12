@@ -45,7 +45,6 @@ void play_sound(int, int, int);
 void sound_play(void);
 
 int cave_convert(char *);
-boolean LoadNativeLevel_EM(char *);
 
 void game_init_vars(void);
 void game_play_init(int, char *);
