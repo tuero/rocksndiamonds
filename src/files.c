@@ -7139,7 +7139,11 @@ static void LoadLevelFromFileInfo(struct LevelInfo *level,
 
   /* if level file is invalid, restore level structure to default values */
   if (level->no_valid_file)
+  {
     setLevelInfoToDefaults(level, level_info_only);
+
+    level->no_valid_file = TRUE;	/* but keep "no valid file" flag */
+  }
 
   if (level->game_engine_type == GAME_ENGINE_TYPE_UNKNOWN)
     level->game_engine_type = GAME_ENGINE_TYPE_RND;

@@ -4636,6 +4636,17 @@ void InitGame()
   MapTapeButtons();
 #endif
 
+  if (!game.restart_level && !tape.playing)
+  {
+    LevelStats_incPlayed(level_nr);
+
+    SaveLevelSetup_SeriesInfo();
+
+#if 1
+    printf("::: PLAYING LEVEL (%d)\n", LevelStats_getPlayed(level_nr));
+#endif
+  }
+
   game.restart_level = FALSE;
 }
 
@@ -4879,6 +4890,17 @@ void GameWon()
     local_player->LevelSolved_SaveTape = tape.recording;
     local_player->LevelSolved_SaveScore = !tape.playing;
 
+    if (!tape.playing)
+    {
+      LevelStats_incSolved(level_nr);
+
+      SaveLevelSetup_SeriesInfo();
+
+#if 1
+      printf("::: LEVEL SOLVED (%d)\n", LevelStats_getSolved(level_nr));
+#endif
+    }
+
     if (tape.auto_play)		/* tape might already be stopped here */
       tape.auto_play_level_solved = TRUE;
 
@@ -5083,6 +5105,7 @@ void GameEnd()
   if (level_nr == leveldir_current->handicap_level)
   {
     leveldir_current->handicap_level++;
+
     SaveLevelSetup_SeriesInfo();
   }
 

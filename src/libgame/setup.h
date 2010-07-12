@@ -320,4 +320,11 @@ void SaveLevelSetup_LastSeries(void);
 void LoadLevelSetup_SeriesInfo(void);
 void SaveLevelSetup_SeriesInfo(void);
 
+int LevelStats_getPlayed(int);
+int LevelStats_getSolved(int);
+void LevelStats_setPlayed(int, int);
+void LevelStats_setSolved(int, int);
+void LevelStats_incPlayed(int);
+void LevelStats_incSolved(int);
+
 #endif /* MISC_H */

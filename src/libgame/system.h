@@ -316,6 +316,9 @@
 /* maximum allowed length of player name */
 #define MAX_PLAYER_NAME_LEN	10
 
+/* maximum number of levels in a level set */
+#define MAX_LEVELS		1000
+
 /* default name for empty highscore entry */
 #define EMPTY_PLAYER_NAME	"no name"
 
@@ -1159,6 +1162,12 @@ struct TextPosInfo
   int id;
 };
 
+struct LevelStats
+{
+  int played;
+  int solved;
+};
+
 
 /* ========================================================================= */
 /* exported variables                                                        */
@@ -1178,6 +1187,8 @@ extern LevelDirTree	       *leveldir_first_all;
 extern LevelDirTree	       *leveldir_first;
 extern LevelDirTree	       *leveldir_current;
 extern int			level_nr;
+
+extern struct LevelStats	level_stats[];
 
 extern Display		       *display;
 extern Visual		       *visual;

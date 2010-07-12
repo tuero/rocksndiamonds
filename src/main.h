@@ -2056,7 +2056,6 @@
 /* special definitions currently only used for custom artwork configuration */
 #define MUSIC_PREFIX_BACKGROUND		0
 #define NUM_MUSIC_PREFIXES		1
-#define MAX_LEVELS			1000
 
 /* definitions for demo animation lists */
 #define HELPANIM_LIST_NEXT		-1

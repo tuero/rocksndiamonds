@@ -4029,9 +4029,16 @@ void LoadLevelSetup_SeriesInfo()
   char *filename;
   SetupFileHash *level_setup_hash = NULL;
   char *level_subdir = leveldir_current->subdir;
+  int i;
 
   /* always start with reliable default values */
   level_nr = leveldir_current->first_level;
+
+  for (i = 0; i < MAX_LEVELS; i++)
+  {
+    LevelStats_setPlayed(i, 0);
+    LevelStats_setSolved(i, 0);
+  }
 
   checkSeriesInfo(leveldir_current);
 
@@ -4047,6 +4054,8 @@ void LoadLevelSetup_SeriesInfo()
   {
     char *token_value;
 
+    /* get last played level in this level set */
+
     token_value = getHashEntry(level_setup_hash, TOKEN_STR_LAST_PLAYED_LEVEL);
 
     if (token_value)
@@ -4058,6 +4067,8 @@ void LoadLevelSetup_SeriesInfo()
       if (level_nr > leveldir_current->last_level)
 	level_nr = leveldir_current->last_level;
     }
+
+    /* get handicap level in this level set */
 
     token_value = getHashEntry(level_setup_hash, TOKEN_STR_HANDICAP_LEVEL);
 
@@ -4075,6 +4086,26 @@ void LoadLevelSetup_SeriesInfo()
 
       leveldir_current->handicap_level = level_nr;
     }
+
+    /* get number of played and solved levels in this level set */
+
+    BEGIN_HASH_ITERATION(level_setup_hash, itr)
+    {
+      char *token = HASH_ITERATION_TOKEN(itr);
+      char *value = HASH_ITERATION_TOKEN(itr);
+
+      if (strlen(token) == 3 &&
+	  token[0] >= '0' && token[0] <= '9' &&
+	  token[1] >= '0' && token[1] <= '9' &&
+	  token[2] >= '0' && token[2] <= '9')
+      {
+	int level_nr = atoi(token);
+
+	LevelStats_setPlayed(level_nr, atoi(value));
+	LevelStats_setSolved(level_nr, atoi(strchr(value, ' ')));
+      }
+    }
+    END_HASH_ITERATION(hash, itr)
 
     checkSetupFileHashIdentifier(level_setup_hash, filename,
 				 getCookie("LEVELSETUP"));
@@ -4094,6 +4125,7 @@ void SaveLevelSetup_SeriesInfo()
   char *level_nr_str = int2str(level_nr, 0);
   char *handicap_level_str = int2str(leveldir_current->handicap_level, 0);
   FILE *file;
+  int i;
 
   /* ----------------------------------------------------------------------- */
   /* ~/.<program>/levelsetup/<level series>/levelsetup.conf                  */
@@ -4114,12 +4146,62 @@ void SaveLevelSetup_SeriesInfo()
 						 getCookie("LEVELSETUP")));
   fprintf(file, "%s\n", getFormattedSetupEntry(TOKEN_STR_LAST_PLAYED_LEVEL,
 					       level_nr_str));
-  fprintf(file, "%s\n", getFormattedSetupEntry(TOKEN_STR_HANDICAP_LEVEL,
-					       handicap_level_str));
+  fprintf(file, "%s\n\n", getFormattedSetupEntry(TOKEN_STR_HANDICAP_LEVEL,
+						 handicap_level_str));
+
+  for (i = leveldir_current->first_level; i <= leveldir_current->last_level;
+       i++)
+  {
+    if (LevelStats_getPlayed(i) > 0 ||
+	LevelStats_getSolved(i) > 0)
+    {
+      char token[16];
+      char value[16];
+
+      sprintf(token, "%03d", i);
+      sprintf(value, "%d %d", LevelStats_getPlayed(i), LevelStats_getSolved(i));
+
+      fprintf(file, "%s\n", getFormattedSetupEntry(token, value));
+    }
+  }
 
   fclose(file);
 
   SetFilePermissions(filename, PERMS_PRIVATE);
 
   free(filename);
+}
+
+int LevelStats_getPlayed(int nr)
+{
+  return (nr >= 0 && nr < MAX_LEVELS ? level_stats[nr].played : 0);
+}
+
+int LevelStats_getSolved(int nr)
+{
+  return (nr >= 0 && nr < MAX_LEVELS ? level_stats[nr].solved : 0);
+}
+
+void LevelStats_setPlayed(int nr, int value)
+{
+  if (nr >= 0 && nr < MAX_LEVELS)
+    level_stats[nr].played = value;
+}
+
+void LevelStats_setSolved(int nr, int value)
+{
+  if (nr >= 0 && nr < MAX_LEVELS)
+    level_stats[nr].solved = value;
+}
+
+void LevelStats_incPlayed(int nr)
+{
+  if (nr >= 0 && nr < MAX_LEVELS)
+    level_stats[nr].played++;
+}
+
+void LevelStats_incSolved(int nr)
+{
+  if (nr >= 0 && nr < MAX_LEVELS)
+    level_stats[nr].solved++;
 }

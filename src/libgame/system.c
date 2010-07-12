@@ -46,6 +46,8 @@ LevelDirTree	       *leveldir_first = NULL;
 LevelDirTree	       *leveldir_current = NULL;
 int			level_nr;
 
+struct LevelStats	level_stats[MAX_LEVELS];
+
 Display		       *display = NULL;
 Visual		       *visual = NULL;
 int			screen = 0;

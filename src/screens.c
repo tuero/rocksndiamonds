@@ -3767,9 +3767,13 @@ void DrawChooseLevelNr()
 
     ti->node_top = &level_number;
     ti->sort_priority = 10000 + value;
+    ti->color = (level.no_valid_file ? FC_BLUE :
+		 LevelStats_getSolved(i) ? FC_GREEN :
+		 LevelStats_getPlayed(i) ? FC_YELLOW : FC_RED);
 
     sprintf(identifier, "%d", value);
-    sprintf(name, "%03d: %s", value, level.name);
+    sprintf(name, "%03d: %s", value,
+	    (level.no_valid_file ? "(empty)" : level.name));
 
     setString(&ti->identifier, identifier);
     setString(&ti->name, name);

@@ -1,5 +1,7 @@
 2010-07-12
 	* added level selection screen (when clicking on main menu level number)
+	* added level tracing (played, solved) for use in level selection screen
+	  (to display already played or solved levels in different font color)
 
 2010-06-24
 	* added alternative game mode for playing with half size playfield tiles
