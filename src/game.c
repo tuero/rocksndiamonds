@@ -4485,7 +4485,9 @@ void InitGame()
 		local_player->jy - MIDPOSY);
   }
 
+#if 0
   printf("::: %d, %d (initial)\n", scroll_x, scroll_y);
+#endif
 
 #if 0
   /* do not use PLAYING mask for fading out from main screen */
@@ -4642,7 +4644,7 @@ void InitGame()
 
     SaveLevelSetup_SeriesInfo();
 
-#if 1
+#if 0
     printf("::: PLAYING LEVEL (%d)\n", LevelStats_getPlayed(level_nr));
 #endif
   }
@@ -4896,7 +4898,7 @@ void GameWon()
 
       SaveLevelSetup_SeriesInfo();
 
-#if 1
+#if 0
       printf("::: LEVEL SOLVED (%d)\n", LevelStats_getSolved(level_nr));
 #endif
     }

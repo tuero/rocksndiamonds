@@ -3773,7 +3773,7 @@ void DrawChooseLevelNr()
 
     sprintf(identifier, "%d", value);
     sprintf(name, "%03d: %s", value,
-	    (level.no_valid_file ? "(empty)" : level.name));
+	    (level.no_valid_file ? "(no file)" : level.name));
 
     setString(&ti->identifier, identifier);
     setString(&ti->name, name);

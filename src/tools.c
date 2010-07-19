@@ -323,13 +323,6 @@ void BlitScreenToBitmap(Bitmap *target_bitmap)
   fy += (ScreenMovDir & (MV_UP | MV_DOWN)    ? ScreenGfxPos : 0);
 #endif
 
-  /* !!! THIS WORKS !!! */
-
-  printf("::: (%d, %d) [(%d / %d, %d / %d)]\n",
-	 scroll_x, scroll_y,
-	 SBX_Left, SBX_Right,
-	 SBY_Upper, SBY_Lower);
-
   ffx = (scroll_x - SBX_Left)  * TILEX_VAR + dx_var;
   ffy = (scroll_y - SBY_Upper) * TILEY_VAR + dy_var;
 
@@ -338,11 +331,11 @@ void BlitScreenToBitmap(Bitmap *target_bitmap)
     if (ffx < SBX_Right * TILEX_VAR + TILEX_VAR / 2 + TILEX_VAR)
       fx += dx_var - MIN(ffx, TILEX_VAR / 2) + TILEX_VAR;
     else
-      fx += (dx > 0 ? TILEX_VAR : 0);
+      fx += (dx_var > 0 ? TILEX_VAR : 0);
   }
   else
   {
-    fx += dx;
+    fx += dx_var;
   }
 
   if (EVEN(SCR_FIELDY))
@@ -350,12 +343,20 @@ void BlitScreenToBitmap(Bitmap *target_bitmap)
     if (ffy < SBY_Lower * TILEY_VAR + TILEY_VAR / 2 + TILEY_VAR)
       fy += dy_var - MIN(ffy, TILEY_VAR / 2) + TILEY_VAR;
     else
-      fy += (dy > 0 ? TILEY_VAR : 0);
+      fy += (dy_var > 0 ? TILEY_VAR : 0);
   }
   else
   {
-    fy += dy;
+    fy += dy_var;
   }
+
+#if 0
+  printf("::: (%d, %d) [(%d / %d, %d / %d)] => %d, %d\n",
+	 scroll_x, scroll_y,
+	 SBX_Left, SBX_Right,
+	 SBY_Upper, SBY_Lower,
+	 fx, fy);
+#endif
 
   if (border.draw_masked[GAME_MODE_PLAYING])
   {
@@ -393,6 +394,13 @@ void BackToFront()
 
   if (redraw_mask & REDRAW_TILES && redraw_tiles > REDRAWTILES_THRESHOLD)
     redraw_mask |= REDRAW_FIELD;
+
+#if 0
+  /* !!! TEST ONLY !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1 */
+  /* (force full redraw) */
+  if (game_status == GAME_MODE_PLAYING)
+    redraw_mask |= REDRAW_FIELD;
+#endif
 
   if (redraw_mask & REDRAW_FIELD)
     redraw_mask &= ~REDRAW_TILES;
@@ -596,18 +604,22 @@ void BackToFront()
       int sy = SY; // + (EVEN(SCR_FIELDY) ? TILEY_VAR / 2 : 0);
 
       int dx = 0, dy = 0;
+      int dx_var = dx * TILESIZE_VAR / TILESIZE;
+      int dy_var = dy * TILESIZE_VAR / TILESIZE;
       int ffx, ffy;
       int fx = FX, fy = FY;
 
-      ffx = (scroll_x - SBX_Left)  * TILEX_VAR + dx * TILESIZE_VAR / TILESIZE;
-      ffy = (scroll_y - SBY_Upper) * TILEY_VAR + dy * TILESIZE_VAR / TILESIZE;
+      int scr_fieldx = SCR_FIELDX + (EVEN(SCR_FIELDX) ? 2 : 0);
+      int scr_fieldy = SCR_FIELDY + (EVEN(SCR_FIELDY) ? 2 : 0);
+
+      ffx = (scroll_x - SBX_Left)  * TILEX_VAR + dx_var;
+      ffy = (scroll_y - SBY_Upper) * TILEY_VAR + dy_var;
 
       if (EVEN(SCR_FIELDX))
       {
 	if (ffx < SBX_Right * TILEX_VAR + TILEX_VAR / 2 + TILEX_VAR)
 	{
-	  fx = fx + dx * TILESIZE_VAR / TILESIZE - MIN(ffx, TILEX_VAR / 2) +
-	    TILEX_VAR;
+	  fx += dx_var - MIN(ffx, TILEX_VAR / 2) + TILEX_VAR;
 
 	  if (fx % TILEX_VAR)
 	    sx -= TILEX_VAR / 2;
@@ -616,7 +628,7 @@ void BackToFront()
 	}
 	else
 	{
-	  fx = fx - (dx <= 0 ? TILEX_VAR : 0) + TILEX_VAR;
+	  fx += (dx_var > 0 ? TILEX_VAR : 0);
 	}
       }
 
@@ -624,8 +636,7 @@ void BackToFront()
       {
 	if (ffy < SBY_Lower * TILEY_VAR + TILEY_VAR / 2 + TILEY_VAR)
 	{
-	  fy = fy + dy * TILESIZE_VAR / TILESIZE - MIN(ffy, TILEY_VAR / 2) +
-	    TILEY_VAR;
+	  fy += dy_var - MIN(ffy, TILEY_VAR / 2) + TILEY_VAR;
 
 	  if (fy % TILEY_VAR)
 	    sy -= TILEY_VAR / 2;
@@ -634,12 +645,16 @@ void BackToFront()
 	}
 	else
 	{
-	  fy = fy - (dy <= 0 ? TILEY_VAR : 0) + TILEY_VAR;
+	  fy += (dy_var > 0 ? TILEY_VAR : 0);
 	}
       }
 
-      for (x = 0; x < SCR_FIELDX; x++)
-	for (y = 0 ; y < SCR_FIELDY; y++)
+#if 0
+      printf("::: %d, %d, %d, %d\n", sx, sy, SCR_FIELDX, SCR_FIELDY);
+#endif
+
+      for (x = 0; x < scr_fieldx; x++)
+	for (y = 0 ; y < scr_fieldy; y++)
 	  if (redraw[redraw_x1 + x][redraw_y1 + y])
 	    BlitBitmap(buffer, window,
 		       FX + x * TILEX_VAR, FY + y * TILEY_VAR,

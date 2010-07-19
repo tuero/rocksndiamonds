@@ -4092,7 +4092,7 @@ void LoadLevelSetup_SeriesInfo()
     BEGIN_HASH_ITERATION(level_setup_hash, itr)
     {
       char *token = HASH_ITERATION_TOKEN(itr);
-      char *value = HASH_ITERATION_TOKEN(itr);
+      char *value = HASH_ITERATION_VALUE(itr);
 
       if (strlen(token) == 3 &&
 	  token[0] >= '0' && token[0] <= '9' &&
@@ -4101,8 +4101,13 @@ void LoadLevelSetup_SeriesInfo()
       {
 	int level_nr = atoi(token);
 
-	LevelStats_setPlayed(level_nr, atoi(value));
-	LevelStats_setSolved(level_nr, atoi(strchr(value, ' ')));
+	if (value != NULL)
+	  LevelStats_setPlayed(level_nr, atoi(value));	/* read 1st column */
+
+	value = strchr(value, ' ');
+
+	if (value != NULL)
+	  LevelStats_setSolved(level_nr, atoi(value));	/* read 2nd column */
       }
     }
     END_HASH_ITERATION(hash, itr)
