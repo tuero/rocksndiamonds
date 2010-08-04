@@ -1,3 +1,6 @@
+2010-08-04
+	* fixed wrong argument order in DrawTextBuffer() in gadgets.c
+
 2010-07-19
 	* fixed some problems with half tile size and even tile sized playfields
 
