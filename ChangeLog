@@ -1,5 +1,10 @@
+2010-11-19
+	* fixed nasty bug (affecting crumbled graphics) after adding new special
+	  graphics suffix ".TAPE" (and messing some things up in src/main.c)
+
 2010-08-04
 	* fixed wrong argument order in DrawTextBuffer() in gadgets.c
+	  (this caused fonts in envelope config in level editor being invisible)
 
 2010-07-19
 	* fixed some problems with half tile size and even tile sized playfields
