@@ -2715,7 +2715,7 @@ static struct
     GADGET_ID_CONTINUOUS_SNAPPING,	GADGET_ID_NONE,
     &level.continuous_snapping,
     NULL,
-    "continuos snapping",		"use snapping without releasing key"
+    "continuous snapping",		"use snapping without releasing key"
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(7),
