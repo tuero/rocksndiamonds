@@ -1448,7 +1448,7 @@ static void gotoTopLevelDir()
 
 void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
 {
-  static unsigned long title_delay = 0;
+  static unsigned int title_delay = 0;
   static int title_screen_nr = 0;
   static int last_sound = -1, last_music = -1;
   boolean return_to_main_menu = FALSE;
@@ -2335,7 +2335,7 @@ void DrawInfoScreen_Elements()
 
 void HandleInfoScreen_Elements(int button)
 {
-  static unsigned long info_delay = 0;
+  static unsigned int info_delay = 0;
   static int num_anims;
   static int num_pages;
   static int page;
@@ -5913,7 +5913,7 @@ static struct
 static void CreateScreenMenubuttons()
 {
   struct GadgetInfo *gi;
-  unsigned long event_mask;
+  unsigned int event_mask;
   int i;
 
   for (i = 0; i < NUM_SCREEN_MENUBUTTONS; i++)
@@ -5966,7 +5966,7 @@ static void CreateScreenMenubuttons()
 static void CreateScreenScrollbuttons()
 {
   struct GadgetInfo *gi;
-  unsigned long event_mask;
+  unsigned int event_mask;
   int i;
 
   /* these values are not constant, but can change at runtime */
@@ -6046,7 +6046,7 @@ static void CreateScreenScrollbars()
     int gd_x1, gd_x2, gd_y1, gd_y2;
     struct GadgetInfo *gi;
     int items_max, items_visible, item_position;
-    unsigned long event_mask;
+    unsigned int event_mask;
     int num_page_entries = NUM_MENU_ENTRIES_ON_SCREEN;
     int id = scrollbar_info[i].gadget_id;
 

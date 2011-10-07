@@ -168,7 +168,7 @@ boolean getTokenValueFromString(char *string, char **token, char **value)
 /* ------------------------------------------------------------------------- */
 
 #if defined(PLATFORM_MSDOS)
-volatile unsigned long counter = 0;
+volatile unsigned int counter = 0;
 
 void increment_counter()
 {
@@ -185,7 +185,7 @@ END_OF_FUNCTION(increment_counter);
 #if 1
 
 #ifdef TARGET_SDL
-static unsigned long getCurrentMS()
+static unsigned int getCurrentMS()
 {
   return SDL_GetTicks();
 }
@@ -193,7 +193,7 @@ static unsigned long getCurrentMS()
 #else /* !TARGET_SDL */
 
 #if defined(PLATFORM_UNIX)
-static unsigned long getCurrentMS()
+static unsigned int getCurrentMS()
 {
   struct timeval current_time;
 
@@ -204,10 +204,10 @@ static unsigned long getCurrentMS()
 #endif /* PLATFORM_UNIX */
 #endif /* !TARGET_SDL */
 
-static unsigned long mainCounter(int mode)
+static unsigned int mainCounter(int mode)
 {
-  static unsigned long base_ms = 0;
-  unsigned long current_ms;
+  static unsigned int base_ms = 0;
+  unsigned int current_ms;
 
   /* get current system milliseconds */
   current_ms = getCurrentMS();
@@ -223,11 +223,11 @@ static unsigned long mainCounter(int mode)
 #else
 
 #ifdef TARGET_SDL
-static unsigned long mainCounter(int mode)
+static unsigned int mainCounter(int mode)
 {
-  static unsigned long base_ms = 0;
-  unsigned long current_ms;
-  unsigned long counter_ms;
+  static unsigned int base_ms = 0;
+  unsigned int current_ms;
+  unsigned int counter_ms;
 
   current_ms = SDL_GetTicks();
 
@@ -243,11 +243,11 @@ static unsigned long mainCounter(int mode)
 #else /* !TARGET_SDL */
 
 #if defined(PLATFORM_UNIX)
-static unsigned long mainCounter(int mode)
+static unsigned int mainCounter(int mode)
 {
   static struct timeval base_time = { 0, 0 };
   struct timeval current_time;
-  unsigned long counter_ms;
+  unsigned int counter_ms;
 
   gettimeofday(&current_time, NULL);
 
@@ -276,7 +276,7 @@ void InitCounter()		/* set counter back to zero */
 #endif
 }
 
-unsigned long Counter()	/* get milliseconds since last call of InitCounter() */
+unsigned int Counter()	/* get milliseconds since last call of InitCounter() */
 {
 #if !defined(PLATFORM_MSDOS)
   return mainCounter(READ_COUNTER);
@@ -285,7 +285,7 @@ unsigned long Counter()	/* get milliseconds since last call of InitCounter() */
 #endif
 }
 
-static void sleep_milliseconds(unsigned long milliseconds_delay)
+static void sleep_milliseconds(unsigned int milliseconds_delay)
 {
   boolean do_busy_waiting = (milliseconds_delay < 5 ? TRUE : FALSE);
 
@@ -296,7 +296,7 @@ static void sleep_milliseconds(unsigned long milliseconds_delay)
        therefore it's better to do a short interval of busy waiting
        to get our sleeping time more accurate */
 
-    unsigned long base_counter = Counter(), actual_counter = Counter();
+    unsigned int base_counter = Counter(), actual_counter = Counter();
 
     while (actual_counter < base_counter + milliseconds_delay &&
 	   actual_counter >= base_counter)
@@ -320,15 +320,15 @@ static void sleep_milliseconds(unsigned long milliseconds_delay)
   }
 }
 
-void Delay(unsigned long delay)	/* Sleep specified number of milliseconds */
+void Delay(unsigned int delay)	/* Sleep specified number of milliseconds */
 {
   sleep_milliseconds(delay);
 }
 
-boolean FrameReached(unsigned long *frame_counter_var,
-		     unsigned long frame_delay)
+boolean FrameReached(unsigned int *frame_counter_var,
+		     unsigned int frame_delay)
 {
-  unsigned long actual_frame_counter = FrameCounter;
+  unsigned int actual_frame_counter = FrameCounter;
 
   if (actual_frame_counter >= *frame_counter_var &&
       actual_frame_counter < *frame_counter_var + frame_delay)
@@ -339,10 +339,10 @@ boolean FrameReached(unsigned long *frame_counter_var,
   return TRUE;
 }
 
-boolean DelayReached(unsigned long *counter_var,
-		     unsigned long delay)
+boolean DelayReached(unsigned int *counter_var,
+		     unsigned int delay)
 {
-  unsigned long actual_counter = Counter();
+  unsigned int actual_counter = Counter();
 
   if (actual_counter >= *counter_var &&
       actual_counter < *counter_var + delay)
@@ -353,9 +353,9 @@ boolean DelayReached(unsigned long *counter_var,
   return TRUE;
 }
 
-void WaitUntilDelayReached(unsigned long *counter_var, unsigned long delay)
+void WaitUntilDelayReached(unsigned int *counter_var, unsigned int delay)
 {
-  unsigned long actual_counter;
+  unsigned int actual_counter;
 
   while (1)
   {
@@ -376,12 +376,12 @@ void WaitUntilDelayReached(unsigned long *counter_var, unsigned long delay)
 /* random generator functions                                                */
 /* ------------------------------------------------------------------------- */
 
-unsigned int init_random_number(int nr, long seed)
+unsigned int init_random_number(int nr, int seed)
 {
   if (seed == NEW_RANDOMIZE)
   {
     /* default random seed */
-    seed = (long)time(NULL);			// seconds since the epoch
+    seed = (int)time(NULL);			// seconds since the epoch
 
 #if !defined(PLATFORM_WIN32)
     /* add some more randomness */
@@ -389,12 +389,12 @@ unsigned int init_random_number(int nr, long seed)
 
     gettimeofday(&current_time, NULL);
 
-    seed += (long)current_time.tv_usec;		// microseconds since the epoch
+    seed += (int)current_time.tv_usec;		// microseconds since the epoch
 #endif
 
 #if defined(TARGET_SDL)
     /* add some more randomness */
-    seed += (long)SDL_GetTicks();		// milliseconds since SDL init
+    seed += (int)SDL_GetTicks();		// milliseconds since SDL init
 #endif
 
 #if 1
@@ -426,7 +426,7 @@ static char *get_corrected_real_name(char *real_name)
   char *to_ptr   = real_name_new;
 
   /* copy the name string, but not more than MAX_USERNAME_LEN characters */
-  while (*from_ptr && (long)(to_ptr - real_name_new) < MAX_USERNAME_LEN - 1)
+  while (*from_ptr && (int)(to_ptr - real_name_new) < MAX_USERNAME_LEN - 1)
   {
     /* the name field read from "passwd" file may also contain additional
        user information, separated by commas, which will be removed here */
@@ -458,7 +458,7 @@ char *getLoginName()
 #if defined(PLATFORM_WIN32)
   if (login_name == NULL)
   {
-    unsigned long buffer_size = MAX_USERNAME_LEN + 1;
+    unsigned int buffer_size = MAX_USERNAME_LEN + 1;
     login_name = checked_malloc(buffer_size);
 
     if (GetUserName(login_name, &buffer_size) == 0)
@@ -487,7 +487,7 @@ char *getRealName()
   if (real_name == NULL)
   {
     static char buffer[MAX_USERNAME_LEN + 1];
-    unsigned long buffer_size = MAX_USERNAME_LEN + 1;
+    unsigned int buffer_size = MAX_USERNAME_LEN + 1;
 
     if (GetUserName(buffer, &buffer_size) != 0)
       real_name = get_corrected_real_name(buffer);
@@ -890,7 +890,7 @@ void GetOptions(char *argv[], void (*print_usage_function)(void))
       options.special_flags = getStringCopy(&option[2]);
 #else
       char *flags_string = &option[2];
-      unsigned long flags_value;
+      unsigned int flags_value;
 
       if (*flags_string == '\0')
 	Error(ERR_EXIT_HELP, "empty flag ignored");
@@ -1024,7 +1024,7 @@ void Error(int mode, char *format, ...)
 /* checked memory allocation and freeing functions                           */
 /* ------------------------------------------------------------------------- */
 
-void *checked_malloc(unsigned long size)
+void *checked_malloc(unsigned int size)
 {
   void *ptr;
 
@@ -1036,7 +1036,7 @@ void *checked_malloc(unsigned long size)
   return ptr;
 }
 
-void *checked_calloc(unsigned long size)
+void *checked_calloc(unsigned int size)
 {
   void *ptr;
 
@@ -1048,7 +1048,7 @@ void *checked_calloc(unsigned long size)
   return ptr;
 }
 
-void *checked_realloc(void *ptr, unsigned long size)
+void *checked_realloc(void *ptr, unsigned int size)
 {
   ptr = realloc(ptr, size);
 
@@ -1064,7 +1064,7 @@ void checked_free(void *ptr)
     free(ptr);
 }
 
-void clear_mem(void *ptr, unsigned long size)
+void clear_mem(void *ptr, unsigned int size)
 {
 #if defined(PLATFORM_WIN32)
   /* for unknown reason, memset() sometimes crashes when compiled with MinGW */
@@ -1256,7 +1256,7 @@ int putFileVersion(FILE *file, int version)
   return 4;
 }
 
-void ReadBytesFromFile(FILE *file, byte *buffer, unsigned long bytes)
+void ReadBytesFromFile(FILE *file, byte *buffer, unsigned int bytes)
 {
   int i;
 
@@ -1264,7 +1264,7 @@ void ReadBytesFromFile(FILE *file, byte *buffer, unsigned long bytes)
     buffer[i] = fgetc(file);
 }
 
-void WriteBytesToFile(FILE *file, byte *buffer, unsigned long bytes)
+void WriteBytesToFile(FILE *file, byte *buffer, unsigned int bytes)
 {
   int i;
 
@@ -1272,13 +1272,13 @@ void WriteBytesToFile(FILE *file, byte *buffer, unsigned long bytes)
     fputc(buffer[i], file);
 }
 
-void ReadUnusedBytesFromFile(FILE *file, unsigned long bytes)
+void ReadUnusedBytesFromFile(FILE *file, unsigned int bytes)
 {
   while (bytes-- && !feof(file))
     fgetc(file);
 }
 
-void WriteUnusedBytesToFile(FILE *file, unsigned long bytes)
+void WriteUnusedBytesToFile(FILE *file, unsigned int bytes)
 {
   while (bytes--)
     fputc(0, file);
@@ -1475,7 +1475,7 @@ void translate_keyname(Key *keysym, char **x11name, char **name, int mode)
       while (translate_key[++i].x11name);
 
       if (!translate_key[i].x11name)
-	sprintf(name_buffer, "0x%04lx", (unsigned long)key);
+	sprintf(name_buffer, "0x%04x", (unsigned int)key);
     }
 
     *x11name = name_buffer;
@@ -1552,7 +1552,7 @@ void translate_keyname(Key *keysym, char **x11name, char **name, int mode)
     }
     else if (strPrefix(name_ptr, "0x"))
     {
-      unsigned long value = 0;
+      unsigned int value = 0;
 
       name_ptr += 2;
 
@@ -3148,7 +3148,7 @@ void debug_print_timestamp(int counter_nr, char *message)
 
   counter[counter_nr][0] = Counter_Microseconds();
 #else
-  static long counter[DEBUG_NUM_TIMESTAMPS][2];
+  static int counter[DEBUG_NUM_TIMESTAMPS][2];
   char *unit = "s";
 
   counter[counter_nr][0] = Counter();

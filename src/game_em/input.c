@@ -6,7 +6,7 @@
 #include "main_em.h"
 
 
-unsigned long RandomEM;
+unsigned int RandomEM;
 
 struct LEVEL lev;
 struct PLAYER ply[MAX_PLAYERS];

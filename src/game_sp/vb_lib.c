@@ -23,7 +23,7 @@ void *REDIM_1D(int data_size, int first_data_pos, int last_data_pos)
 }
 #endif
 
-long MyGetTickCount()
+int MyGetTickCount()
 {
   return random_linux_libc(RANDOM_SIMPLE);
 }

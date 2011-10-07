@@ -83,13 +83,13 @@ void InitGfxBuffers_SP()
   ReCreateBitmap(&bitmap_db_field_sp, FXSIZE, FYSIZE, DEFAULT_DEPTH);
 }
 
-unsigned int InitEngineRandom_SP(long seed)
+unsigned int InitEngineRandom_SP(int seed)
 {
   if (seed == NEW_RANDOMIZE)
   {
     subRandomize();
 
-    seed = (long)RandomSeed;
+    seed = (int)RandomSeed;
   }
 
   RandomSeed = (short)seed;

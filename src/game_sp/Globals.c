@@ -15,7 +15,7 @@ int FieldHeight;	// standard size = 24
 int HeaderSize;		// standard size = 96
 int FieldMax, LevelMax;
 #if 0
-long FileMax;
+int FileMax;
 #endif
 
 #if 1
@@ -48,7 +48,7 @@ int MurphyPosIndex, MurphyXPos, MurphyYPos;
 int MurphyScreenXPos, MurphyScreenYPos;
 int MurphyExplodePos, SplitMoveFlag, RedDiskReleaseMurphyPos;
 int KillMurphyFlag, MurphyMoveCounter;
-long YawnSleepCounter;
+int YawnSleepCounter;
 int MurphyVarFaceLeft;
 int ScratchGravity, GravityFlag;
 int RedDiskReleaseFlag, MovingPictureSequencePhase;

@@ -15,6 +15,6 @@
 extern void *REDIM_1D(int, int, int);
 #endif
 
-extern long MyGetTickCount();
+extern int MyGetTickCount();
 
 #endif /* VB_LIB_H */

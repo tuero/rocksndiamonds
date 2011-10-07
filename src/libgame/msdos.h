@@ -555,7 +555,7 @@
 #define BlackPixel(dpy, scr) 	  (ScreenOfDisplay(dpy,scr)->black_pixel)
 #define WhitePixel(dpy, scr) 	  (ScreenOfDisplay(dpy,scr)->white_pixel)
 #define RootWindow(dpy, scr) 	  (ScreenOfDisplay(dpy,scr)->root)
-#define AllPlanes 		  ((unsigned long)~0L)
+#define AllPlanes 		  ((unsigned int)~0L)
 
 #define DefaultVisual(dpy, scr)	  (NULL)
 #define DefaultDepth(dpy, scr)	  (NULL)
@@ -565,8 +565,8 @@
 #define XGetPixel(ximage, x, y) \
         ((*((ximage)->f.get_pixel))((ximage), (x), (y)))
 
-typedef unsigned long Pixel;	/* Index into colormap */
-typedef unsigned long XID;
+typedef unsigned int Pixel;	/* Index into colormap */
+typedef unsigned int XID;
 typedef XID Window;
 typedef XID Drawable;
 typedef XID Pixmap;
@@ -574,9 +574,9 @@ typedef XID Colormap;
 typedef XID KeySym;
 typedef XID GContext;
 typedef struct _XDisplay Display;
-typedef long Visual;
-typedef long XVisualInfo;
-typedef long Atom;
+typedef int Visual;
+typedef int XVisualInfo;
+typedef int Atom;
 typedef int Status;
 typedef int Bool;
 typedef int XComposeStatus;	/* we don't need the real type */
@@ -590,8 +590,8 @@ typedef struct
 {
   Colormap cmap;		/* default color map */
   Window root;			/* root window id */
-  unsigned long white_pixel;	/* white pixel value */
-  unsigned long black_pixel;	/* black pixel value */
+  unsigned int white_pixel;	/* white pixel value */
+  unsigned int black_pixel;	/* black pixel value */
   int x;
   int y;
   unsigned int width;
@@ -610,13 +610,13 @@ typedef struct _XImage
 {
   struct funcs
   {
-    unsigned long (*get_pixel) (struct _XImage *, int, int);
+    unsigned int (*get_pixel) (struct _XImage *, int, int);
   } f;
 } XImage;
 
 typedef struct
 {
-  long flags;		/* marks which fields in this structure are defined */
+  int flags;		/* marks which fields in this structure are defined */
   int width, height;	/* should set so old wm's don't mess up */
   int min_width, min_height;
   int max_width, max_height;
@@ -624,7 +624,7 @@ typedef struct
 
 typedef struct
 {
-  long flags;		/* marks which fields in this structure are defined */
+  int flags;		/* marks which fields in this structure are defined */
   Bool input;		/* does this application rely on the window manager to
 			   get keyboard input? */
   int initial_state;	/* see below */
@@ -645,13 +645,13 @@ typedef struct
 
 typedef struct
 {
-  unsigned long foreground;	/* foreground pixel */
-  unsigned long background;	/* background pixel */
+  unsigned int foreground;	/* foreground pixel */
+  unsigned int background;	/* background pixel */
   Bool graphics_exposures;	/* boolean, should exposures be generated */
   Pixmap clip_mask;		/* bitmap clipping; other calls for rects */
   int clip_x_origin;		/* x origin for clipping */
   int clip_y_origin;		/* y origin for clipping */
-  unsigned long value_mask;
+  unsigned int value_mask;
   int line_width;		/* line width */
   int line_style;		/* LineSolid, LineOnOffDash, LineDoubleDash */
   int cap_style;		/* CapNotLast, CapButt, 
@@ -711,10 +711,10 @@ void XMapWindow(Display *, Window);
 Display *XOpenDisplay(char *);
 Window XCreateSimpleWindow(Display *, Window, int, int,
 			   unsigned int, unsigned int, unsigned int,
-			   unsigned long, unsigned long);
+			   unsigned int, unsigned int);
 Status XStringListToTextProperty(char **, int, XTextProperty *);
 void XFree(void *);
-GC XCreateGC(Display *, Drawable, unsigned long, XGCValues *);
+GC XCreateGC(Display *, Drawable, unsigned int, XGCValues *);
 void XSetClipMask(Display *, GC, Pixmap);
 void XSetClipOrigin(Display *, GC, int, int);
 void XFillRectangle(Display *, Drawable, GC, int, int,
@@ -735,7 +735,7 @@ void XNextEvent(Display *, XEvent *);
 int XPending(Display *);
 KeySym XLookupKeysym(XKeyEvent *, int);
 int XLookupString(XKeyEvent *, char *, int, KeySym *, XComposeStatus *);
-void XSetForeground(Display *, GC, unsigned long);
+void XSetForeground(Display *, GC, unsigned int);
 void XDrawLine(Display *, Drawable, GC, int, int, int, int);
 void XDestroyImage(XImage *);
 void XDestroyWindow(Display *, Window);

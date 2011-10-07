@@ -9555,8 +9555,8 @@ void AmoebeUmwandelnBD(int ax, int ay, int new_element)
 
 void AmoebeWaechst(int x, int y)
 {
-  static unsigned long sound_delay = 0;
-  static unsigned long sound_delay_value = 0;
+  static unsigned int sound_delay = 0;
+  static unsigned int sound_delay_value = 0;
 
   if (!MovDelay[x][y])		/* start new growing cycle */
   {
@@ -9591,8 +9591,8 @@ void AmoebeWaechst(int x, int y)
 
 void AmoebaDisappearing(int x, int y)
 {
-  static unsigned long sound_delay = 0;
-  static unsigned long sound_delay_value = 0;
+  static unsigned int sound_delay = 0;
+  static unsigned int sound_delay_value = 0;
 
   if (!MovDelay[x][y])		/* start new shrinking cycle */
   {
@@ -12303,9 +12303,9 @@ void AdvanceFrameAndPlayerCounters(int player_nr)
 }
 
 void StartGameActions(boolean init_network_game, boolean record_tape,
-		      long random_seed)
+		      int random_seed)
 {
-  unsigned long new_random_seed = InitRND(random_seed);
+  unsigned int new_random_seed = InitRND(random_seed);
 
   if (record_tape)
     TapeStartRecording(new_random_seed);
@@ -12324,8 +12324,8 @@ void StartGameActions(boolean init_network_game, boolean record_tape,
 
 void GameActions()
 {
-  static unsigned long game_frame_delay = 0;
-  unsigned long game_frame_delay_value;
+  static unsigned int game_frame_delay = 0;
+  unsigned int game_frame_delay_value;
   byte *recorded_player_action;
   byte summarized_player_action = 0;
   byte tape_action[MAX_PLAYERS];
@@ -13093,7 +13093,7 @@ void GameActions_RND()
   /* new experimental amoeba growth stuff */
   if (!(FrameCounter % 8))
   {
-    static unsigned long random = 1684108901;
+    static unsigned int random = 1684108901;
 
     for (i = 0; i < level.amoeba_speed * 28 / 8; i++)
     {
@@ -13277,9 +13277,9 @@ void GameActions_RND()
 
   if (options.debug)			/* calculate frames per second */
   {
-    static unsigned long fps_counter = 0;
+    static unsigned int fps_counter = 0;
     static int fps_frames = 0;
-    unsigned long fps_delay_ms = Counter() - fps_counter;
+    unsigned int fps_delay_ms = Counter() - fps_counter;
 
     fps_frames++;
 
@@ -13710,7 +13710,7 @@ boolean MovePlayer(struct PlayerInfo *player, int dx, int dy)
     int original_move_delay_value = player->move_delay_value;
 
 #if DEBUG
-    printf("THIS SHOULD ONLY HAPPEN WITH PRE-1.2 LEVEL TAPES. [%ld]\n",
+    printf("THIS SHOULD ONLY HAPPEN WITH PRE-1.2 LEVEL TAPES. [%d]\n",
 	   tape.counter);
 #endif
 
@@ -14112,7 +14112,7 @@ void ScrollPlayer(struct PlayerInfo *player, int mode)
 
 void ScrollScreen(struct PlayerInfo *player, int mode)
 {
-  static unsigned long screen_frame_counter = 0;
+  static unsigned int screen_frame_counter = 0;
 
   if (mode == SCROLL_INIT)
   {
@@ -16521,7 +16521,7 @@ void RequestQuitGame(boolean ask_if_really_quit)
 /* random generator functions                                                */
 /* ------------------------------------------------------------------------- */
 
-unsigned int InitEngineRandom_RND(long seed)
+unsigned int InitEngineRandom_RND(int seed)
 {
   game.num_random_calls = 0;
 
@@ -16614,7 +16614,7 @@ static void SaveEngineSnapshotValues_RND()
 
 static void LoadEngineSnapshotValues_RND()
 {
-  unsigned long num_random_calls = game.num_random_calls;
+  unsigned int num_random_calls = game.num_random_calls;
   int i, j;
 
   for (i = 0; i < NUM_CUSTOM_ELEMENTS; i++)
@@ -16832,7 +16832,7 @@ void CreateGameButtons()
     struct GadgetInfo *gi;
     int button_type;
     boolean checked;
-    unsigned long event_mask;
+    unsigned int event_mask;
     int gd_x   = gfx->src_x;
     int gd_y   = gfx->src_y;
     int gd_xp  = gfx->src_x + gfx->pressed_xoffset;

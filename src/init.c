@@ -159,8 +159,8 @@ void DrawInitAnim()
 {
   struct GraphicInfo *graphic_info_last = graphic_info;
   int graphic = 0;
-  static unsigned long action_delay = 0;
-  unsigned long action_delay_value = GameFrameDelay;
+  static unsigned int action_delay = 0;
+  unsigned int action_delay_value = GameFrameDelay;
   int sync_frame = FrameCounter;
   int x, y;
 
@@ -175,9 +175,9 @@ void DrawInitAnim()
 
 #if 0
   {
-    static unsigned long last_counter = -1;
-    unsigned long current_counter = Counter();
-    unsigned long delay = current_counter - last_counter;
+    static unsigned int last_counter = -1;
+    unsigned int current_counter = Counter();
+    unsigned int delay = current_counter - last_counter;
 
     if (last_counter != -1 && delay > action_delay_value + 5)
       printf("::: DrawInitAnim: DELAY TOO LONG: %ld\n", delay);
@@ -1857,7 +1857,7 @@ static void InitGraphicInfo()
   static boolean clipmasks_initialized = FALSE;
   Pixmap src_pixmap;
   XGCValues clip_gc_values;
-  unsigned long clip_gc_valuemask;
+  unsigned int clip_gc_valuemask;
   GC copy_clipmask_gc = None;
 #endif
 

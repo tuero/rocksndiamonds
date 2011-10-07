@@ -129,7 +129,7 @@
    position of the rear pointer is just
 	(MAX_TYPES * (rptr - state)) + TYPE_3 == TYPE_3.  */
 
-static long int randtbl_0[DEG_3 + 1] =
+static int randtbl_0[DEG_3 + 1] =
 {
   TYPE_3,
   -851904987, -43806228, -2029755270, 1390239686, -1912102820,
@@ -139,7 +139,7 @@ static long int randtbl_0[DEG_3 + 1] =
   -607508183, -205999574, -1696891592, 1492211999, -1528267240,
   -952028296, -189082757, 362343714, 1424981831, 2039449641,
 };
-static long int randtbl_1[DEG_3 + 1] =
+static int randtbl_1[DEG_3 + 1] =
 {
   TYPE_3,
   -851904987, -43806228, -2029755270, 1390239686, -1912102820,
@@ -161,8 +161,8 @@ static long int randtbl_1[DEG_3 + 1] =
    in the initialization of randtbl) because the state table pointer is set
    to point to randtbl[1] (as explained below).)  */
 
-static long int *fptr[2] = { &randtbl_0[SEP_3 + 1], &randtbl_1[SEP_3 + 1] };
-static long int *rptr[2] = { &randtbl_0[1],         &randtbl_1[1]         };
+static int *fptr[2] = { &randtbl_0[SEP_3 + 1], &randtbl_1[SEP_3 + 1] };
+static int *rptr[2] = { &randtbl_0[1],         &randtbl_1[1]         };
 
 
 
@@ -176,13 +176,13 @@ static long int *rptr[2] = { &randtbl_0[1],         &randtbl_1[1]         };
    indexing every time to find the address of the last element to see if
    the front and rear pointers have wrapped.  */
 
-static long int *state[2] = { &randtbl_0[1], &randtbl_1[1] };
+static int *state[2] = { &randtbl_0[1], &randtbl_1[1] };
 
 static int rand_type[2] = { TYPE_3,	TYPE_3	};
 static int rand_deg[2]  = { DEG_3,	DEG_3	};
 static int rand_sep[2]  = { SEP_3,	SEP_3	};
 
-static long int *end_ptr[2] =
+static int *end_ptr[2] =
 {
   &randtbl_0[sizeof(randtbl_0) / sizeof(randtbl_0[0])],
   &randtbl_1[sizeof(randtbl_1) / sizeof(randtbl_1[0])]
@@ -203,7 +203,7 @@ void srandom_linux_libc(int nr, unsigned int x)
 
   if (rand_type[nr] != TYPE_0)
   {
-    register long int i;
+    register int i;
 
     for (i = 1; i < rand_deg[nr]; ++i)
       state[nr][i] = (1103515145 * state[nr][i - 1]) + 12345;
@@ -227,21 +227,21 @@ void srandom_linux_libc(int nr, unsigned int x)
    rear pointers can't wrap on the same call by not testing the rear
    pointer if the front one has wrapped.  Returns a 31-bit random number.  */
 
-long int random_linux_libc(int nr)
+int random_linux_libc(int nr)
 {
   if (rand_type[nr] == TYPE_0)
   {
-    state[nr][0] = ((state[nr][0] * 1103515245) + 12345) & LONG_MAX;
+    state[nr][0] = ((state[nr][0] * 1103515245) + 12345) & INT_MAX;
     return state[nr][0];
   }
   else
   {
-    long int i;
+    int i;
 
     *fptr[nr] += *rptr[nr];
 
     /* Chucking least random bit.  */
-    i = (*fptr[nr] >> 1) & LONG_MAX;
+    i = (*fptr[nr] >> 1) & INT_MAX;
     fptr[nr]++;
 
     if (fptr[nr] >= end_ptr[nr])

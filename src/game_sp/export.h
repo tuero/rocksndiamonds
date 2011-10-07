@@ -193,7 +193,7 @@ extern void InitGfxBuffers_SP();
 extern void InitGameEngine_SP();
 extern void GameActions_SP(byte *, boolean);
 
-extern unsigned int InitEngineRandom_SP(long);
+extern unsigned int InitEngineRandom_SP(int);
 
 extern void setLevelInfoToDefaults_SP();
 extern void copyInternalEngineVars_SP();

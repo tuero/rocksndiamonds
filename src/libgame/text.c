@@ -28,7 +28,7 @@ static GC	font_clip_gc = None;
 static void InitFontClipmasks()
 {
   XGCValues clip_gc_values;
-  unsigned long clip_gc_valuemask;
+  unsigned int clip_gc_valuemask;
   GC copy_clipmask_gc;
   int i, j;
 
@@ -210,8 +210,8 @@ int maxWordLengthInString(char *text)
 
 void DrawInitTextExt(char *text, int ypos, int font_nr, boolean force)
 {
-  static unsigned long progress_delay = 0;
-  unsigned long progress_delay_value = 100;	/* (in milliseconds) */
+  static unsigned int progress_delay = 0;
+  unsigned int progress_delay_value = 100;	/* (in milliseconds) */
 
   UPDATE_BUSY_STATE();
 

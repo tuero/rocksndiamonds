@@ -2618,7 +2618,7 @@ struct ElementInfo
 
   /* ---------- special element property values ---------- */
 
-  unsigned long properties[NUM_EP_BITFIELDS];	/* element base properties */
+  unsigned int properties[NUM_EP_BITFIELDS];	/* element base properties */
 
   boolean use_gfx_element;	/* use custom graphic element */
   int gfx_element_initial;	/* initial optional custom graphic element */

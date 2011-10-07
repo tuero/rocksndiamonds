@@ -29,7 +29,7 @@
 
 static boolean cursor_inside_playfield = FALSE;
 static boolean playfield_cursor_set = FALSE;
-static unsigned long playfield_cursor_delay = 0;
+static unsigned int playfield_cursor_delay = 0;
 
 
 /* event filter especially needed for SDL event filtering due to
@@ -1012,7 +1012,7 @@ void HandleKey(Key key, int key_status)
 	  }
 	  break;
 
-	case KSYM_S:
+	case KSYM_s:
 	  if (!global.fps_slowdown)
 	  {
 	    global.fps_slowdown = TRUE;
@@ -1141,7 +1141,7 @@ void HandleJoystick()
     case GAME_MODE_SETUP:
     case GAME_MODE_INFO:
     {
-      static unsigned long joystickmove_delay = 0;
+      static unsigned int joystickmove_delay = 0;
 
       if (joystick && !button &&
 	  !DelayReached(&joystickmove_delay, GADGET_FRAME_DELAY))

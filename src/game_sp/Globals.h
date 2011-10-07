@@ -13,7 +13,7 @@
 #define True				(!False)
 #endif
 
-#define ScrollDelta			((long)1)
+#define ScrollDelta			((int)1)
 
 #if NEW_TILESIZE
 // #define ZoomFactor			(ZOOM_FACTOR)
@@ -229,8 +229,8 @@ typedef struct
 {
   int Width;
   int Height;
-  long OffSet;
-  long Size;
+  int OffSet;
+  int Size;
 } LevelDescriptor;
 #define HAS_LevelDescriptor
 #endif
@@ -320,7 +320,7 @@ extern int TimerVar;
 extern short RandomSeed;
 
 #if 0
-extern long FileMax;
+extern int FileMax;
 #endif
 
 extern LevelInfoType LInfo;
@@ -343,6 +343,6 @@ extern int RedDiskReleasePhase;
 extern int ScratchGravity, GravityFlag;
 extern int SnikSnaksElectronsFrozen;
 extern int YellowDisksExploded;
-extern long YawnSleepCounter;
+extern int YawnSleepCounter;
 
 #endif /* GLOBALS_H */

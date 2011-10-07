@@ -71,7 +71,7 @@ int sound_thread(void)
   short *mix_buffer;
 
   char sound_play[SAMPLE_MAX]; /* if set, we should be playing these sounds */
-  long sound_pos[SAMPLE_MAX]; /* position in the sound */
+  int sound_pos[SAMPLE_MAX]; /* position in the sound */
   int mix_play[MIXER_MAX]; /* which sounds we have chosen to mix (calculated each time) */
   int mix_count;
   int i;
@@ -301,7 +301,7 @@ int sound_thread(void)
 	register short *mix_ptr = mix_buffer;
 	register short *sound_ptr =
 	  sound_data[mix_play[i]] + sound_pos[mix_play[i]];
-	register long count =
+	register int count =
 	  sound_length[mix_play[i]] - sound_pos[mix_play[i]];
 
 	if (count > fragment_size)
@@ -380,16 +380,16 @@ int sound_thread(void)
   return(0);
 }
 
-int read_sample(char *name, short **data, long *length)
+int read_sample(char *name, short **data, int *length)
 {
   int result;
   FILE *file = 0;
   short *dataptr = 0;
-  long datalength;
+  int datalength;
 
   int i, actual, ch;
   unsigned char buffer[24];
-  unsigned long temp;
+  unsigned int temp;
 
   file = fopen(name, "rb");
   if (file == 0)
@@ -454,7 +454,7 @@ int read_sample(char *name, short **data, long *length)
   temp = buffer[12] << 24 | buffer[13] << 16 | buffer[14] << 8 | buffer[15];
   if (temp != 1)
   {
-    fprintf(stderr, "%s: \"%s\": %s (%ld != 1)\n", progname, name,
+    fprintf(stderr, "%s: \"%s\": %s (%d != 1)\n", progname, name,
 	    "bad encoding type", temp);
     result = 1;
     goto fail;
@@ -464,7 +464,7 @@ int read_sample(char *name, short **data, long *length)
   temp = buffer[16] << 24 | buffer[17] << 16 | buffer[18] << 8 | buffer[19];
   if (temp != 8000)
   {
-    fprintf(stderr, "%s: \"%s\": %s (%ld != 8000)\n", progname, name,
+    fprintf(stderr, "%s: \"%s\": %s (%d != 8000)\n", progname, name,
 	    "bad sample rate", temp);
     result = 1;
     goto fail;
@@ -474,7 +474,7 @@ int read_sample(char *name, short **data, long *length)
   temp = buffer[20] << 24 | buffer[21] << 16 | buffer[22] << 8 | buffer[23];
   if (temp != 1)
   {
-    fprintf(stderr, "%s: \"%s\": %s (%ld != 1)\n", progname, name,
+    fprintf(stderr, "%s: \"%s\": %s (%d != 1)\n", progname, name,
 	    "unsupported channels", temp);
     result = 1;
     goto fail;

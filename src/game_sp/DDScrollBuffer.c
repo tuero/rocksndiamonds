@@ -7,14 +7,14 @@
 #include <math.h>
 
 
-long mScrollX, mScrollY;
-long mScrollX_last, mScrollY_last;
+int mScrollX, mScrollY;
+int mScrollX_last, mScrollY_last;
 
 #if 1
-long ScreenBuffer[2 + MAX_PLAYFIELD_WIDTH + 2][2 + MAX_PLAYFIELD_HEIGHT + 2];
+int ScreenBuffer[2 + MAX_PLAYFIELD_WIDTH + 2][2 + MAX_PLAYFIELD_HEIGHT + 2];
 boolean redraw[2 + MAX_PLAYFIELD_WIDTH + 2][2 + MAX_PLAYFIELD_HEIGHT + 2];
 #else
-long ScreenBuffer[MAX_BUF_XSIZE][MAX_BUF_YSIZE];
+int ScreenBuffer[MAX_BUF_XSIZE][MAX_BUF_YSIZE];
 boolean redraw[MAX_BUF_XSIZE][MAX_BUF_YSIZE];
 #endif
 
@@ -91,9 +91,9 @@ static void ScrollPlayfield(int dx, int dy)
 	int sx = x - x1;
 	int sy = y - y1;
 	int tsi = GetSI(x, y);
-	long id = ((PlayField16[tsi]) |
-		   (PlayField8[tsi] << 16) |
-		   (DisPlayField[tsi] << 24));
+	int id = ((PlayField16[tsi]) |
+		  (PlayField8[tsi] << 16) |
+		  (DisPlayField[tsi] << 24));
 
 	if ((dx == -1 && x == x2) ||
 	    (dx == +1 && x == x1) ||
@@ -454,12 +454,12 @@ void DDScrollBuffer_ScrollTowards(int X, int Y, double Step)
   ScrollPlayfieldIfNeeded();
 }
 
-void DDScrollBuffer_SoftScrollTo(int X, int Y, long TimeMS, int FPS)
+void DDScrollBuffer_SoftScrollTo(int X, int Y, int TimeMS, int FPS)
 {
   double dx, dY;
-  long dT, StepCount;
+  int dT, StepCount;
   double T, tStep;
-  long oldX, oldY, maxD;
+  int oldX, oldY, maxD;
   static boolean AlreadyRunning = False;
 
   if (NoDisplayFlag)

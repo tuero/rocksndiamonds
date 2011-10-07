@@ -208,7 +208,7 @@ char *getDeviceNameFromJoystickNr(int joystick_nr)
 
 static int JoystickPositionPercent(int center, int border, int actual)
 {
-  long range, position;
+  int range, position;
   int percent;
 
   if (border < center && actual > center)

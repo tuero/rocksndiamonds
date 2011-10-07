@@ -43,7 +43,7 @@ void synchro_2(void)
 {
   int x = 0;
   int y = 1;
-  unsigned long random = RandomEM;
+  unsigned int random = RandomEM;
   short *cave_cache = Cave[y];	/* might be a win */
   int score = 0;
 

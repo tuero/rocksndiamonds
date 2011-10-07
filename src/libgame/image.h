@@ -59,10 +59,10 @@ typedef struct
 #define IMAGETYPE_RGB		1	/* RGB image with colormap */
 #define IMAGETYPE_TRUECOLOR	2	/* true-color image        */
 
-#define TRUECOLOR_RED(pixel)	(((unsigned long)((pixel) & 0xff0000)) >> 16)
-#define TRUECOLOR_GREEN(pixel)	(((unsigned long)((pixel) & 0xff00)) >> 8)
-#define TRUECOLOR_BLUE(pixel)	( (unsigned long)((pixel) & 0xff))
-#define RGB_TO_TRUECOLOR(r,g,b)	((((unsigned long)((r) & 0xff00)) << 8) | ((g) & 0xff00) | (((unsigned short)(b)) >> 8))
+#define TRUECOLOR_RED(pixel)	(((unsigned int)((pixel) & 0xff0000)) >> 16)
+#define TRUECOLOR_GREEN(pixel)	(((unsigned int)((pixel) & 0xff00)) >> 8)
+#define TRUECOLOR_BLUE(pixel)	( (unsigned int)((pixel) & 0xff))
+#define RGB_TO_TRUECOLOR(r,g,b)	((((unsigned int)((r) & 0xff00)) << 8) | ((g) & 0xff00) | (((unsigned short)(b)) >> 8))
 
 Image *newImage(unsigned int, unsigned int, unsigned int);
 void freeImage(Image *);

@@ -64,28 +64,28 @@ void freeImage(Image *image)
    note: the internal format is big endian */
 
 #define memory_to_value(ptr, len) (					    \
-(len) == 1 ? (unsigned long)(                 *( (byte *)(ptr))         ) : \
-(len) == 2 ? (unsigned long)(((unsigned long)(*( (byte *)(ptr))   ))<< 8)   \
-			  + (                 *(((byte *)(ptr))+1)      ) : \
-(len) == 3 ? (unsigned long)(((unsigned long)(*( (byte *)(ptr))   ))<<16)   \
-			  + (((unsigned long)(*(((byte *)(ptr))+1)))<< 8)   \
-			  + (                 *(((byte *)(ptr))+2)      ) : \
-	     (unsigned long)(((unsigned long)(*( (byte *)(ptr))   ))<<24)   \
-			  + (((unsigned long)(*(((byte *)(ptr))+1)))<<16)   \
-			  + (((unsigned long)(*(((byte *)(ptr))+2)))<< 8)   \
-			  + (                 *(((byte *)(ptr))+3)      ) )
+(len) == 1 ? (unsigned int)(                *( (byte *)(ptr))         ) : \
+(len) == 2 ? (unsigned int)(((unsigned int)(*( (byte *)(ptr))   ))<< 8)   \
+			 + (                *(((byte *)(ptr))+1)      ) : \
+(len) == 3 ? (unsigned int)(((unsigned int)(*( (byte *)(ptr))   ))<<16)   \
+			 + (((unsigned int)(*(((byte *)(ptr))+1)))<< 8)   \
+			 + (                *(((byte *)(ptr))+2)      ) : \
+	     (unsigned int)(((unsigned int)(*( (byte *)(ptr))   ))<<24)   \
+			 + (((unsigned int)(*(((byte *)(ptr))+1)))<<16)   \
+			 + (((unsigned int)(*(((byte *)(ptr))+2)))<< 8)   \
+			 + (                *(((byte *)(ptr))+3)      ) )
 
 
 #define value_to_memory(value, ptr, len) (				\
 (len) == 1 ? (*( (byte *)(ptr)   ) = ( value     ) ) :			\
-(len) == 2 ? (*( (byte *)(ptr)   ) = (((unsigned long)(value))>> 8),	\
+(len) == 2 ? (*( (byte *)(ptr)   ) = (((unsigned int)(value))>> 8),	\
 	      *(((byte *)(ptr))+1) = ( value     ) ) :			\
-(len) == 3 ? (*( (byte *)(ptr)   ) = (((unsigned long)(value))>>16),	\
-	      *(((byte *)(ptr))+1) = (((unsigned long)(value))>> 8),	\
+(len) == 3 ? (*( (byte *)(ptr)   ) = (((unsigned int)(value))>>16),	\
+	      *(((byte *)(ptr))+1) = (((unsigned int)(value))>> 8),	\
 	      *(((byte *)(ptr))+2) = ( value     ) ) :			\
-             (*( (byte *)(ptr)   ) = (((unsigned long)(value))>>24),	\
-	      *(((byte *)(ptr))+1) = (((unsigned long)(value))>>16),	\
-	      *(((byte *)(ptr))+2) = (((unsigned long)(value))>> 8),	\
+             (*( (byte *)(ptr)   ) = (((unsigned int)(value))>>24),	\
+	      *(((byte *)(ptr))+1) = (((unsigned int)(value))>>16),	\
+	      *(((byte *)(ptr))+2) = (((unsigned int)(value))>> 8),	\
 	      *(((byte *)(ptr))+3) = ( value     ) ))
 
 static Pixmap Image_to_Mask(Image *image, Display *display, Window window)

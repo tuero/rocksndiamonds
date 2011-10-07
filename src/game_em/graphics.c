@@ -1008,9 +1008,9 @@ void RedrawPlayfield_EM(boolean force_redraw)
   if (draw_new_player_location && !quick_relocation)
   {
 #if 1
-    unsigned long game_frame_delay_value = getGameFrameDelay_EM(20);
+    unsigned int game_frame_delay_value = getGameFrameDelay_EM(20);
 #else
-    unsigned long game_frame_delay_value = getGameFrameDelay_EM(25);
+    unsigned int game_frame_delay_value = getGameFrameDelay_EM(25);
 #endif
     int wait_delay_value = game_frame_delay_value;
     int screen_xx = VALID_SCREEN_X(sx);

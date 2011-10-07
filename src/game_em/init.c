@@ -46,7 +46,7 @@ struct GameInfo_EM game_em;
 static int sound_pid = -1;
 int sound_pipe[2] = { -1, -1 };		/* for communication */
 short *sound_data[SAMPLE_MAX];		/* pointer to sound data */
-long sound_length[SAMPLE_MAX];		/* length of sound data */
+int sound_length[SAMPLE_MAX];		/* length of sound data */
 
 static const char *sound_names[SAMPLE_MAX] =
 {
@@ -401,7 +401,7 @@ void sound_play(void)
   clear_mem(play, sizeof(play));
 }
 
-unsigned int InitEngineRandom_EM(long seed)
+unsigned int InitEngineRandom_EM(int seed)
 {
   if (seed == NEW_RANDOMIZE)
   {

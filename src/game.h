@@ -178,7 +178,7 @@ struct GameInfo
   boolean set_centered_player;
 
   /* values for random number generator initialization after snapshot */
-  unsigned long num_random_calls;
+  unsigned int num_random_calls;
 };
 
 struct PlayerInfo
@@ -278,7 +278,7 @@ struct PlayerInfo
   int push_delay;
   int push_delay_value;
 
-  unsigned long actual_frame_counter;
+  unsigned int actual_frame_counter;
 
   int drop_delay;
   int drop_pressed_delay;
@@ -331,7 +331,7 @@ void Moving2Blocked(int, int, int *, int *);
 void Blocked2Moving(int, int, int *, int *);
 void DrawDynamite(int, int);
 
-void StartGameActions(boolean, boolean, long);
+void StartGameActions(boolean, boolean, int);
 
 void GameActions(void);
 void GameActions_EM_Main();
@@ -350,7 +350,7 @@ void RaiseScoreElement(int);
 void RequestQuitGameExt(boolean, boolean, char *);
 void RequestQuitGame(boolean);
 
-unsigned int InitEngineRandom_RND(long);
+unsigned int InitEngineRandom_RND(int);
 unsigned int RND(int);
 
 void FreeEngineSnapshot();

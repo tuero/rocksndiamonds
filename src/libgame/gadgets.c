@@ -1431,8 +1431,8 @@ void ClickOnGadget(struct GadgetInfo *gi, int button)
 
 boolean HandleGadgets(int mx, int my, int button)
 {
-  static unsigned long pressed_delay = 0;
-  static unsigned long pressed_delay_value = GADGET_FRAME_DELAY;
+  static unsigned int pressed_delay = 0;
+  static unsigned int pressed_delay_value = GADGET_FRAME_DELAY;
   static int last_button = 0;
   static int last_mx = 0, last_my = 0;
   static int pressed_mx = 0, pressed_my = 0;

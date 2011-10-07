@@ -700,7 +700,7 @@ struct GraphicInfo_EM
 struct EngineSnapshotInfo_EM
 {
   struct GameInfo_EM game_em;
-  unsigned long RandomEM;
+  unsigned int RandomEM;
   struct LEVEL lev;
   struct PLAYER ply[MAX_PLAYERS];
   short Array[4][EM_MAX_CAVE_HEIGHT][EM_MAX_CAVE_WIDTH];
@@ -732,7 +732,7 @@ extern void InitGfxBuffers_EM();
 extern void InitGameEngine_EM();
 extern void GameActions_EM(byte *, boolean);
 
-extern unsigned int InitEngineRandom_EM(long);
+extern unsigned int InitEngineRandom_EM(int);
 
 extern void setLevelInfoToDefaults_EM();
 extern boolean LoadNativeLevel_EM(char *, boolean);

@@ -127,7 +127,7 @@ void subAnimateTerminals(int si)
 
 void subRandomize()
 {
-  long Tick = MyGetTickCount();
+  int Tick = MyGetTickCount();
 
   RandomSeed = (Tick ^ (Tick >> 16)) & 0xFFFF;
 }

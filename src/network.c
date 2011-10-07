@@ -308,7 +308,7 @@ void SendToServer_NrWanted(int nr_wanted)
 
 void SendToServer_StartPlaying()
 {
-  unsigned long new_random_seed = InitRND(level.random_seed);
+  unsigned int new_random_seed = InitRND(level.random_seed);
 
   int dummy = 0;		/* !!! HAS NO MEANING ANYMORE !!! */
 				/* the name of the level must be enough */
@@ -503,7 +503,7 @@ static void Handle_OP_START_PLAYING()
   LevelDirTree *new_leveldir;
   int new_level_nr;
   int dummy;
-  unsigned long new_random_seed;
+  unsigned int new_random_seed;
   char *new_leveldir_identifier;
 
   new_level_nr = (buffer[2] << 8) + buffer[3];

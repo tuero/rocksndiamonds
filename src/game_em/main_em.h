@@ -133,7 +133,7 @@ extern int			SX, SY;
 /* exported variables                                                        */
 /* ------------------------------------------------------------------------- */
 
-extern unsigned long RandomEM;
+extern unsigned int RandomEM;
 
 extern struct LEVEL lev;
 extern struct PLAYER ply[MAX_PLAYERS];

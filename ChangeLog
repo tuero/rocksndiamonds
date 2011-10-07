@@ -1,3 +1,7 @@
+2011-10-07
+	* fixed code (esp. random/tape handling) when compiled on 64-bit systems
+	  (by simply replacing all "long" by "int" types)
+
 2010-11-19
 	* fixed nasty bug (affecting crumbled graphics) after adding new special
 	  graphics suffix ".TAPE" (and messing some things up in src/main.c)

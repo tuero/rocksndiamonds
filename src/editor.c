@@ -5230,7 +5230,7 @@ static void CreateControlButtons()
 {
   Bitmap *gd_bitmap = graphic_info[IMG_GLOBAL_DOOR].bitmap;
   struct GadgetInfo *gi;
-  unsigned long event_mask;
+  unsigned int event_mask;
   int i;
 
   /* create toolbox buttons */
@@ -5519,7 +5519,7 @@ static void CreateCounterButtons()
       int gd_xoffset;
       int gd_x, gd_x1, gd_x2, gd_y;
       int x_size, y_size;
-      unsigned long event_mask;
+      unsigned int event_mask;
       char infotext[max_infotext_len + 1];
 
       event_mask = GD_EVENT_PRESSED | GD_EVENT_REPEATED;
@@ -5655,7 +5655,7 @@ static void CreateDrawingAreas()
   for (i = 0; i < ED_NUM_DRAWING_AREAS; i++)
   {
     struct GadgetInfo *gi;
-    unsigned long event_mask;
+    unsigned int event_mask;
     int id = drawingarea_info[i].gadget_id;
     int x = SX + drawingarea_info[i].x;
     int y = SY + drawingarea_info[i].y;
@@ -5706,7 +5706,7 @@ static void CreateTextInputGadgets()
     Bitmap *gd_bitmap = graphic_info[IMG_GLOBAL_DOOR].bitmap;
     int gd_x, gd_y;
     struct GadgetInfo *gi;
-    unsigned long event_mask;
+    unsigned int event_mask;
     char infotext[MAX_OUTPUT_LINESIZE + 1];
     int id = textinput_info[i].gadget_id;
 
@@ -5754,7 +5754,7 @@ static void CreateTextAreaGadgets()
     Bitmap *gd_bitmap = graphic_info[IMG_GLOBAL_DOOR].bitmap;
     int gd_x, gd_y;
     struct GadgetInfo *gi;
-    unsigned long event_mask;
+    unsigned int event_mask;
     char infotext[MAX_OUTPUT_LINESIZE + 1];
     int id = textarea_info[i].gadget_id;
     int area_xsize = textarea_info[i].xsize;
@@ -5803,7 +5803,7 @@ static void CreateSelectboxGadgets()
     Bitmap *gd_bitmap = graphic_info[IMG_GLOBAL_DOOR].bitmap;
     int gd_x, gd_y;
     struct GadgetInfo *gi;
-    unsigned long event_mask;
+    unsigned int event_mask;
     char infotext[MAX_OUTPUT_LINESIZE + 1];
     int id = selectbox_info[i].gadget_id;
     int x = SX + selectbox_info[i].x;
@@ -5880,7 +5880,7 @@ static void CreateTextbuttonGadgets()
     Bitmap *gd_bitmap = graphic_info[IMG_GLOBAL_DOOR].bitmap;
     int gd_x1, gd_x2, gd_y1, gd_y2;
     struct GadgetInfo *gi;
-    unsigned long event_mask;
+    unsigned int event_mask;
     char infotext[MAX_OUTPUT_LINESIZE + 1];
     int id = textbutton_info[i].gadget_id;
     int x = SX + textbutton_info[i].x;
@@ -5953,7 +5953,7 @@ static void CreateGraphicbuttonGadgets()
 {
   Bitmap *gd_bitmap = graphic_info[IMG_GLOBAL_DOOR].bitmap;
   struct GadgetInfo *gi;
-  unsigned long event_mask;
+  unsigned int event_mask;
   int i;
 
   /* create buttons for scrolling of drawing area and element list */
@@ -6060,7 +6060,7 @@ static void CreateScrollbarGadgets()
     int gd_x1, gd_x2, gd_y1, gd_y2;
     struct GadgetInfo *gi;
     int items_max, items_visible, item_position;
-    unsigned long event_mask;
+    unsigned int event_mask;
 
     if (i == ED_SCROLLBAR_ID_LIST_VERTICAL)
     {
@@ -6127,7 +6127,7 @@ static void CreateCheckbuttonGadgets()
 {
   Bitmap *gd_bitmap = graphic_info[IMG_GLOBAL_DOOR].bitmap;
   struct GadgetInfo *gi;
-  unsigned long event_mask;
+  unsigned int event_mask;
   int gd_x1, gd_x2, gd_x3, gd_x4, gd_y;
   int i;
 
@@ -6190,7 +6190,7 @@ static void CreateRadiobuttonGadgets()
 {
   Bitmap *gd_bitmap = graphic_info[IMG_GLOBAL_DOOR].bitmap;
   struct GadgetInfo *gi;
-  unsigned long event_mask;
+  unsigned int event_mask;
   int gd_x1, gd_x2, gd_x3, gd_x4, gd_y;
   int i;
 
@@ -11749,8 +11749,8 @@ void HandleLevelEditorKeyInput(Key key)
 
 void HandleLevelEditorIdle()
 {
-  static unsigned long action_delay = 0;
-  unsigned long action_delay_value = GameFrameDelay;
+  static unsigned int action_delay = 0;
+  unsigned int action_delay_value = GameFrameDelay;
   int xpos = 1, ypos = 2;
   int i;
 

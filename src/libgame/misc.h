@@ -80,13 +80,13 @@ int log_2(unsigned int);
 boolean getTokenValueFromString(char *, char **, char **);
 
 void InitCounter(void);
-unsigned long Counter(void);
-void Delay(unsigned long);
-boolean FrameReached(unsigned long *, unsigned long);
-boolean DelayReached(unsigned long *, unsigned long);
-void WaitUntilDelayReached(unsigned long *, unsigned long);
+unsigned int Counter(void);
+void Delay(unsigned int);
+boolean FrameReached(unsigned int *, unsigned int);
+boolean DelayReached(unsigned int *, unsigned int);
+void WaitUntilDelayReached(unsigned int *, unsigned int);
 
-unsigned int init_random_number(int, long);
+unsigned int init_random_number(int, int);
 unsigned int get_random_number(int, int);
 
 char *getLoginName(void);
@@ -121,11 +121,11 @@ void SetError(char *, ...);
 char *GetError(void);
 void Error(int, char *, ...);
 
-void *checked_malloc(unsigned long);
-void *checked_calloc(unsigned long);
-void *checked_realloc(void *, unsigned long);
+void *checked_malloc(unsigned int);
+void *checked_calloc(unsigned int);
+void *checked_realloc(void *, unsigned int);
 void checked_free(void *);
-void clear_mem(void *, unsigned long);
+void clear_mem(void *, unsigned int);
 
 void swap_numbers(int *, int *);
 void swap_number_pairs(int *, int *, int *, int *);
@@ -142,11 +142,11 @@ int putFileChunk(FILE *, char *, int, int);
 int getFileVersion(FILE *);
 int putFileVersion(FILE *, int);
 
-void ReadBytesFromFile(FILE *, byte *, unsigned long);
-void WriteBytesToFile(FILE *, byte *, unsigned long);
+void ReadBytesFromFile(FILE *, byte *, unsigned int);
+void WriteBytesToFile(FILE *, byte *, unsigned int);
 
-void ReadUnusedBytesFromFile(FILE *, unsigned long);
-void WriteUnusedBytesToFile(FILE *, unsigned long);
+void ReadUnusedBytesFromFile(FILE *, unsigned int);
+void WriteUnusedBytesToFile(FILE *, unsigned int);
 
 #define getFile8Bit(f)        getFile8BitInteger(f)
 #define putFile8Bit(f,x)      putFile8BitInteger(f,x)

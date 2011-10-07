@@ -77,7 +77,7 @@ static unsigned char realbuffer[512], *buffer = realbuffer + 4;
 
 static int interrupt;
 
-static unsigned long ServerFrameCounter = 0;
+static unsigned int ServerFrameCounter = 0;
 
 static void addtobuffer(struct NetworkServerPlayerInfo *player,
 			unsigned char *b, int len)

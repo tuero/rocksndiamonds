@@ -186,7 +186,7 @@ static struct GadgetInfo *tape_gadget[NUM_TAPE_BUTTONS];
 /* video display functions                                                   */
 /* ========================================================================= */
 
-void DrawVideoDisplay(unsigned long state, unsigned long value)
+void DrawVideoDisplay(unsigned int state, unsigned int value)
 {
   int i, j, k;
   static char *monatsname[12] =
@@ -677,12 +677,12 @@ static void TapeRewind()
   InitRND(tape.random_seed);
 }
 
-static void TapeSetRandomSeed(long random_seed)
+static void TapeSetRandomSeed(int random_seed)
 {
   tape.random_seed = InitRND(random_seed);
 }
 
-void TapeStartRecording(long random_seed)
+void TapeStartRecording(int random_seed)
 {
   if (!TAPE_IS_STOPPED(tape))
     TapeStop();

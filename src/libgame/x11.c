@@ -110,7 +110,7 @@ static DrawWindow *X11InitWindow()
   DrawWindow *new_window = CreateBitmapStruct();
   unsigned int border_width = 4;
   XGCValues gc_values;
-  unsigned long gc_valuemask;
+  unsigned int gc_valuemask;
 #if !defined(PLATFORM_MSDOS)
   XTextProperty windowName, iconName;
   Pixmap icon_pixmap, iconmask_pixmap;
@@ -121,13 +121,13 @@ static DrawWindow *X11InitWindow()
   XClassHint class_hints;
   char *window_name = program.window_title;
   char *icon_name = program.window_title;
-  long window_event_mask;
+  int window_event_mask;
   Atom proto_atom = None, delete_atom = None;
 #endif
   int screen_width, screen_height;
   int win_xpos, win_ypos;
-  unsigned long pen_fg = WhitePixel(display, screen);
-  unsigned long pen_bg = BlackPixel(display, screen);
+  unsigned int pen_fg = WhitePixel(display, screen);
+  unsigned int pen_bg = BlackPixel(display, screen);
   const int width = video.width, height = video.height;
   int i;
 
@@ -289,7 +289,7 @@ Bitmap *X11LoadImage(char *filename)
   char *error = "Read_PCX_to_Pixmap(): %s '%s'";
   int pcx_err;
   XGCValues clip_gc_values;
-  unsigned long clip_gc_valuemask;
+  unsigned int clip_gc_valuemask;
 
   pcx_err = Read_PCX_to_Pixmap(display, window->drawable, window->gc, filename,
 			       &new_bitmap->drawable, &new_bitmap->clip_mask);

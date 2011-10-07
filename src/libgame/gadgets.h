@@ -135,7 +135,7 @@ struct GadgetDecoration
 
 struct GadgetEvent
 {
-  unsigned long type;			/* event type */
+  unsigned int type;			/* event type */
   int button;				/* button number for button events */
   int x, y;				/* gadget position at event time */
   boolean off_borders;			/* mouse pointer outside gadget? */

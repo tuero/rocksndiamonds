@@ -1630,6 +1630,7 @@ SetupFileList *addListEntry(SetupFileList *list, char *token, char *value)
     return addListEntry(list->next, token, value);
 }
 
+#if 0
 #ifdef DEBUG
 static void printSetupFileList(SetupFileList *list)
 {
@@ -1641,6 +1642,7 @@ static void printSetupFileList(SetupFileList *list)
 
   printSetupFileList(list->next);
 }
+#endif
 #endif
 
 #ifdef DEBUG
@@ -3061,8 +3063,8 @@ static boolean LoadLevelInfoFromLevelConf(TreeInfo **node_first,
 					  char *directory_name)
 {
 #if 0
-  static unsigned long progress_delay = 0;
-  unsigned long progress_delay_value = 100;	/* (in milliseconds) */
+  static unsigned int progress_delay = 0;
+  unsigned int progress_delay_value = 100;	/* (in milliseconds) */
 #endif
   char *directory_path = getPath2(level_directory, directory_name);
   char *filename = getPath2(directory_path, LEVELINFO_FILENAME);
@@ -3625,8 +3627,8 @@ void LoadArtworkInfoFromLevelInfo(ArtworkDirTree **artwork_node,
 				  LevelDirTree *level_node)
 {
 #if 0
-  static unsigned long progress_delay = 0;
-  unsigned long progress_delay_value = 100;	/* (in milliseconds) */
+  static unsigned int progress_delay = 0;
+  unsigned int progress_delay_value = 100;	/* (in milliseconds) */
 #endif
   int type = (*artwork_node)->type;
 

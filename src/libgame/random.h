@@ -15,6 +15,6 @@
 #define RANDOM_H
 
 void srandom_linux_libc(int, unsigned int);
-long int random_linux_libc(int);
+int random_linux_libc(int);
 
 #endif

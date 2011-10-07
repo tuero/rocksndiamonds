@@ -186,13 +186,13 @@ void DrawAnim(Bitmap *toon_bitmap, GC toon_clip_gc,
 
 boolean AnimateToon(int toon_nr, boolean restart)
 {
-  static unsigned long animation_frame_counter = 0;
+  static unsigned int animation_frame_counter = 0;
   static int pos_x = 0, pos_y = 0;
   static int delta_x = 0, delta_y = 0;
   static int frame = 0;
   static boolean horiz_move, vert_move;
-  static unsigned long anim_delay = 0;
-  static unsigned long anim_delay_value = 0;
+  static unsigned int anim_delay = 0;
+  static unsigned int anim_delay_value = 0;
   static int width,height;
   static int pad_x,pad_y;
   static int cut_x,cut_y;
@@ -342,8 +342,8 @@ boolean AnimateToon(int toon_nr, boolean restart)
 
 void HandleAnimation(int mode)
 {
-  static unsigned long animstart_delay = -1;
-  static unsigned long animstart_delay_value = 0;
+  static unsigned int animstart_delay = -1;
+  static unsigned int animstart_delay_value = 0;
   static boolean anim_running = FALSE;
   static boolean anim_restart = TRUE;
   static boolean reset_delay = TRUE;

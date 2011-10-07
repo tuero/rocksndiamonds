@@ -146,11 +146,11 @@ struct TapeInfo
 
   char *level_identifier;
   int level_nr;
-  unsigned long random_seed;
-  unsigned long date;
-  unsigned long counter;
-  unsigned long length;
-  unsigned long length_seconds;
+  unsigned int random_seed;
+  unsigned int date;
+  unsigned int counter;
+  unsigned int length;
+  unsigned int length_seconds;
   unsigned int delay_played;
   boolean pause_before_death;
   boolean recording, playing, pausing;
@@ -182,7 +182,7 @@ struct TapeInfo
 };
 
 
-void DrawVideoDisplay(unsigned long, unsigned long);
+void DrawVideoDisplay(unsigned int, unsigned int);
 void DrawCompleteVideoDisplay(void);
 
 void TapeDeactivateDisplayOn();
@@ -191,7 +191,7 @@ void TapeDeactivateDisplayOff(boolean);
 void TapeSetDateFromEpochSeconds(time_t);
 void TapeSetDateFromNow();
 
-void TapeStartRecording(long);
+void TapeStartRecording(int);
 void TapeHaltRecording(void);
 void TapeStopRecording(void);
 void TapeRecordAction(byte *);

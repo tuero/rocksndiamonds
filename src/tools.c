@@ -2478,7 +2478,7 @@ void AnimateEnvelope(int envelope_nr, int anim_mode, int action)
   int mask_mode = (src_bitmap != NULL ? BLIT_MASKED : BLIT_ON_BACKGROUND);
   boolean ffwd_delay = (tape.playing && tape.fast_forward);
   boolean no_delay = (tape.warp_forward);
-  unsigned long anim_delay = 0;
+  unsigned int anim_delay = 0;
   int frame_delay_value = (ffwd_delay ? FfwdFrameDelay : GameFrameDelay);
   int anim_delay_value = (no_delay ? 0 : frame_delay_value);
   int font_nr = FONT_ENVELOPE_1 + envelope_nr;
@@ -2540,7 +2540,7 @@ void AnimateEnvelopeDoor(char *text, int anim_mode, int action)
   int mask_mode = (src_bitmap != NULL ? BLIT_MASKED : BLIT_ON_BACKGROUND);
   boolean ffwd_delay = (tape.playing && tape.fast_forward);
   boolean no_delay = (tape.warp_forward);
-  unsigned long anim_delay = 0;
+  unsigned int anim_delay = 0;
   int frame_delay_value = (ffwd_delay ? FfwdFrameDelay : GameFrameDelay);
   int anim_delay_value = (no_delay ? 0 : frame_delay_value);
 #if 1
@@ -3050,11 +3050,11 @@ static void DrawPreviewLevelLabelExt(int mode)
 
 void DrawPreviewLevel(boolean restart)
 {
-  static unsigned long scroll_delay = 0;
-  static unsigned long label_delay = 0;
+  static unsigned int scroll_delay = 0;
+  static unsigned int label_delay = 0;
   static int from_x, from_y, scroll_direction;
   static int label_state, label_counter;
-  unsigned long scroll_delay_value = preview.step_delay;
+  unsigned int scroll_delay_value = preview.step_delay;
   boolean show_level_border = (BorderElement != EL_EMPTY);
   int level_xsize = lev_fieldx + (show_level_border ? 2 : 0);
   int level_ysize = lev_fieldy + (show_level_border ? 2 : 0);
@@ -4308,8 +4308,8 @@ unsigned int MoveDoor(unsigned int door_state)
 {
   static int door1 = DOOR_OPEN_1;
   static int door2 = DOOR_CLOSE_2;
-  unsigned long door_delay = 0;
-  unsigned long door_delay_value;
+  unsigned int door_delay = 0;
+  unsigned int door_delay_value;
   int stepsize = 1;
 
   if (door_1.width < 0 || door_1.width > DXSIZE)
@@ -4728,7 +4728,7 @@ void CreateToolButtons()
     Bitmap *deco_bitmap = None;
     int deco_x = 0, deco_y = 0, deco_xpos = 0, deco_ypos = 0;
     struct GadgetInfo *gi;
-    unsigned long event_mask;
+    unsigned int event_mask;
     int gd_xoffset, gd_yoffset;
     int gd_x1, gd_x2, gd_y;
     int id = i;
@@ -7211,7 +7211,7 @@ int getGameFrameDelay_EM(int native_em_game_frame_delay)
   return game_frame_delay_value;
 }
 
-unsigned int InitRND(long seed)
+unsigned int InitRND(int seed)
 {
   if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
     return InitEngineRandom_EM(seed);

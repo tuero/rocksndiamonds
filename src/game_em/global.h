@@ -59,7 +59,7 @@ void convert_em_level(unsigned char *, int);
 void prepare_em_level(void);
 
 int sound_thread(void);
-int read_sample(char *, short **, long *);
+int read_sample(char *, short **, int *);
 
 void read_cave_list(void);
 void free_cave_list(void);

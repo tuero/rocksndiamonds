@@ -329,8 +329,8 @@ Display *XOpenDisplay(char *display_name)
 
 Window XCreateSimpleWindow(Display *display, Window parent, int x, int y,
 			   unsigned int width, unsigned int height,
-			   unsigned int border_width, unsigned long border,
-			   unsigned long background)
+			   unsigned int border_width, unsigned int border,
+			   unsigned int background)
 {
   video_bitmap = create_video_bitmap(XRES, YRES);
   clear_to_color(video_bitmap, background);
@@ -381,7 +381,7 @@ void XFree(void *data)
   checked_free(data);
 }
 
-GC XCreateGC(Display *display, Drawable d, unsigned long value_mask,
+GC XCreateGC(Display *display, Drawable d, unsigned int value_mask,
 	     XGCValues *values)
 {
   XGCValues *gcv;
@@ -811,7 +811,7 @@ int XLookupString(XKeyEvent *key_event, char *buffer, int buffer_size,
   return 0;
 }
 
-void XSetForeground(Display *display, GC gc, unsigned long pixel)
+void XSetForeground(Display *display, GC gc, unsigned int pixel)
 {
   XGCValues *gcv = (XGCValues *)gc;
 
