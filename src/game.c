@@ -2223,6 +2223,15 @@ void UpdatePlayfieldElementCount()
 void UpdateGameControlValues()
 {
   int i, k;
+#if 1
+  int time = (local_player->LevelSolved ?
+	      local_player->LevelSolved_CountingTime :
+	      level.game_engine_type == GAME_ENGINE_TYPE_EM ?
+	      level.native_em_level->lev->time :
+	      level.game_engine_type == GAME_ENGINE_TYPE_SP ?
+	      level.native_sp_level->game_sp->time_played :
+	      game.no_time_limit ? TimePlayed : TimeLeft);
+#else
   int time = (local_player->LevelSolved ?
 	      local_player->LevelSolved_CountingTime :
 	      level.game_engine_type == GAME_ENGINE_TYPE_EM ?
@@ -2230,6 +2239,7 @@ void UpdateGameControlValues()
 	      level.game_engine_type == GAME_ENGINE_TYPE_SP ?
 	      level.native_sp_level->game_sp->time_played :
 	      level.time == 0 ? TimePlayed : TimeLeft);
+#endif
   int score = (local_player->LevelSolved ?
 	       local_player->LevelSolved_CountingScore :
 	       level.game_engine_type == GAME_ENGINE_TYPE_EM ?
@@ -3180,7 +3190,7 @@ void DrawGameDoorValues()
 
 void DrawGameDoorValues_OLD()
 {
-  int time_value = (level.time == 0 ? TimePlayed : TimeLeft);
+  int time_value = (game.no_time_limit ? TimePlayed : TimeLeft);
   int dynamite_value = 0;
   int score_value = (local_player->LevelSolved ? local_player->score_final :
 		     local_player->score);
@@ -3922,6 +3932,8 @@ void InitGame()
   ScrollStepSize = 0;	/* will be correctly initialized by ScrollScreen() */
 
   AllPlayersGone = FALSE;
+
+  game.no_time_limit = (level.time == 0);
 
   game.yamyam_content_nr = 0;
   game.robot_wheel_active = FALSE;
@@ -4867,7 +4879,8 @@ static void PlayerWins(struct PlayerInfo *player)
   player->score_final = (level.game_engine_type == GAME_ENGINE_TYPE_EM ?
 			 level.native_em_level->lev->score : player->score);
 
-  player->LevelSolved_CountingTime = (level.time == 0 ? TimePlayed : TimeLeft);
+  player->LevelSolved_CountingTime = (game.no_time_limit ? TimePlayed :
+				      TimeLeft);
   player->LevelSolved_CountingScore = player->score_final;
 }
 
@@ -4913,7 +4926,7 @@ void GameWon()
     game_over_delay_1 = game_over_delay_value_1;
     game_over_delay_2 = game_over_delay_value_2;
 
-    time = time_final = (level.time == 0 ? TimePlayed : TimeLeft);
+    time = time_final = (game.no_time_limit ? TimePlayed : TimeLeft);
     score = score_final = local_player->score_final;
 
     if (TimeLeft > 0)
@@ -4921,7 +4934,7 @@ void GameWon()
       time_final = 0;
       score_final += TimeLeft * level.score[SC_TIME_BONUS];
     }
-    else if (level.time == 0 && TimePlayed < 999)
+    else if (game.no_time_limit && TimePlayed < 999)
     {
       time_final = 999;
       score_final += (999 - TimePlayed) * level.score[SC_TIME_BONUS];
@@ -12207,6 +12220,9 @@ static void CheckLevelTime()
 	  PlaySound(SND_GAME_RUNNING_OUT_OF_TIME);
 
 #if 1
+	/* this does not make sense: game_panel_controls[GAME_PANEL_TIME].value
+	   is reset from other values in UpdateGameDoorValues() -- FIX THIS */
+
 	game_panel_controls[GAME_PANEL_TIME].value = TimeLeft;
 
 	DisplayGameControlValues();
@@ -12224,19 +12240,19 @@ static void CheckLevelTime()
 	}
       }
 #if 1
-      else if (level.time == 0 && !AllPlayersGone) /* level w/o time limit */
+      else if (game.no_time_limit && !AllPlayersGone) /* level w/o time limit */
       {
 	game_panel_controls[GAME_PANEL_TIME].value = TimePlayed;
 
 	DisplayGameControlValues();
       }
 #else
-      else if (level.time == 0 && !AllPlayersGone) /* level w/o time limit */
+      else if (game.no_time_limit && !AllPlayersGone) /* level w/o time limit */
 	DrawGameValue_Time(TimePlayed);
 #endif
 
       level.native_em_level->lev->time =
-	(level.time == 0 ? TimePlayed : TimeLeft);
+	(game.no_time_limit ? TimePlayed : TimeLeft);
     }
 
     if (tape.recording || tape.playing)
@@ -14092,14 +14108,14 @@ void ScrollPlayer(struct PlayerInfo *player, int mode)
 	    KillPlayer(&stored_player[i]);
       }
 #if 1
-      else if (level.time == 0 && !AllPlayersGone) /* level w/o time limit */
+      else if (game.no_time_limit && !AllPlayersGone) /* level w/o time limit */
       {
 	game_panel_controls[GAME_PANEL_TIME].value = TimePlayed;
 
 	DisplayGameControlValues();
       }
 #else
-      else if (level.time == 0 && !AllPlayersGone) /* level w/o time limit */
+      else if (game.no_time_limit && !AllPlayersGone) /* level w/o time limit */
 	DrawGameValue_Time(TimePlayed);
 #endif
     }
@@ -15655,6 +15671,7 @@ static int DigField(struct PlayerInfo *player,
       if (level.time > 0 || level.use_time_orb_bug)
       {
 	TimeLeft += level.time_orb_time;
+	game.no_time_limit = FALSE;
 
 #if 1
 	game_panel_controls[GAME_PANEL_TIME].value = TimeLeft;
@@ -16336,7 +16353,7 @@ void PlayLevelSound_SP(int xx, int yy, int element_sp, int action_sp)
 #if 0
 void ChangeTime(int value)
 {
-  int *time = (level.time == 0 ? &TimePlayed : &TimeLeft);
+  int *time = (game.no_time_limit ? &TimePlayed : &TimeLeft);
 
   *time += value;
 

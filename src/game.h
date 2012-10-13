@@ -156,6 +156,7 @@ struct GameInfo
   boolean gravity;
   boolean explosions_delayed;
   boolean envelope_active;
+  boolean no_time_limit;	/* (variable only in very special case) */
 
   /* values for the new EMC elements */
   int lenses_time_left;

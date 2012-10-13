@@ -1,3 +1,7 @@
+2012-10-13
+	* fixed display of current level time when making use of time orb bug
+	  (see level set "rnd_equinox_tetrachloride_ii", level 053)
+
 2011-10-07
 	* fixed code (esp. random/tape handling) when compiled on 64-bit systems
 	  (by simply replacing all "long" by "int" types)
