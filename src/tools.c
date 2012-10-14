@@ -396,7 +396,15 @@ void BackToFront()
     redraw_mask |= REDRAW_FIELD;
 
 #if 0
-  /* !!! TEST ONLY !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1 */
+  // never redraw single tiles, always redraw the whole field
+  // (redrawing single tiles up to a certain threshold was faster on old,
+  // now legacy graphics, but slows things down on modern graphics now)
+  if (redraw_mask & REDRAW_TILES)
+    redraw_mask |= REDRAW_FIELD;
+#endif
+
+#if 0
+  /* !!! TEST ONLY !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
   /* (force full redraw) */
   if (game_status == GAME_MODE_PLAYING)
     redraw_mask |= REDRAW_FIELD;
@@ -407,6 +415,23 @@ void BackToFront()
 
   if (redraw_mask == REDRAW_NONE)
     return;
+
+#if 0
+  printf("::: ");
+  if (redraw_mask & REDRAW_ALL)
+    printf("[REDRAW_ALL]");
+  if (redraw_mask & REDRAW_FIELD)
+    printf("[REDRAW_FIELD]");
+  if (redraw_mask & REDRAW_TILES)
+    printf("[REDRAW_TILES]");
+  if (redraw_mask & REDRAW_DOOR_1)
+    printf("[REDRAW_DOOR_1]");
+  if (redraw_mask & REDRAW_DOOR_2)
+    printf("[REDRAW_DOOR_2]");
+  if (redraw_mask & REDRAW_FROM_BACKBUFFER)
+    printf("[REDRAW_FROM_BACKBUFFER]");
+  printf(" [%d]\n", FrameCounter);
+#endif
 
   if (redraw_mask & REDRAW_TILES &&
       game_status == GAME_MODE_PLAYING &&
@@ -1061,7 +1086,18 @@ void DrawBackground(int x, int y, int width, int height)
   ClearRectangleOnBackground(backbuffer, x, y, width, height);
 #endif
 
+#if 1
+  /* (this only works for the current arrangement of playfield and panels) */
+  if (x < gfx.dx)
+    redraw_mask |= REDRAW_FIELD;
+  else if (y < gfx.vy)
+    redraw_mask |= REDRAW_DOOR_1;
+  else
+    redraw_mask |= REDRAW_DOOR_2;
+#else
+  /* (this is just wrong (when drawing to one of the two door panel areas)) */
   redraw_mask |= REDRAW_FIELD;
+#endif
 }
 
 void DrawBackgroundForFont(int x, int y, int width, int height, int font_nr)

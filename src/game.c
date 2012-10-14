@@ -12225,7 +12225,8 @@ static void CheckLevelTime()
 
 	game_panel_controls[GAME_PANEL_TIME].value = TimeLeft;
 
-	DisplayGameControlValues();
+	/* (already called by UpdateAndDisplayGameControlValues() below) */
+	// DisplayGameControlValues();
 #else
 	DrawGameValue_Time(TimeLeft);
 #endif
@@ -12244,7 +12245,8 @@ static void CheckLevelTime()
       {
 	game_panel_controls[GAME_PANEL_TIME].value = TimePlayed;
 
-	DisplayGameControlValues();
+	/* (already called by UpdateAndDisplayGameControlValues() below) */
+	// DisplayGameControlValues();
       }
 #else
       else if (game.no_time_limit && !AllPlayersGone) /* level w/o time limit */
