@@ -399,6 +399,7 @@ void BackToFront()
   // never redraw single tiles, always redraw the whole field
   // (redrawing single tiles up to a certain threshold was faster on old,
   // now legacy graphics, but slows things down on modern graphics now)
+  // UPDATE: this is now globally defined by value of REDRAWTILES_THRESHOLD
   if (redraw_mask & REDRAW_TILES)
     redraw_mask |= REDRAW_FIELD;
 #endif

@@ -120,45 +120,7 @@
 #define PANEL_XPOS(p)		(DX + ALIGNED_TEXT_XPOS(p))
 #define PANEL_YPOS(p)		(DY + ALIGNED_TEXT_YPOS(p))
 
-/* special positions in the game control window (relative to control window) */
-#define XX_LEVEL1		(PANEL_XPOS(game.panel.level))
-#define XX_LEVEL2		(PANEL_XPOS(game.panel.level) - 1)
-#define XX_LEVEL		(PANEL_XPOS(game.panel.level))
-#define YY_LEVEL		(PANEL_YPOS(game.panel.level))
-#define XX_EMERALDS		(PANEL_XPOS(game.panel.gems))
-#define YY_EMERALDS		(PANEL_YPOS(game.panel.gems))
-#define XX_DYNAMITE		(PANEL_XPOS(game.panel.inventory))
-#define YY_DYNAMITE		(PANEL_YPOS(game.panel.inventory))
-#define XX_KEYS			(PANEL_XPOS(game.panel.keys))
-#define YY_KEYS			(PANEL_YPOS(game.panel.keys))
-#define XX_SCORE		(PANEL_XPOS(game.panel.score))
-#define YY_SCORE		(PANEL_YPOS(game.panel.score))
-#define XX_TIME1		(PANEL_XPOS(game.panel.time))
-#define XX_TIME2		(PANEL_XPOS(game.panel.time) + 1)
-#define XX_TIME			(PANEL_XPOS(game.panel.time))
-#define YY_TIME			(PANEL_YPOS(game.panel.time))
-
-/* special positions in the game control window (relative to main window) */
-#define DX_LEVEL1		(DX + XX_LEVEL1)
-#define DX_LEVEL2		(DX + XX_LEVEL2)
-#define DX_LEVEL		(DX + XX_LEVEL)
-#define DY_LEVEL		(DY + YY_LEVEL)
-#define DX_EMERALDS		(DX + XX_EMERALDS)
-#define DY_EMERALDS		(DY + YY_EMERALDS)
-#define DX_DYNAMITE		(DX + XX_DYNAMITE)
-#define DY_DYNAMITE		(DY + YY_DYNAMITE)
-#define DX_KEYS			(DX + XX_KEYS)
-#define DY_KEYS			(DY + YY_KEYS)
-#define DX_SCORE		(DX + XX_SCORE)
-#define DY_SCORE		(DY + YY_SCORE)
-#define DX_TIME1		(DX + XX_TIME1)
-#define DX_TIME2		(DX + XX_TIME2)
-#define DX_TIME			(DX + XX_TIME)
-#define DY_TIME			(DY + YY_TIME)
-
-#if 1
 /* game panel display and control definitions */
-
 #define GAME_PANEL_LEVEL_NUMBER			0
 #define GAME_PANEL_GEMS				1
 #define GAME_PANEL_INVENTORY_COUNT		2
@@ -876,8 +838,6 @@ static struct GamePanelControlInfo game_panel_controls[] =
     -1,
   }
 };
-#endif
-
 
 /* values for delayed check of falling and moving elements and for collision */
 #define CHECK_DELAY_MOVING	3
@@ -2076,8 +2036,6 @@ static inline void InitField_WithBug2(int x, int y, boolean init_game)
   */
 }
 
-#if 1
-
 static int get_key_element_from_nr(int key_nr)
 {
   int key_base_element = (key_nr >= STD_NUM_KEYS ? EL_EMC_KEY_5 - STD_NUM_KEYS :
@@ -2223,7 +2181,6 @@ void UpdatePlayfieldElementCount()
 void UpdateGameControlValues()
 {
   int i, k;
-#if 1
   int time = (local_player->LevelSolved ?
 	      local_player->LevelSolved_CountingTime :
 	      level.game_engine_type == GAME_ENGINE_TYPE_EM ?
@@ -2231,15 +2188,6 @@ void UpdateGameControlValues()
 	      level.game_engine_type == GAME_ENGINE_TYPE_SP ?
 	      level.native_sp_level->game_sp->time_played :
 	      game.no_time_limit ? TimePlayed : TimeLeft);
-#else
-  int time = (local_player->LevelSolved ?
-	      local_player->LevelSolved_CountingTime :
-	      level.game_engine_type == GAME_ENGINE_TYPE_EM ?
-	      level.native_em_level->lev->time :
-	      level.game_engine_type == GAME_ENGINE_TYPE_SP ?
-	      level.native_sp_level->game_sp->time_played :
-	      level.time == 0 ? TimePlayed : TimeLeft);
-#endif
   int score = (local_player->LevelSolved ?
 	       local_player->LevelSolved_CountingScore :
 	       level.game_engine_type == GAME_ENGINE_TYPE_EM ?
@@ -2798,11 +2746,7 @@ void UpdateAndDisplayGameControlValues()
 void DrawGameValue_Emeralds(int value)
 {
   struct TextPosInfo *pos = &game.panel.gems;
-#if 1
   int font_nr = pos->font;
-#else
-  int font_nr = FONT_TEXT_2;
-#endif
   int font_width = getFontWidth(font_nr);
   int chars = pos->size;
 
@@ -2821,11 +2765,7 @@ void DrawGameValue_Emeralds(int value)
 void DrawGameValue_Dynamite(int value)
 {
   struct TextPosInfo *pos = &game.panel.inventory_count;
-#if 1
   int font_nr = pos->font;
-#else
-  int font_nr = FONT_TEXT_2;
-#endif
   int font_width = getFontWidth(font_nr);
   int chars = pos->size;
 
@@ -2844,11 +2784,7 @@ void DrawGameValue_Dynamite(int value)
 void DrawGameValue_Score(int value)
 {
   struct TextPosInfo *pos = &game.panel.score;
-#if 1
   int font_nr = pos->font;
-#else
-  int font_nr = FONT_TEXT_2;
-#endif
   int font_width = getFontWidth(font_nr);
   int chars = pos->size;
 
@@ -2871,13 +2807,8 @@ void DrawGameValue_Time(int value)
   int chars1 = 3;
   int chars2 = 4;
   int chars = pos->size;
-#if 1
   int font1_nr = pos->font;
   int font2_nr = pos->font_alt;
-#else
-  int font1_nr = FONT_TEXT_2;
-  int font2_nr = FONT_TEXT_1;
-#endif
   int font_nr = font1_nr;
   boolean use_dynamic_chars = (chars == -1 ? TRUE : FALSE);
 
@@ -2921,13 +2852,8 @@ void DrawGameValue_Level(int value)
   int chars1 = 2;
   int chars2 = 3;
   int chars = pos->size;
-#if 1
   int font1_nr = pos->font;
   int font2_nr = pos->font_alt;
-#else
-  int font1_nr = FONT_TEXT_2;
-  int font2_nr = FONT_TEXT_1;
-#endif
   int font_nr = font1_nr;
   boolean use_dynamic_chars = (chars == -1 ? TRUE : FALSE);
 
@@ -2951,63 +2877,27 @@ void DrawGameValue_Level(int value)
 
 void DrawGameValue_Keys(int key[MAX_NUM_KEYS])
 {
-#if 0
-  struct TextPosInfo *pos = &game.panel.keys;
-#endif
-#if 0
-  int base_key_graphic = EL_KEY_1;
-#endif
   int i;
 
 #if 1
   return;	/* !!! USE NEW STUFF !!! */
 #endif
 
-#if 0
-  if (PANEL_DEACTIVATED(pos))
-    return;
-#endif
-
-#if 0
-  if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
-    base_key_graphic = EL_EM_KEY_1;
-#endif
-
-#if 0
-  pos->width = 4 * MINI_TILEX;
-#endif
-
-#if 1
   for (i = 0; i < MAX_NUM_KEYS; i++)
-#else
-  /* currently only 4 of 8 possible keys are displayed */
-  for (i = 0; i < STD_NUM_KEYS; i++)
-#endif
   {
-#if 1
     struct TextPosInfo *pos = &game.panel.key[i];
-#endif
     int src_x = DOOR_GFX_PAGEX5 + 18 + (i % 4) * MINI_TILEX;
     int src_y = DOOR_GFX_PAGEY1 + 123;
-#if 1
     int dst_x = PANEL_XPOS(pos);
     int dst_y = PANEL_YPOS(pos);
-#else
-    int dst_x = PANEL_XPOS(pos) + i * MINI_TILEX;
-    int dst_y = PANEL_YPOS(pos);
-#endif
 
-#if 1
     int element = (i >= STD_NUM_KEYS ? EL_EMC_KEY_5 - 4 :
 		   level.game_engine_type == GAME_ENGINE_TYPE_EM ? EL_EM_KEY_1 :
 		   EL_KEY_1) + i;
     int graphic = el2edimg(element);
-#endif
 
-#if 1
     if (PANEL_DEACTIVATED(pos))
       continue;
-#endif
 
 #if 0
     /* masked blit with tiles from half-size scaled bitmap does not work yet
@@ -3019,9 +2909,6 @@ void DrawGameValue_Keys(int key[MAX_NUM_KEYS])
 
     if (key[i])
     {
-#if 0
-      int graphic = el2edimg(base_key_graphic + i);
-#endif
       Bitmap *src_bitmap;
       int src_x, src_y;
 
@@ -3033,126 +2920,14 @@ void DrawGameValue_Keys(int key[MAX_NUM_KEYS])
 		       dst_x, dst_y);
     }
 #else
-#if 1
     if (key[i])
       DrawMiniGraphicExt(drawto, dst_x, dst_y, graphic);
     else
       BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto, src_x, src_y,
 		 MINI_TILEX, MINI_TILEY, dst_x, dst_y);
-#else
-    if (key[i])
-      DrawMiniGraphicExt(drawto, dst_x, dst_y, el2edimg(base_key_graphic + i));
-    else
-      BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto, src_x, src_y,
-		 MINI_TILEX, MINI_TILEY, dst_x, dst_y);
-#endif
 #endif
   }
 }
-
-#else
-
-void DrawGameValue_Emeralds(int value)
-{
-  int font_nr = FONT_TEXT_2;
-  int xpos = (3 * 14 - 3 * getFontWidth(font_nr)) / 2;
-
-  if (PANEL_DEACTIVATED(game.panel.gems))
-    return;
-
-  DrawText(DX_EMERALDS + xpos, DY_EMERALDS, int2str(value, 3), font_nr);
-}
-
-void DrawGameValue_Dynamite(int value)
-{
-  int font_nr = FONT_TEXT_2;
-  int xpos = (3 * 14 - 3 * getFontWidth(font_nr)) / 2;
-
-  if (PANEL_DEACTIVATED(game.panel.inventory_count))
-    return;
-
-  DrawText(DX_DYNAMITE + xpos, DY_DYNAMITE, int2str(value, 3), font_nr);
-}
-
-void DrawGameValue_Score(int value)
-{
-  int font_nr = FONT_TEXT_2;
-  int xpos = (5 * 14 - 5 * getFontWidth(font_nr)) / 2;
-
-  if (PANEL_DEACTIVATED(game.panel.score))
-    return;
-
-  DrawText(DX_SCORE + xpos, DY_SCORE, int2str(value, 5), font_nr);
-}
-
-void DrawGameValue_Time(int value)
-{
-  int font1_nr = FONT_TEXT_2;
-#if 1
-  int font2_nr = FONT_TEXT_1;
-#else
-  int font2_nr = FONT_LEVEL_NUMBER;
-#endif
-  int xpos3 = (3 * 14 - 3 * getFontWidth(font1_nr)) / 2;
-  int xpos4 = (4 * 10 - 4 * getFontWidth(font2_nr)) / 2;
-
-  if (PANEL_DEACTIVATED(game.panel.time))
-    return;
-
-  /* clear background if value just changed its size */
-  if (value == 999 || value == 1000)
-    ClearRectangleOnBackground(drawto, DX_TIME1, DY_TIME, 14 * 3, 14);
-
-  if (value < 1000)
-    DrawText(DX_TIME1 + xpos3, DY_TIME, int2str(value, 3), font1_nr);
-  else
-    DrawText(DX_TIME2 + xpos4, DY_TIME, int2str(value, 4), font2_nr);
-}
-
-void DrawGameValue_Level(int value)
-{
-  int font1_nr = FONT_TEXT_2;
-#if 1
-  int font2_nr = FONT_TEXT_1;
-#else
-  int font2_nr = FONT_LEVEL_NUMBER;
-#endif
-
-  if (PANEL_DEACTIVATED(game.panel.level))
-    return;
-
-  if (level_nr < 100)
-    DrawText(DX_LEVEL1, DY_LEVEL, int2str(value, 2), font1_nr);
-  else
-    DrawText(DX_LEVEL2, DY_LEVEL, int2str(value, 3), font2_nr);
-}
-
-void DrawGameValue_Keys(int key[MAX_NUM_KEYS])
-{
-  int base_key_graphic = EL_KEY_1;
-  int i;
-
-  if (PANEL_DEACTIVATED(game.panel.keys))
-    return;
-
-  if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
-    base_key_graphic = EL_EM_KEY_1;
-
-  /* currently only 4 of 8 possible keys are displayed */
-  for (i = 0; i < STD_NUM_KEYS; i++)
-  {
-    int x = XX_KEYS + i * MINI_TILEX;
-    int y = YY_KEYS;
-
-    if (key[i])
-      DrawMiniGraphicExt(drawto, DX + x,DY + y, el2edimg(base_key_graphic + i));
-    else
-      BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
-		 DOOR_GFX_PAGEX5 + x, y, MINI_TILEX, MINI_TILEY, DX + x,DY + y);
-  }
-}
-
-#endif
 
 void DrawAllGameValues(int emeralds, int dynamite, int score, int time,
 		       int key_bits)
@@ -16351,31 +16126,6 @@ void PlayLevelSound_SP(int xx, int yy, int element_sp, int action_sp)
 
   PlayLevelSoundElementAction(x, y, element, action);
 }
-
-#if 0
-void ChangeTime(int value)
-{
-  int *time = (game.no_time_limit ? &TimePlayed : &TimeLeft);
-
-  *time += value;
-
-  /* EMC game engine uses value from time counter of RND game engine */
-  level.native_em_level->lev->time = *time;
-
-  DrawGameValue_Time(*time);
-}
-
-void RaiseScore(int value)
-{
-  /* EMC game engine and RND game engine have separate score counters */
-  int *score = (level.game_engine_type == GAME_ENGINE_TYPE_EM ?
-		&level.native_em_level->lev->score : &local_player->score);
-
-  *score += value;
-
-  DrawGameValue_Score(*score);
-}
-#endif
 
 void RaiseScore(int value)
 {
