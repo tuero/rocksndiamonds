@@ -201,14 +201,19 @@ void BackToFront_EM(void)
     boolean half_shifted_y = (EVEN(SCR_FIELDY) && screen_y % TILEY != 0);
 #endif
 
-    int sx, sy, sxsize, sysize;
+    int sx, sy;
+#if 0
+    int sxsize, sysize;
+#endif
     int xsize = SXSIZE;
     int ysize = SYSIZE;
     int full_xsize = lev.width  * TILEX;
     int full_ysize = lev.height * TILEY;
 
+#if 0
     sxsize = (full_xsize < xsize ? full_xsize : xsize);
     sysize = (full_ysize < ysize ? full_ysize : ysize);
+#endif
     sx = SX + (full_xsize < xsize ? (xsize - full_xsize) / 2 : 0);
     sy = SY + (full_ysize < ysize ? (ysize - full_ysize) / 2 : 0);
 

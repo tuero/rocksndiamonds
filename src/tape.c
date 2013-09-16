@@ -1188,7 +1188,9 @@ void AutoPlayTape()
   static int num_levels_solved = 0;
   static int num_tape_missing = 0;
   static boolean level_failed[MAX_TAPES_PER_SET];
+#if 0
   static boolean tape_missing[MAX_TAPES_PER_SET];
+#endif
   int i;
 
   if (autoplay_initialized)
@@ -1237,7 +1239,9 @@ void AutoPlayTape()
     for (i = 0; i < MAX_TAPES_PER_SET; i++)
     {
       level_failed[i] = FALSE;
+#if 0
       tape_missing[i] = FALSE;
+#endif
     }
 
     autoplay_initialized = TRUE;
@@ -1272,8 +1276,10 @@ void AutoPlayTape()
     if (tape.no_valid_file)
     {
       num_tape_missing++;
+#if 0
       if (level_nr >= 0 && level_nr < MAX_TAPES_PER_SET)
 	tape_missing[level_nr] = TRUE;
+#endif
 
       printf("(no tape)\n");
       continue;

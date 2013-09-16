@@ -4635,7 +4635,10 @@ static void drawSetupValue(int pos)
   int ypos = MENU_SCREEN_START_YPOS + pos;
   int startx = mSX + xpos * 32;
   int starty = mSY + ypos * 32;
-  int font_nr, font_width, font_height;
+  int font_nr, font_width;
+#if 0
+  int font_height;
+#endif
   int type = setup_info[pos].type;
   void *value = setup_info[pos].value;
   char *value_string = getSetupValue(type, value);
@@ -4671,7 +4674,9 @@ static void drawSetupValue(int pos)
   starty = mSY + ypos * 32;
   font_nr = getSetupValueFont(type, value);
   font_width = getFontWidth(font_nr);
+#if 0
   font_height = getFontHeight(font_nr);
+#endif
 
   /* downward compatibility correction for Juergen Bonhagen's menu settings */
   if (setup_mode != SETUP_MODE_INPUT)

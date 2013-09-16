@@ -8840,15 +8840,16 @@ void CheckSingleStepMode_EM(byte action[MAX_PLAYERS], int frame,
 			    boolean any_player_moving,
 			    boolean player_is_dropping)
 {
-  int i;
-
   if (tape.single_step && tape.recording && !tape.pausing)
   {
+#if 0
     boolean active_players = FALSE;
+    int i;
 
     for (i = 0; i < MAX_PLAYERS; i++)
       if (action[i] != JOY_NO_ACTION)
 	active_players = TRUE;
+#endif
 
     // if (frame == 0)
     if (frame == 0 && !player_is_dropping)

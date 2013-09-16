@@ -10314,7 +10314,10 @@ static void FloodFill(int from_x, int from_y, int fill_element)
 static int DrawLevelText(int sx, int sy, char letter, int mode)
 {
   static short delete_buffer[MAX_LEV_FIELDX];
-  static int start_sx, start_sy;
+  static int start_sx;
+#if 0
+  static int start_sy;
+#endif
   static int last_sx, last_sy;
   static boolean typing = FALSE;
   int letter_element = EL_CHAR_ASCII0 + letter;
@@ -10356,8 +10359,12 @@ static int DrawLevelText(int sx, int sy, char letter, int mode)
 	DrawLevelText(0, 0, 0, TEXT_END);
 
       typing = TRUE;
-      start_sx = last_sx = sx;
-      start_sy = last_sy = sy;
+      start_sx = sx;
+#if 0
+      start_sy = sy;
+#endif
+      last_sx = sx;
+      last_sy = sy;
       DrawLevelText(sx, sy, 0, TEXT_SETCURSOR);
       break;
 

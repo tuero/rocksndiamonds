@@ -1334,12 +1334,17 @@ int zoomSurfaceRGBA_scaleDownBy2(SDL_Surface *src, SDL_Surface *dst)
 {
   int x, y;
   tColorRGBA *sp, *csp, *dp;
-  int sgap, dgap;
+#if 0
+  int sgap;
+#endif
+  int dgap;
 
   /* pointer setup */
   sp = csp = (tColorRGBA *) src->pixels;
   dp = (tColorRGBA *) dst->pixels;
+#if 0
   sgap = src->pitch - src->w * 4;
+#endif
   dgap = dst->pitch - dst->w * 4;
 
   for (y = 0; y < dst->h; y++)
@@ -1386,7 +1391,10 @@ int zoomSurfaceRGBA(SDL_Surface *src, SDL_Surface *dst)
 {
   int x, y, sx, sy, *sax, *say, *csax, *csay, csx, csy;
   tColorRGBA *sp, *csp, *dp;
-  int sgap, dgap;
+#if 0
+  int sgap;
+#endif
+  int dgap;
 
   /* use specialized zoom function when scaling down to exactly half size */
   if (src->w == 2 * dst->w &&
@@ -1425,7 +1433,9 @@ int zoomSurfaceRGBA(SDL_Surface *src, SDL_Surface *dst)
   /* pointer setup */
   sp = csp = (tColorRGBA *) src->pixels;
   dp = (tColorRGBA *) dst->pixels;
+#if 0
   sgap = src->pitch - src->w * 4;
+#endif
   dgap = dst->pitch - dst->w * 4;
 
   csay = say;

@@ -458,7 +458,7 @@ char *getLoginName()
 #if defined(PLATFORM_WIN32)
   if (login_name == NULL)
   {
-    unsigned int buffer_size = MAX_USERNAME_LEN + 1;
+    unsigned long buffer_size = MAX_USERNAME_LEN + 1;
     login_name = checked_malloc(buffer_size);
 
     if (GetUserName(login_name, &buffer_size) == 0)
@@ -487,7 +487,7 @@ char *getRealName()
   if (real_name == NULL)
   {
     static char buffer[MAX_USERNAME_LEN + 1];
-    unsigned int buffer_size = MAX_USERNAME_LEN + 1;
+    unsigned long buffer_size = MAX_USERNAME_LEN + 1;
 
     if (GetUserName(buffer, &buffer_size) != 0)
       real_name = get_corrected_real_name(buffer);

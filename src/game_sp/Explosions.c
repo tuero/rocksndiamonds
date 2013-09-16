@@ -17,7 +17,10 @@ static void subExplodeZonk(int tsi, int cx);
 
 void subAnimateExplosion(int si)
 {
-  int ax, bl, X, Y;
+  int ax, bl;
+#if 0
+  int X, Y;
+#endif
 
   if (LowByte(PlayField16[si]) != fiExplosion)
     return;
@@ -35,8 +38,10 @@ void subAnimateExplosion(int si)
   MovHighByte(&PlayField16[si], bl);
 
   // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#if 0
   X = GetStretchX(si);
   Y = GetStretchY(si);
+#endif
   GfxGraphic[GetX(si)][GetY(si)] = aniDefaultExplosion;
   // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -71,8 +76,10 @@ loc_g_28D0: // explosion produces infotron
   MovHighByte(&PlayField16[si], bl);
 
   // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#if 0
   X = GetStretchX(si);
   Y = GetStretchY(si);
+#endif
   GfxGraphic[GetX(si)][GetY(si)] = aniElectronExplosion;
   // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 }
@@ -276,15 +283,19 @@ static void subExplodeInfotron(int tsi, int cx)
 
 void subClearFieldDueToExplosion(int si)
 {
+#if 0
   int X, Y;
+#endif
 
   if (LowByte(PlayField16[si]) == fiExplosion)
     return;
 
   PlayField16[si] = 0;
   // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#if 0
   X = GetStretchX(si);
   Y = GetStretchY(si);
+#endif
   GfxGraphic[GetX(si)][GetY(si)] = aniSpace;
   // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 }

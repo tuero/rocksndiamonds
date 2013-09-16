@@ -39,7 +39,7 @@
 #define CONFIG_TOKEN_GLOBAL_BUSY		"global.busy"
 
 #define DEBUG_PRINT_INIT_TIMESTAMPS		TRUE
-#define DEBUG_PRINT_INIT_TIMESTAMPS_DEPTH	1
+#define DEBUG_PRINT_INIT_TIMESTAMPS_DEPTH	0
 
 
 static struct FontBitmapInfo font_initial[NUM_INITIAL_FONTS];

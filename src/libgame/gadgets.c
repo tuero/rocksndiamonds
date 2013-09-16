@@ -1399,18 +1399,18 @@ boolean anyTextGadgetActive()
 
 static boolean insideSelectboxLine(struct GadgetInfo *gi, int mx, int my)
 {
-  return(gi != NULL &&
-	 gi->type & GD_TYPE_SELECTBOX &&
-	 mx >= gi->x && mx < gi->x + gi->width &&
-	 my >= gi->y && my < gi->y + gi->height);
+  return (gi != NULL &&
+	  gi->type & GD_TYPE_SELECTBOX &&
+	  mx >= gi->x && mx < gi->x + gi->width &&
+	  my >= gi->y && my < gi->y + gi->height);
 }
 
 static boolean insideSelectboxArea(struct GadgetInfo *gi, int mx, int my)
 {
-  return(gi != NULL &&
-	 gi->type & GD_TYPE_SELECTBOX &&
-	 mx >= gi->selectbox.x && mx < gi->selectbox.x + gi->selectbox.width &&
-	 my >= gi->selectbox.y && my < gi->selectbox.y + gi->selectbox.height);
+  return (gi != NULL &&
+	  gi->type & GD_TYPE_SELECTBOX &&
+	  mx >= gi->selectbox.x && mx < gi->selectbox.x + gi->selectbox.width &&
+	  my >= gi->selectbox.y && my < gi->selectbox.y + gi->selectbox.height);
 }
 
 void ClickOnGadget(struct GadgetInfo *gi, int button)
@@ -1458,7 +1458,9 @@ boolean HandleGadgets(int mx, int my, int button)
   boolean gadget_dragging;
   boolean gadget_released;
   boolean gadget_released_inside;
+#if 0
   boolean gadget_released_inside_select_line;
+#endif
   boolean gadget_released_inside_select_area;
   boolean gadget_released_off_borders;
   boolean changed_position = FALSE;
@@ -1561,12 +1563,16 @@ boolean HandleGadgets(int mx, int my, int button)
   /* when handling selectbox, set additional state values */
   if (gadget_released_inside && (last_gi->type & GD_TYPE_SELECTBOX))
   {
+#if 0
     gadget_released_inside_select_line = insideSelectboxLine(last_gi, mx, my);
+#endif
     gadget_released_inside_select_area = insideSelectboxArea(last_gi, mx, my);
   }
   else
   {
+#if 0
     gadget_released_inside_select_line = FALSE;
+#endif
     gadget_released_inside_select_area = FALSE;
   }
 

@@ -502,12 +502,10 @@ static void Handle_OP_START_PLAYING()
 {
   LevelDirTree *new_leveldir;
   int new_level_nr;
-  int dummy;
   unsigned int new_random_seed;
   char *new_leveldir_identifier;
 
   new_level_nr = (buffer[2] << 8) + buffer[3];
-  dummy = (buffer[4] << 8) + buffer[5];			/* (obsolete) */
   new_random_seed =
     (buffer[6] << 24) | (buffer[7] << 16) | (buffer[8] << 8) | (buffer[9]);
   new_leveldir_identifier = (char *)&buffer[10];

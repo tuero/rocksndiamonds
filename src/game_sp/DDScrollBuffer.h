@@ -21,7 +21,7 @@ extern int TEST_flag;
 
 
 extern void InitScrollPlayfield();
-extern void UpdatePlayfield();
+extern void UpdatePlayfield(boolean);
 extern void RestorePlayfield();
 
 extern void DDScrollBuffer_ScrollTo(int X, int Y);

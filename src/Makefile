@@ -30,8 +30,10 @@ RANLIB = ranlib
 ETAGS = etags
 RM = rm -f
 
-BMP2ICO = bmp2ico
+CONVERT = convert
 WINDRES = windres
+
+CONVERT_ICON_ARGS = -transparent black -background transparent
 
 PROGBASE = rocksndiamonds
 
@@ -235,13 +237,16 @@ RNDLIBS = $(LIBGAME) $(GAME_EM) $(GAME_SP)
 AUTOCONF = conf_gfx.h conf_snd.h conf_mus.h
 
 ICONBASE = windows_icon
+ICON_BASEPATH = ../Special/Icons/windows_icons
 ifeq ($(PLATFORM),cross-win32)
 ifdef SPECIAL_EDITION
-ICONSUFFIX = 32x32_$(SPECIAL_EDITION)
+# ICONSUFFIX = 32x32_$(SPECIAL_EDITION)
+ICON_PATH = $(ICON_BASEPATH)/$(SPECIAL_EDITION)
 else
-ICONSUFFIX = 32x32
+# ICONSUFFIX = 32x32
+ICON_PATH = $(ICON_BASEPATH)/default
 endif
-ICON32X32 = ../graphics/$(ICONBASE)_$(ICONSUFFIX).bmp
+# ICON32X32 = ../graphics/$(ICONBASE)_$(ICONSUFFIX).bmp
 ICON = $(ICONBASE).o
 endif
 
@@ -291,7 +296,8 @@ $(TIMESTAMP_FILE): $(SRCS) $(LIBGAME) $(GAME_EM) $(GAME_SP)
 	> $(TIMESTAMP_FILE)
 
 $(ICON):
-	$(BMP2ICO) -transparent $(ICONBASE).ico $(ICON32X32)
+#	$(CONVERT) $(ICON32X32) $(CONVERT_ICON_ARGS) $(ICONBASE).ico
+	$(CONVERT) $(ICON_PATH)/*.png $(CONVERT_ICON_ARGS) $(ICONBASE).ico
 	echo "$(ICONBASE) ICON $(ICONBASE).ico" | $(WINDRES) -o $(ICON)
 
 .c.o:

@@ -11872,7 +11872,6 @@ static void CheckSingleStepMode(struct PlayerInfo *player)
 
 static byte PlayerActions(struct PlayerInfo *player, byte player_action)
 {
-  boolean moved = FALSE, snapped = FALSE, dropped = FALSE;
   int left	= player_action & JOY_LEFT;
   int right	= player_action & JOY_RIGHT;
   int up	= player_action & JOY_UP;
@@ -11888,13 +11887,13 @@ static byte PlayerActions(struct PlayerInfo *player, byte player_action)
   if (player_action)
   {
     if (button1)
-      snapped = SnapField(player, dx, dy);
+      SnapField(player, dx, dy);
     else
     {
       if (button2)
-	dropped = DropElement(player);
+	DropElement(player);
 
-      moved = MovePlayer(player, dx, dy);
+      MovePlayer(player, dx, dy);
     }
 
     CheckSingleStepMode(player);
@@ -15803,14 +15802,19 @@ static boolean DropElement(struct PlayerInfo *player)
   if (IS_CUSTOM_ELEMENT(new_element) && CAN_MOVE(new_element) &&
       element_info[new_element].move_pattern == MV_WHEN_DROPPED)
   {
-    int move_direction, nextx, nexty;
+#if 0
+    int move_direction;
+    int nextx, nexty;
+#endif
 
     if (element_info[new_element].move_direction_initial == MV_START_AUTOMATIC)
       MovDir[dropx][dropy] = drop_direction;
 
+#if 0
     move_direction = MovDir[dropx][dropy];
     nextx = dropx + GET_DX_FROM_DIR(move_direction);
     nexty = dropy + GET_DY_FROM_DIR(move_direction);
+#endif
 
     ChangeCount[dropx][dropy] = 0;	/* allow at least one more change */
 

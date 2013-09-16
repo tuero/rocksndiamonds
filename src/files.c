@@ -2584,13 +2584,21 @@ static int LoadLevel_CNT2(FILE *file, int chunk_size, struct LevelInfo *level)
 {
   int i, x, y;
   int element;
-  int num_contents, content_xsize, content_ysize;
+  int num_contents;
+#if 0
+  int content_xsize, content_ysize;
+#endif
   int content_array[MAX_ELEMENT_CONTENTS][3][3];
 
   element = getMappedElement(getFile16BitBE(file));
   num_contents = getFile8Bit(file);
+#if 1
+  getFile8Bit(file);	/* content x size (unused) */
+  getFile8Bit(file);	/* content y size (unused) */
+#else
   content_xsize = getFile8Bit(file);
   content_ysize = getFile8Bit(file);
+#endif
 
   ReadUnusedBytesFromFile(file, LEVEL_CHUNK_CNT2_UNUSED);
 
@@ -7580,10 +7588,14 @@ void LoadLevel(int nr)
 
 void LoadLevelInfoOnly(int nr)
 {
+#if 0
   char *filename;
+#endif
 
   setLevelFileInfo(&level.file_info, nr);
+#if 0
   filename = level.file_info.filename;
+#endif
 
   LoadLevelFromFileInfo(&level, &level.file_info, TRUE);
 }

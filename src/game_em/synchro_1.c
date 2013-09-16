@@ -469,7 +469,6 @@ static void check_player(struct PLAYER *ply)
   int oldy = ply->y;
   int x = oldx;
   int y = oldy;
-  int anim = 0;
   int dx = 0, dy = 0;
 
   game_em.last_player_direction[ply->num] = MV_NONE;
@@ -485,26 +484,22 @@ static void check_player(struct PLAYER *ply)
   {
     x--;
     dx = -1;
-    anim = 3;
   }
   else if (ply->joy_e)		/* east */
   {
     x++;
     dx = 1;
-    anim = 1;
   }
 
   if (ply->joy_n)		/* north */
   {
     y--;
     dy = -1;
-    anim = 0;
   }
   else if (ply->joy_s)		/* south */
   {
     y++;
     dy = 1;
-    anim = 2;
   }
 
 #else
@@ -515,25 +510,21 @@ static void check_player(struct PLAYER *ply)
     {
       y--;
       dy = -1;
-      anim = 0;
     }
     else if (ply->joy_e)	/* east */
     {
       x++;
       dx = 1;
-      anim = 1;
     }
     else if (ply->joy_s)	/* south */
     {
       y++;
       dy = 1;
-      anim = 2;
     }
     else if (ply->joy_w)	/* west */
     {
       x--;
       dx = -1;
-      anim = 3;
     }
   }
   else
@@ -542,25 +533,21 @@ static void check_player(struct PLAYER *ply)
     {
       x--;
       dx = -1;
-      anim = 3;
     }
     else if (ply->joy_s)	/* south */
     {
       y++;
       dy = 1;
-      anim = 2;
     }
     else if (ply->joy_e)	/* east */
     {
       x++;
       dx = 1;
-      anim = 1;
     }
     else if (ply->joy_n)	/* north */
     {
       y--;
       dy = -1;
-      anim = 0;
     }
   }
 #endif

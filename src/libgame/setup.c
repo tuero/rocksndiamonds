@@ -3979,7 +3979,9 @@ static void checkSeriesInfo()
 {
   static char *level_directory = NULL;
   DIR *dir;
+#if 0
   struct dirent *dir_entry;
+#endif
 
   /* check for more levels besides the 'levels' field of 'levelinfo.conf' */
 
@@ -3991,9 +3993,11 @@ static void checkSeriesInfo()
   if ((dir = opendir(level_directory)) == NULL)
   {
     Error(ERR_WARN, "cannot read level directory '%s'", level_directory);
+
     return;
   }
 
+#if 0
   while ((dir_entry = readdir(dir)) != NULL)	/* last directory entry */
   {
     if (strlen(dir_entry->d_name) > 4 &&
@@ -4008,7 +4012,6 @@ static void checkSeriesInfo()
 
       levelnum_value = atoi(levelnum_str);
 
-#if 0
       if (levelnum_value < leveldir_current->first_level)
       {
 	Error(ERR_WARN, "additional level %d found", levelnum_value);
@@ -4019,9 +4022,9 @@ static void checkSeriesInfo()
 	Error(ERR_WARN, "additional level %d found", levelnum_value);
 	leveldir_current->last_level = levelnum_value;
       }
-#endif
     }
   }
+#endif
 
   closedir(dir);
 }

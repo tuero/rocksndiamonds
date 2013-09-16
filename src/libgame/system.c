@@ -1180,7 +1180,9 @@ static void CreateScaledBitmaps(Bitmap *old_bitmap, int zoom_factor,
   int width_4, height_4;
   int width_8, height_8;
   int width_16, height_16;
+#if 0
   int width_32, height_32;
+#endif
   int new_width, new_height;
 
   /* calculate new image dimensions for normal sized image */
@@ -1211,8 +1213,10 @@ static void CreateScaledBitmaps(Bitmap *old_bitmap, int zoom_factor,
     height_8 = height_1 / 8;
     width_16  = width_1  / 16;
     height_16 = height_1 / 16;
+#if 0
     width_32  = width_1  / 32;
     height_32 = height_1 / 32;
+#endif
 
     UPDATE_BUSY_STATE();
 

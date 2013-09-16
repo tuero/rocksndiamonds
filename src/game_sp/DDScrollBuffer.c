@@ -457,7 +457,10 @@ void DDScrollBuffer_ScrollTowards(int X, int Y, double Step)
 void DDScrollBuffer_SoftScrollTo(int X, int Y, int TimeMS, int FPS)
 {
   double dx, dY;
-  int dT, StepCount;
+#if 0
+  int dT;
+#endif
+  int StepCount;
   double T, tStep;
   int oldX, oldY, maxD;
   static boolean AlreadyRunning = False;
@@ -481,7 +484,9 @@ void DDScrollBuffer_SoftScrollTo(int X, int Y, int TimeMS, int FPS)
   if (StepCount == 0)
     StepCount = 1;
 
+#if 0
   dT = 1000 / FPS;
+#endif
   tStep = (double)1 / StepCount;
   oldX = mScrollX;
   oldY = mScrollY;
