@@ -5169,11 +5169,11 @@ struct ConfigInfo image_config[] =
   { "editor.element_border_input.ypos",		"7"			},
 
   { "editor.cascade_list",			"RocksMore.pcx"		},
-  { "editor.cascade_list.xpos",			"10"			},
+  { "editor.cascade_list.xpos",			"9"			},
   { "editor.cascade_list.ypos",			"8"			},
   { "editor.cascade_list.frames",		"1"			},
   { "editor.cascade_list.active",		"RocksMore.pcx"		},
-  { "editor.cascade_list.active.xpos",		"9"			},
+  { "editor.cascade_list.active.xpos",		"10"			},
   { "editor.cascade_list.active.ypos",		"8"			},
   { "editor.cascade_list.active.frames",	"1"			},
 

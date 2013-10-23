@@ -1,7 +1,7 @@
 # =============================================================================
 # Rocks'n'Diamonds Makefile
 # -----------------------------------------------------------------------------
-# (c) 1995-2007 Holger Schemel <info@artsoft.org>
+# (c) 1995-2013 Holger Schemel <info@artsoft.org>
 # =============================================================================
 
 # -----------------------------------------------------------------------------
@@ -175,6 +175,9 @@ dist-build-win32:
 dist-build-macosx:
 	# (this is done by "dist-package-macosx" target)
 
+dist-build-macosx-ppc:
+	# (this is done by "dist-package-macosx-ppc" target)
+
 dist-package-unix:
 	./Scripts/make_dist.sh unix .
 
@@ -186,6 +189,9 @@ dist-package-win32:
 
 dist-package-macosx:
 	./Scripts/make_dist.sh mac . $(MAKE)
+
+dist-package-macosx-ppc:
+	./Scripts/make_dist.sh mac-ppc . $(MAKE)
 
 dist-upload-unix:
 	./Scripts/make_dist.sh unix . upload
@@ -199,6 +205,9 @@ dist-upload-win32:
 dist-upload-macosx:
 	./Scripts/make_dist.sh mac . upload
 
+dist-upload-macosx-ppc:
+	./Scripts/make_dist.sh mac-ppc . upload
+
 dist-build-all:
 	$(MAKE) clean
 	$(MAKE) dist-build-unix		; $(MAKE) dist-clean
@@ -209,12 +218,14 @@ dist-package-all:
 	$(MAKE) dist-package-unix
 	$(MAKE) dist-package-win32
 	$(MAKE) dist-package-macosx
+	$(MAKE) dist-package-macosx-ppc
 #	$(MAKE) dist-package-msdos
 
 dist-upload-all:
 	$(MAKE) dist-upload-unix
 	$(MAKE) dist-upload-win32
 	$(MAKE) dist-upload-macosx
+	$(MAKE) dist-upload-macosx-ppc
 #	$(MAKE) dist-upload-msdos
 
 dist-all: dist-build-all dist-package-all

@@ -19,6 +19,7 @@
 #include <dirent.h>
 #include <signal.h>
 #include <math.h>
+#include <errno.h>
 
 #include "platform.h"
 
@@ -1152,7 +1153,7 @@ static void Mixer_Main_DSP()
 
   for (i = 0; i < audio.num_channels; i++)
   {
-    void *sample_ptr;
+    // void *sample_ptr;
     int sample_len;
     int sample_pos;
     int sample_size;
@@ -1167,7 +1168,7 @@ static void Mixer_Main_DSP()
     }
 
     /* pointer, lenght and actual playing position of sound sample */
-    sample_ptr = mixer[i].data_ptr;
+    // sample_ptr = mixer[i].data_ptr;
     sample_len = mixer[i].data_len;
     sample_pos = mixer[i].playing_pos;
     sample_size = MIN(max_sample_size, sample_len - sample_pos);
@@ -1265,7 +1266,8 @@ static void Mixer_Main_DSP()
   }
 
   /* finally play the sound fragment */
-  write(audio.device_fd, playing_buffer, fragment_size);
+  if (write(audio.device_fd, playing_buffer, fragment_size) == -1)
+    Error(ERR_WARN, "write() failed; %s", strerror(errno));
 
   if (!mixer_active_channels)
     CloseAudioDevice(&audio.device_fd);

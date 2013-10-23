@@ -87,7 +87,8 @@ static void SendBufferToServer(int size)
 #if defined(TARGET_SDL)
   SDLNet_TCP_Send(sfd, writbuffer, nwrite);
 #else
-  write(sfd, writbuffer, nwrite);
+  if (write(sfd, writbuffer, nwrite) == -1)
+    Error(ERR_WARN, "write() failed; %s", strerror(errno));
 #endif
   nwrite = 0;
 }

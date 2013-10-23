@@ -1193,7 +1193,8 @@ boolean getFileChunk(FILE *file, char *chunk_name, int *chunk_size,
   const int chunk_name_length = 4;
 
   /* read chunk name */
-  fgets(chunk_name, chunk_name_length + 1, file);
+  if (fgets(chunk_name, chunk_name_length + 1, file) == NULL)
+    return FALSE;
 
   if (chunk_size != NULL)
   {

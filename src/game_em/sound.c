@@ -65,7 +65,7 @@ int sound_thread(void)
 {
   int audio_fd; /* file descriptor of /dev/audio or -1 if not open */
   int audio_format;
-  int sample_rate;
+  // int sample_rate;
   int fragment_size;
   unsigned char *audio_buffer; /* actual buffer pumped to /dev/audio */
   short *mix_buffer;
@@ -80,7 +80,7 @@ int sound_thread(void)
 
   audio_fd = -1;
   audio_format = AUDIO_ULAW; /* defaults for non-OSS /dev/audio */
-  sample_rate = 8000;
+  // sample_rate = 8000;
   fragment_size = 256;
   audio_buffer = 0;
   mix_buffer = 0;
@@ -242,7 +242,7 @@ int sound_thread(void)
 	goto reset;
       }
 
-      sample_rate = i;
+      // sample_rate = i;
       if (ioctl(audio_fd, SNDCTL_DSP_GETBLKSIZE, &i) == -1)
       {
 	Error(ERR_WARN, "unable to get block size in sound thread");

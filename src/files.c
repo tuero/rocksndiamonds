@@ -3364,7 +3364,8 @@ static void LoadLevelFromFileInfo_RND(struct LevelInfo *level,
   else	/* check for pre-2.0 file format with cookie string */
   {
     strcpy(cookie, chunk_name);
-    fgets(&cookie[4], MAX_LINE_LEN - 4, file);
+    if (fgets(&cookie[4], MAX_LINE_LEN - 4, file) == NULL)
+      cookie[4] = '\0';
     if (strlen(cookie) > 0 && cookie[strlen(cookie) - 1] == '\n')
       cookie[strlen(cookie) - 1] = '\0';
 
@@ -6416,7 +6417,8 @@ static void LoadLevelFromFileInfo_DC(struct LevelInfo *level,
   if (level_file_info->packed)
   {
     /* read "magic bytes" from start of file */
-    fgets(magic_bytes, num_magic_bytes + 1, file);
+    if (fgets(magic_bytes, num_magic_bytes + 1, file) == NULL)
+      magic_bytes[0] = '\0';
 
     /* check "magic bytes" for correct file format */
     if (!strPrefix(magic_bytes, "DC2"))
@@ -8799,7 +8801,8 @@ void LoadTapeFromFilename(char *filename)
   else	/* check for pre-2.0 file format with cookie string */
   {
     strcpy(cookie, chunk_name);
-    fgets(&cookie[4], MAX_LINE_LEN - 4, file);
+    if (fgets(&cookie[4], MAX_LINE_LEN - 4, file) == NULL)
+      cookie[4] = '\0';
     if (strlen(cookie) > 0 && cookie[strlen(cookie) - 1] == '\n')
       cookie[strlen(cookie) - 1] = '\0';
 
@@ -9142,7 +9145,8 @@ void LoadScore(int nr)
     return;
 
   /* check file identifier */
-  fgets(cookie, MAX_LINE_LEN, file);
+  if (fgets(cookie, MAX_LINE_LEN, file) == NULL)
+    cookie[0] = '\0';
   if (strlen(cookie) > 0 && cookie[strlen(cookie) - 1] == '\n')
     cookie[strlen(cookie) - 1] = '\0';
 
@@ -9155,10 +9159,12 @@ void LoadScore(int nr)
 
   for (i = 0; i < MAX_SCORE_ENTRIES; i++)
   {
-    fscanf(file, "%d", &highscore[i].Score);
-    fgets(line, MAX_LINE_LEN, file);
+    if (fscanf(file, "%d", &highscore[i].Score) == EOF)
+      Error(ERR_WARN, "fscanf() failed; %s", strerror(errno));
+    if (fgets(line, MAX_LINE_LEN, file) == NULL)
+      line[0] = '\0';
 
-    if (line[strlen(line) - 1] == '\n')
+    if (strlen(line) > 0 && line[strlen(line) - 1] == '\n')
       line[strlen(line) - 1] = '\0';
 
     for (line_ptr = line; *line_ptr; line_ptr++)

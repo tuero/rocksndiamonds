@@ -110,7 +110,7 @@ endif
 
 ifeq ($(TARGET),sdl-static)		# compiling for SDL target (static)
 SYS_CFLAGS  = -DTARGET_SDL $(shell sdl-config --cflags)
-SDL_LIBS = -lSDL_image -lSDL_mixer -lSDL_net -lsmpeg
+SDL_LIBS = -lSDL_image -lSDL_mixer -lSDL_net -lsmpeg -lmikmod
 SYS_LDFLAGS = $(SDL_LIBS) $(shell sdl-config --static-libs)
 endif
 
@@ -146,7 +146,7 @@ CONFIG_GAME_DIR = $(CONFIG_RO_GAME_DIR) $(CONFIG_RW_GAME_DIR)
 CONFIG_GAME = $(CONFIG_GAME_DIR) $(CONFIG_SCORE_ENTRIES) $(CONFIG_SPECIAL)
 
 CONFIG = $(CONFIG_GAME) $(JOYSTICK)
-DEBUG = -DDEBUG -g
+# DEBUG = -DDEBUG -g
 # PROFILING = $(PROFILING_FLAGS)
 
 # OPTIONS = $(DEBUG) -Wall			# only for debugging purposes

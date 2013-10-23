@@ -1,3 +1,9 @@
+2013-10-23
+	* version 3.3.1.0 released
+
+2013-10-21
+	* version number set to 3.3.1.0
+
 2012-10-13
 	* fixed display of level time switching from ascending to descending
 	  when making use of the "time orb bug" (see element setting in editor)
