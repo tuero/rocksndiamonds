@@ -1184,8 +1184,13 @@ void dumpTreeInfo(TreeInfo *node, int depth)
     for (i = 0; i < (depth + 1) * 3; i++)
       printf(" ");
 
+    printf("'%s' / '%s'\n", node->identifier, node->name);
+
+    /*
+    // use for dumping artwork info tree
     printf("subdir == '%s' ['%s', '%s'] [%d])\n",
 	   node->subdir, node->fullpath, node->basepath, node->in_user_dir);
+    */
 
     if (node->node_group != NULL)
       dumpTreeInfo(node->node_group, depth + 1);
@@ -2772,7 +2777,7 @@ static int compareTreeInfoEntries(const void *object1, const void *object2)
 {
   const TreeInfo *entry1 = *((TreeInfo **)object1);
   const TreeInfo *entry2 = *((TreeInfo **)object2);
-  int class_sorting1, class_sorting2;
+  int class_sorting1 = 0, class_sorting2 = 0;
   int compare_result;
 
   if (entry1->type == TREE_TYPE_LEVEL_DIR)
@@ -2780,7 +2785,9 @@ static int compareTreeInfoEntries(const void *object1, const void *object2)
     class_sorting1 = LEVELSORTING(entry1);
     class_sorting2 = LEVELSORTING(entry2);
   }
-  else
+  else if (entry1->type == TREE_TYPE_GRAPHICS_DIR ||
+	   entry1->type == TREE_TYPE_SOUNDS_DIR ||
+	   entry1->type == TREE_TYPE_MUSIC_DIR)
   {
     class_sorting1 = ARTWORKSORTING(entry1);
     class_sorting2 = ARTWORKSORTING(entry2);

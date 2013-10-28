@@ -9246,8 +9246,11 @@ void SaveScore(int nr)
 #define SETUP_TOKEN_OVERRIDE_LEVEL_GRAPHICS	30
 #define SETUP_TOKEN_OVERRIDE_LEVEL_SOUNDS	31
 #define SETUP_TOKEN_OVERRIDE_LEVEL_MUSIC	32
+#define SETUP_TOKEN_VOLUME_SIMPLE		33
+#define SETUP_TOKEN_VOLUME_LOOPS		34
+#define SETUP_TOKEN_VOLUME_MUSIC		35
 
-#define NUM_GLOBAL_SETUP_TOKENS			33
+#define NUM_GLOBAL_SETUP_TOKENS			36
 
 /* editor setup */
 #define SETUP_TOKEN_EDITOR_EL_BOULDERDASH	0
@@ -9390,6 +9393,9 @@ static struct TokenInfo global_setup_tokens[] =
   { TYPE_SWITCH3,&si.override_level_graphics, "override_level_graphics"	},
   { TYPE_SWITCH3,&si.override_level_sounds,   "override_level_sounds"	},
   { TYPE_SWITCH3,&si.override_level_music,    "override_level_music"	},
+  { TYPE_INTEGER,&si.volume_simple,           "volume_simple"		},
+  { TYPE_INTEGER,&si.volume_loops,            "volume_loops"		},
+  { TYPE_INTEGER,&si.volume_music,            "volume_music"		},
 };
 
 static boolean not_used = FALSE;
@@ -9559,6 +9565,10 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
   si->override_level_graphics = FALSE;
   si->override_level_sounds = FALSE;
   si->override_level_music = FALSE;
+
+  si->volume_simple = 100;	/* percent */
+  si->volume_loops = 100;	/* percent */
+  si->volume_music = 100;	/* percent */
 
   si->editor.el_boulderdash		= TRUE;
   si->editor.el_emerald_mine		= TRUE;
@@ -9822,7 +9832,8 @@ void SaveSetup()
   {
     /* just to make things nicer :) */
     if (i == SETUP_TOKEN_PLAYER_NAME + 1 ||
-	i == SETUP_TOKEN_GRAPHICS_SET)
+	i == SETUP_TOKEN_GRAPHICS_SET ||
+	i == SETUP_TOKEN_VOLUME_SIMPLE)
       fprintf(file, "\n");
 
     fprintf(file, "%s\n", getSetupLine(global_setup_tokens, "", i));

@@ -63,8 +63,11 @@
 #define SETUP_MODE_CHOOSE_GRAPHICS	18
 #define SETUP_MODE_CHOOSE_SOUNDS	19
 #define SETUP_MODE_CHOOSE_MUSIC		20
+#define SETUP_MODE_CHOOSE_VOLUME_SIMPLE	21
+#define SETUP_MODE_CHOOSE_VOLUME_LOOPS	22
+#define SETUP_MODE_CHOOSE_VOLUME_MUSIC	23
 
-#define MAX_SETUP_MODES			21
+#define MAX_SETUP_MODES			24
 
 /* for input setup functions */
 #define SETUPINPUT_SCREEN_POS_START	0
@@ -138,6 +141,7 @@ static void CustomizeKeyboard(int);
 static void CalibrateJoystick(int);
 static void execSetupGame(void);
 static void execSetupGraphics(void);
+static void execSetupSound(void);
 static void execSetupArtwork(void);
 static void HandleChooseTree(int, int, int, int, int, TreeInfo **);
 
@@ -175,6 +179,15 @@ static TreeInfo *scroll_delay_current = NULL;
 
 static TreeInfo *game_speeds = NULL;
 static TreeInfo *game_speed_current = NULL;
+
+static TreeInfo *volumes_simple = NULL;
+static TreeInfo *volume_simple_current = NULL;
+
+static TreeInfo *volumes_loops = NULL;
+static TreeInfo *volume_loops_current = NULL;
+
+static TreeInfo *volumes_music = NULL;
+static TreeInfo *volume_music_current = NULL;
 
 static TreeInfo *level_number = NULL;
 static TreeInfo *level_number_current = NULL;
@@ -225,6 +238,27 @@ static struct
   {	6,	"6 Tiles"			},
   {	7,	"7 Tiles"			},
   {	8,	"8 Tiles (Maximum Scroll Delay)"},
+
+  {	-1,	NULL				},
+};
+
+static struct
+{
+  int value;
+  char *text;
+} volumes_list[] =
+{
+  {	0,	"0 %"				},
+  {	10,	"10 %"				},
+  {	20,	"20 %"				},
+  {	30,	"30 %"				},
+  {	40,	"40 %"				},
+  {	50,	"50 %"				},
+  {	60,	"60 %"				},
+  {	70,	"70 %"				},
+  {	80,	"80 %"				},
+  {	90,	"90 %"				},
+  {	100,	"100 %"				},
 
   {	-1,	NULL				},
 };
@@ -3525,6 +3559,10 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
       else if (setup_mode == SETUP_MODE_CHOOSE_SCREEN_MODE ||
 	       setup_mode == SETUP_MODE_CHOOSE_SCROLL_DELAY)
 	execSetupGraphics();
+      else if (setup_mode == SETUP_MODE_CHOOSE_VOLUME_SIMPLE ||
+	       setup_mode == SETUP_MODE_CHOOSE_VOLUME_LOOPS ||
+	       setup_mode == SETUP_MODE_CHOOSE_VOLUME_MUSIC)
+	execSetupSound();
       else
 	execSetupArtwork();
     }
@@ -3711,6 +3749,10 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
 	  else if (setup_mode == SETUP_MODE_CHOOSE_SCREEN_MODE ||
 		   setup_mode == SETUP_MODE_CHOOSE_SCROLL_DELAY)
 	    execSetupGraphics();
+	  else if (setup_mode == SETUP_MODE_CHOOSE_VOLUME_SIMPLE ||
+		   setup_mode == SETUP_MODE_CHOOSE_VOLUME_LOOPS ||
+		   setup_mode == SETUP_MODE_CHOOSE_VOLUME_MUSIC)
+	    execSetupSound();
 	  else
 	    execSetupArtwork();
 	}
@@ -3976,6 +4018,9 @@ static char *game_speed_text;
 static char *graphics_set_name;
 static char *sounds_set_name;
 static char *music_set_name;
+static char *volume_simple_text;
+static char *volume_loops_text;
+static char *volume_music_text;
 
 static void execSetupMain()
 {
@@ -4160,6 +4205,7 @@ static void execSetupGraphics()
 #endif
 
   setup_mode = SETUP_MODE_GRAPHICS;
+
   DrawSetupScreen();
 }
 
@@ -4180,8 +4226,166 @@ static void execSetupChooseScrollDelay()
   DrawSetupScreen();
 }
 
+static void execSetupChooseVolumeSimple()
+{
+  setup_mode = SETUP_MODE_CHOOSE_VOLUME_SIMPLE;
+
+  DrawSetupScreen();
+}
+
+static void execSetupChooseVolumeLoops()
+{
+  setup_mode = SETUP_MODE_CHOOSE_VOLUME_LOOPS;
+
+  DrawSetupScreen();
+}
+
+static void execSetupChooseVolumeMusic()
+{
+  setup_mode = SETUP_MODE_CHOOSE_VOLUME_MUSIC;
+
+  DrawSetupScreen();
+}
+
 static void execSetupSound()
 {
+#if 1
+  if (volumes_simple == NULL)
+  {
+    int i;
+
+    for (i = 0; volumes_list[i].value != -1; i++)
+    {
+      TreeInfo *ti = newTreeInfo_setDefaults(TREE_TYPE_UNDEFINED);
+      char identifier[32], name[32];
+      int value = volumes_list[i].value;
+      char *text = volumes_list[i].text;
+
+      ti->node_top = &volumes_simple;
+      ti->sort_priority = value;
+
+      sprintf(identifier, "%d", value);
+      sprintf(name, "%s", text);
+
+      setString(&ti->identifier, identifier);
+      setString(&ti->name, name);
+      setString(&ti->name_sorting, name);
+      setString(&ti->infotext, "Sound Volume");
+
+      pushTreeInfo(&volumes_simple, ti);
+    }
+
+    /* sort volume values to start with lowest volume value */
+    sortTreeInfo(&volumes_simple);
+
+    /* set current volume value to configured volume value */
+    volume_simple_current =
+      getTreeInfoFromIdentifier(volumes_simple,i_to_a(setup.volume_simple));
+
+    /* if that fails, set current volume to reliable default value */
+    if (volume_simple_current == NULL)
+      volume_simple_current =
+	getTreeInfoFromIdentifier(volumes_simple, i_to_a(100));
+
+    /* if that also fails, set current volume to first available value */
+    if (volume_simple_current == NULL)
+      volume_simple_current = volumes_simple;
+  }
+
+  if (volumes_loops == NULL)
+  {
+    int i;
+
+    for (i = 0; volumes_list[i].value != -1; i++)
+    {
+      TreeInfo *ti = newTreeInfo_setDefaults(TREE_TYPE_UNDEFINED);
+      char identifier[32], name[32];
+      int value = volumes_list[i].value;
+      char *text = volumes_list[i].text;
+
+      ti->node_top = &volumes_loops;
+      ti->sort_priority = value;
+
+      sprintf(identifier, "%d", value);
+      sprintf(name, "%s", text);
+
+      setString(&ti->identifier, identifier);
+      setString(&ti->name, name);
+      setString(&ti->name_sorting, name);
+      setString(&ti->infotext, "Loops Volume");
+
+      pushTreeInfo(&volumes_loops, ti);
+    }
+
+    /* sort volume values to start with lowest volume value */
+    sortTreeInfo(&volumes_loops);
+
+    /* set current volume value to configured volume value */
+    volume_loops_current =
+      getTreeInfoFromIdentifier(volumes_loops,i_to_a(setup.volume_loops));
+
+    /* if that fails, set current volume to reliable default value */
+    if (volume_loops_current == NULL)
+      volume_loops_current =
+	getTreeInfoFromIdentifier(volumes_loops, i_to_a(100));
+
+    /* if that also fails, set current volume to first available value */
+    if (volume_loops_current == NULL)
+      volume_loops_current = volumes_loops;
+  }
+
+  if (volumes_music == NULL)
+  {
+    int i;
+
+    for (i = 0; volumes_list[i].value != -1; i++)
+    {
+      TreeInfo *ti = newTreeInfo_setDefaults(TREE_TYPE_UNDEFINED);
+      char identifier[32], name[32];
+      int value = volumes_list[i].value;
+      char *text = volumes_list[i].text;
+
+      ti->node_top = &volumes_music;
+      ti->sort_priority = value;
+
+      sprintf(identifier, "%d", value);
+      sprintf(name, "%s", text);
+
+      setString(&ti->identifier, identifier);
+      setString(&ti->name, name);
+      setString(&ti->name_sorting, name);
+      setString(&ti->infotext, "Music Volume");
+
+      pushTreeInfo(&volumes_music, ti);
+    }
+
+    /* sort volume values to start with lowest volume value */
+    sortTreeInfo(&volumes_music);
+
+    /* set current volume value to configured volume value */
+    volume_music_current =
+      getTreeInfoFromIdentifier(volumes_music,i_to_a(setup.volume_music));
+
+    /* if that fails, set current volume to reliable default value */
+    if (volume_music_current == NULL)
+      volume_music_current =
+	getTreeInfoFromIdentifier(volumes_music, i_to_a(100));
+
+    /* if that also fails, set current volume to first available value */
+    if (volume_music_current == NULL)
+      volume_music_current = volumes_music;
+  }
+
+  setup.volume_simple = atoi(volume_simple_current->identifier);
+  setup.volume_loops  = atoi(volume_loops_current->identifier);
+  setup.volume_music  = atoi(volume_music_current->identifier);
+
+  /* needed for displaying volume text instead of identifier */
+  volume_simple_text = volume_simple_current->name;
+  volume_loops_text = volume_loops_current->name;
+  volume_music_text = volume_music_current->name;
+#endif
+
   setup_mode = SETUP_MODE_SOUND;
 
   DrawSetupScreen();
@@ -4393,6 +4597,13 @@ static struct TokenInfo setup_info_sound[] =
   { TYPE_SWITCH,	&setup.sound_simple,	"Sound Effects (Normal):"  },
   { TYPE_SWITCH,	&setup.sound_loops,	"Sound Effects (Looping):" },
   { TYPE_SWITCH,	&setup.sound_music,	"Music:"		},
+  { TYPE_EMPTY,		NULL,			""			},
+  { TYPE_ENTER_LIST,	execSetupChooseVolumeSimple, "Sound Volume (Normal):" },
+  { TYPE_STRING,	&volume_simple_text,	""			},
+  { TYPE_ENTER_LIST,	execSetupChooseVolumeLoops, "Sound Volume (Looping):" },
+  { TYPE_STRING,	&volume_loops_text,	""			},
+  { TYPE_ENTER_LIST,	execSetupChooseVolumeMusic, "Music Volume:"	},
+  { TYPE_STRING,	&volume_music_text,	""			},
   { TYPE_EMPTY,		NULL,			""			},
   { TYPE_LEAVE_MENU,	execSetupMain, 		"Back"			},
 
@@ -5723,6 +5934,12 @@ void DrawSetupScreen()
     DrawChooseTree(&artwork.snd_current);
   else if (setup_mode == SETUP_MODE_CHOOSE_MUSIC)
     DrawChooseTree(&artwork.mus_current);
+  else if (setup_mode == SETUP_MODE_CHOOSE_VOLUME_SIMPLE)
+    DrawChooseTree(&volume_simple_current);
+  else if (setup_mode == SETUP_MODE_CHOOSE_VOLUME_LOOPS)
+    DrawChooseTree(&volume_loops_current);
+  else if (setup_mode == SETUP_MODE_CHOOSE_VOLUME_MUSIC)
+    DrawChooseTree(&volume_music_current);
   else
     DrawSetupScreen_Generic();
 
@@ -5752,6 +5969,12 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
     HandleChooseTree(mx, my, dx, dy, button, &artwork.snd_current);
   else if (setup_mode == SETUP_MODE_CHOOSE_MUSIC)
     HandleChooseTree(mx, my, dx, dy, button, &artwork.mus_current);
+  else if (setup_mode == SETUP_MODE_CHOOSE_VOLUME_SIMPLE)
+    HandleChooseTree(mx, my, dx, dy, button, &volume_simple_current);
+  else if (setup_mode == SETUP_MODE_CHOOSE_VOLUME_LOOPS)
+    HandleChooseTree(mx, my, dx, dy, button, &volume_loops_current);
+  else if (setup_mode == SETUP_MODE_CHOOSE_VOLUME_MUSIC)
+    HandleChooseTree(mx, my, dx, dy, button, &volume_music_current);
   else
     HandleSetupScreen_Generic(mx, my, dx, dy, button);
 

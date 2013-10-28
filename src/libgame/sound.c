@@ -71,6 +71,21 @@
 #define SAME_SOUND_NR(x,y)		((x).nr == (y).nr)
 #define SAME_SOUND_DATA(x,y)		((x).data_ptr == (y).data_ptr)
 
+#define SOUND_VOLUME_FROM_PERCENT(v,p)	((p) < 0   ? SOUND_MIN_VOLUME :	\
+					 (p) > 100 ? (v) :		\
+					 (p) * (v) / 100)
+
+#define SOUND_VOLUME_SIMPLE(v) SOUND_VOLUME_FROM_PERCENT(v, setup.volume_simple)
+#define SOUND_VOLUME_LOOPS(v)  SOUND_VOLUME_FROM_PERCENT(v, setup.volume_loops)
+#define SOUND_VOLUME_MUSIC(v)  SOUND_VOLUME_FROM_PERCENT(v, setup.volume_music)
+
+#define SETUP_SOUND_VOLUME(v,s)		((s) == SND_CTRL_PLAY_MUSIC ?	\
+					 SOUND_VOLUME_MUSIC(v) :	\
+					 (s) == SND_CTRL_PLAY_LOOP ?	\
+					 SOUND_VOLUME_LOOPS(v) :	\
+					 SOUND_VOLUME_SIMPLE(v))
+
+
 #if defined(AUDIO_UNIX_NATIVE)
 struct SoundHeader_WAV
 {
@@ -721,7 +736,7 @@ static void Mixer_PlayMusicChannel()
     /* Mix_VolumeMusic() must be called _after_ Mix_PlayMusic() --
        this looks like a bug in the SDL_mixer library */
     Mix_PlayMusic(mixer[audio.music_channel].data_ptr, -1);
-    Mix_VolumeMusic(SOUND_MAX_VOLUME);
+    Mix_VolumeMusic(mixer[audio.music_channel].volume);
   }
 #endif
 }
@@ -2103,6 +2118,8 @@ void PlaySoundExt(int nr, int volume, int stereo_position, int state)
       !audio.sound_enabled ||
       audio.sound_deactivated)
     return;
+
+  volume = SETUP_SOUND_VOLUME(volume, state);
 
   if (volume < SOUND_MIN_VOLUME)
     volume = SOUND_MIN_VOLUME;

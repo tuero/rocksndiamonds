@@ -944,6 +944,10 @@ struct SetupInfo
   int override_level_sounds;		/* not boolean -- can also be "AUTO" */
   int override_level_music;		/* not boolean -- can also be "AUTO" */
 
+  int volume_simple;
+  int volume_loops;
+  int volume_music;
+
   struct SetupEditorInfo editor;
   struct SetupEditorCascadeInfo editor_cascade;
   struct SetupShortcutInfo shortcut;
