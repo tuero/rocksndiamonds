@@ -146,7 +146,7 @@ CONFIG_GAME_DIR = $(CONFIG_RO_GAME_DIR) $(CONFIG_RW_GAME_DIR)
 CONFIG_GAME = $(CONFIG_GAME_DIR) $(CONFIG_SCORE_ENTRIES) $(CONFIG_SPECIAL)
 
 CONFIG = $(CONFIG_GAME) $(JOYSTICK)
-DEBUG = -DDEBUG -g
+# DEBUG = -DDEBUG -g
 # PROFILING = $(PROFILING_FLAGS)
 
 # OPTIONS = $(DEBUG) -Wall			# only for debugging purposes
@@ -220,7 +220,7 @@ CNFS =	conf_gfx.h	\
 	conf_var.c	\
 	conf_act.c
 
-CNFS_CMD = ../Scripts/create_element_defs.pl
+CNFS_CMD = ../build-scripts/create_element_defs.pl
 
 TIMESTAMP_FILE = conftime.h
 

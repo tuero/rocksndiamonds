@@ -1,3 +1,10 @@
+2013-11-04
+	* version 3.3.1.1 released
+
+2013-11-03
+	* added scripts directory to distribution package to enable building
+	  element definitions after editing artwork config source code files
+
 2013-10-26
 	* added volume controls for sounds, loops and music to sound setup
 

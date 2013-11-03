@@ -2883,6 +2883,18 @@ void DrawInfoScreen_Program()
 		    "If you like it, send e-mail to:");
   DrawTextSCentered(ystart2 + 2 * ystep, FONT_TEXT_3,
 		    PROGRAM_EMAIL_STRING);
+#if 1
+  DrawTextSCentered(ystart2 + 4 * ystep, FONT_TEXT_2,
+		    "More information and levels:");
+  DrawTextSCentered(ystart2 + 5 * ystep, FONT_TEXT_3,
+		    PROGRAM_WEBSITE_STRING);
+  DrawTextSCentered(ystart2 + 7 * ystep, FONT_TEXT_2,
+		    "If you have created new levels,");
+  DrawTextSCentered(ystart2 + 8 * ystep, FONT_TEXT_2,
+		    "send them to me to include them!");
+  DrawTextSCentered(ystart2 + 9 * ystep, FONT_TEXT_2,
+		    ":-)");
+#else
   DrawTextSCentered(ystart2 + 3 * ystep, FONT_TEXT_2,
 		    "or SnailMail to:");
   DrawTextSCentered(ystart2 + 4 * ystep + 0, FONT_TEXT_3,
@@ -2903,6 +2915,7 @@ void DrawInfoScreen_Program()
 		    "send them to me to include them!");
   DrawTextSCentered(ystart2 + 11 * ystep, FONT_TEXT_2,
 		    ":-)");
+#endif
 
   DrawTextSCentered(ybottom, FONT_TEXT_4,
 		    "Press any key or button for info menu");
