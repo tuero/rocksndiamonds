@@ -3951,7 +3951,7 @@ void LoadLevelSetup_LastSeries()
   free(filename);
 }
 
-void SaveLevelSetup_LastSeries()
+static void SaveLevelSetup_LastSeries_Ext(boolean deactivate_last_level_series)
 {
   /* ----------------------------------------------------------------------- */
   /* ~/.<program>/levelsetup.conf                                            */
@@ -3972,6 +3972,10 @@ void SaveLevelSetup_LastSeries()
 
   fprintf(file, "%s\n\n", getFormattedSetupEntry(TOKEN_STR_FILE_IDENTIFIER,
 						 getCookie("LEVELSETUP")));
+
+  if (deactivate_last_level_series)
+    fprintf(file, "# %s\n# ", "the following level set may have caused a problem and was deactivated");
+
   fprintf(file, "%s\n", getFormattedSetupEntry(TOKEN_STR_LAST_LEVEL_SERIES,
 					       level_subdir));
 
@@ -3980,6 +3984,16 @@ void SaveLevelSetup_LastSeries()
   SetFilePermissions(filename, PERMS_PRIVATE);
 
   free(filename);
+}
+
+void SaveLevelSetup_LastSeries()
+{
+  SaveLevelSetup_LastSeries_Ext(FALSE);
+}
+
+void SaveLevelSetup_LastSeries_Deactivate()
+{
+  SaveLevelSetup_LastSeries_Ext(TRUE);
 }
 
 static void checkSeriesInfo()

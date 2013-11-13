@@ -317,6 +317,7 @@ void LoadLevelArtworkInfo(void);
 
 void LoadLevelSetup_LastSeries(void);
 void SaveLevelSetup_LastSeries(void);
+void SaveLevelSetup_LastSeries_Deactivate();
 void LoadLevelSetup_SeriesInfo(void);
 void SaveLevelSetup_SeriesInfo(void);
 

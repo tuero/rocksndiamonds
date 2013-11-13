@@ -15,6 +15,11 @@
 #define MACOSX_H
 
 
+/* define some Mac OS X specific paths */
+
+#define MAC_APP_BINARY_SUBDIR	"Contents/MacOS"
+
+
 /* some symbols are already defined on Mac OS X */
 #define Delay Delay_internal
 #define DrawLine DrawLine_internal

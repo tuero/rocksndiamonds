@@ -129,8 +129,12 @@ void InitPlatformDependentStuff(void)
   updateUserGameDataDir();
 #endif
 
+#if 1
+  openErrorFile();
+#else
 #if !defined(PLATFORM_UNIX) || defined(PLATFORM_MACOSX)
   openErrorFile();
+#endif
 #endif
 
 #if defined(TARGET_SDL)

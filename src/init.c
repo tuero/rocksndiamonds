@@ -6440,7 +6440,13 @@ void CloseAllAndExit(int exit_value)
   ClosePlatformDependentStuff();
 
   if (exit_value != 0)
+  {
+    /* fall back to default level set (current set may have caused an error) */
+    SaveLevelSetup_LastSeries_Deactivate();
+
+    /* tell user where to find error log file which may contain more details */
     NotifyUserAboutErrorFile();
+  }
 
   exit(exit_value);
 }

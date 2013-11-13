@@ -1,3 +1,15 @@
+2013-11-13
+	* fixed problem with R'n'D restarting with same level set that may have
+	  caused a problem (and therefore failing again and again); after an
+	  error, the last level set is now deactivated in file "levelsetup.conf"
+	  to restart with default level set (which should work without error)
+
+2013-11-07
+	* fixed determining main game data directory on Mac OS X "Mavericks"
+
+2013-11-04
+	* version number set to 3.3.1.2
+
 2013-11-04
 	* version 3.3.1.1 released
 

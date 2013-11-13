@@ -143,7 +143,7 @@ backup:
 backup-net-copy:
 	./Scripts/make_backup.sh src scp
 
-backup-net: backup backup-net-copy
+backup-all: backup backup-net-copy
 
 backup_lev:
 	./Scripts/make_backup.sh lev

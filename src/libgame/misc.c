@@ -564,6 +564,36 @@ char *getBasePath(char *filename)
   return basepath;
 }
 
+static char *getProgramMainDataPath()
+{
+  char *main_data_path = getStringCopy(program.command_basepath);
+
+#if defined(PLATFORM_MACOSX)
+  static char *main_data_binary_subdir = NULL;
+
+  if (main_data_binary_subdir == NULL)
+  {
+    main_data_binary_subdir = checked_malloc(strlen(program.program_title) + 1 +
+					     strlen("app") + 1 +
+					     strlen(MAC_APP_BINARY_SUBDIR) + 1);
+
+    sprintf(main_data_binary_subdir, "%s.app/%s",
+	    program.program_title, MAC_APP_BINARY_SUBDIR);
+  }
+
+  // cut relative path to Mac OS X application binary directory from path
+  if (strSuffix(main_data_path, main_data_binary_subdir))
+    main_data_path[strlen(main_data_path) -
+		   strlen(main_data_binary_subdir)] = '\0';
+
+  // cut trailing path separator from path (but not if path is root directory)
+  if (strSuffix(main_data_path, "/") && !strEqual(main_data_path, "/"))
+    main_data_path[strlen(main_data_path) - 1] = '\0';
+#endif
+
+  return main_data_path;
+}
+
 
 /* ------------------------------------------------------------------------- */
 /* various string functions                                                  */
@@ -721,6 +751,18 @@ void GetOptions(char *argv[], void (*print_usage_function)(void))
   char *rw_base_path = RW_BASE_PATH;
   char **options_left = &argv[1];
 
+#if 1
+  /* if the program is configured to start from current directory (default),
+     determine program package directory from program binary (some versions
+     of KDE/Konqueror and Mac OS X (especially "Maverick") apparently do not
+     set the current working directory to the program package directory) */
+
+  if (strEqual(ro_base_path, "."))
+    ro_base_path = getProgramMainDataPath();
+  if (strEqual(rw_base_path, "."))
+    rw_base_path = getProgramMainDataPath();
+#else
+
 #if !defined(PLATFORM_MACOSX)
   /* if the program is configured to start from current directory (default),
      determine program package directory (KDE/Konqueror does not do this by
@@ -732,6 +774,8 @@ void GetOptions(char *argv[], void (*print_usage_function)(void))
     ro_base_path = program.command_basepath;
   if (strEqual(rw_base_path, "."))
     rw_base_path = program.command_basepath;
+#endif
+
 #endif
 
   /* initialize global program options */
@@ -963,9 +1007,11 @@ void Error(int mode, char *format, ...)
   static boolean last_line_was_separator = FALSE;
   char *process_name = "";
 
+#if 1
   /* display warnings only when running in verbose mode */
   if (mode & ERR_WARN && !options.verbose)
     return;
+#endif
 
   if (mode == ERR_INFO_LINE)
   {

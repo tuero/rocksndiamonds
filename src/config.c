@@ -71,15 +71,27 @@ char *getProgramInitString()
 {
   static char *program_init_string = NULL;
 
+#if 1
+  // do not display compile target anymore, as it is almost always "SDL" now
   if (program_init_string == NULL)
   {
     program_init_string = checked_malloc(strlen(PROGRAM_TITLE_STRING) + 1 +
-					 strlen(getProgramVersionString()) +1 +
+					 strlen(getProgramVersionString()) + 1);
+
+    sprintf(program_init_string, "%s %s",
+	    PROGRAM_TITLE_STRING, getProgramVersionString());
+  }
+#else
+  if (program_init_string == NULL)
+  {
+    program_init_string = checked_malloc(strlen(PROGRAM_TITLE_STRING) + 1 +
+					 strlen(getProgramVersionString()) + 1 +
 					 strlen(TARGET_STRING) + 1);
 
     sprintf(program_init_string, "%s %s %s",
 	    PROGRAM_TITLE_STRING, getProgramVersionString(), TARGET_STRING);
   }
+#endif
 
   return program_init_string;
 }
