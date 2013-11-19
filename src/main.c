@@ -5594,6 +5594,7 @@ int main(int argc, char *argv[])
 		  MSDOS_POINTER_FILENAME,
 		  COOKIE_PREFIX, FILENAME_PREFIX, GAME_VERSION_ACTUAL);
 
+  InitExitMessageFunction(DisplayExitMessage);
   InitExitFunction(CloseAllAndExit);
   InitPlatformDependentStuff();
 

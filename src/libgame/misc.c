@@ -1045,6 +1045,13 @@ void Error(int mode, char *format, ...)
     va_start(ap, format);
     vfprintf_newline(program.error_file, format, ap);
     va_end(ap);
+
+    if ((mode & ERR_EXIT) && !(mode & ERR_FROM_SERVER))
+    {
+      va_start(ap, format);
+      program.exit_message_function(format, ap);
+      va_end(ap);
+    }
   }
   
   if (mode & ERR_HELP)

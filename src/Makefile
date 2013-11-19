@@ -327,13 +327,13 @@ clean: clean-obj clean-ico clean-bin
 # run and test targets
 # -----------------------------------------------------------------------------
 
-run: all
+run:
 	cd .. && ./$(PROGBASE) --verbose
 
-gdb: all
+gdb:
 	cd .. && gdb -batch -x GDB_COMMANDS ./$(PROGBASE)
 
-valgrind: all
+valgrind:
 	cd .. && valgrind -v --leak-check=yes ./$(PROGBASE) 2> valgrind.out
 
 

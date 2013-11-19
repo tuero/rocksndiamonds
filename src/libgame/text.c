@@ -947,6 +947,24 @@ int DrawTextBuffer(int x, int y, char *text_buffer, int font_nr,
   return current_line;
 }
 
+int DrawTextBufferVA(int x, int y, char *format, va_list ap, int font_nr,
+		     int line_length, int cut_length, int max_lines,
+		     int line_spacing, int mask_mode, boolean autowrap,
+		     boolean centered, boolean parse_comments)
+{
+  char text_buffer[MAX_OUTPUT_LINESIZE];
+  int text_length = vsnprintf(text_buffer, MAX_OUTPUT_LINESIZE, format, ap);
+
+  if (text_length >= MAX_OUTPUT_LINESIZE)
+    Error(ERR_WARN, "string too long in DrawTextBufferVA() -- truncated");
+
+  int num_lines_printed = DrawTextBuffer(x, y, text_buffer, font_nr,
+					 line_length, cut_length, max_lines,
+					 line_spacing, mask_mode, autowrap,
+					 centered, parse_comments);
+  return num_lines_printed;
+}
+
 int DrawTextFile(int x, int y, char *filename, int font_nr,
 		 int line_length, int cut_length, int max_lines,
 		 int line_spacing, int mask_mode, boolean autowrap,

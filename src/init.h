@@ -46,6 +46,8 @@ void KeyboardAutoRepeatOffUnlessAutoplay();
 void InitGfxBuffers();
 void InitGadgets();
 
+void DisplayExitMessage(char *, va_list);
+
 void OpenAll(void);
 void CloseAllAndExit(int);
 

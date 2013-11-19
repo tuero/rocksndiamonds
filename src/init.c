@@ -6274,6 +6274,59 @@ void KeyboardAutoRepeatOffUnlessAutoplay()
     KeyboardAutoRepeatOff();
 }
 
+void DisplayExitMessage(char *format, va_list ap)
+{
+  int font_1 = FC_RED;
+  int font_2 = FC_YELLOW;
+  int font_3 = FC_BLUE;
+  int font_width = getFontWidth(font_2);
+  int font_height = getFontHeight(font_2);
+  int sx = SX;
+  int sy = SY;
+  int sxsize = WIN_XSIZE - 2 * sx;
+  int sysize = WIN_YSIZE - 2 * sy;
+  int line_length = sxsize / font_width;
+  int max_lines = sysize / font_height;
+  int num_lines_printed;
+
+  gfx.sx = sx;
+  gfx.sy = sy;
+  gfx.sxsize = sxsize;
+  gfx.sysize = sysize;
+
+  sy = 20;
+
+  ClearRectangle(drawto, 0, 0, WIN_XSIZE, WIN_YSIZE);
+
+  DrawTextSCentered(sy, font_1, "Fatal error:");
+  sy += 3 * font_height;;
+
+  num_lines_printed =
+    DrawTextBufferVA(sx, sy, format, ap, font_2,
+		     line_length, line_length, max_lines,
+		     0, BLIT_ON_BACKGROUND, TRUE, TRUE, FALSE);
+  sy += (num_lines_printed + 3) * font_height;
+
+  DrawTextSCentered(sy, font_1, "For details, see the following error file:");
+  sy += 3 * font_height;
+
+  num_lines_printed =
+    DrawTextBuffer(sx, sy, program.error_filename, font_2,
+		   line_length, line_length, max_lines,
+		   0, BLIT_ON_BACKGROUND, TRUE, TRUE, FALSE);
+
+  DrawTextSCentered(SYSIZE - 20, font_3, "Press any key or button to exit");
+
+  redraw_mask = REDRAW_ALL;
+
+  BackToFront();
+
+  /* deactivate toons on error message screen */
+  setup.toons = FALSE;
+
+  WaitForEventToContinue();
+}
+
 
 /* ========================================================================= */
 /* OpenAll()                                                                 */

@@ -1,3 +1,7 @@
+2013-11-20
+	* improved error handling: display error message on screen (not only in
+	  the error file or on the console), and display path of the error file
+
 2013-11-13
 	* fixed problem with R'n'D restarting with same level set that may have
 	  caused a problem (and therefore failing again and again); after an

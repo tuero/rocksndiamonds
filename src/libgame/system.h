@@ -679,6 +679,7 @@ struct ProgramInfo
   int version_minor;
   int version_patch;
 
+  void (*exit_message_function)(char *, va_list);
   void (*exit_function)(int);
 };
 
@@ -1230,6 +1231,7 @@ extern int			FrameCounter;
 void InitProgramInfo(char *, char *, char *, char *, char *, char *, char *,
 		     char *, char *, char *, char *, char *, int);
 
+void InitExitMessageFunction(void (*exit_message_function)(char *, va_list));
 void InitExitFunction(void (*exit_function)(int));
 void InitPlatformDependentStuff(void);
 void ClosePlatformDependentStuff(void);

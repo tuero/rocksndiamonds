@@ -91,6 +91,8 @@ void DrawTextExt(DrawBuffer *, int, int, char *, int, int);
 char *GetTextBufferFromFile(char *, int);
 int DrawTextBuffer(int, int, char *, int, int, int, int, int, int,
 		   boolean, boolean, boolean);
+int DrawTextBufferVA(int, int, char *, va_list, int, int, int, int, int, int,
+		     boolean, boolean, boolean);
 int DrawTextFile(int, int, char *, int, int, int, int, int, int,
 		 boolean, boolean, boolean);
 
