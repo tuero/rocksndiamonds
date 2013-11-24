@@ -754,7 +754,7 @@ void GetOptions(char *argv[], void (*print_usage_function)(void))
 #if 1
   /* if the program is configured to start from current directory (default),
      determine program package directory from program binary (some versions
-     of KDE/Konqueror and Mac OS X (especially "Maverick") apparently do not
+     of KDE/Konqueror and Mac OS X (especially "Mavericks") apparently do not
      set the current working directory to the program package directory) */
 
   if (strEqual(ro_base_path, "."))

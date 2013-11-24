@@ -1,3 +1,6 @@
+2013-11-24
+	* version 3.3.1.2 released
+
 2013-11-20
 	* improved error handling: display error message on screen (not only in
 	  the error file or on the console), and display path of the error file

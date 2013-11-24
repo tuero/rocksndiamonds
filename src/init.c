@@ -6498,7 +6498,8 @@ void CloseAllAndExit(int exit_value)
     SaveLevelSetup_LastSeries_Deactivate();
 
     /* tell user where to find error log file which may contain more details */
-    NotifyUserAboutErrorFile();
+    // (error notification now directly displayed on screen inside R'n'D
+    // NotifyUserAboutErrorFile();	/* currently only works for Windows */
   }
 
   exit(exit_value);
