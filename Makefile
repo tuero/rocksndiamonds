@@ -75,6 +75,9 @@ x11:
 sdl:
 	@$(MAKE_CMD) TARGET=sdl
 
+sdl2:
+	@$(MAKE_CMD) TARGET=sdl2
+
 solaris:
 	@$(MAKE_CMD) PLATFORM=solaris TARGET=x11
 

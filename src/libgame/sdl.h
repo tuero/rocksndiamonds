@@ -27,6 +27,18 @@
 
 #define SURFACE_FLAGS		(SDL_SWSURFACE)
 
+#if defined(TARGET_SDL2)
+#define SET_TRANSPARENT_PIXEL	(SDL_TRUE)
+#define UNSET_TRANSPARENT_PIXEL	(SDL_FALSE)
+#else
+#define SET_TRANSPARENT_PIXEL	(SDL_SRCCOLORKEY)
+#define UNSET_TRANSPARENT_PIXEL	(0)
+#endif
+
+#if defined(TARGET_SDL2)
+#define SDL_DisplayFormat(s)	(s)
+#endif
+
 /* system dependent definitions */
 
 #define TARGET_STRING		"SDL"
@@ -44,7 +56,11 @@ typedef struct SDLSurfaceInfo	DrawWindow;
 typedef Uint32			Pixel;
 typedef SDL_Cursor	       *Cursor;
 
+#if defined(TARGET_SDL2)
+typedef SDL_Keycode		Key;
+#else
 typedef SDLKey			Key;
+#endif
 typedef unsigned int		KeyMod;
 
 typedef SDL_Event		Event;
@@ -132,12 +148,19 @@ struct MouseCursorInfo
 #define KSYM_Shift_R		SDLK_RSHIFT
 #define KSYM_Control_L		SDLK_LCTRL
 #define KSYM_Control_R		SDLK_RCTRL
+#if defined(TARGET_SDL2)
+#define KSYM_Meta_L		SDLK_LGUI
+#define KSYM_Meta_R		SDLK_RGUI
+#else
 #define KSYM_Meta_L		SDLK_LMETA
 #define KSYM_Meta_R		SDLK_RMETA
+#endif
 #define KSYM_Alt_L		SDLK_LALT
 #define KSYM_Alt_R		SDLK_RALT
+#if !defined(TARGET_SDL2)
 #define KSYM_Super_L		SDLK_LSUPER
 #define KSYM_Super_R		SDLK_RSUPER
+#endif
 #define KSYM_Mode_switch	SDLK_MODE
 #define KSYM_Multi_key		SDLK_RCTRL
 
@@ -189,6 +212,7 @@ struct MouseCursorInfo
 #define KSYM_braceright		KSYM_UNDEFINED		/* undefined */
 #define KSYM_asciitilde		KSYM_UNDEFINED		/* undefined */
 
+#if !defined(TARGET_SDL2)
 #define KSYM_degree		SDLK_WORLD_16
 #define KSYM_Adiaeresis		SDLK_WORLD_36
 #define KSYM_Odiaeresis		SDLK_WORLD_54
@@ -197,6 +221,7 @@ struct MouseCursorInfo
 #define KSYM_odiaeresis		SDLK_WORLD_86
 #define KSYM_udiaeresis		SDLK_WORLD_92
 #define KSYM_ssharp		SDLK_WORLD_63
+#endif
 
 #ifndef SDLK_A
 #define SDLK_A			65
@@ -292,6 +317,18 @@ struct MouseCursorInfo
 #define KSYM_8			SDLK_8
 #define KSYM_9			SDLK_9
 
+#if defined(TARGET_SDL2)
+#define KSYM_KP_0		SDLK_KP_0
+#define KSYM_KP_1		SDLK_KP_1
+#define KSYM_KP_2		SDLK_KP_2
+#define KSYM_KP_3		SDLK_KP_3
+#define KSYM_KP_4		SDLK_KP_4
+#define KSYM_KP_5		SDLK_KP_5
+#define KSYM_KP_6		SDLK_KP_6
+#define KSYM_KP_7		SDLK_KP_7
+#define KSYM_KP_8		SDLK_KP_8
+#define KSYM_KP_9		SDLK_KP_9
+#else
 #define KSYM_KP_0		SDLK_KP0
 #define KSYM_KP_1		SDLK_KP1
 #define KSYM_KP_2		SDLK_KP2
@@ -302,6 +339,7 @@ struct MouseCursorInfo
 #define KSYM_KP_7		SDLK_KP7
 #define KSYM_KP_8		SDLK_KP8
 #define KSYM_KP_9		SDLK_KP9
+#endif
 
 #define KSYM_F1			SDLK_F1
 #define KSYM_F2			SDLK_F2
@@ -337,8 +375,13 @@ struct MouseCursorInfo
 #define KMOD_Shift_R		KMOD_RSHIFT
 #define KMOD_Control_L		KMOD_LCTRL
 #define KMOD_Control_R		KMOD_RCTRL
+#if defined(TARGET_SDL2)
+#define KMOD_Meta_L		KMOD_LGUI
+#define KMOD_Meta_R		KMOD_RGUI
+#else
 #define KMOD_Meta_L		KMOD_LMETA
 #define KMOD_Meta_R		KMOD_RMETA
+#endif
 #define KMOD_Alt_L		KMOD_LALT
 #define KMOD_Alt_R		KMOD_RALT
 

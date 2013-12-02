@@ -184,7 +184,7 @@ END_OF_FUNCTION(increment_counter);
 
 #if 1
 
-#ifdef TARGET_SDL
+#if defined(TARGET_SDL)
 static unsigned int getCurrentMS()
 {
   return SDL_GetTicks();
@@ -222,7 +222,7 @@ static unsigned int mainCounter(int mode)
 
 #else
 
-#ifdef TARGET_SDL
+#if defined(TARGET_SDL)
 static unsigned int mainCounter(int mode)
 {
   static unsigned int base_ms = 0;
@@ -1390,8 +1390,10 @@ void translate_keyname(Key *keysym, char **x11name, char **name, int mode)
     { KSYM_Meta_R,	"XK_Meta_R",		"right meta" },
     { KSYM_Alt_L,	"XK_Alt_L",		"left alt" },
     { KSYM_Alt_R,	"XK_Alt_R",		"right alt" },
+#if !defined(TARGET_SDL2)
     { KSYM_Super_L,	"XK_Super_L",		"left super" },	 /* Win-L */
     { KSYM_Super_R,	"XK_Super_R",		"right super" }, /* Win-R */
+#endif
     { KSYM_Mode_switch,	"XK_Mode_switch",	"mode switch" }, /* Alt-R */
     { KSYM_Multi_key,	"XK_Multi_key",		"multi key" },	 /* Ctrl-R */
 
@@ -1444,6 +1446,7 @@ void translate_keyname(Key *keysym, char **x11name, char **name, int mode)
     { KSYM_braceright,	"XK_braceright",	"brace right" },
     { KSYM_asciitilde,	"XK_asciitilde",	"~" },
 
+#if !defined(TARGET_SDL2)
     /* special (non-ASCII) keys */
     { KSYM_degree,	"XK_degree",		"°" },
     { KSYM_Adiaeresis,	"XK_Adiaeresis",	"Ä" },
@@ -1453,6 +1456,7 @@ void translate_keyname(Key *keysym, char **x11name, char **name, int mode)
     { KSYM_odiaeresis,	"XK_odiaeresis",	"ö" },
     { KSYM_udiaeresis,	"XK_udiaeresis",	"ü" },
     { KSYM_ssharp,	"XK_ssharp",		"sharp s" },
+#endif
 
     /* end-of-array identifier */
     { 0,                NULL,			NULL }

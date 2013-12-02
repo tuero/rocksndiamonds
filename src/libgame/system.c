@@ -59,6 +59,9 @@ DrawBuffer	       *drawto = NULL;
 
 int			button_status = MB_NOT_PRESSED;
 boolean			motion_status = FALSE;
+#if defined(TARGET_SDL2)
+boolean			keyrepeat_status = TRUE;
+#endif
 
 int			redraw_mask = REDRAW_NONE;
 int			redraw_tiles = 0;
@@ -143,7 +146,13 @@ void InitPlatformDependentStuff(void)
 #endif
 
 #if defined(TARGET_SDL)
-  if (SDL_Init(SDL_INIT_EVENTTHREAD | SDL_INIT_NOPARACHUTE) < 0)
+#if defined(TARGET_SDL2)
+  int sdl_init_flags = SDL_INIT_EVENTS      | SDL_INIT_NOPARACHUTE;
+#else
+  int sdl_init_flags = SDL_INIT_EVENTTHREAD | SDL_INIT_NOPARACHUTE;
+#endif
+
+  if (SDL_Init(sdl_init_flags) < 0)
     Error(ERR_EXIT, "SDL_Init() failed: %s", SDL_GetError());
 
   SDLNet_Init();
@@ -1006,7 +1015,7 @@ Pixel GetPixelFromRGBcompact(Bitmap *bitmap, unsigned int color)
 /* execute all pending screen drawing operations */
 void FlushDisplay(void)
 {
-#ifndef TARGET_SDL
+#if !defined(TARGET_SDL)
   XFlush(display);
 #endif
 }
@@ -1014,7 +1023,7 @@ void FlushDisplay(void)
 /* execute and wait for all pending screen drawing operations */
 void SyncDisplay(void)
 {
-#ifndef TARGET_SDL
+#if !defined(TARGET_SDL)
   XSync(display, FALSE);
 #endif
 }
@@ -1022,9 +1031,13 @@ void SyncDisplay(void)
 void KeyboardAutoRepeatOn(void)
 {
 #if defined(TARGET_SDL)
+#if defined(TARGET_SDL2)
+  keyrepeat_status = TRUE;
+#else
   SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY / 2,
 		      SDL_DEFAULT_REPEAT_INTERVAL / 2);
   SDL_EnableUNICODE(1);
+#endif
 #else
   if (display)
     XAutoRepeatOn(display);
@@ -1034,8 +1047,12 @@ void KeyboardAutoRepeatOn(void)
 void KeyboardAutoRepeatOff(void)
 {
 #if defined(TARGET_SDL)
+#if defined(TARGET_SDL2)
+  keyrepeat_status = FALSE;
+#else
   SDL_EnableKeyRepeat(0, SDL_DEFAULT_REPEAT_INTERVAL);
   SDL_EnableUNICODE(0);
+#endif
 #else
   if (display)
     XAutoRepeatOff(display);
@@ -1288,11 +1305,11 @@ static void CreateScaledBitmaps(Bitmap *old_bitmap, int zoom_factor,
     if (old_bitmap->surface_masked)
       SDL_FreeSurface(old_bitmap->surface_masked);
 
-    SDL_SetColorKey(tmp_surface_1, SDL_SRCCOLORKEY,
+    SDL_SetColorKey(tmp_surface_1, SET_TRANSPARENT_PIXEL,
 		    SDL_MapRGB(tmp_surface_1->format, 0x00, 0x00, 0x00));
     if ((old_bitmap->surface_masked = SDL_DisplayFormat(tmp_surface_1)) ==NULL)
       Error(ERR_EXIT, "SDL_DisplayFormat() failed");
-    SDL_SetColorKey(tmp_surface_1, 0, 0);	/* reset transparent pixel */
+    SDL_SetColorKey(tmp_surface_1, UNSET_TRANSPARENT_PIXEL, 0);
 #endif
   }
 #endif
@@ -1379,11 +1396,11 @@ static void CreateScaledBitmaps(Bitmap *old_bitmap, int zoom_factor,
     if (old_bitmap->surface_masked)
       SDL_FreeSurface(old_bitmap->surface_masked);
 
-    SDL_SetColorKey(old_surface, SDL_SRCCOLORKEY,
+    SDL_SetColorKey(old_surface, SET_TRANSPARENT_PIXEL,
 		    SDL_MapRGB(old_surface->format, 0x00, 0x00, 0x00));
     if ((old_bitmap->surface_masked = SDL_DisplayFormat(old_surface)) ==NULL)
       Error(ERR_EXIT, "SDL_DisplayFormat() failed");
-    SDL_SetColorKey(old_surface, 0, 0);		/* reset transparent pixel */
+    SDL_SetColorKey(old_surface, UNSET_TRANSPARENT_PIXEL, 0);
 #endif
   }
 #endif
@@ -1621,9 +1638,13 @@ void SetAudioMode(boolean enabled)
 
 void InitEventFilter(EventFilter filter_function)
 {
-#if defined(TARGET_SDL)
   /* set event filter to filter out certain events */
+#if defined(TARGET_SDL)
+#if defined(TARGET_SDL2)
+  SDL_SetEventFilter(filter_function, NULL);
+#else
   SDL_SetEventFilter(filter_function);
+#endif
 #endif
 }
 
@@ -1648,7 +1669,11 @@ void NextEvent(Event *event)
 void PeekEvent(Event *event)
 {
 #if defined(TARGET_SDL)
+#if defined(TARGET_SDL2)
+  SDL_PeepEvents(event, 1, SDL_PEEKEVENT, SDL_FIRSTEVENT, SDL_LASTEVENT);
+#else
   SDL_PeepEvents(event, 1, SDL_PEEKEVENT, SDL_ALLEVENTS);
+#endif
 #else
   XPeekEvent(display, event);
 #endif
@@ -1657,6 +1682,10 @@ void PeekEvent(Event *event)
 Key GetEventKey(KeyEvent *event, boolean with_modifiers)
 {
 #if defined(TARGET_SDL)
+#if defined(TARGET_SDL2)
+  /* key up/down events in SDL2 do not return text characters anymore */
+  return event->keysym.sym;
+#else
 
 #if 0
   printf("unicode == '%d', sym == '%d', mod == '0x%04x'\n",
@@ -1672,6 +1701,7 @@ Key GetEventKey(KeyEvent *event, boolean with_modifiers)
   else
     return event->keysym.sym;
 
+#endif
 #else
 
 #if 0

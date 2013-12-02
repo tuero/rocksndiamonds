@@ -85,7 +85,7 @@ static void SDLSetWindowIcon(char *basename)
   }
 
   /* set transparent color */
-  SDL_SetColorKey(surface, SDL_SRCCOLORKEY,
+  SDL_SetColorKey(surface, SET_TRANSPARENT_PIXEL,
 		  SDL_MapRGB(surface->format, 0x00, 0x00, 0x00));
 
   SDL_WM_SetIcon(surface, NULL);
@@ -1706,7 +1706,7 @@ Bitmap *SDLLoadImage(char *filename)
   UPDATE_BUSY_STATE();
 
   /* create native transparent surface for current image */
-  SDL_SetColorKey(sdl_image_tmp, SDL_SRCCOLORKEY,
+  SDL_SetColorKey(sdl_image_tmp, SET_TRANSPARENT_PIXEL,
 		  SDL_MapRGB(sdl_image_tmp->format, 0x00, 0x00, 0x00));
   if ((new_bitmap->surface_masked = SDL_DisplayFormat(sdl_image_tmp)) == NULL)
   {

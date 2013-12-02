@@ -170,6 +170,12 @@
 #define TARGET_X11_NATIVE
 #endif
 
+#if defined(TARGET_SDL2)
+#ifndef TARGET_SDL
+#define TARGET_SDL
+#endif
+#endif
+
 
 /* ========================================================================= */
 /* this should better go into "system.h" or "features.h" (yet to be created) */

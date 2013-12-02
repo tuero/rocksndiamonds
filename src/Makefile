@@ -98,18 +98,24 @@ endif
 # -----------------------------------------------------------------------------
 
 ifeq ($(TARGET),x11)			# compiling for X11 target
-SYS_CFLAGS  = -DTARGET_X11 $(X11_INCL)
+SYS_CFLAGS = -DTARGET_X11 $(X11_INCL)
 SYS_LDFLAGS = $(X11_LIBS)
 endif
 
 ifeq ($(TARGET),sdl)			# compiling for SDL target
-SYS_CFLAGS  = -DTARGET_SDL $(shell sdl-config --cflags)
+SYS_CFLAGS = -DTARGET_SDL $(shell sdl-config --cflags)
 SDL_LIBS = -lSDL_image -lSDL_mixer -lSDL_net -lsmpeg
 SYS_LDFLAGS = $(SDL_LIBS) $(shell sdl-config --libs)
 endif
 
+ifeq ($(TARGET),sdl2)			# compiling for SDL2 target
+SYS_CFLAGS = -DTARGET_SDL2 $(shell sdl2-config --cflags)
+SDL_LIBS = -lSDL2_image -lSDL2_mixer -lSDL2_net -lsmpeg2
+SYS_LDFLAGS = $(SDL_LIBS) $(shell sdl2-config --libs)
+endif
+
 ifeq ($(TARGET),sdl-static)		# compiling for SDL target (static)
-SYS_CFLAGS  = -DTARGET_SDL $(shell sdl-config --cflags)
+SYS_CFLAGS = -DTARGET_SDL $(shell sdl-config --cflags)
 SDL_LIBS = -lSDL_image -lSDL_mixer -lSDL_net -lsmpeg -lmikmod
 SYS_LDFLAGS = $(SDL_LIBS) $(shell sdl-config --static-libs)
 endif

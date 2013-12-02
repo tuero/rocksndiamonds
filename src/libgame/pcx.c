@@ -11,13 +11,11 @@
 * pcx.c                                                    *
 ***********************************************************/
 
-#ifndef TARGET_SDL
-
-#include <stdio.h>
-
 #include "pcx.h"
 #include "misc.h"
 
+
+#if !defined(TARGET_SDL)
 
 #define PCX_DEBUG		0
 

@@ -36,7 +36,7 @@
 /* get these values from the program 'js' from the joystick package, */
 /* set JOYSTICK_PERCENT to a threshold appropriate for your joystick */
 
-#ifdef TARGET_SDL
+#if defined(TARGET_SDL)
 #define JOYSTICK_XLEFT		-32767
 #define JOYSTICK_XMIDDLE	0
 #define JOYSTICK_XRIGHT		32767

@@ -644,7 +644,11 @@
 
 
 /* type definitions */
+#if defined(TARGET_SDL2)
+typedef int (*EventFilter)(void *, Event *);
+#else
 typedef int (*EventFilter)(const Event *);
+#endif
 
 
 /* structure definitions */
@@ -1219,6 +1223,9 @@ extern DrawBuffer	       *drawto;
 
 extern int			button_status;
 extern boolean			motion_status;
+#if defined(TARGET_SDL2)
+extern boolean			keyrepeat_status;
+#endif
 
 extern int			redraw_mask;
 extern int			redraw_tiles;

@@ -36,9 +36,20 @@ static unsigned int playfield_cursor_delay = 0;
    delay problems with lots of mouse motion events when mouse button
    not pressed (X11 can handle this with 'PointerMotionHintMask') */
 
-int FilterMouseMotionEvents(const Event *event)
+/* event filter addition for SDL2: as SDL2 does not have a function to enable
+   or disable keyboard auto-repeat, filter repeated keyboard events instead */
+
+int FilterEvents(const Event *event)
 {
   MotionEvent *motion;
+
+#if defined(TARGET_SDL2)
+  /* skip repeated key press events if keyboard auto-repeat is disabled */
+  if (event->type == EVENT_KEYPRESS &&
+      event->key.repeat &&
+      !keyrepeat_status)
+    return 0;
+#endif
 
   /* non-motion events are directly passed to event handler functions */
   if (event->type != EVENT_MOTIONNOTIFY)
@@ -59,8 +70,8 @@ int FilterMouseMotionEvents(const Event *event)
   if (button_status == MB_RELEASED &&
       game_status != GAME_MODE_EDITOR && game_status != GAME_MODE_PLAYING)
     return 0;
-  else
-    return 1;
+
+  return 1;
 }
 
 /* to prevent delay problems, skip mouse motion events if the very next
@@ -318,7 +329,7 @@ void SleepWhileUnmapped()
 
 void HandleExposeEvent(ExposeEvent *event)
 {
-#ifndef TARGET_SDL
+#if !defined(TARGET_SDL)
   RedrawPlayfield(FALSE, event->x, event->y, event->width, event->height);
   FlushDisplay();
 #endif
