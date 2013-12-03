@@ -16,7 +16,12 @@
 
 #include "main.h"
 
+#if defined(TARGET_SDL2)
+int FilterEvents(void *, Event *);
+#else
 int FilterEvents(const Event *);
+#endif
+
 void EventLoop(void);
 void HandleOtherEvents(Event *);
 void ClearEventQueue(void);

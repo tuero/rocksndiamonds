@@ -39,7 +39,7 @@ static unsigned int playfield_cursor_delay = 0;
 /* event filter addition for SDL2: as SDL2 does not have a function to enable
    or disable keyboard auto-repeat, filter repeated keyboard events instead */
 
-int FilterEvents(const Event *event)
+static int FilterEventsExt(const Event *event)
 {
   MotionEvent *motion;
 
@@ -73,6 +73,18 @@ int FilterEvents(const Event *event)
 
   return 1;
 }
+
+#if defined(TARGET_SDL2)
+int FilterEvents(void *userdata, Event *event)
+{
+  return FilterEventsExt(event);
+}
+#else
+int FilterEvents(const Event *event)
+{
+  return FilterEventsExt(event);
+}
+#endif
 
 /* to prevent delay problems, skip mouse motion events if the very next
    event is also a mouse motion event (and therefore effectively only
@@ -115,7 +127,7 @@ static boolean NextValidEvent(Event *event)
 
     NextEvent(event);
 
-    if (FilterMouseMotionEvents(event))
+    if (FilterEventsExt(event))
       handle_this_event = TRUE;
 
     if (SkipPressedMouseMotionEvent(event))

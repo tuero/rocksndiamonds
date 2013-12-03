@@ -5313,6 +5313,7 @@ void Execute_Command(char *command)
 
 #if DEBUG
 #if defined(TARGET_SDL)
+#if !defined(TARGET_SDL2)
   else if (strEqual(command, "SDL_ListModes"))
   {
     SDL_Rect **modes;
@@ -5346,6 +5347,7 @@ void Execute_Command(char *command)
 
     exit(0);
   }
+#endif
 #endif
 #endif
 
@@ -5641,6 +5643,91 @@ void InitGfx()
   InitFontGraphicInfo();
 
   font_height = getFontHeight(FC_RED);
+
+
+
+
+
+
+
+
+
+#if 0
+  Delay(1000);
+
+#if 0
+  Bitmap new_bitmap;
+  printf("::: MARK 1.1\n");
+  new_bitmap.surface = SDL_LoadBMP("TEST.bmp");
+  printf("::: MARK 1.2\n");
+#endif
+
+  char *filename = getCustomImageFilename("RocksFontSmall.pcx");
+
+  printf("::: FILENAME == '%s'\n", filename);
+
+#if 1
+  Bitmap *new_bitmap = LoadImage(filename);
+#else
+#if 1
+  Bitmap *new_bitmap = CreateBitmapStruct();
+  SDL_Surface *sdl_image_tmp;
+  sdl_image_tmp = IMG_Load(filename);
+  new_bitmap->surface = SDL_DisplayFormat(sdl_image_tmp);
+
+#else
+  SDL_Surface *sdl_image_tmp = IMG_Load(filename);
+  SDL_Surface *sdl_image = SDL_DisplayFormat(sdl_image_tmp);
+#endif
+#endif
+
+  // SDL_Surface *image = SDL_LoadBMP("TEST.bmp");
+  // SDL_LoadBMP("TEST.bmp");
+
+  // bitmap_font_initial->surface = SDL_LoadBMP("TEST.bmp");
+
+#if 0
+  printf("::: MARK 1 [%08x, %08xd]\n",
+	 (unsigned int)bitmap_font_initial->surface,
+	 (unsigned int)backbuffer->surface);
+#endif
+
+  // SDL_BlitSurface(image, NULL, backbuffer->surface, NULL);
+  // SDL_BlitSurface(new_bitmap.surface, NULL,backbuffer->surface, NULL);
+  SDL_BlitSurface(new_bitmap->surface, NULL,backbuffer->surface, NULL);
+  // SDL_BlitSurface(sdl_image, NULL,backbuffer->surface, NULL);
+  // SDL_BlitSurface(bitmap_font_initial->surface, NULL,backbuffer->surface, NULL);
+
+#if 0
+  printf("::: MARK 1 [%08x, %08xd, %08xd]\n",
+	 (unsigned int)bitmap_font_initial->surface,
+	 (unsigned int)backbuffer->surface,
+	 (unsigned int)image);
+#endif
+
+  extern SDL_Window *sdl_window;
+  SDL_UpdateWindowSurface(sdl_window);
+
+#if 1
+#if 0
+  SDL_BlitSurface(bitmap_font_initial->surface, NULL,backbuffer->surface, NULL);
+#endif
+  // SDL_UpdateWindowSurface(sdl_window);
+
+  Delay(1000);
+  exit(0);
+#endif
+#endif
+
+
+
+
+
+
+
+
+
+
 
 #if 1
   DrawInitText(getWindowTitleString(), 20, FC_YELLOW);
@@ -6485,8 +6572,14 @@ void CloseAllAndExit(int exit_value)
   FreeAllImages();
 
 #if defined(TARGET_SDL)
+#if defined(TARGET_SDL2)
+  // !!! TODO !!!
+  // set a flag to tell the network server thread to quit and wait for it
+  // using SDL_WaitThread()
+#else
   if (network_server)	/* terminate network server */
     SDL_KillThread(server_thread);
+#endif
 #endif
 
   CloseVideoDisplay();

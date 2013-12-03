@@ -25,7 +25,11 @@
 
 /* definitions needed for "system.c" */
 
+#if defined(TARGET_SDL2)
+#define SURFACE_FLAGS		(0)
+#else
 #define SURFACE_FLAGS		(SDL_SWSURFACE)
+#endif
 
 #if defined(TARGET_SDL2)
 #define SET_TRANSPARENT_PIXEL	(SDL_TRUE)
@@ -35,13 +39,14 @@
 #define UNSET_TRANSPARENT_PIXEL	(0)
 #endif
 
-#if defined(TARGET_SDL2)
-#define SDL_DisplayFormat(s)	(s)
-#endif
-
 /* system dependent definitions */
 
+#if defined(TARGET_SDL2)
+#define TARGET_STRING		"SDL2"
+#else
 #define TARGET_STRING		"SDL"
+#endif
+
 #define FULLSCREEN_STATUS	FULLSCREEN_AVAILABLE
 
 #define CURSOR_MAX_WIDTH	32
@@ -392,6 +397,10 @@ struct MouseCursorInfo
 
 
 /* SDL function definitions */
+
+#if defined(TARGET_SDL2)
+SDL_Surface *SDL_DisplayFormat(SDL_Surface *);
+#endif
 
 void SDLInitVideoDisplay(void);
 void SDLInitVideoBuffer(DrawBuffer **, DrawWindow **, boolean);

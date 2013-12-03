@@ -614,7 +614,8 @@ void NetworkServer(int port, int serveronly)
 #if defined(TARGET_SDL)
     if ((sl = SDLNet_CheckSockets(fds, 500000)) < 1)
     {
-      Error(ERR_NETWORK_SERVER, SDLNet_GetError());
+      Error(ERR_NETWORK_SERVER, "SDLNet_CheckSockets failed: %s",
+	    SDLNet_GetError());
       perror("SDLNet_CheckSockets");
     }
 

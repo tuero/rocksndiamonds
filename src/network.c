@@ -130,7 +130,12 @@ static void StartNetworkServer(int port)
   static int p;
 
   p = port;
+#if defined(TARGET_SDL2)
+  server_thread = SDL_CreateThread(NetworkServerThread,
+				   "NetworkServerThread", &p);
+#else
   server_thread = SDL_CreateThread(NetworkServerThread, &p);
+#endif
   network_server = TRUE;
 
 #else

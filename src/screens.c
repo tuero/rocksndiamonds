@@ -2969,9 +2969,16 @@ void DrawInfoScreen_Version()
 #if defined(TARGET_SDL)
   int xstart3 = mSX + 29 * xstep;
   SDL_version sdl_version_compiled;
+#if defined(TARGET_SDL2)
+  SDL_version sdl_version_linked_ext;
+#endif
   const SDL_version *sdl_version_linked;
+#if defined(TARGET_SDL2)
+  const char *driver_name = NULL;
+#else
   int driver_name_len = 8;
   char driver_name[driver_name_len];
+#endif
 #endif
 
   SetMainBackgroundImageIfDefined(IMG_BACKGROUND_INFO_VERSION);
@@ -3011,7 +3018,12 @@ void DrawInfoScreen_Version()
   DrawTextF(xstart3, ystart2, font_header, "linked");
 
   SDL_VERSION(&sdl_version_compiled);
+#if defined(TARGET_SDL2)
+  SDL_GetVersion(&sdl_version_linked_ext);
+  sdl_version_linked = &sdl_version_linked_ext;
+#else
   sdl_version_linked = SDL_Linked_Version();
+#endif
 
   ystart2 += 2 * ystep;
   DrawTextF(xstart1, ystart2, font_text, "SDL");
@@ -3071,14 +3083,22 @@ void DrawInfoScreen_Version()
   DrawTextF(xstart2, ystart2, font_header, "Requested");
   DrawTextF(xstart3, ystart2, font_header, "Used");
 
+#if defined(TARGET_SDL2)
+  driver_name = SDL_GetVideoDriver(0);
+#else
   SDL_VideoDriverName(driver_name, driver_name_len);
+#endif
 
   ystart2 += 2 * ystep;
   DrawTextF(xstart1, ystart2, font_text, "SDL_VideoDriver");
   DrawTextF(xstart2, ystart2, font_text, "%s", setup.system.sdl_videodriver);
   DrawTextF(xstart3, ystart2, font_text, "%s", driver_name);
 
+#if defined(TARGET_SDL2)
+  driver_name = SDL_GetAudioDriver(0);
+#else
   SDL_AudioDriverName(driver_name, driver_name_len);
+#endif
 
   ystart2 += ystep;
   DrawTextF(xstart1, ystart2, font_text, "SDL_AudioDriver");

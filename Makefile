@@ -176,10 +176,10 @@ dist-build-win32:
 	@BUILD_DIST=TRUE $(MAKE) cross-win32
 
 dist-build-macosx:
-	# (this is done by "dist-package-macosx" target)
+#	(this is done by "dist-package-macosx" target)
 
 dist-build-macosx-ppc:
-	# (this is done by "dist-package-macosx-ppc" target)
+#	(this is done by "dist-package-macosx-ppc" target)
 
 dist-package-unix:
 	./Scripts/make_dist.sh unix .
@@ -239,4 +239,4 @@ tags:
 	$(MAKE_CMD) tags
 
 depend dep:
-	$(MAKE_CMD) depend
+	$(MAKE_CMD) TARGET=$(DEFAULT_TARGET) depend

@@ -24,8 +24,12 @@
 /* video functions                                                           */
 /* ========================================================================= */
 
-/* functions from SGE library */
-void sge_Line(SDL_Surface *, Sint16, Sint16, Sint16, Sint16, Uint32);
+/* SDL internal variables */
+#if defined(TARGET_SDL2)
+// static SDL_Window *sdl_window = NULL;
+SDL_Window *sdl_window = NULL;
+// static SDL_Renderer *sdl_renderer = NULL;
+#endif
 
 /* stuff needed to work around SDL/Windows fullscreen drawing bug */
 static int fullscreen_width;
@@ -34,6 +38,9 @@ static int fullscreen_xoffset;
 static int fullscreen_yoffset;
 static int video_xoffset;
 static int video_yoffset;
+
+/* functions from SGE library */
+void sge_Line(SDL_Surface *, Sint16, Sint16, Sint16, Sint16, Uint32);
 
 static void setFullscreenParameters(char *fullscreen_mode_string)
 {
@@ -88,23 +95,44 @@ static void SDLSetWindowIcon(char *basename)
   SDL_SetColorKey(surface, SET_TRANSPARENT_PIXEL,
 		  SDL_MapRGB(surface->format, 0x00, 0x00, 0x00));
 
+#if defined(TARGET_SDL2)
+  SDL_SetWindowIcon(sdl_window, surface);
+#else
   SDL_WM_SetIcon(surface, NULL);
+#endif
 #endif
 }
 
+#if defined(TARGET_SDL2)
+SDL_Surface *SDL_DisplayFormat(SDL_Surface *surface)
+{
+  if (backbuffer == NULL ||
+      backbuffer->surface == NULL)
+    return NULL;
+
+  return SDL_ConvertSurface(surface, backbuffer->surface->format, 0);
+}
+#endif
+
 void SDLInitVideoDisplay(void)
 {
+#if !defined(TARGET_SDL2)
   if (!strEqual(setup.system.sdl_videodriver, ARG_DEFAULT))
     SDL_putenv(getStringCat2("SDL_VIDEODRIVER=", setup.system.sdl_videodriver));
 
   SDL_putenv("SDL_VIDEO_CENTERED=1");
+#endif
 
   /* initialize SDL video */
   if (SDL_InitSubSystem(SDL_INIT_VIDEO) < 0)
     Error(ERR_EXIT, "SDL_InitSubSystem() failed: %s", SDL_GetError());
 
   /* set default SDL depth */
+#if !defined(TARGET_SDL2)
   video.default_depth = SDL_GetVideoInfo()->vfmt->BitsPerPixel;
+#else
+  video.default_depth = 32;	// (how to determine video depth in SDL2?)
+#endif
 }
 
 void SDLInitVideoBuffer(DrawBuffer **backbuffer, DrawWindow **window,
@@ -147,8 +175,13 @@ void SDLInitVideoBuffer(DrawBuffer **backbuffer, DrawWindow **window,
   video.fullscreen_mode_current = NULL;
 #endif
 
+#if !defined(TARGET_SDL2)
   /* get available hardware supported fullscreen modes */
   modes = SDL_ListModes(NULL, SDL_FULLSCREEN | SDL_HWSURFACE);
+#else
+  // (for now, no display modes in SDL2 -- change this later)
+  modes = NULL;
+#endif
 
   if (modes == NULL)
   {
@@ -219,7 +252,11 @@ void SDLInitVideoBuffer(DrawBuffer **backbuffer, DrawWindow **window,
     Error(ERR_EXIT, "setting video mode failed");
 
   /* set window and icon title */
+#if defined(TARGET_SDL2)
+  SDL_SetWindowTitle(sdl_window, program.window_title);
+#else
   SDL_WM_SetCaption(program.window_title, program.window_title);
+#endif
 
   /* SDL cannot directly draw to the visible video framebuffer like X11,
      but always uses a backbuffer, which is then blitted to the visible
@@ -245,8 +282,13 @@ void SDLInitVideoBuffer(DrawBuffer **backbuffer, DrawWindow **window,
 boolean SDLSetVideoMode(DrawBuffer **backbuffer, boolean fullscreen)
 {
   boolean success = TRUE;
+#if defined(TARGET_SDL2)
+  int surface_flags_fullscreen = SURFACE_FLAGS | SDL_WINDOW_FULLSCREEN;
+  int surface_flags_window = SURFACE_FLAGS;
+#else
   int surface_flags_fullscreen = SURFACE_FLAGS | SDL_FULLSCREEN;
   int surface_flags_window = SURFACE_FLAGS;
+#endif
   SDL_Surface *new_surface = NULL;
 
   if (*backbuffer == NULL)
@@ -264,9 +306,24 @@ boolean SDLSetVideoMode(DrawBuffer **backbuffer, boolean fullscreen)
     video_yoffset = fullscreen_yoffset;
 
     /* switch display to fullscreen mode, if available */
-    if ((new_surface = SDL_SetVideoMode(fullscreen_width, fullscreen_height,
-					video.depth, surface_flags_fullscreen))
-	== NULL)
+#if defined(TARGET_SDL2)
+    sdl_window = SDL_CreateWindow(program.window_title,
+				  SDL_WINDOWPOS_CENTERED,
+				  SDL_WINDOWPOS_CENTERED,
+				  fullscreen_width, fullscreen_height,
+				  surface_flags_fullscreen);
+    if (sdl_window != NULL)
+    {
+      new_surface = SDL_GetWindowSurface(sdl_window);
+
+      SDL_UpdateWindowSurface(sdl_window);	// immediately map window
+    }
+#else
+    new_surface = SDL_SetVideoMode(fullscreen_width, fullscreen_height,
+				   video.depth, surface_flags_fullscreen);
+#endif
+
+    if (new_surface == NULL)
     {
       /* switching display to fullscreen mode failed */
       Error(ERR_WARN, "SDL_SetVideoMode() failed: %s", SDL_GetError());
@@ -293,9 +350,24 @@ boolean SDLSetVideoMode(DrawBuffer **backbuffer, boolean fullscreen)
     video_yoffset = 0;
 
     /* switch display to window mode */
-    if ((new_surface = SDL_SetVideoMode(video.width, video.height,
-					video.depth, surface_flags_window))
-	== NULL)
+#if defined(TARGET_SDL2)
+    sdl_window = SDL_CreateWindow(program.window_title,
+				  SDL_WINDOWPOS_CENTERED,
+				  SDL_WINDOWPOS_CENTERED,
+				  video.width, video.height,
+				  surface_flags_window);
+    if (sdl_window != NULL)
+    {
+      new_surface = SDL_GetWindowSurface(sdl_window);
+
+      SDL_UpdateWindowSurface(sdl_window);	// immediately map window
+    }
+#else
+    new_surface = SDL_SetVideoMode(video.width, video.height,
+				   video.depth, surface_flags_window);
+#endif
+
+    if (new_surface == NULL)
     {
       /* switching display to window mode failed -- should not happen */
       Error(ERR_WARN, "SDL_SetVideoMode() failed: %s", SDL_GetError());
@@ -396,8 +468,13 @@ void SDLCopyArea(Bitmap *src_bitmap, Bitmap *dst_bitmap,
 		     src_bitmap->surface_masked : src_bitmap->surface),
 		    &src_rect, real_dst_bitmap->surface, &dst_rect);
 
+#if defined(TARGET_SDL2)
+  if (dst_bitmap == window)
+    SDL_UpdateWindowSurface(sdl_window);
+#else
   if (dst_bitmap == window)
     SDL_UpdateRect(backbuffer->surface, dst_x, dst_y, width, height);
+#endif
 }
 
 void SDLFillRectangle(Bitmap *dst_bitmap, int x, int y, int width, int height,
@@ -419,8 +496,13 @@ void SDLFillRectangle(Bitmap *dst_bitmap, int x, int y, int width, int height,
 
   SDL_FillRect(real_dst_bitmap->surface, &rect, color);
 
+#if defined(TARGET_SDL2)
+  if (dst_bitmap == window)
+    SDL_UpdateWindowSurface(sdl_window);
+#else
   if (dst_bitmap == window)
     SDL_UpdateRect(backbuffer->surface, x, y, width, height);
+#endif
 }
 
 void SDLFadeRectangle(Bitmap *bitmap_cross, int x, int y, int width, int height,
@@ -464,6 +546,9 @@ void SDLFadeRectangle(Bitmap *bitmap_cross, int x, int y, int width, int height,
 
   if (initialization_needed)
   {
+#if defined(TARGET_SDL2)
+    unsigned int flags = 0;
+#else
     unsigned int flags = SDL_SRCALPHA;
 
     /* use same surface type as screen surface */
@@ -471,6 +556,7 @@ void SDLFadeRectangle(Bitmap *bitmap_cross, int x, int y, int width, int height,
       flags |= SDL_HWSURFACE;
     else
       flags |= SDL_SWSURFACE;
+#endif
 
     /* create surface for temporary copy of screen buffer (source) */
     if ((surface_source =
@@ -546,7 +632,11 @@ void SDLFadeRectangle(Bitmap *bitmap_cross, int x, int y, int width, int height,
     int i;
 
     SDL_BlitSurface(surface_source, &src_rect, surface_screen, &dst_rect);
+#if defined(TARGET_SDL2)
+    SDL_SetSurfaceBlendMode(surface_target, SDL_BLENDMODE_NONE);
+#else
     SDL_SetAlpha(surface_target, 0, 0);		/* disable alpha blending */
+#endif
 
     ypos[0] = -GetSimpleRandom(16);
 
@@ -648,7 +738,11 @@ void SDLFadeRectangle(Bitmap *bitmap_cross, int x, int y, int width, int height,
 	if (draw_border_function != NULL)
 	  draw_border_function();
 
+#if defined(TARGET_SDL2)
+	SDL_UpdateWindowSurface(sdl_window);
+#else
 	SDL_UpdateRect(surface_screen, dst_x, dst_y, width, height);
+#endif
       }
     }
   }
@@ -668,7 +762,12 @@ void SDLFadeRectangle(Bitmap *bitmap_cross, int x, int y, int width, int height,
       SDL_BlitSurface(surface_source, &src_rect, surface_screen, &dst_rect);
 
       /* draw new (target) image to screen buffer using alpha blending */
+#if defined(TARGET_SDL2)
+      SDL_SetSurfaceAlphaMod(surface_target, alpha_final);
+      SDL_SetSurfaceBlendMode(surface_target, SDL_BLENDMODE_BLEND);
+#else
       SDL_SetAlpha(surface_target, SDL_SRCALPHA, alpha_final);
+#endif
       SDL_BlitSurface(surface_target, &src_rect, surface_screen, &dst_rect);
 
       if (draw_border_function != NULL)
@@ -676,7 +775,11 @@ void SDLFadeRectangle(Bitmap *bitmap_cross, int x, int y, int width, int height,
 
 #if 1
       /* only update the region of the screen that is affected from fading */
+#if defined(TARGET_SDL2)
+      SDL_UpdateWindowSurface(sdl_window);
+#else
       SDL_UpdateRect(surface_screen, dst_x, dst_y, width, height);
+#endif
 #else
       SDL_Flip(surface_screen);
 #endif
@@ -1770,8 +1873,10 @@ void SDLSetMouseCursor(struct MouseCursorInfo *cursor_info)
 
 void SDLOpenAudio(void)
 {
+#if !defined(TARGET_SDL2)
   if (!strEqual(setup.system.sdl_audiodriver, ARG_DEFAULT))
     SDL_putenv(getStringCat2("SDL_AUDIODRIVER=", setup.system.sdl_audiodriver));
+#endif
 
   if (SDL_InitSubSystem(SDL_INIT_AUDIO) < 0)
   {
@@ -1896,6 +2001,8 @@ static void SDLCloseJoystick(int nr)
     return;
 
   SDL_JoystickClose(sdl_joystick[nr]);
+
+  sdl_joystick[nr] = NULL;
 }
 
 static boolean SDLCheckJoystickOpened(int nr)
@@ -1903,7 +2010,11 @@ static boolean SDLCheckJoystickOpened(int nr)
   if (nr < 0 || nr > MAX_PLAYERS)
     return FALSE;
 
+#if defined(TARGET_SDL2)
+  return (sdl_joystick[nr] != NULL ? TRUE : FALSE);
+#else
   return (SDL_JoystickOpened(nr) ? TRUE : FALSE);
+#endif
 }
 
 void HandleJoystickEvent(Event *event)
@@ -1940,7 +2051,7 @@ void SDLInitJoysticks()
   {
     sdl_joystick_subsystem_initialized = TRUE;
 
-    if (SDL_Init(SDL_INIT_JOYSTICK) < 0)
+    if (SDL_InitSubSystem(SDL_INIT_JOYSTICK) < 0)
     {
       Error(ERR_EXIT, "SDL_Init() failed: %s", SDL_GetError());
       return;
