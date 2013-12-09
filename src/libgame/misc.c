@@ -19,6 +19,7 @@
 #include <ctype.h>
 #include <string.h>
 #include <unistd.h>
+#include <errno.h>
 
 #include "platform.h"
 
@@ -42,25 +43,47 @@
 /* platform independent wrappers for printf() et al. (newline aware)         */
 /* ------------------------------------------------------------------------- */
 
+#if defined(PLATFORM_ANDROID)
+static int android_log_prio = ANDROID_LOG_INFO;
+#endif
+
+#if 0
+static void vfPrintLog(FILE *stream, char *format, va_list ap)
+{
+}
+
+static void vfPrintLog(FILE *stream, char *format, va_list ap)
+{
+}
+
+static void fPrintLog(FILE *stream, char *format, va_list ap)
+{
+}
+
+static void fPrintLog(FILE *stream, char *format, va_list ap)
+{
+}
+#endif
+
 static void vfprintf_newline(FILE *stream, char *format, va_list ap)
 {
+#if defined(PLATFORM_ANDROID)
+  __android_log_vprint(android_log_prio, program.program_title, format, ap);
+#else
   char *newline = STRING_NEWLINE;
 
   vfprintf(stream, format, ap);
-
   fprintf(stream, "%s", newline);
+#endif
 }
 
 static void fprintf_newline(FILE *stream, char *format, ...)
 {
-  if (format)
-  {
-    va_list ap;
+  va_list ap;
 
-    va_start(ap, format);
-    vfprintf_newline(stream, format, ap);
-    va_end(ap);
-  }
+  va_start(ap, format);
+  vfprintf_newline(stream, format, ap);
+  va_end(ap);
 }
 
 void fprintf_line(FILE *stream, char *line_chars, int line_length)
@@ -494,7 +517,7 @@ char *getRealName()
     else
       real_name = ANONYMOUS_NAME;
   }
-#elif defined(PLATFORM_UNIX)
+#elif defined(PLATFORM_UNIX) && !defined(PLATFORM_ANDROID)
   if (real_name == NULL)
   {
     struct passwd *pwd;
@@ -632,11 +655,23 @@ char *getStringCat3(char *s1, char *s2, char *s3)
 
 char *getPath2(char *path1, char *path2)
 {
+#if defined(PLATFORM_ANDROID)
+  // workaround for reading from APK assets directory -- skip leading "./"
+  if (strEqual(path1, "."))
+    return getStringCopy(path2);
+#endif
+
   return getStringCat2WithSeparator(path1, path2, STRING_PATH_SEPARATOR);
 }
 
 char *getPath3(char *path1, char *path2, char *path3)
 {
+#if defined(PLATFORM_ANDROID)
+  // workaround for reading from APK assets directory -- skip leading "./"
+  if (strEqual(path1, "."))
+    return getStringCat2WithSeparator(path2, path3, STRING_PATH_SEPARATOR);
+#endif
+
   return getStringCat3WithSeparator(path1, path2, path3, STRING_PATH_SEPARATOR);
 }
 
@@ -1006,6 +1041,11 @@ void Error(int mode, char *format, ...)
 {
   static boolean last_line_was_separator = FALSE;
   char *process_name = "";
+
+#if defined(PLATFORM_ANDROID)
+  android_log_prio = (mode & ERR_WARN ? ANDROID_LOG_WARN :
+		      mode & ERR_EXIT ? ANDROID_LOG_FATAL : ANDROID_LOG_INFO);
+#endif
 
 #if 1
   /* display warnings only when running in verbose mode */
@@ -1854,6 +1894,144 @@ void dumpList(ListNode *node_first)
 
 
 /* ------------------------------------------------------------------------- */
+/* functions for reading directories                                         */
+/* ------------------------------------------------------------------------- */
+
+struct Directory *openDirectory(char *dir_name)
+{
+  struct Directory *dir = checked_calloc(sizeof(struct Directory));
+
+  dir->dir = opendir(dir_name);
+
+  if (dir->dir != NULL)
+  {
+    dir->filename = getStringCopy(dir_name);
+
+    return dir;
+  }
+
+#if defined(PLATFORM_ANDROID)
+  char *asset_toc_filename = getPath2(dir_name, ASSET_TOC_BASENAME);
+
+  dir->asset_toc_file = SDL_RWFromFile(asset_toc_filename, MODE_READ);
+
+  checked_free(asset_toc_filename);
+
+  if (dir->asset_toc_file != NULL)
+  {
+    dir->directory_is_asset = TRUE;
+    dir->filename = getStringCopy(dir_name);
+
+    return dir;
+  }
+#endif
+
+  checked_free(dir);
+
+  return NULL;
+}
+
+int closeDirectory(struct Directory *dir)
+{
+  if (dir == NULL)
+    return -1;
+
+  int result;
+
+#if defined(PLATFORM_ANDROID)
+  if (dir->asset_toc_file)
+    result = SDL_RWclose(dir->asset_toc_file);
+#endif
+
+  if (dir->dir)
+    result = closedir(dir->dir);
+
+  if (dir->dir_entry)
+    freeDirectoryEntry(dir->dir_entry);
+
+  checked_free(dir->filename);
+  checked_free(dir);
+
+  return result;
+}
+
+struct DirectoryEntry *readDirectory(struct Directory *dir)
+{
+  if (dir->dir_entry)
+    freeDirectoryEntry(dir->dir_entry);
+
+  dir->dir_entry = NULL;
+
+#if defined(PLATFORM_ANDROID)
+  if (dir->directory_is_asset)
+  {
+    char line[MAX_LINE_LEN];
+    char *line_ptr = line;
+    char *last_line_ptr = line_ptr;
+    int num_bytes_read = 0;
+
+    while (num_bytes_read < MAX_LINE_LEN &&
+	   SDL_RWread(dir->asset_toc_file, line_ptr, 1, 1) == 1 &&
+	   *line_ptr != '\n')
+    {
+      last_line_ptr = line_ptr;
+      line_ptr++;
+      num_bytes_read++;
+    }
+
+    *line_ptr = '\0';
+
+    if (strlen(line) == 0)
+      return NULL;
+
+    dir->dir_entry = checked_calloc(sizeof(struct DirectoryEntry));
+
+    dir->dir_entry->is_directory = FALSE;
+    if (line[strlen(line) - 1] = '/')
+    {
+      dir->dir_entry->is_directory = TRUE;
+
+      line[strlen(line) - 1] = '\0';
+    }
+
+    dir->dir_entry->basename = getStringCopy(line);
+    dir->dir_entry->filename = getPath2(dir->filename, line);
+
+    return dir->dir_entry;
+  }
+#endif
+
+  struct dirent *dir_entry = readdir(dir->dir);
+
+  if (dir_entry == NULL)
+    return NULL;
+
+  dir->dir_entry = checked_calloc(sizeof(struct DirectoryEntry));
+
+  dir->dir_entry->basename = getStringCopy(dir_entry->d_name);
+  dir->dir_entry->filename = getPath2(dir->filename, dir_entry->d_name);
+
+  struct stat file_status;
+
+  dir->dir_entry->is_directory =
+    (stat(dir->dir_entry->filename, &file_status) == 0 &&
+     (file_status.st_mode & S_IFMT) != S_IFDIR);
+
+  return dir->dir_entry;
+}
+
+void freeDirectoryEntry(struct DirectoryEntry *dir_entry)
+{
+  if (dir_entry == NULL)
+    return;
+
+  checked_free(dir_entry->basename);
+  checked_free(dir_entry->filename);
+  checked_free(dir_entry);
+}
+
+
+/* ------------------------------------------------------------------------- */
 /* functions for checking files and filenames                                */
 /* ------------------------------------------------------------------------- */
 
@@ -1862,7 +2040,18 @@ boolean fileExists(char *filename)
   if (filename == NULL)
     return FALSE;
 
+#if defined(PLATFORM_ANDROID)
+  // workaround: check if file exists by opening and closing it
+  SDL_RWops *file = SDL_RWFromFile(filename, MODE_READ);
+  boolean success = (file != NULL);
+
+  if (success)
+    SDL_RWclose(file);
+
+  return success;
+#else
   return (access(filename, F_OK) == 0);
+#endif
 }
 
 boolean fileHasPrefix(char *basename, char *prefix)
@@ -3109,8 +3298,12 @@ void openErrorFile()
   InitUserDataDirectory();
 
   if ((program.error_file = fopen(program.error_filename, MODE_WRITE)) == NULL)
-    fprintf_newline(stderr, "ERROR: cannot open file '%s' for writing!",
-		    program.error_filename);
+  {
+    program.error_file = stderr;
+
+    Error(ERR_WARN, "cannot open file '%s' for writing: %s",
+	  program.error_filename, strerror(errno));
+  }
 }
 
 void closeErrorFile()

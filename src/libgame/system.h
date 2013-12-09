@@ -24,6 +24,8 @@
 #include "windows.h"
 #elif defined(PLATFORM_MSDOS)
 #include "msdos.h"
+#elif defined(PLATFORM_ANDROID)
+#include "android.h"
 #endif
 
 #if defined(TARGET_SDL)

@@ -152,6 +152,12 @@
 #define PLATFORM_STRING "Windows CE"
 #endif
 
+#if defined(__ANDROID__)
+#define PLATFORM_ANDROID
+#undef  PLATFORM_STRING
+#define PLATFORM_STRING "Android"
+#endif
+
 
 /* ========================================================================= */
 /* define additional target keywords                                         */

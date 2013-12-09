@@ -16,6 +16,7 @@
 #include <dirent.h>
 #include <string.h>
 #include <unistd.h>
+#include <errno.h>
 
 #include "platform.h"
 
@@ -1457,7 +1458,8 @@ void createDirectory(char *dir, char *text, int permission_class)
 
   if (!fileExists(dir))
     if (posix_mkdir(dir, dir_mode) != 0)
-      Error(ERR_WARN, "cannot create %s directory '%s'", text, dir);
+      Error(ERR_WARN, "cannot create %s directory '%s': %s",
+	    text, dir, strerror(errno));
 
   if (permission_class == PERMS_PUBLIC && !running_setgid)
     chmod(dir, dir_mode);
@@ -3235,9 +3237,14 @@ static void LoadLevelInfoFromLevelDir(TreeInfo **node_first,
   struct dirent *dir_entry;
   boolean valid_entry_found = FALSE;
 
+#if 1
+  Error(ERR_INFO, "looking for levels in '%s' ...", level_directory);
+#endif
+
   if ((dir = opendir(level_directory)) == NULL)
   {
     Error(ERR_WARN, "cannot read level directory '%s'", level_directory);
+
     return;
   }
 
@@ -3957,6 +3964,10 @@ static void SaveLevelSetup_LastSeries_Ext(boolean deactivate_last_level_series)
   /* ~/.<program>/levelsetup.conf                                            */
   /* ----------------------------------------------------------------------- */
 
+  // check if the current level directory structure is available at this point
+  if (leveldir_current == NULL)
+    return;
+
   char *filename = getPath2(getSetupDir(), LEVELSETUP_FILENAME);
   char *level_subdir = leveldir_current->subdir;
   FILE *file;
@@ -3966,7 +3977,9 @@ static void SaveLevelSetup_LastSeries_Ext(boolean deactivate_last_level_series)
   if (!(file = fopen(filename, MODE_WRITE)))
   {
     Error(ERR_WARN, "cannot write setup file '%s'", filename);
+
     free(filename);
+
     return;
   }
 

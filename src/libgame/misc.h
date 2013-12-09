@@ -16,6 +16,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <dirent.h>
 
 #include "system.h"
 
@@ -69,6 +70,36 @@
 /* values for general username handling stuff */
 #define MAX_USERNAME_LEN		1024
 
+#if defined(PLATFORM_ANDROID)
+/* values for Android asset handling */
+#define ASSET_TOC_BASENAME		".toc"
+#endif
+
+
+/* structure definitions */
+
+struct DirectoryEntry
+{
+  boolean is_directory;
+  char *basename;
+  char *filename;
+};
+
+struct Directory
+{
+  char *filename;
+  DIR *dir;
+  struct DirectoryEntry *dir_entry;
+
+#if defined(PLATFORM_ANDROID)
+  boolean directory_is_asset;
+  SDL_RWops *asset_toc_file;
+  char *current_entry;
+#endif
+};
+
+
+/* function definitions */
 
 void fprintf_line(FILE *, char *, int);
 void printf_line(char *, int);
@@ -180,6 +211,11 @@ void addNodeToList(ListNode **, char *, void *);
 void deleteNodeFromList(ListNode **, char *, void (*function)(void *));
 ListNode *getNodeFromKey(ListNode *, char *);
 int getNumNodes(ListNode *);
+
+struct Directory *openDirectory(char *);
+int closeDirectory(struct Directory *);
+struct DirectoryEntry *readDirectory(struct Directory *);
+void freeDirectoryEntry(struct DirectoryEntry *);
 
 boolean fileExists(char *);
 boolean FileIsGraphic(char *);

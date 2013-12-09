@@ -129,6 +129,9 @@ void InitExitFunction(void (*exit_function)(int))
 
 void InitPlatformDependentStuff(void)
 {
+  // this is initialized in GetOptions(), but may already be used before
+  options.verbose = TRUE;
+
 #if defined(PLATFORM_MSDOS)
   _fmode = O_BINARY;
 #endif

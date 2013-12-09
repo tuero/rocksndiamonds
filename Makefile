@@ -59,7 +59,7 @@ SRC_DIR = src
 MAKE_CMD = $(MAKE) -C $(SRC_DIR)
 
 # DEFAULT_TARGET = x11
-DEFAULT_TARGET = sdl
+DEFAULT_TARGET = sdl2
 
 
 # -----------------------------------------------------------------------------
