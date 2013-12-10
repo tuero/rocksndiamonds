@@ -78,25 +78,37 @@
 
 /* structure definitions */
 
-struct DirectoryEntry
+typedef struct
+{
+  char *filename;
+  FILE *file;
+  boolean end_of_file;
+
+#if defined(PLATFORM_ANDROID)
+  boolean file_is_asset;
+  SDL_RWops *asset_file;
+#endif
+} File;
+
+typedef struct
 {
   boolean is_directory;
   char *basename;
   char *filename;
-};
+} DirectoryEntry;
 
-struct Directory
+typedef struct
 {
   char *filename;
   DIR *dir;
-  struct DirectoryEntry *dir_entry;
+  DirectoryEntry *dir_entry;
 
 #if defined(PLATFORM_ANDROID)
   boolean directory_is_asset;
   SDL_RWops *asset_toc_file;
   char *current_entry;
 #endif
-};
+} Directory;
 
 
 /* function definitions */
@@ -212,10 +224,15 @@ void deleteNodeFromList(ListNode **, char *, void (*function)(void *));
 ListNode *getNodeFromKey(ListNode *, char *);
 int getNumNodes(ListNode *);
 
-struct Directory *openDirectory(char *);
-int closeDirectory(struct Directory *);
-struct DirectoryEntry *readDirectory(struct Directory *);
-void freeDirectoryEntry(struct DirectoryEntry *);
+File *openFile(char *, char *);
+int closeFile(File *);
+int checkEndOfFile(File *);
+char *getStringFromFile(File *, char *, int);
+
+Directory *openDirectory(char *);
+int closeDirectory(Directory *);
+DirectoryEntry *readDirectory(Directory *);
+void freeDirectoryEntry(DirectoryEntry *);
 
 boolean fileExists(char *);
 boolean FileIsGraphic(char *);

@@ -1918,6 +1918,196 @@ boolean getTokenValueFromSetupLine(char *line, char **token, char **value)
 }
 
 #if 1
+
+#if 1
+static boolean loadSetupFileData(void *setup_file_data, char *filename,
+				 boolean top_recursion_level, boolean is_hash)
+{
+  static SetupFileHash *include_filename_hash = NULL;
+  char line[MAX_LINE_LEN], line_raw[MAX_LINE_LEN], previous_line[MAX_LINE_LEN];
+  char *token, *value, *line_ptr;
+  void *insert_ptr = NULL;
+  boolean read_continued_line = FALSE;
+  File *file;
+  int line_nr = 0, token_count = 0, include_count = 0;
+
+#if CHECK_TOKEN_VALUE_SEPARATOR__WARN_IF_MISSING
+  token_value_separator_warning = FALSE;
+#endif
+
+#if CHECK_TOKEN__WARN_IF_ALREADY_EXISTS_IN_HASH
+  token_already_exists_warning = FALSE;
+#endif
+
+#if 0
+  Error(ERR_INFO, "===== opening file: '%s'", filename);
+#endif
+
+  if (!(file = openFile(filename, MODE_READ)))
+  {
+    Error(ERR_WARN, "cannot open configuration file '%s'", filename);
+
+    return FALSE;
+  }
+
+#if 0
+  Error(ERR_INFO, "===== reading file: '%s'", filename);
+#endif
+
+  /* use "insert pointer" to store list end for constant insertion complexity */
+  if (!is_hash)
+    insert_ptr = setup_file_data;
+
+  /* on top invocation, create hash to mark included files (to prevent loops) */
+  if (top_recursion_level)
+    include_filename_hash = newSetupFileHash();
+
+  /* mark this file as already included (to prevent including it again) */
+  setHashEntry(include_filename_hash, getBaseNamePtr(filename), "true");
+
+  while (!checkEndOfFile(file))
+  {
+    /* read next line of input file */
+    if (!getStringFromFile(file, line, MAX_LINE_LEN))
+      break;
+
+#if 0
+    Error(ERR_INFO, "got line: '%s'", line);
+#endif
+
+    /* check if line was completely read and is terminated by line break */
+    if (strlen(line) > 0 && line[strlen(line) - 1] == '\n')
+      line_nr++;
+
+    /* cut trailing line break (this can be newline and/or carriage return) */
+    for (line_ptr = &line[strlen(line)]; line_ptr >= line; line_ptr--)
+      if ((*line_ptr == '\n' || *line_ptr == '\r') && *(line_ptr + 1) == '\0')
+	*line_ptr = '\0';
+
+    /* copy raw input line for later use (mainly debugging output) */
+    strcpy(line_raw, line);
+
+    if (read_continued_line)
+    {
+#if 0
+      /* !!! ??? WHY ??? !!! */
+      /* cut leading whitespaces from input line */
+      for (line_ptr = line; *line_ptr; line_ptr++)
+	if (*line_ptr != ' ' && *line_ptr != '\t')
+	  break;
+#endif
+
+      /* append new line to existing line, if there is enough space */
+      if (strlen(previous_line) + strlen(line_ptr) < MAX_LINE_LEN)
+	strcat(previous_line, line_ptr);
+
+      strcpy(line, previous_line);	/* copy storage buffer to line */
+
+      read_continued_line = FALSE;
+    }
+
+    /* if the last character is '\', continue at next line */
+    if (strlen(line) > 0 && line[strlen(line) - 1] == '\\')
+    {
+      line[strlen(line) - 1] = '\0';	/* cut off trailing backslash */
+      strcpy(previous_line, line);	/* copy line to storage buffer */
+
+      read_continued_line = TRUE;
+
+      continue;
+    }
+
+    if (!getTokenValueFromSetupLineExt(line, &token, &value, filename,
+				       line_raw, line_nr, FALSE))
+      continue;
+
+    if (*token)
+    {
+      if (strEqual(token, "include"))
+      {
+	if (getHashEntry(include_filename_hash, value) == NULL)
+	{
+	  char *basepath = getBasePath(filename);
+	  char *basename = getBaseName(value);
+	  char *filename_include = getPath2(basepath, basename);
+
+#if 0
+	  Error(ERR_INFO, "[including file '%s']", filename_include);
+#endif
+
+	  loadSetupFileData(setup_file_data, filename_include, FALSE, is_hash);
+
+	  free(basepath);
+	  free(basename);
+	  free(filename_include);
+
+	  include_count++;
+	}
+	else
+	{
+	  Error(ERR_WARN, "ignoring already processed file '%s'", value);
+	}
+      }
+      else
+      {
+	if (is_hash)
+	{
+#if CHECK_TOKEN__WARN_IF_ALREADY_EXISTS_IN_HASH
+	  char *old_value =
+	    getHashEntry((SetupFileHash *)setup_file_data, token);
+
+	  if (old_value != NULL)
+	  {
+	    if (!token_already_exists_warning)
+	    {
+	      Error(ERR_INFO_LINE, "-");
+	      Error(ERR_WARN, "duplicate token(s) found in config file:");
+	      Error(ERR_INFO, "- config file: '%s'", filename);
+
+	      token_already_exists_warning = TRUE;
+	    }
+
+	    Error(ERR_INFO, "- token: '%s' (in line %d)", token, line_nr);
+	    Error(ERR_INFO, "  old value: '%s'", old_value);
+	    Error(ERR_INFO, "  new value: '%s'", value);
+	  }
+#endif
+
+	  setHashEntry((SetupFileHash *)setup_file_data, token, value);
+	}
+	else
+	{
+	  insert_ptr = addListEntry((SetupFileList *)insert_ptr, token, value);
+	}
+
+	token_count++;
+      }
+    }
+  }
+
+  closeFile(file);
+
+#if CHECK_TOKEN_VALUE_SEPARATOR__WARN_IF_MISSING
+  if (token_value_separator_warning)
+    Error(ERR_INFO_LINE, "-");
+#endif
+
+#if CHECK_TOKEN__WARN_IF_ALREADY_EXISTS_IN_HASH
+  if (token_already_exists_warning)
+    Error(ERR_INFO_LINE, "-");
+#endif
+
+  if (token_count == 0 && include_count == 0)
+    Error(ERR_WARN, "configuration file '%s' is empty", filename);
+
+  if (top_recursion_level)
+    freeSetupFileHash(include_filename_hash);
+
+  return TRUE;
+}
+
+#else
+
 static boolean loadSetupFileData(void *setup_file_data, char *filename,
 				 boolean top_recursion_level, boolean is_hash)
 {
@@ -2091,6 +2281,8 @@ static boolean loadSetupFileData(void *setup_file_data, char *filename,
 
   return TRUE;
 }
+
+#endif
 
 #else
 
@@ -3229,6 +3421,97 @@ static boolean LoadLevelInfoFromLevelConf(TreeInfo **node_first,
   return TRUE;
 }
 
+#if 1
+static void LoadLevelInfoFromLevelDir(TreeInfo **node_first,
+				      TreeInfo *node_parent,
+				      char *level_directory)
+{
+  Directory *dir;
+  DirectoryEntry *dir_entry;
+  boolean valid_entry_found = FALSE;
+
+#if 0
+  Error(ERR_INFO, "looking for levels in '%s' ...", level_directory);
+#endif
+
+  if ((dir = openDirectory(level_directory)) == NULL)
+  {
+    Error(ERR_WARN, "cannot read level directory '%s'", level_directory);
+
+    return;
+  }
+
+#if 0
+  Error(ERR_INFO, "opening '%s' succeeded ...", level_directory);
+#endif
+
+  while ((dir_entry = readDirectory(dir)) != NULL)	/* loop all entries */
+  {
+    struct stat file_status;
+    char *directory_name = dir_entry->basename;
+    char *directory_path = getPath2(level_directory, directory_name);
+
+#if 0
+    Error(ERR_INFO, "checking entry '%s' ...", directory_name);
+#endif
+
+    /* skip entries for current and parent directory */
+    if (strEqual(directory_name, ".") ||
+	strEqual(directory_name, ".."))
+    {
+      free(directory_path);
+
+      continue;
+    }
+
+#if 1
+    /* find out if directory entry is itself a directory */
+    if (!dir_entry->is_directory)			/* not a directory */
+    {
+      free(directory_path);
+
+      continue;
+    }
+#else
+    /* find out if directory entry is itself a directory */
+    if (stat(directory_path, &file_status) != 0 ||	/* cannot stat file */
+	(file_status.st_mode & S_IFMT) != S_IFDIR)	/* not a directory */
+    {
+      free(directory_path);
+
+      continue;
+    }
+#endif
+
+    free(directory_path);
+
+    if (strEqual(directory_name, GRAPHICS_DIRECTORY) ||
+	strEqual(directory_name, SOUNDS_DIRECTORY) ||
+	strEqual(directory_name, MUSIC_DIRECTORY))
+      continue;
+
+    valid_entry_found |= LoadLevelInfoFromLevelConf(node_first, node_parent,
+						    level_directory,
+						    directory_name);
+  }
+
+  closeDirectory(dir);
+
+  /* special case: top level directory may directly contain "levelinfo.conf" */
+  if (node_parent == NULL && !valid_entry_found)
+  {
+    /* check if this directory directly contains a file "levelinfo.conf" */
+    valid_entry_found |= LoadLevelInfoFromLevelConf(node_first, node_parent,
+						    level_directory, ".");
+  }
+
+  if (!valid_entry_found)
+    Error(ERR_WARN, "cannot find any valid level series in directory '%s'",
+	  level_directory);
+}
+
+#else
+
 static void LoadLevelInfoFromLevelDir(TreeInfo **node_first,
 				      TreeInfo *node_parent,
 				      char *level_directory)
@@ -3248,11 +3531,19 @@ static void LoadLevelInfoFromLevelDir(TreeInfo **node_first,
     return;
   }
 
+#if 1
+  Error(ERR_INFO, "opening '%s' succeeded ...", level_directory);
+#endif
+
   while ((dir_entry = readdir(dir)) != NULL)	/* loop until last dir entry */
   {
     struct stat file_status;
     char *directory_name = dir_entry->d_name;
     char *directory_path = getPath2(level_directory, directory_name);
+
+#if 1
+    Error(ERR_INFO, "checking entry '%s' ...", directory_name);
+#endif
 
     /* skip entries for current and parent directory */
     if (strEqual(directory_name, ".") ||
@@ -3296,6 +3587,7 @@ static void LoadLevelInfoFromLevelDir(TreeInfo **node_first,
     Error(ERR_WARN, "cannot find any valid level series in directory '%s'",
 	  level_directory);
 }
+#endif
 
 boolean AdjustGraphicsForEMC()
 {
@@ -4009,6 +4301,64 @@ void SaveLevelSetup_LastSeries_Deactivate()
   SaveLevelSetup_LastSeries_Ext(TRUE);
 }
 
+#if 1
+
+static void checkSeriesInfo()
+{
+  static char *level_directory = NULL;
+  Directory *dir;
+#if 0
+  DirectoryEntry *dir_entry;
+#endif
+
+  /* check for more levels besides the 'levels' field of 'levelinfo.conf' */
+
+  level_directory = getPath2((leveldir_current->in_user_dir ?
+			      getUserLevelDir(NULL) :
+			      options.level_directory),
+			     leveldir_current->fullpath);
+
+  if ((dir = openDirectory(level_directory)) == NULL)
+  {
+    Error(ERR_WARN, "cannot read level directory '%s'", level_directory);
+
+    return;
+  }
+
+#if 0
+  while ((dir_entry = readDirectory(dir)) != NULL)   /* last directory entry */
+  {
+    if (strlen(dir_entry->basename) > 4 &&
+	dir_entry->basename[3] == '.' &&
+	strEqual(&dir_entry->basename[4], LEVELFILE_EXTENSION))
+    {
+      char levelnum_str[4];
+      int levelnum_value;
+
+      strncpy(levelnum_str, dir_entry->basename, 3);
+      levelnum_str[3] = '\0';
+
+      levelnum_value = atoi(levelnum_str);
+
+      if (levelnum_value < leveldir_current->first_level)
+      {
+	Error(ERR_WARN, "additional level %d found", levelnum_value);
+	leveldir_current->first_level = levelnum_value;
+      }
+      else if (levelnum_value > leveldir_current->last_level)
+      {
+	Error(ERR_WARN, "additional level %d found", levelnum_value);
+	leveldir_current->last_level = levelnum_value;
+      }
+    }
+  }
+#endif
+
+  closeDirectory(dir);
+}
+
+#else
+
 static void checkSeriesInfo()
 {
   static char *level_directory = NULL;
@@ -4062,6 +4412,8 @@ static void checkSeriesInfo()
 
   closedir(dir);
 }
+
+#endif
 
 void LoadLevelSetup_SeriesInfo()
 {

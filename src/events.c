@@ -152,6 +152,13 @@ void EventLoop(void)
       {
   	switch (event.type)
   	{
+#if defined(PLATFORM_ANDROID)
+	  // !!! TEST ONLY !!!
+	  case SDL_QUIT:
+	  case SDL_FINGERDOWN:
+	    CloseAllAndExit(0);
+#endif
+
   	  case EVENT_BUTTONPRESS:
   	  case EVENT_BUTTONRELEASE:
   	    HandleButtonEvent((ButtonEvent *) &event);

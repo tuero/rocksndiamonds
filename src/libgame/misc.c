@@ -835,9 +835,13 @@ void GetOptions(char *argv[], void (*print_usage_function)(void))
   options.debug = FALSE;
   options.debug_x11_sync = FALSE;
 
+#if 1
+  options.verbose = TRUE;
+#else
 #if !defined(PLATFORM_UNIX)
   if (*options_left == NULL)	/* no options given -- enable verbose mode */
     options.verbose = TRUE;
+#endif
 #endif
 
   while (*options_left)
@@ -1894,12 +1898,110 @@ void dumpList(ListNode *node_first)
 
 
 /* ------------------------------------------------------------------------- */
-/* functions for reading directories                                         */
+/* functions for file handling                                               */
 /* ------------------------------------------------------------------------- */
 
-struct Directory *openDirectory(char *dir_name)
+File *openFile(char *filename, char *mode)
 {
-  struct Directory *dir = checked_calloc(sizeof(struct Directory));
+  File *file = checked_calloc(sizeof(File));
+
+  file->file = fopen(filename, mode);
+
+  if (file->file != NULL)
+  {
+    file->filename = getStringCopy(filename);
+
+    return file;
+  }
+
+#if defined(PLATFORM_ANDROID)
+  file->asset_file = SDL_RWFromFile(filename, mode);
+
+  if (file->asset_file != NULL)
+  {
+    file->file_is_asset = TRUE;
+    file->filename = getStringCopy(filename);
+
+    return file;
+  }
+#endif
+
+  checked_free(file);
+
+  return NULL;
+}
+
+int closeFile(File *file)
+{
+  if (file == NULL)
+    return -1;
+
+  int result;
+
+#if defined(PLATFORM_ANDROID)
+  if (file->asset_file)
+    result = SDL_RWclose(file->asset_file);
+#endif
+
+  if (file->file)
+    result = fclose(file->file);
+
+  checked_free(file->filename);
+  checked_free(file);
+
+  return result;
+}
+
+int checkEndOfFile(File *file)
+{
+#if defined(PLATFORM_ANDROID)
+  if (file->file_is_asset)
+    return file->end_of_file;
+#endif
+
+  return feof(file->file);
+}
+
+char *getStringFromFile(File *file, char *line, int size)
+{
+#if defined(PLATFORM_ANDROID)
+  if (file->file_is_asset)
+  {
+    if (file->end_of_file)
+      return NULL;
+
+    char *line_ptr = line;
+    int num_bytes_read = 0;
+
+    while (num_bytes_read < size - 1 &&
+	   SDL_RWread(file->asset_file, line_ptr, 1, 1) == 1 &&
+	   *line_ptr++ != '\n')
+      num_bytes_read++;
+
+    *line_ptr = '\0';
+
+    if (strlen(line) == 0)
+    {
+      file->end_of_file = TRUE;
+
+      return NULL;
+    }
+
+    return line;
+  }
+#endif
+
+  return fgets(line, size, file->file);
+}
+
+
+/* ------------------------------------------------------------------------- */
+/* functions for directory handling                                          */
+/* ------------------------------------------------------------------------- */
+
+Directory *openDirectory(char *dir_name)
+{
+  Directory *dir = checked_calloc(sizeof(Directory));
 
   dir->dir = opendir(dir_name);
 
@@ -1931,7 +2033,7 @@ struct Directory *openDirectory(char *dir_name)
   return NULL;
 }
 
-int closeDirectory(struct Directory *dir)
+int closeDirectory(Directory *dir)
 {
   if (dir == NULL)
     return -1;
@@ -1955,7 +2057,7 @@ int closeDirectory(struct Directory *dir)
   return result;
 }
 
-struct DirectoryEntry *readDirectory(struct Directory *dir)
+DirectoryEntry *readDirectory(Directory *dir)
 {
   if (dir->dir_entry)
     freeDirectoryEntry(dir->dir_entry);
@@ -1967,14 +2069,12 @@ struct DirectoryEntry *readDirectory(struct Directory *dir)
   {
     char line[MAX_LINE_LEN];
     char *line_ptr = line;
-    char *last_line_ptr = line_ptr;
     int num_bytes_read = 0;
 
-    while (num_bytes_read < MAX_LINE_LEN &&
+    while (num_bytes_read < MAX_LINE_LEN - 1 &&
 	   SDL_RWread(dir->asset_toc_file, line_ptr, 1, 1) == 1 &&
 	   *line_ptr != '\n')
     {
-      last_line_ptr = line_ptr;
       line_ptr++;
       num_bytes_read++;
     }
@@ -1984,7 +2084,7 @@ struct DirectoryEntry *readDirectory(struct Directory *dir)
     if (strlen(line) == 0)
       return NULL;
 
-    dir->dir_entry = checked_calloc(sizeof(struct DirectoryEntry));
+    dir->dir_entry = checked_calloc(sizeof(DirectoryEntry));
 
     dir->dir_entry->is_directory = FALSE;
     if (line[strlen(line) - 1] = '/')
@@ -2006,7 +2106,7 @@ struct DirectoryEntry *readDirectory(struct Directory *dir)
   if (dir_entry == NULL)
     return NULL;
 
-  dir->dir_entry = checked_calloc(sizeof(struct DirectoryEntry));
+  dir->dir_entry = checked_calloc(sizeof(DirectoryEntry));
 
   dir->dir_entry->basename = getStringCopy(dir_entry->d_name);
   dir->dir_entry->filename = getPath2(dir->filename, dir_entry->d_name);
@@ -2020,7 +2120,7 @@ struct DirectoryEntry *readDirectory(struct Directory *dir)
   return dir->dir_entry;
 }
 
-void freeDirectoryEntry(struct DirectoryEntry *dir_entry)
+void freeDirectoryEntry(DirectoryEntry *dir_entry)
 {
   if (dir_entry == NULL)
     return;
