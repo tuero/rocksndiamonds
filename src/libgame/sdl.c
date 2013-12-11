@@ -1788,6 +1788,10 @@ Bitmap *SDLLoadImage(char *filename)
   Bitmap *new_bitmap = CreateBitmapStruct();
   SDL_Surface *sdl_image_tmp;
 
+  print_timestamp_init("SDLLoadImage");
+
+  print_timestamp_time(getBaseNamePtr(filename));
+
   /* load image to temporary surface */
   if ((sdl_image_tmp = IMG_Load(filename)) == NULL)
   {
@@ -1795,6 +1799,8 @@ Bitmap *SDLLoadImage(char *filename)
 
     return NULL;
   }
+
+  print_timestamp_time("IMG_Load");
 
   UPDATE_BUSY_STATE();
 
@@ -1805,6 +1811,8 @@ Bitmap *SDLLoadImage(char *filename)
 
     return NULL;
   }
+
+  print_timestamp_time("SDL_DisplayFormat (opaque)");
 
   UPDATE_BUSY_STATE();
 
@@ -1818,6 +1826,8 @@ Bitmap *SDLLoadImage(char *filename)
     return NULL;
   }
 
+  print_timestamp_time("SDL_DisplayFormat (masked)");
+
   UPDATE_BUSY_STATE();
 
   /* free temporary surface */
@@ -1825,6 +1835,8 @@ Bitmap *SDLLoadImage(char *filename)
 
   new_bitmap->width = new_bitmap->surface->w;
   new_bitmap->height = new_bitmap->surface->h;
+
+  print_timestamp_done("SDLLoadImage");
 
   return new_bitmap;
 }

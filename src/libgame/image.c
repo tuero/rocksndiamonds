@@ -1040,8 +1040,15 @@ void ReloadCustomImages()
   printf("::: reloading images '%s' ...\n", artwork.gfx_current_identifier);
 #endif
 
+  print_timestamp_init("ReloadCustomImages");
+
   LoadArtworkConfig(image_info);
+  print_timestamp_time("LoadArtworkConfig");
+
   ReloadCustomArtworkList(image_info);
+  print_timestamp_time("ReloadCustomArtworkList");
+
+  print_timestamp_done("ReloadCustomImages");
 }
 
 void CreateImageWithSmallImages(int pos, int zoom_factor)

@@ -3447,7 +3447,6 @@ static void LoadLevelInfoFromLevelDir(TreeInfo **node_first,
 
   while ((dir_entry = readDirectory(dir)) != NULL)	/* loop all entries */
   {
-    struct stat file_status;
     char *directory_name = dir_entry->basename;
     char *directory_path = getPath2(level_directory, directory_name);
 
@@ -3470,10 +3469,15 @@ static void LoadLevelInfoFromLevelDir(TreeInfo **node_first,
     {
       free(directory_path);
 
+#if 0
+      Error(ERR_INFO, "* entry '%s' is not a directory ...", directory_name);
+#endif
+
       continue;
     }
 #else
     /* find out if directory entry is itself a directory */
+    struct stat file_status;
     if (stat(directory_path, &file_status) != 0 ||	/* cannot stat file */
 	(file_status.st_mode & S_IFMT) != S_IFDIR)	/* not a directory */
     {

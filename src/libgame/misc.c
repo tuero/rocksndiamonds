@@ -2115,7 +2115,13 @@ DirectoryEntry *readDirectory(Directory *dir)
 
   dir->dir_entry->is_directory =
     (stat(dir->dir_entry->filename, &file_status) == 0 &&
-     (file_status.st_mode & S_IFMT) != S_IFDIR);
+     (file_status.st_mode & S_IFMT) == S_IFDIR);
+
+#if 0
+  Error(ERR_INFO, "::: '%s' is directory: %d",
+	dir->dir_entry->basename,
+	dir->dir_entry->is_directory);
+#endif
 
   return dir->dir_entry;
 }
@@ -3324,6 +3330,7 @@ static void LoadCustomArtwork(struct ArtworkListInfo *artwork_info,
   if (strEqual(file_list_entry->filename, UNDEFINED_FILENAME))
   {
     deleteArtworkListEntry(artwork_info, listnode);
+
     return;
   }
 
@@ -3339,6 +3346,8 @@ void ReloadCustomArtworkList(struct ArtworkListInfo *artwork_info)
     artwork_info->num_dynamic_file_list_entries;
   int i;
 
+  print_timestamp_init("ReloadCustomArtworkList");
+
   for (i = 0; i < num_file_list_entries; i++)
     LoadCustomArtwork(artwork_info, &artwork_info->artwork_list[i],
 		      &file_list[i]);
@@ -3346,6 +3355,8 @@ void ReloadCustomArtworkList(struct ArtworkListInfo *artwork_info)
   for (i = 0; i < num_dynamic_file_list_entries; i++)
     LoadCustomArtwork(artwork_info, &artwork_info->dynamic_artwork_list[i],
 		      &dynamic_file_list[i]);
+
+  print_timestamp_done("ReloadCustomArtworkList");
 
 #if 0
   dumpList(artwork_info->content_list);
@@ -3444,8 +3455,11 @@ void NotifyUserAboutErrorFile()
 
 #if DEBUG
 
-#define DEBUG_NUM_TIMESTAMPS		5
-#define DEBUG_TIME_IN_MICROSECONDS	0
+#define DEBUG_PRINT_INIT_TIMESTAMPS		TRUE
+#define DEBUG_PRINT_INIT_TIMESTAMPS_DEPTH	10
+
+#define DEBUG_NUM_TIMESTAMPS			10
+#define DEBUG_TIME_IN_MICROSECONDS		0
 
 #if DEBUG_TIME_IN_MICROSECONDS
 static double Counter_Microseconds()
@@ -3509,7 +3523,11 @@ void debug_print_timestamp(int counter_nr, char *message)
   counter[counter_nr][1] = counter[counter_nr][0];
 
   if (message)
+#if 1
+    Error(ERR_INFO, "%s%s%s %.3f %s",
+#else
     printf("%s%s%s %.3f %s\n",
+#endif
 	   debug_print_timestamp_get_padding(counter_nr * indent_size),
 	   message,
 	   debug_print_timestamp_get_padding(padding_size - strlen(message)),
@@ -3533,4 +3551,69 @@ void debug_print_parent_only(char *format, ...)
     printf("\n");
   }
 }
+
+void print_timestamp_ext(char *message, char *mode)
+{
+#if DEBUG_PRINT_INIT_TIMESTAMPS
+  static char *debug_message = NULL;
+  static char *last_message = NULL;
+  static int counter_nr = 0;
+  int max_depth = DEBUG_PRINT_INIT_TIMESTAMPS_DEPTH;
+
+  checked_free(debug_message);
+  debug_message = getStringCat3(mode, " ", message);
+
+  if (strEqual(mode, "INIT"))
+  {
+    debug_print_timestamp(counter_nr, NULL);
+
+    if (counter_nr + 1 < max_depth)
+      debug_print_timestamp(counter_nr, debug_message);
+
+    counter_nr++;
+
+    debug_print_timestamp(counter_nr, NULL);
+  }
+  else if (strEqual(mode, "DONE"))
+  {
+    counter_nr--;
+
+    if (counter_nr + 1 < max_depth ||
+	(counter_nr == 0 && max_depth == 1))
+    {
+      last_message = message;
+
+      if (counter_nr == 0 && max_depth == 1)
+      {
+	checked_free(debug_message);
+	debug_message = getStringCat3("TIME", " ", message);
+      }
+
+      debug_print_timestamp(counter_nr, debug_message);
+    }
+  }
+  else if (!strEqual(mode, "TIME") ||
+	   !strEqual(message, last_message))
+  {
+    if (counter_nr < max_depth)
+      debug_print_timestamp(counter_nr, debug_message);
+  }
 #endif
+}
+
+void print_timestamp_init(char *message)
+{
+  print_timestamp_ext(message, "INIT");
+}
+
+void print_timestamp_time(char *message)
+{
+  print_timestamp_ext(message, "TIME");
+}
+
+void print_timestamp_done(char *message)
+{
+  print_timestamp_ext(message, "DONE");
+}
+
+#endif	/* DEBUG */
