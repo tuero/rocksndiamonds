@@ -26,8 +26,8 @@
 
 /* SDL internal variables */
 #if defined(TARGET_SDL2)
-// static SDL_Window *sdl_window = NULL;
-SDL_Window *sdl_window = NULL;
+static SDL_Window *sdl_window = NULL;
+// SDL_Window *sdl_window = NULL;
 // static SDL_Renderer *sdl_renderer = NULL;
 #endif
 
@@ -244,12 +244,19 @@ void SDLInitVideoBuffer(DrawBuffer **backbuffer, DrawWindow **window,
     }
   }
 
+#if 0
   /* set window icon */
   SDLSetWindowIcon(program.sdl_icon_filename);
+#endif
 
   /* open SDL video output device (window or fullscreen mode) */
   if (!SDLSetVideoMode(backbuffer, fullscreen))
     Error(ERR_EXIT, "setting video mode failed");
+
+#if 1
+  /* set window icon */
+  SDLSetWindowIcon(program.sdl_icon_filename);
+#endif
 
   /* set window and icon title */
 #if defined(TARGET_SDL2)
@@ -470,7 +477,10 @@ void SDLCopyArea(Bitmap *src_bitmap, Bitmap *dst_bitmap,
 
 #if defined(TARGET_SDL2)
   if (dst_bitmap == window)
-    SDL_UpdateWindowSurface(sdl_window);
+  {
+    // SDL_UpdateWindowSurface(sdl_window);
+    SDL_UpdateWindowSurfaceRects(sdl_window, &dst_rect, 1);
+  }
 #else
   if (dst_bitmap == window)
     SDL_UpdateRect(backbuffer->surface, dst_x, dst_y, width, height);
@@ -498,7 +508,10 @@ void SDLFillRectangle(Bitmap *dst_bitmap, int x, int y, int width, int height,
 
 #if defined(TARGET_SDL2)
   if (dst_bitmap == window)
-    SDL_UpdateWindowSurface(sdl_window);
+  {
+    // SDL_UpdateWindowSurface(sdl_window);
+    SDL_UpdateWindowSurfaceRects(sdl_window, &rect, 1);
+  }
 #else
   if (dst_bitmap == window)
     SDL_UpdateRect(backbuffer->surface, x, y, width, height);
@@ -516,6 +529,9 @@ void SDLFadeRectangle(Bitmap *bitmap_cross, int x, int y, int width, int height,
   SDL_Surface *surface_screen = backbuffer->surface;
   SDL_Surface *surface_cross = (bitmap_cross ? bitmap_cross->surface : NULL);
   SDL_Rect src_rect, dst_rect;
+#if defined(TARGET_SDL2)
+  SDL_Rect dst_rect2;
+#endif
   int src_x = x, src_y = y;
   int dst_x = x, dst_y = y;
   unsigned int time_last, time_current;
@@ -543,6 +559,10 @@ void SDLFadeRectangle(Bitmap *bitmap_cross, int x, int y, int width, int height,
   dst_rect.y = dst_y;
   dst_rect.w = width;		/* (ignored) */
   dst_rect.h = height;		/* (ignored) */
+
+#if defined(TARGET_SDL2)
+  dst_rect2 = dst_rect;
+#endif
 
   if (initialization_needed)
   {
@@ -739,7 +759,8 @@ void SDLFadeRectangle(Bitmap *bitmap_cross, int x, int y, int width, int height,
 	  draw_border_function();
 
 #if defined(TARGET_SDL2)
-	SDL_UpdateWindowSurface(sdl_window);
+	// SDL_UpdateWindowSurface(sdl_window);
+	SDL_UpdateWindowSurfaceRects(sdl_window, &dst_rect2, 1);
 #else
 	SDL_UpdateRect(surface_screen, dst_x, dst_y, width, height);
 #endif
@@ -776,7 +797,8 @@ void SDLFadeRectangle(Bitmap *bitmap_cross, int x, int y, int width, int height,
 #if 1
       /* only update the region of the screen that is affected from fading */
 #if defined(TARGET_SDL2)
-      SDL_UpdateWindowSurface(sdl_window);
+      // SDL_UpdateWindowSurface(sdl_window);
+      SDL_UpdateWindowSurfaceRects(sdl_window, &dst_rect, 1);
 #else
       SDL_UpdateRect(surface_screen, dst_x, dst_y, width, height);
 #endif

@@ -832,7 +832,11 @@ typedef struct ImageInfo ImageInfo;
 
 static struct ArtworkListInfo *image_info = NULL;
 
+#if 1
+static void *Load_Image(char *filename)
+#else
 static void *Load_PCX(char *filename)
+#endif
 {
   ImageInfo *img_info;
 
@@ -1030,7 +1034,11 @@ void InitImageList(struct ConfigInfo *config_list, int num_file_list_entries,
 
   /* ---------- initialize artwork loading/freeing functions ---------- */
 
+#if 1
+  image_info->load_artwork = Load_Image;
+#else
   image_info->load_artwork = Load_PCX;
+#endif
   image_info->free_artwork = FreeImage;
 }
 

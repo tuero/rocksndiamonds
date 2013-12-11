@@ -1127,7 +1127,6 @@ static int get_graphic_parameter_value(char *value_raw, char *suffix, int type)
   if (strEqual(value_raw, ARG_UNDEFINED))
     return ARG_UNDEFINED_VALUE;
 
-#if 1
   if (type == TYPE_ELEMENT)
   {
     char *value = getHashEntry(element_token_hash, value_raw);
@@ -1140,36 +1139,6 @@ static int get_graphic_parameter_value(char *value_raw, char *suffix, int type)
 
     return (value != NULL ? atoi(value) : IMG_UNDEFINED);
   }
-
-#else
-
-  int i;
-  int x = 0;
-
-  /* !!! THIS IS BUGGY !!! NOT SURE IF YOU GET ELEMENT ID OR GRAPHIC ID !!! */
-  /* !!! (possible reason why ".clone_from" with elements doesn't work) !!! */
-
-  /* !!! OPTIMIZE THIS BY USING HASH !!! */
-  for (i = 0; i < MAX_NUM_ELEMENTS; i++)
-    if (strEqual(element_info[i].token_name, value_raw))
-      return i;
-
-  /* !!! OPTIMIZE THIS BY USING HASH !!! */
-  for (i = 0; image_config[i].token != NULL; i++)
-  {
-    int len_config_value = strlen(image_config[i].value);
-
-    if (!strEqual(&image_config[i].value[len_config_value - 4], ".pcx") &&
-	!strEqual(&image_config[i].value[len_config_value - 4], ".wav") &&
-	!strEqual(image_config[i].value, UNDEFINED_FILENAME))
-      continue;
-
-    if (strEqual(image_config[i].token, value_raw))
-      return x;
-
-    x++;
-  }
-#endif
 
   return -1;
 }
@@ -4990,7 +4959,8 @@ static void InitGlobal()
   /* create hash from graphic token list */
   graphic_token_hash = newSetupFileHash();
   for (graphic = 0, i = 0; image_config[i].token != NULL; i++)
-    if (strSuffix(image_config[i].value, ".pcx") ||
+    if (strSuffix(image_config[i].value, ".png") ||
+	strSuffix(image_config[i].value, ".pcx") ||
 	strSuffix(image_config[i].value, ".wav") ||
 	strEqual(image_config[i].value, UNDEFINED_FILENAME))
       setHashEntry(graphic_token_hash,

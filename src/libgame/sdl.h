@@ -71,6 +71,9 @@ typedef unsigned int		KeyMod;
 typedef SDL_Event		Event;
 typedef SDL_MouseButtonEvent	ButtonEvent;
 typedef SDL_MouseMotionEvent	MotionEvent;
+#if defined(TARGET_SDL2)
+typedef SDL_TouchFingerEvent	FingerEvent;
+#endif
 typedef SDL_KeyboardEvent	KeyEvent;
 typedef SDL_Event		ExposeEvent;
 typedef SDL_Event		FocusChangeEvent;
@@ -116,6 +119,11 @@ struct MouseCursorInfo
 #define EVENT_BUTTONPRESS	SDL_MOUSEBUTTONDOWN
 #define EVENT_BUTTONRELEASE	SDL_MOUSEBUTTONUP
 #define EVENT_MOTIONNOTIFY	SDL_MOUSEMOTION
+#if defined(TARGET_SDL2)
+#define	EVENT_FINGERPRESS	SDL_FINGERDOWN
+#define EVENT_FINGERRELEASE	SDL_FINGERUP
+#define EVENT_FINGERMOTION	SDL_FINGERMOTION
+#endif
 #define EVENT_KEYPRESS		SDL_KEYDOWN
 #define EVENT_KEYRELEASE	SDL_KEYUP
 #define EVENT_EXPOSE		SDL_USEREVENT + 0

@@ -31,6 +31,9 @@ void SleepWhileUnmapped(void);
 void HandleExposeEvent(ExposeEvent *);
 void HandleButtonEvent(ButtonEvent *);
 void HandleMotionEvent(MotionEvent *);
+#if defined(TARGET_SDL2)
+void HandleFingerEvent(FingerEvent *);
+#endif
 void HandleKeyEvent(KeyEvent *);
 void HandleFocusEvent(FocusChangeEvent *);
 void HandleClientMessageEvent(ClientMessageEvent *);

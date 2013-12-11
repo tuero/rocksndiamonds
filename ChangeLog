@@ -1,5 +1,17 @@
+2013-12-11
+	* removed limitation of artwork files to selected file types (this means
+	  that every file type supported by SDL_image and SDL_mixer can be used)
+	* changed default graphics vom PCX to PNG (needed for Android version to
+	  prevent painfully slow loading of images, although not compressing PCX
+	  files in the assets directory of the APK package might also work fine)
+	* fixed bug with SDL_BlitSurface creating garbage when source and target
+	  surface are the same (this bug also existed in versions of SDL 1.2.x)
+
+2013-12-07
+	* started porting Rocks'n'Diamonds to Android
+
 2013-12-03
-	* ported Rocks'n'Diamonds to SDL2
+	* ported Rocks'n'Diamonds to SDL2 (first simple version that works)
 
 2013-12-01
 	* version number set to 3.3.1.3

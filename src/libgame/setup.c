@@ -4002,13 +4002,22 @@ void LoadArtworkInfoFromLevelInfo(ArtworkDirTree **artwork_node,
 
 void LoadLevelArtworkInfo()
 {
+  print_timestamp_init("LoadLevelArtworkInfo");
+
   DrawInitText("Looking for custom level artwork", 120, FC_GREEN);
 
+  print_timestamp_time("DrawTimeText");
+
   LoadArtworkInfoFromLevelInfo(&artwork.gfx_first, leveldir_first_all);
+  print_timestamp_time("LoadArtworkInfoFromLevelInfo (gfx)");
   LoadArtworkInfoFromLevelInfo(&artwork.snd_first, leveldir_first_all);
+  print_timestamp_time("LoadArtworkInfoFromLevelInfo (snd)");
   LoadArtworkInfoFromLevelInfo(&artwork.mus_first, leveldir_first_all);
+  print_timestamp_time("LoadArtworkInfoFromLevelInfo (mus)");
 
   SaveArtworkInfoCache();
+
+  print_timestamp_time("SaveArtworkInfoCache");
 
   /* needed for reloading level artwork not known at ealier stage */
 
@@ -4045,15 +4054,21 @@ void LoadLevelArtworkInfo()
       artwork.mus_current = getFirstValidTreeInfoEntry(artwork.mus_first);
   }
 
+  print_timestamp_time("getTreeInfoFromIdentifier");
+
   sortTreeInfo(&artwork.gfx_first);
   sortTreeInfo(&artwork.snd_first);
   sortTreeInfo(&artwork.mus_first);
+
+  print_timestamp_time("sortTreeInfo");
 
 #if 0
   dumpTreeInfo(artwork.gfx_first, 0);
   dumpTreeInfo(artwork.snd_first, 0);
   dumpTreeInfo(artwork.mus_first, 0);
 #endif
+
+  print_timestamp_done("LoadLevelArtworkInfo");
 }
 
 static void SaveUserLevelInfo()

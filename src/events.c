@@ -152,13 +152,6 @@ void EventLoop(void)
       {
   	switch (event.type)
   	{
-#if defined(PLATFORM_ANDROID)
-	  // !!! TEST ONLY !!!
-	  case SDL_QUIT:
-	  case SDL_FINGERDOWN:
-	    CloseAllAndExit(0);
-#endif
-
   	  case EVENT_BUTTONPRESS:
   	  case EVENT_BUTTONRELEASE:
   	    HandleButtonEvent((ButtonEvent *) &event);
@@ -167,7 +160,15 @@ void EventLoop(void)
   	  case EVENT_MOTIONNOTIFY:
   	    HandleMotionEvent((MotionEvent *) &event);
   	    break;
-  
+
+#if defined(TARGET_SDL2)
+  	  case EVENT_FINGERPRESS:
+  	  case EVENT_FINGERRELEASE:
+  	  case EVENT_FINGERMOTION:
+  	    HandleFingerEvent((FingerEvent *) &event);
+  	    break;
+#endif
+
   	  case EVENT_KEYPRESS:
   	  case EVENT_KEYRELEASE:
   	    HandleKeyEvent((KeyEvent *) &event);
@@ -383,6 +384,33 @@ void HandleMotionEvent(MotionEvent *event)
 
   HandleButton(event->x, event->y, button_status, button_status);
 }
+
+#if defined(TARGET_SDL2)
+void HandleFingerEvent(FingerEvent *event)
+{
+  // #if DEBUG_EVENTS
+  Error(ERR_DEBUG, "FINGER EVENT: finger was %s, touch ID %lld, finger ID %lld, x/y %f/%f, dx/dy %f/%f, pressure %f",
+	(event->type == EVENT_FINGERPRESS ? "pressed" :
+	 event->type == EVENT_FINGERRELEASE ? "released" : "moved"),
+	event->touchId,
+	event->fingerId,
+	event->x, event->y,
+	event->dx, event->dy,
+	event->pressure);
+  // #endif
+
+#if 1
+  CloseAllAndExit(0);
+#else
+  if (event->type == EVENT_FINGERPRESS)
+    button_status = event->button;
+  else
+    button_status = MB_RELEASED;
+
+  HandleButton(event->x, event->y, button_status, event->button);
+#endif
+}
+#endif
 
 void HandleKeyEvent(KeyEvent *event)
 {

@@ -1773,12 +1773,21 @@ static void *Load_MOD(char *filename)
 
 static void *Load_WAV_or_MOD(char *filename)
 {
+#if 1
+  if (FileIsMusic(filename))
+    return Load_MOD(filename);
+  else if (FileIsSound(filename))
+    return Load_WAV(filename);
+  else
+    return NULL;
+#else
   if (FileIsSound(filename))
     return Load_WAV(filename);
   else if (FileIsMusic(filename))
     return Load_MOD(filename);
   else
     return NULL;
+#endif
 }
 
 void LoadCustomMusic_NoConf(void)

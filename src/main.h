@@ -2104,7 +2104,7 @@
 
 #define X11_ICON_FILENAME		"rocks_icon.xbm"
 #define X11_ICONMASK_FILENAME		"rocks_iconmask.xbm"
-#define SDL_ICON_FILENAME		"rocks_icon_32x32.pcx"
+#define SDL_ICON_FILENAME		"RocksIcon32x32.png"
 #define MSDOS_POINTER_FILENAME		"mouse.pcx"
 
 /* file version numbers for resource files (levels, tapes, score, setup, etc.)

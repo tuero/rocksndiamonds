@@ -1047,8 +1047,11 @@ void Error(int mode, char *format, ...)
   char *process_name = "";
 
 #if defined(PLATFORM_ANDROID)
-  android_log_prio = (mode & ERR_WARN ? ANDROID_LOG_WARN :
-		      mode & ERR_EXIT ? ANDROID_LOG_FATAL : ANDROID_LOG_INFO);
+  android_log_prio = (mode & ERR_DEBUG ? ANDROID_LOG_DEBUG :
+		      mode & ERR_INFO ? ANDROID_LOG_INFO :
+		      mode & ERR_WARN ? ANDROID_LOG_WARN :
+		      mode & ERR_EXIT ? ANDROID_LOG_FATAL :
+		      ANDROID_LOG_UNKNOWN);
 #endif
 
 #if 1
@@ -2206,20 +2209,31 @@ boolean fileHasSuffix(char *basename, char *suffix)
 
 boolean FileIsGraphic(char *filename)
 {
+#if 1
+  return TRUE;
+#else
   char *basename = getBaseNamePtr(filename);
 
   return fileHasSuffix(basename, "pcx");
+#endif
 }
 
 boolean FileIsSound(char *filename)
 {
+#if 1
+  return TRUE;
+#else
   char *basename = getBaseNamePtr(filename);
 
   return fileHasSuffix(basename, "wav");
+#endif
 }
 
 boolean FileIsMusic(char *filename)
 {
+#if 1
+  return TRUE;
+#else
   char *basename = getBaseNamePtr(filename);
 
   if (FileIsSound(basename))
@@ -2239,6 +2253,7 @@ boolean FileIsMusic(char *filename)
 #endif
 
   return FALSE;
+#endif
 }
 
 boolean FileIsArtworkType(char *basename, int type)
@@ -2496,10 +2511,13 @@ struct FileInfo *getFileListFromConfigList(struct ConfigInfo *config_list,
   }
 
   list_pos = 0;
+
   for (i = 0; config_list[i].token != NULL; i++)
   {
     int len_config_token = strlen(config_list[i].token);
+#if 0
     int len_config_value = strlen(config_list[i].value);
+#endif
     boolean is_file_entry = TRUE;
 
     for (j = 0; suffix_list[j].token != NULL; j++)
@@ -2514,6 +2532,7 @@ struct FileInfo *getFileListFromConfigList(struct ConfigInfo *config_list,
 		  config_list[i].value);
 
 	is_file_entry = FALSE;
+
 	break;
       }
     }
@@ -2531,6 +2550,7 @@ struct FileInfo *getFileListFromConfigList(struct ConfigInfo *config_list,
       if (list_pos >= num_file_list_entries)
 	break;
 
+#if 0
       /* simple sanity check if this is really a file definition */
       if (!strEqual(&config_list[i].value[len_config_value - 4], ".pcx") &&
 	  !strEqual(&config_list[i].value[len_config_value - 4], ".wav") &&
@@ -2540,6 +2560,7 @@ struct FileInfo *getFileListFromConfigList(struct ConfigInfo *config_list,
 	      config_list[i].token, config_list[i].value);
 	Error(ERR_EXIT, "This seems to be no valid definition -- please fix");
       }
+#endif
 
       file_list[list_pos].token = config_list[i].token;
       file_list[list_pos].default_filename = config_list[i].value;
@@ -3524,7 +3545,7 @@ void debug_print_timestamp(int counter_nr, char *message)
 
   if (message)
 #if 1
-    Error(ERR_INFO, "%s%s%s %.3f %s",
+    Error(ERR_DEBUG, "%s%s%s %.3f %s",
 #else
     printf("%s%s%s %.3f %s\n",
 #endif

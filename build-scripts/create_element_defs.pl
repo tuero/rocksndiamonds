@@ -193,7 +193,7 @@ sub contains_image_file
 {
     my ($line) = @_;
 
-    return ($line =~ /\".+\.pcx\"/ ||
+    return ($line =~ /\".+\.png\"/ ||
 	    $line =~ /UNDEFINED_FILENAME/);
 }
 
@@ -609,7 +609,7 @@ sub print_chars_graphics_list_line
 
 	my $tabs_left = get_tabs($left, 6);
 
-	my $right = ($ext eq '' ? $basename . '.pcx' :
+	my $right = ($ext eq '' ? $basename . '.png' :
 		     $ext eq '.frames' ? '1' : '0');
 
 	if ($ext eq '.xpos')
@@ -748,8 +748,8 @@ sub print_custom_graphics_list
 
 	    my $tabs_left = get_tabs($left, 6);
 
-	    # my $right = ($ext eq '' ? 'RocksElements.pcx' :
-	    my $right = ($ext eq '' ? 'RocksCE.pcx' :
+	    # my $right = ($ext eq '' ? 'RocksElements.png' :
+	    my $right = ($ext eq '' ? 'RocksCE.png' :
 			 $ext eq '.frames' ? '1' : '0');
 
 	    if ($ext eq '.xpos')
@@ -776,8 +776,8 @@ sub print_custom_graphics_list
 
 	    my $tabs_left = get_tabs($left, 6);
 
-	    # my $right = ($ext eq '' ? 'RocksElements.pcx' : '0');
-	    my $right = ($ext eq '' ? 'RocksCE.pcx' : '0');
+	    # my $right = ($ext eq '' ? 'RocksElements.png' : '0');
+	    my $right = ($ext eq '' ? 'RocksCE.png' : '0');
 
 	    if ($ext eq '.xpos')
 	    {
@@ -829,8 +829,8 @@ sub print_group_graphics_list
 
 	    my $tabs_left = get_tabs($left, 6);
 
-	    # my $right = ($ext eq '' ? 'RocksDC.pcx' :
-	    my $right = ($ext eq '' ? 'RocksCE.pcx' :
+	    # my $right = ($ext eq '' ? 'RocksDC.png' :
+	    my $right = ($ext eq '' ? 'RocksCE.png' :
 			 $ext eq '.frames' ? '1' : '0');
 
 	    if ($ext eq '.xpos')
@@ -857,8 +857,8 @@ sub print_group_graphics_list
 
 	    my $tabs_left = get_tabs($left, 6);
 
-	    # my $right = ($ext eq '' ? 'RocksDC.pcx' : '0');
-	    my $right = ($ext eq '' ? 'RocksCE.pcx' : '0');
+	    # my $right = ($ext eq '' ? 'RocksDC.png' : '0');
+	    my $right = ($ext eq '' ? 'RocksCE.png' : '0');
 
 	    if ($ext eq '.xpos')
 	    {

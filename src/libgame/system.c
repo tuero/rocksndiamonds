@@ -706,14 +706,17 @@ void BlitBitmap(Bitmap *src_bitmap, Bitmap *dst_bitmap,
     height = dst_bitmap->height - dst_y;
 #endif
 
-#if 0
+#if 1
+  /* !!! 2013-12-11: An "old friend" is back. Same bug in SDL2 2.0.1 !!! */
+#if 1
   /* !!! 2009-03-30: Fixed by using self-compiled, patched SDL.dll !!! */
   /* (This bug still exists in the actual (as of 2009-06-15) version 1.2.13,
      but is already fixed in SVN and should therefore finally be fixed with
      the next official SDL release, which is probably version 1.2.14.) */
 #if 1
   /* !!! 2009-03-24: It seems that this problem still exists in 1.2.12 !!! */
-#if defined(TARGET_SDL) && defined(PLATFORM_WIN32)
+  //#if defined(TARGET_SDL) && defined(PLATFORM_WIN32)
+#if defined(TARGET_SDL2)
   if (src_bitmap == dst_bitmap)
   {
     /* !!! THIS IS A BUG (IN THE SDL LIBRARY?) AND SHOULD BE FIXED !!! */
@@ -755,6 +758,7 @@ void BlitBitmap(Bitmap *src_bitmap, Bitmap *dst_bitmap,
 
     return;
   }
+#endif
 #endif
 #endif
 #endif
