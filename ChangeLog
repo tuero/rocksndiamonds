@@ -1,3 +1,7 @@
+2013-12-12
+	* added SDL2 renderer/texture based graphics frame handling to allow for
+	  "desktop" style fullscreen mode and scaling of game screen/window
+
 2013-12-11
 	* removed limitation of artwork files to selected file types (this means
 	  that every file type supported by SDL_image and SDL_mixer can be used)

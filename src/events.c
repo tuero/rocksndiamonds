@@ -388,6 +388,9 @@ void HandleMotionEvent(MotionEvent *event)
 #if defined(TARGET_SDL2)
 void HandleFingerEvent(FingerEvent *event)
 {
+  static int num_events = 0;
+  int max_events = 10;
+
   // #if DEBUG_EVENTS
   Error(ERR_DEBUG, "FINGER EVENT: finger was %s, touch ID %lld, finger ID %lld, x/y %f/%f, dx/dy %f/%f, pressure %f",
 	(event->type == EVENT_FINGERPRESS ? "pressed" :
@@ -399,15 +402,45 @@ void HandleFingerEvent(FingerEvent *event)
 	event->pressure);
   // #endif
 
+  int x = (int)(event->x * video.width);
+  int y = (int)(event->y * video.height);
+  int button = MB_LEFTBUTTON;
+
+  Error(ERR_DEBUG, "=> screen x/y %d/%d", x, y);
+
+#if 0
+  if (++num_events >= max_events)
+    CloseAllAndExit(0);
+#endif
+
 #if 1
-  CloseAllAndExit(0);
-#else
   if (event->type == EVENT_FINGERPRESS)
-    button_status = event->button;
+    button_status = button;
   else
     button_status = MB_RELEASED;
 
-  HandleButton(event->x, event->y, button_status, event->button);
+  int max_x = SX + SXSIZE;
+  int max_y = SY + SYSIZE;
+
+  if (game_status == GAME_MODE_PLAYING &&
+      x < max_x)
+  {
+    int key_status = (event->type == EVENT_FINGERRELEASE ? KEY_RELEASED :
+		      KEY_PRESSED);
+    Key key = (y <     max_y / 3 ? setup.input[0].key.up :
+	       y > 2 * max_y / 3 ? setup.input[0].key.down :
+	       x <     max_x / 3 ? setup.input[0].key.left :
+	       x > 2 * max_x / 3 ? setup.input[0].key.right :
+	       setup.input[0].key.drop);
+
+    Error(ERR_DEBUG, "=> key == %d, key_status == %d", key, key_status);
+
+    HandleKey(key, key_status);
+  }
+  else
+  {
+    HandleButton(x, y, button_status, button);
+  }
 #endif
 }
 #endif
