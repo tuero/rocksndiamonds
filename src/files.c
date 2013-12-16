@@ -2090,6 +2090,48 @@ static char *getSingleLevelBasename(int nr)
   return getSingleLevelBasenameExt(nr, LEVELFILE_EXTENSION);
 }
 
+#if 1
+
+static char *getPackedLevelBasename(int type)
+{
+  static char basename[MAX_FILENAME_LEN];
+  char *directory = getCurrentLevelDir();
+  Directory *dir;
+  DirectoryEntry *dir_entry;
+
+  strcpy(basename, UNDEFINED_FILENAME);		/* default: undefined file */
+
+  if ((dir = openDirectory(directory)) == NULL)
+  {
+    Error(ERR_WARN, "cannot read current level directory '%s'", directory);
+
+    return basename;
+  }
+
+  while ((dir_entry = readDirectory(dir)) != NULL)	/* loop all entries */
+  {
+    char *entry_basename = dir_entry->basename;
+    int entry_type = getFileTypeFromBasename(entry_basename);
+
+    if (entry_type != LEVEL_FILE_TYPE_UNKNOWN)	/* found valid level package */
+    {
+      if (type == LEVEL_FILE_TYPE_UNKNOWN ||
+	  type == entry_type)
+      {
+	strcpy(basename, entry_basename);
+
+	break;
+      }
+    }
+  }
+
+  closeDirectory(dir);
+
+  return basename;
+}
+
+#else
+
 static char *getPackedLevelBasename(int type)
 {
   static char basename[MAX_FILENAME_LEN];
@@ -2127,6 +2169,8 @@ static char *getPackedLevelBasename(int type)
 
   return basename;
 }
+
+#endif
 
 static char *getSingleLevelFilename(int nr)
 {
@@ -10547,6 +10591,160 @@ static boolean sound_info_listed(struct MusicFileInfo *list, char *basename)
   return music_info_listed_ext(list, basename, TRUE);
 }
 
+#if 1
+
+void LoadMusicInfo()
+{
+  char *music_directory = getCustomMusicDirectory();
+  int num_music = getMusicListSize();
+  int num_music_noconf = 0;
+  int num_sounds = getSoundListSize();
+  Directory *dir;
+  DirectoryEntry *dir_entry;
+  struct FileInfo *music, *sound;
+  struct MusicFileInfo *next, **new;
+  int i;
+
+  while (music_file_info != NULL)
+  {
+    next = music_file_info->next;
+
+    checked_free(music_file_info->basename);
+
+    checked_free(music_file_info->title_header);
+    checked_free(music_file_info->artist_header);
+    checked_free(music_file_info->album_header);
+    checked_free(music_file_info->year_header);
+
+    checked_free(music_file_info->title);
+    checked_free(music_file_info->artist);
+    checked_free(music_file_info->album);
+    checked_free(music_file_info->year);
+
+    free(music_file_info);
+
+    music_file_info = next;
+  }
+
+  new = &music_file_info;
+
+  for (i = 0; i < num_music; i++)
+  {
+    music = getMusicListEntry(i);
+
+    if (music->filename == NULL)
+      continue;
+
+    if (strEqual(music->filename, UNDEFINED_FILENAME))
+      continue;
+
+    /* a configured file may be not recognized as music */
+    if (!FileIsMusic(music->filename))
+      continue;
+
+#if 0
+    printf("::: -> '%s' (configured)\n", music->filename);
+#endif
+
+    if (!music_info_listed(music_file_info, music->filename))
+    {
+      *new = get_music_file_info(music->filename, i);
+#if 0
+      if (*new != NULL)
+	printf(":1: adding '%s' ['%s'] ...\n", (*new)->title, music->filename);
+#endif
+      if (*new != NULL)
+	new = &(*new)->next;
+    }
+  }
+
+  if ((dir = openDirectory(music_directory)) == NULL)
+  {
+    Error(ERR_WARN, "cannot read music directory '%s'", music_directory);
+    return;
+  }
+
+  while ((dir_entry = readDirectory(dir)) != NULL)	/* loop all entries */
+  {
+    char *basename = dir_entry->basename;
+    boolean music_already_used = FALSE;
+    int i;
+
+    /* skip all music files that are configured in music config file */
+    for (i = 0; i < num_music; i++)
+    {
+      music = getMusicListEntry(i);
+
+      if (music->filename == NULL)
+	continue;
+
+      if (strEqual(basename, music->filename))
+      {
+	music_already_used = TRUE;
+	break;
+      }
+    }
+
+    if (music_already_used)
+      continue;
+
+    if (!FileIsMusic(basename))
+      continue;
+
+#if 0
+    printf("::: -> '%s' (found in directory)\n", basename);
+#endif
+
+    if (!music_info_listed(music_file_info, basename))
+    {
+      *new = get_music_file_info(basename, MAP_NOCONF_MUSIC(num_music_noconf));
+#if 0
+      if (*new != NULL)
+	printf(":2: adding '%s' ['%s'] ...\n", (*new)->title, basename);
+#endif
+      if (*new != NULL)
+	new = &(*new)->next;
+    }
+
+    num_music_noconf++;
+  }
+
+  closeDirectory(dir);
+
+  for (i = 0; i < num_sounds; i++)
+  {
+    sound = getSoundListEntry(i);
+
+    if (sound->filename == NULL)
+      continue;
+
+    if (strEqual(sound->filename, UNDEFINED_FILENAME))
+      continue;
+
+    /* a configured file may be not recognized as sound */
+    if (!FileIsSound(sound->filename))
+      continue;
+
+#if 0
+    printf("::: -> '%s' (configured)\n", sound->filename);
+#endif
+
+    if (!sound_info_listed(music_file_info, sound->filename))
+    {
+      *new = get_sound_file_info(sound->filename, i);
+      if (*new != NULL)
+	new = &(*new)->next;
+    }
+  }
+
+#if 0
+  for (next = music_file_info; next != NULL; next = next->next)
+    printf("::: title == '%s'\n", next->title);
+#endif
+}
+
+#else
+
 void LoadMusicInfo()
 {
   char *music_directory = getCustomMusicDirectory();
@@ -10696,6 +10894,8 @@ void LoadMusicInfo()
     printf("::: title == '%s'\n", next->title);
 #endif
 }
+
+#endif
 
 void add_helpanim_entry(int element, int action, int direction, int delay,
 			int *num_list_entries)

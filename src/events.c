@@ -24,7 +24,7 @@
 #include "network.h"
 
 
-#define	DEBUG_EVENTS		0
+#define	DEBUG_EVENTS		1
 
 
 static boolean cursor_inside_playfield = FALSE;
@@ -358,8 +358,10 @@ void HandleExposeEvent(ExposeEvent *event)
 void HandleButtonEvent(ButtonEvent *event)
 {
 #if DEBUG_EVENTS
-  printf("::: BUTTON EVENT: button %d %s\n", event->button,
-	 event->type == EVENT_BUTTONPRESS ? "pressed" : "released");
+  Error(ERR_DEBUG, "BUTTON EVENT: button %d %s, x/y %d/%d\n",
+	event->button,
+	event->type == EVENT_BUTTONPRESS ? "pressed" : "released",
+	event->x, event->y);
 #endif
 
   motion_status = FALSE;
@@ -382,25 +384,30 @@ void HandleMotionEvent(MotionEvent *event)
 
   motion_status = TRUE;
 
+  Error(ERR_DEBUG, "MOTION EVENT: button %d moved, x/y %d/%d\n",
+	button_status, event->x, event->y);
+
   HandleButton(event->x, event->y, button_status, button_status);
 }
 
 #if defined(TARGET_SDL2)
 void HandleFingerEvent(FingerEvent *event)
 {
+#if 0
   static int num_events = 0;
   int max_events = 10;
+#endif
 
-  // #if DEBUG_EVENTS
+#if DEBUG_EVENTS
   Error(ERR_DEBUG, "FINGER EVENT: finger was %s, touch ID %lld, finger ID %lld, x/y %f/%f, dx/dy %f/%f, pressure %f",
-	(event->type == EVENT_FINGERPRESS ? "pressed" :
-	 event->type == EVENT_FINGERRELEASE ? "released" : "moved"),
+	event->type == EVENT_FINGERPRESS ? "pressed" :
+	event->type == EVENT_FINGERRELEASE ? "released" : "moved",
 	event->touchId,
 	event->fingerId,
 	event->x, event->y,
 	event->dx, event->dy,
 	event->pressure);
-  // #endif
+#endif
 
   int x = (int)(event->x * video.width);
   int y = (int)(event->y * video.height);
@@ -414,7 +421,8 @@ void HandleFingerEvent(FingerEvent *event)
 #endif
 
 #if 1
-  if (event->type == EVENT_FINGERPRESS)
+  if (event->type == EVENT_FINGERPRESS ||
+      event->type == EVENT_FINGERMOTION)
     button_status = button;
   else
     button_status = MB_RELEASED;
@@ -439,7 +447,14 @@ void HandleFingerEvent(FingerEvent *event)
   }
   else
   {
+#if 1
+    Error(ERR_DEBUG, "::: button_status == %d, button == %d\n",
+	  button_status, button);
+#endif
+
+#if 1
     HandleButton(x, y, button_status, button);
+#endif
   }
 #endif
 }
@@ -447,14 +462,31 @@ void HandleFingerEvent(FingerEvent *event)
 
 void HandleKeyEvent(KeyEvent *event)
 {
-  int key_status = (event->type==EVENT_KEYPRESS ? KEY_PRESSED : KEY_RELEASED);
+  int key_status = (event->type == EVENT_KEYPRESS ? KEY_PRESSED : KEY_RELEASED);
   boolean with_modifiers = (game_status == GAME_MODE_PLAYING ? FALSE : TRUE);
   Key key = GetEventKey(event, with_modifiers);
   Key keymod = (with_modifiers ? GetEventKey(event, FALSE) : key);
 
 #if DEBUG_EVENTS
-  printf("::: KEY EVENT: %d %s\n", GetEventKey(event, TRUE),
-	 event->type == EVENT_KEYPRESS ? "pressed" : "released");
+  Error(ERR_DEBUG, "KEY EVENT: key was %s, keysym.scancode == %d, keysym.sym == %d, resulting key == %d (%s)",
+	event->type == EVENT_KEYPRESS ? "pressed" : "released",
+	event->keysym.scancode,
+	event->keysym.sym,
+	GetEventKey(event, TRUE),
+	getKeyNameFromKey(key));
+#endif
+
+#if 0
+  if (key == KSYM_Menu)
+    Error(ERR_DEBUG, "menu key pressed");
+  else if (key == KSYM_Back)
+    Error(ERR_DEBUG, "back key pressed");
+#endif
+
+#if defined(PLATFORM_ANDROID)
+  // always map the "back" button to the "escape" key on Android devices
+  if (key == KSYM_Back)
+    key = KSYM_Escape;
 #endif
 
   HandleKeyModState(keymod, key_status);
@@ -541,6 +573,8 @@ void HandleButton(int mx, int my, int button, int button_nr)
   if (IS_WHEEL_BUTTON(button_nr))
     return;
 
+  Error(ERR_DEBUG, "::: game_status == %d", game_status);
+
   switch (game_status)
   {
     case GAME_MODE_TITLE:
@@ -626,7 +660,7 @@ static void HandleKeysSpecial(Key key)
   cheat_input[cheat_input_len] = '\0';
 
 #if DEBUG_EVENTS
-  printf("::: '%s' [%d]\n", cheat_input, cheat_input_len);
+  Error(ERR_DEBUG, "SPECIAL KEY '%s' [%d]\n", cheat_input, cheat_input_len);
 #endif
 
   if (game_status == GAME_MODE_MAIN)

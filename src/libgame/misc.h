@@ -241,6 +241,7 @@ int closeDirectory(Directory *);
 DirectoryEntry *readDirectory(Directory *);
 void freeDirectoryEntry(DirectoryEntry *);
 
+boolean directoryExists(char *);
 boolean fileExists(char *);
 boolean FileIsGraphic(char *);
 boolean FileIsSound(char *);

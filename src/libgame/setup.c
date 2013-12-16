@@ -357,7 +357,7 @@ char *setLevelArtworkDir(TreeInfo *ti)
 
     checked_free(*artwork_set_ptr);
 
-    if (fileExists(dir))
+    if (directoryExists(dir))
     {
       *artwork_path_ptr = getStringCopy(getClassicArtworkDir(ti->type));
       *artwork_set_ptr = getStringCopy(getClassicArtworkSet(ti->type));
@@ -880,7 +880,7 @@ char *getCustomMusicDirectory(void)
   {
     /* 1st try: look for special artwork in current level series directory */
     directory = getPath2(getCurrentLevelDir(), MUSIC_DIRECTORY);
-    if (fileExists(directory))
+    if (directoryExists(directory))
       return directory;
 
     free(directory);
@@ -890,7 +890,7 @@ char *getCustomMusicDirectory(void)
     {
       /* 2nd try: look for special artwork configured in level series config */
       directory = getStringCopy(getLevelArtworkDir(TREE_TYPE_MUSIC_DIR));
-      if (fileExists(directory))
+      if (directoryExists(directory))
 	return directory;
 
       free(directory);
@@ -904,7 +904,7 @@ char *getCustomMusicDirectory(void)
   {
     /* 3rd try: look for special artwork in configured artwork directory */
     directory = getStringCopy(getSetupArtworkDir(artwork.mus_current));
-    if (fileExists(directory))
+    if (directoryExists(directory))
       return directory;
 
     free(directory);
@@ -912,14 +912,14 @@ char *getCustomMusicDirectory(void)
 
   /* 4th try: look for default artwork in new default artwork directory */
   directory = getStringCopy(getDefaultMusicDir(MUS_DEFAULT_SUBDIR));
-  if (fileExists(directory))
+  if (directoryExists(directory))
     return directory;
 
   free(directory);
 
   /* 5th try: look for default artwork in old default artwork directory */
   directory = getStringCopy(options.music_directory);
-  if (fileExists(directory))
+  if (directoryExists(directory))
     return directory;
 
   return NULL;		/* cannot find specified artwork file anywhere */
@@ -943,7 +943,7 @@ static void SaveUserLevelInfo();
 
 void InitUserLevelDirectory(char *level_subdir)
 {
-  if (!fileExists(getUserLevelDir(level_subdir)))
+  if (!directoryExists(getUserLevelDir(level_subdir)))
   {
     createDirectory(getUserGameDataDir(), "user data", PERMS_PRIVATE);
     createDirectory(getUserLevelDir(NULL), "main user level", PERMS_PRIVATE);
@@ -1389,7 +1389,7 @@ void updateUserGameDataDir()
   char *userdata_dir_new = getUserGameDataDir();	/* do not free() this */
 
   /* convert old Unix style game data directory to Mac OS X style, if needed */
-  if (fileExists(userdata_dir_old) && !fileExists(userdata_dir_new))
+  if (directoryExists(userdata_dir_old) && !directoryExists(userdata_dir_new))
   {
     if (rename(userdata_dir_old, userdata_dir_new) != 0)
     {
@@ -1456,7 +1456,7 @@ void createDirectory(char *dir, char *text, int permission_class)
   else
     dir_mode |= MODE_W_ALL;
 
-  if (!fileExists(dir))
+  if (!directoryExists(dir))
     if (posix_mkdir(dir, dir_mode) != 0)
       Error(ERR_WARN, "cannot create %s directory '%s': %s",
 	    text, dir, strerror(errno));
@@ -3634,6 +3634,154 @@ void LoadLevelInfo()
 #endif
 }
 
+#if 1
+
+static boolean LoadArtworkInfoFromArtworkConf(TreeInfo **node_first,
+					      TreeInfo *node_parent,
+					      char *base_directory,
+					      char *directory_name, int type)
+{
+  char *directory_path = getPath2(base_directory, directory_name);
+  char *filename = getPath2(directory_path, ARTWORKINFO_FILENAME(type));
+  SetupFileHash *setup_file_hash = NULL;
+  TreeInfo *artwork_new = NULL;
+  int i;
+
+  if (fileExists(filename))
+    setup_file_hash = loadSetupFileHash(filename);
+
+  if (setup_file_hash == NULL)	/* no config file -- look for artwork files */
+  {
+    Directory *dir;
+    DirectoryEntry *dir_entry;
+    boolean valid_file_found = FALSE;
+
+    if ((dir = openDirectory(directory_path)) != NULL)
+    {
+      while ((dir_entry = readDirectory(dir)) != NULL)
+      {
+	char *entry_name = dir_entry->basename;
+
+	if (FileIsArtworkType(entry_name, type))
+	{
+	  valid_file_found = TRUE;
+
+	  break;
+	}
+      }
+
+      closeDirectory(dir);
+    }
+
+    if (!valid_file_found)
+    {
+      if (!strEqual(directory_name, "."))
+	Error(ERR_WARN, "ignoring artwork directory '%s'", directory_path);
+
+      free(directory_path);
+      free(filename);
+
+      return FALSE;
+    }
+  }
+
+  artwork_new = newTreeInfo();
+
+  if (node_parent)
+    setTreeInfoToDefaultsFromParent(artwork_new, node_parent);
+  else
+    setTreeInfoToDefaults(artwork_new, type);
+
+  artwork_new->subdir = getStringCopy(directory_name);
+
+  if (setup_file_hash)	/* (before defining ".color" and ".class_desc") */
+  {
+#if 0
+    checkSetupFileHashIdentifier(setup_file_hash, filename, getCookie("..."));
+#endif
+
+    /* set all structure fields according to the token/value pairs */
+    ldi = *artwork_new;
+    for (i = 0; i < NUM_LEVELINFO_TOKENS; i++)
+      setSetupInfo(levelinfo_tokens, i,
+		   getHashEntry(setup_file_hash, levelinfo_tokens[i].text));
+    *artwork_new = ldi;
+
+    if (strEqual(artwork_new->name, ANONYMOUS_NAME))
+      setString(&artwork_new->name, artwork_new->subdir);
+
+    if (artwork_new->identifier == NULL)
+      artwork_new->identifier = getStringCopy(artwork_new->subdir);
+
+    if (artwork_new->name_sorting == NULL)
+      artwork_new->name_sorting = getStringCopy(artwork_new->name);
+  }
+
+  if (node_parent == NULL)		/* top level group */
+  {
+    artwork_new->basepath = getStringCopy(base_directory);
+    artwork_new->fullpath = getStringCopy(artwork_new->subdir);
+  }
+  else					/* sub level group */
+  {
+    artwork_new->basepath = getStringCopy(node_parent->basepath);
+    artwork_new->fullpath = getPath2(node_parent->fullpath, directory_name);
+  }
+
+  artwork_new->in_user_dir =
+    (!strEqual(artwork_new->basepath, OPTIONS_ARTWORK_DIRECTORY(type)));
+
+  /* (may use ".sort_priority" from "setup_file_hash" above) */
+  artwork_new->color = ARTWORKCOLOR(artwork_new);
+
+  setString(&artwork_new->class_desc, getLevelClassDescription(artwork_new));
+
+  if (setup_file_hash == NULL)	/* (after determining ".user_defined") */
+  {
+    if (strEqual(artwork_new->subdir, "."))
+    {
+      if (artwork_new->user_defined)
+      {
+	setString(&artwork_new->identifier, "private");
+	artwork_new->sort_priority = ARTWORKCLASS_PRIVATE;
+      }
+      else
+      {
+	setString(&artwork_new->identifier, "classic");
+	artwork_new->sort_priority = ARTWORKCLASS_CLASSICS;
+      }
+
+      /* set to new values after changing ".sort_priority" */
+      artwork_new->color = ARTWORKCOLOR(artwork_new);
+
+      setString(&artwork_new->class_desc,
+		getLevelClassDescription(artwork_new));
+    }
+    else
+    {
+      setString(&artwork_new->identifier, artwork_new->subdir);
+    }
+
+    setString(&artwork_new->name, artwork_new->identifier);
+    setString(&artwork_new->name_sorting, artwork_new->name);
+  }
+
+#if 0
+  DrawInitText(artwork_new->name, 150, FC_YELLOW);
+#endif
+
+  pushTreeInfo(node_first, artwork_new);
+
+  freeSetupFileHash(setup_file_hash);
+
+  free(directory_path);
+  free(filename);
+
+  return TRUE;
+}
+
+#else
+
 static boolean LoadArtworkInfoFromArtworkConf(TreeInfo **node_first,
 					      TreeInfo *node_parent,
 					      char *base_directory,
@@ -3777,6 +3925,82 @@ static boolean LoadArtworkInfoFromArtworkConf(TreeInfo **node_first,
   return TRUE;
 }
 
+#endif
+
+#if 1
+
+static void LoadArtworkInfoFromArtworkDir(TreeInfo **node_first,
+					  TreeInfo *node_parent,
+					  char *base_directory, int type)
+{
+  Directory *dir;
+  DirectoryEntry *dir_entry;
+  boolean valid_entry_found = FALSE;
+
+  if ((dir = openDirectory(base_directory)) == NULL)
+  {
+    /* display error if directory is main "options.graphics_directory" etc. */
+    if (base_directory == OPTIONS_ARTWORK_DIRECTORY(type))
+      Error(ERR_WARN, "cannot read directory '%s'", base_directory);
+
+    return;
+  }
+
+  while ((dir_entry = readDirectory(dir)) != NULL)	/* loop all entries */
+  {
+    char *directory_name = dir_entry->basename;
+    char *directory_path = getPath2(base_directory, directory_name);
+
+    /* skip directory entries for current and parent directory */
+    if (strEqual(directory_name, ".") ||
+	strEqual(directory_name, ".."))
+    {
+      free(directory_path);
+
+      continue;
+    }
+
+#if 1
+    /* skip directory entries which are not a directory */
+    if (!dir_entry->is_directory)			/* not a directory */
+    {
+      free(directory_path);
+
+      continue;
+    }
+#else
+    /* skip directory entries which are not a directory or are not accessible */
+    struct stat file_status;
+    if (stat(directory_path, &file_status) != 0 ||	/* cannot stat file */
+	(file_status.st_mode & S_IFMT) != S_IFDIR)	/* not a directory */
+    {
+      free(directory_path);
+
+      continue;
+    }
+#endif
+
+    free(directory_path);
+
+    /* check if this directory contains artwork with or without config file */
+    valid_entry_found |= LoadArtworkInfoFromArtworkConf(node_first, node_parent,
+							base_directory,
+							directory_name, type);
+  }
+
+  closeDirectory(dir);
+
+  /* check if this directory directly contains artwork itself */
+  valid_entry_found |= LoadArtworkInfoFromArtworkConf(node_first, node_parent,
+						      base_directory, ".",
+						      type);
+  if (!valid_entry_found)
+    Error(ERR_WARN, "cannot find any valid artwork in directory '%s'",
+	  base_directory);
+}
+
+#else
+
 static void LoadArtworkInfoFromArtworkDir(TreeInfo **node_first,
 					  TreeInfo *node_parent,
 					  char *base_directory, int type)
@@ -3834,6 +4058,8 @@ static void LoadArtworkInfoFromArtworkDir(TreeInfo **node_first,
     Error(ERR_WARN, "cannot find any valid artwork in directory '%s'",
 	  base_directory);
 }
+
+#endif
 
 static TreeInfo *getDummyArtworkInfo(int type)
 {

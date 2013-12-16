@@ -441,7 +441,7 @@ unsigned int get_random_number(int nr, int max)
 /* system info functions                                                     */
 /* ------------------------------------------------------------------------- */
 
-#if !defined(PLATFORM_MSDOS)
+#if !defined(PLATFORM_MSDOS) && !defined(PLATFORM_ANDROID)
 static char *get_corrected_real_name(char *real_name)
 {
   char *real_name_new = checked_malloc(MAX_USERNAME_LEN + 1);
@@ -1453,7 +1453,9 @@ void translate_keyname(Key *keysym, char **x11name, char **name, int mode)
     { KSYM_End,		"XK_End",		"end" },
     { KSYM_Page_Up,	"XK_Page_Up",		"page up" },
     { KSYM_Page_Down,	"XK_Page_Down",		"page down" },
-    { KSYM_Menu,	"XK_Menu",		"menu" },	 /* Win-Menu */
+
+    { KSYM_Menu,	"XK_Menu",		"menu" },	 /* menu key */
+    { KSYM_Back,	"XK_Back",		"back" },	 /* back key */
 
     /* ASCII 0x20 to 0x40 keys (except numbers) */
     { KSYM_space,	"XK_space",		"space" },
@@ -2090,7 +2092,7 @@ DirectoryEntry *readDirectory(Directory *dir)
     dir->dir_entry = checked_calloc(sizeof(DirectoryEntry));
 
     dir->dir_entry->is_directory = FALSE;
-    if (line[strlen(line) - 1] = '/')
+    if (line[strlen(line) - 1] == '/')
     {
       dir->dir_entry->is_directory = TRUE;
 
@@ -2144,23 +2146,53 @@ void freeDirectoryEntry(DirectoryEntry *dir_entry)
 /* functions for checking files and filenames                                */
 /* ------------------------------------------------------------------------- */
 
+boolean directoryExists(char *dir_name)
+{
+  if (dir_name == NULL)
+    return FALSE;
+
+  boolean success = (access(dir_name, F_OK) == 0);
+
+#if defined(PLATFORM_ANDROID)
+  if (!success)
+  {
+    // this might be an asset directory; check by trying to open toc file
+    char *asset_toc_filename = getPath2(dir_name, ASSET_TOC_BASENAME);
+    SDL_RWops *file = SDL_RWFromFile(asset_toc_filename, MODE_READ);
+
+    checked_free(asset_toc_filename);
+
+    success = (file != NULL);
+
+    if (success)
+      SDL_RWclose(file);
+  }
+#endif
+
+  return success;
+}
+
 boolean fileExists(char *filename)
 {
   if (filename == NULL)
     return FALSE;
 
-#if defined(PLATFORM_ANDROID)
-  // workaround: check if file exists by opening and closing it
-  SDL_RWops *file = SDL_RWFromFile(filename, MODE_READ);
-  boolean success = (file != NULL);
+  boolean success = (access(filename, F_OK) == 0);
 
-  if (success)
-    SDL_RWclose(file);
+#if defined(PLATFORM_ANDROID)
+  if (!success)
+  {
+    // this might be an asset file; check by trying to open it
+    SDL_RWops *file = SDL_RWFromFile(filename, MODE_READ);
+
+    success = (file != NULL);
+
+    if (success)
+      SDL_RWclose(file);
+  }
+#endif
 
   return success;
-#else
-  return (access(filename, F_OK) == 0);
-#endif
 }
 
 boolean fileHasPrefix(char *basename, char *prefix)
@@ -2209,36 +2241,40 @@ boolean fileHasSuffix(char *basename, char *suffix)
 
 boolean FileIsGraphic(char *filename)
 {
-#if 1
-  return TRUE;
-#else
   char *basename = getBaseNamePtr(filename);
 
+#if defined(TARGET_SDL)
+  return (!fileHasSuffix(basename, "txt") &&
+	  !fileHasSuffix(basename, "conf"));
+#else
   return fileHasSuffix(basename, "pcx");
 #endif
 }
 
 boolean FileIsSound(char *filename)
 {
-#if 1
-  return TRUE;
-#else
   char *basename = getBaseNamePtr(filename);
 
+#if defined(TARGET_SDL)
+  return (!fileHasSuffix(basename, "txt") &&
+	  !fileHasSuffix(basename, "conf"));
+#else
   return fileHasSuffix(basename, "wav");
 #endif
 }
 
 boolean FileIsMusic(char *filename)
 {
-#if 1
-  return TRUE;
-#else
   char *basename = getBaseNamePtr(filename);
 
+#if defined(TARGET_SDL)
+  return (!fileHasSuffix(basename, "txt") &&
+	  !fileHasSuffix(basename, "conf"));
+#else
   if (FileIsSound(basename))
     return TRUE;
 
+#if 0
 #if defined(TARGET_SDL)
   if ((fileHasPrefix(basename, "mod") && !fileHasSuffix(basename, "txt")) ||
       fileHasSuffix(basename, "mod") ||
@@ -2250,6 +2286,7 @@ boolean FileIsMusic(char *filename)
       fileHasSuffix(basename, "mp3") ||
       fileHasSuffix(basename, "ogg"))
     return TRUE;
+#endif
 #endif
 
   return FALSE;

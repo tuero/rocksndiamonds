@@ -1790,6 +1790,91 @@ static void *Load_WAV_or_MOD(char *filename)
 #endif
 }
 
+#if 1
+
+void LoadCustomMusic_NoConf(void)
+{
+  static boolean draw_init_text = TRUE;		/* only draw at startup */
+  static char *last_music_directory = NULL;
+  char *music_directory = getCustomMusicDirectory();
+  Directory *dir;
+  DirectoryEntry *dir_entry;
+  int num_music = getMusicListSize();
+
+  if (!audio.sound_available)
+    return;
+
+  if (last_music_directory != NULL &&
+      strEqual(last_music_directory, music_directory))
+    return;	/* old and new music directory are the same */
+
+  if (last_music_directory != NULL)
+    free(last_music_directory);
+  last_music_directory = getStringCopy(music_directory);
+
+  FreeAllMusic_NoConf();
+
+  if ((dir = openDirectory(music_directory)) == NULL)
+  {
+    Error(ERR_WARN, "cannot read music directory '%s'", music_directory);
+
+    audio.music_available = FALSE;
+
+    return;
+  }
+
+  if (draw_init_text)
+    DrawInitText("Loading music", 120, FC_GREEN);
+
+  while ((dir_entry = readDirectory(dir)) != NULL)	/* loop all entries */
+  {
+    char *basename = dir_entry->basename;
+    char *filename = NULL;
+    MusicInfo *mus_info = NULL;
+    boolean music_already_used = FALSE;
+    int i;
+
+    /* skip all music files that are configured in music config file */
+    for (i = 0; i < num_music; i++)
+    {
+      struct FileInfo *music = getMusicListEntry(i);
+
+      if (strEqual(basename, music->filename))
+      {
+	music_already_used = TRUE;
+	break;
+      }
+    }
+
+    if (music_already_used)
+      continue;
+
+    if (draw_init_text)
+      DrawInitText(basename, 150, FC_YELLOW);
+
+    filename = getPath2(music_directory, basename);
+
+    if (FileIsMusic(basename))
+      mus_info = Load_WAV_or_MOD(filename);
+
+    free(filename);
+
+    if (mus_info)
+    {
+      num_music_noconf++;
+      Music_NoConf = checked_realloc(Music_NoConf,
+				     num_music_noconf * sizeof(MusicInfo *));
+      Music_NoConf[num_music_noconf - 1] = mus_info;
+    }
+  }
+
+  closeDirectory(dir);
+
+  draw_init_text = FALSE;
+}
+
+#else
+
 void LoadCustomMusic_NoConf(void)
 {
   static boolean draw_init_text = TRUE;		/* only draw at startup */
@@ -1815,7 +1900,9 @@ void LoadCustomMusic_NoConf(void)
   if ((dir = opendir(music_directory)) == NULL)
   {
     Error(ERR_WARN, "cannot read music directory '%s'", music_directory);
+
     audio.music_available = FALSE;
+
     return;
   }
 
@@ -1868,6 +1955,8 @@ void LoadCustomMusic_NoConf(void)
 
   draw_init_text = FALSE;
 }
+
+#endif
 
 int getSoundListSize()
 {

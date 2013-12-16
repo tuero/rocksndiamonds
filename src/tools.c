@@ -4172,6 +4172,7 @@ boolean Request(char *text, unsigned int req_state)
 	      break;
 
 	    case KSYM_Escape:
+	    case KSYM_Back:
 	      result = 0;
 	      break;
 
