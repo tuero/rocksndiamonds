@@ -1208,10 +1208,21 @@ inline void swap_number_pairs(int *x1, int *y1, int *x2, int *y2)
    of the (not yet written) chunk, write the correct chunk size and finally
    write the chunk itself */
 
+#if 1
+
+int getFile8BitInteger(File *file)
+{
+  return getByteFromFile(file);
+}
+
+#else
+
 int getFile8BitInteger(FILE *file)
 {
   return fgetc(file);
 }
+
+#endif
 
 int putFile8BitInteger(FILE *file, int value)
 {
@@ -1220,6 +1231,20 @@ int putFile8BitInteger(FILE *file, int value)
 
   return 1;
 }
+
+#if 1
+
+int getFile16BitInteger(File *file, int byte_order)
+{
+  if (byte_order == BYTE_ORDER_BIG_ENDIAN)
+    return ((getByteFromFile(file) << 8) |
+	    (getByteFromFile(file) << 0));
+  else		 /* BYTE_ORDER_LITTLE_ENDIAN */
+    return ((getByteFromFile(file) << 0) |
+	    (getByteFromFile(file) << 8));
+}
+
+#else
 
 int getFile16BitInteger(FILE *file, int byte_order)
 {
@@ -1230,6 +1255,8 @@ int getFile16BitInteger(FILE *file, int byte_order)
     return ((fgetc(file) << 0) |
 	    (fgetc(file) << 8));
 }
+
+#endif
 
 int putFile16BitInteger(FILE *file, int value, int byte_order)
 {
@@ -1250,6 +1277,24 @@ int putFile16BitInteger(FILE *file, int value, int byte_order)
   return 2;
 }
 
+#if 1
+
+int getFile32BitInteger(File *file, int byte_order)
+{
+  if (byte_order == BYTE_ORDER_BIG_ENDIAN)
+    return ((getByteFromFile(file) << 24) |
+	    (getByteFromFile(file) << 16) |
+	    (getByteFromFile(file) <<  8) |
+	    (getByteFromFile(file) <<  0));
+  else		 /* BYTE_ORDER_LITTLE_ENDIAN */
+    return ((getByteFromFile(file) <<  0) |
+	    (getByteFromFile(file) <<  8) |
+	    (getByteFromFile(file) << 16) |
+	    (getByteFromFile(file) << 24));
+}
+
+#else
+
 int getFile32BitInteger(FILE *file, int byte_order)
 {
   if (byte_order == BYTE_ORDER_BIG_ENDIAN)
@@ -1263,6 +1308,8 @@ int getFile32BitInteger(FILE *file, int byte_order)
 	    (fgetc(file) << 16) |
 	    (fgetc(file) << 24));
 }
+
+#endif
 
 int putFile32BitInteger(FILE *file, int value, int byte_order)
 {
@@ -1287,6 +1334,28 @@ int putFile32BitInteger(FILE *file, int value, int byte_order)
   return 4;
 }
 
+#if 1
+
+boolean getFileChunk(File *file, char *chunk_name, int *chunk_size,
+		     int byte_order)
+{
+  const int chunk_name_length = 4;
+
+  /* read chunk name */
+  if (getStringFromFile(file, chunk_name, chunk_name_length + 1) == NULL)
+    return FALSE;
+
+  if (chunk_size != NULL)
+  {
+    /* read chunk size */
+    *chunk_size = getFile32BitInteger(file, byte_order);
+  }
+
+  return (checkEndOfFile(file) ? FALSE : TRUE);
+}
+
+#else
+
 boolean getFileChunk(FILE *file, char *chunk_name, int *chunk_size,
 		     int byte_order)
 {
@@ -1304,6 +1373,8 @@ boolean getFileChunk(FILE *file, char *chunk_name, int *chunk_size,
 
   return (feof(file) || ferror(file) ? FALSE : TRUE);
 }
+
+#endif
 
 int putFileChunk(FILE *file, char *chunk_name, int chunk_size,
 		 int byte_order)
@@ -1328,6 +1399,21 @@ int putFileChunk(FILE *file, char *chunk_name, int chunk_size,
   return num_bytes;
 }
 
+#if 1
+
+int getFileVersion(File *file)
+{
+  int version_major = getByteFromFile(file);
+  int version_minor = getByteFromFile(file);
+  int version_patch = getByteFromFile(file);
+  int version_build = getByteFromFile(file);
+
+  return VERSION_IDENT(version_major, version_minor, version_patch,
+		       version_build);
+}
+
+#else
+
 int getFileVersion(FILE *file)
 {
   int version_major = fgetc(file);
@@ -1338,6 +1424,8 @@ int getFileVersion(FILE *file)
   return VERSION_IDENT(version_major, version_minor, version_patch,
 		       version_build);
 }
+
+#endif
 
 int putFileVersion(FILE *file, int version)
 {
@@ -1357,6 +1445,18 @@ int putFileVersion(FILE *file, int version)
   return 4;
 }
 
+#if 1
+
+void ReadBytesFromFile(File *file, byte *buffer, unsigned int bytes)
+{
+  int i;
+
+  for (i = 0; i < bytes && !checkEndOfFile(file); i++)
+    buffer[i] = getByteFromFile(file);
+}
+
+#else
+
 void ReadBytesFromFile(FILE *file, byte *buffer, unsigned int bytes)
 {
   int i;
@@ -1364,6 +1464,8 @@ void ReadBytesFromFile(FILE *file, byte *buffer, unsigned int bytes)
   for(i = 0; i < bytes && !feof(file); i++)
     buffer[i] = fgetc(file);
 }
+
+#endif
 
 void WriteBytesToFile(FILE *file, byte *buffer, unsigned int bytes)
 {
@@ -1373,11 +1475,23 @@ void WriteBytesToFile(FILE *file, byte *buffer, unsigned int bytes)
     fputc(buffer[i], file);
 }
 
+#if 1
+
+void ReadUnusedBytesFromFile(File *file, unsigned int bytes)
+{
+  while (bytes-- && !checkEndOfFile(file))
+    getByteFromFile(file);
+}
+
+#else
+
 void ReadUnusedBytesFromFile(FILE *file, unsigned int bytes)
 {
   while (bytes-- && !feof(file))
     fgetc(file);
 }
+
+#endif
 
 void WriteUnusedBytesToFile(FILE *file, unsigned int bytes)
 {
@@ -1965,6 +2079,64 @@ int checkEndOfFile(File *file)
 #endif
 
   return feof(file->file);
+}
+
+size_t readFile(File *file, void *buffer, size_t item_size, size_t num_items)
+{
+#if defined(PLATFORM_ANDROID)
+  if (file->file_is_asset)
+  {
+    if (file->end_of_file)
+      return 0;
+
+    size_t num_items_read =
+      SDL_RWread(file->asset_file, buffer, item_size, num_items);
+
+    if (num_items_read < num_items)
+      file->end_of_file = TRUE;
+
+    return num_items_read;
+  }
+#endif
+
+  return fread(buffer, item_size, num_items, file->file);
+}
+
+int seekFile(File *file, long offset, int whence)
+{
+#if defined(PLATFORM_ANDROID)
+  if (file->file_is_asset)
+  {
+    int sdl_whence = (whence == SEEK_SET ? RW_SEEK_SET :
+		      whence == SEEK_CUR ? RW_SEEK_CUR :
+		      whence == SEEK_END ? RW_SEEK_END : 0);
+
+    return (SDL_RWseek(file->asset_file, offset, sdl_whence) == -1 ? -1 : 0);
+  }
+#endif
+
+  return fseek(file->file, offset, whence);
+}
+
+int getByteFromFile(File *file)
+{
+#if defined(PLATFORM_ANDROID)
+  if (file->file_is_asset)
+  {
+    if (file->end_of_file)
+      return EOF;
+
+    byte c;
+    size_t num_bytes_read = SDL_RWread(file->asset_file, &c, 1, 1);
+
+    if (num_bytes_read < 1)
+      file->end_of_file = TRUE;
+
+    return (file->end_of_file ? EOF : (int)c);
+  }
+#endif
+
+  return fgetc(file->file);
 }
 
 char *getStringFromFile(File *file, char *line, int size)

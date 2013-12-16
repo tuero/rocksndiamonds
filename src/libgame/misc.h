@@ -180,6 +180,28 @@ void clear_mem(void *, unsigned int);
 void swap_numbers(int *, int *);
 void swap_number_pairs(int *, int *, int *, int *);
 
+#if 1
+
+int getFile8BitInteger(File *);
+int putFile8BitInteger(FILE *, int);
+int getFile16BitInteger(File *, int);
+int putFile16BitInteger(FILE *, int, int);
+int getFile32BitInteger(File *, int);
+int putFile32BitInteger(FILE *, int, int);
+
+boolean getFileChunk(File *, char *, int *, int);
+int putFileChunk(FILE *, char *, int, int);
+int getFileVersion(File *);
+int putFileVersion(FILE *, int);
+
+void ReadBytesFromFile(File *, byte *, unsigned int);
+void WriteBytesToFile(FILE *, byte *, unsigned int);
+
+void ReadUnusedBytesFromFile(File *, unsigned int);
+void WriteUnusedBytesToFile(FILE *, unsigned int);
+
+#else
+
 int getFile8BitInteger(FILE *);
 int putFile8BitInteger(FILE *, int);
 int getFile16BitInteger(FILE *, int);
@@ -197,6 +219,8 @@ void WriteBytesToFile(FILE *, byte *, unsigned int);
 
 void ReadUnusedBytesFromFile(FILE *, unsigned int);
 void WriteUnusedBytesToFile(FILE *, unsigned int);
+
+#endif
 
 #define getFile8Bit(f)        getFile8BitInteger(f)
 #define putFile8Bit(f,x)      putFile8BitInteger(f,x)
@@ -234,6 +258,9 @@ int getNumNodes(ListNode *);
 File *openFile(char *, char *);
 int closeFile(File *);
 int checkEndOfFile(File *);
+size_t readFile(File *, void *, size_t, size_t);
+int seekFile(File *, long, int);
+int getByteFromFile(File *);
 char *getStringFromFile(File *, char *, int);
 
 Directory *openDirectory(char *);

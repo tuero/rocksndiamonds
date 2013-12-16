@@ -74,6 +74,54 @@ void setLevelInfoToDefaults_EM(void)
 
 #define MAX_EM_LEVEL_SIZE		16384
 
+#if 1
+
+boolean LoadNativeLevel_EM(char *filename, boolean level_info_only)
+{
+  unsigned char raw_leveldata[MAX_EM_LEVEL_SIZE];
+  int raw_leveldata_length;
+  int file_version;
+  File *file;
+
+  /* always start with reliable default values */
+  setLevelInfoToDefaults_EM();
+
+  if (!(file = openFile(filename, MODE_READ)))
+  {
+    if (!level_info_only)
+      Error(ERR_WARN, "cannot open level '%s' -- using empty level", filename);
+
+    return FALSE;
+  }
+
+  raw_leveldata_length = readFile(file, raw_leveldata, 1, MAX_EM_LEVEL_SIZE);
+
+  closeFile(file);
+
+  if (raw_leveldata_length <= 0)
+  {
+    Error(ERR_WARN, "cannot read level '%s' -- using empty level", filename);
+
+    return FALSE;
+  }
+
+  file_version = cleanup_em_level(raw_leveldata, raw_leveldata_length,filename);
+
+  if (file_version == FILE_VERSION_EM_UNKNOWN)
+  {
+    Error(ERR_WARN, "unknown EM level '%s' -- using empty level", filename);
+
+    return FALSE;
+  }
+
+  convert_em_level(raw_leveldata, file_version);
+  prepare_em_level();
+
+  return TRUE;
+}
+
+#else
+
 boolean LoadNativeLevel_EM(char *filename, boolean level_info_only)
 {
   unsigned char raw_leveldata[MAX_EM_LEVEL_SIZE];
@@ -117,3 +165,5 @@ boolean LoadNativeLevel_EM(char *filename, boolean level_info_only)
 
   return TRUE;
 }
+
+#endif

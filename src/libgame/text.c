@@ -448,6 +448,44 @@ void DrawTextExt(DrawBuffer *dst_bitmap, int dst_x, int dst_y, char *text,
 
 #define MAX_LINES_FROM_FILE		1024
 
+#if 1
+
+char *GetTextBufferFromFile(char *filename, int max_lines)
+{
+  File *file;
+  char *buffer;
+  int num_lines = 0;
+
+  if (filename == NULL)
+    return NULL;
+
+  if (!(file = openFile(filename, MODE_READ)))
+    return NULL;
+
+  buffer = checked_calloc(1);	/* start with valid, but empty text buffer */
+
+  while (!checkEndOfFile(file) && num_lines < max_lines)
+  {
+    char line[MAX_LINE_LEN];
+
+    /* read next line of input file */
+    if (!getStringFromFile(file, line, MAX_LINE_LEN))
+      break;
+
+    buffer = checked_realloc(buffer, strlen(buffer) + strlen(line) + 1);
+
+    strcat(buffer, line);
+
+    num_lines++;
+  }
+
+  closeFile(file);
+
+  return buffer;
+}
+
+#else
+
 char *GetTextBufferFromFile(char *filename, int max_lines)
 {
   FILE *file;
@@ -481,6 +519,8 @@ char *GetTextBufferFromFile(char *filename, int max_lines)
 
   return buffer;
 }
+
+#endif
 
 void DrawTextToTextArea_OLD(int x, int y, char *text, int font_nr, int line_length,
 			    int area_xsize, int area_ysize, int mask_mode)
