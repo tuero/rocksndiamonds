@@ -1,3 +1,6 @@
+2013-12-16
+	* continued porting Rocks'n'Diamonds to Android (levels now playable)
+
 2013-12-12
 	* added SDL2 renderer/texture based graphics frame handling to allow for
 	  "desktop" style fullscreen mode and scaling of game screen/window
@@ -12,7 +15,7 @@
 	  surface are the same (this bug also existed in versions of SDL 1.2.x)
 
 2013-12-07
-	* started porting Rocks'n'Diamonds to Android
+	* started porting Rocks'n'Diamonds to Android (already shows main menu)
 
 2013-12-03
 	* ported Rocks'n'Diamonds to SDL2 (first simple version that works)

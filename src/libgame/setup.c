@@ -1375,9 +1375,14 @@ char *getUserGameDataDir(void)
 {
   static char *user_game_data_dir = NULL;
 
+#if defined(PLATFORM_ANDROID)
+  if (user_game_data_dir == NULL)
+    user_game_data_dir = SDL_AndroidGetInternalStoragePath();
+#else
   if (user_game_data_dir == NULL)
     user_game_data_dir = getPath2(getPersonalDataDir(),
 				  program.userdata_subdir);
+#endif
 
   return user_game_data_dir;
 }

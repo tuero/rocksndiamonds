@@ -271,6 +271,7 @@ void SDLInitVideoBuffer(DrawBuffer **backbuffer, DrawWindow **window,
     Error(ERR_EXIT, "setting video mode failed");
 
 #if 1
+  /* !!! SDL2 can only set the window icon if the window already exists !!! */
   /* set window icon */
   SDLSetWindowIcon(program.sdl_icon_filename);
 #endif
