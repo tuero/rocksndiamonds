@@ -1,3 +1,10 @@
+2013-12-28
+	* fixed graphical bugs when using renderer/texture based graphics
+
+2013-12-23
+	* fixed playing certain sounds (menu navigation sound and counting
+	  score sound after solving a level) when "normal sounds" are disabled
+
 2013-12-16
 	* continued porting Rocks'n'Diamonds to Android (levels now playable)
 

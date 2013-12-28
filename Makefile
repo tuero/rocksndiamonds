@@ -167,7 +167,7 @@ dist-clean:
 	@$(MAKE_CMD) dist-clean
 
 dist-build-unix:
-	@BUILD_DIST=TRUE $(MAKE) x11
+	@BUILD_DIST=TRUE $(MAKE)
 
 dist-build-msdos:
 	@BUILD_DIST=TRUE $(MAKE) cross-msdos

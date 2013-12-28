@@ -1568,8 +1568,10 @@ void translate_keyname(Key *keysym, char **x11name, char **name, int mode)
     { KSYM_Page_Up,	"XK_Page_Up",		"page up" },
     { KSYM_Page_Down,	"XK_Page_Down",		"page down" },
 
+#if defined(TARGET_SDL2)
     { KSYM_Menu,	"XK_Menu",		"menu" },	 /* menu key */
     { KSYM_Back,	"XK_Back",		"back" },	 /* back key */
+#endif
 
     /* ASCII 0x20 to 0x40 keys (except numbers) */
     { KSYM_space,	"XK_space",		"space" },
@@ -2055,7 +2057,7 @@ int closeFile(File *file)
   if (file == NULL)
     return -1;
 
-  int result;
+  int result = 0;
 
 #if defined(PLATFORM_ANDROID)
   if (file->asset_file)
@@ -2215,7 +2217,7 @@ int closeDirectory(Directory *dir)
   if (dir == NULL)
     return -1;
 
-  int result;
+  int result = 0;
 
 #if defined(PLATFORM_ANDROID)
   if (dir->asset_toc_file)
@@ -3782,6 +3784,8 @@ void debug_print_parent_only(char *format, ...)
   }
 }
 
+#endif	/* DEBUG */
+
 void print_timestamp_ext(char *message, char *mode)
 {
 #if DEBUG_PRINT_INIT_TIMESTAMPS
@@ -3845,5 +3849,3 @@ void print_timestamp_done(char *message)
 {
   print_timestamp_ext(message, "DONE");
 }
-
-#endif	/* DEBUG */

@@ -2190,21 +2190,33 @@ void PlayMusic(int nr)
 
 void PlaySound(int nr)
 {
+  if (!setup.sound_simple)
+    return;
+
   PlaySoundExt(nr, SOUND_MAX_VOLUME, SOUND_MIDDLE, SND_CTRL_PLAY_SOUND);
 }
 
 void PlaySoundStereo(int nr, int stereo_position)
 {
+  if (!setup.sound_simple)
+    return;
+
   PlaySoundExt(nr, SOUND_MAX_VOLUME, stereo_position, SND_CTRL_PLAY_SOUND);
 }
 
 void PlaySoundLoop(int nr)
 {
+  if (!setup.sound_loops)
+    return;
+
   PlaySoundExt(nr, SOUND_MAX_VOLUME, SOUND_MIDDLE, SND_CTRL_PLAY_LOOP);
 }
 
 void PlaySoundMusic(int nr)
 {
+  if (!setup.sound_music)
+    return;
+
   PlaySoundExt(nr, SOUND_MAX_VOLUME, SOUND_MIDDLE, SND_CTRL_PLAY_MUSIC);
 }
 

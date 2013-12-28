@@ -4172,7 +4172,9 @@ boolean Request(char *text, unsigned int req_state)
 	      break;
 
 	    case KSYM_Escape:
+#if defined(TARGET_SDL2)
 	    case KSYM_Back:
+#endif
 	      result = 0;
 	      break;
 

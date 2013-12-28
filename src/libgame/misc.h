@@ -297,11 +297,10 @@ void NotifyUserAboutErrorFile();
 
 #if DEBUG
 void debug_print_timestamp(int, char *);
+#endif
 void print_timestamp_init(char *);
 void print_timestamp_time(char *);
 void print_timestamp_done(char *);
-#endif	/* DEBUG */
-
 
 
 #endif /* MISC_H */
