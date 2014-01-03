@@ -4242,6 +4242,7 @@ static void execSetupGraphics()
   DrawSetupScreen();
 }
 
+#if !defined(TARGET_SDL2)
 static void execSetupChooseScreenMode()
 {
   if (!video.fullscreen_available)
@@ -4251,6 +4252,7 @@ static void execSetupChooseScreenMode()
 
   DrawSetupScreen();
 }
+#endif
 
 static void execSetupChooseScrollDelay()
 {
@@ -4601,8 +4603,10 @@ static struct TokenInfo setup_info_editor[] =
 static struct TokenInfo setup_info_graphics[] =
 {
   { TYPE_SWITCH,	&setup.fullscreen,	"Fullscreen:"		},
+#if !defined(TARGET_SDL2)
   { TYPE_ENTER_LIST,	execSetupChooseScreenMode, "Fullscreen Mode:"	},
   { TYPE_STRING,	&screen_mode_text,	""			},
+#endif
 #if 0
   { TYPE_SWITCH,	&setup.scroll_delay,	"Scroll Delay:"		},
 #endif

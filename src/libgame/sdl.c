@@ -56,6 +56,9 @@ static void UpdateScreen(SDL_Rect *rect)
     int bytes_x = screen->pitch / video.width;
     int bytes_y = screen->pitch;
 
+    if (video.fullscreen_enabled)
+      bytes_x = screen->pitch / fullscreen_width;
+
     SDL_UpdateTexture(sdl_texture, rect,
 		      screen->pixels + rect->x * bytes_x + rect->y * bytes_y,
 		      screen->pitch);
@@ -81,6 +84,14 @@ static void UpdateScreen(SDL_Rect *rect)
 
 static void setFullscreenParameters(char *fullscreen_mode_string)
 {
+#if defined(TARGET_SDL2)
+  fullscreen_width = video.width;
+  fullscreen_height = video.height;
+  fullscreen_xoffset = 0;
+  fullscreen_yoffset = 0;  
+
+#else
+
   struct ScreenModeInfo *fullscreen_mode;
   int i;
 
@@ -103,6 +114,7 @@ static void setFullscreenParameters(char *fullscreen_mode_string)
       break;
     }
   }
+#endif
 }
 
 static void SDLSetWindowIcon(char *basename)
@@ -175,6 +187,7 @@ void SDLInitVideoDisplay(void)
 void SDLInitVideoBuffer(DrawBuffer **backbuffer, DrawWindow **window,
 			boolean fullscreen)
 {
+#if !defined(TARGET_SDL2)
   static int screen_xy[][2] =
   {
     {  640, 480 },
@@ -182,7 +195,8 @@ void SDLInitVideoBuffer(DrawBuffer **backbuffer, DrawWindow **window,
     { 1024, 768 },
     {   -1,  -1 }
   };
-  SDL_Rect **modes;
+#endif
+  SDL_Rect **modes = NULL;
   int i, j;
 
   /* default: normal game window size */
@@ -191,6 +205,7 @@ void SDLInitVideoBuffer(DrawBuffer **backbuffer, DrawWindow **window,
   fullscreen_xoffset = 0;
   fullscreen_yoffset = 0;
 
+#if !defined(TARGET_SDL2)
   for (i = 0; screen_xy[i][0] != -1; i++)
   {
     if (screen_xy[i][0] >= video.width && screen_xy[i][1] >= video.height)
@@ -204,6 +219,7 @@ void SDLInitVideoBuffer(DrawBuffer **backbuffer, DrawWindow **window,
 
   fullscreen_xoffset = (fullscreen_width  - video.width)  / 2;
   fullscreen_yoffset = (fullscreen_height - video.height) / 2;
+#endif
 
 #if 1
   checked_free(video.fullscreen_modes);
@@ -212,12 +228,37 @@ void SDLInitVideoBuffer(DrawBuffer **backbuffer, DrawWindow **window,
   video.fullscreen_mode_current = NULL;
 #endif
 
-#if !defined(TARGET_SDL2)
+#if defined(TARGET_SDL2)
+  int num_displays = SDL_GetNumVideoDisplays();
+
+  if (num_displays > 0)
+  {
+    // currently only display modes of first display supported
+    int num_modes = SDL_GetNumDisplayModes(0);
+
+    if (num_modes > 0)
+    {
+      modes = checked_calloc((num_modes + 1) * sizeof(SDL_Rect *));
+
+      for (i = 0; i < num_modes; i++)
+      {
+	SDL_DisplayMode mode;
+
+	if (SDL_GetDisplayMode(0, i, &mode) < 0)
+	  break;
+
+	modes[i] = checked_calloc(sizeof(SDL_Rect));
+
+	modes[i]->w = mode.w;
+	modes[i]->h = mode.h;
+      }
+    }
+  }
+
+#else
+
   /* get available hardware supported fullscreen modes */
   modes = SDL_ListModes(NULL, SDL_FULLSCREEN | SDL_HWSURFACE);
-#else
-  // (for now, no display modes in SDL2 -- change this later)
-  modes = NULL;
 #endif
 
   if (modes == NULL)
@@ -242,7 +283,7 @@ void SDLInitVideoBuffer(DrawBuffer **backbuffer, DrawWindow **window,
     /* in this case, a certain number of screen modes is available */
     int num_modes = 0;
 
-    for(i = 0; modes[i] != NULL; i++)
+    for (i = 0; modes[i] != NULL; i++)
     {
       boolean found_mode = FALSE;
 
@@ -280,6 +321,16 @@ void SDLInitVideoBuffer(DrawBuffer **backbuffer, DrawWindow **window,
       video.fullscreen_available = FALSE;
     }
   }
+
+#if defined(TARGET_SDL2)
+  if (modes)
+  {
+    for (i = 0; modes[i] != NULL; i++)
+      checked_free(modes[i]);
+
+    checked_free(modes);
+  }
+#endif
 
 #if 0
   /* set window icon */
@@ -324,9 +375,132 @@ void SDLInitVideoBuffer(DrawBuffer **backbuffer, DrawWindow **window,
 #endif
 }
 
+static SDL_Surface *SDLCreateScreen(DrawBuffer **backbuffer,
+				    boolean fullscreen)
+{
+  SDL_Surface *new_surface = NULL;
+
+  int surface_flags_window = SURFACE_FLAGS;
+#if defined(TARGET_SDL2)
+
+#if 1
+  int surface_flags_fullscreen = SURFACE_FLAGS | SDL_WINDOW_FULLSCREEN_DESKTOP;
+#else
+  // (never used with SDL2 now)
+  int surface_flags_fullscreen = SURFACE_FLAGS | SDL_WINDOW_FULLSCREEN;
+#endif
+
+#else
+  int surface_flags_fullscreen = SURFACE_FLAGS | SDL_FULLSCREEN;
+#endif
+
+  int width  = (fullscreen ? fullscreen_width  : video.width);
+  int height = (fullscreen ? fullscreen_height : video.height);
+  int surface_flags = (fullscreen ? surface_flags_fullscreen :
+		       surface_flags_window);
+
+#if defined(TARGET_SDL2)
+
+#if USE_RENDERER
+  float scale_factor = 1.2;
+
+  if ((*backbuffer)->surface)
+    SDL_FreeSurface((*backbuffer)->surface);
+
+  if (sdl_texture)
+    SDL_DestroyTexture(sdl_texture);
+
+  if (sdl_renderer)
+    SDL_DestroyRenderer(sdl_renderer);
+
+  if (sdl_window)
+    SDL_DestroyWindow(sdl_window);
+
+  sdl_window = SDL_CreateWindow(program.window_title,
+				SDL_WINDOWPOS_CENTERED,
+				SDL_WINDOWPOS_CENTERED,
+				(int)(scale_factor * width),
+				(int)(scale_factor * height),
+				surface_flags);
+
+  if (sdl_window != NULL)
+  {
+    sdl_renderer = SDL_CreateRenderer(sdl_window, -1, 0);
+
+    if (sdl_renderer != NULL)
+    {
+      SDL_RenderSetLogicalSize(sdl_renderer, width, height);
+      SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
+
+      sdl_texture = SDL_CreateTexture(sdl_renderer,
+				      SDL_PIXELFORMAT_ARGB8888,
+				      SDL_TEXTUREACCESS_STREAMING,
+				      width, height);
+
+      if (sdl_texture != NULL)
+      {
+#if 1
+	// (do not use alpha channel)
+	new_surface = SDL_CreateRGBSurface(0, width, height, 32,
+					   0x00FF0000,
+					   0x0000FF00,
+					   0x000000FF,
+					   0x00000000);
+#else
+	// (this uses an alpha channel, which we don't want here)
+	new_surface = SDL_CreateRGBSurface(0, width, height, 32,
+					   0x00FF0000,
+					   0x0000FF00,
+					   0x000000FF,
+					   0xFF000000);
+#endif
+
+	if (new_surface == NULL)
+	  Error(ERR_WARN, "SDL_CreateRGBSurface() failed: %s",
+		SDL_GetError());
+      }
+      else
+      {
+	Error(ERR_WARN, "SDL_CreateTexture() failed: %s", SDL_GetError());
+      }
+    }
+    else
+    {
+      Error(ERR_WARN, "SDL_CreateRenderer() failed: %s", SDL_GetError());
+    }
+  }
+  else
+  {
+    Error(ERR_WARN, "SDL_CreateWindow() failed: %s", SDL_GetError());
+  }
+
+#else
+
+  if (sdl_window)
+    SDL_DestroyWindow(sdl_window);
+
+  sdl_window = SDL_CreateWindow(program.window_title,
+				SDL_WINDOWPOS_CENTERED,
+				SDL_WINDOWPOS_CENTERED,
+				width, height,
+				surface_flags);
+
+  if (sdl_window != NULL)
+    new_surface = SDL_GetWindowSurface(sdl_window);
+#endif
+
+#else
+  new_surface = SDL_SetVideoMode(width, height, video.depth, surface_flags);
+#endif
+
+  return new_surface;
+}
+
 boolean SDLSetVideoMode(DrawBuffer **backbuffer, boolean fullscreen)
 {
   boolean success = TRUE;
+#if 1
+#else
 #if defined(TARGET_SDL2)
   // int surface_flags_fullscreen = SURFACE_FLAGS | SDL_WINDOW_FULLSCREEN;
   int surface_flags_fullscreen = SURFACE_FLAGS | SDL_WINDOW_FULLSCREEN_DESKTOP;
@@ -334,6 +508,7 @@ boolean SDLSetVideoMode(DrawBuffer **backbuffer, boolean fullscreen)
 #else
   int surface_flags_fullscreen = SURFACE_FLAGS | SDL_FULLSCREEN;
   int surface_flags_window = SURFACE_FLAGS;
+#endif
 #endif
   SDL_Surface *new_surface = NULL;
 
@@ -352,6 +527,10 @@ boolean SDLSetVideoMode(DrawBuffer **backbuffer, boolean fullscreen)
     video_yoffset = fullscreen_yoffset;
 
     /* switch display to fullscreen mode, if available */
+#if 1
+    new_surface = SDLCreateScreen(backbuffer, TRUE);
+#else
+
 #if defined(TARGET_SDL2)
     sdl_window = SDL_CreateWindow(program.window_title,
 				  SDL_WINDOWPOS_CENTERED,
@@ -368,6 +547,7 @@ boolean SDLSetVideoMode(DrawBuffer **backbuffer, boolean fullscreen)
 #else
     new_surface = SDL_SetVideoMode(fullscreen_width, fullscreen_height,
 				   video.depth, surface_flags_fullscreen);
+#endif
 #endif
 
     if (new_surface == NULL)
@@ -397,6 +577,10 @@ boolean SDLSetVideoMode(DrawBuffer **backbuffer, boolean fullscreen)
     video_yoffset = 0;
 
     /* switch display to window mode */
+#if 1
+    new_surface = SDLCreateScreen(backbuffer, FALSE);
+#else
+
 #if defined(TARGET_SDL2)
 
 #if USE_RENDERER
@@ -404,6 +588,18 @@ boolean SDLSetVideoMode(DrawBuffer **backbuffer, boolean fullscreen)
     int test_fullscreen = 0;
     int surface_flags = (test_fullscreen ? surface_flags_fullscreen :
 			 surface_flags_window);
+
+    if ((*backbuffer)->surface)
+      SDL_FreeSurface((*backbuffer)->surface);
+
+    if (sdl_texture)
+      SDL_DestroyTexture(sdl_texture);
+
+    if (sdl_renderer)
+      SDL_DestroyRenderer(sdl_renderer);
+
+    if (sdl_window)
+      SDL_DestroyWindow(sdl_window);
 
     sdl_window = SDL_CreateWindow(program.window_title,
 				  SDL_WINDOWPOS_CENTERED,
@@ -462,7 +658,12 @@ boolean SDLSetVideoMode(DrawBuffer **backbuffer, boolean fullscreen)
     {
       Error(ERR_WARN, "SDL_CreateWindow() failed: %s", SDL_GetError());
     }
+
 #else
+
+    if (sdl_window)
+      SDL_DestroyWindow(sdl_window);
+
     sdl_window = SDL_CreateWindow(program.window_title,
 				  SDL_WINDOWPOS_CENTERED,
 				  SDL_WINDOWPOS_CENTERED,
@@ -481,6 +682,7 @@ boolean SDLSetVideoMode(DrawBuffer **backbuffer, boolean fullscreen)
 #else
     new_surface = SDL_SetVideoMode(video.width, video.height,
 				   video.depth, surface_flags_window);
+#endif
 #endif
 
     if (new_surface == NULL)
@@ -521,7 +723,6 @@ boolean SDLSetVideoMode(DrawBuffer **backbuffer, boolean fullscreen)
   }
 #endif
 #endif
-
 
   return success;
 }

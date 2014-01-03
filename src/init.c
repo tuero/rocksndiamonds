@@ -5213,8 +5213,56 @@ void Execute_Command(char *command)
   }
 
 #if DEBUG
-#if defined(TARGET_SDL)
-#if !defined(TARGET_SDL2)
+#if defined(TARGET_SDL2)
+  else if (strEqual(command, "SDL_ListModes"))
+  {
+    SDL_Init(SDL_INIT_VIDEO);
+
+    int num_displays = SDL_GetNumVideoDisplays();
+
+    // check if there are any displays available
+    if (num_displays < 0)
+    {
+      printf("No displays available: %s\n", SDL_GetError());
+
+      exit(-1);
+    }
+
+    for (i = 0; i < num_displays; i++)
+    {
+      int num_modes = SDL_GetNumDisplayModes(i);
+      int j;
+
+      printf("Available display modes for display %d:\n", i);
+
+      // check if there are any display modes available for this display
+      if (num_modes < 0)
+      {
+	printf("No display modes available for display %d: %s\n",
+	       i, SDL_GetError());
+
+	exit(-1);
+      }
+
+      for (j = 0; j < num_modes; j++)
+      {
+	SDL_DisplayMode mode;
+
+	if (SDL_GetDisplayMode(i, j, &mode) < 0)
+	{
+	  printf("Cannot get display mode %d for display %d: %s\n",
+		 j, i, SDL_GetError());
+
+	  exit(-1);
+	}
+
+	printf("- %d x %d\n", mode.w, mode.h);
+      }
+    }
+
+    exit(0);
+  }
+#elif defined(TARGET_SDL)
   else if (strEqual(command, "SDL_ListModes"))
   {
     SDL_Rect **modes;
@@ -5240,15 +5288,14 @@ void Execute_Command(char *command)
     }
     else
     {
-      printf("Available Modes:\n");
+      printf("Available display modes:\n");
 
-      for(i = 0; modes[i]; i++)
-	printf("  %d x %d\n", modes[i]->w, modes[i]->h);
+      for (i = 0; modes[i]; i++)
+	printf("- %d x %d\n", modes[i]->w, modes[i]->h);
     }
 
     exit(0);
   }
-#endif
 #endif
 #endif
 
