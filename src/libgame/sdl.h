@@ -186,8 +186,10 @@ struct MouseCursorInfo
 #define KSYM_Page_Up		SDLK_PAGEUP
 #define KSYM_Page_Down		SDLK_PAGEDOWN
 
+#if defined(TARGET_SDL2)
 #define KSYM_Menu		SDLK_MENU
 #define KSYM_Back		SDLK_AC_BACK
+#endif
 
 #define KSYM_space		SDLK_SPACE
 #define KSYM_exclam		SDLK_EXCLAIM

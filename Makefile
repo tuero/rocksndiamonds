@@ -90,6 +90,9 @@ mac:
 mac-static:
 	@$(MAKE_CMD) PLATFORM=macosx TARGET=sdl-static
 
+mac2-static:
+	@$(MAKE_CMD) PLATFORM=macosx TARGET=sdl2-static
+
 msdos:
 	@$(MAKE_CMD) PLATFORM=msdos
 

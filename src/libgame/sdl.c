@@ -444,8 +444,6 @@ boolean SDLSetVideoMode(DrawBuffer **backbuffer, boolean fullscreen)
 					     0xFF000000);
 #endif
 
-	  printf("::: pitch == %d\n", new_surface->pitch);
-
 	  if (new_surface == NULL)
 	    Error(ERR_WARN, "SDL_CreateRGBSurface() failed: %s",
 		  SDL_GetError());
