@@ -1,5 +1,9 @@
+2014-01-04
+	* fixed remaining text input problems for non-ASCII keys with modifier
+
 2014-01-03
 	* fixed key code problems with certain keys for SDL2
+	  (keypad keys not being in numerical order; number of function keys)
 	* fixed text input problems for text characters using modifier keys
 
 2014-01-02

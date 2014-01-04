@@ -1644,7 +1644,7 @@ void translate_keyname(Key *keysym, char **x11name, char **name, int mode)
     { KSYM_braceright,	"XK_braceright",	"brace right" },
     { KSYM_asciitilde,	"XK_asciitilde",	"~" },
 
-    /* special (non-ASCII) keys */
+    /* special (non-ASCII) keys (ISO-Latin-1) */
     { KSYM_degree,	"XK_degree",		"°" },
     { KSYM_Adiaeresis,	"XK_Adiaeresis",	"Ä" },
     { KSYM_Odiaeresis,	"XK_Odiaeresis",	"Ö" },
@@ -1653,6 +1653,18 @@ void translate_keyname(Key *keysym, char **x11name, char **name, int mode)
     { KSYM_odiaeresis,	"XK_odiaeresis",	"ö" },
     { KSYM_udiaeresis,	"XK_udiaeresis",	"ü" },
     { KSYM_ssharp,	"XK_ssharp",		"sharp s" },
+
+#if defined(TARGET_SDL2)
+    /* special (non-ASCII) keys (UTF-8, for reverse mapping only) */
+    { KSYM_degree,	"XK_degree",		"\xc2\xb0" },
+    { KSYM_Adiaeresis,	"XK_Adiaeresis",	"\xc3\x84" },
+    { KSYM_Odiaeresis,	"XK_Odiaeresis",	"\xc3\x96" },
+    { KSYM_Udiaeresis,	"XK_Udiaeresis",	"\xc3\x9c" },
+    { KSYM_adiaeresis,	"XK_adiaeresis",	"\xc3\xa4" },
+    { KSYM_odiaeresis,	"XK_odiaeresis",	"\xc3\xb6" },
+    { KSYM_udiaeresis,	"XK_udiaeresis",	"\xc3\xbc" },
+    { KSYM_ssharp,	"XK_ssharp",		"\xc3\x9f" },
+#endif
 
 #if defined(TARGET_SDL2)
     /* keypad keys are not in numerical order in SDL2 */

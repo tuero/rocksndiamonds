@@ -201,7 +201,13 @@ struct MouseCursorInfo
 #define KSYM_quotedbl		SDLK_QUOTEDBL
 #define KSYM_numbersign		SDLK_HASH
 #define KSYM_dollar		SDLK_DOLLAR
-#define KSYM_percent		KSYM_UNDEFINED		/* undefined */
+
+#if defined(TARGET_SDL2)
+#define KSYM_percent		SDLK_PERCENT
+#else
+#define KSYM_percent		37			/* undefined in SDL */
+#endif
+
 #define KSYM_ampersand		SDLK_AMPERSAND
 #define KSYM_apostrophe		SDLK_QUOTE
 #define KSYM_parenleft		SDLK_LEFTPAREN
@@ -411,6 +417,9 @@ struct MouseCursorInfo
 #define KMOD_Meta		(KMOD_Meta_L    | KMOD_Meta_R)
 #define KMOD_Alt		(KMOD_Alt_L     | KMOD_Alt_R)
 
+#if defined(TARGET_SDL2)
+#define KMOD_TextInput		(KMOD_Shift | KMOD_Alt_R)
+#endif
 
 /* SDL function definitions */
 

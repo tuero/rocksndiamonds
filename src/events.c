@@ -477,19 +477,35 @@ void HandleFingerEvent(FingerEvent *event)
 #endif
 }
 
+static boolean checkTextInputKeyModState()
+{
+  // when playing, only handle raw key events and ignore text input
+  if (game_status == GAME_MODE_PLAYING)
+    return FALSE;
+
+  return ((GetKeyModState() & KMOD_TextInput) != KMOD_None);
+}
+
 void HandleTextEvent(TextEvent *event)
 {
   char *text = event->text;
   Key key = getKeyFromKeyName(text);
 
 #if DEBUG_EVENTS
-  Error(ERR_DEBUG, "TEXT EVENT: text == '%s', resulting key == %d (%s)",
+  Error(ERR_DEBUG, "TEXT EVENT: text == '%s' [%d byte(s), '%c'/%d], resulting key == %d (%s)",
 	text,
+	strlen(text),
+	text[0], (int)(text[0]),
 	key,
 	getKeyNameFromKey(key));
 #endif
 
-  if (game_status != GAME_MODE_PLAYING && GetKeyModState() != KMOD_None)
+  // if (game_status != GAME_MODE_PLAYING && GetKeyModState() != KMOD_None)
+  /*
+  if (game_status != GAME_MODE_PLAYING &&
+      (GetKeyModState() & KMOD_TextInput) != KMOD_None)
+  */
+  if (checkTextInputKeyModState())
   {
     HandleKey(key, KEY_PRESSED);
     HandleKey(key, KEY_RELEASED);
@@ -528,13 +544,18 @@ void HandleKeyEvent(KeyEvent *event)
     key = KSYM_Escape;
 #endif
 
-#if defined(TARGET_SDL2)
   HandleKeyModState(keymod, key_status);
 
-  if (game_status == GAME_MODE_PLAYING || GetKeyModState() == KMOD_None)
+#if defined(TARGET_SDL2)
+
+  // if (game_status == GAME_MODE_PLAYING || GetKeyModState() == KMOD_None)
+  /*
+  if (game_status == GAME_MODE_PLAYING ||
+      (GetKeyModState() & KMOD_TextInput) == KMOD_None)
+  */
+  if (!checkTextInputKeyModState())
     HandleKey(key, key_status);
 #else
-  HandleKeyModState(keymod, key_status);
   HandleKey(key, key_status);
 #endif
 }
