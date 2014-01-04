@@ -167,13 +167,17 @@ void EventLoop(void)
   	  case EVENT_FINGERMOTION:
   	    HandleFingerEvent((FingerEvent *) &event);
   	    break;
+
+	  case EVENT_TEXTINPUT:
+  	    HandleTextEvent((TextEvent *) &event);
+  	    break;
 #endif
 
   	  case EVENT_KEYPRESS:
   	  case EVENT_KEYRELEASE:
   	    HandleKeyEvent((KeyEvent *) &event);
   	    break;
-  
+
   	  default:
   	    HandleOtherEvents(&event);
   	    break;
@@ -472,6 +476,25 @@ void HandleFingerEvent(FingerEvent *event)
   }
 #endif
 }
+
+void HandleTextEvent(TextEvent *event)
+{
+  char *text = event->text;
+  Key key = getKeyFromKeyName(text);
+
+#if DEBUG_EVENTS
+  Error(ERR_DEBUG, "TEXT EVENT: text == '%s', resulting key == %d (%s)",
+	text,
+	key,
+	getKeyNameFromKey(key));
+#endif
+
+  if (game_status != GAME_MODE_PLAYING && GetKeyModState() != KMOD_None)
+  {
+    HandleKey(key, KEY_PRESSED);
+    HandleKey(key, KEY_RELEASED);
+  }
+}
 #endif
 
 void HandleKeyEvent(KeyEvent *event)
@@ -482,11 +505,13 @@ void HandleKeyEvent(KeyEvent *event)
   Key keymod = (with_modifiers ? GetEventKey(event, FALSE) : key);
 
 #if DEBUG_EVENTS
-  Error(ERR_DEBUG, "KEY EVENT: key was %s, keysym.scancode == %d, keysym.sym == %d, resulting key == %d (%s)",
+  Error(ERR_DEBUG, "KEY EVENT: key was %s, keysym.scancode == %d, keysym.sym == %d, keymod = %d, GetKeyModState() = 0x%04x, resulting key == %d (%s)",
 	event->type == EVENT_KEYPRESS ? "pressed" : "released",
 	event->keysym.scancode,
 	event->keysym.sym,
-	GetEventKey(event, TRUE),
+	keymod,
+	GetKeyModState(),
+	key,
 	getKeyNameFromKey(key));
 #endif
 
@@ -503,8 +528,15 @@ void HandleKeyEvent(KeyEvent *event)
     key = KSYM_Escape;
 #endif
 
+#if defined(TARGET_SDL2)
+  HandleKeyModState(keymod, key_status);
+
+  if (game_status == GAME_MODE_PLAYING || GetKeyModState() == KMOD_None)
+    HandleKey(key, key_status);
+#else
   HandleKeyModState(keymod, key_status);
   HandleKey(key, key_status);
+#endif
 }
 
 void HandleFocusEvent(FocusChangeEvent *event)

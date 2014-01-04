@@ -63,16 +63,18 @@ typedef SDL_Cursor	       *Cursor;
 
 #if defined(TARGET_SDL2)
 typedef SDL_Keycode		Key;
+typedef SDL_Keymod		KeyMod;
 #else
 typedef SDLKey			Key;
-#endif
 typedef unsigned int		KeyMod;
+#endif
 
 typedef SDL_Event		Event;
 typedef SDL_MouseButtonEvent	ButtonEvent;
 typedef SDL_MouseMotionEvent	MotionEvent;
 #if defined(TARGET_SDL2)
 typedef SDL_TouchFingerEvent	FingerEvent;
+typedef SDL_TextInputEvent	TextEvent;
 #endif
 typedef SDL_KeyboardEvent	KeyEvent;
 typedef SDL_Event		ExposeEvent;
@@ -123,6 +125,7 @@ struct MouseCursorInfo
 #define	EVENT_FINGERPRESS	SDL_FINGERDOWN
 #define EVENT_FINGERRELEASE	SDL_FINGERUP
 #define EVENT_FINGERMOTION	SDL_FINGERMOTION
+#define EVENT_TEXTINPUT		SDL_TEXTINPUT
 #endif
 #define EVENT_KEYPRESS		SDL_KEYDOWN
 #define EVENT_KEYRELEASE	SDL_KEYUP
@@ -161,6 +164,7 @@ struct MouseCursorInfo
 #define KSYM_Shift_R		SDLK_RSHIFT
 #define KSYM_Control_L		SDLK_LCTRL
 #define KSYM_Control_R		SDLK_RCTRL
+
 #if defined(TARGET_SDL2)
 #define KSYM_Meta_L		SDLK_LGUI
 #define KSYM_Meta_R		SDLK_RGUI
@@ -168,6 +172,7 @@ struct MouseCursorInfo
 #define KSYM_Meta_L		SDLK_LMETA
 #define KSYM_Meta_R		SDLK_RMETA
 #endif
+
 #define KSYM_Alt_L		SDLK_LALT
 #define KSYM_Alt_R		SDLK_RALT
 #if !defined(TARGET_SDL2)
@@ -229,7 +234,16 @@ struct MouseCursorInfo
 #define KSYM_braceright		KSYM_UNDEFINED		/* undefined */
 #define KSYM_asciitilde		KSYM_UNDEFINED		/* undefined */
 
-#if !defined(TARGET_SDL2)
+#if defined(TARGET_SDL2)
+#define KSYM_degree		176
+#define KSYM_Adiaeresis		196
+#define KSYM_Odiaeresis		214
+#define KSYM_Udiaeresis		220
+#define KSYM_adiaeresis		228
+#define KSYM_odiaeresis		246
+#define KSYM_udiaeresis		252
+#define KSYM_ssharp		223
+#else
 #define KSYM_degree		SDLK_WORLD_16
 #define KSYM_Adiaeresis		SDLK_WORLD_36
 #define KSYM_Odiaeresis		SDLK_WORLD_54
@@ -370,28 +384,17 @@ struct MouseCursorInfo
 #define KSYM_F10		SDLK_F10
 #define KSYM_F11		SDLK_F11
 #define KSYM_F12		SDLK_F12
-#define KSYM_F13		SDLK_F13
-#define KSYM_F14		SDLK_F14
-#define KSYM_F15		SDLK_F15
-#define KSYM_F16		KSYM_UNDEFINED
-#define KSYM_F17		KSYM_UNDEFINED
-#define KSYM_F18		KSYM_UNDEFINED
-#define KSYM_F19		KSYM_UNDEFINED
-#define KSYM_F20		KSYM_UNDEFINED
-#define KSYM_F21		KSYM_UNDEFINED
-#define KSYM_F22		KSYM_UNDEFINED
-#define KSYM_F23		KSYM_UNDEFINED
-#define KSYM_F24		KSYM_UNDEFINED
 
 #define KSYM_FKEY_FIRST		KSYM_F1
-#define KSYM_FKEY_LAST		KSYM_F15
+#define KSYM_FKEY_LAST		KSYM_F12
 #define KSYM_NUM_FKEYS		(KSYM_FKEY_LAST - KSYM_FKEY_FIRST + 1)
 
-#define KMOD_None		None
+#define KMOD_None		KMOD_NONE
 #define KMOD_Shift_L		KMOD_LSHIFT
 #define KMOD_Shift_R		KMOD_RSHIFT
 #define KMOD_Control_L		KMOD_LCTRL
 #define KMOD_Control_R		KMOD_RCTRL
+
 #if defined(TARGET_SDL2)
 #define KMOD_Meta_L		KMOD_LGUI
 #define KMOD_Meta_R		KMOD_RGUI
@@ -399,6 +402,7 @@ struct MouseCursorInfo
 #define KMOD_Meta_L		KMOD_LMETA
 #define KMOD_Meta_R		KMOD_RMETA
 #endif
+
 #define KMOD_Alt_L		KMOD_LALT
 #define KMOD_Alt_R		KMOD_RALT
 

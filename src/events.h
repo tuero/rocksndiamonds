@@ -33,6 +33,7 @@ void HandleButtonEvent(ButtonEvent *);
 void HandleMotionEvent(MotionEvent *);
 #if defined(TARGET_SDL2)
 void HandleFingerEvent(FingerEvent *);
+void HandleTextEvent(TextEvent *);
 #endif
 void HandleKeyEvent(KeyEvent *);
 void HandleFocusEvent(FocusChangeEvent *);

@@ -1,3 +1,7 @@
+2014-01-03
+	* fixed key code problems with certain keys for SDL2
+	* fixed text input problems for text characters using modifier keys
+
 2014-01-02
 	* fixed fullscreen option for SDL2 (using only desktop fullscreen now)
 

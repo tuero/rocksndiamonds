@@ -65,6 +65,22 @@ static void fPrintLog(FILE *stream, char *format, va_list ap)
 }
 #endif
 
+static void vfprintf_nonewline(FILE *stream, char *format, va_list ap)
+{
+#if defined(PLATFORM_ANDROID)
+  // (prefix text of logging output is currently skipped on Android)
+  //__android_log_vprint(android_log_prio, program.program_title, format, ap);
+#else
+  va_list ap2;
+  va_copy(ap2, ap);
+
+  vfprintf(stream, format, ap);
+  vfprintf(stderr, format, ap2);
+
+  va_end(ap2);
+#endif
+}
+
 static void vfprintf_newline(FILE *stream, char *format, va_list ap)
 {
 #if defined(PLATFORM_ANDROID)
@@ -72,9 +88,26 @@ static void vfprintf_newline(FILE *stream, char *format, va_list ap)
 #else
   char *newline = STRING_NEWLINE;
 
+  va_list ap2;
+  va_copy(ap2, ap);
+
   vfprintf(stream, format, ap);
   fprintf(stream, "%s", newline);
+
+  vfprintf(stderr, format, ap2);
+  fprintf(stderr, "%s", newline);
+
+  va_end(ap2);
 #endif
+}
+
+static void fprintf_nonewline(FILE *stream, char *format, ...)
+{
+  va_list ap;
+
+  va_start(ap, format);
+  vfprintf_nonewline(stream, format, ap);
+  va_end(ap);
 }
 
 static void fprintf_newline(FILE *stream, char *format, ...)
@@ -91,7 +124,7 @@ void fprintf_line(FILE *stream, char *line_chars, int line_length)
   int i;
 
   for (i = 0; i < line_length; i++)
-    fprintf(stream, "%s", line_chars);
+    fprintf_nonewline(stream, "%s", line_chars);
 
   fprintf_newline(stream, "");
 }
@@ -1083,11 +1116,11 @@ void Error(int mode, char *format, ...)
   {
     va_list ap;
 
-    fprintf(program.error_file, "%s%s: ", program.command_basename,
-	    process_name);
+    fprintf_nonewline(program.error_file, "%s%s: ", program.command_basename,
+		      process_name);
 
     if (mode & ERR_WARN)
-      fprintf(program.error_file, "warning: ");
+      fprintf_nonewline(program.error_file, "warning: ");
 
     va_start(ap, format);
     vfprintf_newline(program.error_file, format, ap);
@@ -1611,7 +1644,6 @@ void translate_keyname(Key *keysym, char **x11name, char **name, int mode)
     { KSYM_braceright,	"XK_braceright",	"brace right" },
     { KSYM_asciitilde,	"XK_asciitilde",	"~" },
 
-#if !defined(TARGET_SDL2)
     /* special (non-ASCII) keys */
     { KSYM_degree,	"XK_degree",		"°" },
     { KSYM_Adiaeresis,	"XK_Adiaeresis",	"Ä" },
@@ -1621,6 +1653,19 @@ void translate_keyname(Key *keysym, char **x11name, char **name, int mode)
     { KSYM_odiaeresis,	"XK_odiaeresis",	"ö" },
     { KSYM_udiaeresis,	"XK_udiaeresis",	"ü" },
     { KSYM_ssharp,	"XK_ssharp",		"sharp s" },
+
+#if defined(TARGET_SDL2)
+    /* keypad keys are not in numerical order in SDL2 */
+    { KSYM_KP_0,	"XK_KP_0",		"keypad 0" },
+    { KSYM_KP_1,	"XK_KP_1",		"keypad 1" },
+    { KSYM_KP_2,	"XK_KP_2",		"keypad 2" },
+    { KSYM_KP_3,	"XK_KP_3",		"keypad 3" },
+    { KSYM_KP_4,	"XK_KP_4",		"keypad 4" },
+    { KSYM_KP_5,	"XK_KP_5",		"keypad 5" },
+    { KSYM_KP_6,	"XK_KP_6",		"keypad 6" },
+    { KSYM_KP_7,	"XK_KP_7",		"keypad 7" },
+    { KSYM_KP_8,	"XK_KP_8",		"keypad 8" },
+    { KSYM_KP_9,	"XK_KP_9",		"keypad 9" },
 #endif
 
     /* end-of-array identifier */
@@ -1640,8 +1685,10 @@ void translate_keyname(Key *keysym, char **x11name, char **name, int mode)
       sprintf(name_buffer, "%c", 'a' + (char)(key - KSYM_a));
     else if (key >= KSYM_0 && key <= KSYM_9)
       sprintf(name_buffer, "%c", '0' + (char)(key - KSYM_0));
+#if !defined(TARGET_SDL2)
     else if (key >= KSYM_KP_0 && key <= KSYM_KP_9)
       sprintf(name_buffer, "keypad %c", '0' + (char)(key - KSYM_KP_0));
+#endif
     else if (key >= KSYM_FKEY_FIRST && key <= KSYM_FKEY_LAST)
       sprintf(name_buffer, "F%d", (int)(key - KSYM_FKEY_FIRST + 1));
     else if (key == KSYM_UNDEFINED)
@@ -1677,8 +1724,10 @@ void translate_keyname(Key *keysym, char **x11name, char **name, int mode)
       sprintf(name_buffer, "XK_%c", 'a' + (char)(key - KSYM_a));
     else if (key >= KSYM_0 && key <= KSYM_9)
       sprintf(name_buffer, "XK_%c", '0' + (char)(key - KSYM_0));
+#if !defined(TARGET_SDL2)
     else if (key >= KSYM_KP_0 && key <= KSYM_KP_9)
       sprintf(name_buffer, "XK_KP_%c", '0' + (char)(key - KSYM_KP_0));
+#endif
     else if (key >= KSYM_FKEY_FIRST && key <= KSYM_FKEY_LAST)
       sprintf(name_buffer, "XK_F%d", (int)(key - KSYM_FKEY_FIRST + 1));
     else if (key == KSYM_UNDEFINED)
@@ -1706,17 +1755,34 @@ void translate_keyname(Key *keysym, char **x11name, char **name, int mode)
   else if (mode == TRANSLATE_KEYNAME_TO_KEYSYM)
   {
     Key key = KSYM_UNDEFINED;
+    char *name_ptr = *name;
 
-    i = 0;
-    do
+    if (strlen(*name) == 1)
     {
-      if (strEqual(translate_key[i].name, *name))
-      {
-	key = translate_key[i].key;
-	break;
-      }
+      char c = name_ptr[0];
+
+      if (c >= 'A' && c <= 'Z')
+	key = KSYM_A + (Key)(c - 'A');
+      else if (c >= 'a' && c <= 'z')
+	key = KSYM_a + (Key)(c - 'a');
+      else if (c >= '0' && c <= '9')
+	key = KSYM_0 + (Key)(c - '0');
     }
-    while (translate_key[++i].x11name);
+
+    if (key == KSYM_UNDEFINED)
+    {
+      i = 0;
+
+      do
+      {
+	if (strEqual(translate_key[i].name, *name))
+	{
+	  key = translate_key[i].key;
+	  break;
+	}
+      }
+      while (translate_key[++i].x11name);
+    }
 
     if (key == KSYM_UNDEFINED)
       Error(ERR_WARN, "getKeyFromKeyName(): not completely implemented");
@@ -1739,6 +1805,7 @@ void translate_keyname(Key *keysym, char **x11name, char **name, int mode)
       else if (c >= '0' && c <= '9')
 	key = KSYM_0 + (Key)(c - '0');
     }
+#if !defined(TARGET_SDL2)
     else if (strPrefix(name_ptr, "XK_KP_") && strlen(name_ptr) == 7)
     {
       char c = name_ptr[6];
@@ -1746,6 +1813,7 @@ void translate_keyname(Key *keysym, char **x11name, char **name, int mode)
       if (c >= '0' && c <= '9')
 	key = KSYM_KP_0 + (Key)(c - '0');
     }
+#endif
     else if (strPrefix(name_ptr, "XK_F") && strlen(name_ptr) <= 6)
     {
       char c1 = name_ptr[4];
