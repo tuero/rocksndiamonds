@@ -30,7 +30,7 @@ static SDL_Window *sdl_window = NULL;
 static SDL_Renderer *sdl_renderer = NULL;
 static SDL_Texture *sdl_texture = NULL;
 
-#define USE_RENDERER	1
+#define USE_RENDERER	TRUE
 #endif
 
 /* stuff needed to work around SDL/Windows fullscreen drawing bug */
@@ -197,6 +197,7 @@ void SDLInitVideoBuffer(DrawBuffer **backbuffer, DrawWindow **window,
   };
 #endif
   SDL_Rect **modes = NULL;
+  boolean hardware_fullscreen_available = TRUE;
   int i, j;
 
   /* default: normal game window size */
@@ -206,6 +207,7 @@ void SDLInitVideoBuffer(DrawBuffer **backbuffer, DrawWindow **window,
   fullscreen_yoffset = 0;
 
 #if !defined(TARGET_SDL2)
+  /* determine required standard fullscreen mode for game screen size */
   for (i = 0; screen_xy[i][0] != -1; i++)
   {
     if (screen_xy[i][0] >= video.width && screen_xy[i][1] >= video.height)
@@ -227,6 +229,8 @@ void SDLInitVideoBuffer(DrawBuffer **backbuffer, DrawWindow **window,
   video.fullscreen_modes = NULL;
   video.fullscreen_mode_current = NULL;
 #endif
+
+  video.window_scaling_percent = setup.window_scaling_percent;
 
 #if defined(TARGET_SDL2)
   int num_displays = SDL_GetNumVideoDisplays();
@@ -254,17 +258,16 @@ void SDLInitVideoBuffer(DrawBuffer **backbuffer, DrawWindow **window,
       }
     }
   }
-
 #else
-
   /* get available hardware supported fullscreen modes */
   modes = SDL_ListModes(NULL, SDL_FULLSCREEN | SDL_HWSURFACE);
 #endif
 
   if (modes == NULL)
   {
-    /* no screen modes available => no fullscreen mode support */
-    video.fullscreen_available = FALSE;
+    /* no hardware screen modes available => no fullscreen mode support */
+    // video.fullscreen_available = FALSE;
+    hardware_fullscreen_available = FALSE;
   }
   else if (modes == (SDL_Rect **)-1)
   {
@@ -318,9 +321,18 @@ void SDLInitVideoBuffer(DrawBuffer **backbuffer, DrawWindow **window,
     if (num_modes == 0)
     {
       /* no appropriate screen modes available => no fullscreen mode support */
-      video.fullscreen_available = FALSE;
+      // video.fullscreen_available = FALSE;
+      hardware_fullscreen_available = FALSE;
     }
   }
+
+  video.fullscreen_available = hardware_fullscreen_available;
+
+#if USE_DESKTOP_FULLSCREEN
+  // in SDL 2.0, there is always support for desktop fullscreen mode
+  // (in SDL 1.2, there is only support for "real" fullscreen mode)
+  video.fullscreen_available = TRUE;
+#endif
 
 #if defined(TARGET_SDL2)
   if (modes)
@@ -383,10 +395,9 @@ static SDL_Surface *SDLCreateScreen(DrawBuffer **backbuffer,
   int surface_flags_window = SURFACE_FLAGS;
 #if defined(TARGET_SDL2)
 
-#if 1
+#if USE_DESKTOP_FULLSCREEN
   int surface_flags_fullscreen = SURFACE_FLAGS | SDL_WINDOW_FULLSCREEN_DESKTOP;
 #else
-  // (never used with SDL2 now)
   int surface_flags_fullscreen = SURFACE_FLAGS | SDL_WINDOW_FULLSCREEN;
 #endif
 
@@ -402,7 +413,12 @@ static SDL_Surface *SDLCreateScreen(DrawBuffer **backbuffer,
 #if defined(TARGET_SDL2)
 
 #if USE_RENDERER
-  float scale_factor = 1.2;
+  float window_scaling_factor = (float)setup.window_scaling_percent / 100;
+  float screen_scaling_factor = (fullscreen ? 1 : window_scaling_factor);
+
+#if 1
+  printf("::: use window scaling factor %f\n", screen_scaling_factor);
+#endif
 
   if ((*backbuffer)->surface)
     SDL_FreeSurface((*backbuffer)->surface);
@@ -419,8 +435,8 @@ static SDL_Surface *SDLCreateScreen(DrawBuffer **backbuffer,
   sdl_window = SDL_CreateWindow(program.window_title,
 				SDL_WINDOWPOS_CENTERED,
 				SDL_WINDOWPOS_CENTERED,
-				(int)(scale_factor * width),
-				(int)(scale_factor * height),
+				(int)(screen_scaling_factor * width),
+				(int)(screen_scaling_factor * height),
 				surface_flags);
 
   if (sdl_window != NULL)
@@ -584,7 +600,7 @@ boolean SDLSetVideoMode(DrawBuffer **backbuffer, boolean fullscreen)
 #if defined(TARGET_SDL2)
 
 #if USE_RENDERER
-    float scale_factor = 1.2;
+    float screen_scaling_factor = 1.2;
     int test_fullscreen = 0;
     int surface_flags = (test_fullscreen ? surface_flags_fullscreen :
 			 surface_flags_window);
@@ -604,8 +620,8 @@ boolean SDLSetVideoMode(DrawBuffer **backbuffer, boolean fullscreen)
     sdl_window = SDL_CreateWindow(program.window_title,
 				  SDL_WINDOWPOS_CENTERED,
 				  SDL_WINDOWPOS_CENTERED,
-				  (int)(scale_factor * video.width),
-				  (int)(scale_factor * video.height),
+				  (int)(screen_scaling_factor * video.width),
+				  (int)(screen_scaling_factor * video.height),
 				  surface_flags);
 
     if (sdl_window != NULL)
@@ -697,6 +713,7 @@ boolean SDLSetVideoMode(DrawBuffer **backbuffer, boolean fullscreen)
       (*backbuffer)->surface = new_surface;
 
       video.fullscreen_enabled = FALSE;
+      video.window_scaling_percent = setup.window_scaling_percent;
 
       success = TRUE;
     }

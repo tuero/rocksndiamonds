@@ -449,6 +449,8 @@ void InitVideoBuffer(int width, int height, int depth, boolean fullscreen)
   video.fullscreen_modes = NULL;
 #endif
 
+  video.window_scaling_available = TRUE;
+
 #if defined(TARGET_SDL)
   SDLInitVideoBuffer(&backbuffer, &window, fullscreen);
 #else

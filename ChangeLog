@@ -1,5 +1,6 @@
 2014-01-04
 	* fixed remaining text input problems for non-ASCII keys with modifier
+	* added window scaling options to graphics setup menu
 
 2014-01-03
 	* fixed key code problems with certain keys for SDL2

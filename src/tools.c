@@ -8990,11 +8990,19 @@ void ToggleFullscreenIfNeeded()
   boolean change_fullscreen_mode = (video.fullscreen_enabled &&
 				    !strEqual(setup.fullscreen_mode,
 					      video.fullscreen_mode_current));
+  boolean change_window_scaling_percent = (!video.fullscreen_enabled &&
+					   setup.window_scaling_percent !=
+					   video.window_scaling_percent);
 
-  if (!video.fullscreen_available)
+  if (change_window_scaling_percent && video.fullscreen_enabled)
     return;
 
-  if (change_fullscreen || change_fullscreen_mode)
+  if (!change_window_scaling_percent && !video.fullscreen_available)
+    return;
+
+  if (change_fullscreen ||
+      change_fullscreen_mode ||
+      change_window_scaling_percent)
   {
     Bitmap *tmp_backbuffer = CreateBitmap(WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH);
 
@@ -9007,9 +9015,16 @@ void ToggleFullscreenIfNeeded()
       video.fullscreen_enabled = FALSE;		/* force new fullscreen mode */
     }
 
+    if (change_window_scaling_percent)
+    {
+      /* keep window mode, but change window scaling */
+      video.fullscreen_enabled = TRUE;		/* force new window scaling */
+    }
+
     /* toggle fullscreen */
     ChangeVideoModeIfNeeded(setup.fullscreen);
 
+    /* set setup value according to successfully enabled fullscreen mode */
     setup.fullscreen = video.fullscreen_enabled;
 
     /* restore backbuffer content from temporary backbuffer backup bitmap */

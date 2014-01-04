@@ -644,6 +644,11 @@
     gfx.draw_busy_anim_function();		\
 }
 
+/* values for window scaling */
+#define MIN_WINDOW_SCALING_PERCENT	10
+#define STD_WINDOW_SCALING_PERCENT	100
+#define MAX_WINDOW_SCALING_PERCENT	300
+
 
 /* type definitions */
 #if defined(TARGET_SDL2)
@@ -728,6 +733,9 @@ struct VideoSystemInfo
   boolean fullscreen_enabled;
   struct ScreenModeInfo *fullscreen_modes;
   char *fullscreen_mode_current;
+
+  boolean window_scaling_available;
+  int window_scaling_percent;
 };
 
 struct AudioSystemInfo
@@ -937,6 +945,7 @@ struct SetupInfo
   boolean time_limit;
   boolean fullscreen;
   char *fullscreen_mode;
+  int window_scaling_percent;
   boolean ask_on_escape;
   boolean ask_on_escape_editor;
   boolean quick_switch;
