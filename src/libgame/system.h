@@ -47,8 +47,17 @@
 #define BLIT_INVERSE			2
 #define BLIT_ON_BACKGROUND		3
 
+/* values for fullscreen status */
 #define FULLSCREEN_NOT_AVAILABLE	FALSE
 #define FULLSCREEN_AVAILABLE		TRUE
+
+/* values for window scaling */
+#define WINDOW_SCALING_NOT_AVAILABLE	FALSE
+#define WINDOW_SCALING_AVAILABLE	TRUE
+
+#define MIN_WINDOW_SCALING_PERCENT	10
+#define STD_WINDOW_SCALING_PERCENT	100
+#define MAX_WINDOW_SCALING_PERCENT	300
 
 /* default input keys */
 #define DEFAULT_KEY_LEFT		KSYM_Left
@@ -643,11 +652,6 @@
   if (gfx.draw_busy_anim_function != NULL)	\
     gfx.draw_busy_anim_function();		\
 }
-
-/* values for window scaling */
-#define MIN_WINDOW_SCALING_PERCENT	10
-#define STD_WINDOW_SCALING_PERCENT	100
-#define MAX_WINDOW_SCALING_PERCENT	300
 
 
 /* type definitions */

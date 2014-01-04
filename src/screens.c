@@ -4161,8 +4161,8 @@ static void execSetupEditor()
 
 static void execSetupGraphics()
 {
-
-  if (video.fullscreen_available && screen_modes == NULL)
+  // if (screen_modes == NULL && video.fullscreen_available)
+  if (screen_modes == NULL && video.fullscreen_modes != NULL)
   {
     int i;
 
@@ -4210,7 +4210,8 @@ static void execSetupGraphics()
       video.fullscreen_available = FALSE;
   }
 
-  if (video.fullscreen_available)
+  // if (video.fullscreen_available)
+  if (screen_mode_current != NULL)
   {
     setup.fullscreen_mode = screen_mode_current->identifier;
 
