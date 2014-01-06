@@ -4322,6 +4322,7 @@ static void execSetupGraphics()
   DrawSetupScreen();
 }
 
+#if !defined(PLATFORM_ANDROID)
 #if defined(TARGET_SDL2)
 static void execSetupChooseWindowSize()
 {
@@ -4344,6 +4345,7 @@ static void execSetupChooseScreenMode()
 
   DrawSetupScreen();
 }
+#endif
 #endif
 
 static void execSetupChooseScrollDelay()
@@ -4694,6 +4696,7 @@ static struct TokenInfo setup_info_editor[] =
 
 static struct TokenInfo setup_info_graphics[] =
 {
+#if !defined(PLATFORM_ANDROID)
   { TYPE_SWITCH,	&setup.fullscreen,	"Fullscreen:"		},
 #if defined(TARGET_SDL2)
   { TYPE_ENTER_LIST,	execSetupChooseWindowSize, "Window Scaling:"	},
@@ -4701,6 +4704,7 @@ static struct TokenInfo setup_info_graphics[] =
 #else
   { TYPE_ENTER_LIST,	execSetupChooseScreenMode, "Fullscreen Mode:"	},
   { TYPE_STRING,	&screen_mode_text,	""			},
+#endif
 #endif
 #if 0
   { TYPE_SWITCH,	&setup.scroll_delay,	"Scroll Delay:"		},

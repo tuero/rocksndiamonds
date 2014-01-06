@@ -438,6 +438,10 @@ void CloseVideoDisplay(void)
 
 void InitVideoBuffer(int width, int height, int depth, boolean fullscreen)
 {
+#if 0
+  static boolean initialized = FALSE;
+#endif
+
   video.width = width;
   video.height = height;
   video.depth = GetRealDepth(depth);
@@ -451,6 +455,13 @@ void InitVideoBuffer(int width, int height, int depth, boolean fullscreen)
 
   video.window_scaling_available = WINDOW_SCALING_STATUS;
 
+#if 0
+#if defined(PLATFORM_ANDROID)
+  if (!initialized)
+    video.fullscreen_enabled = TRUE;
+#endif
+#endif
+
 #if defined(TARGET_SDL)
   SDLInitVideoBuffer(&backbuffer, &window, fullscreen);
 #else
@@ -458,6 +469,10 @@ void InitVideoBuffer(int width, int height, int depth, boolean fullscreen)
 #endif
 
   drawto = backbuffer;
+
+#if 0
+  initialized = TRUE;
+#endif
 }
 
 inline static void FreeBitmapPointers(Bitmap *bitmap)

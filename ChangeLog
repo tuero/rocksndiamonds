@@ -1,3 +1,7 @@
+2014-01-05
+	* fixed using fullscreen mode on Android instead of pseudo-window mode
+	* fixed keeping desktop fullscreen mode when changing viewport size
+
 2014-01-04
 	* fixed remaining text input problems for non-ASCII keys with modifier
 	* added window scaling options to graphics setup menu

@@ -24,7 +24,7 @@
 #include "network.h"
 
 
-#define	DEBUG_EVENTS		1
+#define	DEBUG_EVENTS		0
 
 
 static boolean cursor_inside_playfield = FALSE;

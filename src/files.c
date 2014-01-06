@@ -11765,6 +11765,10 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
   si->override_level_sounds = AUTO;
   si->override_level_music = AUTO;
 #endif
+
+#if defined(PLATFORM_ANDROID)
+  si->fullscreen = TRUE;
+#endif
 }
 
 static void setSetupInfoToDefaults_EditorCascade(struct SetupInfo *si)

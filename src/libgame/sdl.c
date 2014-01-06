@@ -391,6 +391,7 @@ static SDL_Surface *SDLCreateScreen(DrawBuffer **backbuffer,
 				    boolean fullscreen)
 {
   SDL_Surface *new_surface = NULL;
+  static boolean fullscreen_enabled = FALSE;
 
   int surface_flags_window = SURFACE_FLAGS;
 #if defined(TARGET_SDL2)
@@ -421,27 +422,50 @@ static SDL_Surface *SDLCreateScreen(DrawBuffer **backbuffer,
 #endif
 
   if ((*backbuffer)->surface)
+  {
     SDL_FreeSurface((*backbuffer)->surface);
+    (*backbuffer)->surface = NULL;
+  }
 
   if (sdl_texture)
+  {
     SDL_DestroyTexture(sdl_texture);
+    sdl_texture = NULL;
+  }
 
-  if (sdl_renderer)
-    SDL_DestroyRenderer(sdl_renderer);
+  if (!(fullscreen && fullscreen_enabled))
+  {
+    if (sdl_renderer)
+    {
+      SDL_DestroyRenderer(sdl_renderer);
+      sdl_renderer = NULL;
+    }
 
-  if (sdl_window)
-    SDL_DestroyWindow(sdl_window);
+    if (sdl_window)
+    {
+      SDL_DestroyWindow(sdl_window);
+      sdl_window = NULL;
+    }
+  }
 
-  sdl_window = SDL_CreateWindow(program.window_title,
-				SDL_WINDOWPOS_CENTERED,
-				SDL_WINDOWPOS_CENTERED,
-				(int)(screen_scaling_factor * width),
-				(int)(screen_scaling_factor * height),
-				surface_flags);
+  Error(ERR_INFO, "::: checking 'sdl_window' ...");
+
+  if (sdl_window == NULL)
+    Error(ERR_INFO, "::: calling SDL_CreateWindow() [%d, %d, %d] ...",
+	  setup.fullscreen, fullscreen, fullscreen_enabled);
+
+  if (sdl_window == NULL)
+    sdl_window = SDL_CreateWindow(program.window_title,
+				  SDL_WINDOWPOS_CENTERED,
+				  SDL_WINDOWPOS_CENTERED,
+				  (int)(screen_scaling_factor * width),
+				  (int)(screen_scaling_factor * height),
+				  surface_flags);
 
   if (sdl_window != NULL)
   {
-    sdl_renderer = SDL_CreateRenderer(sdl_window, -1, 0);
+    if (sdl_renderer == NULL)
+      sdl_renderer = SDL_CreateRenderer(sdl_window, -1, 0);
 
     if (sdl_renderer != NULL)
     {
@@ -508,6 +532,10 @@ static SDL_Surface *SDLCreateScreen(DrawBuffer **backbuffer,
 #else
   new_surface = SDL_SetVideoMode(width, height, video.depth, surface_flags);
 #endif
+
+  // store fullscreen state ("video.fullscreen_enabled" may not reflect this!)
+  if (new_surface != NULL)
+    fullscreen_enabled = fullscreen;
 
   return new_surface;
 }
