@@ -32,6 +32,7 @@ void HandleExposeEvent(ExposeEvent *);
 void HandleButtonEvent(ButtonEvent *);
 void HandleMotionEvent(MotionEvent *);
 #if defined(TARGET_SDL2)
+void HandleWindowEvent(WindowEvent *);
 void HandleFingerEvent(FingerEvent *);
 void HandleTextEvent(TextEvent *);
 #endif

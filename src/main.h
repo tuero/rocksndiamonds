@@ -1885,6 +1885,8 @@
 #define NUM_SPECIAL_GFX_INFO_ARGS	8
 
 /* these additional definitions are currently only used for draw offsets */
+/* (must match SETUP_MODE_* values as defined in src/screens.c) */
+/* (should also match corresponding entries in src/conf_gfx.c) */
 #define GFX_SPECIAL_ARG_SETUP_MAIN		0
 #define GFX_SPECIAL_ARG_SETUP_GAME		1
 #define GFX_SPECIAL_ARG_SETUP_EDITOR		2
@@ -1897,10 +1899,11 @@
 #define GFX_SPECIAL_ARG_SETUP_SHORTCUTS_2	9
 #define GFX_SPECIAL_ARG_SETUP_SHORTCUTS_3	10
 #define GFX_SPECIAL_ARG_SETUP_SHORTCUTS_4	11
-#define GFX_SPECIAL_ARG_SETUP_CHOOSE_ARTWORK	12
-#define GFX_SPECIAL_ARG_SETUP_CHOOSE_OTHER	13
+#define GFX_SPECIAL_ARG_SETUP_SHORTCUTS_5	12
+#define GFX_SPECIAL_ARG_SETUP_CHOOSE_ARTWORK	13
+#define GFX_SPECIAL_ARG_SETUP_CHOOSE_OTHER	14
 
-#define NUM_SPECIAL_GFX_SETUP_ARGS		14
+#define NUM_SPECIAL_GFX_SETUP_ARGS		15
 
 
 /* values for image configuration suffixes */

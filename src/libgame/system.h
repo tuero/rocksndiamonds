@@ -55,9 +55,10 @@
 #define WINDOW_SCALING_NOT_AVAILABLE	FALSE
 #define WINDOW_SCALING_AVAILABLE	TRUE
 
-#define MIN_WINDOW_SCALING_PERCENT	10
+#define MIN_WINDOW_SCALING_PERCENT	50
 #define STD_WINDOW_SCALING_PERCENT	100
 #define MAX_WINDOW_SCALING_PERCENT	300
+#define STEP_WINDOW_SCALING_PERCENT	10
 
 /* default input keys */
 #define DEFAULT_KEY_LEFT		KSYM_Left
@@ -732,9 +733,11 @@ struct VideoSystemInfo
 {
   int default_depth;
   int width, height, depth;
+  int window_width, window_height;
 
   boolean fullscreen_available;
   boolean fullscreen_enabled;
+  boolean fullscreen_initial;
   struct ScreenModeInfo *fullscreen_modes;
   char *fullscreen_mode_current;
 

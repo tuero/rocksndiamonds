@@ -162,6 +162,10 @@ void EventLoop(void)
   	    break;
 
 #if defined(TARGET_SDL2)
+	  case SDL_WINDOWEVENT:
+  	    HandleWindowEvent((WindowEvent *) &event);
+  	    break;
+
   	  case EVENT_FINGERPRESS:
   	  case EVENT_FINGERRELEASE:
   	  case EVENT_FINGERMOTION:
@@ -388,13 +392,115 @@ void HandleMotionEvent(MotionEvent *event)
 
   motion_status = TRUE;
 
+#if DEBUG_EVENTS
   Error(ERR_DEBUG, "MOTION EVENT: button %d moved, x/y %d/%d\n",
 	button_status, event->x, event->y);
+#endif
 
   HandleButton(event->x, event->y, button_status, button_status);
 }
 
 #if defined(TARGET_SDL2)
+void HandleWindowEvent(WindowEvent *event)
+{
+  int subtype = event->event;
+
+  char *event_name =
+    (subtype == SDL_WINDOWEVENT_SHOWN ? "SDL_WINDOWEVENT_SHOWN" :
+     subtype == SDL_WINDOWEVENT_HIDDEN ? "SDL_WINDOWEVENT_HIDDEN" :
+     subtype == SDL_WINDOWEVENT_EXPOSED ? "SDL_WINDOWEVENT_EXPOSED" :
+     subtype == SDL_WINDOWEVENT_MOVED ? "SDL_WINDOWEVENT_MOVED" :
+     subtype == SDL_WINDOWEVENT_SIZE_CHANGED ? "SDL_WINDOWEVENT_SIZE_CHANGED" :
+     subtype == SDL_WINDOWEVENT_RESIZED ? "SDL_WINDOWEVENT_RESIZED" :
+     subtype == SDL_WINDOWEVENT_MINIMIZED ? "SDL_WINDOWEVENT_MINIMIZED" :
+     subtype == SDL_WINDOWEVENT_MAXIMIZED ? "SDL_WINDOWEVENT_MAXIMIZED" :
+     subtype == SDL_WINDOWEVENT_RESTORED ? "SDL_WINDOWEVENT_RESTORED" :
+     subtype == SDL_WINDOWEVENT_ENTER ? "SDL_WINDOWEVENT_ENTER" :
+     subtype == SDL_WINDOWEVENT_LEAVE ? "SDL_WINDOWEVENT_LEAVE" :
+     subtype == SDL_WINDOWEVENT_FOCUS_GAINED ? "SDL_WINDOWEVENT_FOCUS_GAINED" :
+     subtype == SDL_WINDOWEVENT_FOCUS_LOST ? "SDL_WINDOWEVENT_FOCUS_LOST" :
+     subtype == SDL_WINDOWEVENT_CLOSE ? "SDL_WINDOWEVENT_CLOSE" :
+     "(UNKNOWN)");
+
+  Error(ERR_DEBUG, "WINDOW EVENT: '%s', %ld, %ld",
+	event_name, event->data1, event->data2);
+
+  if (event->event == SDL_WINDOWEVENT_EXPOSED)
+    SDLRedrawWindow();
+
+#if 0
+  if (event->event == SDL_WINDOWEVENT_SIZE_CHANGED)
+  {
+    // if game started in fullscreen mode, window will also get fullscreen size
+    if (!video.fullscreen_enabled && video.fullscreen_initial)
+    {
+      SDLSetWindowScaling(setup.window_scaling_percent);
+
+      // only do this correction once
+      video.fullscreen_initial = FALSE;
+    }
+  }
+#endif
+
+  if (event->event == SDL_WINDOWEVENT_RESIZED && !video.fullscreen_enabled)
+  {
+#if 1
+    int new_window_width  = event->data1;
+    int new_window_height = event->data2;
+
+    printf("::: RESIZED from %d, %d to %d, %d\n",
+	   video.window_width, video.window_height,
+	   new_window_width, new_window_height);
+
+    // if window size has changed after resizing, calculate new scaling factor
+    if (new_window_width  != video.window_width ||
+	new_window_height != video.window_height)
+    {
+      int new_xpercent = (100 * new_window_width  / video.width);
+      int new_ypercent = (100 * new_window_height / video.height);
+
+      setup.window_scaling_percent = video.window_scaling_percent =
+	MIN(MAX(MIN_WINDOW_SCALING_PERCENT, MIN(new_xpercent, new_ypercent)),
+	    MAX_WINDOW_SCALING_PERCENT);
+
+      video.window_width  = new_window_width;
+      video.window_height = new_window_height;
+
+      printf("::: setup.window_scaling_percent set to %d\n",
+	     setup.window_scaling_percent);
+    }
+#else
+    // prevent slightly wrong scaling factor due to rounding differences
+    float scaling_factor = (float)setup.window_scaling_percent / 100;
+    int old_xsize = (int)(scaling_factor * video.width);
+    int old_ysize = (int)(scaling_factor * video.height);
+    int new_xsize = event->data1;
+    int new_ysize = event->data2;
+
+    // window size is unchanged when going from fullscreen to window mode,
+    // but reverse calculation of scaling factor might result in a scaling
+    // factor that is slightly different due to rounding differences;
+    // therefore compare old/new window size and not old/new scaling factor
+    if (old_xsize != new_xsize ||
+	old_ysize != new_ysize)
+    {
+      int new_xpercent = (100 * new_xsize / video.width);
+      int new_ypercent = (100 * new_ysize / video.height);
+
+      setup.window_scaling_percent = MIN(new_xpercent, new_ypercent);
+
+      if (setup.window_scaling_percent < MIN_WINDOW_SCALING_PERCENT)
+	setup.window_scaling_percent = MIN_WINDOW_SCALING_PERCENT;
+      else if (setup.window_scaling_percent > MAX_WINDOW_SCALING_PERCENT)
+	setup.window_scaling_percent = MAX_WINDOW_SCALING_PERCENT;
+
+      printf("::: setup.window_scaling_percent set to %d\n",
+	     setup.window_scaling_percent);
+    }
+#endif
+  }
+}
+
 void HandleFingerEvent(FingerEvent *event)
 {
 #if 0
@@ -640,7 +746,9 @@ void HandleButton(int mx, int my, int button, int button_nr)
   if (IS_WHEEL_BUTTON(button_nr))
     return;
 
+#if 0
   Error(ERR_DEBUG, "::: game_status == %d", game_status);
+#endif
 
   switch (game_status)
   {
@@ -983,6 +1091,31 @@ void HandleKey(Key key, int key_status)
       (GetKeyModState() & KMOD_Alt) && video.fullscreen_available)
   {
     setup.fullscreen = !setup.fullscreen;
+
+    printf("::: %d\n", setup.window_scaling_percent);
+
+    ToggleFullscreenIfNeeded();
+
+    if (game_status == GAME_MODE_SETUP)
+      RedrawSetupScreenAfterFullscreenToggle();
+
+    return;
+  }
+
+  if ((key == KSYM_minus || key == KSYM_plus || key == KSYM_0) &&
+      (GetKeyModState() & KMOD_Control) && video.window_scaling_available &&
+      !video.fullscreen_enabled)
+  {
+    if (key == KSYM_0)
+      setup.window_scaling_percent = STD_WINDOW_SCALING_PERCENT;
+    else
+      setup.window_scaling_percent +=
+	(key == KSYM_minus ? -1 : +1) * STEP_WINDOW_SCALING_PERCENT;
+
+    if (setup.window_scaling_percent < MIN_WINDOW_SCALING_PERCENT)
+      setup.window_scaling_percent = MIN_WINDOW_SCALING_PERCENT;
+    else if (setup.window_scaling_percent > MAX_WINDOW_SCALING_PERCENT)
+      setup.window_scaling_percent = MAX_WINDOW_SCALING_PERCENT;
 
     ToggleFullscreenIfNeeded();
 

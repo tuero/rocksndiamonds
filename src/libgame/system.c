@@ -438,9 +438,7 @@ void CloseVideoDisplay(void)
 
 void InitVideoBuffer(int width, int height, int depth, boolean fullscreen)
 {
-#if 0
-  static boolean initialized = FALSE;
-#endif
+  printf("::: InitVideoBuffer\n");
 
   video.width = width;
   video.height = height;
@@ -448,19 +446,13 @@ void InitVideoBuffer(int width, int height, int depth, boolean fullscreen)
 
   video.fullscreen_available = FULLSCREEN_STATUS;
   video.fullscreen_enabled = FALSE;
+  // video.fullscreen_initial = FALSE;
 #if 0
   video.fullscreen_mode_current = NULL;
   video.fullscreen_modes = NULL;
 #endif
 
   video.window_scaling_available = WINDOW_SCALING_STATUS;
-
-#if 0
-#if defined(PLATFORM_ANDROID)
-  if (!initialized)
-    video.fullscreen_enabled = TRUE;
-#endif
-#endif
 
 #if defined(TARGET_SDL)
   SDLInitVideoBuffer(&backbuffer, &window, fullscreen);
@@ -469,10 +461,6 @@ void InitVideoBuffer(int width, int height, int depth, boolean fullscreen)
 #endif
 
   drawto = backbuffer;
-
-#if 0
-  initialized = TRUE;
-#endif
 }
 
 inline static void FreeBitmapPointers(Bitmap *bitmap)

@@ -38,6 +38,8 @@
 #define MAX_INFO_MODES			8
 
 /* screens on the setup screen */
+/* (must match GFX_SPECIAL_ARG_SETUP_* values as defined in src/main.h) */
+/* (should also match corresponding entries in src/conf_gfx.c) */
 #define SETUP_MODE_MAIN			0
 #define SETUP_MODE_GAME			1
 #define SETUP_MODE_EDITOR		2
@@ -6088,8 +6090,39 @@ void DrawSetupScreen()
 
 void RedrawSetupScreenAfterFullscreenToggle()
 {
+#if 0
+  if (setup_mode == SETUP_MODE_GRAPHICS ||
+      setup_mode == SETUP_MODE_CHOOSE_WINDOW_SIZE)
+  {
+    if (window_sizes != NULL)
+    {
+      /* set current window size value to configured window size value */
+      window_size_current =
+	getTreeInfoFromIdentifier(window_sizes,
+				  i_to_a(setup.window_scaling_percent));
+
+      /* if that fails, set current window size to reliable default value */
+      if (window_size_current == NULL)
+	window_size_current =
+	  getTreeInfoFromIdentifier(window_sizes,
+				    i_to_a(STD_WINDOW_SCALING_PERCENT));
+
+      /* if that also fails, set current window size to first available value */
+      if (window_size_current == NULL)
+	window_size_current = window_sizes;
+    }
+
+    setup.window_scaling_percent = atoi(window_size_current->identifier);
+
+    /* needed for displaying window size text instead of identifier */
+    window_size_text = window_size_current->name;
+
+    DrawSetupScreen();
+  }
+#else
   if (setup_mode == SETUP_MODE_GRAPHICS)
     DrawSetupScreen();
+#endif
 }
 
 void HandleSetupScreen(int mx, int my, int dx, int dy, int button)

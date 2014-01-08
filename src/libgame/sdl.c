@@ -393,9 +393,8 @@ static SDL_Surface *SDLCreateScreen(DrawBuffer **backbuffer,
   SDL_Surface *new_surface = NULL;
   static boolean fullscreen_enabled = FALSE;
 
-  int surface_flags_window = SURFACE_FLAGS;
 #if defined(TARGET_SDL2)
-
+  int surface_flags_window = SURFACE_FLAGS | SDL_WINDOW_RESIZABLE;
 #if USE_DESKTOP_FULLSCREEN
   int surface_flags_fullscreen = SURFACE_FLAGS | SDL_WINDOW_FULLSCREEN_DESKTOP;
 #else
@@ -403,6 +402,7 @@ static SDL_Surface *SDLCreateScreen(DrawBuffer **backbuffer,
 #endif
 
 #else
+  int surface_flags_window = SURFACE_FLAGS;
   int surface_flags_fullscreen = SURFACE_FLAGS | SDL_FULLSCREEN;
 #endif
 
@@ -411,11 +411,26 @@ static SDL_Surface *SDLCreateScreen(DrawBuffer **backbuffer,
   int surface_flags = (fullscreen ? surface_flags_fullscreen :
 		       surface_flags_window);
 
+  // default window size is unscaled
+  video.window_width  = video.width;
+  video.window_height = video.height;
+
 #if defined(TARGET_SDL2)
+
+  // store if initial screen mode on game start is fullscreen mode
+  if (sdl_window == NULL)
+  {
+    printf("::: GAME STARTS WITH FULLSCREEN %d\n", fullscreen);
+
+    video.fullscreen_initial = fullscreen;
+  }
 
 #if USE_RENDERER
   float window_scaling_factor = (float)setup.window_scaling_percent / 100;
   float screen_scaling_factor = (fullscreen ? 1 : window_scaling_factor);
+
+  video.window_width  = window_scaling_factor * width;
+  video.window_height = window_scaling_factor * height;
 
 #if 1
   printf("::: use window scaling factor %f\n", screen_scaling_factor);
@@ -448,18 +463,25 @@ static SDL_Surface *SDLCreateScreen(DrawBuffer **backbuffer,
     }
   }
 
+#if 0
   Error(ERR_INFO, "::: checking 'sdl_window' ...");
 
   if (sdl_window == NULL)
     Error(ERR_INFO, "::: calling SDL_CreateWindow() [%d, %d, %d] ...",
 	  setup.fullscreen, fullscreen, fullscreen_enabled);
+#endif
 
   if (sdl_window == NULL)
     sdl_window = SDL_CreateWindow(program.window_title,
 				  SDL_WINDOWPOS_CENTERED,
 				  SDL_WINDOWPOS_CENTERED,
+#if USE_DESKTOP_FULLSCREEN
+				  video.window_width,
+				  video.window_height,
+#else
 				  (int)(screen_scaling_factor * width),
 				  (int)(screen_scaling_factor * height),
+#endif
 				  surface_flags);
 
   if (sdl_window != NULL)
@@ -748,7 +770,8 @@ boolean SDLSetVideoMode(DrawBuffer **backbuffer, boolean fullscreen)
   }
 
 #if defined(TARGET_SDL2)
-  UpdateScreen(NULL);		// map window
+  SDLRedrawWindow();			// map window
+  // UpdateScreen(NULL);		// map window
 #endif
 
 #if 1
@@ -771,6 +794,63 @@ boolean SDLSetVideoMode(DrawBuffer **backbuffer, boolean fullscreen)
 
   return success;
 }
+
+#if defined(TARGET_SDL2)
+void SDLSetWindowScaling(int window_scaling_percent)
+{
+  if (sdl_window == NULL)
+    return;
+
+  float window_scaling_factor = (float)window_scaling_percent / 100;
+  int new_window_width  = (int)(window_scaling_factor * video.width);
+  int new_window_height = (int)(window_scaling_factor * video.height);
+
+  Error(ERR_DEBUG, "::: SDLSetWindowScaling(%d) ...", window_scaling_percent);
+
+  SDL_SetWindowSize(sdl_window, new_window_width, new_window_height);
+
+  video.window_scaling_percent = window_scaling_percent;
+  video.window_width  = new_window_width;
+  video.window_height = new_window_height;
+}
+
+void SDLSetWindowFullscreen(boolean fullscreen)
+{
+  if (sdl_window == NULL)
+    return;
+
+#if USE_DESKTOP_FULLSCREEN
+  int flags = (fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0);
+#else
+  int flags = (fullscreen ? SDL_WINDOW_FULLSCREEN : 0);
+#endif
+
+  Error(ERR_DEBUG, "::: SDL_SetWindowFullscreen(%d) ...", fullscreen);
+
+  if (SDL_SetWindowFullscreen(sdl_window, flags) == 0)
+    video.fullscreen_enabled = fullscreen;
+
+  printf("::: SDLSetWindowFullscreen: %d, %d\n",
+	 fullscreen, video.fullscreen_initial);
+
+#if 1
+  // if game started in fullscreen mode, window will also get fullscreen size
+  if (!fullscreen && video.fullscreen_initial)
+  {
+    SDLSetWindowScaling(setup.window_scaling_percent);
+    SDL_SetWindowPosition(sdl_window,
+			  SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
+
+    video.fullscreen_initial = FALSE;
+  }
+#endif
+}
+
+void SDLRedrawWindow()
+{
+  UpdateScreen(NULL);
+}
+#endif
 
 void SDLCreateBitmapContent(Bitmap *new_bitmap, int width, int height,
 			    int depth)

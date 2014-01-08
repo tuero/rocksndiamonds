@@ -9000,6 +9000,24 @@ void ToggleFullscreenIfNeeded()
   if (!change_window_scaling_percent && !video.fullscreen_available)
     return;
 
+#if defined(TARGET_SDL2)
+  if (change_window_scaling_percent)
+  {
+    SDLSetWindowScaling(setup.window_scaling_percent);
+
+    return;
+  }
+  else if (change_fullscreen)
+  {
+    SDLSetWindowFullscreen(setup.fullscreen);
+
+    /* set setup value according to successfully changed fullscreen mode */
+    setup.fullscreen = video.fullscreen_enabled;
+
+    return;
+  }
+#endif
+
   if (change_fullscreen ||
       change_fullscreen_mode ||
       change_window_scaling_percent)
@@ -9024,7 +9042,7 @@ void ToggleFullscreenIfNeeded()
     /* toggle fullscreen */
     ChangeVideoModeIfNeeded(setup.fullscreen);
 
-    /* set setup value according to successfully enabled fullscreen mode */
+    /* set setup value according to successfully changed fullscreen mode */
     setup.fullscreen = video.fullscreen_enabled;
 
     /* restore backbuffer content from temporary backbuffer backup bitmap */

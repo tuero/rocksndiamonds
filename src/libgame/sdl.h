@@ -86,6 +86,7 @@ typedef SDL_MouseMotionEvent	MotionEvent;
 #if defined(TARGET_SDL2)
 typedef SDL_TouchFingerEvent	FingerEvent;
 typedef SDL_TextInputEvent	TextEvent;
+typedef SDL_WindowEvent		WindowEvent;
 #endif
 typedef SDL_KeyboardEvent	KeyEvent;
 typedef SDL_Event		ExposeEvent;
@@ -436,6 +437,9 @@ struct MouseCursorInfo
 
 #if defined(TARGET_SDL2)
 SDL_Surface *SDL_DisplayFormat(SDL_Surface *);
+void SDLSetWindowScaling(int);
+void SDLSetWindowFullscreen(boolean);
+void SDLRedrawWindow();
 #endif
 
 void SDLInitVideoDisplay(void);

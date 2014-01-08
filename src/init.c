@@ -6316,10 +6316,6 @@ void OpenAll()
 
   InitSetup();
 
-#if 1
-  Error(ERR_INFO, "::: MARK 1: setup.fullscreen == %d", setup.fullscreen);
-#endif
-
   print_timestamp_time("[init setup/config stuff (1)]");
 
   InitGameInfo();
@@ -6343,10 +6339,6 @@ void OpenAll()
   InitJoysticks();
 
   print_timestamp_time("[init setup/config stuff]");
-
-#if 1
-  Error(ERR_INFO, "::: MARK 2: setup.fullscreen == %d", setup.fullscreen);
-#endif
 
   InitVideoDisplay();
   InitVideoBuffer(WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH, setup.fullscreen);
