@@ -2926,6 +2926,14 @@ void freeTreeInfo(TreeInfo *ti)
     checked_free(ti->special_flags);
   }
 
+  // recursively free child node
+  if (ti->node_group)
+    freeTreeInfo(ti->node_group);
+
+  // recursively free next node
+  if (ti->next)
+    freeTreeInfo(ti->next);
+
   checked_free(ti);
 }
 

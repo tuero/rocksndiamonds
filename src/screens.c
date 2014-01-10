@@ -3789,7 +3789,11 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
       }
       else
       {
+#if 1
+	FadeSetEnterMenu();
+#else
 	FadeSetEnterScreen();
+#endif
 
 	node_cursor->cl_first = ti->cl_first;
 	node_cursor->cl_cursor = ti->cl_cursor;
@@ -4161,7 +4165,92 @@ static void execSetupEditor()
   DrawSetupScreen();
 }
 
-static void execSetupGraphics()
+static void execSetupGraphics_setWindowSizes(boolean update_list)
+{
+  if (window_sizes != NULL && update_list)
+  {
+    freeTreeInfo(window_sizes);
+
+    window_sizes = NULL;
+  }
+
+  if (window_sizes == NULL)
+  {
+    boolean current_window_size_found = FALSE;
+    int i;
+
+    for (i = 0; window_sizes_list[i].value != -1; i++)
+    {
+      TreeInfo *ti = newTreeInfo_setDefaults(TREE_TYPE_UNDEFINED);
+      char identifier[32], name[32];
+      int value = window_sizes_list[i].value;
+      char *text = window_sizes_list[i].text;
+
+      ti->node_top = &window_sizes;
+      ti->sort_priority = value;
+
+      sprintf(identifier, "%d", value);
+      sprintf(name, "%s", text);
+
+      setString(&ti->identifier, identifier);
+      setString(&ti->name, name);
+      setString(&ti->name_sorting, name);
+      setString(&ti->infotext, "Window Scaling");
+
+      pushTreeInfo(&window_sizes, ti);
+
+      if (value == setup.window_scaling_percent)
+	current_window_size_found = TRUE;
+    }
+
+    if (!current_window_size_found)
+    {
+      // add entry for non-preset window scaling value
+
+      TreeInfo *ti = newTreeInfo_setDefaults(TREE_TYPE_UNDEFINED);
+      char identifier[32], name[32];
+      int value = setup.window_scaling_percent;
+
+      ti->node_top = &window_sizes;
+      ti->sort_priority = value;
+
+      sprintf(identifier, "%d", value);
+      sprintf(name, "%d %% (Current)", value);
+
+      setString(&ti->identifier, identifier);
+      setString(&ti->name, name);
+      setString(&ti->name_sorting, name);
+      setString(&ti->infotext, "Window Scaling");
+
+      pushTreeInfo(&window_sizes, ti);
+    }
+
+    /* sort window size values to start with lowest window size value */
+    sortTreeInfo(&window_sizes);
+
+    /* set current window size value to configured window size value */
+    window_size_current =
+      getTreeInfoFromIdentifier(window_sizes,
+				i_to_a(setup.window_scaling_percent));
+
+    /* if that fails, set current window size to reliable default value */
+    if (window_size_current == NULL)
+      window_size_current =
+	getTreeInfoFromIdentifier(window_sizes,
+				  i_to_a(STD_WINDOW_SCALING_PERCENT));
+
+    /* if that also fails, set current window size to first available value */
+    if (window_size_current == NULL)
+      window_size_current = window_sizes;
+  }
+
+  setup.window_scaling_percent = atoi(window_size_current->identifier);
+
+  /* needed for displaying window size text instead of identifier */
+  window_size_text = window_size_current->name;
+}
+
+static void execSetupGraphics_setScreenModes()
 {
   // if (screen_modes == NULL && video.fullscreen_available)
   if (screen_modes == NULL && video.fullscreen_modes != NULL)
@@ -4220,57 +4309,10 @@ static void execSetupGraphics()
     /* needed for displaying screen mode name instead of identifier */
     screen_mode_text = screen_mode_current->name;
   }
+}
 
-  if (window_sizes == NULL)
-  {
-    int i;
-
-    for (i = 0; window_sizes_list[i].value != -1; i++)
-    {
-      TreeInfo *ti = newTreeInfo_setDefaults(TREE_TYPE_UNDEFINED);
-      char identifier[32], name[32];
-      int value = window_sizes_list[i].value;
-      char *text = window_sizes_list[i].text;
-
-      ti->node_top = &window_sizes;
-      ti->sort_priority = value;
-
-      sprintf(identifier, "%d", value);
-      sprintf(name, "%s", text);
-
-      setString(&ti->identifier, identifier);
-      setString(&ti->name, name);
-      setString(&ti->name_sorting, name);
-      setString(&ti->infotext, "Window Scaling");
-
-      pushTreeInfo(&window_sizes, ti);
-    }
-
-    /* sort window size values to start with lowest window size value */
-    sortTreeInfo(&window_sizes);
-
-    /* set current window size value to configured window size value */
-    window_size_current =
-      getTreeInfoFromIdentifier(window_sizes,
-				i_to_a(setup.window_scaling_percent));
-
-    /* if that fails, set current window size to reliable default value */
-    if (window_size_current == NULL)
-      window_size_current =
-	getTreeInfoFromIdentifier(window_sizes,
-				  i_to_a(STD_WINDOW_SCALING_PERCENT));
-
-    /* if that also fails, set current window size to first available value */
-    if (window_size_current == NULL)
-      window_size_current = window_sizes;
-  }
-
-  setup.window_scaling_percent = atoi(window_size_current->identifier);
-
-  /* needed for displaying window size text instead of identifier */
-  window_size_text = window_size_current->name;
-
-#if 1
+static void execSetupGraphics_setScrollDelays()
+{
   if (scroll_delays == NULL)
   {
     int i;
@@ -4317,7 +4359,17 @@ static void execSetupGraphics()
 
   /* needed for displaying scroll delay text instead of identifier */
   scroll_delay_text = scroll_delay_current->name;
-#endif
+}
+
+static void execSetupGraphics()
+{
+  // update "setup.window_scaling_percent" from list selection
+  execSetupGraphics_setWindowSizes(FALSE);
+  // maybe remove non-preset value (if standard value was selected)
+  execSetupGraphics_setWindowSizes(TRUE);
+
+  execSetupGraphics_setScreenModes();
+  execSetupGraphics_setScrollDelays();
 
   setup_mode = SETUP_MODE_GRAPHICS;
 
@@ -6090,32 +6142,12 @@ void DrawSetupScreen()
 
 void RedrawSetupScreenAfterFullscreenToggle()
 {
-#if 0
+#if 1
   if (setup_mode == SETUP_MODE_GRAPHICS ||
       setup_mode == SETUP_MODE_CHOOSE_WINDOW_SIZE)
   {
-    if (window_sizes != NULL)
-    {
-      /* set current window size value to configured window size value */
-      window_size_current =
-	getTreeInfoFromIdentifier(window_sizes,
-				  i_to_a(setup.window_scaling_percent));
-
-      /* if that fails, set current window size to reliable default value */
-      if (window_size_current == NULL)
-	window_size_current =
-	  getTreeInfoFromIdentifier(window_sizes,
-				    i_to_a(STD_WINDOW_SCALING_PERCENT));
-
-      /* if that also fails, set current window size to first available value */
-      if (window_size_current == NULL)
-	window_size_current = window_sizes;
-    }
-
-    setup.window_scaling_percent = atoi(window_size_current->identifier);
-
-    /* needed for displaying window size text instead of identifier */
-    window_size_text = window_size_current->name;
+    // update "setup.window_scaling_percent" from list selection
+    execSetupGraphics_setWindowSizes(TRUE);
 
     DrawSetupScreen();
   }

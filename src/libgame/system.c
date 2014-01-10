@@ -438,7 +438,9 @@ void CloseVideoDisplay(void)
 
 void InitVideoBuffer(int width, int height, int depth, boolean fullscreen)
 {
+#if 0
   printf("::: InitVideoBuffer\n");
+#endif
 
   video.width = width;
   video.height = height;

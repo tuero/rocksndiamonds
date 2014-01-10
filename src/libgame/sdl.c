@@ -420,7 +420,9 @@ static SDL_Surface *SDLCreateScreen(DrawBuffer **backbuffer,
   // store if initial screen mode on game start is fullscreen mode
   if (sdl_window == NULL)
   {
+#if 0
     printf("::: GAME STARTS WITH FULLSCREEN %d\n", fullscreen);
+#endif
 
     video.fullscreen_initial = fullscreen;
   }
@@ -432,7 +434,7 @@ static SDL_Surface *SDLCreateScreen(DrawBuffer **backbuffer,
   video.window_width  = window_scaling_factor * width;
   video.window_height = window_scaling_factor * height;
 
-#if 1
+#if 0
   printf("::: use window scaling factor %f\n", screen_scaling_factor);
 #endif
 
@@ -805,7 +807,9 @@ void SDLSetWindowScaling(int window_scaling_percent)
   int new_window_width  = (int)(window_scaling_factor * video.width);
   int new_window_height = (int)(window_scaling_factor * video.height);
 
+#if 0
   Error(ERR_DEBUG, "::: SDLSetWindowScaling(%d) ...", window_scaling_percent);
+#endif
 
   SDL_SetWindowSize(sdl_window, new_window_width, new_window_height);
 
@@ -825,13 +829,17 @@ void SDLSetWindowFullscreen(boolean fullscreen)
   int flags = (fullscreen ? SDL_WINDOW_FULLSCREEN : 0);
 #endif
 
+#if 0
   Error(ERR_DEBUG, "::: SDL_SetWindowFullscreen(%d) ...", fullscreen);
+#endif
 
   if (SDL_SetWindowFullscreen(sdl_window, flags) == 0)
     video.fullscreen_enabled = fullscreen;
 
+#if 0
   printf("::: SDLSetWindowFullscreen: %d, %d\n",
 	 fullscreen, video.fullscreen_initial);
+#endif
 
 #if 1
   // if game started in fullscreen mode, window will also get fullscreen size

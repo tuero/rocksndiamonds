@@ -403,6 +403,7 @@ void HandleMotionEvent(MotionEvent *event)
 #if defined(TARGET_SDL2)
 void HandleWindowEvent(WindowEvent *event)
 {
+#if DEBUG_EVENTS
   int subtype = event->event;
 
   char *event_name =
@@ -424,6 +425,7 @@ void HandleWindowEvent(WindowEvent *event)
 
   Error(ERR_DEBUG, "WINDOW EVENT: '%s', %ld, %ld",
 	event_name, event->data1, event->data2);
+#endif
 
   if (event->event == SDL_WINDOWEVENT_EXPOSED)
     SDLRedrawWindow();
@@ -468,6 +470,9 @@ void HandleWindowEvent(WindowEvent *event)
 
       printf("::: setup.window_scaling_percent set to %d\n",
 	     setup.window_scaling_percent);
+
+      if (game_status == GAME_MODE_SETUP)
+	RedrawSetupScreenAfterFullscreenToggle();
     }
 #else
     // prevent slightly wrong scaling factor due to rounding differences
@@ -1092,7 +1097,9 @@ void HandleKey(Key key, int key_status)
   {
     setup.fullscreen = !setup.fullscreen;
 
+#if 0
     printf("::: %d\n", setup.window_scaling_percent);
+#endif
 
     ToggleFullscreenIfNeeded();
 
