@@ -429,7 +429,9 @@ static SDL_Surface *SDLCreateScreen(DrawBuffer **backbuffer,
 
 #if USE_RENDERER
   float window_scaling_factor = (float)setup.window_scaling_percent / 100;
+#if !USE_DESKTOP_FULLSCREEN
   float screen_scaling_factor = (fullscreen ? 1 : window_scaling_factor);
+#endif
 
   video.window_width  = window_scaling_factor * width;
   video.window_height = window_scaling_factor * height;

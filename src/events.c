@@ -188,6 +188,13 @@ void EventLoop(void)
   	}
       }
     }
+
+    // !!! CHECK THIS:
+    // !!! this may result in "HandleNoEvent()" never being called
+    // !!! (especially due to continuously processed tocuh events)
+    // !!! and therefore toon animations being stopped while events
+    // !!! are being processed (even if they are all thrown away)
+
     else
     {
       /* when playing, display a special mouse pointer inside the playfield */
@@ -427,7 +434,9 @@ void HandleWindowEvent(WindowEvent *event)
 	event_name, event->data1, event->data2);
 #endif
 
-  if (event->event == SDL_WINDOWEVENT_EXPOSED)
+  if (event->event == SDL_WINDOWEVENT_SIZE_CHANGED ||
+      event->event == SDL_WINDOWEVENT_RESIZED ||
+      event->event == SDL_WINDOWEVENT_EXPOSED)
     SDLRedrawWindow();
 
 #if 0
@@ -513,6 +522,7 @@ void HandleFingerEvent(FingerEvent *event)
   int max_events = 10;
 #endif
 
+#if 0
 #if DEBUG_EVENTS
   Error(ERR_DEBUG, "FINGER EVENT: finger was %s, touch ID %lld, finger ID %lld, x/y %f/%f, dx/dy %f/%f, pressure %f",
 	event->type == EVENT_FINGERPRESS ? "pressed" :
@@ -522,6 +532,7 @@ void HandleFingerEvent(FingerEvent *event)
 	event->x, event->y,
 	event->dx, event->dy,
 	event->pressure);
+#endif
 #endif
 
 #if 0
@@ -603,12 +614,13 @@ void HandleTextEvent(TextEvent *event)
   Key key = getKeyFromKeyName(text);
 
 #if DEBUG_EVENTS
-  Error(ERR_DEBUG, "TEXT EVENT: text == '%s' [%d byte(s), '%c'/%d], resulting key == %d (%s)",
+  Error(ERR_DEBUG, "TEXT EVENT: text == '%s' [%d byte(s), '%c'/%d], resulting key == %d (%s) [%04x]",
 	text,
 	strlen(text),
 	text[0], (int)(text[0]),
 	key,
-	getKeyNameFromKey(key));
+	getKeyNameFromKey(key),
+	GetKeyModState());
 #endif
 
   // if (game_status != GAME_MODE_PLAYING && GetKeyModState() != KMOD_None)

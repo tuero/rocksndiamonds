@@ -17,6 +17,7 @@
 #include "init.h"
 #include "game.h"
 #include "tape.h"
+#include "tools.h"
 #include "events.h"
 #include "config.h"
 
@@ -156,12 +157,15 @@ struct TitleMessageInfo	readme;
 struct InitInfo		init, init_last;
 struct MenuInfo		menu;
 struct DoorInfo		door_1, door_2;
+struct RequestInfo	request;
 struct PreviewInfo	preview;
+
 struct GraphicInfo     *graphic_info = NULL;
 struct SoundInfo       *sound_info = NULL;
 struct MusicInfo       *music_info = NULL;
 struct MusicFileInfo   *music_file_info = NULL;
 struct HelpAnimInfo    *helpanim_info = NULL;
+
 SetupFileHash          *helptext_info = NULL;
 SetupFileHash	       *image_config_hash = NULL;
 SetupFileHash	       *element_token_hash = NULL;

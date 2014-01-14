@@ -1664,6 +1664,9 @@ void translate_keyname(Key *keysym, char **x11name, char **name, int mode)
     { KSYM_odiaeresis,	"XK_odiaeresis",	"\xc3\xb6" },
     { KSYM_udiaeresis,	"XK_udiaeresis",	"\xc3\xbc" },
     { KSYM_ssharp,	"XK_ssharp",		"\xc3\x9f" },
+
+    /* other keys (for reverse mapping only) */
+    { KSYM_space,	"XK_space",		" " },
 #endif
 
 #if defined(TARGET_SDL2)
@@ -2493,13 +2496,22 @@ boolean fileHasSuffix(char *basename, char *suffix)
   return FALSE;
 }
 
+#if defined(TARGET_SDL)
+static boolean FileCouldBeArtwork(char *basename)
+{
+  return (!strEqual(basename, ".") &&
+	  !strEqual(basename, "..") &&
+	  !fileHasSuffix(basename, "txt") &&
+	  !fileHasSuffix(basename, "conf"));
+}
+#endif
+
 boolean FileIsGraphic(char *filename)
 {
   char *basename = getBaseNamePtr(filename);
 
 #if defined(TARGET_SDL)
-  return (!fileHasSuffix(basename, "txt") &&
-	  !fileHasSuffix(basename, "conf"));
+  return FileCouldBeArtwork(basename);
 #else
   return fileHasSuffix(basename, "pcx");
 #endif
@@ -2510,8 +2522,7 @@ boolean FileIsSound(char *filename)
   char *basename = getBaseNamePtr(filename);
 
 #if defined(TARGET_SDL)
-  return (!fileHasSuffix(basename, "txt") &&
-	  !fileHasSuffix(basename, "conf"));
+  return FileCouldBeArtwork(basename);
 #else
   return fileHasSuffix(basename, "wav");
 #endif
@@ -2522,8 +2533,7 @@ boolean FileIsMusic(char *filename)
   char *basename = getBaseNamePtr(filename);
 
 #if defined(TARGET_SDL)
-  return (!fileHasSuffix(basename, "txt") &&
-	  !fileHasSuffix(basename, "conf"));
+  return FileCouldBeArtwork(basename);
 #else
   if (FileIsSound(basename))
     return TRUE;

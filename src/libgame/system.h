@@ -1198,6 +1198,7 @@ struct TextPosInfo
   int size;
   int font, font_alt;
   boolean draw_masked;
+  boolean draw_player;		/* special case for network player buttons */
   int sort_priority;
   int id;
 };

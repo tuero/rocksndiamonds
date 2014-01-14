@@ -59,6 +59,26 @@
 
 #define REQUEST_WAIT_FOR_INPUT	(REQ_ASK | REQ_CONFIRM | REQ_PLAYER)
 
+
+struct RequestButtonInfo
+{
+  struct TextPosInfo yes;
+  struct TextPosInfo no;
+  struct TextPosInfo confirm;
+  struct TextPosInfo player_1;
+  struct TextPosInfo player_2;
+  struct TextPosInfo player_3;
+  struct TextPosInfo player_4;
+};
+
+struct RequestInfo
+{
+  struct RequestButtonInfo button;
+};
+
+extern struct RequestInfo request;
+
+
 void DumpTile(int, int);
 
 void DrawMaskedBorder_FIELD();

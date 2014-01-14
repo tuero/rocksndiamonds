@@ -2541,7 +2541,11 @@ void AnimateEnvelope(int envelope_nr, int anim_mode, int action)
 
     SetDrawtoField(DRAW_BUFFERED);
 
+#if 1
+    BlitScreenToBitmap(backbuffer);
+#else
     BlitBitmap(fieldbuffer, backbuffer, FX, FY, SXSIZE, SYSIZE, SX, SY);
+#endif
 
     SetDrawtoField(DRAW_BACKBUFFER);
 
@@ -2671,7 +2675,11 @@ void AnimateEnvelopeDoor(char *text, int anim_mode, int action)
 #else
     SetDrawtoField(DRAW_BUFFERED);
 
+#if 1
+    BlitScreenToBitmap(backbuffer);
+#else
     BlitBitmap(fieldbuffer, backbuffer, FX, FY, SXSIZE, SYSIZE, SX, SY);
+#endif
 
     SetDrawtoField(DRAW_BACKBUFFER);
 #endif
@@ -4659,6 +4667,102 @@ void UndrawSpecialEditorDoor()
 
 /* ---------- new tool button stuff ---------------------------------------- */
 
+#if 1
+
+static struct
+{
+  int graphic;
+  struct TextPosInfo *pos;
+  int gadget_id;
+  char *infotext;
+} toolbutton_info[NUM_TOOL_BUTTONS] =
+{
+  {
+    IMG_REQUEST_BUTTON_GFX_YES,		&request.button.yes,
+    TOOL_CTRL_ID_YES,			"yes"
+  },
+  {
+    IMG_REQUEST_BUTTON_GFX_NO,		&request.button.no,
+    TOOL_CTRL_ID_NO,			"no"
+  },
+  {
+    IMG_REQUEST_BUTTON_GFX_CONFIRM,	&request.button.confirm,
+    TOOL_CTRL_ID_CONFIRM,		"confirm"
+  },
+  {
+    IMG_REQUEST_BUTTON_GFX_PLAYER_1,	&request.button.player_1,
+    TOOL_CTRL_ID_PLAYER_1,		"player 1"
+  },
+  {
+    IMG_REQUEST_BUTTON_GFX_PLAYER_2,	&request.button.player_2,
+    TOOL_CTRL_ID_PLAYER_2,		"player 2"
+  },
+  {
+    IMG_REQUEST_BUTTON_GFX_PLAYER_3,	&request.button.player_3,
+    TOOL_CTRL_ID_PLAYER_3,		"player 3"
+  },
+  {
+    IMG_REQUEST_BUTTON_GFX_PLAYER_4,	&request.button.player_4,
+    TOOL_CTRL_ID_PLAYER_4,		"player 4"
+  }
+};
+
+void CreateToolButtons()
+{
+  int i;
+
+  for (i = 0; i < NUM_TOOL_BUTTONS; i++)
+  {
+    struct GraphicInfo *gfx = &graphic_info[toolbutton_info[i].graphic];
+    struct TextPosInfo *pos = toolbutton_info[i].pos;
+    struct GadgetInfo *gi;
+    Bitmap *deco_bitmap = None;
+    int deco_x = 0, deco_y = 0, deco_xpos = 0, deco_ypos = 0;
+    unsigned int event_mask = GD_EVENT_RELEASED;
+    int gd_x   = gfx->src_x;
+    int gd_y   = gfx->src_y;
+    int gd_xp  = gfx->src_x + gfx->pressed_xoffset;
+    int gd_yp  = gfx->src_y + gfx->pressed_yoffset;
+    int id = i;
+
+    if (id >= TOOL_CTRL_ID_PLAYER_1 && id <= TOOL_CTRL_ID_PLAYER_4)
+    {
+      int player_nr = id - TOOL_CTRL_ID_PLAYER_1;
+
+      getSizedGraphicSource(PLAYER_NR_GFX(IMG_PLAYER_1, player_nr), 0,
+			    pos->size, &deco_bitmap, &deco_x, &deco_y);
+      deco_xpos = (gfx->width  - pos->size) / 2;
+      deco_ypos = (gfx->height - pos->size) / 2;
+    }
+
+    gi = CreateGadget(GDI_CUSTOM_ID, id,
+		      GDI_INFO_TEXT, toolbutton_info[i].infotext,
+		      GDI_X, DX + pos->x,
+		      GDI_Y, DY + pos->y,
+		      GDI_WIDTH, gfx->width,
+		      GDI_HEIGHT, gfx->height,
+		      GDI_TYPE, GD_TYPE_NORMAL_BUTTON,
+		      GDI_STATE, GD_BUTTON_UNPRESSED,
+		      GDI_DESIGN_UNPRESSED, gfx->bitmap, gd_x, gd_y,
+		      GDI_DESIGN_PRESSED, gfx->bitmap, gd_xp, gd_yp,
+		      GDI_DECORATION_DESIGN, deco_bitmap, deco_x, deco_y,
+		      GDI_DECORATION_POSITION, deco_xpos, deco_ypos,
+		      GDI_DECORATION_SIZE, pos->size, pos->size,
+		      GDI_DECORATION_SHIFTING, 1, 1,
+		      GDI_DIRECT_DRAW, FALSE,
+		      GDI_EVENT_MASK, event_mask,
+		      GDI_CALLBACK_ACTION, HandleToolButtons,
+		      GDI_END);
+
+    if (gi == NULL)
+      Error(ERR_EXIT, "cannot create gadget");
+
+    tool_gadget[id] = gi;
+  }
+}
+
+#else
+
 /* graphic position values for tool buttons */
 #define TOOL_BUTTON_YES_XPOS		2
 #define TOOL_BUTTON_YES_YPOS		250
@@ -4816,6 +4920,8 @@ void CreateToolButtons()
     tool_gadget[id] = gi;
   }
 }
+
+#endif
 
 void FreeToolButtons()
 {
