@@ -2992,19 +2992,17 @@ void DrawInfoScreen_Version()
   int ystart1 = mSY - SY + 100;
   int ystart2 = mSY - SY + 150;
   int ybottom = mSY - SY + SYSIZE - 20;
-  int xstart1 = mSX + 2 * xstep;
-  int xstart2 = mSX + 19 * xstep;
+  int xstart1 = mSX - SX + 2 * xstep;
+  int xstart2 = mSX - SX + 18 * xstep;
 #if defined(TARGET_SDL)
-  int xstart3 = mSX + 29 * xstep;
+  int xstart3 = mSX - SX + 28 * xstep;
   SDL_version sdl_version_compiled;
+  const SDL_version *sdl_version_linked;
+  int driver_name_len = 10;
 #if defined(TARGET_SDL2)
   SDL_version sdl_version_linked_ext;
-#endif
-  const SDL_version *sdl_version_linked;
-#if defined(TARGET_SDL2)
   const char *driver_name = NULL;
 #else
-  int driver_name_len = 8;
   char driver_name[driver_name_len];
 #endif
 #endif
@@ -3112,7 +3110,7 @@ void DrawInfoScreen_Version()
   DrawTextF(xstart3, ystart2, font_header, "Used");
 
 #if defined(TARGET_SDL2)
-  driver_name = SDL_GetVideoDriver(0);
+  driver_name = getStringCopyNStatic(SDL_GetVideoDriver(0), driver_name_len);
 #else
   SDL_VideoDriverName(driver_name, driver_name_len);
 #endif
@@ -3123,7 +3121,7 @@ void DrawInfoScreen_Version()
   DrawTextF(xstart3, ystart2, font_text, "%s", driver_name);
 
 #if defined(TARGET_SDL2)
-  driver_name = SDL_GetAudioDriver(0);
+  driver_name = getStringCopyNStatic(SDL_GetAudioDriver(0), driver_name_len);
 #else
   SDL_AudioDriverName(driver_name, driver_name_len);
 #endif

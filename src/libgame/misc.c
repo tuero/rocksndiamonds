@@ -708,7 +708,7 @@ char *getPath3(char *path1, char *path2, char *path3)
   return getStringCat3WithSeparator(path1, path2, path3, STRING_PATH_SEPARATOR);
 }
 
-char *getStringCopy(char *s)
+char *getStringCopy(const char *s)
 {
   char *s_copy;
 
@@ -721,7 +721,7 @@ char *getStringCopy(char *s)
   return s_copy;
 }
 
-char *getStringCopyN(char *s, int n)
+char *getStringCopyN(const char *s, int n)
 {
   char *s_copy;
   int s_len = MAX(0, n);
@@ -736,7 +736,18 @@ char *getStringCopyN(char *s, int n)
   return s_copy;
 }
 
-char *getStringToLower(char *s)
+char *getStringCopyNStatic(const char *s, int n)
+{
+  static char *s_copy = NULL;
+
+  checked_free(s_copy);
+
+  s_copy = getStringCopyN(s, n);
+
+  return s_copy;
+}
+
+char *getStringToLower(const char *s)
 {
   char *s_copy = checked_malloc(strlen(s) + 1);
   char *s_ptr = s_copy;
@@ -1057,15 +1068,17 @@ void GetOptions(char *argv[], void (*print_usage_function)(void))
 /* error handling functions                                                  */
 /* ------------------------------------------------------------------------- */
 
+#define MAX_INTERNAL_ERROR_SIZE		1024
+
 /* used by SetError() and GetError() to store internal error messages */
-static char internal_error[1024];	/* this is bad */
+static char internal_error[MAX_INTERNAL_ERROR_SIZE];
 
 void SetError(char *format, ...)
 {
   va_list ap;
 
   va_start(ap, format);
-  vsprintf(internal_error, format, ap);
+  vsnprintf(internal_error, MAX_INTERNAL_ERROR_SIZE, format, ap);
   va_end(ap);
 }
 
