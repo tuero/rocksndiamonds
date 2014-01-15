@@ -187,7 +187,8 @@ void ShowEnvelopeDoor(char *text, int);
 
 void DrawLevel(void);
 void DrawMiniLevel(int, int, int, int);
-void DrawPreviewLevel(boolean);
+void DrawPreviewLevelInitial(void);
+void DrawPreviewLevelAnimation(void);
 
 void WaitForEventToContinue();
 boolean Request(char *, unsigned int);

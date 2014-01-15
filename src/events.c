@@ -188,13 +188,6 @@ void EventLoop(void)
   	}
       }
     }
-
-    // !!! CHECK THIS:
-    // !!! this may result in "HandleNoEvent()" never being called
-    // !!! (especially due to continuously processed tocuh events)
-    // !!! and therefore toon animations being stopped while events
-    // !!! are being processed (even if they are all thrown away)
-
     else
     {
       /* when playing, display a special mouse pointer inside the playfield */
@@ -213,8 +206,14 @@ void EventLoop(void)
 	playfield_cursor_set = FALSE;
       }
 
+#if 0
       HandleNoEvent();
+#endif
     }
+
+#if 1
+    HandleNoEvent();
+#endif
 
     /* don't use all CPU time when idle; the main loop while playing
        has its own synchronization and is CPU friendly, too */
@@ -1425,7 +1424,13 @@ void HandleNoEvent()
   {
     HandleButton(0, 0, -button_status, button_status);
 
+#if 0
     return;
+#endif
+  }
+  else
+  {
+    HandleJoystick();
   }
 
 #if defined(NETWORK_AVALIABLE)
@@ -1433,7 +1438,28 @@ void HandleNoEvent()
     HandleNetworking();
 #endif
 
-  HandleJoystick();
+  switch (game_status)
+  {
+    case GAME_MODE_MAIN:
+      DrawPreviewLevelAnimation();
+      DoAnimation();
+      break;
+
+    case GAME_MODE_LEVELS:
+    case GAME_MODE_LEVELNR:
+    case GAME_MODE_SETUP:
+    case GAME_MODE_INFO:
+    case GAME_MODE_SCORES:
+      DoAnimation();
+      break;
+
+    case GAME_MODE_EDITOR:
+      HandleLevelEditorIdle();
+      break;
+
+    default:
+      break;
+  }
 }
 
 static int HandleJoystickForAllPlayers()
@@ -1510,18 +1536,20 @@ void HandleJoystick()
       HandleHallOfFame(0, 0, dx, dy, !newbutton);
       break;
 
+#if 0
     case GAME_MODE_EDITOR:
       HandleLevelEditorIdle();
       break;
+#endif
 
     case GAME_MODE_PLAYING:
       if (tape.playing || keyboard)
 	newbutton = ((joy & JOY_BUTTON) != 0);
 
 #if 0
-      if (local_player->LevelSolved_GameEnd && newbutton)
+      if (newbutton && local_player->LevelSolved_GameEnd)
 #else
-      if (AllPlayersGone && newbutton)
+      if (newbutton && AllPlayersGone)
 #endif
       {
 	GameEnd();

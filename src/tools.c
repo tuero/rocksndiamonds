@@ -2957,7 +2957,7 @@ void DrawMiniLevel(int size_x, int size_y, int scroll_x, int scroll_y)
   redraw_mask |= REDRAW_FIELD;
 }
 
-static void DrawPreviewLevelExt(int from_x, int from_y)
+static void DrawPreviewLevelPlayfieldExt(int from_x, int from_y)
 {
   boolean show_level_border = (BorderElement != EL_EMPTY);
   int level_xsize = lev_fieldx + (show_level_border ? 2 : 0);
@@ -3093,7 +3093,7 @@ static void DrawPreviewLevelLabelExt(int mode)
   redraw_mask |= REDRAW_MICROLEVEL;
 }
 
-void DrawPreviewLevel(boolean restart)
+static void DrawPreviewLevelExt(boolean restart)
 {
   static unsigned int scroll_delay = 0;
   static unsigned int label_delay = 0;
@@ -3130,7 +3130,7 @@ void DrawPreviewLevel(boolean restart)
     label_state = 1;
     label_counter = 0;
 
-    DrawPreviewLevelExt(from_x, from_y);
+    DrawPreviewLevelPlayfieldExt(from_x, from_y);
     DrawPreviewLevelLabelExt(label_state);
 
     /* initialize delay counters */
@@ -3232,7 +3232,7 @@ void DrawPreviewLevel(boolean restart)
 	break;
     }
 
-    DrawPreviewLevelExt(from_x, from_y);
+    DrawPreviewLevelPlayfieldExt(from_x, from_y);
   }
 
   /* !!! THIS ALL SUCKS -- SHOULD BE CLEANLY REWRITTEN !!! */
@@ -3277,6 +3277,16 @@ void DrawPreviewLevel(boolean restart)
   }
 
   game_status = last_game_status;	/* restore current game status */
+}
+
+void DrawPreviewLevelInitial()
+{
+  DrawPreviewLevelExt(TRUE);
+}
+
+void DrawPreviewLevelAnimation()
+{
+  DrawPreviewLevelExt(FALSE);
 }
 
 inline void DrawGraphicAnimationExt(DrawBuffer *dst_bitmap, int x, int y,

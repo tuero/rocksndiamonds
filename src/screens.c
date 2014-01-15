@@ -1418,7 +1418,7 @@ void DrawMainMenuExt(int fade_mask, boolean do_fading)
   InitializeMainControls();
 
   DrawCursorAndText_Main(-1, FALSE);
-  DrawPreviewLevel(TRUE);
+  DrawPreviewLevelInitial();
 
   HandleMainMenu(0, 0, 0, 0, MB_MENU_INITIALIZE);
 
@@ -1757,13 +1757,13 @@ void HandleMainMenu_SelectLevel(int step, int direction)
 	     mci->pos_text->font);
 
     LoadLevel(level_nr);
-    DrawPreviewLevel(TRUE);
+    DrawPreviewLevelInitial();
 
     TapeErase();
     LoadTape(level_nr);
     DrawCompleteVideoDisplay();
 
-    /* needed because DrawPreviewLevel() takes some time */
+    /* needed because DrawPreviewLevelInitial() takes some time */
     BackToFront();
     SyncDisplay();
   }
@@ -1926,11 +1926,13 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
     }
   }
 
+#if 0
   if (game_status == GAME_MODE_MAIN)
   {
-    DrawPreviewLevel(FALSE);
+    DrawPreviewLevelAnimation();
     DoAnimation();
   }
+#endif
 }
 
 
@@ -3303,7 +3305,9 @@ void HandleInfoScreen(int mx, int my, int dx, int dy, int button)
   else
     HandleInfoScreen_Main(mx, my, dx, dy, button);
 
+#if 0
   DoAnimation();
+#endif
 }
 
 
@@ -3849,7 +3853,9 @@ void HandleChooseLevelSet(int mx, int my, int dx, int dy, int button)
 {
   HandleChooseTree(mx, my, dx, dy, button, &leveldir_current);
 
+#if 0
   DoAnimation();
+#endif
 }
 
 void DrawChooseLevelNr()
@@ -3920,7 +3926,9 @@ void HandleChooseLevelNr(int mx, int my, int dx, int dy, int button)
   HandleChooseTree(mx, my, dx, dy, button, &leveldir_current);
 #endif
 
+#if 0
   DoAnimation();
+#endif
 }
 
 void DrawHallOfFame(int highlight_position)
@@ -4066,7 +4074,9 @@ void HandleHallOfFame(int mx, int my, int dx, int dy, int button)
   if (game_status == GAME_MODE_SCORES)
     PlayMenuSoundIfLoop();
 
+#if 0
   DoAnimation();
+#endif
 }
 
 
@@ -6182,7 +6192,9 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
   else
     HandleSetupScreen_Generic(mx, my, dx, dy, button);
 
+#if 0
   DoAnimation();
+#endif
 }
 
 void HandleGameActions()

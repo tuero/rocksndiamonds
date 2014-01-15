@@ -1,3 +1,6 @@
+2014-01-15
+	* fixed toons stopping on continuous touch events on Mac OS X
+
 2014-01-14
 	* fixed bug when displaying game envelope with even sized playfield
 	* added graphic configuration options for request (dialog) buttons
