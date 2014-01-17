@@ -1,5 +1,7 @@
 2014-01-17
 	* improved speed of displaying progress when loading levels and artwork
+	* changed fullscreen and window scaling changes in setup menu to have
+	  immediate effect (instead of being effective after leaving setup menu)
 
 2014-01-15
 	* fixed toons stopping on continuous touch events on Mac OS X

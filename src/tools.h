@@ -252,7 +252,7 @@ void PlayMenuMusic();
 void PlaySoundActivating();
 void PlaySoundSelecting();
 
-void ToggleFullscreenIfNeeded();
+void ToggleFullscreenOrChangeWindowScalingIfNeeded();
 void ChangeViewportPropertiesIfNeeded();
 
 #endif	/* TOOLS_H */

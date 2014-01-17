@@ -458,16 +458,16 @@ void HandleWindowEvent(WindowEvent *event)
     int new_window_width  = event->data1;
     int new_window_height = event->data2;
 
-    printf("::: RESIZED from %d, %d to %d, %d\n",
-	   video.window_width, video.window_height,
-	   new_window_width, new_window_height);
-
     // if window size has changed after resizing, calculate new scaling factor
     if (new_window_width  != video.window_width ||
 	new_window_height != video.window_height)
     {
       int new_xpercent = (100 * new_window_width  / video.width);
       int new_ypercent = (100 * new_window_height / video.height);
+
+      printf("::: RESIZED from %d, %d to %d, %d\n",
+	     video.window_width, video.window_height,
+	     new_window_width, new_window_height);
 
       setup.window_scaling_percent = video.window_scaling_percent =
 	MIN(MAX(MIN_WINDOW_SCALING_PERCENT, MIN(new_xpercent, new_ypercent)),
@@ -1112,7 +1112,7 @@ void HandleKey(Key key, int key_status)
     printf("::: %d\n", setup.window_scaling_percent);
 #endif
 
-    ToggleFullscreenIfNeeded();
+    ToggleFullscreenOrChangeWindowScalingIfNeeded();
 
     if (game_status == GAME_MODE_SETUP)
       RedrawSetupScreenAfterFullscreenToggle();
@@ -1121,7 +1121,7 @@ void HandleKey(Key key, int key_status)
   }
 
   if ((key == KSYM_minus || key == KSYM_plus || key == KSYM_0) &&
-      (GetKeyModState() & KMOD_Control) && video.window_scaling_available &&
+      (GetKeyModState() & KMOD_Alt) && video.window_scaling_available &&
       !video.fullscreen_enabled)
   {
     if (key == KSYM_0)
@@ -1135,7 +1135,7 @@ void HandleKey(Key key, int key_status)
     else if (setup.window_scaling_percent > MAX_WINDOW_SCALING_PERCENT)
       setup.window_scaling_percent = MAX_WINDOW_SCALING_PERCENT;
 
-    ToggleFullscreenIfNeeded();
+    ToggleFullscreenOrChangeWindowScalingIfNeeded();
 
     if (game_status == GAME_MODE_SETUP)
       RedrawSetupScreenAfterFullscreenToggle();

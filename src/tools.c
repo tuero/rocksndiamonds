@@ -9099,7 +9099,7 @@ void PlaySoundSelecting()
 #endif
 }
 
-void ToggleFullscreenIfNeeded()
+void ToggleFullscreenOrChangeWindowScalingIfNeeded()
 {
   boolean change_fullscreen = (setup.fullscreen !=
 			       video.fullscreen_enabled);

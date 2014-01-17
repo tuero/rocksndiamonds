@@ -1346,7 +1346,8 @@ void DrawMainMenuExt(int fade_mask, boolean do_fading)
   }
 
   /* needed if last screen was the setup screen and fullscreen state changed */
-  ToggleFullscreenIfNeeded();
+  // (moved to "execSetupGraphics()" to change fullscreen state directly)
+  // ToggleFullscreenOrChangeWindowScalingIfNeeded();
 
   /* leveldir_current may be invalid (level group, parent link) */
   if (!validLevelSeries(leveldir_current))
@@ -4384,6 +4385,9 @@ static void execSetupGraphics()
   setup_mode = SETUP_MODE_GRAPHICS;
 
   DrawSetupScreen();
+
+  // window scaling may have changed at this point
+  ToggleFullscreenOrChangeWindowScalingIfNeeded();
 }
 
 #if !defined(PLATFORM_ANDROID)
@@ -5166,6 +5170,10 @@ static void changeSetupValue(int pos, int dx)
   }
 
   drawSetupValue(pos);
+
+  // fullscreen state may have changed at this point
+  if (setup_info[pos].value == &setup.fullscreen)
+    ToggleFullscreenOrChangeWindowScalingIfNeeded();
 }
 
 static void DrawCursorAndText_Setup(int pos, boolean active)
