@@ -40,13 +40,31 @@ static int fullscreen_xoffset;
 static int fullscreen_yoffset;
 static int video_xoffset;
 static int video_yoffset;
+static boolean limit_screen_updates = FALSE;
+
 
 /* functions from SGE library */
 void sge_Line(SDL_Surface *, Sint16, Sint16, Sint16, Sint16, Uint32);
 
-#if defined(TARGET_SDL2)
+void SDLLimitScreenUpdates(boolean enable)
+{
+  limit_screen_updates = enable;
+}
+
 static void UpdateScreen(SDL_Rect *rect)
 {
+  static unsigned int update_screen_delay = 0;
+  unsigned int update_screen_delay_value = 100;		/* (milliseconds) */
+
+#if 1
+  if (limit_screen_updates &&
+      !DelayReached(&update_screen_delay, update_screen_delay_value))
+    return;
+
+  LimitScreenUpdates(FALSE);
+#endif
+
+#if defined(TARGET_SDL2)
 #if USE_RENDERER
   SDL_Surface *screen = backbuffer->surface;
 
@@ -79,8 +97,14 @@ static void UpdateScreen(SDL_Rect *rect)
   else
     SDL_UpdateWindowSurface(sdl_window);
 #endif
-}
+
+#else	// TARGET_SDL
+  if (rect)
+    SDL_UpdateRects(backbuffer->surface, 1, rect);
+  else
+    SDL_UpdateRect(backbuffer->surface, 0, 0, 0, 0);
 #endif
+}
 
 static void setFullscreenParameters(char *fullscreen_mode_string)
 {
@@ -391,9 +415,9 @@ static SDL_Surface *SDLCreateScreen(DrawBuffer **backbuffer,
 				    boolean fullscreen)
 {
   SDL_Surface *new_surface = NULL;
-  static boolean fullscreen_enabled = FALSE;
 
 #if defined(TARGET_SDL2)
+  static boolean fullscreen_enabled = FALSE;
   int surface_flags_window = SURFACE_FLAGS | SDL_WINDOW_RESIZABLE;
 #if USE_DESKTOP_FULLSCREEN
   int surface_flags_fullscreen = SURFACE_FLAGS | SDL_WINDOW_FULLSCREEN_DESKTOP;
@@ -559,9 +583,11 @@ static SDL_Surface *SDLCreateScreen(DrawBuffer **backbuffer,
   new_surface = SDL_SetVideoMode(width, height, video.depth, surface_flags);
 #endif
 
+#if defined(TARGET_SDL2)
   // store fullscreen state ("video.fullscreen_enabled" may not reflect this!)
   if (new_surface != NULL)
     fullscreen_enabled = fullscreen;
+#endif
 
   return new_surface;
 }
@@ -934,7 +960,10 @@ void SDLCopyArea(Bitmap *src_bitmap, Bitmap *dst_bitmap,
   }
 #else
   if (dst_bitmap == window)
-    SDL_UpdateRect(backbuffer->surface, dst_x, dst_y, width, height);
+  {
+    // SDL_UpdateRect(backbuffer->surface, dst_x, dst_y, width, height);
+    UpdateScreen(&dst_rect);
+  }
 #endif
 }
 
@@ -966,7 +995,10 @@ void SDLFillRectangle(Bitmap *dst_bitmap, int x, int y, int width, int height,
   }
 #else
   if (dst_bitmap == window)
-    SDL_UpdateRect(backbuffer->surface, x, y, width, height);
+  {
+    // SDL_UpdateRect(backbuffer->surface, x, y, width, height);
+    UpdateScreen(&rect);
+  }
 #endif
 }
 
@@ -981,9 +1013,7 @@ void SDLFadeRectangle(Bitmap *bitmap_cross, int x, int y, int width, int height,
   SDL_Surface *surface_screen = backbuffer->surface;
   SDL_Surface *surface_cross = (bitmap_cross ? bitmap_cross->surface : NULL);
   SDL_Rect src_rect, dst_rect;
-#if defined(TARGET_SDL2)
   SDL_Rect dst_rect2;
-#endif
   int src_x = x, src_y = y;
   int dst_x = x, dst_y = y;
   unsigned int time_last, time_current;
@@ -1012,9 +1042,7 @@ void SDLFadeRectangle(Bitmap *bitmap_cross, int x, int y, int width, int height,
   dst_rect.w = width;		/* (ignored) */
   dst_rect.h = height;		/* (ignored) */
 
-#if defined(TARGET_SDL2)
   dst_rect2 = dst_rect;
-#endif
 
   if (initialization_needed)
   {
@@ -1215,7 +1243,8 @@ void SDLFadeRectangle(Bitmap *bitmap_cross, int x, int y, int width, int height,
 	// SDL_UpdateWindowSurfaceRects(sdl_window, &dst_rect2, 1);
 	UpdateScreen(&dst_rect2);
 #else
-	SDL_UpdateRect(surface_screen, dst_x, dst_y, width, height);
+	// SDL_UpdateRect(surface_screen, dst_x, dst_y, width, height);
+	UpdateScreen(&dst_rect2);
 #endif
       }
     }
@@ -1254,7 +1283,8 @@ void SDLFadeRectangle(Bitmap *bitmap_cross, int x, int y, int width, int height,
       // SDL_UpdateWindowSurfaceRects(sdl_window, &dst_rect, 1);
       UpdateScreen(&dst_rect);
 #else
-      SDL_UpdateRect(surface_screen, dst_x, dst_y, width, height);
+      // SDL_UpdateRect(surface_screen, dst_x, dst_y, width, height);
+      UpdateScreen(&dst_rect);
 #endif
 #else
       SDL_Flip(surface_screen);

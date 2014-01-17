@@ -1317,6 +1317,8 @@ void DrawMainMenuExt(int fade_mask, boolean do_fading)
   static LevelDirTree *leveldir_last_valid = NULL;
   boolean levelset_has_changed = FALSE;
 
+  LimitScreenUpdates(FALSE);
+
   FadeSetLeaveScreen();
 
   /* do not fade out here -- function may continue and fade on editor screen */

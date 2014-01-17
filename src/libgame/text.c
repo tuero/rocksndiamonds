@@ -210,8 +210,44 @@ int maxWordLengthInString(char *text)
 
 void DrawInitTextExt(char *text, int ypos, int font_nr, boolean force)
 {
+#if 1
+#if 0
   static unsigned int progress_delay = 0;
   unsigned int progress_delay_value = 100;	/* (in milliseconds) */
+#endif
+
+  // LimitScreenUpdates(TRUE);	// (ignore "force" for now)
+  // LimitScreenUpdates(!force);
+  LimitScreenUpdates(TRUE);
+
+  UPDATE_BUSY_STATE();
+
+#if 0
+  if (!force && !DelayReached(&progress_delay, progress_delay_value))
+    return;
+#endif
+
+  if (window != NULL &&
+      gfx.draw_init_text &&
+      gfx.num_fonts > 0 &&
+      gfx.font_bitmap_info[font_nr].bitmap != NULL)
+  {
+    int x = (video.width - getTextWidth(text, font_nr)) / 2;
+    int y = ypos;
+    int width = video.width;
+    int height = getFontHeight(font_nr);
+
+    ClearRectangle(drawto, 0, y, width, height);
+    DrawTextExt(drawto, x, y, text, font_nr, BLIT_OPAQUE);
+
+    BlitBitmap(drawto, window, 0, 0, video.width, video.height, 0, 0);
+  }
+#else
+  static unsigned int progress_delay = 0;
+  unsigned int progress_delay_value = 100;	/* (in milliseconds) */
+
+  // LimitScreenUpdates(TRUE);	// (ignore "force" for now)
+  LimitScreenUpdates(!force);
 
   UPDATE_BUSY_STATE();
 
@@ -234,9 +270,16 @@ void DrawInitTextExt(char *text, int ypos, int font_nr, boolean force)
     /* this makes things significantly faster than directly drawing to window */
     BlitBitmap(drawto, window, 0, y, width, height, 0, y);
   }
+#endif
 }
 
 void DrawInitText(char *text, int ypos, int font_nr)
+{
+  // DrawInitTextExt(text, ypos, font_nr, TRUE);
+  DrawInitTextExt(text, ypos, font_nr, FALSE);
+}
+
+void DrawInitTextAlways(char *text, int ypos, int font_nr)
 {
   DrawInitTextExt(text, ypos, font_nr, TRUE);
 }

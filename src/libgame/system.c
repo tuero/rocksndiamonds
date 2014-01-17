@@ -415,6 +415,13 @@ inline static void sysCopyArea(Bitmap *src_bitmap, Bitmap *dst_bitmap,
 #endif
 }
 
+void LimitScreenUpdates(boolean enable)
+{
+#if defined(TARGET_SDL)
+  SDLLimitScreenUpdates(enable);
+#endif
+}
+
 void InitVideoDisplay(void)
 {
 #if defined(TARGET_SDL)

@@ -5593,14 +5593,15 @@ void InitGfx()
   font_height = getFontHeight(FC_RED);
 
 #if 1
-  DrawInitText(getWindowTitleString(), 20, FC_YELLOW);
+  DrawInitTextAlways(getWindowTitleString(), 20, FC_YELLOW);
 #else
-  DrawInitText(getProgramInitString(), 20, FC_YELLOW);
+  DrawInitTextAlways(getProgramInitString(), 20, FC_YELLOW);
 #endif
-  DrawInitText(PROGRAM_COPYRIGHT_STRING, 50, FC_RED);
-  DrawInitText(PROGRAM_WEBSITE_STRING, WIN_YSIZE - 20 - font_height, FC_RED);
+  DrawInitTextAlways(PROGRAM_COPYRIGHT_STRING, 50, FC_RED);
+  DrawInitTextAlways(PROGRAM_WEBSITE_STRING, WIN_YSIZE - 20 - font_height,
+		     FC_RED);
 
-  DrawInitText("Loading graphics", 120, FC_GREEN);
+  DrawInitTextAlways("Loading graphics", 120, FC_GREEN);
 
 #if 1
 #if 1
@@ -6216,6 +6217,8 @@ void ReloadCustomArtwork(int force_reload)
 #endif
 
   print_timestamp_done("ReloadCustomArtwork");
+
+  LimitScreenUpdates(FALSE);
 }
 
 void KeyboardAutoRepeatOffUnlessAutoplay()

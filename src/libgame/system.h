@@ -1276,6 +1276,8 @@ void SetWindowBackgroundBitmap(Bitmap *);
 void SetMainBackgroundBitmap(Bitmap *);
 void SetDoorBackgroundBitmap(Bitmap *);
 
+void LimitScreenUpdates(boolean);
+
 void InitVideoDisplay(void);
 void CloseVideoDisplay(void);
 void InitVideoBuffer(int, int, int, boolean);

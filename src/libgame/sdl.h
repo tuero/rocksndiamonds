@@ -442,6 +442,7 @@ void SDLSetWindowFullscreen(boolean);
 void SDLRedrawWindow();
 #endif
 
+void SDLLimitScreenUpdates(boolean);
 void SDLInitVideoDisplay(void);
 void SDLInitVideoBuffer(DrawBuffer **, DrawWindow **, boolean);
 boolean SDLSetVideoMode(DrawBuffer **, boolean);
