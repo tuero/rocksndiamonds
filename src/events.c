@@ -514,6 +514,279 @@ void HandleWindowEvent(WindowEvent *event)
   }
 }
 
+#if 1
+
+#define NUM_TOUCH_FINGERS		3
+
+static struct
+{
+  SDL_FingerID finger_id;
+  int counter;
+  Key key;
+} touch_info[NUM_TOUCH_FINGERS];
+
+void HandleFingerEvent(FingerEvent *event)
+{
+  static Key motion_key_x = KSYM_UNDEFINED;
+  static Key motion_key_y = KSYM_UNDEFINED;
+  static Key button_key = KSYM_UNDEFINED;
+  static float motion_x1, motion_y1;
+  static float button_x1, button_y1;
+  static SDL_FingerID motion_id = 0;
+  static SDL_FingerID button_id = 0;
+  int trigger_distance_percent = 1;	// percent of touchpad width/height
+  float trigger_distance = (float)trigger_distance_percent / 100;
+  float event_x = event->x;
+  float event_y = event->y;
+
+#if 1
+#if DEBUG_EVENTS
+  Error(ERR_DEBUG, "FINGER EVENT: finger was %s, touch ID %lld, finger ID %lld, x/y %f/%f, dx/dy %f/%f, pressure %f",
+	event->type == EVENT_FINGERPRESS ? "pressed" :
+	event->type == EVENT_FINGERRELEASE ? "released" : "moved",
+	event->touchId,
+	event->fingerId,
+	event->x, event->y,
+	event->dx, event->dy,
+	event->pressure);
+#endif
+#endif
+
+  if (game_status != GAME_MODE_PLAYING)
+    return;
+
+  if (1)
+  {
+    int key_status = (event->type == EVENT_FINGERRELEASE ? KEY_RELEASED :
+		      KEY_PRESSED);
+#if 1
+    Key key = (event->x < 1.0 / 3.0 ?
+	       (event->y < 1.0 / 2.0 ? setup.input[0].key.snap :
+		setup.input[0].key.drop) :
+	       event->x > 2.0 / 3.0 ?
+	       (event->y < 1.0 / 3.0 ? setup.input[0].key.up :
+		event->y > 2.0 / 3.0 ? setup.input[0].key.down :
+		event->x < 5.0 / 6.0 ? setup.input[0].key.left :
+		setup.input[0].key.right) :
+	       KSYM_UNDEFINED);
+#else
+    Key key = (event->y < 1.0 / 3.0 ? setup.input[0].key.up :
+	       event->y > 2.0 / 3.0 ? setup.input[0].key.down :
+	       event->x < 1.0 / 3.0 ? setup.input[0].key.left :
+	       event->x > 2.0 / 3.0 ? setup.input[0].key.right :
+	       setup.input[0].key.snap);
+#endif
+    int i;
+
+    // check if we already know this touch event's finger id
+    for (i = 0; i < NUM_TOUCH_FINGERS; i++)
+    {
+      if (touch_info[i].finger_id == event->fingerId)
+	break;
+    }
+
+    if (i >= NUM_TOUCH_FINGERS)
+    {
+      if (key_status == KEY_PRESSED)
+      {
+	int oldest_pos = 0, oldest_counter = touch_info[0].counter;
+
+	// unknown finger id -- get new, empty slot, if available
+	for (i = 0; i < NUM_TOUCH_FINGERS; i++)
+	{
+	  if (touch_info[i].counter < oldest_counter)
+	  {
+	    oldest_pos = i;
+	    oldest_counter = touch_info[i].counter;
+	  }
+
+	  if (touch_info[i].finger_id == 0)
+	    break;
+	}
+
+	if (i >= NUM_TOUCH_FINGERS)
+	{
+	  // all slots allocated -- use oldest slot
+	  i = oldest_pos;
+	}
+      }
+      else
+      {
+	// release of previously unknown key (should not happen)
+
+	if (key != KSYM_UNDEFINED)
+	  HandleKey(key, KEY_RELEASED);
+      }
+    }
+
+    if (i < NUM_TOUCH_FINGERS)
+    {
+      if (key_status == KEY_PRESSED)
+      {
+	if (touch_info[i].key != key)
+	{
+	  if (touch_info[i].key != KSYM_UNDEFINED)
+	    HandleKey(touch_info[i].key, KEY_RELEASED);
+
+	  if (key != KSYM_UNDEFINED)
+	    HandleKey(key, KEY_PRESSED);
+	}
+
+	touch_info[i].finger_id = event->fingerId;
+	touch_info[i].counter = Counter();
+	touch_info[i].key = key;
+      }
+      else
+      {
+	if (touch_info[i].key != KSYM_UNDEFINED)
+	  HandleKey(touch_info[i].key, KEY_RELEASED);
+
+	touch_info[i].finger_id = 0;
+	touch_info[i].counter = 0;
+	touch_info[i].key = 0;
+      }
+    }
+
+    Error(ERR_DEBUG, "=> key == %d, key_status == %d", key, key_status);
+
+    return;
+  }
+
+  if (event->type == EVENT_FINGERPRESS)
+  {
+    if (event_x > 1.0 / 3.0)
+    {
+      // motion area
+
+      motion_id = event->fingerId;
+
+      motion_x1 = event_x;
+      motion_y1 = event_y;
+
+      motion_key_x = KSYM_UNDEFINED;
+      motion_key_y = KSYM_UNDEFINED;
+
+      Error(ERR_DEBUG, "---------- MOVE STARTED (WAIT) ----------");
+    }
+    else
+    {
+      // button area
+
+      button_id = event->fingerId;
+
+      button_x1 = event_x;
+      button_y1 = event_y;
+
+      button_key = setup.input[0].key.snap;
+
+      HandleKey(button_key, KEY_PRESSED);
+
+      Error(ERR_DEBUG, "---------- SNAP STARTED ----------");
+    }
+  }
+  else if (event->type == EVENT_FINGERRELEASE)
+  {
+    if (event->fingerId == motion_id)
+    {
+      motion_id = 0;
+
+      if (motion_key_x != KSYM_UNDEFINED)
+	HandleKey(motion_key_x, KEY_RELEASED);
+      if (motion_key_y != KSYM_UNDEFINED)
+	HandleKey(motion_key_y, KEY_RELEASED);
+
+      motion_key_x = KSYM_UNDEFINED;
+      motion_key_y = KSYM_UNDEFINED;
+
+      Error(ERR_DEBUG, "---------- MOVE STOPPED ----------");
+    }
+    else if (event->fingerId == button_id)
+    {
+      button_id = 0;
+
+      if (button_key != KSYM_UNDEFINED)
+	HandleKey(button_key, KEY_RELEASED);
+
+      button_key = KSYM_UNDEFINED;
+
+      Error(ERR_DEBUG, "---------- SNAP STOPPED ----------");
+    }
+  }
+  else if (event->type == EVENT_FINGERMOTION)
+  {
+    if (event->fingerId == motion_id)
+    {
+      float distance_x = ABS(event_x - motion_x1);
+      float distance_y = ABS(event_y - motion_y1);
+      Key new_motion_key_x = (event_x < motion_x1 ? setup.input[0].key.left :
+			      event_x > motion_x1 ? setup.input[0].key.right :
+			      KSYM_UNDEFINED);
+      Key new_motion_key_y = (event_y < motion_y1 ? setup.input[0].key.up :
+			      event_y > motion_y1 ? setup.input[0].key.down :
+			      KSYM_UNDEFINED);
+
+      if (distance_x < trigger_distance / 2 ||
+	  distance_x < distance_y)
+	new_motion_key_x = KSYM_UNDEFINED;
+
+      if (distance_y < trigger_distance / 2 ||
+	  distance_y < distance_x)
+	new_motion_key_y = KSYM_UNDEFINED;
+
+      if (distance_x > trigger_distance ||
+	  distance_y > trigger_distance)
+      {
+	if (new_motion_key_x != motion_key_x)
+	{
+	  if (motion_key_x != KSYM_UNDEFINED)
+	    HandleKey(motion_key_x, KEY_RELEASED);
+	  if (new_motion_key_x != KSYM_UNDEFINED)
+	    HandleKey(new_motion_key_x, KEY_PRESSED);
+	}
+
+	if (new_motion_key_y != motion_key_y)
+	{
+	  if (motion_key_y != KSYM_UNDEFINED)
+	    HandleKey(motion_key_y, KEY_RELEASED);
+	  if (new_motion_key_y != KSYM_UNDEFINED)
+	    HandleKey(new_motion_key_y, KEY_PRESSED);
+	}
+
+	motion_x1 = event_x;
+	motion_y1 = event_y;
+
+	motion_key_x = new_motion_key_x;
+	motion_key_y = new_motion_key_y;
+
+	Error(ERR_DEBUG, "---------- MOVE STARTED (MOVE) ----------");
+      }
+    }
+    else if (event->fingerId == button_id)
+    {
+      float distance_x = ABS(event_x - button_x1);
+      float distance_y = ABS(event_y - button_y1);
+
+      if (distance_x < trigger_distance / 2 &&
+	  distance_y > trigger_distance)
+      {
+	if (button_key == setup.input[0].key.snap)
+	  HandleKey(button_key, KEY_RELEASED);
+
+	button_x1 = event_x;
+	button_y1 = event_y;
+
+	button_key = setup.input[0].key.drop;
+
+	HandleKey(button_key, KEY_PRESSED);
+
+	Error(ERR_DEBUG, "---------- DROP STARTED ----------");
+      }
+    }
+  }
+}
+
+#else
+
 void HandleFingerEvent(FingerEvent *event)
 {
 #if 0
@@ -597,6 +870,8 @@ void HandleFingerEvent(FingerEvent *event)
   }
 #endif
 }
+
+#endif
 
 static boolean checkTextInputKeyModState()
 {

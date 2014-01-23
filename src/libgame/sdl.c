@@ -54,7 +54,7 @@ void SDLLimitScreenUpdates(boolean enable)
 static void UpdateScreen(SDL_Rect *rect)
 {
   static unsigned int update_screen_delay = 0;
-  unsigned int update_screen_delay_value = 100;		/* (milliseconds) */
+  unsigned int update_screen_delay_value = 20;		/* (milliseconds) */
 
 #if 1
   if (limit_screen_updates &&
