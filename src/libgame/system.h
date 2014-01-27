@@ -60,6 +60,13 @@
 #define MAX_WINDOW_SCALING_PERCENT	300
 #define STEP_WINDOW_SCALING_PERCENT	10
 
+/* values for window scaling quality */
+#define SCALING_QUALITY_NEAREST		"nearest"
+#define SCALING_QUALITY_LINEAR		"linear"
+#define SCALING_QUALITY_BEST		"best"
+
+#define SCALING_QUALITY_DEFAULT		SCALING_QUALITY_LINEAR
+
 /* default input keys */
 #define DEFAULT_KEY_LEFT		KSYM_Left
 #define DEFAULT_KEY_RIGHT		KSYM_Right
@@ -743,6 +750,7 @@ struct VideoSystemInfo
 
   boolean window_scaling_available;
   int window_scaling_percent;
+  char *window_scaling_quality;
 };
 
 struct AudioSystemInfo
@@ -953,6 +961,7 @@ struct SetupInfo
   boolean fullscreen;
   char *fullscreen_mode;
   int window_scaling_percent;
+  char *window_scaling_quality;
   boolean ask_on_escape;
   boolean ask_on_escape_editor;
   boolean quick_switch;

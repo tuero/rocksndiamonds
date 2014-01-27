@@ -2465,12 +2465,12 @@ void DrawMiniElementOrWall(int sx, int sy, int scroll_x, int scroll_y)
     DrawMiniGraphic(sx, sy, el2edimg(getBorderElement(x, y)));
 }
 
-void DrawEnvelopeBackground(int envelope_nr, int startx, int starty,
-			    int x, int y, int xsize, int ysize, int font_nr)
+void DrawEnvelopeBackground(int graphic, int startx, int starty,
+			    int x, int y, int xsize, int ysize, int font_nr,
+			    int line_spacing)
 {
   int font_width  = getFontWidth(font_nr);
-  int font_height = getFontHeight(font_nr);
-  int graphic = IMG_BACKGROUND_ENVELOPE_1 + envelope_nr;
+  int font_height = getFontHeight(font_nr) + line_spacing;
   Bitmap *src_bitmap;
   int src_x, src_y;
   int dst_x = SX + startx + x * font_width;
@@ -2549,8 +2549,10 @@ void AnimateEnvelope(int envelope_nr, int anim_mode, int action)
 
     SetDrawtoField(DRAW_BACKBUFFER);
 
-    for (yy = 0; yy < ysize; yy++) for (xx = 0; xx < xsize; xx++)
-      DrawEnvelopeBackground(envelope_nr, sx,sy, xx,yy, xsize, ysize, font_nr);
+    for (yy = 0; yy < ysize; yy++)
+      for (xx = 0; xx < xsize; xx++)
+	DrawEnvelopeBackground(graphic, sx,sy, xx,yy, xsize, ysize,
+			       font_nr, 0);
 
 #if 1
     DrawTextBuffer(SX + sx + font_width, SY + sy + font_height,
@@ -2571,19 +2573,23 @@ void AnimateEnvelope(int envelope_nr, int anim_mode, int action)
   }
 }
 
-void AnimateEnvelopeDoor(char *text, int anim_mode, int action)
+void AnimateEnvelopeRequest(char *text, int anim_mode, int action)
 {
-#if 1
+#if 0
   int envelope_nr = 0;
 #endif
+#if 1
+  int graphic = IMG_BACKGROUND_REQUEST;
+#else
   int graphic = IMG_BACKGROUND_ENVELOPE_1 + envelope_nr;
+#endif
   Bitmap *src_bitmap = graphic_info[graphic].bitmap;
   int mask_mode = (src_bitmap != NULL ? BLIT_MASKED : BLIT_ON_BACKGROUND);
   boolean ffwd_delay = (tape.playing && tape.fast_forward);
   boolean no_delay = (tape.warp_forward);
   unsigned int anim_delay = 0;
   int frame_delay_value = (ffwd_delay ? FfwdFrameDelay : GameFrameDelay);
-  int anim_delay_value = (no_delay ? 0 : frame_delay_value);
+  int anim_delay_value = (no_delay ? 0 : frame_delay_value + 500 * 0);
 #if 1
   int max_word_len = maxWordLengthInString(text);
   int font_nr = (max_word_len > 7 ? FONT_TEXT_1 : FONT_TEXT_2);
@@ -2592,11 +2598,13 @@ void AnimateEnvelopeDoor(char *text, int anim_mode, int action)
 #endif
   int font_width = getFontWidth(font_nr);
   int font_height = getFontHeight(font_nr);
+  int line_spacing = 2 * 1;
 #if 1
 
 #if 1
   int max_xsize = DXSIZE / font_width;
-  int max_ysize = DYSIZE / font_height;
+  // int max_ysize = DYSIZE / font_height;
+  int max_ysize = DYSIZE / (font_height + line_spacing);
 #else
   int max_xsize = 7;	/* tools.c: MAX_REQUEST_LINE_FONT1_LEN == 7 */
   int max_ysize = 13;	/* tools.c: MAX_REQUEST_LINES == 13 */
@@ -2667,7 +2675,8 @@ void AnimateEnvelopeDoor(char *text, int anim_mode, int action)
     int xsize = (action == ACTION_CLOSING ? xend - (x - xstart) : x) + 2;
     int ysize = (action == ACTION_CLOSING ? yend - (y - ystart) : y) + 2;
     int sx = (SXSIZE - xsize * font_width)  / 2;
-    int sy = (SYSIZE - ysize * font_height) / 2;
+    // int sy = (SYSIZE - ysize * font_height) / 2;
+    int sy = (SYSIZE - ysize * (font_height + line_spacing)) / 2;
     int xx, yy;
 
 #if 1
@@ -2684,15 +2693,17 @@ void AnimateEnvelopeDoor(char *text, int anim_mode, int action)
     SetDrawtoField(DRAW_BACKBUFFER);
 #endif
 
-    for (yy = 0; yy < ysize; yy++) for (xx = 0; xx < xsize; xx++)
-      DrawEnvelopeBackground(envelope_nr, sx,sy, xx,yy, xsize, ysize, font_nr);
+    for (yy = 0; yy < ysize; yy++)
+      for (xx = 0; xx < xsize; xx++)
+	DrawEnvelopeBackground(graphic, sx,sy, xx,yy, xsize, ysize,
+			       font_nr, line_spacing);
 
 #if 1
 
 #if 1
     DrawTextBuffer(SX + sx + font_width, SY + sy + font_height + 8,
 		   text_copy, font_nr, max_xsize,
-		   xsize - 2, ysize - 2, 2, mask_mode,
+		   xsize - 2, ysize - 2, line_spacing, mask_mode,
 		   FALSE, TRUE, FALSE);
 #else
     DrawTextBuffer(SX + sx + font_width, SY + sy + font_height,
@@ -2710,6 +2721,7 @@ void AnimateEnvelopeDoor(char *text, int anim_mode, int action)
 
     /* copy request gadgets to door backbuffer */
 #if 1
+    /*
     if ((ysize - 2) > 13)
       BlitBitmap(bitmap_db_door, drawto,
 		 DOOR_GFX_PAGEX1 + (DXSIZE - (xsize - 2) * font_width) / 2,
@@ -2718,6 +2730,15 @@ void AnimateEnvelopeDoor(char *text, int anim_mode, int action)
 		 (ysize - 2 - 13) * font_height,
 		 SX + sx + font_width,
 		 SY + sy + font_height * (1 + 13));
+    */
+    if ((ysize - 2) > 13)
+      BlitBitmap(bitmap_db_door, drawto,
+		 DOOR_GFX_PAGEX1 + (DXSIZE - (xsize - 2) * font_width) / 2,
+		 DOOR_GFX_PAGEY1 + 11 * (font_height + line_spacing * 0),
+		 (xsize - 2) * font_width,
+		 (ysize - 2 - 13) * (font_height + line_spacing),
+		 SX + sx + font_width,
+		 SY + sy + (font_height + line_spacing) * (1 + 13));
 #else
     if ((ysize - 2) > 13)
       BlitBitmap(bitmap_db_door, drawto,
@@ -2795,17 +2816,23 @@ void ShowEnvelope(int envelope_nr)
   BackToFront();
 }
 
-void ShowEnvelopeDoor(char *text, int action)
+void ShowEnvelopeRequest(char *text, int action)
 {
 #if 1
   int last_game_status = game_status;	/* save current game status */
   // int last_draw_background_mask = gfx.draw_background_mask;
-  int envelope_nr = 0;
 #endif
+#if 1
+  int graphic = IMG_BACKGROUND_REQUEST;
+  int sound_opening = SND_REQUEST_OPENING;
+  int sound_closing = SND_REQUEST_CLOSING;
+#else
+  int envelope_nr = 0;
   int element = EL_ENVELOPE_1 + envelope_nr;
   int graphic = IMG_BACKGROUND_ENVELOPE_1 + envelope_nr;
   int sound_opening = element_info[element].sound[ACTION_OPENING];
   int sound_closing = element_info[element].sound[ACTION_CLOSING];
+#endif
 #if 0
   boolean ffwd_delay = (tape.playing && tape.fast_forward);
   boolean no_delay = (tape.warp_forward);
@@ -2852,9 +2879,9 @@ void ShowEnvelopeDoor(char *text, int action)
     PlayMenuSoundStereo(sound_opening, SOUND_MIDDLE);
 
     if (anim_mode == ANIM_DEFAULT)
-      AnimateEnvelopeDoor(text, ANIM_DEFAULT, ACTION_OPENING);
+      AnimateEnvelopeRequest(text, ANIM_DEFAULT, ACTION_OPENING);
 
-    AnimateEnvelopeDoor(text, main_anim_mode, ACTION_OPENING);
+    AnimateEnvelopeRequest(text, main_anim_mode, ACTION_OPENING);
 
 #if 0
     if (tape.playing)
@@ -2868,10 +2895,10 @@ void ShowEnvelopeDoor(char *text, int action)
     PlayMenuSoundStereo(sound_closing, SOUND_MIDDLE);
 
     if (anim_mode != ANIM_NONE)
-      AnimateEnvelopeDoor(text, main_anim_mode, ACTION_CLOSING);
+      AnimateEnvelopeRequest(text, main_anim_mode, ACTION_CLOSING);
 
     if (anim_mode == ANIM_DEFAULT)
-      AnimateEnvelopeDoor(text, ANIM_DEFAULT, ACTION_CLOSING);
+      AnimateEnvelopeRequest(text, ANIM_DEFAULT, ACTION_CLOSING);
   }
 
   game.envelope_active = FALSE;
@@ -3886,8 +3913,8 @@ boolean Request(char *text, unsigned int req_state)
   char *text_ptr;
   int i;
 
-#if 1
-  global.use_envelope_request = 0;
+#if 0
+  global.use_envelope_request = 1;
 #endif
 
 #if 1
@@ -4048,7 +4075,7 @@ boolean Request(char *text, unsigned int req_state)
 #if 1
   if (global.use_envelope_request)
   {
-    ShowEnvelopeDoor(text, ACTION_OPENING);
+    ShowEnvelopeRequest(text, ACTION_OPENING);
 
     for (i = 0; i < NUM_TOOL_BUTTONS; i++)
     {
@@ -4269,7 +4296,7 @@ boolean Request(char *text, unsigned int req_state)
 
 #if 1
   if (global.use_envelope_request)
-    ShowEnvelopeDoor(text, ACTION_CLOSING);
+    ShowEnvelopeRequest(text, ACTION_CLOSING);
 #endif
 
 #if 1

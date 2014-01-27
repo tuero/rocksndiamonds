@@ -255,6 +255,7 @@ void SDLInitVideoBuffer(DrawBuffer **backbuffer, DrawWindow **window,
 #endif
 
   video.window_scaling_percent = setup.window_scaling_percent;
+  video.window_scaling_quality = setup.window_scaling_quality;
 
 #if defined(TARGET_SDL2)
   int num_displays = SDL_GetNumVideoDisplays();
@@ -520,7 +521,8 @@ static SDL_Surface *SDLCreateScreen(DrawBuffer **backbuffer,
     if (sdl_renderer != NULL)
     {
       SDL_RenderSetLogicalSize(sdl_renderer, width, height);
-      SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
+      // SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
+      SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, setup.window_scaling_quality);
 
       sdl_texture = SDL_CreateTexture(sdl_renderer,
 				      SDL_PIXELFORMAT_ARGB8888,
@@ -794,6 +796,7 @@ boolean SDLSetVideoMode(DrawBuffer **backbuffer, boolean fullscreen)
 
       video.fullscreen_enabled = FALSE;
       video.window_scaling_percent = setup.window_scaling_percent;
+      video.window_scaling_quality = setup.window_scaling_quality;
 
       success = TRUE;
     }
@@ -844,6 +847,30 @@ void SDLSetWindowScaling(int window_scaling_percent)
   video.window_scaling_percent = window_scaling_percent;
   video.window_width  = new_window_width;
   video.window_height = new_window_height;
+}
+
+void SDLSetWindowScalingQuality(char *window_scaling_quality)
+{
+  if (sdl_texture == NULL)
+    return;
+
+  SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, window_scaling_quality);
+
+  SDL_Texture *new_texture = SDL_CreateTexture(sdl_renderer,
+					       SDL_PIXELFORMAT_ARGB8888,
+					       SDL_TEXTUREACCESS_STREAMING,
+					       video.width, video.height);
+
+  if (new_texture != NULL)
+  {
+    SDL_DestroyTexture(sdl_texture);
+
+    sdl_texture = new_texture;
+
+    SDLRedrawWindow();
+  }
+
+  video.window_scaling_quality = window_scaling_quality;
 }
 
 void SDLSetWindowFullscreen(boolean fullscreen)

@@ -5027,7 +5027,7 @@ static void InitGlobal()
   global.fading_type = TYPE_ENTER_MENU;
 #endif
 
-  global.use_envelope_request = FALSE;	/* !!! MOVE TO ARTWORK CONFIG !!! */
+  global.use_envelope_request = FALSE;
 }
 
 void Execute_Command(char *command)

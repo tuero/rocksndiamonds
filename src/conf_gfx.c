@@ -5287,6 +5287,14 @@ struct ConfigInfo image_config[] =
   { "background.envelope_4.anim_mode",		"default"		},
   { "background.envelope_4.draw_masked",	"false"			},
 
+  { "background.request",			"RocksScreen.png"	},
+  { "background.request.x",			"562"			},
+  { "background.request.y",			"56"			},
+  { "background.request.width",			"108"			},
+  { "background.request.height",		"288"			},
+  { "background.request.anim_mode",		"default"		},
+  { "background.request.draw_masked",		"false"			},
+
   { "titlescreen_initial_1",			UNDEFINED_FILENAME	},
   { "titlescreen_initial_2",			UNDEFINED_FILENAME	},
   { "titlescreen_initial_3",			UNDEFINED_FILENAME	},
@@ -6716,6 +6724,8 @@ struct ConfigInfo image_config[] =
   { "request.button.player_4.y",		"230"			},
   { "request.button.player_4.draw_player",	"true"			},
   { "request.button.player_4.tile_size",	"16"			},
+
+  { "global.use_envelope_request",		"false"			},
 
   { "game.forced_scroll_delay_value",		"-1"			},
   { "game.use_native_emc_graphics_engine",	"false"			},

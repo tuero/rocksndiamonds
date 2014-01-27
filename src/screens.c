@@ -60,17 +60,18 @@
 
 /* sub-screens on the setup screen (specific) */
 #define SETUP_MODE_CHOOSE_GAME_SPEED	15
-#define SETUP_MODE_CHOOSE_SCREEN_MODE	16
-#define SETUP_MODE_CHOOSE_WINDOW_SIZE	17
-#define SETUP_MODE_CHOOSE_SCROLL_DELAY	18
-#define SETUP_MODE_CHOOSE_GRAPHICS	19
-#define SETUP_MODE_CHOOSE_SOUNDS	20
-#define SETUP_MODE_CHOOSE_MUSIC		21
-#define SETUP_MODE_CHOOSE_VOLUME_SIMPLE	22
-#define SETUP_MODE_CHOOSE_VOLUME_LOOPS	23
-#define SETUP_MODE_CHOOSE_VOLUME_MUSIC	24
+#define SETUP_MODE_CHOOSE_SCROLL_DELAY	16
+#define SETUP_MODE_CHOOSE_SCREEN_MODE	17
+#define SETUP_MODE_CHOOSE_WINDOW_SIZE	18
+#define SETUP_MODE_CHOOSE_SCALING_TYPE	19
+#define SETUP_MODE_CHOOSE_GRAPHICS	20
+#define SETUP_MODE_CHOOSE_SOUNDS	21
+#define SETUP_MODE_CHOOSE_MUSIC		22
+#define SETUP_MODE_CHOOSE_VOLUME_SIMPLE	23
+#define SETUP_MODE_CHOOSE_VOLUME_LOOPS	24
+#define SETUP_MODE_CHOOSE_VOLUME_MUSIC	25
 
-#define MAX_SETUP_MODES			25
+#define MAX_SETUP_MODES			26
 
 /* for input setup functions */
 #define SETUPINPUT_SCREEN_POS_START	0
@@ -180,6 +181,9 @@ static TreeInfo *screen_mode_current = NULL;
 static TreeInfo *window_sizes = NULL;
 static TreeInfo *window_size_current = NULL;
 
+static TreeInfo *scaling_types = NULL;
+static TreeInfo *scaling_type_current = NULL;
+
 static TreeInfo *scroll_delays = NULL;
 static TreeInfo *scroll_delay_current = NULL;
 
@@ -218,6 +222,19 @@ static struct
   {	300,	"300 %"				},
 
   {	-1,	NULL				},
+};
+
+static struct
+{
+  char *value;
+  char *text;
+} scaling_types_list[] =
+{
+  {	SCALING_QUALITY_NEAREST, "None"		},
+  {	SCALING_QUALITY_LINEAR,	 "Linear"	},
+  {	SCALING_QUALITY_BEST,	 "Anisotropic"	},
+
+  {	NULL,			 NULL		},
 };
 
 static struct
@@ -3620,11 +3637,12 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
     }
     else if (game_status == GAME_MODE_SETUP)
     {
-      if (setup_mode == SETUP_MODE_CHOOSE_GAME_SPEED)
+      if (setup_mode == SETUP_MODE_CHOOSE_GAME_SPEED ||
+	  setup_mode == SETUP_MODE_CHOOSE_SCROLL_DELAY)
 	execSetupGame();
       else if (setup_mode == SETUP_MODE_CHOOSE_SCREEN_MODE ||
 	       setup_mode == SETUP_MODE_CHOOSE_WINDOW_SIZE ||
-	       setup_mode == SETUP_MODE_CHOOSE_SCROLL_DELAY)
+	       setup_mode == SETUP_MODE_CHOOSE_SCALING_TYPE)
 	execSetupGraphics();
       else if (setup_mode == SETUP_MODE_CHOOSE_VOLUME_SIMPLE ||
 	       setup_mode == SETUP_MODE_CHOOSE_VOLUME_LOOPS ||
@@ -3815,11 +3833,12 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
 
 	if (game_status == GAME_MODE_SETUP)
 	{
-	  if (setup_mode == SETUP_MODE_CHOOSE_GAME_SPEED)
+	  if (setup_mode == SETUP_MODE_CHOOSE_GAME_SPEED ||
+	      setup_mode == SETUP_MODE_CHOOSE_SCROLL_DELAY)
 	    execSetupGame();
 	  else if (setup_mode == SETUP_MODE_CHOOSE_SCREEN_MODE ||
 		   setup_mode == SETUP_MODE_CHOOSE_WINDOW_SIZE ||
-		   setup_mode == SETUP_MODE_CHOOSE_SCROLL_DELAY)
+		   setup_mode == SETUP_MODE_CHOOSE_SCALING_TYPE)
 	    execSetupGraphics();
 	  else if (setup_mode == SETUP_MODE_CHOOSE_VOLUME_SIMPLE ||
 		   setup_mode == SETUP_MODE_CHOOSE_VOLUME_LOOPS ||
@@ -4092,6 +4111,7 @@ static int num_setup_info;
 
 static char *screen_mode_text;
 static char *window_size_text;
+static char *scaling_type_text;
 static char *scroll_delay_text;
 static char *game_speed_text;
 static char *graphics_set_name;
@@ -4108,7 +4128,7 @@ static void execSetupMain()
   DrawSetupScreen();
 }
 
-static void execSetupGame()
+static void execSetupGame_setGameSpeeds()
 {
   if (game_speeds == NULL)
   {
@@ -4156,6 +4176,62 @@ static void execSetupGame()
 
   /* needed for displaying game speed text instead of identifier */
   game_speed_text = game_speed_current->name;
+}
+
+static void execSetupGame_setScrollDelays()
+{
+  if (scroll_delays == NULL)
+  {
+    int i;
+
+    for (i = 0; scroll_delays_list[i].value != -1; i++)
+    {
+      TreeInfo *ti = newTreeInfo_setDefaults(TREE_TYPE_UNDEFINED);
+      char identifier[32], name[32];
+      int value = scroll_delays_list[i].value;
+      char *text = scroll_delays_list[i].text;
+
+      ti->node_top = &scroll_delays;
+      ti->sort_priority = value;
+
+      sprintf(identifier, "%d", value);
+      sprintf(name, "%s", text);
+
+      setString(&ti->identifier, identifier);
+      setString(&ti->name, name);
+      setString(&ti->name_sorting, name);
+      setString(&ti->infotext, "Scaling Type");
+
+      pushTreeInfo(&scroll_delays, ti);
+    }
+
+    /* sort scaling type values to start with lowest scaling type value */
+    sortTreeInfo(&scroll_delays);
+
+    /* set current scaling type value to configured scaling type value */
+    scroll_delay_current =
+      getTreeInfoFromIdentifier(scroll_delays,i_to_a(setup.scroll_delay_value));
+
+    /* if that fails, set current scaling type to reliable default value */
+    if (scroll_delay_current == NULL)
+      scroll_delay_current =
+	getTreeInfoFromIdentifier(scroll_delays, i_to_a(STD_SCROLL_DELAY));
+
+    /* if that also fails, set current scaling type to first available value */
+    if (scroll_delay_current == NULL)
+      scroll_delay_current = scroll_delays;
+  }
+
+  setup.scroll_delay_value = atoi(scroll_delay_current->identifier);
+
+  /* needed for displaying scaling type text instead of identifier */
+  scroll_delay_text = scroll_delay_current->name;
+}
+
+static void execSetupGame()
+{
+  execSetupGame_setGameSpeeds();
+  execSetupGame_setScrollDelays();
 
   setup_mode = SETUP_MODE_GAME;
 
@@ -4165,6 +4241,13 @@ static void execSetupGame()
 static void execSetupChooseGameSpeed()
 {
   setup_mode = SETUP_MODE_CHOOSE_GAME_SPEED;
+
+  DrawSetupScreen();
+}
+
+static void execSetupChooseScrollDelay()
+{
+  setup_mode = SETUP_MODE_CHOOSE_SCROLL_DELAY;
 
   DrawSetupScreen();
 }
@@ -4261,6 +4344,56 @@ static void execSetupGraphics_setWindowSizes(boolean update_list)
   window_size_text = window_size_current->name;
 }
 
+static void execSetupGraphics_setScalingTypes()
+{
+  if (scaling_types == NULL)
+  {
+    int i;
+
+    for (i = 0; scaling_types_list[i].value != NULL; i++)
+    {
+      TreeInfo *ti = newTreeInfo_setDefaults(TREE_TYPE_UNDEFINED);
+      char identifier[32], name[32];
+      char *value = scaling_types_list[i].value;
+      char *text = scaling_types_list[i].text;
+
+      ti->node_top = &scaling_types;
+      ti->sort_priority = i;
+
+      sprintf(identifier, "%s", value);
+      sprintf(name, "%s", text);
+
+      setString(&ti->identifier, identifier);
+      setString(&ti->name, name);
+      setString(&ti->name_sorting, name);
+      setString(&ti->infotext, "Anti-Aliasing");
+
+      pushTreeInfo(&scaling_types, ti);
+    }
+
+    /* sort scaling type values to start with lowest scaling type value */
+    sortTreeInfo(&scaling_types);
+
+    /* set current scaling type value to configured scaling type value */
+    scaling_type_current =
+      getTreeInfoFromIdentifier(scaling_types, setup.window_scaling_quality);
+
+    /* if that fails, set current scaling type to reliable default value */
+    if (scaling_type_current == NULL)
+      scaling_type_current =
+	getTreeInfoFromIdentifier(scaling_types, SCALING_QUALITY_DEFAULT);
+
+    /* if that also fails, set current scaling type to first available value */
+    if (scaling_type_current == NULL)
+      scaling_type_current = scaling_types;
+  }
+
+  setup.window_scaling_quality = scaling_type_current->identifier;
+
+  /* needed for displaying scaling type text instead of identifier */
+  scaling_type_text = scaling_type_current->name;
+}
+
 static void execSetupGraphics_setScreenModes()
 {
   // if (screen_modes == NULL && video.fullscreen_available)
@@ -4322,72 +4455,34 @@ static void execSetupGraphics_setScreenModes()
   }
 }
 
-static void execSetupGraphics_setScrollDelays()
-{
-  if (scroll_delays == NULL)
-  {
-    int i;
-
-    for (i = 0; scroll_delays_list[i].value != -1; i++)
-    {
-      TreeInfo *ti = newTreeInfo_setDefaults(TREE_TYPE_UNDEFINED);
-      char identifier[32], name[32];
-      int value = scroll_delays_list[i].value;
-      char *text = scroll_delays_list[i].text;
-
-      ti->node_top = &scroll_delays;
-      ti->sort_priority = value;
-
-      sprintf(identifier, "%d", value);
-      sprintf(name, "%s", text);
-
-      setString(&ti->identifier, identifier);
-      setString(&ti->name, name);
-      setString(&ti->name_sorting, name);
-      setString(&ti->infotext, "Scroll Delay");
-
-      pushTreeInfo(&scroll_delays, ti);
-    }
-
-    /* sort scroll delay values to start with lowest scroll delay value */
-    sortTreeInfo(&scroll_delays);
-
-    /* set current scroll delay value to configured scroll delay value */
-    scroll_delay_current =
-      getTreeInfoFromIdentifier(scroll_delays,i_to_a(setup.scroll_delay_value));
-
-    /* if that fails, set current scroll delay to reliable default value */
-    if (scroll_delay_current == NULL)
-      scroll_delay_current =
-	getTreeInfoFromIdentifier(scroll_delays, i_to_a(STD_SCROLL_DELAY));
-
-    /* if that also fails, set current scroll delay to first available value */
-    if (scroll_delay_current == NULL)
-      scroll_delay_current = scroll_delays;
-  }
-
-  setup.scroll_delay_value = atoi(scroll_delay_current->identifier);
-
-  /* needed for displaying scroll delay text instead of identifier */
-  scroll_delay_text = scroll_delay_current->name;
-}
-
 static void execSetupGraphics()
 {
-  // update "setup.window_scaling_percent" from list selection
-  execSetupGraphics_setWindowSizes(FALSE);
-  // maybe remove non-preset value (if standard value was selected)
-  execSetupGraphics_setWindowSizes(TRUE);
+  if (setup_mode == SETUP_MODE_CHOOSE_WINDOW_SIZE)
+  {
+    // update "setup.window_scaling_percent" from list selection
+    execSetupGraphics_setWindowSizes(FALSE);
+  }
+  else
+  {
+    // update list selection from "setup.window_scaling_percent"
+    execSetupGraphics_setWindowSizes(TRUE);
+  }
 
+  execSetupGraphics_setScalingTypes();
   execSetupGraphics_setScreenModes();
-  execSetupGraphics_setScrollDelays();
 
   setup_mode = SETUP_MODE_GRAPHICS;
 
   DrawSetupScreen();
 
+#if defined(TARGET_SDL2)
   // window scaling may have changed at this point
   ToggleFullscreenOrChangeWindowScalingIfNeeded();
+
+  // window scaling quality may have changed at this point
+  if (!strEqual(setup.window_scaling_quality, video.window_scaling_quality))
+    SDLSetWindowScalingQuality(setup.window_scaling_quality);
+#endif
 }
 
 #if !defined(PLATFORM_ANDROID)
@@ -4403,6 +4498,13 @@ static void execSetupChooseWindowSize()
 
   DrawSetupScreen();
 }
+
+static void execSetupChooseScalingType()
+{
+  setup_mode = SETUP_MODE_CHOOSE_SCALING_TYPE;
+
+  DrawSetupScreen();
+}
 #else
 static void execSetupChooseScreenMode()
 {
@@ -4415,13 +4517,6 @@ static void execSetupChooseScreenMode()
 }
 #endif
 #endif
-
-static void execSetupChooseScrollDelay()
-{
-  setup_mode = SETUP_MODE_CHOOSE_SCROLL_DELAY;
-
-  DrawSetupScreen();
-}
 
 static void execSetupChooseVolumeSimple()
 {
@@ -4723,6 +4818,10 @@ static struct TokenInfo setup_info_game[] =
   { TYPE_SWITCH,	&setup.autorecord,	"Auto-Record Tapes:"	},
   { TYPE_ENTER_LIST,	execSetupChooseGameSpeed, "Game Speed:"		},
   { TYPE_STRING,	&game_speed_text,	""			},
+#if 1
+  { TYPE_ENTER_LIST,	execSetupChooseScrollDelay, "Scroll Delay:"	},
+  { TYPE_STRING,	&scroll_delay_text,	""			},
+#endif
   { TYPE_EMPTY,		NULL,			""			},
   { TYPE_LEAVE_MENU,	execSetupMain, 		"Back"			},
 
@@ -4769,6 +4868,10 @@ static struct TokenInfo setup_info_graphics[] =
 #if defined(TARGET_SDL2)
   { TYPE_ENTER_LIST,	execSetupChooseWindowSize, "Window Scaling:"	},
   { TYPE_STRING,	&window_size_text,	""			},
+#if 1
+  { TYPE_ENTER_LIST,	execSetupChooseScalingType, "Anti-Aliasing:"	},
+  { TYPE_STRING,	&scaling_type_text,	""			},
+#endif
 #else
   { TYPE_ENTER_LIST,	execSetupChooseScreenMode, "Fullscreen Mode:"	},
   { TYPE_STRING,	&screen_mode_text,	""			},
@@ -4777,8 +4880,10 @@ static struct TokenInfo setup_info_graphics[] =
 #if 0
   { TYPE_SWITCH,	&setup.scroll_delay,	"Scroll Delay:"		},
 #endif
+#if 0
   { TYPE_ENTER_LIST,	execSetupChooseScrollDelay, "Scroll Delay Value:" },
   { TYPE_STRING,	&scroll_delay_text,	""			},
+#endif
 #if 0
   { TYPE_SWITCH,	&setup.soft_scrolling,	"Soft Scrolling:"	},
 #endif
@@ -5299,7 +5404,8 @@ static void DrawSetupScreen_Generic()
 	(value_ptr == &setup.sound_music  && !audio.music_available) ||
 	(value_ptr == &setup.fullscreen   && !video.fullscreen_available) ||
 	(value_ptr == &screen_mode_text   && !video.fullscreen_available) ||
-	(value_ptr == &window_size_text   && !video.window_scaling_available))
+	(value_ptr == &window_size_text   && !video.window_scaling_available) ||
+	(value_ptr == &scaling_type_text  && !video.window_scaling_available))
       setup_info[i].type |= TYPE_GHOSTED;
 
     if (setup_info[i].type & (TYPE_ENTER_MENU|TYPE_ENTER_LIST))
@@ -5364,7 +5470,8 @@ void HandleSetupScreen_Generic(int mx, int my, int dx, int dy, int button)
   {
     PlaySound(SND_MENU_ITEM_SELECTING);
 
-    for (y = 0; y < num_setup_info; y++)
+    // for (y = 0; y < num_setup_info; y++)
+    for (y = 0; setup_info[y].type != 0; y++)
     {
       if (setup_info[y].type & TYPE_LEAVE_MENU)
       {
@@ -6133,12 +6240,14 @@ void DrawSetupScreen()
     DrawSetupScreen_Input();
   else if (setup_mode == SETUP_MODE_CHOOSE_GAME_SPEED)
     DrawChooseTree(&game_speed_current);
+  else if (setup_mode == SETUP_MODE_CHOOSE_SCROLL_DELAY)
+    DrawChooseTree(&scroll_delay_current);
   else if (setup_mode == SETUP_MODE_CHOOSE_SCREEN_MODE)
     DrawChooseTree(&screen_mode_current);
   else if (setup_mode == SETUP_MODE_CHOOSE_WINDOW_SIZE)
     DrawChooseTree(&window_size_current);
-  else if (setup_mode == SETUP_MODE_CHOOSE_SCROLL_DELAY)
-    DrawChooseTree(&scroll_delay_current);
+  else if (setup_mode == SETUP_MODE_CHOOSE_SCALING_TYPE)
+    DrawChooseTree(&scaling_type_current);
   else if (setup_mode == SETUP_MODE_CHOOSE_GRAPHICS)
     DrawChooseTree(&artwork.gfx_current);
   else if (setup_mode == SETUP_MODE_CHOOSE_SOUNDS)
@@ -6164,7 +6273,7 @@ void RedrawSetupScreenAfterFullscreenToggle()
   if (setup_mode == SETUP_MODE_GRAPHICS ||
       setup_mode == SETUP_MODE_CHOOSE_WINDOW_SIZE)
   {
-    // update "setup.window_scaling_percent" from list selection
+    // update list selection from "setup.window_scaling_percent"
     execSetupGraphics_setWindowSizes(TRUE);
 
     DrawSetupScreen();
@@ -6181,12 +6290,14 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
     HandleSetupScreen_Input(mx, my, dx, dy, button);
   else if (setup_mode == SETUP_MODE_CHOOSE_GAME_SPEED)
     HandleChooseTree(mx, my, dx, dy, button, &game_speed_current);
+  else if (setup_mode == SETUP_MODE_CHOOSE_SCROLL_DELAY)
+    HandleChooseTree(mx, my, dx, dy, button, &scroll_delay_current);
   else if (setup_mode == SETUP_MODE_CHOOSE_SCREEN_MODE)
     HandleChooseTree(mx, my, dx, dy, button, &screen_mode_current);
   else if (setup_mode == SETUP_MODE_CHOOSE_WINDOW_SIZE)
     HandleChooseTree(mx, my, dx, dy, button, &window_size_current);
-  else if (setup_mode == SETUP_MODE_CHOOSE_SCROLL_DELAY)
-    HandleChooseTree(mx, my, dx, dy, button, &scroll_delay_current);
+  else if (setup_mode == SETUP_MODE_CHOOSE_SCALING_TYPE)
+    HandleChooseTree(mx, my, dx, dy, button, &scaling_type_current);
   else if (setup_mode == SETUP_MODE_CHOOSE_GRAPHICS)
     HandleChooseTree(mx, my, dx, dy, button, &artwork.gfx_current);
   else if (setup_mode == SETUP_MODE_CHOOSE_SOUNDS)

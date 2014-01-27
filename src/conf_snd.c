@@ -252,6 +252,9 @@ struct ConfigInfo sound_config[] =
   { "door.opening",			"oeffnen.wav"			},
   { "door.closing",			"oeffnen.wav"			},
 
+  { "request.opening",			UNDEFINED_FILENAME		},
+  { "request.closing",			UNDEFINED_FILENAME		},
+
   /* sounds for menu actions */
   { "menu.item.activating",		"empty.wav"			},
   { "menu.item.selecting",		"base.wav"			},

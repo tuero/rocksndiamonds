@@ -5437,6 +5437,10 @@ struct TokenIntPtrInfo image_config_vars[] =
     &request.button.player_4.size
   },
   {
+    "global.use_envelope_request",
+    &global.use_envelope_request
+  },
+  {
     "game.forced_scroll_delay_value",
     &game.forced_scroll_delay_value
   },

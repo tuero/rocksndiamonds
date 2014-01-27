@@ -1,3 +1,7 @@
+2014-01-27
+	* fixed problems with window scaling and updating related setup value
+	* added setup option to select anti-aliasing quality of scaled windows
+
 2014-01-17
 	* improved speed of displaying progress when loading levels and artwork
 	* changed fullscreen and window scaling changes in setup menu to have
