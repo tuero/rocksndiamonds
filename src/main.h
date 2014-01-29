@@ -2000,23 +2000,24 @@
 #define FONT_ENVELOPE_2			19
 #define FONT_ENVELOPE_3			20
 #define FONT_ENVELOPE_4			21
-#define FONT_INPUT_1_ACTIVE		22
-#define FONT_INPUT_2_ACTIVE		23
-#define FONT_INPUT_1			24
-#define FONT_INPUT_2			25
-#define FONT_OPTION_OFF			26
-#define FONT_OPTION_ON			27
-#define FONT_VALUE_1			28
-#define FONT_VALUE_2			29
-#define FONT_VALUE_OLD			30
-#define FONT_LEVEL_NUMBER_ACTIVE	31
-#define FONT_LEVEL_NUMBER		32
-#define FONT_TAPE_RECORDER		33
-#define FONT_GAME_INFO			34
-#define FONT_INFO_ELEMENTS		35
-#define FONT_INFO_LEVELSET		36
+#define FONT_REQUEST			22
+#define FONT_INPUT_1_ACTIVE		23
+#define FONT_INPUT_2_ACTIVE		24
+#define FONT_INPUT_1			25
+#define FONT_INPUT_2			26
+#define FONT_OPTION_OFF			27
+#define FONT_OPTION_ON			28
+#define FONT_VALUE_1			29
+#define FONT_VALUE_2			30
+#define FONT_VALUE_OLD			31
+#define FONT_LEVEL_NUMBER_ACTIVE	32
+#define FONT_LEVEL_NUMBER		33
+#define FONT_TAPE_RECORDER		34
+#define FONT_GAME_INFO			35
+#define FONT_INFO_ELEMENTS		36
+#define FONT_INFO_LEVELSET		37
 
-#define NUM_FONTS			37
+#define NUM_FONTS			38
 #define NUM_INITIAL_FONTS		4
 
 #if 0
@@ -2172,6 +2173,17 @@ struct BorderInfo
   boolean draw_masked_when_fading;
 };
 
+struct RequestButtonInfo
+{
+  struct TextPosInfo yes;
+  struct TextPosInfo no;
+  struct TextPosInfo confirm;
+  struct TextPosInfo player_1;
+  struct TextPosInfo player_2;
+  struct TextPosInfo player_3;
+  struct TextPosInfo player_4;
+};
+
 struct MenuMainButtonInfo
 {
   struct MenuPosInfo name;
@@ -2284,8 +2296,19 @@ struct MenuInfo
 
 struct DoorInfo
 {
-  int width;
-  int height;
+  int width, height;
+  int step_offset;
+  int step_delay;
+  int anim_mode;
+};
+
+struct RequestInfo
+{
+  struct RequestButtonInfo button;
+  int x, y;
+  int width, height;
+  int border_size;
+  int line_spacing;
   int step_offset;
   int step_delay;
   int anim_mode;
@@ -2970,6 +2993,7 @@ extern struct TitleMessageInfo	readme;
 extern struct InitInfo		init, init_last;
 extern struct MenuInfo		menu;
 extern struct DoorInfo		door_1, door_2;
+extern struct RequestInfo	request;
 extern struct PreviewInfo	preview;
 extern struct ElementInfo	element_info[];
 extern struct ElementNameInfo	element_name_info[];

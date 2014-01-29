@@ -2465,47 +2465,55 @@ void DrawMiniElementOrWall(int sx, int sy, int scroll_x, int scroll_y)
     DrawMiniGraphic(sx, sy, el2edimg(getBorderElement(x, y)));
 }
 
-void DrawEnvelopeBackground(int graphic, int startx, int starty,
-			    int x, int y, int xsize, int ysize, int font_nr,
-			    int line_spacing)
+void DrawEnvelopeBackgroundTiles(int graphic, int startx, int starty,
+				 int x, int y, int xsize, int ysize,
+				 int tile_width, int tile_height)
 {
-  int font_width  = getFontWidth(font_nr);
-  int font_height = getFontHeight(font_nr) + line_spacing;
   Bitmap *src_bitmap;
   int src_x, src_y;
-  int dst_x = SX + startx + x * font_width;
-  int dst_y = SY + starty + y * font_height;
+  int dst_x = startx + x * tile_width;
+  int dst_y = starty + y * tile_height;
   int width  = graphic_info[graphic].width;
   int height = graphic_info[graphic].height;
-  int inner_width  = MAX(width  - 2 * font_width,  font_width);
-  int inner_height = MAX(height - 2 * font_height, font_height);
-  int inner_sx = (width >= 3 * font_width ? font_width : 0);
-  int inner_sy = (height >= 3 * font_height ? font_height : 0);
+  int inner_width  = MAX(width  - 2 * tile_width,  tile_width);
+  int inner_height = MAX(height - 2 * tile_height, tile_height);
+  int inner_sx = (width >= 3 * tile_width ? tile_width : 0);
+  int inner_sy = (height >= 3 * tile_height ? tile_height : 0);
   boolean draw_masked = graphic_info[graphic].draw_masked;
 
   getFixedGraphicSource(graphic, 0, &src_bitmap, &src_x, &src_y);
 
-  if (src_bitmap == NULL || width < font_width || height < font_height)
+  if (src_bitmap == NULL || width < tile_width || height < tile_height)
   {
-    ClearRectangle(drawto, dst_x, dst_y, font_width, font_height);
+    ClearRectangle(drawto, dst_x, dst_y, tile_width, tile_height);
     return;
   }
 
-  src_x += (x == 0 ? 0 : x == xsize - 1 ? width  - font_width  :
-	    inner_sx + (x - 1) * font_width  % inner_width);
-  src_y += (y == 0 ? 0 : y == ysize - 1 ? height - font_height :
-	    inner_sy + (y - 1) * font_height % inner_height);
+  src_x += (x == 0 ? 0 : x == xsize - 1 ? width  - tile_width  :
+	    inner_sx + (x - 1) * tile_width  % inner_width);
+  src_y += (y == 0 ? 0 : y == ysize - 1 ? height - tile_height :
+	    inner_sy + (y - 1) * tile_height % inner_height);
 
   if (draw_masked)
   {
     SetClipOrigin(src_bitmap, src_bitmap->stored_clip_gc,
 		  dst_x - src_x, dst_y - src_y);
-    BlitBitmapMasked(src_bitmap, drawto, src_x, src_y, font_width, font_height,
+    BlitBitmapMasked(src_bitmap, drawto, src_x, src_y, tile_width, tile_height,
 		     dst_x, dst_y);
   }
   else
-    BlitBitmap(src_bitmap, drawto, src_x, src_y, font_width, font_height,
+    BlitBitmap(src_bitmap, drawto, src_x, src_y, tile_width, tile_height,
 	       dst_x, dst_y);
+}
+
+void DrawEnvelopeBackground(int graphic, int startx, int starty,
+			    int x, int y, int xsize, int ysize, int font_nr)
+{
+  int font_width  = getFontWidth(font_nr);
+  int font_height = getFontHeight(font_nr);
+
+  DrawEnvelopeBackgroundTiles(graphic, startx, starty, x, y, xsize, ysize,
+			      font_width, font_height);
 }
 
 void AnimateEnvelope(int envelope_nr, int anim_mode, int action)
@@ -2535,8 +2543,8 @@ void AnimateEnvelope(int envelope_nr, int anim_mode, int action)
   {
     int xsize = (action == ACTION_CLOSING ? xend - (x - xstart) : x) + 2;
     int ysize = (action == ACTION_CLOSING ? yend - (y - ystart) : y) + 2;
-    int sx = (SXSIZE - xsize * font_width)  / 2;
-    int sy = (SYSIZE - ysize * font_height) / 2;
+    int sx = SX + (SXSIZE - xsize * font_width)  / 2;
+    int sy = SY + (SYSIZE - ysize * font_height) / 2;
     int xx, yy;
 
     SetDrawtoField(DRAW_BUFFERED);
@@ -2551,17 +2559,16 @@ void AnimateEnvelope(int envelope_nr, int anim_mode, int action)
 
     for (yy = 0; yy < ysize; yy++)
       for (xx = 0; xx < xsize; xx++)
-	DrawEnvelopeBackground(graphic, sx,sy, xx,yy, xsize, ysize,
-			       font_nr, 0);
+	DrawEnvelopeBackground(graphic, sx, sy, xx, yy, xsize, ysize, font_nr);
 
 #if 1
-    DrawTextBuffer(SX + sx + font_width, SY + sy + font_height,
+    DrawTextBuffer(sx + font_width, sy + font_height,
 		   level.envelope[envelope_nr].text, font_nr, max_xsize,
 		   xsize - 2, ysize - 2, 0, mask_mode,
 		   level.envelope[envelope_nr].autowrap,
 		   level.envelope[envelope_nr].centered, FALSE);
 #else
-    DrawTextToTextArea(SX + sx + font_width, SY + sy + font_height,
+    DrawTextToTextArea(sx + font_width, sy + font_height,
 		       level.envelope[envelope_nr].text, font_nr, max_xsize,
 		       xsize - 2, ysize - 2, mask_mode);
 #endif
@@ -2572,6 +2579,244 @@ void AnimateEnvelope(int envelope_nr, int anim_mode, int action)
     WaitUntilDelayReached(&anim_delay, anim_delay_value / 2);
   }
 }
+
+void ShowEnvelope(int envelope_nr)
+{
+  int element = EL_ENVELOPE_1 + envelope_nr;
+  int graphic = IMG_BACKGROUND_ENVELOPE_1 + envelope_nr;
+  int sound_opening = element_info[element].sound[ACTION_OPENING];
+  int sound_closing = element_info[element].sound[ACTION_CLOSING];
+  boolean ffwd_delay = (tape.playing && tape.fast_forward);
+  boolean no_delay = (tape.warp_forward);
+  int normal_delay_value = ONE_SECOND_DELAY / (ffwd_delay ? 2 : 1);
+  int wait_delay_value = (no_delay ? 0 : normal_delay_value);
+  int anim_mode = graphic_info[graphic].anim_mode;
+  int main_anim_mode = (anim_mode == ANIM_NONE ? ANIM_VERTICAL|ANIM_HORIZONTAL:
+			anim_mode == ANIM_DEFAULT ? ANIM_VERTICAL : anim_mode);
+
+  game.envelope_active = TRUE;	/* needed for RedrawPlayfield() events */
+
+  PlayMenuSoundStereo(sound_opening, SOUND_MIDDLE);
+
+  if (anim_mode == ANIM_DEFAULT)
+    AnimateEnvelope(envelope_nr, ANIM_DEFAULT, ACTION_OPENING);
+
+  AnimateEnvelope(envelope_nr, main_anim_mode, ACTION_OPENING);
+
+  if (tape.playing)
+    Delay(wait_delay_value);
+  else
+    WaitForEventToContinue();
+
+  PlayMenuSoundStereo(sound_closing, SOUND_MIDDLE);
+
+  if (anim_mode != ANIM_NONE)
+    AnimateEnvelope(envelope_nr, main_anim_mode, ACTION_CLOSING);
+
+  if (anim_mode == ANIM_DEFAULT)
+    AnimateEnvelope(envelope_nr, ANIM_DEFAULT, ACTION_CLOSING);
+
+  game.envelope_active = FALSE;
+
+  SetDrawtoField(DRAW_BUFFERED);
+
+  redraw_mask |= REDRAW_FIELD;
+  BackToFront();
+}
+
+static void setRequestPosition(int *x, int *y, boolean add_border_size)
+{
+  int border_size = request.border_size;
+  int sx_center = (request.x != -1 ? request.x : SX + SXSIZE / 2);
+  int sy_center = (request.y != -1 ? request.y : SY + SYSIZE / 2);
+  int sx = sx_center - request.width  / 2;
+  int sy = sy_center - request.height / 2;
+
+  if (add_border_size)
+  {
+    sx += border_size;
+    sy += border_size;
+  }
+
+  *x = sx;
+  *y = sy;
+}
+
+void DrawEnvelopeRequest(char *text)
+{
+  int graphic = IMG_BACKGROUND_REQUEST;
+  Bitmap *src_bitmap = graphic_info[graphic].bitmap;
+  int mask_mode = (src_bitmap != NULL ? BLIT_MASKED : BLIT_ON_BACKGROUND);
+  int font_nr = FONT_REQUEST;
+  int font_width = getFontWidth(font_nr);
+  int font_height = getFontHeight(font_nr);
+  int border_size = request.border_size;
+  int line_spacing = request.line_spacing;
+  int line_height = font_height + line_spacing;
+  int text_width = request.width - 2 * border_size;
+  int text_height = request.height - 2 * border_size;
+  int line_length = text_width / font_width;
+  int max_lines = text_height / line_height;
+  boolean autowrap = FALSE;
+  boolean centered = TRUE;
+  int width = request.width;
+  int height = request.height;
+  int tile_size = request.step_offset;
+  int x_steps = width  / tile_size;
+  int y_steps = height / tile_size;
+  int sx, sy;
+  int i, x, y;
+
+  setRequestPosition(&sx, &sy, FALSE);
+
+  ClearRectangle(backbuffer, 0, 0, WIN_XSIZE, WIN_YSIZE);
+
+  for (y = 0; y < y_steps; y++)
+    for (x = 0; x < x_steps; x++)
+      DrawEnvelopeBackgroundTiles(graphic, sx, sy,
+				  x, y, x_steps, y_steps,
+				  tile_size, tile_size);
+
+  DrawTextBuffer(sx + border_size, sy + border_size, text, font_nr,
+		 line_length, -1, max_lines, line_spacing, mask_mode,
+		 autowrap, centered, FALSE);
+
+  for (i = 0; i < NUM_TOOL_BUTTONS; i++)
+    RedrawGadget(tool_gadget[i]);
+
+  // store readily prepared envelope request for later use when animating
+  BlitBitmap(backbuffer, bitmap_db_cross, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
+
+#if 0
+  // !!! TEST !!!
+  BlitBitmap(bitmap_db_store, backbuffer, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
+  BlitBitmap(bitmap_db_cross, backbuffer, sx, sy, width, height, sx, sy);
+
+  redraw_mask = REDRAW_FIELD | REDRAW_FROM_BACKBUFFER;
+  BackToFront();
+
+  Delay(3000);
+
+  BlitBitmap(bitmap_db_store, backbuffer, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
+
+  redraw_mask = REDRAW_FIELD | REDRAW_FROM_BACKBUFFER;
+  BackToFront();
+
+  Delay(1000);
+#endif
+}
+
+#if 1
+
+void AnimateEnvelopeRequest(char *text, int anim_mode, int action)
+{
+  int graphic = IMG_BACKGROUND_REQUEST;
+  boolean draw_masked = graphic_info[graphic].draw_masked;
+#if 1
+  int delay_value_normal = request.step_delay;
+  int delay_value_fast = delay_value_normal / 2;
+#else
+  int delay_value_normal = GameFrameDelay;
+  int delay_value_fast = FfwdFrameDelay;
+#endif
+  boolean ffwd_delay = (tape.playing && tape.fast_forward);
+  boolean no_delay = (tape.warp_forward);
+  int delay_value = (ffwd_delay ? delay_value_fast : delay_value_normal);
+  int anim_delay_value = (no_delay ? 0 : delay_value + 500 * 0);
+  unsigned int anim_delay = 0;
+
+  int width = request.width;
+  int height = request.height;
+  int tile_size = request.step_offset;
+  int max_xsize = width  / tile_size;
+  int max_ysize = height / tile_size;
+  int max_xsize_inner = max_xsize - 2;
+  int max_ysize_inner = max_ysize - 2;
+
+  int xstart = (anim_mode & ANIM_VERTICAL ? max_xsize_inner : 0);
+  int ystart = (anim_mode & ANIM_HORIZONTAL ? max_ysize_inner : 0);
+  int xend = max_xsize_inner;
+  int yend = (anim_mode != ANIM_DEFAULT ? max_ysize_inner : 0);
+  int xstep = (xstart < xend ? 1 : 0);
+  int ystep = (ystart < yend || xstep == 0 ? 1 : 0);
+  int x, y;
+
+  for (x = xstart, y = ystart; x <= xend && y <= yend; x += xstep, y += ystep)
+  {
+    int xsize = (action == ACTION_CLOSING ? xend - (x - xstart) : x) + 2;
+    int ysize = (action == ACTION_CLOSING ? yend - (y - ystart) : y) + 2;
+    int sx_center = (request.x != -1 ? request.x : SX + SXSIZE / 2);
+    int sy_center = (request.y != -1 ? request.y : SY + SYSIZE / 2);
+    int src_x = sx_center - width  / 2;
+    int src_y = sy_center - height / 2;
+    int dst_x = sx_center - xsize * tile_size / 2;
+    int dst_y = sy_center - ysize * tile_size / 2;
+    int xsize_size_left = (xsize - 1) * tile_size;
+    int ysize_size_top  = (ysize - 1) * tile_size;
+    int max_xsize_pos = (max_xsize - 1) * tile_size;
+    int max_ysize_pos = (max_ysize - 1) * tile_size;
+    int xx, yy;
+
+    BlitBitmap(bitmap_db_store, backbuffer, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
+
+#if 1
+    for (yy = 0; yy < 2; yy++)
+    {
+      for (xx = 0; xx < 2; xx++)
+      {
+	int src_xx = src_x + xx * max_xsize_pos;
+	int src_yy = src_y + yy * max_ysize_pos;
+	int dst_xx = dst_x + xx * xsize_size_left;
+	int dst_yy = dst_y + yy * ysize_size_top;
+	int xx_size = (xx ? tile_size : xsize_size_left);
+	int yy_size = (yy ? tile_size : ysize_size_top);
+
+	if (draw_masked)
+	  BlitBitmapMasked(bitmap_db_cross, backbuffer,
+			   src_xx, src_yy, xx_size, yy_size, dst_xx, dst_yy);
+	else
+	  BlitBitmap(bitmap_db_cross, backbuffer,
+		     src_xx, src_yy, xx_size, yy_size, dst_xx, dst_yy);
+      }
+    }
+#else
+    BlitBitmap(bitmap_db_cross, backbuffer,
+	       src_x, src_y,
+	       xsize_size_left, ysize_size_top,
+	       dst_x, dst_y);
+    BlitBitmap(bitmap_db_cross, backbuffer,
+	       src_x + max_xsize_pos, src_y,
+	       tile_size, ysize_size_top,
+	       dst_x + xsize_size_left, dst_y);
+    BlitBitmap(bitmap_db_cross, backbuffer,
+	       src_x, src_y + max_ysize_pos,
+	       xsize_size_left, tile_size,
+	       dst_x, dst_y + ysize_size_top);
+    BlitBitmap(bitmap_db_cross, backbuffer,
+	       src_x + max_xsize_pos, src_y + max_ysize_pos,
+	       tile_size, tile_size,
+	       dst_x + xsize_size_left, dst_y + ysize_size_top);
+#endif
+
+#if 1
+    redraw_mask = REDRAW_FIELD | REDRAW_FROM_BACKBUFFER;
+    // redraw_mask |= REDRAW_ALL | REDRAW_FROM_BACKBUFFER;
+#else
+    redraw_mask |= REDRAW_FIELD | REDRAW_FROM_BACKBUFFER;
+#endif
+
+#if 1
+    DoAnimation();
+    BackToFront();
+#else
+    BackToFront();
+#endif
+
+    WaitUntilDelayReached(&anim_delay, anim_delay_value / 2);
+  }
+}
+
+#else
 
 void AnimateEnvelopeRequest(char *text, int anim_mode, int action)
 {
@@ -2674,9 +2919,9 @@ void AnimateEnvelopeRequest(char *text, int anim_mode, int action)
   {
     int xsize = (action == ACTION_CLOSING ? xend - (x - xstart) : x) + 2;
     int ysize = (action == ACTION_CLOSING ? yend - (y - ystart) : y) + 2;
-    int sx = (SXSIZE - xsize * font_width)  / 2;
-    // int sy = (SYSIZE - ysize * font_height) / 2;
-    int sy = (SYSIZE - ysize * (font_height + line_spacing)) / 2;
+    int sx = SX + (SXSIZE - xsize * font_width)  / 2;
+    // int sy = SX + (SYSIZE - ysize * font_height) / 2;
+    int sy = SY + (SYSIZE - ysize * (font_height + line_spacing)) / 2;
     int xx, yy;
 
 #if 1
@@ -2695,18 +2940,19 @@ void AnimateEnvelopeRequest(char *text, int anim_mode, int action)
 
     for (yy = 0; yy < ysize; yy++)
       for (xx = 0; xx < xsize; xx++)
-	DrawEnvelopeBackground(graphic, sx,sy, xx,yy, xsize, ysize,
-			       font_nr, line_spacing);
+	DrawEnvelopeBackgroundTiles(graphic, sx, sy, xx, yy, xsize, ysize,
+				    getFontWidth(font_nr),
+				    getFontHeight(font_nr) + line_spacing);
 
 #if 1
 
 #if 1
-    DrawTextBuffer(SX + sx + font_width, SY + sy + font_height + 8,
+    DrawTextBuffer(sx + font_width, sy + font_height + 8,
 		   text_copy, font_nr, max_xsize,
 		   xsize - 2, ysize - 2, line_spacing, mask_mode,
 		   FALSE, TRUE, FALSE);
 #else
-    DrawTextBuffer(SX + sx + font_width, SY + sy + font_height,
+    DrawTextBuffer(sx + font_width, sy + font_height,
 		   level.envelope[envelope_nr].text, font_nr, max_xsize,
 		   xsize - 2, ysize - 2, 0, mask_mode,
 		   level.envelope[envelope_nr].autowrap,
@@ -2714,7 +2960,7 @@ void AnimateEnvelopeRequest(char *text, int anim_mode, int action)
 #endif
 
 #else
-    DrawTextToTextArea(SX + sx + font_width, SY + sy + font_height,
+    DrawTextToTextArea(sx + font_width, sy + font_height,
 		       level.envelope[envelope_nr].text, font_nr, max_xsize,
 		       xsize - 2, ysize - 2, mask_mode);
 #endif
@@ -2728,8 +2974,8 @@ void AnimateEnvelopeRequest(char *text, int anim_mode, int action)
 		 DOOR_GFX_PAGEY1 + 13 * font_height,
 		 (xsize - 2) * font_width,
 		 (ysize - 2 - 13) * font_height,
-		 SX + sx + font_width,
-		 SY + sy + font_height * (1 + 13));
+		 sx + font_width,
+		 sy + font_height * (1 + 13));
     */
     if ((ysize - 2) > 13)
       BlitBitmap(bitmap_db_door, drawto,
@@ -2737,8 +2983,8 @@ void AnimateEnvelopeRequest(char *text, int anim_mode, int action)
 		 DOOR_GFX_PAGEY1 + 11 * (font_height + line_spacing * 0),
 		 (xsize - 2) * font_width,
 		 (ysize - 2 - 13) * (font_height + line_spacing),
-		 SX + sx + font_width,
-		 SY + sy + (font_height + line_spacing) * (1 + 13));
+		 sx + font_width,
+		 sy + (font_height + line_spacing) * (1 + 13));
 #else
     if ((ysize - 2) > 13)
       BlitBitmap(bitmap_db_door, drawto,
@@ -2746,8 +2992,8 @@ void AnimateEnvelopeRequest(char *text, int anim_mode, int action)
 		 DOOR_GFX_PAGEY1 + 13 * font_height,
 		 (xsize - 2) * font_width,
 		 (ysize - 2 - 13) * font_height,
-		 SX + sx + font_width,
-		 SY + sy + font_height * (1 + 13));
+		 sx + font_width,
+		 sy + font_height * (1 + 13));
 #endif
 
 #if 1
@@ -2772,51 +3018,9 @@ void AnimateEnvelopeRequest(char *text, int anim_mode, int action)
 #endif
 }
 
-void ShowEnvelope(int envelope_nr)
-{
-  int element = EL_ENVELOPE_1 + envelope_nr;
-  int graphic = IMG_BACKGROUND_ENVELOPE_1 + envelope_nr;
-  int sound_opening = element_info[element].sound[ACTION_OPENING];
-  int sound_closing = element_info[element].sound[ACTION_CLOSING];
-  boolean ffwd_delay = (tape.playing && tape.fast_forward);
-  boolean no_delay = (tape.warp_forward);
-  int normal_delay_value = ONE_SECOND_DELAY / (ffwd_delay ? 2 : 1);
-  int wait_delay_value = (no_delay ? 0 : normal_delay_value);
-  int anim_mode = graphic_info[graphic].anim_mode;
-  int main_anim_mode = (anim_mode == ANIM_NONE ? ANIM_VERTICAL|ANIM_HORIZONTAL:
-			anim_mode == ANIM_DEFAULT ? ANIM_VERTICAL : anim_mode);
+#endif
 
-  game.envelope_active = TRUE;	/* needed for RedrawPlayfield() events */
-
-  PlayMenuSoundStereo(sound_opening, SOUND_MIDDLE);
-
-  if (anim_mode == ANIM_DEFAULT)
-    AnimateEnvelope(envelope_nr, ANIM_DEFAULT, ACTION_OPENING);
-
-  AnimateEnvelope(envelope_nr, main_anim_mode, ACTION_OPENING);
-
-  if (tape.playing)
-    Delay(wait_delay_value);
-  else
-    WaitForEventToContinue();
-
-  PlayMenuSoundStereo(sound_closing, SOUND_MIDDLE);
-
-  if (anim_mode != ANIM_NONE)
-    AnimateEnvelope(envelope_nr, main_anim_mode, ACTION_CLOSING);
-
-  if (anim_mode == ANIM_DEFAULT)
-    AnimateEnvelope(envelope_nr, ANIM_DEFAULT, ACTION_CLOSING);
-
-  game.envelope_active = FALSE;
-
-  SetDrawtoField(DRAW_BUFFERED);
-
-  redraw_mask |= REDRAW_FIELD;
-  BackToFront();
-}
-
-void ShowEnvelopeRequest(char *text, int action)
+void ShowEnvelopeRequest(char *text, unsigned int req_state, int action)
 {
 #if 1
   int last_game_status = game_status;	/* save current game status */
@@ -2842,6 +3046,12 @@ void ShowEnvelopeRequest(char *text, int action)
   int anim_mode = graphic_info[graphic].anim_mode;
   int main_anim_mode = (anim_mode == ANIM_NONE ? ANIM_VERTICAL|ANIM_HORIZONTAL:
 			anim_mode == ANIM_DEFAULT ? ANIM_VERTICAL : anim_mode);
+  char *text_copy = getStringCopy(text);
+  char *text_ptr;
+
+  for (text_ptr = text_copy; *text_ptr; text_ptr++)
+    if (*text_ptr == ' ')
+      *text_ptr = '\n';
 
 #if 1
   if (game_status == GAME_MODE_PLAYING)
@@ -2863,6 +3073,27 @@ void ShowEnvelopeRequest(char *text, int action)
   if (action == ACTION_OPENING)
   {
     BlitBitmap(backbuffer, bitmap_db_store, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
+
+#if 1
+  if (req_state & REQ_ASK)
+  {
+    MapGadget(tool_gadget[TOOL_CTRL_ID_YES]);
+    MapGadget(tool_gadget[TOOL_CTRL_ID_NO]);
+  }
+  else if (req_state & REQ_CONFIRM)
+  {
+    MapGadget(tool_gadget[TOOL_CTRL_ID_CONFIRM]);
+  }
+  else if (req_state & REQ_PLAYER)
+  {
+    MapGadget(tool_gadget[TOOL_CTRL_ID_PLAYER_1]);
+    MapGadget(tool_gadget[TOOL_CTRL_ID_PLAYER_2]);
+    MapGadget(tool_gadget[TOOL_CTRL_ID_PLAYER_3]);
+    MapGadget(tool_gadget[TOOL_CTRL_ID_PLAYER_4]);
+  }
+#endif
+
+    DrawEnvelopeRequest(text_copy);
 
     if (game_status != GAME_MODE_MAIN)
       InitAnimation();
@@ -2941,6 +3172,8 @@ void ShowEnvelopeRequest(char *text, int action)
 #else
   BackToFront();
 #endif
+
+  free(text_copy);
 }
 
 void DrawPreviewElement(int dst_x, int dst_y, int element, int tilesize)
@@ -3900,6 +4133,549 @@ void WaitForEventToContinue()
 #define MAX_REQUEST_LINE_FONT1_LEN	7
 #define MAX_REQUEST_LINE_FONT2_LEN	10
 
+#if 1
+
+static int RequestHandleEvents(unsigned int req_state)
+{
+  int last_game_status = game_status;	/* save current game status */
+  int result;
+  int mx, my;
+
+  button_status = MB_RELEASED;
+
+  request_gadget_id = -1;
+  result = -1;
+
+  while (result < 0)
+  {
+    if (PendingEvent())
+    {
+      Event event;
+
+      NextEvent(&event);
+
+      switch (event.type)
+      {
+	case EVENT_BUTTONPRESS:
+	case EVENT_BUTTONRELEASE:
+	case EVENT_MOTIONNOTIFY:
+	{
+	  if (event.type == EVENT_MOTIONNOTIFY)
+	  {
+	    if (!PointerInWindow(window))
+	      continue;	/* window and pointer are on different screens */
+
+	    if (!button_status)
+	      continue;
+
+	    motion_status = TRUE;
+	    mx = ((MotionEvent *) &event)->x;
+	    my = ((MotionEvent *) &event)->y;
+	  }
+	  else
+	  {
+	    motion_status = FALSE;
+	    mx = ((ButtonEvent *) &event)->x;
+	    my = ((ButtonEvent *) &event)->y;
+	    if (event.type == EVENT_BUTTONPRESS)
+	      button_status = ((ButtonEvent *) &event)->button;
+	    else
+	      button_status = MB_RELEASED;
+	  }
+
+	  /* this sets 'request_gadget_id' */
+	  HandleGadgets(mx, my, button_status);
+
+	  switch (request_gadget_id)
+	  {
+	    case TOOL_CTRL_ID_YES:
+	      result = TRUE;
+	      break;
+	    case TOOL_CTRL_ID_NO:
+	      result = FALSE;
+	      break;
+	    case TOOL_CTRL_ID_CONFIRM:
+	      result = TRUE | FALSE;
+	      break;
+
+	    case TOOL_CTRL_ID_PLAYER_1:
+	      result = 1;
+	      break;
+	    case TOOL_CTRL_ID_PLAYER_2:
+	      result = 2;
+	      break;
+	    case TOOL_CTRL_ID_PLAYER_3:
+	      result = 3;
+	      break;
+	    case TOOL_CTRL_ID_PLAYER_4:
+	      result = 4;
+	      break;
+
+	    default:
+	      break;
+	  }
+
+	  break;
+	}
+
+	case EVENT_KEYPRESS:
+	  switch (GetEventKey((KeyEvent *)&event, TRUE))
+	  {
+	    case KSYM_space:
+	      if (req_state & REQ_CONFIRM)
+		result = 1;
+	      break;
+
+	    case KSYM_Return:
+	      result = 1;
+	      break;
+
+	    case KSYM_Escape:
+#if defined(TARGET_SDL2)
+	    case KSYM_Back:
+#endif
+	      result = 0;
+	      break;
+
+	    default:
+	      break;
+	  }
+
+	  if (req_state & REQ_PLAYER)
+	    result = 0;
+	  break;
+
+	case EVENT_KEYRELEASE:
+	  ClearPlayerAction();
+	  break;
+
+	default:
+	  HandleOtherEvents(&event);
+	  break;
+      }
+    }
+    else if (AnyJoystickButton() == JOY_BUTTON_NEW_PRESSED)
+    {
+      int joy = AnyJoystick();
+
+      if (joy & JOY_BUTTON_1)
+	result = 1;
+      else if (joy & JOY_BUTTON_2)
+	result = 0;
+    }
+
+#if 1
+
+    if (game_status == GAME_MODE_PLAYING && local_player->LevelSolved_GameEnd)
+    {
+      HandleGameActions();
+    }
+    else
+    {
+      DoAnimation();
+
+      if (!PendingEvent())	/* delay only if no pending events */
+	Delay(10);
+    }
+
+#if 1
+    game_status = GAME_MODE_PSEUDO_DOOR;
+#endif
+
+    BackToFront();
+
+#if 1
+    game_status = last_game_status;	/* restore current game status */
+#endif
+
+#else
+
+    DoAnimation();
+
+#if 1
+    if (!PendingEvent())	/* delay only if no pending events */
+      Delay(10);
+#else
+    /* don't eat all CPU time */
+    Delay(10);
+#endif
+
+#endif
+  }
+
+  return result;
+}
+
+static boolean RequestDoor(char *text, unsigned int req_state)
+{
+  unsigned int old_door_state;
+  int last_game_status = game_status;	/* save current game status */
+  int max_request_line_len = MAX_REQUEST_LINE_FONT1_LEN;
+  int font_nr = FONT_TEXT_2;
+  char *text_ptr;
+  int result;
+  int ty;
+
+  if (maxWordLengthInString(text) > MAX_REQUEST_LINE_FONT1_LEN)
+  {
+    max_request_line_len = MAX_REQUEST_LINE_FONT2_LEN;
+    font_nr = FONT_TEXT_1;
+  }
+
+  if (game_status == GAME_MODE_PLAYING)
+  {
+    if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
+      BlitScreenToBitmap_EM(backbuffer);
+    else if (level.game_engine_type == GAME_ENGINE_TYPE_SP)
+      BlitScreenToBitmap_SP(backbuffer);
+  }
+
+  /* disable deactivated drawing when quick-loading level tape recording */
+  if (tape.playing && tape.deactivate_display)
+    TapeDeactivateDisplayOff(TRUE);
+
+  SetMouseCursor(CURSOR_DEFAULT);
+
+#if defined(NETWORK_AVALIABLE)
+  /* pause network game while waiting for request to answer */
+  if (options.network &&
+      game_status == GAME_MODE_PLAYING &&
+      req_state & REQUEST_WAIT_FOR_INPUT)
+    SendToServer_PausePlaying();
+#endif
+
+  old_door_state = GetDoorState();
+
+  /* simulate releasing mouse button over last gadget, if still pressed */
+  if (button_status)
+    HandleGadgets(-1, -1, 0);
+
+  UnmapAllGadgets();
+
+  /* draw released gadget before proceeding */
+  // BackToFront();
+
+  if (old_door_state & DOOR_OPEN_1)
+  {
+    CloseDoor(DOOR_CLOSE_1);
+
+    /* save old door content */
+    BlitBitmap(bitmap_db_door, bitmap_db_door,
+	       DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1, DXSIZE, DYSIZE,
+	       DOOR_GFX_PAGEX2, DOOR_GFX_PAGEY1);
+  }
+
+  SetDoorBackgroundImage(IMG_BACKGROUND_DOOR);
+  SetDrawBackgroundMask(REDRAW_FIELD | REDRAW_DOOR_1);
+
+  /* clear door drawing field */
+  DrawBackground(DX, DY, DXSIZE, DYSIZE);
+
+  /* force DOOR font inside door area */
+  game_status = GAME_MODE_PSEUDO_DOOR;
+
+  /* write text for request */
+  for (text_ptr = text, ty = 0; ty < MAX_REQUEST_LINES; ty++)
+  {
+    char text_line[max_request_line_len + 1];
+    int tx, tl, tc = 0;
+
+    if (!*text_ptr)
+      break;
+
+    for (tl = 0, tx = 0; tx < max_request_line_len; tl++, tx++)
+    {
+      tc = *(text_ptr + tx);
+      if (!tc || tc == ' ')
+	break;
+    }
+
+    if (!tl)
+    { 
+      text_ptr++; 
+      ty--; 
+      continue; 
+    }
+
+    strncpy(text_line, text_ptr, tl);
+    text_line[tl] = 0;
+
+    DrawText(DX + (DXSIZE - tl * getFontWidth(font_nr)) / 2,
+	     DY + 8 + ty * (getFontHeight(font_nr) + 2),
+	     text_line, font_nr);
+
+    text_ptr += tl + (tc == ' ' ? 1 : 0);
+  }
+
+  game_status = last_game_status;	/* restore current game status */
+
+  if (req_state & REQ_ASK)
+  {
+    MapGadget(tool_gadget[TOOL_CTRL_ID_YES]);
+    MapGadget(tool_gadget[TOOL_CTRL_ID_NO]);
+  }
+  else if (req_state & REQ_CONFIRM)
+  {
+    MapGadget(tool_gadget[TOOL_CTRL_ID_CONFIRM]);
+  }
+  else if (req_state & REQ_PLAYER)
+  {
+    MapGadget(tool_gadget[TOOL_CTRL_ID_PLAYER_1]);
+    MapGadget(tool_gadget[TOOL_CTRL_ID_PLAYER_2]);
+    MapGadget(tool_gadget[TOOL_CTRL_ID_PLAYER_3]);
+    MapGadget(tool_gadget[TOOL_CTRL_ID_PLAYER_4]);
+  }
+
+  /* copy request gadgets to door backbuffer */
+  BlitBitmap(drawto, bitmap_db_door,
+	     DX, DY, DXSIZE, DYSIZE,
+	     DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1);
+
+  OpenDoor(DOOR_OPEN_1);
+
+  if (!(req_state & REQUEST_WAIT_FOR_INPUT))
+  {
+    if (game_status == GAME_MODE_PLAYING)
+    {
+      SetPanelBackground();
+      SetDrawBackgroundMask(REDRAW_DOOR_1);
+    }
+    else
+    {
+      SetDrawBackgroundMask(REDRAW_FIELD);
+    }
+
+    return FALSE;
+  }
+
+  if (game_status != GAME_MODE_MAIN)
+    InitAnimation();
+
+  SetDrawBackgroundMask(REDRAW_FIELD | REDRAW_DOOR_1);
+
+  // ---------- handle request buttons ----------
+  result = RequestHandleEvents(req_state);
+
+  if (game_status != GAME_MODE_MAIN)
+    StopAnimation();
+
+  UnmapToolButtons();
+
+  if (!(req_state & REQ_STAY_OPEN))
+  {
+    CloseDoor(DOOR_CLOSE_1);
+
+    if (((old_door_state & DOOR_OPEN_1) && !(req_state & REQ_STAY_CLOSED)) ||
+	(req_state & REQ_REOPEN))
+      OpenDoor(DOOR_OPEN_1 | DOOR_COPY_BACK);
+  }
+
+  RemapAllGadgets();
+
+  if (game_status == GAME_MODE_PLAYING)
+  {
+    SetPanelBackground();
+    SetDrawBackgroundMask(REDRAW_DOOR_1);
+  }
+  else
+  {
+    SetDrawBackgroundMask(REDRAW_FIELD);
+  }
+
+#if defined(NETWORK_AVALIABLE)
+  /* continue network game after request */
+  if (options.network &&
+      game_status == GAME_MODE_PLAYING &&
+      req_state & REQUEST_WAIT_FOR_INPUT)
+    SendToServer_ContinuePlaying();
+#endif
+
+  /* restore deactivated drawing when quick-loading level tape recording */
+  if (tape.playing && tape.deactivate_display)
+    TapeDeactivateDisplayOn();
+
+  return result;
+}
+
+static boolean RequestEnvelope(char *text, unsigned int req_state)
+{
+  int result;
+#if 0
+  int i;
+#endif
+
+  if (game_status == GAME_MODE_PLAYING)
+  {
+    if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
+      BlitScreenToBitmap_EM(backbuffer);
+    else if (level.game_engine_type == GAME_ENGINE_TYPE_SP)
+      BlitScreenToBitmap_SP(backbuffer);
+  }
+
+  /* disable deactivated drawing when quick-loading level tape recording */
+  if (tape.playing && tape.deactivate_display)
+    TapeDeactivateDisplayOff(TRUE);
+
+  SetMouseCursor(CURSOR_DEFAULT);
+
+#if defined(NETWORK_AVALIABLE)
+  /* pause network game while waiting for request to answer */
+  if (options.network &&
+      game_status == GAME_MODE_PLAYING &&
+      req_state & REQUEST_WAIT_FOR_INPUT)
+    SendToServer_PausePlaying();
+#endif
+
+  /* simulate releasing mouse button over last gadget, if still pressed */
+  if (button_status)
+    HandleGadgets(-1, -1, 0);
+
+  UnmapAllGadgets();
+
+  // (replace with setting corresponding request background)
+  // SetDoorBackgroundImage(IMG_BACKGROUND_DOOR);
+  // SetDrawBackgroundMask(REDRAW_FIELD | REDRAW_DOOR_1);
+
+  /* clear door drawing field */
+  // DrawBackground(DX, DY, DXSIZE, DYSIZE);
+
+#if 0
+  if (global.use_envelope_request)
+  {
+    /* !!! TMP !!! */
+    FreeToolButtons();
+    CreateToolButtons();
+  }
+#endif
+
+#if 0
+#if 0
+  if (req_state & REQ_ASK)
+  {
+    MapGadgetExt(tool_gadget[TOOL_CTRL_ID_YES], FALSE);
+    MapGadgetExt(tool_gadget[TOOL_CTRL_ID_NO], FALSE);
+  }
+  else if (req_state & REQ_CONFIRM)
+  {
+    MapGadgetExt(tool_gadget[TOOL_CTRL_ID_CONFIRM], FALSE);
+  }
+  else if (req_state & REQ_PLAYER)
+  {
+    MapGadgetExt(tool_gadget[TOOL_CTRL_ID_PLAYER_1], FALSE);
+    MapGadgetExt(tool_gadget[TOOL_CTRL_ID_PLAYER_2], FALSE);
+    MapGadgetExt(tool_gadget[TOOL_CTRL_ID_PLAYER_3], FALSE);
+    MapGadgetExt(tool_gadget[TOOL_CTRL_ID_PLAYER_4], FALSE);
+  }
+#else
+  if (req_state & REQ_ASK)
+  {
+    MapGadget(tool_gadget[TOOL_CTRL_ID_YES]);
+    MapGadget(tool_gadget[TOOL_CTRL_ID_NO]);
+  }
+  else if (req_state & REQ_CONFIRM)
+  {
+    MapGadget(tool_gadget[TOOL_CTRL_ID_CONFIRM]);
+  }
+  else if (req_state & REQ_PLAYER)
+  {
+    MapGadget(tool_gadget[TOOL_CTRL_ID_PLAYER_1]);
+    MapGadget(tool_gadget[TOOL_CTRL_ID_PLAYER_2]);
+    MapGadget(tool_gadget[TOOL_CTRL_ID_PLAYER_3]);
+    MapGadget(tool_gadget[TOOL_CTRL_ID_PLAYER_4]);
+  }
+#endif
+#endif
+
+  ShowEnvelopeRequest(text, req_state, ACTION_OPENING);
+
+#if 0
+  for (i = 0; i < NUM_TOOL_BUTTONS; i++)
+  {
+    if ((req_state & REQ_ASK && (i == TOOL_CTRL_ID_YES ||
+				 i == TOOL_CTRL_ID_NO)) ||
+	(req_state & REQ_CONFIRM && i == TOOL_CTRL_ID_CONFIRM) ||
+	(req_state & REQ_PLAYER && (i == TOOL_CTRL_ID_PLAYER_1 &&
+				    i == TOOL_CTRL_ID_PLAYER_2 &&
+				    i == TOOL_CTRL_ID_PLAYER_3 &&
+				    i == TOOL_CTRL_ID_PLAYER_4)))
+    {
+      int x = tool_gadget[i]->x + dDX;
+      int y = tool_gadget[i]->y + dDY;
+
+      ModifyGadget(tool_gadget[i], GDI_X, x, GDI_Y, y, GDI_END);
+    }
+  }
+#endif
+
+  if (!(req_state & REQUEST_WAIT_FOR_INPUT))
+  {
+    if (game_status == GAME_MODE_PLAYING)
+    {
+      SetPanelBackground();
+      SetDrawBackgroundMask(REDRAW_DOOR_1);
+    }
+    else
+    {
+      SetDrawBackgroundMask(REDRAW_FIELD);
+    }
+
+    return FALSE;
+  }
+
+#if 0
+  if (game_status != GAME_MODE_MAIN)
+    InitAnimation();
+#endif
+
+  SetDrawBackgroundMask(REDRAW_FIELD | REDRAW_DOOR_1);
+
+  // ---------- handle request buttons ----------
+  result = RequestHandleEvents(req_state);
+
+  if (game_status != GAME_MODE_MAIN)
+    StopAnimation();
+
+  UnmapToolButtons();
+
+  ShowEnvelopeRequest(text, req_state, ACTION_CLOSING);
+
+  RemapAllGadgets();
+
+  if (game_status == GAME_MODE_PLAYING)
+  {
+    SetPanelBackground();
+    SetDrawBackgroundMask(REDRAW_DOOR_1);
+  }
+  else
+  {
+    SetDrawBackgroundMask(REDRAW_FIELD);
+  }
+
+#if defined(NETWORK_AVALIABLE)
+  /* continue network game after request */
+  if (options.network &&
+      game_status == GAME_MODE_PLAYING &&
+      req_state & REQUEST_WAIT_FOR_INPUT)
+    SendToServer_ContinuePlaying();
+#endif
+
+  /* restore deactivated drawing when quick-loading level tape recording */
+  if (tape.playing && tape.deactivate_display)
+    TapeDeactivateDisplayOn();
+
+  return result;
+}
+
+boolean Request(char *text, unsigned int req_state)
+{
+  if (global.use_envelope_request)
+    return RequestEnvelope(text, req_state);
+  else
+    return RequestDoor(text, req_state);
+}
+
+#else	// =====================================================================
+
 boolean Request(char *text, unsigned int req_state)
 {
   int mx, my, ty, result = -1;
@@ -4339,6 +5115,8 @@ boolean Request(char *text, unsigned int req_state)
   return result;
 }
 
+#endif
+
 unsigned int OpenDoor(unsigned int door_state)
 {
   if (door_state & DOOR_COPY_BACK)
@@ -4756,11 +5534,16 @@ void CreateToolButtons()
     Bitmap *deco_bitmap = None;
     int deco_x = 0, deco_y = 0, deco_xpos = 0, deco_ypos = 0;
     unsigned int event_mask = GD_EVENT_RELEASED;
-    int gd_x   = gfx->src_x;
-    int gd_y   = gfx->src_y;
-    int gd_xp  = gfx->src_x + gfx->pressed_xoffset;
-    int gd_yp  = gfx->src_y + gfx->pressed_yoffset;
+    int dx = DX;
+    int dy = DY;
+    int gd_x = gfx->src_x;
+    int gd_y = gfx->src_y;
+    int gd_xp = gfx->src_x + gfx->pressed_xoffset;
+    int gd_yp = gfx->src_y + gfx->pressed_yoffset;
     int id = i;
+
+    if (global.use_envelope_request)
+      setRequestPosition(&dx, &dy, TRUE);
 
     if (id >= TOOL_CTRL_ID_PLAYER_1 && id <= TOOL_CTRL_ID_PLAYER_4)
     {
@@ -4774,8 +5557,8 @@ void CreateToolButtons()
 
     gi = CreateGadget(GDI_CUSTOM_ID, id,
 		      GDI_INFO_TEXT, toolbutton_info[i].infotext,
-		      GDI_X, DX + pos->x,
-		      GDI_Y, DY + pos->y,
+		      GDI_X, dx + pos->x,
+		      GDI_Y, dy + pos->y,
 		      GDI_WIDTH, gfx->width,
 		      GDI_HEIGHT, gfx->height,
 		      GDI_TYPE, GD_TYPE_NORMAL_BUTTON,

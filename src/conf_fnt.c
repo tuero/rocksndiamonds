@@ -216,6 +216,10 @@ font_to_graphic[] =
     IMG_FONT_ENVELOPE_4
   },
   {
+    FONT_REQUEST,				-1,
+    IMG_FONT_REQUEST
+  },
+  {
     FONT_INPUT_1,				-1,
     IMG_FONT_INPUT_1
   },

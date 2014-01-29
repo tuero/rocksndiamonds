@@ -5437,6 +5437,42 @@ struct TokenIntPtrInfo image_config_vars[] =
     &request.button.player_4.size
   },
   {
+    "request.x",
+    &request.x
+  },
+  {
+    "request.y",
+    &request.y
+  },
+  {
+    "request.width",
+    &request.width
+  },
+  {
+    "request.height",
+    &request.height
+  },
+  {
+    "request.border_size",
+    &request.border_size
+  },
+  {
+    "request.line_spacing",
+    &request.line_spacing
+  },
+  {
+    "request.step_offset",
+    &request.step_offset
+  },
+  {
+    "request.step_delay",
+    &request.step_delay
+  },
+  {
+    "request.anim_mode",
+    &request.anim_mode
+  },
+  {
     "global.use_envelope_request",
     &global.use_envelope_request
   },

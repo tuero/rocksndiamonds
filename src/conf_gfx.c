@@ -5091,6 +5091,12 @@ struct ConfigInfo image_config[] =
   { "font.envelope_4.width",			"16"			},
   { "font.envelope_4.height",			"16"			},
 
+  { "font.request",				"RocksFontSmall.png"	},
+  { "font.request.x",				"0"			},
+  { "font.request.y",				"210"			},
+  { "font.request.width",			"14"			},
+  { "font.request.height",			"14"			},
+
   { "font.input_1",				"RocksFontSmall.png"	},
   { "font.input_1.x",				"0"			},
   { "font.input_1.y",				"210"			},
@@ -6724,6 +6730,16 @@ struct ConfigInfo image_config[] =
   { "request.button.player_4.y",		"230"			},
   { "request.button.player_4.draw_player",	"true"			},
   { "request.button.player_4.tile_size",	"16"			},
+
+  { "request.x",				"-1"			},
+  { "request.y",				"-1"			},
+  { "request.width",				"120"			},
+  { "request.height",				"300"			},
+  { "request.border_size",			"10"			},
+  { "request.line_spacing",			"2"			},
+  { "request.step_offset",			"10"			},
+  { "request.step_delay",			"20"			},
+  { "request.anim_mode",			"default"		},
 
   { "global.use_envelope_request",		"false"			},
 

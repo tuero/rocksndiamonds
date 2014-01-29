@@ -1,3 +1,6 @@
+2014-01-28
+	* added envelope style requester dialog (alternative to door requester)
+
 2014-01-27
 	* fixed problems with window scaling and updating related setup value
 	* added setup option to select anti-aliasing quality of scaled windows

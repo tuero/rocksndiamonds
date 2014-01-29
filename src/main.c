@@ -5517,6 +5517,7 @@ struct FontInfo font_info[NUM_FONTS + 1] =
   { "font.envelope_2"		},
   { "font.envelope_3"		},
   { "font.envelope_4"		},
+  { "font.request"		},
   { "font.input_1.active"	},
   { "font.input_2.active"	},
   { "font.input_1"		},

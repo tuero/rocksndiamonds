@@ -318,11 +318,9 @@ void SetBackgroundBitmap(Bitmap *background_bitmap_tile, int mask)
 		       gfx.real_sx, gfx.real_sy,
 		       gfx.full_sxsize, gfx.full_sysize);
   else if (mask == REDRAW_DOOR_1)
-  {
     DrawBitmapFromTile(gfx.background_bitmap, background_bitmap_tile,
 		       gfx.dx, gfx.dy,
 		       gfx.dxsize, gfx.dysize);
-  }
 }
 
 #else
@@ -350,10 +348,8 @@ void SetBackgroundBitmap(Bitmap *background_bitmap_tile, int mask)
     BlitBitmapTiled(background_bitmap_tile, gfx.background_bitmap, 0, 0, 0, 0,
 		    gfx.real_sx, gfx.real_sy, gfx.full_sxsize, gfx.full_sysize);
   else if (mask == REDRAW_DOOR_1)
-  {
     BlitBitmapTiled(background_bitmap_tile, gfx.background_bitmap, 0, 0, 0, 0,
 		    gfx.dx, gfx.dy, gfx.dxsize, gfx.dysize);
-  }
 }
 
 #endif
