@@ -3166,9 +3166,17 @@ void ShowEnvelopeRequest(char *text, unsigned int req_state, int action)
   /* (important: after "BackToFront()", but before "SetDrawtoField()") */
   game_status = last_game_status;	/* restore current game status */
 
+#if 1
+  if (action == ACTION_CLOSING &&
+      game_status == GAME_MODE_PLAYING &&
+      level.game_engine_type == GAME_ENGINE_TYPE_RND)
+    SetDrawtoField(DRAW_BUFFERED);
+#else
   if (game_status == GAME_MODE_PLAYING &&
       level.game_engine_type == GAME_ENGINE_TYPE_RND)
     SetDrawtoField(DRAW_BUFFERED);
+#endif
+
 #else
   BackToFront();
 #endif
