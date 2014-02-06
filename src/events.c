@@ -520,6 +520,7 @@ void HandleWindowEvent(WindowEvent *event)
 
 static struct
 {
+  boolean touched;
   SDL_FingerID finger_id;
   int counter;
   Key key;
@@ -569,6 +570,14 @@ void HandleFingerEvent(FingerEvent *event)
 		event->x < 5.0 / 6.0 ? setup.input[0].key.left :
 		setup.input[0].key.right) :
 	       KSYM_UNDEFINED);
+    char *key_name = (key == setup.input[0].key.snap  ? "SNAP" :
+		      key == setup.input[0].key.drop  ? "DROP" :
+		      key == setup.input[0].key.up    ? "UP" :
+		      key == setup.input[0].key.down  ? "DOWN" :
+		      key == setup.input[0].key.left  ? "LEFT" :
+		      key == setup.input[0].key.right ? "RIGHT" : "(unknown)");
+    char *key_status_name = (key_status == KEY_RELEASED ? "KEY_RELEASED" :
+			     "KEY_PRESSED");
 #else
     Key key = (event->y < 1.0 / 3.0 ? setup.input[0].key.up :
 	       event->y > 2.0 / 3.0 ? setup.input[0].key.down :
@@ -578,11 +587,19 @@ void HandleFingerEvent(FingerEvent *event)
 #endif
     int i;
 
+    Error(ERR_DEBUG, "::: key '%s' was '%s' [fingerId: %lld]",
+	  getKeyNameFromKey(key), key_status_name, event->fingerId);
+
     // check if we already know this touch event's finger id
     for (i = 0; i < NUM_TOUCH_FINGERS; i++)
     {
-      if (touch_info[i].finger_id == event->fingerId)
+      if (touch_info[i].touched &&
+	  touch_info[i].finger_id == event->fingerId)
+      {
+	// Error(ERR_DEBUG, "MARK 1: %d", i);
+
 	break;
+      }
     }
 
     if (i >= NUM_TOUCH_FINGERS)
@@ -598,16 +615,24 @@ void HandleFingerEvent(FingerEvent *event)
 	  {
 	    oldest_pos = i;
 	    oldest_counter = touch_info[i].counter;
+
+	    // Error(ERR_DEBUG, "MARK 2: %d", i);
 	  }
 
-	  if (touch_info[i].finger_id == 0)
+	  if (!touch_info[i].touched)
+	  {
+	    // Error(ERR_DEBUG, "MARK 3: %d", i);
+
 	    break;
+	  }
 	}
 
 	if (i >= NUM_TOUCH_FINGERS)
 	{
 	  // all slots allocated -- use oldest slot
 	  i = oldest_pos;
+
+	  // Error(ERR_DEBUG, "MARK 4: %d", i);
 	}
       }
       else
@@ -615,7 +640,12 @@ void HandleFingerEvent(FingerEvent *event)
 	// release of previously unknown key (should not happen)
 
 	if (key != KSYM_UNDEFINED)
+	{
 	  HandleKey(key, KEY_RELEASED);
+
+	  Error(ERR_DEBUG, "=> key == '%s', key_status == '%s' [slot %d] [1]",
+		getKeyNameFromKey(key), "KEY_RELEASED", i);
+	}
       }
     }
 
@@ -626,12 +656,23 @@ void HandleFingerEvent(FingerEvent *event)
 	if (touch_info[i].key != key)
 	{
 	  if (touch_info[i].key != KSYM_UNDEFINED)
+	  {
 	    HandleKey(touch_info[i].key, KEY_RELEASED);
 
+	    Error(ERR_DEBUG, "=> key == '%s', key_status == '%s' [slot %d] [2]",
+		  getKeyNameFromKey(touch_info[i].key), "KEY_RELEASED", i);
+	  }
+
 	  if (key != KSYM_UNDEFINED)
+	  {
 	    HandleKey(key, KEY_PRESSED);
+
+	    Error(ERR_DEBUG, "=> key == '%s', key_status == '%s' [slot %d] [3]",
+		  getKeyNameFromKey(key), "KEY_PRESSED", i);
+	  }
 	}
 
+	touch_info[i].touched = TRUE;
 	touch_info[i].finger_id = event->fingerId;
 	touch_info[i].counter = Counter();
 	touch_info[i].key = key;
@@ -639,15 +680,28 @@ void HandleFingerEvent(FingerEvent *event)
       else
       {
 	if (touch_info[i].key != KSYM_UNDEFINED)
+	{
 	  HandleKey(touch_info[i].key, KEY_RELEASED);
 
+	  Error(ERR_DEBUG, "=> key == '%s', key_status == '%s' [slot %d] [4]",
+		getKeyNameFromKey(touch_info[i].key), "KEY_RELEASED", i);
+	}
+
+	touch_info[i].touched = FALSE;
 	touch_info[i].finger_id = 0;
 	touch_info[i].counter = 0;
 	touch_info[i].key = 0;
       }
     }
 
-    Error(ERR_DEBUG, "=> key == %d, key_status == %d", key, key_status);
+#if 0
+#if 1
+    Error(ERR_DEBUG, "=> key == '%s', key_status == '%s' [slot %d]",
+	  key_name, key_status_name, i);
+#else
+    Error(ERR_DEBUG, "=> key == %d, key_status == %d [%d]", key, key_status, i);
+#endif
+#endif
 
     return;
   }
@@ -1027,11 +1081,20 @@ void HandleButton(int mx, int my, int button, int button_nr)
     old_my = my;
   }
 
+#if defined(PLATFORM_ANDROID)
+  if (game_status != GAME_MODE_PLAYING &&
+      HandleGadgets(mx, my, button))
+  {
+    /* do not handle this button event anymore */
+    mx = my = -32;	/* force mouse event to be outside screen tiles */
+  }
+#else
   if (HandleGadgets(mx, my, button))
   {
     /* do not handle this button event anymore */
     mx = my = -32;	/* force mouse event to be outside screen tiles */
   }
+#endif
 
   /* do not use scroll wheel button events for anything other than gadgets */
   if (IS_WHEEL_BUTTON(button_nr))
