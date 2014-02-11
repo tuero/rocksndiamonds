@@ -570,12 +570,14 @@ void HandleFingerEvent(FingerEvent *event)
 		event->x < 5.0 / 6.0 ? setup.input[0].key.left :
 		setup.input[0].key.right) :
 	       KSYM_UNDEFINED);
+#if 0
     char *key_name = (key == setup.input[0].key.snap  ? "SNAP" :
 		      key == setup.input[0].key.drop  ? "DROP" :
 		      key == setup.input[0].key.up    ? "UP" :
 		      key == setup.input[0].key.down  ? "DOWN" :
 		      key == setup.input[0].key.left  ? "LEFT" :
 		      key == setup.input[0].key.right ? "RIGHT" : "(unknown)");
+#endif
     char *key_status_name = (key_status == KEY_RELEASED ? "KEY_RELEASED" :
 			     "KEY_PRESSED");
 #else

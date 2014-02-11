@@ -12126,9 +12126,9 @@ void GameActions()
   /* detect endless loops, caused by custom element programming */
   if (recursion_loop_detected && recursion_loop_depth == 0)
   {
-    char *message = getStringCat3("Internal Error ! Element ",
+    char *message = getStringCat3("Internal Error! Element ",
 				  EL_NAME(recursion_loop_element),
-				  " caused endless loop ! Quit the game ?");
+				  " caused endless loop! Quit the game?");
 
     Error(ERR_WARN, "element '%s' caused endless loop in game engine",
 	  EL_NAME(recursion_loop_element));
@@ -16286,7 +16286,7 @@ void RequestQuitGame(boolean ask_if_really_quit)
   boolean skip_request = AllPlayersGone || quick_quit;
 
   RequestQuitGameExt(skip_request, quick_quit,
-		     "Do you really want to quit the game ?");
+		     "Do you really want to quit the game?");
 }
 
 

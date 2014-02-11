@@ -2475,9 +2475,11 @@ void DrawEnvelopeBackgroundTiles(int graphic, int startx, int starty,
   int dst_y = starty + y * tile_height;
   int width  = graphic_info[graphic].width;
   int height = graphic_info[graphic].height;
-  int inner_width  = MAX(width  - 2 * tile_width,  tile_width);
-  int inner_height = MAX(height - 2 * tile_height, tile_height);
-  int inner_sx = (width >= 3 * tile_width ? tile_width : 0);
+  int inner_width_raw  = MAX(width  - 2 * tile_width,  tile_width);
+  int inner_height_raw = MAX(height - 2 * tile_height, tile_height);
+  int inner_width  = inner_width_raw  - (inner_width_raw  % tile_width);
+  int inner_height = inner_height_raw - (inner_height_raw % tile_height);
+  int inner_sx = (width  >= 3 * tile_width  ? tile_width  : 0);
   int inner_sy = (height >= 3 * tile_height ? tile_height : 0);
   boolean draw_masked = graphic_info[graphic].draw_masked;
 
@@ -2644,6 +2646,8 @@ static void setRequestPosition(int *x, int *y, boolean add_border_size)
 
 void DrawEnvelopeRequest(char *text)
 {
+  char *text_final = text;
+  char *text_door_style = NULL;
   int graphic = IMG_BACKGROUND_REQUEST;
   Bitmap *src_bitmap = graphic_info[graphic].bitmap;
   int mask_mode = (src_bitmap != NULL ? BLIT_MASKED : BLIT_ON_BACKGROUND);
@@ -2657,8 +2661,6 @@ void DrawEnvelopeRequest(char *text)
   int text_height = request.height - 2 * border_size;
   int line_length = text_width / font_width;
   int max_lines = text_height / line_height;
-  boolean autowrap = FALSE;
-  boolean centered = TRUE;
   int width = request.width;
   int height = request.height;
   int tile_size = request.step_offset;
@@ -2666,6 +2668,33 @@ void DrawEnvelopeRequest(char *text)
   int y_steps = height / tile_size;
   int sx, sy;
   int i, x, y;
+
+  if (request.wrap_single_words)
+  {
+    char *src_text_ptr, *dst_text_ptr;
+
+    text_door_style = checked_malloc(2 * strlen(text) + 1);
+
+    src_text_ptr = text;
+    dst_text_ptr = text_door_style;
+
+    while (*src_text_ptr)
+    {
+      if (*src_text_ptr == ' ' ||
+	  *src_text_ptr == '?' ||
+	  *src_text_ptr == '!')
+	*dst_text_ptr++ = '\n';
+
+      if (*src_text_ptr != ' ')
+	*dst_text_ptr++ = *src_text_ptr;
+
+      src_text_ptr++;
+    }
+
+    *dst_text_ptr = '\0';
+
+    text_final = text_door_style;
+  }
 
   setRequestPosition(&sx, &sy, FALSE);
 
@@ -2677,9 +2706,9 @@ void DrawEnvelopeRequest(char *text)
 				  x, y, x_steps, y_steps,
 				  tile_size, tile_size);
 
-  DrawTextBuffer(sx + border_size, sy + border_size, text, font_nr,
+  DrawTextBuffer(sx + border_size, sy + border_size, text_final, font_nr,
 		 line_length, -1, max_lines, line_spacing, mask_mode,
-		 autowrap, centered, FALSE);
+		 request.autowrap, request.centered, FALSE);
 
   for (i = 0; i < NUM_TOOL_BUTTONS; i++)
     RedrawGadget(tool_gadget[i]);
@@ -2704,11 +2733,14 @@ void DrawEnvelopeRequest(char *text)
 
   Delay(1000);
 #endif
+
+  if (text_door_style)
+    free(text_door_style);
 }
 
 #if 1
 
-void AnimateEnvelopeRequest(char *text, int anim_mode, int action)
+void AnimateEnvelopeRequest(int anim_mode, int action)
 {
   int graphic = IMG_BACKGROUND_REQUEST;
   boolean draw_masked = graphic_info[graphic].draw_masked;
@@ -3046,12 +3078,14 @@ void ShowEnvelopeRequest(char *text, unsigned int req_state, int action)
   int anim_mode = graphic_info[graphic].anim_mode;
   int main_anim_mode = (anim_mode == ANIM_NONE ? ANIM_VERTICAL|ANIM_HORIZONTAL:
 			anim_mode == ANIM_DEFAULT ? ANIM_VERTICAL : anim_mode);
+#if 0
   char *text_copy = getStringCopy(text);
   char *text_ptr;
 
   for (text_ptr = text_copy; *text_ptr; text_ptr++)
     if (*text_ptr == ' ')
       *text_ptr = '\n';
+#endif
 
 #if 1
   if (game_status == GAME_MODE_PLAYING)
@@ -3093,7 +3127,11 @@ void ShowEnvelopeRequest(char *text, unsigned int req_state, int action)
   }
 #endif
 
+#if 1
+    DrawEnvelopeRequest(text);
+#else
     DrawEnvelopeRequest(text_copy);
+#endif
 
     if (game_status != GAME_MODE_MAIN)
       InitAnimation();
@@ -3110,9 +3148,9 @@ void ShowEnvelopeRequest(char *text, unsigned int req_state, int action)
     PlayMenuSoundStereo(sound_opening, SOUND_MIDDLE);
 
     if (anim_mode == ANIM_DEFAULT)
-      AnimateEnvelopeRequest(text, ANIM_DEFAULT, ACTION_OPENING);
+      AnimateEnvelopeRequest(ANIM_DEFAULT, ACTION_OPENING);
 
-    AnimateEnvelopeRequest(text, main_anim_mode, ACTION_OPENING);
+    AnimateEnvelopeRequest(main_anim_mode, ACTION_OPENING);
 
 #if 0
     if (tape.playing)
@@ -3126,10 +3164,10 @@ void ShowEnvelopeRequest(char *text, unsigned int req_state, int action)
     PlayMenuSoundStereo(sound_closing, SOUND_MIDDLE);
 
     if (anim_mode != ANIM_NONE)
-      AnimateEnvelopeRequest(text, main_anim_mode, ACTION_CLOSING);
+      AnimateEnvelopeRequest(main_anim_mode, ACTION_CLOSING);
 
     if (anim_mode == ANIM_DEFAULT)
-      AnimateEnvelopeRequest(text, ANIM_DEFAULT, ACTION_CLOSING);
+      AnimateEnvelopeRequest(ANIM_DEFAULT, ACTION_CLOSING);
   }
 
   game.envelope_active = FALSE;
@@ -3181,7 +3219,9 @@ void ShowEnvelopeRequest(char *text, unsigned int req_state, int action)
   BackToFront();
 #endif
 
+#if 0
   free(text_copy);
+#endif
 }
 
 void DrawPreviewElement(int dst_x, int dst_y, int element, int tilesize)
@@ -4394,9 +4434,13 @@ static boolean RequestDoor(char *text, unsigned int req_state)
     for (tl = 0, tx = 0; tx < max_request_line_len; tl++, tx++)
     {
       tc = *(text_ptr + tx);
-      if (!tc || tc == ' ')
+      // if (!tc || tc == ' ')
+      if (!tc || tc == ' ' || tc == '?' || tc == '!')
 	break;
     }
+
+    if ((tc == '?' || tc == '!') && tl == 0)
+      tl = 1;
 
     if (!tl)
     { 
@@ -4413,6 +4457,7 @@ static boolean RequestDoor(char *text, unsigned int req_state)
 	     text_line, font_nr);
 
     text_ptr += tl + (tc == ' ' ? 1 : 0);
+    // text_ptr += tl + (tc == ' ' || tc == '?' || tc == '!' ? 1 : 0);
   }
 
   game_status = last_game_status;	/* restore current game status */

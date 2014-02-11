@@ -6733,8 +6733,8 @@ static boolean PrepareSavingIntoPersonalLevelSet()
     return TRUE;
   }
 
-  if (!Request("This level is read only ! "
-	       "Save into personal level set ?", REQ_ASK))
+  if (!Request("This level is read only! "
+	       "Save into personal level set?", REQ_ASK))
     return FALSE;
 
   // "cd" to personal level set dir (for writing copy the first time)
@@ -7012,13 +7012,13 @@ static boolean CopyCustomElement(int element_old, int element_new,
   }
   else if (IS_CUSTOM_ELEMENT(element_old) && !IS_CUSTOM_ELEMENT(element_new))
   {
-    Request("Please choose custom element !", REQ_CONFIRM);
+    Request("Please choose custom element!", REQ_CONFIRM);
 
     return FALSE;
   }
   else if (IS_GROUP_ELEMENT(element_old) && !IS_GROUP_ELEMENT(element_new))
   {
-    Request("Please choose group element !", REQ_CONFIRM);
+    Request("Please choose group element!", REQ_CONFIRM);
 
     return FALSE;
   }
@@ -7243,7 +7243,7 @@ static void CopyCustomElementPropertiesToGame(int element)
 
   if (level.use_custom_template)
   {
-    if (Request("Copy and modify level template ?", REQ_ASK))
+    if (Request("Copy and modify level template?", REQ_ASK))
     {
       level.use_custom_template = FALSE;
       ModifyGadget(level_editor_gadget[GADGET_ID_CUSTOM_USE_TEMPLATE],
@@ -10878,7 +10878,7 @@ static void HandleCounterButtons(struct GadgetInfo *gi)
     if ((level_changed && pressed) || (!level_changed && released))
       return;
 
-    if (level_changed && !Request("Level has changed ! Discard changes ?",
+    if (level_changed && !Request("Level has changed! Discard changes?",
 				  REQ_ASK))
     {
       if (gadget_id == counterbutton_info[counter_id].gadget_id_text)
@@ -11051,11 +11051,11 @@ static void HandleTextbuttonGadgets(struct GadgetInfo *gi)
     CopyPlayfield(Feld, level.field);
 
     if (new_template ||
-	Request("Save this template and kill the old ?", REQ_ASK))
+	Request("Save this template and kill the old?", REQ_ASK))
       SaveLevelTemplate();
 
     if (new_template)
-      Request("Template saved !", REQ_CONFIRM);
+      Request("Template saved!", REQ_CONFIRM);
 
     /* restore original "level.field" (needed to track playfield changes) */
     CopyPlayfield(FieldBackup, level.field);
@@ -11171,7 +11171,7 @@ static void HandleCheckbuttons(struct GadgetInfo *gi)
 
     if (level.use_custom_template && !fileExists(template_filename))
     {
-      Request("No level template found !", REQ_CONFIRM);
+      Request("No level template found!", REQ_CONFIRM);
 
       level.use_custom_template = FALSE;
       ModifyGadget(gi, GDI_CHECKED, FALSE, GDI_END);
@@ -11404,7 +11404,7 @@ static void HandleControlButtons(struct GadgetInfo *gi)
     case GADGET_ID_UNDO:
       if (undo_buffer_steps == 0)
       {
-	Request("Undo buffer empty !", REQ_CONFIRM);
+	Request("Undo buffer empty!", REQ_CONFIRM);
 	break;
       }
 
@@ -11478,7 +11478,7 @@ static void HandleControlButtons(struct GadgetInfo *gi)
       new_level = !fileExists(level_filename);
 
       if (new_level ||
-	  Request("Save this level and kill the old ?", REQ_ASK))
+	  Request("Save this level and kill the old?", REQ_ASK))
       {
 	if (leveldir_former->readonly)
 	  ModifyLevelInfoForSavingIntoPersonalLevelSet(leveldir_former->name);
@@ -11494,10 +11494,10 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 
 	  if (leveldir_former->readonly)
 	    sprintf(level_saved_msg,
-		    "Level saved as level %d into personal level set !",
+		    "Level saved as level %d into personal level set!",
 		    level_nr);
 	  else
-	    strcpy(level_saved_msg, "Level saved !");
+	    strcpy(level_saved_msg, "Level saved!");
 
 	  Request(level_saved_msg, REQ_CONFIRM);
 	}
@@ -12003,7 +12003,7 @@ void RequestExitLevelEditor(boolean ask_if_level_has_changed,
 {
   if (!ask_if_level_has_changed ||
       !LevelChanged() ||
-      Request("Level has changed ! Exit without saving ?",
+      Request("Level has changed! Exit without saving?",
 	      REQ_ASK | REQ_STAY_OPEN))
   {
     CloseDoor(DOOR_CLOSE_1);

@@ -5473,6 +5473,18 @@ struct TokenIntPtrInfo image_config_vars[] =
     &request.anim_mode
   },
   {
+    "request.autowrap",
+    &request.autowrap
+  },
+  {
+    "request.centered",
+    &request.centered
+  },
+  {
+    "request.wrap_single_words",
+    &request.wrap_single_words
+  },
+  {
     "global.use_envelope_request",
     &global.use_envelope_request
   },

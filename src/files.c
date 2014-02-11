@@ -10176,12 +10176,12 @@ boolean SaveLevelChecked(int nr)
   boolean new_level = !fileExists(filename);
   boolean level_saved = FALSE;
 
-  if (new_level || Request("Save this level and kill the old ?", REQ_ASK))
+  if (new_level || Request("Save this level and kill the old?", REQ_ASK))
   {
     SaveLevel(nr);
 
     if (new_level)
-      Request("Level saved !", REQ_CONFIRM);
+      Request("Level saved!", REQ_CONFIRM);
 
     level_saved = TRUE;
   }
@@ -11111,7 +11111,7 @@ void SaveTape(int nr)
   if (fileExists(filename))
   {
     new_tape = FALSE;
-    if (!Request("Replace old tape ?", REQ_ASK))
+    if (!Request("Replace old tape?", REQ_ASK))
       return;
   }
 #endif
@@ -11156,7 +11156,7 @@ void SaveTape(int nr)
 
 #if 0
   if (new_tape)
-    Request("Tape saved !", REQ_CONFIRM);
+    Request("Tape saved!", REQ_CONFIRM);
 #endif
 }
 
@@ -11166,12 +11166,12 @@ boolean SaveTapeChecked(int nr)
   boolean new_tape = !fileExists(filename);
   boolean tape_saved = FALSE;
 
-  if (new_tape || Request("Replace old tape ?", REQ_ASK))
+  if (new_tape || Request("Replace old tape?", REQ_ASK))
   {
     SaveTape(nr);
 
     if (new_tape)
-      Request("Tape saved !", REQ_CONFIRM);
+      Request("Tape saved!", REQ_CONFIRM);
 
     tape_saved = TRUE;
   }

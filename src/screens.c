@@ -1755,7 +1755,7 @@ void HandleMainMenu_SelectLevel(int step, int direction)
   {
     /* skipping levels is only allowed when trying to skip single level */
     if (setup.skip_levels && step == 1 &&
-	Request("Level still unsolved ! Skip despite handicap ?", REQ_ASK))
+	Request("Level still unsolved! Skip despite handicap?", REQ_ASK))
     {
       leveldir_current->handicap_level++;
       SaveLevelSetup_SeriesInfo();
@@ -1904,7 +1904,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
       {
 	if (leveldir_current->readonly &&
 	    !strEqual(setup.player_name, "Artsoft"))
-	  Request("This level is read only !", REQ_CONFIRM);
+	  Request("This level is read only!", REQ_CONFIRM);
 
 	game_status = GAME_MODE_EDITOR;
 
@@ -1940,7 +1940,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 	SaveLevelSetup_LastSeries();
 	SaveLevelSetup_SeriesInfo();
 
-        if (Request("Do you really want to quit ?", REQ_ASK | REQ_STAY_CLOSED))
+        if (Request("Do you really want to quit?", REQ_ASK | REQ_STAY_CLOSED))
 	  game_status = GAME_MODE_QUIT;
       }
     }

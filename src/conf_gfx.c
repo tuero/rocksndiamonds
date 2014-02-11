@@ -6744,6 +6744,9 @@ struct ConfigInfo image_config[] =
   { "request.step_offset",			"10"			},
   { "request.step_delay",			"20"			},
   { "request.anim_mode",			"default"		},
+  { "request.autowrap",				"false"			},
+  { "request.centered",				"true"			},
+  { "request.wrap_single_words",		"true"			},
 
   { "global.use_envelope_request",		"false"			},
 

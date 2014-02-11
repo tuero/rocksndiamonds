@@ -2312,6 +2312,9 @@ struct RequestInfo
   int step_offset;
   int step_delay;
   int anim_mode;
+  boolean autowrap;
+  boolean centered;
+  boolean wrap_single_words;
 };
 
 struct PreviewInfo

@@ -1079,7 +1079,7 @@ void TapeQuickSave()
 {
   if (game_status == GAME_MODE_MAIN)
   {
-    Request("No game that can be saved !", REQ_CONFIRM);
+    Request("No game that can be saved!", REQ_CONFIRM);
 
     return;
   }
@@ -1092,7 +1092,7 @@ void TapeQuickSave()
 
   if (TAPE_IS_EMPTY(tape))
   {
-    Request("No tape that can be saved !", REQ_CONFIRM);
+    Request("No tape that can be saved!", REQ_CONFIRM);
 
     return;
   }
@@ -1107,12 +1107,12 @@ void TapeQuickLoad()
 
   if (!fileExists(filename))
   {
-    Request("No tape for this level !", REQ_CONFIRM);
+    Request("No tape for this level!", REQ_CONFIRM);
 
     return;
   }
 
-  if (tape.recording && !Request("Stop recording and load tape ?",
+  if (tape.recording && !Request("Stop recording and load tape?",
 				 REQ_ASK | REQ_STAY_CLOSED))
   {
     OpenDoor(DOOR_OPEN_1 | DOOR_COPY_BACK);
@@ -1157,7 +1157,7 @@ void TapeQuickLoad()
   {
     int reopen_door = (game_status == GAME_MODE_PLAYING ? REQ_REOPEN : 0);
 
-    Request("No tape for this level !", REQ_CONFIRM | reopen_door);
+    Request("No tape for this level!", REQ_CONFIRM | reopen_door);
   }
 }
 
@@ -1169,7 +1169,7 @@ void InsertSolutionTape()
   LoadSolutionTape(level_nr);
 
   if (TAPE_IS_EMPTY(tape))
-    Request("No solution tape for this level !", REQ_CONFIRM);
+    Request("No solution tape for this level!", REQ_CONFIRM);
 
   DrawCompleteVideoDisplay();
 }
@@ -1458,7 +1458,7 @@ static void HandleTapeButtonsExt(int id)
 	LoadTape(level_nr);
 
 	if (TAPE_IS_EMPTY(tape))
-	  Request("No tape for this level !", REQ_CONFIRM);
+	  Request("No tape for this level!", REQ_CONFIRM);
       }
       else
       {

@@ -439,7 +439,7 @@ static void Handle_OP_NUMBER_WANTED()
   {
     char request[100];
 
-    sprintf(request, "Sorry ! Player %d already exists ! You are player %d !",
+    sprintf(request, "Sorry! Player %d already exists! You are player %d!",
 	    index_nr_wanted + 1, new_index_nr + 1);
 
     Request(request, REQ_CONFIRM);
@@ -571,7 +571,7 @@ static void Handle_OP_STOP_PLAYING()
     else if (buffer[2] == NETWORK_STOP_BY_ERROR)
       Request("Network game stopped due to internal error!", REQ_CONFIRM);
     else
-      Request("Network game stopped !", REQ_CONFIRM);
+      Request("Network game stopped!", REQ_CONFIRM);
   }
 
   game_status = GAME_MODE_MAIN;
