@@ -2093,14 +2093,6 @@ struct TokenIntPtrInfo image_config_vars[] =
     &preview.anim_mode
   },
   {
-    "door_1.width",
-    &door_1.width
-  },
-  {
-    "door_1.height",
-    &door_1.height
-  },
-  {
     "door_1.step_offset",
     &door_1.step_offset
   },
@@ -2111,14 +2103,6 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "door_1.anim_mode",
     &door_1.anim_mode
-  },
-  {
-    "door_2.width",
-    &door_2.width
-  },
-  {
-    "door_2.height",
-    &door_2.height
   },
   {
     "door_2.step_offset",
@@ -5621,12 +5605,36 @@ struct TokenIntPtrInfo image_config_vars[] =
     &viewport.door_1[GFX_SPECIAL_ARG_DEFAULT].y
   },
   {
+    "viewport.door_1.width",
+    &viewport.door_1[GFX_SPECIAL_ARG_DEFAULT].width
+  },
+  {
+    "viewport.door_1.height",
+    &viewport.door_1[GFX_SPECIAL_ARG_DEFAULT].height
+  },
+  {
+    "viewport.door_1.border_size",
+    &viewport.door_1[GFX_SPECIAL_ARG_DEFAULT].border_size
+  },
+  {
     "viewport.door_1.MAIN.x",
     &viewport.door_1[GFX_SPECIAL_ARG_MAIN].x
   },
   {
     "viewport.door_1.MAIN.y",
     &viewport.door_1[GFX_SPECIAL_ARG_MAIN].y
+  },
+  {
+    "viewport.door_1.MAIN.width",
+    &viewport.door_1[GFX_SPECIAL_ARG_MAIN].width
+  },
+  {
+    "viewport.door_1.MAIN.height",
+    &viewport.door_1[GFX_SPECIAL_ARG_MAIN].height
+  },
+  {
+    "viewport.door_1.MAIN.border_size",
+    &viewport.door_1[GFX_SPECIAL_ARG_MAIN].border_size
   },
   {
     "viewport.door_1.PLAYING.x",
@@ -5637,12 +5645,36 @@ struct TokenIntPtrInfo image_config_vars[] =
     &viewport.door_1[GFX_SPECIAL_ARG_PLAYING].y
   },
   {
+    "viewport.door_1.PLAYING.width",
+    &viewport.door_1[GFX_SPECIAL_ARG_PLAYING].width
+  },
+  {
+    "viewport.door_1.PLAYING.height",
+    &viewport.door_1[GFX_SPECIAL_ARG_PLAYING].height
+  },
+  {
+    "viewport.door_1.PLAYING.border_size",
+    &viewport.door_1[GFX_SPECIAL_ARG_PLAYING].border_size
+  },
+  {
     "viewport.door_1.EDITOR.x",
     &viewport.door_1[GFX_SPECIAL_ARG_EDITOR].x
   },
   {
     "viewport.door_1.EDITOR.y",
     &viewport.door_1[GFX_SPECIAL_ARG_EDITOR].y
+  },
+  {
+    "viewport.door_1.EDITOR.width",
+    &viewport.door_1[GFX_SPECIAL_ARG_EDITOR].width
+  },
+  {
+    "viewport.door_1.EDITOR.height",
+    &viewport.door_1[GFX_SPECIAL_ARG_EDITOR].height
+  },
+  {
+    "viewport.door_1.EDITOR.border_size",
+    &viewport.door_1[GFX_SPECIAL_ARG_EDITOR].border_size
   },
   {
     "viewport.door_2.x",
@@ -5653,12 +5685,36 @@ struct TokenIntPtrInfo image_config_vars[] =
     &viewport.door_2[GFX_SPECIAL_ARG_DEFAULT].y
   },
   {
+    "viewport.door_2.width",
+    &viewport.door_2[GFX_SPECIAL_ARG_DEFAULT].width
+  },
+  {
+    "viewport.door_2.height",
+    &viewport.door_2[GFX_SPECIAL_ARG_DEFAULT].height
+  },
+  {
+    "viewport.door_2.border_size",
+    &viewport.door_2[GFX_SPECIAL_ARG_DEFAULT].border_size
+  },
+  {
     "viewport.door_2.MAIN.x",
     &viewport.door_2[GFX_SPECIAL_ARG_MAIN].x
   },
   {
     "viewport.door_2.MAIN.y",
     &viewport.door_2[GFX_SPECIAL_ARG_MAIN].y
+  },
+  {
+    "viewport.door_2.MAIN.width",
+    &viewport.door_2[GFX_SPECIAL_ARG_MAIN].width
+  },
+  {
+    "viewport.door_2.MAIN.height",
+    &viewport.door_2[GFX_SPECIAL_ARG_MAIN].height
+  },
+  {
+    "viewport.door_2.MAIN.border_size",
+    &viewport.door_2[GFX_SPECIAL_ARG_MAIN].border_size
   },
   {
     "viewport.door_2.PLAYING.x",
@@ -5669,12 +5725,36 @@ struct TokenIntPtrInfo image_config_vars[] =
     &viewport.door_2[GFX_SPECIAL_ARG_PLAYING].y
   },
   {
+    "viewport.door_2.PLAYING.width",
+    &viewport.door_2[GFX_SPECIAL_ARG_PLAYING].width
+  },
+  {
+    "viewport.door_2.PLAYING.height",
+    &viewport.door_2[GFX_SPECIAL_ARG_PLAYING].height
+  },
+  {
+    "viewport.door_2.PLAYING.border_size",
+    &viewport.door_2[GFX_SPECIAL_ARG_PLAYING].border_size
+  },
+  {
     "viewport.door_2.EDITOR.x",
     &viewport.door_2[GFX_SPECIAL_ARG_EDITOR].x
   },
   {
     "viewport.door_2.EDITOR.y",
     &viewport.door_2[GFX_SPECIAL_ARG_EDITOR].y
+  },
+  {
+    "viewport.door_2.EDITOR.width",
+    &viewport.door_2[GFX_SPECIAL_ARG_EDITOR].width
+  },
+  {
+    "viewport.door_2.EDITOR.height",
+    &viewport.door_2[GFX_SPECIAL_ARG_EDITOR].height
+  },
+  {
+    "viewport.door_2.EDITOR.border_size",
+    &viewport.door_2[GFX_SPECIAL_ARG_EDITOR].border_size
   },
   {
     NULL,

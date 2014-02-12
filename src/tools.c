@@ -5228,6 +5228,7 @@ unsigned int MoveDoor(unsigned int door_state)
   unsigned int door_delay_value;
   int stepsize = 1;
 
+#if 0
   if (door_1.width < 0 || door_1.width > DXSIZE)
     door_1.width = DXSIZE;
   if (door_1.height < 0 || door_1.height > DYSIZE)
@@ -5236,6 +5237,7 @@ unsigned int MoveDoor(unsigned int door_state)
     door_2.width = VXSIZE;
   if (door_2.height < 0 || door_2.height > VYSIZE)
     door_2.height = VYSIZE;
+#endif
 
   if (door_state == DOOR_GET_STATE)
     return (door1 | door2);
@@ -5290,8 +5292,13 @@ unsigned int MoveDoor(unsigned int door_state)
     boolean door_2_done = (!handle_door_2);
     boolean door_1_vertical = (door_1.anim_mode & ANIM_VERTICAL);
     boolean door_2_vertical = (door_2.anim_mode & ANIM_VERTICAL);
+#if 1
+    int door_size_1 = (door_1_vertical ? DYSIZE : DXSIZE);
+    int door_size_2 = (door_2_vertical ? VYSIZE : VXSIZE);
+#else
     int door_size_1 = (door_1_vertical ? door_1.height : door_1.width);
     int door_size_2 = (door_2_vertical ? door_2.height : door_2.width);
+#endif
     int max_door_size_1 = (door_1_vertical ? DYSIZE : DXSIZE);
     int max_door_size_2 = (door_2_vertical ? VYSIZE : VXSIZE);
     int door_size     = (handle_door_1 ? door_size_1     : door_size_2);
@@ -5511,23 +5518,50 @@ unsigned int MoveDoor(unsigned int door_state)
 
 void DrawSpecialEditorDoor()
 {
+#if 1
+  struct GraphicInfo *gfx1 = &graphic_info[IMG_DOOR_2_TOP_BORDER_CORRECTION];
+  int outer_border = viewport.door_2[GAME_MODE_EDITOR].border_size;
+
+  /* draw bigger toolbox window */
+  BlitBitmap(gfx1->bitmap, drawto,
+	     gfx1->src_x, gfx1->src_y, gfx1->width, gfx1->height,
+	     EX - outer_border, EY - outer_border - gfx1->height);
+  BlitBitmap(graphic_info[IMG_GLOBAL_BORDER].bitmap, drawto,
+	     EX - outer_border, VY - outer_border,
+	     EXSIZE + 2 * outer_border, EYSIZE - VYSIZE + outer_border,
+	     EX - outer_border, EY - outer_border);
+#else
   /* draw bigger toolbox window */
   BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
-	     DOOR_GFX_PAGEX7, 0, EXSIZE + 8, 8,
-	     EX - 4, EY - 12);
+             DOOR_GFX_PAGEX7, 0, EXSIZE + 8, 8,
+             EX - 4, EY - 12);
   BlitBitmap(graphic_info[IMG_GLOBAL_BORDER].bitmap, drawto,
-	     EX - 6, VY - 4, EXSIZE + 12, EYSIZE - VYSIZE + 4,
-	     EX - 6, EY - 4);
+             EX - 6, VY - 4, EXSIZE + 12, EYSIZE - VYSIZE + 4,
+             EX - 6, EY - 4);
+#endif
 
   redraw_mask |= REDRAW_ALL;
 }
 
 void UndrawSpecialEditorDoor()
 {
+#if 1
+  struct GraphicInfo *gfx1 = &graphic_info[IMG_DOOR_2_TOP_BORDER_CORRECTION];
+  int outer_border = viewport.door_2[GAME_MODE_EDITOR].border_size;
+  int top_border = gfx1->height;
+
   /* draw normal tape recorder window */
   BlitBitmap(graphic_info[IMG_GLOBAL_BORDER].bitmap, drawto,
-	     EX - 6, EY - 12, EXSIZE + 12, EYSIZE - VYSIZE + 12,
-	     EX - 6, EY - 12);
+	     EX - outer_border, EY - outer_border - top_border,
+	     EXSIZE + 2 * outer_border,
+	     EYSIZE - VYSIZE + outer_border + top_border,
+	     EX - outer_border, EY - outer_border - top_border);
+#else
+  /* draw normal tape recorder window */
+  BlitBitmap(graphic_info[IMG_GLOBAL_BORDER].bitmap, drawto,
+             EX - 6, EY - 12, EXSIZE + 12, EYSIZE - VYSIZE + 12,
+             EX - 6, EY - 12);
+#endif
 
   redraw_mask |= REDRAW_ALL;
 }
@@ -10040,25 +10074,42 @@ void ToggleFullscreenOrChangeWindowScalingIfNeeded()
 
 void ChangeViewportPropertiesIfNeeded()
 {
+#if 0
   int *door_1_x = &DX;
   int *door_1_y = &DY;
   int *door_2_x = (game_status == GAME_MODE_EDITOR ? &EX : &VX);
   int *door_2_y = (game_status == GAME_MODE_EDITOR ? &EY : &VY);
+#endif
   int gfx_game_mode = (game_status == GAME_MODE_PLAYING ||
 		       game_status == GAME_MODE_EDITOR ? game_status :
 		       GAME_MODE_MAIN);
+  int gfx_game_mode2 = (game_status == GAME_MODE_EDITOR ? GAME_MODE_DEFAULT :
+			game_status);
   struct RectWithBorder *vp_playfield = &viewport.playfield[gfx_game_mode];
   struct RectWithBorder *vp_door_1 = &viewport.door_1[gfx_game_mode];
-  struct RectWithBorder *vp_door_2 = &viewport.door_2[gfx_game_mode];
-  int border_size = vp_playfield->border_size;
-  int new_sx = vp_playfield->x + border_size;
-  int new_sy = vp_playfield->y + border_size;
-  int new_sxsize = vp_playfield->width  - 2 * border_size;
-  int new_sysize = vp_playfield->height - 2 * border_size;
-  int new_real_sx = vp_playfield->x;
-  int new_real_sy = vp_playfield->y;
-  int new_full_sxsize = vp_playfield->width;
-  int new_full_sysize = vp_playfield->height;
+  struct RectWithBorder *vp_door_2 = &viewport.door_2[gfx_game_mode2];
+  struct RectWithBorder *vp_door_3 = &viewport.door_2[GAME_MODE_EDITOR];
+  int border_size	= vp_playfield->border_size;
+  int new_sx		= vp_playfield->x + border_size;
+  int new_sy		= vp_playfield->y + border_size;
+  int new_sxsize	= vp_playfield->width  - 2 * border_size;
+  int new_sysize	= vp_playfield->height - 2 * border_size;
+  int new_real_sx	= vp_playfield->x;
+  int new_real_sy	= vp_playfield->y;
+  int new_full_sxsize	= vp_playfield->width;
+  int new_full_sysize	= vp_playfield->height;
+  int new_dx		= vp_door_1->x;
+  int new_dy		= vp_door_1->y;
+  int new_dxsize	= vp_door_1->width;
+  int new_dysize	= vp_door_1->height;
+  int new_vx		= vp_door_2->x;
+  int new_vy		= vp_door_2->y;
+  int new_vxsize	= vp_door_2->width;
+  int new_vysize	= vp_door_2->height;
+  int new_ex		= vp_door_3->x;
+  int new_ey		= vp_door_3->y;
+  int new_exsize	= vp_door_3->width;
+  int new_eysize	= vp_door_3->height;
 #if NEW_TILESIZE
   int new_tilesize_var = TILESIZE / (setup.small_game_graphics ? 2 : 1);
   int tilesize = (gfx_game_mode == GAME_MODE_PLAYING ? new_tilesize_var :
@@ -10132,22 +10183,50 @@ void ChangeViewportPropertiesIfNeeded()
 
   if (new_sx != SX ||
       new_sy != SY ||
+      new_dx != DX ||
+      new_dy != DY ||
+      new_vx != VX ||
+      new_vy != VY ||
+      new_ex != EX ||
+      new_ey != EY ||
       new_sxsize != SXSIZE ||
       new_sysize != SYSIZE ||
+      new_dxsize != DXSIZE ||
+      new_dysize != DYSIZE ||
+      new_vxsize != VXSIZE ||
+      new_vysize != VYSIZE ||
+      new_exsize != EXSIZE ||
+      new_eysize != EYSIZE ||
       new_real_sx != REAL_SX ||
       new_real_sy != REAL_SY ||
       new_full_sxsize != FULL_SXSIZE ||
       new_full_sysize != FULL_SYSIZE ||
-      new_tilesize_var != TILESIZE_VAR ||
+      new_tilesize_var != TILESIZE_VAR
+#if 0
+      ||
       vp_door_1->x != *door_1_x ||
       vp_door_1->y != *door_1_y ||
       vp_door_2->x != *door_2_x ||
-      vp_door_2->y != *door_2_y)
+      vp_door_2->y != *door_2_y
+#endif
+      )
   {
     SX = new_sx;
     SY = new_sy;
+    DX = new_dx;
+    DY = new_dy;
+    VX = new_vx;
+    VY = new_vy;
+    EX = new_ex;
+    EY = new_ey;
     SXSIZE = new_sxsize;
     SYSIZE = new_sysize;
+    DXSIZE = new_dxsize;
+    DYSIZE = new_dysize;
+    VXSIZE = new_vxsize;
+    VYSIZE = new_vysize;
+    EXSIZE = new_exsize;
+    EYSIZE = new_eysize;
     REAL_SX = new_real_sx;
     REAL_SY = new_real_sy;
     FULL_SXSIZE = new_full_sxsize;
@@ -10160,10 +10239,12 @@ void ChangeViewportPropertiesIfNeeded()
 	   setup.small_game_graphics);
 #endif
 
+#if 0
     *door_1_x = vp_door_1->x;
     *door_1_y = vp_door_1->y;
     *door_2_x = vp_door_2->x;
     *door_2_y = vp_door_2->y;
+#endif
 
 #if 1
     init_gfx_buffers = TRUE;

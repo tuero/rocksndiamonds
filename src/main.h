@@ -1008,12 +1008,16 @@
 #define FYSIZE			((SCR_FIELDY + 2) * TILEY)
 #endif
 #endif
+
+#if 0
 #define DXSIZE			100
 #define DYSIZE			280
 #define VXSIZE			DXSIZE
 #define VYSIZE			100
 #define EXSIZE			DXSIZE
 #define EYSIZE			(VYSIZE + 44)
+#endif
+
 #if 0
 #define FULL_SXSIZE		(2 + SXSIZE + 2)
 #define FULL_SYSIZE		(2 + SYSIZE + 2)
@@ -2296,7 +2300,6 @@ struct MenuInfo
 
 struct DoorInfo
 {
-  int width, height;
   int step_offset;
   int step_delay;
   int anim_mode;
@@ -2947,14 +2950,17 @@ extern int			scroll_x, scroll_y;
 
 extern int			WIN_XSIZE, WIN_YSIZE;
 extern int			SCR_FIELDX, SCR_FIELDY;
-extern int			SX, SY;
 extern int			REAL_SX, REAL_SY;
+extern int			SX, SY;
 extern int			DX, DY;
 extern int			VX, VY;
 extern int			EX, EY;
 extern int			dDX, dDY;
-extern int			SXSIZE, SYSIZE;
 extern int			FULL_SXSIZE, FULL_SYSIZE;
+extern int			SXSIZE, SYSIZE;
+extern int			DXSIZE, DYSIZE;
+extern int			VXSIZE, VYSIZE;
+extern int			EXSIZE, EYSIZE;
 extern int			TILESIZE_VAR;
 
 extern int			FX, FY;

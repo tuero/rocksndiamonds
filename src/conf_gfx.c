@@ -5316,6 +5316,16 @@ struct ConfigInfo image_config[] =
   { "titlescreen_4",				UNDEFINED_FILENAME	},
   { "titlescreen_5",				UNDEFINED_FILENAME	},
 
+  { "door_2.top_border_correction",		"RocksDoor.png"		},
+  { "door_2.top_border_correction.x",		"600"			},
+  { "door_2.top_border_correction.y",		"0"			},
+  { "door_2.top_border_correction.width",	"108"			},
+  { "door_2.top_border_correction.height",	"8"			},
+
+  /* the last image entry apparently gets overwritten by very last entry
+     of "image_config[]"; so far this bug could not be found and fixed */
+  { "last_image_entry_bug",			UNDEFINED_FILENAME	},
+
   /* the following directives are not associated with an image, but
      probably make sense to be defined in "graphicsinfo.conf", too */
 
@@ -5857,14 +5867,10 @@ struct ConfigInfo image_config[] =
   { "preview.step_delay",			"50"			},
   { "preview.anim_mode",			"default"		},
 
-  { "door_1.width",				"-1"			},
-  { "door_1.height",				"-1"			},
   { "door_1.step_offset",			"2"			},
   { "door_1.step_delay",			"10"			},
   { "door_1.anim_mode",				"default"		},
 
-  { "door_2.width",				"-1"			},
-  { "door_2.height",				"-1"			},
   { "door_2.step_offset",			"2"			},
   { "door_2.step_delay",			"10"			},
   { "door_2.anim_mode",				"default"		},
@@ -6785,20 +6791,44 @@ struct ConfigInfo image_config[] =
   { "viewport.playfield.EDITOR.border_size",	ARG_DEFAULT		},
   { "viewport.door_1.x",			"566"			},
   { "viewport.door_1.y",			"60"			},
+  { "viewport.door_1.width",			"100"			},
+  { "viewport.door_1.height",			"280"			},
+  { "viewport.door_1.border_size",		"4"			},
   { "viewport.door_1.MAIN.x",			ARG_DEFAULT		},
   { "viewport.door_1.MAIN.y",			ARG_DEFAULT		},
+  { "viewport.door_1.MAIN.width",		ARG_DEFAULT		},
+  { "viewport.door_1.MAIN.height",		ARG_DEFAULT		},
+  { "viewport.door_1.MAIN.border_size",		ARG_DEFAULT		},
   { "viewport.door_1.PLAYING.x",		ARG_DEFAULT		},
   { "viewport.door_1.PLAYING.y",		ARG_DEFAULT		},
+  { "viewport.door_1.PLAYING.width",		ARG_DEFAULT		},
+  { "viewport.door_1.PLAYING.height",		ARG_DEFAULT		},
+  { "viewport.door_1.PLAYING.border_size",	ARG_DEFAULT		},
   { "viewport.door_1.EDITOR.x",			ARG_DEFAULT		},
   { "viewport.door_1.EDITOR.y",			ARG_DEFAULT		},
+  { "viewport.door_1.EDITOR.width",		ARG_DEFAULT		},
+  { "viewport.door_1.EDITOR.height",		ARG_DEFAULT		},
+  { "viewport.door_1.EDITOR.border_size",	ARG_DEFAULT		},
   { "viewport.door_2.x",			"566"			},
   { "viewport.door_2.y",			"400"			},
+  { "viewport.door_2.width",			"100"			},
+  { "viewport.door_2.height",			"100"			},
+  { "viewport.door_2.border_size",		"4"			},
   { "viewport.door_2.MAIN.x",			ARG_DEFAULT		},
   { "viewport.door_2.MAIN.y",			ARG_DEFAULT		},
+  { "viewport.door_2.MAIN.width",		ARG_DEFAULT		},
+  { "viewport.door_2.MAIN.height",		ARG_DEFAULT		},
+  { "viewport.door_2.MAIN.border_size",		ARG_DEFAULT		},
   { "viewport.door_2.PLAYING.x",		ARG_DEFAULT		},
   { "viewport.door_2.PLAYING.y",		ARG_DEFAULT		},
+  { "viewport.door_2.PLAYING.width",		ARG_DEFAULT		},
+  { "viewport.door_2.PLAYING.height",		ARG_DEFAULT		},
+  { "viewport.door_2.PLAYING.border_size",	ARG_DEFAULT		},
   { "viewport.door_2.EDITOR.x",			"566"			},
   { "viewport.door_2.EDITOR.y",			"356"			},
+  { "viewport.door_2.EDITOR.width",		"100"			},
+  { "viewport.door_2.EDITOR.height",		"144"			},
+  { "viewport.door_2.EDITOR.border_size",	"4"			},
 
   { NULL,					NULL			}
 };

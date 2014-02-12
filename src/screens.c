@@ -1387,8 +1387,11 @@ void DrawMainMenuExt(int fade_mask, boolean do_fading)
 #if 1
   FadeOut(fade_mask);
 
+#if 0
   /* needed if last screen was the editor screen */
   UndrawSpecialEditorDoor();
+#endif
+
 #if 0
   if (fade_mask == REDRAW_FIELD)
     BackToFront();
@@ -1398,6 +1401,11 @@ void DrawMainMenuExt(int fade_mask, boolean do_fading)
 #if 1
   /* needed if different viewport properties defined for menues */
   ChangeViewportPropertiesIfNeeded();
+#endif
+
+#if 1
+  /* needed if last screen was the editor screen */
+  UndrawSpecialEditorDoor();
 #endif
 
 #if defined(TARGET_SDL)

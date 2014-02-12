@@ -12351,44 +12351,72 @@ static void LoadMenuDesignSettingsFromFilename(char *filename)
   /* (eg, init "viewport.door_1.MAIN.xyz" from "viewport.door_1.xyz") */
   for (i = 0; i < NUM_SPECIAL_GFX_ARGS; i++)
   {
-    char *token_1 = "viewport.playfield.x";
-    char *token_2 = "viewport.playfield.y";
-    char *token_3 = "viewport.playfield.width";
-    char *token_4 = "viewport.playfield.height";
-    char *token_5 = "viewport.playfield.border_size";
-    char *token_6 = "viewport.door_1.x";
-    char *token_7 = "viewport.door_1.y";
-    char *token_8 = "viewport.door_2.x";
-    char *token_9 = "viewport.door_2.y";
-    char *value_1 = getHashEntry(setup_file_hash, token_1);
-    char *value_2 = getHashEntry(setup_file_hash, token_2);
-    char *value_3 = getHashEntry(setup_file_hash, token_3);
-    char *value_4 = getHashEntry(setup_file_hash, token_4);
-    char *value_5 = getHashEntry(setup_file_hash, token_5);
-    char *value_6 = getHashEntry(setup_file_hash, token_6);
-    char *value_7 = getHashEntry(setup_file_hash, token_7);
-    char *value_8 = getHashEntry(setup_file_hash, token_8);
-    char *value_9 = getHashEntry(setup_file_hash, token_9);
+    char *token_01 = "viewport.playfield.x";
+    char *token_02 = "viewport.playfield.y";
+    char *token_03 = "viewport.playfield.width";
+    char *token_04 = "viewport.playfield.height";
+    char *token_05 = "viewport.playfield.border_size";
+    char *token_06 = "viewport.door_1.x";
+    char *token_07 = "viewport.door_1.y";
+    char *token_08 = "viewport.door_1.width";
+    char *token_09 = "viewport.door_1.height";
+    char *token_10 = "viewport.door_1.border_size";
+    char *token_11 = "viewport.door_2.x";
+    char *token_12 = "viewport.door_2.y";
+    char *token_13 = "viewport.door_2.width";
+    char *token_14 = "viewport.door_2.height";
+    char *token_15 = "viewport.door_2.border_size";
+    char *value_01 = getHashEntry(setup_file_hash, token_01);
+    char *value_02 = getHashEntry(setup_file_hash, token_02);
+    char *value_03 = getHashEntry(setup_file_hash, token_03);
+    char *value_04 = getHashEntry(setup_file_hash, token_04);
+    char *value_05 = getHashEntry(setup_file_hash, token_05);
+    char *value_06 = getHashEntry(setup_file_hash, token_06);
+    char *value_07 = getHashEntry(setup_file_hash, token_07);
+    char *value_08 = getHashEntry(setup_file_hash, token_08);
+    char *value_09 = getHashEntry(setup_file_hash, token_09);
+    char *value_10 = getHashEntry(setup_file_hash, token_10);
+    char *value_11 = getHashEntry(setup_file_hash, token_11);
+    char *value_12 = getHashEntry(setup_file_hash, token_12);
+    char *value_13 = getHashEntry(setup_file_hash, token_13);
+    char *value_14 = getHashEntry(setup_file_hash, token_14);
+    char *value_15 = getHashEntry(setup_file_hash, token_15);
 
-    if (value_1 != NULL)
-      viewport.playfield[i].x = get_token_parameter_value(token_1, value_1);
-    if (value_2 != NULL)
-      viewport.playfield[i].y = get_token_parameter_value(token_2, value_2);
-    if (value_3 != NULL)
-      viewport.playfield[i].width = get_token_parameter_value(token_3, value_3);
-    if (value_4 != NULL)
-      viewport.playfield[i].height = get_token_parameter_value(token_4,value_4);
-    if (value_5 != NULL)
-      viewport.playfield[i].border_size = get_token_parameter_value(token_5,
-								    value_5);
-    if (value_6 != NULL)
-      viewport.door_1[i].x = get_token_parameter_value(token_6, value_6);
-    if (value_7 != NULL)
-      viewport.door_1[i].y = get_token_parameter_value(token_7, value_7);
-    if (value_8 != NULL)
-      viewport.door_2[i].x = get_token_parameter_value(token_8, value_8);
-    if (value_9 != NULL)
-      viewport.door_2[i].y = get_token_parameter_value(token_9, value_9);
+    if (value_01 != NULL)
+      viewport.playfield[i].x = get_token_parameter_value(token_01, value_01);
+    if (value_02 != NULL)
+      viewport.playfield[i].y = get_token_parameter_value(token_02, value_02);
+    if (value_03 != NULL)
+      viewport.playfield[i].width = get_token_parameter_value(token_03,
+							      value_03);
+    if (value_04 != NULL)
+      viewport.playfield[i].height = get_token_parameter_value(token_04,
+							       value_04);
+    if (value_05 != NULL)
+      viewport.playfield[i].border_size = get_token_parameter_value(token_05,
+								    value_05);
+    if (value_06 != NULL)
+      viewport.door_1[i].x = get_token_parameter_value(token_06, value_06);
+    if (value_07 != NULL)
+      viewport.door_1[i].y = get_token_parameter_value(token_07, value_07);
+    if (value_08 != NULL)
+      viewport.door_1[i].width = get_token_parameter_value(token_08, value_08);
+    if (value_09 != NULL)
+      viewport.door_1[i].height = get_token_parameter_value(token_09, value_09);
+    if (value_10 != NULL)
+      viewport.door_1[i].border_size = get_token_parameter_value(token_10,
+								 value_10);
+    if (value_11 != NULL)
+      viewport.door_2[i].x = get_token_parameter_value(token_11, value_11);
+    if (value_12 != NULL)
+      viewport.door_2[i].y = get_token_parameter_value(token_12, value_12);
+    if (value_13 != NULL)
+      viewport.door_2[i].width = get_token_parameter_value(token_13, value_13);
+    if (value_14 != NULL)
+      viewport.door_2[i].height = get_token_parameter_value(token_14, value_14);
+    if (value_15 != NULL)
+      viewport.door_1[i].border_size = get_token_parameter_value(token_15,
+								 value_15);
   }
 
   /* special case: initialize with default values that may be overwritten */

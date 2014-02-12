@@ -96,16 +96,22 @@ int			scroll_x, scroll_y;
 
 int			WIN_XSIZE = 672, WIN_YSIZE = 560;
 int			SCR_FIELDX = 17, SCR_FIELDY = 17;
-int			SX = 8, SY = 8;
 int			REAL_SX = 6, REAL_SY = 6;
+int			SX = 8, SY = 8;
 int			DX = 566, DY = 60;
 int			VX = 566, VY = 400;
 int			EX = 566, EY = 356;
 int			dDX, dDY;
-int			SXSIZE = 17 * TILEX;	/* SCR_FIELDX * TILEX */
-int			SYSIZE = 17 * TILEY;	/* SCR_FIELDY * TILEY */
 int			FULL_SXSIZE = 2 + 17 * TILEX + 2; /* 2 + SXSIZE + 2 */
 int			FULL_SYSIZE = 2 + 17 * TILEY + 2; /* 2 + SYSIZE + 2 */
+int			SXSIZE = 17 * TILEX;	/* SCR_FIELDX * TILEX */
+int			SYSIZE = 17 * TILEY;	/* SCR_FIELDY * TILEY */
+int			DXSIZE = 100;
+int			DYSIZE = 280;
+int			VXSIZE = 100;
+int			VYSIZE = 100;
+int			EXSIZE = 100;
+int			EYSIZE = 144;
 int			TILESIZE_VAR = TILESIZE;
 
 #if 1

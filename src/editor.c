@@ -2587,12 +2587,13 @@ static struct
     -1, -1,	/* these values are not constant, but can change at runtime */
     ED_SCROLL2_VERTICAL_XSIZE,		ED_SCROLL2_VERTICAL_YSIZE,
     -1, -1,	/* these values are not constant, but can change at runtime */
+    -1, -1,	/* these values are not constant, but can change at runtime */
 #else
     DX + ED_SCROLL2_VERTICAL_XPOS,	DY + ED_SCROLL2_VERTICAL_YPOS,
     ED_SCROLL2_VERTICAL_XSIZE,		ED_SCROLL2_VERTICAL_YSIZE,
     DX,					DY,
-#endif
     DXSIZE,				DYSIZE,
+#endif
     GD_TYPE_SCROLLBAR_VERTICAL,
     GADGET_ID_SCROLL_LIST_VERTICAL,
     "scroll element list vertically"
@@ -6052,6 +6053,8 @@ static void CreateScrollbarGadgets()
     DY + ED_SCROLL2_VERTICAL_YPOS;
   scrollbar_info[ED_SCROLLBAR_ID_LIST_VERTICAL].wheel_x = DX;
   scrollbar_info[ED_SCROLLBAR_ID_LIST_VERTICAL].wheel_y = DY;
+  scrollbar_info[ED_SCROLLBAR_ID_LIST_VERTICAL].wheel_width  = DXSIZE;
+  scrollbar_info[ED_SCROLLBAR_ID_LIST_VERTICAL].wheel_height = DYSIZE;
 
   for (i = 0; i < ED_NUM_SCROLLBARS; i++)
   {

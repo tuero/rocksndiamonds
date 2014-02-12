@@ -685,6 +685,9 @@ void BlitBitmap(Bitmap *src_bitmap, Bitmap *dst_bitmap,
   int dst_x_unclipped = dst_x;
   int dst_y_unclipped = dst_y;
 
+  if (src_bitmap == NULL || dst_bitmap == NULL)
+    return;
+
   if (DrawingDeactivated(dst_x, dst_y, width, height))
     return;
 
