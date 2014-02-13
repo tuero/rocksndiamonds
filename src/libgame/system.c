@@ -214,6 +214,14 @@ void InitGfxDoor2Info(int vx, int vy, int vxsize, int vysize)
   gfx.vysize = vysize;
 }
 
+void InitGfxDoor3Info(int ex, int ey, int exsize, int eysize)
+{
+  gfx.ex = ex;
+  gfx.ey = ey;
+  gfx.exsize = exsize;
+  gfx.eysize = eysize;
+}
+
 void InitGfxWindowInfo(int win_xsize, int win_ysize)
 {
   gfx.win_xsize = win_xsize;
@@ -563,6 +571,19 @@ inline static boolean CheckDrawingArea(int x, int y, int width, int height,
   if (draw_mask & REDRAW_ALL)
     return TRUE;
 
+#if 1
+  if ((draw_mask & REDRAW_FIELD) && IN_GFX_FIELD_FULL(x, y))
+    return TRUE;
+
+  if ((draw_mask & REDRAW_DOOR_1) && IN_GFX_DOOR_1(x, y))
+    return TRUE;
+
+  if ((draw_mask & REDRAW_DOOR_2) && IN_GFX_DOOR_2(x, y))
+    return TRUE;
+
+  if ((draw_mask & REDRAW_DOOR_3) && IN_GFX_DOOR_3(x, y))
+    return TRUE;
+#else
   if ((draw_mask & REDRAW_FIELD) &&
       x >= gfx.real_sx && x < gfx.real_sx + gfx.full_sxsize)
     return TRUE;
@@ -574,6 +595,7 @@ inline static boolean CheckDrawingArea(int x, int y, int width, int height,
   if ((draw_mask & REDRAW_DOOR_2) &&
       x >= gfx.dx && y >= gfx.vy)
     return TRUE;
+#endif
 
   return FALSE;
 }

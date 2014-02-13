@@ -706,9 +706,21 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 		 gi->selectbox.x,     gi->selectbox.y);
   }
   else
+  {
+#if 1
+    int x = gi->x;
+    int y = gi->y;
+
+    redraw_mask |= (IN_GFX_FIELD_FULL(x, y) ? REDRAW_FIELD :
+		    IN_GFX_DOOR_1(x, y) ? REDRAW_DOOR_1 :
+		    IN_GFX_DOOR_2(x, y) ? REDRAW_DOOR_2 :
+		    IN_GFX_DOOR_3(x, y) ? REDRAW_DOOR_3 : REDRAW_ALL);
+#else
     redraw_mask |= (gi->x < gfx.sx + gfx.sxsize ? REDRAW_FIELD :
 		    gi->y < gfx.dy + gfx.dysize ? REDRAW_DOOR_1 :
 		    gi->y > gfx.vy ? REDRAW_DOOR_2 : REDRAW_DOOR_3);
+#endif
+  }
 }
 
 static int get_minimal_size_for_numeric_input(int minmax_value)
@@ -1324,9 +1336,11 @@ void UnmapGadget(struct GadgetInfo *gi)
 #define MULTIMAP_PLAYFIELD	(1 << 3)
 #define MULTIMAP_DOOR_1		(1 << 4)
 #define MULTIMAP_DOOR_2		(1 << 5)
+#define MULTIMAP_DOOR_3		(1 << 6)
 #define MULTIMAP_ALL		(MULTIMAP_PLAYFIELD | \
-				 MULTIMAP_DOOR_1 | \
-				 MULTIMAP_DOOR_2)
+				 MULTIMAP_DOOR_1    | \
+				 MULTIMAP_DOOR_2    | \
+				 MULTIMAP_DOOR_3)
 
 static void MultiMapGadgets(int mode)
 {
@@ -1336,6 +1350,16 @@ static void MultiMapGadgets(int mode)
 
   while (gi != NULL)
   {
+#if 1
+    int x = gi->x;
+    int y = gi->y;
+
+    if ((mode & MULTIMAP_PLAYFIELD && IN_GFX_FIELD_FULL(x, y)) ||
+	(mode & MULTIMAP_DOOR_1 && IN_GFX_DOOR_1(x, y)) ||
+	(mode & MULTIMAP_DOOR_2 && IN_GFX_DOOR_2(x, y)) ||
+	(mode & MULTIMAP_DOOR_3 && IN_GFX_DOOR_3(x, y)) ||
+	(mode & MULTIMAP_ALL) == MULTIMAP_ALL)
+#else
     if ((mode & MULTIMAP_PLAYFIELD &&
 	 gi->x < gfx.sx + gfx.sxsize) ||
 	(mode & MULTIMAP_DOOR_1 &&
@@ -1343,6 +1367,7 @@ static void MultiMapGadgets(int mode)
 	(mode & MULTIMAP_DOOR_2 &&
 	 gi->x >= gfx.dx && gi->y > gfx.dy + gfx.dysize) ||
 	(mode & MULTIMAP_ALL) == MULTIMAP_ALL)
+#endif
     {
       if (mode & MULTIMAP_UNMAP)
       {

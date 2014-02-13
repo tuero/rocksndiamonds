@@ -6655,13 +6655,20 @@ static void UnmapDrawingArea(int id)
   UnmapGadget(level_editor_gadget[drawingarea_info[id].gadget_id]);
 }
 
-static void UnmapLevelEditorWindowGadgets()
+static void UnmapLevelEditorFieldGadgets()
 {
   int i;
 
+#if 1
+  for (i = 0; i < NUM_EDITOR_GADGETS; i++)
+    if (IN_GFX_FIELD_FULL(level_editor_gadget[i]->x,
+			  level_editor_gadget[i]->y))
+      UnmapGadget(level_editor_gadget[i]);
+#else
   for (i = 0; i < NUM_EDITOR_GADGETS; i++)
     if (level_editor_gadget[i]->x < SX + SXSIZE)
       UnmapGadget(level_editor_gadget[i]);
+#endif
 }
 
 void UnmapLevelEditorGadgets()
@@ -7755,7 +7762,7 @@ static void DrawDrawingWindow()
   SetMainBackgroundImage(IMG_UNDEFINED);
   ClearField();
 
-  UnmapLevelEditorWindowGadgets();
+  UnmapLevelEditorFieldGadgets();
   UnmapLevelEditorToolboxCustomGadgets();
 
   AdjustDrawingAreaGadgets();
@@ -7926,7 +7933,7 @@ static void DrawLevelInfoWindow()
 {
   stick_element_properties_window = FALSE;
 
-  UnmapLevelEditorWindowGadgets();
+  UnmapLevelEditorFieldGadgets();
 
   SetMainBackgroundImage(IMG_BACKGROUND_EDITOR);
   ClearField();
@@ -8892,7 +8899,7 @@ static void DrawPropertiesWindow()
 
   CopyElementPropertiesToEditor(properties_element);
 
-  UnmapLevelEditorWindowGadgets();
+  UnmapLevelEditorFieldGadgets();
   UnmapLevelEditorToolboxDrawingGadgets();
   UnmapLevelEditorToolboxCustomGadgets();
 

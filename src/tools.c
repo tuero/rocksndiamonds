@@ -5520,18 +5520,23 @@ void DrawSpecialEditorDoor()
 {
 #if 1
   struct GraphicInfo *gfx1 = &graphic_info[IMG_DOOR_2_TOP_BORDER_CORRECTION];
+  int top_border_width = gfx1->width;
+  int top_border_height = gfx1->height;
   int outer_border = viewport.door_2[GAME_MODE_EDITOR].border_size;
+  int ex = EX - outer_border;
+  int ey = EY - outer_border;
+  int vy = VY - outer_border;
+  int exsize = EXSIZE + 2 * outer_border;
 
-  /* draw bigger toolbox window */
-  BlitBitmap(gfx1->bitmap, drawto,
-	     gfx1->src_x, gfx1->src_y, gfx1->width, gfx1->height,
-	     EX - outer_border, EY - outer_border - gfx1->height);
-  BlitBitmap(graphic_info[IMG_GLOBAL_BORDER].bitmap, drawto,
-	     EX - outer_border, VY - outer_border,
-	     EXSIZE + 2 * outer_border, EYSIZE - VYSIZE + outer_border,
-	     EX - outer_border, EY - outer_border);
+  CloseDoor(DOOR_CLOSE_2);
+
+  /* draw bigger level editor toolbox window */
+  BlitBitmap(gfx1->bitmap, drawto, gfx1->src_x, gfx1->src_y,
+	     top_border_width, top_border_height, ex, ey - top_border_height);
+  BlitBitmap(graphic_info[IMG_GLOBAL_BORDER].bitmap, drawto, ex, vy,
+	     exsize, EYSIZE - VYSIZE + outer_border, ex, ey);
 #else
-  /* draw bigger toolbox window */
+  /* draw bigger level editor toolbox window */
   BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
              DOOR_GFX_PAGEX7, 0, EXSIZE + 8, 8,
              EX - 4, EY - 12);
@@ -5547,15 +5552,30 @@ void UndrawSpecialEditorDoor()
 {
 #if 1
   struct GraphicInfo *gfx1 = &graphic_info[IMG_DOOR_2_TOP_BORDER_CORRECTION];
+  int top_border_width = gfx1->width;
+  int top_border_height = gfx1->height;
   int outer_border = viewport.door_2[GAME_MODE_EDITOR].border_size;
-  int top_border = gfx1->height;
+  int ex = EX - outer_border;
+  int ey = EY - outer_border;
+  int ey_top = ey - top_border_height;
+  int exsize = EXSIZE + 2 * outer_border;
+  int eysize = EYSIZE + 2 * outer_border;
 
   /* draw normal tape recorder window */
-  BlitBitmap(graphic_info[IMG_GLOBAL_BORDER].bitmap, drawto,
-	     EX - outer_border, EY - outer_border - top_border,
-	     EXSIZE + 2 * outer_border,
-	     EYSIZE - VYSIZE + outer_border + top_border,
-	     EX - outer_border, EY - outer_border - top_border);
+  if (graphic_info[IMG_GLOBAL_BORDER].bitmap)
+  {
+    BlitBitmap(graphic_info[IMG_GLOBAL_BORDER].bitmap, drawto,
+	       ex, ey_top, top_border_width, top_border_height,
+	       ex, ey_top);
+    BlitBitmap(graphic_info[IMG_GLOBAL_BORDER].bitmap, drawto,
+	       ex, ey, exsize, eysize, ex, ey);
+  }
+  else
+  {
+    // if screen background is set to "[NONE]", clear editor toolbox window
+    ClearRectangle(drawto, ex, ey_top, top_border_width, top_border_height);
+    ClearRectangle(drawto, ex, ey, exsize, eysize);
+  }
 #else
   /* draw normal tape recorder window */
   BlitBitmap(graphic_info[IMG_GLOBAL_BORDER].bitmap, drawto,

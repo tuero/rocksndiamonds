@@ -1914,6 +1914,8 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 	    !strEqual(setup.player_name, "Artsoft"))
 	  Request("This level is read only!", REQ_CONFIRM);
 
+	CloseDoor(DOOR_CLOSE_2);
+
 	game_status = GAME_MODE_EDITOR;
 
 	FadeSetEnterScreen();

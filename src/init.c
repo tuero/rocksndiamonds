@@ -5493,6 +5493,7 @@ static void InitMixer()
 
 void InitGfxBuffers()
 {
+  /* create additional image buffers for double-buffering and cross-fading */
   ReCreateBitmap(&bitmap_db_store, WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH);
   ReCreateBitmap(&bitmap_db_cross, WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH);
   ReCreateBitmap(&bitmap_db_field, FXSIZE, FYSIZE, DEFAULT_DEPTH);
@@ -5506,6 +5507,7 @@ void InitGfxBuffers()
 		   bitmap_db_field);
   InitGfxDoor1Info(DX, DY, DXSIZE, DYSIZE);
   InitGfxDoor2Info(VX, VY, VXSIZE, VYSIZE);
+  InitGfxDoor3Info(EX, EY, EXSIZE, EYSIZE);
   InitGfxWindowInfo(WIN_XSIZE, WIN_YSIZE);
   InitGfxScrollbufferInfo(FXSIZE, FYSIZE);
   InitGfxClipRegion(FALSE, -1, -1, -1, -1);
@@ -5560,27 +5562,7 @@ void InitGfx()
   if (filename_font_initial == NULL)	/* should not happen */
     Error(ERR_EXIT, "cannot get filename for '%s'", CONFIG_TOKEN_FONT_INITIAL);
 
-#if 1
   InitGfxBuffers();
-#else
-  /* create additional image buffers for double-buffering and cross-fading */
-  bitmap_db_store = CreateBitmap(WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH);
-  bitmap_db_cross = CreateBitmap(WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH);
-  bitmap_db_field = CreateBitmap(FXSIZE, FYSIZE, DEFAULT_DEPTH);
-  bitmap_db_panel = CreateBitmap(DXSIZE, DYSIZE, DEFAULT_DEPTH);
-  bitmap_db_door  = CreateBitmap(3 * DXSIZE, DYSIZE + VYSIZE, DEFAULT_DEPTH);
-  bitmap_db_toons = CreateBitmap(FULL_SXSIZE, FULL_SYSIZE, DEFAULT_DEPTH);
-
-  /* initialize screen properties */
-  InitGfxFieldInfo(SX, SY, SXSIZE, SYSIZE,
-		   REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE,
-		   bitmap_db_field);
-  InitGfxDoor1Info(DX, DY, DXSIZE, DYSIZE);
-  InitGfxDoor2Info(VX, VY, VXSIZE, VYSIZE);
-  InitGfxWindowInfo(WIN_XSIZE, WIN_YSIZE);
-  InitGfxScrollbufferInfo(FXSIZE, FYSIZE);
-#endif
-
   InitGfxCustomArtworkInfo();
 
   bitmap_font_initial = LoadCustomImage(filename_font_initial);

@@ -361,10 +361,23 @@ void DrawText(int x, int y, char *text, int font_nr)
 
   DrawTextExt(drawto, x, y, text, font_nr, mask_mode);
 
+#if 1
+  if (IN_GFX_FIELD_FULL(x, y))
+    redraw_mask |= REDRAW_FIELD;
+  else if (IN_GFX_DOOR_1(x, y))
+    redraw_mask |= REDRAW_DOOR_1;
+  else if (IN_GFX_DOOR_2(x, y))
+    redraw_mask |= REDRAW_DOOR_2;
+  else if (IN_GFX_DOOR_3(x, y))
+    redraw_mask |= REDRAW_DOOR_3;
+  else
+    redraw_mask |= REDRAW_ALL;
+#else
   if (x < gfx.dx)
     redraw_mask |= REDRAW_FIELD;
   else if (y < gfx.vy || gfx.vy == 0)
     redraw_mask |= REDRAW_DOOR_1;
+#endif
 }
 
 void DrawTextExt(DrawBuffer *dst_bitmap, int dst_x, int dst_y, char *text,

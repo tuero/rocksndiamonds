@@ -1,3 +1,7 @@
+2014-02-13
+	* fixed various problems with playfield and requester/tape/editor doors
+	  defined to be at non-standard screen positions in artwork config file
+
 2014-01-28
 	* added envelope style requester dialog (alternative to door requester)
 

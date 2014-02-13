@@ -317,12 +317,18 @@
 #define REDRAWTILES_THRESHOLD	0
 #endif
 
-#define IN_GFX_SCREEN(x, y)	(x >= gfx.sx && x < gfx.sx + gfx.sxsize && \
+#define IN_GFX_FIELD(x, y)	(x >= gfx.sx && x < gfx.sx + gfx.sxsize && \
 				 y >= gfx.sy && y < gfx.sy + gfx.sysize)
-#define IN_GFX_DOOR(x, y)	(x >= gfx.dx && x < gfx.dx + gfx.dxsize && \
+#define IN_GFX_FIELD_FULL(x, y)	(x >= gfx.real_sx && \
+				 x <  gfx.real_sx + gfx.full_sxsize && \
+				 y >= gfx.real_sy && \
+				 y <  gfx.real_sy + gfx.full_sysize)
+#define IN_GFX_DOOR_1(x, y)	(x >= gfx.dx && x < gfx.dx + gfx.dxsize && \
 				 y >= gfx.dy && y < gfx.dy + gfx.dysize)
-#define IN_GFX_VIDEO(x, y)	(x >= gfx.vx && x < gfx.vx + gfx.vxsize && \
+#define IN_GFX_DOOR_2(x, y)	(x >= gfx.vx && x < gfx.vx + gfx.vxsize && \
 				 y >= gfx.vy && y < gfx.vy + gfx.vysize)
+#define IN_GFX_DOOR_3(x, y)	(x >= gfx.ex && x < gfx.ex + gfx.exsize && \
+				 y >= gfx.ey && y < gfx.ey + gfx.eysize)
 
 /* values for mouse cursor */
 #define CURSOR_DEFAULT		0
@@ -804,6 +810,9 @@ struct GfxInfo
   int vx, vy;
   int vxsize, vysize;
 
+  int ex, ey;
+  int exsize, eysize;
+
   int win_xsize, win_ysize;
 
   int draw_deactivation_mask;
@@ -1274,6 +1283,7 @@ void ClosePlatformDependentStuff(void);
 void InitGfxFieldInfo(int, int, int, int, int, int, int, int, Bitmap *);
 void InitGfxDoor1Info(int, int, int, int);
 void InitGfxDoor2Info(int, int, int, int);
+void InitGfxDoor3Info(int, int, int, int);
 void InitGfxWindowInfo(int, int);
 void InitGfxScrollbufferInfo(int, int);
 void InitGfxClipRegion(boolean, int, int, int, int);
