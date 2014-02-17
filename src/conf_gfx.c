@@ -79,6 +79,10 @@ struct ConfigTypeInfo image_config_suffix[] =
 
 struct ConfigInfo image_config[] =
 {
+  // ==========================================================================
+  // image definitions for game elements (for in-game and editor graphics)
+  // ==========================================================================
+
   /* images for Boulder Dash style elements and actions */
 
   { "bd_wall",					"RocksDC.png"		},
@@ -4366,7 +4370,11 @@ struct ConfigInfo image_config[] =
 #include "conf_cus.c"	/* include auto-generated data structure definitions */
 #include "conf_grp.c"	/* include auto-generated data structure definitions */
 
-  /* images not associated to game elements (used for menu screens etc.) */
+
+  // ==========================================================================
+  // image definitions not associated with game elements (menu screens etc.)
+  // ==========================================================================
+
   /* keyword to stop parser: "NO_MORE_ELEMENT_IMAGES" <-- do not change! */
 
 #if 1
@@ -5316,6 +5324,28 @@ struct ConfigInfo image_config[] =
   { "titlescreen_4",				UNDEFINED_FILENAME	},
   { "titlescreen_5",				UNDEFINED_FILENAME	},
 
+  { "door_1.wing_left",				"RocksDoor.png"		},
+  { "door_1.wing_left.x",			"0"			},
+  { "door_1.wing_left.y",			"0"			},
+  { "door_1.wing_left.width",			"100"			},
+  { "door_1.wing_left.height",			"280"			},
+  { "door_1.wing_right",			"RocksDoor.png"		},
+  { "door_1.wing_right.x",			"100"			},
+  { "door_1.wing_right.y",			"0"			},
+  { "door_1.wing_right.width",			"100"			},
+  { "door_1.wing_right.height",			"280"			},
+
+  { "door_2.wing_left",				"RocksDoor.png"		},
+  { "door_2.wing_left.x",			"0"			},
+  { "door_2.wing_left.y",			"280"			},
+  { "door_2.wing_left.width",			"100"			},
+  { "door_2.wing_left.height",			"100"			},
+  { "door_2.wing_right",			"RocksDoor.png"		},
+  { "door_2.wing_right.x",			"100"			},
+  { "door_2.wing_right.y",			"280"			},
+  { "door_2.wing_right.width",			"100"			},
+  { "door_2.wing_right.height",			"100"			},
+
   { "door_2.top_border_correction",		"RocksDoor.png"		},
   { "door_2.top_border_correction.x",		"600"			},
   { "door_2.top_border_correction.y",		"0"			},
@@ -5325,6 +5355,11 @@ struct ConfigInfo image_config[] =
   /* the last image entry apparently gets overwritten by very last entry
      of "image_config[]"; so far this bug could not be found and fixed */
   { "last_image_entry_bug",			UNDEFINED_FILENAME	},
+
+
+  // ==========================================================================
+  // non-image definitions
+  // ==========================================================================
 
   /* the following directives are not associated with an image, but
      probably make sense to be defined in "graphicsinfo.conf", too */
