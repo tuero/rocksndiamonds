@@ -30,7 +30,11 @@ extern void SetBitmaps_EM(Bitmap **);
 extern void UpdateEngineValues(int, int);
 extern void DrawAllGameValues(int, int, int, int, int);
 
+#if 1
+extern boolean getTeamMode_EM();
+#else
 extern int getNumActivePlayers_EM();
+#endif
 extern int getGameFrameDelay_EM(int);
 
 extern void PlayLevelSound_EM(int, int, int, int);

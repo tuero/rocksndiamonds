@@ -135,6 +135,10 @@ struct GameInfo
   int initial_move_delay_value[MAX_PLAYERS];
   int initial_push_delay_value;
 
+  /* flag for single or multi-player mode (needed for playing tapes) */
+  /* (when playing/recording games, this is identical to "setup.team_mode" */
+  boolean team_mode;
+
   /* flags to handle bugs in and changes between different engine versions */
   /* (for the latest engine version, these flags should always be "FALSE") */
   boolean use_change_when_pushing_bug;

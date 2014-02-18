@@ -1109,7 +1109,11 @@ void prepare_em_level(void)
 {
   int i, x, y;
   int players_left;
+#if 1
+  boolean team_mode;
+#else
   int num_tape_players;
+#endif
 
   /* reset all runtime variables to their initial values */
 
@@ -1176,9 +1180,15 @@ void prepare_em_level(void)
     }
   }
 
+#if 1
+  team_mode = getTeamMode_EM();
+
+  if (!team_mode)
+    lev.home_initial = 1;
+#else
   num_tape_players = getNumActivePlayers_EM();
 
-#if 1
+#if 0
   printf("::: getNumActivePlayers_EM: %d\n", num_tape_players);
 #endif
 
@@ -1189,6 +1199,7 @@ void prepare_em_level(void)
     lev.home_initial = MIN(lev.home_initial, num_tape_players);
   else if (!setup.team_mode)
     lev.home_initial = MIN(lev.home_initial, 1);
+#endif
 #endif
 
   lev.home = lev.home_initial;

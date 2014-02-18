@@ -1142,8 +1142,6 @@ static boolean recursion_loop_element;
 
 static int map_player_action[MAX_PLAYERS];
 
-static boolean TEST_game_team_mode;
-
 
 /* ------------------------------------------------------------------------- */
 /* definition of elements that automatically change to other elements after  */
@@ -3032,6 +3030,21 @@ static void InitGameEngine()
   game.engine_version = (tape.playing ? tape.engine_version :
 			 level.game_version);
 
+  /* set single or multi-player game mode (needed for re-playing tapes) */
+  game.team_mode = setup.team_mode;
+
+  if (tape.playing)
+  {
+    int num_players = 0;
+
+    for (i = 0; i < MAX_PLAYERS; i++)
+      if (tape.player_participates[i])
+	num_players++;
+
+    /* multi-player tapes contain input data for more than one player */
+    game.team_mode = (num_players > 1);
+  }
+
   /* ---------------------------------------------------------------------- */
   /* set flags for bugs and changes according to active game engine version */
   /* ---------------------------------------------------------------------- */
@@ -3902,23 +3915,12 @@ void InitGame()
   local_player->connected = TRUE;
   /* !!! SAME AS init.c:InitPlayerInfo() -- FIX THIS !!! */
 
-  TEST_game_team_mode = setup.team_mode;
+#if 0
+  printf("::: TEAM MODE: %d\n", game.team_mode);
+#endif
 
   if (tape.playing)
   {
-#if 1
-    int num_players = 0;
-
-    for (i = 0; i < MAX_PLAYERS; i++)
-      if (tape.player_participates[i])
-	num_players++;
-
-    TEST_game_team_mode = (num_players > 1);
-
-    printf("::: TAPE TEAM MODE: %s (%d)\n",
-	   (TEST_game_team_mode ? "true" : "false"), num_players);
-#endif
-
 #if 1
     for (i = 0; i < MAX_PLAYERS; i++)
       stored_player[i].connected = tape.player_participates[i];
@@ -3931,7 +3933,7 @@ void InitGame()
 	stored_player[i].connected = TRUE;
 #endif
   }
-  else if (setup.team_mode && !options.network)
+  else if (game.team_mode && !options.network)
   {
     /* try to guess locally connected team mode players (needed for correct
        assignment of player figures from level to locally playing players) */
@@ -4140,8 +4142,7 @@ void InitGame()
 #if USE_NEW_PLAYER_ASSIGNMENTS
 
 #if 1
-    // if (!setup.team_mode)
-    if (!TEST_game_team_mode)
+    if (!game.team_mode)
 #endif
 
     for (i = 0; i < MAX_PLAYERS; i++)
@@ -4162,7 +4163,9 @@ void InitGame()
 	Feld[jx][jy] = EL_EMPTY;
       }
     }
+
 #else
+
     for (i = 0; i < MAX_PLAYERS; i++)
     {
       if (stored_player[i].active &&
@@ -4178,7 +4181,7 @@ void InitGame()
     }
 #endif
   }
-  else if (!options.network && !setup.team_mode)	/* && !tape.playing */
+  else if (!options.network && !game.team_mode)		/* && !tape.playing */
   {
     /* when in single player mode, eliminate all but the first active player */
 
@@ -12375,7 +12378,7 @@ void GameActions()
     summarized_player_action |= stored_player[i].action;
 
 #if 1
-    if (!network_playing && (setup.team_mode || tape.playing))
+    if (!network_playing && (game.team_mode || tape.playing))
       stored_player[i].effective_action = stored_player[i].action;
 #else
     if (!network_playing)
@@ -12388,10 +12391,13 @@ void GameActions()
     SendToServer_MovePlayer(summarized_player_action);
 #endif
 
-  if (!options.network && !setup.team_mode)
+  if (!options.network && !game.team_mode)
     local_player->effective_action = summarized_player_action;
 
-  if (setup.team_mode && setup.input_on_focus && game.centered_player_nr != -1)
+  if (tape.recording &&
+      setup.team_mode &&
+      setup.input_on_focus &&
+      game.centered_player_nr != -1)
   {
     for (i = 0; i < MAX_PLAYERS; i++)
       stored_player[i].effective_action =
@@ -12407,12 +12413,13 @@ void GameActions()
     tape_action[i] = stored_player[i].effective_action;
 
 #if 1
-    /* (this can only happen in the R'n'D game engine) */
-    if (setup.team_mode &&
-	tape.recording &&
+    /* (this may happen in the RND game engine if a player was not present on
+       the playfield on level start, but appeared later from a custom element */
+    if (tape.recording &&
+	setup.team_mode &&
 	tape_action[i] &&
 	!tape.player_participates[i])
-      tape.player_participates[i] = TRUE;    /* player just appeared from CE */
+      tape.player_participates[i] = TRUE;
 #else
     /* (this can only happen in the R'n'D game engine) */
     if (tape.recording && tape_action[i] && !tape.player_participates[i])
@@ -12426,8 +12433,7 @@ void GameActions()
 
 #if USE_NEW_PLAYER_ASSIGNMENTS
 #if 1
-  // if (setup.team_mode)
-  if (TEST_game_team_mode)
+  if (game.team_mode)
 #endif
   {
     byte mapped_action[MAX_PLAYERS];
@@ -12460,11 +12466,6 @@ void GameActions()
     printf("\n");
   }
 #endif
-#endif
-
-#if 0
-  if (!options.network && !setup.team_mode)
-    local_player->effective_action = summarized_player_action;
 #endif
 
 #if 0

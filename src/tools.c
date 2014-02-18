@@ -8503,6 +8503,12 @@ int getBeltSwitchElementFromBeltNrAndBeltDir(int belt_nr, int belt_dir)
   return getBeltSwitchElementFromBeltNrAndBeltDirNr(belt_nr, belt_dir_nr);
 }
 
+#if 1
+boolean getTeamMode_EM()
+{
+  return game.team_mode;
+}
+#else
 int getNumActivePlayers_EM()
 {
 #if 1
@@ -8534,6 +8540,7 @@ int getNumActivePlayers_EM()
   return num_players;
 #endif
 }
+#endif
 
 int getGameFrameDelay_EM(int native_em_game_frame_delay)
 {
