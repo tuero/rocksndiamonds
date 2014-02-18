@@ -1237,6 +1237,20 @@ static void HandleKeysSpecial(Key key)
     {
       DumpTape(&tape);
     }
+    else if (is_string_suffix(cheat_input, ":fix-tape") ||
+	     is_string_suffix(cheat_input, ":ft"))
+    {
+      /* fix single-player tapes that contain player input for more than one
+	 player (due to a bug in 3.3.1.2 and earlier versions), which results
+	 in playing levels with more than one player in multi-player mode,
+	 even though the tape was originally recorded in single-player mode */
+
+      /* remove player input actions for all players but the first one */
+      for (i = 1; i < MAX_PLAYERS; i++)
+	tape.player_participates[i] = FALSE;
+
+      tape.changed = TRUE;
+    }
     else if (is_string_suffix(cheat_input, ":save-native-level") ||
 	     is_string_suffix(cheat_input, ":snl"))
     {
@@ -1695,6 +1709,7 @@ void HandleKey(Key key, int key_status)
 	  }
 	  break;
 
+#if 0
 	case KSYM_s:
 	  if (!global.fps_slowdown)
 	  {
@@ -1714,7 +1729,9 @@ void HandleKey(Key key, int key_status)
 	    printf("fps slowdown disabled\n");
 	  }
 	  break;
+#endif
 
+#if 0
 	case KSYM_f:
 	  ScrollStepSize = TILEX / 8;
 	  printf("ScrollStepSize == %d (1/8)\n", ScrollStepSize);
@@ -1734,6 +1751,7 @@ void HandleKey(Key key, int key_status)
 	  ScrollStepSize = TILEX;
 	  printf("ScrollStepSize == %d (1/1)\n", ScrollStepSize);
 	  break;
+#endif
 
 	case KSYM_v:
 	  printf("::: currently using game engine version %d\n",

@@ -8505,9 +8505,25 @@ int getBeltSwitchElementFromBeltNrAndBeltDir(int belt_nr, int belt_dir)
 
 int getNumActivePlayers_EM()
 {
+#if 1
   int num_players = 0;
   int i;
 
+  if (!tape.playing)
+    return (setup.team_mode ? MAX_PLAYERS : 1);
+
+  for (i = 0; i < MAX_PLAYERS; i++)
+    if (tape.player_participates[i])
+      num_players++;
+
+  return (num_players > 1 ? MAX_PLAYERS : 1);
+
+#else
+
+  int num_players = 0;
+  int i;
+
+  /* when recording game, activate all connected players */
   if (!tape.playing)
     return -1;
 
@@ -8516,6 +8532,7 @@ int getNumActivePlayers_EM()
       num_players++;
 
   return num_players;
+#endif
 }
 
 int getGameFrameDelay_EM(int native_em_game_frame_delay)

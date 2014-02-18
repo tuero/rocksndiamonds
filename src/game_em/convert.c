@@ -1178,10 +1178,18 @@ void prepare_em_level(void)
 
   num_tape_players = getNumActivePlayers_EM();
 
+#if 1
+  printf("::: getNumActivePlayers_EM: %d\n", num_tape_players);
+#endif
+
+#if 1
+  lev.home_initial = MIN(lev.home_initial, num_tape_players);
+#else
   if (num_tape_players != -1)
     lev.home_initial = MIN(lev.home_initial, num_tape_players);
   else if (!setup.team_mode)
     lev.home_initial = MIN(lev.home_initial, 1);
+#endif
 
   lev.home = lev.home_initial;
   players_left = lev.home_initial;

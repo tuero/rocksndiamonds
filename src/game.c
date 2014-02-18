@@ -21,6 +21,11 @@
 #include "tape.h"
 #include "network.h"
 
+
+/* DEBUG SETTINGS */
+#define DEBUG_INIT_PLAYER	1
+#define DEBUG_PLAYER_ACTIONS	0
+
 /* EXPERIMENTAL STUFF */
 #define USE_NEW_AMOEBA_CODE	FALSE
 
@@ -1137,6 +1142,8 @@ static boolean recursion_loop_element;
 
 static int map_player_action[MAX_PLAYERS];
 
+static boolean TEST_game_team_mode;
+
 
 /* ------------------------------------------------------------------------- */
 /* definition of elements that automatically change to other elements after  */
@@ -1740,14 +1747,16 @@ static void InitPlayerField(int x, int y, int element, boolean init_game)
 
       StorePlayer[x][y] = Feld[x][y];
 
+#if DEBUG_INIT_PLAYER
       if (options.debug)
       {
-	printf("Player %d activated.\n", player->element_nr);
-	printf("[Local player is %d and currently %s.]\n",
+	printf("- player element %d activated", player->element_nr);
+	printf(" (local player is %d and currently %s)\n",
 	       local_player->element_nr,
 	       local_player->active ? "active" : "not active");
       }
     }
+#endif
 
     Feld[x][y] = EL_EMPTY;
 
@@ -3753,6 +3762,13 @@ void InitGame()
   for (i = 0; i < MAX_NUM_AMOEBA; i++)
     AmoebaCnt[i] = AmoebaCnt2[i] = 0;
 
+#if DEBUG_INIT_PLAYER
+  if (options.debug)
+  {
+    printf("Player status at level initialization:\n");
+  }
+#endif
+
   SCAN_PLAYFIELD(x, y)
   {
     Feld[x][y] = level.field[x][y];
@@ -3886,14 +3902,34 @@ void InitGame()
   local_player->connected = TRUE;
   /* !!! SAME AS init.c:InitPlayerInfo() -- FIX THIS !!! */
 
+  TEST_game_team_mode = setup.team_mode;
+
   if (tape.playing)
   {
+#if 1
+    int num_players = 0;
+
+    for (i = 0; i < MAX_PLAYERS; i++)
+      if (tape.player_participates[i])
+	num_players++;
+
+    TEST_game_team_mode = (num_players > 1);
+
+    printf("::: TAPE TEAM MODE: %s (%d)\n",
+	   (TEST_game_team_mode ? "true" : "false"), num_players);
+#endif
+
+#if 1
+    for (i = 0; i < MAX_PLAYERS; i++)
+      stored_player[i].connected = tape.player_participates[i];
+#else
     /* try to guess locally connected team mode players (needed for correct
        assignment of player figures from level to locally playing players) */
 
     for (i = 0; i < MAX_PLAYERS; i++)
       if (tape.player_participates[i])
 	stored_player[i].connected = TRUE;
+#endif
   }
   else if (setup.team_mode && !options.network)
   {
@@ -3906,14 +3942,32 @@ void InitGame()
 	stored_player[i].connected = TRUE;
   }
 
-#if 0
-  for (i = 0; i < MAX_PLAYERS; i++)
-    printf("::: player %d: %s\n", i,
-	   (stored_player[i].connected ? "connected" : "not connected"));
+#if DEBUG_INIT_PLAYER
+  if (options.debug)
+  {
+    printf("Player status after level initialization:\n");
 
-  for (i = 0; i < MAX_PLAYERS; i++)
-    printf("::: player %d: %s\n", i,
-	   (stored_player[i].present ? "present" : "not present"));
+    for (i = 0; i < MAX_PLAYERS; i++)
+    {
+      struct PlayerInfo *player = &stored_player[i];
+
+      printf("- player %d: present == %d, connected == %d, active == %d",
+	     i + 1,
+	     player->present,
+	     player->connected,
+	     player->active);
+
+      if (local_player == player)
+	printf(" (local player)");
+
+      printf("\n");
+    }
+  }
+#endif
+
+#if DEBUG_INIT_PLAYER
+  if (options.debug)
+    printf("Reassigning players ...\n");
 #endif
 
   /* check if any connected player was not found in playfield */
@@ -3925,12 +3979,29 @@ void InitGame()
     {
       struct PlayerInfo *field_player = NULL;
 
-#if 0
-      printf("::: looking for field player for player %d ...\n", i);
+#if DEBUG_INIT_PLAYER
+      if (options.debug)
+	printf("- looking for field player for player %d ...\n", i + 1);
 #endif
 
       /* assign first free player found that is present in the playfield */
 
+#if 1
+      /* first try: look for unmapped playfield player that is not connected */
+      for (j = 0; j < MAX_PLAYERS; j++)
+	if (field_player == NULL &&
+	    stored_player[j].present &&
+	    !stored_player[j].mapped &&
+	    !stored_player[j].connected)
+	  field_player = &stored_player[j];
+
+      /* second try: look for *any* unmapped playfield player */
+      for (j = 0; j < MAX_PLAYERS; j++)
+	if (field_player == NULL &&
+	    stored_player[j].present &&
+	    !stored_player[j].mapped)
+	  field_player = &stored_player[j];
+#else
       /* first try: look for unmapped playfield player that is not connected */
       if (field_player == NULL)
 	for (j = 0; j < MAX_PLAYERS; j++)
@@ -3945,13 +4016,15 @@ void InitGame()
 	  if (stored_player[j].present &&
 	      !stored_player[j].mapped)
 	    field_player = &stored_player[j];
+#endif
 
       if (field_player != NULL)
       {
 	int jx = field_player->jx, jy = field_player->jy;
 
-#if 0
-	printf("::: found player figure %d\n", field_player->index_nr);
+#if DEBUG_INIT_PLAYER
+	if (options.debug)
+	  printf("- found player %d\n", field_player->index_nr + 1);
 #endif
 
 	player->present = FALSE;
@@ -3980,9 +4053,10 @@ void InitGame()
 
 	field_player->mapped = TRUE;
 
-#if 0
-	printf("::: map_player_action[%d] == %d\n",
-	       field_player->index_nr, i);
+#if DEBUG_INIT_PLAYER
+	if (options.debug)
+	  printf("- map_player_action[%d] == %d\n",
+		 field_player->index_nr + 1, i + 1);
 #endif
       }
     }
@@ -3990,6 +4064,29 @@ void InitGame()
     if (player->connected && player->present)
       player->mapped = TRUE;
   }
+
+#if DEBUG_INIT_PLAYER
+  if (options.debug)
+  {
+    printf("Player status after player assignment (first stage):\n");
+
+    for (i = 0; i < MAX_PLAYERS; i++)
+    {
+      struct PlayerInfo *player = &stored_player[i];
+
+      printf("- player %d: present == %d, connected == %d, active == %d",
+	     i + 1,
+	     player->present,
+	     player->connected,
+	     player->active);
+
+      if (local_player == player)
+	printf(" (local player)");
+
+      printf("\n");
+    }
+  }
+#endif
 
 #else
 
@@ -4041,6 +4138,12 @@ void InitGame()
     /* when playing a tape, eliminate all players who do not participate */
 
 #if USE_NEW_PLAYER_ASSIGNMENTS
+
+#if 1
+    // if (!setup.team_mode)
+    if (!TEST_game_team_mode)
+#endif
+
     for (i = 0; i < MAX_PLAYERS; i++)
     {
       if (stored_player[i].active &&
@@ -4048,6 +4151,11 @@ void InitGame()
       {
 	struct PlayerInfo *player = &stored_player[i];
 	int jx = player->jx, jy = player->jy;
+
+#if DEBUG_INIT_PLAYER
+	if (options.debug)
+	  printf("Removing player %d at (%d, %d)\n", i + 1, jx, jy);
+#endif
 
 	player->active = FALSE;
 	StorePlayer[jx][jy] = 0;
@@ -4110,21 +4218,28 @@ void InitGame()
 #endif
   }
 
+#if DEBUG_INIT_PLAYER
   if (options.debug)
   {
+    printf("Player status after player assignment (final stage):\n");
+
     for (i = 0; i < MAX_PLAYERS; i++)
     {
       struct PlayerInfo *player = &stored_player[i];
 
-      printf("Player %d: present == %d, connected == %d, active == %d.\n",
-	     i+1,
+      printf("- player %d: present == %d, connected == %d, active == %d",
+	     i + 1,
 	     player->present,
 	     player->connected,
 	     player->active);
+
       if (local_player == player)
-	printf("Player 	%d is local player.\n", i+1);
+	printf(" (local player)");
+
+      printf("\n");
     }
   }
+#endif
 
   if (BorderElement == EL_EMPTY)
   {
@@ -4410,12 +4525,28 @@ void InitGame()
 
     KeyboardAutoRepeatOffUnlessAutoplay();
 
+#if DEBUG_INIT_PLAYER
     if (options.debug)
     {
+      printf("Player status (final):\n");
+
       for (i = 0; i < MAX_PLAYERS; i++)
-	printf("Player %d %sactive.\n",
-	       i + 1, (stored_player[i].active ? "" : "not "));
+      {
+	struct PlayerInfo *player = &stored_player[i];
+
+	printf("- player %d: present == %d, connected == %d, active == %d",
+	       i + 1,
+	       player->present,
+	       player->connected,
+	       player->active);
+
+	if (local_player == player)
+	  printf(" (local player)");
+
+	printf("\n");
+      }
     }
+#endif
   }
 
 #if 1
@@ -12243,8 +12374,13 @@ void GameActions()
   {
     summarized_player_action |= stored_player[i].action;
 
+#if 1
+    if (!network_playing && (setup.team_mode || tape.playing))
+      stored_player[i].effective_action = stored_player[i].action;
+#else
     if (!network_playing)
       stored_player[i].effective_action = stored_player[i].action;
+#endif
   }
 
 #if defined(NETWORK_AVALIABLE)
@@ -12270,9 +12406,18 @@ void GameActions()
   {
     tape_action[i] = stored_player[i].effective_action;
 
+#if 1
+    /* (this can only happen in the R'n'D game engine) */
+    if (setup.team_mode &&
+	tape.recording &&
+	tape_action[i] &&
+	!tape.player_participates[i])
+      tape.player_participates[i] = TRUE;    /* player just appeared from CE */
+#else
     /* (this can only happen in the R'n'D game engine) */
     if (tape.recording && tape_action[i] && !tape.player_participates[i])
       tape.player_participates[i] = TRUE;    /* player just appeared from CE */
+#endif
   }
 
   /* only record actions from input devices, but not programmed actions */
@@ -12280,16 +12425,82 @@ void GameActions()
     TapeRecordAction(tape_action);
 
 #if USE_NEW_PLAYER_ASSIGNMENTS
+#if 1
+  // if (setup.team_mode)
+  if (TEST_game_team_mode)
+#endif
   {
     byte mapped_action[MAX_PLAYERS];
+
+#if DEBUG_PLAYER_ACTIONS
+    printf(":::");
+    for (i = 0; i < MAX_PLAYERS; i++)
+      printf(" %d, ", stored_player[i].effective_action);
+#endif
 
     for (i = 0; i < MAX_PLAYERS; i++)
       mapped_action[i] = stored_player[map_player_action[i]].effective_action;
 
     for (i = 0; i < MAX_PLAYERS; i++)
       stored_player[i].effective_action = mapped_action[i];
+
+#if DEBUG_PLAYER_ACTIONS
+    printf(" =>");
+    for (i = 0; i < MAX_PLAYERS; i++)
+      printf(" %d, ", stored_player[i].effective_action);
+    printf("\n");
+#endif
+  }
+#if DEBUG_PLAYER_ACTIONS
+  else
+  {
+    printf(":::");
+    for (i = 0; i < MAX_PLAYERS; i++)
+      printf(" %d, ", stored_player[i].effective_action);
+    printf("\n");
   }
 #endif
+#endif
+
+#if 0
+  if (!options.network && !setup.team_mode)
+    local_player->effective_action = summarized_player_action;
+#endif
+
+#if 0
+  printf("::: summarized_player_action == %d\n",
+	 local_player->effective_action);
+#endif
+
+
+
+
+#if 0
+#if DEBUG_INIT_PLAYER
+    if (options.debug)
+    {
+      printf("Player status (final):\n");
+
+      for (i = 0; i < MAX_PLAYERS; i++)
+      {
+	struct PlayerInfo *player = &stored_player[i];
+
+	printf("- player %d: present == %d, connected == %d, active == %d",
+	       i + 1,
+	       player->present,
+	       player->connected,
+	       player->active);
+
+	if (local_player == player)
+	  printf(" (local player)");
+
+	printf("\n");
+      }
+    }
+#endif
+#endif
+
+
 
   if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
   {
