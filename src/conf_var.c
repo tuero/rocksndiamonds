@@ -2093,6 +2093,14 @@ struct TokenIntPtrInfo image_config_vars[] =
     &preview.anim_mode
   },
   {
+    "door_1.width",
+    &door_1.width
+  },
+  {
+    "door_1.height",
+    &door_1.height
+  },
+  {
     "door_1.step_offset",
     &door_1.step_offset
   },
@@ -2103,6 +2111,14 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "door_1.anim_mode",
     &door_1.anim_mode
+  },
+  {
+    "door_2.width",
+    &door_2.width
+  },
+  {
+    "door_2.height",
+    &door_2.height
   },
   {
     "door_2.step_offset",

@@ -2002,6 +2002,50 @@ static void InitGraphicCompatibilityInfo()
     }
   }
 
+#if 1
+  struct
+  {
+    int graphic;
+    int *width, *height;
+    boolean right_wing;
+  }
+  doors[] =
+  {
+    { IMG_DOOR_1_WING_LEFT,	&door_1.width,	&door_1.height,	FALSE	},
+    { IMG_DOOR_1_WING_RIGHT,	&door_1.width,	&door_1.height,	TRUE	},
+    { IMG_DOOR_2_WING_LEFT,	&door_2.width,	&door_2.height,	FALSE	},
+    { IMG_DOOR_2_WING_RIGHT,	&door_2.width,	&door_2.height,	TRUE	},
+
+    { 0,			NULL,		NULL,		FALSE	}
+  };
+
+  for (i = 0; doors[i].graphic != 0; i++)
+  {
+    int graphic = doors[i].graphic;
+    int *width  = doors[i].width;
+    int *height = doors[i].height;
+    boolean right_wing = doors[i].right_wing;
+
+    struct FileInfo *fi = getImageListEntryFromImageID(graphic);
+    struct GraphicInfo *g = &graphic_info[graphic];
+
+    if (!fi->redefined)
+    {
+      if (*width != -1)
+      {
+	// correct start position for right wing of "standard" door graphic
+	if (right_wing)
+	  g->src_x += g->width - *width;
+
+	g->width = *width;
+      }
+
+      if (*height != -1)
+	g->height = *height;
+    }
+  }
+#endif
+
 #if 0
   for (i = 0; i < num_images; i++)
   {

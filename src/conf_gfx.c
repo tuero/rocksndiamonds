@@ -5902,10 +5902,14 @@ struct ConfigInfo image_config[] =
   { "preview.step_delay",			"50"			},
   { "preview.anim_mode",			"default"		},
 
+  { "door_1.width",				"-1"			},
+  { "door_1.height",				"-1"			},
   { "door_1.step_offset",			"2"			},
   { "door_1.step_delay",			"10"			},
   { "door_1.anim_mode",				"default"		},
 
+  { "door_2.width",				"-1"			},
+  { "door_2.height",				"-1"			},
   { "door_2.step_offset",			"2"			},
   { "door_2.step_delay",			"10"			},
   { "door_2.anim_mode",				"default"		},

@@ -2300,6 +2300,8 @@ struct MenuInfo
 
 struct DoorInfo
 {
+  int width;
+  int height;
   int step_offset;
   int step_delay;
   int anim_mode;

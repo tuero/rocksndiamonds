@@ -5228,7 +5228,7 @@ unsigned int MoveDoor(unsigned int door_state)
   unsigned int door_delay_value;
   int stepsize = 1;
 
-#if 0
+#if 1
   if (door_1.width < 0 || door_1.width > DXSIZE)
     door_1.width = DXSIZE;
   if (door_1.height < 0 || door_1.height > DYSIZE)
@@ -5288,6 +5288,24 @@ unsigned int MoveDoor(unsigned int door_state)
 
   if (door_state & DOOR_ACTION)
   {
+#if 1
+    struct GraphicInfo *g1_left  = &graphic_info[IMG_DOOR_1_WING_LEFT];
+    struct GraphicInfo *g1_right = &graphic_info[IMG_DOOR_1_WING_RIGHT];
+    struct GraphicInfo *g2_left  = &graphic_info[IMG_DOOR_2_WING_LEFT];
+    struct GraphicInfo *g2_right = &graphic_info[IMG_DOOR_2_WING_RIGHT];
+    int door_1_left_width   = g1_left->width;
+    int door_1_left_height  = g1_left->height;
+    int door_1_right_width  = g1_right->width;
+    int door_1_right_height = g1_right->height;
+    int door_2_left_width   = g2_left->width;
+    int door_2_left_height  = g2_left->height;
+    int door_2_right_width  = g2_right->width;
+    int door_2_right_height = g2_right->height;
+    int door_1_width  = MAX(door_1_left_width,  door_1_right_width);
+    int door_1_height = MAX(door_1_left_height, door_1_right_height);
+    int door_2_width  = MAX(door_2_left_width,  door_2_right_width);
+    int door_2_height = MAX(door_2_left_height, door_2_right_height);
+#endif
     boolean handle_door_1 = (door_state & DOOR_ACTION_1);
     boolean handle_door_2 = (door_state & DOOR_ACTION_2);
     boolean door_1_done = (!handle_door_1);
@@ -5295,15 +5313,21 @@ unsigned int MoveDoor(unsigned int door_state)
     boolean door_1_vertical = (door_1.anim_mode & ANIM_VERTICAL);
     boolean door_2_vertical = (door_2.anim_mode & ANIM_VERTICAL);
 #if 1
+#if 1
+    int door_size_1 = (door_1_vertical ? door_1_height : door_1_width);
+    int door_size_2 = (door_2_vertical ? door_2_height : door_2_width);
+#else
     int door_size_1 = (door_1_vertical ? DYSIZE : DXSIZE);
     int door_size_2 = (door_2_vertical ? VYSIZE : VXSIZE);
+#endif
 #else
     int door_size_1 = (door_1_vertical ? door_1.height : door_1.width);
     int door_size_2 = (door_2_vertical ? door_2.height : door_2.width);
 #endif
     int max_door_size_1 = (door_1_vertical ? DYSIZE : DXSIZE);
     int max_door_size_2 = (door_2_vertical ? VYSIZE : VXSIZE);
-    int door_size     = (handle_door_1 ? door_size_1     : door_size_2);
+    // int door_size     = (handle_door_1 ? door_size_1     : door_size_2);
+    int door_size     = (handle_door_2 ? door_size_2     : door_size_1);
     int max_door_size = (handle_door_1 ? max_door_size_1 : max_door_size_2);
     int door_skip = max_door_size - door_size;
     int end = door_size;
@@ -5322,16 +5346,21 @@ unsigned int MoveDoor(unsigned int door_state)
     for (k = start; k <= end && !(door_1_done && door_2_done); k += stepsize)
     {
       int x = k;
-#if 1
+#if 0
       Bitmap *bitmap = graphic_info[IMG_GLOBAL_DOOR].bitmap;
       GC gc = bitmap->stored_clip_gc;
 #endif
 
-      if (door_state & DOOR_ACTION_1)
+      if (door_state & DOOR_ACTION_1 &&
+	  x * door_1.step_offset <= door_size_1)
       {
 	int a = MIN(x * door_1.step_offset, end);
 	int p = (door_state & DOOR_OPEN_1 ? end - a : a);
+#if 1
+	int i = p;
+#else
 	int i = p + door_skip;
+#endif
 
 #if 1
 	struct GraphicInfo *g_left  = &graphic_info[IMG_DOOR_1_WING_LEFT];
@@ -5449,33 +5478,37 @@ unsigned int MoveDoor(unsigned int door_state)
 	  int ypos1 = 0, ypos2 = height2;
 	  int ypos3 = DYSIZE / 2, ypos4 = DYSIZE - height2;
 
-	  SetClipOrigin(bitmap, gc, dst1_x - src1_x, dst1_y - src1_y + j);
-	  BlitBitmapMasked(bitmap, drawto,
+	  SetClipOrigin(bm_right, gc_right,
+			dst1_x - src1_x, dst1_y - src1_y + j);
+	  BlitBitmapMasked(bm_right, drawto,
 			   src1_x, src1_y + ypos1, width, height2,
 			   dst1_x, dst1_y + ypos1 + j);
-	  BlitBitmapMasked(bitmap, drawto,
+	  BlitBitmapMasked(bm_right, drawto,
 			   src1_x, src1_y + ypos3, width, height1,
 			   dst1_x, dst1_y + ypos3 + j);
-	  SetClipOrigin(bitmap, gc, dst2_x - src2_x, dst2_y - src2_y - j);
-	  BlitBitmapMasked(bitmap, drawto,
+	  SetClipOrigin(bm_left, gc_left,
+			dst2_x - src2_x, dst2_y - src2_y - j);
+	  BlitBitmapMasked(bm_left, drawto,
 			   src2_x, src2_y + ypos1 + j, width, height2 - j,
 			   dst2_x, dst2_y + ypos1);
-	  BlitBitmapMasked(bitmap, drawto,
+	  BlitBitmapMasked(bm_left, drawto,
 			   src2_x, src2_y + ypos3, width, height1,
 			   dst2_x, dst2_y + ypos3 - j);
 
-	  SetClipOrigin(bitmap, gc, dst2_x - src2_x, dst2_y - src2_y - j);
-	  BlitBitmapMasked(bitmap, drawto,
+	  SetClipOrigin(bm_left, gc_left,
+			dst2_x - src2_x, dst2_y - src2_y - j);
+	  BlitBitmapMasked(bm_left, drawto,
 			   src2_x, src2_y + ypos2, width, height1,
 			   dst2_x, dst2_y + ypos2 - j);
-	  BlitBitmapMasked(bitmap, drawto,
+	  BlitBitmapMasked(bm_left, drawto,
 			   src2_x, src2_y + ypos4, width, height2,
 			   dst2_x, dst2_y + ypos4 - j);
-	  SetClipOrigin(bitmap, gc, dst1_x - src1_x, dst1_y - src1_y + j);
-	  BlitBitmapMasked(bitmap, drawto,
+	  SetClipOrigin(bm_right, gc_right,
+			dst1_x - src1_x, dst1_y - src1_y + j);
+	  BlitBitmapMasked(bm_right, drawto,
 			   src1_x, src1_y + ypos2, width, height1,
 			   dst1_x, dst1_y + ypos2 + j);
-	  BlitBitmapMasked(bitmap, drawto,
+	  BlitBitmapMasked(bm_right, drawto,
 			   src1_x, src1_y + ypos4, width, height2 - j,
 			   dst1_x, dst1_y + ypos4 + j);
 #else
@@ -5554,7 +5587,8 @@ unsigned int MoveDoor(unsigned int door_state)
 	door_1_done = (a == end);
       }
 
-      if (door_state & DOOR_ACTION_2)
+      if (door_state & DOOR_ACTION_2 &&
+	  x * door_2.step_offset <= door_size_2)
       {
 	int a = MIN(x * door_2.step_offset, door_size);
 	int p = (door_state & DOOR_OPEN_2 ? door_size - a : a);
@@ -5675,21 +5709,25 @@ unsigned int MoveDoor(unsigned int door_state)
 	  int height = VYSIZE / 2;
 	  int ypos1 = 0, ypos2 = VYSIZE / 2;
 
-	  SetClipOrigin(bitmap, gc, dst1_x - src1_x, dst1_y - src1_y + j);
-	  BlitBitmapMasked(bitmap, drawto,
+	  SetClipOrigin(bm_right, gc_right,
+			dst1_x - src1_x, dst1_y - src1_y + j);
+	  BlitBitmapMasked(bm_right, drawto,
 			   src1_x, src1_y + ypos1, width, height,
 			   dst1_x, dst1_y + ypos1 + j);
-	  SetClipOrigin(bitmap, gc, dst2_x - src2_x, dst2_y - src2_y - j);
-	  BlitBitmapMasked(bitmap, drawto,
+	  SetClipOrigin(bm_left, gc_left,
+			dst2_x - src2_x, dst2_y - src2_y - j);
+	  BlitBitmapMasked(bm_left, drawto,
 			   src2_x, src2_y + ypos1 + j, width, height - j,
 			   dst2_x, dst2_y + ypos1);
 
-	  SetClipOrigin(bitmap, gc, dst2_x - src2_x, dst2_y - src2_y - j);
-	  BlitBitmapMasked(bitmap, drawto,
+	  SetClipOrigin(bm_left, gc_left,
+			dst2_x - src2_x, dst2_y - src2_y - j);
+	  BlitBitmapMasked(bm_left, drawto,
 			   src2_x, src2_y + ypos2, width, height,
 			   dst2_x, dst2_y + ypos2 - j);
-	  SetClipOrigin(bitmap, gc, dst1_x - src1_x, dst1_y - src1_y + j);
-	  BlitBitmapMasked(bitmap, drawto,
+	  SetClipOrigin(bm_right, gc_right,
+			dst1_x - src1_x, dst1_y - src1_y + j);
+	  BlitBitmapMasked(bm_right, drawto,
 			   src1_x, src1_y + ypos2, width, height - j,
 			   dst1_x, dst1_y + ypos2 + j);
 #else

@@ -1,3 +1,7 @@
+2014-02-18
+	* fixed major bugs in handling single-player and multi-player tapes
+	  (for details, see http://www.artsoft.org/forum/viewtopic.php?t=2086)
+
 2014-02-13
 	* fixed various problems with playfield and requester/tape/editor doors
 	  defined to be at non-standard screen positions in artwork config file
