@@ -5371,6 +5371,11 @@ unsigned int MoveDoor(unsigned int door_state)
 	GC gc_right = bm_right->stored_clip_gc;
 #endif
 
+	int classic_dxsize = 100;
+	int classic_dysize = 280;
+	boolean classic_door_1_size = (DXSIZE == classic_dxsize &&
+				       DYSIZE == classic_dysize);
+
 	if (door_1.anim_mode & ANIM_STATIC_PANEL)
 	{
 	  BlitBitmap(bitmap_db_door, drawto,
@@ -5383,7 +5388,10 @@ unsigned int MoveDoor(unsigned int door_state)
 		     DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1 + p / 2,
 		     DXSIZE, DYSIZE - p / 2, DX, DY);
 
+#if 1
+	  // printf("::: p == %d\n", p);
 	  ClearRectangle(drawto, DX, DY + DYSIZE - p / 2, DXSIZE, p / 2);
+#endif
 	}
 
 	if (door_1.anim_mode & ANIM_HORIZONTAL && x <= DXSIZE)
@@ -5460,7 +5468,7 @@ unsigned int MoveDoor(unsigned int door_state)
 			   dst2_x, dst2_y);
 #endif
 	}
-	else if (x <= DXSIZE)	/* ANIM_DEFAULT */
+	else if (classic_door_1_size && x <= DXSIZE)	/* ANIM_DEFAULT */
 	{
 	  int j = (door_1.anim_mode == ANIM_DEFAULT ? (DXSIZE - i) / 3 : 0);
 
@@ -5511,6 +5519,7 @@ unsigned int MoveDoor(unsigned int door_state)
 	  BlitBitmapMasked(bm_right, drawto,
 			   src1_x, src1_y + ypos4, width, height2 - j,
 			   dst1_x, dst1_y + ypos4 + j);
+
 #else
 	  int src1_x = DXSIZE,		src1_y = DOOR_GFX_PAGEY1;
 	  int src2_x = DXSIZE - i,	src2_y = DOOR_GFX_PAGEY1;
@@ -5603,6 +5612,11 @@ unsigned int MoveDoor(unsigned int door_state)
 	GC gc_right = bm_right->stored_clip_gc;
 #endif
 
+	int classic_vxsize = 100;
+	int classic_vysize = 280;
+	boolean classic_door_2_size = (VXSIZE == classic_vxsize &&
+				       VYSIZE == classic_vysize);
+
 	if (door_2.anim_mode & ANIM_STATIC_PANEL)
 	{
 	  BlitBitmap(bitmap_db_door, drawto,
@@ -5692,7 +5706,7 @@ unsigned int MoveDoor(unsigned int door_state)
 			   dst2_x, dst2_y);
 #endif
 	}
-	else if (x <= VXSIZE)	/* ANIM_DEFAULT */
+	else if (classic_door_2_size && x <= VXSIZE)	/* ANIM_DEFAULT */
 	{
 	  int j = (door_2.anim_mode == ANIM_DEFAULT ? (VXSIZE - i) / 3 : 0);
 
