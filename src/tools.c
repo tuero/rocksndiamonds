@@ -5613,7 +5613,7 @@ unsigned int MoveDoor(unsigned int door_state)
 #endif
 
 	int classic_vxsize = 100;
-	int classic_vysize = 280;
+	int classic_vysize = 100;
 	boolean classic_door_2_size = (VXSIZE == classic_vxsize &&
 				       VYSIZE == classic_vysize);
 
