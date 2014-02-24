@@ -37,6 +37,117 @@
 
 #define NUM_TOOL_BUTTONS	7
 
+/* constants for number of doors and door parts */
+#define NUM_DOORS		2
+#define MAX_NUM_DOOR_PARTS	8
+
+
+struct DoorPartOrderInfo
+{
+  int nr;
+  int sort_priority;
+};
+
+static struct DoorPartOrderInfo door_part_order[NUM_DOORS * MAX_NUM_DOOR_PARTS];
+
+struct DoorPartControlInfo
+{
+  int door_nr;
+  int graphic;
+  struct TextPosInfo *pos;
+};
+
+static struct DoorPartControlInfo door_part_controls[] =
+{
+  {
+    DOOR_1,
+    IMG_DOOR_1_GFX_PART_1,
+    &door_1.part_1
+  },
+  {
+    DOOR_1,
+    IMG_DOOR_1_GFX_PART_2,
+    &door_1.part_2
+  },
+  {
+    DOOR_1,
+    IMG_DOOR_1_GFX_PART_3,
+    &door_1.part_3
+  },
+  {
+    DOOR_1,
+    IMG_DOOR_1_GFX_PART_4,
+    &door_1.part_4
+  },
+  {
+    DOOR_1,
+    IMG_DOOR_1_GFX_PART_5,
+    &door_1.part_5
+  },
+  {
+    DOOR_1,
+    IMG_DOOR_1_GFX_PART_6,
+    &door_1.part_6
+  },
+  {
+    DOOR_1,
+    IMG_DOOR_1_GFX_PART_7,
+    &door_1.part_7
+  },
+  {
+    DOOR_1,
+    IMG_DOOR_1_GFX_PART_8,
+    &door_1.part_8
+  },
+  {
+    DOOR_2,
+    IMG_DOOR_2_GFX_PART_1,
+    &door_2.part_1
+  },
+  {
+    DOOR_2,
+    IMG_DOOR_2_GFX_PART_2,
+    &door_2.part_2
+  },
+  {
+    DOOR_2,
+    IMG_DOOR_2_GFX_PART_3,
+    &door_2.part_3
+  },
+  {
+    DOOR_2,
+    IMG_DOOR_2_GFX_PART_4,
+    &door_2.part_4
+  },
+  {
+    DOOR_2,
+    IMG_DOOR_2_GFX_PART_5,
+    &door_2.part_5
+  },
+  {
+    DOOR_2,
+    IMG_DOOR_2_GFX_PART_6,
+    &door_2.part_6
+  },
+  {
+    DOOR_2,
+    IMG_DOOR_2_GFX_PART_7,
+    &door_2.part_7
+  },
+  {
+    DOOR_2,
+    IMG_DOOR_2_GFX_PART_8,
+    &door_2.part_8
+  },
+
+  {
+    -1,
+    -1,
+    NULL
+  }
+};
+
+
 /* forward declaration for internal use */
 static void UnmapToolButtons();
 static void HandleToolButtons(struct GadgetInfo *);
@@ -1088,6 +1199,17 @@ void DrawBackground(int x, int y, int width, int height)
 #endif
 
 #if 1
+
+#if 1
+  if (IN_GFX_FIELD_FULL(x, y))
+    redraw_mask |= REDRAW_FIELD;
+  else if (IN_GFX_DOOR_1(x, y))
+    redraw_mask |= REDRAW_DOOR_1;
+  else if (IN_GFX_DOOR_2(x, y))
+    redraw_mask |= REDRAW_DOOR_2;
+  else if (IN_GFX_DOOR_3(x, y))
+    redraw_mask |= REDRAW_DOOR_3;
+#else
   /* (this only works for the current arrangement of playfield and panels) */
   if (x < gfx.dx)
     redraw_mask |= REDRAW_FIELD;
@@ -1095,6 +1217,8 @@ void DrawBackground(int x, int y, int width, int height)
     redraw_mask |= REDRAW_DOOR_1;
   else
     redraw_mask |= REDRAW_DOOR_2;
+#endif
+
 #else
   /* (this is just wrong (when drawing to one of the two door panel areas)) */
   redraw_mask |= REDRAW_FIELD;
@@ -5170,6 +5294,39 @@ boolean Request(char *text, unsigned int req_state)
 
 #endif
 
+static int compareDoorPartOrderInfo(const void *object1, const void *object2)
+{
+  const struct DoorPartOrderInfo *dpo1 = (struct DoorPartOrderInfo *)object1;
+  const struct DoorPartOrderInfo *dpo2 = (struct DoorPartOrderInfo *)object2;
+  int compare_result;
+
+  if (dpo1->sort_priority != dpo2->sort_priority)
+    compare_result = dpo1->sort_priority - dpo2->sort_priority;
+  else
+    compare_result = dpo1->nr - dpo2->nr;
+
+  return compare_result;
+}
+
+void InitDoors()
+{
+  int i;
+
+  for (i = 0; door_part_controls[i].door_nr != -1; i++)
+  {
+    struct DoorPartControlInfo *dpc = &door_part_controls[i];
+    struct DoorPartOrderInfo *dpo = &door_part_order[i];
+
+    /* fill structure for door part draw order */
+    dpo->nr = i;
+    dpo->sort_priority = dpc->pos->sort_priority;
+  }
+
+  /* sort door part controls according to sort_priority and graphic number */
+  qsort(door_part_order, NUM_DOORS * MAX_NUM_DOOR_PARTS,
+        sizeof(struct DoorPartOrderInfo), compareDoorPartOrderInfo);
+}
+
 unsigned int OpenDoor(unsigned int door_state)
 {
   if (door_state & DOOR_COPY_BACK)
@@ -5219,6 +5376,158 @@ unsigned int SetDoorState(unsigned int door_state)
 {
   return MoveDoor(door_state | DOOR_SET_STATE);
 }
+
+#if 1
+
+// ========== TEST 1 ===========================================================
+
+unsigned int MoveDoor(unsigned int door_state)
+{
+  static int door1 = DOOR_OPEN_1;
+  static int door2 = DOOR_CLOSE_2;
+#if 0
+  unsigned int door_delay = 0;
+  unsigned int door_delay_value;
+  int stepsize = 1;
+#endif
+  int i, j;
+
+#if 1
+  if (door_1.width < 0 || door_1.width > DXSIZE)
+    door_1.width = DXSIZE;
+  if (door_1.height < 0 || door_1.height > DYSIZE)
+    door_1.height = DYSIZE;
+  if (door_2.width < 0 || door_2.width > VXSIZE)
+    door_2.width = VXSIZE;
+  if (door_2.height < 0 || door_2.height > VYSIZE)
+    door_2.height = VYSIZE;
+#endif
+
+  if (door_state == DOOR_GET_STATE)
+    return (door1 | door2);
+
+  if (door_state & DOOR_SET_STATE)
+  {
+    if (door_state & DOOR_ACTION_1)
+      door1 = door_state & DOOR_ACTION_1;
+    if (door_state & DOOR_ACTION_2)
+      door2 = door_state & DOOR_ACTION_2;
+
+    return (door1 | door2);
+  }
+
+  if (!(door_state & DOOR_FORCE_REDRAW))
+  {
+    if (door1 == DOOR_OPEN_1 && door_state & DOOR_OPEN_1)
+      door_state &= ~DOOR_OPEN_1;
+    else if (door1 == DOOR_CLOSE_1 && door_state & DOOR_CLOSE_1)
+      door_state &= ~DOOR_CLOSE_1;
+    if (door2 == DOOR_OPEN_2 && door_state & DOOR_OPEN_2)
+      door_state &= ~DOOR_OPEN_2;
+    else if (door2 == DOOR_CLOSE_2 && door_state & DOOR_CLOSE_2)
+      door_state &= ~DOOR_CLOSE_2;
+  }
+
+#if 0
+  door_delay_value = (door_state & DOOR_ACTION_1 ? door_1.step_delay :
+		      door_2.step_delay);
+
+  if (setup.quick_doors)
+  {
+    stepsize = 20;		/* must be chosen to always draw last frame */
+    door_delay_value = 0;
+  }
+#endif
+
+  if (global.autoplay_leveldir)
+  {
+    door_state |= DOOR_NO_DELAY;
+    door_state &= ~DOOR_CLOSE_ALL;
+  }
+
+#if 1
+  if (game_status == GAME_MODE_EDITOR)
+    door_state |= DOOR_NO_DELAY;
+#endif
+
+  if (door_state & DOOR_ACTION)
+  {
+    for (i = 0; i < NUM_DOORS * MAX_NUM_DOOR_PARTS; i++)
+    {
+      int nr = door_part_order[i].nr;
+      struct DoorPartControlInfo *dpc = &door_part_controls[nr];
+      int door_token = dpc->door_nr;
+      int door_index = DOOR_INDEX_FROM_TOKEN(door_token);
+      int graphic = dpc->graphic;
+      struct GraphicInfo *g = &graphic_info[graphic];
+      struct TextPosInfo *pos = dpc->pos;
+      int panel_src_x, panel_src_y;
+      int dx, dy, dxsize, dysize;
+      static boolean door_panel_drawn[NUM_DOORS];
+
+      if (i == 0)
+	for (j = 0; j < NUM_DOORS; j++)
+	  door_panel_drawn[j] = FALSE;
+
+      if (door_token == DOOR_1)
+      {
+	panel_src_x = DOOR_GFX_PAGEX1;
+	panel_src_y = DOOR_GFX_PAGEY1;
+	dx = DX;
+	dy = DY;
+	dxsize = DXSIZE;
+	dysize = DYSIZE;
+      }
+      else	// DOOR_2
+      {
+	panel_src_x = DOOR_GFX_PAGEX1;
+	panel_src_y = DOOR_GFX_PAGEY2;
+	dx = VX;
+	dy = VY;
+	dxsize = VXSIZE;
+	dysize = VYSIZE;
+      }
+
+      if (!(door_state & door_token))
+	continue;
+
+      if (!g->bitmap)
+	continue;
+
+      if (!door_panel_drawn[door_index])
+      {
+	BlitBitmap(bitmap_db_door, drawto, panel_src_x, panel_src_y,
+		   dxsize, dysize, dx, dy);
+
+	door_panel_drawn[door_index] = TRUE;
+      }
+
+#if 1
+      // !!! TEST !!!
+      if (!((door_state & door_token) & DOOR_CLOSE))
+	continue;
+#endif
+
+      BlitBitmapMasked(g->bitmap, drawto, g->src_x, g->src_y,
+		       g->width, g->height, dx + pos->x, dy + pos->y);
+
+      redraw_mask |= REDRAW_DOOR_FROM_TOKEN(door_token);
+    }
+  }
+
+  redraw_mask |= REDRAW_ALL;
+
+  if (door_state & DOOR_ACTION_1)
+    door1 = door_state & DOOR_ACTION_1;
+  if (door_state & DOOR_ACTION_2)
+    door2 = door_state & DOOR_ACTION_2;
+
+  return (door1 | door2);
+}
+
+#else
+
+// ========== OLD ==============================================================
 
 unsigned int MoveDoor(unsigned int door_state)
 {
@@ -5816,6 +6125,8 @@ unsigned int MoveDoor(unsigned int door_state)
 
   return (door1 | door2);
 }
+
+#endif
 
 void DrawSpecialEditorDoor()
 {

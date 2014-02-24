@@ -2469,6 +2469,8 @@ static void ReinitializeGraphics()
   print_timestamp_time("InitGadgets");
   InitToons();
   print_timestamp_time("InitToons");
+  InitDoors();
+  print_timestamp_time("InitDoors");
 
   print_timestamp_done("ReinitializeGraphics");
 }

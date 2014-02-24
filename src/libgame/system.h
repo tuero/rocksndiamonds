@@ -317,7 +317,7 @@
 #define REDRAWTILES_THRESHOLD	0
 #endif
 
-#define IN_GFX_FIELD(x, y)	(x >= gfx.sx && x < gfx.sx + gfx.sxsize && \
+#define IN_GFX_FIELD_PLAY(x, y)	(x >= gfx.sx && x < gfx.sx + gfx.sxsize && \
 				 y >= gfx.sy && y < gfx.sy + gfx.sysize)
 #define IN_GFX_FIELD_FULL(x, y)	(x >= gfx.real_sx && \
 				 x <  gfx.real_sx + gfx.full_sxsize && \

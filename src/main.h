@@ -2300,6 +2300,15 @@ struct MenuInfo
 
 struct DoorInfo
 {
+  struct TextPosInfo part_1;
+  struct TextPosInfo part_2;
+  struct TextPosInfo part_3;
+  struct TextPosInfo part_4;
+  struct TextPosInfo part_5;
+  struct TextPosInfo part_6;
+  struct TextPosInfo part_7;
+  struct TextPosInfo part_8;
+
   int width;
   int height;
   int step_offset;

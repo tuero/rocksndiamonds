@@ -33,10 +33,21 @@
 #define USE_MASKING		1
  
 /* for MoveDoor */
+#if 0
+#define DOOR_1			(1 << 0)
+#define DOOR_2			(1 << 1)
+#define DOOR_OPEN		(1 << 2)
+#define DOOR_CLOSE		(1 << 3)
+#define DOOR_OPEN_1		(DOOR_1 | DOOR_OPEN)
+#define DOOR_OPEN_2		(DOOR_2 | DOOR_OPEN)
+#define DOOR_CLOSE_1		(DOOR_1 | DOOR_CLOSE)
+#define DOOR_CLOSE_2		(DOOR_2 | DOOR_CLOSE)
+#else
 #define DOOR_OPEN_1		(1 << 0)
 #define DOOR_OPEN_2		(1 << 1)
 #define DOOR_CLOSE_1		(1 << 2)
 #define DOOR_CLOSE_2		(1 << 3)
+#endif
 #define DOOR_OPEN_ALL		(DOOR_OPEN_1 | DOOR_OPEN_2)
 #define DOOR_CLOSE_ALL		(DOOR_CLOSE_1 | DOOR_CLOSE_2)
 #define DOOR_ACTION_1		(DOOR_OPEN_1 | DOOR_CLOSE_1)
@@ -48,6 +59,16 @@
 #define DOOR_FORCE_REDRAW	(1 << 7)
 #define DOOR_GET_STATE		(1 << 8)
 #define DOOR_SET_STATE		(1 << 9)
+
+#define DOOR_1			(DOOR_ACTION_1)
+#define DOOR_2			(DOOR_ACTION_2)
+#define DOOR_OPEN		(DOOR_OPEN_ALL)
+#define DOOR_CLOSE		(DOOR_CLOSE_ALL)
+
+#define DOOR_INDEX_FROM_TOKEN(x)	((x) == DOOR_1 ? 0 : 1)
+#define DOOR_TOKEN_FROM_INDEX(x)	((x) == 0 ? DOOR_1 ? : DOOR_2)
+#define REDRAW_DOOR_FROM_TOKEN(x)	((x) == DOOR_1 ? REDRAW_DOOR_1 : \
+					 REDRAW_DOOR_2)
 
 /* for Request */
 #define REQ_ASK			(1 << 0)
@@ -173,6 +194,7 @@ void DrawPreviewLevelAnimation(void);
 
 void WaitForEventToContinue();
 boolean Request(char *, unsigned int);
+void InitDoors(void);
 unsigned int OpenDoor(unsigned int);
 unsigned int CloseDoor(unsigned int);
 unsigned int GetDoorState(void);
