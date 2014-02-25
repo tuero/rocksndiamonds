@@ -5479,8 +5479,10 @@ unsigned int MoveDoor(unsigned int door_state)
     boolean door_panel_drawn[NUM_DOORS];
     boolean door_part_done[NUM_DOORS * MAX_NUM_DOOR_PARTS];
     boolean door_part_done_all;
+#if 0
     int num_xsteps[NUM_DOORS * MAX_NUM_DOOR_PARTS];
     int num_ysteps[NUM_DOORS * MAX_NUM_DOOR_PARTS];
+#endif
     int max_move_delay = 0;	// delay for complete animations of all doors
     int max_step_delay = 0;	// delay (ms) between two animation frames
     int num_move_steps = 0;	// number of animation steps for all doors
@@ -5490,9 +5492,11 @@ unsigned int MoveDoor(unsigned int door_state)
     {
       int nr = door_part_order[i].nr;
       struct DoorPartControlInfo *dpc = &door_part_controls[nr];
+      struct GraphicInfo *g = &graphic_info[dpc->graphic];
       int door_token = dpc->door_nr;
 
-      door_part_done[nr] = !(door_state & door_token);
+      door_part_done[nr] = (!(door_state & door_token) ||
+			    !g->bitmap);
     }
 
     for (i = 0; i < NUM_DOORS * MAX_NUM_DOOR_PARTS; i++)
@@ -5528,9 +5532,10 @@ unsigned int MoveDoor(unsigned int door_state)
       max_move_delay = MAX(max_move_delay, move_delay);
       max_step_delay = (max_step_delay == 0 ? step_delay :
 			euclid(max_step_delay, step_delay));
-
+#if 0
       num_xsteps[i] = move_xsteps;
       num_ysteps[i] = move_ysteps;
+#endif
     }
 
     num_move_steps = max_move_delay / max_step_delay;
@@ -5540,6 +5545,12 @@ unsigned int MoveDoor(unsigned int door_state)
 #if 0
     printf("::: max_move_delay == %d, max_step_delay == %d, num_move_steps == %d\n",
 	   max_move_delay, max_step_delay, num_move_steps);
+#endif
+
+#if 0
+    for (i = 0; i < NUM_DOORS * MAX_NUM_DOOR_PARTS; i++)
+      printf("::: door_part_done[%d] == %d\n", i, door_part_done[i]);
+    printf("\n");
 #endif
 
     for (k = 0; k < num_move_steps; k++)
