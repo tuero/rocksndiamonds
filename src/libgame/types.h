@@ -66,10 +66,6 @@ typedef unsigned char byte;
 #define EVEN(a)		(((a) & 1) == 0)
 #endif
 
-#ifndef CEIL
-#define CEIL(a, b)	(((a) + (b) - 1) / (b))
-#endif
-
 #define SIZEOF_ARRAY(array, type)	(sizeof(array) / sizeof(type))
 #define SIZEOF_ARRAY_INT(array)		SIZEOF_ARRAY(array, int)
 
