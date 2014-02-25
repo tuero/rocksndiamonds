@@ -1208,6 +1208,16 @@ struct MenuPosInfo
   int align, valign;
 };
 
+struct DoorPartPosInfo
+{
+  int x, y;
+  int step_xoffset;
+  int step_yoffset;
+  int step_delay;
+  boolean draw_masked;
+  int sort_priority;
+};
+
 struct TextPosInfo
 {
   int x, y;

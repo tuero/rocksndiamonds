@@ -54,7 +54,7 @@ struct DoorPartControlInfo
 {
   int door_nr;
   int graphic;
-  struct TextPosInfo *pos;
+  struct DoorPartPosInfo *pos;
 };
 
 static struct DoorPartControlInfo door_part_controls[] =
@@ -5320,6 +5320,13 @@ void InitDoors()
     /* fill structure for door part draw order */
     dpo->nr = i;
     dpo->sort_priority = dpc->pos->sort_priority;
+
+#if 0
+    struct DoorPartPosInfo *pos = dpc->pos;
+
+    printf(":0: step_xoffset == %d, step_yoffset == %d\n",
+	   pos->step_xoffset, pos->step_yoffset);
+#endif
   }
 
   /* sort door part controls according to sort_priority and graphic number */
@@ -5381,16 +5388,33 @@ unsigned int SetDoorState(unsigned int door_state)
 
 // ========== TEST 1 ===========================================================
 
+int euclid(int a, int b)
+{
+  return (b ? euclid(b, a % b) : a);
+}
+
 unsigned int MoveDoor(unsigned int door_state)
 {
+  struct XY panel_pos_list[] =
+  {
+    { DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1 },
+    { DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY2 },
+  };
+  struct Rect door_rect_list[] =
+  {
+    { DX, DY, DXSIZE, DYSIZE },
+    { VX, VY, VXSIZE, VYSIZE }
+  };
   static int door1 = DOOR_OPEN_1;
   static int door2 = DOOR_CLOSE_2;
-#if 0
+#if 1
   unsigned int door_delay = 0;
   unsigned int door_delay_value;
+#endif
+#if 0
   int stepsize = 1;
 #endif
-  int i, j;
+  int i;
 
 #if 1
   if (door_1.width < 0 || door_1.width > DXSIZE)
@@ -5452,66 +5476,271 @@ unsigned int MoveDoor(unsigned int door_state)
 
   if (door_state & DOOR_ACTION)
   {
+    boolean door_panel_drawn[NUM_DOORS];
+    boolean door_part_done[NUM_DOORS * MAX_NUM_DOOR_PARTS];
+    boolean door_part_done_all;
+    int num_xsteps[NUM_DOORS * MAX_NUM_DOOR_PARTS];
+    int num_ysteps[NUM_DOORS * MAX_NUM_DOOR_PARTS];
+    int max_move_delay = 0;	// delay for complete animations of all doors
+    int max_step_delay = 0;	// delay (ms) between two animation frames
+    int num_move_steps = 0;	// number of animation steps for all doors
+    int k;
+
     for (i = 0; i < NUM_DOORS * MAX_NUM_DOOR_PARTS; i++)
     {
       int nr = door_part_order[i].nr;
       struct DoorPartControlInfo *dpc = &door_part_controls[nr];
       int door_token = dpc->door_nr;
-      int door_index = DOOR_INDEX_FROM_TOKEN(door_token);
-      int graphic = dpc->graphic;
-      struct GraphicInfo *g = &graphic_info[graphic];
-      struct TextPosInfo *pos = dpc->pos;
-      int panel_src_x, panel_src_y;
-      int dx, dy, dxsize, dysize;
-      static boolean door_panel_drawn[NUM_DOORS];
 
-      if (i == 0)
-	for (j = 0; j < NUM_DOORS; j++)
-	  door_panel_drawn[j] = FALSE;
+      door_part_done[nr] = !(door_state & door_token);
+    }
 
-      if (door_token == DOOR_1)
-      {
-	panel_src_x = DOOR_GFX_PAGEX1;
-	panel_src_y = DOOR_GFX_PAGEY1;
-	dx = DX;
-	dy = DY;
-	dxsize = DXSIZE;
-	dysize = DYSIZE;
-      }
-      else	// DOOR_2
-      {
-	panel_src_x = DOOR_GFX_PAGEX1;
-	panel_src_y = DOOR_GFX_PAGEY2;
-	dx = VX;
-	dy = VY;
-	dxsize = VXSIZE;
-	dysize = VYSIZE;
-      }
+    for (i = 0; i < NUM_DOORS * MAX_NUM_DOOR_PARTS; i++)
+    {
+      struct DoorPartControlInfo *dpc = &door_part_controls[i];
+      struct GraphicInfo *g = &graphic_info[dpc->graphic];
+      struct DoorPartPosInfo *pos = dpc->pos;
+      int step_xoffset = ABS(pos->step_xoffset);
+      int step_yoffset = ABS(pos->step_yoffset);
+      int step_delay = pos->step_delay;
+      int move_xsize = (step_xoffset ? g->width  : 0);
+      int move_ysize = (step_yoffset ? g->height : 0);
+      /*
+      int move_size = (move_xsize && move_ysize ?
+		       MIN(move_xsize, move_ysize) :
+		       move_xsize ? move_xsize : move_ysize);
+      */
+      int move_xsteps = (step_xoffset ? CEIL(move_xsize, step_xoffset) : 0);
+      int move_ysteps = (step_yoffset ? CEIL(move_ysize, step_yoffset) : 0);
+      /*
+      int move_xdelay = move_xsteps * step_delay;
+      int move_ydelay = move_ysteps * step_delay;
+      int move_delay = (move_xdelay && move_ydelay ?
+			MIN(move_xdelay, move_ydelay) :
+			move_xdelay ? move_xdelay : move_ydelay);
+      */
+      int move_steps = (move_xsteps && move_ysteps ?
+			MIN(move_xsteps, move_ysteps) :
+			move_xsteps ? move_xsteps : move_ysteps);
+      int move_delay = move_steps * step_delay;
+      // int move_delay = MAX(move_xsize, move_ysize) * step_delay;
 
-      if (!(door_state & door_token))
-	continue;
+      max_move_delay = MAX(max_move_delay, move_delay);
+      max_step_delay = (max_step_delay == 0 ? step_delay :
+			euclid(max_step_delay, step_delay));
 
-      if (!g->bitmap)
-	continue;
+      num_xsteps[i] = move_xsteps;
+      num_ysteps[i] = move_ysteps;
+    }
 
-      if (!door_panel_drawn[door_index])
-      {
-	BlitBitmap(bitmap_db_door, drawto, panel_src_x, panel_src_y,
-		   dxsize, dysize, dx, dy);
+    num_move_steps = max_move_delay / max_step_delay;
 
-	door_panel_drawn[door_index] = TRUE;
-      }
+    door_delay_value = max_step_delay;
 
-#if 1
-      // !!! TEST !!!
-      if (!((door_state & door_token) & DOOR_CLOSE))
-	continue;
+#if 0
+    printf("::: max_move_delay == %d, max_step_delay == %d, num_move_steps == %d\n",
+	   max_move_delay, max_step_delay, num_move_steps);
 #endif
 
-      BlitBitmapMasked(g->bitmap, drawto, g->src_x, g->src_y,
-		       g->width, g->height, dx + pos->x, dy + pos->y);
+    for (k = 0; k < num_move_steps; k++)
+    {
+      for (i = 0; i < NUM_DOORS; i++)
+	door_panel_drawn[i] = FALSE;
 
-      redraw_mask |= REDRAW_DOOR_FROM_TOKEN(door_token);
+      for (i = 0; i < NUM_DOORS * MAX_NUM_DOOR_PARTS; i++)
+      {
+	int nr = door_part_order[i].nr;
+	struct DoorPartControlInfo *dpc = &door_part_controls[nr];
+	int door_token = dpc->door_nr;
+	int door_index = DOOR_INDEX_FROM_TOKEN(door_token);
+	struct GraphicInfo *g = &graphic_info[dpc->graphic];
+	struct DoorPartPosInfo *pos = dpc->pos;
+	struct XY *panel_pos = &panel_pos_list[door_index];
+	struct Rect *door_rect = &door_rect_list[door_index];
+	int src_xx, src_yy;
+	int dst_xx, dst_yy;
+	int width, height;
+
+	if (door_part_done[nr])
+	  continue;
+
+	if (!(door_state & door_token))
+	  continue;
+
+	if (!g->bitmap)
+	  continue;
+
+	if (!door_panel_drawn[door_index])
+	{
+	  BlitBitmap(bitmap_db_door, drawto, panel_pos->x, panel_pos->y,
+		     door_rect->width, door_rect->height,
+		     door_rect->x, door_rect->y);
+
+	  door_panel_drawn[door_index] = TRUE;
+	}
+
+#if 1
+	if ((door_state & door_token) & DOOR_OPEN)
+	{
+#if 0
+	  // !!! TEST !!!	
+	  if (nr != 2)
+	    continue;
+#endif
+
+#if 0
+	  if (k == 0)
+	    printf("::: step_xoffset == %d, step_yoffset == %d\n",
+		   pos->step_xoffset, pos->step_yoffset);
+#endif
+
+	  if (pos->step_xoffset < 0)
+	  {
+#if 1
+	    src_xx = 0;
+	    dst_xx = pos->x + ABS(k * pos->step_xoffset);
+	    width = g->width;
+
+	    if (dst_xx + width > door_rect->width)
+	      width = door_rect->width - dst_xx;
+#else
+	    src_xx = 0;
+	    width = g->width + k * pos->step_xoffset;
+
+	    if (width > door_rect->width)
+	      width = door_rect->width;
+
+	    dst_xx = door_rect->width - width;
+#endif
+	  }
+	  else
+	  {
+	    src_xx = 0;
+	    dst_xx = pos->x - k * pos->step_xoffset;
+
+	    if (dst_xx < 0)
+	    {
+	      src_xx = ABS(dst_xx);
+	      dst_xx = 0;
+	    }
+
+	    width = g->width - src_xx;
+	  }
+
+	  if (pos->step_yoffset < 0)
+	  {
+#if 1
+	    src_yy = 0;
+	    dst_yy = pos->y + ABS(k * pos->step_yoffset);
+	    height = g->height;
+
+	    if (dst_yy + height > door_rect->height)
+	      height = door_rect->height - dst_yy;
+#else
+	    src_yy = 0;
+	    height = g->height + k * pos->step_yoffset;
+
+	    if (height > door_rect->height)
+	      height = door_rect->height;
+
+	    dst_yy = door_rect->height - height;
+#endif
+	  }
+	  else
+	  {
+	    src_yy = 0;
+	    dst_yy = pos->y - k * pos->step_yoffset;
+
+	    if (dst_yy < 0)
+	    {
+	      src_yy = ABS(dst_yy);
+	      dst_yy = 0;
+	    }
+
+	    height = g->height - src_yy;
+	  }
+
+	  if (width < 0 || height < 0)
+	    door_part_done[nr] = TRUE;
+	}
+	else	// DOOR_CLOSE
+	{
+#if 1
+	  // !!! TEST !!!
+
+	  door_part_done[nr] = TRUE;
+
+	  BlitBitmapMasked(g->bitmap, drawto, g->src_x, g->src_y,
+			   g->width, g->height,
+			   door_rect->x + pos->x, door_rect->y + pos->y);
+
+	  redraw_mask |= REDRAW_DOOR_FROM_TOKEN(door_token);
+#else
+	  src_xx = (num_xsteps[nr] - k) * pos->step_xoffset;
+	  src_yy = (num_ysteps[nr] - k) * pos->step_yoffset;
+	  dst_xx = pos->x;
+	  dst_yy = pos->y;
+	  width  = g->width  - src_xx;
+	  height = g->height - src_yy;
+
+	  // if (width < ABS(pos->step_xoffset)
+
+
+
+
+	  src_xx = g->width  - k * pos->step_xoffset;
+	  src_yy = g->height - k * pos->step_yoffset;
+	  dst_xx = pos->x;
+	  dst_yy = pos->y;
+
+	  if (width < 0 || height < 0)
+	    door_part_done[nr] = TRUE;
+#endif
+	}
+
+	if (door_part_done[nr])
+	  continue;
+
+#if 0
+	// !!! TEST !!!	
+	if (nr != 7)
+	  continue;
+#endif
+
+	BlitBitmapMasked(g->bitmap, drawto,
+			 g->src_x + src_xx, g->src_y + src_yy, width, height,
+			 door_rect->x + dst_xx, door_rect->y + dst_yy);
+#else
+	// !!! TEST !!!
+	if (!((door_state & door_token) & DOOR_CLOSE))
+	  continue;
+
+	BlitBitmapMasked(g->bitmap, drawto, g->src_x, g->src_y,
+			 g->width, g->height,
+			 door_rect->x + pos->x, door_rect->y + pos->y);
+#endif
+
+	redraw_mask |= REDRAW_DOOR_FROM_TOKEN(door_token);
+      }
+
+      door_part_done_all = TRUE;
+
+      for (i = 0; i < NUM_DOORS * MAX_NUM_DOOR_PARTS; i++)
+	if (!door_part_done[i])
+	  door_part_done_all = FALSE;
+
+      if (door_part_done_all)
+	break;
+
+      if (!(door_state & DOOR_NO_DELAY))
+      {
+	BackToFront();
+
+	if (game_status == GAME_MODE_MAIN)
+	  DoAnimation();
+
+	WaitUntilDelayReached(&door_delay, door_delay_value);
+      }
     }
   }
 

@@ -2101,6 +2101,18 @@ struct TokenIntPtrInfo image_config_vars[] =
     &door_1.part_1.y
   },
   {
+    "door_1.part_1.step_xoffset",
+    &door_1.part_1.step_xoffset
+  },
+  {
+    "door_1.part_1.step_yoffset",
+    &door_1.part_1.step_yoffset
+  },
+  {
+    "door_1.part_1.step_delay",
+    &door_1.part_1.step_delay
+  },
+  {
     "door_1.part_1.draw_masked",
     &door_1.part_1.draw_masked
   },
@@ -2115,6 +2127,18 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "door_1.part_2.y",
     &door_1.part_2.y
+  },
+  {
+    "door_1.part_2.step_xoffset",
+    &door_1.part_2.step_xoffset
+  },
+  {
+    "door_1.part_2.step_yoffset",
+    &door_1.part_2.step_yoffset
+  },
+  {
+    "door_1.part_2.step_delay",
+    &door_1.part_2.step_delay
   },
   {
     "door_1.part_2.draw_masked",
@@ -2133,6 +2157,18 @@ struct TokenIntPtrInfo image_config_vars[] =
     &door_1.part_3.y
   },
   {
+    "door_1.part_3.step_xoffset",
+    &door_1.part_3.step_xoffset
+  },
+  {
+    "door_1.part_3.step_yoffset",
+    &door_1.part_3.step_yoffset
+  },
+  {
+    "door_1.part_3.step_delay",
+    &door_1.part_3.step_delay
+  },
+  {
     "door_1.part_3.draw_masked",
     &door_1.part_3.draw_masked
   },
@@ -2147,6 +2183,18 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "door_1.part_4.y",
     &door_1.part_4.y
+  },
+  {
+    "door_1.part_4.step_xoffset",
+    &door_1.part_4.step_xoffset
+  },
+  {
+    "door_1.part_4.step_yoffset",
+    &door_1.part_4.step_yoffset
+  },
+  {
+    "door_1.part_4.step_delay",
+    &door_1.part_4.step_delay
   },
   {
     "door_1.part_4.draw_masked",
@@ -2165,6 +2213,18 @@ struct TokenIntPtrInfo image_config_vars[] =
     &door_1.part_5.y
   },
   {
+    "door_1.part_5.step_xoffset",
+    &door_1.part_5.step_xoffset
+  },
+  {
+    "door_1.part_5.step_yoffset",
+    &door_1.part_5.step_yoffset
+  },
+  {
+    "door_1.part_5.step_delay",
+    &door_1.part_5.step_delay
+  },
+  {
     "door_1.part_5.draw_masked",
     &door_1.part_5.draw_masked
   },
@@ -2179,6 +2239,18 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "door_1.part_6.y",
     &door_1.part_6.y
+  },
+  {
+    "door_1.part_6.step_xoffset",
+    &door_1.part_6.step_xoffset
+  },
+  {
+    "door_1.part_6.step_yoffset",
+    &door_1.part_6.step_yoffset
+  },
+  {
+    "door_1.part_6.step_delay",
+    &door_1.part_6.step_delay
   },
   {
     "door_1.part_6.draw_masked",
@@ -2197,6 +2269,18 @@ struct TokenIntPtrInfo image_config_vars[] =
     &door_1.part_7.y
   },
   {
+    "door_1.part_7.step_xoffset",
+    &door_1.part_7.step_xoffset
+  },
+  {
+    "door_1.part_7.step_yoffset",
+    &door_1.part_7.step_yoffset
+  },
+  {
+    "door_1.part_7.step_delay",
+    &door_1.part_7.step_delay
+  },
+  {
     "door_1.part_7.draw_masked",
     &door_1.part_7.draw_masked
   },
@@ -2211,6 +2295,18 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "door_1.part_8.y",
     &door_1.part_8.y
+  },
+  {
+    "door_1.part_8.step_xoffset",
+    &door_1.part_8.step_xoffset
+  },
+  {
+    "door_1.part_8.step_yoffset",
+    &door_1.part_8.step_yoffset
+  },
+  {
+    "door_1.part_8.step_delay",
+    &door_1.part_8.step_delay
   },
   {
     "door_1.part_8.draw_masked",
@@ -2229,6 +2325,18 @@ struct TokenIntPtrInfo image_config_vars[] =
     &door_2.part_1.y
   },
   {
+    "door_2.part_1.step_xoffset",
+    &door_2.part_1.step_xoffset
+  },
+  {
+    "door_2.part_1.step_yoffset",
+    &door_2.part_1.step_yoffset
+  },
+  {
+    "door_2.part_1.step_delay",
+    &door_2.part_1.step_delay
+  },
+  {
     "door_2.part_1.draw_masked",
     &door_2.part_1.draw_masked
   },
@@ -2243,6 +2351,18 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "door_2.part_2.y",
     &door_2.part_2.y
+  },
+  {
+    "door_2.part_2.step_xoffset",
+    &door_2.part_2.step_xoffset
+  },
+  {
+    "door_2.part_2.step_yoffset",
+    &door_2.part_2.step_yoffset
+  },
+  {
+    "door_2.part_2.step_delay",
+    &door_2.part_2.step_delay
   },
   {
     "door_2.part_2.draw_masked",
@@ -2261,6 +2381,18 @@ struct TokenIntPtrInfo image_config_vars[] =
     &door_2.part_3.y
   },
   {
+    "door_2.part_3.step_xoffset",
+    &door_2.part_3.step_xoffset
+  },
+  {
+    "door_2.part_3.step_yoffset",
+    &door_2.part_3.step_yoffset
+  },
+  {
+    "door_2.part_3.step_delay",
+    &door_2.part_3.step_delay
+  },
+  {
     "door_2.part_3.draw_masked",
     &door_2.part_3.draw_masked
   },
@@ -2275,6 +2407,18 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "door_2.part_4.y",
     &door_2.part_4.y
+  },
+  {
+    "door_2.part_4.step_xoffset",
+    &door_2.part_4.step_xoffset
+  },
+  {
+    "door_2.part_4.step_yoffset",
+    &door_2.part_4.step_yoffset
+  },
+  {
+    "door_2.part_4.step_delay",
+    &door_2.part_4.step_delay
   },
   {
     "door_2.part_4.draw_masked",
@@ -2293,6 +2437,18 @@ struct TokenIntPtrInfo image_config_vars[] =
     &door_2.part_5.y
   },
   {
+    "door_2.part_5.step_xoffset",
+    &door_2.part_5.step_xoffset
+  },
+  {
+    "door_2.part_5.step_yoffset",
+    &door_2.part_5.step_yoffset
+  },
+  {
+    "door_2.part_5.step_delay",
+    &door_2.part_5.step_delay
+  },
+  {
     "door_2.part_5.draw_masked",
     &door_2.part_5.draw_masked
   },
@@ -2307,6 +2463,18 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "door_2.part_6.y",
     &door_2.part_6.y
+  },
+  {
+    "door_2.part_6.step_xoffset",
+    &door_2.part_6.step_xoffset
+  },
+  {
+    "door_2.part_6.step_yoffset",
+    &door_2.part_6.step_yoffset
+  },
+  {
+    "door_2.part_6.step_delay",
+    &door_2.part_6.step_delay
   },
   {
     "door_2.part_6.draw_masked",
@@ -2325,6 +2493,18 @@ struct TokenIntPtrInfo image_config_vars[] =
     &door_2.part_7.y
   },
   {
+    "door_2.part_7.step_xoffset",
+    &door_2.part_7.step_xoffset
+  },
+  {
+    "door_2.part_7.step_yoffset",
+    &door_2.part_7.step_yoffset
+  },
+  {
+    "door_2.part_7.step_delay",
+    &door_2.part_7.step_delay
+  },
+  {
     "door_2.part_7.draw_masked",
     &door_2.part_7.draw_masked
   },
@@ -2339,6 +2519,18 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "door_2.part_8.y",
     &door_2.part_8.y
+  },
+  {
+    "door_2.part_8.step_xoffset",
+    &door_2.part_8.step_xoffset
+  },
+  {
+    "door_2.part_8.step_yoffset",
+    &door_2.part_8.step_yoffset
+  },
+  {
+    "door_2.part_8.step_delay",
+    &door_2.part_8.step_delay
   },
   {
     "door_2.part_8.draw_masked",
