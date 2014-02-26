@@ -33,21 +33,10 @@
 #define USE_MASKING		1
  
 /* for MoveDoor */
-#if 0
-#define DOOR_1			(1 << 0)
-#define DOOR_2			(1 << 1)
-#define DOOR_OPEN		(1 << 2)
-#define DOOR_CLOSE		(1 << 3)
-#define DOOR_OPEN_1		(DOOR_1 | DOOR_OPEN)
-#define DOOR_OPEN_2		(DOOR_2 | DOOR_OPEN)
-#define DOOR_CLOSE_1		(DOOR_1 | DOOR_CLOSE)
-#define DOOR_CLOSE_2		(DOOR_2 | DOOR_CLOSE)
-#else
 #define DOOR_OPEN_1		(1 << 0)
 #define DOOR_OPEN_2		(1 << 1)
 #define DOOR_CLOSE_1		(1 << 2)
 #define DOOR_CLOSE_2		(1 << 3)
-#endif
 #define DOOR_OPEN_ALL		(DOOR_OPEN_1 | DOOR_OPEN_2)
 #define DOOR_CLOSE_ALL		(DOOR_CLOSE_1 | DOOR_CLOSE_2)
 #define DOOR_ACTION_1		(DOOR_OPEN_1 | DOOR_CLOSE_1)
