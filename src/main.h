@@ -2309,6 +2309,8 @@ struct DoorInfo
   struct DoorPartPosInfo part_7;
   struct DoorPartPosInfo part_8;
 
+  struct DoorPartPosInfo panel;
+
   int width;
   int height;
   int step_offset;

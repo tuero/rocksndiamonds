@@ -1214,6 +1214,7 @@ struct DoorPartPosInfo
   int step_xoffset;
   int step_yoffset;
   int step_delay;
+  int start_step;
   boolean draw_masked;
   int sort_priority;
 };

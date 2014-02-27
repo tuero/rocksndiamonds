@@ -2541,6 +2541,70 @@ struct TokenIntPtrInfo image_config_vars[] =
     &door_2.part_8.sort_priority
   },
   {
+    "door_1.panel.x",
+    &door_1.panel.x
+  },
+  {
+    "door_1.panel.y",
+    &door_1.panel.y
+  },
+  {
+    "door_1.panel.step_xoffset",
+    &door_1.panel.step_xoffset
+  },
+  {
+    "door_1.panel.step_yoffset",
+    &door_1.panel.step_yoffset
+  },
+  {
+    "door_1.panel.step_delay",
+    &door_1.panel.step_delay
+  },
+  {
+    "door_1.panel.start_step",
+    &door_1.panel.start_step
+  },
+  {
+    "door_1.panel.draw_masked",
+    &door_1.panel.draw_masked
+  },
+  {
+    "door_1.panel.draw_order",
+    &door_1.panel.sort_priority
+  },
+  {
+    "door_2.panel.x",
+    &door_2.panel.x
+  },
+  {
+    "door_2.panel.y",
+    &door_2.panel.y
+  },
+  {
+    "door_2.panel.step_xoffset",
+    &door_2.panel.step_xoffset
+  },
+  {
+    "door_2.panel.step_yoffset",
+    &door_2.panel.step_yoffset
+  },
+  {
+    "door_2.panel.step_delay",
+    &door_2.panel.step_delay
+  },
+  {
+    "door_2.panel.start_step",
+    &door_2.panel.start_step
+  },
+  {
+    "door_2.panel.draw_masked",
+    &door_2.panel.draw_masked
+  },
+  {
+    "door_2.panel.draw_order",
+    &door_2.panel.sort_priority
+  },
+  {
     "door_1.width",
     &door_1.width
   },
