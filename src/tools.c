@@ -5528,8 +5528,8 @@ unsigned int MoveDoor(unsigned int door_state)
       struct DoorPartPosInfo *pos = dpc->pos;
       int step_xoffset = ABS(pos->step_xoffset);
       int step_yoffset = ABS(pos->step_yoffset);
-      int start_step = pos->start_step;
       int step_delay = pos->step_delay;
+      int start_step = pos->start_step;
       float move_xsize = (step_xoffset ? g->width  : 0);
       float move_ysize = (step_yoffset ? g->height : 0);
       int move_xsteps = (step_xoffset ? ceil(move_xsize / step_xoffset) : 0);
@@ -5592,10 +5592,11 @@ unsigned int MoveDoor(unsigned int door_state)
 	boolean door_opening = ((current_door_state & DOOR_OPEN)  != 0);
 	boolean door_closing = ((current_door_state & DOOR_CLOSE) != 0);
 	boolean mode_opening = (is_panel ? door_closing : door_opening);
+	int start_step = pos->start_step;
 	int step_delay = pos->step_delay;
 	int step_factor = step_delay / max_step_delay;
 	int k1 = (step_factor ? k / step_factor + 1 : k);
-	int k2 = (mode_opening ? k1 : num_steps[nr] - k1);
+	int k2 = (mode_opening ? k1 + start_step : num_steps[nr] - k1);
 	int kk = (k2 < 0 ? 0 : k2);
 	int src_x, src_y, src_xx, src_yy;
 	int dst_x, dst_y, dst_xx, dst_yy;
@@ -5613,7 +5614,7 @@ unsigned int MoveDoor(unsigned int door_state)
 
 #if 0
 	// !!! TEST !!!	
-	if (nr != 0)
+	if (nr != 16 && nr != 0)
 	  continue;
 #endif
 
@@ -5713,6 +5714,14 @@ unsigned int MoveDoor(unsigned int door_state)
 	dst_x = door_rect->x + dst_xx;
 	dst_y = door_rect->y + dst_yy;
 
+#if 0
+	if (DOOR_PART_IS_PANEL(nr))
+	{
+	  printf("::: width == %d, height == %d [%d, %d] [%d, %d]\n",
+		 width, height, g->width, g->height, src_x, src_y);
+	}
+#endif
+
 	if (width  >= 0 && width  <= g->width &&
 	    height >= 0 && height <= g->height)
 	{
@@ -5767,8 +5776,10 @@ unsigned int MoveDoor(unsigned int door_state)
 	if (!door_part_done[i])
 	  door_part_done_all = FALSE;
 
+#if 0
       if (door_part_done_all)
 	break;
+#endif
     }
   }
 
