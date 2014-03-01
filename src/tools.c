@@ -5335,7 +5335,15 @@ void InitDoors()
     struct DoorPartControlInfo *dpc = &door_part_controls[i];
     struct DoorPartOrderInfo *dpo = &door_part_order[i];
 
-    /* fill structure for door part draw order */
+    /* initialize "start_step_opening" and "start_step_closing", if needed */
+    if (dpc->pos->start_step_opening == 0 &&
+	dpc->pos->start_step_closing == 0)
+    {
+      dpc->pos->start_step_opening = dpc->pos->start_step;
+      dpc->pos->start_step_closing = dpc->pos->start_step;
+    }
+
+    /* fill structure for door part draw order (sorted below) */
     dpo->nr = i;
     dpo->sort_priority = dpc->pos->sort_priority;
 
@@ -5523,13 +5531,21 @@ unsigned int MoveDoor(unsigned int door_state)
 
     for (i = 0; i < MAX_DOOR_PARTS; i++)
     {
-      struct DoorPartControlInfo *dpc = &door_part_controls[i];
-      struct GraphicInfo *g = &graphic_info[dpc->graphic];
+      int nr = door_part_order[i].nr;
+      struct DoorPartControlInfo *dpc = &door_part_controls[nr];
       struct DoorPartPosInfo *pos = dpc->pos;
+      struct GraphicInfo *g = &graphic_info[dpc->graphic];
+      int door_token = dpc->door_nr;
+      boolean is_panel = DOOR_PART_IS_PANEL(nr);
       int step_xoffset = ABS(pos->step_xoffset);
       int step_yoffset = ABS(pos->step_yoffset);
       int step_delay = pos->step_delay;
-      int start_step = pos->start_step;
+      int current_door_state = door_state & door_token;
+      boolean door_opening = ((current_door_state & DOOR_OPEN)  != 0);
+      boolean door_closing = ((current_door_state & DOOR_CLOSE) != 0);
+      boolean part_opening = (is_panel ? door_closing : door_opening);
+      int start_step = (part_opening ? pos->start_step_opening :
+			pos->start_step_closing);
       float move_xsize = (step_xoffset ? g->width  : 0);
       float move_ysize = (step_yoffset ? g->height : 0);
       int move_xsteps = (step_xoffset ? ceil(move_xsize / step_xoffset) : 0);
@@ -5539,13 +5555,13 @@ unsigned int MoveDoor(unsigned int door_state)
 			move_xsteps ? move_xsteps : move_ysteps) - start_step;
       int move_delay = move_steps * step_delay;
 
-      if (door_part_done[i])
+      if (door_part_done[nr])
 	continue;
 
       max_move_delay = MAX(max_move_delay, move_delay);
       max_step_delay = (max_step_delay == 0 ? step_delay :
 			euclid(max_step_delay, step_delay));
-      num_steps[i] = move_steps;
+      num_steps[nr] = move_steps;
 
 #if 0
 #if 0
@@ -5580,23 +5596,24 @@ unsigned int MoveDoor(unsigned int door_state)
       {
 	int nr = door_part_order[i].nr;
 	struct DoorPartControlInfo *dpc = &door_part_controls[nr];
+	struct DoorPartPosInfo *pos = dpc->pos;
+	struct GraphicInfo *g = &graphic_info[dpc->graphic];
 	int door_token = dpc->door_nr;
 	int door_index = DOOR_INDEX_FROM_TOKEN(door_token);
 	boolean is_panel = DOOR_PART_IS_PANEL(nr);
-	struct GraphicInfo *g = &graphic_info[dpc->graphic];
-	struct DoorPartPosInfo *pos = dpc->pos;
 	struct XY *panel_pos = &panel_pos_list[door_index];
 	struct Rect *door_rect = &door_rect_list[door_index];
 	Bitmap *bitmap = (is_panel ? bitmap_db_door : g->bitmap);
 	int current_door_state = door_state & door_token;
 	boolean door_opening = ((current_door_state & DOOR_OPEN)  != 0);
 	boolean door_closing = ((current_door_state & DOOR_CLOSE) != 0);
-	boolean mode_opening = (is_panel ? door_closing : door_opening);
-	int start_step = pos->start_step;
+	boolean part_opening = (is_panel ? door_closing : door_opening);
+	int start_step = (part_opening ? pos->start_step_opening :
+			  pos->start_step_closing);
 	int step_delay = pos->step_delay;
 	int step_factor = step_delay / max_step_delay;
 	int k1 = (step_factor ? k / step_factor + 1 : k);
-	int k2 = (mode_opening ? k1 + start_step : num_steps[nr] - k1);
+	int k2 = (part_opening ? k1 + start_step : num_steps[nr] - k1);
 	int kk = (k2 < 0 ? 0 : k2);
 	int src_x, src_y, src_xx, src_yy;
 	int dst_x, dst_y, dst_xx, dst_yy;

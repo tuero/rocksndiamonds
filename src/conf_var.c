@@ -2117,6 +2117,14 @@ struct TokenIntPtrInfo image_config_vars[] =
     &door_1.part_1.start_step
   },
   {
+    "door_1.part_1.start_step_opening",
+    &door_1.part_1.start_step_opening
+  },
+  {
+    "door_1.part_1.start_step_closing",
+    &door_1.part_1.start_step_closing
+  },
+  {
     "door_1.part_1.draw_masked",
     &door_1.part_1.draw_masked
   },
@@ -2147,6 +2155,14 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "door_1.part_2.start_step",
     &door_1.part_2.start_step
+  },
+  {
+    "door_1.part_2.start_step_opening",
+    &door_1.part_2.start_step_opening
+  },
+  {
+    "door_1.part_2.start_step_closing",
+    &door_1.part_2.start_step_closing
   },
   {
     "door_1.part_2.draw_masked",
@@ -2181,6 +2197,14 @@ struct TokenIntPtrInfo image_config_vars[] =
     &door_1.part_3.start_step
   },
   {
+    "door_1.part_3.start_step_opening",
+    &door_1.part_3.start_step_opening
+  },
+  {
+    "door_1.part_3.start_step_closing",
+    &door_1.part_3.start_step_closing
+  },
+  {
     "door_1.part_3.draw_masked",
     &door_1.part_3.draw_masked
   },
@@ -2211,6 +2235,14 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "door_1.part_4.start_step",
     &door_1.part_4.start_step
+  },
+  {
+    "door_1.part_4.start_step_opening",
+    &door_1.part_4.start_step_opening
+  },
+  {
+    "door_1.part_4.start_step_closing",
+    &door_1.part_4.start_step_closing
   },
   {
     "door_1.part_4.draw_masked",
@@ -2245,6 +2277,14 @@ struct TokenIntPtrInfo image_config_vars[] =
     &door_1.part_5.start_step
   },
   {
+    "door_1.part_5.start_step_opening",
+    &door_1.part_5.start_step_opening
+  },
+  {
+    "door_1.part_5.start_step_closing",
+    &door_1.part_5.start_step_closing
+  },
+  {
     "door_1.part_5.draw_masked",
     &door_1.part_5.draw_masked
   },
@@ -2275,6 +2315,14 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "door_1.part_6.start_step",
     &door_1.part_6.start_step
+  },
+  {
+    "door_1.part_6.start_step_opening",
+    &door_1.part_6.start_step_opening
+  },
+  {
+    "door_1.part_6.start_step_closing",
+    &door_1.part_6.start_step_closing
   },
   {
     "door_1.part_6.draw_masked",
@@ -2309,6 +2357,14 @@ struct TokenIntPtrInfo image_config_vars[] =
     &door_1.part_7.start_step
   },
   {
+    "door_1.part_7.start_step_opening",
+    &door_1.part_7.start_step_opening
+  },
+  {
+    "door_1.part_7.start_step_closing",
+    &door_1.part_7.start_step_closing
+  },
+  {
     "door_1.part_7.draw_masked",
     &door_1.part_7.draw_masked
   },
@@ -2339,6 +2395,14 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "door_1.part_8.start_step",
     &door_1.part_8.start_step
+  },
+  {
+    "door_1.part_8.start_step_opening",
+    &door_1.part_8.start_step_opening
+  },
+  {
+    "door_1.part_8.start_step_closing",
+    &door_1.part_8.start_step_closing
   },
   {
     "door_1.part_8.draw_masked",
@@ -2373,6 +2437,14 @@ struct TokenIntPtrInfo image_config_vars[] =
     &door_2.part_1.start_step
   },
   {
+    "door_2.part_1.start_step_opening",
+    &door_2.part_1.start_step_opening
+  },
+  {
+    "door_2.part_1.start_step_closing",
+    &door_2.part_1.start_step_closing
+  },
+  {
     "door_2.part_1.draw_masked",
     &door_2.part_1.draw_masked
   },
@@ -2403,6 +2475,14 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "door_2.part_2.start_step",
     &door_2.part_2.start_step
+  },
+  {
+    "door_2.part_2.start_step_opening",
+    &door_2.part_2.start_step_opening
+  },
+  {
+    "door_2.part_2.start_step_closing",
+    &door_2.part_2.start_step_closing
   },
   {
     "door_2.part_2.draw_masked",
@@ -2437,6 +2517,14 @@ struct TokenIntPtrInfo image_config_vars[] =
     &door_2.part_3.start_step
   },
   {
+    "door_2.part_3.start_step_opening",
+    &door_2.part_3.start_step_opening
+  },
+  {
+    "door_2.part_3.start_step_closing",
+    &door_2.part_3.start_step_closing
+  },
+  {
     "door_2.part_3.draw_masked",
     &door_2.part_3.draw_masked
   },
@@ -2467,6 +2555,14 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "door_2.part_4.start_step",
     &door_2.part_4.start_step
+  },
+  {
+    "door_2.part_4.start_step_opening",
+    &door_2.part_4.start_step_opening
+  },
+  {
+    "door_2.part_4.start_step_closing",
+    &door_2.part_4.start_step_closing
   },
   {
     "door_2.part_4.draw_masked",
@@ -2501,6 +2597,14 @@ struct TokenIntPtrInfo image_config_vars[] =
     &door_2.part_5.start_step
   },
   {
+    "door_2.part_5.start_step_opening",
+    &door_2.part_5.start_step_opening
+  },
+  {
+    "door_2.part_5.start_step_closing",
+    &door_2.part_5.start_step_closing
+  },
+  {
     "door_2.part_5.draw_masked",
     &door_2.part_5.draw_masked
   },
@@ -2531,6 +2635,14 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "door_2.part_6.start_step",
     &door_2.part_6.start_step
+  },
+  {
+    "door_2.part_6.start_step_opening",
+    &door_2.part_6.start_step_opening
+  },
+  {
+    "door_2.part_6.start_step_closing",
+    &door_2.part_6.start_step_closing
   },
   {
     "door_2.part_6.draw_masked",
@@ -2565,6 +2677,14 @@ struct TokenIntPtrInfo image_config_vars[] =
     &door_2.part_7.start_step
   },
   {
+    "door_2.part_7.start_step_opening",
+    &door_2.part_7.start_step_opening
+  },
+  {
+    "door_2.part_7.start_step_closing",
+    &door_2.part_7.start_step_closing
+  },
+  {
     "door_2.part_7.draw_masked",
     &door_2.part_7.draw_masked
   },
@@ -2595,6 +2715,14 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "door_2.part_8.start_step",
     &door_2.part_8.start_step
+  },
+  {
+    "door_2.part_8.start_step_opening",
+    &door_2.part_8.start_step_opening
+  },
+  {
+    "door_2.part_8.start_step_closing",
+    &door_2.part_8.start_step_closing
   },
   {
     "door_2.part_8.draw_masked",
@@ -2629,6 +2757,14 @@ struct TokenIntPtrInfo image_config_vars[] =
     &door_1.panel.start_step
   },
   {
+    "door_1.panel.start_step_opening",
+    &door_1.panel.start_step_opening
+  },
+  {
+    "door_1.panel.start_step_closing",
+    &door_1.panel.start_step_closing
+  },
+  {
     "door_1.panel.draw_masked",
     &door_1.panel.draw_masked
   },
@@ -2659,6 +2795,14 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "door_2.panel.start_step",
     &door_2.panel.start_step
+  },
+  {
+    "door_2.panel.start_step_opening",
+    &door_2.panel.start_step_opening
+  },
+  {
+    "door_2.panel.start_step_closing",
+    &door_2.panel.start_step_closing
   },
   {
     "door_2.panel.draw_masked",
