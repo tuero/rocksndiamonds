@@ -2003,6 +2003,10 @@ static void InitGraphicCompatibilityInfo()
   }
 
 #if 1
+  InitGraphicCompatibilityInfo_Doors();
+#endif
+
+#if 0
   struct
   {
     int graphic;

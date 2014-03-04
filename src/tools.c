@@ -58,7 +58,7 @@ static struct DoorPartOrderInfo door_part_order[MAX_DOOR_PARTS];
 
 struct DoorPartControlInfo
 {
-  int door_nr;
+  int door_token;
   int graphic;
   struct DoorPartPosInfo *pos;
 };
@@ -5326,11 +5326,166 @@ static int compareDoorPartOrderInfo(const void *object1, const void *object2)
   return compare_result;
 }
 
+void InitGraphicCompatibilityInfo_Doors()
+{
+  struct
+  {
+    int door_token;
+    int part_1, part_8;
+    struct DoorInfo *door;
+  }
+  doors[] =
+  {
+    { DOOR_1,	IMG_DOOR_1_GFX_PART_1,	IMG_DOOR_1_GFX_PART_8,	&door_1	},
+    { DOOR_2,	IMG_DOOR_2_GFX_PART_1,	IMG_DOOR_2_GFX_PART_8,	&door_2	},
+
+    { -1,	-1,			-1,			NULL	}
+  };
+  struct Rect door_rect_list[] =
+  {
+    { DX, DY, DXSIZE, DYSIZE },
+    { VX, VY, VXSIZE, VYSIZE }
+  };
+  int i, j;
+
+  for (i = 0; doors[i].door_token != -1; i++)
+  {
+    int door_token = doors[i].door_token;
+    int door_index = DOOR_INDEX_FROM_TOKEN(door_token);
+    int part_1 = doors[i].part_1;
+    int part_8 = doors[i].part_8;
+    int part_2 = part_1 + 1;
+    int part_3 = part_1 + 2;
+    struct DoorInfo *door = doors[i].door;
+    struct Rect *door_rect = &door_rect_list[door_index];
+    boolean door_gfx_redefined = FALSE;
+
+    /* check if any door part graphic definitions have been redefined */
+
+    for (j = 0; door_part_controls[j].door_token != -1; j++)
+    {
+      struct DoorPartControlInfo *dpc = &door_part_controls[j];
+      struct FileInfo *fi = getImageListEntryFromImageID(dpc->graphic);
+
+      if (dpc->door_token == door_token && fi->redefined)
+	door_gfx_redefined = TRUE;
+    }
+
+    /* check for old-style door graphic/animation modifications */
+
+    if (!door_gfx_redefined)
+    {
+      if (door->anim_mode & ANIM_STATIC_PANEL)
+      {
+	door->panel.step_xoffset = 0;
+	door->panel.step_yoffset = 0;
+      }
+
+      if (door->anim_mode & (ANIM_HORIZONTAL | ANIM_VERTICAL))
+      {
+	struct GraphicInfo *g_part_1 = &graphic_info[part_1];
+	struct GraphicInfo *g_part_2 = &graphic_info[part_2];
+	int num_door_steps, num_panel_steps;
+
+	/* remove door part graphics other than the two default wings */
+
+	for (j = 0; door_part_controls[j].door_token != -1; j++)
+	{
+	  struct DoorPartControlInfo *dpc = &door_part_controls[j];
+	  struct GraphicInfo *g = &graphic_info[dpc->graphic];
+
+	  if (dpc->graphic >= part_3 &&
+	      dpc->graphic <= part_8)
+	    g->bitmap = NULL;
+	}
+
+	/* set graphics and screen positions of the default wings */
+
+	g_part_1->width  = door_rect->width;
+	g_part_1->height = door_rect->height;
+	g_part_2->width  = door_rect->width;
+	g_part_2->height = door_rect->height;
+	g_part_2->src_x = door_rect->width;
+	g_part_2->src_y = g_part_1->src_y;
+
+	door->part_2.x = door->part_1.x;
+	door->part_2.y = door->part_1.y;
+
+	if (door->width != -1)
+	{
+	  g_part_1->width = door->width;
+	  g_part_2->width = door->width;
+
+	  // special treatment for graphics and screen position of right wing
+	  g_part_2->src_x += door_rect->width - door->width;
+	  door->part_2.x  += door_rect->width - door->width;
+	}
+
+	if (door->height != -1)
+	{
+	  g_part_1->height = door->height;
+	  g_part_2->height = door->height;
+
+	  // special treatment for graphics and screen position of bottom wing
+	  g_part_2->src_y += door_rect->height - door->height;
+	  door->part_2.y  += door_rect->height - door->height;
+	}
+
+	/* set animation delays for the default wings and panels */
+
+	door->part_1.step_delay = door->step_delay;
+	door->part_2.step_delay = door->step_delay;
+	door->panel.step_delay  = door->step_delay;
+
+	/* set animation draw order for the default wings */
+
+	door->part_1.sort_priority = 2;	/* draw left wing over ... */
+	door->part_2.sort_priority = 1;	/*          ... right wing */
+
+	/* set animation draw offset for the default wings */
+
+	if (door->anim_mode & ANIM_HORIZONTAL)
+	{
+	  door->part_1.step_xoffset = door->step_offset;
+	  door->part_1.step_yoffset = 0;
+	  door->part_2.step_xoffset = door->step_offset * -1;
+	  door->part_2.step_yoffset = 0;
+
+	  num_door_steps = g_part_1->width / door->step_offset;
+	}
+	else	// ANIM_VERTICAL
+	{
+	  door->part_1.step_xoffset = 0;
+	  door->part_1.step_yoffset = door->step_offset;
+	  door->part_2.step_xoffset = 0;
+	  door->part_2.step_yoffset = door->step_offset * -1;
+
+	  num_door_steps = g_part_1->height / door->step_offset;
+	}
+
+	/* set animation draw offset for the default panels */
+
+	if (door->step_offset > 1)
+	{
+	  num_panel_steps = 2 * door_rect->height / door->step_offset;
+	  door->panel.start_step = num_panel_steps - num_door_steps;
+	}
+	else
+	{
+	  num_panel_steps = door_rect->height / door->step_offset;
+	  door->panel.start_step = num_panel_steps - num_door_steps / 2;
+	  door->panel.step_delay *= 2;
+	}
+      }
+    }
+  }
+}
+
 void InitDoors()
 {
   int i;
 
-  for (i = 0; door_part_controls[i].door_nr != -1; i++)
+  for (i = 0; door_part_controls[i].door_token != -1; i++)
   {
     struct DoorPartControlInfo *dpc = &door_part_controls[i];
     struct DoorPartOrderInfo *dpo = &door_part_order[i];
@@ -5339,7 +5494,7 @@ void InitDoors()
     if (dpc->pos->start_step_opening == 0 &&
 	dpc->pos->start_step_closing == 0)
     {
-      dpc->pos->start_step_opening = dpc->pos->start_step;
+      // dpc->pos->start_step_opening = dpc->pos->start_step;
       dpc->pos->start_step_closing = dpc->pos->start_step;
     }
 
@@ -5499,7 +5654,9 @@ unsigned int MoveDoor(unsigned int door_state)
   {
     boolean door_panel_drawn[NUM_DOORS];
     boolean door_part_done[MAX_DOOR_PARTS];
+#if 1
     boolean door_part_done_all;
+#endif
     int num_steps[MAX_DOOR_PARTS];
     int max_move_delay = 0;	// delay for complete animations of all doors
     int max_step_delay = 0;	// delay (ms) between two animation frames
@@ -5511,7 +5668,7 @@ unsigned int MoveDoor(unsigned int door_state)
     {
       struct DoorPartControlInfo *dpc = &door_part_controls[i];
       struct GraphicInfo *g = &graphic_info[dpc->graphic];
-      int door_token = dpc->door_nr;
+      int door_token = dpc->door_token;
 
       door_part_done[i] = (!(door_state & door_token) ||
 			   !g->bitmap);
@@ -5535,7 +5692,7 @@ unsigned int MoveDoor(unsigned int door_state)
       struct DoorPartControlInfo *dpc = &door_part_controls[nr];
       struct DoorPartPosInfo *pos = dpc->pos;
       struct GraphicInfo *g = &graphic_info[dpc->graphic];
-      int door_token = dpc->door_nr;
+      int door_token = dpc->door_token;
       boolean is_panel = DOOR_PART_IS_PANEL(nr);
       int step_xoffset = ABS(pos->step_xoffset);
       int step_yoffset = ABS(pos->step_yoffset);
@@ -5598,7 +5755,7 @@ unsigned int MoveDoor(unsigned int door_state)
 	struct DoorPartControlInfo *dpc = &door_part_controls[nr];
 	struct DoorPartPosInfo *pos = dpc->pos;
 	struct GraphicInfo *g = &graphic_info[dpc->graphic];
-	int door_token = dpc->door_nr;
+	int door_token = dpc->door_token;
 	int door_index = DOOR_INDEX_FROM_TOKEN(door_token);
 	boolean is_panel = DOOR_PART_IS_PANEL(nr);
 	struct XY *panel_pos = &panel_pos_list[door_index];
@@ -5787,13 +5944,13 @@ unsigned int MoveDoor(unsigned int door_state)
 	current_move_delay += max_step_delay;
       }
 
+#if 1
       door_part_done_all = TRUE;
 
       for (i = 0; i < MAX_DOOR_PARTS; i++)
-	if (!door_part_done[i])
+	if (!door_part_done[i] && !DOOR_PART_IS_PANEL(i))
 	  door_part_done_all = FALSE;
 
-#if 0
       if (door_part_done_all)
 	break;
 #endif

@@ -181,8 +181,9 @@ void DrawMiniLevel(int, int, int, int);
 void DrawPreviewLevelInitial(void);
 void DrawPreviewLevelAnimation(void);
 
-void WaitForEventToContinue();
+void WaitForEventToContinue(void);
 boolean Request(char *, unsigned int);
+void InitGraphicCompatibilityInfo_Doors(void);
 void InitDoors(void);
 unsigned int OpenDoor(unsigned int);
 unsigned int CloseDoor(unsigned int);
