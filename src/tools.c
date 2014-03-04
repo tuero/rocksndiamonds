@@ -5653,10 +5653,9 @@ unsigned int MoveDoor(unsigned int door_state)
   if (door_state & DOOR_ACTION)
   {
     boolean door_panel_drawn[NUM_DOORS];
+    boolean door_part_skip[MAX_DOOR_PARTS];
     boolean door_part_done[MAX_DOOR_PARTS];
-#if 1
     boolean door_part_done_all;
-#endif
     int num_steps[MAX_DOOR_PARTS];
     int max_move_delay = 0;	// delay for complete animations of all doors
     int max_step_delay = 0;	// delay (ms) between two animation frames
@@ -5670,7 +5669,8 @@ unsigned int MoveDoor(unsigned int door_state)
       struct GraphicInfo *g = &graphic_info[dpc->graphic];
       int door_token = dpc->door_token;
 
-      door_part_done[i] = (!(door_state & door_token) ||
+      door_part_done[i] = FALSE;
+      door_part_skip[i] = (!(door_state & door_token) ||
 			   !g->bitmap);
     }
 
@@ -5712,7 +5712,7 @@ unsigned int MoveDoor(unsigned int door_state)
 			move_xsteps ? move_xsteps : move_ysteps) - start_step;
       int move_delay = move_steps * step_delay;
 
-      if (door_part_done[nr])
+      if (door_part_skip[nr])
 	continue;
 
       max_move_delay = MAX(max_move_delay, move_delay);
@@ -5746,6 +5746,8 @@ unsigned int MoveDoor(unsigned int door_state)
 
     for (k = 0; k < num_move_steps; k++)
     {
+      door_part_done_all = TRUE;
+
       for (i = 0; i < NUM_DOORS; i++)
 	door_panel_drawn[i] = FALSE;
 
@@ -5763,8 +5765,9 @@ unsigned int MoveDoor(unsigned int door_state)
 	Bitmap *bitmap = (is_panel ? bitmap_db_door : g->bitmap);
 	int current_door_state = door_state & door_token;
 	boolean door_opening = ((current_door_state & DOOR_OPEN)  != 0);
-	boolean door_closing = ((current_door_state & DOOR_CLOSE) != 0);
+	boolean door_closing = !door_opening;
 	boolean part_opening = (is_panel ? door_closing : door_opening);
+	boolean part_closing = !part_opening;
 	int start_step = (part_opening ? pos->start_step_opening :
 			  pos->start_step_closing);
 	int step_delay = pos->step_delay;
@@ -5793,7 +5796,13 @@ unsigned int MoveDoor(unsigned int door_state)
 #endif
 
 #if 0
-	if (door_part_done[nr])
+	// !!! TEST !!!	
+	if (!is_panel)
+	  continue;
+#endif
+
+#if 1
+	if (door_part_skip[nr])
 	  continue;
 #endif
 
@@ -5927,9 +5936,24 @@ unsigned int MoveDoor(unsigned int door_state)
 
 	redraw_mask |= REDRAW_DOOR_FROM_TOKEN(door_token);
 
+#if 1
+	if ((part_opening && (width < 0         || height < 0)) ||
+	    (part_closing && (width >= g->width && height >= g->height)))
+	  door_part_done[nr] = TRUE;
+#else
 	if ((door_opening && (width < 0         || height < 0)) ||
 	    (door_closing && (width >= g->width && height >= g->height)))
 	  door_part_done[nr] = TRUE;
+#endif
+
+	// continue door part animations, but not panel after door has closed
+	if (!door_part_done[nr] && !(is_panel && door_closing))
+	  door_part_done_all = FALSE;
+
+#if 0
+	if (!door_part_done[nr])
+	  printf("::: k == %d, nr == %d\n", k, nr);
+#endif
       }
 
       if (!(door_state & DOOR_NO_DELAY))
@@ -5944,13 +5968,15 @@ unsigned int MoveDoor(unsigned int door_state)
 	current_move_delay += max_step_delay;
       }
 
-#if 1
+#if 0
       door_part_done_all = TRUE;
 
       for (i = 0; i < MAX_DOOR_PARTS; i++)
-	if (!door_part_done[i] && !DOOR_PART_IS_PANEL(i))
+	if (!door_part_done[i] &&
+	    !(DOOR_PART_IS_PANEL(i) && door_closing))
 	  door_part_done_all = FALSE;
-
+#endif
+#if 1
       if (door_part_done_all)
 	break;
 #endif
@@ -5961,6 +5987,12 @@ unsigned int MoveDoor(unsigned int door_state)
     door1 = door_state & DOOR_ACTION_1;
   if (door_state & DOOR_ACTION_2)
     door2 = door_state & DOOR_ACTION_2;
+
+#if 0
+  printf("::: DOORS DONE %08x\n", door_state);
+  Delay(3000);
+  printf("::: GO!\n");
+#endif
 
   return (door1 | door2);
 }
