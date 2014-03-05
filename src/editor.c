@@ -3487,6 +3487,8 @@ static void HandleControlButtons(struct GadgetInfo *);
 static void HandleDrawingAreaInfo(struct GadgetInfo *);
 static void PrintEditorGadgetInfoText(struct GadgetInfo *);
 
+static int num_editor_gadgets = 0;	/* dynamically determined */
+
 #if 1
 static struct GadgetInfo **level_editor_gadget = NULL;
 static int *right_gadget_border = NULL;
@@ -4797,7 +4799,7 @@ static int num_editor_el_dynamic = 0;
 
 static int editor_hl_empty[] = { };
 #if 1
-static int *editor_el_empty = NULL;
+static int *editor_el_empty = NULL;	/* dynamically allocated */
 #else
 static int editor_el_empty[ED_NUM_ELEMENTLIST_BUTTONS];
 #endif
@@ -6570,10 +6572,14 @@ void CreateLevelEditorGadgets()
   ed_fieldx = MAX_ED_FIELDX - 1;
   ed_fieldy = MAX_ED_FIELDY - 1;
 
+  num_editor_gadgets = NUM_EDITOR_GADGETS;
+
+  // printf("::: allocating %d gadgets ...\n", num_editor_gadgets);
+
   level_editor_gadget =
-    checked_calloc(NUM_EDITOR_GADGETS * sizeof(struct GadgetInfo *));
+    checked_calloc(num_editor_gadgets * sizeof(struct GadgetInfo *));
   right_gadget_border =
-    checked_calloc(NUM_EDITOR_GADGETS * sizeof(int));
+    checked_calloc(num_editor_gadgets * sizeof(int));
 
   editor_el_empty = checked_calloc(ED_NUM_ELEMENTLIST_BUTTONS * sizeof(int));
   editor_el_empty_ptr = editor_el_empty;
@@ -6601,7 +6607,9 @@ void FreeLevelEditorGadgets()
 {
   int i;
 
-  for (i = 0; i < NUM_EDITOR_GADGETS; i++)
+  // printf("::: freeing %d gadgets ...\n", num_editor_gadgets);
+
+  for (i = 0; i < num_editor_gadgets; i++)
   {
     FreeGadget(level_editor_gadget[i]);
 
@@ -6981,7 +6989,7 @@ static void UnmapLevelEditorFieldGadgets()
   int i;
 
 #if 1
-  for (i = 0; i < NUM_EDITOR_GADGETS; i++)
+  for (i = 0; i < num_editor_gadgets; i++)
     if (IN_GFX_FIELD_FULL(level_editor_gadget[i]->x,
 			  level_editor_gadget[i]->y))
       UnmapGadget(level_editor_gadget[i]);
@@ -6996,7 +7004,7 @@ void UnmapLevelEditorGadgets()
 {
   int i;
 
-  for (i = 0; i < NUM_EDITOR_GADGETS; i++)
+  for (i = 0; i < num_editor_gadgets; i++)
     UnmapGadget(level_editor_gadget[i]);
 }
 
