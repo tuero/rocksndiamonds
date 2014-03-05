@@ -35,12 +35,12 @@
 
 /* positions in the level editor */
 #if 1
-#define ED_WIN_MB_LEFT_XPOS		(editor.element_left.x)
-#define ED_WIN_MB_LEFT_YPOS		(editor.element_left.y)
-#define ED_WIN_MB_MIDDLE_XPOS		(editor.element_middle.x)
-#define ED_WIN_MB_MIDDLE_YPOS		(editor.element_middle.y)
-#define ED_WIN_MB_RIGHT_XPOS		(editor.element_right.x)
-#define ED_WIN_MB_RIGHT_YPOS		(editor.element_right.y)
+#define ED_WIN_MB_LEFT_XPOS		(editor.palette.element_left.x)
+#define ED_WIN_MB_LEFT_YPOS		(editor.palette.element_left.y)
+#define ED_WIN_MB_MIDDLE_XPOS		(editor.palette.element_middle.x)
+#define ED_WIN_MB_MIDDLE_YPOS		(editor.palette.element_middle.y)
+#define ED_WIN_MB_RIGHT_XPOS		(editor.palette.element_right.x)
+#define ED_WIN_MB_RIGHT_YPOS		(editor.palette.element_right.y)
 #else
 #define ED_WIN_MB_LEFT_XPOS		6
 #define ED_WIN_MB_LEFT_YPOS		258
@@ -102,16 +102,21 @@
 #if 1
 #define ED_ELEMENTLIST_XPOS		(editor.palette.x)
 #define ED_ELEMENTLIST_YPOS		(editor.palette.y)
+#define ED_ELEMENTLIST_XSIZE		20
+#define ED_ELEMENTLIST_YSIZE		20
 #else
 #define ED_ELEMENTLIST_XPOS		5
 #define ED_ELEMENTLIST_YPOS		30
-#endif
 #define ED_ELEMENTLIST_XSIZE		20
 #define ED_ELEMENTLIST_YSIZE		20
-#define ED_ELEMENTLIST_BUTTONS_HORIZ	4
+#endif
 #if 1
-#define ED_ELEMENTLIST_BUTTONS_VERT	9
+// #define ED_ELEMENTLIST_BUTTONS_HORIZ	4
+// #define ED_ELEMENTLIST_BUTTONS_VERT	9
+#define ED_ELEMENTLIST_BUTTONS_HORIZ	(editor.palette.cols)
+#define ED_ELEMENTLIST_BUTTONS_VERT	(editor.palette.rows)
 #else
+#define ED_ELEMENTLIST_BUTTONS_HORIZ	4
 #define ED_ELEMENTLIST_BUTTONS_VERT	11
 #endif
 #define ED_NUM_ELEMENTLIST_BUTTONS	(ED_ELEMENTLIST_BUTTONS_HORIZ *	\
@@ -231,6 +236,24 @@
 #define ED_SCROLLBUTTON2_XSIZE		10
 #define ED_SCROLLBUTTON2_YSIZE		10
 
+#if 1
+#define ED_SCROLL2_UP_XPOS		(ED_ELEMENTLIST_XPOS +		\
+					 ED_ELEMENTLIST_BUTTONS_HORIZ *	\
+					 ED_ELEMENTLIST_XSIZE)
+#define ED_SCROLL2_UP_YPOS		ED_ELEMENTLIST_YPOS
+#define ED_SCROLL2_DOWN_XPOS		ED_SCROLL2_UP_XPOS
+#define ED_SCROLL2_DOWN_YPOS		(ED_SCROLL2_UP_YPOS +		\
+					 ED_ELEMENTLIST_BUTTONS_VERT *	\
+					 ED_ELEMENTLIST_YSIZE -		\
+					 ED_SCROLLBUTTON2_YSIZE)
+#define ED_SCROLL2_VERTICAL_XPOS	ED_SCROLL2_UP_XPOS
+#define ED_SCROLL2_VERTICAL_YPOS	(ED_SCROLL2_UP_YPOS +		\
+					 ED_SCROLLBUTTON2_YSIZE)
+#define ED_SCROLL2_VERTICAL_XSIZE	ED_SCROLLBUTTON2_XSIZE
+#define ED_SCROLL2_VERTICAL_YSIZE	(ED_ELEMENTLIST_BUTTONS_VERT *	\
+					 ED_ELEMENTLIST_YSIZE -		\
+					 2 * ED_SCROLLBUTTON2_YSIZE)
+#else
 #define ED_SCROLL2_UP_XPOS		85
 #define ED_SCROLL2_UP_YPOS		30
 #define ED_SCROLL2_DOWN_XPOS		ED_SCROLL2_UP_XPOS
@@ -245,6 +268,7 @@
 #define ED_SCROLL2_VERTICAL_YSIZE	(ED_ELEMENTLIST_BUTTONS_VERT *	\
 					 ED_ELEMENTLIST_YSIZE -		\
 					 2 * ED_SCROLLBUTTON2_YSIZE)
+#endif
 
 /* values for checkbutton gadgets */
 #define ED_CHECKBUTTON_XSIZE		ED_BUTTON_COUNT_XSIZE
@@ -2491,6 +2515,90 @@ static struct
   },
 };
 
+#if 1
+
+static struct
+{
+  int x, y;
+} scrollbutton_pos[ED_NUM_SCROLLBUTTONS];
+
+static struct
+{
+  int graphic;
+  int gadget_id;
+  char *infotext;
+} scrollbutton_info[ED_NUM_SCROLLBUTTONS] =
+{
+  {
+    IMG_EDITOR_PLAYFIELD_SCROLL_UP,
+    GADGET_ID_SCROLL_UP,
+    "scroll level editing area up"
+  },
+  {
+    IMG_EDITOR_PLAYFIELD_SCROLL_DOWN,
+    GADGET_ID_SCROLL_DOWN,
+    "scroll level editing area down"
+  },
+  {
+    IMG_EDITOR_PLAYFIELD_SCROLL_LEFT,
+    GADGET_ID_SCROLL_LEFT,
+    "scroll level editing area left"
+  },
+  {
+    IMG_EDITOR_PLAYFIELD_SCROLL_RIGHT,
+    GADGET_ID_SCROLL_RIGHT,
+    "scroll level editing area right"
+  },
+  {
+    IMG_EDITOR_PALETTE_SCROLL_UP,
+    GADGET_ID_SCROLL_LIST_UP,
+    "scroll element list up ('Page Up')"
+  },
+  {
+    IMG_EDITOR_PALETTE_SCROLL_DOWN,
+    GADGET_ID_SCROLL_LIST_DOWN,
+    "scroll element list down ('Page Down')"
+  },
+};
+
+static struct
+{
+  int x, y;
+  int width, height;
+  int wheel_x, wheel_y;
+  int wheel_width, wheel_height;
+} scrollbar_pos[ED_NUM_SCROLLBARS];
+
+static struct
+{
+  int graphic;
+  int type;
+  int gadget_id;
+  char *infotext;
+} scrollbar_info[ED_NUM_SCROLLBARS] =
+{
+  {
+    IMG_EDITOR_PLAYFIELD_SCROLLBAR,
+    GD_TYPE_SCROLLBAR_HORIZONTAL,
+    GADGET_ID_SCROLL_HORIZONTAL,
+    "scroll level editing area horizontally"
+  },
+  {
+    IMG_EDITOR_PLAYFIELD_SCROLLBAR,
+    GD_TYPE_SCROLLBAR_VERTICAL,
+    GADGET_ID_SCROLL_VERTICAL,
+    "scroll level editing area vertically"
+  },
+  {
+    IMG_EDITOR_PALETTE_SCROLLBAR,
+    GD_TYPE_SCROLLBAR_VERTICAL,
+    GADGET_ID_SCROLL_LIST_VERTICAL,
+    "scroll element list vertically"
+  }
+};
+
+#else
+
 static struct
 {
   int gd_x, gd_y;
@@ -2617,6 +2725,8 @@ static struct
     "scroll element list vertically"
   }
 };
+
+#endif
 
 static struct
 {
@@ -3377,8 +3487,13 @@ static void HandleControlButtons(struct GadgetInfo *);
 static void HandleDrawingAreaInfo(struct GadgetInfo *);
 static void PrintEditorGadgetInfoText(struct GadgetInfo *);
 
+#if 1
+static struct GadgetInfo **level_editor_gadget = NULL;
+static int *right_gadget_border = NULL;
+#else
 static struct GadgetInfo *level_editor_gadget[NUM_EDITOR_GADGETS];
 static int right_gadget_border[NUM_EDITOR_GADGETS];
+#endif
 
 static int drawing_function = GADGET_ID_SINGLE_ITEMS;
 static int last_drawing_function = GADGET_ID_SINGLE_ITEMS;
@@ -4681,10 +4796,18 @@ static int num_editor_hl_dynamic = SIZEOF_ARRAY_INT(editor_hl_dynamic);
 static int num_editor_el_dynamic = 0;
 
 static int editor_hl_empty[] = { };
+#if 1
+static int *editor_el_empty = NULL;
+#else
 static int editor_el_empty[ED_NUM_ELEMENTLIST_BUTTONS];
+#endif
 
 static int *editor_hl_empty_ptr = editor_hl_empty;
+#if 1
+static int *editor_el_empty_ptr = NULL;
+#else
 static int *editor_el_empty_ptr = editor_el_empty;
+#endif
 static int num_editor_hl_empty = 0;
 static int num_editor_el_empty = 0;	/* dynamically determined, if needed */
 
@@ -5385,6 +5508,20 @@ static void CreateControlButtons()
   }
 
   /* these values are not constant, but can change at runtime */
+#if 1
+  scrollbutton_pos[ED_SCROLLBUTTON_ID_AREA_UP].x    = ED_SCROLL_UP_XPOS;
+  scrollbutton_pos[ED_SCROLLBUTTON_ID_AREA_UP].y    = ED_SCROLL_UP_YPOS;
+  scrollbutton_pos[ED_SCROLLBUTTON_ID_AREA_DOWN].x  = ED_SCROLL_DOWN_XPOS;
+  scrollbutton_pos[ED_SCROLLBUTTON_ID_AREA_DOWN].y  = ED_SCROLL_DOWN_YPOS;
+  scrollbutton_pos[ED_SCROLLBUTTON_ID_AREA_LEFT].x  = ED_SCROLL_LEFT_XPOS;
+  scrollbutton_pos[ED_SCROLLBUTTON_ID_AREA_LEFT].y  = ED_SCROLL_LEFT_YPOS;
+  scrollbutton_pos[ED_SCROLLBUTTON_ID_AREA_RIGHT].x = ED_SCROLL_RIGHT_XPOS;
+  scrollbutton_pos[ED_SCROLLBUTTON_ID_AREA_RIGHT].y = ED_SCROLL_RIGHT_YPOS;
+  scrollbutton_pos[ED_SCROLLBUTTON_ID_LIST_UP].x    = ED_SCROLL2_UP_XPOS;
+  scrollbutton_pos[ED_SCROLLBUTTON_ID_LIST_UP].y    = ED_SCROLL2_UP_YPOS;
+  scrollbutton_pos[ED_SCROLLBUTTON_ID_LIST_DOWN].x  = ED_SCROLL2_DOWN_XPOS;
+  scrollbutton_pos[ED_SCROLLBUTTON_ID_LIST_DOWN].y  = ED_SCROLL2_DOWN_YPOS;
+#else
   scrollbutton_info[ED_SCROLLBUTTON_ID_AREA_UP].x    = ED_SCROLL_UP_XPOS;
   scrollbutton_info[ED_SCROLLBUTTON_ID_AREA_UP].y    = ED_SCROLL_UP_YPOS;
   scrollbutton_info[ED_SCROLLBUTTON_ID_AREA_DOWN].x  = ED_SCROLL_DOWN_XPOS;
@@ -5393,16 +5530,26 @@ static void CreateControlButtons()
   scrollbutton_info[ED_SCROLLBUTTON_ID_AREA_LEFT].y  = ED_SCROLL_LEFT_YPOS;
   scrollbutton_info[ED_SCROLLBUTTON_ID_AREA_RIGHT].x = ED_SCROLL_RIGHT_XPOS;
   scrollbutton_info[ED_SCROLLBUTTON_ID_AREA_RIGHT].y = ED_SCROLL_RIGHT_YPOS;
+#endif
 
   /* create buttons for scrolling of drawing area and element list */
   for (i = 0; i < ED_NUM_SCROLLBUTTONS; i++)
   {
     int id = scrollbutton_info[i].gadget_id;
+#if 1
+    int graphic = scrollbutton_info[i].graphic;
+    struct GraphicInfo *gd = &graphic_info[graphic];
+#endif
     int x, y, width, height;
     int gd_x1, gd_x2, gd_y1, gd_y2;
 
+#if 1
+    x = scrollbutton_pos[i].x;
+    y = scrollbutton_pos[i].y;
+#else
     x = scrollbutton_info[i].x;
     y = scrollbutton_info[i].y;
+#endif
 
     event_mask = GD_EVENT_PRESSED | GD_EVENT_REPEATED;
 
@@ -5411,23 +5558,41 @@ static void CreateControlButtons()
     {
       x += DX;
       y += DY;
+#if 1
+      width  = gd->width;
+      height = gd->height;
+      gd_x1 = gd->src_x;
+      gd_y1 = gd->src_y;
+      gd_x2 = gd->src_x + gd->pressed_xoffset;
+      gd_y2 = gd->src_y + gd->pressed_yoffset;
+#else
       width = ED_SCROLLBUTTON2_XSIZE;
       height = ED_SCROLLBUTTON2_YSIZE;
       gd_x1 = DOOR_GFX_PAGEX8 + scrollbutton_info[i].gd_x;
       gd_y1 = DOOR_GFX_PAGEY1 + scrollbutton_info[i].gd_y;
       gd_x2 = gd_x1 - ED_SCROLLBUTTON2_XSIZE;
       gd_y2 = gd_y1;
+#endif
     }
     else
     {
       x += SX;
       y += SY;
+#if 1
+      width  = gd->width;
+      height = gd->height;
+      gd_x1 = gd->src_x;
+      gd_y1 = gd->src_y;
+      gd_x2 = gd->src_x + gd->pressed_xoffset;
+      gd_y2 = gd->src_y + gd->pressed_yoffset;
+#else
       width = ED_SCROLLBUTTON_XSIZE;
       height = ED_SCROLLBUTTON_YSIZE;
       gd_x1 = DOOR_GFX_PAGEX8 + scrollbutton_info[i].gd_x;
       gd_y1 = DOOR_GFX_PAGEY1 + scrollbutton_info[i].gd_y;
       gd_x2 = gd_x1 - ED_SCROLLBUTTON_XSIZE;
       gd_y2 = gd_y1;
+#endif
     }
 
     gi = CreateGadget(GDI_CUSTOM_ID, id,
@@ -5459,7 +5624,11 @@ static void CreateControlButtons()
     Bitmap *deco_bitmap;
     int deco_x, deco_y, deco_xpos, deco_ypos;
     int gd_xoffset, gd_yoffset;
+#if 1
+    int gd_x1, gd_y1, gd_x2, gd_y2;
+#else
     int gd_x1, gd_x2, gd_y;
+#endif
     int x = i % ED_ELEMENTLIST_BUTTONS_HORIZ;
     int y = i / ED_ELEMENTLIST_BUTTONS_HORIZ;
     int id = GADGET_ID_ELEMENTLIST_FIRST + i;
@@ -5467,34 +5636,52 @@ static void CreateControlButtons()
 
     event_mask = GD_EVENT_RELEASED;
 
+#if 1
+    gd_xoffset = ED_ELEMENTLIST_XPOS + x * gd->width;
+    gd_yoffset = ED_ELEMENTLIST_YPOS + y * gd->height;
+
+    gd_x1 = gd->src_x;
+    gd_y1 = gd->src_y;
+    gd_x2 = gd->src_x + gd->pressed_xoffset;
+    gd_y2 = gd->src_y + gd->pressed_yoffset;
+
+    getMiniGraphicSource(el2edimg(element), &deco_bitmap, &deco_x, &deco_y);
+    deco_xpos = (gd->width  - MINI_TILEX) / 2;
+    deco_ypos = (gd->height - MINI_TILEY) / 2;
+#else
     gd_xoffset = ED_ELEMENTLIST_XPOS + x * ED_ELEMENTLIST_XSIZE;
     gd_yoffset = ED_ELEMENTLIST_YPOS + y * ED_ELEMENTLIST_YSIZE;
 
-#if 1
-    gd_x1 = gd->src_x;
-    gd_x2 = gd->src_x + gd->pressed_xoffset;
-    gd_y  = gd->src_y;
-#else
     gd_x1 = DOOR_GFX_PAGEX6 + ED_ELEMENTLIST_XPOS + ED_ELEMENTLIST_XSIZE;
     gd_x2 = DOOR_GFX_PAGEX6 + ED_ELEMENTLIST_XPOS;
     gd_y  = DOOR_GFX_PAGEY1 + ED_ELEMENTLIST_YPOS;
-#endif
 
     getMiniGraphicSource(el2edimg(element), &deco_bitmap, &deco_x, &deco_y);
     deco_xpos = (ED_ELEMENTLIST_XSIZE - MINI_TILEX) / 2;
     deco_ypos = (ED_ELEMENTLIST_YSIZE - MINI_TILEY) / 2;
+#endif
 
     gi = CreateGadget(GDI_CUSTOM_ID, id,
 		      GDI_CUSTOM_TYPE_ID, i,
 		      GDI_INFO_TEXT, getElementInfoText(element),
 		      GDI_X, DX + gd_xoffset,
 		      GDI_Y, DY + gd_yoffset,
+#if 1
+		      GDI_WIDTH, gd->width,
+		      GDI_HEIGHT, gd->height,
+#else
 		      GDI_WIDTH, ED_ELEMENTLIST_XSIZE,
 		      GDI_HEIGHT, ED_ELEMENTLIST_YSIZE,
+#endif
 		      GDI_TYPE, GD_TYPE_NORMAL_BUTTON,
 		      GDI_STATE, GD_BUTTON_UNPRESSED,
+#if 1
+		      GDI_DESIGN_UNPRESSED, gd->bitmap, gd_x1, gd_y1,
+		      GDI_DESIGN_PRESSED, gd->bitmap, gd_x2, gd_y2,
+#else
 		      GDI_DESIGN_UNPRESSED, gd->bitmap, gd_x1, gd_y,
 		      GDI_DESIGN_PRESSED, gd->bitmap, gd_x2, gd_y,
+#endif
 		      GDI_DECORATION_DESIGN, deco_bitmap, deco_x, deco_y,
 		      GDI_DECORATION_POSITION, deco_xpos, deco_ypos,
 		      GDI_DECORATION_SIZE, MINI_TILEX, MINI_TILEY,
@@ -5543,7 +5730,7 @@ static void CreateCounterButtons()
 		counterbutton_info[i].gadget_id_down :
 		counterbutton_info[i].gadget_id_up);
       int gd_xoffset;
-      int gd_x, gd_x1, gd_x2, gd_y;
+      int gd_x, gd_y, gd_x1, gd_x2, gd_y1, gd_y2;
       int x_size, y_size;
       unsigned int event_mask;
       char infotext[max_infotext_len + 1];
@@ -5552,6 +5739,27 @@ static void CreateCounterButtons()
 
       if (i == ED_COUNTER_ID_SELECT_LEVEL)
       {
+#if 1
+	int graphic = (j == 0 ?
+		       IMG_EDITOR_BUTTON_GFX_PREV_LEVEL :
+		       IMG_EDITOR_BUTTON_GFX_NEXT_LEVEL);
+	struct GraphicInfo *gd = &graphic_info[graphic];
+
+	gd_bitmap = gd->bitmap;
+
+	event_mask |= GD_EVENT_RELEASED;
+
+	if (j == 1)
+	  x += 2 * ED_GADGET_DISTANCE;
+	y += ED_GADGET_DISTANCE;
+
+	gd_x1 = gd->src_x;
+	gd_y1 = gd->src_y;
+	gd_x2 = gd->src_x + gd->pressed_xoffset;
+	gd_y2 = gd->src_y + gd->pressed_yoffset;
+	x_size = gd->width;
+	y_size = gd->height;
+#else
 	int sid = (j == 0 ?
 		   ED_SCROLLBUTTON_ID_AREA_LEFT :
 		   ED_SCROLLBUTTON_ID_AREA_RIGHT);
@@ -5564,16 +5772,19 @@ static void CreateCounterButtons()
 
 	gd_x1 = DOOR_GFX_PAGEX8 + scrollbutton_info[sid].gd_x;
 	gd_x2 = gd_x1 - ED_SCROLLBUTTON_XSIZE;
-	gd_y  = DOOR_GFX_PAGEY1 + scrollbutton_info[sid].gd_y;
+	gd_y1 = DOOR_GFX_PAGEY1 + scrollbutton_info[sid].gd_y;
+	gd_y2 = gd_y1;
 	x_size = ED_SCROLLBUTTON_XSIZE;
 	y_size = ED_SCROLLBUTTON_YSIZE;
+#endif
       }
       else
       {
 	gd_xoffset = (j == 0 ? ED_BUTTON_MINUS_XPOS : ED_BUTTON_PLUS_XPOS);
 	gd_x1 = DOOR_GFX_PAGEX4 + gd_xoffset;
 	gd_x2 = DOOR_GFX_PAGEX3 + gd_xoffset;
-	gd_y  = DOOR_GFX_PAGEY1 + ED_BUTTON_COUNT_YPOS;
+	gd_y1 = DOOR_GFX_PAGEY1 + ED_BUTTON_COUNT_YPOS;
+	gd_y2 = gd_y1;
 	x_size = ED_BUTTON_COUNT_XSIZE;
 	y_size = ED_BUTTON_COUNT_YSIZE;
       }
@@ -5590,8 +5801,8 @@ static void CreateCounterButtons()
 			GDI_HEIGHT, y_size,
 			GDI_TYPE, GD_TYPE_NORMAL_BUTTON,
 			GDI_STATE, GD_BUTTON_UNPRESSED,
-			GDI_DESIGN_UNPRESSED, gd_bitmap, gd_x1, gd_y,
-			GDI_DESIGN_PRESSED, gd_bitmap, gd_x2, gd_y,
+			GDI_DESIGN_UNPRESSED, gd_bitmap, gd_x1, gd_y1,
+			GDI_DESIGN_PRESSED, gd_bitmap, gd_x2, gd_y2,
 			GDI_EVENT_MASK, event_mask,
 			GDI_CALLBACK_INFO, HandleEditorGadgetInfoText,
 			GDI_CALLBACK_ACTION, HandleCounterButtons,
@@ -6046,6 +6257,46 @@ static void CreateScrollbarGadgets()
   int i;
 
   /* these values are not constant, but can change at runtime */
+#if 1
+  scrollbar_pos[ED_SCROLLBAR_ID_AREA_HORIZONTAL].x =
+    SX + ED_SCROLL_HORIZONTAL_XPOS;
+  scrollbar_pos[ED_SCROLLBAR_ID_AREA_HORIZONTAL].y =
+    SY + ED_SCROLL_HORIZONTAL_YPOS;
+  scrollbar_pos[ED_SCROLLBAR_ID_AREA_HORIZONTAL].width =
+    ED_SCROLL_HORIZONTAL_XSIZE;
+  scrollbar_pos[ED_SCROLLBAR_ID_AREA_HORIZONTAL].height =
+    ED_SCROLL_HORIZONTAL_YSIZE;
+  scrollbar_pos[ED_SCROLLBAR_ID_AREA_HORIZONTAL].wheel_x      = SX;
+  scrollbar_pos[ED_SCROLLBAR_ID_AREA_HORIZONTAL].wheel_y      = SY;
+  scrollbar_pos[ED_SCROLLBAR_ID_AREA_HORIZONTAL].wheel_width  = SXSIZE;
+  scrollbar_pos[ED_SCROLLBAR_ID_AREA_HORIZONTAL].wheel_height = SYSIZE;
+
+  scrollbar_pos[ED_SCROLLBAR_ID_AREA_VERTICAL].x =
+    SX + ED_SCROLL_VERTICAL_XPOS;
+  scrollbar_pos[ED_SCROLLBAR_ID_AREA_VERTICAL].y =
+    SY + ED_SCROLL_VERTICAL_YPOS;
+  scrollbar_pos[ED_SCROLLBAR_ID_AREA_VERTICAL].width =
+    ED_SCROLL_VERTICAL_XSIZE;
+  scrollbar_pos[ED_SCROLLBAR_ID_AREA_VERTICAL].height =
+    ED_SCROLL_VERTICAL_YSIZE;
+  scrollbar_pos[ED_SCROLLBAR_ID_AREA_VERTICAL].wheel_x      = SX;
+  scrollbar_pos[ED_SCROLLBAR_ID_AREA_VERTICAL].wheel_y      = SY;
+  scrollbar_pos[ED_SCROLLBAR_ID_AREA_VERTICAL].wheel_width  = SXSIZE;
+  scrollbar_pos[ED_SCROLLBAR_ID_AREA_VERTICAL].wheel_height = SYSIZE;
+
+  scrollbar_pos[ED_SCROLLBAR_ID_LIST_VERTICAL].x =
+    DX + ED_SCROLL2_VERTICAL_XPOS;
+  scrollbar_pos[ED_SCROLLBAR_ID_LIST_VERTICAL].y =
+    DY + ED_SCROLL2_VERTICAL_YPOS;
+  scrollbar_pos[ED_SCROLLBAR_ID_LIST_VERTICAL].width =
+    ED_SCROLL2_VERTICAL_XSIZE;
+  scrollbar_pos[ED_SCROLLBAR_ID_LIST_VERTICAL].height =
+    ED_SCROLL2_VERTICAL_YSIZE;
+  scrollbar_pos[ED_SCROLLBAR_ID_LIST_VERTICAL].wheel_x = DX;
+  scrollbar_pos[ED_SCROLLBAR_ID_LIST_VERTICAL].wheel_y = DY;
+  scrollbar_pos[ED_SCROLLBAR_ID_LIST_VERTICAL].wheel_width  = DXSIZE;
+  scrollbar_pos[ED_SCROLLBAR_ID_LIST_VERTICAL].wheel_height = DYSIZE;
+#else
   scrollbar_info[ED_SCROLLBAR_ID_AREA_HORIZONTAL].x =
     SX + ED_SCROLL_HORIZONTAL_XPOS;
   scrollbar_info[ED_SCROLLBAR_ID_AREA_HORIZONTAL].y =
@@ -6076,15 +6327,26 @@ static void CreateScrollbarGadgets()
     DX + ED_SCROLL2_VERTICAL_XPOS;
   scrollbar_info[ED_SCROLLBAR_ID_LIST_VERTICAL].y =
     DY + ED_SCROLL2_VERTICAL_YPOS;
+  scrollbar_info[ED_SCROLLBAR_ID_LIST_VERTICAL].width =
+    ED_SCROLL2_VERTICAL_XSIZE;
+  scrollbar_info[ED_SCROLLBAR_ID_LIST_VERTICAL].height =
+    ED_SCROLL2_VERTICAL_YSIZE;
   scrollbar_info[ED_SCROLLBAR_ID_LIST_VERTICAL].wheel_x = DX;
   scrollbar_info[ED_SCROLLBAR_ID_LIST_VERTICAL].wheel_y = DY;
   scrollbar_info[ED_SCROLLBAR_ID_LIST_VERTICAL].wheel_width  = DXSIZE;
   scrollbar_info[ED_SCROLLBAR_ID_LIST_VERTICAL].wheel_height = DYSIZE;
+#endif
 
   for (i = 0; i < ED_NUM_SCROLLBARS; i++)
   {
     int id = scrollbar_info[i].gadget_id;
+#if 1
+    int graphic = scrollbar_info[i].graphic;
+    struct GraphicInfo *gd = &graphic_info[graphic];
+    Bitmap *gd_bitmap = gd->bitmap;
+#else
     Bitmap *gd_bitmap = graphic_info[IMG_GLOBAL_DOOR].bitmap;
+#endif
     int gd_x1, gd_x2, gd_y1, gd_y2;
     struct GadgetInfo *gi;
     int items_max, items_visible, item_position;
@@ -6114,27 +6376,48 @@ static void CreateScrollbarGadgets()
 
     event_mask = GD_EVENT_MOVING | GD_EVENT_OFF_BORDERS;
 
+#if 1
+    gd_x1 = gd->src_x;
+    gd_y1 = gd->src_y;
+    gd_x2 = gd->src_x + gd->pressed_xoffset;
+    gd_y2 = gd->src_y + gd->pressed_yoffset;
+#else
     gd_x1 = DOOR_GFX_PAGEX8 + scrollbar_info[i].gd_x;
     gd_x2 = (gd_x1 - (scrollbar_info[i].type == GD_TYPE_SCROLLBAR_HORIZONTAL ?
 		      scrollbar_info[i].height : scrollbar_info[i].width));
     gd_y1 = DOOR_GFX_PAGEY1 + scrollbar_info[i].gd_y;
     gd_y2 = DOOR_GFX_PAGEY1 + scrollbar_info[i].gd_y;
+#endif
 
     gi = CreateGadget(GDI_CUSTOM_ID, id,
 		      GDI_CUSTOM_TYPE_ID, i,
 		      GDI_INFO_TEXT, scrollbar_info[i].infotext,
+#if 1
+		      GDI_X, scrollbar_pos[i].x,
+		      GDI_Y, scrollbar_pos[i].y,
+		      GDI_WIDTH, scrollbar_pos[i].width,
+		      GDI_HEIGHT, scrollbar_pos[i].height,
+#else
 		      GDI_X, scrollbar_info[i].x,
 		      GDI_Y, scrollbar_info[i].y,
 		      GDI_WIDTH, scrollbar_info[i].width,
 		      GDI_HEIGHT, scrollbar_info[i].height,
+#endif
 		      GDI_TYPE, scrollbar_info[i].type,
 		      GDI_SCROLLBAR_ITEMS_MAX, items_max,
 		      GDI_SCROLLBAR_ITEMS_VISIBLE, items_visible,
 		      GDI_SCROLLBAR_ITEM_POSITION, item_position,
+#if 1
+		      GDI_WHEEL_AREA_X, scrollbar_pos[i].wheel_x,
+		      GDI_WHEEL_AREA_Y, scrollbar_pos[i].wheel_y,
+		      GDI_WHEEL_AREA_WIDTH, scrollbar_pos[i].wheel_width,
+		      GDI_WHEEL_AREA_HEIGHT, scrollbar_pos[i].wheel_height,
+#else
 		      GDI_WHEEL_AREA_X, scrollbar_info[i].wheel_x,
 		      GDI_WHEEL_AREA_Y, scrollbar_info[i].wheel_y,
 		      GDI_WHEEL_AREA_WIDTH, scrollbar_info[i].wheel_width,
 		      GDI_WHEEL_AREA_HEIGHT, scrollbar_info[i].wheel_height,
+#endif
 		      GDI_STATE, GD_BUTTON_UNPRESSED,
 		      GDI_DESIGN_UNPRESSED, gd_bitmap, gd_x1, gd_y1,
 		      GDI_DESIGN_PRESSED, gd_bitmap, gd_x2, gd_y2,
@@ -6287,6 +6570,14 @@ void CreateLevelEditorGadgets()
   ed_fieldx = MAX_ED_FIELDX - 1;
   ed_fieldy = MAX_ED_FIELDY - 1;
 
+  level_editor_gadget =
+    checked_calloc(NUM_EDITOR_GADGETS * sizeof(struct GadgetInfo *));
+  right_gadget_border =
+    checked_calloc(NUM_EDITOR_GADGETS * sizeof(int));
+
+  editor_el_empty = checked_calloc(ED_NUM_ELEMENTLIST_BUTTONS * sizeof(int));
+  editor_el_empty_ptr = editor_el_empty;
+
   ReinitializeElementList();
 
   CreateControlButtons();
@@ -6316,6 +6607,11 @@ void FreeLevelEditorGadgets()
 
     level_editor_gadget[i] = NULL;
   }
+
+  checked_free(level_editor_gadget);
+  checked_free(right_gadget_border);
+
+  checked_free(editor_el_empty);
 }
 
 static void MapCounterButtons(int id)
@@ -7586,14 +7882,24 @@ static void AdjustDrawingAreaGadgets()
   xoffset = (ed_fieldx == MAX_ED_FIELDX ? ED_SCROLLBUTTON_XSIZE : 0);
   yoffset = (ed_fieldy == MAX_ED_FIELDY ? ED_SCROLLBUTTON_YSIZE : 0);
 
+#if 1
+  x = SX + scrollbutton_pos[ED_SCROLLBUTTON_ID_AREA_RIGHT].x + xoffset;
+  y = SX + scrollbutton_pos[ED_SCROLLBUTTON_ID_AREA_DOWN].y + yoffset;
+#else
   x = SX + scrollbutton_info[ED_SCROLLBUTTON_ID_AREA_RIGHT].x + xoffset;
   y = SX + scrollbutton_info[ED_SCROLLBUTTON_ID_AREA_DOWN].y + yoffset;
+#endif
 
   ModifyGadget(level_editor_gadget[GADGET_ID_SCROLL_RIGHT], GDI_X, x, GDI_END);
   ModifyGadget(level_editor_gadget[GADGET_ID_SCROLL_DOWN], GDI_Y, y, GDI_END);
 
-  width = scrollbar_info[ED_SCROLLBAR_ID_AREA_HORIZONTAL].width + xoffset;
+#if 1
+  width  = scrollbar_pos[ED_SCROLLBAR_ID_AREA_HORIZONTAL].width + xoffset;
+  height = scrollbar_pos[ED_SCROLLBAR_ID_AREA_VERTICAL].height + yoffset;
+#else
+  width  = scrollbar_info[ED_SCROLLBAR_ID_AREA_HORIZONTAL].width + xoffset;
   height = scrollbar_info[ED_SCROLLBAR_ID_AREA_VERTICAL].height + yoffset;
+#endif
 
   ModifyGadget(level_editor_gadget[GADGET_ID_SCROLL_HORIZONTAL],
 	       GDI_WIDTH, width,

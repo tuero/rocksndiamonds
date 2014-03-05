@@ -6085,28 +6085,28 @@ struct TokenIntPtrInfo image_config_vars[] =
     &editor.palette.rows
   },
   {
-    "editor.element_left.x",
-    &editor.element_left.x
+    "editor.palette.element_left.x",
+    &editor.palette.element_left.x
   },
   {
-    "editor.element_left.y",
-    &editor.element_left.y
+    "editor.palette.element_left.y",
+    &editor.palette.element_left.y
   },
   {
-    "editor.element_middle.x",
-    &editor.element_middle.x
+    "editor.palette.element_middle.x",
+    &editor.palette.element_middle.x
   },
   {
-    "editor.element_middle.y",
-    &editor.element_middle.y
+    "editor.palette.element_middle.y",
+    &editor.palette.element_middle.y
   },
   {
-    "editor.element_right.x",
-    &editor.element_right.x
+    "editor.palette.element_right.x",
+    &editor.palette.element_right.x
   },
   {
-    "editor.element_right.y",
-    &editor.element_right.y
+    "editor.palette.element_right.y",
+    &editor.palette.element_right.y
   },
   {
     "request.button.yes.x",

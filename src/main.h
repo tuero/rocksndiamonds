@@ -2349,14 +2349,15 @@ struct EditorPaletteInfo
 {
   int x, y;
   int cols, rows;
+
+  struct XY element_left;
+  struct XY element_middle;
+  struct XY element_right;
 };
 
 struct EditorInfo
 {
   struct EditorPaletteInfo palette;
-  struct XY element_left;
-  struct XY element_middle;
-  struct XY element_right;
 };
 
 struct ViewportInfo
