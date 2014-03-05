@@ -3417,14 +3417,28 @@ static void DrawPreviewLevelPlayfieldExt(int from_x, int from_y)
   int preview_height = preview.ysize * tile_size;
   int real_preview_xsize = MIN(level_xsize, preview.xsize);
   int real_preview_ysize = MIN(level_ysize, preview.ysize);
+  int real_preview_width  = real_preview_xsize * tile_size;
+  int real_preview_height = real_preview_ysize * tile_size;
   int dst_x = SX + ALIGNED_XPOS(preview.x, preview_width, preview.align);
   int dst_y = SY + ALIGNED_YPOS(preview.y, preview_height, preview.valign);
   int x, y;
 
+#if 1
+  if (!IN_GFX_FIELD_FULL(dst_x, dst_y + preview_height - 1))
+    return;
+#endif
+
+#if 0
+  dst_x += (preview_width  - real_preview_width)  / 2;
+  dst_y += (preview_height - real_preview_height) / 2;
+
+  DrawBackground(dst_x, dst_y, real_preview_width, real_preview_height);
+#else
   DrawBackground(dst_x, dst_y, preview_width, preview_height);
 
-  dst_x += (preview_width  - real_preview_xsize * tile_size) / 2;
-  dst_y += (preview_height - real_preview_ysize * tile_size) / 2;
+  dst_x += (preview_width  - real_preview_width)  / 2;
+  dst_y += (preview_height - real_preview_height) / 2;
+#endif
 
   for (x = 0; x < real_preview_xsize; x++)
   {
@@ -3475,6 +3489,9 @@ static void DrawPreviewLevelLabelExt(int mode)
 #if 1
   int font_nr = pos->font;
   int i;
+
+  if (!IN_GFX_FIELD_FULL(pos->x, pos->y + getFontHeight(pos->font)))
+    return;
 
   if (mode == MICROLABEL_LEVEL_AUTHOR_HEAD ||
       mode == MICROLABEL_IMPORTED_FROM_HEAD ||
@@ -3615,7 +3632,8 @@ static void DrawPreviewLevelExt(boolean restart)
       label_text[max_len_label_text] = '\0';
 
 #if 1
-      DrawTextSAligned(pos->x, pos->y, label_text, font_nr, pos->align);
+      if (IN_GFX_FIELD_FULL(pos->x, pos->y + getFontHeight(pos->font)))
+	DrawTextSAligned(pos->x, pos->y, label_text, font_nr, pos->align);
 #else
       lxpos = SX + (SXSIZE - getTextWidth(label_text, font_nr)) / 2;
       lypos = SY + MICROLABEL1_YPOS;

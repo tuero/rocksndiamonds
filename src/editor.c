@@ -8532,9 +8532,23 @@ static int PrintElementDescriptionFromFile(char *filename, int start_line)
   int sy = SY + pad_y + start_line * font_height;
   int max_chars_per_line = (SXSIZE - 2 * pad_x) / font_width;
   int max_lines_per_screen = (SYSIZE - pad_y) / font_height - 1;
+  int max_lines_drawable = max_lines_per_screen - start_line;
 
+#if 0
+  printf("::: SYSIZE == %d [%d / %d / %d]\n", SYSIZE,
+	 max_chars_per_line, max_lines_per_screen, max_lines_drawable);
+#endif
+
+  if (start_line >= max_lines_per_screen)
+    return FALSE;
+
+#if 1
+  return DrawTextFile(sx, sy, filename, font_nr, max_chars_per_line, -1,
+		      max_lines_drawable, 0, -1, TRUE, FALSE, FALSE);
+#else
   return DrawTextFile(sx, sy, filename, font_nr, max_chars_per_line, -1,
 		      max_lines_per_screen, 0, -1, TRUE, FALSE, FALSE);
+#endif
 }
 
 static void DrawPropertiesInfo()
@@ -8598,8 +8612,8 @@ static void DrawPropertiesInfo()
     { -1,			NULL					}
   };
   char *filename = getElementDescriptionFilename(properties_element);
-  char *percentage_text = "In this level:";
-  char *properties_text = "Standard properties:";
+  char *percentage_text = "In this level: ";
+  char *properties_text = "Standard properties: ";
   float percentage;
   int num_elements_in_level;
   int num_standard_properties = 0;
