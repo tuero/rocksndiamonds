@@ -378,7 +378,10 @@
 
 /* default values for undefined configuration file parameters */
 #define ARG_UNDEFINED		"-1000000"
-#define ARG_UNDEFINED_VALUE	(atoi(ARG_UNDEFINED))
+#define ARG_UNDEFINED_VALUE	(-1000000)
+
+/* default value for off-screen positions */
+#define POS_OFFSCREEN		(-1000000)
 
 /* definitions for game sub-directories */
 #ifndef RO_GAME_DIR

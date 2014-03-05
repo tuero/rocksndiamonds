@@ -2345,6 +2345,20 @@ struct PreviewInfo
   int anim_mode;
 };
 
+struct EditorPaletteInfo
+{
+  int x, y;
+  int cols, rows;
+};
+
+struct EditorInfo
+{
+  struct EditorPaletteInfo palette;
+  struct XY element_left;
+  struct XY element_middle;
+  struct XY element_right;
+};
+
 struct ViewportInfo
 {
   struct RectWithBorder window;
@@ -3017,6 +3031,7 @@ extern struct MenuInfo		menu;
 extern struct DoorInfo		door_1, door_2;
 extern struct RequestInfo	request;
 extern struct PreviewInfo	preview;
+extern struct EditorInfo	editor;
 extern struct ElementInfo	element_info[];
 extern struct ElementNameInfo	element_name_info[];
 extern struct ElementActionInfo	element_action_info[];

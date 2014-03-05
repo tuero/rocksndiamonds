@@ -6069,6 +6069,46 @@ struct TokenIntPtrInfo image_config_vars[] =
     &tape.text.time.font
   },
   {
+    "editor.palette.x",
+    &editor.palette.x
+  },
+  {
+    "editor.palette.y",
+    &editor.palette.y
+  },
+  {
+    "editor.palette.cols",
+    &editor.palette.cols
+  },
+  {
+    "editor.palette.rows",
+    &editor.palette.rows
+  },
+  {
+    "editor.element_left.x",
+    &editor.element_left.x
+  },
+  {
+    "editor.element_left.y",
+    &editor.element_left.y
+  },
+  {
+    "editor.element_middle.x",
+    &editor.element_middle.x
+  },
+  {
+    "editor.element_middle.y",
+    &editor.element_middle.y
+  },
+  {
+    "editor.element_right.x",
+    &editor.element_right.x
+  },
+  {
+    "editor.element_right.y",
+    &editor.element_right.y
+  },
+  {
     "request.button.yes.x",
     &request.button.yes.x
   },

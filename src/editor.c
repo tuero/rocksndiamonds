@@ -34,12 +34,21 @@
 */
 
 /* positions in the level editor */
+#if 1
+#define ED_WIN_MB_LEFT_XPOS		(editor.element_left.x)
+#define ED_WIN_MB_LEFT_YPOS		(editor.element_left.y)
+#define ED_WIN_MB_MIDDLE_XPOS		(editor.element_middle.x)
+#define ED_WIN_MB_MIDDLE_YPOS		(editor.element_middle.y)
+#define ED_WIN_MB_RIGHT_XPOS		(editor.element_right.x)
+#define ED_WIN_MB_RIGHT_YPOS		(editor.element_right.y)
+#else
 #define ED_WIN_MB_LEFT_XPOS		6
 #define ED_WIN_MB_LEFT_YPOS		258
 #define ED_WIN_MB_MIDDLE_XPOS		42
 #define ED_WIN_MB_MIDDLE_YPOS		ED_WIN_MB_LEFT_YPOS
 #define ED_WIN_MB_RIGHT_XPOS		78
 #define ED_WIN_MB_RIGHT_YPOS		ED_WIN_MB_LEFT_YPOS
+#endif
 
 /* values for the control window */
 #define ED_CTRL_NO_BUTTONS_GFX_XPOS 	6
@@ -90,12 +99,21 @@
 				ED_NUM_CTRL4_BUTTONS)
 
 /* values for the element list */
+#if 1
+#define ED_ELEMENTLIST_XPOS		(editor.palette.x)
+#define ED_ELEMENTLIST_YPOS		(editor.palette.y)
+#else
 #define ED_ELEMENTLIST_XPOS		5
 #define ED_ELEMENTLIST_YPOS		30
+#endif
 #define ED_ELEMENTLIST_XSIZE		20
 #define ED_ELEMENTLIST_YSIZE		20
 #define ED_ELEMENTLIST_BUTTONS_HORIZ	4
+#if 1
+#define ED_ELEMENTLIST_BUTTONS_VERT	9
+#else
 #define ED_ELEMENTLIST_BUTTONS_VERT	11
+#endif
 #define ED_NUM_ELEMENTLIST_BUTTONS	(ED_ELEMENTLIST_BUTTONS_HORIZ *	\
 					 ED_ELEMENTLIST_BUTTONS_VERT)
 
@@ -5437,6 +5455,7 @@ static void CreateControlButtons()
   /* create buttons for element list */
   for (i = 0; i < ED_NUM_ELEMENTLIST_BUTTONS; i++)
   {
+    struct GraphicInfo *gd = &graphic_info[IMG_EDITOR_PALETTE_BUTTON];
     Bitmap *deco_bitmap;
     int deco_x, deco_y, deco_xpos, deco_ypos;
     int gd_xoffset, gd_yoffset;
@@ -5451,9 +5470,15 @@ static void CreateControlButtons()
     gd_xoffset = ED_ELEMENTLIST_XPOS + x * ED_ELEMENTLIST_XSIZE;
     gd_yoffset = ED_ELEMENTLIST_YPOS + y * ED_ELEMENTLIST_YSIZE;
 
+#if 1
+    gd_x1 = gd->src_x;
+    gd_x2 = gd->src_x + gd->pressed_xoffset;
+    gd_y  = gd->src_y;
+#else
     gd_x1 = DOOR_GFX_PAGEX6 + ED_ELEMENTLIST_XPOS + ED_ELEMENTLIST_XSIZE;
     gd_x2 = DOOR_GFX_PAGEX6 + ED_ELEMENTLIST_XPOS;
     gd_y  = DOOR_GFX_PAGEY1 + ED_ELEMENTLIST_YPOS;
+#endif
 
     getMiniGraphicSource(el2edimg(element), &deco_bitmap, &deco_x, &deco_y);
     deco_xpos = (ED_ELEMENTLIST_XSIZE - MINI_TILEX) / 2;
@@ -5468,8 +5493,8 @@ static void CreateControlButtons()
 		      GDI_HEIGHT, ED_ELEMENTLIST_YSIZE,
 		      GDI_TYPE, GD_TYPE_NORMAL_BUTTON,
 		      GDI_STATE, GD_BUTTON_UNPRESSED,
-		      GDI_DESIGN_UNPRESSED, gd_bitmap, gd_x1, gd_y,
-		      GDI_DESIGN_PRESSED, gd_bitmap, gd_x2, gd_y,
+		      GDI_DESIGN_UNPRESSED, gd->bitmap, gd_x1, gd_y,
+		      GDI_DESIGN_PRESSED, gd->bitmap, gd_x2, gd_y,
 		      GDI_DECORATION_DESIGN, deco_bitmap, deco_x, deco_y,
 		      GDI_DECORATION_POSITION, deco_xpos, deco_ypos,
 		      GDI_DECORATION_SIZE, MINI_TILEX, MINI_TILEY,
@@ -7455,8 +7480,15 @@ void DrawLevelEd()
   }
 
   /* copy default editor door content to main double buffer */
+#if 1
+  BlitBitmap(graphic_info[IMG_BACKGROUND_PALETTE].bitmap, drawto,
+	     graphic_info[IMG_BACKGROUND_PALETTE].src_x,
+	     graphic_info[IMG_BACKGROUND_PALETTE].src_y,
+	     DXSIZE, DYSIZE, DX, DY);
+#else
   BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
 	     DOOR_GFX_PAGEX6, DOOR_GFX_PAGEY1, DXSIZE, DYSIZE, DX, DY);
+#endif
 
 #if 0
   printf("::: %d, %d  /  %d, %d\n", VX, VY, EX, EY);

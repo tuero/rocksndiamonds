@@ -5226,6 +5226,11 @@ struct ConfigInfo image_config[] =
   { "editor.cascade_list.active.ypos",		"8"			},
   { "editor.cascade_list.active.frames",	"1"			},
 
+  { "editor.palette_button",			"RocksDoor.png"		},
+  { "editor.palette_button.x",			"525"			},
+  { "editor.palette_button.y",			"30"			},
+  { "editor.palette_button.pressed_xoffset",	"-20"			},
+
   { "background",				UNDEFINED_FILENAME	},
   { "background.TITLE_INITIAL",			UNDEFINED_FILENAME	},
   { "background.TITLE",				UNDEFINED_FILENAME	},
@@ -5254,6 +5259,16 @@ struct ConfigInfo image_config[] =
   { "background.PANEL.y",			"0"			},
   { "background.PANEL.width",			"100"			},
   { "background.PANEL.height",			"280"			},
+  { "background.PALETTE",			"RocksDoor.png"		},
+  { "background.PALETTE.x",			"500"			},
+  { "background.PALETTE.y",			"0"			},
+  { "background.PALETTE.width",			"100"			},
+  { "background.PALETTE.height",		"280"			},
+  { "background.TOOLBOX",			"RocksDoor.png"		},
+  { "background.TOOLBOX.x",			"700"			},
+  { "background.TOOLBOX.y",			"236"			},
+  { "background.TOOLBOX.width",			"100"			},
+  { "background.TOOLBOX.height",		"144"			},
 
   { "background.titlescreen_initial_1",		UNDEFINED_FILENAME	},
   { "background.titlescreen_initial_2",		UNDEFINED_FILENAME	},
@@ -6984,6 +6999,18 @@ struct ConfigInfo image_config[] =
   { "tape.text.time.valign",			"top"			},
   { "tape.text.time.digits",			"-1"			},
   { "tape.text.time.font",			"font.tape_recorder"	},
+
+  { "editor.palette.x",				"5"			},
+  { "editor.palette.y",				"30"			},
+  { "editor.palette.cols",			"4"			},
+  { "editor.palette.rows",			"11"			},
+
+  { "editor.element_left.x",			"6"			},
+  { "editor.element_left.y",			"258"			},
+  { "editor.element_middle.x",			"42"			},
+  { "editor.element_middle.y",			"258"			},
+  { "editor.element_right.x",			"78"			},
+  { "editor.element_right.y",			"258"			},
 
   { "request.button.yes.x",			"2"			},
   { "request.button.yes.y",			"250"			},

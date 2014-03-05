@@ -165,6 +165,7 @@ struct MenuInfo		menu;
 struct DoorInfo		door_1, door_2;
 struct RequestInfo	request;
 struct PreviewInfo	preview;
+struct EditorInfo	editor;
 
 struct GraphicInfo     *graphic_info = NULL;
 struct SoundInfo       *sound_info = NULL;

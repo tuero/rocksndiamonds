@@ -110,6 +110,10 @@
 #define GDI_ACTIVE			45
 #define GDI_DIRECT_DRAW			46
 
+/* gadget deactivation hack */
+#define GDI_ACTIVE_POS(a)		((a) < 0 ? POS_OFFSCREEN : (a))
+
+
 typedef void (*gadget_function)(void *);
 
 struct GadgetBorder

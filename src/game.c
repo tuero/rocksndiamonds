@@ -16848,8 +16848,8 @@ void CreateGameButtons()
 
     gi = CreateGadget(GDI_CUSTOM_ID, id,
 		      GDI_INFO_TEXT, gamebutton_info[i].infotext,
-		      GDI_X, DX + pos->x,
-		      GDI_Y, DY + pos->y,
+		      GDI_X, DX + GDI_ACTIVE_POS(pos->x),
+		      GDI_Y, DY + GDI_ACTIVE_POS(pos->y),
 		      GDI_WIDTH, gfx->width,
 		      GDI_HEIGHT, gfx->height,
 		      GDI_TYPE, button_type,

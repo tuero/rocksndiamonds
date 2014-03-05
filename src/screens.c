@@ -86,7 +86,22 @@
 #define MENU_SCREEN_MAX_XPOS		(SCR_FIELDX - 1)
 #define MENU_TITLE1_YPOS		8
 #define MENU_TITLE2_YPOS		46
-#define MAX_INFO_ELEMENTS_ON_SCREEN	10
+#define MENU_SCREEN_INFO_XSTART		16
+#define MENU_SCREEN_INFO_YSTART1	100
+#define MENU_SCREEN_INFO_YSTART2	128
+#define MENU_SCREEN_INFO_YSTEP		(TILEY + 4)
+#define MENU_SCREEN_INFO_YBOTTOM	(SYSIZE - 20)
+#define MENU_SCREEN_INFO_YSIZE		(MENU_SCREEN_INFO_YBOTTOM -	\
+					 MENU_SCREEN_INFO_YSTART2 -	\
+					 TILEY / 2)
+#define MAX_INFO_ELEMENTS_ON_SCREEN	128
+#if 1
+#define NUM_INFO_ELEMENTS_ON_SCREEN	MIN(MENU_SCREEN_INFO_YSIZE /	\
+                                            MENU_SCREEN_INFO_YSTEP,	\
+                                            MAX_INFO_ELEMENTS_ON_SCREEN)
+#else
+#define NUM_INFO_ELEMENTS_ON_SCREEN	10
+#endif
 #define MAX_MENU_ENTRIES_ON_SCREEN	(SCR_FIELDY - MENU_SCREEN_START_YPOS)
 #define MAX_MENU_TEXT_LENGTH_BIG	(MENU_SCREEN_VALUE_XPOS -	\
 					 MENU_SCREEN_START_XPOS)
@@ -2242,11 +2257,11 @@ void DrawInfoScreen_HelpAnim(int start, int max_anims, boolean init)
 {
   static int infoscreen_step[MAX_INFO_ELEMENTS_ON_SCREEN];
   static int infoscreen_frame[MAX_INFO_ELEMENTS_ON_SCREEN];
-  int xstart = mSX + 16;
-  int ystart1 = mSY - SY + 100;
-  int ystart2 = mSY + 64 + 2 * 32;
-  int ybottom = mSY - SY + SYSIZE - 20;
-  int ystep = TILEY + 4;
+  int xstart = mSX + MENU_SCREEN_INFO_XSTART;
+  int ystart1 = mSY - SY + MENU_SCREEN_INFO_YSTART1;
+  int ystart2 = mSY + MENU_SCREEN_INFO_YSTART2;
+  int ybottom = mSY - SY + MENU_SCREEN_INFO_YBOTTOM;
+  int ystep = MENU_SCREEN_INFO_YSTEP;
   int element, action, direction;
   int graphic;
   int delay;
@@ -2255,7 +2270,7 @@ void DrawInfoScreen_HelpAnim(int start, int max_anims, boolean init)
 
   if (init)
   {
-    for (i = 0; i < MAX_INFO_ELEMENTS_ON_SCREEN; i++)
+    for (i = 0; i < NUM_INFO_ELEMENTS_ON_SCREEN; i++)
       infoscreen_step[i] = infoscreen_frame[i] = 0;
 
     ClearField();
@@ -2272,7 +2287,7 @@ void DrawInfoScreen_HelpAnim(int start, int max_anims, boolean init)
   i = j = 0;
   while (helpanim_info[j].element != HELPANIM_LIST_END)
   {
-    if (i >= start + MAX_INFO_ELEMENTS_ON_SCREEN ||
+    if (i >= start + NUM_INFO_ELEMENTS_ON_SCREEN ||
 	i >= max_anims)
       break;
     else if (i < start)
@@ -2433,7 +2448,7 @@ void HandleInfoScreen_Elements(int button)
   static int num_anims;
   static int num_pages;
   static int page;
-  int anims_per_page = MAX_INFO_ELEMENTS_ON_SCREEN;
+  int anims_per_page = NUM_INFO_ELEMENTS_ON_SCREEN;
   int i;
 
   if (button == MB_MENU_INITIALIZE)
@@ -4003,7 +4018,7 @@ void DrawHallOfFame(int highlight_position)
 
 static void drawHallOfFameList(int first_entry, int highlight_position)
 {
-  int i;
+  int i, j;
 
   SetMainBackgroundImage(IMG_BACKGROUND_SCORES);
   ClearField();
@@ -4022,12 +4037,22 @@ static void drawHallOfFameList(int first_entry, int highlight_position)
     int font_nr4 = (active ? FONT_TEXT_4_ACTIVE : FONT_TEXT_4);
     int dx1 = 3 * getFontWidth(font_nr1);
     int dx2 = dx1 + getFontWidth(font_nr1);
+#if 1
+    int dx3 = SXSIZE - 5 * getFontWidth(font_nr4);
+    int num_dots = (dx3 - dx2) / getFontWidth(font_nr3);
+#else
     int dx3 = dx2 + 25 * getFontWidth(font_nr3);
+#endif
     int sy = mSY + 64 + i * 32;
 
     DrawText(mSX, sy, int2str(entry + 1, 3), font_nr1);
     DrawText(mSX + dx1, sy, ".", font_nr1);
+#if 1
+    for (j = 0; j < num_dots; j++)
+      DrawText(mSX + dx2 + j * getFontWidth(font_nr3), sy, ".", font_nr3);
+#else
     DrawText(mSX + dx2, sy, ".........................", font_nr3);
+#endif
 
     if (!strEqual(highscore[entry].Name, EMPTY_PLAYER_NAME))
       DrawText(mSX + dx2, sy, highscore[entry].Name, font_nr2);
@@ -6348,13 +6373,13 @@ static void getScreenMenuButtonPos(int *x, int *y, int gadget_id)
   {
 #if 1
     case SCREEN_CTRL_ID_PREV_LEVEL:
-      *x = mSX + menu.main.button.prev_level.x;
-      *y = mSY + menu.main.button.prev_level.y;
+      *x = mSX + GDI_ACTIVE_POS(menu.main.button.prev_level.x);
+      *y = mSY + GDI_ACTIVE_POS(menu.main.button.prev_level.y);
       break;
 
     case SCREEN_CTRL_ID_NEXT_LEVEL:
-      *x = mSX + menu.main.button.next_level.x;
-      *y = mSY + menu.main.button.next_level.y;
+      *x = mSX + GDI_ACTIVE_POS(menu.main.button.next_level.x);
+      *y = mSY + GDI_ACTIVE_POS(menu.main.button.next_level.y);
       break;
 #else
     case SCREEN_CTRL_ID_PREV_LEVEL:

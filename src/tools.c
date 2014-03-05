@@ -6748,8 +6748,8 @@ void CreateToolButtons()
 
     gi = CreateGadget(GDI_CUSTOM_ID, id,
 		      GDI_INFO_TEXT, toolbutton_info[i].infotext,
-		      GDI_X, dx + pos->x,
-		      GDI_Y, dy + pos->y,
+		      GDI_X, dx + GDI_ACTIVE_POS(pos->x),
+		      GDI_Y, dy + GDI_ACTIVE_POS(pos->y),
 		      GDI_WIDTH, gfx->width,
 		      GDI_HEIGHT, gfx->height,
 		      GDI_TYPE, GD_TYPE_NORMAL_BUTTON,
@@ -6908,8 +6908,8 @@ void CreateToolButtons()
 
     gi = CreateGadget(GDI_CUSTOM_ID, id,
 		      GDI_INFO_TEXT, toolbutton_info[i].infotext,
-		      GDI_X, DX + toolbutton_info[i].x,
-		      GDI_Y, DY + toolbutton_info[i].y,
+		      GDI_X, DX + GDI_ACTIVE_POS(toolbutton_info[i].x),
+		      GDI_Y, DY + GDI_ACTIVE_POS(toolbutton_info[i].y),
 		      GDI_WIDTH, toolbutton_info[i].width,
 		      GDI_HEIGHT, toolbutton_info[i].height,
 		      GDI_TYPE, GD_TYPE_NORMAL_BUTTON,
@@ -11382,7 +11382,9 @@ void ChangeViewportPropertiesIfNeeded()
     InitGfxBuffers();
 #endif
 
+#if 0
     if (gfx_game_mode == GAME_MODE_MAIN)
+#endif
     {
 #if 1
       init_gadgets_and_toons = TRUE;

@@ -26,6 +26,9 @@
 #define DG_BUFFERED		0
 #define DG_DIRECT		1
 
+#define GADGET_DEACTIVATED(g)	((g)->x < 0 || (g)->y < 0)
+
+
 static struct GadgetInfo *gadget_list_first_entry = NULL;
 static struct GadgetInfo *gadget_list_last_entry = NULL;
 static struct GadgetInfo *last_info_gi = NULL;
@@ -1304,7 +1307,7 @@ static struct GadgetInfo *last_gi = NULL;
 
 static void MapGadgetExt(struct GadgetInfo *gi, boolean redraw)
 {
-  if (gi == NULL || gi->mapped)
+  if (gi == NULL || gi->mapped || GADGET_DEACTIVATED(gi))
     return;
 
   gi->mapped = TRUE;
