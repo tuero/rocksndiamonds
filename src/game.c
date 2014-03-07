@@ -16831,6 +16831,8 @@ void CreateGameButtons()
     int button_type;
     boolean checked;
     unsigned int event_mask;
+    int base_x = (tape.show_game_buttons ? VX : DX);
+    int base_y = (tape.show_game_buttons ? VY : DY);
     int gd_x   = gfx->src_x;
     int gd_y   = gfx->src_y;
     int gd_xp  = gfx->src_x + gfx->pressed_xoffset;
@@ -16870,8 +16872,8 @@ void CreateGameButtons()
 
     gi = CreateGadget(GDI_CUSTOM_ID, id,
 		      GDI_INFO_TEXT, gamebutton_info[i].infotext,
-		      GDI_X, DX + GDI_ACTIVE_POS(pos->x),
-		      GDI_Y, DY + GDI_ACTIVE_POS(pos->y),
+		      GDI_X, base_x + GDI_ACTIVE_POS(pos->x),
+		      GDI_Y, base_y + GDI_ACTIVE_POS(pos->y),
 		      GDI_WIDTH, gfx->width,
 		      GDI_HEIGHT, gfx->height,
 		      GDI_TYPE, button_type,
@@ -16927,12 +16929,19 @@ void RedrawGameButtons()
 
 static void HandleGameButtonsExt(int id)
 {
-  if (game_status != GAME_MODE_PLAYING)
+  boolean handle_game_buttons =
+    (game_status == GAME_MODE_PLAYING ||
+     (game_status == GAME_MODE_MAIN && tape.show_game_buttons));
+
+  if (!handle_game_buttons)
     return;
 
   switch (id)
   {
     case GAME_CTRL_ID_STOP:
+      if (game_status == GAME_MODE_MAIN)
+	break;
+
       if (tape.playing)
 	TapeStop();
       else
@@ -16940,7 +16949,7 @@ static void HandleGameButtonsExt(int id)
       break;
 
     case GAME_CTRL_ID_PAUSE:
-      if (options.network)
+      if (options.network && game_status == GAME_MODE_PLAYING)
       {
 #if defined(NETWORK_AVALIABLE)
 	if (tape.pausing)
@@ -16954,7 +16963,11 @@ static void HandleGameButtonsExt(int id)
       break;
 
     case GAME_CTRL_ID_PLAY:
-      if (tape.pausing)
+      if (game_status == GAME_MODE_MAIN)
+      {
+        StartGameActions(options.network, setup.autorecord, level.random_seed);
+      }
+      else if (tape.pausing)
       {
 #if defined(NETWORK_AVALIABLE)
 	if (options.network)

@@ -1471,6 +1471,9 @@ void MapTapeButtons()
 
   if (tape.recording || tape.playing)
     MapTapeWarpButton();
+
+  if (tape.show_game_buttons)
+    MapGameButtons();
 }
 
 void UnmapTapeButtons()

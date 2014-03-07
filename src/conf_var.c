@@ -2045,10 +2045,6 @@ struct TokenIntPtrInfo image_config_vars[] =
     &menu.main.input.name.font
   },
   {
-    "main.show_game_buttons",
-    &menu.main.show_game_buttons
-  },
-  {
     "preview.x",
     &preview.x
   },
@@ -6087,6 +6083,10 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "tape.text.time.font",
     &tape.text.time.font
+  },
+  {
+    "tape.show_game_buttons",
+    &tape.show_game_buttons
   },
   {
     "editor.palette.x",

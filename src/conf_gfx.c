@@ -6023,8 +6023,6 @@ struct ConfigInfo image_config[] =
   { "main.input.name.valign",			"top"			},
   { "main.input.name.font",			"font.input_1"		},
 
-  { "main.show_game_buttons",			"false"			},
-
   { "preview.x",				"272"			},
   { "preview.y",				"380"			},
   { "preview.align",				"center"		},
@@ -7080,6 +7078,8 @@ struct ConfigInfo image_config[] =
   { "tape.text.time.valign",			"top"			},
   { "tape.text.time.digits",			"-1"			},
   { "tape.text.time.font",			"font.tape_recorder"	},
+
+  { "tape.show_game_buttons",			"false"			},
 
   { "editor.palette.x",				"5"			},
   { "editor.palette.y",				"30"			},

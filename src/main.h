@@ -2240,8 +2240,6 @@ struct MenuMainInfo
   struct MenuMainButtonInfo button;
   struct MenuMainTextInfo text;
   struct MenuMainInputInfo input;
-
-  boolean show_game_buttons;
 };
 
 struct TitleFadingInfo

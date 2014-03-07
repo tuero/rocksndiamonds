@@ -178,6 +178,8 @@ struct TapeInfo
   struct TapeLabelInfo label;
   struct TapeTextInfo text;
 
+  boolean show_game_buttons;	/* show game buttons in tape viewport */
+
   boolean no_valid_file;	/* set when tape file missing or invalid */
 };
 
