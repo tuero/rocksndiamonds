@@ -1263,6 +1263,9 @@ void FreeGadget(struct GadgetInfo *gi)
 {
   struct GadgetInfo *gi_previous = gadget_list_first_entry;
 
+  if (gi == NULL)
+    return;
+
   /* prevent "last_info_gi" from pointing to memory that will be freed */
   if (last_info_gi == gi)
     last_info_gi = NULL;

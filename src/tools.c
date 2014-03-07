@@ -4568,9 +4568,14 @@ static boolean RequestDoor(char *text, unsigned int req_state)
     CloseDoor(DOOR_CLOSE_1);
 
     /* save old door content */
+#if 1
+    BlitBitmap(bitmap_db_door_1, bitmap_db_door_1,
+	       0 * DXSIZE, 0, DXSIZE, DYSIZE, 1 * DXSIZE, 0);
+#else
     BlitBitmap(bitmap_db_door, bitmap_db_door,
 	       DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1, DXSIZE, DYSIZE,
 	       DOOR_GFX_PAGEX2, DOOR_GFX_PAGEY1);
+#endif
   }
 
   SetDoorBackgroundImage(IMG_BACKGROUND_DOOR);
@@ -4640,9 +4645,13 @@ static boolean RequestDoor(char *text, unsigned int req_state)
   }
 
   /* copy request gadgets to door backbuffer */
+#if 1
+  BlitBitmap(drawto, bitmap_db_door_1, DX, DY, DXSIZE, DYSIZE, 0, 0);
+#else
   BlitBitmap(drawto, bitmap_db_door,
 	     DX, DY, DXSIZE, DYSIZE,
 	     DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1);
+#endif
 
   OpenDoor(DOOR_OPEN_1);
 
@@ -5537,6 +5546,15 @@ unsigned int OpenDoor(unsigned int door_state)
 {
   if (door_state & DOOR_COPY_BACK)
   {
+#if 1
+    if (door_state & DOOR_OPEN_1)
+      BlitBitmap(bitmap_db_door_1, bitmap_db_door_1,
+		 1 * DXSIZE, 0, DXSIZE, DYSIZE, 0 * DXSIZE, 0);
+
+    if (door_state & DOOR_OPEN_2)
+      BlitBitmap(bitmap_db_door_2, bitmap_db_door_2,
+		 1 * VXSIZE, 0, VXSIZE, VYSIZE, 0 * VXSIZE, 0);
+#else
     if (door_state & DOOR_OPEN_1)
       BlitBitmap(bitmap_db_door, bitmap_db_door,
 		 DOOR_GFX_PAGEX2, DOOR_GFX_PAGEY1, DXSIZE, DYSIZE,
@@ -5546,6 +5564,7 @@ unsigned int OpenDoor(unsigned int door_state)
       BlitBitmap(bitmap_db_door, bitmap_db_door,
 		 DOOR_GFX_PAGEX2, DOOR_GFX_PAGEY2, VXSIZE, VYSIZE,
 		 DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY2);
+#endif
 
     door_state &= ~DOOR_COPY_BACK;
   }
@@ -5559,6 +5578,15 @@ unsigned int CloseDoor(unsigned int door_state)
 
   if (!(door_state & DOOR_NO_COPY_BACK))
   {
+#if 1
+    if (old_door_state & DOOR_OPEN_1)
+      BlitBitmap(backbuffer, bitmap_db_door_1,
+		 DX, DY, DXSIZE, DYSIZE, 0, 0);
+
+    if (old_door_state & DOOR_OPEN_2)
+      BlitBitmap(backbuffer, bitmap_db_door_2,
+		 VX, VY, VXSIZE, VYSIZE, 0, 0);
+#else
     if (old_door_state & DOOR_OPEN_1)
       BlitBitmap(backbuffer, bitmap_db_door,
 		 DX, DY, DXSIZE, DYSIZE, DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1);
@@ -5566,6 +5594,7 @@ unsigned int CloseDoor(unsigned int door_state)
     if (old_door_state & DOOR_OPEN_2)
       BlitBitmap(backbuffer, bitmap_db_door,
 		 VX, VY, VXSIZE, VYSIZE, DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY2);
+#endif
 
     door_state &= ~DOOR_NO_COPY_BACK;
   }
@@ -5594,11 +5623,13 @@ int euclid(int a, int b)
 
 unsigned int MoveDoor(unsigned int door_state)
 {
+#if 0
   struct XY panel_pos_list[] =
   {
     { DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1 },
     { DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY2 },
   };
+#endif
   struct Rect door_rect_list[] =
   {
     { DX, DY, DXSIZE, DYSIZE },
@@ -5778,8 +5809,12 @@ unsigned int MoveDoor(unsigned int door_state)
 	int door_token = dpc->door_token;
 	int door_index = DOOR_INDEX_FROM_TOKEN(door_token);
 	boolean is_panel = DOOR_PART_IS_PANEL(nr);
+#if 0
 	struct XY *panel_pos = &panel_pos_list[door_index];
+#endif
 	struct Rect *door_rect = &door_rect_list[door_index];
+	Bitmap *bitmap_db_door = (door_token == DOOR_1 ? bitmap_db_door_1 :
+				  bitmap_db_door_2);
 	Bitmap *bitmap = (is_panel ? bitmap_db_door : g->bitmap);
 	int current_door_state = door_state & door_token;
 	boolean door_opening = ((current_door_state & DOOR_OPEN)  != 0);
@@ -5796,6 +5831,11 @@ unsigned int MoveDoor(unsigned int door_state)
 	int src_x, src_y, src_xx, src_yy;
 	int dst_x, dst_y, dst_xx, dst_yy;
 	int width, height;
+
+#if 0
+	if (k == 0 && is_panel && door_token == DOOR_2)
+	  printf("::: %d, %d\n", g->width, g->height);
+#endif
 
 #if 0
 	if (DOOR_PART_IS_PANEL(nr))
@@ -5903,8 +5943,13 @@ unsigned int MoveDoor(unsigned int door_state)
 
 	if (is_panel)
 	{
+#if 1
+	  src_x = src_xx;
+	  src_y = src_yy;
+#else
 	  src_x = panel_pos->x + src_xx;
 	  src_y = panel_pos->y + src_yy;
+#endif
 	}
 	else
 	{

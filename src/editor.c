@@ -7835,8 +7835,12 @@ void DrawLevelEd()
 #endif
 
   /* copy actual editor door content to door double buffer for OpenDoor() */
+#if 1
+  BlitBitmap(drawto, bitmap_db_door_1, DX, DY, DXSIZE, DYSIZE, 0, 0);
+#else
   BlitBitmap(drawto, bitmap_db_door,
 	     DX, DY, DXSIZE, DYSIZE, DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1);
+#endif
 
 #if 1
   /* draw new control window (with border) to window */

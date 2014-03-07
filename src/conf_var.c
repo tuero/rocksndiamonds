@@ -2045,6 +2045,10 @@ struct TokenIntPtrInfo image_config_vars[] =
     &menu.main.input.name.font
   },
   {
+    "main.show_game_buttons",
+    &menu.main.show_game_buttons
+  },
+  {
     "preview.x",
     &preview.x
   },
@@ -5803,6 +5807,22 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "game.button.sound_simple.y",
     &game.button.sound_simple.y
+  },
+  {
+    "game.button.save.x",
+    &game.button.save.x
+  },
+  {
+    "game.button.save.y",
+    &game.button.save.y
+  },
+  {
+    "game.button.load.x",
+    &game.button.load.x
+  },
+  {
+    "game.button.load.y",
+    &game.button.load.y
   },
   {
     "tape.button.eject.x",

@@ -92,9 +92,13 @@ struct GameButtonInfo
   struct Rect stop;
   struct Rect pause;
   struct Rect play;
+
   struct Rect sound_music;
   struct Rect sound_loops;
   struct Rect sound_simple;
+
+  struct Rect save;
+  struct Rect load;
 };
 
 #else
@@ -365,6 +369,7 @@ boolean CheckEngineSnapshot();
 
 void CreateGameButtons();
 void FreeGameButtons();
+void MapGameButtons();
 void UnmapGameButtons();
 void RedrawGameButtons();
 

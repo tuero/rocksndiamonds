@@ -2240,6 +2240,8 @@ struct MenuMainInfo
   struct MenuMainButtonInfo button;
   struct MenuMainTextInfo text;
   struct MenuMainInputInfo input;
+
+  boolean show_game_buttons;
 };
 
 struct TitleFadingInfo
@@ -2906,7 +2908,11 @@ extern Bitmap		       *bitmap_db_store;
 extern Bitmap		       *bitmap_db_cross;
 extern Bitmap		       *bitmap_db_field;
 extern Bitmap		       *bitmap_db_panel;
+#if 0
 extern Bitmap		       *bitmap_db_door;
+#endif
+extern Bitmap		       *bitmap_db_door_1;
+extern Bitmap		       *bitmap_db_door_2;
 extern Bitmap		       *bitmap_db_toons;
 extern Pixmap			tile_clipmask[];
 extern DrawBuffer	       *fieldbuffer;

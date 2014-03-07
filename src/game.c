@@ -1014,8 +1014,10 @@ static struct GamePanelControlInfo game_panel_controls[] =
 #define SOUND_CTRL_ID_MUSIC		3
 #define SOUND_CTRL_ID_LOOPS		4
 #define SOUND_CTRL_ID_SIMPLE		5
+#define GAME_CTRL_ID_SAVE		6
+#define GAME_CTRL_ID_LOAD		7
 
-#define NUM_GAME_BUTTONS		6
+#define NUM_GAME_BUTTONS		8
 
 
 /* forward declaration for internal use */
@@ -1082,7 +1084,6 @@ static void PlayLevelSoundActionIfLoop(int, int, int);
 static void StopLevelSoundActionIfLoop(int, int, int);
 static void PlayLevelMusic();
 
-static void MapGameButtons();
 static void HandleGameButtons(struct GadgetInfo *);
 
 int AmoebeNachbarNr(int, int);
@@ -4516,8 +4517,12 @@ void InitGame()
     MapTapeButtons();
 
     /* copy actual game door content to door double buffer for OpenDoor() */
+#if 1
+    BlitBitmap(drawto, bitmap_db_door_1, DX, DY, DXSIZE, DYSIZE, 0, 0);
+#else
     BlitBitmap(drawto, bitmap_db_door,
 	       DX, DY, DXSIZE, DYSIZE, DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1);
+#endif
 
     OpenDoor(DOOR_OPEN_ALL);
 
@@ -16803,6 +16808,14 @@ static struct
   {
     IMG_GAME_BUTTON_GFX_SOUND_SIMPLE,	&game.button.sound_simple,
     SOUND_CTRL_ID_SIMPLE,		"normal sounds on/off"
+  },
+  {
+    IMG_GAME_BUTTON_GFX_SAVE,		&game.button.save,
+    GAME_CTRL_ID_SAVE,			"save game"
+  },
+  {
+    IMG_GAME_BUTTON_GFX_LOAD,		&game.button.load,
+    GAME_CTRL_ID_LOAD,			"load game"
   }
 };
 
@@ -16828,9 +16841,18 @@ void CreateGameButtons()
     int gd_yap = gfx->src_y + gfx->active_yoffset + gfx->pressed_yoffset;
     int id = i;
 
+    if (gfx->bitmap == NULL)
+    {
+      game_gadget[id] = NULL;
+
+      continue;
+    }
+
     if (id == GAME_CTRL_ID_STOP ||
 	id == GAME_CTRL_ID_PAUSE ||
-	id == GAME_CTRL_ID_PLAY)
+	id == GAME_CTRL_ID_PLAY ||
+	id == GAME_CTRL_ID_SAVE ||
+	id == GAME_CTRL_ID_LOAD)
     {
       button_type = GD_TYPE_NORMAL_BUTTON;
       checked = FALSE;
@@ -16879,7 +16901,7 @@ void FreeGameButtons()
     FreeGadget(game_gadget[i]);
 }
 
-static void MapGameButtons()
+void MapGameButtons()
 {
   int i;
 
@@ -16983,6 +17005,14 @@ static void HandleGameButtonsExt(int id)
 
 	SetAudioMode(setup.sound);
       }
+      break;
+
+    case GAME_CTRL_ID_SAVE:
+      TapeQuickSave();
+      break;
+
+    case GAME_CTRL_ID_LOAD:
+      TapeQuickLoad();
       break;
 
     default:

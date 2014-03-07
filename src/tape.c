@@ -544,6 +544,38 @@ void DrawCompleteVideoDisplay()
 	 tape.date, tape.length);
 #endif
 
+#if 1
+  struct GraphicInfo *g_tape = &graphic_info[IMG_BACKGROUND_TAPE];
+  int tape_button_graphics[] =
+  {
+    IMG_TAPE_BUTTON_GFX_EJECT,
+    IMG_TAPE_BUTTON_GFX_STOP,
+    IMG_TAPE_BUTTON_GFX_PAUSE,
+    IMG_TAPE_BUTTON_GFX_RECORD,
+    IMG_TAPE_BUTTON_GFX_PLAY
+  };
+  struct Rect *tape_button_positions[] =
+  {
+    &tape.button.eject,
+    &tape.button.stop,
+    &tape.button.pause,
+    &tape.button.record,
+    &tape.button.play
+  };
+  int i;
+
+  BlitBitmap(g_tape->bitmap, drawto, g_tape->src_x, g_tape->src_y,
+	     gfx.vxsize, gfx.vysize, gfx.vx, gfx.vy);
+
+  for (i = 0; i < SIZEOF_ARRAY_INT(tape_button_graphics); i++)
+  {
+    struct GraphicInfo *g = &graphic_info[tape_button_graphics[i]];
+    struct Rect *pos = tape_button_positions[i];
+
+    BlitBitmap(g->bitmap, drawto, g->src_x, g->src_y,
+	       g->width, g->height, gfx.vx + pos->x, gfx.vy + pos->y);
+  }
+#else
   BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
 	     DOOR_GFX_PAGEX3, DOOR_GFX_PAGEY2,
 	     gfx.vxsize, gfx.vysize, gfx.vx, gfx.vy);
@@ -552,6 +584,7 @@ void DrawCompleteVideoDisplay()
 	     DOOR_GFX_PAGEY2 + VIDEO_CONTROL_YPOS,
 	     VIDEO_CONTROL_XSIZE, VIDEO_CONTROL_YSIZE,
 	     gfx.vx + VIDEO_CONTROL_XPOS, gfx.vy + VIDEO_CONTROL_YPOS);
+#endif
 
   DrawVideoDisplay(VIDEO_ALL_OFF, 0);
 
@@ -587,8 +620,13 @@ void DrawCompleteVideoDisplay()
   }
 #endif
 
+#if 1
+  BlitBitmap(drawto, bitmap_db_door_2, gfx.vx, gfx.vy, gfx.vxsize, gfx.vysize,
+	     0, 0);
+#else
   BlitBitmap(drawto, bitmap_db_door, gfx.vx, gfx.vy, gfx.vxsize, gfx.vysize,
 	     DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY2);
+#endif
 }
 
 void TapeDeactivateDisplayOn()

@@ -4744,6 +4744,9 @@ struct ConfigInfo image_config[] =
   { "game.button.gfx.sound_simple.pressed_xoffset", "-100"		},
   { "game.button.gfx.sound_simple.active_yoffset", "-30"		},
 
+  { "game.button.gfx.save",			UNDEFINED_FILENAME	},
+  { "game.button.gfx.load",			UNDEFINED_FILENAME	},
+
   { "tape.button.gfx.eject",			"RocksDoor.png"		},
   { "tape.button.gfx.eject.x",			"305"			},
   { "tape.button.gfx.eject.y",			"357"			},
@@ -6020,6 +6023,8 @@ struct ConfigInfo image_config[] =
   { "main.input.name.valign",			"top"			},
   { "main.input.name.font",			"font.input_1"		},
 
+  { "main.show_game_buttons",			"false"			},
+
   { "preview.x",				"272"			},
   { "preview.y",				"380"			},
   { "preview.align",				"center"		},
@@ -6999,6 +7004,10 @@ struct ConfigInfo image_config[] =
   { "game.button.sound_loops.y",		"245"			},
   { "game.button.sound_simple.x",		"65"			},
   { "game.button.sound_simple.y",		"245"			},
+  { "game.button.save.x",			"-1"			},
+  { "game.button.save.y",			"-1"			},
+  { "game.button.load.x",			"-1"			},
+  { "game.button.load.y",			"-1"			},
 
   { "tape.button.eject.x",			"5"			},
   { "tape.button.eject.y",			"77"			},
