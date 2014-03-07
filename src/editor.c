@@ -7751,6 +7751,7 @@ void DrawLevelEd()
 
 #if 1
   FadeOut(REDRAW_FIELD);
+  // FadeOut(REDRAW_ALL);
 #endif
 
 #if 1
@@ -7758,7 +7759,11 @@ void DrawLevelEd()
   ChangeViewportPropertiesIfNeeded();
 #endif
 
+#if 1
+  OpenDoor(DOOR_OPEN_1 | DOOR_OPEN_2 | DOOR_NO_DELAY);
+#else
   OpenDoor(DOOR_OPEN_2 | DOOR_NO_DELAY);
+#endif
 
 #if DEBUG
   CheckElementDescriptions();
@@ -7832,6 +7837,7 @@ void DrawLevelEd()
 
 #if 1
   FadeIn(REDRAW_FIELD);
+  // FadeIn(REDRAW_ALL);
 #endif
 
   /* copy actual editor door content to door double buffer for OpenDoor() */
@@ -7848,7 +7854,9 @@ void DrawLevelEd()
   BackToFront();
 #endif
 
+#if 0
   OpenDoor(DOOR_OPEN_1);
+#endif
 }
 
 static void AdjustDrawingAreaGadgets()

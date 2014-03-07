@@ -1482,6 +1482,11 @@ void DrawMainMenuExt(int fade_mask, boolean do_fading)
   MapScreenMenuGadgets(SCREEN_MASK_MAIN);
 
 #if 1
+  /* copy actual game door content to door double buffer for OpenDoor() */
+  BlitBitmap(drawto, bitmap_db_door_2, VX, VY, VXSIZE, VYSIZE, 0, 0);
+#endif
+
+#if 1
   if (fade_mask == REDRAW_ALL)
   {
     int door_state = GetDoorState();
@@ -1957,6 +1962,10 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
       {
 	game_status = GAME_MODE_SETUP;
 	setup_mode = SETUP_MODE_MAIN;
+
+#if 1
+	ChangeViewportPropertiesIfNeeded();
+#endif
 
 	DrawSetupScreen();
       }

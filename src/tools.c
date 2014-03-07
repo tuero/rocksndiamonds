@@ -5702,6 +5702,7 @@ unsigned int MoveDoor(unsigned int door_state)
   if (door_state & DOOR_ACTION)
   {
     boolean door_panel_drawn[NUM_DOORS];
+    boolean panel_has_doors[NUM_DOORS];
     boolean door_part_skip[MAX_DOOR_PARTS];
     boolean door_part_done[MAX_DOOR_PARTS];
     boolean door_part_done_all;
@@ -5711,6 +5712,9 @@ unsigned int MoveDoor(unsigned int door_state)
     int num_move_steps = 0;	// number of animation steps for all doors
     int current_move_delay = 0;
     int k;
+
+    for (i = 0; i < NUM_DOORS; i++)
+      panel_has_doors[i] = FALSE;
 
     for (i = 0; i < MAX_DOOR_PARTS; i++)
     {
@@ -5742,6 +5746,7 @@ unsigned int MoveDoor(unsigned int door_state)
       struct DoorPartPosInfo *pos = dpc->pos;
       struct GraphicInfo *g = &graphic_info[dpc->graphic];
       int door_token = dpc->door_token;
+      int door_index = DOOR_INDEX_FROM_TOKEN(door_token);
       boolean is_panel = DOOR_PART_IS_PANEL(nr);
       int step_xoffset = ABS(pos->step_xoffset);
       int step_yoffset = ABS(pos->step_yoffset);
@@ -5763,6 +5768,9 @@ unsigned int MoveDoor(unsigned int door_state)
 
       if (door_part_skip[nr])
 	continue;
+
+      if (!is_panel)
+	panel_has_doors[door_index] = TRUE;
 
       max_move_delay = MAX(max_move_delay, move_delay);
       max_step_delay = (max_step_delay == 0 ? step_delay :
@@ -6009,9 +6017,16 @@ unsigned int MoveDoor(unsigned int door_state)
 	  door_part_done[nr] = TRUE;
 #endif
 
+#if 1
+	// continue door part animations, but not panel after door has closed
+	if (!door_part_done[nr] &&
+	    !(is_panel && door_closing && panel_has_doors[door_index]))
+	  door_part_done_all = FALSE;
+#else
 	// continue door part animations, but not panel after door has closed
 	if (!door_part_done[nr] && !(is_panel && door_closing))
 	  door_part_done_all = FALSE;
+#endif
 
 #if 0
 	if (!door_part_done[nr])
@@ -11271,9 +11286,13 @@ void ChangeViewportPropertiesIfNeeded()
   int *door_2_x = (game_status == GAME_MODE_EDITOR ? &EX : &VX);
   int *door_2_y = (game_status == GAME_MODE_EDITOR ? &EY : &VY);
 #endif
+#if 1
+  int gfx_game_mode = game_status;
+#else
   int gfx_game_mode = (game_status == GAME_MODE_PLAYING ||
 		       game_status == GAME_MODE_EDITOR ? game_status :
 		       GAME_MODE_MAIN);
+#endif
   int gfx_game_mode2 = (game_status == GAME_MODE_EDITOR ? GAME_MODE_DEFAULT :
 			game_status);
   struct RectWithBorder *vp_playfield = &viewport.playfield[gfx_game_mode];

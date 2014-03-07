@@ -545,6 +545,20 @@ void DrawCompleteVideoDisplay()
 #endif
 
 #if 1
+
+  struct GraphicInfo *g_tape = &graphic_info[IMG_BACKGROUND_TAPE];
+
+  /* draw tape background */
+  BlitBitmap(g_tape->bitmap, drawto, g_tape->src_x, g_tape->src_y,
+	     gfx.vxsize, gfx.vysize, gfx.vx, gfx.vy);
+
+  /* draw tape buttons (forced) */
+  UnmapTapeButtons();
+  MapTapeButtons();
+
+#else
+
+#if 1
   struct GraphicInfo *g_tape = &graphic_info[IMG_BACKGROUND_TAPE];
   int tape_button_graphics[] =
   {
@@ -584,6 +598,8 @@ void DrawCompleteVideoDisplay()
 	     DOOR_GFX_PAGEY2 + VIDEO_CONTROL_YPOS,
 	     VIDEO_CONTROL_XSIZE, VIDEO_CONTROL_YSIZE,
 	     gfx.vx + VIDEO_CONTROL_XPOS, gfx.vy + VIDEO_CONTROL_YPOS);
+#endif
+
 #endif
 
   DrawVideoDisplay(VIDEO_ALL_OFF, 0);
