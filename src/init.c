@@ -5644,7 +5644,7 @@ void InitGfx()
 
   font_height = getFontHeight(FC_RED);
 
-#if 1
+#if 0
   DrawInitTextAlways(getWindowTitleString(), 20, FC_YELLOW);
 #else
   DrawInitTextAlways(getProgramInitString(), 20, FC_YELLOW);

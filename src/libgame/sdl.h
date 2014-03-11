@@ -437,6 +437,7 @@ struct MouseCursorInfo
 
 #if defined(TARGET_SDL2)
 SDL_Surface *SDL_DisplayFormat(SDL_Surface *);
+void SDLSetWindowTitle(void);
 void SDLSetWindowScaling(int);
 void SDLSetWindowScalingQuality(char *);
 void SDLSetWindowFullscreen(boolean);

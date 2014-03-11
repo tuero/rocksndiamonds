@@ -1880,6 +1880,10 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
   {
     game_status = GAME_MODE_LEVELNR;
 
+#if 1
+    ChangeViewportPropertiesIfNeeded();
+#endif
+
     DrawChooseLevelNr();
   }
   else if (pos >= MAIN_CONTROL_NAME && pos <= MAIN_CONTROL_QUIT)
@@ -1919,12 +1923,20 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 	  gotoTopLevelDir();
 #endif
 
+#if 1
+	  ChangeViewportPropertiesIfNeeded();
+#endif
+
 	  DrawChooseLevelSet();
 	}
       }
       else if (pos == MAIN_CONTROL_SCORES)
       {
 	game_status = GAME_MODE_SCORES;
+
+#if 1
+	ChangeViewportPropertiesIfNeeded();
+#endif
 
 	DrawHallOfFame(-1);
       }
@@ -1951,6 +1963,10 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
       {
 	game_status = GAME_MODE_INFO;
 	info_mode = INFO_MODE_MAIN;
+
+#if 1
+	ChangeViewportPropertiesIfNeeded();
+#endif
 
 	DrawInfoScreen();
       }

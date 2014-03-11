@@ -610,6 +610,8 @@ boolean SDLSetVideoMode(DrawBuffer **backbuffer, boolean fullscreen)
 #endif
   SDL_Surface *new_surface = NULL;
 
+  SetWindowTitle();
+
   if (*backbuffer == NULL)
     *backbuffer = CreateBitmapStruct();
 
@@ -829,6 +831,11 @@ boolean SDLSetVideoMode(DrawBuffer **backbuffer, boolean fullscreen)
 }
 
 #if defined(TARGET_SDL2)
+void SDLSetWindowTitle()
+{
+  SDL_SetWindowTitle(sdl_window, program.window_title);
+}
+
 void SDLSetWindowScaling(int window_scaling_percent)
 {
   if (sdl_window == NULL)
@@ -847,6 +854,8 @@ void SDLSetWindowScaling(int window_scaling_percent)
   video.window_scaling_percent = window_scaling_percent;
   video.window_width  = new_window_width;
   video.window_height = new_window_height;
+
+  SetWindowTitle();
 }
 
 void SDLSetWindowScalingQuality(char *window_scaling_quality)

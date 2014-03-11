@@ -75,7 +75,11 @@ int			FrameCounter = 0;
 
 void InitProgramInfo(char *argv0,
 		     char *userdata_subdir, char *userdata_subdir_unix,
-		     char *program_title, char *window_title, char *icon_title,
+		     char *program_title,
+#if 0
+		     char *window_title,
+#endif
+		     char *icon_title,
 		     char *x11_icon_filename, char *x11_iconmask_filename,
 		     char *sdl_icon_filename, char *msdos_cursor_filename,
 		     char *cookie_prefix, char *filename_prefix,
@@ -89,7 +93,11 @@ void InitProgramInfo(char *argv0,
   program.userdata_path = getUserGameDataDir();
 
   program.program_title = program_title;
+#if 1
+  program.window_title = "(undefined)";
+#else
   program.window_title = window_title;
+#endif
   program.icon_title = icon_title;
 
   program.x11_icon_filename = x11_icon_filename;
@@ -106,6 +114,20 @@ void InitProgramInfo(char *argv0,
 
   program.error_filename = getErrorFilename(ERROR_BASENAME);
   program.error_file = stderr;
+}
+
+void SetWindowTitle()
+{
+  program.window_title = program.window_title_function();
+
+#if defined(TARGET_SDL)
+  SDLSetWindowTitle();
+#endif
+}
+
+void InitWindowTitleFunction(char *(*window_title_function)(void))
+{
+  program.window_title_function = window_title_function;
 }
 
 void InitExitMessageFunction(void (*exit_message_function)(char *, va_list))

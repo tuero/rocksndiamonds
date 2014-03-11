@@ -5602,14 +5602,23 @@ static void print_usage()
 
 int main(int argc, char *argv[])
 {
-  char * window_title_string = getWindowTitleString();
+#if 1
+  InitProgramInfo(argv[0], USERDATA_DIRECTORY, USERDATA_DIRECTORY_UNIX,
+		  PROGRAM_TITLE_STRING, ICON_TITLE_STRING,
+		  X11_ICON_FILENAME, X11_ICONMASK_FILENAME, SDL_ICON_FILENAME,
+		  MSDOS_POINTER_FILENAME,
+		  COOKIE_PREFIX, FILENAME_PREFIX, GAME_VERSION_ACTUAL);
+#else
+  char *window_title_string = getWindowTitleString();
 
   InitProgramInfo(argv[0], USERDATA_DIRECTORY, USERDATA_DIRECTORY_UNIX,
 		  PROGRAM_TITLE_STRING, window_title_string, ICON_TITLE_STRING,
 		  X11_ICON_FILENAME, X11_ICONMASK_FILENAME, SDL_ICON_FILENAME,
 		  MSDOS_POINTER_FILENAME,
 		  COOKIE_PREFIX, FILENAME_PREFIX, GAME_VERSION_ACTUAL);
+#endif
 
+  InitWindowTitleFunction(getWindowTitleString);
   InitExitMessageFunction(DisplayExitMessage);
   InitExitFunction(CloseAllAndExit);
   InitPlatformDependentStuff();

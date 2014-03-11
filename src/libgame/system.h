@@ -711,6 +711,7 @@ struct ProgramInfo
   int version_minor;
   int version_patch;
 
+  char *(*window_title_function)(void);
   void (*exit_message_function)(char *, va_list);
   void (*exit_function)(int);
 };
@@ -1288,9 +1289,17 @@ extern int			FrameCounter;
 
 /* function definitions */
 
+#if 1
+void InitProgramInfo(char *, char *, char *, char *, char *, char *, char *,
+		     char *, char *, char *, char *, int);
+#else
 void InitProgramInfo(char *, char *, char *, char *, char *, char *, char *,
 		     char *, char *, char *, char *, char *, int);
+#endif
 
+void SetWindowTitle();
+
+void InitWindowTitleFunction(char *(*window_title_function)(void));
 void InitExitMessageFunction(void (*exit_message_function)(char *, va_list));
 void InitExitFunction(void (*exit_function)(int));
 void InitPlatformDependentStuff(void);

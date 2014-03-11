@@ -465,9 +465,11 @@ void HandleWindowEvent(WindowEvent *event)
       int new_xpercent = (100 * new_window_width  / video.width);
       int new_ypercent = (100 * new_window_height / video.height);
 
+#if 0
       printf("::: RESIZED from %d, %d to %d, %d\n",
 	     video.window_width, video.window_height,
 	     new_window_width, new_window_height);
+#endif
 
       setup.window_scaling_percent = video.window_scaling_percent =
 	MIN(MAX(MIN_WINDOW_SCALING_PERCENT, MIN(new_xpercent, new_ypercent)),
@@ -476,11 +478,15 @@ void HandleWindowEvent(WindowEvent *event)
       video.window_width  = new_window_width;
       video.window_height = new_window_height;
 
+#if 0
       printf("::: setup.window_scaling_percent set to %d\n",
 	     setup.window_scaling_percent);
+#endif
 
       if (game_status == GAME_MODE_SETUP)
 	RedrawSetupScreenAfterFullscreenToggle();
+
+      SetWindowTitle();
     }
 #else
     // prevent slightly wrong scaling factor due to rounding differences
