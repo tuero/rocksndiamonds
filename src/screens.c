@@ -82,8 +82,13 @@
 /* for various menu stuff  */
 #define MENU_SCREEN_START_XPOS		1
 #define MENU_SCREEN_START_YPOS		2
+#if 1
+#define MENU_SCREEN_VALUE_XPOS		(SCR_FIELDX - 3)
+#define MENU_SCREEN_MAX_XPOS		(SCR_FIELDX - 1)
+#else
 #define MENU_SCREEN_VALUE_XPOS		14
 #define MENU_SCREEN_MAX_XPOS		(SCR_FIELDX - 1)
+#endif
 #define MENU_TITLE1_YPOS		8
 #define MENU_TITLE2_YPOS		46
 #define MENU_SCREEN_INFO_XSTART		16
@@ -103,9 +108,11 @@
 #define NUM_INFO_ELEMENTS_ON_SCREEN	10
 #endif
 #define MAX_MENU_ENTRIES_ON_SCREEN	(SCR_FIELDY - MENU_SCREEN_START_YPOS)
+#if 0
 #define MAX_MENU_TEXT_LENGTH_BIG	(MENU_SCREEN_VALUE_XPOS -	\
 					 MENU_SCREEN_START_XPOS)
 #define MAX_MENU_TEXT_LENGTH_MEDIUM	(MAX_MENU_TEXT_LENGTH_BIG * 2)
+#endif
 
 /* buttons and scrollbars identifiers */
 #define SCREEN_CTRL_ID_PREV_LEVEL	0
@@ -183,6 +190,7 @@ static void HandleInfoScreen_Program(int);
 static void HandleInfoScreen_Version(int);
 
 static void MapScreenMenuGadgets(int);
+static void MapScreenGadgets(int);
 static void MapScreenTreeGadgets(TreeInfo *);
 
 static struct GadgetInfo *screen_gadget[NUM_SCREEN_GADGETS];
@@ -3485,8 +3493,25 @@ static void DrawChooseTree(TreeInfo **ti_ptr)
   InitAnimation();
 }
 
+static void AdjustScrollbar(int id, int items_max, int items_visible,
+			    int item_position)
+{
+  struct GadgetInfo *gi = screen_gadget[id];
+
+  if (item_position > items_max - items_visible)
+    item_position = items_max - items_visible;
+
+  ModifyGadget(gi, GDI_SCROLLBAR_ITEMS_MAX, items_max,
+	       GDI_SCROLLBAR_ITEMS_VISIBLE, items_visible,
+	       GDI_SCROLLBAR_ITEM_POSITION, item_position, GDI_END);
+}
+
 static void AdjustChooseTreeScrollbar(int id, int first_entry, TreeInfo *ti)
 {
+#if 1
+  AdjustScrollbar(id, numTreeInfoInGroup(ti), NUM_MENU_ENTRIES_ON_SCREEN,
+		  first_entry);
+#else
   struct GadgetInfo *gi = screen_gadget[id];
   int items_max, items_visible, item_position;
 
@@ -3500,6 +3525,7 @@ static void AdjustChooseTreeScrollbar(int id, int first_entry, TreeInfo *ti)
   ModifyGadget(gi, GDI_SCROLLBAR_ITEMS_MAX, items_max,
 	       GDI_SCROLLBAR_ITEMS_VISIBLE, items_visible,
 	       GDI_SCROLLBAR_ITEM_POSITION, item_position, GDI_END);
+#endif
 }
 
 static void drawChooseTreeList(int first_entry, int num_page_entries,
@@ -3741,6 +3767,45 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
     if (ti->cl_cursor + dy < 0 ||
 	ti->cl_cursor + dy > num_page_entries - 1)
     {
+#if 1
+      boolean redraw = FALSE;
+
+      if (ABS(dy) == SCROLL_PAGE)
+	step = num_page_entries - 1;
+
+      if (dy < 0 && ti->cl_first > 0)
+      {
+	/* scroll page/line up */
+
+	ti->cl_first -= step;
+	if (ti->cl_first < 0)
+	  ti->cl_first = 0;
+
+	redraw = TRUE;
+      }
+      else if (dy > 0 && ti->cl_first + num_page_entries < num_entries)
+      {
+	/* scroll page/line down */
+
+	ti->cl_first += step;
+	if (ti->cl_first + num_page_entries > num_entries)
+	  ti->cl_first = MAX(0, num_entries - num_page_entries);
+
+	redraw = TRUE;
+      }
+
+      if (redraw)
+      {
+	drawChooseTreeList(ti->cl_first, num_page_entries, ti);
+	drawChooseTreeInfo(ti->cl_first + ti->cl_cursor, ti);
+	drawChooseTreeCursor(ti->cl_cursor, TRUE);
+
+	AdjustChooseTreeScrollbar(SCREEN_CTRL_ID_SCROLL_VERTICAL,
+				  ti->cl_first, ti);
+      }
+
+#else
+
       if (ABS(dy) == SCROLL_PAGE)
 	step = num_page_entries - 1;
 
@@ -3774,6 +3839,7 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
 	AdjustChooseTreeScrollbar(SCREEN_CTRL_ID_SCROLL_VERTICAL,
 				  ti->cl_first, ti);
       }
+#endif
 
       return;
     }
@@ -3821,6 +3887,11 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
       mx < screen_gadget[SCREEN_CTRL_ID_SCROLL_VERTICAL]->x &&
       y >= 0 && y < num_page_entries)
   {
+#if 0
+    printf("::: TEST/HandleChooseTree [%d, %d, %d, %d]\n", Counter(),
+	   button, mx, screen_gadget[SCREEN_CTRL_ID_SCROLL_VERTICAL]->x);
+#endif
+
     if (button)
     {
       if (y != ti->cl_cursor)
@@ -4167,7 +4238,8 @@ void HandleHallOfFame(int mx, int my, int dx, int dy, int button)
 /* ========================================================================= */
 
 static struct TokenInfo *setup_info;
-static int num_setup_info;
+static int num_setup_info;	/* number of setup entries shown on screen */
+static int max_setup_info;	/* total number of setup entries in list */
 
 static char *screen_mode_text;
 static char *window_size_text;
@@ -5207,6 +5279,118 @@ static int getSetupValueFont(int type, void *value)
     return FONT_VALUE_1;
 }
 
+#if 1
+static void drawSetupValue(int screen_pos, int setup_info_pos_raw)
+{
+  int si_pos = (setup_info_pos_raw < 0 ? screen_pos : setup_info_pos_raw);
+  struct TokenInfo *si = &setup_info[si_pos];
+  boolean font_draw_xoffset_modified = FALSE;
+  int font_draw_xoffset_old = -1;
+  int xoffset = (num_setup_info < max_setup_info ? -1 * 1 : 0);
+  int menu_screen_value_xpos = MENU_SCREEN_VALUE_XPOS + xoffset;
+  int menu_screen_max_xpos = MENU_SCREEN_MAX_XPOS + xoffset;
+  int xpos = menu_screen_value_xpos;
+  int ypos = MENU_SCREEN_START_YPOS + screen_pos;
+  int startx = mSX + xpos * 32;
+  int starty = mSY + ypos * 32;
+  int font_nr, font_width;
+#if 0
+  int font_height;
+#endif
+  int type = si->type;
+  void *value = si->value;
+  char *value_string = getSetupValue(type, value);
+#if 1
+  int i;
+#endif
+
+  if (value_string == NULL)
+    return;
+
+  if (type & TYPE_KEY)
+  {
+    xpos = MENU_SCREEN_START_XPOS;
+
+    if (type & TYPE_QUERY)
+      value_string = "<press key>";
+  }
+  else if (type & TYPE_STRING)
+  {
+    int max_value_len = (SCR_FIELDX - 2) * 2;
+
+    xpos = MENU_SCREEN_START_XPOS;
+
+    if (strlen(value_string) > max_value_len)
+      value_string[max_value_len] = '\0';
+  }
+  else if (type & TYPE_YES_NO_AUTO)
+  {
+    xpos = menu_screen_value_xpos - 1;
+  }
+
+  startx = mSX + xpos * 32;
+  starty = mSY + ypos * 32;
+  font_nr = getSetupValueFont(type, value);
+  font_width = getFontWidth(font_nr);
+#if 0
+  font_height = getFontHeight(font_nr);
+#endif
+
+  /* downward compatibility correction for Juergen Bonhagen's menu settings */
+  if (1 && setup_mode != SETUP_MODE_INPUT)
+  {
+    int max_menu_text_length_big = (menu_screen_value_xpos -
+				    MENU_SCREEN_START_XPOS);
+    int max_menu_text_length_medium = max_menu_text_length_big * 2;
+    int check_font_nr = FONT_OPTION_ON; /* known font that needs correction */
+    int font1_xoffset = getFontBitmapInfo(font_nr)->draw_xoffset;
+    int font2_xoffset = getFontBitmapInfo(check_font_nr)->draw_xoffset;
+    int text_startx = mSX + MENU_SCREEN_START_XPOS * 32;
+    int text_font_nr = getSetupTextFont(FONT_MENU_2);
+    int text_font_xoffset = getFontBitmapInfo(text_font_nr)->draw_xoffset;
+    int text_width = max_menu_text_length_medium * getFontWidth(text_font_nr);
+    boolean correct_font_draw_xoffset = FALSE;
+
+    if (xpos == MENU_SCREEN_START_XPOS &&
+	startx + font1_xoffset < text_startx + text_font_xoffset)
+      correct_font_draw_xoffset = TRUE;
+
+    if (xpos == menu_screen_value_xpos &&
+	startx + font2_xoffset < text_startx + text_width + text_font_xoffset)
+      correct_font_draw_xoffset = TRUE;
+
+    /* check if setup value would overlap with setup text when printed */
+    /* (this can happen for extreme/wrong values for font draw offset) */
+    if (correct_font_draw_xoffset)
+    {
+      font_draw_xoffset_old = getFontBitmapInfo(font_nr)->draw_xoffset;
+      font_draw_xoffset_modified = TRUE;
+
+      if (type & TYPE_KEY)
+	getFontBitmapInfo(font_nr)->draw_xoffset += 2 * getFontWidth(font_nr);
+      else if (!(type & TYPE_STRING))
+	getFontBitmapInfo(font_nr)->draw_xoffset = text_font_xoffset + 20 -
+	  max_menu_text_length_medium * (16 - getFontWidth(text_font_nr));
+    }
+  }
+
+#if 0
+  DrawBackground(startx, starty, SX + SXSIZE - startx, font_height);
+#else
+  for (i = 0; i <= menu_screen_max_xpos - xpos; i++)
+    DrawText(startx + i * font_width, starty, " ", font_nr);
+#endif
+
+  // printf("::: startx == %d\n", startx);
+
+  DrawText(startx, starty, value_string, font_nr);
+
+  if (font_draw_xoffset_modified)
+    getFontBitmapInfo(font_nr)->draw_xoffset = font_draw_xoffset_old;
+}
+
+#else
+
 static void drawSetupValue(int pos)
 {
   boolean font_draw_xoffset_modified = FALSE;
@@ -5305,6 +5489,48 @@ static void drawSetupValue(int pos)
   if (font_draw_xoffset_modified)
     getFontBitmapInfo(font_nr)->draw_xoffset = font_draw_xoffset_old;
 }
+#endif
+
+#if 1
+static void changeSetupValue(int screen_pos, int setup_info_pos_raw, int dx)
+{
+  int si_pos = (setup_info_pos_raw < 0 ? screen_pos : setup_info_pos_raw);
+  struct TokenInfo *si = &setup_info[si_pos];
+
+  if (si->type & TYPE_BOOLEAN_STYLE)
+  {
+    *(boolean *)si->value ^= TRUE;
+  }
+  else if (si->type & TYPE_YES_NO_AUTO)
+  {
+    *(int *)si->value =
+      (dx == -1 ?
+       (*(int *)si->value == AUTO ? TRUE :
+	*(int *)si->value == TRUE ? FALSE : AUTO) :
+       (*(int *)si->value == TRUE ? AUTO :
+	*(int *)si->value == AUTO ? FALSE : TRUE));
+  }
+  else if (si->type & TYPE_KEY)
+  {
+    Key key;
+
+    si->type |= TYPE_QUERY;
+    drawSetupValue(screen_pos, setup_info_pos_raw);
+    si->type &= ~TYPE_QUERY;
+
+    key = getSetupKey();
+    if (key != KSYM_UNDEFINED)
+      *(Key *)si->value = key;
+  }
+
+  drawSetupValue(screen_pos, setup_info_pos_raw);
+
+  // fullscreen state may have changed at this point
+  if (si->value == &setup.fullscreen)
+    ToggleFullscreenOrChangeWindowScalingIfNeeded();
+}
+
+#else
 
 static void changeSetupValue(int pos, int dx)
 {
@@ -5326,7 +5552,7 @@ static void changeSetupValue(int pos, int dx)
     Key key;
 
     setup_info[pos].type |= TYPE_QUERY;
-    drawSetupValue(pos);
+    drawSetupValue(pos, -1);
     setup_info[pos].type &= ~TYPE_QUERY;
 
     key = getSetupKey();
@@ -5334,13 +5560,36 @@ static void changeSetupValue(int pos, int dx)
       *(Key *)setup_info[pos].value = key;
   }
 
-  drawSetupValue(pos);
+  drawSetupValue(pos, -1);
 
   // fullscreen state may have changed at this point
   if (setup_info[pos].value == &setup.fullscreen)
     ToggleFullscreenOrChangeWindowScalingIfNeeded();
 }
+#endif
 
+#if 1
+static void DrawCursorAndText_Setup(int screen_pos, int setup_info_pos_raw,
+				    boolean active)
+{
+  int si_pos = (setup_info_pos_raw < 0 ? screen_pos : setup_info_pos_raw);
+  struct TokenInfo *si = &setup_info[si_pos];
+  int xpos = MENU_SCREEN_START_XPOS;
+  int ypos = MENU_SCREEN_START_YPOS + screen_pos;
+  int font_nr = getSetupTextFont(si->type);
+
+  if (setup_info == setup_info_input)
+    font_nr = FONT_MENU_1;
+
+  if (active)
+    font_nr = FONT_ACTIVE(font_nr);
+
+  DrawText(mSX + xpos * 32, mSY + ypos * 32, si->text, font_nr);
+
+  if (si->type & ~TYPE_SKIP_ENTRY)
+    drawCursor(screen_pos, active);
+}
+#else
 static void DrawCursorAndText_Setup(int pos, boolean active)
 {
   int xpos = MENU_SCREEN_START_XPOS;
@@ -5358,6 +5607,58 @@ static void DrawCursorAndText_Setup(int pos, boolean active)
   if (setup_info[pos].type & ~TYPE_SKIP_ENTRY)
     drawCursor(pos, active);
 }
+#endif
+
+static void drawSetupInfoList(struct TokenInfo *setup_info,
+			      int first_entry, int num_page_entries)
+{
+  int i;
+
+  if (num_page_entries > NUM_MENU_ENTRIES_ON_SCREEN)
+    num_page_entries = NUM_MENU_ENTRIES_ON_SCREEN;
+
+  if (num_page_entries > max_setup_info)
+    num_page_entries = max_setup_info;
+
+  if (first_entry + num_page_entries > max_setup_info)
+    first_entry = 0;
+
+#if 1
+  /* clear tree list area, but not title or scrollbar */
+  DrawBackground(mSX, mSY + MENU_SCREEN_START_YPOS * 32,
+                 SC_SCROLLBAR_XPOS + menu.scrollbar_xoffset,
+                 NUM_MENU_ENTRIES_ON_SCREEN * 32);
+#endif
+
+  for (i = 0; i < num_page_entries; i++)
+  {
+    int setup_info_pos = first_entry + i;
+    struct TokenInfo *si = &setup_info[setup_info_pos];
+    void *value_ptr = si->value;
+
+    /* set some entries to "unchangeable" according to other variables */
+    if ((value_ptr == &setup.sound_simple && !audio.sound_available) ||
+	(value_ptr == &setup.sound_loops  && !audio.loops_available) ||
+	(value_ptr == &setup.sound_music  && !audio.music_available) ||
+	(value_ptr == &setup.fullscreen   && !video.fullscreen_available) ||
+	(value_ptr == &screen_mode_text   && !video.fullscreen_available) ||
+	(value_ptr == &window_size_text   && !video.window_scaling_available) ||
+	(value_ptr == &scaling_type_text  && !video.window_scaling_available))
+      si->type |= TYPE_GHOSTED;
+
+    if (si->type & (TYPE_ENTER_MENU|TYPE_ENTER_LIST))
+      initCursor(i, IMG_MENU_BUTTON_ENTER_MENU);
+    else if (si->type & (TYPE_LEAVE_MENU|TYPE_LEAVE_LIST))
+      initCursor(i, IMG_MENU_BUTTON_LEAVE_MENU);
+    else if (si->type & ~TYPE_SKIP_ENTRY)
+      initCursor(i, IMG_MENU_BUTTON);
+
+    DrawCursorAndText_Setup(i, setup_info_pos, FALSE);
+
+    if (si->type & TYPE_VALUE)
+      drawSetupValue(i, setup_info_pos);
+  }
+}
 
 static void DrawSetupScreen_Generic()
 {
@@ -5366,6 +5667,12 @@ static void DrawSetupScreen_Generic()
   int i;
 
   UnmapAllGadgets();
+
+#if 1
+  FreeScreenGadgets();
+  CreateScreenGadgets();
+#endif
+
   CloseDoor(DOOR_CLOSE_2);
 
   if (redraw_mask & REDRAW_ALL)
@@ -5449,6 +5756,22 @@ static void DrawSetupScreen_Generic()
 
   DrawTextSCentered(mSY - SY + 16, FONT_TITLE_1, title_string);
 
+#if 1
+
+  num_setup_info = 0;
+  for (i = 0; setup_info[i].type != 0 && i < MAX_MENU_ENTRIES_ON_SCREEN; i++)
+    num_setup_info++;
+
+  max_setup_info = 0;
+  for (i = 0; setup_info[i].type != 0; i++)
+    max_setup_info++;
+
+#if 0
+  drawSetupInfoList(setup_info, 0, NUM_MENU_ENTRIES_ON_SCREEN);
+#endif
+
+#else
+
   num_setup_info = 0;
 #if 1
   for (i = 0; setup_info[i].type != 0 && i < MAX_MENU_ENTRIES_ON_SCREEN; i++)
@@ -5482,6 +5805,7 @@ static void DrawSetupScreen_Generic()
 
     num_setup_info++;
   }
+#endif
 
 #if 0
   DrawTextSCentered(SYSIZE - 20, FONT_TEXT_4,
@@ -5490,6 +5814,10 @@ static void DrawSetupScreen_Generic()
 
 #if 1
   HandleSetupScreen_Generic(0, 0, 0, 0, MB_MENU_INITIALIZE);
+#endif
+
+#if 1
+  MapScreenGadgets(max_setup_info);
 #endif
 
   if (redraw_all)
@@ -5510,9 +5838,23 @@ static void DrawSetupScreen_Generic()
 void HandleSetupScreen_Generic(int mx, int my, int dx, int dy, int button)
 {
   static int choice_store[MAX_SETUP_MODES];
-  int choice = choice_store[setup_mode];	/* always starts with 0 */
+  static int first_entry_store[MAX_SETUP_MODES];
+  int choice = choice_store[setup_mode];		/* starts with 0 */
+  int first_entry = first_entry_store[setup_mode];	/* starts with 0 */
   int x = 0;
+#if 1
+  int y = choice - first_entry;
+  int y_old = y;
+#else
   int y = choice;
+#endif
+  boolean position_set_by_scrollbar = (dx == 999);
+#if 1
+  int step = (button == 1 ? 1 : button == 2 ? 5 : 10);
+  int num_page_entries;
+
+  num_page_entries = MIN(max_setup_info, NUM_MENU_ENTRIES_ON_SCREEN);
+#endif
 
   if (button == MB_MENU_INITIALIZE)
   {
@@ -5520,22 +5862,46 @@ void HandleSetupScreen_Generic(int mx, int my, int dx, int dy, int button)
     while (choice < num_setup_info &&
 	   setup_info[choice].type & TYPE_SKIP_ENTRY)
       choice++;
+#if 0
+    choice_store[setup_mode] = choice;
+#endif
+
+#if 1
+    if (position_set_by_scrollbar)
+      first_entry = first_entry_store[setup_mode] = dy;
+    else
+      AdjustScrollbar(SCREEN_CTRL_ID_SCROLL_VERTICAL, max_setup_info,
+		      NUM_MENU_ENTRIES_ON_SCREEN, first_entry);
+
+    drawSetupInfoList(setup_info, first_entry, NUM_MENU_ENTRIES_ON_SCREEN);
+#endif
+
+#if 1
+    if (choice < first_entry)
+      choice = first_entry;
+    else if (choice > first_entry + num_page_entries - 1)
+      choice = first_entry + num_page_entries - 1;
+
     choice_store[setup_mode] = choice;
 
-    DrawCursorAndText_Setup(choice, TRUE);
+    DrawCursorAndText_Setup(choice - first_entry, choice, TRUE);
+#else
+    DrawCursorAndText_Setup(choice, -1, TRUE);
+#endif
 
     return;
   }
   else if (button == MB_MENU_LEAVE)
   {
+    int i;
+
     PlaySound(SND_MENU_ITEM_SELECTING);
 
-    // for (y = 0; y < num_setup_info; y++)
-    for (y = 0; setup_info[y].type != 0; y++)
+    for (i = 0; setup_info[i].type != 0; i++)
     {
-      if (setup_info[y].type & TYPE_LEAVE_MENU)
+      if (setup_info[i].type & TYPE_LEAVE_MENU)
       {
-	void (*menu_callback_function)(void) = setup_info[y].value;
+	void (*menu_callback_function)(void) = setup_info[i].value;
 
 	FadeSetLeaveMenu();
 
@@ -5553,8 +5919,73 @@ void HandleSetupScreen_Generic(int mx, int my, int dx, int dy, int button)
     x = (mx - mSX) / 32;
     y = (my - mSY) / 32 - MENU_SCREEN_START_YPOS;
   }
+#if 1
+  else if (dx || dy)	/* keyboard or scrollbar/scrollbutton input */
+#else
   else if (dx || dy)	/* keyboard input */
+#endif
   {
+    /* move cursor instead of scrolling when already at start/end of list */
+    if (dy == -1 * SCROLL_LINE && first_entry == 0)
+      dy = -1;
+    else if (dy == +1 * SCROLL_LINE &&
+	     first_entry + num_page_entries == max_setup_info)
+      dy = 1;
+
+    /* handle scrolling screen one line or page */
+    if (y + dy < 0 ||
+	y + dy > num_page_entries - 1)
+    {
+      boolean redraw = FALSE;
+
+      if (ABS(dy) == SCROLL_PAGE)
+	step = num_page_entries - 1;
+
+      if (dy < 0 && first_entry > 0)
+      {
+	/* scroll page/line up */
+
+	first_entry -= step;
+	if (first_entry < 0)
+	  first_entry = 0;
+
+	redraw = TRUE;
+      }
+      else if (dy > 0 && first_entry + num_page_entries < max_setup_info)
+      {
+	/* scroll page/line down */
+
+	first_entry += step;
+	if (first_entry + num_page_entries > max_setup_info)
+	  first_entry = MAX(0, max_setup_info - num_page_entries);
+
+	redraw = TRUE;
+      }
+
+      if (redraw)
+      {
+	choice += first_entry - first_entry_store[setup_mode];
+
+	first_entry_store[setup_mode] = first_entry;
+
+	if (choice < first_entry)
+	  choice = first_entry;
+	else if (choice > first_entry + num_page_entries - 1)
+	  choice = first_entry + num_page_entries - 1;
+
+	choice_store[setup_mode] = choice;
+
+	drawSetupInfoList(setup_info, first_entry, NUM_MENU_ENTRIES_ON_SCREEN);
+
+	DrawCursorAndText_Setup(choice - first_entry, choice, TRUE);
+
+	AdjustScrollbar(SCREEN_CTRL_ID_SCROLL_VERTICAL, max_setup_info,
+			NUM_MENU_ENTRIES_ON_SCREEN, first_entry);
+      }
+
+      return;
+    }
+
     if (dx)
     {
       int menu_navigation_type = (dx < 0 ? TYPE_LEAVE : TYPE_ENTER);
@@ -5564,29 +5995,117 @@ void HandleSetupScreen_Generic(int mx, int my, int dx, int dy, int button)
 	  setup_info[choice].type & TYPE_YES_NO_AUTO)
 	button = MB_MENU_CHOICE;
     }
+#if 1
+    else if (dy)
+      y += dy;
+#else
     else if (dy)
       y = choice + dy;
+#endif
 
     /* jump to next non-empty menu entry (up or down) */
     while (y > 0 && y < num_setup_info - 1 &&
-	   setup_info[y].type & TYPE_SKIP_ENTRY)
+	   setup_info[first_entry + y].type & TYPE_SKIP_ENTRY)
       y += dy;
+
+    if (!IN_VIS_FIELD(x, y))
+    {
+      first_entry += y - y_old;
+
+      if (first_entry >= 0 &&
+	  first_entry + num_page_entries <= max_setup_info)
+      {
+	first_entry_store[setup_mode] = first_entry;
+
+	if (choice < first_entry)
+	  choice = first_entry;
+	else if (choice > first_entry + num_page_entries - 1)
+	  choice = first_entry + num_page_entries - 1;
+
+	choice_store[setup_mode] = choice;
+
+	drawSetupInfoList(setup_info, first_entry, NUM_MENU_ENTRIES_ON_SCREEN);
+
+	DrawCursorAndText_Setup(choice - first_entry, choice, TRUE);
+
+	AdjustScrollbar(SCREEN_CTRL_ID_SCROLL_VERTICAL, max_setup_info,
+			NUM_MENU_ENTRIES_ON_SCREEN, first_entry);
+      }
+
+      return;
+    }
   }
 
+#if 1
+  if (!anyScrollbarGadgetActive() &&
+      IN_VIS_FIELD(x, y) &&
+      mx < screen_gadget[SCREEN_CTRL_ID_SCROLL_VERTICAL]->x &&
+      y >= 0 && y < num_page_entries)
+#else
   if (IN_VIS_FIELD(x, y) && y >= 0 && y < num_setup_info)
+#endif
   {
+#if 0
+    printf("::: TEST/HandleSetupScreen_Generic [%d, %d, %d, %d]\n", Counter(),
+	   button, mx, screen_gadget[SCREEN_CTRL_ID_SCROLL_VERTICAL]->x);
+#endif
+
     if (button)
     {
+#if 1
+      if (first_entry + y != choice &&
+	  setup_info[first_entry + y].type & ~TYPE_SKIP_ENTRY)
+      {
+	PlaySound(SND_MENU_ITEM_ACTIVATING);
+
+	DrawCursorAndText_Setup(choice - first_entry, choice, FALSE);
+	DrawCursorAndText_Setup(y, first_entry + y, TRUE);
+
+	choice = choice_store[setup_mode] = first_entry + y;
+      }
+#else
       if (y != choice && setup_info[y].type & ~TYPE_SKIP_ENTRY)
       {
 	PlaySound(SND_MENU_ITEM_ACTIVATING);
 
-	DrawCursorAndText_Setup(choice, FALSE);
-	DrawCursorAndText_Setup(y, TRUE);
+	DrawCursorAndText_Setup(choice, -1, FALSE);
+	DrawCursorAndText_Setup(y, -1, TRUE);
 
 	choice = choice_store[setup_mode] = y;
       }
+#endif
     }
+#if 1
+    else if (!(setup_info[first_entry + y].type & TYPE_GHOSTED))
+    {
+      PlaySound(SND_MENU_ITEM_SELECTING);
+
+      /* when selecting key headline, execute function for key value change */
+      if (setup_info[first_entry + y].type & TYPE_KEYTEXT &&
+	  setup_info[first_entry + y + 1].type & TYPE_KEY)
+	y++;
+
+      /* when selecting string value, execute function for list selection */
+      if (setup_info[first_entry + y].type & TYPE_STRING && y > 0 &&
+	  setup_info[first_entry + y - 1].type & TYPE_ENTER_LIST)
+	y--;
+
+      if (setup_info[first_entry + y].type & TYPE_ENTER_OR_LEAVE)
+      {
+	void (*menu_callback_function)(void) =
+	  setup_info[first_entry + y].value;
+
+	FadeSetFromType(setup_info[first_entry + y].type);
+
+	menu_callback_function();
+      }
+      else
+      {
+	if (setup_info[first_entry + y].type & TYPE_VALUE)
+	  changeSetupValue(y, first_entry + y, dx);
+      }
+    }
+#else
     else if (!(setup_info[y].type & TYPE_GHOSTED))
     {
       PlaySound(SND_MENU_ITEM_SELECTING);
@@ -5615,6 +6134,7 @@ void HandleSetupScreen_Generic(int mx, int my, int dx, int dy, int button)
 	  changeSetupValue(y, dx);
       }
     }
+#endif
   }
 }
 
@@ -5657,7 +6177,7 @@ void DrawSetupScreen_Input()
     else if (setup_info[i].type & ~TYPE_SKIP_ENTRY)
       initCursor(i, IMG_MENU_BUTTON);
 
-    DrawCursorAndText_Setup(i, FALSE);
+    DrawCursorAndText_Setup(i, -1, FALSE);
   }
 
 #if 0
@@ -5826,7 +6346,7 @@ void HandleSetupScreen_Input(int mx, int my, int dx, int dy, int button)
   {
     drawPlayerSetupInputInfo(input_player_nr, (choice == 2));
 
-    DrawCursorAndText_Setup(choice, TRUE);
+    DrawCursorAndText_Setup(choice, -1, TRUE);
 
     return;
   }
@@ -5871,8 +6391,8 @@ void HandleSetupScreen_Input(int mx, int my, int dx, int dy, int button)
     {
       if (y != choice)
       {
-	DrawCursorAndText_Setup(choice, FALSE);
-	DrawCursorAndText_Setup(y, TRUE);
+	DrawCursorAndText_Setup(choice, -1, FALSE);
+	DrawCursorAndText_Setup(y, -1, TRUE);
 
 	drawPlayerSetupInputInfo(input_player_nr, (y == 2));
 
@@ -6811,8 +7331,25 @@ void MapScreenMenuGadgets(int screen_mask)
       MapGadget(screen_gadget[menubutton_info[i].gadget_id]);
 }
 
+void MapScreenGadgets(int num_entries)
+{
+  int i;
+
+  if (num_entries <= NUM_MENU_ENTRIES_ON_SCREEN)
+    return;
+
+  for (i = 0; i < NUM_SCREEN_SCROLLBUTTONS; i++)
+    MapGadget(screen_gadget[scrollbutton_info[i].gadget_id]);
+
+  for (i = 0; i < NUM_SCREEN_SCROLLBARS; i++)
+    MapGadget(screen_gadget[scrollbar_info[i].gadget_id]);
+}
+
 void MapScreenTreeGadgets(TreeInfo *ti)
 {
+#if 1
+  MapScreenGadgets(numTreeInfoInGroup(ti));
+#else
   int num_entries = numTreeInfoInGroup(ti);
   int i;
 
@@ -6824,6 +7361,7 @@ void MapScreenTreeGadgets(TreeInfo *ti)
 
   for (i = 0; i < NUM_SCREEN_SCROLLBARS; i++)
     MapGadget(screen_gadget[scrollbar_info[i].gadget_id]);
+#endif
 }
 
 static void HandleScreenGadgets(struct GadgetInfo *gi)
