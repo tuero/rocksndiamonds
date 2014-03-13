@@ -108,7 +108,10 @@
 #define NUM_INFO_ELEMENTS_ON_SCREEN	10
 #endif
 #define MAX_MENU_ENTRIES_ON_SCREEN	(SCR_FIELDY - MENU_SCREEN_START_YPOS)
-#if 0
+#if 1
+#define MAX_MENU_TEXT_LENGTH_BIG	13
+#define MAX_MENU_TEXT_LENGTH_MEDIUM	(MAX_MENU_TEXT_LENGTH_BIG * 2)
+#else
 #define MAX_MENU_TEXT_LENGTH_BIG	(MENU_SCREEN_VALUE_XPOS -	\
 					 MENU_SCREEN_START_XPOS)
 #define MAX_MENU_TEXT_LENGTH_MEDIUM	(MAX_MENU_TEXT_LENGTH_BIG * 2)
@@ -5013,7 +5016,7 @@ static struct TokenInfo setup_info_graphics[] =
   { TYPE_SWITCH,	&setup.scroll_delay,	"Scroll Delay:"		},
 #endif
 #if 0
-  { TYPE_ENTER_LIST,	execSetupChooseScrollDelay, "Scroll Delay Value:" },
+  { TYPE_ENTER_LIST,	execSetupChooseScrollDelay, "Scroll Delay:"	},
   { TYPE_STRING,	&scroll_delay_text,	""			},
 #endif
 #if 0
@@ -5286,7 +5289,7 @@ static void drawSetupValue(int screen_pos, int setup_info_pos_raw)
   struct TokenInfo *si = &setup_info[si_pos];
   boolean font_draw_xoffset_modified = FALSE;
   int font_draw_xoffset_old = -1;
-  int xoffset = (num_setup_info < max_setup_info ? -1 * 1 : 0);
+  int xoffset = (num_setup_info < max_setup_info ? -1 : 0);
   int menu_screen_value_xpos = MENU_SCREEN_VALUE_XPOS + xoffset;
   int menu_screen_max_xpos = MENU_SCREEN_MAX_XPOS + xoffset;
   int xpos = menu_screen_value_xpos;
@@ -5336,8 +5339,13 @@ static void drawSetupValue(int screen_pos, int setup_info_pos_raw)
   font_height = getFontHeight(font_nr);
 #endif
 
+#if 0
+  if (menu_screen_value_xpos < 1 + MAX_MENU_TEXT_LENGTH_BIG)
+    font_nr = ...;
+#endif
+
   /* downward compatibility correction for Juergen Bonhagen's menu settings */
-  if (1 && setup_mode != SETUP_MODE_INPUT)
+  if (setup_mode != SETUP_MODE_INPUT)
   {
     int max_menu_text_length_big = (menu_screen_value_xpos -
 				    MENU_SCREEN_START_XPOS);
@@ -5878,9 +5886,19 @@ void HandleSetupScreen_Generic(int mx, int my, int dx, int dy, int button)
 
 #if 1
     if (choice < first_entry)
+    {
       choice = first_entry;
+
+      if (setup_info[choice].type & TYPE_SKIP_ENTRY)
+	choice++;
+    }
     else if (choice > first_entry + num_page_entries - 1)
+    {
       choice = first_entry + num_page_entries - 1;
+
+      if (setup_info[choice].type & TYPE_SKIP_ENTRY)
+	choice--;
+    }
 
     choice_store[setup_mode] = choice;
 
@@ -5966,13 +5984,34 @@ void HandleSetupScreen_Generic(int mx, int my, int dx, int dy, int button)
       {
 	choice += first_entry - first_entry_store[setup_mode];
 
-	first_entry_store[setup_mode] = first_entry;
-
 	if (choice < first_entry)
+	{
 	  choice = first_entry;
+
+	  if (setup_info[choice].type & TYPE_SKIP_ENTRY)
+	    choice++;
+	}
 	else if (choice > first_entry + num_page_entries - 1)
+	{
 	  choice = first_entry + num_page_entries - 1;
 
+	  if (setup_info[choice].type & TYPE_SKIP_ENTRY)
+	    choice--;
+	}
+#if 1
+	else if (setup_info[choice].type & TYPE_SKIP_ENTRY)
+	{
+	  choice += SIGN(dy);
+
+	  if (choice < first_entry ||
+	      choice > first_entry + num_page_entries - 1)
+	  first_entry += SIGN(dy);
+	}
+#endif
+
+	// printf("::: MARK 1: %d\n", first_entry);
+
+	first_entry_store[setup_mode] = first_entry;
 	choice_store[setup_mode] = choice;
 
 	drawSetupInfoList(setup_info, first_entry, NUM_MENU_ENTRIES_ON_SCREEN);
@@ -6004,13 +6043,28 @@ void HandleSetupScreen_Generic(int mx, int my, int dx, int dy, int button)
 #endif
 
     /* jump to next non-empty menu entry (up or down) */
+#if 1
+    while (first_entry + y > 0 &&
+	   first_entry + y < max_setup_info - 1 &&
+	   setup_info[first_entry + y].type & TYPE_SKIP_ENTRY)
+      y += dy;
+#else
     while (y > 0 && y < num_setup_info - 1 &&
 	   setup_info[first_entry + y].type & TYPE_SKIP_ENTRY)
       y += dy;
+#endif
 
     if (!IN_VIS_FIELD(x, y))
     {
+      choice += y - y_old;
+#if 1
+      if (choice < first_entry)
+	first_entry = choice;
+      else if (choice > first_entry + num_page_entries - 1)
+	first_entry = choice - num_page_entries + 1;
+#else
       first_entry += y - y_old;
+#endif
 
       if (first_entry >= 0 &&
 	  first_entry + num_page_entries <= max_setup_info)
