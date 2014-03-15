@@ -3533,6 +3533,34 @@ void InitGame()
 #endif
   int i, j, x, y;
 
+#if 1
+
+  StopAnimation();
+
+  if (!game.restart_level)
+    CloseDoor(DOOR_CLOSE_1);
+
+#if 1
+  if (level_editor_test_game)
+    FadeSkipNextFadeIn();
+  else
+    FadeSetEnterScreen();
+#else
+  if (level_editor_test_game)
+    fading = fading_none;
+  else
+    fading = menu.destination;
+#endif
+
+#if 1
+  FadeOut(REDRAW_FIELD);
+#else
+  if (do_fading)
+    FadeOut(REDRAW_FIELD);
+#endif
+
+#endif
+
   game_status = GAME_MODE_PLAYING;
 
 #if 1
@@ -4400,6 +4428,8 @@ void InitGame()
   game_status = GAME_MODE_MAIN;
 #endif
 
+#if 0
+
   StopAnimation();
 
   if (!game.restart_level)
@@ -4422,6 +4452,8 @@ void InitGame()
 #else
   if (do_fading)
     FadeOut(REDRAW_FIELD);
+#endif
+
 #endif
 
 #if 0
@@ -16445,6 +16477,12 @@ void RequestQuitGameExt(boolean skip_request, boolean quick_quit, char *message)
 {
   if (skip_request || Request(message, REQ_ASK | REQ_STAY_CLOSED))
   {
+#if 1
+    /* closing door required in case of envelope style request dialogs */
+    if (!skip_request)
+      CloseDoor(DOOR_CLOSE_1);
+#endif
+
 #if defined(NETWORK_AVALIABLE)
     if (options.network)
       SendToServer_StopPlaying(NETWORK_STOP_BY_PLAYER);
@@ -16946,6 +16984,7 @@ static void HandleGameButtonsExt(int id)
 	TapeStop();
       else
 	RequestQuitGame(TRUE);
+
       break;
 
     case GAME_CTRL_ID_PAUSE:

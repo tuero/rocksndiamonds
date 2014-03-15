@@ -7743,8 +7743,15 @@ void CheckElementDescriptions()
       Error(ERR_WARN, "no element description for element '%s'", EL_NAME(i));
 }
 
+static boolean playfield_area_changed = FALSE;
+
 void DrawLevelEd()
 {
+  int old_sx = SX;
+  int old_sy = SY;
+  int old_sxsize = SXSIZE;
+  int old_sysize = SYSIZE;
+
   StopAnimation();
 
   CloseDoor(DOOR_CLOSE_ALL);
@@ -7755,9 +7762,30 @@ void DrawLevelEd()
 #endif
 
 #if 1
+  /* needed after playing if editor playfield area has different size */
+  ClearRectangle(drawto, REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE);
+#endif
+
+#if 1
   /* needed if different viewport properties defined for editor */
   ChangeViewportPropertiesIfNeeded();
 #endif
+
+  if (old_sx != SX ||
+      old_sy != SY ||
+      old_sxsize != SXSIZE ||
+      old_sysize != SYSIZE)
+  {
+    playfield_area_changed = TRUE;
+
+#if 0
+    printf("::: %d, %d, %d, %d != %d, %d, %d, %d\n",
+	   old_sx, old_sy, old_sxsize, old_sysize,
+	   SX, SY, SXSIZE, SYSIZE);
+#endif
+  }
+  else
+    playfield_area_changed = FALSE;
 
 #if 1
   OpenDoor(DOOR_OPEN_1 | DOOR_OPEN_2 | DOOR_NO_DELAY);
@@ -7836,6 +7864,8 @@ void DrawLevelEd()
   DrawEditModeWindow();
 
 #if 1
+  FadeIn(playfield_area_changed ? REDRAW_ALL : REDRAW_FIELD);
+#else
   FadeIn(REDRAW_FIELD);
   // FadeIn(REDRAW_ALL);
 #endif
@@ -7848,7 +7878,7 @@ void DrawLevelEd()
 	     DX, DY, DXSIZE, DYSIZE, DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1);
 #endif
 
-#if 1
+#if 0
   /* draw new control window (with border) to window */
   redraw_mask |= REDRAW_ALL;
   BackToFront();
@@ -11906,7 +11936,16 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 
       CloseDoor(DOOR_CLOSE_ALL);
 
+#if 0
       BackToFront();		/* force redraw of undrawn special door */
+#endif
+
+#if 1
+      /* needed before playing if editor playfield area has different size */
+      ClearRectangle(drawto, REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE);
+
+      redraw_mask = REDRAW_ALL;
+#endif
 
 #if 0
       DrawCompleteVideoDisplay();
@@ -12388,8 +12427,13 @@ void RequestExitLevelEditor(boolean ask_if_level_has_changed,
       Request("Level has changed! Exit without saving?",
 	      REQ_ASK | REQ_STAY_OPEN))
   {
+#if 1
+    // CloseDoor(DOOR_CLOSE_1);
+    SetDoorState(DOOR_CLOSE_2);
+#else
     CloseDoor(DOOR_CLOSE_1);
     SetDoorState(DOOR_CLOSE_2);
+#endif
 
 #if 1
     if (quick_quit)
@@ -12401,14 +12445,23 @@ void RequestExitLevelEditor(boolean ask_if_level_has_changed,
 
     game_status = GAME_MODE_MAIN;
 #if 1
+    DrawAndFadeInMainMenu(playfield_area_changed ? REDRAW_ALL : REDRAW_FIELD);
+#else
+#if 1
     DrawAndFadeInMainMenu(REDRAW_FIELD);
 #else
     DrawMainMenu();
 #endif
+#endif
   }
   else
   {
+#if 1
+    // CloseDoor(DOOR_CLOSE_1);
+    OpenDoor(DOOR_OPEN_1 | DOOR_COPY_BACK);
+#else
     CloseDoor(DOOR_CLOSE_1);
     OpenDoor(DOOR_OPEN_1 | DOOR_COPY_BACK);
+#endif
   }
 }

@@ -1018,10 +1018,27 @@ static void FadeExt(int fade_mask, int fade_mode, int fade_type)
 #endif
 
 #if 1
+
+#if 1
+    BlitBitmap(backbuffer, window, x, y, width, height, x, y);
+
+    redraw_mask &= ~fade_mask;
+#else
+    /* always redraw area that was explicitly marked to fade */
+    redraw_mask |= fade_mask;
+
+    BackToFront();
+#endif
+
+#else
+
+#if 1
     BlitBitmap(backbuffer, window, x, y, width, height, x, y);
     redraw_mask = REDRAW_NONE;
+    // (^^^ WRONG; should be "redraw_mask &= ~fade_mask" if done this way)
 #else
     BackToFront();
+#endif
 #endif
 
     return;
@@ -2972,7 +2989,7 @@ void AnimateEnvelopeRequest(int anim_mode, int action)
 	       dst_x + xsize_size_left, dst_y + ysize_size_top);
 #endif
 
-#if 1
+#if 0
     redraw_mask = REDRAW_FIELD | REDRAW_FROM_BACKBUFFER;
     // redraw_mask |= REDRAW_ALL | REDRAW_FROM_BACKBUFFER;
 #else
