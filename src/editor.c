@@ -4797,7 +4797,7 @@ static int *editor_el_dynamic_ptr = NULL;
 static int num_editor_hl_dynamic = SIZEOF_ARRAY_INT(editor_hl_dynamic);
 static int num_editor_el_dynamic = 0;
 
-static int editor_hl_empty[] = { };
+static int editor_hl_empty[] = { EL_EMPTY };
 #if 1
 static int *editor_el_empty = NULL;	/* dynamically allocated */
 #else
