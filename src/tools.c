@@ -3334,6 +3334,11 @@ void ShowEnvelopeRequest(char *text, unsigned int req_state, int action)
 #if 1
   // game_status = last_game_status;	/* restore current game status */
 
+#if 1
+  /* !!! CHECK AGAIN (SEE BELOW) !!! */
+  game_status = last_game_status;	/* restore current game status */
+#endif
+
   if (action == ACTION_CLOSING)
   {
     if (game_status != GAME_MODE_MAIN)
@@ -3347,7 +3352,7 @@ void ShowEnvelopeRequest(char *text, unsigned int req_state, int action)
 
   // SetDrawBackgroundMask(last_draw_background_mask);
 
-#if 1
+#if 0
   redraw_mask = REDRAW_FIELD;
   // redraw_mask |= REDRAW_ALL;
 #else
@@ -3360,8 +3365,10 @@ void ShowEnvelopeRequest(char *text, unsigned int req_state, int action)
 
   BackToFront();
 
+#if 0
   /* (important: after "BackToFront()", but before "SetDrawtoField()") */
   game_status = last_game_status;	/* restore current game status */
+#endif
 
 #if 1
   if (action == ACTION_CLOSING &&
