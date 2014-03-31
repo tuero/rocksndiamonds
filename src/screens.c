@@ -1498,7 +1498,8 @@ void DrawMainMenuExt(int fade_mask, boolean do_fading)
 #endif
 
 #if 1
-  if (fade_mask == REDRAW_ALL)
+  // if (fade_mask == REDRAW_ALL)
+  // (always redraw current door state)
   {
     int door_state = GetDoorState();
 
@@ -1506,6 +1507,12 @@ void DrawMainMenuExt(int fade_mask, boolean do_fading)
 
     OpenDoor(door_state | DOOR_NO_DELAY | DOOR_FORCE_REDRAW);
   }
+#endif
+
+#if 0
+  redraw_mask |= REDRAW_ALL;
+  BackToFront();
+  Delay(3000);
 #endif
 
   DrawMaskedBorder(REDRAW_ALL);

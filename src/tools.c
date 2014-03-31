@@ -2993,6 +2993,7 @@ void AnimateEnvelopeRequest(int anim_mode, int action)
     redraw_mask = REDRAW_FIELD | REDRAW_FROM_BACKBUFFER;
     // redraw_mask |= REDRAW_ALL | REDRAW_FROM_BACKBUFFER;
 #else
+  /* CHECK AGAIN (previous code reactivated) */
     redraw_mask |= REDRAW_FIELD | REDRAW_FROM_BACKBUFFER;
 #endif
 
@@ -3356,6 +3357,7 @@ void ShowEnvelopeRequest(char *text, unsigned int req_state, int action)
   redraw_mask = REDRAW_FIELD;
   // redraw_mask |= REDRAW_ALL;
 #else
+  /* CHECK AGAIN (previous code reactivated) */
   redraw_mask |= REDRAW_FIELD;
 #endif
 
