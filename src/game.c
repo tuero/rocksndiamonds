@@ -3534,6 +3534,10 @@ void InitGame()
   int i, j, x, y;
 
 #if 1
+  game_status = GAME_MODE_PLAYING;
+#endif
+
+#if 1
 
   StopAnimation();
 
@@ -3561,7 +3565,14 @@ void InitGame()
 
 #endif
 
+#if 0
+  printf("::: FADING OUT: DONE\n");
+  Delay(1000);
+#endif
+
+#if 0
   game_status = GAME_MODE_PLAYING;
+#endif
 
 #if 1
   /* needed if different viewport properties defined for playing */
