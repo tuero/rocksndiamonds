@@ -11365,8 +11365,11 @@ void SaveScore(int nr)
 #define SETUP_TOKEN_VOLUME_SIMPLE		35
 #define SETUP_TOKEN_VOLUME_LOOPS		36
 #define SETUP_TOKEN_VOLUME_MUSIC		37
+#define SETUP_TOKEN_TOUCH_CONTROL_TYPE		38
+#define SETUP_TOKEN_TOUCH_MOVE_DISTANCE		39
+#define SETUP_TOKEN_TOUCH_DROP_DISTANCE		40
 
-#define NUM_GLOBAL_SETUP_TOKENS			38
+#define NUM_GLOBAL_SETUP_TOKENS			41
 
 /* editor setup */
 #define SETUP_TOKEN_EDITOR_EL_BOULDERDASH	0
@@ -11514,6 +11517,9 @@ static struct TokenInfo global_setup_tokens[] =
   { TYPE_INTEGER,&si.volume_simple,           "volume_simple"		},
   { TYPE_INTEGER,&si.volume_loops,            "volume_loops"		},
   { TYPE_INTEGER,&si.volume_music,            "volume_music"		},
+  { TYPE_STRING, &si.touch.control_type,      "touch.control_type"	},
+  { TYPE_INTEGER,&si.touch.move_distance,     "touch.move_distance"	},
+  { TYPE_INTEGER,&si.touch.drop_distance,     "touch.drop_distance"	},
 };
 
 static boolean not_used = FALSE;
@@ -11686,9 +11692,13 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
   si->override_level_sounds = FALSE;
   si->override_level_music = FALSE;
 
-  si->volume_simple = 100;	/* percent */
-  si->volume_loops = 100;	/* percent */
-  si->volume_music = 100;	/* percent */
+  si->volume_simple = 100;		/* percent */
+  si->volume_loops = 100;		/* percent */
+  si->volume_music = 100;		/* percent */
+
+  si->touch.control_type = getStringCopy(TOUCH_CONTROL_DEFAULT);
+  si->touch.move_distance = TOUCH_MOVE_DISTANCE_DEFAULT;	/* percent */
+  si->touch.drop_distance = TOUCH_DROP_DISTANCE_DEFAULT;	/* percent */
 
   si->editor.el_boulderdash		= TRUE;
   si->editor.el_emerald_mine		= TRUE;
@@ -11957,7 +11967,8 @@ void SaveSetup()
     /* just to make things nicer :) */
     if (i == SETUP_TOKEN_PLAYER_NAME + 1 ||
 	i == SETUP_TOKEN_GRAPHICS_SET ||
-	i == SETUP_TOKEN_VOLUME_SIMPLE)
+	i == SETUP_TOKEN_VOLUME_SIMPLE ||
+	i == SETUP_TOKEN_TOUCH_CONTROL_TYPE)
       fprintf(file, "\n");
 
     fprintf(file, "%s\n", getSetupLine(global_setup_tokens, "", i));

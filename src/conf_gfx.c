@@ -5829,6 +5829,8 @@ struct ConfigInfo image_config[] =
   { "menu.draw_yoffset.SETUP[ARTWORK]",		"0"			},
   { "menu.draw_xoffset.SETUP[INPUT]",		"0"			},
   { "menu.draw_yoffset.SETUP[INPUT]",		"0"			},
+  { "menu.draw_xoffset.SETUP[TOUCH]",		"0"			},
+  { "menu.draw_yoffset.SETUP[TOUCH]",		"0"			},
   { "menu.draw_xoffset.SETUP[SHORTCUTS]",	"0"			},
   { "menu.draw_yoffset.SETUP[SHORTCUTS]",	"0"			},
   { "menu.draw_xoffset.SETUP[SHORTCUTS_1]",	"0"			},

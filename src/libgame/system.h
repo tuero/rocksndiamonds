@@ -67,6 +67,16 @@
 
 #define SCALING_QUALITY_DEFAULT		SCALING_QUALITY_LINEAR
 
+/* values for touch control */
+#define TOUCH_CONTROL_VIRTUAL_BUTTONS	"virtual_buttons"
+#define TOUCH_CONTROL_WIPE_GESTURES	"wipe_gestures"
+
+#define TOUCH_CONTROL_DEFAULT		TOUCH_CONTROL_VIRTUAL_BUTTONS
+
+#define TOUCH_MOVE_DISTANCE_DEFAULT	2
+#define TOUCH_DROP_DISTANCE_DEFAULT	5
+
+
 /* default input keys */
 #define DEFAULT_KEY_LEFT		KSYM_Left
 #define DEFAULT_KEY_RIGHT		KSYM_Right
@@ -868,6 +878,13 @@ struct SetupKeyboardInfo
   Key snap, drop;
 };
 
+struct SetupTouchInfo
+{
+  char *control_type;
+  int move_distance;
+  int drop_distance;
+};
+
 struct SetupInputInfo
 {
   boolean use_joystick;
@@ -999,6 +1016,7 @@ struct SetupInfo
   struct SetupEditorCascadeInfo editor_cascade;
   struct SetupShortcutInfo shortcut;
   struct SetupInputInfo input[MAX_PLAYERS];
+  struct SetupTouchInfo touch;
   struct SetupSystemInfo system;
   struct OptionInfo options;
 };

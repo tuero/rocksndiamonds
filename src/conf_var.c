@@ -1301,6 +1301,14 @@ struct TokenIntPtrInfo image_config_vars[] =
     &menu.draw_yoffset_setup[GFX_SPECIAL_ARG_SETUP_INPUT]
   },
   {
+    "menu.draw_xoffset.SETUP[TOUCH]",
+    &menu.draw_xoffset_setup[GFX_SPECIAL_ARG_SETUP_TOUCH]
+  },
+  {
+    "menu.draw_yoffset.SETUP[TOUCH]",
+    &menu.draw_yoffset_setup[GFX_SPECIAL_ARG_SETUP_TOUCH]
+  },
+  {
     "menu.draw_xoffset.SETUP[SHORTCUTS]",
     &menu.draw_xoffset_setup[GFX_SPECIAL_ARG_SETUP_SHORTCUTS]
   },

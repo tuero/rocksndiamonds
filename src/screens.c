@@ -47,31 +47,35 @@
 #define SETUP_MODE_SOUND		4
 #define SETUP_MODE_ARTWORK		5
 #define SETUP_MODE_INPUT		6
-#define SETUP_MODE_SHORTCUTS		7
-#define SETUP_MODE_SHORTCUTS_1		8
-#define SETUP_MODE_SHORTCUTS_2		9
-#define SETUP_MODE_SHORTCUTS_3		10
-#define SETUP_MODE_SHORTCUTS_4		11
-#define SETUP_MODE_SHORTCUTS_5		12
+#define SETUP_MODE_TOUCH		7
+#define SETUP_MODE_SHORTCUTS		8
+#define SETUP_MODE_SHORTCUTS_1		9
+#define SETUP_MODE_SHORTCUTS_2		10
+#define SETUP_MODE_SHORTCUTS_3		11
+#define SETUP_MODE_SHORTCUTS_4		12
+#define SETUP_MODE_SHORTCUTS_5		13
 
 /* sub-screens on the setup screen (generic) */
-#define SETUP_MODE_CHOOSE_ARTWORK	13
-#define SETUP_MODE_CHOOSE_OTHER		14
+#define SETUP_MODE_CHOOSE_ARTWORK	14
+#define SETUP_MODE_CHOOSE_OTHER		15
 
 /* sub-screens on the setup screen (specific) */
-#define SETUP_MODE_CHOOSE_GAME_SPEED	15
-#define SETUP_MODE_CHOOSE_SCROLL_DELAY	16
-#define SETUP_MODE_CHOOSE_SCREEN_MODE	17
-#define SETUP_MODE_CHOOSE_WINDOW_SIZE	18
-#define SETUP_MODE_CHOOSE_SCALING_TYPE	19
-#define SETUP_MODE_CHOOSE_GRAPHICS	20
-#define SETUP_MODE_CHOOSE_SOUNDS	21
-#define SETUP_MODE_CHOOSE_MUSIC		22
-#define SETUP_MODE_CHOOSE_VOLUME_SIMPLE	23
-#define SETUP_MODE_CHOOSE_VOLUME_LOOPS	24
-#define SETUP_MODE_CHOOSE_VOLUME_MUSIC	25
+#define SETUP_MODE_CHOOSE_GAME_SPEED	16
+#define SETUP_MODE_CHOOSE_SCROLL_DELAY	17
+#define SETUP_MODE_CHOOSE_SCREEN_MODE	18
+#define SETUP_MODE_CHOOSE_WINDOW_SIZE	19
+#define SETUP_MODE_CHOOSE_SCALING_TYPE	20
+#define SETUP_MODE_CHOOSE_GRAPHICS	21
+#define SETUP_MODE_CHOOSE_SOUNDS	22
+#define SETUP_MODE_CHOOSE_MUSIC		23
+#define SETUP_MODE_CHOOSE_VOLUME_SIMPLE	24
+#define SETUP_MODE_CHOOSE_VOLUME_LOOPS	25
+#define SETUP_MODE_CHOOSE_VOLUME_MUSIC	26
+#define SETUP_MODE_CHOOSE_TOUCH_CONTROL	27
+#define SETUP_MODE_CHOOSE_MOVE_DISTANCE	28
+#define SETUP_MODE_CHOOSE_DROP_DISTANCE	29
 
-#define MAX_SETUP_MODES			26
+#define MAX_SETUP_MODES			30
 
 /* for input setup functions */
 #define SETUPINPUT_SCREEN_POS_START	0
@@ -171,6 +175,7 @@ static void CalibrateJoystick(int);
 static void execSetupGame(void);
 static void execSetupGraphics(void);
 static void execSetupSound(void);
+static void execSetupTouch(void);
 static void execSetupArtwork(void);
 static void HandleChooseTree(int, int, int, int, int, TreeInfo **);
 
@@ -224,6 +229,15 @@ static TreeInfo *volume_loops_current = NULL;
 
 static TreeInfo *volumes_music = NULL;
 static TreeInfo *volume_music_current = NULL;
+
+static TreeInfo *touch_controls = NULL;
+static TreeInfo *touch_control_current = NULL;
+
+static TreeInfo *move_distances = NULL;
+static TreeInfo *move_distance_current = NULL;
+
+static TreeInfo *drop_distances = NULL;
+static TreeInfo *drop_distance_current = NULL;
 
 static TreeInfo *level_number = NULL;
 static TreeInfo *level_number_current = NULL;
@@ -330,6 +344,37 @@ static struct
   {	80,	"80 %"				},
   {	90,	"90 %"				},
   {	100,	"100 %"				},
+
+  {	-1,	NULL				},
+};
+
+static struct
+{
+  char *value;
+  char *text;
+} touch_controls_list[] =
+{
+  {	TOUCH_CONTROL_VIRTUAL_BUTTONS,	"Virtual Buttons"	},
+  {	TOUCH_CONTROL_WIPE_GESTURES,	"Wipe Gestures"		},
+
+  {	NULL,			 	NULL			},
+};
+
+static struct
+{
+  int value;
+  char *text;
+} distances_list[] =
+{
+  {	1,	"1 %"				},
+  {	2,	"2 %"				},
+  {	3,	"3 %"				},
+  {	4,	"4 %"				},
+  {	5,	"5 %"				},
+  {	10,	"10 %"				},
+  {	15,	"15 %"				},
+  {	20,	"20 %"				},
+  {	25,	"25 %"				},
 
   {	-1,	NULL				},
 };
@@ -3734,6 +3779,10 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
 	       setup_mode == SETUP_MODE_CHOOSE_VOLUME_LOOPS ||
 	       setup_mode == SETUP_MODE_CHOOSE_VOLUME_MUSIC)
 	execSetupSound();
+      else if (setup_mode == SETUP_MODE_CHOOSE_TOUCH_CONTROL ||
+	       setup_mode == SETUP_MODE_CHOOSE_MOVE_DISTANCE ||
+	       setup_mode == SETUP_MODE_CHOOSE_DROP_DISTANCE)
+	execSetupTouch();
       else
 	execSetupArtwork();
     }
@@ -3975,6 +4024,10 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
 		   setup_mode == SETUP_MODE_CHOOSE_VOLUME_LOOPS ||
 		   setup_mode == SETUP_MODE_CHOOSE_VOLUME_MUSIC)
 	    execSetupSound();
+	  else if (setup_mode == SETUP_MODE_CHOOSE_TOUCH_CONTROL ||
+		   setup_mode == SETUP_MODE_CHOOSE_MOVE_DISTANCE ||
+		   setup_mode == SETUP_MODE_CHOOSE_DROP_DISTANCE)
+	    execSetupTouch();
 	  else
 	    execSetupArtwork();
 	}
@@ -4262,6 +4315,9 @@ static char *music_set_name;
 static char *volume_simple_text;
 static char *volume_loops_text;
 static char *volume_music_text;
+static char *touch_controls_text;
+static char *move_distance_text;
+static char *drop_distance_text;
 
 static void execSetupMain()
 {
@@ -4825,6 +4881,173 @@ static void execSetupSound()
   DrawSetupScreen();
 }
 
+static void execSetupChooseTouchControls()
+{
+  setup_mode = SETUP_MODE_CHOOSE_TOUCH_CONTROL;
+
+  DrawSetupScreen();
+}
+
+static void execSetupChooseMoveDistance()
+{
+  setup_mode = SETUP_MODE_CHOOSE_MOVE_DISTANCE;
+
+  DrawSetupScreen();
+}
+
+static void execSetupChooseDropDistance()
+{
+  setup_mode = SETUP_MODE_CHOOSE_DROP_DISTANCE;
+
+  DrawSetupScreen();
+}
+
+static void execSetupTouch()
+{
+#if 1
+  if (touch_controls == NULL)
+  {
+    int i;
+
+    for (i = 0; touch_controls_list[i].value != NULL; i++)
+    {
+      TreeInfo *ti = newTreeInfo_setDefaults(TREE_TYPE_UNDEFINED);
+      char identifier[32], name[32];
+      char *value = touch_controls_list[i].value;
+      char *text = touch_controls_list[i].text;
+
+      ti->node_top = &touch_controls;
+      ti->sort_priority = i;
+
+      sprintf(identifier, "%s", value);
+      sprintf(name, "%s", text);
+
+      setString(&ti->identifier, identifier);
+      setString(&ti->name, name);
+      setString(&ti->name_sorting, name);
+      setString(&ti->infotext, "Control Type");
+
+      pushTreeInfo(&touch_controls, ti);
+    }
+
+    /* sort touch control values to start with lowest touch control value */
+    sortTreeInfo(&touch_controls);
+
+    /* set current touch control value to configured touch control value */
+    touch_control_current =
+      getTreeInfoFromIdentifier(touch_controls, setup.touch.control_type);
+
+    /* if that fails, set current touch control to reliable default value */
+    if (touch_control_current == NULL)
+      touch_control_current =
+	getTreeInfoFromIdentifier(touch_controls, TOUCH_CONTROL_DEFAULT);
+
+    /* if that also fails, set current touch control to first available value */
+    if (touch_control_current == NULL)
+      touch_control_current = touch_controls;
+  }
+
+  if (move_distances == NULL)
+  {
+    int i;
+
+    for (i = 0; distances_list[i].value != -1; i++)
+    {
+      TreeInfo *ti = newTreeInfo_setDefaults(TREE_TYPE_UNDEFINED);
+      char identifier[32], name[32];
+      int value = distances_list[i].value;
+      char *text = distances_list[i].text;
+
+      ti->node_top = &move_distances;
+      ti->sort_priority = value;
+
+      sprintf(identifier, "%d", value);
+      sprintf(name, "%s", text);
+
+      setString(&ti->identifier, identifier);
+      setString(&ti->name, name);
+      setString(&ti->name_sorting, name);
+      setString(&ti->infotext, "Move Distance");
+
+      pushTreeInfo(&move_distances, ti);
+    }
+
+    /* sort distance values to start with lowest distance value */
+    sortTreeInfo(&move_distances);
+
+    /* set current distance value to configured distance value */
+    move_distance_current =
+      getTreeInfoFromIdentifier(move_distances,
+				i_to_a(setup.touch.move_distance));
+
+    /* if that fails, set current distance to reliable default value */
+    if (move_distance_current == NULL)
+      move_distance_current =
+	getTreeInfoFromIdentifier(move_distances, i_to_a(1));
+
+    /* if that also fails, set current distance to first available value */
+    if (move_distance_current == NULL)
+      move_distance_current = move_distances;
+  }
+
+  if (drop_distances == NULL)
+  {
+    int i;
+
+    for (i = 0; distances_list[i].value != -1; i++)
+    {
+      TreeInfo *ti = newTreeInfo_setDefaults(TREE_TYPE_UNDEFINED);
+      char identifier[32], name[32];
+      int value = distances_list[i].value;
+      char *text = distances_list[i].text;
+
+      ti->node_top = &drop_distances;
+      ti->sort_priority = value;
+
+      sprintf(identifier, "%d", value);
+      sprintf(name, "%s", text);
+
+      setString(&ti->identifier, identifier);
+      setString(&ti->name, name);
+      setString(&ti->name_sorting, name);
+      setString(&ti->infotext, "Drop Distance");
+
+      pushTreeInfo(&drop_distances, ti);
+    }
+
+    /* sort distance values to start with lowest distance value */
+    sortTreeInfo(&drop_distances);
+
+    /* set current distance value to configured distance value */
+    drop_distance_current =
+      getTreeInfoFromIdentifier(drop_distances,
+				i_to_a(setup.touch.drop_distance));
+
+    /* if that fails, set current distance to reliable default value */
+    if (drop_distance_current == NULL)
+      drop_distance_current =
+	getTreeInfoFromIdentifier(drop_distances, i_to_a(1));
+
+    /* if that also fails, set current distance to first available value */
+    if (drop_distance_current == NULL)
+      drop_distance_current = drop_distances;
+  }
+
+  setup.touch.control_type = touch_control_current->identifier;
+  setup.touch.move_distance = atoi(move_distance_current->identifier);
+  setup.touch.drop_distance = atoi(drop_distance_current->identifier);
+
+  /* needed for displaying volume text instead of identifier */
+  touch_controls_text = touch_control_current->name;
+  move_distance_text = move_distance_current->name;
+  drop_distance_text = drop_distance_current->name;
+#endif
+
+  setup_mode = SETUP_MODE_TOUCH;
+
+  DrawSetupScreen();
+}
+
 static void execSetupArtwork()
 {
 #if 0
@@ -4941,7 +5164,12 @@ static struct TokenInfo setup_info_main[] =
   { TYPE_ENTER_MENU,	execSetupGraphics,	"Graphics"		},
   { TYPE_ENTER_MENU,	execSetupSound,		"Sound & Music"		},
   { TYPE_ENTER_MENU,	execSetupArtwork,	"Custom Artwork"	},
+#if !defined(PLATFORM_ANDROID)
   { TYPE_ENTER_MENU,	execSetupInput,		"Input Devices"		},
+  { TYPE_ENTER_MENU,	execSetupTouch,		"Touch Controls"	},
+#else
+  { TYPE_ENTER_MENU,	execSetupTouch,		"Touch Controls"	},
+#endif
   { TYPE_ENTER_MENU,	execSetupShortcuts,	"Key Shortcuts"		},
   { TYPE_EMPTY,		NULL,			""			},
   { TYPE_LEAVE_MENU,	execExitSetup, 		"Exit"			},
@@ -5107,6 +5335,21 @@ static struct TokenInfo setup_info_input[] =
   { TYPE_EMPTY,		NULL,			""			},
   { TYPE_EMPTY,		NULL,			""			},
   { TYPE_EMPTY,		NULL,			""			},
+  { TYPE_EMPTY,		NULL,			""			},
+  { TYPE_LEAVE_MENU,	execSetupMain, 		"Back"			},
+
+  { 0,			NULL,			NULL			}
+};
+
+static struct TokenInfo setup_info_touch[] =
+{
+  { TYPE_ENTER_LIST,	execSetupChooseTouchControls, "Touch Control Type:" },
+  { TYPE_STRING,	&touch_controls_text,	""			},
+  { TYPE_EMPTY,		NULL,			""			},
+  { TYPE_ENTER_LIST,	execSetupChooseMoveDistance, "Move Trigger Distance:" },
+  { TYPE_STRING,	&move_distance_text,	""			},
+  { TYPE_ENTER_LIST,	execSetupChooseDropDistance, "Drop Trigger Distance:" },
+  { TYPE_STRING,	&drop_distance_text,	""			},
   { TYPE_EMPTY,		NULL,			""			},
   { TYPE_LEAVE_MENU,	execSetupMain, 		"Back"			},
 
@@ -5737,6 +5980,11 @@ static void DrawSetupScreen_Generic()
   {
     setup_info = setup_info_artwork;
     title_string = "Custom Artwork";
+  }
+  else if (setup_mode == SETUP_MODE_TOUCH)
+  {
+    setup_info = setup_info_touch;
+    title_string = "Setup Touch Ctrls";
   }
   else if (setup_mode == SETUP_MODE_SHORTCUTS)
   {
@@ -6901,6 +7149,12 @@ void DrawSetupScreen()
     DrawChooseTree(&volume_loops_current);
   else if (setup_mode == SETUP_MODE_CHOOSE_VOLUME_MUSIC)
     DrawChooseTree(&volume_music_current);
+  else if (setup_mode == SETUP_MODE_CHOOSE_TOUCH_CONTROL)
+    DrawChooseTree(&touch_control_current);
+  else if (setup_mode == SETUP_MODE_CHOOSE_MOVE_DISTANCE)
+    DrawChooseTree(&move_distance_current);
+  else if (setup_mode == SETUP_MODE_CHOOSE_DROP_DISTANCE)
+    DrawChooseTree(&drop_distance_current);
   else
     DrawSetupScreen_Generic();
 
@@ -6951,6 +7205,12 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
     HandleChooseTree(mx, my, dx, dy, button, &volume_loops_current);
   else if (setup_mode == SETUP_MODE_CHOOSE_VOLUME_MUSIC)
     HandleChooseTree(mx, my, dx, dy, button, &volume_music_current);
+  else if (setup_mode == SETUP_MODE_CHOOSE_TOUCH_CONTROL)
+    HandleChooseTree(mx, my, dx, dy, button, &touch_control_current);
+  else if (setup_mode == SETUP_MODE_CHOOSE_MOVE_DISTANCE)
+    HandleChooseTree(mx, my, dx, dy, button, &move_distance_current);
+  else if (setup_mode == SETUP_MODE_CHOOSE_DROP_DISTANCE)
+    HandleChooseTree(mx, my, dx, dy, button, &drop_distance_current);
   else
     HandleSetupScreen_Generic(mx, my, dx, dy, button);
 

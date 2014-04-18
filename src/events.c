@@ -539,10 +539,12 @@ void HandleFingerEvent(FingerEvent *event)
   static Key button_key = KSYM_UNDEFINED;
   static float motion_x1, motion_y1;
   static float button_x1, button_y1;
-  static SDL_FingerID motion_id = 0;
-  static SDL_FingerID button_id = 0;
-  int trigger_distance_percent = 1;	// percent of touchpad width/height
-  float trigger_distance = (float)trigger_distance_percent / 100;
+  static SDL_FingerID motion_id = -1;
+  static SDL_FingerID button_id = -1;
+  int move_trigger_distance_percent = 2;   // percent of touchpad width/height
+  int drop_trigger_distance_percent = 5;   // percent of touchpad width/height
+  float move_trigger_distance = (float)move_trigger_distance_percent / 100;
+  float drop_trigger_distance = (float)drop_trigger_distance_percent / 100;
   float event_x = event->x;
   float event_y = event->y;
 
@@ -562,7 +564,13 @@ void HandleFingerEvent(FingerEvent *event)
   if (game_status != GAME_MODE_PLAYING)
     return;
 
-  if (1)
+#if 1
+  if (strEqual(setup.touch.control_type, TOUCH_CONTROL_VIRTUAL_BUTTONS))
+#else
+  boolean use_virtual_button_control = FALSE;
+
+  if (use_virtual_button_control)
+#endif
   {
     int key_status = (event->type == EVENT_FINGERRELEASE ? KEY_RELEASED :
 		      KEY_PRESSED);
@@ -714,6 +722,8 @@ void HandleFingerEvent(FingerEvent *event)
     return;
   }
 
+  // use touch direction control
+
   if (event->type == EVENT_FINGERPRESS)
   {
     if (event_x > 1.0 / 3.0)
@@ -750,7 +760,7 @@ void HandleFingerEvent(FingerEvent *event)
   {
     if (event->fingerId == motion_id)
     {
-      motion_id = 0;
+      motion_id = -1;
 
       if (motion_key_x != KSYM_UNDEFINED)
 	HandleKey(motion_key_x, KEY_RELEASED);
@@ -764,7 +774,7 @@ void HandleFingerEvent(FingerEvent *event)
     }
     else if (event->fingerId == button_id)
     {
-      button_id = 0;
+      button_id = -1;
 
       if (button_key != KSYM_UNDEFINED)
 	HandleKey(button_key, KEY_RELEASED);
@@ -787,16 +797,16 @@ void HandleFingerEvent(FingerEvent *event)
 			      event_y > motion_y1 ? setup.input[0].key.down :
 			      KSYM_UNDEFINED);
 
-      if (distance_x < trigger_distance / 2 ||
+      if (distance_x < move_trigger_distance / 2 ||
 	  distance_x < distance_y)
 	new_motion_key_x = KSYM_UNDEFINED;
 
-      if (distance_y < trigger_distance / 2 ||
+      if (distance_y < move_trigger_distance / 2 ||
 	  distance_y < distance_x)
 	new_motion_key_y = KSYM_UNDEFINED;
 
-      if (distance_x > trigger_distance ||
-	  distance_y > trigger_distance)
+      if (distance_x > move_trigger_distance ||
+	  distance_y > move_trigger_distance)
       {
 	if (new_motion_key_x != motion_key_x)
 	{
@@ -828,8 +838,8 @@ void HandleFingerEvent(FingerEvent *event)
       float distance_x = ABS(event_x - button_x1);
       float distance_y = ABS(event_y - button_y1);
 
-      if (distance_x < trigger_distance / 2 &&
-	  distance_y > trigger_distance)
+      if (distance_x < drop_trigger_distance / 2 &&
+	  distance_y > drop_trigger_distance)
       {
 	if (button_key == setup.input[0].key.snap)
 	  HandleKey(button_key, KEY_RELEASED);
