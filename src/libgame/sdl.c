@@ -816,13 +816,26 @@ boolean SDLSetVideoMode(DrawBuffer **backbuffer, boolean fullscreen)
   {
     SDL_SysWMinfo wminfo;
     HWND hwnd;
+    boolean wminfo_success = FALSE;
 
     SDL_VERSION(&wminfo.version);
-    SDL_GetWMInfo(&wminfo);
+#if defined(TARGET_SDL2)
+    if (sdl_window)
+      wminfo_success = SDL_GetWindowWMInfo(sdl_window, &wminfo);
+#else
+    wminfo_success = (SDL_GetWMInfo(&wminfo) == 1);
+#endif
 
-    hwnd = wminfo.window;
+    if (wminfo_success)
+    {
+#if defined(TARGET_SDL2)
+      hwnd = wminfo.info.win.window;
+#else
+      hwnd = wminfo.window;
+#endif
 
-    DragAcceptFiles(hwnd, TRUE);
+      DragAcceptFiles(hwnd, TRUE);
+    }
   }
 #endif
 #endif
@@ -830,12 +843,16 @@ boolean SDLSetVideoMode(DrawBuffer **backbuffer, boolean fullscreen)
   return success;
 }
 
-#if defined(TARGET_SDL2)
 void SDLSetWindowTitle()
 {
+#if defined(TARGET_SDL2)
   SDL_SetWindowTitle(sdl_window, program.window_title);
+#else
+  SDL_WM_SetCaption(program.window_title, program.window_title);
+#endif
 }
 
+#if defined(TARGET_SDL2)
 void SDLSetWindowScaling(int window_scaling_percent)
 {
   if (sdl_window == NULL)
@@ -2508,9 +2525,17 @@ void SDLHandleWindowManagerEvent(Event *event)
   SDL_SysWMEvent *syswmevent = (SDL_SysWMEvent *)event;
   SDL_SysWMmsg *syswmmsg = (SDL_SysWMmsg *)(syswmevent->msg);
 
+#if defined(TARGET_SDL2)
+  if (syswmmsg->msg.win.msg == WM_DROPFILES)
+#else
   if (syswmmsg->msg == WM_DROPFILES)
+#endif
   {
+#if defined(TARGET_SDL2)
+    HDROP hdrop = (HDROP)syswmmsg->msg.win.wParam;
+#else
     HDROP hdrop = (HDROP)syswmmsg->wParam;
+#endif
     int i, num_files;
 
     printf("::: SDL_SYSWMEVENT:\n");
@@ -2527,7 +2552,11 @@ void SDLHandleWindowManagerEvent(Event *event)
       printf("::: - '%s'\n", buffer);
     }
 
+#if defined(TARGET_SDL2)
+    DragFinish((HDROP)syswmmsg->msg.win.wParam);
+#else
     DragFinish((HDROP)syswmmsg->wParam);
+#endif
   }
 #endif
 }

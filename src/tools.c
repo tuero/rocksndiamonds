@@ -437,6 +437,8 @@ void BlitScreenToBitmap(Bitmap *target_bitmap)
 {
   DrawBuffer *buffer = (drawto_field == window ? backbuffer : drawto_field);
   int fx = FX, fy = FY;
+  int full_lev_fieldx = lev_fieldx + (BorderElement != EL_EMPTY ? 2 : 0);
+  int full_lev_fieldy = lev_fieldy + (BorderElement != EL_EMPTY ? 2 : 0);
 
 #if NEW_TILESIZE
   int dx = (ScreenMovDir & (MV_LEFT | MV_RIGHT) ? ScreenGfxPos : 0);
@@ -485,6 +487,28 @@ void BlitScreenToBitmap(Bitmap *target_bitmap)
 	 SBX_Left, SBX_Right,
 	 SBY_Upper, SBY_Lower,
 	 fx, fy);
+#endif
+
+#if 1
+  if (full_lev_fieldx <= SCR_FIELDX)
+  {
+    // printf(":1: PLAYFIELD FITS TO SCREEN [%d, %d, %d]\n", fx, ffx, dx_var);
+
+    if (EVEN(SCR_FIELDX))
+      fx = 2 * TILEX_VAR - (ODD(lev_fieldx)  ? TILEX_VAR / 2 : 0);
+    else
+      fx = 2 * TILEX_VAR - (EVEN(lev_fieldx) ? TILEX_VAR / 2 : 0);
+
+    // printf(":2: PLAYFIELD FITS TO SCREEN [%d, %d, %d]\n", fx, ffx, dx_var);
+  }
+
+  if (full_lev_fieldy <= SCR_FIELDY)
+  {
+    if (EVEN(SCR_FIELDY))
+      fy = 2 * TILEY_VAR - (ODD(lev_fieldy)  ? TILEY_VAR / 2 : 0);
+    else
+      fy = 2 * TILEY_VAR - (EVEN(lev_fieldy) ? TILEY_VAR / 2 : 0);
+  }
 #endif
 
   if (border.draw_masked[GAME_MODE_PLAYING])

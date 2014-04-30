@@ -75,7 +75,8 @@ endif
 ifeq ($(PLATFORM),cross-win32)		# cross-compiling to Windows
 PROGNAME = ../$(PROGBASE).exe
 EXTRA_LDFLAGS = -lshfolder -lwsock32
-TARGET = sdl
+# TARGET = sdl
+TARGET = sdl2
 endif
 
 ifeq ($(PLATFORM),cross-msdos)		# cross-compiling to MS-DOS

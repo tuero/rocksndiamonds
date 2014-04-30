@@ -3520,6 +3520,9 @@ int get_num_special_action(int element, int action_first, int action_last)
 
 void InitGame()
 {
+  int full_lev_fieldx = lev_fieldx + (BorderElement != EL_EMPTY ? 2 : 0);
+  int full_lev_fieldy = lev_fieldy + (BorderElement != EL_EMPTY ? 2 : 0);
+
   boolean emulate_bd = TRUE;	/* unless non-BOULDERDASH elements found */
   boolean emulate_sb = TRUE;	/* unless non-SOKOBAN     elements found */
   boolean emulate_sp = TRUE;	/* unless non-SUPAPLEX    elements found */
@@ -4301,16 +4304,44 @@ void InitGame()
 
 #if NEW_TILESIZE
 
+  // printf("::: START-0: %d, %d\n", lev_fieldx, SCR_FIELDX);
+  // printf("::: START-1: %d, %d\n", SBX_Left, SBX_Right);
+
+#if 1
+  if (full_lev_fieldx <= SCR_FIELDX)
+    SBX_Left = SBX_Right = -1 * (SCR_FIELDX - lev_fieldx) / 2;
+
+  if (full_lev_fieldy <= SCR_FIELDY)
+    SBY_Upper = SBY_Lower = -1 * (SCR_FIELDY - lev_fieldy) / 2;
+#else
   if (lev_fieldx + (SBX_Left < 0 ? 2 : 0) <= SCR_FIELDX)
     SBX_Left = SBX_Right = -1 * (SCR_FIELDX - lev_fieldx) / 2;
 
   if (lev_fieldy + (SBY_Upper < 0 ? 2 : 0) <= SCR_FIELDY)
     SBY_Upper = SBY_Lower = -1 * (SCR_FIELDY - lev_fieldy) / 2;
+#endif
 
+  /*
+  printf("::: START-2: %d, %d (%d)\n", SBX_Left, SBX_Right,
+	 SBX_Right - SBX_Left + 1);
+  */
+
+#if 1
+  if (EVEN(SCR_FIELDX) && full_lev_fieldx > SCR_FIELDX)
+    SBX_Left--;
+  if (EVEN(SCR_FIELDY) && full_lev_fieldy > SCR_FIELDY)
+    SBY_Upper--;
+#else
   if (EVEN(SCR_FIELDX))
     SBX_Left--;
   if (EVEN(SCR_FIELDY))
     SBY_Upper--;
+#endif
+
+  /*
+  printf("::: START-3: %d, %d\n", SBX_Left, SBX_Right);
+  printf("\n");
+  */
 
 #else
 
