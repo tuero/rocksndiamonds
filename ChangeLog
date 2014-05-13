@@ -1,3 +1,6 @@
+2014-05-13
+	* fixed level redraw after quick-loading tape with small tile graphics
+
 2014-03-03
 	* added compatibility code for existing request door animation settings
 

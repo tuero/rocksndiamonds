@@ -4338,10 +4338,10 @@ void InitGame()
     SBY_Upper--;
 #endif
 
-  /*
+#if 0
   printf("::: START-3: %d, %d\n", SBX_Left, SBX_Right);
   printf("\n");
-  */
+#endif
 
 #else
 
@@ -16728,6 +16728,14 @@ static void LoadEngineSnapshotValues_RND()
   }
 }
 
+void FreeEngineSnapshot()
+{
+  FreeEngineSnapshotBuffers();
+
+  setString(&snapshot_level_identifier, NULL);
+  snapshot_level_nr = -1;
+}
+
 void SaveEngineSnapshot()
 {
   /* do not save snapshots from editor */
@@ -16737,6 +16745,25 @@ void SaveEngineSnapshot()
   /* free previous snapshot buffers, if needed */
   FreeEngineSnapshotBuffers();
 
+#if 1
+  /* copy some special values to a structure better suited for the snapshot */
+
+  if (level.game_engine_type == GAME_ENGINE_TYPE_RND)
+    SaveEngineSnapshotValues_RND();
+  if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
+    SaveEngineSnapshotValues_EM();
+  if (level.game_engine_type == GAME_ENGINE_TYPE_SP)
+    SaveEngineSnapshotValues_SP();
+
+  /* save values stored in special snapshot structure */
+
+  if (level.game_engine_type == GAME_ENGINE_TYPE_RND)
+    SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(engine_snapshot_rnd));
+  if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
+    SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(engine_snapshot_em));
+  if (level.game_engine_type == GAME_ENGINE_TYPE_SP)
+    SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(engine_snapshot_sp));
+#else
   /* copy some special values to a structure better suited for the snapshot */
 
   SaveEngineSnapshotValues_RND();
@@ -16748,6 +16775,7 @@ void SaveEngineSnapshot()
   SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(engine_snapshot_rnd));
   SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(engine_snapshot_em));
   SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(engine_snapshot_sp));
+#endif
 
   /* save further RND engine values */
 
@@ -16843,9 +16871,40 @@ void LoadEngineSnapshot()
 
   /* restore special values from snapshot structure */
 
+#if 1
+  if (level.game_engine_type == GAME_ENGINE_TYPE_RND)
+    LoadEngineSnapshotValues_RND();
+  if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
+    LoadEngineSnapshotValues_EM();
+  if (level.game_engine_type == GAME_ENGINE_TYPE_SP)
+    LoadEngineSnapshotValues_SP();
+#else
   LoadEngineSnapshotValues_RND();
   LoadEngineSnapshotValues_EM();
   LoadEngineSnapshotValues_SP();
+#endif
+
+#if 0
+  printf("::: %d, %d (LoadEngineSnapshot / 1)\n", scroll_x, scroll_y);
+#endif
+
+#if 0
+  // needed if tile size was different when saving and loading engine snapshot
+  if (local_player->present)
+  {
+    scroll_x = (local_player->jx < SBX_Left  + MIDPOSX ? SBX_Left :
+		local_player->jx > SBX_Right + MIDPOSX ? SBX_Right :
+		local_player->jx - MIDPOSX);
+
+    scroll_y = (local_player->jy < SBY_Upper + MIDPOSY ? SBY_Upper :
+		local_player->jy > SBY_Lower + MIDPOSY ? SBY_Lower :
+		local_player->jy - MIDPOSY);
+  }
+#endif
+
+#if 0
+  printf("::: %d, %d (LoadEngineSnapshot / 1)\n", scroll_x, scroll_y);
+#endif
 }
 
 boolean CheckEngineSnapshot()

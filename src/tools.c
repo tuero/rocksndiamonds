@@ -296,6 +296,68 @@ void SetDrawtoField(int mode)
   }
 }
 
+#if 1
+
+void RedrawPlayfield(boolean force_redraw, int x, int y, int width, int height)
+{
+  if (game_status == GAME_MODE_PLAYING &&
+      level.game_engine_type == GAME_ENGINE_TYPE_EM)
+  {
+    /* currently there is no partial redraw -- always redraw whole playfield */
+    RedrawPlayfield_EM(TRUE);
+
+    /* blit playfield from scroll buffer to normal back buffer for fading in */
+    BlitScreenToBitmap_EM(backbuffer);
+  }
+  else if (game_status == GAME_MODE_PLAYING &&
+	   level.game_engine_type == GAME_ENGINE_TYPE_SP)
+  {
+    /* currently there is no partial redraw -- always redraw whole playfield */
+    RedrawPlayfield_SP(TRUE);
+
+    /* blit playfield from scroll buffer to normal back buffer for fading in */
+    BlitScreenToBitmap_SP(backbuffer);
+  }
+  else if (game_status == GAME_MODE_PLAYING &&
+	   !game.envelope_active)
+  {
+#if 0
+    DrawLevel();
+#else
+
+    SetMainBackgroundImage(IMG_BACKGROUND_PLAYING);
+    // SetDrawBackgroundMask(REDRAW_FIELD);	// !!! CHECK THIS !!!
+
+    for (x = BX1; x <= BX2; x++)
+      for (y = BY1; y <= BY2; y++)
+	DrawScreenField(x, y);
+
+    redraw_mask |= REDRAW_FIELD;
+#endif
+    DrawAllPlayers();
+
+#if NEW_TILESIZE
+    BlitScreenToBitmap(backbuffer);
+#else
+    /* blit playfield from scroll buffer to normal back buffer */
+    if (setup.soft_scrolling)
+    {
+      int fx = FX, fy = FY;
+
+      fx += (ScreenMovDir & (MV_LEFT|MV_RIGHT) ? ScreenGfxPos : 0);
+      fy += (ScreenMovDir & (MV_UP|MV_DOWN)    ? ScreenGfxPos : 0);
+
+      BlitBitmap(fieldbuffer, backbuffer, fx,fy, SXSIZE,SYSIZE, SX,SY);
+    }
+#endif
+  }
+
+  BlitBitmap(drawto, window, gfx.sx, gfx.sy, gfx.sxsize, gfx.sysize,
+	     gfx.sx, gfx.sy);
+}
+
+#else
+
 void RedrawPlayfield(boolean force_redraw, int x, int y, int width, int height)
 {
   if (game_status == GAME_MODE_PLAYING &&
@@ -361,6 +423,8 @@ void RedrawPlayfield(boolean force_redraw, int x, int y, int width, int height)
 
   BlitBitmap(drawto, window, x, y, width, height, x, y);
 }
+
+#endif
 
 void DrawMaskedBorder_Rect(int x, int y, int width, int height)
 {
@@ -3274,6 +3338,14 @@ void ShowEnvelopeRequest(char *text, unsigned int req_state, int action)
 #if 1
   if (game_status == GAME_MODE_PLAYING)
   {
+#if 1
+    if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
+      BlitScreenToBitmap_EM(backbuffer);
+    else if (level.game_engine_type == GAME_ENGINE_TYPE_SP)
+      BlitScreenToBitmap_SP(backbuffer);
+    else
+      BlitScreenToBitmap(backbuffer);
+#else
     if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
       BlitScreenToBitmap_EM(backbuffer);
     else if (level.game_engine_type == GAME_ENGINE_TYPE_SP)
@@ -3282,6 +3354,7 @@ void ShowEnvelopeRequest(char *text, unsigned int req_state, int action)
     {
       BlitBitmap(fieldbuffer, backbuffer, FX, FY, SXSIZE, SYSIZE, SX, SY);
     }
+#endif
   }
 
   SetDrawtoField(DRAW_BACKBUFFER);
@@ -4778,10 +4851,19 @@ static boolean RequestEnvelope(char *text, unsigned int req_state)
 
   if (game_status == GAME_MODE_PLAYING)
   {
+#if 1
     if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
       BlitScreenToBitmap_EM(backbuffer);
     else if (level.game_engine_type == GAME_ENGINE_TYPE_SP)
       BlitScreenToBitmap_SP(backbuffer);
+    else
+      BlitScreenToBitmap(backbuffer);
+#else
+    if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
+      BlitScreenToBitmap_EM(backbuffer);
+    else if (level.game_engine_type == GAME_ENGINE_TYPE_SP)
+      BlitScreenToBitmap_SP(backbuffer);
+#endif
   }
 
   /* disable deactivated drawing when quick-loading level tape recording */
@@ -11471,6 +11553,16 @@ void ChangeViewportPropertiesIfNeeded()
 #endif
       )
   {
+#if 1
+    // changing tile size invalidates scroll values of engine snapshots
+    if (new_tilesize_var != TILESIZE_VAR)
+    {
+      // printf("::: new_tilesize_var != TILESIZE_VAR\n");
+
+      FreeEngineSnapshot();
+    }
+#endif
+
     SX = new_sx;
     SY = new_sy;
     DX = new_dx;

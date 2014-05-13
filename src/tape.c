@@ -1179,6 +1179,10 @@ void TapeQuickLoad()
 
   if (CheckEngineSnapshot())
   {
+#if 0
+    printf("::: MARK 1\n");
+#endif
+
     TapeStartGamePlaying();
 
     LoadEngineSnapshot();
@@ -1194,6 +1198,10 @@ void TapeQuickLoad()
     if (FrameCounter > 0)
       return;
   }
+
+#if 0
+  printf("::: MARK 2\n");
+#endif
 
   TapeStop();
   TapeErase();

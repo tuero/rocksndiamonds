@@ -1163,7 +1163,9 @@ void HandleButton(int mx, int my, int button, int button_nr)
     case GAME_MODE_PLAYING:
 #ifdef DEBUG
       if (button == MB_PRESSED && !motion_status && IN_GFX_FIELD_PLAY(mx, my))
-	DumpTile(LEVELX((mx - SX) / TILEX), LEVELY((my - SY) / TILEY));
+	DumpTile(LEVELX((mx - SX) / TILESIZE_VAR),
+		 LEVELY((my - SY) / TILESIZE_VAR));
+        // DumpTile(LEVELX((mx - SX) / TILEX), LEVELY((my - SY) / TILEY));
 #endif
       break;
 
