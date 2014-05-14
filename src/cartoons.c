@@ -26,6 +26,9 @@ static void PrepareBackbuffer()
   if (game_status != GAME_MODE_PLAYING)
     return;
 
+#if 1
+  BlitScreenToBitmap(backbuffer);
+#else
   if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
   {
     BlitScreenToBitmap_EM(backbuffer);
@@ -43,6 +46,7 @@ static void PrepareBackbuffer()
 
     BlitBitmap(fieldbuffer, backbuffer, fx, fy, SXSIZE, SYSIZE, SX, SY);
   }
+#endif
 }
 
 boolean ToonNeedsRedraw()

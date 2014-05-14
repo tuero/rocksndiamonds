@@ -1,3 +1,6 @@
+2014-05-14
+	* cleanup of functions RedrawPlayfield() and BlitScreenToBitmap()
+
 2014-05-13
 	* fixed level redraw after quick-loading tape with small tile graphics
 
@@ -81,8 +84,8 @@
 2013-12-11
 	* removed limitation of artwork files to selected file types (this means
 	  that every file type supported by SDL_image and SDL_mixer can be used)
-	* changed default graphics vom PCX to PNG (needed for Android version to
-	  prevent painfully slow loading of images, although not compressing PCX
+	* changed default graphics from PCX to PNG (needed for Android version
+	  to prevent painfully slow image loading, although not compressing PCX
 	  files in the assets directory of the APK package might also work fine)
 	* fixed bug with SDL_BlitSurface creating garbage when source and target
 	  surface are the same (this bug also existed in versions of SDL 1.2.x)

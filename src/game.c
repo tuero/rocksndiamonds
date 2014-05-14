@@ -4507,15 +4507,19 @@ void InitGame()
   {
     InitGameEngine_EM();
 
+#if 0
     /* blit playfield from scroll buffer to normal back buffer for fading in */
     BlitScreenToBitmap_EM(backbuffer);
+#endif
   }
   else if (level.game_engine_type == GAME_ENGINE_TYPE_SP)
   {
     InitGameEngine_SP();
 
+#if 0
     /* blit playfield from scroll buffer to normal back buffer for fading in */
     BlitScreenToBitmap_SP(backbuffer);
+#endif
   }
   else
   {
@@ -4526,16 +4530,26 @@ void InitGame()
     if (game.timegate_time_left == 0)
       CloseAllOpenTimegates();
 
+#if 0
+    /* blit playfield from scroll buffer to normal back buffer for fading in */
 #if NEW_TILESIZE
     BlitScreenToBitmap(backbuffer);
 #else
-    /* blit playfield from scroll buffer to normal back buffer for fading in */
     if (setup.soft_scrolling)
       BlitBitmap(fieldbuffer, backbuffer, FX, FY, SXSIZE, SYSIZE, SX, SY);
 #endif
+#endif
 
+#if 0
     redraw_mask |= REDRAW_FROM_BACKBUFFER;
+#endif
   }
+#if 1
+  /* blit playfield from scroll buffer to normal back buffer for fading in */
+  BlitScreenToBitmap(backbuffer);
+
+  redraw_mask |= REDRAW_FROM_BACKBUFFER;
+#endif
   /* !!! FIX THIS (END) !!! */
 
 #if 1
