@@ -59,10 +59,8 @@ void X11InitVideoBuffer(DrawBuffer **backbuffer, DrawWindow **window)
 
 static void X11InitDisplay()
 {
-#if !defined(PLATFORM_MSDOS)
   XVisualInfo vinfo_template, *vinfo;
   int num_visuals;
-#endif
   unsigned int depth;
 
   /* connect to X server */
@@ -83,7 +81,6 @@ static void X11InitDisplay()
   depth  = DefaultDepth(display, screen);
   cmap   = DefaultColormap(display, screen);
 
-#if !defined(PLATFORM_MSDOS)
   /* look for good enough visual */
   vinfo_template.screen = screen;
   vinfo_template.class = (depth == 8 ? PseudoColor : TrueColor);
@@ -102,7 +99,6 @@ static void X11InitDisplay()
 	   (depth > 8 && visual->class != TrueColor &&
 	    visual->class != DirectColor))
     Error(ERR_EXIT, "X11 display not supported (inappropriate visual)");
-#endif /* !PLATFORM_MSDOS */
 }
 
 static DrawWindow *X11InitWindow()
@@ -111,7 +107,6 @@ static DrawWindow *X11InitWindow()
   unsigned int border_width = 4;
   XGCValues gc_values;
   unsigned int gc_valuemask;
-#if !defined(PLATFORM_MSDOS)
   XTextProperty windowName, iconName;
   Pixmap icon_pixmap, iconmask_pixmap;
   unsigned int icon_width, icon_height;
@@ -123,7 +118,6 @@ static DrawWindow *X11InitWindow()
   char *icon_name = program.window_title;
   int window_event_mask;
   Atom proto_atom = None, delete_atom = None;
-#endif
   int screen_width, screen_height;
   int win_xpos, win_ypos;
   unsigned int pen_fg = WhitePixel(display, screen);
@@ -146,7 +140,6 @@ static DrawWindow *X11InitWindow()
 					     width, height, border_width,
 					     pen_fg, pen_bg);
 
-#if !defined(PLATFORM_MSDOS)
   proto_atom = XInternAtom(display, "WM_PROTOCOLS", FALSE);
   delete_atom = XInternAtom(display, "WM_DELETE_WINDOW", FALSE);
   if ((proto_atom != None) && (delete_atom != None))
@@ -208,7 +201,6 @@ static DrawWindow *X11InitWindow()
     KeyPressMask | KeyReleaseMask;
 
   XSelectInput(display, new_window->drawable, window_event_mask);
-#endif
 
   /* create GC for drawing with window depth and background color (black) */
   gc_values.graphics_exposures = False;

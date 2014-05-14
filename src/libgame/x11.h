@@ -14,7 +14,6 @@
 #ifndef X11_H
 #define X11_H
 
-#if !defined(PLATFORM_MSDOS)
 #define XK_MISCELLANY
 #define XK_LATIN1
 
@@ -24,24 +23,18 @@
 #include <X11/Xos.h>
 #include <X11/Intrinsic.h>
 #include <X11/keysymdef.h>
-#endif
 
 
 /* system dependent definitions */
 
-/* MS-DOS header file also defines "TARGET_STRING" */
-#ifndef TARGET_STRING
 #define TARGET_STRING		"X11"
-#endif
 
-#if defined(PLATFORM_UNIX)
 /* This triggers some stuff that is needed because X11 (XSetClipOrigin(),
    to be precise) is often very slow when preparing a masked XCopyArea()
    for big Pixmaps.
    To prevent this, small (tile-sized) mask Pixmaps are created which will
    then be set much faster with XSetClipOrigin() and speed things up a lot. */
 #define TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND
-#endif
 
 #define WINDOW_SCALING_STATUS	WINDOW_SCALING_NOT_AVAILABLE
 #define FULLSCREEN_STATUS	FULLSCREEN_NOT_AVAILABLE

@@ -22,8 +22,6 @@
 #include "macosx.h"
 #elif defined(PLATFORM_WIN32)
 #include "windows.h"
-#elif defined(PLATFORM_MSDOS)
-#include "msdos.h"
 #elif defined(PLATFORM_ANDROID)
 #include "android.h"
 #endif
@@ -415,15 +413,9 @@
 #define DOCS_DIRECTORY		"docs"
 #define CACHE_DIRECTORY		"cache"
 
-#if !defined(PLATFORM_MSDOS)
 #define GFX_CLASSIC_SUBDIR	"gfx_classic"
 #define SND_CLASSIC_SUBDIR	"snd_classic"
 #define MUS_CLASSIC_SUBDIR	"mus_classic"
-#else
-#define GFX_CLASSIC_SUBDIR	"gfx_orig"
-#define SND_CLASSIC_SUBDIR	"snd_orig"
-#define MUS_CLASSIC_SUBDIR	"mus_orig"
-#endif
 
 #if defined(CREATE_SPECIAL_EDITION_RND_JUE)
 #define GFX_DEFAULT_SUBDIR	"jue0"
@@ -442,7 +434,6 @@
 #endif
 
 /* file names and filename extensions */
-#if !defined(PLATFORM_MSDOS)
 #define LEVELSETUP_DIRECTORY	"levelsetup"
 #define SETUP_FILENAME		"setup.conf"
 #define LEVELSETUP_FILENAME	"levelsetup.conf"
@@ -458,23 +449,6 @@
 #define LEVELFILE_EXTENSION	"level"
 #define TAPEFILE_EXTENSION	"tape"
 #define SCOREFILE_EXTENSION	"score"
-#else
-#define LEVELSETUP_DIRECTORY	"lvlsetup"
-#define SETUP_FILENAME		"setup.cnf"
-#define LEVELSETUP_FILENAME	"lvlsetup.cnf"
-#define EDITORSETUP_FILENAME	"edsetup.cnf"
-#define EDITORCASCADE_FILENAME	"edcascad.conf"
-#define HELPANIM_FILENAME	"helpanim.cnf"
-#define HELPTEXT_FILENAME	"helptext.cnf"
-#define LEVELINFO_FILENAME	"lvlinfo.cnf"
-#define GRAPHICSINFO_FILENAME	"gfxinfo.cnf"
-#define SOUNDSINFO_FILENAME	"sndinfo.cnf"
-#define MUSICINFO_FILENAME	"musinfo.cnf"
-#define ARTWORKINFO_CACHE_FILE	"artinfo.cac"
-#define LEVELFILE_EXTENSION	"lvl"
-#define TAPEFILE_EXTENSION	"tap"
-#define SCOREFILE_EXTENSION	"sco"
-#endif
 
 #define ERROR_BASENAME		"stderr.txt"
 
@@ -487,7 +461,7 @@
 #define STRING_NEWLINE_UNIX		"\n"
 #define STRING_NEWLINE_DOS		"\r\n"
 
-#if defined(PLATFORM_WIN32) || defined(PLATFORM_MSDOS)
+#if defined(PLATFORM_WIN32)
 #define CHAR_PATH_SEPARATOR	CHAR_PATH_SEPARATOR_DOS
 #define STRING_PATH_SEPARATOR	STRING_PATH_SEPARATOR_DOS
 #define STRING_NEWLINE		STRING_NEWLINE_DOS
@@ -709,7 +683,6 @@ struct ProgramInfo
   char *x11_icon_filename;
   char *x11_iconmask_filename;
   char *sdl_icon_filename;
-  char *msdos_cursor_filename;
 
   char *cookie_prefix;
   char *filename_prefix;	/* prefix to cut off from DOS filenames */
@@ -1309,7 +1282,7 @@ extern int			FrameCounter;
 
 #if 1
 void InitProgramInfo(char *, char *, char *, char *, char *, char *, char *,
-		     char *, char *, char *, char *, int);
+		     char *, char *, char *, int);
 #else
 void InitProgramInfo(char *, char *, char *, char *, char *, char *, char *,
 		     char *, char *, char *, char *, char *, int);

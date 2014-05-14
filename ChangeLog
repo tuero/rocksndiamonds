@@ -1,3 +1,6 @@
+2014-05-15
+	* removed MS-DOS support
+
 2014-05-14
 	* cleanup of functions RedrawPlayfield() and BlitScreenToBitmap()
 

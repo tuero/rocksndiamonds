@@ -21,7 +21,6 @@ SRCS =	system.c	\
 	hash.c		\
 	setup.c		\
 	misc.c		\
-	msdos.c		\
 	x11.c		\
 	sdl.c
 
@@ -38,7 +37,6 @@ OBJS =	system.o	\
 	hash.o		\
 	setup.o		\
 	misc.o		\
-	msdos.o		\
 	x11.o		\
 	sdl.o
 

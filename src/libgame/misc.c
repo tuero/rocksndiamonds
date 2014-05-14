@@ -223,18 +223,6 @@ boolean getTokenValueFromString(char *string, char **token, char **value)
 /* counter functions                                                         */
 /* ------------------------------------------------------------------------- */
 
-#if defined(PLATFORM_MSDOS)
-volatile unsigned int counter = 0;
-
-void increment_counter()
-{
-  counter++;
-}
-
-END_OF_FUNCTION(increment_counter);
-#endif
-
-
 /* maximal allowed length of a command line option */
 #define MAX_OPTION_LEN		256
 
@@ -323,22 +311,12 @@ static unsigned int mainCounter(int mode)
 
 void InitCounter()		/* set counter back to zero */
 {
-#if !defined(PLATFORM_MSDOS)
   mainCounter(INIT_COUNTER);
-#else
-  LOCK_VARIABLE(counter);
-  LOCK_FUNCTION(increment_counter);
-  install_int_ex(increment_counter, BPS_TO_TIMER(100));
-#endif
 }
 
 unsigned int Counter()	/* get milliseconds since last call of InitCounter() */
 {
-#if !defined(PLATFORM_MSDOS)
   return mainCounter(READ_COUNTER);
-#else
-  return (counter * 10);
-#endif
 }
 
 static void sleep_milliseconds(unsigned int milliseconds_delay)
@@ -474,7 +452,7 @@ unsigned int get_random_number(int nr, int max)
 /* system info functions                                                     */
 /* ------------------------------------------------------------------------- */
 
-#if !defined(PLATFORM_MSDOS) && !defined(PLATFORM_ANDROID)
+#if !defined(PLATFORM_ANDROID)
 static char *get_corrected_real_name(char *real_name)
 {
   char *real_name_new = checked_malloc(MAX_USERNAME_LEN + 1);

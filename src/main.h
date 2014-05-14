@@ -2099,7 +2099,7 @@
 #define USERDATA_DIRECTORY_WIN32	PROGRAM_TITLE_STRING
 #define USERDATA_DIRECTORY_MACOSX	PROGRAM_TITLE_STRING
 #define USERDATA_DIRECTORY_UNIX		PROGRAM_UNIX_DATADIR_STRING
-#define USERDATA_DIRECTORY_DOS		"userdata"
+#define USERDATA_DIRECTORY_OTHER	"userdata"
 
 #if defined(PLATFORM_WIN32)
 #define USERDATA_DIRECTORY		USERDATA_DIRECTORY_WIN32
@@ -2108,13 +2108,12 @@
 #elif defined(PLATFORM_UNIX)
 #define USERDATA_DIRECTORY		USERDATA_DIRECTORY_UNIX
 #else
-#define USERDATA_DIRECTORY		USERDATA_DIRECTORY_DOS
+#define USERDATA_DIRECTORY		USERDATA_DIRECTORY_OTHER
 #endif
 
 #define X11_ICON_FILENAME		"rocks_icon.xbm"
 #define X11_ICONMASK_FILENAME		"rocks_iconmask.xbm"
 #define SDL_ICON_FILENAME		"RocksIcon32x32.png"
-#define MSDOS_POINTER_FILENAME		"mouse.pcx"
 
 /* file version numbers for resource files (levels, tapes, score, setup, etc.)
 ** currently supported/known file version numbers:

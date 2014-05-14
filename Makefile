@@ -41,8 +41,7 @@ X11_PATH = /usr/X11R6
 # uncomment to install game in single-user environment (default)
 # SCORE_ENTRIES = MANY_PER_NAME
 
-# paths for cross-compiling (only needed for non-native MS-DOS and Win32 build)
-CROSS_PATH_MSDOS = /usr/local/cross-msdos/i386-msdosdjgpp
+# path for cross-compiling (only needed for non-native Windows build)
 CROSS_PATH_WIN32 = /usr/local/cross-tools/i386-mingw32msvc
 
 # compile special edition of R'n'D instead of the normal (classic) version
@@ -93,14 +92,8 @@ mac-static:
 mac2-static:
 	@$(MAKE_CMD) PLATFORM=macosx TARGET=sdl2-static
 
-msdos:
-	@$(MAKE_CMD) PLATFORM=msdos
-
 os2:
 	@$(MAKE_CMD) PLATFORM=os2
-
-cross-msdos:
-	@PATH=$(CROSS_PATH_MSDOS)/bin:${PATH} $(MAKE_CMD) PLATFORM=cross-msdos
 
 cross-win32:
 	@PATH=$(CROSS_PATH_WIN32)/bin:${PATH} $(MAKE_CMD) PLATFORM=cross-win32
@@ -172,9 +165,6 @@ dist-clean:
 dist-build-unix:
 	@BUILD_DIST=TRUE $(MAKE)
 
-dist-build-msdos:
-	@BUILD_DIST=TRUE $(MAKE) cross-msdos
-
 dist-build-win32:
 	@BUILD_DIST=TRUE $(MAKE) cross-win32
 
@@ -187,9 +177,6 @@ dist-build-macosx-ppc:
 dist-package-unix:
 	./Scripts/make_dist.sh unix .
 
-dist-package-msdos:
-	./Scripts/make_dist.sh dos .
-
 dist-package-win32:
 	./Scripts/make_dist.sh win .
 
@@ -201,9 +188,6 @@ dist-package-macosx-ppc:
 
 dist-upload-unix:
 	./Scripts/make_dist.sh unix . upload
-
-dist-upload-msdos:
-	./Scripts/make_dist.sh dos . upload
 
 dist-upload-win32:
 	./Scripts/make_dist.sh win . upload
@@ -218,21 +202,18 @@ dist-build-all:
 	$(MAKE) clean
 	$(MAKE) dist-build-unix		; $(MAKE) dist-clean
 	$(MAKE) dist-build-win32	; $(MAKE) dist-clean
-#	$(MAKE) dist-build-msdos	; $(MAKE) dist-clean
 
 dist-package-all:
 	$(MAKE) dist-package-unix
 	$(MAKE) dist-package-win32
 	$(MAKE) dist-package-macosx
 	$(MAKE) dist-package-macosx-ppc
-#	$(MAKE) dist-package-msdos
 
 dist-upload-all:
 	$(MAKE) dist-upload-unix
 	$(MAKE) dist-upload-win32
 	$(MAKE) dist-upload-macosx
 	$(MAKE) dist-upload-macosx-ppc
-#	$(MAKE) dist-upload-msdos
 
 dist-all: dist-build-all dist-package-all
 

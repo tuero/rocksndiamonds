@@ -18,10 +18,7 @@
 /* define main platform keywords                                             */
 /* ========================================================================= */
 
-#if defined(MSDOS)
-#define PLATFORM_MSDOS
-#define PLATFORM_STRING "DOS"
-#elif defined(WIN32) || defined(_WIN32)
+#if defined(WIN32) || defined(_WIN32)
 #define PLATFORM_WIN32
 #define PLATFORM_STRING "Windows"
 #else
@@ -162,15 +159,6 @@
 /* ========================================================================= */
 /* define additional target keywords                                         */
 /* ========================================================================= */
-
-#if defined(PLATFORM_MSDOS)
-#ifndef TARGET_ALLEGRO
-#define TARGET_ALLEGRO
-#endif
-#ifndef TARGET_X11
-#define TARGET_X11
-#endif
-#endif
 
 #if defined(PLATFORM_UNIX) && defined(TARGET_X11)
 #define TARGET_X11_NATIVE

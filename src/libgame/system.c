@@ -16,10 +16,6 @@
 
 #include "platform.h"
 
-#if defined(PLATFORM_MSDOS)
-#include <fcntl.h>
-#endif
-
 #include "system.h"
 #include "image.h"
 #include "sound.h"
@@ -81,7 +77,7 @@ void InitProgramInfo(char *argv0,
 #endif
 		     char *icon_title,
 		     char *x11_icon_filename, char *x11_iconmask_filename,
-		     char *sdl_icon_filename, char *msdos_cursor_filename,
+		     char *sdl_icon_filename,
 		     char *cookie_prefix, char *filename_prefix,
 		     int program_version)
 {
@@ -103,7 +99,6 @@ void InitProgramInfo(char *argv0,
   program.x11_icon_filename = x11_icon_filename;
   program.x11_iconmask_filename = x11_iconmask_filename;
   program.sdl_icon_filename = sdl_icon_filename;
-  program.msdos_cursor_filename = msdos_cursor_filename;
 
   program.cookie_prefix = cookie_prefix;
   program.filename_prefix = filename_prefix;
@@ -154,10 +149,6 @@ void InitPlatformDependentStuff(void)
   // this is initialized in GetOptions(), but may already be used before
   options.verbose = TRUE;
 
-#if defined(PLATFORM_MSDOS)
-  _fmode = O_BINARY;
-#endif
-
 #if defined(PLATFORM_MACOSX)
   updateUserGameDataDir();
 #endif
@@ -186,12 +177,8 @@ void InitPlatformDependentStuff(void)
 
 void ClosePlatformDependentStuff(void)
 {
-#if defined(PLATFORM_WIN32) || defined(PLATFORM_MSDOS)
+#if defined(PLATFORM_WIN32)
   closeErrorFile();
-#endif
-
-#if defined(PLATFORM_MSDOS)
-  dumpErrorFile();
 #endif
 }
 
@@ -1489,8 +1476,8 @@ void ScaleBitmap(Bitmap *old_bitmap, int zoom_factor)
 /* mouse pointer functions                                                   */
 /* ------------------------------------------------------------------------- */
 
-#if !defined(PLATFORM_MSDOS)
 #define USE_ONE_PIXEL_PLAYFIELD_MOUSEPOINTER		0
+
 /* XPM image definitions */
 static const char *cursor_image_none[] =
 {
@@ -1523,6 +1510,7 @@ static const char *cursor_image_none[] =
   /* hot spot */
   "0,0"
 };
+
 #if USE_ONE_PIXEL_PLAYFIELD_MOUSEPOINTER
 static const char *cursor_image_dot[] =
 {
@@ -1614,11 +1602,9 @@ static struct MouseCursorInfo *get_cursor_from_image(const char **image)
 
   return cursor;
 }
-#endif	/* !PLATFORM_MSDOS */
 
 void SetMouseCursor(int mode)
 {
-#if !defined(PLATFORM_MSDOS)
   static struct MouseCursorInfo *cursor_none = NULL;
   static struct MouseCursorInfo *cursor_playfield = NULL;
   struct MouseCursorInfo *cursor_new;
@@ -1637,7 +1623,6 @@ void SetMouseCursor(int mode)
   SDLSetMouseCursor(cursor_new);
 #elif defined(TARGET_X11_NATIVE)
   X11SetMouseCursor(cursor_new);
-#endif
 #endif
 }
 
@@ -1669,8 +1654,6 @@ void OpenAudio(void)
   SDLOpenAudio();
 #elif defined(PLATFORM_UNIX)
   UnixOpenAudio();
-#elif defined(PLATFORM_MSDOS)
-  MSDOSOpenAudio();
 #endif
 }
 
@@ -1680,8 +1663,6 @@ void CloseAudio(void)
   SDLCloseAudio();
 #elif defined(PLATFORM_UNIX)
   UnixCloseAudio();
-#elif defined(PLATFORM_MSDOS)
-  MSDOSCloseAudio();
 #endif
 
   audio.sound_enabled = FALSE;
@@ -1886,8 +1867,6 @@ void InitJoysticks()
   SDLInitJoysticks();
 #elif defined(PLATFORM_UNIX)
   UnixInitJoysticks();
-#elif defined(PLATFORM_MSDOS)
-  MSDOSInitJoysticks();
 #endif
 
 #if 0
@@ -1902,7 +1881,5 @@ boolean ReadJoystick(int nr, int *x, int *y, boolean *b1, boolean *b2)
   return SDLReadJoystick(nr, x, y, b1, b2);
 #elif defined(PLATFORM_UNIX)
   return UnixReadJoystick(nr, x, y, b1, b2);
-#elif defined(PLATFORM_MSDOS)
-  return MSDOSReadJoystick(nr, x, y, b1, b2);
 #endif
 }

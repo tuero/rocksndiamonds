@@ -600,31 +600,6 @@ static char *getCorrectedArtworkBasename(char *basename)
 {
   char *basename_corrected = basename;
 
-#if defined(PLATFORM_MSDOS)
-  if (program.filename_prefix != NULL)
-  {
-    int prefix_len = strlen(program.filename_prefix);
-
-    if (strncmp(basename, program.filename_prefix, prefix_len) == 0)
-      basename_corrected = &basename[prefix_len];
-
-    /* if corrected filename is still longer than standard MS-DOS filename
-       size (8 characters + 1 dot + 3 characters file extension), shorten
-       filename by writing file extension after 8th basename character */
-    if (strlen(basename_corrected) > 8 + 1 + 3)
-    {
-      static char *msdos_filename = NULL;
-
-      checked_free(msdos_filename);
-
-      msdos_filename = getStringCopy(basename_corrected);
-      strncpy(&msdos_filename[8], &basename[strlen(basename) - (1+3)], 1+3 +1);
-
-      basename_corrected = msdos_filename;
-    }
-  }
-#endif
-
   return basename_corrected;
 }
 

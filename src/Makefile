@@ -10,12 +10,8 @@
 
 .EXPORT_ALL_VARIABLES:
 
-ifndef PLATFORM				# unknown platform -- try auto detection
-ifdef COMSPEC
-PLATFORM = msdos
-else
+ifndef PLATFORM				# unknown platform -- default to Unix
 PLATFORM = unix
-endif
 endif
 
 ifdef X11_PATH				# path to X11 from top level Makefile
@@ -79,20 +75,6 @@ EXTRA_LDFLAGS = -lshfolder -lwsock32
 TARGET = sdl2
 endif
 
-ifeq ($(PLATFORM),cross-msdos)		# cross-compiling to MS-DOS
-PROGBASE = rocks
-PROGNAME = ../$(PROGBASE).exe
-TARGET = allegro
-endif
-
-ifeq ($(PLATFORM),msdos)		# native compiling to MS-DOS
-PROGBASE = rocks
-PROGNAME = ../$(PROGBASE).exe
-SYS_CFLAGS = -DTARGET_X11
-SYS_LDFLAGS = -s -lalleg
-RM = del
-endif
-
 
 # -----------------------------------------------------------------------------
 # configuring target
@@ -125,11 +107,6 @@ ifeq ($(TARGET),sdl2-static)		# compiling for SDL2 target (static)
 SYS_CFLAGS = -DTARGET_SDL2 $(shell sdl2-config --cflags)
 SDL_LIBS = -lSDL2_image -lSDL2_mixer -lSDL2_net -lsmpeg2 -lmikmod
 SYS_LDFLAGS = $(SDL_LIBS) $(shell sdl2-config --static-libs)
-endif
-
-ifeq ($(TARGET),allegro)		# compiling for Allegro target
-SYS_CFLAGS = -DTARGET_ALLEGRO -I$(CROSS_PATH_MSDOS)/include
-SYS_LDFLAGS = -lalleg
 endif
 
 

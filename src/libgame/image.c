@@ -23,8 +23,6 @@
 
 #if defined(TARGET_X11)
 
-/* for MS-DOS/Allegro, exclude all except newImage() and freeImage() */
-
 Image *newImage(unsigned int width, unsigned int height, unsigned int depth)
 {
   Image *image;
@@ -54,8 +52,6 @@ void freeImage(Image *image)
   free(image->data);
   free(image);
 }
-
-#if defined(PLATFORM_UNIX)
 
 /* extra colors to try allocating in private color maps to minimize flashing */
 #define NOFLASH_COLORS 256
@@ -807,7 +803,6 @@ int Read_PCX_to_Pixmap(Display *display, Window window, GC gc, char *filename,
   return PCX_Success;
 }
 
-#endif	/* PLATFORM_UNIX */
 #endif	/* TARGET_X11 */
 
 
