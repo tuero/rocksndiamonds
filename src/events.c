@@ -363,14 +363,6 @@ void SleepWhileUnmapped()
 
 void HandleExposeEvent(ExposeEvent *event)
 {
-#if !defined(TARGET_SDL)
-#if 1
-  RedrawPlayfield();
-#else
-  RedrawPlayfield(FALSE, event->x, event->y, event->width, event->height);
-#endif
-  FlushDisplay();
-#endif
 }
 
 void HandleButtonEvent(ButtonEvent *event)

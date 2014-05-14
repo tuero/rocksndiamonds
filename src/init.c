@@ -1753,14 +1753,6 @@ static void InitGraphicInfo()
   int num_images = getImageListSize();
   int i;
 
-#if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
-  static boolean clipmasks_initialized = FALSE;
-  Pixmap src_pixmap;
-  XGCValues clip_gc_values;
-  unsigned int clip_gc_valuemask;
-  GC copy_clipmask_gc = None;
-#endif
-
   /* use image size as default values for width and height for these images */
   static int full_size_graphics[] =
   {
@@ -1833,22 +1825,6 @@ static void InitGraphicInfo()
   /* initialize "use_image_size" flag from static configuration above */
   for (i = 0; full_size_graphics[i] != -1; i++)
     graphic_info[full_size_graphics[i]].use_image_size = TRUE;
-#endif
-
-#if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
-  if (clipmasks_initialized)
-  {
-    for (i = 0; i < num_images; i++)
-    {
-      if (graphic_info[i].clip_mask)
-	XFreePixmap(display, graphic_info[i].clip_mask);
-      if (graphic_info[i].clip_gc)
-	XFreeGC(display, graphic_info[i].clip_gc);
-
-      graphic_info[i].clip_mask = None;
-      graphic_info[i].clip_gc = None;
-    }
-  }
 #endif
 
   /* first set all graphic paramaters ... */
@@ -1943,41 +1919,7 @@ static void InitGraphicInfo()
 
       graphic_info[i] = graphic_info[fallback_graphic];
     }
-
-#if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
-    /* currently we only need a tile clip mask from the first frame */
-    getFixedGraphicSource(i, first_frame, &src_bitmap, &src_x, &src_y);
-
-    if (copy_clipmask_gc == None)
-    {
-      clip_gc_values.graphics_exposures = False;
-      clip_gc_valuemask = GCGraphicsExposures;
-      copy_clipmask_gc = XCreateGC(display, src_bitmap->clip_mask,
-				   clip_gc_valuemask, &clip_gc_values);
-    }
-
-    graphic_info[i].clip_mask =
-      XCreatePixmap(display, window->drawable, TILEX, TILEY, 1);
-
-    src_pixmap = src_bitmap->clip_mask;
-    XCopyArea(display, src_pixmap, graphic_info[i].clip_mask,
-	      copy_clipmask_gc, src_x, src_y, TILEX, TILEY, 0, 0);
-
-    clip_gc_values.graphics_exposures = False;
-    clip_gc_values.clip_mask = graphic_info[i].clip_mask;
-    clip_gc_valuemask = GCGraphicsExposures | GCClipMask;
-
-    graphic_info[i].clip_gc =
-      XCreateGC(display, window->drawable, clip_gc_valuemask, &clip_gc_values);
-#endif
   }
-
-#if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
-  if (copy_clipmask_gc)
-    XFreeGC(display, copy_clipmask_gc);
-
-  clipmasks_initialized = TRUE;
-#endif
 }
 
 static void InitGraphicCompatibilityInfo()

@@ -72,11 +72,6 @@
 #define JOY_BUTTON_NEW_PRESSED	2
 #define JOY_BUTTON_NEW_RELEASED	3
 
-#if defined(PLATFORM_UNIX)
-void UnixInitJoysticks(void);
-boolean UnixReadJoystick(int, int *, int *, boolean *, boolean *);
-#endif
-
 char *getJoyNameFromJoySymbol(int);
 int getJoySymbolFromJoyName(char *);
 int getJoystickNrFromDeviceName(char *);

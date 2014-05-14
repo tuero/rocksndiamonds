@@ -22,90 +22,6 @@
 /* font functions                                                            */
 /* ========================================================================= */
 
-#if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
-static GC	font_clip_gc = None;
-
-static void InitFontClipmasks()
-{
-  XGCValues clip_gc_values;
-  unsigned int clip_gc_valuemask;
-  GC copy_clipmask_gc;
-  int i, j;
-
-  /* This stuff is needed because X11 (XSetClipOrigin(), to be precise) is
-     often very slow when preparing a masked XCopyArea() for big Pixmaps.
-     To prevent this, create small (tile-sized) mask Pixmaps which will then
-     be set much faster with XSetClipOrigin() and speed things up a lot. */
-
-  clip_gc_values.graphics_exposures = False;
-  clip_gc_valuemask = GCGraphicsExposures;
-  font_clip_gc = XCreateGC(display, window->drawable,
-			   clip_gc_valuemask, &clip_gc_values);
-
-  /* create graphic context structures needed for clipping */
-  clip_gc_values.graphics_exposures = False;
-  clip_gc_valuemask = GCGraphicsExposures;
-  copy_clipmask_gc = XCreateGC(display,
-			       gfx.font_bitmap_info[0].bitmap->clip_mask,
-			       clip_gc_valuemask, &clip_gc_values);
-
-  /* create only those clipping Pixmaps we really need */
-  for (i = 0; i < gfx.num_fonts; i++)
-  {
-    if (gfx.font_bitmap_info[i].bitmap == NULL)
-      continue;
-
-    gfx.font_bitmap_info[i].clip_mask =
-      checked_calloc(gfx.font_bitmap_info[i].num_chars * sizeof(Pixmap));
-
-    for (j = 0; j < gfx.font_bitmap_info[i].num_chars; j++)
-    {
-      Bitmap *src_bitmap = gfx.font_bitmap_info[i].bitmap;
-      Pixmap src_pixmap = src_bitmap->clip_mask;
-      int xpos = j % gfx.font_bitmap_info[i].num_chars_per_line;
-      int ypos = j / gfx.font_bitmap_info[i].num_chars_per_line;
-      int width  = gfx.font_bitmap_info[i].width;
-      int height = gfx.font_bitmap_info[i].height;
-      int src_x = gfx.font_bitmap_info[i].src_x + xpos * width;
-      int src_y = gfx.font_bitmap_info[i].src_y + ypos * height;
-
-      gfx.font_bitmap_info[i].clip_mask[j] =
-	XCreatePixmap(display, window->drawable, width, height, 1);
-
-      XCopyArea(display, src_pixmap, gfx.font_bitmap_info[i].clip_mask[j],
-		copy_clipmask_gc, src_x, src_y, width, height, 0, 0);
-    }
-  }
-
-  XFreeGC(display, copy_clipmask_gc);
-}
-
-static void FreeFontClipmasks()
-{
-  int i, j;
-
-  if (gfx.num_fonts == 0 || gfx.font_bitmap_info[0].bitmap == NULL)
-    return;
-
-  for (i = 0; i < gfx.num_fonts; i++)
-  {
-    if (gfx.font_bitmap_info[i].clip_mask)
-    {
-      for (j = 0; j < gfx.font_bitmap_info[i].num_chars; j++)
-	XFreePixmap(display, gfx.font_bitmap_info[i].clip_mask[j]);
-      free(gfx.font_bitmap_info[i].clip_mask);
-    }
-
-    gfx.font_bitmap_info[i].clip_mask = NULL;
-    gfx.font_bitmap_info[i].num_chars = 0;
-  }
-
-  if (font_clip_gc)
-    XFreeGC(display, font_clip_gc);
-  font_clip_gc = None;
-}
-#endif /* TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND */
-
 void InitFontInfo(struct FontBitmapInfo *font_bitmap_info, int num_fonts,
 		  int (*select_font_function)(int),
 		  int (*get_font_from_token_function)(char *))
@@ -114,20 +30,12 @@ void InitFontInfo(struct FontBitmapInfo *font_bitmap_info, int num_fonts,
   gfx.font_bitmap_info = font_bitmap_info;
   gfx.select_font_function = select_font_function;
   gfx.get_font_from_token_function = get_font_from_token_function;
-
-#if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
-  InitFontClipmasks();
-#endif
 }
 
 void FreeFontInfo(struct FontBitmapInfo *font_bitmap_info)
 {
   if (font_bitmap_info == NULL)
     return;
-
-#if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
-  FreeFontClipmasks();
-#endif
 
   free(font_bitmap_info);
 }
@@ -475,18 +383,8 @@ void DrawTextExt(DrawBuffer *dst_bitmap, int dst_x, int dst_y, char *text,
 				   font_width, font_height);
       }
 
-#if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
-      /* use special font tile clipmasks */
-      {
-	int font_pos = getFontCharPosition(font_nr, c);
-
-	SetClipMask(src_bitmap, font_clip_gc, font->clip_mask[font_pos]);
-	SetClipOrigin(src_bitmap, font_clip_gc, dst_x, dst_y);
-      }
-#else
       SetClipOrigin(src_bitmap, src_bitmap->stored_clip_gc,
 		    dst_x - src_x, dst_y - src_y);
-#endif
 
       BlitBitmapMasked(src_bitmap, dst_bitmap, src_x, src_y,
 		       font_width, font_height, dst_x, dst_y);

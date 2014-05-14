@@ -17,10 +17,6 @@
 #include "system.h"
 
 
-#if defined(PLATFORM_UNIX) && !defined(TARGET_SDL)
-#define AUDIO_UNIX_NATIVE
-#endif
-
 #if defined(PLATFORM_LINUX) || defined(PLATFORM_FREEBSD) || defined(VOXWARE)
 #define AUDIO_LINUX_IOCTL
 #endif
@@ -109,8 +105,6 @@
 #define SOUND_MIN_VOLUME		0
 #if defined(TARGET_SDL)
 #define SOUND_MAX_VOLUME		SDL_MIX_MAXVOLUME
-#elif defined(TARGET_ALLEGRO)
-#define SOUND_MAX_VOLUME		255
 #else
 #define SOUND_MAX_VOLUME		128
 #endif

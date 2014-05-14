@@ -1,5 +1,6 @@
 2014-05-15
 	* removed MS-DOS support
+	* removed native X11 support (X11 now only supported via SDL/SDL2)
 
 2014-05-14
 	* cleanup of functions RedrawPlayfield() and BlitScreenToBitmap()

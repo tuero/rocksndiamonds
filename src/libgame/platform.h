@@ -160,10 +160,6 @@
 /* define additional target keywords                                         */
 /* ========================================================================= */
 
-#if defined(PLATFORM_UNIX) && defined(TARGET_X11)
-#define TARGET_X11_NATIVE
-#endif
-
 #if defined(TARGET_SDL2)
 #ifndef TARGET_SDL
 #define TARGET_SDL

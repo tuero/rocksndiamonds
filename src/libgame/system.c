@@ -71,14 +71,8 @@ int			FrameCounter = 0;
 
 void InitProgramInfo(char *argv0,
 		     char *userdata_subdir, char *userdata_subdir_unix,
-		     char *program_title,
-#if 0
-		     char *window_title,
-#endif
-		     char *icon_title,
-		     char *x11_icon_filename, char *x11_iconmask_filename,
-		     char *sdl_icon_filename,
-		     char *cookie_prefix, char *filename_prefix,
+		     char *program_title, char *icon_title,
+		     char *sdl_icon_filename, char *cookie_prefix,
 		     int program_version)
 {
   program.command_basepath = getBasePath(argv0);
@@ -89,19 +83,12 @@ void InitProgramInfo(char *argv0,
   program.userdata_path = getUserGameDataDir();
 
   program.program_title = program_title;
-#if 1
   program.window_title = "(undefined)";
-#else
-  program.window_title = window_title;
-#endif
   program.icon_title = icon_title;
 
-  program.x11_icon_filename = x11_icon_filename;
-  program.x11_iconmask_filename = x11_iconmask_filename;
   program.sdl_icon_filename = sdl_icon_filename;
 
   program.cookie_prefix = cookie_prefix;
-  program.filename_prefix = filename_prefix;
 
   program.version_major = VERSION_MAJOR(program_version);
   program.version_minor = VERSION_MINOR(program_version);
@@ -408,24 +395,15 @@ inline static int GetRealDepth(int depth)
 inline static void sysFillRectangle(Bitmap *bitmap, int x, int y,
 			       int width, int height, Pixel color)
 {
-#if defined(TARGET_SDL)
   SDLFillRectangle(bitmap, x, y, width, height, color);
-#else
-  X11FillRectangle(bitmap, x, y, width, height, color);
-#endif
 }
 
 inline static void sysCopyArea(Bitmap *src_bitmap, Bitmap *dst_bitmap,
 			       int src_x, int src_y, int width, int height,
 			       int dst_x, int dst_y, int mask_mode)
 {
-#if defined(TARGET_SDL)
   SDLCopyArea(src_bitmap, dst_bitmap, src_x, src_y, width, height,
 	      dst_x, dst_y, mask_mode);
-#else
-  X11CopyArea(src_bitmap, dst_bitmap, src_x, src_y, width, height,
-	      dst_x, dst_y, mask_mode);
-#endif
 }
 
 void LimitScreenUpdates(boolean enable)
@@ -437,11 +415,7 @@ void LimitScreenUpdates(boolean enable)
 
 void InitVideoDisplay(void)
 {
-#if defined(TARGET_SDL)
   SDLInitVideoDisplay();
-#else
-  X11InitVideoDisplay();
-#endif
 }
 
 void CloseVideoDisplay(void)
@@ -476,11 +450,7 @@ void InitVideoBuffer(int width, int height, int depth, boolean fullscreen)
 
   video.window_scaling_available = WINDOW_SCALING_STATUS;
 
-#if defined(TARGET_SDL)
   SDLInitVideoBuffer(&backbuffer, &window, fullscreen);
-#else
-  X11InitVideoBuffer(&backbuffer, &window);
-#endif
 
   drawto = backbuffer;
 }
@@ -490,11 +460,7 @@ inline static void FreeBitmapPointers(Bitmap *bitmap)
   if (bitmap == NULL)
     return;
 
-#if defined(TARGET_SDL)
   SDLFreeBitmapPointers(bitmap);
-#else
-  X11FreeBitmapPointers(bitmap);
-#endif
 
   checked_free(bitmap->source_filename);
   bitmap->source_filename = NULL;
@@ -523,11 +489,7 @@ void FreeBitmap(Bitmap *bitmap)
 
 Bitmap *CreateBitmapStruct(void)
 {
-#if defined(TARGET_SDL)
   return checked_calloc(sizeof(struct SDLSurfaceInfo));
-#else
-  return checked_calloc(sizeof(struct X11DrawableInfo));
-#endif
 }
 
 Bitmap *CreateBitmap(int width, int height, int depth)
@@ -537,11 +499,7 @@ Bitmap *CreateBitmap(int width, int height, int depth)
   int real_height = MAX(1, height);	/* prevent zero bitmap height */
   int real_depth  = GetRealDepth(depth);
 
-#if defined(TARGET_SDL)
   SDLCreateBitmapContent(new_bitmap, real_width, real_height, real_depth);
-#else
-  X11CreateBitmapContent(new_bitmap, real_width, real_height, real_depth);
-#endif
 
   new_bitmap->width  = real_width;
   new_bitmap->height = real_height;
@@ -566,9 +524,6 @@ void ReCreateBitmap(Bitmap **bitmap, int width, int height, int depth)
 
 void CloseWindow(DrawWindow *window)
 {
-#if defined(TARGET_X11)
-  X11CloseWindow(window);
-#endif
 }
 
 inline static boolean CheckDrawingArea(int x, int y, int width, int height,
@@ -854,13 +809,8 @@ void FadeRectangle(Bitmap *bitmap_cross, int x, int y, int width, int height,
     return;
 #endif
 
-#if defined(TARGET_SDL)
   SDLFadeRectangle(bitmap_cross, x, y, width, height,
 		   fade_mode, fade_delay, post_delay, draw_border_function);
-#else
-  X11FadeRectangle(bitmap_cross, x, y, width, height,
-		   fade_mode, fade_delay, post_delay, draw_border_function);
-#endif
 }
 
 void FillRectangle(Bitmap *bitmap, int x, int y, int width, int height,
@@ -904,24 +854,10 @@ void ClearRectangleOnBackground(Bitmap *bitmap, int x, int y,
 
 void SetClipMask(Bitmap *bitmap, GC clip_gc, Pixmap clip_pixmap)
 {
-#if defined(TARGET_X11)
-  if (clip_gc)
-  {
-    bitmap->clip_gc = clip_gc;
-    XSetClipMask(display, bitmap->clip_gc, clip_pixmap);
-  }
-#endif
 }
 
 void SetClipOrigin(Bitmap *bitmap, GC clip_gc, int clip_x, int clip_y)
 {
-#if defined(TARGET_X11)
-  if (clip_gc)
-  {
-    bitmap->clip_gc = clip_gc;
-    XSetClipOrigin(display, bitmap->clip_gc, clip_x, clip_y);
-  }
-#endif
 }
 
 void BlitBitmapMasked(Bitmap *src_bitmap, Bitmap *dst_bitmap,
@@ -959,24 +895,15 @@ void BlitBitmapOnBackground(Bitmap *src_bitmap, Bitmap *dst_bitmap,
 void DrawSimpleBlackLine(Bitmap *bitmap, int from_x, int from_y,
 			 int to_x, int to_y)
 {
-#if defined(TARGET_SDL)
   SDLDrawSimpleLine(bitmap, from_x, from_y, to_x, to_y, BLACK_PIXEL);
-#else
-  X11DrawSimpleLine(bitmap, from_x, from_y, to_x, to_y, BLACK_PIXEL);
-#endif
 }
 
 void DrawSimpleWhiteLine(Bitmap *bitmap, int from_x, int from_y,
 			 int to_x, int to_y)
 {
-#if defined(TARGET_SDL)
   SDLDrawSimpleLine(bitmap, from_x, from_y, to_x, to_y, WHITE_PIXEL);
-#else
-  X11DrawSimpleLine(bitmap, from_x, from_y, to_x, to_y, WHITE_PIXEL);
-#endif
 }
 
-#if !defined(TARGET_X11_NATIVE)
 void DrawLine(Bitmap *bitmap, int from_x, int from_y,
 	      int to_x, int to_y, Pixel pixel, int line_width)
 {
@@ -995,21 +922,14 @@ void DrawLine(Bitmap *bitmap, int from_x, int from_y,
 	  (x == line_width - 1 && y == line_width - 1))
 	continue;
 
-#if defined(TARGET_SDL)
       SDLDrawLine(bitmap,
 		  from_x + dx, from_y + dy, to_x + dx, to_y + dy, pixel);
-#elif defined(TARGET_ALLEGRO)
-      AllegroDrawLine(bitmap->drawable, from_x + dx, from_y + dy,
-		      to_x + dx, to_y + dy, pixel);
-#endif
     }
   }
 }
-#endif
 
 void DrawLines(Bitmap *bitmap, struct XY *points, int num_points, Pixel pixel)
 {
-#if !defined(TARGET_X11_NATIVE)
   int line_width = 4;
   int i;
 
@@ -1020,11 +940,6 @@ void DrawLines(Bitmap *bitmap, struct XY *points, int num_points, Pixel pixel)
   /*
   SDLDrawLines(bitmap->surface, points, num_points, pixel);
   */
-#else
-  XSetForeground(display, bitmap->line_gc[1], pixel);
-  XDrawLines(display, bitmap->drawable, bitmap->line_gc[1],
-	     (XPoint *)points, num_points, CoordModeOrigin);
-#endif
 }
 
 Pixel GetPixel(Bitmap *bitmap, int x, int y)
@@ -1033,25 +948,13 @@ Pixel GetPixel(Bitmap *bitmap, int x, int y)
       y < 0 || y >= bitmap->height)
     return BLACK_PIXEL;
 
-#if defined(TARGET_SDL)
   return SDLGetPixel(bitmap, x, y);
-#elif defined(TARGET_ALLEGRO)
-  return AllegroGetPixel(bitmap->drawable, x, y);
-#else
-  return X11GetPixel(bitmap, x, y);
-#endif
 }
 
 Pixel GetPixelFromRGB(Bitmap *bitmap, unsigned int color_r,
 		      unsigned int color_g, unsigned int color_b)
 {
-#if defined(TARGET_SDL)
   return SDL_MapRGB(bitmap->surface->format, color_r, color_g, color_b);
-#elif defined(TARGET_ALLEGRO)
-  return AllegroAllocColorCell(color_r << 8, color_g << 8, color_b << 8);
-#else
-  return X11GetPixelFromRGB(color_r, color_g, color_b);
-#endif
 }
 
 Pixel GetPixelFromRGBcompact(Bitmap *bitmap, unsigned int color)
@@ -1066,17 +969,11 @@ Pixel GetPixelFromRGBcompact(Bitmap *bitmap, unsigned int color)
 /* execute all pending screen drawing operations */
 void FlushDisplay(void)
 {
-#if !defined(TARGET_SDL)
-  XFlush(display);
-#endif
 }
 
 /* execute and wait for all pending screen drawing operations */
 void SyncDisplay(void)
 {
-#if !defined(TARGET_SDL)
-  XSync(display, FALSE);
-#endif
 }
 
 void KeyboardAutoRepeatOn(void)
@@ -1129,23 +1026,7 @@ boolean PointerInWindow(DrawWindow *window)
 
 boolean SetVideoMode(boolean fullscreen)
 {
-#if defined(TARGET_SDL)
   return SDLSetVideoMode(&backbuffer, fullscreen);
-#else
-  boolean success = TRUE;
-
-  if (fullscreen && video.fullscreen_available)
-  {
-    Error(ERR_WARN, "fullscreen not available in X11 version");
-
-    /* display error message only once */
-    video.fullscreen_available = FALSE;
-
-    success = FALSE;
-  }
-
-  return success;
-#endif
 }
 
 boolean ChangeVideoModeIfNeeded(boolean fullscreen)
@@ -1163,11 +1044,7 @@ Bitmap *LoadImage(char *filename)
 {
   Bitmap *new_bitmap;
 
-#if defined(TARGET_SDL)
   new_bitmap = SDLLoadImage(filename);
-#else
-  new_bitmap = X11LoadImage(filename);
-#endif
 
   if (new_bitmap)
     new_bitmap->source_filename = getStringCopy(filename);
@@ -1232,11 +1109,7 @@ Bitmap *ZoomBitmap(Bitmap *src_bitmap, int zoom_width, int zoom_height)
 {
   Bitmap *dst_bitmap = CreateBitmap(zoom_width, zoom_height, DEFAULT_DEPTH);
 
-#if defined(TARGET_SDL)
   SDLZoomBitmap(src_bitmap, dst_bitmap);
-#else
-  X11ZoomBitmap(src_bitmap, dst_bitmap);
-#endif
 
   return dst_bitmap;
 }
@@ -1342,15 +1215,6 @@ static void CreateScaledBitmaps(Bitmap *old_bitmap, int zoom_factor,
   /* if image was scaled up, create new clipmask for normal size image */
   if (zoom_factor != 1)
   {
-#if defined(TARGET_X11)
-    if (old_bitmap->clip_mask)
-      XFreePixmap(display, old_bitmap->clip_mask);
-
-    old_bitmap->clip_mask =
-      Pixmap_to_Mask(tmp_bitmap_1->drawable, width_1, height_1);
-
-    XSetClipMask(display, old_bitmap->stored_clip_gc, old_bitmap->clip_mask);
-#else
     SDL_Surface *tmp_surface_1 = tmp_bitmap_1->surface;
 
     if (old_bitmap->surface_masked)
@@ -1361,7 +1225,6 @@ static void CreateScaledBitmaps(Bitmap *old_bitmap, int zoom_factor,
     if ((old_bitmap->surface_masked = SDL_DisplayFormat(tmp_surface_1)) ==NULL)
       Error(ERR_EXIT, "SDL_DisplayFormat() failed");
     SDL_SetColorKey(tmp_surface_1, UNSET_TRANSPARENT_PIXEL, 0);
-#endif
   }
 #endif
 
@@ -1433,15 +1296,6 @@ static void CreateScaledBitmaps(Bitmap *old_bitmap, int zoom_factor,
 #if 1
   /* this replaces all blit masks created when loading -- maybe optimize this */
   {
-#if defined(TARGET_X11)
-    if (old_bitmap->clip_mask)
-      XFreePixmap(display, old_bitmap->clip_mask);
-
-    old_bitmap->clip_mask =
-      Pixmap_to_Mask(old_bitmap->drawable, new_width, new_height);
-
-    XSetClipMask(display, old_bitmap->stored_clip_gc, old_bitmap->clip_mask);
-#else
     SDL_Surface *old_surface = old_bitmap->surface;
 
     if (old_bitmap->surface_masked)
@@ -1452,7 +1306,6 @@ static void CreateScaledBitmaps(Bitmap *old_bitmap, int zoom_factor,
     if ((old_bitmap->surface_masked = SDL_DisplayFormat(old_surface)) ==NULL)
       Error(ERR_EXIT, "SDL_DisplayFormat() failed");
     SDL_SetColorKey(old_surface, UNSET_TRANSPARENT_PIXEL, 0);
-#endif
   }
 #endif
 
@@ -1550,11 +1403,7 @@ static const char **cursor_image_playfield = cursor_image_dot;
 static const char **cursor_image_playfield = cursor_image_none;
 #endif
 
-#if defined(TARGET_SDL)
 static const int cursor_bit_order = BIT_ORDER_MSB;
-#elif defined(TARGET_X11_NATIVE)
-static const int cursor_bit_order = BIT_ORDER_LSB;
-#endif
 
 static struct MouseCursorInfo *get_cursor_from_image(const char **image)
 {
@@ -1619,11 +1468,7 @@ void SetMouseCursor(int mode)
 		mode == CURSOR_NONE      ? cursor_none :
 		mode == CURSOR_PLAYFIELD ? cursor_playfield : NULL);
 
-#if defined(TARGET_SDL)
   SDLSetMouseCursor(cursor_new);
-#elif defined(TARGET_X11_NATIVE)
-  X11SetMouseCursor(cursor_new);
-#endif
 }
 
 
@@ -1652,8 +1497,6 @@ void OpenAudio(void)
 
 #if defined(TARGET_SDL)
   SDLOpenAudio();
-#elif defined(PLATFORM_UNIX)
-  UnixOpenAudio();
 #endif
 }
 
@@ -1661,8 +1504,6 @@ void CloseAudio(void)
 {
 #if defined(TARGET_SDL)
   SDLCloseAudio();
-#elif defined(PLATFORM_UNIX)
-  UnixCloseAudio();
 #endif
 
   audio.sound_enabled = FALSE;
@@ -1836,10 +1677,6 @@ boolean CheckCloseWindowEvent(ClientMessageEvent *event)
 
 #if defined(TARGET_SDL)
   return TRUE;		/* the only possible message here is SDL_QUIT */
-#elif defined(PLATFORM_UNIX)
-  if ((event->window == window->drawable) &&
-      (event->data.l[0] == XInternAtom(display, "WM_DELETE_WINDOW", FALSE)))
-    return TRUE;
 #endif
 
   return FALSE;
@@ -1865,8 +1702,6 @@ void InitJoysticks()
 
 #if defined(TARGET_SDL)
   SDLInitJoysticks();
-#elif defined(PLATFORM_UNIX)
-  UnixInitJoysticks();
 #endif
 
 #if 0
@@ -1879,7 +1714,5 @@ boolean ReadJoystick(int nr, int *x, int *y, boolean *b1, boolean *b2)
 {
 #if defined(TARGET_SDL)
   return SDLReadJoystick(nr, x, y, b1, b2);
-#elif defined(PLATFORM_UNIX)
-  return UnixReadJoystick(nr, x, y, b1, b2);
 #endif
 }

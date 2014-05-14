@@ -5,12 +5,7 @@
 
 #include "main_em.h"
 
-
 #include <signal.h>
-
-#if !defined(TARGET_SDL)
-#include <sys/wait.h>
-#endif
 
 
 Bitmap *objBitmap;

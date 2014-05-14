@@ -138,10 +138,6 @@ struct SoundControl
   void *data_ptr;		/* pointer to first sample (8 or 16 bit) */
   int data_len;		/* number of samples, NOT number of bytes */
   int num_channels;		/* mono: 1 channel, stereo: 2 channels */
-
-#if defined(TARGET_ALLEGRO)
-  int voice;
-#endif
 };
 typedef struct SoundControl SoundControl;
 
@@ -650,32 +646,15 @@ static boolean Mixer_ChannelExpired(int channel)
     return TRUE;
 
 #if defined(TARGET_SDL)
-
   if (!Mix_Playing(channel))
     return TRUE;
-
-#elif defined(TARGET_ALLEGRO)
-
-  mixer[channel].playing_pos = voice_get_position(mixer[channel].voice);
-  mixer[channel].volume = voice_get_volume(mixer[channel].voice);
-
-  /* sound sample has completed playing or was completely faded out */
-  if (mixer[channel].playing_pos == -1 || mixer[channel].volume == 0)
-    return TRUE;
-
-#endif /* TARGET_ALLEGRO */
+#endif
 
   return FALSE;
 }
 
 static boolean Mixer_AllocateChannel(int channel)
 {
-#if defined(TARGET_ALLEGRO)
-  mixer[channel].voice = allocate_voice((SAMPLE *)mixer[channel].data_ptr);
-  if (mixer[channel].voice < 0)
-    return FALSE;
-#endif
-
   return TRUE;
 }
 
@@ -686,9 +665,6 @@ static void Mixer_SetChannelProperties(int channel)
   Mix_SetPanning(channel,
 		 SOUND_VOLUME_LEFT(mixer[channel].stereo_position),
 		 SOUND_VOLUME_RIGHT(mixer[channel].stereo_position));
-#elif defined(TARGET_ALLEGRO)
-  voice_set_volume(mixer[channel].voice, mixer[channel].volume);
-  voice_set_pan(mixer[channel].voice, mixer[channel].stereo_position);
 #endif
 }
 
@@ -697,11 +673,6 @@ static void Mixer_StartChannel(int channel)
 #if defined(TARGET_SDL)
   Mix_PlayChannel(channel, mixer[channel].data_ptr,
 		  IS_LOOP(mixer[channel]) ? -1 : 0);
-#elif defined(TARGET_ALLEGRO)
-  if (IS_LOOP(mixer[channel]))
-    voice_set_playmode(mixer[channel].voice, PLAYMODE_LOOP);
-
-  voice_start(mixer[channel].voice);       
 #endif
 }
 
@@ -748,9 +719,6 @@ static void Mixer_StopChannel(int channel)
 
 #if defined(TARGET_SDL)
   Mix_HaltChannel(channel);
-#elif defined(TARGET_ALLEGRO)
-  voice_set_volume(mixer[channel].voice, 0);
-  deallocate_voice(mixer[channel].voice);
 #endif
 
   mixer[channel].active = FALSE;
@@ -775,9 +743,6 @@ static void Mixer_FadeChannel(int channel)
 
 #if defined(TARGET_SDL)
   Mix_FadeOutChannel(channel, SOUND_FADING_INTERVAL);
-#elif defined(TARGET_ALLEGRO)
-  if (voice_check(mixer[channel].voice))
-    voice_ramp_volume(mixer[channel].voice, SOUND_FADING_INTERVAL, 0);
 #endif
 }
 
@@ -801,10 +766,6 @@ static void Mixer_UnFadeChannel(int channel)
 #if defined(TARGET_SDL)
   Mix_ExpireChannel(channel, -1);
   Mix_Volume(channel, mixer[channel].volume);
-#elif defined(TARGET_ALLEGRO)
-  voice_stop_volumeramp(mixer[channel].voice);
-  voice_ramp_volume(mixer[channel].voice, SOUND_FADING_INTERVAL,
-		    mixer[channel].volume);
 #endif
 }
 
@@ -1562,17 +1523,6 @@ static void *Load_WAV(char *filename)
   }
 
   snd_info->data_len = ((Mix_Chunk *)snd_info->data_ptr)->alen;
-
-#elif defined(TARGET_ALLEGRO)
-
-  if ((snd_info->data_ptr = load_sample(filename)) == NULL)
-  {
-    Error(ERR_WARN, "cannot read sound file '%s'", filename);
-    free(snd_info);
-    return NULL;
-  }
-
-  snd_info->data_len = ((SAMPLE *)snd_info->data_ptr)->len;
 
 #else /* AUDIO_UNIX_NATIVE */
 
@@ -2371,8 +2321,6 @@ void FreeSound(void *ptr)
   {
 #if defined(TARGET_SDL)
     Mix_FreeChunk(sound->data_ptr);
-#elif defined(TARGET_ALLEGRO)
-    destroy_sample(sound->data_ptr);
 #else /* AUDIO_UNIX_NATIVE */
     free(sound->data_ptr);
 #endif
@@ -2397,8 +2345,6 @@ void FreeMusic(void *ptr)
       Mix_FreeMusic(music->data_ptr);
     else
       Mix_FreeChunk(music->data_ptr);
-#elif defined(TARGET_ALLEGRO)
-    destroy_sample(music->data_ptr);
 #else /* AUDIO_UNIX_NATIVE */
     free(music->data_ptr);
 #endif

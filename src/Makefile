@@ -14,13 +14,6 @@ ifndef PLATFORM				# unknown platform -- default to Unix
 PLATFORM = unix
 endif
 
-ifdef X11_PATH				# path to X11 from top level Makefile
-XINC_PATH = $(X11_PATH)/include
-XLIB_PATH = $(X11_PATH)/lib
-X11_INCL = -I$(XINC_PATH)
-X11_LIBS = -L$(XLIB_PATH) -lX11
-endif
-
 AR = ar
 RANLIB = ranlib
 ETAGS = etags
@@ -55,15 +48,6 @@ PLATFORM = unix
 TARGET = sdl
 endif
 
-ifeq ($(PLATFORM),os2)			# native compiling to OS/2
-RANLIB = echo
-PROGNAME = ../$(PROGBASE).exe
-EXTRA_CFLAGS = -Zbin-files -D__ST_MT_ERRNO__ -Zmtd -fomit-frame-pointer
-EXTRA_LDFLAGS = -lsocket
-PLATFORM = unix
-TARGET = x11
-endif
-
 ifeq ($(PLATFORM),unix)			# native compiling to Unix (generic)
 PROFILING_FLAGS = -pg
 endif
@@ -79,11 +63,6 @@ endif
 # -----------------------------------------------------------------------------
 # configuring target
 # -----------------------------------------------------------------------------
-
-ifeq ($(TARGET),x11)			# compiling for X11 target
-SYS_CFLAGS = -DTARGET_X11 $(X11_INCL)
-SYS_LDFLAGS = $(X11_LIBS)
-endif
 
 ifeq ($(TARGET),sdl)			# compiling for SDL target
 SYS_CFLAGS = -DTARGET_SDL $(shell sdl-config --cflags)

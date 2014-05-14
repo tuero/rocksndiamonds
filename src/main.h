@@ -2094,7 +2094,6 @@
 
 #define ICON_TITLE_STRING		PROGRAM_TITLE_STRING
 #define COOKIE_PREFIX			"ROCKSNDIAMONDS"
-#define FILENAME_PREFIX			"Rocks"
 
 #define USERDATA_DIRECTORY_WIN32	PROGRAM_TITLE_STRING
 #define USERDATA_DIRECTORY_MACOSX	PROGRAM_TITLE_STRING
@@ -2111,8 +2110,6 @@
 #define USERDATA_DIRECTORY		USERDATA_DIRECTORY_OTHER
 #endif
 
-#define X11_ICON_FILENAME		"rocks_icon.xbm"
-#define X11_ICONMASK_FILENAME		"rocks_iconmask.xbm"
 #define SDL_ICON_FILENAME		"RocksIcon32x32.png"
 
 /* file version numbers for resource files (levels, tapes, score, setup, etc.)
@@ -2827,11 +2824,6 @@ struct GraphicInfo
   int pressed_yoffset;
 
   boolean use_image_size;	/* use image size as default width and height */
-
-#if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
-  Pixmap clip_mask;		/* single-graphic-only clip mask for X11 */
-  GC clip_gc;			/* single-graphic-only clip gc for X11 */
-#endif
 };
 
 struct SoundInfo

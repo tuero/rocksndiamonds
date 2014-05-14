@@ -26,11 +26,7 @@
 #include "android.h"
 #endif
 
-#if defined(TARGET_SDL)
 #include "sdl.h"
-#elif defined(TARGET_X11)
-#include "x11.h"
-#endif
 
 
 /* the additional 'b' is needed for Win32 to open files in binary mode */
@@ -313,17 +309,10 @@
 				 REDRAW_MICROLEVEL)
 #define REDRAW_FPS		(1 << 11)
 
-#if defined(TARGET_X11)
-/* on old-style, classic and potentially slow graphics systems, redraw single
-   tiles instead of the whole playfield unless a certain threshold is reached;
-   when using the X11 target, this method should still be fast on all systems */
-#define REDRAWTILES_THRESHOLD	(SCR_FIELDX * SCR_FIELDY / 2)
-#else
-/* on modern graphics systems and when using the SDL target, this tile redraw
+/* on modern graphics systems and when using the SDL target, the old tile redraw
    optimization can slow things down a lot due to many small blits compared to
    one single playfield-sized blit (especially observed on Mac OS X with SDL) */
 #define REDRAWTILES_THRESHOLD	0
-#endif
 
 #define IN_GFX_FIELD_PLAY(x, y)	(x >= gfx.sx && x < gfx.sx + gfx.sxsize && \
 				 y >= gfx.sy && y < gfx.sy + gfx.sysize)
@@ -680,12 +669,9 @@ struct ProgramInfo
   char *window_title;
   char *icon_title;
 
-  char *x11_icon_filename;
-  char *x11_iconmask_filename;
   char *sdl_icon_filename;
 
   char *cookie_prefix;
-  char *filename_prefix;	/* prefix to cut off from DOS filenames */
 
   char *error_filename;		/* filename where to write error messages to */
   FILE *error_file;		/* (used instead of 'stderr' on some systems) */
@@ -777,10 +763,6 @@ struct FontBitmapInfo
 
   int num_chars;
   int num_chars_per_line;
-
-#if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
-  Pixmap *clip_mask;		/* single-char-only clip mask array for X11 */
-#endif
 };
 
 struct GfxInfo
@@ -1280,13 +1262,8 @@ extern int			FrameCounter;
 
 /* function definitions */
 
-#if 1
 void InitProgramInfo(char *, char *, char *, char *, char *, char *, char *,
-		     char *, char *, char *, int);
-#else
-void InitProgramInfo(char *, char *, char *, char *, char *, char *, char *,
-		     char *, char *, char *, char *, char *, int);
-#endif
+		     int);
 
 void SetWindowTitle();
 

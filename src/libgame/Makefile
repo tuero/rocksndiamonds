@@ -15,13 +15,11 @@ SRCS =	system.c	\
 	joystick.c	\
 	snapshot.c	\
 	toons.c		\
-	pcx.c		\
 	image.c		\
 	random.c	\
 	hash.c		\
 	setup.c		\
 	misc.c		\
-	x11.c		\
 	sdl.c
 
 OBJS =	system.o	\
@@ -31,13 +29,11 @@ OBJS =	system.o	\
 	snapshot.o	\
 	joystick.o	\
 	toons.o		\
-	pcx.o		\
 	image.o		\
 	random.o	\
 	hash.o		\
 	setup.o		\
 	misc.o		\
-	x11.o		\
 	sdl.o
 
 LIBGAME = libgame.a

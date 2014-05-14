@@ -233,20 +233,7 @@ static unsigned int getCurrentMS()
 {
   return SDL_GetTicks();
 }
-
-#else /* !TARGET_SDL */
-
-#if defined(PLATFORM_UNIX)
-static unsigned int getCurrentMS()
-{
-  struct timeval current_time;
-
-  gettimeofday(&current_time, NULL);
-
-  return current_time.tv_sec * 1000 + current_time.tv_usec / 1000;
-}
-#endif /* PLATFORM_UNIX */
-#endif /* !TARGET_SDL */
+#endif
 
 static unsigned int mainCounter(int mode)
 {
@@ -283,29 +270,7 @@ static unsigned int mainCounter(int mode)
 
   return counter_ms;		/* return milliseconds since last init */
 }
-
-#else /* !TARGET_SDL */
-
-#if defined(PLATFORM_UNIX)
-static unsigned int mainCounter(int mode)
-{
-  static struct timeval base_time = { 0, 0 };
-  struct timeval current_time;
-  unsigned int counter_ms;
-
-  gettimeofday(&current_time, NULL);
-
-  /* reset base time in case of counter initializing or wrap-around */
-  if (mode == INIT_COUNTER || current_time.tv_sec < base_time.tv_sec)
-    base_time = current_time;
-
-  counter_ms = (current_time.tv_sec  - base_time.tv_sec)  * 1000
-             + (current_time.tv_usec - base_time.tv_usec) / 1000;
-
-  return counter_ms;		/* return milliseconds since last init */
-}
-#endif /* PLATFORM_UNIX */
-#endif /* !TARGET_SDL */
+#endif
 
 #endif
 
@@ -340,8 +305,6 @@ static void sleep_milliseconds(unsigned int milliseconds_delay)
   {
 #if defined(TARGET_SDL)
     SDL_Delay(milliseconds_delay);
-#elif defined(TARGET_ALLEGRO)
-    rest(milliseconds_delay);
 #else
     struct timeval delay;
 

@@ -16,9 +16,6 @@ CC = gcc
 # (this must be set to "gmake" for some systems)
 MAKE = make
 
-# path to X11 on your system
-X11_PATH = /usr/X11R6
-
 # directory for read-only game data (like graphics, sounds, levels)
 # default is '.' to be able to run program without installation
 # RO_GAME_DIR = /usr/games
@@ -57,7 +54,6 @@ CROSS_PATH_WIN32 = /usr/local/cross-tools/i386-mingw32msvc
 SRC_DIR = src
 MAKE_CMD = $(MAKE) -C $(SRC_DIR)
 
-# DEFAULT_TARGET = x11
 DEFAULT_TARGET = sdl2
 
 
@@ -68,20 +64,11 @@ DEFAULT_TARGET = sdl2
 all:
 	@$(MAKE_CMD) TARGET=$(DEFAULT_TARGET)
 
-x11:
-	@$(MAKE_CMD) TARGET=x11
-
 sdl:
 	@$(MAKE_CMD) TARGET=sdl
 
 sdl2:
 	@$(MAKE_CMD) TARGET=sdl2
-
-solaris:
-	@$(MAKE_CMD) PLATFORM=solaris TARGET=x11
-
-solaris-sdl:
-	@$(MAKE_CMD) PLATFORM=solaris TARGET=sdl
 
 mac:
 	@$(MAKE_CMD) PLATFORM=macosx

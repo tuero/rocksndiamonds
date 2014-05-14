@@ -598,9 +598,7 @@ char *getLevelSetTitleMessageFilename(int nr, boolean initial)
 
 static char *getCorrectedArtworkBasename(char *basename)
 {
-  char *basename_corrected = basename;
-
-  return basename_corrected;
+  return basename;
 }
 
 char *getCustomImageFilename(char *basename)

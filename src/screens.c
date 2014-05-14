@@ -428,11 +428,6 @@ static struct
 				    menu.list_size[game_status] :	\
 				    MAX_MENU_ENTRIES_ON_SCREEN)
 
-#if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
-#define NUM_SCROLLBAR_BITMAPS		2
-static Bitmap *scrollbar_bitmap[NUM_SCROLLBAR_BITMAPS];
-#endif
-
 
 /* title display and control definitions */
 
@@ -7345,11 +7340,7 @@ static struct
 
 static struct
 {
-#if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
-  Bitmap **gfx_unpressed, **gfx_pressed;
-#else
   int gfx_unpressed, gfx_pressed;
-#endif
   int x, y;
   int width, height;
   int type;
@@ -7358,11 +7349,7 @@ static struct
 } scrollbar_info[NUM_SCREEN_SCROLLBARS] =
 {
   {
-#if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
-    &scrollbar_bitmap[0], &scrollbar_bitmap[1],
-#else
     IMG_MENU_SCROLLBAR, IMG_MENU_SCROLLBAR_ACTIVE,
-#endif
 #if 1
     -1, -1,	/* these values are not constant, but can change at runtime */
     -1, -1,	/* these values are not constant, but can change at runtime */
@@ -7505,9 +7492,7 @@ static void CreateScreenScrollbars()
   for (i = 0; i < NUM_SCREEN_SCROLLBARS; i++)
   {
     Bitmap *gd_bitmap_unpressed, *gd_bitmap_pressed;
-#if !defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
     int gfx_unpressed, gfx_pressed;
-#endif
     int x, y, width, height;
     int gd_x1, gd_x2, gd_y1, gd_y2;
     struct GadgetInfo *gi;
@@ -7530,14 +7515,6 @@ static void CreateScreenScrollbars()
     items_visible = num_page_entries;
     item_position = 0;
 
-#if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
-    gd_bitmap_unpressed = *scrollbar_info[i].gfx_unpressed;
-    gd_bitmap_pressed   = *scrollbar_info[i].gfx_pressed;
-    gd_x1 = 0;
-    gd_y1 = 0;
-    gd_x2 = 0;
-    gd_y2 = 0;
-#else
     gfx_unpressed = scrollbar_info[i].gfx_unpressed;
     gfx_pressed   = scrollbar_info[i].gfx_pressed;
     gd_bitmap_unpressed = graphic_info[gfx_unpressed].bitmap;
@@ -7546,7 +7523,6 @@ static void CreateScreenScrollbars()
     gd_y1 = graphic_info[gfx_unpressed].src_y;
     gd_x2 = graphic_info[gfx_pressed].src_x;
     gd_y2 = graphic_info[gfx_pressed].src_y;
-#endif
 
     gi = CreateGadget(GDI_CUSTOM_ID, id,
 		      GDI_CUSTOM_TYPE_ID, i,
@@ -7590,27 +7566,6 @@ void CreateScreenGadgets()
 {
   int last_game_status = game_status;	/* save current game status */
 
-#if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
-  int i;
-
-  for (i = 0; i < NUM_SCROLLBAR_BITMAPS; i++)
-  {
-    scrollbar_bitmap[i] = CreateBitmap(TILEX, TILEY, DEFAULT_DEPTH);
-
-    /* copy pointers to clip mask and GC */
-    scrollbar_bitmap[i]->clip_mask =
-      graphic_info[IMG_MENU_SCROLLBAR + i].clip_mask;
-    scrollbar_bitmap[i]->stored_clip_gc =
-      graphic_info[IMG_MENU_SCROLLBAR + i].clip_gc;
-
-    BlitBitmap(graphic_info[IMG_MENU_SCROLLBAR + i].bitmap,
-	       scrollbar_bitmap[i],
-	       graphic_info[IMG_MENU_SCROLLBAR + i].src_x,
-	       graphic_info[IMG_MENU_SCROLLBAR + i].src_y,
-	       TILEX, TILEY, 0, 0);
-  }
-#endif
-
   CreateScreenMenubuttons();
 
 #if 0
@@ -7627,17 +7582,6 @@ void CreateScreenGadgets()
 void FreeScreenGadgets()
 {
   int i;
-
-#if defined(TARGET_X11_NATIVE_PERFORMANCE_WORKAROUND)
-  for (i = 0; i < NUM_SCROLLBAR_BITMAPS; i++)
-  {
-    /* prevent freeing clip mask and GC twice */
-    scrollbar_bitmap[i]->clip_mask = None;
-    scrollbar_bitmap[i]->stored_clip_gc = None;
-
-    FreeBitmap(scrollbar_bitmap[i]);
-  }
-#endif
 
   for (i = 0; i < NUM_SCREEN_GADGETS; i++)
     FreeGadget(screen_gadget[i]);
