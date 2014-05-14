@@ -180,7 +180,7 @@ void DrawMiniElementOrWall(int, int, int, int);
 void ShowEnvelope(int);
 void ShowEnvelopeDoor(char *text, int);
 
-void DrawLevel(void);
+void DrawLevel(int);
 void DrawMiniLevel(int, int, int, int);
 void DrawPreviewLevelInitial(void);
 void DrawPreviewLevelAnimation(void);

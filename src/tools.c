@@ -300,17 +300,17 @@ void SetDrawtoField(int mode)
 
 static void RedrawPlayfield_RND()
 {
-  int x, y;
-
   if (game.envelope_active)
     return;
 
-#if 0
-  DrawLevel();
+#if 1
+  DrawLevel(REDRAW_ALL);
 #else
+  int x, y;
 
   SetMainBackgroundImage(IMG_BACKGROUND_PLAYING);
   // SetDrawBackgroundMask(REDRAW_FIELD);	// !!! CHECK THIS !!!
+  SetDrawBackgroundMask(REDRAW_ALL);	// !!! CHECK THIS !!!
 
   for (x = BX1; x <= BX2; x++)
     for (y = BY1; y <= BY2; y++)
@@ -3513,15 +3513,20 @@ void DrawPreviewElement(int dst_x, int dst_y, int element, int tilesize)
   BlitBitmap(src_bitmap, drawto, src_x, src_y, tilesize, tilesize, dst_x,dst_y);
 }
 
-void DrawLevel()
+void DrawLevel(int draw_background_mask)
 {
   int x,y;
 
 #if 1
   SetMainBackgroundImage(IMG_BACKGROUND_PLAYING);
+  SetDrawBackgroundMask(draw_background_mask);
+#else
+#if 1
+  SetMainBackgroundImage(IMG_BACKGROUND_PLAYING);
   SetDrawBackgroundMask(REDRAW_FIELD);
 #else
   SetDrawBackgroundMask(REDRAW_NONE);
+#endif
 #endif
 
   ClearField();

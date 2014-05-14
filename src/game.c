@@ -4523,7 +4523,7 @@ void InitGame()
   }
   else
   {
-    DrawLevel();
+    DrawLevel(REDRAW_FIELD);
     DrawAllPlayers();
 
     /* after drawing the level, correct some elements */
