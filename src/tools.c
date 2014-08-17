@@ -1587,6 +1587,7 @@ inline void getGraphicSourceExt(int graphic, int frame, Bitmap **bitmap,
   int src_y = g->src_y + (get_backside ? g->offset2_y : 0);
 
 #if NEW_TILESIZE
+
   if (TILESIZE_VAR != TILESIZE)
     return getSizedGraphicSourceExt(graphic, frame, TILESIZE_VAR, bitmap, x, y,
 				    get_backside);
@@ -11498,6 +11499,7 @@ void ChangeViewportPropertiesIfNeeded()
   boolean init_gfx_buffers = FALSE;
   boolean init_video_buffer = FALSE;
   boolean init_gadgets_and_toons = FALSE;
+  boolean init_em_graphics = FALSE;
 
 #if 0
   /* !!! TEST ONLY !!! */
@@ -11585,12 +11587,15 @@ void ChangeViewportPropertiesIfNeeded()
       )
   {
 #if 1
-    // changing tile size invalidates scroll values of engine snapshots
     if (new_tilesize_var != TILESIZE_VAR)
     {
       // printf("::: new_tilesize_var != TILESIZE_VAR\n");
 
+      // changing tile size invalidates scroll values of engine snapshots
       FreeEngineSnapshot();
+
+      // changing tile size requires update of graphic mapping for EM engine
+      init_em_graphics = TRUE;
     }
 #endif
 
@@ -11681,6 +11686,11 @@ void ChangeViewportPropertiesIfNeeded()
 
     InitGadgets();
     InitToons();
+  }
+
+  if (init_em_graphics)
+  {
+      InitGraphicInfo_EM();
   }
 
 #if 0

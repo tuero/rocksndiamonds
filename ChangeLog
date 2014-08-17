@@ -1,3 +1,9 @@
+2014-08-18
+	* fixed bug causing EM/EMC graphics sets containing original 16x16 tiles
+	  to be displayed incorrectly (with broken scaling) when switching
+	  between small and normal game graphics (thanks a lot to filbo for
+	  analyzing and describing how to exactly reproduce this bug)
+
 2014-05-15
 	* removed MS-DOS support
 	* removed native X11 support (X11 now only supported via SDL/SDL2)
@@ -51,7 +57,7 @@
 	* fixed problems related to fullscreen switching and window scaling
 
 2014-01-06
-	* fixed inconsistent custom artwork contant numbering in src/main.h,
+	* fixed inconsistent custom artwork constants numbering in src/main.h,
 	  src/screen.c and src/conf_gfx.c (this really should be cleaned up)
 	  (this bug caused custom artwork definition to set wrong variable)
 
@@ -1896,8 +1902,8 @@
 	* fixed bug with not resetting push delay under certain circumstances
 
 2004-04-27
-	* added option "handicap" for "levelinfo.conf" (thanks to Niko Böhm)
-	* added network multiplayer code for Windows (thanks to Niko Böhm)
+	* added option "handicap" for "levelinfo.conf" (thanks to Niko BÃ¶hm)
+	* added network multiplayer code for Windows (thanks to Niko BÃ¶hm)
 
 2004-04-25
 	* added option "reachable despite gravity" for gravity movement
@@ -2070,7 +2076,7 @@
 	  (reported by Simon Forsberg)
 
 	* fixed bug which could cause an array overflow in RelocatePlayer()
-	  (reported by Niko Böhm)
+	  (reported by Niko BÃ¶hm)
 
 	* changed Emerald Mine style "passable / over" elements to "protected"
 	  (fixing unsolvable level 10 of "Bondmine 9" with bug beside gate)
@@ -2461,24 +2467,59 @@
 2002-12-31
 	* pre-release version 2.2.0rc1 released
 
+2002-08-25	src/libgame/setup.c, src/libgame/sound.c
+	* Level series artwork now configurable via level series config file.
+	  "levelinfo.conf" may now contain directives "graphics_set",
+	  "sounds_set" and "music_set" to select artwork sets which are
+	  globally defined or which are included into other level series.
+
 2002-08-25
 	* version number set to 2.1.2
 
 2002-08-13
 	* version 2.1.1 released
 
+2002-08-10	src/libgame/system.h
+	* Default "snap" and "bomb" keys for Mac OS X set to left control key
+	  and keypad enter key -- Macs seem not to distinguish between left
+	  and right modifier keys (both generate scan code for left key). :-(
+
+2002-08-10	src/libgame/sound.c
+	* Fixed small NetBSD compilation bug.
+	  Thanks to Adam Ciarcinski for the bug report.
+
+2002-08-10	src/libgame/sound.c
+	* Added support for audio device "/dev/sound/dsp" (devfs).
+	  Thanks to Christoph Bauer for the corresponding report.
+
+2002-08-10	src/libgame/sound.c
+	* Bug fixed that caused regular crashes under SDL/Windows version.
+	  Mixer_InsertSound(): Always stop music before playing new music,
+	  else "mixer_active_channels" can get fucked up.
+	  Thanks to Keith Peterston for the bug report.
+
 2002-08-10
 	* version number set to 2.1.1
 
 2002-08-05
 	* version 2.1.0 released
-	
+
+2002-05-31	src/libgame/image.c
+	* Read_PCX_to_Pixmap(): Fixed bad memory leak by freeing "ximageinfo"
+	  and "image" after converting loaded PCX image file to X11 Pixmap.
+	  This really showed up when reloading custom artwork several times.
+
+2002-05-20	src/libgame/sound.c
+	* added support for 16 bit WAV sound files
+
 2002-05-19
 	* version number set to 2.1.0
 
 2002-04-03 to 2002-05-19	(various source files)
 	* graphics, sounds and music now fully configurable
 	* bug fixed that prevented walking through tubes when gravity on
+	* added support for TrueColor PCX graphics files
+	* enhanced sound system (especially regarding stereo and loop sounds)
 
 2002-04-02	src/events.c, src/editor.c
 	* Make Escape key less aggressive when playing or when editing level.
@@ -2498,6 +2539,16 @@
 	  automatically gets created by "src/Makefile" and contains an actual
 	  compile-time timestamp to identify development versions of the game).
 
+2002-04-01	src/libgame/misc.c
+	* Added (currently incomplete) function "getKeyFromKeyName()" simply
+	  for orthogonality. When really needed, this function must be
+	  extended accordingly (analog to "getKeyFromX11KeyName()").
+
+2002-04-01	src/libgame/setup.c
+	* Changed setup "TYPE_KEY" (internal, X11 style key symbol name) to
+	  "TYPE_KEY_X11" and added "TYPE_KEY" (human readable key symbol name).
+	  (This was needed for custom key setup handling in "src/screens.c".)
+
 2002-03-31	src/tape.c, src/events.c
 	* Added quick game/tape save/load functions to tape stuff which can be
 	  invoked by a keyboard shortcut. Default: "F1" saves game/tape, "F2"
@@ -2516,9 +2567,31 @@
 2002-03-30	src/cartoons.c
 	* Moved some stuff from cartoons.c to the new "src/libgame/toons.c".
 
+2002-03-30	src/libgame/toons.c
+	* New libgame source file "toons.c" for the program independant part
+	  of the toon stuff.
+
 2002-03-29	src/screen.c
 	* Changed setup screen stuff to be more generic (to make it easier
 	  to add more setup screens).
+
+2002-03-29	src/libgame/setup.c
+	* Changed "LoadLevelInfoFromLevelDir()" so that not only directories
+	  with level sub-directories are recognized, but also directories
+	  that directly contain level files.
+
+2002-03-29	src/libgame/sound.c
+	* Changed "boolean stereo = TRUE;" to "static boolean stereo = TRUE;".
+	  (This was a bug that showed up only when in mono audio mode.)
+
+2002-03-24	src/libgame/x11.c, src/libgame/sdl.c, src/libgame/image.c
+	* Changed image loading code to not exit on error, but set error by
+	  using "SetError()" accordingly. Image loading errors must now be
+	  catched by above layers (src/init.c for example).
+
+2002-03-24	src/libgame/misc.c
+	* New functions "SetError()" and "GetError()" to provide more
+	  flexible error handling.
 
 2002-03-23	src/main.c, src/main.h
 	* Various changes due to the introduction of the new libgame files
@@ -2532,6 +2605,18 @@
 	* File "src/joystick.c" moved to libgame source tree, with
 	  correspondig changes.
 
+2002-03-23	src/libgame/system.c, src/libgame/system.h
+	* Various changes due to the introduction of the new files "setup.c"
+	  and "joystick.c".
+
+2002-03-23	src/libgame/setup.c
+	* New libgame source file "setup.c" that contains now most setup and
+	  level directory stuff previously handled in "src/files.c".
+
+2002-03-23	src/libgame/joystick.c
+	* New libgame source file "joystick.c" that contains now all joystick
+	  stuff previously handled in "src/joystick.c" of "Rocks'n'Diamonds".
+
 2002-03-22	src/screens.c
 	* "HandleChooseLevel()": Another bug in level series navigation fixed.
 	  (Wrong level series information displayed when entering main group.)
@@ -2543,6 +2628,19 @@
 	* Changed behaviour of "Escape" key in level editor to be more
 	  intuitive: When in "Element Properties" or "Level Info" mode,
 	  return to "Drawing Mode" instead of leaving the level editor.
+
+2002-03-22	src/libgame/misc.c, src/libgame/sound.c
+	* Added command line option "-s" / "--sounds" and "-m" / "--music"
+	  to specify alternative sound and music directories. (The former
+	  shortcut "-s" for "--serveronly" has changed accordingly.)
+
+2002-03-22	src/libgame/gadgets.c
+	* Added new gadget events for displaying gadget info texts:
+	  "GD_EVENT_INFO_ENTERING" and "GD_EVENT_INFO_LEAVING". Before,
+	  the info text callback function was only called when entering
+	  a gadget (implicit "GD_EVENT_INFO_ENTERING"). But the info text
+	  was never erased. This can now be done by checking the event type
+	  in the info callback function.
 
 2002-03-21	src/game.c, src/editor.c, src/files.c
 	* 2.0.1 introduced the corrected "Emerald Mine" style behaviour of
@@ -2572,11 +2670,28 @@
 	  compiling the SDL version on some systems.
 	  Thanks to the several people who pointed this out.
 
+2002-03-20	src/libgame/gadgets.c
+	* "va_arg(ap, boolean)" changed to "(boolean)va_arg(ap, int)";
+	  this caused problems especially on PowerPC architecture (although
+	  it is wrong on i386 and other architectures, too)
+
+2002-03-20	src/libgame/pcx.c, src/libgame/image.c
+	* Added support for loading and displaying true-color PCX files.
+
+2002-03-20	src/libgame/misc.c, src/libgame/x11.c
+	* Added command line option "-g" / "--graphics" to specify an
+	  alternative graphics directory.
+
 2002-03-19
 	* Version number set to 2.0.2.
 
 2002-03-19
 	* Version 2.0.1 released.
+
+2002-03-19	src/libgame/system.c, src/libgame/sdl.c [src/tools.c]
+	* Moved function "GetPixel()" from src/tools.c ("Mirror Magic" code)
+	  to libgame source files; needed for SDL fullscreen bug workaround
+	  to work correctly.
 
 2002-03-18	src/screens.c
 	* "HandleChooseLevel()": Small bug in level series navigation fixed.
@@ -2585,6 +2700,14 @@
 	* Moved some common functions from src/files.c to src/libgame/misc.c.
 
 2002-03-18	src/files.c [src/libgame/misc.c]
+	* Changed permissions for new directories and saved files (especially
+	  score files) according to suggestions of Debian users and mantainers.
+	  Thanks to Drew Parsons <dparsons@emerall.com> for the patch.
+
+2002-03-18	src/libgame/misc.c [src/files.c]
+	* Moved some common functions from src/files.c to src/libgame/misc.c.
+
+2002-03-18	src/libgame/misc.c [src/files.c]
 	* Changed permissions for new directories and saved files (especially
 	  score files) according to suggestions of Debian users and mantainers.
 	  Thanks to Drew Parsons <dparsons@emerall.com> for the patch.
@@ -2602,10 +2725,26 @@
 	  file, and "file version" is a version number to distinguish files
 	  with different format, for example after adding new features).
 
+2002-03-17	src/libgame/sound.c
+	* Bug in "StopMusic()" fixed: SDL_mixer functions may be called
+	  even when sound not available.
+	  Thanks to Drew Parsons <dparsons@emerall.com> for the patch.
+
 2002-03-15	src/screen.c
 	* "DrawHallOfFame()": "FadeSounds()" when entering the hall of fame.
 	  (Before, you heard a mixture of the in-game music and the
 	  hall-of-fame music.)
+
+2002-03-15	src/libgame/sound.c, src/libgame/platform.h
+	* Added /dev/dsp (streaming audio) support for NetBSD (instead of the
+	  /dev/audio (ulaw) based Unix audio interface).
+	  Thanks to Krister Walfridsson <cato@df.lth.se> for the patches.
+
+2002-03-15	src/libgame/sdl.c
+	* Workaround for fullscreen bug in WIN32 version of SDL (at least
+	  in the currently actual version 1.2.3) by using "standard" screen
+	  resolutions like 800x600 and mapping all input (mouse events) and
+	  output (screen drawing) accordingly.
 
 2002-03-14	src/events.c
 	* Function "DumpTape()" (files.c) now available by pressing 't' from
@@ -2664,6 +2803,11 @@
 2002-03-12	src/game.c
 	* Fixed problem (introduced after 2.0.0 release) with penguins
 	  not getting killed by enemies
+
+2002-02-28	src/libgame/sound.c
+	* Fixed small problem with new SDL_Mixer 1.2.1:
+	  Mix_VolumeMusic() must be called _after_ Mix_PlayMusic(),
+	  or it has no effect.
 
 2002-02-24	src/game.c, src/main.h
 	* Added "player->is_moving"; now "player->last_move_dir" does

@@ -5209,15 +5209,11 @@ void Execute_Command(char *command)
   }
   else if (strPrefix(command, "create images "))
   {
-#if defined(TARGET_SDL)
     global.create_images_dir = getStringCopy(&command[14]);
 
     if (access(global.create_images_dir, W_OK) != 0)
       Error(ERR_EXIT, "image target directory '%s' not found or not writable",
 	    global.create_images_dir);
-#else
-    Error(ERR_EXIT, "command only available for SDL target");
-#endif
   }
 
 #if DEBUG
