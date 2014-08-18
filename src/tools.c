@@ -713,15 +713,37 @@ void BackToFront()
 
   if (redraw_mask & REDRAW_ALL)
   {
+#if 0
+    if (game_status != GAME_MODE_PLAYING ||
+	redraw_mask & REDRAW_FROM_BACKBUFFER)
+    {
+#if 0
+      printf("::: REDRAW_ALL [%d]\n", FrameCounter);
+#endif
+
+      BlitBitmap(backbuffer, window, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
+
+      redraw_mask = REDRAW_NONE;
+    }
+    else
+    {
+      redraw_mask &= ~REDRAW_ALL;
+    }
+#else
+#if 0
+    printf("::: REDRAW_ALL [%d]\n", FrameCounter);
+#endif
+
     BlitBitmap(backbuffer, window, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
 
     redraw_mask = REDRAW_NONE;
+#endif
   }
 
   if (redraw_mask & REDRAW_FIELD)
   {
 #if 0
-    printf("::: REDRAW_FIELD\n");
+    printf("::: REDRAW_FIELD [%d]\n", FrameCounter);
 #endif
 
     if (game_status != GAME_MODE_PLAYING ||

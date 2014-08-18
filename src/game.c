@@ -17078,6 +17078,9 @@ void RedrawGameButtons()
 
   for (i = 0; i < NUM_GAME_BUTTONS; i++)
     RedrawGadget(game_gadget[i]);
+
+  // RedrawGadget() may have set REDRAW_ALL if buttons are defined off-area
+  redraw_mask &= ~REDRAW_ALL;
 }
 
 static void HandleGameButtonsExt(int id)

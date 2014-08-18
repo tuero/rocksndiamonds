@@ -1,3 +1,7 @@
+2014-08-19
+	* fixed bug causing wrong screen updates while playing (whole screen
+	  update from backbuffer instead of playfield buffer if REDRAW_ALL set)
+
 2014-08-18
 	* fixed bug causing EM/EMC graphics sets containing original 16x16 tiles
 	  to be displayed incorrectly (with broken scaling) when switching
