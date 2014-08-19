@@ -71,6 +71,12 @@ void BlitScreenToBitmap_EM(Bitmap *target_bitmap)
   int full_xsize = lev.width  * TILEX;
   int full_ysize = lev.height * TILEY;
 
+#if 0
+  printf("::: %d, %d\n", screenBitmap->width, screenBitmap->height);
+  printf("::: %d / %d, %d / %d\n",
+	 MAX_BUF_XSIZE, MAX_BUF_YSIZE, SXSIZE, SYSIZE);
+#endif
+
   sxsize = (full_xsize < xsize ? full_xsize : xsize);
   sysize = (full_ysize < ysize ? full_ysize : ysize);
   sx = SX + (full_xsize < xsize ? (xsize - full_xsize) / 2 : 0);
@@ -613,9 +619,9 @@ static void blitplayer(struct PLAYER *ply)
     int new_x = old_x + SIGN(dx);
     int new_y = old_y + SIGN(dy);
     int old_sx = old_x % MAX_BUF_XSIZE;
-    int old_sy = old_y % MAX_BUF_XSIZE;
+    int old_sy = old_y % MAX_BUF_YSIZE;
     int new_sx = new_x % MAX_BUF_XSIZE;
-    int new_sy = new_y % MAX_BUF_XSIZE;
+    int new_sy = new_y % MAX_BUF_YSIZE;
 #if 0
     int old_crm = crumbled_state[old_sy][old_sx];
 #endif
