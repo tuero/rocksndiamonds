@@ -515,8 +515,17 @@ static SDL_Surface *SDLCreateScreen(DrawBuffer **backbuffer,
 
   if (sdl_window != NULL)
   {
+#if 0
+    /* if SDL_CreateRenderer() is called from within a VirtualBox Windows VM
+     *without* enabling 2D/3D acceleration and/or guest additions installed,
+     it will crash if flags are *not* set to SDL_RENDERER_SOFTWARE (because
+     it will try to use accelerated graphics and apparently fails miserably) */
+    if (sdl_renderer == NULL)
+      sdl_renderer = SDL_CreateRenderer(sdl_window, -1, SDL_RENDERER_SOFTWARE);
+#else
     if (sdl_renderer == NULL)
       sdl_renderer = SDL_CreateRenderer(sdl_window, -1, 0);
+#endif
 
     if (sdl_renderer != NULL)
     {

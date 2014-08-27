@@ -3691,6 +3691,9 @@ void openErrorFile()
     Error(ERR_WARN, "cannot open file '%s' for writing: %s",
 	  program.error_filename, strerror(errno));
   }
+
+  /* error output should be unbuffered so it is not truncated in a crash */
+  setbuf(program.error_file, NULL);
 }
 
 void closeErrorFile()

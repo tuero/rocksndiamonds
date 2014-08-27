@@ -259,7 +259,8 @@ conf_snd.h: conf_snd.c
 conf_mus.h: conf_mus.c
 	@$(MAKE) auto-conf
 
-$(TIMESTAMP_FILE): $(SRCS) $(LIBGAME) $(GAME_EM) $(GAME_SP)
+# $(TIMESTAMP_FILE): $(SRCS) $(LIBGAME) $(GAME_EM) $(GAME_SP)
+$(TIMESTAMP_FILE): $(SRCS) $(RNDLIBS)
 	@date '+"%Y-%m-%d %H:%M"' \
 	| sed -e 's/^/#define COMPILE_DATE_STRING /' \
 	> $(TIMESTAMP_FILE)
@@ -277,9 +278,10 @@ clean-obj:
 	$(MAKE) -C $(GAME_EM_DIR) clean
 	$(MAKE) -C $(GAME_SP_DIR) clean
 	$(RM) $(OBJS)
-	$(RM) $(LIBGAME)
-	$(RM) $(GAME_EM)
-	$(RM) $(GAME_SP)
+	$(RM) $(RNDLIBS)
+#	$(RM) $(LIBGAME)
+#	$(RM) $(GAME_EM)
+#	$(RM) $(GAME_SP)
 
 clean-ico:
 	$(RM) $(ICONBASE).ico
