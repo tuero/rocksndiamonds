@@ -679,6 +679,8 @@ struct ProgramInfo
   int version_major;
   int version_minor;
   int version_patch;
+  int version_build;
+  int version_ident;
 
   char *(*window_title_function)(void);
   void (*exit_message_function)(char *, va_list);

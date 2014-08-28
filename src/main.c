@@ -5580,6 +5580,7 @@ static void print_usage()
 	 "  -n, --network                    network multiplayer game\n"
 	 "      --serveronly                 only start network server\n"
 	 "  -v, --verbose                    verbose mode\n"
+	 "  -V, --version                    show program version\n"
 	 "      --debug                      display debugging information\n"
 	 "      --debug-x11-sync             enable X11 synchronous mode\n"
 	 "  -e, --execute COMMAND            execute batch COMMAND\n"
@@ -5600,6 +5601,45 @@ static void print_usage()
 	 program.command_basename);
 }
 
+static void print_version()
+{
+  printf("%s %d.%d.%d.%d\n",
+	 PROGRAM_TITLE_STRING,
+	 PROGRAM_VERSION_MAJOR,
+	 PROGRAM_VERSION_MINOR,
+	 PROGRAM_VERSION_PATCH,
+	 PROGRAM_VERSION_BUILD);
+
+  if (options.debug)
+  {
+    SDL_version sdl_version;
+
+    SDL_VERSION(&sdl_version);
+    printf("- SDL %d.%d.%d\n",
+	   sdl_version.major,
+	   sdl_version.minor,
+	   sdl_version.patch);
+
+    SDL_IMAGE_VERSION(&sdl_version);
+    printf("- SDL_image %d.%d.%d\n",
+	   sdl_version.major,
+	   sdl_version.minor,
+	   sdl_version.patch);
+
+    SDL_MIXER_VERSION(&sdl_version);
+    printf("- SDL_mixer %d.%d.%d\n",
+	   sdl_version.major,
+	   sdl_version.minor,
+	   sdl_version.patch);
+
+    SDL_NET_VERSION(&sdl_version);
+    printf("- SDL_net %d.%d.%d\n",
+	   sdl_version.major,
+	   sdl_version.minor,
+	   sdl_version.patch);
+  }
+}
+
 int main(int argc, char *argv[])
 {
   InitProgramInfo(argv[0], USERDATA_DIRECTORY, USERDATA_DIRECTORY_UNIX,
@@ -5611,7 +5651,7 @@ int main(int argc, char *argv[])
   InitExitFunction(CloseAllAndExit);
   InitPlatformDependentStuff();
 
-  GetOptions(argv, print_usage);
+  GetOptions(argv, print_usage, print_version);
   OpenAll();
 
   EventLoop();

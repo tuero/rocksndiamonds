@@ -765,7 +765,9 @@ boolean strSuffixLower(char *s, char *suffix)
 /* command line option handling functions                                    */
 /* ------------------------------------------------------------------------- */
 
-void GetOptions(char *argv[], void (*print_usage_function)(void))
+void GetOptions(char *argv[],
+		void (*print_usage_function)(void),
+		void (*print_version_function)(void))
 {
   char *ro_base_path = RO_BASE_PATH;
   char *rw_base_path = RW_BASE_PATH;
@@ -862,10 +864,19 @@ void GetOptions(char *argv[], void (*print_usage_function)(void))
     option_len = strlen(option);
 
     if (strEqual(option, "-"))
+    {
       Error(ERR_EXIT_HELP, "unrecognized option '%s'", option);
+    }
     else if (strncmp(option, "-help", option_len) == 0)
     {
       print_usage_function();
+
+      exit(0);
+    }
+    else if (strncmp(option, "-version", option_len) == 0 ||
+	     strncmp(option, "-V", option_len) == 0)
+    {
+      print_version_function();
 
       exit(0);
     }
