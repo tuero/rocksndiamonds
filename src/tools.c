@@ -4600,6 +4600,9 @@ static int RequestHandleEvents(unsigned int req_state)
 	      break;
 
 	    case KSYM_Return:
+#if defined(TARGET_SDL2)
+	    case KSYM_Menu:
+#endif
 	      result = 1;
 	      break;
 

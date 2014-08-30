@@ -1,3 +1,7 @@
+2014-08-30
+	* added Android "menu" button to be treated as "yes" requester button
+	  (while the Android "back" button was already treated as "no" button)
+
 2014-08-28
 	* added command line options "--version" / "-V" to show program version
 	  (also shows SDL library versions when prefixed with "--debug" option)
