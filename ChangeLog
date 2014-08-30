@@ -1,4 +1,7 @@
 2014-08-30
+	* fixed music still being played in Android version when in background
+
+2014-08-30
 	* added Android "menu" button to be treated as "yes" requester button
 	  (while the Android "back" button was already treated as "no" button)
 

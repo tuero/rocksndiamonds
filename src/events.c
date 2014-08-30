@@ -175,6 +175,13 @@ void EventLoop(void)
 	  case EVENT_TEXTINPUT:
   	    HandleTextEvent((TextEvent *) &event);
   	    break;
+
+	  case SDL_APP_WILLENTERBACKGROUND:
+	  case SDL_APP_DIDENTERBACKGROUND:
+	  case SDL_APP_WILLENTERFOREGROUND:
+	  case SDL_APP_DIDENTERFOREGROUND:
+  	    HandlePauseResumeEvent((PauseResumeEvent *) &event);
+  	    break;
 #endif
 
   	  case EVENT_KEYPRESS:
@@ -976,6 +983,19 @@ void HandleTextEvent(TextEvent *event)
     HandleKey(key, KEY_RELEASED);
   }
 }
+
+void HandlePauseResumeEvent(PauseResumeEvent *event)
+{
+  if (event->type == SDL_APP_WILLENTERBACKGROUND)
+  {
+    Mix_PauseMusic();
+  }
+  else if (event->type == SDL_APP_DIDENTERFOREGROUND)
+  {
+    Mix_ResumeMusic();
+  }
+}
+
 #endif
 
 void HandleKeyEvent(KeyEvent *event)

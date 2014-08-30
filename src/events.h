@@ -35,6 +35,7 @@ void HandleMotionEvent(MotionEvent *);
 void HandleWindowEvent(WindowEvent *);
 void HandleFingerEvent(FingerEvent *);
 void HandleTextEvent(TextEvent *);
+void HandlePauseResumeEvent(PauseResumeEvent *);
 #endif
 void HandleKeyEvent(KeyEvent *);
 void HandleFocusEvent(FocusChangeEvent *);

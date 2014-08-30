@@ -86,6 +86,7 @@ typedef SDL_MouseMotionEvent	MotionEvent;
 #if defined(TARGET_SDL2)
 typedef SDL_TouchFingerEvent	FingerEvent;
 typedef SDL_TextInputEvent	TextEvent;
+typedef SDL_Event		PauseResumeEvent;
 typedef SDL_WindowEvent		WindowEvent;
 #endif
 typedef SDL_KeyboardEvent	KeyEvent;
