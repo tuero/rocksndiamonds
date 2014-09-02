@@ -873,13 +873,6 @@ void GetOptions(char *argv[],
 
       exit(0);
     }
-    else if (strncmp(option, "-version", option_len) == 0 ||
-	     strncmp(option, "-V", option_len) == 0)
-    {
-      print_version_function();
-
-      exit(0);
-    }
     else if (strncmp(option, "-display", option_len) == 0)
     {
       if (option_arg == NULL)
@@ -951,10 +944,6 @@ void GetOptions(char *argv[],
     {
       options.serveronly = TRUE;
     }
-    else if (strncmp(option, "-verbose", option_len) == 0)
-    {
-      options.verbose = TRUE;
-    }
     else if (strncmp(option, "-debug", option_len) == 0)
     {
       options.debug = TRUE;
@@ -962,6 +951,17 @@ void GetOptions(char *argv[],
     else if (strncmp(option, "-debug-x11-sync", option_len) == 0)
     {
       options.debug_x11_sync = TRUE;
+    }
+    else if (strncmp(option, "-verbose", option_len) == 0)
+    {
+      options.verbose = TRUE;
+    }
+    else if (strncmp(option, "-version", option_len) == 0 ||
+	     strncmp(option, "-V", option_len) == 0)
+    {
+      print_version_function();
+
+      exit(0);
     }
     else if (strPrefix(option, "-D"))
     {
