@@ -1,3 +1,14 @@
+2014-09-04
+	* added custom graphics property "game.tile_size" to define in-game tile
+	  size (this defines the tile size actually displayed on the playfield);
+	  tile graphics will either be scaled to the defined game tile size or
+	  have to be specified with the same image size (using ".tile_size")
+
+2014-09-01
+	* added custom graphics property ".tile_size" to define tile image size
+	  for game element graphics (like "custom_1.tile_size"); non-standard
+	  sized images will then be scaled accordingly to standard tile size
+
 2014-08-30
 	* fixed music still being played in Android version when in background
 

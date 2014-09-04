@@ -1520,12 +1520,28 @@ void getSizedGraphicSourceExt(int graphic, int frame, int tilesize_raw,
   Bitmap *src_bitmap = g->bitmap;
   int tilesize = MIN(MAX(1, tilesize_raw), TILESIZE);
   int offset_calc_pos = log_2(tilesize);
+  int bitmap_width  = src_bitmap->width;
+  int bitmap_height = src_bitmap->height;
   int width_mult  = offset_calc[offset_calc_pos].width_mult;
   int width_div   = offset_calc[offset_calc_pos].width_div;
   int height_mult = offset_calc[offset_calc_pos].height_mult;
   int height_div  = offset_calc[offset_calc_pos].height_div;
-  int startx = src_bitmap->width * width_mult / width_div;
-  int starty = src_bitmap->height * height_mult / height_div;
+  int startx = bitmap_width * width_mult / width_div;
+  int starty = bitmap_height * height_mult / height_div;
+
+#if NEW_GAME_TILESIZE
+
+  int src_x = (g->src_x + (get_backside ? g->offset2_x : 0)) *
+    tilesize_raw / TILESIZE;
+  int src_y = (g->src_y + (get_backside ? g->offset2_y : 0)) *
+    tilesize_raw / TILESIZE;
+  int width = g->width * tilesize_raw / TILESIZE;
+  int height = g->height * tilesize_raw / TILESIZE;
+  int offset_x = g->offset_x * tilesize_raw / TILESIZE;
+  int offset_y = g->offset_y * tilesize_raw / TILESIZE;
+
+#else
+
 #if NEW_TILESIZE
   int src_x = (g->src_x + (get_backside ? g->offset2_x : 0)) *
     tilesize / TILESIZE;
@@ -1539,6 +1555,34 @@ void getSizedGraphicSourceExt(int graphic, int frame, int tilesize_raw,
   int height = g->height * tilesize / TILESIZE;
   int offset_x = g->offset_x * tilesize / TILESIZE;
   int offset_y = g->offset_y * tilesize / TILESIZE;
+
+#endif
+
+#if NEW_GAME_TILESIZE
+  if (game.tile_size != TILESIZE)
+  {
+    int bitmap_width_std =
+      bitmap_width * TILESIZE / (TILESIZE + game.tile_size);
+    int bitmap_height_std =
+      bitmap_height * TILESIZE / game.tile_size * 3 / 2;
+
+    if (tilesize_raw == game.tile_size)
+    {
+      startx = bitmap_width_std;
+      starty = 0;
+    }
+    else
+    {
+      bitmap_width = bitmap_width_std;
+
+      if (game.tile_size > TILESIZE * 3 / 2)
+	bitmap_height = bitmap_height_std;
+
+      startx = bitmap_width * width_mult / width_div;
+      starty = bitmap_height * height_mult / height_div;
+    }
+  }
+#endif
 
   if (g->offset_y == 0)		/* frames are ordered horizontally */
   {
@@ -1609,7 +1653,6 @@ inline void getGraphicSourceExt(int graphic, int frame, Bitmap **bitmap,
   int src_y = g->src_y + (get_backside ? g->offset2_y : 0);
 
 #if NEW_TILESIZE
-
   if (TILESIZE_VAR != TILESIZE)
     return getSizedGraphicSourceExt(graphic, frame, TILESIZE_VAR, bitmap, x, y,
 				    get_backside);
@@ -11510,7 +11553,14 @@ void ChangeViewportPropertiesIfNeeded()
   int new_exsize	= vp_door_3->width;
   int new_eysize	= vp_door_3->height;
 #if NEW_TILESIZE
+
+#if NEW_GAME_TILESIZE
+  int new_tilesize_var =
+    (setup.small_game_graphics ? MINI_TILESIZE : game.tile_size);
+#else
   int new_tilesize_var = TILESIZE / (setup.small_game_graphics ? 2 : 1);
+#endif
+
   int tilesize = (gfx_game_mode == GAME_MODE_PLAYING ? new_tilesize_var :
 		  gfx_game_mode == GAME_MODE_EDITOR ? MINI_TILESIZE : TILESIZE);
   int new_scr_fieldx = new_sxsize / tilesize;

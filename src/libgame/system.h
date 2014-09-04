@@ -775,6 +775,8 @@ struct GfxInfo
   int full_sxsize, full_sysize;
   int scrollbuffer_width, scrollbuffer_height;
 
+  int game_tile_size, standard_tile_size;
+
   int dx, dy;
   int dxsize, dysize;
 
@@ -1276,6 +1278,7 @@ void InitPlatformDependentStuff(void);
 void ClosePlatformDependentStuff(void);
 
 void InitGfxFieldInfo(int, int, int, int, int, int, int, int, Bitmap *);
+void InitGfxTileSizeInfo(int, int);
 void InitGfxDoor1Info(int, int, int, int);
 void InitGfxDoor2Info(int, int, int, int);
 void InitGfxDoor3Info(int, int, int, int);
@@ -1331,7 +1334,7 @@ Bitmap *LoadCustomImage(char *);
 void ReloadCustomImage(Bitmap *, char *);
 
 Bitmap *ZoomBitmap(Bitmap *, int, int);
-void CreateBitmapWithSmallBitmaps(Bitmap *, int);
+void CreateBitmapWithSmallBitmaps(Bitmap *, int, int);
 void ScaleBitmap(Bitmap *, int);
 
 void SetMouseCursor(int);

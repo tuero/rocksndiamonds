@@ -260,14 +260,14 @@ void ReloadCustomImages()
   print_timestamp_done("ReloadCustomImages");
 }
 
-void CreateImageWithSmallImages(int pos, int zoom_factor)
+void CreateImageWithSmallImages(int pos, int zoom_factor, int tile_size)
 {
   ImageInfo *img_info = getImageInfoEntryFromImageID(pos);
 
   if (img_info == NULL || img_info->contains_small_images)
     return;
 
-  CreateBitmapWithSmallBitmaps(img_info->bitmap, zoom_factor);
+  CreateBitmapWithSmallBitmaps(img_info->bitmap, zoom_factor, tile_size);
 
   img_info->contains_small_images = TRUE;
   img_info->scaled_up = TRUE;

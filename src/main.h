@@ -31,6 +31,7 @@
 #include "conf_mus.h"	/* include auto-generated data structure definitions */
 
 
+#define NEW_GAME_TILESIZE		1
 #define NEW_TILESIZE			1
 #define NEW_SCROLL			1
 
@@ -1950,22 +1951,23 @@
 #define GFX_ARG_POST_DELAY_RANDOM	35
 #define GFX_ARG_NAME			36
 #define GFX_ARG_SCALE_UP_FACTOR		37
-#define GFX_ARG_CLONE_FROM		38
-#define GFX_ARG_FADE_MODE		39
-#define GFX_ARG_FADE_DELAY		40
-#define GFX_ARG_POST_DELAY		41
-#define GFX_ARG_AUTO_DELAY		42
-#define GFX_ARG_ALIGN			43
-#define GFX_ARG_VALIGN			44
-#define GFX_ARG_SORT_PRIORITY		45
-#define GFX_ARG_CLASS			46
-#define GFX_ARG_STYLE			47
-#define GFX_ARG_ACTIVE_XOFFSET		48
-#define GFX_ARG_ACTIVE_YOFFSET		49
-#define GFX_ARG_PRESSED_XOFFSET		50
-#define GFX_ARG_PRESSED_YOFFSET		51
+#define GFX_ARG_TILE_SIZE		38
+#define GFX_ARG_CLONE_FROM		39
+#define GFX_ARG_FADE_MODE		40
+#define GFX_ARG_FADE_DELAY		41
+#define GFX_ARG_POST_DELAY		42
+#define GFX_ARG_AUTO_DELAY		43
+#define GFX_ARG_ALIGN			44
+#define GFX_ARG_VALIGN			45
+#define GFX_ARG_SORT_PRIORITY		46
+#define GFX_ARG_CLASS			47
+#define GFX_ARG_STYLE			48
+#define GFX_ARG_ACTIVE_XOFFSET		49
+#define GFX_ARG_ACTIVE_YOFFSET		50
+#define GFX_ARG_PRESSED_XOFFSET		51
+#define GFX_ARG_PRESSED_YOFFSET		52
 
-#define NUM_GFX_ARGS			52
+#define NUM_GFX_ARGS			53
 
 
 /* values for sound configuration suffixes */
@@ -2792,6 +2794,7 @@ struct GraphicInfo
   int border_size;		/* border size for "crumbled" graphics */
 
   int scale_up_factor;		/* optional factor for scaling image up */
+  int tile_size;		/* optional explicitly defined tile size */
 
   int clone_from;		/* graphic for cloning *all* settings */
 
