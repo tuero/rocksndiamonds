@@ -177,14 +177,113 @@ static void SDLSetWindowIcon(char *basename)
 }
 
 #if defined(TARGET_SDL2)
-SDL_Surface *SDL_DisplayFormat(SDL_Surface *surface)
+
+static boolean equalSDLPixelFormat(SDL_PixelFormat *format1,
+				   SDL_PixelFormat *format2)
 {
-  if (backbuffer == NULL ||
+  return (format1->format	 == format2->format &&
+	  format1->BitsPerPixel	 == format2->BitsPerPixel &&
+	  format1->BytesPerPixel == format2->BytesPerPixel &&
+	  format1->Rmask	 == format2->Rmask &&
+	  format1->Gmask	 == format2->Gmask &&
+	  format1->Bmask	 == format2->Bmask &&
+	  format1->Amask	 == format2->Amask);
+}
+
+boolean SDLSetNativeSurface(SDL_Surface **surface)
+{
+  SDL_Surface *new_surface;
+
+  if (surface == NULL ||
+      *surface == NULL ||
+      backbuffer == NULL ||
+      backbuffer->surface == NULL)
+    return FALSE;
+
+  // if pixel format already optimized for destination surface, do nothing
+  if (equalSDLPixelFormat((*surface)->format, backbuffer->surface->format))
+    return FALSE;
+
+  new_surface = SDL_ConvertSurface(*surface, backbuffer->surface->format, 0);
+
+  SDL_FreeSurface(*surface);
+
+  *surface = new_surface;
+
+  return TRUE;
+}
+
+SDL_Surface *SDLGetNativeSurface(SDL_Surface *surface)
+{
+  if (surface == NULL ||
+      backbuffer == NULL ||
       backbuffer->surface == NULL)
     return NULL;
 
   return SDL_ConvertSurface(surface, backbuffer->surface->format, 0);
 }
+
+SDL_Surface *SDL_DisplayFormat(SDL_Surface *surface)
+{
+  if (surface == NULL ||
+      backbuffer == NULL ||
+      backbuffer->surface == NULL)
+    return NULL;
+
+#if 0
+  boolean same_pixel_format =
+    equalSDLPixelFormat(surface->format, backbuffer->surface->format);
+
+  printf("::: SDL_DisplayFormat: %08x -> %08x [%08x, %08x, %08x -> %08x, %08x, %08x] [%d, %d -> %d, %d] => %s\n",
+	 surface->format->format,
+	 backbuffer->surface->format->format,
+	 surface->format->Rmask,
+	 surface->format->Gmask,
+	 surface->format->Bmask,
+	 backbuffer->surface->format->Rmask,
+	 backbuffer->surface->format->Gmask,
+	 backbuffer->surface->format->Bmask,
+	 surface->format->BitsPerPixel,
+	 surface->format->BytesPerPixel,
+	 backbuffer->surface->format->BitsPerPixel,
+	 backbuffer->surface->format->BytesPerPixel,
+	 (same_pixel_format ? "SAME" : "DIFF"));
+#endif
+
+  return SDL_ConvertSurface(surface, backbuffer->surface->format, 0);
+}
+
+#else
+
+boolean SDLSetNativeSurface(SDL_Surface **surface)
+{
+  SDL_Surface *new_surface;
+
+  if (surface == NULL)
+    return FALSE;
+
+  new_surface = SDL_DisplayFormat(*surface);
+
+  if (new_surface == NULL)
+    Error(ERR_EXIT, "SDL_DisplayFormat() failed: %s", SDL_GetError());
+
+  SDL_FreeSurface(*surface);
+
+  *surface = new_surface;
+
+  return TRUE;
+}
+
+SDL_Surface *SDLGetNativeSurface(SDL_Surface *surface)
+{
+  SDL_Surface *new_surface = SDL_DisplayFormat(surface);
+
+  if (new_surface == NULL)
+    Error(ERR_EXIT, "SDL_DisplayFormat() failed: %s", SDL_GetError());
+
+  return new_surface;
+}
+
 #endif
 
 void SDLInitVideoDisplay(void)
@@ -541,6 +640,11 @@ static SDL_Surface *SDLCreateScreen(DrawBuffer **backbuffer,
       if (sdl_texture != NULL)
       {
 #if 1
+	// use SDL default values for RGB masks and no alpha channel
+	new_surface = SDL_CreateRGBSurface(0, width, height, 32, 0,0,0, 0);
+#else
+
+#if 1
 	// (do not use alpha channel)
 	new_surface = SDL_CreateRGBSurface(0, width, height, 32,
 					   0x00FF0000,
@@ -554,6 +658,8 @@ static SDL_Surface *SDLCreateScreen(DrawBuffer **backbuffer,
 					   0x0000FF00,
 					   0x000000FF,
 					   0xFF000000);
+#endif
+
 #endif
 
 	if (new_surface == NULL)
@@ -950,9 +1056,22 @@ void SDLRedrawWindow()
 }
 #endif
 
-void SDLCreateBitmapContent(Bitmap *new_bitmap, int width, int height,
+void SDLCreateBitmapContent(Bitmap *bitmap, int width, int height,
 			    int depth)
 {
+#if 1
+  SDL_Surface *surface =
+    SDL_CreateRGBSurface(SURFACE_FLAGS, width, height, depth, 0,0,0, 0);
+
+  if (surface == NULL)
+    Error(ERR_EXIT, "SDL_CreateRGBSurface() failed: %s", SDL_GetError());
+
+  SDLSetNativeSurface(&surface);
+
+  bitmap->surface = surface;
+
+#else
+
   SDL_Surface *surface_tmp, *surface_native;
 
   if ((surface_tmp = SDL_CreateRGBSurface(SURFACE_FLAGS, width, height, depth,
@@ -966,6 +1085,7 @@ void SDLCreateBitmapContent(Bitmap *new_bitmap, int width, int height,
   SDL_FreeSurface(surface_tmp);
 
   new_bitmap->surface = surface_native;
+#endif
 }
 
 void SDLFreeBitmapPointers(Bitmap *bitmap)
@@ -2058,6 +2178,80 @@ int zoomSurfaceRGBA_scaleDownBy2(SDL_Surface *src, SDL_Surface *dst)
   return 0;
 }
 
+#if 1
+
+int zoomSurfaceRGBA(SDL_Surface *src, SDL_Surface *dst)
+{
+  int x, y, *sax, *say, *csax, *csay;
+  float sx, sy;
+  tColorRGBA *sp, *csp, *csp0, *dp;
+  int dgap;
+
+  /* use specialized zoom function when scaling down to exactly half size */
+  if (src->w == 2 * dst->w &&
+      src->h == 2 * dst->h)
+    return zoomSurfaceRGBA_scaleDownBy2(src, dst);
+
+#if 0
+  printf("::: zoomSurfaceRGBA:  %d, %d -> %d, %d\n",
+	 src->w, src->h, dst->w, dst->h);
+#endif
+
+  /* variable setup */
+  sx = (float) src->w / (float) dst->w;
+  sy = (float) src->h / (float) dst->h;
+
+  /* allocate memory for row increments */
+  csax = sax = (int *)checked_malloc((dst->w + 1) * sizeof(Uint32));
+  csay = say = (int *)checked_malloc((dst->h + 1) * sizeof(Uint32));
+
+  /* precalculate row increments */
+  for (x = 0; x <= dst->w; x++)
+    *csax++ = (int)(sx * x);
+
+  for (y = 0; y <= dst->h; y++)
+    *csay++ = (int)(sy * y);
+
+  /* pointer setup */
+  sp = csp = csp0 = (tColorRGBA *) src->pixels;
+  dp = (tColorRGBA *) dst->pixels;
+  dgap = dst->pitch - dst->w * 4;
+
+  csay = say;
+  for (y = 0; y < dst->h; y++)
+  {
+    sp = csp;
+    csax = sax;
+
+    for (x = 0; x < dst->w; x++)
+    {
+      /* draw */
+      *dp = *sp;
+
+      /* advance source pointers */
+      csax++;
+      sp = csp + *csax;
+
+      /* advance destination pointer */
+      dp++;
+    }
+
+    /* advance source pointer */
+    csay++;
+    csp = (tColorRGBA *) ((Uint8 *) csp0 + *csay * src->pitch);
+
+    /* advance destination pointers */
+    dp = (tColorRGBA *) ((Uint8 *) dp + dgap);
+  }
+
+  free(sax);
+  free(say);
+
+  return 0;
+}
+
+#else
+
 int zoomSurfaceRGBA(SDL_Surface *src, SDL_Surface *dst)
 {
   int x, y, sx, sy, *sax, *say, *csax, *csay, csx, csy;
@@ -2141,6 +2335,8 @@ int zoomSurfaceRGBA(SDL_Surface *src, SDL_Surface *dst)
 
   return 0;
 }
+
+#endif
 
 /*
   -----------------------------------------------------------------------------
@@ -2272,7 +2468,7 @@ SDL_Surface *zoomSurface(SDL_Surface *src, int dst_width, int dst_height)
   else
   {
     /* new source surface is 32 bit with a defined RGB ordering */
-    zoom_src = SDL_CreateRGBSurface(SDL_SWSURFACE, src->w, src->h, 32,
+    zoom_src = SDL_CreateRGBSurface(SURFACE_FLAGS, src->w, src->h, 32,
 				    0x000000ff, 0x0000ff00, 0x00ff0000, 0);
     SDL_BlitSurface(src, NULL, zoom_src, NULL);
     is_32bit = TRUE;
@@ -2283,7 +2479,7 @@ SDL_Surface *zoomSurface(SDL_Surface *src, int dst_width, int dst_height)
   if (is_32bit)
   {
     /* target surface is 32 bit with source RGBA/ABGR ordering */
-    zoom_dst = SDL_CreateRGBSurface(SDL_SWSURFACE, dst_width, dst_height, 32,
+    zoom_dst = SDL_CreateRGBSurface(SURFACE_FLAGS, dst_width, dst_height, 32,
 				    zoom_src->format->Rmask,
 				    zoom_src->format->Gmask,
 				    zoom_src->format->Bmask, 0);
@@ -2291,7 +2487,7 @@ SDL_Surface *zoomSurface(SDL_Surface *src, int dst_width, int dst_height)
   else
   {
     /* target surface is 8 bit */
-    zoom_dst = SDL_CreateRGBSurface(SDL_SWSURFACE, dst_width, dst_height, 8,
+    zoom_dst = SDL_CreateRGBSurface(SURFACE_FLAGS, dst_width, dst_height, 8,
 				    0, 0, 0, 0);
   }
 
@@ -2327,24 +2523,91 @@ SDL_Surface *zoomSurface(SDL_Surface *src, int dst_width, int dst_height)
   return zoom_dst;
 }
 
+#if 1
+
+Bitmap *SDLZoomBitmap(Bitmap *src_bitmap, int dst_width, int dst_height)
+{
+#if 1
+
+  Bitmap *dst_bitmap = CreateBitmapStruct();
+  SDL_Surface **dst_surface = &dst_bitmap->surface;
+
+  dst_width  = MAX(1, dst_width);	/* prevent zero bitmap width */
+  dst_height = MAX(1, dst_height);	/* prevent zero bitmap height */
+
+  dst_bitmap->width  = dst_width;
+  dst_bitmap->height = dst_height;
+
+  /* create zoomed temporary surface from source surface */
+  *dst_surface = zoomSurface(src_bitmap->surface, dst_width, dst_height);
+
+  /* create native format destination surface from zoomed temporary surface */
+  SDLSetNativeSurface(dst_surface);
+
+  return dst_bitmap;
+
+#else
+
+  Bitmap *dst_bitmap = CreateBitmapStruct();
+  SDL_Surface *sdl_surface_tmp;
+
+  dst_width  = MAX(1, dst_width);	/* prevent zero bitmap width */
+  dst_height = MAX(1, dst_height);	/* prevent zero bitmap height */
+
+  dst_bitmap->width  = dst_width;
+  dst_bitmap->height = dst_height;
+
+  print_timestamp_init("SDLZoomBitmap");
+
+  /* create zoomed temporary surface from source surface */
+  sdl_surface_tmp = zoomSurface(src_bitmap->surface, dst_width, dst_height);
+  print_timestamp_time("zoomSurface");
+
+  /* create native format destination surface from zoomed temporary surface */
+  dst_bitmap->surface = SDL_DisplayFormat(sdl_surface_tmp);
+  print_timestamp_time("SDL_DisplayFormat");
+
+  /* free temporary surface */
+  SDL_FreeSurface(sdl_surface_tmp);
+  print_timestamp_time("SDL_FreeSurface");
+
+  print_timestamp_done("SDLZoomBitmap");
+
+  return dst_bitmap;
+
+#endif
+}
+
+#else
+
 void SDLZoomBitmap(Bitmap *src_bitmap, Bitmap *dst_bitmap)
 {
   SDL_Surface *sdl_surface_tmp;
   int dst_width = dst_bitmap->width;
   int dst_height = dst_bitmap->height;
 
+  print_timestamp_init("SDLZoomBitmap");
+
   /* throw away old destination surface */
   SDL_FreeSurface(dst_bitmap->surface);
+  print_timestamp_time("SDL_FreeSurface");
 
   /* create zoomed temporary surface from source surface */
   sdl_surface_tmp = zoomSurface(src_bitmap->surface, dst_width, dst_height);
+  print_timestamp_time("zoomSurface");
 
   /* create native format destination surface from zoomed temporary surface */
   dst_bitmap->surface = SDL_DisplayFormat(sdl_surface_tmp);
+  print_timestamp_time("SDL_DisplayFormat");
 
   /* free temporary surface */
   SDL_FreeSurface(sdl_surface_tmp);
+  print_timestamp_time("SDL_FreeSurface");
+
+  print_timestamp_done("SDLZoomBitmap");
 }
+
+#endif
 
 
 /* ========================================================================= */
@@ -2373,12 +2636,21 @@ Bitmap *SDLLoadImage(char *filename)
   UPDATE_BUSY_STATE();
 
   /* create native non-transparent surface for current image */
+#if 1
+  if ((new_bitmap->surface = SDLGetNativeSurface(sdl_image_tmp)) == NULL)
+  {
+    SetError("SDL_DisplayFormat(): %s", SDL_GetError());
+
+    return NULL;
+  }
+#else
   if ((new_bitmap->surface = SDL_DisplayFormat(sdl_image_tmp)) == NULL)
   {
     SetError("SDL_DisplayFormat(): %s", SDL_GetError());
 
     return NULL;
   }
+#endif
 
   print_timestamp_time("SDL_DisplayFormat (opaque)");
 
@@ -2387,12 +2659,21 @@ Bitmap *SDLLoadImage(char *filename)
   /* create native transparent surface for current image */
   SDL_SetColorKey(sdl_image_tmp, SET_TRANSPARENT_PIXEL,
 		  SDL_MapRGB(sdl_image_tmp->format, 0x00, 0x00, 0x00));
+#if 1
+  if ((new_bitmap->surface_masked = SDLGetNativeSurface(sdl_image_tmp)) == NULL)
+  {
+    SetError("SDL_DisplayFormat(): %s", SDL_GetError());
+
+    return NULL;
+  }
+#else
   if ((new_bitmap->surface_masked = SDL_DisplayFormat(sdl_image_tmp)) == NULL)
   {
     SetError("SDL_DisplayFormat(): %s", SDL_GetError());
 
     return NULL;
   }
+#endif
 
   print_timestamp_time("SDL_DisplayFormat (masked)");
 

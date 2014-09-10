@@ -1,3 +1,7 @@
+2014-09-10
+	* fixed some drawing bugs when scaling graphics due to "game.tile_size"
+	* added some performance improvements when handling SDL surface scaling
+
 2014-09-04
 	* added custom graphics property "game.tile_size" to define in-game tile
 	  size (this defines the tile size actually displayed on the playfield);

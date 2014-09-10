@@ -1115,9 +1115,32 @@ void ReloadCustomImage(Bitmap *bitmap, char *basename)
 
 Bitmap *ZoomBitmap(Bitmap *src_bitmap, int zoom_width, int zoom_height)
 {
-  Bitmap *dst_bitmap = CreateBitmap(zoom_width, zoom_height, DEFAULT_DEPTH);
+#if 0
+  // !!! TEST ONLY !!!
 
-  SDLZoomBitmap(src_bitmap, dst_bitmap);
+  Bitmap *dst_bitmap = CreateBitmap(zoom_width, zoom_height, DEFAULT_DEPTH);
+  print_timestamp_time("CreateBitmap");
+
+  SDL_Rect src_rect, dst_rect;
+
+  src_rect.x = 0;
+  src_rect.y = 0;
+  src_rect.w = src_bitmap->width - 0;
+  src_rect.h = src_bitmap->height;
+
+  dst_rect.x = 0;
+  dst_rect.y = 0;
+  dst_rect.w = dst_bitmap->width;
+  dst_rect.h = dst_bitmap->height;
+
+  SDL_BlitScaled(src_bitmap->surface, &src_rect,
+		 dst_bitmap->surface, &dst_rect);
+  print_timestamp_time("SDL_BlitScaled");
+
+#else
+
+  Bitmap *dst_bitmap = SDLZoomBitmap(src_bitmap, zoom_width, zoom_height);
+#endif
 
   return dst_bitmap;
 }
@@ -1147,6 +1170,8 @@ static void CreateScaledBitmaps(Bitmap *old_bitmap, int zoom_factor,
 #endif
   int old_width, old_height;
   int new_width, new_height;
+
+  print_timestamp_init("CreateScaledBitmaps");
 
   old_width  = old_bitmap->width;
   old_height = old_bitmap->height;
@@ -1199,7 +1224,15 @@ static void CreateScaledBitmaps(Bitmap *old_bitmap, int zoom_factor,
       else if (width_0 == width_final)
 	tmp_bitmap_0 = tmp_bitmap_final;
       else
+      {
+#if 0
+	if (old_width != width_0)
+	  printf("::: %d, %d -> %d, %d\n",
+		 old_width, old_height, width_0, height_0);
+#endif
+
 	tmp_bitmap_0 = ZoomBitmap(old_bitmap, width_0, height_0);
+      }
 
       UPDATE_BUSY_STATE();
     }
@@ -1464,8 +1497,13 @@ static void CreateScaledBitmaps(Bitmap *old_bitmap, int zoom_factor,
     SDL_SetColorKey(old_surface, SET_TRANSPARENT_PIXEL,
 		    SDL_MapRGB(old_surface->format, 0x00, 0x00, 0x00));
 
+#if 1
+    if ((old_bitmap->surface_masked = SDLGetNativeSurface(old_surface)) == NULL)
+      Error(ERR_EXIT, "SDL_DisplayFormat() failed");
+#else
     if ((old_bitmap->surface_masked = SDL_DisplayFormat(old_surface)) == NULL)
       Error(ERR_EXIT, "SDL_DisplayFormat() failed");
+#endif
 
     SDL_SetColorKey(old_surface, UNSET_TRANSPARENT_PIXEL, 0);
   }
@@ -1474,6 +1512,8 @@ static void CreateScaledBitmaps(Bitmap *old_bitmap, int zoom_factor,
   UPDATE_BUSY_STATE();
 
   FreeBitmap(new_bitmap);	/* this actually frees the _old_ bitmap now */
+
+  print_timestamp_done("CreateScaledBitmaps");
 }
 
 void CreateBitmapWithSmallBitmaps(Bitmap *old_bitmap, int zoom_factor,

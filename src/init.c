@@ -202,6 +202,8 @@ inline void InitElementSmallImagesScaledUp(int graphic)
 
 void InitElementSmallImages()
 {
+  print_timestamp_init("InitElementSmallImages");
+
   static int special_graphics[] =
   {
     IMG_EDITOR_ELEMENT_BORDER,
@@ -214,21 +216,30 @@ void InitElementSmallImages()
   int num_property_mappings = getImageListPropertyMappingSize();
   int i;
 
+  print_timestamp_time("getImageListPropertyMapping/Size");
+
+  print_timestamp_init("InitElementSmallImagesScaledUp (1)");
   /* initialize normal images from static configuration */
   for (i = 0; element_to_graphic[i].element > -1; i++)
     InitElementSmallImagesScaledUp(element_to_graphic[i].graphic);
+  print_timestamp_done("InitElementSmallImagesScaledUp (1)");
 
   /* initialize special images from static configuration */
   for (i = 0; element_to_special_graphic[i].element > -1; i++)
     InitElementSmallImagesScaledUp(element_to_special_graphic[i].graphic);
+  print_timestamp_time("InitElementSmallImagesScaledUp (2)");
 
   /* initialize images from dynamic configuration (may be elements or other) */
   for (i = 0; i < num_property_mappings; i++)
     InitElementSmallImagesScaledUp(property_mapping[i].artwork_index);
+  print_timestamp_time("InitElementSmallImagesScaledUp (3)");
 
   /* initialize special images from above list (non-element images) */
   for (i = 0; special_graphics[i] > -1; i++)
     InitElementSmallImagesScaledUp(special_graphics[i]);
+  print_timestamp_time("InitElementSmallImagesScaledUp (4)");
+
+  print_timestamp_done("InitElementSmallImages");
 }
 
 void InitScaledImages()
