@@ -1491,8 +1491,10 @@ void HandleKey(Key key, int key_status)
   if (key_status == KEY_RELEASED)
     return;
 
-  if ((key == KSYM_Return || key == KSYM_KP_Enter) &&
-      (GetKeyModState() & KMOD_Alt) && video.fullscreen_available)
+  if ((key == KSYM_F11 ||
+       ((key == KSYM_Return ||
+	 key == KSYM_KP_Enter) && (GetKeyModState() & KMOD_Alt))) &&
+      video.fullscreen_available)
   {
     setup.fullscreen = !setup.fullscreen;
 
@@ -1508,8 +1510,12 @@ void HandleKey(Key key, int key_status)
     return;
   }
 
-  if ((key == KSYM_minus || key == KSYM_plus || key == KSYM_0) &&
-      (GetKeyModState() & KMOD_Alt) && video.window_scaling_available &&
+  if ((key == KSYM_minus ||
+       key == KSYM_plus ||
+       key == KSYM_0) &&
+      ((GetKeyModState() & KMOD_Control) ||
+       (GetKeyModState() & KMOD_Alt)) &&
+      video.window_scaling_available &&
       !video.fullscreen_enabled)
   {
     if (key == KSYM_0)

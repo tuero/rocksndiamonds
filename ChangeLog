@@ -1,3 +1,8 @@
+2014-09-11
+	* added key shortcuts for window scaling and toggling fullscreen mode:
+	  - Ctrl-'+', Ctrl-'-' and Ctrl-'0' for up/downscaling and normal size
+	  - "F11" key for toggling fullscreen mode (in addition to Alt-Enter)
+
 2014-09-10
 	* fixed some drawing bugs when scaling graphics due to "game.tile_size"
 	* added some performance improvements when handling SDL surface scaling
