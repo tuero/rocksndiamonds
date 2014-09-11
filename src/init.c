@@ -196,11 +196,14 @@ inline void InitElementSmallImagesScaledUp(int graphic)
   printf("::: '%s' -> '%s'\n", fi->token, fi->filename);
 #endif
 
-  CreateImageWithSmallImages(graphic, graphic_info[graphic].scale_up_factor);
+  CreateImageWithSmallImages(graphic, graphic_info[graphic].scale_up_factor,
+			     graphic_info[graphic].tile_size);
 }
 
 void InitElementSmallImages()
 {
+  print_timestamp_init("InitElementSmallImages");
+
   static int special_graphics[] =
   {
     IMG_EDITOR_ELEMENT_BORDER,
@@ -213,21 +216,30 @@ void InitElementSmallImages()
   int num_property_mappings = getImageListPropertyMappingSize();
   int i;
 
+  print_timestamp_time("getImageListPropertyMapping/Size");
+
+  print_timestamp_init("InitElementSmallImagesScaledUp (1)");
   /* initialize normal images from static configuration */
   for (i = 0; element_to_graphic[i].element > -1; i++)
     InitElementSmallImagesScaledUp(element_to_graphic[i].graphic);
+  print_timestamp_done("InitElementSmallImagesScaledUp (1)");
 
   /* initialize special images from static configuration */
   for (i = 0; element_to_special_graphic[i].element > -1; i++)
     InitElementSmallImagesScaledUp(element_to_special_graphic[i].graphic);
+  print_timestamp_time("InitElementSmallImagesScaledUp (2)");
 
   /* initialize images from dynamic configuration (may be elements or other) */
   for (i = 0; i < num_property_mappings; i++)
     InitElementSmallImagesScaledUp(property_mapping[i].artwork_index);
+  print_timestamp_time("InitElementSmallImagesScaledUp (3)");
 
   /* initialize special images from above list (non-element images) */
   for (i = 0; special_graphics[i] > -1; i++)
     InitElementSmallImagesScaledUp(special_graphics[i]);
+  print_timestamp_time("InitElementSmallImagesScaledUp (4)");
+
+  print_timestamp_done("InitElementSmallImages");
 }
 
 void InitScaledImages()
@@ -1182,6 +1194,7 @@ static void set_graphic_parameters_ext(int graphic, int *parameter,
   g->diggable_like = -1;		/* do not use clone element */
   g->border_size = TILEX / 8;		/* "CRUMBLED" border size */
   g->scale_up_factor = 1;		/* default: no scaling up */
+  g->tile_size = TILESIZE;		/* default: standard tile size */
   g->clone_from = -1;			/* do not use clone graphic */
   g->anim_delay_fixed = 0;
   g->anim_delay_random = 0;
@@ -1205,6 +1218,14 @@ static void set_graphic_parameters_ext(int graphic, int *parameter,
     g->scale_up_factor = parameter[GFX_ARG_SCALE_UP_FACTOR];
   if (g->scale_up_factor < 1)
     g->scale_up_factor = 1;		/* no scaling */
+#endif
+
+#if 1
+  /* optional tile size for using non-standard image size */
+  if (parameter[GFX_ARG_TILE_SIZE] != ARG_UNDEFINED_VALUE)
+    g->tile_size = parameter[GFX_ARG_TILE_SIZE];
+  if (g->tile_size < TILESIZE)
+    g->tile_size = TILESIZE;		/* standard tile size */
 #endif
 
 #if 1
@@ -2401,6 +2422,10 @@ static void InitMusicInfo()
 static void ReinitializeGraphics()
 {
   print_timestamp_init("ReinitializeGraphics");
+
+#if NEW_GAME_TILESIZE
+  InitGfxTileSizeInfo(game.tile_size, TILESIZE);
+#endif
 
   InitGraphicInfo();			/* graphic properties mapping */
   print_timestamp_time("InitGraphicInfo");

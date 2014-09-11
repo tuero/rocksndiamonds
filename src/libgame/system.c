@@ -196,6 +196,12 @@ void InitGfxFieldInfo(int sx, int sy, int sxsize, int sysize,
   SetDrawBackgroundMask(REDRAW_NONE);		/* deactivate masked drawing */
 }
 
+void InitGfxTileSizeInfo(int game_tile_size, int standard_tile_size)
+{
+  gfx.game_tile_size = game_tile_size;
+  gfx.standard_tile_size = standard_tile_size;
+}
+
 void InitGfxDoor1Info(int dx, int dy, int dxsize, int dysize)
 {
   gfx.dx = dx;
@@ -1109,50 +1115,148 @@ void ReloadCustomImage(Bitmap *bitmap, char *basename)
 
 Bitmap *ZoomBitmap(Bitmap *src_bitmap, int zoom_width, int zoom_height)
 {
-  Bitmap *dst_bitmap = CreateBitmap(zoom_width, zoom_height, DEFAULT_DEPTH);
+#if 0
+  // !!! TEST ONLY !!!
 
-  SDLZoomBitmap(src_bitmap, dst_bitmap);
+  Bitmap *dst_bitmap = CreateBitmap(zoom_width, zoom_height, DEFAULT_DEPTH);
+  print_timestamp_time("CreateBitmap");
+
+  SDL_Rect src_rect, dst_rect;
+
+  src_rect.x = 0;
+  src_rect.y = 0;
+  src_rect.w = src_bitmap->width - 0;
+  src_rect.h = src_bitmap->height;
+
+  dst_rect.x = 0;
+  dst_rect.y = 0;
+  dst_rect.w = dst_bitmap->width;
+  dst_rect.h = dst_bitmap->height;
+
+  SDL_BlitScaled(src_bitmap->surface, &src_rect,
+		 dst_bitmap->surface, &dst_rect);
+  print_timestamp_time("SDL_BlitScaled");
+
+#else
+
+  Bitmap *dst_bitmap = SDLZoomBitmap(src_bitmap, zoom_width, zoom_height);
+#endif
 
   return dst_bitmap;
 }
 
 static void CreateScaledBitmaps(Bitmap *old_bitmap, int zoom_factor,
-				boolean create_small_bitmaps)
+				int tile_size, boolean create_small_bitmaps)
 {
   Bitmap swap_bitmap;
   Bitmap *new_bitmap;
-  Bitmap *tmp_bitmap_1;
-  Bitmap *tmp_bitmap_2;
-  Bitmap *tmp_bitmap_4;
-  Bitmap *tmp_bitmap_8;
-  Bitmap *tmp_bitmap_16;
-  Bitmap *tmp_bitmap_32;
+  Bitmap *tmp_bitmap_final = NULL;
+  Bitmap *tmp_bitmap_0 = NULL;
+  Bitmap *tmp_bitmap_1 = NULL;
+  Bitmap *tmp_bitmap_2 = NULL;
+  Bitmap *tmp_bitmap_4 = NULL;
+  Bitmap *tmp_bitmap_8 = NULL;
+  Bitmap *tmp_bitmap_16 = NULL;
+  Bitmap *tmp_bitmap_32 = NULL;
+  int width_final, height_final;
+  int width_0, height_0;
   int width_1, height_1;
   int width_2, height_2;
   int width_4, height_4;
   int width_8, height_8;
   int width_16, height_16;
-#if 0
+#if 1
   int width_32, height_32;
 #endif
+  int old_width, old_height;
   int new_width, new_height;
 
-  /* calculate new image dimensions for normal sized image */
-  width_1  = old_bitmap->width  * zoom_factor;
-  height_1 = old_bitmap->height * zoom_factor;
+  print_timestamp_init("CreateScaledBitmaps");
 
-  /* get image with normal size (this might require scaling up) */
+  old_width  = old_bitmap->width;
+  old_height = old_bitmap->height;
+
+#if 1
+  /* calculate new image dimensions for final image size */
+  width_final  = old_width  * zoom_factor;
+  height_final = old_height * zoom_factor;
+
+  /* get image with final size (this might require scaling up) */
+  /* ("final" size may result in non-standard tile size image) */
+  if (zoom_factor != 1)
+    tmp_bitmap_final = ZoomBitmap(old_bitmap, width_final, height_final);
+  else
+    tmp_bitmap_final = old_bitmap;
+
+#else
+
+  /* calculate new image dimensions for final image size */
+  width_1  = old_width  * zoom_factor;
+  height_1 = old_height * zoom_factor;
+
+  /* get image with final size (this might require scaling up) */
+  /* ("final" size may result in non-standard tile size image) */
   if (zoom_factor != 1)
     tmp_bitmap_1 = ZoomBitmap(old_bitmap, width_1, height_1);
   else
     tmp_bitmap_1 = old_bitmap;
+#endif
 
-  /* this is only needed to make compilers happy */
-  tmp_bitmap_2 = NULL;
-  tmp_bitmap_4 = NULL;
-  tmp_bitmap_8 = NULL;
-  tmp_bitmap_16 = NULL;
-  tmp_bitmap_32 = NULL;
+  UPDATE_BUSY_STATE();
+
+  width_0  = width_1  = width_final;
+  height_0 = height_1 = height_final;
+
+  tmp_bitmap_0 = tmp_bitmap_1 = tmp_bitmap_final;
+
+#if 1
+  if (create_small_bitmaps)
+  {
+    /* check if we have a non-gameplay tile size image */
+    if (tile_size != gfx.game_tile_size)
+    {
+      /* get image with gameplay tile size */
+      width_0  = width_final  * gfx.game_tile_size / tile_size;
+      height_0 = height_final * gfx.game_tile_size / tile_size;
+
+      if (width_0 == old_width)
+	tmp_bitmap_0 = old_bitmap;
+      else if (width_0 == width_final)
+	tmp_bitmap_0 = tmp_bitmap_final;
+      else
+      {
+#if 0
+	if (old_width != width_0)
+	  printf("::: %d, %d -> %d, %d\n",
+		 old_width, old_height, width_0, height_0);
+#endif
+
+	tmp_bitmap_0 = ZoomBitmap(old_bitmap, width_0, height_0);
+      }
+
+      UPDATE_BUSY_STATE();
+    }
+
+    /* check if we have a non-standard tile size image */
+    if (tile_size != gfx.standard_tile_size)
+    {
+      /* get image with standard tile size */
+      width_1  = width_final  * gfx.standard_tile_size / tile_size;
+      height_1 = height_final * gfx.standard_tile_size / tile_size;
+
+      if (width_1 == old_width)
+	tmp_bitmap_1 = old_bitmap;
+      else if (width_1 == width_final)
+	tmp_bitmap_1 = tmp_bitmap_final;
+      else if (width_1 == width_0)
+	tmp_bitmap_1 = tmp_bitmap_0;
+      else
+	tmp_bitmap_1 = ZoomBitmap(old_bitmap, width_1, height_1);
+
+      UPDATE_BUSY_STATE();
+    }
+  }
+#endif
 
   if (create_small_bitmaps)
   {
@@ -1165,12 +1269,53 @@ static void CreateScaledBitmaps(Bitmap *old_bitmap, int zoom_factor,
     height_8 = height_1 / 8;
     width_16  = width_1  / 16;
     height_16 = height_1 / 16;
-#if 0
+#if 1
     width_32  = width_1  / 32;
     height_32 = height_1 / 32;
 #endif
 
+#if 1
+    /* get image with 1/2 of normal size (for use in the level editor) */
+    if (width_2 == old_width)
+      tmp_bitmap_2 = old_bitmap;
+    else
+      tmp_bitmap_2 = ZoomBitmap(tmp_bitmap_1, width_2, height_2);
+
     UPDATE_BUSY_STATE();
+
+    /* get image with 1/4 of normal size (for use in the level editor) */
+    if (width_4 == old_width)
+      tmp_bitmap_4 = old_bitmap;
+    else
+      tmp_bitmap_4 = ZoomBitmap(tmp_bitmap_2, width_4, height_4);
+
+    UPDATE_BUSY_STATE();
+
+    /* get image with 1/8 of normal size (for use on the preview screen) */
+    if (width_8 == old_width)
+      tmp_bitmap_8 = old_bitmap;
+    else
+      tmp_bitmap_8 = ZoomBitmap(tmp_bitmap_4, width_8, height_8);
+
+    UPDATE_BUSY_STATE();
+
+    /* get image with 1/16 of normal size (for use on the preview screen) */
+    if (width_16 == old_width)
+      tmp_bitmap_16 = old_bitmap;
+    else
+      tmp_bitmap_16 = ZoomBitmap(tmp_bitmap_8, width_16, height_16);
+
+    UPDATE_BUSY_STATE();
+
+    /* get image with 1/32 of normal size (for use on the preview screen) */
+    if (width_32 == old_width)
+      tmp_bitmap_32 = old_bitmap;
+    else
+      tmp_bitmap_32 = ZoomBitmap(tmp_bitmap_16, width_32, height_32);
+
+    UPDATE_BUSY_STATE();
+
+#else
 
     /* get image with 1/2 of normal size (for use in the level editor) */
     if (zoom_factor != 2)
@@ -1211,6 +1356,7 @@ static void CreateScaledBitmaps(Bitmap *old_bitmap, int zoom_factor,
       tmp_bitmap_32 = old_bitmap;
 
     UPDATE_BUSY_STATE();
+#endif
   }
 
 #if 0
@@ -1235,7 +1381,20 @@ static void CreateScaledBitmaps(Bitmap *old_bitmap, int zoom_factor,
     new_width  = width_1;
     new_height = height_1 + (height_1 + 1) / 2;     /* prevent odd height */
 
+#if 1
+    if (width_0 != width_1)
+    {
+      new_width += width_0;
+      new_height = MAX(new_height, height_0);
+    }
+#endif
+
     new_bitmap = CreateBitmap(new_width, new_height, DEFAULT_DEPTH);
+
+#if 1
+    if (width_0 != width_1)
+      BlitBitmap(tmp_bitmap_0, new_bitmap, 0, 0, width_0, height_0, width_1, 0);
+#endif
 
     BlitBitmap(tmp_bitmap_1, new_bitmap, 0, 0, width_1, height_1, 0, 0);
     BlitBitmap(tmp_bitmap_2, new_bitmap, 0, 0, width_1 / 2, height_1 / 2,
@@ -1262,6 +1421,37 @@ static void CreateScaledBitmaps(Bitmap *old_bitmap, int zoom_factor,
   if (create_small_bitmaps)
   {
     /* if no small bitmaps created, tmp_bitmap_1 is used as new bitmap now */
+
+#if 1
+    if (tmp_bitmap_final != old_bitmap)
+      FreeBitmap(tmp_bitmap_final);
+
+    if (tmp_bitmap_0 != old_bitmap &&
+	tmp_bitmap_0 != tmp_bitmap_final)
+      FreeBitmap(tmp_bitmap_0);
+
+    if (tmp_bitmap_1 != old_bitmap &&
+	tmp_bitmap_1 != tmp_bitmap_final &&
+	tmp_bitmap_1 != tmp_bitmap_0)
+      FreeBitmap(tmp_bitmap_1);
+
+    if (tmp_bitmap_2 != old_bitmap)
+      FreeBitmap(tmp_bitmap_2);
+
+    if (tmp_bitmap_4 != old_bitmap)
+      FreeBitmap(tmp_bitmap_4);
+
+    if (tmp_bitmap_8 != old_bitmap)
+      FreeBitmap(tmp_bitmap_8);
+
+    if (tmp_bitmap_16 != old_bitmap)
+      FreeBitmap(tmp_bitmap_16);
+
+    if (tmp_bitmap_32 != old_bitmap)
+      FreeBitmap(tmp_bitmap_32);
+
+#else
+
     if (zoom_factor != 1)
       FreeBitmap(tmp_bitmap_1);
 
@@ -1279,6 +1469,7 @@ static void CreateScaledBitmaps(Bitmap *old_bitmap, int zoom_factor,
 
     if (zoom_factor != 32)
       FreeBitmap(tmp_bitmap_32);
+#endif
   }
 
   /* replace image with extended image (containing 1/1, 1/2, 1/4, 1/8 size) */
@@ -1305,8 +1496,15 @@ static void CreateScaledBitmaps(Bitmap *old_bitmap, int zoom_factor,
 
     SDL_SetColorKey(old_surface, SET_TRANSPARENT_PIXEL,
 		    SDL_MapRGB(old_surface->format, 0x00, 0x00, 0x00));
-    if ((old_bitmap->surface_masked = SDL_DisplayFormat(old_surface)) ==NULL)
+
+#if 1
+    if ((old_bitmap->surface_masked = SDLGetNativeSurface(old_surface)) == NULL)
       Error(ERR_EXIT, "SDL_DisplayFormat() failed");
+#else
+    if ((old_bitmap->surface_masked = SDL_DisplayFormat(old_surface)) == NULL)
+      Error(ERR_EXIT, "SDL_DisplayFormat() failed");
+#endif
+
     SDL_SetColorKey(old_surface, UNSET_TRANSPARENT_PIXEL, 0);
   }
 #endif
@@ -1314,16 +1512,19 @@ static void CreateScaledBitmaps(Bitmap *old_bitmap, int zoom_factor,
   UPDATE_BUSY_STATE();
 
   FreeBitmap(new_bitmap);	/* this actually frees the _old_ bitmap now */
+
+  print_timestamp_done("CreateScaledBitmaps");
 }
 
-void CreateBitmapWithSmallBitmaps(Bitmap *old_bitmap, int zoom_factor)
+void CreateBitmapWithSmallBitmaps(Bitmap *old_bitmap, int zoom_factor,
+				  int tile_size)
 {
-  CreateScaledBitmaps(old_bitmap, zoom_factor, TRUE);
+  CreateScaledBitmaps(old_bitmap, zoom_factor, tile_size, TRUE);
 }
 
 void ScaleBitmap(Bitmap *old_bitmap, int zoom_factor)
 {
-  CreateScaledBitmaps(old_bitmap, zoom_factor, FALSE);
+  CreateScaledBitmaps(old_bitmap, zoom_factor, 0, FALSE);
 }
 
 

@@ -1520,12 +1520,28 @@ void getSizedGraphicSourceExt(int graphic, int frame, int tilesize_raw,
   Bitmap *src_bitmap = g->bitmap;
   int tilesize = MIN(MAX(1, tilesize_raw), TILESIZE);
   int offset_calc_pos = log_2(tilesize);
+  int bitmap_width  = src_bitmap->width;
+  int bitmap_height = src_bitmap->height;
   int width_mult  = offset_calc[offset_calc_pos].width_mult;
   int width_div   = offset_calc[offset_calc_pos].width_div;
   int height_mult = offset_calc[offset_calc_pos].height_mult;
   int height_div  = offset_calc[offset_calc_pos].height_div;
-  int startx = src_bitmap->width * width_mult / width_div;
-  int starty = src_bitmap->height * height_mult / height_div;
+  int startx = bitmap_width * width_mult / width_div;
+  int starty = bitmap_height * height_mult / height_div;
+
+#if NEW_GAME_TILESIZE
+
+  int src_x = (g->src_x + (get_backside ? g->offset2_x : 0)) *
+    tilesize_raw / TILESIZE;
+  int src_y = (g->src_y + (get_backside ? g->offset2_y : 0)) *
+    tilesize_raw / TILESIZE;
+  int width = g->width * tilesize_raw / TILESIZE;
+  int height = g->height * tilesize_raw / TILESIZE;
+  int offset_x = g->offset_x * tilesize_raw / TILESIZE;
+  int offset_y = g->offset_y * tilesize_raw / TILESIZE;
+
+#else
+
 #if NEW_TILESIZE
   int src_x = (g->src_x + (get_backside ? g->offset2_x : 0)) *
     tilesize / TILESIZE;
@@ -1539,6 +1555,34 @@ void getSizedGraphicSourceExt(int graphic, int frame, int tilesize_raw,
   int height = g->height * tilesize / TILESIZE;
   int offset_x = g->offset_x * tilesize / TILESIZE;
   int offset_y = g->offset_y * tilesize / TILESIZE;
+
+#endif
+
+#if NEW_GAME_TILESIZE
+  if (game.tile_size != TILESIZE)
+  {
+    int bitmap_width_std =
+      bitmap_width * TILESIZE / (TILESIZE + game.tile_size);
+    int bitmap_height_std =
+      bitmap_height * TILESIZE / game.tile_size * 3 / 2;
+
+    if (tilesize_raw == game.tile_size)
+    {
+      startx = bitmap_width_std;
+      starty = 0;
+    }
+    else
+    {
+      bitmap_width = bitmap_width_std;
+
+      if (game.tile_size > TILESIZE * 3 / 2)
+	bitmap_height = bitmap_height_std;
+
+      startx = bitmap_width * width_mult / width_div;
+      starty = bitmap_height * height_mult / height_div;
+    }
+  }
+#endif
 
   if (g->offset_y == 0)		/* frames are ordered horizontally */
   {
@@ -1609,7 +1653,6 @@ inline void getGraphicSourceExt(int graphic, int frame, Bitmap **bitmap,
   int src_y = g->src_y + (get_backside ? g->offset2_y : 0);
 
 #if NEW_TILESIZE
-
   if (TILESIZE_VAR != TILESIZE)
     return getSizedGraphicSourceExt(graphic, frame, TILESIZE_VAR, bitmap, x, y,
 				    get_backside);
@@ -2191,8 +2234,8 @@ static void DrawLevelFieldCrumbledInnerCorners(int x, int y, int dx, int dy,
 #if NEW_TILESIZE
   width  = crumbled_border_size * TILESIZE_VAR / TILESIZE;
   height = crumbled_border_size * TILESIZE_VAR / TILESIZE;
-  cx = (dx > 0 ? TILEX - crumbled_border_size : 0) * TILESIZE_VAR / TILESIZE;
-  cy = (dy > 0 ? TILEY - crumbled_border_size : 0) * TILESIZE_VAR / TILESIZE;
+  cx = (dx > 0 ? TILESIZE_VAR - width  : 0);
+  cy = (dy > 0 ? TILESIZE_VAR - height : 0);
 
   BlitBitmap(src_bitmap, drawto_field, src_x + cx, src_y + cy,
 	     width, height, FX + sx * TILEX_VAR + cx, FY + sy * TILEY_VAR + cy);
@@ -2215,6 +2258,8 @@ static void DrawLevelFieldCrumbledBorders(int x, int y, int graphic, int frame,
   int width, height, bx, by, cx, cy;
   int sx = SCREENX(x), sy = SCREENY(y);
   int crumbled_border_size = graphic_info[graphic].border_size;
+  int crumbled_border_size_var = crumbled_border_size * TILESIZE_VAR / TILESIZE;
+  int crumbled_border_pos_var = TILESIZE_VAR - crumbled_border_size_var;
   int i;
 
   getGraphicSource(graphic, frame, &src_bitmap, &src_x, &src_y);
@@ -2222,10 +2267,10 @@ static void DrawLevelFieldCrumbledBorders(int x, int y, int graphic, int frame,
   /* draw simple, sloppy, non-corner-accurate crumbled border */
 
 #if 1
-  width  = (dir == 1 || dir == 2 ? crumbled_border_size : TILEX);
-  height = (dir == 0 || dir == 3 ? crumbled_border_size : TILEY);
-  cx = (dir == 2 ? TILEX - crumbled_border_size : 0);
-  cy = (dir == 3 ? TILEY - crumbled_border_size : 0);
+  width  = (dir == 1 || dir == 2 ? crumbled_border_size_var : TILESIZE_VAR);
+  height = (dir == 0 || dir == 3 ? crumbled_border_size_var : TILESIZE_VAR);
+  cx = (dir == 2 ? crumbled_border_pos_var : 0);
+  cy = (dir == 3 ? crumbled_border_pos_var : 0);
 #else
   if (dir == 1 || dir == 2)		/* left or right crumbled border */
   {
@@ -2245,12 +2290,12 @@ static void DrawLevelFieldCrumbledBorders(int x, int y, int graphic, int frame,
 
 #if NEW_TILESIZE
   BlitBitmap(src_bitmap, drawto_field,
-	     src_x + cx * TILESIZE_VAR / TILESIZE,
-	     src_y + cy * TILESIZE_VAR / TILESIZE,
-	     width * TILESIZE_VAR / TILESIZE,
-	     height * TILESIZE_VAR / TILESIZE,
-	     FX + sx * TILEX_VAR + cx * TILESIZE_VAR / TILESIZE,
-	     FY + sy * TILEY_VAR + cy * TILESIZE_VAR / TILESIZE);
+	     src_x + cx,
+	     src_y + cy,
+	     width,
+	     height,
+	     FX + sx * TILEX_VAR + cx,
+	     FY + sy * TILEY_VAR + cy);
 #else
   BlitBitmap(src_bitmap, drawto_field, src_x + cx, src_y + cy,
 	     width, height, FX + sx * TILEX + cx, FY + sy * TILEY + cy);
@@ -2264,7 +2309,7 @@ static void DrawLevelFieldCrumbledBorders(int x, int y, int graphic, int frame,
   /* correct corners of crumbled border, if needed */
 
 #if 1
-  for (i = -1; i <= 1; i+=2)
+  for (i = -1; i <= 1; i += 2)
   {
     int xx = x + (dir == 0 || dir == 3 ? i : 0);
     int yy = y + (dir == 1 || dir == 2 ? i : 0);
@@ -2278,13 +2323,13 @@ static void DrawLevelFieldCrumbledBorders(int x, int y, int graphic, int frame,
     {
       /* no crumbled corner, but continued crumbled border */
 
-      int c1 = (dir == 2 || dir == 3 ? TILESIZE - crumbled_border_size : 0);
-      int c2 = (i == 1 ? TILESIZE - crumbled_border_size : 0);
-      int b1 = (i == 1 ? crumbled_border_size :
-		TILESIZE - 2 * crumbled_border_size);
+      int c1 = (dir == 2 || dir == 3 ? crumbled_border_pos_var : 0);
+      int c2 = (i == 1 ? crumbled_border_pos_var : 0);
+      int b1 = (i == 1 ? crumbled_border_size_var :
+		TILESIZE_VAR - 2 * crumbled_border_size_var);
 
-      width  = crumbled_border_size;
-      height = crumbled_border_size;
+      width  = crumbled_border_size_var;
+      height = crumbled_border_size_var;
 
       if (dir == 1 || dir == 2)
       {
@@ -2303,12 +2348,12 @@ static void DrawLevelFieldCrumbledBorders(int x, int y, int graphic, int frame,
 
 #if NEW_TILESIZE
       BlitBitmap(src_bitmap, drawto_field,
-		 src_x + bx * TILESIZE_VAR / TILESIZE,
-		 src_y + by * TILESIZE_VAR / TILESIZE,
-		 width * TILESIZE_VAR / TILESIZE,
-		 height * TILESIZE_VAR / TILESIZE,
-		 FX + sx * TILEX_VAR + cx * TILESIZE_VAR / TILESIZE,
-		 FY + sy * TILEY_VAR + cy * TILESIZE_VAR / TILESIZE);
+		 src_x + bx,
+		 src_y + by,
+		 width,
+		 height,
+		 FX + sx * TILEX_VAR + cx,
+		 FY + sy * TILEY_VAR + cy);
 #else
       BlitBitmap(src_bitmap, drawto_field, src_x + bx, src_y + by,
 		 width, height, FX + sx * TILEX + cx, FY + sy * TILEY + cy);
@@ -11510,7 +11555,14 @@ void ChangeViewportPropertiesIfNeeded()
   int new_exsize	= vp_door_3->width;
   int new_eysize	= vp_door_3->height;
 #if NEW_TILESIZE
+
+#if NEW_GAME_TILESIZE
+  int new_tilesize_var =
+    (setup.small_game_graphics ? MINI_TILESIZE : game.tile_size);
+#else
   int new_tilesize_var = TILESIZE / (setup.small_game_graphics ? 2 : 1);
+#endif
+
   int tilesize = (gfx_game_mode == GAME_MODE_PLAYING ? new_tilesize_var :
 		  gfx_game_mode == GAME_MODE_EDITOR ? MINI_TILESIZE : TILESIZE);
   int new_scr_fieldx = new_sxsize / tilesize;

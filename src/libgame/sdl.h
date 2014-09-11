@@ -436,6 +436,9 @@ struct MouseCursorInfo
 
 /* SDL function definitions */
 
+boolean SDLSetNativeSurface(SDL_Surface **);
+SDL_Surface *SDLGetNativeSurface(SDL_Surface *);
+
 #if defined(TARGET_SDL2)
 SDL_Surface *SDL_DisplayFormat(SDL_Surface *);
 void SDLSetWindowScaling(int);
@@ -464,7 +467,11 @@ void SDLPutPixel(Bitmap *, int, int, Pixel);
 void SDLInvertArea(Bitmap *, int, int, int, int, Uint32);
 void SDLCopyInverseMasked(Bitmap *, Bitmap *, int, int, int, int, int, int);
 
+#if 1
+Bitmap *SDLZoomBitmap(Bitmap *, int, int);
+#else
 void SDLZoomBitmap(Bitmap *, Bitmap *);
+#endif
 
 Bitmap *SDLLoadImage(char *);
 

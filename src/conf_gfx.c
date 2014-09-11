@@ -59,6 +59,7 @@ struct ConfigTypeInfo image_config_suffix[] =
   { ".post_delay_random",		ARG_UNDEFINED,	TYPE_INTEGER	},
   { ".name",				ARG_UNDEFINED,	TYPE_STRING	},
   { ".scale_up_factor",			ARG_UNDEFINED,	TYPE_INTEGER	},
+  { ".tile_size",			ARG_UNDEFINED,	TYPE_INTEGER	},
   { ".clone_from",			ARG_UNDEFINED,	TYPE_GRAPHIC	},
   { ".fade_mode",			ARG_UNDEFINED,	TYPE_INTEGER	},
   { ".fade_delay",			ARG_UNDEFINED,	TYPE_INTEGER	},
