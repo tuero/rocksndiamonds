@@ -1,9 +1,14 @@
 #!/usr/bin/perl -w
 
 # =============================================================================
-# create_element_defs.pl
+# Rocks'n'Diamonds - McDuffin Strikes Back!
 # -----------------------------------------------------------------------------
-# 2002-09-19 holger.schemel@mediaways.net
+# (c) 1995-2014 by Artsoft Entertainment
+#     		    Holger Schemel
+#		    info@artsoft.org
+#		    http://www.artsoft.org/
+# -----------------------------------------------------------------------------
+# create_element_defs.pl
 # =============================================================================
 
 use strict;

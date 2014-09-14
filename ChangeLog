@@ -1,3 +1,6 @@
+2014-09-14
+	* updated source file headers (mainly author contact information)
+
 2014-09-11
 	* added key shortcuts for window scaling and toggling fullscreen mode:
 	  - Ctrl-'+', Ctrl-'-' and Ctrl-'0' for up/downscaling and normal size
