@@ -1,9 +1,15 @@
 # =============================================================================
-# Rocks'n'Diamonds Makefile (game_em)
+# Rocks'n'Diamonds - McDuffin Strikes Back!
 # -----------------------------------------------------------------------------
-# (c) 1995-2006 Holger Schemel <info@artsoft.org>
+# (c) 1995-2014 by Artsoft Entertainment
+#                  Holger Schemel
+#                  info@artsoft.org
+#                  http://www.artsoft.org/
 # -----------------------------------------------------------------------------
+# The native Emerald Mine game engine is based on:
 # Emerald Mine for X11 © 2000,2001 David Tritscher
+# -----------------------------------------------------------------------------
+# src/game_em/Makefile
 # =============================================================================
 
 # -----------------------------------------------------------------------------

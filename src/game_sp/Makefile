@@ -1,11 +1,17 @@
 # =============================================================================
-# Makefile for native Supaplex engine for Rocks'n'Diamonds (game_sp)
+# Rocks'n'Diamonds - McDuffin Strikes Back!
 # -----------------------------------------------------------------------------
-# (c) 1995-2009 Holger Schemel <info@artsoft.org>
+# (c) 1995-2014 by Artsoft Entertainment
+#                  Holger Schemel
+#                  info@artsoft.org
+#                  http://www.artsoft.org/
 # -----------------------------------------------------------------------------
-# based on MegaPlex version 0.5 beta release xmas 2001 by Frank Schindler,
-# based on the Speed Fix 6.3+ by Herman Perk,
-# based on original Supaplex by Michael Stopp & Philip Jespersen
+# The native Supaplex game engine is based on:
+# - MegaPlex version 0.5 beta release xmas 2001 by Frank Schindler
+# - Speed Fix 6.3+ by Herman Perk
+# - Supaplex by Michael Stopp & Philip Jespersen
+# -----------------------------------------------------------------------------
+# src/game_sp/Makefile
 # =============================================================================
 
 # -----------------------------------------------------------------------------
