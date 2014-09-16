@@ -23,9 +23,6 @@ Bitmap		       *bitmap_db_store;
 Bitmap		       *bitmap_db_cross;
 Bitmap		       *bitmap_db_field;
 Bitmap		       *bitmap_db_panel;
-#if 0
-Bitmap		       *bitmap_db_door;
-#endif
 Bitmap		       *bitmap_db_door_1;
 Bitmap		       *bitmap_db_door_2;
 Bitmap		       *bitmap_db_toons;
@@ -43,15 +40,7 @@ SDL_Thread	       *server_thread;
 
 int			key_joystick_mapping = 0;
 
-#if 1
-#if NEW_SCROLL
 boolean			redraw[2 + MAX_LEV_FIELDX + 2][2 + MAX_LEV_FIELDY + 2];
-#else
-boolean			redraw[MAX_LEV_FIELDX + 2][MAX_LEV_FIELDY + 2];
-#endif
-#else
-boolean			redraw[MAX_BUF_XSIZE][MAX_BUF_YSIZE];
-#endif
 int			redraw_x1 = 0, redraw_y1 = 0;
 
 short			Feld[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
@@ -116,24 +105,15 @@ int			EXSIZE = 100;
 int			EYSIZE = 144;
 int			TILESIZE_VAR = TILESIZE;
 
-#if 1
 int			FX, FY;
-#else
-int			FX = SX, FY = SY;
-#endif
 int			ScrollStepSize;
 int			ScreenMovDir = MV_NONE, ScreenMovPos = 0;
 int			ScreenGfxPos = 0;
 int			BorderElement = EL_STEELWALL;
 int			GameFrameDelay = GAME_FRAME_DELAY;
 int			FfwdFrameDelay = FFWD_FRAME_DELAY;
-#if 1
 int			BX1, BY1;
 int			BX2, BY2;
-#else
-int			BX1 = 0, BY1 = 0;
-int			BX2 = SCR_FIELDX - 1, BY2 = SCR_FIELDY - 1;
-#endif
 int			SBX_Left, SBX_Right;
 int			SBY_Upper, SBY_Lower;
 int			ZX, ZY;

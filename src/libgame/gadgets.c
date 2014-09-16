@@ -382,16 +382,9 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 				   gi->height - 2 * border_y);
 
 	/* gadget text value */
-#if 1
 	DrawTextBuffer(gi->x + border_x, gi->y + border_y, gi->textarea.value,
 		       font_nr, gi->textarea.xsize, -1, gi->textarea.ysize, 0,
 		       BLIT_ON_BACKGROUND, FALSE, FALSE, FALSE);
-#else
-	DrawTextToTextArea(gi->x + border_x, gi->y + border_y,
-			   gi->textarea.value, font_nr, gi->textarea.xsize,
-			   gi->textarea.xsize, gi->textarea.ysize,
-			   BLIT_ON_BACKGROUND);
-#endif
 
 	cursor_letter = gi->textarea.value[gi->textarea.cursor_position];
 	cursor_string[0] = (cursor_letter != '\0' ? cursor_letter : ' ');
@@ -708,7 +701,6 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
   }
   else
   {
-#if 1
     int x = gi->x;
     int y = gi->y;
 
@@ -716,11 +708,6 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 		    IN_GFX_DOOR_1(x, y) ? REDRAW_DOOR_1 :
 		    IN_GFX_DOOR_2(x, y) ? REDRAW_DOOR_2 :
 		    IN_GFX_DOOR_3(x, y) ? REDRAW_DOOR_3 : REDRAW_ALL);
-#else
-    redraw_mask |= (gi->x < gfx.sx + gfx.sxsize ? REDRAW_FIELD :
-		    gi->y < gfx.dy + gfx.dysize ? REDRAW_DOOR_1 :
-		    gi->y > gfx.vy ? REDRAW_DOOR_2 : REDRAW_DOOR_3);
-#endif
   }
 }
 
@@ -1354,7 +1341,6 @@ static void MultiMapGadgets(int mode)
 
   while (gi != NULL)
   {
-#if 1
     int x = gi->x;
     int y = gi->y;
 
@@ -1363,15 +1349,6 @@ static void MultiMapGadgets(int mode)
 	(mode & MULTIMAP_DOOR_2 && IN_GFX_DOOR_2(x, y)) ||
 	(mode & MULTIMAP_DOOR_3 && IN_GFX_DOOR_3(x, y)) ||
 	(mode & MULTIMAP_ALL) == MULTIMAP_ALL)
-#else
-    if ((mode & MULTIMAP_PLAYFIELD &&
-	 gi->x < gfx.sx + gfx.sxsize) ||
-	(mode & MULTIMAP_DOOR_1 &&
-	 gi->x >= gfx.dx && gi->y < gfx.dy + gfx.dysize) ||
-	(mode & MULTIMAP_DOOR_2 &&
-	 gi->x >= gfx.dx && gi->y > gfx.dy + gfx.dysize) ||
-	(mode & MULTIMAP_ALL) == MULTIMAP_ALL)
-#endif
     {
       if (mode & MULTIMAP_UNMAP)
       {
@@ -1487,9 +1464,6 @@ boolean HandleGadgets(int mx, int my, int button)
   boolean gadget_dragging;
   boolean gadget_released;
   boolean gadget_released_inside;
-#if 0
-  boolean gadget_released_inside_select_line;
-#endif
   boolean gadget_released_inside_select_area;
   boolean gadget_released_off_borders;
   boolean changed_position = FALSE;
@@ -1591,19 +1565,9 @@ boolean HandleGadgets(int mx, int my, int button)
 
   /* when handling selectbox, set additional state values */
   if (gadget_released_inside && (last_gi->type & GD_TYPE_SELECTBOX))
-  {
-#if 0
-    gadget_released_inside_select_line = insideSelectboxLine(last_gi, mx, my);
-#endif
     gadget_released_inside_select_area = insideSelectboxArea(last_gi, mx, my);
-  }
   else
-  {
-#if 0
-    gadget_released_inside_select_line = FALSE;
-#endif
     gadget_released_inside_select_area = FALSE;
-  }
 
   /* setting state for handling over-large selectbox */
   if (keep_selectbox_open && (press_event || !mouse_inside_select_line))

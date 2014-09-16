@@ -224,14 +224,10 @@ boolean getTokenValueFromString(char *string, char **token, char **value)
 /* maximal allowed length of a command line option */
 #define MAX_OPTION_LEN		256
 
-#if 1
-
-#if defined(TARGET_SDL)
 static unsigned int getCurrentMS()
 {
   return SDL_GetTicks();
 }
-#endif
 
 static unsigned int mainCounter(int mode)
 {
@@ -248,29 +244,6 @@ static unsigned int mainCounter(int mode)
   /* return milliseconds since last counter reset */
   return current_ms - base_ms;
 }
-
-#else
-
-#if defined(TARGET_SDL)
-static unsigned int mainCounter(int mode)
-{
-  static unsigned int base_ms = 0;
-  unsigned int current_ms;
-  unsigned int counter_ms;
-
-  current_ms = SDL_GetTicks();
-
-  /* reset base time in case of counter initializing or wrap-around */
-  if (mode == INIT_COUNTER || current_ms < base_ms)
-    base_ms = current_ms;
-
-  counter_ms = current_ms - base_ms;
-
-  return counter_ms;		/* return milliseconds since last init */
-}
-#endif
-
-#endif
 
 void InitCounter()		/* set counter back to zero */
 {
@@ -301,17 +274,7 @@ static void sleep_milliseconds(unsigned int milliseconds_delay)
   }
   else
   {
-#if defined(TARGET_SDL)
     SDL_Delay(milliseconds_delay);
-#else
-    struct timeval delay;
-
-    delay.tv_sec  = milliseconds_delay / 1000;
-    delay.tv_usec = 1000 * (milliseconds_delay % 1000);
-
-    if (select(0, NULL, NULL, NULL, &delay) != 0)
-      Error(ERR_WARN, "sleep_milliseconds(): select() failed");
-#endif
   }
 }
 
@@ -387,15 +350,11 @@ unsigned int init_random_number(int nr, int seed)
     seed += (int)current_time.tv_usec;		// microseconds since the epoch
 #endif
 
-#if defined(TARGET_SDL)
     /* add some more randomness */
     seed += (int)SDL_GetTicks();		// milliseconds since SDL init
-#endif
 
-#if 1
     /* add some more randomness */
     seed += GetSimpleRandom(1000000);
-#endif
   }
 
   srandom_linux_libc(nr, (unsigned int) seed);
@@ -771,7 +730,6 @@ void GetOptions(char *argv[],
   char *rw_base_path = RW_BASE_PATH;
   char **options_left = &argv[1];
 
-#if 1
   /* if the program is configured to start from current directory (default),
      determine program package directory from program binary (some versions
      of KDE/Konqueror and Mac OS X (especially "Mavericks") apparently do not
@@ -781,22 +739,6 @@ void GetOptions(char *argv[],
     ro_base_path = getProgramMainDataPath();
   if (strEqual(rw_base_path, "."))
     rw_base_path = getProgramMainDataPath();
-#else
-
-#if !defined(PLATFORM_MACOSX)
-  /* if the program is configured to start from current directory (default),
-     determine program package directory (KDE/Konqueror does not do this by
-     itself and fails otherwise); on Mac OS X, the program binary is stored
-     in an application package directory -- do not try to use this directory
-     as the program data directory (Mac OS X handles this correctly anyway) */
-
-  if (strEqual(ro_base_path, "."))
-    ro_base_path = program.command_basepath;
-  if (strEqual(rw_base_path, "."))
-    rw_base_path = program.command_basepath;
-#endif
-
-#endif
 
   /* initialize global program options */
   options.display_name = NULL;
@@ -963,22 +905,7 @@ void GetOptions(char *argv[],
     }
     else if (strPrefix(option, "-D"))
     {
-#if 1
       options.special_flags = getStringCopy(&option[2]);
-#else
-      char *flags_string = &option[2];
-      unsigned int flags_value;
-
-      if (*flags_string == '\0')
-	Error(ERR_EXIT_HELP, "empty flag ignored");
-
-      flags_value = get_special_flags_function(flags_string);
-
-      if (flags_value == 0)
-	Error(ERR_EXIT_HELP, "unknown flag '%s'", flags_string);
-
-      options.special_flags |= flags_value;
-#endif
     }
     else if (strncmp(option, "-execute", option_len) == 0)
     {
@@ -1050,11 +977,9 @@ void Error(int mode, char *format, ...)
 		      ANDROID_LOG_UNKNOWN);
 #endif
 
-#if 1
   /* display warnings only when running in verbose mode */
   if (mode & ERR_WARN && !options.verbose)
     return;
-#endif
 
   if (mode == ERR_INFO_LINE)
   {
@@ -1204,21 +1129,10 @@ inline void swap_number_pairs(int *x1, int *y1, int *x2, int *y2)
    of the (not yet written) chunk, write the correct chunk size and finally
    write the chunk itself */
 
-#if 1
-
 int getFile8BitInteger(File *file)
 {
   return getByteFromFile(file);
 }
-
-#else
-
-int getFile8BitInteger(FILE *file)
-{
-  return fgetc(file);
-}
-
-#endif
 
 int putFile8BitInteger(FILE *file, int value)
 {
@@ -1227,8 +1141,6 @@ int putFile8BitInteger(FILE *file, int value)
 
   return 1;
 }
-
-#if 1
 
 int getFile16BitInteger(File *file, int byte_order)
 {
@@ -1239,20 +1151,6 @@ int getFile16BitInteger(File *file, int byte_order)
     return ((getByteFromFile(file) << 0) |
 	    (getByteFromFile(file) << 8));
 }
-
-#else
-
-int getFile16BitInteger(FILE *file, int byte_order)
-{
-  if (byte_order == BYTE_ORDER_BIG_ENDIAN)
-    return ((fgetc(file) << 8) |
-	    (fgetc(file) << 0));
-  else		 /* BYTE_ORDER_LITTLE_ENDIAN */
-    return ((fgetc(file) << 0) |
-	    (fgetc(file) << 8));
-}
-
-#endif
 
 int putFile16BitInteger(FILE *file, int value, int byte_order)
 {
@@ -1273,8 +1171,6 @@ int putFile16BitInteger(FILE *file, int value, int byte_order)
   return 2;
 }
 
-#if 1
-
 int getFile32BitInteger(File *file, int byte_order)
 {
   if (byte_order == BYTE_ORDER_BIG_ENDIAN)
@@ -1288,24 +1184,6 @@ int getFile32BitInteger(File *file, int byte_order)
 	    (getByteFromFile(file) << 16) |
 	    (getByteFromFile(file) << 24));
 }
-
-#else
-
-int getFile32BitInteger(FILE *file, int byte_order)
-{
-  if (byte_order == BYTE_ORDER_BIG_ENDIAN)
-    return ((fgetc(file) << 24) |
-	    (fgetc(file) << 16) |
-	    (fgetc(file) <<  8) |
-	    (fgetc(file) <<  0));
-  else		 /* BYTE_ORDER_LITTLE_ENDIAN */
-    return ((fgetc(file) <<  0) |
-	    (fgetc(file) <<  8) |
-	    (fgetc(file) << 16) |
-	    (fgetc(file) << 24));
-}
-
-#endif
 
 int putFile32BitInteger(FILE *file, int value, int byte_order)
 {
@@ -1330,8 +1208,6 @@ int putFile32BitInteger(FILE *file, int value, int byte_order)
   return 4;
 }
 
-#if 1
-
 boolean getFileChunk(File *file, char *chunk_name, int *chunk_size,
 		     int byte_order)
 {
@@ -1349,28 +1225,6 @@ boolean getFileChunk(File *file, char *chunk_name, int *chunk_size,
 
   return (checkEndOfFile(file) ? FALSE : TRUE);
 }
-
-#else
-
-boolean getFileChunk(FILE *file, char *chunk_name, int *chunk_size,
-		     int byte_order)
-{
-  const int chunk_name_length = 4;
-
-  /* read chunk name */
-  if (fgets(chunk_name, chunk_name_length + 1, file) == NULL)
-    return FALSE;
-
-  if (chunk_size != NULL)
-  {
-    /* read chunk size */
-    *chunk_size = getFile32BitInteger(file, byte_order);
-  }
-
-  return (feof(file) || ferror(file) ? FALSE : TRUE);
-}
-
-#endif
 
 int putFileChunk(FILE *file, char *chunk_name, int chunk_size,
 		 int byte_order)
@@ -1395,8 +1249,6 @@ int putFileChunk(FILE *file, char *chunk_name, int chunk_size,
   return num_bytes;
 }
 
-#if 1
-
 int getFileVersion(File *file)
 {
   int version_major = getByteFromFile(file);
@@ -1407,21 +1259,6 @@ int getFileVersion(File *file)
   return VERSION_IDENT(version_major, version_minor, version_patch,
 		       version_build);
 }
-
-#else
-
-int getFileVersion(FILE *file)
-{
-  int version_major = fgetc(file);
-  int version_minor = fgetc(file);
-  int version_patch = fgetc(file);
-  int version_build = fgetc(file);
-
-  return VERSION_IDENT(version_major, version_minor, version_patch,
-		       version_build);
-}
-
-#endif
 
 int putFileVersion(FILE *file, int version)
 {
@@ -1441,8 +1278,6 @@ int putFileVersion(FILE *file, int version)
   return 4;
 }
 
-#if 1
-
 void ReadBytesFromFile(File *file, byte *buffer, unsigned int bytes)
 {
   int i;
@@ -1450,18 +1285,6 @@ void ReadBytesFromFile(File *file, byte *buffer, unsigned int bytes)
   for (i = 0; i < bytes && !checkEndOfFile(file); i++)
     buffer[i] = getByteFromFile(file);
 }
-
-#else
-
-void ReadBytesFromFile(FILE *file, byte *buffer, unsigned int bytes)
-{
-  int i;
-
-  for(i = 0; i < bytes && !feof(file); i++)
-    buffer[i] = fgetc(file);
-}
-
-#endif
 
 void WriteBytesToFile(FILE *file, byte *buffer, unsigned int bytes)
 {
@@ -1471,23 +1294,11 @@ void WriteBytesToFile(FILE *file, byte *buffer, unsigned int bytes)
     fputc(buffer[i], file);
 }
 
-#if 1
-
 void ReadUnusedBytesFromFile(File *file, unsigned int bytes)
 {
   while (bytes-- && !checkEndOfFile(file))
     getByteFromFile(file);
 }
-
-#else
-
-void ReadUnusedBytesFromFile(FILE *file, unsigned int bytes)
-{
-  while (bytes-- && !feof(file))
-    fgetc(file);
-}
-
-#endif
 
 void WriteUnusedBytesToFile(FILE *file, unsigned int bytes)
 {
@@ -2342,12 +2153,6 @@ DirectoryEntry *readDirectory(Directory *dir)
     (stat(dir->dir_entry->filename, &file_status) == 0 &&
      (file_status.st_mode & S_IFMT) == S_IFDIR);
 
-#if 0
-  Error(ERR_INFO, "::: '%s' is directory: %d",
-	dir->dir_entry->basename,
-	dir->dir_entry->is_directory);
-#endif
-
   return dir->dir_entry;
 }
 
@@ -2459,7 +2264,6 @@ boolean fileHasSuffix(char *basename, char *suffix)
   return FALSE;
 }
 
-#if defined(TARGET_SDL)
 static boolean FileCouldBeArtwork(char *basename)
 {
   return (!strEqual(basename, ".") &&
@@ -2467,57 +2271,26 @@ static boolean FileCouldBeArtwork(char *basename)
 	  !fileHasSuffix(basename, "txt") &&
 	  !fileHasSuffix(basename, "conf"));
 }
-#endif
 
 boolean FileIsGraphic(char *filename)
 {
   char *basename = getBaseNamePtr(filename);
 
-#if defined(TARGET_SDL)
   return FileCouldBeArtwork(basename);
-#else
-  return fileHasSuffix(basename, "pcx");
-#endif
 }
 
 boolean FileIsSound(char *filename)
 {
   char *basename = getBaseNamePtr(filename);
 
-#if defined(TARGET_SDL)
   return FileCouldBeArtwork(basename);
-#else
-  return fileHasSuffix(basename, "wav");
-#endif
 }
 
 boolean FileIsMusic(char *filename)
 {
   char *basename = getBaseNamePtr(filename);
 
-#if defined(TARGET_SDL)
   return FileCouldBeArtwork(basename);
-#else
-  if (FileIsSound(basename))
-    return TRUE;
-
-#if 0
-#if defined(TARGET_SDL)
-  if ((fileHasPrefix(basename, "mod") && !fileHasSuffix(basename, "txt")) ||
-      fileHasSuffix(basename, "mod") ||
-      fileHasSuffix(basename, "s3m") ||
-      fileHasSuffix(basename, "it") ||
-      fileHasSuffix(basename, "xm") ||
-      fileHasSuffix(basename, "midi") ||
-      fileHasSuffix(basename, "mid") ||
-      fileHasSuffix(basename, "mp3") ||
-      fileHasSuffix(basename, "ogg"))
-    return TRUE;
-#endif
-#endif
-
-  return FALSE;
-#endif
 }
 
 boolean FileIsArtworkType(char *basename, int type)
@@ -2665,11 +2438,7 @@ int get_parameter_value(char *value_raw, char *suffix, int type)
 	      string_has_parameter(value, "melt")	? FADE_MODE_MELT :
 	      FADE_MODE_DEFAULT);
   }
-#if 1
   else if (strPrefix(suffix, ".font"))		/* (may also be ".font_xyz") */
-#else
-  else if (strEqualN(suffix, ".font", 5))	/* (may also be ".font_xyz") */
-#endif
   {
     result = gfx.get_font_from_token_function(value);
   }
@@ -2779,9 +2548,6 @@ struct FileInfo *getFileListFromConfigList(struct ConfigInfo *config_list,
   for (i = 0; config_list[i].token != NULL; i++)
   {
     int len_config_token = strlen(config_list[i].token);
-#if 0
-    int len_config_value = strlen(config_list[i].value);
-#endif
     boolean is_file_entry = TRUE;
 
     for (j = 0; suffix_list[j].token != NULL; j++)
@@ -2814,24 +2580,8 @@ struct FileInfo *getFileListFromConfigList(struct ConfigInfo *config_list,
       if (list_pos >= num_file_list_entries)
 	break;
 
-#if 0
-      /* simple sanity check if this is really a file definition */
-      if (!strEqual(&config_list[i].value[len_config_value - 4], ".pcx") &&
-	  !strEqual(&config_list[i].value[len_config_value - 4], ".wav") &&
-	  !strEqual(config_list[i].value, UNDEFINED_FILENAME))
-      {
-	Error(ERR_INFO, "Configuration directive '%s' -> '%s':",
-	      config_list[i].token, config_list[i].value);
-	Error(ERR_EXIT, "This seems to be no valid definition -- please fix");
-      }
-#endif
-
       file_list[list_pos].token = config_list[i].token;
       file_list[list_pos].default_filename = config_list[i].value;
-
-#if 0
-      printf("::: '%s' => '%s'\n", config_list[i].token, config_list[i].value);
-#endif
     }
 
     if (strSuffix(config_list[i].token, ".clone_from"))
@@ -2849,10 +2599,6 @@ struct FileInfo *getFileListFromConfigList(struct ConfigInfo *config_list,
 	  num_file_list_entries_found);
     Error(ERR_EXIT,   "please fix");
   }
-
-#if 0
-  printf("::: ---------- DONE ----------\n");
-#endif
 
   return file_list;
 }
@@ -2995,10 +2741,6 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
   if (filename == NULL)
     return;
 
-#if 0
-  printf("LoadArtworkConfigFromFilename '%s' ...\n", filename);
-#endif
-
   if ((setup_file_hash = loadSetupFileHash(filename)) == NULL)
     return;
 
@@ -3081,10 +2823,6 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
     boolean base_prefix_found = FALSE;
     boolean parameter_suffix_found = FALSE;
 
-#if 0
-    printf("::: examining '%s' -> '%s'\n", token, HASH_ITERATION_VALUE(itr));
-#endif
-
     /* skip all parameter definitions (handled by read_token_parameters()) */
     for (i = 0; i < num_suffix_list_entries && !parameter_suffix_found; i++)
     {
@@ -3120,19 +2858,9 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
 
       base_index = i;
 
-#if 0
-      if (IS_PARENT_PROCESS())
-	printf("===> MATCH: '%s', '%s'\n", token, base_prefix);
-#endif
-
       if (start_pos + len_base_prefix == len_token)	/* exact match */
       {
 	exact_match = TRUE;
-
-#if 0
-	if (IS_PARENT_PROCESS())
-	  printf("===> EXACT MATCH: '%s', '%s'\n", token, base_prefix);
-#endif
 
 	add_dynamic_file_list_entry(dynamic_file_list,
 				    num_dynamic_file_list_entries,
@@ -3146,11 +2874,6 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
 			     current_summarized_file_list_entry);
 	continue;
       }
-
-#if 0
-      if (IS_PARENT_PROCESS())
-	printf("---> examining token '%s': search 1st suffix ...\n", token);
-#endif
 
       /* ---------- step 1: search for matching first suffix ---------- */
 
@@ -3167,19 +2890,9 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
 
 	ext1_index = j;
 
-#if 0
-	if (IS_PARENT_PROCESS())
-	  printf("===> MATCH: '%s', '%s'\n", token, ext1_suffix);
-#endif
-
 	if (start_pos + len_ext1_suffix == len_token)	/* exact match */
 	{
 	  exact_match = TRUE;
-
-#if 0
-	if (IS_PARENT_PROCESS())
-	  printf("===> EXACT MATCH: '%s', '%s'\n", token, ext1_suffix);
-#endif
 
 	  add_dynamic_file_list_entry(dynamic_file_list,
 				      num_dynamic_file_list_entries,
@@ -3200,11 +2913,6 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
       if (exact_match)
 	break;
 
-#if 0
-      if (IS_PARENT_PROCESS())
-	printf("---> examining token '%s': search 2nd suffix ...\n", token);
-#endif
-
       /* ---------- step 2: search for matching second suffix ---------- */
 
       for (k = 0; k < num_ext2_suffixes && !ext2_suffix_found; k++)
@@ -3219,19 +2927,9 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
 
 	ext2_index = k;
 
-#if 0
-	if (IS_PARENT_PROCESS())
-	  printf("===> MATCH: '%s', '%s'\n", token, ext2_suffix);
-#endif
-
 	if (start_pos + len_ext2_suffix == len_token)	/* exact match */
 	{
 	  exact_match = TRUE;
-
-#if 0
-	  if (IS_PARENT_PROCESS())
-	    printf("===> EXACT MATCH: '%s', '%s'\n", token, ext2_suffix);
-#endif
 
 	  add_dynamic_file_list_entry(dynamic_file_list,
 				      num_dynamic_file_list_entries,
@@ -3252,11 +2950,6 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
       if (exact_match)
 	break;
 
-#if 0
-      if (IS_PARENT_PROCESS())
-	printf("---> examining token '%s': search 3rd suffix ...\n",token);
-#endif
-
       /* ---------- step 3: search for matching third suffix ---------- */
 
       for (l = 0; l < num_ext3_suffixes && !ext3_suffix_found; l++)
@@ -3271,19 +2964,9 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
 
 	ext3_index = l;
 
-#if 0
-	if (IS_PARENT_PROCESS())
-	  printf("===> MATCH: '%s', '%s'\n", token, ext3_suffix);
-#endif
-
 	if (start_pos + len_ext3_suffix == len_token) /* exact match */
 	{
 	  exact_match = TRUE;
-
-#if 0
-	  if (IS_PARENT_PROCESS())
-	    printf("===> EXACT MATCH: '%s', '%s'\n", token, ext3_suffix);
-#endif
 
 	  add_dynamic_file_list_entry(dynamic_file_list,
 				      num_dynamic_file_list_entries,
@@ -3384,17 +3067,6 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
 
   freeSetupFileHash(extra_file_hash);
   freeSetupFileHash(empty_file_hash);
-
-#if 0
-  for (i = 0; i < num_file_list_entries; i++)
-  {
-    printf("'%s' ", file_list[i].token);
-    if (file_list[i].filename)
-      printf("-> '%s'\n", file_list[i].filename);
-    else
-      printf("-> UNDEFINED [-> '%s']\n", file_list[i].default_filename);
-  }
-#endif
 }
 
 void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
@@ -3446,20 +3118,10 @@ void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
     artwork_info->num_property_mapping_entries = 0;
   }
 
-#if 1
   if (!GFX_OVERRIDE_ARTWORK(artwork_info->type))
-#else
-  if (!SETUP_OVERRIDE_ARTWORK(setup, artwork_info->type))
-#endif
   {
     /* first look for special artwork configured in level series config */
     filename_base = getCustomArtworkLevelConfigFilename(artwork_info->type);
-
-#if 0
-    printf("::: filename_base == '%s' [%s, %s]\n", filename_base,
-	   leveldir_current->graphics_set,
-	   leveldir_current->graphics_path);
-#endif
 
     if (fileExists(filename_base))
       LoadArtworkConfigFromFilename(artwork_info, filename_base);
@@ -3554,23 +3216,15 @@ static void replaceArtworkListEntry(struct ArtworkListInfo *artwork_info,
        This usually means that this artwork does not exist in this artwork set
        and a fallback to the existing artwork is done. */
 
-#if 0
-    printf("[artwork '%s' already exists (same list entry)]\n", filename);
-#endif
-
     return;
   }
 
   /* delete existing artwork file entry */
   deleteArtworkListEntry(artwork_info, listnode);
 
-  /* check if the new artwork file already exists in the list of artworks */
+  /* check if the new artwork file already exists in the list of artwork */
   if ((node = getNodeFromKey(artwork_info->content_list, filename)) != NULL)
   {
-#if 0
-      printf("[artwork '%s' already exists (other list entry)]\n", filename);
-#endif
-
       *listnode = (struct ListNodeInfo *)node->content;
       (*listnode)->num_references++;
 
@@ -3582,10 +3236,7 @@ static void replaceArtworkListEntry(struct ArtworkListInfo *artwork_info,
 
   if ((*listnode = artwork_info->load_artwork(filename)) != NULL)
   {
-#if 0
-      printf("[adding new artwork '%s']\n", filename);
-#endif
-
+    /* add new artwork file entry to the list of artwork files */
     (*listnode)->num_references = 1;
     addNodeToList(&artwork_info->content_list, (*listnode)->source_filename,
 		  *listnode);
@@ -3608,10 +3259,6 @@ static void LoadCustomArtwork(struct ArtworkListInfo *artwork_info,
 			      struct ListNodeInfo **listnode,
 			      struct FileInfo *file_list_entry)
 {
-#if 0
-  printf("GOT CUSTOM ARTWORK FILE '%s'\n", file_list_entry->filename);
-#endif
-
   if (strEqual(file_list_entry->filename, UNDEFINED_FILENAME))
   {
     deleteArtworkListEntry(artwork_info, listnode);
@@ -3811,11 +3458,7 @@ void debug_print_timestamp(int counter_nr, char *message)
   counter[counter_nr][1] = counter[counter_nr][0];
 
   if (message)
-#if 1
     Error(ERR_DEBUG, "%s%s%s %.3f %s",
-#else
-    printf("%s%s%s %.3f %s\n",
-#endif
 	   debug_print_timestamp_get_padding(counter_nr * indent_size),
 	   message,
 	   debug_print_timestamp_get_padding(padding_size - strlen(message)),

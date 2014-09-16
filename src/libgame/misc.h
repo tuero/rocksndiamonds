@@ -50,11 +50,6 @@
 #define ERR_EXIT_SOUND_SERVER		(ERR_EXIT | ERR_SOUND_SERVER)
 #define ERR_EXIT_NETWORK_SERVER		(ERR_EXIT | ERR_NETWORK_SERVER)
 #define ERR_EXIT_NETWORK_CLIENT		(ERR_EXIT | ERR_NETWORK_CLIENT)
-#if 0
-#define ERR_ERROR			(ERR_UNKNOWN)
-#define ERR_FATAL			(ERR_EXIT)
-#define ERR_VERBOSE			(ERR_INFO)
-#endif
 
 /* values for getFile...() and putFile...() */
 #define BYTE_ORDER_BIG_ENDIAN		0
@@ -181,8 +176,6 @@ void clear_mem(void *, unsigned int);
 void swap_numbers(int *, int *);
 void swap_number_pairs(int *, int *, int *, int *);
 
-#if 1
-
 int getFile8BitInteger(File *);
 int putFile8BitInteger(FILE *, int);
 int getFile16BitInteger(File *, int);
@@ -200,28 +193,6 @@ void WriteBytesToFile(FILE *, byte *, unsigned int);
 
 void ReadUnusedBytesFromFile(File *, unsigned int);
 void WriteUnusedBytesToFile(FILE *, unsigned int);
-
-#else
-
-int getFile8BitInteger(FILE *);
-int putFile8BitInteger(FILE *, int);
-int getFile16BitInteger(FILE *, int);
-int putFile16BitInteger(FILE *, int, int);
-int getFile32BitInteger(FILE *, int);
-int putFile32BitInteger(FILE *, int, int);
-
-boolean getFileChunk(FILE *, char *, int *, int);
-int putFileChunk(FILE *, char *, int, int);
-int getFileVersion(FILE *);
-int putFileVersion(FILE *, int);
-
-void ReadBytesFromFile(FILE *, byte *, unsigned int);
-void WriteBytesToFile(FILE *, byte *, unsigned int);
-
-void ReadUnusedBytesFromFile(FILE *, unsigned int);
-void WriteUnusedBytesToFile(FILE *, unsigned int);
-
-#endif
 
 #define getFile8Bit(f)        getFile8BitInteger(f)
 #define putFile8Bit(f,x)      putFile8BitInteger(f,x)

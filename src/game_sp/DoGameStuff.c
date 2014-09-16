@@ -8,13 +8,8 @@
 static void CallAnimation(int si, byte bl);
 static boolean IsToBeAnimated(int bl);
 
-#if 1
 int AnimationPosTable[SP_MAX_PLAYFIELD_SIZE];
 byte AnimationSubTable[SP_MAX_PLAYFIELD_SIZE];
-#else
-int *AnimationPosTable;
-byte *AnimationSubTable;
-#endif
 
 
 // ==========================================================================
@@ -75,18 +70,9 @@ void subDoGameStuff()
 	!game_sp.LevelSolved &&
 	!game_sp.GameOver)
     {
-#if 0
-      printf("::: DoGameStuff.c: killing murphy [%d] ...\n", KillMurphyFlag);
-#endif
-
       KillMurphyFlag = 0;			// no more "kill Murphy"
       ExplodeFieldSP(MurphyExplodePos);		// Explode
       LeadOutCounter = 0x40;			// quit: start lead-out
-
-#if 0
-      printf("::: DoGameStuff.c: !!!!!!!!!! GAME OVER !!!!!!!!!!\n");
-      printf("::: [KillMurphyFlag == %d]\n", KillMurphyFlag);
-#endif
 
       /* give Murphy some more time (LeadOutCounter) to reach the exit */
     }

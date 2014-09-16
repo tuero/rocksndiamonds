@@ -164,19 +164,8 @@ loc_g_1242: // infotron comes falling from above
   if (ax == fiOrangeDisk) // orange disk hit
     goto loc_g_1386;
 
-#if 1
-
-#if 1
   // play the infotron sound, 'cause infotron hits something "hard"
   subSoundFX(si, fiInfotron, actImpact);
-#else
- // play the zonk sound, 'cause zonk hits something "hard"
-  subSoundFX(si, fiZonk, actImpact);
-#endif
-
-#else
-  subSoundFXZonk(); // play the zonk sound,'cause zonk hits something "hard"
-#endif
 
   if (! (ax == fiZonk || ax == fiInfotron || ax == fiRAM))
     return;

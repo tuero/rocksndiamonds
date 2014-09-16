@@ -8,10 +8,6 @@
 #include "main_em.h"
 
 
-#if 0
-extern int centered_player_nr;
-#endif
-
 #define USE_CHANGED_ACID_STUFF		1
 
 extern boolean checkIfAllPlayersFitToScreen();
@@ -23,15 +19,12 @@ static boolean player_killed(struct PLAYER *);
 
 void synchro_1(void)
 {
-#if 1
-
   int start_check_nr;
   int i;
 
   game_em.any_player_moving = FALSE;
 
   /* must test for death and actually kill separately */
-
   for (i = 0; i < MAX_PLAYERS; i++)
   {
     boolean ply_kill = player_killed(&ply[i]);
@@ -39,25 +32,6 @@ void synchro_1(void)
     if (ply[i].alive && ply_kill)
       kill_player(&ply[i]);
   }
-
-#else
-
-  /* must test for death and actually kill separately */
-  boolean ply1_kill = player_killed(&ply1);
-  boolean ply2_kill = player_killed(&ply2);
-
-  if (ply1.alive && ply1_kill)
-    kill_player(&ply1);
-  if (ply2.alive && ply2_kill)
-    kill_player(&ply2);
-
-#endif
-
-#if 0
-  ply1.alive = 1; /* debugging */
-#endif
-
-#if 1
 
   for (i = 0; i < MAX_PLAYERS; i++)
   {
@@ -93,58 +67,6 @@ void synchro_1(void)
       Next[ply[i].y][ply[i].x] = Zplayer;
     }
   }
-
-#else
-
-  ply1.oldx = ply1.x;
-  ply1.oldy = ply1.y;
-  ply1.anim = SPR_still;
-  ply2.oldx = ply2.x;
-  ply2.oldy = ply2.y;
-  ply2.anim = SPR_still;
-
-  if (RandomEM & 256)
-  {
-    if (ply1.alive) check_player(&ply1);
-    if (ply2.alive) check_player(&ply2);
-  }
-  else
-  {
-    if (ply2.alive) check_player(&ply2);
-    if (ply1.alive) check_player(&ply1);
-  }
-
-  if (ply1.alive)
-  {
-    if (Cave[ply1.oldy][ply1.oldx] == Zplayer)
-    {
-      Cave[ply1.oldy][ply1.oldx] = Xblank;
-      Next[ply1.oldy][ply1.oldx] = Xblank;
-    }
-
-    if (Cave[ply1.y][ply1.x] == Xblank)
-    {
-      Cave[ply1.y][ply1.x] = Zplayer;
-      Next[ply1.y][ply1.x] = Zplayer;
-    }
-  }
-
-  if (ply2.alive)
-  {
-    if (Cave[ply2.oldy][ply2.oldx] == Zplayer)
-    {
-      Cave[ply2.oldy][ply2.oldx] = Xblank;
-      Next[ply2.oldy][ply2.oldx] = Xblank;
-    }
-
-    if (Cave[ply2.y][ply2.x] == Xblank)
-    {
-      Cave[ply2.y][ply2.x] = Zplayer;
-      Next[ply2.y][ply2.x] = Zplayer;
-    }
-  }
-
-#endif
 }
 
 static boolean player_killed(struct PLAYER *ply)
@@ -152,20 +74,11 @@ static boolean player_killed(struct PLAYER *ply)
   int x = ply->x;
   int y = ply->y;
 
-#if 0
-  printf("::: %d: %d, %d\n", ply->num, x, y);
-#endif
-
   if (!ply->alive)
     return FALSE;
 
-#if 1
   if (lev.killed_out_of_time && setup.time_limit)
     return TRUE;
-#else
-  if (lev.time_initial > 0 && lev.time == 0 && setup.time_limit)
-    return TRUE;
-#endif
 
   switch(Cave[y-1][x])
   {
@@ -295,11 +208,6 @@ static void kill_player(struct PLAYER *ply)
     case Xbug_gos:
     case Xbug_gow:
       Cave[y-1][x] = Xboom_bug;
-#if 0
-#if PLAY_ELEMENT_SOUND
-      play_element_sound(x, y, SAMPLE_boom, Zplayer);
-#endif
-#endif
       break;
 
     case Xtank_n:
@@ -311,11 +219,6 @@ static void kill_player(struct PLAYER *ply)
     case Xtank_gos:
     case Xtank_gow:
       Cave[y-1][x] = Xboom_bomb;
-#if 0
-#if PLAY_ELEMENT_SOUND
-      play_element_sound(x, y, SAMPLE_boom, Zplayer);
-#endif
-#endif
       break;
   }
 
@@ -330,11 +233,6 @@ static void kill_player(struct PLAYER *ply)
     case Xbug_gos:
     case Xbug_gow:
       Cave[y][x+1] = Xboom_bug;
-#if 0
-#if PLAY_ELEMENT_SOUND
-      play_element_sound(x, y, SAMPLE_boom, Zplayer);
-#endif
-#endif
       break;
 
     case Xtank_n:
@@ -346,11 +244,6 @@ static void kill_player(struct PLAYER *ply)
     case Xtank_gos:
     case Xtank_gow:
       Cave[y][x+1] = Xboom_bomb;
-#if 0
-#if PLAY_ELEMENT_SOUND
-      play_element_sound(x, y, SAMPLE_boom, Zplayer);
-#endif
-#endif
       break;
   }
 
@@ -365,11 +258,6 @@ static void kill_player(struct PLAYER *ply)
     case Xbug_gos:
     case Xbug_gow:
       Cave[y+1][x] = Xboom_bug;
-#if 0
-#if PLAY_ELEMENT_SOUND
-      play_element_sound(x, y, SAMPLE_boom, Zplayer);
-#endif
-#endif
       break;
 
     case Xtank_n:
@@ -381,11 +269,6 @@ static void kill_player(struct PLAYER *ply)
     case Xtank_gos:
     case Xtank_gow:
       Cave[y+1][x] = Xboom_bomb;
-#if 0
-#if PLAY_ELEMENT_SOUND
-      play_element_sound(x, y, SAMPLE_boom, Zplayer);
-#endif
-#endif
       break;
   }
 
@@ -400,11 +283,6 @@ static void kill_player(struct PLAYER *ply)
     case Xbug_gos:
     case Xbug_gow:
       Cave[y][x-1] = Xboom_bug;
-#if 0
-#if PLAY_ELEMENT_SOUND
-      play_element_sound(x, y, SAMPLE_boom, Zplayer);
-#endif
-#endif
       break;
 
     case Xtank_n:
@@ -416,11 +294,6 @@ static void kill_player(struct PLAYER *ply)
     case Xtank_gos:
     case Xtank_gow:
       Cave[y][x-1] = Xboom_bomb;
-#if 0
-#if PLAY_ELEMENT_SOUND
-      play_element_sound(x, y, SAMPLE_boom, Zplayer);
-#endif
-#endif
       break;
   }
 
@@ -435,9 +308,6 @@ static void kill_player(struct PLAYER *ply)
       break;
 
     default:
-#if PLAY_ELEMENT_SOUND
-      play_element_sound(x, y, SAMPLE_boom, Zplayer);
-#endif
       play_element_sound(x, y, SAMPLE_die, Zplayer);
       break;
   }
@@ -473,13 +343,6 @@ static void check_player(struct PLAYER *ply)
 
   game_em.last_player_direction[ply->num] = MV_NONE;
 
-#if 0
-  printf("::: up == %d, down == %d, left == %d, right == %d, fire == %d [spin == %d, stick == %d]\n",
-	 ply->joy_n, ply->joy_s, ply->joy_w, ply->joy_e, ply->joy_fire,
-	 ply->joy_spin, ply->joy_stick);
-#endif
-
-#if 1
   if (ply->joy_w)		/* west */
   {
     x--;
@@ -501,56 +364,6 @@ static void check_player(struct PLAYER *ply)
     y++;
     dy = 1;
   }
-
-#else
-
-  if ((ply->joy_spin = !ply->joy_spin))
-  {
-    if (ply->joy_n)		/* north */
-    {
-      y--;
-      dy = -1;
-    }
-    else if (ply->joy_e)	/* east */
-    {
-      x++;
-      dx = 1;
-    }
-    else if (ply->joy_s)	/* south */
-    {
-      y++;
-      dy = 1;
-    }
-    else if (ply->joy_w)	/* west */
-    {
-      x--;
-      dx = -1;
-    }
-  }
-  else
-  {
-    if (ply->joy_w)		/* west */
-    {
-      x--;
-      dx = -1;
-    }
-    else if (ply->joy_s)	/* south */
-    {
-      y++;
-      dy = 1;
-    }
-    else if (ply->joy_e)	/* east */
-    {
-      x++;
-      dx = 1;
-    }
-    else if (ply->joy_n)	/* north */
-    {
-      y--;
-      dy = -1;
-    }
-  }
-#endif
 
   if (dx || dy)
   {
@@ -1253,18 +1066,7 @@ static boolean player_digfield(struct PLAYER *ply, int dx, int dy)
       case Xexit_1:
       case Xexit_2:
       case Xexit_3:
-#if 0
-	/* !!! already played in kill_player !!! */
-	play_element_sound(x, y, SAMPLE_exit_leave, Xexit_1);
-#endif
-
 	lev.home--;
-
-#if 0
-	/* !!! CHECK SCORE CALCULATION !!! */
-	if (lev.home == 0 && lev.time_initial > 0)	/* game won */
-	  lev.score += lev.time * lev.exit_score / 100;
-#endif
 
 	ply->anim = SPR_walk + anim;
 	ply->x = x;

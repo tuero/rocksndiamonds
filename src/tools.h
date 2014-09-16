@@ -78,11 +78,7 @@ void DrawMaskedBorder_ALL();
 void DrawMaskedBorder(int);
 
 void SetDrawtoField(int);
-#if 1
 void RedrawPlayfield();
-#else
-void RedrawPlayfield(boolean, int, int, int, int);
-#endif
 void BlitScreenToBitmap(Bitmap *);
 void BackToFront();
 

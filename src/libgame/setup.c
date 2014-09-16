@@ -30,6 +30,8 @@
 #include "hash.h"
 
 
+#define ENABLE_UNUSED_CODE	0	/* currently unused functions */
+
 #define NUM_LEVELCLASS_DESC	8
 
 static char *levelclass_desc[NUM_LEVELCLASS_DESC] =
@@ -1089,13 +1091,7 @@ TreeInfo *cloneTreeNode(TreeInfo **node_top, TreeInfo *node_parent,
     return cloneTreeNode(node_top, node_parent, node->next,
 			 skip_sets_without_levels);
 
-#if 1
   node_new = getTreeInfoCopy(node);		/* copy complete node */
-#else
-  node_new = newTreeInfo();
-
-  *node_new = *node;				/* copy complete node */
-#endif
 
   node_new->node_top = node_top;		/* correct top node link */
   node_new->node_parent = node_parent;		/* correct parent node link */
@@ -1613,7 +1609,7 @@ SetupFileList *addListEntry(SetupFileList *list, char *token, char *value)
     return addListEntry(list->next, token, value);
 }
 
-#if 0
+#if ENABLE_UNUSED_CODE
 #ifdef DEBUG
 static void printSetupFileList(SetupFileList *list)
 {
@@ -1725,7 +1721,8 @@ char *removeHashEntry(SetupFileHash *hash, char *token)
   return remove_hash_entry(hash, token);
 }
 
-#if 0
+#if ENABLE_UNUSED_CODE
+#if DEBUG
 static void printSetupFileHash(SetupFileHash *hash)
 {
   BEGIN_HASH_ITERATION(hash, itr)
@@ -1735,6 +1732,7 @@ static void printSetupFileHash(SetupFileHash *hash)
   }
   END_HASH_ITERATION(hash, itr)
 }
+#endif
 #endif
 
 #define ALLOW_TOKEN_VALUE_SEPARATOR_BEING_WHITESPACE		1
@@ -1801,12 +1799,8 @@ static boolean getTokenValueFromSetupLineExt(char *line,
   /* find end of token to determine start of value */
   for (line_ptr = token; *line_ptr; line_ptr++)
   {
-#if 1
     /* first look for an explicit token/value separator, like ':' or '=' */
     if (*line_ptr == ':' || *line_ptr == '=')
-#else
-    if (*line_ptr == ' ' || *line_ptr == '\t' || *line_ptr == ':')
-#endif
     {
       *line_ptr = '\0';			/* terminate token string */
       value = line_ptr + 1;		/* set beginning of value */
@@ -1873,11 +1867,6 @@ static boolean getTokenValueFromSetupLineExt(char *line,
     if (*value != ' ' && *value != '\t')
       break;
 
-#if 0
-  if (*value == '\0')
-    value = "true";	/* treat tokens without value as "true" */
-#endif
-
   *token_ptr = token;
   *value_ptr = value;
 
@@ -1893,9 +1882,6 @@ boolean getTokenValueFromSetupLine(char *line, char **token, char **value)
   return getTokenValueFromSetupLineExt(line, token, value, NULL, NULL, 0, TRUE);
 }
 
-#if 1
-
-#if 1
 static boolean loadSetupFileData(void *setup_file_data, char *filename,
 				 boolean top_recursion_level, boolean is_hash)
 {
@@ -1915,20 +1901,12 @@ static boolean loadSetupFileData(void *setup_file_data, char *filename,
   token_already_exists_warning = FALSE;
 #endif
 
-#if 0
-  Error(ERR_INFO, "===== opening file: '%s'", filename);
-#endif
-
   if (!(file = openFile(filename, MODE_READ)))
   {
     Error(ERR_WARN, "cannot open configuration file '%s'", filename);
 
     return FALSE;
   }
-
-#if 0
-  Error(ERR_INFO, "===== reading file: '%s'", filename);
-#endif
 
   /* use "insert pointer" to store list end for constant insertion complexity */
   if (!is_hash)
@@ -1947,10 +1925,6 @@ static boolean loadSetupFileData(void *setup_file_data, char *filename,
     if (!getStringFromFile(file, line, MAX_LINE_LEN))
       break;
 
-#if 0
-    Error(ERR_INFO, "got line: '%s'", line);
-#endif
-
     /* check if line was completely read and is terminated by line break */
     if (strlen(line) > 0 && line[strlen(line) - 1] == '\n')
       line_nr++;
@@ -1965,14 +1939,6 @@ static boolean loadSetupFileData(void *setup_file_data, char *filename,
 
     if (read_continued_line)
     {
-#if 0
-      /* !!! ??? WHY ??? !!! */
-      /* cut leading whitespaces from input line */
-      for (line_ptr = line; *line_ptr; line_ptr++)
-	if (*line_ptr != ' ' && *line_ptr != '\t')
-	  break;
-#endif
-
       /* append new line to existing line, if there is enough space */
       if (strlen(previous_line) + strlen(line_ptr) < MAX_LINE_LEN)
 	strcat(previous_line, line_ptr);
@@ -2006,10 +1972,6 @@ static boolean loadSetupFileData(void *setup_file_data, char *filename,
 	  char *basepath = getBasePath(filename);
 	  char *basename = getBaseName(value);
 	  char *filename_include = getPath2(basepath, basename);
-
-#if 0
-	  Error(ERR_INFO, "[including file '%s']", filename_include);
-#endif
 
 	  loadSetupFileData(setup_file_data, filename_include, FALSE, is_hash);
 
@@ -2081,417 +2043,6 @@ static boolean loadSetupFileData(void *setup_file_data, char *filename,
 
   return TRUE;
 }
-
-#else
-
-static boolean loadSetupFileData(void *setup_file_data, char *filename,
-				 boolean top_recursion_level, boolean is_hash)
-{
-  static SetupFileHash *include_filename_hash = NULL;
-  char line[MAX_LINE_LEN], line_raw[MAX_LINE_LEN], previous_line[MAX_LINE_LEN];
-  char *token, *value, *line_ptr;
-  void *insert_ptr = NULL;
-  boolean read_continued_line = FALSE;
-  FILE *file;
-  int line_nr = 0, token_count = 0, include_count = 0;
-
-#if CHECK_TOKEN_VALUE_SEPARATOR__WARN_IF_MISSING
-  token_value_separator_warning = FALSE;
-#endif
-
-#if CHECK_TOKEN__WARN_IF_ALREADY_EXISTS_IN_HASH
-  token_already_exists_warning = FALSE;
-#endif
-
-  if (!(file = fopen(filename, MODE_READ)))
-  {
-    Error(ERR_WARN, "cannot open configuration file '%s'", filename);
-
-    return FALSE;
-  }
-
-  /* use "insert pointer" to store list end for constant insertion complexity */
-  if (!is_hash)
-    insert_ptr = setup_file_data;
-
-  /* on top invocation, create hash to mark included files (to prevent loops) */
-  if (top_recursion_level)
-    include_filename_hash = newSetupFileHash();
-
-  /* mark this file as already included (to prevent including it again) */
-  setHashEntry(include_filename_hash, getBaseNamePtr(filename), "true");
-
-  while (!feof(file))
-  {
-    /* read next line of input file */
-    if (!fgets(line, MAX_LINE_LEN, file))
-      break;
-
-    /* check if line was completely read and is terminated by line break */
-    if (strlen(line) > 0 && line[strlen(line) - 1] == '\n')
-      line_nr++;
-
-    /* cut trailing line break (this can be newline and/or carriage return) */
-    for (line_ptr = &line[strlen(line)]; line_ptr >= line; line_ptr--)
-      if ((*line_ptr == '\n' || *line_ptr == '\r') && *(line_ptr + 1) == '\0')
-	*line_ptr = '\0';
-
-    /* copy raw input line for later use (mainly debugging output) */
-    strcpy(line_raw, line);
-
-    if (read_continued_line)
-    {
-#if 0
-      /* !!! ??? WHY ??? !!! */
-      /* cut leading whitespaces from input line */
-      for (line_ptr = line; *line_ptr; line_ptr++)
-	if (*line_ptr != ' ' && *line_ptr != '\t')
-	  break;
-#endif
-
-      /* append new line to existing line, if there is enough space */
-      if (strlen(previous_line) + strlen(line_ptr) < MAX_LINE_LEN)
-	strcat(previous_line, line_ptr);
-
-      strcpy(line, previous_line);	/* copy storage buffer to line */
-
-      read_continued_line = FALSE;
-    }
-
-    /* if the last character is '\', continue at next line */
-    if (strlen(line) > 0 && line[strlen(line) - 1] == '\\')
-    {
-      line[strlen(line) - 1] = '\0';	/* cut off trailing backslash */
-      strcpy(previous_line, line);	/* copy line to storage buffer */
-
-      read_continued_line = TRUE;
-
-      continue;
-    }
-
-    if (!getTokenValueFromSetupLineExt(line, &token, &value, filename,
-				       line_raw, line_nr, FALSE))
-      continue;
-
-    if (*token)
-    {
-      if (strEqual(token, "include"))
-      {
-	if (getHashEntry(include_filename_hash, value) == NULL)
-	{
-	  char *basepath = getBasePath(filename);
-	  char *basename = getBaseName(value);
-	  char *filename_include = getPath2(basepath, basename);
-
-#if 0
-	  Error(ERR_INFO, "[including file '%s']", filename_include);
-#endif
-
-	  loadSetupFileData(setup_file_data, filename_include, FALSE, is_hash);
-
-	  free(basepath);
-	  free(basename);
-	  free(filename_include);
-
-	  include_count++;
-	}
-	else
-	{
-	  Error(ERR_WARN, "ignoring already processed file '%s'", value);
-	}
-      }
-      else
-      {
-	if (is_hash)
-	{
-#if CHECK_TOKEN__WARN_IF_ALREADY_EXISTS_IN_HASH
-	  char *old_value =
-	    getHashEntry((SetupFileHash *)setup_file_data, token);
-
-	  if (old_value != NULL)
-	  {
-	    if (!token_already_exists_warning)
-	    {
-	      Error(ERR_INFO_LINE, "-");
-	      Error(ERR_WARN, "duplicate token(s) found in config file:");
-	      Error(ERR_INFO, "- config file: '%s'", filename);
-
-	      token_already_exists_warning = TRUE;
-	    }
-
-	    Error(ERR_INFO, "- token: '%s' (in line %d)", token, line_nr);
-	    Error(ERR_INFO, "  old value: '%s'", old_value);
-	    Error(ERR_INFO, "  new value: '%s'", value);
-	  }
-#endif
-
-	  setHashEntry((SetupFileHash *)setup_file_data, token, value);
-	}
-	else
-	{
-	  insert_ptr = addListEntry((SetupFileList *)insert_ptr, token, value);
-	}
-
-	token_count++;
-      }
-    }
-  }
-
-  fclose(file);
-
-#if CHECK_TOKEN_VALUE_SEPARATOR__WARN_IF_MISSING
-  if (token_value_separator_warning)
-    Error(ERR_INFO_LINE, "-");
-#endif
-
-#if CHECK_TOKEN__WARN_IF_ALREADY_EXISTS_IN_HASH
-  if (token_already_exists_warning)
-    Error(ERR_INFO_LINE, "-");
-#endif
-
-  if (token_count == 0 && include_count == 0)
-    Error(ERR_WARN, "configuration file '%s' is empty", filename);
-
-  if (top_recursion_level)
-    freeSetupFileHash(include_filename_hash);
-
-  return TRUE;
-}
-
-#endif
-
-#else
-
-static boolean loadSetupFileData(void *setup_file_data, char *filename,
-				 boolean top_recursion_level, boolean is_hash)
-{
-  static SetupFileHash *include_filename_hash = NULL;
-  char line[MAX_LINE_LEN], line_raw[MAX_LINE_LEN], previous_line[MAX_LINE_LEN];
-  char *token, *value, *line_ptr;
-  void *insert_ptr = NULL;
-  boolean read_continued_line = FALSE;
-  FILE *file;
-  int line_nr = 0;
-  int token_count = 0;
-
-#if CHECK_TOKEN_VALUE_SEPARATOR__WARN_IF_MISSING
-  token_value_separator_warning = FALSE;
-#endif
-
-  if (!(file = fopen(filename, MODE_READ)))
-  {
-    Error(ERR_WARN, "cannot open configuration file '%s'", filename);
-
-    return FALSE;
-  }
-
-  /* use "insert pointer" to store list end for constant insertion complexity */
-  if (!is_hash)
-    insert_ptr = setup_file_data;
-
-  /* on top invocation, create hash to mark included files (to prevent loops) */
-  if (top_recursion_level)
-    include_filename_hash = newSetupFileHash();
-
-  /* mark this file as already included (to prevent including it again) */
-  setHashEntry(include_filename_hash, getBaseNamePtr(filename), "true");
-
-  while (!feof(file))
-  {
-    /* read next line of input file */
-    if (!fgets(line, MAX_LINE_LEN, file))
-      break;
-
-    /* check if line was completely read and is terminated by line break */
-    if (strlen(line) > 0 && line[strlen(line) - 1] == '\n')
-      line_nr++;
-
-    /* cut trailing line break (this can be newline and/or carriage return) */
-    for (line_ptr = &line[strlen(line)]; line_ptr >= line; line_ptr--)
-      if ((*line_ptr == '\n' || *line_ptr == '\r') && *(line_ptr + 1) == '\0')
-	*line_ptr = '\0';
-
-    /* copy raw input line for later use (mainly debugging output) */
-    strcpy(line_raw, line);
-
-    if (read_continued_line)
-    {
-      /* cut leading whitespaces from input line */
-      for (line_ptr = line; *line_ptr; line_ptr++)
-	if (*line_ptr != ' ' && *line_ptr != '\t')
-	  break;
-
-      /* append new line to existing line, if there is enough space */
-      if (strlen(previous_line) + strlen(line_ptr) < MAX_LINE_LEN)
-	strcat(previous_line, line_ptr);
-
-      strcpy(line, previous_line);	/* copy storage buffer to line */
-
-      read_continued_line = FALSE;
-    }
-
-    /* if the last character is '\', continue at next line */
-    if (strlen(line) > 0 && line[strlen(line) - 1] == '\\')
-    {
-      line[strlen(line) - 1] = '\0';	/* cut off trailing backslash */
-      strcpy(previous_line, line);	/* copy line to storage buffer */
-
-      read_continued_line = TRUE;
-
-      continue;
-    }
-
-    /* cut trailing comment from input line */
-    for (line_ptr = line; *line_ptr; line_ptr++)
-    {
-      if (*line_ptr == '#')
-      {
-	*line_ptr = '\0';
-	break;
-      }
-    }
-
-    /* cut trailing whitespaces from input line */
-    for (line_ptr = &line[strlen(line)]; line_ptr >= line; line_ptr--)
-      if ((*line_ptr == ' ' || *line_ptr == '\t') && *(line_ptr + 1) == '\0')
-	*line_ptr = '\0';
-
-    /* ignore empty lines */
-    if (*line == '\0')
-      continue;
-
-    /* cut leading whitespaces from token */
-    for (token = line; *token; token++)
-      if (*token != ' ' && *token != '\t')
-	break;
-
-    /* start with empty value as reliable default */
-    value = "";
-
-    token_value_separator_found = FALSE;
-
-    /* find end of token to determine start of value */
-    for (line_ptr = token; *line_ptr; line_ptr++)
-    {
-#if 1
-      /* first look for an explicit token/value separator, like ':' or '=' */
-      if (*line_ptr == ':' || *line_ptr == '=')
-#else
-      if (*line_ptr == ' ' || *line_ptr == '\t' || *line_ptr == ':')
-#endif
-      {
-	*line_ptr = '\0';		/* terminate token string */
-	value = line_ptr + 1;		/* set beginning of value */
-
-	token_value_separator_found = TRUE;
-
-	break;
-      }
-    }
-
-#if ALLOW_TOKEN_VALUE_SEPARATOR_BEING_WHITESPACE
-    /* fallback: if no token/value separator found, also allow whitespaces */
-    if (!token_value_separator_found)
-    {
-      for (line_ptr = token; *line_ptr; line_ptr++)
-      {
-	if (*line_ptr == ' ' || *line_ptr == '\t')
-	{
-	  *line_ptr = '\0';		/* terminate token string */
-	  value = line_ptr + 1;		/* set beginning of value */
-
-	  token_value_separator_found = TRUE;
-
-	  break;
-	}
-      }
-
-#if CHECK_TOKEN_VALUE_SEPARATOR__WARN_IF_MISSING
-      if (token_value_separator_found)
-      {
-	if (!token_value_separator_warning)
-	{
-	  Error(ERR_INFO_LINE, "-");
-	  Error(ERR_WARN, "missing token/value separator(s) in config file:");
-	  Error(ERR_INFO, "- config file: '%s'", filename);
-
-	  token_value_separator_warning = TRUE;
-	}
-
-	Error(ERR_INFO, "- line %d: '%s'", line_nr, line_raw);
-      }
-#endif
-    }
-#endif
-
-    /* cut trailing whitespaces from token */
-    for (line_ptr = &token[strlen(token)]; line_ptr >= token; line_ptr--)
-      if ((*line_ptr == ' ' || *line_ptr == '\t') && *(line_ptr + 1) == '\0')
-	*line_ptr = '\0';
-
-    /* cut leading whitespaces from value */
-    for (; *value; value++)
-      if (*value != ' ' && *value != '\t')
-	break;
-
-#if 0
-    if (*value == '\0')
-      value = "true";	/* treat tokens without value as "true" */
-#endif
-
-    if (*token)
-    {
-      if (strEqual(token, "include"))
-      {
-	if (getHashEntry(include_filename_hash, value) == NULL)
-	{
-	  char *basepath = getBasePath(filename);
-	  char *basename = getBaseName(value);
-	  char *filename_include = getPath2(basepath, basename);
-
-#if 0
-	  Error(ERR_INFO, "[including file '%s']", filename_include);
-#endif
-
-	  loadSetupFileData(setup_file_data, filename_include, FALSE, is_hash);
-
-	  free(basepath);
-	  free(basename);
-	  free(filename_include);
-	}
-	else
-	{
-	  Error(ERR_WARN, "ignoring already processed file '%s'", value);
-	}
-      }
-      else
-      {
-	if (is_hash)
-	  setHashEntry((SetupFileHash *)setup_file_data, token, value);
-	else
-	  insert_ptr = addListEntry((SetupFileList *)insert_ptr, token, value);
-
-	token_count++;
-      }
-    }
-  }
-
-  fclose(file);
-
-#if CHECK_TOKEN_VALUE_SEPARATOR__WARN_IF_MISSING
-  if (token_value_separator_warning)
-    Error(ERR_INFO_LINE, "-");
-#endif
-
-  if (token_count == 0)
-    Error(ERR_WARN, "configuration file '%s' is empty", filename);
-
-  if (top_recursion_level)
-    freeSetupFileHash(include_filename_hash);
-
-  return TRUE;
-}
-#endif
 
 void saveSetupFileHash(SetupFileHash *hash, char *filename)
 {
@@ -2780,11 +2331,7 @@ static void setTreeInfoToDefaultsFromParent(TreeInfo *ti, TreeInfo *parent)
     ti->last_level = 0;
     ti->level_group = FALSE;
     ti->handicap_level = 0;
-#if 1
     ti->readonly = parent->readonly;
-#else
-    ti->readonly = TRUE;
-#endif
     ti->handicap = TRUE;
     ti->skip_levels = FALSE;
   }
@@ -3082,16 +2629,7 @@ static char *getCacheToken(char *prefix, char *suffix)
 
 static char *getFileTimestampString(char *filename)
 {
-#if 1
   return getStringCopy(i_to_a(getFileTimestampEpochSeconds(filename)));
-#else
-  struct stat file_status;
-
-  if (stat(filename, &file_status) != 0)	/* cannot stat file */
-    return getStringCopy(i_to_a(0));
-
-  return getStringCopy(i_to_a(file_status.st_mtime));
-#endif
 }
 
 static boolean modifiedFileTimestamp(char *filename, char *timestamp_string)
@@ -3139,9 +2677,7 @@ static TreeInfo *getArtworkInfoCacheEntry(LevelDirTree *level_node, int type)
       /* check if cache entry for this item is invalid or incomplete */
       if (value == NULL)
       {
-#if 1
 	Error(ERR_WARN, "cache entry '%s' invalid", token);
-#endif
 
 	cached = FALSE;
       }
@@ -3170,11 +2706,6 @@ static TreeInfo *getArtworkInfoCacheEntry(LevelDirTree *level_node, int type)
 
     if (modifiedFileTimestamp(filename_artworkinfo, cache_entry))
       cached = FALSE;
-
-#if 0
-    if (!cached)
-      printf("::: '%s': INVALIDATED FROM CACHE BY TIMESTAMP\n", identifier);
-#endif
 
     checked_free(filename_levelinfo);
     checked_free(filename_artworkinfo);
@@ -3247,10 +2778,6 @@ static boolean LoadLevelInfoFromLevelConf(TreeInfo **node_first,
 					  char *level_directory,
 					  char *directory_name)
 {
-#if 0
-  static unsigned int progress_delay = 0;
-  unsigned int progress_delay_value = 100;	/* (in milliseconds) */
-#endif
   char *directory_path = getPath2(level_directory, directory_name);
   char *filename = getPath2(directory_path, LEVELINFO_FILENAME);
   SetupFileHash *setup_file_hash;
@@ -3317,22 +2844,11 @@ static boolean LoadLevelInfoFromLevelConf(TreeInfo **node_first,
     leveldir_new->fullpath = getPath2(node_parent->fullpath, directory_name);
   }
 
-#if 0
-  if (leveldir_new->levels < 1)
-    leveldir_new->levels = 1;
-#endif
-
   leveldir_new->last_level =
     leveldir_new->first_level + leveldir_new->levels - 1;
 
   leveldir_new->in_user_dir =
     (!strEqual(leveldir_new->basepath, options.level_directory));
-
-#if 0
-  printf("::: '%s' -> %d\n",
-	 leveldir_new->identifier,
-	 leveldir_new->in_user_dir);
-#endif
 
   /* adjust some settings if user's private level directory was detected */
   if (leveldir_new->sort_priority == LEVELCLASS_UNDEFINED &&
@@ -3356,34 +2872,8 @@ static boolean LoadLevelInfoFromLevelConf(TreeInfo **node_first,
     (leveldir_new->user_defined || !leveldir_new->handicap ?
      leveldir_new->last_level : leveldir_new->first_level);
 
-#if 1
-#if 1
   DrawInitTextExt(leveldir_new->name, 150, FC_YELLOW,
 		  leveldir_new->level_group);
-#else
-  if (leveldir_new->level_group ||
-      DelayReached(&progress_delay, progress_delay_value))
-    DrawInitText(leveldir_new->name, 150, FC_YELLOW);
-#endif
-#else
-  DrawInitText(leveldir_new->name, 150, FC_YELLOW);
-#endif
-
-#if 0
-  /* !!! don't skip sets without levels (else artwork base sets are missing) */
-#if 1
-  if (leveldir_new->levels < 1 && !leveldir_new->level_group)
-  {
-    /* skip level sets without levels (which are probably artwork base sets) */
-
-    freeSetupFileHash(setup_file_hash);
-    free(directory_path);
-    free(filename);
-
-    return FALSE;
-  }
-#endif
-#endif
 
   pushTreeInfo(node_first, leveldir_new);
 
@@ -3405,7 +2895,6 @@ static boolean LoadLevelInfoFromLevelConf(TreeInfo **node_first,
   return TRUE;
 }
 
-#if 1
 static void LoadLevelInfoFromLevelDir(TreeInfo **node_first,
 				      TreeInfo *node_parent,
 				      char *level_directory)
@@ -3414,10 +2903,6 @@ static void LoadLevelInfoFromLevelDir(TreeInfo **node_first,
   DirectoryEntry *dir_entry;
   boolean valid_entry_found = FALSE;
 
-#if 0
-  Error(ERR_INFO, "looking for levels in '%s' ...", level_directory);
-#endif
-
   if ((dir = openDirectory(level_directory)) == NULL)
   {
     Error(ERR_WARN, "cannot read level directory '%s'", level_directory);
@@ -3425,18 +2910,10 @@ static void LoadLevelInfoFromLevelDir(TreeInfo **node_first,
     return;
   }
 
-#if 0
-  Error(ERR_INFO, "opening '%s' succeeded ...", level_directory);
-#endif
-
   while ((dir_entry = readDirectory(dir)) != NULL)	/* loop all entries */
   {
     char *directory_name = dir_entry->basename;
     char *directory_path = getPath2(level_directory, directory_name);
-
-#if 0
-    Error(ERR_INFO, "checking entry '%s' ...", directory_name);
-#endif
 
     /* skip entries for current and parent directory */
     if (strEqual(directory_name, ".") ||
@@ -3447,29 +2924,13 @@ static void LoadLevelInfoFromLevelDir(TreeInfo **node_first,
       continue;
     }
 
-#if 1
     /* find out if directory entry is itself a directory */
     if (!dir_entry->is_directory)			/* not a directory */
     {
       free(directory_path);
 
-#if 0
-      Error(ERR_INFO, "* entry '%s' is not a directory ...", directory_name);
-#endif
-
       continue;
     }
-#else
-    /* find out if directory entry is itself a directory */
-    struct stat file_status;
-    if (stat(directory_path, &file_status) != 0 ||	/* cannot stat file */
-	(file_status.st_mode & S_IFMT) != S_IFDIR)	/* not a directory */
-    {
-      free(directory_path);
-
-      continue;
-    }
-#endif
 
     free(directory_path);
 
@@ -3497,85 +2958,6 @@ static void LoadLevelInfoFromLevelDir(TreeInfo **node_first,
     Error(ERR_WARN, "cannot find any valid level series in directory '%s'",
 	  level_directory);
 }
-
-#else
-
-static void LoadLevelInfoFromLevelDir(TreeInfo **node_first,
-				      TreeInfo *node_parent,
-				      char *level_directory)
-{
-  DIR *dir;
-  struct dirent *dir_entry;
-  boolean valid_entry_found = FALSE;
-
-#if 1
-  Error(ERR_INFO, "looking for levels in '%s' ...", level_directory);
-#endif
-
-  if ((dir = opendir(level_directory)) == NULL)
-  {
-    Error(ERR_WARN, "cannot read level directory '%s'", level_directory);
-
-    return;
-  }
-
-#if 1
-  Error(ERR_INFO, "opening '%s' succeeded ...", level_directory);
-#endif
-
-  while ((dir_entry = readdir(dir)) != NULL)	/* loop until last dir entry */
-  {
-    struct stat file_status;
-    char *directory_name = dir_entry->d_name;
-    char *directory_path = getPath2(level_directory, directory_name);
-
-#if 1
-    Error(ERR_INFO, "checking entry '%s' ...", directory_name);
-#endif
-
-    /* skip entries for current and parent directory */
-    if (strEqual(directory_name, ".") ||
-	strEqual(directory_name, ".."))
-    {
-      free(directory_path);
-      continue;
-    }
-
-    /* find out if directory entry is itself a directory */
-    if (stat(directory_path, &file_status) != 0 ||	/* cannot stat file */
-	(file_status.st_mode & S_IFMT) != S_IFDIR)	/* not a directory */
-    {
-      free(directory_path);
-      continue;
-    }
-
-    free(directory_path);
-
-    if (strEqual(directory_name, GRAPHICS_DIRECTORY) ||
-	strEqual(directory_name, SOUNDS_DIRECTORY) ||
-	strEqual(directory_name, MUSIC_DIRECTORY))
-      continue;
-
-    valid_entry_found |= LoadLevelInfoFromLevelConf(node_first, node_parent,
-						    level_directory,
-						    directory_name);
-  }
-
-  closedir(dir);
-
-  /* special case: top level directory may directly contain "levelinfo.conf" */
-  if (node_parent == NULL && !valid_entry_found)
-  {
-    /* check if this directory directly contains a file "levelinfo.conf" */
-    valid_entry_found |= LoadLevelInfoFromLevelConf(node_first, node_parent,
-						    level_directory, ".");
-  }
-
-  if (!valid_entry_found)
-    Error(ERR_WARN, "cannot find any valid level series in directory '%s'",
-	  level_directory);
-}
-#endif
 
 boolean AdjustGraphicsForEMC()
 {
@@ -3613,12 +2995,10 @@ void LoadLevelInfo()
 
   sortTreeInfo(&leveldir_first);
 
-#if 0
+#if ENABLE_UNUSED_CODE
   dumpTreeInfo(leveldir_first, 0);
 #endif
 }
-
-#if 1
 
 static boolean LoadArtworkInfoFromArtworkConf(TreeInfo **node_first,
 					      TreeInfo *node_parent,
@@ -3680,10 +3060,6 @@ static boolean LoadArtworkInfoFromArtworkConf(TreeInfo **node_first,
 
   if (setup_file_hash)	/* (before defining ".color" and ".class_desc") */
   {
-#if 0
-    checkSetupFileHashIdentifier(setup_file_hash, filename, getCookie("..."));
-#endif
-
     /* set all structure fields according to the token/value pairs */
     ldi = *artwork_new;
     for (i = 0; i < NUM_LEVELINFO_TOKENS; i++)
@@ -3750,10 +3126,6 @@ static boolean LoadArtworkInfoFromArtworkConf(TreeInfo **node_first,
     setString(&artwork_new->name_sorting, artwork_new->name);
   }
 
-#if 0
-  DrawInitText(artwork_new->name, 150, FC_YELLOW);
-#endif
-
   pushTreeInfo(node_first, artwork_new);
 
   freeSetupFileHash(setup_file_hash);
@@ -3763,155 +3135,6 @@ static boolean LoadArtworkInfoFromArtworkConf(TreeInfo **node_first,
 
   return TRUE;
 }
-
-#else
-
-static boolean LoadArtworkInfoFromArtworkConf(TreeInfo **node_first,
-					      TreeInfo *node_parent,
-					      char *base_directory,
-					      char *directory_name, int type)
-{
-  char *directory_path = getPath2(base_directory, directory_name);
-  char *filename = getPath2(directory_path, ARTWORKINFO_FILENAME(type));
-  SetupFileHash *setup_file_hash = NULL;
-  TreeInfo *artwork_new = NULL;
-  int i;
-
-  if (fileExists(filename))
-    setup_file_hash = loadSetupFileHash(filename);
-
-  if (setup_file_hash == NULL)	/* no config file -- look for artwork files */
-  {
-    DIR *dir;
-    struct dirent *dir_entry;
-    boolean valid_file_found = FALSE;
-
-    if ((dir = opendir(directory_path)) != NULL)
-    {
-      while ((dir_entry = readdir(dir)) != NULL)
-      {
-	char *entry_name = dir_entry->d_name;
-
-	if (FileIsArtworkType(entry_name, type))
-	{
-	  valid_file_found = TRUE;
-	  break;
-	}
-      }
-
-      closedir(dir);
-    }
-
-    if (!valid_file_found)
-    {
-      if (!strEqual(directory_name, "."))
-	Error(ERR_WARN, "ignoring artwork directory '%s'", directory_path);
-
-      free(directory_path);
-      free(filename);
-
-      return FALSE;
-    }
-  }
-
-  artwork_new = newTreeInfo();
-
-  if (node_parent)
-    setTreeInfoToDefaultsFromParent(artwork_new, node_parent);
-  else
-    setTreeInfoToDefaults(artwork_new, type);
-
-  artwork_new->subdir = getStringCopy(directory_name);
-
-  if (setup_file_hash)	/* (before defining ".color" and ".class_desc") */
-  {
-#if 0
-    checkSetupFileHashIdentifier(setup_file_hash, filename, getCookie("..."));
-#endif
-
-    /* set all structure fields according to the token/value pairs */
-    ldi = *artwork_new;
-    for (i = 0; i < NUM_LEVELINFO_TOKENS; i++)
-      setSetupInfo(levelinfo_tokens, i,
-		   getHashEntry(setup_file_hash, levelinfo_tokens[i].text));
-    *artwork_new = ldi;
-
-    if (strEqual(artwork_new->name, ANONYMOUS_NAME))
-      setString(&artwork_new->name, artwork_new->subdir);
-
-    if (artwork_new->identifier == NULL)
-      artwork_new->identifier = getStringCopy(artwork_new->subdir);
-
-    if (artwork_new->name_sorting == NULL)
-      artwork_new->name_sorting = getStringCopy(artwork_new->name);
-  }
-
-  if (node_parent == NULL)		/* top level group */
-  {
-    artwork_new->basepath = getStringCopy(base_directory);
-    artwork_new->fullpath = getStringCopy(artwork_new->subdir);
-  }
-  else					/* sub level group */
-  {
-    artwork_new->basepath = getStringCopy(node_parent->basepath);
-    artwork_new->fullpath = getPath2(node_parent->fullpath, directory_name);
-  }
-
-  artwork_new->in_user_dir =
-    (!strEqual(artwork_new->basepath, OPTIONS_ARTWORK_DIRECTORY(type)));
-
-  /* (may use ".sort_priority" from "setup_file_hash" above) */
-  artwork_new->color = ARTWORKCOLOR(artwork_new);
-
-  setString(&artwork_new->class_desc, getLevelClassDescription(artwork_new));
-
-  if (setup_file_hash == NULL)	/* (after determining ".user_defined") */
-  {
-    if (strEqual(artwork_new->subdir, "."))
-    {
-      if (artwork_new->user_defined)
-      {
-	setString(&artwork_new->identifier, "private");
-	artwork_new->sort_priority = ARTWORKCLASS_PRIVATE;
-      }
-      else
-      {
-	setString(&artwork_new->identifier, "classic");
-	artwork_new->sort_priority = ARTWORKCLASS_CLASSICS;
-      }
-
-      /* set to new values after changing ".sort_priority" */
-      artwork_new->color = ARTWORKCOLOR(artwork_new);
-
-      setString(&artwork_new->class_desc,
-		getLevelClassDescription(artwork_new));
-    }
-    else
-    {
-      setString(&artwork_new->identifier, artwork_new->subdir);
-    }
-
-    setString(&artwork_new->name, artwork_new->identifier);
-    setString(&artwork_new->name_sorting, artwork_new->name);
-  }
-
-#if 0
-  DrawInitText(artwork_new->name, 150, FC_YELLOW);
-#endif
-
-  pushTreeInfo(node_first, artwork_new);
-
-  freeSetupFileHash(setup_file_hash);
-
-  free(directory_path);
-  free(filename);
-
-  return TRUE;
-}
-
-#endif
-
-#if 1
 
 static void LoadArtworkInfoFromArtworkDir(TreeInfo **node_first,
 					  TreeInfo *node_parent,
@@ -3944,7 +3167,6 @@ static void LoadArtworkInfoFromArtworkDir(TreeInfo **node_first,
       continue;
     }
 
-#if 1
     /* skip directory entries which are not a directory */
     if (!dir_entry->is_directory)			/* not a directory */
     {
@@ -3952,17 +3174,6 @@ static void LoadArtworkInfoFromArtworkDir(TreeInfo **node_first,
 
       continue;
     }
-#else
-    /* skip directory entries which are not a directory or are not accessible */
-    struct stat file_status;
-    if (stat(directory_path, &file_status) != 0 ||	/* cannot stat file */
-	(file_status.st_mode & S_IFMT) != S_IFDIR)	/* not a directory */
-    {
-      free(directory_path);
-
-      continue;
-    }
-#endif
 
     free(directory_path);
 
@@ -3982,68 +3193,6 @@ static void LoadArtworkInfoFromArtworkDir(TreeInfo **node_first,
     Error(ERR_WARN, "cannot find any valid artwork in directory '%s'",
 	  base_directory);
 }
-
-#else
-
-static void LoadArtworkInfoFromArtworkDir(TreeInfo **node_first,
-					  TreeInfo *node_parent,
-					  char *base_directory, int type)
-{
-  DIR *dir;
-  struct dirent *dir_entry;
-  boolean valid_entry_found = FALSE;
-
-  if ((dir = opendir(base_directory)) == NULL)
-  {
-    /* display error if directory is main "options.graphics_directory" etc. */
-    if (base_directory == OPTIONS_ARTWORK_DIRECTORY(type))
-      Error(ERR_WARN, "cannot read directory '%s'", base_directory);
-
-    return;
-  }
-
-  while ((dir_entry = readdir(dir)) != NULL)	/* loop until last dir entry */
-  {
-    struct stat file_status;
-    char *directory_name = dir_entry->d_name;
-    char *directory_path = getPath2(base_directory, directory_name);
-
-    /* skip directory entries for current and parent directory */
-    if (strEqual(directory_name, ".") ||
-	strEqual(directory_name, ".."))
-    {
-      free(directory_path);
-      continue;
-    }
-
-    /* skip directory entries which are not a directory or are not accessible */
-    if (stat(directory_path, &file_status) != 0 ||	/* cannot stat file */
-	(file_status.st_mode & S_IFMT) != S_IFDIR)	/* not a directory */
-    {
-      free(directory_path);
-      continue;
-    }
-
-    free(directory_path);
-
-    /* check if this directory contains artwork with or without config file */
-    valid_entry_found |= LoadArtworkInfoFromArtworkConf(node_first, node_parent,
-							base_directory,
-							directory_name, type);
-  }
-
-  closedir(dir);
-
-  /* check if this directory directly contains artwork itself */
-  valid_entry_found |= LoadArtworkInfoFromArtworkConf(node_first, node_parent,
-						      base_directory, ".",
-						      type);
-  if (!valid_entry_found)
-    Error(ERR_WARN, "cannot find any valid artwork in directory '%s'",
-	  base_directory);
-}
-
-#endif
 
 static TreeInfo *getDummyArtworkInfo(int type)
 {
@@ -4126,7 +3275,7 @@ void LoadArtworkInfo()
   artwork.snd_current_identifier = artwork.snd_current->identifier;
   artwork.mus_current_identifier = artwork.mus_current->identifier;
 
-#if 0
+#if ENABLE_UNUSED_CODE
   printf("graphics set == %s\n\n", artwork.gfx_current_identifier);
   printf("sounds set == %s\n\n", artwork.snd_current_identifier);
   printf("music set == %s\n\n", artwork.mus_current_identifier);
@@ -4136,7 +3285,7 @@ void LoadArtworkInfo()
   sortTreeInfo(&artwork.snd_first);
   sortTreeInfo(&artwork.mus_first);
 
-#if 0
+#if ENABLE_UNUSED_CODE
   dumpTreeInfo(artwork.gfx_first, 0);
   dumpTreeInfo(artwork.snd_first, 0);
   dumpTreeInfo(artwork.mus_first, 0);
@@ -4146,10 +3295,6 @@ void LoadArtworkInfo()
 void LoadArtworkInfoFromLevelInfo(ArtworkDirTree **artwork_node,
 				  LevelDirTree *level_node)
 {
-#if 0
-  static unsigned int progress_delay = 0;
-  unsigned int progress_delay_value = 100;	/* (in milliseconds) */
-#endif
   int type = (*artwork_node)->type;
 
   /* recursively check all level directories for artwork sub-directories */
@@ -4194,14 +3339,8 @@ void LoadArtworkInfoFromLevelInfo(ArtworkDirTree **artwork_node,
 	setArtworkInfoCacheEntry(artwork_new, level_node, type);
     }
 
-#if 1
     DrawInitTextExt(level_node->name, 150, FC_YELLOW,
 		    level_node->level_group);
-#else
-    if (level_node->level_group ||
-	DelayReached(&progress_delay, progress_delay_value))
-      DrawInitText(level_node->name, 150, FC_YELLOW);
-#endif
 
     if (level_node->node_group != NULL)
       LoadArtworkInfoFromLevelInfo(artwork_node, level_node->node_group);
@@ -4272,7 +3411,7 @@ void LoadLevelArtworkInfo()
 
   print_timestamp_time("sortTreeInfo");
 
-#if 0
+#if ENABLE_UNUSED_CODE
   dumpTreeInfo(artwork.gfx_first, 0);
   dumpTreeInfo(artwork.snd_first, 0);
   dumpTreeInfo(artwork.mus_first, 0);
@@ -4530,15 +3669,10 @@ void SaveLevelSetup_LastSeries_Deactivate()
   SaveLevelSetup_LastSeries_Ext(TRUE);
 }
 
-#if 1
-
 static void checkSeriesInfo()
 {
   static char *level_directory = NULL;
   Directory *dir;
-#if 0
-  DirectoryEntry *dir_entry;
-#endif
 
   /* check for more levels besides the 'levels' field of 'levelinfo.conf' */
 
@@ -4554,95 +3688,8 @@ static void checkSeriesInfo()
     return;
   }
 
-#if 0
-  while ((dir_entry = readDirectory(dir)) != NULL)   /* last directory entry */
-  {
-    if (strlen(dir_entry->basename) > 4 &&
-	dir_entry->basename[3] == '.' &&
-	strEqual(&dir_entry->basename[4], LEVELFILE_EXTENSION))
-    {
-      char levelnum_str[4];
-      int levelnum_value;
-
-      strncpy(levelnum_str, dir_entry->basename, 3);
-      levelnum_str[3] = '\0';
-
-      levelnum_value = atoi(levelnum_str);
-
-      if (levelnum_value < leveldir_current->first_level)
-      {
-	Error(ERR_WARN, "additional level %d found", levelnum_value);
-	leveldir_current->first_level = levelnum_value;
-      }
-      else if (levelnum_value > leveldir_current->last_level)
-      {
-	Error(ERR_WARN, "additional level %d found", levelnum_value);
-	leveldir_current->last_level = levelnum_value;
-      }
-    }
-  }
-#endif
-
   closeDirectory(dir);
 }
-
-#else
-
-static void checkSeriesInfo()
-{
-  static char *level_directory = NULL;
-  DIR *dir;
-#if 0
-  struct dirent *dir_entry;
-#endif
-
-  /* check for more levels besides the 'levels' field of 'levelinfo.conf' */
-
-  level_directory = getPath2((leveldir_current->in_user_dir ?
-			      getUserLevelDir(NULL) :
-			      options.level_directory),
-			     leveldir_current->fullpath);
-
-  if ((dir = opendir(level_directory)) == NULL)
-  {
-    Error(ERR_WARN, "cannot read level directory '%s'", level_directory);
-
-    return;
-  }
-
-#if 0
-  while ((dir_entry = readdir(dir)) != NULL)	/* last directory entry */
-  {
-    if (strlen(dir_entry->d_name) > 4 &&
-	dir_entry->d_name[3] == '.' &&
-	strEqual(&dir_entry->d_name[4], LEVELFILE_EXTENSION))
-    {
-      char levelnum_str[4];
-      int levelnum_value;
-
-      strncpy(levelnum_str, dir_entry->d_name, 3);
-      levelnum_str[3] = '\0';
-
-      levelnum_value = atoi(levelnum_str);
-
-      if (levelnum_value < leveldir_current->first_level)
-      {
-	Error(ERR_WARN, "additional level %d found", levelnum_value);
-	leveldir_current->first_level = levelnum_value;
-      }
-      else if (levelnum_value > leveldir_current->last_level)
-      {
-	Error(ERR_WARN, "additional level %d found", levelnum_value);
-	leveldir_current->last_level = levelnum_value;
-      }
-    }
-  }
-#endif
-
-  closedir(dir);
-}
-
-#endif
 
 void LoadLevelSetup_SeriesInfo()
 {

@@ -26,11 +26,6 @@
 					 SP_MAX_PLAYFIELD_HEIGHT)
 #define SP_STD_LEVEL_SIZE		(SP_HEADER_SIZE + SP_STD_PLAYFIELD_SIZE)
 
-#if 0
-#define SP_SCREEN_BUFFER_XSIZE		(SCR_FIELDX + 2)
-#define SP_SCREEN_BUFFER_YSIZE		(SCR_FIELDY + 2)
-#endif
-
 #define SP_FRAMES_PER_SECOND		35
 #define SP_MAX_TAPE_LEN			64010	/* (see "spfix63.doc") */
 
@@ -55,11 +50,7 @@
 #ifndef HAS_SpecialPortType
 typedef struct
 {
-#if 1
   short PortLocation; // = 2*(x+(y*60))		/* big endian format */
-#else
-  int PortLocation; // = 2*(x+(y*60))
-#endif
   byte Gravity; // 1 = turn on, anything else (0) = turn off
   byte FreezeZonks; // 2 = turn on, anything else (0) = turn off  (1=off!)
   byte FreezeEnemies; // 1 = turn on, anything else (0) = turn off
@@ -85,11 +76,7 @@ typedef struct
   SpecialPortType SpecialPort[10];
   byte SpeedByte; // = Speed XOR Highbyte(RandomSeed)
   byte CheckSumByte; // = CheckSum XOR SpeedByte
-#if 1
   short DemoRandomSeed;				/* little endian format */
-#else
-  int DemoRandomSeed;
-#endif
 } LevelInfoType;
 #define HAS_LevelInfoType
 #endif

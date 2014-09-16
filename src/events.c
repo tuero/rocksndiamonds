@@ -210,15 +210,10 @@ void EventLoop(void)
 	SetMouseCursor(CURSOR_DEFAULT);
 	playfield_cursor_set = FALSE;
       }
-
-#if 0
-      HandleNoEvent();
-#endif
     }
 
-#if 1
+    /* also execute after pending events have been processed before */
     HandleNoEvent();
-#endif
 
     /* don't use all CPU time when idle; the main loop while playing
        has its own synchronization and is CPU friendly, too */
@@ -230,6 +225,7 @@ void EventLoop(void)
     else
     {
       SyncDisplay();
+
       if (!PendingEvent())	/* delay only if no pending events */
 	Delay(10);
     }
@@ -299,11 +295,7 @@ void ClearEventQueue()
 	break;
 
       case EVENT_KEYRELEASE:
-#if 1
 	ClearPlayerAction();
-#else
-	key_joystick_mapping = 0;
-#endif
 	break;
 
       default:
@@ -408,6 +400,7 @@ void HandleMotionEvent(MotionEvent *event)
 }
 
 #if defined(TARGET_SDL2)
+
 void HandleWindowEvent(WindowEvent *event)
 {
 #if DEBUG_EVENTS
@@ -439,23 +432,8 @@ void HandleWindowEvent(WindowEvent *event)
       event->event == SDL_WINDOWEVENT_EXPOSED)
     SDLRedrawWindow();
 
-#if 0
-  if (event->event == SDL_WINDOWEVENT_SIZE_CHANGED)
-  {
-    // if game started in fullscreen mode, window will also get fullscreen size
-    if (!video.fullscreen_enabled && video.fullscreen_initial)
-    {
-      SDLSetWindowScaling(setup.window_scaling_percent);
-
-      // only do this correction once
-      video.fullscreen_initial = FALSE;
-    }
-  }
-#endif
-
   if (event->event == SDL_WINDOWEVENT_RESIZED && !video.fullscreen_enabled)
   {
-#if 1
     int new_window_width  = event->data1;
     int new_window_height = event->data2;
 
@@ -466,12 +444,6 @@ void HandleWindowEvent(WindowEvent *event)
       int new_xpercent = (100 * new_window_width  / video.width);
       int new_ypercent = (100 * new_window_height / video.height);
 
-#if 0
-      printf("::: RESIZED from %d, %d to %d, %d\n",
-	     video.window_width, video.window_height,
-	     new_window_width, new_window_height);
-#endif
-
       setup.window_scaling_percent = video.window_scaling_percent =
 	MIN(MAX(MIN_WINDOW_SCALING_PERCENT, MIN(new_xpercent, new_ypercent)),
 	    MAX_WINDOW_SCALING_PERCENT);
@@ -479,49 +451,13 @@ void HandleWindowEvent(WindowEvent *event)
       video.window_width  = new_window_width;
       video.window_height = new_window_height;
 
-#if 0
-      printf("::: setup.window_scaling_percent set to %d\n",
-	     setup.window_scaling_percent);
-#endif
-
       if (game_status == GAME_MODE_SETUP)
 	RedrawSetupScreenAfterFullscreenToggle();
 
       SetWindowTitle();
     }
-#else
-    // prevent slightly wrong scaling factor due to rounding differences
-    float scaling_factor = (float)setup.window_scaling_percent / 100;
-    int old_xsize = (int)(scaling_factor * video.width);
-    int old_ysize = (int)(scaling_factor * video.height);
-    int new_xsize = event->data1;
-    int new_ysize = event->data2;
-
-    // window size is unchanged when going from fullscreen to window mode,
-    // but reverse calculation of scaling factor might result in a scaling
-    // factor that is slightly different due to rounding differences;
-    // therefore compare old/new window size and not old/new scaling factor
-    if (old_xsize != new_xsize ||
-	old_ysize != new_ysize)
-    {
-      int new_xpercent = (100 * new_xsize / video.width);
-      int new_ypercent = (100 * new_ysize / video.height);
-
-      setup.window_scaling_percent = MIN(new_xpercent, new_ypercent);
-
-      if (setup.window_scaling_percent < MIN_WINDOW_SCALING_PERCENT)
-	setup.window_scaling_percent = MIN_WINDOW_SCALING_PERCENT;
-      else if (setup.window_scaling_percent > MAX_WINDOW_SCALING_PERCENT)
-	setup.window_scaling_percent = MAX_WINDOW_SCALING_PERCENT;
-
-      printf("::: setup.window_scaling_percent set to %d\n",
-	     setup.window_scaling_percent);
-    }
-#endif
   }
 }
-
-#if 1
 
 #define NUM_TOUCH_FINGERS		3
 
@@ -549,7 +485,6 @@ void HandleFingerEvent(FingerEvent *event)
   float event_x = event->x;
   float event_y = event->y;
 
-#if 1
 #if DEBUG_EVENTS
   Error(ERR_DEBUG, "FINGER EVENT: finger was %s, touch ID %lld, finger ID %lld, x/y %f/%f, dx/dy %f/%f, pressure %f",
 	event->type == EVENT_FINGERPRESS ? "pressed" :
@@ -560,22 +495,14 @@ void HandleFingerEvent(FingerEvent *event)
 	event->dx, event->dy,
 	event->pressure);
 #endif
-#endif
 
   if (game_status != GAME_MODE_PLAYING)
     return;
 
-#if 1
   if (strEqual(setup.touch.control_type, TOUCH_CONTROL_VIRTUAL_BUTTONS))
-#else
-  boolean use_virtual_button_control = FALSE;
-
-  if (use_virtual_button_control)
-#endif
   {
     int key_status = (event->type == EVENT_FINGERRELEASE ? KEY_RELEASED :
 		      KEY_PRESSED);
-#if 1
     Key key = (event->x < 1.0 / 3.0 ?
 	       (event->y < 1.0 / 2.0 ? setup.input[0].key.snap :
 		setup.input[0].key.drop) :
@@ -585,23 +512,8 @@ void HandleFingerEvent(FingerEvent *event)
 		event->x < 5.0 / 6.0 ? setup.input[0].key.left :
 		setup.input[0].key.right) :
 	       KSYM_UNDEFINED);
-#if 0
-    char *key_name = (key == setup.input[0].key.snap  ? "SNAP" :
-		      key == setup.input[0].key.drop  ? "DROP" :
-		      key == setup.input[0].key.up    ? "UP" :
-		      key == setup.input[0].key.down  ? "DOWN" :
-		      key == setup.input[0].key.left  ? "LEFT" :
-		      key == setup.input[0].key.right ? "RIGHT" : "(unknown)");
-#endif
     char *key_status_name = (key_status == KEY_RELEASED ? "KEY_RELEASED" :
 			     "KEY_PRESSED");
-#else
-    Key key = (event->y < 1.0 / 3.0 ? setup.input[0].key.up :
-	       event->y > 2.0 / 3.0 ? setup.input[0].key.down :
-	       event->x < 1.0 / 3.0 ? setup.input[0].key.left :
-	       event->x > 2.0 / 3.0 ? setup.input[0].key.right :
-	       setup.input[0].key.snap);
-#endif
     int i;
 
     Error(ERR_DEBUG, "::: key '%s' was '%s' [fingerId: %lld]",
@@ -710,15 +622,6 @@ void HandleFingerEvent(FingerEvent *event)
 	touch_info[i].key = 0;
       }
     }
-
-#if 0
-#if 1
-    Error(ERR_DEBUG, "=> key == '%s', key_status == '%s' [slot %d]",
-	  key_name, key_status_name, i);
-#else
-    Error(ERR_DEBUG, "=> key == %d, key_status == %d [%d]", key, key_status, i);
-#endif
-#endif
 
     return;
   }
@@ -858,94 +761,6 @@ void HandleFingerEvent(FingerEvent *event)
   }
 }
 
-#else
-
-void HandleFingerEvent(FingerEvent *event)
-{
-#if 0
-  static int num_events = 0;
-  int max_events = 10;
-#endif
-
-#if 0
-#if DEBUG_EVENTS
-  Error(ERR_DEBUG, "FINGER EVENT: finger was %s, touch ID %lld, finger ID %lld, x/y %f/%f, dx/dy %f/%f, pressure %f",
-	event->type == EVENT_FINGERPRESS ? "pressed" :
-	event->type == EVENT_FINGERRELEASE ? "released" : "moved",
-	event->touchId,
-	event->fingerId,
-	event->x, event->y,
-	event->dx, event->dy,
-	event->pressure);
-#endif
-#endif
-
-#if 0
-  int x = (int)(event->x * video.width);
-  int y = (int)(event->y * video.height);
-  int button = MB_LEFTBUTTON;
-
-  Error(ERR_DEBUG, "=> screen x/y %d/%d", x, y);
-#endif
-
-#if 0
-  if (++num_events >= max_events)
-    CloseAllAndExit(0);
-#endif
-
-#if 1
-#if 0
-  if (event->type == EVENT_FINGERPRESS ||
-      event->type == EVENT_FINGERMOTION)
-    button_status = button;
-  else
-    button_status = MB_RELEASED;
-
-  int max_x = SX + SXSIZE;
-  int max_y = SY + SYSIZE;
-#endif
-
-#if 1
-  if (game_status == GAME_MODE_PLAYING)
-#else
-  if (game_status == GAME_MODE_PLAYING &&
-      x < max_x)
-#endif
-  {
-    int key_status = (event->type == EVENT_FINGERRELEASE ? KEY_RELEASED :
-		      KEY_PRESSED);
-#if 1
-    Key key = (event->y < 1.0 / 3.0 ? setup.input[0].key.up :
-	       event->y > 2.0 / 3.0 ? setup.input[0].key.down :
-	       event->x < 1.0 / 3.0 ? setup.input[0].key.left :
-	       event->x > 2.0 / 3.0 ? setup.input[0].key.right :
-	       setup.input[0].key.drop);
-#else
-    Key key = (y <     max_y / 3 ? setup.input[0].key.up :
-	       y > 2 * max_y / 3 ? setup.input[0].key.down :
-	       x <     max_x / 3 ? setup.input[0].key.left :
-	       x > 2 * max_x / 3 ? setup.input[0].key.right :
-	       setup.input[0].key.drop);
-#endif
-
-    Error(ERR_DEBUG, "=> key == %d, key_status == %d", key, key_status);
-
-    HandleKey(key, key_status);
-  }
-  else
-  {
-#if 0
-    Error(ERR_DEBUG, "::: button_status == %d, button == %d\n",
-	  button_status, button);
-
-    HandleButton(x, y, button_status, button);
-#endif
-  }
-#endif
-}
-
-#endif
-
 static boolean checkTextInputKeyModState()
 {
   // when playing, only handle raw key events and ignore text input
@@ -1014,13 +829,6 @@ void HandleKeyEvent(KeyEvent *event)
 	getKeyNameFromKey(key));
 #endif
 
-#if 0
-  if (key == KSYM_Menu)
-    Error(ERR_DEBUG, "menu key pressed");
-  else if (key == KSYM_Back)
-    Error(ERR_DEBUG, "back key pressed");
-#endif
-
 #if defined(PLATFORM_ANDROID)
   // always map the "back" button to the "escape" key on Android devices
   if (key == KSYM_Back)
@@ -1030,12 +838,6 @@ void HandleKeyEvent(KeyEvent *event)
   HandleKeyModState(keymod, key_status);
 
 #if defined(TARGET_SDL2)
-
-  // if (game_status == GAME_MODE_PLAYING || GetKeyModState() == KMOD_None)
-  /*
-  if (game_status == GAME_MODE_PLAYING ||
-      (GetKeyModState() & KMOD_TextInput) == KMOD_None)
-  */
   if (!checkTextInputKeyModState())
     HandleKey(key, key_status);
 #else
@@ -1131,10 +933,6 @@ void HandleButton(int mx, int my, int button, int button_nr)
   /* do not use scroll wheel button events for anything other than gadgets */
   if (IS_WHEEL_BUTTON(button_nr))
     return;
-
-#if 0
-  Error(ERR_DEBUG, "::: game_status == %d", game_status);
-#endif
 
   switch (game_status)
   {
@@ -1400,15 +1198,11 @@ void HandleKey(Key key, int key_status)
 	  if (stored_player[pnr].action & KEY_BUTTON_DROP)
 	    element_dropped[pnr] = TRUE;
 	}
-#if 1
 	else if (key_status == KEY_PRESSED && key_action & KEY_BUTTON_DROP)
 	{
 	  if (level.game_engine_type == GAME_ENGINE_TYPE_EM ||
 	      level.game_engine_type == GAME_ENGINE_TYPE_SP)
 	  {
-#if 0
-	    printf("::: drop key pressed\n");
-#endif
 
 	    if (level.game_engine_type == GAME_ENGINE_TYPE_SP &&
 		getRedDiskReleaseFlag_SP() == 0)
@@ -1417,7 +1211,6 @@ void HandleKey(Key key, int key_status)
 	    TapeTogglePause(TAPE_TOGGLE_AUTOMATIC);
 	  }
 	}
-#endif
 	else if (key_status == KEY_RELEASED && key_action & KEY_BUTTON)
 	{
 	  if (key_action & KEY_BUTTON_SNAP)
@@ -1436,7 +1229,6 @@ void HandleKey(Key key, int key_status)
 	    element_snapped[pnr] = FALSE;
 	  }
 
-#if 1
 	  if (key_action & KEY_BUTTON_DROP &&
 	      level.game_engine_type == GAME_ENGINE_TYPE_RND)
 	  {
@@ -1455,7 +1247,6 @@ void HandleKey(Key key, int key_status)
 
 	    element_dropped[pnr] = FALSE;
 	  }
-#endif
 	}
       }
       else if (tape.recording && tape.pausing)
@@ -1496,10 +1287,6 @@ void HandleKey(Key key, int key_status)
   {
     setup.fullscreen = !setup.fullscreen;
 
-#if 0
-    printf("::: %d\n", setup.window_scaling_percent);
-#endif
-
     ToggleFullscreenOrChangeWindowScalingIfNeeded();
 
     if (game_status == GAME_MODE_SETUP)
@@ -1535,13 +1322,8 @@ void HandleKey(Key key, int key_status)
     return;
   }
 
-#if 0
-  if (game_status == GAME_MODE_PLAYING && local_player->LevelSolved_GameEnd &&
-      (key == KSYM_Return || key == setup.shortcut.toggle_pause))
-#else
   if (game_status == GAME_MODE_PLAYING && AllPlayersGone &&
       (key == KSYM_Return || key == setup.shortcut.toggle_pause))
-#endif
   {
     GameEnd();
 
@@ -1710,17 +1492,6 @@ void HandleKey(Key key, int key_status)
 
 #ifdef DEBUG
 	case KSYM_0:
-#if 0
-	case KSYM_1:
-	case KSYM_2:
-	case KSYM_3:
-	case KSYM_4:
-	case KSYM_5:
-	case KSYM_6:
-	case KSYM_7:
-	case KSYM_8:
-	case KSYM_9:
-#endif
 	  if (key == KSYM_0)
 	  {
 	    if (GameFrameDelay == 500)
@@ -1769,28 +1540,6 @@ void HandleKey(Key key, int key_status)
 	  break;
 #endif
 
-#if 0
-	case KSYM_f:
-	  ScrollStepSize = TILEX / 8;
-	  printf("ScrollStepSize == %d (1/8)\n", ScrollStepSize);
-	  break;
-
-	case KSYM_g:
-	  ScrollStepSize = TILEX / 4;
-	  printf("ScrollStepSize == %d (1/4)\n", ScrollStepSize);
-	  break;
-
-	case KSYM_h:
-	  ScrollStepSize = TILEX / 2;
-	  printf("ScrollStepSize == %d (1/2)\n", ScrollStepSize);
-	  break;
-
-	case KSYM_l:
-	  ScrollStepSize = TILEX;
-	  printf("ScrollStepSize == %d (1/1)\n", ScrollStepSize);
-	  break;
-#endif
-
 	case KSYM_v:
 	  printf("::: currently using game engine version %d\n",
 		 game.engine_version);
@@ -1819,10 +1568,6 @@ void HandleNoEvent()
   if (button_status && game_status != GAME_MODE_PLAYING)
   {
     HandleButton(0, 0, -button_status, button_status);
-
-#if 0
-    return;
-#endif
   }
   else
   {
@@ -1932,21 +1677,11 @@ void HandleJoystick()
       HandleHallOfFame(0, 0, dx, dy, !newbutton);
       break;
 
-#if 0
-    case GAME_MODE_EDITOR:
-      HandleLevelEditorIdle();
-      break;
-#endif
-
     case GAME_MODE_PLAYING:
       if (tape.playing || keyboard)
 	newbutton = ((joy & JOY_BUTTON) != 0);
 
-#if 0
-      if (newbutton && local_player->LevelSolved_GameEnd)
-#else
       if (newbutton && AllPlayersGone)
-#endif
       {
 	GameEnd();
 

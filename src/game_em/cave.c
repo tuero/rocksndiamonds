@@ -45,7 +45,6 @@ void setLevelInfoToDefaults_EM(void)
   for (i = 0; i < TILE_MAX; i++)
     lev.android_array[i] = Xblank;
 
-#if 1
   /* initial number of players in this level */
   lev.home_initial = 0;
 
@@ -54,16 +53,6 @@ void setLevelInfoToDefaults_EM(void)
     ply[i].exists = 0;
     ply[i].alive_initial = FALSE;
   }
-#else
-  /* initial number of players in this level */
-  lev.home_initial = (setup.team_mode ? 2 : 1);
-
-  for (i = 0; i < MAX_PLAYERS; i++)
-  {
-    ply[i].exists = 0;
-    ply[i].alive_initial = (lev.home_initial > i ? TRUE : FALSE);
-  }
-#endif
 }
 
 
@@ -73,8 +62,6 @@ void setLevelInfoToDefaults_EM(void)
  */
 
 #define MAX_EM_LEVEL_SIZE		16384
-
-#if 1
 
 boolean LoadNativeLevel_EM(char *filename, boolean level_info_only)
 {
@@ -119,51 +106,3 @@ boolean LoadNativeLevel_EM(char *filename, boolean level_info_only)
 
   return TRUE;
 }
-
-#else
-
-boolean LoadNativeLevel_EM(char *filename, boolean level_info_only)
-{
-  unsigned char raw_leveldata[MAX_EM_LEVEL_SIZE];
-  int raw_leveldata_length;
-  int file_version;
-  FILE *file;
-
-  /* always start with reliable default values */
-  setLevelInfoToDefaults_EM();
-
-  if (!(file = fopen(filename, MODE_READ)))
-  {
-    if (!level_info_only)
-      Error(ERR_WARN, "cannot open level '%s' -- using empty level", filename);
-
-    return FALSE;
-  }
-
-  raw_leveldata_length = fread(raw_leveldata, 1, MAX_EM_LEVEL_SIZE, file);
-
-  fclose(file);
-
-  if (raw_leveldata_length <= 0)
-  {
-    Error(ERR_WARN, "cannot read level '%s' -- using empty level", filename);
-
-    return FALSE;
-  }
-
-  file_version = cleanup_em_level(raw_leveldata, raw_leveldata_length,filename);
-
-  if (file_version == FILE_VERSION_EM_UNKNOWN)
-  {
-    Error(ERR_WARN, "unknown EM level '%s' -- using empty level", filename);
-
-    return FALSE;
-  }
-
-  convert_em_level(raw_leveldata, file_version);
-  prepare_em_level();
-
-  return TRUE;
-}
-
-#endif

@@ -16,16 +16,7 @@
 #include <signal.h>
 #include <sys/time.h>
 
-#if defined(TARGET_SDL)
 #include "main.h"
-#else
-#include <sys/wait.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <netinet/tcp.h>
-#include <arpa/inet.h>
-#include <netdb.h>
-#endif
 
 #include "libgame/libgame.h"
 
@@ -53,12 +44,8 @@ static struct NetworkClientPlayerInfo first_player =
 
 /* server stuff */
 
-#if defined(TARGET_SDL)
 static TCPsocket sfd;		/* server socket */
 static SDLNet_SocketSet rfds;	/* socket set */
-#else
-static int sfd;			/* server socket */
-#endif
 
 static byte realbuffer[512];
 static byte readbuffer[MAX_BUFFER_SIZE], writbuffer[MAX_BUFFER_SIZE];
@@ -82,12 +69,7 @@ static void SendBufferToServer(int size)
   nwrite += 4 + size;
 
   /* directly send the buffer to the network server */
-#if defined(TARGET_SDL)
   SDLNet_TCP_Send(sfd, writbuffer, nwrite);
-#else
-  if (write(sfd, writbuffer, nwrite) == -1)
-    Error(ERR_WARN, "write() failed; %s", strerror(errno));
-#endif
   nwrite = 0;
 }
 
@@ -124,7 +106,6 @@ char *getNetworkPlayerName(int player_nr)
 
 static void StartNetworkServer(int port)
 {
-#if defined(TARGET_SDL)
   static int p;
 
   p = port;
@@ -135,31 +116,8 @@ static void StartNetworkServer(int port)
   server_thread = SDL_CreateThread(NetworkServerThread, &p);
 #endif
   network_server = TRUE;
-
-#else
-
-  switch (fork())
-  {
-    case 0:
-      NetworkServer(port, options.serveronly);
-
-      /* never reached */
-      exit(0);
-
-    case -1:
-      Error(ERR_WARN,
-	    "cannot create network server process - no network playing");
-      options.network = FALSE;
-      return;
-
-    default:
-      /* we are parent process -- resume normal operation */
-      return;
-  }
-#endif
 }
 
-#if defined(TARGET_SDL)
 boolean ConnectToServer(char *hostname, int port)
 {
   IPaddress ip;
@@ -215,72 +173,6 @@ boolean ConnectToServer(char *hostname, int port)
   /* when reaching this point, connect to newly started server has failed */
   return FALSE;
 }
-
-#else
-
-boolean ConnectToServer(char *hostname, int port)
-{
-  struct sockaddr_in s;
-  struct protoent *tcpproto;
-  int on = 1, i;
-
-  if (hostname)
-  {
-    if ((s.sin_addr.s_addr = inet_addr(hostname)) == -1)
-    {
-      struct hostent *host;
-
-      if ((host = gethostbyname(hostname)) == NULL)
-	Error(ERR_EXIT, "cannot locate host '%s'", hostname);
-
-      s.sin_addr = *(struct in_addr *)(host->h_addr_list[0]);
-    }
-  }
-  else
-    s.sin_addr.s_addr = inet_addr("127.0.0.1");		/* localhost */
-
-  if (port == 0)
-    port = DEFAULT_SERVER_PORT;
-
-  s.sin_port = htons(port);
-  s.sin_family = AF_INET;
-
-  sfd = socket(PF_INET, SOCK_STREAM, 0);
-  if (sfd < 0)
-    Error(ERR_EXIT, "out of file descriptors");
-
-  if ((tcpproto = getprotobyname("tcp")) != NULL)
-    setsockopt(sfd, tcpproto->p_proto, TCP_NODELAY, (char *)&on, sizeof(int));
-
-  if (connect(sfd, (struct sockaddr *)&s, sizeof(s)) == 0)	/* connected */
-    return TRUE;
-
-  if (hostname)	/* connect to specified server failed */
-    return FALSE;
-
-  printf("No rocksndiamonds server on localhost -- starting up one ...\n");
-  StartNetworkServer(port);
-
-  /* wait for server to start up and try connecting several times */
-  for (i = 0; i < 6; i++)
-  {
-    Delay(500);		/* wait 500 ms == 0.5 seconds */
-    close(sfd);
-
-    sfd = socket(PF_INET, SOCK_STREAM, 0);
-    if (sfd < 0)
-      Error(ERR_EXIT, "out of file descriptors");
-
-    setsockopt(sfd, tcpproto->p_proto, TCP_NODELAY, (char *)&on, sizeof(int));
-
-    if (connect(sfd, (struct sockaddr *)&s, sizeof(s)) >= 0)	/* connected */
-      return TRUE;
-  }
-
-  /* when reaching this point, connect to newly started server has failed */
-  return FALSE;
-}
-#endif	/* defined(TARGET_SDL) */
 
 void SendToServer_PlayerName(char *player_name)
 {
@@ -587,11 +479,6 @@ static void Handle_OP_MOVE_PLAYER(unsigned int len)
   server_frame_counter =
     (buffer[2] << 24) | (buffer[3] << 16) | (buffer[4] << 8) | (buffer[5]);
 
-#if 0
-  Error(ERR_NETWORK_CLIENT, "receiving server frame counter value %d [%d]",
-	server_frame_counter, FrameCounter);
-#endif
-
   if (server_frame_counter != FrameCounter)
   {
     Error(ERR_INFO, "client and servers frame counters out of sync");
@@ -692,43 +579,16 @@ static void HandleNetworkingMessages()
 
 void HandleNetworking()
 {
-#if !defined(TARGET_SDL)
-  static struct timeval tv = { 0, 0 };
-  fd_set rfds;
-#endif
   int r = 0;
 
   do
   {
-#if defined(TARGET_SDL)
     if ((r = SDLNet_CheckSockets(rfds, 1)) < 0)
       Error(ERR_EXIT, "HandleNetworking(): SDLNet_CheckSockets() failed");
 
-#else
-
-    FD_ZERO(&rfds);
-    FD_SET(sfd, &rfds);
-
-    r = select(sfd + 1, &rfds, NULL, NULL, &tv);
-
-    if (r < 0 && errno != EINTR)
-      Error(ERR_EXIT, "HandleNetworking(): select() failed");
-
-    if (r < 0)
-      FD_ZERO(&rfds);
-#endif
-
-#if defined(TARGET_SDL)
     if (r > 0)
-#else
-    if (FD_ISSET(sfd, &rfds))
-#endif
     {
-#if defined(TARGET_SDL)
       r = SDLNet_TCP_Recv(sfd, readbuffer + nread, 1);
-#else
-      r = read(sfd, readbuffer + nread, MAX_BUFFER_SIZE - nread);
-#endif
 
       if (r < 0)
 	Error(ERR_EXIT, "error reading from network server");
@@ -744,4 +604,4 @@ void HandleNetworking()
   while (r > 0);
 }
 
-#endif /* PLATFORM_UNIX */
+#endif /* NETWORK_AVALIABLE */

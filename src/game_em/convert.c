@@ -150,9 +150,6 @@ int cleanup_em_level(unsigned char *src, int length, char *filename)
     for (i = 2112; i < 2148; i++)
       src[i] = src[i - 64];
   }
-
-#if 1	/* ================================================================== */
-
   else if (length >= 2106 &&
 	   (src[1983] == 27 ||		/* encrypted (only EM I/II/III) */
 	    src[1983] == 116 ||		/* unencrypted (usual case) */
@@ -237,93 +234,6 @@ int cleanup_em_level(unsigned char *src, int length, char *filename)
     return FILE_VERSION_EM_UNKNOWN;
   }
 
-#else	/* ================================================================== */
-
-#if 0
-  else if (length >= 2106)	/* !!! TEST ONLY: SHOW BROKEN LEVELS !!! */
-#else
-  else if (length >= 2106 &&
-	   src[1983] == 116)
-#endif
-  {
-    /* ---------- this cave has V4 file format ---------- */
-    file_version = FILE_VERSION_EM_V4;
-
-    /* remap elements to internal EMC level format */
-    for (i = 0; i < 2048; i++)
-      src[i] = remap_v4[src[i]];
-    for (i = 2048; i < 2084; i++)
-      src[i] = remap_v4eater[src[i] >= 28 ? 0 : src[i]];
-    for (i = 2112; i < 2148; i++)
-      src[i] = src[i - 64];
-  }
-  else if (length >= 2106 &&
-	   src[0] == 241 &&	/* <-- Emerald Mine I and III levels */
-	   src[1983] == 27)
-  {
-    unsigned char j = 94;
-
-    /* ---------- this cave has V3 file format ---------- */
-    file_version = FILE_VERSION_EM_V3;
-
-    /* decrypt encrypted level file */
-    for (i = 0; i < 2106; i++)
-      src[i] = (src[i] ^ (j += 7)) - 0x11;
-
-    src[1] = 131;
-
-    /* remap elements to internal EMC level format */
-    for (i = 0; i < 2048; i++)
-      src[i] = remap_v4[src[i]];
-    for (i = 2048; i < 2084; i++)
-      src[i] = remap_v4eater[src[i] >= 28 ? 0 : src[i]];
-    for (i = 2112; i < 2148; i++)
-      src[i] = src[i - 64];
-  }
-#if 1
-  else if (length >= 2106 &&
-	   src[0] == 245 &&	/* <-- Emerald Mine II levels */
-	   src[1983] == 27)
-  {
-    unsigned char j = 94;
-
-    /* ---------- this cave has V3 file format ---------- */
-    file_version = FILE_VERSION_EM_V3;
-
-    /* decrypt encrypted level file */
-    for (i = 0; i < 2106; i++)
-      src[i] = (src[i] ^ (j += 7)) - 0x11;
-
-    src[0] = 131;		/* needed for Emerald Mine II levels */
-    src[1] = 131;
-
-    /* remap elements to internal EMC level format */
-    for (i = 0; i < 2048; i++)
-      src[i] = remap_v4[src[i]];
-    for (i = 2048; i < 2084; i++)
-      src[i] = remap_v4eater[src[i] >= 28 ? 0 : src[i]];
-    for (i = 2112; i < 2148; i++)
-      src[i] = src[i - 64];
-
-    /* fix copyright sign in Emerald Mine II levels */
-    for (i = 0; i < 2048; i++)
-      if (src[i] == 241)
-	src[i] = 254;		/* replace 'Xdecor_1' with 'Xalpha_copyr' */
-  }
-#endif
-  else
-  {
-    /* ---------- this cave has unknown file format ---------- */
-
-#if 0
-    printf("::: %d, %d\n", src[0], src[1983]);
-#endif
-
-    return 0;
-  }
-
-#endif	/* ================================================================== */
-
   if (file_version < FILE_VERSION_EM_V6)
   {
     /* id */
@@ -347,17 +257,7 @@ int cleanup_em_level(unsigned char *src, int length, char *filename)
 
     /* ball data */
     src[2159] = 128;
-
-#if 0
-    printf("::: STORED TIME (< V6): %d s\n", src[2094] * 10);
-#endif
   }
-#if 0
-  else
-  {
-    printf("::: STORED TIME (>= V6): %d s\n", src[2110] * 256 + src[2111]);
-  }
-#endif
 
   /* ---------- at this stage, the cave data always has V6 format ---------- */
 
@@ -554,12 +454,8 @@ int cleanup_em_level(unsigned char *src, int length, char *filename)
   /* size of v6 cave */
   length = 2172;
 
-#if 1
-#if 1
   if (options.debug)
-#endif
     printf("::: EM level file version: %d\n", file_version);
-#endif
 
   return file_version;
 }
@@ -1093,14 +989,8 @@ void convert_em_level(unsigned char *src, int file_version)
 
   /* at last, set the two players at their positions in the playfield */
   /* (native EM[C] levels always have exactly two players in a level) */
-#if 1
   for (i = 0; i < 2; i++)
     native_em_level.cave[ply[i].x_initial][ply[i].y_initial] = Zplayer;
-#else
-  for (i = 0; i < 2; i++)
-    if (ply[i].alive_initial)
-      native_em_level.cave[ply[i].x_initial][ply[i].y_initial] = Zplayer;
-#endif
 
   native_em_level.file_version = file_version;
 }
@@ -1109,11 +999,7 @@ void prepare_em_level(void)
 {
   int i, x, y;
   int players_left;
-#if 1
   boolean team_mode;
-#else
-  int num_tape_players;
-#endif
 
   /* reset all runtime variables to their initial values */
 
@@ -1129,11 +1015,7 @@ void prepare_em_level(void)
     for (x = 0; x < WIDTH; x++)
       Draw[y][x] = Cave[y][x];
 
-#if 1
   lev.time_initial = lev.time_seconds;
-#else
-  lev.time_initial = (lev.time_seconds * 50 + 7) / 8;
-#endif
   lev.time = lev.time_initial;
 
   lev.required = lev.required_initial;
@@ -1180,27 +1062,10 @@ void prepare_em_level(void)
     }
   }
 
-#if 1
   team_mode = getTeamMode_EM();
 
   if (!team_mode)
     lev.home_initial = 1;
-#else
-  num_tape_players = getNumActivePlayers_EM();
-
-#if 0
-  printf("::: getNumActivePlayers_EM: %d\n", num_tape_players);
-#endif
-
-#if 1
-  lev.home_initial = MIN(lev.home_initial, num_tape_players);
-#else
-  if (num_tape_players != -1)
-    lev.home_initial = MIN(lev.home_initial, num_tape_players);
-  else if (!setup.team_mode)
-    lev.home_initial = MIN(lev.home_initial, 1);
-#endif
-#endif
 
   lev.home = lev.home_initial;
   players_left = lev.home_initial;
@@ -1240,11 +1105,6 @@ void prepare_em_level(void)
     ply[i].joy_n = ply[i].joy_e = ply[i].joy_s = ply[i].joy_w = 0;
     ply[i].joy_snap  = ply[i].joy_drop = 0;
     ply[i].joy_stick = ply[i].joy_spin = 0;
-
-#if 0
-    printf("player %d: x/y == %d/%d, alive == %d\n",
-	   i, ply[i].x_initial, ply[i].y_initial, ply[i].alive);
-#endif
   }
 
   game_em.any_player_moving = FALSE;

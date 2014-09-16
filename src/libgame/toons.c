@@ -127,25 +127,8 @@ void DrawAnim(Bitmap *toon_bitmap, GC toon_clip_gc,
   int pad_dest_y = dest_y - pad_y;
   int pad_width  = width  + 2 * pad_x;
   int pad_height = height + 2 * pad_y;
-#if 1
   int buffer_x = 0;
   int buffer_y = 0;
-#else
-  int buffer_x = DOOR_GFX_PAGEX3;
-  int buffer_y = DOOR_GFX_PAGEY1;
-#endif
-
-#if 0
-  printf("::: (%d, %d), (%d, %d), (%d, %d), (%d, %d) -> (%d, %d), (%d, %d), (%d, %d)\n",
-	 src_x, src_y,
-	 width, height,
-	 dest_x, dest_y,
-	 pad_x, pad_y,
-
-	 pad_dest_x, pad_dest_y,
-	 pad_width, pad_height,
-	 buffer_x, buffer_y);
-#endif
 
   /* correct values to avoid off-screen blitting (start position) */
   if (pad_dest_x < screen_info.startx)
@@ -374,11 +357,9 @@ void HandleAnimation(int mode)
     case ANIM_STOP:
       if (anim_running)
       {
-#if 1
 	redraw_mask |= (REDRAW_FIELD | REDRAW_FROM_BACKBUFFER);
 
 	screen_info.update_function();
-#endif
 
 	anim_running = FALSE;
       }

@@ -15,16 +15,7 @@
 #include "system.h"
 
 
-#if defined(PLATFORM_LINUX) || defined(PLATFORM_FREEBSD) || defined(VOXWARE)
-#define AUDIO_LINUX_IOCTL
-#endif
-
-#if defined(AUDIO_LINUX_IOCTL) || defined(PLATFORM_NETBSD)
-#define AUDIO_STREAMING_DSP
-#endif
-
 /* values for platform specific sound initialization */
-#define AUDIO_SAMPLE_RATE_8000		8000
 #define AUDIO_SAMPLE_RATE_22050		22050
 
 #define AUDIO_FRAGMENT_SIZE_512		512
@@ -42,25 +33,15 @@
 #define AUDIO_FORMAT_LE			(1 << 2)
 #define AUDIO_FORMAT_BE			(1 << 3)
 
-#if defined(AUDIO_UNIX_NATIVE) && !defined(AUDIO_STREAMING_DSP)
-#define DEFAULT_AUDIO_SAMPLE_RATE	AUDIO_SAMPLE_RATE_8000
-#else
 #define DEFAULT_AUDIO_SAMPLE_RATE	AUDIO_SAMPLE_RATE_22050
-#endif
 
-#if defined(PLATFORM_HPUX)
-#define DEFAULT_AUDIO_FRAGMENT_SIZE	AUDIO_FRAGMENT_SIZE_32768
-#elif defined(PLATFORM_WIN32)
+#if defined(PLATFORM_WIN32)
 #define DEFAULT_AUDIO_FRAGMENT_SIZE	AUDIO_FRAGMENT_SIZE_1024
 #else
 #define DEFAULT_AUDIO_FRAGMENT_SIZE	AUDIO_FRAGMENT_SIZE_512
 #endif
 
-#if defined(TARGET_SDL)
 #define NUM_MIXER_CHANNELS		MIX_CHANNELS
-#else
-#define NUM_MIXER_CHANNELS		8
-#endif
 
 #define MUSIC_CHANNEL			0
 #define FIRST_SOUND_CHANNEL		1
@@ -101,11 +82,7 @@
 
 
 #define SOUND_MIN_VOLUME		0
-#if defined(TARGET_SDL)
 #define SOUND_MAX_VOLUME		SDL_MIX_MAXVOLUME
-#else
-#define SOUND_MAX_VOLUME		128
-#endif
 
 #define SOUND_MAX_LEFT			0
 #define SOUND_MAX_RIGHT			255

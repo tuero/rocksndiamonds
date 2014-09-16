@@ -15,12 +15,7 @@
 
 #define ScrollDelta			((int)1)
 
-#if NEW_TILESIZE
-// #define ZoomFactor			(ZOOM_FACTOR)
 #define ZoomFactor			(2)
-#else
-#define ZoomFactor			(2)
-#endif
 
 #define StretchWidth			(ZoomFactor * 16)
 #define TwoPixels			(ZoomFactor * 2)
@@ -282,11 +277,6 @@ extern void PrepareLevel();
 extern int getSequenceLength(int sequence);
 extern boolean isSnappingSequence(int sequence);
 
-#if 0
-extern void Trace(char *Source, char *Message);
-extern void ReportError(char *Source, char *Message);
-#endif
-
 extern int Min(int A, int B);
 extern int Max(int A, int B);
 
@@ -299,17 +289,9 @@ extern boolean LevelLoaded;
 extern boolean DemoAvailable;
 extern boolean menBorder;
 
-#if 1
 extern int *PlayField16;
 extern byte *PlayField8;
-// extern int PlayField16[SP_MAX_PLAYFIELD_SIZE + SP_HEADER_SIZE];
-// extern byte PlayField8[SP_MAX_PLAYFIELD_SIZE + SP_HEADER_SIZE];
 extern byte DisPlayField[SP_MAX_PLAYFIELD_SIZE + SP_HEADER_SIZE];
-#else
-extern int *PlayField16;
-extern byte *PlayField8;
-extern byte *DisPlayField;
-#endif
 
 extern int FieldHeight;
 extern int FieldMax, LevelMax;
@@ -318,10 +300,6 @@ extern int FreezeZonks;
 extern int HeaderSize;
 extern int TimerVar;
 extern short RandomSeed;
-
-#if 0
-extern int FileMax;
-#endif
 
 extern LevelInfoType LInfo;
 extern int ScrollMinX, ScrollMaxX, ScrollMinY, ScrollMaxY;

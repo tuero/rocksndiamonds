@@ -24,27 +24,7 @@ static void PrepareBackbuffer()
   if (game_status != GAME_MODE_PLAYING)
     return;
 
-#if 1
   BlitScreenToBitmap(backbuffer);
-#else
-  if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
-  {
-    BlitScreenToBitmap_EM(backbuffer);
-  }
-  else if (level.game_engine_type == GAME_ENGINE_TYPE_SP)
-  {
-    BlitScreenToBitmap_SP(backbuffer);
-  }
-  else if (setup.soft_scrolling)	/* GAME_ENGINE_TYPE_RND */
-  {
-    int fx = FX, fy = FY;
-
-    fx += (ScreenMovDir & (MV_LEFT|MV_RIGHT) ? ScreenGfxPos : 0);
-    fy += (ScreenMovDir & (MV_UP|MV_DOWN)    ? ScreenGfxPos : 0);
-
-    BlitBitmap(fieldbuffer, backbuffer, fx, fy, SXSIZE, SYSIZE, SX, SY);
-  }
-#endif
 }
 
 boolean ToonNeedsRedraw()
@@ -85,11 +65,7 @@ void InitToons()
     toons[i].position = image->parameter[GFX_ARG_POSITION];
   }
 
-#if 1
   InitToonScreen(bitmap_db_toons,
-#else
-  InitToonScreen(bitmap_db_door,
-#endif
 		 BackToFront, PrepareBackbuffer, ToonNeedsRedraw,
 		 toons, num_toons,
 		 REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE,

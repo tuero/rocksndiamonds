@@ -28,7 +28,6 @@
 #define NUM_PANEL_ELEMENTS	8
 #define NUM_PANEL_CE_SCORE	8
 
-#if 1
 struct GamePanelInfo
 {
   struct TextPosInfo level_number;
@@ -98,19 +97,6 @@ struct GameButtonInfo
   struct Rect save;
   struct Rect load;
 };
-
-#else
-
-struct GamePanelInfo
-{
-  struct XY level;
-  struct XY gems;
-  struct XY inventory;
-  struct XY keys;
-  struct XY score;
-  struct XY time;
-};
-#endif
 
 struct GameInfo
 {

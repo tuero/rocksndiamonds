@@ -14,28 +14,13 @@ int FieldWidth;		// standard size = 60
 int FieldHeight;	// standard size = 24
 int HeaderSize;		// standard size = 96
 int FieldMax, LevelMax;
-#if 0
-int FileMax;
-#endif
 
-#if 1
 int *PlayField16;
 byte *PlayField8;
-// int PlayField16[SP_MAX_PLAYFIELD_SIZE + SP_HEADER_SIZE];
-// byte PlayField8[SP_MAX_PLAYFIELD_SIZE + SP_HEADER_SIZE];
 byte DisPlayField[SP_MAX_PLAYFIELD_SIZE + SP_HEADER_SIZE];
-#else
-int *PlayField16;
-byte *PlayField8;
-byte *DisPlayField;
-#endif
 
 int TimerVar;
-#if 1
 short RandomSeed;
-#else
-int RandomSeed;
-#endif
 
 int FreezeZonks;
 
@@ -192,17 +177,6 @@ void InitGlobals()
 			       SP_MAX_PLAYFIELD_SIZE +
 			       SP_HEADER_SIZE) * sizeof(byte));
   PlayField8 = &PlayField8[SP_MAX_PLAYFIELD_WIDTH];
-
-#if 0
-  /* these defaults will be changed after reading a Supaplex level file */
-  PlayField8 = REDIM_1D(sizeof(byte), 0, FieldMax);
-  DisPlayField = REDIM_1D(sizeof(byte), 0, FieldMax);
-  PlayField16 = REDIM_1D(sizeof(int), 0, FieldMax);
-
-  AnimationPosTable = REDIM_1D(sizeof(int), 0, LevelMax);
-  AnimationSubTable = REDIM_1D(sizeof(byte), 0, LevelMax);
-  TerminalState = REDIM_1D(sizeof(byte), 0, FieldMax);
-#endif
 }
 
 int GetSI(int X, int Y)
@@ -234,25 +208,11 @@ void PrepareLevel()
 {
   copyInternalEngineVars_SP();
 
-#if 1
   SetDisplayRegion();
   SetScrollEdges();
-#endif
 
   LevelLoaded = True;
 }
-
-#if 0
-void Trace(char *Source, char *Message)
-{
-  printf("::: Trace: Source == '%s', Message == '%s'\n", Source, Message);
-}
-
-void ReportError(char *Source, char *Message)
-{
-  printf("::: ReportError: Source == '%s', Message == '%s'\n", Source, Message);
-}
-#endif
 
 int Min(int A, int B)
 {

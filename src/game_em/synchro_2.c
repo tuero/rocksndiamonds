@@ -1902,45 +1902,7 @@ void synchro_2(void)
 	    Cave[y+1][x+1] == Zplayer)
 	  goto android_still;
 
-#if 1
-
 	set_nearest_player_xy(x, y, &dx, &dy);
-
-#else
-
-  	if (ply1.alive && ply2.alive)
-	{
-  	  if ((ply1.x > x ? ply1.x - x : x - ply1.x) +
-	      (ply1.y > y ? ply1.y - y : y - ply1.y) <
-	      (ply2.x > x ? ply2.x - x : x - ply2.x) +
-	      (ply2.y > y ? ply2.y - y : y - ply2.y))
-	  {
-  	    dx = ply1.x;
-  	    dy = ply1.y;
-  	  }
-	  else
-	  {
-  	    dx = ply2.x;
-  	    dy = ply2.y;
-  	  }
-  	}
-	else if (ply1.alive)
-	{
-  	  dx = ply1.x;
-  	  dy = ply1.y;
-  	}
-	else if (ply2.alive)
-	{
-  	  dx = ply2.x;
-  	  dy = ply2.y;
-  	}
-	else
-	{
-  	  dx = 0;
-  	  dy = 0;
-  	}
-
-#endif
 
   	Next[y][x] = Xblank;	/* assume we will move */
   	temp = ((x < dx) + 1 - (x > dx)) + ((y < dy) + 1 - (y > dy)) * 3;
@@ -3237,8 +3199,6 @@ void synchro_2(void)
 
     case Xalien:
 
-#if 1
-
       if (lev.wheel_cnt)
       {
 	dx = lev.wheel_x;
@@ -3248,47 +3208,6 @@ void synchro_2(void)
       {
 	set_nearest_player_xy(x, y, &dx, &dy);
       }
-
-#else
-
-      if (lev.wheel_cnt)
-      {
-	dx = lev.wheel_x;
-	dy = lev.wheel_y;
-      }
-      else if (ply1.alive && ply2.alive)
-      {
-	if ((ply1.x > x ? ply1.x - x : x - ply1.x) +
-	    (ply1.y > y ? ply1.y - y : y - ply1.y) <
-	    (ply2.x > x ? ply2.x - x : x - ply2.x) +
-	    (ply2.y > y ? ply2.y - y : y - ply2.y))
-	{
-	  dx = ply1.x;
-	  dy = ply1.y;
-	}
-	else
-	{
-	  dx = ply2.x;
-	  dy = ply2.y;
-	}
-      }
-      else if (ply1.alive)
-      {
-	dx = ply1.x;
-	dy = ply1.y;
-      }
-      else if (ply2.alive)
-      {
-	dx = ply2.x;
-	dy = ply2.y;
-      }
-      else
-      {
-	dx = 0;
-	dy = 0;
-      }
-
-#endif
 
       if (RANDOM & 1)
       {
@@ -4565,11 +4484,8 @@ void synchro_2(void)
 	}
       }
 
-#if 1
       lev.ball_pos = (lev.ball_pos + 1) % lev.num_ball_arrays;
-#else
-      lev.ball_pos = (lev.ball_pos + 1) & 7;
-#endif
+
       goto loop;
 
     /* --------------------------------------------------------------------- */
@@ -4716,7 +4632,6 @@ void synchro_2(void)
   	case Xacid_6:
   	case Xacid_7:
   	case Xacid_8:
-#if 1
   	  Cave[y][x] = Xsand_stonesand_quickout_1;
   	  if (Cave[y][x+1] == Xblank)
 	    Cave[y][x+1] = Yacid_splash_eB;
@@ -4725,33 +4640,15 @@ void synchro_2(void)
   	  Next[y][x] = Xsand_stonesand_quickout_2;
   	  play_element_sound(x, y, SAMPLE_acid, Xacid_1);
   	  goto loop;
-#else
-  	  Cave[y][x] = Xsand_stonesand_3;
-  	  if (Cave[y][x+1] == Xblank)
-	    Cave[y][x+1] = Yacid_splash_eB;
-  	  if (Cave[y][x-1] == Xblank)
-	    Cave[y][x-1] = Yacid_splash_wB;
-  	  Next[y][x] = Xsand_stonesand_4;
-  	  play_element_sound(x, y, SAMPLE_acid, Xacid_1);
-  	  goto loop;
-#endif
 
   	case Xblank:
   	case Yacid_splash_eB:
   	case Yacid_splash_wB:
-#if 1
   	  Cave[y][x] = Xsand_stonesand_quickout_1;
   	  Cave[y+1][x] = Xsand_stoneout_1;
   	  Next[y][x] = Xsand_stonesand_quickout_2;
   	  Next[y+1][x] = Xsand_stoneout_2;
   	  goto loop;
-#else
-  	  Cave[y][x] = Xsand_stonesand_3;
-  	  Cave[y+1][x] = Xsand_stoneout_1;
-  	  Next[y][x] = Xsand_stonesand_4;
-  	  Next[y+1][x] = Xsand_stoneout_2;
-  	  goto loop;
-#endif
 
   	case Xsand:
   	  Cave[y][x] = Xsand_stonesand_1;

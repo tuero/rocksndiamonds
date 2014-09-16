@@ -33,11 +33,9 @@ void subAnimateSnikSnaks(int si)
   if (SnikSnaksElectronsFrozen == 1)
     return;
 
-#if 1
   /* (not sure why this was removed -- this broke several level solutions) */
   if (LowByte(PlayField16[si]) != fiSnikSnak)
     return;
-#endif
 
   // If LowByte(PlayField16(si)) <> fiSnikSnak Then Exit Function
   // Debug.Assert (LowByte(PlayField16[si]) == fiSnikSnak);

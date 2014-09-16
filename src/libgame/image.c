@@ -31,17 +31,9 @@ typedef struct ImageInfo ImageInfo;
 
 static struct ArtworkListInfo *image_info = NULL;
 
-#if 1
 static void *Load_Image(char *filename)
-#else
-static void *Load_PCX(char *filename)
-#endif
 {
   ImageInfo *img_info;
-
-#if 0
-  printf("::: loading PCX file '%s'\n", filename);
-#endif
 
   img_info = checked_calloc(sizeof(ImageInfo));
 
@@ -233,20 +225,12 @@ void InitImageList(struct ConfigInfo *config_list, int num_file_list_entries,
 
   /* ---------- initialize artwork loading/freeing functions ---------- */
 
-#if 1
   image_info->load_artwork = Load_Image;
-#else
-  image_info->load_artwork = Load_PCX;
-#endif
   image_info->free_artwork = FreeImage;
 }
 
 void ReloadCustomImages()
 {
-#if 0
-  printf("::: reloading images '%s' ...\n", artwork.gfx_current_identifier);
-#endif
-
   print_timestamp_init("ReloadCustomImages");
 
   LoadArtworkConfig(image_info);

@@ -4482,79 +4482,6 @@ void create_obj()
   int *map = obj_map;
   int buffer[8][TILE_MAX];
 
-#if 0
-
-  int debug = 0;
-
-  for (i = 0; i < 8; i++)
-    for (j = 0; j < TILE_MAX; j++)
-      buffer[i][j] = 0;
-
-  for (i = 0; i < 64; i++)
-  {
-    for (;*map != -1; map += 2)
-    {
-      if (map[0] < 0 || map[0] >= TILE_MAX || map[1] < 0 || map[1] >= 8)
-      {
-	fprintf(stderr, "obj_map: bad tile (%d, %d) @ %d+%d\n",
-		map[0], map[1], i / 16, i % 16);
-	debug = 1;
-	continue;
-      }
-      buffer[map[1]][map[0]]++;
-    }
-    map++;
-  }
-
-  for (i = 0; i < 896; i++)
-  {
-    for (;*map != -1; map += 2)
-    {
-      if (map[0] < 0 || map[0] >= TILE_MAX || map[1] < 0 || map[1] >= 8)
-      {
-	fprintf(stderr, "obj_map: bad tile (%d, %d) @ %d\n", map[0], map[1], i);
-	debug = 1;
-	continue;
-      }
-      buffer[map[1]][map[0]]++;
-    }
-    map++;
-  }
-
-  for (i = 0; i < TILE_MAX; i++)
-  {
-    for (j = 0; j < 8; j++)
-    {
-      switch(buffer[j][i])
-      {
-        case 0:
-	  fprintf(stderr, "obj_map: uninitialized (%d, %d)\n", i, j);
-	  debug = 1;
-	  break;
-        case 1:
-	  break; /* good */
-        default:
-	  fprintf(stderr, "obj_map: duplicate (%d, %d)\n", i, j);
-	  debug = 1;
-	  break;
-      }
-    }
-  }
-
-  if (sizeof(obj_map) / sizeof(*obj_map) != map - obj_map)
-  {
-    fprintf(stderr, "obj_map: bad end (%d != %d)\n",
-	    sizeof(obj_map) / sizeof(*obj_map), map - obj_map);
-    debug = 1;
-  }
-
-  if (debug == 0)
-    fprintf(stderr, "obj_map: looks good, now disable debug code\n");
-
-  abort();
-
-#else
-
   for (i = 0; i < 8; i++)
     for (j = 0; j < TILE_MAX; j++)
       buffer[i][j] = Xblank;
@@ -4578,8 +4505,6 @@ void create_obj()
   for (i = 0; i < 8; i++)
     for (j = 0; j < TILE_MAX; j++)
       map_obj[i][j] = buffer[7 - i][j];
-
-#endif
 }
 
 void create_obj_graphics_info_em()

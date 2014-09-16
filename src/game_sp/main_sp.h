@@ -27,68 +27,30 @@
 
 /* screen sizes and positions for SP engine */
 
-#define NEW_TILESIZE		1
-
-#define ORIG_TILESIZE		16
-
-#if NEW_TILESIZE
-#define ZOOM_FACTOR		(2 * TILESIZE_VAR / TILESIZE)
-#else
-#define ZOOM_FACTOR		2
-#endif
-
-#if NEW_TILESIZE
 extern int			TILESIZE_VAR;
+
 #define TILESIZE		32
 #define TILEX			TILESIZE
 #define TILEY			TILESIZE
 #define TILEX_VAR		TILESIZE_VAR
 #define TILEY_VAR		TILESIZE_VAR
-#else
-#define TILESIZE		(ORIG_TILESIZE * ZOOM_FACTOR)
-#define TILEX			TILESIZE
-#define TILEY			TILESIZE
-#endif
 
-#define ORIG_SCR_MENUX		20
-#define ORIG_SCR_MENUY		12
-#define SCR_MENUX		17
-#define SCR_MENUY		12
-#if 1
 extern int			SCR_FIELDX, SCR_FIELDY;
-#else
-#define SCR_FIELDX		17
-#define SCR_FIELDY		17
-#endif
+
 #define MAX_BUF_XSIZE		(2 + SCR_FIELDX + 2)
 #define MAX_BUF_YSIZE		(2 + SCR_FIELDY + 2)
 
 /* often used screen positions */
-#if 1
-extern int			SX, SY;
-#else
-#define SX			8
-#define SY			8
-#endif
 
-#if NEW_TILESIZE
+extern int			SX, SY;
+
 #define SXSIZE			(SCR_FIELDX * TILEX_VAR)
 #define SYSIZE			(SCR_FIELDY * TILEY_VAR)
 #define FXSIZE			(MAX_BUF_XSIZE * TILEX_VAR)
 #define FYSIZE			(MAX_BUF_YSIZE * TILEY_VAR)
-#else
-#define SXSIZE			(SCR_FIELDX * TILEX)
-#define SYSIZE			(SCR_FIELDY * TILEY)
-#define FXSIZE			(MAX_BUF_XSIZE * TILEX)
-#define FYSIZE			(MAX_BUF_YSIZE * TILEY)
-#endif
 
-#if 1
 extern int			REAL_SX, REAL_SY;
-#else
-#define REAL_SX			(SX - 2)
-#define REAL_SY			(SY - 2)
-#endif
+
 #define FULL_SXSIZE		(2 + SXSIZE + 2)
 #define FULL_SYSIZE		(2 + SYSIZE + 2)
 

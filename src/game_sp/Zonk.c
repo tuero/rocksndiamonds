@@ -181,12 +181,8 @@ loc_g_0DE8: // zonk comes falling from above
   if (ax == fiOrangeDisk) // OrangeDisk explodes 'loc_g_0E95:
     goto loc_g_0F75;
 
-#if 1
   // play the zonk sound, 'cause zonk hits something "hard"
   subSoundFX(si, fiZonk, actImpact);
-#else
-  subSoundFXZonk(); // play the zonk sound,'cause zonk hits something "hard"
-#endif
 
   if (! (ax == fiZonk || ax == fiInfotron || ax == fiRAM))
     return;

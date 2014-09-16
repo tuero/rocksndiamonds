@@ -8,17 +8,8 @@
 static void subEatRedDisk(int si);
 static boolean subMoveKillsMurphy(int si, int ax, int bl);
 
-#if 1
-
 #define LocalStretch 			(2)
 #define MurphyZoomFactor		(ZoomFactor)
-
-#else
-
-#define LocalStretch 			(1)
-#define MurphyZoomFactor		(1)
-
-#endif
 
 // ==========================================================================
 //                              SUBROUTINE
@@ -81,10 +72,6 @@ void subAnimateMurphy(int *si)
     }
   } // loc_g_5E8B:
 
-#if 0
-  printf("::: RedDiskReleaseFlag == %d\n", RedDiskReleaseFlag);
-#endif
-
   bl = DemoKeyCode;
   if (bl != 0) // a key was pressed!
     goto locKeyPressed5FCF;
@@ -95,14 +82,6 @@ void subAnimateMurphy(int *si)
     MurphyDY = 2;
     goto loc_g_6364;
   }
-
-#if 1
-
-#if 0
-  ax = (TimerVar & 3);
-  if (ax != 0)
-    return;
-#endif
 
   // ------------------------------------------------------------------
   // Murphy's YAWN & SLEEP sequence, counted down by YawnSleepCounter:
@@ -183,79 +162,6 @@ void subAnimateMurphy(int *si)
   return;
 
   // end of YAWN-SLEEP-Sequence
-
-#else
-
-  ax = (TimerVar & 3);
-  if (ax != 0)
-    return;
-
-  // ------------------------------------------------------------------
-  // Murphy's YAWN & SLEEP sequence, counted down by YawnSleepCounter:
-  YawnSleepCounter = YawnSleepCounter + 1;
-  if (YawnSleepCounter == 4)
-  {
-    subCopyFieldToScreen(*si, fiMurphy); // normal grin
-    return;
-  } // loc_g_5ECE:
-
-  if (YawnSleepCounter <= 500) // loc_g_5ED7:
-    return;
-
-  if (YawnSleepCounter <= 522)
-  {
-    bx = (YawnSleepCounter - 500) / 2;
-    subCopyFieldToScreen(*si, aniMurphyYawn + bx); // yawn! and look depressed afterwards...
-    return;
-  } // loc_g_5F00:
-
-  if (YawnSleepCounter <= 1000)
-    return;
-
-  if (YawnSleepCounter <= 1022)
-  {
-    bx = (YawnSleepCounter - 1000) / 2;
-    subCopyFieldToScreen(*si, aniMurphyYawn + bx); // yawn again!
-    return;
-  } // loc_g_5F32:
-
-  if (YawnSleepCounter <= 1600) // loc_g_5F3B:
-    return;
-
-  if (YawnSleepCounter <= 1622)
-  {
-    bx = (YawnSleepCounter - 1600) / 2;
-    subCopyFieldToScreen(*si, aniMurphyYawn + bx); // yawn again! - third time
-    return;
-  } // loc_g_5F64:
-
-  if (YawnSleepCounter > 1654)
-    return;
-
-  if (PlayField16[*si - 1] == 0)
-  {
-    if (PlayField16[*si + 1] == 0)
-    {
-      YawnSleepCounter = 36;
-      return;
-
-    }
-    else
-    {
-      bx = (YawnSleepCounter - 1622) / 16;
-      subCopyFieldToScreen(*si, aniMurphySleepRight + bx); // go to sleep
-      return;
-    }
-  } // loc_g_5F81:
-
-  bx = (YawnSleepCounter - 1622) / 16;
-  subCopyFieldToScreen(*si, aniMurphySleepLeft + bx); // go to sleep
-
-  return;
-
-  // end of YAWN-SLEEP-Sequence
-
-#endif
 
   // ------------------------------------------------------------------
   // ==========================================================================
@@ -944,11 +850,6 @@ loc_g_65FE:
   subSoundFX(*si, fiInfotron, actCollecting);
 
   dx1 = aniEatInfotronLeft;
-#if 0
-  dx2 = fiInfotron;
-  dx2Step = -1;
-  ClearPos = -1;
-#endif
   PlayField16[*si - 1] = 0xA03;
   PlayField16[*si] = 0x300;
   *si = *si - 1;
@@ -975,11 +876,6 @@ loc_g_6662:
   subSoundFX(*si, fiInfotron, actCollecting);
 
   dx1 = aniEatInfotronRight;
-#if 0
-  dx2 = fiInfotron;
-  dx2Step = 1;
-  ClearPos = -1;
-#endif
   PlayField16[*si + 1] = 0xC03;
   PlayField16[*si] = 0x300;
   *si = *si + 1;
@@ -1050,14 +946,7 @@ loc_g_6756:
   if (LowByte(InfotronsNeeded) != 0)
     return;
 
-#if 0
-  if (!game_sp.LevelSolved)
-    printf("::: Murphy.c: !!!!!!!!!! LEVEL %d SOLVED !!!!!!!!!!\n", level_nr);
-#endif
-
-#if 1
   game_sp.LevelSolved = TRUE;
-#endif
 
   subSoundFX(*si, fiExit, actPassing);
 
@@ -1119,16 +1008,8 @@ loc_g_6817:
     return;
   } // loc_g_6838:
 
-#if 1
   // draw new terminal type
-#if 1
   GfxGraphic[GetX(*si - FieldWidth)][GetY(*si - FieldWidth)] = aniTerminalActive;
-#else
-  subCopyImageToScreen(*si - FieldWidth, aniTerminalActive);
-#endif
-#else
-  subCopyFieldToScreen(*si - FieldWidth, 0x88); // draw new terminal type
-#endif
   TerminalState[*si - FieldWidth] = 8;
   goto loc_g_68F0;
 
@@ -1145,16 +1026,8 @@ loc_g_684E:
     return;
   } // loc_g_6838:
 
-#if 1
   // draw new terminal type
-#if 1
   GfxGraphic[GetX(*si - 1)][GetY(*si - 1)] = aniTerminalActive;
-#else
-  subCopyImageToScreen(*si - 1, aniTerminalActive);
-#endif
-#else
-  subCopyFieldToScreen(*si - 1, 0x88); // draw new terminal type
-#endif
   TerminalState[*si - 1] = 8;
   goto loc_g_68F0;
 
@@ -1171,16 +1044,8 @@ loc_g_6884:
     return;
   } // loc_g_6838:
 
-#if 1
   // draw new terminal type
-#if 1
   GfxGraphic[GetX(*si + FieldWidth)][GetY(*si + FieldWidth)] = aniTerminalActive;
-#else
-  subCopyImageToScreen(*si + FieldWidth, aniTerminalActive);
-#endif
-#else
-  subCopyFieldToScreen(*si + FieldWidth, 0x88); // draw new terminal type
-#endif
   TerminalState[*si + FieldWidth] = 8;
   goto loc_g_68F0;
 
@@ -1197,16 +1062,8 @@ loc_g_68BA:
     return;
   } // loc_g_6838:
 
-#if 1
   // draw new terminal type
-#if 1
   GfxGraphic[GetX(*si + 1)][GetY(*si + 1)] = aniTerminalActive;
-#else
-  subCopyImageToScreen(*si + 1, aniTerminalActive);
-#endif
-#else
-  subCopyFieldToScreen(*si + 1, 0x88); // draw new terminal type
-#endif
   TerminalState[*si + 1] = 8;
   // ==========================================================================
   // common TERMINAL stuff moving/touching from all directions
@@ -1579,10 +1436,8 @@ locProceedMovingMurphy: // proceed moving murphy
 
 loc_g_6C8F:
 
-#if 1
   if (SeqPos <= 0)
     dx1SequenceLength = getSequenceLength(dx1);
-#endif
 
   if (SplitMoveFlag == 0)
   {
@@ -1594,55 +1449,28 @@ loc_g_6C8F:
     if (!(ClearPos < 0)) // clear field that murphy is leaving
       subCopyImageToScreen(ClearPos, aniSpace);
 
-#if 0
-    // !!! special two-tile animation currently not used !!!
-    if (dx2 == fiInfotron) // special case of infotron moving left or right
-    {
-      tDeltaX = 0;
-      tDeltaY = 0;
-    }
-    else
-#endif
-    {
-      tDeltaX = MurphyDX * LocalStretch * (SeqPos + 1);
-      tDeltaY = MurphyDY * LocalStretch * (SeqPos + 1);
-    }
+    tDeltaX = MurphyDX * LocalStretch * (SeqPos + 1);
+    tDeltaY = MurphyDY * LocalStretch * (SeqPos + 1);
 
     X = GetStretchX(dxPos) + tDeltaX;
     Y = GetStretchY(dxPos) + tDeltaY;
     Tmp = (SeqPos < 0 ? 0 : SeqPos); // 9StepBugFix!(red disk move right)
 
-#if 1
     if (isSnappingSequence(dx1) && SeqPos == dx1SequenceLength - 1)
       dx1 = aniSpace;
-#endif
 
-#if 1
     DDSpriteBuffer_BltImg(X, Y, dx1, Tmp);
     GfxGraphic[GetX(*si)][GetY(*si)] = -1;	// (Murphy's position)
     GfxGraphic[GetX(dxPos)][GetY(dxPos)] = -1;	// (snapping position)
-    // printf("::: Tmp: %d\n", Tmp);
-#else
-    StretchedSprites.BltEx(X, Y, dx[Tmp]);
-#endif
 
     if (!(dx2 < 0))
     {
       tPos = dxPos + dx2Step;
       X = GetStretchX(tPos);
       Y = GetStretchY(tPos);
-#if 0
-    // !!! special two-tile animation currently not used !!!
-      if (dx2 == fiInfotron) // special case of infotron moving left or right
-      {
-        StretchedSprites.BltEx(X, Y, dx[SeqPos] + dx2Step);
-      }
-      else // pushing something
-#endif
-      {
-	// (SeqPos iterates from 0 to 7 while pushing)
-        DDSpriteBuffer_BltImg(X + tDeltaX, Y + tDeltaY, dx2, SeqPos);
-      }
+
+      // (SeqPos iterates from 0 to 7 while pushing)
+      DDSpriteBuffer_BltImg(X + tDeltaX, Y + tDeltaY, dx2, SeqPos);
     }
 
     // End of normal movement
@@ -1671,13 +1499,8 @@ loc_g_6C8F:
   } // loc_g_6D1E:'loc_g_6D28:
 
   SeqPos = SeqPos + 1;
-#if 1
   if (SeqPos < dx1SequenceLength)
     return;
-#else
-  if (dx[SeqPos] > -1)
-    return;
-#endif
 
   // Follow-up after movement completed     'loc_g_6D35:
   MurphyXPos = MurphyXPos + MurphyDX;
@@ -1966,9 +1789,7 @@ loc_g_6F3B:
 loc_g_6F77:
   ExitToMenuFlag = 1;
 
-#if 1
   PlayField16[*si] = fiSpace;	// remove Murphy from playfield after exiting
-#endif
 
   return;
 

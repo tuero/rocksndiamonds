@@ -288,28 +288,5 @@ struct ConfigInfo sound_config[] =
   { "background.titlemessage_4",	UNDEFINED_FILENAME		},
   { "background.titlemessage_5",	UNDEFINED_FILENAME		},
 
-#if 0
-  { "[not used]",			"antigrav.wav"			},
-  { "[not used]",			"bong.wav"			},
-  { "[not used]",		 	"fuel.wav"			},
-  { "[not used]",			"holz.wav"			},
-  { "[not used]",			"hui.wav"			},
-  { "[not used]",			"kabumm.wav"			},
-  { "[not used]",			"kink.wav"			},
-  { "[not used]",			"kling.wav"			},
-  { "[not used]",			"krach.wav"			},
-  { "[not used]",			"laser.wav"			},
-  { "[not used]",			"quiek.wav"			},
-  { "[not used]",			"rumms.wav"			},
-  { "[not used]",			"schlopp.wav"			},
-  { "[not used]",			"schrff.wav"			},
-  { "[not used]",			"schwirr.wav"			},
-  { "[not used]",			"slurp.wav"			},
-  { "[not used]",			"sproing.wav"			},
-  { "[not used]",			"warnton.wav"			},
-  { "[not used]",			"whoosh.wav"			},
-  { "[not used]",			"boom.wav"			},
-#endif
-
   { NULL,				NULL				}
 };

@@ -20,18 +20,6 @@ void synchro_3(void)
   if (lev.score > 9999)
     lev.score = 9999;
 
-#if 0
-#if 1
-  if (lev.time_initial == 0)
-    lev.time++;
-  else if (lev.time > 0)
-    lev.time--;
-#else
-  if (lev.time)
-    lev.time--;
-#endif
-#endif
-
   if (lev.android_move_cnt-- == 0)
     lev.android_move_cnt = lev.android_move_time;
   if (lev.android_clone_cnt-- == 0)
@@ -49,12 +37,6 @@ void synchro_3(void)
     lev.wind_cnt--;
   if (lev.wonderwall_time && lev.wonderwall_state)
     lev.wonderwall_time--;
-
-#if 0
-  if (lev.time_initial > 0 &&
-      lev.time > 0 && lev.time <= 50 && lev.time % 5 == 0 && setup.time_limit)
-    play_sound(-1, -1, SAMPLE_time);
-#endif
 
   if (lev.wheel_cnt)
     play_element_sound(lev.wheel_x, lev.wheel_y, SAMPLE_wheel, Xwheel);

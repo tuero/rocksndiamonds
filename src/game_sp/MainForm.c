@@ -17,10 +17,8 @@ void DrawFrameIfNeeded()
   DrawFrame(0);
 
   /* !!! CHECK THIS !!! */
-#if 1
   if (! menBorder)
     DrawFrame(1);
-#endif
 }
 
 void DisplayLevel()
@@ -31,16 +29,9 @@ void DisplayLevel()
     return;
 
   ClearRectangle(backbuffer, REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE);
-#if 1
   ClearRectangle(bitmap_db_field_sp, 0, 0, FXSIZE, FYSIZE);
-#else
-  ClearRectangle(bitmap_db_field_sp, 0, 0,
-		 MAX_BUF_XSIZE * TILEX, MAX_BUF_YSIZE * TILEY);
-#endif
 
-#if 1
   SetDisplayRegion();
-#endif
 
   DrawFrameIfNeeded();
 
@@ -157,14 +148,6 @@ void menPlay_Click()
   ReStretch();
 
   subMainGameLoop_Init();
-
-#if 1
-  return;
-#endif
-
-  bPlaying = False;
-
-  subFetchAndInitLevel();
 }
 
 static void ReStretch()
@@ -187,30 +170,14 @@ static void ReStretch()
 
 void SetScrollEdges()
 {
-#if NEW_TILESIZE
-#if 0
-  int pseudo_sxsize = SXSIZE * TILESIZE / TILESIZE_VAR;
-  int pseudo_sysize = SYSIZE * TILESIZE / TILESIZE_VAR;
-#endif
-#endif
   int border1_offset = (menBorder ? 1 : 2);
   int border2_offset = (menBorder ? 0 : TILESIZE / 2);
 
   /* scroll correction for border frame (1 tile) or border element (2 tiles) */
   ScrollMinX = 0;
   ScrollMinY = 0;
-#if NEW_TILESIZE
-#if 1
   ScrollMaxX = (DisplayMaxX + border1_offset - SCR_FIELDX) * TILEX;
   ScrollMaxY = (DisplayMaxY + border1_offset - SCR_FIELDY) * TILEY;
-#else
-  ScrollMaxX = (DisplayMaxX + border1_offset) * TILEX - pseudo_sxsize;
-  ScrollMaxY = (DisplayMaxY + border1_offset) * TILEY - pseudo_sysize;
-#endif
-#else
-  ScrollMaxX = (DisplayMaxX + border1_offset) * TILEX - SXSIZE;
-  ScrollMaxY = (DisplayMaxY + border1_offset) * TILEY - SYSIZE;
-#endif
 
   /* scroll correction for border element (half tile on left and right side) */
   ScrollMinX += border2_offset;
@@ -223,12 +190,6 @@ void SetScrollEdges()
   ScrollMaxX -= game_sp.scroll_xoffset;
   ScrollMinY -= game_sp.scroll_yoffset;
   ScrollMaxY -= game_sp.scroll_yoffset;
-
-#if 0
-  printf("::: (%ld, %ld), (%ld, %ld) -> (%d, %d), (%d, %d)\n",
-	 DisplayMinX, DisplayMinY, DisplayMaxX, DisplayMaxY,
-	 ScrollMinX, ScrollMinY, ScrollMaxX, ScrollMaxY);
-#endif
 }
 
 void DrawField(int X, int Y)
@@ -289,25 +250,7 @@ void DrawFieldNoAnimated(int X, int Y)
       break;
 
     default:
-#if 1
       DrawField(X, Y);
-#else
-      if (Tmp < fiFirst || Tmp > fiLast)
-	Tmp = fiSpace;
-
-      if (Tmp == fiRAM ||
-	  Tmp == fiHardWare ||
-	  Tmp == fiBug ||
-	  Tmp == fiWallSpace)
-	Tmp = DisPlayField[tsi];
-
-      subCopyImageToScreen(tsi, fiGraphic[Tmp]);
-
-      if (Tmp != fiSpace &&
-	  Tmp != fiSnikSnak &&
-	  Tmp != fiElectron)
-	GfxGraphic[X][Y] = fiGraphic[Tmp];
-#endif
       break;
   }
 }

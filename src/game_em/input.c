@@ -64,45 +64,12 @@ void InitGameEngine_EM()
 
   game_initscreen();
   game_animscreen();
-
-#if 0
-  /* blit playfield from scroll buffer to normal back buffer for fading in */
-  BlitScreenToBitmap_EM(backbuffer);
-#endif
 }
 
 void GameActions_EM(byte action[MAX_PLAYERS], boolean warp_mode)
 {
   int i;
   boolean player_is_dropping = FALSE;
-
-#if 0
-  static int foo = -1;
-
-  if (action[0] == 0 && foo != 0)
-    printf("KEY RELEASED @ %05d\n", FrameCounter);
-
-  foo = action[0];
-#endif
-
-#if 0
-#if 1
-  if (FrameCounter % 10 == 0)
-#endif
-    printf("::: %05d: %lu, %d\n", FrameCounter, RandomEM, frame);
-#endif
-
-#if 0
-  game_animscreen();
-
-#if 1
-#if 0
-  SyncDisplay();
-#endif
-
-  blitscreen();
-#endif
-#endif
 
   RandomEM = RandomEM * 129 + 1;
 
@@ -138,17 +105,9 @@ void GameActions_EM(byte action[MAX_PLAYERS], boolean warp_mode)
   CheckSingleStepMode_EM(action, frame, game_em.any_player_moving,
 			 player_is_dropping);
 
-#if 1
   game_animscreen();
 
-#if 1
-#if 0
-  SyncDisplay();
-#endif
-
   blitscreen();
-#endif
-#endif
 }
 
 /* read input device for players */

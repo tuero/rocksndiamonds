@@ -31,12 +31,10 @@ void InitGameEngine_SP()
   game_sp.scroll_xoffset = (EVEN(SCR_FIELDX) ? TILEX / 2 : 0);
   game_sp.scroll_yoffset = (EVEN(SCR_FIELDY) ? TILEY / 2 : 0);
 
-#if 1
   if (native_sp_level.width <= SCR_FIELDX)
     game_sp.scroll_xoffset = TILEX / 2;
   if (native_sp_level.height <= SCR_FIELDY)
     game_sp.scroll_yoffset = TILEY / 2;
-#endif
 
   for (x = 0; x < SP_MAX_PLAYFIELD_WIDTH; x++)
   {
@@ -66,20 +64,10 @@ void RedrawPlayfield_SP(boolean force_redraw)
 
 void DrawGameDoorValues_SP()
 {
-#if 1
-  // game_sp.time_played = TimerVar / FRAMES_PER_SECOND_SP;
   game_sp.time_played = TimerVar / FRAMES_PER_SECOND;
-#else
-  game_sp.time_played = TimerVar * setup.game_frame_delay / 1000;
-#endif
   game_sp.infotrons_still_needed = InfotronsNeeded;
   game_sp.red_disk_count = RedDiskCount;
   game_sp.score = 0;		// (currently no score in Supaplex engine)
-
-#if 0
-  printf("::: %d, %d => %d\n",
-	 TimerVar, setup.game_frame_delay, game_sp.time_played);
-#endif
 }
 
 void GameActions_SP(byte action[MAX_PLAYERS], boolean warp_mode)

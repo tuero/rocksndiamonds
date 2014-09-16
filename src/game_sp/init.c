@@ -130,9 +130,6 @@ void SaveEngineSnapshotValues_SP()
   SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(FieldHeight));
   SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(FieldMax));
   SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(LevelMax));
-#if 0
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(FileMax));
-#endif
 
   SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(TimerVar));
   SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(RandomSeed));

@@ -18,9 +18,6 @@ static void subExplodeZonk(int tsi, int cx);
 void subAnimateExplosion(int si)
 {
   int ax, bl;
-#if 0
-  int X, Y;
-#endif
 
   if (LowByte(PlayField16[si]) != fiExplosion)
     return;
@@ -38,10 +35,6 @@ void subAnimateExplosion(int si)
   MovHighByte(&PlayField16[si], bl);
 
   // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-#if 0
-  X = GetStretchX(si);
-  Y = GetStretchY(si);
-#endif
   GfxGraphic[GetX(si)][GetY(si)] = aniDefaultExplosion;
   // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -76,10 +69,6 @@ loc_g_28D0: // explosion produces infotron
   MovHighByte(&PlayField16[si], bl);
 
   // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-#if 0
-  X = GetStretchX(si);
-  Y = GetStretchY(si);
-#endif
   GfxGraphic[GetX(si)][GetY(si)] = aniElectronExplosion;
   // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 }
@@ -101,15 +90,9 @@ void ExplodeFieldSP(int si)
 
   if (ax == fiMurphy)
   {
-#if 0
-    printf("::: Explosions.c: ExplodeFieldSP(): killing murphy\n");
-#endif
-
     KillMurphyFlag = 1;
 
-#if 1
     ExplosionShakeMurphy = 30;	// Murphy explodes
-#endif
   }
 
   if (ax == fiElectron)
@@ -175,11 +158,6 @@ static void LetExplodeFieldSP(int tsi, int cx, int dh)
       break;
 
     case fiMurphy:
-#if 0
-      printf("::: Explosions.c: LetExplodeFieldSP(): killing murphy [%d]\n",
-	     tsi);
-#endif
-
       KillMurphyFlag = 1;
       PlayField8[tsi] = dh;
       PlayField16[tsi] = cx;
@@ -283,19 +261,11 @@ static void subExplodeInfotron(int tsi, int cx)
 
 void subClearFieldDueToExplosion(int si)
 {
-#if 0
-  int X, Y;
-#endif
-
   if (LowByte(PlayField16[si]) == fiExplosion)
     return;
 
   PlayField16[si] = 0;
   // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-#if 0
-  X = GetStretchX(si);
-  Y = GetStretchY(si);
-#endif
   GfxGraphic[GetX(si)][GetY(si)] = aniSpace;
   // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 }
@@ -315,12 +285,7 @@ void subRedDiskReleaseExplosion()
   // +++++++++++++++++++++++++++++++++++++++++
   X = GetStretchX(si);
   Y = GetStretchY(si);
-#if 0
-  // !!! causes flicker -- fix in Murphy.c !!!
-  GfxGraphic[GetX(si)][GetY(si)] = aniRedDisk;
-#else
   DDSpriteBuffer_BltImg(X, Y, aniRedDisk, 0);
-#endif
   // +++++++++++++++++++++++++++++++++++++++++
 
   RedDiskReleasePhase = RedDiskReleasePhase + 1;

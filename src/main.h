@@ -29,10 +29,6 @@
 #include "conf_mus.h"	/* include auto-generated data structure definitions */
 
 
-#define NEW_GAME_TILESIZE		1
-#define NEW_TILESIZE			1
-#define NEW_SCROLL			1
-
 #define IMG_UNDEFINED			(-1)
 #define IMG_EMPTY			IMG_EMPTY_SPACE
 #define IMG_SP_EMPTY			IMG_EMPTY_SPACE
@@ -45,17 +41,8 @@
 #define SND_UNDEFINED			(-1)
 #define MUS_UNDEFINED			(-1)
 
-#if 0
-#define WIN_XSIZE			672
-#define WIN_YSIZE			560
-#endif
-
 #define DEFAULT_FULLSCREEN_MODE		"800x600"
 
-#if 0
-#define SCR_FIELDX			17
-#define SCR_FIELDY			17
-#endif
 #define MAX_BUF_XSIZE			(SCR_FIELDX + 2)
 #define MAX_BUF_YSIZE			(SCR_FIELDY + 2)
 #define MIN_LEV_FIELDX			3
@@ -768,27 +755,7 @@
 #define IS_DC_STEELWALL_2(e)	((e) >= EL_DC_STEELWALL_2_LEFT &&	\
 				 (e) <= EL_DC_STEELWALL_2_SINGLE)
 
-#if 1
-
-#if 1
 #define GFX_ELEMENT(e)		(element_info[e].gfx_element)
-#else
-#define GFX_ELEMENT(e)		(element_info[e].gfx_element ==		\
-				 (element_info[e].use_gfx_element ?	\
-				  element_info[e].gfx_element : e)  ?	\
-				 element_info[e].gfx_element :		\
-				 element_info[e].gfx_element +		\
-				 0 * printf("::: %d: %d <-> %d\n",	\
-					    e,				\
-					    element_info[e].gfx_element,      \
-					    element_info[e].use_gfx_element ? \
-					    element_info[e].gfx_element : e))
-#endif
-
-#else
-#define GFX_ELEMENT(e)		(element_info[e].use_gfx_element ?	\
-				 element_info[e].gfx_element : e)
-#endif
 
 /* !!! CHECK THIS !!! */
 #if 1
@@ -949,18 +916,6 @@
 #define MAX_INITIAL_INVENTORY_SIZE	8
 
 /* often used screen positions */
-#if 0
-#define SX			8
-#define SY			8
-#define REAL_SX			(SX - 2)
-#define REAL_SY			(SY - 2)
-#define DX			566
-#define DY			60
-#define VX			DX
-#define VY			400
-#define EX			DX
-#define EY			(VY - 44)
-#endif
 #define TILESIZE		32
 #define TILEX			TILESIZE
 #define TILEY			TILESIZE
@@ -974,53 +929,9 @@
 #define MICRO_TILEY		MICRO_TILESIZE
 #define MIDPOSX			(SCR_FIELDX / 2)
 #define MIDPOSY			(SCR_FIELDY / 2)
-#if NEW_TILESIZE
-#if NEW_SCROLL
-#if 0
-#define SXSIZE			(SCR_FIELDX * TILEX_VAR)
-#define SYSIZE			(SCR_FIELDY * TILEY_VAR)
-#endif
 #define FXSIZE			((2 + SCR_FIELDX + 2) * TILEX_VAR)
 #define FYSIZE			((2 + SCR_FIELDY + 2) * TILEY_VAR)
-#else
-#if 0
-#define SXSIZE			(SCR_FIELDX * TILEX_VAR)
-#define SYSIZE			(SCR_FIELDY * TILEY_VAR)
-#endif
-#define FXSIZE			((SCR_FIELDX + 2) * TILEX_VAR)
-#define FYSIZE			((SCR_FIELDY + 2) * TILEY_VAR)
-#endif
-#else
-#if NEW_SCROLL
-#if 0
-#define SXSIZE			(SCR_FIELDX * TILEX)
-#define SYSIZE			(SCR_FIELDY * TILEY)
-#endif
-#define FXSIZE			((2 + SCR_FIELDX + 2) * TILEX)
-#define FYSIZE			((2 + SCR_FIELDY + 2) * TILEY)
-#else
-#if 0
-#define SXSIZE			(SCR_FIELDX * TILEX)
-#define SYSIZE			(SCR_FIELDY * TILEY)
-#endif
-#define FXSIZE			((SCR_FIELDX + 2) * TILEX)
-#define FYSIZE			((SCR_FIELDY + 2) * TILEY)
-#endif
-#endif
 
-#if 0
-#define DXSIZE			100
-#define DYSIZE			280
-#define VXSIZE			DXSIZE
-#define VYSIZE			100
-#define EXSIZE			DXSIZE
-#define EYSIZE			(VYSIZE + 44)
-#endif
-
-#if 0
-#define FULL_SXSIZE		(2 + SXSIZE + 2)
-#define FULL_SYSIZE		(2 + SYSIZE + 2)
-#endif
 #define MICROLEVEL_XSIZE	((STD_LEV_FIELDX + 2) * MICRO_TILEX)
 #define MICROLEVEL_YSIZE	((STD_LEV_FIELDY + 2) * MICRO_TILEY)
 #define MICROLEVEL_XPOS		(SX + (SXSIZE - MICROLEVEL_XSIZE) / 2)
@@ -2025,20 +1936,6 @@
 #define NUM_FONTS			38
 #define NUM_INITIAL_FONTS		4
 
-#if 0
-#define FONT_ACTIVE(f)							  \
-	((f) == FONT_MENU_1		? FONT_MENU_1_ACTIVE		: \
-	 (f) == FONT_MENU_2		? FONT_MENU_2_ACTIVE		: \
-	 (f) == FONT_TEXT_1		? FONT_TEXT_1_ACTIVE		: \
-	 (f) == FONT_TEXT_2		? FONT_TEXT_2_ACTIVE		: \
-	 (f) == FONT_TEXT_3		? FONT_TEXT_3_ACTIVE		: \
-	 (f) == FONT_TEXT_4		? FONT_TEXT_4_ACTIVE		: \
-	 (f) == FONT_INPUT_1		? FONT_INPUT_1_ACTIVE		: \
-	 (f) == FONT_INPUT_2		? FONT_INPUT_2_ACTIVE		: \
-	 (f) == FONT_LEVEL_NUMBER	? FONT_LEVEL_NUMBER_ACTIVE	: \
-	 (f))
-#endif
-
 /* values for game_status (must match special image configuration suffixes) */
 #define GAME_MODE_DEFAULT		0
 #define GAME_MODE_LOADING		1
@@ -2556,10 +2453,6 @@ struct GlobalInfo
 
   /* global values for fading screens and masking borders */
   int border_status;
-#if 0
-  int fading_status;
-  int fading_type;
-#endif
 
   boolean use_envelope_request;
 };
@@ -2899,9 +2792,6 @@ extern Bitmap		       *bitmap_db_store;
 extern Bitmap		       *bitmap_db_cross;
 extern Bitmap		       *bitmap_db_field;
 extern Bitmap		       *bitmap_db_panel;
-#if 0
-extern Bitmap		       *bitmap_db_door;
-#endif
 extern Bitmap		       *bitmap_db_door_1;
 extern Bitmap		       *bitmap_db_door_2;
 extern Bitmap		       *bitmap_db_toons;
@@ -2920,15 +2810,7 @@ extern SDL_Thread	       *server_thread;
 
 extern int			key_joystick_mapping;
 
-#if 1
-#if NEW_SCROLL
 extern boolean			redraw[2 + MAX_LEV_FIELDX + 2][2 + MAX_LEV_FIELDY + 2];
-#else
-extern boolean			redraw[MAX_LEV_FIELDX + 2][MAX_LEV_FIELDY + 2];
-#endif
-#else
-extern boolean			redraw[MAX_BUF_XSIZE][MAX_BUF_YSIZE];
-#endif
 extern int			redraw_x1, redraw_y1;
 
 extern short			Feld[MAX_LEV_FIELDX][MAX_LEV_FIELDY];

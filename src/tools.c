@@ -235,8 +235,6 @@ void SetDrawtoField(int mode)
 {
   if (mode == DRAW_BUFFERED && setup.soft_scrolling)
   {
-#if NEW_TILESIZE
-#if NEW_SCROLL
     FX = 2 * TILEX_VAR;
     FY = 2 * TILEY_VAR;
     BX1 = -2;
@@ -245,37 +243,6 @@ void SetDrawtoField(int mode)
     BY2 = SCR_FIELDY + 1;
     redraw_x1 = 2;
     redraw_y1 = 2;
-#else
-    FX = TILEX_VAR;
-    FY = TILEY_VAR;
-    BX1 = -1;
-    BY1 = -1;
-    BX2 = SCR_FIELDX;
-    BY2 = SCR_FIELDY;
-    redraw_x1 = 1;
-    redraw_y1 = 1;
-#endif
-#else
-#if NEW_SCROLL
-    FX = 2 * TILEX;
-    FY = 2 * TILEY;
-    BX1 = -2;
-    BY1 = -2;
-    BX2 = SCR_FIELDX + 1;
-    BY2 = SCR_FIELDY + 1;
-    redraw_x1 = 2;
-    redraw_y1 = 2;
-#else
-    FX = TILEX;
-    FY = TILEY;
-    BX1 = -1;
-    BY1 = -1;
-    BX2 = SCR_FIELDX;
-    BY2 = SCR_FIELDY;
-    redraw_x1 = 1;
-    redraw_y1 = 1;
-#endif
-#endif
 
     drawto_field = fieldbuffer;
   }
@@ -294,46 +261,13 @@ void SetDrawtoField(int mode)
   }
 }
 
-#if 1
-
 static void RedrawPlayfield_RND()
 {
   if (game.envelope_active)
     return;
 
-#if 1
   DrawLevel(REDRAW_ALL);
-#else
-  int x, y;
-
-  SetMainBackgroundImage(IMG_BACKGROUND_PLAYING);
-  // SetDrawBackgroundMask(REDRAW_FIELD);	// !!! CHECK THIS !!!
-  SetDrawBackgroundMask(REDRAW_ALL);	// !!! CHECK THIS !!!
-
-  for (x = BX1; x <= BX2; x++)
-    for (y = BY1; y <= BY2; y++)
-      DrawScreenField(x, y);
-
-  redraw_mask |= REDRAW_FIELD;
-#endif
   DrawAllPlayers();
-
-#if 0
-#if NEW_TILESIZE
-  BlitScreenToBitmap(backbuffer);
-#else
-  /* blit playfield from scroll buffer to normal back buffer */
-  if (setup.soft_scrolling)
-  {
-    int fx = FX, fy = FY;
-
-    fx += (ScreenMovDir & (MV_LEFT|MV_RIGHT) ? ScreenGfxPos : 0);
-    fy += (ScreenMovDir & (MV_UP|MV_DOWN)    ? ScreenGfxPos : 0);
-
-    BlitBitmap(fieldbuffer, backbuffer, fx,fy, SXSIZE,SYSIZE, SX,SY);
-  }
-#endif
-#endif
 }
 
 void RedrawPlayfield()
@@ -353,76 +287,6 @@ void RedrawPlayfield()
   BlitBitmap(drawto, window, gfx.sx, gfx.sy, gfx.sxsize, gfx.sysize,
 	     gfx.sx, gfx.sy);
 }
-
-#else
-
-void RedrawPlayfield(boolean force_redraw, int x, int y, int width, int height)
-{
-  if (game_status == GAME_MODE_PLAYING &&
-      level.game_engine_type == GAME_ENGINE_TYPE_EM)
-  {
-    /* currently there is no partial redraw -- always redraw whole playfield */
-    RedrawPlayfield_EM(TRUE);
-
-    /* blit playfield from scroll buffer to normal back buffer for fading in */
-    BlitScreenToBitmap_EM(backbuffer);
-  }
-  else if (game_status == GAME_MODE_PLAYING &&
-	   level.game_engine_type == GAME_ENGINE_TYPE_SP)
-  {
-    /* currently there is no partial redraw -- always redraw whole playfield */
-    RedrawPlayfield_SP(TRUE);
-
-    /* blit playfield from scroll buffer to normal back buffer for fading in */
-    BlitScreenToBitmap_SP(backbuffer);
-  }
-  else if (game_status == GAME_MODE_PLAYING &&
-	   !game.envelope_active)
-  {
-    if (force_redraw)
-    {
-      x = gfx.sx - TILEX;
-      y = gfx.sy - TILEY;
-      width = gfx.sxsize + 2 * TILEX;
-      height = gfx.sysize + 2 * TILEY;
-    }
-
-    if (force_redraw)
-    {
-      int xx, yy;
-      int x1 = (x - SX) / TILEX, y1 = (y - SY) / TILEY;
-      int x2 = (x - SX + width) / TILEX, y2 = (y - SY + height) / TILEY;
-
-      for (xx = BX1; xx <= BX2; xx++)
-	for (yy = BY1; yy <= BY2; yy++)
-	  if (xx >= x1 && xx <= x2 && yy >= y1 && yy <= y2)
-	    DrawScreenField(xx, yy);
-      DrawAllPlayers();
-    }
-
-    if (setup.soft_scrolling)
-    {
-      int fx = FX, fy = FY;
-
-      fx += (ScreenMovDir & (MV_LEFT|MV_RIGHT) ? ScreenGfxPos : 0);
-      fy += (ScreenMovDir & (MV_UP|MV_DOWN)    ? ScreenGfxPos : 0);
-
-      BlitBitmap(fieldbuffer, backbuffer, fx,fy, SXSIZE,SYSIZE, SX,SY);
-    }
-  }
-
-  if (force_redraw)
-  {
-    x = gfx.sx;
-    y = gfx.sy;
-    width = gfx.sxsize;
-    height = gfx.sysize;
-  }
-
-  BlitBitmap(drawto, window, x, y, width, height, x, y);
-}
-
-#endif
 
 void DrawMaskedBorder_Rect(int x, int y, int width, int height)
 {
@@ -502,19 +366,11 @@ static void BlitScreenToBitmap_RND(Bitmap *target_bitmap)
   int full_lev_fieldx = lev_fieldx + (BorderElement != EL_EMPTY ? 2 : 0);
   int full_lev_fieldy = lev_fieldy + (BorderElement != EL_EMPTY ? 2 : 0);
 
-#if NEW_TILESIZE
   int dx = (ScreenMovDir & (MV_LEFT | MV_RIGHT) ? ScreenGfxPos : 0);
   int dy = (ScreenMovDir & (MV_UP | MV_DOWN)    ? ScreenGfxPos : 0);
   int dx_var = dx * TILESIZE_VAR / TILESIZE;
   int dy_var = dy * TILESIZE_VAR / TILESIZE;
   int ffx, ffy;
-
-  // fx += dx * TILESIZE_VAR / TILESIZE;
-  // fy += dy * TILESIZE_VAR / TILESIZE;
-#else
-  fx += (ScreenMovDir & (MV_LEFT | MV_RIGHT) ? ScreenGfxPos : 0);
-  fy += (ScreenMovDir & (MV_UP | MV_DOWN)    ? ScreenGfxPos : 0);
-#endif
 
   ffx = (scroll_x - SBX_Left)  * TILEX_VAR + dx_var;
   ffy = (scroll_y - SBY_Upper) * TILEY_VAR + dy_var;
@@ -543,25 +399,12 @@ static void BlitScreenToBitmap_RND(Bitmap *target_bitmap)
     fy += dy_var;
   }
 
-#if 0
-  printf("::: (%d, %d) [(%d / %d, %d / %d)] => %d, %d\n",
-	 scroll_x, scroll_y,
-	 SBX_Left, SBX_Right,
-	 SBY_Upper, SBY_Lower,
-	 fx, fy);
-#endif
-
-#if 1
   if (full_lev_fieldx <= SCR_FIELDX)
   {
-    // printf(":1: PLAYFIELD FITS TO SCREEN [%d, %d, %d]\n", fx, ffx, dx_var);
-
     if (EVEN(SCR_FIELDX))
       fx = 2 * TILEX_VAR - (ODD(lev_fieldx)  ? TILEX_VAR / 2 : 0);
     else
       fx = 2 * TILEX_VAR - (EVEN(lev_fieldx) ? TILEX_VAR / 2 : 0);
-
-    // printf(":2: PLAYFIELD FITS TO SCREEN [%d, %d, %d]\n", fx, ffx, dx_var);
   }
 
   if (full_lev_fieldy <= SCR_FIELDY)
@@ -571,7 +414,6 @@ static void BlitScreenToBitmap_RND(Bitmap *target_bitmap)
     else
       fy = 2 * TILEY_VAR - (EVEN(lev_fieldy) ? TILEY_VAR / 2 : 0);
   }
-#endif
 
   if (border.draw_masked[GAME_MODE_PLAYING])
   {
@@ -606,16 +448,6 @@ void BackToFront()
 {
   int x, y;
   DrawBuffer *buffer = (drawto_field == window ? backbuffer : drawto_field);
-
-#if 0
-  printf("::: TILES TO REFRESH: %d\n", redraw_tiles);
-  for (x = 0; x < SCR_FIELDX; x++)
-    for (y = 0 ; y < SCR_FIELDY; y++)
-      if (redraw[redraw_x1 + x][redraw_y1 + y])
-	printf("::: - %d, %d [%s]\n",
-	       LEVELX(x), LEVELY(y),
-	       EL_NAME(Feld[LEVELX(x)][LEVELY(y)]));
-#endif
 
   if (redraw_mask & REDRAW_TILES && redraw_tiles > REDRAWTILES_THRESHOLD)
     redraw_mask |= REDRAW_FIELD;
@@ -711,39 +543,13 @@ void BackToFront()
 
   if (redraw_mask & REDRAW_ALL)
   {
-#if 0
-    if (game_status != GAME_MODE_PLAYING ||
-	redraw_mask & REDRAW_FROM_BACKBUFFER)
-    {
-#if 0
-      printf("::: REDRAW_ALL [%d]\n", FrameCounter);
-#endif
-
-      BlitBitmap(backbuffer, window, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
-
-      redraw_mask = REDRAW_NONE;
-    }
-    else
-    {
-      redraw_mask &= ~REDRAW_ALL;
-    }
-#else
-#if 0
-    printf("::: REDRAW_ALL [%d]\n", FrameCounter);
-#endif
-
     BlitBitmap(backbuffer, window, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
 
     redraw_mask = REDRAW_NONE;
-#endif
   }
 
   if (redraw_mask & REDRAW_FIELD)
   {
-#if 0
-    printf("::: REDRAW_FIELD [%d]\n", FrameCounter);
-#endif
-
     if (game_status != GAME_MODE_PLAYING ||
 	redraw_mask & REDRAW_FROM_BACKBUFFER)
     {
@@ -752,88 +558,7 @@ void BackToFront()
     }
     else
     {
-#if 1
       BlitScreenToBitmap_RND(window);
-#else
-      int fx = FX, fy = FY;
-
-#if NEW_TILESIZE
-      int dx = (ScreenMovDir & (MV_LEFT | MV_RIGHT) ? ScreenGfxPos : 0);
-      int dy = (ScreenMovDir & (MV_UP | MV_DOWN)    ? ScreenGfxPos : 0);
-      int dx_var = dx * TILESIZE_VAR / TILESIZE;
-      int dy_var = dy * TILESIZE_VAR / TILESIZE;
-      int ffx, ffy;
-
-      // fx += dx * TILESIZE_VAR / TILESIZE;
-      // fy += dy * TILESIZE_VAR / TILESIZE;
-#else
-      fx += (ScreenMovDir & (MV_LEFT | MV_RIGHT) ? ScreenGfxPos : 0);
-      fy += (ScreenMovDir & (MV_UP | MV_DOWN)    ? ScreenGfxPos : 0);
-#endif
-
-      /* !!! THIS WORKS !!! */
-
-      printf("::: %d, %d\n", scroll_x, scroll_y);
-
-      ffx = (scroll_x - SBX_Left)  * TILEX_VAR + dx_var;
-      ffy = (scroll_y - SBY_Upper) * TILEY_VAR + dy_var;
-
-      if (EVEN(SCR_FIELDX))
-      {
-	if (ffx < SBX_Right * TILEX_VAR + TILEX_VAR / 2 + TILEX_VAR)
-	  fx += dx_var - MIN(ffx, TILEX_VAR / 2) + TILEX_VAR;
-	else
-	  fx += (dx > 0 ? TILEX_VAR : 0);
-      }
-      else
-      {
-	fx += dx;
-      }
-
-      if (EVEN(SCR_FIELDY))
-      {
-	if (ffy < SBY_Lower * TILEY_VAR + TILEY_VAR / 2 + TILEY_VAR)
-	  fy += dy_var - MIN(ffy, TILEY_VAR / 2) + TILEY_VAR;
-	else
-	  fy += (dy > 0 ? TILEY_VAR : 0);
-      }
-      else
-      {
-	fy += dy;
-      }
-
-      if (border.draw_masked[GAME_MODE_PLAYING])
-      {
-	if (buffer != backbuffer)
-	{
-	  /* copy playfield buffer to backbuffer to add masked border */
-	  BlitBitmap(buffer, backbuffer, fx, fy, SXSIZE, SYSIZE, SX, SY);
-	  DrawMaskedBorder(REDRAW_FIELD);
-	}
-
-	BlitBitmap(backbuffer, window,
-		   REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE,
-		   REAL_SX, REAL_SY);
-      }
-      else
-      {
-	BlitBitmap(buffer, window, fx, fy, SXSIZE, SYSIZE, SX, SY);
-      }
-#endif
-
-#if 0
-#ifdef DEBUG
-      printf("redrawing all (ScreenGfxPos == %d) because %s\n",
-	     ScreenGfxPos,
-	     (setup.soft_scrolling ?
-	      "setup.soft_scrolling" :
-	      ABS(ScreenGfxPos) + ScrollStepSize == TILEX ?
-	      "ABS(ScreenGfxPos) + ScrollStepSize == TILEX" :
-	      ABS(ScreenGfxPos) == ScrollStepSize ?
-	      "ABS(ScreenGfxPos) == ScrollStepSize" :
-	      "redraw_tiles > REDRAWTILES_THRESHOLD"));
-#endif
-#endif
     }
 
     redraw_mask &= ~REDRAW_MAIN;
@@ -863,97 +588,66 @@ void BackToFront()
 
   if (redraw_mask & REDRAW_TILES)
   {
-#if 0
-    printf("::: REDRAW_TILES\n");
-#endif
+    int sx = SX;
+    int sy = SY;
 
-#if NEW_TILESIZE
+    int dx = 0, dy = 0;
+    int dx_var = dx * TILESIZE_VAR / TILESIZE;
+    int dy_var = dy * TILESIZE_VAR / TILESIZE;
+    int ffx, ffy;
+    int fx = FX, fy = FY;
 
-#if 1
+    int scr_fieldx = SCR_FIELDX + (EVEN(SCR_FIELDX) ? 2 : 0);
+    int scr_fieldy = SCR_FIELDY + (EVEN(SCR_FIELDY) ? 2 : 0);
+
     InitGfxClipRegion(TRUE, SX, SY, SXSIZE, SYSIZE);
 
+    ffx = (scroll_x - SBX_Left)  * TILEX_VAR + dx_var;
+    ffy = (scroll_y - SBY_Upper) * TILEY_VAR + dy_var;
+
+    if (EVEN(SCR_FIELDX))
     {
-      int sx = SX; // - (EVEN(SCR_FIELDX) ? TILEX_VAR / 2 : 0);
-      int sy = SY; // + (EVEN(SCR_FIELDY) ? TILEY_VAR / 2 : 0);
-
-      int dx = 0, dy = 0;
-      int dx_var = dx * TILESIZE_VAR / TILESIZE;
-      int dy_var = dy * TILESIZE_VAR / TILESIZE;
-      int ffx, ffy;
-      int fx = FX, fy = FY;
-
-      int scr_fieldx = SCR_FIELDX + (EVEN(SCR_FIELDX) ? 2 : 0);
-      int scr_fieldy = SCR_FIELDY + (EVEN(SCR_FIELDY) ? 2 : 0);
-
-      ffx = (scroll_x - SBX_Left)  * TILEX_VAR + dx_var;
-      ffy = (scroll_y - SBY_Upper) * TILEY_VAR + dy_var;
-
-      if (EVEN(SCR_FIELDX))
+      if (ffx < SBX_Right * TILEX_VAR + TILEX_VAR / 2 + TILEX_VAR)
       {
-	if (ffx < SBX_Right * TILEX_VAR + TILEX_VAR / 2 + TILEX_VAR)
-	{
-	  fx += dx_var - MIN(ffx, TILEX_VAR / 2) + TILEX_VAR;
+	fx += dx_var - MIN(ffx, TILEX_VAR / 2) + TILEX_VAR;
 
-	  if (fx % TILEX_VAR)
-	    sx -= TILEX_VAR / 2;
-	  else
-	    sx -= TILEX_VAR;
-	}
+	if (fx % TILEX_VAR)
+	  sx -= TILEX_VAR / 2;
 	else
-	{
-	  fx += (dx_var > 0 ? TILEX_VAR : 0);
-	}
+	  sx -= TILEX_VAR;
       }
-
-      if (EVEN(SCR_FIELDY))
+      else
       {
-	if (ffy < SBY_Lower * TILEY_VAR + TILEY_VAR / 2 + TILEY_VAR)
-	{
-	  fy += dy_var - MIN(ffy, TILEY_VAR / 2) + TILEY_VAR;
-
-	  if (fy % TILEY_VAR)
-	    sy -= TILEY_VAR / 2;
-	  else
-	    sy -= TILEY_VAR;
-	}
-	else
-	{
-	  fy += (dy_var > 0 ? TILEY_VAR : 0);
-	}
+	fx += (dx_var > 0 ? TILEX_VAR : 0);
       }
-
-#if 0
-      printf("::: %d, %d, %d, %d\n", sx, sy, SCR_FIELDX, SCR_FIELDY);
-#endif
-
-      for (x = 0; x < scr_fieldx; x++)
-	for (y = 0 ; y < scr_fieldy; y++)
-	  if (redraw[redraw_x1 + x][redraw_y1 + y])
-	    BlitBitmap(buffer, window,
-		       FX + x * TILEX_VAR, FY + y * TILEY_VAR,
-		       TILEX_VAR, TILEY_VAR,
-		       sx + x * TILEX_VAR, sy + y * TILEY_VAR);
     }
 
-    InitGfxClipRegion(FALSE, -1, -1, -1, -1);
-#else
-    for (x = 0; x < SCR_FIELDX; x++)
-      for (y = 0 ; y < SCR_FIELDY; y++)
+    if (EVEN(SCR_FIELDY))
+    {
+      if (ffy < SBY_Lower * TILEY_VAR + TILEY_VAR / 2 + TILEY_VAR)
+      {
+	fy += dy_var - MIN(ffy, TILEY_VAR / 2) + TILEY_VAR;
+
+	if (fy % TILEY_VAR)
+	  sy -= TILEY_VAR / 2;
+	else
+	  sy -= TILEY_VAR;
+      }
+      else
+      {
+	fy += (dy_var > 0 ? TILEY_VAR : 0);
+      }
+    }
+
+    for (x = 0; x < scr_fieldx; x++)
+      for (y = 0 ; y < scr_fieldy; y++)
 	if (redraw[redraw_x1 + x][redraw_y1 + y])
 	  BlitBitmap(buffer, window,
 		     FX + x * TILEX_VAR, FY + y * TILEY_VAR,
 		     TILEX_VAR, TILEY_VAR,
-		     SX + x * TILEX_VAR, SY + y * TILEY_VAR);
-#endif
+		     sx + x * TILEX_VAR, sy + y * TILEY_VAR);
 
-#else
-    for (x = 0; x < SCR_FIELDX; x++)
-      for (y = 0 ; y < SCR_FIELDY; y++)
-	if (redraw[redraw_x1 + x][redraw_y1 + y])
-	  BlitBitmap(buffer, window,
-		     FX + x * TILEX, FY + y * TILEY, TILEX, TILEY,
-		     SX + x * TILEX, SY + y * TILEY);
-#endif
+    InitGfxClipRegion(FALSE, -1, -1, -1, -1);
   }
 
   if (redraw_mask & REDRAW_FPS)		/* display frames per second */
@@ -966,11 +660,8 @@ void BackToFront()
       info1[0] = '\0';
 
     sprintf(text, "%04.1f fps%s", global.frames_per_second, info1);
-#if 1
+
     DrawTextExt(window, SX + SXSIZE + SX, 0, text, FONT_TEXT_2, BLIT_OPAQUE);
-#else
-    DrawTextExt(window, SX, SY, text, FONT_TEXT_2, BLIT_OPAQUE);
-#endif
   }
 
   FlushDisplay();
@@ -999,10 +690,6 @@ static void FadeExt(int fade_mask, int fade_mode, int fade_type)
   {
     if (fade_type_skip != FADE_TYPE_NONE)
     {
-#if 0
-      printf("::: skipping %d ... [%d] (X)\n", fade_mode, fade_type_skip);
-#endif
-
       /* skip all fade operations until specified fade operation */
       if (fade_type & fade_type_skip)
 	fade_type_skip = FADE_TYPE_NONE;
@@ -1022,83 +709,34 @@ static void FadeExt(int fade_mask, int fade_mode, int fade_type)
 
   if (fade_type == FADE_TYPE_SKIP)
   {
-#if 0
-    printf("::: will skip %d ... [%d]\n", fade_mode, fade_type_skip);
-#endif
-
     fade_type_skip = fade_mode;
 
     return;
   }
 
-#if 0
-  printf("::: !!! FADING %d ... [%d] [%d]\n", fade_mode, fade_type,
-	 fade_type_skip);
-#endif
-
-#if 1
   fade_delay = fading.fade_delay;
   post_delay = (fade_mode == FADE_MODE_FADE_OUT ? fading.post_delay : 0);
-#endif
 
   if (fade_type_skip != FADE_TYPE_NONE)
   {
-#if 0
-    printf("::: skipping %d ... [%d]\n", fade_mode, fade_type_skip);
-#endif
-
     /* skip all fade operations until specified fade operation */
     if (fade_type & fade_type_skip)
       fade_type_skip = FADE_TYPE_NONE;
 
-#if 1
     fade_delay = 0;
-#else
-    return;
-#endif
   }
 
-#if 1
   if (global.autoplay_leveldir)
   {
-    // fading.fade_mode = FADE_MODE_NONE;
-
     return;
   }
-#endif
 
-#if 0
-  if (fading.fade_mode == FADE_MODE_NONE)
-  {
-    BackToFront();
-
-    return;
-  }
-#endif
-
-  /* !!! what about fade_mask == REDRAW_FIELD | REDRAW_ALL ??? !!! */
-
-#if 0
-  printf("::: NOW FADING %d ... [%d]\n", fade_mode, fade_type);
-#endif
-
-#if 0
-  if (fade_mask == REDRAW_NONE)
-    fade_mask = REDRAW_FIELD;
-#endif
-
-  // if (fade_mask & REDRAW_FIELD)
   if (fade_mask == REDRAW_FIELD)
   {
     x = REAL_SX;
     y = REAL_SY;
     width  = FULL_SXSIZE;
     height = FULL_SYSIZE;
-
-#if 0
-    fade_delay = fading.fade_delay;
-    post_delay = (fade_mode == FADE_MODE_FADE_OUT ? fading.post_delay : 0);
-#endif
 
     if (border.draw_masked_when_fading)
       draw_border_function = DrawMaskedBorder_FIELD;	/* update when fading */
@@ -1111,53 +749,18 @@ static void FadeExt(int fade_mask, int fade_mode, int fade_type)
     y = 0;
     width  = WIN_XSIZE;
     height = WIN_YSIZE;
-
-#if 0
-    fade_delay = fading.fade_delay;
-    post_delay = (fade_mode == FADE_MODE_FADE_OUT ? fading.post_delay : 0);
-#endif
   }
 
-#if 1
   if (!setup.fade_screens ||
       fade_delay == 0 ||
       fading.fade_mode == FADE_MODE_NONE)
-#else
-  if (!setup.fade_screens || fade_delay == 0)
-#endif
   {
     if (fade_mode == FADE_MODE_FADE_OUT)
       return;
 
-#if 0
-    if (fade_mode == FADE_MODE_FADE_OUT &&
-	fading.fade_mode != FADE_MODE_NONE)
-      ClearRectangle(backbuffer, x, y, width, height);
-#endif
-
-#if 1
-
-#if 1
     BlitBitmap(backbuffer, window, x, y, width, height, x, y);
 
     redraw_mask &= ~fade_mask;
-#else
-    /* always redraw area that was explicitly marked to fade */
-    redraw_mask |= fade_mask;
-
-    BackToFront();
-#endif
-
-#else
-
-#if 1
-    BlitBitmap(backbuffer, window, x, y, width, height, x, y);
-    redraw_mask = REDRAW_NONE;
-    // (^^^ WRONG; should be "redraw_mask &= ~fade_mask" if done this way)
-#else
-    BackToFront();
-#endif
-#endif
 
     return;
   }
@@ -1200,20 +803,12 @@ void FadeSetEnterMenu()
 {
   fading = menu.enter_menu;
 
-#if 0
-  printf("::: storing enter_menu\n");
-#endif
-
   FadeSetLeaveNext(fading, TRUE);	/* (keep same fade mode) */
 }
 
 void FadeSetLeaveMenu()
 {
   fading = menu.leave_menu;
-
-#if 0
-  printf("::: storing leave_menu\n");
-#endif
 
   FadeSetLeaveNext(fading, TRUE);	/* (keep same fade mode) */
 }
@@ -1222,10 +817,6 @@ void FadeSetEnterScreen()
 {
   fading = menu.enter_screen[game_status];
 
-#if 0
-  printf("::: storing leave_screen[%d]\n", game_status);
-#endif
-
   FadeSetLeaveNext(menu.leave_screen[game_status], TRUE);	/* store */
 }
 
@@ -1233,20 +824,12 @@ void FadeSetNextScreen()
 {
   fading = menu.next_screen;
 
-#if 0
-  printf("::: storing next_screen\n");
-#endif
-
   // (do not overwrite fade mode set by FadeSetEnterScreen)
   // FadeSetLeaveNext(fading, TRUE);	/* (keep same fade mode) */
 }
 
 void FadeSetLeaveScreen()
 {
-#if 0
-  printf("::: recalling last stored value\n");
-#endif
-
   FadeSetLeaveNext(menu.leave_screen[game_status], FALSE);	/* recall */
 }
 
@@ -1321,39 +904,19 @@ void SetDoorBackgroundImage(int graphic)
 
 void SetPanelBackground()
 {
-#if 1
   struct GraphicInfo *gfx = &graphic_info[IMG_BACKGROUND_PANEL];
 
-#if 1
   BlitBitmapTiled(gfx->bitmap, bitmap_db_panel, gfx->src_x, gfx->src_y,
 		  gfx->width, gfx->height, 0, 0, DXSIZE, DYSIZE);
-#else
-  /* (ClearRectangle() only needed if panel bitmap is smaller than panel) */
-  ClearRectangle(bitmap_db_panel, DX, DY, DXSIZE, DYSIZE);
-  BlitBitmap(gfx->bitmap, bitmap_db_panel, gfx->src_x, gfx->src_y,
-	     MIN(gfx->width, DXSIZE), MIN(gfx->height, DYSIZE), 0, 0);
-#endif
-#else
-  BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, bitmap_db_panel,
-             DOOR_GFX_PAGEX5, DOOR_GFX_PAGEY1, DXSIZE, DYSIZE, 0, 0);
-#endif
 
   SetDoorBackgroundBitmap(bitmap_db_panel);
 }
 
 void DrawBackground(int x, int y, int width, int height)
 {
-  /* !!! "drawto" might still point to playfield buffer here (see below) !!! */
-  /* (when entering hall of fame after playing) */
-#if 0
-  ClearRectangleOnBackground(drawto, x, y, width, height);
-#else
+  /* "drawto" might still point to playfield buffer here (hall of fame) */
   ClearRectangleOnBackground(backbuffer, x, y, width, height);
-#endif
 
-#if 1
-
-#if 1
   if (IN_GFX_FIELD_FULL(x, y))
     redraw_mask |= REDRAW_FIELD;
   else if (IN_GFX_DOOR_1(x, y))
@@ -1362,20 +925,6 @@ void DrawBackground(int x, int y, int width, int height)
     redraw_mask |= REDRAW_DOOR_2;
   else if (IN_GFX_DOOR_3(x, y))
     redraw_mask |= REDRAW_DOOR_3;
-#else
-  /* (this only works for the current arrangement of playfield and panels) */
-  if (x < gfx.dx)
-    redraw_mask |= REDRAW_FIELD;
-  else if (y < gfx.vy)
-    redraw_mask |= REDRAW_DOOR_1;
-  else
-    redraw_mask |= REDRAW_DOOR_2;
-#endif
-
-#else
-  /* (this is just wrong (when drawing to one of the two door panel areas)) */
-  redraw_mask |= REDRAW_FIELD;
-#endif
 }
 
 void DrawBackgroundForFont(int x, int y, int width, int height, int font_nr)
@@ -1526,9 +1075,6 @@ void getSizedGraphicSourceExt(int graphic, int frame, int tilesize_raw,
   int height_div  = offset_calc[offset_calc_pos].height_div;
   int startx = bitmap_width * width_mult / width_div;
   int starty = bitmap_height * height_mult / height_div;
-
-#if NEW_GAME_TILESIZE
-
   int src_x = (g->src_x + (get_backside ? g->offset2_x : 0)) *
     tilesize_raw / TILESIZE;
   int src_y = (g->src_y + (get_backside ? g->offset2_y : 0)) *
@@ -1538,25 +1084,6 @@ void getSizedGraphicSourceExt(int graphic, int frame, int tilesize_raw,
   int offset_x = g->offset_x * tilesize_raw / TILESIZE;
   int offset_y = g->offset_y * tilesize_raw / TILESIZE;
 
-#else
-
-#if NEW_TILESIZE
-  int src_x = (g->src_x + (get_backside ? g->offset2_x : 0)) *
-    tilesize / TILESIZE;
-  int src_y = (g->src_y + (get_backside ? g->offset2_y : 0)) *
-    tilesize / TILESIZE;
-#else
-  int src_x = g->src_x * tilesize / TILESIZE;
-  int src_y = g->src_y * tilesize / TILESIZE;
-#endif
-  int width = g->width * tilesize / TILESIZE;
-  int height = g->height * tilesize / TILESIZE;
-  int offset_x = g->offset_x * tilesize / TILESIZE;
-  int offset_y = g->offset_y * tilesize / TILESIZE;
-
-#endif
-
-#if NEW_GAME_TILESIZE
   if (game.tile_size != TILESIZE)
   {
     int bitmap_width_std =
@@ -1580,7 +1107,6 @@ void getSizedGraphicSourceExt(int graphic, int frame, int tilesize_raw,
       starty = bitmap_height * height_mult / height_div;
     }
   }
-#endif
 
   if (g->offset_y == 0)		/* frames are ordered horizontally */
   {
@@ -1630,17 +1156,7 @@ void getFixedGraphicSource(int graphic, int frame,
 
 void getMiniGraphicSource(int graphic, Bitmap **bitmap, int *x, int *y)
 {
-#if 1
   getSizedGraphicSource(graphic, 0, MINI_TILESIZE, bitmap, x, y);
-#else
-  struct GraphicInfo *g = &graphic_info[graphic];
-  int mini_startx = 0;
-  int mini_starty = g->bitmap->height * 2 / 3;
-
-  *bitmap = g->bitmap;
-  *x = mini_startx + g->src_x / 2;
-  *y = mini_starty + g->src_y / 2;
-#endif
 }
 
 inline void getGraphicSourceExt(int graphic, int frame, Bitmap **bitmap,
@@ -1650,11 +1166,9 @@ inline void getGraphicSourceExt(int graphic, int frame, Bitmap **bitmap,
   int src_x = g->src_x + (get_backside ? g->offset2_x : 0);
   int src_y = g->src_y + (get_backside ? g->offset2_y : 0);
 
-#if NEW_TILESIZE
   if (TILESIZE_VAR != TILESIZE)
     return getSizedGraphicSourceExt(graphic, frame, TILESIZE_VAR, bitmap, x, y,
 				    get_backside);
-#endif
 
   *bitmap = g->bitmap;
 
@@ -1697,12 +1211,9 @@ void DrawGraphic(int x, int y, int graphic, int frame)
   }
 #endif
 
-#if NEW_TILESIZE
   DrawGraphicExt(drawto_field, FX + x * TILEX_VAR, FY + y * TILEY_VAR, graphic,
 		 frame);
-#else
-  DrawGraphicExt(drawto_field, FX + x * TILEX, FY + y * TILEY, graphic, frame);
-#endif
+
   MarkTileDirty(x, y);
 }
 
@@ -1729,11 +1240,8 @@ void DrawGraphicExt(DrawBuffer *dst_bitmap, int x, int y, int graphic,
   int src_x, src_y;
 
   getGraphicSource(graphic, frame, &src_bitmap, &src_x, &src_y);
-#if NEW_TILESIZE
+
   BlitBitmap(src_bitmap, dst_bitmap, src_x, src_y, TILEX_VAR, TILEY_VAR, x, y);
-#else
-  BlitBitmap(src_bitmap, dst_bitmap, src_x, src_y, TILEX, TILEY, x, y);
-#endif
 }
 
 void DrawFixedGraphicExt(DrawBuffer *dst_bitmap, int x, int y, int graphic,
@@ -1757,13 +1265,9 @@ void DrawGraphicThruMask(int x, int y, int graphic, int frame)
   }
 #endif
 
-#if NEW_TILESIZE
   DrawGraphicThruMaskExt(drawto_field, FX + x * TILEX_VAR, FY + y * TILEY_VAR,
 			 graphic, frame);
-#else
-  DrawGraphicThruMaskExt(drawto_field, FX + x * TILEX, FY + y * TILEY, graphic,
-			 frame);
-#endif
+
   MarkTileDirty(x, y);
 }
 
@@ -1793,12 +1297,9 @@ void DrawGraphicThruMaskExt(DrawBuffer *d, int dst_x, int dst_y, int graphic,
 
   SetClipOrigin(src_bitmap, src_bitmap->stored_clip_gc,
 		dst_x - src_x, dst_y - src_y);
-#if NEW_TILESIZE
+
   BlitBitmapMasked(src_bitmap, d, src_x, src_y, TILEX_VAR, TILEY_VAR,
 		   dst_x, dst_y);
-#else
-  BlitBitmapMasked(src_bitmap, d, src_x, src_y, TILEX, TILEY, dst_x, dst_y);
-#endif
 }
 
 void DrawFixedGraphicThruMaskExt(DrawBuffer *d, int dst_x, int dst_y,
@@ -1929,14 +1430,12 @@ inline static void DrawGraphicShiftedNormal(int x, int y, int dx, int dy,
   }
 #endif
 
-#if NEW_TILESIZE
   width = width * TILESIZE_VAR / TILESIZE;
   height = height * TILESIZE_VAR / TILESIZE;
   cx = cx * TILESIZE_VAR / TILESIZE;
   cy = cy * TILESIZE_VAR / TILESIZE;
   dx = dx * TILESIZE_VAR / TILESIZE;
   dy = dy * TILESIZE_VAR / TILESIZE;
-#endif
 
   if (width > 0 && height > 0)
   {
@@ -1945,13 +1444,8 @@ inline static void DrawGraphicShiftedNormal(int x, int y, int dx, int dy,
     src_x += cx;
     src_y += cy;
 
-#if NEW_TILESIZE
     dst_x = FX + x * TILEX_VAR + dx;
     dst_y = FY + y * TILEY_VAR + dy;
-#else
-    dst_x = FX + x * TILEX + dx;
-    dst_y = FY + y * TILEY + dy;
-#endif
 
     if (mask_mode == USE_MASKING)
     {
@@ -1975,64 +1469,34 @@ inline static void DrawGraphicShiftedDouble(int x, int y, int dx, int dy,
   Bitmap *src_bitmap;
   int src_x, src_y;
   int dst_x, dst_y;
-#if NEW_TILESIZE
   int width = TILEX_VAR, height = TILEY_VAR;
-#else
-  int width = TILEX, height = TILEY;
-#endif
   int x1 = x;
   int y1 = y;
   int x2 = x + SIGN(dx);
   int y2 = y + SIGN(dy);
-#if 0
-  /* !!! DOES NOT WORK FOR SLOW MOVEMENT !!! */
-  int sync_frame = GfxFrame[LEVELX(x)][LEVELY(y)];
-#else
+
   /* movement with two-tile animations must be sync'ed with movement position,
      not with current GfxFrame (which can be higher when using slow movement) */
   int anim_pos = (dx ? ABS(dx) : ABS(dy));
   int anim_frames = graphic_info[graphic].anim_frames;
-#if 1
+
   /* (we also need anim_delay here for movement animations with less frames) */
   int anim_delay = graphic_info[graphic].anim_delay;
   int sync_frame = anim_pos * anim_frames * anim_delay / TILESIZE;
-#else
-  int sync_frame = anim_pos * anim_frames / TILESIZE;
-#endif
-#endif
+
   boolean draw_start_tile = (cut_mode != CUT_ABOVE);	/* only for falling! */
   boolean draw_end_tile   = (cut_mode != CUT_BELOW);	/* only for falling! */
 
   /* re-calculate animation frame for two-tile movement animation */
   frame = getGraphicAnimationFrame(graphic, sync_frame);
 
-#if 0
-#if 0
-  printf("::: %d, %d, %d => %d [%d]\n",
-	 anim_pos, anim_frames, anim_delay, sync_frame, graphic);
-#else
-  printf("::: %d, %d => %d\n",
-	 anim_pos, anim_frames, sync_frame);
-#endif
-#endif
-
-#if 0
-  printf("::: %d [%d, %d] [%d] [%d]\n", frame, sync_frame, dy,
-	 GfxFrame[LEVELX(x)][LEVELY(y)], mask_mode);
-#endif
-
   /* check if movement start graphic inside screen area and should be drawn */
   if (draw_start_tile && IN_SCR_FIELD(x1, y1))
   {
     getGraphicSourceExt(graphic, frame, &src_bitmap, &src_x, &src_y, TRUE);
 
-#if NEW_TILESIZE
     dst_x = FX + x1 * TILEX_VAR;
     dst_y = FY + y1 * TILEY_VAR;
-#else
-    dst_x = FX + x1 * TILEX;
-    dst_y = FY + y1 * TILEY;
-#endif
 
     if (mask_mode == USE_MASKING)
     {
@@ -2053,13 +1517,8 @@ inline static void DrawGraphicShiftedDouble(int x, int y, int dx, int dy,
   {
     getGraphicSourceExt(graphic, frame, &src_bitmap, &src_x, &src_y, FALSE);
 
-#if NEW_TILESIZE
     dst_x = FX + x2 * TILEX_VAR;
     dst_y = FY + y2 * TILEY_VAR;
-#else
-    dst_x = FX + x2 * TILEX;
-    dst_y = FY + y2 * TILEY;
-#endif
 
     if (mask_mode == USE_MASKING)
     {
@@ -2229,7 +1688,6 @@ static void DrawLevelFieldCrumbledInnerCorners(int x, int y, int dx, int dy,
 
   getGraphicSource(graphic, 1, &src_bitmap, &src_x, &src_y);
 
-#if NEW_TILESIZE
   width  = crumbled_border_size * TILESIZE_VAR / TILESIZE;
   height = crumbled_border_size * TILESIZE_VAR / TILESIZE;
   cx = (dx > 0 ? TILESIZE_VAR - width  : 0);
@@ -2237,15 +1695,6 @@ static void DrawLevelFieldCrumbledInnerCorners(int x, int y, int dx, int dy,
 
   BlitBitmap(src_bitmap, drawto_field, src_x + cx, src_y + cy,
 	     width, height, FX + sx * TILEX_VAR + cx, FY + sy * TILEY_VAR + cy);
-#else
-  width  = crumbled_border_size;
-  height = crumbled_border_size;
-  cx = (dx > 0 ? TILEX - crumbled_border_size : 0);
-  cy = (dy > 0 ? TILEY - crumbled_border_size : 0);
-
-  BlitBitmap(src_bitmap, drawto_field, src_x + cx, src_y + cy,
-	     width, height, FX + sx * TILEX + cx, FY + sy * TILEY + cy);
-#endif
 }
 
 static void DrawLevelFieldCrumbledBorders(int x, int y, int graphic, int frame,
@@ -2264,40 +1713,14 @@ static void DrawLevelFieldCrumbledBorders(int x, int y, int graphic, int frame,
 
   /* draw simple, sloppy, non-corner-accurate crumbled border */
 
-#if 1
   width  = (dir == 1 || dir == 2 ? crumbled_border_size_var : TILESIZE_VAR);
   height = (dir == 0 || dir == 3 ? crumbled_border_size_var : TILESIZE_VAR);
   cx = (dir == 2 ? crumbled_border_pos_var : 0);
   cy = (dir == 3 ? crumbled_border_pos_var : 0);
-#else
-  if (dir == 1 || dir == 2)		/* left or right crumbled border */
-  {
-    width = crumbled_border_size;
-    height = TILEY;
-    cx = (dir == 2 ? TILEX - crumbled_border_size : 0);
-    cy = 0;
-  }
-  else					/* top or bottom crumbled border */
-  {
-    width = TILEX;
-    height = crumbled_border_size;
-    cx = 0;
-    cy = (dir == 3 ? TILEY - crumbled_border_size : 0);
-  }
-#endif
 
-#if NEW_TILESIZE
-  BlitBitmap(src_bitmap, drawto_field,
-	     src_x + cx,
-	     src_y + cy,
-	     width,
-	     height,
+  BlitBitmap(src_bitmap, drawto_field, src_x + cx, src_y + cy, width, height,
 	     FX + sx * TILEX_VAR + cx,
 	     FY + sy * TILEY_VAR + cy);
-#else
-  BlitBitmap(src_bitmap, drawto_field, src_x + cx, src_y + cy,
-	     width, height, FX + sx * TILEX + cx, FY + sy * TILEY + cy);
-#endif
 
   /* (remaining middle border part must be at least as big as corner part) */
   if (!(graphic_info[graphic].style & STYLE_ACCURATE_BORDERS) ||
@@ -2306,7 +1729,6 @@ static void DrawLevelFieldCrumbledBorders(int x, int y, int graphic, int frame,
 
   /* correct corners of crumbled border, if needed */
 
-#if 1
   for (i = -1; i <= 1; i += 2)
   {
     int xx = x + (dir == 0 || dir == 3 ? i : 0);
@@ -2344,80 +1766,12 @@ static void DrawLevelFieldCrumbledBorders(int x, int y, int graphic, int frame,
 	by = cy;
       }
 
-#if NEW_TILESIZE
-      BlitBitmap(src_bitmap, drawto_field,
-		 src_x + bx,
-		 src_y + by,
-		 width,
-		 height,
+      BlitBitmap(src_bitmap, drawto_field, src_x + bx, src_y + by,
+		 width, height,
 		 FX + sx * TILEX_VAR + cx,
 		 FY + sy * TILEY_VAR + cy);
-#else
-      BlitBitmap(src_bitmap, drawto_field, src_x + bx, src_y + by,
-		 width, height, FX + sx * TILEX + cx, FY + sy * TILEY + cy);
-#endif
     }
   }
-#else
-  if (dir == 1 || dir == 2)		/* left or right crumbled border */
-  {
-    for (i = -1; i <= 1; i+=2)
-    {
-      int xx = x;
-      int yy = y + i;
-      int element = (IN_LEV_FIELD(xx, yy) ? TILE_GFX_ELEMENT(xx, yy) :
-		     BorderElement);
-
-      /* check if neighbour field is of same crumble type */
-      if (IS_CRUMBLED_TILE(xx, yy, element) &&
-	  graphic_info[graphic].class ==
-	  graphic_info[el_act2crm(element, ACTION_DEFAULT)].class)
-      {
-	/* no crumbled corner, but continued crumbled border */
-
-	width  = crumbled_border_size;
-	height = crumbled_border_size;
-	cx = (dir == 2 ? TILEX - crumbled_border_size : 0);
-	cy = (i == 1 ? TILEY - crumbled_border_size : 0);
-	bx = cx;
-	by = (i == 1 ? crumbled_border_size :
-	      TILEY - 2 * crumbled_border_size);
-
-	BlitBitmap(src_bitmap, drawto_field, src_x + bx, src_y + by,
-		   width, height, FX + sx * TILEX + cx, FY + sy * TILEY + cy);
-      }
-    }
-  }
-  else				/* top or bottom crumbled border */
-  {
-    for (i = -1; i <= 1; i+=2)
-    {
-      int xx = x + i;
-      int yy = y;
-      int element = (IN_LEV_FIELD(xx, yy) ? TILE_GFX_ELEMENT(xx, yy) :
-		     BorderElement);
-
-      /* check if neighbour field is of same crumble type */
-      if (IS_CRUMBLED_TILE(xx, yy, element) &&
-	  graphic_info[graphic].class ==
-	  graphic_info[el_act2crm(element, ACTION_DEFAULT)].class)
-      {
-	/* no crumbled corner, but continued crumbled border */
-
-	width  = crumbled_border_size;
-	height = crumbled_border_size;
-	cx = (i == 1 ? TILEX - crumbled_border_size : 0);
-	cy = (dir == 3 ? TILEY - crumbled_border_size : 0);
-	bx = (i == 1 ? crumbled_border_size :
-	      TILEX - 2 * crumbled_border_size);
-	by = cy;
-
-	BlitBitmap(src_bitmap, drawto_field, src_x + bx, src_y + by,
-		   width, height, FX + sx * TILEX + cx, FY + sy * TILEY + cy);
-      }
-    }
-  }
-#endif
 }
 
 static void DrawLevelFieldCrumbledExt(int x, int y, int graphic, int frame)
@@ -2453,15 +1807,10 @@ static void DrawLevelFieldCrumbledExt(int x, int y, int graphic, int frame)
 		 BorderElement);
 
       /* check if neighbour field is of same crumble type */
-#if 1
       if (IS_CRUMBLED_TILE(xx, yy, element) &&
 	  graphic_info[graphic].class ==
 	  graphic_info[el_act2crm(element, ACTION_DEFAULT)].class)
 	continue;
-#else
-      if (IS_CRUMBLED_TILE(xx, yy, element))
-	continue;
-#endif
 
       DrawLevelFieldCrumbledBorders(x, y, graphic, frame, i);
     }
@@ -2517,14 +1866,6 @@ void DrawLevelFieldCrumbled(int x, int y)
   if (!IN_LEV_FIELD(x, y))
     return;
 
-#if 1
-  /* !!! CHECK THIS !!! */
-
-  /*
-  if (Feld[x][y] == EL_ELEMENT_SNAPPING &&
-      GFX_CRUMBLED(GfxElement[x][y]))
-  */
-
   if (Feld[x][y] == EL_ELEMENT_SNAPPING &&
       GfxElement[x][y] != EL_UNDEFINED &&
       GFX_CRUMBLED(GfxElement[x][y]))
@@ -2533,13 +1874,8 @@ void DrawLevelFieldCrumbled(int x, int y)
 
     return;
   }
-#endif
 
-#if 1
   graphic = el_act2crm(TILE_GFX_ELEMENT(x, y), ACTION_DEFAULT);
-#else
-  graphic = el_act2crm(Feld[x][y], ACTION_DEFAULT);
-#endif
 
   DrawLevelFieldCrumbledExt(x, y, graphic, 0);
 }
@@ -2660,22 +1996,8 @@ void DrawScreenField(int x, int y)
 	     element == EL_DC_MAGIC_WALL_FILLING)
       cut_mode = CUT_BELOW;
 
-#if 0
-    if (lx == 9 && ly == 1)
-      printf("::: %s [%d] [%d, %d] [%d]\n",
-	     EL_NAME(TILE_GFX_ELEMENT(lx, ly)),
-	     el_act2crm(TILE_GFX_ELEMENT(lx, ly), ACTION_DEFAULT),
-	     element_info[EL_QUICKSAND_EMPTYING].graphic[ACTION_DEFAULT],
-	     element_info[EL_QUICKSAND_EMPTYING].crumbled[ACTION_DEFAULT],
-	     GFX_CRUMBLED(TILE_GFX_ELEMENT(lx, ly)));
-#endif
-
     if (cut_mode == CUT_ABOVE)
-#if 1
       DrawScreenElement(x, y, element);
-#else
-      DrawScreenElementShifted(x, y, 0, 0, element, NO_CUTTING);
-#endif
     else
       DrawScreenElement(x, y, EL_EMPTY);
 
@@ -2687,11 +2009,9 @@ void DrawScreenField(int x, int y)
     {
       DrawScreenElementShifted(x, y, 0, MovPos[lx][ly], content, cut_mode);
 
-#if 1
       if (cut_mode == CUT_BELOW &&
 	  IN_LEV_FIELD(lx, ly + 1) && IN_SCR_FIELD(x, y + 1))
 	DrawLevelElement(lx, ly + 1, element);
-#endif
     }
 
     if (content == EL_ACID)
@@ -2874,11 +2194,7 @@ void AnimateEnvelope(int envelope_nr, int anim_mode, int action)
 
     SetDrawtoField(DRAW_BUFFERED);
 
-#if 1
     BlitScreenToBitmap(backbuffer);
-#else
-    BlitBitmap(fieldbuffer, backbuffer, FX, FY, SXSIZE, SYSIZE, SX, SY);
-#endif
 
     SetDrawtoField(DRAW_BACKBUFFER);
 
@@ -2886,17 +2202,11 @@ void AnimateEnvelope(int envelope_nr, int anim_mode, int action)
       for (xx = 0; xx < xsize; xx++)
 	DrawEnvelopeBackground(graphic, sx, sy, xx, yy, xsize, ysize, font_nr);
 
-#if 1
     DrawTextBuffer(sx + font_width, sy + font_height,
 		   level.envelope[envelope_nr].text, font_nr, max_xsize,
 		   xsize - 2, ysize - 2, 0, mask_mode,
 		   level.envelope[envelope_nr].autowrap,
 		   level.envelope[envelope_nr].centered, FALSE);
-#else
-    DrawTextToTextArea(sx + font_width, sy + font_height,
-		       level.envelope[envelope_nr].text, font_nr, max_xsize,
-		       xsize - 2, ysize - 2, mask_mode);
-#endif
 
     redraw_mask |= REDRAW_FIELD | REDRAW_FROM_BACKBUFFER;
     BackToFront();
@@ -3039,41 +2349,16 @@ void DrawEnvelopeRequest(char *text)
   // store readily prepared envelope request for later use when animating
   BlitBitmap(backbuffer, bitmap_db_cross, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
 
-#if 0
-  // !!! TEST !!!
-  BlitBitmap(bitmap_db_store, backbuffer, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
-  BlitBitmap(bitmap_db_cross, backbuffer, sx, sy, width, height, sx, sy);
-
-  redraw_mask = REDRAW_FIELD | REDRAW_FROM_BACKBUFFER;
-  BackToFront();
-
-  Delay(3000);
-
-  BlitBitmap(bitmap_db_store, backbuffer, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
-
-  redraw_mask = REDRAW_FIELD | REDRAW_FROM_BACKBUFFER;
-  BackToFront();
-
-  Delay(1000);
-#endif
-
   if (text_door_style)
     free(text_door_style);
 }
-
-#if 1
 
 void AnimateEnvelopeRequest(int anim_mode, int action)
 {
   int graphic = IMG_BACKGROUND_REQUEST;
   boolean draw_masked = graphic_info[graphic].draw_masked;
-#if 1
   int delay_value_normal = request.step_delay;
   int delay_value_fast = delay_value_normal / 2;
-#else
-  int delay_value_normal = GameFrameDelay;
-  int delay_value_fast = FfwdFrameDelay;
-#endif
   boolean ffwd_delay = (tape.playing && tape.fast_forward);
   boolean no_delay = (tape.warp_forward);
   int delay_value = (ffwd_delay ? delay_value_fast : delay_value_normal);
@@ -3114,7 +2399,6 @@ void AnimateEnvelopeRequest(int anim_mode, int action)
 
     BlitBitmap(bitmap_db_store, backbuffer, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
 
-#if 1
     for (yy = 0; yy < 2; yy++)
     {
       for (xx = 0; xx < 2; xx++)
@@ -3134,308 +2418,29 @@ void AnimateEnvelopeRequest(int anim_mode, int action)
 		     src_xx, src_yy, xx_size, yy_size, dst_xx, dst_yy);
       }
     }
-#else
-    BlitBitmap(bitmap_db_cross, backbuffer,
-	       src_x, src_y,
-	       xsize_size_left, ysize_size_top,
-	       dst_x, dst_y);
-    BlitBitmap(bitmap_db_cross, backbuffer,
-	       src_x + max_xsize_pos, src_y,
-	       tile_size, ysize_size_top,
-	       dst_x + xsize_size_left, dst_y);
-    BlitBitmap(bitmap_db_cross, backbuffer,
-	       src_x, src_y + max_ysize_pos,
-	       xsize_size_left, tile_size,
-	       dst_x, dst_y + ysize_size_top);
-    BlitBitmap(bitmap_db_cross, backbuffer,
-	       src_x + max_xsize_pos, src_y + max_ysize_pos,
-	       tile_size, tile_size,
-	       dst_x + xsize_size_left, dst_y + ysize_size_top);
-#endif
 
-#if 0
-    redraw_mask = REDRAW_FIELD | REDRAW_FROM_BACKBUFFER;
-    // redraw_mask |= REDRAW_ALL | REDRAW_FROM_BACKBUFFER;
-#else
-  /* CHECK AGAIN (previous code reactivated) */
     redraw_mask |= REDRAW_FIELD | REDRAW_FROM_BACKBUFFER;
-#endif
 
-#if 1
     DoAnimation();
     BackToFront();
-#else
-    BackToFront();
-#endif
 
     WaitUntilDelayReached(&anim_delay, anim_delay_value / 2);
   }
 }
 
-#else
-
-void AnimateEnvelopeRequest(char *text, int anim_mode, int action)
-{
-#if 0
-  int envelope_nr = 0;
-#endif
-#if 1
-  int graphic = IMG_BACKGROUND_REQUEST;
-#else
-  int graphic = IMG_BACKGROUND_ENVELOPE_1 + envelope_nr;
-#endif
-  Bitmap *src_bitmap = graphic_info[graphic].bitmap;
-  int mask_mode = (src_bitmap != NULL ? BLIT_MASKED : BLIT_ON_BACKGROUND);
-  boolean ffwd_delay = (tape.playing && tape.fast_forward);
-  boolean no_delay = (tape.warp_forward);
-  unsigned int anim_delay = 0;
-  int frame_delay_value = (ffwd_delay ? FfwdFrameDelay : GameFrameDelay);
-  int anim_delay_value = (no_delay ? 0 : frame_delay_value + 500 * 0);
-#if 1
-  int max_word_len = maxWordLengthInString(text);
-  int font_nr = (max_word_len > 7 ? FONT_TEXT_1 : FONT_TEXT_2);
-#else
-  int font_nr = FONT_ENVELOPE_1 + envelope_nr;
-#endif
-  int font_width = getFontWidth(font_nr);
-  int font_height = getFontHeight(font_nr);
-  int line_spacing = 2 * 1;
-#if 1
-
-#if 1
-  int max_xsize = DXSIZE / font_width;
-  // int max_ysize = DYSIZE / font_height;
-  int max_ysize = DYSIZE / (font_height + line_spacing);
-#else
-  int max_xsize = 7;	/* tools.c: MAX_REQUEST_LINE_FONT1_LEN == 7 */
-  int max_ysize = 13;	/* tools.c: MAX_REQUEST_LINES == 13 */
-#endif
-
-#else
-  int max_xsize = level.envelope[envelope_nr].xsize;
-  int max_ysize = level.envelope[envelope_nr].ysize;
-#endif
-  int xstart = (anim_mode & ANIM_VERTICAL ? max_xsize : 0);
-  int ystart = (anim_mode & ANIM_HORIZONTAL ? max_ysize : 0);
-  int xend = max_xsize;
-  int yend = (anim_mode != ANIM_DEFAULT ? max_ysize : 0);
-  int xstep = (xstart < xend ? 1 : 0);
-  int ystep = (ystart < yend || xstep == 0 ? 1 : 0);
-  int x, y;
-
-#if 1
-  char *text_ptr;
-  char *text_copy = getStringCopy(text);
-#else
-#if 1
-  font_nr = FONT_TEXT_2;
-
-  if (maxWordLengthInString(text) > 7)	/* MAX_REQUEST_LINE_FONT1_LEN == 7 */
-  {
-    max_xsize = 10;	/* tools.c: MAX_REQUEST_LINE_FONT2_LEN == 10 */
-    font_nr = FONT_TEXT_1;
-  }
-#else
-  int max_word_len = 0;
-  char *text_ptr;
-  char *text_copy = getStringCopy(text);
-
-  font_nr = FONT_TEXT_2;
-
-  for (text_ptr = text; *text_ptr; text_ptr++)
-  {
-    max_word_len = (*text_ptr != ' ' ? max_word_len + 1 : 0);
-
-    if (max_word_len > 7)	/* tools.c: MAX_REQUEST_LINE_FONT1_LEN == 7 */
-    {
-      max_xsize = 10;	/* tools.c: MAX_REQUEST_LINE_FONT2_LEN == 10 */
-      font_nr = FONT_TEXT_1;
-
-      break;
-    }
-  }
-#endif
-#endif
-
-#if 1
-  for (text_ptr = text_copy; *text_ptr; text_ptr++)
-    if (*text_ptr == ' ')
-      *text_ptr = '\n';
-#endif
-
-#if 1
-  dDX = SX + (SXSIZE - DXSIZE) / 2 - DX;
-  dDY = SY + (SYSIZE - DYSIZE) / 2 - DY;
-#else
-  dDX = SX + SXSIZE / 2 - max_xsize * font_width  / 2 - DX;
-  dDY = SY + SYSIZE / 2 - max_ysize * font_height / 2 - DY;
-#endif
-
-  for (x = xstart, y = ystart; x <= xend && y <= yend; x += xstep, y += ystep)
-  {
-    int xsize = (action == ACTION_CLOSING ? xend - (x - xstart) : x) + 2;
-    int ysize = (action == ACTION_CLOSING ? yend - (y - ystart) : y) + 2;
-    int sx = SX + (SXSIZE - xsize * font_width)  / 2;
-    // int sy = SX + (SYSIZE - ysize * font_height) / 2;
-    int sy = SY + (SYSIZE - ysize * (font_height + line_spacing)) / 2;
-    int xx, yy;
-
-#if 1
-    BlitBitmap(bitmap_db_store, backbuffer, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
-#else
-    SetDrawtoField(DRAW_BUFFERED);
-
-#if 1
-    BlitScreenToBitmap(backbuffer);
-#else
-    BlitBitmap(fieldbuffer, backbuffer, FX, FY, SXSIZE, SYSIZE, SX, SY);
-#endif
-
-    SetDrawtoField(DRAW_BACKBUFFER);
-#endif
-
-    for (yy = 0; yy < ysize; yy++)
-      for (xx = 0; xx < xsize; xx++)
-	DrawEnvelopeBackgroundTiles(graphic, sx, sy, xx, yy, xsize, ysize,
-				    getFontWidth(font_nr),
-				    getFontHeight(font_nr) + line_spacing);
-
-#if 1
-
-#if 1
-    DrawTextBuffer(sx + font_width, sy + font_height + 8,
-		   text_copy, font_nr, max_xsize,
-		   xsize - 2, ysize - 2, line_spacing, mask_mode,
-		   FALSE, TRUE, FALSE);
-#else
-    DrawTextBuffer(sx + font_width, sy + font_height,
-		   level.envelope[envelope_nr].text, font_nr, max_xsize,
-		   xsize - 2, ysize - 2, 0, mask_mode,
-		   level.envelope[envelope_nr].autowrap,
-		   level.envelope[envelope_nr].centered, FALSE);
-#endif
-
-#else
-    DrawTextToTextArea(sx + font_width, sy + font_height,
-		       level.envelope[envelope_nr].text, font_nr, max_xsize,
-		       xsize - 2, ysize - 2, mask_mode);
-#endif
-
-    /* copy request gadgets to door backbuffer */
-#if 1
-    /*
-    if ((ysize - 2) > 13)
-      BlitBitmap(bitmap_db_door, drawto,
-		 DOOR_GFX_PAGEX1 + (DXSIZE - (xsize - 2) * font_width) / 2,
-		 DOOR_GFX_PAGEY1 + 13 * font_height,
-		 (xsize - 2) * font_width,
-		 (ysize - 2 - 13) * font_height,
-		 sx + font_width,
-		 sy + font_height * (1 + 13));
-    */
-    if ((ysize - 2) > 13)
-      BlitBitmap(bitmap_db_door, drawto,
-		 DOOR_GFX_PAGEX1 + (DXSIZE - (xsize - 2) * font_width) / 2,
-		 DOOR_GFX_PAGEY1 + 11 * (font_height + line_spacing * 0),
-		 (xsize - 2) * font_width,
-		 (ysize - 2 - 13) * (font_height + line_spacing),
-		 sx + font_width,
-		 sy + (font_height + line_spacing) * (1 + 13));
-#else
-    if ((ysize - 2) > 13)
-      BlitBitmap(bitmap_db_door, drawto,
-		 DOOR_GFX_PAGEX1 + (DXSIZE - (xsize - 2) * font_width) / 2,
-		 DOOR_GFX_PAGEY1 + 13 * font_height,
-		 (xsize - 2) * font_width,
-		 (ysize - 2 - 13) * font_height,
-		 sx + font_width,
-		 sy + font_height * (1 + 13));
-#endif
-
-#if 1
-    redraw_mask = REDRAW_FIELD | REDRAW_FROM_BACKBUFFER;
-    // redraw_mask |= REDRAW_ALL | REDRAW_FROM_BACKBUFFER;
-#else
-    redraw_mask |= REDRAW_FIELD | REDRAW_FROM_BACKBUFFER;
-#endif
-
-#if 1
-    DoAnimation();
-    BackToFront();
-#else
-    BackToFront();
-#endif
-
-    WaitUntilDelayReached(&anim_delay, anim_delay_value / 2);
-  }
-
-#if 1
-  free(text_copy);
-#endif
-}
-
-#endif
 
 void ShowEnvelopeRequest(char *text, unsigned int req_state, int action)
 {
-#if 1
   int last_game_status = game_status;	/* save current game status */
-  // int last_draw_background_mask = gfx.draw_background_mask;
-#endif
-#if 1
   int graphic = IMG_BACKGROUND_REQUEST;
   int sound_opening = SND_REQUEST_OPENING;
   int sound_closing = SND_REQUEST_CLOSING;
-#else
-  int envelope_nr = 0;
-  int element = EL_ENVELOPE_1 + envelope_nr;
-  int graphic = IMG_BACKGROUND_ENVELOPE_1 + envelope_nr;
-  int sound_opening = element_info[element].sound[ACTION_OPENING];
-  int sound_closing = element_info[element].sound[ACTION_CLOSING];
-#endif
-#if 0
-  boolean ffwd_delay = (tape.playing && tape.fast_forward);
-  boolean no_delay = (tape.warp_forward);
-  int normal_delay_value = ONE_SECOND_DELAY / (ffwd_delay ? 2 : 1);
-  int wait_delay_value = (no_delay ? 0 : normal_delay_value);
-#endif
   int anim_mode = graphic_info[graphic].anim_mode;
   int main_anim_mode = (anim_mode == ANIM_NONE ? ANIM_VERTICAL|ANIM_HORIZONTAL:
 			anim_mode == ANIM_DEFAULT ? ANIM_VERTICAL : anim_mode);
-#if 0
-  char *text_copy = getStringCopy(text);
-  char *text_ptr;
 
-  for (text_ptr = text_copy; *text_ptr; text_ptr++)
-    if (*text_ptr == ' ')
-      *text_ptr = '\n';
-#endif
-
-#if 1
   if (game_status == GAME_MODE_PLAYING)
-  {
-#if 1
-#if 1
     BlitScreenToBitmap(backbuffer);
-#else
-    if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
-      BlitScreenToBitmap_EM(backbuffer);
-    else if (level.game_engine_type == GAME_ENGINE_TYPE_SP)
-      BlitScreenToBitmap_SP(backbuffer);
-    else
-      BlitScreenToBitmap_RND(backbuffer);
-#endif
-#else
-    if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
-      BlitScreenToBitmap_EM(backbuffer);
-    else if (level.game_engine_type == GAME_ENGINE_TYPE_SP)
-      BlitScreenToBitmap_SP(backbuffer);
-    else
-    {
-      BlitBitmap(fieldbuffer, backbuffer, FX, FY, SXSIZE, SYSIZE, SX, SY);
-    }
-#endif
-  }
 
   SetDrawtoField(DRAW_BACKBUFFER);
 
@@ -3445,30 +2450,24 @@ void ShowEnvelopeRequest(char *text, unsigned int req_state, int action)
   {
     BlitBitmap(backbuffer, bitmap_db_store, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
 
-#if 1
-  if (req_state & REQ_ASK)
-  {
-    MapGadget(tool_gadget[TOOL_CTRL_ID_YES]);
-    MapGadget(tool_gadget[TOOL_CTRL_ID_NO]);
-  }
-  else if (req_state & REQ_CONFIRM)
-  {
-    MapGadget(tool_gadget[TOOL_CTRL_ID_CONFIRM]);
-  }
-  else if (req_state & REQ_PLAYER)
-  {
-    MapGadget(tool_gadget[TOOL_CTRL_ID_PLAYER_1]);
-    MapGadget(tool_gadget[TOOL_CTRL_ID_PLAYER_2]);
-    MapGadget(tool_gadget[TOOL_CTRL_ID_PLAYER_3]);
-    MapGadget(tool_gadget[TOOL_CTRL_ID_PLAYER_4]);
-  }
-#endif
+    if (req_state & REQ_ASK)
+    {
+      MapGadget(tool_gadget[TOOL_CTRL_ID_YES]);
+      MapGadget(tool_gadget[TOOL_CTRL_ID_NO]);
+    }
+    else if (req_state & REQ_CONFIRM)
+    {
+      MapGadget(tool_gadget[TOOL_CTRL_ID_CONFIRM]);
+    }
+    else if (req_state & REQ_PLAYER)
+    {
+      MapGadget(tool_gadget[TOOL_CTRL_ID_PLAYER_1]);
+      MapGadget(tool_gadget[TOOL_CTRL_ID_PLAYER_2]);
+      MapGadget(tool_gadget[TOOL_CTRL_ID_PLAYER_3]);
+      MapGadget(tool_gadget[TOOL_CTRL_ID_PLAYER_4]);
+    }
 
-#if 1
     DrawEnvelopeRequest(text);
-#else
-    DrawEnvelopeRequest(text_copy);
-#endif
 
     if (game_status != GAME_MODE_MAIN)
       InitAnimation();
@@ -3476,7 +2475,6 @@ void ShowEnvelopeRequest(char *text, unsigned int req_state, int action)
 
   /* force DOOR font inside door area */
   game_status = GAME_MODE_PSEUDO_DOOR;
-#endif
 
   game.envelope_active = TRUE;	/* needed for RedrawPlayfield() events */
 
@@ -3489,12 +2487,6 @@ void ShowEnvelopeRequest(char *text, unsigned int req_state, int action)
 
     AnimateEnvelopeRequest(main_anim_mode, ACTION_OPENING);
 
-#if 0
-    if (tape.playing)
-      Delay(wait_delay_value);
-    else
-      WaitForEventToContinue();
-#endif
   }
   else
   {
@@ -3509,13 +2501,7 @@ void ShowEnvelopeRequest(char *text, unsigned int req_state, int action)
 
   game.envelope_active = FALSE;
 
-#if 1
-  // game_status = last_game_status;	/* restore current game status */
-
-#if 1
-  /* !!! CHECK AGAIN (SEE BELOW) !!! */
   game_status = last_game_status;	/* restore current game status */
-#endif
 
   if (action == ACTION_CLOSING)
   {
@@ -3524,49 +2510,20 @@ void ShowEnvelopeRequest(char *text, unsigned int req_state, int action)
 
     BlitBitmap(bitmap_db_store, backbuffer, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
   }
-#else
-  SetDrawtoField(DRAW_BUFFERED);
-#endif
 
   // SetDrawBackgroundMask(last_draw_background_mask);
 
-#if 0
-  redraw_mask = REDRAW_FIELD;
-  // redraw_mask |= REDRAW_ALL;
-#else
-  /* CHECK AGAIN (previous code reactivated) */
   redraw_mask |= REDRAW_FIELD;
-#endif
 
-#if 1
   if (game_status == GAME_MODE_MAIN)
     DoAnimation();
 
   BackToFront();
 
-#if 0
-  /* (important: after "BackToFront()", but before "SetDrawtoField()") */
-  game_status = last_game_status;	/* restore current game status */
-#endif
-
-#if 1
   if (action == ACTION_CLOSING &&
       game_status == GAME_MODE_PLAYING &&
       level.game_engine_type == GAME_ENGINE_TYPE_RND)
     SetDrawtoField(DRAW_BUFFERED);
-#else
-  if (game_status == GAME_MODE_PLAYING &&
-      level.game_engine_type == GAME_ENGINE_TYPE_RND)
-    SetDrawtoField(DRAW_BUFFERED);
-#endif
-
-#else
-  BackToFront();
-#endif
-
-#if 0
-  free(text_copy);
-#endif
 }
 
 void DrawPreviewElement(int dst_x, int dst_y, int element, int tilesize)
@@ -3583,17 +2540,8 @@ void DrawLevel(int draw_background_mask)
 {
   int x,y;
 
-#if 1
   SetMainBackgroundImage(IMG_BACKGROUND_PLAYING);
   SetDrawBackgroundMask(draw_background_mask);
-#else
-#if 1
-  SetMainBackgroundImage(IMG_BACKGROUND_PLAYING);
-  SetDrawBackgroundMask(REDRAW_FIELD);
-#else
-  SetDrawBackgroundMask(REDRAW_NONE);
-#endif
-#endif
 
   ClearField();
 
@@ -3631,22 +2579,13 @@ static void DrawPreviewLevelPlayfieldExt(int from_x, int from_y)
   int dst_y = SY + ALIGNED_YPOS(preview.y, preview_height, preview.valign);
   int x, y;
 
-#if 1
   if (!IN_GFX_FIELD_FULL(dst_x, dst_y + preview_height - 1))
     return;
-#endif
 
-#if 0
-  dst_x += (preview_width  - real_preview_width)  / 2;
-  dst_y += (preview_height - real_preview_height) / 2;
-
-  DrawBackground(dst_x, dst_y, real_preview_width, real_preview_height);
-#else
   DrawBackground(dst_x, dst_y, preview_width, preview_height);
 
   dst_x += (preview_width  - real_preview_width)  / 2;
   dst_y += (preview_height - real_preview_height) / 2;
-#endif
 
   for (x = 0; x < real_preview_xsize; x++)
   {
@@ -3694,7 +2633,6 @@ static void DrawPreviewLevelLabelExt(int mode)
   struct TextPosInfo *pos = &menu.main.text.level_info_2;
   char label_text[MAX_OUTPUT_LINESIZE + 1];
   int max_len_label_text;
-#if 1
   int font_nr = pos->font;
   int i;
 
@@ -3705,42 +2643,18 @@ static void DrawPreviewLevelLabelExt(int mode)
       mode == MICROLABEL_IMPORTED_FROM_HEAD ||
       mode == MICROLABEL_IMPORTED_BY_HEAD)
     font_nr = pos->font_alt;
-#else
-  int font_nr = FONT_TEXT_2;
-  int i;
 
-  if (mode == MICROLABEL_LEVEL_AUTHOR_HEAD ||
-      mode == MICROLABEL_IMPORTED_FROM_HEAD ||
-      mode == MICROLABEL_IMPORTED_BY_HEAD)
-    font_nr = FONT_TEXT_3;
-#endif
-
-#if 1
   max_len_label_text = getMaxTextLength(pos, font_nr);
-#else
-  max_len_label_text = SXSIZE / getFontWidth(font_nr);
-#endif
 
-#if 1
   if (pos->size != -1)
     max_len_label_text = pos->size;
-#endif
 
   for (i = 0; i < max_len_label_text; i++)
     label_text[i] = ' ';
   label_text[max_len_label_text] = '\0';
 
   if (strlen(label_text) > 0)
-  {
-#if 1
     DrawTextSAligned(pos->x, pos->y, label_text, font_nr, pos->align);
-#else
-    int lxpos = SX + (SXSIZE - getTextWidth(label_text, font_nr)) / 2;
-    int lypos = MICROLABEL2_YPOS;
-
-    DrawText(lxpos, lypos, label_text, font_nr);
-#endif
-  }
 
   strncpy(label_text,
 	  (mode == MICROLABEL_LEVEL_NAME ? level.name :
@@ -3754,16 +2668,7 @@ static void DrawPreviewLevelLabelExt(int mode)
   label_text[max_len_label_text] = '\0';
 
   if (strlen(label_text) > 0)
-  {
-#if 1
     DrawTextSAligned(pos->x, pos->y, label_text, font_nr, pos->align);
-#else
-    int lxpos = SX + (SXSIZE - getTextWidth(label_text, font_nr)) / 2;
-    int lypos = MICROLABEL2_YPOS;
-
-    DrawText(lxpos, lypos, label_text, font_nr);
-#endif
-  }
 
   redraw_mask |= REDRAW_MICROLEVEL;
 }
@@ -3779,11 +2684,6 @@ static void DrawPreviewLevelExt(boolean restart)
   int level_xsize = lev_fieldx + (show_level_border ? 2 : 0);
   int level_ysize = lev_fieldy + (show_level_border ? 2 : 0);
   int last_game_status = game_status;		/* save current game status */
-
-#if 0
-  /* force PREVIEW font on preview level */
-  game_status = GAME_MODE_PSEUDO_PREVIEW;
-#endif
 
   if (restart)
   {
@@ -3816,38 +2716,17 @@ static void DrawPreviewLevelExt(boolean restart)
     {
       struct TextPosInfo *pos = &menu.main.text.level_info_1;
       char label_text[MAX_OUTPUT_LINESIZE + 1];
-#if 1
       int font_nr = pos->font;
-#else
-      int font_nr = FONT_TEXT_1;
-#endif
-#if 1
       int max_len_label_text = getMaxTextLength(pos, font_nr);
-#else
-      int max_len_label_text = SXSIZE / getFontWidth(font_nr);
-#endif
-#if 0
-      int text_width;
-      int lxpos, lypos;
-#endif
 
-#if 1
       if (pos->size != -1)
 	max_len_label_text = pos->size;
-#endif
 
       strncpy(label_text, leveldir_current->name, max_len_label_text);
       label_text[max_len_label_text] = '\0';
 
-#if 1
       if (IN_GFX_FIELD_FULL(pos->x, pos->y + getFontHeight(pos->font)))
 	DrawTextSAligned(pos->x, pos->y, label_text, font_nr, pos->align);
-#else
-      lxpos = SX + (SXSIZE - getTextWidth(label_text, font_nr)) / 2;
-      lypos = SY + MICROLABEL1_YPOS;
-
-      DrawText(lxpos, lypos, label_text, font_nr);
-#endif
     }
 
     game_status = last_game_status;	/* restore current game status */
@@ -3995,13 +2874,9 @@ inline void DrawGraphicAnimation(int x, int y, int graphic)
   if (!IN_SCR_FIELD(x, y))
     return;
 
-#if NEW_TILESIZE
   DrawGraphicAnimationExt(drawto_field, FX + x * TILEX_VAR, FY + y * TILEY_VAR,
 			  graphic, GfxFrame[lx][ly], NO_MASKING);
-#else
-  DrawGraphicAnimationExt(drawto_field, FX + x * TILEX, FY + y * TILEY,
-			  graphic, GfxFrame[lx][ly], NO_MASKING);
-#endif
+
   MarkTileDirty(x, y);
 }
 
@@ -4250,15 +3125,10 @@ void DrawPlayer(struct PlayerInfo *player)
       GfxElement[jx][jy] = EL_UNDEFINED;
 
       /* make sure that pushed elements are drawn with correct frame rate */
-#if 1
       graphic = el_act_dir2img(element, ACTION_PUSHING, move_dir);
 
       if (player->is_pushing && player->is_moving && !IS_ANIM_MODE_CE(graphic))
 	GfxFrame[jx][jy] = player->StepFrame;
-#else
-      if (player->is_pushing && player->is_moving)
-	GfxFrame[jx][jy] = player->StepFrame;
-#endif
 
       DrawLevelField(jx, jy);
     }
@@ -4318,13 +3188,6 @@ void DrawPlayer(struct PlayerInfo *player)
   /* draw things the player is pushing, if needed                            */
   /* ----------------------------------------------------------------------- */
 
-#if 0
-  printf("::: %d, %d [%d, %d] [%d]\n",
-	 player->is_pushing, player_is_moving, player->GfxAction,
-	 player->is_moving, player_is_moving);
-#endif
-
-#if 1
   if (player->is_pushing && player->is_moving)
   {
     int px = SCREENX(jx), py = SCREENY(jy);
@@ -4344,15 +3207,10 @@ void DrawPlayer(struct PlayerInfo *player)
 
     graphic = el_act_dir2img(element, ACTION_PUSHING, move_dir);
 
-#if 1
     sync_frame = (IS_ANIM_MODE_CE(graphic) ? gfx_frame : player->StepFrame);
     frame = getGraphicAnimationFrame(graphic, sync_frame);
-#else
-    frame = getGraphicAnimationFrame(graphic, player->StepFrame);
-#endif
 
     /* draw background element under pushed element (like the Sokoban field) */
-#if 1
     if (game.use_masked_pushing && IS_MOVING(jx, jy))
     {
       /* this allows transparent pushing animation over non-black background */
@@ -4369,20 +3227,6 @@ void DrawPlayer(struct PlayerInfo *player)
     }
     else if (Back[next_jx][next_jy])
       DrawLevelElement(next_jx, next_jy, Back[next_jx][next_jy]);
-#else
-    if (Back[next_jx][next_jy])
-      DrawLevelElement(next_jx, next_jy, Back[next_jx][next_jy]);
-#endif
-
-#if 0
-    printf("::: %d, %d, %d, %d [%d] [%d, %d, %d] [%d] [%d, %d] [%d, %d]\n",
-	   jx, px, player->GfxPos, player->StepFrame,
-	   player->is_pushing,
-	   dx, sxx, pxx,
-	   IS_MOVING(jx, jy),
-	   graphic, frame,
-	   GfxFrame[jx][jy], GfxFrame[next_jx][next_jy]);
-#endif
 
 #if 1
     /* do not draw (EM style) pushing animation when pushing is finished */
@@ -4397,7 +3241,6 @@ void DrawPlayer(struct PlayerInfo *player)
     DrawGraphicShiftedThruMask(px, py, pxx, pyy, graphic, frame, NO_CUTTING);
 #endif
   }
-#endif
 
 #if DRAW_PLAYER_OVER_PUSHED_ELEMENT
   /* ----------------------------------------------------------------------- */
@@ -4505,9 +3348,7 @@ void WaitForEventToContinue()
 
   button_status = MB_RELEASED;
 
-#if 1
   ClearEventQueue();
-#endif
 
   while (still_wait)
   {
@@ -4548,8 +3389,6 @@ void WaitForEventToContinue()
 #define MAX_REQUEST_LINES		13
 #define MAX_REQUEST_LINE_FONT1_LEN	7
 #define MAX_REQUEST_LINE_FONT2_LEN	10
-
-#if 1
 
 static int RequestHandleEvents(unsigned int req_state)
 {
@@ -4683,8 +3522,6 @@ static int RequestHandleEvents(unsigned int req_state)
 	result = 0;
     }
 
-#if 1
-
     if (game_status == GAME_MODE_PLAYING && local_player->LevelSolved_GameEnd)
     {
       HandleGameActions();
@@ -4697,29 +3534,11 @@ static int RequestHandleEvents(unsigned int req_state)
 	Delay(10);
     }
 
-#if 1
     game_status = GAME_MODE_PSEUDO_DOOR;
-#endif
 
     BackToFront();
 
-#if 1
     game_status = last_game_status;	/* restore current game status */
-#endif
-
-#else
-
-    DoAnimation();
-
-#if 1
-    if (!PendingEvent())	/* delay only if no pending events */
-      Delay(10);
-#else
-    /* don't eat all CPU time */
-    Delay(10);
-#endif
-
-#endif
   }
 
   return result;
@@ -4742,16 +3561,7 @@ static boolean RequestDoor(char *text, unsigned int req_state)
   }
 
   if (game_status == GAME_MODE_PLAYING)
-  {
-#if 1
     BlitScreenToBitmap(backbuffer);
-#else
-    if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
-      BlitScreenToBitmap_EM(backbuffer);
-    else if (level.game_engine_type == GAME_ENGINE_TYPE_SP)
-      BlitScreenToBitmap_SP(backbuffer);
-#endif
-  }
 
   /* disable deactivated drawing when quick-loading level tape recording */
   if (tape.playing && tape.deactivate_display)
@@ -4783,14 +3593,8 @@ static boolean RequestDoor(char *text, unsigned int req_state)
     CloseDoor(DOOR_CLOSE_1);
 
     /* save old door content */
-#if 1
     BlitBitmap(bitmap_db_door_1, bitmap_db_door_1,
 	       0 * DXSIZE, 0, DXSIZE, DYSIZE, 1 * DXSIZE, 0);
-#else
-    BlitBitmap(bitmap_db_door, bitmap_db_door,
-	       DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1, DXSIZE, DYSIZE,
-	       DOOR_GFX_PAGEX2, DOOR_GFX_PAGEY1);
-#endif
   }
 
   SetDoorBackgroundImage(IMG_BACKGROUND_DOOR);
@@ -4860,13 +3664,7 @@ static boolean RequestDoor(char *text, unsigned int req_state)
   }
 
   /* copy request gadgets to door backbuffer */
-#if 1
   BlitBitmap(drawto, bitmap_db_door_1, DX, DY, DXSIZE, DYSIZE, 0, 0);
-#else
-  BlitBitmap(drawto, bitmap_db_door,
-	     DX, DY, DXSIZE, DYSIZE,
-	     DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1);
-#endif
 
   OpenDoor(DOOR_OPEN_1);
 
@@ -4937,30 +3735,9 @@ static boolean RequestDoor(char *text, unsigned int req_state)
 static boolean RequestEnvelope(char *text, unsigned int req_state)
 {
   int result;
-#if 0
-  int i;
-#endif
 
   if (game_status == GAME_MODE_PLAYING)
-  {
-#if 1
-#if 1
     BlitScreenToBitmap(backbuffer);
-#else
-    if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
-      BlitScreenToBitmap_EM(backbuffer);
-    else if (level.game_engine_type == GAME_ENGINE_TYPE_SP)
-      BlitScreenToBitmap_SP(backbuffer);
-    else
-      BlitScreenToBitmap_RND(backbuffer);
-#endif
-#else
-    if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
-      BlitScreenToBitmap_EM(backbuffer);
-    else if (level.game_engine_type == GAME_ENGINE_TYPE_SP)
-      BlitScreenToBitmap_SP(backbuffer);
-#endif
-  }
 
   /* disable deactivated drawing when quick-loading level tape recording */
   if (tape.playing && tape.deactivate_display)
@@ -4989,73 +3766,7 @@ static boolean RequestEnvelope(char *text, unsigned int req_state)
   /* clear door drawing field */
   // DrawBackground(DX, DY, DXSIZE, DYSIZE);
 
-#if 0
-  if (global.use_envelope_request)
-  {
-    /* !!! TMP !!! */
-    FreeToolButtons();
-    CreateToolButtons();
-  }
-#endif
-
-#if 0
-#if 0
-  if (req_state & REQ_ASK)
-  {
-    MapGadgetExt(tool_gadget[TOOL_CTRL_ID_YES], FALSE);
-    MapGadgetExt(tool_gadget[TOOL_CTRL_ID_NO], FALSE);
-  }
-  else if (req_state & REQ_CONFIRM)
-  {
-    MapGadgetExt(tool_gadget[TOOL_CTRL_ID_CONFIRM], FALSE);
-  }
-  else if (req_state & REQ_PLAYER)
-  {
-    MapGadgetExt(tool_gadget[TOOL_CTRL_ID_PLAYER_1], FALSE);
-    MapGadgetExt(tool_gadget[TOOL_CTRL_ID_PLAYER_2], FALSE);
-    MapGadgetExt(tool_gadget[TOOL_CTRL_ID_PLAYER_3], FALSE);
-    MapGadgetExt(tool_gadget[TOOL_CTRL_ID_PLAYER_4], FALSE);
-  }
-#else
-  if (req_state & REQ_ASK)
-  {
-    MapGadget(tool_gadget[TOOL_CTRL_ID_YES]);
-    MapGadget(tool_gadget[TOOL_CTRL_ID_NO]);
-  }
-  else if (req_state & REQ_CONFIRM)
-  {
-    MapGadget(tool_gadget[TOOL_CTRL_ID_CONFIRM]);
-  }
-  else if (req_state & REQ_PLAYER)
-  {
-    MapGadget(tool_gadget[TOOL_CTRL_ID_PLAYER_1]);
-    MapGadget(tool_gadget[TOOL_CTRL_ID_PLAYER_2]);
-    MapGadget(tool_gadget[TOOL_CTRL_ID_PLAYER_3]);
-    MapGadget(tool_gadget[TOOL_CTRL_ID_PLAYER_4]);
-  }
-#endif
-#endif
-
   ShowEnvelopeRequest(text, req_state, ACTION_OPENING);
-
-#if 0
-  for (i = 0; i < NUM_TOOL_BUTTONS; i++)
-  {
-    if ((req_state & REQ_ASK && (i == TOOL_CTRL_ID_YES ||
-				 i == TOOL_CTRL_ID_NO)) ||
-	(req_state & REQ_CONFIRM && i == TOOL_CTRL_ID_CONFIRM) ||
-	(req_state & REQ_PLAYER && (i == TOOL_CTRL_ID_PLAYER_1 &&
-				    i == TOOL_CTRL_ID_PLAYER_2 &&
-				    i == TOOL_CTRL_ID_PLAYER_3 &&
-				    i == TOOL_CTRL_ID_PLAYER_4)))
-    {
-      int x = tool_gadget[i]->x + dDX;
-      int y = tool_gadget[i]->y + dDY;
-
-      ModifyGadget(tool_gadget[i], GDI_X, x, GDI_Y, y, GDI_END);
-    }
-  }
-#endif
 
   if (!(req_state & REQUEST_WAIT_FOR_INPUT))
   {
@@ -5071,11 +3782,6 @@ static boolean RequestEnvelope(char *text, unsigned int req_state)
 
     return FALSE;
   }
-
-#if 0
-  if (game_status != GAME_MODE_MAIN)
-    InitAnimation();
-#endif
 
   SetDrawBackgroundMask(REDRAW_FIELD | REDRAW_DOOR_1);
 
@@ -5123,453 +3829,6 @@ boolean Request(char *text, unsigned int req_state)
   else
     return RequestDoor(text, req_state);
 }
-
-#else	// =====================================================================
-
-boolean Request(char *text, unsigned int req_state)
-{
-  int mx, my, ty, result = -1;
-  unsigned int old_door_state;
-  int last_game_status = game_status;	/* save current game status */
-  int max_request_line_len = MAX_REQUEST_LINE_FONT1_LEN;
-  int font_nr = FONT_TEXT_2;
-#if 0
-  int max_word_len = 0;
-#endif
-  char *text_ptr;
-  int i;
-
-#if 0
-  global.use_envelope_request = 1;
-#endif
-
-#if 1
-  if (maxWordLengthInString(text) > MAX_REQUEST_LINE_FONT1_LEN)
-  {
-    max_request_line_len = MAX_REQUEST_LINE_FONT2_LEN;
-    font_nr = FONT_TEXT_1;
-  }
-#else
-  for (text_ptr = text; *text_ptr; text_ptr++)
-  {
-    max_word_len = (*text_ptr != ' ' ? max_word_len + 1 : 0);
-
-    if (max_word_len > MAX_REQUEST_LINE_FONT1_LEN)
-    {
-      max_request_line_len = MAX_REQUEST_LINE_FONT2_LEN;
-#if 1
-      font_nr = FONT_TEXT_1;
-#else
-      font_nr = FONT_LEVEL_NUMBER;
-#endif
-
-      break;
-    }
-  }
-#endif
-
-  if (game_status == GAME_MODE_PLAYING)
-  {
-#if 1
-    BlitScreenToBitmap(backbuffer);
-#else
-    if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
-      BlitScreenToBitmap_EM(backbuffer);
-    else if (level.game_engine_type == GAME_ENGINE_TYPE_SP)
-      BlitScreenToBitmap_SP(backbuffer);
-#endif
-  }
-
-  /* disable deactivated drawing when quick-loading level tape recording */
-  if (tape.playing && tape.deactivate_display)
-    TapeDeactivateDisplayOff(TRUE);
-
-  SetMouseCursor(CURSOR_DEFAULT);
-
-#if defined(NETWORK_AVALIABLE)
-  /* pause network game while waiting for request to answer */
-  if (options.network &&
-      game_status == GAME_MODE_PLAYING &&
-      req_state & REQUEST_WAIT_FOR_INPUT)
-    SendToServer_PausePlaying();
-#endif
-
-  old_door_state = GetDoorState();
-
-  /* simulate releasing mouse button over last gadget, if still pressed */
-  if (button_status)
-    HandleGadgets(-1, -1, 0);
-
-  UnmapAllGadgets();
-
-  /* draw released gadget before proceeding */
-  // BackToFront();
-
-#if 0
-  if (old_door_state & DOOR_OPEN_1 && !global.use_envelope_request)
-#else
-  if (old_door_state & DOOR_OPEN_1)
-#endif
-  {
-#if 1
-    if (!global.use_envelope_request)
-      CloseDoor(DOOR_CLOSE_1);
-#else
-    CloseDoor(DOOR_CLOSE_1);
-#endif
-
-    /* save old door content */
-    BlitBitmap(bitmap_db_door, bitmap_db_door,
-	       DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1, DXSIZE, DYSIZE,
-	       DOOR_GFX_PAGEX2, DOOR_GFX_PAGEY1);
-  }
-
-#if 1
-  SetDoorBackgroundImage(IMG_BACKGROUND_DOOR);
-#endif
-
-  SetDrawBackgroundMask(REDRAW_FIELD | REDRAW_DOOR_1);
-
-  /* clear door drawing field */
-  DrawBackground(DX, DY, DXSIZE, DYSIZE);
-
-  /* force DOOR font inside door area */
-  game_status = GAME_MODE_PSEUDO_DOOR;
-
-  /* write text for request */
-  for (text_ptr = text, ty = 0; ty < MAX_REQUEST_LINES; ty++)
-  {
-    char text_line[max_request_line_len + 1];
-    int tx, tl, tc = 0;
-
-    if (!*text_ptr)
-      break;
-
-    for (tl = 0, tx = 0; tx < max_request_line_len; tl++, tx++)
-    {
-      tc = *(text_ptr + tx);
-      if (!tc || tc == ' ')
-	break;
-    }
-
-    if (!tl)
-    { 
-      text_ptr++; 
-      ty--; 
-      continue; 
-    }
-
-    strncpy(text_line, text_ptr, tl);
-    text_line[tl] = 0;
-
-    DrawText(DX + (DXSIZE - tl * getFontWidth(font_nr)) / 2,
-	     DY + 8 + ty * (getFontHeight(font_nr) + 2),
-	     text_line, font_nr);
-
-    text_ptr += tl + (tc == ' ' ? 1 : 0);
-  }
-
-  game_status = last_game_status;	/* restore current game status */
-
-#if 1
-  if (global.use_envelope_request)
-  {
-    /* !!! TMP !!! */
-    FreeToolButtons();
-    CreateToolButtons();
-  }
-#endif
-
-  if (req_state & REQ_ASK)
-  {
-    MapGadget(tool_gadget[TOOL_CTRL_ID_YES]);
-    MapGadget(tool_gadget[TOOL_CTRL_ID_NO]);
-  }
-  else if (req_state & REQ_CONFIRM)
-  {
-    MapGadget(tool_gadget[TOOL_CTRL_ID_CONFIRM]);
-  }
-  else if (req_state & REQ_PLAYER)
-  {
-    MapGadget(tool_gadget[TOOL_CTRL_ID_PLAYER_1]);
-    MapGadget(tool_gadget[TOOL_CTRL_ID_PLAYER_2]);
-    MapGadget(tool_gadget[TOOL_CTRL_ID_PLAYER_3]);
-    MapGadget(tool_gadget[TOOL_CTRL_ID_PLAYER_4]);
-  }
-
-  /* copy request gadgets to door backbuffer */
-  BlitBitmap(drawto, bitmap_db_door,
-	     DX, DY, DXSIZE, DYSIZE,
-	     DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1);
-
-#if 1
-  if (global.use_envelope_request)
-  {
-    ShowEnvelopeRequest(text, ACTION_OPENING);
-
-    for (i = 0; i < NUM_TOOL_BUTTONS; i++)
-    {
-      if ((req_state & REQ_ASK && (i == TOOL_CTRL_ID_YES ||
-				   i == TOOL_CTRL_ID_NO)) ||
-	  (req_state & REQ_CONFIRM && i == TOOL_CTRL_ID_CONFIRM) ||
-	  (req_state & REQ_PLAYER && (i == TOOL_CTRL_ID_PLAYER_1 &&
-				      i == TOOL_CTRL_ID_PLAYER_2 &&
-				      i == TOOL_CTRL_ID_PLAYER_3 &&
-				      i == TOOL_CTRL_ID_PLAYER_4)))
-      {
-	int x = tool_gadget[i]->x + dDX;
-	int y = tool_gadget[i]->y + dDY;
-
-	ModifyGadget(tool_gadget[i], GDI_X, x, GDI_Y, y, GDI_END);
-      }
-    }
-  }
-#endif
-
-#if 1
-  if (!global.use_envelope_request)
-    OpenDoor(DOOR_OPEN_1);
-#else
-  OpenDoor(DOOR_OPEN_1);
-#endif
-
-  if (!(req_state & REQUEST_WAIT_FOR_INPUT))
-  {
-    if (game_status == GAME_MODE_PLAYING)
-    {
-      SetPanelBackground();
-      SetDrawBackgroundMask(REDRAW_DOOR_1);
-    }
-    else
-    {
-      SetDrawBackgroundMask(REDRAW_FIELD);
-    }
-
-    return FALSE;
-  }
-
-#if 1
-  if (game_status != GAME_MODE_MAIN && !global.use_envelope_request)
-    InitAnimation();
-#else
-  if (game_status != GAME_MODE_MAIN)
-    InitAnimation();
-#endif
-
-  button_status = MB_RELEASED;
-
-  request_gadget_id = -1;
-
-  SetDrawBackgroundMask(REDRAW_FIELD | REDRAW_DOOR_1);
-
-  while (result < 0)
-  {
-    if (PendingEvent())
-    {
-      Event event;
-
-      NextEvent(&event);
-
-      switch (event.type)
-      {
-	case EVENT_BUTTONPRESS:
-	case EVENT_BUTTONRELEASE:
-	case EVENT_MOTIONNOTIFY:
-	{
-	  if (event.type == EVENT_MOTIONNOTIFY)
-	  {
-	    if (!PointerInWindow(window))
-	      continue;	/* window and pointer are on different screens */
-
-	    if (!button_status)
-	      continue;
-
-	    motion_status = TRUE;
-	    mx = ((MotionEvent *) &event)->x;
-	    my = ((MotionEvent *) &event)->y;
-	  }
-	  else
-	  {
-	    motion_status = FALSE;
-	    mx = ((ButtonEvent *) &event)->x;
-	    my = ((ButtonEvent *) &event)->y;
-	    if (event.type == EVENT_BUTTONPRESS)
-	      button_status = ((ButtonEvent *) &event)->button;
-	    else
-	      button_status = MB_RELEASED;
-	  }
-
-	  /* this sets 'request_gadget_id' */
-	  HandleGadgets(mx, my, button_status);
-
-	  switch (request_gadget_id)
-	  {
-	    case TOOL_CTRL_ID_YES:
-	      result = TRUE;
-	      break;
-	    case TOOL_CTRL_ID_NO:
-	      result = FALSE;
-	      break;
-	    case TOOL_CTRL_ID_CONFIRM:
-	      result = TRUE | FALSE;
-	      break;
-
-	    case TOOL_CTRL_ID_PLAYER_1:
-	      result = 1;
-	      break;
-	    case TOOL_CTRL_ID_PLAYER_2:
-	      result = 2;
-	      break;
-	    case TOOL_CTRL_ID_PLAYER_3:
-	      result = 3;
-	      break;
-	    case TOOL_CTRL_ID_PLAYER_4:
-	      result = 4;
-	      break;
-
-	    default:
-	      break;
-	  }
-
-	  break;
-	}
-
-	case EVENT_KEYPRESS:
-	  switch (GetEventKey((KeyEvent *)&event, TRUE))
-	  {
-	    case KSYM_space:
-	      if (req_state & REQ_CONFIRM)
-		result = 1;
-	      break;
-
-	    case KSYM_Return:
-	      result = 1;
-	      break;
-
-	    case KSYM_Escape:
-#if defined(TARGET_SDL2)
-	    case KSYM_Back:
-#endif
-	      result = 0;
-	      break;
-
-	    default:
-	      break;
-	  }
-
-	  if (req_state & REQ_PLAYER)
-	    result = 0;
-	  break;
-
-	case EVENT_KEYRELEASE:
-	  ClearPlayerAction();
-	  break;
-
-	default:
-	  HandleOtherEvents(&event);
-	  break;
-      }
-    }
-    else if (AnyJoystickButton() == JOY_BUTTON_NEW_PRESSED)
-    {
-      int joy = AnyJoystick();
-
-      if (joy & JOY_BUTTON_1)
-	result = 1;
-      else if (joy & JOY_BUTTON_2)
-	result = 0;
-    }
-
-#if 1
-
-    if (game_status == GAME_MODE_PLAYING && local_player->LevelSolved_GameEnd)
-    {
-      HandleGameActions();
-    }
-    else
-    {
-      DoAnimation();
-
-      if (!PendingEvent())	/* delay only if no pending events */
-	Delay(10);
-    }
-
-#if 1
-    game_status = GAME_MODE_PSEUDO_DOOR;
-#endif
-
-    BackToFront();
-
-#if 1
-    game_status = last_game_status;	/* restore current game status */
-#endif
-
-#else
-
-    DoAnimation();
-
-#if 1
-    if (!PendingEvent())	/* delay only if no pending events */
-      Delay(10);
-#else
-    /* don't eat all CPU time */
-    Delay(10);
-#endif
-
-#endif
-  }
-
-  if (game_status != GAME_MODE_MAIN)
-    StopAnimation();
-
-  UnmapToolButtons();
-
-#if 1
-  if (global.use_envelope_request)
-    ShowEnvelopeRequest(text, ACTION_CLOSING);
-#endif
-
-#if 1
-  if (!(req_state & REQ_STAY_OPEN) && !global.use_envelope_request)
-#else
-  if (!(req_state & REQ_STAY_OPEN))
-#endif
-  {
-    CloseDoor(DOOR_CLOSE_1);
-
-    if (((old_door_state & DOOR_OPEN_1) && !(req_state & REQ_STAY_CLOSED)) ||
-	(req_state & REQ_REOPEN))
-      OpenDoor(DOOR_OPEN_1 | DOOR_COPY_BACK);
-  }
-
-  RemapAllGadgets();
-
-  if (game_status == GAME_MODE_PLAYING)
-  {
-    SetPanelBackground();
-    SetDrawBackgroundMask(REDRAW_DOOR_1);
-  }
-  else
-  {
-    SetDrawBackgroundMask(REDRAW_FIELD);
-  }
-
-#if defined(NETWORK_AVALIABLE)
-  /* continue network game after request */
-  if (options.network &&
-      game_status == GAME_MODE_PLAYING &&
-      req_state & REQUEST_WAIT_FOR_INPUT)
-    SendToServer_ContinuePlaying();
-#endif
-
-  /* restore deactivated drawing when quick-loading level tape recording */
-  if (tape.playing && tape.deactivate_display)
-    TapeDeactivateDisplayOn();
-
-  return result;
-}
-
-#endif
 
 static int compareDoorPartOrderInfo(const void *object1, const void *object2)
 {
@@ -5760,13 +4019,6 @@ void InitDoors()
     /* fill structure for door part draw order (sorted below) */
     dpo->nr = i;
     dpo->sort_priority = dpc->pos->sort_priority;
-
-#if 0
-    struct DoorPartPosInfo *pos = dpc->pos;
-
-    printf(":0: step_xoffset == %d, step_yoffset == %d\n",
-	   pos->step_xoffset, pos->step_yoffset);
-#endif
   }
 
   /* sort door part controls according to sort_priority and graphic number */
@@ -5778,7 +4030,6 @@ unsigned int OpenDoor(unsigned int door_state)
 {
   if (door_state & DOOR_COPY_BACK)
   {
-#if 1
     if (door_state & DOOR_OPEN_1)
       BlitBitmap(bitmap_db_door_1, bitmap_db_door_1,
 		 1 * DXSIZE, 0, DXSIZE, DYSIZE, 0 * DXSIZE, 0);
@@ -5786,17 +4037,6 @@ unsigned int OpenDoor(unsigned int door_state)
     if (door_state & DOOR_OPEN_2)
       BlitBitmap(bitmap_db_door_2, bitmap_db_door_2,
 		 1 * VXSIZE, 0, VXSIZE, VYSIZE, 0 * VXSIZE, 0);
-#else
-    if (door_state & DOOR_OPEN_1)
-      BlitBitmap(bitmap_db_door, bitmap_db_door,
-		 DOOR_GFX_PAGEX2, DOOR_GFX_PAGEY1, DXSIZE, DYSIZE,
-		 DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1);
-
-    if (door_state & DOOR_OPEN_2)
-      BlitBitmap(bitmap_db_door, bitmap_db_door,
-		 DOOR_GFX_PAGEX2, DOOR_GFX_PAGEY2, VXSIZE, VYSIZE,
-		 DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY2);
-#endif
 
     door_state &= ~DOOR_COPY_BACK;
   }
@@ -5810,7 +4050,6 @@ unsigned int CloseDoor(unsigned int door_state)
 
   if (!(door_state & DOOR_NO_COPY_BACK))
   {
-#if 1
     if (old_door_state & DOOR_OPEN_1)
       BlitBitmap(backbuffer, bitmap_db_door_1,
 		 DX, DY, DXSIZE, DYSIZE, 0, 0);
@@ -5818,15 +4057,6 @@ unsigned int CloseDoor(unsigned int door_state)
     if (old_door_state & DOOR_OPEN_2)
       BlitBitmap(backbuffer, bitmap_db_door_2,
 		 VX, VY, VXSIZE, VYSIZE, 0, 0);
-#else
-    if (old_door_state & DOOR_OPEN_1)
-      BlitBitmap(backbuffer, bitmap_db_door,
-		 DX, DY, DXSIZE, DYSIZE, DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1);
-
-    if (old_door_state & DOOR_OPEN_2)
-      BlitBitmap(backbuffer, bitmap_db_door,
-		 VX, VY, VXSIZE, VYSIZE, DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY2);
-#endif
 
     door_state &= ~DOOR_NO_COPY_BACK;
   }
@@ -5844,10 +4074,6 @@ unsigned int SetDoorState(unsigned int door_state)
   return MoveDoor(door_state | DOOR_SET_STATE);
 }
 
-#if 1
-
-// ========== TEST 1 ===========================================================
-
 int euclid(int a, int b)
 {
   return (b ? euclid(b, a % b) : a);
@@ -5855,13 +4081,6 @@ int euclid(int a, int b)
 
 unsigned int MoveDoor(unsigned int door_state)
 {
-#if 0
-  struct XY panel_pos_list[] =
-  {
-    { DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1 },
-    { DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY2 },
-  };
-#endif
   struct Rect door_rect_list[] =
   {
     { DX, DY, DXSIZE, DYSIZE },
@@ -5873,7 +4092,6 @@ unsigned int MoveDoor(unsigned int door_state)
   unsigned int door_delay_value;
   int i;
 
-#if 1
   if (door_1.width < 0 || door_1.width > DXSIZE)
     door_1.width = DXSIZE;
   if (door_1.height < 0 || door_1.height > DYSIZE)
@@ -5882,7 +4100,6 @@ unsigned int MoveDoor(unsigned int door_state)
     door_2.width = VXSIZE;
   if (door_2.height < 0 || door_2.height > VYSIZE)
     door_2.height = VYSIZE;
-#endif
 
   if (door_state == DOOR_GET_STATE)
     return (door1 | door2);
@@ -5909,27 +4126,14 @@ unsigned int MoveDoor(unsigned int door_state)
       door_state &= ~DOOR_CLOSE_2;
   }
 
-#if 0
-  door_delay_value = (door_state & DOOR_ACTION_1 ? door_1.step_delay :
-		      door_2.step_delay);
-
-  if (setup.quick_doors)
-  {
-    stepsize = 20;		/* must be chosen to always draw last frame */
-    door_delay_value = 0;
-  }
-#endif
-
   if (global.autoplay_leveldir)
   {
     door_state |= DOOR_NO_DELAY;
     door_state &= ~DOOR_CLOSE_ALL;
   }
 
-#if 1
   if (game_status == GAME_MODE_EDITOR)
     door_state |= DOOR_NO_DELAY;
-#endif
 
   if (door_state & DOOR_ACTION)
   {
@@ -5958,18 +4162,6 @@ unsigned int MoveDoor(unsigned int door_state)
       door_part_skip[i] = (!(door_state & door_token) ||
 			   !g->bitmap);
     }
-
-#if 0
-    for (i = 0; i < MAX_DOOR_PARTS; i++)
-    {
-      struct DoorPartControlInfo *dpc = &door_part_controls[i];
-      struct DoorPartPosInfo *pos = dpc->pos;
-      int start_step = pos->start_step;
-
-      printf("::: ---> %d: start_step == %d [%d]\n",
-	     i, start_step, door_part_done[i]);
-    }
-#endif
 
     for (i = 0; i < MAX_DOOR_PARTS; i++)
     {
@@ -6008,30 +4200,11 @@ unsigned int MoveDoor(unsigned int door_state)
       max_step_delay = (max_step_delay == 0 ? step_delay :
 			euclid(max_step_delay, step_delay));
       num_steps[nr] = move_steps;
-
-#if 0
-#if 0
-      printf("::: %d: move_delay == %d, start_step == %d [%d]\n",
-	     i, move_delay, start_step, door_part_order[i].nr);
-#else
-      if (DOOR_PART_IS_PANEL(i))
-	printf("::: %d: move_delay == %d, start_step == %d\n",
-	       i, move_delay, start_step);
-#endif
-#endif
     }
 
     num_move_steps = max_move_delay / max_step_delay;
 
     door_delay_value = max_step_delay;
-
-#if 0
-    door_delay_value *= 10;
-#endif
-
-#if 0
-    printf("::: num_move_steps == %d, max_move_delay == %d, max_step_delay == %d\n", num_move_steps, max_move_delay, max_step_delay);
-#endif
 
     for (k = 0; k < num_move_steps; k++)
     {
@@ -6049,9 +4222,6 @@ unsigned int MoveDoor(unsigned int door_state)
 	int door_token = dpc->door_token;
 	int door_index = DOOR_INDEX_FROM_TOKEN(door_token);
 	boolean is_panel = DOOR_PART_IS_PANEL(nr);
-#if 0
-	struct XY *panel_pos = &panel_pos_list[door_index];
-#endif
 	struct Rect *door_rect = &door_rect_list[door_index];
 	Bitmap *bitmap_db_door = (door_token == DOOR_1 ? bitmap_db_door_1 :
 				  bitmap_db_door_2);
@@ -6072,37 +4242,8 @@ unsigned int MoveDoor(unsigned int door_state)
 	int dst_x, dst_y, dst_xx, dst_yy;
 	int width, height;
 
-#if 0
-	if (k == 0 && is_panel && door_token == DOOR_2)
-	  printf("::: %d, %d\n", g->width, g->height);
-#endif
-
-#if 0
-	if (DOOR_PART_IS_PANEL(nr))
-	{
-	  int start_step = pos->start_step;
-
-	  k2 = (door_closing ? k1 : num_steps[nr] - k1);// - start_step;
-	  kk = (k2 < 0 ? 0 : k2);
-	}
-#endif
-
-#if 0
-	// !!! TEST !!!	
-	if (nr != 16 && nr != 0)
-	  continue;
-#endif
-
-#if 0
-	// !!! TEST !!!	
-	if (!is_panel)
-	  continue;
-#endif
-
-#if 1
 	if (door_part_skip[nr])
 	  continue;
-#endif
 
 	if (!(door_state & door_token))
 	  continue;
@@ -6110,23 +4251,12 @@ unsigned int MoveDoor(unsigned int door_state)
 	if (!g->bitmap)
 	  continue;
 
-#if 0
-	if (current_move_delay % step_delay)
-	  continue;
-#endif
-
 	// draw door panel
 
 	if (!door_panel_drawn[door_index])
 	{
-#if 1
 	  ClearRectangle(drawto, door_rect->x, door_rect->y,
 			 door_rect->width, door_rect->height);
-#else
-	  BlitBitmap(bitmap_db_door, drawto, panel_pos->x, panel_pos->y,
-		     door_rect->width, door_rect->height,
-		     door_rect->x, door_rect->y);
-#endif
 
 	  door_panel_drawn[door_index] = TRUE;
 	}
@@ -6183,13 +4313,8 @@ unsigned int MoveDoor(unsigned int door_state)
 
 	if (is_panel)
 	{
-#if 1
 	  src_x = src_xx;
 	  src_y = src_yy;
-#else
-	  src_x = panel_pos->x + src_xx;
-	  src_y = panel_pos->y + src_yy;
-#endif
 	}
 	else
 	{
@@ -6199,14 +4324,6 @@ unsigned int MoveDoor(unsigned int door_state)
 
 	dst_x = door_rect->x + dst_xx;
 	dst_y = door_rect->y + dst_yy;
-
-#if 0
-	if (DOOR_PART_IS_PANEL(nr))
-	{
-	  printf("::: width == %d, height == %d [%d, %d] [%d, %d]\n",
-		 width, height, g->width, g->height, src_x, src_y);
-	}
-#endif
 
 	if (width  >= 0 && width  <= g->width &&
 	    height >= 0 && height <= g->height)
@@ -6219,51 +4336,16 @@ unsigned int MoveDoor(unsigned int door_state)
 			     dst_x, dst_y);
 	}
 
-#if 0
-	if (DOOR_PART_IS_PANEL(nr))
-	{
-	  bitmap = bitmap_db_door;
-	  src_x = panel_pos->x + src_xx;
-	  src_y = panel_pos->y + src_yy;
-
-	  printf("::: width == %d, height == %d [%d, %d] [%d, %d]\n",
-		 width, height, g->width, g->height, src_x, src_y);
-
-	  if (width  >= 0 && width  <= g->width &&
-	      height >= 0 && height <= g->height)
-	    BlitBitmap(bitmap, drawto, src_x, src_y,
-			     width, height,
-			     dst_x, dst_y);
-	}
-#endif
-
 	redraw_mask |= REDRAW_DOOR_FROM_TOKEN(door_token);
 
-#if 1
 	if ((part_opening && (width < 0         || height < 0)) ||
 	    (part_closing && (width >= g->width && height >= g->height)))
 	  door_part_done[nr] = TRUE;
-#else
-	if ((door_opening && (width < 0         || height < 0)) ||
-	    (door_closing && (width >= g->width && height >= g->height)))
-	  door_part_done[nr] = TRUE;
-#endif
 
-#if 1
 	// continue door part animations, but not panel after door has closed
 	if (!door_part_done[nr] &&
 	    !(is_panel && door_closing && panel_has_doors[door_index]))
 	  door_part_done_all = FALSE;
-#else
-	// continue door part animations, but not panel after door has closed
-	if (!door_part_done[nr] && !(is_panel && door_closing))
-	  door_part_done_all = FALSE;
-#endif
-
-#if 0
-	if (!door_part_done[nr])
-	  printf("::: k == %d, nr == %d\n", k, nr);
-#endif
       }
 
       if (!(door_state & DOOR_NO_DELAY))
@@ -6278,625 +4360,8 @@ unsigned int MoveDoor(unsigned int door_state)
 	current_move_delay += max_step_delay;
       }
 
-#if 0
-      door_part_done_all = TRUE;
-
-      for (i = 0; i < MAX_DOOR_PARTS; i++)
-	if (!door_part_done[i] &&
-	    !(DOOR_PART_IS_PANEL(i) && door_closing))
-	  door_part_done_all = FALSE;
-#endif
-#if 1
       if (door_part_done_all)
 	break;
-#endif
-    }
-  }
-
-  if (door_state & DOOR_ACTION_1)
-    door1 = door_state & DOOR_ACTION_1;
-  if (door_state & DOOR_ACTION_2)
-    door2 = door_state & DOOR_ACTION_2;
-
-#if 0
-  printf("::: DOORS DONE %08x\n", door_state);
-  Delay(3000);
-  printf("::: GO!\n");
-#endif
-
-  return (door1 | door2);
-}
-
-#else
-
-// ========== OLD ==============================================================
-
-unsigned int MoveDoor(unsigned int door_state)
-{
-  static int door1 = DOOR_OPEN_1;
-  static int door2 = DOOR_CLOSE_2;
-  unsigned int door_delay = 0;
-  unsigned int door_delay_value;
-  int stepsize = 1;
-
-#if 1
-  if (door_1.width < 0 || door_1.width > DXSIZE)
-    door_1.width = DXSIZE;
-  if (door_1.height < 0 || door_1.height > DYSIZE)
-    door_1.height = DYSIZE;
-  if (door_2.width < 0 || door_2.width > VXSIZE)
-    door_2.width = VXSIZE;
-  if (door_2.height < 0 || door_2.height > VYSIZE)
-    door_2.height = VYSIZE;
-#endif
-
-  if (door_state == DOOR_GET_STATE)
-    return (door1 | door2);
-
-  if (door_state & DOOR_SET_STATE)
-  {
-    if (door_state & DOOR_ACTION_1)
-      door1 = door_state & DOOR_ACTION_1;
-    if (door_state & DOOR_ACTION_2)
-      door2 = door_state & DOOR_ACTION_2;
-
-    return (door1 | door2);
-  }
-
-  if (!(door_state & DOOR_FORCE_REDRAW))
-  {
-    if (door1 == DOOR_OPEN_1 && door_state & DOOR_OPEN_1)
-      door_state &= ~DOOR_OPEN_1;
-    else if (door1 == DOOR_CLOSE_1 && door_state & DOOR_CLOSE_1)
-      door_state &= ~DOOR_CLOSE_1;
-    if (door2 == DOOR_OPEN_2 && door_state & DOOR_OPEN_2)
-      door_state &= ~DOOR_OPEN_2;
-    else if (door2 == DOOR_CLOSE_2 && door_state & DOOR_CLOSE_2)
-      door_state &= ~DOOR_CLOSE_2;
-  }
-
-  door_delay_value = (door_state & DOOR_ACTION_1 ? door_1.step_delay :
-		      door_2.step_delay);
-
-  // door_delay_value *= 4;	// !!! TEST ONLY !!!
-
-  if (setup.quick_doors)
-  {
-    stepsize = 20;		/* must be chosen to always draw last frame */
-    door_delay_value = 0;
-  }
-
-  if (global.autoplay_leveldir)
-  {
-    door_state |= DOOR_NO_DELAY;
-    door_state &= ~DOOR_CLOSE_ALL;
-  }
-
-#if 1
-  if (game_status == GAME_MODE_EDITOR)
-    door_state |= DOOR_NO_DELAY;
-#endif
-
-  if (door_state & DOOR_ACTION)
-  {
-#if 1
-    struct GraphicInfo *g1_left  = &graphic_info[IMG_DOOR_1_WING_LEFT];
-    struct GraphicInfo *g1_right = &graphic_info[IMG_DOOR_1_WING_RIGHT];
-    struct GraphicInfo *g2_left  = &graphic_info[IMG_DOOR_2_WING_LEFT];
-    struct GraphicInfo *g2_right = &graphic_info[IMG_DOOR_2_WING_RIGHT];
-    int door_1_left_width   = g1_left->width;
-    int door_1_left_height  = g1_left->height;
-    int door_1_right_width  = g1_right->width;
-    int door_1_right_height = g1_right->height;
-    int door_2_left_width   = g2_left->width;
-    int door_2_left_height  = g2_left->height;
-    int door_2_right_width  = g2_right->width;
-    int door_2_right_height = g2_right->height;
-    int door_1_width  = MAX(door_1_left_width,  door_1_right_width);
-    int door_1_height = MAX(door_1_left_height, door_1_right_height);
-    int door_2_width  = MAX(door_2_left_width,  door_2_right_width);
-    int door_2_height = MAX(door_2_left_height, door_2_right_height);
-#endif
-    boolean handle_door_1 = (door_state & DOOR_ACTION_1);
-    boolean handle_door_2 = (door_state & DOOR_ACTION_2);
-    boolean door_1_done = (!handle_door_1);
-    boolean door_2_done = (!handle_door_2);
-    boolean door_1_vertical = (door_1.anim_mode & ANIM_VERTICAL);
-    boolean door_2_vertical = (door_2.anim_mode & ANIM_VERTICAL);
-#if 1
-#if 1
-    int door_size_1 = (door_1_vertical ? door_1_height : door_1_width);
-    int door_size_2 = (door_2_vertical ? door_2_height : door_2_width);
-#else
-    int door_size_1 = (door_1_vertical ? DYSIZE : DXSIZE);
-    int door_size_2 = (door_2_vertical ? VYSIZE : VXSIZE);
-#endif
-#else
-    int door_size_1 = (door_1_vertical ? door_1.height : door_1.width);
-    int door_size_2 = (door_2_vertical ? door_2.height : door_2.width);
-#endif
-    int max_door_size_1 = (door_1_vertical ? DYSIZE : DXSIZE);
-    int max_door_size_2 = (door_2_vertical ? VYSIZE : VXSIZE);
-    // int door_size     = (handle_door_1 ? door_size_1     : door_size_2);
-    int door_size     = (handle_door_2 ? door_size_2     : door_size_1);
-    int max_door_size = (handle_door_1 ? max_door_size_1 : max_door_size_2);
-    int door_skip = max_door_size - door_size;
-    int end = door_size;
-    int start = ((door_state & DOOR_NO_DELAY) ? end : 0);
-    int k;
-
-    if (!(door_state & DOOR_NO_DELAY) && !setup.quick_doors)
-    {
-      /* opening door sound has priority over simultaneously closing door */
-      if (door_state & (DOOR_OPEN_1 | DOOR_OPEN_2))
-	PlayMenuSoundStereo(SND_DOOR_OPENING, SOUND_MIDDLE);
-      else if (door_state & (DOOR_CLOSE_1 | DOOR_CLOSE_2))
-	PlayMenuSoundStereo(SND_DOOR_CLOSING, SOUND_MIDDLE);
-    }
-
-    for (k = start; k <= end && !(door_1_done && door_2_done); k += stepsize)
-    {
-      int x = k;
-#if 0
-      Bitmap *bitmap = graphic_info[IMG_GLOBAL_DOOR].bitmap;
-      GC gc = bitmap->stored_clip_gc;
-#endif
-
-      if (door_state & DOOR_ACTION_1 &&
-	  x * door_1.step_offset <= door_size_1)
-      {
-	int a = MIN(x * door_1.step_offset, end);
-	int p = (door_state & DOOR_OPEN_1 ? end - a : a);
-#if 1
-	int i = p;
-#else
-	int i = p + door_skip;
-#endif
-
-#if 1
-	struct GraphicInfo *g_left  = &graphic_info[IMG_DOOR_1_WING_LEFT];
-	struct GraphicInfo *g_right = &graphic_info[IMG_DOOR_1_WING_RIGHT];
-	Bitmap *bm_left  = g_left->bitmap;
-	Bitmap *bm_right = g_right->bitmap;
-	GC gc_left  = bm_left->stored_clip_gc;
-	GC gc_right = bm_right->stored_clip_gc;
-#endif
-
-	int classic_dxsize = 100;
-	int classic_dysize = 280;
-	boolean classic_door_1_size = (DXSIZE == classic_dxsize &&
-				       DYSIZE == classic_dysize);
-
-	if (door_1.anim_mode & ANIM_STATIC_PANEL)
-	{
-	  BlitBitmap(bitmap_db_door, drawto,
-		     DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1,
-		     DXSIZE, DYSIZE, DX, DY);
-	}
-	else if (x <= a)
-	{
-	  BlitBitmap(bitmap_db_door, drawto,
-		     DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1 + p / 2,
-		     DXSIZE, DYSIZE - p / 2, DX, DY);
-
-#if 1
-	  // printf("::: p == %d\n", p);
-	  ClearRectangle(drawto, DX, DY + DYSIZE - p / 2, DXSIZE, p / 2);
-#endif
-	}
-
-	if (door_1.anim_mode & ANIM_HORIZONTAL && x <= DXSIZE)
-	{
-#if 1
-	  int src1_x = g_right->src_x;
-	  int src1_y = g_right->src_y;
-	  int src2_x = g_left->src_x + g_left->width - i;
-	  int src2_y = g_left->src_y;
-	  int dst1_x = DX + DXSIZE - i;
-	  int dst1_y = DY;
-	  int dst2_x = DX;
-	  int dst2_y = DY;
-	  int width = i;
-	  int height = DYSIZE;
-
-	  SetClipOrigin(bm_right, gc_right, dst1_x - src1_x, dst1_y - src1_y);
-	  BlitBitmapMasked(bm_right, drawto, src1_x, src1_y, width, height,
-			   dst1_x, dst1_y);
-
-	  SetClipOrigin(bm_left, gc_left, dst2_x - src2_x, dst2_y - src2_y);
-	  BlitBitmapMasked(bm_left, drawto, src2_x, src2_y, width, height,
-			   dst2_x, dst2_y);
-#else
-	  int src1_x = DXSIZE,		src1_y = DOOR_GFX_PAGEY1;
-	  int src2_x = DXSIZE - i,	src2_y = DOOR_GFX_PAGEY1;
-	  int dst1_x = DX + DXSIZE - i,	dst1_y = DY;
-	  int dst2_x = DX,		dst2_y = DY;
-	  int width = i, height = DYSIZE;
-
-	  SetClipOrigin(bitmap, gc, dst1_x - src1_x, dst1_y - src1_y);
-	  BlitBitmapMasked(bitmap, drawto, src1_x, src1_y, width, height,
-			   dst1_x, dst1_y);
-
-	  SetClipOrigin(bitmap, gc, dst2_x - src2_x, dst2_y - src2_y);
-	  BlitBitmapMasked(bitmap, drawto, src2_x, src2_y, width, height,
-			   dst2_x, dst2_y);
-#endif
-	}
-	else if (door_1.anim_mode & ANIM_VERTICAL && x <= DYSIZE)
-	{
-#if 1
-	  int src1_x = g_right->src_x;
-	  int src1_y = g_right->src_y;
-	  int src2_x = g_left->src_x;
-	  int src2_y = g_left->src_y + g_left->height - i;
-	  int dst1_x = DX;
-	  int dst1_y = DY + DYSIZE - i;
-	  int dst2_x = DX;
-	  int dst2_y = DY;
-	  int width = DXSIZE;
-	  int height = i;
-
-	  SetClipOrigin(bm_right, gc_right, dst1_x - src1_x, dst1_y - src1_y);
-	  BlitBitmapMasked(bm_right, drawto, src1_x, src1_y, width, height,
-			   dst1_x, dst1_y);
-
-	  SetClipOrigin(bm_left, gc_left, dst2_x - src2_x, dst2_y - src2_y);
-	  BlitBitmapMasked(bm_left, drawto, src2_x, src2_y, width, height,
-			   dst2_x, dst2_y);
-#else
-	  int src1_x = DXSIZE,		src1_y = DOOR_GFX_PAGEY1;
-	  int src2_x = 0,		src2_y = DOOR_GFX_PAGEY1 + DYSIZE - i;
-	  int dst1_x = DX,		dst1_y = DY + DYSIZE - i;
-	  int dst2_x = DX,		dst2_y = DY;
-	  int width = DXSIZE, height = i;
-
-	  SetClipOrigin(bitmap, gc, dst1_x - src1_x, dst1_y - src1_y);
-	  BlitBitmapMasked(bitmap, drawto, src1_x, src1_y, width, height,
-			   dst1_x, dst1_y);
-
-	  SetClipOrigin(bitmap, gc, dst2_x - src2_x, dst2_y - src2_y);
-	  BlitBitmapMasked(bitmap, drawto, src2_x, src2_y, width, height,
-			   dst2_x, dst2_y);
-#endif
-	}
-	else if (classic_door_1_size && x <= DXSIZE)	/* ANIM_DEFAULT */
-	{
-	  int j = (door_1.anim_mode == ANIM_DEFAULT ? (DXSIZE - i) / 3 : 0);
-
-#if 1
-	  int src1_x = g_right->src_x;
-	  int src1_y = g_right->src_y;
-	  int src2_x = g_left->src_x + g_left->width - i;
-	  int src2_y = g_left->src_y;
-	  int dst1_x = DX + DXSIZE - i;
-	  int dst1_y = DY;
-	  int dst2_x = DX;
-	  int dst2_y = DY;
-	  int width = i;
-	  int height1 = 63, height2 = DYSIZE / 2 - height1;
-	  int ypos1 = 0, ypos2 = height2;
-	  int ypos3 = DYSIZE / 2, ypos4 = DYSIZE - height2;
-
-	  SetClipOrigin(bm_right, gc_right,
-			dst1_x - src1_x, dst1_y - src1_y + j);
-	  BlitBitmapMasked(bm_right, drawto,
-			   src1_x, src1_y + ypos1, width, height2,
-			   dst1_x, dst1_y + ypos1 + j);
-	  BlitBitmapMasked(bm_right, drawto,
-			   src1_x, src1_y + ypos3, width, height1,
-			   dst1_x, dst1_y + ypos3 + j);
-	  SetClipOrigin(bm_left, gc_left,
-			dst2_x - src2_x, dst2_y - src2_y - j);
-	  BlitBitmapMasked(bm_left, drawto,
-			   src2_x, src2_y + ypos1 + j, width, height2 - j,
-			   dst2_x, dst2_y + ypos1);
-	  BlitBitmapMasked(bm_left, drawto,
-			   src2_x, src2_y + ypos3, width, height1,
-			   dst2_x, dst2_y + ypos3 - j);
-
-	  SetClipOrigin(bm_left, gc_left,
-			dst2_x - src2_x, dst2_y - src2_y - j);
-	  BlitBitmapMasked(bm_left, drawto,
-			   src2_x, src2_y + ypos2, width, height1,
-			   dst2_x, dst2_y + ypos2 - j);
-	  BlitBitmapMasked(bm_left, drawto,
-			   src2_x, src2_y + ypos4, width, height2,
-			   dst2_x, dst2_y + ypos4 - j);
-	  SetClipOrigin(bm_right, gc_right,
-			dst1_x - src1_x, dst1_y - src1_y + j);
-	  BlitBitmapMasked(bm_right, drawto,
-			   src1_x, src1_y + ypos2, width, height1,
-			   dst1_x, dst1_y + ypos2 + j);
-	  BlitBitmapMasked(bm_right, drawto,
-			   src1_x, src1_y + ypos4, width, height2 - j,
-			   dst1_x, dst1_y + ypos4 + j);
-
-#else
-	  int src1_x = DXSIZE,		src1_y = DOOR_GFX_PAGEY1;
-	  int src2_x = DXSIZE - i,	src2_y = DOOR_GFX_PAGEY1;
-	  int dst1_x = DX + DXSIZE - i,	dst1_y = DY;
-	  int dst2_x = DX,		dst2_y = DY;
-	  int width = i, height = DYSIZE;
-	  int ypos1 = 63, ypos2 = 77, ypos3 = 140, ypos4 = 203;
-
-	  SetClipOrigin(bitmap, gc, dst1_x - src1_x, dst1_y - src1_y + j);
-	  BlitBitmapMasked(bitmap, drawto,
-			   src1_x, src1_y, width, ypos2,
-			   dst1_x, dst1_y + j);
-	  BlitBitmapMasked(bitmap, drawto,
-			   src1_x, src1_y + ypos3, width, ypos1,
-			   dst1_x, dst1_y + ypos3 + j);
-	  SetClipOrigin(bitmap, gc, dst2_x - src2_x, dst2_y - src2_y - j);
-	  BlitBitmapMasked(bitmap, drawto,
-			   src2_x, src2_y + j, width, ypos2 - j,
-			   dst2_x, dst2_y);
-	  BlitBitmapMasked(bitmap, drawto,
-			   src2_x, src2_y + ypos3, width, ypos1,
-			   dst2_x, dst2_y + ypos3 - j);
-
-	  SetClipOrigin(bitmap, gc, dst2_x - src2_x, dst2_y - src2_y - j);
-	  BlitBitmapMasked(bitmap, drawto,
-			   src2_x, src2_y + ypos2, width, ypos1,
-			   dst2_x, dst2_y + ypos2 - j);
-	  BlitBitmapMasked(bitmap, drawto,
-			   src2_x, src2_y + ypos4, width, ypos2,
-			   dst2_x, dst2_y + ypos4 - j);
-	  SetClipOrigin(bitmap, gc, dst1_x - src1_x, dst1_y - src1_y + j);
-	  BlitBitmapMasked(bitmap, drawto,
-			   src1_x, src1_y + ypos2, width, ypos1,
-			   dst1_x, dst1_y + ypos2 + j);
-	  BlitBitmapMasked(bitmap, drawto,
-			   src1_x, src1_y + ypos4, width, ypos2 - j,
-			   dst1_x, dst1_y + ypos4 + j);
-
-	  /*
-	  SetClipOrigin(bitmap, gc, DX - i, (DY + j) - DOOR_GFX_PAGEY1);
-	  BlitBitmapMasked(bitmap, drawto,
-			   DXSIZE, DOOR_GFX_PAGEY1, i, 77,
-			   DX + DXSIZE - i, DY + j);
-	  BlitBitmapMasked(bitmap, drawto,
-			   DXSIZE, DOOR_GFX_PAGEY1 + 140, i, 63,
-			   DX + DXSIZE - i, DY + 140 + j);
-	  SetClipOrigin(bitmap, gc, DX - DXSIZE + i,
-			DY - (DOOR_GFX_PAGEY1 + j));
-	  BlitBitmapMasked(bitmap, drawto,
-			   DXSIZE - i, DOOR_GFX_PAGEY1 + j, i, 77 - j,
-			   DX, DY);
-	  BlitBitmapMasked(bitmap, drawto,
-			   DXSIZE-i, DOOR_GFX_PAGEY1 + 140, i, 63,
-			   DX, DY + 140 - j);
-
-	  BlitBitmapMasked(bitmap, drawto,
-			   DXSIZE - i, DOOR_GFX_PAGEY1 + 77, i, 63,
-			   DX, DY + 77 - j);
-	  BlitBitmapMasked(bitmap, drawto,
-			   DXSIZE - i, DOOR_GFX_PAGEY1 + 203, i, 77,
-			   DX, DY + 203 - j);
-	  SetClipOrigin(bitmap, gc, DX - i, (DY + j) - DOOR_GFX_PAGEY1);
-	  BlitBitmapMasked(bitmap, drawto,
-			   DXSIZE, DOOR_GFX_PAGEY1 + 77, i, 63,
-			   DX + DXSIZE - i, DY + 77 + j);
-	  BlitBitmapMasked(bitmap, drawto,
-			   DXSIZE, DOOR_GFX_PAGEY1 + 203, i, 77 - j,
-			   DX + DXSIZE - i, DY + 203 + j);
-	  */
-#endif
-	}
-
-	redraw_mask |= REDRAW_DOOR_1;
-	door_1_done = (a == end);
-      }
-
-      if (door_state & DOOR_ACTION_2 &&
-	  x * door_2.step_offset <= door_size_2)
-      {
-	int a = MIN(x * door_2.step_offset, door_size);
-	int p = (door_state & DOOR_OPEN_2 ? door_size - a : a);
-	int i = p + door_skip;
-
-#if 1
-	struct GraphicInfo *g_left  = &graphic_info[IMG_DOOR_2_WING_LEFT];
-	struct GraphicInfo *g_right = &graphic_info[IMG_DOOR_2_WING_RIGHT];
-	Bitmap *bm_left  = g_left->bitmap;
-	Bitmap *bm_right = g_right->bitmap;
-	GC gc_left  = bm_left->stored_clip_gc;
-	GC gc_right = bm_right->stored_clip_gc;
-#endif
-
-	int classic_vxsize = 100;
-	int classic_vysize = 100;
-	boolean classic_door_2_size = (VXSIZE == classic_vxsize &&
-				       VYSIZE == classic_vysize);
-
-	if (door_2.anim_mode & ANIM_STATIC_PANEL)
-	{
-	  BlitBitmap(bitmap_db_door, drawto,
-		     DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY2,
-		     VXSIZE, VYSIZE, VX, VY);
-	}
-	else if (x <= VYSIZE)
-	{
-	  BlitBitmap(bitmap_db_door, drawto,
-		     DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY2 + p / 2,
-		     VXSIZE, VYSIZE - p / 2, VX, VY);
-
-	  ClearRectangle(drawto, VX, VY + VYSIZE - p / 2, VXSIZE, p / 2);
-	}
-
-	if (door_2.anim_mode & ANIM_HORIZONTAL && x <= VXSIZE)
-	{
-#if 1
-	  int src1_x = g_right->src_x;
-	  int src1_y = g_right->src_y;
-	  int src2_x = g_left->src_x + g_left->width - i;
-	  int src2_y = g_left->src_y;
-	  int dst1_x = VX + VXSIZE - i;
-	  int dst1_y = VY;
-	  int dst2_x = VX;
-	  int dst2_y = VY;
-	  int width = i;
-	  int height = VYSIZE;
-
-	  SetClipOrigin(bm_right, gc_right, dst1_x - src1_x, dst1_y - src1_y);
-	  BlitBitmapMasked(bm_right, drawto, src1_x, src1_y, width, height,
-			   dst1_x, dst1_y);
-
-	  SetClipOrigin(bm_left, gc_left, dst2_x - src2_x, dst2_y - src2_y);
-	  BlitBitmapMasked(bm_left, drawto, src2_x, src2_y, width, height,
-			   dst2_x, dst2_y);
-#else
-	  int src1_x = VXSIZE,		src1_y = DOOR_GFX_PAGEY2;
-	  int src2_x = VXSIZE - i,	src2_y = DOOR_GFX_PAGEY2;
-	  int dst1_x = VX + VXSIZE - i,	dst1_y = VY;
-	  int dst2_x = VX,		dst2_y = VY;
-	  int width = i, height = VYSIZE;
-
-	  SetClipOrigin(bitmap, gc, dst1_x - src1_x, dst1_y - src1_y);
-	  BlitBitmapMasked(bitmap, drawto, src1_x, src1_y, width, height,
-			   dst1_x, dst1_y);
-
-	  SetClipOrigin(bitmap, gc, dst2_x - src2_x, dst2_y - src2_y);
-	  BlitBitmapMasked(bitmap, drawto, src2_x, src2_y, width, height,
-			   dst2_x, dst2_y);
-#endif
-	}
-	else if (door_2.anim_mode & ANIM_VERTICAL && x <= VYSIZE)
-	{
-#if 1
-	  int src1_x = g_right->src_x;
-	  int src1_y = g_right->src_y;
-	  int src2_x = g_left->src_x;
-	  int src2_y = g_left->src_y + g_left->height - i;
-	  int dst1_x = VX;
-	  int dst1_y = VY + VYSIZE - i;
-	  int dst2_x = VX;
-	  int dst2_y = VY;
-	  int width = VXSIZE;
-	  int height = i;
-
-	  SetClipOrigin(bm_right, gc_right, dst1_x - src1_x, dst1_y - src1_y);
-	  BlitBitmapMasked(bm_right, drawto, src1_x, src1_y, width, height,
-			   dst1_x, dst1_y);
-
-	  SetClipOrigin(bm_left, gc_left, dst2_x - src2_x, dst2_y - src2_y);
-	  BlitBitmapMasked(bm_left, drawto, src2_x, src2_y, width, height,
-			   dst2_x, dst2_y);
-#else
-	  int src1_x = VXSIZE,		src1_y = DOOR_GFX_PAGEY2;
-	  int src2_x = 0,		src2_y = DOOR_GFX_PAGEY2 + VYSIZE - i;
-	  int dst1_x = VX,		dst1_y = VY + VYSIZE - i;
-	  int dst2_x = VX,		dst2_y = VY;
-	  int width = VXSIZE, height = i;
-
-	  SetClipOrigin(bitmap, gc, dst1_x - src1_x, dst1_y - src1_y);
-	  BlitBitmapMasked(bitmap, drawto, src1_x, src1_y, width, height,
-			   dst1_x, dst1_y);
-
-	  SetClipOrigin(bitmap, gc, dst2_x - src2_x, dst2_y - src2_y);
-	  BlitBitmapMasked(bitmap, drawto, src2_x, src2_y, width, height,
-			   dst2_x, dst2_y);
-#endif
-	}
-	else if (classic_door_2_size && x <= VXSIZE)	/* ANIM_DEFAULT */
-	{
-	  int j = (door_2.anim_mode == ANIM_DEFAULT ? (VXSIZE - i) / 3 : 0);
-
-#if 1
-	  int src1_x = g_right->src_x;
-	  int src1_y = g_right->src_y;
-	  int src2_x = g_left->src_x + g_left->width - i;
-	  int src2_y = g_left->src_y;
-	  int dst1_x = VX + VXSIZE - i;
-	  int dst1_y = VY;
-	  int dst2_x = VX;
-	  int dst2_y = VY;
-	  int width = i;
-	  int height = VYSIZE / 2;
-	  int ypos1 = 0, ypos2 = VYSIZE / 2;
-
-	  SetClipOrigin(bm_right, gc_right,
-			dst1_x - src1_x, dst1_y - src1_y + j);
-	  BlitBitmapMasked(bm_right, drawto,
-			   src1_x, src1_y + ypos1, width, height,
-			   dst1_x, dst1_y + ypos1 + j);
-	  SetClipOrigin(bm_left, gc_left,
-			dst2_x - src2_x, dst2_y - src2_y - j);
-	  BlitBitmapMasked(bm_left, drawto,
-			   src2_x, src2_y + ypos1 + j, width, height - j,
-			   dst2_x, dst2_y + ypos1);
-
-	  SetClipOrigin(bm_left, gc_left,
-			dst2_x - src2_x, dst2_y - src2_y - j);
-	  BlitBitmapMasked(bm_left, drawto,
-			   src2_x, src2_y + ypos2, width, height,
-			   dst2_x, dst2_y + ypos2 - j);
-	  SetClipOrigin(bm_right, gc_right,
-			dst1_x - src1_x, dst1_y - src1_y + j);
-	  BlitBitmapMasked(bm_right, drawto,
-			   src1_x, src1_y + ypos2, width, height - j,
-			   dst1_x, dst1_y + ypos2 + j);
-#else
-	  int src1_x = VXSIZE,		src1_y = DOOR_GFX_PAGEY2;
-	  int src2_x = VXSIZE - i,	src2_y = DOOR_GFX_PAGEY2;
-	  int dst1_x = VX + VXSIZE - i,	dst1_y = VY;
-	  int dst2_x = VX,		dst2_y = VY;
-	  int width = i, height = VYSIZE;
-	  int ypos = VYSIZE / 2;
-
-	  SetClipOrigin(bitmap, gc, dst1_x - src1_x, dst1_y - src1_y + j);
-	  BlitBitmapMasked(bitmap, drawto,
-			   src1_x, src1_y, width, ypos,
-			   dst1_x, dst1_y + j);
-	  SetClipOrigin(bitmap, gc, dst2_x - src2_x, dst2_y - src1_y - j);
-	  BlitBitmapMasked(bitmap, drawto,
-			   src2_x, src2_y + j, width, ypos - j,
-			   dst2_x, dst2_y);
-
-	  SetClipOrigin(bitmap, gc, dst2_x - src2_x, dst2_y - src1_y - j);
-	  BlitBitmapMasked(bitmap, drawto,
-			   src2_x, src2_y + ypos, width, ypos,
-			   dst2_x, dst2_y + ypos - j);
-	  SetClipOrigin(bitmap, gc, dst1_x - src1_x, dst1_y - src1_y + j);
-	  BlitBitmapMasked(bitmap, drawto,
-			   src1_x, src1_y + ypos, width, ypos - j,
-			   dst1_x, dst1_y + ypos + j);
-
-	  /*
-	  SetClipOrigin(bitmap, gc, VX - i, (VY + j) - DOOR_GFX_PAGEY2);
-	  BlitBitmapMasked(bitmap, drawto,
-			   VXSIZE, DOOR_GFX_PAGEY2, i, VYSIZE / 2,
-			   VX + VXSIZE - i, VY + j);
-	  SetClipOrigin(bitmap, gc,
-			VX - VXSIZE + i, VY - (DOOR_GFX_PAGEY2 + j));
-	  BlitBitmapMasked(bitmap, drawto,
-			   VXSIZE - i, DOOR_GFX_PAGEY2 + j, i, VYSIZE / 2 - j,
-			   VX, VY);
-
-	  BlitBitmapMasked(bitmap, drawto,
-			   VXSIZE - i, DOOR_GFX_PAGEY2 + VYSIZE / 2,
-			   i, VYSIZE / 2, VX, VY + VYSIZE / 2 - j);
-	  SetClipOrigin(bitmap, gc, VX - i, (VY + j) - DOOR_GFX_PAGEY2);
-	  BlitBitmapMasked(bitmap, drawto,
-			   VXSIZE, DOOR_GFX_PAGEY2 + VYSIZE / 2,
-			   i, VYSIZE / 2 - j,
-			   VX + VXSIZE - i, VY + VYSIZE / 2 + j);
-	  */
-#endif
-	}
-
-	redraw_mask |= REDRAW_DOOR_2;
-	door_2_done = (a == VXSIZE);
-      }
-
-      if (!(door_state & DOOR_NO_DELAY))
-      {
-	BackToFront();
-
-	if (game_status == GAME_MODE_MAIN)
-	  DoAnimation();
-
-	WaitUntilDelayReached(&door_delay, door_delay_value);
-      }
     }
   }
 
@@ -6907,12 +4372,9 @@ unsigned int MoveDoor(unsigned int door_state)
 
   return (door1 | door2);
 }
-
-#endif
 
 void DrawSpecialEditorDoor()
 {
-#if 1
   struct GraphicInfo *gfx1 = &graphic_info[IMG_DOOR_2_TOP_BORDER_CORRECTION];
   int top_border_width = gfx1->width;
   int top_border_height = gfx1->height;
@@ -6929,22 +4391,12 @@ void DrawSpecialEditorDoor()
 	     top_border_width, top_border_height, ex, ey - top_border_height);
   BlitBitmap(graphic_info[IMG_GLOBAL_BORDER].bitmap, drawto, ex, vy,
 	     exsize, EYSIZE - VYSIZE + outer_border, ex, ey);
-#else
-  /* draw bigger level editor toolbox window */
-  BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
-             DOOR_GFX_PAGEX7, 0, EXSIZE + 8, 8,
-             EX - 4, EY - 12);
-  BlitBitmap(graphic_info[IMG_GLOBAL_BORDER].bitmap, drawto,
-             EX - 6, VY - 4, EXSIZE + 12, EYSIZE - VYSIZE + 4,
-             EX - 6, EY - 4);
-#endif
 
   redraw_mask |= REDRAW_ALL;
 }
 
 void UndrawSpecialEditorDoor()
 {
-#if 1
   struct GraphicInfo *gfx1 = &graphic_info[IMG_DOOR_2_TOP_BORDER_CORRECTION];
   int top_border_width = gfx1->width;
   int top_border_height = gfx1->height;
@@ -6970,20 +4422,12 @@ void UndrawSpecialEditorDoor()
     ClearRectangle(drawto, ex, ey_top, top_border_width, top_border_height);
     ClearRectangle(drawto, ex, ey, exsize, eysize);
   }
-#else
-  /* draw normal tape recorder window */
-  BlitBitmap(graphic_info[IMG_GLOBAL_BORDER].bitmap, drawto,
-             EX - 6, EY - 12, EXSIZE + 12, EYSIZE - VYSIZE + 12,
-             EX - 6, EY - 12);
-#endif
 
   redraw_mask |= REDRAW_ALL;
 }
 
 
 /* ---------- new tool button stuff ---------------------------------------- */
-
-#if 1
 
 static struct
 {
@@ -7081,168 +4525,6 @@ void CreateToolButtons()
     tool_gadget[id] = gi;
   }
 }
-
-#else
-
-/* graphic position values for tool buttons */
-#define TOOL_BUTTON_YES_XPOS		2
-#define TOOL_BUTTON_YES_YPOS		250
-#define TOOL_BUTTON_YES_GFX_YPOS	0
-#define TOOL_BUTTON_YES_XSIZE		46
-#define TOOL_BUTTON_YES_YSIZE		28
-#define TOOL_BUTTON_NO_XPOS		52
-#define TOOL_BUTTON_NO_YPOS		TOOL_BUTTON_YES_YPOS
-#define TOOL_BUTTON_NO_GFX_YPOS		TOOL_BUTTON_YES_GFX_YPOS
-#define TOOL_BUTTON_NO_XSIZE		TOOL_BUTTON_YES_XSIZE
-#define TOOL_BUTTON_NO_YSIZE		TOOL_BUTTON_YES_YSIZE
-#define TOOL_BUTTON_CONFIRM_XPOS	TOOL_BUTTON_YES_XPOS
-#define TOOL_BUTTON_CONFIRM_YPOS	TOOL_BUTTON_YES_YPOS
-#define TOOL_BUTTON_CONFIRM_GFX_YPOS	30
-#define TOOL_BUTTON_CONFIRM_XSIZE	96
-#define TOOL_BUTTON_CONFIRM_YSIZE	TOOL_BUTTON_YES_YSIZE
-#define TOOL_BUTTON_PLAYER_XSIZE	30
-#define TOOL_BUTTON_PLAYER_YSIZE	30
-#define TOOL_BUTTON_PLAYER_GFX_XPOS	5
-#define TOOL_BUTTON_PLAYER_GFX_YPOS	185
-#define TOOL_BUTTON_PLAYER_XPOS		(5 + TOOL_BUTTON_PLAYER_XSIZE / 2)
-#define TOOL_BUTTON_PLAYER_YPOS		(215 - TOOL_BUTTON_PLAYER_YSIZE / 2)
-#define TOOL_BUTTON_PLAYER1_XPOS	(TOOL_BUTTON_PLAYER_XPOS \
-					 + 0 * TOOL_BUTTON_PLAYER_XSIZE)
-#define TOOL_BUTTON_PLAYER2_XPOS	(TOOL_BUTTON_PLAYER_XPOS \
-					 + 1 * TOOL_BUTTON_PLAYER_XSIZE)
-#define TOOL_BUTTON_PLAYER3_XPOS	(TOOL_BUTTON_PLAYER_XPOS \
-					 + 0 * TOOL_BUTTON_PLAYER_XSIZE)
-#define TOOL_BUTTON_PLAYER4_XPOS	(TOOL_BUTTON_PLAYER_XPOS \
-					 + 1 * TOOL_BUTTON_PLAYER_XSIZE)
-#define TOOL_BUTTON_PLAYER1_YPOS	(TOOL_BUTTON_PLAYER_YPOS \
-					 + 0 * TOOL_BUTTON_PLAYER_YSIZE)
-#define TOOL_BUTTON_PLAYER2_YPOS	(TOOL_BUTTON_PLAYER_YPOS \
-					 + 0 * TOOL_BUTTON_PLAYER_YSIZE)
-#define TOOL_BUTTON_PLAYER3_YPOS	(TOOL_BUTTON_PLAYER_YPOS \
-					 + 1 * TOOL_BUTTON_PLAYER_YSIZE)
-#define TOOL_BUTTON_PLAYER4_YPOS	(TOOL_BUTTON_PLAYER_YPOS \
-					 + 1 * TOOL_BUTTON_PLAYER_YSIZE)
-
-static struct
-{
-  int xpos, ypos;
-  int x, y;
-  int width, height;
-  int gadget_id;
-  char *infotext;
-} toolbutton_info[NUM_TOOL_BUTTONS] =
-{
-  {
-    TOOL_BUTTON_YES_XPOS,	TOOL_BUTTON_YES_GFX_YPOS,
-    TOOL_BUTTON_YES_XPOS,	TOOL_BUTTON_YES_YPOS,
-    TOOL_BUTTON_YES_XSIZE,	TOOL_BUTTON_YES_YSIZE,
-    TOOL_CTRL_ID_YES,
-    "yes"
-  },
-  {
-    TOOL_BUTTON_NO_XPOS,	TOOL_BUTTON_NO_GFX_YPOS,
-    TOOL_BUTTON_NO_XPOS,	TOOL_BUTTON_NO_YPOS,
-    TOOL_BUTTON_NO_XSIZE,	TOOL_BUTTON_NO_YSIZE,
-    TOOL_CTRL_ID_NO,
-    "no"
-  },
-  {
-    TOOL_BUTTON_CONFIRM_XPOS,	TOOL_BUTTON_CONFIRM_GFX_YPOS,
-    TOOL_BUTTON_CONFIRM_XPOS,	TOOL_BUTTON_CONFIRM_YPOS,
-    TOOL_BUTTON_CONFIRM_XSIZE,	TOOL_BUTTON_CONFIRM_YSIZE,
-    TOOL_CTRL_ID_CONFIRM,
-    "confirm"
-  },
-  {
-    TOOL_BUTTON_PLAYER_GFX_XPOS,TOOL_BUTTON_PLAYER_GFX_YPOS,
-    TOOL_BUTTON_PLAYER1_XPOS,	TOOL_BUTTON_PLAYER1_YPOS,
-    TOOL_BUTTON_PLAYER_XSIZE,	TOOL_BUTTON_PLAYER_YSIZE,
-    TOOL_CTRL_ID_PLAYER_1,
-    "player 1"
-  },
-  {
-    TOOL_BUTTON_PLAYER_GFX_XPOS,TOOL_BUTTON_PLAYER_GFX_YPOS,
-    TOOL_BUTTON_PLAYER2_XPOS,	TOOL_BUTTON_PLAYER2_YPOS,
-    TOOL_BUTTON_PLAYER_XSIZE,	TOOL_BUTTON_PLAYER_YSIZE,
-    TOOL_CTRL_ID_PLAYER_2,
-    "player 2"
-  },
-  {
-    TOOL_BUTTON_PLAYER_GFX_XPOS,TOOL_BUTTON_PLAYER_GFX_YPOS,
-    TOOL_BUTTON_PLAYER3_XPOS,	TOOL_BUTTON_PLAYER3_YPOS,
-    TOOL_BUTTON_PLAYER_XSIZE,	TOOL_BUTTON_PLAYER_YSIZE,
-    TOOL_CTRL_ID_PLAYER_3,
-    "player 3"
-  },
-  {
-    TOOL_BUTTON_PLAYER_GFX_XPOS,TOOL_BUTTON_PLAYER_GFX_YPOS,
-    TOOL_BUTTON_PLAYER4_XPOS,	TOOL_BUTTON_PLAYER4_YPOS,
-    TOOL_BUTTON_PLAYER_XSIZE,	TOOL_BUTTON_PLAYER_YSIZE,
-    TOOL_CTRL_ID_PLAYER_4,
-    "player 4"
-  }
-};
-
-void CreateToolButtons()
-{
-  int i;
-
-  for (i = 0; i < NUM_TOOL_BUTTONS; i++)
-  {
-    Bitmap *gd_bitmap = graphic_info[IMG_GLOBAL_DOOR].bitmap;
-    Bitmap *deco_bitmap = None;
-    int deco_x = 0, deco_y = 0, deco_xpos = 0, deco_ypos = 0;
-    struct GadgetInfo *gi;
-    unsigned int event_mask;
-    int gd_xoffset, gd_yoffset;
-    int gd_x1, gd_x2, gd_y;
-    int id = i;
-
-    event_mask = GD_EVENT_RELEASED;
-
-    gd_xoffset = toolbutton_info[i].xpos;
-    gd_yoffset = toolbutton_info[i].ypos;
-    gd_x1 = DOOR_GFX_PAGEX4 + gd_xoffset;
-    gd_x2 = DOOR_GFX_PAGEX3 + gd_xoffset;
-    gd_y = DOOR_GFX_PAGEY1 + gd_yoffset;
-
-    if (id >= TOOL_CTRL_ID_PLAYER_1 && id <= TOOL_CTRL_ID_PLAYER_4)
-    {
-      int player_nr = id - TOOL_CTRL_ID_PLAYER_1;
-
-      getMiniGraphicSource(PLAYER_NR_GFX(IMG_PLAYER_1, player_nr),
-			   &deco_bitmap, &deco_x, &deco_y);
-      deco_xpos = (toolbutton_info[i].width - MINI_TILEX) / 2;
-      deco_ypos = (toolbutton_info[i].height - MINI_TILEY) / 2;
-    }
-
-    gi = CreateGadget(GDI_CUSTOM_ID, id,
-		      GDI_INFO_TEXT, toolbutton_info[i].infotext,
-		      GDI_X, DX + GDI_ACTIVE_POS(toolbutton_info[i].x),
-		      GDI_Y, DY + GDI_ACTIVE_POS(toolbutton_info[i].y),
-		      GDI_WIDTH, toolbutton_info[i].width,
-		      GDI_HEIGHT, toolbutton_info[i].height,
-		      GDI_TYPE, GD_TYPE_NORMAL_BUTTON,
-		      GDI_STATE, GD_BUTTON_UNPRESSED,
-		      GDI_DESIGN_UNPRESSED, gd_bitmap, gd_x1, gd_y,
-		      GDI_DESIGN_PRESSED, gd_bitmap, gd_x2, gd_y,
-		      GDI_DECORATION_DESIGN, deco_bitmap, deco_x, deco_y,
-		      GDI_DECORATION_POSITION, deco_xpos, deco_ypos,
-		      GDI_DECORATION_SIZE, MINI_TILEX, MINI_TILEY,
-		      GDI_DECORATION_SHIFTING, 1, 1,
-		      GDI_DIRECT_DRAW, FALSE,
-		      GDI_EVENT_MASK, event_mask,
-		      GDI_CALLBACK_ACTION, HandleToolButtons,
-		      GDI_END);
-
-    if (gi == NULL)
-      Error(ERR_EXIT, "cannot create gadget");
-
-    tool_gadget[id] = gi;
-  }
-}
-
-#endif
 
 void FreeToolButtons()
 {
@@ -8481,7 +5763,6 @@ em_object_mapping_list[] =
     Xsand_stonein_4,			FALSE,	TRUE,
     EL_ROCK,				ACTION_FILLING, -1
   },
-#if 1
   {
     Xsand_stonesand_1,			FALSE,	FALSE,
     EL_QUICKSAND_EMPTYING,		-1, -1
@@ -8506,24 +5787,6 @@ em_object_mapping_list[] =
     Xsand_stonesand_quickout_2,		FALSE,	FALSE,
     EL_QUICKSAND_EMPTYING,		-1, -1
   },
-#else
-  {
-    Xsand_stonesand_1,			FALSE,	FALSE,
-    EL_QUICKSAND_FULL,			-1, -1
-  },
-  {
-    Xsand_stonesand_2,			FALSE,	FALSE,
-    EL_QUICKSAND_FULL,			-1, -1
-  },
-  {
-    Xsand_stonesand_3,			FALSE,	FALSE,
-    EL_QUICKSAND_FULL,			-1, -1
-  },
-  {
-    Xsand_stonesand_4,			FALSE,	FALSE,
-    EL_QUICKSAND_FULL,			-1, -1
-  },
-#endif
   {
     Xsand_stoneout_1,			FALSE,	FALSE,
     EL_ROCK,				ACTION_EMPTYING, -1
@@ -8532,7 +5795,6 @@ em_object_mapping_list[] =
     Xsand_stoneout_2,			FALSE,	FALSE,
     EL_ROCK,				ACTION_EMPTYING, -1
   },
-#if 1
   {
     Xsand_sandstone_1,			FALSE,	FALSE,
     EL_QUICKSAND_FILLING,		-1, -1
@@ -8549,24 +5811,6 @@ em_object_mapping_list[] =
     Xsand_sandstone_4,			FALSE,	FALSE,
     EL_QUICKSAND_FILLING,		-1, -1
   },
-#else
-  {
-    Xsand_sandstone_1,			FALSE,	FALSE,
-    EL_QUICKSAND_FULL,			-1, -1
-  },
-  {
-    Xsand_sandstone_2,			FALSE,	FALSE,
-    EL_QUICKSAND_FULL,			-1, -1
-  },
-  {
-    Xsand_sandstone_3,			FALSE,	FALSE,
-    EL_QUICKSAND_FULL,			-1, -1
-  },
-  {
-    Xsand_sandstone_4,			FALSE,	FALSE,
-    EL_QUICKSAND_FULL,			-1, -1
-  },
-#endif
   {
     Xplant,				TRUE,	FALSE,
     EL_EMC_PLANT,			-1, -1
@@ -9422,19 +6666,6 @@ int get_next_element(int element)
   }
 }
 
-#if 0
-int el_act_dir2img(int element, int action, int direction)
-{
-  element = GFX_ELEMENT(element);
-
-  if (direction == MV_NONE)
-    return element_info[element].graphic[action];
-
-  direction = MV_DIR_TO_BIT(direction);
-
-  return element_info[element].direction_graphic[action][direction];
-}
-#else
 int el_act_dir2img(int element, int action, int direction)
 {
   element = GFX_ELEMENT(element);
@@ -9443,21 +6674,7 @@ int el_act_dir2img(int element, int action, int direction)
   /* direction_graphic[][] == graphic[] for undefined direction graphics */
   return element_info[element].direction_graphic[action][direction];
 }
-#endif
 
-#if 0
-static int el_act_dir2crm(int element, int action, int direction)
-{
-  element = GFX_ELEMENT(element);
-
-  if (direction == MV_NONE)
-    return element_info[element].crumbled[action];
-
-  direction = MV_DIR_TO_BIT(direction);
-
-  return element_info[element].direction_crumbled[action][direction];
-}
-#else
 static int el_act_dir2crm(int element, int action, int direction)
 {
   element = GFX_ELEMENT(element);
@@ -9466,7 +6683,6 @@ static int el_act_dir2crm(int element, int action, int direction)
   /* direction_graphic[][] == graphic[] for undefined direction graphics */
   return element_info[element].direction_crumbled[action][direction];
 }
-#endif
 
 int el_act2img(int element, int action)
 {
@@ -9648,44 +6864,10 @@ int getBeltSwitchElementFromBeltNrAndBeltDir(int belt_nr, int belt_dir)
   return getBeltSwitchElementFromBeltNrAndBeltDirNr(belt_nr, belt_dir_nr);
 }
 
-#if 1
 boolean getTeamMode_EM()
 {
   return game.team_mode;
 }
-#else
-int getNumActivePlayers_EM()
-{
-#if 1
-  int num_players = 0;
-  int i;
-
-  if (!tape.playing)
-    return (setup.team_mode ? MAX_PLAYERS : 1);
-
-  for (i = 0; i < MAX_PLAYERS; i++)
-    if (tape.player_participates[i])
-      num_players++;
-
-  return (num_players > 1 ? MAX_PLAYERS : 1);
-
-#else
-
-  int num_players = 0;
-  int i;
-
-  /* when recording game, activate all connected players */
-  if (!tape.playing)
-    return -1;
-
-  for (i = 0; i < MAX_PLAYERS; i++)
-    if (tape.player_participates[i])
-      num_players++;
-
-  return num_players;
-#endif
-}
-#endif
 
 int getGameFrameDelay_EM(int native_em_game_frame_delay)
 {
@@ -9712,10 +6894,8 @@ unsigned int InitRND(int seed)
     return InitEngineRandom_RND(seed);
 }
 
-#if 1
 static struct Mapping_EM_to_RND_object object_mapping[TILE_MAX];
 static struct Mapping_EM_to_RND_player player_mapping[MAX_PLAYERS][SPR_MAX];
-#endif
 
 inline static int get_effective_element_EM(int tile, int frame_em)
 {
@@ -9733,13 +6913,6 @@ inline static int get_effective_element_EM(int tile, int frame_em)
       case Yacid_splash_eB:
       case Yacid_splash_wB:
 	return (frame_em > 5 ? EL_EMPTY : element);
-
-#if 0
-	/* !!! FIX !!! */
-      case Ydiamond_stone:
-	//  if (!game.use_native_emc_graphics_engine)
-	return EL_ROCK;
-#endif
 
       default:
 	return element;
@@ -9818,11 +6991,9 @@ inline static boolean check_linear_animation_EM(int tile)
     case Ytank_s_e:
     case Ytank_w_s:
     case Ytank_n_w:
-#if 1
     case Yacid_splash_eB:
     case Yacid_splash_wB:
     case Yemerald_stone:
-#endif
       return TRUE;
   }
 
@@ -9875,7 +7046,6 @@ void SetGfxAnimation_EM(struct GraphicInfo_EM *g_em,
 			int tile, int frame_em, int x, int y)
 {
   int action = object_mapping[tile].action;
-#if 1
   int direction = object_mapping[tile].direction;
   int effective_element = get_effective_element_EM(tile, frame_em);
   int graphic = (direction == MV_NONE ?
@@ -9883,7 +7053,6 @@ void SetGfxAnimation_EM(struct GraphicInfo_EM *g_em,
 		 el_act_dir2img(effective_element, action, direction));
   struct GraphicInfo *g = &graphic_info[graphic];
   int sync_frame;
-#endif
   boolean action_removing = (action == ACTION_DIGGING ||
 			     action == ACTION_SNAPPING ||
 			     action == ACTION_COLLECTING);
@@ -9910,29 +7079,10 @@ void SetGfxAnimation_EM(struct GraphicInfo_EM *g_em,
     g = &graphic_info[graphic];
   }
 
-#if 0
-  if (tile == Xsand_stonesand_1 ||
-      tile == Xsand_stonesand_2 ||
-      tile == Xsand_stonesand_3 ||
-      tile == Xsand_stonesand_4)
-    printf("::: 1: quicksand frame %d [%d]\n", GfxFrame[x][y], tile);
-#endif
-
-#if 1
   if ((action_removing || check_linear_animation_EM(tile)) && frame_em == 0)
   {
     GfxFrame[x][y] = 0;
-
-    // printf("::: resetting... [%d]\n", tile);
   }
-#else
-  if (action_removing || check_linear_animation_EM(tile))
-  {
-    GfxFrame[x][y] = frame_em;
-
-    // printf("::: resetting... [%d]\n", tile);
-  }
-#endif
   else if (action_moving)
   {
     boolean is_backside = object_mapping[tile].is_backside;
@@ -9947,11 +7097,7 @@ void SetGfxAnimation_EM(struct GraphicInfo_EM *g_em,
 #if 1
       /* !!! TEST !!! NEW !!! DOES NOT WORK RIGHT YET !!! */
       if (g->double_movement && frame_em == 0)
-      {
 	GfxFrame[x][y] = 0;
-
-	// printf("::: resetting... [%d]\n", tile);
-      }
 #endif
 
       if (move_dir == MV_LEFT)
@@ -9974,15 +7120,6 @@ void SetGfxAnimation_EM(struct GraphicInfo_EM *g_em,
       GfxFrame[x][y]++;
   }
 
-#if 0
-  if (tile == Xsand_stonesand_1 ||
-      tile == Xsand_stonesand_2 ||
-      tile == Xsand_stonesand_3 ||
-      tile == Xsand_stonesand_4)
-    printf("::: 2: quicksand frame %d [%d]\n", GfxFrame[x][y], tile);
-#endif
-
-#if 1
   if (graphic_info[graphic].anim_global_sync)
     sync_frame = FrameCounter;
   else if (IN_FIELD(x, y, MAX_LEV_FIELDX, MAX_LEV_FIELDY))
@@ -10000,7 +7137,6 @@ void SetGfxAnimation_EM(struct GraphicInfo_EM *g_em,
 
   g_em->unique_identifier =
     (graphic << 16) | ((frame % 8) << 12) | (g_em->width << 6) | g_em->height;
-#endif
 }
 
 void getGraphicSourceObjectExt_EM(struct GraphicInfo_EM *g_em,
@@ -10010,11 +7146,7 @@ void getGraphicSourceObjectExt_EM(struct GraphicInfo_EM *g_em,
   int direction = object_mapping[tile].direction;
   boolean is_backside = object_mapping[tile].is_backside;
   int effective_element = get_effective_element_EM(tile, frame_em);
-#if 1
   int effective_action = action;
-#else
-  int effective_action = (frame_em < 7 ? action : ACTION_DEFAULT);
-#endif
   int graphic = (direction == MV_NONE ?
 		 el_act2img(effective_element, effective_action) :
 		 el_act_dir2img(effective_element, effective_action,
@@ -10027,9 +7159,6 @@ void getGraphicSourceObjectExt_EM(struct GraphicInfo_EM *g_em,
   int base_crumbled = el_act2crm(effective_element, ACTION_DEFAULT);
   boolean has_crumbled_graphics = (base_crumbled != base_graphic);
   struct GraphicInfo *g = &graphic_info[graphic];
-#if 0
-  struct GraphicInfo *g_crumbled = &graphic_info[crumbled];
-#endif
   int sync_frame;
 
   /* special case: graphic uses "2nd movement tile" and has defined
@@ -10050,20 +7179,6 @@ void getGraphicSourceObjectExt_EM(struct GraphicInfo_EM *g_em,
     g = &graphic_info[graphic];
   }
 
-#if 0
-  if (frame_em == 7)
-    return;
-#endif
-
-
-#if 0
-  if (frame_em == 0)	/* reset animation frame for certain elements */
-  {
-    if (check_linear_animation_EM(tile))
-      GfxFrame[x][y] = 0;
-  }
-#endif
-
   if (graphic_info[graphic].anim_global_sync)
     sync_frame = FrameCounter;
   else if (IN_FIELD(x, y, MAX_LEV_FIELDX, MAX_LEV_FIELDY))
@@ -10073,517 +7188,19 @@ void getGraphicSourceObjectExt_EM(struct GraphicInfo_EM *g_em,
 
   SetRandomAnimationValue(x, y);
 
-#if 0
-  int i = tile;
-  int j = frame_em;
-  int xxx_sync_frame = (i == Xdrip_stretch ? 7 :
-			i == Xdrip_stretchB ? 7 :
-			i == Ydrip_s2 ? j + 8 :
-			i == Ydrip_s2B ? j + 8 :
-			i == Xacid_1 ? 0 :
-			i == Xacid_2 ? 10 :
-			i == Xacid_3 ? 20 :
-			i == Xacid_4 ? 30 :
-			i == Xacid_5 ? 40 :
-			i == Xacid_6 ? 50 :
-			i == Xacid_7 ? 60 :
-			i == Xacid_8 ? 70 :
-			i == Xfake_acid_1 ? 0 :
-			i == Xfake_acid_2 ? 10 :
-			i == Xfake_acid_3 ? 20 :
-			i == Xfake_acid_4 ? 30 :
-			i == Xfake_acid_5 ? 40 :
-			i == Xfake_acid_6 ? 50 :
-			i == Xfake_acid_7 ? 60 :
-			i == Xfake_acid_8 ? 70 :
-			i == Xball_2 ? 7 :
-			i == Xball_2B ? j + 8 :
-			i == Yball_eat ? j + 1 :
-			i == Ykey_1_eat ? j + 1 :
-			i == Ykey_2_eat ? j + 1 :
-			i == Ykey_3_eat ? j + 1 :
-			i == Ykey_4_eat ? j + 1 :
-			i == Ykey_5_eat ? j + 1 :
-			i == Ykey_6_eat ? j + 1 :
-			i == Ykey_7_eat ? j + 1 :
-			i == Ykey_8_eat ? j + 1 :
-			i == Ylenses_eat ? j + 1 :
-			i == Ymagnify_eat ? j + 1 :
-			i == Ygrass_eat ? j + 1 :
-			i == Ydirt_eat ? j + 1 :
-			i == Xamoeba_1 ? 0 :
-			i == Xamoeba_2 ? 1 :
-			i == Xamoeba_3 ? 2 :
-			i == Xamoeba_4 ? 3 :
-			i == Xamoeba_5 ? 0 :
-			i == Xamoeba_6 ? 1 :
-			i == Xamoeba_7 ? 2 :
-			i == Xamoeba_8 ? 3 :
-			i == Xexit_2 ? j + 8 :
-			i == Xexit_3 ? j + 16 :
-			i == Xdynamite_1 ? 0 :
-			i == Xdynamite_2 ? 8 :
-			i == Xdynamite_3 ? 16 :
-			i == Xdynamite_4 ? 24 :
-			i == Xsand_stonein_1 ? j + 1 :
-			i == Xsand_stonein_2 ? j + 9 :
-			i == Xsand_stonein_3 ? j + 17 :
-			i == Xsand_stonein_4 ? j + 25 :
-			i == Xsand_stoneout_1 && j == 0 ? 0 :
-			i == Xsand_stoneout_1 && j == 1 ? 0 :
-			i == Xsand_stoneout_1 && j == 2 ? 1 :
-			i == Xsand_stoneout_1 && j == 3 ? 2 :
-			i == Xsand_stoneout_1 && j == 4 ? 2 :
-			i == Xsand_stoneout_1 && j == 5 ? 3 :
-			i == Xsand_stoneout_1 && j == 6 ? 4 :
-			i == Xsand_stoneout_1 && j == 7 ? 4 :
-			i == Xsand_stoneout_2 && j == 0 ? 5 :
-			i == Xsand_stoneout_2 && j == 1 ? 6 :
-			i == Xsand_stoneout_2 && j == 2 ? 7 :
-			i == Xsand_stoneout_2 && j == 3 ? 8 :
-			i == Xsand_stoneout_2 && j == 4 ? 9 :
-			i == Xsand_stoneout_2 && j == 5 ? 11 :
-			i == Xsand_stoneout_2 && j == 6 ? 13 :
-			i == Xsand_stoneout_2 && j == 7 ? 15 :
-			i == Xboom_bug && j == 1 ? 2 :
-			i == Xboom_bug && j == 2 ? 2 :
-			i == Xboom_bug && j == 3 ? 4 :
-			i == Xboom_bug && j == 4 ? 4 :
-			i == Xboom_bug && j == 5 ? 2 :
-			i == Xboom_bug && j == 6 ? 2 :
-			i == Xboom_bug && j == 7 ? 0 :
-			i == Xboom_bomb && j == 1 ? 2 :
-			i == Xboom_bomb && j == 2 ? 2 :
-			i == Xboom_bomb && j == 3 ? 4 :
-			i == Xboom_bomb && j == 4 ? 4 :
-			i == Xboom_bomb && j == 5 ? 2 :
-			i == Xboom_bomb && j == 6 ? 2 :
-			i == Xboom_bomb && j == 7 ? 0 :
-			i == Xboom_android && j == 7 ? 6 :
-			i == Xboom_1 && j == 1 ? 2 :
-			i == Xboom_1 && j == 2 ? 2 :
-			i == Xboom_1 && j == 3 ? 4 :
-			i == Xboom_1 && j == 4 ? 4 :
-			i == Xboom_1 && j == 5 ? 6 :
-			i == Xboom_1 && j == 6 ? 6 :
-			i == Xboom_1 && j == 7 ? 8 :
-			i == Xboom_2 && j == 0 ? 8 :
-			i == Xboom_2 && j == 1 ? 8 :
-			i == Xboom_2 && j == 2 ? 10 :
-			i == Xboom_2 && j == 3 ? 10 :
-			i == Xboom_2 && j == 4 ? 10 :
-			i == Xboom_2 && j == 5 ? 12 :
-			i == Xboom_2 && j == 6 ? 12 :
-			i == Xboom_2 && j == 7 ? 12 :
-#if 0
-			special_animation && j == 4 ? 3 :
-			effective_action != action ? 0 :
-#endif
-			j);
-#endif
-
-#if 0
-  int xxx_effective_action;
-  int xxx_has_action_graphics;
-
-  {
-    int element = object_mapping[i].element_rnd;
-    int action = object_mapping[i].action;
-    int direction = object_mapping[i].direction;
-    boolean is_backside = object_mapping[i].is_backside;
-#if 0
-    boolean action_removing = (action == ACTION_DIGGING ||
-			       action == ACTION_SNAPPING ||
-			       action == ACTION_COLLECTING);
-#endif
-    boolean action_exploding = ((action == ACTION_EXPLODING ||
-				 action == ACTION_SMASHED_BY_ROCK ||
-				 action == ACTION_SMASHED_BY_SPRING) &&
-				element != EL_DIAMOND);
-    boolean action_active = (action == ACTION_ACTIVE);
-    boolean action_other = (action == ACTION_OTHER);
-
-    {
-#if 1
-      int effective_element = get_effective_element_EM(i, j);
-#else
-      int effective_element = (j > 5 && i == Yacid_splash_eB ? EL_EMPTY :
-			       j > 5 && i == Yacid_splash_wB ? EL_EMPTY :
-			       j < 7 ? element :
-			       i == Xdrip_stretch ? element :
-			       i == Xdrip_stretchB ? element :
-			       i == Ydrip_s1 ? element :
-			       i == Ydrip_s1B ? element :
-			       i == Xball_1B ? element :
-			       i == Xball_2 ? element :
-			       i == Xball_2B ? element :
-			       i == Yball_eat ? element :
-			       i == Ykey_1_eat ? element :
-			       i == Ykey_2_eat ? element :
-			       i == Ykey_3_eat ? element :
-			       i == Ykey_4_eat ? element :
-			       i == Ykey_5_eat ? element :
-			       i == Ykey_6_eat ? element :
-			       i == Ykey_7_eat ? element :
-			       i == Ykey_8_eat ? element :
-			       i == Ylenses_eat ? element :
-			       i == Ymagnify_eat ? element :
-			       i == Ygrass_eat ? element :
-			       i == Ydirt_eat ? element :
-			       i == Yemerald_stone ? EL_EMERALD :
-			       i == Ydiamond_stone ? EL_ROCK :
-			       i == Xsand_stonein_1 ? element :
-			       i == Xsand_stonein_2 ? element :
-			       i == Xsand_stonein_3 ? element :
-			       i == Xsand_stonein_4 ? element :
-			       is_backside ? EL_EMPTY :
-			       action_removing ? EL_EMPTY :
-			       element);
-#endif
-      int effective_action = (j < 7 ? action :
-			      i == Xdrip_stretch ? action :
-			      i == Xdrip_stretchB ? action :
-			      i == Ydrip_s1 ? action :
-			      i == Ydrip_s1B ? action :
-			      i == Xball_1B ? action :
-			      i == Xball_2 ? action :
-			      i == Xball_2B ? action :
-			      i == Yball_eat ? action :
-			      i == Ykey_1_eat ? action :
-			      i == Ykey_2_eat ? action :
-			      i == Ykey_3_eat ? action :
-			      i == Ykey_4_eat ? action :
-			      i == Ykey_5_eat ? action :
-			      i == Ykey_6_eat ? action :
-			      i == Ykey_7_eat ? action :
-			      i == Ykey_8_eat ? action :
-			      i == Ylenses_eat ? action :
-			      i == Ymagnify_eat ? action :
-			      i == Ygrass_eat ? action :
-			      i == Ydirt_eat ? action :
-			      i == Xsand_stonein_1 ? action :
-			      i == Xsand_stonein_2 ? action :
-			      i == Xsand_stonein_3 ? action :
-			      i == Xsand_stonein_4 ? action :
-			      i == Xsand_stoneout_1 ? action :
-			      i == Xsand_stoneout_2 ? action :
-			      i == Xboom_android ? ACTION_EXPLODING :
-			      action_exploding ? ACTION_EXPLODING :
-			      action_active ? action :
-			      action_other ? action :
-			      ACTION_DEFAULT);
-      int graphic = (el_act_dir2img(effective_element, effective_action,
-				    direction));
-      int crumbled = (el_act_dir2crm(effective_element, effective_action,
-				     direction));
-      int base_graphic = el_act2img(effective_element, ACTION_DEFAULT);
-      int base_crumbled = el_act2crm(effective_element, ACTION_DEFAULT);
-      boolean has_action_graphics = (graphic != base_graphic);
-      boolean has_crumbled_graphics = (base_crumbled != base_graphic);
-      struct GraphicInfo *g = &graphic_info[graphic];
-#if 0
-      struct GraphicInfo *g_crumbled = &graphic_info[crumbled];
-#endif
-      struct GraphicInfo_EM *g_em = &graphic_info_em_object[i][7 - j];
-      Bitmap *src_bitmap;
-      int src_x, src_y;
-      /* ensure to get symmetric 3-frame, 2-delay animations as used in EM */
-      boolean special_animation = (action != ACTION_DEFAULT &&
-				   g->anim_frames == 3 &&
-				   g->anim_delay == 2 &&
-				   g->anim_mode & ANIM_LINEAR);
-      xxx_sync_frame = (i == Xdrip_stretch ? 7 :
-			i == Xdrip_stretchB ? 7 :
-			i == Ydrip_s2 ? j + 8 :
-			i == Ydrip_s2B ? j + 8 :
-			i == Xacid_1 ? 0 :
-			i == Xacid_2 ? 10 :
-			i == Xacid_3 ? 20 :
-			i == Xacid_4 ? 30 :
-			i == Xacid_5 ? 40 :
-			i == Xacid_6 ? 50 :
-			i == Xacid_7 ? 60 :
-			i == Xacid_8 ? 70 :
-			i == Xfake_acid_1 ? 0 :
-			i == Xfake_acid_2 ? 10 :
-			i == Xfake_acid_3 ? 20 :
-			i == Xfake_acid_4 ? 30 :
-			i == Xfake_acid_5 ? 40 :
-			i == Xfake_acid_6 ? 50 :
-			i == Xfake_acid_7 ? 60 :
-			i == Xfake_acid_8 ? 70 :
-			i == Xball_2 ? 7 :
-			i == Xball_2B ? j + 8 :
-			i == Yball_eat ? j + 1 :
-			i == Ykey_1_eat ? j + 1 :
-			i == Ykey_2_eat ? j + 1 :
-			i == Ykey_3_eat ? j + 1 :
-			i == Ykey_4_eat ? j + 1 :
-			i == Ykey_5_eat ? j + 1 :
-			i == Ykey_6_eat ? j + 1 :
-			i == Ykey_7_eat ? j + 1 :
-			i == Ykey_8_eat ? j + 1 :
-			i == Ylenses_eat ? j + 1 :
-			i == Ymagnify_eat ? j + 1 :
-			i == Ygrass_eat ? j + 1 :
-			i == Ydirt_eat ? j + 1 :
-			i == Xamoeba_1 ? 0 :
-			i == Xamoeba_2 ? 1 :
-			i == Xamoeba_3 ? 2 :
-			i == Xamoeba_4 ? 3 :
-			i == Xamoeba_5 ? 0 :
-			i == Xamoeba_6 ? 1 :
-			i == Xamoeba_7 ? 2 :
-			i == Xamoeba_8 ? 3 :
-			i == Xexit_2 ? j + 8 :
-			i == Xexit_3 ? j + 16 :
-			i == Xdynamite_1 ? 0 :
-			i == Xdynamite_2 ? 8 :
-			i == Xdynamite_3 ? 16 :
-			i == Xdynamite_4 ? 24 :
-			i == Xsand_stonein_1 ? j + 1 :
-			i == Xsand_stonein_2 ? j + 9 :
-			i == Xsand_stonein_3 ? j + 17 :
-			i == Xsand_stonein_4 ? j + 25 :
-			i == Xsand_stoneout_1 && j == 0 ? 0 :
-			i == Xsand_stoneout_1 && j == 1 ? 0 :
-			i == Xsand_stoneout_1 && j == 2 ? 1 :
-			i == Xsand_stoneout_1 && j == 3 ? 2 :
-			i == Xsand_stoneout_1 && j == 4 ? 2 :
-			i == Xsand_stoneout_1 && j == 5 ? 3 :
-			i == Xsand_stoneout_1 && j == 6 ? 4 :
-			i == Xsand_stoneout_1 && j == 7 ? 4 :
-			i == Xsand_stoneout_2 && j == 0 ? 5 :
-			i == Xsand_stoneout_2 && j == 1 ? 6 :
-			i == Xsand_stoneout_2 && j == 2 ? 7 :
-			i == Xsand_stoneout_2 && j == 3 ? 8 :
-			i == Xsand_stoneout_2 && j == 4 ? 9 :
-			i == Xsand_stoneout_2 && j == 5 ? 11 :
-			i == Xsand_stoneout_2 && j == 6 ? 13 :
-			i == Xsand_stoneout_2 && j == 7 ? 15 :
-			i == Xboom_bug && j == 1 ? 2 :
-			i == Xboom_bug && j == 2 ? 2 :
-			i == Xboom_bug && j == 3 ? 4 :
-			i == Xboom_bug && j == 4 ? 4 :
-			i == Xboom_bug && j == 5 ? 2 :
-			i == Xboom_bug && j == 6 ? 2 :
-			i == Xboom_bug && j == 7 ? 0 :
-			i == Xboom_bomb && j == 1 ? 2 :
-			i == Xboom_bomb && j == 2 ? 2 :
-			i == Xboom_bomb && j == 3 ? 4 :
-			i == Xboom_bomb && j == 4 ? 4 :
-			i == Xboom_bomb && j == 5 ? 2 :
-			i == Xboom_bomb && j == 6 ? 2 :
-			i == Xboom_bomb && j == 7 ? 0 :
-			i == Xboom_android && j == 7 ? 6 :
-			i == Xboom_1 && j == 1 ? 2 :
-			i == Xboom_1 && j == 2 ? 2 :
-			i == Xboom_1 && j == 3 ? 4 :
-			i == Xboom_1 && j == 4 ? 4 :
-			i == Xboom_1 && j == 5 ? 6 :
-			i == Xboom_1 && j == 6 ? 6 :
-			i == Xboom_1 && j == 7 ? 8 :
-			i == Xboom_2 && j == 0 ? 8 :
-			i == Xboom_2 && j == 1 ? 8 :
-			i == Xboom_2 && j == 2 ? 10 :
-			i == Xboom_2 && j == 3 ? 10 :
-			i == Xboom_2 && j == 4 ? 10 :
-			i == Xboom_2 && j == 5 ? 12 :
-			i == Xboom_2 && j == 6 ? 12 :
-			i == Xboom_2 && j == 7 ? 12 :
-			special_animation && j == 4 ? 3 :
-			effective_action != action ? 0 :
-			j);
-
-      xxx_effective_action = effective_action;
-      xxx_has_action_graphics = has_action_graphics;
-    }
-  }
-#endif
-
   int frame = getAnimationFrame(g->anim_frames,
 				g->anim_delay,
 				g->anim_mode,
 				g->anim_start_frame,
 				sync_frame);
 
-
-#if 0
-  return;
-#endif
-
-#if 0
-  if (frame_em == 7)
-    return;
-#endif
-
-#if 0
-  int old_src_x = g_em->src_x;
-  int old_src_y = g_em->src_y;
-#endif
-
-#if 1
   getGraphicSourceExt(graphic, frame, &g_em->bitmap, &g_em->src_x, &g_em->src_y,
 		      g->double_movement && is_backside);
-#else
-  getGraphicSourceExt(graphic, frame, &g_em->bitmap,
-		      &g_em->src_x, &g_em->src_y, FALSE);
-#endif
-
-
-#if 0
-  if (tile == Ydiamond_stone)
-    printf("::: stone smashing diamond... %d: %d, %d, %d, %d, %d -> %d [%d, %d, %d, %d, %d, %d] [%d]\n",
-	   frame_em,
-	   g->anim_frames,
-	   g->anim_delay,
-	   g->anim_mode,
-	   g->anim_start_frame,
-	   sync_frame,
-	   frame,
-	   g_em->src_x, g_em->src_y,
-	   g_em->src_offset_x, g_em->src_offset_y,
-	   g_em->dst_offset_x, g_em->dst_offset_y,
-	   graphic);
-#endif
-
-
-#if 0
-  return;
-#endif
-
-#if 0
-  if (frame_em == 7)
-  {
-    if (graphic == IMG_BUG_MOVING_RIGHT)
-      printf("::: %d, %d, %d: %d, %d [%d, %d -> %d, %d]\n", graphic, x, y,
-	     g->double_movement, is_backside,
-	     old_src_x, old_src_y, g_em->src_x, g_em->src_y);
-
-    return;
-  }
-#endif
-
-
-#if 0
-  g_em->src_offset_x = 0;
-  g_em->src_offset_y = 0;
-  g_em->dst_offset_x = 0;
-  g_em->dst_offset_y = 0;
-  g_em->width  = TILEX;
-  g_em->height = TILEY;
-
-  g_em->preserve_background = FALSE;
-#endif
 
   /* (updating the "crumbled" graphic definitions is probably not really needed,
      as animations for crumbled graphics can't be longer than one EMC cycle) */
-#if 1
   set_crumbled_graphics_EM(g_em, has_crumbled_graphics, crumbled,
 			   sync_frame);
-
-#else
-
-  g_em->crumbled_bitmap = NULL;
-  g_em->crumbled_src_x = 0;
-  g_em->crumbled_src_y = 0;
-
-  g_em->has_crumbled_graphics = FALSE;
-
-  if (has_crumbled_graphics && crumbled != IMG_EMPTY_SPACE)
-  {
-    int frame_crumbled = getAnimationFrame(g_crumbled->anim_frames,
-					   g_crumbled->anim_delay,
-					   g_crumbled->anim_mode,
-					   g_crumbled->anim_start_frame,
-					   sync_frame);
-
-    getGraphicSource(crumbled, frame_crumbled, &g_em->crumbled_bitmap,
-		     &g_em->crumbled_src_x, &g_em->crumbled_src_y);
-
-    g_em->has_crumbled_graphics = TRUE;
-  }
-#endif
-
-#if 0
- {
-   int effective_action = xxx_effective_action;
-   int has_action_graphics = xxx_has_action_graphics;
-
-      if ((!g->double_movement && (effective_action == ACTION_FALLING ||
-				   effective_action == ACTION_MOVING  ||
-				   effective_action == ACTION_PUSHING ||
-				   effective_action == ACTION_EATING)) ||
-	  (!has_action_graphics && (effective_action == ACTION_FILLING ||
-				    effective_action == ACTION_EMPTYING)))
-      {
-	int move_dir =
-	  (effective_action == ACTION_FALLING ||
-	   effective_action == ACTION_FILLING ||
-	   effective_action == ACTION_EMPTYING ? MV_DOWN : direction);
-	int dx = (move_dir == MV_LEFT ? -1 : move_dir == MV_RIGHT ? 1 : 0);
-	int dy = (move_dir == MV_UP   ? -1 : move_dir == MV_DOWN  ? 1 : 0);
-	int num_steps = (i == Ydrip_s1  ? 16 :
-			 i == Ydrip_s1B ? 16 :
-			 i == Ydrip_s2  ? 16 :
-			 i == Ydrip_s2B ? 16 :
-			 i == Xsand_stonein_1 ? 32 :
-			 i == Xsand_stonein_2 ? 32 :
-			 i == Xsand_stonein_3 ? 32 :
-			 i == Xsand_stonein_4 ? 32 :
-			 i == Xsand_stoneout_1 ? 16 :
-			 i == Xsand_stoneout_2 ? 16 : 8);
-	int cx = ABS(dx) * (TILEX / num_steps);
-	int cy = ABS(dy) * (TILEY / num_steps);
-	int step_frame = (i == Ydrip_s2         ? j + 8 :
-			  i == Ydrip_s2B        ? j + 8 :
-			  i == Xsand_stonein_2  ? j + 8 :
-			  i == Xsand_stonein_3  ? j + 16 :
-			  i == Xsand_stonein_4  ? j + 24 :
-			  i == Xsand_stoneout_2 ? j + 8 : j) + 1;
-	int step = (is_backside ? step_frame : num_steps - step_frame);
-
-	if (is_backside)	/* tile where movement starts */
-	{
-	  if (dx < 0 || dy < 0)
-	  {
-	    g_em->src_offset_x = cx * step;
-	    g_em->src_offset_y = cy * step;
-	  }
-	  else
-	  {
-	    g_em->dst_offset_x = cx * step;
-	    g_em->dst_offset_y = cy * step;
-	  }
-	}
-	else			/* tile where movement ends */
-	{
-	  if (dx < 0 || dy < 0)
-	  {
-	    g_em->dst_offset_x = cx * step;
-	    g_em->dst_offset_y = cy * step;
-	  }
-	  else
-	  {
-	    g_em->src_offset_x = cx * step;
-	    g_em->src_offset_y = cy * step;
-	  }
-	}
-
-	g_em->width  = TILEX - cx * step;
-	g_em->height = TILEY - cy * step;
-      }
-
-      /* create unique graphic identifier to decide if tile must be redrawn */
-      /* bit 31 - 16 (16 bit): EM style graphic
-	 bit 15 - 12 ( 4 bit): EM style frame
-	 bit 11 -  6 ( 6 bit): graphic width
-	 bit  5 -  0 ( 6 bit): graphic height */
-      g_em->unique_identifier =
-	(graphic << 16) | (frame << 12) | (g_em->width << 6) | g_em->height;
- }
-#endif
-
 }
 
 void getGraphicSourcePlayerExt_EM(struct GraphicInfo_EM *g_em,
@@ -10612,22 +7229,10 @@ void getGraphicSourcePlayerExt_EM(struct GraphicInfo_EM *g_em,
 
   getGraphicSourceExt(graphic, frame, &g_em->bitmap,
 		      &g_em->src_x, &g_em->src_y, FALSE);
-
-#if 0
-  printf("::: %d: %d, %d [%d]\n",
-	 player_nr,
-	 stored_player[player_nr].Frame,
-	 stored_player[player_nr].StepFrame,
-	 FrameCounter);
-#endif
 }
 
 void InitGraphicInfo_EM(void)
 {
-#if 0
-  struct Mapping_EM_to_RND_object object_mapping[TILE_MAX];
-  struct Mapping_EM_to_RND_player player_mapping[MAX_PLAYERS][SPR_MAX];
-#endif
   int i, j, p;
 
 #if DEBUG_EM_GFX
@@ -10699,11 +7304,6 @@ void InitGraphicInfo_EM(void)
     int action = object_mapping[i].action;
     int direction = object_mapping[i].direction;
     boolean is_backside = object_mapping[i].is_backside;
-#if 0
-    boolean action_removing = (action == ACTION_DIGGING ||
-			       action == ACTION_SNAPPING ||
-			       action == ACTION_COLLECTING);
-#endif
     boolean action_exploding = ((action == ACTION_EXPLODING ||
 				 action == ACTION_SMASHED_BY_ROCK ||
 				 action == ACTION_SMASHED_BY_SPRING) &&
@@ -10713,42 +7313,7 @@ void InitGraphicInfo_EM(void)
 
     for (j = 0; j < 8; j++)
     {
-#if 1
       int effective_element = get_effective_element_EM(i, j);
-#else
-      int effective_element = (j > 5 && i == Yacid_splash_eB ? EL_EMPTY :
-			       j > 5 && i == Yacid_splash_wB ? EL_EMPTY :
-			       j < 7 ? element :
-			       i == Xdrip_stretch ? element :
-			       i == Xdrip_stretchB ? element :
-			       i == Ydrip_s1 ? element :
-			       i == Ydrip_s1B ? element :
-			       i == Xball_1B ? element :
-			       i == Xball_2 ? element :
-			       i == Xball_2B ? element :
-			       i == Yball_eat ? element :
-			       i == Ykey_1_eat ? element :
-			       i == Ykey_2_eat ? element :
-			       i == Ykey_3_eat ? element :
-			       i == Ykey_4_eat ? element :
-			       i == Ykey_5_eat ? element :
-			       i == Ykey_6_eat ? element :
-			       i == Ykey_7_eat ? element :
-			       i == Ykey_8_eat ? element :
-			       i == Ylenses_eat ? element :
-			       i == Ymagnify_eat ? element :
-			       i == Ygrass_eat ? element :
-			       i == Ydirt_eat ? element :
-			       i == Yemerald_stone ? EL_EMERALD :
-			       i == Ydiamond_stone ? EL_ROCK :
-			       i == Xsand_stonein_1 ? element :
-			       i == Xsand_stonein_2 ? element :
-			       i == Xsand_stonein_3 ? element :
-			       i == Xsand_stonein_4 ? element :
-			       is_backside ? EL_EMPTY :
-			       action_removing ? EL_EMPTY :
-			       element);
-#endif
       int effective_action = (j < 7 ? action :
 			      i == Xdrip_stretch ? action :
 			      i == Xdrip_stretchB ? action :
@@ -10790,9 +7355,6 @@ void InitGraphicInfo_EM(void)
       boolean has_action_graphics = (graphic != base_graphic);
       boolean has_crumbled_graphics = (base_crumbled != base_graphic);
       struct GraphicInfo *g = &graphic_info[graphic];
-#if 0
-      struct GraphicInfo *g_crumbled = &graphic_info[crumbled];
-#endif
       struct GraphicInfo_EM *g_em = &graphic_info_em_object[i][7 - j];
       Bitmap *src_bitmap;
       int src_x, src_y;
@@ -10931,74 +7493,8 @@ void InitGraphicInfo_EM(void)
 
       g_em->preserve_background = FALSE;
 
-#if 1
       set_crumbled_graphics_EM(g_em, has_crumbled_graphics, crumbled,
 			       sync_frame);
-
-#else
-
-      g_em->crumbled_bitmap = NULL;
-      g_em->crumbled_src_x = 0;
-      g_em->crumbled_src_y = 0;
-      g_em->crumbled_border_size = 0;
-
-      g_em->has_crumbled_graphics = FALSE;
-
-#if 0
-      if (has_crumbled_graphics && crumbled == IMG_EMPTY_SPACE)
-	printf("::: empty crumbled: %d [%s], %d, %d\n",
-	       effective_element, element_info[effective_element].token_name,
-	       effective_action, direction);
-#endif
-
-      /* if element can be crumbled, but certain action graphics are just empty
-	 space (like instantly snapping sand to empty space in 1 frame), do not
-	 treat these empty space graphics as crumbled graphics in EMC engine */
-      if (has_crumbled_graphics && crumbled != IMG_EMPTY_SPACE)
-      {
-	int frame_crumbled = getAnimationFrame(g_crumbled->anim_frames,
-					       g_crumbled->anim_delay,
-					       g_crumbled->anim_mode,
-					       g_crumbled->anim_start_frame,
-					       sync_frame);
-
-	getGraphicSource(crumbled, frame_crumbled, &src_bitmap, &src_x, &src_y);
-
-	g_em->has_crumbled_graphics = TRUE;
-	g_em->crumbled_bitmap = src_bitmap;
-	g_em->crumbled_src_x = src_x;
-	g_em->crumbled_src_y = src_y;
-	g_em->crumbled_border_size = graphic_info[crumbled].border_size;
-
-
-#if 0
-	if (g_em == &graphic_info_em_object[207][0])
-	  printf("... %d, %d [%d, %d, %d, %d] [%d, %d, %d, %d, %d, %d => %d]\n",
-		 graphic_info_em_object[207][0].crumbled_src_x,
-		 graphic_info_em_object[207][0].crumbled_src_y,
-
-		 crumbled, frame, src_x, src_y,
-
-		 g->anim_frames,
-		 g->anim_delay,
-		 g->anim_mode,
-		 g->anim_start_frame,
-		 sync_frame,
-		 gfx.anim_random_frame,
-		 frame);
-#endif
-
-#if 0
-	printf("::: EMC tile %d is crumbled\n", i);
-#endif
-      }
-#endif
-
-#if 0
-      if (element == EL_ROCK &&
-	  effective_action == ACTION_FILLING)
-	printf("::: has_action_graphics == %d\n", has_action_graphics);
-#endif
 
       if ((!g->double_movement && (effective_action == ACTION_FALLING ||
 				   effective_action == ACTION_MOVING  ||
@@ -11295,42 +7791,16 @@ void CheckSingleStepMode_EM(byte action[MAX_PLAYERS], int frame,
 			    boolean player_is_dropping)
 {
   if (tape.single_step && tape.recording && !tape.pausing)
-  {
-#if 0
-    boolean active_players = FALSE;
-    int i;
-
-    for (i = 0; i < MAX_PLAYERS; i++)
-      if (action[i] != JOY_NO_ACTION)
-	active_players = TRUE;
-#endif
-
-    // if (frame == 0)
     if (frame == 0 && !player_is_dropping)
       TapeTogglePause(TAPE_TOGGLE_AUTOMATIC);
-  }
 }
 
 void CheckSingleStepMode_SP(boolean murphy_is_waiting,
 			    boolean murphy_is_dropping)
 {
-#if 0
-  printf("::: waiting: %d, dropping: %d\n",
-	 murphy_is_waiting, murphy_is_dropping);
-#endif
-
   if (tape.single_step && tape.recording && !tape.pausing)
-  {
-    // if (murphy_is_waiting || murphy_is_dropping)
     if (murphy_is_waiting)
-    {
-#if 0
-      printf("::: murphy is waiting -> pause mode\n");
-#endif
-
       TapeTogglePause(TAPE_TOGGLE_AUTOMATIC);
-    }
-  }
 }
 
 void getGraphicSource_SP(struct GraphicInfo_SP *g_sp,
@@ -11501,30 +7971,14 @@ void ToggleFullscreenOrChangeWindowScalingIfNeeded()
 
     FreeBitmap(tmp_backbuffer);
 
-#if 1
     /* update visible window/screen */
     BlitBitmap(backbuffer, window, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
-#else
-    redraw_mask = REDRAW_ALL;
-#endif
   }
 }
 
 void ChangeViewportPropertiesIfNeeded()
 {
-#if 0
-  int *door_1_x = &DX;
-  int *door_1_y = &DY;
-  int *door_2_x = (game_status == GAME_MODE_EDITOR ? &EX : &VX);
-  int *door_2_y = (game_status == GAME_MODE_EDITOR ? &EY : &VY);
-#endif
-#if 1
   int gfx_game_mode = game_status;
-#else
-  int gfx_game_mode = (game_status == GAME_MODE_PLAYING ||
-		       game_status == GAME_MODE_EDITOR ? game_status :
-		       GAME_MODE_MAIN);
-#endif
   int gfx_game_mode2 = (game_status == GAME_MODE_EDITOR ? GAME_MODE_DEFAULT :
 			game_status);
   struct RectWithBorder *vp_playfield = &viewport.playfield[gfx_game_mode];
@@ -11552,14 +8006,8 @@ void ChangeViewportPropertiesIfNeeded()
   int new_ey		= vp_door_3->y;
   int new_exsize	= vp_door_3->width;
   int new_eysize	= vp_door_3->height;
-#if NEW_TILESIZE
-
-#if NEW_GAME_TILESIZE
   int new_tilesize_var =
     (setup.small_game_graphics ? MINI_TILESIZE : game.tile_size);
-#else
-  int new_tilesize_var = TILESIZE / (setup.small_game_graphics ? 2 : 1);
-#endif
 
   int tilesize = (gfx_game_mode == GAME_MODE_PLAYING ? new_tilesize_var :
 		  gfx_game_mode == GAME_MODE_EDITOR ? MINI_TILESIZE : TILESIZE);
@@ -11567,20 +8015,10 @@ void ChangeViewportPropertiesIfNeeded()
   int new_scr_fieldy = new_sysize / tilesize;
   int new_scr_fieldx_buffers = new_sxsize / new_tilesize_var;
   int new_scr_fieldy_buffers = new_sysize / new_tilesize_var;
-#else
-  int new_scr_fieldx = (vp_playfield->width  - 2 * border_size) / TILESIZE;
-  int new_scr_fieldy = (vp_playfield->height - 2 * border_size) / TILESIZE;
-#endif
   boolean init_gfx_buffers = FALSE;
   boolean init_video_buffer = FALSE;
   boolean init_gadgets_and_toons = FALSE;
   boolean init_em_graphics = FALSE;
-
-#if 0
-  /* !!! TEST ONLY !!! */
-  // InitGfxBuffers();
-  return;
-#endif
 
   if (viewport.window.width  != WIN_XSIZE ||
       viewport.window.height != WIN_YSIZE)
@@ -11588,20 +8026,8 @@ void ChangeViewportPropertiesIfNeeded()
     WIN_XSIZE = viewport.window.width;
     WIN_YSIZE = viewport.window.height;
 
-#if 1
     init_video_buffer = TRUE;
     init_gfx_buffers = TRUE;
-#else
-    InitVideoBuffer(WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH, setup.fullscreen);
-    InitGfxBuffers();
-
-#if 1
-    SetDrawDeactivationMask(REDRAW_NONE);
-    SetDrawBackgroundMask(REDRAW_FIELD);
-
-    // RedrawBackground();
-#endif
-#endif
 
     // printf("::: video: init_video_buffer, init_gfx_buffers\n");
   }
@@ -11616,20 +8042,6 @@ void ChangeViewportPropertiesIfNeeded()
 
     // printf("::: new_scr_fieldx != SCR_FIELDX ...\n");
   }
-
-#if 0
-  if (new_tilesize_var != TILESIZE_VAR &&
-      gfx_game_mode == GAME_MODE_PLAYING)
-  {
-    /* doing this outside GAME_MODE_PLAYING would give wrong playfield size */
-
-    TILESIZE_VAR = new_tilesize_var;
-
-    init_gfx_buffers = TRUE;
-
-    // printf("::: tilesize: init_gfx_buffers\n");
-  }
-#endif
 
   if (new_sx != SX ||
       new_sy != SY ||
@@ -11652,16 +8064,8 @@ void ChangeViewportPropertiesIfNeeded()
       new_full_sxsize != FULL_SXSIZE ||
       new_full_sysize != FULL_SYSIZE ||
       new_tilesize_var != TILESIZE_VAR
-#if 0
-      ||
-      vp_door_1->x != *door_1_x ||
-      vp_door_1->y != *door_1_y ||
-      vp_door_2->x != *door_2_x ||
-      vp_door_2->y != *door_2_y
-#endif
       )
   {
-#if 1
     if (new_tilesize_var != TILESIZE_VAR)
     {
       // printf("::: new_tilesize_var != TILESIZE_VAR\n");
@@ -11672,7 +8076,6 @@ void ChangeViewportPropertiesIfNeeded()
       // changing tile size requires update of graphic mapping for EM engine
       init_em_graphics = TRUE;
     }
-#endif
 
     SX = new_sx;
     SY = new_sy;
@@ -11696,40 +8099,11 @@ void ChangeViewportPropertiesIfNeeded()
     FULL_SYSIZE = new_full_sysize;
     TILESIZE_VAR = new_tilesize_var;
 
-#if 0
-    printf("::: %d, %d, %d [%d]\n",
-	   SCR_FIELDX, SCR_FIELDY, TILESIZE_VAR,
-	   setup.small_game_graphics);
-#endif
-
-#if 0
-    *door_1_x = vp_door_1->x;
-    *door_1_y = vp_door_1->y;
-    *door_2_x = vp_door_2->x;
-    *door_2_y = vp_door_2->y;
-#endif
-
-#if 1
     init_gfx_buffers = TRUE;
+    init_gadgets_and_toons = TRUE;
 
     // printf("::: viewports: init_gfx_buffers\n");
-#else
-    InitGfxBuffers();
-#endif
-
-#if 0
-    if (gfx_game_mode == GAME_MODE_MAIN)
-#endif
-    {
-#if 1
-      init_gadgets_and_toons = TRUE;
-
-      // printf("::: viewports: init_gadgets_and_toons\n");
-#else
-      InitGadgets();
-      InitToons();
-#endif
-    }
+    // printf("::: viewports: init_gadgets_and_toons\n");
   }
 
   if (init_gfx_buffers)
@@ -11767,8 +8141,4 @@ void ChangeViewportPropertiesIfNeeded()
   {
       InitGraphicInfo_EM();
   }
-
-#if 0
-  printf("::: %d, %d  /  %d, %d [%d]\n", VX, VY, EX, EY, game_status);
-#endif
 }

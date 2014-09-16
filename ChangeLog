@@ -1,3 +1,6 @@
+2014-09-15
+	* removed large parts of the preprocessor hell of old and unused code
+
 2014-09-14
 	* updated source file headers (mainly author contact information)
 

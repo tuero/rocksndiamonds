@@ -45,64 +45,22 @@
 
 /* screen sizes and positions for EM engine */
 
-#define NEW_TILESIZE		1
-
-#define ORIG_TILESIZE		16
-
-#define ORIG_TILEX		16
-#define ORIG_TILEY		16
-#define ORIG_SCOREX		8
-#define ORIG_SCOREY		9
-#define ORIG_GFXMENUFONTX	14
-#define ORIG_GFXMENUFONTY	16
-#define ORIG_MENUFONTX		12
-#define ORIG_MENUFONTY		16
-
-#if NEW_TILESIZE
-#define ZOOM_FACTOR		(2 * TILESIZE_VAR / TILESIZE)
-#else
-#define ZOOM_FACTOR		2
-#endif
-
 #define TILESIZE		32
 
-#if NEW_TILESIZE
 extern int			TILESIZE_VAR;
+
 #define TILEX			TILESIZE_VAR
 #define TILEY			TILESIZE_VAR
-#else
-#define TILEX			(ORIG_TILEX		* ZOOM_FACTOR)
-#define TILEY			(ORIG_TILEY		* ZOOM_FACTOR)
-#endif
-#define SCOREX			(ORIG_SCOREX		* ZOOM_FACTOR)
-#define SCOREY			(ORIG_SCOREY		* ZOOM_FACTOR)
-#define GFXMENUFONTX		(ORIG_GFXMENUFONTX	* ZOOM_FACTOR)
-#define GFXMENUFONTY		(ORIG_GFXMENUFONTY	* ZOOM_FACTOR)
-#define MENUFONTX		(ORIG_MENUFONTX		* ZOOM_FACTOR)
-#define MENUFONTY		(ORIG_MENUFONTY		* ZOOM_FACTOR)
 
-#define ORIG_SCR_MENUX		20
-#define ORIG_SCR_MENUY		12
-#define SCR_MENUX		17
-#define SCR_MENUY		12
-#if 1
 extern int			SCR_FIELDX, SCR_FIELDY;
-#else
-#define SCR_FIELDX		17
-#define SCR_FIELDY		17
-#endif
+
 #define MAX_BUF_XSIZE		(SCR_FIELDX + 2)
 #define MAX_BUF_YSIZE		(SCR_FIELDY + 2)
 
 /* often used screen positions */
-#define ORIG_MENU_SX		((ORIG_SCR_MENUX - SCR_MENUX) * TILEX / 2)
-#define ORIG_MENU_SY		0
-#if 1
+
 extern int			SX, SY;
-#else
-#define SX			8
-#define SY			8
-#endif
+
 #define SXSIZE			(SCR_FIELDX * TILEX)
 #define SYSIZE			(SCR_FIELDY * TILEY)
 

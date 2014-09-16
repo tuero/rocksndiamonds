@@ -193,160 +193,6 @@ void DrawVideoDisplay(unsigned int state, unsigned int value)
     "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"
   };
 
-#if 0
-  static struct
-  {
-    int gd_x1, gd_y1;
-    int gd_x2, gd_y2;
-    int x, y;
-    int width, height;
-  }
-  video_pos[NUM_TAPE_FUNCTIONS][NUM_TAPE_FUNCTION_PARTS] =
-  {
-    {
-      {
-	PG_X4(VIDEO_PLAY_LABEL_XPOS),	PG_Y2(VIDEO_PLAY_LABEL_YPOS),
-	PG_X3(VIDEO_PLAY_LABEL_XPOS),	PG_Y2(VIDEO_PLAY_LABEL_YPOS),
-	VIDEO_PLAY_LABEL_XPOS,		VIDEO_PLAY_LABEL_YPOS,
-	VIDEO_PLAY_LABEL_XSIZE,		VIDEO_PLAY_LABEL_YSIZE
-      },
-      {
-	PG_X4(VIDEO_PLAY_SYMBOL_XPOS),	PG_Y2(VIDEO_PLAY_SYMBOL_YPOS),
-	PG_X3(VIDEO_PLAY_SYMBOL_XPOS),	PG_Y2(VIDEO_PLAY_SYMBOL_YPOS),
-	VIDEO_PLAY_SYMBOL_XPOS,		VIDEO_PLAY_SYMBOL_YPOS,
-	VIDEO_PLAY_SYMBOL_XSIZE,	VIDEO_PLAY_SYMBOL_YSIZE
-      }
-    },
-    {
-      {
-	PG_X4(VIDEO_REC_LABEL_XPOS),	PG_Y2(VIDEO_REC_LABEL_YPOS),
-	PG_X3(VIDEO_REC_LABEL_XPOS),	PG_Y2(VIDEO_REC_LABEL_YPOS),
-	VIDEO_REC_LABEL_XPOS,		VIDEO_REC_LABEL_YPOS,
-	VIDEO_REC_LABEL_XSIZE,		VIDEO_REC_LABEL_YSIZE
-      },
-      {
-	PG_X4(VIDEO_REC_SYMBOL_XPOS),	PG_Y2(VIDEO_REC_SYMBOL_YPOS),
-	PG_X3(VIDEO_REC_SYMBOL_XPOS),	PG_Y2(VIDEO_REC_SYMBOL_YPOS),
-	VIDEO_REC_SYMBOL_XPOS,		VIDEO_REC_SYMBOL_YPOS,
-	VIDEO_REC_SYMBOL_XSIZE,		VIDEO_REC_SYMBOL_YSIZE
-      }
-    },
-    {
-      {
-	PG_X4(VIDEO_PAUSE_LABEL_XPOS),	PG_Y2(VIDEO_PAUSE_LABEL_YPOS),
-	PG_X3(VIDEO_PAUSE_LABEL_XPOS),	PG_Y2(VIDEO_PAUSE_LABEL_YPOS),
-	VIDEO_PAUSE_LABEL_XPOS,		VIDEO_PAUSE_LABEL_YPOS,
-	VIDEO_PAUSE_LABEL_XSIZE,	VIDEO_PAUSE_LABEL_YSIZE
-      },
-      {
-	PG_X4(VIDEO_PAUSE_SYMBOL_XPOS),	PG_Y2(VIDEO_PAUSE_SYMBOL_YPOS),
-	PG_X3(VIDEO_PAUSE_SYMBOL_XPOS),	PG_Y2(VIDEO_PAUSE_SYMBOL_YPOS),
-	VIDEO_PAUSE_SYMBOL_XPOS,	VIDEO_PAUSE_SYMBOL_YPOS,
-	VIDEO_PAUSE_SYMBOL_XSIZE,	VIDEO_PAUSE_SYMBOL_YSIZE
-      }
-    },
-    {
-      {
-	PG_X4(VIDEO_DATE_LABEL_XPOS),	PG_Y2(VIDEO_DATE_LABEL_YPOS),
-	PG_X3(VIDEO_DATE_LABEL_XPOS),	PG_Y2(VIDEO_DATE_LABEL_YPOS),
-	VIDEO_DATE_LABEL_XPOS,		VIDEO_DATE_LABEL_YPOS,
-	VIDEO_DATE_LABEL_XSIZE,		VIDEO_DATE_LABEL_YSIZE
-      },
-      {
-	PG_X4(VIDEO_DATE_XPOS),		PG_Y2(VIDEO_DATE_YPOS),
-	PG_X3(VIDEO_DATE_XPOS),		PG_Y2(VIDEO_DATE_YPOS),
-	VIDEO_DATE_XPOS,		VIDEO_DATE_YPOS,
-	VIDEO_DATE_XSIZE,		VIDEO_DATE_YSIZE
-      }
-    },
-    {
-      {
-	-1,				-1,
-	-1,				-1,
-	-1,				-1,
-	-1,				-1
-      },
-      {
-	PG_X4(VIDEO_TIME_XPOS),		PG_Y2(VIDEO_TIME_YPOS),
-	PG_X3(VIDEO_TIME_XPOS),		PG_Y2(VIDEO_TIME_YPOS),
-	VIDEO_TIME_XPOS,		VIDEO_TIME_YPOS,
-	VIDEO_TIME_XSIZE,		VIDEO_TIME_YSIZE
-      }
-    },
-    {
-      {
-	PG_X6(VIDEO_FFWD_LABEL_XPOS),	PG_Y1(VIDEO_FFWD_LABEL_YPOS),
-	PG_X3(VIDEO_LABEL_XPOS),	PG_Y2(VIDEO_LABEL_YPOS),
-	VIDEO_LABEL_XPOS,		VIDEO_LABEL_YPOS,
-	VIDEO_LABEL_XSIZE,		VIDEO_LABEL_YSIZE
-      },
-      {
-	PG_X6(VIDEO_FFWD_SYMBOL_XPOS),	PG_Y1(VIDEO_FFWD_SYMBOL_YPOS),
-	PG_X3(VIDEO_FFWD_SYMBOL_XPOS),	PG_Y2(VIDEO_SYMBOL_YPOS),
-	VIDEO_SYMBOL_XPOS,		VIDEO_SYMBOL_YPOS,
-	VIDEO_FFWD_SYMBOL_XSIZE,	VIDEO_FFWD_SYMBOL_YSIZE
-      }
-    },
-    {
-      {
-	PG_X6(VIDEO_PBEND_LABEL_XPOS),	PG_Y1(VIDEO_PBEND_LABEL_YPOS),
-	PG_X3(VIDEO_LABEL_XPOS),	PG_Y2(VIDEO_LABEL_YPOS),
-	VIDEO_LABEL_XPOS,		VIDEO_LABEL_YPOS,
-	VIDEO_LABEL_XSIZE,		VIDEO_LABEL_YSIZE
-      },
-      {
-	PG_X6(VIDEO_PBEND_SYMBOL_XPOS),	PG_Y1(VIDEO_PBEND_SYMBOL_YPOS),
-	PG_X3(VIDEO_PBEND_SYMBOL_XPOS),	PG_Y2(VIDEO_SYMBOL_YPOS),
-	VIDEO_SYMBOL_XPOS,		VIDEO_SYMBOL_YPOS,
-	VIDEO_PBEND_SYMBOL_XSIZE,	VIDEO_PBEND_SYMBOL_YSIZE
-      }
-    },
-    {
-      {
-	PG_X6(VIDEO_WARP_LABEL_XPOS),	PG_Y1(VIDEO_WARP_LABEL_YPOS),
-	PG_X3(VIDEO_LABEL_XPOS),	PG_Y2(VIDEO_LABEL_YPOS),
-	VIDEO_LABEL_XPOS,		VIDEO_LABEL_YPOS,
-	VIDEO_LABEL_XSIZE,		VIDEO_LABEL_YSIZE
-      },
-      {
-	PG_X6(VIDEO_WARP_SYMBOL_XPOS),	PG_Y1(VIDEO_WARP_SYMBOL_YPOS),
-	PG_X3(VIDEO_WARP_SYMBOL_XPOS),	PG_Y2(VIDEO_SYMBOL_YPOS),
-	VIDEO_SYMBOL_XPOS,		VIDEO_SYMBOL_YPOS,
-	VIDEO_WARP_SYMBOL_XSIZE,	VIDEO_WARP_SYMBOL_YSIZE
-      }
-    },
-    {
-      {
-	-1,				-1,
-	-1,				-1,
-	-1,				-1,
-	-1,				-1
-      },
-      {
-	PG_X6(VIDEO_WARP2_SYMBOL_XPOS),	PG_Y1(VIDEO_WARP2_SYMBOL_YPOS),
-	PG_X3(VIDEO_WARP2_SYMBOL_XPOS),	PG_Y2(VIDEO_SYMBOL_YPOS),
-	VIDEO_SYMBOL_XPOS,		VIDEO_SYMBOL_YPOS,
-	VIDEO_WARP2_SYMBOL_XSIZE,	VIDEO_WARP2_SYMBOL_YSIZE
-      }
-    },
-    {
-      {
-	-1,				-1,
-	-1,				-1,
-	-1,				-1,
-	-1,				-1
-      },
-      {
-	PG_X6(VIDEO_1STEP_SYMBOL_XPOS),	PG_Y1(VIDEO_1STEP_SYMBOL_YPOS),
-	PG_X3(VIDEO_1STEP_SYMBOL_XPOS),	PG_Y2(VIDEO_SYMBOL_YPOS),
-	VIDEO_1STEP_SYMBOL_XPOS,	VIDEO_SYMBOL_YPOS,
-	VIDEO_1STEP_SYMBOL_XSIZE,	VIDEO_1STEP_SYMBOL_YSIZE
-      }
-    },
-  };
-#endif
-
-#if 1
   static struct
   {
     int graphic;
@@ -442,45 +288,6 @@ void DrawVideoDisplay(unsigned int state, unsigned int value)
     }
   }
 
-#else
-
-  for (k = 0; k < NUM_TAPE_FUNCTION_STATES; k++)	/* on or off states */
-  {
-    for (i = 0; i < NUM_TAPE_FUNCTIONS; i++)		/* record, play, ... */
-    {
-      for (j = 0; j < NUM_TAPE_FUNCTION_PARTS; j++)	/* label or symbol */
-      {
-	if (state & (1 << (i * 2 + k)))
-	{
-	  int gd_x, gd_y;
-	  int skip_value =
-	    (j == 0 ? VIDEO_DISPLAY_SYMBOL_ONLY : VIDEO_DISPLAY_LABEL_ONLY);
-
-	  if (k == 1)		/* on */
-	  {
-	    gd_x = video_pos[i][j].gd_x1;
-	    gd_y = video_pos[i][j].gd_y1;
-	  }
-	  else			/* off */
-	  {
-	    gd_x = video_pos[i][j].gd_x2;
-	    gd_y = video_pos[i][j].gd_y2;
-	  }
-
-	  if (video_pos[i][j].x != -1 && value != skip_value)
-	    BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
-		       gd_x, gd_y,
-		       video_pos[i][j].width,
-		       video_pos[i][j].height,
-		       VX + video_pos[i][j].x,
-		       VY + video_pos[i][j].y);
-	}
-      }
-    }
-  }
-#endif
-
-#if 1
   if (state & VIDEO_STATE_DATE_ON)
   {
     struct TextPosInfo *pos = &tape.text.date;
@@ -503,47 +310,11 @@ void DrawVideoDisplay(unsigned int state, unsigned int value)
     DrawText(VX + pos->x + 27, VY + pos->y, int2str(sec, 2), pos->font);
   }
 
-#else
-
-  if (state & VIDEO_STATE_DATE_ON)
-  {
-    int tag = value % 100;
-    int monat = (value/100) % 100;
-    int jahr = (value/10000);
-
-    DrawText(VX + VIDEO_DATE_XPOS, VY + VIDEO_DATE_YPOS,
-	     int2str(tag, 2), FONT_TAPE_RECORDER);
-    DrawText(VX + VIDEO_DATE_XPOS + 27, VY + VIDEO_DATE_YPOS,
-	     monatsname[monat], FONT_TAPE_RECORDER);
-    DrawText(VX + VIDEO_DATE_XPOS + 64, VY + VIDEO_DATE_YPOS,
-	     int2str(jahr, 2), FONT_TAPE_RECORDER);
-  }
-
-  if (state & VIDEO_STATE_TIME_ON)
-  {
-    int min = value / 60;
-    int sec = value % 60;
-
-    DrawText(VX + VIDEO_TIME_XPOS, VY + VIDEO_TIME_YPOS,
-	     int2str(min, 2), FONT_TAPE_RECORDER);
-    DrawText(VX + VIDEO_TIME_XPOS + 27, VY + VIDEO_TIME_YPOS,
-	     int2str(sec, 2), FONT_TAPE_RECORDER);
-  }
-#endif
-
   redraw_mask |= REDRAW_DOOR_2;
 }
 
 void DrawCompleteVideoDisplay()
 {
-#if 0
-  printf("::: %d, %d  /  %d, %d [%d] [%d, %d] [%d/%d]\n",
-	 VX, VY, EX, EY, game_status, gfx.vx, gfx.vy,
-	 tape.date, tape.length);
-#endif
-
-#if 1
-
   struct GraphicInfo *g_tape = &graphic_info[IMG_BACKGROUND_TAPE];
 
   /* draw tape background */
@@ -554,55 +325,8 @@ void DrawCompleteVideoDisplay()
   UnmapTapeButtons();
   MapTapeButtons();
 
-#else
-
-#if 1
-  struct GraphicInfo *g_tape = &graphic_info[IMG_BACKGROUND_TAPE];
-  int tape_button_graphics[] =
-  {
-    IMG_TAPE_BUTTON_GFX_EJECT,
-    IMG_TAPE_BUTTON_GFX_STOP,
-    IMG_TAPE_BUTTON_GFX_PAUSE,
-    IMG_TAPE_BUTTON_GFX_RECORD,
-    IMG_TAPE_BUTTON_GFX_PLAY
-  };
-  struct Rect *tape_button_positions[] =
-  {
-    &tape.button.eject,
-    &tape.button.stop,
-    &tape.button.pause,
-    &tape.button.record,
-    &tape.button.play
-  };
-  int i;
-
-  BlitBitmap(g_tape->bitmap, drawto, g_tape->src_x, g_tape->src_y,
-	     gfx.vxsize, gfx.vysize, gfx.vx, gfx.vy);
-
-  for (i = 0; i < SIZEOF_ARRAY_INT(tape_button_graphics); i++)
-  {
-    struct GraphicInfo *g = &graphic_info[tape_button_graphics[i]];
-    struct Rect *pos = tape_button_positions[i];
-
-    BlitBitmap(g->bitmap, drawto, g->src_x, g->src_y,
-	       g->width, g->height, gfx.vx + pos->x, gfx.vy + pos->y);
-  }
-#else
-  BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
-	     DOOR_GFX_PAGEX3, DOOR_GFX_PAGEY2,
-	     gfx.vxsize, gfx.vysize, gfx.vx, gfx.vy);
-  BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
-	     DOOR_GFX_PAGEX4 + VIDEO_CONTROL_XPOS,
-	     DOOR_GFX_PAGEY2 + VIDEO_CONTROL_YPOS,
-	     VIDEO_CONTROL_XSIZE, VIDEO_CONTROL_YSIZE,
-	     gfx.vx + VIDEO_CONTROL_XPOS, gfx.vy + VIDEO_CONTROL_YPOS);
-#endif
-
-#endif
-
   DrawVideoDisplay(VIDEO_ALL_OFF, 0);
 
-#if 1
   if (tape.recording)
   {
     DrawVideoDisplay(VIDEO_STATE_REC_ON, 0);
@@ -626,21 +350,9 @@ void DrawCompleteVideoDisplay()
     DrawVideoDisplay(VIDEO_STATE_DATE_ON, tape.date);
     DrawVideoDisplay(VIDEO_STATE_TIME_ON, tape.length_seconds);
   }
-#else
-  if (tape.date && tape.length)
-  {
-    DrawVideoDisplay(VIDEO_STATE_DATE_ON, tape.date);
-    DrawVideoDisplay(VIDEO_STATE_TIME_ON, tape.length_seconds);
-  }
-#endif
 
-#if 1
   BlitBitmap(drawto, bitmap_db_door_2, gfx.vx, gfx.vy, gfx.vxsize, gfx.vysize,
 	     0, 0);
-#else
-  BlitBitmap(drawto, bitmap_db_door, gfx.vx, gfx.vy, gfx.vxsize, gfx.vysize,
-	     DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY2);
-#endif
 }
 
 void TapeDeactivateDisplayOn()
@@ -786,9 +498,7 @@ static void TapeAppendRecording()
   DrawVideoDisplay(VIDEO_STATE_DATE_ON, tape.date);
   DrawVideoDisplay(VIDEO_STATE_PLAY_OFF | VIDEO_STATE_REC_ON, 0);
 
-#if 1
   UpdateAndDisplayGameControlValues();
-#endif
 }
 
 void TapeHaltRecording()
@@ -1177,10 +887,6 @@ void TapeQuickLoad()
 
   if (CheckEngineSnapshot())
   {
-#if 0
-    printf("::: MARK 1\n");
-#endif
-
     TapeStartGamePlaying();
 
     LoadEngineSnapshot();
@@ -1196,10 +902,6 @@ void TapeQuickLoad()
     if (FrameCounter > 0)
       return;
   }
-
-#if 0
-  printf("::: MARK 2\n");
-#endif
 
   TapeStop();
   TapeErase();
@@ -1248,9 +950,6 @@ void AutoPlayTape()
   static int num_levels_solved = 0;
   static int num_tape_missing = 0;
   static boolean level_failed[MAX_TAPES_PER_SET];
-#if 0
-  static boolean tape_missing[MAX_TAPES_PER_SET];
-#endif
   int i;
 
   if (autoplay_initialized)
@@ -1297,12 +996,7 @@ void AutoPlayTape()
     printf("\n");
 
     for (i = 0; i < MAX_TAPES_PER_SET; i++)
-    {
       level_failed[i] = FALSE;
-#if 0
-      tape_missing[i] = FALSE;
-#endif
-    }
 
     autoplay_initialized = TRUE;
   }
@@ -1336,12 +1030,9 @@ void AutoPlayTape()
     if (tape.no_valid_file)
     {
       num_tape_missing++;
-#if 0
-      if (level_nr >= 0 && level_nr < MAX_TAPES_PER_SET)
-	tape_missing[level_nr] = TRUE;
-#endif
 
       printf("(no tape)\n");
+
       continue;
     }
 
@@ -1371,16 +1062,6 @@ void AutoPlayTape()
       if (level_failed[i])
 	printf(" %03d", i);
   }
-
-#if 0
-  if (num_tape_missing > 0)
-  {
-    printf(", NO TAPE:");
-    for (i = 0; i < MAX_TAPES_PER_SET; i++)
-      if (tape_missing[i])
-	printf(" %03d", i);
-  }
-#endif
 
   printf("\n");
   printf_line("=", 79);

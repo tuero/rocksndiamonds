@@ -51,24 +51,13 @@ void subMainGameLoop_Main(byte action, boolean warp_mode)
 
   TimerVar = TimerVar + 1;
 
-#if 1
   if (ExplosionShakeMurphy > 0)
     ExplosionShakeMurphy--;
-#endif
 
-#if 1
   if (ExitToMenuFlag == 1)
   {
     // happens when demo ends or when Murphy enters exit (to be checked)
-
-#if 0
-    goto locExitMainGameLoop;
-#endif
   }
-#else
-  if (ExitToMenuFlag == 1)
-    goto locExitMainGameLoop;
-#endif
 
   if (LeadOutCounter == 0) // no lead-out: game busy
     return;
@@ -85,25 +74,13 @@ void subMainGameLoop_Main(byte action, boolean warp_mode)
   // lead-out done: exit now
   // ---------------------- END OF GAME-BUSY LOOP (including lead-out) ---------
 
-#if 0
-locExitMainGameLoop:
-#endif
-
-#if 0
-  printf("::: locExitMainGameLoop reached [%d]\n", LeadOutCounter);
-  printf("::: [KillMurphyFlag == %d]\n", KillMurphyFlag);
-#endif
-
-#if 1
   /* if the game is not won when reaching this point, then it is lost */
   if (!game_sp.LevelSolved)
     game_sp.GameOver = TRUE;
-#endif
 }
 
 void subCalculateScreenScrollPos()
 {
-#if 1
   int jump_pos = TILEX / 2;
 
   /* handle wrap-around */
@@ -117,7 +94,6 @@ void subCalculateScreenScrollPos()
     MurphyScreenXPos = MurphyScreenXPos - FieldWidth * TILEX;
     MurphyScreenYPos += TILEY;
   }
-#endif
 
   if (ExplosionShake != 0)
   {

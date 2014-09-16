@@ -30,34 +30,13 @@
 #define USE_EXTENDED_GRAPHICS_ENGINE		1
 
 
-#if 0
-int TILEX = ORIG_TILEX * ZOOM_FACTOR;
-int TILEY = ORIG_TILEY * ZOOM_FACTOR;
-#endif
-
 int frame;				/* current screen frame */
 int screen_x, screen_y;			/* current scroll position */
 
 /* tiles currently on screen */
-#if 1
 static int screentiles[MAX_PLAYFIELD_HEIGHT + 2][MAX_PLAYFIELD_WIDTH + 2];
 static int crumbled_state[MAX_PLAYFIELD_HEIGHT + 2][MAX_PLAYFIELD_WIDTH + 2];
-
 static boolean redraw[MAX_PLAYFIELD_WIDTH + 2][MAX_PLAYFIELD_HEIGHT + 2];
-#else
-static int screentiles[MAX_BUF_YSIZE][MAX_BUF_XSIZE];
-static int crumbled_state[MAX_BUF_YSIZE][MAX_BUF_XSIZE];
-
-static boolean redraw[MAX_BUF_XSIZE][MAX_BUF_YSIZE];
-#endif
-
-#if 0
-#if 1
-int centered_player_nr;
-#else
-static int centered_player_nr;
-#endif
-#endif
 
 /* copy the entire screen to the window at the scroll position */
 
@@ -71,24 +50,11 @@ void BlitScreenToBitmap_EM(Bitmap *target_bitmap)
   int full_xsize = lev.width  * TILEX;
   int full_ysize = lev.height * TILEY;
 
-#if 0
-  printf("::: %d, %d\n", screenBitmap->width, screenBitmap->height);
-  printf("::: %d / %d, %d / %d\n",
-	 MAX_BUF_XSIZE, MAX_BUF_YSIZE, SXSIZE, SYSIZE);
-#endif
-
   sxsize = (full_xsize < xsize ? full_xsize : xsize);
   sysize = (full_ysize < ysize ? full_ysize : ysize);
   sx = SX + (full_xsize < xsize ? (xsize - full_xsize) / 2 : 0);
   sy = SY + (full_ysize < ysize ? (ysize - full_ysize) / 2 : 0);
 
-#if 0
-  printf("::: %d, %d\n", screenBitmap->width, screenBitmap->height);
-  BlitBitmap(screenBitmap, target_bitmap, 0, 0, 544, 544, SX, SY);
-  return;
-#endif
-
-#if 1
   if (x < 2 * TILEX && y < 2 * TILEY)
   {
     BlitBitmap(screenBitmap, target_bitmap, x, y,
@@ -127,46 +93,6 @@ void BlitScreenToBitmap_EM(Bitmap *target_bitmap)
 	       x - 2 * TILEX, y - 2 * TILEY,
 	       sx + MAX_BUF_XSIZE * TILEX - x, sy + MAX_BUF_YSIZE * TILEY - y);
   }
-#else
-  if (x < 2 * TILEX && y < 2 * TILEY)
-  {
-    BlitBitmap(screenBitmap, target_bitmap, x, y,
-	       SCR_FIELDX * TILEX, SCR_FIELDY * TILEY, SX, SY);
-  }
-  else if (x < 2 * TILEX && y >= 2 * TILEY)
-  {
-    BlitBitmap(screenBitmap, target_bitmap, x, y,
-	       SCR_FIELDX * TILEX, MAX_BUF_YSIZE * TILEY - y,
-	       SX, SY);
-    BlitBitmap(screenBitmap, target_bitmap, x, 0,
-	       SCR_FIELDX * TILEX, y - 2 * TILEY,
-	       SX, SY + MAX_BUF_YSIZE * TILEY - y);
-  }
-  else if (x >= 2 * TILEX && y < 2 * TILEY)
-  {
-    BlitBitmap(screenBitmap, target_bitmap, x, y,
-	       MAX_BUF_XSIZE * TILEX - x, SCR_FIELDY * TILEY,
-	       SX, SY);
-    BlitBitmap(screenBitmap, target_bitmap, 0, y,
-	       x - 2 * TILEX, SCR_FIELDY * TILEY,
-	       SX + MAX_BUF_XSIZE * TILEX - x, SY);
-  }
-  else
-  {
-    BlitBitmap(screenBitmap, target_bitmap, x, y,
-	       MAX_BUF_XSIZE * TILEX - x, MAX_BUF_YSIZE * TILEY - y,
-	       SX, SY);
-    BlitBitmap(screenBitmap, target_bitmap, 0, y,
-	       x - 2 * TILEX, MAX_BUF_YSIZE * TILEY - y,
-	       SX + MAX_BUF_XSIZE * TILEX - x, SY);
-    BlitBitmap(screenBitmap, target_bitmap, x, 0,
-	       MAX_BUF_XSIZE * TILEX - x, y - 2 * TILEY,
-	       SX, SY + MAX_BUF_YSIZE * TILEY - y);
-    BlitBitmap(screenBitmap, target_bitmap, 0, 0,
-	       x - 2 * TILEX, y - 2 * TILEY,
-	       SX + MAX_BUF_XSIZE * TILEX - x, SY + MAX_BUF_YSIZE * TILEY - y);
-  }
-#endif
 }
 
 void BackToFront_EM(void)
@@ -175,16 +101,8 @@ void BackToFront_EM(void)
   static boolean scrolling_last = FALSE;
   int left = screen_x / TILEX;
   int top  = screen_y / TILEY;
-#if 1
   boolean scrolling = (screen_x != screen_x_last || screen_y != screen_y_last);
-#else
-  boolean scrolling = (screen_x % TILEX != 0 || screen_y % TILEY != 0);
-#endif
   int x, y;
-
-#if 0
-  printf("::: %d, %d\n", screen_x, screen_y);
-#endif
 
   SyncDisplay();
 
@@ -198,39 +116,17 @@ void BackToFront_EM(void)
   }
   else
   {
-#if 1
-#if 1
     boolean half_shifted_x = (screen_x % TILEX != 0);
     boolean half_shifted_y = (screen_y % TILEY != 0);
-#else
-    boolean half_shifted_x = (EVEN(SCR_FIELDX) && screen_x % TILEX != 0);
-    boolean half_shifted_y = (EVEN(SCR_FIELDY) && screen_y % TILEY != 0);
-#endif
 
     int sx, sy;
-#if 0
-    int sxsize, sysize;
-#endif
     int xsize = SXSIZE;
     int ysize = SYSIZE;
     int full_xsize = lev.width  * TILEX;
     int full_ysize = lev.height * TILEY;
 
-#if 0
-    sxsize = (full_xsize < xsize ? full_xsize : xsize);
-    sysize = (full_ysize < ysize ? full_ysize : ysize);
-#endif
     sx = SX + (full_xsize < xsize ? (xsize - full_xsize) / 2 : 0);
     sy = SY + (full_ysize < ysize ? (ysize - full_ysize) / 2 : 0);
-
-#if 0
-#if 1
-    printf("::: %d, %d\n", EVEN(SCR_FIELDX), screen_x);
-#else
-    half_shifted_x = TRUE;
-    half_shifted_y = FALSE;
-#endif
-#endif
 
     int x1 = 0, x2 = SCR_FIELDX - (half_shifted_x ? 0 : 1);
     int y1 = 0, y2 = SCR_FIELDY - (half_shifted_y ? 0 : 1);
@@ -255,23 +151,6 @@ void BackToFront_EM(void)
     }
 
     InitGfxClipRegion(FALSE, -1, -1, -1, -1);
-
-#else
-
-    for (x = 0; x < SCR_FIELDX; x++)
-    {
-      for (y = 0; y < SCR_FIELDY; y++)
-      {
-	int xx = (left + x) % MAX_BUF_XSIZE;
-	int yy = (top  + y) % MAX_BUF_YSIZE;
-
-	if (redraw[xx][yy])
-	  BlitBitmap(screenBitmap, window,
-		     xx * TILEX, yy * TILEY, TILEX, TILEY,
-		     SX + x * TILEX, SY + y * TILEY);
-      }
-    }
-#endif
   }
 
   FlushDisplay();
@@ -316,21 +195,12 @@ static void DrawLevelField_EM(int x, int y, int sx, int sy,
 			      boolean draw_masked)
 {
   struct GraphicInfo_EM *g = getObjectGraphic(x, y);
-#if NEW_TILESIZE
   int src_x = g->src_x + g->src_offset_x * TILESIZE_VAR / TILESIZE;
   int src_y = g->src_y + g->src_offset_y * TILESIZE_VAR / TILESIZE;
   int dst_x = sx * TILEX + g->dst_offset_x * TILESIZE_VAR / TILESIZE;
   int dst_y = sy * TILEY + g->dst_offset_y * TILESIZE_VAR / TILESIZE;
   int width = g->width * TILESIZE_VAR / TILESIZE;
   int height = g->height * TILESIZE_VAR / TILESIZE;
-#else
-  int src_x = g->src_x + g->src_offset_x;
-  int src_y = g->src_y + g->src_offset_y;
-  int dst_x = sx * TILEX + g->dst_offset_x;
-  int dst_y = sy * TILEY + g->dst_offset_y;
-  int width = g->width;
-  int height = g->height;
-#endif
   int left = screen_x / TILEX;
   int top  = screen_y / TILEY;
 
@@ -363,11 +233,7 @@ static void DrawLevelField_EM(int x, int y, int sx, int sy,
 static void DrawLevelFieldCrumbled_EM(int x, int y, int sx, int sy,
 				      int crm, boolean draw_masked)
 {
-#if 1
   struct GraphicInfo_EM *g;
-#else
-  struct GraphicInfo_EM *g = getObjectGraphic(x, y);
-#endif
   int crumbled_border_size;
   int left = screen_x / TILEX;
   int top  = screen_y / TILEY;
@@ -381,22 +247,9 @@ static void DrawLevelFieldCrumbled_EM(int x, int y, int sx, int sy,
   if (crm == 0)		/* no crumbled edges for this tile */
     return;
 
-#if 1
   g = getObjectGraphic(x, y);
-#endif
 
-  crumbled_border_size = g->crumbled_border_size;
-
-#if NEW_TILESIZE
-  crumbled_border_size = crumbled_border_size * TILESIZE_VAR / TILESIZE;
-#endif
-
-#if 0
-  if (x == 3 && y == 3 && frame == 0)
-    printf("::: %d, %d\n",
-	   graphic_info_em_object[207][0].crumbled_src_x,
-	   graphic_info_em_object[207][0].crumbled_src_y);
-#endif
+  crumbled_border_size = g->crumbled_border_size * TILESIZE_VAR / TILESIZE;
 
   for (i = 0; i < 4; i++)
   {
@@ -563,12 +416,6 @@ static void animscreen(void)
       redraw_screen_tile = (screentiles[sy][sx]    != obj ||
 			    crumbled_state[sy][sx] != crm);
 
-#if 0
-      /* !!! TEST ONLY -- CHANGE THIS !!! */
-      if (!game.use_native_emc_graphics_engine)
-	redraw_screen_tile = TRUE;
-#endif
-
       /* only redraw screen tiles if they (or their crumbled state) changed */
       if (redraw_screen_tile)
       {
@@ -604,10 +451,6 @@ static void blitplayer(struct PLAYER *ply)
   x2 = x1 + TILEX - 1;
   y2 = y1 + TILEY - 1;
 
-#if 0
-  printf("::: %d, %d\n", x1, y1);
-#endif
-
   if ((int)(x2 - screen_x) < ((MAX_BUF_XSIZE - 1) * TILEX - 1) &&
       (int)(y2 - screen_y) < ((MAX_BUF_YSIZE - 1) * TILEY - 1))
   {
@@ -622,29 +465,13 @@ static void blitplayer(struct PLAYER *ply)
     int old_sy = old_y % MAX_BUF_YSIZE;
     int new_sx = new_x % MAX_BUF_XSIZE;
     int new_sy = new_y % MAX_BUF_YSIZE;
-#if 0
-    int old_crm = crumbled_state[old_sy][old_sx];
-#endif
     int new_crm = crumbled_state[new_sy][new_sx];
 
     /* only diggable elements can be crumbled in the classic EM engine */
     boolean player_is_digging = (new_crm != 0);
 
-#if 0
-    x1 %= MAX_BUF_XSIZE * TILEX;
-    y1 %= MAX_BUF_YSIZE * TILEY;
-    x2 %= MAX_BUF_XSIZE * TILEX;
-    y2 %= MAX_BUF_YSIZE * TILEY;
-#endif
-
     if (player_is_digging)
     {
-#if 0
-      /* draw the field the player is moving from (under the player) */
-      DrawLevelField_EM(old_x, old_y, old_sx, old_sy, FALSE);
-      DrawLevelFieldCrumbled_EM(old_x, old_y, old_sx, old_sy, old_crm, FALSE);
-#endif
-
       /* draw the field the player is moving to (under the player) */
       DrawLevelField_EM(new_x, new_y, new_sx, new_sy, FALSE);
       DrawLevelFieldCrumbled_EM(new_x, new_y, new_sx, new_sy, new_crm, FALSE);
@@ -652,10 +479,8 @@ static void blitplayer(struct PLAYER *ply)
       /* draw the player (masked) over the element he is just digging away */
       DrawLevelPlayer_EM(x1, y1, ply->num, ply->anim, TRUE);
 
-#if 1
       /* draw the field the player is moving from (masked over the player) */
       DrawLevelField_EM(old_x, old_y, old_sx, old_sy, TRUE);
-#endif
     }
     else
     {
@@ -682,16 +507,10 @@ static void blitplayer(struct PLAYER *ply)
 
 void game_initscreen(void)
 {
-  int x,y;
-  int dynamite_state = ply[0].dynamite;		/* !!! ONLY PLAYER 1 !!! */
-  int all_keys_state = ply[0].keys | ply[1].keys | ply[2].keys | ply[3].keys;
   int player_nr;
+  int x,y;
 
   frame = 6;
-
-#if 0
-  game.centered_player_nr = getCenteredPlayerNr_EM();
-#endif
 
   player_nr = (game.centered_player_nr != -1 ? game.centered_player_nr : 0);
 
@@ -706,106 +525,7 @@ void game_initscreen(void)
       crumbled_state[y][x] = 0;
     }
   }
-
-  DrawAllGameValues(lev.required, dynamite_state, lev.score,
-		    lev.time, all_keys_state);
 }
-
-#if 0
-void DrawRelocatePlayer(struct PlayerInfo *player, boolean quick_relocation)
-{
-  boolean ffwd_delay = (tape.playing && tape.fast_forward);
-  boolean no_delay = (tape.warp_forward);
-  int frame_delay_value = (ffwd_delay ? FfwdFrameDelay : GameFrameDelay);
-  int wait_delay_value = (no_delay ? 0 : frame_delay_value);
-  int jx = player->jx;
-  int jy = player->jy;
-
-  if (quick_relocation)
-  {
-    int offset = game.scroll_delay_value;
-
-    if (!IN_VIS_FIELD(SCREENX(jx), SCREENY(jy)))
-    {
-      scroll_x = (player->jx < SBX_Left  + MIDPOSX ? SBX_Left :
-		  player->jx > SBX_Right + MIDPOSX ? SBX_Right :
-		  player->jx - MIDPOSX);
-
-      scroll_y = (player->jy < SBY_Upper + MIDPOSY ? SBY_Upper :
-		  player->jy > SBY_Lower + MIDPOSY ? SBY_Lower :
-		  player->jy - MIDPOSY);
-    }
-    else
-    {
-      if ((player->MovDir == MV_LEFT  && scroll_x > jx - MIDPOSX + offset) ||
-	  (player->MovDir == MV_RIGHT && scroll_x < jx - MIDPOSX - offset))
-	scroll_x = jx - MIDPOSX + (scroll_x < jx-MIDPOSX ? -offset : +offset);
-
-      if ((player->MovDir == MV_UP  && scroll_y > jy - MIDPOSY + offset) ||
-	  (player->MovDir == MV_DOWN && scroll_y < jy - MIDPOSY - offset))
-	scroll_y = jy - MIDPOSY + (scroll_y < jy-MIDPOSY ? -offset : +offset);
-
-      /* don't scroll over playfield boundaries */
-      if (scroll_x < SBX_Left || scroll_x > SBX_Right)
-	scroll_x = (scroll_x < SBX_Left ? SBX_Left : SBX_Right);
-
-      /* don't scroll over playfield boundaries */
-      if (scroll_y < SBY_Upper || scroll_y > SBY_Lower)
-	scroll_y = (scroll_y < SBY_Upper ? SBY_Upper : SBY_Lower);
-    }
-
-    RedrawPlayfield(TRUE, 0,0,0,0);
-  }
-  else
-  {
-    int scroll_xx = -999, scroll_yy = -999;
-
-    ScrollScreen(NULL, SCROLL_GO_ON);	/* scroll last frame to full tile */
-
-    while (scroll_xx != scroll_x || scroll_yy != scroll_y)
-    {
-      int dx = 0, dy = 0;
-      int fx = FX, fy = FY;
-
-      scroll_xx = (player->jx < SBX_Left  + MIDPOSX ? SBX_Left :
-		   player->jx > SBX_Right + MIDPOSX ? SBX_Right :
-		   player->jx - MIDPOSX);
-
-      scroll_yy = (player->jy < SBY_Upper + MIDPOSY ? SBY_Upper :
-		   player->jy > SBY_Lower + MIDPOSY ? SBY_Lower :
-		   player->jy - MIDPOSY);
-
-      dx = (scroll_xx < scroll_x ? +1 : scroll_xx > scroll_x ? -1 : 0);
-      dy = (scroll_yy < scroll_y ? +1 : scroll_yy > scroll_y ? -1 : 0);
-
-      if (dx == 0 && dy == 0)		/* no scrolling needed at all */
-	break;
-
-      scroll_x -= dx;
-      scroll_y -= dy;
-
-      fx += dx * TILEX / 2;
-      fy += dy * TILEY / 2;
-
-      ScrollLevel(dx, dy);
-      DrawAllPlayers();
-
-      /* scroll in two steps of half tile size to make things smoother */
-      BlitBitmap(drawto_field, window, fx, fy, SXSIZE, SYSIZE, SX, SY);
-      FlushDisplay();
-      Delay(wait_delay_value);
-
-      /* scroll second step to align at full tile size */
-      BackToFront();
-      Delay(wait_delay_value);
-    }
-
-    DrawPlayer(player);
-    BackToFront();
-    Delay(wait_delay_value);
-  }
-}
-#endif
 
 static int getMaxCenterDistancePlayerNr(int center_x, int center_y)
 {
@@ -908,24 +628,10 @@ static boolean checkIfAllPlayersAreVisible(int center_x, int center_y)
 
 void RedrawPlayfield_EM(boolean force_redraw)
 {
-#if 0
-  boolean all_players_visible = checkIfAllPlayersAreVisible();
-#endif
   boolean draw_new_player_location = FALSE;
   boolean quick_relocation = setup.quick_switch;
-#if 0
-  boolean scrolling = (screen_x % TILEX != 0 || screen_y % TILEY != 0);
-#endif
-#if 0
-  boolean game.set_centered_player = getSetCenteredPlayer_EM();
-  int game.centered_player_nr_next = getCenteredPlayerNr_EM();
-#endif
-#if 1
   int max_center_distance_player_nr =
     getMaxCenterDistancePlayerNr(screen_x, screen_y);
-#else
-  int player_nr = game_em.last_moving_player;
-#endif
   int stepsize = TILEX / 8;
   int offset = game.scroll_delay_value * TILEX;
   int offset_x = offset;
@@ -955,46 +661,27 @@ void RedrawPlayfield_EM(boolean force_redraw)
     }
   }
 
-#if 1
   /* also allow focus switching when screen is scrolled to half tile */
-#else
-  if (!scrolling)	/* screen currently aligned at tile position */
-#endif
+  if (game.set_centered_player)
   {
-#if 1
-    if (game.set_centered_player)
-#else
-    if (game.centered_player_nr != game.centered_player_nr_next)
-#endif
-    {
-      game.centered_player_nr = game.centered_player_nr_next;
+    game.centered_player_nr = game.centered_player_nr_next;
 
-      draw_new_player_location = TRUE;
-      force_redraw = TRUE;
+    draw_new_player_location = TRUE;
+    force_redraw = TRUE;
 
-      game.set_centered_player = FALSE;
-    }
+    game.set_centered_player = FALSE;
   }
 
   if (game.centered_player_nr == -1)
   {
-#if 1
     if (draw_new_player_location || offset == 0)
-#else
-    if (draw_new_player_location)
-#endif
     {
       setScreenCenteredToAllPlayers(&sx, &sy);
     }
     else
     {
-#if 1
       sx = PLAYER_SCREEN_X(max_center_distance_player_nr);
       sy = PLAYER_SCREEN_Y(max_center_distance_player_nr);
-#else
-      sx = PLAYER_SCREEN_X(game_em.last_moving_player);
-      sy = PLAYER_SCREEN_Y(game_em.last_moving_player);
-#endif
     }
   }
   else
@@ -1009,20 +696,11 @@ void RedrawPlayfield_EM(boolean force_redraw)
     screen_y = VALID_SCREEN_Y(sy);
     screen_x_old = screen_x;
     screen_y_old = screen_y;
-
-#if 0
-    offset_x = 0;
-    offset_y = 0;
-#endif
   }
 
   if (draw_new_player_location && !quick_relocation)
   {
-#if 1
     unsigned int game_frame_delay_value = getGameFrameDelay_EM(20);
-#else
-    unsigned int game_frame_delay_value = getGameFrameDelay_EM(25);
-#endif
     int wait_delay_value = game_frame_delay_value;
     int screen_xx = VALID_SCREEN_X(sx);
     int screen_yy = VALID_SCREEN_Y(sy);
@@ -1035,8 +713,6 @@ void RedrawPlayfield_EM(boolean force_redraw)
 
       if (dx == 0 && dy == 0)		/* no scrolling needed at all */
 	break;
-
-#if 1
 
       if (ABS(screen_xx - screen_x) >= TILEX)
       {
@@ -1060,36 +736,6 @@ void RedrawPlayfield_EM(boolean force_redraw)
 	dyy = 0;
       }
 
-#else
-
-#if 1
-      if (ABS(screen_xx - screen_x) >= TILEX ||
-	  ABS(screen_yy - screen_y) >= TILEY)
-      {
-	screen_x -= dx * TILEX;
-	screen_y -= dy * TILEY;
-
-	dxx = dx * TILEX / 2;
-	dyy = dy * TILEY / 2;
-      }
-      else
-      {
-	screen_x = screen_xx;
-	screen_y = screen_yy;
-
-	dxx = 0;
-	dyy = 0;
-      }
-#else
-      screen_x -= dx * TILEX;
-      screen_y -= dy * TILEY;
-
-      dxx += dx * TILEX / 2;
-      dyy += dy * TILEY / 2;
-#endif
-
-#endif
-
       /* scroll in two steps of half tile size to make things smoother */
       screen_x += dxx;
       screen_y += dyy;
@@ -1106,10 +752,6 @@ void RedrawPlayfield_EM(boolean force_redraw)
       /* scroll second step to align at full tile size */
       screen_x -= dxx;
       screen_y -= dyy;
-
-#if 0
-      SyncDisplay();
-#endif
 
       animscreen();
 
@@ -1145,22 +787,6 @@ void RedrawPlayfield_EM(boolean force_redraw)
 			    sy - offset_y > screen_y ? sy - offset_y :
 			    screen_y);
 
-#if 0
-  printf("::: (%d, %d) => (%d, %d) [(%d, %d), (%d, %d)] [%d, %d] [%d / %d]\n",
-	 screen_x_old, screen_y_old,
-	 screen_x, screen_y,
-	 ply[max_center_distance_player_nr].oldx,
-	 ply[max_center_distance_player_nr].x,
-	 ply[max_center_distance_player_nr].oldy,
-	 ply[max_center_distance_player_nr].y,
-	 sx, sy,
-	 ABS(screen_x - screen_x_old),
-	 ABS(screen_y - screen_y_old));
-#endif
-
-#if 1
-
-#if 1
   /* prevent scrolling further than double player step size when scrolling */
   if (ABS(screen_x - screen_x_old) > 2 * stepsize)
   {
@@ -1174,36 +800,10 @@ void RedrawPlayfield_EM(boolean force_redraw)
 
     screen_y = screen_y_old + dy * 2 * stepsize;
   }
-#else
-  /* prevent scrolling further than double player step size when scrolling */
-  if (ABS(screen_x - screen_x_old) > 2 * stepsize ||
-      ABS(screen_y - screen_y_old) > 2 * stepsize)
-  {
-    int dx = SIGN(screen_x - screen_x_old);
-    int dy = SIGN(screen_y - screen_y_old);
-
-    screen_x = screen_x_old + dx * 2 * stepsize;
-    screen_y = screen_y_old + dy * 2 * stepsize;
-  }
-#endif
-
-#else
-  /* prevent scrolling further than player step size when scrolling */
-  if (ABS(screen_x - screen_x_old) > stepsize ||
-      ABS(screen_y - screen_y_old) > stepsize)
-  {
-    int dx = SIGN(screen_x - screen_x_old);
-    int dy = SIGN(screen_y - screen_y_old);
-
-    screen_x = screen_x_old + dx * stepsize;
-    screen_y = screen_y_old + dy * stepsize;
-  }
-#endif
 
   /* prevent scrolling away from the other players when focus on all players */
   if (game.centered_player_nr == -1)
   {
-#if 1
     /* check if all players are still visible with new scrolling position */
     if (checkIfAllPlayersAreVisible(screen_x_old, screen_y_old) &&
 	!checkIfAllPlayersAreVisible(screen_x, screen_y))
@@ -1216,17 +816,6 @@ void RedrawPlayfield_EM(boolean force_redraw)
       if (!checkIfAllPlayersAreVisible(screen_x_old, screen_y))
 	screen_y = screen_y_old;
     }
-#else
-    boolean all_players_visible = checkIfAllPlayersAreVisible();
-
-    if (!all_players_visible)
-    {
-      printf("::: not all players visible\n");
-
-      screen_x = screen_x_old;
-      screen_y = screen_y_old;
-    }
-#endif
   }
 
   /* prevent scrolling (for screen correcting) if no player is moving */
@@ -1238,9 +827,6 @@ void RedrawPlayfield_EM(boolean force_redraw)
   else
   {
     /* prevent scrolling against the players move direction */
-#if 0
-    int player_nr = game_em.last_moving_player;
-#endif
     int player_nr = (game.centered_player_nr == -1 ?
 		     max_center_distance_player_nr : game.centered_player_nr);
     int player_move_dir = game_em.last_player_direction[player_nr];
@@ -1260,14 +846,6 @@ void RedrawPlayfield_EM(boolean force_redraw)
 
   for (i = 0; i < MAX_PLAYERS; i++)
     blitplayer(&ply[i]);
-
-#if 0
-#if 0
-  SyncDisplay();
-#endif
-
-  blitscreen();
-#endif
 }
 
 void game_animscreen(void)
@@ -1277,49 +855,4 @@ void game_animscreen(void)
 
 void DrawGameDoorValues_EM()
 {
-#if 1
-  int dynamite_state;
-  int key_state;
-#else
-  int dynamite_state = ply[0].dynamite;		/* !!! ONLY PLAYER 1 !!! */
-  int key_state = ply[0].keys | ply[1].keys | ply[2].keys | ply[3].keys;
-#endif
-
-#if 1
-  if (game.centered_player_nr == -1)
-  {
-#if 1
-    int i;
-
-    dynamite_state = 0;
-    key_state = 0;
-
-    for (i = 0; i < MAX_PLAYERS; i++)
-    {
-      dynamite_state += ply[i].dynamite;
-      key_state |= ply[i].keys;
-    }
-
-#else
-
-    dynamite_state = ply[0].dynamite;		/* !!! ONLY PLAYER 1 !!! */
-    key_state = ply[0].keys | ply[1].keys | ply[2].keys | ply[3].keys;
-#endif
-  }
-  else
-  {
-    int player_nr = game.centered_player_nr;
-
-    dynamite_state = ply[player_nr].dynamite;
-    key_state = ply[player_nr].keys;
-  }
-#endif
-
-#if 1
-  DrawAllGameValues(lev.required, dynamite_state, lev.score,
-		    lev.time, key_state);
-#else
-  DrawAllGameValues(lev.required, ply1.dynamite, lev.score,
-		    DISPLAY_TIME(lev.time), ply1.keys | ply2.keys);
-#endif
 }

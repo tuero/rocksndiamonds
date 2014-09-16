@@ -11,11 +11,7 @@
 extern int mScrollX, mScrollY;
 extern int mScrollX_last, mScrollY_last;
 
-#if 1
 extern boolean redraw[2 + MAX_PLAYFIELD_WIDTH + 2][2 + MAX_PLAYFIELD_HEIGHT + 2];
-#else
-extern boolean redraw[MAX_BUF_XSIZE][MAX_BUF_YSIZE];
-#endif
 
 extern int TEST_flag;
 

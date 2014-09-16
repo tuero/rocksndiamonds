@@ -5,11 +5,7 @@
 #include "BugsTerminals.h"
 
 
-#if 1
 byte TerminalState[SP_MAX_PLAYFIELD_SIZE + SP_HEADER_SIZE];
-#else
-byte *TerminalState;
-#endif
 
 int TerminalMaxCycles;
 
