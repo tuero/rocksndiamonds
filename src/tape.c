@@ -19,6 +19,8 @@
 #include "network.h"
 #include "cartoons.h"
 
+#define DEBUG_TAPE_WHEN_PLAYING			FALSE
+
 /* tape button identifiers */
 #define TAPE_CTRL_ID_EJECT			0
 #define TAPE_CTRL_ID_EXTRA			1
@@ -732,6 +734,13 @@ byte *TapePlayAction()
 
   for (i = 0; i < MAX_PLAYERS; i++)
     action[i] = tape.pos[tape.counter].action[i];
+
+#if DEBUG_TAPE_WHEN_PLAYING
+  printf("%05d", FrameCounter);
+  for (i = 0; i < MAX_PLAYERS; i++)
+    printf("   %08x", action[i]);
+  printf("\n");
+#endif
 
   tape.set_centered_player = FALSE;
   tape.centered_player_nr_next = -999;

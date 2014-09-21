@@ -1,3 +1,8 @@
+2014-09-19
+	* fixed bug where player actions were only mapped in team mode
+	  (this broke four tapes in automatic game engine unit test where
+	  old levels contained a non-yellow player, like rnd_abby_king, 011)
+
 2014-09-15
 	* removed large parts of the preprocessor hell of old and unused code
 

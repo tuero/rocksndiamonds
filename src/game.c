@@ -11074,7 +11074,8 @@ void GameActions()
     TapeRecordAction(tape_action);
 
 #if USE_NEW_PLAYER_ASSIGNMENTS
-  if (game.team_mode)
+  // !!! also map player actions in single player mode !!!
+  // if (game.team_mode)
   {
     byte mapped_action[MAX_PLAYERS];
 
