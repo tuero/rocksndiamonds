@@ -30,7 +30,8 @@
 #include "hash.h"
 
 
-#define ENABLE_UNUSED_CODE	0	/* currently unused functions */
+#define USE_FILE_IDENTIFIERS	FALSE	/* do not use identifiers anymore */
+#define ENABLE_UNUSED_CODE	FALSE	/* for currently unused functions */
 
 #define NUM_LEVELCLASS_DESC	8
 
@@ -2103,12 +2104,14 @@ SetupFileHash *loadSetupFileHash(char *filename)
 void checkSetupFileHashIdentifier(SetupFileHash *setup_file_hash,
 				  char *filename, char *identifier)
 {
+#if USE_FILE_IDENTIFIERS
   char *value = getHashEntry(setup_file_hash, TOKEN_STR_FILE_IDENTIFIER);
 
   if (value == NULL)
     Error(ERR_WARN, "config file '%s' has no file identifier", filename);
   else if (!checkCookieString(value, identifier))
     Error(ERR_WARN, "config file '%s' has wrong file identifier", filename);
+#endif
 }
 
 

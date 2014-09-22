@@ -1,3 +1,6 @@
+2014-09-22
+	* removed checking of file identifier tokens for configuration files
+
 2014-09-19
 	* fixed bug where player actions were only mapped in team mode
 	  (this broke four tapes in automatic game engine unit test where
