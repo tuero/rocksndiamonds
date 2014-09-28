@@ -1,3 +1,7 @@
+2014-09-28
+	* fixed bug with animation frames per line with non-standard tile size
+	  (relevant for example for 64x64 sized frames continued on next row)
+
 2014-09-22
 	* removed checking of file identifier tokens for configuration files
 

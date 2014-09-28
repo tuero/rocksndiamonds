@@ -1024,9 +1024,21 @@ static void set_graphic_parameters_ext(int graphic, int *parameter,
 
   /* optional tile size for using non-standard image size */
   if (parameter[GFX_ARG_TILE_SIZE] != ARG_UNDEFINED_VALUE)
+  {
     g->tile_size = parameter[GFX_ARG_TILE_SIZE];
-  if (g->tile_size < TILESIZE)
-    g->tile_size = TILESIZE;		/* standard tile size */
+
+#if 0
+    // CHECK: should tile sizes less than standard tile size be allowed?
+    if (g->tile_size < TILESIZE)
+      g->tile_size = TILESIZE;		/* standard tile size */
+#endif
+
+#if 0
+    // CHECK: when setting tile size, should this set width and height?
+    g->width  = g->tile_size;
+    g->height = g->tile_size;
+#endif
+  }
 
   if (g->use_image_size)
   {
@@ -1089,8 +1101,16 @@ static void set_graphic_parameters_ext(int graphic, int *parameter,
       src_image_height = src_bitmap->height;
     }
 
-    anim_frames_per_row = src_image_width  / g->width;
-    anim_frames_per_col = src_image_height / g->height;
+    if (parameter[GFX_ARG_TILE_SIZE] != ARG_UNDEFINED_VALUE)
+    {
+      anim_frames_per_row = src_image_width  / g->tile_size;
+      anim_frames_per_col = src_image_height / g->tile_size;
+    }
+    else
+    {
+      anim_frames_per_row = src_image_width  / g->width;
+      anim_frames_per_col = src_image_height / g->height;
+    }
 
     g->src_image_width  = src_image_width;
     g->src_image_height = src_image_height;
