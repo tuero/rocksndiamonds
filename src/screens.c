@@ -3763,7 +3763,7 @@ static void drawHallOfFameList(int first_entry, int highlight_position)
     int font_nr4 = (active ? FONT_TEXT_4_ACTIVE : FONT_TEXT_4);
     int dx1 = 3 * getFontWidth(font_nr1);
     int dx2 = dx1 + getFontWidth(font_nr1);
-    int dx3 = SXSIZE - 5 * getFontWidth(font_nr4);
+    int dx3 = SXSIZE - 2 * (mSX - SX) - 5 * getFontWidth(font_nr4);
     int num_dots = (dx3 - dx2) / getFontWidth(font_nr3);
     int sy = mSY + 64 + i * 32;
 
@@ -5344,10 +5344,12 @@ static void DrawSetupScreen_Generic()
 
   DrawTextSCentered(mSY - SY + 16, FONT_TITLE_1, title_string);
 
+  // determine maximal number of setup entries that can be displayed on screen
   num_setup_info = 0;
-  for (i = 0; setup_info[i].type != 0 && i < MAX_MENU_ENTRIES_ON_SCREEN; i++)
+  for (i = 0; setup_info[i].type != 0 && i < NUM_MENU_ENTRIES_ON_SCREEN; i++)
     num_setup_info++;
 
+  // determine maximal number of setup entries available for this setup screen
   max_setup_info = 0;
   for (i = 0; setup_info[i].type != 0; i++)
     max_setup_info++;
