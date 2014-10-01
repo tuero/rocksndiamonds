@@ -2381,6 +2381,19 @@ void AnimateEnvelopeRequest(int anim_mode, int action)
   int ystep = (ystart < yend || xstep == 0 ? 1 : 0);
   int x, y;
 
+  if (setup.quick_doors)
+  {
+    xstart = xend;
+    ystart = yend;
+  }
+  else
+  {
+    if (action == ACTION_OPENING)
+      PlayMenuSoundStereo(SND_DOOR_OPENING, SOUND_MIDDLE);
+    else if (action == ACTION_CLOSING)
+      PlayMenuSoundStereo(SND_DOOR_CLOSING, SOUND_MIDDLE);
+  }
+
   for (x = xstart, y = ystart; x <= xend && y <= yend; x += xstep, y += ystep)
   {
     int xsize = (action == ACTION_CLOSING ? xend - (x - xstart) : x) + 2;
@@ -4147,6 +4160,7 @@ unsigned int MoveDoor(unsigned int door_state)
     int max_step_delay = 0;	// delay (ms) between two animation frames
     int num_move_steps = 0;	// number of animation steps for all doors
     int current_move_delay = 0;
+    int start = 0;
     int k;
 
     for (i = 0; i < NUM_DOORS; i++)
@@ -4206,7 +4220,20 @@ unsigned int MoveDoor(unsigned int door_state)
 
     door_delay_value = max_step_delay;
 
-    for (k = 0; k < num_move_steps; k++)
+    if ((door_state & DOOR_NO_DELAY) || setup.quick_doors)
+    {
+      start = num_move_steps - 1;
+    }
+    else
+    {
+      /* opening door sound has priority over simultaneously closing door */
+      if (door_state & (DOOR_OPEN_1 | DOOR_OPEN_2))
+        PlayMenuSoundStereo(SND_DOOR_OPENING, SOUND_MIDDLE);
+      else if (door_state & (DOOR_CLOSE_1 | DOOR_CLOSE_2))
+        PlayMenuSoundStereo(SND_DOOR_CLOSING, SOUND_MIDDLE);
+    }
+
+    for (k = start; k < num_move_steps; k++)
     {
       door_part_done_all = TRUE;
 
