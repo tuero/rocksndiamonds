@@ -22,7 +22,14 @@
 #include "network.h"
 
 
-#define	DEBUG_EVENTS		0
+#define	DEBUG_EVENTS		1
+
+#define DEBUG_EVENTS_BUTTON	(DEBUG_EVENTS	* 0)
+#define DEBUG_EVENTS_MOTION	(DEBUG_EVENTS	* 0)
+#define DEBUG_EVENTS_WINDOW	(DEBUG_EVENTS	* 0)
+#define DEBUG_EVENTS_FINGER	(DEBUG_EVENTS	* 0)
+#define DEBUG_EVENTS_TEXT	(DEBUG_EVENTS	* 1)
+#define DEBUG_EVENTS_KEY	(DEBUG_EVENTS	* 1)
 
 
 static boolean cursor_inside_playfield = FALSE;
@@ -364,7 +371,7 @@ void HandleExposeEvent(ExposeEvent *event)
 
 void HandleButtonEvent(ButtonEvent *event)
 {
-#if DEBUG_EVENTS
+#if DEBUG_EVENTS_BUTTON
   Error(ERR_DEBUG, "BUTTON EVENT: button %d %s, x/y %d/%d\n",
 	event->button,
 	event->type == EVENT_BUTTONPRESS ? "pressed" : "released",
@@ -391,7 +398,7 @@ void HandleMotionEvent(MotionEvent *event)
 
   motion_status = TRUE;
 
-#if DEBUG_EVENTS
+#if DEBUG_EVENTS_MOTION
   Error(ERR_DEBUG, "MOTION EVENT: button %d moved, x/y %d/%d\n",
 	button_status, event->x, event->y);
 #endif
@@ -403,7 +410,7 @@ void HandleMotionEvent(MotionEvent *event)
 
 void HandleWindowEvent(WindowEvent *event)
 {
-#if DEBUG_EVENTS
+#if DEBUG_EVENTS_WINDOW
   int subtype = event->event;
 
   char *event_name =
@@ -485,7 +492,7 @@ void HandleFingerEvent(FingerEvent *event)
   float event_x = event->x;
   float event_y = event->y;
 
-#if DEBUG_EVENTS
+#if DEBUG_EVENTS_FINGER
   Error(ERR_DEBUG, "FINGER EVENT: finger was %s, touch ID %lld, finger ID %lld, x/y %f/%f, dx/dy %f/%f, pressure %f",
 	event->type == EVENT_FINGERPRESS ? "pressed" :
 	event->type == EVENT_FINGERRELEASE ? "released" : "moved",
@@ -775,7 +782,7 @@ void HandleTextEvent(TextEvent *event)
   char *text = event->text;
   Key key = getKeyFromKeyName(text);
 
-#if DEBUG_EVENTS
+#if DEBUG_EVENTS_TEXT
   Error(ERR_DEBUG, "TEXT EVENT: text == '%s' [%d byte(s), '%c'/%d], resulting key == %d (%s) [%04x]",
 	text,
 	strlen(text),
@@ -783,6 +790,15 @@ void HandleTextEvent(TextEvent *event)
 	key,
 	getKeyNameFromKey(key),
 	GetKeyModState());
+#endif
+
+#if defined(PLATFORM_ANDROID)
+  if (game_status == GAME_MODE_PSEUDO_TYPENAME)
+  {
+    HandleTypeName(0, key);
+
+    return;
+  }
 #endif
 
   // if (game_status != GAME_MODE_PLAYING && GetKeyModState() != KMOD_None)
@@ -818,7 +834,7 @@ void HandleKeyEvent(KeyEvent *event)
   Key key = GetEventKey(event, with_modifiers);
   Key keymod = (with_modifiers ? GetEventKey(event, FALSE) : key);
 
-#if DEBUG_EVENTS
+#if DEBUG_EVENTS_KEY
   Error(ERR_DEBUG, "KEY EVENT: key was %s, keysym.scancode == %d, keysym.sym == %d, keymod = %d, GetKeyModState() = 0x%04x, resulting key == %d (%s)",
 	event->type == EVENT_KEYPRESS ? "pressed" : "released",
 	event->keysym.scancode,
@@ -1020,7 +1036,7 @@ static void HandleKeysSpecial(Key key)
   cheat_input[cheat_input_len++] = letter;
   cheat_input[cheat_input_len] = '\0';
 
-#if DEBUG_EVENTS
+#if DEBUG_EVENTS_KEY
   Error(ERR_DEBUG, "SPECIAL KEY '%s' [%d]\n", cheat_input, cheat_input_len);
 #endif
 

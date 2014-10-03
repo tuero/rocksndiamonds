@@ -3159,6 +3159,10 @@ void HandleTypeName(int newxpos, Key key)
     strcpy(last_player_name, setup.player_name);
 
     xpos = newxpos;
+
+#if defined(TARGET_SDL2)
+    SDL_StartTextInput();
+#endif
   }
   else if (is_valid_key_char && xpos < MAX_PLAYER_NAME_LEN)
   {
@@ -3204,6 +3208,10 @@ void HandleTypeName(int newxpos, Key key)
     startx = mSX + ALIGNED_TEXT_XPOS(pos);
 
     DrawText(startx, starty, setup.player_name, font_nr);
+
+#if defined(TARGET_SDL2)
+    SDL_StopTextInput();
+#endif
   }
 }
 
@@ -4638,12 +4646,14 @@ static void execSetupChooseMusic()
   DrawSetupScreen();
 }
 
+#if !defined(PLATFORM_ANDROID)
 static void execSetupInput()
 {
   setup_mode = SETUP_MODE_INPUT;
 
   DrawSetupScreen();
 }
+#endif
 
 static void execSetupShortcuts()
 {
