@@ -1,3 +1,8 @@
+2014-10-07
+	* fixed bug when changing between graphic sets with different tile size
+	* cleanup of handling the various graphic sizes for different purposes
+	  (like 32x32, 16x16 etc.); this change was needed for the bugfix above
+
 2014-10-02
 	* added virtual keyboard on Android port when entering player name
 

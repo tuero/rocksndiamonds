@@ -19,13 +19,15 @@ struct ImageInfo
   char *source_filename;
   int num_references;
 
-  Bitmap *bitmap;
+  Bitmap *bitmaps[NUM_IMG_BITMAP_POINTERS];
 
   int original_width;			/* original image file width */
   int original_height;			/* original image file height */
 
   boolean contains_small_images;	/* set after adding small images */
   boolean scaled_up;			/* set after scaling up */
+
+  int game_tile_size;			/* size of in-game sized bitmap */
 };
 typedef struct ImageInfo ImageInfo;
 
@@ -33,25 +35,27 @@ static struct ArtworkListInfo *image_info = NULL;
 
 static void *Load_Image(char *filename)
 {
-  ImageInfo *img_info;
+  ImageInfo *img_info = checked_calloc(sizeof(ImageInfo));
 
-  img_info = checked_calloc(sizeof(ImageInfo));
-
-  if ((img_info->bitmap = LoadImage(filename)) == NULL)
+  if ((img_info->bitmaps[IMG_BITMAP_STANDARD] = LoadImage(filename)) == NULL)
   {
     Error(ERR_WARN, "cannot load image file '%s': LoadImage() failed: %s",
 	  filename, GetError());
+
     free(img_info);
+
     return NULL;
   }
 
   img_info->source_filename = getStringCopy(filename);
 
-  img_info->original_width  = img_info->bitmap->width;
-  img_info->original_height = img_info->bitmap->height;
+  img_info->original_width  = img_info->bitmaps[IMG_BITMAP_STANDARD]->width;
+  img_info->original_height = img_info->bitmaps[IMG_BITMAP_STANDARD]->height;
 
   img_info->contains_small_images = FALSE;
   img_info->scaled_up = FALSE;
+
+  img_info->game_tile_size = 0;		// will be set later
 
   return img_info;
 }
@@ -59,12 +63,14 @@ static void *Load_Image(char *filename)
 static void FreeImage(void *ptr)
 {
   ImageInfo *image = (ImageInfo *)ptr;
+  int i;
 
   if (image == NULL)
     return;
 
-  if (image->bitmap)
-    FreeBitmap(image->bitmap);
+  for (i = 0; i < NUM_IMG_BITMAPS; i++)
+    if (image->bitmaps[i])
+      FreeBitmap(image->bitmaps[i]);
 
   if (image->source_filename)
     free(image->source_filename);
@@ -98,11 +104,11 @@ static ImageInfo *getImageInfoEntryFromImageID(int pos)
   return img_info[list_pos];
 }
 
-Bitmap *getBitmapFromImageID(int pos)
+Bitmap **getBitmapsFromImageID(int pos)
 {
   ImageInfo *img_info = getImageInfoEntryFromImageID(pos);
 
-  return (img_info != NULL ? img_info->bitmap : NULL);
+  return (img_info != NULL ? img_info->bitmaps : NULL);
 }
 
 int getOriginalImageWidthFromImageID(int pos)
@@ -246,13 +252,25 @@ void CreateImageWithSmallImages(int pos, int zoom_factor, int tile_size)
 {
   ImageInfo *img_info = getImageInfoEntryFromImageID(pos);
 
-  if (img_info == NULL || img_info->contains_small_images)
+  if (img_info == NULL)
     return;
 
-  CreateBitmapWithSmallBitmaps(img_info->bitmap, zoom_factor, tile_size);
+  if (img_info->contains_small_images)
+  {
+    if (img_info->game_tile_size != gfx.game_tile_size)
+      ReCreateGameTileSizeBitmap(img_info->bitmaps);
+
+    img_info->game_tile_size = gfx.game_tile_size;
+
+    return;
+  }
+
+  CreateBitmapWithSmallBitmaps(img_info->bitmaps, zoom_factor, tile_size);
 
   img_info->contains_small_images = TRUE;
-  img_info->scaled_up = TRUE;
+  img_info->scaled_up = TRUE;			// scaling was also done here
+
+  img_info->game_tile_size = gfx.game_tile_size;
 }
 
 void ScaleImage(int pos, int zoom_factor)
@@ -263,7 +281,7 @@ void ScaleImage(int pos, int zoom_factor)
     return;
 
   if (zoom_factor != 1)
-    ScaleBitmap(img_info->bitmap, zoom_factor);
+    ScaleBitmap(img_info->bitmaps, zoom_factor);
 
   img_info->scaled_up = TRUE;
 }

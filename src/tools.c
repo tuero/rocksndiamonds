@@ -1049,64 +1049,24 @@ void getSizedGraphicSourceExt(int graphic, int frame, int tilesize_raw,
 			      Bitmap **bitmap, int *x, int *y,
 			      boolean get_backside)
 {
-  struct
-  {
-    int width_mult, width_div;
-    int height_mult, height_div;
-  }
-  offset_calc[6] =
-  {
-    { 15, 16,	2, 3	},	/* 1 x 1 */
-    { 7, 8,	2, 3	},	/* 2 x 2 */
-    { 3, 4,	2, 3	},	/* 4 x 4 */
-    { 1, 2,	2, 3	},	/* 8 x 8 */
-    { 0, 1,	2, 3	},	/* 16 x 16 */
-    { 0, 1,	0, 1	},	/* 32 x 32 */
-  };
   struct GraphicInfo *g = &graphic_info[graphic];
   Bitmap *src_bitmap = g->bitmap;
   int tilesize = MIN(MAX(1, tilesize_raw), TILESIZE);
-  int offset_calc_pos = log_2(tilesize);
-  int bitmap_width  = src_bitmap->width;
-  int bitmap_height = src_bitmap->height;
-  int width_mult  = offset_calc[offset_calc_pos].width_mult;
-  int width_div   = offset_calc[offset_calc_pos].width_div;
-  int height_mult = offset_calc[offset_calc_pos].height_mult;
-  int height_div  = offset_calc[offset_calc_pos].height_div;
-  int startx = bitmap_width * width_mult / width_div;
-  int starty = bitmap_height * height_mult / height_div;
-  int src_x = (g->src_x + (get_backside ? g->offset2_x : 0)) *
-    tilesize_raw / TILESIZE;
-  int src_y = (g->src_y + (get_backside ? g->offset2_y : 0)) *
-    tilesize_raw / TILESIZE;
-  int width = g->width * tilesize_raw / TILESIZE;
-  int height = g->height * tilesize_raw / TILESIZE;
   int offset_x = g->offset_x * tilesize_raw / TILESIZE;
   int offset_y = g->offset_y * tilesize_raw / TILESIZE;
+  int offset2_x = (get_backside ? g->offset2_x : 0);
+  int offset2_y = (get_backside ? g->offset2_y : 0);
+  int src_x = (g->src_x + offset2_x) * tilesize_raw / TILESIZE;
+  int src_y = (g->src_y + offset2_y) * tilesize_raw / TILESIZE;
+  int width = g->width * tilesize_raw / TILESIZE;
+  int height = g->height * tilesize_raw / TILESIZE;
 
-  if (game.tile_size != TILESIZE)
-  {
-    int bitmap_width_std =
-      bitmap_width * TILESIZE / (TILESIZE + game.tile_size);
-    int bitmap_height_std =
-      bitmap_height * TILESIZE / game.tile_size * 3 / 2;
-
-    if (tilesize_raw == game.tile_size)
-    {
-      startx = bitmap_width_std;
-      starty = 0;
-    }
-    else
-    {
-      bitmap_width = bitmap_width_std;
-
-      if (game.tile_size > TILESIZE * 3 / 2)
-	bitmap_height = bitmap_height_std;
-
-      startx = bitmap_width * width_mult / width_div;
-      starty = bitmap_height * height_mult / height_div;
-    }
-  }
+  if (tilesize_raw == gfx.standard_tile_size)
+    src_bitmap = g->bitmaps[IMG_BITMAP_STANDARD];
+  else if (tilesize_raw == game.tile_size)
+    src_bitmap = g->bitmaps[IMG_BITMAP_GAME];
+  else
+    src_bitmap = g->bitmaps[IMG_BITMAP_1x1 - log_2(tilesize)];
 
   if (g->offset_y == 0)		/* frames are ordered horizontally */
   {
@@ -1131,8 +1091,8 @@ void getSizedGraphicSourceExt(int graphic, int frame, int tilesize_raw,
   }
 
   *bitmap = src_bitmap;
-  *x = startx + src_x;
-  *y = starty + src_y;
+  *x = src_x;
+  *y = src_y;
 }
 
 void getFixedGraphicSourceExt(int graphic, int frame, Bitmap **bitmap,

@@ -1332,8 +1332,9 @@ Bitmap *LoadCustomImage(char *);
 void ReloadCustomImage(Bitmap *, char *);
 
 Bitmap *ZoomBitmap(Bitmap *, int, int);
-void CreateBitmapWithSmallBitmaps(Bitmap *, int, int);
-void ScaleBitmap(Bitmap *, int);
+void ReCreateGameTileSizeBitmap(Bitmap **);
+void CreateBitmapWithSmallBitmaps(Bitmap **, int, int);
+void ScaleBitmap(Bitmap **, int);
 
 void SetMouseCursor(int);
 

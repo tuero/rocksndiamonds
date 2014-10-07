@@ -896,11 +896,57 @@ Bitmap *ZoomBitmap(Bitmap *src_bitmap, int zoom_width, int zoom_height)
   return dst_bitmap;
 }
 
-static void CreateScaledBitmaps(Bitmap *old_bitmap, int zoom_factor,
+static void SetMaskedBitmapSurface(Bitmap *bitmap)
+{
+  if (bitmap == NULL)
+    return;
+
+  SDL_Surface *surface = bitmap->surface;
+
+  if (bitmap->surface_masked)
+    SDL_FreeSurface(bitmap->surface_masked);
+
+  SDL_SetColorKey(surface, SET_TRANSPARENT_PIXEL,
+		  SDL_MapRGB(surface->format, 0x00, 0x00, 0x00));
+
+  if ((bitmap->surface_masked = SDLGetNativeSurface(surface)) == NULL)
+    Error(ERR_EXIT, "SDL_DisplayFormat() failed");
+
+  SDL_SetColorKey(surface, UNSET_TRANSPARENT_PIXEL, 0);
+}
+
+void ReCreateGameTileSizeBitmap(Bitmap **bitmaps)
+{
+  if (bitmaps[IMG_BITMAP_CUSTOM])
+  {
+    FreeBitmap(bitmaps[IMG_BITMAP_CUSTOM]);
+
+    bitmaps[IMG_BITMAP_CUSTOM] = NULL;
+  }
+
+  if (gfx.game_tile_size == gfx.standard_tile_size)
+  {
+    bitmaps[IMG_BITMAP_GAME] = bitmaps[IMG_BITMAP_STANDARD];
+
+    return;
+  }
+
+  Bitmap *bitmap = bitmaps[IMG_BITMAP_STANDARD];
+  int width  = bitmap->width  * gfx.game_tile_size / gfx.standard_tile_size;;
+  int height = bitmap->height * gfx.game_tile_size / gfx.standard_tile_size;;
+
+  Bitmap *bitmap_new = ZoomBitmap(bitmap, width, height);
+
+  bitmaps[IMG_BITMAP_CUSTOM] = bitmap_new;
+  bitmaps[IMG_BITMAP_GAME]   = bitmap_new;
+
+  SetMaskedBitmapSurface(bitmap_new);
+}
+
+static void CreateScaledBitmaps(Bitmap **bitmaps, int zoom_factor,
 				int tile_size, boolean create_small_bitmaps)
 {
-  Bitmap swap_bitmap;
-  Bitmap *new_bitmap;
+  Bitmap *old_bitmap = bitmaps[IMG_BITMAP_STANDARD];
   Bitmap *tmp_bitmap_final = NULL;
   Bitmap *tmp_bitmap_0 = NULL;
   Bitmap *tmp_bitmap_1 = NULL;
@@ -918,7 +964,7 @@ static void CreateScaledBitmaps(Bitmap *old_bitmap, int zoom_factor,
   int width_16, height_16;
   int width_32, height_32;
   int old_width, old_height;
-  int new_width, new_height;
+  int i;
 
   print_timestamp_init("CreateScaledBitmaps");
 
@@ -980,10 +1026,7 @@ static void CreateScaledBitmaps(Bitmap *old_bitmap, int zoom_factor,
 
       UPDATE_BUSY_STATE();
     }
-  }
 
-  if (create_small_bitmaps)
-  {
     /* calculate new image dimensions for small images */
     width_2  = width_1  / 2;
     height_2 = height_1 / 2;
@@ -1035,118 +1078,56 @@ static void CreateScaledBitmaps(Bitmap *old_bitmap, int zoom_factor,
       tmp_bitmap_32 = ZoomBitmap(tmp_bitmap_16, width_32, height_32);
 
     UPDATE_BUSY_STATE();
-  }
 
-  if (create_small_bitmaps)
-  {
-    new_width  = width_1;
-    new_height = height_1 + (height_1 + 1) / 2;     /* prevent odd height */
-
-    if (width_0 != width_1)
-    {
-      new_width += width_0;
-      new_height = MAX(new_height, height_0);
-    }
-
-    new_bitmap = CreateBitmap(new_width, new_height, DEFAULT_DEPTH);
+    bitmaps[IMG_BITMAP_32x32] = tmp_bitmap_1;
+    bitmaps[IMG_BITMAP_16x16] = tmp_bitmap_2;
+    bitmaps[IMG_BITMAP_8x8]   = tmp_bitmap_4;
+    bitmaps[IMG_BITMAP_4x4]   = tmp_bitmap_8;
+    bitmaps[IMG_BITMAP_2x2]   = tmp_bitmap_16;
+    bitmaps[IMG_BITMAP_1x1]   = tmp_bitmap_32;
 
     if (width_0 != width_1)
-      BlitBitmap(tmp_bitmap_0, new_bitmap, 0, 0, width_0, height_0, width_1, 0);
+      bitmaps[IMG_BITMAP_CUSTOM] = tmp_bitmap_0;
 
-    BlitBitmap(tmp_bitmap_1, new_bitmap, 0, 0, width_1, height_1, 0, 0);
-    BlitBitmap(tmp_bitmap_2, new_bitmap, 0, 0, width_1 / 2, height_1 / 2,
-	       0, height_1);
-    BlitBitmap(tmp_bitmap_4, new_bitmap, 0, 0, width_1 / 4, height_1 / 4,
-	       width_1 / 2, height_1);
-    BlitBitmap(tmp_bitmap_8, new_bitmap, 0, 0, width_1 / 8, height_1 / 8,
-	       3 * width_1 / 4, height_1);
-    BlitBitmap(tmp_bitmap_16, new_bitmap, 0, 0, width_1 / 16, height_1 / 16,
-	       7 * width_1 / 8, height_1);
-    BlitBitmap(tmp_bitmap_32, new_bitmap, 0, 0, width_1 / 32, height_1 / 32,
-	       15 * width_1 / 16, height_1);
+    if (bitmaps[IMG_BITMAP_CUSTOM])
+      bitmaps[IMG_BITMAP_GAME] = bitmaps[IMG_BITMAP_CUSTOM];
+    else
+      bitmaps[IMG_BITMAP_GAME] = bitmaps[IMG_BITMAP_STANDARD];
 
-    UPDATE_BUSY_STATE();
+    boolean free_old_bitmap = TRUE;
+
+    for (i = 0; i < NUM_IMG_BITMAPS; i++)
+      if (bitmaps[i] == old_bitmap)
+	free_old_bitmap = FALSE;
+
+    if (free_old_bitmap)
+      FreeBitmap(old_bitmap);
   }
   else
   {
-    new_width  = width_1;
-    new_height = height_1;
-
-    new_bitmap = tmp_bitmap_1;	/* directly use tmp_bitmap_1 as new bitmap */
+    bitmaps[IMG_BITMAP_32x32] = tmp_bitmap_1;
   }
 
-  if (create_small_bitmaps)
-  {
-    /* if no small bitmaps created, tmp_bitmap_1 is used as new bitmap now */
-
-    if (tmp_bitmap_final != old_bitmap)
-      FreeBitmap(tmp_bitmap_final);
-
-    if (tmp_bitmap_0 != old_bitmap &&
-	tmp_bitmap_0 != tmp_bitmap_final)
-      FreeBitmap(tmp_bitmap_0);
-
-    if (tmp_bitmap_1 != old_bitmap &&
-	tmp_bitmap_1 != tmp_bitmap_final &&
-	tmp_bitmap_1 != tmp_bitmap_0)
-      FreeBitmap(tmp_bitmap_1);
-
-    if (tmp_bitmap_2 != old_bitmap)
-      FreeBitmap(tmp_bitmap_2);
-
-    if (tmp_bitmap_4 != old_bitmap)
-      FreeBitmap(tmp_bitmap_4);
-
-    if (tmp_bitmap_8 != old_bitmap)
-      FreeBitmap(tmp_bitmap_8);
-
-    if (tmp_bitmap_16 != old_bitmap)
-      FreeBitmap(tmp_bitmap_16);
-
-    if (tmp_bitmap_32 != old_bitmap)
-      FreeBitmap(tmp_bitmap_32);
-  }
-
-  /* replace image with extended image (containing 1/1, 1/2, 1/4, 1/8 size) */
-  swap_bitmap.surface = old_bitmap->surface;
-  old_bitmap->surface = new_bitmap->surface;
-  new_bitmap->surface = swap_bitmap.surface;
-
-  old_bitmap->width  = new_bitmap->width;
-  old_bitmap->height = new_bitmap->height;
-
-  /* this replaces all blit masks created when loading -- maybe optimize this */
-  {
-    SDL_Surface *old_surface = old_bitmap->surface;
-
-    if (old_bitmap->surface_masked)
-      SDL_FreeSurface(old_bitmap->surface_masked);
-
-    SDL_SetColorKey(old_surface, SET_TRANSPARENT_PIXEL,
-		    SDL_MapRGB(old_surface->format, 0x00, 0x00, 0x00));
-
-    if ((old_bitmap->surface_masked = SDLGetNativeSurface(old_surface)) == NULL)
-      Error(ERR_EXIT, "SDL_DisplayFormat() failed");
-
-    SDL_SetColorKey(old_surface, UNSET_TRANSPARENT_PIXEL, 0);
-  }
+  // create corresponding bitmaps for masked blitting
+  for (i = 0; i < NUM_IMG_BITMAPS; i++)
+    if (bitmaps[i] != NULL &&
+	bitmaps[i] != old_bitmap)
+      SetMaskedBitmapSurface(bitmaps[i]);
 
   UPDATE_BUSY_STATE();
-
-  FreeBitmap(new_bitmap);	/* this actually frees the _old_ bitmap now */
 
   print_timestamp_done("CreateScaledBitmaps");
 }
 
-void CreateBitmapWithSmallBitmaps(Bitmap *old_bitmap, int zoom_factor,
+void CreateBitmapWithSmallBitmaps(Bitmap **bitmaps, int zoom_factor,
 				  int tile_size)
 {
-  CreateScaledBitmaps(old_bitmap, zoom_factor, tile_size, TRUE);
+  CreateScaledBitmaps(bitmaps, zoom_factor, tile_size, TRUE);
 }
 
-void ScaleBitmap(Bitmap *old_bitmap, int zoom_factor)
+void ScaleBitmap(Bitmap **bitmaps, int zoom_factor)
 {
-  CreateScaledBitmaps(old_bitmap, zoom_factor, 0, FALSE);
+  CreateScaledBitmaps(bitmaps, zoom_factor, 0, FALSE);
 }
 
 

@@ -153,8 +153,14 @@ void InitGadgets()
 
 inline void InitElementSmallImagesScaledUp(int graphic)
 {
-  CreateImageWithSmallImages(graphic, graphic_info[graphic].scale_up_factor,
-			     graphic_info[graphic].tile_size);
+  struct GraphicInfo *g = &graphic_info[graphic];
+
+  // create small and game tile sized bitmaps (and scale up, if needed)
+  CreateImageWithSmallImages(graphic, g->scale_up_factor, g->tile_size);
+
+  // default (standard sized) bitmap may have changed now -- update it
+  if (g->bitmaps)
+    g->bitmap = g->bitmaps[IMG_BITMAP_STANDARD];
 }
 
 void InitElementSmallImages()
@@ -976,9 +982,10 @@ static int get_scaled_graphic_height(int graphic)
 }
 
 static void set_graphic_parameters_ext(int graphic, int *parameter,
-				       Bitmap *src_bitmap)
+				       Bitmap **src_bitmaps)
 {
   struct GraphicInfo *g = &graphic_info[graphic];
+  Bitmap *src_bitmap = (src_bitmaps ? src_bitmaps[IMG_BITMAP_STANDARD] : NULL);
   int anim_frames_per_row = 1, anim_frames_per_col = 1;
   int anim_frames_per_line = 1;
 
@@ -1014,6 +1021,7 @@ static void set_graphic_parameters_ext(int graphic, int *parameter,
   g->class = 0;
   g->style = STYLE_DEFAULT;
 
+  g->bitmaps = src_bitmaps;
   g->bitmap = src_bitmap;
 
   /* optional zoom factor for scaling up the image to a larger size */
@@ -1263,7 +1271,7 @@ static void set_graphic_parameters(int graphic)
 {
   struct FileInfo *image = getImageListEntryFromImageID(graphic);
   char **parameter_raw = image->parameter;
-  Bitmap *src_bitmap = getBitmapFromImageID(graphic);
+  Bitmap **src_bitmaps = getBitmapsFromImageID(graphic);
   int parameter[NUM_GFX_ARGS];
   int i;
 
@@ -1277,7 +1285,7 @@ static void set_graphic_parameters(int graphic)
 					       image_config_suffix[i].token,
 					       image_config_suffix[i].type);
 
-  set_graphic_parameters_ext(graphic, parameter, src_bitmap);
+  set_graphic_parameters_ext(graphic, parameter, src_bitmaps);
 
   UPDATE_BUSY_STATE();
 }
@@ -5061,11 +5069,15 @@ void InitGfx()
   if (filename_anim_initial == NULL)	/* should not happen */
     Error(ERR_EXIT, "cannot get filename for '%s'", CONFIG_TOKEN_GLOBAL_BUSY);
 
-  anim_initial.bitmap = LoadCustomImage(filename_anim_initial);
+  anim_initial.bitmaps =
+    checked_calloc(sizeof(Bitmap *) * NUM_IMG_BITMAP_POINTERS);
+
+  anim_initial.bitmaps[IMG_BITMAP_STANDARD] =
+    LoadCustomImage(filename_anim_initial);
 
   graphic_info = &anim_initial;		/* graphic == 0 => anim_initial */
 
-  set_graphic_parameters_ext(0, parameter, anim_initial.bitmap);
+  set_graphic_parameters_ext(0, parameter, anim_initial.bitmaps);
 
   graphic_info = graphic_info_last;
 

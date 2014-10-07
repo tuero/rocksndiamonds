@@ -2658,7 +2658,9 @@ struct FontInfo
 
 struct GraphicInfo
 {
-  Bitmap *bitmap;
+  Bitmap **bitmaps;		/* bitmaps in all required sizes */
+  Bitmap *bitmap;		/* bitmap in default size */
+
   int src_image_width;		/* scaled bitmap size, but w/o small images */
   int src_image_height;		/* scaled bitmap size, but w/o small images */
 
