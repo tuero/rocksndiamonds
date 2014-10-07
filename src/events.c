@@ -22,7 +22,7 @@
 #include "network.h"
 
 
-#define	DEBUG_EVENTS		1
+#define	DEBUG_EVENTS		0
 
 #define DEBUG_EVENTS_BUTTON	(DEBUG_EVENTS	* 0)
 #define DEBUG_EVENTS_MOTION	(DEBUG_EVENTS	* 0)
@@ -801,11 +801,7 @@ void HandleTextEvent(TextEvent *event)
   }
 #endif
 
-  // if (game_status != GAME_MODE_PLAYING && GetKeyModState() != KMOD_None)
-  /*
-  if (game_status != GAME_MODE_PLAYING &&
-      (GetKeyModState() & KMOD_TextInput) != KMOD_None)
-  */
+  // only handle key input with text modifier keys pressed
   if (checkTextInputKeyModState())
   {
     HandleKey(key, KEY_PRESSED);
@@ -854,6 +850,7 @@ void HandleKeyEvent(KeyEvent *event)
   HandleKeyModState(keymod, key_status);
 
 #if defined(TARGET_SDL2)
+  // only handle raw key input without text modifier keys pressed
   if (!checkTextInputKeyModState())
     HandleKey(key, key_status);
 #else
