@@ -1,3 +1,6 @@
+2014-10-08
+	* added handling of unselectable selectbox options and option headlines
+
 2014-10-07
 	* fixed bug when changing between graphic sets with different tile size
 	* cleanup of handling the various graphic sizes for different purposes

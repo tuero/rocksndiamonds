@@ -78,35 +78,37 @@
 #define GDI_TEXT_SIZE			15
 #define GDI_TEXT_FONT			16
 #define GDI_TEXT_FONT_ACTIVE		17
-#define GDI_SELECTBOX_OPTIONS		18
-#define GDI_SELECTBOX_INDEX		19
-#define GDI_DESIGN_UNPRESSED		20
-#define GDI_DESIGN_PRESSED		21
-#define GDI_ALT_DESIGN_UNPRESSED	22
-#define GDI_ALT_DESIGN_PRESSED		23
-#define GDI_BORDER_SIZE			24
-#define GDI_BORDER_SIZE_SELECTBUTTON	25
-#define GDI_DESIGN_WIDTH		26
-#define GDI_DECORATION_DESIGN		27
-#define GDI_DECORATION_POSITION		28
-#define GDI_DECORATION_SIZE		29
-#define GDI_DECORATION_SHIFTING		30
-#define GDI_EVENT_MASK			31
-#define GDI_EVENT			32
-#define GDI_CALLBACK_INFO		33
-#define GDI_CALLBACK_ACTION		34
-#define GDI_AREA_SIZE			35
-#define GDI_ITEM_SIZE			36
-#define GDI_SCROLLBAR_ITEMS_MAX		37
-#define GDI_SCROLLBAR_ITEMS_VISIBLE	38
-#define GDI_SCROLLBAR_ITEM_POSITION	39
-#define GDI_WHEEL_AREA_X		40
-#define GDI_WHEEL_AREA_Y		41
-#define GDI_WHEEL_AREA_WIDTH		42
-#define GDI_WHEEL_AREA_HEIGHT		43
-#define GDI_INFO_TEXT			44
-#define GDI_ACTIVE			45
-#define GDI_DIRECT_DRAW			46
+#define GDI_TEXT_FONT_UNSELECTABLE	18
+#define GDI_SELECTBOX_OPTIONS		19
+#define GDI_SELECTBOX_INDEX		20
+#define GDI_SELECTBOX_CHAR_UNSELECTABLE	21
+#define GDI_DESIGN_UNPRESSED		22
+#define GDI_DESIGN_PRESSED		23
+#define GDI_ALT_DESIGN_UNPRESSED	24
+#define GDI_ALT_DESIGN_PRESSED		25
+#define GDI_BORDER_SIZE			26
+#define GDI_BORDER_SIZE_SELECTBUTTON	27
+#define GDI_DESIGN_WIDTH		28
+#define GDI_DECORATION_DESIGN		29
+#define GDI_DECORATION_POSITION		30
+#define GDI_DECORATION_SIZE		31
+#define GDI_DECORATION_SHIFTING		32
+#define GDI_EVENT_MASK			33
+#define GDI_EVENT			34
+#define GDI_CALLBACK_INFO		35
+#define GDI_CALLBACK_ACTION		36
+#define GDI_AREA_SIZE			37
+#define GDI_ITEM_SIZE			38
+#define GDI_SCROLLBAR_ITEMS_MAX		39
+#define GDI_SCROLLBAR_ITEMS_VISIBLE	40
+#define GDI_SCROLLBAR_ITEM_POSITION	41
+#define GDI_WHEEL_AREA_X		42
+#define GDI_WHEEL_AREA_Y		43
+#define GDI_WHEEL_AREA_WIDTH		44
+#define GDI_WHEEL_AREA_HEIGHT		45
+#define GDI_INFO_TEXT			46
+#define GDI_ACTIVE			47
+#define GDI_DIRECT_DRAW			48
 
 /* gadget deactivation hack */
 #define GDI_ACTIVE_POS(a)		((a) < 0 ? POS_OFFSCREEN : (a))
@@ -184,6 +186,7 @@ struct GadgetSelectbox
   struct ValueTextInfo *options;	/* pointer to text/value array */
   int index;				/* index of actual text string */
   int size;				/* maximal size of text strings */
+  char char_unselectable;		/* first char of unselectable options */
 
   /* automatically determined values */
   int x, y;				/* open selectbox position */
@@ -235,6 +238,7 @@ struct GadgetInfo
   boolean direct_draw;			/* directly draw to frontbuffer */
   int font;				/* font to use when inactive */
   int font_active;			/* font to use when active */
+  int font_unselectable;		/* font to use when unselectable */
   struct GadgetBorder border;		/* gadget border design */
   struct GadgetDesign design[2];	/* 0: normal; 1: pressed */
   struct GadgetDesign alt_design[2];	/* alternative design */

@@ -26,6 +26,13 @@
 
 #define GADGET_DEACTIVATED(g)	((g)->x < 0 || (g)->y < 0)
 
+#define OPTION_TEXT_SELECTABLE(g, t)					\
+  (t[0] != g->selectbox.char_unselectable &&				\
+   t[0] != '\0' &&							\
+   !strEqual(t, " "))
+#define CURRENT_OPTION_SELECTABLE(g)					\
+  OPTION_TEXT_SELECTABLE(g, g->selectbox.options[g->selectbox.current_index].text)
+
 
 static struct GadgetInfo *gadget_list_first_entry = NULL;
 static struct GadgetInfo *gadget_list_last_entry = NULL;
@@ -404,7 +411,8 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
       {
 	int i;
 	char text[MAX_GADGET_TEXTSIZE + 1];
-	int font_nr = (pressed ? gi->font_active : gi->font);
+	int font_nr_default = (pressed ? gi->font_active : gi->font);
+	int font_nr = font_nr_default;
 	int font_width = getFontWidth(font_nr);
 	int font_height = getFontHeight(font_nr);
 	int border_x = gi->border.xsize;
@@ -440,6 +448,10 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 	strncpy(text, gi->selectbox.options[gi->selectbox.index].text,
 		gi->selectbox.size);
 	text[gi->selectbox.size] = '\0';
+
+	/* set font value */
+	font_nr = (OPTION_TEXT_SELECTABLE(gi, text) ? font_nr_default :
+		   gi->font_unselectable);
 
 	/* gadget text value */
 	DrawTextExt(drawto, gi->x + border_x, gi->y + border_y, text,
@@ -549,7 +561,11 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 	    strncpy(text, gi->selectbox.options[i].text, gi->selectbox.size);
 	    text[gi->selectbox.size] = '\0';
 
-	    if (i == gi->selectbox.current_index)
+	    font_nr = (OPTION_TEXT_SELECTABLE(gi, text) ? font_nr_default :
+		       gi->font_unselectable);
+
+	    if (i == gi->selectbox.current_index &&
+		OPTION_TEXT_SELECTABLE(gi, text))
 	    {
 	      FillRectangle(drawto,
 			    gi->selectbox.x + border_x,
@@ -873,10 +889,16 @@ static void HandleGadgetTags(struct GadgetInfo *gi, int first_tag, va_list ap)
 	gi->font = va_arg(ap, int);
 	if (gi->font_active == 0)
 	  gi->font_active = gi->font;
+	if (gi->font_unselectable == 0)
+	  gi->font_unselectable = gi->font;
 	break;
 
       case GDI_TEXT_FONT_ACTIVE:
 	gi->font_active = va_arg(ap, int);
+	break;
+
+      case GDI_TEXT_FONT_UNSELECTABLE:
+	gi->font_unselectable = va_arg(ap, int);
 	break;
 
       case GDI_SELECTBOX_OPTIONS:
@@ -885,6 +907,10 @@ static void HandleGadgetTags(struct GadgetInfo *gi, int first_tag, va_list ap)
 
       case GDI_SELECTBOX_INDEX:
 	gi->selectbox.index = va_arg(ap, int);
+	break;
+
+      case GDI_SELECTBOX_CHAR_UNSELECTABLE:
+	gi->selectbox.char_unselectable = (char)va_arg(ap, int);
 	break;
 
       case GDI_DESIGN_UNPRESSED:
@@ -1591,7 +1617,8 @@ boolean HandleGadgets(int mx, int my, int button)
     if (gi->type & GD_TYPE_SELECTBOX &&
 	(keep_selectbox_open ||
 	 mouse_released_where_pressed ||
-	 !gadget_released_inside_select_area))	     /* selectbox stays open */
+	 !gadget_released_inside_select_area ||
+	 !CURRENT_OPTION_SELECTABLE(gi)))	    /* selectbox stays open */
     {
       gi->selectbox.stay_open = TRUE;
       pressed_mx = 0;
@@ -1949,7 +1976,8 @@ boolean HandleGadgets(int mx, int my, int button)
     {
       if (keep_selectbox_open ||
 	  mouse_released_where_pressed ||
-	  !gadget_released_inside_select_area)	     /* selectbox stays open */
+	  !gadget_released_inside_select_area ||
+	  !CURRENT_OPTION_SELECTABLE(gi))	    /* selectbox stays open */
       {
 	deactivate_gadget = FALSE;
 	gadget_changed = FALSE;
