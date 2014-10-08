@@ -11869,6 +11869,7 @@ void RequestExitLevelEditor(boolean ask_if_level_has_changed,
   }
   else
   {
+    CloseDoor(DOOR_CLOSE_1);
     OpenDoor(DOOR_OPEN_1 | DOOR_COPY_BACK);
   }
 }
