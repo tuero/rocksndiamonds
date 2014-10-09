@@ -10074,7 +10074,7 @@ static void CopyBrushExt(int from_x, int from_y, int to_x, int to_y,
 	else if (element >= NUM_FILE_ELEMENTS)
 	  element_mapped = EL_UNKNOWN;
 
-	printf("%c%03d", (mode == CB_DUMP_BRUSH ? '`' : '¸'), element_mapped);
+	printf("%s%03d", (mode == CB_DUMP_BRUSH ? "`" : "¸"), element_mapped);
       }
 
       printf("\n");
