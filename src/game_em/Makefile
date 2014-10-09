@@ -7,7 +7,7 @@
 #                  http://www.artsoft.org/
 # -----------------------------------------------------------------------------
 # The native Emerald Mine game engine is based on:
-# Emerald Mine for X11 © 2000,2001 David Tritscher
+# Emerald Mine for X11 (c) 2000,2001 David Tritscher
 # -----------------------------------------------------------------------------
 # src/game_em/Makefile
 # =============================================================================

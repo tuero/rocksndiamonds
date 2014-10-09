@@ -2620,7 +2620,7 @@ static void DrawInfoScreen_CreditsScreen(int screen_nr)
     DrawTextSCentered(ystart2 + 2 * ystep, FONT_TEXT_2,
 		      "and");
     DrawTextSCentered(ystart2 + 3 * ystep, FONT_TEXT_3,
-		      "Jürgen Bonhagen");
+		      "J\xfcrgen Bonhagen");
     DrawTextSCentered(ystart2 + 4 * ystep, FONT_TEXT_2,
 		      "for the continuous creation");
     DrawTextSCentered(ystart2 + 5 * ystep, FONT_TEXT_2,
@@ -2674,7 +2674,7 @@ static void DrawInfoScreen_CreditsScreen(int screen_nr)
     DrawTextSCentered(ystart2 + 4 * ystep, FONT_TEXT_2,
 		      "Thanks to");
     DrawTextSCentered(ystart2 + 5 * ystep, FONT_TEXT_3,
-		      "Karl Hörnell");
+		      "Karl H\xf6rnell");
     DrawTextSCentered(ystart2 + 6 * ystep, FONT_TEXT_2,
 		      "for some additional toons");
   }

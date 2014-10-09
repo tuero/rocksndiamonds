@@ -387,9 +387,9 @@ static char *get_corrected_real_name(char *real_name)
     if (*from_ptr == ',')
       break;
 
-    /* the user's real name may contain 'ß' characters (german sharp s),
+    /* the user's real name may contain 'german sharp s' characters,
        which have no equivalent in upper case letters (used by our fonts) */
-    if (*from_ptr == 'ß')
+    if (*from_ptr == CHAR_BYTE_SHARP_S)
     {
       from_ptr++;
       *to_ptr++ = 's';
@@ -1419,13 +1419,13 @@ void translate_keyname(Key *keysym, char **x11name, char **name, int mode)
     { KSYM_asciitilde,	"XK_asciitilde",	"~" },
 
     /* special (non-ASCII) keys (ISO-Latin-1) */
-    { KSYM_degree,	"XK_degree",		"°" },
-    { KSYM_Adiaeresis,	"XK_Adiaeresis",	"Ä" },
-    { KSYM_Odiaeresis,	"XK_Odiaeresis",	"Ö" },
-    { KSYM_Udiaeresis,	"XK_Udiaeresis",	"Ü" },
-    { KSYM_adiaeresis,	"XK_adiaeresis",	"ä" },
-    { KSYM_odiaeresis,	"XK_odiaeresis",	"ö" },
-    { KSYM_udiaeresis,	"XK_udiaeresis",	"ü" },
+    { KSYM_degree,	"XK_degree",		"degree" },
+    { KSYM_Adiaeresis,	"XK_Adiaeresis",	"A umlaut" },
+    { KSYM_Odiaeresis,	"XK_Odiaeresis",	"O umlaut" },
+    { KSYM_Udiaeresis,	"XK_Udiaeresis",	"U umlaut" },
+    { KSYM_adiaeresis,	"XK_adiaeresis",	"a umlaut" },
+    { KSYM_odiaeresis,	"XK_odiaeresis",	"o umlaut" },
+    { KSYM_udiaeresis,	"XK_udiaeresis",	"u umlaut" },
     { KSYM_ssharp,	"XK_ssharp",		"sharp s" },
 
 #if defined(TARGET_SDL2)

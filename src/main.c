@@ -1094,37 +1094,37 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
   {
     "char_copyright",
     "char",
-    "letter '©'"
+    "letter '\xa9'"
   },
   {
     "char_aumlaut",
     "char",
-    "letter 'Ä'"
+    "letter '\xc4'"
   },
   {
     "char_oumlaut",
     "char",
-    "letter 'Ö'"
+    "letter '\xd6'"
   },
   {
     "char_uumlaut",
     "char",
-    "letter 'Ü'"
+    "letter '\xdc'"
   },
   {
     "char_degree",
     "char",
-    "letter '°'"
+    "letter '\xb0'"
   },
   {
     "char_trademark",
     "char",
-    "letter '®'"
+    "letter '\xae'"
   },
   {
     "char_cursor",
     "char",
-    "letter ' '"
+    "letter '\xa0'"
   },
   {
     "char_unused",
@@ -4154,37 +4154,37 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
   {
     "steel_char_copyright",
     "steel_char",
-    "steel letter '©'"
+    "steel letter '\xa9'"
   },
   {
     "steel_char_aumlaut",
     "steel_char",
-    "steel letter 'Ä'"
+    "steel letter '\xc4'"
   },
   {
     "steel_char_oumlaut",
     "steel_char",
-    "steel letter 'Ö'"
+    "steel letter '\xd6'"
   },
   {
     "steel_char_uumlaut",
     "steel_char",
-    "steel letter 'Ü'"
+    "steel letter '\xdc'"
   },
   {
     "steel_char_degree",
     "steel_char",
-    "steel letter '°'"
+    "steel letter '\xb0'"
   },
   {
     "steel_char_trademark",
     "steel_char",
-    "steel letter '®'"
+    "steel letter '\xae'"
   },
   {
     "steel_char_cursor",
     "steel_char",
-    "steel letter ' '"
+    "steel letter '\xa0'"
   },
   {
     "steel_char_unused",
