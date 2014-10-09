@@ -1418,7 +1418,7 @@ void translate_keyname(Key *keysym, char **x11name, char **name, int mode)
     { KSYM_braceright,	"XK_braceright",	"brace right" },
     { KSYM_asciitilde,	"XK_asciitilde",	"~" },
 
-    /* special (non-ASCII) keys (ISO-Latin-1) */
+    /* special (non-ASCII) keys */
     { KSYM_degree,	"XK_degree",		"degree" },
     { KSYM_Adiaeresis,	"XK_Adiaeresis",	"A umlaut" },
     { KSYM_Odiaeresis,	"XK_Odiaeresis",	"O umlaut" },
@@ -1699,6 +1699,26 @@ Key getKeyFromX11KeyName(char *x11name)
 
 char getCharFromKey(Key key)
 {
+  static struct
+  {
+    Key key;
+    byte key_char;
+  } translate_key_char[] =
+  {
+    /* special (non-ASCII) keys (ISO-8859-1) */
+    { KSYM_degree,	CHAR_BYTE_DEGREE	},
+    { KSYM_Adiaeresis,	CHAR_BYTE_UMLAUT_A	},
+    { KSYM_Odiaeresis,	CHAR_BYTE_UMLAUT_O	},
+    { KSYM_Udiaeresis,	CHAR_BYTE_UMLAUT_U	},
+    { KSYM_adiaeresis,	CHAR_BYTE_UMLAUT_a	},
+    { KSYM_odiaeresis,	CHAR_BYTE_UMLAUT_o	},
+    { KSYM_udiaeresis,	CHAR_BYTE_UMLAUT_u	},
+    { KSYM_ssharp,	CHAR_BYTE_SHARP_S	},
+
+    /* end-of-array identifier */
+    { 0,                0			}
+  };
+
   char *keyname = getKeyNameFromKey(key);
   char c = 0;
 
@@ -1706,6 +1726,21 @@ char getCharFromKey(Key key)
     c = keyname[0];
   else if (strEqual(keyname, "space"))
     c = ' ';
+  else
+  {
+    int i = 0;
+
+    do
+    {
+      if (key == translate_key_char[i].key)
+      {
+	c = translate_key_char[i].key_char;
+
+	break;
+      }
+    }
+    while (translate_key_char[++i].key_char);
+  }
 
   return c;
 }

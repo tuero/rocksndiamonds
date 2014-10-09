@@ -31,17 +31,17 @@
 #define MAX_OUTPUT_LINESIZE	1024
 
 /* special constants for old ISO-8859-1 character byte values */
-#define CHAR_BYTE_UMLAUT_A	(0xc4)
-#define CHAR_BYTE_UMLAUT_O	(0xd6)
-#define CHAR_BYTE_UMLAUT_U	(0xdc)
-#define CHAR_BYTE_UMLAUT_a	(0xe4)
-#define CHAR_BYTE_UMLAUT_o	(0xf6)
-#define CHAR_BYTE_UMLAUT_u	(0xfc)
-#define CHAR_BYTE_SHARP_S	(0xdf)
-#define CHAR_BYTE_COPYRIGHT	(0xa9)
-#define CHAR_BYTE_REGISTERED	(0xae)
-#define CHAR_BYTE_DEGREE	(0xb0)
-#define CHAR_BYTE_CURSOR	(0xa0)
+#define CHAR_BYTE_UMLAUT_A	((char)0xc4)
+#define CHAR_BYTE_UMLAUT_O	((char)0xd6)
+#define CHAR_BYTE_UMLAUT_U	((char)0xdc)
+#define CHAR_BYTE_UMLAUT_a	((char)0xe4)
+#define CHAR_BYTE_UMLAUT_o	((char)0xf6)
+#define CHAR_BYTE_UMLAUT_u	((char)0xfc)
+#define CHAR_BYTE_SHARP_S	((char)0xdf)
+#define CHAR_BYTE_COPYRIGHT	((char)0xa9)
+#define CHAR_BYTE_REGISTERED	((char)0xae)
+#define CHAR_BYTE_DEGREE	((char)0xb0)
+#define CHAR_BYTE_CURSOR	((char)0xa0)
 
 /* special character mapping for default fonts */
 #define FONT_ASCII_CURSOR	((char)160)
