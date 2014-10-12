@@ -6174,7 +6174,7 @@ em_object_mapping_list[] =
   },
   {
     Xalpha_copyr,			TRUE,	FALSE,
-    EL_CHAR('©'),			-1, -1
+    EL_CHAR(CHAR_BYTE_COPYRIGHT),	-1, -1
   },
 
   {

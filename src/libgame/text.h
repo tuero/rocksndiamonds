@@ -30,6 +30,19 @@
 /* text output definitions */
 #define MAX_OUTPUT_LINESIZE	1024
 
+/* special constants for old ISO-8859-1 character byte values */
+#define CHAR_BYTE_UMLAUT_A	((char)0xc4)
+#define CHAR_BYTE_UMLAUT_O	((char)0xd6)
+#define CHAR_BYTE_UMLAUT_U	((char)0xdc)
+#define CHAR_BYTE_UMLAUT_a	((char)0xe4)
+#define CHAR_BYTE_UMLAUT_o	((char)0xf6)
+#define CHAR_BYTE_UMLAUT_u	((char)0xfc)
+#define CHAR_BYTE_SHARP_S	((char)0xdf)
+#define CHAR_BYTE_COPYRIGHT	((char)0xa9)
+#define CHAR_BYTE_REGISTERED	((char)0xae)
+#define CHAR_BYTE_DEGREE	((char)0xb0)
+#define CHAR_BYTE_CURSOR	((char)0xa0)
+
 /* special character mapping for default fonts */
 #define FONT_ASCII_CURSOR	((char)160)
 #define FONT_ASCII_BUTTON	((char)128)
@@ -39,16 +52,19 @@
 #define FONT_ASCII_RIGHT	((char)'>')
 
 #define MAP_FONT_ASCII(c)	((c) >= 'a' && (c) <= 'z' ? 'A' + (c) - 'a' : \
-				 (c) == '©'		  ? 96  :	      \
-				 (c) == 'ä' || (c) == 'Ä' ? 97  :	      \
-				 (c) == 'ö' || (c) == 'Ö' ? 98  :	      \
-				 (c) == 'ü' || (c) == 'Ü' ? 99  :	      \
-				 (c) == '°'		  ? 100 :	      \
-				 (c) == '®'		  ? 101 :	      \
-				 (c) == FONT_ASCII_CURSOR ? 102 :	      \
-				 (c) == FONT_ASCII_BUTTON ? 109 :	      \
-				 (c) == FONT_ASCII_UP	  ? 110 :	      \
-				 (c) == FONT_ASCII_DOWN	  ? 111 :	      \
+				 (c) == CHAR_BYTE_COPYRIGHT  ?  96 :	\
+				 (c) == CHAR_BYTE_UMLAUT_a   ?  97 :	\
+				 (c) == CHAR_BYTE_UMLAUT_A   ?  97 :	\
+				 (c) == CHAR_BYTE_UMLAUT_o   ?  98 :	\
+				 (c) == CHAR_BYTE_UMLAUT_O   ?  98 :	\
+				 (c) == CHAR_BYTE_UMLAUT_u   ?  99 :	\
+				 (c) == CHAR_BYTE_UMLAUT_U   ?  99 :	\
+				 (c) == CHAR_BYTE_DEGREE     ? 100 :	\
+				 (c) == CHAR_BYTE_REGISTERED ? 101 :	\
+				 (c) == FONT_ASCII_CURSOR    ? 102 :	\
+				 (c) == FONT_ASCII_BUTTON    ? 109 :	\
+				 (c) == FONT_ASCII_UP	     ? 110 :	\
+				 (c) == FONT_ASCII_DOWN	     ? 111 :	\
 				 (c))
 
 /* 64 regular ordered ASCII characters, 6 special characters, 1 cursor char. */

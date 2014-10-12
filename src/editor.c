@@ -3999,13 +3999,13 @@ static int editor_el_chars[] =
   EL_CHAR('^'),
   EL_CHAR('_'),
 
-  EL_CHAR('©'),
-  EL_CHAR('Ä'),
-  EL_CHAR('Ö'),
-  EL_CHAR('Ü'),
+  EL_CHAR(CHAR_BYTE_COPYRIGHT),
+  EL_CHAR(CHAR_BYTE_UMLAUT_A),
+  EL_CHAR(CHAR_BYTE_UMLAUT_O),
+  EL_CHAR(CHAR_BYTE_UMLAUT_U),
 
-  EL_CHAR('°'),
-  EL_CHAR('®'),
+  EL_CHAR(CHAR_BYTE_DEGREE),
+  EL_CHAR(CHAR_BYTE_REGISTERED),
   EL_CHAR(FONT_ASCII_CURSOR),
   EL_CHAR(FONT_ASCII_BUTTON),
 
@@ -4109,13 +4109,13 @@ static int editor_el_steel_chars[] =
   EL_STEEL_CHAR('^'),
   EL_STEEL_CHAR('_'),
 
-  EL_STEEL_CHAR('©'),
-  EL_STEEL_CHAR('Ä'),
-  EL_STEEL_CHAR('Ö'),
-  EL_STEEL_CHAR('Ü'),
+  EL_STEEL_CHAR(CHAR_BYTE_COPYRIGHT),
+  EL_STEEL_CHAR(CHAR_BYTE_UMLAUT_A),
+  EL_STEEL_CHAR(CHAR_BYTE_UMLAUT_O),
+  EL_STEEL_CHAR(CHAR_BYTE_UMLAUT_U),
 
-  EL_STEEL_CHAR('°'),
-  EL_STEEL_CHAR('®'),
+  EL_STEEL_CHAR(CHAR_BYTE_DEGREE),
+  EL_STEEL_CHAR(CHAR_BYTE_REGISTERED),
   EL_STEEL_CHAR(FONT_ASCII_CURSOR),
   EL_STEEL_CHAR(FONT_ASCII_BUTTON),
 
@@ -10074,7 +10074,10 @@ static void CopyBrushExt(int from_x, int from_y, int to_x, int to_y,
 	else if (element >= NUM_FILE_ELEMENTS)
 	  element_mapped = EL_UNKNOWN;
 
-	printf("%c%03d", (mode == CB_DUMP_BRUSH ? '`' : '¸'), element_mapped);
+	// dump brush as level sketch text for the R'n'D forum:
+	// - large tiles: `xxx (0x60 ASCII)
+	// - small tiles: Â¸xxx (0xb8 ISO-8859-1, 0xc2b8 UTF-8)
+	printf("%s%03d", (mode == CB_DUMP_BRUSH ? "`" : "Â¸"), element_mapped);
       }
 
       printf("\n");
@@ -10233,11 +10236,11 @@ static int DrawLevelText(int sx, int sy, char letter, int mode)
   /* map lower case letters to upper case and convert special characters */
   if (letter >= 'a' && letter <= 'z')
     letter_element = EL_CHAR_ASCII0 + letter + (int)('A' - 'a');
-  else if (letter == 'ä' || letter == 'Ä')
+  else if (letter == CHAR_BYTE_UMLAUT_a || letter == CHAR_BYTE_UMLAUT_A)
     letter_element = EL_CHAR_AUMLAUT;
-  else if (letter == 'ö' || letter == 'Ö')
+  else if (letter == CHAR_BYTE_UMLAUT_o || letter == CHAR_BYTE_UMLAUT_O)
     letter_element = EL_CHAR_OUMLAUT;
-  else if (letter == 'ü' || letter == 'Ü')
+  else if (letter == CHAR_BYTE_UMLAUT_u || letter == CHAR_BYTE_UMLAUT_U)
     letter_element = EL_CHAR_UUMLAUT;
   else if (letter == '^')
     letter_element = EL_CHAR_COPYRIGHT;

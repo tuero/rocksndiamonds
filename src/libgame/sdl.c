@@ -1338,7 +1338,7 @@ Pixel SDLGetPixel(Bitmap *src_bitmap, int x, int y)
 
 /* ========================================================================= */
 /* The following functions were taken from the SGE library                   */
-/* (SDL Graphics Extension Library) by Anders Lindström                      */
+/* (SDL Graphics Extension Library) by Anders LindstrÃ¶m                      */
 /* http://www.etek.chalmers.se/~e8cal1/sge/index.html                        */
 /* ========================================================================= */
 
