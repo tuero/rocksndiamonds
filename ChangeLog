@@ -1,3 +1,8 @@
+2014-10-13
+	* eliminated historical ISO-8859-1 characters from source code files
+	  (but still using them internally for special character encodings)
+	* changed output of special character for level sketch brushes to UTF-8
+
 2014-10-08
 	* added handling of unselectable selectbox options and option headlines
 

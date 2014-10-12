@@ -10074,6 +10074,9 @@ static void CopyBrushExt(int from_x, int from_y, int to_x, int to_y,
 	else if (element >= NUM_FILE_ELEMENTS)
 	  element_mapped = EL_UNKNOWN;
 
+	// dump brush as level sketch text for the R'n'D forum:
+	// - large tiles: `xxx (0x60 ASCII)
+	// - small tiles: ¸xxx (0xb8 ISO-8859-1, 0xc2b8 UTF-8)
 	printf("%s%03d", (mode == CB_DUMP_BRUSH ? "`" : "¸"), element_mapped);
       }
 
