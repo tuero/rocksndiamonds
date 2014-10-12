@@ -10285,6 +10285,10 @@ static int DrawLevelText(int sx, int sy, char letter, int mode)
     case TEXT_WRITECHAR:
       if (letter_element >= EL_CHAR_START && letter_element <= EL_CHAR_END)
       {
+	if (new_element1 >= EL_STEEL_CHAR_START &&
+	    new_element1 <= EL_STEEL_CHAR_END)
+	  letter_element = letter_element - EL_CHAR_START + EL_STEEL_CHAR_START;
+
 	delete_buffer[sx - start_sx] = Feld[lx][ly];
 	Feld[lx][ly] = letter_element;
 

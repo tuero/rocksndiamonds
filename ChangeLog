@@ -1,4 +1,8 @@
 2014-10-13
+	* added automatic detection of normal/steel character elements in level
+	  editor when drawing text (depending on currently selected element)
+
+2014-10-13
 	* eliminated historical ISO-8859-1 characters from source code files
 	  (but still using them internally for special character encodings)
 	* changed output of special character for level sketch brushes to UTF-8
