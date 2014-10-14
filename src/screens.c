@@ -411,6 +411,9 @@ static struct
 				    menu.list_size[game_status] :	\
 				    MAX_MENU_ENTRIES_ON_SCREEN)
 
+#define IN_VIS_MENU(x, y)	IN_FIELD(x, y, SCR_FIELDX,		\
+					 NUM_MENU_ENTRIES_ON_SCREEN)
+
 
 /* title display and control definitions */
 
@@ -2046,7 +2049,7 @@ void HandleInfoScreen_Main(int mx, int my, int dx, int dy, int button)
       y += dy;
   }
 
-  if (IN_VIS_FIELD(x, y) &&
+  if (IN_VIS_MENU(x, y) &&
       y >= 0 && y < num_info_info && info_info[y].type & ~TYPE_SKIP_ENTRY)
   {
     if (button)
@@ -3260,6 +3263,19 @@ static void AdjustChooseTreeScrollbar(int id, int first_entry, TreeInfo *ti)
 		  first_entry);
 }
 
+static void clearMenuListArea()
+{
+  int scrollbar_xpos = mSX + SC_SCROLLBAR_XPOS + menu.scrollbar_xoffset;
+
+  /* correct scrollbar position if placed outside menu (playfield) area */
+  if (scrollbar_xpos > SC_SCROLLBAR_XPOS)
+    scrollbar_xpos = SC_SCROLLBAR_XPOS;
+
+  /* clear menu list area, but not title or scrollbar */
+  DrawBackground(mSX, mSY + MENU_SCREEN_START_YPOS * 32,
+                 scrollbar_xpos - mSX, NUM_MENU_ENTRIES_ON_SCREEN * 32);
+}
+
 static void drawChooseTreeList(int first_entry, int num_page_entries,
 			       TreeInfo *ti)
 {
@@ -3275,10 +3291,7 @@ static void drawChooseTreeList(int first_entry, int num_page_entries,
 
   DrawTextSCentered(mSY - SY + yoffset, FONT_TITLE_1, title_string);
 
-  /* clear tree list area, but not title or scrollbar */
-  DrawBackground(mSX, mSY + MENU_SCREEN_START_YPOS * 32,
-		 SC_SCROLLBAR_XPOS + menu.scrollbar_xoffset,
-		 NUM_MENU_ENTRIES_ON_SCREEN * 32);
+  clearMenuListArea();
 
   for (i = 0; i < num_page_entries; i++)
   {
@@ -3548,7 +3561,7 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
   }
 
   if (!anyScrollbarGadgetActive() &&
-      IN_VIS_FIELD(x, y) &&
+      IN_VIS_MENU(x, y) &&
       mx < screen_gadget[SCREEN_CTRL_ID_SCROLL_VERTICAL]->x &&
       y >= 0 && y < num_page_entries)
   {
@@ -5231,10 +5244,7 @@ static void drawSetupInfoList(struct TokenInfo *setup_info,
   if (first_entry + num_page_entries > max_setup_info)
     first_entry = 0;
 
-  /* clear tree list area, but not title or scrollbar */
-  DrawBackground(mSX, mSY + MENU_SCREEN_START_YPOS * 32,
-                 SC_SCROLLBAR_XPOS + menu.scrollbar_xoffset,
-                 NUM_MENU_ENTRIES_ON_SCREEN * 32);
+  clearMenuListArea();
 
   for (i = 0; i < num_page_entries; i++)
   {
@@ -5553,7 +5563,7 @@ void HandleSetupScreen_Generic(int mx, int my, int dx, int dy, int button)
 	   setup_info[first_entry + y].type & TYPE_SKIP_ENTRY)
       y += dy;
 
-    if (!IN_VIS_FIELD(x, y))
+    if (!IN_VIS_MENU(x, y))
     {
       choice += y - y_old;
 
@@ -5587,7 +5597,7 @@ void HandleSetupScreen_Generic(int mx, int my, int dx, int dy, int button)
   }
 
   if (!anyScrollbarGadgetActive() &&
-      IN_VIS_FIELD(x, y) &&
+      IN_VIS_MENU(x, y) &&
       mx < screen_gadget[SCREEN_CTRL_ID_SCROLL_VERTICAL]->x &&
       y >= 0 && y < num_page_entries)
   {
@@ -5850,7 +5860,7 @@ void HandleSetupScreen_Input(int mx, int my, int dx, int dy, int button)
   {
     HandleSetupScreen_Input_Player(1, dx < 0 ? -1 : +1);
   }
-  else if (IN_VIS_FIELD(x, y) &&
+  else if (IN_VIS_FIELD(x, y) &&	// (does not use "IN_VIS_MENU()" yet)
 	   y >= pos_start && y <= pos_end &&
 	   !(y >= pos_empty1 && y <= pos_empty2))
   {
@@ -6545,6 +6555,10 @@ static void CreateScreenScrollbuttons()
     width = SC_SCROLLBUTTON_XSIZE;
     height = SC_SCROLLBUTTON_YSIZE;
 
+    /* correct scrollbar position if placed outside menu (playfield) area */
+    if (x > SC_SCROLL_UP_XPOS)
+      x = SC_SCROLL_UP_XPOS;
+
     if (id == SCREEN_CTRL_ID_SCROLL_DOWN)
       y = mSY + (SC_SCROLL_VERTICAL_YPOS +
 		 (NUM_MENU_ENTRIES_ON_SCREEN - 2) * SC_SCROLLBUTTON_YSIZE);
@@ -6609,6 +6623,10 @@ static void CreateScreenScrollbars()
     y = mSY + scrollbar_info[i].y;
     width  = scrollbar_info[i].width;
     height = scrollbar_info[i].height;
+
+    /* correct scrollbar position if placed outside menu (playfield) area */
+    if (x > SC_SCROLL_VERTICAL_XPOS)
+      x = SC_SCROLL_VERTICAL_XPOS;
 
     if (id == SCREEN_CTRL_ID_SCROLL_VERTICAL)
       height = (NUM_MENU_ENTRIES_ON_SCREEN - 2) * SC_SCROLLBUTTON_YSIZE;
