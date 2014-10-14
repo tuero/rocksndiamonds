@@ -4113,6 +4113,8 @@ unsigned int MoveDoor(unsigned int door_state)
     int max_move_delay = 0;	// delay for complete animations of all doors
     int max_step_delay = 0;	// delay (ms) between two animation frames
     int num_move_steps = 0;	// number of animation steps for all doors
+    int max_move_delay_doors_only = 0;	// delay for doors only (no panel)
+    int num_move_steps_doors_only = 0;	// steps for doors only (no panel)
     int current_move_delay = 0;
     int start = 0;
     int k;
@@ -4161,16 +4163,21 @@ unsigned int MoveDoor(unsigned int door_state)
       if (door_part_skip[nr])
 	continue;
 
-      if (!is_panel)
-	panel_has_doors[door_index] = TRUE;
-
       max_move_delay = MAX(max_move_delay, move_delay);
       max_step_delay = (max_step_delay == 0 ? step_delay :
 			euclid(max_step_delay, step_delay));
       num_steps[nr] = move_steps;
+
+      if (!is_panel)
+      {
+	max_move_delay_doors_only = MAX(max_move_delay_doors_only, move_delay);
+
+	panel_has_doors[door_index] = TRUE;
+      }
     }
 
     num_move_steps = max_move_delay / max_step_delay;
+    num_move_steps_doors_only = max_move_delay_doors_only / max_step_delay;
 
     door_delay_value = max_step_delay;
 
@@ -4203,6 +4210,7 @@ unsigned int MoveDoor(unsigned int door_state)
 	int door_token = dpc->door_token;
 	int door_index = DOOR_INDEX_FROM_TOKEN(door_token);
 	boolean is_panel = DOOR_PART_IS_PANEL(nr);
+	boolean is_panel_and_door_has_closed = FALSE;
 	struct Rect *door_rect = &door_rect_list[door_index];
 	Bitmap *bitmap_db_door = (door_token == DOOR_1 ? bitmap_db_door_1 :
 				  bitmap_db_door_2);
@@ -4218,7 +4226,9 @@ unsigned int MoveDoor(unsigned int door_state)
 	int step_factor = step_delay / max_step_delay;
 	int k1 = (step_factor ? k / step_factor + 1 : k);
 	int k2 = (part_opening ? k1 + start_step : num_steps[nr] - k1);
-	int kk = (k2 < 0 ? 0 : k2);
+	int kk = MAX(0, k2);
+	int g_src_x = 0;
+	int g_src_y = 0;
 	int src_x, src_y, src_xx, src_yy;
 	int dst_x, dst_y, dst_xx, dst_yy;
 	int width, height;
@@ -4231,6 +4241,16 @@ unsigned int MoveDoor(unsigned int door_state)
 
 	if (!g->bitmap)
 	  continue;
+
+	if (!is_panel)
+	{
+	  int k2_door = (door_opening ? k : num_move_steps_doors_only - k - 1);
+	  int kk_door = MAX(0, k2_door);
+	  int sync_frame = kk_door * door_delay_value;
+	  int frame = getGraphicAnimationFrame(dpc->graphic, sync_frame);
+
+	  getGraphicSource(dpc->graphic, frame, &bitmap, &g_src_x, &g_src_y);
+	}
 
 	// draw door panel
 
@@ -4292,22 +4312,21 @@ unsigned int MoveDoor(unsigned int door_state)
 	  height = g->height - src_yy;
 	}
 
-	if (is_panel)
-	{
-	  src_x = src_xx;
-	  src_y = src_yy;
-	}
-	else
-	{
-	  src_x = g->src_x + src_xx;
-	  src_y = g->src_y + src_yy;
-	}
+	src_x = g_src_x + src_xx;
+	src_y = g_src_y + src_yy;
 
 	dst_x = door_rect->x + dst_xx;
 	dst_y = door_rect->y + dst_yy;
 
+	is_panel_and_door_has_closed =
+	  (is_panel &&
+	   door_closing &&
+	   panel_has_doors[door_index] &&
+	   k >= num_move_steps_doors_only - 1);
+
 	if (width  >= 0 && width  <= g->width &&
-	    height >= 0 && height <= g->height)
+	    height >= 0 && height <= g->height &&
+	    !is_panel_and_door_has_closed)
 	{
 	  if (is_panel || !pos->draw_masked)
 	    BlitBitmap(bitmap, drawto, src_x, src_y, width, height,
@@ -4324,8 +4343,7 @@ unsigned int MoveDoor(unsigned int door_state)
 	  door_part_done[nr] = TRUE;
 
 	// continue door part animations, but not panel after door has closed
-	if (!door_part_done[nr] &&
-	    !(is_panel && door_closing && panel_has_doors[door_index]))
+	if (!door_part_done[nr] && !is_panel_and_door_has_closed)
 	  door_part_done_all = FALSE;
       }
 

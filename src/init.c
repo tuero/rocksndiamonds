@@ -1055,23 +1055,23 @@ static void set_graphic_parameters_ext(int graphic, int *parameter,
     g->height = get_scaled_graphic_height(graphic);
   }
 
+  /* optional width and height of each animation frame */
+  if (parameter[GFX_ARG_WIDTH] != ARG_UNDEFINED_VALUE)
+    g->width = parameter[GFX_ARG_WIDTH];
+  if (parameter[GFX_ARG_HEIGHT] != ARG_UNDEFINED_VALUE)
+    g->height = parameter[GFX_ARG_HEIGHT];
+
   /* optional x and y tile position of animation frame sequence */
   if (parameter[GFX_ARG_XPOS] != ARG_UNDEFINED_VALUE)
-    g->src_x = parameter[GFX_ARG_XPOS] * TILEX;
+    g->src_x = parameter[GFX_ARG_XPOS] * g->width;
   if (parameter[GFX_ARG_YPOS] != ARG_UNDEFINED_VALUE)
-    g->src_y = parameter[GFX_ARG_YPOS] * TILEY;
+    g->src_y = parameter[GFX_ARG_YPOS] * g->height;
 
   /* optional x and y pixel position of animation frame sequence */
   if (parameter[GFX_ARG_X] != ARG_UNDEFINED_VALUE)
     g->src_x = parameter[GFX_ARG_X];
   if (parameter[GFX_ARG_Y] != ARG_UNDEFINED_VALUE)
     g->src_y = parameter[GFX_ARG_Y];
-
-  /* optional width and height of each animation frame */
-  if (parameter[GFX_ARG_WIDTH] != ARG_UNDEFINED_VALUE)
-    g->width = parameter[GFX_ARG_WIDTH];
-  if (parameter[GFX_ARG_HEIGHT] != ARG_UNDEFINED_VALUE)
-    g->height = parameter[GFX_ARG_HEIGHT];
 
   if (src_bitmap)
   {
