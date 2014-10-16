@@ -1,3 +1,7 @@
+2014-10-16
+	* fixed bug not loading tape when selecting level from level selection
+	  screen (thanks to filbo for finding this bug and supplying a patch)
+
 2014-10-15
 	* fixed menu display bugs (drawing outside menu area with draw offset)
 	* fixed menu key navigation bugs (when using smaller menu list size)

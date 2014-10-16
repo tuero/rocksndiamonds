@@ -420,6 +420,9 @@ static struct
 #define MAX_NUM_TITLE_SCREENS	(2 * MAX_NUM_TITLE_IMAGES +		\
 				 2 * MAX_NUM_TITLE_MESSAGES)
 
+#define NO_DIRECT_LEVEL_SELECT	(-1)
+
+
 static int num_title_screens = 0;
 
 struct TitleControlInfo
@@ -1632,12 +1635,16 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
   }
 }
 
-void HandleMainMenu_SelectLevel(int step, int direction)
+void HandleMainMenu_SelectLevel(int step, int direction, int selected_level_nr)
 {
   int old_level_nr = level_nr;
   int new_level_nr;
 
-  new_level_nr = old_level_nr + step * direction;
+  if (selected_level_nr != NO_DIRECT_LEVEL_SELECT)
+    new_level_nr = selected_level_nr;
+  else
+    new_level_nr = old_level_nr + step * direction;
+
   if (new_level_nr < leveldir_current->first_level)
     new_level_nr = leveldir_current->first_level;
   if (new_level_nr > leveldir_current->last_level)
@@ -1646,7 +1653,7 @@ void HandleMainMenu_SelectLevel(int step, int direction)
   if (setup.handicap && new_level_nr > leveldir_current->handicap_level)
   {
     /* skipping levels is only allowed when trying to skip single level */
-    if (setup.skip_levels && step == 1 &&
+    if (setup.skip_levels && new_level_nr == old_level_nr + 1 &&
 	Request("Level still unsolved! Skip despite handicap?", REQ_ASK))
     {
       leveldir_current->handicap_level++;
@@ -1721,15 +1728,15 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 
   if (pos == MAIN_CONTROL_LEVELS && dx != 0 && button)
   {
-    HandleMainMenu_SelectLevel(1, dx < 0 ? -1 : +1);
+    HandleMainMenu_SelectLevel(1, (dx < 0 ? -1 : +1), NO_DIRECT_LEVEL_SELECT);
   }
   else if (pos == MAIN_CONTROL_FIRST_LEVEL && !button)
   {
-    HandleMainMenu_SelectLevel(MAX_LEVELS, -1);
+    HandleMainMenu_SelectLevel(MAX_LEVELS, -1, NO_DIRECT_LEVEL_SELECT);
   }
   else if (pos == MAIN_CONTROL_LAST_LEVEL && !button)
   {
-    HandleMainMenu_SelectLevel(MAX_LEVELS, +1);
+    HandleMainMenu_SelectLevel(MAX_LEVELS, +1, NO_DIRECT_LEVEL_SELECT);
   }
   else if (pos == MAIN_CONTROL_LEVEL_NUMBER && !button)
   {
@@ -3450,7 +3457,11 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
     else
     {
       if (game_status == GAME_MODE_LEVELNR)
-	level_nr = atoi(level_number_current->identifier);
+      {
+	int new_level_nr = atoi(level_number_current->identifier);
+
+	HandleMainMenu_SelectLevel(0, 0, new_level_nr);
+      }
 
       game_status = GAME_MODE_MAIN;
 
@@ -3644,7 +3655,11 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
 	else
 	{
 	  if (game_status == GAME_MODE_LEVELNR)
-	    level_nr = atoi(level_number_current->identifier);
+	  {
+	    int new_level_nr = atoi(level_number_current->identifier);
+
+	    HandleMainMenu_SelectLevel(0, 0, new_level_nr);
+	  }
 
 	  game_status = GAME_MODE_MAIN;
 
@@ -6732,11 +6747,11 @@ static void HandleScreenGadgets(struct GadgetInfo *gi)
   switch (id)
   {
     case SCREEN_CTRL_ID_PREV_LEVEL:
-      HandleMainMenu_SelectLevel(step, -1);
+      HandleMainMenu_SelectLevel(step, -1, NO_DIRECT_LEVEL_SELECT);
       break;
 
     case SCREEN_CTRL_ID_NEXT_LEVEL:
-      HandleMainMenu_SelectLevel(step, +1);
+      HandleMainMenu_SelectLevel(step, +1, NO_DIRECT_LEVEL_SELECT);
       break;
 
     case SCREEN_CTRL_ID_PREV_PLAYER:
