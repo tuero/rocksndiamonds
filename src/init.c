@@ -5017,12 +5017,11 @@ void InitGfx()
 
   font_height = getFontHeight(FC_RED);
 
-  DrawInitTextAlways(getProgramInitString(), 20, FC_YELLOW);
-  DrawInitTextAlways(PROGRAM_COPYRIGHT_STRING, 50, FC_RED);
-  DrawInitTextAlways(PROGRAM_WEBSITE_STRING, WIN_YSIZE - 20 - font_height,
-		     FC_RED);
+  DrawInitText(getProgramInitString(), 20, FC_YELLOW);
+  DrawInitText(PROGRAM_COPYRIGHT_STRING, 50, FC_RED);
+  DrawInitText(PROGRAM_WEBSITE_STRING, WIN_YSIZE - 20 - font_height, FC_RED);
 
-  DrawInitTextAlways("Loading graphics", 120, FC_GREEN);
+  DrawInitText("Loading graphics", 120, FC_GREEN);
 
   /* initialize busy animation with default values */
   int parameter[NUM_GFX_ARGS];

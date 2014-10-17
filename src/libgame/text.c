@@ -118,7 +118,7 @@ int maxWordLengthInString(char *text)
 /* simple text drawing functions                                             */
 /* ========================================================================= */
 
-void DrawInitTextExt(char *text, int ypos, int font_nr, boolean force)
+void DrawInitText(char *text, int ypos, int font_nr)
 {
   LimitScreenUpdates(TRUE);
 
@@ -139,22 +139,6 @@ void DrawInitTextExt(char *text, int ypos, int font_nr, boolean force)
 
     BlitBitmap(drawto, window, 0, 0, video.width, video.height, 0, 0);
   }
-}
-
-void DrawInitText(char *text, int ypos, int font_nr)
-{
-  // DrawInitTextExt(text, ypos, font_nr, TRUE);
-  DrawInitTextExt(text, ypos, font_nr, FALSE);
-}
-
-void DrawInitTextAlways(char *text, int ypos, int font_nr)
-{
-  DrawInitTextExt(text, ypos, font_nr, TRUE);
-}
-
-void DrawInitTextIfNeeded(char *text, int ypos, int font_nr)
-{
-  DrawInitTextExt(text, ypos, font_nr, FALSE);
 }
 
 void DrawTextF(int x, int y, int font_nr, char *format, ...)

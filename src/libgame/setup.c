@@ -2875,8 +2875,7 @@ static boolean LoadLevelInfoFromLevelConf(TreeInfo **node_first,
     (leveldir_new->user_defined || !leveldir_new->handicap ?
      leveldir_new->last_level : leveldir_new->first_level);
 
-  DrawInitTextExt(leveldir_new->name, 150, FC_YELLOW,
-		  leveldir_new->level_group);
+  DrawInitText(leveldir_new->name, 150, FC_YELLOW);
 
   pushTreeInfo(node_first, leveldir_new);
 
@@ -3342,8 +3341,7 @@ void LoadArtworkInfoFromLevelInfo(ArtworkDirTree **artwork_node,
 	setArtworkInfoCacheEntry(artwork_new, level_node, type);
     }
 
-    DrawInitTextExt(level_node->name, 150, FC_YELLOW,
-		    level_node->level_group);
+    DrawInitText(level_node->name, 150, FC_YELLOW);
 
     if (level_node->node_group != NULL)
       LoadArtworkInfoFromLevelInfo(artwork_node, level_node->node_group);
