@@ -1,3 +1,6 @@
+2014-10-17
+	* removed some remaining unused X11 stuff
+
 2014-10-16
 	* fixed bug not loading tape when selecting level from level selection
 	  screen (thanks to filbo for finding this bug and supplying a patch)

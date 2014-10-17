@@ -707,7 +707,6 @@ struct OptionInfo
   boolean network;
   boolean verbose;
   boolean debug;
-  boolean debug_x11_sync;
 };
 
 struct ScreenModeInfo
@@ -1241,11 +1240,6 @@ extern int			level_nr;
 
 extern struct LevelStats	level_stats[];
 
-extern Display		       *display;
-extern Visual		       *visual;
-extern int			screen;
-extern Colormap			cmap;
-
 extern DrawWindow	       *window;
 extern DrawBuffer	       *backbuffer;
 extern DrawBuffer	       *drawto;
@@ -1307,8 +1301,6 @@ void FadeRectangle(Bitmap *bitmap, int, int, int, int, int, int, int,
 void FillRectangle(Bitmap *, int, int, int, int, Pixel);
 void ClearRectangle(Bitmap *, int, int, int, int);
 void ClearRectangleOnBackground(Bitmap *, int, int, int, int);
-void SetClipMask(Bitmap *, GC, Pixmap);
-void SetClipOrigin(Bitmap *, GC, int, int);
 void BlitBitmapMasked(Bitmap *, Bitmap *, int, int, int, int, int, int);
 boolean DrawingOnBackground(int, int);
 void BlitBitmapOnBackground(Bitmap *, Bitmap *, int, int, int, int, int, int);
@@ -1319,8 +1311,6 @@ Pixel GetPixel(Bitmap *, int, int);
 Pixel GetPixelFromRGB(Bitmap *, unsigned int,unsigned int,unsigned int);
 Pixel GetPixelFromRGBcompact(Bitmap *, unsigned int);
 
-void FlushDisplay(void);
-void SyncDisplay(void);
 void KeyboardAutoRepeatOn(void);
 void KeyboardAutoRepeatOff(void);
 boolean PointerInWindow(DrawWindow *);

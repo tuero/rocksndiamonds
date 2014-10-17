@@ -2797,7 +2797,6 @@ extern Bitmap		       *bitmap_db_panel;
 extern Bitmap		       *bitmap_db_door_1;
 extern Bitmap		       *bitmap_db_door_2;
 extern Bitmap		       *bitmap_db_toons;
-extern Pixmap			tile_clipmask[];
 extern DrawBuffer	       *fieldbuffer;
 extern DrawBuffer	       *drawto_field;
 

@@ -92,12 +92,6 @@ typedef SDL_Event		ExposeEvent;
 typedef SDL_Event		FocusChangeEvent;
 typedef SDL_Event		ClientMessageEvent;
 
-typedef int			GC;
-typedef int			Pixmap;
-typedef int			Display;
-typedef int			Visual;
-typedef int			Colormap;
-
 
 /* structure definitions */
 
@@ -108,8 +102,6 @@ struct SDLSurfaceInfo
   int width, height;
   SDL_Surface *surface;
   SDL_Surface *surface_masked;
-  GC gc;
-  GC stored_clip_gc;
 };
 
 struct MouseCursorInfo

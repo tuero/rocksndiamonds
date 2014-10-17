@@ -2519,17 +2519,11 @@ void DisplayGameControlValues()
 	height = graphic_info[graphic].height * size / TILESIZE;
 
 	if (draw_masked)
-	{
-	  SetClipOrigin(src_bitmap, src_bitmap->stored_clip_gc,
-			dst_x - src_x, dst_y - src_y);
 	  BlitBitmapMasked(src_bitmap, drawto, src_x, src_y, width, height,
 			   dst_x, dst_y);
-	}
 	else
-	{
 	  BlitBitmap(src_bitmap, drawto, src_x, src_y, width, height,
 		     dst_x, dst_y);
-	}
       }
     }
     else if (type == TYPE_STRING)
@@ -5007,7 +5001,6 @@ void DrawRelocateScreen(int old_x, int old_y, int x, int y, int move_dir,
 
       /* scroll in two steps of half tile size to make things smoother */
       BlitBitmap(drawto_field, window, fx, fy, SXSIZE, SYSIZE, SX, SY);
-      FlushDisplay();
       Delay(wait_delay_value);
 
       /* scroll second step to align at full tile size */

@@ -119,8 +119,7 @@ void InitToonScreen(Bitmap *save_buffer,
   screen_info.frame_delay_value = frame_delay_value;
 }
 
-void DrawAnim(Bitmap *toon_bitmap, GC toon_clip_gc,
-	      int src_x, int src_y, int width, int height,
+void DrawAnim(Bitmap *toon_bitmap, int src_x, int src_y, int width, int height,
 	      int dest_x, int dest_y, int pad_x, int pad_y)
 {
   int pad_dest_x = dest_x - pad_x;
@@ -151,7 +150,6 @@ void DrawAnim(Bitmap *toon_bitmap, GC toon_clip_gc,
   /* special method to avoid flickering interference with BackToFront() */
   BlitBitmap(backbuffer, screen_info.save_buffer, pad_dest_x, pad_dest_y,
 	     pad_width, pad_height, buffer_x, buffer_y);
-  SetClipOrigin(toon_bitmap, toon_clip_gc, dest_x - src_x, dest_y - src_y);
   BlitBitmapMasked(toon_bitmap, backbuffer, src_x, src_y, width, height,
 		   dest_x, dest_y);
   BlitBitmap(backbuffer, window, pad_dest_x, pad_dest_y, pad_width, pad_height,
@@ -161,8 +159,6 @@ void DrawAnim(Bitmap *toon_bitmap, GC toon_clip_gc,
 
   BlitBitmap(screen_info.save_buffer, backbuffer, buffer_x, buffer_y,
 	     pad_width, pad_height, pad_dest_x, pad_dest_y);
-
-  FlushDisplay();
 }
 
 boolean AnimateToon(int toon_nr, boolean restart)
@@ -181,7 +177,6 @@ boolean AnimateToon(int toon_nr, boolean restart)
   static int dest_x, dest_y;
   struct ToonInfo *anim = &screen_info.toons[toon_nr];
   Bitmap *anim_bitmap = screen_info.toons[toon_nr].bitmap;
-  GC anim_clip_gc = anim_bitmap->stored_clip_gc;
   int direction = get_toon_direction(anim->direction);
 
   if (restart)
@@ -257,7 +252,7 @@ boolean AnimateToon(int toon_nr, boolean restart)
   if (!DelayReached(&anim_delay, anim_delay_value))
   {
     if (screen_info.redraw_needed_function() && !restart)
-      DrawAnim(anim_bitmap, anim_clip_gc,
+      DrawAnim(anim_bitmap,
 	       src_x + cut_x, src_y + cut_y,
 	       width, height,
 	       screen_info.startx + dest_x,
@@ -304,7 +299,7 @@ boolean AnimateToon(int toon_nr, boolean restart)
   else if (pos_y > screen_info.height - anim->height)
     height -= (pos_y - (screen_info.height - anim->height));
 
-  DrawAnim(anim_bitmap, anim_clip_gc,
+  DrawAnim(anim_bitmap,
 	   src_x + cut_x, src_y + cut_y,
 	   width, height,
 	   screen_info.startx + dest_x,

@@ -231,8 +231,6 @@ void EventLoop(void)
     }
     else
     {
-      SyncDisplay();
-
       if (!PendingEvent())	/* delay only if no pending events */
 	Delay(10);
     }

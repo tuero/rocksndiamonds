@@ -126,15 +126,6 @@ extern Bitmap *sprBitmap;
 extern Bitmap *ttlBitmap;
 extern Bitmap *botBitmap;
 
-extern Pixmap screenPixmap;
-extern Pixmap scorePixmap;
-extern Pixmap spriteBitmap;
-
-extern Pixmap objmaskBitmap;
-extern Pixmap sprmaskBitmap;
-
-extern GC spriteGC;
-
 
 /* ------------------------------------------------------------------------- */
 /* exported functions                                                        */

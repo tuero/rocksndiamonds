@@ -44,11 +44,6 @@ int			level_nr;
 
 struct LevelStats	level_stats[MAX_LEVELS];
 
-Display		       *display = NULL;
-Visual		       *visual = NULL;
-int			screen = 0;
-Colormap		cmap = None;
-
 DrawWindow	       *window = NULL;
 DrawBuffer	       *backbuffer = NULL;
 DrawBuffer	       *drawto = NULL;
@@ -660,14 +655,6 @@ void ClearRectangleOnBackground(Bitmap *bitmap, int x, int y,
     ClearRectangle(bitmap, x, y, width, height);
 }
 
-void SetClipMask(Bitmap *bitmap, GC clip_gc, Pixmap clip_pixmap)
-{
-}
-
-void SetClipOrigin(Bitmap *bitmap, GC clip_gc, int clip_x, int clip_y)
-{
-}
-
 void BlitBitmapMasked(Bitmap *src_bitmap, Bitmap *dst_bitmap,
 		      int src_x, int src_y, int width, int height,
 		      int dst_x, int dst_y)
@@ -690,8 +677,6 @@ void BlitBitmapOnBackground(Bitmap *src_bitmap, Bitmap *dst_bitmap,
 	       dst_x, dst_y);
 
     /* draw foreground */
-    SetClipOrigin(src_bitmap, src_bitmap->stored_clip_gc,
-		  dst_x - src_x, dst_y - src_y);
     BlitBitmapMasked(src_bitmap, dst_bitmap, src_x, src_y, width, height,
 		     dst_x, dst_y);
   }
@@ -772,16 +757,6 @@ Pixel GetPixelFromRGBcompact(Bitmap *bitmap, unsigned int color)
   unsigned int color_b = (color >>  0) & 0xff;
 
   return GetPixelFromRGB(bitmap, color_r, color_g, color_b);
-}
-
-/* execute all pending screen drawing operations */
-void FlushDisplay(void)
-{
-}
-
-/* execute and wait for all pending screen drawing operations */
-void SyncDisplay(void)
-{
 }
 
 void KeyboardAutoRepeatOn(void)

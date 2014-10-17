@@ -1224,10 +1224,7 @@ void DrawTitleScreenImage(int nr, boolean initial)
   ClearRectangleOnBackground(drawto, 0, 0, WIN_XSIZE, WIN_YSIZE);
 
   if (DrawingOnBackground(dst_x, dst_y))
-  {
-    SetClipOrigin(bitmap, bitmap->stored_clip_gc, dst_x - src_x, dst_y - src_y);
     BlitBitmapMasked(bitmap, drawto, src_x, src_y, width, height, dst_x, dst_y);
-  }
   else
     BlitBitmap(bitmap, drawto, src_x, src_y, width, height, dst_x, dst_y);
 
@@ -1684,7 +1681,7 @@ void HandleMainMenu_SelectLevel(int step, int direction, int selected_level_nr)
 
     /* needed because DrawPreviewLevelInitial() takes some time */
     BackToFront();
-    SyncDisplay();
+    /* SyncDisplay(); */
   }
 }
 

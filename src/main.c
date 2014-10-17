@@ -5560,7 +5560,6 @@ static void print_usage()
 	 "  -v, --verbose                    verbose mode\n"
 	 "  -V, --version                    show program version\n"
 	 "      --debug                      display debugging information\n"
-	 "      --debug-x11-sync             enable X11 synchronous mode\n"
 	 "  -e, --execute COMMAND            execute batch COMMAND\n"
 	 "\n"
 	 "Valid commands for '--execute' option:\n"

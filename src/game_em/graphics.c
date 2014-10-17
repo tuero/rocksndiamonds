@@ -104,8 +104,6 @@ void BackToFront_EM(void)
   boolean scrolling = (screen_x != screen_x_last || screen_y != screen_y_last);
   int x, y;
 
-  SyncDisplay();
-
   if (redraw_tiles > REDRAWTILES_THRESHOLD || scrolling || scrolling_last)
   {
     /* blit all (up to four) parts of the scroll buffer to the backbuffer */
@@ -152,8 +150,6 @@ void BackToFront_EM(void)
 
     InitGfxClipRegion(FALSE, -1, -1, -1, -1);
   }
-
-  FlushDisplay();
 
   for (x = 0; x < MAX_BUF_XSIZE; x++)
     for (y = 0; y < MAX_BUF_YSIZE; y++)
@@ -212,12 +208,8 @@ static void DrawLevelField_EM(int x, int y, int sx, int sy,
   if (draw_masked)
   {
     if (width > 0 && height > 0)
-    {
-      SetClipOrigin(g->bitmap, g->bitmap->stored_clip_gc,
-		    dst_x - src_x, dst_y - src_y);
       BlitBitmapMasked(g->bitmap, screenBitmap,
 		       src_x, src_y, width, height, dst_x, dst_y);
-    }
   }
   else
   {
@@ -280,12 +272,8 @@ static void DrawLevelFieldCrumbled_EM(int x, int y, int sx, int sy,
 	int dst_y = sy * TILEY + cy;
 
 	if (draw_masked)
-	{
-	  SetClipOrigin(g->crumbled_bitmap, g->crumbled_bitmap->stored_clip_gc,
-			dst_x - src_x, dst_y - src_y);
 	  BlitBitmapMasked(g->crumbled_bitmap, screenBitmap,
 			   src_x, src_y, width, height, dst_x, dst_y);
-	}
 	else
 	  BlitBitmap(g->crumbled_bitmap, screenBitmap,
 		     src_x, src_y, width, height, dst_x, dst_y);
@@ -314,24 +302,18 @@ static void DrawLevelPlayer_EM(int x1, int y1, int player_nr, int anim,
     /* draw the player to current location */
     dst_x = x1;
     dst_y = y1;
-    SetClipOrigin(g->bitmap, g->bitmap->stored_clip_gc,
-		  dst_x - src_x, dst_y - src_y);
     BlitBitmapMasked(g->bitmap, screenBitmap,
 		     src_x, src_y, TILEX, TILEY, dst_x, dst_y);
 
     /* draw the player to opposite wrap-around column */
     dst_x = x1 - MAX_BUF_XSIZE * TILEX;
     dst_y = y1;
-    SetClipOrigin(g->bitmap, g->bitmap->stored_clip_gc,
-		  dst_x - src_x, dst_y - src_y);
     BlitBitmapMasked(g->bitmap, screenBitmap,
 		     g->src_x, g->src_y, TILEX, TILEY, dst_x, dst_y);
 
     /* draw the player to opposite wrap-around row */
     dst_x = x1;
     dst_y = y1 - MAX_BUF_YSIZE * TILEY;
-    SetClipOrigin(g->bitmap, g->bitmap->stored_clip_gc,
-		  dst_x - src_x, dst_y - src_y);
     BlitBitmapMasked(g->bitmap, screenBitmap,
 		     g->src_x, g->src_y, TILEX, TILEY, dst_x, dst_y);
   }

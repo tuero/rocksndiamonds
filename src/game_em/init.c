@@ -13,9 +13,6 @@ Bitmap *sprBitmap;
 
 Bitmap *screenBitmap;
 
-Pixmap objPixmap;
-Pixmap sprPixmap;
-
 char play[SAMPLE_MAX];
 int play_x[SAMPLE_MAX];
 int play_y[SAMPLE_MAX];

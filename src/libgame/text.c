@@ -307,9 +307,6 @@ void DrawTextExt(DrawBuffer *dst_bitmap, int dst_x, int dst_y, char *text,
 				   font_width, font_height);
       }
 
-      SetClipOrigin(src_bitmap, src_bitmap->stored_clip_gc,
-		    dst_x - src_x, dst_y - src_y);
-
       BlitBitmapMasked(src_bitmap, dst_bitmap, src_x, src_y,
 		       font_width, font_height, dst_x, dst_y);
     }

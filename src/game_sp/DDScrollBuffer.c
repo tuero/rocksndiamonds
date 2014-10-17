@@ -245,8 +245,6 @@ void BackToFront_SP(void)
   boolean scrolling = (mScrollX != scroll_x_last || mScrollY != scroll_y_last);
   int x, y;
 
-  SyncDisplay();
-
   if (0 ||
       redraw_tiles > REDRAWTILES_THRESHOLD || scrolling || scrolling_last ||
       ExplosionShakeMurphy != 0 || ExplosionShakeMurphy_last != 0)
@@ -290,8 +288,6 @@ void BackToFront_SP(void)
 
     InitGfxClipRegion(FALSE, -1, -1, -1, -1);
   }
-
-  FlushDisplay();
 
   for (x = 0; x < 2 + MAX_PLAYFIELD_WIDTH + 2; x++)
     for (y = 0; y < 2 + MAX_PLAYFIELD_HEIGHT + 2; y++)

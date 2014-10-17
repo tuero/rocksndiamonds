@@ -760,7 +760,6 @@ void GetOptions(char *argv[],
   options.network = FALSE;
   options.verbose = FALSE;
   options.debug = FALSE;
-  options.debug_x11_sync = FALSE;
 
 #if 1
   options.verbose = TRUE;
@@ -887,10 +886,6 @@ void GetOptions(char *argv[],
     else if (strncmp(option, "-debug", option_len) == 0)
     {
       options.debug = TRUE;
-    }
-    else if (strncmp(option, "-debug-x11-sync", option_len) == 0)
-    {
-      options.debug_x11_sync = TRUE;
     }
     else if (strncmp(option, "-verbose", option_len) == 0)
     {

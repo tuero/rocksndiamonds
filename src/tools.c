@@ -292,7 +292,6 @@ void DrawMaskedBorder_Rect(int x, int y, int width, int height)
 {
   Bitmap *bitmap = graphic_info[IMG_GLOBAL_BORDER].bitmap;
 
-  SetClipOrigin(bitmap, bitmap->stored_clip_gc, 0, 0);
   BlitBitmapMasked(bitmap, backbuffer, x, y, width, height, x, y);
 }
 
@@ -531,7 +530,7 @@ void BackToFront()
      this could mean that we have to wait for the graphics to complete,
      although we could go on doing calculations for the next frame */
 
-  SyncDisplay();
+  /* SyncDisplay(); */
 
   /* never draw masked border to backbuffer when using playfield buffer */
   if (game_status != GAME_MODE_PLAYING ||
@@ -663,8 +662,6 @@ void BackToFront()
 
     DrawTextExt(window, SX + SXSIZE + SX, 0, text, FONT_TEXT_2, BLIT_OPAQUE);
   }
-
-  FlushDisplay();
 
   for (x = 0; x < MAX_BUF_XSIZE; x++)
     for (y = 0; y < MAX_BUF_YSIZE; y++)
@@ -1249,9 +1246,6 @@ void DrawGraphicThruMaskExt(DrawBuffer *d, int dst_x, int dst_y, int graphic,
 
   getGraphicSource(graphic, frame, &src_bitmap, &src_x, &src_y);
 
-  SetClipOrigin(src_bitmap, src_bitmap->stored_clip_gc,
-		dst_x - src_x, dst_y - src_y);
-
   BlitBitmapMasked(src_bitmap, d, src_x, src_y, TILEX_VAR, TILEY_VAR,
 		   dst_x, dst_y);
 }
@@ -1264,8 +1258,6 @@ void DrawFixedGraphicThruMaskExt(DrawBuffer *d, int dst_x, int dst_y,
 
   getFixedGraphicSource(graphic, frame, &src_bitmap, &src_x, &src_y);
 
-  SetClipOrigin(src_bitmap, src_bitmap->stored_clip_gc,
-		dst_x - src_x, dst_y - src_y);
   BlitBitmapMasked(src_bitmap, d, src_x, src_y, TILEX, TILEY, dst_x, dst_y);
 }
 
@@ -1402,12 +1394,8 @@ inline static void DrawGraphicShiftedNormal(int x, int y, int dx, int dy,
     dst_y = FY + y * TILEY_VAR + dy;
 
     if (mask_mode == USE_MASKING)
-    {
-      SetClipOrigin(src_bitmap, src_bitmap->stored_clip_gc,
-		    dst_x - src_x, dst_y - src_y);
       BlitBitmapMasked(src_bitmap, drawto_field, src_x, src_y, width, height,
 		       dst_x, dst_y);
-    }
     else
       BlitBitmap(src_bitmap, drawto_field, src_x, src_y, width, height,
 		 dst_x, dst_y);
@@ -1453,12 +1441,8 @@ inline static void DrawGraphicShiftedDouble(int x, int y, int dx, int dy,
     dst_y = FY + y1 * TILEY_VAR;
 
     if (mask_mode == USE_MASKING)
-    {
-      SetClipOrigin(src_bitmap, src_bitmap->stored_clip_gc,
-		    dst_x - src_x, dst_y - src_y);
       BlitBitmapMasked(src_bitmap, drawto_field, src_x, src_y, width, height,
 		       dst_x, dst_y);
-    }
     else
       BlitBitmap(src_bitmap, drawto_field, src_x, src_y, width, height,
 		 dst_x, dst_y);
@@ -1475,12 +1459,8 @@ inline static void DrawGraphicShiftedDouble(int x, int y, int dx, int dy,
     dst_y = FY + y2 * TILEY_VAR;
 
     if (mask_mode == USE_MASKING)
-    {
-      SetClipOrigin(src_bitmap, src_bitmap->stored_clip_gc,
-		    dst_x - src_x, dst_y - src_y);
       BlitBitmapMasked(src_bitmap, drawto_field, src_x, src_y, width, height,
 		       dst_x, dst_y);
-    }
     else
       BlitBitmap(src_bitmap, drawto_field, src_x, src_y, width, height,
 		 dst_x, dst_y);
@@ -2094,12 +2074,8 @@ void DrawEnvelopeBackgroundTiles(int graphic, int startx, int starty,
 	    inner_sy + (y - 1) * tile_height % inner_height);
 
   if (draw_masked)
-  {
-    SetClipOrigin(src_bitmap, src_bitmap->stored_clip_gc,
-		  dst_x - src_x, dst_y - src_y);
     BlitBitmapMasked(src_bitmap, drawto, src_x, src_y, tile_width, tile_height,
 		     dst_x, dst_y);
-  }
   else
     BlitBitmap(src_bitmap, drawto, src_x, src_y, tile_width, tile_height,
 	       dst_x, dst_y);
