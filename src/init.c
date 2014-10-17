@@ -5576,6 +5576,9 @@ void DisplayExitMessage(char *format, va_list ap)
 
   redraw_mask = REDRAW_ALL;
 
+  /* force drawing exit message even if screen updates are currently limited */
+  LimitScreenUpdates(FALSE);
+
   BackToFront();
 
   /* deactivate toons on error message screen */

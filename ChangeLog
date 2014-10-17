@@ -1,5 +1,6 @@
 2014-10-17
 	* removed some remaining unused X11 stuff
+	* fixed bug with potentially suppressed exit error message on startup
 
 2014-10-16
 	* fixed bug not loading tape when selecting level from level selection
