@@ -53,6 +53,8 @@ char *getWindowTitleString()
 
   checked_free(window_title_string);
 
+#if defined(TARGET_SDL2)
+
 #ifdef DEBUG
   window_title_string = checked_malloc(strlen(getProgramInitString()) + 20 +
 				       strlen(getCompileDateString()) + 2 + 1);
@@ -65,6 +67,23 @@ char *getWindowTitleString()
 
   sprintf(window_title_string, "%s (%d %%)",
 	  getProgramInitString(), setup.window_scaling_percent);
+#endif
+
+#else
+
+#ifdef DEBUG
+  window_title_string = checked_malloc(strlen(getProgramInitString()) + 1 +
+				       strlen(getCompileDateString()) + 2 + 1);
+
+  sprintf(window_title_string, "%s [%s]",
+	  getProgramInitString(), getCompileDateString());
+#else
+  window_title_string = checked_malloc(strlen(getProgramInitString()) + 1);
+
+  sprintf(window_title_string, "%s",
+	  getProgramInitString());
+#endif
+
 #endif
 
   return window_title_string;
