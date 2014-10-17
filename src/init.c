@@ -1315,7 +1315,7 @@ static void set_cloned_graphic_parameters(int graphic)
     Error(ERR_INFO, "custom graphic rejected for this element/action");
 
     if (graphic == fallback_graphic)
-      Error(ERR_EXIT, "fatal error: no fallback graphic available");
+      Error(ERR_EXIT, "no fallback graphic available");
 
     Error(ERR_INFO, "fallback done to 'char_exclam' for this graphic");
     Error(ERR_INFO_LINE, "-");
@@ -1461,7 +1461,7 @@ static void InitGraphicInfo()
       Error(ERR_INFO, "custom graphic rejected for this element/action");
 
       if (i == fallback_graphic)
-	Error(ERR_EXIT, "fatal error: no fallback graphic available");
+	Error(ERR_EXIT, "no fallback graphic available");
 
       Error(ERR_INFO, "fallback done to 'char_exclam' for this graphic");
       Error(ERR_INFO_LINE, "-");
@@ -1490,7 +1490,7 @@ static void InitGraphicInfo()
       Error(ERR_INFO, "custom graphic rejected for this element/action");
 
       if (i == fallback_graphic)
-	Error(ERR_EXIT, "fatal error: no fallback graphic available");
+	Error(ERR_EXIT, "no fallback graphic available");
 
       Error(ERR_INFO, "fallback done to 'char_exclam' for this graphic");
       Error(ERR_INFO_LINE, "-");

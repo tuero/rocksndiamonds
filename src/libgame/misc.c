@@ -1005,6 +1005,9 @@ void Error(int mode, char *format, ...)
     if (mode & ERR_WARN)
       fprintf_nonewline(program.error_file, "warning: ");
 
+    if (mode & ERR_EXIT)
+      fprintf_nonewline(program.error_file, "fatal error: ");
+
     va_start(ap, format);
     vfprintf_newline(program.error_file, format, ap);
     va_end(ap);
