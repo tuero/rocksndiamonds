@@ -972,18 +972,19 @@ static void InitializeMainControls()
       /* calculate size for non-clickable text -- needed for text alignment */
       boolean calculate_text_size = (pos_button == NULL && text != NULL);
 
+      if (pos_text->width == -1 || calculate_text_size)
+	pos_text->width = text_width;
+      if (pos_text->height == -1 || calculate_text_size)
+	pos_text->height = text_height;
+
       if (visibleMenuPos(pos_button))
       {
 	if (pos_text->x == -1)
 	  pos_text->x = pos_button->x + pos_button->width;
 	if (pos_text->y == -1)
-	  pos_text->y = pos_button->y;
+	  pos_text->y =
+	    pos_button->y + (pos_button->height - pos_text->height) / 2;
       }
-
-      if (pos_text->width == -1 || calculate_text_size)
-	pos_text->width = text_width;
-      if (pos_text->height == -1 || calculate_text_size)
-	pos_text->height = text_height;
     }
 
     if (pos_input != NULL)		/* (x/y may be -1/-1 here) */
