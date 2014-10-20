@@ -1052,6 +1052,10 @@ void getSizedGraphicSourceExt(int graphic, int frame, int tilesize,
   int src_y = g->src_y + (get_backside ? g->offset2_y : 0);
   int tilesize_capped = MIN(MAX(1, tilesize), TILESIZE);
 
+  // if no in-game graphics defined, always use standard graphic size
+  if (g->bitmaps[IMG_BITMAP_GAME] == NULL)
+    tilesize = TILESIZE;
+
   if (tilesize == gfx.standard_tile_size)
     src_bitmap = g->bitmaps[IMG_BITMAP_STANDARD];
   else if (tilesize == game.tile_size)
