@@ -1,5 +1,6 @@
 2014-10-20
 	* fixed using buttons on main screen with size other than 32x32 pixels
+	* fixed some initialization bugs for scrollbars and main screen buttons
 
 2014-10-17
 	* removed some remaining unused X11 stuff

@@ -961,10 +961,8 @@ static void InitializeMainControls()
 
     if (pos_button != NULL)		/* (x/y may be -1/-1 here) */
     {
-      if (pos_button->width == 0)
-	pos_button->width = button_width;
-      if (pos_button->height == 0)
-	pos_button->height = button_height;
+      pos_button->width  = button_width;
+      pos_button->height = button_height;
     }
 
     if (pos_text != NULL)		/* (x/y may be -1/-1 here) */
@@ -6569,8 +6567,8 @@ static void CreateScreenScrollbuttons()
     height = SC_SCROLLBUTTON_YSIZE;
 
     /* correct scrollbar position if placed outside menu (playfield) area */
-    if (x > SC_SCROLL_UP_XPOS)
-      x = SC_SCROLL_UP_XPOS;
+    if (x > SX + SC_SCROLL_UP_XPOS)
+      x = SX + SC_SCROLL_UP_XPOS;
 
     if (id == SCREEN_CTRL_ID_SCROLL_DOWN)
       y = mSY + (SC_SCROLL_VERTICAL_YPOS +
@@ -6638,8 +6636,8 @@ static void CreateScreenScrollbars()
     height = scrollbar_info[i].height;
 
     /* correct scrollbar position if placed outside menu (playfield) area */
-    if (x > SC_SCROLL_VERTICAL_XPOS)
-      x = SC_SCROLL_VERTICAL_XPOS;
+    if (x > SX + SC_SCROLL_VERTICAL_XPOS)
+      x = SX + SC_SCROLL_VERTICAL_XPOS;
 
     if (id == SCREEN_CTRL_ID_SCROLL_VERTICAL)
       height = (NUM_MENU_ENTRIES_ON_SCREEN - 2) * SC_SCROLLBUTTON_YSIZE;
