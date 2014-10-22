@@ -953,13 +953,36 @@ static int get_graphic_parameter_value(char *value_raw, char *suffix, int type)
   {
     char *value = getHashEntry(element_token_hash, value_raw);
 
+    if (value == NULL)
+    {
+      Error(ERR_INFO_LINE, "-");
+      Error(ERR_INFO, "warning: error found in config file:");
+      Error(ERR_INFO, "- config file: '%s'", getImageConfigFilename());
+      Error(ERR_INFO, "error: invalid element token '%s'", value_raw);
+      Error(ERR_INFO, "custom graphic rejected for this element/action");
+      Error(ERR_INFO, "fallback done to undefined element for this graphic");
+      Error(ERR_INFO_LINE, "-");
+    }
+
     return (value != NULL ? atoi(value) : EL_UNDEFINED);
   }
   else if (type == TYPE_GRAPHIC)
   {
     char *value = getHashEntry(graphic_token_hash, value_raw);
+    int fallback_graphic = IMG_CHAR_EXCLAM;
 
-    return (value != NULL ? atoi(value) : IMG_UNDEFINED);
+    if (value == NULL)
+    {
+      Error(ERR_INFO_LINE, "-");
+      Error(ERR_INFO, "warning: error found in config file:");
+      Error(ERR_INFO, "- config file: '%s'", getImageConfigFilename());
+      Error(ERR_INFO, "error: invalid graphic token '%s'", value_raw);
+      Error(ERR_INFO, "custom graphic rejected for this element/action");
+      Error(ERR_INFO, "fallback done to 'char_exclam' for this graphic");
+      Error(ERR_INFO_LINE, "-");
+    }
+
+    return (value != NULL ? atoi(value) : fallback_graphic);
   }
 
   return -1;
