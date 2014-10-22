@@ -4469,6 +4469,33 @@ static void InitGlobal()
 		 font_info[i].token_name,
 		 int2str(i, 0));
 
+  /* set default filenames for all cloned graphics in static configuration */
+  for (i = 0; image_config[i].token != NULL; i++)
+  {
+    if (strEqual(image_config[i].value, UNDEFINED_FILENAME))
+    {
+      char *token = image_config[i].token;
+      char *token_clone_from = getStringCat2(token, ".clone_from");
+      char *token_cloned = getHashEntry(image_config_hash, token_clone_from);
+
+      if (token_cloned != NULL)
+      {
+	char *value_cloned = getHashEntry(image_config_hash, token_cloned);
+
+	if (value_cloned != NULL)
+	{
+	  /* set default filename in static configuration */
+	  image_config[i].value = value_cloned;
+
+	  /* set default filename in image config hash */
+	  setHashEntry(image_config_hash, token, value_cloned);
+	}
+      }
+
+      free(token_clone_from);
+    }
+  }
+
   /* always start with reliable default values (all elements) */
   for (i = 0; i < MAX_NUM_ELEMENTS; i++)
     ActiveElement[i] = i;

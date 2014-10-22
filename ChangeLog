@@ -1,6 +1,8 @@
 2014-10-22
 	* added warnings when using undefined element and graphic names in
 	  custom artwork definitions (like ".crumbled_like" or ".clone_from")
+	* added setting default filenames for all cloned graphics in static
+	  graphics configuration on startup (to be able to fall back later)
 
 2014-10-20
 	* fixed using buttons on main screen with size other than 32x32 pixels
