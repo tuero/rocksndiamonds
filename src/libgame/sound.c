@@ -598,7 +598,6 @@ void LoadCustomMusic_NoConf(void)
   while ((dir_entry = readDirectory(dir)) != NULL)	/* loop all entries */
   {
     char *basename = dir_entry->basename;
-    char *filename = NULL;
     MusicInfo *mus_info = NULL;
     boolean music_already_used = FALSE;
     int i;
@@ -621,12 +620,8 @@ void LoadCustomMusic_NoConf(void)
     if (draw_init_text)
       DrawInitText(basename, 150, FC_YELLOW);
 
-    filename = getPath2(music_directory, basename);
-
-    if (FileIsMusic(basename))
-      mus_info = Load_WAV_or_MOD(filename);
-
-    free(filename);
+    if (FileIsMusic(dir_entry->filename))
+      mus_info = Load_WAV_or_MOD(dir_entry->filename);
 
     if (mus_info)
     {

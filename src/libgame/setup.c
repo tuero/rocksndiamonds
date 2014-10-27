@@ -3026,9 +3026,7 @@ static boolean LoadArtworkInfoFromArtworkConf(TreeInfo **node_first,
     {
       while ((dir_entry = readDirectory(dir)) != NULL)
       {
-	char *entry_name = dir_entry->basename;
-
-	if (FileIsArtworkType(entry_name, type))
+	if (FileIsArtworkType(dir_entry->filename, type))
 	{
 	  valid_file_found = TRUE;
 

@@ -2209,7 +2209,9 @@ boolean directoryExists(char *dir_name)
   if (dir_name == NULL)
     return FALSE;
 
-  boolean success = (access(dir_name, F_OK) == 0);
+  struct stat file_status;
+  boolean success = (stat(dir_name, &file_status) == 0 &&
+		     (file_status.st_mode & S_IFMT) == S_IFDIR);
 
 #if defined(PLATFORM_ANDROID)
   if (!success)
@@ -2297,40 +2299,37 @@ boolean fileHasSuffix(char *basename, char *suffix)
   return FALSE;
 }
 
-static boolean FileCouldBeArtwork(char *basename)
+static boolean FileCouldBeArtwork(char *filename)
 {
+  char *basename = getBaseNamePtr(filename);
+
   return (!strEqual(basename, ".") &&
 	  !strEqual(basename, "..") &&
 	  !fileHasSuffix(basename, "txt") &&
-	  !fileHasSuffix(basename, "conf"));
+	  !fileHasSuffix(basename, "conf") &&
+	  !directoryExists(filename));
 }
 
 boolean FileIsGraphic(char *filename)
 {
-  char *basename = getBaseNamePtr(filename);
-
-  return FileCouldBeArtwork(basename);
+  return FileCouldBeArtwork(filename);
 }
 
 boolean FileIsSound(char *filename)
 {
-  char *basename = getBaseNamePtr(filename);
-
-  return FileCouldBeArtwork(basename);
+  return FileCouldBeArtwork(filename);
 }
 
 boolean FileIsMusic(char *filename)
 {
-  char *basename = getBaseNamePtr(filename);
-
-  return FileCouldBeArtwork(basename);
+  return FileCouldBeArtwork(filename);
 }
 
-boolean FileIsArtworkType(char *basename, int type)
+boolean FileIsArtworkType(char *filename, int type)
 {
-  if ((type == TREE_TYPE_GRAPHICS_DIR && FileIsGraphic(basename)) ||
-      (type == TREE_TYPE_SOUNDS_DIR && FileIsSound(basename)) ||
-      (type == TREE_TYPE_MUSIC_DIR && FileIsMusic(basename)))
+  if ((type == TREE_TYPE_GRAPHICS_DIR && FileIsGraphic(filename)) ||
+      (type == TREE_TYPE_SOUNDS_DIR && FileIsSound(filename)) ||
+      (type == TREE_TYPE_MUSIC_DIR && FileIsMusic(filename)))
     return TRUE;
 
   return FALSE;

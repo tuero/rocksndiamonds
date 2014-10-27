@@ -1,3 +1,6 @@
+2014-10-27
+	* fixed some smaller issues with loading custom artwork
+
 2014-10-22
 	* added warnings when using undefined element and graphic names in
 	  custom artwork definitions (like ".crumbled_like" or ".clone_from")

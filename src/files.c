@@ -9257,7 +9257,7 @@ void LoadMusicInfo()
     if (music_already_used)
       continue;
 
-    if (!FileIsMusic(basename))
+    if (!FileIsMusic(dir_entry->filename))
       continue;
 
     if (!music_info_listed(music_file_info, basename))
