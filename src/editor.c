@@ -7368,11 +7368,6 @@ static boolean playfield_area_changed = FALSE;
 
 void DrawLevelEd()
 {
-  int old_sx = SX;
-  int old_sy = SY;
-  int old_sxsize = SXSIZE;
-  int old_sysize = SYSIZE;
-
   StopAnimation();
 
   CloseDoor(DOOR_CLOSE_ALL);
@@ -7385,13 +7380,7 @@ void DrawLevelEd()
   /* needed if different viewport properties defined for editor */
   ChangeViewportPropertiesIfNeeded();
 
-  if (old_sx != SX ||
-      old_sy != SY ||
-      old_sxsize != SXSIZE ||
-      old_sysize != SYSIZE)
-    playfield_area_changed = TRUE;
-  else
-    playfield_area_changed = FALSE;
+  playfield_area_changed = DrawingAreaChanged();
 
   OpenDoor(DOOR_OPEN_1 | DOOR_OPEN_2 | DOOR_NO_DELAY);
 
@@ -7431,7 +7420,7 @@ void DrawLevelEd()
   BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
 	     DOOR_GFX_PAGEX8, 236, EXSIZE, EYSIZE, EX, EY);
 
-  redraw_mask |= REDRAW_ALL;
+  // redraw_mask |= REDRAW_ALL;
 
   FreeLevelEditorGadgets();
   CreateLevelEditorGadgets();
@@ -11389,7 +11378,7 @@ static void HandleControlButtons(struct GadgetInfo *gi)
       /* needed before playing if editor playfield area has different size */
       ClearRectangle(drawto, REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE);
 
-      redraw_mask = REDRAW_ALL;
+      // redraw_mask = REDRAW_ALL;
 
       level_editor_test_game = TRUE;
 

@@ -1,5 +1,6 @@
 2014-11-02
 	* fixed bug with not updating default bitmap pointer for scaled images
+	* fixed redraw/fade bugs when redefining the playfield size or position
 
 2014-10-27
 	* fixed some smaller issues with loading custom artwork

@@ -4365,8 +4365,6 @@ void DrawSpecialEditorDoor()
   int vy = VY - outer_border;
   int exsize = EXSIZE + 2 * outer_border;
 
-  CloseDoor(DOOR_CLOSE_2);
-
   /* draw bigger level editor toolbox window */
   BlitBitmap(gfx1->bitmap, drawto, gfx1->src_x, gfx1->src_y,
 	     top_border_width, top_border_height, ex, ey - top_border_height);
@@ -8000,6 +7998,7 @@ void ChangeViewportPropertiesIfNeeded()
   boolean init_video_buffer = FALSE;
   boolean init_gadgets_and_toons = FALSE;
   boolean init_em_graphics = FALSE;
+  boolean drawing_area_changed = FALSE;
 
   if (viewport.window.width  != WIN_XSIZE ||
       viewport.window.height != WIN_YSIZE)
@@ -8058,6 +8057,19 @@ void ChangeViewportPropertiesIfNeeded()
       init_em_graphics = TRUE;
     }
 
+    if (new_sx != SX ||
+	new_sy != SY ||
+	new_sxsize != SXSIZE ||
+	new_sysize != SYSIZE ||
+	new_real_sx != REAL_SX ||
+	new_real_sy != REAL_SY ||
+	new_full_sxsize != FULL_SXSIZE ||
+	new_full_sysize != FULL_SYSIZE)
+    {
+      if (!init_video_buffer)
+	drawing_area_changed = TRUE;
+    }
+
     SX = new_sx;
     SY = new_sy;
     DX = new_dx;
@@ -8098,6 +8110,11 @@ void ChangeViewportPropertiesIfNeeded()
 
     SCR_FIELDX = new_scr_fieldx;
     SCR_FIELDY = new_scr_fieldy;
+
+    gfx.drawing_area_changed = drawing_area_changed;
+
+    SetDrawDeactivationMask(REDRAW_NONE);
+    SetDrawBackgroundMask(REDRAW_FIELD);
   }
 
   if (init_video_buffer)
@@ -8105,9 +8122,6 @@ void ChangeViewportPropertiesIfNeeded()
     // printf("::: init_video_buffer\n");
 
     InitVideoBuffer(WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH, setup.fullscreen);
-
-    SetDrawDeactivationMask(REDRAW_NONE);
-    SetDrawBackgroundMask(REDRAW_FIELD);
   }
 
   if (init_gadgets_and_toons)

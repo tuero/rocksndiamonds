@@ -3909,6 +3909,14 @@ void InitGame()
 
   FadeIn(REDRAW_FIELD);
 
+#if 1
+  // full screen redraw is required at this point in the following cases:
+  // - special editor door undrawn when game was started from level editor
+  // - drawing area (playfield) was changed and has to be removed completely
+  redraw_mask = REDRAW_ALL;
+  BackToFront();
+#endif
+
   if (!game.restart_level)
   {
     /* copy default game door content to main double buffer */

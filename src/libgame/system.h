@@ -788,6 +788,8 @@ struct GfxInfo
   int draw_deactivation_mask;
   int draw_background_mask;
 
+  boolean drawing_area_changed;
+
   Bitmap *field_save_buffer;
 
   Bitmap *background_bitmap;
@@ -1303,6 +1305,7 @@ void ClearRectangle(Bitmap *, int, int, int, int);
 void ClearRectangleOnBackground(Bitmap *, int, int, int, int);
 void BlitBitmapMasked(Bitmap *, Bitmap *, int, int, int, int, int, int);
 boolean DrawingOnBackground(int, int);
+boolean DrawingAreaChanged();
 void BlitBitmapOnBackground(Bitmap *, Bitmap *, int, int, int, int, int, int);
 void DrawSimpleBlackLine(Bitmap *, int, int, int, int);
 void DrawSimpleWhiteLine(Bitmap *, int, int, int, int);

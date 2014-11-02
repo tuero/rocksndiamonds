@@ -1309,9 +1309,6 @@ void DrawMainMenuExt(int fade_mask, boolean do_fading)
   KeyboardAutoRepeatOn();
   ActivateJoystick();
 
-  SetDrawDeactivationMask(REDRAW_NONE);
-  SetDrawBackgroundMask(REDRAW_FIELD);
-
   audio.sound_deactivated = FALSE;
 
   GetPlayerConfig();
@@ -1372,6 +1369,10 @@ void DrawMainMenuExt(int fade_mask, boolean do_fading)
 
   LoadLevel(level_nr);
   LoadScore(level_nr);
+
+  // set this after "ChangeViewportPropertiesIfNeeded()" (which may reset it)
+  SetDrawDeactivationMask(REDRAW_NONE);
+  SetDrawBackgroundMask(REDRAW_FIELD);
 
   SetMainBackgroundImage(IMG_BACKGROUND_MAIN);
 
@@ -3228,6 +3229,8 @@ void HandleTypeName(int newxpos, Key key)
 
 static void DrawChooseTree(TreeInfo **ti_ptr)
 {
+  int fade_mask = (DrawingAreaChanged() ? REDRAW_ALL : REDRAW_FIELD);
+
   UnmapAllGadgets();
 
   FreeScreenGadgets();
@@ -3235,14 +3238,14 @@ static void DrawChooseTree(TreeInfo **ti_ptr)
 
   CloseDoor(DOOR_CLOSE_2);
 
-  FadeOut(REDRAW_FIELD);
+  FadeOut(fade_mask);
 
   ClearField();
 
   HandleChooseTree(0, 0, 0, 0, MB_MENU_INITIALIZE, ti_ptr);
   MapScreenTreeGadgets(*ti_ptr);
 
-  FadeIn(REDRAW_FIELD);
+  FadeIn(fade_mask);
 
   InitAnimation();
 }
@@ -3744,6 +3747,8 @@ void HandleChooseLevelNr(int mx, int my, int dx, int dy, int button)
 
 void DrawHallOfFame(int highlight_position)
 {
+  int fade_mask = (DrawingAreaChanged() ? REDRAW_ALL : REDRAW_FIELD);
+
   UnmapAllGadgets();
   FadeSoundsAndMusic();
 
@@ -3762,7 +3767,7 @@ void DrawHallOfFame(int highlight_position)
 
   FadeSetEnterScreen();
 
-  FadeOut(REDRAW_FIELD);
+  FadeOut(fade_mask);
 
   InitAnimation();
 
@@ -3771,7 +3776,7 @@ void DrawHallOfFame(int highlight_position)
 
   HandleHallOfFame(highlight_position, 0, 0, 0, MB_MENU_INITIALIZE);
 
-  FadeIn(REDRAW_FIELD);
+  FadeIn(fade_mask);
 }
 
 static void drawHallOfFameList(int first_entry, int highlight_position)
@@ -5289,6 +5294,7 @@ static void drawSetupInfoList(struct TokenInfo *setup_info,
 
 static void DrawSetupScreen_Generic()
 {
+  int fade_mask = (DrawingAreaChanged() ? REDRAW_ALL : REDRAW_FIELD);
   boolean redraw_all = FALSE;
   char *title_string = NULL;
   int i;
@@ -5303,7 +5309,7 @@ static void DrawSetupScreen_Generic()
   if (redraw_mask & REDRAW_ALL)
     redraw_all = TRUE;
 
-  FadeOut(REDRAW_FIELD);
+  FadeOut(fade_mask);
 
   ClearField();
 
@@ -5390,9 +5396,9 @@ static void DrawSetupScreen_Generic()
   MapScreenGadgets(max_setup_info);
 
   if (redraw_all)
-    redraw_mask = REDRAW_ALL;
+    redraw_mask = fade_mask = REDRAW_ALL;
 
-  FadeIn(redraw_mask);
+  FadeIn(fade_mask);
 
   InitAnimation();
 }
