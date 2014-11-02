@@ -157,10 +157,6 @@ inline void InitElementSmallImagesScaledUp(int graphic)
 
   // create small and game tile sized bitmaps (and scale up, if needed)
   CreateImageWithSmallImages(graphic, g->scale_up_factor, g->tile_size);
-
-  // default (standard sized) bitmap may have changed now -- update it
-  if (g->bitmaps)
-    g->bitmap = g->bitmaps[IMG_BITMAP_STANDARD];
 }
 
 void InitElementSmallImages()
@@ -212,6 +208,17 @@ void InitScaledImages()
   /* scale normal images from static configuration, if not already scaled */
   for (i = 0; i < NUM_IMAGE_FILES; i++)
     ScaleImage(i, graphic_info[i].scale_up_factor);
+}
+
+void InitBitmapPointers()
+{
+  int num_images = getImageListSize();
+  int i;
+
+  // standard size bitmap may have changed -- update default bitmap pointer
+  for (i = 0; i < num_images; i++)
+    if (graphic_info[i].bitmaps)
+      graphic_info[i].bitmap = graphic_info[i].bitmaps[IMG_BITMAP_STANDARD];
 }
 
 #if 1
@@ -1918,6 +1925,8 @@ static void ReinitializeGraphics()
   print_timestamp_time("InitElementSmallImages");
   InitScaledImages();			/* scale all other images, if needed */
   print_timestamp_time("InitScaledImages");
+  InitBitmapPointers();			/* set standard size bitmap pointers */
+  print_timestamp_time("InitBitmapPointers");
   InitFontGraphicInfo();		/* initialize text drawing functions */
   print_timestamp_time("InitFontGraphicInfo");
 
