@@ -3019,7 +3019,6 @@ void DrawInfoScreen_LevelSet()
   char *filename = getLevelSetInfoFilename();
   char *title = "Level Set Information:";
   int ystart1 = mSY - SY + 100;
-  int ystart2 = mSY - SY + 150;
   int ybottom = mSY - SY + SYSIZE - 20;
 
   if (filename == NULL)
