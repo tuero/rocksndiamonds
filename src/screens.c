@@ -1619,9 +1619,11 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
 
     if (game_status == GAME_MODE_INFO)
     {
+      int fade_mask = (num_title_screens == 0 ? REDRAW_FIELD : REDRAW_ALL);
+
       info_mode = INFO_MODE_MAIN;
 
-      DrawInfoScreenExt(REDRAW_ALL, use_fading_main_menu);
+      DrawInfoScreenExt(fade_mask, use_fading_main_menu);
     }
     else	/* default: return to main menu */
     {

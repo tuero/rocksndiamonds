@@ -1,5 +1,6 @@
 2014-11-06
 	* fixed layout for "level set info" to support custom playfield size
+	* fixed changing from title to info screen with custom playfield size
 
 2014-11-02
 	* fixed bug with not updating default bitmap pointer for scaled images
