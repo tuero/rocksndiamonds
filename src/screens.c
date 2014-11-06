@@ -2090,7 +2090,7 @@ void DrawInfoScreen_NotAvailable(char *text_title, char *text_error)
   int ystart2 = mSY - SY + 150;
   int ybottom = mSY - SY + SYSIZE - 20;
 
-  SetMainBackgroundImageIfDefined(IMG_BACKGROUND_INFO_LEVELSET);
+  SetMainBackgroundImageIfDefined(IMG_BACKGROUND_INFO);
 
   FadeOut(REDRAW_FIELD);
 
@@ -3017,6 +3017,42 @@ void DrawInfoScreen_LevelSet()
 {
   struct TitleMessageInfo *tmi = &readme;
   char *filename = getLevelSetInfoFilename();
+  char *title = "Level Set Information:";
+  int ystart1 = mSY - SY + 100;
+  int ystart2 = mSY - SY + 150;
+  int ybottom = mSY - SY + SYSIZE - 20;
+
+  if (filename == NULL)
+  {
+    DrawInfoScreen_NotAvailable(title, "No information for this level set.");
+
+    return;
+  }
+
+  SetMainBackgroundImageIfDefined(IMG_BACKGROUND_INFO_LEVELSET);
+
+  FadeOut(REDRAW_FIELD);
+
+  ClearField();
+  DrawHeadline();
+
+  DrawTextSCentered(ystart1, FONT_TEXT_1, title);
+
+  /* if x position set to "-1", automatically determine by playfield width */
+  if (tmi->x == -1)
+    tmi->x = SXSIZE / 2;
+
+  /* if y position set to "-1", use static default value */
+  if (tmi->y == -1)
+    tmi->y = 150;
+
+  /* if width set to "-1", automatically determine by playfield width */
+  if (tmi->width == -1)
+    tmi->width = SXSIZE - 2 * TILEX;
+
+  /* if height set to "-1", automatically determine by playfield height */
+  if (tmi->height == -1)
+    tmi->height = SYSIZE - 20 - tmi->y - 10;
 
   /* if chars set to "-1", automatically determine by text and font width */
   if (tmi->chars == -1)
@@ -3030,25 +3066,12 @@ void DrawInfoScreen_LevelSet()
   else
     tmi->height = tmi->lines * getFontHeight(tmi->font);
 
-  SetMainBackgroundImageIfDefined(IMG_BACKGROUND_INFO_LEVELSET);
+  DrawTextFile(mSX + ALIGNED_TEXT_XPOS(tmi), mSY + ALIGNED_TEXT_YPOS(tmi),
+	       filename, tmi->font, tmi->chars, -1, tmi->lines, 0, -1,
+	       tmi->autowrap, tmi->centered, tmi->parse_comments);
 
-  FadeOut(REDRAW_FIELD);
-
-  ClearField();
-  DrawHeadline();
-
-  DrawTextCentered(mSY + 100, FONT_TEXT_1, "Level Set Information:");
-
-  if (filename != NULL)
-    DrawTextFile(mSX + ALIGNED_TEXT_XPOS(tmi), mSY + ALIGNED_TEXT_YPOS(tmi),
-		 filename, tmi->font, tmi->chars, -1, tmi->lines, 0, -1,
-		 tmi->autowrap, tmi->centered, tmi->parse_comments);
-  else
-    DrawTextCentered(mSY + ALIGNED_TEXT_YPOS(tmi), FONT_TEXT_2,
-		     "No information for this level set.");
-
-  DrawTextCentered(mSY + SYSIZE - 20, FONT_TEXT_4,
-		   "Press any key or button for info menu");
+  DrawTextSCentered(ybottom, FONT_TEXT_4,
+		    "Press any key or button for info menu");
 
   FadeIn(REDRAW_FIELD);
 }
