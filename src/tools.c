@@ -3936,11 +3936,13 @@ void InitGraphicCompatibilityInfo_Doors()
 	{
 	  num_panel_steps = 2 * door_rect->height / door->step_offset;
 	  door->panel.start_step = num_panel_steps - num_door_steps;
+	  door->panel.start_step_closing = door->panel.start_step;
 	}
 	else
 	{
 	  num_panel_steps = door_rect->height / door->step_offset;
 	  door->panel.start_step = num_panel_steps - num_door_steps / 2;
+	  door->panel.start_step_closing = door->panel.start_step;
 	  door->panel.step_delay *= 2;
 	}
       }
@@ -4040,15 +4042,6 @@ unsigned int MoveDoor(unsigned int door_state)
   unsigned int door_delay = 0;
   unsigned int door_delay_value;
   int i;
-
-  if (door_1.width < 0 || door_1.width > DXSIZE)
-    door_1.width = DXSIZE;
-  if (door_1.height < 0 || door_1.height > DYSIZE)
-    door_1.height = DYSIZE;
-  if (door_2.width < 0 || door_2.width > VXSIZE)
-    door_2.width = VXSIZE;
-  if (door_2.height < 0 || door_2.height > VYSIZE)
-    door_2.height = VYSIZE;
 
   if (door_state == DOOR_GET_STATE)
     return (door1 | door2);

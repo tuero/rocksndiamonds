@@ -5014,6 +5014,9 @@ void InitGfxBuffers()
   InitGfxScrollbufferInfo(FXSIZE, FYSIZE);
   InitGfxClipRegion(FALSE, -1, -1, -1, -1);
 
+  /* required if door size definitions have changed */
+  InitGraphicCompatibilityInfo_Doors();
+
   InitGfxBuffers_EM();
   InitGfxBuffers_SP();
 }

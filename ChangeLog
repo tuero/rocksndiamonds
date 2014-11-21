@@ -1,3 +1,6 @@
+2014-11-19
+	* fixed broken door animations when switching between custom graphics
+
 2014-11-06
 	* fixed layout for "level set info" to support custom playfield size
 	* fixed changing from title to info screen with custom playfield size
