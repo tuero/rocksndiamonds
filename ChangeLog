@@ -1,3 +1,6 @@
+2014-11-22
+	* fixed menu display bugs caused by drawing outside menu area (again)
+
 2014-11-19
 	* fixed broken door animations when switching between custom graphics
 

@@ -3298,8 +3298,8 @@ static void clearMenuListArea()
   int scrollbar_xpos = mSX + SC_SCROLLBAR_XPOS + menu.scrollbar_xoffset;
 
   /* correct scrollbar position if placed outside menu (playfield) area */
-  if (scrollbar_xpos > mSX + SC_SCROLLBAR_XPOS)
-    scrollbar_xpos = mSX + SC_SCROLLBAR_XPOS;
+  if (scrollbar_xpos > SX + SC_SCROLLBAR_XPOS)
+    scrollbar_xpos = SX + SC_SCROLLBAR_XPOS;
 
   /* clear menu list area, but not title or scrollbar */
   DrawBackground(mSX, mSY + MENU_SCREEN_START_YPOS * 32,
