@@ -31,14 +31,6 @@
   -----------------------------------------------------------------------------
 */
 
-/* positions in the level editor */
-#define ED_WIN_MB_LEFT_XPOS		(editor.palette.element_left.x)
-#define ED_WIN_MB_LEFT_YPOS		(editor.palette.element_left.y)
-#define ED_WIN_MB_MIDDLE_XPOS		(editor.palette.element_middle.x)
-#define ED_WIN_MB_MIDDLE_YPOS		(editor.palette.element_middle.y)
-#define ED_WIN_MB_RIGHT_XPOS		(editor.palette.element_right.x)
-#define ED_WIN_MB_RIGHT_YPOS		(editor.palette.element_right.y)
-
 /* values for the control window */
 #define ED_CTRL_NO_BUTTONS_GFX_XPOS 	6
 #define ED_CTRL_NO_BUTTONS_GFX_YPOS 	286
@@ -90,8 +82,8 @@
 /* values for the element list */
 #define ED_ELEMENTLIST_XPOS		(editor.palette.x)
 #define ED_ELEMENTLIST_YPOS		(editor.palette.y)
-#define ED_ELEMENTLIST_XSIZE		20
-#define ED_ELEMENTLIST_YSIZE		20
+#define ED_ELEMENTLIST_XSIZE		(graphic_info[IMG_EDITOR_PALETTE_BUTTON].width)
+#define ED_ELEMENTLIST_YSIZE		(graphic_info[IMG_EDITOR_PALETTE_BUTTON].height)
 #define ED_ELEMENTLIST_BUTTONS_HORIZ	(editor.palette.cols)
 #define ED_ELEMENTLIST_BUTTONS_VERT	(editor.palette.rows)
 #define ED_NUM_ELEMENTLIST_BUTTONS	(ED_ELEMENTLIST_BUTTONS_HORIZ *	\
@@ -208,8 +200,8 @@
 #define ED_SCROLLBAR2_XPOS		50
 #define ED_SCROLLBAR2_YPOS		20
 
-#define ED_SCROLLBUTTON2_XSIZE		10
-#define ED_SCROLLBUTTON2_YSIZE		10
+#define ED_SCROLLBUTTON2_XSIZE		(graphic_info[IMG_EDITOR_PALETTE_SCROLL_UP].width)
+#define ED_SCROLLBUTTON2_YSIZE		(graphic_info[IMG_EDITOR_PALETTE_SCROLL_UP].height)
 
 #define ED_SCROLL2_UP_XPOS		(ED_ELEMENTLIST_XPOS +		\
 					 ED_ELEMENTLIST_BUTTONS_HORIZ *	\
@@ -251,10 +243,6 @@
 #define ED_WIN_COUNT_YPOS		ED_BUTTON_COUNT_YPOS
 #define ED_WIN_COUNT_XSIZE		52
 #define ED_WIN_COUNT_YSIZE		ED_BUTTON_COUNT_YSIZE
-#define ED_WIN_COUNT2_XPOS		27
-#define ED_WIN_COUNT2_YPOS		3
-#define ED_WIN_COUNT2_XSIZE		46
-#define ED_WIN_COUNT2_YSIZE		ED_BUTTON_COUNT_YSIZE
 
 #define ED_BUTTON_MINUS_XPOS		2
 #define ED_BUTTON_MINUS_YPOS		ED_BUTTON_COUNT_YPOS
@@ -5155,6 +5143,15 @@ static void ScrollMiniLevel(int from_x, int from_y, int scroll)
   BackToFront();
 }
 
+void getElementListGraphicSource(int element, Bitmap **bitmap, int *x, int *y)
+{
+  int graphic = el2edimg(element);
+  int tile_size = (editor.palette.tile_size >= TILESIZE ? TILESIZE :
+		   MINI_TILESIZE);
+
+  getSizedGraphicSource(graphic, 0, tile_size, bitmap, x, y);
+}
+
 static void CreateControlButtons()
 {
   Bitmap *gd_bitmap = graphic_info[IMG_GLOBAL_DOOR].bitmap;
@@ -5380,6 +5377,8 @@ static void CreateControlButtons()
     int y = i / ED_ELEMENTLIST_BUTTONS_HORIZ;
     int id = GADGET_ID_ELEMENTLIST_FIRST + i;
     int element = editor_elements[i];
+    int tile_size = (editor.palette.tile_size >= TILESIZE ? TILESIZE :
+		     MINI_TILESIZE);
 
     event_mask = GD_EVENT_RELEASED;
 
@@ -5391,9 +5390,9 @@ static void CreateControlButtons()
     gd_x2 = gd->src_x + gd->pressed_xoffset;
     gd_y2 = gd->src_y + gd->pressed_yoffset;
 
-    getMiniGraphicSource(el2edimg(element), &deco_bitmap, &deco_x, &deco_y);
-    deco_xpos = (gd->width  - MINI_TILEX) / 2;
-    deco_ypos = (gd->height - MINI_TILEY) / 2;
+    getElementListGraphicSource(element, &deco_bitmap, &deco_x, &deco_y);
+    deco_xpos = (gd->width  - tile_size) / 2;
+    deco_ypos = (gd->height - tile_size) / 2;
 
     gi = CreateGadget(GDI_CUSTOM_ID, id,
 		      GDI_CUSTOM_TYPE_ID, i,
@@ -5408,7 +5407,7 @@ static void CreateControlButtons()
 		      GDI_DESIGN_PRESSED, gd->bitmap, gd_x2, gd_y2,
 		      GDI_DECORATION_DESIGN, deco_bitmap, deco_x, deco_y,
 		      GDI_DECORATION_POSITION, deco_xpos, deco_ypos,
-		      GDI_DECORATION_SIZE, MINI_TILEX, MINI_TILEY,
+		      GDI_DECORATION_SIZE, tile_size, tile_size,
 		      GDI_DECORATION_SHIFTING, 1, 1,
 		      GDI_EVENT_MASK, event_mask,
 		      GDI_CALLBACK_INFO, HandleEditorGadgetInfoText,
@@ -5426,10 +5425,6 @@ static void CreateCounterButtons()
 {
   int max_infotext_len = getMaxInfoTextLength();
   int i;
-
-  /* these values are not constant, but can change at runtime */
-  counterbutton_info[ED_COUNTER_ID_SELECT_LEVEL].x = DX + 5 - SX;
-  counterbutton_info[ED_COUNTER_ID_SELECT_LEVEL].y = DY + 3 - SY;
 
   for (i = 0; i < ED_NUM_COUNTERBUTTONS; i++)
   {
@@ -5472,9 +5467,16 @@ static void CreateCounterButtons()
 
 	event_mask |= GD_EVENT_RELEASED;
 
-	if (j == 1)
-	  x += 2 * ED_GADGET_DISTANCE;
-	y += ED_GADGET_DISTANCE;
+	if (j == 0)
+	{
+	  x = DX + editor.button.prev_level.x;
+	  y = DY + editor.button.prev_level.y;
+	}
+	else
+	{
+	  x = DX + editor.button.next_level.x;
+	  y = DY + editor.button.next_level.y;
+	}
 
 	gd_x1 = gd->src_x;
 	gd_y1 = gd->src_y;
@@ -5527,20 +5529,28 @@ static void CreateCounterButtons()
 	int font_type = FONT_INPUT_1;
 	int font_type_active = FONT_INPUT_1_ACTIVE;
 	int gd_width = ED_WIN_COUNT_XSIZE;
+	int border_size = ED_BORDER_SIZE;
 
 	id = counterbutton_info[i].gadget_id_text;
 	event_mask = GD_EVENT_TEXT_RETURN | GD_EVENT_TEXT_LEAVING;
 
 	if (i == ED_COUNTER_ID_SELECT_LEVEL)
 	{
+	  int graphic = IMG_EDITOR_INPUT_GFX_LEVEL_NUMBER;
+	  struct GraphicInfo *gd = &graphic_info[graphic];
+
+	  gd_bitmap = gd->bitmap;
+
+	  x = DX + editor.input.level_number.x;
+	  y = DY + editor.input.level_number.y;
+
+	  gd_x = gd->src_x;
+	  gd_y = gd->src_y;
+	  gd_width = gd->width;
+	  border_size = gd->border_size;
+
 	  font_type = FONT_LEVEL_NUMBER;
 	  font_type_active = FONT_LEVEL_NUMBER_ACTIVE;
-	  x += 2 * ED_GADGET_DISTANCE;
-	  y -= ED_GADGET_DISTANCE;
-
-	  gd_x = DOOR_GFX_PAGEX6 + ED_WIN_COUNT2_XPOS;
-	  gd_y = DOOR_GFX_PAGEY1 + ED_WIN_COUNT2_YPOS;
-	  gd_width = ED_WIN_COUNT2_XSIZE;
 	}
 	else
 	{
@@ -5562,7 +5572,7 @@ static void CreateCounterButtons()
 			  GDI_TEXT_FONT_ACTIVE, font_type_active,
 			  GDI_DESIGN_UNPRESSED, gd_bitmap, gd_x, gd_y,
 			  GDI_DESIGN_PRESSED, gd_bitmap, gd_x, gd_y,
-			  GDI_BORDER_SIZE, ED_BORDER_SIZE, ED_BORDER_SIZE,
+			  GDI_BORDER_SIZE, border_size, border_size,
 			  GDI_DESIGN_WIDTH, gd_width,
 			  GDI_EVENT_MASK, event_mask,
 			  GDI_CALLBACK_INFO, HandleEditorGadgetInfoText,
@@ -7641,39 +7651,41 @@ static void ModifyEditorElementList()
 
     UnmapGadget(gi);
 
-    getMiniGraphicSource(el2edimg(element), &gd->bitmap, &gd->x, &gd->y);
+    getElementListGraphicSource(element, &gd->bitmap, &gd->x, &gd->y);
+
     ModifyGadget(gi, GDI_INFO_TEXT, getElementInfoText(element), GDI_END);
 
     MapGadget(gi);
   }
 }
 
+static void DrawDrawingElement(int element, struct EditorPaletteElementInfo *e)
+{
+  int graphic = el2edimg(element);
+  int tile_size = (e->tile_size >= TILESIZE ? TILESIZE : MINI_TILESIZE);
+
+  DrawSizedGraphicExt(drawto, DX + e->x, DY + e->y, graphic, 0, tile_size);
+}
+
 static void PickDrawingElement(int button, int element)
 {
+  struct
+  {
+    int *new_element;
+    struct EditorPaletteElementInfo *e;
+  } de, drawing_elements[] =
+  {
+    { &new_element1,	&editor.palette.element_left	},
+    { &new_element2,	&editor.palette.element_middle	},
+    { &new_element3,	&editor.palette.element_right	},
+  };
+
   if (button < 1 || button > 3)
     return;
 
-  if (button == 1)
-  {
-    new_element1 = element;
-    DrawMiniGraphicExt(drawto,
-		       DX + ED_WIN_MB_LEFT_XPOS, DY + ED_WIN_MB_LEFT_YPOS,
-		       el2edimg(new_element1));
-  }
-  else if (button == 2)
-  {
-    new_element2 = element;
-    DrawMiniGraphicExt(drawto,
-		       DX + ED_WIN_MB_MIDDLE_XPOS, DY + ED_WIN_MB_MIDDLE_YPOS,
-		       el2edimg(new_element2));
-  }
-  else
-  {
-    new_element3 = element;
-    DrawMiniGraphicExt(drawto,
-		       DX + ED_WIN_MB_RIGHT_XPOS, DY + ED_WIN_MB_RIGHT_YPOS,
-		       el2edimg(new_element3));
-  }
+  de = drawing_elements[button - 1];
+
+  DrawDrawingElement((*de.new_element = element), de.e);
 
   redraw_mask |= REDRAW_DOOR_1;
 }

@@ -6095,6 +6095,30 @@ struct TokenIntPtrInfo image_config_vars[] =
     &tape.show_game_buttons
   },
   {
+    "editor.button.prev_level.x",
+    &editor.button.prev_level.x
+  },
+  {
+    "editor.button.prev_level.y",
+    &editor.button.prev_level.y
+  },
+  {
+    "editor.button.next_level.x",
+    &editor.button.next_level.x
+  },
+  {
+    "editor.button.next_level.y",
+    &editor.button.next_level.y
+  },
+  {
+    "editor.input.level_number.x",
+    &editor.input.level_number.x
+  },
+  {
+    "editor.input.level_number.y",
+    &editor.input.level_number.y
+  },
+  {
     "editor.palette.x",
     &editor.palette.x
   },
@@ -6111,12 +6135,20 @@ struct TokenIntPtrInfo image_config_vars[] =
     &editor.palette.rows
   },
   {
+    "editor.palette.tile_size",
+    &editor.palette.tile_size
+  },
+  {
     "editor.palette.element_left.x",
     &editor.palette.element_left.x
   },
   {
     "editor.palette.element_left.y",
     &editor.palette.element_left.y
+  },
+  {
+    "editor.palette.element_left.tile_size",
+    &editor.palette.element_left.tile_size
   },
   {
     "editor.palette.element_middle.x",
@@ -6127,12 +6159,20 @@ struct TokenIntPtrInfo image_config_vars[] =
     &editor.palette.element_middle.y
   },
   {
+    "editor.palette.element_middle.tile_size",
+    &editor.palette.element_middle.tile_size
+  },
+  {
     "editor.palette.element_right.x",
     &editor.palette.element_right.x
   },
   {
     "editor.palette.element_right.y",
     &editor.palette.element_right.y
+  },
+  {
+    "editor.palette.element_right.tile_size",
+    &editor.palette.element_right.tile_size
   },
   {
     "request.button.yes.x",

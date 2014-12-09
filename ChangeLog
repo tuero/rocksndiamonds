@@ -1,3 +1,14 @@
+2014-12-03
+	* added some more graphics customization options for the level editor:
+	  - editor.button.prev_level (position)
+	  - editor.button.next_level (position)
+	  - editor.input.level_number (position)
+	  - editor.palette.tile_size (tile size for palette elements)
+	  - editor.palette.element_left.tile_size (draw element tile size)
+	  - editor.palette.element_middle.tile_size (draw element tile size)
+	  - editor.palette.element_right.tile_size (draw element tile size)
+	  - editor.input.gfx.level_number (current level number input field)
+
 2014-11-22
 	* fixed menu display bugs caused by drawing outside menu area (again)
 

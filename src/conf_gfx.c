@@ -5305,6 +5305,13 @@ struct ConfigInfo image_config[] =
   { "editor.button.gfx.next_level.height",	"16"			},
   { "editor.button.gfx.next_level.pressed_xoffset", "-16"		},
 
+  { "editor.input.gfx.level_number",		"RocksDoor.png"		},
+  { "editor.input.gfx.level_number.x",		"529"			},
+  { "editor.input.gfx.level_number.y",		"5"			},
+  { "editor.input.gfx.level_number.width",	"42"			},
+  { "editor.input.gfx.level_number.height",	"16"			},
+  { "editor.input.gfx.level_number.border_size","1"			},
+
   { "background",				UNDEFINED_FILENAME	},
   { "background.TITLE_INITIAL",			UNDEFINED_FILENAME	},
   { "background.TITLE",				UNDEFINED_FILENAME	},
@@ -7094,17 +7101,28 @@ struct ConfigInfo image_config[] =
 
   { "tape.show_game_buttons",			"false"			},
 
+  { "editor.button.prev_level.x",		"5"			},
+  { "editor.button.prev_level.y",		"5"			},
+  { "editor.button.next_level.x",		"79"			},
+  { "editor.button.next_level.y",		"5"			},
+  { "editor.input.level_number.x",		"29"			},
+  { "editor.input.level_number.y",		"5"			},
+
   { "editor.palette.x",				"5"			},
   { "editor.palette.y",				"30"			},
   { "editor.palette.cols",			"4"			},
   { "editor.palette.rows",			"11"			},
+  { "editor.palette.tile_size",			"16"			},
 
   { "editor.palette.element_left.x",		"6"			},
   { "editor.palette.element_left.y",		"258"			},
+  { "editor.palette.element_left.tile_size",	"16"			},
   { "editor.palette.element_middle.x",		"42"			},
   { "editor.palette.element_middle.y",		"258"			},
+  { "editor.palette.element_middle.tile_size",	"16"			},
   { "editor.palette.element_right.x",		"78"			},
   { "editor.palette.element_right.y",		"258"			},
+  { "editor.palette.element_right.tile_size",	"16"			},
 
   { "request.button.yes.x",			"2"			},
   { "request.button.yes.y",			"250"			},

@@ -2239,18 +2239,38 @@ struct PreviewInfo
   int anim_mode;
 };
 
+struct EditorButtonInfo
+{
+  struct XY prev_level;
+  struct XY next_level;
+};
+
+struct EditorInputInfo
+{
+  struct XY level_number;
+};
+
+struct EditorPaletteElementInfo
+{
+  int x, y;
+  int tile_size;
+};
+
 struct EditorPaletteInfo
 {
   int x, y;
   int cols, rows;
+  int tile_size;
 
-  struct XY element_left;
-  struct XY element_middle;
-  struct XY element_right;
+  struct EditorPaletteElementInfo element_left;
+  struct EditorPaletteElementInfo element_middle;
+  struct EditorPaletteElementInfo element_right;
 };
 
 struct EditorInfo
 {
+  struct EditorButtonInfo button;
+  struct EditorInputInfo input;
   struct EditorPaletteInfo palette;
 };
 
