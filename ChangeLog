@@ -1,3 +1,14 @@
+2014-12-13
+	* fixed loading custom PCX image files with default artwork file names
+	  (like "RocksDoor.pcx") which are not redefined in artwork config file
+	  (this is a special fix for Zelda 2 and probably some other existing
+	  level sets which use new graphics which are not defined in the file
+	  "graphicsinfo.conf", but use a file name of one of default graphics
+	  (like "RocksScreen.pcx"); this did not work anymore for PCX files
+	  since the default graphics files have been changed to PNG files, so
+	  different file names are checked now (like "RocksScreen.png"), so if
+	  the PNG files cannot be found, the old PCX files are also checked)
+
 2014-12-03
 	* added some more graphics customization options for the level editor:
 	  - editor.button.prev_level (position)

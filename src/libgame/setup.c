@@ -614,7 +614,7 @@ char *getCustomImageFilename(char *basename)
   if (!gfx.override_level_graphics)
   {
     /* 1st try: look for special artwork in current level series directory */
-    filename = getPath3(getCurrentLevelDir(), GRAPHICS_DIRECTORY, basename);
+    filename = getImg3(getCurrentLevelDir(), GRAPHICS_DIRECTORY, basename);
     if (fileExists(filename))
       return filename;
 
@@ -624,7 +624,7 @@ char *getCustomImageFilename(char *basename)
     if (getLevelArtworkSet(ARTWORK_TYPE_GRAPHICS) != NULL)
     {
       /* 2nd try: look for special artwork configured in level series config */
-      filename = getPath2(getLevelArtworkDir(ARTWORK_TYPE_GRAPHICS), basename);
+      filename = getImg2(getLevelArtworkDir(ARTWORK_TYPE_GRAPHICS), basename);
       if (fileExists(filename))
 	return filename;
 
@@ -638,7 +638,7 @@ char *getCustomImageFilename(char *basename)
   if (!skip_setup_artwork)
   {
     /* 3rd try: look for special artwork in configured artwork directory */
-    filename = getPath2(getSetupArtworkDir(artwork.gfx_current), basename);
+    filename = getImg2(getSetupArtworkDir(artwork.gfx_current), basename);
     if (fileExists(filename))
       return filename;
 
@@ -646,14 +646,14 @@ char *getCustomImageFilename(char *basename)
   }
 
   /* 4th try: look for default artwork in new default artwork directory */
-  filename = getPath2(getDefaultGraphicsDir(GFX_DEFAULT_SUBDIR), basename);
+  filename = getImg2(getDefaultGraphicsDir(GFX_DEFAULT_SUBDIR), basename);
   if (fileExists(filename))
     return filename;
 
   free(filename);
 
   /* 5th try: look for default artwork in old default artwork directory */
-  filename = getPath2(options.graphics_directory, basename);
+  filename = getImg2(options.graphics_directory, basename);
   if (fileExists(filename))
     return filename;
 
@@ -665,7 +665,7 @@ char *getCustomImageFilename(char *basename)
 
   /* 6th try: look for fallback artwork in old default artwork directory */
   /* (needed to prevent errors when trying to access unused artwork files) */
-  filename = getPath2(options.graphics_directory, GFX_FALLBACK_FILENAME);
+  filename = getImg2(options.graphics_directory, GFX_FALLBACK_FILENAME);
   if (fileExists(filename))
     return filename;
 #endif

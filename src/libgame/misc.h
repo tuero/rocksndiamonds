@@ -147,6 +147,8 @@ char *getStringCat2(char *, char *);
 char *getStringCat3(char *, char *, char *);
 char *getPath2(char *, char *);
 char *getPath3(char *, char *, char*);
+char *getImg2(char *, char *);
+char *getImg3(char *, char *, char*);
 char *getStringCopy(const char *);
 char *getStringCopyN(const char *, int);
 char *getStringCopyNStatic(const char *, int);

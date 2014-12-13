@@ -606,6 +606,48 @@ char *getPath3(char *path1, char *path2, char *path3)
   return getStringCat3WithSeparator(path1, path2, path3, STRING_PATH_SEPARATOR);
 }
 
+char *getImg2(char *path1, char *path2)
+{
+  char *filename = getPath2(path1, path2);
+
+  if (!fileExists(filename) && strSuffix(path2, ".png"))
+  {
+    // backward compatibility: if PNG file not found, check for PCX file
+    char *path2pcx = getStringCopy(path2);
+
+    strcpy(&path2pcx[strlen(path2pcx) - 3], "pcx");
+
+    free(filename);
+
+    filename = getPath2(path1, path2pcx);
+
+    free(path2pcx);
+  }
+
+  return filename;
+}
+
+char *getImg3(char *path1, char *path2, char *path3)
+{
+  char *filename = getPath3(path1, path2, path3);
+
+  if (!fileExists(filename) && strSuffix(path3, ".png"))
+  {
+    // backward compatibility: if PNG file not found, check for PCX file
+    char *path3pcx = getStringCopy(path3);
+
+    strcpy(&path3pcx[strlen(path3pcx) - 3], "pcx");
+
+    free(filename);
+
+    filename = getPath3(path1, path2, path3pcx);
+
+    free(path3pcx);
+  }
+
+  return filename;
+}
+
 char *getStringCopy(const char *s)
 {
   char *s_copy;
