@@ -1,3 +1,6 @@
+2015-01-19
+	* re-enabled editor palette element options in setup configuration file
+
 2014-12-13
 	* fixed loading custom PCX image files with default artwork file names
 	  (like "RocksDoor.pcx") which are not redefined in artwork config file
