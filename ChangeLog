@@ -3,6 +3,7 @@
 	* added "zoom level tile size" button in editor to toolbox (currently
 	  no function behind it; will be used to zoom level editor playfield)
 	* added key shortcuts '1' to '3' to view properties of drawing elements
+	* fixed gadget display bug in editor (door 1 area) after test playing
 
 2015-01-19
 	* re-enabled editor palette element options in setup configuration file

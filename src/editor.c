@@ -7466,6 +7466,9 @@ void DrawLevelEd()
     level_ypos = -1;
   }
 
+  /* needed for gadgets drawn on background (like palette scrollbar) */
+  SetDoorBackgroundImage(IMG_UNDEFINED);
+
   /* copy default editor door content to main double buffer */
   BlitBitmap(graphic_info[IMG_BACKGROUND_PALETTE].bitmap, drawto,
 	     graphic_info[IMG_BACKGROUND_PALETTE].src_x,
