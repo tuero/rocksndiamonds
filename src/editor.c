@@ -7538,8 +7538,6 @@ static void AdjustDrawingAreaGadgets()
   ed_fieldy = (ed_ysize < MAX_ED_FIELDY ? ed_ysize : max_ed_fieldy);
 
   ModifyGadget(level_editor_gadget[GADGET_ID_DRAWING_LEVEL],
-	       GDI_WIDTH, ed_fieldx * MINI_TILEX,
-	       GDI_HEIGHT, ed_fieldy * MINI_TILEY,
 	       GDI_AREA_SIZE, ed_fieldx, ed_fieldy,
 	       GDI_END);
 

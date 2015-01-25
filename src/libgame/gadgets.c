@@ -980,14 +980,12 @@ static void HandleGadgetTags(struct GadgetInfo *gi, int first_tag, va_list ap)
 	gi->drawing.area_ysize = va_arg(ap, int);
 
 	/* determine dependent values for drawing area gadget, if needed */
-	if (gi->width == 0 && gi->height == 0 &&
-	    gi->drawing.item_xsize !=0 && gi->drawing.item_ysize !=0)
+	if (gi->drawing.item_xsize != 0 && gi->drawing.item_ysize != 0)
 	{
 	  gi->width = gi->drawing.area_xsize * gi->drawing.item_xsize;
 	  gi->height = gi->drawing.area_ysize * gi->drawing.item_ysize;
 	}
-	else if (gi->drawing.item_xsize == 0 && gi->drawing.item_ysize == 0 &&
-		 gi->width != 0 && gi->height != 0)
+	else if (gi->width != 0 && gi->height != 0)
 	{
 	  gi->drawing.item_xsize = gi->width / gi->drawing.area_xsize;
 	  gi->drawing.item_ysize = gi->height / gi->drawing.area_ysize;
@@ -1010,14 +1008,12 @@ static void HandleGadgetTags(struct GadgetInfo *gi, int first_tag, va_list ap)
 	gi->drawing.item_ysize = va_arg(ap, int);
 
 	/* determine dependent values for drawing area gadget, if needed */
-	if (gi->width == 0 && gi->height == 0 &&
-	    gi->drawing.area_xsize !=0 && gi->drawing.area_ysize !=0)
+	if (gi->drawing.area_xsize != 0 && gi->drawing.area_ysize != 0)
 	{
 	  gi->width = gi->drawing.area_xsize * gi->drawing.item_xsize;
 	  gi->height = gi->drawing.area_ysize * gi->drawing.item_ysize;
 	}
-	else if (gi->drawing.area_xsize == 0 && gi->drawing.area_ysize == 0 &&
-		 gi->width != 0 && gi->height != 0)
+	else if (gi->width != 0 && gi->height != 0)
 	{
 	  gi->drawing.area_xsize = gi->width / gi->drawing.item_xsize;
 	  gi->drawing.area_ysize = gi->height / gi->drawing.item_ysize;
