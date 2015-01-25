@@ -6111,6 +6111,14 @@ struct TokenIntPtrInfo image_config_vars[] =
     &editor.button.next_level.y
   },
   {
+    "editor.button.properties.x",
+    &editor.button.properties.x
+  },
+  {
+    "editor.button.properties.y",
+    &editor.button.properties.y
+  },
+  {
     "editor.input.level_number.x",
     &editor.input.level_number.x
   },

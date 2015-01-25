@@ -1,3 +1,9 @@
+2015-01-25
+	* moved "element properties" button in editor from toolbox to palette
+	* added "zoom level tile size" button in editor to toolbox (currently
+	  no function behind it; will be used to zoom level editor playfield)
+	* added key shortcuts '1' to '3' to view properties of drawing elements
+
 2015-01-19
 	* re-enabled editor palette element options in setup configuration file
 

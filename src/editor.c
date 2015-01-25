@@ -41,6 +41,8 @@
 #define ED_CTRL4_BUTTONS_GFX_YPOS 	214
 #define ED_CTRL1_BUTTONS_ALT_GFX_YPOS 	142
 #define ED_CTRL3_BUTTONS_ALT_GFX_YPOS 	302
+#define ED_CTRL5_BUTTONS_GFX_XPOS 	5
+#define ED_CTRL5_BUTTONS_GFX_YPOS 	110
 
 #define ED_CTRL1_BUTTON_XSIZE		22
 #define ED_CTRL1_BUTTON_YSIZE		22
@@ -58,6 +60,10 @@
 #define ED_CTRL4_BUTTON_YSIZE		22
 #define ED_CTRL4_BUTTONS_XPOS		6
 #define ED_CTRL4_BUTTONS_YPOS		6
+#define ED_CTRL5_BUTTON_XSIZE		90
+#define ED_CTRL5_BUTTON_YSIZE		20
+#define ED_CTRL5_BUTTONS_XPOS		5
+#define ED_CTRL5_BUTTONS_YPOS		230
 
 #define ED_CTRL1_BUTTONS_HORIZ		4
 #define ED_CTRL1_BUTTONS_VERT		4
@@ -67,17 +73,18 @@
 #define ED_CTRL3_BUTTONS_VERT		1
 #define ED_CTRL4_BUTTONS_HORIZ		2
 #define ED_CTRL4_BUTTONS_VERT		1
+#define ED_CTRL5_BUTTONS_HORIZ		1
+#define ED_CTRL5_BUTTONS_VERT		1
 
 #define ED_NUM_CTRL1_BUTTONS   (ED_CTRL1_BUTTONS_HORIZ * ED_CTRL1_BUTTONS_VERT)
 #define ED_NUM_CTRL2_BUTTONS   (ED_CTRL2_BUTTONS_HORIZ * ED_CTRL2_BUTTONS_VERT)
 #define ED_NUM_CTRL3_BUTTONS   (ED_CTRL3_BUTTONS_HORIZ * ED_CTRL3_BUTTONS_VERT)
 #define ED_NUM_CTRL4_BUTTONS   (ED_CTRL4_BUTTONS_HORIZ * ED_CTRL4_BUTTONS_VERT)
+#define ED_NUM_CTRL5_BUTTONS   (ED_CTRL5_BUTTONS_HORIZ * ED_CTRL5_BUTTONS_VERT)
 #define ED_NUM_CTRL1_2_BUTTONS (ED_NUM_CTRL1_BUTTONS   + ED_NUM_CTRL2_BUTTONS)
 #define ED_NUM_CTRL1_3_BUTTONS (ED_NUM_CTRL1_2_BUTTONS + ED_NUM_CTRL3_BUTTONS)
-#define ED_NUM_CTRL_BUTTONS    (ED_NUM_CTRL1_BUTTONS +	\
-				ED_NUM_CTRL2_BUTTONS +	\
-				ED_NUM_CTRL3_BUTTONS +	\
-				ED_NUM_CTRL4_BUTTONS)
+#define ED_NUM_CTRL1_4_BUTTONS (ED_NUM_CTRL1_3_BUTTONS + ED_NUM_CTRL4_BUTTONS)
+#define ED_NUM_CTRL_BUTTONS    (ED_NUM_CTRL1_4_BUTTONS + ED_NUM_CTRL5_BUTTONS)
 
 /* values for the element list */
 #define ED_ELEMENTLIST_XPOS		(editor.palette.x)
@@ -303,7 +310,7 @@
 #define GADGET_ID_TEXT			(GADGET_ID_TOOLBOX_FIRST + 7)
 #define GADGET_ID_FLOOD_FILL		(GADGET_ID_TOOLBOX_FIRST + 8)
 #define GADGET_ID_WRAP_LEFT		(GADGET_ID_TOOLBOX_FIRST + 9)
-#define GADGET_ID_PROPERTIES		(GADGET_ID_TOOLBOX_FIRST + 10)
+#define GADGET_ID_ZOOM			(GADGET_ID_TOOLBOX_FIRST + 10)
 #define GADGET_ID_WRAP_RIGHT		(GADGET_ID_TOOLBOX_FIRST + 11)
 #define GADGET_ID_RANDOM_PLACEMENT	(GADGET_ID_TOOLBOX_FIRST + 12)
 #define GADGET_ID_GRAB_BRUSH		(GADGET_ID_TOOLBOX_FIRST + 13)
@@ -323,8 +330,10 @@
 #define GADGET_ID_CUSTOM_COPY		(GADGET_ID_TOOLBOX_FIRST + 25)
 #define GADGET_ID_CUSTOM_PASTE		(GADGET_ID_TOOLBOX_FIRST + 26)
 
+#define GADGET_ID_PROPERTIES		(GADGET_ID_TOOLBOX_FIRST + 27)
+
 /* counter gadget identifiers */
-#define GADGET_ID_COUNTER_FIRST		(GADGET_ID_TOOLBOX_FIRST + 27)
+#define GADGET_ID_COUNTER_FIRST		(GADGET_ID_TOOLBOX_FIRST + 28)
 
 #define GADGET_ID_SELECT_LEVEL_DOWN	(GADGET_ID_COUNTER_FIRST + 0)
 #define GADGET_ID_SELECT_LEVEL_TEXT	(GADGET_ID_COUNTER_FIRST + 1)
@@ -988,7 +997,7 @@ static struct
   { 't',	"enter text elements"			},
   { 'f',	"flood fill"				},
   { '\0',	"wrap (rotate) level left"		},
-  { '?',	"properties of drawing element"		},
+  { 'z',	"zoom level tile size"			},
   { '\0',	"wrap (rotate) level right"		},
   { '\0',	"random element placement"		},
   { 'b',	"grab brush"				},
@@ -1008,6 +1017,8 @@ static struct
 
   { '\0',	"copy settings from this element"	},
   { '\0',	"paste settings to this element"	},
+
+  { 'p',	"properties of drawing element"		},
 };
 
 static int random_placement_value = 10;
@@ -5166,6 +5177,7 @@ static void CreateControlButtons()
     int width, height;
     int gd_xoffset, gd_yoffset;
     int gd_x1, gd_x2, gd_y1, gd_y2;
+    int gd_x1a, gd_x2a, gd_y1a, gd_y2a;
     int button_type;
     int radio_button_nr;
     boolean checked;
@@ -5249,7 +5261,7 @@ static void CreateControlButtons()
       gd_y1 = DOOR_GFX_PAGEY1 + ED_CTRL3_BUTTONS_GFX_YPOS     + gd_yoffset;
       gd_y2 = DOOR_GFX_PAGEY1 + ED_CTRL3_BUTTONS_ALT_GFX_YPOS + gd_yoffset;
     }
-    else
+    else if (id < ED_NUM_CTRL1_4_BUTTONS)
     {
       int x = (i - ED_NUM_CTRL1_3_BUTTONS) % ED_CTRL4_BUTTONS_HORIZ;
       int y = (i - ED_NUM_CTRL1_3_BUTTONS) / ED_CTRL4_BUTTONS_HORIZ + 3;
@@ -5264,6 +5276,41 @@ static void CreateControlButtons()
       gd_y1 = DOOR_GFX_PAGEY1 + ED_CTRL4_BUTTONS_GFX_YPOS + gd_yoffset;
       gd_y2 = 0;	/* no alternative graphic for these buttons */
     }
+    else
+    {
+      gd_xoffset = DX - EX + ED_CTRL5_BUTTONS_XPOS;
+      gd_yoffset = DY - EY + ED_CTRL5_BUTTONS_YPOS;
+      width  = ED_CTRL5_BUTTON_XSIZE;
+      height = ED_CTRL5_BUTTON_YSIZE;
+
+      gd_x1 = DOOR_GFX_PAGEX6 + ED_CTRL5_BUTTONS_GFX_XPOS;
+      gd_x2 = 0;	/* no alternative graphic for these buttons */
+      gd_y1 = DOOR_GFX_PAGEY1 + ED_CTRL5_BUTTONS_GFX_YPOS;
+      gd_y2 = DOOR_GFX_PAGEY1 + ED_CTRL5_BUTTONS_GFX_YPOS - height;
+    }
+
+    if (id < ED_NUM_CTRL1_4_BUTTONS)
+    {
+      gd_x1a = gd_x1;
+      gd_y1a = gd_y2;
+      gd_x2a = gd_x2;
+      gd_y2a = gd_y2;
+      gd_x1 = gd_x1;
+      gd_y1 = gd_y1;
+      gd_x2 = gd_x2;
+      gd_y2 = gd_y1;
+    }
+    else
+    {
+      gd_x1a = 0;
+      gd_y1a = 0;
+      gd_x2a = 0;
+      gd_y2a = 0;
+      gd_x1 = gd_x1;
+      gd_y1 = gd_y1;
+      gd_x2 = gd_x1;
+      gd_y2 = gd_y2;
+    }
 
     gi = CreateGadget(GDI_CUSTOM_ID, id,
 		      GDI_CUSTOM_TYPE_ID, i,
@@ -5277,9 +5324,9 @@ static void CreateControlButtons()
 		      GDI_RADIO_NR, radio_button_nr,
 		      GDI_CHECKED, checked,
 		      GDI_DESIGN_UNPRESSED, gd_bitmap, gd_x1, gd_y1,
-		      GDI_DESIGN_PRESSED, gd_bitmap, gd_x2, gd_y1,
-		      GDI_ALT_DESIGN_UNPRESSED, gd_bitmap, gd_x1, gd_y2,
-		      GDI_ALT_DESIGN_PRESSED, gd_bitmap, gd_x2, gd_y2,
+		      GDI_DESIGN_PRESSED, gd_bitmap, gd_x2, gd_y2,
+		      GDI_ALT_DESIGN_UNPRESSED, gd_bitmap, gd_x1a, gd_y1a,
+		      GDI_ALT_DESIGN_PRESSED, gd_bitmap, gd_x2a, gd_y2a,
 		      GDI_EVENT_MASK, event_mask,
 		      GDI_CALLBACK_INFO, HandleEditorGadgetInfoText,
 		      GDI_CALLBACK_ACTION, HandleControlButtons,
@@ -6328,6 +6375,9 @@ static void MapControlButtons()
   for (i = 0; i < ED_NUM_CTRL1_2_BUTTONS; i++)
     MapGadget(level_editor_gadget[i]);
 
+  /* map toolbox buttons (element properties button) */
+  MapGadget(level_editor_gadget[ED_NUM_CTRL1_4_BUTTONS]);
+
   /* map buttons to select elements */
   for (i = 0; i < ED_NUM_ELEMENTLIST_BUTTONS; i++)
     MapGadget(level_editor_gadget[GADGET_ID_ELEMENTLIST_FIRST + i]);
@@ -6591,7 +6641,6 @@ static void MapOrUnmapLevelEditorToolboxDrawingGadgets(boolean map)
   for (i = 0; i < ED_NUM_CTRL1_BUTTONS; i++)
   {
     if (i != GADGET_ID_SINGLE_ITEMS &&
-	i != GADGET_ID_PROPERTIES &&
 	i != GADGET_ID_PICK_ELEMENT)
     {
       struct GadgetInfo *gi = level_editor_gadget[i];
@@ -11066,7 +11115,6 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 
   if (id < ED_NUM_CTRL1_BUTTONS &&
       id != GADGET_ID_SINGLE_ITEMS &&
-      id != GADGET_ID_PROPERTIES &&
       id != GADGET_ID_PICK_ELEMENT &&
       edit_mode != ED_MODE_DRAWING &&
       drawing_function != GADGET_ID_PICK_ELEMENT &&
@@ -11192,6 +11240,27 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 
       break;
 
+    case GADGET_ID_PROPERTIES:
+      if (edit_mode != ED_MODE_PROPERTIES)
+      {
+	properties_element = new_element;
+	DrawPropertiesWindow();
+	edit_mode = ED_MODE_PROPERTIES;
+
+	last_level_drawing_function = drawing_function;
+	ClickOnGadget(level_editor_gadget[GADGET_ID_SINGLE_ITEMS],
+		      MB_LEFTBUTTON);
+      }
+      else
+      {
+	DrawDrawingWindow();
+	edit_mode = ED_MODE_DRAWING;
+
+	ClickOnGadget(level_editor_gadget[last_level_drawing_function],
+		      MB_LEFTBUTTON);
+      }
+      break;
+
     case GADGET_ID_WRAP_LEFT:
       WrapLevel(-step, 0);
       break;
@@ -11228,25 +11297,8 @@ static void HandleControlButtons(struct GadgetInfo *gi)
       RandomPlacement(new_element);
       break;
 
-    case GADGET_ID_PROPERTIES:
-      if (edit_mode != ED_MODE_PROPERTIES)
-      {
-	properties_element = new_element;
-	DrawPropertiesWindow();
-	edit_mode = ED_MODE_PROPERTIES;
-
-	last_level_drawing_function = drawing_function;
-	ClickOnGadget(level_editor_gadget[GADGET_ID_SINGLE_ITEMS],
-		      MB_LEFTBUTTON);
-      }
-      else
-      {
-	DrawDrawingWindow();
-	edit_mode = ED_MODE_DRAWING;
-
-	ClickOnGadget(level_editor_gadget[last_level_drawing_function],
-		      MB_LEFTBUTTON);
-      }
+    case GADGET_ID_ZOOM:
+      printf("::: zoom button pressed with mouse button %d\n", button);
       break;
 
     case GADGET_ID_CUSTOM_COPY_FROM:
@@ -11602,6 +11654,10 @@ void HandleLevelEditorKeyInput(Key key)
 
     if (id != GADGET_ID_NONE)
       ClickOnGadget(level_editor_gadget[id], button);
+    else if (letter >= '1' && letter <= '3')
+      ClickOnGadget(level_editor_gadget[GADGET_ID_PROPERTIES], letter - '0');
+    else if (letter == '?')
+      ClickOnGadget(level_editor_gadget[GADGET_ID_PROPERTIES], button);
     else if (letter == '.')
       ClickOnGadget(level_editor_gadget[GADGET_ID_SINGLE_ITEMS], button);
     else if (key == KSYM_Return ||

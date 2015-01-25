@@ -5305,6 +5305,13 @@ struct ConfigInfo image_config[] =
   { "editor.button.gfx.next_level.height",	"16"			},
   { "editor.button.gfx.next_level.pressed_xoffset", "-16"		},
 
+  { "editor.button.gfx.properties",		"RocksDoor.png"		},
+  { "editor.button.gfx.properties.x",		"505"			},
+  { "editor.button.gfx.properties.y",		"110"			},
+  { "editor.button.gfx.properties.width",	"90"			},
+  { "editor.button.gfx.properties.height",	"20"			},
+  { "editor.button.gfx.properties.pressed_yoffset", "-20"		},
+
   { "editor.input.gfx.level_number",		"RocksDoor.png"		},
   { "editor.input.gfx.level_number.x",		"529"			},
   { "editor.input.gfx.level_number.y",		"5"			},
@@ -7105,13 +7112,15 @@ struct ConfigInfo image_config[] =
   { "editor.button.prev_level.y",		"5"			},
   { "editor.button.next_level.x",		"79"			},
   { "editor.button.next_level.y",		"5"			},
+  { "editor.button.properties.x",		"5"			},
+  { "editor.button.properties.y",		"230"			},
   { "editor.input.level_number.x",		"29"			},
   { "editor.input.level_number.y",		"5"			},
 
   { "editor.palette.x",				"5"			},
   { "editor.palette.y",				"30"			},
   { "editor.palette.cols",			"4"			},
-  { "editor.palette.rows",			"11"			},
+  { "editor.palette.rows",			"10"			},
   { "editor.palette.tile_size",			"16"			},
 
   { "editor.palette.element_left.x",		"6"			},
