@@ -1,3 +1,7 @@
+2015-01-27
+	* added looking for editor element descriptions in level set directory
+	  (for example, in file "<my-level-folder>/docs/elements/custom_1.txt")
+
 2015-01-25
 	* moved "element properties" button in editor from toolbox to palette
 	* added "zoom level tile size" button in editor to toolbox (currently

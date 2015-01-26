@@ -4787,27 +4787,47 @@ static char *getElementInfoText(int element)
   return info_text;
 }
 
-char *getElementDescriptionFilename(int element)
+static char *getElementDescriptionFilenameExt(char *basename)
 {
-  char *docs_dir = options.docs_directory;
   char *elements_subdir = "elements";
+  static char *elements_subdir2 = NULL;
   static char *filename = NULL;
-  char basename[MAX_FILENAME_LEN];
+
+  if (elements_subdir2 == NULL)
+    elements_subdir2 = getPath2(DOCS_DIRECTORY, elements_subdir);
 
   checked_free(filename);
 
-  /* 1st try: look for element description file for exactly this element */
-  sprintf(basename, "%s.txt", element_info[element].token_name);
-  filename = getPath3(docs_dir, elements_subdir, basename);
+  /* 1st try: look for element description in current level set directory */
+  filename = getPath3(getCurrentLevelDir(), elements_subdir2, basename);
   if (fileExists(filename))
     return filename;
 
   free(filename);
 
+  /* 2nd try: look for element description in the game's base directory */
+  filename = getPath3(options.docs_directory, elements_subdir, basename);
+  if (fileExists(filename))
+    return filename;
+
+  return NULL;
+}
+
+char *getElementDescriptionFilename(int element)
+{
+  char basename[MAX_FILENAME_LEN];
+  char *filename;
+
+  /* 1st try: look for element description file for exactly this element */
+  sprintf(basename, "%s.txt", element_info[element].token_name);
+  filename = getElementDescriptionFilenameExt(basename);
+  if (filename != NULL)
+    return filename;
+
   /* 2nd try: look for element description file for this element's class */
   sprintf(basename, "%s.txt", element_info[element].class_name);
-  filename = getPath3(docs_dir, elements_subdir, basename);
-  if (fileExists(filename))
+  filename = getElementDescriptionFilenameExt(basename);
+  if (filename != NULL)
     return filename;
 
   return NULL;
