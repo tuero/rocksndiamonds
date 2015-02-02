@@ -255,13 +255,13 @@ auto-conf:
 		$(CNFS_CMD) $$i > $$i;		\
 	done
 
-conf_gfx.h: conf_gfx.c
+conf_gfx.h: conf_gfx.c $(CNFS_CMD)
 	@$(MAKE) auto-conf
 
-conf_snd.h: conf_snd.c
+conf_snd.h: conf_snd.c $(CNFS_CMD)
 	@$(MAKE) auto-conf
 
-conf_mus.h: conf_mus.c
+conf_mus.h: conf_mus.c $(CNFS_CMD)
 	@$(MAKE) auto-conf
 
 # $(TIMESTAMP_FILE): $(SRCS) $(LIBGAME) $(GAME_EM) $(GAME_SP)
