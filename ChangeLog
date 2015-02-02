@@ -1,3 +1,11 @@
+2015-02-02
+	* fixed configurability of editor element palette (for columns != 4)
+
+2015-01-29
+	* improved configurability of tape date and time display positions
+	* added configurability of element properties button in editor
+	* added build dependency for auto-conf files
+
 2015-01-27
 	* added looking for editor element descriptions in level set directory
 	  (for example, in file "<my-level-folder>/docs/elements/custom_1.txt")
