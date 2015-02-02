@@ -5298,15 +5298,20 @@ static void CreateControlButtons()
     }
     else
     {
-      gd_xoffset = DX - EX + ED_CTRL5_BUTTONS_XPOS;
-      gd_yoffset = DY - EY + ED_CTRL5_BUTTONS_YPOS;
-      width  = ED_CTRL5_BUTTON_XSIZE;
-      height = ED_CTRL5_BUTTON_YSIZE;
+      int graphic = IMG_EDITOR_BUTTON_GFX_PROPERTIES;
+      struct GraphicInfo *gd = &graphic_info[graphic];
+      struct XY ebi = editor.button.properties;
 
-      gd_x1 = DOOR_GFX_PAGEX6 + ED_CTRL5_BUTTONS_GFX_XPOS;
+      gd_bitmap = gd->bitmap;
+      gd_xoffset = DX - EX + ebi.x;
+      gd_yoffset = DY - EY + ebi.y;
+      width  = gd->width;
+      height = gd->height;
+
+      gd_x1 = gd->src_x;
       gd_x2 = 0;	/* no alternative graphic for these buttons */
-      gd_y1 = DOOR_GFX_PAGEY1 + ED_CTRL5_BUTTONS_GFX_YPOS;
-      gd_y2 = DOOR_GFX_PAGEY1 + ED_CTRL5_BUTTONS_GFX_YPOS - height;
+      gd_y1 = gd->src_y;
+      gd_y2 = gd->src_y + gd->pressed_yoffset;
     }
 
     if (id < ED_NUM_CTRL1_4_BUTTONS)
