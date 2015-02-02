@@ -294,12 +294,16 @@ void DrawVideoDisplay(unsigned int state, unsigned int value)
   {
     struct TextPosInfo *pos = &tape.text.date;
     int tag = value % 100;
-    int monat = (value/100) % 100;
-    int jahr = (value/10000);
+    int monat = (value / 100) % 100;
+    int jahr = (value / 10000);
+    int xpos1 = VX + pos->x;
+    int xpos2 = VX + pos->x + pos->xoffset;
+    int xpos3 = VX + pos->x + pos->xoffset2;
+    int ypos  = VY + pos->y;
 
-    DrawText(VX + pos->x,      VY + pos->y, int2str(tag, 2),   pos->font);
-    DrawText(VX + pos->x + 27, VY + pos->y, monatsname[monat], pos->font);
-    DrawText(VX + pos->x + 64, VY + pos->y, int2str(jahr, 2),  pos->font);
+    DrawText(xpos1, ypos, int2str(tag, 2),   pos->font);
+    DrawText(xpos2, ypos, monatsname[monat], pos->font);
+    DrawText(xpos3, ypos, int2str(jahr, 2),  pos->font);
   }
 
   if (state & VIDEO_STATE_TIME_ON)
@@ -307,9 +311,12 @@ void DrawVideoDisplay(unsigned int state, unsigned int value)
     struct TextPosInfo *pos = &tape.text.time;
     int min = value / 60;
     int sec = value % 60;
+    int xpos1 = VX + pos->x;
+    int xpos2 = VX + pos->x + pos->xoffset;
+    int ypos  = VY + pos->y;
 
-    DrawText(VX + pos->x,      VY + pos->y, int2str(min, 2), pos->font);
-    DrawText(VX + pos->x + 27, VY + pos->y, int2str(sec, 2), pos->font);
+    DrawText(xpos1, ypos, int2str(min, 2), pos->font);
+    DrawText(xpos2, ypos, int2str(sec, 2), pos->font);
   }
 
   redraw_mask |= REDRAW_DOOR_2;

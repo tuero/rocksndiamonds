@@ -1204,13 +1204,15 @@ struct DoorPartPosInfo
 struct TextPosInfo
 {
   int x, y;
+  int xoffset;			/* special case for tape date and time */
+  int xoffset2;			/* special case for tape date */
   int width, height;
   int align, valign;
-  int size;
+  int size;			/* also used for suffix ".digits" */
   int font, font_alt;
   boolean draw_masked;
   boolean draw_player;		/* special case for network player buttons */
-  int sort_priority;
+  int sort_priority;		/* also used for suffix ".draw_order" */
   int id;
 };
 

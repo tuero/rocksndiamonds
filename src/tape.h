@@ -133,7 +133,16 @@ struct TapeLabelInfo
 struct TapeTextInfo
 {
   struct TextPosInfo date;
+  struct TextPosInfo date_yyyy;
+  struct TextPosInfo date_yy;
+  struct TextPosInfo date_mmm;
+  struct TextPosInfo date_mm;
+  struct TextPosInfo date_dd;
+
   struct TextPosInfo time;
+  struct TextPosInfo time_hh;
+  struct TextPosInfo time_mm;
+  struct TextPosInfo time_ss;
 };
 
 struct TapeInfo
