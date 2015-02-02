@@ -4946,7 +4946,9 @@ static void ReinitializeElementList()
     {
       if (setup.editor.el_headlines)
       {
-	num_editor_elements += *editor_elements_info[i].headline_list_size;
+	// required for correct padding of palette headline buttons
+	if (*editor_elements_info[i].headline_list_size > 0)
+	  num_editor_elements += editor.palette.cols;
 
 	for (j = 0; j < *editor_elements_info[i].headline_list_size; j++)
 	{
@@ -4960,7 +4962,13 @@ static void ReinitializeElementList()
       if (found_inactive_cascade)
 	continue;
 
-      num_editor_elements += *editor_elements_info[i].element_list_size;
+      // required for correct padding of palette element buttons
+      int element_list_size = *editor_elements_info[i].element_list_size;
+      int element_rows =
+	(element_list_size + editor.palette.cols - 1) / editor.palette.cols;
+      int element_buttons = editor.palette.cols * element_rows;
+
+      num_editor_elements += element_buttons;
     }
   }
 
@@ -4984,9 +4992,16 @@ static void ReinitializeElementList()
     {
       if (setup.editor.el_headlines)
       {
-	for (j = 0; j < *editor_elements_info[i].headline_list_size; j++)
+	// required for correct padding of palette headline buttons
+	int headline_size = (*editor_elements_info[i].headline_list_size > 0 ?
+			     editor.palette.cols : 0);
+
+	for (j = 0; j < headline_size; j++)
 	{
-	  int element = (*editor_elements_info[i].headline_list)[j];
+	  // use empty elements for padding of palette headline buttons
+	  int element = (j < *editor_elements_info[i].headline_list_size ?
+			 (*editor_elements_info[i].headline_list)[j] :
+			 editor_el_empty[0]);
 
 	  editor_elements[pos++] = element;
 
@@ -4998,8 +5013,19 @@ static void ReinitializeElementList()
       if (found_inactive_cascade)
 	continue;
 
-      for (j = 0; j < *editor_elements_info[i].element_list_size; j++)
+      // required for correct padding of palette element buttons
+      int element_list_size = *editor_elements_info[i].element_list_size;
+      int element_rows =
+	(element_list_size + editor.palette.cols - 1) / editor.palette.cols;
+      int element_buttons = editor.palette.cols * element_rows;
+
+      // copy all elements from element list
+      for (j = 0; j < element_list_size; j++)
 	editor_elements[pos++] = (*editor_elements_info[i].element_list)[j];
+
+      // use empty elements for padding of palette element buttons
+      for (j = 0; j < element_buttons - element_list_size; j++)
+	editor_elements[pos++] = editor_el_empty[0];
     }
   }
 
