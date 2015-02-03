@@ -2391,6 +2391,7 @@ sub print_image_config_vars
 	    # --- some suffix replacements ---
 
 	    $var =~ s/^(menu\.main\..*)\.chars$/$1.size/;
+	    $var =~ s/^(tape\.text\..*)\.chars$/$1.size/;
 	    $var =~ s/^(game\.panel\..*)\.chars$/$1.size/;
 	    $var =~ s/^(game\.panel\..*)\.tile_size$/$1.size/;
 	    $var =~ s/^(request\.button\..*)\.tile_size$/$1.size/;

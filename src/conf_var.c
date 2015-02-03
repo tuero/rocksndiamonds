@@ -6135,32 +6135,32 @@ struct TokenIntPtrInfo image_config_vars[] =
     &tape.text.date_yy.draw_masked
   },
   {
-    "tape.text.date_mmm.x",
-    &tape.text.date_mmm.x
+    "tape.text.date_mon.x",
+    &tape.text.date_mon.x
   },
   {
-    "tape.text.date_mmm.y",
-    &tape.text.date_mmm.y
+    "tape.text.date_mon.y",
+    &tape.text.date_mon.y
   },
   {
-    "tape.text.date_mmm.align",
-    &tape.text.date_mmm.align
+    "tape.text.date_mon.align",
+    &tape.text.date_mon.align
   },
   {
-    "tape.text.date_mmm.valign",
-    &tape.text.date_mmm.valign
+    "tape.text.date_mon.valign",
+    &tape.text.date_mon.valign
   },
   {
-    "tape.text.date_mmm.digits",
-    &tape.text.date_mmm.size
+    "tape.text.date_mon.chars",
+    &tape.text.date_mon.size
   },
   {
-    "tape.text.date_mmm.font",
-    &tape.text.date_mmm.font
+    "tape.text.date_mon.font",
+    &tape.text.date_mon.font
   },
   {
-    "tape.text.date_mmm.draw_masked",
-    &tape.text.date_mmm.draw_masked
+    "tape.text.date_mon.draw_masked",
+    &tape.text.date_mon.draw_masked
   },
   {
     "tape.text.date_mm.x",

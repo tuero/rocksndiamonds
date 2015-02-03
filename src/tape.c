@@ -186,14 +186,9 @@ static struct GadgetInfo *tape_gadget[NUM_TAPE_BUTTONS];
 /* video display functions                                                   */
 /* ========================================================================= */
 
-void DrawVideoDisplay(unsigned int state, unsigned int value)
+static void DrawVideoDisplay_Graphics(unsigned int state, unsigned int value)
 {
   int i, j, k;
-  static char *monatsname[12] =
-  {
-    "JAN", "FEB", "MAR", "APR", "MAY", "JUN",
-    "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"
-  };
 
   static struct
   {
@@ -289,35 +284,136 @@ void DrawVideoDisplay(unsigned int state, unsigned int value)
       }
     }
   }
+}
 
-  if (state & VIDEO_STATE_DATE_ON)
+
+#define DATETIME_NONE			(0)
+
+#define DATETIME_DATE_YYYY		(1 << 0)
+#define DATETIME_DATE_YY		(1 << 1)
+#define DATETIME_DATE_MON		(1 << 2)
+#define DATETIME_DATE_MM		(1 << 3)
+#define DATETIME_DATE_DD		(1 << 4)
+
+#define DATETIME_TIME_HH		(1 << 5)
+#define DATETIME_TIME_MIN		(1 << 6)
+#define DATETIME_TIME_MM		(1 << 7)
+#define DATETIME_TIME_SS		(1 << 8)
+
+#define DATETIME_XOFFSET_1		(1 << 9)
+#define DATETIME_XOFFSET_2		(1 << 10)
+
+#define DATETIME_DATE			(DATETIME_DATE_YYYY	|	\
+					 DATETIME_DATE_YY	|	\
+					 DATETIME_DATE_MON	|	\
+					 DATETIME_DATE_MM	|	\
+					 DATETIME_DATE_DD)
+
+#define DATETIME_TIME			(DATETIME_TIME_HH	|	\
+					 DATETIME_TIME_MIN	|	\
+					 DATETIME_TIME_MM	|	\
+					 DATETIME_TIME_SS)
+
+#define MAX_DATETIME_STRING_SIZE	32
+
+static void DrawVideoDisplay_DateTime(unsigned int state, unsigned int value)
+{
+  int i;
+
+  static char *month_shortnames[] =
   {
-    struct TextPosInfo *pos = &tape.text.date;
-    int tag = value % 100;
-    int monat = (value / 100) % 100;
-    int jahr = (value / 10000);
-    int xpos1 = VX + pos->x;
-    int xpos2 = VX + pos->x + pos->xoffset;
-    int xpos3 = VX + pos->x + pos->xoffset2;
-    int ypos  = VY + pos->y;
+    "JAN",
+    "FEB",
+    "MAR",
+    "APR",
+    "MAY",
+    "JUN",
+    "JUL",
+    "AUG",
+    "SEP",
+    "OCT",
+    "NOV",
+    "DEC"
+  };
 
-    DrawText(xpos1, ypos, int2str(tag, 2),   pos->font);
-    DrawText(xpos2, ypos, monatsname[monat], pos->font);
-    DrawText(xpos3, ypos, int2str(jahr, 2),  pos->font);
-  }
-
-  if (state & VIDEO_STATE_TIME_ON)
+  static struct
   {
-    struct TextPosInfo *pos = &tape.text.time;
-    int min = value / 60;
-    int sec = value % 60;
-    int xpos1 = VX + pos->x;
-    int xpos2 = VX + pos->x + pos->xoffset;
-    int ypos  = VY + pos->y;
-
-    DrawText(xpos1, ypos, int2str(min, 2), pos->font);
-    DrawText(xpos2, ypos, int2str(sec, 2), pos->font);
+    struct TextPosInfo *pos;
+    int type;
   }
+  datetime_info[] =
+  {
+    { &tape.text.date,		DATETIME_DATE_DD			},
+    { &tape.text.date,		DATETIME_DATE_MON | DATETIME_XOFFSET_1	},
+    { &tape.text.date,		DATETIME_DATE_YY  | DATETIME_XOFFSET_2	},
+    { &tape.text.date_yyyy,	DATETIME_DATE_YYYY			},
+    { &tape.text.date_yy,	DATETIME_DATE_YY			},
+    { &tape.text.date_mon,	DATETIME_DATE_MON			},
+    { &tape.text.date_mm,	DATETIME_DATE_MM			},
+    { &tape.text.date_dd,	DATETIME_DATE_DD			},
+
+    { &tape.text.time,		DATETIME_TIME_MIN			},
+    { &tape.text.time,		DATETIME_TIME_SS  | DATETIME_XOFFSET_1	},
+    { &tape.text.time_hh,	DATETIME_TIME_HH			},
+    { &tape.text.time_mm,	DATETIME_TIME_MM			},
+    { &tape.text.time_ss,	DATETIME_TIME_SS			},
+
+    { NULL,			DATETIME_NONE				},
+  };
+
+  for (i = 0; datetime_info[i].pos != NULL; i++)
+  {
+    struct TextPosInfo *pos = datetime_info[i].pos;
+    int type = datetime_info[i].type;
+    int xpos, ypos;
+
+    if (pos->x == -1 &&
+	pos->y == -1)
+      continue;
+
+    xpos = VX + pos->x + (type & DATETIME_XOFFSET_1 ? pos->xoffset  :
+			  type & DATETIME_XOFFSET_2 ? pos->xoffset2 : 0);
+    ypos = VY + pos->y;
+
+    if ((type & DATETIME_DATE) && (state & VIDEO_STATE_DATE_ON))
+    {
+      char s[MAX_DATETIME_STRING_SIZE];
+      int year2 = value / 10000;
+      int year4 = (year2 < 70 ? 2000 + year2 : 1900 + year2);
+      int month_index = (value / 100) % 100;
+      int month = month_index + 1;
+      int day = value % 100;
+
+      strcpy(s, (type & DATETIME_DATE_YYYY ? int2str(year4, 4) :
+		 type & DATETIME_DATE_YY   ? int2str(year2, 2) :
+		 type & DATETIME_DATE_MON  ? month_shortnames[month_index] :
+		 type & DATETIME_DATE_MM   ? int2str(month, 2) :
+		 type & DATETIME_DATE_DD   ? int2str(day, 2) : ""));
+
+      DrawText(xpos, ypos, s, pos->font);
+    }
+    else if ((type & DATETIME_TIME) && (state & VIDEO_STATE_TIME_ON))
+    {
+      char s[MAX_DATETIME_STRING_SIZE];
+      int hh = (value / 3600) % 100;
+      int min = value / 60;
+      int mm = (value / 60) % 60;
+      int ss = value % 60;
+
+      strcpy(s, (type & DATETIME_TIME_HH  ? int2str(hh, 2) :
+		 type & DATETIME_TIME_MIN ? int2str(min, 2) :
+		 type & DATETIME_TIME_MM  ? int2str(mm, 2) :
+		 type & DATETIME_TIME_SS  ? int2str(ss, 2) : ""));
+
+      DrawText(xpos, ypos, s, pos->font);
+    }
+  }
+}
+
+void DrawVideoDisplay(unsigned int state, unsigned int value)
+{
+  DrawVideoDisplay_Graphics(state, value);
+  DrawVideoDisplay_DateTime(state, value);
 
   redraw_mask |= REDRAW_DOOR_2;
 }
