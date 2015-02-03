@@ -4871,7 +4871,7 @@ struct ConfigInfo image_config[] =
   { "tape.label.gfx.date.width",		"90"			},
   { "tape.label.gfx.date.height",		"31"			},
   { "tape.label.gfx.time",			"RocksDoor.png"		},
-  { "tape.label.gfx.time.x",			"345"			},
+  { "tape.label.gfx.time.x",			"346"			},
   { "tape.label.gfx.time.y",			"335"			},
   { "tape.label.gfx.time.width",		"45"			},
   { "tape.label.gfx.time.height",		"13"			},
@@ -7089,7 +7089,7 @@ struct ConfigInfo image_config[] =
 
   { "tape.label.date.x",			"5"			},
   { "tape.label.date.y",			"5"			},
-  { "tape.label.time.x",			"45"			},
+  { "tape.label.time.x",			"46"			},
   { "tape.label.time.y",			"55"			},
 
   { "tape.text.date.x",				"7"			},
