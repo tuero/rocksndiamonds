@@ -1,5 +1,6 @@
 2015-02-03
 	* finished configurability of tape date and time display positions
+	* fixed bug with game buttons in tape area not properly redrawn
 
 2015-02-02
 	* fixed configurability of editor element palette (for columns != 4)

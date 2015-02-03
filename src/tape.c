@@ -1297,6 +1297,9 @@ void UnmapTapeButtons()
 
   for (i = 0; i < NUM_TAPE_BUTTONS; i++)
     UnmapGadget(tape_gadget[i]);
+
+  if (tape.show_game_buttons)
+    UnmapGameButtons();
 }
 
 static void HandleTapeButtonsExt(int id)
