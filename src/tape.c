@@ -139,7 +139,8 @@ static struct GadgetInfo *tape_gadget[NUM_TAPE_BUTTONS];
 #define PG_Y2(y)			(DOOR_GFX_PAGEY2 + (y))
 
 #define VIDEO_INFO_OFF			(VIDEO_STATE_DATE_OFF	|	\
-					 VIDEO_STATE_TIME_OFF)
+					 VIDEO_STATE_TIME_OFF	|	\
+					 VIDEO_STATE_FRAME_OFF)
 #define VIDEO_STATE_OFF			(VIDEO_STATE_PLAY_OFF	|	\
 					 VIDEO_STATE_REC_OFF	|	\
 					 VIDEO_STATE_PAUSE_OFF	|	\
@@ -156,7 +157,8 @@ static struct GadgetInfo *tape_gadget[NUM_TAPE_BUTTONS];
 	 				 VIDEO_PRESS_OFF)
 
 #define VIDEO_INFO_ON			(VIDEO_STATE_DATE_ON	|	\
-					 VIDEO_STATE_TIME_ON)
+					 VIDEO_STATE_TIME_ON	|	\
+					 VIDEO_STATE_FRAME_ON)
 #define VIDEO_STATE_ON			(VIDEO_STATE_PLAY_ON	|	\
 					 VIDEO_STATE_REC_ON	|	\
 					 VIDEO_STATE_PAUSE_ON	|	\
@@ -177,7 +179,7 @@ static struct GadgetInfo *tape_gadget[NUM_TAPE_BUTTONS];
 #define VIDEO_PRESS			(VIDEO_PRESS_ON | VIDEO_PRESS_OFF)
 #define VIDEO_ALL			(VIDEO_ALL_ON | VIDEO_ALL_OFF)
 
-#define NUM_TAPE_FUNCTIONS		10
+#define NUM_TAPE_FUNCTIONS		11
 #define NUM_TAPE_FUNCTION_PARTS		2
 #define NUM_TAPE_FUNCTION_STATES	2
 
@@ -218,6 +220,11 @@ static void DrawVideoDisplay_Graphics(unsigned int state, unsigned int value)
       { -1,					NULL			},
     },
     {
+      /* (no label for displaying optional frame) */
+      { -1,					NULL			},
+      { -1,					NULL			},
+    },
+    {
       { IMG_TAPE_LABEL_GFX_FAST_FORWARD,	&tape.label.fast_forward  },
       { IMG_TAPE_SYMBOL_GFX_FAST_FORWARD,	&tape.symbol.fast_forward },
     },
@@ -245,16 +252,18 @@ static void DrawVideoDisplay_Graphics(unsigned int state, unsigned int value)
     {
       for (j = 0; j < NUM_TAPE_FUNCTION_PARTS; j++)	/* label or symbol */
       {
-	if (video_pos[i][j].graphic == -1 ||
-	    video_pos[i][j].pos->x < 0 ||
-	    video_pos[i][j].pos->y < 0)
+	int graphic = video_pos[i][j].graphic;
+	struct Rect *pos = video_pos[i][j].pos;
+
+	if (graphic == -1 ||
+	    pos->x == -1 ||
+	    pos->y == -1)
 	  continue;
 
 	if (state & (1 << (i * 2 + k)))
 	{
 	  struct GraphicInfo *gfx_bg = &graphic_info[IMG_BACKGROUND_TAPE];
-	  struct GraphicInfo *gfx = &graphic_info[video_pos[i][j].graphic];
-	  struct Rect *pos = video_pos[i][j].pos;
+	  struct GraphicInfo *gfx = &graphic_info[graphic];
 	  Bitmap *gd_bitmap;
 	  int gd_x, gd_y;
 	  int skip_value =
@@ -300,8 +309,10 @@ static void DrawVideoDisplay_Graphics(unsigned int state, unsigned int value)
 #define DATETIME_TIME_MM		(1 << 7)
 #define DATETIME_TIME_SS		(1 << 8)
 
-#define DATETIME_XOFFSET_1		(1 << 9)
-#define DATETIME_XOFFSET_2		(1 << 10)
+#define DATETIME_FRAME			(1 << 9)
+
+#define DATETIME_XOFFSET_1		(1 << 10)
+#define DATETIME_XOFFSET_2		(1 << 11)
 
 #define DATETIME_DATE			(DATETIME_DATE_YYYY	|	\
 					 DATETIME_DATE_YY	|	\
@@ -358,6 +369,8 @@ static void DrawVideoDisplay_DateTime(unsigned int state, unsigned int value)
     { &tape.text.time_mm,	DATETIME_TIME_MM			},
     { &tape.text.time_ss,	DATETIME_TIME_SS			},
 
+    { &tape.text.frame,		DATETIME_FRAME				},
+
     { NULL,			DATETIME_NONE				},
   };
 
@@ -407,6 +420,10 @@ static void DrawVideoDisplay_DateTime(unsigned int state, unsigned int value)
 
       DrawText(xpos, ypos, s, pos->font);
     }
+    else if ((type & DATETIME_FRAME) && (state & VIDEO_STATE_FRAME_ON))
+    {
+      DrawText(xpos, ypos, int2str(value, pos->size), pos->font);
+    }
   }
 }
 
@@ -437,6 +454,7 @@ void DrawCompleteVideoDisplay()
     DrawVideoDisplay(VIDEO_STATE_REC_ON, 0);
     DrawVideoDisplay(VIDEO_STATE_DATE_ON, tape.date);
     DrawVideoDisplay(VIDEO_STATE_TIME_ON, tape.length_seconds);
+    DrawVideoDisplay(VIDEO_STATE_FRAME_ON, tape.length_frames);
 
     if (tape.pausing)
       DrawVideoDisplay(VIDEO_STATE_PAUSE_ON, 0);
@@ -446,6 +464,7 @@ void DrawCompleteVideoDisplay()
     DrawVideoDisplay(VIDEO_STATE_PLAY_ON, 0);
     DrawVideoDisplay(VIDEO_STATE_DATE_ON, tape.date);
     DrawVideoDisplay(VIDEO_STATE_TIME_ON, 0);
+    DrawVideoDisplay(VIDEO_STATE_FRAME_ON, 0);
 
     if (tape.pausing)
       DrawVideoDisplay(VIDEO_STATE_PAUSE_ON, 0);
@@ -454,6 +473,7 @@ void DrawCompleteVideoDisplay()
   {
     DrawVideoDisplay(VIDEO_STATE_DATE_ON, tape.date);
     DrawVideoDisplay(VIDEO_STATE_TIME_ON, tape.length_seconds);
+    DrawVideoDisplay(VIDEO_STATE_FRAME_ON, tape.length_frames);
   }
 
   BlitBitmap(drawto, bitmap_db_door_2, gfx.vx, gfx.vy, gfx.vxsize, gfx.vysize,
@@ -501,6 +521,7 @@ void TapeErase()
 
   tape.counter = 0;
   tape.length = 0;
+  tape.length_frames = 0;
   tape.length_seconds = 0;
 
   if (leveldir_current)
@@ -565,6 +586,7 @@ void TapeStartRecording(int random_seed)
   DrawVideoDisplay(VIDEO_STATE_REC_ON, 0);
   DrawVideoDisplay(VIDEO_STATE_DATE_ON, tape.date);
   DrawVideoDisplay(VIDEO_STATE_TIME_ON, 0);
+  DrawVideoDisplay(VIDEO_STATE_FRAME_ON, 0);
 
   MapTapeWarpButton();
 
@@ -615,7 +637,8 @@ void TapeHaltRecording()
   tape.pos[tape.counter].delay = 0;
 
   tape.length = tape.counter;
-  tape.length_seconds = GetTapeLength();
+  tape.length_frames = GetTapeLengthFrames();
+  tape.length_seconds = GetTapeLengthSeconds();
 }
 
 void TapeStopRecording()
@@ -737,6 +760,7 @@ void TapeStartPlaying()
   DrawVideoDisplay(VIDEO_STATE_PLAY_ON, 0);
   DrawVideoDisplay(VIDEO_STATE_DATE_ON, tape.date);
   DrawVideoDisplay(VIDEO_STATE_TIME_ON, 0);
+  DrawVideoDisplay(VIDEO_STATE_FRAME_ON, 0);
 
   MapTapeWarpButton();
 
@@ -881,21 +905,27 @@ void TapeStop()
   {
     DrawVideoDisplay(VIDEO_STATE_DATE_ON, tape.date);
     DrawVideoDisplay(VIDEO_STATE_TIME_ON, tape.length_seconds);
+    DrawVideoDisplay(VIDEO_STATE_FRAME_ON, tape.length_frames);
   }
 }
 
-unsigned int GetTapeLength()
+unsigned int GetTapeLengthFrames()
 {
-  unsigned int tape_length = 0;
+  unsigned int tape_length_frames = 0;
   int i;
 
   if (TAPE_IS_EMPTY(tape))
     return(0);
 
   for (i = 0; i < tape.length; i++)
-    tape_length += tape.pos[i].delay;
+    tape_length_frames += tape.pos[i].delay;
 
-  return(tape_length * GAME_FRAME_DELAY / 1000);
+  return tape_length_frames;
+}
+
+unsigned int GetTapeLengthSeconds()
+{
+  return (GetTapeLengthFrames() * GAME_FRAME_DELAY / 1000);
 }
 
 static void TapeStartWarpForward()

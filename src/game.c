@@ -10832,6 +10832,9 @@ static void CheckLevelTime()
       DrawVideoDisplay(VIDEO_STATE_TIME_ON, TapeTime);
   }
 
+  if (tape.recording || tape.playing)
+    DrawVideoDisplay(VIDEO_STATE_FRAME_ON, FrameCounter);
+
   UpdateAndDisplayGameControlValues();
 }
 

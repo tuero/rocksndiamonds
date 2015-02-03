@@ -3743,7 +3743,8 @@ static void CopyNativeTape_SP_to_RND(struct LevelInfo *level)
     tape.pos[i].delay = demo_repeat + 1;
   }
 
-  tape.length_seconds = GetTapeLength();
+  tape.length_frames  = GetTapeLengthFrames();
+  tape.length_seconds = GetTapeLengthSeconds();
 }
 
 
@@ -7430,7 +7431,8 @@ void LoadTape_SokobanSolution(char *filename)
   if (tape.no_valid_file)
     return;
 
-  tape.length_seconds = GetTapeLength();
+  tape.length_frames  = GetTapeLengthFrames();
+  tape.length_seconds = GetTapeLengthSeconds();
 }
 
 void LoadTapeFromFilename(char *filename)
@@ -7572,7 +7574,8 @@ void LoadTapeFromFilename(char *filename)
 
   closeFile(file);
 
-  tape.length_seconds = GetTapeLength();
+  tape.length_frames  = GetTapeLengthFrames();
+  tape.length_seconds = GetTapeLengthSeconds();
 
 #if 0
   printf("::: tape file version: %d\n",   tape.file_version);

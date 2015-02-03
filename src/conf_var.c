@@ -6335,6 +6335,34 @@ struct TokenIntPtrInfo image_config_vars[] =
     &tape.text.time_ss.draw_masked
   },
   {
+    "tape.text.frame.x",
+    &tape.text.frame.x
+  },
+  {
+    "tape.text.frame.y",
+    &tape.text.frame.y
+  },
+  {
+    "tape.text.frame.align",
+    &tape.text.frame.align
+  },
+  {
+    "tape.text.frame.valign",
+    &tape.text.frame.valign
+  },
+  {
+    "tape.text.frame.digits",
+    &tape.text.frame.size
+  },
+  {
+    "tape.text.frame.font",
+    &tape.text.frame.font
+  },
+  {
+    "tape.text.frame.draw_masked",
+    &tape.text.frame.draw_masked
+  },
+  {
     "tape.show_game_buttons",
     &tape.show_game_buttons
   },
