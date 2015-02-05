@@ -14700,7 +14700,7 @@ boolean CheckEngineSnapshot()
 static struct
 {
   int graphic;
-  struct Rect *pos;
+  struct XY *pos;
   int gadget_id;
   char *infotext;
 } gamebutton_info[NUM_GAME_BUTTONS] =
@@ -14746,7 +14746,7 @@ void CreateGameButtons()
   for (i = 0; i < NUM_GAME_BUTTONS; i++)
   {
     struct GraphicInfo *gfx = &graphic_info[gamebutton_info[i].graphic];
-    struct Rect *pos = gamebutton_info[i].pos;
+    struct XY *pos = gamebutton_info[i].pos;
     struct GadgetInfo *gi;
     int button_type;
     boolean checked;

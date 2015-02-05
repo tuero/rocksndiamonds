@@ -1,3 +1,6 @@
+2015-02-04
+	* added configurability of editor control buttons (toolbox buttons)
+
 2015-02-03
 	* finished configurability of tape date and time display positions
 	* fixed bug with game buttons in tape area not properly redrawn

@@ -32,39 +32,6 @@
 */
 
 /* values for the control window */
-#define ED_CTRL_NO_BUTTONS_GFX_XPOS 	6
-#define ED_CTRL_NO_BUTTONS_GFX_YPOS 	286
-#define ED_CTRL1_BUTTONS_GFX_YPOS 	236
-#define ED_CTRL2_BUTTONS_GFX_YPOS 	236
-#define ED_CTRL3_BUTTONS_GFX_YPOS 	324
-#define ED_CTRL4_BUTTONS_GFX_XPOS 	44
-#define ED_CTRL4_BUTTONS_GFX_YPOS 	214
-#define ED_CTRL1_BUTTONS_ALT_GFX_YPOS 	142
-#define ED_CTRL3_BUTTONS_ALT_GFX_YPOS 	302
-#define ED_CTRL5_BUTTONS_GFX_XPOS 	5
-#define ED_CTRL5_BUTTONS_GFX_YPOS 	110
-
-#define ED_CTRL1_BUTTON_XSIZE		22
-#define ED_CTRL1_BUTTON_YSIZE		22
-#define ED_CTRL1_BUTTONS_XPOS		6
-#define ED_CTRL1_BUTTONS_YPOS		6
-#define ED_CTRL2_BUTTON_XSIZE		30
-#define ED_CTRL2_BUTTON_YSIZE		20
-#define ED_CTRL2_BUTTONS_XPOS		5
-#define ED_CTRL2_BUTTONS_YPOS		99
-#define ED_CTRL3_BUTTON_XSIZE		22
-#define ED_CTRL3_BUTTON_YSIZE		22
-#define ED_CTRL3_BUTTONS_XPOS		6
-#define ED_CTRL3_BUTTONS_YPOS		6
-#define ED_CTRL4_BUTTON_XSIZE		22
-#define ED_CTRL4_BUTTON_YSIZE		22
-#define ED_CTRL4_BUTTONS_XPOS		6
-#define ED_CTRL4_BUTTONS_YPOS		6
-#define ED_CTRL5_BUTTON_XSIZE		90
-#define ED_CTRL5_BUTTON_YSIZE		20
-#define ED_CTRL5_BUTTONS_XPOS		5
-#define ED_CTRL5_BUTTONS_YPOS		230
-
 #define ED_CTRL1_BUTTONS_HORIZ		4
 #define ED_CTRL1_BUTTONS_VERT		4
 #define ED_CTRL2_BUTTONS_HORIZ		3
@@ -980,45 +947,168 @@
 
 static struct
 {
+  int graphic;
+  int gadget_id;
+  struct XY *pos;
+  int gadget_type;
+  char *infotext;
   char shortcut;
-  char *text;
-} control_info[ED_NUM_CTRL_BUTTONS] =
+} controlbutton_info[ED_NUM_CTRL_BUTTONS] =
 {
   /* note: some additional characters are already reserved for "cheat mode"
      shortcuts (":XYZ" style) -- for details, see "events.c" */
 
-  { 's',	"draw single items"			},
-  { 'd',	"draw connected items"			},
-  { 'l',	"draw lines"				},
-  { 'a',	"draw arcs"				},
-  { 'r',	"draw outline rectangles"		},
-  { 'R',	"draw filled rectangles"		},
-  { '\0',	"wrap (rotate) level up"		},
-  { 't',	"enter text elements"			},
-  { 'f',	"flood fill"				},
-  { '\0',	"wrap (rotate) level left"		},
-  { 'z',	"zoom level tile size"			},
-  { '\0',	"wrap (rotate) level right"		},
-  { '\0',	"random element placement"		},
-  { 'b',	"grab brush"				},
-  { '\0',	"wrap (rotate) level down"		},
-  { ',',	"pick drawing element"			},
+  /* ---------- toolbox control buttons ------------------------------------ */
 
-  { 'U',	"undo last operation"			},
-  { 'I',	"properties of level"			},
-  { 'S',	"save level"				},
-  { 'C',	"clear level"				},
-  { 'T',	"test level"				},
-  { 'E',	"exit level editor"			},
+  {
+    IMG_EDITOR_BUTTON_GFX_DRAW_SINGLE,		GADGET_ID_SINGLE_ITEMS,
+    &editor.button.draw_single,			GD_TYPE_RADIO_BUTTON,
+    "draw single items",			's'
+  },
+  {
+    IMG_EDITOR_BUTTON_GFX_DRAW_CONNECTED,	GADGET_ID_CONNECTED_ITEMS,
+    &editor.button.draw_connected,		GD_TYPE_RADIO_BUTTON,
+    "draw connected items",			'd'
+  },
+  {
+    IMG_EDITOR_BUTTON_GFX_DRAW_LINE,		GADGET_ID_LINE,
+    &editor.button.draw_line,			GD_TYPE_RADIO_BUTTON,
+    "draw lines",				'l'
+  },
+  {
+    IMG_EDITOR_BUTTON_GFX_DRAW_ARC,		GADGET_ID_ARC,
+    &editor.button.draw_arc,			GD_TYPE_RADIO_BUTTON,
+    "draw arcs",				'a'
+  },
+  {
+    IMG_EDITOR_BUTTON_GFX_DRAW_RECTANGLE,	GADGET_ID_RECTANGLE,
+    &editor.button.draw_rectangle,		GD_TYPE_RADIO_BUTTON,
+    "draw outline rectangles",			'r'
+  },
+  {
+    IMG_EDITOR_BUTTON_GFX_DRAW_FILLED_BOX,	GADGET_ID_FILLED_BOX,
+    &editor.button.draw_filled_box,		GD_TYPE_RADIO_BUTTON,
+    "draw filled rectangles",			'R'
+  },
+  {
+    IMG_EDITOR_BUTTON_GFX_ROTATE_UP,		GADGET_ID_WRAP_UP,
+    &editor.button.rotate_up,			GD_TYPE_NORMAL_BUTTON,
+    "wrap (rotate) level up",			0
+  },
+  {
+    IMG_EDITOR_BUTTON_GFX_DRAW_TEXT,		GADGET_ID_TEXT,
+    &editor.button.draw_text,			GD_TYPE_RADIO_BUTTON,
+    "enter text elements",			't'
+  },
+  {
+    IMG_EDITOR_BUTTON_GFX_FLOOD_FILL,		GADGET_ID_FLOOD_FILL,
+    &editor.button.flood_fill,			GD_TYPE_RADIO_BUTTON,
+    "flood fill",				'f'
+  },
+  {
+    IMG_EDITOR_BUTTON_GFX_ROTATE_LEFT,		GADGET_ID_WRAP_LEFT,
+    &editor.button.rotate_left,			GD_TYPE_NORMAL_BUTTON,
+    "wrap (rotate) level left",			0
+  },
+  {
+    IMG_EDITOR_BUTTON_GFX_ZOOM_LEVEL,		GADGET_ID_ZOOM,
+    &editor.button.zoom_level,			GD_TYPE_NORMAL_BUTTON,
+    "zoom level tile size",			'z'
+  },
+  {
+    IMG_EDITOR_BUTTON_GFX_ROTATE_RIGHT,		GADGET_ID_WRAP_RIGHT,
+    &editor.button.rotate_right,		GD_TYPE_NORMAL_BUTTON,
+    "wrap (rotate) level right",		0
+  },
+  {
+    IMG_EDITOR_BUTTON_GFX_DRAW_RANDOM,		GADGET_ID_RANDOM_PLACEMENT,
+    &editor.button.draw_random,			GD_TYPE_NORMAL_BUTTON,
+    "random element placement",			0
+  },
+  {
+    IMG_EDITOR_BUTTON_GFX_GRAB_BRUSH,		GADGET_ID_GRAB_BRUSH,
+    &editor.button.grab_brush,			GD_TYPE_RADIO_BUTTON,
+    "grab brush",				'b'
+  },
+  {
+    IMG_EDITOR_BUTTON_GFX_ROTATE_DOWN,		GADGET_ID_WRAP_DOWN,
+    &editor.button.rotate_down,			GD_TYPE_NORMAL_BUTTON,
+    "wrap (rotate) level down",			0
+  },
+  {
+    IMG_EDITOR_BUTTON_GFX_PICK_ELEMENT,		GADGET_ID_PICK_ELEMENT,
+    &editor.button.pick_element,		GD_TYPE_RADIO_BUTTON,
+    "pick drawing element",			','
+  },
 
-  { '\0',	"copy settings from other element"	},
-  { '\0',	"copy settings to other element"	},
-  { '\0',	"exchange element with other element"	},
+  /* ---------- level control buttons -------------------------------------- */
 
-  { '\0',	"copy settings from this element"	},
-  { '\0',	"paste settings to this element"	},
+  {
+    IMG_EDITOR_BUTTON_GFX_UNDO,			GADGET_ID_UNDO,
+    &editor.button.undo,			GD_TYPE_NORMAL_BUTTON,
+    "undo last operation",			'U'
+  },
+  {
+    IMG_EDITOR_BUTTON_GFX_CONF,			GADGET_ID_INFO,
+    &editor.button.conf,			GD_TYPE_NORMAL_BUTTON,
+    "properties of level",			'I'
+  },
+  {
+    IMG_EDITOR_BUTTON_GFX_SAVE,			GADGET_ID_SAVE,
+    &editor.button.save,			GD_TYPE_NORMAL_BUTTON,
+    "save level",				'S'
+  },
+  {
+    IMG_EDITOR_BUTTON_GFX_CLEAR,		GADGET_ID_CLEAR,
+    &editor.button.clear,			GD_TYPE_NORMAL_BUTTON,
+    "clear level",				'C'
+  },
+  {
+    IMG_EDITOR_BUTTON_GFX_TEST,			GADGET_ID_TEST,
+    &editor.button.test,			GD_TYPE_NORMAL_BUTTON,
+    "test level",				'T'
+  },
+  {
+    IMG_EDITOR_BUTTON_GFX_EXIT,			GADGET_ID_EXIT,
+    &editor.button.exit,			GD_TYPE_NORMAL_BUTTON,
+    "exit level editor",			'E'
+  },
 
-  { 'p',	"properties of drawing element"		},
+  /* ---------- CE and GE control buttons ---------------------------------- */
+
+  {
+    IMG_EDITOR_BUTTON_GFX_CE_COPY_FROM,		GADGET_ID_CUSTOM_COPY_FROM,
+    &editor.button.ce_copy_from,		GD_TYPE_RADIO_BUTTON,
+    "copy settings from other element",		0
+  },
+  {
+    IMG_EDITOR_BUTTON_GFX_CE_COPY_TO,		GADGET_ID_CUSTOM_COPY_TO,
+    &editor.button.ce_copy_to,			GD_TYPE_RADIO_BUTTON,
+    "copy settings to other element",		0
+  },
+  {
+    IMG_EDITOR_BUTTON_GFX_CE_SWAP,		GADGET_ID_CUSTOM_EXCHANGE,
+    &editor.button.ce_swap,			GD_TYPE_RADIO_BUTTON,
+    "exchange element with other element",	0
+  },
+  {
+    IMG_EDITOR_BUTTON_GFX_CE_COPY,		GADGET_ID_CUSTOM_COPY,
+    &editor.button.ce_copy,			GD_TYPE_NORMAL_BUTTON,
+    "copy settings from this element",		0
+  },
+  {
+    IMG_EDITOR_BUTTON_GFX_CE_PASTE,		GADGET_ID_CUSTOM_PASTE,
+    &editor.button.ce_paste,			GD_TYPE_NORMAL_BUTTON,
+    "paste settings to this element",		0
+  },
+
+  /* ---------- palette control buttons ------------------------------------ */
+
+  {
+    IMG_EDITOR_BUTTON_GFX_PROPERTIES,		GADGET_ID_PROPERTIES,
+    &editor.button.properties,			GD_TYPE_NORMAL_BUTTON,
+    "properties of drawing element",		'p'
+  }
 };
 
 static int random_placement_value = 10;
@@ -5211,48 +5301,44 @@ void getElementListGraphicSource(int element, Bitmap **bitmap, int *x, int *y)
 
 static void CreateControlButtons()
 {
-  Bitmap *gd_bitmap = graphic_info[IMG_GLOBAL_DOOR].bitmap;
   struct GadgetInfo *gi;
-  unsigned int event_mask;
   int i;
 
   /* create toolbox buttons */
   for (i = 0; i < ED_NUM_CTRL_BUTTONS; i++)
   {
-    int id = i;
-    int width, height;
-    int gd_xoffset, gd_yoffset;
-    int gd_x1, gd_x2, gd_y1, gd_y2;
-    int gd_x1a, gd_x2a, gd_y1a, gd_y2a;
-    int button_type;
-    int radio_button_nr;
-    boolean checked;
+    int id = controlbutton_info[i].gadget_id;
+    int type = controlbutton_info[i].gadget_type;
+    int graphic = controlbutton_info[i].graphic;
+    struct XY *pos = controlbutton_info[i].pos;
+    struct GraphicInfo *gd = &graphic_info[graphic];
+    Bitmap *gd_bitmap = gd->bitmap;
+    int gd_x1 = gd->src_x;
+    int gd_y1 = gd->src_y;
+    int gd_x2 = gd->src_x + gd->pressed_xoffset;
+    int gd_y2 = gd->src_y + gd->pressed_yoffset;
+    int gd_x1a = gd->src_x + gd->active_xoffset;
+    int gd_y1a = gd->src_y + gd->active_yoffset;
+    int gd_x2a = gd->src_x + gd->active_xoffset + gd->pressed_xoffset;
+    int gd_y2a = gd->src_y + gd->active_yoffset + gd->pressed_yoffset;
+    int width  = gd->width;
+    int height = gd->height;
+    int x = pos->x;
+    int y = pos->y;
+    unsigned int event_mask;
+    int radio_button_nr = RADIO_NR_NONE;
+    boolean checked = FALSE;
 
-    if (id == GADGET_ID_SINGLE_ITEMS ||
-	id == GADGET_ID_CONNECTED_ITEMS ||
-	id == GADGET_ID_LINE ||
-	id == GADGET_ID_ARC ||
-	id == GADGET_ID_TEXT ||
-	id == GADGET_ID_RECTANGLE ||
-	id == GADGET_ID_FILLED_BOX ||
-	id == GADGET_ID_FLOOD_FILL ||
-	id == GADGET_ID_GRAB_BRUSH ||
-	id == GADGET_ID_PICK_ELEMENT ||
-	id == GADGET_ID_CUSTOM_COPY_FROM ||
-	id == GADGET_ID_CUSTOM_COPY_TO ||
-	id == GADGET_ID_CUSTOM_EXCHANGE)
+    if (type == GD_TYPE_RADIO_BUTTON)
     {
-      button_type = GD_TYPE_RADIO_BUTTON;
-      radio_button_nr = RADIO_NR_DRAWING_TOOLBOX;
-      checked = (id == drawing_function ? TRUE : FALSE);
       event_mask = GD_EVENT_PRESSED;
+      radio_button_nr = RADIO_NR_DRAWING_TOOLBOX;
+
+      if (id == drawing_function)
+	checked = TRUE;
     }
     else
     {
-      button_type = GD_TYPE_NORMAL_BUTTON;
-      radio_button_nr = RADIO_NR_NONE;
-      checked = FALSE;
-
       if (id == GADGET_ID_WRAP_LEFT ||
 	  id == GADGET_ID_WRAP_RIGHT ||
 	  id == GADGET_ID_WRAP_UP ||
@@ -5262,115 +5348,25 @@ static void CreateControlButtons()
 	event_mask = GD_EVENT_RELEASED;
     }
 
-    if (id < ED_NUM_CTRL1_BUTTONS)
+    if (id == GADGET_ID_PROPERTIES)
     {
-      int x = i % ED_CTRL1_BUTTONS_HORIZ;
-      int y = i / ED_CTRL1_BUTTONS_HORIZ;
-
-      gd_xoffset = ED_CTRL1_BUTTONS_XPOS + x * ED_CTRL1_BUTTON_XSIZE;
-      gd_yoffset = ED_CTRL1_BUTTONS_YPOS + y * ED_CTRL1_BUTTON_YSIZE;
-      width  = ED_CTRL1_BUTTON_XSIZE;
-      height = ED_CTRL1_BUTTON_YSIZE;
-
-      gd_x1 = DOOR_GFX_PAGEX8 + gd_xoffset;
-      gd_x2 = DOOR_GFX_PAGEX7 + gd_xoffset;
-      gd_y1 = DOOR_GFX_PAGEY1 + ED_CTRL1_BUTTONS_GFX_YPOS     + gd_yoffset;
-      gd_y2 = DOOR_GFX_PAGEY1 + ED_CTRL1_BUTTONS_ALT_GFX_YPOS + gd_yoffset;
-    }
-    else if (id < ED_NUM_CTRL1_2_BUTTONS)
-    {
-      int x = (i - ED_NUM_CTRL1_BUTTONS) % ED_CTRL2_BUTTONS_HORIZ;
-      int y = (i - ED_NUM_CTRL1_BUTTONS) / ED_CTRL2_BUTTONS_HORIZ;
-
-      gd_xoffset = ED_CTRL2_BUTTONS_XPOS + x * ED_CTRL2_BUTTON_XSIZE;
-      gd_yoffset = ED_CTRL2_BUTTONS_YPOS + y * ED_CTRL2_BUTTON_YSIZE;
-      width  = ED_CTRL2_BUTTON_XSIZE;
-      height = ED_CTRL2_BUTTON_YSIZE;
-
-      gd_x1 = DOOR_GFX_PAGEX8 + gd_xoffset;
-      gd_x2 = DOOR_GFX_PAGEX7 + gd_xoffset;
-      gd_y1 = DOOR_GFX_PAGEY1 + ED_CTRL2_BUTTONS_GFX_YPOS + gd_yoffset;
-      gd_y2 = 0;	/* no alternative graphic for these buttons */
-    }
-    else if (id < ED_NUM_CTRL1_3_BUTTONS)
-    {
-      int x = (i - ED_NUM_CTRL1_2_BUTTONS) % ED_CTRL3_BUTTONS_HORIZ + 1;
-      int y = (i - ED_NUM_CTRL1_2_BUTTONS) / ED_CTRL3_BUTTONS_HORIZ;
-
-      gd_xoffset = ED_CTRL3_BUTTONS_XPOS + x * ED_CTRL3_BUTTON_XSIZE;
-      gd_yoffset = ED_CTRL3_BUTTONS_YPOS + y * ED_CTRL3_BUTTON_YSIZE;
-      width  = ED_CTRL3_BUTTON_XSIZE;
-      height = ED_CTRL3_BUTTON_YSIZE;
-
-      gd_x1 = DOOR_GFX_PAGEX6 + gd_xoffset;
-      gd_x2 = DOOR_GFX_PAGEX5 + gd_xoffset;
-      gd_y1 = DOOR_GFX_PAGEY1 + ED_CTRL3_BUTTONS_GFX_YPOS     + gd_yoffset;
-      gd_y2 = DOOR_GFX_PAGEY1 + ED_CTRL3_BUTTONS_ALT_GFX_YPOS + gd_yoffset;
-    }
-    else if (id < ED_NUM_CTRL1_4_BUTTONS)
-    {
-      int x = (i - ED_NUM_CTRL1_3_BUTTONS) % ED_CTRL4_BUTTONS_HORIZ;
-      int y = (i - ED_NUM_CTRL1_3_BUTTONS) / ED_CTRL4_BUTTONS_HORIZ + 3;
-
-      gd_xoffset = ED_CTRL4_BUTTONS_XPOS + x * ED_CTRL4_BUTTON_XSIZE;
-      gd_yoffset = ED_CTRL4_BUTTONS_YPOS + y * ED_CTRL4_BUTTON_YSIZE;
-      width  = ED_CTRL4_BUTTON_XSIZE;
-      height = ED_CTRL4_BUTTON_YSIZE;
-
-      gd_x1 = DOOR_GFX_PAGEX6 + ED_CTRL4_BUTTONS_GFX_XPOS + gd_xoffset;
-      gd_x2 = DOOR_GFX_PAGEX5 + ED_CTRL4_BUTTONS_GFX_XPOS + gd_xoffset;
-      gd_y1 = DOOR_GFX_PAGEY1 + ED_CTRL4_BUTTONS_GFX_YPOS + gd_yoffset;
-      gd_y2 = 0;	/* no alternative graphic for these buttons */
+      x += DX;
+      y += DY;
     }
     else
     {
-      int graphic = IMG_EDITOR_BUTTON_GFX_PROPERTIES;
-      struct GraphicInfo *gd = &graphic_info[graphic];
-      struct XY ebi = editor.button.properties;
-
-      gd_bitmap = gd->bitmap;
-      gd_xoffset = DX - EX + ebi.x;
-      gd_yoffset = DY - EY + ebi.y;
-      width  = gd->width;
-      height = gd->height;
-
-      gd_x1 = gd->src_x;
-      gd_x2 = 0;	/* no alternative graphic for these buttons */
-      gd_y1 = gd->src_y;
-      gd_y2 = gd->src_y + gd->pressed_yoffset;
-    }
-
-    if (id < ED_NUM_CTRL1_4_BUTTONS)
-    {
-      gd_x1a = gd_x1;
-      gd_y1a = gd_y2;
-      gd_x2a = gd_x2;
-      gd_y2a = gd_y2;
-      gd_x1 = gd_x1;
-      gd_y1 = gd_y1;
-      gd_x2 = gd_x2;
-      gd_y2 = gd_y1;
-    }
-    else
-    {
-      gd_x1a = 0;
-      gd_y1a = 0;
-      gd_x2a = 0;
-      gd_y2a = 0;
-      gd_x1 = gd_x1;
-      gd_y1 = gd_y1;
-      gd_x2 = gd_x1;
-      gd_y2 = gd_y2;
+      x += EX;
+      y += EY;
     }
 
     gi = CreateGadget(GDI_CUSTOM_ID, id,
 		      GDI_CUSTOM_TYPE_ID, i,
-		      GDI_INFO_TEXT, control_info[i].text,
-		      GDI_X, EX + gd_xoffset,
-		      GDI_Y, EY + gd_yoffset,
+		      GDI_INFO_TEXT, controlbutton_info[i].infotext,
+		      GDI_X, x,
+		      GDI_Y, y,
 		      GDI_WIDTH, width,
 		      GDI_HEIGHT, height,
-		      GDI_TYPE, button_type,
+		      GDI_TYPE, type,
 		      GDI_STATE, GD_BUTTON_UNPRESSED,
 		      GDI_RADIO_NR, radio_button_nr,
 		      GDI_CHECKED, checked,
@@ -5409,36 +5405,27 @@ static void CreateControlButtons()
     int id = scrollbutton_info[i].gadget_id;
     int graphic = scrollbutton_info[i].graphic;
     struct GraphicInfo *gd = &graphic_info[graphic];
-    int x, y, width, height;
-    int gd_x1, gd_x2, gd_y1, gd_y2;
-
-    x = scrollbutton_pos[i].x;
-    y = scrollbutton_pos[i].y;
-
-    event_mask = GD_EVENT_PRESSED | GD_EVENT_REPEATED;
+    Bitmap *gd_bitmap = gd->bitmap;
+    int gd_x1 = gd->src_x;
+    int gd_y1 = gd->src_y;
+    int gd_x2 = gd->src_x + gd->pressed_xoffset;
+    int gd_y2 = gd->src_y + gd->pressed_yoffset;
+    int width  = gd->width;
+    int height = gd->height;
+    int x = scrollbutton_pos[i].x;
+    int y = scrollbutton_pos[i].y;
+    unsigned int event_mask = GD_EVENT_PRESSED | GD_EVENT_REPEATED;
 
     if (id == GADGET_ID_SCROLL_LIST_UP ||
 	id == GADGET_ID_SCROLL_LIST_DOWN)
     {
       x += DX;
       y += DY;
-      width  = gd->width;
-      height = gd->height;
-      gd_x1 = gd->src_x;
-      gd_y1 = gd->src_y;
-      gd_x2 = gd->src_x + gd->pressed_xoffset;
-      gd_y2 = gd->src_y + gd->pressed_yoffset;
     }
     else
     {
       x += SX;
       y += SY;
-      width  = gd->width;
-      height = gd->height;
-      gd_x1 = gd->src_x;
-      gd_y1 = gd->src_y;
-      gd_x2 = gd->src_x + gd->pressed_xoffset;
-      gd_y2 = gd->src_y + gd->pressed_yoffset;
     }
 
     gi = CreateGadget(GDI_CUSTOM_ID, id,
@@ -5466,27 +5453,24 @@ static void CreateControlButtons()
   /* create buttons for element list */
   for (i = 0; i < ED_NUM_ELEMENTLIST_BUTTONS; i++)
   {
-    struct GraphicInfo *gd = &graphic_info[IMG_EDITOR_PALETTE_BUTTON];
+    int id = GADGET_ID_ELEMENTLIST_FIRST + i;
+    int graphic = IMG_EDITOR_PALETTE_BUTTON;
+    struct GraphicInfo *gd = &graphic_info[graphic];
+    Bitmap *gd_bitmap = gd->bitmap;
     Bitmap *deco_bitmap;
     int deco_x, deco_y, deco_xpos, deco_ypos;
-    int gd_xoffset, gd_yoffset;
-    int gd_x1, gd_y1, gd_x2, gd_y2;
-    int x = i % ED_ELEMENTLIST_BUTTONS_HORIZ;
-    int y = i / ED_ELEMENTLIST_BUTTONS_HORIZ;
-    int id = GADGET_ID_ELEMENTLIST_FIRST + i;
+    int gd_x1 = gd->src_x;
+    int gd_y1 = gd->src_y;
+    int gd_x2 = gd->src_x + gd->pressed_xoffset;
+    int gd_y2 = gd->src_y + gd->pressed_yoffset;
+    int xx = i % ED_ELEMENTLIST_BUTTONS_HORIZ;
+    int yy = i / ED_ELEMENTLIST_BUTTONS_HORIZ;
+    int x = DX + ED_ELEMENTLIST_XPOS + xx * gd->width;
+    int y = DY + ED_ELEMENTLIST_YPOS + yy * gd->height;
     int element = editor_elements[i];
     int tile_size = (editor.palette.tile_size >= TILESIZE ? TILESIZE :
 		     MINI_TILESIZE);
-
-    event_mask = GD_EVENT_RELEASED;
-
-    gd_xoffset = ED_ELEMENTLIST_XPOS + x * gd->width;
-    gd_yoffset = ED_ELEMENTLIST_YPOS + y * gd->height;
-
-    gd_x1 = gd->src_x;
-    gd_y1 = gd->src_y;
-    gd_x2 = gd->src_x + gd->pressed_xoffset;
-    gd_y2 = gd->src_y + gd->pressed_yoffset;
+    unsigned int event_mask = GD_EVENT_RELEASED;
 
     getElementListGraphicSource(element, &deco_bitmap, &deco_x, &deco_y);
     deco_xpos = (gd->width  - tile_size) / 2;
@@ -5495,14 +5479,14 @@ static void CreateControlButtons()
     gi = CreateGadget(GDI_CUSTOM_ID, id,
 		      GDI_CUSTOM_TYPE_ID, i,
 		      GDI_INFO_TEXT, getElementInfoText(element),
-		      GDI_X, DX + gd_xoffset,
-		      GDI_Y, DY + gd_yoffset,
+		      GDI_X, x,
+		      GDI_Y, y,
 		      GDI_WIDTH, gd->width,
 		      GDI_HEIGHT, gd->height,
 		      GDI_TYPE, GD_TYPE_NORMAL_BUTTON,
 		      GDI_STATE, GD_BUTTON_UNPRESSED,
-		      GDI_DESIGN_UNPRESSED, gd->bitmap, gd_x1, gd_y1,
-		      GDI_DESIGN_PRESSED, gd->bitmap, gd_x2, gd_y2,
+		      GDI_DESIGN_UNPRESSED, gd_bitmap, gd_x1, gd_y1,
+		      GDI_DESIGN_PRESSED, gd_bitmap, gd_x2, gd_y2,
 		      GDI_DECORATION_DESIGN, deco_bitmap, deco_x, deco_y,
 		      GDI_DECORATION_POSITION, deco_xpos, deco_ypos,
 		      GDI_DECORATION_SIZE, tile_size, tile_size,
@@ -6686,7 +6670,6 @@ static void UnmapLevelEditorToolboxCustomGadgets()
 
 static void MapOrUnmapLevelEditorToolboxDrawingGadgets(boolean map)
 {
-  Bitmap *gd_bitmap = graphic_info[IMG_GLOBAL_DOOR].bitmap;
   int i;
 
   for (i = 0; i < ED_NUM_CTRL1_BUTTONS; i++)
@@ -6697,14 +6680,17 @@ static void MapOrUnmapLevelEditorToolboxDrawingGadgets(boolean map)
       struct GadgetInfo *gi = level_editor_gadget[i];
 
       if (map)
+      {
 	MapGadget(gi);
+      }
       else
       {
+	int graphic = IMG_EDITOR_NO_TOOLBOX_BUTTON;
+	struct GraphicInfo *gd = &graphic_info[graphic];
+
 	UnmapGadget(gi);
 
-	BlitBitmap(gd_bitmap, drawto,
-		   DOOR_GFX_PAGEX6 + ED_CTRL_NO_BUTTONS_GFX_XPOS,
-		   DOOR_GFX_PAGEY1 + ED_CTRL_NO_BUTTONS_GFX_YPOS,
+	BlitBitmap(gd->bitmap, drawto, gd->src_x, gd->src_y,
 		   gi->width, gi->height, gi->x, gi->y);
 
 	redraw_mask |= REDRAW_DOOR_3;
@@ -11718,7 +11704,7 @@ void HandleLevelEditorKeyInput(Key key)
       ClickOnGadget(level_editor_gadget[GADGET_ID_TEST], button);
     else
       for (i = 0; i < ED_NUM_CTRL_BUTTONS; i++)
-	if (letter && letter == control_info[i].shortcut)
+	if (letter && letter == controlbutton_info[i].shortcut)
 	  if (!anyTextGadgetActive())
 	    ClickOnGadget(level_editor_gadget[i], button);
   }
@@ -11773,7 +11759,7 @@ void PrintEditorGadgetInfoText(struct GadgetInfo *gi)
 
   if (gi->custom_id < ED_NUM_CTRL_BUTTONS)
   {
-    int key = control_info[gi->custom_id].shortcut;
+    int key = controlbutton_info[gi->custom_id].shortcut;
 
     if (key)
     {

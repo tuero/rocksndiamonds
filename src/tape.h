@@ -96,41 +96,41 @@
 
 struct TapeButtonInfo
 {
-  struct Rect eject;
-  struct Rect stop;
-  struct Rect pause;
-  struct Rect record;
-  struct Rect play;
+  struct XY eject;
+  struct XY stop;
+  struct XY pause;
+  struct XY record;
+  struct XY play;
 };
 
 struct TapeSymbolInfo
 {
-  struct Rect eject;
-  struct Rect stop;
-  struct Rect pause;
-  struct Rect record;
-  struct Rect play;
-  struct Rect fast_forward;
-  struct Rect warp_forward;
-  struct Rect warp_forward_blind;
-  struct Rect pause_before_end;
-  struct Rect single_step;
+  struct XY eject;
+  struct XY stop;
+  struct XY pause;
+  struct XY record;
+  struct XY play;
+  struct XY fast_forward;
+  struct XY warp_forward;
+  struct XY warp_forward_blind;
+  struct XY pause_before_end;
+  struct XY single_step;
 };
 
 struct TapeLabelInfo
 {
-  struct Rect eject;
-  struct Rect stop;
-  struct Rect pause;
-  struct Rect record;
-  struct Rect play;
-  struct Rect fast_forward;
-  struct Rect warp_forward;
-  struct Rect warp_forward_blind;
-  struct Rect pause_before_end;
-  struct Rect single_step;
-  struct Rect date;
-  struct Rect time;
+  struct XY eject;
+  struct XY stop;
+  struct XY pause;
+  struct XY record;
+  struct XY play;
+  struct XY fast_forward;
+  struct XY warp_forward;
+  struct XY warp_forward_blind;
+  struct XY pause_before_end;
+  struct XY single_step;
+  struct XY date;
+  struct XY time;
 };
 
 struct TapeTextInfo

@@ -86,16 +86,16 @@ struct GamePanelInfo
 
 struct GameButtonInfo
 {
-  struct Rect stop;
-  struct Rect pause;
-  struct Rect play;
+  struct XY stop;
+  struct XY pause;
+  struct XY play;
 
-  struct Rect sound_music;
-  struct Rect sound_loops;
-  struct Rect sound_simple;
+  struct XY sound_music;
+  struct XY sound_loops;
+  struct XY sound_simple;
 
-  struct Rect save;
-  struct Rect load;
+  struct XY save;
+  struct XY load;
 };
 
 struct GameInfo

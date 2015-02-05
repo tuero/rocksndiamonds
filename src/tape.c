@@ -195,7 +195,7 @@ static void DrawVideoDisplay_Graphics(unsigned int state, unsigned int value)
   static struct
   {
     int graphic;
-    struct Rect *pos;
+    struct XY *pos;
   }
   video_pos[NUM_TAPE_FUNCTIONS][NUM_TAPE_FUNCTION_PARTS] =
   {
@@ -253,7 +253,7 @@ static void DrawVideoDisplay_Graphics(unsigned int state, unsigned int value)
       for (j = 0; j < NUM_TAPE_FUNCTION_PARTS; j++)	/* label or symbol */
       {
 	int graphic = video_pos[i][j].graphic;
-	struct Rect *pos = video_pos[i][j].pos;
+	struct XY *pos = video_pos[i][j].pos;
 
 	if (graphic == -1 ||
 	    pos->x == -1 ||
@@ -1217,7 +1217,7 @@ void AutoPlayTape()
 static struct
 {
   int graphic;
-  struct Rect *pos;
+  struct XY *pos;
   int gadget_id;
   char *infotext;
 } tapebutton_info[NUM_TAPE_BUTTONS] =
@@ -1256,7 +1256,7 @@ void CreateTapeButtons()
   for (i = 0; i < NUM_TAPE_BUTTONS; i++)
   {
     struct GraphicInfo *gfx = &graphic_info[tapebutton_info[i].graphic];
-    struct Rect *pos = tapebutton_info[i].pos;
+    struct XY *pos = tapebutton_info[i].pos;
     struct GadgetInfo *gi;
     int gd_x = gfx->src_x;
     int gd_y = gfx->src_y;
