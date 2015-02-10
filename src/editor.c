@@ -1048,7 +1048,7 @@ static struct
   {
     IMG_EDITOR_BUTTON_GFX_UNDO,			GADGET_ID_UNDO,
     &editor.button.undo,			GD_TYPE_NORMAL_BUTTON,
-    "undo last operation",			'U'
+    "undo/redo last operation",			'U'
   },
   {
     IMG_EDITOR_BUTTON_GFX_CONF,			GADGET_ID_INFO,
@@ -3391,6 +3391,7 @@ static short UndoBuffer[NUM_UNDO_STEPS][MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 static short IntelliDrawBuffer[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 static int undo_buffer_position = 0;
 static int undo_buffer_steps = 0;
+static int redo_buffer_steps = 0;
 
 static int edit_mode;
 static int edit_mode_levelinfo;
@@ -6738,6 +6739,8 @@ static void ResetUndoBuffer()
 {
   undo_buffer_position = -1;
   undo_buffer_steps = -1;
+  redo_buffer_steps = 0;
+
   CopyLevelToUndoBuffer(UNDO_IMMEDIATE);
 
   level.changed = FALSE;
@@ -10498,12 +10501,15 @@ static void CopyLevelToUndoBuffer(int mode)
 
   if (new_undo_buffer_position)
   {
-    /* new position in undo buffer ring */
+    /* advance position in undo buffer ring */
     undo_buffer_position = (undo_buffer_position + 1) % NUM_UNDO_STEPS;
 
     if (undo_buffer_steps < NUM_UNDO_STEPS - 1)
       undo_buffer_steps++;
   }
+
+  /* always reset redo buffer when storing level change into undo buffer */
+  redo_buffer_steps = 0;
 
   for (x = 0; x < lev_fieldx; x++)
     for (y = 0; y < lev_fieldy; y++)
@@ -11384,9 +11390,20 @@ static void HandleControlButtons(struct GadgetInfo *gi)
       break;
 
     case GADGET_ID_UNDO:
-      if (undo_buffer_steps == 0)
+      if (button == 1 && undo_buffer_steps == 0)
       {
 	Request("Undo buffer empty!", REQ_CONFIRM);
+
+	break;
+      }
+      else if (button == 2)
+      {
+	break;
+      }
+      else if (button == 3 && redo_buffer_steps == 0)
+      {
+	Request("Redo buffer empty!", REQ_CONFIRM);
+
 	break;
       }
 
@@ -11396,9 +11413,25 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 	edit_mode = ED_MODE_DRAWING;
       }
 
-      undo_buffer_position =
-	(undo_buffer_position - 1 + NUM_UNDO_STEPS) % NUM_UNDO_STEPS;
-      undo_buffer_steps--;
+      if (button == 1)
+      {
+	/* undo */
+
+	undo_buffer_position =
+	  (undo_buffer_position - 1 + NUM_UNDO_STEPS) % NUM_UNDO_STEPS;
+
+	undo_buffer_steps--;
+	redo_buffer_steps++;
+      }
+      else
+      {
+	/* redo */
+
+	undo_buffer_position = (undo_buffer_position + 1) % NUM_UNDO_STEPS;
+
+	undo_buffer_steps++;
+	redo_buffer_steps--;
+      }
 
       for (x = 0; x < lev_fieldx; x++)
 	for (y = 0; y < lev_fieldy; y++)
@@ -11727,6 +11760,8 @@ void HandleLevelEditorKeyInput(Key key)
       ClickOnGadget(level_editor_gadget[GADGET_ID_PROPERTIES], button);
     else if (letter == '.')
       ClickOnGadget(level_editor_gadget[GADGET_ID_SINGLE_ITEMS], button);
+    else if (letter == 'R')
+      ClickOnGadget(level_editor_gadget[GADGET_ID_UNDO], 3);
     else if (key == KSYM_Return ||
 	     key == KSYM_space ||
 	     key == setup.shortcut.toggle_pause)
@@ -11798,6 +11833,8 @@ void PrintEditorGadgetInfoText(struct GadgetInfo *gi)
 	sprintf(shortcut, " ('%c' or 'Ctrl')", key);
       else if (gi->custom_id == GADGET_ID_TEST)		/* special case 3 */
 	sprintf(shortcut, " ('Enter' or 'Shift-%c')", key);
+      else if (gi->custom_id == GADGET_ID_UNDO)		/* special case 4 */
+	sprintf(shortcut, " ('Shift-%c/R')", key);
       else						/* normal case */
 	sprintf(shortcut, " ('%s%c')",
 		(key >= 'A' && key <= 'Z' ? "Shift-" : ""), key);

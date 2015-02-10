@@ -2,6 +2,8 @@
 	* changed position of CE/GE use/save template gadgets to be visually
 	  separated from other CE/GE gadgets (to prevent accidental use)
 	* fixed bug in editor when using undo after rotating level repeatedly
+	* added 'redo' functionality to editor (by pressing 'undo' with right
+	  mouse button or by using key shortcut "Shift-R")
 
 2015-02-04
 	* added configurability of editor control buttons (toolbox buttons)
