@@ -67,6 +67,8 @@
 #define ED_BORDER_SIZE			3
 #define ED_BORDER_TEXT_XSIZE		5
 #define ED_BORDER_AREA_YSIZE		1
+#define ED_ELEMENT_BORDER		8
+#define ED_ELEMENT_BORDER_INPUT		4
 
 #define ED_GADGET_DISTANCE		2
 #define ED_GADGET_TEXT_DISTANCE		(2 * ED_GADGET_DISTANCE)
@@ -1289,7 +1291,7 @@ static struct
   /* ---------- element settings: configure 1 (custom elements) ------------ */
 
   {
-    ED_ELEMENT_SETTINGS_XPOS(1),	ED_ELEMENT_SETTINGS_YPOS(6),
+    ED_ELEMENT_SETTINGS_XPOS(1),	ED_ELEMENT_SETTINGS_YPOS(5),
     MIN_SCORE,				MAX_SCORE,
     GADGET_ID_CUSTOM_SCORE_DOWN,	GADGET_ID_CUSTOM_SCORE_UP,
     GADGET_ID_CUSTOM_SCORE_TEXT,	GADGET_ID_NONE,
@@ -1297,7 +1299,7 @@ static struct
     NULL,				"CE score", " "
   },
   {
-    -1,					ED_ELEMENT_SETTINGS_YPOS(6),
+    -1,					ED_ELEMENT_SETTINGS_YPOS(5),
     MIN_COLLECT_COUNT,			MAX_COLLECT_COUNT,
     GADGET_ID_CUSTOM_GEMCOUNT_DOWN,	GADGET_ID_CUSTOM_GEMCOUNT_UP,
     GADGET_ID_CUSTOM_GEMCOUNT_TEXT,	GADGET_ID_CUSTOM_SCORE_UP,
@@ -1305,7 +1307,7 @@ static struct
     NULL,				"CE count", NULL
   },
   {
-    ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(12),
+    ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(10),
     0,					9999,
     GADGET_ID_CUSTOM_VALUE_FIX_DOWN,	GADGET_ID_CUSTOM_VALUE_FIX_UP,
     GADGET_ID_CUSTOM_VALUE_FIX_TEXT,	GADGET_ID_NONE,
@@ -1313,7 +1315,7 @@ static struct
     NULL,				"CE value", NULL
   },
   {
-    ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(12),
+    ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(10),
     0,					9999,
     GADGET_ID_CUSTOM_VALUE_RND_DOWN,	GADGET_ID_CUSTOM_VALUE_RND_UP,
     GADGET_ID_CUSTOM_VALUE_RND_TEXT,	GADGET_ID_CUSTOM_VALUE_FIX_UP,
@@ -1321,7 +1323,7 @@ static struct
     NULL,				"+random", NULL
   },
   {
-    ED_ELEMENT_SETTINGS_XPOS(1),	ED_ELEMENT_SETTINGS_YPOS(7),
+    ED_ELEMENT_SETTINGS_XPOS(1),	ED_ELEMENT_SETTINGS_YPOS(6),
     0,					999,
     GADGET_ID_PUSH_DELAY_FIX_DOWN,	GADGET_ID_PUSH_DELAY_FIX_UP,
     GADGET_ID_PUSH_DELAY_FIX_TEXT,	GADGET_ID_NONE,
@@ -1329,7 +1331,7 @@ static struct
     NULL,				"push delay", NULL
   },
   {
-    -1,					ED_ELEMENT_SETTINGS_YPOS(7),
+    -1,					ED_ELEMENT_SETTINGS_YPOS(6),
     0,					999,
     GADGET_ID_PUSH_DELAY_RND_DOWN,	GADGET_ID_PUSH_DELAY_RND_UP,
     GADGET_ID_PUSH_DELAY_RND_TEXT,	GADGET_ID_PUSH_DELAY_FIX_UP,
@@ -1337,7 +1339,7 @@ static struct
     NULL,				"+random", NULL
   },
   {
-    ED_ELEMENT_SETTINGS_XPOS(1),	ED_ELEMENT_SETTINGS_YPOS(8),
+    ED_ELEMENT_SETTINGS_XPOS(1),	ED_ELEMENT_SETTINGS_YPOS(7),
     0,					999,
     GADGET_ID_DROP_DELAY_FIX_DOWN,	GADGET_ID_DROP_DELAY_FIX_UP,
     GADGET_ID_DROP_DELAY_FIX_TEXT,	GADGET_ID_NONE,
@@ -1345,7 +1347,7 @@ static struct
     NULL,				"drop delay", NULL
   },
   {
-    -1,					ED_ELEMENT_SETTINGS_YPOS(8),
+    -1,					ED_ELEMENT_SETTINGS_YPOS(7),
     0,					999,
     GADGET_ID_DROP_DELAY_RND_DOWN,	GADGET_ID_DROP_DELAY_RND_UP,
     GADGET_ID_DROP_DELAY_RND_TEXT,	GADGET_ID_DROP_DELAY_FIX_UP,
@@ -1391,7 +1393,7 @@ static struct
   /* ---------- element settings: configure (group elements) --------------- */
 
   {
-    ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(5),
+    ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(3),
     MIN_ELEMENTS_IN_GROUP,		MAX_ELEMENTS_IN_GROUP,
     GADGET_ID_GROUP_CONTENT_DOWN,	GADGET_ID_GROUP_CONTENT_UP,
     GADGET_ID_GROUP_CONTENT_TEXT,	GADGET_ID_NONE,
@@ -2231,7 +2233,7 @@ static struct
   /* ---------- element settings: configure 1 (custom elements) ------------ */
 
   {
-    ED_ELEMENT_SETTINGS_XPOS(1),	ED_ELEMENT_SETTINGS_YPOS(3),
+    ED_ELEMENT_SETTINGS_XPOS(1),	ED_ELEMENT_SETTINGS_YPOS(2),
     GADGET_ID_CUSTOM_ACCESS_TYPE,	GADGET_ID_NONE,
     -1,
     options_access_type,
@@ -2239,7 +2241,7 @@ static struct
     NULL, NULL,				"type of access to this field"
   },
   {
-    -1,					ED_ELEMENT_SETTINGS_YPOS(3),
+    -1,					ED_ELEMENT_SETTINGS_YPOS(2),
     GADGET_ID_CUSTOM_ACCESS_LAYER,	GADGET_ID_CUSTOM_ACCESS_TYPE,
     -1,
     options_access_layer,
@@ -2247,7 +2249,7 @@ static struct
     NULL, NULL,				"layer of access for this field"
   },
   {
-    -1,					ED_ELEMENT_SETTINGS_YPOS(3),
+    -1,					ED_ELEMENT_SETTINGS_YPOS(2),
     GADGET_ID_CUSTOM_ACCESS_PROTECTED,	GADGET_ID_CUSTOM_ACCESS_LAYER,
     -1,
     options_access_protected,
@@ -2255,7 +2257,7 @@ static struct
     NULL, NULL,				"protected access for this field"
   },
   {
-    ED_ELEMENT_SETTINGS_XPOS(1),	ED_ELEMENT_SETTINGS_YPOS(4),
+    ED_ELEMENT_SETTINGS_XPOS(1),	ED_ELEMENT_SETTINGS_YPOS(3),
     GADGET_ID_CUSTOM_ACCESS_DIRECTION,	GADGET_ID_NONE,
     -1,
     options_access_direction,
@@ -2263,7 +2265,7 @@ static struct
     "from", NULL,			"access direction for this field"
   },
   {
-    ED_ELEMENT_SETTINGS_XPOS(1),	ED_ELEMENT_SETTINGS_YPOS(5),
+    ED_ELEMENT_SETTINGS_XPOS(1),	ED_ELEMENT_SETTINGS_YPOS(4),
     GADGET_ID_CUSTOM_WALK_TO_ACTION,	GADGET_ID_NONE,
     -1,
     options_walk_to_action,
@@ -2432,7 +2434,7 @@ static struct
   /* ---------- element settings: configure (group elements) --------------- */
 
   {
-    ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(6),
+    ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(4),
     GADGET_ID_GROUP_CHOICE_MODE,	GADGET_ID_NONE,
     -1,
     options_group_choice_mode,
@@ -2494,7 +2496,7 @@ static struct
     NULL, NULL,				"Configure custom element change pages"
   },
   {
-    -1,					ED_ELEMENT_SETTINGS_YPOS(2),
+    -1,					ED_ELEMENT_SETTINGS_YPOS(14),
     GADGET_ID_SAVE_AS_TEMPLATE,		GADGET_ID_CUSTOM_USE_TEMPLATE,
     -1,					"Save",
     " ", "As Template",			"Save current settings as new template"
@@ -2875,42 +2877,42 @@ static struct
     "use graphic of element:",		"use existing element graphic"
   },
   {
-    ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(2),
+    ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(14),
     GADGET_ID_CUSTOM_USE_TEMPLATE,	GADGET_ID_NONE,
     &level.use_custom_template,
     NULL,
     "use template",			"use template for custom properties"
   },
   {
-    ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(3),
+    ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(2),
     GADGET_ID_CUSTOM_ACCESSIBLE,	GADGET_ID_NONE,
     &custom_element_properties[EP_ACCESSIBLE],
     NULL,
     NULL,				"player can walk to or pass this field"
   },
   {
-    ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(10),
+    ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(9),
     GADGET_ID_CUSTOM_GRAV_REACHABLE,	GADGET_ID_NONE,
     &custom_element_properties[EP_GRAVITY_REACHABLE],
     NULL,
     "reachable despite gravity",	"player can walk/dig despite gravity"
   },
   {
-    ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(13),
+    ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(11),
     GADGET_ID_CUSTOM_USE_LAST_VALUE,	GADGET_ID_NONE,
     &custom_element.use_last_ce_value,
     NULL,
     "use last CE value after change",	"use last CE value after change"
   },
   {
-    ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(5),
+    ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(4),
     GADGET_ID_CUSTOM_WALK_TO_OBJECT,	GADGET_ID_NONE,
     &custom_element_properties[EP_WALK_TO_OBJECT],
     NULL,
     NULL,				"player can dig/collect/push element"
   },
   {
-    ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(9),
+    ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(8),
     GADGET_ID_CUSTOM_INDESTRUCTIBLE,	GADGET_ID_NONE,
     &custom_element_properties[EP_INDESTRUCTIBLE],
     NULL,
@@ -3304,7 +3306,7 @@ static struct
   /* ---------- group element content -------------------------------------- */
 
   {
-    ED_AREA_1X1_SETTINGS_XPOS(0),	ED_AREA_1X1_SETTINGS_YPOS(4),
+    ED_AREA_1X1_SETTINGS_XPOS(0),	ED_AREA_1X1_SETTINGS_YPOS(2),
     GADGET_ID_GROUP_CONTENT,		GADGET_ID_NONE,
     &group_element_info.element[0],	MAX_ELEMENTS_IN_GROUP, 1,
     "content:", NULL, NULL,		NULL
@@ -5206,8 +5208,8 @@ static void DrawElementBorder(int dest_x, int dest_y, int width, int height,
     (input ? IMG_EDITOR_ELEMENT_BORDER_INPUT : IMG_EDITOR_ELEMENT_BORDER);
   Bitmap *src_bitmap;
   int src_x, src_y;
-  int bx = (input ? 4 : 8);
-  int by = (input ? 4 : 8);
+  int bx = (input ? ED_ELEMENT_BORDER_INPUT : ED_ELEMENT_BORDER);
+  int by = (input ? ED_ELEMENT_BORDER_INPUT : ED_ELEMENT_BORDER);
   int bx2 = TILEX - bx;
   int by2 = TILEY - by;
   int i;
@@ -8085,8 +8087,10 @@ static void DrawGroupElementArea(int element)
 {
   int num_elements = group_element_info.num_elements;
   int id = ED_DRAWING_ID_GROUP_CONTENT;
-  int sx = SX + drawingarea_info[id].x - MINI_TILEX / 2;
-  int sy = SY + drawingarea_info[id].y - MINI_TILEY / 2;
+  int bx = ED_ELEMENT_BORDER_INPUT;
+  int by = ED_ELEMENT_BORDER_INPUT;
+  int sx = SX + drawingarea_info[id].x - bx;
+  int sy = SY + drawingarea_info[id].y - by;
   int xsize = MAX_ELEMENTS_IN_GROUP;
   int ysize = 1;
 
@@ -8098,7 +8102,7 @@ static void DrawGroupElementArea(int element)
   ModifyEditorDrawingArea(id, num_elements, 1);
 
   /* delete content areas in case of reducing number of them */
-  DrawBackground(sx, sy, (xsize + 1) * MINI_TILEX, (ysize + 1) * MINI_TILEY);
+  DrawBackground(sx, sy, xsize * MINI_TILEX + 2*bx, ysize * MINI_TILEY + 2*by);
 
   MapDrawingArea(id);
 }
@@ -8468,6 +8472,7 @@ static boolean checkPropertiesConfig(int element)
 
 static void DrawPropertiesConfig()
 {
+  boolean draw_footer_line = FALSE;
   int max_num_element_counters = 4;
   int num_element_counters = 0;
   int i;
@@ -8710,6 +8715,8 @@ static void DrawPropertiesConfig()
 
       /* draw drawing area gadgets */
       MapDrawingArea(ED_DRAWING_ID_CUSTOM_GRAPHIC);
+
+      draw_footer_line = TRUE;
     }
     else if (edit_mode_properties == ED_MODE_PROPERTIES_CONFIG_2)
     {
@@ -8760,6 +8767,25 @@ static void DrawPropertiesConfig()
 
     /* draw drawing area gadgets */
     MapDrawingArea(ED_DRAWING_ID_CUSTOM_GRAPHIC);
+
+    draw_footer_line = TRUE;
+  }
+
+  /* draw little footer border line above CE/GE use/save template gadgets */
+  if (draw_footer_line)
+  {
+    struct GadgetInfo *gd_gi1 = level_editor_gadget[GADGET_ID_PROPERTIES_INFO];
+    struct GadgetDesign *gd = &gd_gi1->alt_design[GD_BUTTON_UNPRESSED];
+    int gd_x = gd->x + gd_gi1->border.width / 2;
+    int gd_y = gd->y + gd_gi1->height - 1;
+    Pixel tab_color = GetPixel(gd->bitmap, gd_x, gd_y);
+
+    if (tab_color != BLACK_PIXEL)		/* black => transparent */
+      FillRectangle(drawto,
+		    SX + ED_ELEMENT_SETTINGS_XPOS(0),
+		    SY + ED_ELEMENT_SETTINGS_YPOS(14) - MINI_TILEY / 2,
+		    getTabulatorBarWidth(), ED_GADGET_DISTANCE,
+		    tab_color);
   }
 }
 
