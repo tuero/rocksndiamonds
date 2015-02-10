@@ -10477,6 +10477,9 @@ static void CopyLevelToUndoBuffer(int mode)
   boolean new_undo_buffer_position = TRUE;
   int x, y;
 
+  if (undo_buffer_steps == 0)
+    accumulated_undo = FALSE;
+
   switch (mode)
   {
     case UNDO_IMMEDIATE:

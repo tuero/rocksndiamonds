@@ -1,6 +1,7 @@
 2015-02-10
 	* changed position of CE/GE use/save template gadgets to be visually
 	  separated from other CE/GE gadgets (to prevent accidental use)
+	* fixed bug in editor when using undo after rotating level repeatedly
 
 2015-02-04
 	* added configurability of editor control buttons (toolbox buttons)
