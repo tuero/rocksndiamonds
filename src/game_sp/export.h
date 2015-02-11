@@ -190,7 +190,6 @@ extern void SaveNativeLevel_SP(char *);
 extern void BackToFront_SP(void);
 extern void BlitScreenToBitmap_SP(Bitmap *);
 extern void RedrawPlayfield_SP(boolean);
-extern void DrawGameDoorValues_SP();
 
 extern void LoadEngineSnapshotValues_SP();
 extern void SaveEngineSnapshotValues_SP();

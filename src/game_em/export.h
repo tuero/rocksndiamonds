@@ -740,7 +740,6 @@ extern boolean LoadNativeLevel_EM(char *, boolean);
 extern void BackToFront_EM(void);
 extern void BlitScreenToBitmap_EM(Bitmap *);
 extern void RedrawPlayfield_EM(boolean);
-extern void DrawGameDoorValues_EM();
 
 extern void LoadEngineSnapshotValues_EM();
 extern void SaveEngineSnapshotValues_EM();

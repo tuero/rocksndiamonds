@@ -66,6 +66,10 @@ void InitGameEngine_EM()
   game_animscreen();
 }
 
+void UpdateGameDoorValues_EM()
+{
+}
+
 void GameActions_EM(byte action[MAX_PLAYERS], boolean warp_mode)
 {
   int i;
@@ -91,8 +95,7 @@ void GameActions_EM(byte action[MAX_PLAYERS], boolean warp_mode)
     synchro_3();
     sound_play();
 
-    if (!warp_mode)		/* do not redraw values in warp mode */
-      DrawGameDoorValues_EM();
+    UpdateGameDoorValues_EM();
   }
 
   for (i = 0; i < MAX_PLAYERS; i++)

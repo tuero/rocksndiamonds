@@ -834,7 +834,3 @@ void game_animscreen(void)
 {
   RedrawPlayfield_EM(FALSE);
 }
-
-void DrawGameDoorValues_EM()
-{
-}

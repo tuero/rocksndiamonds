@@ -62,7 +62,7 @@ void RedrawPlayfield_SP(boolean force_redraw)
   BackToFront_SP();
 }
 
-void DrawGameDoorValues_SP()
+void UpdateGameDoorValues_SP()
 {
   game_sp.time_played = TimerVar / FRAMES_PER_SECOND;
   game_sp.infotrons_still_needed = InfotronsNeeded;
@@ -81,8 +81,7 @@ void GameActions_SP(byte action[MAX_PLAYERS], boolean warp_mode)
 
   RedrawPlayfield_SP(FALSE);
 
-  if (!warp_mode)		/* do not redraw values in warp mode */
-    DrawGameDoorValues_SP();
+  UpdateGameDoorValues_SP();
 
   CheckSingleStepMode_SP(PlayField16[MurphyPosIndex] == fiMurphy,
 			 HighByte(PlayField16[MurphyPosIndex]) == 0x2A);

@@ -2575,7 +2575,7 @@ void DisplayGameControlValues()
 
 void UpdateAndDisplayGameControlValues()
 {
-  if (tape.warp_forward)
+  if (tape.deactivate_display)
     return;
 
   UpdateGameControlValues();
