@@ -85,18 +85,24 @@ int			ActiveFont[NUM_FONTS];
 int			lev_fieldx, lev_fieldy;
 int			scroll_x, scroll_y;
 
-int			WIN_XSIZE = 672, WIN_YSIZE = 560;
-int			SCR_FIELDX = 17, SCR_FIELDY = 17;
+int			WIN_XSIZE = WIN_XSIZE_DEFAULT;
+int			WIN_YSIZE = WIN_YSIZE_DEFAULT;
+
+int			SCR_FIELDX = SCR_FIELDX_DEFAULT;
+int			SCR_FIELDY = SCR_FIELDY_DEFAULT;
+
 int			REAL_SX = 6, REAL_SY = 6;
 int			SX = 8, SY = 8;
 int			DX = 566, DY = 60;
 int			VX = 566, VY = 400;
 int			EX = 566, EY = 356;
 int			dDX, dDY;
-int			FULL_SXSIZE = 2 + 17 * TILEX + 2; /* 2 + SXSIZE + 2 */
-int			FULL_SYSIZE = 2 + 17 * TILEY + 2; /* 2 + SYSIZE + 2 */
-int			SXSIZE = 17 * TILEX;	/* SCR_FIELDX * TILEX */
-int			SYSIZE = 17 * TILEY;	/* SCR_FIELDY * TILEY */
+
+int			FULL_SXSIZE = 2 + SXSIZE_DEFAULT + 2;
+int			FULL_SYSIZE = 2 + SYSIZE_DEFAULT + 2;
+int			SXSIZE = SXSIZE_DEFAULT;
+int			SYSIZE = SYSIZE_DEFAULT;
+
 int			DXSIZE = 100;
 int			DYSIZE = 280;
 int			VXSIZE = 100;

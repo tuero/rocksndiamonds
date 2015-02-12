@@ -168,6 +168,9 @@ void DrawLevelElement(int, int, int);
 void DrawScreenField(int, int);
 void DrawLevelField(int, int);
 
+void DrawSizedElement(int, int, int, int);
+void DrawSizedElementOrWall(int, int, int, int, int);
+
 void DrawMiniElement(int, int, int);
 void DrawMiniElementOrWall(int, int, int, int);
 
@@ -175,6 +178,7 @@ void ShowEnvelope(int);
 void ShowEnvelopeDoor(char *text, int);
 
 void DrawLevel(int);
+void DrawSizedLevel(int, int, int, int, int);
 void DrawMiniLevel(int, int, int, int);
 void DrawPreviewLevelInitial(void);
 void DrawPreviewLevelAnimation(void);

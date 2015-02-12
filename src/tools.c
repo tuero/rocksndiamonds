@@ -2028,12 +2028,33 @@ void DrawLevelField(int x, int y)
   }
 }
 
+void DrawSizedElement(int x, int y, int element, int tilesize)
+{
+  int graphic;
+
+  graphic = el2edimg(element);
+  DrawSizedGraphic(x, y, graphic, 0, tilesize);
+}
+
 void DrawMiniElement(int x, int y, int element)
 {
   int graphic;
 
   graphic = el2edimg(element);
   DrawMiniGraphic(x, y, graphic);
+}
+
+void DrawSizedElementOrWall(int sx, int sy, int scroll_x, int scroll_y,
+			    int tilesize)
+{
+  int x = sx + scroll_x, y = sy + scroll_y;
+
+  if (x < -1 || x > lev_fieldx || y < -1 || y > lev_fieldy)
+    DrawSizedElement(sx, sy, EL_EMPTY, tilesize);
+  else if (x > -1 && x < lev_fieldx && y > -1 && y < lev_fieldy)
+    DrawSizedElement(sx, sy, Feld[x][y], tilesize);
+  else
+    DrawSizedGraphic(sx, sy, el2edimg(getBorderElement(x, y)), 0, tilesize);
 }
 
 void DrawMiniElementOrWall(int sx, int sy, int scroll_x, int scroll_y)
@@ -2497,6 +2518,18 @@ void DrawLevel(int draw_background_mask)
   for (x = BX1; x <= BX2; x++)
     for (y = BY1; y <= BY2; y++)
       DrawScreenField(x, y);
+
+  redraw_mask |= REDRAW_FIELD;
+}
+
+void DrawSizedLevel(int size_x, int size_y, int scroll_x, int scroll_y,
+		    int tilesize)
+{
+  int x,y;
+
+  for (x = 0; x < size_x; x++)
+    for (y = 0; y < size_y; y++)
+      DrawSizedElementOrWall(x, y, scroll_x, scroll_y, tilesize);
 
   redraw_mask |= REDRAW_FIELD;
 }

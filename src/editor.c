@@ -256,7 +256,7 @@
 #define INFOTEXT_XPOS			SX
 #define INFOTEXT_YPOS			(SY + SYSIZE - MINI_TILEX + 2)
 #define INFOTEXT_XSIZE			SXSIZE
-#define INFOTEXT_YSIZE			MINI_TILEX
+#define INFOTEXT_YSIZE			MINI_TILEY
 
 
 /*
@@ -936,9 +936,8 @@
 #define RANDOM_USE_PERCENTAGE		0
 #define RANDOM_USE_QUANTITY		1
 
-/* maximal size of level editor drawing area */
-#define MAX_ED_FIELDX			(SCR_FIELDX)
-#define MAX_ED_FIELDY			(SCR_FIELDY - 1)
+/* default value for element tile size in drawing area */
+#define DEFAULT_EDITOR_TILESIZE		MINI_TILESIZE
 
 
 /*
@@ -1015,7 +1014,7 @@ static struct
   {
     IMG_EDITOR_BUTTON_GFX_ZOOM_LEVEL,		GADGET_ID_ZOOM,
     &editor.button.zoom_level,			GD_TYPE_NORMAL_BUTTON,
-    "zoom level tile size",			'z'
+    "zoom level tile size",			'-'
   },
   {
     IMG_EDITOR_BUTTON_GFX_ROTATE_RIGHT,		GADGET_ID_WRAP_RIGHT,
@@ -3329,11 +3328,17 @@ static struct
   -----------------------------------------------------------------------------
 */
 
+/* maximal size of level editor drawing area */
+static int MAX_ED_FIELDX, MAX_ED_FIELDY;
+
 /* actual size of level editor drawing area */
 static int ed_fieldx, ed_fieldy;
 
 /* actual position of level editor drawing area in level playfield */
 static int level_xpos = -1, level_ypos = -1;
+
+/* actual tile size used to display level editor playfield */
+static int ed_tilesize = DEFAULT_EDITOR_TILESIZE;
 
 #define IN_ED_FIELD(x,y)	IN_FIELD(x, y, ed_fieldx, ed_fieldy)
 
@@ -5245,6 +5250,21 @@ static void DrawElementBorder(int dest_x, int dest_y, int width, int height,
   ClearRectangle(drawto, dest_x - 1, dest_y - 1, width + 2, height + 2);
 }
 
+static void DrawEditorElement(int x, int y, int element)
+{
+  DrawSizedElement(x, y, element, ed_tilesize);
+}
+
+static void DrawEditorElementOrWall(int x, int y, int scroll_x, int scroll_y)
+{
+  DrawSizedElementOrWall(x, y, scroll_x, scroll_y, ed_tilesize);
+}
+
+static void DrawEditorLevel(int size_x, int size_y, int scroll_x, int scroll_y)
+{
+  DrawSizedLevel(size_x, size_y, scroll_x, scroll_y, ed_tilesize);
+}
+
 static void DrawDrawingArea(int id)
 {
   struct GadgetInfo *gi = level_editor_gadget[drawingarea_info[id].gadget_id];
@@ -5262,31 +5282,31 @@ static void DrawDrawingArea(int id)
 			 el2edimg(value[x * area_ysize + y]));
 }
 
-static void ScrollMiniLevel(int from_x, int from_y, int scroll)
+static void ScrollEditorLevel(int from_x, int from_y, int scroll)
 {
   int x, y;
   int dx = (scroll == ED_SCROLL_LEFT ? -1 : scroll == ED_SCROLL_RIGHT ? 1 : 0);
   int dy = (scroll == ED_SCROLL_UP   ? -1 : scroll == ED_SCROLL_DOWN  ? 1 : 0);
 
   BlitBitmap(drawto, drawto,
-	     SX + (dx == -1 ? MINI_TILEX : 0),
-	     SY + (dy == -1 ? MINI_TILEY : 0),
-	     (ed_fieldx * MINI_TILEX) - (dx != 0 ? MINI_TILEX : 0),
-	     (ed_fieldy * MINI_TILEY) - (dy != 0 ? MINI_TILEY : 0),
-	     SX + (dx == +1 ? MINI_TILEX : 0),
-	     SY + (dy == +1 ? MINI_TILEY : 0));
+	     SX + (dx == -1 ? ed_tilesize : 0),
+	     SY + (dy == -1 ? ed_tilesize : 0),
+	     (ed_fieldx * ed_tilesize) - (dx != 0 ? ed_tilesize : 0),
+	     (ed_fieldy * ed_tilesize) - (dy != 0 ? ed_tilesize : 0),
+	     SX + (dx == +1 ? ed_tilesize : 0),
+	     SY + (dy == +1 ? ed_tilesize : 0));
 
   if (dx)
   {
     x = (dx == 1 ? 0 : ed_fieldx - 1);
     for (y = 0; y < ed_fieldy; y++)
-      DrawMiniElementOrWall(x, y, from_x, from_y);
+      DrawEditorElementOrWall(x, y, from_x, from_y);
   }
   else if (dy)
   {
     y = (dy == 1 ? 0 : ed_fieldy - 1);
     for (x = 0; x < ed_fieldx; x++)
-      DrawMiniElementOrWall(x, y, from_x, from_y);
+      DrawEditorElementOrWall(x, y, from_x, from_y);
   }
 
   redraw_mask |= REDRAW_FIELD;
@@ -5714,7 +5734,7 @@ static void CreateDrawingAreas()
 		      GDI_Y, y,
 		      GDI_TYPE, GD_TYPE_DRAWING_AREA,
 		      GDI_AREA_SIZE, area_xsize, area_ysize,
-		      GDI_ITEM_SIZE, MINI_TILEX, MINI_TILEY,
+		      GDI_ITEM_SIZE, ed_tilesize, ed_tilesize,
 		      GDI_EVENT_MASK, event_mask,
 		      GDI_CALLBACK_INFO, HandleDrawingAreaInfo,
 		      GDI_CALLBACK_ACTION, HandleDrawingAreas,
@@ -7465,6 +7485,31 @@ void CheckElementDescriptions()
       Error(ERR_WARN, "no element description for element '%s'", EL_NAME(i));
 }
 
+static int getMaxEdFieldX(boolean has_scrollbar)
+{
+  int scrollbar_width = (has_scrollbar ? ED_SCROLLBUTTON_XSIZE : 0);
+  int sxsize = SXSIZE - scrollbar_width;
+  int max_ed_fieldx = sxsize / ed_tilesize;
+
+  return max_ed_fieldx;
+}
+
+static int getMaxEdFieldY(boolean has_scrollbar)
+{
+  int infotext_height = INFOTEXT_YSIZE;
+  int scrollbar_height = (has_scrollbar ? ED_SCROLLBUTTON_YSIZE : 0);
+  int sysize = SYSIZE - scrollbar_height - infotext_height;
+  int max_ed_fieldy = sysize / ed_tilesize;
+
+  return max_ed_fieldy;
+}
+
+void InitZoomLevelSettings()
+{
+  MAX_ED_FIELDX = getMaxEdFieldX(FALSE);
+  MAX_ED_FIELDY = getMaxEdFieldY(FALSE);
+}
+
 static boolean playfield_area_changed = FALSE;
 
 void DrawLevelEd()
@@ -7480,6 +7525,8 @@ void DrawLevelEd()
 
   /* needed if different viewport properties defined for editor */
   ChangeViewportPropertiesIfNeeded();
+
+  InitZoomLevelSettings();
 
   playfield_area_changed = DrawingAreaChanged();
 
@@ -7554,52 +7601,62 @@ static void AdjustDrawingAreaGadgets()
   boolean horizontal_scrollbar_needed;
   boolean vertical_scrollbar_needed;
   int x, y, width, height;
-  int xoffset, yoffset;
 
   /* check if we need any scrollbars */
   horizontal_scrollbar_needed = (ed_xsize > max_ed_fieldx);
-  vertical_scrollbar_needed = (ed_ysize > max_ed_fieldy);
+  vertical_scrollbar_needed   = (ed_ysize > max_ed_fieldy);
 
   /* check if we have a smaller editor field because of scrollbars */
-  if (horizontal_scrollbar_needed)
-    max_ed_fieldy = MAX_ED_FIELDY - 1;
-  if (vertical_scrollbar_needed)
-    max_ed_fieldx = MAX_ED_FIELDX - 1;
+  max_ed_fieldx = getMaxEdFieldX(vertical_scrollbar_needed);
+  max_ed_fieldy = getMaxEdFieldY(horizontal_scrollbar_needed);
 
   /* check again if we now need more scrollbars because of less space */
   horizontal_scrollbar_needed = (ed_xsize > max_ed_fieldx);
-  vertical_scrollbar_needed = (ed_ysize > max_ed_fieldy);
+  vertical_scrollbar_needed   = (ed_ysize > max_ed_fieldy);
 
   /* check if editor field gets even smaller after adding new scrollbars */
-  if (horizontal_scrollbar_needed)
-    max_ed_fieldy = MAX_ED_FIELDY - 1;
-  if (vertical_scrollbar_needed)
-    max_ed_fieldx = MAX_ED_FIELDX - 1;
+  max_ed_fieldx = getMaxEdFieldX(vertical_scrollbar_needed);
+  max_ed_fieldy = getMaxEdFieldY(horizontal_scrollbar_needed);
 
-  ed_fieldx = (ed_xsize < MAX_ED_FIELDX ? ed_xsize : max_ed_fieldx);
-  ed_fieldy = (ed_ysize < MAX_ED_FIELDY ? ed_ysize : max_ed_fieldy);
+  ed_fieldx = (ed_xsize > max_ed_fieldx ? max_ed_fieldx : ed_xsize);
+  ed_fieldy = (ed_ysize > max_ed_fieldy ? max_ed_fieldy : ed_ysize);
 
+  x = SX + ed_fieldx * ed_tilesize;
+  y = SY + ed_fieldy * ed_tilesize;
+
+  width  = ed_fieldx * ed_tilesize - 2 * ED_SCROLLBUTTON_XSIZE;
+  height = ed_fieldy * ed_tilesize - 2 * ED_SCROLLBUTTON_YSIZE;
+
+  /* adjust drawing area gadget */
   ModifyGadget(level_editor_gadget[GADGET_ID_DRAWING_LEVEL],
 	       GDI_AREA_SIZE, ed_fieldx, ed_fieldy,
+	       GDI_ITEM_SIZE, ed_tilesize, ed_tilesize,
 	       GDI_END);
 
-  xoffset = (ed_fieldx == MAX_ED_FIELDX ? ED_SCROLLBUTTON_XSIZE : 0);
-  yoffset = (ed_fieldy == MAX_ED_FIELDY ? ED_SCROLLBUTTON_YSIZE : 0);
-
-  x = SX + scrollbutton_pos[ED_SCROLLBUTTON_ID_AREA_RIGHT].x + xoffset;
-  y = SX + scrollbutton_pos[ED_SCROLLBUTTON_ID_AREA_DOWN].y + yoffset;
-
-  ModifyGadget(level_editor_gadget[GADGET_ID_SCROLL_RIGHT], GDI_X, x, GDI_END);
-  ModifyGadget(level_editor_gadget[GADGET_ID_SCROLL_DOWN], GDI_Y, y, GDI_END);
-
-  width  = scrollbar_pos[ED_SCROLLBAR_ID_AREA_HORIZONTAL].width + xoffset;
-  height = scrollbar_pos[ED_SCROLLBAR_ID_AREA_VERTICAL].height + yoffset;
-
+  /* adjust horizontal scrollbar gadgets */
+  ModifyGadget(level_editor_gadget[GADGET_ID_SCROLL_LEFT],
+	       GDI_Y, y,
+	       GDI_END);
+  ModifyGadget(level_editor_gadget[GADGET_ID_SCROLL_RIGHT],
+	       GDI_X, x - ED_SCROLLBUTTON_XSIZE,
+	       GDI_Y, y,
+	       GDI_END);
   ModifyGadget(level_editor_gadget[GADGET_ID_SCROLL_HORIZONTAL],
+	       GDI_Y, y,
 	       GDI_WIDTH, width,
 	       GDI_SCROLLBAR_ITEMS_VISIBLE, ed_fieldx,
 	       GDI_END);
+
+  /* adjust vertical scrollbar gadgets */
+  ModifyGadget(level_editor_gadget[GADGET_ID_SCROLL_UP],
+	       GDI_X, x,
+	       GDI_END);
+  ModifyGadget(level_editor_gadget[GADGET_ID_SCROLL_DOWN],
+	       GDI_X, x,
+	       GDI_Y, y - ED_SCROLLBUTTON_YSIZE,
+	       GDI_END);
   ModifyGadget(level_editor_gadget[GADGET_ID_SCROLL_VERTICAL],
+	       GDI_X, x,
 	       GDI_HEIGHT, height,
 	       GDI_SCROLLBAR_ITEMS_VISIBLE, ed_fieldy,
 	       GDI_END);
@@ -7804,7 +7861,7 @@ static void DrawDrawingWindow()
   AdjustEditorScrollbar(GADGET_ID_SCROLL_HORIZONTAL);
   AdjustEditorScrollbar(GADGET_ID_SCROLL_VERTICAL);
 
-  DrawMiniLevel(ed_fieldx, ed_fieldy, level_xpos, level_ypos);
+  DrawEditorLevel(ed_fieldx, ed_fieldy, level_xpos, level_ypos);
 
   MapMainDrawingArea();
   MapLevelEditorToolboxDrawingGadgets();
@@ -9423,7 +9480,7 @@ static void SetElementSimple(int x, int y, int element, boolean change_level)
     Feld[x][y] = element;
 
   if (IN_ED_FIELD(sx, sy))
-    DrawMiniElement(sx, sy, element);
+    DrawEditorElement(sx, sy, element);
 }
 
 static void MergeAndCloseNeighbourElements(int x1, int y1, int *element1,
@@ -10124,10 +10181,10 @@ static void DrawAreaBorder(int from_x, int from_y, int to_x, int to_y)
   if (from_y > to_y)
     swap_numbers(&from_y, &to_y);
 
-  from_sx = SX + from_x * MINI_TILEX;
-  from_sy = SY + from_y * MINI_TILEY;
-  to_sx = SX + to_x * MINI_TILEX + MINI_TILEX - 1;
-  to_sy = SY + to_y * MINI_TILEY + MINI_TILEY - 1;
+  from_sx = SX + from_x * ed_tilesize;
+  from_sy = SY + from_y * ed_tilesize;
+  to_sx = SX + (to_x + 1) * ed_tilesize - 1;
+  to_sy = SY + (to_y + 1) * ed_tilesize - 1;
 
   DrawSimpleWhiteLine(drawto, from_sx, from_sy, to_sx, from_sy);
   DrawSimpleWhiteLine(drawto, to_sx, from_sy, to_sx, to_sy);
@@ -10393,7 +10450,7 @@ static int DrawLevelText(int sx, int sy, char letter, int mode)
       break;
 
     case TEXT_SETCURSOR:
-      DrawMiniElement(last_sx, last_sy, Feld[lx][ly]);
+      DrawEditorElement(last_sx, last_sy, Feld[lx][ly]);
       DrawAreaBorder(sx, sy, sx, sy);
       last_sx = sx;
       last_sy = sy;
@@ -10424,7 +10481,7 @@ static int DrawLevelText(int sx, int sy, char letter, int mode)
       if (sx > start_sx)
       {
 	Feld[lx - 1][ly] = delete_buffer[sx - start_sx - 1];
-	DrawMiniElement(sx - 1, sy, Feld[lx - 1][ly]);
+	DrawEditorElement(sx - 1, sy, Feld[lx - 1][ly]);
 	DrawLevelText(sx - 1, sy, 0, TEXT_SETCURSOR);
       }
       break;
@@ -10438,7 +10495,7 @@ static int DrawLevelText(int sx, int sy, char letter, int mode)
 
     case TEXT_END:
       CopyLevelToUndoBuffer(UNDO_IMMEDIATE);
-      DrawMiniElement(sx, sy, Feld[lx][ly]);
+      DrawEditorElement(sx, sy, Feld[lx][ly]);
       typing = FALSE;
       break;
 
@@ -10459,7 +10516,7 @@ static void SetTextCursor(int unused_sx, int unused_sy, int sx, int sy,
   int ly = sy + level_ypos;
 
   if (element == -1)
-    DrawMiniElement(sx, sy, Feld[lx][ly]);
+    DrawEditorElement(sx, sy, Feld[lx][ly]);
   else
     DrawAreaBorder(sx, sy, sx, sy);
 }
@@ -10471,7 +10528,7 @@ static void CheckLevelBorderElement(boolean redraw_playfield)
   SetBorderElement();
 
   if (redraw_playfield && BorderElement != last_border_element)
-    DrawMiniLevel(ed_fieldx, ed_fieldy, level_xpos, level_ypos);
+    DrawEditorLevel(ed_fieldx, ed_fieldy, level_xpos, level_ypos);
 }
 
 static void CopyLevelToUndoBuffer(int mode)
@@ -10572,7 +10629,7 @@ static void RandomPlacement(int new_element)
     }
   }
 
-  DrawMiniLevel(ed_fieldx, ed_fieldy, level_xpos, level_ypos);
+  DrawEditorLevel(ed_fieldx, ed_fieldy, level_xpos, level_ypos);
   CopyLevelToUndoBuffer(UNDO_IMMEDIATE);
 }
 
@@ -10591,7 +10648,7 @@ void WrapLevel(int dx, int dy)
       Feld[x][y] =
 	FieldBackup[(x + wrap_dx) % lev_fieldx][(y + wrap_dy) % lev_fieldy];
 
-  DrawMiniLevel(ed_fieldx, ed_fieldy, level_xpos, level_ypos);
+  DrawEditorLevel(ed_fieldx, ed_fieldy, level_xpos, level_ypos);
   CopyLevelToUndoBuffer(UNDO_ACCUMULATE);
 }
 
@@ -10824,7 +10881,7 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
       if (button_press_event && Feld[lx][ly] != new_element)
       {
 	FloodFill(lx, ly, new_element);
-	DrawMiniLevel(ed_fieldx, ed_fieldy, level_xpos, level_ypos);
+	DrawEditorLevel(ed_fieldx, ed_fieldy, level_xpos, level_ypos);
 	CopyLevelToUndoBuffer(UNDO_IMMEDIATE);
       }
       break;
@@ -11213,9 +11270,9 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 	if (level_xpos < -1)
 	  level_xpos = -1;
 	if (button == 1)
-	  ScrollMiniLevel(level_xpos, level_ypos, ED_SCROLL_RIGHT);
+	  ScrollEditorLevel(level_xpos, level_ypos, ED_SCROLL_RIGHT);
 	else
-	  DrawMiniLevel(ed_fieldx, ed_fieldy, level_xpos, level_ypos);
+	  DrawEditorLevel(ed_fieldx, ed_fieldy, level_xpos, level_ypos);
 
 	ModifyGadget(level_editor_gadget[GADGET_ID_SCROLL_HORIZONTAL],
 		     GDI_SCROLLBAR_ITEM_POSITION, level_xpos + 1, GDI_END);
@@ -11232,9 +11289,9 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 	if (level_xpos > lev_fieldx - ed_fieldx + 1)
 	  level_xpos = lev_fieldx - ed_fieldx + 1;
 	if (button == 1)
-	  ScrollMiniLevel(level_xpos, level_ypos, ED_SCROLL_LEFT);
+	  ScrollEditorLevel(level_xpos, level_ypos, ED_SCROLL_LEFT);
 	else
-	  DrawMiniLevel(ed_fieldx, ed_fieldy, level_xpos, level_ypos);
+	  DrawEditorLevel(ed_fieldx, ed_fieldy, level_xpos, level_ypos);
 
 	ModifyGadget(level_editor_gadget[GADGET_ID_SCROLL_HORIZONTAL],
 		     GDI_SCROLLBAR_ITEM_POSITION, level_xpos + 1, GDI_END);
@@ -11251,9 +11308,9 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 	if (level_ypos < -1)
 	  level_ypos = -1;
 	if (button == 1)
-	  ScrollMiniLevel(level_xpos, level_ypos, ED_SCROLL_DOWN);
+	  ScrollEditorLevel(level_xpos, level_ypos, ED_SCROLL_DOWN);
 	else
-	  DrawMiniLevel(ed_fieldx, ed_fieldy, level_xpos, level_ypos);
+	  DrawEditorLevel(ed_fieldx, ed_fieldy, level_xpos, level_ypos);
 
 	ModifyGadget(level_editor_gadget[GADGET_ID_SCROLL_VERTICAL],
 		     GDI_SCROLLBAR_ITEM_POSITION, level_ypos + 1, GDI_END);
@@ -11270,9 +11327,9 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 	if (level_ypos > lev_fieldy - ed_fieldy + 1)
 	  level_ypos = lev_fieldy - ed_fieldy + 1;
 	if (button == 1)
-	  ScrollMiniLevel(level_xpos, level_ypos, ED_SCROLL_UP);
+	  ScrollEditorLevel(level_xpos, level_ypos, ED_SCROLL_UP);
 	else
-	  DrawMiniLevel(ed_fieldx, ed_fieldy, level_xpos, level_ypos);
+	  DrawEditorLevel(ed_fieldx, ed_fieldy, level_xpos, level_ypos);
 
 	ModifyGadget(level_editor_gadget[GADGET_ID_SCROLL_VERTICAL],
 		     GDI_SCROLLBAR_ITEM_POSITION, level_ypos + 1, GDI_END);
@@ -11281,12 +11338,12 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 
     case GADGET_ID_SCROLL_HORIZONTAL:
       level_xpos = gi->event.item_position - 1;
-      DrawMiniLevel(ed_fieldx, ed_fieldy, level_xpos, level_ypos);
+      DrawEditorLevel(ed_fieldx, ed_fieldy, level_xpos, level_ypos);
       break;
 
     case GADGET_ID_SCROLL_VERTICAL:
       level_ypos = gi->event.item_position - 1;
-      DrawMiniLevel(ed_fieldx, ed_fieldy, level_xpos, level_ypos);
+      DrawEditorLevel(ed_fieldx, ed_fieldy, level_xpos, level_ypos);
       break;
 
     case GADGET_ID_SCROLL_LIST_UP:
@@ -11371,7 +11428,19 @@ static void HandleControlButtons(struct GadgetInfo *gi)
       break;
 
     case GADGET_ID_ZOOM:
-      printf("::: zoom button pressed with mouse button %d\n", button);
+      // zoom level editor tile size in or out (or reset to default size)
+      ed_tilesize = (button == 1 ? ed_tilesize / 2 :
+		     button == 2 ? DEFAULT_EDITOR_TILESIZE :
+		     button == 3 ? ed_tilesize * 2 : ed_tilesize);
+
+      // limit zoom level by upper and lower bound
+      ed_tilesize = MIN(MAX(MICRO_TILESIZE, ed_tilesize), TILESIZE);
+
+      InitZoomLevelSettings();
+
+      if (edit_mode == ED_MODE_DRAWING)
+	DrawDrawingWindow();
+
       break;
 
     case GADGET_ID_CUSTOM_COPY_FROM:
@@ -11440,7 +11509,7 @@ static void HandleControlButtons(struct GadgetInfo *gi)
       /* check if undo operation forces change of border style */
       CheckLevelBorderElement(FALSE);
 
-      DrawMiniLevel(ed_fieldx, ed_fieldy, level_xpos, level_ypos);
+      DrawEditorLevel(ed_fieldx, ed_fieldy, level_xpos, level_ypos);
 
       break;
 
@@ -11473,7 +11542,7 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 
       CopyLevelToUndoBuffer(GADGET_ID_CLEAR);
 
-      DrawMiniLevel(ed_fieldx, ed_fieldy, level_xpos, level_ypos);
+      DrawEditorLevel(ed_fieldx, ed_fieldy, level_xpos, level_ypos);
       break;
 
     case GADGET_ID_SAVE:
@@ -11762,6 +11831,10 @@ void HandleLevelEditorKeyInput(Key key)
       ClickOnGadget(level_editor_gadget[GADGET_ID_SINGLE_ITEMS], button);
     else if (letter == 'R')
       ClickOnGadget(level_editor_gadget[GADGET_ID_UNDO], 3);
+    else if (letter == '0')
+      ClickOnGadget(level_editor_gadget[GADGET_ID_ZOOM], 2);
+    else if (letter == '+')
+      ClickOnGadget(level_editor_gadget[GADGET_ID_ZOOM], 3);
     else if (key == KSYM_Return ||
 	     key == KSYM_space ||
 	     key == setup.shortcut.toggle_pause)
@@ -11827,15 +11900,17 @@ void PrintEditorGadgetInfoText(struct GadgetInfo *gi)
 
     if (key)
     {
-      if (gi->custom_id == GADGET_ID_SINGLE_ITEMS)	/* special case 1 */
+      if (gi->custom_id == GADGET_ID_SINGLE_ITEMS)
 	sprintf(shortcut, " ('.' or '%c')", key);
-      else if (gi->custom_id == GADGET_ID_PICK_ELEMENT)	/* special case 2 */
+      else if (gi->custom_id == GADGET_ID_PICK_ELEMENT)
 	sprintf(shortcut, " ('%c' or 'Ctrl')", key);
-      else if (gi->custom_id == GADGET_ID_TEST)		/* special case 3 */
+      else if (gi->custom_id == GADGET_ID_TEST)
 	sprintf(shortcut, " ('Enter' or 'Shift-%c')", key);
-      else if (gi->custom_id == GADGET_ID_UNDO)		/* special case 4 */
+      else if (gi->custom_id == GADGET_ID_UNDO)
 	sprintf(shortcut, " ('Shift-%c/R')", key);
-      else						/* normal case */
+      else if (gi->custom_id == GADGET_ID_ZOOM)
+	sprintf(shortcut, " ('%c', '0', '+')", key);
+      else
 	sprintf(shortcut, " ('%s%c')",
 		(key >= 'A' && key <= 'Z' ? "Shift-" : ""), key);
 

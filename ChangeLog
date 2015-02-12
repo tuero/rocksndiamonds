@@ -1,3 +1,8 @@
+2015-02-13
+	* added zoom functionality for playfield drawing area to level editor
+	  (use left, right and middle mouse buttons on new "zoom" toolbox button
+	  or use keys '-', '+' and '0' to zoom out, in or reset to default size)
+
 2015-02-11
 	* fixed bug not updating game panel values in visible warp forward mode
 
