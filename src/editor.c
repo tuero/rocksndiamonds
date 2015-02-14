@@ -10985,6 +10985,10 @@ static void HandleCounterButtons(struct GadgetInfo *gi)
     case ED_COUNTER_ID_LEVEL_YSIZE:
       lev_fieldx = level.fieldx;
       lev_fieldy = level.fieldy;
+
+      /* check if resizing of level results in change of border border */
+      SetBorderElement();
+
       break;
 
     default:

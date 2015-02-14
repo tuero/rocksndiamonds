@@ -1,3 +1,6 @@
+2015-02-14
+	* fixed bug with editor border element not adjusted after resizing level
+
 2015-02-13
 	* added zoom functionality for playfield drawing area to level editor
 	  (use left, right and middle mouse buttons on new "zoom" toolbox button
