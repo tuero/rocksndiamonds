@@ -1608,17 +1608,20 @@ static void setLevelInfoToDefaults_Level(struct LevelInfo *level)
   level->encoding_16bit_yamyam = TRUE;
   level->encoding_16bit_amoeba = TRUE;
 
-  for (x = 0; x < MAX_LEV_FIELDX; x++)
-    for (y = 0; y < MAX_LEV_FIELDY; y++)
-      level->field[x][y] = EL_SAND;
-
+  /* clear level name and level author string buffers */
   for (i = 0; i < MAX_LEVEL_NAME_LEN; i++)
     level->name[i] = '\0';
   for (i = 0; i < MAX_LEVEL_AUTHOR_LEN; i++)
     level->author[i] = '\0';
 
+  /* set level name and level author to default values */
   strcpy(level->name, NAMELESS_LEVEL_NAME);
   strcpy(level->author, ANONYMOUS_NAME);
+
+  /* set level playfield to playable default level with player and exit */
+  for (x = 0; x < MAX_LEV_FIELDX; x++)
+    for (y = 0; y < MAX_LEV_FIELDY; y++)
+      level->field[x][y] = EL_SAND;
 
   level->field[0][0] = EL_PLAYER_1;
   level->field[STD_LEV_FIELDX - 1][STD_LEV_FIELDY - 1] = EL_EXIT_CLOSED;
@@ -6217,6 +6220,12 @@ static void LoadLevel_InitPlayfield(struct LevelInfo *level, char *filename)
     for (x = 0; x < level->fieldx; x++)
       level->field[x][y] = getMappedElementByVersion(level->field[x][y],
 						     level->game_version);
+
+  /* clear unused playfield data (nicer if level gets resized in editor) */
+  for (x = 0; x < MAX_LEV_FIELDX; x++)
+    for (y = 0; y < MAX_LEV_FIELDY; y++)
+      if (x >= level->fieldx || y >= level->fieldy)
+	level->field[x][y] = EL_EMPTY;
 
   /* copy elements to runtime playfield array */
   for (x = 0; x < MAX_LEV_FIELDX; x++)
