@@ -1,6 +1,7 @@
 2015-02-14
 	* fixed bug with editor border element not adjusted after resizing level
 	* changed unused playfield from "default" to "empty" after loading level
+	* increased number of undo/redo steps in level editor from 10 to 64
 
 2015-02-13
 	* added zoom functionality for playfield drawing area to level editor

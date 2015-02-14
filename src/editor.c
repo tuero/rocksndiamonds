@@ -922,7 +922,7 @@
 #define ED_MODE_PROPERTIES_CHANGE	ED_TEXTBUTTON_ID_PROPERTIES_CHANGE
 
 /* how many steps can be cancelled */
-#define NUM_UNDO_STEPS			(10 + 1)
+#define NUM_UNDO_STEPS			(64 + 1)
 
 /* values for elements with score for certain actions */
 #define MIN_SCORE			0
