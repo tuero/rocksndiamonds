@@ -1,5 +1,6 @@
 2015-02-23
 	* added key pad '-', '+' and '0' keys to zoom function in level editor
+	* changed editor key shortcut for undo/redo to 'u' and 'Shift-u'
 
 2015-02-21
 	* added 1%, 2% and 5% to volume controls for sound and music settings

@@ -1047,7 +1047,7 @@ static struct
   {
     IMG_EDITOR_BUTTON_GFX_UNDO,			GADGET_ID_UNDO,
     &editor.button.undo,			GD_TYPE_NORMAL_BUTTON,
-    "undo/redo last operation",			'U'
+    "undo/redo last operation",			'u'
   },
   {
     IMG_EDITOR_BUTTON_GFX_CONF,			GADGET_ID_INFO,
@@ -11833,7 +11833,7 @@ void HandleLevelEditorKeyInput(Key key)
       ClickOnGadget(level_editor_gadget[GADGET_ID_PROPERTIES], button);
     else if (letter == '.')
       ClickOnGadget(level_editor_gadget[GADGET_ID_SINGLE_ITEMS], button);
-    else if (letter == 'R')
+    else if (letter == 'U')
       ClickOnGadget(level_editor_gadget[GADGET_ID_UNDO], 3);
     else if (key == KSYM_KP_Subtract)
       ClickOnGadget(level_editor_gadget[GADGET_ID_ZOOM], 1);
@@ -11913,7 +11913,7 @@ void PrintEditorGadgetInfoText(struct GadgetInfo *gi)
       else if (gi->custom_id == GADGET_ID_TEST)
 	sprintf(shortcut, " ('Enter' or 'Shift-%c')", key);
       else if (gi->custom_id == GADGET_ID_UNDO)
-	sprintf(shortcut, " ('Shift-%c/R')", key);
+	sprintf(shortcut, " ('%c/Shift-U')", key);
       else if (gi->custom_id == GADGET_ID_ZOOM)
 	sprintf(shortcut, " ('%c', '0', '+')", key);
       else
