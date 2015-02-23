@@ -3351,7 +3351,10 @@ static int new_element3 = EL_SAND;
 #define BUTTON_ELEMENT(button) ((button) == 1 ? new_element1 : \
 				(button) == 2 ? new_element2 : \
 				(button) == 3 ? new_element3 : EL_EMPTY)
-#define BUTTON_STEPSIZE(button) ((button) == 1 ? 1 : (button) == 2 ? 5 : 10)
+#define BUTTON_STEPSIZE(button) ((button) == 1 ?  1 : \
+				 (button) == 2 ?  5 : \
+				 (button) == 3 ? 10 : \
+				 (button))
 
 /* forward declaration for internal use */
 static void ModifyEditorCounterValue(int, int);
@@ -11747,11 +11750,11 @@ void HandleLevelEditorKeyInput(Key key)
 	break;
       case KSYM_Page_Up:
 	id = GADGET_ID_SCROLL_LIST_UP;
-	button = MB_RIGHTBUTTON;
+	button = ED_ELEMENTLIST_BUTTONS_VERT - 1;
 	break;
       case KSYM_Page_Down:
 	id = GADGET_ID_SCROLL_LIST_DOWN;
-	button = MB_RIGHTBUTTON;
+	button = ED_ELEMENTLIST_BUTTONS_VERT - 1;
 	break;
 
       case KSYM_Home:
