@@ -1,0 +1,28 @@
+# ignore temporary development files
+*.o
+*.a
+.depend
+
+# ignore automatically generated files
+src/conftime.h
+src/conf_gfx.h
+src/conf_snd.h
+src/conf_mus.h
+src/conf_chr.c
+src/conf_chr.h
+src/conf_cus.c
+src/conf_cus.h
+src/conf_grp.c
+src/conf_grp.h
+src/conf_e2g.c
+src/conf_esg.c
+src/conf_e2s.c
+src/conf_fnt.c
+src/conf_g2s.c
+src/conf_g2m.c
+src/conf_var.c
+src/conf_act.c
+
+# ignore compiled executable files
+rocksndiamonds
+rocksndiamonds.exe
