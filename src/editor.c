@@ -7571,8 +7571,10 @@ void DrawLevelEd()
   DrawSpecialEditorDoor();
 
   /* draw new control window */
-  BlitBitmap(graphic_info[IMG_GLOBAL_DOOR].bitmap, drawto,
-	     DOOR_GFX_PAGEX8, 236, EXSIZE, EYSIZE, EX, EY);
+  BlitBitmap(graphic_info[IMG_BACKGROUND_TOOLBOX].bitmap, drawto,
+	     graphic_info[IMG_BACKGROUND_TOOLBOX].src_x,
+	     graphic_info[IMG_BACKGROUND_TOOLBOX].src_y,
+	     EXSIZE, EYSIZE, EX, EY);
 
   // redraw_mask |= REDRAW_ALL;
 
