@@ -3,6 +3,8 @@
 	* added classic level sets to git repository
 	* added element description files to git repository
 	* changed mouse cursor on title screens not being always invisible
+	* added manually edited non-preset audio volume values to select list
+	  (if sound, loops or music volume was manually edited in "setup.conf")
 
 2015-02-27
 	* fixed using "background.TOOLBOX", which was simply ignored before

@@ -4352,6 +4352,7 @@ static void execSetupSound()
 {
   if (volumes_simple == NULL)
   {
+    boolean current_volume_simple_found = FALSE;
     int i;
 
     for (i = 0; volumes_list[i].value != -1; i++)
@@ -4366,6 +4367,31 @@ static void execSetupSound()
 
       sprintf(identifier, "%d", value);
       sprintf(name, "%s", text);
+
+      setString(&ti->identifier, identifier);
+      setString(&ti->name, name);
+      setString(&ti->name_sorting, name);
+      setString(&ti->infotext, "Sound Volume");
+
+      pushTreeInfo(&volumes_simple, ti);
+
+      if (value == setup.volume_simple)
+        current_volume_simple_found = TRUE;
+    }
+
+    if (!current_volume_simple_found)
+    {
+      // add entry for non-preset volume value
+
+      TreeInfo *ti = newTreeInfo_setDefaults(TREE_TYPE_UNDEFINED);
+      char identifier[32], name[32];
+      int value = setup.volume_simple;
+
+      ti->node_top = &volumes_simple;
+      ti->sort_priority = value;
+
+      sprintf(identifier, "%d", value);
+      sprintf(name, "%d %% (Current)", value);
 
       setString(&ti->identifier, identifier);
       setString(&ti->name, name);
@@ -4394,6 +4420,7 @@ static void execSetupSound()
 
   if (volumes_loops == NULL)
   {
+    boolean current_volume_loops_found = FALSE;
     int i;
 
     for (i = 0; volumes_list[i].value != -1; i++)
@@ -4408,6 +4435,31 @@ static void execSetupSound()
 
       sprintf(identifier, "%d", value);
       sprintf(name, "%s", text);
+
+      setString(&ti->identifier, identifier);
+      setString(&ti->name, name);
+      setString(&ti->name_sorting, name);
+      setString(&ti->infotext, "Loops Volume");
+
+      pushTreeInfo(&volumes_loops, ti);
+
+      if (value == setup.volume_loops)
+        current_volume_loops_found = TRUE;
+    }
+
+    if (!current_volume_loops_found)
+    {
+      // add entry for non-preset volume value
+
+      TreeInfo *ti = newTreeInfo_setDefaults(TREE_TYPE_UNDEFINED);
+      char identifier[32], name[32];
+      int value = setup.volume_loops;
+
+      ti->node_top = &volumes_loops;
+      ti->sort_priority = value;
+
+      sprintf(identifier, "%d", value);
+      sprintf(name, "%d %% (Current)", value);
 
       setString(&ti->identifier, identifier);
       setString(&ti->name, name);
@@ -4436,6 +4488,7 @@ static void execSetupSound()
 
   if (volumes_music == NULL)
   {
+    boolean current_volume_music_found = FALSE;
     int i;
 
     for (i = 0; volumes_list[i].value != -1; i++)
@@ -4450,6 +4503,31 @@ static void execSetupSound()
 
       sprintf(identifier, "%d", value);
       sprintf(name, "%s", text);
+
+      setString(&ti->identifier, identifier);
+      setString(&ti->name, name);
+      setString(&ti->name_sorting, name);
+      setString(&ti->infotext, "Music Volume");
+
+      pushTreeInfo(&volumes_music, ti);
+
+      if (value == setup.volume_music)
+        current_volume_music_found = TRUE;
+    }
+
+    if (!current_volume_music_found)
+    {
+      // add entry for non-preset volume value
+
+      TreeInfo *ti = newTreeInfo_setDefaults(TREE_TYPE_UNDEFINED);
+      char identifier[32], name[32];
+      int value = setup.volume_music;
+
+      ti->node_top = &volumes_music;
+      ti->sort_priority = value;
+
+      sprintf(identifier, "%d", value);
+      sprintf(name, "%d %% (Current)", value);
 
       setString(&ti->identifier, identifier);
       setString(&ti->name, name);
