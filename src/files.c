@@ -9775,7 +9775,7 @@ void CreateLevelSketchImages()
 void CreateCustomElementImages(char *filename)
 {
 #if defined(TARGET_SDL)
-  char *src_basename = "RocksCE.tmpl.ilbm";
+  char *src_basename = "RocksCE-template.ilbm";
   Bitmap *bitmap;
   Bitmap *src_bitmap;
   int yoffset_ce = 0;
