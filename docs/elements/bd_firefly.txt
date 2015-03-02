@@ -1,2 +1,4 @@
-BD style fireflies always try to follow the left side of a wall
-or other elements. Touching them is deadly.
+Fireflies always try to follow the left side of a wall or other elements.
+Touching them is deadly.
+
+Fireflies can be smashed by BD style diamonds in addition to rocks.
