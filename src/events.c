@@ -33,9 +33,9 @@
 
 
 static boolean cursor_inside_playfield = FALSE;
-static boolean playfield_cursor_set = FALSE;
-static unsigned int playfield_cursor_delay = 0;
-
+static int cursor_mode_last = CURSOR_DEFAULT;
+static unsigned int special_cursor_delay = 0;
+static unsigned int special_cursor_delay_value = 1000;
 
 /* event filter especially needed for SDL event filtering due to
    delay problems with lots of mouse motion events when mouse button
@@ -64,11 +64,18 @@ static int FilterEventsExt(const Event *event)
   cursor_inside_playfield = (motion->x >= SX && motion->x < SX + SXSIZE &&
 			     motion->y >= SY && motion->y < SY + SYSIZE);
 
-  if (game_status == GAME_MODE_PLAYING && playfield_cursor_set)
+  /* do no reset mouse cursor before all pending events have been processed */
+  if (gfx.cursor_mode == cursor_mode_last &&
+      ((effectiveGameStatus() == GAME_MODE_TITLE &&
+	gfx.cursor_mode == CURSOR_NONE) ||
+       (game_status == GAME_MODE_PLAYING &&
+	gfx.cursor_mode == CURSOR_PLAYFIELD)))
   {
     SetMouseCursor(CURSOR_DEFAULT);
-    playfield_cursor_set = FALSE;
-    DelayReached(&playfield_cursor_delay, 0);
+
+    DelayReached(&special_cursor_delay, 0);
+
+    cursor_mode_last = CURSOR_DEFAULT;
   }
 
   /* skip mouse motion events without pressed button outside level editor */
@@ -202,21 +209,34 @@ void EventLoop(void)
     }
     else
     {
-      /* when playing, display a special mouse pointer inside the playfield */
-      if (game_status == GAME_MODE_PLAYING && !tape.pausing)
+      if (effectiveGameStatus() == GAME_MODE_TITLE)
       {
-	if (!playfield_cursor_set && cursor_inside_playfield &&
-	    DelayReached(&playfield_cursor_delay, 1000))
+	/* when showing title screens, hide mouse pointer (if not moved) */
+
+	if (gfx.cursor_mode != CURSOR_NONE &&
+	    DelayReached(&special_cursor_delay, special_cursor_delay_value))
 	{
-	  SetMouseCursor(CURSOR_PLAYFIELD);
-	  playfield_cursor_set = TRUE;
+	  SetMouseCursor(CURSOR_NONE);
 	}
       }
-      else if (playfield_cursor_set)
+      else if (game_status == GAME_MODE_PLAYING && !tape.pausing)
+      {
+	/* when playing, display a special mouse pointer inside the playfield */
+
+	if (gfx.cursor_mode != CURSOR_PLAYFIELD &&
+	    cursor_inside_playfield &&
+	    DelayReached(&special_cursor_delay, special_cursor_delay_value))
+	{
+	  SetMouseCursor(CURSOR_PLAYFIELD);
+	}
+      }
+      else if (gfx.cursor_mode != CURSOR_DEFAULT)
       {
 	SetMouseCursor(CURSOR_DEFAULT);
-	playfield_cursor_set = FALSE;
       }
+
+      /* this is set after all pending events have been processed */
+      cursor_mode_last = gfx.cursor_mode;
     }
 
     /* also execute after pending events have been processed before */

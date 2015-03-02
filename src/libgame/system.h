@@ -813,6 +813,8 @@ struct GfxInfo
   int anim_random_frame;
 
   void (*draw_busy_anim_function)(void);
+
+  int cursor_mode;
 };
 
 struct JoystickInfo
@@ -1283,6 +1285,7 @@ void InitGfxScrollbufferInfo(int, int);
 void InitGfxClipRegion(boolean, int, int, int, int);
 void InitGfxDrawBusyAnimFunction(void (*draw_busy_anim_function)(void));
 void InitGfxCustomArtworkInfo();
+void InitGfxOtherSettings();
 void SetDrawDeactivationMask(int);
 void SetDrawBackgroundMask(int);
 void SetWindowBackgroundBitmap(Bitmap *);

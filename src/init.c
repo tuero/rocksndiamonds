@@ -5075,6 +5075,7 @@ void InitGfx()
 
   InitGfxBuffers();
   InitGfxCustomArtworkInfo();
+  InitGfxOtherSettings();
 
   bitmap_font_initial = LoadCustomImage(filename_font_initial);
 

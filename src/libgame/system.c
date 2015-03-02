@@ -247,6 +247,11 @@ void InitGfxCustomArtworkInfo()
   gfx.draw_init_text = TRUE;
 }
 
+void InitGfxOtherSettings()
+{
+  gfx.cursor_mode = CURSOR_DEFAULT;
+}
+
 void SetDrawDeactivationMask(int draw_deactivation_mask)
 {
   gfx.draw_deactivation_mask = draw_deactivation_mask;
@@ -1262,6 +1267,8 @@ void SetMouseCursor(int mode)
 		mode == CURSOR_PLAYFIELD ? cursor_playfield : NULL);
 
   SDLSetMouseCursor(cursor_new);
+
+  gfx.cursor_mode = mode;
 }
 
 
