@@ -224,12 +224,14 @@ endif
 ICON = $(ICONBASE).o
 endif
 
+GRAPHICS_DIR = ../graphics
+
 
 # -----------------------------------------------------------------------------
 # build targets
 # -----------------------------------------------------------------------------
 
-all: $(AUTOCONF) libgame_dir game_em_dir game_sp_dir $(PROGNAME)
+all: $(AUTOCONF) libgame_dir game_em_dir game_sp_dir $(PROGNAME) graphics_dir
 
 $(PROGNAME): $(RNDLIBS) $(TIMESTAMP_FILE) $(OBJS) $(ICON)
 	$(CC) $(PROFILING) $(OBJS) $(ICON) $(RNDLIBS) $(LDFLAGS) -o $(PROGNAME)
@@ -255,6 +257,12 @@ auto-conf:
 		$(CNFS_CMD) $$i > $$i;		\
 	done
 
+auto-conf-clean:
+	@for i in $(CNFS); do			\
+		echo "$(RM) $$i";		\
+		$(RM) $$i;			\
+	done
+
 conf_gfx.h: conf_gfx.c $(CNFS_CMD)
 	@$(MAKE) auto-conf
 
@@ -278,6 +286,9 @@ $(ICON):
 .c.o:
 	$(CC) $(PROFILING) $(CFLAGS) -c $*.c
 
+graphics_dir:
+	@$(MAKE) -C $(GRAPHICS_DIR)
+
 clean-obj:
 	$(MAKE) -C $(LIBGAME_DIR) clean
 	$(MAKE) -C $(GAME_EM_DIR) clean
@@ -297,6 +308,9 @@ clean-bin:
 	$(RM) ../*.exe
 
 clean: clean-obj clean-ico clean-bin
+
+clean-git: clean auto-conf-clean
+	@$(MAKE) -C $(GRAPHICS_DIR) clean
 
 
 # -----------------------------------------------------------------------------

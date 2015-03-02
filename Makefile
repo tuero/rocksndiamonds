@@ -93,6 +93,9 @@ cross-win32:
 clean:
 	@$(MAKE_CMD) clean
 
+clean-git:
+	@$(MAKE_CMD) clean-git
+
 
 # -----------------------------------------------------------------------------
 # development, test, distribution build and packaging targets

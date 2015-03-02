@@ -13,7 +13,7 @@
 # configuration
 # -----------------------------------------------------------------------------
 
-RND = ../rocksndiamonds
+RND = ../../rocksndiamonds
 
 RM = rm -f
 
@@ -37,8 +37,6 @@ FILES = RocksBusy.$(EXT)	\
 	RocksScreen.$(EXT)	\
 	RocksToons.$(EXT)
 
-# FILES_GENERATED = RocksCE.$(EXT)
-
 
 # -----------------------------------------------------------------------------
 # build targets
@@ -57,7 +55,8 @@ RocksCE.ilbm: RocksCE-template.ilbm
 	bmptoppm RocksCE.bmp | ppmtoilbm > RocksCE.ilbm
 	$(RM) RocksCE.bmp
 
-clean-gfx:
+clean:
 	@for i in $(FILES); do			\
+		echo "$(RM) $$i";		\
 		$(RM) $$i;			\
 	done
