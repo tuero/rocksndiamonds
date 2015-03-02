@@ -9772,23 +9772,23 @@ void CreateLevelSketchImages()
 /* create and save images for custom and group elements (raw BMP format)     */
 /* ------------------------------------------------------------------------- */
 
-void CreateCustomElementImages()
+void CreateCustomElementImages(char *filename)
 {
 #if defined(TARGET_SDL)
-  char *filename = "graphics.classic/RocksCE.bmp";
+  char *src_basename = "RocksCE.tmpl.ilbm";
   Bitmap *bitmap;
   Bitmap *src_bitmap;
-  int dummy_graphic = IMG_CUSTOM_99;
   int yoffset_ce = 0;
   int yoffset_ge = (TILEY * NUM_CUSTOM_ELEMENTS / 16);
-  int src_x, src_y;
   int i;
+
+  SDLInitVideoDisplay();
+
+  src_bitmap = LoadCustomImage(src_basename);
 
   bitmap = CreateBitmap(TILEX * 16 * 2,
 			TILEY * (NUM_CUSTOM_ELEMENTS + NUM_GROUP_ELEMENTS) / 16,
 			DEFAULT_DEPTH);
-
-  getFixedGraphicSource(dummy_graphic, 0, &src_bitmap, &src_x, &src_y);
 
   for (i = 0; i < NUM_CUSTOM_ELEMENTS; i++)
   {

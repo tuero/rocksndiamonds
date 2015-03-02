@@ -70,5 +70,6 @@ void LoadHelpTextInfo();
 
 void ConvertLevels();
 void CreateLevelSketchImages();
+void CreateCustomElementImages(char *);
 
 #endif	/* FILES_H */

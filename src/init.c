@@ -4734,6 +4734,12 @@ void Execute_Command(char *command)
       Error(ERR_EXIT, "image target directory '%s' not found or not writable",
 	    global.create_images_dir);
   }
+  else if (strPrefix(command, "create CE image "))
+  {
+    CreateCustomElementImages(&command[16]);
+
+    exit(0);
+  }
 
 #if DEBUG
 #if defined(TARGET_SDL2)
