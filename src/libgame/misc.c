@@ -555,6 +555,9 @@ static char *getProgramMainDataPath()
 
 char *getStringCat2WithSeparator(char *s1, char *s2, char *sep)
 {
+  if (s1 == NULL || s2 == NULL || sep == NULL)
+    return NULL;
+
   char *complete_string = checked_malloc(strlen(s1) + strlen(sep) +
 					 strlen(s2) + 1);
 
@@ -565,6 +568,9 @@ char *getStringCat2WithSeparator(char *s1, char *s2, char *sep)
 
 char *getStringCat3WithSeparator(char *s1, char *s2, char *s3, char *sep)
 {
+  if (s1 == NULL || s2 == NULL || s3 == NULL || sep == NULL)
+    return NULL;
+
   char *complete_string = checked_malloc(strlen(s1) + strlen(sep) +
 					 strlen(s2) + strlen(sep) +
 					 strlen(s3) + 1);
