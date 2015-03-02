@@ -17,7 +17,7 @@ RND = ../rocksndiamonds
 
 RM = rm -f
 
-EXT = pcx
+EXT = png
 
 FILES = RocksBusy.$(EXT)	\
 	RocksCE.$(EXT)		\
@@ -48,6 +48,9 @@ all: $(FILES)
 
 %.pcx: %.ilbm
 	ilbmtoppm $< | ppmtopcx > $@
+
+%.png: %.ilbm
+	ilbmtoppm $< | pnmtopng > $@
 
 RocksCE.ilbm: RocksCE-template.ilbm
 	$(RND) -e "create CE image RocksCE.bmp"
