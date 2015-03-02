@@ -207,10 +207,12 @@ boolean SDLSetNativeSurface(SDL_Surface **surface)
 
 SDL_Surface *SDLGetNativeSurface(SDL_Surface *surface)
 {
-  if (surface == NULL ||
-      backbuffer == NULL ||
-      backbuffer->surface == NULL)
+  if (surface == NULL)
     return NULL;
+
+  if (backbuffer == NULL ||
+      backbuffer->surface == NULL)
+    return SDL_ConvertSurface(surface, surface->format, 0);
 
   return SDL_ConvertSurface(surface, backbuffer->surface->format, 0);
 }
