@@ -17,10 +17,10 @@ RND = ../../rocksndiamonds
 
 RM = rm -f
 
+# EXT = pcx
 EXT = png
 
 FILES = RocksBusy.$(EXT)	\
-	RocksCE.$(EXT)		\
 	RocksDC.$(EXT)		\
 	RocksDC2.$(EXT)		\
 	RocksDoor.$(EXT)	\
@@ -35,7 +35,9 @@ FILES = RocksBusy.$(EXT)	\
 	RocksMore.$(EXT)	\
 	RocksSP.$(EXT)		\
 	RocksScreen.$(EXT)	\
-	RocksToons.$(EXT)
+	RocksToons.$(EXT)	\
+				\
+	RocksCE.$(EXT)		# dynamically generated from template
 
 
 # -----------------------------------------------------------------------------
@@ -60,3 +62,4 @@ clean:
 		echo "$(RM) $$i";		\
 		$(RM) $$i;			\
 	done
+	$(RM) RocksCE.ilbm
