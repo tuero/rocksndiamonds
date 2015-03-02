@@ -315,6 +315,9 @@ static char *getSetupArtworkDir(TreeInfo *ti)
 {
   static char *artwork_dir = NULL;
 
+  if (ti == NULL)
+    return NULL;
+
   checked_free(artwork_dir);
 
   artwork_dir = getPath2(ti->basepath, ti->fullpath);
