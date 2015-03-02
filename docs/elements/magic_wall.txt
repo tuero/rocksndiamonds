@@ -1,0 +1,4 @@
+This is a (EM style) magic wall. It gets activated for a limited
+time by certain elements that fall on it. Objects falling though
+it will be changed to other objects. After it has stopped running,
+it cannot be activated again.

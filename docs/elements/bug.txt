@@ -1,0 +1,2 @@
+Bugs always try to follow the right side of a wall
+or other elements. Touching them is deadly.

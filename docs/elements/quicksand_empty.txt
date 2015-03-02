@@ -1,0 +1,2 @@
+A rock that is pushed or thrown on the quicksand sinks into it,
+passes it and again leaves it if there is empty space below it.

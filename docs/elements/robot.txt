@@ -1,0 +1,3 @@
+Robots try to follow the player everywhere, taking the direct way.
+Touching them for a short time (running side by side to them, for
+example) is not deadly, but don't let them run into the player!

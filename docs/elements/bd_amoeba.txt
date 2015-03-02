@@ -1,0 +1,4 @@
+The BD style amoeba has some special properties: When it is completely
+surrounded by boulders, it turns to diamonds. But if this cannot be
+achieved in a certain amount of time, this amoeba turns to boulders
+instead.
