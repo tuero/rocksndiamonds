@@ -1380,7 +1380,7 @@ void DrawMainMenuExt(int fade_mask, boolean do_fading)
   SetMainBackgroundImage(IMG_BACKGROUND_MAIN);
 
   if (fade_mask == REDRAW_ALL)
-    RedrawBackground();
+    RedrawGlobalBorder();
 
   ClearField();
 
@@ -1956,7 +1956,7 @@ static void DrawInfoScreen_Main(int fade_mask, boolean do_fading)
 
   if (fade_mask == REDRAW_ALL)
   {
-    RedrawBackground();
+    RedrawGlobalBorder();
 
     OpenDoor(DOOR_CLOSE_1 | DOOR_CLOSE_2 | DOOR_NO_DELAY | DOOR_FORCE_REDRAW);
   }

@@ -37,7 +37,7 @@ void InitElementPropertiesAfterLoading(int);
 void InitElementPropertiesGfxElement();
 
 void ReloadCustomArtwork(int);
-void RedrawBackground();
+void RedrawGlobalBorder();
 
 void KeyboardAutoRepeatOffUnlessAutoplay();
 

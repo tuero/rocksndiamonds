@@ -5159,7 +5159,7 @@ void InitGfx()
   init_last = init;
 }
 
-void RedrawBackground()
+void RedrawGlobalBorder()
 {
   BlitBitmap(graphic_info[IMG_GLOBAL_BORDER].bitmap, backbuffer,
 	     0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
@@ -5576,7 +5576,7 @@ void ReloadCustomArtwork(int force_reload)
 
   FadeOut(REDRAW_ALL);
 
-  RedrawBackground();
+  RedrawGlobalBorder();
 
   /* force redraw of (open or closed) door graphics */
   SetDoorState(DOOR_OPEN_ALL);
