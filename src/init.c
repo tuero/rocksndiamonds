@@ -5673,6 +5673,10 @@ void OpenAll()
 
   print_timestamp_time("[init global stuff]");
 
+  InitSetup();
+
+  print_timestamp_time("[init setup/config stuff (1)]");
+
   if (options.execute_command)
     Execute_Command(options.execute_command);
 
@@ -5686,10 +5690,6 @@ void OpenAll()
 
     exit(0);			/* never reached, server loops forever */
   }
-
-  InitSetup();
-
-  print_timestamp_time("[init setup/config stuff (1)]");
 
   InitGameInfo();
   print_timestamp_time("[init setup/config stuff (2)]");
