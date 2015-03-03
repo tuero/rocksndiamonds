@@ -198,6 +198,9 @@ boolean SDLSetNativeSurface(SDL_Surface **surface)
 
   new_surface = SDL_ConvertSurface(*surface, backbuffer->surface->format, 0);
 
+  if (new_surface == NULL)
+    Error(ERR_EXIT, "SDL_ConvertSurface() failed: %s", SDL_GetError());
+
   SDL_FreeSurface(*surface);
 
   *surface = new_surface;
@@ -207,14 +210,20 @@ boolean SDLSetNativeSurface(SDL_Surface **surface)
 
 SDL_Surface *SDLGetNativeSurface(SDL_Surface *surface)
 {
+  SDL_Surface *new_surface;
+
   if (surface == NULL)
     return NULL;
 
-  if (backbuffer == NULL ||
-      backbuffer->surface == NULL)
-    return SDL_ConvertSurface(surface, surface->format, 0);
+  if (backbuffer && backbuffer->surface)
+    new_surface = SDL_ConvertSurface(surface, backbuffer->surface->format, 0);
+  else
+    new_surface = SDL_ConvertSurface(surface, surface->format, 0);
 
-  return SDL_ConvertSurface(surface, backbuffer->surface->format, 0);
+  if (new_surface == NULL)
+    Error(ERR_EXIT, "SDL_ConvertSurface() failed: %s", SDL_GetError());
+
+  return new_surface;
 }
 
 #else
@@ -223,7 +232,9 @@ boolean SDLSetNativeSurface(SDL_Surface **surface)
 {
   SDL_Surface *new_surface;
 
-  if (surface == NULL)
+  if (surface == NULL ||
+      *surface == NULL ||
+      !video.initialized)
     return FALSE;
 
   new_surface = SDL_DisplayFormat(*surface);
@@ -240,10 +251,17 @@ boolean SDLSetNativeSurface(SDL_Surface **surface)
 
 SDL_Surface *SDLGetNativeSurface(SDL_Surface *surface)
 {
-  SDL_Surface *new_surface = SDL_DisplayFormat(surface);
+  SDL_Surface *new_surface;
+
+  if (video.initialized)
+    new_surface = SDL_DisplayFormat(surface);
+  else
+    new_surface = SDL_ConvertSurface(surface, surface->format, SURFACE_FLAGS);
 
   if (new_surface == NULL)
-    Error(ERR_EXIT, "SDL_DisplayFormat() failed: %s", SDL_GetError());
+    Error(ERR_EXIT, "%s() failed: %s",
+	  (video.initialized ? "SDL_DisplayFormat" : "SDL_ConvertSurface"),
+	  SDL_GetError());
 
   return new_surface;
 }

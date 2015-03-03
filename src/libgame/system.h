@@ -729,6 +729,8 @@ struct VideoSystemInfo
   boolean window_scaling_available;
   int window_scaling_percent;
   char *window_scaling_quality;
+
+  boolean initialized;
 };
 
 struct AudioSystemInfo

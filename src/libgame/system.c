@@ -361,6 +361,8 @@ void InitVideoBuffer(int width, int height, int depth, boolean fullscreen)
 
   SDLInitVideoBuffer(&backbuffer, &window, fullscreen);
 
+  video.initialized = TRUE;
+
   drawto = backbuffer;
 }
 
