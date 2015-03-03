@@ -53,7 +53,7 @@ all: $(FILES)
 	ilbmtoppm $< | pnmtopng > $@
 
 RocksCE.ilbm: RocksCE-template.ilbm
-	$(RND) -e "create CE image RocksCE.bmp"
+	$(RND) -e "create CE image ."
 	bmptoppm RocksCE.bmp | ppmtoilbm > RocksCE.ilbm
 	$(RM) RocksCE.bmp
 

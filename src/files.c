@@ -9772,19 +9772,22 @@ void CreateLevelSketchImages()
 /* create and save images for custom and group elements (raw BMP format)     */
 /* ------------------------------------------------------------------------- */
 
-void CreateCustomElementImages(char *filename)
+void CreateCustomElementImages(char *directory)
 {
 #if defined(TARGET_SDL)
   char *src_basename = "RocksCE-template.ilbm";
-  Bitmap *bitmap;
+  char *dst_basename = "RocksCE.bmp";
+  char *src_filename = getPath2(directory, src_basename);
+  char *dst_filename = getPath2(directory, dst_basename);
   Bitmap *src_bitmap;
+  Bitmap *bitmap;
   int yoffset_ce = 0;
   int yoffset_ge = (TILEY * NUM_CUSTOM_ELEMENTS / 16);
   int i;
 
   SDLInitVideoDisplay();
 
-  src_bitmap = LoadCustomImage(src_basename);
+  src_bitmap = LoadImage(src_filename);
 
   bitmap = CreateBitmap(TILEX * 16 * 2,
 			TILEY * (NUM_CUSTOM_ELEMENTS + NUM_GROUP_ELEMENTS) / 16,
@@ -9855,8 +9858,8 @@ void CreateCustomElementImages(char *filename)
     }
   }
 
-  if (SDL_SaveBMP(bitmap->surface, filename) != 0)
-    Error(ERR_EXIT, "cannot save CE graphics file '%s'", filename);
+  if (SDL_SaveBMP(bitmap->surface, dst_filename) != 0)
+    Error(ERR_EXIT, "cannot save CE graphics file '%s'", dst_filename);
 
   FreeBitmap(bitmap);
 

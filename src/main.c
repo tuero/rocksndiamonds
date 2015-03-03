@@ -5580,7 +5580,7 @@ static void print_usage()
 	 "  \"autoplay LEVELDIR [NR ...]\"     play level tapes for LEVELDIR\n"
 	 "  \"convert LEVELDIR [NR]\"          convert levels in LEVELDIR\n"
 	 "  \"create images DIRECTORY\"        write BMP images to DIRECTORY\n"
-	 "  \"create CE image FILE\"           write BMP image to FILE\n"
+	 "  \"create CE image DIRECTORY\"      write BMP image to DIRECTORY\n"
 	 "\n",
 	 program.command_basename);
 }
