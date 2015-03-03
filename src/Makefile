@@ -42,32 +42,49 @@ PROGNAME = ../$(PROGBASE)
 # configuring platform
 # -----------------------------------------------------------------------------
 
-ifeq ($(PLATFORM),solaris)		# native compiling to Solaris
+ifeq ($(PLATFORM),solaris)		# compiling on Solaris
 EXTRA_LDFLAGS = -lnsl -lsocket -R$(XLIB_PATH)
-PLATFORM = unix
+override PLATFORM = unix
 endif
 
-ifeq ($(PLATFORM),macosx)		# native compiling to Mac OS X
+ifeq ($(PLATFORM),macosx)		# compiling on Mac OS X
 EXTRA_LDFLAGS = -lstdc++
-PLATFORM = unix
-TARGET = sdl
+override PLATFORM = unix
 endif
 
-ifeq ($(PLATFORM),unix)			# native compiling to Unix (generic)
+ifeq ($(PLATFORM),unix)			# compiling on Unix/Linux (generic)
 PROFILING_FLAGS = -pg
 endif
 
 ifeq ($(PLATFORM),cross-win32)		# cross-compiling to Windows
 PROGNAME = ../$(PROGBASE).exe
 EXTRA_LDFLAGS = -lshfolder -lwsock32
-# TARGET = sdl
-TARGET = sdl2
 endif
 
 
 # -----------------------------------------------------------------------------
 # configuring target
 # -----------------------------------------------------------------------------
+
+ifndef TARGET				# auto-detect compiling for SDL or SDL2
+  SDL_VERSION := $(shell sdl2-config --version 2> /dev/null)
+  ifdef SDL_VERSION
+    TARGET = sdl2
+  else
+    SDL_VERSION := $(shell sdl-config --version 2> /dev/null)
+    ifdef SDL_VERSION
+      TARGET = sdl
+    else
+      $(error SDL/SDL2 library not found)
+    endif
+  endif
+endif
+
+ifeq ($(STATIC),true)			# check for static linking
+override TARGET := $(TARGET)-static
+endif
+
+# $(info Using SDL version $(SDL_VERSION) [TARGET == $(TARGET)])
 
 ifeq ($(TARGET),sdl)			# compiling for SDL target
 SYS_CFLAGS = -DTARGET_SDL $(shell sdl-config --cflags)

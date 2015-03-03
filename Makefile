@@ -59,15 +59,13 @@ CROSS_PATH_WIN32 = /usr/local/cross-tools/i386-mingw32msvc
 SRC_DIR = src
 MAKE_CMD = $(MAKE) -C $(SRC_DIR)
 
-DEFAULT_TARGET = sdl2
-
 
 # -----------------------------------------------------------------------------
 # build targets
 # -----------------------------------------------------------------------------
 
 all:
-	@$(MAKE_CMD) TARGET=$(DEFAULT_TARGET)
+	@$(MAKE_CMD)
 
 sdl:
 	@$(MAKE_CMD) TARGET=sdl
@@ -79,13 +77,7 @@ mac:
 	@$(MAKE_CMD) PLATFORM=macosx
 
 mac-static:
-	@$(MAKE_CMD) PLATFORM=macosx TARGET=sdl-static
-
-mac2-static:
-	@$(MAKE_CMD) PLATFORM=macosx TARGET=sdl2-static
-
-os2:
-	@$(MAKE_CMD) PLATFORM=os2
+	@$(MAKE_CMD) PLATFORM=macosx STATIC=true
 
 cross-win32:
 	@PATH=$(CROSS_PATH_WIN32)/bin:${PATH} $(MAKE_CMD) PLATFORM=cross-win32
@@ -218,4 +210,4 @@ tags:
 	$(MAKE_CMD) tags
 
 depend dep:
-	$(MAKE_CMD) TARGET=$(DEFAULT_TARGET) depend
+	$(MAKE_CMD) depend
