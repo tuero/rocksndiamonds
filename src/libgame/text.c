@@ -183,11 +183,6 @@ void DrawTextSCentered(int y, int font_nr, char *text)
 	   gfx.sy + y, text, font_nr);
 }
 
-void DrawTextCentered(int y, int font_nr, char *text)
-{
-  DrawText((gfx.sxsize - getTextWidth(text, font_nr)) / 2, y, text, font_nr);
-}
-
 void DrawTextSAligned(int x, int y, char *text, int font_nr, int align)
 {
   DrawText(gfx.sx + ALIGNED_XPOS(x, getTextWidth(text, font_nr), align),
