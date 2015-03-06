@@ -3389,109 +3389,110 @@ static int RequestHandleEvents(unsigned int req_state)
     {
       Event event;
 
-      NextEvent(&event);
-
-      switch (event.type)
+      while (NextValidEvent(&event))
       {
-	case EVENT_BUTTONPRESS:
-	case EVENT_BUTTONRELEASE:
-	case EVENT_MOTIONNOTIFY:
+	switch (event.type)
 	{
-	  if (event.type == EVENT_MOTIONNOTIFY)
+	  case EVENT_BUTTONPRESS:
+	  case EVENT_BUTTONRELEASE:
+	  case EVENT_MOTIONNOTIFY:
 	  {
-	    if (!PointerInWindow(window))
-	      continue;	/* window and pointer are on different screens */
+	    if (event.type == EVENT_MOTIONNOTIFY)
+	    {
+	      if (!PointerInWindow(window))
+		continue;	/* window and pointer on different screens */
 
-	    if (!button_status)
-	      continue;
+	      if (!button_status)
+		continue;
 
-	    motion_status = TRUE;
-	    mx = ((MotionEvent *) &event)->x;
-	    my = ((MotionEvent *) &event)->y;
-	  }
-	  else
-	  {
-	    motion_status = FALSE;
-	    mx = ((ButtonEvent *) &event)->x;
-	    my = ((ButtonEvent *) &event)->y;
-	    if (event.type == EVENT_BUTTONPRESS)
-	      button_status = ((ButtonEvent *) &event)->button;
+	      motion_status = TRUE;
+	      mx = ((MotionEvent *) &event)->x;
+	      my = ((MotionEvent *) &event)->y;
+	    }
 	    else
-	      button_status = MB_RELEASED;
-	  }
+	    {
+	      motion_status = FALSE;
+	      mx = ((ButtonEvent *) &event)->x;
+	      my = ((ButtonEvent *) &event)->y;
+	      if (event.type == EVENT_BUTTONPRESS)
+		button_status = ((ButtonEvent *) &event)->button;
+	      else
+		button_status = MB_RELEASED;
+	    }
 
-	  /* this sets 'request_gadget_id' */
-	  HandleGadgets(mx, my, button_status);
+	    /* this sets 'request_gadget_id' */
+	    HandleGadgets(mx, my, button_status);
 
-	  switch (request_gadget_id)
-	  {
-	    case TOOL_CTRL_ID_YES:
-	      result = TRUE;
-	      break;
-	    case TOOL_CTRL_ID_NO:
-	      result = FALSE;
-	      break;
-	    case TOOL_CTRL_ID_CONFIRM:
-	      result = TRUE | FALSE;
-	      break;
+	    switch (request_gadget_id)
+	    {
+	      case TOOL_CTRL_ID_YES:
+		result = TRUE;
+		break;
+	      case TOOL_CTRL_ID_NO:
+		result = FALSE;
+		break;
+	      case TOOL_CTRL_ID_CONFIRM:
+		result = TRUE | FALSE;
+		break;
 
-	    case TOOL_CTRL_ID_PLAYER_1:
-	      result = 1;
-	      break;
-	    case TOOL_CTRL_ID_PLAYER_2:
-	      result = 2;
-	      break;
-	    case TOOL_CTRL_ID_PLAYER_3:
-	      result = 3;
-	      break;
-	    case TOOL_CTRL_ID_PLAYER_4:
-	      result = 4;
-	      break;
-
-	    default:
-	      break;
-	  }
-
-	  break;
-	}
-
-	case EVENT_KEYPRESS:
-	  switch (GetEventKey((KeyEvent *)&event, TRUE))
-	  {
-	    case KSYM_space:
-	      if (req_state & REQ_CONFIRM)
+	      case TOOL_CTRL_ID_PLAYER_1:
 		result = 1;
-	      break;
+		break;
+	      case TOOL_CTRL_ID_PLAYER_2:
+		result = 2;
+		break;
+	      case TOOL_CTRL_ID_PLAYER_3:
+		result = 3;
+		break;
+	      case TOOL_CTRL_ID_PLAYER_4:
+		result = 4;
+		break;
 
-	    case KSYM_Return:
-#if defined(TARGET_SDL2)
-	    case KSYM_Menu:
-#endif
-	      result = 1;
-	      break;
+	      default:
+		break;
+	    }
 
-	    case KSYM_Escape:
-#if defined(TARGET_SDL2)
-	    case KSYM_Back:
-#endif
-	      result = 0;
-	      break;
-
-	    default:
-	      break;
+	    break;
 	  }
 
-	  if (req_state & REQ_PLAYER)
-	    result = 0;
-	  break;
+	  case EVENT_KEYPRESS:
+	    switch (GetEventKey((KeyEvent *)&event, TRUE))
+	    {
+	      case KSYM_space:
+		if (req_state & REQ_CONFIRM)
+		  result = 1;
+		break;
 
-	case EVENT_KEYRELEASE:
-	  ClearPlayerAction();
-	  break;
+	      case KSYM_Return:
+#if defined(TARGET_SDL2)
+	      case KSYM_Menu:
+#endif
+		result = 1;
+		break;
 
-	default:
-	  HandleOtherEvents(&event);
-	  break;
+	      case KSYM_Escape:
+#if defined(TARGET_SDL2)
+	      case KSYM_Back:
+#endif
+		result = 0;
+		break;
+
+	      default:
+		break;
+	    }
+
+	    if (req_state & REQ_PLAYER)
+	      result = 0;
+	    break;
+
+	  case EVENT_KEYRELEASE:
+	    ClearPlayerAction();
+	    break;
+
+	  default:
+	    HandleOtherEvents(&event);
+	    break;
+	}
       }
     }
     else if (AnyJoystickButton() == JOY_BUTTON_NEW_PRESSED)

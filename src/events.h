@@ -20,6 +20,8 @@ int FilterEvents(void *, Event *);
 int FilterEvents(const Event *);
 #endif
 
+boolean NextValidEvent(Event *);
+
 void EventLoop(void);
 void HandleOtherEvents(Event *);
 void ClearEventQueue(void);

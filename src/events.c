@@ -131,7 +131,7 @@ boolean SkipPressedMouseMotionEvent(const Event *event)
    when using SDL with properly installed event filter, this function can be
    replaced with a simple "NextEvent()" call, but it doesn't hurt either */
 
-static boolean NextValidEvent(Event *event)
+boolean NextValidEvent(Event *event)
 {
   while (PendingEvent())
   {
