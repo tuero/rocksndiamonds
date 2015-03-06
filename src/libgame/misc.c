@@ -38,93 +38,149 @@
 /* ========================================================================= */
 
 /* ------------------------------------------------------------------------- */
-/* platform independent wrappers for printf() et al. (newline aware)         */
+/* logging functions                                                         */
 /* ------------------------------------------------------------------------- */
+
+#define DUPLICATE_LOG_OUTPUT_TO_STDERR		TRUE
+
 
 #if defined(PLATFORM_ANDROID)
 static int android_log_prio = ANDROID_LOG_INFO;
-#endif
+static char *android_log_buffer = NULL;
 
-#if 0
-static void vfPrintLog(FILE *stream, char *format, va_list ap)
+static void append_to_android_log_buffer(char *format, va_list ap)
 {
+  char text_new[MAX_OUTPUT_LINESIZE];
+
+  // print text to temporary string
+  vsnprintf(text_new, MAX_OUTPUT_LINESIZE, format, ap);
+
+  if (android_log_buffer == NULL)
+  {
+    android_log_buffer = getStringCopy(text_new);
+  }
+  else
+  {
+    char *android_log_buffer_old = android_log_buffer;
+
+    // append new text to existing text
+    android_log_buffer = getStringCat2(android_log_buffer, text_new);
+
+    checked_free(android_log_buffer_old);
+  }
 }
 
-static void vfPrintLog(FILE *stream, char *format, va_list ap)
+static void vprintf_log_nonewline(char *format, va_list ap)
 {
+  // add log output to buffer until text with newline is printed
+  append_to_android_log_buffer(format, ap);
 }
 
-static void fPrintLog(FILE *stream, char *format, va_list ap)
+static void vprintf_log(char *format, va_list ap)
 {
+  // add log output to buffer
+  append_to_android_log_buffer(format, ap);
+
+  // __android_log_vprint(android_log_prio, program.program_title, format, ap);
+  __android_log_write(android_log_prio, program.program_title,
+		      android_log_buffer);
+
+  checked_free(android_log_buffer);
+  android_log_buffer = NULL;
 }
 
-static void fPrintLog(FILE *stream, char *format, va_list ap)
-{
-}
-#endif
-
-static void vfprintf_nonewline(FILE *stream, char *format, va_list ap)
-{
-#if defined(PLATFORM_ANDROID)
-  // (prefix text of logging output is currently skipped on Android)
-  //__android_log_vprint(android_log_prio, program.program_title, format, ap);
 #else
-  va_list ap2;
-  va_copy(ap2, ap);
 
-  vfprintf(stream, format, ap);
-  vfprintf(stderr, format, ap2);
+static void vprintf_log_nonewline(char *format, va_list ap)
+{
+  FILE *file = program.error_file;
 
-  va_end(ap2);
+#if DUPLICATE_LOG_OUTPUT_TO_STDERR
+  if (file != stderr)
+  {
+    va_list ap2;
+    va_copy(ap2, ap);
+
+    vfprintf(stderr, format, ap2);
+
+    va_end(ap2);
+  }
 #endif
+
+  vfprintf(file, format, ap);
 }
 
-static void vfprintf_newline(FILE *stream, char *format, va_list ap)
+static void vprintf_log(char *format, va_list ap)
 {
-#if defined(PLATFORM_ANDROID)
-  __android_log_vprint(android_log_prio, program.program_title, format, ap);
-#else
+  FILE *file = program.error_file;
   char *newline = STRING_NEWLINE;
 
-  va_list ap2;
-  va_copy(ap2, ap);
+#if DUPLICATE_LOG_OUTPUT_TO_STDERR
+  if (file != stderr)
+  {
+    va_list ap2;
+    va_copy(ap2, ap);
 
-  vfprintf(stream, format, ap);
-  fprintf(stream, "%s", newline);
+    vfprintf(stderr, format, ap2);
+    fprintf(stderr, "%s", newline);
 
-  vfprintf(stderr, format, ap2);
-  fprintf(stderr, "%s", newline);
-
-  va_end(ap2);
+    va_end(ap2);
+  }
 #endif
-}
 
-static void fprintf_nonewline(FILE *stream, char *format, ...)
+  vfprintf(file, format, ap);
+  fprintf(file, "%s", newline);
+}
+#endif
+
+static void printf_log_nonewline(char *format, ...)
 {
   va_list ap;
 
   va_start(ap, format);
-  vfprintf_nonewline(stream, format, ap);
+  vprintf_log_nonewline(format, ap);
   va_end(ap);
 }
 
-static void fprintf_newline(FILE *stream, char *format, ...)
+static void printf_log(char *format, ...)
 {
   va_list ap;
 
   va_start(ap, format);
-  vfprintf_newline(stream, format, ap);
+  vprintf_log(format, ap);
   va_end(ap);
 }
 
-void fprintf_line(FILE *stream, char *line_chars, int line_length)
+static void printf_log_line(char *line_chars, int line_length)
 {
   int i;
 
   for (i = 0; i < line_length; i++)
-    fprintf_nonewline(stream, "%s", line_chars);
+    printf_log_nonewline("%s", line_chars);
 
-  fprintf_newline(stream, "");
+  printf_log("");
+}
+
+
+/* ------------------------------------------------------------------------- */
+/* platform independent wrappers for printf() et al.                         */
+/* ------------------------------------------------------------------------- */
+
+void fprintf_line(FILE *file, char *line_chars, int line_length)
+{
+  int i;
+
+  for (i = 0; i < line_length; i++)
+    fprintf(file, "%s", line_chars);
+
+  fprintf(file, "\n");
+}
+
+void fprintf_line_with_prefix(FILE *file, char *prefix, char *line_chars,
+			      int line_length)
+{
+  fprintf(file, "%s", prefix);
+  fprintf_line(file, line_chars, line_length);
 }
 
 void printf_line(char *line_chars, int line_length)
@@ -134,8 +190,7 @@ void printf_line(char *line_chars, int line_length)
 
 void printf_line_with_prefix(char *prefix, char *line_chars, int line_length)
 {
-  fprintf(stdout, "%s", prefix);
-  fprintf_line(stdout, line_chars, line_length);
+  fprintf_line_with_prefix(stdout, prefix, line_chars, line_length);
 }
 
 
@@ -1027,7 +1082,7 @@ void Error(int mode, char *format, ...)
   if (mode == ERR_INFO_LINE)
   {
     if (!last_line_was_separator)
-      fprintf_line(program.error_file, format, 79);
+      printf_log_line(format, 79);
 
     last_line_was_separator = TRUE;
 
@@ -1045,19 +1100,20 @@ void Error(int mode, char *format, ...)
 
   if (format)
   {
-    va_list ap;
-
-    fprintf_nonewline(program.error_file, "%s%s: ", program.command_basename,
-		      process_name);
+#if !defined(PLATFORM_ANDROID)
+    printf_log_nonewline("%s%s: ", program.command_basename, process_name);
+#endif
 
     if (mode & ERR_WARN)
-      fprintf_nonewline(program.error_file, "warning: ");
+      printf_log_nonewline("warning: ");
 
     if (mode & ERR_EXIT)
-      fprintf_nonewline(program.error_file, "fatal error: ");
+      printf_log_nonewline("fatal error: ");
+
+    va_list ap;
 
     va_start(ap, format);
-    vfprintf_newline(program.error_file, format, ap);
+    vprintf_log(format, ap);
     va_end(ap);
 
     if ((mode & ERR_EXIT) && !(mode & ERR_FROM_SERVER))
@@ -1069,13 +1125,11 @@ void Error(int mode, char *format, ...)
   }
   
   if (mode & ERR_HELP)
-    fprintf_newline(program.error_file,
-		    "%s: Try option '--help' for more information.",
-		    program.command_basename);
+    printf_log("%s: Try option '--help' for more information.",
+	       program.command_basename);
 
   if (mode & ERR_EXIT)
-    fprintf_newline(program.error_file, "%s%s: aborting",
-		    program.command_basename, process_name);
+    printf_log("%s%s: aborting", program.command_basename, process_name);
 
   if (mode & ERR_EXIT)
   {
@@ -3434,7 +3488,7 @@ void openErrorFile()
 
 void closeErrorFile()
 {
-  if (program.error_file != stderr)	/* do not close stream 'stderr' */
+  if (program.error_file != stderr)	/* do not close file 'stderr' */
     fclose(program.error_file);
 }
 
