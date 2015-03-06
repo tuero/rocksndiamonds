@@ -8437,7 +8437,6 @@ void LoadSetup()
   {
     char *player_name_new;
 
-    checkSetupFileHashIdentifier(setup_file_hash, filename,getCookie("SETUP"));
     decodeSetupFileHash(setup_file_hash);
 
     freeSetupFileHash(setup_file_hash);
@@ -8474,7 +8473,6 @@ void LoadSetup_EditorCascade()
 
   if (setup_file_hash)
   {
-    checkSetupFileHashIdentifier(setup_file_hash, filename,getCookie("SETUP"));
     decodeSetupFileHash_EditorCascade(setup_file_hash);
 
     freeSetupFileHash(setup_file_hash);
@@ -8497,9 +8495,7 @@ void SaveSetup()
     return;
   }
 
-  fprintf(file, "%s\n", getFormattedSetupEntry(TOKEN_STR_FILE_IDENTIFIER,
-					       getCookie("SETUP")));
-  fprintf(file, "\n");
+  fprintFileHeader(file, SETUP_FILENAME);
 
   /* global setup */
   si = setup;
@@ -8572,12 +8568,9 @@ void SaveSetup_EditorCascade()
     return;
   }
 
-  fprintf(file, "%s\n", getFormattedSetupEntry(TOKEN_STR_FILE_IDENTIFIER,
-					       getCookie("SETUP")));
-  fprintf(file, "\n");
+  fprintFileHeader(file, EDITORCASCADE_FILENAME);
 
   seci = setup.editor_cascade;
-  fprintf(file, "\n");
   for (i = 0; i < NUM_EDITOR_CASCADE_SETUP_TOKENS; i++)
     fprintf(file, "%s\n", getSetupLine(editor_cascade_setup_tokens, "", i));
 

@@ -30,7 +30,6 @@
 #include "hash.h"
 
 
-#define USE_FILE_IDENTIFIERS	FALSE	/* do not use identifiers anymore */
 #define ENABLE_UNUSED_CODE	FALSE	/* for currently unused functions */
 
 #define NUM_LEVELCLASS_DESC	8
@@ -1475,6 +1474,17 @@ char *getCookie(char *file_type)
   return cookie;
 }
 
+void fprintFileHeader(FILE *file, char *basename)
+{
+  char *prefix = "# ";
+  char *sep1 = "=";
+
+  fprintf_line_with_prefix(file, prefix, sep1, 77);
+  fprintf(file, "%s%s\n", prefix, basename);
+  fprintf_line_with_prefix(file, prefix, sep1, 77);
+  fprintf(file, "\n");
+}
+
 int getFileVersionFromCookieString(const char *cookie)
 {
   const char *ptr_cookie1, *ptr_cookie2;
@@ -1521,6 +1531,7 @@ boolean checkCookieString(const char *cookie, const char *template)
 
   return TRUE;
 }
+
 
 /* ------------------------------------------------------------------------- */
 /* setup file list and hash handling functions                               */
@@ -2102,19 +2113,6 @@ SetupFileHash *loadSetupFileHash(char *filename)
   }
 
   return setup_file_hash;
-}
-
-void checkSetupFileHashIdentifier(SetupFileHash *setup_file_hash,
-				  char *filename, char *identifier)
-{
-#if USE_FILE_IDENTIFIERS
-  char *value = getHashEntry(setup_file_hash, TOKEN_STR_FILE_IDENTIFIER);
-
-  if (value == NULL)
-    Error(ERR_WARN, "config file '%s' has no file identifier", filename);
-  else if (!checkCookieString(value, identifier))
-    Error(ERR_WARN, "config file '%s' has wrong file identifier", filename);
-#endif
 }
 
 
@@ -2820,9 +2818,6 @@ static boolean LoadLevelInfoFromLevelConf(TreeInfo **node_first,
 
   leveldir_new->subdir = getStringCopy(directory_name);
 
-  checkSetupFileHashIdentifier(setup_file_hash, filename,
-			       getCookie("LEVELINFO"));
-
   /* set all structure fields according to the token/value pairs */
   ldi = *leveldir_new;
   for (i = 0; i < NUM_LEVELINFO_TOKENS; i++)
@@ -3450,8 +3445,7 @@ static void SaveUserLevelInfo()
 
   token_value_position = TOKEN_VALUE_POSITION_SHORT;
 
-  fprintf(file, "%s\n\n", getFormattedSetupEntry(TOKEN_STR_FILE_IDENTIFIER,
-						 getCookie("LEVELINFO")));
+  fprintFileHeader(file, LEVELINFO_FILENAME);
 
   ldi = *level_info;
   for (i = 0; i < NUM_LEVELINFO_TOKENS; i++)
@@ -3609,9 +3603,6 @@ void LoadLevelSetup_LastSeries()
     if (leveldir_current == NULL)
       leveldir_current = getFirstValidTreeInfoEntry(leveldir_first);
 
-    checkSetupFileHashIdentifier(level_setup_hash, filename,
-				 getCookie("LEVELSETUP"));
-
     freeSetupFileHash(level_setup_hash);
   }
   else
@@ -3645,8 +3636,7 @@ static void SaveLevelSetup_LastSeries_Ext(boolean deactivate_last_level_series)
     return;
   }
 
-  fprintf(file, "%s\n\n", getFormattedSetupEntry(TOKEN_STR_FILE_IDENTIFIER,
-						 getCookie("LEVELSETUP")));
+  fprintFileHeader(file, LEVELSETUP_FILENAME);
 
   if (deactivate_last_level_series)
     fprintf(file, "# %s\n# ", "the following level set may have caused a problem and was deactivated");
@@ -3781,9 +3771,6 @@ void LoadLevelSetup_SeriesInfo()
     }
     END_HASH_ITERATION(hash, itr)
 
-    checkSetupFileHashIdentifier(level_setup_hash, filename,
-				 getCookie("LEVELSETUP"));
-
     freeSetupFileHash(level_setup_hash);
   }
   else
@@ -3816,8 +3803,8 @@ void SaveLevelSetup_SeriesInfo()
     return;
   }
 
-  fprintf(file, "%s\n\n", getFormattedSetupEntry(TOKEN_STR_FILE_IDENTIFIER,
-						 getCookie("LEVELSETUP")));
+  fprintFileHeader(file, LEVELSETUP_FILENAME);
+
   fprintf(file, "%s\n", getFormattedSetupEntry(TOKEN_STR_LAST_PLAYED_LEVEL,
 					       level_nr_str));
   fprintf(file, "%s\n\n", getFormattedSetupEntry(TOKEN_STR_HANDICAP_LEVEL,
