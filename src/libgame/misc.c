@@ -648,9 +648,11 @@ char *getStringCat3(char *s1, char *s2, char *s3)
 char *getPath2(char *path1, char *path2)
 {
 #if defined(PLATFORM_ANDROID)
-  // workaround for reading from APK assets directory -- skip leading "./"
+  // workaround for reading from assets directory -- skip "." subdirs in path
   if (strEqual(path1, "."))
     return getStringCopy(path2);
+  else if (strEqual(path2, "."))
+    return getStringCopy(path1);
 #endif
 
   return getStringCat2WithSeparator(path1, path2, STRING_PATH_SEPARATOR);
@@ -659,9 +661,13 @@ char *getPath2(char *path1, char *path2)
 char *getPath3(char *path1, char *path2, char *path3)
 {
 #if defined(PLATFORM_ANDROID)
-  // workaround for reading from APK assets directory -- skip leading "./"
+  // workaround for reading from assets directory -- skip "." subdirs in path
   if (strEqual(path1, "."))
     return getStringCat2WithSeparator(path2, path3, STRING_PATH_SEPARATOR);
+  else if (strEqual(path2, "."))
+    return getStringCat2WithSeparator(path1, path3, STRING_PATH_SEPARATOR);
+  else if (strEqual(path3, "."))
+    return getStringCat2WithSeparator(path1, path2, STRING_PATH_SEPARATOR);
 #endif
 
   return getStringCat3WithSeparator(path1, path2, path3, STRING_PATH_SEPARATOR);
