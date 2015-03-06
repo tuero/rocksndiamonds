@@ -4184,6 +4184,8 @@ unsigned int MoveDoor(unsigned int door_state)
       }
     }
 
+    max_step_delay = MAX(1, max_step_delay);	// prevent division by zero
+
     num_move_steps = max_move_delay / max_step_delay;
     num_move_steps_doors_only = max_move_delay_doors_only / max_step_delay;
 
