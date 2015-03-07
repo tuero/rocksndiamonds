@@ -1006,8 +1006,24 @@ static void InitializeMainControls()
   }
 }
 
+static void DrawPressedGraphicThruMask(int dst_x, int dst_y,
+				       int graphic, boolean pressed)
+{
+  struct GraphicInfo *g = &graphic_info[graphic];
+  Bitmap *src_bitmap;
+  int src_x, src_y;
+  int xoffset = (pressed ? g->pressed_xoffset : 0);
+  int yoffset = (pressed ? g->pressed_yoffset : 0);
+
+  getFixedGraphicSource(graphic, 0, &src_bitmap, &src_x, &src_y);
+
+  BlitBitmapMasked(src_bitmap, drawto, src_x + xoffset, src_y + yoffset,
+		   g->width, g->height, dst_x, dst_y);
+}
+
 static void DrawCursorAndText_Main_Ext(int nr, boolean active_text,
-				       boolean active_input)
+				       boolean active_input,
+				       boolean pressed_button)
 {
   int i;
 
@@ -1044,7 +1060,7 @@ static void DrawCursorAndText_Main_Ext(int nr, boolean active_text,
 	int y = mSY + pos->y;
 
 	DrawBackgroundForGraphic(x, y, pos->width, pos->height, button_graphic);
-	DrawFixedGraphicThruMaskExt(drawto, x, y, button_graphic, 0);
+	DrawPressedGraphicThruMask(x, y, button_graphic, pressed_button);
       }
 
       if (visibleTextPos(pos_text) && text != NULL)
@@ -1076,15 +1092,17 @@ static void DrawCursorAndText_Main_Ext(int nr, boolean active_text,
   }
 }
 
-static void DrawCursorAndText_Main(int nr, boolean active_text)
+static void DrawCursorAndText_Main(int nr, boolean active_text,
+				   boolean pressed_button)
 {
-  DrawCursorAndText_Main_Ext(nr, active_text, FALSE);
+  DrawCursorAndText_Main_Ext(nr, active_text, FALSE, pressed_button);
 }
 
 #if 0
-static void DrawCursorAndText_Main_Input(int nr, boolean active_text)
+static void DrawCursorAndText_Main_Input(int nr, boolean active_text,
+					 boolean pressed_button)
 {
-  DrawCursorAndText_Main_Ext(nr, active_text, TRUE);
+  DrawCursorAndText_Main_Ext(nr, active_text, TRUE, pressed_button);
 }
 #endif
 
@@ -1386,7 +1404,7 @@ void DrawMainMenuExt(int fade_mask, boolean do_fading)
 
   InitializeMainControls();
 
-  DrawCursorAndText_Main(-1, FALSE);
+  DrawCursorAndText_Main(-1, FALSE, FALSE);
   DrawPreviewLevelInitial();
 
   HandleMainMenu(0, 0, 0, 0, MB_MENU_INITIALIZE);
@@ -1693,12 +1711,14 @@ void HandleMainMenu_SelectLevel(int step, int direction, int selected_level_nr)
 void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 {
   static int choice = MAIN_CONTROL_GAME;
+  static boolean button_pressed_last = FALSE;
+  boolean button_pressed = FALSE;
   int pos = choice;
   int i;
 
   if (button == MB_MENU_INITIALIZE)
   {
-    DrawCursorAndText_Main(choice, TRUE);
+    DrawCursorAndText_Main(choice, TRUE, FALSE);
 
     return;
   }
@@ -1718,6 +1738,16 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 	break;
       }
     }
+
+    // handle pressed/unpressed state for active/inactive menu buttons
+    // (if pos != -1, "i" contains index position corresponding to "pos")
+    if (button &&
+	pos >= MAIN_CONTROL_NAME && pos <= MAIN_CONTROL_QUIT &&
+	insideMenuPosRect(main_controls[i].pos_button, mx - mSX, my - mSY))
+      button_pressed = TRUE;
+
+    if (button_pressed != button_pressed_last)
+      DrawCursorAndText_Main(choice, TRUE, button_pressed);
   }
   else if (dx || dy)	/* keyboard input */
   {
@@ -1756,8 +1786,8 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
       {
 	PlaySound(SND_MENU_ITEM_ACTIVATING);
 
-	DrawCursorAndText_Main(choice, FALSE);
-	DrawCursorAndText_Main(pos, TRUE);
+	DrawCursorAndText_Main(choice, FALSE, FALSE);
+	DrawCursorAndText_Main(pos, TRUE, button_pressed);
 
 	choice = pos;
       }
@@ -1844,6 +1874,8 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
       }
     }
   }
+
+  button_pressed_last = button_pressed;
 }
 
 
