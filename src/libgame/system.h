@@ -439,6 +439,9 @@
 
 #define ERROR_BASENAME		"stderr.txt"
 
+#define STRING_PARENT_DIRECTORY		".."
+#define STRING_TOP_DIRECTORY		"/"
+
 #define CHAR_PATH_SEPARATOR_UNIX	'/'
 #define CHAR_PATH_SEPARATOR_DOS		'\\'
 

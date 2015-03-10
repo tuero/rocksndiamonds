@@ -2542,12 +2542,12 @@ static int compareTreeInfoEntries(const void *object1, const void *object2)
   return compare_result;
 }
 
-static void createParentTreeInfoNode(TreeInfo *node_parent)
+static TreeInfo *createParentTreeInfoNode(TreeInfo *node_parent)
 {
   TreeInfo *ti_new;
 
   if (node_parent == NULL)
-    return;
+    return NULL;
 
   ti_new = newTreeInfo();
   setTreeInfoToDefaults(ti_new, node_parent->type);
@@ -2559,7 +2559,7 @@ static void createParentTreeInfoNode(TreeInfo *node_parent)
   setString(&ti_new->name, ".. (parent directory)");
   setString(&ti_new->name_sorting, ti_new->name);
 
-  setString(&ti_new->subdir, "..");
+  setString(&ti_new->subdir, STRING_PARENT_DIRECTORY);
   setString(&ti_new->fullpath, node_parent->fullpath);
 
   ti_new->sort_priority = node_parent->sort_priority;
@@ -2568,6 +2568,44 @@ static void createParentTreeInfoNode(TreeInfo *node_parent)
   setString(&ti_new->class_desc, getLevelClassDescription(ti_new));
 
   pushTreeInfo(&node_parent->node_group, ti_new);
+
+  return ti_new;
+}
+
+static TreeInfo *createTopTreeInfoNode(TreeInfo *node_first)
+{
+  TreeInfo *ti_new, *ti_new2;
+
+  if (node_first == NULL)
+    return NULL;
+
+  ti_new = newTreeInfo();
+  setTreeInfoToDefaults(ti_new, TREE_TYPE_LEVEL_DIR);
+
+  ti_new->node_parent = NULL;
+  ti_new->parent_link = FALSE;
+
+  setString(&ti_new->identifier, node_first->identifier);
+  setString(&ti_new->name, "level sets");
+  setString(&ti_new->name_sorting, ti_new->name);
+
+  setString(&ti_new->subdir, STRING_TOP_DIRECTORY);
+  setString(&ti_new->fullpath, node_first->fullpath);
+
+  ti_new->sort_priority = node_first->sort_priority;;
+  ti_new->latest_engine = node_first->latest_engine;
+
+  setString(&ti_new->class_desc, "level sets");
+
+  ti_new->node_group = node_first;
+  ti_new->level_group = TRUE;
+
+  ti_new2 = createParentTreeInfoNode(ti_new);
+
+  setString(&ti_new2->name, ".. (main menu)");
+  setString(&ti_new2->name_sorting, ti_new2->name);
+
+  return ti_new;
 }
 
 
@@ -2977,6 +3015,8 @@ void LoadLevelInfo()
 
   LoadLevelInfoFromLevelDir(&leveldir_first, NULL, options.level_directory);
   LoadLevelInfoFromLevelDir(&leveldir_first, NULL, getUserLevelDir(NULL));
+
+  leveldir_first = createTopTreeInfoNode(leveldir_first);
 
   /* after loading all level set information, clone the level directory tree
      and remove all level sets without levels (these may still contain artwork

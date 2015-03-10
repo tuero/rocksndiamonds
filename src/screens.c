@@ -3290,6 +3290,15 @@ static void DrawChooseTree(TreeInfo **ti_ptr)
 {
   int fade_mask = (DrawingAreaChanged() ? REDRAW_ALL : REDRAW_FIELD);
 
+  if (strEqual((*ti_ptr)->subdir, STRING_TOP_DIRECTORY))
+  {
+    game_status = GAME_MODE_MAIN;
+
+    DrawMainMenuExt(REDRAW_FIELD, FALSE);
+
+    return;
+  }
+
   UnmapAllGadgets();
 
   FreeScreenGadgets();
