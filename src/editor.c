@@ -110,16 +110,6 @@
 					 2 * MINI_TILEY)
 
 #define ED_SETTINGS1_YPOS		MINI_TILEY
-#define ED_SETTINGS2_XPOS		MINI_TILEX
-#define ED_SETTINGS2_YPOS		(ED_SETTINGS1_YPOS + 12 * TILEY - 2)
-
-/* values for counter gadgets */
-#define ED_COUNTER_YSTART		(ED_SETTINGS1_YPOS + 2 * TILEY)
-#define ED_COUNTER_YDISTANCE		(3 * MINI_TILEY)
-#define ED_COUNTER_YPOS(n)		(ED_COUNTER_YSTART +		\
-					 (n) * ED_COUNTER_YDISTANCE)
-#define ED_COUNTER2_YPOS(n)		(ED_COUNTER_YSTART +		\
-					 (n) * ED_COUNTER_YDISTANCE - 2)
 
 /* values for element content drawing areas */
 #define ED_AREA_1X1_SETTINGS_XPOS(n)	(ED_ELEMENT_SETTINGS_XPOS(n))
@@ -143,11 +133,6 @@
 					    6 * ((n) / 4) * MINI_TILEY)
 
 /* values for scrolling gadgets for drawing area */
-#define ED_SCROLLBUTTON_XPOS		24
-#define ED_SCROLLBUTTON_YPOS		0
-#define ED_SCROLLBAR_XPOS		24
-#define ED_SCROLLBAR_YPOS		64
-
 #define ED_SCROLLBUTTON_XSIZE		16
 #define ED_SCROLLBUTTON_YSIZE		16
 
@@ -171,11 +156,6 @@
 #define ED_SCROLL_VERTICAL_YSIZE	(SYSIZE - 4 * ED_SCROLLBUTTON_YSIZE)
 
 /* values for scrolling gadgets for element list */
-#define ED_SCROLLBUTTON2_XPOS		50
-#define ED_SCROLLBUTTON2_YPOS		0
-#define ED_SCROLLBAR2_XPOS		50
-#define ED_SCROLLBAR2_YPOS		20
-
 #define ED_SCROLLBUTTON2_XSIZE		(graphic_info[IMG_EDITOR_PALETTE_SCROLL_UP].width)
 #define ED_SCROLLBUTTON2_YSIZE		(graphic_info[IMG_EDITOR_PALETTE_SCROLL_UP].height)
 
@@ -197,60 +177,8 @@
 					 2 * ED_SCROLLBUTTON2_YSIZE)
 
 /* values for checkbutton gadgets */
-#define ED_CHECKBUTTON_XSIZE		ED_BUTTON_COUNT_XSIZE
-#define ED_CHECKBUTTON_YSIZE		ED_BUTTON_COUNT_YSIZE
-#define ED_CHECKBUTTON_UNCHECKED_XPOS	ED_BUTTON_MINUS_XPOS
-#define ED_CHECKBUTTON_CHECKED_XPOS	ED_BUTTON_PLUS_XPOS
-#define ED_CHECKBUTTON_YPOS		(ED_BUTTON_MINUS_YPOS + 22)
-#define ED_RADIOBUTTON_YPOS		(ED_BUTTON_MINUS_YPOS + 44)
-#define ED_STICKYBUTTON_YPOS		(ED_BUTTON_MINUS_YPOS + 66)
-
-/* values for some special graphic buttons */
-#define ED_COPY_CHANGE_PAGE_XPOS	25
-#define ED_COPY_CHANGE_PAGE_YPOS	50
-#define ED_PASTE_CHANGE_PAGE_XPOS	25
-#define ED_PASTE_CHANGE_PAGE_YPOS	70
-
-/* some values for text input, selectbox and counter gadgets */
-#define ED_BUTTON_COUNT_YPOS		60
-#define ED_BUTTON_COUNT_XSIZE		20
-#define ED_BUTTON_COUNT_YSIZE		20
-#define ED_WIN_COUNT_XPOS		(2 + ED_BUTTON_COUNT_XSIZE + 2)
-#define ED_WIN_COUNT_YPOS		ED_BUTTON_COUNT_YPOS
-#define ED_WIN_COUNT_XSIZE		52
-#define ED_WIN_COUNT_YSIZE		ED_BUTTON_COUNT_YSIZE
-
-#define ED_BUTTON_MINUS_XPOS		2
-#define ED_BUTTON_MINUS_YPOS		ED_BUTTON_COUNT_YPOS
-#define ED_BUTTON_MINUS_XSIZE		ED_BUTTON_COUNT_XSIZE
-#define ED_BUTTON_MINUS_YSIZE		ED_BUTTON_COUNT_YSIZE
-#define ED_BUTTON_PLUS_XPOS		(ED_WIN_COUNT_XPOS +		\
-	 				 ED_WIN_COUNT_XSIZE + 2)
-#define ED_BUTTON_PLUS_YPOS		ED_BUTTON_COUNT_YPOS
-#define ED_BUTTON_PLUS_XSIZE		ED_BUTTON_COUNT_XSIZE
-#define ED_BUTTON_PLUS_YSIZE		ED_BUTTON_COUNT_YSIZE
-
-#define ED_SELECTBOX_XPOS		ED_WIN_COUNT_XPOS
-#define ED_SELECTBOX_YPOS		(ED_WIN_COUNT_YPOS +		\
-					 2 + ED_WIN_COUNT_YSIZE)
-#define ED_SELECTBOX_XSIZE		ED_WIN_COUNT_XSIZE
-#define ED_SELECTBOX_YSIZE		ED_WIN_COUNT_YSIZE
-
-#define ED_SELECTBOX_BUTTON_XSIZE	14
-
-#define ED_TEXTBUTTON_XPOS		ED_WIN_COUNT_XPOS
-#define ED_TEXTBUTTON_YPOS		(ED_WIN_COUNT_YPOS +		\
-					 4 * (2 + ED_WIN_COUNT_YSIZE))
-#define ED_TEXTBUTTON_INACTIVE_YPOS	ED_TEXTBUTTON_YPOS
-
-#define ED_TEXTBUTTON_TAB_XPOS		ED_WIN_COUNT_XPOS
-#define ED_TEXTBUTTON_TAB_YPOS		(ED_WIN_COUNT_YPOS +		\
-					 2 * (2 + ED_WIN_COUNT_YSIZE))
-#define ED_TEXTBUTTON_TAB_INACTIVE_YPOS	(ED_WIN_COUNT_YPOS +		\
-					 3 * (2 + ED_WIN_COUNT_YSIZE))
-
-#define ED_TEXTBUTTON_XSIZE		ED_WIN_COUNT_XSIZE
-#define ED_TEXTBUTTON_YSIZE		ED_WIN_COUNT_YSIZE
+#define ED_CHECKBUTTON_XSIZE		20
+#define ED_CHECKBUTTON_YSIZE		20
 
 /* values for ClearEditorGadgetInfoText() and HandleEditorGadgetInfoText() */
 #define INFOTEXT_XPOS			SX
@@ -2516,39 +2444,34 @@ static struct
 
 static struct
 {
-  int gd_x, gd_y;
+  int graphic;
   int x, y;
-  int width, height;
   int gadget_id;
   int gadget_id_align;
   char *text_left, *text_right, *infotext;
 } graphicbutton_info[ED_NUM_GRAPHICBUTTONS] =
 {
   {
-    ED_BUTTON_MINUS_XPOS,		ED_BUTTON_COUNT_YPOS,
+    IMG_EDITOR_COUNTER_DOWN,
     ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(14),
-    ED_BUTTON_COUNT_XSIZE,		ED_BUTTON_COUNT_YSIZE,
     GADGET_ID_PREV_CHANGE_PAGE,		GADGET_ID_NONE,
     NULL, NULL,				"select previous change page"
   },
   {
-    ED_BUTTON_PLUS_XPOS,		ED_BUTTON_COUNT_YPOS,
+    IMG_EDITOR_COUNTER_UP,
     -1,					ED_ELEMENT_SETTINGS_YPOS(14),
-    ED_BUTTON_COUNT_XSIZE,		ED_BUTTON_COUNT_YSIZE,
     GADGET_ID_NEXT_CHANGE_PAGE,		GADGET_ID_SELECT_CHANGE_PAGE,
     NULL, "change page",		"select next change page"
   },
   {
-    ED_COPY_CHANGE_PAGE_XPOS,		ED_COPY_CHANGE_PAGE_YPOS,
+    IMG_EDITOR_BUTTON_GFX_CP_COPY,
     -1,					ED_ELEMENT_SETTINGS_YPOS(14),
-    ED_BUTTON_COUNT_XSIZE,		ED_BUTTON_COUNT_YSIZE,
     GADGET_ID_COPY_CHANGE_PAGE,		GADGET_ID_NEXT_CHANGE_PAGE,
     " ", NULL,				"copy settings from this change page"
   },
   {
-    ED_PASTE_CHANGE_PAGE_XPOS,		ED_PASTE_CHANGE_PAGE_YPOS,
+    IMG_EDITOR_BUTTON_GFX_CP_PASTE,
     -1,					ED_ELEMENT_SETTINGS_YPOS(14),
-    ED_BUTTON_COUNT_XSIZE,		ED_BUTTON_COUNT_YSIZE,
     GADGET_ID_PASTE_CHANGE_PAGE,	GADGET_ID_COPY_CHANGE_PAGE,
     NULL, NULL,				"paste settings to this change page"
   },
@@ -5338,7 +5261,6 @@ static void CreateControlButtons()
     int graphic = controlbutton_info[i].graphic;
     struct XY *pos = controlbutton_info[i].pos;
     struct GraphicInfo *gd = &graphic_info[graphic];
-    Bitmap *gd_bitmap = gd->bitmap;
     int gd_x1 = gd->src_x;
     int gd_y1 = gd->src_y;
     int gd_x2 = gd->src_x + gd->pressed_xoffset;
@@ -5347,8 +5269,6 @@ static void CreateControlButtons()
     int gd_y1a = gd->src_y + gd->active_yoffset;
     int gd_x2a = gd->src_x + gd->active_xoffset + gd->pressed_xoffset;
     int gd_y2a = gd->src_y + gd->active_yoffset + gd->pressed_yoffset;
-    int width  = gd->width;
-    int height = gd->height;
     int x = pos->x;
     int y = pos->y;
     unsigned int event_mask;
@@ -5390,16 +5310,16 @@ static void CreateControlButtons()
 		      GDI_INFO_TEXT, controlbutton_info[i].infotext,
 		      GDI_X, x,
 		      GDI_Y, y,
-		      GDI_WIDTH, width,
-		      GDI_HEIGHT, height,
+		      GDI_WIDTH, gd->width,
+		      GDI_HEIGHT, gd->height,
 		      GDI_TYPE, type,
 		      GDI_STATE, GD_BUTTON_UNPRESSED,
 		      GDI_RADIO_NR, radio_button_nr,
 		      GDI_CHECKED, checked,
-		      GDI_DESIGN_UNPRESSED, gd_bitmap, gd_x1, gd_y1,
-		      GDI_DESIGN_PRESSED, gd_bitmap, gd_x2, gd_y2,
-		      GDI_ALT_DESIGN_UNPRESSED, gd_bitmap, gd_x1a, gd_y1a,
-		      GDI_ALT_DESIGN_PRESSED, gd_bitmap, gd_x2a, gd_y2a,
+		      GDI_DESIGN_UNPRESSED, gd->bitmap, gd_x1, gd_y1,
+		      GDI_DESIGN_PRESSED, gd->bitmap, gd_x2, gd_y2,
+		      GDI_ALT_DESIGN_UNPRESSED, gd->bitmap, gd_x1a, gd_y1a,
+		      GDI_ALT_DESIGN_PRESSED, gd->bitmap, gd_x2a, gd_y2a,
 		      GDI_EVENT_MASK, event_mask,
 		      GDI_CALLBACK_INFO, HandleEditorGadgetInfoText,
 		      GDI_CALLBACK_ACTION, HandleControlButtons,
@@ -5551,14 +5471,13 @@ static void CreateCounterButtons()
 
     for (j = 0; j < 2; j++)
     {
-      Bitmap *gd_bitmap = graphic_info[IMG_GLOBAL_DOOR].bitmap;
       struct GadgetInfo *gi;
       int id = (j == 0 ?
 		counterbutton_info[i].gadget_id_down :
 		counterbutton_info[i].gadget_id_up);
-      int gd_xoffset;
-      int gd_x, gd_y, gd_x1, gd_x2, gd_y1, gd_y2;
-      int x_size, y_size;
+      int graphic;
+      struct GraphicInfo *gd;
+      int gd_x1, gd_x2, gd_y1, gd_y2;
       unsigned int event_mask;
       char infotext[max_infotext_len + 1];
 
@@ -5566,12 +5485,9 @@ static void CreateCounterButtons()
 
       if (i == ED_COUNTER_ID_SELECT_LEVEL)
       {
-	int graphic = (j == 0 ?
-		       IMG_EDITOR_BUTTON_GFX_PREV_LEVEL :
-		       IMG_EDITOR_BUTTON_GFX_NEXT_LEVEL);
-	struct GraphicInfo *gd = &graphic_info[graphic];
-
-	gd_bitmap = gd->bitmap;
+	graphic = (j == 0 ?
+		   IMG_EDITOR_BUTTON_GFX_PREV_LEVEL :
+		   IMG_EDITOR_BUTTON_GFX_NEXT_LEVEL);
 
 	event_mask |= GD_EVENT_RELEASED;
 
@@ -5585,24 +5501,20 @@ static void CreateCounterButtons()
 	  x = DX + editor.button.next_level.x;
 	  y = DY + editor.button.next_level.y;
 	}
-
-	gd_x1 = gd->src_x;
-	gd_y1 = gd->src_y;
-	gd_x2 = gd->src_x + gd->pressed_xoffset;
-	gd_y2 = gd->src_y + gd->pressed_yoffset;
-	x_size = gd->width;
-	y_size = gd->height;
       }
       else
       {
-	gd_xoffset = (j == 0 ? ED_BUTTON_MINUS_XPOS : ED_BUTTON_PLUS_XPOS);
-	gd_x1 = DOOR_GFX_PAGEX4 + gd_xoffset;
-	gd_x2 = DOOR_GFX_PAGEX3 + gd_xoffset;
-	gd_y1 = DOOR_GFX_PAGEY1 + ED_BUTTON_COUNT_YPOS;
-	gd_y2 = gd_y1;
-	x_size = ED_BUTTON_COUNT_XSIZE;
-	y_size = ED_BUTTON_COUNT_YSIZE;
+	graphic = (j == 0 ?
+		   IMG_EDITOR_COUNTER_DOWN :
+		   IMG_EDITOR_COUNTER_UP);
       }
+
+      gd = &graphic_info[graphic];
+
+      gd_x1 = gd->src_x;
+      gd_y1 = gd->src_y;
+      gd_x2 = gd->src_x + gd->pressed_xoffset;
+      gd_y2 = gd->src_y + gd->pressed_yoffset;
 
       sprintf(infotext, "%s counter value by 1, 5 or 10",
 	      (j == 0 ? "decrease" : "increase"));
@@ -5612,12 +5524,12 @@ static void CreateCounterButtons()
 			GDI_INFO_TEXT, infotext,
 			GDI_X, x,
 			GDI_Y, y,
-			GDI_WIDTH, x_size,
-			GDI_HEIGHT, y_size,
+			GDI_WIDTH, gd->width,
+			GDI_HEIGHT, gd->height,
 			GDI_TYPE, GD_TYPE_NORMAL_BUTTON,
 			GDI_STATE, GD_BUTTON_UNPRESSED,
-			GDI_DESIGN_UNPRESSED, gd_bitmap, gd_x1, gd_y1,
-			GDI_DESIGN_PRESSED, gd_bitmap, gd_x2, gd_y2,
+			GDI_DESIGN_UNPRESSED, gd->bitmap, gd_x1, gd_y1,
+			GDI_DESIGN_PRESSED, gd->bitmap, gd_x2, gd_y2,
 			GDI_EVENT_MASK, event_mask,
 			GDI_CALLBACK_INFO, HandleEditorGadgetInfoText,
 			GDI_CALLBACK_ACTION, HandleCounterButtons,
@@ -5636,35 +5548,32 @@ static void CreateCounterButtons()
       {
 	int font_type = FONT_INPUT_1;
 	int font_type_active = FONT_INPUT_1_ACTIVE;
-	int gd_width = ED_WIN_COUNT_XSIZE;
-	int border_size = ED_BORDER_SIZE;
 
 	id = counterbutton_info[i].gadget_id_text;
+
 	event_mask = GD_EVENT_TEXT_RETURN | GD_EVENT_TEXT_LEAVING;
 
 	if (i == ED_COUNTER_ID_SELECT_LEVEL)
 	{
-	  int graphic = IMG_EDITOR_INPUT_GFX_LEVEL_NUMBER;
-	  struct GraphicInfo *gd = &graphic_info[graphic];
-
-	  gd_bitmap = gd->bitmap;
-
-	  x = DX + editor.input.level_number.x;
-	  y = DY + editor.input.level_number.y;
-
-	  gd_x = gd->src_x;
-	  gd_y = gd->src_y;
-	  gd_width = gd->width;
-	  border_size = gd->border_size;
+	  graphic = IMG_EDITOR_INPUT_GFX_LEVEL_NUMBER;
 
 	  font_type = FONT_LEVEL_NUMBER;
 	  font_type_active = FONT_LEVEL_NUMBER_ACTIVE;
+
+	  x = DX + editor.input.level_number.x;
+	  y = DY + editor.input.level_number.y;
 	}
 	else
 	{
-	  gd_x = DOOR_GFX_PAGEX4 + ED_WIN_COUNT_XPOS;
-	  gd_y = DOOR_GFX_PAGEY1 + ED_WIN_COUNT_YPOS;
+	  graphic = IMG_EDITOR_COUNTER_INPUT;
 	}
+
+	gd = &graphic_info[graphic];
+
+	gd_x1 = gd->src_x;
+	gd_y1 = gd->src_y;
+	gd_x2 = gd->src_x + gd->active_xoffset;
+	gd_y2 = gd->src_y + gd->active_yoffset;
 
 	gi = CreateGadget(GDI_CUSTOM_ID, id,
 			  GDI_CUSTOM_TYPE_ID, i,
@@ -5678,10 +5587,10 @@ static void CreateCounterButtons()
 			  GDI_TEXT_SIZE, 3,	/* minimal counter text size */
 			  GDI_TEXT_FONT, font_type,
 			  GDI_TEXT_FONT_ACTIVE, font_type_active,
-			  GDI_DESIGN_UNPRESSED, gd_bitmap, gd_x, gd_y,
-			  GDI_DESIGN_PRESSED, gd_bitmap, gd_x, gd_y,
-			  GDI_BORDER_SIZE, border_size, border_size,
-			  GDI_DESIGN_WIDTH, gd_width,
+			  GDI_DESIGN_UNPRESSED, gd->bitmap, gd_x1, gd_y1,
+			  GDI_DESIGN_PRESSED, gd->bitmap, gd_x2, gd_y2,
+			  GDI_BORDER_SIZE, gd->border_size, gd->border_size,
+			  GDI_DESIGN_WIDTH, gd->width,
 			  GDI_EVENT_MASK, event_mask,
 			  GDI_CALLBACK_INFO, HandleEditorGadgetInfoText,
 			  GDI_CALLBACK_ACTION, HandleCounterButtons,
@@ -5759,17 +5668,17 @@ static void CreateTextInputGadgets()
 
   for (i = 0; i < ED_NUM_TEXTINPUT; i++)
   {
-    Bitmap *gd_bitmap = graphic_info[IMG_GLOBAL_DOOR].bitmap;
-    int gd_x, gd_y;
+    struct GraphicInfo *gd = &graphic_info[IMG_EDITOR_INPUT_TEXT];
+    int gd_x1 = gd->src_x;
+    int gd_y1 = gd->src_y;
+    int gd_x2 = gd->src_x + gd->active_xoffset;
+    int gd_y2 = gd->src_y + gd->active_yoffset;
     struct GadgetInfo *gi;
     unsigned int event_mask;
     char infotext[MAX_OUTPUT_LINESIZE + 1];
     int id = textinput_info[i].gadget_id;
 
     event_mask = GD_EVENT_TEXT_RETURN | GD_EVENT_TEXT_LEAVING;
-
-    gd_x = DOOR_GFX_PAGEX4 + ED_WIN_COUNT_XPOS;
-    gd_y = DOOR_GFX_PAGEY1 + ED_WIN_COUNT_YPOS;
 
     sprintf(infotext, "Enter %s", textinput_info[i].infotext);
     infotext[max_infotext_len] = '\0';
@@ -5784,10 +5693,10 @@ static void CreateTextInputGadgets()
 		      GDI_TEXT_SIZE, textinput_info[i].size,
 		      GDI_TEXT_FONT, FONT_INPUT_1,
 		      GDI_TEXT_FONT_ACTIVE, FONT_INPUT_1_ACTIVE,
-		      GDI_DESIGN_UNPRESSED, gd_bitmap, gd_x, gd_y,
-		      GDI_DESIGN_PRESSED, gd_bitmap, gd_x, gd_y,
-		      GDI_BORDER_SIZE, ED_BORDER_SIZE, ED_BORDER_SIZE,
-		      GDI_DESIGN_WIDTH, ED_WIN_COUNT_XSIZE,
+		      GDI_DESIGN_UNPRESSED, gd->bitmap, gd_x1, gd_y1,
+		      GDI_DESIGN_PRESSED, gd->bitmap, gd_x2, gd_y2,
+		      GDI_BORDER_SIZE, gd->border_size, gd->border_size,
+		      GDI_DESIGN_WIDTH, gd->width,
 		      GDI_EVENT_MASK, event_mask,
 		      GDI_CALLBACK_INFO, HandleEditorGadgetInfoText,
 		      GDI_CALLBACK_ACTION, HandleTextInputGadgets,
@@ -5807,8 +5716,11 @@ static void CreateTextAreaGadgets()
 
   for (i = 0; i < ED_NUM_TEXTAREAS; i++)
   {
-    Bitmap *gd_bitmap = graphic_info[IMG_GLOBAL_DOOR].bitmap;
-    int gd_x, gd_y;
+    struct GraphicInfo *gd = &graphic_info[IMG_EDITOR_INPUT_TEXTAREA];
+    int gd_x1 = gd->src_x;
+    int gd_y1 = gd->src_y;
+    int gd_x2 = gd->src_x + gd->active_xoffset;
+    int gd_y2 = gd->src_y + gd->active_yoffset;
     struct GadgetInfo *gi;
     unsigned int event_mask;
     char infotext[MAX_OUTPUT_LINESIZE + 1];
@@ -5817,9 +5729,6 @@ static void CreateTextAreaGadgets()
     int area_ysize = textarea_info[i].ysize;
 
     event_mask = GD_EVENT_TEXT_LEAVING;
-
-    gd_x = DOOR_GFX_PAGEX4 + ED_WIN_COUNT_XPOS;
-    gd_y = DOOR_GFX_PAGEY1 + ED_WIN_COUNT_YPOS;
 
     sprintf(infotext, "Enter %s", textarea_info[i].infotext);
     infotext[max_infotext_len] = '\0';
@@ -5833,10 +5742,10 @@ static void CreateTextAreaGadgets()
 		      GDI_AREA_SIZE, area_xsize, area_ysize,
 		      GDI_TEXT_FONT, FONT_INPUT_1,
 		      GDI_TEXT_FONT_ACTIVE, FONT_INPUT_1_ACTIVE,
-		      GDI_DESIGN_UNPRESSED, gd_bitmap, gd_x, gd_y,
-		      GDI_DESIGN_PRESSED, gd_bitmap, gd_x, gd_y,
-		      GDI_BORDER_SIZE, ED_BORDER_SIZE, ED_BORDER_SIZE,
-		      GDI_DESIGN_WIDTH, ED_WIN_COUNT_XSIZE,
+		      GDI_DESIGN_UNPRESSED, gd->bitmap, gd_x1, gd_y1,
+		      GDI_DESIGN_PRESSED, gd->bitmap, gd_x2, gd_y2,
+		      GDI_BORDER_SIZE, gd->border_size, gd->border_size,
+		      GDI_DESIGN_WIDTH, gd->width,
 		      GDI_EVENT_MASK, event_mask,
 		      GDI_CALLBACK_INFO, HandleEditorGadgetInfoText,
 		      GDI_CALLBACK_ACTION, HandleTextAreaGadgets,
@@ -5856,8 +5765,13 @@ static void CreateSelectboxGadgets()
 
   for (i = 0; i < ED_NUM_SELECTBOX; i++)
   {
-    Bitmap *gd_bitmap = graphic_info[IMG_GLOBAL_DOOR].bitmap;
-    int gd_x, gd_y;
+    struct GraphicInfo *gd = &graphic_info[IMG_EDITOR_SELECTBOX_INPUT];
+    struct GraphicInfo *gd2 = &graphic_info[IMG_EDITOR_SELECTBOX_BUTTON];
+    int gd_x1 = gd->src_x;
+    int gd_y1 = gd->src_y;
+    int gd_x2 = gd->src_x + gd->active_xoffset;
+    int gd_y2 = gd->src_y + gd->active_yoffset;
+    int selectbox_button_xsize = gd2->width;
     struct GadgetInfo *gi;
     unsigned int event_mask;
     char infotext[MAX_OUTPUT_LINESIZE + 1];
@@ -5881,9 +5795,6 @@ static void CreateSelectboxGadgets()
 
     event_mask = GD_EVENT_RELEASED |
       GD_EVENT_TEXT_RETURN | GD_EVENT_TEXT_LEAVING;
-
-    gd_x = DOOR_GFX_PAGEX4 + ED_SELECTBOX_XPOS;
-    gd_y = DOOR_GFX_PAGEY1 + ED_SELECTBOX_YPOS;
 
     /* determine horizontal position to the right of specified gadget */
     if (selectbox_info[i].gadget_id_align != GADGET_ID_NONE)
@@ -5909,11 +5820,11 @@ static void CreateSelectboxGadgets()
 		      GDI_TEXT_FONT, FONT_INPUT_1,
 		      GDI_TEXT_FONT_ACTIVE, FONT_INPUT_1_ACTIVE,
 		      GDI_TEXT_FONT_UNSELECTABLE, FONT_TEXT_1,
-		      GDI_DESIGN_UNPRESSED, gd_bitmap, gd_x, gd_y,
-		      GDI_DESIGN_PRESSED, gd_bitmap, gd_x, gd_y,
-		      GDI_BORDER_SIZE, ED_BORDER_SIZE, ED_BORDER_SIZE,
-		      GDI_BORDER_SIZE_SELECTBUTTON, ED_SELECTBOX_BUTTON_XSIZE,
-		      GDI_DESIGN_WIDTH, ED_WIN_COUNT_XSIZE,
+		      GDI_DESIGN_UNPRESSED, gd->bitmap, gd_x1, gd_y1,
+		      GDI_DESIGN_PRESSED, gd->bitmap, gd_x2, gd_y2,
+		      GDI_BORDER_SIZE, gd->border_size, gd->border_size,
+		      GDI_BORDER_SIZE_SELECTBUTTON, selectbox_button_xsize,
+		      GDI_DESIGN_WIDTH, gd->width,
 		      GDI_EVENT_MASK, event_mask,
 		      GDI_CALLBACK_INFO, HandleEditorGadgetInfoText,
 		      GDI_CALLBACK_ACTION, HandleSelectboxGadgets,
@@ -5935,12 +5846,23 @@ static void CreateTextbuttonGadgets()
 
   for (i = 0; i < ED_NUM_TEXTBUTTONS; i++)
   {
-    Bitmap *gd_bitmap = graphic_info[IMG_GLOBAL_DOOR].bitmap;
-    int gd_x1, gd_x2, gd_y1, gd_y2;
+    int id = textbutton_info[i].gadget_id;
+    int graphic =
+      ((id >= GADGET_ID_LEVELINFO_LEVEL && id <= GADGET_ID_LEVELINFO_EDITOR) ||
+       (id >= GADGET_ID_PROPERTIES_INFO && id <= GADGET_ID_PROPERTIES_CHANGE) ?
+       IMG_EDITOR_TABBUTTON : IMG_EDITOR_TEXTBUTTON);
+    struct GraphicInfo *gd = &graphic_info[graphic];
+    int gd_x1 = gd->src_x;
+    int gd_y1 = gd->src_y;
+    int gd_x2 = gd->src_x + gd->pressed_xoffset;
+    int gd_y2 = gd->src_y + gd->pressed_yoffset;
+    int gd_x1a = gd->src_x + gd->active_xoffset;
+    int gd_y1a = gd->src_y + gd->active_yoffset;
+    int border_xsize = gd->border_size + gd->draw_xoffset;
+    int border_ysize = gd->border_size;
     struct GadgetInfo *gi;
     unsigned int event_mask;
     char infotext[MAX_OUTPUT_LINESIZE + 1];
-    int id = textbutton_info[i].gadget_id;
     int x = SX + textbutton_info[i].x;
     int y = SY + textbutton_info[i].y;
 
@@ -5948,22 +5870,6 @@ static void CreateTextbuttonGadgets()
       textbutton_info[i].size = strlen(textbutton_info[i].text);
 
     event_mask = GD_EVENT_RELEASED;
-
-    if ((id >= GADGET_ID_LEVELINFO_LEVEL && id <= GADGET_ID_LEVELINFO_EDITOR) ||
-	(id >= GADGET_ID_PROPERTIES_INFO && id <= GADGET_ID_PROPERTIES_CHANGE))
-    {
-      gd_x1 = DOOR_GFX_PAGEX4 + ED_TEXTBUTTON_TAB_XPOS;
-      gd_x2 = DOOR_GFX_PAGEX3 + ED_TEXTBUTTON_TAB_XPOS;
-      gd_y1 = DOOR_GFX_PAGEY1 + ED_TEXTBUTTON_TAB_YPOS;
-      gd_y2 = DOOR_GFX_PAGEY1 + ED_TEXTBUTTON_TAB_INACTIVE_YPOS;
-    }
-    else
-    {
-      gd_x1 = DOOR_GFX_PAGEX4 + ED_TEXTBUTTON_XPOS;
-      gd_x2 = DOOR_GFX_PAGEX3 + ED_TEXTBUTTON_XPOS;
-      gd_y1 = DOOR_GFX_PAGEY1 + ED_TEXTBUTTON_YPOS;
-      gd_y2 = DOOR_GFX_PAGEY1 + ED_TEXTBUTTON_INACTIVE_YPOS;
-    }
 
     sprintf(infotext, "%s", textbutton_info[i].infotext);
     infotext[max_infotext_len] = '\0';
@@ -5987,11 +5893,11 @@ static void CreateTextbuttonGadgets()
 		      GDI_TEXT_SIZE, textbutton_info[i].size,
 		      GDI_TEXT_FONT, FONT_INPUT_2_ACTIVE,
 		      GDI_TEXT_FONT_ACTIVE, FONT_INPUT_2,
-		      GDI_DESIGN_UNPRESSED, gd_bitmap, gd_x1, gd_y1,
-		      GDI_DESIGN_PRESSED, gd_bitmap, gd_x2, gd_y1,
-		      GDI_ALT_DESIGN_UNPRESSED, gd_bitmap, gd_x1, gd_y2,
-		      GDI_BORDER_SIZE, ED_BORDER_TEXT_XSIZE, ED_BORDER_SIZE,
-		      GDI_DESIGN_WIDTH, ED_WIN_COUNT_XSIZE,
+		      GDI_DESIGN_UNPRESSED, gd->bitmap, gd_x1, gd_y1,
+		      GDI_DESIGN_PRESSED, gd->bitmap, gd_x2, gd_y2,
+		      GDI_ALT_DESIGN_UNPRESSED, gd->bitmap, gd_x1a, gd_y1a,
+		      GDI_BORDER_SIZE, border_xsize, border_ysize,
+		      GDI_DESIGN_WIDTH, gd->width,
 		      GDI_DECORATION_SHIFTING, 1, 1,
 		      GDI_EVENT_MASK, event_mask,
 		      GDI_CALLBACK_INFO, HandleEditorGadgetInfoText,
@@ -6009,7 +5915,6 @@ static void CreateTextbuttonGadgets()
 
 static void CreateGraphicbuttonGadgets()
 {
-  Bitmap *gd_bitmap = graphic_info[IMG_GLOBAL_DOOR].bitmap;
   struct GadgetInfo *gi;
   unsigned int event_mask;
   int i;
@@ -6018,26 +5923,15 @@ static void CreateGraphicbuttonGadgets()
   for (i = 0; i < ED_NUM_GRAPHICBUTTONS; i++)
   {
     int id = graphicbutton_info[i].gadget_id;
-    int gd_x1, gd_x2, gd_y1, gd_y2;
     int x = SX + graphicbutton_info[i].x;
     int y = SY + graphicbutton_info[i].y;
+    struct GraphicInfo *gd = &graphic_info[graphicbutton_info[i].graphic];
+    int gd_x1 = gd->src_x;
+    int gd_y1 = gd->src_y;
+    int gd_x2 = gd->src_x + gd->pressed_xoffset;
+    int gd_y2 = gd->src_y + gd->pressed_yoffset;
 
     event_mask = GD_EVENT_PRESSED | GD_EVENT_REPEATED;
-
-    if (i <= ED_GRAPHICBUTTON_ID_NEXT_CHANGE_PAGE)
-    {
-      gd_x1 = DOOR_GFX_PAGEX4 + graphicbutton_info[i].gd_x;
-      gd_y1 = DOOR_GFX_PAGEY1 + graphicbutton_info[i].gd_y;
-      gd_x2 = DOOR_GFX_PAGEX3 + graphicbutton_info[i].gd_x;
-      gd_y2 = gd_y1;
-    }
-    else	/* (i <= ED_GRAPHICBUTTON_ID_PASTE_CHANGE_PAGE) */
-    {
-      gd_x1 = DOOR_GFX_PAGEX6 + graphicbutton_info[i].gd_x;
-      gd_y1 = DOOR_GFX_PAGEY1 + graphicbutton_info[i].gd_y;
-      gd_x2 = gd_x1 - ED_BUTTON_COUNT_XSIZE;
-      gd_y2 = gd_y1;
-    }
 
     /* determine horizontal position to the right of specified gadget */
     if (graphicbutton_info[i].gadget_id_align != GADGET_ID_NONE)
@@ -6053,12 +5947,12 @@ static void CreateGraphicbuttonGadgets()
 		      GDI_INFO_TEXT, graphicbutton_info[i].infotext,
 		      GDI_X, x,
 		      GDI_Y, y,
-		      GDI_WIDTH, graphicbutton_info[i].width,
-		      GDI_HEIGHT, graphicbutton_info[i].height,
+		      GDI_WIDTH, gd->width,
+		      GDI_HEIGHT, gd->height,
 		      GDI_TYPE, GD_TYPE_NORMAL_BUTTON,
 		      GDI_STATE, GD_BUTTON_UNPRESSED,
-		      GDI_DESIGN_UNPRESSED, gd_bitmap, gd_x1, gd_y1,
-		      GDI_DESIGN_PRESSED, gd_bitmap, gd_x2, gd_y2,
+		      GDI_DESIGN_UNPRESSED, gd->bitmap, gd_x1, gd_y1,
+		      GDI_DESIGN_PRESSED, gd->bitmap, gd_x2, gd_y2,
 		      GDI_EVENT_MASK, event_mask,
 		      GDI_CALLBACK_INFO, HandleEditorGadgetInfoText,
 		      GDI_CALLBACK_ACTION, HandleGraphicbuttonGadgets,
@@ -6190,30 +6084,28 @@ static void CreateScrollbarGadgets()
 
 static void CreateCheckbuttonGadgets()
 {
-  Bitmap *gd_bitmap = graphic_info[IMG_GLOBAL_DOOR].bitmap;
   struct GadgetInfo *gi;
   unsigned int event_mask;
-  int gd_x1, gd_x2, gd_x3, gd_x4, gd_y;
   int i;
 
   event_mask = GD_EVENT_PRESSED;
 
-  gd_x1 = DOOR_GFX_PAGEX4 + ED_CHECKBUTTON_UNCHECKED_XPOS;
-  gd_x2 = DOOR_GFX_PAGEX3 + ED_CHECKBUTTON_UNCHECKED_XPOS;
-  gd_x3 = DOOR_GFX_PAGEX4 + ED_CHECKBUTTON_CHECKED_XPOS;
-  gd_x4 = DOOR_GFX_PAGEX3 + ED_CHECKBUTTON_CHECKED_XPOS;
-  gd_y  = DOOR_GFX_PAGEY1 + ED_RADIOBUTTON_YPOS;
-
   for (i = 0; i < ED_NUM_CHECKBUTTONS; i++)
   {
     int id = checkbutton_info[i].gadget_id;
+    int graphic = (id == GADGET_ID_STICK_ELEMENT ? IMG_EDITOR_STICKYBUTTON :
+		   IMG_EDITOR_CHECKBOX);
+    struct GraphicInfo *gd = &graphic_info[graphic];
+    int gd_x1 = gd->src_x;
+    int gd_y1 = gd->src_y;
+    int gd_x2 = gd->src_x + gd->pressed_xoffset;
+    int gd_y2 = gd->src_y + gd->pressed_yoffset;
+    int gd_x1a = gd->src_x + gd->active_xoffset;
+    int gd_y1a = gd->src_y + gd->active_yoffset;
+    int gd_x2a = gd->src_x + gd->active_xoffset + gd->pressed_xoffset;
+    int gd_y2a = gd->src_y + gd->active_yoffset + gd->pressed_yoffset;
     int x = SX + checkbutton_info[i].x;
     int y = SY + checkbutton_info[i].y;
-
-    if (id == GADGET_ID_STICK_ELEMENT)
-      gd_y  = DOOR_GFX_PAGEY1 + ED_STICKYBUTTON_YPOS;
-    else
-      gd_y  = DOOR_GFX_PAGEY1 + ED_CHECKBUTTON_YPOS;
 
     /* determine horizontal position to the right of specified gadget */
     if (checkbutton_info[i].gadget_id_align != GADGET_ID_NONE)
@@ -6229,14 +6121,14 @@ static void CreateCheckbuttonGadgets()
 		      GDI_INFO_TEXT, checkbutton_info[i].infotext,
 		      GDI_X, x,
 		      GDI_Y, y,
-		      GDI_WIDTH, ED_CHECKBUTTON_XSIZE,
-		      GDI_HEIGHT, ED_CHECKBUTTON_YSIZE,
+		      GDI_WIDTH, gd->width,
+		      GDI_HEIGHT, gd->height,
 		      GDI_TYPE, GD_TYPE_CHECK_BUTTON,
 		      GDI_CHECKED, *checkbutton_info[i].value,
-		      GDI_DESIGN_UNPRESSED, gd_bitmap, gd_x1, gd_y,
-		      GDI_DESIGN_PRESSED, gd_bitmap, gd_x2, gd_y,
-		      GDI_ALT_DESIGN_UNPRESSED, gd_bitmap, gd_x3, gd_y,
-		      GDI_ALT_DESIGN_PRESSED, gd_bitmap, gd_x4, gd_y,
+		      GDI_DESIGN_UNPRESSED, gd->bitmap, gd_x1, gd_y1,
+		      GDI_DESIGN_PRESSED, gd->bitmap, gd_x2, gd_y2,
+		      GDI_ALT_DESIGN_UNPRESSED, gd->bitmap, gd_x1a, gd_y1a,
+		      GDI_ALT_DESIGN_PRESSED, gd->bitmap, gd_x2a, gd_y2a,
 		      GDI_EVENT_MASK, event_mask,
 		      GDI_CALLBACK_INFO, HandleEditorGadgetInfoText,
 		      GDI_CALLBACK_ACTION, HandleCheckbuttons,
@@ -6253,19 +6145,20 @@ static void CreateCheckbuttonGadgets()
 
 static void CreateRadiobuttonGadgets()
 {
-  Bitmap *gd_bitmap = graphic_info[IMG_GLOBAL_DOOR].bitmap;
+  struct GraphicInfo *gd = &graphic_info[IMG_EDITOR_RADIOBUTTON];
+  int gd_x1 = gd->src_x;
+  int gd_y1 = gd->src_y;
+  int gd_x2 = gd->src_x + gd->pressed_xoffset;
+  int gd_y2 = gd->src_y + gd->pressed_yoffset;
+  int gd_x1a = gd->src_x + gd->active_xoffset;
+  int gd_y1a = gd->src_y + gd->active_yoffset;
+  int gd_x2a = gd->src_x + gd->active_xoffset + gd->pressed_xoffset;
+  int gd_y2a = gd->src_y + gd->active_yoffset + gd->pressed_yoffset;
   struct GadgetInfo *gi;
   unsigned int event_mask;
-  int gd_x1, gd_x2, gd_x3, gd_x4, gd_y;
   int i;
 
   event_mask = GD_EVENT_PRESSED;
-
-  gd_x1 = DOOR_GFX_PAGEX4 + ED_CHECKBUTTON_UNCHECKED_XPOS;
-  gd_x2 = DOOR_GFX_PAGEX3 + ED_CHECKBUTTON_UNCHECKED_XPOS;
-  gd_x3 = DOOR_GFX_PAGEX4 + ED_CHECKBUTTON_CHECKED_XPOS;
-  gd_x4 = DOOR_GFX_PAGEX3 + ED_CHECKBUTTON_CHECKED_XPOS;
-  gd_y  = DOOR_GFX_PAGEY1 + ED_RADIOBUTTON_YPOS;
 
   for (i = 0; i < ED_NUM_RADIOBUTTONS; i++)
   {
@@ -6290,15 +6183,15 @@ static void CreateRadiobuttonGadgets()
 		      GDI_INFO_TEXT, radiobutton_info[i].infotext,
 		      GDI_X, x,
 		      GDI_Y, y,
-		      GDI_WIDTH, ED_CHECKBUTTON_XSIZE,
-		      GDI_HEIGHT, ED_CHECKBUTTON_YSIZE,
+		      GDI_WIDTH, gd->width,
+		      GDI_HEIGHT, gd->height,
 		      GDI_TYPE, GD_TYPE_RADIO_BUTTON,
 		      GDI_RADIO_NR, radiobutton_info[i].radio_button_nr,
 		      GDI_CHECKED, checked,
-		      GDI_DESIGN_UNPRESSED, gd_bitmap, gd_x1, gd_y,
-		      GDI_DESIGN_PRESSED, gd_bitmap, gd_x2, gd_y,
-		      GDI_ALT_DESIGN_UNPRESSED, gd_bitmap, gd_x3, gd_y,
-		      GDI_ALT_DESIGN_PRESSED, gd_bitmap, gd_x4, gd_y,
+		      GDI_DESIGN_UNPRESSED, gd->bitmap, gd_x1, gd_y1,
+		      GDI_DESIGN_PRESSED, gd->bitmap, gd_x2, gd_y2,
+		      GDI_ALT_DESIGN_UNPRESSED, gd->bitmap, gd_x1a, gd_y1a,
+		      GDI_ALT_DESIGN_PRESSED, gd->bitmap, gd_x2a, gd_y2a,
 		      GDI_EVENT_MASK, event_mask,
 		      GDI_CALLBACK_INFO, HandleEditorGadgetInfoText,
 		      GDI_CALLBACK_ACTION, HandleRadiobuttons,
