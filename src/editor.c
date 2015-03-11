@@ -11331,9 +11331,9 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 
     case GADGET_ID_ZOOM:
       // zoom level editor tile size in or out (or reset to default size)
-      ed_tilesize = (button == 1 ? ed_tilesize / 2 :
+      ed_tilesize = (button == 1 ? ed_tilesize * 2 :
 		     button == 2 ? DEFAULT_EDITOR_TILESIZE :
-		     button == 3 ? ed_tilesize * 2 : ed_tilesize);
+		     button == 3 ? ed_tilesize / 2 : ed_tilesize);
 
       // limit zoom level by upper and lower bound
       ed_tilesize = MIN(MAX(MICRO_TILESIZE, ed_tilesize), TILESIZE);
