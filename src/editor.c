@@ -77,59 +77,133 @@
 					 MINI_TILEX / 2)
 
 /* values for the settings windows */
-#define ED_LEVEL_SETTINGS_XSTART	(3 * MINI_TILEX / 2)
-#define ED_LEVEL_SETTINGS_YSTART	(7 * MINI_TILEY)
-
-#define ED_ELEMENT_SETTINGS_XSTART	(3 * MINI_TILEX / 2)
-#define ED_ELEMENT_SETTINGS_YSTART	(10 * MINI_TILEY)
-
-#define ED_XOFFSET_CHECKBOX		(ED_CHECKBUTTON_XSIZE +		\
-					 2 * ED_GADGET_DISTANCE)
-
-#define ED_SETTINGS_XOFFSET		ED_XOFFSET_CHECKBOX
-#define ED_SETTINGS_YOFFSET		(3 * MINI_TILEY / 2)
-#define ED_SETTINGS_TAB_XOFFSET		124
-
-#define ED_LEVEL_SETTINGS_XPOS(n)	(ED_LEVEL_SETTINGS_XSTART +	\
-	 				 (n) * ED_SETTINGS_XOFFSET)
-#define ED_LEVEL_SETTINGS_YPOS(n)	(ED_LEVEL_SETTINGS_YSTART +	\
-					 (n) * ED_SETTINGS_YOFFSET)
-
-#define ED_ELEMENT_SETTINGS_XPOS(n)	(ED_ELEMENT_SETTINGS_XSTART +	\
-	 				 (n) * ED_SETTINGS_XOFFSET)
-#define ED_ELEMENT_SETTINGS_YPOS(n)	(ED_ELEMENT_SETTINGS_YSTART +	\
-					 (n) * ED_SETTINGS_YOFFSET)
-
-#define ED_LEVEL_SETTINGS_TABS_YPOS	(ED_LEVEL_SETTINGS_YSTART -	\
-					 3 * MINI_TILEY)
-#define ED_ELEMENT_SETTINGS_TABS_YPOS	(ED_ELEMENT_SETTINGS_YSTART -	\
-					 2 * MINI_TILEY)
-
 #define ED_SETTINGS1_YPOS		MINI_TILEY
 
 #define ED_ELEMENT_SETTINGS_ELEM_XPOS	(2 * MINI_TILEX)
 #define ED_ELEMENT_SETTINGS_ELEM_YPOS	(4 * MINI_TILEY + MINI_TILEY / 2)
 
-/* values for element content drawing areas */
-#define ED_AREA_1X1_SETTINGS_XPOS(n)	(ED_ELEMENT_SETTINGS_XPOS(n))
-#define ED_AREA_1X1_SETTINGS_YPOS(n)	(ED_ELEMENT_SETTINGS_YPOS(n) +	\
+/* values for checkbutton gadgets */
+#define ED_CHECKBUTTON_XSIZE	     (graphic_info[IMG_EDITOR_CHECKBOX].width)
+#define ED_CHECKBUTTON_YSIZE	     (graphic_info[IMG_EDITOR_CHECKBOX].height)
+
+#define ED_TABBUTTON_XSIZE	     (graphic_info[IMG_EDITOR_TABBUTTON].width)
+#define ED_TABBUTTON_YSIZE	     (graphic_info[IMG_EDITOR_TABBUTTON].height)
+
+#define ED_TAB_BAR_HEIGHT		ED_GADGET_DISTANCE
+
+#define ED_LEVEL_SETTINGS_BASE_XSTART	(3 * MINI_TILEX / 2)
+#define ED_LEVEL_SETTINGS_BASE_YSTART	(9 * MINI_TILEY / 2)
+#define ED_ELEMENT_SETTINGS_BASE_XSTART	(3 * MINI_TILEX / 2)
+#define ED_ELEMENT_SETTINGS_BASE_YSTART	(9 * MINI_TILEY)
+
+#define ED_LEVEL_SETTINGS_XSTART	(ED_LEVEL_SETTINGS_BASE_XSTART)
+#define ED_LEVEL_SETTINGS_YSTART	(ED_LEVEL_SETTINGS_BASE_YSTART + \
+					 ED_TABBUTTON_YSIZE +		 \
+					 ED_TAB_BAR_HEIGHT +		 \
+					 ED_GADGET_DISTANCE +		 \
+					 getFontHeight(FONT_TEXT_1) +	 \
+					 ED_GADGET_DISTANCE)
+#define ED_ELEMENT_SETTINGS_XSTART	(ED_ELEMENT_SETTINGS_BASE_XSTART)
+#define ED_ELEMENT_SETTINGS_YSTART	(ED_ELEMENT_SETTINGS_BASE_YSTART + \
+					 getFontHeight(FONT_INPUT_2) +	   \
 					 ED_GADGET_DISTANCE)
 
-#define ED_AREA_3X3_SETTINGS_XPOS(n)	(ED_ELEMENT_SETTINGS_XPOS(n))
-#define ED_AREA_3X3_SETTINGS_YPOS(n)	(ED_ELEMENT_SETTINGS_YPOS(n) +	\
-					 ED_GADGET_DISTANCE - MINI_TILEY)
+#define ED_SETTINGS_XOFFSET		(ED_CHECKBUTTON_XSIZE +		\
+					 ED_GADGET_TEXT_DISTANCE)
+#define ED_SETTINGS_YOFFSET		(ED_CHECKBUTTON_YSIZE +		\
+					 ED_GADGET_LINE_DISTANCE)
+
+#define ED_POS_LEVEL_SETTINGS		(100)
+#define ED_POS_ELEMENT_SETTINGS		(200)
+
+#define ED_LEVEL_SETTINGS_XPOS(n)	(ED_POS_LEVEL_SETTINGS + (n))
+#define ED_LEVEL_SETTINGS_YPOS(n)	(ED_POS_LEVEL_SETTINGS + (n))
+
+#define ED_ELEMENT_SETTINGS_XPOS(n)	(ED_POS_ELEMENT_SETTINGS + (n))
+#define ED_ELEMENT_SETTINGS_YPOS(n)	(ED_POS_ELEMENT_SETTINGS + (n))
+
+#define IS_POS_LEVEL_SETTINGS(n)	((n) >= ED_POS_LEVEL_SETTINGS && \
+					 (n) < ED_POS_LEVEL_SETTINGS + 100)
+#define IS_POS_ELEMENT_SETTINGS(n)	((n) >= ED_POS_ELEMENT_SETTINGS && \
+					 (n) < ED_POS_ELEMENT_SETTINGS + 100)
+
+#define ED_LEVEL_SETTINGS_LINE(n)	((n) - ED_POS_LEVEL_SETTINGS)
+#define ED_ELEMENT_SETTINGS_LINE(n)	((n) - ED_POS_ELEMENT_SETTINGS)
+
+#define ED_LEVEL_SETTINGS_X(n)		(ED_LEVEL_SETTINGS_XSTART +	\
+					 (n) * ED_SETTINGS_XOFFSET)
+#define ED_LEVEL_SETTINGS_Y(n)		(ED_LEVEL_SETTINGS_YSTART +	\
+					 (n) * ED_SETTINGS_YOFFSET)
+
+#define ED_ELEMENT_SETTINGS_X(n)	(ED_ELEMENT_SETTINGS_XSTART +	\
+					 (n) * ED_SETTINGS_XOFFSET)
+#define ED_ELEMENT_SETTINGS_Y(n)	(ED_ELEMENT_SETTINGS_YSTART +	\
+					 (n) * ED_SETTINGS_YOFFSET)
+
+#define ED_POS_TO_LEVEL_SETTINGS_X(n)	\
+  (ED_LEVEL_SETTINGS_X(ED_LEVEL_SETTINGS_LINE(n)))
+#define ED_POS_TO_LEVEL_SETTINGS_Y(n)	\
+  (ED_LEVEL_SETTINGS_Y(ED_LEVEL_SETTINGS_LINE(n)))
+
+#define ED_POS_TO_ELEMENT_SETTINGS_X(n)	\
+  (ED_ELEMENT_SETTINGS_X(ED_ELEMENT_SETTINGS_LINE(n)))
+#define ED_POS_TO_ELEMENT_SETTINGS_Y(n)	\
+  (ED_ELEMENT_SETTINGS_Y(ED_ELEMENT_SETTINGS_LINE(n)))
+
+#define ED_SETTINGS_X(n)		(IS_POS_LEVEL_SETTINGS(n) ?	\
+					 ED_POS_TO_LEVEL_SETTINGS_X(n) : \
+					 ED_POS_TO_ELEMENT_SETTINGS_X(n))
+#define ED_SETTINGS_Y(n)		(IS_POS_LEVEL_SETTINGS(n) ?	\
+					 ED_POS_TO_LEVEL_SETTINGS_Y(n) : \
+					 ED_POS_TO_ELEMENT_SETTINGS_Y(n))
+
+#define ED_AREA_SETTINGS_X(i)		(ED_SETTINGS_X((i).x) + (i).xoffset)
+#define ED_AREA_SETTINGS_Y(i)		(ED_SETTINGS_Y((i).y) + (i).yoffset)
+
+#define ED_LEVEL_SETTINGS_TABS_XPOS	(ED_LEVEL_SETTINGS_BASE_XSTART)
+#define ED_LEVEL_SETTINGS_TABS_YPOS	(4 * MINI_TILEY)
+#define ED_ELEMENT_SETTINGS_TABS_XPOS	(ED_ELEMENT_SETTINGS_BASE_XSTART)
+#define ED_ELEMENT_SETTINGS_TABS_YPOS	(8 * MINI_TILEY)
+
+/* values for element content drawing areas */
+#define ED_AREA_1X1_LSETTINGS_XPOS(n)	ED_LEVEL_SETTINGS_XPOS(n)
+#define ED_AREA_1X1_LSETTINGS_YPOS(n)	ED_LEVEL_SETTINGS_YPOS(n)
+#define ED_AREA_1X1_LSETTINGS_XOFF	(0)
+#define ED_AREA_1X1_LSETTINGS_YOFF	(ED_GADGET_DISTANCE)
+
+#define ED_AREA_1X1_SETTINGS_XPOS(n)	ED_ELEMENT_SETTINGS_XPOS(n)
+#define ED_AREA_1X1_SETTINGS_YPOS(n)	ED_ELEMENT_SETTINGS_YPOS(n)
+#define ED_AREA_1X1_SETTINGS_XOFF	(0)
+#define ED_AREA_1X1_SETTINGS_YOFF	(ED_GADGET_DISTANCE)
+
+#define ED_AREA_3X3_SETTINGS_XPOS(n)	ED_ELEMENT_SETTINGS_XPOS(n)
+#define ED_AREA_3X3_SETTINGS_YPOS(n)	ED_ELEMENT_SETTINGS_YPOS(n)
+#define ED_AREA_3X3_SETTINGS_XOFF	(0)
+#define ED_AREA_3X3_SETTINGS_YOFF	(ED_GADGET_DISTANCE - MINI_TILEY)
 
 /* yamyam content */
-#define ED_AREA_YAMYAM_CONTENT_XPOS(n)	(2 * MINI_TILEX +		\
+#define ED_AREA_YAMYAM_CONTENT_XPOS	ED_ELEMENT_SETTINGS_XPOS(0)
+#define ED_AREA_YAMYAM_CONTENT_YPOS	ED_ELEMENT_SETTINGS_YPOS(0)
+#define ED_AREA_YAMYAM_CONTENT_XOFF(n)	(MINI_TILEX / 2 +		\
 					 5 * ((n) % 4) * MINI_TILEX)
-#define ED_AREA_YAMYAM_CONTENT_YPOS(n)	(11 * ED_SETTINGS_YOFFSET +	\
+#define ED_AREA_YAMYAM_CONTENT_YOFF(n)	(13 * MINI_TILEY / 2 +	\
 					 6 * ((n) / 4) * MINI_TILEY)
+#define ED_AREA_YAMYAM_CONTENT_X(n)	(ED_ELEMENT_SETTINGS_X(0) +	\
+					 ED_AREA_YAMYAM_CONTENT_XOFF(n))
+#define ED_AREA_YAMYAM_CONTENT_Y(n)	(ED_ELEMENT_SETTINGS_Y(0) +	\
+					 ED_AREA_YAMYAM_CONTENT_YOFF(n))
 
 /* magic ball content */
-#define ED_AREA_MAGIC_BALL_CONTENT_XPOS(n) (2 * MINI_TILEX +		\
+#define ED_AREA_MAGIC_BALL_CONTENT_XPOS	ED_ELEMENT_SETTINGS_XPOS(0)
+#define ED_AREA_MAGIC_BALL_CONTENT_YPOS	ED_ELEMENT_SETTINGS_YPOS(0)
+#define ED_AREA_MAGIC_BALL_CONTENT_XOFF(n) (MINI_TILEX / 2 +		\
 					    5 * ((n) % 4) * MINI_TILEX)
-#define ED_AREA_MAGIC_BALL_CONTENT_YPOS(n) (12 * ED_SETTINGS_YOFFSET +	\
+#define ED_AREA_MAGIC_BALL_CONTENT_YOFF(n) (16 * MINI_TILEY / 2 +	\
 					    6 * ((n) / 4) * MINI_TILEY)
+#define ED_AREA_MAGIC_BALL_CONTENT_X(n)	(ED_ELEMENT_SETTINGS_X(0) +	\
+					 ED_AREA_MAGIC_BALL_CONTENT_XOFF(n))
+#define ED_AREA_MAGIC_BALL_CONTENT_Y(n)	(ED_ELEMENT_SETTINGS_Y(0) +	\
+					 ED_AREA_MAGIC_BALL_CONTENT_YOFF(n))
 
 /* values for scrolling gadgets for drawing area */
 #define ED_SCROLLBUTTON_XSIZE		16
@@ -174,10 +248,6 @@
 #define ED_SCROLL2_VERTICAL_YSIZE	(ED_ELEMENTLIST_BUTTONS_VERT *	\
 					 ED_ELEMENTLIST_YSIZE -		\
 					 2 * ED_SCROLLBUTTON2_YSIZE)
-
-/* values for checkbutton gadgets */
-#define ED_CHECKBUTTON_XSIZE		20
-#define ED_CHECKBUTTON_YSIZE		20
 
 /* values for ClearEditorGadgetInfoText() and HandleEditorGadgetInfoText() */
 #define INFOTEXT_XPOS			SX
@@ -2231,7 +2301,10 @@ static struct
     -1,
     options_move_leave_type,
     &custom_element.move_leave_type,
-    "can dig:    can", ":",		"leave behind or change element"
+    // left text with leading spaces to place gadget next to "can dig" gadget
+    // (needed because drawing area gadgets created after selectbox gadgets)
+    // "can dig:    can", ":",		"leave behind or change element"
+    "            can", ":",		"leave behind or change element"
   },
   {
     -1,					ED_ELEMENT_SETTINGS_YPOS(7),
@@ -2380,7 +2453,7 @@ static struct
 } textbutton_info[ED_NUM_TEXTBUTTONS] =
 {
   {
-    ED_LEVEL_SETTINGS_XPOS(0),		ED_LEVEL_SETTINGS_TABS_YPOS,
+    ED_LEVEL_SETTINGS_TABS_XPOS,	ED_LEVEL_SETTINGS_TABS_YPOS,
     GADGET_ID_LEVELINFO_LEVEL,		GADGET_ID_NONE,
     8,					"Level",			
     NULL, NULL,				"Configure level properties"
@@ -2392,7 +2465,7 @@ static struct
     NULL, NULL,				"Configure editor properties"
   },
   {
-    ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_TABS_YPOS,
+    ED_ELEMENT_SETTINGS_TABS_XPOS,	ED_ELEMENT_SETTINGS_TABS_YPOS,
     GADGET_ID_PROPERTIES_INFO,		GADGET_ID_NONE,
     8,					"Info",			
     NULL, NULL,				"Show information about element"
@@ -2976,6 +3049,7 @@ static struct
 static struct
 {
   int x, y;
+  int xoffset, yoffset;
   int gadget_id;
   int gadget_id_align;
   int *value;
@@ -2987,6 +3061,7 @@ static struct
 
   {
     0,					0,
+    0,					0,
     GADGET_ID_DRAWING_LEVEL,		GADGET_ID_NONE,
     NULL,
     -1, -1,	/* these values are not constant, but can change at runtime */
@@ -2996,49 +3071,57 @@ static struct
   /* ---------- yam yam content -------------------------------------------- */
 
   {
-    ED_AREA_YAMYAM_CONTENT_XPOS(0),	ED_AREA_YAMYAM_CONTENT_YPOS(0),
+    ED_AREA_YAMYAM_CONTENT_XPOS,	ED_AREA_YAMYAM_CONTENT_YPOS,
+    ED_AREA_YAMYAM_CONTENT_XOFF(0),	ED_AREA_YAMYAM_CONTENT_YOFF(0),
     GADGET_ID_YAMYAM_CONTENT_0,		GADGET_ID_NONE,
     &level.yamyam_content[0].e[0][0],	3, 3,
     NULL, NULL, "1",			NULL
   },
   {
-    ED_AREA_YAMYAM_CONTENT_XPOS(1),	ED_AREA_YAMYAM_CONTENT_YPOS(1),
+    ED_AREA_YAMYAM_CONTENT_XPOS,	ED_AREA_YAMYAM_CONTENT_YPOS,
+    ED_AREA_YAMYAM_CONTENT_XOFF(1),	ED_AREA_YAMYAM_CONTENT_YOFF(1),
     GADGET_ID_YAMYAM_CONTENT_1,		GADGET_ID_NONE,
     &level.yamyam_content[1].e[0][0],	3, 3,
     NULL, NULL, "2",			NULL
   },
   {
-    ED_AREA_YAMYAM_CONTENT_XPOS(2),	ED_AREA_YAMYAM_CONTENT_YPOS(2),
+    ED_AREA_YAMYAM_CONTENT_XPOS,	ED_AREA_YAMYAM_CONTENT_YPOS,
+    ED_AREA_YAMYAM_CONTENT_XOFF(2),	ED_AREA_YAMYAM_CONTENT_YOFF(2),
     GADGET_ID_YAMYAM_CONTENT_2,		GADGET_ID_NONE,
     &level.yamyam_content[2].e[0][0],	3, 3,
     NULL, NULL, "3",			NULL
   },
   {
-    ED_AREA_YAMYAM_CONTENT_XPOS(3),	ED_AREA_YAMYAM_CONTENT_YPOS(3),
+    ED_AREA_YAMYAM_CONTENT_XPOS,	ED_AREA_YAMYAM_CONTENT_YPOS,
+    ED_AREA_YAMYAM_CONTENT_XOFF(3),	ED_AREA_YAMYAM_CONTENT_YOFF(3),
     GADGET_ID_YAMYAM_CONTENT_3,		GADGET_ID_NONE,
     &level.yamyam_content[3].e[0][0],	3, 3,
     NULL, NULL, "4",			NULL
   },
   {
-    ED_AREA_YAMYAM_CONTENT_XPOS(4),	ED_AREA_YAMYAM_CONTENT_YPOS(4),
+    ED_AREA_YAMYAM_CONTENT_XPOS,	ED_AREA_YAMYAM_CONTENT_YPOS,
+    ED_AREA_YAMYAM_CONTENT_XOFF(4),	ED_AREA_YAMYAM_CONTENT_YOFF(4),
     GADGET_ID_YAMYAM_CONTENT_4,		GADGET_ID_NONE,
     &level.yamyam_content[4].e[0][0],	3, 3,
     NULL, NULL, "5",			NULL
   },
   {
-    ED_AREA_YAMYAM_CONTENT_XPOS(5),	ED_AREA_YAMYAM_CONTENT_YPOS(5),
+    ED_AREA_YAMYAM_CONTENT_XPOS,	ED_AREA_YAMYAM_CONTENT_YPOS,
+    ED_AREA_YAMYAM_CONTENT_XOFF(5),	ED_AREA_YAMYAM_CONTENT_YOFF(5),
     GADGET_ID_YAMYAM_CONTENT_5,		GADGET_ID_NONE,
     &level.yamyam_content[5].e[0][0],	3, 3,
     NULL, NULL, "6",			NULL
   },
   {
-    ED_AREA_YAMYAM_CONTENT_XPOS(6),	ED_AREA_YAMYAM_CONTENT_YPOS(6),
+    ED_AREA_YAMYAM_CONTENT_XPOS,	ED_AREA_YAMYAM_CONTENT_YPOS,
+    ED_AREA_YAMYAM_CONTENT_XOFF(6),	ED_AREA_YAMYAM_CONTENT_YOFF(6),
     GADGET_ID_YAMYAM_CONTENT_6,		GADGET_ID_NONE,
     &level.yamyam_content[6].e[0][0],	3, 3,
     NULL, NULL, "7",			NULL
   },
   {
-    ED_AREA_YAMYAM_CONTENT_XPOS(7),	ED_AREA_YAMYAM_CONTENT_YPOS(7),
+    ED_AREA_YAMYAM_CONTENT_XPOS,	ED_AREA_YAMYAM_CONTENT_YPOS,
+    ED_AREA_YAMYAM_CONTENT_XOFF(7),	ED_AREA_YAMYAM_CONTENT_YOFF(7),
     GADGET_ID_YAMYAM_CONTENT_7,		GADGET_ID_NONE,
     &level.yamyam_content[7].e[0][0],	3, 3,
     NULL, NULL, "8",			NULL
@@ -3047,49 +3130,57 @@ static struct
   /* ---------- magic ball content ----------------------------------------- */
 
   {
-    ED_AREA_MAGIC_BALL_CONTENT_XPOS(0),	ED_AREA_MAGIC_BALL_CONTENT_YPOS(0),
+    ED_AREA_MAGIC_BALL_CONTENT_XPOS,	ED_AREA_MAGIC_BALL_CONTENT_YPOS,
+    ED_AREA_MAGIC_BALL_CONTENT_XOFF(0),	ED_AREA_MAGIC_BALL_CONTENT_YOFF(0),
     GADGET_ID_MAGIC_BALL_CONTENT_0,	GADGET_ID_NONE,
     &level.ball_content[0].e[0][0],	3, 3,
     NULL, NULL, "1",			NULL
   },
   {
-    ED_AREA_MAGIC_BALL_CONTENT_XPOS(1),	ED_AREA_MAGIC_BALL_CONTENT_YPOS(1),
+    ED_AREA_MAGIC_BALL_CONTENT_XPOS,	ED_AREA_MAGIC_BALL_CONTENT_YPOS,
+    ED_AREA_MAGIC_BALL_CONTENT_XOFF(1),	ED_AREA_MAGIC_BALL_CONTENT_YOFF(1),
     GADGET_ID_MAGIC_BALL_CONTENT_1,	GADGET_ID_NONE,
     &level.ball_content[1].e[0][0],	3, 3,
     NULL, NULL, "2",			NULL
   },
   {
-    ED_AREA_MAGIC_BALL_CONTENT_XPOS(2),	ED_AREA_MAGIC_BALL_CONTENT_YPOS(2),
+    ED_AREA_MAGIC_BALL_CONTENT_XPOS,	ED_AREA_MAGIC_BALL_CONTENT_YPOS,
+    ED_AREA_MAGIC_BALL_CONTENT_XOFF(2),	ED_AREA_MAGIC_BALL_CONTENT_YOFF(2),
     GADGET_ID_MAGIC_BALL_CONTENT_2,	GADGET_ID_NONE,
     &level.ball_content[2].e[0][0],	3, 3,
     NULL, NULL, "3",			NULL
   },
   {
-    ED_AREA_MAGIC_BALL_CONTENT_XPOS(3),	ED_AREA_MAGIC_BALL_CONTENT_YPOS(3),
+    ED_AREA_MAGIC_BALL_CONTENT_XPOS,	ED_AREA_MAGIC_BALL_CONTENT_YPOS,
+    ED_AREA_MAGIC_BALL_CONTENT_XOFF(3),	ED_AREA_MAGIC_BALL_CONTENT_YOFF(3),
     GADGET_ID_MAGIC_BALL_CONTENT_3,	GADGET_ID_NONE,
     &level.ball_content[3].e[0][0],	3, 3,
     NULL, NULL, "4",			NULL
   },
   {
-    ED_AREA_MAGIC_BALL_CONTENT_XPOS(4),	ED_AREA_MAGIC_BALL_CONTENT_YPOS(4),
+    ED_AREA_MAGIC_BALL_CONTENT_XPOS,	ED_AREA_MAGIC_BALL_CONTENT_YPOS,
+    ED_AREA_MAGIC_BALL_CONTENT_XOFF(4),	ED_AREA_MAGIC_BALL_CONTENT_YOFF(4),
     GADGET_ID_MAGIC_BALL_CONTENT_4,	GADGET_ID_NONE,
     &level.ball_content[4].e[0][0],	3, 3,
     NULL, NULL, "5",			NULL
   },
   {
-    ED_AREA_MAGIC_BALL_CONTENT_XPOS(5),	ED_AREA_MAGIC_BALL_CONTENT_YPOS(5),
+    ED_AREA_MAGIC_BALL_CONTENT_XPOS,	ED_AREA_MAGIC_BALL_CONTENT_YPOS,
+    ED_AREA_MAGIC_BALL_CONTENT_XOFF(5),	ED_AREA_MAGIC_BALL_CONTENT_YOFF(5),
     GADGET_ID_MAGIC_BALL_CONTENT_5,	GADGET_ID_NONE,
     &level.ball_content[5].e[0][0],	3, 3,
     NULL, NULL, "6",			NULL
   },
   {
-    ED_AREA_MAGIC_BALL_CONTENT_XPOS(6),	ED_AREA_MAGIC_BALL_CONTENT_YPOS(6),
+    ED_AREA_MAGIC_BALL_CONTENT_XPOS,	ED_AREA_MAGIC_BALL_CONTENT_YPOS,
+    ED_AREA_MAGIC_BALL_CONTENT_XOFF(6),	ED_AREA_MAGIC_BALL_CONTENT_YOFF(6),
     GADGET_ID_MAGIC_BALL_CONTENT_6,	GADGET_ID_NONE,
     &level.ball_content[6].e[0][0],	3, 3,
     NULL, NULL, "7",			NULL
   },
   {
-    ED_AREA_MAGIC_BALL_CONTENT_XPOS(7),	ED_AREA_MAGIC_BALL_CONTENT_YPOS(7),
+    ED_AREA_MAGIC_BALL_CONTENT_XPOS,	ED_AREA_MAGIC_BALL_CONTENT_YPOS,
+    ED_AREA_MAGIC_BALL_CONTENT_XOFF(7),	ED_AREA_MAGIC_BALL_CONTENT_YOFF(7),
     GADGET_ID_MAGIC_BALL_CONTENT_7,	GADGET_ID_NONE,
     &level.ball_content[7].e[0][0],	3, 3,
     NULL, NULL, "8",			NULL
@@ -3099,6 +3190,7 @@ static struct
 
   {
     ED_AREA_1X1_SETTINGS_XPOS(0),	ED_AREA_1X1_SETTINGS_YPOS(5),
+    ED_AREA_1X1_SETTINGS_XOFF,		ED_AREA_1X1_SETTINGS_YOFF,
     GADGET_ID_ANDROID_CONTENT,		GADGET_ID_NONE,
     &level.android_clone_element[0],	MAX_ANDROID_ELEMENTS, 1,
     "elements:", NULL, NULL,		"elements android can clone"
@@ -3108,6 +3200,7 @@ static struct
 
   {
     ED_AREA_1X1_SETTINGS_XPOS(0),	ED_AREA_1X1_SETTINGS_YPOS(3),
+    ED_AREA_1X1_SETTINGS_XOFF,		ED_AREA_1X1_SETTINGS_YOFF,
     GADGET_ID_AMOEBA_CONTENT,		GADGET_ID_NONE,
     &level.amoeba_content,		1, 1,
     "content:", NULL, NULL,		"amoeba content"
@@ -3117,6 +3210,7 @@ static struct
 
   {
     -1,					ED_AREA_1X1_SETTINGS_YPOS(9),
+    0,					ED_AREA_1X1_SETTINGS_YOFF,
     GADGET_ID_START_ELEMENT,		GADGET_ID_USE_START_ELEMENT,
     &level.start_element[0],		1, 1,
     NULL, NULL, NULL,			"level start element"
@@ -3126,6 +3220,7 @@ static struct
 
   {
     -1,					ED_AREA_1X1_SETTINGS_YPOS(10),
+    0,					ED_AREA_1X1_SETTINGS_YOFF,
     GADGET_ID_ARTWORK_ELEMENT,		GADGET_ID_USE_ARTWORK_ELEMENT,
     &level.artwork_element[0],		1, 1,
     NULL, NULL, NULL,			"element for player artwork"
@@ -3135,6 +3230,7 @@ static struct
 
   {
     -1,					ED_AREA_1X1_SETTINGS_YPOS(11),
+    0,					ED_AREA_1X1_SETTINGS_YOFF,
     GADGET_ID_EXPLOSION_ELEMENT,	GADGET_ID_USE_EXPLOSION_ELEMENT,
     &level.explosion_element[0],	1, 1,
     NULL, NULL, NULL,			"element for player explosion"
@@ -3144,6 +3240,7 @@ static struct
 
   {
     -1,					ED_AREA_1X1_SETTINGS_YPOS(1),
+    0,					ED_AREA_1X1_SETTINGS_YOFF,
     GADGET_ID_INVENTORY_CONTENT,	GADGET_ID_USE_INITIAL_INVENTORY,
     &level.initial_inventory_content[0][0], MAX_INITIAL_INVENTORY_SIZE, 1,
     NULL, NULL, NULL,			"content for initial inventory"
@@ -3155,6 +3252,7 @@ static struct
 
   {
     -1,					ED_AREA_1X1_SETTINGS_YPOS(1),
+    0,					ED_AREA_1X1_SETTINGS_YOFF,
     GADGET_ID_CUSTOM_GRAPHIC,		GADGET_ID_CUSTOM_USE_GRAPHIC,
     &custom_element.gfx_element_initial,1, 1,
     NULL, NULL, NULL,			"custom graphic element"
@@ -3166,6 +3264,7 @@ static struct
 
   {
     -1,					ED_AREA_3X3_SETTINGS_YPOS(10),
+    0,					ED_AREA_3X3_SETTINGS_YOFF,
     GADGET_ID_CUSTOM_CONTENT,		GADGET_ID_NONE,	/* align three rows */
     &custom_element.content.e[0][0],	3, 3,
     "content:", NULL, NULL,		NULL
@@ -3175,12 +3274,14 @@ static struct
 
   {
     ED_AREA_1X1_SETTINGS_XPOS(1),	ED_AREA_1X1_SETTINGS_YPOS(3),
+    ED_AREA_1X1_SETTINGS_XOFF,		ED_AREA_1X1_SETTINGS_YOFF,
     GADGET_ID_CUSTOM_MOVE_ENTER,	GADGET_ID_NONE,
     &custom_element.move_enter_element,	1, 1,
     "can dig:", " ", NULL,		"element that can be digged/collected"
   },
   {
     -1,					ED_AREA_1X1_SETTINGS_YPOS(3),
+    0,					ED_AREA_1X1_SETTINGS_YOFF,
     GADGET_ID_CUSTOM_MOVE_LEAVE,	GADGET_ID_CUSTOM_MOVE_LEAVE_TYPE,
     &custom_element.move_leave_element,	1, 1,
     NULL, NULL, NULL,			"element that will be left behind"
@@ -3192,6 +3293,7 @@ static struct
 
   {
     -1,					ED_AREA_1X1_SETTINGS_YPOS(1),
+    0,					ED_AREA_1X1_SETTINGS_YOFF,
     GADGET_ID_CUSTOM_CHANGE_TARGET,	GADGET_ID_CUSTOM_CAN_CHANGE,
     &custom_element_change.target_element, 1, 1,
     NULL, "after/when:", NULL,		"new target element after change"
@@ -3201,6 +3303,7 @@ static struct
 
   {
     -1,					ED_AREA_3X3_SETTINGS_YPOS(9),
+    0,					ED_AREA_3X3_SETTINGS_YOFF,
     GADGET_ID_CUSTOM_CHANGE_CONTENT,	GADGET_ID_NONE,	/* align three rows */
     &custom_element_change.target_content.e[0][0], 3, 3,
     NULL, NULL, NULL,			"new extended elements after change"
@@ -3210,6 +3313,7 @@ static struct
 
   {
     -1,					ED_AREA_1X1_SETTINGS_YPOS(5),
+    0,					ED_AREA_1X1_SETTINGS_YOFF,
     GADGET_ID_CUSTOM_CHANGE_TRIGGER,	GADGET_ID_CHANGE_OTHER_ACTION,
     &custom_element_change.initial_trigger_element, 1, 1,
     NULL, NULL, NULL,			"other element triggering change"
@@ -3219,6 +3323,7 @@ static struct
 
   {
     -1,					ED_AREA_1X1_SETTINGS_YPOS(13),
+    0,					ED_AREA_1X1_SETTINGS_YOFF,
     GADGET_ID_CUSTOM_CHANGE_ACTION,	GADGET_ID_ACTION_ARG,
     &custom_element_change.action_element, 1, 1,
     NULL, NULL, NULL,			"element used as action parameter"
@@ -3228,6 +3333,7 @@ static struct
 
   {
     ED_AREA_1X1_SETTINGS_XPOS(0),	ED_AREA_1X1_SETTINGS_YPOS(2),
+    ED_AREA_1X1_SETTINGS_XOFF,		ED_AREA_1X1_SETTINGS_YOFF,
     GADGET_ID_GROUP_CONTENT,		GADGET_ID_NONE,
     &group_element_info.element[0],	MAX_ELEMENTS_IN_GROUP, 1,
     "content:", NULL, NULL,		NULL
@@ -3236,7 +3342,8 @@ static struct
   /* ---------- random background (for random painting) -------------------- */
 
   {
-    -1,					ED_AREA_1X1_SETTINGS_YPOS(-1),
+    -1,					ED_AREA_1X1_LSETTINGS_YPOS(1),
+    0,					ED_AREA_1X1_LSETTINGS_YOFF,
     GADGET_ID_RANDOM_BACKGROUND,	GADGET_ID_RANDOM_RESTRICTED,
     &random_placement_background_element, 1, 1,
     NULL, NULL, NULL,			"random placement background"
@@ -5456,8 +5563,8 @@ static void CreateCounterButtons()
   for (i = 0; i < ED_NUM_COUNTERBUTTONS; i++)
   {
     int j;
-    int x = SX + counterbutton_info[i].x;	/* down count button */
-    int y = SY + counterbutton_info[i].y;
+    int x = SX + ED_SETTINGS_X(counterbutton_info[i].x); /* down count button */
+    int y = SY + ED_SETTINGS_Y(counterbutton_info[i].y);
 
     /* determine horizontal position to the right of specified gadget */
     if (counterbutton_info[i].gadget_id_align != GADGET_ID_NONE)
@@ -5621,8 +5728,8 @@ static void CreateDrawingAreas()
     struct GadgetInfo *gi;
     unsigned int event_mask;
     int id = drawingarea_info[i].gadget_id;
-    int x = SX + drawingarea_info[i].x;
-    int y = SY + drawingarea_info[i].y;
+    int x = SX + ED_AREA_SETTINGS_X(drawingarea_info[i]);
+    int y = SY + ED_AREA_SETTINGS_Y(drawingarea_info[i]);
     int area_xsize = drawingarea_info[i].area_xsize;
     int area_ysize = drawingarea_info[i].area_ysize;
 
@@ -5666,16 +5773,10 @@ static void CreateTextInputGadgets()
   int border_size = gd->border_size;
   int font_nr = FONT_INPUT_1;
   int font_height = getFontHeight(font_nr);
-  int x = ED_ELEMENT_SETTINGS_ELEM_XPOS;
-  int y = ED_ELEMENT_SETTINGS_ELEM_YPOS;
   int xoffset = TILEX + ED_ELEMENT_BORDER + 3 * border_size;
   int yoffset = (TILEY - font_height) / 2;
   int max_infotext_len = getMaxInfoTextLength();
   int i;
-
-  /* these values are not constant, but can change at runtime */
-  textinput_info[ED_TEXTINPUT_ID_ELEMENT_NAME].x = x + xoffset - border_size;
-  textinput_info[ED_TEXTINPUT_ID_ELEMENT_NAME].y = y + yoffset - border_size;
 
   for (i = 0; i < ED_NUM_TEXTINPUT; i++)
   {
@@ -5687,6 +5788,18 @@ static void CreateTextInputGadgets()
     unsigned int event_mask;
     char infotext[MAX_OUTPUT_LINESIZE + 1];
     int id = textinput_info[i].gadget_id;
+    int x, y;
+
+    if (i == ED_TEXTINPUT_ID_ELEMENT_NAME)
+    {
+      x = ED_ELEMENT_SETTINGS_ELEM_XPOS + xoffset - border_size;
+      y = ED_ELEMENT_SETTINGS_ELEM_YPOS + yoffset - border_size;
+    }
+    else
+    {
+      x = ED_SETTINGS_X(textinput_info[i].x);
+      y = ED_SETTINGS_Y(textinput_info[i].y);
+    }
 
     event_mask = GD_EVENT_TEXT_RETURN | GD_EVENT_TEXT_LEAVING;
 
@@ -5696,8 +5809,8 @@ static void CreateTextInputGadgets()
     gi = CreateGadget(GDI_CUSTOM_ID, id,
 		      GDI_CUSTOM_TYPE_ID, i,
 		      GDI_INFO_TEXT, infotext,
-		      GDI_X, SX + textinput_info[i].x,
-		      GDI_Y, SY + textinput_info[i].y,
+		      GDI_X, SX + x,
+		      GDI_Y, SY + y,
 		      GDI_TYPE, GD_TYPE_TEXT_INPUT_ALPHANUMERIC,
 		      GDI_TEXT_VALUE, textinput_info[i].value,
 		      GDI_TEXT_SIZE, textinput_info[i].size,
@@ -5746,8 +5859,8 @@ static void CreateTextAreaGadgets()
     gi = CreateGadget(GDI_CUSTOM_ID, id,
 		      GDI_CUSTOM_TYPE_ID, i,
 		      GDI_INFO_TEXT, infotext,
-		      GDI_X, SX + textarea_info[i].x,
-		      GDI_Y, SY + textarea_info[i].y,
+		      GDI_X, SX + ED_SETTINGS_X(textarea_info[i].x),
+		      GDI_Y, SY + ED_SETTINGS_Y(textarea_info[i].y),
 		      GDI_TYPE, GD_TYPE_TEXT_AREA,
 		      GDI_AREA_SIZE, area_xsize, area_ysize,
 		      GDI_TEXT_FONT, FONT_INPUT_1,
@@ -5786,8 +5899,8 @@ static void CreateSelectboxGadgets()
     unsigned int event_mask;
     char infotext[MAX_OUTPUT_LINESIZE + 1];
     int id = selectbox_info[i].gadget_id;
-    int x = SX + selectbox_info[i].x;
-    int y = SY + selectbox_info[i].y;
+    int x = SX + ED_SETTINGS_X(selectbox_info[i].x);
+    int y = SY + ED_SETTINGS_Y(selectbox_info[i].y);
 
     if (selectbox_info[i].size == -1)	/* dynamically determine size */
     {
@@ -5942,8 +6055,8 @@ static void CreateGraphicbuttonGadgets()
   for (i = 0; i < ED_NUM_GRAPHICBUTTONS; i++)
   {
     int id = graphicbutton_info[i].gadget_id;
-    int x = SX + graphicbutton_info[i].x;
-    int y = SY + graphicbutton_info[i].y;
+    int x = SX + ED_SETTINGS_X(graphicbutton_info[i].x);
+    int y = SY + ED_SETTINGS_Y(graphicbutton_info[i].y);
     struct GraphicInfo *gd = &graphic_info[graphicbutton_info[i].graphic];
     int gd_x1 = gd->src_x;
     int gd_y1 = gd->src_y;
@@ -6123,8 +6236,8 @@ static void CreateCheckbuttonGadgets()
     int gd_y1a = gd->src_y + gd->active_yoffset;
     int gd_x2a = gd->src_x + gd->active_xoffset + gd->pressed_xoffset;
     int gd_y2a = gd->src_y + gd->active_yoffset + gd->pressed_yoffset;
-    int x = SX + checkbutton_info[i].x;
-    int y = SY + checkbutton_info[i].y;
+    int x = SX + ED_SETTINGS_X(checkbutton_info[i].x);
+    int y = SY + ED_SETTINGS_Y(checkbutton_info[i].y);
 
     /* determine horizontal position to the right of specified gadget */
     if (checkbutton_info[i].gadget_id_align != GADGET_ID_NONE)
@@ -6182,8 +6295,8 @@ static void CreateRadiobuttonGadgets()
   for (i = 0; i < ED_NUM_RADIOBUTTONS; i++)
   {
     int id = radiobutton_info[i].gadget_id;
-    int x = SX + radiobutton_info[i].x;
-    int y = SY + radiobutton_info[i].y;
+    int x = SX + ED_SETTINGS_X(radiobutton_info[i].x);
+    int y = SY + ED_SETTINGS_Y(radiobutton_info[i].y);
 
     int checked =
       (*radiobutton_info[i].value == radiobutton_info[i].checked_value);
@@ -6319,9 +6432,12 @@ static void MapCounterButtons(int id)
   if (id >= ED_COUNTER_ID_ELEMENT_VALUE1 &&
       id <= ED_COUNTER_ID_ELEMENT_VALUE4)
   {
-    ModifyGadget(gi_down, GDI_Y, SY + counterbutton_info[id].y, GDI_END);
-    ModifyGadget(gi_text, GDI_Y, SY + counterbutton_info[id].y, GDI_END);
-    ModifyGadget(gi_up,   GDI_Y, SY + counterbutton_info[id].y, GDI_END);
+    ModifyGadget(gi_down, GDI_Y,
+		 SY + ED_SETTINGS_Y(counterbutton_info[id].y), GDI_END);
+    ModifyGadget(gi_text, GDI_Y,
+		 SY + ED_SETTINGS_Y(counterbutton_info[id].y), GDI_END);
+    ModifyGadget(gi_up,   GDI_Y,
+		 SY + ED_SETTINGS_Y(counterbutton_info[id].y), GDI_END);
   }
 
   /* vertical position might have changed after setting position above */
@@ -6408,8 +6524,8 @@ static void MapTextInputGadget(int id)
   int font_height = getFontHeight(font_nr);
   struct GadgetInfo *gi = level_editor_gadget[textinput_info[id].gadget_id];
   int yoffset_above = font_height + ED_GADGET_LINE_DISTANCE;
-  int x_above = textinput_info[id].x;
-  int y_above = textinput_info[id].y - yoffset_above;
+  int x_above = ED_SETTINGS_X(textinput_info[id].x);
+  int y_above = ED_SETTINGS_Y(textinput_info[id].y) - yoffset_above;
 
   if (textinput_info[id].text_above)
     DrawTextS(x_above, y_above, font_nr, textinput_info[id].text_above);
@@ -6425,8 +6541,8 @@ static void MapTextAreaGadget(int id)
   int font_height = getFontHeight(font_nr);
   struct GadgetInfo *gi = level_editor_gadget[textarea_info[id].gadget_id];
   int yoffset_above = font_height + ED_GADGET_LINE_DISTANCE;
-  int x_above = textarea_info[id].x;
-  int y_above = textarea_info[id].y - yoffset_above;
+  int x_above = ED_SETTINGS_X(textarea_info[id].x);
+  int y_above = ED_SETTINGS_Y(textarea_info[id].y) - yoffset_above;
 
   if (textarea_info[id].text_above)
     DrawTextS(x_above, y_above, font_nr, textarea_info[id].text_above);
@@ -6543,8 +6659,8 @@ static void MapCheckbuttonGadget(int id)
 
   /* set position for gadgets with dynamically determined position */
   if (checkbutton_info[id].x != -1)	/* do not change dynamic positions */
-    ModifyGadget(gi, GDI_X, SX + checkbutton_info[id].x, GDI_END);
-  ModifyGadget(gi, GDI_Y, SY + checkbutton_info[id].y, GDI_END);
+    ModifyGadget(gi, GDI_X, SX + ED_SETTINGS_X(checkbutton_info[id].x),GDI_END);
+  ModifyGadget(gi, GDI_Y, SY + ED_SETTINGS_Y(checkbutton_info[id].y), GDI_END);
 
   x_left = gi->x - xoffset_left;
   x_right = gi->x + gi->width + xoffset_right;
@@ -7808,6 +7924,11 @@ static int getTabulatorBarWidth()
   return gd_gi4->x - gd_gi1->x + gd_gi4->width;
 }
 
+static int getTabulatorBarHeight()
+{
+  return ED_TAB_BAR_HEIGHT;
+}
+
 static void DrawLevelInfoTabulatorGadgets()
 {
   struct GadgetInfo *gd_gi1 = level_editor_gadget[GADGET_ID_LEVELINFO_LEVEL];
@@ -7839,8 +7960,7 @@ static void DrawLevelInfoTabulatorGadgets()
   /* draw little border line below tabulator buttons */
   if (tab_color != BLACK_PIXEL)			/* black => transparent */
     FillRectangle(drawto, gd_gi1->x, gd_gi1->y + gd_gi1->height + 1,
-		  getTabulatorBarWidth(), ED_GADGET_DISTANCE,
-		  tab_color);
+		  getTabulatorBarWidth(), getTabulatorBarHeight(), tab_color);
 }
 
 static void DrawPropertiesTabulatorGadgets()
@@ -7888,8 +8008,7 @@ static void DrawPropertiesTabulatorGadgets()
   /* draw little border line below tabulator buttons */
   if (tab_color != BLACK_PIXEL)			/* black => transparent */
     FillRectangle(drawto, gd_gi1->x, gd_gi1->y + gd_gi1->height + 1,
-		  getTabulatorBarWidth(), ED_GADGET_DISTANCE,
-		  tab_color);
+		  getTabulatorBarWidth(), getTabulatorBarHeight(), tab_color);
 }
 
 static void DrawLevelInfoLevel()
@@ -7981,8 +8100,8 @@ static void DrawCustomChangeContentArea()
 
 static void DrawYamYamContentAreas()
 {
-  int x = SX + ED_AREA_YAMYAM_CONTENT_XPOS(3) + 4 * MINI_TILEX;
-  int y = SY + ED_AREA_YAMYAM_CONTENT_YPOS(0) + ED_BORDER_AREA_YSIZE;
+  int x = SX + ED_AREA_YAMYAM_CONTENT_X(3) + 4 * MINI_TILEX;
+  int y = SY + ED_AREA_YAMYAM_CONTENT_Y(0) + ED_BORDER_AREA_YSIZE;
   int i;
 
   /* display counter to choose number of element content areas */
@@ -8003,8 +8122,10 @@ static void DrawYamYamContentAreas()
       UnmapDrawingArea(id);
 
       /* delete content areas in case of reducing number of them */
-      DrawBackground(SX + drawingarea_info[id].x - MINI_TILEX / 2,
-		     SY + drawingarea_info[id].y - MINI_TILEY / 2,
+      DrawBackground(SX + ED_AREA_SETTINGS_X(drawingarea_info[id])
+		     - MINI_TILEX / 2,
+		     SY + ED_AREA_SETTINGS_Y(drawingarea_info[id])
+		     - MINI_TILEY / 2,
 		     4 * MINI_TILEX,
 		     4 * MINI_TILEY + ED_GADGET_TEXT_DISTANCE + font_height);
     }
@@ -8017,8 +8138,8 @@ static void DrawYamYamContentAreas()
 
 static void DrawMagicBallContentAreas()
 {
-  int x = SX + ED_AREA_MAGIC_BALL_CONTENT_XPOS(3) + 4 * MINI_TILEX;
-  int y = SY + ED_AREA_MAGIC_BALL_CONTENT_YPOS(0) + ED_BORDER_AREA_YSIZE;
+  int x = SX + ED_AREA_MAGIC_BALL_CONTENT_X(3) + 4 * MINI_TILEX;
+  int y = SY + ED_AREA_MAGIC_BALL_CONTENT_Y(0) + ED_BORDER_AREA_YSIZE;
   int i;
 
   /* display counter to choose number of element content areas */
@@ -8039,8 +8160,10 @@ static void DrawMagicBallContentAreas()
       UnmapDrawingArea(id);
 
       /* delete content areas in case of reducing number of them */
-      DrawBackground(SX + drawingarea_info[id].x - MINI_TILEX / 2,
-		     SY + drawingarea_info[id].y - MINI_TILEY / 2,
+      DrawBackground(SX + ED_AREA_SETTINGS_X(drawingarea_info[id])
+		     - MINI_TILEX / 2,
+		     SY + ED_AREA_SETTINGS_Y(drawingarea_info[id])
+		     - MINI_TILEY / 2,
 		     4 * MINI_TILEX,
 		     4 * MINI_TILEY + ED_GADGET_TEXT_DISTANCE + font_height);
     }
@@ -8055,8 +8178,8 @@ static void DrawAndroidElementArea(int element)
 {
   int num_elements = level.num_android_clone_elements;
   int id = ED_DRAWING_ID_ANDROID_CONTENT;
-  int sx = SX + drawingarea_info[id].x - MINI_TILEX / 2;
-  int sy = SY + drawingarea_info[id].y - MINI_TILEY / 2;
+  int sx = SX + ED_AREA_SETTINGS_X(drawingarea_info[id]) - MINI_TILEX / 2;
+  int sy = SY + ED_AREA_SETTINGS_Y(drawingarea_info[id]) - MINI_TILEY / 2;
   int xsize = MAX_ANDROID_ELEMENTS;
   int ysize = 1;
 
@@ -8082,8 +8205,8 @@ static void DrawGroupElementArea(int element)
   int id = ED_DRAWING_ID_GROUP_CONTENT;
   int bx = ED_ELEMENT_BORDER_INPUT;
   int by = ED_ELEMENT_BORDER_INPUT;
-  int sx = SX + drawingarea_info[id].x - bx;
-  int sy = SY + drawingarea_info[id].y - by;
+  int sx = SX + ED_AREA_SETTINGS_X(drawingarea_info[id]) - bx;
+  int sy = SY + ED_AREA_SETTINGS_Y(drawingarea_info[id]) - by;
   int xsize = MAX_ELEMENTS_IN_GROUP;
   int ysize = 1;
 
@@ -8105,8 +8228,8 @@ static void DrawPlayerInitialInventoryArea(int element)
   int player_nr = GET_PLAYER_NR(element);
   int num_elements = level.initial_inventory_size[player_nr];
   int id = ED_DRAWING_ID_INVENTORY_CONTENT;
-  int sx = SX + drawingarea_info[id].x - MINI_TILEX / 2;
-  int sy = SY + drawingarea_info[id].y - MINI_TILEY / 2;
+  int sx = SX + ED_AREA_SETTINGS_X(drawingarea_info[id]) - MINI_TILEX / 2;
+  int sy = SY + ED_AREA_SETTINGS_Y(drawingarea_info[id]) - MINI_TILEY / 2;
   int xsize = MAX_INITIAL_INVENTORY_SIZE;
   int ysize = 1;
 
@@ -8151,8 +8274,8 @@ static void DrawEnvelopeTextArea(int envelope_nr)
 static boolean PrintInfoText(char *text, int font_nr, int start_line)
 {
   int font_height = getFontHeight(font_nr);
-  int pad_x = ED_ELEMENT_SETTINGS_XPOS(0);
-  int pad_y = ED_ELEMENT_SETTINGS_YPOS(0) + ED_BORDER_SIZE;
+  int pad_x = ED_ELEMENT_SETTINGS_X(0);
+  int pad_y = ED_ELEMENT_SETTINGS_Y(0) + ED_BORDER_SIZE;
   int sx = SX + pad_x;
   int sy = SY + pad_y;
   int max_lines_per_screen = (SYSIZE - pad_y) / font_height - 1;
@@ -8170,8 +8293,8 @@ static int PrintElementDescriptionFromFile(char *filename, int start_line)
   int font_nr = FONT_TEXT_2;
   int font_width = getFontWidth(font_nr);
   int font_height = getFontHeight(font_nr);
-  int pad_x = ED_ELEMENT_SETTINGS_XPOS(0);
-  int pad_y = ED_ELEMENT_SETTINGS_YPOS(0) + ED_BORDER_SIZE;
+  int pad_x = ED_ELEMENT_SETTINGS_X(0);
+  int pad_y = ED_ELEMENT_SETTINGS_Y(0) + ED_BORDER_SIZE;
   int sx = SX + pad_x;
   int sy = SY + pad_y + start_line * font_height;
   int max_chars_per_line = (SXSIZE - 2 * pad_x) / font_width;
@@ -8255,8 +8378,8 @@ static void DrawPropertiesInfo()
   int font2_nr = FONT_TEXT_2;
   int font1_width = getFontWidth(font1_nr);
   int font2_height = getFontHeight(font2_nr);
-  int pad_x = ED_ELEMENT_SETTINGS_XPOS(0);
-  int pad_y = ED_ELEMENT_SETTINGS_YPOS(0) + ED_BORDER_SIZE;
+  int pad_x = ED_ELEMENT_SETTINGS_X(0);
+  int pad_y = ED_ELEMENT_SETTINGS_Y(0) + ED_BORDER_SIZE;
   int screen_line = 0;
   int i, x, y;
 
@@ -8775,10 +8898,9 @@ static void DrawPropertiesConfig()
 
     if (tab_color != BLACK_PIXEL)		/* black => transparent */
       FillRectangle(drawto,
-		    SX + ED_ELEMENT_SETTINGS_XPOS(0),
-		    SY + ED_ELEMENT_SETTINGS_YPOS(14) - MINI_TILEY / 2,
-		    getTabulatorBarWidth(), ED_GADGET_DISTANCE,
-		    tab_color);
+		    SX + ED_ELEMENT_SETTINGS_X(0),
+		    SY + ED_ELEMENT_SETTINGS_Y(14) - MINI_TILEY / 2,
+		    getTabulatorBarWidth(), getTabulatorBarHeight(), tab_color);
   }
 }
 
@@ -8851,7 +8973,7 @@ static void DrawEditorElementName(int x, int y, int font_nr)
   char *element_name = getElementInfoText(properties_element);
   int font_width = getFontWidth(font_nr);
   int font_height = getFontHeight(font_nr);
-  int max_text_width = SXSIZE - x - ED_ELEMENT_SETTINGS_XPOS(0);
+  int max_text_width = SXSIZE - x - ED_ELEMENT_SETTINGS_X(0);
   int max_chars_per_line = max_text_width / font_width;
   char buffer[max_chars_per_line + 1];
 
