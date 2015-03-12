@@ -72,6 +72,7 @@
 
 #define ED_GADGET_DISTANCE		2
 #define ED_GADGET_TEXT_DISTANCE		(2 * ED_GADGET_DISTANCE)
+#define ED_GADGET_LINE_DISTANCE		(2 * ED_GADGET_DISTANCE)
 #define ED_DRAWINGAREA_TEXT_DISTANCE	(ED_GADGET_TEXT_DISTANCE +	\
 					 MINI_TILEX / 2)
 
@@ -99,17 +100,15 @@
 #define ED_ELEMENT_SETTINGS_YPOS(n)	(ED_ELEMENT_SETTINGS_YSTART +	\
 					 (n) * ED_SETTINGS_YOFFSET)
 
-#define ED_LEVEL_SETTINGS_TABS_XPOS(n)	(ED_LEVEL_SETTINGS_XPOS(0) +	\
-	 				(n) * ED_SETTINGS_TAB_XOFFSET)
-#define ED_LEVEL_SETTINGS_TABS_YPOS(n)	(ED_LEVEL_SETTINGS_YSTART -	\
+#define ED_LEVEL_SETTINGS_TABS_YPOS	(ED_LEVEL_SETTINGS_YSTART -	\
 					 3 * MINI_TILEY)
-
-#define ED_ELEMENT_SETTINGS_TABS_XPOS(n) (ED_ELEMENT_SETTINGS_XPOS(0) +	\
-	 				 (n) * ED_SETTINGS_TAB_XOFFSET)
-#define ED_ELEMENT_SETTINGS_TABS_YPOS(n) (ED_ELEMENT_SETTINGS_YSTART -	\
+#define ED_ELEMENT_SETTINGS_TABS_YPOS	(ED_ELEMENT_SETTINGS_YSTART -	\
 					 2 * MINI_TILEY)
 
 #define ED_SETTINGS1_YPOS		MINI_TILEY
+
+#define ED_ELEMENT_SETTINGS_ELEM_XPOS	(2 * MINI_TILEX)
+#define ED_ELEMENT_SETTINGS_ELEM_YPOS	(4 * MINI_TILEY + MINI_TILEY / 2)
 
 /* values for element content drawing areas */
 #define ED_AREA_1X1_SETTINGS_XPOS(n)	(ED_ELEMENT_SETTINGS_XPOS(n))
@@ -1380,7 +1379,7 @@ static struct
     "Author:", "Author"
   },
   {
-    5 * MINI_TILEX - 2,			5 * MINI_TILEY - ED_BORDER_SIZE + 1,
+    -1, -1,	/* these values are not constant, but can change at runtime */
     GADGET_ID_ELEMENT_NAME,
     MAX_ELEMENT_NAME_LEN - 2,		/* currently 2 chars less editable */
     custom_element.description,
@@ -2381,61 +2380,61 @@ static struct
 } textbutton_info[ED_NUM_TEXTBUTTONS] =
 {
   {
-    ED_LEVEL_SETTINGS_TABS_XPOS(0),	ED_LEVEL_SETTINGS_TABS_YPOS(0),
+    ED_LEVEL_SETTINGS_XPOS(0),		ED_LEVEL_SETTINGS_TABS_YPOS,
     GADGET_ID_LEVELINFO_LEVEL,		GADGET_ID_NONE,
     8,					"Level",			
     NULL, NULL,				"Configure level properties"
   },
   {
-    ED_LEVEL_SETTINGS_TABS_XPOS(1),	ED_LEVEL_SETTINGS_TABS_YPOS(0),
-    GADGET_ID_LEVELINFO_EDITOR,		GADGET_ID_NONE,
+    -1,					-1,
+    GADGET_ID_LEVELINFO_EDITOR,		GADGET_ID_LEVELINFO_LEVEL,
     8,					"Editor",			
     NULL, NULL,				"Configure editor properties"
   },
   {
-    ED_ELEMENT_SETTINGS_TABS_XPOS(0),	ED_ELEMENT_SETTINGS_TABS_YPOS(0),
+    ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_TABS_YPOS,
     GADGET_ID_PROPERTIES_INFO,		GADGET_ID_NONE,
     8,					"Info",			
     NULL, NULL,				"Show information about element"
   },
   {
-    ED_ELEMENT_SETTINGS_TABS_XPOS(1),	ED_ELEMENT_SETTINGS_TABS_YPOS(0),
-    GADGET_ID_PROPERTIES_CONFIG,	GADGET_ID_NONE,
+    -1,					-1,
+    GADGET_ID_PROPERTIES_CONFIG,	GADGET_ID_PROPERTIES_INFO,
     8,					"Config",
     NULL, NULL,				"Configure element properties"
   },
   {
-    ED_ELEMENT_SETTINGS_TABS_XPOS(1),	ED_ELEMENT_SETTINGS_TABS_YPOS(0),
-    GADGET_ID_PROPERTIES_CONFIG_1,	GADGET_ID_NONE,
+    -1,					-1,
+    GADGET_ID_PROPERTIES_CONFIG_1,	GADGET_ID_PROPERTIES_INFO,
     8,					"Config 1",
     NULL, NULL,				"Configure element properties, part 1"
   },
   {
-    ED_ELEMENT_SETTINGS_TABS_XPOS(2),	ED_ELEMENT_SETTINGS_TABS_YPOS(0),
-    GADGET_ID_PROPERTIES_CONFIG_2,	GADGET_ID_NONE,
+    -1,					-1,
+    GADGET_ID_PROPERTIES_CONFIG_2,	GADGET_ID_PROPERTIES_CONFIG_1,
     8,					"Config 2",
     NULL, NULL,				"Configure element properties, part 2"
   },
   {
-    ED_ELEMENT_SETTINGS_TABS_XPOS(3),	ED_ELEMENT_SETTINGS_TABS_YPOS(0),
-    GADGET_ID_PROPERTIES_CHANGE,	GADGET_ID_NONE,
+    -1,					-1,
+    GADGET_ID_PROPERTIES_CHANGE,	GADGET_ID_PROPERTIES_CONFIG_2,
     8,					"Change",
     NULL, NULL,				"Configure custom element change pages"
   },
   {
-    -1,					ED_ELEMENT_SETTINGS_YPOS(14),
+    -1,					-1,
     GADGET_ID_SAVE_AS_TEMPLATE,		GADGET_ID_CUSTOM_USE_TEMPLATE,
     -1,					"Save",
     " ", "As Template",			"Save current settings as new template"
   },
   {
-    -1,					ED_ELEMENT_SETTINGS_YPOS(14),
+    -1,					-1,
     GADGET_ID_ADD_CHANGE_PAGE,		GADGET_ID_PASTE_CHANGE_PAGE,
     -1,					"New",
     NULL, NULL,				"Add new change page"
   },
   {
-    -1,					ED_ELEMENT_SETTINGS_YPOS(14),
+    -1,					-1,
     GADGET_ID_DEL_CHANGE_PAGE,		GADGET_ID_ADD_CHANGE_PAGE,
     -1,					"Delete",
     NULL, NULL,				"Delete current change page"
@@ -5663,12 +5662,23 @@ static void CreateDrawingAreas()
 
 static void CreateTextInputGadgets()
 {
+  struct GraphicInfo *gd = &graphic_info[IMG_EDITOR_INPUT_TEXT];
+  int border_size = gd->border_size;
+  int font_nr = FONT_INPUT_1;
+  int font_height = getFontHeight(font_nr);
+  int x = ED_ELEMENT_SETTINGS_ELEM_XPOS;
+  int y = ED_ELEMENT_SETTINGS_ELEM_YPOS;
+  int xoffset = TILEX + ED_ELEMENT_BORDER + 3 * border_size;
+  int yoffset = (TILEY - font_height) / 2;
   int max_infotext_len = getMaxInfoTextLength();
   int i;
 
+  /* these values are not constant, but can change at runtime */
+  textinput_info[ED_TEXTINPUT_ID_ELEMENT_NAME].x = x + xoffset - border_size;
+  textinput_info[ED_TEXTINPUT_ID_ELEMENT_NAME].y = y + yoffset - border_size;
+
   for (i = 0; i < ED_NUM_TEXTINPUT; i++)
   {
-    struct GraphicInfo *gd = &graphic_info[IMG_EDITOR_INPUT_TEXT];
     int gd_x1 = gd->src_x;
     int gd_y1 = gd->src_y;
     int gd_x2 = gd->src_x + gd->active_xoffset;
@@ -5847,10 +5857,13 @@ static void CreateTextbuttonGadgets()
   for (i = 0; i < ED_NUM_TEXTBUTTONS; i++)
   {
     int id = textbutton_info[i].gadget_id;
-    int graphic =
+    int is_tab_button =
       ((id >= GADGET_ID_LEVELINFO_LEVEL && id <= GADGET_ID_LEVELINFO_EDITOR) ||
-       (id >= GADGET_ID_PROPERTIES_INFO && id <= GADGET_ID_PROPERTIES_CHANGE) ?
-       IMG_EDITOR_TABBUTTON : IMG_EDITOR_TEXTBUTTON);
+       (id >= GADGET_ID_PROPERTIES_INFO && id <= GADGET_ID_PROPERTIES_CHANGE));
+    int graphic =
+      (is_tab_button ? IMG_EDITOR_TABBUTTON : IMG_EDITOR_TEXTBUTTON);
+    int gadget_distance =
+      (is_tab_button ? ED_GADGET_DISTANCE : ED_GADGET_TEXT_DISTANCE);
     struct GraphicInfo *gd = &graphic_info[graphic];
     int gd_x1 = gd->src_x;
     int gd_y1 = gd->src_y;
@@ -5876,8 +5889,14 @@ static void CreateTextbuttonGadgets()
 
     /* determine horizontal position to the right of specified gadget */
     if (textbutton_info[i].gadget_id_align != GADGET_ID_NONE)
-      x = (right_gadget_border[textbutton_info[i].gadget_id_align] +
-	   ED_GADGET_TEXT_DISTANCE);
+    {
+      int gadget_id_align = textbutton_info[i].gadget_id_align;
+
+      x = right_gadget_border[gadget_id_align] + gadget_distance;
+
+      if (textbutton_info[i].y == -1)
+	y = level_editor_gadget[gadget_id_align]->y;
+    }
 
     /* determine horizontal offset for leading text */
     if (textbutton_info[i].text_left != NULL)
@@ -6269,6 +6288,8 @@ void FreeLevelEditorGadgets()
 
 static void MapCounterButtons(int id)
 {
+  int font_nr = FONT_TEXT_1;
+  int font_height = getFontHeight(font_nr);
   int gadget_id_down = counterbutton_info[id].gadget_id_down;
   int gadget_id_text = counterbutton_info[id].gadget_id_text;
   int gadget_id_up   = counterbutton_info[id].gadget_id_up;
@@ -6277,8 +6298,8 @@ static void MapCounterButtons(int id)
   struct GadgetInfo *gi_up   = level_editor_gadget[gadget_id_up];
   int xoffset_left = getTextWidthForGadget(counterbutton_info[id].text_left);
   int xoffset_right = ED_GADGET_TEXT_DISTANCE;
-  int yoffset_above = MINI_TILEX + ED_GADGET_DISTANCE;
-  int yoffset = ED_BORDER_SIZE;
+  int yoffset_above = font_height + ED_GADGET_LINE_DISTANCE;
+  int yoffset = (gi_down->height - font_height) / 2;
   int x_left = gi_down->x - xoffset_left;
   int x_right;	/* set after gadget position was modified */
   int y_above = gi_down->y - yoffset_above;
@@ -6307,13 +6328,13 @@ static void MapCounterButtons(int id)
   y = gi_up->y + yoffset;
 
   if (counterbutton_info[id].text_above)
-    DrawText(x, y_above, counterbutton_info[id].text_above, FONT_TEXT_1);
+    DrawText(x, y_above, counterbutton_info[id].text_above, font_nr);
 
   if (counterbutton_info[id].text_left)
-    DrawText(x_left, y, counterbutton_info[id].text_left, FONT_TEXT_1);
+    DrawText(x_left, y, counterbutton_info[id].text_left, font_nr);
 
   if (counterbutton_info[id].text_right)
-    DrawText(x_right, y, counterbutton_info[id].text_right, FONT_TEXT_1);
+    DrawText(x_right, y, counterbutton_info[id].text_right, font_nr);
 
   MapGadget(gi_down);
   MapGadget(gi_text);
@@ -6348,25 +6369,27 @@ static void MapControlButtons()
 
 static void MapDrawingArea(int id)
 {
+  int font_nr = FONT_TEXT_1;
+  int font_height = getFontHeight(font_nr);
   struct GadgetInfo *gi = level_editor_gadget[drawingarea_info[id].gadget_id];
   int area_xsize = gi->drawing.area_xsize;
   int area_ysize = gi->drawing.area_ysize;
-  int xoffset_left= getTextWidthForDrawingArea(drawingarea_info[id].text_left);
-  int xoffset_below= getTextWidth(drawingarea_info[id].text_below,FONT_TEXT_1);
+  int xoffset_left = getTextWidthForDrawingArea(drawingarea_info[id].text_left);
+  int xoffset_below = getTextWidth(drawingarea_info[id].text_below, font_nr);
   int x_left  = gi->x - xoffset_left;
   int x_right = gi->x + gi->width + ED_DRAWINGAREA_TEXT_DISTANCE;
   int x_below = gi->x + (gi->width - xoffset_below) / 2;
-  int y_side  = gi->y + (gi->height - getFontHeight(FONT_TEXT_1)) / 2;
+  int y_side  = gi->y + (gi->height - font_height) / 2;
   int y_below = gi->y + gi->height + ED_DRAWINGAREA_TEXT_DISTANCE;
 
   if (drawingarea_info[id].text_left)
-    DrawText(x_left, y_side, drawingarea_info[id].text_left, FONT_TEXT_1);
+    DrawText(x_left, y_side, drawingarea_info[id].text_left, font_nr);
 
   if (drawingarea_info[id].text_right)
-    DrawText(x_right, y_side, drawingarea_info[id].text_right, FONT_TEXT_1);
+    DrawText(x_right, y_side, drawingarea_info[id].text_right, font_nr);
 
   if (drawingarea_info[id].text_below)
-    DrawText(x_below, y_below, drawingarea_info[id].text_below, FONT_TEXT_1);
+    DrawText(x_below, y_below, drawingarea_info[id].text_below, font_nr);
 
   if (id != ED_DRAWING_ID_DRAWING_LEVEL)
   {
@@ -6381,14 +6404,15 @@ static void MapDrawingArea(int id)
 
 static void MapTextInputGadget(int id)
 {
+  int font_nr = FONT_TEXT_1;
+  int font_height = getFontHeight(font_nr);
   struct GadgetInfo *gi = level_editor_gadget[textinput_info[id].gadget_id];
-  int xoffset_above = 0;
-  int yoffset_above = -(MINI_TILEX + ED_GADGET_DISTANCE);
-  int x_above = textinput_info[id].x + xoffset_above;
-  int y_above = textinput_info[id].y + yoffset_above;
+  int yoffset_above = font_height + ED_GADGET_LINE_DISTANCE;
+  int x_above = textinput_info[id].x;
+  int y_above = textinput_info[id].y - yoffset_above;
 
   if (textinput_info[id].text_above)
-    DrawTextS(x_above, y_above, FONT_TEXT_1, textinput_info[id].text_above);
+    DrawTextS(x_above, y_above, font_nr, textinput_info[id].text_above);
 
   ModifyGadget(gi, GDI_TEXT_VALUE, textinput_info[id].value, GDI_END);
 
@@ -6397,14 +6421,15 @@ static void MapTextInputGadget(int id)
 
 static void MapTextAreaGadget(int id)
 {
+  int font_nr = FONT_TEXT_1;
+  int font_height = getFontHeight(font_nr);
   struct GadgetInfo *gi = level_editor_gadget[textarea_info[id].gadget_id];
-  int xoffset_above = 0;
-  int yoffset_above = -(MINI_TILEX + ED_GADGET_DISTANCE);
-  int x_above = textarea_info[id].x + xoffset_above;
-  int y_above = textarea_info[id].y + yoffset_above;
+  int yoffset_above = font_height + ED_GADGET_LINE_DISTANCE;
+  int x_above = textarea_info[id].x;
+  int y_above = textarea_info[id].y - yoffset_above;
 
   if (textarea_info[id].text_above)
-    DrawTextS(x_above, y_above, FONT_TEXT_1, textarea_info[id].text_above);
+    DrawTextS(x_above, y_above, font_nr, textarea_info[id].text_above);
 
   ModifyGadget(gi, GDI_TEXT_VALUE, textarea_info[id].value, GDI_END);
 
@@ -6413,19 +6438,21 @@ static void MapTextAreaGadget(int id)
 
 static void MapSelectboxGadget(int id)
 {
+  int font_nr = FONT_TEXT_1;
+  int font_height = getFontHeight(font_nr);
   struct GadgetInfo *gi = level_editor_gadget[selectbox_info[id].gadget_id];
   int xoffset_left = getTextWidthForGadget(selectbox_info[id].text_left);
   int xoffset_right = ED_GADGET_TEXT_DISTANCE;
-  int yoffset = ED_BORDER_SIZE;
+  int yoffset = (gi->height - font_height) / 2;
   int x_left = gi->x - xoffset_left;
   int x_right = gi->x + gi->width + xoffset_right;
   int y = gi->y + yoffset;
 
   if (selectbox_info[id].text_left)
-    DrawText(x_left, y, selectbox_info[id].text_left, FONT_TEXT_1);
+    DrawText(x_left, y, selectbox_info[id].text_left, font_nr);
 
   if (selectbox_info[id].text_right)
-    DrawText(x_right, y, selectbox_info[id].text_right, FONT_TEXT_1);
+    DrawText(x_right, y, selectbox_info[id].text_right, font_nr);
 
   ModifyEditorSelectboxValue(id, *selectbox_info[id].value);
 
@@ -6434,10 +6461,12 @@ static void MapSelectboxGadget(int id)
 
 static void MapTextbuttonGadget(int id)
 {
+  int font_nr = FONT_TEXT_1;
+  int font_height = getFontHeight(font_nr);
   struct GadgetInfo *gi = level_editor_gadget[textbutton_info[id].gadget_id];
   int xoffset_left = getTextWidthForGadget(textbutton_info[id].text_left);
   int xoffset_right = ED_GADGET_TEXT_DISTANCE;
-  int yoffset = ED_BORDER_SIZE;
+  int yoffset = (gi->height - font_height) / 2;
   int x_left = gi->x - xoffset_left;
   int x_right = gi->x + gi->width + xoffset_right;
   int y = gi->y + yoffset;
@@ -6448,39 +6477,43 @@ static void MapTextbuttonGadget(int id)
     return;
 
   if (textbutton_info[id].text_left)
-    DrawText(x_left, y, textbutton_info[id].text_left, FONT_TEXT_1);
+    DrawText(x_left, y, textbutton_info[id].text_left, font_nr);
 
   if (textbutton_info[id].text_right)
-    DrawText(x_right, y, textbutton_info[id].text_right, FONT_TEXT_1);
+    DrawText(x_right, y, textbutton_info[id].text_right, font_nr);
 
   MapGadget(gi);
 }
 
 static void MapGraphicbuttonGadget(int id)
 {
+  int font_nr = FONT_TEXT_1;
+  int font_height = getFontHeight(font_nr);
   struct GadgetInfo *gi= level_editor_gadget[graphicbutton_info[id].gadget_id];
   int xoffset_left = getTextWidthForGadget(graphicbutton_info[id].text_left);
   int xoffset_right = ED_GADGET_TEXT_DISTANCE;
-  int yoffset = ED_BORDER_SIZE;
+  int yoffset = (gi->height - font_height) / 2;
   int x_left = gi->x - xoffset_left;
   int x_right = gi->x + gi->width + xoffset_right;
   int y = gi->y + yoffset;
 
   if (graphicbutton_info[id].text_left)
-    DrawText(x_left, y, graphicbutton_info[id].text_left, FONT_TEXT_1);
+    DrawText(x_left, y, graphicbutton_info[id].text_left, font_nr);
 
   if (graphicbutton_info[id].text_right)
-    DrawText(x_right, y, graphicbutton_info[id].text_right, FONT_TEXT_1);
+    DrawText(x_right, y, graphicbutton_info[id].text_right, font_nr);
 
   MapGadget(gi);
 }
 
 static void MapRadiobuttonGadget(int id)
 {
+  int font_nr = FONT_TEXT_1;
+  int font_height = getFontHeight(font_nr);
   struct GadgetInfo *gi = level_editor_gadget[radiobutton_info[id].gadget_id];
   int xoffset_left = getTextWidthForGadget(checkbutton_info[id].text_left);
   int xoffset_right = ED_GADGET_TEXT_DISTANCE;
-  int yoffset = ED_BORDER_SIZE;
+  int yoffset = (gi->height - font_height) / 2;
   int x_left = gi->x - xoffset_left;
   int x_right = gi->x + gi->width + xoffset_right;
   int y = gi->y + yoffset;
@@ -6488,10 +6521,10 @@ static void MapRadiobuttonGadget(int id)
     (*radiobutton_info[id].value == radiobutton_info[id].checked_value);
 
   if (radiobutton_info[id].text_left)
-    DrawText(x_left, y, radiobutton_info[id].text_left, FONT_TEXT_1);
+    DrawText(x_left, y, radiobutton_info[id].text_left, font_nr);
 
   if (radiobutton_info[id].text_right)
-    DrawText(x_right, y, radiobutton_info[id].text_right, FONT_TEXT_1);
+    DrawText(x_right, y, radiobutton_info[id].text_right, font_nr);
 
   ModifyGadget(gi, GDI_CHECKED, checked, GDI_END);
 
@@ -6500,10 +6533,12 @@ static void MapRadiobuttonGadget(int id)
 
 static void MapCheckbuttonGadget(int id)
 {
+  int font_nr = FONT_TEXT_1;
+  int font_height = getFontHeight(font_nr);
   struct GadgetInfo *gi = level_editor_gadget[checkbutton_info[id].gadget_id];
   int xoffset_left = getTextWidthForGadget(checkbutton_info[id].text_left);
   int xoffset_right = ED_GADGET_TEXT_DISTANCE;
-  int yoffset = ED_BORDER_SIZE;
+  int yoffset = (gi->height - font_height) / 2;
   int x_left, x_right, y;	/* set after gadget position was modified */
 
   /* set position for gadgets with dynamically determined position */
@@ -6516,10 +6551,10 @@ static void MapCheckbuttonGadget(int id)
   y = gi->y + yoffset;
 
   if (checkbutton_info[id].text_left)
-    DrawText(x_left, y, checkbutton_info[id].text_left, FONT_TEXT_1);
+    DrawText(x_left, y, checkbutton_info[id].text_left, font_nr);
 
   if (checkbutton_info[id].text_right)
-    DrawText(x_right, y, checkbutton_info[id].text_right, FONT_TEXT_1);
+    DrawText(x_right, y, checkbutton_info[id].text_right, font_nr);
 
   ModifyGadget(gi, GDI_CHECKED, *checkbutton_info[id].value, GDI_END);
 
@@ -8811,10 +8846,9 @@ static void DrawEditorElementAnimation(int x, int y)
   DrawFixedGraphicAnimationExt(drawto, x, y, graphic, frame, NO_MASKING);
 }
 
-static void DrawEditorElementName(int x, int y, int element)
+static void DrawEditorElementName(int x, int y, int font_nr)
 {
-  char *element_name = getElementInfoText(element);
-  int font_nr = FONT_TEXT_1;
+  char *element_name = getElementInfoText(properties_element);
   int font_width = getFontWidth(font_nr);
   int font_height = getFontHeight(font_nr);
   int max_text_width = SXSIZE - x - ED_ELEMENT_SETTINGS_XPOS(0);
@@ -8858,9 +8892,6 @@ static void DrawEditorElementName(int x, int y, int element)
 
 static void DrawPropertiesWindow()
 {
-  int xstart = 2;
-  int ystart = 4;
-
   stick_element_properties_window = FALSE;
 
   /* make sure that previous properties edit mode exists for this element */
@@ -8895,16 +8926,18 @@ static void DrawPropertiesWindow()
 
   FrameCounter = 0;	/* restart animation frame counter */
 
-  DrawElementBorder(SX + xstart * MINI_TILEX,
-		    SY + ystart * MINI_TILEY + MINI_TILEY / 2,
-		    TILEX, TILEY, FALSE);
+  struct GraphicInfo *gd = &graphic_info[IMG_EDITOR_INPUT_TEXT];
+  int border_size = gd->border_size;
+  int font_nr = FONT_TEXT_1;
+  int font_height = getFontHeight(font_nr);
+  int x = ED_ELEMENT_SETTINGS_ELEM_XPOS;
+  int y = ED_ELEMENT_SETTINGS_ELEM_YPOS;
+  int xoffset = TILEX + ED_ELEMENT_BORDER + 3 * border_size;
+  int yoffset = (TILEY - font_height) / 2;
 
-  DrawEditorElementAnimation(SX + xstart * MINI_TILEX,
-			     SY + ystart * MINI_TILEY + MINI_TILEY / 2);
-
-  DrawEditorElementName((xstart + 3) * MINI_TILEX + 1,
-			(ystart + 1) * MINI_TILEY + 1,
-			properties_element);
+  DrawElementBorder(SX + x, SY + y, TILEX, TILEY, FALSE);
+  DrawEditorElementAnimation(SX + x, SY + y);
+  DrawEditorElementName(x + xoffset, y + yoffset, font_nr);
 
   DrawPropertiesTabulatorGadgets();
 
