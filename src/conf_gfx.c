@@ -5214,10 +5214,12 @@ struct ConfigInfo image_config[] =
   { "editor.element_border",			"RocksMore.png"		},
   { "editor.element_border.xpos",		"0"			},
   { "editor.element_border.ypos",		"2"			},
+  { "editor.element_border.border_size",	"8"			},
 
   { "editor.element_border_input",		"RocksMore.png"		},
   { "editor.element_border_input.xpos",		"10"			},
   { "editor.element_border_input.ypos",		"7"			},
+  { "editor.element_border_input.border_size",	"4"			},
 
   { "editor.counter.down",			"RocksDoor.png"		},
   { "editor.counter.down.x",			"302"			},

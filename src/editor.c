@@ -65,10 +65,7 @@
 
 /* standard distances */
 #define ED_BORDER_SIZE			3
-#define ED_BORDER_TEXT_XSIZE		5
 #define ED_BORDER_AREA_YSIZE		1
-#define ED_ELEMENT_BORDER		8
-#define ED_ELEMENT_BORDER_INPUT		4
 
 #define ED_GADGET_DISTANCE		2
 #define ED_GADGET_TEXT_DISTANCE		(2 * ED_GADGET_DISTANCE)
@@ -113,22 +110,25 @@
 #define ED_SETTINGS_YOFFSET		(ED_CHECKBUTTON_YSIZE +		\
 					 ED_GADGET_LINE_DISTANCE)
 
-#define ED_POS_LEVEL_SETTINGS		(100)
-#define ED_POS_ELEMENT_SETTINGS		(200)
+#define ED_POS_LEVEL_SETTINGS_RANGE	(10000)
+#define ED_POS_LEVEL_SETTINGS_FIRST	(1 * ED_POS_LEVEL_SETTINGS_RANGE)
+#define ED_POS_LEVEL_SETTINGS_LAST	(2 * ED_POS_LEVEL_SETTINGS_RANGE - 1)
+#define ED_POS_ELEMENT_SETTINGS_FIRST	(2 * ED_POS_LEVEL_SETTINGS_RANGE)
+#define ED_POS_ELEMENT_SETTINGS_LAST	(3 * ED_POS_LEVEL_SETTINGS_RANGE - 1)
 
-#define ED_LEVEL_SETTINGS_XPOS(n)	(ED_POS_LEVEL_SETTINGS + (n))
-#define ED_LEVEL_SETTINGS_YPOS(n)	(ED_POS_LEVEL_SETTINGS + (n))
+#define ED_LEVEL_SETTINGS_XPOS(n)	(ED_POS_LEVEL_SETTINGS_FIRST + (n))
+#define ED_LEVEL_SETTINGS_YPOS(n)	(ED_POS_LEVEL_SETTINGS_FIRST + (n))
 
-#define ED_ELEMENT_SETTINGS_XPOS(n)	(ED_POS_ELEMENT_SETTINGS + (n))
-#define ED_ELEMENT_SETTINGS_YPOS(n)	(ED_POS_ELEMENT_SETTINGS + (n))
+#define ED_ELEMENT_SETTINGS_XPOS(n)	(ED_POS_ELEMENT_SETTINGS_FIRST + (n))
+#define ED_ELEMENT_SETTINGS_YPOS(n)	(ED_POS_ELEMENT_SETTINGS_FIRST + (n))
 
-#define IS_POS_LEVEL_SETTINGS(n)	((n) >= ED_POS_LEVEL_SETTINGS && \
-					 (n) < ED_POS_LEVEL_SETTINGS + 100)
-#define IS_POS_ELEMENT_SETTINGS(n)	((n) >= ED_POS_ELEMENT_SETTINGS && \
-					 (n) < ED_POS_ELEMENT_SETTINGS + 100)
+#define IS_POS_LEVEL_SETTINGS(n)      ((n) >= ED_POS_LEVEL_SETTINGS_FIRST && \
+				       (n) <= ED_POS_LEVEL_SETTINGS_LAST)
+#define IS_POS_ELEMENT_SETTINGS(n)    ((n) >= ED_POS_ELEMENT_SETTINGS_FIRST && \
+				       (n) <= ED_POS_ELEMENT_SETTINGS_LAST)
 
-#define ED_LEVEL_SETTINGS_LINE(n)	((n) - ED_POS_LEVEL_SETTINGS)
-#define ED_ELEMENT_SETTINGS_LINE(n)	((n) - ED_POS_ELEMENT_SETTINGS)
+#define ED_LEVEL_SETTINGS_LINE(n)	((n) - ED_POS_LEVEL_SETTINGS_FIRST)
+#define ED_ELEMENT_SETTINGS_LINE(n)	((n) - ED_POS_ELEMENT_SETTINGS_FIRST)
 
 #define ED_LEVEL_SETTINGS_X(n)		(ED_LEVEL_SETTINGS_XSTART +	\
 					 (n) * ED_SETTINGS_XOFFSET)
@@ -152,13 +152,20 @@
 
 #define ED_SETTINGS_X(n)		(IS_POS_LEVEL_SETTINGS(n) ?	\
 					 ED_POS_TO_LEVEL_SETTINGS_X(n) : \
-					 ED_POS_TO_ELEMENT_SETTINGS_X(n))
+					 IS_POS_ELEMENT_SETTINGS(n) ?	\
+					 ED_POS_TO_ELEMENT_SETTINGS_X(n) : (n))
 #define ED_SETTINGS_Y(n)		(IS_POS_LEVEL_SETTINGS(n) ?	\
 					 ED_POS_TO_LEVEL_SETTINGS_Y(n) : \
-					 ED_POS_TO_ELEMENT_SETTINGS_Y(n))
+					 IS_POS_ELEMENT_SETTINGS(n) ?	\
+					 ED_POS_TO_ELEMENT_SETTINGS_Y(n) : (n))
 
-#define ED_AREA_SETTINGS_X(i)		(ED_SETTINGS_X((i).x) + (i).xoffset)
-#define ED_AREA_SETTINGS_Y(i)		(ED_SETTINGS_Y((i).y) + (i).yoffset)
+#define ED_AREA_XOFFSET		       (0)
+#define ED_AREA_YOFFSET		       ((ED_CHECKBUTTON_YSIZE - MINI_TILEY) / 2)
+
+#define ED_AREA_SETTINGS_X(i)		(ED_SETTINGS_X((i).x) + (i).xoffset + \
+					 ((i).x != 0 ? ED_AREA_XOFFSET : 0))
+#define ED_AREA_SETTINGS_Y(i)		(ED_SETTINGS_Y((i).y) + (i).yoffset + \
+					 ((i).y != 0 ? ED_AREA_YOFFSET : 0))
 
 #define ED_LEVEL_SETTINGS_TABS_XPOS	(ED_LEVEL_SETTINGS_BASE_XSTART)
 #define ED_LEVEL_SETTINGS_TABS_YPOS	(4 * MINI_TILEY)
@@ -169,40 +176,45 @@
 #define ED_AREA_1X1_LSETTINGS_XPOS(n)	ED_LEVEL_SETTINGS_XPOS(n)
 #define ED_AREA_1X1_LSETTINGS_YPOS(n)	ED_LEVEL_SETTINGS_YPOS(n)
 #define ED_AREA_1X1_LSETTINGS_XOFF	(0)
-#define ED_AREA_1X1_LSETTINGS_YOFF	(ED_GADGET_DISTANCE)
+#define ED_AREA_1X1_LSETTINGS_YOFF	(0)
 
 #define ED_AREA_1X1_SETTINGS_XPOS(n)	ED_ELEMENT_SETTINGS_XPOS(n)
 #define ED_AREA_1X1_SETTINGS_YPOS(n)	ED_ELEMENT_SETTINGS_YPOS(n)
 #define ED_AREA_1X1_SETTINGS_XOFF	(0)
-#define ED_AREA_1X1_SETTINGS_YOFF	(ED_GADGET_DISTANCE)
+#define ED_AREA_1X1_SETTINGS_YOFF	(0)
 
 #define ED_AREA_3X3_SETTINGS_XPOS(n)	ED_ELEMENT_SETTINGS_XPOS(n)
 #define ED_AREA_3X3_SETTINGS_YPOS(n)	ED_ELEMENT_SETTINGS_YPOS(n)
 #define ED_AREA_3X3_SETTINGS_XOFF	(0)
-#define ED_AREA_3X3_SETTINGS_YOFF	(ED_GADGET_DISTANCE - MINI_TILEY)
+#define ED_AREA_3X3_SETTINGS_YOFF	(-MINI_TILEY)
 
-/* yamyam content */
-#define ED_AREA_YAMYAM_CONTENT_XPOS	ED_ELEMENT_SETTINGS_XPOS(0)
-#define ED_AREA_YAMYAM_CONTENT_YPOS	ED_ELEMENT_SETTINGS_YPOS(0)
-#define ED_AREA_YAMYAM_CONTENT_XOFF(n)	(MINI_TILEX / 2 +		\
+/* element content */
+#define ED_AREA_ELEMENT_CONTENT_XOFF(n)	(MINI_TILEX / 2 +		\
 					 5 * ((n) % 4) * MINI_TILEX)
-#define ED_AREA_YAMYAM_CONTENT_YOFF(n)	(13 * MINI_TILEY / 2 +	\
+#define ED_AREA_ELEMENT_CONTENT_YOFF(n)	(MINI_TILEY / 2 +		\
 					 6 * ((n) / 4) * MINI_TILEY)
-#define ED_AREA_YAMYAM_CONTENT_X(n)	(ED_ELEMENT_SETTINGS_X(0) +	\
+/* yamyam content */
+#define ED_XPOS_YAM			0
+#define ED_YPOS_YAM			4
+#define ED_AREA_YAMYAM_CONTENT_XPOS	ED_ELEMENT_SETTINGS_XPOS(ED_XPOS_YAM)
+#define ED_AREA_YAMYAM_CONTENT_YPOS	ED_ELEMENT_SETTINGS_YPOS(ED_YPOS_YAM)
+#define ED_AREA_YAMYAM_CONTENT_XOFF(n)	ED_AREA_ELEMENT_CONTENT_XOFF(n)
+#define ED_AREA_YAMYAM_CONTENT_YOFF(n)	ED_AREA_ELEMENT_CONTENT_YOFF(n)
+#define ED_AREA_YAMYAM_CONTENT_X(n)	(ED_ELEMENT_SETTINGS_X(ED_XPOS_YAM) + \
 					 ED_AREA_YAMYAM_CONTENT_XOFF(n))
-#define ED_AREA_YAMYAM_CONTENT_Y(n)	(ED_ELEMENT_SETTINGS_Y(0) +	\
+#define ED_AREA_YAMYAM_CONTENT_Y(n)	(ED_ELEMENT_SETTINGS_Y(ED_YPOS_YAM) + \
 					 ED_AREA_YAMYAM_CONTENT_YOFF(n))
 
 /* magic ball content */
-#define ED_AREA_MAGIC_BALL_CONTENT_XPOS	ED_ELEMENT_SETTINGS_XPOS(0)
-#define ED_AREA_MAGIC_BALL_CONTENT_YPOS	ED_ELEMENT_SETTINGS_YPOS(0)
-#define ED_AREA_MAGIC_BALL_CONTENT_XOFF(n) (MINI_TILEX / 2 +		\
-					    5 * ((n) % 4) * MINI_TILEX)
-#define ED_AREA_MAGIC_BALL_CONTENT_YOFF(n) (16 * MINI_TILEY / 2 +	\
-					    6 * ((n) / 4) * MINI_TILEY)
-#define ED_AREA_MAGIC_BALL_CONTENT_X(n)	(ED_ELEMENT_SETTINGS_X(0) +	\
+#define ED_XPOS_BALL			0
+#define ED_YPOS_BALL			5
+#define ED_AREA_MAGIC_BALL_CONTENT_XPOS	ED_ELEMENT_SETTINGS_XPOS(ED_XPOS_BALL)
+#define ED_AREA_MAGIC_BALL_CONTENT_YPOS	ED_ELEMENT_SETTINGS_YPOS(ED_YPOS_BALL)
+#define ED_AREA_MAGIC_BALL_CONTENT_XOFF(n) ED_AREA_ELEMENT_CONTENT_XOFF(n)
+#define ED_AREA_MAGIC_BALL_CONTENT_YOFF(n) ED_AREA_ELEMENT_CONTENT_YOFF(n)
+#define ED_AREA_MAGIC_BALL_CONTENT_X(n)	(ED_ELEMENT_SETTINGS_X(ED_XPOS_BALL) + \
 					 ED_AREA_MAGIC_BALL_CONTENT_XOFF(n))
-#define ED_AREA_MAGIC_BALL_CONTENT_Y(n)	(ED_ELEMENT_SETTINGS_Y(0) +	\
+#define ED_AREA_MAGIC_BALL_CONTENT_Y(n)	(ED_ELEMENT_SETTINGS_Y(ED_YPOS_BALL) + \
 					 ED_AREA_MAGIC_BALL_CONTENT_YOFF(n))
 
 /* values for scrolling gadgets for drawing area */
@@ -250,10 +262,12 @@
 					 2 * ED_SCROLLBUTTON2_YSIZE)
 
 /* values for ClearEditorGadgetInfoText() and HandleEditorGadgetInfoText() */
-#define INFOTEXT_XPOS			SX
-#define INFOTEXT_YPOS			(SY + SYSIZE - MINI_TILEX + 2)
+#define INFOTEXT_FONT			FONT_TEXT_2
 #define INFOTEXT_XSIZE			SXSIZE
-#define INFOTEXT_YSIZE			MINI_TILEY
+#define INFOTEXT_YSIZE			getFontHeight(INFOTEXT_FONT)
+#define INFOTEXT_YSIZE_FULL		(INFOTEXT_YSIZE + ED_GADGET_DISTANCE)
+#define INFOTEXT_XPOS			SX
+#define INFOTEXT_YPOS			(SY + SYSIZE - INFOTEXT_YSIZE)
 
 
 /*
@@ -3366,8 +3380,11 @@ static int ed_fieldx, ed_fieldy;
 /* actual position of level editor drawing area in level playfield */
 static int level_xpos = -1, level_ypos = -1;
 
-/* actual tile size used to display level editor playfield */
+/* actual tile size used to display playfield drawing area */
 static int ed_tilesize = DEFAULT_EDITOR_TILESIZE;
+
+/* actual tile size used to display config drawing areas */
+static int ed_config_tilesize = DEFAULT_EDITOR_TILESIZE;
 
 #define IN_ED_FIELD(x,y)	IN_FIELD(x, y, ed_fieldx, ed_fieldy)
 
@@ -4873,7 +4890,7 @@ editor_elements_info[] =
 
 static int getMaxInfoTextLength()
 {
-  return (SXSIZE / getFontWidth(FONT_TEXT_2));
+  return (SXSIZE / getFontWidth(INFOTEXT_FONT));
 }
 
 static int getTextWidthForGadget(char *text)
@@ -5244,38 +5261,45 @@ static void DrawElementBorder(int dest_x, int dest_y, int width, int height,
 {
   int border_graphic =
     (input ? IMG_EDITOR_ELEMENT_BORDER_INPUT : IMG_EDITOR_ELEMENT_BORDER);
-  Bitmap *src_bitmap;
-  int src_x, src_y;
-  int bx = (input ? ED_ELEMENT_BORDER_INPUT : ED_ELEMENT_BORDER);
-  int by = (input ? ED_ELEMENT_BORDER_INPUT : ED_ELEMENT_BORDER);
-  int bx2 = TILEX - bx;
-  int by2 = TILEY - by;
+  struct GraphicInfo *g = &graphic_info[border_graphic];
+  Bitmap *src_bitmap = g->bitmap;
+  int src_x = g->src_x;
+  int src_y = g->src_y;
+  int border_size = g->border_size;
+  int border_xpos = g->width  - border_size;
+  int border_ypos = g->height - border_size;
   int i;
 
-  getFixedGraphicSource(border_graphic, 0, &src_bitmap, &src_x, &src_y);
-
   BlitBitmap(src_bitmap, drawto, src_x, src_y,
-	     bx, by, dest_x - bx, dest_y - by);
-  BlitBitmap(src_bitmap, drawto, src_x + bx2, src_y,
-	     bx, by, dest_x + width, dest_y - by);
-  BlitBitmap(src_bitmap, drawto, src_x, src_y + by2,
-	     bx, by, dest_x - bx, dest_y + height);
-  BlitBitmap(src_bitmap, drawto, src_x + bx2, src_y + by2,
-	     bx, by, dest_x + width, dest_y + height);
+	     border_size, border_size,
+	     dest_x - border_size, dest_y - border_size);
+  BlitBitmap(src_bitmap, drawto, src_x + border_xpos, src_y,
+	     border_size, border_size,
+	     dest_x + width, dest_y - border_size);
+  BlitBitmap(src_bitmap, drawto, src_x, src_y + border_ypos,
+	     border_size, border_size,
+	     dest_x - border_size, dest_y + height);
+  BlitBitmap(src_bitmap, drawto, src_x + border_xpos, src_y + border_ypos,
+	     border_size, border_size,
+	     dest_x + width, dest_y + height);
 
   for (i = 0; i < width / MINI_TILEX; i++)
   {
-    BlitBitmap(src_bitmap, drawto, src_x + bx, src_y, MINI_TILEX, by,
-	       dest_x + i * MINI_TILEX, dest_y - by);
-    BlitBitmap(src_bitmap, drawto, src_x + bx, src_y + by2, MINI_TILEX, by,
+    BlitBitmap(src_bitmap, drawto, src_x + border_size, src_y,
+	       MINI_TILEX, border_size,
+	       dest_x + i * MINI_TILEX, dest_y - border_size);
+    BlitBitmap(src_bitmap, drawto, src_x + border_size, src_y + border_ypos,
+	       MINI_TILEX, border_size,
 	       dest_x + i * MINI_TILEX, dest_y + height);
   }
 
   for (i = 0; i < height / MINI_TILEY; i++)
   {
-    BlitBitmap(src_bitmap, drawto, src_x, src_y + by, bx, MINI_TILEY,
-	       dest_x - bx, dest_y + i * MINI_TILEY);
-    BlitBitmap(src_bitmap, drawto, src_x + bx2, src_y + by, bx, MINI_TILEY,
+    BlitBitmap(src_bitmap, drawto, src_x, src_y + border_size,
+	       border_size, MINI_TILEY,
+	       dest_x - border_size, dest_y + i * MINI_TILEY);
+    BlitBitmap(src_bitmap, drawto, src_x + border_xpos, src_y + border_size,
+	       border_size, MINI_TILEY,
 	       dest_x + width, dest_y + i * MINI_TILEY);
   }
 
@@ -5732,6 +5756,8 @@ static void CreateDrawingAreas()
     int y = SY + ED_AREA_SETTINGS_Y(drawingarea_info[i]);
     int area_xsize = drawingarea_info[i].area_xsize;
     int area_ysize = drawingarea_info[i].area_ysize;
+    int item_size = (id == GADGET_ID_DRAWING_LEVEL ?
+		     ed_tilesize : ed_config_tilesize);
 
     event_mask =
       GD_EVENT_PRESSED | GD_EVENT_RELEASED | GD_EVENT_MOVING |
@@ -5752,7 +5778,7 @@ static void CreateDrawingAreas()
 		      GDI_Y, y,
 		      GDI_TYPE, GD_TYPE_DRAWING_AREA,
 		      GDI_AREA_SIZE, area_xsize, area_ysize,
-		      GDI_ITEM_SIZE, ed_tilesize, ed_tilesize,
+		      GDI_ITEM_SIZE, item_size, item_size,
 		      GDI_EVENT_MASK, event_mask,
 		      GDI_CALLBACK_INFO, HandleDrawingAreaInfo,
 		      GDI_CALLBACK_ACTION, HandleDrawingAreas,
@@ -5770,11 +5796,6 @@ static void CreateDrawingAreas()
 static void CreateTextInputGadgets()
 {
   struct GraphicInfo *gd = &graphic_info[IMG_EDITOR_INPUT_TEXT];
-  int border_size = gd->border_size;
-  int font_nr = FONT_INPUT_1;
-  int font_height = getFontHeight(font_nr);
-  int xoffset = TILEX + ED_ELEMENT_BORDER + 3 * border_size;
-  int yoffset = (TILEY - font_height) / 2;
   int max_infotext_len = getMaxInfoTextLength();
   int i;
 
@@ -5792,6 +5813,13 @@ static void CreateTextInputGadgets()
 
     if (i == ED_TEXTINPUT_ID_ELEMENT_NAME)
     {
+      int element_border = graphic_info[IMG_EDITOR_ELEMENT_BORDER].border_size;
+      int border_size = gd->border_size;
+      int font_nr = FONT_INPUT_1;
+      int font_height = getFontHeight(font_nr);
+      int xoffset = TILEX + element_border + 3 * border_size;
+      int yoffset = (TILEY - font_height) / 2;
+
       x = ED_ELEMENT_SETTINGS_ELEM_XPOS + xoffset - border_size;
       y = ED_ELEMENT_SETTINGS_ELEM_YPOS + yoffset - border_size;
     }
@@ -7543,7 +7571,7 @@ static int getMaxEdFieldX(boolean has_scrollbar)
 
 static int getMaxEdFieldY(boolean has_scrollbar)
 {
-  int infotext_height = INFOTEXT_YSIZE;
+  int infotext_height = INFOTEXT_YSIZE_FULL;
   int scrollbar_height = (has_scrollbar ? ED_SCROLLBUTTON_YSIZE : 0);
   int sysize = SYSIZE - scrollbar_height - infotext_height;
   int max_ed_fieldy = sysize / ed_tilesize;
@@ -8100,6 +8128,9 @@ static void DrawCustomChangeContentArea()
 
 static void DrawYamYamContentAreas()
 {
+  int font_nr = FONT_TEXT_1;
+  int font_height = getFontHeight(font_nr);
+  int yoffset = font_height + ED_GADGET_DISTANCE;
   int x = SX + ED_AREA_YAMYAM_CONTENT_X(3) + 4 * MINI_TILEX;
   int y = SY + ED_AREA_YAMYAM_CONTENT_Y(0) + ED_BORDER_AREA_YSIZE;
   int i;
@@ -8131,13 +8162,16 @@ static void DrawYamYamContentAreas()
     }
   }
 
-  DrawText(x, y + 0 * MINI_TILEY, "content", FONT_TEXT_1);
-  DrawText(x, y + 1 * MINI_TILEY, "when",    FONT_TEXT_1);
-  DrawText(x, y + 2 * MINI_TILEY, "smashed", FONT_TEXT_1);
+  DrawText(x, y + 0 * yoffset, "content", font_nr);
+  DrawText(x, y + 1 * yoffset, "when",    font_nr);
+  DrawText(x, y + 2 * yoffset, "smashed", font_nr);
 }
 
 static void DrawMagicBallContentAreas()
 {
+  int font_nr = FONT_TEXT_1;
+  int font_height = getFontHeight(font_nr);
+  int yoffset = font_height + ED_GADGET_DISTANCE;
   int x = SX + ED_AREA_MAGIC_BALL_CONTENT_X(3) + 4 * MINI_TILEX;
   int y = SY + ED_AREA_MAGIC_BALL_CONTENT_Y(0) + ED_BORDER_AREA_YSIZE;
   int i;
@@ -8169,9 +8203,9 @@ static void DrawMagicBallContentAreas()
     }
   }
 
-  DrawText(x, y + 0 * MINI_TILEY, "generated", FONT_TEXT_1);
-  DrawText(x, y + 1 * MINI_TILEY, "when",      FONT_TEXT_1);
-  DrawText(x, y + 2 * MINI_TILEY, "active",    FONT_TEXT_1);
+  DrawText(x, y + 0 * yoffset, "generated", font_nr);
+  DrawText(x, y + 1 * yoffset, "when",      font_nr);
+  DrawText(x, y + 2 * yoffset, "active",    font_nr);
 }
 
 static void DrawAndroidElementArea(int element)
@@ -8203,10 +8237,9 @@ static void DrawGroupElementArea(int element)
 {
   int num_elements = group_element_info.num_elements;
   int id = ED_DRAWING_ID_GROUP_CONTENT;
-  int bx = ED_ELEMENT_BORDER_INPUT;
-  int by = ED_ELEMENT_BORDER_INPUT;
-  int sx = SX + ED_AREA_SETTINGS_X(drawingarea_info[id]) - bx;
-  int sy = SY + ED_AREA_SETTINGS_Y(drawingarea_info[id]) - by;
+  int border_size = graphic_info[IMG_EDITOR_ELEMENT_BORDER_INPUT].border_size;
+  int sx = SX + ED_AREA_SETTINGS_X(drawingarea_info[id]) - border_size;
+  int sy = SY + ED_AREA_SETTINGS_Y(drawingarea_info[id]) - border_size;
   int xsize = MAX_ELEMENTS_IN_GROUP;
   int ysize = 1;
 
@@ -8218,7 +8251,9 @@ static void DrawGroupElementArea(int element)
   ModifyEditorDrawingArea(id, num_elements, 1);
 
   /* delete content areas in case of reducing number of them */
-  DrawBackground(sx, sy, xsize * MINI_TILEX + 2*bx, ysize * MINI_TILEY + 2*by);
+  DrawBackground(sx, sy,
+		 xsize * MINI_TILEX + 2 * border_size,
+		 ysize * MINI_TILEY + 2 * border_size);
 
   MapDrawingArea(id);
 }
@@ -8235,8 +8270,8 @@ static void DrawPlayerInitialInventoryArea(int element)
 
   /* determine horizontal position to the right of specified gadget */
   if (drawingarea_info[id].gadget_id_align != GADGET_ID_NONE)
-    sx += (right_gadget_border[drawingarea_info[id].gadget_id_align] +
-	   ED_DRAWINGAREA_TEXT_DISTANCE);
+    sx = (right_gadget_border[drawingarea_info[id].gadget_id_align] +
+	  ED_DRAWINGAREA_TEXT_DISTANCE);
 
   /* determine horizontal offset for leading text */
   if (drawingarea_info[id].text_left != NULL)
@@ -9049,12 +9084,13 @@ static void DrawPropertiesWindow()
   FrameCounter = 0;	/* restart animation frame counter */
 
   struct GraphicInfo *gd = &graphic_info[IMG_EDITOR_INPUT_TEXT];
+  int element_border = graphic_info[IMG_EDITOR_ELEMENT_BORDER].border_size;
   int border_size = gd->border_size;
   int font_nr = FONT_TEXT_1;
   int font_height = getFontHeight(font_nr);
   int x = ED_ELEMENT_SETTINGS_ELEM_XPOS;
   int y = ED_ELEMENT_SETTINGS_ELEM_YPOS;
-  int xoffset = TILEX + ED_ELEMENT_BORDER + 3 * border_size;
+  int xoffset = TILEX + element_border + 3 * border_size;
   int yoffset = (TILEY - font_height) / 2;
 
   DrawElementBorder(SX + x, SY + y, TILEX, TILEY, FALSE);
@@ -11978,7 +12014,7 @@ void PrintEditorGadgetInfoText(struct GadgetInfo *gi)
     }
   }
 
-  DrawText(INFOTEXT_XPOS, INFOTEXT_YPOS, infotext, FONT_TEXT_2);
+  DrawText(INFOTEXT_XPOS, INFOTEXT_YPOS, infotext, INFOTEXT_FONT);
 }
 
 void HandleEditorGadgetInfoText(void *ptr)
@@ -12151,7 +12187,7 @@ static void HandleDrawingAreaInfo(struct GadgetInfo *gi)
   infotext[max_infotext_len] = '\0';
 
   if (strlen(infotext) > 0)
-    DrawTextS(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, FONT_TEXT_2, infotext);
+    DrawTextS(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, INFOTEXT_FONT, infotext);
 }
 
 void RequestExitLevelEditor(boolean ask_if_level_has_changed,
