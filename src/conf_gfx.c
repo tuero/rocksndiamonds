@@ -5220,6 +5220,7 @@ struct ConfigInfo image_config[] =
   { "editor.element_border_input.xpos",		"10"			},
   { "editor.element_border_input.ypos",		"7"			},
   { "editor.element_border_input.border_size",	"4"			},
+  { "editor.element_border_input.tile_size",	"16"			},
 
   { "editor.counter.down",			"RocksDoor.png"		},
   { "editor.counter.down.x",			"302"			},
@@ -5349,6 +5350,7 @@ struct ConfigInfo image_config[] =
   { "editor.palette.scrollbar.width",		"10"			},
   { "editor.palette.scrollbar.height",		"10"			},
   { "editor.palette.scrollbar.pressed_xoffset",	"-10"			},
+  { "editor.palette.scrollbar.border_size",	"3"			},
 
   { "editor.playfield.scroll_up",		"RocksDoor.png"		},
   { "editor.playfield.scroll_up.x",		"724"			},
@@ -5384,6 +5386,7 @@ struct ConfigInfo image_config[] =
   { "editor.playfield.scrollbar.width",		"16"			},
   { "editor.playfield.scrollbar.height",	"16"			},
   { "editor.playfield.scrollbar.pressed_xoffset", "-16"			},
+  { "editor.playfield.scrollbar.border_size",	"3"			},
 
   { "editor.button.gfx.prev_level",		"RocksDoor.png"		},
   { "editor.button.gfx.prev_level.x",		"724"			},
@@ -7584,6 +7587,28 @@ struct ConfigInfo image_config[] =
   { "editor.palette.element_right.x",		"78"			},
   { "editor.palette.element_right.y",		"258"			},
   { "editor.palette.element_right.tile_size",	"16"			},
+
+  { "editor.level_settings.headline.x",		"272"			},
+  { "editor.level_settings.headline.y",		"16"			},
+  { "editor.level_settings.headline.align",	"center"		},
+  { "editor.level_settings.tabs.x",		"24"			},
+  { "editor.level_settings.tabs.y",		"64"			},
+
+  { "editor.element_settings.headline.x",	"272"			},
+  { "editor.element_settings.headline.y",	"16"			},
+  { "editor.element_settings.headline.align",	"center"		},
+  { "editor.element_settings.element.x",	"24"			},
+  { "editor.element_settings.element.y",	"64"			},
+  { "editor.element_settings.tabs.x",		"24"			},
+  { "editor.element_settings.tabs.y",		"128"			},
+
+  { "editor.gadget.normal_spacing",		"4"			},
+  { "editor.gadget.small_spacing",		"2"			},
+  { "editor.gadget.tiny_spacing",		"1"			},
+  { "editor.gadget.line_spacing",		"4"			},
+  { "editor.gadget.text_spacing",		"4"			},
+  { "editor.gadget.tab_spacing",		"8"			},
+  { "editor.gadget.separator_line.height",	"2"			},
 
   { "request.button.yes.x",			"2"			},
   { "request.button.yes.y",			"250"			},

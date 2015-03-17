@@ -2248,6 +2248,26 @@ struct PreviewInfo
   int anim_mode;
 };
 
+struct EditorSettingsInfo
+{
+  struct MenuPosInfo headline;
+
+  struct XY element;
+  struct XY tabs;
+};
+
+struct EditorGadgetInfo
+{
+  int normal_spacing;
+  int small_spacing;
+  int tiny_spacing;
+  int line_spacing;
+  int text_spacing;
+  int tab_spacing;
+
+  struct Rect separator_line;
+};
+
 struct EditorButtonInfo
 {
   struct XY prev_level;
@@ -2310,6 +2330,10 @@ struct EditorPaletteInfo
 
 struct EditorInfo
 {
+  struct EditorSettingsInfo level_settings;
+  struct EditorSettingsInfo element_settings;
+
+  struct EditorGadgetInfo gadget;
   struct EditorButtonInfo button;
   struct EditorInputInfo input;
   struct EditorPaletteInfo palette;
