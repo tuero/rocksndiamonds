@@ -2248,12 +2248,25 @@ struct PreviewInfo
   int anim_mode;
 };
 
+struct EditorTabsInfo
+{
+  int x;
+  int y;
+  int yoffset2;
+  int width;
+  int height;
+  int draw_xoffset;
+  int draw_yoffset;
+};
+
 struct EditorSettingsInfo
 {
   struct MenuPosInfo headline;
 
-  struct XY element;
-  struct XY tabs;
+  struct XY element_graphic;
+  struct XY element_name;
+
+  struct EditorTabsInfo tabs;
 };
 
 struct EditorGadgetInfo
@@ -2330,9 +2343,7 @@ struct EditorPaletteInfo
 
 struct EditorInfo
 {
-  struct EditorSettingsInfo level_settings;
-  struct EditorSettingsInfo element_settings;
-
+  struct EditorSettingsInfo settings;
   struct EditorGadgetInfo gadget;
   struct EditorButtonInfo button;
   struct EditorInputInfo input;

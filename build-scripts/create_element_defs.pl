@@ -2396,7 +2396,9 @@ sub print_image_config_vars
 	    $var =~ s/^(game\.panel\..*)\.tile_size$/$1.size/;
 	    $var =~ s/^(request\.button\..*)\.tile_size$/$1.size/;
 	    $var =~ s/\.digits$/.size/;
+	    $var =~ s/\.2nd_offset$/.offset2/;
 	    $var =~ s/\.2nd_xoffset$/.xoffset2/;
+	    $var =~ s/\.2nd_yoffset$/.yoffset2/;
 	    $var =~ s/\.element$/.id/;
 	    $var =~ s/\.draw_order$/.sort_priority/;
 

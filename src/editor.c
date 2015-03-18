@@ -69,7 +69,6 @@
 #define ED_GADGET_TINY_DISTANCE		(editor.gadget.tiny_spacing)
 #define ED_GADGET_LINE_DISTANCE		(editor.gadget.line_spacing)
 #define ED_GADGET_TEXT_DISTANCE		(editor.gadget.text_spacing)
-#define ED_GADGET_TAB_DISTANCE		(editor.gadget.tab_spacing)
 #define ED_TAB_BAR_HEIGHT		(editor.gadget.separator_line.height)
 #define ED_DRAWINGAREA_TEXT_DISTANCE	(ED_GADGET_TEXT_DISTANCE +	\
 					 ED_DRAWINGAREA_BORDER_SIZE)
@@ -89,25 +88,31 @@
 #define ED_TABBUTTON_XSIZE	     (graphic_info[IMG_EDITOR_TABBUTTON].width)
 #define ED_TABBUTTON_YSIZE	     (graphic_info[IMG_EDITOR_TABBUTTON].height)
 
-#define ED_LEVEL_SETTINGS_TABS_XPOS	(editor.level_settings.tabs.x)
-#define ED_LEVEL_SETTINGS_TABS_YPOS	(editor.level_settings.tabs.y)
-#define ED_ELEMENT_SETTINGS_TABS_XPOS	(editor.element_settings.tabs.x)
-#define ED_ELEMENT_SETTINGS_TABS_YPOS	(editor.element_settings.tabs.y)
+#define ED_LEVEL_SETTINGS_TABS_X	(editor.settings.tabs.x)
+#define ED_LEVEL_SETTINGS_TABS_Y	(editor.settings.tabs.y)
+#define ED_ELEMENT_SETTINGS_TABS_X	(editor.settings.tabs.x)
+#define ED_ELEMENT_SETTINGS_TABS_Y	(editor.settings.tabs.y +	\
+					 editor.settings.tabs.yoffset2)
 
-#define ED_LEVEL_SETTINGS_XSTART	(ED_LEVEL_SETTINGS_TABS_XPOS)
-#define ED_LEVEL_SETTINGS_YSTART	(ED_LEVEL_SETTINGS_TABS_YPOS +	\
+#define ED_SETTINGS_TABS_XOFFSET	(editor.settings.tabs.draw_xoffset)
+#define ED_SETTINGS_TABS_YOFFSET	(editor.settings.tabs.draw_yoffset)
+
+#define ED_LEVEL_SETTINGS_XSTART	(ED_LEVEL_SETTINGS_TABS_X +	\
+					 ED_SETTINGS_TABS_XOFFSET)
+#define ED_LEVEL_SETTINGS_YSTART	(ED_LEVEL_SETTINGS_TABS_Y +	\
 					 ED_TABBUTTON_YSIZE +		\
 					 ED_GADGET_TINY_DISTANCE +	\
 					 ED_TAB_BAR_HEIGHT +		\
-					 ED_GADGET_TAB_DISTANCE +	\
+					 ED_SETTINGS_TABS_YOFFSET +	\
 					 getFontHeight(FONT_TEXT_1) +	\
 					 ED_GADGET_TEXT_DISTANCE)
-#define ED_ELEMENT_SETTINGS_XSTART	(ED_ELEMENT_SETTINGS_TABS_XPOS)
-#define ED_ELEMENT_SETTINGS_YSTART	(ED_ELEMENT_SETTINGS_TABS_YPOS + \
+#define ED_ELEMENT_SETTINGS_XSTART	(ED_ELEMENT_SETTINGS_TABS_X +	\
+					 ED_SETTINGS_TABS_XOFFSET)
+#define ED_ELEMENT_SETTINGS_YSTART	(ED_ELEMENT_SETTINGS_TABS_Y +	\
 					 ED_TABBUTTON_YSIZE +		\
 					 ED_GADGET_TINY_DISTANCE +	\
 					 ED_TAB_BAR_HEIGHT +		\
-					 ED_GADGET_TAB_DISTANCE)
+					 ED_SETTINGS_TABS_YOFFSET)
 
 #define ED_SETTINGS_XOFFSET		(ED_CHECKBUTTON_XSIZE +		\
 					 ED_GADGET_TEXT_DISTANCE)
@@ -164,11 +169,11 @@
 					 ED_POS_TO_ELEMENT_SETTINGS_Y(n) : (n))
 
 #define ED_TAB_SETTINGS_X(n)		(IS_POS_LEVEL_SETTINGS(n) ?	\
-					 ED_LEVEL_SETTINGS_TABS_XPOS :	\
-					 ED_ELEMENT_SETTINGS_TABS_XPOS)
+					 ED_LEVEL_SETTINGS_TABS_X :	\
+					 ED_ELEMENT_SETTINGS_TABS_X)
 #define ED_TAB_SETTINGS_Y(n)		(IS_POS_LEVEL_SETTINGS(n) ?	\
-					 ED_LEVEL_SETTINGS_TABS_YPOS :	\
-					 ED_ELEMENT_SETTINGS_TABS_YPOS)
+					 ED_LEVEL_SETTINGS_TABS_Y :	\
+					 ED_ELEMENT_SETTINGS_TABS_Y)
 
 #define ED_SETTINGS_XOFF(n)		(5 * ((n) % 4) *		\
 					 ED_DRAWINGAREA_TILE_SIZE)
@@ -5844,8 +5849,12 @@ static void CreateTextInputGadgets()
       int xoffset = element_border + TILEX + element_border + 3 * border_size;
       int yoffset = element_border + (TILEY - font_height) / 2;
 
-      x = editor.element_settings.element.x + xoffset - border_size;
-      y = editor.element_settings.element.y + yoffset - border_size;
+      x = (editor.settings.element_name.x != -1 ?
+	   editor.settings.element_name.x :
+	   editor.settings.element_graphic.x + xoffset) - border_size;
+      y = (editor.settings.element_name.y != -1 ?
+	   editor.settings.element_name.y :
+	   editor.settings.element_graphic.y + yoffset) - border_size;
     }
     else
     {
@@ -8107,7 +8116,7 @@ static void DrawLevelInfoWindow()
 {
   char *text = "Global Settings";
   int font_nr = FONT_TITLE_1;
-  struct MenuPosInfo *pos = &editor.level_settings.headline;
+  struct MenuPosInfo *pos = &editor.settings.headline;
   int sx = SX + ALIGNED_XPOS(pos->x, getTextWidth(text, font_nr), pos->align);
   int sy = SY + pos->y;
 
@@ -8972,7 +8981,7 @@ static void DrawPropertiesConfig()
     if (tab_color != BLACK_PIXEL)		/* black => transparent */
       FillRectangle(drawto,
 		    SX + ED_ELEMENT_SETTINGS_X(0),
-		    SY + ED_ELEMENT_SETTINGS_Y(14) - ED_GADGET_TAB_DISTANCE -
+		    SY + ED_ELEMENT_SETTINGS_Y(14) - ED_SETTINGS_TABS_YOFFSET -
 		    ED_TAB_BAR_HEIGHT,
 		    getTabulatorBarWidth(), getTabulatorBarHeight(), tab_color);
   }
@@ -9093,13 +9102,17 @@ static void DrawPropertiesWindow()
   int border_size = gd->border_size;
   int font_nr = FONT_TEXT_1;
   int font_height = getFontHeight(font_nr);
-  int x = editor.element_settings.element.x + element_border;
-  int y = editor.element_settings.element.y + element_border;
   int xoffset = TILEX + element_border + 3 * border_size;
   int yoffset = (TILEY - font_height) / 2;
+  int x1 = editor.settings.element_graphic.x + element_border;
+  int y1 = editor.settings.element_graphic.y + element_border;
+  int x2 = (editor.settings.element_name.x == -1 ? x1 + xoffset :
+	    editor.settings.element_name.x);
+  int y2 = (editor.settings.element_name.y == -1 ? y1 + yoffset :
+	    editor.settings.element_name.y);
   char *text = "Element Settings";
   int font2_nr = FONT_TITLE_1;
-  struct MenuPosInfo *pos = &editor.element_settings.headline;
+  struct MenuPosInfo *pos = &editor.settings.headline;
   int sx = SX + ALIGNED_XPOS(pos->x, getTextWidth(text, font2_nr), pos->align);
   int sy = SY + pos->y;
 
@@ -9137,9 +9150,9 @@ static void DrawPropertiesWindow()
 
   FrameCounter = 0;	/* restart animation frame counter */
 
-  DrawElementBorder(SX + x, SY + y, TILEX, TILEY, FALSE);
-  DrawEditorElementAnimation(SX + x, SY + y);
-  DrawEditorElementName(x + xoffset, y + yoffset, font_nr);
+  DrawElementBorder(SX + x1, SY + y1, TILEX, TILEY, FALSE);
+  DrawEditorElementAnimation(SX + x1, SY + y1);
+  DrawEditorElementName(x2, y2, font_nr);
 
   DrawPropertiesTabulatorGadgets();
 
@@ -11995,8 +12008,8 @@ void HandleLevelEditorKeyInput(Key key)
 void HandleLevelEditorIdle()
 {
   int element_border = graphic_info[IMG_EDITOR_ELEMENT_BORDER].border_size;
-  int x = editor.element_settings.element.x + element_border;
-  int y = editor.element_settings.element.y + element_border;
+  int x = editor.settings.element_graphic.x + element_border;
+  int y = editor.settings.element_graphic.y + element_border;
   static unsigned int action_delay = 0;
   unsigned int action_delay_value = GameFrameDelay;
   int i;
