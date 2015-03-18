@@ -716,9 +716,12 @@ boolean SDLSetVideoMode(DrawBuffer **backbuffer, boolean fullscreen)
   SDLRedrawWindow();			// map window
 #endif
 
+#ifdef DEBUG
+#if defined(PLATFORM_WIN32)
+  // experimental drag and drop code
+
   SDL_EventState(SDL_SYSWMEVENT, SDL_ENABLE);
 
-#if defined(PLATFORM_WIN32)
   {
     SDL_SysWMinfo wminfo;
     HWND hwnd;
@@ -743,6 +746,7 @@ boolean SDLSetVideoMode(DrawBuffer **backbuffer, boolean fullscreen)
       DragAcceptFiles(hwnd, TRUE);
     }
   }
+#endif
 #endif
 
   return success;
@@ -2373,7 +2377,10 @@ void SDLNextEvent(Event *event)
 
 void SDLHandleWindowManagerEvent(Event *event)
 {
+#ifdef DEBUG
 #if defined(PLATFORM_WIN32)
+  // experimental drag and drop code
+
   SDL_SysWMEvent *syswmevent = (SDL_SysWMEvent *)event;
   SDL_SysWMmsg *syswmmsg = (SDL_SysWMmsg *)(syswmevent->msg);
 
@@ -2410,6 +2417,7 @@ void SDLHandleWindowManagerEvent(Event *event)
     DragFinish((HDROP)syswmmsg->wParam);
 #endif
   }
+#endif
 #endif
 }
 
