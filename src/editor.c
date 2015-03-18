@@ -11475,12 +11475,18 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 
     case GADGET_ID_SCROLL_HORIZONTAL:
       level_xpos = gi->event.item_position - 1;
+
       DrawEditorLevel(ed_fieldx, ed_fieldy, level_xpos, level_ypos);
+      BackToFront();
+
       break;
 
     case GADGET_ID_SCROLL_VERTICAL:
       level_ypos = gi->event.item_position - 1;
+
       DrawEditorLevel(ed_fieldx, ed_fieldy, level_xpos, level_ypos);
+      BackToFront();
+
       break;
 
     case GADGET_ID_SCROLL_LIST_UP:

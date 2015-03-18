@@ -108,9 +108,8 @@ boolean SkipPressedMouseMotionEvent(const Event *event)
   if (event->type != EVENT_MOTIONNOTIFY)
     return FALSE;
 
-  /* only skip motion events with pressed button outside level editor */
-  if (button_status == MB_RELEASED ||
-      game_status == GAME_MODE_EDITOR || game_status == GAME_MODE_PLAYING)
+  /* only skip motion events with pressed button outside the game */
+  if (button_status == MB_RELEASED || game_status == GAME_MODE_PLAYING)
     return FALSE;
 
   if (PendingEvent())
