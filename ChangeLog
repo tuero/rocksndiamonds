@@ -1,3 +1,12 @@
+2015-03-18
+	* added dynamically configurable graphics and layout of editor gadgets
+
+2015-03-11
+	* fixed (swapped) editor zoom directions for left and right mouse button
+
+2015-03-10
+	* added main menu backlink to level set selection screen
+
 2015-03-07
 	* added support for gadget-like pressable menu buttons on main screen
 
