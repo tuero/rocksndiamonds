@@ -1055,7 +1055,7 @@ static struct
   {
     IMG_EDITOR_BUTTON_GFX_ZOOM_LEVEL,		GADGET_ID_ZOOM,
     &editor.button.zoom_level,			GD_TYPE_NORMAL_BUTTON,
-    "zoom level tile size",			'-'
+    "zoom level tile size",			'+'
   },
   {
     IMG_EDITOR_BUTTON_GFX_ROTATE_RIGHT,		GADGET_ID_WRAP_RIGHT,
@@ -11987,12 +11987,12 @@ void HandleLevelEditorKeyInput(Key key)
       ClickOnGadget(level_editor_gadget[GADGET_ID_SINGLE_ITEMS], button);
     else if (letter == 'U')
       ClickOnGadget(level_editor_gadget[GADGET_ID_UNDO], 3);
-    else if (key == KSYM_KP_Subtract)
-      ClickOnGadget(level_editor_gadget[GADGET_ID_ZOOM], 1);
+    else if (key == KSYM_KP_Subtract || letter == '-')
+      ClickOnGadget(level_editor_gadget[GADGET_ID_ZOOM], 3);
     else if (key == KSYM_KP_0 || letter == '0')
       ClickOnGadget(level_editor_gadget[GADGET_ID_ZOOM], 2);
-    else if (key == KSYM_KP_Add || letter == '+')
-      ClickOnGadget(level_editor_gadget[GADGET_ID_ZOOM], 3);
+    else if (key == KSYM_KP_Add)
+      ClickOnGadget(level_editor_gadget[GADGET_ID_ZOOM], 1);
     else if (key == KSYM_Return ||
 	     key == KSYM_space ||
 	     key == setup.shortcut.toggle_pause)

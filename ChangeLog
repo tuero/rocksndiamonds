@@ -1,3 +1,6 @@
+2015-03-19
+	* fixed (swapped) editor zoom directions for '-' and '+' (keypad) keys
+
 2015-03-18
 	* added dynamically configurable graphics and layout of editor gadgets
 
