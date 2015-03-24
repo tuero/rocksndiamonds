@@ -7801,9 +7801,6 @@ void CheckSaveEngineSnapshot_EM(byte action[MAX_PLAYERS], int frame,
 {
   static boolean player_was_waiting = TRUE;
 
-  if (!tape.recording)
-    return;
-
   if (frame == 0 && !any_player_dropping)
   {
     if (!player_was_waiting)
@@ -7823,9 +7820,6 @@ void CheckSaveEngineSnapshot_SP(boolean murphy_is_waiting,
 				boolean murphy_is_dropping)
 {
   static boolean player_was_waiting = FALSE;
-
-  if (!tape.recording)
-    return;
 
   if (murphy_is_waiting)
   {

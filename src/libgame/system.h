@@ -136,6 +136,10 @@
 					 (b) <= MB_WHEEL_DOWN)
 #define DEFAULT_WHEEL_STEPS		3
 
+#define BUTTON_STEPSIZE(b)		((b) == MB_LEFTBUTTON   ?  1 :	\
+					 (b) == MB_MIDDLEBUTTON ?  5 :	\
+					 (b) == MB_RIGHTBUTTON  ? 10 : 1)
+
 /* values for move directions */
 #define MV_BIT_LEFT			0
 #define MV_BIT_RIGHT			1

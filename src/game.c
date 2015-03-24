@@ -10681,9 +10681,6 @@ static void CheckSaveEngineSnapshot(struct PlayerInfo *player)
   static boolean player_was_snapping = FALSE;
   static boolean player_was_dropping = FALSE;
 
-  if (!tape.recording)
-    return;
-
   if ((!player->is_moving  && player_was_moving) ||
       (player->MovPos == 0 && player_was_moving) ||
       (player->is_snapping && !player_was_snapping) ||
@@ -14758,16 +14755,16 @@ void LoadEngineSnapshotSingle()
   LoadEngineSnapshotValues();
 }
 
-void LoadEngineSnapshot_Undo()
+void LoadEngineSnapshot_Undo(int steps)
 {
-  LoadSnapshotFromList_Older();
+  LoadSnapshotFromList_Older(steps);
 
   LoadEngineSnapshotValues();
 }
 
-void LoadEngineSnapshot_Redo()
+void LoadEngineSnapshot_Redo(int steps)
 {
-  LoadSnapshotFromList_Newer();
+  LoadSnapshotFromList_Newer(steps);
 
   LoadEngineSnapshotValues();
 }
@@ -14984,28 +14981,29 @@ void GameUndoRedoExt()
   BackToFront();
 }
 
-void GameUndo()
+void GameUndo(int steps)
 {
   if (!CheckEngineSnapshot())
     return;
 
-  LoadEngineSnapshot_Undo();
+  LoadEngineSnapshot_Undo(steps);
 
   GameUndoRedoExt();
 }
 
-void GameRedo()
+void GameRedo(int steps)
 {
   if (!CheckEngineSnapshot())
     return;
 
-  LoadEngineSnapshot_Redo();
+  LoadEngineSnapshot_Redo(steps);
 
   GameUndoRedoExt();
 }
 
-static void HandleGameButtonsExt(int id)
+static void HandleGameButtonsExt(int id, int button)
 {
+  int steps = BUTTON_STEPSIZE(button);
   boolean handle_game_buttons =
     (game_status == GAME_MODE_PLAYING ||
      (game_status == GAME_MODE_MAIN && tape.show_game_buttons));
@@ -15060,11 +15058,11 @@ static void HandleGameButtonsExt(int id)
       break;
 
     case GAME_CTRL_ID_UNDO:
-      GameUndo();
+      GameUndo(steps);
       break;
 
     case GAME_CTRL_ID_REDO:
-      GameRedo();
+      GameRedo(steps);
       break;
 
     case GAME_CTRL_ID_SAVE:
@@ -15121,7 +15119,7 @@ static void HandleGameButtonsExt(int id)
 
 static void HandleGameButtons(struct GadgetInfo *gi)
 {
-  HandleGameButtonsExt(gi->custom_id);
+  HandleGameButtonsExt(gi->custom_id, gi->event.button);
 }
 
 void HandleSoundButtonKeys(Key key)

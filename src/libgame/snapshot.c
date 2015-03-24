@@ -133,11 +133,12 @@ boolean LoadSnapshotSingle()
   return FALSE;
 }
 
-boolean LoadSnapshotFromList_Older()
+boolean LoadSnapshotFromList_Older(int steps)
 {
   if (snapshot_current->next)
   {
-    snapshot_current = snapshot_current->next;
+    while (snapshot_current->next && steps--)
+      snapshot_current = snapshot_current->next;
 
     LoadSnapshotBuffers(snapshot_current->content);
 
@@ -151,11 +152,12 @@ boolean LoadSnapshotFromList_Older()
   return FALSE;
 }
 
-boolean LoadSnapshotFromList_Newer()
+boolean LoadSnapshotFromList_Newer(int steps)
 {
   if (snapshot_current->prev)
   {
-    snapshot_current = snapshot_current->prev;
+    while (snapshot_current->prev && steps--)
+      snapshot_current = snapshot_current->prev;
 
     LoadSnapshotBuffers(snapshot_current->content);
 

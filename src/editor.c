@@ -3424,10 +3424,6 @@ static int new_element3 = EL_SAND;
 #define BUTTON_ELEMENT(button) ((button) == 1 ? new_element1 : \
 				(button) == 2 ? new_element2 : \
 				(button) == 3 ? new_element3 : EL_EMPTY)
-#define BUTTON_STEPSIZE(button) ((button) == 1 ?  1 : \
-				 (button) == 2 ?  5 : \
-				 (button) == 3 ? 10 : \
-				 (button))
 
 /* forward declaration for internal use */
 static void ModifyEditorCounterValue(int, int);
