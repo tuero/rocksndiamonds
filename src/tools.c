@@ -7794,13 +7794,65 @@ void InitGraphicInfo_EM(void)
 #endif
 }
 
+void CheckSaveEngineSnapshot_EM(byte action[MAX_PLAYERS], int frame,
+				boolean any_player_moving,
+				boolean any_player_snapping,
+				boolean any_player_dropping)
+{
+  static boolean player_was_waiting = TRUE;
+
+  if (!tape.recording)
+    return;
+
+  if (frame == 0 && !any_player_dropping)
+  {
+    if (!player_was_waiting)
+    {
+      SaveEngineSnapshotToList();
+
+      player_was_waiting = TRUE;
+    }
+  }
+  else if (any_player_moving || any_player_snapping || any_player_dropping)
+  {
+    player_was_waiting = FALSE;
+  }
+}
+
+void CheckSaveEngineSnapshot_SP(boolean murphy_is_waiting,
+				boolean murphy_is_dropping)
+{
+  static boolean player_was_waiting = FALSE;
+
+  if (!tape.recording)
+    return;
+
+  if (murphy_is_waiting)
+  {
+    if (!player_was_waiting)
+    {
+      SaveEngineSnapshotToList();
+
+      player_was_waiting = TRUE;
+    }
+  }
+  else
+  {
+    player_was_waiting = FALSE;
+  }
+}
+
 void CheckSingleStepMode_EM(byte action[MAX_PLAYERS], int frame,
 			    boolean any_player_moving,
-			    boolean player_is_dropping)
+			    boolean any_player_snapping,
+			    boolean any_player_dropping)
 {
   if (tape.single_step && tape.recording && !tape.pausing)
-    if (frame == 0 && !player_is_dropping)
+    if (frame == 0 && !any_player_dropping)
       TapeTogglePause(TAPE_TOGGLE_AUTOMATIC);
+
+  CheckSaveEngineSnapshot_EM(action, frame, any_player_moving,
+			     any_player_snapping, any_player_dropping);
 }
 
 void CheckSingleStepMode_SP(boolean murphy_is_waiting,
@@ -7809,6 +7861,8 @@ void CheckSingleStepMode_SP(boolean murphy_is_waiting,
   if (tape.single_step && tape.recording && !tape.pausing)
     if (murphy_is_waiting)
       TapeTogglePause(TAPE_TOGGLE_AUTOMATIC);
+
+  CheckSaveEngineSnapshot_SP(murphy_is_waiting, murphy_is_dropping);
 }
 
 void getGraphicSource_SP(struct GraphicInfo_SP *g_sp,
@@ -8080,7 +8134,7 @@ void ChangeViewportPropertiesIfNeeded()
       // printf("::: new_tilesize_var != TILESIZE_VAR\n");
 
       // changing tile size invalidates scroll values of engine snapshots
-      FreeEngineSnapshot();
+      FreeEngineSnapshotSingle();
 
       // changing tile size requires update of graphic mapping for EM engine
       init_em_graphics = TRUE;

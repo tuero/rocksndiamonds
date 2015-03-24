@@ -932,12 +932,14 @@ void HandleWindowManagerEvent(Event *event)
 void HandleButton(int mx, int my, int button, int button_nr)
 {
   static int old_mx = 0, old_my = 0;
+  boolean button_hold = FALSE;
 
   if (button < 0)
   {
     mx = old_mx;
     my = old_my;
     button = -button;
+    button_hold = TRUE;
   }
   else
   {
@@ -946,6 +948,7 @@ void HandleButton(int mx, int my, int button, int button_nr)
   }
 
 #if defined(PLATFORM_ANDROID)
+  // !!! for now, do not handle gadgets when playing -- maybe fix this !!!
   if (game_status != GAME_MODE_PLAYING &&
       HandleGadgets(mx, my, button))
   {
@@ -959,6 +962,9 @@ void HandleButton(int mx, int my, int button, int button_nr)
     mx = my = -32;	/* force mouse event to be outside screen tiles */
   }
 #endif
+
+  if (button_hold && game_status == GAME_MODE_PLAYING && tape.pausing)
+    return;
 
   /* do not use scroll wheel button events for anything other than gadgets */
   if (IS_WHEEL_BUTTON(button_nr))
@@ -1595,7 +1601,8 @@ void HandleKey(Key key, int key_status)
 
 void HandleNoEvent()
 {
-  if (button_status && game_status != GAME_MODE_PLAYING)
+  // if (button_status && game_status != GAME_MODE_PLAYING)
+  if (button_status && (game_status != GAME_MODE_PLAYING || tape.pausing))
   {
     HandleButton(0, 0, -button_status, button_status);
   }

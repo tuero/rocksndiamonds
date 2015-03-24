@@ -72,6 +72,7 @@ struct ListNode
 {
   char *key;
   void *content;
+  struct ListNode *prev;
   struct ListNode *next;
 };
 typedef struct ListNode ListNode;

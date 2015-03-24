@@ -740,9 +740,14 @@ void TapeTogglePause(boolean toggle_manual)
       TapeAppendRecording();
 
       if (!CheckEngineSnapshot())
-	SaveEngineSnapshot();
+	SaveEngineSnapshotSingle();
     }
   }
+
+  if (tape.pausing)
+    MapUndoRedoButtons();
+  else
+    MapStopPlayButtons();
 }
 
 void TapeStartPlaying()
@@ -1002,7 +1007,7 @@ void TapeQuickSave()
   }
 
   if (SaveTapeChecked(tape.level_nr))
-    SaveEngineSnapshot();
+    SaveEngineSnapshotSingle();
 }
 
 void TapeQuickLoad()
@@ -1031,7 +1036,7 @@ void TapeQuickLoad()
   {
     TapeStartGamePlaying();
 
-    LoadEngineSnapshot();
+    LoadEngineSnapshotSingle();
 
     DrawCompleteVideoDisplay();
 

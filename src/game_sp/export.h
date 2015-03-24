@@ -192,7 +192,7 @@ extern void BlitScreenToBitmap_SP(Bitmap *);
 extern void RedrawPlayfield_SP(boolean);
 
 extern void LoadEngineSnapshotValues_SP();
-extern void SaveEngineSnapshotValues_SP();
+extern void SaveEngineSnapshotValues_SP(ListNode **);
 
 extern int map_key_RND_to_SP(int);
 extern int map_key_SP_to_RND(int);

@@ -1108,6 +1108,7 @@ void prepare_em_level(void)
   }
 
   game_em.any_player_moving = FALSE;
+  game_em.any_player_snapping = FALSE;
   game_em.last_moving_player = 0;	/* default: first player */
 
   for (i = 0; i < MAX_PLAYERS; i++)

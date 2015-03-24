@@ -15,6 +15,7 @@
 #include "init.h"
 #include "tools.h"
 #include "screens.h"
+#include "events.h"
 #include "files.h"
 #include "tape.h"
 #include "network.h"
@@ -970,13 +971,15 @@ static struct GamePanelControlInfo game_panel_controls[] =
 #define GAME_CTRL_ID_STOP		0
 #define GAME_CTRL_ID_PAUSE		1
 #define GAME_CTRL_ID_PLAY		2
-#define SOUND_CTRL_ID_MUSIC		3
-#define SOUND_CTRL_ID_LOOPS		4
-#define SOUND_CTRL_ID_SIMPLE		5
-#define GAME_CTRL_ID_SAVE		6
-#define GAME_CTRL_ID_LOAD		7
+#define GAME_CTRL_ID_UNDO		3
+#define GAME_CTRL_ID_REDO		4
+#define GAME_CTRL_ID_SAVE		5
+#define GAME_CTRL_ID_LOAD		6
+#define SOUND_CTRL_ID_MUSIC		7
+#define SOUND_CTRL_ID_LOOPS		8
+#define SOUND_CTRL_ID_SIMPLE		9
 
-#define NUM_GAME_BUTTONS		8
+#define NUM_GAME_BUTTONS		10
 
 
 /* forward declaration for internal use */
@@ -3031,6 +3034,8 @@ static void InitGameEngine()
      setup.scroll_delay                   ? setup.scroll_delay_value       : 0);
   game.scroll_delay_value =
     MIN(MAX(MIN_SCROLL_DELAY, game.scroll_delay_value), MAX_SCROLL_DELAY);
+
+  FreeEngineSnapshotList();
 }
 
 int get_num_special_action(int element, int action_first, int action_last)
@@ -3991,6 +3996,8 @@ void InitGame()
   }
 
   game.restart_level = FALSE;
+
+  SaveEngineSnapshotToList();
 }
 
 void UpdateEngineValues(int actual_scroll_x, int actual_scroll_y)
@@ -10668,6 +10675,39 @@ static void SetPlayerWaiting(struct PlayerInfo *player, boolean is_waiting)
   }
 }
 
+static void CheckSaveEngineSnapshot(struct PlayerInfo *player)
+{
+  static boolean player_was_moving = FALSE;
+  static boolean player_was_snapping = FALSE;
+  static boolean player_was_dropping = FALSE;
+
+  if (!tape.recording)
+    return;
+
+  if ((!player->is_moving  && player_was_moving) ||
+      (player->MovPos == 0 && player_was_moving) ||
+      (player->is_snapping && !player_was_snapping) ||
+      (player->is_dropping && !player_was_dropping))
+  {
+    SaveEngineSnapshotToList();
+
+    player_was_moving = FALSE;
+    player_was_snapping = TRUE;
+    player_was_dropping = TRUE;
+  }
+  else
+  {
+    if (player->is_moving)
+      player_was_moving = TRUE;
+
+    if (!player->is_snapping)
+      player_was_snapping = FALSE;
+
+    if (!player->is_dropping)
+      player_was_dropping = FALSE;
+  }
+}
+
 static void CheckSingleStepMode(struct PlayerInfo *player)
 {
   if (tape.single_step && tape.recording && !tape.pausing)
@@ -10680,6 +10720,8 @@ static void CheckSingleStepMode(struct PlayerInfo *player)
       SnapField(player, 0, 0);			/* stop snapping */
     }
   }
+
+  CheckSaveEngineSnapshot(player);
 }
 
 static byte PlayerActions(struct PlayerInfo *player, byte player_action)
@@ -12308,6 +12350,9 @@ void ScrollPlayer(struct PlayerInfo *player, int mode)
     if (tape.single_step && tape.recording && !tape.pausing &&
 	!player->programmed_action)
       TapeTogglePause(TAPE_TOGGLE_AUTOMATIC);
+
+    if (!player->programmed_action)
+      CheckSaveEngineSnapshot(player);
   }
 }
 
@@ -14551,22 +14596,26 @@ static void LoadEngineSnapshotValues_RND()
   }
 }
 
-void FreeEngineSnapshot()
+void FreeEngineSnapshotSingle()
 {
-  FreeEngineSnapshotBuffers();
+  FreeSnapshotSingle();
 
   setString(&snapshot_level_identifier, NULL);
   snapshot_level_nr = -1;
 }
 
-void SaveEngineSnapshot()
+void FreeEngineSnapshotList()
 {
+  FreeSnapshotList();
+}
+
+ListNode *SaveEngineSnapshotBuffers()
+{
+  ListNode *buffers = NULL;
+
   /* do not save snapshots from editor */
   if (level_editor_test_game)
-    return;
-
-  /* free previous snapshot buffers, if needed */
-  FreeEngineSnapshotBuffers();
+    return NULL;
 
   /* copy some special values to a structure better suited for the snapshot */
 
@@ -14575,82 +14624,82 @@ void SaveEngineSnapshot()
   if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
     SaveEngineSnapshotValues_EM();
   if (level.game_engine_type == GAME_ENGINE_TYPE_SP)
-    SaveEngineSnapshotValues_SP();
+    SaveEngineSnapshotValues_SP(&buffers);
 
   /* save values stored in special snapshot structure */
 
   if (level.game_engine_type == GAME_ENGINE_TYPE_RND)
-    SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(engine_snapshot_rnd));
+    SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(engine_snapshot_rnd));
   if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
-    SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(engine_snapshot_em));
+    SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(engine_snapshot_em));
   if (level.game_engine_type == GAME_ENGINE_TYPE_SP)
-    SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(engine_snapshot_sp));
+    SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(engine_snapshot_sp));
 
   /* save further RND engine values */
 
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(stored_player));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(game));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(tape));
+  SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(stored_player));
+  SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(game));
+  SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(tape));
 
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(ZX));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(ZY));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(ExitX));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(ExitY));
+  SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(ZX));
+  SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(ZY));
+  SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(ExitX));
+  SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(ExitY));
 
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(FrameCounter));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(TimeFrames));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(TimePlayed));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(TimeLeft));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(TapeTime));
+  SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(FrameCounter));
+  SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(TimeFrames));
+  SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(TimePlayed));
+  SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(TimeLeft));
+  SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(TapeTime));
 
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(ScreenMovDir));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(ScreenMovPos));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(ScreenGfxPos));
+  SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(ScreenMovDir));
+  SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(ScreenMovPos));
+  SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(ScreenGfxPos));
 
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(ScrollStepSize));
+  SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(ScrollStepSize));
 
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(AllPlayersGone));
+  SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(AllPlayersGone));
 
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(AmoebaCnt));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(AmoebaCnt2));
+  SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(AmoebaCnt));
+  SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(AmoebaCnt2));
 
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(Feld));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(MovPos));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(MovDir));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(MovDelay));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(ChangeDelay));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(ChangePage));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(CustomValue));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(Store));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(Store2));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(StorePlayer));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(Back));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(AmoebaNr));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(WasJustMoving));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(WasJustFalling));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(CheckCollision));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(CheckImpact));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(Stop));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(Pushed));
+  SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(Feld));
+  SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(MovPos));
+  SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(MovDir));
+  SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(MovDelay));
+  SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(ChangeDelay));
+  SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(ChangePage));
+  SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(CustomValue));
+  SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(Store));
+  SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(Store2));
+  SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(StorePlayer));
+  SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(Back));
+  SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(AmoebaNr));
+  SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(WasJustMoving));
+  SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(WasJustFalling));
+  SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(CheckCollision));
+  SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(CheckImpact));
+  SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(Stop));
+  SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(Pushed));
 
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(ChangeCount));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(ChangeEvent));
+  SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(ChangeCount));
+  SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(ChangeEvent));
 
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(ExplodePhase));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(ExplodeDelay));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(ExplodeField));
+  SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(ExplodePhase));
+  SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(ExplodeDelay));
+  SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(ExplodeField));
 
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(RunnerVisit));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(PlayerVisit));
+  SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(RunnerVisit));
+  SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(PlayerVisit));
 
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(GfxFrame));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(GfxRandom));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(GfxElement));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(GfxAction));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(GfxDir));
+  SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(GfxFrame));
+  SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(GfxRandom));
+  SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(GfxElement));
+  SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(GfxAction));
+  SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(GfxDir));
 
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(scroll_x));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(scroll_y));
+  SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(scroll_x));
+  SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(scroll_y));
 
   /* save level identification information */
 
@@ -14670,14 +14719,28 @@ void SaveEngineSnapshot()
 
   printf("::: size of engine snapshot: %d bytes\n", num_bytes);
 #endif
+
+  return buffers;
 }
 
-void LoadEngineSnapshot()
+void SaveEngineSnapshotSingle()
 {
-  /* restore generically stored snapshot buffers */
+  ListNode *buffers = SaveEngineSnapshotBuffers();
 
-  LoadEngineSnapshotBuffers();
+  /* finally save all snapshot buffers to single snapshot */
+  SaveSnapshotSingle(buffers);
+}
 
+void SaveEngineSnapshotToList()
+{
+  ListNode *buffers = SaveEngineSnapshotBuffers();
+
+  /* finally save all snapshot buffers to snapshot list */
+  SaveSnapshotToList(buffers);
+}
+
+void LoadEngineSnapshotValues()
+{
   /* restore special values from snapshot structure */
 
   if (level.game_engine_type == GAME_ENGINE_TYPE_RND)
@@ -14686,6 +14749,27 @@ void LoadEngineSnapshot()
     LoadEngineSnapshotValues_EM();
   if (level.game_engine_type == GAME_ENGINE_TYPE_SP)
     LoadEngineSnapshotValues_SP();
+}
+
+void LoadEngineSnapshotSingle()
+{
+  LoadSnapshotSingle();
+
+  LoadEngineSnapshotValues();
+}
+
+void LoadEngineSnapshot_Undo()
+{
+  LoadSnapshotFromList_Older();
+
+  LoadEngineSnapshotValues();
+}
+
+void LoadEngineSnapshot_Redo()
+{
+  LoadSnapshotFromList_Newer();
+
+  LoadEngineSnapshotValues();
 }
 
 boolean CheckEngineSnapshot()
@@ -14718,6 +14802,22 @@ static struct
     GAME_CTRL_ID_PLAY,			"play game"
   },
   {
+    IMG_GAME_BUTTON_GFX_UNDO,		&game.button.undo,
+    GAME_CTRL_ID_UNDO,			"undo step"
+  },
+  {
+    IMG_GAME_BUTTON_GFX_REDO,		&game.button.redo,
+    GAME_CTRL_ID_REDO,			"redo step"
+  },
+  {
+    IMG_GAME_BUTTON_GFX_SAVE,		&game.button.save,
+    GAME_CTRL_ID_SAVE,			"save game"
+  },
+  {
+    IMG_GAME_BUTTON_GFX_LOAD,		&game.button.load,
+    GAME_CTRL_ID_LOAD,			"load game"
+  },
+  {
     IMG_GAME_BUTTON_GFX_SOUND_MUSIC,	&game.button.sound_music,
     SOUND_CTRL_ID_MUSIC,		"background music on/off"
   },
@@ -14728,14 +14828,6 @@ static struct
   {
     IMG_GAME_BUTTON_GFX_SOUND_SIMPLE,	&game.button.sound_simple,
     SOUND_CTRL_ID_SIMPLE,		"normal sounds on/off"
-  },
-  {
-    IMG_GAME_BUTTON_GFX_SAVE,		&game.button.save,
-    GAME_CTRL_ID_SAVE,			"save game"
-  },
-  {
-    IMG_GAME_BUTTON_GFX_LOAD,		&game.button.load,
-    GAME_CTRL_ID_LOAD,			"load game"
   }
 };
 
@@ -14780,6 +14872,13 @@ void CreateGameButtons()
       checked = FALSE;
       event_mask = GD_EVENT_RELEASED;
     }
+    else if (id == GAME_CTRL_ID_UNDO ||
+	     id == GAME_CTRL_ID_REDO)
+    {
+      button_type = GD_TYPE_NORMAL_BUTTON;
+      checked = FALSE;
+      event_mask = GD_EVENT_PRESSED | GD_EVENT_REPEATED;
+    }
     else
     {
       button_type = GD_TYPE_CHECK_BUTTON;
@@ -14823,12 +14922,32 @@ void FreeGameButtons()
     FreeGadget(game_gadget[i]);
 }
 
+void MapStopPlayButtons()
+{
+  UnmapGadget(game_gadget[GAME_CTRL_ID_UNDO]);
+  UnmapGadget(game_gadget[GAME_CTRL_ID_REDO]);
+
+  MapGadget(game_gadget[GAME_CTRL_ID_STOP]);
+  MapGadget(game_gadget[GAME_CTRL_ID_PLAY]);
+}
+
+void MapUndoRedoButtons()
+{
+  UnmapGadget(game_gadget[GAME_CTRL_ID_STOP]);
+  UnmapGadget(game_gadget[GAME_CTRL_ID_PLAY]);
+
+  MapGadget(game_gadget[GAME_CTRL_ID_UNDO]);
+  MapGadget(game_gadget[GAME_CTRL_ID_REDO]);
+}
+
 void MapGameButtons()
 {
   int i;
 
   for (i = 0; i < NUM_GAME_BUTTONS; i++)
-    MapGadget(game_gadget[i]);
+    if (i != GAME_CTRL_ID_UNDO &&
+	i != GAME_CTRL_ID_REDO)
+      MapGadget(game_gadget[i]);
 }
 
 void UnmapGameButtons()
@@ -14848,6 +14967,41 @@ void RedrawGameButtons()
 
   // RedrawGadget() may have set REDRAW_ALL if buttons are defined off-area
   redraw_mask &= ~REDRAW_ALL;
+}
+
+void GameUndoRedoExt()
+{
+  ClearPlayerAction();
+
+  tape.pausing = TRUE;
+
+  RedrawPlayfield();
+  UpdateAndDisplayGameControlValues();
+
+  DrawVideoDisplay(VIDEO_STATE_TIME_ON, TapeTime);
+  DrawVideoDisplay(VIDEO_STATE_FRAME_ON, FrameCounter);
+
+  BackToFront();
+}
+
+void GameUndo()
+{
+  if (!CheckEngineSnapshot())
+    return;
+
+  LoadEngineSnapshot_Undo();
+
+  GameUndoRedoExt();
+}
+
+void GameRedo()
+{
+  if (!CheckEngineSnapshot())
+    return;
+
+  LoadEngineSnapshot_Redo();
+
+  GameUndoRedoExt();
 }
 
 static void HandleGameButtonsExt(int id)
@@ -14905,6 +15059,22 @@ static void HandleGameButtonsExt(int id)
       }
       break;
 
+    case GAME_CTRL_ID_UNDO:
+      GameUndo();
+      break;
+
+    case GAME_CTRL_ID_REDO:
+      GameRedo();
+      break;
+
+    case GAME_CTRL_ID_SAVE:
+      TapeQuickSave();
+      break;
+
+    case GAME_CTRL_ID_LOAD:
+      TapeQuickLoad();
+      break;
+
     case SOUND_CTRL_ID_MUSIC:
       if (setup.sound_music)
       { 
@@ -14942,14 +15112,6 @@ static void HandleGameButtonsExt(int id)
 
 	SetAudioMode(setup.sound);
       }
-      break;
-
-    case GAME_CTRL_ID_SAVE:
-      TapeQuickSave();
-      break;
-
-    case GAME_CTRL_ID_LOAD:
-      TapeQuickLoad();
       break;
 
     default:

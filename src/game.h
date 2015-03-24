@@ -90,12 +90,15 @@ struct GameButtonInfo
   struct XY pause;
   struct XY play;
 
-  struct XY sound_music;
-  struct XY sound_loops;
-  struct XY sound_simple;
+  struct XY undo;
+  struct XY redo;
 
   struct XY save;
   struct XY load;
+
+  struct XY sound_music;
+  struct XY sound_loops;
+  struct XY sound_simple;
 };
 
 struct GameInfo
@@ -346,13 +349,17 @@ void RequestQuitGame(boolean);
 unsigned int InitEngineRandom_RND(int);
 unsigned int RND(int);
 
-void FreeEngineSnapshot();
-void LoadEngineSnapshot();
-void SaveEngineSnapshot();
+void FreeEngineSnapshotSingle();
+void FreeEngineSnapshotList();
+void LoadEngineSnapshotSingle();
+void SaveEngineSnapshotSingle();
+void SaveEngineSnapshotToList();
 boolean CheckEngineSnapshot();
 
 void CreateGameButtons();
 void FreeGameButtons();
+void MapStopPlayButtons();
+void MapUndoRedoButtons();
 void MapGameButtons();
 void UnmapGameButtons();
 void RedrawGameButtons();

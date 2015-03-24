@@ -73,7 +73,7 @@ void UpdateGameDoorValues_EM()
 void GameActions_EM(byte action[MAX_PLAYERS], boolean warp_mode)
 {
   int i;
-  boolean player_is_dropping = FALSE;
+  boolean any_player_dropping = FALSE;
 
   RandomEM = RandomEM * 129 + 1;
 
@@ -103,10 +103,10 @@ void GameActions_EM(byte action[MAX_PLAYERS], boolean warp_mode)
 	ply[i].dynamite &&
 	ply[i].dynamite_cnt > 0 &&
 	ply[i].dynamite_cnt < 5)
-      player_is_dropping = TRUE;
+      any_player_dropping = TRUE;
 
   CheckSingleStepMode_EM(action, frame, game_em.any_player_moving,
-			 player_is_dropping);
+			 game_em.any_player_snapping, any_player_dropping);
 
   game_animscreen();
 

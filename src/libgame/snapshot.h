@@ -19,7 +19,7 @@
 /* needed for comfortably saving engine snapshot buffers */
 #define ARGS_ADDRESS_AND_SIZEOF(x)		(&(x)), (sizeof(x))
 
-struct EngineSnapshotNodeInfo
+struct SnapshotNodeInfo
 {
   void *buffer_orig;
   void *buffer_copy;
@@ -27,8 +27,16 @@ struct EngineSnapshotNodeInfo
 };
 
 
-void SaveEngineSnapshotBuffer(void *buffer, int size);
-void LoadEngineSnapshotBuffers();
-void FreeEngineSnapshotBuffers();
+void SaveSnapshotBuffer(ListNode **, void *, int);
+void LoadSnapshotBuffers(ListNode *);
+void FreeSnapshotBuffers(ListNode *);
+
+void SaveSnapshotSingle();
+void SaveSnapshotToList();
+boolean LoadSnapshotSingle();
+boolean LoadSnapshotFromList_Older();
+boolean LoadSnapshotFromList_Newer();
+void FreeSnapshotSingle();
+void FreeSnapshotList();
 
 #endif	/* SNAPSHOT_H */

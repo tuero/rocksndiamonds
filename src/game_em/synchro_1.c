@@ -23,6 +23,7 @@ void synchro_1(void)
   int i;
 
   game_em.any_player_moving = FALSE;
+  game_em.any_player_snapping = FALSE;
 
   /* must test for death and actually kill separately */
   for (i = 0; i < MAX_PLAYERS; i++)
@@ -460,7 +461,7 @@ static void check_player(struct PLAYER *ply)
   }
   else					/* player wants to snap */
   {
-    player_digfield(ply, dx, dy);
+    game_em.any_player_snapping = player_digfield(ply, dx, dy);
   }
 }
 

@@ -102,7 +102,7 @@ unsigned int InitEngineRandom_SP(int seed)
 /* Supaplex game engine snapshot handling functions                          */
 /* ------------------------------------------------------------------------- */
 
-void SaveEngineSnapshotValues_SP()
+void SaveEngineSnapshotValues_SP(ListNode **buffers)
 {
   int i;
 
@@ -126,66 +126,66 @@ void SaveEngineSnapshotValues_SP()
 
   /* store special data into engine snapshot buffers */
 
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(FieldWidth));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(FieldHeight));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(FieldMax));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(LevelMax));
+  SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(FieldWidth));
+  SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(FieldHeight));
+  SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(FieldMax));
+  SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(LevelMax));
 
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(TimerVar));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(RandomSeed));
+  SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(TimerVar));
+  SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(RandomSeed));
 
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(TerminalMaxCycles));
+  SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(TerminalMaxCycles));
 
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(mScrollX));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(mScrollY));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(mScrollX_last));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(mScrollY_last));
+  SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(mScrollX));
+  SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(mScrollY));
+  SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(mScrollX_last));
+  SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(mScrollY_last));
 
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(ScreenScrollXPos));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(ScreenScrollYPos));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(DisplayMinX));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(DisplayMinY));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(DisplayMaxX));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(DisplayMaxY));
+  SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(ScreenScrollXPos));
+  SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(ScreenScrollYPos));
+  SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(DisplayMinX));
+  SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(DisplayMinY));
+  SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(DisplayMaxX));
+  SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(DisplayMaxY));
 
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(InfotronsNeeded));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(KillMurphyFlag));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(MurphyMoveCounter));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(MurphyExplodePos));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(SplitMoveFlag));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(RedDiskReleaseMurphyPos));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(MurphyPosIndex));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(MurphyXPos));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(MurphyYPos));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(MurphyScreenXPos));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(MurphyScreenYPos));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(MurphyVarFaceLeft));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(RedDiskCount));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(RedDiskReleaseFlag));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(MovingPictureSequencePhase));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(RedDiskReleasePhase));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(ScratchGravity));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(GravityFlag));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(SnikSnaksElectronsFrozen));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(YellowDisksExploded));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(YawnSleepCounter));
+  SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(InfotronsNeeded));
+  SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(KillMurphyFlag));
+  SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(MurphyMoveCounter));
+  SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(MurphyExplodePos));
+  SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(SplitMoveFlag));
+  SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(RedDiskReleaseMurphyPos));
+  SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(MurphyPosIndex));
+  SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(MurphyXPos));
+  SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(MurphyYPos));
+  SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(MurphyScreenXPos));
+  SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(MurphyScreenYPos));
+  SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(MurphyVarFaceLeft));
+  SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(RedDiskCount));
+  SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(RedDiskReleaseFlag));
+  SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(MovingPictureSequencePhase));
+  SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(RedDiskReleasePhase));
+  SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(ScratchGravity));
+  SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(GravityFlag));
+  SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(SnikSnaksElectronsFrozen));
+  SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(YellowDisksExploded));
+  SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(YawnSleepCounter));
 
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(LeadOutCounter));
+  SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(LeadOutCounter));
 
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(GfxElementLast));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(GfxGraphicLast));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(GfxGraphic));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(GfxFrame));
+  SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(GfxElementLast));
+  SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(GfxGraphicLast));
+  SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(GfxGraphic));
+  SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(GfxFrame));
 
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(ScrollMinX));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(ScrollMinY));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(ScrollMaxX));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(ScrollMaxY));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(ScrollX));
-  SaveEngineSnapshotBuffer(ARGS_ADDRESS_AND_SIZEOF(ScrollY));
+  SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(ScrollMinX));
+  SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(ScrollMinY));
+  SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(ScrollMaxX));
+  SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(ScrollMaxY));
+  SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(ScrollX));
+  SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(ScrollY));
 
-  SaveEngineSnapshotBuffer(&PlayField16[-game_sp.preceding_buffer_size],
-			   game_sp.preceding_buffer_size * sizeof(int));
+  SaveSnapshotBuffer(buffers, &PlayField16[-game_sp.preceding_buffer_size],
+		     game_sp.preceding_buffer_size * sizeof(int));
 }
 
 void LoadEngineSnapshotValues_SP()

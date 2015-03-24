@@ -1965,6 +1965,10 @@ void addNodeToList(ListNode **node_first, char *key, void *content)
   node_new->key = getStringCopy(key);
   node_new->content = content;
   node_new->next = *node_first;
+
+  if (*node_first)
+    (*node_first)->prev = node_new;
+
   *node_first = node_new;
 }
 
@@ -1977,8 +1981,15 @@ void deleteNodeFromList(ListNode **node_first, char *key,
   if (strEqual((*node_first)->key, key))
   {
     checked_free((*node_first)->key);
+
     if (destructor_function)
       destructor_function((*node_first)->content);
+
+    if ((*node_first)->next)
+      (*node_first)->next->prev = (*node_first)->prev;
+
+    checked_free(*node_first);
+
     *node_first = (*node_first)->next;
   }
   else
