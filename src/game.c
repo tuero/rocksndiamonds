@@ -14610,10 +14610,6 @@ ListNode *SaveEngineSnapshotBuffers()
 {
   ListNode *buffers = NULL;
 
-  /* do not save snapshots from editor */
-  if (level_editor_test_game)
-    return NULL;
-
   /* copy some special values to a structure better suited for the snapshot */
 
   if (level.game_engine_type == GAME_ENGINE_TYPE_RND)
