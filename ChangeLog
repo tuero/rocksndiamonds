@@ -1,3 +1,6 @@
+2015-03-24
+	* added step-based engine snapshots to undo/redo single steps in game
+
 2015-03-19
 	* fixed (swapped) editor zoom directions for '-' and '+' (keypad) keys
 
