@@ -14971,6 +14971,7 @@ void GameUndoRedoExt()
   RedrawPlayfield();
   UpdateAndDisplayGameControlValues();
 
+  DrawCompleteVideoDisplay();
   DrawVideoDisplay(VIDEO_STATE_TIME_ON, TapeTime);
   DrawVideoDisplay(VIDEO_STATE_FRAME_ON, FrameCounter);
 
