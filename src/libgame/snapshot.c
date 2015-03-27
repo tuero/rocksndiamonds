@@ -18,9 +18,13 @@ static ListNode *snapshot_current = NULL;
 
 static int num_snapshots_in_list = 0;
 
-
 #ifdef DEBUG
 #define DEBUG_SNAPSHOTS			0
+#endif
+
+#if DEBUG_SNAPSHOTS
+static int num_snapshot_buffers = 0;
+static int num_snapshot_bytes = 0;
 #endif
 
 
@@ -40,6 +44,11 @@ void SaveSnapshotBuffer(ListNode **snapshot_buffers, void *buffer, int size)
   memcpy(bi->buffer_copy, buffer, size);
 
   addNodeToList(snapshot_buffers, NULL, bi);
+
+#if DEBUG_SNAPSHOTS
+  num_snapshot_buffers++;
+  num_snapshot_bytes += size;
+#endif
 }
 
 static void LoadSnapshotBuffer(struct SnapshotNodeInfo *bi)
@@ -57,17 +66,30 @@ void LoadSnapshotBuffers(ListNode *snapshot_buffers)
   }
 }
 
+static void FreeSnapshotBuffer(void *bi_raw)
+{
+  struct SnapshotNodeInfo *bi = (struct SnapshotNodeInfo *)bi_raw;
+
+#if DEBUG_SNAPSHOTS
+  num_snapshot_buffers--;
+  num_snapshot_bytes -= bi->size;
+#endif
+
+  checked_free(bi->buffer_copy);
+  checked_free(bi);
+}
+
 void FreeSnapshotBuffers(ListNode *snapshot_buffers)
 {
   while (snapshot_buffers != NULL)
-    deleteNodeFromList(&snapshot_buffers, snapshot_buffers->key, checked_free);
+    deleteNodeFromList(&snapshot_buffers, NULL, FreeSnapshotBuffer);
 }
 
 // -----------------------------------------------------------------------------
 // functions for handling one of several snapshots
 // -----------------------------------------------------------------------------
 
-static void FreeSnapshotExt(void *snapshot_buffers_ptr)
+static void FreeSnapshot(void *snapshot_buffers_ptr)
 {
   FreeSnapshotBuffers(snapshot_buffers_ptr);
 }
@@ -79,11 +101,16 @@ void FreeSnapshotSingle()
   snapshot_single = NULL;
 }
 
-void FreeSnapshotList_UpToNode(ListNode *node)
+static void FreeSnapshotList_UpToNode(ListNode *node)
 {
   while (snapshot_list != node)
   {
-    deleteNodeFromList(&snapshot_list, snapshot_list->key, FreeSnapshotExt);
+#if DEBUG_SNAPSHOTS
+    printf("::: FreeSnapshotList_*() [%s, %d, %d]\n",
+	   snapshot_list->key, num_snapshot_buffers, num_snapshot_bytes);
+#endif
+
+    deleteNodeFromList(&snapshot_list, snapshot_list->key, FreeSnapshot);
 
     num_snapshots_in_list--;
   }
@@ -91,6 +118,10 @@ void FreeSnapshotList_UpToNode(ListNode *node)
 
 void FreeSnapshotList()
 {
+#if DEBUG_SNAPSHOTS
+  printf("::: FreeSnapshotList()\n");
+#endif
+
   FreeSnapshotList_UpToNode(NULL);
 
   snapshot_current = NULL;
@@ -117,7 +148,8 @@ void SaveSnapshotToList(ListNode *snapshot_buffers)
   num_snapshots_in_list++;
 
 #if DEBUG_SNAPSHOTS
-  printf("::: SaveSnapshotToList() [%s]\n", snapshot_current->key);
+  printf("::: SaveSnapshotToList() [%s, %d, %d]\n",
+	 snapshot_current->key, num_snapshot_buffers, num_snapshot_bytes);
 #endif
 }
 
