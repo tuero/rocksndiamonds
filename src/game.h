@@ -28,6 +28,10 @@
 #define NUM_PANEL_ELEMENTS	8
 #define NUM_PANEL_CE_SCORE	8
 
+#define SNAPSHOT_MODE_STEP	0
+#define SNAPSHOT_MODE_MOVE	1
+
+
 struct GamePanelInfo
 {
   struct TextPosInfo level_number;
@@ -99,6 +103,14 @@ struct GameButtonInfo
   struct XY sound_music;
   struct XY sound_loops;
   struct XY sound_simple;
+};
+
+struct GameSnapshotInfo
+{
+  int mode;
+
+  byte last_action[MAX_PLAYERS];
+  boolean changed_action;
 };
 
 struct GameInfo
@@ -175,6 +187,9 @@ struct GameInfo
 
   /* values for random number generator initialization after snapshot */
   unsigned int num_random_calls;
+
+  /* values for game engine snapshot control */
+  struct GameSnapshotInfo snapshot;
 };
 
 struct PlayerInfo
@@ -353,7 +368,7 @@ void FreeEngineSnapshotSingle();
 void FreeEngineSnapshotList();
 void LoadEngineSnapshotSingle();
 void SaveEngineSnapshotSingle();
-void SaveEngineSnapshotToList();
+boolean SaveEngineSnapshotToList();
 boolean CheckEngineSnapshot();
 
 void CreateGameButtons();

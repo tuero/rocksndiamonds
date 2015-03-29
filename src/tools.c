@@ -7805,7 +7805,8 @@ void CheckSaveEngineSnapshot_EM(byte action[MAX_PLAYERS], int frame,
   {
     if (!player_was_waiting)
     {
-      SaveEngineSnapshotToList();
+      if (!SaveEngineSnapshotToList())
+	return;
 
       player_was_waiting = TRUE;
     }
@@ -7819,13 +7820,14 @@ void CheckSaveEngineSnapshot_EM(byte action[MAX_PLAYERS], int frame,
 void CheckSaveEngineSnapshot_SP(boolean murphy_is_waiting,
 				boolean murphy_is_dropping)
 {
-  static boolean player_was_waiting = FALSE;
+  static boolean player_was_waiting = TRUE;
 
   if (murphy_is_waiting)
   {
     if (!player_was_waiting)
     {
-      SaveEngineSnapshotToList();
+      if (!SaveEngineSnapshotToList())
+	return;
 
       player_was_waiting = TRUE;
     }

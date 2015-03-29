@@ -3035,6 +3035,12 @@ static void InitGameEngine()
   game.scroll_delay_value =
     MIN(MAX(MIN_SCROLL_DELAY, game.scroll_delay_value), MAX_SCROLL_DELAY);
 
+  /* ---------- initialize game engine snapshots ---------------------------- */
+  for (i = 0; i < MAX_PLAYERS; i++)
+    game.snapshot.last_action[i] = 0;
+  game.snapshot.changed_action = FALSE;
+  game.snapshot.mode = SNAPSHOT_MODE_MOVE;
+
   FreeEngineSnapshotList();
 }
 
@@ -10686,7 +10692,8 @@ static void CheckSaveEngineSnapshot(struct PlayerInfo *player)
       (player->is_snapping && !player_was_snapping) ||
       (player->is_dropping && !player_was_dropping))
   {
-    SaveEngineSnapshotToList();
+    if (!SaveEngineSnapshotToList())
+      return;
 
     player_was_moving = FALSE;
     player_was_snapping = TRUE;
@@ -10954,6 +10961,23 @@ void GameActions()
   byte summarized_player_action = 0;
   byte tape_action[MAX_PLAYERS];
   int i;
+
+  for (i = 0; i < MAX_PLAYERS; i++)
+  {
+    struct PlayerInfo *player = &stored_player[i];
+
+    // allow engine snapshot if movement attempt was stopped
+    if ((game.snapshot.last_action[i] & KEY_MOTION) != 0 &&
+	(player->action & KEY_MOTION) == 0)
+      game.snapshot.changed_action = TRUE;
+
+    // allow engine snapshot in case of snapping/dropping attempt
+    if ((game.snapshot.last_action[i] & KEY_BUTTON) == 0 &&
+	(player->action & KEY_BUTTON) != 0)
+      game.snapshot.changed_action = TRUE;
+
+    game.snapshot.last_action[i] = player->action;
+  }
 
   /* detect endless loops, caused by custom element programming */
   if (recursion_loop_detected && recursion_loop_depth == 0)
@@ -14724,12 +14748,25 @@ void SaveEngineSnapshotSingle()
   SaveSnapshotSingle(buffers);
 }
 
-void SaveEngineSnapshotToList()
+boolean SaveEngineSnapshotToList()
 {
+  boolean save_snapshot =
+    (FrameCounter == 0 ||
+     (game.snapshot.mode == SNAPSHOT_MODE_STEP) ||
+     (game.snapshot.mode == SNAPSHOT_MODE_MOVE &&
+      game.snapshot.changed_action));
+
+  game.snapshot.changed_action = FALSE;
+
+  if (!save_snapshot)
+    return FALSE;
+
   ListNode *buffers = SaveEngineSnapshotBuffers();
 
   /* finally save all snapshot buffers to snapshot list */
   SaveSnapshotToList(buffers);
+
+  return TRUE;
 }
 
 void LoadEngineSnapshotValues()
