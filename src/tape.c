@@ -741,6 +741,9 @@ void TapeTogglePause(boolean toggle_manual)
 
       if (!CheckEngineSnapshotSingle())
 	SaveEngineSnapshotSingle();
+
+      // restart step/move snapshots after quick loading tape
+      SaveEngineSnapshotToListInitial();
     }
   }
 
@@ -749,7 +752,7 @@ void TapeTogglePause(boolean toggle_manual)
     if (tape.pausing)
       MapUndoRedoButtons();
     else if (!tape.single_step)
-      MapStopPlayButtons();
+      UnmapUndoRedoButtons();
   }
 }
 
@@ -1048,6 +1051,9 @@ void TapeQuickLoad()
 
     TapeStopWarpForward();
     TapeAppendRecording();
+
+    // restart step/move snapshots after quick loading tape
+    SaveEngineSnapshotToListInitial();
 
     if (FrameCounter > 0)
       return;

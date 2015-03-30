@@ -376,12 +376,14 @@ void FreeEngineSnapshotList();
 void LoadEngineSnapshotSingle();
 void SaveEngineSnapshotSingle();
 boolean SaveEngineSnapshotToList();
+void SaveEngineSnapshotToListInitial();
 boolean CheckEngineSnapshotSingle();
+boolean CheckEngineSnapshotList();
 
 void CreateGameButtons();
 void FreeGameButtons();
-void MapStopPlayButtons();
 void MapUndoRedoButtons();
+void UnmapUndoRedoButtons();
 void MapGameButtons();
 void UnmapGameButtons();
 void RedrawGameButtons();

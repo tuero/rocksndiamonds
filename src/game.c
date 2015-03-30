@@ -3044,8 +3044,6 @@ static void InitGameEngine()
      SNAPSHOT_MODE_EVERY_STEP :
      strEqual(setup.engine_snapshot_mode, STR_SNAPSHOT_MODE_EVERY_MOVE) ?
      SNAPSHOT_MODE_EVERY_MOVE : SNAPSHOT_MODE_OFF);
-
-  FreeEngineSnapshotList();
 }
 
 int get_num_special_action(int element, int action_first, int action_last)
@@ -4007,7 +4005,7 @@ void InitGame()
 
   game.restart_level = FALSE;
 
-  SaveEngineSnapshotToList();
+  SaveEngineSnapshotToListInitial();
 }
 
 void UpdateEngineValues(int actual_scroll_x, int actual_scroll_y)
@@ -14722,11 +14720,6 @@ ListNode *SaveEngineSnapshotBuffers()
   SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(scroll_x));
   SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(scroll_y));
 
-  /* save level identification information */
-
-  setString(&snapshot_level_identifier, leveldir_current->identifier);
-  snapshot_level_nr = level_nr;
-
 #if 0
   ListNode *node = engine_snapshot_list_rnd;
   int num_bytes = 0;
@@ -14750,19 +14743,25 @@ void SaveEngineSnapshotSingle()
 
   /* finally save all snapshot buffers to single snapshot */
   SaveSnapshotSingle(buffers);
+
+  /* save level identification information */
+  setString(&snapshot_level_identifier, leveldir_current->identifier);
+  snapshot_level_nr = level_nr;
 }
 
-boolean SaveEngineSnapshotToList()
+static boolean SaveEngineSnapshotToListExt(boolean initial_snapshot)
 {
   boolean save_snapshot =
-    (FrameCounter == 0 ||
+    (initial_snapshot ||
      (game.snapshot.mode == SNAPSHOT_MODE_EVERY_STEP) ||
      (game.snapshot.mode == SNAPSHOT_MODE_EVERY_MOVE &&
       game.snapshot.changed_action));
 
   game.snapshot.changed_action = FALSE;
 
-  if (game.snapshot.mode == SNAPSHOT_MODE_OFF || !save_snapshot)
+  if (game.snapshot.mode == SNAPSHOT_MODE_OFF ||
+      tape.quick_resume ||
+      !save_snapshot)
     return FALSE;
 
   ListNode *buffers = SaveEngineSnapshotBuffers();
@@ -14771,6 +14770,18 @@ boolean SaveEngineSnapshotToList()
   SaveSnapshotToList(buffers);
 
   return TRUE;
+}
+
+boolean SaveEngineSnapshotToList()
+{
+  return SaveEngineSnapshotToListExt(FALSE);
+}
+
+void SaveEngineSnapshotToListInitial()
+{
+  FreeEngineSnapshotList();
+
+  SaveEngineSnapshotToListExt(TRUE);
 }
 
 void LoadEngineSnapshotValues()
@@ -14961,22 +14972,44 @@ void FreeGameButtons()
     FreeGadget(game_gadget[i]);
 }
 
-void MapStopPlayButtons()
+static void MapGameButtonsAtSamePosition(int id)
 {
-  UnmapGadget(game_gadget[GAME_CTRL_ID_UNDO]);
-  UnmapGadget(game_gadget[GAME_CTRL_ID_REDO]);
+  int i;
 
-  MapGadget(game_gadget[GAME_CTRL_ID_STOP]);
-  MapGadget(game_gadget[GAME_CTRL_ID_PLAY]);
+  for (i = 0; i < NUM_GAME_BUTTONS; i++)
+    if (i != id &&
+	gamebutton_info[i].pos->x == gamebutton_info[id].pos->x &&
+	gamebutton_info[i].pos->y == gamebutton_info[id].pos->y)
+      MapGadget(game_gadget[i]);
+}
+
+static void UnmapGameButtonsAtSamePosition(int id)
+{
+  int i;
+
+  for (i = 0; i < NUM_GAME_BUTTONS; i++)
+    if (i != id &&
+	gamebutton_info[i].pos->x == gamebutton_info[id].pos->x &&
+	gamebutton_info[i].pos->y == gamebutton_info[id].pos->y)
+      UnmapGadget(game_gadget[i]);
 }
 
 void MapUndoRedoButtons()
 {
-  UnmapGadget(game_gadget[GAME_CTRL_ID_STOP]);
-  UnmapGadget(game_gadget[GAME_CTRL_ID_PLAY]);
+  UnmapGameButtonsAtSamePosition(GAME_CTRL_ID_UNDO);
+  UnmapGameButtonsAtSamePosition(GAME_CTRL_ID_REDO);
 
   MapGadget(game_gadget[GAME_CTRL_ID_UNDO]);
   MapGadget(game_gadget[GAME_CTRL_ID_REDO]);
+}
+
+void UnmapUndoRedoButtons()
+{
+  UnmapGadget(game_gadget[GAME_CTRL_ID_UNDO]);
+  UnmapGadget(game_gadget[GAME_CTRL_ID_REDO]);
+
+  MapGameButtonsAtSamePosition(GAME_CTRL_ID_UNDO);
+  MapGameButtonsAtSamePosition(GAME_CTRL_ID_REDO);
 }
 
 void MapGameButtons()
