@@ -60,20 +60,21 @@
 /* sub-screens on the setup screen (specific) */
 #define SETUP_MODE_CHOOSE_GAME_SPEED	16
 #define SETUP_MODE_CHOOSE_SCROLL_DELAY	17
-#define SETUP_MODE_CHOOSE_SCREEN_MODE	18
-#define SETUP_MODE_CHOOSE_WINDOW_SIZE	19
-#define SETUP_MODE_CHOOSE_SCALING_TYPE	20
-#define SETUP_MODE_CHOOSE_GRAPHICS	21
-#define SETUP_MODE_CHOOSE_SOUNDS	22
-#define SETUP_MODE_CHOOSE_MUSIC		23
-#define SETUP_MODE_CHOOSE_VOLUME_SIMPLE	24
-#define SETUP_MODE_CHOOSE_VOLUME_LOOPS	25
-#define SETUP_MODE_CHOOSE_VOLUME_MUSIC	26
-#define SETUP_MODE_CHOOSE_TOUCH_CONTROL	27
-#define SETUP_MODE_CHOOSE_MOVE_DISTANCE	28
-#define SETUP_MODE_CHOOSE_DROP_DISTANCE	29
+#define SETUP_MODE_CHOOSE_SNAPSHOT_MODE	18
+#define SETUP_MODE_CHOOSE_SCREEN_MODE	19
+#define SETUP_MODE_CHOOSE_WINDOW_SIZE	20
+#define SETUP_MODE_CHOOSE_SCALING_TYPE	21
+#define SETUP_MODE_CHOOSE_GRAPHICS	22
+#define SETUP_MODE_CHOOSE_SOUNDS	23
+#define SETUP_MODE_CHOOSE_MUSIC		24
+#define SETUP_MODE_CHOOSE_VOLUME_SIMPLE	25
+#define SETUP_MODE_CHOOSE_VOLUME_LOOPS	26
+#define SETUP_MODE_CHOOSE_VOLUME_MUSIC	27
+#define SETUP_MODE_CHOOSE_TOUCH_CONTROL	28
+#define SETUP_MODE_CHOOSE_MOVE_DISTANCE	29
+#define SETUP_MODE_CHOOSE_DROP_DISTANCE	30
 
-#define MAX_SETUP_MODES			30
+#define MAX_SETUP_MODES			31
 
 /* for input setup functions */
 #define SETUPINPUT_SCREEN_POS_START	0
@@ -201,6 +202,9 @@ static TreeInfo *scaling_type_current = NULL;
 static TreeInfo *scroll_delays = NULL;
 static TreeInfo *scroll_delay_current = NULL;
 
+static TreeInfo *snapshot_modes = NULL;
+static TreeInfo *snapshot_mode_current = NULL;
+
 static TreeInfo *game_speeds = NULL;
 static TreeInfo *game_speed_current = NULL;
 
@@ -308,6 +312,19 @@ static struct
   {	8,	"8 Tiles (Maximum Scroll Delay)"},
 
   {	-1,	NULL				},
+};
+
+static struct
+{
+  char *value;
+  char *text;
+} snapshot_modes_list[] =
+{
+  {	STR_SNAPSHOT_MODE_OFF,		"Off"		},
+  {	STR_SNAPSHOT_MODE_EVERY_STEP,	"Every Step"	},
+  {	STR_SNAPSHOT_MODE_EVERY_MOVE,	"Every Move"	},
+
+  {	NULL,			 	NULL		},
 };
 
 static struct
@@ -3504,7 +3521,8 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
     else if (game_status == GAME_MODE_SETUP)
     {
       if (setup_mode == SETUP_MODE_CHOOSE_GAME_SPEED ||
-	  setup_mode == SETUP_MODE_CHOOSE_SCROLL_DELAY)
+	  setup_mode == SETUP_MODE_CHOOSE_SCROLL_DELAY ||
+	  setup_mode == SETUP_MODE_CHOOSE_SNAPSHOT_MODE)
 	execSetupGame();
       else if (setup_mode == SETUP_MODE_CHOOSE_SCREEN_MODE ||
 	       setup_mode == SETUP_MODE_CHOOSE_WINDOW_SIZE ||
@@ -3595,7 +3613,6 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
 	AdjustChooseTreeScrollbar(SCREEN_CTRL_ID_SCROLL_VERTICAL,
 				  ti->cl_first, ti);
       }
-
 
       return;
     }
@@ -3702,7 +3719,8 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
 	if (game_status == GAME_MODE_SETUP)
 	{
 	  if (setup_mode == SETUP_MODE_CHOOSE_GAME_SPEED ||
-	      setup_mode == SETUP_MODE_CHOOSE_SCROLL_DELAY)
+	      setup_mode == SETUP_MODE_CHOOSE_SCROLL_DELAY ||
+	      setup_mode == SETUP_MODE_CHOOSE_SNAPSHOT_MODE)
 	    execSetupGame();
 	  else if (setup_mode == SETUP_MODE_CHOOSE_SCREEN_MODE ||
 		   setup_mode == SETUP_MODE_CHOOSE_WINDOW_SIZE ||
@@ -3965,6 +3983,7 @@ static char *screen_mode_text;
 static char *window_size_text;
 static char *scaling_type_text;
 static char *scroll_delay_text;
+static char *snapshot_mode_text;
 static char *game_speed_text;
 static char *graphics_set_name;
 static char *sounds_set_name;
@@ -4083,10 +4102,61 @@ static void execSetupGame_setScrollDelays()
   scroll_delay_text = scroll_delay_current->name;
 }
 
+static void execSetupGame_setSnapshotModes()
+{
+  if (snapshot_modes == NULL)
+  {
+    int i;
+
+    for (i = 0; snapshot_modes_list[i].value != NULL; i++)
+    {
+      TreeInfo *ti = newTreeInfo_setDefaults(TREE_TYPE_UNDEFINED);
+      char identifier[32], name[32];
+      char *value = snapshot_modes_list[i].value;
+      char *text = snapshot_modes_list[i].text;
+
+      ti->node_top = &snapshot_modes;
+      ti->sort_priority = i;
+
+      sprintf(identifier, "%s", value);
+      sprintf(name, "%s", text);
+
+      setString(&ti->identifier, identifier);
+      setString(&ti->name, name);
+      setString(&ti->name_sorting, name);
+      setString(&ti->infotext, "Snapshot Mode");
+
+      pushTreeInfo(&snapshot_modes, ti);
+    }
+
+    /* sort snapshot mode values to start with lowest snapshot mode value */
+    sortTreeInfo(&snapshot_modes);
+
+    /* set current snapshot mode value to configured snapshot mode value */
+    snapshot_mode_current =
+      getTreeInfoFromIdentifier(snapshot_modes, setup.engine_snapshot_mode);
+
+    /* if that fails, set current snapshot mode to reliable default value */
+    if (snapshot_mode_current == NULL)
+      snapshot_mode_current =
+	getTreeInfoFromIdentifier(snapshot_modes, STR_SNAPSHOT_MODE_DEFAULT);
+
+    /* if that also fails, set current snapshot mode to first available value */
+    if (snapshot_mode_current == NULL)
+      snapshot_mode_current = snapshot_modes;
+  }
+
+  setup.engine_snapshot_mode = snapshot_mode_current->identifier;
+
+  /* needed for displaying snapshot mode text instead of identifier */
+  snapshot_mode_text = snapshot_mode_current->name;
+}
+
 static void execSetupGame()
 {
   execSetupGame_setGameSpeeds();
   execSetupGame_setScrollDelays();
+  execSetupGame_setSnapshotModes();
 
   setup_mode = SETUP_MODE_GAME;
 
@@ -4103,6 +4173,13 @@ static void execSetupChooseGameSpeed()
 static void execSetupChooseScrollDelay()
 {
   setup_mode = SETUP_MODE_CHOOSE_SCROLL_DELAY;
+
+  DrawSetupScreen();
+}
+
+static void execSetupChooseSnapshotMode()
+{
+  setup_mode = SETUP_MODE_CHOOSE_SNAPSHOT_MODE;
 
   DrawSetupScreen();
 }
@@ -4920,6 +4997,8 @@ static struct TokenInfo setup_info_game[] =
   { TYPE_ENTER_LIST,	execSetupChooseScrollDelay, "Scroll Delay:"	},
   { TYPE_STRING,	&scroll_delay_text,	""			},
 #endif
+  { TYPE_ENTER_LIST, execSetupChooseSnapshotMode,"Game Engine Snapshot Mode:" },
+  { TYPE_STRING,	&snapshot_mode_text,	""			},
   { TYPE_EMPTY,		NULL,			""			},
   { TYPE_LEAVE_MENU,	execSetupMain, 		"Back"			},
 
@@ -6435,6 +6514,8 @@ void DrawSetupScreen()
     DrawChooseTree(&game_speed_current);
   else if (setup_mode == SETUP_MODE_CHOOSE_SCROLL_DELAY)
     DrawChooseTree(&scroll_delay_current);
+  else if (setup_mode == SETUP_MODE_CHOOSE_SNAPSHOT_MODE)
+    DrawChooseTree(&snapshot_mode_current);
   else if (setup_mode == SETUP_MODE_CHOOSE_SCREEN_MODE)
     DrawChooseTree(&screen_mode_current);
   else if (setup_mode == SETUP_MODE_CHOOSE_WINDOW_SIZE)
@@ -6486,6 +6567,8 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
     HandleChooseTree(mx, my, dx, dy, button, &game_speed_current);
   else if (setup_mode == SETUP_MODE_CHOOSE_SCROLL_DELAY)
     HandleChooseTree(mx, my, dx, dy, button, &scroll_delay_current);
+  else if (setup_mode == SETUP_MODE_CHOOSE_SNAPSHOT_MODE)
+    HandleChooseTree(mx, my, dx, dy, button, &snapshot_mode_current);
   else if (setup_mode == SETUP_MODE_CHOOSE_SCREEN_MODE)
     HandleChooseTree(mx, my, dx, dy, button, &screen_mode_current);
   else if (setup_mode == SETUP_MODE_CHOOSE_WINDOW_SIZE)

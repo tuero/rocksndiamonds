@@ -86,7 +86,7 @@ void FreeSnapshotBuffers(ListNode *snapshot_buffers)
 }
 
 // -----------------------------------------------------------------------------
-// functions for handling one of several snapshots
+// functions for handling single shapshot or list of snapshots
 // -----------------------------------------------------------------------------
 
 static void FreeSnapshot(void *snapshot_buffers_ptr)
@@ -167,7 +167,7 @@ boolean LoadSnapshotSingle()
 
 boolean LoadSnapshotFromList_Older(int steps)
 {
-  if (snapshot_current->next)
+  if (snapshot_current && snapshot_current->next)
   {
     while (snapshot_current->next && steps--)
       snapshot_current = snapshot_current->next;
@@ -186,7 +186,7 @@ boolean LoadSnapshotFromList_Older(int steps)
 
 boolean LoadSnapshotFromList_Newer(int steps)
 {
-  if (snapshot_current->prev)
+  if (snapshot_current && snapshot_current->prev)
   {
     while (snapshot_current->prev && steps--)
       snapshot_current = snapshot_current->prev;
@@ -201,4 +201,9 @@ boolean LoadSnapshotFromList_Newer(int steps)
   }
 
   return FALSE;
+}
+
+boolean CheckSnapshotList()
+{
+  return (snapshot_list ? TRUE : FALSE);
 }

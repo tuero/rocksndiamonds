@@ -3039,7 +3039,11 @@ static void InitGameEngine()
   for (i = 0; i < MAX_PLAYERS; i++)
     game.snapshot.last_action[i] = 0;
   game.snapshot.changed_action = FALSE;
-  game.snapshot.mode = SNAPSHOT_MODE_MOVE;
+  game.snapshot.mode =
+    (strEqual(setup.engine_snapshot_mode, STR_SNAPSHOT_MODE_EVERY_STEP) ?
+     SNAPSHOT_MODE_EVERY_STEP :
+     strEqual(setup.engine_snapshot_mode, STR_SNAPSHOT_MODE_EVERY_MOVE) ?
+     SNAPSHOT_MODE_EVERY_MOVE : SNAPSHOT_MODE_OFF);
 
   FreeEngineSnapshotList();
 }
@@ -14752,13 +14756,13 @@ boolean SaveEngineSnapshotToList()
 {
   boolean save_snapshot =
     (FrameCounter == 0 ||
-     (game.snapshot.mode == SNAPSHOT_MODE_STEP) ||
-     (game.snapshot.mode == SNAPSHOT_MODE_MOVE &&
+     (game.snapshot.mode == SNAPSHOT_MODE_EVERY_STEP) ||
+     (game.snapshot.mode == SNAPSHOT_MODE_EVERY_MOVE &&
       game.snapshot.changed_action));
 
   game.snapshot.changed_action = FALSE;
 
-  if (!save_snapshot)
+  if (game.snapshot.mode == SNAPSHOT_MODE_OFF || !save_snapshot)
     return FALSE;
 
   ListNode *buffers = SaveEngineSnapshotBuffers();
@@ -14802,10 +14806,15 @@ void LoadEngineSnapshot_Redo(int steps)
   LoadEngineSnapshotValues();
 }
 
-boolean CheckEngineSnapshot()
+boolean CheckEngineSnapshotSingle()
 {
   return (strEqual(snapshot_level_identifier, leveldir_current->identifier) &&
 	  snapshot_level_nr == level_nr);
+}
+
+boolean CheckEngineSnapshotList()
+{
+  return CheckSnapshotList();
 }
 
 
@@ -15019,7 +15028,7 @@ void GameUndoRedoExt()
 
 void GameUndo(int steps)
 {
-  if (!CheckEngineSnapshot())
+  if (!CheckEngineSnapshotList())
     return;
 
   LoadEngineSnapshot_Undo(steps);
@@ -15029,7 +15038,7 @@ void GameUndo(int steps)
 
 void GameRedo(int steps)
 {
-  if (!CheckEngineSnapshot())
+  if (!CheckEngineSnapshotList())
     return;
 
   LoadEngineSnapshot_Redo(steps);

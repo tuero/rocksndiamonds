@@ -739,15 +739,18 @@ void TapeTogglePause(boolean toggle_manual)
 
       TapeAppendRecording();
 
-      if (!CheckEngineSnapshot())
+      if (!CheckEngineSnapshotSingle())
 	SaveEngineSnapshotSingle();
     }
   }
 
-  if (tape.pausing)
-    MapUndoRedoButtons();
-  else if (!tape.single_step)
-    MapStopPlayButtons();
+  if (CheckEngineSnapshotList())
+  {
+    if (tape.pausing)
+      MapUndoRedoButtons();
+    else if (!tape.single_step)
+      MapStopPlayButtons();
+  }
 }
 
 void TapeStartPlaying()
@@ -1032,7 +1035,7 @@ void TapeQuickLoad()
   if (game_status != GAME_MODE_PLAYING && game_status != GAME_MODE_MAIN)
     return;
 
-  if (CheckEngineSnapshot())
+  if (CheckEngineSnapshotSingle())
   {
     TapeStartGamePlaying();
 

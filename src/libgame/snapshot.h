@@ -36,6 +36,7 @@ void SaveSnapshotToList();
 boolean LoadSnapshotSingle();
 boolean LoadSnapshotFromList_Older();
 boolean LoadSnapshotFromList_Newer();
+boolean CheckSnapshotList();
 void FreeSnapshotSingle();
 void FreeSnapshotList();
 

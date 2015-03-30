@@ -948,6 +948,7 @@ struct SetupInfo
   boolean toons;
   boolean scroll_delay;
   boolean scroll_delay_value;
+  char *engine_snapshot_mode;
   boolean soft_scrolling;
   boolean fade_screens;
   boolean autorecord;
