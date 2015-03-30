@@ -289,6 +289,8 @@ static void DrawVideoDisplay_Graphics(unsigned int state, unsigned int value)
 	  if (gd_bitmap != NULL)
 	    BlitBitmap(gd_bitmap, drawto, gd_x, gd_y, gfx->width, gfx->height,
 		       VX + pos->x, VY + pos->y);
+
+	  redraw_mask |= REDRAW_DOOR_2;
 	}
       }
     }
@@ -431,8 +433,6 @@ void DrawVideoDisplay(unsigned int state, unsigned int value)
 {
   DrawVideoDisplay_Graphics(state, value);
   DrawVideoDisplay_DateTime(state, value);
-
-  redraw_mask |= REDRAW_DOOR_2;
 }
 
 void DrawCompleteVideoDisplay()
