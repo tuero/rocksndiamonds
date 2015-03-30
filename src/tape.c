@@ -746,7 +746,7 @@ void TapeTogglePause(boolean toggle_manual)
 
   if (tape.pausing)
     MapUndoRedoButtons();
-  else
+  else if (!tape.single_step)
     MapStopPlayButtons();
 }
 

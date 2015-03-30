@@ -15011,6 +15011,8 @@ void GameUndoRedoExt()
   DrawCompleteVideoDisplay();
   DrawVideoDisplay(VIDEO_STATE_TIME_ON, TapeTime);
   DrawVideoDisplay(VIDEO_STATE_FRAME_ON, FrameCounter);
+  DrawVideoDisplay((tape.single_step ? VIDEO_STATE_1STEP_ON :
+		    VIDEO_STATE_1STEP_OFF), 0);
 
   BackToFront();
 }
