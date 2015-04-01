@@ -14998,18 +14998,22 @@ void MapUndoRedoButtons()
 {
   UnmapGameButtonsAtSamePosition(GAME_CTRL_ID_UNDO);
   UnmapGameButtonsAtSamePosition(GAME_CTRL_ID_REDO);
+  UnmapGameButtonsAtSamePosition(GAME_CTRL_ID_PLAY);
 
   MapGadget(game_gadget[GAME_CTRL_ID_UNDO]);
   MapGadget(game_gadget[GAME_CTRL_ID_REDO]);
+  MapGadget(game_gadget[GAME_CTRL_ID_PLAY]);
 }
 
 void UnmapUndoRedoButtons()
 {
   UnmapGadget(game_gadget[GAME_CTRL_ID_UNDO]);
   UnmapGadget(game_gadget[GAME_CTRL_ID_REDO]);
+  UnmapGadget(game_gadget[GAME_CTRL_ID_PLAY]);
 
   MapGameButtonsAtSamePosition(GAME_CTRL_ID_UNDO);
   MapGameButtonsAtSamePosition(GAME_CTRL_ID_REDO);
+  MapGameButtonsAtSamePosition(GAME_CTRL_ID_PLAY);
 }
 
 void MapGameButtons()
@@ -15018,7 +15022,8 @@ void MapGameButtons()
 
   for (i = 0; i < NUM_GAME_BUTTONS; i++)
     if (i != GAME_CTRL_ID_UNDO &&
-	i != GAME_CTRL_ID_REDO)
+	i != GAME_CTRL_ID_REDO &&
+	i != GAME_CTRL_ID_PLAY)
       MapGadget(game_gadget[i]);
 }
 
@@ -15128,10 +15133,7 @@ static void HandleGameButtonsExt(int id, int button)
 	  SendToServer_ContinuePlaying();
 	else
 #endif
-	{
-	  tape.pausing = FALSE;
-	  DrawVideoDisplay(VIDEO_STATE_PAUSE_OFF, 0);
-	}
+	  TapeTogglePause(TAPE_TOGGLE_MANUAL);
       }
       break;
 

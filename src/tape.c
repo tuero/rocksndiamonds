@@ -747,7 +747,7 @@ void TapeTogglePause(boolean toggle_manual)
     }
   }
 
-  if (CheckEngineSnapshotList())
+  if (game_status == GAME_MODE_PLAYING && CheckEngineSnapshotList())
   {
     if (tape.pausing)
       MapUndoRedoButtons();
@@ -1412,6 +1412,13 @@ static void HandleTapeButtonsExt(int id)
       break;
 
     case TAPE_CTRL_ID_PLAY:
+      if (tape.recording && tape.pausing)	/* PAUSE -> RECORD */
+      {
+	// ("TAPE_IS_EMPTY(tape)" is TRUE here -- probably fix this)
+
+	TapeTogglePause(TAPE_TOGGLE_MANUAL);
+      }
+
       if (TAPE_IS_EMPTY(tape))
 	break;
 
