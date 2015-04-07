@@ -1764,7 +1764,14 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
       button_pressed = TRUE;
 
     if (button_pressed != button_pressed_last)
+    {
       DrawCursorAndText_Main(choice, TRUE, button_pressed);
+
+      if (button_pressed)
+	PlaySound(SND_MENU_BUTTON_PRESSING);
+      else
+	PlaySound(SND_MENU_BUTTON_RELEASING);
+    }
   }
   else if (dx || dy)	/* keyboard input */
   {

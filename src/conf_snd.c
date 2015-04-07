@@ -257,6 +257,9 @@ struct ConfigInfo sound_config[] =
   { "menu.item.activating",		"empty.wav"			},
   { "menu.item.selecting",		"base.wav"			},
 
+  { "menu.button.pressing",		UNDEFINED_FILENAME		},
+  { "menu.button.releasing",		UNDEFINED_FILENAME		},
+
   { "background.TITLE_INITIAL",		UNDEFINED_FILENAME		},
   { "background.TITLE",			UNDEFINED_FILENAME		},
   { "background.MAIN",			UNDEFINED_FILENAME		},
