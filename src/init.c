@@ -5087,52 +5087,79 @@ void InitGfx()
   font_height = getFontHeight(FC_RED);
 
   DrawInitText(getProgramInitString(), 20, FC_YELLOW);
-  DrawInitText(PROGRAM_COPYRIGHT_STRING, 50, FC_RED);
-  DrawInitText(PROGRAM_WEBSITE_STRING, WIN_YSIZE - 20 - font_height, FC_RED);
+  DrawInitText(setup.internal.program_copyright, 50, FC_RED);
+  DrawInitText(setup.internal.program_website, WIN_YSIZE - 20 - font_height,
+	       FC_RED);
 
   DrawInitText("Loading graphics", 120, FC_GREEN);
 
-  /* initialize busy animation with default values */
+  /* initialize settings for busy animation with default values */
   int parameter[NUM_GFX_ARGS];
   for (i = 0; i < NUM_GFX_ARGS; i++)
     parameter[i] = get_graphic_parameter_value(image_config_suffix[i].value,
                                                image_config_suffix[i].token,
                                                image_config_suffix[i].type);
 
-  /* determine settings for busy animation (when displaying startup messages) */
-  for (i = 0; image_config[i].token != NULL; i++)
-  {
-    char *anim_token = CONFIG_TOKEN_GLOBAL_BUSY;
-    int len_anim_token = strlen(anim_token);
+  char *anim_token = CONFIG_TOKEN_GLOBAL_BUSY;
+  int len_anim_token = strlen(anim_token);
 
-    if (strEqual(image_config[i].token, anim_token))
-      filename_anim_initial = image_config[i].value;
-    else if (strlen(image_config[i].token) > len_anim_token &&
-	     strncmp(image_config[i].token, anim_token, len_anim_token) == 0)
+  /* read settings for busy animation from default custom artwork config */
+  char *gfx_config_filename = getPath3(options.graphics_directory,
+				       GFX_DEFAULT_SUBDIR,
+				       GRAPHICSINFO_FILENAME);
+
+  if (fileExists(gfx_config_filename))
+  {
+    SetupFileHash *setup_file_hash = loadSetupFileHash(gfx_config_filename);
+
+    if (setup_file_hash)
     {
-      for (j = 0; image_config_suffix[j].token != NULL; j++)
+      char *filename = getHashEntry(setup_file_hash, anim_token);
+
+      if (filename)
       {
-	if (strEqual(&image_config[i].token[len_anim_token],
-		     image_config_suffix[j].token))
-	  parameter[j] =
-	    get_graphic_parameter_value(image_config[i].value,
-					image_config_suffix[j].token,
-					image_config_suffix[j].type);
+	filename_anim_initial = getStringCopy(filename);
+
+	for (j = 0; image_config_suffix[j].token != NULL; j++)
+	{
+	  int type = image_config_suffix[j].type;
+	  char *suffix = image_config_suffix[j].token;
+	  char *token = getStringCat2(anim_token, suffix);
+	  char *value = getHashEntry(setup_file_hash, token);
+
+	  checked_free(token);
+
+	  if (value)
+	    parameter[j] = get_graphic_parameter_value(value, suffix, type);
+	}
       }
+
+      freeSetupFileHash(setup_file_hash);
     }
   }
 
-#if defined(CREATE_SPECIAL_EDITION_RND_JUE)
-  filename_anim_initial = "loading.pcx";
-
-  parameter[GFX_ARG_X] = 0;
-  parameter[GFX_ARG_Y] = 0;
-  parameter[GFX_ARG_WIDTH] = 128;
-  parameter[GFX_ARG_HEIGHT] = 40;
-  parameter[GFX_ARG_FRAMES] = 32;
-  parameter[GFX_ARG_DELAY] = 4;
-  parameter[GFX_ARG_FRAMES_PER_LINE] = ARG_UNDEFINED_VALUE;
-#endif
+  if (filename_anim_initial == NULL)
+  {
+    /* read settings for busy animation from static default artwork config */
+    for (i = 0; image_config[i].token != NULL; i++)
+    {
+      if (strEqual(image_config[i].token, anim_token))
+	filename_anim_initial = getStringCopy(image_config[i].value);
+      else if (strlen(image_config[i].token) > len_anim_token &&
+	       strncmp(image_config[i].token, anim_token, len_anim_token) == 0)
+      {
+	for (j = 0; image_config_suffix[j].token != NULL; j++)
+	{
+	  if (strEqual(&image_config[i].token[len_anim_token],
+		       image_config_suffix[j].token))
+	    parameter[j] =
+	      get_graphic_parameter_value(image_config[i].value,
+					  image_config_suffix[j].token,
+					  image_config_suffix[j].type);
+	}
+      }
+    }
+  }
 
   if (filename_anim_initial == NULL)	/* should not happen */
     Error(ERR_EXIT, "cannot get filename for '%s'", CONFIG_TOKEN_GLOBAL_BUSY);
@@ -5142,6 +5169,8 @@ void InitGfx()
 
   anim_initial.bitmaps[IMG_BITMAP_STANDARD] =
     LoadCustomImage(filename_anim_initial);
+
+  checked_free(filename_anim_initial);
 
   graphic_info = &anim_initial;		/* graphic == 0 => anim_initial */
 

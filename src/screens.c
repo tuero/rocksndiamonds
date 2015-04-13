@@ -504,9 +504,6 @@ static char *main_text_level_year		= NULL;
 static char *main_text_level_imported_from	= NULL;
 static char *main_text_level_imported_by	= NULL;
 static char *main_text_level_tested_by		= NULL;
-static char *main_text_title_1			= PROGRAM_TITLE_STRING;
-static char *main_text_title_2			= PROGRAM_COPYRIGHT_STRING;
-static char *main_text_title_3			= PROGRAM_GAME_BY_STRING;
 
 struct MainControlInfo
 {
@@ -656,19 +653,19 @@ static struct MainControlInfo main_controls[] =
   {
     MAIN_CONTROL_TITLE_1,
     NULL,				-1,
-    &menu.main.text.title_1,		&main_text_title_1,
+    &menu.main.text.title_1,		&setup.internal.program_title,
     NULL,				NULL,
   },
   {
     MAIN_CONTROL_TITLE_2,
     NULL,				-1,
-    &menu.main.text.title_2,		&main_text_title_2,
+    &menu.main.text.title_2,		&setup.internal.program_copyright,
     NULL,				NULL,
   },
   {
     MAIN_CONTROL_TITLE_3,
     NULL,				-1,
-    &menu.main.text.title_3,		&main_text_title_3,
+    &menu.main.text.title_3,		&setup.internal.program_company,
     NULL,				NULL,
   },
 
@@ -1212,8 +1209,9 @@ static void drawChooseTreeCursor(int ypos, boolean active)
 
 void DrawHeadline()
 {
-  DrawTextSCentered(MENU_TITLE1_YPOS, FONT_TITLE_1, PROGRAM_TITLE_STRING);
-  DrawTextSCentered(MENU_TITLE2_YPOS, FONT_TITLE_2, PROGRAM_COPYRIGHT_STRING);
+  DrawTextSCentered(MENU_TITLE1_YPOS, FONT_TITLE_1, getProgramTitleString());
+  DrawTextSCentered(MENU_TITLE2_YPOS, FONT_TITLE_2,
+		    setup.internal.program_copyright);
 }
 
 int effectiveGameStatus()
@@ -1473,11 +1471,11 @@ void DrawMainMenu()
   DrawMainMenuExt(REDRAW_ALL, FALSE);
 }
 
-#if defined(CREATE_SPECIAL_EDITION_RND_JUE)
 static void gotoTopLevelDir()
 {
-  /* move upwards to top level directory */
-  while (leveldir_current->node_parent)
+  /* move upwards until inside (but not above) top level directory */
+  while (leveldir_current->node_parent &&
+	 !strEqual(leveldir_current->node_parent->subdir, STRING_TOP_DIRECTORY))
   {
     /* write a "path" into level tree for easy navigation to last level */
     if (leveldir_current->node_parent->node_group->cl_first == -1)
@@ -1502,7 +1500,6 @@ static void gotoTopLevelDir()
     leveldir_current = leveldir_current->node_parent;
   }
 }
-#endif
 
 void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
 {
@@ -1835,9 +1832,8 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 	  SaveLevelSetup_LastSeries();
 	  SaveLevelSetup_SeriesInfo();
 
-#if defined(CREATE_SPECIAL_EDITION_RND_JUE)
-	  gotoTopLevelDir();
-#endif
+	  if (setup.internal.choose_from_top_leveldir)
+	    gotoTopLevelDir();
 
 	  ChangeViewportPropertiesIfNeeded();
 
@@ -2855,11 +2851,11 @@ void DrawInfoScreen_Program()
   DrawTextSCentered(ystart2 + 1 * ystep, FONT_TEXT_2,
 		    "If you like it, send e-mail to:");
   DrawTextSCentered(ystart2 + 2 * ystep, FONT_TEXT_3,
-		    PROGRAM_EMAIL_STRING);
+		    setup.internal.program_email);
   DrawTextSCentered(ystart2 + 4 * ystep, FONT_TEXT_2,
 		    "More information and levels:");
   DrawTextSCentered(ystart2 + 5 * ystep, FONT_TEXT_3,
-		    PROGRAM_WEBSITE_STRING);
+		    setup.internal.program_website);
   DrawTextSCentered(ystart2 + 7 * ystep, FONT_TEXT_2,
 		    "If you have created new levels,");
   DrawTextSCentered(ystart2 + 8 * ystep, FONT_TEXT_2,
@@ -2931,7 +2927,7 @@ void DrawInfoScreen_Version()
   DrawTextSCentered(ystart1, FONT_TEXT_1, "Version Information:");
 
   DrawTextF(xstart1, ystart2, font_header, "Name");
-  DrawTextF(xstart2, ystart2, font_text, PROGRAM_TITLE_STRING);
+  DrawTextF(xstart2, ystart2, font_text, getProgramTitleString());
 
   ystart2 += ystep;
   DrawTextF(xstart1, ystart2, font_header, "Version");

@@ -372,6 +372,9 @@
 /* default value for undefined filename */
 #define UNDEFINED_FILENAME	"[NONE]"
 
+/* default value for undefined levelset */
+#define UNDEFINED_LEVELSET	"[NONE]"
+
 /* default value for undefined parameter */
 #define ARG_DEFAULT		"[DEFAULT]"
 
@@ -408,21 +411,15 @@
 #define SND_CLASSIC_SUBDIR	"snd_classic"
 #define MUS_CLASSIC_SUBDIR	"mus_classic"
 
-#if defined(CREATE_SPECIAL_EDITION_RND_JUE)
-#define GFX_DEFAULT_SUBDIR	"jue0"
-#define SND_DEFAULT_SUBDIR	"jue0"
-#define MUS_DEFAULT_SUBDIR	"jue0"
-#else
-#define GFX_DEFAULT_SUBDIR	GFX_CLASSIC_SUBDIR
-#define SND_DEFAULT_SUBDIR	SND_CLASSIC_SUBDIR
-#define MUS_DEFAULT_SUBDIR	MUS_CLASSIC_SUBDIR
-#endif
+#define GFX_DEFAULT_SUBDIR	(setup.internal.default_graphics_set)
+#define SND_DEFAULT_SUBDIR	(setup.internal.default_sounds_set)
+#define MUS_DEFAULT_SUBDIR	(setup.internal.default_music_set)
 
-#if defined(CREATE_SPECIAL_EDITION)
-#define GFX_FALLBACK_FILENAME	"fallback.pcx"
-#define SND_FALLBACK_FILENAME	"fallback.wav"
-#define MUS_FALLBACK_FILENAME	"fallback.wav"
-#endif
+#define GFX_FALLBACK_FILENAME	(setup.internal.fallback_graphics_file)
+#define SND_FALLBACK_FILENAME	(setup.internal.fallback_sounds_file)
+#define MUS_FALLBACK_FILENAME	(setup.internal.fallback_music_file)
+
+#define DEFAULT_LEVELSET	(setup.internal.default_level_series)
 
 /* file names and filename extensions */
 #define LEVELSETUP_DIRECTORY	"levelsetup"
@@ -663,6 +660,8 @@ struct ProgramInfo
 {
   char *command_basepath;	/* path to the program binary */
   char *command_basename;	/* base filename of the program binary */
+
+  char *config_filename;	/* optional global program config filename */
 
   char *maindata_path;		/* main game data (installation) directory */
 
@@ -937,6 +936,28 @@ struct SetupSystemInfo
   int audio_fragment_size;
 };
 
+struct SetupInternalInfo
+{
+  char *program_title;
+  char *program_author;
+  char *program_email;
+  char *program_website;
+  char *program_copyright;
+  char *program_company;
+
+  char *default_graphics_set;
+  char *default_sounds_set;
+  char *default_music_set;
+
+  char *fallback_graphics_file;
+  char *fallback_sounds_file;
+  char *fallback_music_file;
+
+  char *default_level_series;
+
+  boolean choose_from_top_leveldir;
+};
+
 struct SetupInfo
 {
   char *player_name;
@@ -988,6 +1009,7 @@ struct SetupInfo
   struct SetupInputInfo input[MAX_PLAYERS];
   struct SetupTouchInfo touch;
   struct SetupSystemInfo system;
+  struct SetupInternalInfo internal;
   struct OptionInfo options;
 };
 
@@ -1275,7 +1297,7 @@ extern int			FrameCounter;
 /* function definitions */
 
 void InitProgramInfo(char *, char *, char *, char *, char *, char *, char *,
-		     int);
+		     char *, int);
 
 void SetWindowTitle();
 

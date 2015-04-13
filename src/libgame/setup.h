@@ -222,10 +222,12 @@ typedef struct hashtable     SetupFileHash;
 
 
 char *setLevelArtworkDir(TreeInfo *);
+char *getProgramConfigFilename(char *);
 char *getTapeFilename(int);
 char *getSolutionTapeFilename(int);
 char *getScoreFilename(int);
 char *getSetupFilename(void);
+char *getDefaultSetupFilename(void);
 char *getEditorSetupFilename(void);
 char *getHelpAnimFilename(void);
 char *getHelpTextFilename(void);

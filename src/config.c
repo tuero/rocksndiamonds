@@ -20,6 +20,11 @@ char *getCompileDateString()
   return COMPILE_DATE_STRING;
 }
 
+char *getProgramTitleString()
+{
+  return program.program_title;
+}
+
 char *getProgramVersionString()
 {
   static char program_version_string[32];
@@ -37,11 +42,11 @@ char *getProgramInitString()
 
   if (program_init_string == NULL)
   {
-    program_init_string = checked_malloc(strlen(PROGRAM_TITLE_STRING) + 1 +
+    program_init_string = checked_malloc(strlen(getProgramTitleString()) + 1 +
 					 strlen(getProgramVersionString()) + 1);
 
     sprintf(program_init_string, "%s %s",
-	    PROGRAM_TITLE_STRING, getProgramVersionString());
+	    getProgramTitleString(), getProgramVersionString());
   }
 
   return program_init_string;

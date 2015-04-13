@@ -8021,6 +8021,24 @@ void SaveScore(int nr)
 
 #define NUM_SYSTEM_SETUP_TOKENS			3
 
+/* internal setup */
+#define SETUP_TOKEN_INT_PROGRAM_TITLE		0
+#define SETUP_TOKEN_INT_PROGRAM_AUTHOR		1
+#define SETUP_TOKEN_INT_PROGRAM_EMAIL		2
+#define SETUP_TOKEN_INT_PROGRAM_WEBSITE		3
+#define SETUP_TOKEN_INT_PROGRAM_COPYRIGHT	4
+#define SETUP_TOKEN_INT_PROGRAM_COMPANY		5
+#define SETUP_TOKEN_INT_DEFAULT_GRAPHICS_SET	6
+#define SETUP_TOKEN_INT_DEFAULT_SOUNDS_SET	7
+#define SETUP_TOKEN_INT_DEFAULT_MUSIC_SET	8
+#define SETUP_TOKEN_INT_FALLBACK_GRAPHICS_FILE	9
+#define SETUP_TOKEN_INT_FALLBACK_SOUNDS_FILE	10
+#define SETUP_TOKEN_INT_FALLBACK_MUSIC_FILE	11
+#define SETUP_TOKEN_INT_DEFAULT_LEVEL_SERIES	12
+#define SETUP_TOKEN_INT_CHOOSE_FROM_TOP_LEVELDIR 13
+
+#define NUM_INTERNAL_SETUP_TOKENS		14
+
 /* options setup */
 #define SETUP_TOKEN_OPTIONS_VERBOSE		0
 
@@ -8033,6 +8051,7 @@ static struct SetupEditorCascadeInfo seci;
 static struct SetupShortcutInfo ssi;
 static struct SetupInputInfo sii;
 static struct SetupSystemInfo syi;
+static struct SetupInternalInfo sxi;
 static struct OptionInfo soi;
 
 static struct TokenInfo global_setup_tokens[] =
@@ -8168,9 +8187,27 @@ static struct TokenInfo player_setup_tokens[] =
 
 static struct TokenInfo system_setup_tokens[] =
 {
-  { TYPE_STRING,  &syi.sdl_videodriver,	"system.sdl_videodriver"	},
-  { TYPE_STRING,  &syi.sdl_audiodriver,	"system.sdl_audiodriver"	},
+  { TYPE_STRING,  &syi.sdl_videodriver,    "system.sdl_videodriver"	},
+  { TYPE_STRING,  &syi.sdl_audiodriver,	   "system.sdl_audiodriver"	},
   { TYPE_INTEGER, &syi.audio_fragment_size,"system.audio_fragment_size"	},
+};
+
+static struct TokenInfo internal_setup_tokens[] =
+{
+  { TYPE_STRING, &sxi.program_title,		"program_title"		},
+  { TYPE_STRING, &sxi.program_author,		"program_author"	},
+  { TYPE_STRING, &sxi.program_email,		"program_email"		},
+  { TYPE_STRING, &sxi.program_website,		"program_website"	},
+  { TYPE_STRING, &sxi.program_copyright,	"program_copyright"	},
+  { TYPE_STRING, &sxi.program_company,		"program_company"	},
+  { TYPE_STRING, &sxi.default_graphics_set,	"default_graphics_set"	},
+  { TYPE_STRING, &sxi.default_sounds_set,	"default_sounds_set"	},
+  { TYPE_STRING, &sxi.default_music_set,	"default_music_set"	},
+  { TYPE_STRING, &sxi.fallback_graphics_file,	"fallback_graphics_file"},
+  { TYPE_STRING, &sxi.fallback_sounds_file,	"fallback_sounds_file"	},
+  { TYPE_STRING, &sxi.fallback_music_file,	"fallback_music_file"	},
+  { TYPE_STRING, &sxi.default_level_series,	"default_level_series"	},
+  { TYPE_STRING, &sxi.choose_from_top_leveldir,	"choose_from_top_leveldir" },
 };
 
 static struct TokenInfo options_setup_tokens[] =
@@ -8229,9 +8266,10 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
   si->sp_show_border_elements = FALSE;
   si->small_game_graphics = FALSE;
 
-  si->graphics_set = getStringCopy(GFX_DEFAULT_SUBDIR);
-  si->sounds_set = getStringCopy(SND_DEFAULT_SUBDIR);
-  si->music_set = getStringCopy(MUS_DEFAULT_SUBDIR);
+  si->graphics_set = getStringCopy(GFX_CLASSIC_SUBDIR);
+  si->sounds_set   = getStringCopy(SND_CLASSIC_SUBDIR);
+  si->music_set    = getStringCopy(MUS_CLASSIC_SUBDIR);
+
   si->override_level_graphics = FALSE;
   si->override_level_sounds = FALSE;
   si->override_level_music = FALSE;
@@ -8312,16 +8350,25 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
   si->system.sdl_audiodriver = getStringCopy(ARG_DEFAULT);
   si->system.audio_fragment_size = DEFAULT_AUDIO_FRAGMENT_SIZE;
 
-  si->options.verbose = FALSE;
+  si->internal.program_title     = getStringCopy(PROGRAM_TITLE_STRING);
+  si->internal.program_author    = getStringCopy(PROGRAM_AUTHOR_STRING);
+  si->internal.program_email     = getStringCopy(PROGRAM_EMAIL_STRING);
+  si->internal.program_website   = getStringCopy(PROGRAM_WEBSITE_STRING);
+  si->internal.program_copyright = getStringCopy(PROGRAM_COPYRIGHT_STRING);
+  si->internal.program_company   = getStringCopy(PROGRAM_COMPANY_STRING);
 
-#if defined(CREATE_SPECIAL_EDITION_RND_JUE)
-  si->toons = FALSE;
-  si->handicap = FALSE;
-  si->fullscreen = TRUE;
-  si->override_level_graphics = AUTO;
-  si->override_level_sounds = AUTO;
-  si->override_level_music = AUTO;
-#endif
+  si->internal.default_graphics_set = getStringCopy(GFX_CLASSIC_SUBDIR);
+  si->internal.default_sounds_set   = getStringCopy(SND_CLASSIC_SUBDIR);
+  si->internal.default_music_set    = getStringCopy(MUS_CLASSIC_SUBDIR);
+
+  si->internal.fallback_graphics_file = getStringCopy(UNDEFINED_FILENAME);
+  si->internal.fallback_sounds_file   = getStringCopy(UNDEFINED_FILENAME);
+  si->internal.fallback_music_file    = getStringCopy(UNDEFINED_FILENAME);
+
+  si->internal.default_level_series = getStringCopy(UNDEFINED_LEVELSET);
+  si->internal.choose_from_top_leveldir = FALSE;
+
+  si->options.verbose = FALSE;
 
 #if defined(PLATFORM_ANDROID)
   si->fullscreen = TRUE;
@@ -8402,6 +8449,13 @@ static void decodeSetupFileHash(SetupFileHash *setup_file_hash)
 		 getHashEntry(setup_file_hash, system_setup_tokens[i].text));
   setup.system = syi;
 
+  /* internal setup */
+  sxi = setup.internal;
+  for (i = 0; i < NUM_INTERNAL_SETUP_TOKENS; i++)
+    setSetupInfo(internal_setup_tokens, i,
+		 getHashEntry(setup_file_hash, internal_setup_tokens[i].text));
+  setup.internal = sxi;
+
   /* options setup */
   soi = setup.options;
   for (i = 0; i < NUM_OPTIONS_SETUP_TOKENS; i++)
@@ -8426,42 +8480,62 @@ static void decodeSetupFileHash_EditorCascade(SetupFileHash *setup_file_hash)
   setup.editor_cascade = seci;
 }
 
+void LoadSetupFromFilename(char *filename)
+{
+  SetupFileHash *setup_file_hash = loadSetupFileHash(filename);
+
+  if (setup_file_hash)
+  {
+    decodeSetupFileHash(setup_file_hash);
+
+    freeSetupFileHash(setup_file_hash);
+  }
+  else
+  {
+    Error(ERR_WARN, "using default setup values");
+  }
+}
+
+static void LoadSetup_SpecialPostProcessing()
+{
+  char *player_name_new;
+
+  /* needed to work around problems with fixed length strings */
+  player_name_new = get_corrected_login_name(setup.player_name);
+  free(setup.player_name);
+  setup.player_name = player_name_new;
+
+  /* "scroll_delay: on(3) / off(0)" was replaced by scroll delay value */
+  if (setup.scroll_delay == FALSE)
+  {
+    setup.scroll_delay_value = MIN_SCROLL_DELAY;
+    setup.scroll_delay = TRUE;			/* now always "on" */
+  }
+
+  /* make sure that scroll delay value stays inside valid range */
+  setup.scroll_delay_value =
+    MIN(MAX(MIN_SCROLL_DELAY, setup.scroll_delay_value), MAX_SCROLL_DELAY);
+}
+
 void LoadSetup()
 {
-  char *filename = getSetupFilename();
-  SetupFileHash *setup_file_hash = NULL;
+  char *filename;
 
   /* always start with reliable default values */
   setSetupInfoToDefaults(&setup);
 
-  setup_file_hash = loadSetupFileHash(filename);
+  /* try to load setup values from default setup file */
+  filename = getDefaultSetupFilename();
 
-  if (setup_file_hash)
-  {
-    char *player_name_new;
+  if (fileExists(filename))
+    LoadSetupFromFilename(filename);
 
-    decodeSetupFileHash(setup_file_hash);
+  /* try to load setup values from user setup file */
+  filename = getSetupFilename();
 
-    freeSetupFileHash(setup_file_hash);
+  LoadSetupFromFilename(filename);
 
-    /* needed to work around problems with fixed length strings */
-    player_name_new = get_corrected_login_name(setup.player_name);
-    free(setup.player_name);
-    setup.player_name = player_name_new;
-
-    /* "scroll_delay: on(3) / off(0)" was replaced by scroll delay value */
-    if (setup.scroll_delay == FALSE)
-    {
-      setup.scroll_delay_value = MIN_SCROLL_DELAY;
-      setup.scroll_delay = TRUE;			/* now always "on" */
-    }
-
-    /* make sure that scroll delay value stays inside valid range */
-    setup.scroll_delay_value =
-      MIN(MAX(MIN_SCROLL_DELAY, setup.scroll_delay_value), MAX_SCROLL_DELAY);
-  }
-  else
-    Error(ERR_WARN, "using default setup values");
+  LoadSetup_SpecialPostProcessing();
 }
 
 void LoadSetup_EditorCascade()
@@ -8544,6 +8618,9 @@ void SaveSetup()
   fprintf(file, "\n");
   for (i = 0; i < NUM_SYSTEM_SETUP_TOKENS; i++)
     fprintf(file, "%s\n", getSetupLine(system_setup_tokens, "", i));
+
+  /* internal setup */
+  /* (internal setup values not saved to user setup file) */
 
   /* options setup */
   soi = setup.options;

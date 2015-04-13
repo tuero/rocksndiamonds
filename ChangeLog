@@ -1,3 +1,52 @@
+2015-04-14
+	* added run-time "special edition" support;
+	  this change is especially targeted to the "R'n'D jue" special edition
+	  of R'n'D, which changed some defaults at compile-time in previous
+	  versions, like:
+	  - using a different default artwork set (with fallback artwork for
+	    classic artwork not existing in the special edition),
+	  - using a different default level set,
+	  - using a different program name and user data directory,
+	  - starting with different default setup values and
+	  - using custom artwork even at a very early stage of startup
+	    (like initial fonts and initial loading/busy animation);
+	  these changes can now all be accomplished at run-time by using a new
+	  program-specific configuration file in the same location and with the
+	  same name as the game binary (minus a potential binary file extension
+	  ".exe", plus a configuration file extension ".conf", so a binary file
+	  "rnd_jue.exe" would be complemented by a new file "rnd_jue.conf" in
+	  the same directory);
+	  this config file can contain all options found in "setup.conf" plus
+	  the following new, internal "special edition" default settings:
+	  - program_title (like "R'n'D jue")
+	  - program_author (like "Juergen Bonhagen")
+	  - program_email (like "jue@artsoft.org")
+	  - program_website (like "http://jue.artsoft.org/")
+	  - program_copyright (like "(c) 2015 by jue")
+	  - program_company (like "A game by jue")
+	  - default_graphics_set (like "jue0")
+	  - default_sounds_set (like "jue0")
+	  - default_music_set (like "jue0")
+	  - fallback_graphics_file (like "fallback.png")
+	  - fallback_sounds_file (like "fallback.wav")
+	  - fallback_music_file (like "fallback.wav")
+	  - default_level_series (like "jue_start")
+	  - choose_from_top_leveldir ("true" or "false")
+	  where the "default" artwork set definitions are used to specify new
+	  default artwork that replaces the "classic" artwork sets, while the
+	  "fallback" settings specify artwork files used for all artwork files
+	  that would exist in the classic artwork sets, but are not defined or
+	  cannot be found in the new default artwork set; the program title is
+	  used for things like window title, title screens and user data folder
+	  name, and the entry point for choosing a level set can be changed
+	  from the current level set location to the topmost level tree node
+
+2015-04-07
+	* added sound definitions for pressing and releasing main menu buttons
+
+2015-03-31
+	* fixed slow tape quick-loading due to unneeded tape area update
+
 2015-03-30
 	* replaced stop/play buttons in game panel with save/load buttons
 

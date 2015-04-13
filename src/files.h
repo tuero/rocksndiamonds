@@ -54,6 +54,7 @@ boolean SaveTapeChecked(int);
 void LoadScore(int);
 void SaveScore(int);
 
+void LoadSetupFromFilename(char *);
 void LoadSetup();
 void SaveSetup();
 

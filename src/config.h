@@ -15,8 +15,7 @@
 #include "main.h"
 
 char *getCompileDateString(void);
-char *getProgramReleaseVersionString(void);
-char *getProgramFullVersionString(void);
+char *getProgramTitleString(void);
 char *getProgramVersionString(void);
 char *getProgramInitString(void);
 char *getWindowTitleString(void);

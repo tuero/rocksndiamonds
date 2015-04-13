@@ -393,6 +393,17 @@ inline static char *getLevelArtworkDir(int type)
   return LEVELDIR_ARTWORK_PATH(leveldir_current, type);
 }
 
+char *getProgramConfigFilename(char *command_filename_ptr)
+{
+  char *command_filename = getStringCopy(command_filename_ptr);
+
+  // strip trailing executable suffix from command filename
+  if (strSuffix(command_filename, ".exe"))
+    command_filename[strlen(command_filename) - 4] = '\0';
+
+  return getStringCat2(command_filename, ".conf");
+}
+
 char *getTapeFilename(int nr)
 {
   static char *filename = NULL;
@@ -454,6 +465,11 @@ char *getSetupFilename()
   filename = getPath2(getSetupDir(), SETUP_FILENAME);
 
   return filename;
+}
+
+char *getDefaultSetupFilename()
+{
+  return program.config_filename;
 }
 
 char *getEditorSetupFilename()
@@ -659,18 +675,20 @@ char *getCustomImageFilename(char *basename)
   if (fileExists(filename))
     return filename;
 
-#if defined(CREATE_SPECIAL_EDITION)
-  free(filename);
+  if (!strEqual(GFX_FALLBACK_FILENAME, UNDEFINED_FILENAME))
+  {
+    free(filename);
 
-  if (options.debug)
-    Error(ERR_WARN, "cannot find artwork file '%s' (using fallback)", basename);
+    if (options.debug)
+      Error(ERR_WARN, "cannot find artwork file '%s' (using fallback)",
+	    basename);
 
-  /* 6th try: look for fallback artwork in old default artwork directory */
-  /* (needed to prevent errors when trying to access unused artwork files) */
-  filename = getImg2(options.graphics_directory, GFX_FALLBACK_FILENAME);
-  if (fileExists(filename))
-    return filename;
-#endif
+    /* 6th try: look for fallback artwork in old default artwork directory */
+    /* (needed to prevent errors when trying to access unused artwork files) */
+    filename = getImg2(options.graphics_directory, GFX_FALLBACK_FILENAME);
+    if (fileExists(filename))
+      return filename;
+  }
 
   return NULL;		/* cannot find specified artwork file anywhere */
 }
@@ -730,18 +748,20 @@ char *getCustomSoundFilename(char *basename)
   if (fileExists(filename))
     return filename;
 
-#if defined(CREATE_SPECIAL_EDITION)
-  free(filename);
+  if (!strEqual(SND_FALLBACK_FILENAME, UNDEFINED_FILENAME))
+  {
+    free(filename);
 
-  if (options.debug)
-    Error(ERR_WARN, "cannot find artwork file '%s' (using fallback)", basename);
+    if (options.debug)
+      Error(ERR_WARN, "cannot find artwork file '%s' (using fallback)",
+	    basename);
 
-  /* 6th try: look for fallback artwork in old default artwork directory */
-  /* (needed to prevent errors when trying to access unused artwork files) */
-  filename = getPath2(options.sounds_directory, SND_FALLBACK_FILENAME);
-  if (fileExists(filename))
-    return filename;
-#endif
+    /* 6th try: look for fallback artwork in old default artwork directory */
+    /* (needed to prevent errors when trying to access unused artwork files) */
+    filename = getPath2(options.sounds_directory, SND_FALLBACK_FILENAME);
+    if (fileExists(filename))
+      return filename;
+  }
 
   return NULL;		/* cannot find specified artwork file anywhere */
 }
@@ -801,18 +821,20 @@ char *getCustomMusicFilename(char *basename)
   if (fileExists(filename))
     return filename;
 
-#if defined(CREATE_SPECIAL_EDITION)
-  free(filename);
+  if (!strEqual(MUS_FALLBACK_FILENAME, UNDEFINED_FILENAME))
+  {
+    free(filename);
 
-  if (options.debug)
-    Error(ERR_WARN, "cannot find artwork file '%s' (using fallback)", basename);
+    if (options.debug)
+      Error(ERR_WARN, "cannot find artwork file '%s' (using fallback)",
+	    basename);
 
-  /* 6th try: look for fallback artwork in old default artwork directory */
-  /* (needed to prevent errors when trying to access unused artwork files) */
-  filename = getPath2(options.music_directory, MUS_FALLBACK_FILENAME);
-  if (fileExists(filename))
-    return filename;
-#endif
+    /* 6th try: look for fallback artwork in old default artwork directory */
+    /* (needed to prevent errors when trying to access unused artwork files) */
+    filename = getPath2(options.music_directory, MUS_FALLBACK_FILENAME);
+    if (fileExists(filename))
+      return filename;
+  }
 
   return NULL;		/* cannot find specified artwork file anywhere */
 }
@@ -3626,12 +3648,13 @@ void LoadLevelSetup_LastSeries()
   /* always start with reliable default values */
   leveldir_current = getFirstValidTreeInfoEntry(leveldir_first);
 
-#if defined(CREATE_SPECIAL_EDITION_RND_JUE)
-  leveldir_current = getTreeInfoFromIdentifier(leveldir_first,
-					       "jue_start");
-  if (leveldir_current == NULL)
-    leveldir_current = getFirstValidTreeInfoEntry(leveldir_first);
-#endif
+  if (!strEqual(DEFAULT_LEVELSET, UNDEFINED_LEVELSET))
+  {
+    leveldir_current = getTreeInfoFromIdentifier(leveldir_first,
+						 DEFAULT_LEVELSET);
+    if (leveldir_current == NULL)
+      leveldir_current = getFirstValidTreeInfoEntry(leveldir_first);
+  }
 
   if ((level_setup_hash = loadSetupFileHash(filename)))
   {

@@ -16,6 +16,7 @@
 #include "game.h"
 #include "tape.h"
 #include "tools.h"
+#include "files.h"
 #include "events.h"
 #include "config.h"
 
@@ -5624,11 +5625,51 @@ static void print_version()
   }
 }
 
+static void InitProgramConfig(char *command_filename)
+{
+  char *command_basename = getBaseName(command_filename);
+  char *config_filename = getProgramConfigFilename(command_filename);
+  char *program_title = PROGRAM_TITLE_STRING;
+  char *userdata_subdir;
+  char *userdata_subdir_unix;
+
+  // read default program config, if existing
+  if (fileExists(config_filename))
+    LoadSetupFromFilename(config_filename);
+
+  // set program title from potentially redefined program title
+  if (setup.internal.program_title != NULL &&
+      strlen(setup.internal.program_title) > 0)
+    program_title = getStringCopy(setup.internal.program_title);
+
+  // strip trailing executable suffix from command basename
+  if (strSuffix(command_basename, ".exe"))
+    command_basename[strlen(command_basename) - 4] = '\0';
+
+  userdata_subdir_unix = getStringCat2(".", command_basename);
+
+#if defined(PLATFORM_WIN32) || defined(PLATFORM_MACOSX)
+  userdata_subdir = program_title;
+#elif defined(PLATFORM_UNIX)
+  userdata_subdir = userdata_subdir_unix;
+#else
+  userdata_subdir = USERDATA_DIRECTORY_OTHER;
+#endif
+
+  InitProgramInfo(command_filename,
+		  config_filename,
+		  userdata_subdir,
+		  userdata_subdir_unix,
+		  program_title,
+		  program_title,
+		  SDL_ICON_FILENAME,
+		  COOKIE_PREFIX,
+		  GAME_VERSION_ACTUAL);
+}
+
 int main(int argc, char *argv[])
 {
-  InitProgramInfo(argv[0], USERDATA_DIRECTORY, USERDATA_DIRECTORY_UNIX,
-		  PROGRAM_TITLE_STRING, ICON_TITLE_STRING, SDL_ICON_FILENAME,
-		  COOKIE_PREFIX, GAME_VERSION_ACTUAL);
+  InitProgramConfig(argv[0]);
 
   InitWindowTitleFunction(getWindowTitleString);
   InitExitMessageFunction(DisplayExitMessage);

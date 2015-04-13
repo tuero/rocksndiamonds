@@ -1073,6 +1073,9 @@ void Error(int mode, char *format, ...)
   static boolean last_line_was_separator = FALSE;
   char *process_name = "";
 
+  if (program.error_file == NULL)
+    return;
+
 #if defined(PLATFORM_ANDROID)
   android_log_prio = (mode & ERR_DEBUG ? ANDROID_LOG_DEBUG :
 		      mode & ERR_INFO ? ANDROID_LOG_INFO :
