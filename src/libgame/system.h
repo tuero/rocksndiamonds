@@ -673,7 +673,7 @@ struct ProgramInfo
   char *window_title;
   char *icon_title;
 
-  char *sdl_icon_filename;
+  char *icon_filename;
 
   char *cookie_prefix;
 
@@ -944,6 +944,8 @@ struct SetupInternalInfo
   char *program_website;
   char *program_copyright;
   char *program_company;
+
+  char *program_icon_file;
 
   char *default_graphics_set;
   char *default_sounds_set;

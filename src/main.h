@@ -1990,11 +1990,11 @@
 #define PROGRAM_COPYRIGHT_STRING	"Copyright \xa9""1995-2015 by Holger Schemel"
 #define PROGRAM_COMPANY_STRING		"A Game by Artsoft Entertainment"
 
+#define PROGRAM_ICON_FILENAME		"RocksIcon32x32.png"
+
 #define COOKIE_PREFIX			"ROCKSNDIAMONDS"
 
 #define USERDATA_DIRECTORY_OTHER	"userdata"
-
-#define SDL_ICON_FILENAME		"RocksIcon32x32.png"
 
 /* file version numbers for resource files (levels, tapes, score, setup, etc.)
 ** currently supported/known file version numbers:

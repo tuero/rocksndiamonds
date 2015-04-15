@@ -67,7 +67,7 @@ int			FrameCounter = 0;
 void InitProgramInfo(char *argv0, char *config_filename,
 		     char *userdata_subdir, char *userdata_subdir_unix,
 		     char *program_title, char *icon_title,
-		     char *sdl_icon_filename, char *cookie_prefix,
+		     char *icon_filename, char *cookie_prefix,
 		     int program_version)
 {
   program.command_basepath = getBasePath(argv0);
@@ -83,7 +83,7 @@ void InitProgramInfo(char *argv0, char *config_filename,
   program.window_title = "(undefined)";
   program.icon_title = icon_title;
 
-  program.sdl_icon_filename = sdl_icon_filename;
+  program.icon_filename = icon_filename;
 
   program.cookie_prefix = cookie_prefix;
 

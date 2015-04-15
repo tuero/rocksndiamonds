@@ -5630,6 +5630,7 @@ static void InitProgramConfig(char *command_filename)
   char *command_basename = getBaseName(command_filename);
   char *config_filename = getProgramConfigFilename(command_filename);
   char *program_title = PROGRAM_TITLE_STRING;
+  char *program_icon_file = PROGRAM_ICON_FILENAME;
   char *userdata_subdir;
   char *userdata_subdir_unix;
 
@@ -5641,6 +5642,11 @@ static void InitProgramConfig(char *command_filename)
   if (setup.internal.program_title != NULL &&
       strlen(setup.internal.program_title) > 0)
     program_title = getStringCopy(setup.internal.program_title);
+
+  // set program icon file from potentially redefined program icon file
+  if (setup.internal.program_icon_file != NULL &&
+      strlen(setup.internal.program_icon_file) > 0)
+    program_icon_file = getStringCopy(setup.internal.program_icon_file);
 
   // strip trailing executable suffix from command basename
   if (strSuffix(command_basename, ".exe"))
@@ -5662,7 +5668,7 @@ static void InitProgramConfig(char *command_filename)
 		  userdata_subdir_unix,
 		  program_title,
 		  program_title,
-		  SDL_ICON_FILENAME,
+		  program_icon_file,
 		  COOKIE_PREFIX,
 		  GAME_VERSION_ACTUAL);
 }

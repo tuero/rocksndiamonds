@@ -8028,16 +8028,17 @@ void SaveScore(int nr)
 #define SETUP_TOKEN_INT_PROGRAM_WEBSITE		3
 #define SETUP_TOKEN_INT_PROGRAM_COPYRIGHT	4
 #define SETUP_TOKEN_INT_PROGRAM_COMPANY		5
-#define SETUP_TOKEN_INT_DEFAULT_GRAPHICS_SET	6
-#define SETUP_TOKEN_INT_DEFAULT_SOUNDS_SET	7
-#define SETUP_TOKEN_INT_DEFAULT_MUSIC_SET	8
-#define SETUP_TOKEN_INT_FALLBACK_GRAPHICS_FILE	9
-#define SETUP_TOKEN_INT_FALLBACK_SOUNDS_FILE	10
-#define SETUP_TOKEN_INT_FALLBACK_MUSIC_FILE	11
-#define SETUP_TOKEN_INT_DEFAULT_LEVEL_SERIES	12
-#define SETUP_TOKEN_INT_CHOOSE_FROM_TOP_LEVELDIR 13
+#define SETUP_TOKEN_INT_PROGRAM_ICON_FILE	6
+#define SETUP_TOKEN_INT_DEFAULT_GRAPHICS_SET	7
+#define SETUP_TOKEN_INT_DEFAULT_SOUNDS_SET	8
+#define SETUP_TOKEN_INT_DEFAULT_MUSIC_SET	9
+#define SETUP_TOKEN_INT_FALLBACK_GRAPHICS_FILE	10
+#define SETUP_TOKEN_INT_FALLBACK_SOUNDS_FILE	11
+#define SETUP_TOKEN_INT_FALLBACK_MUSIC_FILE	12
+#define SETUP_TOKEN_INT_DEFAULT_LEVEL_SERIES	13
+#define SETUP_TOKEN_INT_CHOOSE_FROM_TOP_LEVELDIR 14
 
-#define NUM_INTERNAL_SETUP_TOKENS		14
+#define NUM_INTERNAL_SETUP_TOKENS		15
 
 /* options setup */
 #define SETUP_TOKEN_OPTIONS_VERBOSE		0
@@ -8200,6 +8201,7 @@ static struct TokenInfo internal_setup_tokens[] =
   { TYPE_STRING, &sxi.program_website,		"program_website"	},
   { TYPE_STRING, &sxi.program_copyright,	"program_copyright"	},
   { TYPE_STRING, &sxi.program_company,		"program_company"	},
+  { TYPE_STRING, &sxi.program_icon_file,	"program_icon_file"	},
   { TYPE_STRING, &sxi.default_graphics_set,	"default_graphics_set"	},
   { TYPE_STRING, &sxi.default_sounds_set,	"default_sounds_set"	},
   { TYPE_STRING, &sxi.default_music_set,	"default_music_set"	},
@@ -8356,6 +8358,8 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
   si->internal.program_website   = getStringCopy(PROGRAM_WEBSITE_STRING);
   si->internal.program_copyright = getStringCopy(PROGRAM_COPYRIGHT_STRING);
   si->internal.program_company   = getStringCopy(PROGRAM_COMPANY_STRING);
+
+  si->internal.program_icon_file = getStringCopy(PROGRAM_ICON_FILENAME);
 
   si->internal.default_graphics_set = getStringCopy(GFX_CLASSIC_SUBDIR);
   si->internal.default_sounds_set   = getStringCopy(SND_CLASSIC_SUBDIR);

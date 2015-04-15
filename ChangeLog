@@ -1,3 +1,6 @@
+2015-04-15
+	* added option "program_icon_file" to run-time "special edition" support
+
 2015-04-14
 	* added run-time "special edition" support;
 	  this change is especially targeted to the "R'n'D jue" special edition

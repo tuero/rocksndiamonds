@@ -454,7 +454,7 @@ void SDLInitVideoBuffer(DrawBuffer **backbuffer, DrawWindow **window,
 
   /* !!! SDL2 can only set the window icon if the window already exists !!! */
   /* set window icon */
-  SDLSetWindowIcon(program.sdl_icon_filename);
+  SDLSetWindowIcon(program.icon_filename);
 
   /* set window and icon title */
 #if defined(TARGET_SDL2)
