@@ -118,6 +118,10 @@ void fprintf_line_with_prefix(FILE *, char *, char *, int);
 void printf_line(char *, int);
 void printf_line_with_prefix(char *, char *, int);
 
+void Print(char *, ...);
+void PrintLine(char *, int);
+void PrintLineWithPrefix(char *, char *, int);
+
 char *int2str(int, int);
 char *i_to_a(unsigned int);
 int log_2(unsigned int);
@@ -265,10 +269,11 @@ void LoadArtworkConfig(struct ArtworkListInfo *);
 void ReloadCustomArtworkList(struct ArtworkListInfo *);
 void FreeCustomArtworkLists(struct ArtworkListInfo *);
 
-char *getErrorFilename(char *);
-void openErrorFile();
-void closeErrorFile();
-void dumpErrorFile();
+char *getLogFilename(char *);
+void OpenLogFiles();
+void CloseLogFiles();
+void DumpLogFile(int);
+
 void NotifyUserAboutErrorFile();
 
 #if DEBUG

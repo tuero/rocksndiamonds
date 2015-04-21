@@ -93,8 +93,10 @@ void InitProgramInfo(char *argv0, char *config_filename,
   program.version_build = VERSION_BUILD(program_version);
   program.version_ident = program_version;
 
-  program.error_filename = getErrorFilename(ERROR_BASENAME);
-  program.error_file = stderr;
+  program.log_filename[LOG_OUT_ID] = getLogFilename(LOG_OUT_BASENAME);
+  program.log_filename[LOG_ERR_ID] = getLogFilename(LOG_ERR_BASENAME);
+  program.log_file[LOG_OUT_ID] = program.log_file_default[LOG_OUT_ID] = stdout;
+  program.log_file[LOG_ERR_ID] = program.log_file_default[LOG_ERR_ID] = stderr;
 }
 
 void SetWindowTitle()
@@ -135,7 +137,7 @@ void InitPlatformDependentStuff(void)
   updateUserGameDataDir();
 #endif
 
-  openErrorFile();
+  OpenLogFiles();
 
 #if defined(TARGET_SDL2)
   int sdl_init_flags = SDL_INIT_EVENTS      | SDL_INIT_NOPARACHUTE;
@@ -151,9 +153,7 @@ void InitPlatformDependentStuff(void)
 
 void ClosePlatformDependentStuff(void)
 {
-#if defined(PLATFORM_WIN32)
-  closeErrorFile();
-#endif
+  CloseLogFiles();
 }
 
 void InitGfxFieldInfo(int sx, int sy, int sxsize, int sysize,

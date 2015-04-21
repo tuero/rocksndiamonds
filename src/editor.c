@@ -5217,9 +5217,9 @@ void PrintEditorElementList()
       int cascade_element_show = EL_CASCADE_INACTIVE(cascade_element);
       char *headline = element_info[cascade_element_show].editor_description;
 
-      printf_line_with_prefix("# ", "-", 77);
-      printf("# %s\n", headline);
-      printf_line_with_prefix("# ", "-", 77);
+      PrintLineWithPrefix("# ", "-", 77);
+      Print("# %s\n", headline);
+      PrintLineWithPrefix("# ", "-", 77);
     }
 
     for (j = 0; j < *editor_elements_info[i].headline_list_size; j++)
@@ -5229,21 +5229,21 @@ void PrintEditorElementList()
       if (IS_EDITOR_CASCADE(element))
 	element = EL_CHAR_MINUS;
 
-      printf("# %s\n", element_info[element].token_name);
+      Print("# %s\n", element_info[element].token_name);
     }
 
     if (j > 0)
-      printf("#\n");
+      Print("#\n");
 
     for (j = 0; j < *editor_elements_info[i].element_list_size; j++)
     {
       int element = (*editor_elements_info[i].element_list)[j];
 
-      printf("# %s\n", element_info[element].token_name);
+      Print("# %s\n", element_info[element].token_name);
     }
 
     if (j > 0)
-      printf("#\n");
+      Print("#\n");
   }
 }
 

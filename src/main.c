@@ -5552,76 +5552,76 @@ struct MusicPrefixInfo music_prefix_info[NUM_MUSIC_PREFIXES + 1] =
 
 static void print_usage()
 {
-  printf("\n"
-	 "Usage: %s [OPTION]... [HOSTNAME [PORT]]\n"
-	 "\n"
-	 "Options:\n"
-	 "  -d, --display HOSTNAME[:SCREEN]  specify X server display\n"
-	 "  -b, --basepath DIRECTORY         alternative base DIRECTORY\n"
-	 "  -l, --level DIRECTORY            alternative level DIRECTORY\n"
-	 "  -g, --graphics DIRECTORY         alternative graphics DIRECTORY\n"
-	 "  -s, --sounds DIRECTORY           alternative sounds DIRECTORY\n"
-	 "  -m, --music DIRECTORY            alternative music DIRECTORY\n"
-	 "  -n, --network                    network multiplayer game\n"
-	 "      --serveronly                 only start network server\n"
-	 "  -v, --verbose                    verbose mode\n"
-	 "  -V, --version                    show program version\n"
-	 "      --debug                      display debugging information\n"
-	 "  -e, --execute COMMAND            execute batch COMMAND\n"
-	 "\n"
-	 "Valid commands for '--execute' option:\n"
-	 "  \"print graphicsinfo.conf\"        print default graphics config\n"
-	 "  \"print soundsinfo.conf\"          print default sounds config\n"
-	 "  \"print musicinfo.conf\"           print default music config\n"
-	 "  \"print editorsetup.conf\"         print default editor config\n"
-	 "  \"print helpanim.conf\"            print default helpanim config\n"
-	 "  \"print helptext.conf\"            print default helptext config\n"
-	 "  \"dump level FILE\"                dump level data from FILE\n"
-	 "  \"dump tape FILE\"                 dump tape data from FILE\n"
-	 "  \"autoplay LEVELDIR [NR ...]\"     play level tapes for LEVELDIR\n"
-	 "  \"convert LEVELDIR [NR]\"          convert levels in LEVELDIR\n"
-	 "  \"create images DIRECTORY\"        write BMP images to DIRECTORY\n"
-	 "  \"create CE image DIRECTORY\"      write BMP image to DIRECTORY\n"
-	 "\n",
-	 program.command_basename);
+  Print("\n"
+	"Usage: %s [OPTION]... [HOSTNAME [PORT]]\n"
+	"\n"
+	"Options:\n"
+	"  -d, --display HOSTNAME[:SCREEN]  specify X server display\n"
+	"  -b, --basepath DIRECTORY         alternative base DIRECTORY\n"
+	"  -l, --level DIRECTORY            alternative level DIRECTORY\n"
+	"  -g, --graphics DIRECTORY         alternative graphics DIRECTORY\n"
+	"  -s, --sounds DIRECTORY           alternative sounds DIRECTORY\n"
+	"  -m, --music DIRECTORY            alternative music DIRECTORY\n"
+	"  -n, --network                    network multiplayer game\n"
+	"      --serveronly                 only start network server\n"
+	"  -v, --verbose                    verbose mode\n"
+	"  -V, --version                    show program version\n"
+	"      --debug                      display debugging information\n"
+	"  -e, --execute COMMAND            execute batch COMMAND\n"
+	"\n"
+	"Valid commands for '--execute' option:\n"
+	"  \"print graphicsinfo.conf\"        print default graphics config\n"
+	"  \"print soundsinfo.conf\"          print default sounds config\n"
+	"  \"print musicinfo.conf\"           print default music config\n"
+	"  \"print editorsetup.conf\"         print default editor config\n"
+	"  \"print helpanim.conf\"            print default helpanim config\n"
+	"  \"print helptext.conf\"            print default helptext config\n"
+	"  \"dump level FILE\"                dump level data from FILE\n"
+	"  \"dump tape FILE\"                 dump tape data from FILE\n"
+	"  \"autoplay LEVELDIR [NR ...]\"     play level tapes for LEVELDIR\n"
+	"  \"convert LEVELDIR [NR]\"          convert levels in LEVELDIR\n"
+	"  \"create images DIRECTORY\"        write BMP images to DIRECTORY\n"
+	"  \"create CE image DIRECTORY\"      write BMP image to DIRECTORY\n"
+	"\n",
+	program.command_basename);
 }
 
 static void print_version()
 {
-  printf("%s %d.%d.%d.%d\n",
-	 PROGRAM_TITLE_STRING,
-	 PROGRAM_VERSION_MAJOR,
-	 PROGRAM_VERSION_MINOR,
-	 PROGRAM_VERSION_PATCH,
-	 PROGRAM_VERSION_BUILD);
+  Print("%s %d.%d.%d.%d\n",
+	PROGRAM_TITLE_STRING,
+	PROGRAM_VERSION_MAJOR,
+	PROGRAM_VERSION_MINOR,
+	PROGRAM_VERSION_PATCH,
+	PROGRAM_VERSION_BUILD);
 
   if (options.debug)
   {
     SDL_version sdl_version;
 
     SDL_VERSION(&sdl_version);
-    printf("- SDL %d.%d.%d\n",
-	   sdl_version.major,
-	   sdl_version.minor,
-	   sdl_version.patch);
+    Print("- SDL %d.%d.%d\n",
+	  sdl_version.major,
+	  sdl_version.minor,
+	  sdl_version.patch);
 
     SDL_IMAGE_VERSION(&sdl_version);
-    printf("- SDL_image %d.%d.%d\n",
-	   sdl_version.major,
-	   sdl_version.minor,
-	   sdl_version.patch);
+    Print("- SDL_image %d.%d.%d\n",
+	  sdl_version.major,
+	  sdl_version.minor,
+	  sdl_version.patch);
 
     SDL_MIXER_VERSION(&sdl_version);
-    printf("- SDL_mixer %d.%d.%d\n",
-	   sdl_version.major,
-	   sdl_version.minor,
-	   sdl_version.patch);
+    Print("- SDL_mixer %d.%d.%d\n",
+	  sdl_version.major,
+	  sdl_version.minor,
+	  sdl_version.patch);
 
     SDL_NET_VERSION(&sdl_version);
-    printf("- SDL_net %d.%d.%d\n",
-	   sdl_version.major,
-	   sdl_version.minor,
-	   sdl_version.patch);
+    Print("- SDL_net %d.%d.%d\n",
+	  sdl_version.major,
+	  sdl_version.minor,
+	  sdl_version.patch);
   }
 }
 

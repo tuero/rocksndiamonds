@@ -7158,34 +7158,34 @@ void DumpLevel(struct LevelInfo *level)
     return;
   }
 
-  printf_line("-", 79);
-  printf("Level xxx (file version %08d, game version %08d)\n",
-	 level->file_version, level->game_version);
-  printf_line("-", 79);
+  PrintLine("-", 79);
+  Print("Level xxx (file version %08d, game version %08d)\n",
+	level->file_version, level->game_version);
+  PrintLine("-", 79);
 
-  printf("Level author: '%s'\n", level->author);
-  printf("Level title:  '%s'\n", level->name);
-  printf("\n");
-  printf("Playfield size: %d x %d\n", level->fieldx, level->fieldy);
-  printf("\n");
-  printf("Level time:  %d seconds\n", level->time);
-  printf("Gems needed: %d\n", level->gems_needed);
-  printf("\n");
-  printf("Time for magic wall: %d seconds\n", level->time_magic_wall);
-  printf("Time for wheel:      %d seconds\n", level->time_wheel);
-  printf("Time for light:      %d seconds\n", level->time_light);
-  printf("Time for timegate:   %d seconds\n", level->time_timegate);
-  printf("\n");
-  printf("Amoeba speed: %d\n", level->amoeba_speed);
-  printf("\n");
+  Print("Level author: '%s'\n", level->author);
+  Print("Level title:  '%s'\n", level->name);
+  Print("\n");
+  Print("Playfield size: %d x %d\n", level->fieldx, level->fieldy);
+  Print("\n");
+  Print("Level time:  %d seconds\n", level->time);
+  Print("Gems needed: %d\n", level->gems_needed);
+  Print("\n");
+  Print("Time for magic wall: %d seconds\n", level->time_magic_wall);
+  Print("Time for wheel:      %d seconds\n", level->time_wheel);
+  Print("Time for light:      %d seconds\n", level->time_light);
+  Print("Time for timegate:   %d seconds\n", level->time_timegate);
+  Print("\n");
+  Print("Amoeba speed: %d\n", level->amoeba_speed);
+  Print("\n");
 
-  printf("EM style slippery gems:      %s\n", (level->em_slippery_gems ? "yes" : "no"));
-  printf("Player blocks last field:    %s\n", (level->block_last_field ? "yes" : "no"));
-  printf("SP player blocks last field: %s\n", (level->sp_block_last_field ? "yes" : "no"));
-  printf("use spring bug: %s\n", (level->use_spring_bug ? "yes" : "no"));
-  printf("use step counter: %s\n", (level->use_step_counter ? "yes" : "no"));
+  Print("EM style slippery gems:      %s\n", (level->em_slippery_gems ? "yes" : "no"));
+  Print("Player blocks last field:    %s\n", (level->block_last_field ? "yes" : "no"));
+  Print("SP player blocks last field: %s\n", (level->sp_block_last_field ? "yes" : "no"));
+  Print("use spring bug: %s\n", (level->use_spring_bug ? "yes" : "no"));
+  Print("use step counter: %s\n", (level->use_step_counter ? "yes" : "no"));
 
-  printf_line("-", 79);
+  PrintLine("-", 79);
 }
 
 
@@ -7748,13 +7748,13 @@ void DumpTape(struct TapeInfo *tape)
     return;
   }
 
-  printf_line("-", 79);
-  printf("Tape of Level %03d (file version %08d, game version %08d)\n",
-	 tape->level_nr, tape->file_version, tape->game_version);
-  printf("                  (effective engine version %08d)\n",
-	 tape->engine_version);
-  printf("Level series identifier: '%s'\n", tape->level_identifier);
-  printf_line("-", 79);
+  PrintLine("-", 79);
+  Print("Tape of Level %03d (file version %08d, game version %08d)\n",
+	tape->level_nr, tape->file_version, tape->game_version);
+  Print("                  (effective engine version %08d)\n",
+	tape->engine_version);
+  Print("Level series identifier: '%s'\n", tape->level_identifier);
+  PrintLine("-", 79);
 
   tape_frame_counter = 0;
 
@@ -7763,7 +7763,7 @@ void DumpTape(struct TapeInfo *tape)
     if (i >= MAX_TAPE_LEN)
       break;
 
-    printf("%04d: ", i);
+    Print("%04d: ", i);
 
     for (j = 0; j < MAX_PLAYERS; j++)
     {
@@ -7771,24 +7771,24 @@ void DumpTape(struct TapeInfo *tape)
       {
 	int action = tape->pos[i].action[j];
 
-	printf("%d:%02x ", j, action);
-	printf("[%c%c%c%c|%c%c] - ",
-	       (action & JOY_LEFT ? '<' : ' '),
-	       (action & JOY_RIGHT ? '>' : ' '),
-	       (action & JOY_UP ? '^' : ' '),
-	       (action & JOY_DOWN ? 'v' : ' '),
-	       (action & JOY_BUTTON_1 ? '1' : ' '),
-	       (action & JOY_BUTTON_2 ? '2' : ' '));
+	Print("%d:%02x ", j, action);
+	Print("[%c%c%c%c|%c%c] - ",
+	      (action & JOY_LEFT ? '<' : ' '),
+	      (action & JOY_RIGHT ? '>' : ' '),
+	      (action & JOY_UP ? '^' : ' '),
+	      (action & JOY_DOWN ? 'v' : ' '),
+	      (action & JOY_BUTTON_1 ? '1' : ' '),
+	      (action & JOY_BUTTON_2 ? '2' : ' '));
       }
     }
 
-    printf("(%03d) ", tape->pos[i].delay);
-    printf("[%05d]\n", tape_frame_counter);
+    Print("(%03d) ", tape->pos[i].delay);
+    Print("[%05d]\n", tape_frame_counter);
 
     tape_frame_counter += tape->pos[i].delay;
   }
 
-  printf_line("-", 79);
+  PrintLine("-", 79);
 }
 
 

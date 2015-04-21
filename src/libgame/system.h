@@ -438,7 +438,12 @@
 #define TAPEFILE_EXTENSION	"tape"
 #define SCOREFILE_EXTENSION	"score"
 
-#define ERROR_BASENAME		"stderr.txt"
+#define LOG_OUT_BASENAME	"stdout.txt"
+#define LOG_ERR_BASENAME	"stderr.txt"
+
+#define LOG_OUT_ID		0
+#define LOG_ERR_ID		1
+#define NUM_LOGS		2
 
 #define STRING_PARENT_DIRECTORY		".."
 #define STRING_TOP_DIRECTORY		"/"
@@ -677,8 +682,9 @@ struct ProgramInfo
 
   char *cookie_prefix;
 
-  char *error_filename;		/* filename where to write error messages to */
-  FILE *error_file;		/* (used instead of 'stderr' on some systems) */
+  char *log_filename[NUM_LOGS];		/* log filenames for out/err messages */
+  FILE *log_file[NUM_LOGS];		/* log file handles for out/err files */
+  FILE *log_file_default[NUM_LOGS];	/* default log file handles (out/err) */
 
   int version_major;
   int version_minor;

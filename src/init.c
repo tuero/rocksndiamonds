@@ -4563,57 +4563,57 @@ void Execute_Command(char *command)
 
   if (strEqual(command, "print graphicsinfo.conf"))
   {
-    printf("# You can configure additional/alternative image files here.\n");
-    printf("# (The entries below are default and therefore commented out.)\n");
-    printf("\n");
-    printf("%s\n", getFormattedSetupEntry("name", "Classic Graphics"));
-    printf("\n");
-    printf("%s\n", getFormattedSetupEntry("sort_priority", "100"));
-    printf("\n");
+    Print("# You can configure additional/alternative image files here.\n");
+    Print("# (The entries below are default and therefore commented out.)\n");
+    Print("\n");
+    Print("%s\n", getFormattedSetupEntry("name", "Classic Graphics"));
+    Print("\n");
+    Print("%s\n", getFormattedSetupEntry("sort_priority", "100"));
+    Print("\n");
 
     for (i = 0; image_config[i].token != NULL; i++)
-      printf("# %s\n", getFormattedSetupEntry(image_config[i].token,
-					      image_config[i].value));
+      Print("# %s\n", getFormattedSetupEntry(image_config[i].token,
+					     image_config[i].value));
 
     exit(0);
   }
   else if (strEqual(command, "print soundsinfo.conf"))
   {
-    printf("# You can configure additional/alternative sound files here.\n");
-    printf("# (The entries below are default and therefore commented out.)\n");
-    printf("\n");
-    printf("%s\n", getFormattedSetupEntry("name", "Classic Sounds"));
-    printf("\n");
-    printf("%s\n", getFormattedSetupEntry("sort_priority", "100"));
-    printf("\n");
+    Print("# You can configure additional/alternative sound files here.\n");
+    Print("# (The entries below are default and therefore commented out.)\n");
+    Print("\n");
+    Print("%s\n", getFormattedSetupEntry("name", "Classic Sounds"));
+    Print("\n");
+    Print("%s\n", getFormattedSetupEntry("sort_priority", "100"));
+    Print("\n");
 
     for (i = 0; sound_config[i].token != NULL; i++)
-      printf("# %s\n", getFormattedSetupEntry(sound_config[i].token,
-					      sound_config[i].value));
+      Print("# %s\n", getFormattedSetupEntry(sound_config[i].token,
+					     sound_config[i].value));
 
     exit(0);
   }
   else if (strEqual(command, "print musicinfo.conf"))
   {
-    printf("# You can configure additional/alternative music files here.\n");
-    printf("# (The entries below are default and therefore commented out.)\n");
-    printf("\n");
-    printf("%s\n", getFormattedSetupEntry("name", "Classic Music"));
-    printf("\n");
-    printf("%s\n", getFormattedSetupEntry("sort_priority", "100"));
-    printf("\n");
+    Print("# You can configure additional/alternative music files here.\n");
+    Print("# (The entries below are default and therefore commented out.)\n");
+    Print("\n");
+    Print("%s\n", getFormattedSetupEntry("name", "Classic Music"));
+    Print("\n");
+    Print("%s\n", getFormattedSetupEntry("sort_priority", "100"));
+    Print("\n");
 
     for (i = 0; music_config[i].token != NULL; i++)
-      printf("# %s\n", getFormattedSetupEntry(music_config[i].token,
-					      music_config[i].value));
+      Print("# %s\n", getFormattedSetupEntry(music_config[i].token,
+					     music_config[i].value));
 
     exit(0);
   }
   else if (strEqual(command, "print editorsetup.conf"))
   {
-    printf("# You can configure your personal editor element list here.\n");
-    printf("# (The entries below are default and therefore commented out.)\n");
-    printf("\n");
+    Print("# You can configure your personal editor element list here.\n");
+    Print("# (The entries below are default and therefore commented out.)\n");
+    Print("\n");
 
     /* this is needed to be able to check element list for cascade elements */
     InitElementPropertiesStatic();
@@ -4625,30 +4625,30 @@ void Execute_Command(char *command)
   }
   else if (strEqual(command, "print helpanim.conf"))
   {
-    printf("# You can configure different element help animations here.\n");
-    printf("# (The entries below are default and therefore commented out.)\n");
-    printf("\n");
+    Print("# You can configure different element help animations here.\n");
+    Print("# (The entries below are default and therefore commented out.)\n");
+    Print("\n");
 
     for (i = 0; helpanim_config[i].token != NULL; i++)
     {
-      printf("# %s\n", getFormattedSetupEntry(helpanim_config[i].token,
-					      helpanim_config[i].value));
+      Print("# %s\n", getFormattedSetupEntry(helpanim_config[i].token,
+					     helpanim_config[i].value));
 
       if (strEqual(helpanim_config[i].token, "end"))
-	printf("#\n");
+	Print("#\n");
     }
 
     exit(0);
   }
   else if (strEqual(command, "print helptext.conf"))
   {
-    printf("# You can configure different element help text here.\n");
-    printf("# (The entries below are default and therefore commented out.)\n");
-    printf("\n");
+    Print("# You can configure different element help text here.\n");
+    Print("# (The entries below are default and therefore commented out.)\n");
+    Print("\n");
 
     for (i = 0; helptext_config[i].token != NULL; i++)
-      printf("# %s\n", getFormattedSetupEntry(helptext_config[i].token,
-					      helptext_config[i].value));
+      Print("# %s\n", getFormattedSetupEntry(helptext_config[i].token,
+					     helptext_config[i].value));
 
     exit(0);
   }
@@ -4752,7 +4752,7 @@ void Execute_Command(char *command)
     // check if there are any displays available
     if (num_displays < 0)
     {
-      printf("No displays available: %s\n", SDL_GetError());
+      Print("No displays available: %s\n", SDL_GetError());
 
       exit(-1);
     }
@@ -4762,13 +4762,13 @@ void Execute_Command(char *command)
       int num_modes = SDL_GetNumDisplayModes(i);
       int j;
 
-      printf("Available display modes for display %d:\n", i);
+      Print("Available display modes for display %d:\n", i);
 
       // check if there are any display modes available for this display
       if (num_modes < 0)
       {
-	printf("No display modes available for display %d: %s\n",
-	       i, SDL_GetError());
+	Print("No display modes available for display %d: %s\n",
+	      i, SDL_GetError());
 
 	exit(-1);
       }
@@ -4779,13 +4779,13 @@ void Execute_Command(char *command)
 
 	if (SDL_GetDisplayMode(i, j, &mode) < 0)
 	{
-	  printf("Cannot get display mode %d for display %d: %s\n",
-		 j, i, SDL_GetError());
+	  Print("Cannot get display mode %d for display %d: %s\n",
+		j, i, SDL_GetError());
 
 	  exit(-1);
 	}
 
-	printf("- %d x %d\n", mode.w, mode.h);
+	Print("- %d x %d\n", mode.w, mode.h);
       }
     }
 
@@ -4805,7 +4805,7 @@ void Execute_Command(char *command)
     /* check if there are any modes available */
     if (modes == NULL)
     {
-      printf("No modes available!\n");
+      Print("No modes available!\n");
 
       exit(-1);
     }
@@ -4813,14 +4813,14 @@ void Execute_Command(char *command)
     /* check if our resolution is restricted */
     if (modes == (SDL_Rect **)-1)
     {
-      printf("All resolutions available.\n");
+      Print("All resolutions available.\n");
     }
     else
     {
-      printf("Available display modes:\n");
+      Print("Available display modes:\n");
 
       for (i = 0; modes[i]; i++)
-	printf("- %d x %d\n", modes[i]->w, modes[i]->h);
+	Print("- %d x %d\n", modes[i]->w, modes[i]->h);
     }
 
     exit(0);
@@ -5666,7 +5666,7 @@ void DisplayExitMessage(char *format, va_list ap)
   sy += 3 * font_height;
 
   num_lines_printed =
-    DrawTextBuffer(sx, sy, program.error_filename, font_2,
+    DrawTextBuffer(sx, sy, program.log_filename[LOG_ERR_ID], font_2,
 		   line_length, line_length, max_lines,
 		   0, BLIT_ON_BACKGROUND, TRUE, TRUE, FALSE);
 
