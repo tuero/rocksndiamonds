@@ -133,7 +133,8 @@ unsigned int Counter(void);
 void Delay(unsigned int);
 boolean FrameReached(unsigned int *, unsigned int);
 boolean DelayReached(unsigned int *, unsigned int);
-void WaitUntilDelayReached(unsigned int *, unsigned int);
+int WaitUntilDelayReached(unsigned int *, unsigned int);
+void SkipUntilDelayReached(unsigned int *, unsigned int, int *, int);
 
 unsigned int init_random_number(int, int);
 unsigned int get_random_number(int, int);

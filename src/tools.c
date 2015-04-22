@@ -2127,7 +2127,7 @@ void AnimateEnvelope(int envelope_nr, int anim_mode, int action)
   boolean no_delay = (tape.warp_forward);
   unsigned int anim_delay = 0;
   int frame_delay_value = (ffwd_delay ? FfwdFrameDelay : GameFrameDelay);
-  int anim_delay_value = (no_delay ? 0 : frame_delay_value);
+  int anim_delay_value = (no_delay ? 0 : frame_delay_value) / 2;
   int font_nr = FONT_ENVELOPE_1 + envelope_nr;
   int font_width = getFontWidth(font_nr);
   int font_height = getFontHeight(font_nr);
@@ -2139,10 +2139,15 @@ void AnimateEnvelope(int envelope_nr, int anim_mode, int action)
   int yend = (anim_mode != ANIM_DEFAULT ? max_ysize : 0);
   int xstep = (xstart < xend ? 1 : 0);
   int ystep = (ystart < yend || xstep == 0 ? 1 : 0);
-  int x, y;
+  int start = 0;
+  int end = MAX(xend - xstart, yend - ystart);
+  int i;
 
-  for (x = xstart, y = ystart; x <= xend && y <= yend; x += xstep, y += ystep)
+  for (i = start; i <= end; i++)
   {
+    int last_frame = end;	// last frame of this "for" loop
+    int x = xstart + i * xstep;
+    int y = ystart + i * ystep;
     int xsize = (action == ACTION_CLOSING ? xend - (x - xstart) : x) + 2;
     int ysize = (action == ACTION_CLOSING ? yend - (y - ystart) : y) + 2;
     int sx = SX + (SXSIZE - xsize * font_width)  / 2;
@@ -2168,7 +2173,7 @@ void AnimateEnvelope(int envelope_nr, int anim_mode, int action)
     redraw_mask |= REDRAW_FIELD | REDRAW_FROM_BACKBUFFER;
     BackToFront();
 
-    WaitUntilDelayReached(&anim_delay, anim_delay_value / 2);
+    SkipUntilDelayReached(&anim_delay, anim_delay_value, &i, last_frame);
   }
 }
 
@@ -2319,7 +2324,7 @@ void AnimateEnvelopeRequest(int anim_mode, int action)
   boolean ffwd_delay = (tape.playing && tape.fast_forward);
   boolean no_delay = (tape.warp_forward);
   int delay_value = (ffwd_delay ? delay_value_fast : delay_value_normal);
-  int anim_delay_value = (no_delay ? 0 : delay_value + 500 * 0);
+  int anim_delay_value = (no_delay ? 0 : delay_value + 500 * 0) / 2;
   unsigned int anim_delay = 0;
 
   int width = request.width;
@@ -2336,12 +2341,15 @@ void AnimateEnvelopeRequest(int anim_mode, int action)
   int yend = (anim_mode != ANIM_DEFAULT ? max_ysize_inner : 0);
   int xstep = (xstart < xend ? 1 : 0);
   int ystep = (ystart < yend || xstep == 0 ? 1 : 0);
-  int x, y;
+  int start = 0;
+  int end = MAX(xend - xstart, yend - ystart);
+  int i;
 
   if (setup.quick_doors)
   {
     xstart = xend;
     ystart = yend;
+    end = 0;
   }
   else
   {
@@ -2351,8 +2359,11 @@ void AnimateEnvelopeRequest(int anim_mode, int action)
       PlayMenuSoundStereo(SND_DOOR_CLOSING, SOUND_MIDDLE);
   }
 
-  for (x = xstart, y = ystart; x <= xend && y <= yend; x += xstep, y += ystep)
+  for (i = start; i <= end; i++)
   {
+    int last_frame = end;	// last frame of this "for" loop
+    int x = xstart + i * xstep;
+    int y = ystart + i * ystep;
     int xsize = (action == ACTION_CLOSING ? xend - (x - xstart) : x) + 2;
     int ysize = (action == ACTION_CLOSING ? yend - (y - ystart) : y) + 2;
     int sx_center = (request.x != -1 ? request.x : SX + SXSIZE / 2);
@@ -2394,7 +2405,7 @@ void AnimateEnvelopeRequest(int anim_mode, int action)
     DoAnimation();
     BackToFront();
 
-    WaitUntilDelayReached(&anim_delay, anim_delay_value / 2);
+    SkipUntilDelayReached(&anim_delay, anim_delay_value, &i, last_frame);
   }
 }
 
@@ -4207,6 +4218,8 @@ unsigned int MoveDoor(unsigned int door_state)
 
     for (k = start; k < num_move_steps; k++)
     {
+      int last_frame = num_move_steps - 1;	// last frame of this "for" loop
+
       door_part_done_all = TRUE;
 
       for (i = 0; i < NUM_DOORS; i++)
@@ -4365,7 +4378,7 @@ unsigned int MoveDoor(unsigned int door_state)
 	if (game_status == GAME_MODE_MAIN)
 	  DoAnimation();
 
-	WaitUntilDelayReached(&door_delay, door_delay_value);
+	SkipUntilDelayReached(&door_delay, door_delay_value, &k, last_frame);
 
 	current_move_delay += max_step_delay;
       }

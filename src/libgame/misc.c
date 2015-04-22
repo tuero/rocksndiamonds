@@ -362,7 +362,7 @@ static void sleep_milliseconds(unsigned int milliseconds_delay)
   if (do_busy_waiting)
   {
     /* we want to wait only a few ms -- if we assume that we have a
-       kernel timer resolution of 10 ms, we would wait far to long;
+       kernel timer resolution of 10 ms, we would wait far too long;
        therefore it's better to do a short interval of busy waiting
        to get our sleeping time more accurate */
 
@@ -411,9 +411,10 @@ boolean DelayReached(unsigned int *counter_var,
   return TRUE;
 }
 
-void WaitUntilDelayReached(unsigned int *counter_var, unsigned int delay)
+int WaitUntilDelayReached(unsigned int *counter_var, unsigned int delay)
 {
   unsigned int actual_counter;
+  int skip_frames = 0;
 
   while (1)
   {
@@ -426,7 +427,53 @@ void WaitUntilDelayReached(unsigned int *counter_var, unsigned int delay)
       break;
   }
 
+  if (*counter_var != 0 && actual_counter >= *counter_var + delay)
+  {
+    int lag = actual_counter - (*counter_var + delay);
+    int delay2 = (delay + 1) / 2;
+
+    if (lag >= delay2)
+      skip_frames = (lag + delay2) / delay;
+  }
+
   *counter_var = actual_counter;
+
+  return skip_frames;
+}
+
+void SkipUntilDelayReached(unsigned int *counter_var, unsigned int delay,
+			   int *loop_var, int last_loop_value)
+{
+  int skip_frames = WaitUntilDelayReached(counter_var, delay);
+
+#if 0
+#if DEBUG
+  printf("::: %d: %d ms", *loop_var, delay);
+  if (skip_frames)
+    printf(" -> SKIP %d FRAME(S) [%d ms]", skip_frames, skip_frames * delay);
+  printf("\n");
+#endif
+#endif
+
+  if (skip_frames == 0)
+    return;
+
+  // when skipping frames, make sure to never skip the last frame, as
+  // this may be needed for animations to reach a defined end state;
+  // furthermore, we assume that this function is called at the end
+  // of a "for" loop, which continues by incrementing the loop variable
+  // by one before checking the loop condition again; therefore we have
+  // to check against the last loop value minus one here
+
+  last_loop_value--;
+
+  if (*loop_var < last_loop_value)	// never skip the last frame
+  {
+    *loop_var += skip_frames;
+
+    if (*loop_var > last_loop_value)	// never skip the last frame
+      *loop_var = last_loop_value;
+  }
 }
 
 
