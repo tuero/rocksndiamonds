@@ -4433,6 +4433,9 @@ void GameEnd()
   {
     game_status = GAME_MODE_SCORES;
 
+    /* needed if different viewport properties defined for scores */
+    ChangeViewportPropertiesIfNeeded();
+
     DrawHallOfFame(hi_pos);
 
     if (raise_level)
