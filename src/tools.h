@@ -16,7 +16,7 @@
 #include "game.h"
 
 /* for SetDrawtoField */
-#define DRAW_BUFFERED		1
+#define DRAW_FIELDBUFFER	1
 #define DRAW_BACKBUFFER		2
 
 /* for DrawElementShifted */

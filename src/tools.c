@@ -233,7 +233,7 @@ void DumpTile(int x, int y)
 
 void SetDrawtoField(int mode)
 {
-  if (mode == DRAW_BUFFERED && setup.soft_scrolling)
+  if (mode == DRAW_FIELDBUFFER && setup.soft_scrolling)
   {
     FX = 2 * TILEX_VAR;
     FY = 2 * TILEY_VAR;
@@ -954,7 +954,7 @@ void ClearField()
   if (setup.soft_scrolling && game_status == GAME_MODE_PLAYING)
   {
     ClearRectangle(fieldbuffer, 0, 0, FXSIZE, FYSIZE);
-    SetDrawtoField(DRAW_BUFFERED);
+    SetDrawtoField(DRAW_FIELDBUFFER);
   }
   else
     SetDrawtoField(DRAW_BACKBUFFER);
@@ -2154,7 +2154,7 @@ void AnimateEnvelope(int envelope_nr, int anim_mode, int action)
     int sy = SY + (SYSIZE - ysize * font_height) / 2;
     int xx, yy;
 
-    SetDrawtoField(DRAW_BUFFERED);
+    SetDrawtoField(DRAW_FIELDBUFFER);
 
     BlitScreenToBitmap(backbuffer);
 
@@ -2215,7 +2215,7 @@ void ShowEnvelope(int envelope_nr)
 
   game.envelope_active = FALSE;
 
-  SetDrawtoField(DRAW_BUFFERED);
+  SetDrawtoField(DRAW_FIELDBUFFER);
 
   redraw_mask |= REDRAW_FIELD;
   BackToFront();
@@ -2467,7 +2467,6 @@ void ShowEnvelopeRequest(char *text, unsigned int req_state, int action)
       AnimateEnvelopeRequest(ANIM_DEFAULT, ACTION_OPENING);
 
     AnimateEnvelopeRequest(main_anim_mode, ACTION_OPENING);
-
   }
   else
   {
@@ -2504,7 +2503,7 @@ void ShowEnvelopeRequest(char *text, unsigned int req_state, int action)
   if (action == ACTION_CLOSING &&
       game_status == GAME_MODE_PLAYING &&
       level.game_engine_type == GAME_ENGINE_TYPE_RND)
-    SetDrawtoField(DRAW_BUFFERED);
+    SetDrawtoField(DRAW_FIELDBUFFER);
 }
 
 void DrawPreviewElement(int dst_x, int dst_y, int element, int tilesize)
