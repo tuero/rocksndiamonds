@@ -239,65 +239,14 @@ void BlitScreenToBitmap_SP(Bitmap *target_bitmap)
 
 void BackToFront_SP(void)
 {
-  static int scroll_x_last = -1, scroll_y_last = -1;
-  static boolean scrolling_last = FALSE;
-  static boolean ExplosionShakeMurphy_last = -1;
-  boolean scrolling = (mScrollX != scroll_x_last || mScrollY != scroll_y_last);
   int x, y;
 
-  if (0 ||
-      redraw_tiles > REDRAWTILES_THRESHOLD || scrolling || scrolling_last ||
-      ExplosionShakeMurphy != 0 || ExplosionShakeMurphy_last != 0)
-  {
-    BlitScreenToBitmap_SP(window);
-  }
-  else
-  {
-    int scroll_xoffset = mScrollX - mScrollX_last + game_sp.scroll_xoffset;
-    int scroll_yoffset = mScrollY - mScrollY_last + game_sp.scroll_yoffset;
-    int x1 = 0, x2 = SCR_FIELDX - (scroll_xoffset != 0 ? 0 : 1);
-    int y1 = 0, y2 = SCR_FIELDY - (scroll_yoffset != 0 ? 0 : 1);
-    int full_xsize = (FieldWidth  - (menBorder ? 0 : 1)) * TILEX_VAR;
-    int full_ysize = (FieldHeight - (menBorder ? 0 : 1)) * TILEY_VAR;
-    int xsize = SXSIZE;
-    int ysize = SYSIZE;
-    int sxsize = (full_xsize < xsize ? full_xsize : xsize);
-    int sysize = (full_ysize < ysize ? full_ysize : ysize);
-    int sx = SX + (full_xsize < xsize ? (xsize - full_xsize) / 2 : 0);
-    int sy = SY + (full_ysize < ysize ? (ysize - full_ysize) / 2 : 0);
-
-    InitGfxClipRegion(TRUE, sx, sy, sxsize, sysize);
-
-    scroll_xoffset = scroll_xoffset * TILESIZE_VAR / TILESIZE;
-    scroll_yoffset = scroll_yoffset * TILESIZE_VAR / TILESIZE;
-
-    for (x = x1; x <= x2; x++)
-    {
-      for (y = y1; y <= y2; y++)
-      {
-	int xx = 2 + x;
-	int yy = 2 + y;
-
-	if (redraw[xx][yy])
-	  BlitBitmap(bitmap_db_field_sp, window,
-		     xx * TILEX_VAR, yy * TILEY_VAR, TILEX_VAR, TILEY_VAR,
-		     sx + x * TILEX_VAR - scroll_xoffset,
-		     sy + y * TILEY_VAR - scroll_yoffset);
-      }
-    }
-
-    InitGfxClipRegion(FALSE, -1, -1, -1, -1);
-  }
+  BlitScreenToBitmap_SP(window);
 
   for (x = 0; x < 2 + MAX_PLAYFIELD_WIDTH + 2; x++)
     for (y = 0; y < 2 + MAX_PLAYFIELD_HEIGHT + 2; y++)
       redraw[x][y] = FALSE;
   redraw_tiles = 0;
-
-  scroll_x_last = mScrollX;
-  scroll_y_last = mScrollY;
-  scrolling_last = scrolling;
-  ExplosionShakeMurphy_last = ExplosionShakeMurphy;
 }
 
 void DDScrollBuffer_ScrollTo(int X, int Y)

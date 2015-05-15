@@ -97,68 +97,18 @@ void BlitScreenToBitmap_EM(Bitmap *target_bitmap)
 
 void BackToFront_EM(void)
 {
-  static int screen_x_last = -1, screen_y_last = -1;
-  static boolean scrolling_last = FALSE;
-  int left = screen_x / TILEX;
-  int top  = screen_y / TILEY;
-  boolean scrolling = (screen_x != screen_x_last || screen_y != screen_y_last);
   int x, y;
 
-  if (redraw_tiles > REDRAWTILES_THRESHOLD || scrolling || scrolling_last)
-  {
-    /* blit all (up to four) parts of the scroll buffer to the backbuffer */
-    BlitScreenToBitmap_EM(backbuffer);
+  /* blit all (up to four) parts of the scroll buffer to the backbuffer */
+  BlitScreenToBitmap_EM(backbuffer);
 
-    /* blit the completely updated backbuffer to the window (in one blit) */
-    BlitBitmap(backbuffer, window, SX, SY, SXSIZE, SYSIZE, SX, SY);
-  }
-  else
-  {
-    boolean half_shifted_x = (screen_x % TILEX != 0);
-    boolean half_shifted_y = (screen_y % TILEY != 0);
-
-    int sx, sy;
-    int xsize = SXSIZE;
-    int ysize = SYSIZE;
-    int full_xsize = lev.width  * TILEX;
-    int full_ysize = lev.height * TILEY;
-
-    sx = SX + (full_xsize < xsize ? (xsize - full_xsize) / 2 : 0);
-    sy = SY + (full_ysize < ysize ? (ysize - full_ysize) / 2 : 0);
-
-    int x1 = 0, x2 = SCR_FIELDX - (half_shifted_x ? 0 : 1);
-    int y1 = 0, y2 = SCR_FIELDY - (half_shifted_y ? 0 : 1);
-    int scroll_xoffset = (half_shifted_x ? TILEX / 2 : 0);
-    int scroll_yoffset = (half_shifted_y ? TILEY / 2 : 0);
-
-    InitGfxClipRegion(TRUE, SX, SY, SXSIZE, SYSIZE);
-
-    for (x = x1; x <= x2; x++)
-    {
-      for (y = y1; y <= y2; y++)
-      {
-	int xx = (left + x) % MAX_BUF_XSIZE;
-	int yy = (top  + y) % MAX_BUF_YSIZE;
-
-	if (redraw[xx][yy])
-	  BlitBitmap(screenBitmap, window,
-		     xx * TILEX, yy * TILEY, TILEX, TILEY,
-		     sx + x * TILEX - scroll_xoffset,
-		     sy + y * TILEY - scroll_yoffset);
-      }
-    }
-
-    InitGfxClipRegion(FALSE, -1, -1, -1, -1);
-  }
+  /* blit the completely updated backbuffer to the window (in one blit) */
+  BlitBitmap(backbuffer, window, SX, SY, SXSIZE, SYSIZE, SX, SY);
 
   for (x = 0; x < MAX_BUF_XSIZE; x++)
     for (y = 0; y < MAX_BUF_YSIZE; y++)
       redraw[x][y] = FALSE;
   redraw_tiles = 0;
-
-  screen_x_last = screen_x;
-  screen_y_last = screen_y;
-  scrolling_last = scrolling;
 }
 
 void blitscreen(void)

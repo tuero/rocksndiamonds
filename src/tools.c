@@ -448,17 +448,9 @@ void BackToFront()
   int x, y;
   DrawBuffer *buffer = (drawto_field == window ? backbuffer : drawto_field);
 
-  if (redraw_mask & REDRAW_TILES && redraw_tiles > REDRAWTILES_THRESHOLD)
-    redraw_mask |= REDRAW_FIELD;
-
-#if 0
   // never redraw single tiles, always redraw the whole field
-  // (redrawing single tiles up to a certain threshold was faster on old,
-  // now legacy graphics, but slows things down on modern graphics now)
-  // UPDATE: this is now globally defined by value of REDRAWTILES_THRESHOLD
   if (redraw_mask & REDRAW_TILES)
     redraw_mask |= REDRAW_FIELD;
-#endif
 
 #if 0
   /* !!! TEST ONLY !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
@@ -583,70 +575,6 @@ void BackToFront()
 	       SX, SY + 10 * TILEY);
 
     redraw_mask &= ~REDRAW_MICROLEVEL;
-  }
-
-  if (redraw_mask & REDRAW_TILES)
-  {
-    int sx = SX;
-    int sy = SY;
-
-    int dx = 0, dy = 0;
-    int dx_var = dx * TILESIZE_VAR / TILESIZE;
-    int dy_var = dy * TILESIZE_VAR / TILESIZE;
-    int ffx, ffy;
-    int fx = FX, fy = FY;
-
-    int scr_fieldx = SCR_FIELDX + (EVEN(SCR_FIELDX) ? 2 : 0);
-    int scr_fieldy = SCR_FIELDY + (EVEN(SCR_FIELDY) ? 2 : 0);
-
-    InitGfxClipRegion(TRUE, SX, SY, SXSIZE, SYSIZE);
-
-    ffx = (scroll_x - SBX_Left)  * TILEX_VAR + dx_var;
-    ffy = (scroll_y - SBY_Upper) * TILEY_VAR + dy_var;
-
-    if (EVEN(SCR_FIELDX))
-    {
-      if (ffx < SBX_Right * TILEX_VAR + TILEX_VAR / 2 + TILEX_VAR)
-      {
-	fx += dx_var - MIN(ffx, TILEX_VAR / 2) + TILEX_VAR;
-
-	if (fx % TILEX_VAR)
-	  sx -= TILEX_VAR / 2;
-	else
-	  sx -= TILEX_VAR;
-      }
-      else
-      {
-	fx += (dx_var > 0 ? TILEX_VAR : 0);
-      }
-    }
-
-    if (EVEN(SCR_FIELDY))
-    {
-      if (ffy < SBY_Lower * TILEY_VAR + TILEY_VAR / 2 + TILEY_VAR)
-      {
-	fy += dy_var - MIN(ffy, TILEY_VAR / 2) + TILEY_VAR;
-
-	if (fy % TILEY_VAR)
-	  sy -= TILEY_VAR / 2;
-	else
-	  sy -= TILEY_VAR;
-      }
-      else
-      {
-	fy += (dy_var > 0 ? TILEY_VAR : 0);
-      }
-    }
-
-    for (x = 0; x < scr_fieldx; x++)
-      for (y = 0 ; y < scr_fieldy; y++)
-	if (redraw[redraw_x1 + x][redraw_y1 + y])
-	  BlitBitmap(buffer, window,
-		     FX + x * TILEX_VAR, FY + y * TILEY_VAR,
-		     TILEX_VAR, TILEY_VAR,
-		     sx + x * TILEX_VAR, sy + y * TILEY_VAR);
-
-    InitGfxClipRegion(FALSE, -1, -1, -1, -1);
   }
 
   if (redraw_mask & REDRAW_FPS)		/* display frames per second */

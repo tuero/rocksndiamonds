@@ -311,11 +311,6 @@
 				 REDRAW_MICROLEVEL)
 #define REDRAW_FPS		(1 << 11)
 
-/* on modern graphics systems and when using the SDL target, the old tile redraw
-   optimization can slow things down a lot due to many small blits compared to
-   one single playfield-sized blit (especially observed on Mac OS X with SDL) */
-#define REDRAWTILES_THRESHOLD	0
-
 #define IN_GFX_FIELD_PLAY(x, y)	(x >= gfx.sx && x < gfx.sx + gfx.sxsize && \
 				 y >= gfx.sy && y < gfx.sy + gfx.sysize)
 #define IN_GFX_FIELD_FULL(x, y)	(x >= gfx.real_sx && \
