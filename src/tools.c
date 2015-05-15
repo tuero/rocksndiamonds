@@ -3301,9 +3301,6 @@ static int RequestHandleEvents(unsigned int req_state)
 	  {
 	    if (event.type == EVENT_MOTIONNOTIFY)
 	    {
-	      if (!PointerInWindow(window))
-		continue;	/* window and pointer on different screens */
-
 	      if (!button_status)
 		continue;
 

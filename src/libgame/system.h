@@ -1354,7 +1354,6 @@ Pixel GetPixelFromRGBcompact(Bitmap *, unsigned int);
 
 void KeyboardAutoRepeatOn(void);
 void KeyboardAutoRepeatOff(void);
-boolean PointerInWindow(DrawWindow *);
 boolean SetVideoMode(boolean);
 boolean ChangeVideoModeIfNeeded(boolean);
 

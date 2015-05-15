@@ -800,11 +800,6 @@ void KeyboardAutoRepeatOff(void)
 #endif
 }
 
-boolean PointerInWindow(DrawWindow *window)
-{
-  return TRUE;
-}
-
 boolean SetVideoMode(boolean fullscreen)
 {
   return SDLSetVideoMode(&backbuffer, fullscreen);

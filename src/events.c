@@ -407,9 +407,6 @@ void HandleButtonEvent(ButtonEvent *event)
 
 void HandleMotionEvent(MotionEvent *event)
 {
-  if (!PointerInWindow(window))
-    return;	/* window and pointer are on different screens */
-
   if (button_status == MB_RELEASED && game_status != GAME_MODE_EDITOR)
     return;
 
