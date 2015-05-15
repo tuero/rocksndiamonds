@@ -3454,7 +3454,7 @@ static void drawChooseTreeInfo(int entry_pos, TreeInfo *ti)
 		      node->class_desc);
 
   /* let BackToFront() redraw only what is needed */
-  redraw_mask = last_redraw_mask | REDRAW_TILES;
+  redraw_mask = last_redraw_mask;
   for (x = 0; x < SCR_FIELDX; x++)
     MarkTileDirty(x, 1);
 }

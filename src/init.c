@@ -5198,17 +5198,11 @@ void RedrawGlobalBorder()
 
 void InitGfxBackground()
 {
-  int x, y;
-
   fieldbuffer = bitmap_db_field;
   SetDrawtoField(DRAW_BACKBUFFER);
 
   ClearRectangle(backbuffer, 0, 0, WIN_XSIZE, WIN_YSIZE);
 
-  for (x = 0; x < MAX_BUF_XSIZE; x++)
-    for (y = 0; y < MAX_BUF_YSIZE; y++)
-      redraw[x][y] = 0;
-  redraw_tiles = 0;
   redraw_mask = REDRAW_ALL;
 }
 

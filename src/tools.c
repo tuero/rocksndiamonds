@@ -241,8 +241,6 @@ void SetDrawtoField(int mode)
     BY1 = -2;
     BX2 = SCR_FIELDX + 1;
     BY2 = SCR_FIELDY + 1;
-    redraw_x1 = 2;
-    redraw_y1 = 2;
 
     drawto_field = fieldbuffer;
   }
@@ -254,8 +252,6 @@ void SetDrawtoField(int mode)
     BY1 = 0;
     BX2 = SCR_FIELDX - 1;
     BY2 = SCR_FIELDY - 1;
-    redraw_x1 = 0;
-    redraw_y1 = 0;
 
     drawto_field = backbuffer;
   }
@@ -445,12 +441,7 @@ void BlitScreenToBitmap(Bitmap *target_bitmap)
 
 void BackToFront()
 {
-  int x, y;
   DrawBuffer *buffer = (drawto_field == window ? backbuffer : drawto_field);
-
-  // never redraw single tiles, always redraw the whole field
-  if (redraw_mask & REDRAW_TILES)
-    redraw_mask |= REDRAW_FIELD;
 
 #if 0
   /* !!! TEST ONLY !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
@@ -458,9 +449,6 @@ void BackToFront()
   if (game_status == GAME_MODE_PLAYING)
     redraw_mask |= REDRAW_FIELD;
 #endif
-
-  if (redraw_mask & REDRAW_FIELD)
-    redraw_mask &= ~REDRAW_TILES;
 
   if (redraw_mask == REDRAW_NONE)
     return;
@@ -471,8 +459,6 @@ void BackToFront()
     printf("[REDRAW_ALL]");
   if (redraw_mask & REDRAW_FIELD)
     printf("[REDRAW_FIELD]");
-  if (redraw_mask & REDRAW_TILES)
-    printf("[REDRAW_TILES]");
   if (redraw_mask & REDRAW_DOOR_1)
     printf("[REDRAW_DOOR_1]");
   if (redraw_mask & REDRAW_DOOR_2)
@@ -481,11 +467,6 @@ void BackToFront()
     printf("[REDRAW_FROM_BACKBUFFER]");
   printf(" [%d]\n", FrameCounter);
 #endif
-
-  if (redraw_mask & REDRAW_TILES &&
-      game_status == GAME_MODE_PLAYING &&
-      border.draw_masked[GAME_MODE_PLAYING])
-    redraw_mask |= REDRAW_FIELD;
 
   if (global.fps_slowdown && game_status == GAME_MODE_PLAYING)
   {
@@ -591,10 +572,6 @@ void BackToFront()
     DrawTextExt(window, SX + SXSIZE + SX, 0, text, FONT_TEXT_2, BLIT_OPAQUE);
   }
 
-  for (x = 0; x < MAX_BUF_XSIZE; x++)
-    for (y = 0; y < MAX_BUF_YSIZE; y++)
-      redraw[x][y] = 0;
-  redraw_tiles = 0;
   redraw_mask = REDRAW_NONE;
 }
 
@@ -890,14 +867,7 @@ void ClearField()
 
 void MarkTileDirty(int x, int y)
 {
-  int xx = redraw_x1 + x;
-  int yy = redraw_y1 + y;
-
-  if (!redraw[xx][yy])
-    redraw_tiles++;
-
-  redraw[xx][yy] = TRUE;
-  redraw_mask |= REDRAW_TILES;
+  redraw_mask |= REDRAW_FIELD;
 }
 
 void SetBorderElement()

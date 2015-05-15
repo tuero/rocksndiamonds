@@ -36,7 +36,6 @@ int screen_x, screen_y;			/* current scroll position */
 /* tiles currently on screen */
 static int screentiles[MAX_PLAYFIELD_HEIGHT + 2][MAX_PLAYFIELD_WIDTH + 2];
 static int crumbled_state[MAX_PLAYFIELD_HEIGHT + 2][MAX_PLAYFIELD_WIDTH + 2];
-static boolean redraw[MAX_PLAYFIELD_WIDTH + 2][MAX_PLAYFIELD_HEIGHT + 2];
 
 /* copy the entire screen to the window at the scroll position */
 
@@ -97,18 +96,11 @@ void BlitScreenToBitmap_EM(Bitmap *target_bitmap)
 
 void BackToFront_EM(void)
 {
-  int x, y;
-
   /* blit all (up to four) parts of the scroll buffer to the backbuffer */
   BlitScreenToBitmap_EM(backbuffer);
 
   /* blit the completely updated backbuffer to the window (in one blit) */
   BlitBitmap(backbuffer, window, SX, SY, SXSIZE, SYSIZE, SX, SY);
-
-  for (x = 0; x < MAX_BUF_XSIZE; x++)
-    for (y = 0; y < MAX_BUF_YSIZE; y++)
-      redraw[x][y] = FALSE;
-  redraw_tiles = 0;
 }
 
 void blitscreen(void)
@@ -356,9 +348,6 @@ static void animscreen(void)
 
 	screentiles[sy][sx] = obj;
 	crumbled_state[sy][sx] = crm;
-
-	redraw[sx][sy] = TRUE;
-	redraw_tiles++;
       }
     }
   }
@@ -429,11 +418,6 @@ static void blitplayer(struct PLAYER *ply)
     /* redraw screen tiles in the next frame (player may have left the tiles) */
     screentiles[old_sy][old_sx] = -1;
     screentiles[new_sy][new_sx] = -1;
-
-    /* mark screen tiles as dirty (force screen refresh with changed content) */
-    redraw[old_sx][old_sy] = TRUE;
-    redraw[new_sx][new_sy] = TRUE;
-    redraw_tiles += 2;
   }
 }
 

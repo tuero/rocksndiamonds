@@ -1291,7 +1291,6 @@ extern boolean			keyrepeat_status;
 #endif
 
 extern int			redraw_mask;
-extern int			redraw_tiles;
 
 extern int			FrameCounter;
 

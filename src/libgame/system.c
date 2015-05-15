@@ -55,7 +55,6 @@ boolean			keyrepeat_status = TRUE;
 #endif
 
 int			redraw_mask = REDRAW_NONE;
-int			redraw_tiles = 0;
 
 int			FrameCounter = 0;
 

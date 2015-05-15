@@ -11,7 +11,6 @@ int mScrollX, mScrollY;
 int mScrollX_last, mScrollY_last;
 
 int ScreenBuffer[2 + MAX_PLAYFIELD_WIDTH + 2][2 + MAX_PLAYFIELD_HEIGHT + 2];
-boolean redraw[2 + MAX_PLAYFIELD_WIDTH + 2][2 + MAX_PLAYFIELD_HEIGHT + 2];
 
 
 void RestorePlayfield()
@@ -52,12 +51,6 @@ static void ScrollPlayfield(int dx, int dy)
              (MAX_BUF_YSIZE * TILEY_VAR) - TILEY_VAR * (dy != 0),
              TILEX_VAR * (dx == 1),
              TILEY_VAR * (dy == 1));
-
-  /* when scrolling the whole playfield, do not redraw single tiles */
-  for (x = 0; x < 2 + MAX_PLAYFIELD_WIDTH + 2; x++)
-    for (y = 0; y < 2 + MAX_PLAYFIELD_HEIGHT + 2; y++)
-      redraw[x][y] = FALSE;
-  redraw_tiles = 0;
 
   DrawFrameIfNeeded();
 
@@ -239,14 +232,7 @@ void BlitScreenToBitmap_SP(Bitmap *target_bitmap)
 
 void BackToFront_SP(void)
 {
-  int x, y;
-
   BlitScreenToBitmap_SP(window);
-
-  for (x = 0; x < 2 + MAX_PLAYFIELD_WIDTH + 2; x++)
-    for (y = 0; y < 2 + MAX_PLAYFIELD_HEIGHT + 2; y++)
-      redraw[x][y] = FALSE;
-  redraw_tiles = 0;
 }
 
 void DDScrollBuffer_ScrollTo(int X, int Y)

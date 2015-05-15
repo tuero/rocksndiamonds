@@ -41,9 +41,6 @@ SDL_Thread	       *server_thread;
 
 int			key_joystick_mapping = 0;
 
-boolean			redraw[2 + MAX_LEV_FIELDX + 2][2 + MAX_LEV_FIELDY + 2];
-int			redraw_x1 = 0, redraw_y1 = 0;
-
 short			Feld[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 short			MovPos[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 short			MovDir[MAX_LEV_FIELDX][MAX_LEV_FIELDY];

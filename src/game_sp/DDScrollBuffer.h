@@ -11,10 +11,6 @@
 extern int mScrollX, mScrollY;
 extern int mScrollX_last, mScrollY_last;
 
-extern boolean redraw[2 + MAX_PLAYFIELD_WIDTH + 2][2 + MAX_PLAYFIELD_HEIGHT + 2];
-
-extern int TEST_flag;
-
 
 extern void InitScrollPlayfield();
 extern void UpdatePlayfield(boolean);

@@ -2885,9 +2885,6 @@ extern SDL_Thread	       *server_thread;
 
 extern int			key_joystick_mapping;
 
-extern boolean			redraw[2 + MAX_LEV_FIELDX + 2][2 + MAX_LEV_FIELDY + 2];
-extern int			redraw_x1, redraw_y1;
-
 extern short			Feld[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short			MovPos[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short			MovDir[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
