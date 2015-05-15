@@ -233,7 +233,7 @@ void DumpTile(int x, int y)
 
 void SetDrawtoField(int mode)
 {
-  if (mode == DRAW_FIELDBUFFER && setup.soft_scrolling)
+  if (mode == DRAW_FIELDBUFFER)
   {
     FX = 2 * TILEX_VAR;
     FY = 2 * TILEY_VAR;
@@ -951,7 +951,7 @@ void ClearField()
   DrawBackground(REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE);
 
   /* !!! maybe this should be done before clearing the background !!! */
-  if (setup.soft_scrolling && game_status == GAME_MODE_PLAYING)
+  if (game_status == GAME_MODE_PLAYING)
   {
     ClearRectangle(fieldbuffer, 0, 0, FXSIZE, FYSIZE);
     SetDrawtoField(DRAW_FIELDBUFFER);
@@ -3148,9 +3148,6 @@ void DrawPlayer(struct PlayerInfo *player)
       syy = player->GfxPos;
   }
 
-  if (!setup.soft_scrolling && ScreenMovPos)
-    sxx = syy = 0;
-
   if (player_is_opaque)
     DrawGraphicShifted(sx, sy, sxx, syy, graphic, frame,NO_CUTTING,NO_MASKING);
   else
@@ -3255,9 +3252,6 @@ void DrawPlayer(struct PlayerInfo *player)
     else
       syy = player->GfxPos;
   }
-
-  if (!setup.soft_scrolling && ScreenMovPos)
-    sxx = syy = 0;
 
   if (player_is_opaque)
     DrawGraphicShifted(sx, sy, sxx, syy, graphic, frame,NO_CUTTING,NO_MASKING);

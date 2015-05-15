@@ -11805,16 +11805,16 @@ static boolean AllPlayersInVisibleScreen()
 
 void ScrollLevel(int dx, int dy)
 {
-  int softscroll_offset = (setup.soft_scrolling ? 2 * TILEX_VAR : 0);
+  int scroll_offset = 2 * TILEX_VAR;
   int x, y;
 
   BlitBitmap(drawto_field, drawto_field,
-	     FX + TILEX_VAR * (dx == -1) - softscroll_offset,
-	     FY + TILEY_VAR * (dy == -1) - softscroll_offset,
-	     SXSIZE - TILEX_VAR * (dx != 0) + 2 * softscroll_offset,
-	     SYSIZE - TILEY_VAR * (dy != 0) + 2 * softscroll_offset,
-	     FX + TILEX_VAR * (dx == 1) - softscroll_offset,
-	     FY + TILEY_VAR * (dy == 1) - softscroll_offset);
+	     FX + TILEX_VAR * (dx == -1) - scroll_offset,
+	     FY + TILEY_VAR * (dy == -1) - scroll_offset,
+	     SXSIZE - TILEX_VAR * (dx != 0) + 2 * scroll_offset,
+	     SYSIZE - TILEY_VAR * (dy != 0) + 2 * scroll_offset,
+	     FX + TILEX_VAR * (dx == 1) - scroll_offset,
+	     FY + TILEY_VAR * (dy == 1) - scroll_offset);
 
   if (dx != 0)
   {
