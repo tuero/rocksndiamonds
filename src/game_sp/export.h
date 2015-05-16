@@ -187,7 +187,6 @@ extern void copyInternalEngineVars_SP();
 extern boolean LoadNativeLevel_SP(char *, int, boolean);
 extern void SaveNativeLevel_SP(char *);
 
-extern void BackToFront_SP(void);
 extern void BlitScreenToBitmap_SP(Bitmap *);
 extern void RedrawPlayfield_SP(boolean);
 

@@ -197,10 +197,10 @@ void UpdatePlayfield(boolean force_redraw)
 #endif
 }
 
-/* copy the entire screen to the window at the scroll position */
-
 void BlitScreenToBitmap_SP(Bitmap *target_bitmap)
 {
+  /* copy playfield buffer to target bitmap at scroll position */
+
   int px = 2 * TILEX + (mScrollX - mScrollX_last) % TILEX;
   int py = 2 * TILEY + (mScrollY - mScrollY_last) % TILEY;
   int sx, sy, sxsize, sysize;
@@ -228,11 +228,6 @@ void BlitScreenToBitmap_SP(Bitmap *target_bitmap)
   py = py * TILESIZE_VAR / TILESIZE;
 
   BlitBitmap(bitmap_db_field_sp, target_bitmap, px, py, sxsize, sysize, sx, sy);
-}
-
-void BackToFront_SP(void)
-{
-  BlitScreenToBitmap_SP(window);
 }
 
 void DDScrollBuffer_ScrollTo(int X, int Y)
