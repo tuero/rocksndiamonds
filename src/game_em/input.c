@@ -63,7 +63,8 @@ void InitGameEngine_EM()
   prepare_em_level();
 
   game_initscreen();
-  game_animscreen();
+
+  RedrawPlayfield_EM(FALSE);
 }
 
 void UpdateGameDoorValues_EM()
@@ -108,9 +109,10 @@ void GameActions_EM(byte action[MAX_PLAYERS], boolean warp_mode)
   CheckSingleStepMode_EM(action, frame, game_em.any_player_moving,
 			 game_em.any_player_snapping, any_player_dropping);
 
-  game_animscreen();
+  RedrawPlayfield_EM(FALSE);
 
-  blitscreen();
+  BlitScreenToBitmap_EM(backbuffer);
+  BackToFront_EM();
 }
 
 /* read input device for players */

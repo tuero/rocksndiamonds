@@ -37,10 +37,10 @@ int screen_x, screen_y;			/* current scroll position */
 static int screentiles[MAX_PLAYFIELD_HEIGHT + 2][MAX_PLAYFIELD_WIDTH + 2];
 static int crumbled_state[MAX_PLAYFIELD_HEIGHT + 2][MAX_PLAYFIELD_WIDTH + 2];
 
-/* copy the entire screen to the window at the scroll position */
-
 void BlitScreenToBitmap_EM(Bitmap *target_bitmap)
 {
+  /* blit all (up to four) parts of the scroll buffer to the target bitmap */
+
   int x = screen_x % (MAX_BUF_XSIZE * TILEX);
   int y = screen_y % (MAX_BUF_YSIZE * TILEY);
   int sx, sy, sxsize, sysize;
@@ -96,16 +96,7 @@ void BlitScreenToBitmap_EM(Bitmap *target_bitmap)
 
 void BackToFront_EM(void)
 {
-  /* blit all (up to four) parts of the scroll buffer to the backbuffer */
-  BlitScreenToBitmap_EM(backbuffer);
-
-  /* blit the completely updated backbuffer to the window (in one blit) */
   BlitBitmap(backbuffer, window, SX, SY, SXSIZE, SYSIZE, SX, SY);
-}
-
-void blitscreen(void)
-{
-  BackToFront_EM();
 }
 
 static struct GraphicInfo_EM *getObjectGraphic(int x, int y)
@@ -661,7 +652,8 @@ void RedrawPlayfield_EM(boolean force_redraw)
       for (i = 0; i < MAX_PLAYERS; i++)
 	blitplayer(&ply[i]);
 
-      blitscreen();
+      BlitScreenToBitmap_EM(backbuffer);
+      BackToFront_EM();
 
       Delay(wait_delay_value);
 
@@ -674,7 +666,8 @@ void RedrawPlayfield_EM(boolean force_redraw)
       for (i = 0; i < MAX_PLAYERS; i++)
 	blitplayer(&ply[i]);
 
-      blitscreen();
+      BlitScreenToBitmap_EM(backbuffer);
+      BackToFront_EM();
 
       Delay(wait_delay_value);
     }
@@ -762,9 +755,4 @@ void RedrawPlayfield_EM(boolean force_redraw)
 
   for (i = 0; i < MAX_PLAYERS; i++)
     blitplayer(&ply[i]);
-}
-
-void game_animscreen(void)
-{
-  RedrawPlayfield_EM(FALSE);
 }

@@ -27,9 +27,7 @@ void close_all(void);
 void readjoy(byte, struct PLAYER *);
 void input_eventloop(void);
 
-void blitscreen(void);
 void game_initscreen(void);
-void game_animscreen(void);
 
 void play_sound(int, int, int);
 void sound_play(void);
