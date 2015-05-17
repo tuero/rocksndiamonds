@@ -356,7 +356,6 @@ void DrawMaskedBorder(int redraw_mask)
 
 void BlitScreenToBitmap_RND(Bitmap *target_bitmap)
 {
-  DrawBuffer *buffer = (drawto_field == window ? backbuffer : drawto_field);
   int fx = FX, fy = FY;
   int full_lev_fieldx = lev_fieldx + (BorderElement != EL_EMPTY ? 2 : 0);
   int full_lev_fieldy = lev_fieldy + (BorderElement != EL_EMPTY ? 2 : 0);
@@ -410,7 +409,7 @@ void BlitScreenToBitmap_RND(Bitmap *target_bitmap)
       fy = 2 * TILEY_VAR - (EVEN(lev_fieldy) ? TILEY_VAR / 2 : 0);
   }
 
-  BlitBitmap(buffer, target_bitmap, fx, fy, SXSIZE, SYSIZE, SX, SY);
+  BlitBitmap(drawto_field, target_bitmap, fx, fy, SXSIZE, SYSIZE, SX, SY);
 }
 
 void BlitScreenToBitmap(Bitmap *target_bitmap)
