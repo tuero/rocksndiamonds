@@ -5223,18 +5223,6 @@ struct ConfigInfo image_config[] =
   { "font.info.levelset",			UNDEFINED_FILENAME	},
   { "font.info.levelset.clone_from",		"font.level_number"	},
 
-  { "global.border",				"RocksScreen.png"	},
-  { "global.door",				"RocksDoor.png"		},
-
-  { "global.busy",				"RocksBusy.png"		},
-  { "global.busy.x",				"0"			},
-  { "global.busy.y",				"0"			},
-  { "global.busy.width",			"32"			},
-  { "global.busy.height",			"32"			},
-  { "global.busy.frames",			"28"			},
-  { "global.busy.frames_per_line",		"7"			},
-  { "global.busy.delay",			"2"			},
-
   { "editor.element_border",			"RocksMore.png"		},
   { "editor.element_border.xpos",		"0"			},
   { "editor.element_border.ypos",		"2"			},
@@ -5667,6 +5655,18 @@ struct ConfigInfo image_config[] =
   { "editor.input.gfx.level_number.width",	"42"			},
   { "editor.input.gfx.level_number.height",	"16"			},
   { "editor.input.gfx.level_number.border_size","1"			},
+
+  { "global.border",				"RocksScreen.png"	},
+  { "global.door",				"RocksDoor.png"		},
+
+  { "global.busy",				"RocksBusy.png"		},
+  { "global.busy.x",				"0"			},
+  { "global.busy.y",				"0"			},
+  { "global.busy.width",			"32"			},
+  { "global.busy.height",			"32"			},
+  { "global.busy.frames",			"28"			},
+  { "global.busy.frames_per_line",		"7"			},
+  { "global.busy.delay",			"2"			},
 
   { "background",				UNDEFINED_FILENAME	},
   { "background.TITLE_INITIAL",			UNDEFINED_FILENAME	},
