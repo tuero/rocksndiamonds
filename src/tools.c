@@ -3290,9 +3290,15 @@ void WaitForEventToContinue()
 
 static int RequestHandleEvents(unsigned int req_state)
 {
+  boolean level_solved = (game_status == GAME_MODE_PLAYING &&
+			  local_player->LevelSolved_GameEnd);
   int last_game_status = game_status;	/* save current game status */
+  int width  = request.width;
+  int height = request.height;
+  int sx, sy;
   int result;
-  int mx, my;
+
+  setRequestPosition(&sx, &sy, FALSE);
 
   button_status = MB_RELEASED;
 
@@ -3301,6 +3307,21 @@ static int RequestHandleEvents(unsigned int req_state)
 
   while (result < 0)
   {
+    if (level_solved)
+    {
+      SetDrawtoField(DRAW_FIELDBUFFER);
+
+      HandleGameActions();
+
+      SetDrawtoField(DRAW_BACKBUFFER);
+
+      if (global.use_envelope_request)
+      {
+	/* copy current state of request area to middle of playfield area */
+	BlitBitmap(bitmap_db_cross, drawto, sx, sy, width, height, sx, sy);
+      }
+    }
+
     if (PendingEvent())
     {
       Event event;
@@ -3313,6 +3334,8 @@ static int RequestHandleEvents(unsigned int req_state)
 	  case EVENT_BUTTONRELEASE:
 	  case EVENT_MOTIONNOTIFY:
 	  {
+	    int mx, my;
+
 	    if (event.type == EVENT_MOTIONNOTIFY)
 	    {
 	      if (!button_status)
@@ -3418,9 +3441,13 @@ static int RequestHandleEvents(unsigned int req_state)
 	result = 0;
     }
 
-    if (game_status == GAME_MODE_PLAYING && local_player->LevelSolved_GameEnd)
+    if (level_solved)
     {
-      HandleGameActions();
+      if (global.use_envelope_request)
+      {
+	/* copy back current state of pressed buttons inside request area */
+	BlitBitmap(drawto, bitmap_db_cross, sx, sy, width, height, sx, sy);
+      }
     }
     else
     {
