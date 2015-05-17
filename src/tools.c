@@ -854,7 +854,9 @@ void ClearField()
     SetDrawtoField(DRAW_FIELDBUFFER);
   }
   else
+  {
     SetDrawtoField(DRAW_BACKBUFFER);
+  }
 }
 
 void MarkTileDirty(int x, int y)
@@ -2314,7 +2316,6 @@ void AnimateEnvelopeRequest(int anim_mode, int action)
     SkipUntilDelayReached(&anim_delay, anim_delay_value, &i, last_frame);
   }
 }
-
 
 void ShowEnvelopeRequest(char *text, unsigned int req_state, int action)
 {
