@@ -334,11 +334,6 @@ void DrawMaskedBorder(int redraw_mask)
       effectiveGameStatus() == GAME_MODE_TITLE)
     return;
 
-  /* never draw masked screen borders when displaying request outside door */
-  if (effectiveGameStatus() == GAME_MODE_PSEUDO_DOOR &&
-      global.use_envelope_request)
-    return;
-
   if (redraw_mask & REDRAW_ALL)
     DrawMaskedBorder_ALL();
   else
