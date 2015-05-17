@@ -354,6 +354,7 @@ void StartGameActions(boolean, boolean, int);
 void GameActions(void);
 void GameActions_EM_Main();
 void GameActions_SP_Main();
+void GameActions_RND_Main();
 void GameActions_RND();
 
 void ScrollLevel(int, int);

@@ -79,6 +79,7 @@ void DrawMaskedBorder(int);
 
 void SetDrawtoField(int);
 void RedrawPlayfield();
+void BlitScreenToBitmap_RND(Bitmap *);
 void BlitScreenToBitmap(Bitmap *);
 void BackToFront();
 

@@ -11191,8 +11191,10 @@ void GameActions()
   }
   else
   {
-    GameActions_RND();
+    GameActions_RND_Main();
   }
+
+  redraw_mask |= REDRAW_FIELD;
 }
 
 void GameActions_EM_Main()
@@ -11225,6 +11227,13 @@ void GameActions_SP_Main()
   CheckLevelTime();
 
   AdvanceFrameAndPlayerCounters(-1);	/* advance counters for all players */
+}
+
+void GameActions_RND_Main()
+{
+  GameActions_RND();
+
+  BlitScreenToBitmap_RND(backbuffer);
 }
 
 void GameActions_RND()

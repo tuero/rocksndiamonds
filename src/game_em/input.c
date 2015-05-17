@@ -112,7 +112,6 @@ void GameActions_EM(byte action[MAX_PLAYERS], boolean warp_mode)
   RedrawPlayfield_EM(FALSE);
 
   BlitScreenToBitmap_EM(backbuffer);
-  BackToFront_EM();
 }
 
 /* read input device for players */

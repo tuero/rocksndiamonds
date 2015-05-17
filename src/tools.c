@@ -354,7 +354,7 @@ void DrawMaskedBorder(int redraw_mask)
   }
 }
 
-static void BlitScreenToBitmap_RND(Bitmap *target_bitmap)
+void BlitScreenToBitmap_RND(Bitmap *target_bitmap)
 {
   DrawBuffer *buffer = (drawto_field == window ? backbuffer : drawto_field);
   int fx = FX, fy = FY;
@@ -410,23 +410,7 @@ static void BlitScreenToBitmap_RND(Bitmap *target_bitmap)
       fy = 2 * TILEY_VAR - (EVEN(lev_fieldy) ? TILEY_VAR / 2 : 0);
   }
 
-  if (border.draw_masked[GAME_MODE_PLAYING])
-  {
-    if (buffer != backbuffer)
-    {
-      /* copy playfield buffer to backbuffer to add masked border */
-      BlitBitmap(buffer, backbuffer, fx, fy, SXSIZE, SYSIZE, SX, SY);
-      DrawMaskedBorder(REDRAW_FIELD);
-    }
-
-    BlitBitmap(backbuffer, target_bitmap,
-	       REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE,
-	       REAL_SX, REAL_SY);
-  }
-  else
-  {
-    BlitBitmap(buffer, target_bitmap, fx, fy, SXSIZE, SYSIZE, SX, SY);
-  }
+  BlitBitmap(buffer, target_bitmap, fx, fy, SXSIZE, SYSIZE, SX, SY);
 }
 
 void BlitScreenToBitmap(Bitmap *target_bitmap)
@@ -439,7 +423,7 @@ void BlitScreenToBitmap(Bitmap *target_bitmap)
     BlitScreenToBitmap_RND(target_bitmap);
 }
 
-void BackToFront()
+void BackToFront_OLD()
 {
   DrawBuffer *buffer = (drawto_field == window ? backbuffer : drawto_field);
 
@@ -571,6 +555,20 @@ void BackToFront()
 
     DrawTextExt(window, SX + SXSIZE + SX, 0, text, FONT_TEXT_2, BLIT_OPAQUE);
   }
+
+  redraw_mask = REDRAW_NONE;
+}
+
+void BackToFront()
+{
+  if (redraw_mask == REDRAW_NONE)
+    return;
+
+  // draw masked border to all viewports, if defined
+  DrawMaskedBorder(redraw_mask);
+
+  // blit backbuffer to visible screen
+  BlitBitmap(backbuffer, window, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
 
   redraw_mask = REDRAW_NONE;
 }
