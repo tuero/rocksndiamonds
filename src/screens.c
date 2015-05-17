@@ -3849,7 +3849,7 @@ void DrawHallOfFame(int highlight_position)
   SetDrawDeactivationMask(REDRAW_NONE);
   SetDrawBackgroundMask(REDRAW_FIELD);
 
-  CloseDoor(DOOR_CLOSE_2);
+  CloseDoor(DOOR_CLOSE_ALL);
 
   if (highlight_position < 0) 
     LoadScore(level_nr);

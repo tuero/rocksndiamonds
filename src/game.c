@@ -4392,12 +4392,15 @@ void GameEnd()
 
   local_player->LevelSolved_GameEnd = TRUE;
 
-  CloseDoor(DOOR_CLOSE_1);
+  if (!global.use_envelope_request)
+    CloseDoor(DOOR_CLOSE_1);
 
   if (local_player->LevelSolved_SaveTape)
   {
     SaveTapeChecked(tape.level_nr);	/* ask to save tape */
   }
+
+  CloseDoor(DOOR_CLOSE_ALL);
 
   if (level_editor_test_game)
   {
