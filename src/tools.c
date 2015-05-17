@@ -2117,13 +2117,25 @@ void ShowEnvelope(int envelope_nr)
   BackToFront();
 }
 
+static void setRequestCenterPosition(int *x, int *y)
+{
+  int sx_center = (request.x != -1 ? request.x : SX + SXSIZE / 2);
+  int sy_center = (request.y != -1 ? request.y : SY + SYSIZE / 2);
+
+  *x = sx_center;
+  *y = sy_center;
+}
+
 static void setRequestPosition(int *x, int *y, boolean add_border_size)
 {
   int border_size = request.border_size;
-  int sx_center = (request.x != -1 ? request.x : SX + SXSIZE / 2);
-  int sy_center = (request.y != -1 ? request.y : SY + SYSIZE / 2);
-  int sx = sx_center - request.width  / 2;
-  int sy = sy_center - request.height / 2;
+  int sx_center, sy_center;
+  int sx, sy;
+
+  setRequestCenterPosition(&sx_center, &sy_center);
+
+  sx = sx_center - request.width  / 2;
+  sy = sy_center - request.height / 2;
 
   if (add_border_size)
   {
@@ -2262,17 +2274,21 @@ void AnimateEnvelopeRequest(int anim_mode, int action)
     int y = ystart + i * ystep;
     int xsize = (action == ACTION_CLOSING ? xend - (x - xstart) : x) + 2;
     int ysize = (action == ACTION_CLOSING ? yend - (y - ystart) : y) + 2;
-    int sx_center = (request.x != -1 ? request.x : SX + SXSIZE / 2);
-    int sy_center = (request.y != -1 ? request.y : SY + SYSIZE / 2);
-    int src_x = sx_center - width  / 2;
-    int src_y = sy_center - height / 2;
-    int dst_x = sx_center - xsize * tile_size / 2;
-    int dst_y = sy_center - ysize * tile_size / 2;
     int xsize_size_left = (xsize - 1) * tile_size;
     int ysize_size_top  = (ysize - 1) * tile_size;
     int max_xsize_pos = (max_xsize - 1) * tile_size;
     int max_ysize_pos = (max_ysize - 1) * tile_size;
+    int sx_center, sy_center;
+    int src_x, src_y;
+    int dst_x, dst_y;
     int xx, yy;
+
+    setRequestCenterPosition(&sx_center, &sy_center);
+
+    src_x = sx_center - width  / 2;
+    src_y = sy_center - height / 2;
+    dst_x = sx_center - xsize * tile_size / 2;
+    dst_y = sy_center - ysize * tile_size / 2;
 
     BlitBitmap(bitmap_db_store, backbuffer, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
 
