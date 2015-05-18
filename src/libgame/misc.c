@@ -427,7 +427,9 @@ int WaitUntilDelayReached(unsigned int *counter_var, unsigned int delay)
       break;
   }
 
-  if (*counter_var != 0 && actual_counter >= *counter_var + delay)
+  if (*counter_var != 0 &&
+      delay != 0 &&
+      actual_counter >= *counter_var + delay)
   {
     int lag = actual_counter - (*counter_var + delay);
     int delay2 = (delay + 1) / 2;
