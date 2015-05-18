@@ -58,8 +58,6 @@ void RedrawPlayfield_SP(boolean force_redraw)
     RestorePlayfield();
 
   UpdatePlayfield(force_redraw);
-
-  BlitScreenToBitmap_SP(backbuffer);
 }
 
 void UpdateGameDoorValues_SP()

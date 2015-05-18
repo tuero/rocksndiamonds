@@ -415,6 +415,8 @@ void BlitScreenToBitmap(Bitmap *target_bitmap)
     BlitScreenToBitmap_SP(target_bitmap);
   else if (level.game_engine_type == GAME_ENGINE_TYPE_RND)
     BlitScreenToBitmap_RND(target_bitmap);
+
+  redraw_mask |= REDRAW_FIELD;
 }
 
 void BackToFront_OLD()

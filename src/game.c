@@ -11197,7 +11197,11 @@ void GameActions()
     GameActions_RND_Main();
   }
 
-  redraw_mask |= REDRAW_FIELD;
+  BlitScreenToBitmap(backbuffer);
+
+  CheckLevelTime();
+
+  AdvanceFrameAndPlayerCounters(-1);	/* advance counters for all players */
 }
 
 void GameActions_EM_Main()
@@ -11210,10 +11214,6 @@ void GameActions_EM_Main()
     effective_action[i] = stored_player[i].effective_action;
 
   GameActions_EM(effective_action, warp_mode);
-
-  CheckLevelTime();
-
-  AdvanceFrameAndPlayerCounters(-1);	/* advance counters for all players */
 }
 
 void GameActions_SP_Main()
@@ -11226,17 +11226,11 @@ void GameActions_SP_Main()
     effective_action[i] = stored_player[i].effective_action;
 
   GameActions_SP(effective_action, warp_mode);
-
-  CheckLevelTime();
-
-  AdvanceFrameAndPlayerCounters(-1);	/* advance counters for all players */
 }
 
 void GameActions_RND_Main()
 {
   GameActions_RND();
-
-  BlitScreenToBitmap_RND(backbuffer);
 }
 
 void GameActions_RND()
@@ -11738,8 +11732,6 @@ void GameActions_RND()
   }
 #endif
 
-  CheckLevelTime();
-
   DrawAllPlayers();
   PlayAllPlayersSound();
 
@@ -11761,8 +11753,6 @@ void GameActions_RND()
 
     redraw_mask |= REDRAW_FPS;
   }
-
-  AdvanceFrameAndPlayerCounters(-1);	/* advance counters for all players */
 
   if (local_player->show_envelope != 0 && local_player->MovPos == 0)
   {
