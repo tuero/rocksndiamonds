@@ -560,11 +560,42 @@ void BackToFront()
   if (redraw_mask == REDRAW_NONE)
     return;
 
+  // redraw playfield if anything inside main playfield area needs redraw
+  if (redraw_mask & REDRAW_MAIN)
+    redraw_mask |= REDRAW_FIELD;
+
   // draw masked border to all viewports, if defined
   DrawMaskedBorder(redraw_mask);
 
-  // blit backbuffer to visible screen
-  BlitBitmap(backbuffer, window, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
+  // redraw complete window if both playfield and (some) doors need redraw
+  if (redraw_mask & REDRAW_FIELD && redraw_mask & REDRAW_DOORS)
+    redraw_mask = REDRAW_ALL;
+
+  /* although redrawing the whole window would be fine for normal gameplay,
+     being able to only redraw the playfield is required for deactivating
+     certain drawing areas (mainly playfield) to work, which is needed for
+     warp-forward to be fast enough (by skipping redraw of most frames) */
+
+  if (redraw_mask & REDRAW_ALL)
+  {
+    BlitBitmap(backbuffer, window, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
+  }
+  else if (redraw_mask & REDRAW_FIELD)
+  {
+    BlitBitmap(backbuffer, window,
+	       REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE, REAL_SX, REAL_SY);
+  }
+  else if (redraw_mask & REDRAW_DOORS)
+  {
+    if (redraw_mask & REDRAW_DOOR_1)
+      BlitBitmap(backbuffer, window, DX, DY, DXSIZE, DYSIZE, DX, DY);
+
+    if (redraw_mask & REDRAW_DOOR_2)
+      BlitBitmap(backbuffer, window, VX, VY, VXSIZE, VYSIZE, VX, VY);
+
+    if (redraw_mask & REDRAW_DOOR_3)
+      BlitBitmap(backbuffer, window, EX, EY, EXSIZE, EYSIZE, EX, EY);
+  }
 
   redraw_mask = REDRAW_NONE;
 }
