@@ -4549,8 +4549,6 @@ static void InitGlobal()
   global.create_images_dir = NULL;
 
   global.frames_per_second = 0;
-  global.fps_slowdown = FALSE;
-  global.fps_slowdown_factor = 1;
 
   global.border_status = GAME_MODE_MAIN;
 

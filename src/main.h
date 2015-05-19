@@ -2522,8 +2522,6 @@ struct GlobalInfo
   int num_toons;
 
   float frames_per_second;
-  boolean fps_slowdown;
-  int fps_slowdown_factor;
 
   /* global values for fading screens and masking borders */
   int border_status;

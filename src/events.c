@@ -1551,28 +1551,6 @@ void HandleKey(Key key, int key_status)
 	  }
 	  break;
 
-#if 0
-	case KSYM_s:
-	  if (!global.fps_slowdown)
-	  {
-	    global.fps_slowdown = TRUE;
-	    global.fps_slowdown_factor = 2;
-	    printf("fps slowdown enabled -- display only every 2nd frame\n");
-	  }
-	  else if (global.fps_slowdown_factor == 2)
-	  {
-	    global.fps_slowdown_factor = 4;
-	    printf("fps slowdown enabled -- display only every 4th frame\n");
-	  }
-	  else
-	  {
-	    global.fps_slowdown = FALSE;
-	    global.fps_slowdown_factor = 1;
-	    printf("fps slowdown disabled\n");
-	  }
-	  break;
-#endif
-
 	case KSYM_v:
 	  printf("::: currently using game engine version %d\n",
 		 game.engine_version);
