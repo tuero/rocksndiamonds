@@ -419,6 +419,18 @@ void BlitScreenToBitmap(Bitmap *target_bitmap)
   redraw_mask |= REDRAW_FIELD;
 }
 
+void DrawFramesPerSecond()
+{
+  char text[100];
+  int font_nr = FONT_TEXT_2;
+  int font_width = getFontWidth(font_nr);
+
+  sprintf(text, "%04.1f fps", global.frames_per_second);
+
+  DrawTextExt(backbuffer, WIN_XSIZE - font_width * strlen(text), 0, text,
+	      font_nr, BLIT_OPAQUE);
+}
+
 void BackToFront()
 {
   if (redraw_mask == REDRAW_NONE)
@@ -430,6 +442,10 @@ void BackToFront()
 
   // draw masked border to all viewports, if defined
   DrawMaskedBorder(redraw_mask);
+
+  // draw frames per second (only if debug mode is enabled)
+  if (redraw_mask & REDRAW_FPS)
+    DrawFramesPerSecond();
 
   // redraw complete window if both playfield and (some) doors need redraw
   if (redraw_mask & REDRAW_FIELD && redraw_mask & REDRAW_DOORS)
