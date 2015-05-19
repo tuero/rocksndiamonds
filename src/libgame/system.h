@@ -291,25 +291,14 @@
 #define REDRAW_NONE		(0)
 #define REDRAW_ALL		(1 << 0)
 #define REDRAW_FIELD		(1 << 1)
-#define REDRAW_TILES		(1 << 2)
-#define REDRAW_DOOR_1		(1 << 3)
-#define REDRAW_VIDEO_1		(1 << 4)
-#define REDRAW_VIDEO_2		(1 << 5)
-#define REDRAW_VIDEO_3		(1 << 6)
-#define REDRAW_MICROLEVEL	(1 << 7)
-#define REDRAW_MICROLABEL	(1 << 8)
-#define REDRAW_FROM_BACKBUFFER	(1 << 9)
-#define REDRAW_DOOR_2		(REDRAW_VIDEO_1 | \
-				 REDRAW_VIDEO_2 | \
-				 REDRAW_VIDEO_3)
-#define REDRAW_DOOR_3		(1 << 10)
+#define REDRAW_DOOR_1		(1 << 2)
+#define REDRAW_DOOR_2		(1 << 3)
+#define REDRAW_DOOR_3		(1 << 4)
+#define REDRAW_FPS		(1 << 5)
+
 #define REDRAW_DOORS		(REDRAW_DOOR_1 | \
 				 REDRAW_DOOR_2 | \
 				 REDRAW_DOOR_3)
-#define REDRAW_MAIN		(REDRAW_FIELD | \
-				 REDRAW_TILES | \
-				 REDRAW_MICROLEVEL)
-#define REDRAW_FPS		(1 << 11)
 
 #define IN_GFX_FIELD_PLAY(x, y)	(x >= gfx.sx && x < gfx.sx + gfx.sxsize && \
 				 y >= gfx.sy && y < gfx.sy + gfx.sysize)

@@ -352,7 +352,7 @@ void HandleAnimation(int mode)
     case ANIM_STOP:
       if (anim_running)
       {
-	redraw_mask |= (REDRAW_FIELD | REDRAW_FROM_BACKBUFFER);
+	redraw_mask |= REDRAW_FIELD;
 
 	screen_info.update_function();
 

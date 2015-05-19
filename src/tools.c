@@ -436,10 +436,6 @@ void BackToFront()
   if (redraw_mask == REDRAW_NONE)
     return;
 
-  // redraw playfield if anything inside main playfield area needs redraw
-  if (redraw_mask & REDRAW_MAIN)
-    redraw_mask |= REDRAW_FIELD;
-
   // draw masked border to all viewports, if defined
   DrawMaskedBorder(redraw_mask);
 
@@ -1975,7 +1971,7 @@ void AnimateEnvelope(int envelope_nr, int anim_mode, int action)
 		   level.envelope[envelope_nr].autowrap,
 		   level.envelope[envelope_nr].centered, FALSE);
 
-    redraw_mask |= REDRAW_FIELD | REDRAW_FROM_BACKBUFFER;
+    redraw_mask |= REDRAW_FIELD;
     BackToFront();
 
     SkipUntilDelayReached(&anim_delay, anim_delay_value, &i, last_frame);
@@ -2221,7 +2217,7 @@ void AnimateEnvelopeRequest(int anim_mode, int action)
       }
     }
 
-    redraw_mask |= REDRAW_FIELD | REDRAW_FROM_BACKBUFFER;
+    redraw_mask |= REDRAW_FIELD;
 
     DoAnimation();
     BackToFront();
@@ -2413,7 +2409,7 @@ static void DrawPreviewLevelPlayfieldExt(int from_x, int from_y)
     }
   }
 
-  redraw_mask |= REDRAW_MICROLEVEL;
+  redraw_mask |= REDRAW_FIELD;
 }
 
 #define MICROLABEL_EMPTY		0
@@ -2482,7 +2478,7 @@ static void DrawPreviewLevelLabelExt(int mode)
   if (strlen(label_text) > 0)
     DrawTextSAligned(pos->x, pos->y, label_text, font_nr, pos->align);
 
-  redraw_mask |= REDRAW_MICROLEVEL;
+  redraw_mask |= REDRAW_FIELD;
 }
 
 static void DrawPreviewLevelExt(boolean restart)

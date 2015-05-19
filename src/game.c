@@ -3916,8 +3916,6 @@ void InitGame()
 
   /* blit playfield from scroll buffer to normal back buffer for fading in */
   BlitScreenToBitmap(backbuffer);
-
-  redraw_mask |= REDRAW_FROM_BACKBUFFER;
   /* !!! FIX THIS (END) !!! */
 
   FadeIn(REDRAW_FIELD);
