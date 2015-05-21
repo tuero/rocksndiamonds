@@ -1313,6 +1313,7 @@ void SetDrawBackgroundMask(int);
 void SetWindowBackgroundBitmap(Bitmap *);
 void SetMainBackgroundBitmap(Bitmap *);
 void SetDoorBackgroundBitmap(Bitmap *);
+void SetRedrawMaskFromArea(int, int, int, int);
 
 void LimitScreenUpdates(boolean);
 

@@ -319,9 +319,12 @@ inline static int GetRealDepth(int depth)
 }
 
 inline static void sysFillRectangle(Bitmap *bitmap, int x, int y,
-			       int width, int height, Pixel color)
+				    int width, int height, Pixel color)
 {
   SDLFillRectangle(bitmap, x, y, width, height, color);
+
+  if (bitmap == backbuffer)
+    SetRedrawMaskFromArea(x, y, width, height);
 }
 
 inline static void sysCopyArea(Bitmap *src_bitmap, Bitmap *dst_bitmap,
@@ -330,6 +333,9 @@ inline static void sysCopyArea(Bitmap *src_bitmap, Bitmap *dst_bitmap,
 {
   SDLCopyArea(src_bitmap, dst_bitmap, src_x, src_y, width, height,
 	      dst_x, dst_y, mask_mode);
+
+  if (dst_bitmap == backbuffer)
+    SetRedrawMaskFromArea(dst_x, dst_y, width, height);
 }
 
 void LimitScreenUpdates(boolean enable)
@@ -436,6 +442,28 @@ void ReCreateBitmap(Bitmap **bitmap, int width, int height, int depth)
 
 void CloseWindow(DrawWindow *window)
 {
+}
+
+void SetRedrawMaskFromArea(int x, int y, int width, int height)
+{
+  int x1 = x;
+  int y1 = y;
+  int x2 = x + width - 1;
+  int y2 = y + height - 1;
+
+  if (width == 0 || height == 0)
+    return;
+
+  if (IN_GFX_FIELD_FULL(x1, y1) && IN_GFX_FIELD_FULL(x2, y2))
+    redraw_mask |= REDRAW_FIELD;
+  else if (IN_GFX_DOOR_1(x1, y1) && IN_GFX_DOOR_1(x2, y2))
+    redraw_mask |= REDRAW_DOOR_1;
+  else if (IN_GFX_DOOR_2(x1, y1) && IN_GFX_DOOR_2(x2, y2))
+    redraw_mask |= REDRAW_DOOR_2;
+  else if (IN_GFX_DOOR_3(x1, y1) && IN_GFX_DOOR_3(x2, y2))
+    redraw_mask |= REDRAW_DOOR_3;
+  else
+    redraw_mask = REDRAW_ALL;
 }
 
 inline static boolean CheckDrawingArea(int x, int y, int width, int height,
