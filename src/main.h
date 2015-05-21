@@ -2209,6 +2209,8 @@ struct RequestInfo
   int step_offset;
   int step_delay;
   int anim_mode;
+  int align;
+  int valign;
   boolean autowrap;
   boolean centered;
   boolean wrap_single_words;

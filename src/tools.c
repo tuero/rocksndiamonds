@@ -2022,25 +2022,57 @@ void ShowEnvelope(int envelope_nr)
   BackToFront();
 }
 
-static void setRequestCenterPosition(int *x, int *y)
+static void setRequestBasePosition(int *x, int *y)
 {
-  int sx_center = (request.x != -1 ? request.x : SX + SXSIZE / 2);
-  int sy_center = (request.y != -1 ? request.y : SY + SYSIZE / 2);
+  int sx_base, sy_base;
 
-  *x = sx_center;
-  *y = sy_center;
+  if (request.x != -1)
+    sx_base = request.x;
+  else if (request.align == ALIGN_LEFT)
+    sx_base = SX;
+  else if (request.align == ALIGN_RIGHT)
+    sx_base = SX + SXSIZE;
+  else
+    sx_base = SX + SXSIZE / 2;
+
+  if (request.y != -1)
+    sy_base = request.y;
+  else if (request.valign == VALIGN_TOP)
+    sy_base = SY;
+  else if (request.valign == VALIGN_BOTTOM)
+    sy_base = SY + SYSIZE;
+  else
+    sy_base = SY + SYSIZE / 2;
+
+  *x = sx_base;
+  *y = sy_base;
 }
 
-static void setRequestPosition(int *x, int *y, boolean add_border_size)
+static void setRequestPositionExt(int *x, int *y, int width, int height,
+				  boolean add_border_size)
 {
   int border_size = request.border_size;
-  int sx_center, sy_center;
+  int sx_base, sy_base;
   int sx, sy;
 
-  setRequestCenterPosition(&sx_center, &sy_center);
+  setRequestBasePosition(&sx_base, &sy_base);
 
-  sx = sx_center - request.width  / 2;
-  sy = sy_center - request.height / 2;
+  if (request.align == ALIGN_LEFT)
+    sx = sx_base;
+  else if (request.align == ALIGN_RIGHT)
+    sx = sx_base - width;
+  else
+    sx = sx_base - width  / 2;
+
+  if (request.valign == VALIGN_TOP)
+    sy = sy_base;
+  else if (request.valign == VALIGN_BOTTOM)
+    sy = sy_base - height;
+  else
+    sy = sy_base - height / 2;
+
+  sx = MAX(0, MIN(sx, WIN_XSIZE - width));
+  sy = MAX(0, MIN(sy, WIN_YSIZE - height));
 
   if (add_border_size)
   {
@@ -2050,6 +2082,11 @@ static void setRequestPosition(int *x, int *y, boolean add_border_size)
 
   *x = sx;
   *y = sy;
+}
+
+static void setRequestPosition(int *x, int *y, boolean add_border_size)
+{
+  setRequestPositionExt(x, y, request.width, request.height, add_border_size);
 }
 
 void DrawEnvelopeRequest(char *text)
@@ -2140,11 +2177,9 @@ void AnimateEnvelopeRequest(int anim_mode, int action)
   int anim_delay_value = (no_delay ? 0 : delay_value + 500 * 0) / 2;
   unsigned int anim_delay = 0;
 
-  int width = request.width;
-  int height = request.height;
   int tile_size = request.step_offset;
-  int max_xsize = width  / tile_size;
-  int max_ysize = height / tile_size;
+  int max_xsize = request.width  / tile_size;
+  int max_ysize = request.height / tile_size;
   int max_xsize_inner = max_xsize - 2;
   int max_ysize_inner = max_ysize - 2;
 
@@ -2183,17 +2218,14 @@ void AnimateEnvelopeRequest(int anim_mode, int action)
     int ysize_size_top  = (ysize - 1) * tile_size;
     int max_xsize_pos = (max_xsize - 1) * tile_size;
     int max_ysize_pos = (max_ysize - 1) * tile_size;
-    int sx_center, sy_center;
+    int width  = xsize * tile_size;
+    int height = ysize * tile_size;
     int src_x, src_y;
     int dst_x, dst_y;
     int xx, yy;
 
-    setRequestCenterPosition(&sx_center, &sy_center);
-
-    src_x = sx_center - width  / 2;
-    src_y = sy_center - height / 2;
-    dst_x = sx_center - xsize * tile_size / 2;
-    dst_y = sy_center - ysize * tile_size / 2;
+    setRequestPosition(&src_x, &src_y, FALSE);
+    setRequestPositionExt(&dst_x, &dst_y, width, height, FALSE);
 
     BlitBitmap(bitmap_db_store, backbuffer, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
 
@@ -2232,7 +2264,9 @@ void ShowEnvelopeRequest(char *text, unsigned int req_state, int action)
   int graphic = IMG_BACKGROUND_REQUEST;
   int sound_opening = SND_REQUEST_OPENING;
   int sound_closing = SND_REQUEST_CLOSING;
-  int anim_mode = graphic_info[graphic].anim_mode;
+  int anim_mode_1 = request.anim_mode;			/* (higher priority) */
+  int anim_mode_2 = graphic_info[graphic].anim_mode;	/* (lower priority) */
+  int anim_mode = (anim_mode_1 != ANIM_DEFAULT ? anim_mode_1 : anim_mode_2);
   int main_anim_mode = (anim_mode == ANIM_NONE ? ANIM_VERTICAL|ANIM_HORIZONTAL:
 			anim_mode == ANIM_DEFAULT ? ANIM_VERTICAL : anim_mode);
 
