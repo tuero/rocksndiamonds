@@ -159,6 +159,9 @@ void DrawAnim(Bitmap *toon_bitmap, int src_x, int src_y, int width, int height,
 
   BlitBitmap(screen_info.save_buffer, backbuffer, buffer_x, buffer_y,
 	     pad_width, pad_height, pad_dest_x, pad_dest_y);
+
+  /* prevent immediate redraw of restored toon area in backbuffer */
+  redraw_mask = REDRAW_NONE;
 }
 
 boolean AnimateToon(int toon_nr, boolean restart)
