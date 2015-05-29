@@ -76,6 +76,8 @@
 
 #define MAX_SETUP_MODES			31
 
+#define MAX_MENU_MODES			MAX(MAX_INFO_MODES, MAX_SETUP_MODES)
+
 /* for input setup functions */
 #define SETUPINPUT_SCREEN_POS_START	0
 #define SETUPINPUT_SCREEN_POS_END	(SCR_FIELDY - 4)
@@ -2016,53 +2018,103 @@ static struct TokenInfo info_info_main[] =
   { 0,			NULL,			NULL			}
 };
 
-static void DrawCursorAndText_Info(int screen_pos, int info_info_pos_raw,
-				    boolean active)
+static int getMenuTextFont(int type)
 {
-  int ii_pos = (info_info_pos_raw < 0 ? screen_pos : info_info_pos_raw);
-  struct TokenInfo *ii = &info_info[ii_pos];
+  if (type & (TYPE_SWITCH	|
+	      TYPE_YES_NO	|
+	      TYPE_YES_NO_AUTO	|
+	      TYPE_STRING	|
+	      TYPE_ECS_AGA	|
+	      TYPE_KEYTEXT	|
+	      TYPE_ENTER_LIST))
+    return FONT_MENU_2;
+  else
+    return FONT_MENU_1;
+}
+
+static struct TokenInfo *setup_info;
+static struct TokenInfo setup_info_input[];
+
+static struct TokenInfo *menu_info;
+
+static void DrawCursorAndText_Menu_Ext(struct TokenInfo *token_info,
+				       int screen_pos, int menu_info_pos_raw,
+				       boolean active)
+{
+  int pos = (menu_info_pos_raw < 0 ? screen_pos : menu_info_pos_raw);
+  struct TokenInfo *ti = &token_info[pos];
   int xpos = MENU_SCREEN_START_XPOS;
   int ypos = MENU_SCREEN_START_YPOS + screen_pos;
-  int font_nr = FONT_MENU_1;
+  int font_nr = getMenuTextFont(ti->type);
+
+  if (token_info == setup_info_input)
+    font_nr = FONT_MENU_1;
 
   if (active)
     font_nr = FONT_ACTIVE(font_nr);
 
-  DrawText(mSX + xpos * 32, mSY + ypos * 32, ii->text, font_nr);
+  DrawText(mSX + xpos * 32, mSY + ypos * 32, ti->text, font_nr);
 
-  if (ii->type & ~TYPE_SKIP_ENTRY)
+  if (ti->type & ~TYPE_SKIP_ENTRY)
     drawCursor(screen_pos, active);
 }
 
-static void drawInfoInfoList(struct TokenInfo *info_info,
-			     int first_entry, int num_page_entries)
+static void DrawCursorAndText_Menu(int screen_pos, int menu_info_pos_raw,
+				   boolean active)
+{
+  DrawCursorAndText_Menu_Ext(menu_info, screen_pos, menu_info_pos_raw, active);
+}
+
+static void DrawCursorAndText_Setup(int screen_pos, int menu_info_pos_raw,
+				    boolean active)
+{
+  DrawCursorAndText_Menu_Ext(setup_info, screen_pos, menu_info_pos_raw, active);
+}
+
+static char *screen_mode_text;
+static char *window_size_text;
+static char *scaling_type_text;
+
+static void drawSetupValue(int, int);
+
+static void drawMenuInfoList(int first_entry, int num_page_entries,
+			     int max_page_entries)
 {
   int i;
 
-  if (num_page_entries > NUM_MENU_ENTRIES_ON_SCREEN)
-    num_page_entries = NUM_MENU_ENTRIES_ON_SCREEN;
-
-  if (num_page_entries > max_info_info)
-    num_page_entries = max_info_info;
-
-  if (first_entry + num_page_entries > max_info_info)
+  if (first_entry + num_page_entries > max_page_entries)
     first_entry = 0;
 
   clearMenuListArea();
 
   for (i = 0; i < num_page_entries; i++)
   {
-    int info_info_pos = first_entry + i;
-    struct TokenInfo *ii = &info_info[info_info_pos];
+    int menu_info_pos = first_entry + i;
+    struct TokenInfo *si = &menu_info[menu_info_pos];
+    void *value_ptr = si->value;
 
-    if (ii->type & (TYPE_ENTER_MENU|TYPE_ENTER_LIST))
+    /* set some entries to "unchangeable" according to other variables */
+    if ((value_ptr == &setup.sound_simple && !audio.sound_available) ||
+	(value_ptr == &setup.sound_loops  && !audio.loops_available) ||
+	(value_ptr == &setup.sound_music  && !audio.music_available) ||
+	(value_ptr == &setup.fullscreen   && !video.fullscreen_available) ||
+	(value_ptr == &screen_mode_text   && !video.fullscreen_available) ||
+	(value_ptr == &window_size_text   && !video.window_scaling_available) ||
+	(value_ptr == &scaling_type_text  && !video.window_scaling_available))
+      si->type |= TYPE_GHOSTED;
+
+    if (si->type & (TYPE_ENTER_MENU|TYPE_ENTER_LIST))
       initCursor(i, IMG_MENU_BUTTON_ENTER_MENU);
-    else if (ii->type & (TYPE_LEAVE_MENU|TYPE_LEAVE_LIST))
+    else if (si->type & (TYPE_LEAVE_MENU|TYPE_LEAVE_LIST))
       initCursor(i, IMG_MENU_BUTTON_LEAVE_MENU);
-    else if (ii->type & ~TYPE_SKIP_ENTRY)
+    else if (si->type & ~TYPE_SKIP_ENTRY)
       initCursor(i, IMG_MENU_BUTTON);
 
-    DrawCursorAndText_Info(i, info_info_pos, FALSE);
+    DrawCursorAndText_Menu(i, menu_info_pos, FALSE);
+
+    if (si->type & TYPE_VALUE &&
+	menu_info == setup_info)
+      drawSetupValue(i, menu_info_pos);
   }
 }
 
@@ -2099,7 +2151,7 @@ static void DrawInfoScreen_Main(int fade_mask, boolean do_fading)
 
   // determine maximal number of info entries that can be displayed on screen
   num_info_info = 0;
-  for (i = 0; info_info[i].type != 0 && i < MAX_MENU_ENTRIES_ON_SCREEN; i++)
+  for (i = 0; info_info[i].type != 0 && i < NUM_MENU_ENTRIES_ON_SCREEN; i++)
     num_info_info++;
 
   // determine maximal number of info entries available for menu of info screen
@@ -2121,88 +2173,93 @@ static void DrawInfoScreen_Main(int fade_mask, boolean do_fading)
   InitAnimation();
 }
 
-void HandleInfoScreen_Main(int mx, int my, int dx, int dy, int button)
+static void changeSetupValue(int, int, int);
+
+void HandleMenuScreen(int mx, int my, int dx, int dy, int button,
+		      int mode, int num_page_entries, int max_page_entries)
 {
-  static int choice_store[MAX_INFO_MODES];
-  static int first_entry_store[MAX_INFO_MODES];
-  static int num_page_entries_last = 0;
-  int choice = choice_store[info_mode];			/* starts with 0 */
-  int first_entry = first_entry_store[info_mode];	/* starts with 0 */
+  static int game_status_last;
+  static int num_page_entries_last[NUM_SPECIAL_GFX_ARGS];
+  static int choice_stores[NUM_SPECIAL_GFX_ARGS][MAX_MENU_MODES];
+  static int first_entry_stores[NUM_SPECIAL_GFX_ARGS][MAX_MENU_MODES];
+  int *choice_store = choice_stores[game_status];
+  int *first_entry_store = first_entry_stores[game_status];
+  int choice = choice_store[mode];		/* starts with 0 */
+  int first_entry = first_entry_store[mode];	/* starts with 0 */
   int x = 0;
   int y = choice - first_entry;
   int y_old = y;
   boolean position_set_by_scrollbar = (dx == 999);
   int step = (button == 1 ? 1 : button == 2 ? 5 : 10);
-  int num_page_entries;
-
-  num_page_entries = MIN(max_info_info, NUM_MENU_ENTRIES_ON_SCREEN);
+  int i;
 
   if (button == MB_MENU_INITIALIZE)
   {
     // check if number of menu page entries has changed (may happen by change
     // of custom artwork definition value for 'list_size' for this menu screen)
     // (in this case, the last menu position most probably has to be corrected)
-    if (num_page_entries != num_page_entries_last)
+    if (game_status != game_status_last &&
+	num_page_entries != num_page_entries_last[game_status])
     {
-      int i;
-
-      for (i = 0; i < MAX_INFO_MODES; i++)
+      for (i = 0; i < MAX_MENU_MODES; i++)
 	choice_store[i] = first_entry_store[i] = 0;
 
-      num_page_entries_last = num_page_entries;
-
-      HandleInfoScreen_Main(mx, my, dx, dy, button);
-
-      return;
+      choice = first_entry = 0;
+      y = y_old = 0;
     }
 
+    game_status_last = game_status;
+    num_page_entries_last[game_status] = num_page_entries;
+
     /* advance to first valid menu entry */
-    while (choice < num_info_info &&
-	   info_info[choice].type & TYPE_SKIP_ENTRY)
+    while (choice < num_page_entries &&
+	   menu_info[choice].type & TYPE_SKIP_ENTRY)
       choice++;
 
     if (position_set_by_scrollbar)
-      first_entry = first_entry_store[info_mode] = dy;
+      first_entry = first_entry_store[mode] = dy;
     else
-      AdjustScrollbar(SCREEN_CTRL_ID_SCROLL_VERTICAL, max_info_info,
+      AdjustScrollbar(SCREEN_CTRL_ID_SCROLL_VERTICAL, max_page_entries,
 		      NUM_MENU_ENTRIES_ON_SCREEN, first_entry);
 
-    drawInfoInfoList(info_info, first_entry, NUM_MENU_ENTRIES_ON_SCREEN);
+    drawMenuInfoList(first_entry, num_page_entries, max_page_entries);
 
     if (choice < first_entry)
     {
       choice = first_entry;
 
-      if (info_info[choice].type & TYPE_SKIP_ENTRY)
+      if (menu_info[choice].type & TYPE_SKIP_ENTRY)
 	choice++;
     }
     else if (choice > first_entry + num_page_entries - 1)
     {
       choice = first_entry + num_page_entries - 1;
 
-      if (info_info[choice].type & TYPE_SKIP_ENTRY)
+      if (menu_info[choice].type & TYPE_SKIP_ENTRY)
 	choice--;
     }
 
-    choice_store[info_mode] = choice;
+    choice_store[mode] = choice;
 
-    DrawCursorAndText_Info(choice - first_entry, choice, TRUE);
+    DrawCursorAndText_Menu(choice - first_entry, choice, TRUE);
 
     return;
   }
   else if (button == MB_MENU_LEAVE)
   {
-    for (y = 0; y < num_info_info; y++)
+    PlaySound(SND_MENU_ITEM_SELECTING);
+
+    for (i = 0; i < max_page_entries; i++)
     {
-      if (info_info[y].type & TYPE_LEAVE_MENU)
+      if (menu_info[i].type & TYPE_LEAVE_MENU)
       {
-	void (*menu_callback_function)(void) = info_info[y].value;
+	void (*menu_callback_function)(void) = menu_info[i].value;
 
 	FadeSetLeaveMenu();
 
 	menu_callback_function();
 
-	break;	/* absolutely needed because function changes 'info_info'! */
+	break;	/* absolutely needed because function changes 'menu_info'! */
       }
     }
 
@@ -2220,7 +2277,7 @@ void HandleInfoScreen_Main(int mx, int my, int dx, int dy, int button)
     if (dy == -1 * SCROLL_LINE && first_entry == 0)
       dy = -1;
     else if (dy == +1 * SCROLL_LINE &&
-	     first_entry + num_page_entries == max_info_info)
+	     first_entry + num_page_entries == max_page_entries)
       dy = 1;
 
     /* handle scrolling screen one line or page */
@@ -2242,36 +2299,36 @@ void HandleInfoScreen_Main(int mx, int my, int dx, int dy, int button)
 
 	redraw = TRUE;
       }
-      else if (dy > 0 && first_entry + num_page_entries < max_info_info)
+      else if (dy > 0 && first_entry + num_page_entries < max_page_entries)
       {
 	/* scroll page/line down */
 
 	first_entry += step;
-	if (first_entry + num_page_entries > max_info_info)
-	  first_entry = MAX(0, max_info_info - num_page_entries);
+	if (first_entry + num_page_entries > max_page_entries)
+	  first_entry = MAX(0, max_page_entries - num_page_entries);
 
 	redraw = TRUE;
       }
 
       if (redraw)
       {
-	choice += first_entry - first_entry_store[info_mode];
+	choice += first_entry - first_entry_store[mode];
 
 	if (choice < first_entry)
 	{
 	  choice = first_entry;
 
-	  if (info_info[choice].type & TYPE_SKIP_ENTRY)
+	  if (menu_info[choice].type & TYPE_SKIP_ENTRY)
 	    choice++;
 	}
 	else if (choice > first_entry + num_page_entries - 1)
 	{
 	  choice = first_entry + num_page_entries - 1;
 
-	  if (info_info[choice].type & TYPE_SKIP_ENTRY)
+	  if (menu_info[choice].type & TYPE_SKIP_ENTRY)
 	    choice--;
 	}
-	else if (info_info[choice].type & TYPE_SKIP_ENTRY)
+	else if (menu_info[choice].type & TYPE_SKIP_ENTRY)
 	{
 	  choice += SIGN(dy);
 
@@ -2280,14 +2337,14 @@ void HandleInfoScreen_Main(int mx, int my, int dx, int dy, int button)
 	  first_entry += SIGN(dy);
 	}
 
-	first_entry_store[info_mode] = first_entry;
-	choice_store[info_mode] = choice;
+	first_entry_store[mode] = first_entry;
+	choice_store[mode] = choice;
 
-	drawInfoInfoList(info_info, first_entry, NUM_MENU_ENTRIES_ON_SCREEN);
+	drawMenuInfoList(first_entry, num_page_entries, max_page_entries);
 
-	DrawCursorAndText_Info(choice - first_entry, choice, TRUE);
+	DrawCursorAndText_Menu(choice - first_entry, choice, TRUE);
 
-	AdjustScrollbar(SCREEN_CTRL_ID_SCROLL_VERTICAL, max_info_info,
+	AdjustScrollbar(SCREEN_CTRL_ID_SCROLL_VERTICAL, max_page_entries,
 			NUM_MENU_ENTRIES_ON_SCREEN, first_entry);
       }
 
@@ -2298,9 +2355,9 @@ void HandleInfoScreen_Main(int mx, int my, int dx, int dy, int button)
     {
       int menu_navigation_type = (dx < 0 ? TYPE_LEAVE : TYPE_ENTER);
 
-      if (info_info[choice].type & menu_navigation_type ||
-	  info_info[choice].type & TYPE_BOOLEAN_STYLE ||
-	  info_info[choice].type & TYPE_YES_NO_AUTO)
+      if (menu_info[choice].type & menu_navigation_type ||
+	  menu_info[choice].type & TYPE_BOOLEAN_STYLE ||
+	  menu_info[choice].type & TYPE_YES_NO_AUTO)
 	button = MB_MENU_CHOICE;
     }
     else if (dy)
@@ -2308,8 +2365,8 @@ void HandleInfoScreen_Main(int mx, int my, int dx, int dy, int button)
 
     /* jump to next non-empty menu entry (up or down) */
     while (first_entry + y > 0 &&
-	   first_entry + y < max_info_info - 1 &&
-	   info_info[first_entry + y].type & TYPE_SKIP_ENTRY)
+	   first_entry + y < max_page_entries - 1 &&
+	   menu_info[first_entry + y].type & TYPE_SKIP_ENTRY)
       y += dy;
 
     if (!IN_VIS_MENU(x, y))
@@ -2322,22 +2379,22 @@ void HandleInfoScreen_Main(int mx, int my, int dx, int dy, int button)
 	first_entry = choice - num_page_entries + 1;
 
       if (first_entry >= 0 &&
-	  first_entry + num_page_entries <= max_info_info)
+	  first_entry + num_page_entries <= max_page_entries)
       {
-	first_entry_store[info_mode] = first_entry;
+	first_entry_store[mode] = first_entry;
 
 	if (choice < first_entry)
 	  choice = first_entry;
 	else if (choice > first_entry + num_page_entries - 1)
 	  choice = first_entry + num_page_entries - 1;
 
-	choice_store[info_mode] = choice;
+	choice_store[mode] = choice;
 
-	drawInfoInfoList(info_info, first_entry, NUM_MENU_ENTRIES_ON_SCREEN);
+	drawMenuInfoList(first_entry, num_page_entries, max_page_entries);
 
-	DrawCursorAndText_Info(choice - first_entry, choice, TRUE);
+	DrawCursorAndText_Menu(choice - first_entry, choice, TRUE);
 
-	AdjustScrollbar(SCREEN_CTRL_ID_SCROLL_VERTICAL, max_info_info,
+	AdjustScrollbar(SCREEN_CTRL_ID_SCROLL_VERTICAL, max_page_entries,
 			NUM_MENU_ENTRIES_ON_SCREEN, first_entry);
       }
 
@@ -2353,31 +2410,54 @@ void HandleInfoScreen_Main(int mx, int my, int dx, int dy, int button)
     if (button)
     {
       if (first_entry + y != choice &&
-	  info_info[first_entry + y].type & ~TYPE_SKIP_ENTRY)
+	  menu_info[first_entry + y].type & ~TYPE_SKIP_ENTRY)
       {
 	PlaySound(SND_MENU_ITEM_ACTIVATING);
 
-	DrawCursorAndText_Info(choice - first_entry, choice, FALSE);
-	DrawCursorAndText_Info(y, first_entry + y, TRUE);
+	DrawCursorAndText_Menu(choice - first_entry, choice, FALSE);
+	DrawCursorAndText_Menu(y, first_entry + y, TRUE);
 
-	choice = choice_store[info_mode] = first_entry + y;
+	choice = choice_store[mode] = first_entry + y;
       }
     }
-    else if (!(info_info[first_entry + y].type & TYPE_GHOSTED))
+    else if (!(menu_info[first_entry + y].type & TYPE_GHOSTED))
     {
       PlaySound(SND_MENU_ITEM_SELECTING);
 
-      if (info_info[first_entry + y].type & TYPE_ENTER_OR_LEAVE)
+      /* when selecting key headline, execute function for key value change */
+      if (menu_info[first_entry + y].type & TYPE_KEYTEXT &&
+	  menu_info[first_entry + y + 1].type & TYPE_KEY)
+	y++;
+
+      /* when selecting string value, execute function for list selection */
+      if (menu_info[first_entry + y].type & TYPE_STRING && y > 0 &&
+	  menu_info[first_entry + y - 1].type & TYPE_ENTER_LIST)
+	y--;
+
+      if (menu_info[first_entry + y].type & TYPE_ENTER_OR_LEAVE)
       {
 	void (*menu_callback_function)(void) =
-	  info_info[first_entry + y].value;
+	  menu_info[first_entry + y].value;
 
-	FadeSetFromType(info_info[first_entry + y].type);
+	FadeSetFromType(menu_info[first_entry + y].type);
 
 	menu_callback_function();
       }
+      else if (menu_info[first_entry + y].type & TYPE_VALUE &&
+	       menu_info == setup_info)
+      {
+	changeSetupValue(y, first_entry + y, dx);
+      }
     }
   }
+}
+
+void HandleInfoScreen_Main(int mx, int my, int dx, int dy, int button)
+{
+  menu_info = info_info;
+
+  HandleMenuScreen(mx, my, dx, dy, button,
+		   info_mode, num_info_info, max_info_info);
 }
 
 void DrawInfoScreen_NotAvailable(char *text_title, char *text_error)
@@ -5496,20 +5576,6 @@ static Key getSetupKey()
   return key;
 }
 
-static int getSetupTextFont(int type)
-{
-  if (type & (TYPE_SWITCH	|
-	      TYPE_YES_NO	|
-	      TYPE_YES_NO_AUTO	|
-	      TYPE_STRING	|
-	      TYPE_ECS_AGA	|
-	      TYPE_KEYTEXT	|
-	      TYPE_ENTER_LIST))
-    return FONT_MENU_2;
-  else
-    return FONT_MENU_1;
-}
-
 static int getSetupValueFont(int type, void *value)
 {
   if (type & TYPE_KEY)
@@ -5585,7 +5651,7 @@ static void drawSetupValue(int screen_pos, int setup_info_pos_raw)
     int font1_xoffset = getFontBitmapInfo(font_nr)->draw_xoffset;
     int font2_xoffset = getFontBitmapInfo(check_font_nr)->draw_xoffset;
     int text_startx = mSX + MENU_SCREEN_START_XPOS * 32;
-    int text_font_nr = getSetupTextFont(FONT_MENU_2);
+    int text_font_nr = getMenuTextFont(FONT_MENU_2);
     int text_font_xoffset = getFontBitmapInfo(text_font_nr)->draw_xoffset;
     int text_width = max_menu_text_length_medium * getFontWidth(text_font_nr);
     boolean correct_font_draw_xoffset = FALSE;
@@ -5658,73 +5724,6 @@ static void changeSetupValue(int screen_pos, int setup_info_pos_raw, int dx)
   // fullscreen state may have changed at this point
   if (si->value == &setup.fullscreen)
     ToggleFullscreenOrChangeWindowScalingIfNeeded();
-}
-
-static void DrawCursorAndText_Setup(int screen_pos, int setup_info_pos_raw,
-				    boolean active)
-{
-  int si_pos = (setup_info_pos_raw < 0 ? screen_pos : setup_info_pos_raw);
-  struct TokenInfo *si = &setup_info[si_pos];
-  int xpos = MENU_SCREEN_START_XPOS;
-  int ypos = MENU_SCREEN_START_YPOS + screen_pos;
-  int font_nr = getSetupTextFont(si->type);
-
-  if (setup_info == setup_info_input)
-    font_nr = FONT_MENU_1;
-
-  if (active)
-    font_nr = FONT_ACTIVE(font_nr);
-
-  DrawText(mSX + xpos * 32, mSY + ypos * 32, si->text, font_nr);
-
-  if (si->type & ~TYPE_SKIP_ENTRY)
-    drawCursor(screen_pos, active);
-}
-
-static void drawSetupInfoList(struct TokenInfo *setup_info,
-			      int first_entry, int num_page_entries)
-{
-  int i;
-
-  if (num_page_entries > NUM_MENU_ENTRIES_ON_SCREEN)
-    num_page_entries = NUM_MENU_ENTRIES_ON_SCREEN;
-
-  if (num_page_entries > max_setup_info)
-    num_page_entries = max_setup_info;
-
-  if (first_entry + num_page_entries > max_setup_info)
-    first_entry = 0;
-
-  clearMenuListArea();
-
-  for (i = 0; i < num_page_entries; i++)
-  {
-    int setup_info_pos = first_entry + i;
-    struct TokenInfo *si = &setup_info[setup_info_pos];
-    void *value_ptr = si->value;
-
-    /* set some entries to "unchangeable" according to other variables */
-    if ((value_ptr == &setup.sound_simple && !audio.sound_available) ||
-	(value_ptr == &setup.sound_loops  && !audio.loops_available) ||
-	(value_ptr == &setup.sound_music  && !audio.music_available) ||
-	(value_ptr == &setup.fullscreen   && !video.fullscreen_available) ||
-	(value_ptr == &screen_mode_text   && !video.fullscreen_available) ||
-	(value_ptr == &window_size_text   && !video.window_scaling_available) ||
-	(value_ptr == &scaling_type_text  && !video.window_scaling_available))
-      si->type |= TYPE_GHOSTED;
-
-    if (si->type & (TYPE_ENTER_MENU|TYPE_ENTER_LIST))
-      initCursor(i, IMG_MENU_BUTTON_ENTER_MENU);
-    else if (si->type & (TYPE_LEAVE_MENU|TYPE_LEAVE_LIST))
-      initCursor(i, IMG_MENU_BUTTON_LEAVE_MENU);
-    else if (si->type & ~TYPE_SKIP_ENTRY)
-      initCursor(i, IMG_MENU_BUTTON);
-
-    DrawCursorAndText_Setup(i, setup_info_pos, FALSE);
-
-    if (si->type & TYPE_VALUE)
-      drawSetupValue(i, setup_info_pos);
-  }
 }
 
 static void DrawSetupScreen_Generic()
@@ -5840,280 +5839,10 @@ static void DrawSetupScreen_Generic()
 
 void HandleSetupScreen_Generic(int mx, int my, int dx, int dy, int button)
 {
-  static int choice_store[MAX_SETUP_MODES];
-  static int first_entry_store[MAX_SETUP_MODES];
-  static int num_page_entries_last = 0;
-  int choice = choice_store[setup_mode];		/* starts with 0 */
-  int first_entry = first_entry_store[setup_mode];	/* starts with 0 */
-  int x = 0;
-  int y = choice - first_entry;
-  int y_old = y;
-  boolean position_set_by_scrollbar = (dx == 999);
-  int step = (button == 1 ? 1 : button == 2 ? 5 : 10);
-  int num_page_entries;
+  menu_info = setup_info;
 
-  num_page_entries = MIN(max_setup_info, NUM_MENU_ENTRIES_ON_SCREEN);
-
-  if (button == MB_MENU_INITIALIZE)
-  {
-    // check if number of menu page entries has changed (may happen by change
-    // of custom artwork definition value for 'list_size' for this menu screen)
-    // (in this case, the last menu position most probably has to be corrected)
-    if (num_page_entries != num_page_entries_last)
-    {
-      int i;
-
-      for (i = 0; i < MAX_INFO_MODES; i++)
-	choice_store[i] = first_entry_store[i] = 0;
-
-      num_page_entries_last = num_page_entries;
-
-      HandleSetupScreen_Generic(mx, my, dx, dy, button);
-
-      return;
-    }
-
-    /* advance to first valid menu entry */
-    while (choice < num_setup_info &&
-	   setup_info[choice].type & TYPE_SKIP_ENTRY)
-      choice++;
-
-    if (position_set_by_scrollbar)
-      first_entry = first_entry_store[setup_mode] = dy;
-    else
-      AdjustScrollbar(SCREEN_CTRL_ID_SCROLL_VERTICAL, max_setup_info,
-		      NUM_MENU_ENTRIES_ON_SCREEN, first_entry);
-
-    drawSetupInfoList(setup_info, first_entry, NUM_MENU_ENTRIES_ON_SCREEN);
-
-    if (choice < first_entry)
-    {
-      choice = first_entry;
-
-      if (setup_info[choice].type & TYPE_SKIP_ENTRY)
-	choice++;
-    }
-    else if (choice > first_entry + num_page_entries - 1)
-    {
-      choice = first_entry + num_page_entries - 1;
-
-      if (setup_info[choice].type & TYPE_SKIP_ENTRY)
-	choice--;
-    }
-
-    choice_store[setup_mode] = choice;
-
-    DrawCursorAndText_Setup(choice - first_entry, choice, TRUE);
-
-    return;
-  }
-  else if (button == MB_MENU_LEAVE)
-  {
-    int i;
-
-    PlaySound(SND_MENU_ITEM_SELECTING);
-
-    for (i = 0; setup_info[i].type != 0; i++)
-    {
-      if (setup_info[i].type & TYPE_LEAVE_MENU)
-      {
-	void (*menu_callback_function)(void) = setup_info[i].value;
-
-	FadeSetLeaveMenu();
-
-	menu_callback_function();
-
-	break;	/* absolutely needed because function changes 'setup_info'! */
-      }
-    }
-
-    return;
-  }
-
-  if (mx || my)		/* mouse input */
-  {
-    x = (mx - mSX) / 32;
-    y = (my - mSY) / 32 - MENU_SCREEN_START_YPOS;
-  }
-  else if (dx || dy)	/* keyboard or scrollbar/scrollbutton input */
-  {
-    /* move cursor instead of scrolling when already at start/end of list */
-    if (dy == -1 * SCROLL_LINE && first_entry == 0)
-      dy = -1;
-    else if (dy == +1 * SCROLL_LINE &&
-	     first_entry + num_page_entries == max_setup_info)
-      dy = 1;
-
-    /* handle scrolling screen one line or page */
-    if (y + dy < 0 ||
-	y + dy > num_page_entries - 1)
-    {
-      boolean redraw = FALSE;
-
-      if (ABS(dy) == SCROLL_PAGE)
-	step = num_page_entries - 1;
-
-      if (dy < 0 && first_entry > 0)
-      {
-	/* scroll page/line up */
-
-	first_entry -= step;
-	if (first_entry < 0)
-	  first_entry = 0;
-
-	redraw = TRUE;
-      }
-      else if (dy > 0 && first_entry + num_page_entries < max_setup_info)
-      {
-	/* scroll page/line down */
-
-	first_entry += step;
-	if (first_entry + num_page_entries > max_setup_info)
-	  first_entry = MAX(0, max_setup_info - num_page_entries);
-
-	redraw = TRUE;
-      }
-
-      if (redraw)
-      {
-	choice += first_entry - first_entry_store[setup_mode];
-
-	if (choice < first_entry)
-	{
-	  choice = first_entry;
-
-	  if (setup_info[choice].type & TYPE_SKIP_ENTRY)
-	    choice++;
-	}
-	else if (choice > first_entry + num_page_entries - 1)
-	{
-	  choice = first_entry + num_page_entries - 1;
-
-	  if (setup_info[choice].type & TYPE_SKIP_ENTRY)
-	    choice--;
-	}
-	else if (setup_info[choice].type & TYPE_SKIP_ENTRY)
-	{
-	  choice += SIGN(dy);
-
-	  if (choice < first_entry ||
-	      choice > first_entry + num_page_entries - 1)
-	  first_entry += SIGN(dy);
-	}
-
-	first_entry_store[setup_mode] = first_entry;
-	choice_store[setup_mode] = choice;
-
-	drawSetupInfoList(setup_info, first_entry, NUM_MENU_ENTRIES_ON_SCREEN);
-
-	DrawCursorAndText_Setup(choice - first_entry, choice, TRUE);
-
-	AdjustScrollbar(SCREEN_CTRL_ID_SCROLL_VERTICAL, max_setup_info,
-			NUM_MENU_ENTRIES_ON_SCREEN, first_entry);
-      }
-
-      return;
-    }
-
-    if (dx)
-    {
-      int menu_navigation_type = (dx < 0 ? TYPE_LEAVE : TYPE_ENTER);
-
-      if (setup_info[choice].type & menu_navigation_type ||
-	  setup_info[choice].type & TYPE_BOOLEAN_STYLE ||
-	  setup_info[choice].type & TYPE_YES_NO_AUTO)
-	button = MB_MENU_CHOICE;
-    }
-    else if (dy)
-      y += dy;
-
-    /* jump to next non-empty menu entry (up or down) */
-    while (first_entry + y > 0 &&
-	   first_entry + y < max_setup_info - 1 &&
-	   setup_info[first_entry + y].type & TYPE_SKIP_ENTRY)
-      y += dy;
-
-    if (!IN_VIS_MENU(x, y))
-    {
-      choice += y - y_old;
-
-      if (choice < first_entry)
-	first_entry = choice;
-      else if (choice > first_entry + num_page_entries - 1)
-	first_entry = choice - num_page_entries + 1;
-
-      if (first_entry >= 0 &&
-	  first_entry + num_page_entries <= max_setup_info)
-      {
-	first_entry_store[setup_mode] = first_entry;
-
-	if (choice < first_entry)
-	  choice = first_entry;
-	else if (choice > first_entry + num_page_entries - 1)
-	  choice = first_entry + num_page_entries - 1;
-
-	choice_store[setup_mode] = choice;
-
-	drawSetupInfoList(setup_info, first_entry, NUM_MENU_ENTRIES_ON_SCREEN);
-
-	DrawCursorAndText_Setup(choice - first_entry, choice, TRUE);
-
-	AdjustScrollbar(SCREEN_CTRL_ID_SCROLL_VERTICAL, max_setup_info,
-			NUM_MENU_ENTRIES_ON_SCREEN, first_entry);
-      }
-
-      return;
-    }
-  }
-
-  if (!anyScrollbarGadgetActive() &&
-      IN_VIS_MENU(x, y) &&
-      mx < screen_gadget[SCREEN_CTRL_ID_SCROLL_VERTICAL]->x &&
-      y >= 0 && y < num_page_entries)
-  {
-    if (button)
-    {
-      if (first_entry + y != choice &&
-	  setup_info[first_entry + y].type & ~TYPE_SKIP_ENTRY)
-      {
-	PlaySound(SND_MENU_ITEM_ACTIVATING);
-
-	DrawCursorAndText_Setup(choice - first_entry, choice, FALSE);
-	DrawCursorAndText_Setup(y, first_entry + y, TRUE);
-
-	choice = choice_store[setup_mode] = first_entry + y;
-      }
-    }
-    else if (!(setup_info[first_entry + y].type & TYPE_GHOSTED))
-    {
-      PlaySound(SND_MENU_ITEM_SELECTING);
-
-      /* when selecting key headline, execute function for key value change */
-      if (setup_info[first_entry + y].type & TYPE_KEYTEXT &&
-	  setup_info[first_entry + y + 1].type & TYPE_KEY)
-	y++;
-
-      /* when selecting string value, execute function for list selection */
-      if (setup_info[first_entry + y].type & TYPE_STRING && y > 0 &&
-	  setup_info[first_entry + y - 1].type & TYPE_ENTER_LIST)
-	y--;
-
-      if (setup_info[first_entry + y].type & TYPE_ENTER_OR_LEAVE)
-      {
-	void (*menu_callback_function)(void) =
-	  setup_info[first_entry + y].value;
-
-	FadeSetFromType(setup_info[first_entry + y].type);
-
-	menu_callback_function();
-      }
-      else
-      {
-	if (setup_info[first_entry + y].type & TYPE_VALUE)
-	  changeSetupValue(y, first_entry + y, dx);
-      }
-    }
-  }
+  HandleMenuScreen(mx, my, dx, dy, button,
+		   setup_mode, num_setup_info, max_setup_info);
 }
 
 void DrawSetupScreen_Input()
