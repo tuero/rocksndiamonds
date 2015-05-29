@@ -8862,6 +8862,14 @@ static void LoadMenuDesignSettingsFromFilename(char *filename)
       menu.draw_xoffset_info[i] = get_integer_from_string(value_1);
     if (value_2 != NULL)
       menu.draw_yoffset_info[i] = get_integer_from_string(value_2);
+
+    if (i == GFX_SPECIAL_ARG_INFO_ELEMENTS)
+    {
+      char *value_1 = getHashEntry(setup_file_hash, "menu.list_size.INFO");
+
+      if (value_1 != NULL)
+	menu.list_size_info[i] = get_integer_from_string(value_1);
+    }
   }
 
   /* special case: initialize with default values that may be overwritten */

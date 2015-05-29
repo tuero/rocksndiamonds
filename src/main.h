@@ -2166,6 +2166,7 @@ struct MenuInfo
   int scrollbar_xoffset;
 
   int list_size[NUM_SPECIAL_GFX_ARGS];
+  int list_size_info[NUM_SPECIAL_GFX_INFO_ARGS];
 
   struct TitleFadingInfo enter_menu;
   struct TitleFadingInfo leave_menu;

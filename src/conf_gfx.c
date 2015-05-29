@@ -6229,6 +6229,7 @@ struct ConfigInfo image_config[] =
   { "menu.list_size.LEVELNR",			"-1"			},
   { "menu.list_size.SCORES",			"-1"			},
   { "menu.list_size.INFO",			"-1"			},
+  { "menu.list_size.INFO[ELEMENTS]",		"-1"			},
   { "menu.list_size.SETUP",			"-1"			},
 
   { "main.button.name.x",			"0"			},
