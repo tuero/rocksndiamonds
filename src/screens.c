@@ -2178,10 +2178,10 @@ static void changeSetupValue(int, int, int);
 void HandleMenuScreen(int mx, int my, int dx, int dy, int button,
 		      int mode, int num_page_entries, int max_page_entries)
 {
-  static int game_status_last;
-  static int num_page_entries_last[NUM_SPECIAL_GFX_ARGS];
+  static int num_page_entries_all_last[NUM_SPECIAL_GFX_ARGS][MAX_MENU_MODES];
   static int choice_stores[NUM_SPECIAL_GFX_ARGS][MAX_MENU_MODES];
   static int first_entry_stores[NUM_SPECIAL_GFX_ARGS][MAX_MENU_MODES];
+  int *num_page_entries_last = num_page_entries_all_last[game_status];
   int *choice_store = choice_stores[game_status];
   int *first_entry_store = first_entry_stores[game_status];
   int choice = choice_store[mode];		/* starts with 0 */
@@ -2198,18 +2198,15 @@ void HandleMenuScreen(int mx, int my, int dx, int dy, int button,
     // check if number of menu page entries has changed (may happen by change
     // of custom artwork definition value for 'list_size' for this menu screen)
     // (in this case, the last menu position most probably has to be corrected)
-    if (game_status != game_status_last &&
-	num_page_entries != num_page_entries_last[game_status])
+    if (num_page_entries != num_page_entries_last[mode])
     {
-      for (i = 0; i < MAX_MENU_MODES; i++)
-	choice_store[i] = first_entry_store[i] = 0;
+      choice_store[mode] = first_entry_store[mode] = 0;
 
       choice = first_entry = 0;
       y = y_old = 0;
-    }
 
-    game_status_last = game_status;
-    num_page_entries_last[game_status] = num_page_entries;
+      num_page_entries_last[mode] = num_page_entries;
+    }
 
     /* advance to first valid menu entry */
     while (choice < num_page_entries &&
