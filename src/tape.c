@@ -747,7 +747,9 @@ void TapeTogglePause(boolean toggle_manual)
     }
   }
 
-  if (game_status == GAME_MODE_PLAYING && CheckEngineSnapshotList())
+  if (setup.show_snapshot_buttons &&
+      game_status == GAME_MODE_PLAYING &&
+      CheckEngineSnapshotList())
   {
     if (tape.pausing)
       MapUndoRedoButtons();

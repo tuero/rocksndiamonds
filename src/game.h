@@ -105,6 +105,7 @@ struct GameButtonInfo
   struct XY redo;
 
   struct XY save;
+  struct XY pause2;
   struct XY load;
 
   struct XY sound_music;

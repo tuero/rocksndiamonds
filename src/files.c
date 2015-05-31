@@ -7913,20 +7913,21 @@ void SaveScore(int nr)
 #define SETUP_TOKEN_GAME_FRAME_DELAY		26
 #define SETUP_TOKEN_SP_SHOW_BORDER_ELEMENTS	27
 #define SETUP_TOKEN_SMALL_GAME_GRAPHICS		28
-#define SETUP_TOKEN_GRAPHICS_SET		29
-#define SETUP_TOKEN_SOUNDS_SET			30
-#define SETUP_TOKEN_MUSIC_SET			31
-#define SETUP_TOKEN_OVERRIDE_LEVEL_GRAPHICS	32
-#define SETUP_TOKEN_OVERRIDE_LEVEL_SOUNDS	33
-#define SETUP_TOKEN_OVERRIDE_LEVEL_MUSIC	34
-#define SETUP_TOKEN_VOLUME_SIMPLE		35
-#define SETUP_TOKEN_VOLUME_LOOPS		36
-#define SETUP_TOKEN_VOLUME_MUSIC		37
-#define SETUP_TOKEN_TOUCH_CONTROL_TYPE		38
-#define SETUP_TOKEN_TOUCH_MOVE_DISTANCE		39
-#define SETUP_TOKEN_TOUCH_DROP_DISTANCE		40
+#define SETUP_TOKEN_SHOW_SNAPSHOT_BUTTONS	29
+#define SETUP_TOKEN_GRAPHICS_SET		30
+#define SETUP_TOKEN_SOUNDS_SET			31
+#define SETUP_TOKEN_MUSIC_SET			32
+#define SETUP_TOKEN_OVERRIDE_LEVEL_GRAPHICS	33
+#define SETUP_TOKEN_OVERRIDE_LEVEL_SOUNDS	34
+#define SETUP_TOKEN_OVERRIDE_LEVEL_MUSIC	35
+#define SETUP_TOKEN_VOLUME_SIMPLE		36
+#define SETUP_TOKEN_VOLUME_LOOPS		37
+#define SETUP_TOKEN_VOLUME_MUSIC		38
+#define SETUP_TOKEN_TOUCH_CONTROL_TYPE		39
+#define SETUP_TOKEN_TOUCH_MOVE_DISTANCE		40
+#define SETUP_TOKEN_TOUCH_DROP_DISTANCE		41
 
-#define NUM_GLOBAL_SETUP_TOKENS			41
+#define NUM_GLOBAL_SETUP_TOKENS			42
 
 /* editor setup */
 #define SETUP_TOKEN_EDITOR_EL_BOULDERDASH	0
@@ -8085,6 +8086,7 @@ static struct TokenInfo global_setup_tokens[] =
   { TYPE_INTEGER,&si.game_frame_delay,        "game_frame_delay"	},
   { TYPE_SWITCH, &si.sp_show_border_elements, "sp_show_border_elements"	},
   { TYPE_SWITCH, &si.small_game_graphics,     "small_game_graphics"	},
+  { TYPE_SWITCH, &si.show_snapshot_buttons,   "show_snapshot_buttons"	},
   { TYPE_STRING, &si.graphics_set,            "graphics_set"		},
   { TYPE_STRING, &si.sounds_set,              "sounds_set"		},
   { TYPE_STRING, &si.music_set,               "music_set"		},
@@ -8264,6 +8266,7 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
   si->game_frame_delay = GAME_FRAME_DELAY;
   si->sp_show_border_elements = FALSE;
   si->small_game_graphics = FALSE;
+  si->show_snapshot_buttons = FALSE;
 
   si->graphics_set = getStringCopy(GFX_CLASSIC_SUBDIR);
   si->sounds_set   = getStringCopy(SND_CLASSIC_SUBDIR);

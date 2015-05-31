@@ -974,12 +974,13 @@ static struct GamePanelControlInfo game_panel_controls[] =
 #define GAME_CTRL_ID_UNDO		3
 #define GAME_CTRL_ID_REDO		4
 #define GAME_CTRL_ID_SAVE		5
-#define GAME_CTRL_ID_LOAD		6
-#define SOUND_CTRL_ID_MUSIC		7
-#define SOUND_CTRL_ID_LOOPS		8
-#define SOUND_CTRL_ID_SIMPLE		9
+#define GAME_CTRL_ID_PAUSE2		6
+#define GAME_CTRL_ID_LOAD		7
+#define SOUND_CTRL_ID_MUSIC		8
+#define SOUND_CTRL_ID_LOOPS		9
+#define SOUND_CTRL_ID_SIMPLE		10
 
-#define NUM_GAME_BUTTONS		10
+#define NUM_GAME_BUTTONS		11
 
 
 /* forward declaration for internal use */
@@ -14867,6 +14868,10 @@ static struct
     GAME_CTRL_ID_SAVE,			"save game"
   },
   {
+    IMG_GAME_BUTTON_GFX_PAUSE2,		&game.button.pause2,
+    GAME_CTRL_ID_PAUSE2,		"pause game"
+  },
+  {
     IMG_GAME_BUTTON_GFX_LOAD,		&game.button.load,
     GAME_CTRL_ID_LOAD,			"load game"
   },
@@ -14916,7 +14921,6 @@ void CreateGameButtons()
     }
 
     if (id == GAME_CTRL_ID_STOP ||
-	id == GAME_CTRL_ID_PAUSE ||
 	id == GAME_CTRL_ID_PLAY ||
 	id == GAME_CTRL_ID_SAVE ||
 	id == GAME_CTRL_ID_LOAD)
@@ -15001,22 +15005,18 @@ void MapUndoRedoButtons()
 {
   UnmapGameButtonsAtSamePosition(GAME_CTRL_ID_UNDO);
   UnmapGameButtonsAtSamePosition(GAME_CTRL_ID_REDO);
-  UnmapGameButtonsAtSamePosition(GAME_CTRL_ID_PLAY);
 
   MapGadget(game_gadget[GAME_CTRL_ID_UNDO]);
   MapGadget(game_gadget[GAME_CTRL_ID_REDO]);
-  MapGadget(game_gadget[GAME_CTRL_ID_PLAY]);
 }
 
 void UnmapUndoRedoButtons()
 {
   UnmapGadget(game_gadget[GAME_CTRL_ID_UNDO]);
   UnmapGadget(game_gadget[GAME_CTRL_ID_REDO]);
-  UnmapGadget(game_gadget[GAME_CTRL_ID_PLAY]);
 
   MapGameButtonsAtSamePosition(GAME_CTRL_ID_UNDO);
   MapGameButtonsAtSamePosition(GAME_CTRL_ID_REDO);
-  MapGameButtonsAtSamePosition(GAME_CTRL_ID_PLAY);
 }
 
 void MapGameButtons()
@@ -15025,9 +15025,23 @@ void MapGameButtons()
 
   for (i = 0; i < NUM_GAME_BUTTONS; i++)
     if (i != GAME_CTRL_ID_UNDO &&
-	i != GAME_CTRL_ID_REDO &&
-	i != GAME_CTRL_ID_PLAY)
+	i != GAME_CTRL_ID_REDO)
       MapGadget(game_gadget[i]);
+
+  if (setup.show_snapshot_buttons)
+  {
+    UnmapGameButtonsAtSamePosition(GAME_CTRL_ID_SAVE);
+    UnmapGameButtonsAtSamePosition(GAME_CTRL_ID_PAUSE2);
+    UnmapGameButtonsAtSamePosition(GAME_CTRL_ID_LOAD);
+  }
+  else
+  {
+    UnmapGameButtonsAtSamePosition(GAME_CTRL_ID_STOP);
+    UnmapGameButtonsAtSamePosition(GAME_CTRL_ID_PAUSE);
+    UnmapGameButtonsAtSamePosition(GAME_CTRL_ID_PLAY);
+  }
+
+  RedrawGameButtons();
 }
 
 void UnmapGameButtons()
@@ -15111,6 +15125,7 @@ static void HandleGameButtonsExt(int id, int button)
       break;
 
     case GAME_CTRL_ID_PAUSE:
+    case GAME_CTRL_ID_PAUSE2:
       if (options.network && game_status == GAME_MODE_PLAYING)
       {
 #if defined(NETWORK_AVALIABLE)

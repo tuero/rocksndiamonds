@@ -982,6 +982,7 @@ struct SetupInfo
   int game_frame_delay;
   boolean sp_show_border_elements;
   boolean small_game_graphics;
+  boolean show_snapshot_buttons;
 
   char *graphics_set;
   char *sounds_set;
