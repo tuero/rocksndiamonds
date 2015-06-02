@@ -8788,9 +8788,36 @@ static void InitMenuDesignSettings_SpecialPreProcessing()
 
 static void InitMenuDesignSettings_SpecialPostProcessing()
 {
+  static struct
+  {
+    struct XY *dst, *src;
+  }
+  game_buttons_xy[] =
+  {
+    { &game.button.save,	&game.button.stop	},
+    { &game.button.pause2,	&game.button.pause	},
+    { &game.button.load,	&game.button.play	},
+    { &game.button.undo,	&game.button.stop	},
+    { &game.button.redo,	&game.button.play	},
+
+    { NULL,			NULL			}
+  };
+  int i;
+
   /* special case: initialize later added SETUP list size from LEVELS value */
   if (menu.list_size[GAME_MODE_SETUP] == -1)
     menu.list_size[GAME_MODE_SETUP] = menu.list_size[GAME_MODE_LEVELS];
+
+  /* set default position for snapshot buttons to stop/pause/play buttons */
+  for (i = 0; game_buttons_xy[i].dst != NULL; i++)
+  {
+    if ((*game_buttons_xy[i].dst).x == -1 &&
+	(*game_buttons_xy[i].dst).y == -1)
+    {
+      (*game_buttons_xy[i].dst).x = (*game_buttons_xy[i].src).x;
+      (*game_buttons_xy[i].dst).y = (*game_buttons_xy[i].src).y;
+    }
+  }
 }
 
 static void LoadMenuDesignSettingsFromFilename(char *filename)
