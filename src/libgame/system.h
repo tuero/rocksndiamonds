@@ -786,8 +786,6 @@ struct GfxInfo
   int draw_deactivation_mask;
   int draw_background_mask;
 
-  boolean drawing_area_changed;
-
   Bitmap *field_save_buffer;
 
   Bitmap *background_bitmap;

@@ -174,10 +174,8 @@ static void HandleChooseTree(int, int, int, int, int, TreeInfo **);
 static void DrawChooseLevelSet(void);
 static void DrawChooseLevelNr(void);
 static void DrawInfoScreen(void);
-static void DrawAndFadeInInfoScreen(int);
 static void DrawSetupScreen(void);
 
-static void DrawInfoScreenExt(int, int);
 static void DrawInfoScreen_NotAvailable(char *, char *);
 static void DrawInfoScreen_HelpAnim(int, int, boolean);
 static void DrawInfoScreen_HelpText(int, int, int, int);
@@ -1368,10 +1366,11 @@ boolean CheckTitleScreen(boolean levelset_has_changed)
   return (show_titlescreen && num_title_screens > 0);
 }
 
-void DrawMainMenuExt(int fade_mask, boolean do_fading)
+void DrawMainMenu()
 {
   static LevelDirTree *leveldir_last_valid = NULL;
   boolean levelset_has_changed = FALSE;
+  int fade_mask = REDRAW_FIELD;
 
   LimitScreenUpdates(FALSE);
 
@@ -1439,9 +1438,6 @@ void DrawMainMenuExt(int fade_mask, boolean do_fading)
   UndrawSpecialEditorDoor();
 
   SetDrawtoField(DRAW_BACKBUFFER);
-
-  /* reset drawing area change flag */
-  DrawingAreaChanged();
 
   if (CheckTitleScreen(levelset_has_changed))
   {
@@ -1521,16 +1517,6 @@ void DrawMainMenuExt(int fade_mask, boolean do_fading)
   OpenDoor(DOOR_CLOSE_1 | DOOR_OPEN_2);
 }
 
-void DrawAndFadeInMainMenu(int fade_mask)
-{
-  DrawMainMenuExt(fade_mask, TRUE);
-}
-
-void DrawMainMenu()
-{
-  DrawMainMenuExt(REDRAW_ALL, FALSE);
-}
-
 static void gotoTopLevelDir()
 {
   /* move upwards until inside (but not above) top level directory */
@@ -1567,7 +1553,6 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
   static int title_screen_nr = 0;
   static int last_sound = -1, last_music = -1;
   boolean return_to_main_menu = FALSE;
-  boolean use_fading_main_menu = TRUE;
   struct TitleControlInfo *tci;
   struct TitleFadingInfo fading_default;
   struct TitleFadingInfo fading_last = fading;
@@ -1642,7 +1627,6 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
   if (button == MB_MENU_LEAVE)
   {
     return_to_main_menu = TRUE;
-    use_fading_main_menu = FALSE;
   }
   else if (button == MB_MENU_CHOICE)
   {
@@ -1651,7 +1635,7 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
       FadeSetEnterScreen();
 
       info_mode = INFO_MODE_MAIN;
-      DrawAndFadeInInfoScreen(REDRAW_FIELD);
+      DrawInfoScreen();
 
       return;
     }
@@ -1712,19 +1696,20 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
   {
     SetMouseCursor(CURSOR_DEFAULT);
 
+    /* force full menu screen redraw after displaying title screens */
+    redraw_mask = REDRAW_ALL;
+
     if (game_status == GAME_MODE_INFO)
     {
-      int fade_mask = (num_title_screens == 0 ? REDRAW_FIELD : REDRAW_ALL);
-
       info_mode = INFO_MODE_MAIN;
 
-      DrawInfoScreenExt(fade_mask, use_fading_main_menu);
+      DrawInfoScreen();
     }
     else	/* default: return to main menu */
     {
       game_status = GAME_MODE_MAIN;
 
-      DrawMainMenuExt(REDRAW_ALL, use_fading_main_menu);
+      DrawMainMenu();
     }
   }
 }
@@ -1904,13 +1889,6 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
       {
 	game_status = GAME_MODE_SCORES;
 
-#if 1
-	/* required before door position may be changed in next step */
-	CloseDoor(DOOR_CLOSE_ALL);
-#endif
-
-	ChangeViewportPropertiesIfNeeded();
-
 	DrawHallOfFame(-1);
       }
       else if (pos == MAIN_CONTROL_EDITOR)
@@ -2025,7 +2003,7 @@ static void execExitInfo()
 {
   game_status = GAME_MODE_MAIN;
 
-  DrawMainMenuExt(REDRAW_FIELD, FALSE);
+  DrawMainMenu();
 }
 
 static struct TokenInfo info_info_main[] =
@@ -2143,9 +2121,13 @@ static void drawMenuInfoList(int first_entry, int num_page_entries,
   }
 }
 
-static void DrawInfoScreen_Main(int fade_mask, boolean do_fading)
+static void DrawInfoScreen_Main()
 {
+  int fade_mask = REDRAW_FIELD;
   int i;
+
+  if (redraw_mask & REDRAW_ALL)
+    fade_mask = REDRAW_ALL;
 
   if (CheckIfRedrawGlobalBorderIsNeeded())
     fade_mask = REDRAW_ALL;
@@ -2749,7 +2731,7 @@ void HandleInfoScreen_Elements(int button)
       FadeSoundsAndMusic();
 
       info_mode = INFO_MODE_MAIN;
-      DrawAndFadeInInfoScreen(REDRAW_FIELD);
+      DrawInfoScreen();
 
       return;
     }
@@ -2848,7 +2830,7 @@ void HandleInfoScreen_Music(int button)
       FadeSoundsAndMusic();
 
       info_mode = INFO_MODE_MAIN;
-      DrawAndFadeInInfoScreen(REDRAW_FIELD);
+      DrawInfoScreen();
 
       return;
     }
@@ -3152,7 +3134,7 @@ void HandleInfoScreen_Credits(int button)
       FadeSoundsAndMusic();
 
       info_mode = INFO_MODE_MAIN;
-      DrawAndFadeInInfoScreen(REDRAW_FIELD);
+      DrawInfoScreen();
 
       return;
     }
@@ -3231,7 +3213,7 @@ void HandleInfoScreen_Program(int button)
     FadeSoundsAndMusic();
 
     info_mode = INFO_MODE_MAIN;
-    DrawAndFadeInInfoScreen(REDRAW_FIELD);
+    DrawInfoScreen();
   }
   else
   {
@@ -3406,7 +3388,7 @@ void HandleInfoScreen_Version(int button)
     FadeSoundsAndMusic();
 
     info_mode = INFO_MODE_MAIN;
-    DrawAndFadeInInfoScreen(REDRAW_FIELD);
+    DrawInfoScreen();
   }
   else
   {
@@ -3494,7 +3476,7 @@ void HandleInfoScreen_LevelSet(int button)
     FadeSoundsAndMusic();
 
     info_mode = INFO_MODE_MAIN;
-    DrawAndFadeInInfoScreen(REDRAW_FIELD);
+    DrawInfoScreen();
   }
   else
   {
@@ -3502,7 +3484,7 @@ void HandleInfoScreen_LevelSet(int button)
   }
 }
 
-static void DrawInfoScreenExt(int fade_mask, boolean do_fading)
+static void DrawInfoScreen()
 {
   SetMainBackgroundImage(IMG_BACKGROUND_INFO);
 
@@ -3521,7 +3503,7 @@ static void DrawInfoScreenExt(int fade_mask, boolean do_fading)
   else if (info_mode == INFO_MODE_LEVELSET)
     DrawInfoScreen_LevelSet();
   else
-    DrawInfoScreen_Main(fade_mask, do_fading);
+    DrawInfoScreen_Main();
 
   if (info_mode != INFO_MODE_MAIN &&
       info_mode != INFO_MODE_TITLE &&
@@ -3530,16 +3512,6 @@ static void DrawInfoScreenExt(int fade_mask, boolean do_fading)
     PlayMenuSound();
     PlayMenuMusic();
   }
-}
-
-void DrawAndFadeInInfoScreen(int fade_mask)
-{
-  DrawInfoScreenExt(fade_mask, TRUE);
-}
-
-void DrawInfoScreen()
-{
-  DrawInfoScreenExt(REDRAW_FIELD, FALSE);
 }
 
 void HandleInfoScreen(int mx, int my, int dx, int dy, int button)
@@ -3652,13 +3624,16 @@ void HandleTypeName(int newxpos, Key key)
 
 static void DrawChooseTree(TreeInfo **ti_ptr)
 {
-  int fade_mask = (DrawingAreaChanged() ? REDRAW_ALL : REDRAW_FIELD);
+  int fade_mask = REDRAW_FIELD;
+
+  if (CheckIfRedrawGlobalBorderIsNeeded())
+    fade_mask = REDRAW_ALL;
 
   if (strEqual((*ti_ptr)->subdir, STRING_TOP_DIRECTORY))
   {
     game_status = GAME_MODE_MAIN;
 
-    DrawMainMenuExt(REDRAW_FIELD, FALSE);
+    DrawMainMenu();
 
     return;
   }
@@ -3865,7 +3840,7 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
 
       game_status = GAME_MODE_MAIN;
 
-      DrawMainMenuExt(REDRAW_FIELD, FALSE);
+      DrawMainMenu();
     }
 
     return;
@@ -4148,7 +4123,16 @@ void HandleChooseLevelNr(int mx, int my, int dx, int dy, int button)
 
 void DrawHallOfFame(int highlight_position)
 {
-  int fade_mask = (DrawingAreaChanged() ? REDRAW_ALL : REDRAW_FIELD);
+  int fade_mask = REDRAW_FIELD;
+
+  /* required before door position may be changed in next step */
+  CloseDoor(DOOR_CLOSE_ALL);
+
+  /* needed if different viewport properties defined for scores */
+  ChangeViewportPropertiesIfNeeded();
+
+  if (CheckIfRedrawGlobalBorderIsNeeded())
+    fade_mask = REDRAW_ALL;
 
   UnmapAllGadgets();
   FadeSoundsAndMusic();
@@ -4160,8 +4144,6 @@ void DrawHallOfFame(int highlight_position)
   /* (this is needed when called from GameEnd() after winning a game) */
   SetDrawDeactivationMask(REDRAW_NONE);
   SetDrawBackgroundMask(REDRAW_FIELD);
-
-  CloseDoor(DOOR_CLOSE_ALL);
 
   if (highlight_position < 0) 
     LoadScore(level_nr);
@@ -4278,7 +4260,7 @@ void HandleHallOfFame(int mx, int my, int dx, int dy, int button)
 
     game_status = GAME_MODE_MAIN;
 
-    DrawAndFadeInMainMenu(REDRAW_FIELD);
+    DrawMainMenu();
   }
 
   if (game_status == GAME_MODE_SCORES)
@@ -5268,7 +5250,7 @@ static void execExitSetup()
 {
   game_status = GAME_MODE_MAIN;
 
-  DrawMainMenuExt(REDRAW_FIELD, FALSE);
+  DrawMainMenu();
 }
 
 static void execSaveAndExitSetup()
@@ -5754,7 +5736,7 @@ static void changeSetupValue(int screen_pos, int setup_info_pos_raw, int dx)
 
 static void DrawSetupScreen_Generic()
 {
-  int fade_mask = (DrawingAreaChanged() ? REDRAW_ALL : REDRAW_FIELD);
+  int fade_mask = REDRAW_FIELD;
   boolean redraw_all = FALSE;
   char *title_string = NULL;
   int i;

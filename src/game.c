@@ -4424,7 +4424,7 @@ void GameEnd()
   {
     game_status = GAME_MODE_MAIN;
 
-    DrawAndFadeInMainMenu(REDRAW_FIELD);
+    DrawMainMenu();
 
     return;
   }
@@ -4435,7 +4435,7 @@ void GameEnd()
 
     game_status = GAME_MODE_MAIN;
 
-    DrawAndFadeInMainMenu(REDRAW_FIELD);
+    DrawMainMenu();
 
     return;
   }
@@ -4453,9 +4453,6 @@ void GameEnd()
   if ((hi_pos = NewHiScore()) >= 0) 
   {
     game_status = GAME_MODE_SCORES;
-
-    /* needed if different viewport properties defined for scores */
-    ChangeViewportPropertiesIfNeeded();
 
     DrawHallOfFame(hi_pos);
 
@@ -4477,7 +4474,7 @@ void GameEnd()
       TapeErase();
     }
 
-    DrawAndFadeInMainMenu(REDRAW_FIELD);
+    DrawMainMenu();
   }
 }
 
@@ -14489,13 +14486,13 @@ void RequestQuitGameExt(boolean skip_request, boolean quick_quit, char *message)
 
 	game_status = GAME_MODE_MAIN;
 
-	DrawAndFadeInMainMenu(REDRAW_FIELD);
+	DrawMainMenu();
       }
       else
       {
 	game_status = GAME_MODE_MAIN;
 
-	DrawAndFadeInMainMenu(REDRAW_FIELD);
+	DrawMainMenu();
       }
     }
   }

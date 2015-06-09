@@ -21,7 +21,7 @@
 
 int effectiveGameStatus();
 
-void DrawMainMenuExt(int, boolean);
+void DrawMainMenuExt(int);
 void DrawAndFadeInMainMenu(int);
 void DrawMainMenu(void);
 void DrawHallOfFame(int);

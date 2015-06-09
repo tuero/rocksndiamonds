@@ -7612,8 +7612,6 @@ void InitZoomLevelSettings()
   MAX_ED_FIELDY = getMaxEdFieldY(FALSE);
 }
 
-static boolean playfield_area_changed = FALSE;
-
 void DrawLevelEd()
 {
   int fade_mask = REDRAW_FIELD;
@@ -7651,8 +7649,6 @@ void DrawLevelEd()
 #endif
 
   InitZoomLevelSettings();
-
-  playfield_area_changed = DrawingAreaChanged();
 
   OpenDoor(DOOR_OPEN_1 | DOOR_OPEN_2 | DOOR_NO_DELAY);
 
@@ -7711,11 +7707,6 @@ void DrawLevelEd()
   MapControlButtons();
 
   DrawEditModeWindow();
-
-  fade_mask = (playfield_area_changed ? REDRAW_ALL : REDRAW_FIELD);
-
-  if (CheckIfRedrawGlobalBorderIsNeeded())
-    fade_mask = REDRAW_ALL;
 
   FadeIn(fade_mask);
 
@@ -12291,7 +12282,7 @@ void RequestExitLevelEditor(boolean ask_if_level_has_changed,
 
     game_status = GAME_MODE_MAIN;
 
-    DrawAndFadeInMainMenu(playfield_area_changed ? REDRAW_ALL : REDRAW_FIELD);
+    DrawMainMenu();
   }
   else
   {

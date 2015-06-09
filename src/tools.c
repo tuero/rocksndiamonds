@@ -8085,7 +8085,6 @@ void ChangeViewportPropertiesIfNeeded()
   boolean init_video_buffer = FALSE;
   boolean init_gadgets_and_toons = FALSE;
   boolean init_em_graphics = FALSE;
-  boolean drawing_area_changed = FALSE;
 
   if (viewport.window.width  != WIN_XSIZE ||
       viewport.window.height != WIN_YSIZE)
@@ -8144,19 +8143,6 @@ void ChangeViewportPropertiesIfNeeded()
       init_em_graphics = TRUE;
     }
 
-    if (new_sx != SX ||
-	new_sy != SY ||
-	new_sxsize != SXSIZE ||
-	new_sysize != SYSIZE ||
-	new_real_sx != REAL_SX ||
-	new_real_sy != REAL_SY ||
-	new_full_sxsize != FULL_SXSIZE ||
-	new_full_sysize != FULL_SYSIZE)
-    {
-      if (!init_video_buffer)
-	drawing_area_changed = TRUE;
-    }
-
     SX = new_sx;
     SY = new_sy;
     DX = new_dx;
@@ -8197,8 +8183,6 @@ void ChangeViewportPropertiesIfNeeded()
 
     SCR_FIELDX = new_scr_fieldx;
     SCR_FIELDY = new_scr_fieldy;
-
-    gfx.drawing_area_changed = drawing_area_changed;
 
     SetDrawDeactivationMask(REDRAW_NONE);
     SetDrawBackgroundMask(REDRAW_FIELD);

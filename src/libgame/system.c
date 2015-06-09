@@ -171,8 +171,6 @@ void InitGfxFieldInfo(int sx, int sy, int sxsize, int sysize,
 
   gfx.field_save_buffer = field_save_buffer;
 
-  gfx.drawing_area_changed = FALSE;
-
   SetDrawDeactivationMask(REDRAW_NONE);		/* do not deactivate drawing */
   SetDrawBackgroundMask(REDRAW_NONE);		/* deactivate masked drawing */
 }
@@ -499,16 +497,6 @@ boolean DrawingOnBackground(int x, int y)
 {
   return (CheckDrawingArea(x, y, 1, 1, gfx.background_bitmap_mask) &&
 	  CheckDrawingArea(x, y, 1, 1, gfx.draw_background_mask));
-}
-
-boolean DrawingAreaChanged()
-{
-  int drawing_area_changed = gfx.drawing_area_changed;
-
-  // reset flag for change of drawing area after querying it
-  gfx.drawing_area_changed = FALSE;
-
-  return drawing_area_changed;
 }
 
 static boolean InClippedRectangle(Bitmap *bitmap, int *x, int *y,
