@@ -7620,33 +7620,15 @@ void DrawLevelEd()
 
   CloseDoor(DOOR_CLOSE_ALL);
 
-#if 1
   /* needed if different viewport properties defined for editor */
   ChangeViewportPropertiesIfNeeded();
-#endif
 
   if (CheckIfRedrawGlobalBorderIsNeeded())
     fade_mask = REDRAW_ALL;
 
-#if 0
-  printf("::: %d\n", (fade_mask == REDRAW_ALL ? 1 : 0));
-#endif
-
   FadeOut(fade_mask);
 
-#if 0
-  /* needed after playing if editor playfield area has different size */
-  ClearRectangle(drawto, REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE);
-#endif
-
-#if 0
-  /* needed if different viewport properties defined for editor */
-  ChangeViewportPropertiesIfNeeded();
-#endif
-
-#if 1
   ClearField();
-#endif
 
   InitZoomLevelSettings();
 

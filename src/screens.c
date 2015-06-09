@@ -1416,10 +1416,8 @@ void DrawMainMenu()
   /* needed if last screen (level choice) changed graphics, sounds or music */
   ReloadCustomArtwork(0);
 
-#if 1
   /* needed if different viewport properties defined for menues */
   ChangeViewportPropertiesIfNeeded();
-#endif
 
   if (redraw_mask & REDRAW_ALL)
     fade_mask = REDRAW_ALL;
@@ -1428,11 +1426,6 @@ void DrawMainMenu()
     fade_mask = REDRAW_ALL;
 
   FadeOut(fade_mask);
-
-#if 0
-  /* needed if different viewport properties defined for menues */
-  ChangeViewportPropertiesIfNeeded();
-#endif
 
   /* needed if last screen was the editor screen */
   UndrawSpecialEditorDoor();
@@ -1461,7 +1454,7 @@ void DrawMainMenu()
 
   SetMainBackgroundImage(IMG_BACKGROUND_MAIN);
 
-#if 1
+#if 0
   if (fade_mask == REDRAW_ALL)
     RedrawGlobalBorder();
 #endif
@@ -1497,11 +1490,6 @@ void DrawMainMenu()
   OpenDoor(GetDoorState() | DOOR_NO_DELAY | DOOR_FORCE_REDRAW);
 
   DrawMaskedBorder(REDRAW_ALL);
-
-#if 0
-  if (redraw_mask & REDRAW_ALL)
-    fade_mask = REDRAW_ALL;
-#endif
 
   FadeIn(fade_mask);
   FadeSetEnterMenu();

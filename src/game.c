@@ -3098,10 +3098,8 @@ void InitGame()
   if (!game.restart_level)
     CloseDoor(DOOR_CLOSE_1);
 
-#if 1
   /* needed if different viewport properties defined for playing */
   ChangeViewportPropertiesIfNeeded();
-#endif
 
   if (level_editor_test_game)
     FadeSkipNextFadeIn();
@@ -3111,20 +3109,9 @@ void InitGame()
   if (CheckIfRedrawGlobalBorderIsNeeded())
     fade_mask = REDRAW_ALL;
 
-#if 0
-  printf("::: %d\n", (fade_mask == REDRAW_ALL ? 1 : 0));
-#endif
-
   FadeOut(fade_mask);
 
-#if 0
-  /* needed if different viewport properties defined for playing */
-  ChangeViewportPropertiesIfNeeded();
-#endif
-
-#if 1
   ClearField();
-#endif
 
   DrawCompleteVideoDisplay();
 
