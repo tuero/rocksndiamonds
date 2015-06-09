@@ -247,8 +247,8 @@ struct ConfigInfo sound_config[] =
   { "game.sokoban_solving",		"buing.wav"			},
 
   /* sounds for other non-game actions */
-  { "door.opening",			"oeffnen.wav"			},
-  { "door.closing",			"oeffnen.wav"			},
+  { "door.opening",			"door.wav"			},
+  { "door.closing",			"door.wav"			},
 
   { "request.opening",			UNDEFINED_FILENAME		},
   { "request.closing",			UNDEFINED_FILENAME		},
