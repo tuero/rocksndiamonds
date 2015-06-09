@@ -11057,9 +11057,18 @@ void GameActions()
   if (tape.playing && tape.warp_forward && !tape.pausing)
     game_frame_delay_value = 0;
 
+#if 0
+  /* ---------- main game synchronization point ---------- */
+
+  int skip = WaitUntilDelayReached(&game_frame_delay, game_frame_delay_value);
+
+  printf("::: skip == %d\n", skip);
+
+#else
   /* ---------- main game synchronization point ---------- */
 
   WaitUntilDelayReached(&game_frame_delay, game_frame_delay_value);
+#endif
 
   if (network_playing && !network_player_action_received)
   {

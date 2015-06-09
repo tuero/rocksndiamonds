@@ -60,6 +60,23 @@ static void UpdateScreen(SDL_Rect *rect)
 
   LimitScreenUpdates(FALSE);
 
+#if 0
+  {
+    static int LastFrameCounter = 0;
+    boolean changed = (FrameCounter != LastFrameCounter);
+
+    printf("::: FrameCounter == %d [%s]\n", FrameCounter,
+	   (changed ? "-" : "SAME FRAME UPDATED"));
+
+    LastFrameCounter = FrameCounter;
+
+    /*
+    if (FrameCounter % 2)
+      return;
+    */
+  }
+#endif
+
 #if defined(TARGET_SDL2)
 #if USE_RENDERER
   SDL_Surface *screen = backbuffer->surface;
