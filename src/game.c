@@ -3083,6 +3083,7 @@ void InitGame()
 {
   int full_lev_fieldx = lev_fieldx + (BorderElement != EL_EMPTY ? 2 : 0);
   int full_lev_fieldy = lev_fieldy + (BorderElement != EL_EMPTY ? 2 : 0);
+  int fade_mask = REDRAW_FIELD;
 
   boolean emulate_bd = TRUE;	/* unless non-BOULDERDASH elements found */
   boolean emulate_sb = TRUE;	/* unless non-SOKOBAN     elements found */
@@ -3097,15 +3098,33 @@ void InitGame()
   if (!game.restart_level)
     CloseDoor(DOOR_CLOSE_1);
 
+#if 1
+  /* needed if different viewport properties defined for playing */
+  ChangeViewportPropertiesIfNeeded();
+#endif
+
   if (level_editor_test_game)
     FadeSkipNextFadeIn();
   else
     FadeSetEnterScreen();
 
-  FadeOut(REDRAW_FIELD);
+  if (CheckIfRedrawGlobalBorderIsNeeded())
+    fade_mask = REDRAW_ALL;
 
+#if 0
+  printf("::: %d\n", (fade_mask == REDRAW_ALL ? 1 : 0));
+#endif
+
+  FadeOut(fade_mask);
+
+#if 0
   /* needed if different viewport properties defined for playing */
   ChangeViewportPropertiesIfNeeded();
+#endif
+
+#if 1
+  ClearField();
+#endif
 
   DrawCompleteVideoDisplay();
 
@@ -3919,7 +3938,7 @@ void InitGame()
   BlitScreenToBitmap(backbuffer);
   /* !!! FIX THIS (END) !!! */
 
-  FadeIn(REDRAW_FIELD);
+  FadeIn(fade_mask);
 
 #if 1
   // full screen redraw is required at this point in the following cases:

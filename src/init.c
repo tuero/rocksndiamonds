@@ -1369,6 +1369,10 @@ static void InitGraphicInfo()
   static int full_size_graphics[] =
   {
     IMG_GLOBAL_BORDER,
+    IMG_GLOBAL_BORDER_MAIN,
+    IMG_GLOBAL_BORDER_SCORES,
+    IMG_GLOBAL_BORDER_EDITOR,
+    IMG_GLOBAL_BORDER_PLAYING,
     IMG_GLOBAL_DOOR,
 
     IMG_BACKGROUND_ENVELOPE_1,
@@ -4998,9 +5002,21 @@ static void InitMixer()
 
 void InitGfxBuffers()
 {
+  static int win_xsize_last = -1;
+  static int win_ysize_last = -1;
+
   /* create additional image buffers for double-buffering and cross-fading */
-  ReCreateBitmap(&bitmap_db_store, WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH);
-  ReCreateBitmap(&bitmap_db_cross, WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH);
+
+  if (WIN_XSIZE != win_xsize_last || WIN_YSIZE != win_ysize_last)
+  {
+    /* may contain content for cross-fading -- only re-create if changed */
+    ReCreateBitmap(&bitmap_db_store, WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH);
+    ReCreateBitmap(&bitmap_db_cross, WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH);
+
+    win_xsize_last = WIN_XSIZE;
+    win_ysize_last = WIN_YSIZE;
+  }
+
   ReCreateBitmap(&bitmap_db_field, FXSIZE, FYSIZE, DEFAULT_DEPTH);
   ReCreateBitmap(&bitmap_db_panel, DXSIZE, DYSIZE, DEFAULT_DEPTH);
   ReCreateBitmap(&bitmap_db_door_1, 3 * DXSIZE, DYSIZE, DEFAULT_DEPTH);
@@ -5188,7 +5204,16 @@ void InitGfx()
 
 void RedrawGlobalBorder()
 {
-  BlitBitmap(graphic_info[IMG_GLOBAL_BORDER].bitmap, backbuffer,
+  int global_border_graphic;
+
+  global_border_graphic =
+    (game_status == GAME_MODE_MAIN ? IMG_GLOBAL_BORDER_MAIN :
+     game_status == GAME_MODE_SCORES ? IMG_GLOBAL_BORDER_SCORES :
+     game_status == GAME_MODE_EDITOR ? IMG_GLOBAL_BORDER_EDITOR :
+     game_status == GAME_MODE_PLAYING ? IMG_GLOBAL_BORDER_PLAYING :
+     IMG_GLOBAL_BORDER);
+
+  BlitBitmap(graphic_info[global_border_graphic].bitmap, backbuffer,
 	     0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
 
   redraw_mask = REDRAW_ALL;

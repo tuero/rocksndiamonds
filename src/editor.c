@@ -7616,17 +7616,39 @@ static boolean playfield_area_changed = FALSE;
 
 void DrawLevelEd()
 {
+  int fade_mask = REDRAW_FIELD;
+
   StopAnimation();
 
   CloseDoor(DOOR_CLOSE_ALL);
 
-  FadeOut(REDRAW_FIELD);
-
-  /* needed after playing if editor playfield area has different size */
-  ClearRectangle(drawto, REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE);
-
+#if 1
   /* needed if different viewport properties defined for editor */
   ChangeViewportPropertiesIfNeeded();
+#endif
+
+  if (CheckIfRedrawGlobalBorderIsNeeded())
+    fade_mask = REDRAW_ALL;
+
+#if 0
+  printf("::: %d\n", (fade_mask == REDRAW_ALL ? 1 : 0));
+#endif
+
+  FadeOut(fade_mask);
+
+#if 0
+  /* needed after playing if editor playfield area has different size */
+  ClearRectangle(drawto, REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE);
+#endif
+
+#if 0
+  /* needed if different viewport properties defined for editor */
+  ChangeViewportPropertiesIfNeeded();
+#endif
+
+#if 1
+  ClearField();
+#endif
 
   InitZoomLevelSettings();
 
@@ -7690,7 +7712,12 @@ void DrawLevelEd()
 
   DrawEditModeWindow();
 
-  FadeIn(playfield_area_changed ? REDRAW_ALL : REDRAW_FIELD);
+  fade_mask = (playfield_area_changed ? REDRAW_ALL : REDRAW_FIELD);
+
+  if (CheckIfRedrawGlobalBorderIsNeeded())
+    fade_mask = REDRAW_ALL;
+
+  FadeIn(fade_mask);
 
   /* copy actual editor door content to door double buffer for OpenDoor() */
   BlitBitmap(drawto, bitmap_db_door_1, DX, DY, DXSIZE, DYSIZE, 0, 0);

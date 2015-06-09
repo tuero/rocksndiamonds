@@ -1417,18 +1417,31 @@ void DrawMainMenuExt(int fade_mask, boolean do_fading)
   /* needed if last screen (level choice) changed graphics, sounds or music */
   ReloadCustomArtwork(0);
 
+#if 1
+  /* needed if different viewport properties defined for menues */
+  ChangeViewportPropertiesIfNeeded();
+#endif
+
   if (redraw_mask & REDRAW_ALL)
+    fade_mask = REDRAW_ALL;
+
+  if (CheckIfRedrawGlobalBorderIsNeeded())
     fade_mask = REDRAW_ALL;
 
   FadeOut(fade_mask);
 
+#if 0
   /* needed if different viewport properties defined for menues */
   ChangeViewportPropertiesIfNeeded();
+#endif
 
   /* needed if last screen was the editor screen */
   UndrawSpecialEditorDoor();
 
   SetDrawtoField(DRAW_BACKBUFFER);
+
+  /* reset drawing area change flag */
+  DrawingAreaChanged();
 
   if (CheckTitleScreen(levelset_has_changed))
   {
@@ -1452,8 +1465,10 @@ void DrawMainMenuExt(int fade_mask, boolean do_fading)
 
   SetMainBackgroundImage(IMG_BACKGROUND_MAIN);
 
+#if 1
   if (fade_mask == REDRAW_ALL)
     RedrawGlobalBorder();
+#endif
 
   ClearField();
 
@@ -1486,6 +1501,11 @@ void DrawMainMenuExt(int fade_mask, boolean do_fading)
   OpenDoor(GetDoorState() | DOOR_NO_DELAY | DOOR_FORCE_REDRAW);
 
   DrawMaskedBorder(REDRAW_ALL);
+
+#if 0
+  if (redraw_mask & REDRAW_ALL)
+    fade_mask = REDRAW_ALL;
+#endif
 
   FadeIn(fade_mask);
   FadeSetEnterMenu();
@@ -1884,6 +1904,11 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
       {
 	game_status = GAME_MODE_SCORES;
 
+#if 1
+	/* required before door position may be changed in next step */
+	CloseDoor(DOOR_CLOSE_ALL);
+#endif
+
 	ChangeViewportPropertiesIfNeeded();
 
 	DrawHallOfFame(-1);
@@ -2121,6 +2146,9 @@ static void drawMenuInfoList(int first_entry, int num_page_entries,
 static void DrawInfoScreen_Main(int fade_mask, boolean do_fading)
 {
   int i;
+
+  if (CheckIfRedrawGlobalBorderIsNeeded())
+    fade_mask = REDRAW_ALL;
 
   UnmapAllGadgets();
 
@@ -5730,6 +5758,9 @@ static void DrawSetupScreen_Generic()
   boolean redraw_all = FALSE;
   char *title_string = NULL;
   int i;
+
+  if (CheckIfRedrawGlobalBorderIsNeeded())
+    fade_mask = REDRAW_ALL;
 
   UnmapAllGadgets();
 

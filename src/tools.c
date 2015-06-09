@@ -481,6 +481,11 @@ static void FadeCrossSaveBackbuffer()
   BlitBitmap(backbuffer, bitmap_db_cross, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
 }
 
+static void FadeCrossRestoreBackbuffer()
+{
+  BlitBitmap(bitmap_db_cross, backbuffer, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
+}
+
 static void FadeExt(int fade_mask, int fade_mode, int fade_type)
 {
   static int fade_type_skip = FADE_TYPE_NONE;
@@ -500,9 +505,15 @@ static void FadeExt(int fade_mask, int fade_mode, int fade_type)
       return;
     }
 
+#if 1
+    FadeCrossSaveBackbuffer();
+#endif
+
     if (fading.fade_mode & FADE_TYPE_TRANSFORM)
     {
+#if 0
       FadeCrossSaveBackbuffer();
+#endif
 
       return;
     }
@@ -570,6 +581,9 @@ static void FadeExt(int fade_mask, int fade_mode, int fade_type)
 
   FadeRectangle(bitmap, x, y, width, height, fade_mode, fade_delay, post_delay,
 		draw_border_function);
+
+  if (fade_type == FADE_TYPE_FADE_OUT)
+    FadeCrossRestoreBackbuffer();
 
   redraw_mask &= ~fade_mask;
 }
@@ -750,8 +764,122 @@ void DrawBackgroundForGraphic(int x, int y, int width, int height, int graphic)
   DrawBackground(x, y, width, height);
 }
 
+static int game_status_last = -1;
+static Bitmap *global_border_bitmap_last = NULL;
+static Bitmap *global_border_bitmap = NULL;
+static int real_sx_last = -1, real_sy_last = -1;
+static int full_sxsize_last = -1, full_sysize_last = -1;
+static int dx_last = -1, dy_last = -1;
+static int dxsize_last = -1, dysize_last = -1;
+static int vx_last = -1, vy_last = -1;
+static int vxsize_last = -1, vysize_last = -1;
+
+boolean CheckIfRedrawGlobalBorderIsNeeded()
+{
+  int global_border_graphic;
+
+  if (game_status == game_status_last)
+    return FALSE;
+
+  global_border_graphic =
+    (game_status == GAME_MODE_MAIN ? IMG_GLOBAL_BORDER_MAIN :
+     game_status == GAME_MODE_SCORES ? IMG_GLOBAL_BORDER_SCORES :
+     game_status == GAME_MODE_EDITOR ? IMG_GLOBAL_BORDER_EDITOR :
+     game_status == GAME_MODE_PLAYING ? IMG_GLOBAL_BORDER_PLAYING :
+     IMG_GLOBAL_BORDER);
+
+  global_border_bitmap =
+    (graphic_info[global_border_graphic].bitmap ?
+     graphic_info[global_border_graphic].bitmap :
+     graphic_info[IMG_GLOBAL_BORDER].bitmap);
+
+  // redraw if global screen border has changed
+  if (global_border_bitmap_last != global_border_bitmap)
+    return TRUE;
+
+  // redraw if position or size of playfield area has changed
+  if (real_sx_last != REAL_SX || real_sy_last != REAL_SY ||
+      full_sxsize_last != FULL_SXSIZE || full_sysize_last != FULL_SYSIZE)
+    return TRUE;
+
+  // redraw if position or size of door area has changed
+  if (dx_last != DX || dy_last != DY ||
+      dxsize_last != DXSIZE || dysize_last != DYSIZE)
+    return TRUE;
+
+  // redraw if position or size of tape area has changed
+  if (vx_last != VX || vy_last != VY ||
+      vxsize_last != VXSIZE || vysize_last != VYSIZE)
+    return TRUE;
+
+  return FALSE;
+}
+
+static void RedrawGlobalBorderIfNeeded()
+{
+  if (game_status == game_status_last)
+    return;
+
+  // copy current draw buffer to later copy back areas that have not changed
+  BlitBitmap(backbuffer, bitmap_db_store, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
+
+  if (CheckIfRedrawGlobalBorderIsNeeded())
+  {
+    // redraw global screen border (or clear, if defined to be empty)
+
+    if (global_border_bitmap)
+      BlitBitmap(global_border_bitmap, backbuffer,
+		 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
+    else
+      ClearRectangle(backbuffer, 0, 0, WIN_XSIZE, WIN_YSIZE);
+
+    // copy previous playfield and door areas, if they are defined on both
+    // previous and current screen and if they still have the same size
+
+    if (real_sx_last != -1 && real_sy_last != -1 &&
+	REAL_SX != -1 && REAL_SY != -1 &&
+	full_sxsize_last == FULL_SXSIZE && full_sysize_last == FULL_SYSIZE)
+      BlitBitmap(bitmap_db_store, backbuffer,
+		 real_sx_last, real_sy_last, FULL_SXSIZE, FULL_SYSIZE,
+		 REAL_SX, REAL_SY);
+
+    if (dx_last != -1 && dy_last != -1 &&
+	DX != -1 && DY != -1 &&
+	dxsize_last == DXSIZE && dysize_last == DYSIZE)
+      BlitBitmap(bitmap_db_store, backbuffer,
+		 dx_last, dy_last, DXSIZE, DYSIZE, DX, DY);
+
+    if (vx_last != -1 && vy_last != -1 &&
+	VX != -1 && VY != -1 &&
+	vxsize_last == VXSIZE && vysize_last == VYSIZE)
+      BlitBitmap(bitmap_db_store, backbuffer,
+		 vx_last, vy_last, VXSIZE, VYSIZE, VX, VY);
+
+    redraw_mask = REDRAW_ALL;
+  }
+
+  game_status_last = game_status;
+
+  global_border_bitmap_last = global_border_bitmap;
+
+  real_sx_last = REAL_SX;
+  real_sy_last = REAL_SY;
+  full_sxsize_last = FULL_SXSIZE;
+  full_sysize_last = FULL_SYSIZE;
+  dx_last = DX;
+  dy_last = DY;
+  dxsize_last = DXSIZE;
+  dysize_last = DYSIZE;
+  vx_last = VX;
+  vy_last = VY;
+  vxsize_last = VXSIZE;
+  vysize_last = VYSIZE;
+}
+
 void ClearField()
 {
+  RedrawGlobalBorderIfNeeded();
+
   /* !!! "drawto" might still point to playfield buffer here (see above) !!! */
   /* (when entering hall of fame after playing) */
   DrawBackground(REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE);
