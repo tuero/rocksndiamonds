@@ -483,7 +483,12 @@ static void FadeCrossSaveBackbuffer()
 
 static void FadeCrossRestoreBackbuffer()
 {
+  int redraw_mask_last = redraw_mask;
+
   BlitBitmap(bitmap_db_cross, backbuffer, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
+
+  // do not change redraw mask when restoring backbuffer after cross-fading
+  redraw_mask = redraw_mask_last;
 }
 
 static void FadeExt(int fade_mask, int fade_mode, int fade_type)
@@ -547,10 +552,10 @@ static void FadeExt(int fade_mask, int fade_mode, int fade_type)
 
   if (fade_mask == REDRAW_FIELD)
   {
-    x = REAL_SX;
-    y = REAL_SY;
-    width  = FULL_SXSIZE;
-    height = FULL_SYSIZE;
+    x = FADE_SX;
+    y = FADE_SY;
+    width  = FADE_SXSIZE;
+    height = FADE_SYSIZE;
 
     if (border.draw_masked_when_fading)
       draw_border_function = DrawMaskedBorder_FIELD;	/* update when fading */
@@ -594,6 +599,11 @@ void FadeIn(int fade_mask)
     FadeExt(fade_mask, fading.fade_mode, FADE_TYPE_FADE_IN);
   else
     FadeExt(fade_mask, FADE_MODE_FADE_IN, FADE_TYPE_FADE_IN);
+
+  FADE_SX = REAL_SX;
+  FADE_SY = REAL_SY;
+  FADE_SXSIZE = FULL_SXSIZE;
+  FADE_SYSIZE = FULL_SYSIZE;
 }
 
 void FadeOut(int fade_mask)
@@ -774,10 +784,11 @@ static int dxsize_last = -1, dysize_last = -1;
 static int vx_last = -1, vy_last = -1;
 static int vxsize_last = -1, vysize_last = -1;
 
-boolean CheckIfRedrawGlobalBorderIsNeeded()
+boolean CheckIfGlobalBorderHasChanged()
 {
   int global_border_graphic;
 
+  // if game status has not changed, global border has not changed either
   if (game_status == game_status_last)
     return FALSE;
 
@@ -793,8 +804,17 @@ boolean CheckIfRedrawGlobalBorderIsNeeded()
      graphic_info[global_border_graphic].bitmap :
      graphic_info[IMG_GLOBAL_BORDER].bitmap);
 
+  return (global_border_bitmap_last != global_border_bitmap);
+}
+
+boolean CheckIfGlobalBorderRedrawIsNeeded()
+{
+  // if game status has not changed, nothing has to be redrawn
+  if (game_status == game_status_last)
+    return FALSE;
+
   // redraw if global screen border has changed
-  if (global_border_bitmap_last != global_border_bitmap)
+  if (CheckIfGlobalBorderHasChanged())
     return TRUE;
 
   // redraw if position or size of playfield area has changed
@@ -823,7 +843,7 @@ static void RedrawGlobalBorderIfNeeded()
   // copy current draw buffer to later copy back areas that have not changed
   BlitBitmap(backbuffer, bitmap_db_store, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
 
-  if (CheckIfRedrawGlobalBorderIsNeeded())
+  if (CheckIfGlobalBorderRedrawIsNeeded())
   {
     // redraw global screen border (or clear, if defined to be empty)
 
@@ -4304,6 +4324,9 @@ unsigned int MoveDoor(unsigned int door_state)
 	  }
 
 	  width = g->width - src_xx;
+
+	  if (width > door_rect->width)
+	    width = door_rect->width;
 
 	  // printf("::: k == %d [%d] \n", k, start_step);
 	}
@@ -8042,6 +8065,19 @@ void ToggleFullscreenOrChangeWindowScalingIfNeeded()
   }
 }
 
+void JoinRectangles(int *x, int *y, int *width, int *height,
+		    int x2, int y2, int width2, int height2)
+{
+  // do not join with "off-screen" rectangle
+  if (x2 == -1 || y2 == -1)
+    return;
+
+  *x = MIN(*x, x2);
+  *y = MIN(*y, y2);
+  *width = MAX(*width, width2);
+  *height = MAX(*height, height2);
+}
+
 void ChangeViewportPropertiesIfNeeded()
 {
   int gfx_game_mode = game_status;
@@ -8132,6 +8168,48 @@ void ChangeViewportPropertiesIfNeeded()
       new_tilesize_var != TILESIZE_VAR
       )
   {
+    // ------------------------------------------------------------------------
+    // determine next fading area for changed viewport definitions
+    // ------------------------------------------------------------------------
+
+    // start with current playfield area (default fading area)
+    FADE_SX = REAL_SX;
+    FADE_SY = REAL_SY;
+    FADE_SXSIZE = FULL_SXSIZE;
+    FADE_SYSIZE = FULL_SYSIZE;
+
+    // add new playfield area if position or size has changed
+    if (new_real_sx != REAL_SX || new_real_sy != REAL_SY ||
+	new_full_sxsize != FULL_SXSIZE || new_full_sysize != FULL_SYSIZE)
+    {
+      JoinRectangles(&FADE_SX, &FADE_SY, &FADE_SXSIZE, &FADE_SYSIZE,
+		     new_real_sx, new_real_sy, new_full_sxsize,new_full_sysize);
+    }
+
+    // add current and new door 1 area if position or size has changed
+    if (new_dx != DX || new_dy != DY ||
+	new_dxsize != DXSIZE || new_dysize != DYSIZE)
+    {
+      JoinRectangles(&FADE_SX, &FADE_SY, &FADE_SXSIZE, &FADE_SYSIZE,
+		     DX, DY, DXSIZE, DYSIZE);
+      JoinRectangles(&FADE_SX, &FADE_SY, &FADE_SXSIZE, &FADE_SYSIZE,
+		     new_dx, new_dy, new_dxsize, new_dysize);
+    }
+
+    // add current and new door 2 area if position or size has changed
+    if (new_dx != VX || new_dy != VY ||
+	new_dxsize != VXSIZE || new_dysize != VYSIZE)
+    {
+      JoinRectangles(&FADE_SX, &FADE_SY, &FADE_SXSIZE, &FADE_SYSIZE,
+		     VX, VY, VXSIZE, VYSIZE);
+      JoinRectangles(&FADE_SX, &FADE_SY, &FADE_SXSIZE, &FADE_SYSIZE,
+		     new_vx, new_vy, new_vxsize, new_vysize);
+    }
+
+    // ------------------------------------------------------------------------
+    // handle changed tile size
+    // ------------------------------------------------------------------------
+
     if (new_tilesize_var != TILESIZE_VAR)
     {
       // printf("::: new_tilesize_var != TILESIZE_VAR\n");

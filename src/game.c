@@ -3106,7 +3106,7 @@ void InitGame()
   else
     FadeSetEnterScreen();
 
-  if (CheckIfRedrawGlobalBorderIsNeeded())
+  if (CheckIfGlobalBorderHasChanged())
     fade_mask = REDRAW_ALL;
 
   FadeOut(fade_mask);

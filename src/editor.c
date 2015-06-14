@@ -7623,7 +7623,7 @@ void DrawLevelEd()
   /* needed if different viewport properties defined for editor */
   ChangeViewportPropertiesIfNeeded();
 
-  if (CheckIfRedrawGlobalBorderIsNeeded())
+  if (CheckIfGlobalBorderHasChanged())
     fade_mask = REDRAW_ALL;
 
   FadeOut(fade_mask);

@@ -2943,6 +2943,9 @@ extern int			VXSIZE, VYSIZE;
 extern int			EXSIZE, EYSIZE;
 extern int			TILESIZE_VAR;
 
+extern int			FADE_SX, FADE_SY;
+extern int			FADE_SXSIZE, FADE_SYSIZE;
+
 extern int			FX, FY;
 extern int			ScrollStepSize;
 extern int			ScreenMovDir, ScreenMovPos, ScreenGfxPos;

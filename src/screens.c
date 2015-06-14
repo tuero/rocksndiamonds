@@ -1422,7 +1422,7 @@ void DrawMainMenu()
   if (redraw_mask & REDRAW_ALL)
     fade_mask = REDRAW_ALL;
 
-  if (CheckIfRedrawGlobalBorderIsNeeded())
+  if (CheckIfGlobalBorderHasChanged())
     fade_mask = REDRAW_ALL;
 
   FadeOut(fade_mask);
@@ -2117,7 +2117,7 @@ static void DrawInfoScreen_Main()
   if (redraw_mask & REDRAW_ALL)
     fade_mask = REDRAW_ALL;
 
-  if (CheckIfRedrawGlobalBorderIsNeeded())
+  if (CheckIfGlobalBorderHasChanged())
     fade_mask = REDRAW_ALL;
 
   UnmapAllGadgets();
@@ -3614,7 +3614,7 @@ static void DrawChooseTree(TreeInfo **ti_ptr)
 {
   int fade_mask = REDRAW_FIELD;
 
-  if (CheckIfRedrawGlobalBorderIsNeeded())
+  if (CheckIfGlobalBorderHasChanged())
     fade_mask = REDRAW_ALL;
 
   if (strEqual((*ti_ptr)->subdir, STRING_TOP_DIRECTORY))
@@ -4119,7 +4119,7 @@ void DrawHallOfFame(int highlight_position)
   /* needed if different viewport properties defined for scores */
   ChangeViewportPropertiesIfNeeded();
 
-  if (CheckIfRedrawGlobalBorderIsNeeded())
+  if (CheckIfGlobalBorderHasChanged())
     fade_mask = REDRAW_ALL;
 
   UnmapAllGadgets();
@@ -5729,7 +5729,7 @@ static void DrawSetupScreen_Generic()
   char *title_string = NULL;
   int i;
 
-  if (CheckIfRedrawGlobalBorderIsNeeded())
+  if (CheckIfGlobalBorderHasChanged())
     fade_mask = REDRAW_ALL;
 
   UnmapAllGadgets();
