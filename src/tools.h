@@ -107,6 +107,7 @@ void DrawBackground(int, int, int, int);
 void DrawBackgroundForFont(int, int, int, int, int);
 void DrawBackgroundForGraphic(int, int, int, int, int);
 boolean CheckIfGlobalBorderHasChanged();
+void RedrawGlobalBorder();
 
 void MarkTileDirty(int, int);
 void SetBorderElement();

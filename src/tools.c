@@ -687,6 +687,37 @@ void FadeSkipNextFadeOut()
   FadeExt(0, FADE_MODE_SKIP_FADE_OUT, FADE_TYPE_SKIP);
 }
 
+Bitmap *getBitmapFromGraphicOrDefault(int graphic, int default_graphic)
+{
+  boolean redefined = getImageListEntryFromImageID(graphic)->redefined;
+
+  return (graphic == IMG_UNDEFINED ? NULL :
+	  graphic_info[graphic].bitmap != NULL || redefined ?
+	  graphic_info[graphic].bitmap :
+	  graphic_info[default_graphic].bitmap);
+}
+
+Bitmap *getBackgroundBitmap(int graphic)
+{
+  return getBitmapFromGraphicOrDefault(graphic, IMG_BACKGROUND);
+}
+
+Bitmap *getGlobalBorderBitmap(int graphic)
+{
+  return getBitmapFromGraphicOrDefault(graphic, IMG_GLOBAL_BORDER);
+}
+
+Bitmap *getGlobalBorderBitmapFromGameStatus()
+{
+  int graphic = (game_status == GAME_MODE_MAIN    ? IMG_GLOBAL_BORDER_MAIN :
+		 game_status == GAME_MODE_SCORES  ? IMG_GLOBAL_BORDER_SCORES :
+		 game_status == GAME_MODE_EDITOR  ? IMG_GLOBAL_BORDER_EDITOR :
+		 game_status == GAME_MODE_PLAYING ? IMG_GLOBAL_BORDER_PLAYING :
+		 IMG_GLOBAL_BORDER);
+
+  return getGlobalBorderBitmap(graphic);
+}
+
 void SetWindowBackgroundImageIfDefined(int graphic)
 {
   if (graphic_info[graphic].bitmap)
@@ -707,26 +738,17 @@ void SetDoorBackgroundImageIfDefined(int graphic)
 
 void SetWindowBackgroundImage(int graphic)
 {
-  SetWindowBackgroundBitmap(graphic == IMG_UNDEFINED ? NULL :
-			    graphic_info[graphic].bitmap ?
-			    graphic_info[graphic].bitmap :
-			    graphic_info[IMG_BACKGROUND].bitmap);
+  SetWindowBackgroundBitmap(getBackgroundBitmap(graphic));
 }
 
 void SetMainBackgroundImage(int graphic)
 {
-  SetMainBackgroundBitmap(graphic == IMG_UNDEFINED ? NULL :
-			  graphic_info[graphic].bitmap ?
-			  graphic_info[graphic].bitmap :
-			  graphic_info[IMG_BACKGROUND].bitmap);
+  SetMainBackgroundBitmap(getBackgroundBitmap(graphic));
 }
 
 void SetDoorBackgroundImage(int graphic)
 {
-  SetDoorBackgroundBitmap(graphic == IMG_UNDEFINED ? NULL :
-			  graphic_info[graphic].bitmap ?
-			  graphic_info[graphic].bitmap :
-			  graphic_info[IMG_BACKGROUND].bitmap);
+  SetDoorBackgroundBitmap(getBackgroundBitmap(graphic));
 }
 
 void SetPanelBackground()
@@ -786,23 +808,12 @@ static int vxsize_last = -1, vysize_last = -1;
 
 boolean CheckIfGlobalBorderHasChanged()
 {
-  int global_border_graphic;
-
   // if game status has not changed, global border has not changed either
   if (game_status == game_status_last)
     return FALSE;
 
-  global_border_graphic =
-    (game_status == GAME_MODE_MAIN ? IMG_GLOBAL_BORDER_MAIN :
-     game_status == GAME_MODE_SCORES ? IMG_GLOBAL_BORDER_SCORES :
-     game_status == GAME_MODE_EDITOR ? IMG_GLOBAL_BORDER_EDITOR :
-     game_status == GAME_MODE_PLAYING ? IMG_GLOBAL_BORDER_PLAYING :
-     IMG_GLOBAL_BORDER);
-
-  global_border_bitmap =
-    (graphic_info[global_border_graphic].bitmap ?
-     graphic_info[global_border_graphic].bitmap :
-     graphic_info[IMG_GLOBAL_BORDER].bitmap);
+  // determine and store new global border bitmap for current game status
+  global_border_bitmap = getGlobalBorderBitmapFromGameStatus();
 
   return (global_border_bitmap_last != global_border_bitmap);
 }
@@ -835,6 +846,23 @@ boolean CheckIfGlobalBorderRedrawIsNeeded()
   return FALSE;
 }
 
+void RedrawGlobalBorderFromBitmap(Bitmap *bitmap)
+{
+  if (bitmap)
+    BlitBitmap(bitmap, backbuffer, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
+  else
+    ClearRectangle(backbuffer, 0, 0, WIN_XSIZE, WIN_YSIZE);
+}
+
+void RedrawGlobalBorder()
+{
+  Bitmap *bitmap = getGlobalBorderBitmapFromGameStatus();
+
+  RedrawGlobalBorderFromBitmap(bitmap);
+
+  redraw_mask = REDRAW_ALL;
+}
+
 static void RedrawGlobalBorderIfNeeded()
 {
   if (game_status == game_status_last)
@@ -846,12 +874,7 @@ static void RedrawGlobalBorderIfNeeded()
   if (CheckIfGlobalBorderRedrawIsNeeded())
   {
     // redraw global screen border (or clear, if defined to be empty)
-
-    if (global_border_bitmap)
-      BlitBitmap(global_border_bitmap, backbuffer,
-		 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
-    else
-      ClearRectangle(backbuffer, 0, 0, WIN_XSIZE, WIN_YSIZE);
+    RedrawGlobalBorderFromBitmap(global_border_bitmap);
 
     // copy previous playfield and door areas, if they are defined on both
     // previous and current screen and if they still have the same size

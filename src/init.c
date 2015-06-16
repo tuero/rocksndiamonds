@@ -5202,26 +5202,6 @@ void InitGfx()
   init_last = init;
 }
 
-void RedrawGlobalBorder()
-{
-  int global_border_graphic =
-    (game_status == GAME_MODE_MAIN ? IMG_GLOBAL_BORDER_MAIN :
-     game_status == GAME_MODE_SCORES ? IMG_GLOBAL_BORDER_SCORES :
-     game_status == GAME_MODE_EDITOR ? IMG_GLOBAL_BORDER_EDITOR :
-     game_status == GAME_MODE_PLAYING ? IMG_GLOBAL_BORDER_PLAYING :
-     IMG_GLOBAL_BORDER);
-
-  Bitmap *global_border_bitmap =
-    (graphic_info[global_border_graphic].bitmap ?
-     graphic_info[global_border_graphic].bitmap :
-     graphic_info[IMG_GLOBAL_BORDER].bitmap);
-
-  BlitBitmap(global_border_bitmap, backbuffer,
-	     0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
-
-  redraw_mask = REDRAW_ALL;
-}
-
 void InitGfxBackground()
 {
   fieldbuffer = bitmap_db_field;
