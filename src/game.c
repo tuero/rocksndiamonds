@@ -3954,9 +3954,14 @@ void InitGame()
   {
     UnmapGameButtons();
     UnmapTapeButtons();
+
+    FreeGameButtons();
+    CreateGameButtons();
+
     game_gadget[SOUND_CTRL_ID_MUSIC]->checked = setup.sound_music;
     game_gadget[SOUND_CTRL_ID_LOOPS]->checked = setup.sound_loops;
     game_gadget[SOUND_CTRL_ID_SIMPLE]->checked = setup.sound_simple;
+
     MapGameButtons();
     MapTapeButtons();
 
