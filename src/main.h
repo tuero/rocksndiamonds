@@ -2051,6 +2051,11 @@
 
 #define NUM_ENGINE_TYPES		4
 
+/* values for automatically playing tapes */
+#define AUTOPLAY_TEST			0
+#define AUTOPLAY_PLAY			1
+#define AUTOPLAY_FFWD			2
+
 
 struct BorderInfo
 {
@@ -2516,6 +2521,7 @@ struct GlobalInfo
   char *autoplay_leveldir;
   int autoplay_level[MAX_TAPES_PER_SET];
   boolean autoplay_all;
+  boolean autoplay_mode;
 
   char *convert_leveldir;
   int convert_level_nr;

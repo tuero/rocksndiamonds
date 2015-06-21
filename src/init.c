@@ -4678,9 +4678,15 @@ void Execute_Command(char *command)
 
     exit(0);
   }
-  else if (strPrefix(command, "autoplay "))
+  else if (strPrefix(command, "autotest ") ||
+	   strPrefix(command, "autoplay ") ||
+	   strPrefix(command, "autoffwd "))
   {
     char *str_ptr = getStringCopy(&command[9]);	/* read command parameters */
+
+    global.autoplay_mode = (strPrefix(command, "autotest") ? AUTOPLAY_TEST :
+			    strPrefix(command, "autoplay") ? AUTOPLAY_PLAY :
+			    strPrefix(command, "autoffwd") ? AUTOPLAY_FFWD : 0);
 
     while (*str_ptr != '\0')			/* continue parsing string */
     {
@@ -5217,6 +5223,15 @@ static void InitLevelInfo()
   LoadLevelInfo();				/* global level info */
   LoadLevelSetup_LastSeries();			/* last played series info */
   LoadLevelSetup_SeriesInfo();			/* last played level info */
+
+  if (global.autoplay_leveldir &&
+      global.autoplay_mode != AUTOPLAY_TEST)
+  {
+    leveldir_current = getTreeInfoFromIdentifier(leveldir_first,
+                                                 global.autoplay_leveldir);
+    if (leveldir_current == NULL)
+      leveldir_current = getFirstValidTreeInfoEntry(leveldir_first);
+  }
 }
 
 static void InitLevelArtworkInfo()

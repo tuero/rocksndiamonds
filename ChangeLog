@@ -1,3 +1,9 @@
+2015-06-21
+	* extended automatic tape playing modes:
+	  - "autotest" to automatically test tapes (this was "autoplay" before)
+	  - "autoplay" to automatically play tapes (visibly)
+	  - "autoffwd" to automatically play tapes (visibly, with maximum speed)
+
 2015-06-16
 	* fixed and enhanced screen fading and background/border handling
 

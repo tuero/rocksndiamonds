@@ -1197,7 +1197,12 @@ void AutoPlayTape()
     printf("playing tape ... ");
 
     TapeStartGamePlaying();
-    TapeStartWarpForward();
+
+    if (global.autoplay_mode == AUTOPLAY_FFWD)
+      tape.fast_forward = TRUE;
+
+    if (global.autoplay_mode != AUTOPLAY_PLAY)
+      TapeStartWarpForward();
 
     return;
   }
