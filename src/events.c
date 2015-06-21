@@ -218,7 +218,8 @@ void EventLoop(void)
 	  SetMouseCursor(CURSOR_NONE);
 	}
       }
-      else if (game_status == GAME_MODE_PLAYING && !tape.pausing)
+      else if (game_status == GAME_MODE_PLAYING && (!tape.pausing ||
+						    tape.single_step))
       {
 	/* when playing, display a special mouse pointer inside the playfield */
 
