@@ -4437,6 +4437,29 @@ unsigned int MoveDoor(unsigned int door_state)
   return (door1 | door2);
 }
 
+static boolean useSpecialEditorDoor()
+{
+  int graphic = IMG_GLOBAL_BORDER_EDITOR;
+  boolean redefined = getImageListEntryFromImageID(graphic)->redefined;
+
+  // do not draw special editor door if editor border defined or redefined
+  if (graphic_info[graphic].bitmap != NULL || redefined)
+    return FALSE;
+
+  // do not draw special editor door if global border defined to be empty
+  if (graphic_info[IMG_GLOBAL_BORDER].bitmap == NULL)
+    return FALSE;
+
+  // do not draw special editor door if viewport definitions do not match
+  if (EX != VX ||
+      EY >= VY ||
+      EXSIZE != VXSIZE ||
+      EY + EYSIZE != VY + VYSIZE)
+    return FALSE;
+
+  return TRUE;
+}
+
 void DrawSpecialEditorDoor()
 {
   struct GraphicInfo *gfx1 = &graphic_info[IMG_DOOR_2_TOP_BORDER_CORRECTION];
@@ -4447,6 +4470,9 @@ void DrawSpecialEditorDoor()
   int ey = EY - outer_border;
   int vy = VY - outer_border;
   int exsize = EXSIZE + 2 * outer_border;
+
+  if (!useSpecialEditorDoor())
+    return;
 
   /* draw bigger level editor toolbox window */
   BlitBitmap(gfx1->bitmap, drawto, gfx1->src_x, gfx1->src_y,
@@ -4468,6 +4494,9 @@ void UndrawSpecialEditorDoor()
   int ey_top = ey - top_border_height;
   int exsize = EXSIZE + 2 * outer_border;
   int eysize = EYSIZE + 2 * outer_border;
+
+  if (!useSpecialEditorDoor())
+    return;
 
   /* draw normal tape recorder window */
   if (graphic_info[IMG_GLOBAL_BORDER].bitmap)
