@@ -10977,23 +10977,6 @@ void GameActions()
   byte tape_action[MAX_PLAYERS];
   int i;
 
-  for (i = 0; i < MAX_PLAYERS; i++)
-  {
-    struct PlayerInfo *player = &stored_player[i];
-
-    // allow engine snapshot if movement attempt was stopped
-    if ((game.snapshot.last_action[i] & KEY_MOTION) != 0 &&
-	(player->action & KEY_MOTION) == 0)
-      game.snapshot.changed_action = TRUE;
-
-    // allow engine snapshot in case of snapping/dropping attempt
-    if ((game.snapshot.last_action[i] & KEY_BUTTON) == 0 &&
-	(player->action & KEY_BUTTON) != 0)
-      game.snapshot.changed_action = TRUE;
-
-    game.snapshot.last_action[i] = player->action;
-  }
-
   /* detect endless loops, caused by custom element programming */
   if (recursion_loop_detected && recursion_loop_depth == 0)
   {
@@ -11199,6 +11182,21 @@ void GameActions()
   }
 #endif
 #endif
+
+  for (i = 0; i < MAX_PLAYERS; i++)
+  {
+    // allow engine snapshot in case of changed movement attempt
+    if ((game.snapshot.last_action[i] & KEY_MOTION) !=
+	(stored_player[i].effective_action & KEY_MOTION))
+      game.snapshot.changed_action = TRUE;
+
+    // allow engine snapshot in case of snapping/dropping attempt
+    if ((game.snapshot.last_action[i] & KEY_BUTTON) == 0 &&
+	(stored_player[i].effective_action & KEY_BUTTON) != 0)
+      game.snapshot.changed_action = TRUE;
+
+    game.snapshot.last_action[i] = stored_player[i].effective_action;
+  }
 
   if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
   {
