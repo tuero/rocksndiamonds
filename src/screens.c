@@ -1485,6 +1485,7 @@ void DrawMainMenu()
   MapScreenMenuGadgets(SCREEN_MASK_MAIN);
 
   /* copy actual game door content to door double buffer for OpenDoor() */
+  BlitBitmap(drawto, bitmap_db_door_1, DX, DY, DXSIZE, DYSIZE, 0, 0);
   BlitBitmap(drawto, bitmap_db_door_2, VX, VY, VXSIZE, VYSIZE, 0, 0);
 
   OpenDoor(GetDoorState() | DOOR_NO_DELAY | DOOR_FORCE_REDRAW);
