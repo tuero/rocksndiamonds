@@ -7616,8 +7616,6 @@ void DrawLevelEd()
 {
   int fade_mask = REDRAW_FIELD;
 
-  StopAnimation();
-
   CloseDoor(DOOR_CLOSE_ALL);
 
   /* needed if different viewport properties defined for editor */
@@ -7689,6 +7687,8 @@ void DrawLevelEd()
   MapControlButtons();
 
   DrawEditModeWindow();
+
+  DrawMaskedBorder(fade_mask);
 
   FadeIn(fade_mask);
 

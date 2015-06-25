@@ -1490,7 +1490,7 @@ void DrawMainMenu()
 
   OpenDoor(GetDoorState() | DOOR_NO_DELAY | DOOR_FORCE_REDRAW);
 
-  DrawMaskedBorder(REDRAW_ALL);
+  DrawMaskedBorder(fade_mask);
 
   FadeIn(fade_mask);
   FadeSetEnterMenu();
@@ -1827,6 +1827,10 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
   }
   else if (pos == MAIN_CONTROL_LEVEL_NUMBER && !button)
   {
+    StopAnimation();
+
+    CloseDoor(DOOR_CLOSE_2);
+
     game_status = GAME_MODE_LEVELNR;
 
     ChangeViewportPropertiesIfNeeded();
@@ -1861,6 +1865,10 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
       {
 	if (leveldir_first)
 	{
+	  StopAnimation();
+
+	  CloseDoor(DOOR_CLOSE_2);
+
 	  game_status = GAME_MODE_LEVELS;
 
 	  SaveLevelSetup_LastSeries();
@@ -1876,6 +1884,10 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
       }
       else if (pos == MAIN_CONTROL_SCORES)
       {
+	StopAnimation();
+
+	CloseDoor(DOOR_CLOSE_2);
+
 	game_status = GAME_MODE_SCORES;
 
 	DrawHallOfFame(-1);
@@ -1885,6 +1897,8 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 	if (leveldir_current->readonly &&
 	    !strEqual(setup.player_name, "Artsoft"))
 	  Request("This level is read only!", REQ_CONFIRM);
+
+	StopAnimation();
 
 	CloseDoor(DOOR_CLOSE_2);
 
@@ -1896,6 +1910,10 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
       }
       else if (pos == MAIN_CONTROL_INFO)
       {
+	StopAnimation();
+
+	CloseDoor(DOOR_CLOSE_2);
+
 	game_status = GAME_MODE_INFO;
 	info_mode = INFO_MODE_MAIN;
 
@@ -1905,10 +1923,16 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
       }
       else if (pos == MAIN_CONTROL_GAME)
       {
+	StopAnimation();
+
 	StartGameActions(options.network, setup.autorecord, level.random_seed);
       }
       else if (pos == MAIN_CONTROL_SETUP)
       {
+	StopAnimation();
+
+	CloseDoor(DOOR_CLOSE_2);
+
 	game_status = GAME_MODE_SETUP;
 	setup_mode = SETUP_MODE_MAIN;
 
@@ -3641,6 +3665,8 @@ static void DrawChooseTree(TreeInfo **ti_ptr)
   HandleChooseTree(0, 0, 0, 0, MB_MENU_INITIALIZE, ti_ptr);
   MapScreenTreeGadgets(*ti_ptr);
 
+  DrawMaskedBorder(fade_mask);
+
   FadeIn(fade_mask);
 
   InitAnimation();
@@ -4147,6 +4173,8 @@ void DrawHallOfFame(int highlight_position)
   PlayMenuMusic();
 
   HandleHallOfFame(highlight_position, 0, 0, 0, MB_MENU_INITIALIZE);
+
+  DrawMaskedBorder(fade_mask);
 
   FadeIn(fade_mask);
 }
@@ -5831,6 +5859,8 @@ static void DrawSetupScreen_Generic()
 
   if (redraw_all)
     redraw_mask = fade_mask = REDRAW_ALL;
+
+  DrawMaskedBorder(fade_mask);
 
   FadeIn(fade_mask);
 

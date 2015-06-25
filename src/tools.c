@@ -286,7 +286,7 @@ void RedrawPlayfield()
 
 void DrawMaskedBorder_Rect(int x, int y, int width, int height)
 {
-  Bitmap *bitmap = graphic_info[IMG_GLOBAL_BORDER].bitmap;
+  Bitmap *bitmap = getGlobalBorderBitmapFromGameStatus();
 
   BlitBitmapMasked(bitmap, backbuffer, x, y, width, height, x, y);
 }
@@ -709,11 +709,13 @@ Bitmap *getGlobalBorderBitmap(int graphic)
 
 Bitmap *getGlobalBorderBitmapFromGameStatus()
 {
-  int graphic = (game_status == GAME_MODE_MAIN    ? IMG_GLOBAL_BORDER_MAIN :
-		 game_status == GAME_MODE_SCORES  ? IMG_GLOBAL_BORDER_SCORES :
-		 game_status == GAME_MODE_EDITOR  ? IMG_GLOBAL_BORDER_EDITOR :
-		 game_status == GAME_MODE_PLAYING ? IMG_GLOBAL_BORDER_PLAYING :
-		 IMG_GLOBAL_BORDER);
+  int graphic =
+    (game_status == GAME_MODE_MAIN ||
+     game_status == GAME_MODE_PSEUDO_TYPENAME	? IMG_GLOBAL_BORDER_MAIN :
+     game_status == GAME_MODE_SCORES		? IMG_GLOBAL_BORDER_SCORES :
+     game_status == GAME_MODE_EDITOR		? IMG_GLOBAL_BORDER_EDITOR :
+     game_status == GAME_MODE_PLAYING		? IMG_GLOBAL_BORDER_PLAYING :
+     IMG_GLOBAL_BORDER);
 
   return getGlobalBorderBitmap(graphic);
 }
@@ -3401,7 +3403,6 @@ static int RequestHandleEvents(unsigned int req_state)
 {
   boolean level_solved = (game_status == GAME_MODE_PLAYING &&
 			  local_player->LevelSolved_GameEnd);
-  int last_game_status = game_status;	/* save current game status */
   int width  = request.width;
   int height = request.height;
   int sx, sy;
@@ -3566,11 +3567,7 @@ static int RequestHandleEvents(unsigned int req_state)
 	Delay(10);
     }
 
-    game_status = GAME_MODE_PSEUDO_DOOR;
-
     BackToFront();
-
-    game_status = last_game_status;	/* restore current game status */
   }
 
   return result;

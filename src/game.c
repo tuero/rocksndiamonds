@@ -3091,9 +3091,10 @@ void InitGame()
   int initial_move_dir = MV_DOWN;
   int i, j, x, y;
 
-  game_status = GAME_MODE_PLAYING;
+  // required here to update video display before fading (FIX THIS)
+  DrawMaskedBorder(REDRAW_DOOR_2);
 
-  StopAnimation();
+  game_status = GAME_MODE_PLAYING;
 
   if (!game.restart_level)
     CloseDoor(DOOR_CLOSE_1);
@@ -3924,6 +3925,8 @@ void InitGame()
   /* blit playfield from scroll buffer to normal back buffer for fading in */
   BlitScreenToBitmap(backbuffer);
   /* !!! FIX THIS (END) !!! */
+
+  DrawMaskedBorder(fade_mask);
 
   FadeIn(fade_mask);
 
