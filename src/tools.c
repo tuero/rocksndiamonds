@@ -1003,7 +1003,7 @@ void SetRandomAnimationValue(int x, int y)
   gfx.anim_random_frame = GfxRandom[x][y];
 }
 
-inline int getGraphicAnimationFrame(int graphic, int sync_frame)
+int getGraphicAnimationFrame(int graphic, int sync_frame)
 {
   /* animation synchronized with global frame counter, not move position */
   if (graphic_info[graphic].anim_global_sync || sync_frame < 0)
@@ -1088,8 +1088,8 @@ void getMiniGraphicSource(int graphic, Bitmap **bitmap, int *x, int *y)
   getSizedGraphicSource(graphic, 0, MINI_TILESIZE, bitmap, x, y);
 }
 
-inline void getGraphicSourceExt(int graphic, int frame, Bitmap **bitmap,
-				int *x, int *y, boolean get_backside)
+inline static void getGraphicSourceExt(int graphic, int frame, Bitmap **bitmap,
+				       int *x, int *y, boolean get_backside)
 {
   struct GraphicInfo *g = &graphic_info[graphic];
   int src_x = g->src_x + (get_backside ? g->offset2_x : 0);
@@ -2859,8 +2859,9 @@ void DrawPreviewLevelAnimation()
   DrawPreviewLevelExt(FALSE);
 }
 
-inline void DrawGraphicAnimationExt(DrawBuffer *dst_bitmap, int x, int y,
-				    int graphic, int sync_frame, int mask_mode)
+inline static void DrawGraphicAnimationExt(DrawBuffer *dst_bitmap, int x, int y,
+					   int graphic, int sync_frame,
+					   int mask_mode)
 {
   int frame = getGraphicAnimationFrame(graphic, sync_frame);
 
@@ -2870,9 +2871,8 @@ inline void DrawGraphicAnimationExt(DrawBuffer *dst_bitmap, int x, int y,
     DrawGraphicExt(dst_bitmap, x, y, graphic, frame);
 }
 
-inline void DrawFixedGraphicAnimationExt(DrawBuffer *dst_bitmap, int x, int y,
-					 int graphic, int sync_frame,
-					 int mask_mode)
+void DrawFixedGraphicAnimationExt(DrawBuffer *dst_bitmap, int x, int y,
+				  int graphic, int sync_frame, int mask_mode)
 {
   int frame = getGraphicAnimationFrame(graphic, sync_frame);
 
@@ -2882,7 +2882,7 @@ inline void DrawFixedGraphicAnimationExt(DrawBuffer *dst_bitmap, int x, int y,
     DrawFixedGraphicExt(dst_bitmap, x, y, graphic, frame);
 }
 
-inline void DrawGraphicAnimation(int x, int y, int graphic)
+inline static void DrawGraphicAnimation(int x, int y, int graphic)
 {
   int lx = LEVELX(x), ly = LEVELY(y);
 
@@ -2895,7 +2895,7 @@ inline void DrawGraphicAnimation(int x, int y, int graphic)
   MarkTileDirty(x, y);
 }
 
-inline void DrawFixedGraphicAnimation(int x, int y, int graphic)
+void DrawFixedGraphicAnimation(int x, int y, int graphic)
 {
   int lx = LEVELX(x), ly = LEVELY(y);
 
@@ -2919,7 +2919,7 @@ void DrawLevelElementAnimation(int x, int y, int element)
   DrawGraphicAnimation(SCREENX(x), SCREENY(y), graphic);
 }
 
-inline void DrawLevelGraphicAnimationIfNeeded(int x, int y, int graphic)
+void DrawLevelGraphicAnimationIfNeeded(int x, int y, int graphic)
 {
   int sx = SCREENX(x), sy = SCREENY(y);
 

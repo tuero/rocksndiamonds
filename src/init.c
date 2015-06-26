@@ -151,7 +151,7 @@ void InitGadgets()
   gadgets_initialized = TRUE;
 }
 
-inline void InitElementSmallImagesScaledUp(int graphic)
+inline static void InitElementSmallImagesScaledUp(int graphic)
 {
   struct GraphicInfo *g = &graphic_info[graphic];
 

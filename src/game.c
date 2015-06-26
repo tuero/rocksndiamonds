@@ -1949,7 +1949,7 @@ static void InitField(int x, int y, boolean init_game)
     CheckTriggeredElementChange(x, y, element, CE_CREATION_OF_X);
 }
 
-static inline void InitField_WithBug1(int x, int y, boolean init_game)
+inline static void InitField_WithBug1(int x, int y, boolean init_game)
 {
   InitField(x, y, init_game);
 
@@ -1959,7 +1959,7 @@ static inline void InitField_WithBug1(int x, int y, boolean init_game)
     InitMovDir(x, y);
 }
 
-static inline void InitField_WithBug2(int x, int y, boolean init_game)
+inline static void InitField_WithBug2(int x, int y, boolean init_game)
 {
   int old_element = Feld[x][y];
 

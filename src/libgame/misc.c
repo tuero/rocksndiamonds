@@ -1306,7 +1306,7 @@ void clear_mem(void *ptr, unsigned int size)
 /* various helper functions                                                  */
 /* ------------------------------------------------------------------------- */
 
-inline void swap_numbers(int *i1, int *i2)
+void swap_numbers(int *i1, int *i2)
 {
   int help = *i1;
 
@@ -1314,7 +1314,7 @@ inline void swap_numbers(int *i1, int *i2)
   *i2 = help;
 }
 
-inline void swap_number_pairs(int *x1, int *y1, int *x2, int *y2)
+void swap_number_pairs(int *x1, int *y1, int *x2, int *y2)
 {
   int help_x = *x1;
   int help_y = *y1;

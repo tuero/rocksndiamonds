@@ -119,9 +119,6 @@ void FloodFillLevel(int, int, int, short[MAX_LEV_FIELDX][MAX_LEV_FIELDY],
 void SetRandomAnimationValue(int, int);
 int getGraphicAnimationFrame(int, int);
 
-void DrawGraphicAnimation(int, int, int);
-void DrawGraphicAnimationExt(DrawBuffer *, int, int, int, int, int);
-
 void DrawFixedGraphicAnimation(int, int, int);
 void DrawFixedGraphicAnimationExt(DrawBuffer *, int, int, int, int, int);
 
@@ -139,7 +136,6 @@ void getFixedGraphicSourceExt(int, int, Bitmap **, int *, int *, boolean);
 void getSizedGraphicSource(int, int, int, Bitmap **, int *, int *);
 void getFixedGraphicSource(int, int, Bitmap **, int *, int *);
 void getMiniGraphicSource(int, Bitmap **, int *, int *);
-void getGraphicSourceExt(int, int, Bitmap **, int *, int *, boolean);
 void getGraphicSource(int, int, Bitmap **, int *, int *);
 
 void DrawGraphic(int, int, int, int);
