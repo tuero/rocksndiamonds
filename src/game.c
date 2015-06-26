@@ -4973,7 +4973,7 @@ void DrawRelocateScreen(int old_x, int old_y, int x, int y, int move_dir,
       }
     }
 
-    RedrawPlayfield(TRUE, 0,0,0,0);
+    RedrawPlayfield();
   }
   else
   {

@@ -3762,7 +3762,7 @@ void LoadLevelSetup_SeriesInfo()
     LevelStats_setSolved(i, 0);
   }
 
-  checkSeriesInfo(leveldir_current);
+  checkSeriesInfo();
 
   /* ----------------------------------------------------------------------- */
   /* ~/.<program>/levelsetup/<level series>/levelsetup.conf                  */

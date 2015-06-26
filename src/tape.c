@@ -493,7 +493,7 @@ void TapeDeactivateDisplayOff(boolean redraw_display)
 
   if (redraw_display)
   {
-    RedrawPlayfield(TRUE, 0,0,0,0);
+    RedrawPlayfield();
     DrawGameDoorValues();
   }
 }
