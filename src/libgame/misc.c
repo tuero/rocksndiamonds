@@ -2400,7 +2400,7 @@ DirectoryEntry *readDirectory(Directory *dir)
 
   dir->dir_entry->is_directory =
     (stat(dir->dir_entry->filename, &file_status) == 0 &&
-     (file_status.st_mode & S_IFMT) == S_IFDIR);
+     S_ISDIR(file_status.st_mode));
 
   return dir->dir_entry;
 }
@@ -2427,7 +2427,7 @@ boolean directoryExists(char *dir_name)
 
   struct stat file_status;
   boolean success = (stat(dir_name, &file_status) == 0 &&
-		     (file_status.st_mode & S_IFMT) == S_IFDIR);
+		     S_ISDIR(file_status.st_mode));
 
 #if defined(PLATFORM_ANDROID)
   if (!success)
