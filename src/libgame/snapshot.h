@@ -31,11 +31,11 @@ void SaveSnapshotBuffer(ListNode **, void *, int);
 void LoadSnapshotBuffers(ListNode *);
 void FreeSnapshotBuffers(ListNode *);
 
-void SaveSnapshotSingle();
-void SaveSnapshotToList();
+void SaveSnapshotSingle(ListNode *);
+void SaveSnapshotToList(ListNode *);
 boolean LoadSnapshotSingle();
-boolean LoadSnapshotFromList_Older();
-boolean LoadSnapshotFromList_Newer();
+boolean LoadSnapshotFromList_Older(int);
+boolean LoadSnapshotFromList_Newer(int);
 boolean CheckSnapshotList();
 void FreeSnapshotSingle();
 void FreeSnapshotList();
