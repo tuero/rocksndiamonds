@@ -516,7 +516,7 @@ static void *Load_WAV(char *filename)
 
   if ((snd_info->data_ptr = Mix_LoadWAV(filename)) == NULL)
   {
-    Error(ERR_WARN, "cannot read sound file '%s'", filename);
+    Error(ERR_WARN, "cannot read sound file '%s': %s", filename, Mix_GetError());
     free(snd_info);
     return NULL;
   }
@@ -540,7 +540,7 @@ static void *Load_MOD(char *filename)
 
   if ((mod_info->data_ptr = Mix_LoadMUS(filename)) == NULL)
   {
-    Error(ERR_WARN, "cannot read music file '%s'", filename);
+    Error(ERR_WARN, "cannot read music file '%s': %s", filename, Mix_GetError());
     free(mod_info);
     return NULL;
   }

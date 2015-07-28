@@ -851,7 +851,7 @@ Bitmap *LoadCustomImage(char *basename)
     Error(ERR_EXIT, "LoadCustomImage(): cannot find file '%s'", basename);
 
   if ((new_bitmap = LoadImage(filename)) == NULL)
-    Error(ERR_EXIT, "LoadImage() failed: %s", GetError());
+    Error(ERR_EXIT, "LoadImage('%s') failed: %s", basename, GetError());
 
   return new_bitmap;
 }
@@ -878,7 +878,7 @@ void ReloadCustomImage(Bitmap *bitmap, char *basename)
 
   if ((new_bitmap = LoadImage(filename)) == NULL)
   {
-    Error(ERR_WARN, "LoadImage() failed: %s", GetError());
+    Error(ERR_WARN, "LoadImage('%s') failed: %s", basename, GetError());
     return;
   }
 
