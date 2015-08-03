@@ -10921,7 +10921,7 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 	  DrawFixedGraphicExt(drawto,
 			      gi->x + sx * TILEX,
 			      gi->y + sy * TILEY,
-			      el2img(new_element), 0);
+			      el2edimg(new_element), 0);
 
 	if (id == GADGET_ID_CUSTOM_GRAPHIC)
 	  new_element = GFX_ELEMENT(new_element);
