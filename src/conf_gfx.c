@@ -6129,8 +6129,8 @@ struct ConfigInfo image_config[] =
 
   { "border.draw_masked_when_fading",		"true"			},
 
-  { "init.busy.x",				"336"			},
-  { "init.busy.y",				"280"			},
+  { "init.busy.x",				"-1"			},
+  { "init.busy.y",				"-1"			},
   { "init.busy.align",				"center"		},
   { "init.busy.valign",				"middle"		},
 

@@ -102,6 +102,11 @@ void DrawInitAnim()
   if (!DelayReached(&action_delay, action_delay_value))
     return;
 
+  if (init_last.busy.x == -1)
+    init_last.busy.x = WIN_XSIZE / 2;
+  if (init_last.busy.y == -1)
+    init_last.busy.y = WIN_YSIZE / 2;
+
   x = ALIGNED_TEXT_XPOS(&init_last.busy);
   y = ALIGNED_TEXT_YPOS(&init_last.busy);
 
