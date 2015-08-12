@@ -2327,6 +2327,11 @@ struct EditorPaletteInfo
   struct EditorPaletteElementInfo element_right;
 };
 
+struct EditorDrawingAreaInfo
+{
+  int tile_size;
+};
+
 struct EditorInfo
 {
   struct EditorSettingsInfo settings;
@@ -2334,6 +2339,7 @@ struct EditorInfo
   struct EditorButtonInfo button;
   struct EditorInputInfo input;
   struct EditorPaletteInfo palette;
+  struct EditorDrawingAreaInfo drawingarea;
 };
 
 struct ViewportInfo

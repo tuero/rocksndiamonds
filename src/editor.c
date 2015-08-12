@@ -79,7 +79,7 @@
 #define IMG_BORDER_2			IMG_EDITOR_ELEMENT_BORDER_INPUT
 #define ED_ELEMENT_BORDER		(graphic_info[IMG_BORDER_1].border_size)
 #define ED_DRAWINGAREA_BORDER_SIZE	(graphic_info[IMG_BORDER_2].border_size)
-#define ED_DRAWINGAREA_TILE_SIZE	(graphic_info[IMG_BORDER_2].tile_size)
+#define ED_DRAWINGAREA_TILE_SIZE	(editor.drawingarea.tile_size)
 
 /* values for checkbutton gadgets */
 #define ED_CHECKBUTTON_XSIZE	     (graphic_info[IMG_EDITOR_CHECKBOX].width)

@@ -5239,7 +5239,6 @@ struct ConfigInfo image_config[] =
   { "editor.element_border_input.xpos",		"10"			},
   { "editor.element_border_input.ypos",		"7"			},
   { "editor.element_border_input.border_size",	"4"			},
-  { "editor.element_border_input.tile_size",	"16"			},
 
   { "editor.counter.down",			"RocksDoor.png"		},
   { "editor.counter.down.x",			"302"			},
@@ -7630,6 +7629,8 @@ struct ConfigInfo image_config[] =
   { "editor.palette.element_right.x",		"78"			},
   { "editor.palette.element_right.y",		"258"			},
   { "editor.palette.element_right.tile_size",	"16"			},
+
+  { "editor.drawingarea.tile_size",		"16"			},
 
   { "editor.settings.headline.x",		"272"			},
   { "editor.settings.headline.y",		"16"			},
