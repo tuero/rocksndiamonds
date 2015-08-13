@@ -275,11 +275,6 @@ static boolean CheckIfImageContainsSmallImages(ImageInfo *img_info,
   if (!strEqual(img_info->leveldir, leveldir_current->identifier) &&
       img_info->conf_tile_size != tile_size)
   {
-#if 0
-    printf("::: RE-CREATING DEFAULT TILE SIZE: %d -> %d\n",
-	   img_info->conf_tile_size, tile_size);
-#endif
-
     int bitmap_nr = GET_BITMAP_ID_FROM_TILESIZE(img_info->conf_tile_size);
     int i;
 
@@ -316,12 +311,6 @@ static boolean CheckIfImageContainsSmallImages(ImageInfo *img_info,
 
   if (img_info->game_tile_size != gfx.game_tile_size)
   {
-#if 0
-    if (strSuffix(img_info->source_filename, "RocksHeroes.png"))
-      printf("::: RE-CREATING IN-GAME TILE SIZE: %d -> %d\n",
-	     img_info->game_tile_size, gfx.game_tile_size);
-#endif
-
     ReCreateGameTileSizeBitmap(img_info->bitmaps);
 
     img_info->game_tile_size = gfx.game_tile_size;
