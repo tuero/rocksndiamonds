@@ -2159,12 +2159,7 @@ static void DrawInfoScreen_Main()
 
   FadeOut(fade_mask);
 
-  if (fade_mask == REDRAW_ALL)
-  {
-    RedrawGlobalBorder();
-
-    OpenDoor(DOOR_CLOSE_1 | DOOR_CLOSE_2 | DOOR_NO_DELAY | DOOR_FORCE_REDRAW);
-  }
+  OpenDoor(GetDoorState() | DOOR_NO_DELAY | DOOR_FORCE_REDRAW);
 
   ClearField();
 
@@ -3660,6 +3655,8 @@ static void DrawChooseTree(TreeInfo **ti_ptr)
 
   FadeOut(fade_mask);
 
+  OpenDoor(GetDoorState() | DOOR_NO_DELAY | DOOR_FORCE_REDRAW);
+
   ClearField();
 
   HandleChooseTree(0, 0, 0, 0, MB_MENU_INITIALIZE, ti_ptr);
@@ -4171,6 +4168,8 @@ void DrawHallOfFame(int highlight_position)
 
   PlayMenuSound();
   PlayMenuMusic();
+
+  OpenDoor(GetDoorState() | DOOR_NO_DELAY | DOOR_FORCE_REDRAW);
 
   HandleHallOfFame(highlight_position, 0, 0, 0, MB_MENU_INITIALIZE);
 
@@ -5772,6 +5771,8 @@ static void DrawSetupScreen_Generic()
     redraw_all = TRUE;
 
   FadeOut(fade_mask);
+
+  OpenDoor(GetDoorState() | DOOR_NO_DELAY | DOOR_FORCE_REDRAW);
 
   ClearField();
 

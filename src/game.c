@@ -3112,6 +3112,8 @@ void InitGame()
 
   FadeOut(fade_mask);
 
+  OpenDoor(GetDoorState() | DOOR_NO_DELAY | DOOR_FORCE_REDRAW);
+
   ClearField();
 
   DrawCompleteVideoDisplay();
