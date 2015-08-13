@@ -2264,6 +2264,7 @@ static void setRequestPosition(int *x, int *y, boolean add_border_size)
 
 void DrawEnvelopeRequest(char *text)
 {
+  int last_game_status = game_status;	/* save current game status */
   char *text_final = text;
   char *text_door_style = NULL;
   int graphic = IMG_BACKGROUND_REQUEST;
@@ -2324,9 +2325,14 @@ void DrawEnvelopeRequest(char *text)
 				  x, y, x_steps, y_steps,
 				  tile_size, tile_size);
 
+  /* force DOOR font inside door area */
+  game_status = GAME_MODE_PSEUDO_DOOR;
+
   DrawTextBuffer(sx + border_size, sy + border_size, text_final, font_nr,
 		 line_length, -1, max_lines, line_spacing, mask_mode,
 		 request.autowrap, request.centered, FALSE);
+
+  game_status = last_game_status;	/* restore current game status */
 
   for (i = 0; i < NUM_TOOL_BUTTONS; i++)
     RedrawGadget(tool_gadget[i]);
@@ -2433,7 +2439,6 @@ void AnimateEnvelopeRequest(int anim_mode, int action)
 
 void ShowEnvelopeRequest(char *text, unsigned int req_state, int action)
 {
-  int last_game_status = game_status;	/* save current game status */
   int graphic = IMG_BACKGROUND_REQUEST;
   int sound_opening = SND_REQUEST_OPENING;
   int sound_closing = SND_REQUEST_CLOSING;
@@ -2477,9 +2482,6 @@ void ShowEnvelopeRequest(char *text, unsigned int req_state, int action)
       InitAnimation();
   }
 
-  /* force DOOR font inside door area */
-  game_status = GAME_MODE_PSEUDO_DOOR;
-
   game.envelope_active = TRUE;	/* needed for RedrawPlayfield() events */
 
   if (action == ACTION_OPENING)
@@ -2503,8 +2505,6 @@ void ShowEnvelopeRequest(char *text, unsigned int req_state, int action)
   }
 
   game.envelope_active = FALSE;
-
-  game_status = last_game_status;	/* restore current game status */
 
   if (action == ACTION_CLOSING)
   {
