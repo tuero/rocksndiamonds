@@ -27,7 +27,10 @@ struct ImageInfo
   boolean contains_small_images;	/* set after adding small images */
   boolean scaled_up;			/* set after scaling up */
 
-  int game_tile_size;			/* size of in-game sized bitmap */
+  int conf_tile_size;			/* tile size as defined in config */
+  int game_tile_size;			/* tile size as resized for game */
+
+  char *leveldir;			/* level set when image was loaded */
 };
 typedef struct ImageInfo ImageInfo;
 
@@ -55,7 +58,10 @@ static void *Load_Image(char *filename)
   img_info->contains_small_images = FALSE;
   img_info->scaled_up = FALSE;
 
+  img_info->conf_tile_size = 0;		// will be set later
   img_info->game_tile_size = 0;		// will be set later
+
+  img_info->leveldir = NULL;		// will be set later
 
   return img_info;
 }
@@ -248,6 +254,82 @@ void ReloadCustomImages()
   print_timestamp_done("ReloadCustomImages");
 }
 
+static boolean CheckIfImageContainsSmallImages(ImageInfo *img_info,
+					       int tile_size)
+{
+  if (!img_info->contains_small_images)
+    return FALSE;
+
+  // at this point, small images already exist for this image;
+  // now do some checks that may require re-creating small (or in-game) images
+
+  // special case 1:
+  //
+  // check if the configured tile size for an already loaded image has changed
+  // from one level set to another; this should usually not happen, but if a
+  // custom artwork set redefines classic (or default) graphics with wrong tile
+  // size (by mistake or by intention), it will be corrected to its original
+  // tile size here by forcing complete re-creation of all small images again
+  // (this does not work if different tile sizes are used in same image file)
+
+  if (!strEqual(img_info->leveldir, leveldir_current->identifier) &&
+      img_info->conf_tile_size != tile_size)
+  {
+#if 0
+    printf("::: RE-CREATING DEFAULT TILE SIZE: %d -> %d\n",
+	   img_info->conf_tile_size, tile_size);
+#endif
+
+    int bitmap_nr = GET_BITMAP_ID_FROM_TILESIZE(img_info->conf_tile_size);
+    int i;
+
+    // free all calculated, resized bitmaps, but keep last configured size
+    for (i = 0; i < NUM_IMG_BITMAPS; i++)
+    {
+      if (i == bitmap_nr)
+	continue;
+
+      if (img_info->bitmaps[i])
+      {
+	FreeBitmap(img_info->bitmaps[i]);
+
+	img_info->bitmaps[i] = NULL;
+      }
+    }
+
+    // re-create small bitmaps from last configured size as new default size
+    if (bitmap_nr != IMG_BITMAP_STANDARD)
+    {
+      img_info->bitmaps[IMG_BITMAP_STANDARD] = img_info->bitmaps[bitmap_nr];
+      img_info->bitmaps[bitmap_nr] = NULL;
+    }
+
+    img_info->contains_small_images = FALSE;
+
+    return FALSE;
+  }
+
+  // special case 2:
+  //
+  // graphic config setting "game.tile_size" has changed since last level set;
+  // this may require resizing image to new size required for in-game graphics
+
+  if (img_info->game_tile_size != gfx.game_tile_size)
+  {
+#if 0
+    if (strSuffix(img_info->source_filename, "RocksHeroes.png"))
+      printf("::: RE-CREATING IN-GAME TILE SIZE: %d -> %d\n",
+	     img_info->game_tile_size, gfx.game_tile_size);
+#endif
+
+    ReCreateGameTileSizeBitmap(img_info->bitmaps);
+
+    img_info->game_tile_size = gfx.game_tile_size;
+  }
+
+  return TRUE;
+}
+
 void CreateImageWithSmallImages(int pos, int zoom_factor, int tile_size)
 {
   ImageInfo *img_info = getImageInfoEntryFromImageID(pos);
@@ -255,22 +337,18 @@ void CreateImageWithSmallImages(int pos, int zoom_factor, int tile_size)
   if (img_info == NULL)
     return;
 
-  if (img_info->contains_small_images)
-  {
-    if (img_info->game_tile_size != gfx.game_tile_size)
-      ReCreateGameTileSizeBitmap(img_info->bitmaps);
-
-    img_info->game_tile_size = gfx.game_tile_size;
-
+  if (CheckIfImageContainsSmallImages(img_info, tile_size))
     return;
-  }
 
   CreateBitmapWithSmallBitmaps(img_info->bitmaps, zoom_factor, tile_size);
 
   img_info->contains_small_images = TRUE;
   img_info->scaled_up = TRUE;			// scaling was also done here
 
+  img_info->conf_tile_size = tile_size;
   img_info->game_tile_size = gfx.game_tile_size;
+
+  setString(&img_info->leveldir, leveldir_current->identifier);
 }
 
 void ScaleImage(int pos, int zoom_factor)

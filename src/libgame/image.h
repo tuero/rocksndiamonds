@@ -35,6 +35,23 @@
 #define IMG_BITMAP_STANDARD	IMG_BITMAP_32x32
 
 
+#define GET_BITMAP_ID_FROM_TILESIZE(x)	((x) ==  1 ? IMG_BITMAP_1x1   :	\
+					 (x) ==  2 ? IMG_BITMAP_2x2   :	\
+					 (x) ==  4 ? IMG_BITMAP_4x4   :	\
+					 (x) ==  8 ? IMG_BITMAP_8x8   :	\
+					 (x) == 16 ? IMG_BITMAP_16x16 :	\
+					 (x) == 32 ? IMG_BITMAP_32x32 : \
+					 IMG_BITMAP_CUSTOM)
+
+#define GET_TILESIZE_FROM_BITMAP_ID(x)	((x) == IMG_BITMAP_1x1   ? 1  :	\
+					 (x) == IMG_BITMAP_2x2   ? 2  :	\
+					 (x) == IMG_BITMAP_4x4   ? 4  :	\
+					 (x) == IMG_BITMAP_8x8   ? 8  :	\
+					 (x) == IMG_BITMAP_16x16 ? 16 :	\
+					 (x) == IMG_BITMAP_32x32 ? 32 :	\
+					 0)
+
+
 int getImageListSize();
 struct FileInfo *getImageListEntryFromImageID(int);
 Bitmap **getBitmapsFromImageID(int);
