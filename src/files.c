@@ -3007,6 +3007,8 @@ static int LoadLevel_NOTE(File *file, int chunk_size, struct LevelInfo *level)
   int envelope_nr = element - EL_ENVELOPE_1;
   int real_chunk_size = 2;
 
+  xx_envelope = level->envelope[envelope_nr];	/* copy into temporary buffer */
+
   while (!checkEndOfFile(file))
   {
     real_chunk_size += LoadLevel_MicroChunk(file, chunk_config_NOTE,
@@ -3016,7 +3018,7 @@ static int LoadLevel_NOTE(File *file, int chunk_size, struct LevelInfo *level)
       break;
   }
 
-  level->envelope[envelope_nr] = xx_envelope;
+  level->envelope[envelope_nr] = xx_envelope;	/* copy from temporary buffer */
 
   return real_chunk_size;
 }
