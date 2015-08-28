@@ -270,7 +270,6 @@ static boolean CheckIfImageContainsSmallImages(ImageInfo *img_info,
   // custom artwork set redefines classic (or default) graphics with wrong tile
   // size (by mistake or by intention), it will be corrected to its original
   // tile size here by forcing complete re-creation of all small images again
-  // (this does not work if different tile sizes are used in same image file)
 
   if (!strEqual(img_info->leveldir, leveldir_current->identifier) &&
       img_info->conf_tile_size != tile_size)
@@ -303,6 +302,16 @@ static boolean CheckIfImageContainsSmallImages(ImageInfo *img_info,
 
     return FALSE;
   }
+
+  // special case 1 (continued):
+  //
+  // if different tile sizes are used in same image file (usually by mistake,
+  // like forgetting option ".tile_size" for one or more graphic definitions),
+  // make sure to use only the first tile size that is processed for this image
+  // (and ignore all subsequent, potentially different tile size definitions
+  // for this image within the current level set by disabling the above check)
+
+  setString(&img_info->leveldir, leveldir_current->identifier);
 
   // special case 2:
   //
