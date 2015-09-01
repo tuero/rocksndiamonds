@@ -4896,7 +4896,11 @@ void DrawRelocateScreen(int old_x, int old_y, int x, int y, int move_dir,
   int frame_delay_value = (ffwd_delay ? FfwdFrameDelay : GameFrameDelay);
   int wait_delay_value = (no_delay ? 0 : frame_delay_value);
 
-  if (quick_relocation)
+  if (level.lazy_relocation && IN_VIS_FIELD(SCREENX(x), SCREENY(y)))
+  {
+    RedrawPlayfield();
+  }
+  else if (quick_relocation)
   {
     if (!IN_VIS_FIELD(SCREENX(x), SCREENY(y)) || center_screen)
     {
@@ -5016,7 +5020,6 @@ void DrawRelocateScreen(int old_x, int old_y, int x, int y, int move_dir,
 		   offset_y > SBY_Lower + MIDPOSY ? SBY_Lower :
 		   offset_y - MIDPOSY);
     }
-
 
     ScrollScreen(NULL, SCROLL_GO_ON);	/* scroll last frame to full tile */
 

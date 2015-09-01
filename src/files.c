@@ -288,6 +288,11 @@ static struct LevelFileConfigInfo chunk_config_ELEM[] =
     TYPE_BOOLEAN,			CONF_VALUE_8_BIT(12),
     &li.shifted_relocation,		FALSE
   },
+  {
+    EL_PLAYER_1,			-1,
+    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(15),
+    &li.lazy_relocation,		FALSE
+  },
 
   /* (these values are different for each player) */
   {
