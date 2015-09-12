@@ -2294,7 +2294,7 @@ void DrawEnvelopeRequest(char *text)
   if (request.centered)
     sx_offset = (request.width - text_width) / 2;
 
-  if (request.wrap_single_words)
+  if (request.wrap_single_words && !request.autowrap)
   {
     char *src_text_ptr, *dst_text_ptr;
 
