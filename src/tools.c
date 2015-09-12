@@ -2276,17 +2276,23 @@ void DrawEnvelopeRequest(char *text)
   int border_size = request.border_size;
   int line_spacing = request.line_spacing;
   int line_height = font_height + line_spacing;
-  int text_width = request.width - 2 * border_size;
-  int text_height = request.height - 2 * border_size;
-  int line_length = text_width / font_width;
-  int max_lines = text_height / line_height;
+  int max_text_width  = request.width  - 2 * border_size;
+  int max_text_height = request.height - 2 * border_size;
+  int line_length = max_text_width  / font_width;
+  int max_lines   = max_text_height / line_height;
+  int text_width = line_length * font_width;
   int width = request.width;
   int height = request.height;
   int tile_size = request.step_offset;
   int x_steps = width  / tile_size;
   int y_steps = height / tile_size;
+  int sx_offset = border_size;
+  int sy_offset = border_size;
   int sx, sy;
   int i, x, y;
+
+  if (request.centered)
+    sx_offset = (request.width - text_width) / 2;
 
   if (request.wrap_single_words)
   {
@@ -2328,7 +2334,7 @@ void DrawEnvelopeRequest(char *text)
   /* force DOOR font inside door area */
   game_status = GAME_MODE_PSEUDO_DOOR;
 
-  DrawTextBuffer(sx + border_size, sy + border_size, text_final, font_nr,
+  DrawTextBuffer(sx + sx_offset, sy + sy_offset, text_final, font_nr,
 		 line_length, -1, max_lines, line_spacing, mask_mode,
 		 request.autowrap, request.centered, FALSE);
 
