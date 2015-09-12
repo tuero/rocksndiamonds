@@ -2283,7 +2283,7 @@ void DrawEnvelopeRequest(char *text)
   int text_width = line_length * font_width;
   int width = request.width;
   int height = request.height;
-  int tile_size = request.step_offset;
+  int tile_size = MAX(request.step_offset, 1);
   int x_steps = width  / tile_size;
   int y_steps = height / tile_size;
   int sx_offset = border_size;
@@ -2362,7 +2362,7 @@ void AnimateEnvelopeRequest(int anim_mode, int action)
   int anim_delay_value = (no_delay ? 0 : delay_value + 500 * 0) / 2;
   unsigned int anim_delay = 0;
 
-  int tile_size = request.step_offset;
+  int tile_size = MAX(request.step_offset, 1);
   int max_xsize = request.width  / tile_size;
   int max_ysize = request.height / tile_size;
   int max_xsize_inner = max_xsize - 2;
