@@ -117,6 +117,8 @@ OPTIONS = $(DEBUG) -Wall			# only for debugging purposes
 # OPTIONS = -O3
 
 ifdef BUILD_DIST			# distribution build
+SYS_LDFLAGS := $(shell echo $(SYS_LDFLAGS) |	\
+		       sed -e "s%-rpath,[^ ]*%-rpath,'\$$ORIGIN/lib'%")
 OPTIONS = -O3 -Wall
 endif
 
