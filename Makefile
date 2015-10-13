@@ -1,7 +1,7 @@
 # =============================================================================
 # Rocks'n'Diamonds - McDuffin Strikes Back!
 # -----------------------------------------------------------------------------
-# (c) 1995-2014 by Artsoft Entertainment
+# (c) 1995-2015 by Artsoft Entertainment
 #                  Holger Schemel
 #                  info@artsoft.org
 #                  http://www.artsoft.org/
@@ -46,9 +46,6 @@ MAKE = make
 # path for cross-compiling (only needed for non-native Windows build)
 CROSS_PATH_WIN32 = /usr/local/cross-tools/i386-mingw32msvc
 
-# compile special edition of R'n'D instead of the normal (classic) version
-# SPECIAL_EDITION = rnd_jue
-
 
 # -----------------------------------------------------------------------------
 # there should be no need to change anything below
@@ -75,9 +72,6 @@ sdl2:
 
 mac:
 	@$(MAKE_CMD) PLATFORM=macosx
-
-mac-static:
-	@$(MAKE_CMD) PLATFORM=macosx STATIC=true
 
 cross-win32:
 	@PATH=$(CROSS_PATH_WIN32)/bin:${PATH} $(MAKE_CMD) PLATFORM=cross-win32
@@ -139,12 +133,6 @@ backup_gfx:
 
 # prerelease:
 #	./Scripts/make_prerelease.sh
-
-jue:
-	@$(MAKE) SPECIAL_EDITION=rnd_jue all
-
-jue-win:
-	@$(MAKE) SPECIAL_EDITION=rnd_jue cross-win32
 
 dist-clean:
 	@$(MAKE_CMD) dist-clean

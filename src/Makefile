@@ -1,7 +1,7 @@
 # =============================================================================
 # Rocks'n'Diamonds - McDuffin Strikes Back!
 # -----------------------------------------------------------------------------
-# (c) 1995-2014 by Artsoft Entertainment
+# (c) 1995-2015 by Artsoft Entertainment
 #                  Holger Schemel
 #                  info@artsoft.org
 #                  http://www.artsoft.org/
@@ -30,22 +30,12 @@ WINDRES = windres
 CONVERT_ICON_ARGS = -transparent black -background transparent
 
 PROGBASE = rocksndiamonds
-
-ifdef SPECIAL_EDITION			# create special edition
-PROGBASE = $(SPECIAL_EDITION)
-endif
-
 PROGNAME = ../$(PROGBASE)
 
 
 # -----------------------------------------------------------------------------
 # configuring platform
 # -----------------------------------------------------------------------------
-
-ifeq ($(PLATFORM),solaris)		# compiling on Solaris
-EXTRA_LDFLAGS = -lnsl -lsocket -R$(XLIB_PATH)
-override PLATFORM = unix
-endif
 
 ifeq ($(PLATFORM),macosx)		# compiling on Mac OS X
 EXTRA_LDFLAGS = -lstdc++
@@ -80,34 +70,18 @@ ifndef TARGET				# auto-detect compiling for SDL or SDL2
   endif
 endif
 
-ifeq ($(STATIC),true)			# check for static linking
-override TARGET := $(TARGET)-static
-endif
-
 # $(info Using SDL version $(SDL_VERSION) [TARGET == $(TARGET)])
 
 ifeq ($(TARGET),sdl)			# compiling for SDL target
 SYS_CFLAGS = -DTARGET_SDL $(shell sdl-config --cflags)
-SDL_LIBS = -lSDL_image -lSDL_mixer -lSDL_net -lsmpeg
+SDL_LIBS = -lSDL_image -lSDL_mixer -lSDL_net
 SYS_LDFLAGS = $(SDL_LIBS) $(shell sdl-config --libs)
 endif
 
 ifeq ($(TARGET),sdl2)			# compiling for SDL2 target
 SYS_CFLAGS = -DTARGET_SDL2 $(shell sdl2-config --cflags)
-SDL_LIBS = -lSDL2_image -lSDL2_mixer -lSDL2_net -lsmpeg2
+SDL_LIBS = -lSDL2_image -lSDL2_mixer -lSDL2_net
 SYS_LDFLAGS = $(SDL_LIBS) $(shell sdl2-config --libs)
-endif
-
-ifeq ($(TARGET),sdl-static)		# compiling for SDL target (static)
-SYS_CFLAGS = -DTARGET_SDL $(shell sdl-config --cflags)
-SDL_LIBS = -lSDL_image -lSDL_mixer -lSDL_net -lsmpeg -lmikmod
-SYS_LDFLAGS = $(SDL_LIBS) $(shell sdl-config --static-libs)
-endif
-
-ifeq ($(TARGET),sdl2-static)		# compiling for SDL2 target (static)
-SYS_CFLAGS = -DTARGET_SDL2 $(shell sdl2-config --cflags)
-SDL_LIBS = -lSDL2_image -lSDL2_mixer -lSDL2_net -lsmpeg2 -lmikmod
-SYS_LDFLAGS = $(SDL_LIBS) $(shell sdl2-config --static-libs)
 endif
 
 
@@ -127,14 +101,8 @@ ifdef SCORE_ENTRIES			# number of score entries per player
 CONFIG_SCORE_ENTRIES = -D$(SCORE_ENTRIES)
 endif
 
-ifdef SPECIAL_EDITION
-ifeq ($(SPECIAL_EDITION),rnd_jue)	# create special edition
-CONFIG_SPECIAL = -DCREATE_SPECIAL_EDITION -DCREATE_SPECIAL_EDITION_RND_JUE
-endif
-endif
-
 CONFIG_GAME_DIR = $(CONFIG_RO_GAME_DIR) $(CONFIG_RW_GAME_DIR)
-CONFIG_GAME = $(CONFIG_GAME_DIR) $(CONFIG_SCORE_ENTRIES) $(CONFIG_SPECIAL)
+CONFIG_GAME = $(CONFIG_GAME_DIR) $(CONFIG_SCORE_ENTRIES)
 
 CONFIG = $(CONFIG_GAME) $(JOYSTICK)
 DEBUG = -DDEBUG -g
@@ -147,7 +115,6 @@ OPTIONS = $(DEBUG) -Wall			# only for debugging purposes
 # OPTIONS = -O3 -Wall -ansi -pedantic
 # OPTIONS = -O3 -Wall
 # OPTIONS = -O3
-# OPTIONS = -DSYSV -Ae			# may be needed for HP-UX
 
 ifdef BUILD_DIST			# distribution build
 OPTIONS = -O3 -Wall
@@ -229,15 +196,9 @@ AUTOCONF = conf_gfx.h conf_snd.h conf_mus.h
 
 ICONBASE = windows_icon
 ICON_BASEPATH = ../Special/Icons/windows_icons
+
 ifeq ($(PLATFORM),cross-win32)
-ifdef SPECIAL_EDITION
-# ICONSUFFIX = 32x32_$(SPECIAL_EDITION)
-ICON_PATH = $(ICON_BASEPATH)/$(SPECIAL_EDITION)
-else
-# ICONSUFFIX = 32x32
 ICON_PATH = $(ICON_BASEPATH)/default
-endif
-# ICON32X32 = ../graphics/$(ICONBASE)_$(ICONSUFFIX).bmp
 ICON = $(ICONBASE).o
 endif
 
