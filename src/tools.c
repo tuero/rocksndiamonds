@@ -227,7 +227,7 @@ void DumpTile(int x, int y)
   printf("  CustomValue: %d\n", CustomValue[x][y]);
   printf("  GfxElement:  %d\n", GfxElement[x][y]);
   printf("  GfxAction:   %d\n", GfxAction[x][y]);
-  printf("  GfxFrame:    %d\n", GfxFrame[x][y]);
+  printf("  GfxFrame:    %d [%d]\n", GfxFrame[x][y], FrameCounter);
   printf("\n");
 }
 
