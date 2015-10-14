@@ -128,6 +128,7 @@ struct GameInfo
   struct GameButtonInfo button;
 
   /* values for graphics engine customization */
+  int graphics_engine_version;
   boolean use_native_emc_graphics_engine;
   boolean use_native_sp_graphics_engine;
   boolean use_masked_pushing;
