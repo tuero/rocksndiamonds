@@ -25,6 +25,10 @@
 #define DEBUG_INIT_PLAYER	1
 #define DEBUG_PLAYER_ACTIONS	0
 
+// test element position in level set "test_gfxframe" / level "000"
+#define DEBUG_GFXFRAME_X	11
+#define DEBUG_GFXFRAME_Y	9
+
 /* EXPERIMENTAL STUFF */
 #define USE_NEW_AMOEBA_CODE	FALSE
 
@@ -3091,6 +3095,11 @@ void InitGame()
   int initial_move_dir = MV_DOWN;
   int i, j, x, y;
 
+#if 1
+  printf("::: game.graphics_engine_version == %d\n",
+	 game.graphics_engine_version);
+#endif
+
   // required here to update video display before fading (FIX THIS)
   DrawMaskedBorder(REDRAW_DOOR_2);
 
@@ -3386,6 +3395,10 @@ void InitGame()
     GfxRedraw[x][y] = GFX_REDRAW_NONE;
   }
 
+#if 1
+  printf("::: INIT GAME");
+#endif
+
   SCAN_PLAYFIELD(x, y)
   {
     if (emulate_bd && !IS_BD_ELEMENT(Feld[x][y]))
@@ -3399,6 +3412,10 @@ void InitGame()
 
     ResetGfxAnimation(x, y);
   }
+
+#if 1
+  printf(" -> %d\n", GfxFrame[DEBUG_GFXFRAME_X][DEBUG_GFXFRAME_Y]);
+#endif
 
   InitBeltMovement();
 
@@ -4599,6 +4616,11 @@ static void ResetGfxAnimation(int x, int y)
   GfxFrame[x][y] = 0;
 
   ResetGfxFrame(x, y, FALSE);
+
+#if 1
+  if (x == DEBUG_GFXFRAME_X && y == DEBUG_GFXFRAME_Y)
+    printf(" (RESET_GFX_ANIM)");
+#endif
 }
 
 static void ResetRandomAnimationValue(int x, int y)
@@ -9996,6 +10018,11 @@ static void CreateFieldExt(int x, int y, int element, boolean is_change)
     ResetGfxAnimation(x, y);
     ResetRandomAnimationValue(x, y);
 
+#if 0
+  if (x == DEBUG_GFXFRAME_X && y == DEBUG_GFXFRAME_Y)
+    printf(" (RESET X)");
+#endif
+
     TEST_DrawLevelField(x, y);
 
     if (GFX_CRUMBLED(new_element))
@@ -10252,12 +10279,60 @@ static void HandleElementChange(int x, int y, int page)
     {
       /* !!! not clear why graphic animation should be reset at all here !!! */
       /* !!! UPDATE: but is needed for correct Snake Bite tail animation !!! */
+      /* !!! SOLUTION: do not reset if graphics engine set to 4 or above !!! */
+
+      /*
+	GRAPHICAL BUG ADDRESSED BY CHECKING GRAPHICS ENGINE VERSION:
+
+	When using an animation frame delay of 1 (this only happens with
+	"sp_zonk.moving.left/right" in the classic graphics), the default
+	(non-moving) animation shows wrong animation frames (while the
+	moving animation, like "sp_zonk.moving.left/right", is correct,
+	so this graphical bug never shows up with the classic graphics).
+	For an animation with 4 frames, this causes wrong frames 0,0,1,2
+	be drawn instead of the correct frames 0,1,2,3. This is caused by
+	"GfxFrame[][]" being reset *twice* (in two successive frames) after
+	an element change: First when the change delay ("ChangeDelay[][]")
+	counter has reached zero after decrementing (see "RESET 1" below),
+	then a second time in the next frame (after "GfxFrame[][]" was
+	already incremented) when "ChangeDelay[][]" is reset to the initial
+	delay value again (see "RESET 2" below).
+
+	This causes frame 0 to be drawn twice, while the last frame won't
+	be drawn anymore, resulting in the wrong frame sequence 0,0,1,2.
+
+	As some animations may already be cleverly designed around this bug
+	(at least the "Snake Bite" snake tail animation does this), it cannot
+	simply be fixed here without breaking such existing animations.
+	Unfortunately, it cannot easily be detected if a graphics set was
+	designed "before" or "after" the bug was fixed. As a workaround,
+	a new graphics set option "game.graphics_engine_version" was added
+	to be able to specify the game's major release version for which the
+	graphics set was designed, which can then be used to decide if the
+	bugfix should be used (version 4 and above) or not (version 3 or
+	below, or if no version was specified at all, as with old sets).
+
+	(The wrong/fixed animation frames can be tested with the test level set
+	"test_gfxframe" and level "000", which contains a specially prepared
+	custom element at level position (x/y) == (11/9) which uses the zonk
+	animation mentioned above. Using "game.graphics_engine_version: 4"
+	fixes the wrong animation frames, showing the correct frames 0,1,2,3.
+	This can also be seen from the debug output for this test element.)
+      */
+
       /* when a custom element is about to change (for example by change delay),
 	 do not reset graphic animation when the custom element is moving */
-      if (!IS_MOVING(x, y))
+      if (game.graphics_engine_version < 4 &&
+	  !IS_MOVING(x, y))
       {
 	ResetGfxAnimation(x, y);
 	ResetRandomAnimationValue(x, y);
+
+#if 1
+	if (x == DEBUG_GFXFRAME_X && y == DEBUG_GFXFRAME_Y)
+	  printf(" (RESET 2)");
+#endif
+
       }
 
       if (change->pre_change_function)
@@ -10312,6 +10387,12 @@ static void HandleElementChange(int x, int y, int page)
 	if (change->post_change_function)
 	  change->post_change_function(x, y);
       }
+
+#if 1
+      if (x == DEBUG_GFXFRAME_X && y == DEBUG_GFXFRAME_Y)
+	printf(" (RESET 1)");
+#endif
+
     }
 
     if (change->has_action && !handle_action_before_change)
@@ -11388,6 +11469,10 @@ void GameActions_RND()
     }
   }
 
+#if 1
+  printf("::: %d", GfxFrame[DEBUG_GFXFRAME_X][DEBUG_GFXFRAME_Y]);
+#endif
+
   SCAN_PLAYFIELD(x, y)
   {
     ChangeCount[x][y] = 0;
@@ -11459,6 +11544,10 @@ void GameActions_RND()
     }
 #endif
   }
+
+#if 1
+  printf(" -> %d", GfxFrame[DEBUG_GFXFRAME_X][DEBUG_GFXFRAME_Y]);
+#endif
 
   SCAN_PLAYFIELD(x, y)
   {
@@ -11601,6 +11690,10 @@ void GameActions_RND()
       }
     }
   }
+
+#if 1
+  printf(" -> %d\n", GfxFrame[DEBUG_GFXFRAME_X][DEBUG_GFXFRAME_Y]);
+#endif
 
 #if USE_NEW_AMOEBA_CODE
   /* new experimental amoeba growth stuff */
