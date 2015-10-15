@@ -63,8 +63,7 @@ int			FrameCounter = 0;
 /* init/close functions                                                      */
 /* ========================================================================= */
 
-void InitProgramInfo(char *argv0, char *config_filename,
-		     char *userdata_subdir, char *userdata_subdir_unix,
+void InitProgramInfo(char *argv0, char *config_filename, char *userdata_subdir,
 		     char *program_title, char *icon_title,
 		     char *icon_filename, char *cookie_prefix,
 		     int program_version)
@@ -75,7 +74,6 @@ void InitProgramInfo(char *argv0, char *config_filename,
   program.config_filename = config_filename;
 
   program.userdata_subdir = userdata_subdir;
-  program.userdata_subdir_unix = userdata_subdir_unix;
   program.userdata_path = getUserGameDataDir();
 
   program.program_title = program_title;
@@ -131,10 +129,6 @@ void InitPlatformDependentStuff(void)
 {
   // this is initialized in GetOptions(), but may already be used before
   options.verbose = TRUE;
-
-#if defined(PLATFORM_MACOSX)
-  updateUserGameDataDir();
-#endif
 
   OpenLogFiles();
 

@@ -272,8 +272,6 @@ char *getUserGameDataDir(void);
 char *getSetupDir(void);
 char *getCurrentLevelDir(void);
 
-void updateUserGameDataDir(void);
-
 void createDirectory(char *, char *, int);
 void InitUserDataDirectory(void);
 void SetFilePermissions(char *, int);

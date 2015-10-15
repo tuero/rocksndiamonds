@@ -5630,10 +5630,10 @@ static void print_version()
 
 static void InitProgramConfig(char *command_filename)
 {
-  char *userdata_basename = getBaseNameNoSuffix(command_filename);
-  char *config_filename = getProgramConfigFilename(command_filename);
   char *program_title = PROGRAM_TITLE_STRING;
   char *program_icon_file = PROGRAM_ICON_FILENAME;
+  char *config_filename = getProgramConfigFilename(command_filename);
+  char *userdata_basename = getBaseNameNoSuffix(command_filename);
   char *userdata_subdir;
   char *userdata_subdir_unix;
 
@@ -5673,7 +5673,6 @@ static void InitProgramConfig(char *command_filename)
   InitProgramInfo(command_filename,
 		  config_filename,
 		  userdata_subdir,
-		  userdata_subdir_unix,
 		  program_title,
 		  program_title,
 		  program_icon_file,

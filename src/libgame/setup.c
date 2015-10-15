@@ -1391,30 +1391,6 @@ char *getUserGameDataDir(void)
   return user_game_data_dir;
 }
 
-void updateUserGameDataDir()
-{
-#if defined(PLATFORM_MACOSX)
-  char *userdata_dir_old = getPath2(getHomeDir(), program.userdata_subdir_unix);
-  char *userdata_dir_new = getUserGameDataDir();	/* do not free() this */
-
-  /* convert old Unix style game data directory to Mac OS X style, if needed */
-  if (directoryExists(userdata_dir_old) && !directoryExists(userdata_dir_new))
-  {
-    if (rename(userdata_dir_old, userdata_dir_new) != 0)
-    {
-      Error(ERR_WARN, "cannot move game data directory '%s' to '%s'",
-	    userdata_dir_old, userdata_dir_new);
-
-      /* continue using Unix style data directory -- this should not happen */
-      program.userdata_path = getPath2(getPersonalDataDir(),
-				       program.userdata_subdir_unix);
-    }
-  }
-
-  free(userdata_dir_old);
-#endif
-}
-
 char *getSetupDir()
 {
   return getUserGameDataDir();

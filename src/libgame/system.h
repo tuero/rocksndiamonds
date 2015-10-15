@@ -655,7 +655,6 @@ struct ProgramInfo
   char *maindata_path;		/* main game data (installation) directory */
 
   char *userdata_subdir;	/* personal user game data directory */
-  char *userdata_subdir_unix;	/* personal user game data directory (Unix) */
   char *userdata_path;		/* resulting full path to game data directory */
 
   char *program_title;
@@ -1286,7 +1285,7 @@ extern int			FrameCounter;
 /* function definitions */
 
 void InitProgramInfo(char *, char *, char *, char *, char *, char *, char *,
-		     char *, int);
+		     int);
 
 void SetWindowTitle();
 
