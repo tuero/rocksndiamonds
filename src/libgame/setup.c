@@ -395,13 +395,25 @@ inline static char *getLevelArtworkDir(int type)
 
 char *getProgramConfigFilename(char *command_filename_ptr)
 {
-  char *command_filename = getStringCopy(command_filename_ptr);
+  char *command_filename_1 = getStringCopy(command_filename_ptr);
 
   // strip trailing executable suffix from command filename
-  if (strSuffix(command_filename, ".exe"))
-    command_filename[strlen(command_filename) - 4] = '\0';
+  if (strSuffix(command_filename_1, ".exe"))
+    command_filename_1[strlen(command_filename_1) - 4] = '\0';
 
-  return getStringCat2(command_filename, ".conf");
+  char *command_basepath = getBasePath(command_filename_ptr);
+  char *command_basename = getBaseNameNoSuffix(command_filename_ptr);
+  char *command_filename_2 = getPath2(command_basepath, command_basename);
+
+  char *config_filename_1 = getStringCat2(command_filename_1, ".conf");
+  char *config_filename_2 = getStringCat2(command_filename_2, ".conf");
+
+  // 1st try: look for config file that exactly matches the binary filename
+  if (fileExists(config_filename_1))
+    return config_filename_1;
+
+  // 2nd try: return config filename that matches binary filename without suffix
+  return config_filename_2;
 }
 
 char *getTapeFilename(int nr)

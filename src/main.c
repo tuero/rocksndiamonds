@@ -5630,7 +5630,7 @@ static void print_version()
 
 static void InitProgramConfig(char *command_filename)
 {
-  char *command_basename = getBaseName(command_filename);
+  char *userdata_basename = getBaseNameNoSuffix(command_filename);
   char *config_filename = getProgramConfigFilename(command_filename);
   char *program_title = PROGRAM_TITLE_STRING;
   char *program_icon_file = PROGRAM_ICON_FILENAME;
@@ -5639,7 +5639,18 @@ static void InitProgramConfig(char *command_filename)
 
   // read default program config, if existing
   if (fileExists(config_filename))
+  {
+    // if program config file exists, derive Unix user data directory from it
+    userdata_basename = getBaseName(config_filename);
+
+    if (strSuffix(userdata_basename, ".conf"))
+      userdata_basename[strlen(userdata_basename) - 4] = '\0';
+
     LoadSetupFromFilename(config_filename);
+  }
+
+  // set user data directory for Linux/Unix (but not Mac OS X)
+  userdata_subdir_unix = getStringCat2(".", userdata_basename);
 
   // set program title from potentially redefined program title
   if (setup.internal.program_title != NULL &&
@@ -5650,12 +5661,6 @@ static void InitProgramConfig(char *command_filename)
   if (setup.internal.program_icon_file != NULL &&
       strlen(setup.internal.program_icon_file) > 0)
     program_icon_file = getStringCopy(setup.internal.program_icon_file);
-
-  // strip trailing executable suffix from command basename
-  if (strSuffix(command_basename, ".exe"))
-    command_basename[strlen(command_basename) - 4] = '\0';
-
-  userdata_subdir_unix = getStringCat2(".", command_basename);
 
 #if defined(PLATFORM_WIN32) || defined(PLATFORM_MACOSX)
   userdata_subdir = program_title;

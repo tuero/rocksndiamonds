@@ -147,6 +147,7 @@ time_t getFileTimestampEpochSeconds(char *);
 char *getBasePath(char *);
 char *getBaseName(char *);
 char *getBaseNamePtr(char *);
+char *getBaseNameNoSuffix(char *);
 
 char *getStringCat2WithSeparator(char *, char *, char *);
 char *getStringCat3WithSeparator(char *, char *, char *, char *);

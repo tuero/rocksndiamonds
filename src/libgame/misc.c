@@ -654,6 +654,23 @@ char *getBaseName(char *filename)
   return getStringCopy(getBaseNamePtr(filename));
 }
 
+char *getBaseNameNoSuffix(char *filename)
+{
+  char *basename = getStringCopy(getBaseNamePtr(filename));
+
+  // remove trailing suffix (separated by dot or hyphen)
+  if (basename[0] != '.' && basename[0] != '-')
+  {
+    if (strchr(basename, '.') != NULL)
+      *strchr(basename, '.') = '\0';
+
+    if (strchr(basename, '-') != NULL)
+      *strchr(basename, '-') = '\0';
+  }
+
+  return basename;
+}
+
 char *getBasePath(char *filename)
 {
   char *basepath = getStringCopy(filename);
