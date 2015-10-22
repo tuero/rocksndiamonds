@@ -267,7 +267,7 @@ $(ICON):
 	$(CC) $(PROFILING) $(CFLAGS) -c $*.c
 
 graphics_dir:
-	@$(MAKE) -C $(GRAPHICS_DIR)
+	@test -f $(GRAPHICS_DIR)/Makefile && $(MAKE) -C $(GRAPHICS_DIR) || true
 
 clean-obj:
 	$(MAKE) -C $(LIBGAME_DIR) clean
