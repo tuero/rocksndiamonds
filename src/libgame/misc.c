@@ -1139,6 +1139,12 @@ void GetOptions(int argc, char *argv[],
       /* when doing batch processing, always enable verbose mode (warnings) */
       options.verbose = TRUE;
     }
+#if defined(PLATFORM_MACOSX)
+    else if (strPrefix(option, "-psn"))
+    {
+      /* ignore process serial number when launched via GUI on Mac OS X */
+    }
+#endif
     else if (*option == '-')
     {
       Error(ERR_EXIT_HELP, "unrecognized option '%s'", option_str);
