@@ -5689,7 +5689,7 @@ int main(int argc, char *argv[])
   InitExitFunction(CloseAllAndExit);
   InitPlatformDependentStuff();
 
-  GetOptions(argv, print_usage, print_version);
+  GetOptions(argc, argv, print_usage, print_version);
   OpenAll();
 
   EventLoop();

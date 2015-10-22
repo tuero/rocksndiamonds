@@ -942,13 +942,18 @@ boolean strSuffixLower(char *s, char *suffix)
 /* command line option handling functions                                    */
 /* ------------------------------------------------------------------------- */
 
-void GetOptions(char *argv[],
+void GetOptions(int argc, char *argv[],
 		void (*print_usage_function)(void),
 		void (*print_version_function)(void))
 {
   char *ro_base_path = RO_BASE_PATH;
   char *rw_base_path = RW_BASE_PATH;
-  char **options_left = &argv[1];
+  char **argvplus = checked_calloc((argc + 1) * sizeof(char **));
+  char **options_left = &argvplus[1];
+
+  /* replace original "argv" with null-terminated array of string pointers */
+  while (argc--)
+    argvplus[argc] = argv[argc];
 
   /* if the program is configured to start from current directory (default),
      determine program package directory from program binary (some versions

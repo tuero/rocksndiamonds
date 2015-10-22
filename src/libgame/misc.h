@@ -169,7 +169,7 @@ boolean strSuffix(char *, char *);
 boolean strPrefixLower(char *, char *);
 boolean strSuffixLower(char *, char *);
 
-void GetOptions(char **,
+void GetOptions(int, char **,
 		void (*print_usage_function)(void),
 		void (*print_version_function)(void));
 
