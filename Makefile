@@ -117,23 +117,6 @@ leveltest: all
 levelsketch_images: all
 	./Scripts/make_levelsketch_images.sh
 
-backup:
-	./Scripts/make_backup.sh src tar
-
-backup-net-copy:
-	./Scripts/make_backup.sh src scp
-
-backup-all: backup backup-net-copy
-
-backup_lev:
-	./Scripts/make_backup.sh lev
-
-backup_gfx:
-	./Scripts/make_backup.sh gfx
-
-# prerelease:
-#	./Scripts/make_prerelease.sh
-
 dist-clean:
 	@$(MAKE_CMD) dist-clean
 
@@ -144,53 +127,37 @@ dist-build-win32:
 	@BUILD_DIST=TRUE $(MAKE) cross-win32
 
 dist-build-macosx:
-#	(this is done by "dist-package-macosx" target)
-
-dist-build-macosx-ppc:
-#	(this is done by "dist-package-macosx-ppc" target)
+	@BUILD_DIST=TRUE $(MAKE)
 
 dist-package-unix:
-	./Scripts/make_dist.sh unix .
+	./Scripts/make_dist.sh package unix
 
 dist-package-win32:
-	./Scripts/make_dist.sh win .
+	./Scripts/make_dist.sh package win
 
 dist-package-macosx:
-	./Scripts/make_dist.sh mac . $(MAKE)
-
-dist-package-macosx-ppc:
-	./Scripts/make_dist.sh mac-ppc . $(MAKE)
+	./Scripts/make_dist.sh package mac
 
 dist-upload-unix:
-	./Scripts/make_dist.sh unix . upload
+	./Scripts/make_dist.sh upload unix
 
 dist-upload-win32:
-	./Scripts/make_dist.sh win . upload
+	./Scripts/make_dist.sh upload win
 
 dist-upload-macosx:
-	./Scripts/make_dist.sh mac . upload
-
-dist-upload-macosx-ppc:
-	./Scripts/make_dist.sh mac-ppc . upload
-
-dist-build-all:
-	$(MAKE) clean
-	$(MAKE) dist-build-unix		; $(MAKE) dist-clean
-	$(MAKE) dist-build-win32	; $(MAKE) dist-clean
+	./Scripts/make_dist.sh upload mac
 
 dist-package-all:
 	$(MAKE) dist-package-unix
 	$(MAKE) dist-package-win32
 	$(MAKE) dist-package-macosx
-	$(MAKE) dist-package-macosx-ppc
 
 dist-upload-all:
 	$(MAKE) dist-upload-unix
 	$(MAKE) dist-upload-win32
 	$(MAKE) dist-upload-macosx
-	$(MAKE) dist-upload-macosx-ppc
 
-dist-all: dist-build-all dist-package-all
+package-all: dist-package-all
 
 upload-all: dist-upload-all
 
