@@ -4891,7 +4891,7 @@ void DrawRelocateScreen(int old_x, int old_y, int x, int y, int move_dir,
   boolean no_delay = (tape.warp_forward);
   int frame_delay_value = (ffwd_delay ? FfwdFrameDelay : GameFrameDelay);
   int wait_delay_value = (no_delay ? 0 : frame_delay_value);
-  int scroll_xx, scroll_yy;
+  int new_scroll_x, new_scroll_y;
 
   if (level.lazy_relocation && IN_VIS_FIELD(SCREENX(x), SCREENY(y)))
   {
@@ -4906,13 +4906,13 @@ void DrawRelocateScreen(int old_x, int old_y, int x, int y, int move_dir,
   {
     /* relocation _with_ centering of screen */
 
-    scroll_xx = (x < SBX_Left  + MIDPOSX ? SBX_Left :
-		 x > SBX_Right + MIDPOSX ? SBX_Right :
-		 x - MIDPOSX);
+    new_scroll_x = (x < SBX_Left  + MIDPOSX ? SBX_Left :
+		    x > SBX_Right + MIDPOSX ? SBX_Right :
+		    x - MIDPOSX);
 
-    scroll_yy = (y < SBY_Upper + MIDPOSY ? SBY_Upper :
-		 y > SBY_Lower + MIDPOSY ? SBY_Lower :
-		 y - MIDPOSY);
+    new_scroll_y = (y < SBY_Upper + MIDPOSY ? SBY_Upper :
+		    y > SBY_Lower + MIDPOSY ? SBY_Lower :
+		    y - MIDPOSY);
   }
   else
   {
@@ -4929,21 +4929,21 @@ void DrawRelocateScreen(int old_x, int old_y, int x, int y, int move_dir,
     int offset_x = x + (scroll_x - center_scroll_x);
     int offset_y = y + (scroll_y - center_scroll_y);
 
-    scroll_xx = (offset_x < SBX_Left  + MIDPOSX ? SBX_Left :
-		 offset_x > SBX_Right + MIDPOSX ? SBX_Right :
-		 offset_x - MIDPOSX);
+    new_scroll_x = (offset_x < SBX_Left  + MIDPOSX ? SBX_Left :
+		    offset_x > SBX_Right + MIDPOSX ? SBX_Right :
+		    offset_x - MIDPOSX);
 
-    scroll_yy = (offset_y < SBY_Upper + MIDPOSY ? SBY_Upper :
-		 offset_y > SBY_Lower + MIDPOSY ? SBY_Lower :
-		 offset_y - MIDPOSY);
+    new_scroll_y = (offset_y < SBY_Upper + MIDPOSY ? SBY_Upper :
+		    offset_y > SBY_Lower + MIDPOSY ? SBY_Lower :
+		    offset_y - MIDPOSY);
   }
 
   if (quick_relocation)
   {
     /* case 2: quick relocation (redraw without visible scrolling) */
 
-    scroll_x = scroll_xx;
-    scroll_y = scroll_yy;
+    scroll_x = new_scroll_x;
+    scroll_y = new_scroll_y;
 
     RedrawPlayfield();
 
@@ -4954,13 +4954,13 @@ void DrawRelocateScreen(int old_x, int old_y, int x, int y, int move_dir,
 
   ScrollScreen(NULL, SCROLL_GO_ON);	/* scroll last frame to full tile */
 
-  while (scroll_x != scroll_xx || scroll_y != scroll_yy)
+  while (scroll_x != new_scroll_x || scroll_y != new_scroll_y)
   {
     int dx = 0, dy = 0;
     int fx = FX, fy = FY;
 
-    dx = (scroll_xx < scroll_x ? +1 : scroll_xx > scroll_x ? -1 : 0);
-    dy = (scroll_yy < scroll_y ? +1 : scroll_yy > scroll_y ? -1 : 0);
+    dx = (new_scroll_x < scroll_x ? +1 : new_scroll_x > scroll_x ? -1 : 0);
+    dy = (new_scroll_y < scroll_y ? +1 : new_scroll_y > scroll_y ? -1 : 0);
 
     if (dx == 0 && dy == 0)		/* no scrolling needed at all */
       break;
