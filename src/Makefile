@@ -216,6 +216,9 @@ all: $(AUTOCONF) libgame_dir game_em_dir game_sp_dir $(PROGNAME) graphics_dir
 $(PROGNAME): $(RNDLIBS) $(TIMESTAMP_FILE) $(OBJS) $(ICON)
 	$(CC) $(PROFILING) $(OBJS) $(ICON) $(RNDLIBS) $(LDFLAGS) -o $(PROGNAME)
 
+strip: $(PROGNAME)
+	strip $(PROGNAME)
+
 libgame_dir:
 	@$(MAKE) -C $(LIBGAME_DIR)
 $(LIBGAME):
