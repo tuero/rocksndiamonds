@@ -4428,8 +4428,6 @@ void GameEnd()
 
   if (!local_player->LevelSolved_SaveScore)
   {
-    FadeOut(REDRAW_FIELD);
-
     game_status = GAME_MODE_MAIN;
 
     DrawMainMenu();
@@ -4461,8 +4459,6 @@ void GameEnd()
   }
   else
   {
-    FadeOut(REDRAW_FIELD);
-
     game_status = GAME_MODE_MAIN;
 
     if (raise_level)
