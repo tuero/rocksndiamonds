@@ -4898,81 +4898,40 @@ void DrawRelocateScreen(int old_x, int old_y, int x, int y, int move_dir,
   }
   else if (quick_relocation)
   {
-    if (!IN_VIS_FIELD(SCREENX(x), SCREENY(y)) || center_screen)
+    if (!level.shifted_relocation || center_screen)
     {
-      if (!level.shifted_relocation || center_screen)
-      {
-	/* quick relocation (without scrolling), with centering of screen */
+      /* quick relocation (without scrolling), with centering of screen */
 
-	scroll_x = (x < SBX_Left  + MIDPOSX ? SBX_Left :
-		    x > SBX_Right + MIDPOSX ? SBX_Right :
-		    x - MIDPOSX);
+      scroll_x = (x < SBX_Left  + MIDPOSX ? SBX_Left :
+		  x > SBX_Right + MIDPOSX ? SBX_Right :
+		  x - MIDPOSX);
 
-	scroll_y = (y < SBY_Upper + MIDPOSY ? SBY_Upper :
-		    y > SBY_Lower + MIDPOSY ? SBY_Lower :
-		    y - MIDPOSY);
-      }
-      else
-      {
-	/* quick relocation (without scrolling), but do not center screen */
-
-	int center_scroll_x = (old_x < SBX_Left  + MIDPOSX ? SBX_Left :
-			       old_x > SBX_Right + MIDPOSX ? SBX_Right :
-			       old_x - MIDPOSX);
-
-	int center_scroll_y = (old_y < SBY_Upper + MIDPOSY ? SBY_Upper :
-			       old_y > SBY_Lower + MIDPOSY ? SBY_Lower :
-			       old_y - MIDPOSY);
-
-	int offset_x = x + (scroll_x - center_scroll_x);
-	int offset_y = y + (scroll_y - center_scroll_y);
-
-	scroll_x = (offset_x < SBX_Left  + MIDPOSX ? SBX_Left :
-		    offset_x > SBX_Right + MIDPOSX ? SBX_Right :
-		    offset_x - MIDPOSX);
-
-	scroll_y = (offset_y < SBY_Upper + MIDPOSY ? SBY_Upper :
-		    offset_y > SBY_Lower + MIDPOSY ? SBY_Lower :
-		    offset_y - MIDPOSY);
-      }
+      scroll_y = (y < SBY_Upper + MIDPOSY ? SBY_Upper :
+		  y > SBY_Lower + MIDPOSY ? SBY_Lower :
+		  y - MIDPOSY);
     }
     else
     {
-      if (!level.shifted_relocation || center_screen)
-      {
-	/* quick relocation (without scrolling), with centering of screen */
+      /* quick relocation (without scrolling), but do not center screen */
 
-	scroll_x = (x < SBX_Left  + MIDPOSX ? SBX_Left :
-		    x > SBX_Right + MIDPOSX ? SBX_Right :
-		    x - MIDPOSX);
+      int center_scroll_x = (old_x < SBX_Left  + MIDPOSX ? SBX_Left :
+			     old_x > SBX_Right + MIDPOSX ? SBX_Right :
+			     old_x - MIDPOSX);
 
-	scroll_y = (y < SBY_Upper + MIDPOSY ? SBY_Upper :
-		    y > SBY_Lower + MIDPOSY ? SBY_Lower :
-		    y - MIDPOSY);
-      }
-      else
-      {
-	/* quick relocation (without scrolling), but do not center screen */
+      int center_scroll_y = (old_y < SBY_Upper + MIDPOSY ? SBY_Upper :
+			     old_y > SBY_Lower + MIDPOSY ? SBY_Lower :
+			     old_y - MIDPOSY);
 
-	int center_scroll_x = (old_x < SBX_Left  + MIDPOSX ? SBX_Left :
-			       old_x > SBX_Right + MIDPOSX ? SBX_Right :
-			       old_x - MIDPOSX);
+      int offset_x = x + (scroll_x - center_scroll_x);
+      int offset_y = y + (scroll_y - center_scroll_y);
 
-	int center_scroll_y = (old_y < SBY_Upper + MIDPOSY ? SBY_Upper :
-			       old_y > SBY_Lower + MIDPOSY ? SBY_Lower :
-			       old_y - MIDPOSY);
+      scroll_x = (offset_x < SBX_Left  + MIDPOSX ? SBX_Left :
+		  offset_x > SBX_Right + MIDPOSX ? SBX_Right :
+		  offset_x - MIDPOSX);
 
-	int offset_x = x + (scroll_x - center_scroll_x);
-	int offset_y = y + (scroll_y - center_scroll_y);
-
-	scroll_x = (offset_x < SBX_Left  + MIDPOSX ? SBX_Left :
-		    offset_x > SBX_Right + MIDPOSX ? SBX_Right :
-		    offset_x - MIDPOSX);
-
-	scroll_y = (offset_y < SBY_Upper + MIDPOSY ? SBY_Upper :
-		    offset_y > SBY_Lower + MIDPOSY ? SBY_Lower :
-		    offset_y - MIDPOSY);
-      }
+      scroll_y = (offset_y < SBY_Upper + MIDPOSY ? SBY_Upper :
+		  offset_y > SBY_Lower + MIDPOSY ? SBY_Lower :
+		  offset_y - MIDPOSY);
     }
 
     RedrawPlayfield();
