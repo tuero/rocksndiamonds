@@ -4891,126 +4891,101 @@ void DrawRelocateScreen(int old_x, int old_y, int x, int y, int move_dir,
   boolean no_delay = (tape.warp_forward);
   int frame_delay_value = (ffwd_delay ? FfwdFrameDelay : GameFrameDelay);
   int wait_delay_value = (no_delay ? 0 : frame_delay_value);
+  int scroll_xx, scroll_yy;
 
   if (level.lazy_relocation && IN_VIS_FIELD(SCREENX(x), SCREENY(y)))
   {
+    /* case 1: quick relocation inside visible screen (without scrolling) */
+
     RedrawPlayfield();
+
+    return;
   }
-  else if (quick_relocation)
+
+  if (!level.shifted_relocation || center_screen)
   {
-    if (!level.shifted_relocation || center_screen)
-    {
-      /* quick relocation (without scrolling), with centering of screen */
+    /* relocation _with_ centering of screen */
 
-      scroll_x = (x < SBX_Left  + MIDPOSX ? SBX_Left :
-		  x > SBX_Right + MIDPOSX ? SBX_Right :
-		  x - MIDPOSX);
+    scroll_xx = (x < SBX_Left  + MIDPOSX ? SBX_Left :
+		 x > SBX_Right + MIDPOSX ? SBX_Right :
+		 x - MIDPOSX);
 
-      scroll_y = (y < SBY_Upper + MIDPOSY ? SBY_Upper :
-		  y > SBY_Lower + MIDPOSY ? SBY_Lower :
-		  y - MIDPOSY);
-    }
-    else
-    {
-      /* quick relocation (without scrolling), but do not center screen */
-
-      int center_scroll_x = (old_x < SBX_Left  + MIDPOSX ? SBX_Left :
-			     old_x > SBX_Right + MIDPOSX ? SBX_Right :
-			     old_x - MIDPOSX);
-
-      int center_scroll_y = (old_y < SBY_Upper + MIDPOSY ? SBY_Upper :
-			     old_y > SBY_Lower + MIDPOSY ? SBY_Lower :
-			     old_y - MIDPOSY);
-
-      int offset_x = x + (scroll_x - center_scroll_x);
-      int offset_y = y + (scroll_y - center_scroll_y);
-
-      scroll_x = (offset_x < SBX_Left  + MIDPOSX ? SBX_Left :
-		  offset_x > SBX_Right + MIDPOSX ? SBX_Right :
-		  offset_x - MIDPOSX);
-
-      scroll_y = (offset_y < SBY_Upper + MIDPOSY ? SBY_Upper :
-		  offset_y > SBY_Lower + MIDPOSY ? SBY_Lower :
-		  offset_y - MIDPOSY);
-    }
-
-    RedrawPlayfield();
+    scroll_yy = (y < SBY_Upper + MIDPOSY ? SBY_Upper :
+		 y > SBY_Lower + MIDPOSY ? SBY_Lower :
+		 y - MIDPOSY);
   }
   else
   {
-    int scroll_xx, scroll_yy;
+    /* relocation _without_ centering of screen */
 
-    if (!level.shifted_relocation || center_screen)
-    {
-      /* visible relocation (with scrolling), with centering of screen */
+    int center_scroll_x = (old_x < SBX_Left  + MIDPOSX ? SBX_Left :
+			   old_x > SBX_Right + MIDPOSX ? SBX_Right :
+			   old_x - MIDPOSX);
 
-      scroll_xx = (x < SBX_Left  + MIDPOSX ? SBX_Left :
-		   x > SBX_Right + MIDPOSX ? SBX_Right :
-		   x - MIDPOSX);
+    int center_scroll_y = (old_y < SBY_Upper + MIDPOSY ? SBY_Upper :
+			   old_y > SBY_Lower + MIDPOSY ? SBY_Lower :
+			   old_y - MIDPOSY);
 
-      scroll_yy = (y < SBY_Upper + MIDPOSY ? SBY_Upper :
-		   y > SBY_Lower + MIDPOSY ? SBY_Lower :
-		   y - MIDPOSY);
-    }
-    else
-    {
-      /* visible relocation (with scrolling), but do not center screen */
+    int offset_x = x + (scroll_x - center_scroll_x);
+    int offset_y = y + (scroll_y - center_scroll_y);
 
-      int center_scroll_x = (old_x < SBX_Left  + MIDPOSX ? SBX_Left :
-			     old_x > SBX_Right + MIDPOSX ? SBX_Right :
-			     old_x - MIDPOSX);
+    scroll_xx = (offset_x < SBX_Left  + MIDPOSX ? SBX_Left :
+		 offset_x > SBX_Right + MIDPOSX ? SBX_Right :
+		 offset_x - MIDPOSX);
 
-      int center_scroll_y = (old_y < SBY_Upper + MIDPOSY ? SBY_Upper :
-			     old_y > SBY_Lower + MIDPOSY ? SBY_Lower :
-			     old_y - MIDPOSY);
+    scroll_yy = (offset_y < SBY_Upper + MIDPOSY ? SBY_Upper :
+		 offset_y > SBY_Lower + MIDPOSY ? SBY_Lower :
+		 offset_y - MIDPOSY);
+  }
 
-      int offset_x = x + (scroll_x - center_scroll_x);
-      int offset_y = y + (scroll_y - center_scroll_y);
+  if (quick_relocation)
+  {
+    /* case 2: quick relocation (redraw without visible scrolling) */
 
-      scroll_xx = (offset_x < SBX_Left  + MIDPOSX ? SBX_Left :
-		   offset_x > SBX_Right + MIDPOSX ? SBX_Right :
-		   offset_x - MIDPOSX);
+    scroll_x = scroll_xx;
+    scroll_y = scroll_yy;
 
-      scroll_yy = (offset_y < SBY_Upper + MIDPOSY ? SBY_Upper :
-		   offset_y > SBY_Lower + MIDPOSY ? SBY_Lower :
-		   offset_y - MIDPOSY);
-    }
+    RedrawPlayfield();
 
-    ScrollScreen(NULL, SCROLL_GO_ON);	/* scroll last frame to full tile */
+    return;
+  }
 
-    while (scroll_x != scroll_xx || scroll_y != scroll_yy)
-    {
-      int dx = 0, dy = 0;
-      int fx = FX, fy = FY;
+  /* case 3: visible relocation (with scrolling to new position) */
 
-      dx = (scroll_xx < scroll_x ? +1 : scroll_xx > scroll_x ? -1 : 0);
-      dy = (scroll_yy < scroll_y ? +1 : scroll_yy > scroll_y ? -1 : 0);
+  ScrollScreen(NULL, SCROLL_GO_ON);	/* scroll last frame to full tile */
 
-      if (dx == 0 && dy == 0)		/* no scrolling needed at all */
-	break;
+  while (scroll_x != scroll_xx || scroll_y != scroll_yy)
+  {
+    int dx = 0, dy = 0;
+    int fx = FX, fy = FY;
 
-      scroll_x -= dx;
-      scroll_y -= dy;
+    dx = (scroll_xx < scroll_x ? +1 : scroll_xx > scroll_x ? -1 : 0);
+    dy = (scroll_yy < scroll_y ? +1 : scroll_yy > scroll_y ? -1 : 0);
 
-      fx += dx * TILEX / 2;
-      fy += dy * TILEY / 2;
+    if (dx == 0 && dy == 0)		/* no scrolling needed at all */
+      break;
 
-      ScrollLevel(dx, dy);
-      DrawAllPlayers();
+    scroll_x -= dx;
+    scroll_y -= dy;
 
-      /* scroll in two steps of half tile size to make things smoother */
-      BlitBitmap(drawto_field, window, fx, fy, SXSIZE, SYSIZE, SX, SY);
-      Delay(wait_delay_value);
+    fx += dx * TILEX / 2;
+    fy += dy * TILEY / 2;
 
-      /* scroll second step to align at full tile size */
-      BackToFront();
-      Delay(wait_delay_value);
-    }
-
+    ScrollLevel(dx, dy);
     DrawAllPlayers();
+
+    /* scroll in two steps of half tile size to make things smoother */
+    BlitBitmap(drawto_field, window, fx, fy, SXSIZE, SYSIZE, SX, SY);
+    Delay(wait_delay_value);
+
+    /* scroll second step to align at full tile size */
     BackToFront();
     Delay(wait_delay_value);
   }
+
+  DrawAllPlayers();
+  BackToFront();
+  Delay(wait_delay_value);
 }
 
 void RelocatePlayer(int jx, int jy, int el_player_raw)
