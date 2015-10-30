@@ -8216,7 +8216,7 @@ static struct TokenInfo internal_setup_tokens[] =
   { TYPE_STRING, &sxi.fallback_sounds_file,	"fallback_sounds_file"	},
   { TYPE_STRING, &sxi.fallback_music_file,	"fallback_music_file"	},
   { TYPE_STRING, &sxi.default_level_series,	"default_level_series"	},
-  { TYPE_STRING, &sxi.choose_from_top_leveldir,	"choose_from_top_leveldir" },
+  { TYPE_BOOLEAN,&sxi.choose_from_top_leveldir,	"choose_from_top_leveldir" },
 };
 
 static struct TokenInfo options_setup_tokens[] =
