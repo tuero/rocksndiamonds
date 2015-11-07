@@ -826,6 +826,10 @@ boolean CheckIfGlobalBorderRedrawIsNeeded()
   if (game_status == game_status_last)
     return FALSE;
 
+  // redraw if last screen was title screen
+  if (game_status_last == GAME_MODE_TITLE)
+    return TRUE;
+
   // redraw if global screen border has changed
   if (CheckIfGlobalBorderHasChanged())
     return TRUE;

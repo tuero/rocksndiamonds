@@ -886,7 +886,6 @@
 #define BUTTON_ACTIVE(b)	(ActiveButton[b])
 #define FONT_ACTIVE(f)		(ActiveFont[f])
 
-
 /* fundamental game speed values */
 #define MICROLEVEL_SCROLL_DELAY	50	/* delay for scrolling micro level */
 #define MICROLEVEL_LABEL_DELAY	250	/* delay for micro level label */
@@ -2889,6 +2888,7 @@ extern DrawBuffer	       *fieldbuffer;
 extern DrawBuffer	       *drawto_field;
 
 extern int			game_status;
+extern boolean			game_status_last_screen;
 extern boolean			level_editor_test_game;
 extern boolean			network_playing;
 

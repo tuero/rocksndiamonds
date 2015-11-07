@@ -1434,6 +1434,7 @@ void DrawMainMenu()
 
   if (CheckTitleScreen(levelset_has_changed))
   {
+    game_status_last_screen = GAME_MODE_MAIN;
     game_status = GAME_MODE_TITLE;
 
     DrawTitleScreen();
@@ -1557,7 +1558,7 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
     last_sound = SND_UNDEFINED;
     last_music = MUS_UNDEFINED;
 
-    if (game_status == GAME_MODE_INFO)
+    if (game_status_last_screen == GAME_MODE_INFO)
     {
       if (num_title_screens == 0)
       {
@@ -1570,6 +1571,9 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
       FadeSoundsAndMusic();
 
       FadeOut(REDRAW_ALL);
+
+      /* only required to update logic for redrawing global border */
+      ClearField();
     }
 
     if (tci->is_image)
@@ -1619,11 +1623,13 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
   }
   else if (button == MB_MENU_CHOICE)
   {
-    if (game_status == GAME_MODE_INFO && num_title_screens == 0)
+    if (game_status_last_screen == GAME_MODE_INFO && num_title_screens == 0)
     {
       FadeSetEnterScreen();
 
+      game_status = GAME_MODE_INFO;
       info_mode = INFO_MODE_MAIN;
+
       DrawInfoScreen();
 
       return;
@@ -1688,8 +1694,9 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
     /* force full menu screen redraw after displaying title screens */
     redraw_mask = REDRAW_ALL;
 
-    if (game_status == GAME_MODE_INFO)
+    if (game_status_last_screen == GAME_MODE_INFO)
     {
+      game_status = GAME_MODE_INFO;
       info_mode = INFO_MODE_MAIN;
 
       DrawInfoScreen();
@@ -2662,6 +2669,9 @@ void DrawInfoScreen_HelpText(int element, int action, int direction, int ypos)
 
 void DrawInfoScreen_TitleScreen()
 {
+  game_status_last_screen = GAME_MODE_INFO;
+  game_status = GAME_MODE_TITLE;
+
   DrawTitleScreen();
 }
 

@@ -31,6 +31,7 @@ DrawBuffer	       *fieldbuffer;
 DrawBuffer	       *drawto_field;
 
 int			game_status = -1;
+boolean			game_status_last_screen = -1;
 boolean			level_editor_test_game = FALSE;
 boolean			network_playing = FALSE;
 
