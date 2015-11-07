@@ -66,7 +66,7 @@ static int FilterEventsExt(const Event *event)
 
   /* do no reset mouse cursor before all pending events have been processed */
   if (gfx.cursor_mode == cursor_mode_last &&
-      ((effectiveGameStatus() == GAME_MODE_TITLE &&
+      ((game_status == GAME_MODE_TITLE &&
 	gfx.cursor_mode == CURSOR_NONE) ||
        (game_status == GAME_MODE_PLAYING &&
 	gfx.cursor_mode == CURSOR_PLAYFIELD)))
@@ -208,7 +208,7 @@ void EventLoop(void)
     }
     else
     {
-      if (effectiveGameStatus() == GAME_MODE_TITLE)
+      if (game_status == GAME_MODE_TITLE)
       {
 	/* when showing title screens, hide mouse pointer (if not moved) */
 

@@ -1252,14 +1252,6 @@ void DrawHeadline()
 		    setup.internal.program_copyright);
 }
 
-int effectiveGameStatus()
-{
-  if (game_status == GAME_MODE_INFO && info_mode == INFO_MODE_TITLE)
-    return GAME_MODE_TITLE;
-
-  return game_status;
-}
-
 void DrawTitleScreenImage(int nr, boolean initial)
 {
   int graphic = getTitleScreenGraphic(nr, initial);

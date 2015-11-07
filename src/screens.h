@@ -19,8 +19,6 @@
 #define SCROLL_PAGE	(2 * SCR_FIELDY)
 
 
-int effectiveGameStatus();
-
 void DrawMainMenuExt(int);
 void DrawAndFadeInMainMenu(int);
 void DrawMainMenu(void);

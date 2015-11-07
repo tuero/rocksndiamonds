@@ -330,8 +330,8 @@ void DrawMaskedBorder_ALL()
 void DrawMaskedBorder(int redraw_mask)
 {
   /* never draw masked screen borders on borderless screens */
-  if (effectiveGameStatus() == GAME_MODE_LOADING ||
-      effectiveGameStatus() == GAME_MODE_TITLE)
+  if (game_status == GAME_MODE_LOADING ||
+      game_status == GAME_MODE_TITLE)
     return;
 
   if (redraw_mask & REDRAW_ALL)
