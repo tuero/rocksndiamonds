@@ -14450,19 +14450,11 @@ void RequestQuitGameExt(boolean skip_request, boolean quick_quit, char *message)
 #endif
     {
       if (quick_quit)
-      {
 	FadeSkipNextFadeIn();
 
-	game_status = GAME_MODE_MAIN;
+      game_status = GAME_MODE_MAIN;
 
-	DrawMainMenu();
-      }
-      else
-      {
-	game_status = GAME_MODE_MAIN;
-
-	DrawMainMenu();
-      }
+      DrawMainMenu();
     }
   }
   else		/* continue playing the game */
