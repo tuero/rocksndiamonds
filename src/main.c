@@ -5645,7 +5645,7 @@ static void InitProgramConfig(char *command_filename)
     userdata_basename = getBaseName(config_filename);
 
     if (strSuffix(userdata_basename, ".conf"))
-      userdata_basename[strlen(userdata_basename) - 4] = '\0';
+      userdata_basename[strlen(userdata_basename) - 5] = '\0';
 
     LoadSetupFromFilename(config_filename);
   }
