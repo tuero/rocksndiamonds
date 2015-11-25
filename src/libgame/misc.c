@@ -2712,6 +2712,7 @@ int get_parameter_value(char *value_raw, char *suffix, int type)
 	      string_has_parameter(value, "fade")	? FADE_MODE_FADE :
 	      string_has_parameter(value, "crossfade")	? FADE_MODE_CROSSFADE :
 	      string_has_parameter(value, "melt")	? FADE_MODE_MELT :
+	      string_has_parameter(value, "curtain")	? FADE_MODE_CURTAIN :
 	      FADE_MODE_DEFAULT);
   }
   else if (strPrefix(suffix, ".font"))		/* (may also be ".font_xyz") */
