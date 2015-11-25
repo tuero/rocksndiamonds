@@ -1125,7 +1125,9 @@ void AutoPlayTape()
   else
   {
     DrawCompleteVideoDisplay();
+
     audio.sound_enabled = FALSE;
+    setup.engine_snapshot_mode = getStringCopy(STR_SNAPSHOT_MODE_OFF);
 
     autoplay_leveldir = getTreeInfoFromIdentifier(leveldir_first,
 						  global.autoplay_leveldir);
