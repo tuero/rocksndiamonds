@@ -1198,14 +1198,7 @@ void SDLFadeRectangle(Bitmap *bitmap_cross, int x, int y, int width, int height,
 	if (draw_border_function != NULL)
 	  draw_border_function();
 
-#if defined(TARGET_SDL2)
-	// SDL_UpdateWindowSurface(sdl_window);
-	// SDL_UpdateWindowSurfaceRects(sdl_window, &dst_rect2, 1);
 	UpdateScreen(&dst_rect2);
-#else
-	// SDL_UpdateRect(surface_screen, dst_x, dst_y, width, height);
-	UpdateScreen(&dst_rect2);
-#endif
       }
     }
   }
