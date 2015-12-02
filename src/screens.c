@@ -1568,6 +1568,8 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
       ClearField();
     }
 
+    ChangeViewportPropertiesIfNeeded();
+
     if (tci->is_image)
       DrawTitleScreenImage(tci->local_nr, tci->initial);
     else
@@ -2157,6 +2159,8 @@ static void DrawInfoScreen_Main()
   FadeSetLeaveScreen();
 
   FadeOut(fade_mask);
+
+  ChangeViewportPropertiesIfNeeded();
 
   OpenDoor(GetDoorState() | DOOR_NO_DELAY | DOOR_FORCE_REDRAW);
 

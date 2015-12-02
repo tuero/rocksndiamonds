@@ -7706,6 +7706,9 @@ struct ConfigInfo image_config[] =
 
   { "viewport.window.width",			"672"			},
   { "viewport.window.height",			"560"			},
+  { "viewport.window.TITLE.width",		ARG_DEFAULT		},
+  { "viewport.window.TITLE.height",		ARG_DEFAULT		},
+
   { "viewport.playfield.x",			"6"			},
   { "viewport.playfield.y",			"6"			},
   { "viewport.playfield.width",			"548"			},
@@ -7731,6 +7734,7 @@ struct ConfigInfo image_config[] =
   { "viewport.playfield.PLAYING.width",		ARG_DEFAULT		},
   { "viewport.playfield.PLAYING.height",	ARG_DEFAULT		},
   { "viewport.playfield.PLAYING.border_size",	ARG_DEFAULT		},
+
   { "viewport.door_1.x",			"566"			},
   { "viewport.door_1.y",			"60"			},
   { "viewport.door_1.width",			"100"			},
@@ -7756,6 +7760,7 @@ struct ConfigInfo image_config[] =
   { "viewport.door_1.PLAYING.width",		ARG_DEFAULT		},
   { "viewport.door_1.PLAYING.height",		ARG_DEFAULT		},
   { "viewport.door_1.PLAYING.border_size",	ARG_DEFAULT		},
+
   { "viewport.door_2.x",			"566"			},
   { "viewport.door_2.y",			"400"			},
   { "viewport.door_2.width",			"100"			},

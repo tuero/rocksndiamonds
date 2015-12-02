@@ -8142,10 +8142,13 @@ void ChangeViewportPropertiesIfNeeded()
   int gfx_game_mode = game_status;
   int gfx_game_mode2 = (game_status == GAME_MODE_EDITOR ? GAME_MODE_DEFAULT :
 			game_status);
+  struct RectWithBorder *vp_window    = &viewport.window[gfx_game_mode];
   struct RectWithBorder *vp_playfield = &viewport.playfield[gfx_game_mode];
-  struct RectWithBorder *vp_door_1 = &viewport.door_1[gfx_game_mode];
-  struct RectWithBorder *vp_door_2 = &viewport.door_2[gfx_game_mode2];
-  struct RectWithBorder *vp_door_3 = &viewport.door_2[GAME_MODE_EDITOR];
+  struct RectWithBorder *vp_door_1    = &viewport.door_1[gfx_game_mode];
+  struct RectWithBorder *vp_door_2    = &viewport.door_2[gfx_game_mode2];
+  struct RectWithBorder *vp_door_3    = &viewport.door_2[GAME_MODE_EDITOR];
+  int new_win_xsize	= vp_window->width;
+  int new_win_ysize	= vp_window->height;
   int border_size	= vp_playfield->border_size;
   int new_sx		= vp_playfield->x + border_size;
   int new_sy		= vp_playfield->y + border_size;
@@ -8181,11 +8184,11 @@ void ChangeViewportPropertiesIfNeeded()
   boolean init_gadgets_and_toons = FALSE;
   boolean init_em_graphics = FALSE;
 
-  if (viewport.window.width  != WIN_XSIZE ||
-      viewport.window.height != WIN_YSIZE)
+  if (new_win_xsize != WIN_XSIZE ||
+      new_win_ysize != WIN_YSIZE)
   {
-    WIN_XSIZE = viewport.window.width;
-    WIN_YSIZE = viewport.window.height;
+    WIN_XSIZE = new_win_xsize;
+    WIN_YSIZE = new_win_ysize;
 
     init_video_buffer = TRUE;
     init_gfx_buffers = TRUE;

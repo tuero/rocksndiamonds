@@ -2418,7 +2418,7 @@ sub print_image_config_vars
 		$var .= "[GFX_SPECIAL_ARG_DEFAULT]";
 	    }
 
-	    if ($var =~ /^(viewport.(playfield|door_[12]))(.[a-z_]+)$/)
+	    if ($var =~ /^(viewport.(window|playfield|door_[12]))(.[a-z_]+)$/)
 	    {
 		$var = $1 . "[GFX_SPECIAL_ARG_DEFAULT]" . $3;
 	    }

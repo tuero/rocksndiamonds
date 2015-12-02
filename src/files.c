@@ -8786,8 +8786,10 @@ static void InitMenuDesignSettings_SpecialPreProcessing()
   /* (eg, init "viewport.door_1.MAIN.xyz" from "viewport.door_1.xyz") */
   for (i = 0; i < NUM_SPECIAL_GFX_ARGS; i++)
   {
+    viewport.window[i]    = viewport.window[GFX_SPECIAL_ARG_DEFAULT];
     viewport.playfield[i] = viewport.playfield[GFX_SPECIAL_ARG_DEFAULT];
-    viewport.door_1[i] = viewport.door_1[GFX_SPECIAL_ARG_DEFAULT];
+    viewport.door_1[i]    = viewport.door_1[GFX_SPECIAL_ARG_DEFAULT];
+
     if (i != GFX_SPECIAL_ARG_EDITOR)	/* editor value already initialized */
       viewport.door_2[i] = viewport.door_2[GFX_SPECIAL_ARG_DEFAULT];
   }
@@ -8963,6 +8965,8 @@ static void LoadMenuDesignSettingsFromFilename(char *filename)
   /* (eg, init "viewport.door_1.MAIN.xyz" from "viewport.door_1.xyz") */
   for (i = 0; i < NUM_SPECIAL_GFX_ARGS; i++)
   {
+    char *token_w1 = "viewport.window.width";
+    char *token_w2 = "viewport.window.height";
     char *token_01 = "viewport.playfield.x";
     char *token_02 = "viewport.playfield.y";
     char *token_03 = "viewport.playfield.width";
@@ -8978,6 +8982,8 @@ static void LoadMenuDesignSettingsFromFilename(char *filename)
     char *token_13 = "viewport.door_2.width";
     char *token_14 = "viewport.door_2.height";
     char *token_15 = "viewport.door_2.border_size";
+    char *value_w1 = getHashEntry(setup_file_hash, token_w1);
+    char *value_w2 = getHashEntry(setup_file_hash, token_w2);
     char *value_01 = getHashEntry(setup_file_hash, token_01);
     char *value_02 = getHashEntry(setup_file_hash, token_02);
     char *value_03 = getHashEntry(setup_file_hash, token_03);
@@ -8994,6 +9000,10 @@ static void LoadMenuDesignSettingsFromFilename(char *filename)
     char *value_14 = getHashEntry(setup_file_hash, token_14);
     char *value_15 = getHashEntry(setup_file_hash, token_15);
 
+    if (value_w1 != NULL)
+      viewport.window[i].width = get_token_parameter_value(token_w1, value_w1);
+    if (value_w2 != NULL)
+      viewport.window[i].height = get_token_parameter_value(token_w2, value_w2);
     if (value_01 != NULL)
       viewport.playfield[i].x = get_token_parameter_value(token_01, value_01);
     if (value_02 != NULL)

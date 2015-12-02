@@ -2343,7 +2343,7 @@ struct EditorInfo
 
 struct ViewportInfo
 {
-  struct RectWithBorder window;
+  struct RectWithBorder window[NUM_SPECIAL_GFX_ARGS];
   struct RectWithBorder playfield[NUM_SPECIAL_GFX_ARGS];
   struct RectWithBorder door_1[NUM_SPECIAL_GFX_ARGS];
   struct RectWithBorder door_2[NUM_SPECIAL_GFX_ARGS];
