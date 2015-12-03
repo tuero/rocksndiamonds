@@ -1308,6 +1308,14 @@ void DrawTitleScreenMessage(int nr, boolean initial)
   /* force TITLE font on title message screen */
   game_status = getTitleMessageGameMode(initial);
 
+  /* if chars *and* width set to "-1", automatically determine width */
+  if (tmi->chars == -1 && tmi->width == -1)
+    tmi->width = viewport.window[game_status].width;
+
+  /* if lines *and* height set to "-1", automatically determine height */
+  if (tmi->lines == -1 && tmi->height == -1)
+    tmi->height = viewport.window[game_status].height;
+
   /* if chars set to "-1", automatically determine by text and font width */
   if (tmi->chars == -1)
     tmi->chars = tmi->width / getFontWidth(tmi->font);
@@ -1319,6 +1327,14 @@ void DrawTitleScreenMessage(int nr, boolean initial)
     tmi->lines = tmi->height / getFontHeight(tmi->font);
   else
     tmi->height = tmi->lines * getFontHeight(tmi->font);
+
+  /* if x set to "-1", automatically determine by width and alignment */
+  if (tmi->x == -1)
+    tmi->x = -1 * ALIGNED_XPOS(0, tmi->width, tmi->align);
+
+  /* if y set to "-1", automatically determine by height and alignment */
+  if (tmi->y == -1)
+    tmi->y = -1 * ALIGNED_YPOS(0, tmi->height, tmi->valign);
 
   SetDrawBackgroundMask(REDRAW_ALL);
   SetWindowBackgroundImage(getTitleBackground(nr, initial, FALSE));
