@@ -27,6 +27,7 @@
 static SDL_Window *sdl_window = NULL;
 static SDL_Renderer *sdl_renderer = NULL;
 static SDL_Texture *sdl_texture = NULL;
+static boolean fullscreen_enabled = FALSE;
 
 #define USE_RENDERER	TRUE
 #endif
@@ -503,7 +504,6 @@ static SDL_Surface *SDLCreateScreen(DrawBuffer **backbuffer,
   SDL_Surface *new_surface = NULL;
 
 #if defined(TARGET_SDL2)
-  static boolean fullscreen_enabled = FALSE;
   int surface_flags_window = SURFACE_FLAGS | SDL_WINDOW_RESIZABLE;
 #if USE_DESKTOP_FULLSCREEN
   int surface_flags_fullscreen = SURFACE_FLAGS | SDL_WINDOW_FULLSCREEN_DESKTOP;
@@ -527,9 +527,8 @@ static SDL_Surface *SDLCreateScreen(DrawBuffer **backbuffer,
 
 #if defined(TARGET_SDL2)
 
-  // store if initial screen mode on game start is fullscreen mode
-  if (sdl_window == NULL)
-    video.fullscreen_initial = fullscreen;
+  // store if initial screen mode is fullscreen mode when changing screen size
+  video.fullscreen_initial = fullscreen;
 
 #if USE_RENDERER
   float window_scaling_factor = (float)setup.window_scaling_percent / 100;
@@ -833,9 +832,9 @@ void SDLSetWindowFullscreen(boolean fullscreen)
 #endif
 
   if (SDL_SetWindowFullscreen(sdl_window, flags) == 0)
-    video.fullscreen_enabled = fullscreen;
+    video.fullscreen_enabled = fullscreen_enabled = fullscreen;
 
-  // if game started in fullscreen mode, window will also get fullscreen size
+  // if screen size was changed in fullscreen mode, correct desktop window size
   if (!fullscreen && video.fullscreen_initial)
   {
     SDLSetWindowScaling(setup.window_scaling_percent);
