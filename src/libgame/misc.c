@@ -3276,8 +3276,8 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
     boolean unknown_tokens_found = FALSE;
     boolean undefined_values_found = (hashtable_count(empty_file_hash) != 0);
 
-    if ((setup_file_list = loadSetupFileList(filename)) == NULL)
-      Error(ERR_EXIT, "loadSetupFileHash works, but loadSetupFileList fails");
+    /* list may be NULL for empty artwork config files */
+    setup_file_list = loadSetupFileList(filename);
 
     BEGIN_HASH_ITERATION(extra_file_hash, itr)
     {
