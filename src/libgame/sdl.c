@@ -1201,7 +1201,65 @@ void SDLFadeRectangle(Bitmap *bitmap_cross, int x, int y, int width, int height,
       }
     }
   }
-  else
+  else if (fade_mode == FADE_MODE_CURTAIN)
+  {
+    float xx;
+    int xx_final;
+    int xx_size = width / 2;
+
+    SDL_BlitSurface(surface_target, &src_rect, surface_screen, &dst_rect);
+#if defined(TARGET_SDL2)
+    SDL_SetSurfaceBlendMode(surface_source, SDL_BLENDMODE_NONE);
+#else
+    SDL_SetAlpha(surface_source, 0, 0);		/* disable alpha blending */
+#endif
+
+    for (xx = 0; xx < xx_size;)
+    {
+      time_last = time_current;
+      time_current = SDL_GetTicks();
+      xx += xx_size * ((float)(time_current - time_last) / fade_delay);
+      xx_final = MIN(MAX(0, xx), xx_size);
+
+      src_rect.x = src_x;
+      src_rect.y = src_y;
+      src_rect.w = width;
+      src_rect.h = height;
+
+      dst_rect.x = dst_x;
+      dst_rect.y = dst_y;
+
+      /* draw new (target) image to screen buffer */
+      SDL_BlitSurface(surface_target, &src_rect, surface_screen, &dst_rect);
+
+      if (xx_final < xx_size)
+      {
+	src_rect.w = xx_size - xx_final;
+	src_rect.h = height;
+
+	/* draw old (source) image to screen buffer (left side) */
+
+	src_rect.x = src_x + xx_final;
+	dst_rect.x = dst_x;
+
+	SDL_BlitSurface(surface_source, &src_rect, surface_screen, &dst_rect);
+
+	/* draw old (source) image to screen buffer (right side) */
+
+	src_rect.x = src_x + xx_size;
+	dst_rect.x = dst_x + xx_size + xx_final;
+
+	SDL_BlitSurface(surface_source, &src_rect, surface_screen, &dst_rect);
+      }
+
+      if (draw_border_function != NULL)
+	draw_border_function();
+
+      /* only update the region of the screen that is affected from fading */
+      UpdateScreen(&dst_rect2);
+    }
+  }
+  else		/* fading in, fading out or cross-fading */
   {
     float alpha;
     int alpha_final;
