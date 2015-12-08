@@ -1302,20 +1302,20 @@ inline static void DrawGraphicShiftedNormal(int x, int y, int dx, int dy,
       width = -dx;
       dx = TILEX + dx;
     }
-    else if (x==BX1 && dx < 0)	/* object leaves playfield to the left */
+    else if (x == BX1 && dx < 0) /* object leaves playfield to the left */
     {
       width += dx;
       cx = -dx;
       dx = 0;
     }
-    else if (x==BX2 && dx > 0)	/* object leaves playfield to the right */
+    else if (x == BX2 && dx > 0) /* object leaves playfield to the right */
       width -= dx;
     else if (dx)		/* general horizontal movement */
       MarkTileDirty(x + SIGN(dx), y);
 
     if (y < BY1)		/* object enters playfield from the top */
     {
-      if (cut_mode==CUT_BELOW)	/* object completely above top border */
+      if (cut_mode == CUT_BELOW) /* object completely above top border */
 	return;
 
       y = BY1;
@@ -1329,7 +1329,7 @@ inline static void DrawGraphicShiftedNormal(int x, int y, int dx, int dy,
       height = -dy;
       dy = TILEY + dy;
     }
-    else if (y==BY1 && dy < 0)	/* object leaves playfield to the top */
+    else if (y == BY1 && dy < 0) /* object leaves playfield to the top */
     {
       height += dy;
       cy = -dy;
