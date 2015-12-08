@@ -118,7 +118,7 @@ void InitExitFunction(void (*exit_function)(int))
   program.exit_function = exit_function;
 
   /* set signal handlers to custom exit function */
-  signal(SIGINT, exit_function);
+  // signal(SIGINT, exit_function);
   signal(SIGTERM, exit_function);
 
   /* set exit function to automatically cleanup SDL stuff after exit() */
