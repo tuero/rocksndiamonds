@@ -875,7 +875,8 @@ static void RedrawGlobalBorderIfNeeded()
     return;
 
   // copy current draw buffer to later copy back areas that have not changed
-  BlitBitmap(backbuffer, bitmap_db_store, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
+  if (game_status_last != GAME_MODE_TITLE)
+    BlitBitmap(backbuffer, bitmap_db_store, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
 
   if (CheckIfGlobalBorderRedrawIsNeeded())
   {
