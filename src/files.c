@@ -8778,8 +8778,12 @@ static void InitMenuDesignSettings_SpecialPreProcessing()
   /* (eg, init "menu.enter_screen.SCORES.xyz" from "menu.enter_screen.xyz") */
   for (i = 0; i < NUM_SPECIAL_GFX_ARGS; i++)
   {
+    if (i == GFX_SPECIAL_ARG_TITLE)	/* title values already initialized */
+      continue;
+
     menu.enter_screen[i] = menu.enter_screen[GFX_SPECIAL_ARG_DEFAULT];
     menu.leave_screen[i] = menu.leave_screen[GFX_SPECIAL_ARG_DEFAULT];
+    menu.next_screen[i]  = menu.next_screen[GFX_SPECIAL_ARG_DEFAULT];
   }
 
   /* special case: initialize "ARG_DEFAULT" values in static default config */
@@ -8790,8 +8794,10 @@ static void InitMenuDesignSettings_SpecialPreProcessing()
     viewport.playfield[i] = viewport.playfield[GFX_SPECIAL_ARG_DEFAULT];
     viewport.door_1[i]    = viewport.door_1[GFX_SPECIAL_ARG_DEFAULT];
 
-    if (i != GFX_SPECIAL_ARG_EDITOR)	/* editor value already initialized */
-      viewport.door_2[i] = viewport.door_2[GFX_SPECIAL_ARG_DEFAULT];
+    if (i == GFX_SPECIAL_ARG_EDITOR)	/* editor values already initialized */
+      continue;
+
+    viewport.door_2[i] = viewport.door_2[GFX_SPECIAL_ARG_DEFAULT];
   }
 }
 
@@ -8831,7 +8837,17 @@ static void InitMenuDesignSettings_SpecialPostProcessing()
 
 static void LoadMenuDesignSettingsFromFilename(char *filename)
 {
+  static struct TitleFadingInfo tfi;
   static struct TitleMessageInfo tmi;
+  static struct TokenInfo title_tokens[] =
+  {
+    { TYPE_INTEGER,	&tfi.fade_mode,		".fade_mode"		},
+    { TYPE_INTEGER,	&tfi.fade_delay,	".fade_delay"		},
+    { TYPE_INTEGER,	&tfi.post_delay,	".post_delay"		},
+    { TYPE_INTEGER,	&tfi.auto_delay,	".auto_delay"		},
+
+    { -1,		NULL,			NULL			}
+  };
   static struct TokenInfo titlemessage_tokens[] =
   {
     { TYPE_INTEGER,	&tmi.x,			".x"			},
@@ -8856,11 +8872,33 @@ static void LoadMenuDesignSettingsFromFilename(char *filename)
   };
   static struct
   {
+    struct TitleFadingInfo *info;
+    char *text;
+  }
+  title_info[] =
+  {
+    /* initialize title screens from "next screen" definitions, if defined */
+    { &title_initial_default,		"menu.next_screen.TITLE"	},
+    { &title_default,			"menu.next_screen.TITLE"	},
+
+    { NULL,				NULL				}
+  };
+  static struct
+  {
     struct TitleMessageInfo *array;
     char *text;
   }
   titlemessage_arrays[] =
   {
+    /* initialize title messages from "next screen" definitions, if defined */
+    { titlemessage_initial,		"menu.next_screen.TITLE"	},
+    { titlemessage,			"menu.next_screen.TITLE"	},
+
+    /* overwrite title messages with title definitions, if defined */
+    { titlemessage_initial,		"[title_initial]"		},
+    { titlemessage,			"[title]"			},
+
+    /* overwrite title messages with title message definitions, if defined */
     { titlemessage_initial,		"[titlemessage_initial]"	},
     { titlemessage,			"[titlemessage]"		},
 
@@ -8934,12 +8972,18 @@ static void LoadMenuDesignSettingsFromFilename(char *filename)
     char *token_4 = "menu.leave_screen.fade_mode";
     char *token_5 = "menu.leave_screen.fade_delay";
     char *token_6 = "menu.leave_screen.post_delay";
+    char *token_7 = "menu.next_screen.fade_mode";
+    char *token_8 = "menu.next_screen.fade_delay";
+    char *token_9 = "menu.next_screen.post_delay";
     char *value_1 = getHashEntry(setup_file_hash, token_1);
     char *value_2 = getHashEntry(setup_file_hash, token_2);
     char *value_3 = getHashEntry(setup_file_hash, token_3);
     char *value_4 = getHashEntry(setup_file_hash, token_4);
     char *value_5 = getHashEntry(setup_file_hash, token_5);
     char *value_6 = getHashEntry(setup_file_hash, token_6);
+    char *value_7 = getHashEntry(setup_file_hash, token_7);
+    char *value_8 = getHashEntry(setup_file_hash, token_8);
+    char *value_9 = getHashEntry(setup_file_hash, token_9);
 
     if (value_1 != NULL)
       menu.enter_screen[i].fade_mode = get_token_parameter_value(token_1,
@@ -8959,6 +9003,15 @@ static void LoadMenuDesignSettingsFromFilename(char *filename)
     if (value_6 != NULL)
       menu.leave_screen[i].post_delay = get_token_parameter_value(token_6,
 								  value_6);
+    if (value_7 != NULL)
+      menu.next_screen[i].fade_mode = get_token_parameter_value(token_7,
+								value_7);
+    if (value_8 != NULL)
+      menu.next_screen[i].fade_delay = get_token_parameter_value(token_8,
+								 value_8);
+    if (value_9 != NULL)
+      menu.next_screen[i].post_delay = get_token_parameter_value(token_9,
+								 value_9);
   }
 
   /* special case: initialize with default values that may be overwritten */
@@ -9039,6 +9092,33 @@ static void LoadMenuDesignSettingsFromFilename(char *filename)
     if (value_15 != NULL)
       viewport.door_1[i].border_size = get_token_parameter_value(token_15,
 								 value_15);
+  }
+
+  /* special case: initialize with default values that may be overwritten */
+  /* (e.g., init "[title].fade_mode" from "menu.next_screen.TITLE.fade_mode") */
+  for (i = 0; title_info[i].info != NULL; i++)
+  {
+    struct TitleFadingInfo *info = title_info[i].info;
+    char *base_token = title_info[i].text;
+
+    for (j = 0; title_tokens[j].type != -1; j++)
+    {
+      char *token = getStringCat2(base_token, title_tokens[j].text);
+      char *value = getHashEntry(setup_file_hash, token);
+
+      if (value != NULL)
+      {
+	int parameter_value = get_token_parameter_value(token, value);
+
+	tfi = *info;
+
+	*(boolean *)title_tokens[j].value = (boolean)parameter_value;
+
+	*info = tfi;
+      }
+
+      free(token);
+    }
   }
 
   /* special case: initialize with default values that may be overwritten */

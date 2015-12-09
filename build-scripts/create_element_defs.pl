@@ -2408,7 +2408,7 @@ sub print_image_config_vars
 	    $var =~ s/\.([A-Z]+)$/\[GFX_SPECIAL_ARG_$1\]/;
 	    $var =~ s/\.([A-Z]+)\./\[GFX_SPECIAL_ARG_$1\]./;
 
-	    if ($var =~ /^(menu.(enter|leave)_screen)(.[a-z_]+)$/)
+	    if ($var =~ /^(menu.(enter|leave|next)_screen)(.[a-z_]+)$/)
 	    {
 		$var = $1 . "[GFX_SPECIAL_ARG_DEFAULT]" . $3;
 	    }

@@ -2176,7 +2176,7 @@ struct MenuInfo
   struct TitleFadingInfo leave_menu;
   struct TitleFadingInfo enter_screen[NUM_SPECIAL_GFX_ARGS];
   struct TitleFadingInfo leave_screen[NUM_SPECIAL_GFX_ARGS];
-  struct TitleFadingInfo next_screen;
+  struct TitleFadingInfo next_screen[NUM_SPECIAL_GFX_ARGS];
 
   int sound[NUM_SPECIAL_GFX_ARGS];
   int music[NUM_SPECIAL_GFX_ARGS];

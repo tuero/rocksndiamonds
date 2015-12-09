@@ -1552,9 +1552,6 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
   static int last_sound = -1, last_music = -1;
   boolean return_to_main_menu = FALSE;
   struct TitleControlInfo *tci;
-  struct TitleFadingInfo fading_default;
-  struct TitleFadingInfo fading_last = fading;
-  struct TitleFadingInfo fading_next;
   int sound, music;
 
   if (button == MB_MENU_INITIALIZE)
@@ -1565,6 +1562,8 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
 
     last_sound = SND_UNDEFINED;
     last_music = MUS_UNDEFINED;
+
+    FadeSetEnterScreen();
 
     if (game_status_last_screen == GAME_MODE_INFO)
     {
@@ -1584,23 +1583,13 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
     /* only required to update logic for redrawing global border */
     ClearField();
 
+    /* title screens may have different window size */
     ChangeViewportPropertiesIfNeeded();
 
     if (tci->is_image)
       DrawTitleScreenImage(tci->local_nr, tci->initial);
     else
       DrawTitleScreenMessage(tci->local_nr, tci->initial);
-
-    fading_default = (tci->initial ? title_initial_default : title_default);
-
-    fading = fading_next = getTitleFading(tci);
-
-    if (!(fading_last.fade_mode & FADE_TYPE_TRANSFORM) &&
-	fading_next.fade_mode & FADE_TYPE_TRANSFORM)
-    {
-      fading.fade_mode = FADE_MODE_FADE;
-      fading.fade_delay = fading_default.fade_delay;
-    }
 
     sound = getTitleSound(tci);
     music = getTitleMusic(tci);
@@ -1616,8 +1605,6 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
     SetMouseCursor(CURSOR_NONE);
 
     FadeIn(REDRAW_ALL);
-
-    fading = fading_next;
 
     DelayReached(&title_delay, 0);	/* reset delay counter */
 
@@ -1658,14 +1645,14 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
       if (music == MUS_UNDEFINED || music != last_music)
 	FadeMusic();
 
+      fading = getTitleFading(tci);
+
       FadeOut(REDRAW_ALL);
 
       if (tci->is_image)
 	DrawTitleScreenImage(tci->local_nr, tci->initial);
       else
 	DrawTitleScreenMessage(tci->local_nr, tci->initial);
-
-      fading_next = getTitleFading(tci);
 
       sound = getTitleSound(tci);
       music = getTitleMusic(tci);
@@ -1678,14 +1665,7 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
       last_sound = sound;
       last_music = music;
 
-      /* last screen already faded out, next screen has no animation */
-      if (!(fading.fade_mode & FADE_TYPE_TRANSFORM) &&
-	  fading_next.fade_mode == FADE_MODE_NONE)
-	fading = fading_next;
-
       FadeIn(REDRAW_ALL);
-
-      fading = fading_next;
 
       DelayReached(&title_delay, 0);	/* reset delay counter */
     }
@@ -2202,6 +2182,11 @@ static void DrawInfoScreen_Main()
 
   PlayMenuSound();
   PlayMenuMusic();
+
+#if 1
+  // needed after returning from title screens with different window size
+  OpenDoor(GetDoorState() | DOOR_NO_DELAY | DOOR_FORCE_REDRAW);
+#endif
 
   DrawMaskedBorder(fade_mask);
 

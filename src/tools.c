@@ -649,7 +649,7 @@ void FadeSetEnterScreen()
 
 void FadeSetNextScreen()
 {
-  fading = menu.next_screen;
+  fading = menu.next_screen[game_status];
 
   // (do not overwrite fade mode set by FadeSetEnterScreen)
   // FadeSetLeaveNext(fading, TRUE);	/* (keep same fade mode) */
