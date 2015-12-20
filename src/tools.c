@@ -1065,8 +1065,8 @@ void getSizedGraphicSourceExt(int graphic, int frame, int tilesize,
   }
 
   *bitmap = src_bitmap;
-  *x = src_x * tilesize / TILESIZE;
-  *y = src_y * tilesize / TILESIZE;
+  *x = src_x * tilesize / g->tile_size;
+  *y = src_y * tilesize / g->tile_size;
 }
 
 void getFixedGraphicSourceExt(int graphic, int frame, Bitmap **bitmap,
@@ -1127,6 +1127,9 @@ inline static void getGraphicSourceExt(int graphic, int frame, Bitmap **bitmap,
     *x = src_x + frame * g->offset_x;
     *y = src_y + frame * g->offset_y;
   }
+
+  *x = *x * TILESIZE_VAR / g->tile_size;
+  *y = *y * TILESIZE_VAR / g->tile_size;
 }
 
 void getGraphicSource(int graphic, int frame, Bitmap **bitmap, int *x, int *y)

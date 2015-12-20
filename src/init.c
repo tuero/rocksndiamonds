@@ -1076,11 +1076,9 @@ static void set_graphic_parameters_ext(int graphic, int *parameter,
       g->tile_size = TILESIZE;		/* standard tile size */
 #endif
 
-#if 0
-    // CHECK: when setting tile size, should this set width and height?
+    // when setting tile size, also set width and height accordingly
     g->width  = g->tile_size;
     g->height = g->tile_size;
-#endif
   }
 
   if (g->use_image_size)
