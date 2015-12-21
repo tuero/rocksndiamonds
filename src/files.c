@@ -8757,6 +8757,14 @@ static void InitMenuDesignSettings_SpecialPreProcessing()
 
   /* special case: initialize "ARG_DEFAULT" values in static default config */
   /* (e.g., initialize "[titlemessage].fade_mode" from "[title].fade_mode") */
+  titlescreen_initial_default.fade_mode  = title_initial_default.fade_mode;
+  titlescreen_initial_default.fade_delay = title_initial_default.fade_delay;
+  titlescreen_initial_default.post_delay = title_initial_default.post_delay;
+  titlescreen_initial_default.auto_delay = title_initial_default.auto_delay;
+  titlescreen_default.fade_mode  = title_default.fade_mode;
+  titlescreen_default.fade_delay = title_default.fade_delay;
+  titlescreen_default.post_delay = title_default.post_delay;
+  titlescreen_default.auto_delay = title_default.auto_delay;
   titlemessage_initial_default.fade_mode  = title_initial_default.fade_mode;
   titlemessage_initial_default.fade_delay = title_initial_default.fade_delay;
   titlemessage_initial_default.post_delay = title_initial_default.post_delay;
@@ -8770,6 +8778,8 @@ static void InitMenuDesignSettings_SpecialPreProcessing()
   /* (e.g., init "titlemessage_1.fade_mode" from "[titlemessage].fade_mode") */
   for (i = 0; i < MAX_NUM_TITLE_MESSAGES; i++)
   {
+    titlescreen_initial[i] = titlescreen_initial_default;
+    titlescreen[i] = titlescreen_default;
     titlemessage_initial[i] = titlemessage_initial_default;
     titlemessage[i] = titlemessage_default;
   }
@@ -8890,15 +8900,37 @@ static void LoadMenuDesignSettingsFromFilename(char *filename)
   }
   titlemessage_arrays[] =
   {
-    /* initialize title messages from "next screen" definitions, if defined */
+    /* initialize first titles from "enter screen" definitions, if defined */
+    { titlescreen_initial_first,	"menu.enter_screen.TITLE"	},
+    { titlescreen_first,		"menu.enter_screen.TITLE"	},
+    { titlemessage_initial_first,	"menu.enter_screen.TITLE"	},
+    { titlemessage_first,		"menu.enter_screen.TITLE"	},
+
+    /* initialize titles from "next screen" definitions, if defined */
+    { titlescreen_initial,		"menu.next_screen.TITLE"	},
+    { titlescreen,			"menu.next_screen.TITLE"	},
     { titlemessage_initial,		"menu.next_screen.TITLE"	},
     { titlemessage,			"menu.next_screen.TITLE"	},
 
-    /* overwrite title messages with title definitions, if defined */
+    /* overwrite titles with title definitions, if defined */
+    { titlescreen_initial_first,	"[title_initial]"		},
+    { titlescreen_first,		"[title]"			},
+    { titlemessage_initial_first,	"[title_initial]"		},
+    { titlemessage_first,		"[title]"			},
+
+    { titlescreen_initial,		"[title_initial]"		},
+    { titlescreen,			"[title]"			},
     { titlemessage_initial,		"[title_initial]"		},
     { titlemessage,			"[title]"			},
 
-    /* overwrite title messages with title message definitions, if defined */
+    /* overwrite titles with title screen/message definitions, if defined */
+    { titlescreen_initial_first,	"[titlescreen_initial]"		},
+    { titlescreen_first,		"[titlescreen]"			},
+    { titlemessage_initial_first,	"[titlemessage_initial]"	},
+    { titlemessage_first,		"[titlemessage]"		},
+
+    { titlescreen_initial,		"[titlescreen_initial]"		},
+    { titlescreen,			"[titlescreen]"			},
     { titlemessage_initial,		"[titlemessage_initial]"	},
     { titlemessage,			"[titlemessage]"		},
 
@@ -9112,7 +9144,7 @@ static void LoadMenuDesignSettingsFromFilename(char *filename)
 
 	tfi = *info;
 
-	*(boolean *)title_tokens[j].value = (boolean)parameter_value;
+	*(int *)title_tokens[j].value = (int)parameter_value;
 
 	*info = tfi;
       }
@@ -9142,9 +9174,9 @@ static void LoadMenuDesignSettingsFromFilename(char *filename)
 	  tmi = array[k];
 
 	  if (titlemessage_tokens[j].type == TYPE_INTEGER)
-	    *(boolean *)titlemessage_tokens[j].value = (boolean)parameter_value;
-	  else
 	    *(int     *)titlemessage_tokens[j].value = (int)parameter_value;
+	  else
+	    *(boolean *)titlemessage_tokens[j].value = (boolean)parameter_value;
 
 	  array[k] = tmi;
 	}

@@ -455,6 +455,7 @@ struct TitleControlInfo
 {
   boolean is_image;
   boolean initial;
+  boolean first;
   int local_nr;
   int sort_priority;
 };
@@ -803,44 +804,29 @@ static int getTitleMusic(struct TitleControlInfo *tci)
 static struct TitleFadingInfo getTitleFading(struct TitleControlInfo *tci)
 {
   boolean is_image = tci->is_image;
-  int initial = tci->initial;
+  boolean initial = tci->initial;
+  boolean first = tci->first;
   int nr = tci->local_nr;
+  struct TitleMessageInfo tmi;
   struct TitleFadingInfo ti;
 
-  if (is_image)
-  {
-    int graphic = getTitleScreenGraphic(nr, initial);
+  tmi = (is_image ? (initial ? (first ?
+				titlescreen_initial_first[nr] :
+				titlescreen_initial[nr])
+		             : (first ?
+				titlescreen_first[nr] :
+				titlescreen[nr]))
+	          : (initial ? (first ?
+				titlemessage_initial_first[nr] :
+				titlemessage_initial[nr])
+		             : (first ?
+				titlemessage_first[nr] :
+				titlemessage[nr])));
 
-    /* initialize fading control values to default title config settings */
-    ti = (initial ? title_initial_default : title_default);
-
-    /* override default settings with image config settings, if defined */
-    if (graphic_info[graphic].fade_mode != FADE_MODE_DEFAULT)
-      ti.fade_mode = graphic_info[graphic].fade_mode;
-    if (graphic_info[graphic].fade_delay > -1)
-      ti.fade_delay = graphic_info[graphic].fade_delay;
-    if (graphic_info[graphic].post_delay > -1)
-      ti.post_delay = graphic_info[graphic].post_delay;
-    if (graphic_info[graphic].auto_delay > -1)
-      ti.auto_delay = graphic_info[graphic].auto_delay;
-  }
-  else
-  {
-    if (initial)
-    {
-      ti.fade_mode  = titlemessage_initial[nr].fade_mode;
-      ti.fade_delay = titlemessage_initial[nr].fade_delay;
-      ti.post_delay = titlemessage_initial[nr].post_delay;
-      ti.auto_delay = titlemessage_initial[nr].auto_delay;
-    }
-    else
-    {
-      ti.fade_mode  = titlemessage[nr].fade_mode;
-      ti.fade_delay = titlemessage[nr].fade_delay;
-      ti.post_delay = titlemessage[nr].post_delay;
-      ti.auto_delay = titlemessage[nr].auto_delay;
-    }
-  }
+  ti.fade_mode  = tmi.fade_mode;
+  ti.fade_delay = tmi.fade_delay;
+  ti.post_delay = tmi.post_delay;
+  ti.auto_delay = tmi.auto_delay;
 
   return ti;
 }
@@ -871,6 +857,8 @@ static void InitializeTitleControlsExt_AddTitleInfo(boolean is_image,
   title_controls[num_title_screens].initial = initial;
   title_controls[num_title_screens].local_nr = nr;
   title_controls[num_title_screens].sort_priority = sort_priority;
+
+  title_controls[num_title_screens].first = FALSE;	/* will be set later */
 
   num_title_screens++;
 }
@@ -914,6 +902,9 @@ static void InitializeTitleControls(boolean show_title_initial)
   /* sort title screens according to sort_priority and title number */
   qsort(title_controls, num_title_screens, sizeof(struct TitleControlInfo),
 	compareTitleControlInfo);
+
+  /* mark first title screen */
+  title_controls[0].first = TRUE;
 }
 
 static boolean visibleMenuPos(struct MenuPosInfo *pos)
@@ -1563,7 +1554,13 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
     last_sound = SND_UNDEFINED;
     last_music = MUS_UNDEFINED;
 
-    FadeSetEnterScreen();
+    if (num_title_screens != 0)
+    {
+      FadeSetEnterScreen();
+
+      /* use individual title fading instead of global "enter screen" fading */
+      fading = getTitleFading(tci);
+    }
 
     if (game_status_last_screen == GAME_MODE_INFO)
     {
@@ -1622,8 +1619,6 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
   {
     if (game_status_last_screen == GAME_MODE_INFO && num_title_screens == 0)
     {
-      FadeSetEnterScreen();
-
       game_status = GAME_MODE_INFO;
       info_mode = INFO_MODE_MAIN;
 

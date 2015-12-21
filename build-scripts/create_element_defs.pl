@@ -2362,10 +2362,13 @@ sub print_image_config_vars
 	    $var =~ s/^\[player\]\./game.player_/;
 	    $var =~ s/^\[title_initial\]/title_initial_default/;
 	    $var =~ s/^\[title\]/title_default/;
+	    $var =~ s/^\[titlescreen_initial\]/titlescreen_initial_default/;
+	    $var =~ s/^\[titlescreen\]/titlescreen_default/;
 	    $var =~ s/^\[titlemessage_initial\]/titlemessage_initial_default/;
 	    $var =~ s/^\[titlemessage\]/titlemessage_default/;
 
-	    if ($var =~ /^titlemessage.*(\d)/ ||
+	    if ($var =~ /^titlescreen.*(\d)/ ||
+		$var =~ /^titlemessage.*(\d)/ ||
 		$var =~ /^game.panel.key_(\d)/ ||
 		$var =~ /^game.panel.inventory_first_(\d)/ ||
 		$var =~ /^game.panel.inventory_last_(\d)/ ||
@@ -2424,6 +2427,15 @@ sub print_image_config_vars
 	    }
 
 	    print_image_config_var_entry("\"$token\"", "&$var");
+
+	    if ($var =~ /^(titlescreen.*)\[\d\]/ ||
+		$var =~ /^(titlemessage.*)\[\d\]/)
+	    {
+		my $prefix = $1;
+		$var =~ s/^$prefix/${prefix}_first/;
+
+		print_image_config_var_entry("\"$token\"", "&$var");
+	    }
 	}
     }
 
