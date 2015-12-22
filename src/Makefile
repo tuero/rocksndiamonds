@@ -278,9 +278,6 @@ clean-obj:
 	$(MAKE) -C $(GAME_SP_DIR) clean
 	$(RM) $(OBJS)
 	$(RM) $(RNDLIBS)
-#	$(RM) $(LIBGAME)
-#	$(RM) $(GAME_EM)
-#	$(RM) $(GAME_SP)
 
 clean-ico:
 	$(RM) $(ICONBASE).ico
@@ -294,6 +291,8 @@ clean: clean-obj clean-ico clean-bin
 
 clean-git: clean auto-conf-clean
 	@$(MAKE) -C $(GRAPHICS_DIR) clean
+
+dist-clean: clean-obj clean-ico
 
 
 # -----------------------------------------------------------------------------
@@ -313,8 +312,6 @@ valgrind:
 # -----------------------------------------------------------------------------
 # development only
 # -----------------------------------------------------------------------------
-
-dist-clean: clean-obj
 
 tags:
 	$(ETAGS) *.[ch] $(LIBGAME_DIR)/*.[ch] $(GAME_EM_DIR)/*.[ch] $(GAME_SP_DIR)/*.[ch]
