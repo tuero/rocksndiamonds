@@ -76,9 +76,6 @@ mac:
 cross-win32:
 	@PATH=$(CROSS_PATH_WIN32)/bin:${PATH} $(MAKE_CMD) PLATFORM=cross-win32
 
-strip:
-	@$(MAKE_CMD) strip
-
 clean:
 	@$(MAKE_CMD) clean
 
