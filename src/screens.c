@@ -1566,6 +1566,9 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
     {
       if (num_title_screens == 0)
       {
+	/* switch game mode from title screen mode back to info screen mode */
+	game_status = GAME_MODE_INFO;
+
 	DrawInfoScreen_NotAvailable("Title screen information:",
 				    "No title screen for this level set.");
 
