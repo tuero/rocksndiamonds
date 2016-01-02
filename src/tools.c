@@ -1239,13 +1239,12 @@ void DrawGraphicThruMaskExt(DrawBuffer *d, int dst_x, int dst_y, int graphic,
 void DrawFixedGraphicThruMaskExt(DrawBuffer *d, int dst_x, int dst_y,
 				 int graphic, int frame)
 {
-  struct GraphicInfo *g = &graphic_info[graphic];
   Bitmap *src_bitmap;
   int src_x, src_y;
 
   getFixedGraphicSource(graphic, frame, &src_bitmap, &src_x, &src_y);
 
-  BlitBitmapMasked(src_bitmap, d, src_x, src_y, g->width, g->height,
+  BlitBitmapMasked(src_bitmap, d, src_x, src_y, TILEX, TILEY,
 		   dst_x, dst_y);
 }
 
