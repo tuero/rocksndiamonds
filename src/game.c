@@ -13656,9 +13656,16 @@ static int DigField(struct PlayerInfo *player,
       SCAN_PLAYFIELD(xx, yy)
       {
 	if (Feld[xx][yy] == EL_SP_DISK_YELLOW)
+	{
 	  Bang(xx, yy);
+	}
 	else if (Feld[xx][yy] == EL_SP_TERMINAL)
+	{
 	  Feld[xx][yy] = EL_SP_TERMINAL_ACTIVE;
+
+	  ResetGfxAnimation(xx, yy);
+	  TEST_DrawLevelField(xx, yy);
+	}
       }
     }
     else if (IS_BELT_SWITCH(element))
