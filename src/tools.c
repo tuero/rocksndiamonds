@@ -2391,13 +2391,6 @@ void AnimateEnvelopeRequest(int anim_mode, int action)
     ystart = yend;
     end = 0;
   }
-  else
-  {
-    if (action == ACTION_OPENING)
-      PlayMenuSoundStereo(SND_DOOR_OPENING, SOUND_MIDDLE);
-    else if (action == ACTION_CLOSING)
-      PlayMenuSoundStereo(SND_DOOR_CLOSING, SOUND_MIDDLE);
-  }
 
   for (i = start; i <= end; i++)
   {
