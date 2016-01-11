@@ -4588,6 +4588,15 @@ struct ConfigInfo image_config[] =
   { "toon_20.direction",			"down"			},
   { "toon_20.position",				"any"			},
 
+  { "global.anim_1",				UNDEFINED_FILENAME	},
+  { "global.anim_2",				UNDEFINED_FILENAME	},
+  { "global.anim_3",				UNDEFINED_FILENAME	},
+  { "global.anim_4",				UNDEFINED_FILENAME	},
+  { "global.anim_5",				UNDEFINED_FILENAME	},
+  { "global.anim_6",				UNDEFINED_FILENAME	},
+  { "global.anim_7",				UNDEFINED_FILENAME	},
+  { "global.anim_8",				UNDEFINED_FILENAME	},
+
   { "menu.calibrate_red",			"RocksElements.png"	},
   { "menu.calibrate_red.xpos",			"12"			},
   { "menu.calibrate_red.ypos",			"8"			},

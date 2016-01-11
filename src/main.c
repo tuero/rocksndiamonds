@@ -5440,6 +5440,14 @@ struct ElementActionInfo element_action_info[NUM_ACTIONS + 1 + 1] =
   { ".page[30]",		ACTION_PAGE_30,			FALSE	},
   { ".page[31]",		ACTION_PAGE_31,			FALSE	},
   { ".page[32]",		ACTION_PAGE_32,			FALSE	},
+  { ".part_1",			ACTION_PART_1,			FALSE	},
+  { ".part_2",			ACTION_PART_2,			FALSE	},
+  { ".part_3",			ACTION_PART_3,			FALSE	},
+  { ".part_4",			ACTION_PART_4,			FALSE	},
+  { ".part_5",			ACTION_PART_5,			FALSE	},
+  { ".part_6",			ACTION_PART_6,			FALSE	},
+  { ".part_7",			ACTION_PART_7,			FALSE	},
+  { ".part_8",			ACTION_PART_8,			FALSE	},
   { ".other",			ACTION_OTHER,			FALSE	},
 
   /* empty suffix always matches -- check as last entry in InitSoundInfo() */
@@ -5539,6 +5547,20 @@ struct FontInfo font_info[NUM_FONTS + 1] =
   { "font.game_info"		},
   { "font.info.elements"	},
   { "font.info.levelset"	},
+
+  { NULL			}
+};
+
+struct GlobalAnimInfo global_anim_info[NUM_GLOBAL_ANIMS + 1] =
+{
+  { "global.anim_1",		},
+  { "global.anim_2",		},
+  { "global.anim_3",		},
+  { "global.anim_4",		},
+  { "global.anim_5",		},
+  { "global.anim_6",		},
+  { "global.anim_7",		},
+  { "global.anim_8",		},
 
   { NULL			}
 };

@@ -1765,9 +1765,17 @@
 #define ACTION_PAGE_30			81
 #define ACTION_PAGE_31			82
 #define ACTION_PAGE_32			83
-#define ACTION_OTHER			84
+#define ACTION_PART_1			84
+#define ACTION_PART_2			85
+#define ACTION_PART_3			86
+#define ACTION_PART_4			87
+#define ACTION_PART_5			88
+#define ACTION_PART_6			89
+#define ACTION_PART_7			90
+#define ACTION_PART_8			91
+#define ACTION_OTHER			92
 
-#define NUM_ACTIONS			85
+#define NUM_ACTIONS			93
 
 #define ACTION_BORING_LAST		ACTION_BORING_10
 #define ACTION_SLEEPING_LAST		ACTION_SLEEPING_3
@@ -1943,6 +1951,10 @@
 
 #define NUM_FONTS			38
 #define NUM_INITIAL_FONTS		4
+
+/* values for global animation configuration (must match those from main.c) */
+#define NUM_GLOBAL_ANIMS		8
+#define NUM_GLOBAL_ANIM_PARTS		8
 
 /* values for game_status (must match special image configuration suffixes) */
 #define GAME_MODE_DEFAULT		0
@@ -2743,6 +2755,14 @@ struct FontInfo
   				/* internal bitmap ID for special graphics */
 };
 
+struct GlobalAnimInfo
+{
+  char *token_name;		/* global animation token in config files */
+
+  /* global animation parts for certain screens */
+  int graphic[NUM_GLOBAL_ANIM_PARTS][NUM_SPECIAL_GFX_ARGS];
+};
+
 struct GraphicInfo
 {
   Bitmap **bitmaps;		/* bitmaps in all required sizes */
@@ -3016,6 +3036,7 @@ extern struct ElementDirectionInfo element_direction_info[];
 extern struct SpecialSuffixInfo special_suffix_info[];
 extern struct TokenIntPtrInfo	image_config_vars[];
 extern struct FontInfo		font_info[];
+extern struct GlobalAnimInfo	global_anim_info[];
 extern struct MusicPrefixInfo	music_prefix_info[];
 extern struct GraphicInfo      *graphic_info;
 extern struct SoundInfo	       *sound_info;
