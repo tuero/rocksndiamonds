@@ -451,6 +451,7 @@ boolean SDLSetVideoMode(DrawBuffer **, boolean);
 void SDLCreateBitmapContent(Bitmap *, int, int, int);
 void SDLFreeBitmapPointers(Bitmap *);
 void SDLCopyArea(Bitmap *, Bitmap *, int, int, int, int, int, int, int);
+void SDLBlitTexture(Bitmap *, int, int, int, int, int, int, int);
 void SDLFillRectangle(Bitmap *, int, int, int, int, Uint32);
 void SDLFadeRectangle(Bitmap *, int, int, int, int, int, int, int,
 		      void (*draw_border_function)(void));

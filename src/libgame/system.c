@@ -720,6 +720,28 @@ void BlitBitmapOnBackground(Bitmap *src_bitmap, Bitmap *dst_bitmap,
 	       dst_x, dst_y);
 }
 
+void BlitTexture(Bitmap *bitmap,
+		int src_x, int src_y, int width, int height,
+		int dst_x, int dst_y)
+{
+  if (bitmap == NULL)
+    return;
+
+  SDLBlitTexture(bitmap, src_x, src_y, width, height, dst_x, dst_y,
+		 BLIT_OPAQUE);
+}
+
+void BlitTextureMasked(Bitmap *bitmap,
+		       int src_x, int src_y, int width, int height,
+		       int dst_x, int dst_y)
+{
+  if (bitmap == NULL)
+    return;
+
+  SDLBlitTexture(bitmap, src_x, src_y, width, height, dst_x, dst_y,
+		 BLIT_MASKED);
+}
+
 void DrawSimpleBlackLine(Bitmap *bitmap, int from_x, int from_y,
 			 int to_x, int to_y)
 {

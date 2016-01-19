@@ -98,10 +98,22 @@ static void UpdateScreen(SDL_Rect *rect)
   {
     SDL_UpdateTexture(sdl_texture, NULL, screen->pixels, screen->pitch);
   }
+
+  // clear render target buffer
   SDL_RenderClear(sdl_renderer);
+
+  // copy backbuffer to render target buffer
   SDL_RenderCopy(sdl_renderer, sdl_texture, NULL, NULL);
+
+  // copy global animations to render target buffer, if defined
+  if (gfx.draw_global_anim_function != NULL)
+    gfx.draw_global_anim_function();
+
+  // show render target buffer on screen
   SDL_RenderPresent(sdl_renderer);
+
 #else
+
   if (rect)
     SDL_UpdateWindowSurfaceRects(sdl_window, rect, 1);
   else
@@ -958,6 +970,37 @@ void SDLCopyArea(Bitmap *src_bitmap, Bitmap *dst_bitmap,
     // SDL_UpdateRect(backbuffer->surface, dst_x, dst_y, width, height);
     UpdateScreen(&dst_rect);
   }
+#endif
+}
+
+void SDLBlitTexture(Bitmap *bitmap,
+		    int src_x, int src_y, int width, int height,
+		    int dst_x, int dst_y, int mask_mode)
+{
+#if defined(TARGET_SDL2)
+#if USE_RENDERER
+  SDL_Texture *texture;
+  SDL_Rect src_rect;
+  SDL_Rect dst_rect;
+
+  texture =
+    (mask_mode == BLIT_MASKED ? bitmap->texture_masked : bitmap->texture);
+
+  if (texture == NULL)
+    return;
+
+  src_rect.x = src_x;
+  src_rect.y = src_y;
+  src_rect.w = width;
+  src_rect.h = height;
+
+  dst_rect.x = dst_x;
+  dst_rect.y = dst_y;
+  dst_rect.w = width;
+  dst_rect.h = height;
+
+  SDL_RenderCopy(sdl_renderer, texture, &src_rect, &dst_rect);
+#endif
 #endif
 }
 

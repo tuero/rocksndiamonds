@@ -1337,6 +1337,8 @@ void BlitBitmapMasked(Bitmap *, Bitmap *, int, int, int, int, int, int);
 boolean DrawingOnBackground(int, int);
 boolean DrawingAreaChanged();
 void BlitBitmapOnBackground(Bitmap *, Bitmap *, int, int, int, int, int, int);
+void BlitTexture(Bitmap *, int, int, int, int, int, int);
+void BlitTextureMasked(Bitmap *, int, int, int, int, int, int);
 void DrawSimpleBlackLine(Bitmap *, int, int, int, int);
 void DrawSimpleWhiteLine(Bitmap *, int, int, int, int);
 void DrawLines(Bitmap *, struct XY *, int, Pixel);
