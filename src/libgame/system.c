@@ -231,6 +231,11 @@ void InitGfxDrawBusyAnimFunction(void (*draw_busy_anim_function)(void))
   gfx.draw_busy_anim_function = draw_busy_anim_function;
 }
 
+void InitGfxDrawGlobalAnimFunction(void (*draw_global_anim_function)(void))
+{
+  gfx.draw_global_anim_function = draw_global_anim_function;
+}
+
 void InitGfxCustomArtworkInfo()
 {
   gfx.override_level_graphics = FALSE;
@@ -1123,6 +1128,11 @@ void CreateBitmapWithSmallBitmaps(Bitmap **bitmaps, int zoom_factor,
 				  int tile_size)
 {
   CreateScaledBitmaps(bitmaps, zoom_factor, tile_size, TRUE);
+}
+
+void CreateBitmapTextures(Bitmap **bitmaps)
+{
+  SDLCreateBitmapTextures(bitmaps[IMG_BITMAP_STANDARD]);
 }
 
 void ScaleBitmap(Bitmap **bitmaps, int zoom_factor)

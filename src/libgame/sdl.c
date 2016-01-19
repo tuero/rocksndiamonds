@@ -286,6 +286,30 @@ SDL_Surface *SDLGetNativeSurface(SDL_Surface *surface)
 
 #endif
 
+#if defined(TARGET_SDL2)
+static SDL_Texture *SDLCreateTextureFromSurface(SDL_Surface *surface)
+{
+  SDL_Texture *texture = SDL_CreateTextureFromSurface(sdl_renderer, surface);
+
+  if (texture == NULL)
+    Error(ERR_EXIT, "SDL_CreateTextureFromSurface() failed: %s",
+	  SDL_GetError());
+
+  return texture;
+}
+#endif
+
+void SDLCreateBitmapTextures(Bitmap *bitmap)
+{
+#if defined(TARGET_SDL2)
+  if (bitmap == NULL)
+    return;
+
+  bitmap->texture        = SDLCreateTextureFromSurface(bitmap->surface);
+  bitmap->texture_masked = SDLCreateTextureFromSurface(bitmap->surface_masked);
+#endif
+}
+
 void SDLInitVideoDisplay(void)
 {
 #if !defined(TARGET_SDL2)
@@ -871,8 +895,19 @@ void SDLFreeBitmapPointers(Bitmap *bitmap)
     SDL_FreeSurface(bitmap->surface);
   if (bitmap->surface_masked)
     SDL_FreeSurface(bitmap->surface_masked);
+
   bitmap->surface = NULL;
   bitmap->surface_masked = NULL;
+
+#if defined(TARGET_SDL2)
+  if (bitmap->texture)
+    SDL_DestroyTexture(bitmap->texture);
+  if (bitmap->texture_masked)
+    SDL_DestroyTexture(bitmap->texture_masked);
+
+  bitmap->texture = NULL;
+  bitmap->texture_masked = NULL;
+#endif
 }
 
 void SDLCopyArea(Bitmap *src_bitmap, Bitmap *dst_bitmap,

@@ -129,6 +129,10 @@ void DrawInitAnim()
   FrameCounter++;
 }
 
+void DrawGlobalAnim()
+{
+}
+
 void FreeGadgets()
 {
   FreeLevelEditorGadgets();
@@ -224,6 +228,28 @@ void InitBitmapPointers()
   for (i = 0; i < num_images; i++)
     if (graphic_info[i].bitmaps)
       graphic_info[i].bitmap = graphic_info[i].bitmaps[IMG_BITMAP_STANDARD];
+}
+
+static void InitGlobalAnimImages()
+{
+  int i, j, k;
+
+  for (i = 0; i < NUM_GLOBAL_ANIMS; i++)
+  {
+    for (j = 0; j < NUM_GLOBAL_ANIM_PARTS; j++)
+    {
+      for (k = 0; k < NUM_SPECIAL_GFX_ARGS; k++)
+      {
+	int graphic = global_anim_info[i].graphic[j][k];
+
+	if (graphic == IMG_UNDEFINED)
+	  continue;
+
+	// create textures from images for fast GPU blitting, if possible
+	CreateImageTextures(graphic);
+      }
+    }
+  }
 }
 
 #if 1
@@ -1991,8 +2017,10 @@ static void ReinitializeGraphics()
   print_timestamp_time("InitBitmapPointers");
   InitFontGraphicInfo();		/* initialize text drawing functions */
   print_timestamp_time("InitFontGraphicInfo");
-  InitGlobalAnimGraphicInfo();		/* initialize global animations */
+  InitGlobalAnimGraphicInfo();		/* initialize global animation config */
   print_timestamp_time("InitGlobalAnimGraphicInfo");
+  InitGlobalAnimImages();		/* initialize global animation images */
+  print_timestamp_time("InitGlobalAnimImages");
 
   InitGraphicInfo_EM();			/* graphic mapping for EM engine */
   print_timestamp_time("InitGraphicInfo_EM");
@@ -5267,7 +5295,9 @@ void InitGfx()
   init.busy.height = anim_initial.height;
 
   InitMenuDesignSettings_Static();
+
   InitGfxDrawBusyAnimFunction(DrawInitAnim);
+  InitGfxDrawGlobalAnimFunction(DrawGlobalAnim);
 
   /* use copy of busy animation to prevent change while reloading artwork */
   init_last = init;

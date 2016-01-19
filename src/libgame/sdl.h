@@ -102,6 +102,10 @@ struct SDLSurfaceInfo
   int width, height;
   SDL_Surface *surface;
   SDL_Surface *surface_masked;
+#if defined(TARGET_SDL2)
+  SDL_Texture *texture;
+  SDL_Texture *texture_masked;
+#endif
 };
 
 struct MouseCursorInfo
@@ -428,6 +432,7 @@ struct MouseCursorInfo
 
 boolean SDLSetNativeSurface(SDL_Surface **);
 SDL_Surface *SDLGetNativeSurface(SDL_Surface *);
+void SDLCreateBitmapTextures(Bitmap *);
 
 #if defined(TARGET_SDL2)
 SDL_Surface *SDL_DisplayFormat(SDL_Surface *);

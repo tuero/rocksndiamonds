@@ -810,6 +810,7 @@ struct GfxInfo
   int anim_random_frame;
 
   void (*draw_busy_anim_function)(void);
+  void (*draw_global_anim_function)(void);
 
   int cursor_mode;
 };
@@ -1306,6 +1307,7 @@ void InitGfxWindowInfo(int, int);
 void InitGfxScrollbufferInfo(int, int);
 void InitGfxClipRegion(boolean, int, int, int, int);
 void InitGfxDrawBusyAnimFunction(void (*draw_busy_anim_function)(void));
+void InitGfxDrawGlobalAnimFunction(void (*draw_global_anim_function)(void));
 void InitGfxCustomArtworkInfo();
 void InitGfxOtherSettings();
 void SetDrawDeactivationMask(int);
@@ -1354,6 +1356,7 @@ void ReloadCustomImage(Bitmap *, char *);
 Bitmap *ZoomBitmap(Bitmap *, int, int);
 void ReCreateGameTileSizeBitmap(Bitmap **);
 void CreateBitmapWithSmallBitmaps(Bitmap **, int, int);
+void CreateBitmapTextures(Bitmap **);
 void ScaleBitmap(Bitmap **, int);
 
 void SetMouseCursor(int);
