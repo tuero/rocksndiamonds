@@ -129,10 +129,6 @@ void DrawInitAnim()
   FrameCounter++;
 }
 
-void DrawGlobalAnim()
-{
-}
-
 void FreeGadgets()
 {
   FreeLevelEditorGadgets();

@@ -14,4 +14,10 @@
 
 void InitToons(void);
 
+void DrawGlobalAnim(void);
+
+void InitAnimation(void);
+void StopAnimation(void);
+void DoAnimation(void);
+
 #endif

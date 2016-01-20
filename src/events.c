@@ -19,6 +19,7 @@
 #include "editor.h"
 #include "files.h"
 #include "tape.h"
+#include "cartoons.h"
 #include "network.h"
 
 

@@ -13,12 +13,6 @@
 #include "misc.h"
 
 
-/* values for toon animation */
-#define ANIM_START	0
-#define ANIM_CONTINUE	1
-#define ANIM_STOP	2
-
-
 static struct ToonScreenInfo screen_info;
 
 
@@ -384,19 +378,4 @@ void HandleAnimation(int mode)
   }
 
   anim_restart = reset_delay = AnimateToon(toon_nr, anim_restart);
-}
-
-void InitAnimation()
-{
-  HandleAnimation(ANIM_START);
-}
-
-void StopAnimation()
-{
-  HandleAnimation(ANIM_STOP);
-}
-
-void DoAnimation()
-{
-  HandleAnimation(ANIM_CONTINUE);
 }

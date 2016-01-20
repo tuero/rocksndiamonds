@@ -71,3 +71,22 @@ void InitToons()
 		 REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE,
 		 GAME_FRAME_DELAY);
 }
+
+void DrawGlobalAnim()
+{
+}
+
+void InitAnimation()
+{
+  HandleAnimation(ANIM_START);
+}
+
+void StopAnimation()
+{
+  HandleAnimation(ANIM_STOP);
+}
+
+void DoAnimation()
+{
+  HandleAnimation(ANIM_CONTINUE);
+}
