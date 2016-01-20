@@ -45,6 +45,8 @@ struct ConfigTypeInfo image_config_suffix[] =
   { ".diggable_like",			ARG_UNDEFINED,	TYPE_ELEMENT	},
   { ".border_size",			ARG_UNDEFINED,	TYPE_INTEGER	},
   { ".step_offset",			"4",		TYPE_INTEGER	},
+  { ".step_xoffset",			ARG_UNDEFINED,	TYPE_INTEGER	},
+  { ".step_yoffset",			ARG_UNDEFINED,	TYPE_INTEGER	},
   { ".step_delay",			"1",		TYPE_INTEGER	},
   { ".direction",			ARG_UNDEFINED,	TYPE_STRING	},
   { ".position",			ARG_UNDEFINED,	TYPE_STRING	},

@@ -238,6 +238,7 @@
 #define ANIM_VERTICAL		(1 << 11)
 #define ANIM_CENTERED		(1 << 12)
 #define ANIM_STATIC_PANEL	(1 << 13)
+#define ANIM_ALL		(1 << 14)
 
 #define ANIM_DEFAULT		ANIM_LOOP
 
@@ -270,6 +271,17 @@
 #define FADE_MODE_SKIP_FADE_OUT	(FADE_TYPE_SKIP | FADE_TYPE_FADE_OUT)
 
 #define FADE_MODE_DEFAULT	FADE_MODE_FADE
+
+/* values for toon positions */
+#define POS_UNDEFINED		-1
+#define POS_LEFT		0
+#define POS_RIGHT		1
+#define POS_TOP			2
+#define POS_UPPER		3
+#define POS_MIDDLE		4
+#define POS_LOWER		5
+#define POS_BOTTOM		6
+#define POS_ANY			7
 
 /* values for text alignment */
 #define ALIGN_LEFT		(1 << 0)

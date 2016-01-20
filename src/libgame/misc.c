@@ -2653,6 +2653,17 @@ int get_parameter_value(char *value_raw, char *suffix, int type)
 	      strEqual(value, "up")    ? MV_UP :
 	      strEqual(value, "down")  ? MV_DOWN : MV_NONE);
   }
+  else if (strEqual(suffix, ".position"))
+  {
+    result = (strEqual(value, "left")   ? POS_LEFT :
+	      strEqual(value, "right")  ? POS_RIGHT :
+	      strEqual(value, "top")    ? POS_TOP :
+	      strEqual(value, "upper")  ? POS_UPPER :
+	      strEqual(value, "middle") ? POS_MIDDLE :
+	      strEqual(value, "lower")  ? POS_LOWER :
+	      strEqual(value, "bottom") ? POS_BOTTOM :
+	      strEqual(value, "any")    ? POS_ANY : POS_UNDEFINED);
+  }
   else if (strEqual(suffix, ".align"))
   {
     result = (strEqual(value, "left")   ? ALIGN_LEFT :
@@ -2681,6 +2692,7 @@ int get_parameter_value(char *value_raw, char *suffix, int type)
 	      string_has_parameter(value, "horizontal")	? ANIM_HORIZONTAL :
 	      string_has_parameter(value, "vertical")	? ANIM_VERTICAL :
 	      string_has_parameter(value, "centered")	? ANIM_CENTERED :
+	      string_has_parameter(value, "all")	? ANIM_ALL :
 	      ANIM_DEFAULT);
 
     if (string_has_parameter(value, "reverse"))

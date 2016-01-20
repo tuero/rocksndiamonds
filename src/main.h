@@ -1864,35 +1864,37 @@
 #define GFX_ARG_DIGGABLE_LIKE		23
 #define GFX_ARG_BORDER_SIZE		24
 #define GFX_ARG_STEP_OFFSET		25
-#define GFX_ARG_STEP_DELAY		26
-#define GFX_ARG_DIRECTION		27
-#define GFX_ARG_POSITION		28
-#define GFX_ARG_DRAW_XOFFSET		29
-#define GFX_ARG_DRAW_YOFFSET		30
-#define GFX_ARG_DRAW_MASKED		31
-#define GFX_ARG_ANIM_DELAY_FIXED	32
-#define GFX_ARG_ANIM_DELAY_RANDOM	33
-#define GFX_ARG_POST_DELAY_FIXED	34
-#define GFX_ARG_POST_DELAY_RANDOM	35
-#define GFX_ARG_NAME			36
-#define GFX_ARG_SCALE_UP_FACTOR		37
-#define GFX_ARG_TILE_SIZE		38
-#define GFX_ARG_CLONE_FROM		39
-#define GFX_ARG_FADE_MODE		40
-#define GFX_ARG_FADE_DELAY		41
-#define GFX_ARG_POST_DELAY		42
-#define GFX_ARG_AUTO_DELAY		43
-#define GFX_ARG_ALIGN			44
-#define GFX_ARG_VALIGN			45
-#define GFX_ARG_SORT_PRIORITY		46
-#define GFX_ARG_CLASS			47
-#define GFX_ARG_STYLE			48
-#define GFX_ARG_ACTIVE_XOFFSET		49
-#define GFX_ARG_ACTIVE_YOFFSET		50
-#define GFX_ARG_PRESSED_XOFFSET		51
-#define GFX_ARG_PRESSED_YOFFSET		52
+#define GFX_ARG_STEP_XOFFSET		26
+#define GFX_ARG_STEP_YOFFSET		27
+#define GFX_ARG_STEP_DELAY		28
+#define GFX_ARG_DIRECTION		29
+#define GFX_ARG_POSITION		30
+#define GFX_ARG_DRAW_XOFFSET		31
+#define GFX_ARG_DRAW_YOFFSET		32
+#define GFX_ARG_DRAW_MASKED		33
+#define GFX_ARG_ANIM_DELAY_FIXED	34
+#define GFX_ARG_ANIM_DELAY_RANDOM	35
+#define GFX_ARG_POST_DELAY_FIXED	36
+#define GFX_ARG_POST_DELAY_RANDOM	37
+#define GFX_ARG_NAME			38
+#define GFX_ARG_SCALE_UP_FACTOR		39
+#define GFX_ARG_TILE_SIZE		40
+#define GFX_ARG_CLONE_FROM		41
+#define GFX_ARG_FADE_MODE		42
+#define GFX_ARG_FADE_DELAY		43
+#define GFX_ARG_POST_DELAY		44
+#define GFX_ARG_AUTO_DELAY		45
+#define GFX_ARG_ALIGN			46
+#define GFX_ARG_VALIGN			47
+#define GFX_ARG_SORT_PRIORITY		48
+#define GFX_ARG_CLASS			49
+#define GFX_ARG_STYLE			50
+#define GFX_ARG_ACTIVE_XOFFSET		51
+#define GFX_ARG_ACTIVE_YOFFSET		52
+#define GFX_ARG_PRESSED_XOFFSET		53
+#define GFX_ARG_PRESSED_YOFFSET		54
 
-#define NUM_GFX_ARGS			53
+#define NUM_GFX_ARGS			55
 
 
 /* values for sound configuration suffixes */
@@ -2804,7 +2806,11 @@ struct GraphicInfo
   int post_delay_random;	/* next intervall (bored animation only) */
 
   int step_offset;		/* optional step offset of toon animations */
+  int step_xoffset;		/* optional step offset of toon animations */
+  int step_yoffset;		/* optional step offset of toon animations */
   int step_delay;		/* optional step delay of toon animations */
+  int direction;		/* optional move direction of toon animations */
+  int position;			/* optional draw position of toon animations */
 
   int draw_xoffset;		/* optional offset for drawing font chars */
   int draw_yoffset;		/* optional offset for drawing font chars */

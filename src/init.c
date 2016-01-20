@@ -1335,8 +1335,12 @@ static void set_graphic_parameters_ext(int graphic, int *parameter,
     g->post_delay_random = parameter[GFX_ARG_POST_DELAY_RANDOM];
 
   /* this is only used for toon animations */
-  g->step_offset = parameter[GFX_ARG_STEP_OFFSET];
-  g->step_delay  = parameter[GFX_ARG_STEP_DELAY];
+  g->step_offset  = parameter[GFX_ARG_STEP_OFFSET];
+  g->step_xoffset = parameter[GFX_ARG_STEP_XOFFSET];
+  g->step_yoffset = parameter[GFX_ARG_STEP_YOFFSET];
+  g->step_delay   = parameter[GFX_ARG_STEP_DELAY];
+  g->direction    = parameter[GFX_ARG_DIRECTION];
+  g->position     = parameter[GFX_ARG_POSITION];
 
   /* this is only used for drawing font characters */
   g->draw_xoffset = parameter[GFX_ARG_DRAW_XOFFSET];
