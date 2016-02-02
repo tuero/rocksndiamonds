@@ -383,25 +383,9 @@ void Delay(unsigned int delay)	/* Sleep specified number of milliseconds */
   sleep_milliseconds(delay);
 }
 
-boolean FrameReached(unsigned int *frame_counter_var,
-		     unsigned int frame_delay)
+boolean DelayReachedExt(unsigned int *counter_var, unsigned int delay,
+			unsigned int actual_counter)
 {
-  unsigned int actual_frame_counter = FrameCounter;
-
-  if (actual_frame_counter >= *frame_counter_var &&
-      actual_frame_counter < *frame_counter_var + frame_delay)
-    return FALSE;
-
-  *frame_counter_var = actual_frame_counter;
-
-  return TRUE;
-}
-
-boolean DelayReached(unsigned int *counter_var,
-		     unsigned int delay)
-{
-  unsigned int actual_counter = Counter();
-
   if (actual_counter >= *counter_var &&
       actual_counter < *counter_var + delay)
     return FALSE;
@@ -409,6 +393,32 @@ boolean DelayReached(unsigned int *counter_var,
   *counter_var = actual_counter;
 
   return TRUE;
+}
+
+boolean FrameReached(unsigned int *frame_counter_var, unsigned int frame_delay)
+{
+  return DelayReachedExt(frame_counter_var, frame_delay, FrameCounter);
+}
+
+boolean DelayReached(unsigned int *counter_var, unsigned int delay)
+{
+  return DelayReachedExt(counter_var, delay, Counter());
+}
+
+void ResetDelayCounterExt(unsigned int *counter_var,
+			  unsigned int actual_counter)
+{
+  DelayReachedExt(counter_var, 0, actual_counter);
+}
+
+void ResetFrameCounter(unsigned int *frame_counter_var)
+{
+  FrameReached(frame_counter_var, 0);
+}
+
+void ResetDelayCounter(unsigned int *counter_var)
+{
+  DelayReached(counter_var, 0);
 }
 
 int WaitUntilDelayReached(unsigned int *counter_var, unsigned int delay)
