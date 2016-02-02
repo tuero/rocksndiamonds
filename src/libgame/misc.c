@@ -776,46 +776,27 @@ char *getPath3(char *path1, char *path2, char *path3)
   return getStringCat3WithSeparator(path1, path2, path3, STRING_PATH_SEPARATOR);
 }
 
-char *getImg2(char *path1, char *path2)
+static char *getPngOrPcxIfNotExists(char *filename)
 {
-  char *filename = getPath2(path1, path2);
+  // switch from PNG to PCX file and vice versa, if file does not exist
+  // (backwards compatibility with PCX files used in previous versions)
 
-  if (!fileExists(filename) && strSuffix(path2, ".png"))
-  {
-    // backward compatibility: if PNG file not found, check for PCX file
-    char *path2pcx = getStringCopy(path2);
-
-    strcpy(&path2pcx[strlen(path2pcx) - 3], "pcx");
-
-    free(filename);
-
-    filename = getPath2(path1, path2pcx);
-
-    free(path2pcx);
-  }
+  if (!fileExists(filename) && strSuffix(filename, ".png"))
+    strcpy(&filename[strlen(filename) - 3], "pcx");
+  else if (!fileExists(filename) && strSuffix(filename, ".pcx"))
+    strcpy(&filename[strlen(filename) - 3], "png");
 
   return filename;
 }
 
+char *getImg2(char *path1, char *path2)
+{
+  return getPngOrPcxIfNotExists(getPath2(path1, path2));
+}
+
 char *getImg3(char *path1, char *path2, char *path3)
 {
-  char *filename = getPath3(path1, path2, path3);
-
-  if (!fileExists(filename) && strSuffix(path3, ".png"))
-  {
-    // backward compatibility: if PNG file not found, check for PCX file
-    char *path3pcx = getStringCopy(path3);
-
-    strcpy(&path3pcx[strlen(path3pcx) - 3], "pcx");
-
-    free(filename);
-
-    filename = getPath3(path1, path2, path3pcx);
-
-    free(path3pcx);
-  }
-
-  return filename;
+  return getPngOrPcxIfNotExists(getPath3(path1, path2, path3));
 }
 
 char *getStringCopy(const char *s)
