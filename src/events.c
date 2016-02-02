@@ -154,6 +154,9 @@ boolean NextValidEvent(Event *event)
 
 void EventLoop(void)
 {
+  static unsigned int sync_frame_delay = 0;
+  unsigned int sync_frame_delay_value = GAME_FRAME_DELAY;
+
   while (1)
   {
     if (PendingEvent())		/* got event */
@@ -247,17 +250,13 @@ void EventLoop(void)
        has its own synchronization and is CPU friendly, too */
 
     if (game_status == GAME_MODE_PLAYING)
-    {
       HandleGameActions();
-    }
-    else
-    {
-      if (!PendingEvent())	/* delay only if no pending events */
-	Delay(10);
-    }
 
     /* refresh window contents from drawing buffer, if needed */
     BackToFront();
+
+    if (game_status != GAME_MODE_PLAYING)
+      WaitUntilDelayReached(&sync_frame_delay, sync_frame_delay_value);
 
     if (game_status == GAME_MODE_QUIT)
       return;
