@@ -357,25 +357,7 @@ unsigned int Counter()	/* get milliseconds since last call of InitCounter() */
 
 static void sleep_milliseconds(unsigned int milliseconds_delay)
 {
-  boolean do_busy_waiting = (milliseconds_delay < 5 ? TRUE : FALSE);
-
-  if (do_busy_waiting)
-  {
-    /* we want to wait only a few ms -- if we assume that we have a
-       kernel timer resolution of 10 ms, we would wait far too long;
-       therefore it's better to do a short interval of busy waiting
-       to get our sleeping time more accurate */
-
-    unsigned int base_counter = Counter(), actual_counter = Counter();
-
-    while (actual_counter < base_counter + milliseconds_delay &&
-	   actual_counter >= base_counter)
-      actual_counter = Counter();
-  }
-  else
-  {
-    SDL_Delay(milliseconds_delay);
-  }
+  SDL_Delay(milliseconds_delay);
 }
 
 void Delay(unsigned int delay)	/* Sleep specified number of milliseconds */
