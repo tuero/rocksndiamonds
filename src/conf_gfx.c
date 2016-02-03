@@ -4591,6 +4591,15 @@ struct ConfigInfo image_config[] =
   { "toon_20.direction",			"down"			},
   { "toon_20.position",				"any"			},
 
+  { "global.anim_1.gfx",			UNDEFINED_FILENAME	},
+  { "global.anim_2.gfx",			UNDEFINED_FILENAME	},
+  { "global.anim_3.gfx",			UNDEFINED_FILENAME	},
+  { "global.anim_4.gfx",			UNDEFINED_FILENAME	},
+  { "global.anim_5.gfx",			UNDEFINED_FILENAME	},
+  { "global.anim_6.gfx",			UNDEFINED_FILENAME	},
+  { "global.anim_7.gfx",			UNDEFINED_FILENAME	},
+  { "global.anim_8.gfx",			UNDEFINED_FILENAME	},
+
   { "global.anim_1",				UNDEFINED_FILENAME	},
   { "global.anim_2",				UNDEFINED_FILENAME	},
   { "global.anim_3",				UNDEFINED_FILENAME	},

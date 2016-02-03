@@ -870,6 +870,8 @@
 
 #define IS_SPECIAL_GFX_ARG(a)	((a) >= 0 && (a) < NUM_SPECIAL_GFX_ARGS)
 
+#define IS_GLOBAL_ANIM_PART(a)	((a) >= 0 && (a) < NUM_GLOBAL_ANIM_PARTS)
+
 #define EL_CASCADE_ACTIVE(e)	(IS_EDITOR_CASCADE_INACTIVE(e) ? (e) + 1 : (e))
 #define EL_CASCADE_INACTIVE(e)	(IS_EDITOR_CASCADE_ACTIVE(e)   ? (e) - 1 : (e))
 #define EL_CASCADE_TOGGLE(e)	(IS_EDITOR_CASCADE_INACTIVE(e) ? (e) + 1 :    \
@@ -1958,6 +1960,17 @@
 /* values for global animation configuration (must match those from main.c) */
 #define NUM_GLOBAL_ANIMS		8
 #define NUM_GLOBAL_ANIM_PARTS		8
+#define NUM_GLOBAL_ANIM_PARTS_ALL	(NUM_GLOBAL_ANIM_PARTS + 1)
+#define NUM_GLOBAL_ANIM_TOKENS		(2 * NUM_GLOBAL_ANIMS)
+
+#define GLOBAL_ANIM_ID_GRAPHIC_FIRST	0
+#define GLOBAL_ANIM_ID_GRAPHIC_LAST	7
+#define GLOBAL_ANIM_ID_CONTROL_FIRST	(NUM_GLOBAL_ANIMS + 0)
+#define GLOBAL_ANIM_ID_CONTROL_LAST	(NUM_GLOBAL_ANIMS + 7)
+
+#define GLOBAL_ANIM_ID_PART_FIRST	0
+#define GLOBAL_ANIM_ID_PART_LAST	7
+#define GLOBAL_ANIM_ID_PART_BASE	8
 
 /* values for game_status (must match special image configuration suffixes) */
 #define GAME_MODE_DEFAULT		0
@@ -2762,8 +2775,8 @@ struct GlobalAnimInfo
 {
   char *token_name;		/* global animation token in config files */
 
-  /* global animation parts for certain screens */
-  int graphic[NUM_GLOBAL_ANIM_PARTS][NUM_SPECIAL_GFX_ARGS];
+  /* global animation graphic and control definitions */
+  int graphic[NUM_GLOBAL_ANIM_PARTS_ALL][NUM_SPECIAL_GFX_ARGS];
 };
 
 struct GraphicInfo

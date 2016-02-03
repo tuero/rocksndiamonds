@@ -5551,8 +5551,19 @@ struct FontInfo font_info[NUM_FONTS + 1] =
   { NULL			}
 };
 
-struct GlobalAnimInfo global_anim_info[NUM_GLOBAL_ANIMS + 1] =
+struct GlobalAnimInfo global_anim_info[NUM_GLOBAL_ANIM_TOKENS + 1] =
 {
+  /* (real) graphic definitions used to define animation graphics */
+  { "global.anim_1.gfx",	},
+  { "global.anim_2.gfx",	},
+  { "global.anim_3.gfx",	},
+  { "global.anim_4.gfx",	},
+  { "global.anim_5.gfx",	},
+  { "global.anim_6.gfx",	},
+  { "global.anim_7.gfx",	},
+  { "global.anim_8.gfx",	},
+
+  /* (dummy) graphic definitions used to define animation controls */
   { "global.anim_1",		},
   { "global.anim_2",		},
   { "global.anim_3",		},

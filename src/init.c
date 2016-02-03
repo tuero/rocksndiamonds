@@ -232,7 +232,7 @@ static void InitGlobalAnimImages()
 
   for (i = 0; i < NUM_GLOBAL_ANIMS; i++)
   {
-    for (j = 0; j < NUM_GLOBAL_ANIM_PARTS; j++)
+    for (j = 0; j < NUM_GLOBAL_ANIM_PARTS_ALL; j++)
     {
       for (k = 0; k < NUM_SPECIAL_GFX_ARGS; k++)
       {
@@ -537,15 +537,19 @@ void InitGlobalAnimGraphicInfo()
     return;
 
   /* always start with reliable default values (no global animations) */
-  for (i = 0; i < NUM_GLOBAL_ANIMS; i++)
-    for (j = 0; j < NUM_GLOBAL_ANIM_PARTS; j++)
+  for (i = 0; i < NUM_GLOBAL_ANIM_TOKENS; i++)
+    for (j = 0; j < NUM_GLOBAL_ANIM_PARTS_ALL; j++)
       for (k = 0; k < NUM_SPECIAL_GFX_ARGS; k++)
 	global_anim_info[i].graphic[j][k] = IMG_UNDEFINED;
 
   /* initialize global animation definitions from static configuration */
-  for (i = 0; i < NUM_GLOBAL_ANIMS; i++)
-    global_anim_info[i].graphic[0][GFX_SPECIAL_ARG_DEFAULT] =
-      IMG_GLOBAL_ANIM_1 + i;
+  for (i = 0; i < NUM_GLOBAL_ANIM_TOKENS; i++)
+  {
+    int j = GLOBAL_ANIM_ID_PART_BASE;
+    int k = GFX_SPECIAL_ARG_DEFAULT;
+
+    global_anim_info[i].graphic[j][k] = IMG_GLOBAL_ANIM_1_GFX + i;
+  }
 
   /* initialize global animation definitions from dynamic configuration */
   for (i = 0; i < num_property_mappings; i++)
@@ -555,14 +559,14 @@ void InitGlobalAnimGraphicInfo()
     int special = property_mapping[i].ext3_index;
     int graphic = property_mapping[i].artwork_index;
 
-    if (anim_nr < 0 || anim_nr >= NUM_GLOBAL_ANIMS)
+    if (anim_nr < 0 || anim_nr >= NUM_GLOBAL_ANIM_TOKENS)
       continue;
 
-    /* map animation part to first part, if not specified */
-    if (part_nr < 0)
-      part_nr = 0;
+    /* set animation part to base part, if not specified */
+    if (!IS_GLOBAL_ANIM_PART(part_nr))
+      part_nr = GLOBAL_ANIM_ID_PART_BASE;
 
-    /* map animation screen to default, if not specified */
+    /* set animation screen to default, if not specified */
     if (!IS_SPECIAL_GFX_ARG(special))
       special = GFX_SPECIAL_ARG_DEFAULT;
 
@@ -573,11 +577,11 @@ void InitGlobalAnimGraphicInfo()
   printf("::: InitGlobalAnimGraphicInfo\n");
 
   for (i = 0; i < NUM_GLOBAL_ANIMS; i++)
-    for (j = 0; j < NUM_GLOBAL_ANIM_PARTS; j++)
+    for (j = 0; j < NUM_GLOBAL_ANIM_PARTS_ALL; j++)
       for (k = 0; k < NUM_SPECIAL_GFX_ARGS; k++)
 	if (global_anim_info[i].graphic[j][k] != IMG_UNDEFINED &&
 	    graphic_info[global_anim_info[i].graphic[j][k]].bitmap != NULL)
-	  printf("::: %d, %d, %d => %d\n",
+	  printf("::: - anim %d, part %d, mode %d => %d\n",
 		 i, j, k, global_anim_info[i].graphic[j][k]);
 #endif
 }
@@ -4989,7 +4993,7 @@ static void InitArtworkConfig()
 {
   static char *image_id_prefix[MAX_NUM_ELEMENTS +
 			       NUM_FONTS +
-			       NUM_GLOBAL_ANIMS + 1];
+			       NUM_GLOBAL_ANIM_TOKENS + 1];
   static char *sound_id_prefix[2 * MAX_NUM_ELEMENTS + 1];
   static char *music_id_prefix[NUM_MUSIC_PREFIXES + 1];
   static char *action_id_suffix[NUM_ACTIONS + 1];
@@ -5050,10 +5054,10 @@ static void InitArtworkConfig()
     image_id_prefix[i] = element_info[i].token_name;
   for (i = 0; i < NUM_FONTS; i++)
     image_id_prefix[MAX_NUM_ELEMENTS + i] = font_info[i].token_name;
-  for (i = 0; i < NUM_GLOBAL_ANIMS; i++)
+  for (i = 0; i < NUM_GLOBAL_ANIM_TOKENS; i++)
     image_id_prefix[MAX_NUM_ELEMENTS + NUM_FONTS + i] =
       global_anim_info[i].token_name;
-  image_id_prefix[MAX_NUM_ELEMENTS + NUM_FONTS + NUM_GLOBAL_ANIMS] = NULL;
+  image_id_prefix[MAX_NUM_ELEMENTS + NUM_FONTS + NUM_GLOBAL_ANIM_TOKENS] = NULL;
 
   for (i = 0; i < MAX_NUM_ELEMENTS; i++)
     sound_id_prefix[i] = element_info[i].token_name;
