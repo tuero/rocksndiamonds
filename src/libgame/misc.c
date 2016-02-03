@@ -2577,6 +2577,43 @@ char *get_mapped_token(char *token)
   return NULL;
 }
 
+char *get_special_base_token(struct ArtworkListInfo *artwork_info, char *token)
+{
+  /* !!! make this dynamically configurable (init.c:InitArtworkConfig) !!! */
+  static struct ConfigTypeInfo prefix_list[] =
+  {
+    { "global.anim_1"	},
+    { "global.anim_2"	},
+    { "global.anim_3"	},
+    { "global.anim_4"	},
+    { "global.anim_5"	},
+    { "global.anim_6"	},
+    { "global.anim_7"	},
+    { "global.anim_8"	},
+
+    { NULL		}
+  };
+  struct ConfigTypeInfo *suffix_list = artwork_info->suffix_list;
+  boolean prefix_found = FALSE;
+  int len_suffix = 0;
+  int i;
+
+  /* search for prefix to check if base token has to be created */
+  for (i = 0; prefix_list[i].token != NULL; i++)
+    if (strPrefix(token, prefix_list[i].token))
+      prefix_found = TRUE;
+
+  if (!prefix_found)
+    return NULL;
+
+  /* search for suffix (parameter) to determine base token length */
+  for (i = 0; suffix_list[i].token != NULL; i++)
+    if (strSuffix(token, suffix_list[i].token))
+      len_suffix = strlen(suffix_list[i].token);
+
+  return getStringCopyN(token, strlen(token) - len_suffix);
+}
+
 /* This function checks if a string <s> of the format "string1, string2, ..."
    exactly contains a string <s_contained>. */
 
@@ -2998,6 +3035,7 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
   SetupFileHash *setup_file_hash, *valid_file_hash;
   SetupFileHash *extra_file_hash, *empty_file_hash;
   char *known_token_value = KNOWN_TOKEN_VALUE;
+  char *base_token_value = UNDEFINED_FILENAME;
   int i, j, k, l;
 
   if (filename == NULL)
@@ -3038,6 +3076,23 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
       setHashEntry(valid_file_hash, token, known_token_value);
 
       free(mapped_token);
+    }
+  }
+  END_HASH_ITERATION(valid_file_hash, itr)
+
+  /* add special base tokens (using prefix match and replace) */
+  BEGIN_HASH_ITERATION(valid_file_hash, itr)
+  {
+    char *token = HASH_ITERATION_TOKEN(itr);
+    char *base_token = get_special_base_token(artwork_info, token);
+
+    if (base_token != NULL)
+    {
+      /* add base token only if it does not already exist */
+      if (getHashEntry(valid_file_hash, base_token) == NULL)
+	setHashEntry(valid_file_hash, base_token, base_token_value);
+
+      free(base_token);
     }
   }
   END_HASH_ITERATION(valid_file_hash, itr)
