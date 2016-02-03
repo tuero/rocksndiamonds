@@ -1346,6 +1346,8 @@ static void set_graphic_parameters_ext(int graphic, int *parameter,
   g->step_delay   = parameter[GFX_ARG_STEP_DELAY];
   g->direction    = parameter[GFX_ARG_DIRECTION];
   g->position     = parameter[GFX_ARG_POSITION];
+  g->x            = parameter[GFX_ARG_X];	// (may be uninitialized,
+  g->y            = parameter[GFX_ARG_Y];	// unlike src_x and src_y)
 
   /* this is only used for drawing font characters */
   g->draw_xoffset = parameter[GFX_ARG_DRAW_XOFFSET];

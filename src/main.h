@@ -2826,6 +2826,8 @@ struct GraphicInfo
   int step_delay;		/* optional step delay of toon animations */
   int direction;		/* optional move direction of toon animations */
   int position;			/* optional draw position of toon animations */
+  int x;			/* optional draw position of toon animations */
+  int y;			/* optional draw position of toon animations */
 
   int draw_xoffset;		/* optional offset for drawing font chars */
   int draw_yoffset;		/* optional offset for drawing font chars */
