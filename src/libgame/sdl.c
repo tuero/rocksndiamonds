@@ -317,6 +317,11 @@ void SDLCreateBitmapTextures(Bitmap *bitmap)
   if (bitmap == NULL)
     return;
 
+  if (bitmap->texture)
+    SDL_DestroyTexture(bitmap->texture);
+  if (bitmap->texture_masked)
+    SDL_DestroyTexture(bitmap->texture_masked);
+
   bitmap->texture        = SDLCreateTextureFromSurface(bitmap->surface);
   bitmap->texture_masked = SDLCreateTextureFromSurface(bitmap->surface_masked);
 #endif

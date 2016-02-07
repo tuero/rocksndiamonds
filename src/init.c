@@ -226,7 +226,7 @@ void InitBitmapPointers()
       graphic_info[i].bitmap = graphic_info[i].bitmaps[IMG_BITMAP_STANDARD];
 }
 
-static void InitGlobalAnimImages()
+void InitImageTextures()
 {
   int i, j, k;
 
@@ -241,8 +241,8 @@ static void InitGlobalAnimImages()
 	if (graphic == IMG_UNDEFINED)
 	  continue;
 
-	// create textures from images for fast GPU blitting, if possible
-	CreateImageTextures(graphic);
+	// (re)create textures from images for fast GPU blitting, if possible
+	ReCreateImageTextures(graphic);
       }
     }
   }
@@ -2026,8 +2026,9 @@ static void ReinitializeGraphics()
   print_timestamp_time("InitFontGraphicInfo");
   InitGlobalAnimGraphicInfo();		/* initialize global animation config */
   print_timestamp_time("InitGlobalAnimGraphicInfo");
-  InitGlobalAnimImages();		/* initialize global animation images */
-  print_timestamp_time("InitGlobalAnimImages");
+
+  InitImageTextures();			/* create textures for certain images */
+  print_timestamp_time("InitImageTextures");
 
   InitGraphicInfo_EM();			/* graphic mapping for EM engine */
   print_timestamp_time("InitGraphicInfo_EM");

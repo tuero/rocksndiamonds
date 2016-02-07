@@ -8330,6 +8330,7 @@ void ChangeViewportPropertiesIfNeeded()
     // printf("::: init_video_buffer\n");
 
     InitVideoBuffer(WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH, setup.fullscreen);
+    InitImageTextures();
   }
 
   if (init_gadgets_and_toons)
