@@ -54,6 +54,7 @@ static void UpdateScreen(SDL_Rect *rect)
 {
   static unsigned int update_screen_delay = 0;
   unsigned int update_screen_delay_value = 20;		/* (milliseconds) */
+  SDL_Surface *screen = backbuffer->surface;
 
   if (limit_screen_updates &&
       !DelayReached(&update_screen_delay, update_screen_delay_value))
@@ -78,10 +79,29 @@ static void UpdateScreen(SDL_Rect *rect)
   }
 #endif
 
+#if USE_FINAL_SCREEN_BITMAP
+  if (gfx.final_screen_bitmap != NULL)	// may not be initialized yet
+  {
+    // !!! TEST !!!
+    // draw global animations using bitmaps instead of using textures
+    // to prevent texture scaling artefacts (this is potentially slower)
+
+    BlitBitmap(backbuffer, gfx.final_screen_bitmap, 0, 0,
+	       gfx.win_xsize, gfx.win_ysize, 0, 0);
+
+    // copy global animations to render target buffer, if defined
+    if (gfx.draw_global_anim_function != NULL)
+      gfx.draw_global_anim_function();
+
+    screen = gfx.final_screen_bitmap->surface;
+
+    // force full window redraw
+    rect = NULL;
+  }
+#endif
+
 #if defined(TARGET_SDL2)
 #if USE_RENDERER
-  SDL_Surface *screen = backbuffer->surface;
-
   if (rect)
   {
     int bytes_x = screen->pitch / video.width;
@@ -105,9 +125,11 @@ static void UpdateScreen(SDL_Rect *rect)
   // copy backbuffer to render target buffer
   SDL_RenderCopy(sdl_renderer, sdl_texture, NULL, NULL);
 
+#if !USE_FINAL_SCREEN_BITMAP
   // copy global animations to render target buffer, if defined
   if (gfx.draw_global_anim_function != NULL)
     gfx.draw_global_anim_function();
+#endif
 
   // show render target buffer on screen
   SDL_RenderPresent(sdl_renderer);

@@ -207,6 +207,9 @@ void InitGfxWindowInfo(int win_xsize, int win_ysize)
   gfx.background_bitmap_mask = REDRAW_NONE;
 
   ReCreateBitmap(&gfx.background_bitmap, win_xsize, win_ysize, DEFAULT_DEPTH);
+#if USE_FINAL_SCREEN_BITMAP
+  ReCreateBitmap(&gfx.final_screen_bitmap, win_xsize, win_ysize, DEFAULT_DEPTH);
+#endif
 }
 
 void InitGfxScrollbufferInfo(int scrollbuffer_width, int scrollbuffer_height)
@@ -740,6 +743,36 @@ void BlitTextureMasked(Bitmap *bitmap,
 
   SDLBlitTexture(bitmap, src_x, src_y, width, height, dst_x, dst_y,
 		 BLIT_MASKED);
+}
+
+void BlitToScreen(Bitmap *bitmap,
+		  int src_x, int src_y, int width, int height,
+		  int dst_x, int dst_y)
+{
+  if (bitmap == NULL)
+    return;
+
+#if USE_FINAL_SCREEN_BITMAP
+  BlitBitmap(bitmap, gfx.final_screen_bitmap, src_x, src_y,
+	     width, height, dst_x, dst_y);
+#else
+  BlitTexture(bitmap, src_x, src_y, width, height, dst_x, dst_y);
+#endif
+}
+
+void BlitToScreenMasked(Bitmap *bitmap,
+			int src_x, int src_y, int width, int height,
+			int dst_x, int dst_y)
+{
+  if (bitmap == NULL)
+    return;
+
+#if USE_FINAL_SCREEN_BITMAP
+  BlitBitmapMasked(bitmap, gfx.final_screen_bitmap, src_x, src_y,
+		   width, height, dst_x, dst_y);
+#else
+  BlitTextureMasked(bitmap, src_x, src_y, width, height, dst_x, dst_y);
+#endif
 }
 
 void DrawSimpleBlackLine(Bitmap *bitmap, int from_x, int from_y,

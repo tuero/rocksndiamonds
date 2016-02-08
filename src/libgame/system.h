@@ -804,6 +804,10 @@ struct GfxInfo
   Bitmap *background_bitmap;
   int background_bitmap_mask;
 
+#if USE_FINAL_SCREEN_BITMAP
+  Bitmap *final_screen_bitmap;
+#endif
+
   boolean clipping_enabled;
   int clip_x, clip_y;
   int clip_width, clip_height;
@@ -1351,6 +1355,8 @@ boolean DrawingAreaChanged();
 void BlitBitmapOnBackground(Bitmap *, Bitmap *, int, int, int, int, int, int);
 void BlitTexture(Bitmap *, int, int, int, int, int, int);
 void BlitTextureMasked(Bitmap *, int, int, int, int, int, int);
+void BlitToScreen(Bitmap *, int, int, int, int, int, int);
+void BlitToScreenMasked(Bitmap *, int, int, int, int, int, int);
 void DrawSimpleBlackLine(Bitmap *, int, int, int, int);
 void DrawSimpleWhiteLine(Bitmap *, int, int, int, int);
 void DrawLines(Bitmap *, struct XY *, int, Pixel);
