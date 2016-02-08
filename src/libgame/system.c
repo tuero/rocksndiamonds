@@ -407,7 +407,7 @@ void FreeBitmap(Bitmap *bitmap)
 
 Bitmap *CreateBitmapStruct(void)
 {
-  return checked_calloc(sizeof(struct SDLSurfaceInfo));
+  return checked_calloc(sizeof(Bitmap));
 }
 
 Bitmap *CreateBitmap(int width, int height, int depth)
