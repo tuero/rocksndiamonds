@@ -1396,7 +1396,24 @@ void SDLFadeRectangle(Bitmap *bitmap_cross, int x, int y, int width, int height,
     }
   }
 
-  Delay(post_delay);
+  if (post_delay > 0)
+  {
+    unsigned int time_post_delay;
+
+    time_current = SDL_GetTicks();
+    time_post_delay = time_current + post_delay;
+
+    while (time_current < time_post_delay)
+    {
+      // do not wait longer than 10 ms at a time to be able to ...
+      Delay(MIN(10, time_post_delay - time_current));
+
+      // ... continue drawing global animations during post delay
+      UpdateScreen(NULL);
+
+      time_current = SDL_GetTicks();
+    }
+  }
 }
 
 void SDLDrawSimpleLine(Bitmap *dst_bitmap, int from_x, int from_y,
