@@ -144,9 +144,9 @@ static void UpdateScreen(SDL_Rect *rect)
 
 #else	// TARGET_SDL
   if (rect)
-    SDL_UpdateRects(backbuffer->surface, 1, rect);
+    SDL_UpdateRects(screen, 1, rect);
   else
-    SDL_UpdateRect(backbuffer->surface, 0, 0, 0, 0);
+    SDL_UpdateRect(screen, 0, 0, 0, 0);
 #endif
 }
 
