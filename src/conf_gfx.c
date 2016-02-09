@@ -4609,6 +4609,11 @@ struct ConfigInfo image_config[] =
   { "global.anim_7",				UNDEFINED_FILENAME	},
   { "global.anim_8",				UNDEFINED_FILENAME	},
 
+  { "internal.global.toon_default",		UNDEFINED_FILENAME	},
+  { "internal.global.toon_default.anim_mode",	"random"		},
+
+  { "internal.global.anim_default",		UNDEFINED_FILENAME	},
+
   { "menu.calibrate_red",			"RocksElements.png"	},
   { "menu.calibrate_red.xpos",			"12"			},
   { "menu.calibrate_red.ypos",			"8"			},
