@@ -435,6 +435,7 @@ struct MouseCursorInfo
 boolean SDLSetNativeSurface(SDL_Surface **);
 SDL_Surface *SDLGetNativeSurface(SDL_Surface *);
 void SDLCreateBitmapTextures(Bitmap *);
+void SDLFreeBitmapTextures(Bitmap *);
 
 #if defined(TARGET_SDL2)
 SDL_Surface *SDL_DisplayFormat(SDL_Surface *);

@@ -230,6 +230,8 @@ void InitImageTextures()
 {
   int i, j, k;
 
+  FreeAllImageTextures();
+
   for (i = 0; i < NUM_GLOBAL_ANIMS; i++)
   {
     for (j = 0; j < NUM_GLOBAL_ANIM_PARTS_ALL; j++)
@@ -241,8 +243,7 @@ void InitImageTextures()
 	if (graphic == IMG_UNDEFINED)
 	  continue;
 
-	// (re)create textures from images for fast GPU blitting, if possible
-	ReCreateImageTextures(graphic);
+	CreateImageTextures(graphic);
       }
     }
   }

@@ -1377,6 +1377,7 @@ Bitmap *ZoomBitmap(Bitmap *, int, int);
 void ReCreateGameTileSizeBitmap(Bitmap **);
 void CreateBitmapWithSmallBitmaps(Bitmap **, int, int);
 void CreateBitmapTextures(Bitmap **);
+void FreeBitmapTextures(Bitmap **);
 void ScaleBitmap(Bitmap **, int);
 
 void SetMouseCursor(int);

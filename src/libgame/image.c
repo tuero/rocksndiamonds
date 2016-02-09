@@ -351,11 +351,11 @@ void CreateImageWithSmallImages(int pos, int zoom_factor, int tile_size)
   setString(&img_info->leveldir, leveldir_current->identifier);
 }
 
-static void CreateImageTexturesExt(int pos, boolean force)
+void CreateImageTextures(int pos)
 {
   ImageInfo *img_info = getImageInfoEntryFromImageID(pos);
 
-  if (img_info == NULL || (img_info->contains_textures && !force))
+  if (img_info == NULL || img_info->contains_textures)
     return;
 
   CreateBitmapTextures(img_info->bitmaps);
@@ -363,14 +363,25 @@ static void CreateImageTexturesExt(int pos, boolean force)
   img_info->contains_textures = TRUE;
 }
 
-void CreateImageTextures(int pos)
+void FreeImageTextures(int pos)
 {
-  CreateImageTexturesExt(pos, FALSE);
+  ImageInfo *img_info = getImageInfoEntryFromImageID(pos);
+
+  if (img_info == NULL || !img_info->contains_textures)
+    return;
+
+  FreeBitmapTextures(img_info->bitmaps);
+
+  img_info->contains_textures = FALSE;
 }
 
-void ReCreateImageTextures(int pos)
+void FreeAllImageTextures()
 {
-  CreateImageTexturesExt(pos, TRUE);
+  int num_images = getImageListSize();
+  int i;
+
+  for (i = 0; i < num_images; i++)
+    FreeImageTextures(i);
 }
 
 void ScaleImage(int pos, int zoom_factor)

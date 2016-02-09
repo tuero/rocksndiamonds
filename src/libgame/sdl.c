@@ -349,6 +349,22 @@ void SDLCreateBitmapTextures(Bitmap *bitmap)
 #endif
 }
 
+void SDLFreeBitmapTextures(Bitmap *bitmap)
+{
+#if defined(TARGET_SDL2)
+  if (bitmap == NULL)
+    return;
+
+  if (bitmap->texture)
+    SDL_DestroyTexture(bitmap->texture);
+  if (bitmap->texture_masked)
+    SDL_DestroyTexture(bitmap->texture_masked);
+
+  bitmap->texture = NULL;
+  bitmap->texture_masked = NULL;
+#endif
+}
+
 void SDLInitVideoDisplay(void)
 {
 #if !defined(TARGET_SDL2)

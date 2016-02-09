@@ -1190,6 +1190,11 @@ void CreateBitmapTextures(Bitmap **bitmaps)
   SDLCreateBitmapTextures(bitmaps[IMG_BITMAP_STANDARD]);
 }
 
+void FreeBitmapTextures(Bitmap **bitmaps)
+{
+  SDLFreeBitmapTextures(bitmaps[IMG_BITMAP_STANDARD]);
+}
+
 void ScaleBitmap(Bitmap **bitmaps, int zoom_factor)
 {
   CreateScaledBitmaps(bitmaps, zoom_factor, 0, FALSE);
