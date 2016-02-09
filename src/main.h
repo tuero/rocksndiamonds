@@ -1957,6 +1957,9 @@
 #define NUM_FONTS			38
 #define NUM_INITIAL_FONTS		4
 
+/* values for toon animation configuration */
+#define MAX_NUM_TOONS			20
+
 /* values for global animation configuration (must match those from main.c) */
 #define NUM_GLOBAL_ANIMS		8
 #define NUM_GLOBAL_ANIM_PARTS		8

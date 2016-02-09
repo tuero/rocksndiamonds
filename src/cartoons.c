@@ -14,9 +14,6 @@
 #include "tools.h"
 
 
-/* values for toon definition */
-#define MAX_NUM_TOONS			20
-
 static struct ToonInfo toons[MAX_NUM_TOONS];
 
 static void PrepareBackbuffer()

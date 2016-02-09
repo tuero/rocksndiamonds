@@ -232,6 +232,9 @@ void InitImageTextures()
 
   FreeAllImageTextures();
 
+  for (i = 0; i < MAX_NUM_TOONS; i++)
+    CreateImageTextures(IMG_TOON_1 + i);
+
   for (i = 0; i < NUM_GLOBAL_ANIMS; i++)
   {
     for (j = 0; j < NUM_GLOBAL_ANIM_PARTS_ALL; j++)
