@@ -54,6 +54,8 @@ struct ConfigTypeInfo image_config_suffix[] =
   { ".draw_xoffset",			"0",		TYPE_INTEGER	},
   { ".draw_yoffset",			"0",		TYPE_INTEGER	},
   { ".draw_masked",			"false",	TYPE_BOOLEAN	},
+  { ".init_delay_fixed",		ARG_UNDEFINED,	TYPE_INTEGER	},
+  { ".init_delay_random",		ARG_UNDEFINED,	TYPE_INTEGER	},
   { ".anim_delay_fixed",		ARG_UNDEFINED,	TYPE_INTEGER	},
   { ".anim_delay_random",		ARG_UNDEFINED,	TYPE_INTEGER	},
   { ".post_delay_fixed",		ARG_UNDEFINED,	TYPE_INTEGER	},

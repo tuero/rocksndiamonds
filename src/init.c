@@ -1127,6 +1127,8 @@ static void set_graphic_parameters_ext(int graphic, int *parameter,
   g->scale_up_factor = 1;		/* default: no scaling up */
   g->tile_size = TILESIZE;		/* default: standard tile size */
   g->clone_from = -1;			/* do not use clone graphic */
+  g->init_delay_fixed = 0;
+  g->init_delay_random = 0;
   g->anim_delay_fixed = 0;
   g->anim_delay_random = 0;
   g->post_delay_fixed = 0;
@@ -1332,7 +1334,11 @@ static void set_graphic_parameters_ext(int graphic, int *parameter,
   if (parameter[GFX_ARG_BORDER_SIZE] != ARG_UNDEFINED_VALUE)
     g->border_size = parameter[GFX_ARG_BORDER_SIZE];
 
-  /* this is only used for player "boring" and "sleeping" actions */
+  /* used for global animations and player "boring" and "sleeping" actions */
+  if (parameter[GFX_ARG_INIT_DELAY_FIXED] != ARG_UNDEFINED_VALUE)
+    g->init_delay_fixed = parameter[GFX_ARG_INIT_DELAY_FIXED];
+  if (parameter[GFX_ARG_INIT_DELAY_RANDOM] != ARG_UNDEFINED_VALUE)
+    g->init_delay_random = parameter[GFX_ARG_INIT_DELAY_RANDOM];
   if (parameter[GFX_ARG_ANIM_DELAY_FIXED] != ARG_UNDEFINED_VALUE)
     g->anim_delay_fixed = parameter[GFX_ARG_ANIM_DELAY_FIXED];
   if (parameter[GFX_ARG_ANIM_DELAY_RANDOM] != ARG_UNDEFINED_VALUE)
@@ -1342,7 +1348,7 @@ static void set_graphic_parameters_ext(int graphic, int *parameter,
   if (parameter[GFX_ARG_POST_DELAY_RANDOM] != ARG_UNDEFINED_VALUE)
     g->post_delay_random = parameter[GFX_ARG_POST_DELAY_RANDOM];
 
-  /* this is only used for toon animations */
+  /* used for toon animations and global animations */
   g->step_offset  = parameter[GFX_ARG_STEP_OFFSET];
   g->step_xoffset = parameter[GFX_ARG_STEP_XOFFSET];
   g->step_yoffset = parameter[GFX_ARG_STEP_YOFFSET];

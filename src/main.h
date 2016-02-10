@@ -1875,29 +1875,31 @@
 #define GFX_ARG_DRAW_XOFFSET		32
 #define GFX_ARG_DRAW_YOFFSET		33
 #define GFX_ARG_DRAW_MASKED		34
-#define GFX_ARG_ANIM_DELAY_FIXED	35
-#define GFX_ARG_ANIM_DELAY_RANDOM	36
-#define GFX_ARG_POST_DELAY_FIXED	37
-#define GFX_ARG_POST_DELAY_RANDOM	38
-#define GFX_ARG_NAME			39
-#define GFX_ARG_SCALE_UP_FACTOR		40
-#define GFX_ARG_TILE_SIZE		41
-#define GFX_ARG_CLONE_FROM		42
-#define GFX_ARG_FADE_MODE		43
-#define GFX_ARG_FADE_DELAY		44
-#define GFX_ARG_POST_DELAY		45
-#define GFX_ARG_AUTO_DELAY		46
-#define GFX_ARG_ALIGN			47
-#define GFX_ARG_VALIGN			48
-#define GFX_ARG_SORT_PRIORITY		49
-#define GFX_ARG_CLASS			50
-#define GFX_ARG_STYLE			51
-#define GFX_ARG_ACTIVE_XOFFSET		52
-#define GFX_ARG_ACTIVE_YOFFSET		53
-#define GFX_ARG_PRESSED_XOFFSET		54
-#define GFX_ARG_PRESSED_YOFFSET		55
+#define GFX_ARG_INIT_DELAY_FIXED	35
+#define GFX_ARG_INIT_DELAY_RANDOM	36
+#define GFX_ARG_ANIM_DELAY_FIXED	37
+#define GFX_ARG_ANIM_DELAY_RANDOM	38
+#define GFX_ARG_POST_DELAY_FIXED	39
+#define GFX_ARG_POST_DELAY_RANDOM	40
+#define GFX_ARG_NAME			41
+#define GFX_ARG_SCALE_UP_FACTOR		42
+#define GFX_ARG_TILE_SIZE		43
+#define GFX_ARG_CLONE_FROM		44
+#define GFX_ARG_FADE_MODE		45
+#define GFX_ARG_FADE_DELAY		46
+#define GFX_ARG_POST_DELAY		47
+#define GFX_ARG_AUTO_DELAY		48
+#define GFX_ARG_ALIGN			49
+#define GFX_ARG_VALIGN			50
+#define GFX_ARG_SORT_PRIORITY		51
+#define GFX_ARG_CLASS			52
+#define GFX_ARG_STYLE			53
+#define GFX_ARG_ACTIVE_XOFFSET		54
+#define GFX_ARG_ACTIVE_YOFFSET		55
+#define GFX_ARG_PRESSED_XOFFSET		56
+#define GFX_ARG_PRESSED_YOFFSET		57
 
-#define NUM_GFX_ARGS			56
+#define NUM_GFX_ARGS			58
 
 
 /* values for sound configuration suffixes */
@@ -2817,6 +2819,8 @@ struct GraphicInfo
 
   int clone_from;		/* graphic for cloning *all* settings */
 
+  int init_delay_fixed;		/* optional initial delay values for global */
+  int init_delay_random;	/* animations (pause interval before start) */
   int anim_delay_fixed;		/* optional delay values for bored and   */
   int anim_delay_random;	/* sleeping player animations (animation */
   int post_delay_fixed;		/* intervall and following pause before  */
