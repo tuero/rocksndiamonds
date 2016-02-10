@@ -1366,6 +1366,9 @@ static void set_graphic_parameters_ext(int graphic, int *parameter,
   /* this is only used for drawing envelope graphics */
   g->draw_masked = parameter[GFX_ARG_DRAW_MASKED];
 
+  /* used for toon animations and global animations */
+  g->draw_order = parameter[GFX_ARG_DRAW_ORDER];
+
   /* optional graphic for cloning all graphics settings */
   if (parameter[GFX_ARG_CLONE_FROM] != ARG_UNDEFINED_VALUE)
     g->clone_from = parameter[GFX_ARG_CLONE_FROM];
