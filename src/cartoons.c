@@ -425,13 +425,12 @@ void DrawGlobalAnim()
   }
 }
 
-boolean HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part,
-			      boolean restart)
+int HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part, int state)
 {
   struct GraphicInfo *g = &part->graphic_info;
   struct GraphicInfo *c = &part->control_info;
 
-  if (restart)
+  if (state & ANIM_STATE_RESTART)
   {
     ResetDelayCounterExt(&part->step_delay, anim_sync_frame);
 
@@ -516,15 +515,15 @@ boolean HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part,
       (part->x >=  FULL_SXSIZE && part->step_xoffset >= 0) ||
       (part->y <= -g->height   && part->step_yoffset <= 0) ||
       (part->y >=  FULL_SYSIZE && part->step_yoffset >= 0))
-    return TRUE;
+    return ANIM_STATE_RESTART;
 
   if (part->step_frames_value != ARG_UNDEFINED_VALUE &&
       part->step_frames >= part->step_frames_value)
-    return TRUE;
+    return ANIM_STATE_RESTART;
 
   if (!DelayReachedExt(&part->step_delay, part->step_delay_value,
 		       anim_sync_frame))
-    return FALSE;
+    return ANIM_STATE_RUNNING;
 
 #if 0
   {
@@ -543,7 +542,7 @@ boolean HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part,
 
   part->step_frames++;
 
-  return FALSE;
+  return ANIM_STATE_RUNNING;
 }
 
 void HandleGlobalAnim_Main(struct GlobalAnimMainControlInfo *anim, int action)
@@ -677,10 +676,7 @@ void HandleGlobalAnim_Main(struct GlobalAnimMainControlInfo *anim, int action)
 	     anim->running);
 #endif
 
-      if (HandleGlobalAnim_Part(part, part->state & ANIM_STATE_RESTART))
-	part->state = ANIM_STATE_RESTART;
-      else
-	part->state = ANIM_STATE_RUNNING;
+      part->state = HandleGlobalAnim_Part(part, part->state);
     }
 
     return;
@@ -717,16 +713,10 @@ void HandleGlobalAnim_Main(struct GlobalAnimMainControlInfo *anim, int action)
 
   part->state = ANIM_STATE_RUNNING;
 
-  if (HandleGlobalAnim_Part(part, anim->state & ANIM_STATE_RESTART))
-  {
-    anim->state = ANIM_STATE_RESTART;
+  anim->state = HandleGlobalAnim_Part(part, anim->state);
 
+  if (anim->state == ANIM_STATE_RESTART)
     anim->part_counter++;
-  }
-  else
-  {
-    anim->state = ANIM_STATE_RUNNING;
-  }
 }
 
 void HandleGlobalAnim_Mode(struct GlobalAnimControlInfo *ctrl, int action)
