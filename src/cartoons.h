@@ -12,6 +12,14 @@
 #ifndef CARTOONS_H
 #define CARTOONS_H
 
+
+/* values for global animations */
+#define ANIM_STATE_INACTIVE	0
+#define ANIM_STATE_RESTART	(1 << 0)
+#define ANIM_STATE_WAITING	(1 << 1)
+#define ANIM_STATE_RUNNING	(1 << 2)
+
+
 void InitToons(void);
 
 void DrawGlobalAnim(void);

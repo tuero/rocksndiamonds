@@ -32,10 +32,6 @@ struct GlobalAnimPartControlInfo
   int x, y;
   int step_xoffset, step_yoffset;
 
-  boolean restart;
-  boolean waiting;
-  boolean running;
-
   unsigned int initial_anim_sync_frame;
   unsigned int step_frames, step_frames_value;
   unsigned int step_delay, step_delay_value;
@@ -43,6 +39,8 @@ struct GlobalAnimPartControlInfo
   unsigned int init_delay, init_delay_value;
   unsigned int anim_delay, anim_delay_value;
   unsigned int post_delay, post_delay_value;
+
+  int state;
 };
 
 struct GlobalAnimMainControlInfo
@@ -61,11 +59,9 @@ struct GlobalAnimMainControlInfo
 
   boolean has_base;
 
-  boolean restart;
-  boolean waiting;
-  boolean running;
-
   unsigned int init_delay, init_delay_value;
+
+  int state;
 };
 
 struct GlobalAnimControlInfo
@@ -185,12 +181,10 @@ static void InitToonControls()
 
   anim->has_base = FALSE;
 
-  anim->restart = FALSE;
-  anim->waiting = FALSE;
-  anim->running = FALSE;
-
   anim->init_delay = 0;
   anim->init_delay_value = 0;
+
+  anim->state = ANIM_STATE_INACTIVE;
 
   part_nr = 0;
 
@@ -215,15 +209,13 @@ static void InitToonControls()
     part->control_info.x = ARG_UNDEFINED_VALUE;
     part->control_info.y = ARG_UNDEFINED_VALUE;
 
-    part->restart = FALSE;
-    part->waiting = FALSE;
-    part->running = FALSE;
-
     part->step_frames = 0;
     part->step_frames_value = graphic_info[control].step_frames;
 
     part->step_delay = 0;
     part->step_delay_value = graphic_info[control].step_delay;
+
+    part->state = ANIM_STATE_INACTIVE;
 
     anim->num_parts++;
     part_nr++;
@@ -274,12 +266,10 @@ void InitGlobalAnimControls()
 
       anim->has_base = FALSE;
 
-      anim->restart = FALSE;
-      anim->waiting = FALSE;
-      anim->running = FALSE;
-
       anim->init_delay = 0;
       anim->init_delay_value = 0;
+
+      anim->state = ANIM_STATE_INACTIVE;
 
       part_nr = 0;
 
@@ -306,15 +296,13 @@ void InitGlobalAnimControls()
 	part->graphic_info = graphic_info[graphic];
 	part->control_info = graphic_info[control];
 
-	part->restart = FALSE;
-	part->waiting = FALSE;
-	part->running = FALSE;
-
 	part->step_frames = 0;
 	part->step_frames_value = graphic_info[control].step_frames;
 
 	part->step_delay = 0;
 	part->step_delay_value = graphic_info[control].step_delay;
+
+	part->state = ANIM_STATE_INACTIVE;
 
 	if (p < GLOBAL_ANIM_ID_PART_BASE)
 	{
@@ -367,7 +355,7 @@ void DrawGlobalAnim()
       int part_first, part_last;
       int part_nr;
 
-      if (!anim->running)
+      if (anim->state != ANIM_STATE_RUNNING)
 	continue;
 
       part_first = part_last = anim->active_part_nr;
@@ -395,7 +383,7 @@ void DrawGlobalAnim()
 	int sync_frame;
 	int frame;
 
-	if (!part->running)
+	if (part->state != ANIM_STATE_RUNNING)
 	  continue;
 
 	if (part->x < 0)
@@ -577,16 +565,16 @@ void HandleGlobalAnim_Main(struct GlobalAnimMainControlInfo *anim, int action)
 	  action == ANIM_CONTINUE ? "ANIM_CONTINUE" :
 	  action == ANIM_STOP ? "ANIM_STOP" : "(should not happen)"),
 	 anim->nr,
-	 anim->restart, anim->waiting, anim->running,
+	 anim->state & ANIM_STATE_RESTART,
+	 anim->state & ANIM_STATE_WAITING,
+	 anim->state & ANIM_STATE_RUNNING,
 	 anim->num_parts);
 #endif
 
   switch (action)
   {
     case ANIM_START:
-      anim->restart = TRUE;
-      anim->waiting = FALSE;
-      anim->running = FALSE;
+      anim->state = ANIM_STATE_RESTART;
       anim->part_counter = 0;
       anim->active_part_nr = 0;
       skip = TRUE;
@@ -594,17 +582,13 @@ void HandleGlobalAnim_Main(struct GlobalAnimMainControlInfo *anim, int action)
       break;
 
     case ANIM_CONTINUE:
-      if (!anim->restart &&
-	  !anim->waiting &&
-	  !anim->running)
+      if (anim->state == ANIM_STATE_INACTIVE)
 	skip = TRUE;
 
       break;
 
     case ANIM_STOP:
-      anim->restart = FALSE;
-      anim->waiting = FALSE;
-      anim->running = FALSE;
+      anim->state = ANIM_STATE_INACTIVE;
       skip = TRUE;
 
       break;
@@ -631,27 +615,20 @@ void HandleGlobalAnim_Main(struct GlobalAnimMainControlInfo *anim, int action)
       switch (action)
       {
         case ANIM_START:
-	  anim->running = TRUE;
-
-	  part->restart = TRUE;
-	  part->waiting = FALSE;
-	  part->running = FALSE;
+	  anim->state = ANIM_STATE_RUNNING;
+	  part->state = ANIM_STATE_RESTART;
 	  skip = TRUE;
 
 	  break;
 
         case ANIM_CONTINUE:
-	  if (!part->restart &&
-	      !part->waiting &&
-	      !part->running)
+	  if (part->state == ANIM_STATE_INACTIVE)
 	    skip = TRUE;
 
 	  break;
 
         case ANIM_STOP:
-	  part->restart = FALSE;
-	  part->waiting = FALSE;
-	  part->running = FALSE;
+	  part->state = ANIM_STATE_INACTIVE;
 	  skip = TRUE;
 
 	  break;
@@ -663,13 +640,13 @@ void HandleGlobalAnim_Main(struct GlobalAnimMainControlInfo *anim, int action)
       if (skip)
 	continue;
 
-      if (part->restart)
+      if (part->state & ANIM_STATE_RESTART)
       {
 #if 0
 	printf("::: RESTART %d.%d\n", part->anim_nr, part->nr);
 #endif
 
-	if (!part->waiting)
+	if (!(part->state & ANIM_STATE_WAITING))
 	{
 #if 0
 	  printf("::: WAITING %d.%d\n", part->anim_nr, part->nr);
@@ -680,7 +657,7 @@ void HandleGlobalAnim_Main(struct GlobalAnimMainControlInfo *anim, int action)
 	  part->init_delay_value =
 	    (cp->init_delay_fixed + GetSimpleRandom(cp->init_delay_random));
 
-	  part->waiting = TRUE;
+	  part->state |= ANIM_STATE_WAITING;
 	}
 
 	if (!DelayReachedExt(&part->init_delay, part->init_delay_value,
@@ -691,8 +668,7 @@ void HandleGlobalAnim_Main(struct GlobalAnimMainControlInfo *anim, int action)
 	printf("::: RUNNING %d.%d\n", part->anim_nr, part->nr);
 #endif
 
-	part->waiting = FALSE;
-	part->running = TRUE;
+	part->state = ANIM_STATE_RESTART | ANIM_STATE_RUNNING;
       }
 
 #if 0
@@ -701,10 +677,10 @@ void HandleGlobalAnim_Main(struct GlobalAnimMainControlInfo *anim, int action)
 	     anim->running);
 #endif
 
-      part->restart = HandleGlobalAnim_Part(part, part->restart);
-
-      if (part->restart)
-	part->running = FALSE;
+      if (HandleGlobalAnim_Part(part, part->state & ANIM_STATE_RESTART))
+	part->state = ANIM_STATE_RESTART;
+      else
+	part->state = ANIM_STATE_RUNNING;
     }
 
     return;
@@ -713,14 +689,14 @@ void HandleGlobalAnim_Main(struct GlobalAnimMainControlInfo *anim, int action)
   if (skip)
     return;
 
-  if (anim->restart && !anim->waiting)		// directly after restart
+  if (anim->state == ANIM_STATE_RESTART)	// directly after restart
     anim->active_part_nr = getGlobalAnimationPart(anim);
 
   part = &anim->part[anim->active_part_nr];
 
-  if (anim->restart)
+  if (anim->state & ANIM_STATE_RESTART)
   {
-    if (!anim->waiting)
+    if (!(anim->state & ANIM_STATE_WAITING))
     {
       cp = &part->control_info;
 
@@ -729,26 +705,27 @@ void HandleGlobalAnim_Main(struct GlobalAnimMainControlInfo *anim, int action)
       part->init_delay_value =
 	(cp->init_delay_fixed + GetSimpleRandom(cp->init_delay_random));
 
-      anim->waiting = TRUE;
+      anim->state |= ANIM_STATE_WAITING;
     }
 
     if (!DelayReachedExt(&part->init_delay, part->init_delay_value,
 			 anim_sync_frame))
       return;
 
-    anim->waiting = FALSE;
-    anim->running = TRUE;
+    anim->state = ANIM_STATE_RESTART | ANIM_STATE_RUNNING;
   }
 
-  part->running = TRUE;
+  part->state = ANIM_STATE_RUNNING;
 
-  anim->restart = HandleGlobalAnim_Part(part, anim->restart);
-
-  if (anim->restart)
+  if (HandleGlobalAnim_Part(part, anim->state & ANIM_STATE_RESTART))
   {
-    anim->running = FALSE;
+    anim->state = ANIM_STATE_RESTART;
 
     anim->part_counter++;
+  }
+  else
+  {
+    anim->state = ANIM_STATE_RUNNING;
   }
 }
 
