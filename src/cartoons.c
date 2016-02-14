@@ -35,9 +35,9 @@ struct GlobalAnimPartControlInfo
   unsigned int initial_anim_sync_frame;
   unsigned int step_delay, step_delay_value;
 
-  unsigned int init_delay, init_delay_value;
-  unsigned int anim_delay, anim_delay_value;
-  unsigned int post_delay, post_delay_value;
+  int init_delay_counter;
+  int anim_delay_counter;
+  int post_delay_counter;
 
   int state;
 };
@@ -58,7 +58,7 @@ struct GlobalAnimMainControlInfo
 
   boolean has_base;
 
-  unsigned int init_delay, init_delay_value;
+  int init_delay_counter;
 
   int state;
 };
@@ -180,8 +180,7 @@ static void InitToonControls()
 
   anim->has_base = FALSE;
 
-  anim->init_delay = 0;
-  anim->init_delay_value = 0;
+  anim->init_delay_counter = 0;
 
   anim->state = ANIM_STATE_INACTIVE;
 
@@ -262,8 +261,7 @@ void InitGlobalAnimControls()
 
       anim->has_base = FALSE;
 
-      anim->init_delay = 0;
-      anim->init_delay_value = 0;
+      anim->init_delay_counter = 0;
 
       anim->state = ANIM_STATE_INACTIVE;
 
@@ -427,14 +425,14 @@ int HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part, int state)
   {
     ResetDelayCounterExt(&part->step_delay, anim_sync_frame);
 
-    part->init_delay_value =
+    part->init_delay_counter =
       (c->init_delay_fixed + GetSimpleRandom(c->init_delay_random));
 
-    part->anim_delay_value =
+    part->anim_delay_counter =
       (c->anim_delay_fixed + GetSimpleRandom(c->anim_delay_random));
 
     part->initial_anim_sync_frame =
-      (g->anim_global_sync ? 0 : anim_sync_frame + part->init_delay_value);
+      (g->anim_global_sync ? 0 : anim_sync_frame + part->init_delay_counter);
 
     if (c->direction & MV_HORIZONTAL)
     {
@@ -510,9 +508,9 @@ int HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part, int state)
       part->step_yoffset = c->step_yoffset;
   }
 
-  if (part->init_delay_value > 0)
+  if (part->init_delay_counter > 0)
   {
-    part->init_delay_value--;
+    part->init_delay_counter--;
 
     return ANIM_STATE_WAITING;
   }
@@ -523,27 +521,27 @@ int HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part, int state)
       (part->y >=  FULL_SYSIZE && part->step_yoffset >= 0))
     return ANIM_STATE_RESTART;
 
-  if (part->anim_delay_value > 0)
+  if (part->anim_delay_counter > 0)
   {
-    part->anim_delay_value--;
+    part->anim_delay_counter--;
 
-    if (part->anim_delay_value == 0)
+    if (part->anim_delay_counter == 0)
     {
-      part->post_delay_value =
+      part->post_delay_counter =
 	(c->post_delay_fixed + GetSimpleRandom(c->post_delay_random));
 
-      if (part->post_delay_value > 0)
+      if (part->post_delay_counter > 0)
 	return ANIM_STATE_RUNNING;
 
       return ANIM_STATE_RESTART | ANIM_STATE_RUNNING;
     }
   }
 
-  if (part->post_delay_value > 0)
+  if (part->post_delay_counter > 0)
   {
-    part->post_delay_value--;
+    part->post_delay_counter--;
 
-    if (part->post_delay_value == 0)
+    if (part->post_delay_counter == 0)
       return ANIM_STATE_RESTART;
 
     return ANIM_STATE_WAITING;
