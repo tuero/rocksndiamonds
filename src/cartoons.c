@@ -14,10 +14,15 @@
 #include "tools.h"
 
 
-/* values for global animation definition */
-#define NUM_GLOBAL_ANIMS_AND_TOONS	(NUM_GLOBAL_ANIMS + 1)
+/* values for global toon animation definition */
+#define NUM_GLOBAL_TOON_ANIMS		1
+#define NUM_GLOBAL_TOON_PARTS		MAX_NUM_TOONS
+
+/* values for global animation definition (including toons) */
+#define NUM_GLOBAL_ANIMS_AND_TOONS	(NUM_GLOBAL_ANIMS +		\
+					 NUM_GLOBAL_TOON_ANIMS)
 #define NUM_GLOBAL_ANIM_PARTS_AND_TOONS	MAX(NUM_GLOBAL_ANIM_PARTS_ALL,	\
-					    MAX_NUM_TOONS)
+					    NUM_GLOBAL_TOON_PARTS)
 
 struct GlobalAnimPartControlInfo
 {
