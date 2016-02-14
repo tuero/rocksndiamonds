@@ -528,7 +528,25 @@ int HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part, int state)
     part->anim_delay_value--;
 
     if (part->anim_delay_value == 0)
+    {
+      part->post_delay_value =
+	(c->post_delay_fixed + GetSimpleRandom(c->post_delay_random));
+
+      if (part->post_delay_value > 0)
+	return ANIM_STATE_RUNNING;
+
       return ANIM_STATE_RESTART | ANIM_STATE_RUNNING;
+    }
+  }
+
+  if (part->post_delay_value > 0)
+  {
+    part->post_delay_value--;
+
+    if (part->post_delay_value == 0)
+      return ANIM_STATE_RESTART;
+
+    return ANIM_STATE_WAITING;
   }
 
   if (!DelayReachedExt(&part->step_delay, part->step_delay_value,
