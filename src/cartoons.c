@@ -434,7 +434,12 @@ int HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part, int state)
   {
     ResetDelayCounterExt(&part->step_delay, anim_sync_frame);
 
-    part->initial_anim_sync_frame = (g->anim_global_sync ? 0 : anim_sync_frame);
+    part->init_delay_value =
+      (c->init_delay_fixed + GetSimpleRandom(c->init_delay_random));
+
+    part->initial_anim_sync_frame =
+      (g->anim_global_sync ? 0 : anim_sync_frame + part->init_delay_value);
+
     part->step_frames = 0;
 
     if (c->direction & MV_HORIZONTAL)
@@ -511,6 +516,13 @@ int HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part, int state)
       part->step_yoffset = c->step_yoffset;
   }
 
+  if (part->init_delay_value > 0)
+  {
+    part->init_delay_value--;
+
+    return ANIM_STATE_WAITING;
+  }
+
   if ((part->x <= -g->width    && part->step_xoffset <= 0) ||
       (part->x >=  FULL_SXSIZE && part->step_xoffset >= 0) ||
       (part->y <= -g->height   && part->step_yoffset <= 0) ||
@@ -549,7 +561,6 @@ void HandleGlobalAnim_Main(struct GlobalAnimMainControlInfo *anim, int action)
 {
   struct GlobalAnimPartControlInfo *part;
   struct GraphicInfo *c = &anim->control_info;
-  struct GraphicInfo *cp;
   boolean skip = FALSE;
 
 #if 0
@@ -609,7 +620,6 @@ void HandleGlobalAnim_Main(struct GlobalAnimMainControlInfo *anim, int action)
     for (i = 0; i < num_parts; i++)
     {
       part = &anim->part[i];
-      cp = &part->control_info;
 
       switch (action)
       {
@@ -636,47 +646,34 @@ void HandleGlobalAnim_Main(struct GlobalAnimMainControlInfo *anim, int action)
 	  break;
       }
 
+#if 0
+      printf("::: LOOPING ...\n");
+#endif
+
       if (skip)
 	continue;
 
-      if (part->state & ANIM_STATE_RESTART)
-      {
 #if 0
-	printf("::: RESTART %d.%d\n", part->anim_nr, part->nr);
-#endif
-
-	if (!(part->state & ANIM_STATE_WAITING))
-	{
-#if 0
-	  printf("::: WAITING %d.%d\n", part->anim_nr, part->nr);
-#endif
-
-	  ResetDelayCounterExt(&part->init_delay, anim_sync_frame);
-
-	  part->init_delay_value =
-	    (cp->init_delay_fixed + GetSimpleRandom(cp->init_delay_random));
-
-	  part->state |= ANIM_STATE_WAITING;
-	}
-
-	if (!DelayReachedExt(&part->init_delay, part->init_delay_value,
-			     anim_sync_frame))
-	  return;
-
-#if 0
-	printf("::: RUNNING %d.%d\n", part->anim_nr, part->nr);
-#endif
-
-	part->state = ANIM_STATE_RESTART | ANIM_STATE_RUNNING;
-      }
-
-#if 0
-      printf("::: DO PART %d.%d [%d, %d, %d] [%d]\n", part->anim_nr, part->nr,
-	     part->restart, part->waiting, part->running,
-	     anim->running);
+      printf("::: DO PART (1) %d.%d [%d, %d, %d] [%d] [%d / %d]\n",
+	     part->anim_nr, part->nr,
+	     part->state & ANIM_STATE_RESTART,
+	     part->state & ANIM_STATE_WAITING,
+	     part->state & ANIM_STATE_RUNNING,
+	     anim->state & ANIM_STATE_RUNNING,
+	     part->step_frames, part->step_frames_value);
 #endif
 
       part->state = HandleGlobalAnim_Part(part, part->state);
+
+#if 0
+      printf("::: DO PART (2) %d.%d [%d, %d, %d] [%d] [%d / %d]\n",
+	     part->anim_nr, part->nr,
+	     part->state & ANIM_STATE_RESTART,
+	     part->state & ANIM_STATE_WAITING,
+	     part->state & ANIM_STATE_RUNNING,
+	     anim->state & ANIM_STATE_RUNNING,
+	     part->step_frames, part->step_frames_value);
+#endif
     }
 
     return;
@@ -689,27 +686,6 @@ void HandleGlobalAnim_Main(struct GlobalAnimMainControlInfo *anim, int action)
     anim->active_part_nr = getGlobalAnimationPart(anim);
 
   part = &anim->part[anim->active_part_nr];
-
-  if (anim->state & ANIM_STATE_RESTART)
-  {
-    if (!(anim->state & ANIM_STATE_WAITING))
-    {
-      cp = &part->control_info;
-
-      ResetDelayCounterExt(&part->init_delay, anim_sync_frame);
-
-      part->init_delay_value =
-	(cp->init_delay_fixed + GetSimpleRandom(cp->init_delay_random));
-
-      anim->state |= ANIM_STATE_WAITING;
-    }
-
-    if (!DelayReachedExt(&part->init_delay, part->init_delay_value,
-			 anim_sync_frame))
-      return;
-
-    anim->state = ANIM_STATE_RESTART | ANIM_STATE_RUNNING;
-  }
 
   part->state = ANIM_STATE_RUNNING;
 
