@@ -47,7 +47,6 @@ struct ConfigTypeInfo image_config_suffix[] =
   { ".step_offset",			"4",		TYPE_INTEGER	},
   { ".step_xoffset",			ARG_UNDEFINED,	TYPE_INTEGER	},
   { ".step_yoffset",			ARG_UNDEFINED,	TYPE_INTEGER	},
-  { ".step_frames",			ARG_UNDEFINED,	TYPE_INTEGER	},
   { ".step_delay",			"1",		TYPE_INTEGER	},
   { ".direction",			ARG_UNDEFINED,	TYPE_STRING	},
   { ".position",			ARG_UNDEFINED,	TYPE_STRING	},

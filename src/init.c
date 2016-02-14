@@ -1352,7 +1352,6 @@ static void set_graphic_parameters_ext(int graphic, int *parameter,
   g->step_offset  = parameter[GFX_ARG_STEP_OFFSET];
   g->step_xoffset = parameter[GFX_ARG_STEP_XOFFSET];
   g->step_yoffset = parameter[GFX_ARG_STEP_YOFFSET];
-  g->step_frames  = parameter[GFX_ARG_STEP_FRAMES];
   g->step_delay   = parameter[GFX_ARG_STEP_DELAY];
   g->direction    = parameter[GFX_ARG_DIRECTION];
   g->position     = parameter[GFX_ARG_POSITION];

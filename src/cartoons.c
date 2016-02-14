@@ -33,7 +33,6 @@ struct GlobalAnimPartControlInfo
   int step_xoffset, step_yoffset;
 
   unsigned int initial_anim_sync_frame;
-  unsigned int step_frames, step_frames_value;
   unsigned int step_delay, step_delay_value;
 
   unsigned int init_delay, init_delay_value;
@@ -209,9 +208,6 @@ static void InitToonControls()
     part->control_info.x = ARG_UNDEFINED_VALUE;
     part->control_info.y = ARG_UNDEFINED_VALUE;
 
-    part->step_frames = 0;
-    part->step_frames_value = graphic_info[control].step_frames;
-
     part->step_delay = 0;
     part->step_delay_value = graphic_info[control].step_delay;
 
@@ -296,9 +292,6 @@ void InitGlobalAnimControls()
 	part->graphic_info = graphic_info[graphic];
 	part->control_info = graphic_info[control];
 
-	part->step_frames = 0;
-	part->step_frames_value = graphic_info[control].step_frames;
-
 	part->step_delay = 0;
 	part->step_delay_value = graphic_info[control].step_delay;
 
@@ -355,7 +348,7 @@ void DrawGlobalAnim()
       int part_first, part_last;
       int part_nr;
 
-      if (anim->state != ANIM_STATE_RUNNING)
+      if (!(anim->state & ANIM_STATE_RUNNING))
 	continue;
 
       part_first = part_last = anim->active_part_nr;
@@ -383,7 +376,7 @@ void DrawGlobalAnim()
 	int sync_frame;
 	int frame;
 
-	if (part->state != ANIM_STATE_RUNNING)
+	if (!(part->state & ANIM_STATE_RUNNING))
 	  continue;
 
 	if (part->x < 0)
@@ -437,10 +430,11 @@ int HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part, int state)
     part->init_delay_value =
       (c->init_delay_fixed + GetSimpleRandom(c->init_delay_random));
 
+    part->anim_delay_value =
+      (c->anim_delay_fixed + GetSimpleRandom(c->anim_delay_random));
+
     part->initial_anim_sync_frame =
       (g->anim_global_sync ? 0 : anim_sync_frame + part->init_delay_value);
-
-    part->step_frames = 0;
 
     if (c->direction & MV_HORIZONTAL)
     {
@@ -529,9 +523,13 @@ int HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part, int state)
       (part->y >=  FULL_SYSIZE && part->step_yoffset >= 0))
     return ANIM_STATE_RESTART;
 
-  if (part->step_frames_value != ARG_UNDEFINED_VALUE &&
-      part->step_frames >= part->step_frames_value)
-    return ANIM_STATE_RESTART;
+  if (part->anim_delay_value > 0)
+  {
+    part->anim_delay_value--;
+
+    if (part->anim_delay_value == 0)
+      return ANIM_STATE_RESTART | ANIM_STATE_RUNNING;
+  }
 
   if (!DelayReachedExt(&part->step_delay, part->step_delay_value,
 		       anim_sync_frame))
@@ -551,8 +549,6 @@ int HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part, int state)
 
   part->x += part->step_xoffset;
   part->y += part->step_yoffset;
-
-  part->step_frames++;
 
   return ANIM_STATE_RUNNING;
 }
@@ -646,34 +642,10 @@ void HandleGlobalAnim_Main(struct GlobalAnimMainControlInfo *anim, int action)
 	  break;
       }
 
-#if 0
-      printf("::: LOOPING ...\n");
-#endif
-
       if (skip)
 	continue;
 
-#if 0
-      printf("::: DO PART (1) %d.%d [%d, %d, %d] [%d] [%d / %d]\n",
-	     part->anim_nr, part->nr,
-	     part->state & ANIM_STATE_RESTART,
-	     part->state & ANIM_STATE_WAITING,
-	     part->state & ANIM_STATE_RUNNING,
-	     anim->state & ANIM_STATE_RUNNING,
-	     part->step_frames, part->step_frames_value);
-#endif
-
       part->state = HandleGlobalAnim_Part(part, part->state);
-
-#if 0
-      printf("::: DO PART (2) %d.%d [%d, %d, %d] [%d] [%d / %d]\n",
-	     part->anim_nr, part->nr,
-	     part->state & ANIM_STATE_RESTART,
-	     part->state & ANIM_STATE_WAITING,
-	     part->state & ANIM_STATE_RUNNING,
-	     anim->state & ANIM_STATE_RUNNING,
-	     part->step_frames, part->step_frames_value);
-#endif
     }
 
     return;
@@ -682,7 +654,7 @@ void HandleGlobalAnim_Main(struct GlobalAnimMainControlInfo *anim, int action)
   if (skip)
     return;
 
-  if (anim->state == ANIM_STATE_RESTART)	// directly after restart
+  if (anim->state & ANIM_STATE_RESTART)		// directly after restart
     anim->active_part_nr = getGlobalAnimationPart(anim);
 
   part = &anim->part[anim->active_part_nr];
@@ -691,7 +663,7 @@ void HandleGlobalAnim_Main(struct GlobalAnimMainControlInfo *anim, int action)
 
   anim->state = HandleGlobalAnim_Part(part, anim->state);
 
-  if (anim->state == ANIM_STATE_RESTART)
+  if (anim->state & ANIM_STATE_RESTART)
     anim->part_counter++;
 }
 
