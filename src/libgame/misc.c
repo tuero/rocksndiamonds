@@ -2716,7 +2716,8 @@ int get_parameter_value(char *value_raw, char *suffix, int type)
   }
   else if (strEqual(suffix, ".class"))
   {
-    result = get_hash_from_key(value);
+    result = (strEqual(value, ARG_UNDEFINED) ? ARG_UNDEFINED_VALUE :
+	      get_hash_from_key(value));
   }
   else if (strEqual(suffix, ".style"))
   {

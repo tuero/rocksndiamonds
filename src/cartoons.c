@@ -34,6 +34,11 @@ struct GlobalAnimPartControlInfo
   struct GraphicInfo graphic_info;
   struct GraphicInfo control_info;
 
+  int viewport_x;
+  int viewport_y;
+  int viewport_width;
+  int viewport_height;
+
   int x, y;
   int step_xoffset, step_yoffset;
 
@@ -45,6 +50,7 @@ struct GlobalAnimPartControlInfo
   int post_delay_counter;
 
   int state;
+  int last_game_status;
 };
 
 struct GlobalAnimMainControlInfo
@@ -212,10 +218,13 @@ static void InitToonControls()
     part->control_info.x = ARG_UNDEFINED_VALUE;
     part->control_info.y = ARG_UNDEFINED_VALUE;
 
+    part->initial_anim_sync_frame = 0;
+
     part->step_delay = 0;
     part->step_delay_value = graphic_info[control].step_delay;
 
     part->state = ANIM_STATE_INACTIVE;
+    part->last_game_status = -1;
 
     anim->num_parts++;
     part_nr++;
@@ -295,10 +304,13 @@ void InitGlobalAnimControls()
 	part->graphic_info = graphic_info[graphic];
 	part->control_info = graphic_info[control];
 
+	part->initial_anim_sync_frame = 0;
+
 	part->step_delay = 0;
 	part->step_delay_value = graphic_info[control].step_delay;
 
 	part->state = ANIM_STATE_INACTIVE;
+	part->last_game_status = -1;
 
 	if (p < GLOBAL_ANIM_ID_PART_BASE)
 	{
@@ -388,8 +400,8 @@ void DrawGlobalAnim()
 	  width += part->x;
 	  cut_x = -part->x;
 	}
-	else if (part->x > FULL_SXSIZE - g->width)
-	  width -= (part->x - (FULL_SXSIZE - g->width));
+	else if (part->x > part->viewport_width - g->width)
+	  width -= (part->x - (part->viewport_width - g->width));
 
 	if (part->y < 0)
 	{
@@ -397,11 +409,11 @@ void DrawGlobalAnim()
 	  height += part->y;
 	  cut_y = -part->y;
 	}
-	else if (part->y > FULL_SYSIZE - g->height)
-	  height -= (part->y - (FULL_SYSIZE - g->height));
+	else if (part->y > part->viewport_height - g->height)
+	  height -= (part->y - (part->viewport_height - g->height));
 
-	dst_x += REAL_SX;
-	dst_y += REAL_SY;
+	dst_x += part->viewport_x;
+	dst_y += part->viewport_y;
 
 	sync_frame = anim_sync_frame - part->initial_anim_sync_frame;
 	frame = getAnimationFrame(g->anim_frames, g->anim_delay,
@@ -421,10 +433,73 @@ void DrawGlobalAnim()
   }
 }
 
+boolean SetGlobalAnimPart_Viewport(struct GlobalAnimPartControlInfo *part)
+{
+  int viewport_x;
+  int viewport_y;
+  int viewport_width;
+  int viewport_height;
+  boolean changed = FALSE;
+
+  if (part->last_game_status == game_status)
+    return FALSE;
+
+  part->last_game_status = game_status;
+
+  if (part->control_info.class == get_hash_from_key("window") ||
+      part->control_info.class == get_hash_from_key("border"))
+  {
+    viewport_x = 0;
+    viewport_y = 0;
+    viewport_width  = WIN_XSIZE;
+    viewport_height = WIN_YSIZE;
+  }
+  else if (part->control_info.class == get_hash_from_key("door_1"))
+  {
+    viewport_x = DX;
+    viewport_y = DY;
+    viewport_width  = DXSIZE;
+    viewport_height = DYSIZE;
+  }
+  else if (part->control_info.class == get_hash_from_key("door_2"))
+  {
+    viewport_x = VX;
+    viewport_y = VY;
+    viewport_width  = VXSIZE;
+    viewport_height = VYSIZE;
+  }
+  else		// default: "playfield"
+  {
+    viewport_x = REAL_SX;
+    viewport_y = REAL_SY;
+    viewport_width  = FULL_SXSIZE;
+    viewport_height = FULL_SYSIZE;
+  }
+
+  if (viewport_x != part->viewport_x ||
+      viewport_y != part->viewport_y ||
+      viewport_width  != part->viewport_width ||
+      viewport_height != part->viewport_height)
+  {
+    part->viewport_x = viewport_x;
+    part->viewport_y = viewport_y;
+    part->viewport_width  = viewport_width;
+    part->viewport_height = viewport_height;
+
+    changed = TRUE;
+  }
+
+  return changed;
+}
+
 int HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part, int state)
 {
   struct GraphicInfo *g = &part->graphic_info;
   struct GraphicInfo *c = &part->control_info;
+  boolean viewport_changed = SetGlobalAnimPart_Viewport(part);
+
+  if (viewport_changed)
+    state |= ANIM_STATE_RESTART;
 
   if (state & ANIM_STATE_RESTART)
   {
@@ -441,7 +516,7 @@ int HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part, int state)
 
     if (c->direction & MV_HORIZONTAL)
     {
-      int pos_bottom = FULL_SYSIZE - g->height;
+      int pos_bottom = part->viewport_height - g->height;
 
       if (c->position == POS_TOP)
 	part->y = 0;
@@ -464,14 +539,14 @@ int HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part, int state)
       else
       {
 	part->step_xoffset = -c->step_offset;
-	part->x = FULL_SXSIZE + part->step_xoffset;
+	part->x = part->viewport_width + part->step_xoffset;
       }
 
       part->step_yoffset = 0;
     }
     else if (c->direction & MV_VERTICAL)
     {
-      int pos_right = FULL_SXSIZE - g->width;
+      int pos_right = part->viewport_width - g->width;
 
       if (c->position == POS_LEFT)
 	part->x = 0;
@@ -488,7 +563,7 @@ int HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part, int state)
       else
       {
 	part->step_yoffset = -c->step_offset;
-	part->y = FULL_SYSIZE + part->step_yoffset;
+	part->y = part->viewport_height + part->step_yoffset;
       }
 
       part->step_xoffset = 0;
@@ -520,10 +595,10 @@ int HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part, int state)
     return ANIM_STATE_WAITING;
   }
 
-  if ((part->x <= -g->width    && part->step_xoffset <= 0) ||
-      (part->x >=  FULL_SXSIZE && part->step_xoffset >= 0) ||
-      (part->y <= -g->height   && part->step_yoffset <= 0) ||
-      (part->y >=  FULL_SYSIZE && part->step_yoffset >= 0))
+  if ((part->x <= -g->width              && part->step_xoffset <= 0) ||
+      (part->x >=  part->viewport_width  && part->step_xoffset >= 0) ||
+      (part->y <= -g->height             && part->step_yoffset <= 0) ||
+      (part->y >=  part->viewport_height && part->step_yoffset >= 0))
     return ANIM_STATE_RESTART;
 
   if (part->anim_delay_counter > 0)
