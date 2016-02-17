@@ -232,6 +232,9 @@ void InitImageTextures()
 
   FreeAllImageTextures();
 
+  for (i = IMG_GLOBAL_BORDER_FIRST; i <= IMG_GLOBAL_BORDER_LAST; i++)
+    CreateImageTextures(i);
+
   for (i = 0; i < MAX_NUM_TOONS; i++)
     CreateImageTextures(IMG_TOON_1 + i);
 
@@ -5318,6 +5321,7 @@ void InitGfx()
 
   InitGfxDrawBusyAnimFunction(DrawInitAnim);
   InitGfxDrawGlobalAnimFunction(DrawGlobalAnim);
+  InitGfxDrawGlobalBorderFunction(DrawMaskedBorderToScreen);
 
   /* use copy of busy animation to prevent change while reloading artwork */
   init_last = init;

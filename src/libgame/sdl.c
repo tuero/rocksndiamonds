@@ -89,9 +89,17 @@ static void UpdateScreen(SDL_Rect *rect)
     BlitBitmap(backbuffer, gfx.final_screen_bitmap, 0, 0,
 	       gfx.win_xsize, gfx.win_ysize, 0, 0);
 
-    // copy global animations to render target buffer, if defined
+    // copy global animations to render target buffer, if defined (below border)
     if (gfx.draw_global_anim_function != NULL)
-      gfx.draw_global_anim_function();
+      gfx.draw_global_anim_function(DRAW_GLOBAL_ANIM_STAGE_1);
+
+    // copy global masked border to render target buffer, if defined
+    if (gfx.draw_global_border_function != NULL)
+      gfx.draw_global_border_function(REDRAW_ALL);
+
+    // copy global animations to render target buffer, if defined (above border)
+    if (gfx.draw_global_anim_function != NULL)
+      gfx.draw_global_anim_function(DRAW_GLOBAL_ANIM_STAGE_2);
 
     screen = gfx.final_screen_bitmap->surface;
 
@@ -126,9 +134,17 @@ static void UpdateScreen(SDL_Rect *rect)
   SDL_RenderCopy(sdl_renderer, sdl_texture, NULL, NULL);
 
 #if !USE_FINAL_SCREEN_BITMAP
-  // copy global animations to render target buffer, if defined
+  // copy global animations to render target buffer, if defined (below border)
   if (gfx.draw_global_anim_function != NULL)
-    gfx.draw_global_anim_function();
+    gfx.draw_global_anim_function(DRAW_GLOBAL_ANIM_STAGE_1);
+
+  // copy global masked border to render target buffer, if defined
+  if (gfx.draw_global_border_function != NULL)
+    gfx.draw_global_border_function(REDRAW_ALL);
+
+  // copy global animations to render target buffer, if defined (above border)
+  if (gfx.draw_global_anim_function != NULL)
+    gfx.draw_global_anim_function(DRAW_GLOBAL_ANIM_STAGE_2);
 #endif
 
   // show render target buffer on screen
@@ -1098,6 +1114,13 @@ void SDLFadeRectangle(Bitmap *bitmap_cross, int x, int y, int width, int height,
   int dst_x = x, dst_y = y;
   unsigned int time_last, time_current;
 
+  // store function for drawing global masked border
+  void (*draw_global_border_function)(int) = gfx.draw_global_border_function;
+
+  // deactivate drawing of global border while fading, if needed
+  if (draw_border_function == NULL)
+    gfx.draw_global_border_function = NULL;
+
   /* check if screen size has changed */
   if (surface_source != NULL && (video.width  != surface_source->w ||
 				 video.height != surface_source->h))
@@ -1430,6 +1453,9 @@ void SDLFadeRectangle(Bitmap *bitmap_cross, int x, int y, int width, int height,
       time_current = SDL_GetTicks();
     }
   }
+
+  // restore function for drawing global masked border
+  gfx.draw_global_border_function = draw_global_border_function;
 }
 
 void SDLDrawSimpleLine(Bitmap *dst_bitmap, int from_x, int from_y,

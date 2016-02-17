@@ -49,6 +49,8 @@ struct GlobalAnimPartControlInfo
   int anim_delay_counter;
   int post_delay_counter;
 
+  int drawing_stage;
+
   int state;
   int last_game_status;
 };
@@ -335,7 +337,7 @@ void InitGlobalAnimControls()
   InitToonControls();
 }
 
-void DrawGlobalAnim()
+void DrawGlobalAnimExt(int drawing_stage)
 {
   int mode_nr;
 
@@ -345,7 +347,8 @@ void DrawGlobalAnim()
   if (!do_animations || !setup.toons)
     return;
 
-  DoAnimationExt();
+  if (drawing_stage == DRAW_GLOBAL_ANIM_STAGE_1)
+    DoAnimationExt();
 
   for (mode_nr = 0; mode_nr < NUM_SPECIAL_GFX_ARGS; mode_nr++)
   {
@@ -394,6 +397,9 @@ void DrawGlobalAnim()
 	if (!(part->state & ANIM_STATE_RUNNING))
 	  continue;
 
+	if (part->drawing_stage != drawing_stage)
+	  continue;
+
 	if (part->x < 0)
 	{
 	  dst_x = 0;
@@ -433,6 +439,14 @@ void DrawGlobalAnim()
   }
 }
 
+void DrawGlobalAnim(int drawing_stage)
+{
+  if (!do_animations || !setup.toons)
+    return;
+
+  DrawGlobalAnimExt(drawing_stage);
+}
+
 boolean SetGlobalAnimPart_Viewport(struct GlobalAnimPartControlInfo *part)
 {
   int viewport_x;
@@ -446,6 +460,8 @@ boolean SetGlobalAnimPart_Viewport(struct GlobalAnimPartControlInfo *part)
 
   part->last_game_status = game_status;
 
+  part->drawing_stage = DRAW_GLOBAL_ANIM_STAGE_1;
+
   if (part->control_info.class == get_hash_from_key("window") ||
       part->control_info.class == get_hash_from_key("border"))
   {
@@ -453,6 +469,8 @@ boolean SetGlobalAnimPart_Viewport(struct GlobalAnimPartControlInfo *part)
     viewport_y = 0;
     viewport_width  = WIN_XSIZE;
     viewport_height = WIN_YSIZE;
+
+    part->drawing_stage = DRAW_GLOBAL_ANIM_STAGE_2;
   }
   else if (part->control_info.class == get_hash_from_key("door_1"))
   {

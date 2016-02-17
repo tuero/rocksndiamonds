@@ -234,9 +234,14 @@ void InitGfxDrawBusyAnimFunction(void (*draw_busy_anim_function)(void))
   gfx.draw_busy_anim_function = draw_busy_anim_function;
 }
 
-void InitGfxDrawGlobalAnimFunction(void (*draw_global_anim_function)(void))
+void InitGfxDrawGlobalAnimFunction(void (*draw_global_anim_function)(int))
 {
   gfx.draw_global_anim_function = draw_global_anim_function;
+}
+
+void InitGfxDrawGlobalBorderFunction(void (*draw_global_border_function)(int))
+{
+  gfx.draw_global_border_function = draw_global_border_function;
 }
 
 void InitGfxCustomArtworkInfo()

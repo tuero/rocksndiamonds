@@ -165,6 +165,10 @@
 /* values for special "focus player" bitmasks */
 #define BIT_SET_FOCUS			6
 
+/* values for drawing stages for global animations */
+#define DRAW_GLOBAL_ANIM_STAGE_1	1
+#define DRAW_GLOBAL_ANIM_STAGE_2	2
+
 /* values for move directions and special "button" key bitmasks */
 #define MV_NONE			0
 #define MV_LEFT			(1 << MV_BIT_LEFT)
@@ -826,7 +830,8 @@ struct GfxInfo
   int anim_random_frame;
 
   void (*draw_busy_anim_function)(void);
-  void (*draw_global_anim_function)(void);
+  void (*draw_global_anim_function)(int);
+  void (*draw_global_border_function)(int);
 
   int cursor_mode;
 };
@@ -1323,7 +1328,8 @@ void InitGfxWindowInfo(int, int);
 void InitGfxScrollbufferInfo(int, int);
 void InitGfxClipRegion(boolean, int, int, int, int);
 void InitGfxDrawBusyAnimFunction(void (*draw_busy_anim_function)(void));
-void InitGfxDrawGlobalAnimFunction(void (*draw_global_anim_function)(void));
+void InitGfxDrawGlobalAnimFunction(void (*draw_global_anim_function)(int));
+void InitGfxDrawGlobalBorderFunction(void (*draw_global_border_function)(int));
 void InitGfxCustomArtworkInfo();
 void InitGfxOtherSettings();
 void SetDrawDeactivationMask(int);

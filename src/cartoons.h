@@ -22,7 +22,7 @@
 
 void InitToons(void);
 
-void DrawGlobalAnim(void);
+void DrawGlobalAnim(int);
 
 void InitAnimation(void);
 void StopAnimation(void);

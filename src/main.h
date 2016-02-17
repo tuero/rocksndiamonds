@@ -1977,6 +1977,10 @@
 #define GLOBAL_ANIM_ID_PART_LAST	7
 #define GLOBAL_ANIM_ID_PART_BASE	8
 
+/* values for global border graphics */
+#define IMG_GLOBAL_BORDER_FIRST		IMG_GLOBAL_BORDER
+#define IMG_GLOBAL_BORDER_LAST		IMG_GLOBAL_BORDER_PLAYING
+
 /* values for game_status (must match special image configuration suffixes) */
 #define GAME_MODE_DEFAULT		0
 #define GAME_MODE_LOADING		1
