@@ -31,11 +31,13 @@
 #define STR_SNAPSHOT_MODE_OFF		"off"
 #define STR_SNAPSHOT_MODE_EVERY_STEP	"every_step"
 #define STR_SNAPSHOT_MODE_EVERY_MOVE	"every_move"
+#define STR_SNAPSHOT_MODE_EVERY_COLLECT	"every_collect"
 #define STR_SNAPSHOT_MODE_DEFAULT	STR_SNAPSHOT_MODE_OFF
 
 #define SNAPSHOT_MODE_OFF		0
 #define SNAPSHOT_MODE_EVERY_STEP	1
 #define SNAPSHOT_MODE_EVERY_MOVE	2
+#define SNAPSHOT_MODE_EVERY_COLLECT	3
 #define SNAPSHOT_MODE_DEFAULT		SNAPSHOT_MODE_OFF
 
 
@@ -119,6 +121,7 @@ struct GameSnapshotInfo
 
   byte last_action[MAX_PLAYERS];
   boolean changed_action;
+  boolean collected_item;
 };
 
 struct GameInfo

@@ -329,11 +329,12 @@ static struct
   char *text;
 } snapshot_modes_list[] =
 {
-  {	STR_SNAPSHOT_MODE_OFF,		"Off"		},
-  {	STR_SNAPSHOT_MODE_EVERY_STEP,	"Every Step"	},
-  {	STR_SNAPSHOT_MODE_EVERY_MOVE,	"Every Move"	},
+  {	STR_SNAPSHOT_MODE_OFF,			"Off"		},
+  {	STR_SNAPSHOT_MODE_EVERY_STEP,		"Every Step"	},
+  {	STR_SNAPSHOT_MODE_EVERY_MOVE,		"Every Move"	},
+  {	STR_SNAPSHOT_MODE_EVERY_COLLECT,	"Every Collect"	},
 
-  {	NULL,			 	NULL		},
+  {	NULL,			 		NULL		},
 };
 
 static struct
