@@ -3040,11 +3040,14 @@ static void InitGameEngine()
   for (i = 0; i < MAX_PLAYERS; i++)
     game.snapshot.last_action[i] = 0;
   game.snapshot.changed_action = FALSE;
+  game.snapshot.collected_item = FALSE;
   game.snapshot.mode =
     (strEqual(setup.engine_snapshot_mode, STR_SNAPSHOT_MODE_EVERY_STEP) ?
      SNAPSHOT_MODE_EVERY_STEP :
      strEqual(setup.engine_snapshot_mode, STR_SNAPSHOT_MODE_EVERY_MOVE) ?
-     SNAPSHOT_MODE_EVERY_MOVE : SNAPSHOT_MODE_OFF);
+     SNAPSHOT_MODE_EVERY_MOVE :
+     strEqual(setup.engine_snapshot_mode, STR_SNAPSHOT_MODE_EVERY_COLLECT) ?
+     SNAPSHOT_MODE_EVERY_COLLECT : SNAPSHOT_MODE_OFF);
 }
 
 int get_num_special_action(int element, int action_first, int action_last)
@@ -9494,6 +9497,8 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
     {
       local_player->gems_still_needed = action_arg_number_new;
 
+      game.snapshot.collected_item = TRUE;
+
       game_panel_controls[GAME_PANEL_GEMS].value =
 	local_player->gems_still_needed;
 
@@ -13458,6 +13463,8 @@ static int DigField(struct PlayerInfo *player,
       if (local_player->gems_still_needed < 0)
 	local_player->gems_still_needed = 0;
 
+      game.snapshot.collected_item = TRUE;
+
       game_panel_controls[GAME_PANEL_GEMS].value = local_player->gems_still_needed;
 
       DisplayGameControlValues();
@@ -14752,9 +14759,12 @@ static boolean SaveEngineSnapshotToListExt(boolean initial_snapshot)
     (initial_snapshot ||
      (game.snapshot.mode == SNAPSHOT_MODE_EVERY_STEP) ||
      (game.snapshot.mode == SNAPSHOT_MODE_EVERY_MOVE &&
-      game.snapshot.changed_action));
+      game.snapshot.changed_action) ||
+     (game.snapshot.mode == SNAPSHOT_MODE_EVERY_COLLECT &&
+      game.snapshot.collected_item));
 
   game.snapshot.changed_action = FALSE;
+  game.snapshot.collected_item = FALSE;
 
   if (game.snapshot.mode == SNAPSHOT_MODE_OFF ||
       tape.quick_resume ||
@@ -15096,6 +15106,7 @@ void GameRedo(int steps)
 
 static void HandleGameButtonsExt(int id, int button)
 {
+  static boolean game_undo_executed = FALSE;
   int steps = BUTTON_STEPSIZE(button);
   boolean handle_game_buttons =
     (game_status == GAME_MODE_PLAYING ||
@@ -15130,6 +15141,9 @@ static void HandleGameButtonsExt(int id, int button)
       }
       else
 	TapeTogglePause(TAPE_TOGGLE_MANUAL);
+
+      game_undo_executed = FALSE;
+
       break;
 
     case GAME_CTRL_ID_PLAY:
@@ -15149,6 +15163,17 @@ static void HandleGameButtonsExt(int id, int button)
       break;
 
     case GAME_CTRL_ID_UNDO:
+      // Important: When using "save snapshot when collecting an item" mode,
+      // load last (current) snapshot for first "undo" after pressing "pause"
+      // (else the last-but-one snapshot would be loaded, because the snapshot
+      // pointer already points to the last snapshot when pressing "pause",
+      // which is fine for "every step/move" mode, but not for "every collect")
+      if (game.snapshot.mode == SNAPSHOT_MODE_EVERY_COLLECT &&
+	  !game_undo_executed)
+	steps--;
+
+      game_undo_executed = TRUE;
+
       GameUndo(steps);
       break;
 

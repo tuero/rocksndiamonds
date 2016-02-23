@@ -585,6 +585,7 @@ static boolean player_digfield(struct PLAYER *ply, int dx, int dy)
 	play_element_sound(x, y, SAMPLE_collect, element);
 	lev.score += lev.diamond_score;
 	lev.required = lev.required < 3 ? 0 : lev.required - 3;
+	game.snapshot.collected_item = TRUE;
 	ply->anim = SPR_walk + anim;
 	ply->x = x;
 	ply->y = y;
@@ -597,6 +598,7 @@ static boolean player_digfield(struct PLAYER *ply, int dx, int dy)
 	play_element_sound(x, y, SAMPLE_collect, element);
 	lev.score += lev.emerald_score;
 	lev.required = lev.required < 1 ? 0 : lev.required - 1;
+	game.snapshot.collected_item = TRUE;
 	ply->anim = SPR_walk + anim;
 	ply->x = x;
 	ply->y = y;
@@ -1108,6 +1110,7 @@ static boolean player_digfield(struct PLAYER *ply, int dx, int dy)
 	play_element_sound(x, y, SAMPLE_collect, element);
 	lev.score += lev.diamond_score;
 	lev.required = lev.required < 3 ? 0 : lev.required - 3;
+	game.snapshot.collected_item = TRUE;
 	ply->anim = SPR_walk + anim;
 	break;
 
@@ -1118,6 +1121,7 @@ static boolean player_digfield(struct PLAYER *ply, int dx, int dy)
 	play_element_sound(x, y, SAMPLE_collect, element);
 	lev.score += lev.emerald_score;
 	lev.required = lev.required < 1 ? 0 : lev.required - 1;
+	game.snapshot.collected_item = TRUE;
 	ply->anim = SPR_walk + anim;
 	break;
 

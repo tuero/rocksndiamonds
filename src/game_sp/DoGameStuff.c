@@ -20,8 +20,12 @@ byte AnimationSubTable[SP_MAX_PLAYFIELD_SIZE];
 void subDoGameStuff()
 {
   int si, cx, dx, bl;
+  int InfotronsNeeded_last = InfotronsNeeded;
 
   subAnimateMurphy(&MurphyPosIndex);       // move Murphy in any direction
+
+  if (InfotronsNeeded != InfotronsNeeded_last)
+    game.snapshot.collected_item = TRUE;
 
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   // Build a database of locations and subs-to-call of animatable fields only:
