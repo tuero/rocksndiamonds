@@ -21,6 +21,7 @@
 
 
 void InitToons(void);
+void InitGlobalAnimations(void);
 
 void DrawGlobalAnim(int);
 

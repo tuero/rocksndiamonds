@@ -1801,8 +1801,12 @@
 #define GFX_SPECIAL_ARG_PANEL		14
 #define GFX_SPECIAL_ARG_PREVIEW		15
 #define GFX_SPECIAL_ARG_CRUMBLED	16
+#define GFX_SPECIAL_ARG_TYPENAME	17
+#define GFX_SPECIAL_ARG_MENU		18
+#define GFX_SPECIAL_ARG_TOONS		19
+#define GFX_SPECIAL_ARG_QUIT		20
 
-#define NUM_SPECIAL_GFX_ARGS		17
+#define NUM_SPECIAL_GFX_ARGS		21
 
 /* these additional definitions are currently only used for draw offsets */
 #define GFX_SPECIAL_ARG_INFO_MAIN	0
@@ -1999,10 +2003,12 @@
 #define GAME_MODE_PSEUDO_PANEL		14
 #define GAME_MODE_PSEUDO_PREVIEW	15
 #define GAME_MODE_PSEUDO_CRUMBLED	16
-
-/* there are no special config file suffixes for these modes */
 #define GAME_MODE_PSEUDO_TYPENAME	17
-#define GAME_MODE_QUIT			18
+#define GAME_MODE_PSEUDO_MENU		18
+#define GAME_MODE_PSEUDO_TOONS		19
+#define GAME_MODE_QUIT			20
+
+#define NUM_GAME_MODES			21
 
 /* special definitions currently only used for custom artwork configuration */
 #define MUSIC_PREFIX_BACKGROUND		0

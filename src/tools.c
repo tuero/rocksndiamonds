@@ -8233,6 +8233,7 @@ void ChangeViewportPropertiesIfNeeded()
 
     init_video_buffer = TRUE;
     init_gfx_buffers = TRUE;
+    init_gadgets_and_toons = TRUE;
 
     // printf("::: video: init_video_buffer, init_gfx_buffers\n");
   }
@@ -8383,6 +8384,7 @@ void ChangeViewportPropertiesIfNeeded()
 
     InitGadgets();
     InitToons();
+    InitGlobalAnimations();
   }
 
   if (init_em_graphics)

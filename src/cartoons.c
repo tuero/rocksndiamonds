@@ -24,6 +24,16 @@
 #define NUM_GLOBAL_ANIM_PARTS_AND_TOONS	MAX(NUM_GLOBAL_ANIM_PARTS_ALL,	\
 					    NUM_GLOBAL_TOON_PARTS)
 
+#define ANIM_CLASS_BIT_MENU		0
+#define ANIM_CLASS_BIT_TOONS		1
+
+#define NUM_ANIM_CLASSES		2
+
+#define ANIM_CLASS_NONE			0
+#define ANIM_CLASS_MENU			(1 << ANIM_CLASS_BIT_MENU)
+#define ANIM_CLASS_TOONS		(1 << ANIM_CLASS_BIT_TOONS)
+
+
 struct GlobalAnimPartControlInfo
 {
   int nr;
@@ -84,18 +94,50 @@ struct GlobalAnimControlInfo
   int num_anims;
 };
 
+struct GameModeAnimClass
+{
+  int game_mode;
+  int class;
+} game_mode_anim_classes_list[] =
+{
+  { GAME_MODE_MAIN,		ANIM_CLASS_TOONS | ANIM_CLASS_MENU	},
+  { GAME_MODE_LEVELS,		ANIM_CLASS_TOONS | ANIM_CLASS_MENU	},
+  { GAME_MODE_LEVELNR,		ANIM_CLASS_TOONS | ANIM_CLASS_MENU	},
+  { GAME_MODE_INFO,		ANIM_CLASS_TOONS | ANIM_CLASS_MENU	},
+  { GAME_MODE_SETUP,		ANIM_CLASS_TOONS | ANIM_CLASS_MENU	},
+  { GAME_MODE_SCORES,		ANIM_CLASS_TOONS			},
+
+  { -1,				-1					}
+};
+
+struct AnimClassGameMode
+{
+  int class_bit;
+  int game_mode;
+} anim_class_game_modes_list[] =
+{
+  { ANIM_CLASS_BIT_MENU,	GAME_MODE_PSEUDO_MENU	},
+  { ANIM_CLASS_BIT_TOONS,	GAME_MODE_PSEUDO_TOONS	},
+
+  { -1,				-1			}
+};
 
 /* forward declaration for internal use */
+static void HandleGlobalAnim(int, int);
 static void DoAnimationExt(void);
 
-static struct GlobalAnimControlInfo global_anim_ctrl[NUM_SPECIAL_GFX_ARGS];
+static struct GlobalAnimControlInfo global_anim_ctrl[NUM_GAME_MODES];
 static struct ToonInfo toons[MAX_NUM_TOONS];
 
 static unsigned int anim_sync_frame = 0;
 static unsigned int anim_sync_frame_delay = 0;
 static unsigned int anim_sync_frame_delay_value = GAME_FRAME_DELAY;
 
-static boolean do_animations = FALSE;
+static int game_mode_anim_classes[NUM_GAME_MODES];
+static int anim_class_game_modes[NUM_ANIM_CLASSES];
+
+static int game_status_last = GAME_MODE_DEFAULT;
+static int anim_classes_last = ANIM_CLASS_NONE;
 
 
 static int getGlobalAnimationPart(struct GlobalAnimMainControlInfo *anim)
@@ -170,7 +212,8 @@ void InitToons()
 
 static void InitToonControls()
 {
-  struct GlobalAnimControlInfo *ctrl = &global_anim_ctrl[GAME_MODE_DEFAULT];
+  int mode_nr_toons = GAME_MODE_PSEUDO_TOONS;
+  struct GlobalAnimControlInfo *ctrl = &global_anim_ctrl[mode_nr_toons];
   struct GlobalAnimMainControlInfo *anim = &ctrl->anim[ctrl->num_anims];
   int mode_nr, anim_nr, part_nr;
   int control = IMG_INTERNAL_GLOBAL_TOON_DEFAULT;
@@ -180,7 +223,7 @@ static void InitToonControls()
   if (global.num_toons >= 0 && global.num_toons < MAX_NUM_TOONS)
     num_toons = global.num_toons;
 
-  mode_nr = GAME_MODE_DEFAULT;
+  mode_nr = mode_nr_toons;
   anim_nr = ctrl->num_anims;
 
   anim->nr = anim_nr;
@@ -237,7 +280,7 @@ static void InitToonControls()
 
 void InitGlobalAnimControls()
 {
-  int m, a, p;
+  int i, m, a, p;
   int mode_nr, anim_nr, part_nr;
   int graphic, control;
 
@@ -245,7 +288,7 @@ void InitGlobalAnimControls()
 
   ResetDelayCounter(&anim_sync_frame_delay);
 
-  for (m = 0; m < NUM_SPECIAL_GFX_ARGS; m++)
+  for (m = 0; m < NUM_GAME_MODES; m++)
   {
     mode_nr = m;
 
@@ -335,29 +378,87 @@ void InitGlobalAnimControls()
   }
 
   InitToonControls();
+
+  for (i = 0; i < NUM_GAME_MODES; i++)
+    game_mode_anim_classes[i] = ANIM_CLASS_NONE;
+  for (i = 0; game_mode_anim_classes_list[i].game_mode != -1; i++)
+    game_mode_anim_classes[game_mode_anim_classes_list[i].game_mode] =
+      game_mode_anim_classes_list[i].class;
+
+  for (i = 0; i < NUM_ANIM_CLASSES; i++)
+    anim_class_game_modes[i] = GAME_MODE_DEFAULT;
+  for (i = 0; anim_class_game_modes_list[i].game_mode != -1; i++)
+    anim_class_game_modes[anim_class_game_modes_list[i].class_bit] =
+      anim_class_game_modes_list[i].game_mode;
+
+  game_status_last = GAME_MODE_LOADING;
+  anim_classes_last = ANIM_CLASS_NONE;
+}
+
+void InitGlobalAnimations()
+{
+  InitGlobalAnimControls();
 }
 
 void DrawGlobalAnimExt(int drawing_stage)
 {
+  int anim_classes = game_mode_anim_classes[game_status];
   int mode_nr;
+  int i;
 
-  if (game_status == GAME_MODE_LOADING)
-    do_animations = FALSE;
+  // start or stop global animations by change of game mode
+  // (special handling of animations for "current screen" and "all screens")
+  if (game_status != game_status_last)
+  {
+    // stop animations for last screen
+    HandleGlobalAnim(ANIM_STOP, game_status_last);
 
-  if (!do_animations || !setup.toons)
+    // start animations for current screen
+    HandleGlobalAnim(ANIM_START, game_status);
+
+    // start animations for all screens after loading new artwork set
+    if (game_status_last == GAME_MODE_LOADING)
+      HandleGlobalAnim(ANIM_START, GAME_MODE_DEFAULT);
+
+    game_status_last = game_status;
+  }
+
+  // start or stop global animations by change of animation class
+  // (generic handling of animations for "class of screens")
+  if (anim_classes != anim_classes_last)
+  {
+    for (i = 0; i < NUM_ANIM_CLASSES; i++)
+    {
+      int anim_class_check = (1 << i);
+      int anim_class_game_mode = anim_class_game_modes[i];
+      int anim_class_last = anim_classes_last & anim_class_check;
+      int anim_class      = anim_classes      & anim_class_check;
+
+      if (anim_class_last && !anim_class)
+	HandleGlobalAnim(ANIM_STOP, anim_class_game_mode);
+      else if (!anim_class_last && anim_class)
+	HandleGlobalAnim(ANIM_START, anim_class_game_mode);
+    }
+
+    anim_classes_last = anim_classes;
+  }
+
+  if (!setup.toons || game_status == GAME_MODE_LOADING)
     return;
 
   if (drawing_stage == DRAW_GLOBAL_ANIM_STAGE_1)
     DoAnimationExt();
 
-  for (mode_nr = 0; mode_nr < NUM_SPECIAL_GFX_ARGS; mode_nr++)
+  for (mode_nr = 0; mode_nr < NUM_GAME_MODES; mode_nr++)
   {
     struct GlobalAnimControlInfo *ctrl = &global_anim_ctrl[mode_nr];
     int anim_nr;
 
+#if 0
     if (mode_nr != GFX_SPECIAL_ARG_DEFAULT &&
 	mode_nr != game_status)
       continue;
+#endif
 
     for (anim_nr = 0; anim_nr < ctrl->num_anims; anim_nr++)
     {
@@ -441,9 +542,6 @@ void DrawGlobalAnimExt(int drawing_stage)
 
 void DrawGlobalAnim(int drawing_stage)
 {
-  if (!do_animations || !setup.toons)
-    return;
-
   DrawGlobalAnimExt(drawing_stage);
 }
 
@@ -794,48 +892,27 @@ void HandleGlobalAnim_Mode(struct GlobalAnimControlInfo *ctrl, int action)
     HandleGlobalAnim_Main(&ctrl->anim[i], action);
 }
 
-void HandleGlobalAnim(int action)
+static void HandleGlobalAnim(int action, int game_mode)
 {
 #if 0
   printf("::: HandleGlobalAnim [mode == %d]\n", game_status);
 #endif
 
-  HandleGlobalAnim_Mode(&global_anim_ctrl[GAME_MODE_DEFAULT], action);
-  HandleGlobalAnim_Mode(&global_anim_ctrl[game_status], action);
+  HandleGlobalAnim_Mode(&global_anim_ctrl[game_mode], action);
 }
 
 void InitAnimation()
 {
-  // HandleAnimation(ANIM_START);
-
-#if 0
-  printf("::: InitAnimation\n");
-#endif
-
-  // InitCounter();
-
-  InitGlobalAnimControls();
-
-  HandleGlobalAnim(ANIM_START);
-
-  do_animations = TRUE;
 }
 
 void StopAnimation()
 {
-  // HandleAnimation(ANIM_STOP);
-
-#if 0
-  printf("::: StopAnimation\n");
-#endif
-
-  HandleGlobalAnim(ANIM_STOP);
-
-  do_animations = FALSE;
 }
 
 static void DoAnimationExt()
 {
+  int i;
+
 #if 0
   printf("::: DoAnimation [%d, %d]\n", anim_sync_frame, Counter());
 #endif
@@ -848,7 +925,8 @@ static void DoAnimationExt()
     anim_sync_frame++;
 #endif
 
-  HandleGlobalAnim(ANIM_CONTINUE);
+  for (i = 0; i < NUM_GAME_MODES; i++)
+    HandleGlobalAnim(ANIM_CONTINUE, i);
 
 #if 1
   // force screen redraw in next frame to continue drawing global animations

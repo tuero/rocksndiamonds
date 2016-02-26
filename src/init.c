@@ -2059,6 +2059,7 @@ static void ReinitializeGraphics()
   InitGadgets();
   print_timestamp_time("InitGadgets");
   InitToons();
+  InitGlobalAnimations();
   print_timestamp_time("InitToons");
   InitDoors();
   print_timestamp_time("InitDoors");

@@ -5489,6 +5489,10 @@ struct SpecialSuffixInfo special_suffix_info[NUM_SPECIAL_GFX_ARGS + 1 + 1] =
   { ".PANEL",			GFX_SPECIAL_ARG_PANEL,			},
   { ".PREVIEW",			GFX_SPECIAL_ARG_PREVIEW,		},
   { ".CRUMBLED",		GFX_SPECIAL_ARG_CRUMBLED,		},
+  { ".TYPENAME",		GFX_SPECIAL_ARG_TYPENAME,		},
+  { ".MENU",			GFX_SPECIAL_ARG_MENU,			},
+  { ".TOONS",			GFX_SPECIAL_ARG_TOONS,			},
+  { ".QUIT",			GFX_SPECIAL_ARG_QUIT,			},
 
   /* empty suffix always matches -- check as last entry in InitMusicInfo() */
   { "",				GFX_SPECIAL_ARG_DEFAULT,		},
