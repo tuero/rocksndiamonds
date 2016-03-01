@@ -11097,8 +11097,11 @@ void GameActions()
     SendToServer_MovePlayer(summarized_player_action);
 #endif
 
+  // summarize all actions at local players mapped input device position
+  // (this allows using different input devices in single player mode)
   if (!options.network && !game.team_mode)
-    local_player->effective_action = summarized_player_action;
+    stored_player[map_player_action[local_player->index_nr]].effective_action =
+      summarized_player_action;
 
   if (tape.recording &&
       setup.team_mode &&
@@ -11134,6 +11137,7 @@ void GameActions()
 #if USE_NEW_PLAYER_ASSIGNMENTS
   // !!! also map player actions in single player mode !!!
   // if (game.team_mode)
+  if (1)
   {
     byte mapped_action[MAX_PLAYERS];
 
