@@ -643,10 +643,14 @@ void FadeIn(int fade_mask)
   FADE_SY = REAL_SY;
   FADE_SXSIZE = FULL_SXSIZE;
   FADE_SYSIZE = FULL_SYSIZE;
+
+  global.anim_status = global.anim_status_next;
 }
 
 void FadeOut(int fade_mask)
 {
+  global.anim_status = GAME_MODE_PSEUDO_FADING;
+
 #if 0
   DrawMaskedBorder(REDRAW_ALL);
 #endif
@@ -8181,6 +8185,8 @@ void JoinRectangles(int *x, int *y, int *width, int *height,
 void SetGameStatus(int game_status_new)
 {
   game_status = game_status_new;
+
+  global.anim_status_next = game_status;
 }
 
 void ChangeViewportPropertiesIfNeeded()

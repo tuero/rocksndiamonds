@@ -62,7 +62,7 @@ struct GlobalAnimPartControlInfo
   int drawing_stage;
 
   int state;
-  int last_game_status;
+  int last_anim_status;
 };
 
 struct GlobalAnimMainControlInfo
@@ -136,7 +136,7 @@ static unsigned int anim_sync_frame_delay_value = GAME_FRAME_DELAY;
 static int game_mode_anim_classes[NUM_GAME_MODES];
 static int anim_class_game_modes[NUM_ANIM_CLASSES];
 
-static int game_status_last = GAME_MODE_DEFAULT;
+static int anim_status_last = GAME_MODE_DEFAULT;
 static int anim_classes_last = ANIM_CLASS_NONE;
 
 
@@ -269,7 +269,7 @@ static void InitToonControls()
     part->step_delay_value = graphic_info[control].step_delay;
 
     part->state = ANIM_STATE_INACTIVE;
-    part->last_game_status = -1;
+    part->last_anim_status = -1;
 
     anim->num_parts++;
     part_nr++;
@@ -355,7 +355,7 @@ void InitGlobalAnimControls()
 	part->step_delay_value = graphic_info[control].step_delay;
 
 	part->state = ANIM_STATE_INACTIVE;
-	part->last_game_status = -1;
+	part->last_anim_status = -1;
 
 	if (p < GLOBAL_ANIM_ID_PART_BASE)
 	{
@@ -391,7 +391,7 @@ void InitGlobalAnimControls()
     anim_class_game_modes[anim_class_game_modes_list[i].class_bit] =
       anim_class_game_modes_list[i].game_mode;
 
-  game_status_last = GAME_MODE_LOADING;
+  anim_status_last = GAME_MODE_LOADING;
   anim_classes_last = ANIM_CLASS_NONE;
 }
 
@@ -402,25 +402,25 @@ void InitGlobalAnimations()
 
 void DrawGlobalAnimExt(int drawing_stage)
 {
-  int anim_classes = game_mode_anim_classes[game_status];
+  int anim_classes = game_mode_anim_classes[global.anim_status_next];
   int mode_nr;
   int i;
 
   // start or stop global animations by change of game mode
   // (special handling of animations for "current screen" and "all screens")
-  if (game_status != game_status_last)
+  if (global.anim_status != anim_status_last)
   {
     // stop animations for last screen
-    HandleGlobalAnim(ANIM_STOP, game_status_last);
+    HandleGlobalAnim(ANIM_STOP, anim_status_last);
 
     // start animations for current screen
-    HandleGlobalAnim(ANIM_START, game_status);
+    HandleGlobalAnim(ANIM_START, global.anim_status);
 
     // start animations for all screens after loading new artwork set
-    if (game_status_last == GAME_MODE_LOADING)
+    if (anim_status_last == GAME_MODE_LOADING)
       HandleGlobalAnim(ANIM_START, GAME_MODE_DEFAULT);
 
-    game_status_last = game_status;
+    anim_status_last = global.anim_status;
   }
 
   // start or stop global animations by change of animation class
@@ -443,7 +443,7 @@ void DrawGlobalAnimExt(int drawing_stage)
     anim_classes_last = anim_classes;
   }
 
-  if (!setup.toons || game_status == GAME_MODE_LOADING)
+  if (!setup.toons || global.anim_status == GAME_MODE_LOADING)
     return;
 
   if (drawing_stage == DRAW_GLOBAL_ANIM_STAGE_1)
@@ -553,10 +553,10 @@ boolean SetGlobalAnimPart_Viewport(struct GlobalAnimPartControlInfo *part)
   int viewport_height;
   boolean changed = FALSE;
 
-  if (part->last_game_status == game_status)
+  if (part->last_anim_status == global.anim_status)
     return FALSE;
 
-  part->last_game_status = game_status;
+  part->last_anim_status = global.anim_status;
 
   part->drawing_stage = DRAW_GLOBAL_ANIM_STAGE_1;
 
