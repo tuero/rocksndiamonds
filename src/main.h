@@ -1802,12 +1802,13 @@
 #define GFX_SPECIAL_ARG_PREVIEW		15
 #define GFX_SPECIAL_ARG_CRUMBLED	16
 #define GFX_SPECIAL_ARG_TYPENAME	17
-#define GFX_SPECIAL_ARG_MENU		18
-#define GFX_SPECIAL_ARG_TOONS		19
-#define GFX_SPECIAL_ARG_FADING		20
-#define GFX_SPECIAL_ARG_QUIT		21
+#define GFX_SPECIAL_ARG_SUBMENU		18
+#define GFX_SPECIAL_ARG_MENU		19
+#define GFX_SPECIAL_ARG_TOONS		20
+#define GFX_SPECIAL_ARG_FADING		21
+#define GFX_SPECIAL_ARG_QUIT		22
 
-#define NUM_SPECIAL_GFX_ARGS		22
+#define NUM_SPECIAL_GFX_ARGS		23
 
 /* these additional definitions are currently only used for draw offsets */
 #define GFX_SPECIAL_ARG_INFO_MAIN	0
@@ -2005,12 +2006,13 @@
 #define GAME_MODE_PSEUDO_PREVIEW	15
 #define GAME_MODE_PSEUDO_CRUMBLED	16
 #define GAME_MODE_PSEUDO_TYPENAME	17
-#define GAME_MODE_PSEUDO_MENU		18
-#define GAME_MODE_PSEUDO_TOONS		19
-#define GAME_MODE_PSEUDO_FADING		20
-#define GAME_MODE_QUIT			21
+#define GAME_MODE_PSEUDO_SUBMENU	18
+#define GAME_MODE_PSEUDO_MENU		19
+#define GAME_MODE_PSEUDO_TOONS		20
+#define GAME_MODE_PSEUDO_FADING		21
+#define GAME_MODE_QUIT			22
 
-#define NUM_GAME_MODES			22
+#define NUM_GAME_MODES			23
 
 /* special definitions currently only used for custom artwork configuration */
 #define MUSIC_PREFIX_BACKGROUND		0

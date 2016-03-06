@@ -5490,6 +5490,7 @@ struct SpecialSuffixInfo special_suffix_info[NUM_SPECIAL_GFX_ARGS + 1 + 1] =
   { ".PREVIEW",			GFX_SPECIAL_ARG_PREVIEW,		},
   { ".CRUMBLED",		GFX_SPECIAL_ARG_CRUMBLED,		},
   { ".TYPENAME",		GFX_SPECIAL_ARG_TYPENAME,		},
+  { ".SUBMENU",			GFX_SPECIAL_ARG_SUBMENU,		},
   { ".MENU",			GFX_SPECIAL_ARG_MENU,			},
   { ".TOONS",			GFX_SPECIAL_ARG_TOONS,			},
   { ".FADING",			GFX_SPECIAL_ARG_FADING,			},
