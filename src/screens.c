@@ -1237,7 +1237,7 @@ static void drawChooseTreeCursor(int ypos, boolean active)
 
   drawCursorExt(0, ypos, active, -1);
 
-  game_status = last_game_status;	/* restore current game status */
+  SetGameStatus(last_game_status);	/* restore current game status */
 }
 
 void DrawHeadline()
@@ -1301,7 +1301,7 @@ void DrawTitleScreenMessage(int nr, boolean initial)
     return;
 
   /* force TITLE font on title message screen */
-  game_status = getTitleMessageGameMode(initial);
+  SetGameStatus(getTitleMessageGameMode(initial));
 
   /* if chars *and* width set to "-1", automatically determine width */
   if (tmi->chars == -1 && tmi->width == -1)
@@ -1340,7 +1340,7 @@ void DrawTitleScreenMessage(int nr, boolean initial)
 	       filename, tmi->font, tmi->chars, -1, tmi->lines, 0, -1,
 	       tmi->autowrap, tmi->centered, tmi->parse_comments);
 
-  game_status = last_game_status;	/* restore current game status */
+  SetGameStatus(last_game_status);	/* restore current game status */
 }
 
 void DrawTitleScreen()
@@ -1394,7 +1394,8 @@ void DrawMainMenu()
   /* needed if last screen was the playing screen, invoked from level editor */
   if (level_editor_test_game)
   {
-    game_status = GAME_MODE_EDITOR;
+    SetGameStatus(GAME_MODE_EDITOR);
+
     DrawLevelEd();
 
     return;
@@ -1438,7 +1439,8 @@ void DrawMainMenu()
   if (CheckTitleScreen(levelset_has_changed))
   {
     game_status_last_screen = GAME_MODE_MAIN;
-    game_status = GAME_MODE_TITLE;
+
+    SetGameStatus(GAME_MODE_TITLE);
 
     DrawTitleScreen();
 
@@ -1571,7 +1573,7 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
       if (num_title_screens == 0)
       {
 	/* switch game mode from title screen mode back to info screen mode */
-	game_status = GAME_MODE_INFO;
+	SetGameStatus(GAME_MODE_INFO);
 
 	DrawInfoScreen_NotAvailable("Title screen information:",
 				    "No title screen for this level set.");
@@ -1626,7 +1628,8 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
   {
     if (game_status_last_screen == GAME_MODE_INFO && num_title_screens == 0)
     {
-      game_status = GAME_MODE_INFO;
+      SetGameStatus(GAME_MODE_INFO);
+
       info_mode = INFO_MODE_MAIN;
 
       DrawInfoScreen();
@@ -1688,14 +1691,15 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
 
     if (game_status_last_screen == GAME_MODE_INFO)
     {
-      game_status = GAME_MODE_INFO;
+      SetGameStatus(GAME_MODE_INFO);
+
       info_mode = INFO_MODE_MAIN;
 
       DrawInfoScreen();
     }
     else	/* default: return to main menu */
     {
-      game_status = GAME_MODE_MAIN;
+      SetGameStatus(GAME_MODE_MAIN);
 
       DrawMainMenu();
     }
@@ -1830,7 +1834,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 
     CloseDoor(DOOR_CLOSE_2);
 
-    game_status = GAME_MODE_LEVELNR;
+    SetGameStatus(GAME_MODE_LEVELNR);
 
     ChangeViewportPropertiesIfNeeded();
 
@@ -1856,7 +1860,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 
       if (pos == MAIN_CONTROL_NAME)
       {
-	game_status = GAME_MODE_PSEUDO_TYPENAME;
+	SetGameStatus(GAME_MODE_PSEUDO_TYPENAME);
 
 	HandleTypeName(strlen(setup.player_name), 0);
       }
@@ -1868,7 +1872,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 
 	  CloseDoor(DOOR_CLOSE_2);
 
-	  game_status = GAME_MODE_LEVELS;
+	  SetGameStatus(GAME_MODE_LEVELS);
 
 	  SaveLevelSetup_LastSeries();
 	  SaveLevelSetup_SeriesInfo();
@@ -1887,7 +1891,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 
 	CloseDoor(DOOR_CLOSE_2);
 
-	game_status = GAME_MODE_SCORES;
+	SetGameStatus(GAME_MODE_SCORES);
 
 	DrawHallOfFame(-1);
       }
@@ -1901,7 +1905,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 
 	CloseDoor(DOOR_CLOSE_2);
 
-	game_status = GAME_MODE_EDITOR;
+	SetGameStatus(GAME_MODE_EDITOR);
 
 	FadeSetEnterScreen();
 
@@ -1913,7 +1917,8 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 
 	CloseDoor(DOOR_CLOSE_2);
 
-	game_status = GAME_MODE_INFO;
+	SetGameStatus(GAME_MODE_INFO);
+
 	info_mode = INFO_MODE_MAIN;
 
 	ChangeViewportPropertiesIfNeeded();
@@ -1932,7 +1937,8 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 
 	CloseDoor(DOOR_CLOSE_2);
 
-	game_status = GAME_MODE_SETUP;
+	SetGameStatus(GAME_MODE_SETUP);
+
 	setup_mode = SETUP_MODE_MAIN;
 
 	ChangeViewportPropertiesIfNeeded();
@@ -1945,7 +1951,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 	SaveLevelSetup_SeriesInfo();
 
         if (Request("Do you really want to quit?", REQ_ASK | REQ_STAY_CLOSED))
-	  game_status = GAME_MODE_QUIT;
+	  SetGameStatus(GAME_MODE_QUIT);
       }
     }
   }
@@ -2013,7 +2019,7 @@ static void execInfoLevelSet()
 
 static void execExitInfo()
 {
-  game_status = GAME_MODE_MAIN;
+  SetGameStatus(GAME_MODE_MAIN);
 
   DrawMainMenu();
 }
@@ -2669,7 +2675,8 @@ void DrawInfoScreen_HelpText(int element, int action, int direction, int ypos)
 void DrawInfoScreen_TitleScreen()
 {
   game_status_last_screen = GAME_MODE_INFO;
-  game_status = GAME_MODE_TITLE;
+
+  SetGameStatus(GAME_MODE_TITLE);
 
   DrawTitleScreen();
 }
@@ -3602,7 +3609,7 @@ void HandleTypeName(int newxpos, Key key)
 
     is_active = FALSE;
 
-    game_status = GAME_MODE_MAIN;
+    SetGameStatus(GAME_MODE_MAIN);
   }
   else if (key == KSYM_Escape)
   {
@@ -3610,7 +3617,7 @@ void HandleTypeName(int newxpos, Key key)
 
     is_active = FALSE;
 
-    game_status = GAME_MODE_MAIN;
+    SetGameStatus(GAME_MODE_MAIN);
   }
 
   if (is_active)
@@ -3648,7 +3655,7 @@ static void DrawChooseTree(TreeInfo **ti_ptr)
 
   if (strEqual((*ti_ptr)->subdir, STRING_TOP_DIRECTORY))
   {
-    game_status = GAME_MODE_MAIN;
+    SetGameStatus(GAME_MODE_MAIN);
 
     DrawMainMenu();
 
@@ -3727,7 +3734,7 @@ static void drawChooseTreeList(int first_entry, int num_page_entries,
       initCursor(i, IMG_MENU_BUTTON);
   }
 
-  game_status = last_game_status;	/* restore current game status */
+  SetGameStatus(last_game_status);	/* restore current game status */
 
   redraw_mask |= REDRAW_FIELD;
 }
@@ -3784,7 +3791,7 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
   else
     num_page_entries = NUM_MENU_ENTRIES_ON_SCREEN;
 
-  game_status = last_game_status;	/* restore current game status */
+  SetGameStatus(last_game_status);	/* restore current game status */
 
   if (button == MB_MENU_INITIALIZE)
   {
@@ -3859,7 +3866,7 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
 	HandleMainMenu_SelectLevel(0, 0, new_level_nr);
       }
 
-      game_status = GAME_MODE_MAIN;
+      SetGameStatus(GAME_MODE_MAIN);
 
       DrawMainMenu();
     }
@@ -3874,7 +3881,7 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
     x = (mx - mSX) / 32;
     y = (my - mSY) / 32 - MENU_SCREEN_START_YPOS;
 
-    game_status = last_game_status;	/* restore current game status */
+    SetGameStatus(last_game_status);	/* restore current game status */
   }
   else if (dx || dy)	/* keyboard or scrollbar/scrollbutton input */
   {
@@ -4057,7 +4064,7 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
 	    HandleMainMenu_SelectLevel(0, 0, new_level_nr);
 	  }
 
-	  game_status = GAME_MODE_MAIN;
+	  SetGameStatus(GAME_MODE_MAIN);
 
 	  DrawMainMenu();
 	}
@@ -4273,7 +4280,7 @@ void HandleHallOfFame(int mx, int my, int dx, int dy, int button)
 
     FadeSound(SND_BACKGROUND_SCORES);
 
-    game_status = GAME_MODE_MAIN;
+    SetGameStatus(GAME_MODE_MAIN);
 
     DrawMainMenu();
   }
@@ -4283,7 +4290,7 @@ void HandleHallOfFame(int mx, int my, int dx, int dy, int button)
 
     FadeSound(SND_BACKGROUND_SCORES);
 
-    game_status = GAME_MODE_MAIN;
+    SetGameStatus(GAME_MODE_MAIN);
 
     DrawMainMenu();
   }
@@ -5273,7 +5280,7 @@ static void execSetupShortcuts5()
 
 static void execExitSetup()
 {
-  game_status = GAME_MODE_MAIN;
+  SetGameStatus(GAME_MODE_MAIN);
 
   DrawMainMenu();
 }
@@ -6924,7 +6931,7 @@ void CreateScreenGadgets()
   CreateScreenScrollbuttons();
   CreateScreenScrollbars();
 
-  game_status = last_game_status;	/* restore current game status */
+  SetGameStatus(last_game_status);	/* restore current game status */
 }
 
 void FreeScreenGadgets()

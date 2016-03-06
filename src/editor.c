@@ -6406,7 +6406,7 @@ void CreateLevelEditorGadgets()
   int old_game_status = game_status;
 
   /* setting 'game_status' is needed to get the right fonts for the editor */
-  game_status = GAME_MODE_EDITOR;
+  SetGameStatus(GAME_MODE_EDITOR);
 
   /* these values are not constant, but can change at runtime */
   ed_fieldx = MAX_ED_FIELDX - 1;
@@ -6440,7 +6440,7 @@ void CreateLevelEditorGadgets()
   CreateTextbuttonGadgets();
   CreateDrawingAreas();
 
-  game_status = old_game_status;
+  SetGameStatus(old_game_status);
 }
 
 void FreeLevelEditorGadgets()
@@ -12272,7 +12272,7 @@ void RequestExitLevelEditor(boolean ask_if_level_has_changed,
     if (quick_quit)
       FadeSkipNextFadeIn();
 
-    game_status = GAME_MODE_MAIN;
+    SetGameStatus(GAME_MODE_MAIN);
 
     DrawMainMenu();
   }

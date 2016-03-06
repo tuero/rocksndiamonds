@@ -249,6 +249,8 @@ void PlayMenuMusic();
 void PlaySoundActivating();
 void PlaySoundSelecting();
 
+void SetGameStatus(int);
+
 void ToggleFullscreenOrChangeWindowScalingIfNeeded();
 void ChangeViewportPropertiesIfNeeded();
 

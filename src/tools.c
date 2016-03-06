@@ -2382,13 +2382,13 @@ void DrawEnvelopeRequest(char *text)
 				  tile_size, tile_size);
 
   /* force DOOR font inside door area */
-  game_status = GAME_MODE_PSEUDO_DOOR;
+  SetGameStatus(GAME_MODE_PSEUDO_DOOR);
 
   DrawTextBuffer(sx + sx_offset, sy + sy_offset, text_final, font_nr,
 		 line_length, -1, max_lines, line_spacing, mask_mode,
 		 request.autowrap, request.centered, FALSE);
 
-  game_status = last_game_status;	/* restore current game status */
+  SetGameStatus(last_game_status);	/* restore current game status */
 
   for (i = 0; i < NUM_TOOL_BUTTONS; i++)
     RedrawGadget(tool_gadget[i]);
@@ -2793,7 +2793,7 @@ static void DrawPreviewLevelExt(boolean restart)
 	DrawTextSAligned(pos->x, pos->y, label_text, font_nr, pos->align);
     }
 
-    game_status = last_game_status;	/* restore current game status */
+    SetGameStatus(last_game_status);	/* restore current game status */
 
     return;
   }
@@ -2895,7 +2895,7 @@ static void DrawPreviewLevelExt(boolean restart)
     DrawPreviewLevelLabelExt(label_state);
   }
 
-  game_status = last_game_status;	/* restore current game status */
+  SetGameStatus(last_game_status);	/* restore current game status */
 }
 
 void DrawPreviewLevelInitial()
@@ -3680,7 +3680,7 @@ static boolean RequestDoor(char *text, unsigned int req_state)
   DrawBackground(DX, DY, DXSIZE, DYSIZE);
 
   /* force DOOR font inside door area */
-  game_status = GAME_MODE_PSEUDO_DOOR;
+  SetGameStatus(GAME_MODE_PSEUDO_DOOR);
 
   /* write text for request */
   for (text_ptr = text, ty = 0; ty < MAX_REQUEST_LINES; ty++)
@@ -3720,7 +3720,7 @@ static boolean RequestDoor(char *text, unsigned int req_state)
     // text_ptr += tl + (tc == ' ' || tc == '?' || tc == '!' ? 1 : 0);
   }
 
-  game_status = last_game_status;	/* restore current game status */
+  SetGameStatus(last_game_status);	/* restore current game status */
 
   if (req_state & REQ_ASK)
   {
@@ -8176,6 +8176,11 @@ void JoinRectangles(int *x, int *y, int *width, int *height,
   *y = MIN(*y, y2);
   *width = MAX(*width, width2);
   *height = MAX(*height, height2);
+}
+
+void SetGameStatus(int game_status_new)
+{
+  game_status = game_status_new;
 }
 
 void ChangeViewportPropertiesIfNeeded()

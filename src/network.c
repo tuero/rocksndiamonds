@@ -464,7 +464,8 @@ static void Handle_OP_STOP_PLAYING()
       Request("Network game stopped!", REQ_CONFIRM);
   }
 
-  game_status = GAME_MODE_MAIN;
+  SetGameStatus(GAME_MODE_MAIN);
+
   DrawMainMenu();
 }
 

@@ -1567,7 +1567,8 @@ void HandleKey(Key key, int key_status)
     default:
       if (key == KSYM_Escape)
       {
-	game_status = GAME_MODE_MAIN;
+	SetGameStatus(GAME_MODE_MAIN);
+
 	DrawMainMenu();
 
 	return;

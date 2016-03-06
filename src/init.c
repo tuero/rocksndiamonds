@@ -5699,7 +5699,7 @@ void ReloadCustomArtwork(int force_reload)
 
   print_timestamp_init("ReloadCustomArtwork");
 
-  game_status = GAME_MODE_LOADING;
+  SetGameStatus(GAME_MODE_LOADING);
 
   FadeOut(REDRAW_ALL);
 
@@ -5734,7 +5734,7 @@ void ReloadCustomArtwork(int force_reload)
     print_timestamp_time("InitMusic");
   }
 
-  game_status = last_game_status;	/* restore current game status */
+  SetGameStatus(last_game_status);	/* restore current game status */
 
   init_last = init;			/* switch to new busy animation */
 
@@ -5829,7 +5829,7 @@ void OpenAll()
 {
   print_timestamp_init("OpenAll");
 
-  game_status = GAME_MODE_LOADING;
+  SetGameStatus(GAME_MODE_LOADING);
 
   InitCounter();
 
@@ -5929,7 +5929,7 @@ void OpenAll()
     return;
   }
 
-  game_status = GAME_MODE_MAIN;
+  SetGameStatus(GAME_MODE_MAIN);
 
   FadeSetEnterScreen();
   if (!(fading.fade_mode & FADE_TYPE_TRANSFORM))
