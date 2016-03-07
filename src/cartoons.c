@@ -405,14 +405,19 @@ void InitGlobalAnimations()
 
 void DrawGlobalAnimExt(int drawing_stage)
 {
-  int anim_classes = game_mode_anim_classes[global.anim_status_next];
   int mode_nr;
-  int i;
 
-  // start or stop global animations by change of game mode
-  // (special handling of animations for "current screen" and "all screens")
   if (global.anim_status != anim_status_last)
   {
+    boolean before_fading = (global.anim_status == GAME_MODE_PSEUDO_FADING);
+    boolean after_fading  = (anim_status_last   == GAME_MODE_PSEUDO_FADING);
+    int anim_classes_next = game_mode_anim_classes[global.anim_status_next];
+    int i;
+
+    // ---------- part 1 ------------------------------------------------------
+    // start or stop global animations by change of game mode
+    // (special handling of animations for "current screen" and "all screens")
+
     // stop animations for last screen
     HandleGlobalAnim(ANIM_STOP, anim_status_last);
 
@@ -423,27 +428,30 @@ void DrawGlobalAnimExt(int drawing_stage)
     if (anim_status_last == GAME_MODE_LOADING)
       HandleGlobalAnim(ANIM_START, GAME_MODE_DEFAULT);
 
-    anim_status_last = global.anim_status;
-  }
+    // ---------- part 2 ------------------------------------------------------
+    // start or stop global animations by change of animation class
+    // (generic handling of animations for "class of screens")
 
-  // start or stop global animations by change of animation class
-  // (generic handling of animations for "class of screens")
-  if (anim_classes != anim_classes_last)
-  {
     for (i = 0; i < NUM_ANIM_CLASSES; i++)
     {
       int anim_class_check = (1 << i);
       int anim_class_game_mode = anim_class_game_modes[i];
       int anim_class_last = anim_classes_last & anim_class_check;
-      int anim_class      = anim_classes      & anim_class_check;
+      int anim_class_next = anim_classes_next & anim_class_check;
 
-      if (anim_class_last && !anim_class)
+      // stop animations for changed screen class before fading to new screen
+      if (before_fading && anim_class_last && !anim_class_next)
 	HandleGlobalAnim(ANIM_STOP, anim_class_game_mode);
-      else if (!anim_class_last && anim_class)
+
+      // start animations for changed screen class after fading to new screen
+      if (after_fading && !anim_class_last && anim_class_next)
 	HandleGlobalAnim(ANIM_START, anim_class_game_mode);
     }
 
-    anim_classes_last = anim_classes;
+    if (after_fading)
+      anim_classes_last = anim_classes_next;
+
+    anim_status_last = global.anim_status;
   }
 
   if (!setup.toons || global.anim_status == GAME_MODE_LOADING)

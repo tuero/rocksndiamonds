@@ -628,6 +628,20 @@ static void FadeExt(int fade_mask, int fade_mode, int fade_type)
   redraw_mask &= ~fade_mask;
 }
 
+static void SetAnimStatus_BeforeFadingOut()
+{
+  global.anim_status = GAME_MODE_PSEUDO_FADING;
+}
+
+static void SetAnimStatus_AfterFadingIn()
+{
+  global.anim_status = global.anim_status_next;
+
+  // force update of global animation status in case of rapid screen changes
+  redraw_mask = REDRAW_ALL;
+  BackToFront();
+}
+
 void FadeIn(int fade_mask)
 {
 #if 1
@@ -644,12 +658,12 @@ void FadeIn(int fade_mask)
   FADE_SXSIZE = FULL_SXSIZE;
   FADE_SYSIZE = FULL_SYSIZE;
 
-  global.anim_status = global.anim_status_next;
+  SetAnimStatus_AfterFadingIn();
 }
 
 void FadeOut(int fade_mask)
 {
-  global.anim_status = GAME_MODE_PSEUDO_FADING;
+  SetAnimStatus_BeforeFadingOut();
 
 #if 0
   DrawMaskedBorder(REDRAW_ALL);
