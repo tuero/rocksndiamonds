@@ -1420,6 +1420,17 @@ void DrawMainMenu()
   /* needed if last screen (level choice) changed graphics, sounds or music */
   ReloadCustomArtwork(0);
 
+  if (CheckTitleScreen(levelset_has_changed))
+  {
+    game_status_last_screen = GAME_MODE_MAIN;
+
+    SetGameStatus(GAME_MODE_TITLE);
+
+    DrawTitleScreen();
+
+    return;
+  }
+
   /* needed if different viewport properties defined for menues */
   ChangeViewportPropertiesIfNeeded();
 
@@ -1435,17 +1446,6 @@ void DrawMainMenu()
   UndrawSpecialEditorDoor();
 
   SetDrawtoField(DRAW_BACKBUFFER);
-
-  if (CheckTitleScreen(levelset_has_changed))
-  {
-    game_status_last_screen = GAME_MODE_MAIN;
-
-    SetGameStatus(GAME_MODE_TITLE);
-
-    DrawTitleScreen();
-
-    return;
-  }
 
   /* level_nr may have been set to value over handicap with level editor */
   if (setup.handicap && level_nr > leveldir_current->handicap_level)
