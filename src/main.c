@@ -5718,6 +5718,14 @@ static void InitProgramConfig(char *command_filename)
   userdata_subdir = USERDATA_DIRECTORY_OTHER;
 #endif
 
+  // set default window size (only relevant on program startup)
+  if (setup.internal.default_window_width  != 0 &&
+      setup.internal.default_window_height != 0)
+  {
+    WIN_XSIZE = setup.internal.default_window_width;
+    WIN_YSIZE = setup.internal.default_window_height;
+  }
+
   InitProgramInfo(command_filename,
 		  config_filename,
 		  userdata_subdir,

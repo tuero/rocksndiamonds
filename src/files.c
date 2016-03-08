@@ -8044,8 +8044,10 @@ void SaveScore(int nr)
 #define SETUP_TOKEN_INT_FALLBACK_MUSIC_FILE	12
 #define SETUP_TOKEN_INT_DEFAULT_LEVEL_SERIES	13
 #define SETUP_TOKEN_INT_CHOOSE_FROM_TOP_LEVELDIR 14
+#define SETUP_TOKEN_INT_DEFAULT_WINDOW_WIDTH	15
+#define SETUP_TOKEN_INT_DEFAULT_WINDOW_HEIGHT	16
 
-#define NUM_INTERNAL_SETUP_TOKENS		15
+#define NUM_INTERNAL_SETUP_TOKENS		17
 
 /* options setup */
 #define SETUP_TOKEN_OPTIONS_VERBOSE		0
@@ -8217,6 +8219,8 @@ static struct TokenInfo internal_setup_tokens[] =
   { TYPE_STRING, &sxi.fallback_music_file,	"fallback_music_file"	},
   { TYPE_STRING, &sxi.default_level_series,	"default_level_series"	},
   { TYPE_BOOLEAN,&sxi.choose_from_top_leveldir,	"choose_from_top_leveldir" },
+  { TYPE_INTEGER,&sxi.default_window_width,	"default_window_width"	},
+  { TYPE_INTEGER,&sxi.default_window_height,	"default_window_height"	},
 };
 
 static struct TokenInfo options_setup_tokens[] =
@@ -8378,6 +8382,9 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
 
   si->internal.default_level_series = getStringCopy(UNDEFINED_LEVELSET);
   si->internal.choose_from_top_leveldir = FALSE;
+
+  si->internal.default_window_width  = WIN_XSIZE_DEFAULT;
+  si->internal.default_window_height = WIN_YSIZE_DEFAULT;
 
   si->options.verbose = FALSE;
 

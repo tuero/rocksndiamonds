@@ -968,6 +968,9 @@ struct SetupInternalInfo
 
   char *default_level_series;
 
+  int default_window_width;
+  int default_window_height;
+
   boolean choose_from_top_leveldir;
 };
 
