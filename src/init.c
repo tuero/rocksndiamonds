@@ -4666,7 +4666,7 @@ static void InitGlobal()
 
   global.frames_per_second = 0;
 
-  global.border_status = GAME_MODE_MAIN;
+  global.border_status = GAME_MODE_LOADING;
   global.anim_status = global.anim_status_next = GAME_MODE_LOADING;
 
   global.use_envelope_request = FALSE;
