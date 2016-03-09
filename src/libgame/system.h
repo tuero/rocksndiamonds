@@ -225,6 +225,7 @@
 				 MV_NONE)
 
 /* values for animation mode (frame order and direction) */
+/* (stored in level files -- never change existing values) */
 #define ANIM_NONE		0
 #define ANIM_LOOP		(1 << 0)
 #define ANIM_LINEAR		(1 << 1)
@@ -238,11 +239,13 @@
 #define ANIM_OPAQUE_PLAYER	(1 << 9)
 
 /* values for special (non game element) animation modes */
+/* (not stored in level files -- can be changed, if needed) */
 #define ANIM_HORIZONTAL		(1 << 10)
 #define ANIM_VERTICAL		(1 << 11)
 #define ANIM_CENTERED		(1 << 12)
 #define ANIM_STATIC_PANEL	(1 << 13)
 #define ANIM_ALL		(1 << 14)
+#define ANIM_ONCE		(1 << 15)
 
 #define ANIM_DEFAULT		ANIM_LOOP
 

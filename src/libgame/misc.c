@@ -2705,6 +2705,9 @@ int get_parameter_value(char *value_raw, char *suffix, int type)
 	      string_has_parameter(value, "all")	? ANIM_ALL :
 	      ANIM_DEFAULT);
 
+    if (string_has_parameter(value, "once"))
+      result |= ANIM_ONCE;
+
     if (string_has_parameter(value, "reverse"))
       result |= ANIM_REVERSE;
 

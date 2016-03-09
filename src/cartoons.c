@@ -888,6 +888,10 @@ void HandleGlobalAnim_Main(struct GlobalAnimMainControlInfo *anim, int action)
 
   if (anim->state & ANIM_STATE_RESTART)
     anim->part_counter++;
+
+  if (anim->part_counter == anim->num_parts &&
+      c->anim_mode & ANIM_ONCE)
+    anim->state = ANIM_STATE_INACTIVE;
 }
 
 void HandleGlobalAnim_Mode(struct GlobalAnimControlInfo *ctrl, int action)
