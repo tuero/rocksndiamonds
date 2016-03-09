@@ -704,6 +704,10 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
       return;
   }
 
+  // do not use direct gadget drawing anymore; this worked as a speed-up once,
+  // but would slow things down a lot now the screen is always fully redrawn
+  direct = FALSE;
+
   if (direct)
   {
     BlitBitmap(drawto, window,

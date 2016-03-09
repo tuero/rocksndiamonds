@@ -208,6 +208,9 @@ void EventLoop(void)
   	    HandleOtherEvents(&event);
   	    break;
   	}
+
+	if (DelayReached(&sync_frame_delay, sync_frame_delay_value))
+	  BackToFront();
       }
     }
     else
