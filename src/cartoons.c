@@ -780,7 +780,6 @@ void HandleGlobalAnim_Main(struct GlobalAnimMainControlInfo *anim, int action)
 {
   struct GlobalAnimPartControlInfo *part;
   struct GraphicInfo *c = &anim->control_info;
-  boolean skip = FALSE;
 
 #if 0
   printf("::: HandleGlobalAnim_Main: %d, %d => %d\n",
@@ -806,21 +805,19 @@ void HandleGlobalAnim_Main(struct GlobalAnimMainControlInfo *anim, int action)
       anim->state = ANIM_STATE_RESTART;
       anim->part_counter = 0;
       anim->active_part_nr = 0;
-      skip = TRUE;
 
       break;
 
     case ANIM_CONTINUE:
       if (anim->state == ANIM_STATE_INACTIVE)
-	skip = TRUE;
+	return;
 
       break;
 
     case ANIM_STOP:
       anim->state = ANIM_STATE_INACTIVE;
-      skip = TRUE;
 
-      break;
+      return;
 
     default:
       break;
@@ -845,37 +842,34 @@ void HandleGlobalAnim_Main(struct GlobalAnimMainControlInfo *anim, int action)
         case ANIM_START:
 	  anim->state = ANIM_STATE_RUNNING;
 	  part->state = ANIM_STATE_RESTART;
-	  skip = TRUE;
 
 	  break;
 
         case ANIM_CONTINUE:
 	  if (part->state == ANIM_STATE_INACTIVE)
-	    skip = TRUE;
+	    continue;
 
 	  break;
 
         case ANIM_STOP:
 	  part->state = ANIM_STATE_INACTIVE;
-	  skip = TRUE;
 
-	  break;
+	  continue;
 
         default:
 	  break;
       }
 
-      if (skip)
-	continue;
-
       part->state = HandleGlobalAnim_Part(part, part->state);
+
+      // when animation mode is "once", stop after animation was played once
+      if (c->anim_mode & ANIM_ONCE &&
+	  part->state & ANIM_STATE_RESTART)
+	part->state = ANIM_STATE_INACTIVE;
     }
 
     return;
   }
-
-  if (skip)
-    return;
 
   if (anim->state & ANIM_STATE_RESTART)		// directly after restart
     anim->active_part_nr = getGlobalAnimationPart(anim);
@@ -889,8 +883,9 @@ void HandleGlobalAnim_Main(struct GlobalAnimMainControlInfo *anim, int action)
   if (anim->state & ANIM_STATE_RESTART)
     anim->part_counter++;
 
-  if (anim->part_counter == anim->num_parts &&
-      c->anim_mode & ANIM_ONCE)
+  // when animation mode is "once", stop after all animations were played once
+  if (c->anim_mode & ANIM_ONCE &&
+      anim->part_counter == anim->num_parts)
     anim->state = ANIM_STATE_INACTIVE;
 }
 
