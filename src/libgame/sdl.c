@@ -278,15 +278,23 @@ boolean SDLSetNativeSurface(SDL_Surface **surface)
 
 SDL_Surface *SDLGetNativeSurface(SDL_Surface *surface)
 {
+  SDL_PixelFormat format;
   SDL_Surface *new_surface;
 
   if (surface == NULL)
     return NULL;
 
   if (backbuffer && backbuffer->surface)
-    new_surface = SDL_ConvertSurface(surface, backbuffer->surface->format, 0);
+  {
+    format = *backbuffer->surface->format;
+    format.Amask = surface->format->Amask;	// keep alpha channel
+  }
   else
-    new_surface = SDL_ConvertSurface(surface, surface->format, 0);
+  {
+    format = *surface->format;
+  }
+
+  new_surface = SDL_ConvertSurface(surface, &format, 0);
 
   if (new_surface == NULL)
     Error(ERR_EXIT, "SDL_ConvertSurface() failed: %s", SDL_GetError());
@@ -2462,8 +2470,9 @@ Bitmap *SDLLoadImage(char *filename)
   UPDATE_BUSY_STATE();
 
   /* create native transparent surface for current image */
-  SDL_SetColorKey(sdl_image_tmp, SET_TRANSPARENT_PIXEL,
-		  SDL_MapRGB(sdl_image_tmp->format, 0x00, 0x00, 0x00));
+  if (sdl_image_tmp->format->Amask == 0)
+    SDL_SetColorKey(sdl_image_tmp, SET_TRANSPARENT_PIXEL,
+		    SDL_MapRGB(sdl_image_tmp->format, 0x00, 0x00, 0x00));
 
   if ((new_bitmap->surface_masked = SDLGetNativeSurface(sdl_image_tmp)) == NULL)
   {
