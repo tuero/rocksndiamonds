@@ -24,7 +24,8 @@
 
 
 /* select level set with EMC X11 graphics before activating EM GFX debugging */
-#define DEBUG_EM_GFX	0
+#define DEBUG_EM_GFX		FALSE
+#define DEBUG_FRAME_TIME	FALSE
 
 /* tool button identifiers */
 #define TOOL_CTRL_ID_YES	0
@@ -462,6 +463,44 @@ void DrawFramesPerSecond()
 	      font_nr, BLIT_OPAQUE);
 }
 
+#if DEBUG_FRAME_TIME
+static void PrintFrameTimeDebugging()
+{
+  static unsigned int last_counter = 0;
+  unsigned int counter = Counter();
+  int diff_1 = counter - last_counter;
+  int diff_2 = diff_1 - GAME_FRAME_DELAY;
+  int diff_2_max = 20;
+  int diff_2_cut = MIN(ABS(diff_2), diff_2_max);
+  char diff_bar[2 * diff_2_max + 5];
+  int pos = 0;
+  int i;
+
+  diff_bar[pos++] = (diff_2 < -diff_2_max ? '<' : ' ');
+
+  for (i = 0; i < diff_2_max; i++)
+    diff_bar[pos++] = (diff_2 >= 0 ? ' ' :
+		       i >= diff_2_max - diff_2_cut ? '-' : ' ');
+
+  diff_bar[pos++] = '|';
+
+  for (i = 0; i < diff_2_max; i++)
+    diff_bar[pos++] = (diff_2 <= 0 ? ' ' : i < diff_2_cut ? '+' : ' ');
+
+  diff_bar[pos++] = (diff_2 > diff_2_max ? '>' : ' ');
+
+  diff_bar[pos++] = '\0';
+
+  Error(ERR_INFO, "%06d [%02d] [%c%02d] %s",
+	counter,
+	diff_1,
+	(diff_2 < 0 ? '-' : diff_2 > 0 ? '+' : ' '), ABS(diff_2),
+	diff_bar);
+
+  last_counter = counter;
+}
+#endif
+
 void BackToFront()
 {
   if (redraw_mask == REDRAW_NONE)
@@ -512,6 +551,10 @@ void BackToFront()
 
   // force screen redraw in every frame to continue drawing global animations
   redraw_mask = REDRAW_ALL;
+
+#if DEBUG_FRAME_TIME
+  PrintFrameTimeDebugging();
+#endif
 }
 
 static void FadeCrossSaveBackbuffer()
