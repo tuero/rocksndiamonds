@@ -293,6 +293,9 @@ static void DrawMaskedBorderExt_Rect(int x, int y, int width, int height,
 {
   Bitmap *bitmap = getGlobalBorderBitmapFromGameStatus();
 
+  if (x == -1 && y == -1)
+    return;
+
   if (blit_to_screen)
     BlitToScreenMasked(bitmap, x, y, width, height, x, y);
   else
