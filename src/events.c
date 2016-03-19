@@ -161,7 +161,12 @@ void EventLoop(void)
   {
     if (PendingEvent())		/* got event */
     {
+      // use separate frame delay counter to not reset main delay counter
+      unsigned int sync_frame_delay2 = 0;
+      unsigned int sync_frame_delay_value2 = sync_frame_delay_value;
       Event event;
+
+      ResetDelayCounter(&sync_frame_delay2);
 
       while (NextValidEvent(&event))
       {
@@ -209,11 +214,13 @@ void EventLoop(void)
   	    break;
   	}
 
-	if (DelayReached(&sync_frame_delay, sync_frame_delay_value))
-	  BackToFront();
+	// do not handle events for longer than standard frame delay period
+	if (DelayReached(&sync_frame_delay2, sync_frame_delay_value2))
+	  break;
       }
     }
-    else
+
+    // always handle non-event game actions for every game frame interval
     {
       if (game_status == GAME_MODE_TITLE)
       {
