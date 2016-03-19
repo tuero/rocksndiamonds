@@ -152,124 +152,63 @@ boolean NextValidEvent(Event *event)
   return FALSE;
 }
 
-void EventLoop(void)
+void HandleEvents()
 {
-  static unsigned int sync_frame_delay = 0;
-  unsigned int sync_frame_delay_value = GAME_FRAME_DELAY;
+  Event event;
+  unsigned int event_frame_delay = 0;
+  unsigned int event_frame_delay_value = GAME_FRAME_DELAY;
 
-  while (1)
+  ResetDelayCounter(&event_frame_delay);
+
+  while (NextValidEvent(&event))
   {
-    if (PendingEvent())		/* got event */
+    switch (event.type)
     {
-      // use separate frame delay counter to not reset main delay counter
-      unsigned int sync_frame_delay2 = 0;
-      unsigned int sync_frame_delay_value2 = sync_frame_delay_value;
-      Event event;
+      case EVENT_BUTTONPRESS:
+      case EVENT_BUTTONRELEASE:
+	HandleButtonEvent((ButtonEvent *) &event);
+	break;
 
-      ResetDelayCounter(&sync_frame_delay2);
-
-      while (NextValidEvent(&event))
-      {
-  	switch (event.type)
-  	{
-  	  case EVENT_BUTTONPRESS:
-  	  case EVENT_BUTTONRELEASE:
-  	    HandleButtonEvent((ButtonEvent *) &event);
-  	    break;
-  
-  	  case EVENT_MOTIONNOTIFY:
-  	    HandleMotionEvent((MotionEvent *) &event);
-  	    break;
+      case EVENT_MOTIONNOTIFY:
+	HandleMotionEvent((MotionEvent *) &event);
+	break;
 
 #if defined(TARGET_SDL2)
-	  case SDL_WINDOWEVENT:
-  	    HandleWindowEvent((WindowEvent *) &event);
-  	    break;
+      case SDL_WINDOWEVENT:
+	HandleWindowEvent((WindowEvent *) &event);
+	break;
 
-  	  case EVENT_FINGERPRESS:
-  	  case EVENT_FINGERRELEASE:
-  	  case EVENT_FINGERMOTION:
-  	    HandleFingerEvent((FingerEvent *) &event);
-  	    break;
+      case EVENT_FINGERPRESS:
+      case EVENT_FINGERRELEASE:
+      case EVENT_FINGERMOTION:
+	HandleFingerEvent((FingerEvent *) &event);
+	break;
 
-	  case EVENT_TEXTINPUT:
-  	    HandleTextEvent((TextEvent *) &event);
-  	    break;
+      case EVENT_TEXTINPUT:
+	HandleTextEvent((TextEvent *) &event);
+	break;
 
-	  case SDL_APP_WILLENTERBACKGROUND:
-	  case SDL_APP_DIDENTERBACKGROUND:
-	  case SDL_APP_WILLENTERFOREGROUND:
-	  case SDL_APP_DIDENTERFOREGROUND:
-  	    HandlePauseResumeEvent((PauseResumeEvent *) &event);
-  	    break;
+      case SDL_APP_WILLENTERBACKGROUND:
+      case SDL_APP_DIDENTERBACKGROUND:
+      case SDL_APP_WILLENTERFOREGROUND:
+      case SDL_APP_DIDENTERFOREGROUND:
+	HandlePauseResumeEvent((PauseResumeEvent *) &event);
+	break;
 #endif
 
-  	  case EVENT_KEYPRESS:
-  	  case EVENT_KEYRELEASE:
-  	    HandleKeyEvent((KeyEvent *) &event);
-  	    break;
+      case EVENT_KEYPRESS:
+      case EVENT_KEYRELEASE:
+	HandleKeyEvent((KeyEvent *) &event);
+	break;
 
-  	  default:
-  	    HandleOtherEvents(&event);
-  	    break;
-  	}
-
-	// do not handle events for longer than standard frame delay period
-	if (DelayReached(&sync_frame_delay2, sync_frame_delay_value2))
-	  break;
-      }
+      default:
+	HandleOtherEvents(&event);
+	break;
     }
 
-    // always handle non-event game actions for every game frame interval
-    {
-      if (game_status == GAME_MODE_TITLE)
-      {
-	/* when showing title screens, hide mouse pointer (if not moved) */
-
-	if (gfx.cursor_mode != CURSOR_NONE &&
-	    DelayReached(&special_cursor_delay, special_cursor_delay_value))
-	{
-	  SetMouseCursor(CURSOR_NONE);
-	}
-      }
-      else if (game_status == GAME_MODE_PLAYING && (!tape.pausing ||
-						    tape.single_step))
-      {
-	/* when playing, display a special mouse pointer inside the playfield */
-
-	if (gfx.cursor_mode != CURSOR_PLAYFIELD &&
-	    cursor_inside_playfield &&
-	    DelayReached(&special_cursor_delay, special_cursor_delay_value))
-	{
-	  SetMouseCursor(CURSOR_PLAYFIELD);
-	}
-      }
-      else if (gfx.cursor_mode != CURSOR_DEFAULT)
-      {
-	SetMouseCursor(CURSOR_DEFAULT);
-      }
-
-      /* this is set after all pending events have been processed */
-      cursor_mode_last = gfx.cursor_mode;
-    }
-
-    /* also execute after pending events have been processed before */
-    HandleNoEvent();
-
-    /* don't use all CPU time when idle; the main loop while playing
-       has its own synchronization and is CPU friendly, too */
-
-    if (game_status == GAME_MODE_PLAYING)
-      HandleGameActions();
-
-    /* refresh window contents from drawing buffer, if needed */
-    BackToFront();
-
-    if (game_status != GAME_MODE_PLAYING)
-      WaitUntilDelayReached(&sync_frame_delay, sync_frame_delay_value);
-
-    if (game_status == GAME_MODE_QUIT)
-      return;
+    // do not handle events for longer than standard frame delay period
+    if (DelayReached(&event_frame_delay, event_frame_delay_value))
+      break;
   }
 }
 
@@ -312,6 +251,71 @@ void HandleOtherEvents(Event *event)
 
     default:
       break;
+  }
+}
+
+void HandleMouseCursor()
+{
+  if (game_status == GAME_MODE_TITLE)
+  {
+    /* when showing title screens, hide mouse pointer (if not moved) */
+
+    if (gfx.cursor_mode != CURSOR_NONE &&
+	DelayReached(&special_cursor_delay, special_cursor_delay_value))
+    {
+      SetMouseCursor(CURSOR_NONE);
+    }
+  }
+  else if (game_status == GAME_MODE_PLAYING && (!tape.pausing ||
+						tape.single_step))
+  {
+    /* when playing, display a special mouse pointer inside the playfield */
+
+    if (gfx.cursor_mode != CURSOR_PLAYFIELD &&
+	cursor_inside_playfield &&
+	DelayReached(&special_cursor_delay, special_cursor_delay_value))
+    {
+      SetMouseCursor(CURSOR_PLAYFIELD);
+    }
+  }
+  else if (gfx.cursor_mode != CURSOR_DEFAULT)
+  {
+    SetMouseCursor(CURSOR_DEFAULT);
+  }
+
+  /* this is set after all pending events have been processed */
+  cursor_mode_last = gfx.cursor_mode;
+}
+
+void EventLoop(void)
+{
+  unsigned int sync_frame_delay = 0;
+  unsigned int sync_frame_delay_value = GAME_FRAME_DELAY;
+
+  while (1)
+  {
+    if (PendingEvent())
+      HandleEvents();
+    else
+      HandleMouseCursor();
+
+    /* also execute after pending events have been processed before */
+    HandleNoEvent();
+
+    /* don't use all CPU time when idle; the main loop while playing
+       has its own synchronization and is CPU friendly, too */
+
+    if (game_status == GAME_MODE_PLAYING)
+      HandleGameActions();
+
+    /* refresh window contents from drawing buffer, if needed */
+    BackToFront();
+
+    if (game_status != GAME_MODE_PLAYING)
+      WaitUntilDelayReached(&sync_frame_delay, sync_frame_delay_value);
+
+    if (game_status == GAME_MODE_QUIT)
+      return;
   }
 }
 
