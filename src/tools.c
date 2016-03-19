@@ -550,7 +550,7 @@ void BackToFront()
   redraw_mask = REDRAW_NONE;
 
   // force screen redraw in every frame to continue drawing global animations
-  redraw_mask = REDRAW_ALL;
+  redraw_mask = REDRAW_FIELD;
 
 #if DEBUG_FRAME_TIME
   PrintFrameTimeDebugging();
