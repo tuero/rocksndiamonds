@@ -3097,10 +3097,10 @@ void InitGame()
   // required here to update video display before fading (FIX THIS)
   DrawMaskedBorder(REDRAW_DOOR_2);
 
-  SetGameStatus(GAME_MODE_PLAYING);
-
   if (!game.restart_level)
     CloseDoor(DOOR_CLOSE_1);
+
+  SetGameStatus(GAME_MODE_PLAYING);
 
   /* needed if different viewport properties defined for playing */
   ChangeViewportPropertiesIfNeeded();
@@ -3115,9 +3115,9 @@ void InitGame()
 
   FadeOut(fade_mask);
 
-  OpenDoor(GetDoorState() | DOOR_NO_DELAY | DOOR_FORCE_REDRAW);
-
   ClearField();
+
+  OpenDoor(GetDoorState() | DOOR_NO_DELAY | DOOR_FORCE_REDRAW);
 
   DrawCompleteVideoDisplay();
 

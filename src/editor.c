@@ -7625,8 +7625,6 @@ void DrawLevelEd()
 {
   int fade_mask = REDRAW_FIELD;
 
-  CloseDoor(DOOR_CLOSE_ALL);
-
   /* needed if different viewport properties defined for editor */
   ChangeViewportPropertiesIfNeeded();
 

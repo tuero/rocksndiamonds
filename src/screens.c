@@ -1394,6 +1394,8 @@ void DrawMainMenu()
   /* needed if last screen was the playing screen, invoked from level editor */
   if (level_editor_test_game)
   {
+    CloseDoor(DOOR_CLOSE_ALL);
+
     SetGameStatus(GAME_MODE_EDITOR);
 
     DrawLevelEd();
@@ -2155,8 +2157,6 @@ static void DrawInfoScreen_Main()
   FreeScreenGadgets();
   CreateScreenGadgets();
 
-  CloseDoor(DOOR_CLOSE_2);
-
   /* (needed after displaying title screens which disable auto repeat) */
   KeyboardAutoRepeatOn();
 
@@ -2166,9 +2166,9 @@ static void DrawInfoScreen_Main()
 
   ChangeViewportPropertiesIfNeeded();
 
-  OpenDoor(GetDoorState() | DOOR_NO_DELAY | DOOR_FORCE_REDRAW);
-
   ClearField();
+
+  OpenDoor(GetDoorState() | DOOR_NO_DELAY | DOOR_FORCE_REDRAW);
 
   DrawTextSCentered(mSY - SY + 16, FONT_TITLE_1, "Info Screen");
 
@@ -2190,11 +2190,6 @@ static void DrawInfoScreen_Main()
 
   PlayMenuSound();
   PlayMenuMusic();
-
-#if 1
-  // needed after returning from title screens with different window size
-  OpenDoor(GetDoorState() | DOOR_NO_DELAY | DOOR_FORCE_REDRAW);
-#endif
 
   DrawMaskedBorder(fade_mask);
 
@@ -3667,13 +3662,11 @@ static void DrawChooseTree(TreeInfo **ti_ptr)
   FreeScreenGadgets();
   CreateScreenGadgets();
 
-  CloseDoor(DOOR_CLOSE_2);
-
   FadeOut(fade_mask);
 
-  OpenDoor(GetDoorState() | DOOR_NO_DELAY | DOOR_FORCE_REDRAW);
-
   ClearField();
+
+  OpenDoor(GetDoorState() | DOOR_NO_DELAY | DOOR_FORCE_REDRAW);
 
   HandleChooseTree(0, 0, 0, 0, MB_MENU_INITIALIZE, ti_ptr);
   MapScreenTreeGadgets(*ti_ptr);
@@ -4152,9 +4145,6 @@ void HandleChooseLevelNr(int mx, int my, int dx, int dy, int button)
 void DrawHallOfFame(int highlight_position)
 {
   int fade_mask = REDRAW_FIELD;
-
-  /* required before door position may be changed in next step */
-  CloseDoor(DOOR_CLOSE_ALL);
 
   /* needed if different viewport properties defined for scores */
   ChangeViewportPropertiesIfNeeded();
@@ -5780,16 +5770,14 @@ static void DrawSetupScreen_Generic()
   FreeScreenGadgets();
   CreateScreenGadgets();
 
-  CloseDoor(DOOR_CLOSE_2);
-
   if (redraw_mask & REDRAW_ALL)
     redraw_all = TRUE;
 
   FadeOut(fade_mask);
 
-  OpenDoor(GetDoorState() | DOOR_NO_DELAY | DOOR_FORCE_REDRAW);
-
   ClearField();
+
+  OpenDoor(GetDoorState() | DOOR_NO_DELAY | DOOR_FORCE_REDRAW);
 
   if (setup_mode == SETUP_MODE_MAIN)
   {
