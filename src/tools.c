@@ -506,8 +506,14 @@ static void PrintFrameTimeDebugging()
 
 void BackToFront()
 {
+  static int last_redraw_mask = REDRAW_NONE;
+
+  // force screen redraw in every frame to continue drawing global animations
+  // (but always use the last redraw mask to prevent unwanted side effects)
   if (redraw_mask == REDRAW_NONE)
-    return;
+    redraw_mask = last_redraw_mask;
+
+  last_redraw_mask = redraw_mask;
 
 #if 1
   // masked border now drawn immediately when blitting backbuffer to window
@@ -551,9 +557,6 @@ void BackToFront()
   }
 
   redraw_mask = REDRAW_NONE;
-
-  // force screen redraw in every frame to continue drawing global animations
-  redraw_mask = REDRAW_FIELD;
 
 #if DEBUG_FRAME_TIME
   PrintFrameTimeDebugging();
