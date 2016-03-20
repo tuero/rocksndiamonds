@@ -4231,7 +4231,7 @@ unsigned int MoveDoor(unsigned int door_state)
     { DX, DY, DXSIZE, DYSIZE },
     { VX, VY, VXSIZE, VYSIZE }
   };
-  static int door1 = DOOR_OPEN_1;
+  static int door1 = DOOR_CLOSE_1;
   static int door2 = DOOR_CLOSE_2;
   unsigned int door_delay = 0;
   unsigned int door_delay_value;
