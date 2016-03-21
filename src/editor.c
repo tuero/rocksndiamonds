@@ -12265,7 +12265,26 @@ void RequestExitLevelEditor(boolean ask_if_level_has_changed,
       Request("Level has changed! Exit without saving?",
 	      REQ_ASK | REQ_STAY_OPEN))
   {
-    SetDoorState(DOOR_CLOSE_2);
+    struct RectWithBorder *vp_door_1 = &viewport.door_1[GAME_MODE_MAIN];
+    struct RectWithBorder *vp_door_2 = &viewport.door_2[GAME_MODE_MAIN];
+
+    /* draw normal door */
+    UndrawSpecialEditorDoor();
+
+    // close editor doors if viewport definition is the same as in main menu
+    if (vp_door_1->x      == DX     &&
+	vp_door_1->y      == DY     &&
+	vp_door_1->width  == DXSIZE &&
+	vp_door_1->height == DYSIZE &&
+	vp_door_2->x      == VX     &&
+	vp_door_2->y      == VY     &&
+	vp_door_2->width  == VXSIZE &&
+	vp_door_2->height == VYSIZE)
+      CloseDoor(DOOR_CLOSE_ALL | DOOR_NO_DELAY);
+    else
+      SetDoorState(DOOR_CLOSE_2);
+
+    BackToFront();
 
     if (quick_quit)
       FadeSkipNextFadeIn();

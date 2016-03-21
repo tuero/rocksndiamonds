@@ -1444,9 +1444,6 @@ void DrawMainMenu()
 
   FadeOut(fade_mask);
 
-  /* needed if last screen was the editor screen */
-  UndrawSpecialEditorDoor();
-
   SetDrawtoField(DRAW_BACKBUFFER);
 
   /* level_nr may have been set to value over handicap with level editor */
