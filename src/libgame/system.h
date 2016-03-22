@@ -811,6 +811,10 @@ struct GfxInfo
   Bitmap *background_bitmap;
   int background_bitmap_mask;
 
+  Bitmap *fade_bitmap_source;
+  Bitmap *fade_bitmap_target;
+  Bitmap *fade_bitmap_black;
+
 #if USE_FINAL_SCREEN_BITMAP
   Bitmap *final_screen_bitmap;
 #endif
