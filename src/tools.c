@@ -384,7 +384,8 @@ void DrawMaskedBorder(int redraw_mask)
 
 void DrawMaskedBorderToTarget(int draw_target)
 {
-  if (draw_target == DRAW_BORDER_TO_SCREEN)
+  if (draw_target == DRAW_BORDER_TO_BACKBUFFER ||
+      draw_target == DRAW_BORDER_TO_SCREEN)
   {
     DrawMaskedBorderExt(REDRAW_ALL, draw_target);
   }
@@ -397,7 +398,7 @@ void DrawMaskedBorderToTarget(int draw_target)
       global.border_status = gfx.fade_border_source_status;
       gfx.masked_border_bitmap_ptr = gfx.fade_bitmap_source;
     }
-    else
+    else if (draw_target == DRAW_BORDER_TO_FADE_TARGET)
     {
       global.border_status = gfx.fade_border_target_status;
       gfx.masked_border_bitmap_ptr = gfx.fade_bitmap_target;
