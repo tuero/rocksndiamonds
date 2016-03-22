@@ -291,15 +291,16 @@ void RedrawPlayfield()
 static void DrawMaskedBorderExt_Rect(int x, int y, int width, int height,
 				     int draw_target)
 {
-  Bitmap *bitmap = getGlobalBorderBitmapFromStatus(global.border_status);
+  Bitmap *src_bitmap = getGlobalBorderBitmapFromStatus(global.border_status);
+  Bitmap *dst_bitmap = gfx.masked_border_bitmap_ptr;
 
   if (x == -1 && y == -1)
     return;
 
   if (draw_target == DRAW_BORDER_TO_SCREEN)
-    BlitToScreenMasked(bitmap, x, y, width, height, x, y);
+    BlitToScreenMasked(src_bitmap, x, y, width, height, x, y);
   else
-    BlitBitmapMasked(bitmap, backbuffer, x, y, width, height, x, y);
+    BlitBitmapMasked(src_bitmap, dst_bitmap, x, y, width, height, x, y);
 }
 
 static void DrawMaskedBorderExt_FIELD(int draw_target)
@@ -381,7 +382,7 @@ void DrawMaskedBorder(int redraw_mask)
   DrawMaskedBorderExt(redraw_mask, DRAW_BORDER_TO_BACKBUFFER);
 }
 
-void DrawMaskedBorderToScreen(int draw_target)
+void DrawMaskedBorderToTarget(int draw_target)
 {
   DrawMaskedBorderExt(REDRAW_ALL, draw_target);
 }

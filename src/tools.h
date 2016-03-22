@@ -76,7 +76,7 @@ void DrawMaskedBorder_DOOR_2();
 void DrawMaskedBorder_DOOR_3();
 void DrawMaskedBorder_ALL();
 void DrawMaskedBorder(int);
-void DrawMaskedBorderToScreen(int);
+void DrawMaskedBorderToTarget(int);
 
 void SetDrawtoField(int);
 void RedrawPlayfield();

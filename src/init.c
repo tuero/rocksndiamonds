@@ -5323,7 +5323,9 @@ void InitGfx()
 
   InitGfxDrawBusyAnimFunction(DrawInitAnim);
   InitGfxDrawGlobalAnimFunction(DrawGlobalAnim);
-  InitGfxDrawGlobalBorderFunction(DrawMaskedBorderToScreen);
+  InitGfxDrawGlobalBorderFunction(DrawMaskedBorderToTarget);
+
+  gfx.masked_border_bitmap_ptr = backbuffer;
 
   /* use copy of busy animation to prevent change while reloading artwork */
   init_last = init;
