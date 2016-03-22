@@ -96,7 +96,7 @@ void FadeSetDisabled();
 void FadeSkipNextFadeIn();
 void FadeSkipNextFadeOut();
 
-Bitmap *getGlobalBorderBitmapFromGameStatus();
+Bitmap *getGlobalBorderBitmapFromStatus(int);
 
 void ClearField();
 void SetWindowBackgroundImageIfDefined(int);

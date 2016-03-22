@@ -291,7 +291,7 @@ void RedrawPlayfield()
 static void DrawMaskedBorderExt_Rect(int x, int y, int width, int height,
 				     int draw_target)
 {
-  Bitmap *bitmap = getGlobalBorderBitmapFromGameStatus();
+  Bitmap *bitmap = getGlobalBorderBitmapFromStatus(global.border_status);
 
   if (x == -1 && y == -1)
     return;
@@ -833,14 +833,14 @@ Bitmap *getGlobalBorderBitmap(int graphic)
   return getBitmapFromGraphicOrDefault(graphic, IMG_GLOBAL_BORDER);
 }
 
-Bitmap *getGlobalBorderBitmapFromGameStatus()
+Bitmap *getGlobalBorderBitmapFromStatus(int status)
 {
   int graphic =
-    (game_status == GAME_MODE_MAIN ||
-     game_status == GAME_MODE_PSEUDO_TYPENAME	? IMG_GLOBAL_BORDER_MAIN :
-     game_status == GAME_MODE_SCORES		? IMG_GLOBAL_BORDER_SCORES :
-     game_status == GAME_MODE_EDITOR		? IMG_GLOBAL_BORDER_EDITOR :
-     game_status == GAME_MODE_PLAYING		? IMG_GLOBAL_BORDER_PLAYING :
+    (status == GAME_MODE_MAIN ||
+     status == GAME_MODE_PSEUDO_TYPENAME	? IMG_GLOBAL_BORDER_MAIN :
+     status == GAME_MODE_SCORES			? IMG_GLOBAL_BORDER_SCORES :
+     status == GAME_MODE_EDITOR			? IMG_GLOBAL_BORDER_EDITOR :
+     status == GAME_MODE_PLAYING		? IMG_GLOBAL_BORDER_PLAYING :
      IMG_GLOBAL_BORDER);
 
   return getGlobalBorderBitmap(graphic);
@@ -941,7 +941,7 @@ boolean CheckIfGlobalBorderHasChanged()
     return FALSE;
 
   // determine and store new global border bitmap for current game status
-  global_border_bitmap = getGlobalBorderBitmapFromGameStatus();
+  global_border_bitmap = getGlobalBorderBitmapFromStatus(game_status);
 
   return (global_border_bitmap_last != global_border_bitmap);
 }
@@ -988,7 +988,7 @@ void RedrawGlobalBorderFromBitmap(Bitmap *bitmap)
 
 void RedrawGlobalBorder()
 {
-  Bitmap *bitmap = getGlobalBorderBitmapFromGameStatus();
+  Bitmap *bitmap = getGlobalBorderBitmapFromStatus(game_status);
 
   RedrawGlobalBorderFromBitmap(bitmap);
 
