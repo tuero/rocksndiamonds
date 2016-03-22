@@ -682,12 +682,11 @@ static void FadeExt(int fade_mask, int fade_mode, int fade_type)
   redraw_mask &= ~fade_mask;
 }
 
-static void SetAnimStatus_BeforeFadingOut()
+static void SetScreenStates_BeforeFadingIn()
 {
-  global.anim_status = GAME_MODE_PSEUDO_FADING;
 }
 
-static void SetAnimStatus_AfterFadingIn()
+static void SetScreenStates_AfterFadingIn()
 {
   global.anim_status = global.anim_status_next;
 
@@ -696,8 +695,20 @@ static void SetAnimStatus_AfterFadingIn()
   BackToFront();
 }
 
+static void SetScreenStates_BeforeFadingOut()
+{
+  global.anim_status = GAME_MODE_PSEUDO_FADING;
+}
+
+static void SetScreenStates_AfterFadingOut()
+{
+  global.border_status = game_status;
+}
+
 void FadeIn(int fade_mask)
 {
+  SetScreenStates_BeforeFadingIn();
+
 #if 1
   DrawMaskedBorder(REDRAW_ALL);
 #endif
@@ -712,12 +723,12 @@ void FadeIn(int fade_mask)
   FADE_SXSIZE = FULL_SXSIZE;
   FADE_SYSIZE = FULL_SYSIZE;
 
-  SetAnimStatus_AfterFadingIn();
+  SetScreenStates_AfterFadingIn();
 }
 
 void FadeOut(int fade_mask)
 {
-  SetAnimStatus_BeforeFadingOut();
+  SetScreenStates_BeforeFadingOut();
 
 #if 0
   DrawMaskedBorder(REDRAW_ALL);
@@ -728,7 +739,7 @@ void FadeOut(int fade_mask)
   else
     FadeExt(fade_mask, FADE_MODE_FADE_OUT, FADE_TYPE_FADE_OUT);
 
-  global.border_status = game_status;
+  SetScreenStates_AfterFadingOut();
 }
 
 static void FadeSetLeaveNext(struct TitleFadingInfo fading_leave, boolean set)
