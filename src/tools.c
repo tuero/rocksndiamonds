@@ -384,7 +384,30 @@ void DrawMaskedBorder(int redraw_mask)
 
 void DrawMaskedBorderToTarget(int draw_target)
 {
-  DrawMaskedBorderExt(REDRAW_ALL, draw_target);
+  if (draw_target == DRAW_BORDER_TO_SCREEN)
+  {
+    DrawMaskedBorderExt(REDRAW_ALL, draw_target);
+  }
+  else
+  {
+    int last_border_status = global.border_status;
+
+    if (draw_target == DRAW_BORDER_TO_FADE_SOURCE)
+    {
+      global.border_status = gfx.fade_border_source_status;
+      gfx.masked_border_bitmap_ptr = gfx.fade_bitmap_source;
+    }
+    else
+    {
+      global.border_status = gfx.fade_border_target_status;
+      gfx.masked_border_bitmap_ptr = gfx.fade_bitmap_target;
+    }
+
+    DrawMaskedBorderExt(REDRAW_ALL, draw_target);
+
+    global.border_status = last_border_status;
+    gfx.masked_border_bitmap_ptr = backbuffer;
+  }
 }
 
 void BlitScreenToBitmap_RND(Bitmap *target_bitmap)
@@ -689,6 +712,9 @@ static void SetScreenStates_BeforeFadingIn()
 
 static void SetScreenStates_AfterFadingIn()
 {
+  // store new source screen (to use correct masked border for fading)
+  gfx.fade_border_source_status = global.border_status;
+
   global.anim_status = global.anim_status_next;
 
   // force update of global animation status in case of rapid screen changes
@@ -698,6 +724,9 @@ static void SetScreenStates_AfterFadingIn()
 
 static void SetScreenStates_BeforeFadingOut()
 {
+  // store new target screen (to use correct masked border for fading)
+  gfx.fade_border_target_status = game_status;
+
   global.anim_status = GAME_MODE_PSEUDO_FADING;
 }
 

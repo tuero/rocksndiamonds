@@ -172,6 +172,8 @@
 /* values for drawing target for global border */
 #define DRAW_BORDER_TO_BACKBUFFER	0
 #define DRAW_BORDER_TO_SCREEN		1
+#define DRAW_BORDER_TO_FADE_SOURCE	2
+#define DRAW_BORDER_TO_FADE_TARGET	3
 
 /* values for move directions and special "button" key bitmasks */
 #define MV_NONE			0
@@ -819,6 +821,8 @@ struct GfxInfo
   Bitmap *fade_bitmap_target;
   Bitmap *fade_bitmap_black;
 
+  int fade_border_source_status;
+  int fade_border_target_status;
   Bitmap *masked_border_bitmap_ptr;
 
 #if USE_FINAL_SCREEN_BITMAP

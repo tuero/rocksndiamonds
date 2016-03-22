@@ -5325,6 +5325,8 @@ void InitGfx()
   InitGfxDrawGlobalAnimFunction(DrawGlobalAnim);
   InitGfxDrawGlobalBorderFunction(DrawMaskedBorderToTarget);
 
+  gfx.fade_border_source_status = global.border_status;
+  gfx.fade_border_target_status = global.border_status;
   gfx.masked_border_bitmap_ptr = backbuffer;
 
   /* use copy of busy animation to prevent change while reloading artwork */
