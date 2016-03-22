@@ -169,6 +169,10 @@
 #define DRAW_GLOBAL_ANIM_STAGE_1	1
 #define DRAW_GLOBAL_ANIM_STAGE_2	2
 
+/* values for drawing target for global border */
+#define DRAW_BORDER_TO_BACKBUFFER	0
+#define DRAW_BORDER_TO_SCREEN		1
+
 /* values for move directions and special "button" key bitmasks */
 #define MV_NONE			0
 #define MV_LEFT			(1 << MV_BIT_LEFT)

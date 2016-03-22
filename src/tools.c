@@ -289,65 +289,67 @@ void RedrawPlayfield()
 }
 
 static void DrawMaskedBorderExt_Rect(int x, int y, int width, int height,
-				     boolean blit_to_screen)
+				     int draw_target)
 {
   Bitmap *bitmap = getGlobalBorderBitmapFromGameStatus();
 
   if (x == -1 && y == -1)
     return;
 
-  if (blit_to_screen)
+  if (draw_target == DRAW_BORDER_TO_SCREEN)
     BlitToScreenMasked(bitmap, x, y, width, height, x, y);
   else
     BlitBitmapMasked(bitmap, backbuffer, x, y, width, height, x, y);
 }
 
-static void DrawMaskedBorderExt_FIELD(boolean blit_to_screen)
+static void DrawMaskedBorderExt_FIELD(int draw_target)
 {
   if (global.border_status >= GAME_MODE_TITLE &&
       global.border_status <= GAME_MODE_PLAYING &&
       border.draw_masked[global.border_status])
     DrawMaskedBorderExt_Rect(REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE,
-			     blit_to_screen);
+			     draw_target);
 }
 
-static void DrawMaskedBorderExt_DOOR_1(boolean blit_to_screen)
+static void DrawMaskedBorderExt_DOOR_1(int draw_target)
 {
-  // only draw border over closed doors when drawing to backbuffer
-  if (!blit_to_screen && (GetDoorState() & DOOR_OPEN_1))
+  // when drawing to backbuffer, never draw border over open doors
+  if (draw_target == DRAW_BORDER_TO_BACKBUFFER &&
+      (GetDoorState() & DOOR_OPEN_1))
     return;
 
   if (border.draw_masked[GFX_SPECIAL_ARG_DOOR] &&
       (global.border_status != GAME_MODE_EDITOR ||
        border.draw_masked[GFX_SPECIAL_ARG_EDITOR]))
-    DrawMaskedBorderExt_Rect(DX, DY, DXSIZE, DYSIZE, blit_to_screen);
+    DrawMaskedBorderExt_Rect(DX, DY, DXSIZE, DYSIZE, draw_target);
 }
 
-static void DrawMaskedBorderExt_DOOR_2(boolean blit_to_screen)
+static void DrawMaskedBorderExt_DOOR_2(int draw_target)
 {
-  // only draw border over closed doors when drawing to backbuffer
-  if (!blit_to_screen && (GetDoorState() & DOOR_OPEN_2))
+  // when drawing to backbuffer, never draw border over open doors
+  if (draw_target == DRAW_BORDER_TO_BACKBUFFER &&
+      (GetDoorState() & DOOR_OPEN_2))
     return;
 
   if (border.draw_masked[GFX_SPECIAL_ARG_DOOR] &&
       global.border_status != GAME_MODE_EDITOR)
-    DrawMaskedBorderExt_Rect(VX, VY, VXSIZE, VYSIZE, blit_to_screen);
+    DrawMaskedBorderExt_Rect(VX, VY, VXSIZE, VYSIZE, draw_target);
 }
 
-static void DrawMaskedBorderExt_DOOR_3(boolean blit_to_screen)
+static void DrawMaskedBorderExt_DOOR_3(int draw_target)
 {
   /* currently not available */
 }
 
-static void DrawMaskedBorderExt_ALL(boolean blit_to_screen)
+static void DrawMaskedBorderExt_ALL(int draw_target)
 {
-  DrawMaskedBorderExt_FIELD(blit_to_screen);
-  DrawMaskedBorderExt_DOOR_1(blit_to_screen);
-  DrawMaskedBorderExt_DOOR_2(blit_to_screen);
-  DrawMaskedBorderExt_DOOR_3(blit_to_screen);
+  DrawMaskedBorderExt_FIELD(draw_target);
+  DrawMaskedBorderExt_DOOR_1(draw_target);
+  DrawMaskedBorderExt_DOOR_2(draw_target);
+  DrawMaskedBorderExt_DOOR_3(draw_target);
 }
 
-static void DrawMaskedBorderExt(int redraw_mask, boolean blit_to_screen)
+static void DrawMaskedBorderExt(int redraw_mask, int draw_target)
 {
   /* never draw masked screen borders on borderless screens */
   if (game_status == GAME_MODE_LOADING ||
@@ -355,33 +357,33 @@ static void DrawMaskedBorderExt(int redraw_mask, boolean blit_to_screen)
     return;
 
   if (redraw_mask & REDRAW_ALL)
-    DrawMaskedBorderExt_ALL(blit_to_screen);
+    DrawMaskedBorderExt_ALL(draw_target);
   else
   {
     if (redraw_mask & REDRAW_FIELD)
-      DrawMaskedBorderExt_FIELD(blit_to_screen);
+      DrawMaskedBorderExt_FIELD(draw_target);
     if (redraw_mask & REDRAW_DOOR_1)
-      DrawMaskedBorderExt_DOOR_1(blit_to_screen);
+      DrawMaskedBorderExt_DOOR_1(draw_target);
     if (redraw_mask & REDRAW_DOOR_2)
-      DrawMaskedBorderExt_DOOR_2(blit_to_screen);
+      DrawMaskedBorderExt_DOOR_2(draw_target);
     if (redraw_mask & REDRAW_DOOR_3)
-      DrawMaskedBorderExt_DOOR_3(blit_to_screen);
+      DrawMaskedBorderExt_DOOR_3(draw_target);
   }
 }
 
 void DrawMaskedBorder_FIELD()
 {
-  DrawMaskedBorderExt_FIELD(FALSE);
+  DrawMaskedBorderExt_FIELD(DRAW_BORDER_TO_BACKBUFFER);
 }
 
 void DrawMaskedBorder(int redraw_mask)
 {
-  DrawMaskedBorderExt(redraw_mask, FALSE);
+  DrawMaskedBorderExt(redraw_mask, DRAW_BORDER_TO_BACKBUFFER);
 }
 
-void DrawMaskedBorderToScreen(int redraw_mask)
+void DrawMaskedBorderToScreen(int draw_target)
 {
-  DrawMaskedBorderExt(redraw_mask, TRUE);
+  DrawMaskedBorderExt(REDRAW_ALL, draw_target);
 }
 
 void BlitScreenToBitmap_RND(Bitmap *target_bitmap)

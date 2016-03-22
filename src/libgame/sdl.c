@@ -95,7 +95,7 @@ static void UpdateScreen(SDL_Rect *rect)
 
     // copy global masked border to render target buffer, if defined
     if (gfx.draw_global_border_function != NULL)
-      gfx.draw_global_border_function(REDRAW_ALL);
+      gfx.draw_global_border_function(DRAW_BORDER_TO_SCREEN);
 
     // copy global animations to render target buffer, if defined (above border)
     if (gfx.draw_global_anim_function != NULL)
@@ -140,7 +140,7 @@ static void UpdateScreen(SDL_Rect *rect)
 
   // copy global masked border to render target buffer, if defined
   if (gfx.draw_global_border_function != NULL)
-    gfx.draw_global_border_function(REDRAW_ALL);
+    gfx.draw_global_border_function(DRAW_BORDER_TO_SCREEN);
 
   // copy global animations to render target buffer, if defined (above border)
   if (gfx.draw_global_anim_function != NULL)
