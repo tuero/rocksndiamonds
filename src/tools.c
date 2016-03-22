@@ -305,7 +305,7 @@ static void DrawMaskedBorderExt_Rect(int x, int y, int width, int height,
 
 static void DrawMaskedBorderExt_FIELD(int draw_target)
 {
-  if (global.border_status >= GAME_MODE_TITLE &&
+  if (global.border_status >= GAME_MODE_MAIN &&
       global.border_status <= GAME_MODE_PLAYING &&
       border.draw_masked[global.border_status])
     DrawMaskedBorderExt_Rect(REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE,
@@ -353,8 +353,8 @@ static void DrawMaskedBorderExt_ALL(int draw_target)
 static void DrawMaskedBorderExt(int redraw_mask, int draw_target)
 {
   /* never draw masked screen borders on borderless screens */
-  if (game_status == GAME_MODE_LOADING ||
-      game_status == GAME_MODE_TITLE)
+  if (global.border_status == GAME_MODE_LOADING ||
+      global.border_status == GAME_MODE_TITLE)
     return;
 
   if (redraw_mask & REDRAW_ALL)

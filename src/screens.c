@@ -1581,9 +1581,9 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
       }
 
       FadeSoundsAndMusic();
-
-      FadeOut(REDRAW_ALL);
     }
+
+    FadeOut(REDRAW_ALL);
 
     /* only required to update logic for redrawing global border */
     ClearField();
