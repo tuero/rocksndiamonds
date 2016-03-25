@@ -160,6 +160,38 @@ static int getGlobalAnimationPart(struct GlobalAnimMainControlInfo *anim)
   return part_nr;
 }
 
+static int compareGlobalAnimPartControlInfo(const void *obj1, const void *obj2)
+{
+  const struct GlobalAnimPartControlInfo *o1 =
+    (struct GlobalAnimPartControlInfo *)obj1;
+  const struct GlobalAnimPartControlInfo *o2 =
+    (struct GlobalAnimPartControlInfo *)obj2;
+  int compare_result;
+
+  if (o1->control_info.draw_order != o2->control_info.draw_order)
+    compare_result = o1->control_info.draw_order - o2->control_info.draw_order;
+  else
+    compare_result = o1->nr - o2->nr;
+
+  return compare_result;
+}
+
+static int compareGlobalAnimMainControlInfo(const void *obj1, const void *obj2)
+{
+  const struct GlobalAnimMainControlInfo *o1 =
+    (struct GlobalAnimMainControlInfo *)obj1;
+  const struct GlobalAnimMainControlInfo *o2 =
+    (struct GlobalAnimMainControlInfo *)obj2;
+  int compare_result;
+
+  if (o1->control_info.draw_order != o2->control_info.draw_order)
+    compare_result = o1->control_info.draw_order - o2->control_info.draw_order;
+  else
+    compare_result = o1->nr - o2->nr;
+
+  return compare_result;
+}
+
 static void PrepareBackbuffer()
 {
   if (game_status != GAME_MODE_PLAYING)
@@ -381,6 +413,27 @@ void InitGlobalAnimControls()
   }
 
   InitToonControls();
+
+  /* sort all animations according to draw_order and animation number */
+  for (m = 0; m < NUM_GAME_MODES; m++)
+  {
+    struct GlobalAnimControlInfo *ctrl = &global_anim_ctrl[m];
+
+    /* sort all main animations for this game mode */
+    qsort(ctrl->anim, ctrl->num_anims,
+	  sizeof(struct GlobalAnimMainControlInfo),
+	  compareGlobalAnimMainControlInfo);
+
+    for (a = 0; a < ctrl->num_anims; a++)
+    {
+      struct GlobalAnimMainControlInfo *anim = &ctrl->anim[a];
+
+      /* sort all animation parts for this main animation */
+      qsort(anim->part, anim->num_parts,
+	    sizeof(struct GlobalAnimPartControlInfo),
+	    compareGlobalAnimPartControlInfo);
+    }
+  }
 
   for (i = 0; i < NUM_GAME_MODES; i++)
     game_mode_anim_classes[i] = ANIM_CLASS_NONE;

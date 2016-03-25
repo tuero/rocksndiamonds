@@ -1136,6 +1136,7 @@ static void set_graphic_parameters_ext(int graphic, int *parameter,
   g->anim_delay_random = 0;
   g->post_delay_fixed = 0;
   g->post_delay_random = 0;
+  g->draw_order = 0;
   g->fade_mode = FADE_MODE_DEFAULT;
   g->fade_delay = -1;
   g->post_delay = -1;
@@ -1369,7 +1370,8 @@ static void set_graphic_parameters_ext(int graphic, int *parameter,
   g->draw_masked = parameter[GFX_ARG_DRAW_MASKED];
 
   /* used for toon animations and global animations */
-  g->draw_order = parameter[GFX_ARG_DRAW_ORDER];
+  if (parameter[GFX_ARG_DRAW_ORDER] != ARG_UNDEFINED_VALUE)
+    g->draw_order = parameter[GFX_ARG_DRAW_ORDER];
 
   /* optional graphic for cloning all graphics settings */
   if (parameter[GFX_ARG_CLONE_FROM] != ARG_UNDEFINED_VALUE)
