@@ -709,7 +709,6 @@ struct ProgramInfo
 
 struct OptionInfo
 {
-  char *display_name;
   char *server_host;
   int server_port;
 

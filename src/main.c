@@ -5605,7 +5605,6 @@ static void print_usage()
 	"Usage: %s [OPTION]... [HOSTNAME [PORT]]\n"
 	"\n"
 	"Options:\n"
-	"  -d, --display HOSTNAME[:SCREEN]  specify X server display\n"
 	"  -b, --basepath DIRECTORY         alternative base DIRECTORY\n"
 	"  -l, --level DIRECTORY            alternative level DIRECTORY\n"
 	"  -g, --graphics DIRECTORY         alternative graphics DIRECTORY\n"

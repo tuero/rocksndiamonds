@@ -939,7 +939,6 @@ void GetOptions(int argc, char *argv[],
     rw_base_path = getProgramMainDataPath();
 
   /* initialize global program options */
-  options.display_name = NULL;
   options.server_host = NULL;
   options.server_port = 0;
 
@@ -1009,15 +1008,6 @@ void GetOptions(int argc, char *argv[],
       print_usage_function();
 
       exit(0);
-    }
-    else if (strncmp(option, "-display", option_len) == 0)
-    {
-      if (option_arg == NULL)
-	Error(ERR_EXIT_HELP, "option '%s' requires an argument", option_str);
-
-      options.display_name = option_arg;
-      if (option_arg == next_option)
-	options_left++;
     }
     else if (strncmp(option, "-basepath", option_len) == 0)
     {
