@@ -36,8 +36,6 @@ static SDL_Texture *sdl_texture_target = NULL;
 static SDL_Texture *sdl_texture = NULL;
 #endif
 static boolean fullscreen_enabled = FALSE;
-
-#define USE_RENDERER	TRUE
 #endif
 
 /* stuff needed to work around SDL/Windows fullscreen drawing bug */
@@ -125,7 +123,6 @@ static void UpdateScreen(SDL_Rect *rect)
 #endif
 
 #if defined(TARGET_SDL2)
-#if USE_RENDERER
   if (rect)
   {
     int bytes_x = screen->pitch / video.width;
@@ -178,14 +175,6 @@ static void UpdateScreen(SDL_Rect *rect)
 
   // show render target buffer on screen
   SDL_RenderPresent(sdl_renderer);
-
-#else
-
-  if (rect)
-    SDL_UpdateWindowSurfaceRects(sdl_window, rect, 1);
-  else
-    SDL_UpdateWindowSurface(sdl_window);
-#endif
 
 #else	// TARGET_SDL
   if (rect)
@@ -662,7 +651,6 @@ static SDL_Surface *SDLCreateScreen(DrawBuffer **backbuffer,
   // store if initial screen mode is fullscreen mode when changing screen size
   video.fullscreen_initial = fullscreen;
 
-#if USE_RENDERER
   float window_scaling_factor = (float)setup.window_scaling_percent / 100;
 #if !USE_DESKTOP_FULLSCREEN
   float screen_scaling_factor = (fullscreen ? 1 : window_scaling_factor);
@@ -790,21 +778,6 @@ static SDL_Surface *SDLCreateScreen(DrawBuffer **backbuffer,
   {
     Error(ERR_WARN, "SDL_CreateWindow() failed: %s", SDL_GetError());
   }
-
-#else
-
-  if (sdl_window)
-    SDL_DestroyWindow(sdl_window);
-
-  sdl_window = SDL_CreateWindow(program.window_title,
-				SDL_WINDOWPOS_CENTERED,
-				SDL_WINDOWPOS_CENTERED,
-				width, height,
-				surface_flags);
-
-  if (sdl_window != NULL)
-    new_surface = SDL_GetWindowSurface(sdl_window);
-#endif
 
 #else
   new_surface = SDL_SetVideoMode(width, height, video.depth, surface_flags);
@@ -1142,7 +1115,6 @@ void SDLBlitTexture(Bitmap *bitmap,
 		    int dst_x, int dst_y, int mask_mode)
 {
 #if defined(TARGET_SDL2)
-#if USE_RENDERER
   SDL_Texture *texture;
   SDL_Rect src_rect;
   SDL_Rect dst_rect;
@@ -1164,7 +1136,6 @@ void SDLBlitTexture(Bitmap *bitmap,
   dst_rect.h = height;
 
   SDL_RenderCopy(sdl_renderer, texture, &src_rect, &dst_rect);
-#endif
 #endif
 }
 
