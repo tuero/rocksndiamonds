@@ -41,8 +41,6 @@
 #define SND_UNDEFINED			(-1)
 #define MUS_UNDEFINED			(-1)
 
-#define DEFAULT_FULLSCREEN_MODE		"800x600"
-
 #define WIN_XSIZE_DEFAULT		672
 #define WIN_YSIZE_DEFAULT		560
 

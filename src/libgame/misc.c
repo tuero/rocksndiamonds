@@ -2748,48 +2748,6 @@ int get_parameter_value(char *value_raw, char *suffix, int type)
   return result;
 }
 
-struct ScreenModeInfo *get_screen_mode_from_string(char *screen_mode_string)
-{
-  static struct ScreenModeInfo screen_mode;
-  char *screen_mode_string_x = strchr(screen_mode_string, 'x');
-  char *screen_mode_string_copy;
-  char *screen_mode_string_pos_w;
-  char *screen_mode_string_pos_h;
-
-  if (screen_mode_string_x == NULL)	/* invalid screen mode format */
-    return NULL;
-
-  screen_mode_string_copy = getStringCopy(screen_mode_string);
-
-  screen_mode_string_pos_w = screen_mode_string_copy;
-  screen_mode_string_pos_h = strchr(screen_mode_string_copy, 'x');
-  *screen_mode_string_pos_h++ = '\0';
-
-  screen_mode.width  = atoi(screen_mode_string_pos_w);
-  screen_mode.height = atoi(screen_mode_string_pos_h);
-
-  return &screen_mode;
-}
-
-void get_aspect_ratio_from_screen_mode(struct ScreenModeInfo *screen_mode,
-				       int *x, int *y)
-{
-  float aspect_ratio = (float)screen_mode->width / (float)screen_mode->height;
-  float aspect_ratio_new;
-  int i = 1;
-
-  do
-  {
-    *x = i * aspect_ratio + 0.000001;
-    *y = i;
-
-    aspect_ratio_new = (float)*x / (float)*y;
-
-    i++;
-  }
-  while (aspect_ratio_new != aspect_ratio && *y < screen_mode->height);
-}
-
 static void FreeCustomArtworkList(struct ArtworkListInfo *,
 				  struct ListNodeInfo ***, int *);
 

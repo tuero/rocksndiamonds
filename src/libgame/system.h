@@ -730,11 +730,6 @@ struct OptionInfo
   boolean debug;
 };
 
-struct ScreenModeInfo
-{
-  int width, height;
-};
-
 struct VideoSystemInfo
 {
   int default_depth;
@@ -744,8 +739,6 @@ struct VideoSystemInfo
   boolean fullscreen_available;
   boolean fullscreen_enabled;
   boolean fullscreen_initial;
-  struct ScreenModeInfo *fullscreen_modes;
-  char *fullscreen_mode_current;
 
   boolean window_scaling_available;
   int window_scaling_percent;
@@ -1011,7 +1004,6 @@ struct SetupInfo
   boolean skip_levels;
   boolean time_limit;
   boolean fullscreen;
-  char *fullscreen_mode;
   int window_scaling_percent;
   char *window_scaling_quality;
   boolean ask_on_escape;

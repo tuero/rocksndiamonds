@@ -61,20 +61,19 @@
 #define SETUP_MODE_CHOOSE_GAME_SPEED	16
 #define SETUP_MODE_CHOOSE_SCROLL_DELAY	17
 #define SETUP_MODE_CHOOSE_SNAPSHOT_MODE	18
-#define SETUP_MODE_CHOOSE_SCREEN_MODE	19
-#define SETUP_MODE_CHOOSE_WINDOW_SIZE	20
-#define SETUP_MODE_CHOOSE_SCALING_TYPE	21
-#define SETUP_MODE_CHOOSE_GRAPHICS	22
-#define SETUP_MODE_CHOOSE_SOUNDS	23
-#define SETUP_MODE_CHOOSE_MUSIC		24
-#define SETUP_MODE_CHOOSE_VOLUME_SIMPLE	25
-#define SETUP_MODE_CHOOSE_VOLUME_LOOPS	26
-#define SETUP_MODE_CHOOSE_VOLUME_MUSIC	27
-#define SETUP_MODE_CHOOSE_TOUCH_CONTROL	28
-#define SETUP_MODE_CHOOSE_MOVE_DISTANCE	29
-#define SETUP_MODE_CHOOSE_DROP_DISTANCE	30
+#define SETUP_MODE_CHOOSE_WINDOW_SIZE	19
+#define SETUP_MODE_CHOOSE_SCALING_TYPE	20
+#define SETUP_MODE_CHOOSE_GRAPHICS	21
+#define SETUP_MODE_CHOOSE_SOUNDS	22
+#define SETUP_MODE_CHOOSE_MUSIC		23
+#define SETUP_MODE_CHOOSE_VOLUME_SIMPLE	24
+#define SETUP_MODE_CHOOSE_VOLUME_LOOPS	25
+#define SETUP_MODE_CHOOSE_VOLUME_MUSIC	26
+#define SETUP_MODE_CHOOSE_TOUCH_CONTROL	27
+#define SETUP_MODE_CHOOSE_MOVE_DISTANCE	28
+#define SETUP_MODE_CHOOSE_DROP_DISTANCE	29
 
-#define MAX_SETUP_MODES			31
+#define MAX_SETUP_MODES			30
 
 #define MAX_MENU_MODES			MAX(MAX_INFO_MODES, MAX_SETUP_MODES)
 
@@ -195,9 +194,6 @@ static struct GadgetInfo *screen_gadget[NUM_SCREEN_GADGETS];
 
 static int info_mode = INFO_MODE_MAIN;
 static int setup_mode = SETUP_MODE_MAIN;
-
-static TreeInfo *screen_modes = NULL;
-static TreeInfo *screen_mode_current = NULL;
 
 static TreeInfo *window_sizes = NULL;
 static TreeInfo *window_size_current = NULL;
@@ -2091,7 +2087,6 @@ static void DrawCursorAndText_Setup(int screen_pos, int menu_info_pos_raw,
   DrawCursorAndText_Menu_Ext(setup_info, screen_pos, menu_info_pos_raw, active);
 }
 
-static char *screen_mode_text;
 static char *window_size_text;
 static char *scaling_type_text;
 
@@ -2118,7 +2113,6 @@ static void drawMenuInfoList(int first_entry, int num_page_entries,
 	(value_ptr == &setup.sound_loops  && !audio.loops_available) ||
 	(value_ptr == &setup.sound_music  && !audio.music_available) ||
 	(value_ptr == &setup.fullscreen   && !video.fullscreen_available) ||
-	(value_ptr == &screen_mode_text   && !video.fullscreen_available) ||
 	(value_ptr == &window_size_text   && !video.window_scaling_available) ||
 	(value_ptr == &scaling_type_text  && !video.window_scaling_available))
       si->type |= TYPE_GHOSTED;
@@ -3832,8 +3826,7 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
 	  setup_mode == SETUP_MODE_CHOOSE_SCROLL_DELAY ||
 	  setup_mode == SETUP_MODE_CHOOSE_SNAPSHOT_MODE)
 	execSetupGame();
-      else if (setup_mode == SETUP_MODE_CHOOSE_SCREEN_MODE ||
-	       setup_mode == SETUP_MODE_CHOOSE_WINDOW_SIZE ||
+      else if (setup_mode == SETUP_MODE_CHOOSE_WINDOW_SIZE ||
 	       setup_mode == SETUP_MODE_CHOOSE_SCALING_TYPE)
 	execSetupGraphics();
       else if (setup_mode == SETUP_MODE_CHOOSE_VOLUME_SIMPLE ||
@@ -4030,8 +4023,7 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
 	      setup_mode == SETUP_MODE_CHOOSE_SCROLL_DELAY ||
 	      setup_mode == SETUP_MODE_CHOOSE_SNAPSHOT_MODE)
 	    execSetupGame();
-	  else if (setup_mode == SETUP_MODE_CHOOSE_SCREEN_MODE ||
-		   setup_mode == SETUP_MODE_CHOOSE_WINDOW_SIZE ||
+	  else if (setup_mode == SETUP_MODE_CHOOSE_WINDOW_SIZE ||
 		   setup_mode == SETUP_MODE_CHOOSE_SCALING_TYPE)
 	    execSetupGraphics();
 	  else if (setup_mode == SETUP_MODE_CHOOSE_VOLUME_SIMPLE ||
@@ -4295,7 +4287,6 @@ static struct TokenInfo *setup_info;
 static int num_setup_info;	/* number of setup entries shown on screen */
 static int max_setup_info;	/* total number of setup entries in list */
 
-static char *screen_mode_text;
 static char *window_size_text;
 static char *scaling_type_text;
 static char *scroll_delay_text;
@@ -4642,67 +4633,6 @@ static void execSetupGraphics_setScalingTypes()
   scaling_type_text = scaling_type_current->name;
 }
 
-static void execSetupGraphics_setScreenModes()
-{
-  // if (screen_modes == NULL && video.fullscreen_available)
-  if (screen_modes == NULL && video.fullscreen_modes != NULL)
-  {
-    int i;
-
-    for (i = 0; video.fullscreen_modes[i].width != -1; i++)
-    {
-      TreeInfo *ti = newTreeInfo_setDefaults(TREE_TYPE_UNDEFINED);
-      char identifier[32], name[32];
-      int x = video.fullscreen_modes[i].width;
-      int y = video.fullscreen_modes[i].height;
-      int xx, yy;
-
-      get_aspect_ratio_from_screen_mode(&video.fullscreen_modes[i], &xx, &yy);
-
-      ti->node_top = &screen_modes;
-      ti->sort_priority = x * 10000 + y;
-
-      sprintf(identifier, "%dx%d", x, y);
-      sprintf(name, "%d x %d [%d:%d]", x, y, xx, yy);
-
-      setString(&ti->identifier, identifier);
-      setString(&ti->name, name);
-      setString(&ti->name_sorting, name);
-      setString(&ti->infotext, "Fullscreen Mode");
-
-      pushTreeInfo(&screen_modes, ti);
-    }
-
-    /* sort fullscreen modes to start with lowest available screen resolution */
-    sortTreeInfo(&screen_modes);
-
-    /* set current screen mode for fullscreen mode to configured setup value */
-    screen_mode_current = getTreeInfoFromIdentifier(screen_modes,
-						    setup.fullscreen_mode);
-
-    /* if that fails, set current screen mode to reliable default value */
-    if (screen_mode_current == NULL)
-      screen_mode_current = getTreeInfoFromIdentifier(screen_modes,
-						      DEFAULT_FULLSCREEN_MODE);
-
-    /* if that also fails, set current screen mode to first available mode */
-    if (screen_mode_current == NULL)
-      screen_mode_current = screen_modes;
-
-    if (screen_mode_current == NULL)
-      video.fullscreen_available = FALSE;
-  }
-
-  // if (video.fullscreen_available)
-  if (screen_mode_current != NULL)
-  {
-    setup.fullscreen_mode = screen_mode_current->identifier;
-
-    /* needed for displaying screen mode name instead of identifier */
-    screen_mode_text = screen_mode_current->name;
-  }
-}
-
 static void execSetupGraphics()
 {
   if (setup_mode == SETUP_MODE_CHOOSE_WINDOW_SIZE)
@@ -4717,7 +4647,6 @@ static void execSetupGraphics()
   }
 
   execSetupGraphics_setScalingTypes();
-  execSetupGraphics_setScreenModes();
 
   setup_mode = SETUP_MODE_GRAPHICS;
 
@@ -4733,8 +4662,7 @@ static void execSetupGraphics()
 #endif
 }
 
-#if !defined(PLATFORM_ANDROID)
-#if defined(TARGET_SDL2)
+#if defined(TARGET_SDL2) && !defined(PLATFORM_ANDROID)
 static void execSetupChooseWindowSize()
 {
   setup_mode = SETUP_MODE_CHOOSE_WINDOW_SIZE;
@@ -4748,17 +4676,6 @@ static void execSetupChooseScalingType()
 
   DrawSetupScreen();
 }
-#else
-static void execSetupChooseScreenMode()
-{
-  if (!video.fullscreen_available)
-    return;
-
-  setup_mode = SETUP_MODE_CHOOSE_SCREEN_MODE;
-
-  DrawSetupScreen();
-}
-#endif
 #endif
 
 static void execSetupChooseVolumeSimple()
@@ -5357,17 +5274,12 @@ static struct TokenInfo setup_info_editor[] =
 
 static struct TokenInfo setup_info_graphics[] =
 {
-#if !defined(PLATFORM_ANDROID)
+#if defined(TARGET_SDL2) && !defined(PLATFORM_ANDROID)
   { TYPE_SWITCH,	&setup.fullscreen,	"Fullscreen:"		},
-#if defined(TARGET_SDL2)
   { TYPE_ENTER_LIST,	execSetupChooseWindowSize, "Window Scaling:"	},
   { TYPE_STRING,	&window_size_text,	""			},
   { TYPE_ENTER_LIST,	execSetupChooseScalingType, "Anti-Aliasing:"	},
   { TYPE_STRING,	&scaling_type_text,	""			},
-#else
-  { TYPE_ENTER_LIST,	execSetupChooseScreenMode, "Fullscreen Mode:"	},
-  { TYPE_STRING,	&screen_mode_text,	""			},
-#endif
 #endif
 #if 0
   { TYPE_ENTER_LIST,	execSetupChooseScrollDelay, "Scroll Delay:"	},
@@ -6502,8 +6414,6 @@ void DrawSetupScreen()
     DrawChooseTree(&scroll_delay_current);
   else if (setup_mode == SETUP_MODE_CHOOSE_SNAPSHOT_MODE)
     DrawChooseTree(&snapshot_mode_current);
-  else if (setup_mode == SETUP_MODE_CHOOSE_SCREEN_MODE)
-    DrawChooseTree(&screen_mode_current);
   else if (setup_mode == SETUP_MODE_CHOOSE_WINDOW_SIZE)
     DrawChooseTree(&window_size_current);
   else if (setup_mode == SETUP_MODE_CHOOSE_SCALING_TYPE)
@@ -6555,8 +6465,6 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
     HandleChooseTree(mx, my, dx, dy, button, &scroll_delay_current);
   else if (setup_mode == SETUP_MODE_CHOOSE_SNAPSHOT_MODE)
     HandleChooseTree(mx, my, dx, dy, button, &snapshot_mode_current);
-  else if (setup_mode == SETUP_MODE_CHOOSE_SCREEN_MODE)
-    HandleChooseTree(mx, my, dx, dy, button, &screen_mode_current);
   else if (setup_mode == SETUP_MODE_CHOOSE_WINDOW_SIZE)
     HandleChooseTree(mx, my, dx, dy, button, &window_size_current);
   else if (setup_mode == SETUP_MODE_CHOOSE_SCALING_TYPE)

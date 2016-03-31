@@ -8211,9 +8211,6 @@ void ToggleFullscreenOrChangeWindowScalingIfNeeded()
 {
   boolean change_fullscreen = (setup.fullscreen !=
 			       video.fullscreen_enabled);
-  boolean change_fullscreen_mode = (video.fullscreen_enabled &&
-				    !strEqual(setup.fullscreen_mode,
-					      video.fullscreen_mode_current));
   boolean change_window_scaling_percent = (!video.fullscreen_enabled &&
 					   setup.window_scaling_percent !=
 					   video.window_scaling_percent);
@@ -8243,19 +8240,12 @@ void ToggleFullscreenOrChangeWindowScalingIfNeeded()
 #endif
 
   if (change_fullscreen ||
-      change_fullscreen_mode ||
       change_window_scaling_percent)
   {
     Bitmap *tmp_backbuffer = CreateBitmap(WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH);
 
     /* save backbuffer content which gets lost when toggling fullscreen mode */
     BlitBitmap(backbuffer, tmp_backbuffer, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
-
-    if (change_fullscreen_mode)
-    {
-      /* keep fullscreen, but change fullscreen mode (screen resolution) */
-      video.fullscreen_enabled = FALSE;		/* force new fullscreen mode */
-    }
 
     if (change_window_scaling_percent)
     {

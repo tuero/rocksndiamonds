@@ -265,9 +265,6 @@ char *get_mapped_token(char *);
 
 int get_parameter_value(char *, char *, int);
 
-struct ScreenModeInfo *get_screen_mode_from_string(char *);
-void get_aspect_ratio_from_screen_mode(struct ScreenModeInfo *, int *x, int *y);
-
 struct FileInfo *getFileListFromConfigList(struct ConfigInfo *,
 					   struct ConfigTypeInfo *,
 					   char **, int);
