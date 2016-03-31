@@ -24,9 +24,17 @@
 
 /* SDL internal variables */
 #if defined(TARGET_SDL2)
+#define USE_TARGET_TEXTURE		TRUE
+#define USE_TARGET_TEXTURE_ONLY		FALSE
+
 static SDL_Window *sdl_window = NULL;
 static SDL_Renderer *sdl_renderer = NULL;
+#if USE_TARGET_TEXTURE
+static SDL_Texture *sdl_texture_stream = NULL;
+static SDL_Texture *sdl_texture_target = NULL;
+#else
 static SDL_Texture *sdl_texture = NULL;
+#endif
 static boolean fullscreen_enabled = FALSE;
 
 #define USE_RENDERER	TRUE
@@ -108,6 +116,14 @@ static void UpdateScreen(SDL_Rect *rect)
   }
 #endif
 
+#if USE_TARGET_TEXTURE
+#if USE_TARGET_TEXTURE_ONLY
+  SDL_Texture *sdl_texture = sdl_texture_target;
+#else
+  SDL_Texture *sdl_texture = sdl_texture_stream;
+#endif
+#endif
+
 #if defined(TARGET_SDL2)
 #if USE_RENDERER
   if (rect)
@@ -130,8 +146,16 @@ static void UpdateScreen(SDL_Rect *rect)
   // clear render target buffer
   SDL_RenderClear(sdl_renderer);
 
+#if USE_TARGET_TEXTURE
+  SDL_SetRenderTarget(sdl_renderer, sdl_texture_target);
+
+  // copy backbuffer to render target buffer
+  if (sdl_texture != sdl_texture_target)
+    SDL_RenderCopy(sdl_renderer, sdl_texture, NULL, NULL);
+#else
   // copy backbuffer to render target buffer
   SDL_RenderCopy(sdl_renderer, sdl_texture, NULL, NULL);
+#endif
 
 #if !USE_FINAL_SCREEN_BITMAP
   // copy global animations to render target buffer, if defined (below border)
@@ -145,6 +169,11 @@ static void UpdateScreen(SDL_Rect *rect)
   // copy global animations to render target buffer, if defined (above border)
   if (gfx.draw_global_anim_function != NULL)
     gfx.draw_global_anim_function(DRAW_GLOBAL_ANIM_STAGE_2);
+#endif
+
+#if USE_TARGET_TEXTURE
+  SDL_SetRenderTarget(sdl_renderer, NULL);
+  SDL_RenderCopy(sdl_renderer, sdl_texture_target, NULL, NULL);
 #endif
 
   // show render target buffer on screen
@@ -648,11 +677,25 @@ static SDL_Surface *SDLCreateScreen(DrawBuffer **backbuffer,
     (*backbuffer)->surface = NULL;
   }
 
+#if USE_TARGET_TEXTURE
+  if (sdl_texture_stream)
+  {
+    SDL_DestroyTexture(sdl_texture_stream);
+    sdl_texture_stream = NULL;
+  }
+
+  if (sdl_texture_target)
+  {
+    SDL_DestroyTexture(sdl_texture_target);
+    sdl_texture_target = NULL;
+  }
+#else
   if (sdl_texture)
   {
     SDL_DestroyTexture(sdl_texture);
     sdl_texture = NULL;
   }
+#endif
 
   if (!(fullscreen && fullscreen_enabled))
   {
@@ -702,12 +745,29 @@ static SDL_Surface *SDLCreateScreen(DrawBuffer **backbuffer,
       // SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
       SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, setup.window_scaling_quality);
 
+#if USE_TARGET_TEXTURE
+      sdl_texture_stream = SDL_CreateTexture(sdl_renderer,
+					     SDL_PIXELFORMAT_ARGB8888,
+					     SDL_TEXTUREACCESS_STREAMING,
+					     width, height);
+
+      sdl_texture_target = SDL_CreateTexture(sdl_renderer,
+					     SDL_PIXELFORMAT_ARGB8888,
+					     SDL_TEXTUREACCESS_TARGET,
+					     width, height);
+#else
       sdl_texture = SDL_CreateTexture(sdl_renderer,
 				      SDL_PIXELFORMAT_ARGB8888,
 				      SDL_TEXTUREACCESS_STREAMING,
 				      width, height);
+#endif
 
+#if USE_TARGET_TEXTURE
+      if (sdl_texture_stream != NULL &&
+	  sdl_texture_target != NULL)
+#else
       if (sdl_texture != NULL)
+#endif
       {
 	// use SDL default values for RGB masks and no alpha channel
 	new_surface = SDL_CreateRGBSurface(0, width, height, 32, 0,0,0, 0);
@@ -901,6 +961,42 @@ void SDLSetWindowScaling(int window_scaling_percent)
 
 void SDLSetWindowScalingQuality(char *window_scaling_quality)
 {
+#if USE_TARGET_TEXTURE
+  SDL_Texture *new_texture;
+
+  if (sdl_texture_stream == NULL ||
+      sdl_texture_target == NULL)
+    return;
+
+  SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, window_scaling_quality);
+
+  new_texture = SDL_CreateTexture(sdl_renderer,
+				  SDL_PIXELFORMAT_ARGB8888,
+				  SDL_TEXTUREACCESS_STREAMING,
+				  video.width, video.height);
+
+  if (new_texture != NULL)
+  {
+    SDL_DestroyTexture(sdl_texture_stream);
+
+    sdl_texture_stream = new_texture;
+  }
+
+  new_texture = SDL_CreateTexture(sdl_renderer,
+				  SDL_PIXELFORMAT_ARGB8888,
+				  SDL_TEXTUREACCESS_TARGET,
+				  video.width, video.height);
+
+  if (new_texture != NULL)
+  {
+    SDL_DestroyTexture(sdl_texture_target);
+
+    sdl_texture_target = new_texture;
+  }
+
+  SDLRedrawWindow();
+
+#else
   if (sdl_texture == NULL)
     return;
 
@@ -919,6 +1015,7 @@ void SDLSetWindowScalingQuality(char *window_scaling_quality)
 
     SDLRedrawWindow();
   }
+#endif
 
   video.window_scaling_quality = window_scaling_quality;
 }
