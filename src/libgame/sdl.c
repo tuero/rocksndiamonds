@@ -866,20 +866,8 @@ void SDLCopyArea(Bitmap *src_bitmap, Bitmap *dst_bitmap,
 		     src_bitmap->surface_masked : src_bitmap->surface),
 		    &src_rect, real_dst_bitmap->surface, &dst_rect);
 
-#if defined(TARGET_SDL2)
   if (dst_bitmap == window)
-  {
-    // SDL_UpdateWindowSurface(sdl_window);
-    // SDL_UpdateWindowSurfaceRects(sdl_window, &dst_rect, 1);
     UpdateScreen(&dst_rect);
-  }
-#else
-  if (dst_bitmap == window)
-  {
-    // SDL_UpdateRect(backbuffer->surface, dst_x, dst_y, width, height);
-    UpdateScreen(&dst_rect);
-  }
-#endif
 }
 
 void SDLBlitTexture(Bitmap *bitmap,
