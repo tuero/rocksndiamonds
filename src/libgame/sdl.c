@@ -571,7 +571,7 @@ void SDLInitVideoBuffer(DrawBuffer **backbuffer, DrawWindow **window,
 
   video.fullscreen_available = hardware_fullscreen_available;
 
-#if USE_DESKTOP_FULLSCREEN
+#if defined(TARGET_SDL2)
   // in SDL 2.0, there is always support for desktop fullscreen mode
   // (in SDL 1.2, there is only support for "real" fullscreen mode)
   video.fullscreen_available = TRUE;
@@ -626,12 +626,7 @@ static SDL_Surface *SDLCreateScreen(DrawBuffer **backbuffer,
 
 #if defined(TARGET_SDL2)
   int surface_flags_window = SURFACE_FLAGS | SDL_WINDOW_RESIZABLE;
-#if USE_DESKTOP_FULLSCREEN
   int surface_flags_fullscreen = SURFACE_FLAGS | SDL_WINDOW_FULLSCREEN_DESKTOP;
-#else
-  int surface_flags_fullscreen = SURFACE_FLAGS | SDL_WINDOW_FULLSCREEN;
-#endif
-
 #else
   int surface_flags_window = SURFACE_FLAGS;
   int surface_flags_fullscreen = SURFACE_FLAGS | SDL_FULLSCREEN;
@@ -652,9 +647,6 @@ static SDL_Surface *SDLCreateScreen(DrawBuffer **backbuffer,
   video.fullscreen_initial = fullscreen;
 
   float window_scaling_factor = (float)setup.window_scaling_percent / 100;
-#if !USE_DESKTOP_FULLSCREEN
-  float screen_scaling_factor = (fullscreen ? 1 : window_scaling_factor);
-#endif
 
   video.window_width  = window_scaling_factor * width;
   video.window_height = window_scaling_factor * height;
@@ -704,13 +696,8 @@ static SDL_Surface *SDLCreateScreen(DrawBuffer **backbuffer,
     sdl_window = SDL_CreateWindow(program.window_title,
 				  SDL_WINDOWPOS_CENTERED,
 				  SDL_WINDOWPOS_CENTERED,
-#if USE_DESKTOP_FULLSCREEN
 				  video.window_width,
 				  video.window_height,
-#else
-				  (int)(screen_scaling_factor * width),
-				  (int)(screen_scaling_factor * height),
-#endif
 				  surface_flags);
 
   if (sdl_window != NULL)
@@ -998,11 +985,7 @@ void SDLSetWindowFullscreen(boolean fullscreen)
   if (sdl_window == NULL)
     return;
 
-#if USE_DESKTOP_FULLSCREEN
   int flags = (fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0);
-#else
-  int flags = (fullscreen ? SDL_WINDOW_FULLSCREEN : 0);
-#endif
 
   if (SDL_SetWindowFullscreen(sdl_window, flags) == 0)
     video.fullscreen_enabled = fullscreen_enabled = fullscreen;
