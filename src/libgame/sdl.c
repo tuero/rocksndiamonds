@@ -558,8 +558,7 @@ static SDL_Surface *SDLCreateScreen(DrawBuffer **backbuffer,
 	new_surface = SDL_CreateRGBSurface(0, width, height, 32, 0,0,0, 0);
 
 	if (new_surface == NULL)
-	  Error(ERR_WARN, "SDL_CreateRGBSurface() failed: %s",
-		SDL_GetError());
+	  Error(ERR_WARN, "SDL_CreateRGBSurface() failed: %s", SDL_GetError());
       }
       else
       {
@@ -578,6 +577,9 @@ static SDL_Surface *SDLCreateScreen(DrawBuffer **backbuffer,
 
 #else
   new_surface = SDL_SetVideoMode(width, height, video.depth, surface_flags);
+
+  if (new_surface == NULL)
+    Error(ERR_WARN, "SDL_SetVideoMode() failed: %s", SDL_GetError());
 #endif
 
 #if defined(TARGET_SDL2)
@@ -610,10 +612,7 @@ boolean SDLSetVideoMode(DrawBuffer **backbuffer, boolean fullscreen)
 
     if (new_surface == NULL)
     {
-      /* switching display to fullscreen mode failed */
-      Error(ERR_WARN, "SDL_SetVideoMode() failed: %s", SDL_GetError());
-
-      /* do not try it again */
+      /* switching display to fullscreen mode failed -- do not try it again */
       video.fullscreen_available = FALSE;
 
       success = FALSE;
@@ -636,7 +635,6 @@ boolean SDLSetVideoMode(DrawBuffer **backbuffer, boolean fullscreen)
     if (new_surface == NULL)
     {
       /* switching display to window mode failed -- should not happen */
-      Error(ERR_WARN, "SDL_SetVideoMode() failed: %s", SDL_GetError());
 
       success = FALSE;
     }
