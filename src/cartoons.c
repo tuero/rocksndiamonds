@@ -583,6 +583,9 @@ void DrawGlobalAnimExt(int drawing_stage)
 	else if (part->y > part->viewport_height - g->height)
 	  height -= (part->y - (part->viewport_height - g->height));
 
+	if (width <= 0 || height <= 0)
+	  continue;
+
 	dst_x += part->viewport_x;
 	dst_y += part->viewport_y;
 
