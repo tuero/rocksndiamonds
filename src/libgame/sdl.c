@@ -575,11 +575,41 @@ static SDL_Surface *SDLCreateScreen(DrawBuffer **backbuffer,
     Error(ERR_WARN, "SDL_CreateWindow() failed: %s", SDL_GetError());
   }
 
-#else
-  new_surface = SDL_SetVideoMode(width, height, video.depth, surface_flags);
+#else	// TARGET_SDL
 
-  if (new_surface == NULL)
+  if ((*backbuffer)->surface)
+  {
+    SDL_FreeSurface((*backbuffer)->surface);
+    (*backbuffer)->surface = NULL;
+  }
+
+  if (gfx.final_screen_bitmap == NULL)
+    gfx.final_screen_bitmap = CreateBitmapStruct();
+
+  gfx.final_screen_bitmap->width = width;
+  gfx.final_screen_bitmap->height = height;
+
+  gfx.final_screen_bitmap->surface =
+    SDL_SetVideoMode(width, height, video.depth, surface_flags);
+
+  if (gfx.final_screen_bitmap->surface != NULL)
+  {
+    new_surface =
+      SDL_CreateRGBSurface(surface_flags, width, height, video.depth, 0,0,0, 0);
+
+    if (new_surface == NULL)
+      Error(ERR_WARN, "SDL_CreateRGBSurface() failed: %s", SDL_GetError());
+
+#if 0
+    new_surface = gfx.final_screen_bitmap->surface;
+    gfx.final_screen_bitmap = NULL;
+#endif
+
+  }
+  else
+  {
     Error(ERR_WARN, "SDL_SetVideoMode() failed: %s", SDL_GetError());
+  }
 #endif
 
 #if defined(TARGET_SDL2)

@@ -208,8 +208,10 @@ void InitGfxWindowInfo(int win_xsize, int win_ysize)
 
   ReCreateBitmap(&gfx.background_bitmap, win_xsize, win_ysize, DEFAULT_DEPTH);
 
+#if defined(TARGET_SDL2)
 #if USE_FINAL_SCREEN_BITMAP
   ReCreateBitmap(&gfx.final_screen_bitmap, win_xsize, win_ysize, DEFAULT_DEPTH);
+#endif
 #endif
 
   ReCreateBitmap(&gfx.fade_bitmap_source, win_xsize, win_ysize, DEFAULT_DEPTH);
