@@ -4381,31 +4381,31 @@ static void execSetupGame_setScrollDelays()
       setString(&ti->identifier, identifier);
       setString(&ti->name, name);
       setString(&ti->name_sorting, name);
-      setString(&ti->infotext, "Scaling Type");
+      setString(&ti->infotext, "Scroll Delay");
 
       pushTreeInfo(&scroll_delays, ti);
     }
 
-    /* sort scaling type values to start with lowest scaling type value */
+    /* sort scroll delay values to start with lowest scroll delay value */
     sortTreeInfo(&scroll_delays);
 
-    /* set current scaling type value to configured scaling type value */
+    /* set current scroll delay value to configured scroll delay value */
     scroll_delay_current =
       getTreeInfoFromIdentifier(scroll_delays,i_to_a(setup.scroll_delay_value));
 
-    /* if that fails, set current scaling type to reliable default value */
+    /* if that fails, set current scroll delay to reliable default value */
     if (scroll_delay_current == NULL)
       scroll_delay_current =
 	getTreeInfoFromIdentifier(scroll_delays, i_to_a(STD_SCROLL_DELAY));
 
-    /* if that also fails, set current scaling type to first available value */
+    /* if that also fails, set current scroll delay to first available value */
     if (scroll_delay_current == NULL)
       scroll_delay_current = scroll_delays;
   }
 
   setup.scroll_delay_value = atoi(scroll_delay_current->identifier);
 
-  /* needed for displaying scaling type text instead of identifier */
+  /* needed for displaying scroll delay text instead of identifier */
   scroll_delay_text = scroll_delay_current->name;
 }
 
