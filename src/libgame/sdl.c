@@ -917,20 +917,8 @@ void SDLFillRectangle(Bitmap *dst_bitmap, int x, int y, int width, int height,
 
   SDL_FillRect(real_dst_bitmap->surface, &rect, color);
 
-#if defined(TARGET_SDL2)
   if (dst_bitmap == window)
-  {
-    // SDL_UpdateWindowSurface(sdl_window);
-    // SDL_UpdateWindowSurfaceRects(sdl_window, &rect, 1);
     UpdateScreen(&rect);
-  }
-#else
-  if (dst_bitmap == window)
-  {
-    // SDL_UpdateRect(backbuffer->surface, x, y, width, height);
-    UpdateScreen(&rect);
-  }
-#endif
 }
 
 void SDLFadeRectangle(Bitmap *bitmap_cross, int x, int y, int width, int height,
