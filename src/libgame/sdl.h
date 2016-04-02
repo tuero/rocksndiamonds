@@ -451,8 +451,8 @@ void SDLSetWindowTitle(void);
 
 void SDLLimitScreenUpdates(boolean);
 void SDLInitVideoDisplay(void);
-void SDLInitVideoBuffer(DrawBuffer **, DrawWindow **, boolean);
-boolean SDLSetVideoMode(DrawBuffer **, boolean);
+void SDLInitVideoBuffer(boolean);
+boolean SDLSetVideoMode(boolean);
 void SDLCreateBitmapContent(Bitmap *, int, int, int);
 void SDLFreeBitmapPointers(Bitmap *);
 void SDLCopyArea(Bitmap *, Bitmap *, int, int, int, int, int, int, int);

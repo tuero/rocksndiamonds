@@ -380,7 +380,7 @@ void InitVideoBuffer(int width, int height, int depth, boolean fullscreen)
 
   video.window_scaling_available = WINDOW_SCALING_STATUS;
 
-  SDLInitVideoBuffer(&backbuffer, &window, fullscreen);
+  SDLInitVideoBuffer(fullscreen);
 
   video.initialized = TRUE;
 
@@ -886,7 +886,7 @@ void KeyboardAutoRepeatOff(void)
 
 boolean SetVideoMode(boolean fullscreen)
 {
-  return SDLSetVideoMode(&backbuffer, fullscreen);
+  return SDLSetVideoMode(fullscreen);
 }
 
 boolean ChangeVideoModeIfNeeded(boolean fullscreen)

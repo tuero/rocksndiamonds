@@ -383,8 +383,7 @@ void SDLInitVideoDisplay(void)
 #endif
 }
 
-void SDLInitVideoBuffer(DrawBuffer **backbuffer, DrawWindow **window,
-			boolean fullscreen)
+void SDLInitVideoBuffer(boolean fullscreen)
 {
   video.window_scaling_percent = setup.window_scaling_percent;
   video.window_scaling_quality = setup.window_scaling_quality;
@@ -398,7 +397,7 @@ void SDLInitVideoBuffer(DrawBuffer **backbuffer, DrawWindow **window,
 #endif
 
   /* open SDL video output device (window or fullscreen mode) */
-  if (!SDLSetVideoMode(backbuffer, fullscreen))
+  if (!SDLSetVideoMode(fullscreen))
     Error(ERR_EXIT, "setting video mode failed");
 
   /* !!! SDL2 can only set the window icon if the window already exists !!! */
@@ -426,10 +425,10 @@ void SDLInitVideoBuffer(DrawBuffer **backbuffer, DrawWindow **window,
      should never be drawn to directly, it would do no harm nevertheless. */
 
   /* create additional (symbolic) buffer for double-buffering */
-  ReCreateBitmap(window, video.width, video.height, video.depth);
+  ReCreateBitmap(&window, video.width, video.height, video.depth);
 }
 
-static boolean SDLCreateScreen(DrawBuffer **backbuffer, boolean fullscreen)
+static boolean SDLCreateScreen(boolean fullscreen)
 {
   SDL_Surface *new_surface = NULL;
 
@@ -605,21 +604,21 @@ static boolean SDLCreateScreen(DrawBuffer **backbuffer, boolean fullscreen)
     fullscreen_enabled = fullscreen;
 #endif
 
-  if (*backbuffer == NULL)
-    *backbuffer = CreateBitmapStruct();
+  if (backbuffer == NULL)
+    backbuffer = CreateBitmapStruct();
 
-  (*backbuffer)->width  = video.width;
-  (*backbuffer)->height = video.height;
+  backbuffer->width  = video.width;
+  backbuffer->height = video.height;
 
-  if ((*backbuffer)->surface)
-    SDL_FreeSurface((*backbuffer)->surface);
+  if (backbuffer->surface)
+    SDL_FreeSurface(backbuffer->surface);
 
-  (*backbuffer)->surface = new_surface;
+  backbuffer->surface = new_surface;
 
   return (new_surface != NULL);
 }
 
-boolean SDLSetVideoMode(DrawBuffer **backbuffer, boolean fullscreen)
+boolean SDLSetVideoMode(boolean fullscreen)
 {
   boolean success = FALSE;
 
@@ -628,7 +627,7 @@ boolean SDLSetVideoMode(DrawBuffer **backbuffer, boolean fullscreen)
   if (fullscreen && !video.fullscreen_enabled && video.fullscreen_available)
   {
     /* switch display to fullscreen mode, if available */
-    success = SDLCreateScreen(backbuffer, TRUE);
+    success = SDLCreateScreen(TRUE);
 
     if (!success)
     {
@@ -644,7 +643,7 @@ boolean SDLSetVideoMode(DrawBuffer **backbuffer, boolean fullscreen)
   if ((!fullscreen && video.fullscreen_enabled) || !success)
   {
     /* switch display to window mode */
-    success = SDLCreateScreen(backbuffer, FALSE);
+    success = SDLCreateScreen(FALSE);
 
     if (!success)
     {
