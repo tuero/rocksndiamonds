@@ -429,8 +429,7 @@ void SDLInitVideoBuffer(DrawBuffer **backbuffer, DrawWindow **window,
   ReCreateBitmap(window, video.width, video.height, video.depth);
 }
 
-static SDL_Surface *SDLCreateScreen(DrawBuffer **backbuffer,
-				    boolean fullscreen)
+static boolean SDLCreateScreen(DrawBuffer **backbuffer, boolean fullscreen)
 {
   SDL_Surface *new_surface = NULL;
 
@@ -460,12 +459,6 @@ static SDL_Surface *SDLCreateScreen(DrawBuffer **backbuffer,
 
   video.window_width  = window_scaling_factor * width;
   video.window_height = window_scaling_factor * height;
-
-  if ((*backbuffer)->surface)
-  {
-    SDL_FreeSurface((*backbuffer)->surface);
-    (*backbuffer)->surface = NULL;
-  }
 
 #if USE_TARGET_TEXTURE
   if (sdl_texture_stream)
@@ -577,12 +570,6 @@ static SDL_Surface *SDLCreateScreen(DrawBuffer **backbuffer,
 
 #else	// TARGET_SDL
 
-  if ((*backbuffer)->surface)
-  {
-    SDL_FreeSurface((*backbuffer)->surface);
-    (*backbuffer)->surface = NULL;
-  }
-
   if (gfx.final_screen_bitmap == NULL)
     gfx.final_screen_bitmap = CreateBitmapStruct();
 
@@ -618,65 +605,56 @@ static SDL_Surface *SDLCreateScreen(DrawBuffer **backbuffer,
     fullscreen_enabled = fullscreen;
 #endif
 
-  return new_surface;
+  if (*backbuffer == NULL)
+    *backbuffer = CreateBitmapStruct();
+
+  (*backbuffer)->width  = video.width;
+  (*backbuffer)->height = video.height;
+
+  if ((*backbuffer)->surface)
+    SDL_FreeSurface((*backbuffer)->surface);
+
+  (*backbuffer)->surface = new_surface;
+
+  return (new_surface != NULL);
 }
 
 boolean SDLSetVideoMode(DrawBuffer **backbuffer, boolean fullscreen)
 {
-  boolean success = TRUE;
-  SDL_Surface *new_surface = NULL;
+  boolean success = FALSE;
 
   SetWindowTitle();
-
-  if (*backbuffer == NULL)
-    *backbuffer = CreateBitmapStruct();
-
-  /* (real bitmap might be larger in fullscreen mode with video offsets) */
-  (*backbuffer)->width  = video.width;
-  (*backbuffer)->height = video.height;
 
   if (fullscreen && !video.fullscreen_enabled && video.fullscreen_available)
   {
     /* switch display to fullscreen mode, if available */
-    new_surface = SDLCreateScreen(backbuffer, TRUE);
+    success = SDLCreateScreen(backbuffer, TRUE);
 
-    if (new_surface == NULL)
+    if (!success)
     {
       /* switching display to fullscreen mode failed -- do not try it again */
       video.fullscreen_available = FALSE;
-
-      success = FALSE;
     }
     else
     {
-      (*backbuffer)->surface = new_surface;
-
       video.fullscreen_enabled = TRUE;
-
-      success = TRUE;
     }
   }
 
-  if ((!fullscreen && video.fullscreen_enabled) || new_surface == NULL)
+  if ((!fullscreen && video.fullscreen_enabled) || !success)
   {
     /* switch display to window mode */
-    new_surface = SDLCreateScreen(backbuffer, FALSE);
+    success = SDLCreateScreen(backbuffer, FALSE);
 
-    if (new_surface == NULL)
+    if (!success)
     {
       /* switching display to window mode failed -- should not happen */
-
-      success = FALSE;
     }
     else
     {
-      (*backbuffer)->surface = new_surface;
-
       video.fullscreen_enabled = FALSE;
       video.window_scaling_percent = setup.window_scaling_percent;
       video.window_scaling_quality = setup.window_scaling_quality;
-
-      success = TRUE;
     }
   }
 
