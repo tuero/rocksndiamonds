@@ -49,6 +49,21 @@ void SDLLimitScreenUpdates(boolean enable)
   limit_screen_updates = enable;
 }
 
+static void FinalizeScreen()
+{
+  // copy global animations to render target buffer, if defined (below border)
+  if (gfx.draw_global_anim_function != NULL)
+    gfx.draw_global_anim_function(DRAW_GLOBAL_ANIM_STAGE_1);
+
+  // copy global masked border to render target buffer, if defined
+  if (gfx.draw_global_border_function != NULL)
+    gfx.draw_global_border_function(DRAW_BORDER_TO_SCREEN);
+
+  // copy global animations to render target buffer, if defined (above border)
+  if (gfx.draw_global_anim_function != NULL)
+    gfx.draw_global_anim_function(DRAW_GLOBAL_ANIM_STAGE_2);
+}
+
 static void UpdateScreen(SDL_Rect *rect)
 {
   static unsigned int update_screen_delay = 0;
@@ -88,17 +103,7 @@ static void UpdateScreen(SDL_Rect *rect)
     BlitBitmap(backbuffer, gfx.final_screen_bitmap, 0, 0,
 	       gfx.win_xsize, gfx.win_ysize, 0, 0);
 
-    // copy global animations to render target buffer, if defined (below border)
-    if (gfx.draw_global_anim_function != NULL)
-      gfx.draw_global_anim_function(DRAW_GLOBAL_ANIM_STAGE_1);
-
-    // copy global masked border to render target buffer, if defined
-    if (gfx.draw_global_border_function != NULL)
-      gfx.draw_global_border_function(DRAW_BORDER_TO_SCREEN);
-
-    // copy global animations to render target buffer, if defined (above border)
-    if (gfx.draw_global_anim_function != NULL)
-      gfx.draw_global_anim_function(DRAW_GLOBAL_ANIM_STAGE_2);
+    FinalizeScreen();
 
     screen = gfx.final_screen_bitmap->surface;
 
@@ -145,17 +150,7 @@ static void UpdateScreen(SDL_Rect *rect)
 #endif
 
 #if !USE_FINAL_SCREEN_BITMAP
-  // copy global animations to render target buffer, if defined (below border)
-  if (gfx.draw_global_anim_function != NULL)
-    gfx.draw_global_anim_function(DRAW_GLOBAL_ANIM_STAGE_1);
-
-  // copy global masked border to render target buffer, if defined
-  if (gfx.draw_global_border_function != NULL)
-    gfx.draw_global_border_function(DRAW_BORDER_TO_SCREEN);
-
-  // copy global animations to render target buffer, if defined (above border)
-  if (gfx.draw_global_anim_function != NULL)
-    gfx.draw_global_anim_function(DRAW_GLOBAL_ANIM_STAGE_2);
+  FinalizeScreen();
 #endif
 
 #if USE_TARGET_TEXTURE
