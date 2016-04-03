@@ -24,17 +24,10 @@
 
 /* SDL internal variables */
 #if defined(TARGET_SDL2)
-#define USE_TARGET_TEXTURE		TRUE
-#define USE_TARGET_TEXTURE_ONLY		FALSE
-
 static SDL_Window *sdl_window = NULL;
 static SDL_Renderer *sdl_renderer = NULL;
-#if USE_TARGET_TEXTURE
 static SDL_Texture *sdl_texture_stream = NULL;
 static SDL_Texture *sdl_texture_target = NULL;
-#else
-static SDL_Texture *sdl_texture = NULL;
-#endif
 static boolean fullscreen_enabled = FALSE;
 #endif
 
@@ -93,10 +86,9 @@ static void UpdateScreen(SDL_Rect *rect)
   }
 #endif
 
-#if USE_FINAL_SCREEN_BITMAP
-  if (gfx.final_screen_bitmap != NULL)	// may not be initialized yet
+  if (video.screen_rendering_mode == SPECIAL_RENDERING_BITMAP &&
+      gfx.final_screen_bitmap != NULL)	// may not be initialized yet
   {
-    // !!! TEST !!!
     // draw global animations using bitmaps instead of using textures
     // to prevent texture scaling artefacts (this is potentially slower)
 
@@ -110,17 +102,13 @@ static void UpdateScreen(SDL_Rect *rect)
     // force full window redraw
     rect = NULL;
   }
-#endif
-
-#if USE_TARGET_TEXTURE
-#if USE_TARGET_TEXTURE_ONLY
-  SDL_Texture *sdl_texture = sdl_texture_target;
-#else
-  SDL_Texture *sdl_texture = sdl_texture_stream;
-#endif
-#endif
 
 #if defined(TARGET_SDL2)
+  SDL_Texture *sdl_texture = sdl_texture_stream;
+
+  if (video.screen_rendering_mode == SPECIAL_RENDERING_TARGET)
+    sdl_texture = sdl_texture_target;
+
   if (rect)
   {
     int bytes_x = screen->pitch / video.width;
@@ -138,25 +126,25 @@ static void UpdateScreen(SDL_Rect *rect)
   // clear render target buffer
   SDL_RenderClear(sdl_renderer);
 
-#if USE_TARGET_TEXTURE
-  SDL_SetRenderTarget(sdl_renderer, sdl_texture_target);
+  // set renderer to use target texture for rendering
+  if (video.screen_rendering_mode == SPECIAL_RENDERING_TARGET ||
+      video.screen_rendering_mode == SPECIAL_RENDERING_DOUBLE)
+    SDL_SetRenderTarget(sdl_renderer, sdl_texture_target);
 
-  // copy backbuffer to render target buffer
-  if (sdl_texture != sdl_texture_target)
-    SDL_RenderCopy(sdl_renderer, sdl_texture, NULL, NULL);
-#else
-  // copy backbuffer to render target buffer
-  SDL_RenderCopy(sdl_renderer, sdl_texture, NULL, NULL);
-#endif
+  // copy backbuffer texture to render target buffer
+  if (video.screen_rendering_mode != SPECIAL_RENDERING_TARGET)
+    SDL_RenderCopy(sdl_renderer, sdl_texture_stream, NULL, NULL);
 
-#if !USE_FINAL_SCREEN_BITMAP
-  FinalizeScreen();
-#endif
+  if (video.screen_rendering_mode != SPECIAL_RENDERING_BITMAP)
+    FinalizeScreen();
 
-#if USE_TARGET_TEXTURE
-  SDL_SetRenderTarget(sdl_renderer, NULL);
-  SDL_RenderCopy(sdl_renderer, sdl_texture_target, NULL, NULL);
-#endif
+  // when using target texture, copy it to screen buffer
+  if (video.screen_rendering_mode == SPECIAL_RENDERING_TARGET ||
+      video.screen_rendering_mode == SPECIAL_RENDERING_DOUBLE)
+  {
+    SDL_SetRenderTarget(sdl_renderer, NULL);
+    SDL_RenderCopy(sdl_renderer, sdl_texture_target, NULL, NULL);
+  }
 
   // show render target buffer on screen
   SDL_RenderPresent(sdl_renderer);
@@ -382,6 +370,13 @@ void SDLInitVideoBuffer(boolean fullscreen)
 {
   video.window_scaling_percent = setup.window_scaling_percent;
   video.window_scaling_quality = setup.window_scaling_quality;
+  video.screen_rendering_mode =
+    (strEqual(setup.screen_rendering_mode, STR_SPECIAL_RENDERING_BITMAP) ?
+     SPECIAL_RENDERING_BITMAP :
+     strEqual(setup.screen_rendering_mode, STR_SPECIAL_RENDERING_TARGET) ?
+     SPECIAL_RENDERING_TARGET:
+     strEqual(setup.screen_rendering_mode, STR_SPECIAL_RENDERING_DOUBLE) ?
+     SPECIAL_RENDERING_DOUBLE : SPECIAL_RENDERING_OFF);
 
 #if defined(TARGET_SDL2)
   // SDL 2.0: support for (desktop) fullscreen mode available
@@ -454,7 +449,6 @@ static boolean SDLCreateScreen(boolean fullscreen)
   video.window_width  = window_scaling_factor * width;
   video.window_height = window_scaling_factor * height;
 
-#if USE_TARGET_TEXTURE
   if (sdl_texture_stream)
   {
     SDL_DestroyTexture(sdl_texture_stream);
@@ -466,13 +460,6 @@ static boolean SDLCreateScreen(boolean fullscreen)
     SDL_DestroyTexture(sdl_texture_target);
     sdl_texture_target = NULL;
   }
-#else
-  if (sdl_texture)
-  {
-    SDL_DestroyTexture(sdl_texture);
-    sdl_texture = NULL;
-  }
-#endif
 
   if (!(fullscreen && fullscreen_enabled))
   {
@@ -517,7 +504,6 @@ static boolean SDLCreateScreen(boolean fullscreen)
       // SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
       SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, setup.window_scaling_quality);
 
-#if USE_TARGET_TEXTURE
       sdl_texture_stream = SDL_CreateTexture(sdl_renderer,
 					     SDL_PIXELFORMAT_ARGB8888,
 					     SDL_TEXTUREACCESS_STREAMING,
@@ -527,19 +513,9 @@ static boolean SDLCreateScreen(boolean fullscreen)
 					     SDL_PIXELFORMAT_ARGB8888,
 					     SDL_TEXTUREACCESS_TARGET,
 					     width, height);
-#else
-      sdl_texture = SDL_CreateTexture(sdl_renderer,
-				      SDL_PIXELFORMAT_ARGB8888,
-				      SDL_TEXTUREACCESS_STREAMING,
-				      width, height);
-#endif
 
-#if USE_TARGET_TEXTURE
       if (sdl_texture_stream != NULL &&
 	  sdl_texture_target != NULL)
-#else
-      if (sdl_texture != NULL)
-#endif
       {
 	// use SDL default values for RGB masks and no alpha channel
 	new_surface = SDL_CreateRGBSurface(0, width, height, 32, 0,0,0, 0);
@@ -649,6 +625,13 @@ boolean SDLSetVideoMode(boolean fullscreen)
       video.fullscreen_enabled = FALSE;
       video.window_scaling_percent = setup.window_scaling_percent;
       video.window_scaling_quality = setup.window_scaling_quality;
+      video.screen_rendering_mode =
+	(strEqual(setup.screen_rendering_mode, STR_SPECIAL_RENDERING_BITMAP) ?
+	 SPECIAL_RENDERING_BITMAP :
+	 strEqual(setup.screen_rendering_mode, STR_SPECIAL_RENDERING_TARGET) ?
+	 SPECIAL_RENDERING_TARGET:
+	 strEqual(setup.screen_rendering_mode, STR_SPECIAL_RENDERING_DOUBLE) ?
+	 SPECIAL_RENDERING_DOUBLE : SPECIAL_RENDERING_OFF);
     }
   }
 
@@ -722,7 +705,6 @@ void SDLSetWindowScaling(int window_scaling_percent)
 
 void SDLSetWindowScalingQuality(char *window_scaling_quality)
 {
-#if USE_TARGET_TEXTURE
   SDL_Texture *new_texture;
 
   if (sdl_texture_stream == NULL ||
@@ -756,27 +738,6 @@ void SDLSetWindowScalingQuality(char *window_scaling_quality)
   }
 
   SDLRedrawWindow();
-
-#else
-  if (sdl_texture == NULL)
-    return;
-
-  SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, window_scaling_quality);
-
-  SDL_Texture *new_texture = SDL_CreateTexture(sdl_renderer,
-					       SDL_PIXELFORMAT_ARGB8888,
-					       SDL_TEXTUREACCESS_STREAMING,
-					       video.width, video.height);
-
-  if (new_texture != NULL)
-  {
-    SDL_DestroyTexture(sdl_texture);
-
-    sdl_texture = new_texture;
-
-    SDLRedrawWindow();
-  }
-#endif
 
   video.window_scaling_quality = window_scaling_quality;
 }

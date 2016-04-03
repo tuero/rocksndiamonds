@@ -59,6 +59,29 @@
 
 #define SCALING_QUALITY_DEFAULT		SCALING_QUALITY_LINEAR
 
+/* values for screen rendering mode */
+#define STR_SPECIAL_RENDERING_OFF	"stream_texture_only"
+#define STR_SPECIAL_RENDERING_BITMAP	"bitmap_and_stream_texture"
+#define STR_SPECIAL_RENDERING_TARGET	"target_texture_only"
+#define STR_SPECIAL_RENDERING_DOUBLE	"stream_and_target_texture"
+
+#if defined(TARGET_SDL2)
+#define STR_SPECIAL_RENDERING_DEFAULT	STR_SPECIAL_RENDERING_DOUBLE
+#else
+#define STR_SPECIAL_RENDERING_DEFAULT	STR_SPECIAL_RENDERING_BITMAP
+#endif
+
+#define SPECIAL_RENDERING_OFF		0
+#define SPECIAL_RENDERING_BITMAP	1
+#define SPECIAL_RENDERING_TARGET	2
+#define SPECIAL_RENDERING_DOUBLE	3
+
+#if defined(TARGET_SDL2)
+#define SPECIAL_RENDERING_DEFAULT	SPECIAL_RENDERING_DOUBLE
+#else
+#define SPECIAL_RENDERING_DEFAULT	SPECIAL_RENDERING_BITMAP
+#endif
+
 /* values for touch control */
 #define TOUCH_CONTROL_VIRTUAL_BUTTONS	"virtual_buttons"
 #define TOUCH_CONTROL_WIPE_GESTURES	"wipe_gestures"
@@ -743,6 +766,7 @@ struct VideoSystemInfo
   boolean window_scaling_available;
   int window_scaling_percent;
   char *window_scaling_quality;
+  int screen_rendering_mode;
 
   boolean initialized;
 };
@@ -817,9 +841,7 @@ struct GfxInfo
   int fade_border_target_status;
   Bitmap *masked_border_bitmap_ptr;
 
-#if USE_FINAL_SCREEN_BITMAP
   Bitmap *final_screen_bitmap;
-#endif
 
   boolean clipping_enabled;
   int clip_x, clip_y;
@@ -1006,6 +1028,7 @@ struct SetupInfo
   boolean fullscreen;
   int window_scaling_percent;
   char *window_scaling_quality;
+  char *screen_rendering_mode;
   boolean ask_on_escape;
   boolean ask_on_escape_editor;
   boolean quick_switch;

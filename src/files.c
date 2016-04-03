@@ -7911,29 +7911,30 @@ void SaveScore(int nr)
 #define SETUP_TOKEN_FULLSCREEN			17
 #define SETUP_TOKEN_WINDOW_SCALING_PERCENT	18
 #define SETUP_TOKEN_WINDOW_SCALING_QUALITY	19
-#define SETUP_TOKEN_ASK_ON_ESCAPE		20
-#define SETUP_TOKEN_ASK_ON_ESCAPE_EDITOR	21
-#define SETUP_TOKEN_QUICK_SWITCH		22
-#define SETUP_TOKEN_INPUT_ON_FOCUS		23
-#define SETUP_TOKEN_PREFER_AGA_GRAPHICS		24
-#define SETUP_TOKEN_GAME_FRAME_DELAY		25
-#define SETUP_TOKEN_SP_SHOW_BORDER_ELEMENTS	26
-#define SETUP_TOKEN_SMALL_GAME_GRAPHICS		27
-#define SETUP_TOKEN_SHOW_SNAPSHOT_BUTTONS	28
-#define SETUP_TOKEN_GRAPHICS_SET		29
-#define SETUP_TOKEN_SOUNDS_SET			30
-#define SETUP_TOKEN_MUSIC_SET			31
-#define SETUP_TOKEN_OVERRIDE_LEVEL_GRAPHICS	32
-#define SETUP_TOKEN_OVERRIDE_LEVEL_SOUNDS	33
-#define SETUP_TOKEN_OVERRIDE_LEVEL_MUSIC	34
-#define SETUP_TOKEN_VOLUME_SIMPLE		35
-#define SETUP_TOKEN_VOLUME_LOOPS		36
-#define SETUP_TOKEN_VOLUME_MUSIC		37
-#define SETUP_TOKEN_TOUCH_CONTROL_TYPE		38
-#define SETUP_TOKEN_TOUCH_MOVE_DISTANCE		39
-#define SETUP_TOKEN_TOUCH_DROP_DISTANCE		40
+#define SETUP_TOKEN_SCREEN_RENDERING_MODE	20
+#define SETUP_TOKEN_ASK_ON_ESCAPE		21
+#define SETUP_TOKEN_ASK_ON_ESCAPE_EDITOR	22
+#define SETUP_TOKEN_QUICK_SWITCH		23
+#define SETUP_TOKEN_INPUT_ON_FOCUS		24
+#define SETUP_TOKEN_PREFER_AGA_GRAPHICS		25
+#define SETUP_TOKEN_GAME_FRAME_DELAY		26
+#define SETUP_TOKEN_SP_SHOW_BORDER_ELEMENTS	27
+#define SETUP_TOKEN_SMALL_GAME_GRAPHICS		28
+#define SETUP_TOKEN_SHOW_SNAPSHOT_BUTTONS	29
+#define SETUP_TOKEN_GRAPHICS_SET		30
+#define SETUP_TOKEN_SOUNDS_SET			31
+#define SETUP_TOKEN_MUSIC_SET			32
+#define SETUP_TOKEN_OVERRIDE_LEVEL_GRAPHICS	33
+#define SETUP_TOKEN_OVERRIDE_LEVEL_SOUNDS	34
+#define SETUP_TOKEN_OVERRIDE_LEVEL_MUSIC	35
+#define SETUP_TOKEN_VOLUME_SIMPLE		36
+#define SETUP_TOKEN_VOLUME_LOOPS		37
+#define SETUP_TOKEN_VOLUME_MUSIC		38
+#define SETUP_TOKEN_TOUCH_CONTROL_TYPE		39
+#define SETUP_TOKEN_TOUCH_MOVE_DISTANCE		40
+#define SETUP_TOKEN_TOUCH_DROP_DISTANCE		41
 
-#define NUM_GLOBAL_SETUP_TOKENS			41
+#define NUM_GLOBAL_SETUP_TOKENS			42
 
 /* editor setup */
 #define SETUP_TOKEN_EDITOR_EL_BOULDERDASH	0
@@ -8085,6 +8086,7 @@ static struct TokenInfo global_setup_tokens[] =
   { TYPE_SWITCH, &si.fullscreen,              "fullscreen"		},
   { TYPE_INTEGER,&si.window_scaling_percent,  "window_scaling_percent"	},
   { TYPE_STRING, &si.window_scaling_quality,  "window_scaling_quality"	},
+  { TYPE_STRING, &si.screen_rendering_mode,   "screen_rendering_mode"	},
   { TYPE_SWITCH, &si.ask_on_escape,           "ask_on_escape"		},
   { TYPE_SWITCH, &si.ask_on_escape_editor,    "ask_on_escape_editor"	},
   { TYPE_SWITCH, &si.quick_switch,            "quick_player_switch"	},
@@ -8266,6 +8268,7 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
   si->fullscreen = FALSE;
   si->window_scaling_percent = STD_WINDOW_SCALING_PERCENT;
   si->window_scaling_quality = getStringCopy(SCALING_QUALITY_DEFAULT);
+  si->screen_rendering_mode = getStringCopy(STR_SPECIAL_RENDERING_DEFAULT);
   si->ask_on_escape = TRUE;
   si->ask_on_escape_editor = TRUE;
   si->quick_switch = FALSE;
