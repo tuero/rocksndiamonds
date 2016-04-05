@@ -1948,19 +1948,22 @@
 #define FONT_INPUT_2_ACTIVE		24
 #define FONT_INPUT_1			25
 #define FONT_INPUT_2			26
-#define FONT_OPTION_OFF			27
-#define FONT_OPTION_ON			28
-#define FONT_VALUE_1			29
-#define FONT_VALUE_2			30
-#define FONT_VALUE_OLD			31
-#define FONT_LEVEL_NUMBER_ACTIVE	32
-#define FONT_LEVEL_NUMBER		33
-#define FONT_TAPE_RECORDER		34
-#define FONT_GAME_INFO			35
-#define FONT_INFO_ELEMENTS		36
-#define FONT_INFO_LEVELSET		37
+#define FONT_OPTION_OFF_NARROW		27
+#define FONT_OPTION_OFF			28
+#define FONT_OPTION_ON_NARROW		29
+#define FONT_OPTION_ON			30
+#define FONT_VALUE_1			31
+#define FONT_VALUE_2			32
+#define FONT_VALUE_OLD			33
+#define FONT_VALUE_NARROW		34
+#define FONT_LEVEL_NUMBER_ACTIVE	35
+#define FONT_LEVEL_NUMBER		36
+#define FONT_TAPE_RECORDER		37
+#define FONT_GAME_INFO			38
+#define FONT_INFO_ELEMENTS		39
+#define FONT_INFO_LEVELSET		40
 
-#define NUM_FONTS			38
+#define NUM_FONTS			41
 #define NUM_INITIAL_FONTS		4
 
 /* values for toon animation configuration */

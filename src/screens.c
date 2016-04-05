@@ -5616,13 +5616,22 @@ static int getSetupValueFont(int type, void *value)
     return FONT_VALUE_1;
 }
 
+static int getSetupValueFontNarrow(int type, int font_nr)
+{
+  return (font_nr == FONT_VALUE_1    ? FONT_VALUE_NARROW :
+	  font_nr == FONT_OPTION_ON  ? FONT_OPTION_ON_NARROW :
+	  font_nr == FONT_OPTION_OFF ? FONT_OPTION_OFF_NARROW :
+	  font_nr);
+}
+
 static void drawSetupValue(int screen_pos, int setup_info_pos_raw)
 {
   int si_pos = (setup_info_pos_raw < 0 ? screen_pos : setup_info_pos_raw);
   struct TokenInfo *si = &setup_info[si_pos];
   boolean font_draw_xoffset_modified = FALSE;
+  boolean scrollbar_needed = (num_setup_info < max_setup_info);
   int font_draw_xoffset_old = -1;
-  int xoffset = (num_setup_info < max_setup_info ? -1 : 0);
+  int xoffset = (scrollbar_needed ? -1 : 0);
   int menu_screen_value_xpos = MENU_SCREEN_VALUE_XPOS + xoffset;
   int menu_screen_max_xpos = MENU_SCREEN_MAX_XPOS + xoffset;
   int xpos = menu_screen_value_xpos;
@@ -5663,6 +5672,26 @@ static void drawSetupValue(int screen_pos, int setup_info_pos_raw)
   starty = mSY + ypos * 32;
   font_nr = getSetupValueFont(type, value);
   font_width = getFontWidth(font_nr);
+
+  // special check if right-side setup values moved left due to scrollbar
+  if (scrollbar_needed && xpos > MENU_SCREEN_START_XPOS)
+  {
+    int max_menu_text_length = 26;	// maximum text length for classic menu
+    int font_xoffset = getFontBitmapInfo(font_nr)->draw_xoffset;
+    int text_startx = mSX + MENU_SCREEN_START_XPOS * 32;
+    int text_font_nr = getMenuTextFont(FONT_MENU_2);
+    int text_font_xoffset = getFontBitmapInfo(text_font_nr)->draw_xoffset;
+    int text_width = max_menu_text_length * getFontWidth(text_font_nr);
+
+    if (startx + font_xoffset < text_startx + text_width + text_font_xoffset)
+    {
+      xpos += 1;
+      startx = mSX + xpos * 32;
+
+      font_nr = getSetupValueFontNarrow(type, font_nr);
+      font_width = getFontWidth(font_nr);
+    }
+  }
 
   /* downward compatibility correction for Juergen Bonhagen's menu settings */
   if (setup_mode != SETUP_MODE_INPUT)
