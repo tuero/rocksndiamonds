@@ -742,6 +742,17 @@ void SDLSetWindowScalingQuality(char *window_scaling_quality)
   video.window_scaling_quality = window_scaling_quality;
 }
 
+void SDLSetScreenRenderingMode(char *screen_rendering_mode)
+{
+  video.screen_rendering_mode =
+    (strEqual(screen_rendering_mode, STR_SPECIAL_RENDERING_BITMAP) ?
+     SPECIAL_RENDERING_BITMAP :
+     strEqual(screen_rendering_mode, STR_SPECIAL_RENDERING_TARGET) ?
+     SPECIAL_RENDERING_TARGET:
+     strEqual(screen_rendering_mode, STR_SPECIAL_RENDERING_DOUBLE) ?
+     SPECIAL_RENDERING_DOUBLE : SPECIAL_RENDERING_OFF);
+}
+
 void SDLSetWindowFullscreen(boolean fullscreen)
 {
   if (sdl_window == NULL)

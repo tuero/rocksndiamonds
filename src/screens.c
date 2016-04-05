@@ -63,17 +63,18 @@
 #define SETUP_MODE_CHOOSE_SNAPSHOT_MODE	18
 #define SETUP_MODE_CHOOSE_WINDOW_SIZE	19
 #define SETUP_MODE_CHOOSE_SCALING_TYPE	20
-#define SETUP_MODE_CHOOSE_GRAPHICS	21
-#define SETUP_MODE_CHOOSE_SOUNDS	22
-#define SETUP_MODE_CHOOSE_MUSIC		23
-#define SETUP_MODE_CHOOSE_VOLUME_SIMPLE	24
-#define SETUP_MODE_CHOOSE_VOLUME_LOOPS	25
-#define SETUP_MODE_CHOOSE_VOLUME_MUSIC	26
-#define SETUP_MODE_CHOOSE_TOUCH_CONTROL	27
-#define SETUP_MODE_CHOOSE_MOVE_DISTANCE	28
-#define SETUP_MODE_CHOOSE_DROP_DISTANCE	29
+#define SETUP_MODE_CHOOSE_RENDERING	21
+#define SETUP_MODE_CHOOSE_GRAPHICS	22
+#define SETUP_MODE_CHOOSE_SOUNDS	23
+#define SETUP_MODE_CHOOSE_MUSIC		24
+#define SETUP_MODE_CHOOSE_VOLUME_SIMPLE	25
+#define SETUP_MODE_CHOOSE_VOLUME_LOOPS	26
+#define SETUP_MODE_CHOOSE_VOLUME_MUSIC	27
+#define SETUP_MODE_CHOOSE_TOUCH_CONTROL	28
+#define SETUP_MODE_CHOOSE_MOVE_DISTANCE	29
+#define SETUP_MODE_CHOOSE_DROP_DISTANCE	30
 
-#define MAX_SETUP_MODES			30
+#define MAX_SETUP_MODES			31
 
 #define MAX_MENU_MODES			MAX(MAX_INFO_MODES, MAX_SETUP_MODES)
 
@@ -201,6 +202,9 @@ static TreeInfo *window_size_current = NULL;
 static TreeInfo *scaling_types = NULL;
 static TreeInfo *scaling_type_current = NULL;
 
+static TreeInfo *rendering_modes = NULL;
+static TreeInfo *rendering_mode_current = NULL;
+
 static TreeInfo *scroll_delays = NULL;
 static TreeInfo *scroll_delay_current = NULL;
 
@@ -267,6 +271,20 @@ static struct
   {	SCALING_QUALITY_BEST,	 "Anisotropic"	},
 
   {	NULL,			 NULL		},
+};
+
+static struct
+{
+  char *value;
+  char *text;
+} rendering_modes_list[] =
+{
+  {	STR_SPECIAL_RENDERING_OFF,	"Off (May show artifacts, fast)" },
+  {	STR_SPECIAL_RENDERING_BITMAP,	"Bitmap/Texture mode (slower)"	 },
+  {	STR_SPECIAL_RENDERING_TARGET,	"Target Texture mode (slower)"	 },
+  {	STR_SPECIAL_RENDERING_DOUBLE,	"Double Texture mode (slower)"	 },
+
+  {	NULL,				 NULL				 },
 };
 
 static struct
@@ -3827,7 +3845,8 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
 	  setup_mode == SETUP_MODE_CHOOSE_SNAPSHOT_MODE)
 	execSetupGame();
       else if (setup_mode == SETUP_MODE_CHOOSE_WINDOW_SIZE ||
-	       setup_mode == SETUP_MODE_CHOOSE_SCALING_TYPE)
+	       setup_mode == SETUP_MODE_CHOOSE_SCALING_TYPE ||
+	       setup_mode == SETUP_MODE_CHOOSE_RENDERING)
 	execSetupGraphics();
       else if (setup_mode == SETUP_MODE_CHOOSE_VOLUME_SIMPLE ||
 	       setup_mode == SETUP_MODE_CHOOSE_VOLUME_LOOPS ||
@@ -4024,7 +4043,8 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
 	      setup_mode == SETUP_MODE_CHOOSE_SNAPSHOT_MODE)
 	    execSetupGame();
 	  else if (setup_mode == SETUP_MODE_CHOOSE_WINDOW_SIZE ||
-		   setup_mode == SETUP_MODE_CHOOSE_SCALING_TYPE)
+		   setup_mode == SETUP_MODE_CHOOSE_SCALING_TYPE ||
+		   setup_mode == SETUP_MODE_CHOOSE_RENDERING)
 	    execSetupGraphics();
 	  else if (setup_mode == SETUP_MODE_CHOOSE_VOLUME_SIMPLE ||
 		   setup_mode == SETUP_MODE_CHOOSE_VOLUME_LOOPS ||
@@ -4289,6 +4309,7 @@ static int max_setup_info;	/* total number of setup entries in list */
 
 static char *window_size_text;
 static char *scaling_type_text;
+static char *rendering_mode_text;
 static char *scroll_delay_text;
 static char *snapshot_mode_text;
 static char *game_speed_text;
@@ -4633,6 +4654,57 @@ static void execSetupGraphics_setScalingTypes()
   scaling_type_text = scaling_type_current->name;
 }
 
+static void execSetupGraphics_setRenderingModes()
+{
+  if (rendering_modes == NULL)
+  {
+    int i;
+
+    for (i = 0; rendering_modes_list[i].value != NULL; i++)
+    {
+      TreeInfo *ti = newTreeInfo_setDefaults(TREE_TYPE_UNDEFINED);
+      char identifier[32], name[32];
+      char *value = rendering_modes_list[i].value;
+      char *text = rendering_modes_list[i].text;
+
+      ti->node_top = &rendering_modes;
+      ti->sort_priority = i;
+
+      sprintf(identifier, "%s", value);
+      sprintf(name, "%s", text);
+
+      setString(&ti->identifier, identifier);
+      setString(&ti->name, name);
+      setString(&ti->name_sorting, name);
+      setString(&ti->infotext, "Special Rendering");
+
+      pushTreeInfo(&rendering_modes, ti);
+    }
+
+    /* sort rendering mode values to start with lowest rendering mode value */
+    sortTreeInfo(&rendering_modes);
+
+    /* set current rendering mode value to configured rendering mode value */
+    rendering_mode_current =
+      getTreeInfoFromIdentifier(rendering_modes, setup.screen_rendering_mode);
+
+    /* if that fails, set current rendering mode to reliable default value */
+    if (rendering_mode_current == NULL)
+      rendering_mode_current =
+	getTreeInfoFromIdentifier(rendering_modes,
+				  STR_SPECIAL_RENDERING_DEFAULT);
+
+    /* if that also fails, set current rendering mode to first available one */
+    if (rendering_mode_current == NULL)
+      rendering_mode_current = rendering_modes;
+  }
+
+  setup.screen_rendering_mode = rendering_mode_current->identifier;
+
+  /* needed for displaying rendering mode text instead of identifier */
+  rendering_mode_text = rendering_mode_current->name;
+}
+
 static void execSetupGraphics()
 {
   if (setup_mode == SETUP_MODE_CHOOSE_WINDOW_SIZE)
@@ -4647,6 +4719,7 @@ static void execSetupGraphics()
   }
 
   execSetupGraphics_setScalingTypes();
+  execSetupGraphics_setRenderingModes();
 
   setup_mode = SETUP_MODE_GRAPHICS;
 
@@ -4659,6 +4732,9 @@ static void execSetupGraphics()
   // window scaling quality may have changed at this point
   if (!strEqual(setup.window_scaling_quality, video.window_scaling_quality))
     SDLSetWindowScalingQuality(setup.window_scaling_quality);
+
+  // screen rendering mode may have changed at this point
+  SDLSetScreenRenderingMode(setup.screen_rendering_mode);
 #endif
 }
 
@@ -4673,6 +4749,13 @@ static void execSetupChooseWindowSize()
 static void execSetupChooseScalingType()
 {
   setup_mode = SETUP_MODE_CHOOSE_SCALING_TYPE;
+
+  DrawSetupScreen();
+}
+
+static void execSetupChooseRenderingMode()
+{
+  setup_mode = SETUP_MODE_CHOOSE_RENDERING;
 
   DrawSetupScreen();
 }
@@ -5280,6 +5363,8 @@ static struct TokenInfo setup_info_graphics[] =
   { TYPE_STRING,	&window_size_text,	""			},
   { TYPE_ENTER_LIST,	execSetupChooseScalingType, "Anti-Aliasing:"	},
   { TYPE_STRING,	&scaling_type_text,	""			},
+  { TYPE_ENTER_LIST,	execSetupChooseRenderingMode, "Special Rendering:" },
+  { TYPE_STRING,	&rendering_mode_text,	""			},
 #endif
 #if 0
   { TYPE_ENTER_LIST,	execSetupChooseScrollDelay, "Scroll Delay:"	},
@@ -6418,6 +6503,8 @@ void DrawSetupScreen()
     DrawChooseTree(&window_size_current);
   else if (setup_mode == SETUP_MODE_CHOOSE_SCALING_TYPE)
     DrawChooseTree(&scaling_type_current);
+  else if (setup_mode == SETUP_MODE_CHOOSE_RENDERING)
+    DrawChooseTree(&rendering_mode_current);
   else if (setup_mode == SETUP_MODE_CHOOSE_GRAPHICS)
     DrawChooseTree(&artwork.gfx_current);
   else if (setup_mode == SETUP_MODE_CHOOSE_SOUNDS)
@@ -6469,6 +6556,8 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
     HandleChooseTree(mx, my, dx, dy, button, &window_size_current);
   else if (setup_mode == SETUP_MODE_CHOOSE_SCALING_TYPE)
     HandleChooseTree(mx, my, dx, dy, button, &scaling_type_current);
+  else if (setup_mode == SETUP_MODE_CHOOSE_RENDERING)
+    HandleChooseTree(mx, my, dx, dy, button, &rendering_mode_current);
   else if (setup_mode == SETUP_MODE_CHOOSE_GRAPHICS)
     HandleChooseTree(mx, my, dx, dy, button, &artwork.gfx_current);
   else if (setup_mode == SETUP_MODE_CHOOSE_SOUNDS)

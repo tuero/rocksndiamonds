@@ -437,6 +437,7 @@ void SDLFreeBitmapTextures(Bitmap *);
 SDL_Surface *SDL_DisplayFormat(SDL_Surface *);
 void SDLSetWindowScaling(int);
 void SDLSetWindowScalingQuality(char *);
+void SDLSetScreenRenderingMode(char *);
 void SDLSetWindowFullscreen(boolean);
 void SDLRedrawWindow();
 #endif
