@@ -86,6 +86,8 @@ struct GlobalAnimMainControlInfo
   int init_delay_counter;
 
   int state;
+
+  int last_state, last_active_part_nr;
 };
 
 struct GlobalAnimControlInfo
@@ -836,6 +838,7 @@ void HandleGlobalAnim_Main(struct GlobalAnimMainControlInfo *anim, int action)
 {
   struct GlobalAnimPartControlInfo *part;
   struct GraphicInfo *c = &anim->control_info;
+  int state, active_part_nr;
 
 #if 0
   printf("::: HandleGlobalAnim_Main: %d, %d => %d\n",
@@ -858,15 +861,18 @@ void HandleGlobalAnim_Main(struct GlobalAnimMainControlInfo *anim, int action)
   switch (action)
   {
     case ANIM_START:
-      anim->state = ANIM_STATE_RESTART;
+      anim->state = anim->last_state = ANIM_STATE_RESTART;
+      anim->active_part_nr = anim->last_active_part_nr = 0;
       anim->part_counter = 0;
-      anim->active_part_nr = 0;
 
       break;
 
     case ANIM_CONTINUE:
       if (anim->state == ANIM_STATE_INACTIVE)
 	return;
+
+      anim->state = anim->last_state;
+      anim->active_part_nr = anim->last_active_part_nr;
 
       break;
 
@@ -924,6 +930,9 @@ void HandleGlobalAnim_Main(struct GlobalAnimMainControlInfo *anim, int action)
 	part->state = ANIM_STATE_INACTIVE;
     }
 
+    anim->last_state = anim->state;
+    anim->last_active_part_nr = anim->active_part_nr;
+
     return;
   }
 
@@ -943,6 +952,31 @@ void HandleGlobalAnim_Main(struct GlobalAnimMainControlInfo *anim, int action)
   if (c->anim_mode & ANIM_ONCE &&
       anim->part_counter == anim->num_parts)
     anim->state = ANIM_STATE_INACTIVE;
+
+  state = anim->state;
+  active_part_nr = anim->active_part_nr;
+
+  // while the animation parts are pausing (waiting or inactive), play the base
+  // (main) animation; this corresponds to the "boring player animation" logic
+  // (!!! KLUDGE WARNING: I THINK THIS IS A MESS THAT SHOULD BE CLEANED UP !!!)
+  if (anim->has_base)
+  {
+    if (anim->state == ANIM_STATE_WAITING ||
+	anim->state == ANIM_STATE_INACTIVE)
+    {
+      anim->active_part_nr = anim->num_parts;	// part nr of base animation
+      part = &anim->part[anim->active_part_nr];
+
+      if (anim->state != anim->last_state)
+	part->state = ANIM_STATE_RESTART;
+
+      anim->state = ANIM_STATE_RUNNING;
+      part->state = HandleGlobalAnim_Part(part, part->state);
+    }
+  }
+
+  anim->last_state = state;
+  anim->last_active_part_nr = active_part_nr;
 }
 
 void HandleGlobalAnim_Mode(struct GlobalAnimControlInfo *ctrl, int action)
