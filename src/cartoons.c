@@ -780,11 +780,25 @@ int HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part, int state)
     return ANIM_STATE_WAITING;
   }
 
+  // check if moving animation has left the visible screen area
   if ((part->x <= -g->width              && part->step_xoffset <= 0) ||
       (part->x >=  part->viewport_width  && part->step_xoffset >= 0) ||
       (part->y <= -g->height             && part->step_yoffset <= 0) ||
       (part->y >=  part->viewport_height && part->step_yoffset >= 0))
-    return ANIM_STATE_RESTART;
+  {
+    // do not stop animation before "anim" or "post" counter are finished
+    if (part->anim_delay_counter == 0 &&
+	part->post_delay_counter == 0)
+    {
+      part->post_delay_counter =
+	(c->post_delay_fixed + GetSimpleRandom(c->post_delay_random));
+
+      if (part->post_delay_counter > 0)
+	return ANIM_STATE_RUNNING;
+
+      return ANIM_STATE_RESTART;
+    }
+  }
 
   if (part->anim_delay_counter > 0)
   {
@@ -798,6 +812,7 @@ int HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part, int state)
       if (part->post_delay_counter > 0)
 	return ANIM_STATE_RUNNING;
 
+      // additional state "RUNNING" required to not skip drawing last frame
       return ANIM_STATE_RESTART | ANIM_STATE_RUNNING;
     }
   }
