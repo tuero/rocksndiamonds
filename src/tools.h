@@ -249,7 +249,10 @@ void PlayMenuMusic();
 void PlaySoundActivating();
 void PlaySoundSelecting();
 
+void SetAnimStatus(int);
 void SetGameStatus(int);
+void SetFontStatus(int);
+void ResetFontStatus();
 
 void ToggleFullscreenOrChangeWindowScalingIfNeeded();
 void ChangeViewportPropertiesIfNeeded();

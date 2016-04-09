@@ -1247,11 +1247,7 @@ static void drawCursorXY(int xpos, int ypos, int graphic)
 
 static void drawChooseTreeCursor(int ypos, boolean active)
 {
-  int last_game_status = game_status;	/* save current game status */
-
   drawCursorExt(0, ypos, active, -1);
-
-  SetGameStatus(last_game_status);	/* restore current game status */
 }
 
 void DrawHeadline()
@@ -1309,13 +1305,12 @@ void DrawTitleScreenMessage(int nr, boolean initial)
 {
   char *filename = getLevelSetTitleMessageFilename(nr, initial);
   struct TitleMessageInfo *tmi = getTitleMessageInfo(nr, initial);
-  int last_game_status = game_status;	/* save current game status */
 
   if (filename == NULL)
     return;
 
   /* force TITLE font on title message screen */
-  SetGameStatus(getTitleMessageGameMode(initial));
+  SetFontStatus(getTitleMessageGameMode(initial));
 
   /* if chars *and* width set to "-1", automatically determine width */
   if (tmi->chars == -1 && tmi->width == -1)
@@ -1354,7 +1349,7 @@ void DrawTitleScreenMessage(int nr, boolean initial)
 	       filename, tmi->font, tmi->chars, -1, tmi->lines, 0, -1,
 	       tmi->autowrap, tmi->centered, tmi->parse_comments);
 
-  SetGameStatus(last_game_status);	/* restore current game status */
+  ResetFontStatus();
 }
 
 void DrawTitleScreen()
@@ -1590,7 +1585,6 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
 
 	DrawInfoScreen_NotAvailable("Title screen information:",
 				    "No title screen for this level set.");
-
 	return;
       }
 
@@ -3696,7 +3690,6 @@ static void drawChooseTreeList(int first_entry, int num_page_entries,
   int yoffset_setup = 16;
   int yoffset = (ti->type == TREE_TYPE_LEVEL_DIR ||
 		 ti->type == TREE_TYPE_LEVEL_NR ? yoffset_sets : yoffset_setup);
-  int last_game_status = game_status;	/* save current game status */
 
   title_string = ti->infotext;
 
@@ -3735,8 +3728,6 @@ static void drawChooseTreeList(int first_entry, int num_page_entries,
     else
       initCursor(i, IMG_MENU_BUTTON);
   }
-
-  SetGameStatus(last_game_status);	/* restore current game status */
 
   redraw_mask |= REDRAW_FIELD;
 }
@@ -3785,15 +3776,12 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
   int step = (button == 1 ? 1 : button == 2 ? 5 : 10);
   int num_entries = numTreeInfoInGroup(ti);
   int num_page_entries;
-  int last_game_status = game_status;	/* save current game status */
   boolean position_set_by_scrollbar = (dx == 999);
 
   if (num_entries <= NUM_MENU_ENTRIES_ON_SCREEN)
     num_page_entries = num_entries;
   else
     num_page_entries = NUM_MENU_ENTRIES_ON_SCREEN;
-
-  SetGameStatus(last_game_status);	/* restore current game status */
 
   if (button == MB_MENU_INITIALIZE)
   {
@@ -3878,12 +3866,8 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
 
   if (mx || my)		/* mouse input */
   {
-    int last_game_status = game_status;	/* save current game status */
-
     x = (mx - mSX) / 32;
     y = (my - mSY) / 32 - MENU_SCREEN_START_YPOS;
-
-    SetGameStatus(last_game_status);	/* restore current game status */
   }
   else if (dx || dy)	/* keyboard or scrollbar/scrollbutton input */
   {
@@ -6935,14 +6919,10 @@ static void CreateScreenScrollbars()
 
 void CreateScreenGadgets()
 {
-  int last_game_status = game_status;	/* save current game status */
-
   CreateScreenMenubuttons();
 
   CreateScreenScrollbuttons();
   CreateScreenScrollbars();
-
-  SetGameStatus(last_game_status);	/* restore current game status */
 }
 
 void FreeScreenGadgets()

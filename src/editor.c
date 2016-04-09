@@ -6403,10 +6403,8 @@ static void CreateRadiobuttonGadgets()
 
 void CreateLevelEditorGadgets()
 {
-  int old_game_status = game_status;
-
-  /* setting 'game_status' is needed to get the right fonts for the editor */
-  SetGameStatus(GAME_MODE_EDITOR);
+  /* force EDITOR font inside level editor */
+  SetFontStatus(GAME_MODE_EDITOR);
 
   /* these values are not constant, but can change at runtime */
   ed_fieldx = MAX_ED_FIELDX - 1;
@@ -6440,7 +6438,7 @@ void CreateLevelEditorGadgets()
   CreateTextbuttonGadgets();
   CreateDrawingAreas();
 
-  SetGameStatus(old_game_status);
+  ResetFontStatus();
 }
 
 void FreeLevelEditorGadgets()

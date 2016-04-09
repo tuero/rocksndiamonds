@@ -2428,7 +2428,6 @@ static void setRequestPosition(int *x, int *y, boolean add_border_size)
 
 void DrawEnvelopeRequest(char *text)
 {
-  int last_game_status = game_status;	/* save current game status */
   char *text_final = text;
   char *text_door_style = NULL;
   int graphic = IMG_BACKGROUND_REQUEST;
@@ -2496,13 +2495,13 @@ void DrawEnvelopeRequest(char *text)
 				  tile_size, tile_size);
 
   /* force DOOR font inside door area */
-  SetGameStatus(GAME_MODE_PSEUDO_DOOR);
+  SetFontStatus(GAME_MODE_PSEUDO_DOOR);
 
   DrawTextBuffer(sx + sx_offset, sy + sy_offset, text_final, font_nr,
 		 line_length, -1, max_lines, line_spacing, mask_mode,
 		 request.autowrap, request.centered, FALSE);
 
-  SetGameStatus(last_game_status);	/* restore current game status */
+  ResetFontStatus();
 
   for (i = 0; i < NUM_TOOL_BUTTONS; i++)
     RedrawGadget(tool_gadget[i]);
@@ -2861,7 +2860,6 @@ static void DrawPreviewLevelExt(boolean restart)
   boolean show_level_border = (BorderElement != EL_EMPTY);
   int level_xsize = lev_fieldx + (show_level_border ? 2 : 0);
   int level_ysize = lev_fieldy + (show_level_border ? 2 : 0);
-  int last_game_status = game_status;		/* save current game status */
 
   if (restart)
   {
@@ -2906,8 +2904,6 @@ static void DrawPreviewLevelExt(boolean restart)
       if (IN_GFX_FIELD_FULL(pos->x, pos->y + getFontHeight(pos->font)))
 	DrawTextSAligned(pos->x, pos->y, label_text, font_nr, pos->align);
     }
-
-    SetGameStatus(last_game_status);	/* restore current game status */
 
     return;
   }
@@ -3008,8 +3004,6 @@ static void DrawPreviewLevelExt(boolean restart)
 
     DrawPreviewLevelLabelExt(label_state);
   }
-
-  SetGameStatus(last_game_status);	/* restore current game status */
 }
 
 void DrawPreviewLevelInitial()
@@ -3737,7 +3731,6 @@ static int RequestHandleEvents(unsigned int req_state)
 static boolean RequestDoor(char *text, unsigned int req_state)
 {
   unsigned int old_door_state;
-  int last_game_status = game_status;	/* save current game status */
   int max_request_line_len = MAX_REQUEST_LINE_FONT1_LEN;
   int font_nr = FONT_TEXT_2;
   char *text_ptr;
@@ -3794,7 +3787,7 @@ static boolean RequestDoor(char *text, unsigned int req_state)
   DrawBackground(DX, DY, DXSIZE, DYSIZE);
 
   /* force DOOR font inside door area */
-  SetGameStatus(GAME_MODE_PSEUDO_DOOR);
+  SetFontStatus(GAME_MODE_PSEUDO_DOOR);
 
   /* write text for request */
   for (text_ptr = text, ty = 0; ty < MAX_REQUEST_LINES; ty++)
@@ -3834,7 +3827,7 @@ static boolean RequestDoor(char *text, unsigned int req_state)
     // text_ptr += tl + (tc == ' ' || tc == '?' || tc == '!' ? 1 : 0);
   }
 
-  SetGameStatus(last_game_status);	/* restore current game status */
+  ResetFontStatus();
 
   if (req_state & REQ_ASK)
   {
@@ -8282,11 +8275,38 @@ void JoinRectangles(int *x, int *y, int *width, int *height,
   *height = MAX(*height, height2);
 }
 
+void SetAnimStatus(int anim_status_new)
+{
+  global.anim_status_next = anim_status_new;
+}
+
 void SetGameStatus(int game_status_new)
 {
   game_status = game_status_new;
 
-  global.anim_status_next = game_status;
+  SetAnimStatus(game_status_new);
+}
+
+void SetFontStatus(int game_status_new)
+{
+  static int last_game_status = -1;
+
+  if (game_status_new != -1)
+  {
+    // set game status for font use after storing last game status
+    last_game_status = game_status;
+    game_status = game_status_new;
+  }
+  else
+  {
+    // reset game status after font use from last stored game status
+    game_status = last_game_status;
+  }
+}
+
+void ResetFontStatus()
+{
+  SetFontStatus(-1);
 }
 
 void ChangeViewportPropertiesIfNeeded()
