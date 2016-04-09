@@ -725,6 +725,13 @@ static int getTitleMessageGameMode(boolean initial)
   return (initial ? GAME_MODE_TITLE_INITIAL : GAME_MODE_TITLE);
 }
 
+static int getTitleAnimMode(struct TitleControlInfo *tci)
+{
+  int base = (tci->initial ? GAME_MODE_TITLE_INITIAL_1 : GAME_MODE_TITLE_1);
+
+  return base + tci->local_nr;
+}
+
 #if 0
 static int getTitleScreenBackground(boolean initial)
 {
@@ -1565,6 +1572,8 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
     title_screen_nr = 0;
     tci = &title_controls[title_screen_nr];
 
+    SetAnimStatus(getTitleAnimMode(tci));
+
     last_sound = SND_UNDEFINED;
     last_music = MUS_UNDEFINED;
 
@@ -1645,10 +1654,13 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
     }
 
     title_screen_nr++;
-    tci = &title_controls[title_screen_nr];
 
     if (title_screen_nr < num_title_screens)
     {
+      tci = &title_controls[title_screen_nr];
+
+      SetAnimStatus(getTitleAnimMode(tci));
+
       sound = getTitleSound(tci);
       music = getTitleMusic(tci);
 
