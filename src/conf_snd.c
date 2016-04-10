@@ -264,6 +264,7 @@ struct ConfigInfo sound_config[] =
   { "background.TITLE",			UNDEFINED_FILENAME		},
   { "background.MAIN",			UNDEFINED_FILENAME		},
   { "background.LEVELS",		UNDEFINED_FILENAME		},
+  { "background.LEVELNR",		UNDEFINED_FILENAME		},
   { "background.SCORES",		"halloffame.wav"		},
   { "background.SCORES.mode_loop",	"false"				},
   { "background.EDITOR",		UNDEFINED_FILENAME		},
