@@ -3113,6 +3113,8 @@ void InitGame()
   if (CheckIfGlobalBorderHasChanged())
     fade_mask = REDRAW_ALL;
 
+  ExpireSoundLoops(TRUE);
+
   FadeOut(fade_mask);
 
   ClearField();

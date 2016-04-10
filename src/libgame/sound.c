@@ -122,6 +122,7 @@ static int stereo_volume[SOUND_MAX_LEFT2RIGHT + 1];
 
 static struct SoundControl mixer[NUM_MIXER_CHANNELS];
 static int mixer_active_channels = 0;
+static boolean expire_loop_sounds = FALSE;
 
 static void ReloadCustomSounds();
 static void ReloadCustomMusic();
@@ -150,7 +151,8 @@ static void Mixer_ResetChannelExpiration(int channel)
 {
   mixer[channel].playing_starttime = Counter();
 
-  if (IS_LOOP(mixer[channel]) && !IS_MUSIC(mixer[channel]))
+  if (expire_loop_sounds &&
+      IS_LOOP(mixer[channel]) && !IS_MUSIC(mixer[channel]))
     Mix_ExpireChannel(channel, SOUND_LOOP_EXPIRATION_TIME);
 }
 
@@ -159,7 +161,8 @@ static boolean Mixer_ChannelExpired(int channel)
   if (!mixer[channel].active)
     return TRUE;
 
-  if (IS_LOOP(mixer[channel]) && !IS_MUSIC(mixer[channel]) &&
+  if (expire_loop_sounds &&
+      IS_LOOP(mixer[channel]) && !IS_MUSIC(mixer[channel]) &&
       DelayReached(&mixer[channel].playing_starttime,
 		   SOUND_LOOP_EXPIRATION_TIME))
     return TRUE;
@@ -477,6 +480,10 @@ static void HandleSoundRequest(SoundControl snd_ctrl)
     for (i = audio.first_sound_channel; i < audio.num_channels; i++)
       if (SAME_SOUND_NR(mixer[i], snd_ctrl) || ALL_SOUNDS(snd_ctrl))
 	Mixer_StopChannel(i);
+  }
+  else if (SET_EXPIRE_LOOPS(snd_ctrl))	/* set loop expiration on or off */
+  {
+    expire_loop_sounds = snd_ctrl.active;
   }
   else if (snd_ctrl.active)		/* add new sound to mixer */
   {
@@ -986,6 +993,21 @@ void StopSoundExt(int nr, int state)
   snd_ctrl.active = FALSE;
   snd_ctrl.nr = nr;
   snd_ctrl.state = state;
+
+  HandleSoundRequest(snd_ctrl);
+}
+
+void ExpireSoundLoops(boolean active)
+{
+  SoundControl snd_ctrl;
+
+  if (!audio.sound_available)
+    return;
+
+  clear_mem(&snd_ctrl, sizeof(SoundControl));	/* to make valgrind happy */
+
+  snd_ctrl.active = active;
+  snd_ctrl.state = SND_CTRL_EXPIRE_LOOPS;
 
   HandleSoundRequest(snd_ctrl);
 }

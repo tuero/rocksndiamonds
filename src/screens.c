@@ -1400,6 +1400,8 @@ void DrawMainMenu()
   UnmapAllGadgets();
   FadeSoundsAndMusic();
 
+  ExpireSoundLoops(FALSE);
+
   KeyboardAutoRepeatOn();
   ActivateJoystick();
 
