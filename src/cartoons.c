@@ -52,7 +52,9 @@ struct GlobalAnimPartControlInfo
   int anim_nr;
   int mode_nr;
 
+  int sound;
   int graphic;
+
   struct GraphicInfo graphic_info;
   struct GraphicInfo control_info;
 
@@ -341,7 +343,7 @@ void InitGlobalAnimControls()
 {
   int i, m, a, p;
   int mode_nr, anim_nr, part_nr;
-  int graphic, control;
+  int sound, graphic, control;
 
   anim_sync_frame = 0;
 
@@ -389,6 +391,7 @@ void InitGlobalAnimControls()
       {
 	struct GlobalAnimPartControlInfo *part = &anim->part[part_nr];
 
+	sound   = global_anim_info[a].sound[p][m];
 	graphic = global_anim_info[a].graphic[p][m];
 	control = global_anim_info[ctrl_id].graphic[p][m];
 
@@ -401,9 +404,15 @@ void InitGlobalAnimControls()
 	       m, a, p, mode_nr, anim_nr, part_nr, control);
 #endif
 
+#if 0
+	printf("::: mode == %d, anim = %d, part = %d [%d, %d, %d] [%d]\n",
+	       m, a, p, mode_nr, anim_nr, part_nr, sound);
+#endif
+
 	part->nr = part_nr;
 	part->anim_nr = anim_nr;
 	part->mode_nr = mode_nr;
+	part->sound = sound;
 	part->graphic = graphic;
 	part->graphic_info = graphic_info[graphic];
 	part->control_info = graphic_info[control];
@@ -699,6 +708,44 @@ boolean SetGlobalAnimPart_Viewport(struct GlobalAnimPartControlInfo *part)
   return changed;
 }
 
+void PlayGlobalAnimSound(struct GlobalAnimPartControlInfo *part)
+{
+  int sound = part->sound;
+
+  if (sound == SND_UNDEFINED)
+    return;
+
+  if ((!setup.sound_simple && !IS_LOOP_SOUND(sound)) ||
+      (!setup.sound_loops && IS_LOOP_SOUND(sound)))
+    return;
+
+  // !!! TODO: ADD STEREO POSITION FOR MOVING ANIMATIONS !!!
+  if (IS_LOOP_SOUND(sound))
+    PlaySoundLoop(sound);
+  else
+    PlaySound(sound);
+
+#if 0
+  printf("::: PLAY %d.%d.%d: %d\n",
+	 part->anim_nr, part->nr, part->mode_nr, sound);
+#endif
+}
+
+void StopGlobalAnimSound(struct GlobalAnimPartControlInfo *part)
+{
+  int sound = part->sound;
+
+  if (sound == SND_UNDEFINED)
+    return;
+
+  StopSound(sound);
+
+#if 0
+  printf("::: STOP %d.%d.%d: %d\n",
+	 part->anim_nr, part->nr, part->mode_nr, sound);
+#endif
+}
+
 int HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part, int state)
 {
   struct GraphicInfo *g = &part->graphic_info;
@@ -793,11 +840,17 @@ int HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part, int state)
       part->step_xoffset = c->step_xoffset;
     if (c->step_yoffset != ARG_UNDEFINED_VALUE)
       part->step_yoffset = c->step_yoffset;
+
+    if (part->init_delay_counter == 0)
+      PlayGlobalAnimSound(part);
   }
 
   if (part->init_delay_counter > 0)
   {
     part->init_delay_counter--;
+
+    if (part->init_delay_counter == 0)
+      PlayGlobalAnimSound(part);
 
     return ANIM_STATE_WAITING;
   }
@@ -818,6 +871,8 @@ int HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part, int state)
       if (part->post_delay_counter > 0)
 	return ANIM_STATE_RUNNING;
 
+      StopGlobalAnimSound(part);
+
       return ANIM_STATE_RESTART;
     }
   }
@@ -834,6 +889,8 @@ int HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part, int state)
       if (part->post_delay_counter > 0)
 	return ANIM_STATE_RUNNING;
 
+      StopGlobalAnimSound(part);
+
       // additional state "RUNNING" required to not skip drawing last frame
       return ANIM_STATE_RESTART | ANIM_STATE_RUNNING;
     }
@@ -842,6 +899,9 @@ int HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part, int state)
   if (part->post_delay_counter > 0)
   {
     part->post_delay_counter--;
+
+    if (part->post_delay_counter == 0)
+      StopGlobalAnimSound(part);
 
     if (part->post_delay_counter == 0)
       return ANIM_STATE_RESTART;
@@ -915,6 +975,14 @@ void HandleGlobalAnim_Main(struct GlobalAnimMainControlInfo *anim, int action)
 
     case ANIM_STOP:
       anim->state = ANIM_STATE_INACTIVE;
+
+      {
+	int num_parts = anim->num_parts + (anim->has_base ? 1 : 0);
+	int i;
+
+	for (i = 0; i < num_parts; i++)
+	  StopGlobalAnimSound(&anim->part[i]);
+      }
 
       return;
 

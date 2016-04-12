@@ -593,6 +593,55 @@ void InitGlobalAnimGraphicInfo()
 #endif
 }
 
+void InitGlobalAnimSoundInfo()
+{
+  struct PropertyMapping *property_mapping = getSoundListPropertyMapping();
+  int num_property_mappings = getSoundListPropertyMappingSize();
+  int i, j, k;
+
+  /* always start with reliable default values (no global animation sounds) */
+  for (i = 0; i < NUM_GLOBAL_ANIM_TOKENS; i++)
+    for (j = 0; j < NUM_GLOBAL_ANIM_PARTS_ALL; j++)
+      for (k = 0; k < NUM_SPECIAL_GFX_ARGS; k++)
+	global_anim_info[i].sound[j][k] = SND_UNDEFINED;
+
+  /* initialize global animation sound definitions from dynamic configuration */
+  for (i = 0; i < num_property_mappings; i++)
+  {
+    int anim_nr = property_mapping[i].base_index - 2 * MAX_NUM_ELEMENTS;
+    int part_nr = property_mapping[i].ext1_index - ACTION_PART_1;
+    int special = property_mapping[i].ext3_index;
+    int sound   = property_mapping[i].artwork_index;
+
+    // sound uses control definition; map it to position of graphic (artwork)
+    anim_nr -= GLOBAL_ANIM_ID_CONTROL_FIRST;
+
+    if (anim_nr < 0 || anim_nr >= NUM_GLOBAL_ANIM_TOKENS)
+      continue;
+
+    /* set animation part to base part, if not specified */
+    if (!IS_GLOBAL_ANIM_PART(part_nr))
+      part_nr = GLOBAL_ANIM_ID_PART_BASE;
+
+    /* set animation screen to default, if not specified */
+    if (!IS_SPECIAL_GFX_ARG(special))
+      special = GFX_SPECIAL_ARG_DEFAULT;
+
+    global_anim_info[anim_nr].sound[part_nr][special] = sound;
+  }
+
+#if 0
+  printf("::: InitGlobalAnimSoundInfo\n");
+
+  for (i = 0; i < NUM_GLOBAL_ANIMS; i++)
+    for (j = 0; j < NUM_GLOBAL_ANIM_PARTS_ALL; j++)
+      for (k = 0; k < NUM_SPECIAL_GFX_ARGS; k++)
+	if (global_anim_info[i].sound[j][k] != SND_UNDEFINED)
+	  printf("::: - anim %d, part %d, mode %d => %d\n",
+		 i, j, k, global_anim_info[i].sound[j][k]);
+#endif
+}
+
 void InitElementGraphicInfo()
 {
   struct PropertyMapping *property_mapping = getImageListPropertyMapping();
@@ -2061,7 +2110,6 @@ static void ReinitializeGraphics()
   InitGadgets();
   print_timestamp_time("InitGadgets");
   InitToons();
-  InitGlobalAnimations();
   print_timestamp_time("InitToons");
   InitDoors();
   print_timestamp_time("InitDoors");
@@ -2074,6 +2122,7 @@ static void ReinitializeSounds()
   InitSoundInfo();		/* sound properties mapping */
   InitElementSoundInfo();	/* element game sound mapping */
   InitGameModeSoundInfo();	/* game mode sound mapping */
+  InitGlobalAnimSoundInfo();	/* global animation sound settings */
 
   InitPlayLevelSound();		/* internal game sound settings */
 }
@@ -4928,7 +4977,8 @@ static void InitArtworkConfig()
   static char *image_id_prefix[MAX_NUM_ELEMENTS +
 			       NUM_FONTS +
 			       NUM_GLOBAL_ANIM_TOKENS + 1];
-  static char *sound_id_prefix[2 * MAX_NUM_ELEMENTS + 1];
+  static char *sound_id_prefix[2 * MAX_NUM_ELEMENTS +
+			       NUM_GLOBAL_ANIM_TOKENS + 1];
   static char *music_id_prefix[NUM_MUSIC_PREFIXES + 1];
   static char *action_id_suffix[NUM_ACTIONS + 1];
   static char *direction_id_suffix[NUM_DIRECTIONS_FULL + 1];
@@ -4998,7 +5048,10 @@ static void InitArtworkConfig()
   for (i = 0; i < MAX_NUM_ELEMENTS; i++)
     sound_id_prefix[MAX_NUM_ELEMENTS + i] =
       get_string_in_brackets(element_info[i].class_name);
-  sound_id_prefix[2 * MAX_NUM_ELEMENTS] = NULL;
+  for (i = 0; i < NUM_GLOBAL_ANIM_TOKENS; i++)
+    sound_id_prefix[2 * MAX_NUM_ELEMENTS + i] =
+      global_anim_info[i].token_name;
+  sound_id_prefix[2 * MAX_NUM_ELEMENTS + NUM_GLOBAL_ANIM_TOKENS] = NULL;
 
   for (i = 0; i < NUM_MUSIC_PREFIXES; i++)
     music_id_prefix[i] = music_prefix_info[i].prefix;
@@ -5378,6 +5431,11 @@ static void InitMusic(char *identifier)
   print_timestamp_done("InitMusic");
 }
 
+static void InitArtworkDone()
+{
+  InitGlobalAnimations();
+}
+
 void InitNetworkServer()
 {
 #if defined(NETWORK_AVALIABLE)
@@ -5653,6 +5711,8 @@ void ReloadCustomArtwork(int force_reload)
     print_timestamp_time("InitMusic");
   }
 
+  InitArtworkDone();
+
   SetGameStatus(last_game_status);	/* restore current game status */
 
   init_last = init;			/* switch to new busy animation */
@@ -5826,6 +5886,8 @@ void OpenAll()
 
   InitMusic(NULL);		/* needs to know current level directory */
   print_timestamp_time("InitMusic");
+
+  InitArtworkDone();
 
   InitGfxBackground();
 
