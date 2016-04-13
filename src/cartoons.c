@@ -865,14 +865,15 @@ int HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part, int state)
     if (part->anim_delay_counter == 0 &&
 	part->post_delay_counter == 0)
     {
+      StopGlobalAnimSound(part);
+
       part->post_delay_counter =
 	(c->post_delay_fixed + GetSimpleRandom(c->post_delay_random));
 
       if (part->post_delay_counter > 0)
 	return ANIM_STATE_RUNNING;
 
-      StopGlobalAnimSound(part);
-
+      // drawing last frame not needed here -- animation not visible anymore
       return ANIM_STATE_RESTART;
     }
   }
@@ -883,13 +884,13 @@ int HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part, int state)
 
     if (part->anim_delay_counter == 0)
     {
+      StopGlobalAnimSound(part);
+
       part->post_delay_counter =
 	(c->post_delay_fixed + GetSimpleRandom(c->post_delay_random));
 
       if (part->post_delay_counter > 0)
 	return ANIM_STATE_RUNNING;
-
-      StopGlobalAnimSound(part);
 
       // additional state "RUNNING" required to not skip drawing last frame
       return ANIM_STATE_RESTART | ANIM_STATE_RUNNING;
@@ -899,9 +900,6 @@ int HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part, int state)
   if (part->post_delay_counter > 0)
   {
     part->post_delay_counter--;
-
-    if (part->post_delay_counter == 0)
-      StopGlobalAnimSound(part);
 
     if (part->post_delay_counter == 0)
       return ANIM_STATE_RESTART;
