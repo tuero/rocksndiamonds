@@ -7623,6 +7623,8 @@ void DrawLevelEd()
 {
   int fade_mask = REDRAW_FIELD;
 
+  FadeSoundsAndMusic();
+
   /* needed if different viewport properties defined for editor */
   ChangeViewportPropertiesIfNeeded();
 

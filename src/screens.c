@@ -2170,6 +2170,7 @@ static void DrawInfoScreen_Main()
     fade_mask = REDRAW_ALL;
 
   UnmapAllGadgets();
+  FadeSoundsAndMusic();
 
   FreeScreenGadgets();
   CreateScreenGadgets();
@@ -4075,6 +4076,8 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
 
 void DrawChooseLevelSet()
 {
+  FadeSoundsAndMusic();
+
   SetMainBackgroundImage(IMG_BACKGROUND_LEVELS);
 
   DrawChooseTree(&leveldir_current);
@@ -4091,6 +4094,8 @@ void HandleChooseLevelSet(int mx, int my, int dx, int dy, int button)
 void DrawChooseLevelNr()
 {
   int i;
+
+  FadeSoundsAndMusic();
 
   if (level_number != NULL)
   {
@@ -5787,6 +5792,7 @@ static void DrawSetupScreen_Generic()
     fade_mask = REDRAW_ALL;
 
   UnmapAllGadgets();
+  FadeSoundsAndMusic();
 
   FreeScreenGadgets();
   CreateScreenGadgets();
