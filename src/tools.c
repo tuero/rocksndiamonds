@@ -8277,7 +8277,17 @@ void JoinRectangles(int *x, int *y, int *width, int *height,
 
 void SetAnimStatus(int anim_status_new)
 {
+  if (anim_status_new == GAME_MODE_MAIN)
+    anim_status_new = GAME_MODE_PSEUDO_MAINONLY;
+
   global.anim_status_next = anim_status_new;
+
+  // directly set screen modes that are entered without fading
+  if ((global.anim_status      == GAME_MODE_PSEUDO_MAINONLY &&
+       global.anim_status_next == GAME_MODE_PSEUDO_TYPENAME) ||
+      (global.anim_status      == GAME_MODE_PSEUDO_TYPENAME &&
+       global.anim_status_next == GAME_MODE_PSEUDO_MAINONLY))
+    global.anim_status = global.anim_status_next;
 }
 
 void SetGameStatus(int game_status_new)
