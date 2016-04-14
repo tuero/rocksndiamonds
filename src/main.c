@@ -5652,12 +5652,13 @@ static void print_usage()
 
 static void print_version()
 {
-  Print("%s %d.%d.%d.%d\n",
+  Print("%s %d.%d.%d.%d%s\n",
 	PROGRAM_TITLE_STRING,
 	PROGRAM_VERSION_MAJOR,
 	PROGRAM_VERSION_MINOR,
 	PROGRAM_VERSION_PATCH,
-	PROGRAM_VERSION_BUILD);
+	PROGRAM_VERSION_BUILD,
+	PROGRAM_VERSION_EXTRA);
 
   if (options.debug)
   {
