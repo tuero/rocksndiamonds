@@ -306,12 +306,14 @@ static void InitToonControls()
   for (i = 0; i < num_toons; i++)
   {
     struct GlobalAnimPartControlInfo *part = &anim->part[part_nr];
+    int sound = SND_UNDEFINED;
     int graphic = IMG_TOON_1 + i;
     int control = graphic;
 
     part->nr = part_nr;
     part->anim_nr = anim_nr;
     part->mode_nr = mode_nr;
+    part->sound = sound;
     part->graphic = graphic;
     part->graphic_info = graphic_info[graphic];
     part->control_info = graphic_info[control];
