@@ -5641,7 +5641,7 @@ static void drawSetupValue(int screen_pos, int setup_info_pos_raw)
   int ypos = MENU_SCREEN_START_YPOS + screen_pos;
   int startx = mSX + xpos * 32;
   int starty = mSY + ypos * 32;
-  int font_nr, font_width;
+  int font_nr, font_nr_default, font_width_default;
   int type = si->type;
   void *value = si->value;
   char *value_string = getSetupValue(type, value);
@@ -5673,8 +5673,10 @@ static void drawSetupValue(int screen_pos, int setup_info_pos_raw)
 
   startx = mSX + xpos * 32;
   starty = mSY + ypos * 32;
-  font_nr = getSetupValueFont(type, value);
-  font_width = getFontWidth(font_nr);
+  font_nr_default = getSetupValueFont(type, value);
+  font_width_default = getFontWidth(font_nr_default);
+
+  font_nr = font_nr_default;
 
   // special check if right-side setup values moved left due to scrollbar
   if (scrollbar_needed && xpos > MENU_SCREEN_START_XPOS)
@@ -5692,7 +5694,6 @@ static void drawSetupValue(int screen_pos, int setup_info_pos_raw)
       startx = mSX + xpos * 32;
 
       font_nr = getSetupValueFontNarrow(type, font_nr);
-      font_width = getFontWidth(font_nr);
     }
   }
 
@@ -5735,7 +5736,7 @@ static void drawSetupValue(int screen_pos, int setup_info_pos_raw)
   }
 
   for (i = 0; i <= menu_screen_max_xpos - xpos; i++)
-    DrawText(startx + i * font_width, starty, " ", font_nr);
+    DrawText(startx + i * font_width_default, starty, " ", font_nr_default);
 
   DrawText(startx, starty, value_string, font_nr);
 
