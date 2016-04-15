@@ -226,6 +226,35 @@ void InitBitmapPointers()
       graphic_info[i].bitmap = graphic_info[i].bitmaps[IMG_BITMAP_STANDARD];
 }
 
+void InitImageTextures()
+{
+  int i, j, k;
+
+  FreeAllImageTextures();
+
+  for (i = IMG_GLOBAL_BORDER_FIRST; i <= IMG_GLOBAL_BORDER_LAST; i++)
+    CreateImageTextures(i);
+
+  for (i = 0; i < MAX_NUM_TOONS; i++)
+    CreateImageTextures(IMG_TOON_1 + i);
+
+  for (i = 0; i < NUM_GLOBAL_ANIMS; i++)
+  {
+    for (j = 0; j < NUM_GLOBAL_ANIM_PARTS_ALL; j++)
+    {
+      for (k = 0; k < NUM_SPECIAL_GFX_ARGS; k++)
+      {
+	int graphic = global_anim_info[i].graphic[j][k];
+
+	if (graphic == IMG_UNDEFINED)
+	  continue;
+
+	CreateImageTextures(graphic);
+      }
+    }
+  }
+}
+
 #if 1
 /* !!! FIX THIS (CHANGE TO USING NORMAL ELEMENT GRAPHIC DEFINITIONS) !!! */
 void SetBitmaps_EM(Bitmap **em_bitmap)
@@ -503,6 +532,114 @@ void InitFontGraphicInfo()
 
   InitFontInfo(font_bitmap_info, num_font_bitmaps,
 	       getFontBitmapID, getFontFromToken);
+}
+
+void InitGlobalAnimGraphicInfo()
+{
+  struct PropertyMapping *property_mapping = getImageListPropertyMapping();
+  int num_property_mappings = getImageListPropertyMappingSize();
+  int i, j, k;
+
+  if (graphic_info == NULL)		/* still at startup phase */
+    return;
+
+  /* always start with reliable default values (no global animations) */
+  for (i = 0; i < NUM_GLOBAL_ANIM_TOKENS; i++)
+    for (j = 0; j < NUM_GLOBAL_ANIM_PARTS_ALL; j++)
+      for (k = 0; k < NUM_SPECIAL_GFX_ARGS; k++)
+	global_anim_info[i].graphic[j][k] = IMG_UNDEFINED;
+
+  /* initialize global animation definitions from static configuration */
+  for (i = 0; i < NUM_GLOBAL_ANIM_TOKENS; i++)
+  {
+    int j = GLOBAL_ANIM_ID_PART_BASE;
+    int k = GFX_SPECIAL_ARG_DEFAULT;
+
+    global_anim_info[i].graphic[j][k] = IMG_GLOBAL_ANIM_1_GFX + i;
+  }
+
+  /* initialize global animation definitions from dynamic configuration */
+  for (i = 0; i < num_property_mappings; i++)
+  {
+    int anim_nr = property_mapping[i].base_index - MAX_NUM_ELEMENTS - NUM_FONTS;
+    int part_nr = property_mapping[i].ext1_index - ACTION_PART_1;
+    int special = property_mapping[i].ext3_index;
+    int graphic = property_mapping[i].artwork_index;
+
+    if (anim_nr < 0 || anim_nr >= NUM_GLOBAL_ANIM_TOKENS)
+      continue;
+
+    /* set animation part to base part, if not specified */
+    if (!IS_GLOBAL_ANIM_PART(part_nr))
+      part_nr = GLOBAL_ANIM_ID_PART_BASE;
+
+    /* set animation screen to default, if not specified */
+    if (!IS_SPECIAL_GFX_ARG(special))
+      special = GFX_SPECIAL_ARG_DEFAULT;
+
+    global_anim_info[anim_nr].graphic[part_nr][special] = graphic;
+  }
+
+#if 0
+  printf("::: InitGlobalAnimGraphicInfo\n");
+
+  for (i = 0; i < NUM_GLOBAL_ANIMS; i++)
+    for (j = 0; j < NUM_GLOBAL_ANIM_PARTS_ALL; j++)
+      for (k = 0; k < NUM_SPECIAL_GFX_ARGS; k++)
+	if (global_anim_info[i].graphic[j][k] != IMG_UNDEFINED &&
+	    graphic_info[global_anim_info[i].graphic[j][k]].bitmap != NULL)
+	  printf("::: - anim %d, part %d, mode %d => %d\n",
+		 i, j, k, global_anim_info[i].graphic[j][k]);
+#endif
+}
+
+void InitGlobalAnimSoundInfo()
+{
+  struct PropertyMapping *property_mapping = getSoundListPropertyMapping();
+  int num_property_mappings = getSoundListPropertyMappingSize();
+  int i, j, k;
+
+  /* always start with reliable default values (no global animation sounds) */
+  for (i = 0; i < NUM_GLOBAL_ANIM_TOKENS; i++)
+    for (j = 0; j < NUM_GLOBAL_ANIM_PARTS_ALL; j++)
+      for (k = 0; k < NUM_SPECIAL_GFX_ARGS; k++)
+	global_anim_info[i].sound[j][k] = SND_UNDEFINED;
+
+  /* initialize global animation sound definitions from dynamic configuration */
+  for (i = 0; i < num_property_mappings; i++)
+  {
+    int anim_nr = property_mapping[i].base_index - 2 * MAX_NUM_ELEMENTS;
+    int part_nr = property_mapping[i].ext1_index - ACTION_PART_1;
+    int special = property_mapping[i].ext3_index;
+    int sound   = property_mapping[i].artwork_index;
+
+    // sound uses control definition; map it to position of graphic (artwork)
+    anim_nr -= GLOBAL_ANIM_ID_CONTROL_FIRST;
+
+    if (anim_nr < 0 || anim_nr >= NUM_GLOBAL_ANIM_TOKENS)
+      continue;
+
+    /* set animation part to base part, if not specified */
+    if (!IS_GLOBAL_ANIM_PART(part_nr))
+      part_nr = GLOBAL_ANIM_ID_PART_BASE;
+
+    /* set animation screen to default, if not specified */
+    if (!IS_SPECIAL_GFX_ARG(special))
+      special = GFX_SPECIAL_ARG_DEFAULT;
+
+    global_anim_info[anim_nr].sound[part_nr][special] = sound;
+  }
+
+#if 0
+  printf("::: InitGlobalAnimSoundInfo\n");
+
+  for (i = 0; i < NUM_GLOBAL_ANIMS; i++)
+    for (j = 0; j < NUM_GLOBAL_ANIM_PARTS_ALL; j++)
+      for (k = 0; k < NUM_SPECIAL_GFX_ARGS; k++)
+	if (global_anim_info[i].sound[j][k] != SND_UNDEFINED)
+	  printf("::: - anim %d, part %d, mode %d => %d\n",
+		 i, j, k, global_anim_info[i].sound[j][k]);
+#endif
 }
 
 void InitElementGraphicInfo()
@@ -1042,10 +1179,13 @@ static void set_graphic_parameters_ext(int graphic, int *parameter,
   g->scale_up_factor = 1;		/* default: no scaling up */
   g->tile_size = TILESIZE;		/* default: standard tile size */
   g->clone_from = -1;			/* do not use clone graphic */
+  g->init_delay_fixed = 0;
+  g->init_delay_random = 0;
   g->anim_delay_fixed = 0;
   g->anim_delay_random = 0;
   g->post_delay_fixed = 0;
   g->post_delay_random = 0;
+  g->draw_order = 0;
   g->fade_mode = FADE_MODE_DEFAULT;
   g->fade_delay = -1;
   g->post_delay = -1;
@@ -1247,7 +1387,11 @@ static void set_graphic_parameters_ext(int graphic, int *parameter,
   if (parameter[GFX_ARG_BORDER_SIZE] != ARG_UNDEFINED_VALUE)
     g->border_size = parameter[GFX_ARG_BORDER_SIZE];
 
-  /* this is only used for player "boring" and "sleeping" actions */
+  /* used for global animations and player "boring" and "sleeping" actions */
+  if (parameter[GFX_ARG_INIT_DELAY_FIXED] != ARG_UNDEFINED_VALUE)
+    g->init_delay_fixed = parameter[GFX_ARG_INIT_DELAY_FIXED];
+  if (parameter[GFX_ARG_INIT_DELAY_RANDOM] != ARG_UNDEFINED_VALUE)
+    g->init_delay_random = parameter[GFX_ARG_INIT_DELAY_RANDOM];
   if (parameter[GFX_ARG_ANIM_DELAY_FIXED] != ARG_UNDEFINED_VALUE)
     g->anim_delay_fixed = parameter[GFX_ARG_ANIM_DELAY_FIXED];
   if (parameter[GFX_ARG_ANIM_DELAY_RANDOM] != ARG_UNDEFINED_VALUE)
@@ -1257,9 +1401,15 @@ static void set_graphic_parameters_ext(int graphic, int *parameter,
   if (parameter[GFX_ARG_POST_DELAY_RANDOM] != ARG_UNDEFINED_VALUE)
     g->post_delay_random = parameter[GFX_ARG_POST_DELAY_RANDOM];
 
-  /* this is only used for toon animations */
-  g->step_offset = parameter[GFX_ARG_STEP_OFFSET];
-  g->step_delay  = parameter[GFX_ARG_STEP_DELAY];
+  /* used for toon animations and global animations */
+  g->step_offset  = parameter[GFX_ARG_STEP_OFFSET];
+  g->step_xoffset = parameter[GFX_ARG_STEP_XOFFSET];
+  g->step_yoffset = parameter[GFX_ARG_STEP_YOFFSET];
+  g->step_delay   = parameter[GFX_ARG_STEP_DELAY];
+  g->direction    = parameter[GFX_ARG_DIRECTION];
+  g->position     = parameter[GFX_ARG_POSITION];
+  g->x            = parameter[GFX_ARG_X];	// (may be uninitialized,
+  g->y            = parameter[GFX_ARG_Y];	// unlike src_x and src_y)
 
   /* this is only used for drawing font characters */
   g->draw_xoffset = parameter[GFX_ARG_DRAW_XOFFSET];
@@ -1267,6 +1417,10 @@ static void set_graphic_parameters_ext(int graphic, int *parameter,
 
   /* this is only used for drawing envelope graphics */
   g->draw_masked = parameter[GFX_ARG_DRAW_MASKED];
+
+  /* used for toon animations and global animations */
+  if (parameter[GFX_ARG_DRAW_ORDER] != ARG_UNDEFINED_VALUE)
+    g->draw_order = parameter[GFX_ARG_DRAW_ORDER];
 
   /* optional graphic for cloning all graphics settings */
   if (parameter[GFX_ARG_CLONE_FROM] != ARG_UNDEFINED_VALUE)
@@ -1936,6 +2090,11 @@ static void ReinitializeGraphics()
   print_timestamp_time("InitBitmapPointers");
   InitFontGraphicInfo();		/* initialize text drawing functions */
   print_timestamp_time("InitFontGraphicInfo");
+  InitGlobalAnimGraphicInfo();		/* initialize global animation config */
+  print_timestamp_time("InitGlobalAnimGraphicInfo");
+
+  InitImageTextures();			/* create textures for certain images */
+  print_timestamp_time("InitImageTextures");
 
   InitGraphicInfo_EM();			/* graphic mapping for EM engine */
   print_timestamp_time("InitGraphicInfo_EM");
@@ -1963,6 +2122,7 @@ static void ReinitializeSounds()
   InitSoundInfo();		/* sound properties mapping */
   InitElementSoundInfo();	/* element game sound mapping */
   InitGameModeSoundInfo();	/* game mode sound mapping */
+  InitGlobalAnimSoundInfo();	/* global animation sound settings */
 
   InitPlayLevelSound();		/* internal game sound settings */
 }
@@ -4557,7 +4717,8 @@ static void InitGlobal()
 
   global.frames_per_second = 0;
 
-  global.border_status = GAME_MODE_MAIN;
+  global.border_status = GAME_MODE_LOADING;
+  global.anim_status = global.anim_status_next = GAME_MODE_LOADING;
 
   global.use_envelope_request = FALSE;
 }
@@ -4751,94 +4912,6 @@ void Execute_Command(char *command)
 
     exit(0);
   }
-
-#if DEBUG
-#if defined(TARGET_SDL2)
-  else if (strEqual(command, "SDL_ListModes"))
-  {
-    SDL_Init(SDL_INIT_VIDEO);
-
-    int num_displays = SDL_GetNumVideoDisplays();
-
-    // check if there are any displays available
-    if (num_displays < 0)
-    {
-      Print("No displays available: %s\n", SDL_GetError());
-
-      exit(-1);
-    }
-
-    for (i = 0; i < num_displays; i++)
-    {
-      int num_modes = SDL_GetNumDisplayModes(i);
-      int j;
-
-      Print("Available display modes for display %d:\n", i);
-
-      // check if there are any display modes available for this display
-      if (num_modes < 0)
-      {
-	Print("No display modes available for display %d: %s\n",
-	      i, SDL_GetError());
-
-	exit(-1);
-      }
-
-      for (j = 0; j < num_modes; j++)
-      {
-	SDL_DisplayMode mode;
-
-	if (SDL_GetDisplayMode(i, j, &mode) < 0)
-	{
-	  Print("Cannot get display mode %d for display %d: %s\n",
-		j, i, SDL_GetError());
-
-	  exit(-1);
-	}
-
-	Print("- %d x %d\n", mode.w, mode.h);
-      }
-    }
-
-    exit(0);
-  }
-#elif defined(TARGET_SDL)
-  else if (strEqual(command, "SDL_ListModes"))
-  {
-    SDL_Rect **modes;
-    int i;
-
-    SDL_Init(SDL_INIT_VIDEO);
-
-    /* get available fullscreen/hardware modes */
-    modes = SDL_ListModes(NULL, SDL_FULLSCREEN | SDL_HWSURFACE);
-
-    /* check if there are any modes available */
-    if (modes == NULL)
-    {
-      Print("No modes available!\n");
-
-      exit(-1);
-    }
-
-    /* check if our resolution is restricted */
-    if (modes == (SDL_Rect **)-1)
-    {
-      Print("All resolutions available.\n");
-    }
-    else
-    {
-      Print("Available display modes:\n");
-
-      for (i = 0; modes[i]; i++)
-	Print("- %d x %d\n", modes[i]->w, modes[i]->h);
-    }
-
-    exit(0);
-  }
-#endif
-#endif
-
   else
   {
     Error(ERR_EXIT_HELP, "unrecognized command '%s'", command);
@@ -4901,8 +4974,11 @@ static char *get_level_id_suffix(int id_nr)
 
 static void InitArtworkConfig()
 {
-  static char *image_id_prefix[MAX_NUM_ELEMENTS + NUM_FONTS + 1];
-  static char *sound_id_prefix[2 * MAX_NUM_ELEMENTS + 1];
+  static char *image_id_prefix[MAX_NUM_ELEMENTS +
+			       NUM_FONTS +
+			       NUM_GLOBAL_ANIM_TOKENS + 1];
+  static char *sound_id_prefix[2 * MAX_NUM_ELEMENTS +
+			       NUM_GLOBAL_ANIM_TOKENS + 1];
   static char *music_id_prefix[NUM_MUSIC_PREFIXES + 1];
   static char *action_id_suffix[NUM_ACTIONS + 1];
   static char *direction_id_suffix[NUM_DIRECTIONS_FULL + 1];
@@ -4962,14 +5038,20 @@ static void InitArtworkConfig()
     image_id_prefix[i] = element_info[i].token_name;
   for (i = 0; i < NUM_FONTS; i++)
     image_id_prefix[MAX_NUM_ELEMENTS + i] = font_info[i].token_name;
-  image_id_prefix[MAX_NUM_ELEMENTS + NUM_FONTS] = NULL;
+  for (i = 0; i < NUM_GLOBAL_ANIM_TOKENS; i++)
+    image_id_prefix[MAX_NUM_ELEMENTS + NUM_FONTS + i] =
+      global_anim_info[i].token_name;
+  image_id_prefix[MAX_NUM_ELEMENTS + NUM_FONTS + NUM_GLOBAL_ANIM_TOKENS] = NULL;
 
   for (i = 0; i < MAX_NUM_ELEMENTS; i++)
     sound_id_prefix[i] = element_info[i].token_name;
   for (i = 0; i < MAX_NUM_ELEMENTS; i++)
     sound_id_prefix[MAX_NUM_ELEMENTS + i] =
       get_string_in_brackets(element_info[i].class_name);
-  sound_id_prefix[2 * MAX_NUM_ELEMENTS] = NULL;
+  for (i = 0; i < NUM_GLOBAL_ANIM_TOKENS; i++)
+    sound_id_prefix[2 * MAX_NUM_ELEMENTS + i] =
+      global_anim_info[i].token_name;
+  sound_id_prefix[2 * MAX_NUM_ELEMENTS + NUM_GLOBAL_ANIM_TOKENS] = NULL;
 
   for (i = 0; i < NUM_MUSIC_PREFIXES; i++)
     music_id_prefix[i] = music_prefix_info[i].prefix;
@@ -5205,7 +5287,14 @@ void InitGfx()
   init.busy.height = anim_initial.height;
 
   InitMenuDesignSettings_Static();
+
   InitGfxDrawBusyAnimFunction(DrawInitAnim);
+  InitGfxDrawGlobalAnimFunction(DrawGlobalAnim);
+  InitGfxDrawGlobalBorderFunction(DrawMaskedBorderToTarget);
+
+  gfx.fade_border_source_status = global.border_status;
+  gfx.fade_border_target_status = global.border_status;
+  gfx.masked_border_bitmap_ptr = backbuffer;
 
   /* use copy of busy animation to prevent change while reloading artwork */
   init_last = init;
@@ -5340,6 +5429,11 @@ static void InitMusic(char *identifier)
   print_timestamp_time("ReinitializeMusic");
 
   print_timestamp_done("InitMusic");
+}
+
+static void InitArtworkDone()
+{
+  InitGlobalAnimations();
 }
 
 void InitNetworkServer()
@@ -5582,7 +5676,7 @@ void ReloadCustomArtwork(int force_reload)
 
   print_timestamp_init("ReloadCustomArtwork");
 
-  game_status = GAME_MODE_LOADING;
+  SetGameStatus(GAME_MODE_LOADING);
 
   FadeOut(REDRAW_ALL);
 
@@ -5617,7 +5711,9 @@ void ReloadCustomArtwork(int force_reload)
     print_timestamp_time("InitMusic");
   }
 
-  game_status = last_game_status;	/* restore current game status */
+  InitArtworkDone();
+
+  SetGameStatus(last_game_status);	/* restore current game status */
 
   init_last = init;			/* switch to new busy animation */
 
@@ -5712,7 +5808,7 @@ void OpenAll()
 {
   print_timestamp_init("OpenAll");
 
-  game_status = GAME_MODE_LOADING;
+  SetGameStatus(GAME_MODE_LOADING);
 
   InitCounter();
 
@@ -5791,6 +5887,8 @@ void OpenAll()
   InitMusic(NULL);		/* needs to know current level directory */
   print_timestamp_time("InitMusic");
 
+  InitArtworkDone();
+
   InitGfxBackground();
 
   em_open_all();
@@ -5812,7 +5910,7 @@ void OpenAll()
     return;
   }
 
-  game_status = GAME_MODE_MAIN;
+  SetGameStatus(GAME_MODE_MAIN);
 
   FadeSetEnterScreen();
   if (!(fading.fade_mode & FADE_TYPE_TRANSFORM))

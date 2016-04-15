@@ -24,7 +24,8 @@
 
 
 /* select level set with EMC X11 graphics before activating EM GFX debugging */
-#define DEBUG_EM_GFX	0
+#define DEBUG_EM_GFX		FALSE
+#define DEBUG_FRAME_TIME	FALSE
 
 /* tool button identifiers */
 #define TOOL_CTRL_ID_YES	0
@@ -173,6 +174,9 @@ static int el_act2crm(int, int);
 static struct GadgetInfo *tool_gadget[NUM_TOOL_BUTTONS];
 static int request_gadget_id = -1;
 
+static unsigned int sync_frame_delay = 0;
+static unsigned int sync_frame_delay_value = GAME_FRAME_DELAY;
+
 static char *print_if_not_empty(int element)
 {
   static char *s = NULL;
@@ -284,68 +288,126 @@ void RedrawPlayfield()
 	     gfx.sx, gfx.sy);
 }
 
-void DrawMaskedBorder_Rect(int x, int y, int width, int height)
+static void DrawMaskedBorderExt_Rect(int x, int y, int width, int height,
+				     int draw_target)
 {
-  Bitmap *bitmap = getGlobalBorderBitmapFromGameStatus();
+  Bitmap *src_bitmap = getGlobalBorderBitmapFromStatus(global.border_status);
+  Bitmap *dst_bitmap = gfx.masked_border_bitmap_ptr;
 
-  BlitBitmapMasked(bitmap, backbuffer, x, y, width, height, x, y);
+  if (x == -1 && y == -1)
+    return;
+
+  if (draw_target == DRAW_BORDER_TO_SCREEN)
+    BlitToScreenMasked(src_bitmap, x, y, width, height, x, y);
+  else
+    BlitBitmapMasked(src_bitmap, dst_bitmap, x, y, width, height, x, y);
 }
 
-void DrawMaskedBorder_FIELD()
+static void DrawMaskedBorderExt_FIELD(int draw_target)
 {
-  if (global.border_status >= GAME_MODE_TITLE &&
+  if (global.border_status >= GAME_MODE_MAIN &&
       global.border_status <= GAME_MODE_PLAYING &&
       border.draw_masked[global.border_status])
-    DrawMaskedBorder_Rect(REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE);
+    DrawMaskedBorderExt_Rect(REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE,
+			     draw_target);
 }
 
-void DrawMaskedBorder_DOOR_1()
+static void DrawMaskedBorderExt_DOOR_1(int draw_target)
 {
+  // when drawing to backbuffer, never draw border over open doors
+  if (draw_target == DRAW_BORDER_TO_BACKBUFFER &&
+      (GetDoorState() & DOOR_OPEN_1))
+    return;
+
   if (border.draw_masked[GFX_SPECIAL_ARG_DOOR] &&
       (global.border_status != GAME_MODE_EDITOR ||
        border.draw_masked[GFX_SPECIAL_ARG_EDITOR]))
-    DrawMaskedBorder_Rect(DX, DY, DXSIZE, DYSIZE);
+    DrawMaskedBorderExt_Rect(DX, DY, DXSIZE, DYSIZE, draw_target);
 }
 
-void DrawMaskedBorder_DOOR_2()
+static void DrawMaskedBorderExt_DOOR_2(int draw_target)
 {
+  // when drawing to backbuffer, never draw border over open doors
+  if (draw_target == DRAW_BORDER_TO_BACKBUFFER &&
+      (GetDoorState() & DOOR_OPEN_2))
+    return;
+
   if (border.draw_masked[GFX_SPECIAL_ARG_DOOR] &&
       global.border_status != GAME_MODE_EDITOR)
-    DrawMaskedBorder_Rect(VX, VY, VXSIZE, VYSIZE);
+    DrawMaskedBorderExt_Rect(VX, VY, VXSIZE, VYSIZE, draw_target);
 }
 
-void DrawMaskedBorder_DOOR_3()
+static void DrawMaskedBorderExt_DOOR_3(int draw_target)
 {
   /* currently not available */
 }
 
-void DrawMaskedBorder_ALL()
+static void DrawMaskedBorderExt_ALL(int draw_target)
 {
-  DrawMaskedBorder_FIELD();
-  DrawMaskedBorder_DOOR_1();
-  DrawMaskedBorder_DOOR_2();
-  DrawMaskedBorder_DOOR_3();
+  DrawMaskedBorderExt_FIELD(draw_target);
+  DrawMaskedBorderExt_DOOR_1(draw_target);
+  DrawMaskedBorderExt_DOOR_2(draw_target);
+  DrawMaskedBorderExt_DOOR_3(draw_target);
+}
+
+static void DrawMaskedBorderExt(int redraw_mask, int draw_target)
+{
+  /* never draw masked screen borders on borderless screens */
+  if (global.border_status == GAME_MODE_LOADING ||
+      global.border_status == GAME_MODE_TITLE)
+    return;
+
+  if (redraw_mask & REDRAW_ALL)
+    DrawMaskedBorderExt_ALL(draw_target);
+  else
+  {
+    if (redraw_mask & REDRAW_FIELD)
+      DrawMaskedBorderExt_FIELD(draw_target);
+    if (redraw_mask & REDRAW_DOOR_1)
+      DrawMaskedBorderExt_DOOR_1(draw_target);
+    if (redraw_mask & REDRAW_DOOR_2)
+      DrawMaskedBorderExt_DOOR_2(draw_target);
+    if (redraw_mask & REDRAW_DOOR_3)
+      DrawMaskedBorderExt_DOOR_3(draw_target);
+  }
+}
+
+void DrawMaskedBorder_FIELD()
+{
+  DrawMaskedBorderExt_FIELD(DRAW_BORDER_TO_BACKBUFFER);
 }
 
 void DrawMaskedBorder(int redraw_mask)
 {
-  /* never draw masked screen borders on borderless screens */
-  if (game_status == GAME_MODE_LOADING ||
-      game_status == GAME_MODE_TITLE)
-    return;
+  DrawMaskedBorderExt(redraw_mask, DRAW_BORDER_TO_BACKBUFFER);
+}
 
-  if (redraw_mask & REDRAW_ALL)
-    DrawMaskedBorder_ALL();
+void DrawMaskedBorderToTarget(int draw_target)
+{
+  if (draw_target == DRAW_BORDER_TO_BACKBUFFER ||
+      draw_target == DRAW_BORDER_TO_SCREEN)
+  {
+    DrawMaskedBorderExt(REDRAW_ALL, draw_target);
+  }
   else
   {
-    if (redraw_mask & REDRAW_FIELD)
-      DrawMaskedBorder_FIELD();
-    if (redraw_mask & REDRAW_DOOR_1)
-      DrawMaskedBorder_DOOR_1();
-    if (redraw_mask & REDRAW_DOOR_2)
-      DrawMaskedBorder_DOOR_2();
-    if (redraw_mask & REDRAW_DOOR_3)
-      DrawMaskedBorder_DOOR_3();
+    int last_border_status = global.border_status;
+
+    if (draw_target == DRAW_BORDER_TO_FADE_SOURCE)
+    {
+      global.border_status = gfx.fade_border_source_status;
+      gfx.masked_border_bitmap_ptr = gfx.fade_bitmap_source;
+    }
+    else if (draw_target == DRAW_BORDER_TO_FADE_TARGET)
+    {
+      global.border_status = gfx.fade_border_target_status;
+      gfx.masked_border_bitmap_ptr = gfx.fade_bitmap_target;
+    }
+
+    DrawMaskedBorderExt(REDRAW_ALL, draw_target);
+
+    global.border_status = last_border_status;
+    gfx.masked_border_bitmap_ptr = backbuffer;
   }
 }
 
@@ -431,13 +493,61 @@ void DrawFramesPerSecond()
 	      font_nr, BLIT_OPAQUE);
 }
 
+#if DEBUG_FRAME_TIME
+static void PrintFrameTimeDebugging()
+{
+  static unsigned int last_counter = 0;
+  unsigned int counter = Counter();
+  int diff_1 = counter - last_counter;
+  int diff_2 = diff_1 - GAME_FRAME_DELAY;
+  int diff_2_max = 20;
+  int diff_2_cut = MIN(ABS(diff_2), diff_2_max);
+  char diff_bar[2 * diff_2_max + 5];
+  int pos = 0;
+  int i;
+
+  diff_bar[pos++] = (diff_2 < -diff_2_max ? '<' : ' ');
+
+  for (i = 0; i < diff_2_max; i++)
+    diff_bar[pos++] = (diff_2 >= 0 ? ' ' :
+		       i >= diff_2_max - diff_2_cut ? '-' : ' ');
+
+  diff_bar[pos++] = '|';
+
+  for (i = 0; i < diff_2_max; i++)
+    diff_bar[pos++] = (diff_2 <= 0 ? ' ' : i < diff_2_cut ? '+' : ' ');
+
+  diff_bar[pos++] = (diff_2 > diff_2_max ? '>' : ' ');
+
+  diff_bar[pos++] = '\0';
+
+  Error(ERR_INFO, "%06d [%02d] [%c%02d] %s",
+	counter,
+	diff_1,
+	(diff_2 < 0 ? '-' : diff_2 > 0 ? '+' : ' '), ABS(diff_2),
+	diff_bar);
+
+  last_counter = counter;
+}
+#endif
+
 void BackToFront()
 {
-  if (redraw_mask == REDRAW_NONE)
-    return;
+  static int last_redraw_mask = REDRAW_NONE;
 
+  // force screen redraw in every frame to continue drawing global animations
+  // (but always use the last redraw mask to prevent unwanted side effects)
+  if (redraw_mask == REDRAW_NONE)
+    redraw_mask = last_redraw_mask;
+
+  last_redraw_mask = redraw_mask;
+
+#if 1
+  // masked border now drawn immediately when blitting backbuffer to window
+#else
   // draw masked border to all viewports, if defined
   DrawMaskedBorder(redraw_mask);
+#endif
 
   // draw frames per second (only if debug mode is enabled)
   if (redraw_mask & REDRAW_FPS)
@@ -474,6 +584,10 @@ void BackToFront()
   }
 
   redraw_mask = REDRAW_NONE;
+
+#if DEBUG_FRAME_TIME
+  PrintFrameTimeDebugging();
+#endif
 }
 
 static void FadeCrossSaveBackbuffer()
@@ -593,8 +707,43 @@ static void FadeExt(int fade_mask, int fade_mode, int fade_type)
   redraw_mask &= ~fade_mask;
 }
 
+static void SetScreenStates_BeforeFadingIn()
+{
+}
+
+static void SetScreenStates_AfterFadingIn()
+{
+  // store new source screen (to use correct masked border for fading)
+  gfx.fade_border_source_status = global.border_status;
+
+  global.anim_status = global.anim_status_next;
+
+  // force update of global animation status in case of rapid screen changes
+  redraw_mask = REDRAW_ALL;
+  BackToFront();
+}
+
+static void SetScreenStates_BeforeFadingOut()
+{
+  // store new target screen (to use correct masked border for fading)
+  gfx.fade_border_target_status = game_status;
+
+  global.anim_status = GAME_MODE_PSEUDO_FADING;
+}
+
+static void SetScreenStates_AfterFadingOut()
+{
+  global.border_status = game_status;
+}
+
 void FadeIn(int fade_mask)
 {
+  SetScreenStates_BeforeFadingIn();
+
+#if 1
+  DrawMaskedBorder(REDRAW_ALL);
+#endif
+
   if (fading.fade_mode & FADE_TYPE_TRANSFORM)
     FadeExt(fade_mask, fading.fade_mode, FADE_TYPE_FADE_IN);
   else
@@ -604,16 +753,24 @@ void FadeIn(int fade_mask)
   FADE_SY = REAL_SY;
   FADE_SXSIZE = FULL_SXSIZE;
   FADE_SYSIZE = FULL_SYSIZE;
+
+  SetScreenStates_AfterFadingIn();
 }
 
 void FadeOut(int fade_mask)
 {
+  SetScreenStates_BeforeFadingOut();
+
+#if 0
+  DrawMaskedBorder(REDRAW_ALL);
+#endif
+
   if (fading.fade_mode & FADE_TYPE_TRANSFORM)
     FadeExt(fade_mask, fading.fade_mode, FADE_TYPE_FADE_OUT);
   else
     FadeExt(fade_mask, FADE_MODE_FADE_OUT, FADE_TYPE_FADE_OUT);
 
-  global.border_status = game_status;
+  SetScreenStates_AfterFadingOut();
 }
 
 static void FadeSetLeaveNext(struct TitleFadingInfo fading_leave, boolean set)
@@ -707,14 +864,14 @@ Bitmap *getGlobalBorderBitmap(int graphic)
   return getBitmapFromGraphicOrDefault(graphic, IMG_GLOBAL_BORDER);
 }
 
-Bitmap *getGlobalBorderBitmapFromGameStatus()
+Bitmap *getGlobalBorderBitmapFromStatus(int status)
 {
   int graphic =
-    (game_status == GAME_MODE_MAIN ||
-     game_status == GAME_MODE_PSEUDO_TYPENAME	? IMG_GLOBAL_BORDER_MAIN :
-     game_status == GAME_MODE_SCORES		? IMG_GLOBAL_BORDER_SCORES :
-     game_status == GAME_MODE_EDITOR		? IMG_GLOBAL_BORDER_EDITOR :
-     game_status == GAME_MODE_PLAYING		? IMG_GLOBAL_BORDER_PLAYING :
+    (status == GAME_MODE_MAIN ||
+     status == GAME_MODE_PSEUDO_TYPENAME	? IMG_GLOBAL_BORDER_MAIN :
+     status == GAME_MODE_SCORES			? IMG_GLOBAL_BORDER_SCORES :
+     status == GAME_MODE_EDITOR			? IMG_GLOBAL_BORDER_EDITOR :
+     status == GAME_MODE_PLAYING		? IMG_GLOBAL_BORDER_PLAYING :
      IMG_GLOBAL_BORDER);
 
   return getGlobalBorderBitmap(graphic);
@@ -815,7 +972,7 @@ boolean CheckIfGlobalBorderHasChanged()
     return FALSE;
 
   // determine and store new global border bitmap for current game status
-  global_border_bitmap = getGlobalBorderBitmapFromGameStatus();
+  global_border_bitmap = getGlobalBorderBitmapFromStatus(game_status);
 
   return (global_border_bitmap_last != global_border_bitmap);
 }
@@ -862,7 +1019,7 @@ void RedrawGlobalBorderFromBitmap(Bitmap *bitmap)
 
 void RedrawGlobalBorder()
 {
-  Bitmap *bitmap = getGlobalBorderBitmapFromGameStatus();
+  Bitmap *bitmap = getGlobalBorderBitmapFromStatus(game_status);
 
   RedrawGlobalBorderFromBitmap(bitmap);
 
@@ -2271,7 +2428,6 @@ static void setRequestPosition(int *x, int *y, boolean add_border_size)
 
 void DrawEnvelopeRequest(char *text)
 {
-  int last_game_status = game_status;	/* save current game status */
   char *text_final = text;
   char *text_door_style = NULL;
   int graphic = IMG_BACKGROUND_REQUEST;
@@ -2339,13 +2495,13 @@ void DrawEnvelopeRequest(char *text)
 				  tile_size, tile_size);
 
   /* force DOOR font inside door area */
-  game_status = GAME_MODE_PSEUDO_DOOR;
+  SetFontStatus(GAME_MODE_PSEUDO_DOOR);
 
   DrawTextBuffer(sx + sx_offset, sy + sy_offset, text_final, font_nr,
 		 line_length, -1, max_lines, line_spacing, mask_mode,
 		 request.autowrap, request.centered, FALSE);
 
-  game_status = last_game_status;	/* restore current game status */
+  ResetFontStatus();
 
   for (i = 0; i < NUM_TOOL_BUTTONS; i++)
     RedrawGadget(tool_gadget[i]);
@@ -2704,7 +2860,6 @@ static void DrawPreviewLevelExt(boolean restart)
   boolean show_level_border = (BorderElement != EL_EMPTY);
   int level_xsize = lev_fieldx + (show_level_border ? 2 : 0);
   int level_ysize = lev_fieldy + (show_level_border ? 2 : 0);
-  int last_game_status = game_status;		/* save current game status */
 
   if (restart)
   {
@@ -2749,8 +2904,6 @@ static void DrawPreviewLevelExt(boolean restart)
       if (IN_GFX_FIELD_FULL(pos->x, pos->y + getFontHeight(pos->font)))
 	DrawTextSAligned(pos->x, pos->y, label_text, font_nr, pos->align);
     }
-
-    game_status = last_game_status;	/* restore current game status */
 
     return;
   }
@@ -2851,8 +3004,6 @@ static void DrawPreviewLevelExt(boolean restart)
 
     DrawPreviewLevelLabelExt(label_state);
   }
-
-  game_status = last_game_status;	/* restore current game status */
 }
 
 void DrawPreviewLevelInitial()
@@ -3396,8 +3547,7 @@ void WaitForEventToContinue()
 
     DoAnimation();
 
-    /* don't eat all CPU time */
-    Delay(10);
+    WaitUntilDelayReached(&sync_frame_delay, sync_frame_delay_value);
   }
 }
 
@@ -3568,12 +3718,11 @@ static int RequestHandleEvents(unsigned int req_state)
     else
     {
       DoAnimation();
-
-      if (!PendingEvent())	/* delay only if no pending events */
-	Delay(10);
     }
 
     BackToFront();
+
+    WaitUntilDelayReached(&sync_frame_delay, sync_frame_delay_value);
   }
 
   return result;
@@ -3582,7 +3731,6 @@ static int RequestHandleEvents(unsigned int req_state)
 static boolean RequestDoor(char *text, unsigned int req_state)
 {
   unsigned int old_door_state;
-  int last_game_status = game_status;	/* save current game status */
   int max_request_line_len = MAX_REQUEST_LINE_FONT1_LEN;
   int font_nr = FONT_TEXT_2;
   char *text_ptr;
@@ -3639,7 +3787,7 @@ static boolean RequestDoor(char *text, unsigned int req_state)
   DrawBackground(DX, DY, DXSIZE, DYSIZE);
 
   /* force DOOR font inside door area */
-  game_status = GAME_MODE_PSEUDO_DOOR;
+  SetFontStatus(GAME_MODE_PSEUDO_DOOR);
 
   /* write text for request */
   for (text_ptr = text, ty = 0; ty < MAX_REQUEST_LINES; ty++)
@@ -3679,7 +3827,7 @@ static boolean RequestDoor(char *text, unsigned int req_state)
     // text_ptr += tl + (tc == ' ' || tc == '?' || tc == '!' ? 1 : 0);
   }
 
-  game_status = last_game_status;	/* restore current game status */
+  ResetFontStatus();
 
   if (req_state & REQ_ASK)
   {
@@ -4123,7 +4271,7 @@ unsigned int MoveDoor(unsigned int door_state)
     { DX, DY, DXSIZE, DYSIZE },
     { VX, VY, VXSIZE, VYSIZE }
   };
-  static int door1 = DOOR_OPEN_1;
+  static int door1 = DOOR_CLOSE_1;
   static int door2 = DOOR_CLOSE_2;
   unsigned int door_delay = 0;
   unsigned int door_delay_value;
@@ -4436,6 +4584,10 @@ unsigned int MoveDoor(unsigned int door_state)
     door1 = door_state & DOOR_ACTION_1;
   if (door_state & DOOR_ACTION_2)
     door2 = door_state & DOOR_ACTION_2;
+
+  // draw masked border over door area
+  DrawMaskedBorder(REDRAW_DOOR_1);
+  DrawMaskedBorder(REDRAW_DOOR_2);
 
   return (door1 | door2);
 }
@@ -8052,9 +8204,6 @@ void ToggleFullscreenOrChangeWindowScalingIfNeeded()
 {
   boolean change_fullscreen = (setup.fullscreen !=
 			       video.fullscreen_enabled);
-  boolean change_fullscreen_mode = (video.fullscreen_enabled &&
-				    !strEqual(setup.fullscreen_mode,
-					      video.fullscreen_mode_current));
   boolean change_window_scaling_percent = (!video.fullscreen_enabled &&
 					   setup.window_scaling_percent !=
 					   video.window_scaling_percent);
@@ -8084,19 +8233,12 @@ void ToggleFullscreenOrChangeWindowScalingIfNeeded()
 #endif
 
   if (change_fullscreen ||
-      change_fullscreen_mode ||
       change_window_scaling_percent)
   {
     Bitmap *tmp_backbuffer = CreateBitmap(WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH);
 
     /* save backbuffer content which gets lost when toggling fullscreen mode */
     BlitBitmap(backbuffer, tmp_backbuffer, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
-
-    if (change_fullscreen_mode)
-    {
-      /* keep fullscreen, but change fullscreen mode (screen resolution) */
-      video.fullscreen_enabled = FALSE;		/* force new fullscreen mode */
-    }
 
     if (change_window_scaling_percent)
     {
@@ -8131,6 +8273,50 @@ void JoinRectangles(int *x, int *y, int *width, int *height,
   *y = MIN(*y, y2);
   *width = MAX(*width, width2);
   *height = MAX(*height, height2);
+}
+
+void SetAnimStatus(int anim_status_new)
+{
+  if (anim_status_new == GAME_MODE_MAIN)
+    anim_status_new = GAME_MODE_PSEUDO_MAINONLY;
+
+  global.anim_status_next = anim_status_new;
+
+  // directly set screen modes that are entered without fading
+  if ((global.anim_status      == GAME_MODE_PSEUDO_MAINONLY &&
+       global.anim_status_next == GAME_MODE_PSEUDO_TYPENAME) ||
+      (global.anim_status      == GAME_MODE_PSEUDO_TYPENAME &&
+       global.anim_status_next == GAME_MODE_PSEUDO_MAINONLY))
+    global.anim_status = global.anim_status_next;
+}
+
+void SetGameStatus(int game_status_new)
+{
+  game_status = game_status_new;
+
+  SetAnimStatus(game_status_new);
+}
+
+void SetFontStatus(int game_status_new)
+{
+  static int last_game_status = -1;
+
+  if (game_status_new != -1)
+  {
+    // set game status for font use after storing last game status
+    last_game_status = game_status;
+    game_status = game_status_new;
+  }
+  else
+  {
+    // reset game status after font use from last stored game status
+    game_status = last_game_status;
+  }
+}
+
+void ResetFontStatus()
+{
+  SetFontStatus(-1);
 }
 
 void ChangeViewportPropertiesIfNeeded()
@@ -8188,6 +8374,7 @@ void ChangeViewportPropertiesIfNeeded()
 
     init_video_buffer = TRUE;
     init_gfx_buffers = TRUE;
+    init_gadgets_and_toons = TRUE;
 
     // printf("::: video: init_video_buffer, init_gfx_buffers\n");
   }
@@ -8329,6 +8516,7 @@ void ChangeViewportPropertiesIfNeeded()
     // printf("::: init_video_buffer\n");
 
     InitVideoBuffer(WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH, setup.fullscreen);
+    InitImageTextures();
   }
 
   if (init_gadgets_and_toons)
@@ -8337,6 +8525,7 @@ void ChangeViewportPropertiesIfNeeded()
 
     InitGadgets();
     InitToons();
+    InitGlobalAnimations();
   }
 
   if (init_em_graphics)

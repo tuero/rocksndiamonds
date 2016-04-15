@@ -26,19 +26,11 @@
 #if defined(TARGET_SDL2)
 static SDL_Window *sdl_window = NULL;
 static SDL_Renderer *sdl_renderer = NULL;
-static SDL_Texture *sdl_texture = NULL;
+static SDL_Texture *sdl_texture_stream = NULL;
+static SDL_Texture *sdl_texture_target = NULL;
 static boolean fullscreen_enabled = FALSE;
-
-#define USE_RENDERER	TRUE
 #endif
 
-/* stuff needed to work around SDL/Windows fullscreen drawing bug */
-static int fullscreen_width;
-static int fullscreen_height;
-static int fullscreen_xoffset;
-static int fullscreen_yoffset;
-static int video_xoffset;
-static int video_yoffset;
 static boolean limit_screen_updates = FALSE;
 
 
@@ -50,10 +42,26 @@ void SDLLimitScreenUpdates(boolean enable)
   limit_screen_updates = enable;
 }
 
+static void FinalizeScreen()
+{
+  // copy global animations to render target buffer, if defined (below border)
+  if (gfx.draw_global_anim_function != NULL)
+    gfx.draw_global_anim_function(DRAW_GLOBAL_ANIM_STAGE_1);
+
+  // copy global masked border to render target buffer, if defined
+  if (gfx.draw_global_border_function != NULL)
+    gfx.draw_global_border_function(DRAW_BORDER_TO_SCREEN);
+
+  // copy global animations to render target buffer, if defined (above border)
+  if (gfx.draw_global_anim_function != NULL)
+    gfx.draw_global_anim_function(DRAW_GLOBAL_ANIM_STAGE_2);
+}
+
 static void UpdateScreen(SDL_Rect *rect)
 {
   static unsigned int update_screen_delay = 0;
-  unsigned int update_screen_delay_value = 20;		/* (milliseconds) */
+  unsigned int update_screen_delay_value = 50;		/* (milliseconds) */
+  SDL_Surface *screen = backbuffer->surface;
 
   if (limit_screen_updates &&
       !DelayReached(&update_screen_delay, update_screen_delay_value))
@@ -78,17 +86,33 @@ static void UpdateScreen(SDL_Rect *rect)
   }
 #endif
 
+  if (video.screen_rendering_mode == SPECIAL_RENDERING_BITMAP &&
+      gfx.final_screen_bitmap != NULL)	// may not be initialized yet
+  {
+    // draw global animations using bitmaps instead of using textures
+    // to prevent texture scaling artefacts (this is potentially slower)
+
+    BlitBitmap(backbuffer, gfx.final_screen_bitmap, 0, 0,
+	       gfx.win_xsize, gfx.win_ysize, 0, 0);
+
+    FinalizeScreen();
+
+    screen = gfx.final_screen_bitmap->surface;
+
+    // force full window redraw
+    rect = NULL;
+  }
+
 #if defined(TARGET_SDL2)
-#if USE_RENDERER
-  SDL_Surface *screen = backbuffer->surface;
+  SDL_Texture *sdl_texture = sdl_texture_stream;
+
+  if (video.screen_rendering_mode == SPECIAL_RENDERING_TARGET)
+    sdl_texture = sdl_texture_target;
 
   if (rect)
   {
     int bytes_x = screen->pitch / video.width;
     int bytes_y = screen->pitch;
-
-    if (video.fullscreen_enabled)
-      bytes_x = screen->pitch / fullscreen_width;
 
     SDL_UpdateTexture(sdl_texture, rect,
 		      screen->pixels + rect->x * bytes_x + rect->y * bytes_y,
@@ -98,56 +122,38 @@ static void UpdateScreen(SDL_Rect *rect)
   {
     SDL_UpdateTexture(sdl_texture, NULL, screen->pixels, screen->pitch);
   }
+
+  // clear render target buffer
   SDL_RenderClear(sdl_renderer);
-  SDL_RenderCopy(sdl_renderer, sdl_texture, NULL, NULL);
+
+  // set renderer to use target texture for rendering
+  if (video.screen_rendering_mode == SPECIAL_RENDERING_TARGET ||
+      video.screen_rendering_mode == SPECIAL_RENDERING_DOUBLE)
+    SDL_SetRenderTarget(sdl_renderer, sdl_texture_target);
+
+  // copy backbuffer texture to render target buffer
+  if (video.screen_rendering_mode != SPECIAL_RENDERING_TARGET)
+    SDL_RenderCopy(sdl_renderer, sdl_texture_stream, NULL, NULL);
+
+  if (video.screen_rendering_mode != SPECIAL_RENDERING_BITMAP)
+    FinalizeScreen();
+
+  // when using target texture, copy it to screen buffer
+  if (video.screen_rendering_mode == SPECIAL_RENDERING_TARGET ||
+      video.screen_rendering_mode == SPECIAL_RENDERING_DOUBLE)
+  {
+    SDL_SetRenderTarget(sdl_renderer, NULL);
+    SDL_RenderCopy(sdl_renderer, sdl_texture_target, NULL, NULL);
+  }
+
+  // show render target buffer on screen
   SDL_RenderPresent(sdl_renderer);
-#else
-  if (rect)
-    SDL_UpdateWindowSurfaceRects(sdl_window, rect, 1);
-  else
-    SDL_UpdateWindowSurface(sdl_window);
-#endif
 
 #else	// TARGET_SDL
   if (rect)
-    SDL_UpdateRects(backbuffer->surface, 1, rect);
+    SDL_UpdateRects(screen, 1, rect);
   else
-    SDL_UpdateRect(backbuffer->surface, 0, 0, 0, 0);
-#endif
-}
-
-static void setFullscreenParameters(char *fullscreen_mode_string)
-{
-#if defined(TARGET_SDL2)
-  fullscreen_width = video.width;
-  fullscreen_height = video.height;
-  fullscreen_xoffset = 0;
-  fullscreen_yoffset = 0;  
-
-#else
-
-  struct ScreenModeInfo *fullscreen_mode;
-  int i;
-
-  fullscreen_mode = get_screen_mode_from_string(fullscreen_mode_string);
-
-  if (fullscreen_mode == NULL)
-    return;
-
-  for (i = 0; video.fullscreen_modes[i].width != -1; i++)
-  {
-    if (fullscreen_mode->width  == video.fullscreen_modes[i].width &&
-	fullscreen_mode->height == video.fullscreen_modes[i].height)
-    {
-      fullscreen_width  = fullscreen_mode->width;
-      fullscreen_height = fullscreen_mode->height;
-
-      fullscreen_xoffset = (fullscreen_width  - video.width)  / 2;
-      fullscreen_yoffset = (fullscreen_height - video.height) / 2;
-
-      break;
-    }
-  }
+    SDL_UpdateRect(screen, 0, 0, 0, 0);
 #endif
 }
 
@@ -228,15 +234,23 @@ boolean SDLSetNativeSurface(SDL_Surface **surface)
 
 SDL_Surface *SDLGetNativeSurface(SDL_Surface *surface)
 {
+  SDL_PixelFormat format;
   SDL_Surface *new_surface;
 
   if (surface == NULL)
     return NULL;
 
   if (backbuffer && backbuffer->surface)
-    new_surface = SDL_ConvertSurface(surface, backbuffer->surface->format, 0);
+  {
+    format = *backbuffer->surface->format;
+    format.Amask = surface->format->Amask;	// keep alpha channel
+  }
   else
-    new_surface = SDL_ConvertSurface(surface, surface->format, 0);
+  {
+    format = *surface->format;
+  }
+
+  new_surface = SDL_ConvertSurface(surface, &format, 0);
 
   if (new_surface == NULL)
     Error(ERR_EXIT, "SDL_ConvertSurface() failed: %s", SDL_GetError());
@@ -286,6 +300,51 @@ SDL_Surface *SDLGetNativeSurface(SDL_Surface *surface)
 
 #endif
 
+#if defined(TARGET_SDL2)
+static SDL_Texture *SDLCreateTextureFromSurface(SDL_Surface *surface)
+{
+  SDL_Texture *texture = SDL_CreateTextureFromSurface(sdl_renderer, surface);
+
+  if (texture == NULL)
+    Error(ERR_EXIT, "SDL_CreateTextureFromSurface() failed: %s",
+	  SDL_GetError());
+
+  return texture;
+}
+#endif
+
+void SDLCreateBitmapTextures(Bitmap *bitmap)
+{
+#if defined(TARGET_SDL2)
+  if (bitmap == NULL)
+    return;
+
+  if (bitmap->texture)
+    SDL_DestroyTexture(bitmap->texture);
+  if (bitmap->texture_masked)
+    SDL_DestroyTexture(bitmap->texture_masked);
+
+  bitmap->texture        = SDLCreateTextureFromSurface(bitmap->surface);
+  bitmap->texture_masked = SDLCreateTextureFromSurface(bitmap->surface_masked);
+#endif
+}
+
+void SDLFreeBitmapTextures(Bitmap *bitmap)
+{
+#if defined(TARGET_SDL2)
+  if (bitmap == NULL)
+    return;
+
+  if (bitmap->texture)
+    SDL_DestroyTexture(bitmap->texture);
+  if (bitmap->texture_masked)
+    SDL_DestroyTexture(bitmap->texture_masked);
+
+  bitmap->texture = NULL;
+  bitmap->texture_masked = NULL;
+#endif
+}
+
 void SDLInitVideoDisplay(void)
 {
 #if !defined(TARGET_SDL2)
@@ -307,167 +366,28 @@ void SDLInitVideoDisplay(void)
 #endif
 }
 
-void SDLInitVideoBuffer(DrawBuffer **backbuffer, DrawWindow **window,
-			boolean fullscreen)
+void SDLInitVideoBuffer(boolean fullscreen)
 {
-#if !defined(TARGET_SDL2)
-  static int screen_xy[][2] =
-  {
-    {  640, 480 },
-    {  800, 600 },
-    { 1024, 768 },
-    {   -1,  -1 }
-  };
-#endif
-  SDL_Rect **modes = NULL;
-  boolean hardware_fullscreen_available = TRUE;
-  int i, j;
-
-  /* default: normal game window size */
-  fullscreen_width = video.width;
-  fullscreen_height = video.height;
-  fullscreen_xoffset = 0;
-  fullscreen_yoffset = 0;
-
-#if !defined(TARGET_SDL2)
-  /* determine required standard fullscreen mode for game screen size */
-  for (i = 0; screen_xy[i][0] != -1; i++)
-  {
-    if (screen_xy[i][0] >= video.width && screen_xy[i][1] >= video.height)
-    {
-      fullscreen_width  = screen_xy[i][0];
-      fullscreen_height = screen_xy[i][1];
-
-      break;
-    }
-  }
-
-  fullscreen_xoffset = (fullscreen_width  - video.width)  / 2;
-  fullscreen_yoffset = (fullscreen_height - video.height) / 2;
-#endif
-
-  checked_free(video.fullscreen_modes);
-
-  video.fullscreen_modes = NULL;
-  video.fullscreen_mode_current = NULL;
-
   video.window_scaling_percent = setup.window_scaling_percent;
   video.window_scaling_quality = setup.window_scaling_quality;
+  video.screen_rendering_mode =
+    (strEqual(setup.screen_rendering_mode, STR_SPECIAL_RENDERING_BITMAP) ?
+     SPECIAL_RENDERING_BITMAP :
+     strEqual(setup.screen_rendering_mode, STR_SPECIAL_RENDERING_TARGET) ?
+     SPECIAL_RENDERING_TARGET:
+     strEqual(setup.screen_rendering_mode, STR_SPECIAL_RENDERING_DOUBLE) ?
+     SPECIAL_RENDERING_DOUBLE : SPECIAL_RENDERING_OFF);
 
 #if defined(TARGET_SDL2)
-  int num_displays = SDL_GetNumVideoDisplays();
-
-  if (num_displays > 0)
-  {
-    // currently only display modes of first display supported
-    int num_modes = SDL_GetNumDisplayModes(0);
-
-    if (num_modes > 0)
-    {
-      modes = checked_calloc((num_modes + 1) * sizeof(SDL_Rect *));
-
-      for (i = 0; i < num_modes; i++)
-      {
-	SDL_DisplayMode mode;
-
-	if (SDL_GetDisplayMode(0, i, &mode) < 0)
-	  break;
-
-	modes[i] = checked_calloc(sizeof(SDL_Rect));
-
-	modes[i]->w = mode.w;
-	modes[i]->h = mode.h;
-      }
-    }
-  }
-#else
-  /* get available hardware supported fullscreen modes */
-  modes = SDL_ListModes(NULL, SDL_FULLSCREEN | SDL_HWSURFACE);
-#endif
-
-  if (modes == NULL)
-  {
-    /* no hardware screen modes available => no fullscreen mode support */
-    // video.fullscreen_available = FALSE;
-    hardware_fullscreen_available = FALSE;
-  }
-  else if (modes == (SDL_Rect **)-1)
-  {
-    /* fullscreen resolution is not restricted -- all resolutions available */
-    video.fullscreen_modes = checked_calloc(2 * sizeof(struct ScreenModeInfo));
-
-    /* use native video buffer size for fullscreen mode */
-    video.fullscreen_modes[0].width  = video.width;
-    video.fullscreen_modes[0].height = video.height;
-
-    video.fullscreen_modes[1].width  = -1;
-    video.fullscreen_modes[1].height = -1;
-  }
-  else
-  {
-    /* in this case, a certain number of screen modes is available */
-    int num_modes = 0;
-
-    for (i = 0; modes[i] != NULL; i++)
-    {
-      boolean found_mode = FALSE;
-
-      /* screen mode is smaller than video buffer size -- skip it */
-      if (modes[i]->w < video.width || modes[i]->h < video.height)
-	continue;
-
-      if (video.fullscreen_modes != NULL)
-	for (j = 0; video.fullscreen_modes[j].width != -1; j++)
-	  if (modes[i]->w == video.fullscreen_modes[j].width &&
-	      modes[i]->h == video.fullscreen_modes[j].height)
-	    found_mode = TRUE;
-
-      if (found_mode)		/* screen mode already stored -- skip it */
-	continue;
-
-      /* new mode found; add it to list of available fullscreen modes */
-
-      num_modes++;
-
-      video.fullscreen_modes = checked_realloc(video.fullscreen_modes,
-					       (num_modes + 1) *
-					       sizeof(struct ScreenModeInfo));
-
-      video.fullscreen_modes[num_modes - 1].width  = modes[i]->w;
-      video.fullscreen_modes[num_modes - 1].height = modes[i]->h;
-
-      video.fullscreen_modes[num_modes].width  = -1;
-      video.fullscreen_modes[num_modes].height = -1;
-    }
-
-    if (num_modes == 0)
-    {
-      /* no appropriate screen modes available => no fullscreen mode support */
-      // video.fullscreen_available = FALSE;
-      hardware_fullscreen_available = FALSE;
-    }
-  }
-
-  video.fullscreen_available = hardware_fullscreen_available;
-
-#if USE_DESKTOP_FULLSCREEN
-  // in SDL 2.0, there is always support for desktop fullscreen mode
-  // (in SDL 1.2, there is only support for "real" fullscreen mode)
+  // SDL 2.0: support for (desktop) fullscreen mode available
   video.fullscreen_available = TRUE;
-#endif
-
-#if defined(TARGET_SDL2)
-  if (modes)
-  {
-    for (i = 0; modes[i] != NULL; i++)
-      checked_free(modes[i]);
-
-    checked_free(modes);
-  }
+#else
+  // SDL 1.2: no support for fullscreen mode in R'n'D anymore
+  video.fullscreen_available = FALSE;
 #endif
 
   /* open SDL video output device (window or fullscreen mode) */
-  if (!SDLSetVideoMode(backbuffer, fullscreen))
+  if (!SDLSetVideoMode(fullscreen))
     Error(ERR_EXIT, "setting video mode failed");
 
   /* !!! SDL2 can only set the window icon if the window already exists !!! */
@@ -495,29 +415,23 @@ void SDLInitVideoBuffer(DrawBuffer **backbuffer, DrawWindow **window,
      should never be drawn to directly, it would do no harm nevertheless. */
 
   /* create additional (symbolic) buffer for double-buffering */
-  ReCreateBitmap(window, video.width, video.height, video.depth);
+  ReCreateBitmap(&window, video.width, video.height, video.depth);
 }
 
-static SDL_Surface *SDLCreateScreen(DrawBuffer **backbuffer,
-				    boolean fullscreen)
+static boolean SDLCreateScreen(boolean fullscreen)
 {
   SDL_Surface *new_surface = NULL;
 
 #if defined(TARGET_SDL2)
-  int surface_flags_window = SURFACE_FLAGS | SDL_WINDOW_RESIZABLE;
-#if USE_DESKTOP_FULLSCREEN
+  int surface_flags_window     = SURFACE_FLAGS | SDL_WINDOW_RESIZABLE;
   int surface_flags_fullscreen = SURFACE_FLAGS | SDL_WINDOW_FULLSCREEN_DESKTOP;
 #else
-  int surface_flags_fullscreen = SURFACE_FLAGS | SDL_WINDOW_FULLSCREEN;
+  int surface_flags_window     = SURFACE_FLAGS;
+  int surface_flags_fullscreen = SURFACE_FLAGS;	// (no fullscreen in SDL 1.2)
 #endif
 
-#else
-  int surface_flags_window = SURFACE_FLAGS;
-  int surface_flags_fullscreen = SURFACE_FLAGS | SDL_FULLSCREEN;
-#endif
-
-  int width  = (fullscreen ? fullscreen_width  : video.width);
-  int height = (fullscreen ? fullscreen_height : video.height);
+  int width  = video.width;
+  int height = video.height;
   int surface_flags = (fullscreen ? surface_flags_fullscreen :
 		       surface_flags_window);
 
@@ -530,25 +444,21 @@ static SDL_Surface *SDLCreateScreen(DrawBuffer **backbuffer,
   // store if initial screen mode is fullscreen mode when changing screen size
   video.fullscreen_initial = fullscreen;
 
-#if USE_RENDERER
   float window_scaling_factor = (float)setup.window_scaling_percent / 100;
-#if !USE_DESKTOP_FULLSCREEN
-  float screen_scaling_factor = (fullscreen ? 1 : window_scaling_factor);
-#endif
 
   video.window_width  = window_scaling_factor * width;
   video.window_height = window_scaling_factor * height;
 
-  if ((*backbuffer)->surface)
+  if (sdl_texture_stream)
   {
-    SDL_FreeSurface((*backbuffer)->surface);
-    (*backbuffer)->surface = NULL;
+    SDL_DestroyTexture(sdl_texture_stream);
+    sdl_texture_stream = NULL;
   }
 
-  if (sdl_texture)
+  if (sdl_texture_target)
   {
-    SDL_DestroyTexture(sdl_texture);
-    sdl_texture = NULL;
+    SDL_DestroyTexture(sdl_texture_target);
+    sdl_texture_target = NULL;
   }
 
   if (!(fullscreen && fullscreen_enabled))
@@ -570,13 +480,8 @@ static SDL_Surface *SDLCreateScreen(DrawBuffer **backbuffer,
     sdl_window = SDL_CreateWindow(program.window_title,
 				  SDL_WINDOWPOS_CENTERED,
 				  SDL_WINDOWPOS_CENTERED,
-#if USE_DESKTOP_FULLSCREEN
 				  video.window_width,
 				  video.window_height,
-#else
-				  (int)(screen_scaling_factor * width),
-				  (int)(screen_scaling_factor * height),
-#endif
 				  surface_flags);
 
   if (sdl_window != NULL)
@@ -599,19 +504,24 @@ static SDL_Surface *SDLCreateScreen(DrawBuffer **backbuffer,
       // SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
       SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, setup.window_scaling_quality);
 
-      sdl_texture = SDL_CreateTexture(sdl_renderer,
-				      SDL_PIXELFORMAT_ARGB8888,
-				      SDL_TEXTUREACCESS_STREAMING,
-				      width, height);
+      sdl_texture_stream = SDL_CreateTexture(sdl_renderer,
+					     SDL_PIXELFORMAT_ARGB8888,
+					     SDL_TEXTUREACCESS_STREAMING,
+					     width, height);
 
-      if (sdl_texture != NULL)
+      sdl_texture_target = SDL_CreateTexture(sdl_renderer,
+					     SDL_PIXELFORMAT_ARGB8888,
+					     SDL_TEXTUREACCESS_TARGET,
+					     width, height);
+
+      if (sdl_texture_stream != NULL &&
+	  sdl_texture_target != NULL)
       {
 	// use SDL default values for RGB masks and no alpha channel
 	new_surface = SDL_CreateRGBSurface(0, width, height, 32, 0,0,0, 0);
 
 	if (new_surface == NULL)
-	  Error(ERR_WARN, "SDL_CreateRGBSurface() failed: %s",
-		SDL_GetError());
+	  Error(ERR_WARN, "SDL_CreateRGBSurface() failed: %s", SDL_GetError());
       }
       else
       {
@@ -628,23 +538,35 @@ static SDL_Surface *SDLCreateScreen(DrawBuffer **backbuffer,
     Error(ERR_WARN, "SDL_CreateWindow() failed: %s", SDL_GetError());
   }
 
-#else
+#else	// TARGET_SDL
 
-  if (sdl_window)
-    SDL_DestroyWindow(sdl_window);
+  if (gfx.final_screen_bitmap == NULL)
+    gfx.final_screen_bitmap = CreateBitmapStruct();
 
-  sdl_window = SDL_CreateWindow(program.window_title,
-				SDL_WINDOWPOS_CENTERED,
-				SDL_WINDOWPOS_CENTERED,
-				width, height,
-				surface_flags);
+  gfx.final_screen_bitmap->width = width;
+  gfx.final_screen_bitmap->height = height;
 
-  if (sdl_window != NULL)
-    new_surface = SDL_GetWindowSurface(sdl_window);
+  gfx.final_screen_bitmap->surface =
+    SDL_SetVideoMode(width, height, video.depth, surface_flags);
+
+  if (gfx.final_screen_bitmap->surface != NULL)
+  {
+    new_surface =
+      SDL_CreateRGBSurface(surface_flags, width, height, video.depth, 0,0,0, 0);
+
+    if (new_surface == NULL)
+      Error(ERR_WARN, "SDL_CreateRGBSurface() failed: %s", SDL_GetError());
+
+#if 0
+    new_surface = gfx.final_screen_bitmap->surface;
+    gfx.final_screen_bitmap = NULL;
 #endif
 
-#else
-  new_surface = SDL_SetVideoMode(width, height, video.depth, surface_flags);
+  }
+  else
+  {
+    Error(ERR_WARN, "SDL_SetVideoMode() failed: %s", SDL_GetError());
+  }
 #endif
 
 #if defined(TARGET_SDL2)
@@ -653,78 +575,63 @@ static SDL_Surface *SDLCreateScreen(DrawBuffer **backbuffer,
     fullscreen_enabled = fullscreen;
 #endif
 
-  return new_surface;
+  if (backbuffer == NULL)
+    backbuffer = CreateBitmapStruct();
+
+  backbuffer->width  = video.width;
+  backbuffer->height = video.height;
+
+  if (backbuffer->surface)
+    SDL_FreeSurface(backbuffer->surface);
+
+  backbuffer->surface = new_surface;
+
+  return (new_surface != NULL);
 }
 
-boolean SDLSetVideoMode(DrawBuffer **backbuffer, boolean fullscreen)
+boolean SDLSetVideoMode(boolean fullscreen)
 {
-  boolean success = TRUE;
-  SDL_Surface *new_surface = NULL;
+  boolean success = FALSE;
 
   SetWindowTitle();
 
-  if (*backbuffer == NULL)
-    *backbuffer = CreateBitmapStruct();
-
-  /* (real bitmap might be larger in fullscreen mode with video offsets) */
-  (*backbuffer)->width  = video.width;
-  (*backbuffer)->height = video.height;
-
   if (fullscreen && !video.fullscreen_enabled && video.fullscreen_available)
   {
-    setFullscreenParameters(setup.fullscreen_mode);
-
-    video_xoffset = fullscreen_xoffset;
-    video_yoffset = fullscreen_yoffset;
-
     /* switch display to fullscreen mode, if available */
-    new_surface = SDLCreateScreen(backbuffer, TRUE);
+    success = SDLCreateScreen(TRUE);
 
-    if (new_surface == NULL)
+    if (!success)
     {
-      /* switching display to fullscreen mode failed */
-      Error(ERR_WARN, "SDL_SetVideoMode() failed: %s", SDL_GetError());
-
-      /* do not try it again */
+      /* switching display to fullscreen mode failed -- do not try it again */
       video.fullscreen_available = FALSE;
-
-      success = FALSE;
     }
     else
     {
-      (*backbuffer)->surface = new_surface;
-
       video.fullscreen_enabled = TRUE;
-      video.fullscreen_mode_current = setup.fullscreen_mode;
-
-      success = TRUE;
     }
   }
 
-  if ((!fullscreen && video.fullscreen_enabled) || new_surface == NULL)
+  if ((!fullscreen && video.fullscreen_enabled) || !success)
   {
-    video_xoffset = 0;
-    video_yoffset = 0;
-
     /* switch display to window mode */
-    new_surface = SDLCreateScreen(backbuffer, FALSE);
+    success = SDLCreateScreen(FALSE);
 
-    if (new_surface == NULL)
+    if (!success)
     {
       /* switching display to window mode failed -- should not happen */
-      Error(ERR_WARN, "SDL_SetVideoMode() failed: %s", SDL_GetError());
-
-      success = FALSE;
     }
     else
     {
-      (*backbuffer)->surface = new_surface;
-
       video.fullscreen_enabled = FALSE;
       video.window_scaling_percent = setup.window_scaling_percent;
       video.window_scaling_quality = setup.window_scaling_quality;
-
-      success = TRUE;
+      video.screen_rendering_mode =
+	(strEqual(setup.screen_rendering_mode, STR_SPECIAL_RENDERING_BITMAP) ?
+	 SPECIAL_RENDERING_BITMAP :
+	 strEqual(setup.screen_rendering_mode, STR_SPECIAL_RENDERING_TARGET) ?
+	 SPECIAL_RENDERING_TARGET:
+	 strEqual(setup.screen_rendering_mode, STR_SPECIAL_RENDERING_DOUBLE) ?
+	 SPECIAL_RENDERING_DOUBLE : SPECIAL_RENDERING_OFF);
     }
   }
 
@@ -798,26 +705,52 @@ void SDLSetWindowScaling(int window_scaling_percent)
 
 void SDLSetWindowScalingQuality(char *window_scaling_quality)
 {
-  if (sdl_texture == NULL)
+  SDL_Texture *new_texture;
+
+  if (sdl_texture_stream == NULL ||
+      sdl_texture_target == NULL)
     return;
 
   SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, window_scaling_quality);
 
-  SDL_Texture *new_texture = SDL_CreateTexture(sdl_renderer,
-					       SDL_PIXELFORMAT_ARGB8888,
-					       SDL_TEXTUREACCESS_STREAMING,
-					       video.width, video.height);
+  new_texture = SDL_CreateTexture(sdl_renderer,
+				  SDL_PIXELFORMAT_ARGB8888,
+				  SDL_TEXTUREACCESS_STREAMING,
+				  video.width, video.height);
 
   if (new_texture != NULL)
   {
-    SDL_DestroyTexture(sdl_texture);
+    SDL_DestroyTexture(sdl_texture_stream);
 
-    sdl_texture = new_texture;
-
-    SDLRedrawWindow();
+    sdl_texture_stream = new_texture;
   }
 
+  new_texture = SDL_CreateTexture(sdl_renderer,
+				  SDL_PIXELFORMAT_ARGB8888,
+				  SDL_TEXTUREACCESS_TARGET,
+				  video.width, video.height);
+
+  if (new_texture != NULL)
+  {
+    SDL_DestroyTexture(sdl_texture_target);
+
+    sdl_texture_target = new_texture;
+  }
+
+  SDLRedrawWindow();
+
   video.window_scaling_quality = window_scaling_quality;
+}
+
+void SDLSetScreenRenderingMode(char *screen_rendering_mode)
+{
+  video.screen_rendering_mode =
+    (strEqual(screen_rendering_mode, STR_SPECIAL_RENDERING_BITMAP) ?
+     SPECIAL_RENDERING_BITMAP :
+     strEqual(screen_rendering_mode, STR_SPECIAL_RENDERING_TARGET) ?
+     SPECIAL_RENDERING_TARGET:
+     strEqual(screen_rendering_mode, STR_SPECIAL_RENDERING_DOUBLE) ?
+     SPECIAL_RENDERING_DOUBLE : SPECIAL_RENDERING_OFF);
 }
 
 void SDLSetWindowFullscreen(boolean fullscreen)
@@ -825,11 +758,7 @@ void SDLSetWindowFullscreen(boolean fullscreen)
   if (sdl_window == NULL)
     return;
 
-#if USE_DESKTOP_FULLSCREEN
   int flags = (fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0);
-#else
-  int flags = (fullscreen ? SDL_WINDOW_FULLSCREEN : 0);
-#endif
 
   if (SDL_SetWindowFullscreen(sdl_window, flags) == 0)
     video.fullscreen_enabled = fullscreen_enabled = fullscreen;
@@ -871,8 +800,19 @@ void SDLFreeBitmapPointers(Bitmap *bitmap)
     SDL_FreeSurface(bitmap->surface);
   if (bitmap->surface_masked)
     SDL_FreeSurface(bitmap->surface_masked);
+
   bitmap->surface = NULL;
   bitmap->surface_masked = NULL;
+
+#if defined(TARGET_SDL2)
+  if (bitmap->texture)
+    SDL_DestroyTexture(bitmap->texture);
+  if (bitmap->texture_masked)
+    SDL_DestroyTexture(bitmap->texture_masked);
+
+  bitmap->texture = NULL;
+  bitmap->texture_masked = NULL;
+#endif
 }
 
 void SDLCopyArea(Bitmap *src_bitmap, Bitmap *dst_bitmap,
@@ -882,22 +822,10 @@ void SDLCopyArea(Bitmap *src_bitmap, Bitmap *dst_bitmap,
   Bitmap *real_dst_bitmap = (dst_bitmap == window ? backbuffer : dst_bitmap);
   SDL_Rect src_rect, dst_rect;
 
-  if (src_bitmap == backbuffer)
-  {
-    src_x += video_xoffset;
-    src_y += video_yoffset;
-  }
-
   src_rect.x = src_x;
   src_rect.y = src_y;
   src_rect.w = width;
   src_rect.h = height;
-
-  if (dst_bitmap == backbuffer || dst_bitmap == window)
-  {
-    dst_x += video_xoffset;
-    dst_y += video_yoffset;
-  }
 
   dst_rect.x = dst_x;
   dst_rect.y = dst_y;
@@ -910,19 +838,36 @@ void SDLCopyArea(Bitmap *src_bitmap, Bitmap *dst_bitmap,
 		     src_bitmap->surface_masked : src_bitmap->surface),
 		    &src_rect, real_dst_bitmap->surface, &dst_rect);
 
+  if (dst_bitmap == window)
+    UpdateScreen(&dst_rect);
+}
+
+void SDLBlitTexture(Bitmap *bitmap,
+		    int src_x, int src_y, int width, int height,
+		    int dst_x, int dst_y, int mask_mode)
+{
 #if defined(TARGET_SDL2)
-  if (dst_bitmap == window)
-  {
-    // SDL_UpdateWindowSurface(sdl_window);
-    // SDL_UpdateWindowSurfaceRects(sdl_window, &dst_rect, 1);
-    UpdateScreen(&dst_rect);
-  }
-#else
-  if (dst_bitmap == window)
-  {
-    // SDL_UpdateRect(backbuffer->surface, dst_x, dst_y, width, height);
-    UpdateScreen(&dst_rect);
-  }
+  SDL_Texture *texture;
+  SDL_Rect src_rect;
+  SDL_Rect dst_rect;
+
+  texture =
+    (mask_mode == BLIT_MASKED ? bitmap->texture_masked : bitmap->texture);
+
+  if (texture == NULL)
+    return;
+
+  src_rect.x = src_x;
+  src_rect.y = src_y;
+  src_rect.w = width;
+  src_rect.h = height;
+
+  dst_rect.x = dst_x;
+  dst_rect.y = dst_y;
+  dst_rect.w = width;
+  dst_rect.h = height;
+
+  SDL_RenderCopy(sdl_renderer, texture, &src_rect, &dst_rect);
 #endif
 }
 
@@ -932,12 +877,6 @@ void SDLFillRectangle(Bitmap *dst_bitmap, int x, int y, int width, int height,
   Bitmap *real_dst_bitmap = (dst_bitmap == window ? backbuffer : dst_bitmap);
   SDL_Rect rect;
 
-  if (dst_bitmap == backbuffer || dst_bitmap == window)
-  {
-    x += video_xoffset;
-    y += video_yoffset;
-  }
-
   rect.x = x;
   rect.y = y;
   rect.w = width;
@@ -945,30 +884,17 @@ void SDLFillRectangle(Bitmap *dst_bitmap, int x, int y, int width, int height,
 
   SDL_FillRect(real_dst_bitmap->surface, &rect, color);
 
-#if defined(TARGET_SDL2)
   if (dst_bitmap == window)
-  {
-    // SDL_UpdateWindowSurface(sdl_window);
-    // SDL_UpdateWindowSurfaceRects(sdl_window, &rect, 1);
     UpdateScreen(&rect);
-  }
-#else
-  if (dst_bitmap == window)
-  {
-    // SDL_UpdateRect(backbuffer->surface, x, y, width, height);
-    UpdateScreen(&rect);
-  }
-#endif
 }
 
 void SDLFadeRectangle(Bitmap *bitmap_cross, int x, int y, int width, int height,
 		      int fade_mode, int fade_delay, int post_delay,
 		      void (*draw_border_function)(void))
 {
-  static boolean initialization_needed = TRUE;
-  static SDL_Surface *surface_source = NULL;
-  static SDL_Surface *surface_target = NULL;
-  static SDL_Surface *surface_black = NULL;
+  SDL_Surface *surface_source = gfx.fade_bitmap_source->surface;
+  SDL_Surface *surface_target = gfx.fade_bitmap_target->surface;
+  SDL_Surface *surface_black  = gfx.fade_bitmap_black->surface;
   SDL_Surface *surface_screen = backbuffer->surface;
   SDL_Surface *surface_cross = (bitmap_cross ? bitmap_cross->surface : NULL);
   SDL_Rect src_rect, dst_rect;
@@ -977,24 +903,17 @@ void SDLFadeRectangle(Bitmap *bitmap_cross, int x, int y, int width, int height,
   int dst_x = x, dst_y = y;
   unsigned int time_last, time_current;
 
-  /* check if screen size has changed */
-  if (surface_source != NULL && (video.width  != surface_source->w ||
-				 video.height != surface_source->h))
-  {
-    SDL_FreeSurface(surface_source);
-    SDL_FreeSurface(surface_target);
-    SDL_FreeSurface(surface_black);
+  // store function for drawing global masked border
+  void (*draw_global_border_function)(int) = gfx.draw_global_border_function;
 
-    initialization_needed = TRUE;
-  }
+  // deactivate drawing of global border while fading, if needed
+  if (draw_border_function == NULL)
+    gfx.draw_global_border_function = NULL;
 
   src_rect.x = src_x;
   src_rect.y = src_y;
   src_rect.w = width;
   src_rect.h = height;
-
-  dst_x += video_xoffset;
-  dst_y += video_yoffset;
 
   dst_rect.x = dst_x;
   dst_rect.y = dst_y;
@@ -1003,78 +922,28 @@ void SDLFadeRectangle(Bitmap *bitmap_cross, int x, int y, int width, int height,
 
   dst_rect2 = dst_rect;
 
-  if (initialization_needed)
-  {
-#if defined(TARGET_SDL2)
-    unsigned int flags = 0;
-#else
-    unsigned int flags = SDL_SRCALPHA;
-
-    /* use same surface type as screen surface */
-    if ((surface_screen->flags & SDL_HWSURFACE))
-      flags |= SDL_HWSURFACE;
-    else
-      flags |= SDL_SWSURFACE;
-#endif
-
-    /* create surface for temporary copy of screen buffer (source) */
-    if ((surface_source =
-	 SDL_CreateRGBSurface(flags,
-			      video.width,
-			      video.height,
-			      surface_screen->format->BitsPerPixel,
-			      surface_screen->format->Rmask,
-			      surface_screen->format->Gmask,
-			      surface_screen->format->Bmask,
-			      surface_screen->format->Amask)) == NULL)
-      Error(ERR_EXIT, "SDL_CreateRGBSurface() failed: %s", SDL_GetError());
-
-    /* create surface for cross-fading screen buffer (target) */
-    if ((surface_target =
-	 SDL_CreateRGBSurface(flags,
-			      video.width,
-			      video.height,
-			      surface_screen->format->BitsPerPixel,
-			      surface_screen->format->Rmask,
-			      surface_screen->format->Gmask,
-			      surface_screen->format->Bmask,
-			      surface_screen->format->Amask)) == NULL)
-      Error(ERR_EXIT, "SDL_CreateRGBSurface() failed: %s", SDL_GetError());
-
-    /* create black surface for fading from/to black */
-    if ((surface_black =
-	 SDL_CreateRGBSurface(flags,
-			      video.width,
-			      video.height,
-			      surface_screen->format->BitsPerPixel,
-			      surface_screen->format->Rmask,
-			      surface_screen->format->Gmask,
-			      surface_screen->format->Bmask,
-			      surface_screen->format->Amask)) == NULL)
-      Error(ERR_EXIT, "SDL_CreateRGBSurface() failed: %s", SDL_GetError());
-
-    /* completely fill the surface with black color pixels */
-    SDL_FillRect(surface_black, NULL,
-		 SDL_MapRGB(surface_screen->format, 0, 0, 0));
-
-    initialization_needed = FALSE;
-  }
-
   /* copy source and target surfaces to temporary surfaces for fading */
   if (fade_mode & FADE_TYPE_TRANSFORM)
   {
     SDL_BlitSurface(surface_cross,  &src_rect, surface_source, &src_rect);
     SDL_BlitSurface(surface_screen, &dst_rect, surface_target, &src_rect);
+
+    draw_global_border_function(DRAW_BORDER_TO_FADE_SOURCE);
+    draw_global_border_function(DRAW_BORDER_TO_FADE_TARGET);
   }
   else if (fade_mode & FADE_TYPE_FADE_IN)
   {
     SDL_BlitSurface(surface_black,  &src_rect, surface_source, &src_rect);
     SDL_BlitSurface(surface_screen, &dst_rect, surface_target, &src_rect);
+
+    draw_global_border_function(DRAW_BORDER_TO_FADE_TARGET);
   }
   else		/* FADE_TYPE_FADE_OUT */
   {
     SDL_BlitSurface(surface_screen, &dst_rect, surface_source, &src_rect);
     SDL_BlitSurface(surface_black,  &src_rect, surface_target, &src_rect);
+
+    draw_global_border_function(DRAW_BORDER_TO_FADE_SOURCE);
   }
 
   time_current = SDL_GetTicks();
@@ -1291,7 +1160,27 @@ void SDLFadeRectangle(Bitmap *bitmap_cross, int x, int y, int width, int height,
     }
   }
 
-  Delay(post_delay);
+  if (post_delay > 0)
+  {
+    unsigned int time_post_delay;
+
+    time_current = SDL_GetTicks();
+    time_post_delay = time_current + post_delay;
+
+    while (time_current < time_post_delay)
+    {
+      // do not wait longer than 10 ms at a time to be able to ...
+      Delay(MIN(10, time_post_delay - time_current));
+
+      // ... continue drawing global animations during post delay
+      UpdateScreen(NULL);
+
+      time_current = SDL_GetTicks();
+    }
+  }
+
+  // restore function for drawing global masked border
+  gfx.draw_global_border_function = draw_global_border_function;
 }
 
 void SDLDrawSimpleLine(Bitmap *dst_bitmap, int from_x, int from_y,
@@ -1311,26 +1200,12 @@ void SDLDrawSimpleLine(Bitmap *dst_bitmap, int from_x, int from_y,
   rect.w = (to_x - from_x + 1);
   rect.h = (to_y - from_y + 1);
 
-  if (dst_bitmap == backbuffer || dst_bitmap == window)
-  {
-    rect.x += video_xoffset;
-    rect.y += video_yoffset;
-  }
-
   SDL_FillRect(surface, &rect, color);
 }
 
 void SDLDrawLine(Bitmap *dst_bitmap, int from_x, int from_y,
 		 int to_x, int to_y, Uint32 color)
 {
-  if (dst_bitmap == backbuffer || dst_bitmap == window)
-  {
-    from_x += video_xoffset;
-    from_y += video_yoffset;
-    to_x += video_xoffset;
-    to_y += video_yoffset;
-  }
-
   sge_Line(dst_bitmap->surface, from_x, from_y, to_x, to_y, color);
 }
 
@@ -1367,12 +1242,6 @@ void SDLDrawLines(SDL_Surface *surface, struct XY *points,
 Pixel SDLGetPixel(Bitmap *src_bitmap, int x, int y)
 {
   SDL_Surface *surface = src_bitmap->surface;
-
-  if (src_bitmap == backbuffer || src_bitmap == window)
-  {
-    x += video_xoffset;
-    y += video_yoffset;
-  }
 
   switch (surface->format->BytesPerPixel)
   {
@@ -1865,12 +1734,6 @@ void sge_LineRGB(SDL_Surface *Surface, Sint16 x1, Sint16 y1, Sint16 x2,
 
 void SDLPutPixel(Bitmap *dst_bitmap, int x, int y, Pixel pixel)
 {
-  if (dst_bitmap == backbuffer || dst_bitmap == window)
-  {
-    x += video_xoffset;
-    y += video_yoffset;
-  }
-
   sge_PutPixel(dst_bitmap->surface, x, y, pixel);
 }
 
@@ -2298,8 +2161,9 @@ Bitmap *SDLLoadImage(char *filename)
   UPDATE_BUSY_STATE();
 
   /* create native transparent surface for current image */
-  SDL_SetColorKey(sdl_image_tmp, SET_TRANSPARENT_PIXEL,
-		  SDL_MapRGB(sdl_image_tmp->format, 0x00, 0x00, 0x00));
+  if (sdl_image_tmp->format->Amask == 0)
+    SDL_SetColorKey(sdl_image_tmp, SET_TRANSPARENT_PIXEL,
+		    SDL_MapRGB(sdl_image_tmp->format, 0x00, 0x00, 0x00));
 
   if ((new_bitmap->surface_masked = SDLGetNativeSurface(sdl_image_tmp)) == NULL)
   {
@@ -2416,30 +2280,6 @@ void SDLCloseAudio(void)
 void SDLNextEvent(Event *event)
 {
   SDL_WaitEvent(event);
-
-  if (event->type == EVENT_BUTTONPRESS ||
-      event->type == EVENT_BUTTONRELEASE)
-  {
-    if (((ButtonEvent *)event)->x > video_xoffset)
-      ((ButtonEvent *)event)->x -= video_xoffset;
-    else
-      ((ButtonEvent *)event)->x = 0;
-    if (((ButtonEvent *)event)->y > video_yoffset)
-      ((ButtonEvent *)event)->y -= video_yoffset;
-    else
-      ((ButtonEvent *)event)->y = 0;
-  }
-  else if (event->type == EVENT_MOTIONNOTIFY)
-  {
-    if (((MotionEvent *)event)->x > video_xoffset)
-      ((MotionEvent *)event)->x -= video_xoffset;
-    else
-      ((MotionEvent *)event)->x = 0;
-    if (((MotionEvent *)event)->y > video_yoffset)
-      ((MotionEvent *)event)->y -= video_yoffset;
-    else
-      ((MotionEvent *)event)->y = 0;
-  }
 }
 
 void SDLHandleWindowManagerEvent(Event *event)

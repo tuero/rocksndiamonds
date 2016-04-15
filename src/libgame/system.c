@@ -207,6 +207,16 @@ void InitGfxWindowInfo(int win_xsize, int win_ysize)
   gfx.background_bitmap_mask = REDRAW_NONE;
 
   ReCreateBitmap(&gfx.background_bitmap, win_xsize, win_ysize, DEFAULT_DEPTH);
+
+#if defined(TARGET_SDL2)
+  ReCreateBitmap(&gfx.final_screen_bitmap, win_xsize, win_ysize, DEFAULT_DEPTH);
+#endif
+
+  ReCreateBitmap(&gfx.fade_bitmap_source, win_xsize, win_ysize, DEFAULT_DEPTH);
+  ReCreateBitmap(&gfx.fade_bitmap_target, win_xsize, win_ysize, DEFAULT_DEPTH);
+  ReCreateBitmap(&gfx.fade_bitmap_black,  win_xsize, win_ysize, DEFAULT_DEPTH);
+
+  ClearRectangle(gfx.fade_bitmap_black, 0, 0, win_xsize, win_ysize);
 }
 
 void InitGfxScrollbufferInfo(int scrollbuffer_width, int scrollbuffer_height)
@@ -229,6 +239,16 @@ void InitGfxClipRegion(boolean enabled, int x, int y, int width, int height)
 void InitGfxDrawBusyAnimFunction(void (*draw_busy_anim_function)(void))
 {
   gfx.draw_busy_anim_function = draw_busy_anim_function;
+}
+
+void InitGfxDrawGlobalAnimFunction(void (*draw_global_anim_function)(int))
+{
+  gfx.draw_global_anim_function = draw_global_anim_function;
+}
+
+void InitGfxDrawGlobalBorderFunction(void (*draw_global_border_function)(int))
+{
+  gfx.draw_global_border_function = draw_global_border_function;
 }
 
 void InitGfxCustomArtworkInfo()
@@ -358,7 +378,7 @@ void InitVideoBuffer(int width, int height, int depth, boolean fullscreen)
 
   video.window_scaling_available = WINDOW_SCALING_STATUS;
 
-  SDLInitVideoBuffer(&backbuffer, &window, fullscreen);
+  SDLInitVideoBuffer(fullscreen);
 
   video.initialized = TRUE;
 
@@ -399,7 +419,7 @@ void FreeBitmap(Bitmap *bitmap)
 
 Bitmap *CreateBitmapStruct(void)
 {
-  return checked_calloc(sizeof(struct SDLSurfaceInfo));
+  return checked_calloc(sizeof(Bitmap));
 }
 
 Bitmap *CreateBitmap(int width, int height, int depth)
@@ -715,6 +735,56 @@ void BlitBitmapOnBackground(Bitmap *src_bitmap, Bitmap *dst_bitmap,
 	       dst_x, dst_y);
 }
 
+void BlitTexture(Bitmap *bitmap,
+		int src_x, int src_y, int width, int height,
+		int dst_x, int dst_y)
+{
+  if (bitmap == NULL)
+    return;
+
+  SDLBlitTexture(bitmap, src_x, src_y, width, height, dst_x, dst_y,
+		 BLIT_OPAQUE);
+}
+
+void BlitTextureMasked(Bitmap *bitmap,
+		       int src_x, int src_y, int width, int height,
+		       int dst_x, int dst_y)
+{
+  if (bitmap == NULL)
+    return;
+
+  SDLBlitTexture(bitmap, src_x, src_y, width, height, dst_x, dst_y,
+		 BLIT_MASKED);
+}
+
+void BlitToScreen(Bitmap *bitmap,
+		  int src_x, int src_y, int width, int height,
+		  int dst_x, int dst_y)
+{
+  if (bitmap == NULL)
+    return;
+
+  if (video.screen_rendering_mode == SPECIAL_RENDERING_BITMAP)
+    BlitBitmap(bitmap, gfx.final_screen_bitmap, src_x, src_y,
+	       width, height, dst_x, dst_y);
+  else
+    BlitTexture(bitmap, src_x, src_y, width, height, dst_x, dst_y);
+}
+
+void BlitToScreenMasked(Bitmap *bitmap,
+			int src_x, int src_y, int width, int height,
+			int dst_x, int dst_y)
+{
+  if (bitmap == NULL)
+    return;
+
+  if (video.screen_rendering_mode == SPECIAL_RENDERING_BITMAP)
+    BlitBitmapMasked(bitmap, gfx.final_screen_bitmap, src_x, src_y,
+		     width, height, dst_x, dst_y);
+  else
+    BlitTextureMasked(bitmap, src_x, src_y, width, height, dst_x, dst_y);
+}
+
 void DrawSimpleBlackLine(Bitmap *bitmap, int from_x, int from_y,
 			 int to_x, int to_y)
 {
@@ -812,7 +882,7 @@ void KeyboardAutoRepeatOff(void)
 
 boolean SetVideoMode(boolean fullscreen)
 {
-  return SDLSetVideoMode(&backbuffer, fullscreen);
+  return SDLSetVideoMode(fullscreen);
 }
 
 boolean ChangeVideoModeIfNeeded(boolean fullscreen)
@@ -1123,6 +1193,16 @@ void CreateBitmapWithSmallBitmaps(Bitmap **bitmaps, int zoom_factor,
 				  int tile_size)
 {
   CreateScaledBitmaps(bitmaps, zoom_factor, tile_size, TRUE);
+}
+
+void CreateBitmapTextures(Bitmap **bitmaps)
+{
+  SDLCreateBitmapTextures(bitmaps[IMG_BITMAP_STANDARD]);
+}
+
+void FreeBitmapTextures(Bitmap **bitmaps)
+{
+  SDLFreeBitmapTextures(bitmaps[IMG_BITMAP_STANDARD]);
 }
 
 void ScaleBitmap(Bitmap **bitmaps, int zoom_factor)

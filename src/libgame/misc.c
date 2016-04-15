@@ -357,25 +357,7 @@ unsigned int Counter()	/* get milliseconds since last call of InitCounter() */
 
 static void sleep_milliseconds(unsigned int milliseconds_delay)
 {
-  boolean do_busy_waiting = (milliseconds_delay < 5 ? TRUE : FALSE);
-
-  if (do_busy_waiting)
-  {
-    /* we want to wait only a few ms -- if we assume that we have a
-       kernel timer resolution of 10 ms, we would wait far too long;
-       therefore it's better to do a short interval of busy waiting
-       to get our sleeping time more accurate */
-
-    unsigned int base_counter = Counter(), actual_counter = Counter();
-
-    while (actual_counter < base_counter + milliseconds_delay &&
-	   actual_counter >= base_counter)
-      actual_counter = Counter();
-  }
-  else
-  {
-    SDL_Delay(milliseconds_delay);
-  }
+  SDL_Delay(milliseconds_delay);
 }
 
 void Delay(unsigned int delay)	/* Sleep specified number of milliseconds */
@@ -383,25 +365,9 @@ void Delay(unsigned int delay)	/* Sleep specified number of milliseconds */
   sleep_milliseconds(delay);
 }
 
-boolean FrameReached(unsigned int *frame_counter_var,
-		     unsigned int frame_delay)
+boolean DelayReachedExt(unsigned int *counter_var, unsigned int delay,
+			unsigned int actual_counter)
 {
-  unsigned int actual_frame_counter = FrameCounter;
-
-  if (actual_frame_counter >= *frame_counter_var &&
-      actual_frame_counter < *frame_counter_var + frame_delay)
-    return FALSE;
-
-  *frame_counter_var = actual_frame_counter;
-
-  return TRUE;
-}
-
-boolean DelayReached(unsigned int *counter_var,
-		     unsigned int delay)
-{
-  unsigned int actual_counter = Counter();
-
   if (actual_counter >= *counter_var &&
       actual_counter < *counter_var + delay)
     return FALSE;
@@ -409,6 +375,32 @@ boolean DelayReached(unsigned int *counter_var,
   *counter_var = actual_counter;
 
   return TRUE;
+}
+
+boolean FrameReached(unsigned int *frame_counter_var, unsigned int frame_delay)
+{
+  return DelayReachedExt(frame_counter_var, frame_delay, FrameCounter);
+}
+
+boolean DelayReached(unsigned int *counter_var, unsigned int delay)
+{
+  return DelayReachedExt(counter_var, delay, Counter());
+}
+
+void ResetDelayCounterExt(unsigned int *counter_var,
+			  unsigned int actual_counter)
+{
+  DelayReachedExt(counter_var, 0, actual_counter);
+}
+
+void ResetFrameCounter(unsigned int *frame_counter_var)
+{
+  FrameReached(frame_counter_var, 0);
+}
+
+void ResetDelayCounter(unsigned int *counter_var)
+{
+  DelayReached(counter_var, 0);
 }
 
 int WaitUntilDelayReached(unsigned int *counter_var, unsigned int delay)
@@ -784,46 +776,27 @@ char *getPath3(char *path1, char *path2, char *path3)
   return getStringCat3WithSeparator(path1, path2, path3, STRING_PATH_SEPARATOR);
 }
 
-char *getImg2(char *path1, char *path2)
+static char *getPngOrPcxIfNotExists(char *filename)
 {
-  char *filename = getPath2(path1, path2);
+  // switch from PNG to PCX file and vice versa, if file does not exist
+  // (backwards compatibility with PCX files used in previous versions)
 
-  if (!fileExists(filename) && strSuffix(path2, ".png"))
-  {
-    // backward compatibility: if PNG file not found, check for PCX file
-    char *path2pcx = getStringCopy(path2);
-
-    strcpy(&path2pcx[strlen(path2pcx) - 3], "pcx");
-
-    free(filename);
-
-    filename = getPath2(path1, path2pcx);
-
-    free(path2pcx);
-  }
+  if (!fileExists(filename) && strSuffix(filename, ".png"))
+    strcpy(&filename[strlen(filename) - 3], "pcx");
+  else if (!fileExists(filename) && strSuffix(filename, ".pcx"))
+    strcpy(&filename[strlen(filename) - 3], "png");
 
   return filename;
 }
 
+char *getImg2(char *path1, char *path2)
+{
+  return getPngOrPcxIfNotExists(getPath2(path1, path2));
+}
+
 char *getImg3(char *path1, char *path2, char *path3)
 {
-  char *filename = getPath3(path1, path2, path3);
-
-  if (!fileExists(filename) && strSuffix(path3, ".png"))
-  {
-    // backward compatibility: if PNG file not found, check for PCX file
-    char *path3pcx = getStringCopy(path3);
-
-    strcpy(&path3pcx[strlen(path3pcx) - 3], "pcx");
-
-    free(filename);
-
-    filename = getPath3(path1, path2, path3pcx);
-
-    free(path3pcx);
-  }
-
-  return filename;
+  return getPngOrPcxIfNotExists(getPath3(path1, path2, path3));
 }
 
 char *getStringCopy(const char *s)
@@ -966,7 +939,6 @@ void GetOptions(int argc, char *argv[],
     rw_base_path = getProgramMainDataPath();
 
   /* initialize global program options */
-  options.display_name = NULL;
   options.server_host = NULL;
   options.server_port = 0;
 
@@ -1036,15 +1008,6 @@ void GetOptions(int argc, char *argv[],
       print_usage_function();
 
       exit(0);
-    }
-    else if (strncmp(option, "-display", option_len) == 0)
-    {
-      if (option_arg == NULL)
-	Error(ERR_EXIT_HELP, "option '%s' requires an argument", option_str);
-
-      options.display_name = option_arg;
-      if (option_arg == next_option)
-	options_left++;
     }
     else if (strncmp(option, "-basepath", option_len) == 0)
     {
@@ -2604,6 +2567,43 @@ char *get_mapped_token(char *token)
   return NULL;
 }
 
+char *get_special_base_token(struct ArtworkListInfo *artwork_info, char *token)
+{
+  /* !!! make this dynamically configurable (init.c:InitArtworkConfig) !!! */
+  static struct ConfigTypeInfo prefix_list[] =
+  {
+    { "global.anim_1"	},
+    { "global.anim_2"	},
+    { "global.anim_3"	},
+    { "global.anim_4"	},
+    { "global.anim_5"	},
+    { "global.anim_6"	},
+    { "global.anim_7"	},
+    { "global.anim_8"	},
+
+    { NULL		}
+  };
+  struct ConfigTypeInfo *suffix_list = artwork_info->suffix_list;
+  boolean prefix_found = FALSE;
+  int len_suffix = 0;
+  int i;
+
+  /* search for prefix to check if base token has to be created */
+  for (i = 0; prefix_list[i].token != NULL; i++)
+    if (strPrefix(token, prefix_list[i].token))
+      prefix_found = TRUE;
+
+  if (!prefix_found)
+    return NULL;
+
+  /* search for suffix (parameter) to determine base token length */
+  for (i = 0; suffix_list[i].token != NULL; i++)
+    if (strSuffix(token, suffix_list[i].token))
+      len_suffix = strlen(suffix_list[i].token);
+
+  return getStringCopyN(token, strlen(token) - len_suffix);
+}
+
 /* This function checks if a string <s> of the format "string1, string2, ..."
    exactly contains a string <s_contained>. */
 
@@ -2653,6 +2653,17 @@ int get_parameter_value(char *value_raw, char *suffix, int type)
 	      strEqual(value, "up")    ? MV_UP :
 	      strEqual(value, "down")  ? MV_DOWN : MV_NONE);
   }
+  else if (strEqual(suffix, ".position"))
+  {
+    result = (strEqual(value, "left")   ? POS_LEFT :
+	      strEqual(value, "right")  ? POS_RIGHT :
+	      strEqual(value, "top")    ? POS_TOP :
+	      strEqual(value, "upper")  ? POS_UPPER :
+	      strEqual(value, "middle") ? POS_MIDDLE :
+	      strEqual(value, "lower")  ? POS_LOWER :
+	      strEqual(value, "bottom") ? POS_BOTTOM :
+	      strEqual(value, "any")    ? POS_ANY : POS_UNDEFINED);
+  }
   else if (strEqual(suffix, ".align"))
   {
     result = (strEqual(value, "left")   ? ALIGN_LEFT :
@@ -2681,7 +2692,11 @@ int get_parameter_value(char *value_raw, char *suffix, int type)
 	      string_has_parameter(value, "horizontal")	? ANIM_HORIZONTAL :
 	      string_has_parameter(value, "vertical")	? ANIM_VERTICAL :
 	      string_has_parameter(value, "centered")	? ANIM_CENTERED :
+	      string_has_parameter(value, "all")	? ANIM_ALL :
 	      ANIM_DEFAULT);
+
+    if (string_has_parameter(value, "once"))
+      result |= ANIM_ONCE;
 
     if (string_has_parameter(value, "reverse"))
       result |= ANIM_REVERSE;
@@ -2694,7 +2709,8 @@ int get_parameter_value(char *value_raw, char *suffix, int type)
   }
   else if (strEqual(suffix, ".class"))
   {
-    result = get_hash_from_key(value);
+    result = (strEqual(value, ARG_UNDEFINED) ? ARG_UNDEFINED_VALUE :
+	      get_hash_from_key(value));
   }
   else if (strEqual(suffix, ".style"))
   {
@@ -2730,48 +2746,6 @@ int get_parameter_value(char *value_raw, char *suffix, int type)
   free(value);
 
   return result;
-}
-
-struct ScreenModeInfo *get_screen_mode_from_string(char *screen_mode_string)
-{
-  static struct ScreenModeInfo screen_mode;
-  char *screen_mode_string_x = strchr(screen_mode_string, 'x');
-  char *screen_mode_string_copy;
-  char *screen_mode_string_pos_w;
-  char *screen_mode_string_pos_h;
-
-  if (screen_mode_string_x == NULL)	/* invalid screen mode format */
-    return NULL;
-
-  screen_mode_string_copy = getStringCopy(screen_mode_string);
-
-  screen_mode_string_pos_w = screen_mode_string_copy;
-  screen_mode_string_pos_h = strchr(screen_mode_string_copy, 'x');
-  *screen_mode_string_pos_h++ = '\0';
-
-  screen_mode.width  = atoi(screen_mode_string_pos_w);
-  screen_mode.height = atoi(screen_mode_string_pos_h);
-
-  return &screen_mode;
-}
-
-void get_aspect_ratio_from_screen_mode(struct ScreenModeInfo *screen_mode,
-				       int *x, int *y)
-{
-  float aspect_ratio = (float)screen_mode->width / (float)screen_mode->height;
-  float aspect_ratio_new;
-  int i = 1;
-
-  do
-  {
-    *x = i * aspect_ratio + 0.000001;
-    *y = i;
-
-    aspect_ratio_new = (float)*x / (float)*y;
-
-    i++;
-  }
-  while (aspect_ratio_new != aspect_ratio && *y < screen_mode->height);
 }
 
 static void FreeCustomArtworkList(struct ArtworkListInfo *,
@@ -3013,6 +2987,7 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
   SetupFileHash *setup_file_hash, *valid_file_hash;
   SetupFileHash *extra_file_hash, *empty_file_hash;
   char *known_token_value = KNOWN_TOKEN_VALUE;
+  char *base_token_value = UNDEFINED_FILENAME;
   int i, j, k, l;
 
   if (filename == NULL)
@@ -3053,6 +3028,23 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
       setHashEntry(valid_file_hash, token, known_token_value);
 
       free(mapped_token);
+    }
+  }
+  END_HASH_ITERATION(valid_file_hash, itr)
+
+  /* add special base tokens (using prefix match and replace) */
+  BEGIN_HASH_ITERATION(valid_file_hash, itr)
+  {
+    char *token = HASH_ITERATION_TOKEN(itr);
+    char *base_token = get_special_base_token(artwork_info, token);
+
+    if (base_token != NULL)
+    {
+      /* add base token only if it does not already exist */
+      if (getHashEntry(valid_file_hash, base_token) == NULL)
+	setHashEntry(valid_file_hash, base_token, base_token_value);
+
+      free(base_token);
     }
   }
   END_HASH_ITERATION(valid_file_hash, itr)

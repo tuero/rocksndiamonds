@@ -56,6 +56,7 @@
 #define SND_CTRL_ALL_SOUNDS		(1 << 4)
 #define SND_CTRL_RELOAD_SOUNDS		(1 << 5)
 #define SND_CTRL_RELOAD_MUSIC		(1 << 6)
+#define SND_CTRL_EXPIRE_LOOPS		(1 << 7)
 
 #define SND_CTRL_PLAY_SOUND		(SND_CTRL_NONE)
 #define SND_CTRL_PLAY_LOOP		(SND_CTRL_LOOP)
@@ -76,6 +77,7 @@
 #define IS_RELOADING(x)			((x).state & (SND_CTRL_RELOAD_SOUNDS |\
 						      SND_CTRL_RELOAD_MUSIC))
 #define ALL_SOUNDS(x)			((x).state & SND_CTRL_ALL_SOUNDS)
+#define SET_EXPIRE_LOOPS(x)		((x).state & SND_CTRL_EXPIRE_LOOPS)
 
 #define MAP_NOCONF_MUSIC(x)		(-((x) + 1))
 #define UNMAP_NOCONF_MUSIC(x)		MAP_NOCONF_MUSIC(x)
@@ -113,6 +115,7 @@ void StopMusic(void);
 void StopSound(int);
 void StopSounds(void);
 void StopSoundExt(int, int);
+void ExpireSoundLoops(boolean);
 
 int getSoundListSize();
 int getMusicListSize();

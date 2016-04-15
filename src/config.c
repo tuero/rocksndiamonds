@@ -29,9 +29,9 @@ char *getProgramVersionString()
 {
   static char program_version_string[32];
 
-  sprintf(program_version_string, "%d.%d.%d.%d",
+  sprintf(program_version_string, "%d.%d.%d.%d%s",
 	  PROGRAM_VERSION_MAJOR, PROGRAM_VERSION_MINOR, PROGRAM_VERSION_PATCH,
-	  PROGRAM_VERSION_BUILD);
+	  PROGRAM_VERSION_BUILD, PROGRAM_VERSION_EXTRA);
 
   return program_version_string;
 }

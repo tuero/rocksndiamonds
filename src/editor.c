@@ -6403,10 +6403,8 @@ static void CreateRadiobuttonGadgets()
 
 void CreateLevelEditorGadgets()
 {
-  int old_game_status = game_status;
-
-  /* setting 'game_status' is needed to get the right fonts for the editor */
-  game_status = GAME_MODE_EDITOR;
+  /* force EDITOR font inside level editor */
+  SetFontStatus(GAME_MODE_EDITOR);
 
   /* these values are not constant, but can change at runtime */
   ed_fieldx = MAX_ED_FIELDX - 1;
@@ -6440,7 +6438,7 @@ void CreateLevelEditorGadgets()
   CreateTextbuttonGadgets();
   CreateDrawingAreas();
 
-  game_status = old_game_status;
+  ResetFontStatus();
 }
 
 void FreeLevelEditorGadgets()
@@ -7625,7 +7623,7 @@ void DrawLevelEd()
 {
   int fade_mask = REDRAW_FIELD;
 
-  CloseDoor(DOOR_CLOSE_ALL);
+  FadeSoundsAndMusic();
 
   /* needed if different viewport properties defined for editor */
   ChangeViewportPropertiesIfNeeded();
@@ -12267,12 +12265,31 @@ void RequestExitLevelEditor(boolean ask_if_level_has_changed,
       Request("Level has changed! Exit without saving?",
 	      REQ_ASK | REQ_STAY_OPEN))
   {
-    SetDoorState(DOOR_CLOSE_2);
+    struct RectWithBorder *vp_door_1 = &viewport.door_1[GAME_MODE_MAIN];
+    struct RectWithBorder *vp_door_2 = &viewport.door_2[GAME_MODE_MAIN];
+
+    /* draw normal door */
+    UndrawSpecialEditorDoor();
+
+    // close editor doors if viewport definition is the same as in main menu
+    if (vp_door_1->x      == DX     &&
+	vp_door_1->y      == DY     &&
+	vp_door_1->width  == DXSIZE &&
+	vp_door_1->height == DYSIZE &&
+	vp_door_2->x      == VX     &&
+	vp_door_2->y      == VY     &&
+	vp_door_2->width  == VXSIZE &&
+	vp_door_2->height == VYSIZE)
+      CloseDoor(DOOR_CLOSE_ALL | DOOR_NO_DELAY);
+    else
+      SetDoorState(DOOR_CLOSE_2);
+
+    BackToFront();
 
     if (quick_quit)
       FadeSkipNextFadeIn();
 
-    game_status = GAME_MODE_MAIN;
+    SetGameStatus(GAME_MODE_MAIN);
 
     DrawMainMenu();
   }

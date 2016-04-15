@@ -2446,7 +2446,7 @@ void DisplayGameControlValues()
   /* redraw game control buttons */
   RedrawGameButtons();
 
-  game_status = GAME_MODE_PSEUDO_PANEL;
+  SetGameStatus(GAME_MODE_PSEUDO_PANEL);
 
   for (i = 0; i < NUM_GAME_PANEL_CONTROLS; i++)
   {
@@ -2574,7 +2574,7 @@ void DisplayGameControlValues()
     redraw_mask |= REDRAW_DOOR_1;
   }
 
-  game_status = GAME_MODE_PLAYING;
+  SetGameStatus(GAME_MODE_PLAYING);
 }
 
 void UpdateAndDisplayGameControlValues()
@@ -3097,10 +3097,10 @@ void InitGame()
   // required here to update video display before fading (FIX THIS)
   DrawMaskedBorder(REDRAW_DOOR_2);
 
-  game_status = GAME_MODE_PLAYING;
-
   if (!game.restart_level)
     CloseDoor(DOOR_CLOSE_1);
+
+  SetGameStatus(GAME_MODE_PLAYING);
 
   /* needed if different viewport properties defined for playing */
   ChangeViewportPropertiesIfNeeded();
@@ -3113,11 +3113,15 @@ void InitGame()
   if (CheckIfGlobalBorderHasChanged())
     fade_mask = REDRAW_ALL;
 
+  FadeSoundsAndMusic();
+
+  ExpireSoundLoops(TRUE);
+
   FadeOut(fade_mask);
 
-  OpenDoor(GetDoorState() | DOOR_NO_DELAY | DOOR_FORCE_REDRAW);
-
   ClearField();
+
+  OpenDoor(GetDoorState() | DOOR_NO_DELAY | DOOR_FORCE_REDRAW);
 
   DrawCompleteVideoDisplay();
 
@@ -4422,7 +4426,7 @@ void GameEnd()
 
   if (level_editor_test_game)
   {
-    game_status = GAME_MODE_MAIN;
+    SetGameStatus(GAME_MODE_MAIN);
 
     DrawMainMenu();
 
@@ -4431,7 +4435,7 @@ void GameEnd()
 
   if (!local_player->LevelSolved_SaveScore)
   {
-    game_status = GAME_MODE_MAIN;
+    SetGameStatus(GAME_MODE_MAIN);
 
     DrawMainMenu();
 
@@ -4450,7 +4454,7 @@ void GameEnd()
 
   if ((hi_pos = NewHiScore()) >= 0) 
   {
-    game_status = GAME_MODE_SCORES;
+    SetGameStatus(GAME_MODE_SCORES);
 
     DrawHallOfFame(hi_pos);
 
@@ -4462,7 +4466,7 @@ void GameEnd()
   }
   else
   {
-    game_status = GAME_MODE_MAIN;
+    SetGameStatus(GAME_MODE_MAIN);
 
     if (raise_level)
     {
@@ -14470,7 +14474,7 @@ void RequestQuitGameExt(boolean skip_request, boolean quick_quit, char *message)
       if (quick_quit)
 	FadeSkipNextFadeIn();
 
-      game_status = GAME_MODE_MAIN;
+      SetGameStatus(GAME_MODE_MAIN);
 
       DrawMainMenu();
     }

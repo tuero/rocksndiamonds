@@ -5440,6 +5440,14 @@ struct ElementActionInfo element_action_info[NUM_ACTIONS + 1 + 1] =
   { ".page[30]",		ACTION_PAGE_30,			FALSE	},
   { ".page[31]",		ACTION_PAGE_31,			FALSE	},
   { ".page[32]",		ACTION_PAGE_32,			FALSE	},
+  { ".part_1",			ACTION_PART_1,			FALSE	},
+  { ".part_2",			ACTION_PART_2,			FALSE	},
+  { ".part_3",			ACTION_PART_3,			FALSE	},
+  { ".part_4",			ACTION_PART_4,			FALSE	},
+  { ".part_5",			ACTION_PART_5,			FALSE	},
+  { ".part_6",			ACTION_PART_6,			FALSE	},
+  { ".part_7",			ACTION_PART_7,			FALSE	},
+  { ".part_8",			ACTION_PART_8,			FALSE	},
   { ".other",			ACTION_OTHER,			FALSE	},
 
   /* empty suffix always matches -- check as last entry in InitSoundInfo() */
@@ -5467,7 +5475,17 @@ struct SpecialSuffixInfo special_suffix_info[NUM_SPECIAL_GFX_ARGS + 1 + 1] =
   { ".[DEFAULT]",		GFX_SPECIAL_ARG_DEFAULT,		},
   { ".LOADING",			GFX_SPECIAL_ARG_LOADING,		},
   { ".TITLE_INITIAL",		GFX_SPECIAL_ARG_TITLE_INITIAL,		},
+  { ".TITLE_INITIAL_1",		GFX_SPECIAL_ARG_TITLE_INITIAL_1,	},
+  { ".TITLE_INITIAL_2",		GFX_SPECIAL_ARG_TITLE_INITIAL_2,	},
+  { ".TITLE_INITIAL_3",		GFX_SPECIAL_ARG_TITLE_INITIAL_3,	},
+  { ".TITLE_INITIAL_4",		GFX_SPECIAL_ARG_TITLE_INITIAL_4,	},
+  { ".TITLE_INITIAL_5",		GFX_SPECIAL_ARG_TITLE_INITIAL_5,	},
   { ".TITLE",			GFX_SPECIAL_ARG_TITLE,			},
+  { ".TITLE_1",			GFX_SPECIAL_ARG_TITLE_1,		},
+  { ".TITLE_2",			GFX_SPECIAL_ARG_TITLE_2,		},
+  { ".TITLE_3",			GFX_SPECIAL_ARG_TITLE_3,		},
+  { ".TITLE_4",			GFX_SPECIAL_ARG_TITLE_4,		},
+  { ".TITLE_5",			GFX_SPECIAL_ARG_TITLE_5,		},
   { ".MAIN",			GFX_SPECIAL_ARG_MAIN,			},
   { ".LEVELS",			GFX_SPECIAL_ARG_LEVELS			},
   { ".LEVELNR",			GFX_SPECIAL_ARG_LEVELNR			},
@@ -5481,6 +5499,13 @@ struct SpecialSuffixInfo special_suffix_info[NUM_SPECIAL_GFX_ARGS + 1 + 1] =
   { ".PANEL",			GFX_SPECIAL_ARG_PANEL,			},
   { ".PREVIEW",			GFX_SPECIAL_ARG_PREVIEW,		},
   { ".CRUMBLED",		GFX_SPECIAL_ARG_CRUMBLED,		},
+  { ".MAINONLY",		GFX_SPECIAL_ARG_MAINONLY,		},
+  { ".TYPENAME",		GFX_SPECIAL_ARG_TYPENAME,		},
+  { ".SUBMENU",			GFX_SPECIAL_ARG_SUBMENU,		},
+  { ".MENU",			GFX_SPECIAL_ARG_MENU,			},
+  { ".TOONS",			GFX_SPECIAL_ARG_TOONS,			},
+  { ".FADING",			GFX_SPECIAL_ARG_FADING,			},
+  { ".QUIT",			GFX_SPECIAL_ARG_QUIT,			},
 
   /* empty suffix always matches -- check as last entry in InitMusicInfo() */
   { "",				GFX_SPECIAL_ARG_DEFAULT,		},
@@ -5528,17 +5553,45 @@ struct FontInfo font_info[NUM_FONTS + 1] =
   { "font.input_2.active"	},
   { "font.input_1"		},
   { "font.input_2"		},
+  { "font.option_off_narrow"	},
   { "font.option_off"		},
+  { "font.option_on_narrow"	},
   { "font.option_on"		},
   { "font.value_1"		},
   { "font.value_2"		},
   { "font.value_old"		},
+  { "font.value_narrow"		},
   { "font.level_number.active"	},
   { "font.level_number"		},
   { "font.tape_recorder"	},
   { "font.game_info"		},
   { "font.info.elements"	},
   { "font.info.levelset"	},
+
+  { NULL			}
+};
+
+struct GlobalAnimInfo global_anim_info[NUM_GLOBAL_ANIM_TOKENS + 1] =
+{
+  /* (real) graphic definitions used to define animation graphics */
+  { "global.anim_1.gfx",	},
+  { "global.anim_2.gfx",	},
+  { "global.anim_3.gfx",	},
+  { "global.anim_4.gfx",	},
+  { "global.anim_5.gfx",	},
+  { "global.anim_6.gfx",	},
+  { "global.anim_7.gfx",	},
+  { "global.anim_8.gfx",	},
+
+  /* (dummy) graphic definitions used to define animation controls */
+  { "global.anim_1",		},
+  { "global.anim_2",		},
+  { "global.anim_3",		},
+  { "global.anim_4",		},
+  { "global.anim_5",		},
+  { "global.anim_6",		},
+  { "global.anim_7",		},
+  { "global.anim_8",		},
 
   { NULL			}
 };
@@ -5566,7 +5619,6 @@ static void print_usage()
 	"Usage: %s [OPTION]... [HOSTNAME [PORT]]\n"
 	"\n"
 	"Options:\n"
-	"  -d, --display HOSTNAME[:SCREEN]  specify X server display\n"
 	"  -b, --basepath DIRECTORY         alternative base DIRECTORY\n"
 	"  -l, --level DIRECTORY            alternative level DIRECTORY\n"
 	"  -g, --graphics DIRECTORY         alternative graphics DIRECTORY\n"
@@ -5600,12 +5652,13 @@ static void print_usage()
 
 static void print_version()
 {
-  Print("%s %d.%d.%d.%d\n",
+  Print("%s %d.%d.%d.%d%s\n",
 	PROGRAM_TITLE_STRING,
 	PROGRAM_VERSION_MAJOR,
 	PROGRAM_VERSION_MINOR,
 	PROGRAM_VERSION_PATCH,
-	PROGRAM_VERSION_BUILD);
+	PROGRAM_VERSION_BUILD,
+	PROGRAM_VERSION_EXTRA);
 
   if (options.debug)
   {
@@ -5678,6 +5731,14 @@ static void InitProgramConfig(char *command_filename)
 #else
   userdata_subdir = USERDATA_DIRECTORY_OTHER;
 #endif
+
+  // set default window size (only relevant on program startup)
+  if (setup.internal.default_window_width  != 0 &&
+      setup.internal.default_window_height != 0)
+  {
+    WIN_XSIZE = setup.internal.default_window_width;
+    WIN_YSIZE = setup.internal.default_window_height;
+  }
 
   InitProgramInfo(command_filename,
 		  config_filename,

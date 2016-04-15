@@ -31,6 +31,7 @@ struct ConfigInfo music_config[] =
   { "background.TITLE",			UNDEFINED_FILENAME		},
   { "background.MAIN",			UNDEFINED_FILENAME		},
   { "background.LEVELS",		UNDEFINED_FILENAME		},
+  { "background.LEVELNR",		UNDEFINED_FILENAME		},
   { "background.SCORES",		UNDEFINED_FILENAME		},
   { "background.EDITOR",		UNDEFINED_FILENAME		},
   { "background.INFO",			"rhythmloop.wav"		},

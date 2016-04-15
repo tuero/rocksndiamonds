@@ -76,6 +76,7 @@ void DrawMaskedBorder_DOOR_2();
 void DrawMaskedBorder_DOOR_3();
 void DrawMaskedBorder_ALL();
 void DrawMaskedBorder(int);
+void DrawMaskedBorderToTarget(int);
 
 void SetDrawtoField(int);
 void RedrawPlayfield();
@@ -95,7 +96,7 @@ void FadeSetDisabled();
 void FadeSkipNextFadeIn();
 void FadeSkipNextFadeOut();
 
-Bitmap *getGlobalBorderBitmapFromGameStatus();
+Bitmap *getGlobalBorderBitmapFromStatus(int);
 
 void ClearField();
 void SetWindowBackgroundImageIfDefined(int);
@@ -247,6 +248,11 @@ void PlayMenuMusicExt(int);
 void PlayMenuMusic();
 void PlaySoundActivating();
 void PlaySoundSelecting();
+
+void SetAnimStatus(int);
+void SetGameStatus(int);
+void SetFontStatus(int);
+void ResetFontStatus();
 
 void ToggleFullscreenOrChangeWindowScalingIfNeeded();
 void ChangeViewportPropertiesIfNeeded();

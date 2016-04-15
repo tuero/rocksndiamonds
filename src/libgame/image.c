@@ -25,6 +25,7 @@ struct ImageInfo
   int original_height;			/* original image file height */
 
   boolean contains_small_images;	/* set after adding small images */
+  boolean contains_textures;		/* set after adding GPU textures */
   boolean scaled_up;			/* set after scaling up */
 
   int conf_tile_size;			/* tile size as defined in config */
@@ -56,6 +57,7 @@ static void *Load_Image(char *filename)
   img_info->original_height = img_info->bitmaps[IMG_BITMAP_STANDARD]->height;
 
   img_info->contains_small_images = FALSE;
+  img_info->contains_textures = FALSE;
   img_info->scaled_up = FALSE;
 
   img_info->conf_tile_size = 0;		// will be set later
@@ -347,6 +349,39 @@ void CreateImageWithSmallImages(int pos, int zoom_factor, int tile_size)
   img_info->game_tile_size = gfx.game_tile_size;
 
   setString(&img_info->leveldir, leveldir_current->identifier);
+}
+
+void CreateImageTextures(int pos)
+{
+  ImageInfo *img_info = getImageInfoEntryFromImageID(pos);
+
+  if (img_info == NULL || img_info->contains_textures)
+    return;
+
+  CreateBitmapTextures(img_info->bitmaps);
+
+  img_info->contains_textures = TRUE;
+}
+
+void FreeImageTextures(int pos)
+{
+  ImageInfo *img_info = getImageInfoEntryFromImageID(pos);
+
+  if (img_info == NULL || !img_info->contains_textures)
+    return;
+
+  FreeBitmapTextures(img_info->bitmaps);
+
+  img_info->contains_textures = FALSE;
+}
+
+void FreeAllImageTextures()
+{
+  int num_images = getImageListSize();
+  int i;
+
+  for (i = 0; i < num_images; i++)
+    FreeImageTextures(i);
 }
 
 void ScaleImage(int pos, int zoom_factor)

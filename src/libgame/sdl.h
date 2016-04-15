@@ -48,11 +48,9 @@
 #if defined(PLATFORM_ANDROID)
 #define WINDOW_SCALING_STATUS	WINDOW_SCALING_NOT_AVAILABLE
 #define FULLSCREEN_STATUS	FULLSCREEN_AVAILABLE
-#define USE_DESKTOP_FULLSCREEN	TRUE
 #elif defined(TARGET_SDL2)
 #define WINDOW_SCALING_STATUS	WINDOW_SCALING_AVAILABLE
 #define FULLSCREEN_STATUS	FULLSCREEN_AVAILABLE
-#define USE_DESKTOP_FULLSCREEN	TRUE
 #else	// SDL 1.2
 #define WINDOW_SCALING_STATUS	WINDOW_SCALING_NOT_AVAILABLE
 #define FULLSCREEN_STATUS	FULLSCREEN_AVAILABLE
@@ -102,6 +100,10 @@ struct SDLSurfaceInfo
   int width, height;
   SDL_Surface *surface;
   SDL_Surface *surface_masked;
+#if defined(TARGET_SDL2)
+  SDL_Texture *texture;
+  SDL_Texture *texture_masked;
+#endif
 };
 
 struct MouseCursorInfo
@@ -428,11 +430,14 @@ struct MouseCursorInfo
 
 boolean SDLSetNativeSurface(SDL_Surface **);
 SDL_Surface *SDLGetNativeSurface(SDL_Surface *);
+void SDLCreateBitmapTextures(Bitmap *);
+void SDLFreeBitmapTextures(Bitmap *);
 
 #if defined(TARGET_SDL2)
 SDL_Surface *SDL_DisplayFormat(SDL_Surface *);
 void SDLSetWindowScaling(int);
 void SDLSetWindowScalingQuality(char *);
+void SDLSetScreenRenderingMode(char *);
 void SDLSetWindowFullscreen(boolean);
 void SDLRedrawWindow();
 #endif
@@ -441,11 +446,12 @@ void SDLSetWindowTitle(void);
 
 void SDLLimitScreenUpdates(boolean);
 void SDLInitVideoDisplay(void);
-void SDLInitVideoBuffer(DrawBuffer **, DrawWindow **, boolean);
-boolean SDLSetVideoMode(DrawBuffer **, boolean);
+void SDLInitVideoBuffer(boolean);
+boolean SDLSetVideoMode(boolean);
 void SDLCreateBitmapContent(Bitmap *, int, int, int);
 void SDLFreeBitmapPointers(Bitmap *);
 void SDLCopyArea(Bitmap *, Bitmap *, int, int, int, int, int, int, int);
+void SDLBlitTexture(Bitmap *, int, int, int, int, int, int, int);
 void SDLFillRectangle(Bitmap *, int, int, int, int, Uint32);
 void SDLFadeRectangle(Bitmap *, int, int, int, int, int, int, int,
 		      void (*draw_border_function)(void));

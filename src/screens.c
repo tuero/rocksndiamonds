@@ -61,9 +61,9 @@
 #define SETUP_MODE_CHOOSE_GAME_SPEED	16
 #define SETUP_MODE_CHOOSE_SCROLL_DELAY	17
 #define SETUP_MODE_CHOOSE_SNAPSHOT_MODE	18
-#define SETUP_MODE_CHOOSE_SCREEN_MODE	19
-#define SETUP_MODE_CHOOSE_WINDOW_SIZE	20
-#define SETUP_MODE_CHOOSE_SCALING_TYPE	21
+#define SETUP_MODE_CHOOSE_WINDOW_SIZE	19
+#define SETUP_MODE_CHOOSE_SCALING_TYPE	20
+#define SETUP_MODE_CHOOSE_RENDERING	21
 #define SETUP_MODE_CHOOSE_GRAPHICS	22
 #define SETUP_MODE_CHOOSE_SOUNDS	23
 #define SETUP_MODE_CHOOSE_MUSIC		24
@@ -196,14 +196,14 @@ static struct GadgetInfo *screen_gadget[NUM_SCREEN_GADGETS];
 static int info_mode = INFO_MODE_MAIN;
 static int setup_mode = SETUP_MODE_MAIN;
 
-static TreeInfo *screen_modes = NULL;
-static TreeInfo *screen_mode_current = NULL;
-
 static TreeInfo *window_sizes = NULL;
 static TreeInfo *window_size_current = NULL;
 
 static TreeInfo *scaling_types = NULL;
 static TreeInfo *scaling_type_current = NULL;
+
+static TreeInfo *rendering_modes = NULL;
+static TreeInfo *rendering_mode_current = NULL;
 
 static TreeInfo *scroll_delays = NULL;
 static TreeInfo *scroll_delay_current = NULL;
@@ -234,6 +234,9 @@ static TreeInfo *drop_distance_current = NULL;
 
 static TreeInfo *level_number = NULL;
 static TreeInfo *level_number_current = NULL;
+
+static unsigned int sync_frame_delay = 0;
+static unsigned int sync_frame_delay_value = GAME_FRAME_DELAY;
 
 static struct
 {
@@ -268,6 +271,20 @@ static struct
   {	SCALING_QUALITY_BEST,	 "Anisotropic"	},
 
   {	NULL,			 NULL		},
+};
+
+static struct
+{
+  char *value;
+  char *text;
+} rendering_modes_list[] =
+{
+  {	STR_SPECIAL_RENDERING_OFF,	"Off (May show artifacts, fast)" },
+  {	STR_SPECIAL_RENDERING_BITMAP,	"Bitmap/Texture mode (slower)"	 },
+  {	STR_SPECIAL_RENDERING_TARGET,	"Target Texture mode (slower)"	 },
+  {	STR_SPECIAL_RENDERING_DOUBLE,	"Double Texture mode (slower)"	 },
+
+  {	NULL,				 NULL				 },
 };
 
 static struct
@@ -706,6 +723,13 @@ static int getTitleScreenGameMode(boolean initial)
 static int getTitleMessageGameMode(boolean initial)
 {
   return (initial ? GAME_MODE_TITLE_INITIAL : GAME_MODE_TITLE);
+}
+
+static int getTitleAnimMode(struct TitleControlInfo *tci)
+{
+  int base = (tci->initial ? GAME_MODE_TITLE_INITIAL_1 : GAME_MODE_TITLE_1);
+
+  return base + tci->local_nr;
 }
 
 #if 0
@@ -1230,11 +1254,7 @@ static void drawCursorXY(int xpos, int ypos, int graphic)
 
 static void drawChooseTreeCursor(int ypos, boolean active)
 {
-  int last_game_status = game_status;	/* save current game status */
-
   drawCursorExt(0, ypos, active, -1);
-
-  game_status = last_game_status;	/* restore current game status */
 }
 
 void DrawHeadline()
@@ -1292,13 +1312,12 @@ void DrawTitleScreenMessage(int nr, boolean initial)
 {
   char *filename = getLevelSetTitleMessageFilename(nr, initial);
   struct TitleMessageInfo *tmi = getTitleMessageInfo(nr, initial);
-  int last_game_status = game_status;	/* save current game status */
 
   if (filename == NULL)
     return;
 
   /* force TITLE font on title message screen */
-  game_status = getTitleMessageGameMode(initial);
+  SetFontStatus(getTitleMessageGameMode(initial));
 
   /* if chars *and* width set to "-1", automatically determine width */
   if (tmi->chars == -1 && tmi->width == -1)
@@ -1337,7 +1356,7 @@ void DrawTitleScreenMessage(int nr, boolean initial)
 	       filename, tmi->font, tmi->chars, -1, tmi->lines, 0, -1,
 	       tmi->autowrap, tmi->centered, tmi->parse_comments);
 
-  game_status = last_game_status;	/* restore current game status */
+  ResetFontStatus();
 }
 
 void DrawTitleScreen()
@@ -1381,6 +1400,8 @@ void DrawMainMenu()
   UnmapAllGadgets();
   FadeSoundsAndMusic();
 
+  ExpireSoundLoops(FALSE);
+
   KeyboardAutoRepeatOn();
   ActivateJoystick();
 
@@ -1391,7 +1412,10 @@ void DrawMainMenu()
   /* needed if last screen was the playing screen, invoked from level editor */
   if (level_editor_test_game)
   {
-    game_status = GAME_MODE_EDITOR;
+    CloseDoor(DOOR_CLOSE_ALL);
+
+    SetGameStatus(GAME_MODE_EDITOR);
+
     DrawLevelEd();
 
     return;
@@ -1416,6 +1440,17 @@ void DrawMainMenu()
   /* needed if last screen (level choice) changed graphics, sounds or music */
   ReloadCustomArtwork(0);
 
+  if (CheckTitleScreen(levelset_has_changed))
+  {
+    game_status_last_screen = GAME_MODE_MAIN;
+
+    SetGameStatus(GAME_MODE_TITLE);
+
+    DrawTitleScreen();
+
+    return;
+  }
+
   /* needed if different viewport properties defined for menues */
   ChangeViewportPropertiesIfNeeded();
 
@@ -1427,20 +1462,7 @@ void DrawMainMenu()
 
   FadeOut(fade_mask);
 
-  /* needed if last screen was the editor screen */
-  UndrawSpecialEditorDoor();
-
   SetDrawtoField(DRAW_BACKBUFFER);
-
-  if (CheckTitleScreen(levelset_has_changed))
-  {
-    game_status_last_screen = GAME_MODE_MAIN;
-    game_status = GAME_MODE_TITLE;
-
-    DrawTitleScreen();
-
-    return;
-  }
 
   /* level_nr may have been set to value over handicap with level editor */
   if (setup.handicap && level_nr > leveldir_current->handicap_level)
@@ -1552,6 +1574,8 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
     title_screen_nr = 0;
     tci = &title_controls[title_screen_nr];
 
+    SetAnimStatus(getTitleAnimMode(tci));
+
     last_sound = SND_UNDEFINED;
     last_music = MUS_UNDEFINED;
 
@@ -1568,18 +1592,17 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
       if (num_title_screens == 0)
       {
 	/* switch game mode from title screen mode back to info screen mode */
-	game_status = GAME_MODE_INFO;
+	SetGameStatus(GAME_MODE_INFO);
 
 	DrawInfoScreen_NotAvailable("Title screen information:",
 				    "No title screen for this level set.");
-
 	return;
       }
 
       FadeSoundsAndMusic();
-
-      FadeOut(REDRAW_ALL);
     }
+
+    FadeOut(REDRAW_ALL);
 
     /* only required to update logic for redrawing global border */
     ClearField();
@@ -1623,7 +1646,8 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
   {
     if (game_status_last_screen == GAME_MODE_INFO && num_title_screens == 0)
     {
-      game_status = GAME_MODE_INFO;
+      SetGameStatus(GAME_MODE_INFO);
+
       info_mode = INFO_MODE_MAIN;
 
       DrawInfoScreen();
@@ -1632,10 +1656,13 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
     }
 
     title_screen_nr++;
-    tci = &title_controls[title_screen_nr];
 
     if (title_screen_nr < num_title_screens)
     {
+      tci = &title_controls[title_screen_nr];
+
+      SetAnimStatus(getTitleAnimMode(tci));
+
       sound = getTitleSound(tci);
       music = getTitleMusic(tci);
 
@@ -1685,14 +1712,15 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
 
     if (game_status_last_screen == GAME_MODE_INFO)
     {
-      game_status = GAME_MODE_INFO;
+      SetGameStatus(GAME_MODE_INFO);
+
       info_mode = INFO_MODE_MAIN;
 
       DrawInfoScreen();
     }
     else	/* default: return to main menu */
     {
-      game_status = GAME_MODE_MAIN;
+      SetGameStatus(GAME_MODE_MAIN);
 
       DrawMainMenu();
     }
@@ -1827,7 +1855,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 
     CloseDoor(DOOR_CLOSE_2);
 
-    game_status = GAME_MODE_LEVELNR;
+    SetGameStatus(GAME_MODE_LEVELNR);
 
     ChangeViewportPropertiesIfNeeded();
 
@@ -1853,7 +1881,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 
       if (pos == MAIN_CONTROL_NAME)
       {
-	game_status = GAME_MODE_PSEUDO_TYPENAME;
+	SetGameStatus(GAME_MODE_PSEUDO_TYPENAME);
 
 	HandleTypeName(strlen(setup.player_name), 0);
       }
@@ -1865,7 +1893,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 
 	  CloseDoor(DOOR_CLOSE_2);
 
-	  game_status = GAME_MODE_LEVELS;
+	  SetGameStatus(GAME_MODE_LEVELS);
 
 	  SaveLevelSetup_LastSeries();
 	  SaveLevelSetup_SeriesInfo();
@@ -1884,7 +1912,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 
 	CloseDoor(DOOR_CLOSE_2);
 
-	game_status = GAME_MODE_SCORES;
+	SetGameStatus(GAME_MODE_SCORES);
 
 	DrawHallOfFame(-1);
       }
@@ -1898,7 +1926,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 
 	CloseDoor(DOOR_CLOSE_2);
 
-	game_status = GAME_MODE_EDITOR;
+	SetGameStatus(GAME_MODE_EDITOR);
 
 	FadeSetEnterScreen();
 
@@ -1910,7 +1938,8 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 
 	CloseDoor(DOOR_CLOSE_2);
 
-	game_status = GAME_MODE_INFO;
+	SetGameStatus(GAME_MODE_INFO);
+
 	info_mode = INFO_MODE_MAIN;
 
 	ChangeViewportPropertiesIfNeeded();
@@ -1929,7 +1958,8 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 
 	CloseDoor(DOOR_CLOSE_2);
 
-	game_status = GAME_MODE_SETUP;
+	SetGameStatus(GAME_MODE_SETUP);
+
 	setup_mode = SETUP_MODE_MAIN;
 
 	ChangeViewportPropertiesIfNeeded();
@@ -1942,7 +1972,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 	SaveLevelSetup_SeriesInfo();
 
         if (Request("Do you really want to quit?", REQ_ASK | REQ_STAY_CLOSED))
-	  game_status = GAME_MODE_QUIT;
+	  SetGameStatus(GAME_MODE_QUIT);
       }
     }
   }
@@ -2010,7 +2040,7 @@ static void execInfoLevelSet()
 
 static void execExitInfo()
 {
-  game_status = GAME_MODE_MAIN;
+  SetGameStatus(GAME_MODE_MAIN);
 
   DrawMainMenu();
 }
@@ -2083,7 +2113,6 @@ static void DrawCursorAndText_Setup(int screen_pos, int menu_info_pos_raw,
   DrawCursorAndText_Menu_Ext(setup_info, screen_pos, menu_info_pos_raw, active);
 }
 
-static char *screen_mode_text;
 static char *window_size_text;
 static char *scaling_type_text;
 
@@ -2110,7 +2139,6 @@ static void drawMenuInfoList(int first_entry, int num_page_entries,
 	(value_ptr == &setup.sound_loops  && !audio.loops_available) ||
 	(value_ptr == &setup.sound_music  && !audio.music_available) ||
 	(value_ptr == &setup.fullscreen   && !video.fullscreen_available) ||
-	(value_ptr == &screen_mode_text   && !video.fullscreen_available) ||
 	(value_ptr == &window_size_text   && !video.window_scaling_available) ||
 	(value_ptr == &scaling_type_text  && !video.window_scaling_available))
       si->type |= TYPE_GHOSTED;
@@ -2142,11 +2170,10 @@ static void DrawInfoScreen_Main()
     fade_mask = REDRAW_ALL;
 
   UnmapAllGadgets();
+  FadeSoundsAndMusic();
 
   FreeScreenGadgets();
   CreateScreenGadgets();
-
-  CloseDoor(DOOR_CLOSE_2);
 
   /* (needed after displaying title screens which disable auto repeat) */
   KeyboardAutoRepeatOn();
@@ -2157,9 +2184,9 @@ static void DrawInfoScreen_Main()
 
   ChangeViewportPropertiesIfNeeded();
 
-  OpenDoor(GetDoorState() | DOOR_NO_DELAY | DOOR_FORCE_REDRAW);
-
   ClearField();
+
+  OpenDoor(GetDoorState() | DOOR_NO_DELAY | DOOR_FORCE_REDRAW);
 
   DrawTextSCentered(mSY - SY + 16, FONT_TITLE_1, "Info Screen");
 
@@ -2181,11 +2208,6 @@ static void DrawInfoScreen_Main()
 
   PlayMenuSound();
   PlayMenuMusic();
-
-#if 1
-  // needed after returning from title screens with different window size
-  OpenDoor(GetDoorState() | DOOR_NO_DELAY | DOOR_FORCE_REDRAW);
-#endif
 
   DrawMaskedBorder(fade_mask);
 
@@ -2666,7 +2688,8 @@ void DrawInfoScreen_HelpText(int element, int action, int direction, int ypos)
 void DrawInfoScreen_TitleScreen()
 {
   game_status_last_screen = GAME_MODE_INFO;
-  game_status = GAME_MODE_TITLE;
+
+  SetGameStatus(GAME_MODE_TITLE);
 
   DrawTitleScreen();
 }
@@ -3599,7 +3622,7 @@ void HandleTypeName(int newxpos, Key key)
 
     is_active = FALSE;
 
-    game_status = GAME_MODE_MAIN;
+    SetGameStatus(GAME_MODE_MAIN);
   }
   else if (key == KSYM_Escape)
   {
@@ -3607,7 +3630,7 @@ void HandleTypeName(int newxpos, Key key)
 
     is_active = FALSE;
 
-    game_status = GAME_MODE_MAIN;
+    SetGameStatus(GAME_MODE_MAIN);
   }
 
   if (is_active)
@@ -3645,7 +3668,7 @@ static void DrawChooseTree(TreeInfo **ti_ptr)
 
   if (strEqual((*ti_ptr)->subdir, STRING_TOP_DIRECTORY))
   {
-    game_status = GAME_MODE_MAIN;
+    SetGameStatus(GAME_MODE_MAIN);
 
     DrawMainMenu();
 
@@ -3657,13 +3680,11 @@ static void DrawChooseTree(TreeInfo **ti_ptr)
   FreeScreenGadgets();
   CreateScreenGadgets();
 
-  CloseDoor(DOOR_CLOSE_2);
-
   FadeOut(fade_mask);
 
-  OpenDoor(GetDoorState() | DOOR_NO_DELAY | DOOR_FORCE_REDRAW);
-
   ClearField();
+
+  OpenDoor(GetDoorState() | DOOR_NO_DELAY | DOOR_FORCE_REDRAW);
 
   HandleChooseTree(0, 0, 0, 0, MB_MENU_INITIALIZE, ti_ptr);
   MapScreenTreeGadgets(*ti_ptr);
@@ -3684,7 +3705,6 @@ static void drawChooseTreeList(int first_entry, int num_page_entries,
   int yoffset_setup = 16;
   int yoffset = (ti->type == TREE_TYPE_LEVEL_DIR ||
 		 ti->type == TREE_TYPE_LEVEL_NR ? yoffset_sets : yoffset_setup);
-  int last_game_status = game_status;	/* save current game status */
 
   title_string = ti->infotext;
 
@@ -3723,8 +3743,6 @@ static void drawChooseTreeList(int first_entry, int num_page_entries,
     else
       initCursor(i, IMG_MENU_BUTTON);
   }
-
-  game_status = last_game_status;	/* restore current game status */
 
   redraw_mask |= REDRAW_FIELD;
 }
@@ -3773,15 +3791,12 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
   int step = (button == 1 ? 1 : button == 2 ? 5 : 10);
   int num_entries = numTreeInfoInGroup(ti);
   int num_page_entries;
-  int last_game_status = game_status;	/* save current game status */
   boolean position_set_by_scrollbar = (dx == 999);
 
   if (num_entries <= NUM_MENU_ENTRIES_ON_SCREEN)
     num_page_entries = num_entries;
   else
     num_page_entries = NUM_MENU_ENTRIES_ON_SCREEN;
-
-  game_status = last_game_status;	/* restore current game status */
 
   if (button == MB_MENU_INITIALIZE)
   {
@@ -3832,9 +3847,9 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
 	  setup_mode == SETUP_MODE_CHOOSE_SCROLL_DELAY ||
 	  setup_mode == SETUP_MODE_CHOOSE_SNAPSHOT_MODE)
 	execSetupGame();
-      else if (setup_mode == SETUP_MODE_CHOOSE_SCREEN_MODE ||
-	       setup_mode == SETUP_MODE_CHOOSE_WINDOW_SIZE ||
-	       setup_mode == SETUP_MODE_CHOOSE_SCALING_TYPE)
+      else if (setup_mode == SETUP_MODE_CHOOSE_WINDOW_SIZE ||
+	       setup_mode == SETUP_MODE_CHOOSE_SCALING_TYPE ||
+	       setup_mode == SETUP_MODE_CHOOSE_RENDERING)
 	execSetupGraphics();
       else if (setup_mode == SETUP_MODE_CHOOSE_VOLUME_SIMPLE ||
 	       setup_mode == SETUP_MODE_CHOOSE_VOLUME_LOOPS ||
@@ -3856,7 +3871,7 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
 	HandleMainMenu_SelectLevel(0, 0, new_level_nr);
       }
 
-      game_status = GAME_MODE_MAIN;
+      SetGameStatus(GAME_MODE_MAIN);
 
       DrawMainMenu();
     }
@@ -3866,12 +3881,8 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
 
   if (mx || my)		/* mouse input */
   {
-    int last_game_status = game_status;	/* save current game status */
-
     x = (mx - mSX) / 32;
     y = (my - mSY) / 32 - MENU_SCREEN_START_YPOS;
-
-    game_status = last_game_status;	/* restore current game status */
   }
   else if (dx || dy)	/* keyboard or scrollbar/scrollbutton input */
   {
@@ -4030,9 +4041,9 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
 	      setup_mode == SETUP_MODE_CHOOSE_SCROLL_DELAY ||
 	      setup_mode == SETUP_MODE_CHOOSE_SNAPSHOT_MODE)
 	    execSetupGame();
-	  else if (setup_mode == SETUP_MODE_CHOOSE_SCREEN_MODE ||
-		   setup_mode == SETUP_MODE_CHOOSE_WINDOW_SIZE ||
-		   setup_mode == SETUP_MODE_CHOOSE_SCALING_TYPE)
+	  else if (setup_mode == SETUP_MODE_CHOOSE_WINDOW_SIZE ||
+		   setup_mode == SETUP_MODE_CHOOSE_SCALING_TYPE ||
+		   setup_mode == SETUP_MODE_CHOOSE_RENDERING)
 	    execSetupGraphics();
 	  else if (setup_mode == SETUP_MODE_CHOOSE_VOLUME_SIMPLE ||
 		   setup_mode == SETUP_MODE_CHOOSE_VOLUME_LOOPS ||
@@ -4054,7 +4065,7 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
 	    HandleMainMenu_SelectLevel(0, 0, new_level_nr);
 	  }
 
-	  game_status = GAME_MODE_MAIN;
+	  SetGameStatus(GAME_MODE_MAIN);
 
 	  DrawMainMenu();
 	}
@@ -4065,6 +4076,8 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
 
 void DrawChooseLevelSet()
 {
+  FadeSoundsAndMusic();
+
   SetMainBackgroundImage(IMG_BACKGROUND_LEVELS);
 
   DrawChooseTree(&leveldir_current);
@@ -4081,6 +4094,8 @@ void HandleChooseLevelSet(int mx, int my, int dx, int dy, int button)
 void DrawChooseLevelNr()
 {
   int i;
+
+  FadeSoundsAndMusic();
 
   if (level_number != NULL)
   {
@@ -4142,9 +4157,6 @@ void HandleChooseLevelNr(int mx, int my, int dx, int dy, int button)
 void DrawHallOfFame(int highlight_position)
 {
   int fade_mask = REDRAW_FIELD;
-
-  /* required before door position may be changed in next step */
-  CloseDoor(DOOR_CLOSE_ALL);
 
   /* needed if different viewport properties defined for scores */
   ChangeViewportPropertiesIfNeeded();
@@ -4270,7 +4282,7 @@ void HandleHallOfFame(int mx, int my, int dx, int dy, int button)
 
     FadeSound(SND_BACKGROUND_SCORES);
 
-    game_status = GAME_MODE_MAIN;
+    SetGameStatus(GAME_MODE_MAIN);
 
     DrawMainMenu();
   }
@@ -4280,7 +4292,7 @@ void HandleHallOfFame(int mx, int my, int dx, int dy, int button)
 
     FadeSound(SND_BACKGROUND_SCORES);
 
-    game_status = GAME_MODE_MAIN;
+    SetGameStatus(GAME_MODE_MAIN);
 
     DrawMainMenu();
   }
@@ -4298,9 +4310,9 @@ static struct TokenInfo *setup_info;
 static int num_setup_info;	/* number of setup entries shown on screen */
 static int max_setup_info;	/* total number of setup entries in list */
 
-static char *screen_mode_text;
 static char *window_size_text;
 static char *scaling_type_text;
+static char *rendering_mode_text;
 static char *scroll_delay_text;
 static char *snapshot_mode_text;
 static char *game_speed_text;
@@ -4393,31 +4405,31 @@ static void execSetupGame_setScrollDelays()
       setString(&ti->identifier, identifier);
       setString(&ti->name, name);
       setString(&ti->name_sorting, name);
-      setString(&ti->infotext, "Scaling Type");
+      setString(&ti->infotext, "Scroll Delay");
 
       pushTreeInfo(&scroll_delays, ti);
     }
 
-    /* sort scaling type values to start with lowest scaling type value */
+    /* sort scroll delay values to start with lowest scroll delay value */
     sortTreeInfo(&scroll_delays);
 
-    /* set current scaling type value to configured scaling type value */
+    /* set current scroll delay value to configured scroll delay value */
     scroll_delay_current =
       getTreeInfoFromIdentifier(scroll_delays,i_to_a(setup.scroll_delay_value));
 
-    /* if that fails, set current scaling type to reliable default value */
+    /* if that fails, set current scroll delay to reliable default value */
     if (scroll_delay_current == NULL)
       scroll_delay_current =
 	getTreeInfoFromIdentifier(scroll_delays, i_to_a(STD_SCROLL_DELAY));
 
-    /* if that also fails, set current scaling type to first available value */
+    /* if that also fails, set current scroll delay to first available value */
     if (scroll_delay_current == NULL)
       scroll_delay_current = scroll_delays;
   }
 
   setup.scroll_delay_value = atoi(scroll_delay_current->identifier);
 
-  /* needed for displaying scaling type text instead of identifier */
+  /* needed for displaying scroll delay text instead of identifier */
   scroll_delay_text = scroll_delay_current->name;
 }
 
@@ -4645,65 +4657,55 @@ static void execSetupGraphics_setScalingTypes()
   scaling_type_text = scaling_type_current->name;
 }
 
-static void execSetupGraphics_setScreenModes()
+static void execSetupGraphics_setRenderingModes()
 {
-  // if (screen_modes == NULL && video.fullscreen_available)
-  if (screen_modes == NULL && video.fullscreen_modes != NULL)
+  if (rendering_modes == NULL)
   {
     int i;
 
-    for (i = 0; video.fullscreen_modes[i].width != -1; i++)
+    for (i = 0; rendering_modes_list[i].value != NULL; i++)
     {
       TreeInfo *ti = newTreeInfo_setDefaults(TREE_TYPE_UNDEFINED);
       char identifier[32], name[32];
-      int x = video.fullscreen_modes[i].width;
-      int y = video.fullscreen_modes[i].height;
-      int xx, yy;
+      char *value = rendering_modes_list[i].value;
+      char *text = rendering_modes_list[i].text;
 
-      get_aspect_ratio_from_screen_mode(&video.fullscreen_modes[i], &xx, &yy);
+      ti->node_top = &rendering_modes;
+      ti->sort_priority = i;
 
-      ti->node_top = &screen_modes;
-      ti->sort_priority = x * 10000 + y;
-
-      sprintf(identifier, "%dx%d", x, y);
-      sprintf(name, "%d x %d [%d:%d]", x, y, xx, yy);
+      sprintf(identifier, "%s", value);
+      sprintf(name, "%s", text);
 
       setString(&ti->identifier, identifier);
       setString(&ti->name, name);
       setString(&ti->name_sorting, name);
-      setString(&ti->infotext, "Fullscreen Mode");
+      setString(&ti->infotext, "Special Rendering");
 
-      pushTreeInfo(&screen_modes, ti);
+      pushTreeInfo(&rendering_modes, ti);
     }
 
-    /* sort fullscreen modes to start with lowest available screen resolution */
-    sortTreeInfo(&screen_modes);
+    /* sort rendering mode values to start with lowest rendering mode value */
+    sortTreeInfo(&rendering_modes);
 
-    /* set current screen mode for fullscreen mode to configured setup value */
-    screen_mode_current = getTreeInfoFromIdentifier(screen_modes,
-						    setup.fullscreen_mode);
+    /* set current rendering mode value to configured rendering mode value */
+    rendering_mode_current =
+      getTreeInfoFromIdentifier(rendering_modes, setup.screen_rendering_mode);
 
-    /* if that fails, set current screen mode to reliable default value */
-    if (screen_mode_current == NULL)
-      screen_mode_current = getTreeInfoFromIdentifier(screen_modes,
-						      DEFAULT_FULLSCREEN_MODE);
+    /* if that fails, set current rendering mode to reliable default value */
+    if (rendering_mode_current == NULL)
+      rendering_mode_current =
+	getTreeInfoFromIdentifier(rendering_modes,
+				  STR_SPECIAL_RENDERING_DEFAULT);
 
-    /* if that also fails, set current screen mode to first available mode */
-    if (screen_mode_current == NULL)
-      screen_mode_current = screen_modes;
-
-    if (screen_mode_current == NULL)
-      video.fullscreen_available = FALSE;
+    /* if that also fails, set current rendering mode to first available one */
+    if (rendering_mode_current == NULL)
+      rendering_mode_current = rendering_modes;
   }
 
-  // if (video.fullscreen_available)
-  if (screen_mode_current != NULL)
-  {
-    setup.fullscreen_mode = screen_mode_current->identifier;
+  setup.screen_rendering_mode = rendering_mode_current->identifier;
 
-    /* needed for displaying screen mode name instead of identifier */
-    screen_mode_text = screen_mode_current->name;
-  }
+  /* needed for displaying rendering mode text instead of identifier */
+  rendering_mode_text = rendering_mode_current->name;
 }
 
 static void execSetupGraphics()
@@ -4720,7 +4722,7 @@ static void execSetupGraphics()
   }
 
   execSetupGraphics_setScalingTypes();
-  execSetupGraphics_setScreenModes();
+  execSetupGraphics_setRenderingModes();
 
   setup_mode = SETUP_MODE_GRAPHICS;
 
@@ -4733,11 +4735,13 @@ static void execSetupGraphics()
   // window scaling quality may have changed at this point
   if (!strEqual(setup.window_scaling_quality, video.window_scaling_quality))
     SDLSetWindowScalingQuality(setup.window_scaling_quality);
+
+  // screen rendering mode may have changed at this point
+  SDLSetScreenRenderingMode(setup.screen_rendering_mode);
 #endif
 }
 
-#if !defined(PLATFORM_ANDROID)
-#if defined(TARGET_SDL2)
+#if defined(TARGET_SDL2) && !defined(PLATFORM_ANDROID)
 static void execSetupChooseWindowSize()
 {
   setup_mode = SETUP_MODE_CHOOSE_WINDOW_SIZE;
@@ -4751,17 +4755,13 @@ static void execSetupChooseScalingType()
 
   DrawSetupScreen();
 }
-#else
-static void execSetupChooseScreenMode()
-{
-  if (!video.fullscreen_available)
-    return;
 
-  setup_mode = SETUP_MODE_CHOOSE_SCREEN_MODE;
+static void execSetupChooseRenderingMode()
+{
+  setup_mode = SETUP_MODE_CHOOSE_RENDERING;
 
   DrawSetupScreen();
 }
-#endif
 #endif
 
 static void execSetupChooseVolumeSimple()
@@ -5270,7 +5270,7 @@ static void execSetupShortcuts5()
 
 static void execExitSetup()
 {
-  game_status = GAME_MODE_MAIN;
+  SetGameStatus(GAME_MODE_MAIN);
 
   DrawMainMenu();
 }
@@ -5360,17 +5360,14 @@ static struct TokenInfo setup_info_editor[] =
 
 static struct TokenInfo setup_info_graphics[] =
 {
-#if !defined(PLATFORM_ANDROID)
+#if defined(TARGET_SDL2) && !defined(PLATFORM_ANDROID)
   { TYPE_SWITCH,	&setup.fullscreen,	"Fullscreen:"		},
-#if defined(TARGET_SDL2)
   { TYPE_ENTER_LIST,	execSetupChooseWindowSize, "Window Scaling:"	},
   { TYPE_STRING,	&window_size_text,	""			},
   { TYPE_ENTER_LIST,	execSetupChooseScalingType, "Anti-Aliasing:"	},
   { TYPE_STRING,	&scaling_type_text,	""			},
-#else
-  { TYPE_ENTER_LIST,	execSetupChooseScreenMode, "Fullscreen Mode:"	},
-  { TYPE_STRING,	&screen_mode_text,	""			},
-#endif
+  { TYPE_ENTER_LIST,	execSetupChooseRenderingMode, "Special Rendering:" },
+  { TYPE_STRING,	&rendering_mode_text,	""			},
 #endif
 #if 0
   { TYPE_ENTER_LIST,	execSetupChooseScrollDelay, "Scroll Delay:"	},
@@ -5380,7 +5377,7 @@ static struct TokenInfo setup_info_graphics[] =
   { TYPE_SWITCH,	&setup.quick_switch,	"Quick Player Focus Switch:" },
   { TYPE_SWITCH,	&setup.quick_doors,	"Quick Menu Doors:"	},
   { TYPE_SWITCH,	&setup.show_titlescreen,"Show Title Screens:"	},
-  { TYPE_SWITCH,	&setup.toons,		"Show Toons:"		},
+  { TYPE_SWITCH,	&setup.toons,		"Show Menu Animations:"	},
   { TYPE_ECS_AGA,	&setup.prefer_aga_graphics,"EMC graphics preference:" },
   { TYPE_SWITCH, &setup.sp_show_border_elements,"Supaplex Border Elements:" },
   { TYPE_SWITCH,	&setup.small_game_graphics, "Small Game Graphics:" },
@@ -5599,8 +5596,7 @@ static Key getSetupKey()
     DoAnimation();
     BackToFront();
 
-    /* don't eat all CPU time */
-    Delay(10);
+    WaitUntilDelayReached(&sync_frame_delay, sync_frame_delay_value);
   }
 
   return key;
@@ -5623,13 +5619,22 @@ static int getSetupValueFont(int type, void *value)
     return FONT_VALUE_1;
 }
 
+static int getSetupValueFontNarrow(int type, int font_nr)
+{
+  return (font_nr == FONT_VALUE_1    ? FONT_VALUE_NARROW :
+	  font_nr == FONT_OPTION_ON  ? FONT_OPTION_ON_NARROW :
+	  font_nr == FONT_OPTION_OFF ? FONT_OPTION_OFF_NARROW :
+	  font_nr);
+}
+
 static void drawSetupValue(int screen_pos, int setup_info_pos_raw)
 {
   int si_pos = (setup_info_pos_raw < 0 ? screen_pos : setup_info_pos_raw);
   struct TokenInfo *si = &setup_info[si_pos];
   boolean font_draw_xoffset_modified = FALSE;
+  boolean scrollbar_needed = (num_setup_info < max_setup_info);
   int font_draw_xoffset_old = -1;
-  int xoffset = (num_setup_info < max_setup_info ? -1 : 0);
+  int xoffset = (scrollbar_needed ? -1 : 0);
   int menu_screen_value_xpos = MENU_SCREEN_VALUE_XPOS + xoffset;
   int menu_screen_max_xpos = MENU_SCREEN_MAX_XPOS + xoffset;
   int xpos = menu_screen_value_xpos;
@@ -5670,6 +5675,26 @@ static void drawSetupValue(int screen_pos, int setup_info_pos_raw)
   starty = mSY + ypos * 32;
   font_nr = getSetupValueFont(type, value);
   font_width = getFontWidth(font_nr);
+
+  // special check if right-side setup values moved left due to scrollbar
+  if (scrollbar_needed && xpos > MENU_SCREEN_START_XPOS)
+  {
+    int max_menu_text_length = 26;	// maximum text length for classic menu
+    int font_xoffset = getFontBitmapInfo(font_nr)->draw_xoffset;
+    int text_startx = mSX + MENU_SCREEN_START_XPOS * 32;
+    int text_font_nr = getMenuTextFont(FONT_MENU_2);
+    int text_font_xoffset = getFontBitmapInfo(text_font_nr)->draw_xoffset;
+    int text_width = max_menu_text_length * getFontWidth(text_font_nr);
+
+    if (startx + font_xoffset < text_startx + text_width + text_font_xoffset)
+    {
+      xpos += 1;
+      startx = mSX + xpos * 32;
+
+      font_nr = getSetupValueFontNarrow(type, font_nr);
+      font_width = getFontWidth(font_nr);
+    }
+  }
 
   /* downward compatibility correction for Juergen Bonhagen's menu settings */
   if (setup_mode != SETUP_MODE_INPUT)
@@ -5767,20 +5792,19 @@ static void DrawSetupScreen_Generic()
     fade_mask = REDRAW_ALL;
 
   UnmapAllGadgets();
+  FadeSoundsAndMusic();
 
   FreeScreenGadgets();
   CreateScreenGadgets();
-
-  CloseDoor(DOOR_CLOSE_2);
 
   if (redraw_mask & REDRAW_ALL)
     redraw_all = TRUE;
 
   FadeOut(fade_mask);
 
-  OpenDoor(GetDoorState() | DOOR_NO_DELAY | DOOR_FORCE_REDRAW);
-
   ClearField();
+
+  OpenDoor(GetDoorState() | DOOR_NO_DELAY | DOOR_FORCE_REDRAW);
 
   if (setup_mode == SETUP_MODE_MAIN)
   {
@@ -6287,8 +6311,7 @@ void CustomizeKeyboard(int player_nr)
     DoAnimation();
     BackToFront();
 
-    /* don't eat all CPU time */
-    Delay(10);
+    WaitUntilDelayReached(&sync_frame_delay, sync_frame_delay_value);
   }
 
   /* write new key bindings back to player setup */
@@ -6443,8 +6466,7 @@ static boolean CalibrateJoystickMain(int player_nr)
     DoAnimation();
     BackToFront();
 
-    /* don't eat all CPU time */
-    Delay(10);
+    WaitUntilDelayReached(&sync_frame_delay, sync_frame_delay_value);
   }
 
   /* calibrated center position (joystick should now be centered) */
@@ -6466,7 +6488,7 @@ static boolean CalibrateJoystickMain(int player_nr)
       NextEvent(&event);
       HandleOtherEvents(&event);
 
-      Delay(10);
+      WaitUntilDelayReached(&sync_frame_delay, sync_frame_delay_value);
     }
   }
 
@@ -6510,12 +6532,12 @@ void DrawSetupScreen()
     DrawChooseTree(&scroll_delay_current);
   else if (setup_mode == SETUP_MODE_CHOOSE_SNAPSHOT_MODE)
     DrawChooseTree(&snapshot_mode_current);
-  else if (setup_mode == SETUP_MODE_CHOOSE_SCREEN_MODE)
-    DrawChooseTree(&screen_mode_current);
   else if (setup_mode == SETUP_MODE_CHOOSE_WINDOW_SIZE)
     DrawChooseTree(&window_size_current);
   else if (setup_mode == SETUP_MODE_CHOOSE_SCALING_TYPE)
     DrawChooseTree(&scaling_type_current);
+  else if (setup_mode == SETUP_MODE_CHOOSE_RENDERING)
+    DrawChooseTree(&rendering_mode_current);
   else if (setup_mode == SETUP_MODE_CHOOSE_GRAPHICS)
     DrawChooseTree(&artwork.gfx_current);
   else if (setup_mode == SETUP_MODE_CHOOSE_SOUNDS)
@@ -6563,12 +6585,12 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
     HandleChooseTree(mx, my, dx, dy, button, &scroll_delay_current);
   else if (setup_mode == SETUP_MODE_CHOOSE_SNAPSHOT_MODE)
     HandleChooseTree(mx, my, dx, dy, button, &snapshot_mode_current);
-  else if (setup_mode == SETUP_MODE_CHOOSE_SCREEN_MODE)
-    HandleChooseTree(mx, my, dx, dy, button, &screen_mode_current);
   else if (setup_mode == SETUP_MODE_CHOOSE_WINDOW_SIZE)
     HandleChooseTree(mx, my, dx, dy, button, &window_size_current);
   else if (setup_mode == SETUP_MODE_CHOOSE_SCALING_TYPE)
     HandleChooseTree(mx, my, dx, dy, button, &scaling_type_current);
+  else if (setup_mode == SETUP_MODE_CHOOSE_RENDERING)
+    HandleChooseTree(mx, my, dx, dy, button, &rendering_mode_current);
   else if (setup_mode == SETUP_MODE_CHOOSE_GRAPHICS)
     HandleChooseTree(mx, my, dx, dy, button, &artwork.gfx_current);
   else if (setup_mode == SETUP_MODE_CHOOSE_SOUNDS)
@@ -6917,14 +6939,10 @@ static void CreateScreenScrollbars()
 
 void CreateScreenGadgets()
 {
-  int last_game_status = game_status;	/* save current game status */
-
   CreateScreenMenubuttons();
 
   CreateScreenScrollbuttons();
   CreateScreenScrollbars();
-
-  game_status = last_game_status;	/* restore current game status */
 }
 
 void FreeScreenGadgets()

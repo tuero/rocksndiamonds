@@ -43,6 +43,7 @@ void KeyboardAutoRepeatOffUnlessAutoplay();
 
 void InitGfxBuffers();
 void InitGadgets();
+void InitImageTextures();
 
 void DisplayExitMessage(char *, va_list);
 

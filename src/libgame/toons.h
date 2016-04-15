@@ -15,6 +15,12 @@
 #include "system.h"
 
 
+/* values for toon animation */
+#define ANIM_START	0
+#define ANIM_CONTINUE	1
+#define ANIM_STOP	2
+
+
 struct ToonScreenInfo
 {
   Bitmap *save_buffer;
@@ -55,8 +61,7 @@ void InitToonScreen(Bitmap *, void (*update_function)(void),
 		    void (*prepare_backbuffer_function)(void),
 		    boolean (*redraw_needed_function)(void),
 		    struct ToonInfo *, int, int, int, int, int, int);
-void InitAnimation(void);
-void StopAnimation(void);
-void DoAnimation(void);
+
+void HandleAnimation(int);
 
 #endif	/* TOONS_H */

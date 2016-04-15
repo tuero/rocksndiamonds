@@ -131,8 +131,12 @@ boolean getTokenValueFromString(char *, char **, char **);
 void InitCounter(void);
 unsigned int Counter(void);
 void Delay(unsigned int);
+boolean DelayReachedExt(unsigned int *, unsigned int, unsigned int);
 boolean FrameReached(unsigned int *, unsigned int);
 boolean DelayReached(unsigned int *, unsigned int);
+void ResetDelayCounterExt(unsigned int *, unsigned int);
+void ResetFrameCounter(unsigned int *);
+void ResetDelayCounter(unsigned int *);
 int WaitUntilDelayReached(unsigned int *, unsigned int);
 void SkipUntilDelayReached(unsigned int *, unsigned int, int *, int);
 
@@ -260,9 +264,6 @@ boolean FileIsArtworkType(char *, int);
 char *get_mapped_token(char *);
 
 int get_parameter_value(char *, char *, int);
-
-struct ScreenModeInfo *get_screen_mode_from_string(char *);
-void get_aspect_ratio_from_screen_mode(struct ScreenModeInfo *, int *x, int *y);
 
 struct FileInfo *getFileListFromConfigList(struct ConfigInfo *,
 					   struct ConfigTypeInfo *,

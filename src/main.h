@@ -41,8 +41,6 @@
 #define SND_UNDEFINED			(-1)
 #define MUS_UNDEFINED			(-1)
 
-#define DEFAULT_FULLSCREEN_MODE		"800x600"
-
 #define WIN_XSIZE_DEFAULT		672
 #define WIN_YSIZE_DEFAULT		560
 
@@ -869,6 +867,8 @@
 #define IS_LOOP_SOUND(s)	(sound_info[s].loop)
 
 #define IS_SPECIAL_GFX_ARG(a)	((a) >= 0 && (a) < NUM_SPECIAL_GFX_ARGS)
+
+#define IS_GLOBAL_ANIM_PART(a)	((a) >= 0 && (a) < NUM_GLOBAL_ANIM_PARTS)
 
 #define EL_CASCADE_ACTIVE(e)	(IS_EDITOR_CASCADE_INACTIVE(e) ? (e) + 1 : (e))
 #define EL_CASCADE_INACTIVE(e)	(IS_EDITOR_CASCADE_ACTIVE(e)   ? (e) - 1 : (e))
@@ -1765,9 +1765,17 @@
 #define ACTION_PAGE_30			81
 #define ACTION_PAGE_31			82
 #define ACTION_PAGE_32			83
-#define ACTION_OTHER			84
+#define ACTION_PART_1			84
+#define ACTION_PART_2			85
+#define ACTION_PART_3			86
+#define ACTION_PART_4			87
+#define ACTION_PART_5			88
+#define ACTION_PART_6			89
+#define ACTION_PART_7			90
+#define ACTION_PART_8			91
+#define ACTION_OTHER			92
 
-#define NUM_ACTIONS			85
+#define NUM_ACTIONS			93
 
 #define ACTION_BORING_LAST		ACTION_BORING_10
 #define ACTION_SLEEPING_LAST		ACTION_SLEEPING_3
@@ -1777,22 +1785,39 @@
 #define GFX_SPECIAL_ARG_DEFAULT		0
 #define GFX_SPECIAL_ARG_LOADING		1
 #define GFX_SPECIAL_ARG_TITLE_INITIAL	2
-#define GFX_SPECIAL_ARG_TITLE		3
-#define GFX_SPECIAL_ARG_MAIN		4
-#define GFX_SPECIAL_ARG_LEVELS		5
-#define GFX_SPECIAL_ARG_LEVELNR		6
-#define GFX_SPECIAL_ARG_SCORES		7
-#define GFX_SPECIAL_ARG_EDITOR		8
-#define GFX_SPECIAL_ARG_INFO		9
-#define GFX_SPECIAL_ARG_SETUP		10
-#define GFX_SPECIAL_ARG_PLAYING		11
-#define GFX_SPECIAL_ARG_DOOR		12
-#define GFX_SPECIAL_ARG_TAPE		13
-#define GFX_SPECIAL_ARG_PANEL		14
-#define GFX_SPECIAL_ARG_PREVIEW		15
-#define GFX_SPECIAL_ARG_CRUMBLED	16
+#define GFX_SPECIAL_ARG_TITLE_INITIAL_1	3
+#define GFX_SPECIAL_ARG_TITLE_INITIAL_2	4
+#define GFX_SPECIAL_ARG_TITLE_INITIAL_3	5
+#define GFX_SPECIAL_ARG_TITLE_INITIAL_4	6
+#define GFX_SPECIAL_ARG_TITLE_INITIAL_5	7
+#define GFX_SPECIAL_ARG_TITLE		8
+#define GFX_SPECIAL_ARG_TITLE_1		9
+#define GFX_SPECIAL_ARG_TITLE_2		10
+#define GFX_SPECIAL_ARG_TITLE_3		11
+#define GFX_SPECIAL_ARG_TITLE_4		12
+#define GFX_SPECIAL_ARG_TITLE_5		13
+#define GFX_SPECIAL_ARG_MAIN		14
+#define GFX_SPECIAL_ARG_LEVELS		15
+#define GFX_SPECIAL_ARG_LEVELNR		16
+#define GFX_SPECIAL_ARG_SCORES		17
+#define GFX_SPECIAL_ARG_EDITOR		18
+#define GFX_SPECIAL_ARG_INFO		19
+#define GFX_SPECIAL_ARG_SETUP		20
+#define GFX_SPECIAL_ARG_PLAYING		21
+#define GFX_SPECIAL_ARG_DOOR		22
+#define GFX_SPECIAL_ARG_TAPE		23
+#define GFX_SPECIAL_ARG_PANEL		24
+#define GFX_SPECIAL_ARG_PREVIEW		25
+#define GFX_SPECIAL_ARG_CRUMBLED	26
+#define GFX_SPECIAL_ARG_MAINONLY	27
+#define GFX_SPECIAL_ARG_TYPENAME	28
+#define GFX_SPECIAL_ARG_SUBMENU		29
+#define GFX_SPECIAL_ARG_MENU		30
+#define GFX_SPECIAL_ARG_TOONS		31
+#define GFX_SPECIAL_ARG_FADING		32
+#define GFX_SPECIAL_ARG_QUIT		33
 
-#define NUM_SPECIAL_GFX_ARGS		17
+#define NUM_SPECIAL_GFX_ARGS		34
 
 /* these additional definitions are currently only used for draw offsets */
 #define GFX_SPECIAL_ARG_INFO_MAIN	0
@@ -1856,35 +1881,40 @@
 #define GFX_ARG_DIGGABLE_LIKE		23
 #define GFX_ARG_BORDER_SIZE		24
 #define GFX_ARG_STEP_OFFSET		25
-#define GFX_ARG_STEP_DELAY		26
-#define GFX_ARG_DIRECTION		27
-#define GFX_ARG_POSITION		28
-#define GFX_ARG_DRAW_XOFFSET		29
-#define GFX_ARG_DRAW_YOFFSET		30
-#define GFX_ARG_DRAW_MASKED		31
-#define GFX_ARG_ANIM_DELAY_FIXED	32
-#define GFX_ARG_ANIM_DELAY_RANDOM	33
-#define GFX_ARG_POST_DELAY_FIXED	34
-#define GFX_ARG_POST_DELAY_RANDOM	35
-#define GFX_ARG_NAME			36
-#define GFX_ARG_SCALE_UP_FACTOR		37
-#define GFX_ARG_TILE_SIZE		38
-#define GFX_ARG_CLONE_FROM		39
-#define GFX_ARG_FADE_MODE		40
-#define GFX_ARG_FADE_DELAY		41
-#define GFX_ARG_POST_DELAY		42
-#define GFX_ARG_AUTO_DELAY		43
-#define GFX_ARG_ALIGN			44
-#define GFX_ARG_VALIGN			45
-#define GFX_ARG_SORT_PRIORITY		46
-#define GFX_ARG_CLASS			47
-#define GFX_ARG_STYLE			48
-#define GFX_ARG_ACTIVE_XOFFSET		49
-#define GFX_ARG_ACTIVE_YOFFSET		50
-#define GFX_ARG_PRESSED_XOFFSET		51
-#define GFX_ARG_PRESSED_YOFFSET		52
+#define GFX_ARG_STEP_XOFFSET		26
+#define GFX_ARG_STEP_YOFFSET		27
+#define GFX_ARG_STEP_DELAY		28
+#define GFX_ARG_DIRECTION		29
+#define GFX_ARG_POSITION		30
+#define GFX_ARG_DRAW_XOFFSET		31
+#define GFX_ARG_DRAW_YOFFSET		32
+#define GFX_ARG_DRAW_MASKED		33
+#define GFX_ARG_DRAW_ORDER		34
+#define GFX_ARG_INIT_DELAY_FIXED	35
+#define GFX_ARG_INIT_DELAY_RANDOM	36
+#define GFX_ARG_ANIM_DELAY_FIXED	37
+#define GFX_ARG_ANIM_DELAY_RANDOM	38
+#define GFX_ARG_POST_DELAY_FIXED	39
+#define GFX_ARG_POST_DELAY_RANDOM	40
+#define GFX_ARG_NAME			41
+#define GFX_ARG_SCALE_UP_FACTOR		42
+#define GFX_ARG_TILE_SIZE		43
+#define GFX_ARG_CLONE_FROM		44
+#define GFX_ARG_FADE_MODE		45
+#define GFX_ARG_FADE_DELAY		46
+#define GFX_ARG_POST_DELAY		47
+#define GFX_ARG_AUTO_DELAY		48
+#define GFX_ARG_ALIGN			49
+#define GFX_ARG_VALIGN			50
+#define GFX_ARG_SORT_PRIORITY		51
+#define GFX_ARG_CLASS			52
+#define GFX_ARG_STYLE			53
+#define GFX_ARG_ACTIVE_XOFFSET		54
+#define GFX_ARG_ACTIVE_YOFFSET		55
+#define GFX_ARG_PRESSED_XOFFSET		56
+#define GFX_ARG_PRESSED_YOFFSET		57
 
-#define NUM_GFX_ARGS			53
+#define NUM_GFX_ARGS			58
 
 
 /* values for sound configuration suffixes */
@@ -1929,43 +1959,83 @@
 #define FONT_INPUT_2_ACTIVE		24
 #define FONT_INPUT_1			25
 #define FONT_INPUT_2			26
-#define FONT_OPTION_OFF			27
-#define FONT_OPTION_ON			28
-#define FONT_VALUE_1			29
-#define FONT_VALUE_2			30
-#define FONT_VALUE_OLD			31
-#define FONT_LEVEL_NUMBER_ACTIVE	32
-#define FONT_LEVEL_NUMBER		33
-#define FONT_TAPE_RECORDER		34
-#define FONT_GAME_INFO			35
-#define FONT_INFO_ELEMENTS		36
-#define FONT_INFO_LEVELSET		37
+#define FONT_OPTION_OFF_NARROW		27
+#define FONT_OPTION_OFF			28
+#define FONT_OPTION_ON_NARROW		29
+#define FONT_OPTION_ON			30
+#define FONT_VALUE_1			31
+#define FONT_VALUE_2			32
+#define FONT_VALUE_OLD			33
+#define FONT_VALUE_NARROW		34
+#define FONT_LEVEL_NUMBER_ACTIVE	35
+#define FONT_LEVEL_NUMBER		36
+#define FONT_TAPE_RECORDER		37
+#define FONT_GAME_INFO			38
+#define FONT_INFO_ELEMENTS		39
+#define FONT_INFO_LEVELSET		40
 
-#define NUM_FONTS			38
+#define NUM_FONTS			41
 #define NUM_INITIAL_FONTS		4
+
+/* values for toon animation configuration */
+#define MAX_NUM_TOONS			20
+
+/* values for global animation configuration (must match those from main.c) */
+#define NUM_GLOBAL_ANIMS		8
+#define NUM_GLOBAL_ANIM_PARTS		8
+#define NUM_GLOBAL_ANIM_PARTS_ALL	(NUM_GLOBAL_ANIM_PARTS + 1)
+#define NUM_GLOBAL_ANIM_TOKENS		(2 * NUM_GLOBAL_ANIMS)
+
+#define GLOBAL_ANIM_ID_GRAPHIC_FIRST	0
+#define GLOBAL_ANIM_ID_GRAPHIC_LAST	7
+#define GLOBAL_ANIM_ID_CONTROL_FIRST	(NUM_GLOBAL_ANIMS + 0)
+#define GLOBAL_ANIM_ID_CONTROL_LAST	(NUM_GLOBAL_ANIMS + 7)
+
+#define GLOBAL_ANIM_ID_PART_FIRST	0
+#define GLOBAL_ANIM_ID_PART_LAST	7
+#define GLOBAL_ANIM_ID_PART_BASE	8
+
+/* values for global border graphics */
+#define IMG_GLOBAL_BORDER_FIRST		IMG_GLOBAL_BORDER
+#define IMG_GLOBAL_BORDER_LAST		IMG_GLOBAL_BORDER_PLAYING
 
 /* values for game_status (must match special image configuration suffixes) */
 #define GAME_MODE_DEFAULT		0
 #define GAME_MODE_LOADING		1
 #define GAME_MODE_TITLE_INITIAL		2
-#define GAME_MODE_TITLE			3
-#define GAME_MODE_MAIN			4
-#define GAME_MODE_LEVELS		5
-#define GAME_MODE_LEVELNR		6
-#define GAME_MODE_SCORES		7
-#define GAME_MODE_EDITOR		8
-#define GAME_MODE_INFO			9
-#define GAME_MODE_SETUP			10
-#define GAME_MODE_PLAYING		11
-#define GAME_MODE_PSEUDO_DOOR		12
-#define GAME_MODE_PSEUDO_TAPE		13
-#define GAME_MODE_PSEUDO_PANEL		14
-#define GAME_MODE_PSEUDO_PREVIEW	15
-#define GAME_MODE_PSEUDO_CRUMBLED	16
+#define GAME_MODE_TITLE_INITIAL_1	3
+#define GAME_MODE_TITLE_INITIAL_2	4
+#define GAME_MODE_TITLE_INITIAL_3	5
+#define GAME_MODE_TITLE_INITIAL_4	6
+#define GAME_MODE_TITLE_INITIAL_5	7
+#define GAME_MODE_TITLE			8
+#define GAME_MODE_TITLE_1		9
+#define GAME_MODE_TITLE_2		10
+#define GAME_MODE_TITLE_3		11
+#define GAME_MODE_TITLE_4		12
+#define GAME_MODE_TITLE_5		13
+#define GAME_MODE_MAIN			14
+#define GAME_MODE_LEVELS		15
+#define GAME_MODE_LEVELNR		16
+#define GAME_MODE_SCORES		17
+#define GAME_MODE_EDITOR		18
+#define GAME_MODE_INFO			19
+#define GAME_MODE_SETUP			20
+#define GAME_MODE_PLAYING		21
+#define GAME_MODE_PSEUDO_DOOR		22
+#define GAME_MODE_PSEUDO_TAPE		23
+#define GAME_MODE_PSEUDO_PANEL		24
+#define GAME_MODE_PSEUDO_PREVIEW	25
+#define GAME_MODE_PSEUDO_CRUMBLED	26
+#define GAME_MODE_PSEUDO_MAINONLY	27
+#define GAME_MODE_PSEUDO_TYPENAME	28
+#define GAME_MODE_PSEUDO_SUBMENU	29
+#define GAME_MODE_PSEUDO_MENU		30
+#define GAME_MODE_PSEUDO_TOONS		31
+#define GAME_MODE_PSEUDO_FADING		32
+#define GAME_MODE_QUIT			33
 
-/* there are no special config file suffixes for these modes */
-#define GAME_MODE_PSEUDO_TYPENAME	17
-#define GAME_MODE_QUIT			18
+#define NUM_GAME_MODES			34
 
 /* special definitions currently only used for custom artwork configuration */
 #define MUSIC_PREFIX_BACKGROUND		0
@@ -1981,12 +2051,13 @@
 #define PROGRAM_VERSION_MINOR		0
 #define PROGRAM_VERSION_PATCH		0
 #define PROGRAM_VERSION_BUILD		0
+#define PROGRAM_VERSION_EXTRA		" RC1"
 
 #define PROGRAM_TITLE_STRING		"Rocks'n'Diamonds"
 #define PROGRAM_AUTHOR_STRING		"Holger Schemel"
 #define PROGRAM_EMAIL_STRING		"info@artsoft.org"
 #define PROGRAM_WEBSITE_STRING		"http://www.artsoft.org/"
-#define PROGRAM_COPYRIGHT_STRING	"Copyright \xa9""1995-2015 by Holger Schemel"
+#define PROGRAM_COPYRIGHT_STRING	"Copyright \xa9""1995-2016 by Holger Schemel"
 #define PROGRAM_COMPANY_STRING		"A Game by Artsoft Entertainment"
 
 #define PROGRAM_ICON_FILENAME		"RocksIcon32x32.png"
@@ -2541,6 +2612,10 @@ struct GlobalInfo
   /* global values for fading screens and masking borders */
   int border_status;
 
+  /* values for global animations */
+  int anim_status;
+  int anim_status_next;
+
   boolean use_envelope_request;
 };
 
@@ -2743,6 +2818,17 @@ struct FontInfo
   				/* internal bitmap ID for special graphics */
 };
 
+struct GlobalAnimInfo
+{
+  char *token_name;		/* global animation token in config files */
+
+  /* global animation graphic and control definitions */
+  int graphic[NUM_GLOBAL_ANIM_PARTS_ALL][NUM_SPECIAL_GFX_ARGS];
+
+  /* global animation sound definitions */
+  int sound[NUM_GLOBAL_ANIM_PARTS_ALL][NUM_SPECIAL_GFX_ARGS];
+};
+
 struct GraphicInfo
 {
   Bitmap **bitmaps;		/* bitmaps in all required sizes */
@@ -2778,18 +2864,27 @@ struct GraphicInfo
 
   int clone_from;		/* graphic for cloning *all* settings */
 
-  int anim_delay_fixed;		/* optional delay values for bored and   */
-  int anim_delay_random;	/* sleeping player animations (animation */
-  int post_delay_fixed;		/* intervall and following pause before  */
-  int post_delay_random;	/* next intervall (bored animation only) */
+  int init_delay_fixed;		/* optional initial delay values for global */
+  int init_delay_random;	/* animations (pause interval before start) */
+  int anim_delay_fixed;		/* optional delay values for bored/sleeping */
+  int anim_delay_random;	/* and global animations (animation length) */
+  int post_delay_fixed;		/* optional delay values after bored/global */
+  int post_delay_random;	/* animations (pause before next animation) */
 
   int step_offset;		/* optional step offset of toon animations */
+  int step_xoffset;		/* optional step offset of toon animations */
+  int step_yoffset;		/* optional step offset of toon animations */
   int step_delay;		/* optional step delay of toon animations */
+  int direction;		/* optional move direction of toon animations */
+  int position;			/* optional draw position of toon animations */
+  int x;			/* optional draw position of toon animations */
+  int y;			/* optional draw position of toon animations */
 
   int draw_xoffset;		/* optional offset for drawing font chars */
   int draw_yoffset;		/* optional offset for drawing font chars */
 
   int draw_masked;		/* optional setting for drawing envelope gfx */
+  int draw_order;		/* optional draw order for global animations */
 
   int fade_mode;		/* optional setting for drawing title screens */
   int fade_delay;		/* optional setting for drawing title screens */
@@ -3016,6 +3111,7 @@ extern struct ElementDirectionInfo element_direction_info[];
 extern struct SpecialSuffixInfo special_suffix_info[];
 extern struct TokenIntPtrInfo	image_config_vars[];
 extern struct FontInfo		font_info[];
+extern struct GlobalAnimInfo	global_anim_info[];
 extern struct MusicPrefixInfo	music_prefix_info[];
 extern struct GraphicInfo      *graphic_info;
 extern struct SoundInfo	       *sound_info;

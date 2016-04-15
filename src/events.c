@@ -19,6 +19,7 @@
 #include "editor.h"
 #include "files.h"
 #include "tape.h"
+#include "cartoons.h"
 #include "network.h"
 
 
@@ -151,115 +152,63 @@ boolean NextValidEvent(Event *event)
   return FALSE;
 }
 
-void EventLoop(void)
+void HandleEvents()
 {
-  while (1)
-  {
-    if (PendingEvent())		/* got event */
-    {
-      Event event;
+  Event event;
+  unsigned int event_frame_delay = 0;
+  unsigned int event_frame_delay_value = GAME_FRAME_DELAY;
 
-      while (NextValidEvent(&event))
-      {
-  	switch (event.type)
-  	{
-  	  case EVENT_BUTTONPRESS:
-  	  case EVENT_BUTTONRELEASE:
-  	    HandleButtonEvent((ButtonEvent *) &event);
-  	    break;
-  
-  	  case EVENT_MOTIONNOTIFY:
-  	    HandleMotionEvent((MotionEvent *) &event);
-  	    break;
+  ResetDelayCounter(&event_frame_delay);
+
+  while (NextValidEvent(&event))
+  {
+    switch (event.type)
+    {
+      case EVENT_BUTTONPRESS:
+      case EVENT_BUTTONRELEASE:
+	HandleButtonEvent((ButtonEvent *) &event);
+	break;
+
+      case EVENT_MOTIONNOTIFY:
+	HandleMotionEvent((MotionEvent *) &event);
+	break;
 
 #if defined(TARGET_SDL2)
-	  case SDL_WINDOWEVENT:
-  	    HandleWindowEvent((WindowEvent *) &event);
-  	    break;
+      case SDL_WINDOWEVENT:
+	HandleWindowEvent((WindowEvent *) &event);
+	break;
 
-  	  case EVENT_FINGERPRESS:
-  	  case EVENT_FINGERRELEASE:
-  	  case EVENT_FINGERMOTION:
-  	    HandleFingerEvent((FingerEvent *) &event);
-  	    break;
+      case EVENT_FINGERPRESS:
+      case EVENT_FINGERRELEASE:
+      case EVENT_FINGERMOTION:
+	HandleFingerEvent((FingerEvent *) &event);
+	break;
 
-	  case EVENT_TEXTINPUT:
-  	    HandleTextEvent((TextEvent *) &event);
-  	    break;
+      case EVENT_TEXTINPUT:
+	HandleTextEvent((TextEvent *) &event);
+	break;
 
-	  case SDL_APP_WILLENTERBACKGROUND:
-	  case SDL_APP_DIDENTERBACKGROUND:
-	  case SDL_APP_WILLENTERFOREGROUND:
-	  case SDL_APP_DIDENTERFOREGROUND:
-  	    HandlePauseResumeEvent((PauseResumeEvent *) &event);
-  	    break;
+      case SDL_APP_WILLENTERBACKGROUND:
+      case SDL_APP_DIDENTERBACKGROUND:
+      case SDL_APP_WILLENTERFOREGROUND:
+      case SDL_APP_DIDENTERFOREGROUND:
+	HandlePauseResumeEvent((PauseResumeEvent *) &event);
+	break;
 #endif
 
-  	  case EVENT_KEYPRESS:
-  	  case EVENT_KEYRELEASE:
-  	    HandleKeyEvent((KeyEvent *) &event);
-  	    break;
+      case EVENT_KEYPRESS:
+      case EVENT_KEYRELEASE:
+	HandleKeyEvent((KeyEvent *) &event);
+	break;
 
-  	  default:
-  	    HandleOtherEvents(&event);
-  	    break;
-  	}
-      }
-    }
-    else
-    {
-      if (game_status == GAME_MODE_TITLE)
-      {
-	/* when showing title screens, hide mouse pointer (if not moved) */
-
-	if (gfx.cursor_mode != CURSOR_NONE &&
-	    DelayReached(&special_cursor_delay, special_cursor_delay_value))
-	{
-	  SetMouseCursor(CURSOR_NONE);
-	}
-      }
-      else if (game_status == GAME_MODE_PLAYING && (!tape.pausing ||
-						    tape.single_step))
-      {
-	/* when playing, display a special mouse pointer inside the playfield */
-
-	if (gfx.cursor_mode != CURSOR_PLAYFIELD &&
-	    cursor_inside_playfield &&
-	    DelayReached(&special_cursor_delay, special_cursor_delay_value))
-	{
-	  SetMouseCursor(CURSOR_PLAYFIELD);
-	}
-      }
-      else if (gfx.cursor_mode != CURSOR_DEFAULT)
-      {
-	SetMouseCursor(CURSOR_DEFAULT);
-      }
-
-      /* this is set after all pending events have been processed */
-      cursor_mode_last = gfx.cursor_mode;
+      default:
+	HandleOtherEvents(&event);
+	break;
     }
 
-    /* also execute after pending events have been processed before */
-    HandleNoEvent();
-
-    /* don't use all CPU time when idle; the main loop while playing
-       has its own synchronization and is CPU friendly, too */
-
-    if (game_status == GAME_MODE_PLAYING)
-    {
-      HandleGameActions();
-    }
-    else
-    {
-      if (!PendingEvent())	/* delay only if no pending events */
-	Delay(10);
-    }
-
-    /* refresh window contents from drawing buffer, if needed */
-    BackToFront();
-
-    if (game_status == GAME_MODE_QUIT)
-      return;
+    // do not handle events for longer than standard frame delay period
+    if (DelayReached(&event_frame_delay, event_frame_delay_value))
+      break;
   }
 }
 
@@ -302,6 +251,71 @@ void HandleOtherEvents(Event *event)
 
     default:
       break;
+  }
+}
+
+void HandleMouseCursor()
+{
+  if (game_status == GAME_MODE_TITLE)
+  {
+    /* when showing title screens, hide mouse pointer (if not moved) */
+
+    if (gfx.cursor_mode != CURSOR_NONE &&
+	DelayReached(&special_cursor_delay, special_cursor_delay_value))
+    {
+      SetMouseCursor(CURSOR_NONE);
+    }
+  }
+  else if (game_status == GAME_MODE_PLAYING && (!tape.pausing ||
+						tape.single_step))
+  {
+    /* when playing, display a special mouse pointer inside the playfield */
+
+    if (gfx.cursor_mode != CURSOR_PLAYFIELD &&
+	cursor_inside_playfield &&
+	DelayReached(&special_cursor_delay, special_cursor_delay_value))
+    {
+      SetMouseCursor(CURSOR_PLAYFIELD);
+    }
+  }
+  else if (gfx.cursor_mode != CURSOR_DEFAULT)
+  {
+    SetMouseCursor(CURSOR_DEFAULT);
+  }
+
+  /* this is set after all pending events have been processed */
+  cursor_mode_last = gfx.cursor_mode;
+}
+
+void EventLoop(void)
+{
+  unsigned int sync_frame_delay = 0;
+  unsigned int sync_frame_delay_value = GAME_FRAME_DELAY;
+
+  while (1)
+  {
+    if (PendingEvent())
+      HandleEvents();
+    else
+      HandleMouseCursor();
+
+    /* also execute after pending events have been processed before */
+    HandleNoEvent();
+
+    /* don't use all CPU time when idle; the main loop while playing
+       has its own synchronization and is CPU friendly, too */
+
+    if (game_status == GAME_MODE_PLAYING)
+      HandleGameActions();
+
+    /* refresh window contents from drawing buffer, if needed */
+    BackToFront();
+
+    if (game_status != GAME_MODE_PLAYING)
+      WaitUntilDelayReached(&sync_frame_delay, sync_frame_delay_value);
+
+    if (game_status == GAME_MODE_QUIT)
+      return;
   }
 }
 
@@ -1567,7 +1581,8 @@ void HandleKey(Key key, int key_status)
     default:
       if (key == KSYM_Escape)
       {
-	game_status = GAME_MODE_MAIN;
+	SetGameStatus(GAME_MODE_MAIN);
+
 	DrawMainMenu();
 
 	return;

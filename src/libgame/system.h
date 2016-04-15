@@ -59,6 +59,29 @@
 
 #define SCALING_QUALITY_DEFAULT		SCALING_QUALITY_LINEAR
 
+/* values for screen rendering mode */
+#define STR_SPECIAL_RENDERING_OFF	"stream_texture_only"
+#define STR_SPECIAL_RENDERING_BITMAP	"bitmap_and_stream_texture"
+#define STR_SPECIAL_RENDERING_TARGET	"target_texture_only"
+#define STR_SPECIAL_RENDERING_DOUBLE	"stream_and_target_texture"
+
+#if defined(TARGET_SDL2)
+#define STR_SPECIAL_RENDERING_DEFAULT	STR_SPECIAL_RENDERING_DOUBLE
+#else
+#define STR_SPECIAL_RENDERING_DEFAULT	STR_SPECIAL_RENDERING_BITMAP
+#endif
+
+#define SPECIAL_RENDERING_OFF		0
+#define SPECIAL_RENDERING_BITMAP	1
+#define SPECIAL_RENDERING_TARGET	2
+#define SPECIAL_RENDERING_DOUBLE	3
+
+#if defined(TARGET_SDL2)
+#define SPECIAL_RENDERING_DEFAULT	SPECIAL_RENDERING_DOUBLE
+#else
+#define SPECIAL_RENDERING_DEFAULT	SPECIAL_RENDERING_BITMAP
+#endif
+
 /* values for touch control */
 #define TOUCH_CONTROL_VIRTUAL_BUTTONS	"virtual_buttons"
 #define TOUCH_CONTROL_WIPE_GESTURES	"wipe_gestures"
@@ -165,6 +188,16 @@
 /* values for special "focus player" bitmasks */
 #define BIT_SET_FOCUS			6
 
+/* values for drawing stages for global animations */
+#define DRAW_GLOBAL_ANIM_STAGE_1	1
+#define DRAW_GLOBAL_ANIM_STAGE_2	2
+
+/* values for drawing target for global border */
+#define DRAW_BORDER_TO_BACKBUFFER	0
+#define DRAW_BORDER_TO_SCREEN		1
+#define DRAW_BORDER_TO_FADE_SOURCE	2
+#define DRAW_BORDER_TO_FADE_TARGET	3
+
 /* values for move directions and special "button" key bitmasks */
 #define MV_NONE			0
 #define MV_LEFT			(1 << MV_BIT_LEFT)
@@ -221,6 +254,7 @@
 				 MV_NONE)
 
 /* values for animation mode (frame order and direction) */
+/* (stored in level files -- never change existing values) */
 #define ANIM_NONE		0
 #define ANIM_LOOP		(1 << 0)
 #define ANIM_LINEAR		(1 << 1)
@@ -234,10 +268,13 @@
 #define ANIM_OPAQUE_PLAYER	(1 << 9)
 
 /* values for special (non game element) animation modes */
+/* (not stored in level files -- can be changed, if needed) */
 #define ANIM_HORIZONTAL		(1 << 10)
 #define ANIM_VERTICAL		(1 << 11)
 #define ANIM_CENTERED		(1 << 12)
 #define ANIM_STATIC_PANEL	(1 << 13)
+#define ANIM_ALL		(1 << 14)
+#define ANIM_ONCE		(1 << 15)
 
 #define ANIM_DEFAULT		ANIM_LOOP
 
@@ -270,6 +307,17 @@
 #define FADE_MODE_SKIP_FADE_OUT	(FADE_TYPE_SKIP | FADE_TYPE_FADE_OUT)
 
 #define FADE_MODE_DEFAULT	FADE_MODE_FADE
+
+/* values for toon positions */
+#define POS_UNDEFINED		-1
+#define POS_LEFT		0
+#define POS_RIGHT		1
+#define POS_TOP			2
+#define POS_UPPER		3
+#define POS_MIDDLE		4
+#define POS_LOWER		5
+#define POS_BOTTOM		6
+#define POS_ANY			7
 
 /* values for text alignment */
 #define ALIGN_LEFT		(1 << 0)
@@ -684,7 +732,6 @@ struct ProgramInfo
 
 struct OptionInfo
 {
-  char *display_name;
   char *server_host;
   int server_port;
 
@@ -706,11 +753,6 @@ struct OptionInfo
   boolean debug;
 };
 
-struct ScreenModeInfo
-{
-  int width, height;
-};
-
 struct VideoSystemInfo
 {
   int default_depth;
@@ -720,12 +762,11 @@ struct VideoSystemInfo
   boolean fullscreen_available;
   boolean fullscreen_enabled;
   boolean fullscreen_initial;
-  struct ScreenModeInfo *fullscreen_modes;
-  char *fullscreen_mode_current;
 
   boolean window_scaling_available;
   int window_scaling_percent;
   char *window_scaling_quality;
+  int screen_rendering_mode;
 
   boolean initialized;
 };
@@ -792,6 +833,16 @@ struct GfxInfo
   Bitmap *background_bitmap;
   int background_bitmap_mask;
 
+  Bitmap *fade_bitmap_source;
+  Bitmap *fade_bitmap_target;
+  Bitmap *fade_bitmap_black;
+
+  int fade_border_source_status;
+  int fade_border_target_status;
+  Bitmap *masked_border_bitmap_ptr;
+
+  Bitmap *final_screen_bitmap;
+
   boolean clipping_enabled;
   int clip_x, clip_y;
   int clip_width, clip_height;
@@ -810,6 +861,8 @@ struct GfxInfo
   int anim_random_frame;
 
   void (*draw_busy_anim_function)(void);
+  void (*draw_global_anim_function)(int);
+  void (*draw_global_border_function)(int);
 
   int cursor_mode;
 };
@@ -946,6 +999,9 @@ struct SetupInternalInfo
 
   char *default_level_series;
 
+  int default_window_width;
+  int default_window_height;
+
   boolean choose_from_top_leveldir;
 };
 
@@ -970,9 +1026,9 @@ struct SetupInfo
   boolean skip_levels;
   boolean time_limit;
   boolean fullscreen;
-  char *fullscreen_mode;
   int window_scaling_percent;
   char *window_scaling_quality;
+  char *screen_rendering_mode;
   boolean ask_on_escape;
   boolean ask_on_escape_editor;
   boolean quick_switch;
@@ -1306,6 +1362,8 @@ void InitGfxWindowInfo(int, int);
 void InitGfxScrollbufferInfo(int, int);
 void InitGfxClipRegion(boolean, int, int, int, int);
 void InitGfxDrawBusyAnimFunction(void (*draw_busy_anim_function)(void));
+void InitGfxDrawGlobalAnimFunction(void (*draw_global_anim_function)(int));
+void InitGfxDrawGlobalBorderFunction(void (*draw_global_border_function)(int));
 void InitGfxCustomArtworkInfo();
 void InitGfxOtherSettings();
 void SetDrawDeactivationMask(int);
@@ -1335,6 +1393,10 @@ void BlitBitmapMasked(Bitmap *, Bitmap *, int, int, int, int, int, int);
 boolean DrawingOnBackground(int, int);
 boolean DrawingAreaChanged();
 void BlitBitmapOnBackground(Bitmap *, Bitmap *, int, int, int, int, int, int);
+void BlitTexture(Bitmap *, int, int, int, int, int, int);
+void BlitTextureMasked(Bitmap *, int, int, int, int, int, int);
+void BlitToScreen(Bitmap *, int, int, int, int, int, int);
+void BlitToScreenMasked(Bitmap *, int, int, int, int, int, int);
 void DrawSimpleBlackLine(Bitmap *, int, int, int, int);
 void DrawSimpleWhiteLine(Bitmap *, int, int, int, int);
 void DrawLines(Bitmap *, struct XY *, int, Pixel);
@@ -1354,6 +1416,8 @@ void ReloadCustomImage(Bitmap *, char *);
 Bitmap *ZoomBitmap(Bitmap *, int, int);
 void ReCreateGameTileSizeBitmap(Bitmap **);
 void CreateBitmapWithSmallBitmaps(Bitmap **, int, int);
+void CreateBitmapTextures(Bitmap **);
+void FreeBitmapTextures(Bitmap **);
 void ScaleBitmap(Bitmap **, int);
 
 void SetMouseCursor(int);
