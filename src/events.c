@@ -1159,6 +1159,7 @@ static void HandleKeysSpecial(Key key)
 void HandleKey(Key key, int key_status)
 {
   boolean anyTextGadgetActiveOrJustFinished = anyTextGadgetActive();
+  static boolean ignore_repeated_key = FALSE;
   static struct SetupKeyboardInfo ski;
   static struct SetupShortcutInfo ssi;
   static struct
@@ -1326,12 +1327,18 @@ void HandleKey(Key key, int key_status)
     key_joystick_mapping = 0;
 
   if (key_status == KEY_RELEASED)
+  {
+    // reset flag to ignore repeated "key pressed" events after key release
+    ignore_repeated_key = FALSE;
+
     return;
+  }
 
   if ((key == KSYM_F11 ||
        ((key == KSYM_Return ||
 	 key == KSYM_KP_Enter) && (GetKeyModState() & KMOD_Alt))) &&
-      video.fullscreen_available)
+      video.fullscreen_available &&
+      !ignore_repeated_key)
   {
     setup.fullscreen = !setup.fullscreen;
 
@@ -1339,6 +1346,9 @@ void HandleKey(Key key, int key_status)
 
     if (game_status == GAME_MODE_SETUP)
       RedrawSetupScreenAfterFullscreenToggle();
+
+    // set flag to ignore repeated "key pressed" events
+    ignore_repeated_key = TRUE;
 
     return;
   }
