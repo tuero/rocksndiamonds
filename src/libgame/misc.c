@@ -2564,6 +2564,27 @@ char *get_mapped_token(char *token)
       return getStringCat2(map_token_prefix[i][1], &token[len_token_prefix]);
   }
 
+  // change tokens containing ".gfx" by moving the "gfx" part to the very left
+  char *gfx_substring = ".gfx";
+  char *gfx_prefix = "gfx.";
+  if (strstr(token, gfx_substring) != NULL)
+  {
+    char *token_prefix = getStringCopy(token);
+    char *token_gfx_pos = strstr(token_prefix, gfx_substring);
+    char *token_suffix = &token_gfx_pos[strlen(gfx_substring)];
+    char *mapped_token;
+
+    // cut off token string at ".gfx" substring position
+    *token_gfx_pos = '\0';
+
+    // put together prefix "gfx." and token prefix and suffix without ".gfx"
+    mapped_token = getStringCat3(gfx_prefix, token_prefix, token_suffix);
+
+    free(token_prefix);
+
+    return mapped_token;
+  }
+
   return NULL;
 }
 

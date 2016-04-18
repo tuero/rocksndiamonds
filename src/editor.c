@@ -1005,82 +1005,82 @@ static struct
   /* ---------- toolbox control buttons ------------------------------------ */
 
   {
-    IMG_EDITOR_BUTTON_GFX_DRAW_SINGLE,		GADGET_ID_SINGLE_ITEMS,
+    IMG_GFX_EDITOR_BUTTON_DRAW_SINGLE,		GADGET_ID_SINGLE_ITEMS,
     &editor.button.draw_single,			GD_TYPE_RADIO_BUTTON,
     "draw single items",			's'
   },
   {
-    IMG_EDITOR_BUTTON_GFX_DRAW_CONNECTED,	GADGET_ID_CONNECTED_ITEMS,
+    IMG_GFX_EDITOR_BUTTON_DRAW_CONNECTED,	GADGET_ID_CONNECTED_ITEMS,
     &editor.button.draw_connected,		GD_TYPE_RADIO_BUTTON,
     "draw connected items",			'd'
   },
   {
-    IMG_EDITOR_BUTTON_GFX_DRAW_LINE,		GADGET_ID_LINE,
+    IMG_GFX_EDITOR_BUTTON_DRAW_LINE,		GADGET_ID_LINE,
     &editor.button.draw_line,			GD_TYPE_RADIO_BUTTON,
     "draw lines",				'l'
   },
   {
-    IMG_EDITOR_BUTTON_GFX_DRAW_ARC,		GADGET_ID_ARC,
+    IMG_GFX_EDITOR_BUTTON_DRAW_ARC,		GADGET_ID_ARC,
     &editor.button.draw_arc,			GD_TYPE_RADIO_BUTTON,
     "draw arcs",				'a'
   },
   {
-    IMG_EDITOR_BUTTON_GFX_DRAW_RECTANGLE,	GADGET_ID_RECTANGLE,
+    IMG_GFX_EDITOR_BUTTON_DRAW_RECTANGLE,	GADGET_ID_RECTANGLE,
     &editor.button.draw_rectangle,		GD_TYPE_RADIO_BUTTON,
     "draw outline rectangles",			'r'
   },
   {
-    IMG_EDITOR_BUTTON_GFX_DRAW_FILLED_BOX,	GADGET_ID_FILLED_BOX,
+    IMG_GFX_EDITOR_BUTTON_DRAW_FILLED_BOX,	GADGET_ID_FILLED_BOX,
     &editor.button.draw_filled_box,		GD_TYPE_RADIO_BUTTON,
     "draw filled rectangles",			'R'
   },
   {
-    IMG_EDITOR_BUTTON_GFX_ROTATE_UP,		GADGET_ID_WRAP_UP,
+    IMG_GFX_EDITOR_BUTTON_ROTATE_UP,		GADGET_ID_WRAP_UP,
     &editor.button.rotate_up,			GD_TYPE_NORMAL_BUTTON,
     "wrap (rotate) level up",			0
   },
   {
-    IMG_EDITOR_BUTTON_GFX_DRAW_TEXT,		GADGET_ID_TEXT,
+    IMG_GFX_EDITOR_BUTTON_DRAW_TEXT,		GADGET_ID_TEXT,
     &editor.button.draw_text,			GD_TYPE_RADIO_BUTTON,
     "enter text elements",			't'
   },
   {
-    IMG_EDITOR_BUTTON_GFX_FLOOD_FILL,		GADGET_ID_FLOOD_FILL,
+    IMG_GFX_EDITOR_BUTTON_FLOOD_FILL,		GADGET_ID_FLOOD_FILL,
     &editor.button.flood_fill,			GD_TYPE_RADIO_BUTTON,
     "flood fill",				'f'
   },
   {
-    IMG_EDITOR_BUTTON_GFX_ROTATE_LEFT,		GADGET_ID_WRAP_LEFT,
+    IMG_GFX_EDITOR_BUTTON_ROTATE_LEFT,		GADGET_ID_WRAP_LEFT,
     &editor.button.rotate_left,			GD_TYPE_NORMAL_BUTTON,
     "wrap (rotate) level left",			0
   },
   {
-    IMG_EDITOR_BUTTON_GFX_ZOOM_LEVEL,		GADGET_ID_ZOOM,
+    IMG_GFX_EDITOR_BUTTON_ZOOM_LEVEL,		GADGET_ID_ZOOM,
     &editor.button.zoom_level,			GD_TYPE_NORMAL_BUTTON,
     "zoom level tile size",			'+'
   },
   {
-    IMG_EDITOR_BUTTON_GFX_ROTATE_RIGHT,		GADGET_ID_WRAP_RIGHT,
+    IMG_GFX_EDITOR_BUTTON_ROTATE_RIGHT,		GADGET_ID_WRAP_RIGHT,
     &editor.button.rotate_right,		GD_TYPE_NORMAL_BUTTON,
     "wrap (rotate) level right",		0
   },
   {
-    IMG_EDITOR_BUTTON_GFX_DRAW_RANDOM,		GADGET_ID_RANDOM_PLACEMENT,
+    IMG_GFX_EDITOR_BUTTON_DRAW_RANDOM,		GADGET_ID_RANDOM_PLACEMENT,
     &editor.button.draw_random,			GD_TYPE_NORMAL_BUTTON,
     "random element placement",			0
   },
   {
-    IMG_EDITOR_BUTTON_GFX_GRAB_BRUSH,		GADGET_ID_GRAB_BRUSH,
+    IMG_GFX_EDITOR_BUTTON_GRAB_BRUSH,		GADGET_ID_GRAB_BRUSH,
     &editor.button.grab_brush,			GD_TYPE_RADIO_BUTTON,
     "grab brush",				'b'
   },
   {
-    IMG_EDITOR_BUTTON_GFX_ROTATE_DOWN,		GADGET_ID_WRAP_DOWN,
+    IMG_GFX_EDITOR_BUTTON_ROTATE_DOWN,		GADGET_ID_WRAP_DOWN,
     &editor.button.rotate_down,			GD_TYPE_NORMAL_BUTTON,
     "wrap (rotate) level down",			0
   },
   {
-    IMG_EDITOR_BUTTON_GFX_PICK_ELEMENT,		GADGET_ID_PICK_ELEMENT,
+    IMG_GFX_EDITOR_BUTTON_PICK_ELEMENT,		GADGET_ID_PICK_ELEMENT,
     &editor.button.pick_element,		GD_TYPE_RADIO_BUTTON,
     "pick drawing element",			','
   },
@@ -1088,32 +1088,32 @@ static struct
   /* ---------- level control buttons -------------------------------------- */
 
   {
-    IMG_EDITOR_BUTTON_GFX_UNDO,			GADGET_ID_UNDO,
+    IMG_GFX_EDITOR_BUTTON_UNDO,			GADGET_ID_UNDO,
     &editor.button.undo,			GD_TYPE_NORMAL_BUTTON,
     "undo/redo last operation",			'u'
   },
   {
-    IMG_EDITOR_BUTTON_GFX_CONF,			GADGET_ID_INFO,
+    IMG_GFX_EDITOR_BUTTON_CONF,			GADGET_ID_INFO,
     &editor.button.conf,			GD_TYPE_NORMAL_BUTTON,
     "properties of level",			'I'
   },
   {
-    IMG_EDITOR_BUTTON_GFX_SAVE,			GADGET_ID_SAVE,
+    IMG_GFX_EDITOR_BUTTON_SAVE,			GADGET_ID_SAVE,
     &editor.button.save,			GD_TYPE_NORMAL_BUTTON,
     "save level",				'S'
   },
   {
-    IMG_EDITOR_BUTTON_GFX_CLEAR,		GADGET_ID_CLEAR,
+    IMG_GFX_EDITOR_BUTTON_CLEAR,		GADGET_ID_CLEAR,
     &editor.button.clear,			GD_TYPE_NORMAL_BUTTON,
     "clear level",				'C'
   },
   {
-    IMG_EDITOR_BUTTON_GFX_TEST,			GADGET_ID_TEST,
+    IMG_GFX_EDITOR_BUTTON_TEST,			GADGET_ID_TEST,
     &editor.button.test,			GD_TYPE_NORMAL_BUTTON,
     "test level",				'T'
   },
   {
-    IMG_EDITOR_BUTTON_GFX_EXIT,			GADGET_ID_EXIT,
+    IMG_GFX_EDITOR_BUTTON_EXIT,			GADGET_ID_EXIT,
     &editor.button.exit,			GD_TYPE_NORMAL_BUTTON,
     "exit level editor",			'E'
   },
@@ -1121,27 +1121,27 @@ static struct
   /* ---------- CE and GE control buttons ---------------------------------- */
 
   {
-    IMG_EDITOR_BUTTON_GFX_CE_COPY_FROM,		GADGET_ID_CUSTOM_COPY_FROM,
+    IMG_GFX_EDITOR_BUTTON_CE_COPY_FROM,		GADGET_ID_CUSTOM_COPY_FROM,
     &editor.button.ce_copy_from,		GD_TYPE_RADIO_BUTTON,
     "copy settings from other element",		0
   },
   {
-    IMG_EDITOR_BUTTON_GFX_CE_COPY_TO,		GADGET_ID_CUSTOM_COPY_TO,
+    IMG_GFX_EDITOR_BUTTON_CE_COPY_TO,		GADGET_ID_CUSTOM_COPY_TO,
     &editor.button.ce_copy_to,			GD_TYPE_RADIO_BUTTON,
     "copy settings to other element",		0
   },
   {
-    IMG_EDITOR_BUTTON_GFX_CE_SWAP,		GADGET_ID_CUSTOM_EXCHANGE,
+    IMG_GFX_EDITOR_BUTTON_CE_SWAP,		GADGET_ID_CUSTOM_EXCHANGE,
     &editor.button.ce_swap,			GD_TYPE_RADIO_BUTTON,
     "exchange element with other element",	0
   },
   {
-    IMG_EDITOR_BUTTON_GFX_CE_COPY,		GADGET_ID_CUSTOM_COPY,
+    IMG_GFX_EDITOR_BUTTON_CE_COPY,		GADGET_ID_CUSTOM_COPY,
     &editor.button.ce_copy,			GD_TYPE_NORMAL_BUTTON,
     "copy settings from this element",		0
   },
   {
-    IMG_EDITOR_BUTTON_GFX_CE_PASTE,		GADGET_ID_CUSTOM_PASTE,
+    IMG_GFX_EDITOR_BUTTON_CE_PASTE,		GADGET_ID_CUSTOM_PASTE,
     &editor.button.ce_paste,			GD_TYPE_NORMAL_BUTTON,
     "paste settings to this element",		0
   },
@@ -1149,7 +1149,7 @@ static struct
   /* ---------- palette control buttons ------------------------------------ */
 
   {
-    IMG_EDITOR_BUTTON_GFX_PROPERTIES,		GADGET_ID_PROPERTIES,
+    IMG_GFX_EDITOR_BUTTON_PROPERTIES,		GADGET_ID_PROPERTIES,
     &editor.button.properties,			GD_TYPE_NORMAL_BUTTON,
     "properties of drawing element",		'p'
   }
@@ -2582,13 +2582,13 @@ static struct
     NULL, "change page",		"select next change page"
   },
   {
-    IMG_EDITOR_BUTTON_GFX_CP_COPY,
+    IMG_GFX_EDITOR_BUTTON_CP_COPY,
     -1,					ED_ELEMENT_SETTINGS_YPOS(14),
     GADGET_ID_COPY_CHANGE_PAGE,		GADGET_ID_NEXT_CHANGE_PAGE,
     " ", NULL,				"copy settings from this change page"
   },
   {
-    IMG_EDITOR_BUTTON_GFX_CP_PASTE,
+    IMG_GFX_EDITOR_BUTTON_CP_PASTE,
     -1,					ED_ELEMENT_SETTINGS_YPOS(14),
     GADGET_ID_PASTE_CHANGE_PAGE,	GADGET_ID_COPY_CHANGE_PAGE,
     NULL, NULL,				"paste settings to this change page"
@@ -5650,8 +5650,8 @@ static void CreateCounterButtons()
       if (i == ED_COUNTER_ID_SELECT_LEVEL)
       {
 	graphic = (j == 0 ?
-		   IMG_EDITOR_BUTTON_GFX_PREV_LEVEL :
-		   IMG_EDITOR_BUTTON_GFX_NEXT_LEVEL);
+		   IMG_GFX_EDITOR_BUTTON_PREV_LEVEL :
+		   IMG_GFX_EDITOR_BUTTON_NEXT_LEVEL);
 
 	event_mask |= GD_EVENT_RELEASED;
 
@@ -5719,7 +5719,7 @@ static void CreateCounterButtons()
 
 	if (i == ED_COUNTER_ID_SELECT_LEVEL)
 	{
-	  graphic = IMG_EDITOR_INPUT_GFX_LEVEL_NUMBER;
+	  graphic = IMG_GFX_EDITOR_INPUT_LEVEL_NUMBER;
 
 	  font_type = FONT_LEVEL_NUMBER;
 	  font_type_active = FONT_LEVEL_NUMBER_ACTIVE;

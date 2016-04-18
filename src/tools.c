@@ -66,83 +66,83 @@ static struct DoorPartControlInfo door_part_controls[] =
 {
   {
     DOOR_1,
-    IMG_DOOR_1_GFX_PART_1,
+    IMG_GFX_DOOR_1_PART_1,
     &door_1.part_1
   },
   {
     DOOR_1,
-    IMG_DOOR_1_GFX_PART_2,
+    IMG_GFX_DOOR_1_PART_2,
     &door_1.part_2
   },
   {
     DOOR_1,
-    IMG_DOOR_1_GFX_PART_3,
+    IMG_GFX_DOOR_1_PART_3,
     &door_1.part_3
   },
   {
     DOOR_1,
-    IMG_DOOR_1_GFX_PART_4,
+    IMG_GFX_DOOR_1_PART_4,
     &door_1.part_4
   },
   {
     DOOR_1,
-    IMG_DOOR_1_GFX_PART_5,
+    IMG_GFX_DOOR_1_PART_5,
     &door_1.part_5
   },
   {
     DOOR_1,
-    IMG_DOOR_1_GFX_PART_6,
+    IMG_GFX_DOOR_1_PART_6,
     &door_1.part_6
   },
   {
     DOOR_1,
-    IMG_DOOR_1_GFX_PART_7,
+    IMG_GFX_DOOR_1_PART_7,
     &door_1.part_7
   },
   {
     DOOR_1,
-    IMG_DOOR_1_GFX_PART_8,
+    IMG_GFX_DOOR_1_PART_8,
     &door_1.part_8
   },
 
   {
     DOOR_2,
-    IMG_DOOR_2_GFX_PART_1,
+    IMG_GFX_DOOR_2_PART_1,
     &door_2.part_1
   },
   {
     DOOR_2,
-    IMG_DOOR_2_GFX_PART_2,
+    IMG_GFX_DOOR_2_PART_2,
     &door_2.part_2
   },
   {
     DOOR_2,
-    IMG_DOOR_2_GFX_PART_3,
+    IMG_GFX_DOOR_2_PART_3,
     &door_2.part_3
   },
   {
     DOOR_2,
-    IMG_DOOR_2_GFX_PART_4,
+    IMG_GFX_DOOR_2_PART_4,
     &door_2.part_4
   },
   {
     DOOR_2,
-    IMG_DOOR_2_GFX_PART_5,
+    IMG_GFX_DOOR_2_PART_5,
     &door_2.part_5
   },
   {
     DOOR_2,
-    IMG_DOOR_2_GFX_PART_6,
+    IMG_GFX_DOOR_2_PART_6,
     &door_2.part_6
   },
   {
     DOOR_2,
-    IMG_DOOR_2_GFX_PART_7,
+    IMG_GFX_DOOR_2_PART_7,
     &door_2.part_7
   },
   {
     DOOR_2,
-    IMG_DOOR_2_GFX_PART_8,
+    IMG_GFX_DOOR_2_PART_8,
     &door_2.part_8
   },
 
@@ -4037,8 +4037,8 @@ void InitGraphicCompatibilityInfo_Doors()
   }
   doors[] =
   {
-    { DOOR_1,	IMG_DOOR_1_GFX_PART_1,	IMG_DOOR_1_GFX_PART_8,	&door_1	},
-    { DOOR_2,	IMG_DOOR_2_GFX_PART_1,	IMG_DOOR_2_GFX_PART_8,	&door_2	},
+    { DOOR_1,	IMG_GFX_DOOR_1_PART_1,	IMG_GFX_DOOR_1_PART_8,	&door_1	},
+    { DOOR_2,	IMG_GFX_DOOR_2_PART_1,	IMG_GFX_DOOR_2_PART_8,	&door_2	},
 
     { -1,	-1,			-1,			NULL	}
   };
@@ -4684,31 +4684,31 @@ static struct
 } toolbutton_info[NUM_TOOL_BUTTONS] =
 {
   {
-    IMG_REQUEST_BUTTON_GFX_YES,		&request.button.yes,
+    IMG_GFX_REQUEST_BUTTON_YES,		&request.button.yes,
     TOOL_CTRL_ID_YES,			"yes"
   },
   {
-    IMG_REQUEST_BUTTON_GFX_NO,		&request.button.no,
+    IMG_GFX_REQUEST_BUTTON_NO,		&request.button.no,
     TOOL_CTRL_ID_NO,			"no"
   },
   {
-    IMG_REQUEST_BUTTON_GFX_CONFIRM,	&request.button.confirm,
+    IMG_GFX_REQUEST_BUTTON_CONFIRM,	&request.button.confirm,
     TOOL_CTRL_ID_CONFIRM,		"confirm"
   },
   {
-    IMG_REQUEST_BUTTON_GFX_PLAYER_1,	&request.button.player_1,
+    IMG_GFX_REQUEST_BUTTON_PLAYER_1,	&request.button.player_1,
     TOOL_CTRL_ID_PLAYER_1,		"player 1"
   },
   {
-    IMG_REQUEST_BUTTON_GFX_PLAYER_2,	&request.button.player_2,
+    IMG_GFX_REQUEST_BUTTON_PLAYER_2,	&request.button.player_2,
     TOOL_CTRL_ID_PLAYER_2,		"player 2"
   },
   {
-    IMG_REQUEST_BUTTON_GFX_PLAYER_3,	&request.button.player_3,
+    IMG_GFX_REQUEST_BUTTON_PLAYER_3,	&request.button.player_3,
     TOOL_CTRL_ID_PLAYER_3,		"player 3"
   },
   {
-    IMG_REQUEST_BUTTON_GFX_PLAYER_4,	&request.button.player_4,
+    IMG_GFX_REQUEST_BUTTON_PLAYER_4,	&request.button.player_4,
     TOOL_CTRL_ID_PLAYER_4,		"player 4"
   }
 };

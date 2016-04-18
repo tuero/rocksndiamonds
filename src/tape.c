@@ -200,23 +200,23 @@ static void DrawVideoDisplay_Graphics(unsigned int state, unsigned int value)
   video_pos[NUM_TAPE_FUNCTIONS][NUM_TAPE_FUNCTION_PARTS] =
   {
     {
-      { IMG_TAPE_LABEL_GFX_PLAY,		&tape.label.play	},
-      { IMG_TAPE_SYMBOL_GFX_PLAY,		&tape.symbol.play	},
+      { IMG_GFX_TAPE_LABEL_PLAY,		&tape.label.play	},
+      { IMG_GFX_TAPE_SYMBOL_PLAY,		&tape.symbol.play	},
     },
     {
-      { IMG_TAPE_LABEL_GFX_RECORD,		&tape.label.record	},
-      { IMG_TAPE_SYMBOL_GFX_RECORD,		&tape.symbol.record	},
+      { IMG_GFX_TAPE_LABEL_RECORD,		&tape.label.record	},
+      { IMG_GFX_TAPE_SYMBOL_RECORD,		&tape.symbol.record	},
     },
     {
-      { IMG_TAPE_LABEL_GFX_PAUSE,		&tape.label.pause	},
-      { IMG_TAPE_SYMBOL_GFX_PAUSE,		&tape.symbol.pause	},
+      { IMG_GFX_TAPE_LABEL_PAUSE,		&tape.label.pause	},
+      { IMG_GFX_TAPE_SYMBOL_PAUSE,		&tape.symbol.pause	},
     },
     {
-      { IMG_TAPE_LABEL_GFX_DATE,		&tape.label.date	},
+      { IMG_GFX_TAPE_LABEL_DATE,		&tape.label.date	},
       { -1,					NULL			},
     },
     {
-      { IMG_TAPE_LABEL_GFX_TIME,		&tape.label.time	},
+      { IMG_GFX_TAPE_LABEL_TIME,		&tape.label.time	},
       { -1,					NULL			},
     },
     {
@@ -225,24 +225,24 @@ static void DrawVideoDisplay_Graphics(unsigned int state, unsigned int value)
       { -1,					NULL			},
     },
     {
-      { IMG_TAPE_LABEL_GFX_FAST_FORWARD,	&tape.label.fast_forward  },
-      { IMG_TAPE_SYMBOL_GFX_FAST_FORWARD,	&tape.symbol.fast_forward },
+      { IMG_GFX_TAPE_LABEL_FAST_FORWARD,	&tape.label.fast_forward  },
+      { IMG_GFX_TAPE_SYMBOL_FAST_FORWARD,	&tape.symbol.fast_forward },
     },
     {
-      { IMG_TAPE_LABEL_GFX_PAUSE_BEFORE_END,	&tape.label.pause_before_end  },
-      { IMG_TAPE_SYMBOL_GFX_PAUSE_BEFORE_END,	&tape.symbol.pause_before_end },
+      { IMG_GFX_TAPE_LABEL_PAUSE_BEFORE_END,	&tape.label.pause_before_end  },
+      { IMG_GFX_TAPE_SYMBOL_PAUSE_BEFORE_END,	&tape.symbol.pause_before_end },
     },
     {
-      { IMG_TAPE_LABEL_GFX_WARP_FORWARD_BLIND,	&tape.label.warp_forward_blind},
-      { IMG_TAPE_SYMBOL_GFX_WARP_FORWARD_BLIND, &tape.symbol.warp_forward_blind},
+      { IMG_GFX_TAPE_LABEL_WARP_FORWARD_BLIND,	&tape.label.warp_forward_blind},
+      { IMG_GFX_TAPE_SYMBOL_WARP_FORWARD_BLIND, &tape.symbol.warp_forward_blind},
     },
     {
-      { IMG_TAPE_LABEL_GFX_WARP_FORWARD,	&tape.label.warp_forward  },
-      { IMG_TAPE_SYMBOL_GFX_WARP_FORWARD,	&tape.symbol.warp_forward },
+      { IMG_GFX_TAPE_LABEL_WARP_FORWARD,	&tape.label.warp_forward  },
+      { IMG_GFX_TAPE_SYMBOL_WARP_FORWARD,	&tape.symbol.warp_forward },
     },
     {
-      { IMG_TAPE_LABEL_GFX_SINGLE_STEP,		&tape.label.single_step	 },
-      { IMG_TAPE_SYMBOL_GFX_SINGLE_STEP,	&tape.symbol.single_step },
+      { IMG_GFX_TAPE_LABEL_SINGLE_STEP,		&tape.label.single_step	 },
+      { IMG_GFX_TAPE_SYMBOL_SINGLE_STEP,	&tape.symbol.single_step },
     },
   };
 
@@ -1246,28 +1246,28 @@ static struct
 } tapebutton_info[NUM_TAPE_BUTTONS] =
 {
   {
-    IMG_TAPE_BUTTON_GFX_EJECT,		&tape.button.eject,
+    IMG_GFX_TAPE_BUTTON_EJECT,		&tape.button.eject,
     TAPE_CTRL_ID_EJECT,			"eject tape"
   },
   {
     /* (same position as "eject" button) */
-    IMG_TAPE_BUTTON_GFX_EXTRA,		&tape.button.eject,
+    IMG_GFX_TAPE_BUTTON_EXTRA,		&tape.button.eject,
     TAPE_CTRL_ID_EXTRA,			"extra functions"
   },
   {
-    IMG_TAPE_BUTTON_GFX_STOP,		&tape.button.stop,
+    IMG_GFX_TAPE_BUTTON_STOP,		&tape.button.stop,
     TAPE_CTRL_ID_STOP,			"stop tape"
   },
   {
-    IMG_TAPE_BUTTON_GFX_PAUSE,		&tape.button.pause,
+    IMG_GFX_TAPE_BUTTON_PAUSE,		&tape.button.pause,
     TAPE_CTRL_ID_PAUSE,			"pause tape"
   },
   {
-    IMG_TAPE_BUTTON_GFX_RECORD,		&tape.button.record,
+    IMG_GFX_TAPE_BUTTON_RECORD,		&tape.button.record,
     TAPE_CTRL_ID_RECORD,		"record tape"
   },
   {
-    IMG_TAPE_BUTTON_GFX_PLAY,		&tape.button.play,
+    IMG_GFX_TAPE_BUTTON_PLAY,		&tape.button.play,
     TAPE_CTRL_ID_PLAY,			"play tape"
   }
 };

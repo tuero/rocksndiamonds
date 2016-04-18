@@ -555,7 +555,7 @@ void InitGlobalAnimGraphicInfo()
     int j = GLOBAL_ANIM_ID_PART_BASE;
     int k = GFX_SPECIAL_ARG_DEFAULT;
 
-    global_anim_info[i].graphic[j][k] = IMG_GLOBAL_ANIM_1_GFX + i;
+    global_anim_info[i].graphic[j][k] = IMG_GFX_GLOBAL_ANIM_1 + i;
   }
 
   /* initialize global animation definitions from dynamic configuration */

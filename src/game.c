@@ -14855,47 +14855,47 @@ static struct
 } gamebutton_info[NUM_GAME_BUTTONS] =
 {
   {
-    IMG_GAME_BUTTON_GFX_STOP,		&game.button.stop,
+    IMG_GFX_GAME_BUTTON_STOP,		&game.button.stop,
     GAME_CTRL_ID_STOP,			"stop game"
   },
   {
-    IMG_GAME_BUTTON_GFX_PAUSE,		&game.button.pause,
+    IMG_GFX_GAME_BUTTON_PAUSE,		&game.button.pause,
     GAME_CTRL_ID_PAUSE,			"pause game"
   },
   {
-    IMG_GAME_BUTTON_GFX_PLAY,		&game.button.play,
+    IMG_GFX_GAME_BUTTON_PLAY,		&game.button.play,
     GAME_CTRL_ID_PLAY,			"play game"
   },
   {
-    IMG_GAME_BUTTON_GFX_UNDO,		&game.button.undo,
+    IMG_GFX_GAME_BUTTON_UNDO,		&game.button.undo,
     GAME_CTRL_ID_UNDO,			"undo step"
   },
   {
-    IMG_GAME_BUTTON_GFX_REDO,		&game.button.redo,
+    IMG_GFX_GAME_BUTTON_REDO,		&game.button.redo,
     GAME_CTRL_ID_REDO,			"redo step"
   },
   {
-    IMG_GAME_BUTTON_GFX_SAVE,		&game.button.save,
+    IMG_GFX_GAME_BUTTON_SAVE,		&game.button.save,
     GAME_CTRL_ID_SAVE,			"save game"
   },
   {
-    IMG_GAME_BUTTON_GFX_PAUSE2,		&game.button.pause2,
+    IMG_GFX_GAME_BUTTON_PAUSE2,		&game.button.pause2,
     GAME_CTRL_ID_PAUSE2,		"pause game"
   },
   {
-    IMG_GAME_BUTTON_GFX_LOAD,		&game.button.load,
+    IMG_GFX_GAME_BUTTON_LOAD,		&game.button.load,
     GAME_CTRL_ID_LOAD,			"load game"
   },
   {
-    IMG_GAME_BUTTON_GFX_SOUND_MUSIC,	&game.button.sound_music,
+    IMG_GFX_GAME_BUTTON_SOUND_MUSIC,	&game.button.sound_music,
     SOUND_CTRL_ID_MUSIC,		"background music on/off"
   },
   {
-    IMG_GAME_BUTTON_GFX_SOUND_LOOPS,	&game.button.sound_loops,
+    IMG_GFX_GAME_BUTTON_SOUND_LOOPS,	&game.button.sound_loops,
     SOUND_CTRL_ID_LOOPS,		"sound loops on/off"
   },
   {
-    IMG_GAME_BUTTON_GFX_SOUND_SIMPLE,	&game.button.sound_simple,
+    IMG_GFX_GAME_BUTTON_SOUND_SIMPLE,	&game.button.sound_simple,
     SOUND_CTRL_ID_SIMPLE,		"normal sounds on/off"
   }
 };
