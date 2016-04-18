@@ -2984,7 +2984,7 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
   int num_ext2_suffixes = artwork_info->num_ext2_suffixes;
   int num_ext3_suffixes = artwork_info->num_ext3_suffixes;
   int num_ignore_tokens = artwork_info->num_ignore_tokens;
-  SetupFileHash *setup_file_hash, *valid_file_hash;
+  SetupFileHash *setup_file_hash, *valid_file_hash, *valid_file_hash_tmp;
   SetupFileHash *extra_file_hash, *empty_file_hash;
   char *known_token_value = KNOWN_TOKEN_VALUE;
   char *base_token_value = UNDEFINED_FILENAME;
@@ -3011,8 +3011,20 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
   /* at this point, we do not need the setup file hash anymore -- free it */
   freeSetupFileHash(setup_file_hash);
 
-  /* map deprecated to current tokens (using prefix match and replace) */
+  /* prevent changing hash while iterating over it by using a temporary copy */
+  valid_file_hash_tmp = newSetupFileHash();
   BEGIN_HASH_ITERATION(valid_file_hash, itr)
+  {
+    setHashEntry(valid_file_hash_tmp,
+		 HASH_ITERATION_TOKEN(itr),
+		 HASH_ITERATION_VALUE(itr));
+  }
+  END_HASH_ITERATION(valid_file_hash, itr)
+
+  /* (iterate over same temporary hash, as modifications are independent) */
+
+  /* map deprecated to current tokens (using prefix match and replace) */
+  BEGIN_HASH_ITERATION(valid_file_hash_tmp, itr)
   {
     char *token = HASH_ITERATION_TOKEN(itr);
     char *mapped_token = get_mapped_token(token);
@@ -3030,10 +3042,10 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
       free(mapped_token);
     }
   }
-  END_HASH_ITERATION(valid_file_hash, itr)
+  END_HASH_ITERATION(valid_file_hash_tmp, itr)
 
   /* add special base tokens (using prefix match and replace) */
-  BEGIN_HASH_ITERATION(valid_file_hash, itr)
+  BEGIN_HASH_ITERATION(valid_file_hash_tmp, itr)
   {
     char *token = HASH_ITERATION_TOKEN(itr);
     char *base_token = get_special_base_token(artwork_info, token);
@@ -3047,7 +3059,10 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
       free(base_token);
     }
   }
-  END_HASH_ITERATION(valid_file_hash, itr)
+  END_HASH_ITERATION(valid_file_hash_tmp, itr)
+
+    /* free temporary hash used for iteration */
+  freeSetupFileHash(valid_file_hash_tmp);
 
   /* read parameters for all known config file tokens */
   for (i = 0; i < num_file_list_entries; i++)
