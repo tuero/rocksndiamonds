@@ -4894,6 +4894,7 @@ static void setScreenCenteredToAllPlayers(int *sx, int *sy)
 void DrawRelocateScreen(int old_x, int old_y, int x, int y, int move_dir,
 			boolean center_screen, boolean quick_relocation)
 {
+  unsigned int frame_delay_value_old = GetVideoFrameDelay();
   boolean ffwd_delay = (tape.playing && tape.fast_forward);
   boolean no_delay = (tape.warp_forward);
   int frame_delay_value = (ffwd_delay ? FfwdFrameDelay : GameFrameDelay);
@@ -4961,6 +4962,8 @@ void DrawRelocateScreen(int old_x, int old_y, int x, int y, int move_dir,
 
   ScrollScreen(NULL, SCROLL_GO_ON);	/* scroll last frame to full tile */
 
+  SetVideoFrameDelay(wait_delay_value);
+
   while (scroll_x != new_scroll_x || scroll_y != new_scroll_y)
   {
     int dx = 0, dy = 0;
@@ -4983,16 +4986,15 @@ void DrawRelocateScreen(int old_x, int old_y, int x, int y, int move_dir,
 
     /* scroll in two steps of half tile size to make things smoother */
     BlitBitmap(drawto_field, window, fx, fy, SXSIZE, SYSIZE, SX, SY);
-    Delay(wait_delay_value);
 
     /* scroll second step to align at full tile size */
-    BackToFront();
-    Delay(wait_delay_value);
+    BlitScreenToBitmap(window);
   }
 
   DrawAllPlayers();
   BackToFront();
-  Delay(wait_delay_value);
+
+  SetVideoFrameDelay(frame_delay_value_old);
 }
 
 void RelocatePlayer(int jx, int jy, int el_player_raw)
@@ -5042,8 +5044,7 @@ void RelocatePlayer(int jx, int jy, int el_player_raw)
 
       DrawPlayer(player);
 
-      BackToFront();
-      Delay(wait_delay_value);
+      BackToFront_WithFrameDelay(wait_delay_value);
     }
 
     DrawPlayer(player);		/* needed here only to cleanup last field */
@@ -10958,7 +10959,9 @@ void StartGameActions(boolean init_network_game, boolean record_tape,
 
 void GameActions()
 {
+#if 0
   static unsigned int game_frame_delay = 0;
+#endif
   unsigned int game_frame_delay_value;
   byte *recorded_player_action;
   byte summarized_player_action = 0;
@@ -11036,6 +11039,9 @@ void GameActions()
   if (tape.playing && tape.warp_forward && !tape.pausing)
     game_frame_delay_value = 0;
 
+  SetVideoFrameDelay(game_frame_delay_value);
+
+#if 0
 #if 0
   /* ---------- main game synchronization point ---------- */
 
@@ -11047,6 +11053,7 @@ void GameActions()
   /* ---------- main game synchronization point ---------- */
 
   WaitUntilDelayReached(&game_frame_delay, game_frame_delay_value);
+#endif
 #endif
 
   if (network_playing && !network_player_action_received)
@@ -12059,7 +12066,7 @@ boolean MovePlayer(struct PlayerInfo *player, int dx, int dy)
       AdvanceFrameAndPlayerCounters(player->index_nr);
 
       DrawAllPlayers();
-      BackToFront();
+      BackToFront_WithFrameDelay(0);
     }
 
     player->move_delay_value = original_move_delay_value;

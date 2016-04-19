@@ -1127,13 +1127,8 @@ static void DoAnimationExt()
   printf("::: DoAnimation [%d, %d]\n", anim_sync_frame, Counter());
 #endif
 
-#if 1
-  WaitUntilDelayReached(&anim_sync_frame_delay, anim_sync_frame_delay_value);
+  // global animations now synchronized with frame delay of screen update
   anim_sync_frame++;
-#else
-  if (DelayReached(&anim_sync_frame_delay, anim_sync_frame_delay_value))
-    anim_sync_frame++;
-#endif
 
   for (i = 0; i < NUM_GAME_MODES; i++)
     HandleGlobalAnim(ANIM_CONTINUE, i);

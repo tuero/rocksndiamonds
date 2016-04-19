@@ -378,6 +378,9 @@ void InitVideoBuffer(int width, int height, int depth, boolean fullscreen)
 
   video.window_scaling_available = WINDOW_SCALING_STATUS;
 
+  video.frame_delay = 0;
+  video.frame_delay_value = GAME_FRAME_DELAY;
+
   SDLInitVideoBuffer(fullscreen);
 
   video.initialized = TRUE;
@@ -883,6 +886,16 @@ void KeyboardAutoRepeatOff(void)
 boolean SetVideoMode(boolean fullscreen)
 {
   return SDLSetVideoMode(fullscreen);
+}
+
+void SetVideoFrameDelay(unsigned int frame_delay_value)
+{
+  video.frame_delay_value = frame_delay_value;
+}
+
+unsigned int GetVideoFrameDelay()
+{
+  return video.frame_delay_value;
 }
 
 boolean ChangeVideoModeIfNeeded(boolean fullscreen)

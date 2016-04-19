@@ -768,6 +768,9 @@ struct VideoSystemInfo
   char *window_scaling_quality;
   int screen_rendering_mode;
 
+  unsigned int frame_delay;
+  unsigned int frame_delay_value;
+
   boolean initialized;
 };
 
@@ -1407,6 +1410,8 @@ Pixel GetPixelFromRGBcompact(Bitmap *, unsigned int);
 void KeyboardAutoRepeatOn(void);
 void KeyboardAutoRepeatOff(void);
 boolean SetVideoMode(boolean);
+void SetVideoFrameDelay(unsigned int);
+unsigned int GetVideoFrameDelay();
 boolean ChangeVideoModeIfNeeded(boolean);
 
 Bitmap *LoadImage(char *);

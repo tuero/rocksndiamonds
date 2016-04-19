@@ -289,9 +289,6 @@ void HandleMouseCursor()
 
 void EventLoop(void)
 {
-  unsigned int sync_frame_delay = 0;
-  unsigned int sync_frame_delay_value = GAME_FRAME_DELAY;
-
   while (1)
   {
     if (PendingEvent())
@@ -308,11 +305,11 @@ void EventLoop(void)
     if (game_status == GAME_MODE_PLAYING)
       HandleGameActions();
 
-    /* refresh window contents from drawing buffer, if needed */
+    /* always copy backbuffer to visible screen for every video frame */
     BackToFront();
 
-    if (game_status != GAME_MODE_PLAYING)
-      WaitUntilDelayReached(&sync_frame_delay, sync_frame_delay_value);
+    /* reset video frame delay to default (may change again while playing) */
+    SetVideoFrameDelay(GAME_FRAME_DELAY);
 
     if (game_status == GAME_MODE_QUIT)
       return;

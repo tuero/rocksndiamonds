@@ -83,6 +83,7 @@ void RedrawPlayfield();
 void BlitScreenToBitmap_RND(Bitmap *);
 void BlitScreenToBitmap(Bitmap *);
 void BackToFront();
+void BackToFront_WithFrameDelay(unsigned int);
 
 void FadeIn(int);
 void FadeOut(int);

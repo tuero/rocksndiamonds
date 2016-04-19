@@ -174,9 +174,6 @@ static int el_act2crm(int, int);
 static struct GadgetInfo *tool_gadget[NUM_TOOL_BUTTONS];
 static int request_gadget_id = -1;
 
-static unsigned int sync_frame_delay = 0;
-static unsigned int sync_frame_delay_value = GAME_FRAME_DELAY;
-
 static char *print_if_not_empty(int element)
 {
   static char *s = NULL;
@@ -588,6 +585,17 @@ void BackToFront()
 #if DEBUG_FRAME_TIME
   PrintFrameTimeDebugging();
 #endif
+}
+
+void BackToFront_WithFrameDelay(unsigned int frame_delay_value)
+{
+  unsigned int frame_delay_value_old = GetVideoFrameDelay();
+
+  SetVideoFrameDelay(frame_delay_value);
+
+  BackToFront();
+
+  SetVideoFrameDelay(frame_delay_value_old);
 }
 
 static void FadeCrossSaveBackbuffer()
@@ -3547,7 +3555,7 @@ void WaitForEventToContinue()
 
     DoAnimation();
 
-    WaitUntilDelayReached(&sync_frame_delay, sync_frame_delay_value);
+    BackToFront();
   }
 }
 
@@ -3721,8 +3729,6 @@ static int RequestHandleEvents(unsigned int req_state)
     }
 
     BackToFront();
-
-    WaitUntilDelayReached(&sync_frame_delay, sync_frame_delay_value);
   }
 
   return result;

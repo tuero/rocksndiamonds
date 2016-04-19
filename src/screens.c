@@ -235,9 +235,6 @@ static TreeInfo *drop_distance_current = NULL;
 static TreeInfo *level_number = NULL;
 static TreeInfo *level_number_current = NULL;
 
-static unsigned int sync_frame_delay = 0;
-static unsigned int sync_frame_delay_value = GAME_FRAME_DELAY;
-
 static struct
 {
   int value;
@@ -5595,8 +5592,6 @@ static Key getSetupKey()
 
     DoAnimation();
     BackToFront();
-
-    WaitUntilDelayReached(&sync_frame_delay, sync_frame_delay_value);
   }
 
   return key;
@@ -6311,8 +6306,6 @@ void CustomizeKeyboard(int player_nr)
 
     DoAnimation();
     BackToFront();
-
-    WaitUntilDelayReached(&sync_frame_delay, sync_frame_delay_value);
   }
 
   /* write new key bindings back to player setup */
@@ -6466,8 +6459,6 @@ static boolean CalibrateJoystickMain(int player_nr)
 
     DoAnimation();
     BackToFront();
-
-    WaitUntilDelayReached(&sync_frame_delay, sync_frame_delay_value);
   }
 
   /* calibrated center position (joystick should now be centered) */
@@ -6489,7 +6480,7 @@ static boolean CalibrateJoystickMain(int player_nr)
       NextEvent(&event);
       HandleOtherEvents(&event);
 
-      WaitUntilDelayReached(&sync_frame_delay, sync_frame_delay_value);
+      BackToFront();
     }
   }
 

@@ -145,10 +145,14 @@ static void UpdateScreen(SDL_Rect *rect)
     SDL_SetRenderTarget(sdl_renderer, NULL);
     SDL_RenderCopy(sdl_renderer, sdl_texture_target, NULL, NULL);
   }
+#endif
 
-  // show render target buffer on screen
+  // global synchronization point of the game to align video frame delay
+  WaitUntilDelayReached(&video.frame_delay, video.frame_delay_value);
+
+#if defined(TARGET_SDL2)
+ // show render target buffer on screen
   SDL_RenderPresent(sdl_renderer);
-
 #else	// TARGET_SDL
   if (rect)
     SDL_UpdateRects(screen, 1, rect);
@@ -1169,10 +1173,7 @@ void SDLFadeRectangle(Bitmap *bitmap_cross, int x, int y, int width, int height,
 
     while (time_current < time_post_delay)
     {
-      // do not wait longer than 10 ms at a time to be able to ...
-      Delay(MIN(10, time_post_delay - time_current));
-
-      // ... continue drawing global animations during post delay
+      // updating the screen contains waiting for frame delay (non-busy)
       UpdateScreen(NULL);
 
       time_current = SDL_GetTicks();
