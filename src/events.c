@@ -460,10 +460,13 @@ void HandleWindowEvent(WindowEvent *event)
 	event_name, event->data1, event->data2);
 #endif
 
+#if 0
+  // (not needed, as the screen gets redrawn every 20 ms anyway)
   if (event->event == SDL_WINDOWEVENT_SIZE_CHANGED ||
       event->event == SDL_WINDOWEVENT_RESIZED ||
       event->event == SDL_WINDOWEVENT_EXPOSED)
     SDLRedrawWindow();
+#endif
 
   if (event->event == SDL_WINDOWEVENT_RESIZED && !video.fullscreen_enabled)
   {
