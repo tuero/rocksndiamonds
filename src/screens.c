@@ -1663,9 +1663,9 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
       sound = getTitleSound(tci);
       music = getTitleMusic(tci);
 
-      if (sound == SND_UNDEFINED || sound != last_sound)
-	FadeSounds();
-      if (music == MUS_UNDEFINED || music != last_music)
+      if (last_sound != SND_UNDEFINED && sound != last_sound)
+	FadeSound(last_sound);
+      if (last_music != MUS_UNDEFINED && music != last_music)
 	FadeMusic();
 
       fading = getTitleFading(tci);
