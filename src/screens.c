@@ -4707,16 +4707,14 @@ static void execSetupGraphics_setRenderingModes()
 
 static void execSetupGraphics()
 {
+  // update "setup.window_scaling_percent" from list selection
+  // (in this case, window scaling was changed on setup screen)
   if (setup_mode == SETUP_MODE_CHOOSE_WINDOW_SIZE)
-  {
-    // update "setup.window_scaling_percent" from list selection
     execSetupGraphics_setWindowSizes(FALSE);
-  }
-  else
-  {
-    // update list selection from "setup.window_scaling_percent"
-    execSetupGraphics_setWindowSizes(TRUE);
-  }
+
+  // update list selection from "setup.window_scaling_percent"
+  // (window scaling may have changed by resizing the window)
+  execSetupGraphics_setWindowSizes(TRUE);
 
   execSetupGraphics_setScalingTypes();
   execSetupGraphics_setRenderingModes();
