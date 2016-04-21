@@ -65,13 +65,13 @@ char *getWindowTitleString()
 				       strlen(getCompileDateString()) + 2 + 1);
 
   sprintf(window_title_string, "%s (%d %%) [%s]",
-	  getProgramInitString(), setup.window_scaling_percent,
+	  getProgramInitString(), video.window_scaling_percent,
 	  getCompileDateString());
 #else
   window_title_string = checked_malloc(strlen(getProgramInitString()) + 20);
 
   sprintf(window_title_string, "%s (%d %%)",
-	  getProgramInitString(), setup.window_scaling_percent);
+	  getProgramInitString(), video.window_scaling_percent);
 #endif
 
 #else
