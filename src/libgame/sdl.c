@@ -57,7 +57,7 @@ static void FinalizeScreen()
     gfx.draw_global_anim_function(DRAW_GLOBAL_ANIM_STAGE_2);
 }
 
-static void UpdateScreen(SDL_Rect *rect)
+static void UpdateScreenExt(SDL_Rect *rect, boolean with_frame_delay)
 {
   static unsigned int update_screen_delay = 0;
   unsigned int update_screen_delay_value = 50;		/* (milliseconds) */
@@ -148,7 +148,8 @@ static void UpdateScreen(SDL_Rect *rect)
 #endif
 
   // global synchronization point of the game to align video frame delay
-  WaitUntilDelayReached(&video.frame_delay, video.frame_delay_value);
+  if (with_frame_delay)
+    WaitUntilDelayReached(&video.frame_delay, video.frame_delay_value);
 
 #if defined(TARGET_SDL2)
  // show render target buffer on screen
@@ -159,6 +160,16 @@ static void UpdateScreen(SDL_Rect *rect)
   else
     SDL_UpdateRect(screen, 0, 0, 0, 0);
 #endif
+}
+
+static void UpdateScreen_WithFrameDelay(SDL_Rect *rect)
+{
+  UpdateScreenExt(rect, TRUE);
+}
+
+static void UpdateScreen_WithoutFrameDelay(SDL_Rect *rect)
+{
+  UpdateScreenExt(rect, FALSE);
 }
 
 static void SDLSetWindowIcon(char *basename)
@@ -780,7 +791,7 @@ void SDLSetWindowFullscreen(boolean fullscreen)
 
 void SDLRedrawWindow()
 {
-  UpdateScreen(NULL);
+  UpdateScreen_WithoutFrameDelay(NULL);
 }
 #endif
 
@@ -843,7 +854,7 @@ void SDLCopyArea(Bitmap *src_bitmap, Bitmap *dst_bitmap,
 		    &src_rect, real_dst_bitmap->surface, &dst_rect);
 
   if (dst_bitmap == window)
-    UpdateScreen(&dst_rect);
+    UpdateScreen_WithFrameDelay(&dst_rect);
 }
 
 void SDLBlitTexture(Bitmap *bitmap,
@@ -889,7 +900,7 @@ void SDLFillRectangle(Bitmap *dst_bitmap, int x, int y, int width, int height,
   SDL_FillRect(real_dst_bitmap->surface, &rect, color);
 
   if (dst_bitmap == window)
-    UpdateScreen(&rect);
+    UpdateScreen_WithFrameDelay(&rect);
 }
 
 void SDLFadeRectangle(Bitmap *bitmap_cross, int x, int y, int width, int height,
@@ -1070,7 +1081,7 @@ void SDLFadeRectangle(Bitmap *bitmap_cross, int x, int y, int width, int height,
 	if (draw_border_function != NULL)
 	  draw_border_function();
 
-	UpdateScreen(&dst_rect2);
+	UpdateScreen_WithFrameDelay(&dst_rect2);
       }
     }
   }
@@ -1129,7 +1140,7 @@ void SDLFadeRectangle(Bitmap *bitmap_cross, int x, int y, int width, int height,
 	draw_border_function();
 
       /* only update the region of the screen that is affected from fading */
-      UpdateScreen(&dst_rect2);
+      UpdateScreen_WithFrameDelay(&dst_rect2);
     }
   }
   else		/* fading in, fading out or cross-fading */
@@ -1160,7 +1171,7 @@ void SDLFadeRectangle(Bitmap *bitmap_cross, int x, int y, int width, int height,
 	draw_border_function();
 
       /* only update the region of the screen that is affected from fading */
-      UpdateScreen(&dst_rect);
+      UpdateScreen_WithFrameDelay(&dst_rect);
     }
   }
 
@@ -1174,7 +1185,7 @@ void SDLFadeRectangle(Bitmap *bitmap_cross, int x, int y, int width, int height,
     while (time_current < time_post_delay)
     {
       // updating the screen contains waiting for frame delay (non-busy)
-      UpdateScreen(NULL);
+      UpdateScreen_WithFrameDelay(NULL);
 
       time_current = SDL_GetTicks();
     }
