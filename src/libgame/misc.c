@@ -3082,7 +3082,7 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
   }
   END_HASH_ITERATION(valid_file_hash_tmp, itr)
 
-    /* free temporary hash used for iteration */
+  /* free temporary hash used for iteration */
   freeSetupFileHash(valid_file_hash_tmp);
 
   /* read parameters for all known config file tokens */
