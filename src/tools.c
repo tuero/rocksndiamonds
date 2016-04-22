@@ -2600,7 +2600,6 @@ void AnimateEnvelopeRequest(int anim_mode, int action)
 
     redraw_mask |= REDRAW_FIELD;
 
-    DoAnimation();
     BackToFront();
 
     SkipUntilDelayReached(&anim_delay, anim_delay_value, &i, last_frame);
@@ -2647,9 +2646,6 @@ void ShowEnvelopeRequest(char *text, unsigned int req_state, int action)
     }
 
     DrawEnvelopeRequest(text);
-
-    if (game_status != GAME_MODE_MAIN)
-      InitAnimation();
   }
 
   game.envelope_active = TRUE;	/* needed for RedrawPlayfield() events */
@@ -2677,19 +2673,11 @@ void ShowEnvelopeRequest(char *text, unsigned int req_state, int action)
   game.envelope_active = FALSE;
 
   if (action == ACTION_CLOSING)
-  {
-    if (game_status != GAME_MODE_MAIN)
-      StopAnimation();
-
     BlitBitmap(bitmap_db_store, backbuffer, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
-  }
 
   // SetDrawBackgroundMask(last_draw_background_mask);
 
   redraw_mask |= REDRAW_FIELD;
-
-  if (game_status == GAME_MODE_MAIN)
-    DoAnimation();
 
   BackToFront();
 
@@ -3553,8 +3541,6 @@ void WaitForEventToContinue()
       still_wait = FALSE;
     }
 
-    DoAnimation();
-
     BackToFront();
   }
 }
@@ -3723,10 +3709,6 @@ static int RequestHandleEvents(unsigned int req_state)
 	BlitBitmap(drawto, bitmap_db_cross, sx, sy, width, height, sx, sy);
       }
     }
-    else
-    {
-      DoAnimation();
-    }
 
     BackToFront();
   }
@@ -3872,16 +3854,10 @@ static boolean RequestDoor(char *text, unsigned int req_state)
     return FALSE;
   }
 
-  if (game_status != GAME_MODE_MAIN)
-    InitAnimation();
-
   SetDrawBackgroundMask(REDRAW_FIELD | REDRAW_DOOR_1);
 
   // ---------- handle request buttons ----------
   result = RequestHandleEvents(req_state);
-
-  if (game_status != GAME_MODE_MAIN)
-    StopAnimation();
 
   UnmapToolButtons();
 
@@ -3976,9 +3952,6 @@ static boolean RequestEnvelope(char *text, unsigned int req_state)
 
   // ---------- handle request buttons ----------
   result = RequestHandleEvents(req_state);
-
-  if (game_status != GAME_MODE_MAIN)
-    StopAnimation();
 
   UnmapToolButtons();
 
@@ -4572,9 +4545,6 @@ unsigned int MoveDoor(unsigned int door_state)
       if (!(door_state & DOOR_NO_DELAY))
       {
 	BackToFront();
-
-	if (game_status == GAME_MODE_MAIN)
-	  DoAnimation();
 
 	SkipUntilDelayReached(&door_delay, door_delay_value, &k, last_frame);
 

@@ -1107,14 +1107,6 @@ static void HandleGlobalAnim(int action, int game_mode)
   HandleGlobalAnim_Mode(&global_anim_ctrl[game_mode], action);
 }
 
-void InitAnimation()
-{
-}
-
-void StopAnimation()
-{
-}
-
 static void DoAnimationExt()
 {
   int i;
@@ -1128,16 +1120,6 @@ static void DoAnimationExt()
 
   for (i = 0; i < NUM_GAME_MODES; i++)
     HandleGlobalAnim(ANIM_CONTINUE, i);
-
-#if 1
-  // force screen redraw in next frame to continue drawing global animations
-  redraw_mask = REDRAW_ALL;
-#endif
-}
-
-void DoAnimation()
-{
-  // HandleAnimation(ANIM_CONTINUE);
 
 #if 1
   // force screen redraw in next frame to continue drawing global animations

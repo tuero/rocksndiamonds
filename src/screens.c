@@ -1361,8 +1361,6 @@ void DrawTitleScreen()
   KeyboardAutoRepeatOff();
 
   HandleTitleScreen(0, 0, 0, 0, MB_MENU_INITIALIZE);
-
-  StopAnimation();
 }
 
 boolean CheckTitleScreen(boolean levelset_has_changed)
@@ -1520,8 +1518,6 @@ void DrawMainMenu()
   BackToFront();
 
   SetMouseCursor(CURSOR_DEFAULT);
-
-  InitAnimation();
 
   OpenDoor(DOOR_CLOSE_1 | DOOR_OPEN_2);
 }
@@ -1848,8 +1844,6 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
   }
   else if (pos == MAIN_CONTROL_LEVEL_NUMBER && !button)
   {
-    StopAnimation();
-
     CloseDoor(DOOR_CLOSE_2);
 
     SetGameStatus(GAME_MODE_LEVELNR);
@@ -1886,8 +1880,6 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
       {
 	if (leveldir_first)
 	{
-	  StopAnimation();
-
 	  CloseDoor(DOOR_CLOSE_2);
 
 	  SetGameStatus(GAME_MODE_LEVELS);
@@ -1905,8 +1897,6 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
       }
       else if (pos == MAIN_CONTROL_SCORES)
       {
-	StopAnimation();
-
 	CloseDoor(DOOR_CLOSE_2);
 
 	SetGameStatus(GAME_MODE_SCORES);
@@ -1919,8 +1909,6 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 	    !strEqual(setup.player_name, "Artsoft"))
 	  Request("This level is read only!", REQ_CONFIRM);
 
-	StopAnimation();
-
 	CloseDoor(DOOR_CLOSE_2);
 
 	SetGameStatus(GAME_MODE_EDITOR);
@@ -1931,8 +1919,6 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
       }
       else if (pos == MAIN_CONTROL_INFO)
       {
-	StopAnimation();
-
 	CloseDoor(DOOR_CLOSE_2);
 
 	SetGameStatus(GAME_MODE_INFO);
@@ -1945,14 +1931,10 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
       }
       else if (pos == MAIN_CONTROL_GAME)
       {
-	StopAnimation();
-
 	StartGameActions(options.network, setup.autorecord, level.random_seed);
       }
       else if (pos == MAIN_CONTROL_SETUP)
       {
-	StopAnimation();
-
 	CloseDoor(DOOR_CLOSE_2);
 
 	SetGameStatus(GAME_MODE_SETUP);
@@ -2209,8 +2191,6 @@ static void DrawInfoScreen_Main()
   DrawMaskedBorder(fade_mask);
 
   FadeIn(fade_mask);
-
-  InitAnimation();
 }
 
 static void changeSetupValue(int, int, int);
@@ -2708,8 +2688,6 @@ void DrawInfoScreen_Elements()
   HandleInfoScreen_Elements(MB_MENU_INITIALIZE);
 
   FadeIn(REDRAW_FIELD);
-
-  InitAnimation();
 }
 
 void HandleInfoScreen_Elements(int button)
@@ -3689,8 +3667,6 @@ static void DrawChooseTree(TreeInfo **ti_ptr)
   DrawMaskedBorder(fade_mask);
 
   FadeIn(fade_mask);
-
-  InitAnimation();
 }
 
 static void drawChooseTreeList(int first_entry, int num_page_entries,
@@ -4178,8 +4154,6 @@ void DrawHallOfFame(int highlight_position)
   FadeSetEnterScreen();
 
   FadeOut(fade_mask);
-
-  InitAnimation();
 
   PlayMenuSound();
   PlayMenuMusic();
@@ -5588,7 +5562,6 @@ static Key getSetupKey()
       }
     }
 
-    DoAnimation();
     BackToFront();
   }
 
@@ -5888,8 +5861,6 @@ static void DrawSetupScreen_Generic()
   DrawMaskedBorder(fade_mask);
 
   FadeIn(fade_mask);
-
-  InitAnimation();
 }
 
 void HandleSetupScreen_Generic(int mx, int my, int dx, int dy, int button)
@@ -5937,8 +5908,6 @@ void DrawSetupScreen_Input()
   HandleSetupScreen_Input(0, 0, 0, 0, MB_MENU_INITIALIZE);
 
   FadeIn(REDRAW_FIELD);
-
-  InitAnimation();
 }
 
 static void setJoystickDeviceToNr(char *device_name, int device_nr)
@@ -6219,8 +6188,6 @@ void CustomizeKeyboard(int player_nr)
 
   FadeIn(REDRAW_FIELD);
 
-  InitAnimation();
-
   while (!finished)
   {
     if (PendingEvent())		/* got event */
@@ -6302,14 +6269,12 @@ void CustomizeKeyboard(int player_nr)
       }
     }
 
-    DoAnimation();
     BackToFront();
   }
 
   /* write new key bindings back to player setup */
   setup.input[player_nr].key = custom_key;
 
-  StopAnimation();
   DrawSetupScreen_Input();
 }
 
@@ -6373,7 +6338,6 @@ static boolean CalibrateJoystickMain(int player_nr)
   FadeIn(REDRAW_FIELD);
 
   while (Joystick(player_nr) & JOY_BUTTON);	/* wait for released button */
-  InitAnimation();
 
   while (result < 0)
   {
@@ -6455,7 +6419,6 @@ static boolean CalibrateJoystickMain(int player_nr)
       }
     }
 
-    DoAnimation();
     BackToFront();
   }
 
@@ -6465,8 +6428,6 @@ static boolean CalibrateJoystickMain(int player_nr)
 
   new_joystick_xmiddle = joy_x;
   new_joystick_ymiddle = joy_y;
-
-  StopAnimation();
 
   /* wait until the last pressed button was released */
   while (Joystick(player_nr) & JOY_BUTTON)

@@ -25,8 +25,4 @@ void InitGlobalAnimations(void);
 
 void DrawGlobalAnim(int);
 
-void InitAnimation(void);
-void StopAnimation(void);
-void DoAnimation(void);
-
 #endif

@@ -1623,15 +1623,6 @@ void HandleNoEvent()
   {
     case GAME_MODE_MAIN:
       DrawPreviewLevelAnimation();
-      DoAnimation();
-      break;
-
-    case GAME_MODE_LEVELS:
-    case GAME_MODE_LEVELNR:
-    case GAME_MODE_SETUP:
-    case GAME_MODE_INFO:
-    case GAME_MODE_SCORES:
-      DoAnimation();
       break;
 
     case GAME_MODE_EDITOR:
