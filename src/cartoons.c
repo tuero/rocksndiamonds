@@ -164,8 +164,6 @@ static struct GlobalAnimControlInfo global_anim_ctrl[NUM_GAME_MODES];
 static struct ToonInfo toons[MAX_NUM_TOONS];
 
 static unsigned int anim_sync_frame = 0;
-static unsigned int anim_sync_frame_delay = 0;
-static unsigned int anim_sync_frame_delay_value = GAME_FRAME_DELAY;
 
 static int game_mode_anim_classes[NUM_GAME_MODES];
 static int anim_class_game_modes[NUM_ANIM_CLASSES];
@@ -353,8 +351,6 @@ void InitGlobalAnimControls()
   int sound, graphic, control;
 
   anim_sync_frame = 0;
-
-  ResetDelayCounter(&anim_sync_frame_delay);
 
   for (m = 0; m < NUM_GAME_MODES; m++)
   {
