@@ -439,8 +439,9 @@ void SDLSetWindowScaling(int);
 void SDLSetWindowScalingQuality(char *);
 void SDLSetScreenRenderingMode(char *);
 void SDLSetWindowFullscreen(boolean);
-void SDLRedrawWindow();
 #endif
+
+void SDLRedrawWindow();
 
 void SDLSetWindowTitle(void);
 

@@ -788,12 +788,12 @@ void SDLSetWindowFullscreen(boolean fullscreen)
     video.fullscreen_initial = FALSE;
   }
 }
+#endif
 
 void SDLRedrawWindow()
 {
   UpdateScreen_WithoutFrameDelay(NULL);
 }
-#endif
 
 void SDLCreateBitmapContent(Bitmap *bitmap, int width, int height,
 			    int depth)
