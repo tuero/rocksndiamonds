@@ -106,6 +106,12 @@ static void UpdateScreenExt(SDL_Rect *rect, boolean with_frame_delay)
 #if defined(TARGET_SDL2)
   SDL_Texture *sdl_texture = sdl_texture_stream;
 
+  // deactivate use of target texture if render targets are not supported
+  if ((video.screen_rendering_mode == SPECIAL_RENDERING_TARGET ||
+       video.screen_rendering_mode == SPECIAL_RENDERING_DOUBLE) &&
+      sdl_texture_target == NULL)
+    video.screen_rendering_mode = SPECIAL_RENDERING_OFF;
+
   if (video.screen_rendering_mode == SPECIAL_RENDERING_TARGET)
     sdl_texture = sdl_texture_target;
 
@@ -440,6 +446,18 @@ static boolean SDLCreateScreen(boolean fullscreen)
   int surface_flags_fullscreen = SURFACE_FLAGS;	// (no fullscreen in SDL 1.2)
 #endif
 
+#if defined(TARGET_SDL2)
+#if 1
+  int renderer_flags = SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE;
+#else
+  /* If SDL_CreateRenderer() is called from within a VirtualBox Windows VM
+     _without_ enabling 2D/3D acceleration and/or guest additions installed,
+     it will crash if flags are *not* set to SDL_RENDERER_SOFTWARE (because
+     it will try to use accelerated graphics and apparently fails miserably) */
+  int renderer_flags = SDL_RENDERER_SOFTWARE;
+#endif
+#endif
+
   int width  = video.width;
   int height = video.height;
   int surface_flags = (fullscreen ? surface_flags_fullscreen :
@@ -496,17 +514,8 @@ static boolean SDLCreateScreen(boolean fullscreen)
 
   if (sdl_window != NULL)
   {
-#if 0
-    /* if SDL_CreateRenderer() is called from within a VirtualBox Windows VM
-     *without* enabling 2D/3D acceleration and/or guest additions installed,
-     it will crash if flags are *not* set to SDL_RENDERER_SOFTWARE (because
-     it will try to use accelerated graphics and apparently fails miserably) */
     if (sdl_renderer == NULL)
-      sdl_renderer = SDL_CreateRenderer(sdl_window, -1, SDL_RENDERER_SOFTWARE);
-#else
-    if (sdl_renderer == NULL)
-      sdl_renderer = SDL_CreateRenderer(sdl_window, -1, 0);
-#endif
+      sdl_renderer = SDL_CreateRenderer(sdl_window, -1, renderer_flags);
 
     if (sdl_renderer != NULL)
     {
@@ -519,13 +528,13 @@ static boolean SDLCreateScreen(boolean fullscreen)
 					     SDL_TEXTUREACCESS_STREAMING,
 					     width, height);
 
-      sdl_texture_target = SDL_CreateTexture(sdl_renderer,
-					     SDL_PIXELFORMAT_ARGB8888,
-					     SDL_TEXTUREACCESS_TARGET,
-					     width, height);
+      if (SDL_RenderTargetSupported(sdl_renderer))
+	sdl_texture_target = SDL_CreateTexture(sdl_renderer,
+					       SDL_PIXELFORMAT_ARGB8888,
+					       SDL_TEXTUREACCESS_TARGET,
+					       width, height);
 
-      if (sdl_texture_stream != NULL &&
-	  sdl_texture_target != NULL)
+      if (sdl_texture_stream != NULL)
       {
 	// use SDL default values for RGB masks and no alpha channel
 	new_surface = SDL_CreateRGBSurface(0, width, height, 32, 0,0,0, 0);
@@ -712,8 +721,7 @@ void SDLSetWindowScalingQuality(char *window_scaling_quality)
 {
   SDL_Texture *new_texture;
 
-  if (sdl_texture_stream == NULL ||
-      sdl_texture_target == NULL)
+  if (sdl_texture_stream == NULL)
     return;
 
   SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, window_scaling_quality);
@@ -730,10 +738,13 @@ void SDLSetWindowScalingQuality(char *window_scaling_quality)
     sdl_texture_stream = new_texture;
   }
 
-  new_texture = SDL_CreateTexture(sdl_renderer,
-				  SDL_PIXELFORMAT_ARGB8888,
-				  SDL_TEXTUREACCESS_TARGET,
-				  video.width, video.height);
+  if (SDL_RenderTargetSupported(sdl_renderer))
+    new_texture = SDL_CreateTexture(sdl_renderer,
+				    SDL_PIXELFORMAT_ARGB8888,
+				    SDL_TEXTUREACCESS_TARGET,
+				    video.width, video.height);
+  else
+    new_texture = NULL;
 
   if (new_texture != NULL)
   {
