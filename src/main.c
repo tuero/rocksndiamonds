@@ -26,7 +26,6 @@ Bitmap		       *bitmap_db_field;
 Bitmap		       *bitmap_db_panel;
 Bitmap		       *bitmap_db_door_1;
 Bitmap		       *bitmap_db_door_2;
-Bitmap		       *bitmap_db_toons;
 DrawBuffer	       *fieldbuffer;
 DrawBuffer	       *drawto_field;
 

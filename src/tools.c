@@ -8500,7 +8500,6 @@ void ChangeViewportPropertiesIfNeeded()
     // printf("::: init_gadgets_and_toons\n");
 
     InitGadgets();
-    InitToons();
     InitGlobalAnimations();
   }
 

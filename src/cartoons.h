@@ -20,9 +20,7 @@
 #define ANIM_STATE_RUNNING	(1 << 2)
 
 
-void InitToons(void);
 void InitGlobalAnimations(void);
-
-void DrawGlobalAnim(int);
+void DrawGlobalAnimations(int);
 
 #endif

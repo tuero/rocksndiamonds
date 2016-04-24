@@ -2121,8 +2121,6 @@ static void ReinitializeGraphics()
 
   InitGadgets();
   print_timestamp_time("InitGadgets");
-  InitToons();
-  print_timestamp_time("InitToons");
   InitDoors();
   print_timestamp_time("InitDoors");
 
@@ -5124,7 +5122,6 @@ void InitGfxBuffers()
   ReCreateBitmap(&bitmap_db_panel, DXSIZE, DYSIZE, DEFAULT_DEPTH);
   ReCreateBitmap(&bitmap_db_door_1, 3 * DXSIZE, DYSIZE, DEFAULT_DEPTH);
   ReCreateBitmap(&bitmap_db_door_2, 3 * VXSIZE, VYSIZE, DEFAULT_DEPTH);
-  ReCreateBitmap(&bitmap_db_toons, FULL_SXSIZE, FULL_SYSIZE, DEFAULT_DEPTH);
 
   /* initialize screen properties */
   InitGfxFieldInfo(SX, SY, SXSIZE, SYSIZE,
@@ -5301,7 +5298,7 @@ void InitGfx()
   InitMenuDesignSettings_Static();
 
   InitGfxDrawBusyAnimFunction(DrawInitAnim);
-  InitGfxDrawGlobalAnimFunction(DrawGlobalAnim);
+  InitGfxDrawGlobalAnimFunction(DrawGlobalAnimations);
   InitGfxDrawGlobalBorderFunction(DrawMaskedBorderToTarget);
 
   gfx.fade_border_source_status = global.border_status;
