@@ -21,7 +21,7 @@
 #include "files.h"
 #include "network.h"
 #include "netserv.h"
-#include "cartoons.h"
+#include "anim.h"
 #include "config.h"
 
 #include "conf_e2g.c"	/* include auto-generated data structure definitions */

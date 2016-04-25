@@ -18,7 +18,7 @@
 #include "editor.h"
 #include "files.h"
 #include "tape.h"
-#include "cartoons.h"
+#include "anim.h"
 #include "network.h"
 #include "init.h"
 #include "config.h"

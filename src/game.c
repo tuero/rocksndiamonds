@@ -19,6 +19,7 @@
 #include "files.h"
 #include "tape.h"
 #include "network.h"
+#include "anim.h"
 
 
 /* DEBUG SETTINGS */

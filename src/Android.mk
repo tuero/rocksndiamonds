@@ -41,7 +41,6 @@ LOCAL_SRC_FILES := $(SDL_PATH)/src/main/android/SDL_android_main.c \
 	libgame/sound.c			\
 	libgame/joystick.c		\
 	libgame/snapshot.c		\
-	libgame/toons.c			\
 	libgame/image.c			\
 	libgame/random.c		\
 	libgame/hash.c			\
@@ -97,7 +96,7 @@ LOCAL_SRC_FILES := $(SDL_PATH)/src/main/android/SDL_android_main.c \
 	editor.c			\
 	files.c				\
 	tape.c				\
-	cartoons.c			\
+	anim.c				\
 	network.c			\
 	netserv.c
 

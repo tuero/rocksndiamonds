@@ -140,7 +140,7 @@ SRCS =	main.c		\
 	editor.c	\
 	files.c		\
 	tape.c		\
-	cartoons.c	\
+	anim.c		\
 	network.c	\
 	netserv.c
 
@@ -158,7 +158,7 @@ OBJS =	main.o		\
 	editor.o	\
 	files.o		\
 	tape.o		\
-	cartoons.o	\
+	anim.o		\
 	network.o	\
 	netserv.o
 

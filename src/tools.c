@@ -17,7 +17,7 @@
 #include "init.h"
 #include "game.h"
 #include "events.h"
-#include "cartoons.h"
+#include "anim.h"
 #include "network.h"
 #include "tape.h"
 #include "screens.h"
@@ -8339,7 +8339,7 @@ void ChangeViewportPropertiesIfNeeded()
   int new_scr_fieldy_buffers = new_sysize / new_tilesize_var;
   boolean init_gfx_buffers = FALSE;
   boolean init_video_buffer = FALSE;
-  boolean init_gadgets_and_toons = FALSE;
+  boolean init_gadgets_and_anims = FALSE;
   boolean init_em_graphics = FALSE;
 
   if (new_win_xsize != WIN_XSIZE ||
@@ -8350,7 +8350,7 @@ void ChangeViewportPropertiesIfNeeded()
 
     init_video_buffer = TRUE;
     init_gfx_buffers = TRUE;
-    init_gadgets_and_toons = TRUE;
+    init_gadgets_and_anims = TRUE;
 
     // printf("::: video: init_video_buffer, init_gfx_buffers\n");
   }
@@ -8465,10 +8465,10 @@ void ChangeViewportPropertiesIfNeeded()
     TILESIZE_VAR = new_tilesize_var;
 
     init_gfx_buffers = TRUE;
-    init_gadgets_and_toons = TRUE;
+    init_gadgets_and_anims = TRUE;
 
     // printf("::: viewports: init_gfx_buffers\n");
-    // printf("::: viewports: init_gadgets_and_toons\n");
+    // printf("::: viewports: init_gadgets_and_anims\n");
   }
 
   if (init_gfx_buffers)
@@ -8495,9 +8495,9 @@ void ChangeViewportPropertiesIfNeeded()
     InitImageTextures();
   }
 
-  if (init_gadgets_and_toons)
+  if (init_gadgets_and_anims)
   {
-    // printf("::: init_gadgets_and_toons\n");
+    // printf("::: init_gadgets_and_anims\n");
 
     InitGadgets();
     InitGlobalAnimations();

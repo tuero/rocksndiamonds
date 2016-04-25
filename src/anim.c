@@ -6,10 +6,10 @@
 //		    info@artsoft.org
 //		    http://www.artsoft.org/
 // ----------------------------------------------------------------------------
-// cartoons.c
+// anim.c
 // ============================================================================
 
-#include "cartoons.h"
+#include "anim.h"
 #include "main.h"
 #include "tools.h"
 
@@ -48,6 +48,18 @@
 #define ANIM_CLASS_TOONS_MENU_SUBMENU	(ANIM_CLASS_TOONS |	\
 					 ANIM_CLASS_MENU  |	\
 					 ANIM_CLASS_SUBMENU)
+
+/* values for global animation states */
+#define ANIM_STATE_INACTIVE		0
+#define ANIM_STATE_RESTART		(1 << 0)
+#define ANIM_STATE_WAITING		(1 << 1)
+#define ANIM_STATE_RUNNING		(1 << 2)
+
+/* values for global animation control */
+#define ANIM_START			0
+#define ANIM_CONTINUE			1
+#define ANIM_STOP			2
+
 
 struct GlobalAnimPartControlInfo
 {
@@ -170,6 +182,67 @@ static int anim_class_game_modes[NUM_ANIM_CLASSES];
 static int anim_status_last = GAME_MODE_DEFAULT;
 static int anim_classes_last = ANIM_CLASS_NONE;
 
+
+/* ========================================================================= */
+/* generic animation frame calculation                                       */
+/* ========================================================================= */
+
+int getAnimationFrame(int num_frames, int delay, int mode, int start_frame,
+		      int sync_frame)
+{
+  int frame = 0;
+
+  sync_frame += start_frame * delay;
+
+  if (mode & ANIM_LOOP)			/* looping animation */
+  {
+    frame = (sync_frame % (delay * num_frames)) / delay;
+  }
+  else if (mode & ANIM_LINEAR)		/* linear (non-looping) animation */
+  {
+    frame = sync_frame / delay;
+
+    if (frame > num_frames - 1)
+      frame = num_frames - 1;
+  }
+  else if (mode & ANIM_PINGPONG)	/* oscillate (border frames once) */
+  {
+    int max_anim_frames = (num_frames > 1 ? 2 * num_frames - 2 : 1);
+
+    frame = (sync_frame % (delay * max_anim_frames)) / delay;
+    frame = (frame < num_frames ? frame : max_anim_frames - frame);
+  }
+  else if (mode & ANIM_PINGPONG2)	/* oscillate (border frames twice) */
+  {
+    int max_anim_frames = 2 * num_frames;
+
+    frame = (sync_frame % (delay * max_anim_frames)) / delay;
+    frame = (frame < num_frames ? frame : max_anim_frames - frame - 1);
+  }
+  else if (mode & ANIM_RANDOM)		/* play frames in random order */
+  {
+    /* note: expect different frames for the same delay cycle! */
+
+    if (gfx.anim_random_frame < 0)
+      frame = GetSimpleRandom(num_frames);
+    else
+      frame = gfx.anim_random_frame % num_frames;
+  }
+  else if (mode & (ANIM_CE_VALUE | ANIM_CE_SCORE | ANIM_CE_DELAY))
+  {
+    frame = sync_frame % num_frames;
+  }
+
+  if (mode & ANIM_REVERSE)		/* use reverse animation direction */
+    frame = num_frames - frame - 1;
+
+  return frame;
+}
+
+
+/* ========================================================================= */
+/* global animation functions                                                */
+/* ========================================================================= */
 
 static int getGlobalAnimationPart(struct GlobalAnimMainControlInfo *anim)
 {

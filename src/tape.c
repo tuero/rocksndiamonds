@@ -17,7 +17,7 @@
 #include "tools.h"
 #include "files.h"
 #include "network.h"
-#include "cartoons.h"
+#include "anim.h"
 
 #define DEBUG_TAPE_WHEN_PLAYING			FALSE
 

@@ -19,7 +19,6 @@ SRCS =	system.c	\
 	sound.c		\
 	joystick.c	\
 	snapshot.c	\
-	toons.c		\
 	image.c		\
 	random.c	\
 	hash.c		\
@@ -33,7 +32,6 @@ OBJS =	system.o	\
 	sound.o		\
 	snapshot.o	\
 	joystick.o	\
-	toons.o		\
 	image.o		\
 	random.o	\
 	hash.o		\
