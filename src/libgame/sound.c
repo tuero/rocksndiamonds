@@ -219,10 +219,10 @@ static void Mixer_PlayMusicChannel()
 
   if (mixer[audio.music_channel].type != MUS_TYPE_WAV)
   {
-    /* Mix_VolumeMusic() must be called _after_ Mix_PlayMusic() --
-       this looks like a bug in the SDL_mixer library */
-    Mix_PlayMusic(mixer[audio.music_channel].data_ptr, -1);
+    // use short fade-in to prevent "plop" sound for certain music files
+    // (this may happen when switching on music while playing the game)
     Mix_VolumeMusic(mixer[audio.music_channel].volume);
+    Mix_FadeInMusic(mixer[audio.music_channel].data_ptr, -1, 100);
   }
 }
 
