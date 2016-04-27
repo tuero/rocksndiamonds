@@ -1359,7 +1359,8 @@ void HandleKey(Key key, int key_status)
        key == KSYM_plus ||
        key == KSYM_0) &&
       ((GetKeyModState() & KMOD_Control) ||
-       (GetKeyModState() & KMOD_Alt)) &&
+       (GetKeyModState() & KMOD_Alt) ||
+       (GetKeyModState() & KMOD_Meta)) &&
       video.window_scaling_available &&
       !video.fullscreen_enabled)
   {
