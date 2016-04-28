@@ -278,7 +278,10 @@ static struct
 {
   {	STR_SPECIAL_RENDERING_OFF,	"Off (May show artifacts, fast)" },
   {	STR_SPECIAL_RENDERING_BITMAP,	"Bitmap/Texture mode (slower)"	 },
+#if DEBUG
+  // this mode may work under certain conditions, but does not work on Windows
   {	STR_SPECIAL_RENDERING_TARGET,	"Target Texture mode (slower)"	 },
+#endif
   {	STR_SPECIAL_RENDERING_DOUBLE,	"Double Texture mode (slower)"	 },
 
   {	NULL,				 NULL				 },
