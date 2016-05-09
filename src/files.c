@@ -8764,6 +8764,31 @@ static void InitMenuDesignSettings_SpecialPreProcessing()
 
   /* special case: initialize "ARG_DEFAULT" values in static default config */
   /* (e.g., initialize "[titlemessage].fade_mode" from "[title].fade_mode") */
+  titlescreen_initial_first_default.fade_mode  =
+    title_initial_first_default.fade_mode;
+  titlescreen_initial_first_default.fade_delay =
+    title_initial_first_default.fade_delay;
+  titlescreen_initial_first_default.post_delay =
+    title_initial_first_default.post_delay;
+  titlescreen_initial_first_default.auto_delay =
+    title_initial_first_default.auto_delay;
+  titlescreen_first_default.fade_mode  = title_first_default.fade_mode;
+  titlescreen_first_default.fade_delay = title_first_default.fade_delay;
+  titlescreen_first_default.post_delay = title_first_default.post_delay;
+  titlescreen_first_default.auto_delay = title_first_default.auto_delay;
+  titlemessage_initial_first_default.fade_mode  =
+    title_initial_first_default.fade_mode;
+  titlemessage_initial_first_default.fade_delay =
+    title_initial_first_default.fade_delay;
+  titlemessage_initial_first_default.post_delay =
+    title_initial_first_default.post_delay;
+  titlemessage_initial_first_default.auto_delay =
+    title_initial_first_default.auto_delay;
+  titlemessage_first_default.fade_mode  = title_first_default.fade_mode;
+  titlemessage_first_default.fade_delay = title_first_default.fade_delay;
+  titlemessage_first_default.post_delay = title_first_default.post_delay;
+  titlemessage_first_default.auto_delay = title_first_default.auto_delay;
+
   titlescreen_initial_default.fade_mode  = title_initial_default.fade_mode;
   titlescreen_initial_default.fade_delay = title_initial_default.fade_delay;
   titlescreen_initial_default.post_delay = title_initial_default.post_delay;
@@ -8785,6 +8810,11 @@ static void InitMenuDesignSettings_SpecialPreProcessing()
   /* (e.g., init "titlemessage_1.fade_mode" from "[titlemessage].fade_mode") */
   for (i = 0; i < MAX_NUM_TITLE_MESSAGES; i++)
   {
+    titlescreen_initial_first[i] = titlescreen_initial_first_default;
+    titlescreen_first[i] = titlescreen_first_default;
+    titlemessage_initial_first[i] = titlemessage_initial_first_default;
+    titlemessage_first[i] = titlemessage_first_default;
+
     titlescreen_initial[i] = titlescreen_initial_default;
     titlescreen[i] = titlescreen_default;
     titlemessage_initial[i] = titlemessage_initial_default;
@@ -8894,6 +8924,10 @@ static void LoadMenuDesignSettingsFromFilename(char *filename)
   }
   title_info[] =
   {
+    /* initialize first titles from "enter screen" definitions, if defined */
+    { &title_initial_first_default,	"menu.enter_screen.TITLE"	},
+    { &title_first_default,		"menu.enter_screen.TITLE"	},
+
     /* initialize title screens from "next screen" definitions, if defined */
     { &title_initial_default,		"menu.next_screen.TITLE"	},
     { &title_default,			"menu.next_screen.TITLE"	},

@@ -2428,7 +2428,9 @@ sub print_image_config_vars
 
 	    print_image_config_var_entry("\"$token\"", "&$var");
 
-	    if ($var =~ /^(titlescreen.*)\[\d\]/ ||
+	    if ($var =~ /^(title)_default/ ||
+		$var =~ /^(title_initial)_default/ ||
+		$var =~ /^(titlescreen.*)\[\d\]/ ||
 		$var =~ /^(titlemessage.*)\[\d\]/)
 	    {
 		my $prefix = $1;
