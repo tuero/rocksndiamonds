@@ -2825,8 +2825,9 @@ struct GlobalAnimInfo
   /* global animation graphic and control definitions */
   int graphic[NUM_GLOBAL_ANIM_PARTS_ALL][NUM_SPECIAL_GFX_ARGS];
 
-  /* global animation sound definitions */
+  /* global animation sound and music definitions */
   int sound[NUM_GLOBAL_ANIM_PARTS_ALL][NUM_SPECIAL_GFX_ARGS];
+  int music[NUM_GLOBAL_ANIM_PARTS_ALL][NUM_SPECIAL_GFX_ARGS];
 };
 
 struct GraphicInfo

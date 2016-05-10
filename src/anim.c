@@ -68,6 +68,7 @@ struct GlobalAnimPartControlInfo
   int mode_nr;
 
   int sound;
+  int music;
   int graphic;
 
   struct GraphicInfo graphic_info;
@@ -329,6 +330,7 @@ static void InitToonControls()
   {
     struct GlobalAnimPartControlInfo *part = &anim->part[part_nr];
     int sound = SND_UNDEFINED;
+    int music = MUS_UNDEFINED;
     int graphic = IMG_TOON_1 + i;
     int control = graphic;
 
@@ -336,6 +338,7 @@ static void InitToonControls()
     part->anim_nr = anim_nr;
     part->mode_nr = mode_nr;
     part->sound = sound;
+    part->music = music;
     part->graphic = graphic;
     part->graphic_info = graphic_info[graphic];
     part->control_info = graphic_info[control];
@@ -367,7 +370,7 @@ void InitGlobalAnimControls()
 {
   int i, m, a, p;
   int mode_nr, anim_nr, part_nr;
-  int sound, graphic, control;
+  int sound, music, graphic, control;
 
   anim_sync_frame = 0;
 
@@ -414,6 +417,7 @@ void InitGlobalAnimControls()
 	struct GlobalAnimPartControlInfo *part = &anim->part[part_nr];
 
 	sound   = global_anim_info[a].sound[p][m];
+	music   = global_anim_info[a].music[p][m];
 	graphic = global_anim_info[a].graphic[p][m];
 	control = global_anim_info[ctrl_id].graphic[p][m];
 
@@ -435,6 +439,7 @@ void InitGlobalAnimControls()
 	part->anim_nr = anim_nr;
 	part->mode_nr = mode_nr;
 	part->sound = sound;
+	part->music = music;
 	part->graphic = graphic;
 	part->graphic_info = graphic_info[graphic];
 	part->control_info = graphic_info[control];
@@ -730,7 +735,7 @@ boolean SetGlobalAnimPart_Viewport(struct GlobalAnimPartControlInfo *part)
   return changed;
 }
 
-void PlayGlobalAnimSound(struct GlobalAnimPartControlInfo *part)
+static void PlayGlobalAnimSound(struct GlobalAnimPartControlInfo *part)
 {
   int sound = part->sound;
 
@@ -748,12 +753,12 @@ void PlayGlobalAnimSound(struct GlobalAnimPartControlInfo *part)
     PlaySound(sound);
 
 #if 0
-  printf("::: PLAY %d.%d.%d: %d\n",
+  printf("::: PLAY SOUND %d.%d.%d: %d\n",
 	 part->anim_nr, part->nr, part->mode_nr, sound);
 #endif
 }
 
-void StopGlobalAnimSound(struct GlobalAnimPartControlInfo *part)
+static void StopGlobalAnimSound(struct GlobalAnimPartControlInfo *part)
 {
   int sound = part->sound;
 
@@ -763,9 +768,54 @@ void StopGlobalAnimSound(struct GlobalAnimPartControlInfo *part)
   StopSound(sound);
 
 #if 0
-  printf("::: STOP %d.%d.%d: %d\n",
+  printf("::: STOP SOUND %d.%d.%d: %d\n",
 	 part->anim_nr, part->nr, part->mode_nr, sound);
 #endif
+}
+
+static void PlayGlobalAnimMusic(struct GlobalAnimPartControlInfo *part)
+{
+  int music = part->music;
+
+  if (music == MUS_UNDEFINED)
+    return;
+
+  if (!setup.sound_music)
+    return;
+
+  PlayMusic(music);
+
+#if 0
+  printf("::: PLAY MUSIC %d.%d.%d: %d\n",
+	 part->anim_nr, part->nr, part->mode_nr, music);
+#endif
+}
+
+static void StopGlobalAnimMusic(struct GlobalAnimPartControlInfo *part)
+{
+  int music = part->music;
+
+  if (music == MUS_UNDEFINED)
+    return;
+
+  StopMusic();
+
+#if 0
+  printf("::: STOP MUSIC %d.%d.%d: %d\n",
+	 part->anim_nr, part->nr, part->mode_nr, music);
+#endif
+}
+
+static void PlayGlobalAnimSoundAndMusic(struct GlobalAnimPartControlInfo *part)
+{
+  PlayGlobalAnimSound(part);
+  PlayGlobalAnimMusic(part);
+}
+
+static void StopGlobalAnimSoundAndMusic(struct GlobalAnimPartControlInfo *part)
+{
+  StopGlobalAnimSound(part);
+  StopGlobalAnimMusic(part);
 }
 
 int HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part, int state)
@@ -864,7 +914,7 @@ int HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part, int state)
       part->step_yoffset = c->step_yoffset;
 
     if (part->init_delay_counter == 0)
-      PlayGlobalAnimSound(part);
+      PlayGlobalAnimSoundAndMusic(part);
   }
 
   if (part->init_delay_counter > 0)
@@ -872,7 +922,7 @@ int HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part, int state)
     part->init_delay_counter--;
 
     if (part->init_delay_counter == 0)
-      PlayGlobalAnimSound(part);
+      PlayGlobalAnimSoundAndMusic(part);
 
     return ANIM_STATE_WAITING;
   }
@@ -887,7 +937,7 @@ int HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part, int state)
     if (part->anim_delay_counter == 0 &&
 	part->post_delay_counter == 0)
     {
-      StopGlobalAnimSound(part);
+      StopGlobalAnimSoundAndMusic(part);
 
       part->post_delay_counter =
 	(c->post_delay_fixed + GetSimpleRandom(c->post_delay_random));
@@ -906,7 +956,7 @@ int HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part, int state)
 
     if (part->anim_delay_counter == 0)
     {
-      StopGlobalAnimSound(part);
+      StopGlobalAnimSoundAndMusic(part);
 
       part->post_delay_counter =
 	(c->post_delay_fixed + GetSimpleRandom(c->post_delay_random));
@@ -1001,7 +1051,7 @@ void HandleGlobalAnim_Main(struct GlobalAnimMainControlInfo *anim, int action)
 	int i;
 
 	for (i = 0; i < num_parts; i++)
-	  StopGlobalAnimSound(&anim->part[i]);
+	  StopGlobalAnimSoundAndMusic(&anim->part[i]);
       }
 
       return;

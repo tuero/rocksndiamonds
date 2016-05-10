@@ -654,6 +654,55 @@ void InitGlobalAnimSoundInfo()
 #endif
 }
 
+void InitGlobalAnimMusicInfo()
+{
+  struct PropertyMapping *property_mapping = getMusicListPropertyMapping();
+  int num_property_mappings = getMusicListPropertyMappingSize();
+  int i, j, k;
+
+  /* always start with reliable default values (no global animation music) */
+  for (i = 0; i < NUM_GLOBAL_ANIM_TOKENS; i++)
+    for (j = 0; j < NUM_GLOBAL_ANIM_PARTS_ALL; j++)
+      for (k = 0; k < NUM_SPECIAL_GFX_ARGS; k++)
+	global_anim_info[i].music[j][k] = MUS_UNDEFINED;
+
+  /* initialize global animation music definitions from dynamic configuration */
+  for (i = 0; i < num_property_mappings; i++)
+  {
+    int anim_nr = property_mapping[i].base_index - NUM_MUSIC_PREFIXES;
+    int part_nr = property_mapping[i].ext1_index - ACTION_PART_1;
+    int special = property_mapping[i].ext2_index;
+    int music   = property_mapping[i].artwork_index;
+
+    // music uses control definition; map it to position of graphic (artwork)
+    anim_nr -= GLOBAL_ANIM_ID_CONTROL_FIRST;
+
+    if (anim_nr < 0 || anim_nr >= NUM_GLOBAL_ANIM_TOKENS)
+      continue;
+
+    /* set animation part to base part, if not specified */
+    if (!IS_GLOBAL_ANIM_PART(part_nr))
+      part_nr = GLOBAL_ANIM_ID_PART_BASE;
+
+    /* set animation screen to default, if not specified */
+    if (!IS_SPECIAL_GFX_ARG(special))
+      special = GFX_SPECIAL_ARG_DEFAULT;
+
+    global_anim_info[anim_nr].music[part_nr][special] = music;
+  }
+
+#if 0
+  printf("::: InitGlobalAnimMusicInfo\n");
+
+  for (i = 0; i < NUM_GLOBAL_ANIMS; i++)
+    for (j = 0; j < NUM_GLOBAL_ANIM_PARTS_ALL; j++)
+      for (k = 0; k < NUM_SPECIAL_GFX_ARGS; k++)
+	if (global_anim_info[i].music[j][k] != MUS_UNDEFINED)
+	  printf("::: - anim %d, part %d, mode %d => %d\n",
+		 i, j, k, global_anim_info[i].music[j][k]);
+#endif
+}
+
 void InitElementGraphicInfo()
 {
   struct PropertyMapping *property_mapping = getImageListPropertyMapping();
@@ -1991,8 +2040,8 @@ static void InitGameModeMusicInfo()
   for (i = 0; i < num_property_mappings; i++)
   {
     int prefix   = property_mapping[i].base_index;
-    int gamemode = property_mapping[i].ext1_index;
-    int level    = property_mapping[i].ext2_index;
+    int gamemode = property_mapping[i].ext2_index;
+    int level    = property_mapping[i].ext3_index;
     int music    = property_mapping[i].artwork_index;
 
     if (prefix < 0 || prefix >= NUM_MUSIC_PREFIXES)
@@ -2141,6 +2190,7 @@ static void ReinitializeMusic()
 {
   InitMusicInfo();		/* music properties mapping */
   InitGameModeMusicInfo();	/* game mode music mapping */
+  InitGlobalAnimMusicInfo();	/* global animation music settings */
 }
 
 static int get_special_property_bit(int element, int property_bit_nr)
@@ -4989,7 +5039,8 @@ static void InitArtworkConfig()
 			       NUM_GLOBAL_ANIM_TOKENS + 1];
   static char *sound_id_prefix[2 * MAX_NUM_ELEMENTS +
 			       NUM_GLOBAL_ANIM_TOKENS + 1];
-  static char *music_id_prefix[NUM_MUSIC_PREFIXES + 1];
+  static char *music_id_prefix[NUM_MUSIC_PREFIXES +
+			       NUM_GLOBAL_ANIM_TOKENS + 1];
   static char *action_id_suffix[NUM_ACTIONS + 1];
   static char *direction_id_suffix[NUM_DIRECTIONS_FULL + 1];
   static char *special_id_suffix[NUM_SPECIAL_GFX_ARGS + 1];
@@ -5065,7 +5116,10 @@ static void InitArtworkConfig()
 
   for (i = 0; i < NUM_MUSIC_PREFIXES; i++)
     music_id_prefix[i] = music_prefix_info[i].prefix;
-  music_id_prefix[NUM_MUSIC_PREFIXES] = NULL;
+  for (i = 0; i < NUM_GLOBAL_ANIM_TOKENS; i++)
+    music_id_prefix[NUM_MUSIC_PREFIXES + i] =
+      global_anim_info[i].token_name;
+  music_id_prefix[NUM_MUSIC_PREFIXES + NUM_GLOBAL_ANIM_TOKENS] = NULL;
 
   for (i = 0; i < NUM_ACTIONS; i++)
     action_id_suffix[i] = element_action_info[i].suffix;
@@ -5090,8 +5144,8 @@ static void InitArtworkConfig()
 		sound_id_prefix, action_id_suffix, dummy,
 		special_id_suffix, ignore_sound_tokens);
   InitMusicList(music_config, NUM_MUSIC_FILES, music_config_suffix,
-		music_id_prefix, special_id_suffix, level_id_suffix,
-		dummy, ignore_music_tokens);
+		music_id_prefix, action_id_suffix, special_id_suffix,
+		level_id_suffix, ignore_music_tokens);
 }
 
 static void InitMixer()
