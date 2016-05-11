@@ -5366,7 +5366,7 @@ void InitGfx()
 void InitGfxBackground()
 {
   fieldbuffer = bitmap_db_field;
-  SetDrawtoField(DRAW_BACKBUFFER);
+  SetDrawtoField(DRAW_TO_BACKBUFFER);
 
   ClearRectangle(backbuffer, 0, 0, WIN_XSIZE, WIN_YSIZE);
 

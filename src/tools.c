@@ -234,7 +234,7 @@ void DumpTile(int x, int y)
 
 void SetDrawtoField(int mode)
 {
-  if (mode == DRAW_FIELDBUFFER)
+  if (mode == DRAW_TO_FIELDBUFFER)
   {
     FX = 2 * TILEX_VAR;
     FY = 2 * TILEY_VAR;
@@ -245,7 +245,7 @@ void SetDrawtoField(int mode)
 
     drawto_field = fieldbuffer;
   }
-  else	/* DRAW_BACKBUFFER */
+  else	/* DRAW_TO_BACKBUFFER */
   {
     FX = SX;
     FY = SY;
@@ -294,7 +294,7 @@ static void DrawMaskedBorderExt_Rect(int x, int y, int width, int height,
   if (x == -1 && y == -1)
     return;
 
-  if (draw_target == DRAW_BORDER_TO_SCREEN)
+  if (draw_target == DRAW_TO_SCREEN)
     BlitToScreenMasked(src_bitmap, x, y, width, height, x, y);
   else
     BlitBitmapMasked(src_bitmap, dst_bitmap, x, y, width, height, x, y);
@@ -312,7 +312,7 @@ static void DrawMaskedBorderExt_FIELD(int draw_target)
 static void DrawMaskedBorderExt_DOOR_1(int draw_target)
 {
   // when drawing to backbuffer, never draw border over open doors
-  if (draw_target == DRAW_BORDER_TO_BACKBUFFER &&
+  if (draw_target == DRAW_TO_BACKBUFFER &&
       (GetDoorState() & DOOR_OPEN_1))
     return;
 
@@ -325,7 +325,7 @@ static void DrawMaskedBorderExt_DOOR_1(int draw_target)
 static void DrawMaskedBorderExt_DOOR_2(int draw_target)
 {
   // when drawing to backbuffer, never draw border over open doors
-  if (draw_target == DRAW_BORDER_TO_BACKBUFFER &&
+  if (draw_target == DRAW_TO_BACKBUFFER &&
       (GetDoorState() & DOOR_OPEN_2))
     return;
 
@@ -371,18 +371,18 @@ static void DrawMaskedBorderExt(int redraw_mask, int draw_target)
 
 void DrawMaskedBorder_FIELD()
 {
-  DrawMaskedBorderExt_FIELD(DRAW_BORDER_TO_BACKBUFFER);
+  DrawMaskedBorderExt_FIELD(DRAW_TO_BACKBUFFER);
 }
 
 void DrawMaskedBorder(int redraw_mask)
 {
-  DrawMaskedBorderExt(redraw_mask, DRAW_BORDER_TO_BACKBUFFER);
+  DrawMaskedBorderExt(redraw_mask, DRAW_TO_BACKBUFFER);
 }
 
 void DrawMaskedBorderToTarget(int draw_target)
 {
-  if (draw_target == DRAW_BORDER_TO_BACKBUFFER ||
-      draw_target == DRAW_BORDER_TO_SCREEN)
+  if (draw_target == DRAW_TO_BACKBUFFER ||
+      draw_target == DRAW_TO_SCREEN)
   {
     DrawMaskedBorderExt(REDRAW_ALL, draw_target);
   }
@@ -390,12 +390,12 @@ void DrawMaskedBorderToTarget(int draw_target)
   {
     int last_border_status = global.border_status;
 
-    if (draw_target == DRAW_BORDER_TO_FADE_SOURCE)
+    if (draw_target == DRAW_TO_FADE_SOURCE)
     {
       global.border_status = gfx.fade_border_source_status;
       gfx.masked_border_bitmap_ptr = gfx.fade_bitmap_source;
     }
-    else if (draw_target == DRAW_BORDER_TO_FADE_TARGET)
+    else if (draw_target == DRAW_TO_FADE_TARGET)
     {
       global.border_status = gfx.fade_border_target_status;
       gfx.masked_border_bitmap_ptr = gfx.fade_bitmap_target;
@@ -1103,11 +1103,11 @@ void ClearField()
   if (game_status == GAME_MODE_PLAYING)
   {
     ClearRectangle(fieldbuffer, 0, 0, FXSIZE, FYSIZE);
-    SetDrawtoField(DRAW_FIELDBUFFER);
+    SetDrawtoField(DRAW_TO_FIELDBUFFER);
   }
   else
   {
-    SetDrawtoField(DRAW_BACKBUFFER);
+    SetDrawtoField(DRAW_TO_BACKBUFFER);
   }
 }
 
@@ -2300,11 +2300,11 @@ void AnimateEnvelope(int envelope_nr, int anim_mode, int action)
     int sy = SY + (SYSIZE - ysize * font_height) / 2;
     int xx, yy;
 
-    SetDrawtoField(DRAW_FIELDBUFFER);
+    SetDrawtoField(DRAW_TO_FIELDBUFFER);
 
     BlitScreenToBitmap(backbuffer);
 
-    SetDrawtoField(DRAW_BACKBUFFER);
+    SetDrawtoField(DRAW_TO_BACKBUFFER);
 
     for (yy = 0; yy < ysize; yy++)
       for (xx = 0; xx < xsize; xx++)
@@ -2361,7 +2361,7 @@ void ShowEnvelope(int envelope_nr)
 
   game.envelope_active = FALSE;
 
-  SetDrawtoField(DRAW_FIELDBUFFER);
+  SetDrawtoField(DRAW_TO_FIELDBUFFER);
 
   redraw_mask |= REDRAW_FIELD;
   BackToFront();
@@ -2620,7 +2620,7 @@ void ShowEnvelopeRequest(char *text, unsigned int req_state, int action)
   if (game_status == GAME_MODE_PLAYING)
     BlitScreenToBitmap(backbuffer);
 
-  SetDrawtoField(DRAW_BACKBUFFER);
+  SetDrawtoField(DRAW_TO_BACKBUFFER);
 
   // SetDrawBackgroundMask(REDRAW_NONE);
 
@@ -2684,7 +2684,7 @@ void ShowEnvelopeRequest(char *text, unsigned int req_state, int action)
   if (action == ACTION_CLOSING &&
       game_status == GAME_MODE_PLAYING &&
       level.game_engine_type == GAME_ENGINE_TYPE_RND)
-    SetDrawtoField(DRAW_FIELDBUFFER);
+    SetDrawtoField(DRAW_TO_FIELDBUFFER);
 }
 
 void DrawPreviewElement(int dst_x, int dst_y, int element, int tilesize)
@@ -3569,11 +3569,11 @@ static int RequestHandleEvents(unsigned int req_state)
   {
     if (level_solved)
     {
-      SetDrawtoField(DRAW_FIELDBUFFER);
+      SetDrawtoField(DRAW_TO_FIELDBUFFER);
 
       HandleGameActions();
 
-      SetDrawtoField(DRAW_BACKBUFFER);
+      SetDrawtoField(DRAW_TO_BACKBUFFER);
 
       if (global.use_envelope_request)
       {

@@ -1460,7 +1460,7 @@ void DrawMainMenu()
 
   FadeOut(fade_mask);
 
-  SetDrawtoField(DRAW_BACKBUFFER);
+  SetDrawtoField(DRAW_TO_BACKBUFFER);
 
   /* level_nr may have been set to value over handicap with level editor */
   if (setup.handicap && level_nr > leveldir_current->handicap_level)

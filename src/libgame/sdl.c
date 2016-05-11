@@ -50,7 +50,7 @@ static void FinalizeScreen()
 
   // copy global masked border to render target buffer, if defined
   if (gfx.draw_global_border_function != NULL)
-    gfx.draw_global_border_function(DRAW_BORDER_TO_SCREEN);
+    gfx.draw_global_border_function(DRAW_TO_SCREEN);
 
   // copy global animations to render target buffer, if defined (above border)
   if (gfx.draw_global_anim_function != NULL)
@@ -948,22 +948,22 @@ void SDLFadeRectangle(Bitmap *bitmap_cross, int x, int y, int width, int height,
     SDL_BlitSurface(surface_cross,  &src_rect, surface_source, &src_rect);
     SDL_BlitSurface(surface_screen, &dst_rect, surface_target, &src_rect);
 
-    draw_global_border_function(DRAW_BORDER_TO_FADE_SOURCE);
-    draw_global_border_function(DRAW_BORDER_TO_FADE_TARGET);
+    draw_global_border_function(DRAW_TO_FADE_SOURCE);
+    draw_global_border_function(DRAW_TO_FADE_TARGET);
   }
   else if (fade_mode & FADE_TYPE_FADE_IN)
   {
     SDL_BlitSurface(surface_black,  &src_rect, surface_source, &src_rect);
     SDL_BlitSurface(surface_screen, &dst_rect, surface_target, &src_rect);
 
-    draw_global_border_function(DRAW_BORDER_TO_FADE_TARGET);
+    draw_global_border_function(DRAW_TO_FADE_TARGET);
   }
   else		/* FADE_TYPE_FADE_OUT */
   {
     SDL_BlitSurface(surface_screen, &dst_rect, surface_source, &src_rect);
     SDL_BlitSurface(surface_black,  &src_rect, surface_target, &src_rect);
 
-    draw_global_border_function(DRAW_BORDER_TO_FADE_SOURCE);
+    draw_global_border_function(DRAW_TO_FADE_SOURCE);
   }
 
   time_current = SDL_GetTicks();
