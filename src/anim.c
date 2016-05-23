@@ -56,9 +56,10 @@
 #define ANIM_STATE_RUNNING		(1 << 2)
 
 /* values for global animation control */
-#define ANIM_START			0
-#define ANIM_CONTINUE			1
-#define ANIM_STOP			2
+#define ANIM_NO_ACTION			0
+#define ANIM_START			1
+#define ANIM_CONTINUE			2
+#define ANIM_STOP			3
 
 
 struct GlobalAnimPartControlInfo
