@@ -521,6 +521,9 @@ void DrawGlobalAnimationsExt(int drawing_stage)
 {
   int mode_nr;
 
+  if (!setup.toons)
+    return;
+
   if (global.anim_status != anim_status_last)
   {
     boolean before_fading = (global.anim_status == GAME_MODE_PSEUDO_FADING);
@@ -568,7 +571,7 @@ void DrawGlobalAnimationsExt(int drawing_stage)
     anim_status_last = global.anim_status;
   }
 
-  if (!setup.toons || global.anim_status == GAME_MODE_LOADING)
+  if (global.anim_status == GAME_MODE_LOADING)
     return;
 
   if (drawing_stage == DRAW_GLOBAL_ANIM_STAGE_1)
