@@ -16,6 +16,6 @@
 int getAnimationFrame(int, int, int, int, int);
 
 void InitGlobalAnimations(void);
-void DrawGlobalAnimations(int);
+void DrawGlobalAnimations(int, int);
 
 #endif

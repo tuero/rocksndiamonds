@@ -517,7 +517,7 @@ void InitGlobalAnimations()
   InitGlobalAnimControls();
 }
 
-void DrawGlobalAnimationsExt(int drawing_stage)
+void DrawGlobalAnimationsExt(int drawing_target, int drawing_stage)
 {
   int mode_nr;
 
@@ -671,9 +671,9 @@ void DrawGlobalAnimationsExt(int drawing_stage)
   }
 }
 
-void DrawGlobalAnimations(int drawing_stage)
+void DrawGlobalAnimations(int drawing_target, int drawing_stage)
 {
-  DrawGlobalAnimationsExt(drawing_stage);
+  DrawGlobalAnimationsExt(drawing_target, drawing_stage);
 }
 
 boolean SetGlobalAnimPart_Viewport(struct GlobalAnimPartControlInfo *part)

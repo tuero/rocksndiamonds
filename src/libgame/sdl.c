@@ -42,19 +42,19 @@ void SDLLimitScreenUpdates(boolean enable)
   limit_screen_updates = enable;
 }
 
-static void FinalizeScreen()
+static void FinalizeScreen(int draw_target)
 {
   // copy global animations to render target buffer, if defined (below border)
   if (gfx.draw_global_anim_function != NULL)
-    gfx.draw_global_anim_function(DRAW_GLOBAL_ANIM_STAGE_1);
+    gfx.draw_global_anim_function(draw_target, DRAW_GLOBAL_ANIM_STAGE_1);
 
   // copy global masked border to render target buffer, if defined
   if (gfx.draw_global_border_function != NULL)
-    gfx.draw_global_border_function(DRAW_TO_SCREEN);
+    gfx.draw_global_border_function(draw_target);
 
   // copy global animations to render target buffer, if defined (above border)
   if (gfx.draw_global_anim_function != NULL)
-    gfx.draw_global_anim_function(DRAW_GLOBAL_ANIM_STAGE_2);
+    gfx.draw_global_anim_function(draw_target, DRAW_GLOBAL_ANIM_STAGE_2);
 }
 
 static void UpdateScreenExt(SDL_Rect *rect, boolean with_frame_delay)
@@ -95,7 +95,7 @@ static void UpdateScreenExt(SDL_Rect *rect, boolean with_frame_delay)
     BlitBitmap(backbuffer, gfx.final_screen_bitmap, 0, 0,
 	       gfx.win_xsize, gfx.win_ysize, 0, 0);
 
-    FinalizeScreen();
+    FinalizeScreen(DRAW_TO_SCREEN);
 
     screen = gfx.final_screen_bitmap->surface;
 
@@ -142,7 +142,7 @@ static void UpdateScreenExt(SDL_Rect *rect, boolean with_frame_delay)
     SDL_RenderCopy(sdl_renderer, sdl_texture_stream, NULL, NULL);
 
   if (video.screen_rendering_mode != SPECIAL_RENDERING_BITMAP)
-    FinalizeScreen();
+    FinalizeScreen(DRAW_TO_SCREEN);
 
   // when using target texture, copy it to screen buffer
   if (video.screen_rendering_mode == SPECIAL_RENDERING_TARGET ||

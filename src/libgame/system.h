@@ -865,7 +865,7 @@ struct GfxInfo
   int anim_random_frame;
 
   void (*draw_busy_anim_function)(void);
-  void (*draw_global_anim_function)(int);
+  void (*draw_global_anim_function)(int, int);
   void (*draw_global_border_function)(int);
 
   int cursor_mode;
@@ -1366,7 +1366,7 @@ void InitGfxWindowInfo(int, int);
 void InitGfxScrollbufferInfo(int, int);
 void InitGfxClipRegion(boolean, int, int, int, int);
 void InitGfxDrawBusyAnimFunction(void (*draw_busy_anim_function)(void));
-void InitGfxDrawGlobalAnimFunction(void (*draw_global_anim_function)(int));
+void InitGfxDrawGlobalAnimFunction(void (*draw_global_anim_function)(int, int));
 void InitGfxDrawGlobalBorderFunction(void (*draw_global_border_function)(int));
 void InitGfxCustomArtworkInfo();
 void InitGfxOtherSettings();

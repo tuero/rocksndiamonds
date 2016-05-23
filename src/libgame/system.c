@@ -241,7 +241,7 @@ void InitGfxDrawBusyAnimFunction(void (*draw_busy_anim_function)(void))
   gfx.draw_busy_anim_function = draw_busy_anim_function;
 }
 
-void InitGfxDrawGlobalAnimFunction(void (*draw_global_anim_function)(int))
+void InitGfxDrawGlobalAnimFunction(void (*draw_global_anim_function)(int, int))
 {
   gfx.draw_global_anim_function = draw_global_anim_function;
 }
