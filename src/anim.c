@@ -525,6 +525,9 @@ void DrawGlobalAnimationsExt(int drawing_target, int drawing_stage)
   if (!setup.toons)
     return;
 
+  if (drawing_stage == DRAW_GLOBAL_ANIM_STAGE_1)
+    DoAnimationExt();
+
   // always start with reliable default values (no animation actions)
   for (mode_nr = 0; mode_nr < NUM_GAME_MODES; mode_nr++)
     game_mode_anim_action[mode_nr] = ANIM_NO_ACTION;
@@ -583,9 +586,6 @@ void DrawGlobalAnimationsExt(int drawing_target, int drawing_stage)
 
   if (global.anim_status == GAME_MODE_LOADING)
     return;
-
-  if (drawing_stage == DRAW_GLOBAL_ANIM_STAGE_1)
-    DoAnimationExt();
 
   for (mode_nr = 0; mode_nr < NUM_GAME_MODES; mode_nr++)
   {
