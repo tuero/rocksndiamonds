@@ -519,10 +519,15 @@ void InitGlobalAnimations()
 
 void DrawGlobalAnimationsExt(int drawing_target, int drawing_stage)
 {
+  int game_mode_anim_action[NUM_GAME_MODES];
   int mode_nr;
 
   if (!setup.toons)
     return;
+
+  // always start with reliable default values (no animation actions)
+  for (mode_nr = 0; mode_nr < NUM_GAME_MODES; mode_nr++)
+    game_mode_anim_action[mode_nr] = ANIM_NO_ACTION;
 
   if (global.anim_status != anim_status_last)
   {
@@ -536,14 +541,14 @@ void DrawGlobalAnimationsExt(int drawing_target, int drawing_stage)
     // (special handling of animations for "current screen" and "all screens")
 
     // stop animations for last screen
-    HandleGlobalAnim(ANIM_STOP, anim_status_last);
+    game_mode_anim_action[anim_status_last] = ANIM_STOP;
 
     // start animations for current screen
-    HandleGlobalAnim(ANIM_START, global.anim_status);
+    game_mode_anim_action[global.anim_status] = ANIM_START;
 
     // start animations for all screens after loading new artwork set
     if (anim_status_last == GAME_MODE_LOADING)
-      HandleGlobalAnim(ANIM_START, GAME_MODE_DEFAULT);
+      game_mode_anim_action[GAME_MODE_DEFAULT] = ANIM_START;
 
     // ---------- part 2 ------------------------------------------------------
     // start or stop global animations by change of animation class
@@ -558,17 +563,22 @@ void DrawGlobalAnimationsExt(int drawing_target, int drawing_stage)
 
       // stop animations for changed screen class before fading to new screen
       if (before_fading && anim_class_last && !anim_class_next)
-	HandleGlobalAnim(ANIM_STOP, anim_class_game_mode);
+	game_mode_anim_action[anim_class_game_mode] = ANIM_STOP;
 
       // start animations for changed screen class after fading to new screen
       if (after_fading && !anim_class_last && anim_class_next)
-	HandleGlobalAnim(ANIM_START, anim_class_game_mode);
+	game_mode_anim_action[anim_class_game_mode] = ANIM_START;
     }
 
     if (after_fading)
       anim_classes_last = anim_classes_next;
 
     anim_status_last = global.anim_status;
+
+    // start or stop animations determined to be started or stopped above
+    for (mode_nr = 0; mode_nr < NUM_GAME_MODES; mode_nr++)
+      if (game_mode_anim_action[mode_nr] != ANIM_NO_ACTION)
+	HandleGlobalAnim(game_mode_anim_action[mode_nr], mode_nr);
   }
 
   if (global.anim_status == GAME_MODE_LOADING)
