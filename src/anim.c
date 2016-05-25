@@ -184,6 +184,8 @@ static int anim_class_game_modes[NUM_ANIM_CLASSES];
 static int anim_status_last = GAME_MODE_DEFAULT;
 static int anim_classes_last = ANIM_CLASS_NONE;
 
+static boolean drawing_to_fading_buffer = FALSE;
+
 
 /* ========================================================================= */
 /* generic animation frame calculation                                       */
@@ -519,13 +521,17 @@ void InitGlobalAnimations()
 
 void DrawGlobalAnimationsExt(int drawing_target, int drawing_stage)
 {
+  Bitmap *fade_bitmap =
+    (drawing_target == DRAW_TO_FADE_SOURCE ? gfx.fade_bitmap_source :
+     drawing_target == DRAW_TO_FADE_TARGET ? gfx.fade_bitmap_target : NULL);
   int game_mode_anim_action[NUM_GAME_MODES];
   int mode_nr;
 
   if (!setup.toons)
     return;
 
-  if (drawing_stage == DRAW_GLOBAL_ANIM_STAGE_1)
+  if (drawing_stage == DRAW_GLOBAL_ANIM_STAGE_1 &&
+      drawing_target == DRAW_TO_SCREEN)
     DoAnimationExt();
 
   // always start with reliable default values (no animation actions)
@@ -538,6 +544,9 @@ void DrawGlobalAnimationsExt(int drawing_target, int drawing_stage)
     boolean after_fading  = (anim_status_last   == GAME_MODE_PSEUDO_FADING);
     int anim_classes_next = game_mode_anim_classes[global.anim_status_next];
     int i;
+
+    if (drawing_target == DRAW_TO_FADE_TARGET)
+      after_fading = TRUE;
 
     // ---------- part 1 ------------------------------------------------------
     // start or stop global animations by change of game mode
@@ -573,15 +582,27 @@ void DrawGlobalAnimationsExt(int drawing_target, int drawing_stage)
 	game_mode_anim_action[anim_class_game_mode] = ANIM_START;
     }
 
-    if (after_fading)
-      anim_classes_last = anim_classes_next;
+    if (drawing_target == DRAW_TO_SCREEN)
+    {
+      if (after_fading)
+	anim_classes_last = anim_classes_next;
 
-    anim_status_last = global.anim_status;
+      anim_status_last = global.anim_status;
 
-    // start or stop animations determined to be started or stopped above
-    for (mode_nr = 0; mode_nr < NUM_GAME_MODES; mode_nr++)
-      if (game_mode_anim_action[mode_nr] != ANIM_NO_ACTION)
-	HandleGlobalAnim(game_mode_anim_action[mode_nr], mode_nr);
+      // start or stop animations determined to be started or stopped above
+      for (mode_nr = 0; mode_nr < NUM_GAME_MODES; mode_nr++)
+	if (game_mode_anim_action[mode_nr] != ANIM_NO_ACTION)
+	  HandleGlobalAnim(game_mode_anim_action[mode_nr], mode_nr);
+    }
+    else if (drawing_target == DRAW_TO_FADE_TARGET)
+    {
+      drawing_to_fading_buffer = TRUE;
+
+      // start animations determined to be (temporary) started above
+      for (mode_nr = 0; mode_nr < NUM_GAME_MODES; mode_nr++)
+	if (game_mode_anim_action[mode_nr] == ANIM_START)
+	  HandleGlobalAnim(ANIM_START, mode_nr);
+    }
   }
 
   if (global.anim_status == GAME_MODE_LOADING)
@@ -591,6 +612,16 @@ void DrawGlobalAnimationsExt(int drawing_target, int drawing_stage)
   {
     struct GlobalAnimControlInfo *ctrl = &global_anim_ctrl[mode_nr];
     int anim_nr;
+
+    // when preparing source fading buffer, only draw animations to be stopped
+    if (drawing_target == DRAW_TO_FADE_SOURCE &&
+	game_mode_anim_action[mode_nr] != ANIM_STOP)
+      continue;
+
+    // when preparing target fading buffer, only draw animations to be started
+    if (drawing_target == DRAW_TO_FADE_TARGET &&
+	game_mode_anim_action[mode_nr] != ANIM_START)
+      continue;
 
 #if 0
     if (mode_nr != GFX_SPECIAL_ARG_DEFAULT &&
@@ -674,10 +705,24 @@ void DrawGlobalAnimationsExt(int drawing_target, int drawing_stage)
 	src_x += cut_x;
 	src_y += cut_y;
 
-	BlitToScreenMasked(src_bitmap, src_x, src_y, width, height,
+	if (drawing_target == DRAW_TO_SCREEN)
+	  BlitToScreenMasked(src_bitmap, src_x, src_y, width, height,
+			     dst_x, dst_y);
+	else
+	  BlitBitmapMasked(src_bitmap, fade_bitmap, src_x, src_y, width, height,
 			   dst_x, dst_y);
       }
     }
+  }
+
+  if (drawing_target == DRAW_TO_FADE_TARGET)
+  {
+    // stop animations determined to be (temporary) started above
+    for (mode_nr = 0; mode_nr < NUM_GAME_MODES; mode_nr++)
+      if (game_mode_anim_action[mode_nr] == ANIM_START)
+	HandleGlobalAnim(ANIM_STOP, mode_nr);
+
+    drawing_to_fading_buffer = FALSE;
   }
 }
 
@@ -822,6 +867,10 @@ static void StopGlobalAnimMusic(struct GlobalAnimPartControlInfo *part)
 
 static void PlayGlobalAnimSoundAndMusic(struct GlobalAnimPartControlInfo *part)
 {
+  // when drawing animations to fading buffer, do not play sounds or music
+  if (drawing_to_fading_buffer)
+    return;
+
   PlayGlobalAnimSound(part);
   PlayGlobalAnimMusic(part);
 }
@@ -843,6 +892,11 @@ int HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part, int state)
 
   if (state & ANIM_STATE_RESTART)
   {
+    // when drawing animations to fading buffer, only start fixed animations
+    if (drawing_to_fading_buffer && (c->x == ARG_UNDEFINED_VALUE ||
+				     c->y == ARG_UNDEFINED_VALUE))
+      return ANIM_STATE_INACTIVE;
+
     ResetDelayCounterExt(&part->step_delay, anim_sync_frame);
 
     part->init_delay_counter =

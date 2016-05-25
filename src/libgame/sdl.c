@@ -908,15 +908,31 @@ void SDLFillRectangle(Bitmap *dst_bitmap, int x, int y, int width, int height,
     UpdateScreen_WithFrameDelay(&rect);
 }
 
+void PrepareFadeBitmap(int draw_target)
+{
+  Bitmap *fade_bitmap =
+    (draw_target == DRAW_TO_FADE_SOURCE ? gfx.fade_bitmap_source :
+     draw_target == DRAW_TO_FADE_TARGET ? gfx.fade_bitmap_target : NULL);
+
+  if (fade_bitmap == NULL)
+    return;
+
+  // copy backbuffer to fading buffer
+  BlitBitmap(backbuffer, fade_bitmap, 0, 0, gfx.win_xsize, gfx.win_ysize, 0, 0);
+
+  // add border and animations to fading buffer
+  FinalizeScreen(draw_target);
+}
+
 void SDLFadeRectangle(Bitmap *bitmap_cross, int x, int y, int width, int height,
 		      int fade_mode, int fade_delay, int post_delay,
 		      void (*draw_border_function)(void))
 {
+  SDL_Surface *surface_backup = gfx.fade_bitmap_backup->surface;
   SDL_Surface *surface_source = gfx.fade_bitmap_source->surface;
   SDL_Surface *surface_target = gfx.fade_bitmap_target->surface;
   SDL_Surface *surface_black  = gfx.fade_bitmap_black->surface;
   SDL_Surface *surface_screen = backbuffer->surface;
-  SDL_Surface *surface_cross = (bitmap_cross ? bitmap_cross->surface : NULL);
   SDL_Rect src_rect, dst_rect;
   SDL_Rect dst_rect2;
   int src_x = x, src_y = y;
@@ -942,28 +958,24 @@ void SDLFadeRectangle(Bitmap *bitmap_cross, int x, int y, int width, int height,
 
   dst_rect2 = dst_rect;
 
+  // before fading in, store backbuffer (without animation graphics)
+  if (fade_mode & (FADE_TYPE_FADE_IN | FADE_TYPE_TRANSFORM))
+    SDL_BlitSurface(surface_screen, &dst_rect, surface_backup, &src_rect);
+
   /* copy source and target surfaces to temporary surfaces for fading */
   if (fade_mode & FADE_TYPE_TRANSFORM)
   {
-    SDL_BlitSurface(surface_cross,  &src_rect, surface_source, &src_rect);
-    SDL_BlitSurface(surface_screen, &dst_rect, surface_target, &src_rect);
-
-    draw_global_border_function(DRAW_TO_FADE_SOURCE);
-    draw_global_border_function(DRAW_TO_FADE_TARGET);
+    // (source and target fading buffer already prepared)
   }
   else if (fade_mode & FADE_TYPE_FADE_IN)
   {
+    // (target fading buffer already prepared)
     SDL_BlitSurface(surface_black,  &src_rect, surface_source, &src_rect);
-    SDL_BlitSurface(surface_screen, &dst_rect, surface_target, &src_rect);
-
-    draw_global_border_function(DRAW_TO_FADE_TARGET);
   }
   else		/* FADE_TYPE_FADE_OUT */
   {
-    SDL_BlitSurface(surface_screen, &dst_rect, surface_source, &src_rect);
+    // (source fading buffer already prepared)
     SDL_BlitSurface(surface_black,  &src_rect, surface_target, &src_rect);
-
-    draw_global_border_function(DRAW_TO_FADE_SOURCE);
   }
 
   time_current = SDL_GetTicks();
@@ -1198,6 +1210,10 @@ void SDLFadeRectangle(Bitmap *bitmap_cross, int x, int y, int width, int height,
 
   // restore function for drawing global masked border
   gfx.draw_global_border_function = draw_global_border_function;
+
+  // after fading in, restore backbuffer (without animation graphics)
+  if (fade_mode & (FADE_TYPE_FADE_IN | FADE_TYPE_TRANSFORM))
+    SDL_BlitSurface(surface_backup, &dst_rect, surface_screen, &src_rect);
 }
 
 void SDLDrawSimpleLine(Bitmap *dst_bitmap, int from_x, int from_y,

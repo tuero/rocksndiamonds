@@ -837,6 +837,7 @@ struct GfxInfo
   Bitmap *background_bitmap;
   int background_bitmap_mask;
 
+  Bitmap *fade_bitmap_backup;
   Bitmap *fade_bitmap_source;
   Bitmap *fade_bitmap_target;
   Bitmap *fade_bitmap_black;

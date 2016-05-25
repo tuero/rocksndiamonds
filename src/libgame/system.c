@@ -212,6 +212,7 @@ void InitGfxWindowInfo(int win_xsize, int win_ysize)
   ReCreateBitmap(&gfx.final_screen_bitmap, win_xsize, win_ysize, DEFAULT_DEPTH);
 #endif
 
+  ReCreateBitmap(&gfx.fade_bitmap_backup, win_xsize, win_ysize, DEFAULT_DEPTH);
   ReCreateBitmap(&gfx.fade_bitmap_source, win_xsize, win_ysize, DEFAULT_DEPTH);
   ReCreateBitmap(&gfx.fade_bitmap_target, win_xsize, win_ysize, DEFAULT_DEPTH);
   ReCreateBitmap(&gfx.fade_bitmap_black,  win_xsize, win_ysize, DEFAULT_DEPTH);

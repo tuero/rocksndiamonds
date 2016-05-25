@@ -479,4 +479,6 @@ void HandleJoystickEvent(Event *);
 void SDLInitJoysticks(void);
 boolean SDLReadJoystick(int, int *, int *, boolean *, boolean *);
 
+void PrepareFadeBitmap(int);
+
 #endif /* SDL_H */
