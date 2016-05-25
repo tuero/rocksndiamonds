@@ -1024,7 +1024,7 @@ static void RedrawGlobalBorderIfNeeded()
 
   // copy current draw buffer to later copy back areas that have not changed
   if (game_status_last != GAME_MODE_TITLE)
-    BlitBitmap(backbuffer, bitmap_db_store, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
+    BlitBitmap(backbuffer, bitmap_db_store_1, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
 
   if (CheckIfGlobalBorderRedrawIsNeeded())
   {
@@ -1037,20 +1037,20 @@ static void RedrawGlobalBorderIfNeeded()
     if (real_sx_last != -1 && real_sy_last != -1 &&
 	REAL_SX != -1 && REAL_SY != -1 &&
 	full_sxsize_last == FULL_SXSIZE && full_sysize_last == FULL_SYSIZE)
-      BlitBitmap(bitmap_db_store, backbuffer,
+      BlitBitmap(bitmap_db_store_1, backbuffer,
 		 real_sx_last, real_sy_last, FULL_SXSIZE, FULL_SYSIZE,
 		 REAL_SX, REAL_SY);
 
     if (dx_last != -1 && dy_last != -1 &&
 	DX != -1 && DY != -1 &&
 	dxsize_last == DXSIZE && dysize_last == DYSIZE)
-      BlitBitmap(bitmap_db_store, backbuffer,
+      BlitBitmap(bitmap_db_store_1, backbuffer,
 		 dx_last, dy_last, DXSIZE, DYSIZE, DX, DY);
 
     if (vx_last != -1 && vy_last != -1 &&
 	VX != -1 && VY != -1 &&
 	vxsize_last == VXSIZE && vysize_last == VYSIZE)
-      BlitBitmap(bitmap_db_store, backbuffer,
+      BlitBitmap(bitmap_db_store_1, backbuffer,
 		 vx_last, vy_last, VXSIZE, VYSIZE, VX, VY);
 
     redraw_mask = REDRAW_ALL;
@@ -2498,7 +2498,7 @@ void DrawEnvelopeRequest(char *text)
     RedrawGadget(tool_gadget[i]);
 
   // store readily prepared envelope request for later use when animating
-  BlitBitmap(backbuffer, bitmap_db_cross, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
+  BlitBitmap(backbuffer, bitmap_db_store_2, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
 
   if (text_door_style)
     free(text_door_style);
@@ -2559,7 +2559,7 @@ void AnimateEnvelopeRequest(int anim_mode, int action)
     setRequestPosition(&src_x, &src_y, FALSE);
     setRequestPositionExt(&dst_x, &dst_y, width, height, FALSE);
 
-    BlitBitmap(bitmap_db_store, backbuffer, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
+    BlitBitmap(bitmap_db_store_1, backbuffer, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
 
     for (yy = 0; yy < 2; yy++)
     {
@@ -2573,10 +2573,10 @@ void AnimateEnvelopeRequest(int anim_mode, int action)
 	int yy_size = (yy ? tile_size : ysize_size_top);
 
 	if (draw_masked)
-	  BlitBitmapMasked(bitmap_db_cross, backbuffer,
+	  BlitBitmapMasked(bitmap_db_store_2, backbuffer,
 			   src_xx, src_yy, xx_size, yy_size, dst_xx, dst_yy);
 	else
-	  BlitBitmap(bitmap_db_cross, backbuffer,
+	  BlitBitmap(bitmap_db_store_2, backbuffer,
 		     src_xx, src_yy, xx_size, yy_size, dst_xx, dst_yy);
       }
     }
@@ -2609,7 +2609,7 @@ void ShowEnvelopeRequest(char *text, unsigned int req_state, int action)
 
   if (action == ACTION_OPENING)
   {
-    BlitBitmap(backbuffer, bitmap_db_store, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
+    BlitBitmap(backbuffer, bitmap_db_store_1, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
 
     if (req_state & REQ_ASK)
     {
@@ -2656,7 +2656,7 @@ void ShowEnvelopeRequest(char *text, unsigned int req_state, int action)
   game.envelope_active = FALSE;
 
   if (action == ACTION_CLOSING)
-    BlitBitmap(bitmap_db_store, backbuffer, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
+    BlitBitmap(bitmap_db_store_1, backbuffer, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
 
   // SetDrawBackgroundMask(last_draw_background_mask);
 
@@ -3561,7 +3561,7 @@ static int RequestHandleEvents(unsigned int req_state)
       if (global.use_envelope_request)
       {
 	/* copy current state of request area to middle of playfield area */
-	BlitBitmap(bitmap_db_cross, drawto, sx, sy, width, height, sx, sy);
+	BlitBitmap(bitmap_db_store_2, drawto, sx, sy, width, height, sx, sy);
       }
     }
 
@@ -3689,7 +3689,7 @@ static int RequestHandleEvents(unsigned int req_state)
       if (global.use_envelope_request)
       {
 	/* copy back current state of pressed buttons inside request area */
-	BlitBitmap(drawto, bitmap_db_cross, sx, sy, width, height, sx, sy);
+	BlitBitmap(drawto, bitmap_db_store_2, sx, sy, width, height, sx, sy);
       }
     }
 

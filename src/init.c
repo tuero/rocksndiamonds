@@ -5164,9 +5164,9 @@ void InitGfxBuffers()
 
   if (WIN_XSIZE != win_xsize_last || WIN_YSIZE != win_ysize_last)
   {
-    /* may contain content for cross-fading -- only re-create if changed */
-    ReCreateBitmap(&bitmap_db_store, WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH);
-    ReCreateBitmap(&bitmap_db_cross, WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH);
+    /* used to temporarily store the backbuffer -- only re-create if changed */
+    ReCreateBitmap(&bitmap_db_store_1, WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH);
+    ReCreateBitmap(&bitmap_db_store_2, WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH);
 
     win_xsize_last = WIN_XSIZE;
     win_ysize_last = WIN_YSIZE;
