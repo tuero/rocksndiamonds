@@ -924,7 +924,7 @@ void PrepareFadeBitmap(int draw_target)
   FinalizeScreen(draw_target);
 }
 
-void SDLFadeRectangle(Bitmap *bitmap_cross, int x, int y, int width, int height,
+void SDLFadeRectangle(int x, int y, int width, int height,
 		      int fade_mode, int fade_delay, int post_delay,
 		      void (*draw_border_function)(void))
 {

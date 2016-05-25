@@ -671,7 +671,7 @@ void BlitBitmapTiled(Bitmap *src_bitmap, Bitmap *dst_bitmap,
   }
 }
 
-void FadeRectangle(Bitmap *bitmap_cross, int x, int y, int width, int height,
+void FadeRectangle(int x, int y, int width, int height,
 		   int fade_mode, int fade_delay, int post_delay,
 		   void (*draw_border_function)(void))
 {
@@ -679,7 +679,7 @@ void FadeRectangle(Bitmap *bitmap_cross, int x, int y, int width, int height,
   if (!InClippedRectangle(backbuffer, &x, &y, &width, &height, TRUE))
     return;
 
-  SDLFadeRectangle(bitmap_cross, x, y, width, height,
+  SDLFadeRectangle(x, y, width, height,
 		   fade_mode, fade_delay, post_delay, draw_border_function);
 }
 

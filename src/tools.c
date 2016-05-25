@@ -598,26 +598,10 @@ void BackToFront_WithFrameDelay(unsigned int frame_delay_value)
   SetVideoFrameDelay(frame_delay_value_old);
 }
 
-static void FadeCrossSaveBackbuffer()
-{
-  BlitBitmap(backbuffer, bitmap_db_cross, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
-}
-
-static void FadeCrossRestoreBackbuffer()
-{
-  int redraw_mask_last = redraw_mask;
-
-  BlitBitmap(bitmap_db_cross, backbuffer, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
-
-  // do not change redraw mask when restoring backbuffer after cross-fading
-  redraw_mask = redraw_mask_last;
-}
-
 static void FadeExt(int fade_mask, int fade_mode, int fade_type)
 {
   static int fade_type_skip = FADE_TYPE_NONE;
   void (*draw_border_function)(void) = NULL;
-  Bitmap *bitmap = (fade_mode & FADE_TYPE_TRANSFORM ? bitmap_db_cross : NULL);
   int x, y, width, height;
   int fade_delay, post_delay;
 
@@ -632,18 +616,8 @@ static void FadeExt(int fade_mask, int fade_mode, int fade_type)
       return;
     }
 
-#if 1
-    FadeCrossSaveBackbuffer();
-#endif
-
     if (fading.fade_mode & FADE_TYPE_TRANSFORM)
-    {
-#if 0
-      FadeCrossSaveBackbuffer();
-#endif
-
       return;
-    }
   }
 
   redraw_mask |= fade_mask;
@@ -706,11 +680,8 @@ static void FadeExt(int fade_mask, int fade_mode, int fade_type)
     return;
   }
 
-  FadeRectangle(bitmap, x, y, width, height, fade_mode, fade_delay, post_delay,
+  FadeRectangle(x, y, width, height, fade_mode, fade_delay, post_delay,
 		draw_border_function);
-
-  if (fade_type == FADE_TYPE_FADE_OUT)
-    FadeCrossRestoreBackbuffer();
 
   redraw_mask &= ~fade_mask;
 }
