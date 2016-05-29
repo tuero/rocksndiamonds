@@ -1258,7 +1258,7 @@ static void DoAnimationExt()
   for (i = 0; i < NUM_GAME_MODES; i++)
     HandleGlobalAnim(ANIM_CONTINUE, i);
 
-#if 1
+#if 0
   // force screen redraw in next frame to continue drawing global animations
   redraw_mask = REDRAW_ALL;
 #endif
