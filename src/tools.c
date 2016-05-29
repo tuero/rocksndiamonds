@@ -550,6 +550,10 @@ void BackToFront()
   if (redraw_mask & REDRAW_FPS)
     DrawFramesPerSecond();
 
+  // remove playfield redraw before potentially merging with doors redraw
+  if (DrawingDeactivated(REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE))
+    redraw_mask &= ~REDRAW_FIELD;
+
   // redraw complete window if both playfield and (some) doors need redraw
   if (redraw_mask & REDRAW_FIELD && redraw_mask & REDRAW_DOORS)
     redraw_mask = REDRAW_ALL;
