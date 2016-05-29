@@ -587,14 +587,16 @@ void BackToFront()
       x2 = MAX(x2, DX + DXSIZE);
       y2 = MAX(y2, DY + DYSIZE);
     }
-    else if (redraw_mask & REDRAW_DOOR_2)
+
+    if (redraw_mask & REDRAW_DOOR_2)
     {
       x1 = MIN(x1, VX);
       y1 = MIN(y1, VY);
       x2 = MAX(x2, VX + VXSIZE);
       y2 = MAX(y2, VY + VYSIZE);
     }
-    else if (redraw_mask & REDRAW_DOOR_3)
+
+    if (redraw_mask & REDRAW_DOOR_3)
     {
       x1 = MIN(x1, EX);
       y1 = MIN(y1, EY);
