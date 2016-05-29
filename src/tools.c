@@ -570,14 +570,35 @@ void BackToFront()
   }
   else if (redraw_mask & REDRAW_DOORS)
   {
+    // merge door areas to prevent calling screen redraw more than once
+    int x1 = WIN_XSIZE;
+    int y1 = WIN_YSIZE;
+    int x2 = 0;
+    int y2 = 0;
+
     if (redraw_mask & REDRAW_DOOR_1)
-      BlitBitmap(backbuffer, window, DX, DY, DXSIZE, DYSIZE, DX, DY);
+    {
+      x1 = MIN(x1, DX);
+      y1 = MIN(y1, DY);
+      x2 = MAX(x2, DX + DXSIZE);
+      y2 = MAX(y2, DY + DYSIZE);
+    }
+    else if (redraw_mask & REDRAW_DOOR_2)
+    {
+      x1 = MIN(x1, VX);
+      y1 = MIN(y1, VY);
+      x2 = MAX(x2, VX + VXSIZE);
+      y2 = MAX(y2, VY + VYSIZE);
+    }
+    else if (redraw_mask & REDRAW_DOOR_3)
+    {
+      x1 = MIN(x1, EX);
+      y1 = MIN(y1, EY);
+      x2 = MAX(x2, EX + EXSIZE);
+      y2 = MAX(y2, EY + EYSIZE);
+    }
 
-    if (redraw_mask & REDRAW_DOOR_2)
-      BlitBitmap(backbuffer, window, VX, VY, VXSIZE, VYSIZE, VX, VY);
-
-    if (redraw_mask & REDRAW_DOOR_3)
-      BlitBitmap(backbuffer, window, EX, EY, EXSIZE, EYSIZE, EX, EY);
+    BlitBitmap(backbuffer, window, x1, y1, x2 - x1, y2 - y1, x1, y1);
   }
 
   redraw_mask = REDRAW_NONE;
