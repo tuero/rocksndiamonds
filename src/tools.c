@@ -739,6 +739,9 @@ static void SetScreenStates_AfterFadingIn()
 
 static void SetScreenStates_BeforeFadingOut()
 {
+  // required if "fade_mask != redraw_mask" (fading only affects fade area)
+  BackToFront();
+
   // store new target screen (to use correct masked border for fading)
   gfx.fade_border_target_status = game_status;
 
