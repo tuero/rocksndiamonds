@@ -528,6 +528,22 @@ static void PrintFrameTimeDebugging()
 }
 #endif
 
+static int unifiedRedrawMask(int mask)
+{
+  if (mask & REDRAW_ALL)
+    return REDRAW_ALL;
+
+  if (mask & REDRAW_FIELD && mask & REDRAW_DOORS)
+    return REDRAW_ALL;
+
+  return mask;
+}
+
+static boolean equalRedrawMasks(int mask_1, int mask_2)
+{
+  return unifiedRedrawMask(mask_1) == unifiedRedrawMask(mask_2);
+}
+
 void BackToFront()
 {
   static int last_redraw_mask = REDRAW_NONE;
@@ -731,17 +747,10 @@ static void SetScreenStates_AfterFadingIn()
   gfx.fade_border_source_status = global.border_status;
 
   global.anim_status = global.anim_status_next;
-
-  // force update of global animation status in case of rapid screen changes
-  redraw_mask = REDRAW_ALL;
-  BackToFront();
 }
 
 static void SetScreenStates_BeforeFadingOut()
 {
-  // required if "fade_mask != redraw_mask" (fading only affects fade area)
-  BackToFront();
-
   // store new target screen (to use correct masked border for fading)
   gfx.fade_border_target_status = game_status;
 
@@ -776,10 +785,18 @@ void FadeIn(int fade_mask)
   FADE_SYSIZE = FULL_SYSIZE;
 
   SetScreenStates_AfterFadingIn();
+
+  // force update of global animation status in case of rapid screen changes
+  redraw_mask = REDRAW_ALL;
+  BackToFront();
 }
 
 void FadeOut(int fade_mask)
 {
+  // update screen if areas covered by "fade_mask" and "redraw_mask" differ
+  if (!equalRedrawMasks(fade_mask, redraw_mask))
+    BackToFront();
+
   SetScreenStates_BeforeFadingOut();
 
 #if 0
