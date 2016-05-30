@@ -615,11 +615,21 @@ static void TapeAppendRecording()
   if (!tape.playing || !tape.pausing)
     return;
 
-  tape.pos[tape.counter].delay = tape.delay_played;
+  // stop playing
   tape.playing = FALSE;
+  tape.fast_forward = FALSE;
+  tape.warp_forward = FALSE;
+  tape.pause_before_death = FALSE;
+  tape.deactivate_display = FALSE;
+
+  // start recording
   tape.recording = TRUE;
   tape.changed = TRUE;
 
+  // set current delay (for last played move)
+  tape.pos[tape.counter].delay = tape.delay_played;
+
+  // set current date
   TapeSetDateFromNow();
 
   DrawVideoDisplay(VIDEO_STATE_DATE_ON, tape.date);
@@ -709,19 +719,18 @@ void TapeTogglePause(boolean toggle_manual)
 {
   int state = 0;
 
-  if (tape.pause_before_death)
-    state |= VIDEO_STATE_PBEND_OFF;
-  else if (tape.fast_forward)
-    state |= VIDEO_STATE_FFWD_OFF;
-
   tape.pausing = !tape.pausing;
-  tape.fast_forward = FALSE;
-  tape.pause_before_death = FALSE;
 
   if (tape.single_step && toggle_manual)
     tape.single_step = FALSE;
 
   state |= (tape.pausing ? VIDEO_STATE_PAUSE_ON : VIDEO_STATE_PAUSE_OFF);
+
+  if (tape.pause_before_death)
+    state |= (tape.pausing ? VIDEO_STATE_PBEND_OFF : VIDEO_STATE_PBEND_ON);
+  else if (tape.fast_forward)
+    state |= (tape.pausing ? VIDEO_STATE_FFWD_OFF : VIDEO_STATE_FFWD_ON);
+
   if (tape.playing)
     state |= VIDEO_STATE_PLAY_ON;
   else
@@ -731,12 +740,23 @@ void TapeTogglePause(boolean toggle_manual)
 
   if (tape.warp_forward)
   {
-    TapeStopWarpForward();
+    if (tape.pausing)
+    {
+      TapeDeactivateDisplayOff(game_status == GAME_MODE_PLAYING);
+    }
+    else
+    {
+      if (tape.deactivate_display)
+	TapeDeactivateDisplayOn();
+
+      DrawVideoDisplay(VIDEO_STATE_WARP_ON, VIDEO_DISPLAY_SYMBOL_ONLY);
+    }
 
     if (tape.quick_resume)
     {
       tape.quick_resume = FALSE;
 
+      TapeStopWarpForward();
       TapeAppendRecording();
 
       if (!CheckEngineSnapshotSingle())
@@ -808,44 +828,57 @@ byte *TapePlayAction()
   if (!tape.playing || tape.pausing)
     return NULL;
 
-  if (tape.pause_before_death)	/* stop 10 seconds before player gets killed */
+  // stop some seconds before player gets killed
+  if (tape.pause_before_death)
   {
-    if (!(FrameCounter % 20))
-    {
-      if ((FrameCounter / 20) % 2)
-	DrawVideoDisplay(VIDEO_STATE_PBEND_ON, VIDEO_DISPLAY_LABEL_ONLY);
-      else
-	DrawVideoDisplay(VIDEO_STATE_PBEND_OFF, VIDEO_DISPLAY_LABEL_ONLY);
-    }
-
-    if (tape.warp_forward)
-    {
-      if (tape.deactivate_display)
-	DrawVideoDisplay(VIDEO_STATE_WARP_ON, VIDEO_DISPLAY_SYMBOL_ONLY);
-      else
-	DrawVideoDisplay(VIDEO_STATE_WARP2_ON, VIDEO_DISPLAY_SYMBOL_ONLY);
-    }
-
     if (TapeTime > tape.length_seconds - TAPE_PAUSE_SECONDS_BEFORE_DEATH)
     {
+      tape.fast_forward = FALSE;
+      tape.pause_before_death = FALSE;
+
+      DrawVideoDisplay(VIDEO_STATE_PBEND_OFF, 0);
+
+      TapeStopWarpForward();
       TapeTogglePause(TAPE_TOGGLE_MANUAL);
 
       return NULL;
     }
   }
-  else if (tape.fast_forward)
-  {
-    if ((FrameCounter / 20) % 2)
-      DrawVideoDisplay(VIDEO_STATE_FFWD_ON, VIDEO_DISPLAY_LABEL_ONLY);
-    else
-      DrawVideoDisplay(VIDEO_STATE_FFWD_OFF, VIDEO_DISPLAY_LABEL_ONLY);
 
-    if (tape.warp_forward)
+  if (!tape.deactivate_display)
+  {
+    if (tape.pause_before_death)
     {
-      if (tape.deactivate_display)
-	DrawVideoDisplay(VIDEO_STATE_WARP_ON, VIDEO_DISPLAY_SYMBOL_ONLY);
+      if (!(FrameCounter % 20))
+      {
+	if ((FrameCounter / 20) % 2)
+	  DrawVideoDisplay(VIDEO_STATE_PBEND_ON, VIDEO_DISPLAY_LABEL_ONLY);
+	else
+	  DrawVideoDisplay(VIDEO_STATE_PBEND_OFF, VIDEO_DISPLAY_LABEL_ONLY);
+      }
+
+      if (tape.warp_forward)
+      {
+	if (tape.deactivate_display)
+	  DrawVideoDisplay(VIDEO_STATE_WARP_ON, VIDEO_DISPLAY_SYMBOL_ONLY);
+	else
+	  DrawVideoDisplay(VIDEO_STATE_WARP2_ON, VIDEO_DISPLAY_SYMBOL_ONLY);
+      }
+    }
+    else if (tape.fast_forward)
+    {
+      if ((FrameCounter / 20) % 2)
+	DrawVideoDisplay(VIDEO_STATE_FFWD_ON, VIDEO_DISPLAY_LABEL_ONLY);
       else
-	DrawVideoDisplay(VIDEO_STATE_WARP2_ON, VIDEO_DISPLAY_SYMBOL_ONLY);
+	DrawVideoDisplay(VIDEO_STATE_FFWD_OFF, VIDEO_DISPLAY_LABEL_ONLY);
+
+      if (tape.warp_forward)
+      {
+	if (tape.deactivate_display)
+	  DrawVideoDisplay(VIDEO_STATE_WARP_ON, VIDEO_DISPLAY_SYMBOL_ONLY);
+	else
+	  DrawVideoDisplay(VIDEO_STATE_WARP2_ON, VIDEO_DISPLAY_SYMBOL_ONLY);
+      }
     }
   }
 
@@ -948,20 +981,26 @@ static void TapeStartWarpForward()
   if (!tape.fast_forward && !tape.pause_before_death)
   {
     tape.pausing = FALSE;
+    tape.pause_before_death = TRUE;
     tape.deactivate_display = TRUE;
 
     TapeDeactivateDisplayOn();
-  }
 
-  if (tape.fast_forward || tape.pause_before_death)
+    DrawVideoDisplay(VIDEO_STATE_PBEND_ON, 0);
     DrawVideoDisplay(VIDEO_STATE_WARP_ON, VIDEO_DISPLAY_SYMBOL_ONLY);
+  }
   else
-    DrawVideoDisplay(VIDEO_STATE_WARP_ON, 0);
+  {
+    DrawVideoDisplay(VIDEO_STATE_WARP2_ON, VIDEO_DISPLAY_SYMBOL_ONLY);
+  }
 }
 
 static void TapeStopWarpForward()
 {
   int state = (tape.pausing ? VIDEO_STATE_PAUSE_ON : VIDEO_STATE_PAUSE_OFF);
+
+  if (tape.deactivate_display)
+    tape.pause_before_death = FALSE;
 
   tape.warp_forward = FALSE;
   tape.deactivate_display = FALSE;
@@ -1390,6 +1429,10 @@ static void HandleTapeButtonsExt(int id)
 	{
 	  TapeStartWarpForward();
 	}
+	else if (tape.pausing)			/* PAUSE -> WARP FORWARD PLAY */
+	{
+	  TapeTogglePause(TAPE_TOGGLE_MANUAL);
+	}
 	else					/* WARP FORWARD PLAY -> PLAY */
 	{
 	  TapeStopWarpForward();
@@ -1439,7 +1482,18 @@ static void HandleTapeButtonsExt(int id)
       {
 	if (tape.pausing)			/* PAUSE -> PLAY */
 	{
+	  // continue playing in normal mode
+	  tape.fast_forward = FALSE;
+	  tape.warp_forward = FALSE;
+	  tape.pause_before_death = FALSE;
+	  tape.deactivate_display = FALSE;
+
 	  TapeTogglePause(TAPE_TOGGLE_MANUAL);
+	}
+	else if (tape.warp_forward &&
+		 !tape.fast_forward)		/* WARP FORWARD PLAY -> PLAY */
+	{
+	  TapeStopWarpForward();
 	}
 	else if (!tape.fast_forward)		/* PLAY -> FAST FORWARD PLAY */
 	{
