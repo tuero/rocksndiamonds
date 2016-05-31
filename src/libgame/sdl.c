@@ -431,7 +431,7 @@ void SDLInitVideoBuffer(boolean fullscreen)
      should never be drawn to directly, it would do no harm nevertheless. */
 
   /* create additional (symbolic) buffer for double-buffering */
-  ReCreateBitmap(&window, video.width, video.height, video.depth);
+  ReCreateBitmap(&window, video.width, video.height);
 }
 
 static boolean SDLCreateScreen(boolean fullscreen)

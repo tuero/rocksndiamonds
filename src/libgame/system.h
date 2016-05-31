@@ -1385,7 +1385,7 @@ void CloseVideoDisplay(void);
 void InitVideoBuffer(int, int, int, boolean);
 Bitmap *CreateBitmapStruct(void);
 Bitmap *CreateBitmap(int, int, int);
-void ReCreateBitmap(Bitmap **, int, int, int);
+void ReCreateBitmap(Bitmap **, int, int);
 void FreeBitmap(Bitmap *);
 void BlitBitmap(Bitmap *, Bitmap *, int, int, int, int, int, int);
 void BlitBitmapTiled(Bitmap *, Bitmap *, int, int, int, int, int, int, int,int);

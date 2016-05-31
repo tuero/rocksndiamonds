@@ -41,8 +41,7 @@ int open_all(void)
 
 void InitGfxBuffers_EM()
 {
-  ReCreateBitmap(&screenBitmap, MAX_BUF_XSIZE * TILEX, MAX_BUF_YSIZE * TILEY,
-		 DEFAULT_DEPTH);
+  ReCreateBitmap(&screenBitmap, MAX_BUF_XSIZE * TILEX, MAX_BUF_YSIZE * TILEY);
 
   global_em_info.screenbuffer = screenBitmap;
 }

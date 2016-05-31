@@ -80,7 +80,7 @@ void InitPrecedingPlayfieldMemory()
 
 void InitGfxBuffers_SP()
 {
-  ReCreateBitmap(&bitmap_db_field_sp, FXSIZE, FYSIZE, DEFAULT_DEPTH);
+  ReCreateBitmap(&bitmap_db_field_sp, FXSIZE, FYSIZE);
 }
 
 unsigned int InitEngineRandom_SP(int seed)

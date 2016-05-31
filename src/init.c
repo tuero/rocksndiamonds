@@ -5165,17 +5165,17 @@ void InitGfxBuffers()
   if (WIN_XSIZE != win_xsize_last || WIN_YSIZE != win_ysize_last)
   {
     /* used to temporarily store the backbuffer -- only re-create if changed */
-    ReCreateBitmap(&bitmap_db_store_1, WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH);
-    ReCreateBitmap(&bitmap_db_store_2, WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH);
+    ReCreateBitmap(&bitmap_db_store_1, WIN_XSIZE, WIN_YSIZE);
+    ReCreateBitmap(&bitmap_db_store_2, WIN_XSIZE, WIN_YSIZE);
 
     win_xsize_last = WIN_XSIZE;
     win_ysize_last = WIN_YSIZE;
   }
 
-  ReCreateBitmap(&bitmap_db_field, FXSIZE, FYSIZE, DEFAULT_DEPTH);
-  ReCreateBitmap(&bitmap_db_panel, DXSIZE, DYSIZE, DEFAULT_DEPTH);
-  ReCreateBitmap(&bitmap_db_door_1, 3 * DXSIZE, DYSIZE, DEFAULT_DEPTH);
-  ReCreateBitmap(&bitmap_db_door_2, 3 * VXSIZE, VYSIZE, DEFAULT_DEPTH);
+  ReCreateBitmap(&bitmap_db_field, FXSIZE, FYSIZE);
+  ReCreateBitmap(&bitmap_db_panel, DXSIZE, DYSIZE);
+  ReCreateBitmap(&bitmap_db_door_1, 3 * DXSIZE, DYSIZE);
+  ReCreateBitmap(&bitmap_db_door_2, 3 * VXSIZE, VYSIZE);
 
   /* initialize screen properties */
   InitGfxFieldInfo(SX, SY, SXSIZE, SYSIZE,

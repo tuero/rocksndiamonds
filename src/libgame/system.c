@@ -203,16 +203,16 @@ void InitGfxWindowInfo(int win_xsize, int win_ysize)
 {
   if (win_xsize != gfx.win_xsize || win_ysize != gfx.win_ysize)
   {
-    ReCreateBitmap(&gfx.background_bitmap, win_xsize, win_ysize, DEFAULT_DEPTH);
+    ReCreateBitmap(&gfx.background_bitmap, win_xsize, win_ysize);
 
 #if defined(TARGET_SDL2)
-    ReCreateBitmap(&gfx.final_screen_bitmap, win_xsize, win_ysize, DEFAULT_DEPTH);
+    ReCreateBitmap(&gfx.final_screen_bitmap, win_xsize, win_ysize);
 #endif
 
-    ReCreateBitmap(&gfx.fade_bitmap_backup, win_xsize, win_ysize, DEFAULT_DEPTH);
-    ReCreateBitmap(&gfx.fade_bitmap_source, win_xsize, win_ysize, DEFAULT_DEPTH);
-    ReCreateBitmap(&gfx.fade_bitmap_target, win_xsize, win_ysize, DEFAULT_DEPTH);
-    ReCreateBitmap(&gfx.fade_bitmap_black,  win_xsize, win_ysize, DEFAULT_DEPTH);
+    ReCreateBitmap(&gfx.fade_bitmap_backup, win_xsize, win_ysize);
+    ReCreateBitmap(&gfx.fade_bitmap_source, win_xsize, win_ysize);
+    ReCreateBitmap(&gfx.fade_bitmap_target, win_xsize, win_ysize);
+    ReCreateBitmap(&gfx.fade_bitmap_black,  win_xsize, win_ysize);
 
     ClearRectangle(gfx.fade_bitmap_black, 0, 0, win_xsize, win_ysize);
   }
@@ -444,9 +444,9 @@ Bitmap *CreateBitmap(int width, int height, int depth)
   return new_bitmap;
 }
 
-void ReCreateBitmap(Bitmap **bitmap, int width, int height, int depth)
+void ReCreateBitmap(Bitmap **bitmap, int width, int height)
 {
-  Bitmap *new_bitmap = CreateBitmap(width, height, depth);
+  Bitmap *new_bitmap = CreateBitmap(width, height, DEFAULT_DEPTH);
 
   if (*bitmap == NULL)
   {
