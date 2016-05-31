@@ -435,6 +435,16 @@ void DrawVideoDisplay(unsigned int state, unsigned int value)
   DrawVideoDisplay_DateTime(state, value);
 }
 
+void DrawVideoDisplayLabel(unsigned int state)
+{
+  DrawVideoDisplay(state, VIDEO_DISPLAY_LABEL_ONLY);
+}
+
+void DrawVideoDisplaySymbol(unsigned int state)
+{
+  DrawVideoDisplay(state, VIDEO_DISPLAY_SYMBOL_ONLY);
+}
+
 void DrawCompleteVideoDisplay()
 {
   struct GraphicInfo *g_tape = &graphic_info[IMG_BACKGROUND_TAPE];
@@ -749,7 +759,7 @@ void TapeTogglePause(boolean toggle_manual)
       if (tape.deactivate_display)
 	TapeDeactivateDisplayOn();
 
-      DrawVideoDisplay(VIDEO_STATE_WARP_ON, VIDEO_DISPLAY_SYMBOL_ONLY);
+      DrawVideoDisplaySymbol(VIDEO_STATE_WARP_ON);
     }
 
     if (tape.quick_resume)
@@ -850,16 +860,16 @@ byte *TapePlayAction()
   if (update_video_display && !tape.deactivate_display)
   {
     if (tape.pause_before_death)
-      DrawVideoDisplay(update_draw_label_on ?
-		       VIDEO_STATE_PBEND_ON :
-		       VIDEO_STATE_PBEND_OFF, VIDEO_DISPLAY_LABEL_ONLY);
+      DrawVideoDisplayLabel(update_draw_label_on ?
+			    VIDEO_STATE_PBEND_ON :
+			    VIDEO_STATE_PBEND_OFF);
     else if (tape.fast_forward)
-      DrawVideoDisplay(update_draw_label_on ?
-		       VIDEO_STATE_FFWD_ON :
-		       VIDEO_STATE_FFWD_OFF, VIDEO_DISPLAY_LABEL_ONLY);
+      DrawVideoDisplayLabel(update_draw_label_on ?
+			    VIDEO_STATE_FFWD_ON :
+			    VIDEO_STATE_FFWD_OFF);
 
     if (tape.warp_forward)
-      DrawVideoDisplay(VIDEO_STATE_WARP2_ON, VIDEO_DISPLAY_SYMBOL_ONLY);
+      DrawVideoDisplaySymbol(VIDEO_STATE_WARP2_ON);
   }
 
   if (tape.counter >= tape.length)	/* end of tape reached */
@@ -954,11 +964,11 @@ static void TapeStartWarpForward()
     TapeDeactivateDisplayOn();
 
     DrawVideoDisplay(VIDEO_STATE_PBEND_ON, 0);
-    DrawVideoDisplay(VIDEO_STATE_WARP_ON, VIDEO_DISPLAY_SYMBOL_ONLY);
+    DrawVideoDisplaySymbol(VIDEO_STATE_WARP_ON);
   }
   else
   {
-    DrawVideoDisplay(VIDEO_STATE_WARP2_ON, VIDEO_DISPLAY_SYMBOL_ONLY);
+    DrawVideoDisplaySymbol(VIDEO_STATE_WARP2_ON);
   }
 }
 
@@ -1475,7 +1485,7 @@ static void HandleTapeButtonsExt(int id)
 	  DrawVideoDisplay(VIDEO_STATE_FFWD_OFF | VIDEO_STATE_PBEND_ON, 0);
 
 	  if (tape.warp_forward)
-	    DrawVideoDisplay(VIDEO_STATE_WARP2_ON, VIDEO_DISPLAY_SYMBOL_ONLY);
+	    DrawVideoDisplaySymbol(VIDEO_STATE_WARP2_ON);
 	}
 	else					/* AUTO PAUSE -> NORMAL PLAY */
 	{
