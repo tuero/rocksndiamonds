@@ -734,17 +734,17 @@ void TapeTogglePause(boolean toggle_manual)
   if (tape.single_step && toggle_manual)
     tape.single_step = FALSE;
 
-  state |= (tape.pausing ? VIDEO_STATE_PAUSE_ON : VIDEO_STATE_PAUSE_OFF);
+  state |= VIDEO_STATE_PAUSE(tape.pausing);
 
   if (tape.pause_before_death)
-    state |= (tape.pausing ? VIDEO_STATE_PBEND_OFF : VIDEO_STATE_PBEND_ON);
+    state |= VIDEO_STATE_PBEND(!tape.pausing);
   else if (tape.fast_forward)
-    state |= (tape.pausing ? VIDEO_STATE_FFWD_OFF : VIDEO_STATE_FFWD_ON);
+    state |= VIDEO_STATE_FFWD(!tape.pausing);
 
   if (tape.playing)
     state |= VIDEO_STATE_PLAY_ON;
   else
-    state |= (tape.single_step ? VIDEO_STATE_1STEP_ON : VIDEO_STATE_1STEP_OFF);
+    state |= VIDEO_STATE_1STEP(tape.single_step);
 
   DrawVideoDisplay(state, 0);
 
@@ -860,13 +860,9 @@ byte *TapePlayAction()
   if (update_video_display && !tape.deactivate_display)
   {
     if (tape.pause_before_death)
-      DrawVideoDisplayLabel(update_draw_label_on ?
-			    VIDEO_STATE_PBEND_ON :
-			    VIDEO_STATE_PBEND_OFF);
+      DrawVideoDisplayLabel(VIDEO_STATE_PBEND(update_draw_label_on));
     else if (tape.fast_forward)
-      DrawVideoDisplayLabel(update_draw_label_on ?
-			    VIDEO_STATE_FFWD_ON :
-			    VIDEO_STATE_FFWD_OFF);
+      DrawVideoDisplayLabel(VIDEO_STATE_FFWD(update_draw_label_on));
 
     if (tape.warp_forward)
       DrawVideoDisplaySymbol(VIDEO_STATE_WARP2_ON);
@@ -974,7 +970,7 @@ static void TapeStartWarpForward()
 
 static void TapeStopWarpForward()
 {
-  int state = (tape.pausing ? VIDEO_STATE_PAUSE_ON : VIDEO_STATE_PAUSE_OFF);
+  int state = VIDEO_STATE_PAUSE(tape.pausing);
 
   if (tape.deactivate_display)
     tape.pause_before_death = FALSE;
@@ -984,12 +980,10 @@ static void TapeStopWarpForward()
 
   TapeDeactivateDisplayOff(game_status == GAME_MODE_PLAYING);
 
-  if (tape.pause_before_death)
-    state |= VIDEO_STATE_WARP_OFF | VIDEO_STATE_PBEND_ON;
-  else if (tape.fast_forward)
-    state |= VIDEO_STATE_WARP_OFF | VIDEO_STATE_FFWD_ON;
-  else
-    state |= VIDEO_STATE_WARP_OFF | VIDEO_STATE_PLAY_ON;
+  state |= VIDEO_STATE_WARP_OFF;
+  state |= (tape.pause_before_death ? VIDEO_STATE_PBEND_ON :
+	    tape.fast_forward       ? VIDEO_STATE_FFWD_ON :
+	    VIDEO_STATE_PLAY_ON);
 
   DrawVideoDisplay(state, 0);
 }
@@ -1004,8 +998,7 @@ static void TapeSingleStep()
 
   tape.single_step = !tape.single_step;
 
-  DrawVideoDisplay((tape.single_step ? VIDEO_STATE_1STEP_ON :
-		    VIDEO_STATE_1STEP_OFF), 0);
+  DrawVideoDisplay(VIDEO_STATE_1STEP(tape.single_step), 0);
 }
 
 void TapeQuickSave()
