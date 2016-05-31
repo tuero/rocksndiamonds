@@ -1449,9 +1449,6 @@ void DrawMainMenu()
     return;
   }
 
-  /* needed if different viewport properties defined for menues */
-  ChangeViewportPropertiesIfNeeded();
-
   if (redraw_mask & REDRAW_ALL)
     fade_mask = REDRAW_ALL;
 
@@ -1459,6 +1456,9 @@ void DrawMainMenu()
     fade_mask = REDRAW_ALL;
 
   FadeOut(fade_mask);
+
+  /* needed if different viewport properties defined for menues */
+  ChangeViewportPropertiesIfNeeded();
 
   SetDrawtoField(DRAW_TO_BACKBUFFER);
 
@@ -4134,9 +4134,6 @@ void DrawHallOfFame(int highlight_position)
 {
   int fade_mask = REDRAW_FIELD;
 
-  /* needed if different viewport properties defined for scores */
-  ChangeViewportPropertiesIfNeeded();
-
   if (CheckIfGlobalBorderHasChanged())
     fade_mask = REDRAW_ALL;
 
@@ -4157,6 +4154,9 @@ void DrawHallOfFame(int highlight_position)
   FadeSetEnterScreen();
 
   FadeOut(fade_mask);
+
+  /* needed if different viewport properties defined for scores */
+  ChangeViewportPropertiesIfNeeded();
 
   PlayMenuSound();
   PlayMenuMusic();
