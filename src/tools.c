@@ -641,9 +641,10 @@ void BackToFront_WithFrameDelay(unsigned int frame_delay_value)
   SetVideoFrameDelay(frame_delay_value_old);
 }
 
+static int fade_type_skip = FADE_TYPE_NONE;
+
 static void FadeExt(int fade_mask, int fade_mode, int fade_type)
 {
-  static int fade_type_skip = FADE_TYPE_NONE;
   void (*draw_border_function)(void) = NULL;
   int x, y, width, height;
   int fade_delay, post_delay;
@@ -735,7 +736,8 @@ static void SetScreenStates_BeforeFadingIn()
   global.anim_status = global.anim_status_next;
 
   // store backbuffer with all animations that will be started after fading in
-  PrepareFadeBitmap(DRAW_TO_FADE_TARGET);
+  if (fade_type_skip != FADE_MODE_SKIP_FADE_IN)
+    PrepareFadeBitmap(DRAW_TO_FADE_TARGET);
 
   // set screen mode for animations back to fading
   global.anim_status = GAME_MODE_PSEUDO_FADING;
@@ -758,7 +760,8 @@ static void SetScreenStates_BeforeFadingOut()
   global.anim_status = GAME_MODE_PSEUDO_FADING;
 
   // store backbuffer with all animations that will be stopped for fading out
-  PrepareFadeBitmap(DRAW_TO_FADE_SOURCE);
+  if (fade_type_skip != FADE_MODE_SKIP_FADE_OUT)
+    PrepareFadeBitmap(DRAW_TO_FADE_SOURCE);
 }
 
 static void SetScreenStates_AfterFadingOut()
