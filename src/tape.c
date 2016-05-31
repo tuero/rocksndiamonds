@@ -851,8 +851,6 @@ byte *TapePlayAction()
       tape.fast_forward = FALSE;
       tape.pause_before_death = FALSE;
 
-      DrawVideoDisplay(VIDEO_STATE_PBEND_OFF, 0);
-
       TapeStopWarpForward();
       TapeTogglePause(TAPE_TOGGLE_MANUAL);
 
