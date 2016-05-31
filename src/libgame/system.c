@@ -201,23 +201,26 @@ void InitGfxDoor3Info(int ex, int ey, int exsize, int eysize)
 
 void InitGfxWindowInfo(int win_xsize, int win_ysize)
 {
+  if (win_xsize != gfx.win_xsize || win_ysize != gfx.win_ysize)
+  {
+    ReCreateBitmap(&gfx.background_bitmap, win_xsize, win_ysize, DEFAULT_DEPTH);
+
+#if defined(TARGET_SDL2)
+    ReCreateBitmap(&gfx.final_screen_bitmap, win_xsize, win_ysize, DEFAULT_DEPTH);
+#endif
+
+    ReCreateBitmap(&gfx.fade_bitmap_backup, win_xsize, win_ysize, DEFAULT_DEPTH);
+    ReCreateBitmap(&gfx.fade_bitmap_source, win_xsize, win_ysize, DEFAULT_DEPTH);
+    ReCreateBitmap(&gfx.fade_bitmap_target, win_xsize, win_ysize, DEFAULT_DEPTH);
+    ReCreateBitmap(&gfx.fade_bitmap_black,  win_xsize, win_ysize, DEFAULT_DEPTH);
+
+    ClearRectangle(gfx.fade_bitmap_black, 0, 0, win_xsize, win_ysize);
+  }
+
   gfx.win_xsize = win_xsize;
   gfx.win_ysize = win_ysize;
 
   gfx.background_bitmap_mask = REDRAW_NONE;
-
-  ReCreateBitmap(&gfx.background_bitmap, win_xsize, win_ysize, DEFAULT_DEPTH);
-
-#if defined(TARGET_SDL2)
-  ReCreateBitmap(&gfx.final_screen_bitmap, win_xsize, win_ysize, DEFAULT_DEPTH);
-#endif
-
-  ReCreateBitmap(&gfx.fade_bitmap_backup, win_xsize, win_ysize, DEFAULT_DEPTH);
-  ReCreateBitmap(&gfx.fade_bitmap_source, win_xsize, win_ysize, DEFAULT_DEPTH);
-  ReCreateBitmap(&gfx.fade_bitmap_target, win_xsize, win_ysize, DEFAULT_DEPTH);
-  ReCreateBitmap(&gfx.fade_bitmap_black,  win_xsize, win_ysize, DEFAULT_DEPTH);
-
-  ClearRectangle(gfx.fade_bitmap_black, 0, 0, win_xsize, win_ysize);
 }
 
 void InitGfxScrollbufferInfo(int scrollbuffer_width, int scrollbuffer_height)
