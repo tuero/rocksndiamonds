@@ -822,14 +822,16 @@ void TapeStopPlaying()
 
 byte *TapePlayAction()
 {
+  int update_delay = FRAMES_PER_SECOND / 2;
+  boolean update_video_display = (FrameCounter % update_delay == 0);
+  boolean update_draw_label_on = ((FrameCounter / update_delay) % 2 == 1);
   static byte action[MAX_PLAYERS];
   int i;
 
   if (!tape.playing || tape.pausing)
     return NULL;
 
-  // stop some seconds before player gets killed
-  if (tape.pause_before_death)
+  if (tape.pause_before_death)  // stop some seconds before end of tape
   {
     if (TapeTime > tape.length_seconds - TAPE_PAUSE_SECONDS_BEFORE_DEATH)
     {
@@ -845,55 +847,20 @@ byte *TapePlayAction()
     }
   }
 
-  if (!tape.deactivate_display)
+  if (update_video_display && !tape.deactivate_display)
   {
     if (tape.pause_before_death)
-    {
-      if (!(FrameCounter % 20))
-      {
-	if ((FrameCounter / 20) % 2)
-	  DrawVideoDisplay(VIDEO_STATE_PBEND_ON, VIDEO_DISPLAY_LABEL_ONLY);
-	else
-	  DrawVideoDisplay(VIDEO_STATE_PBEND_OFF, VIDEO_DISPLAY_LABEL_ONLY);
-      }
-
-      if (tape.warp_forward)
-      {
-	if (tape.deactivate_display)
-	  DrawVideoDisplay(VIDEO_STATE_WARP_ON, VIDEO_DISPLAY_SYMBOL_ONLY);
-	else
-	  DrawVideoDisplay(VIDEO_STATE_WARP2_ON, VIDEO_DISPLAY_SYMBOL_ONLY);
-      }
-    }
+      DrawVideoDisplay(update_draw_label_on ?
+		       VIDEO_STATE_PBEND_ON :
+		       VIDEO_STATE_PBEND_OFF, VIDEO_DISPLAY_LABEL_ONLY);
     else if (tape.fast_forward)
-    {
-      if ((FrameCounter / 20) % 2)
-	DrawVideoDisplay(VIDEO_STATE_FFWD_ON, VIDEO_DISPLAY_LABEL_ONLY);
-      else
-	DrawVideoDisplay(VIDEO_STATE_FFWD_OFF, VIDEO_DISPLAY_LABEL_ONLY);
+      DrawVideoDisplay(update_draw_label_on ?
+		       VIDEO_STATE_FFWD_ON :
+		       VIDEO_STATE_FFWD_OFF, VIDEO_DISPLAY_LABEL_ONLY);
 
-      if (tape.warp_forward)
-      {
-	if (tape.deactivate_display)
-	  DrawVideoDisplay(VIDEO_STATE_WARP_ON, VIDEO_DISPLAY_SYMBOL_ONLY);
-	else
-	  DrawVideoDisplay(VIDEO_STATE_WARP2_ON, VIDEO_DISPLAY_SYMBOL_ONLY);
-      }
-    }
+    if (tape.warp_forward)
+      DrawVideoDisplay(VIDEO_STATE_WARP2_ON, VIDEO_DISPLAY_SYMBOL_ONLY);
   }
-
-#if 0
-  /* !!! this makes things much slower !!! */
-  else if (tape.warp_forward)
-  {
-    if ((FrameCounter / 20) % 2)
-      DrawVideoDisplay(VIDEO_STATE_WARP_ON, VIDEO_DISPLAY_LABEL_ONLY);
-    else
-      DrawVideoDisplay(VIDEO_STATE_WARP_OFF, VIDEO_DISPLAY_LABEL_ONLY);
-
-    DrawVideoDisplay(VIDEO_STATE_WARP_ON, VIDEO_DISPLAY_SYMBOL_ONLY);
-  }
-#endif
 
   if (tape.counter >= tape.length)	/* end of tape reached */
   {
@@ -1498,12 +1465,17 @@ static void HandleTapeButtonsExt(int id)
 	else if (!tape.fast_forward)		/* PLAY -> FAST FORWARD PLAY */
 	{
 	  tape.fast_forward = TRUE;
+
 	  DrawVideoDisplay(VIDEO_STATE_FFWD_ON, 0);
 	}
 	else if (!tape.pause_before_death)	/* FFWD PLAY -> AUTO PAUSE */
 	{
 	  tape.pause_before_death = TRUE;
+
 	  DrawVideoDisplay(VIDEO_STATE_FFWD_OFF | VIDEO_STATE_PBEND_ON, 0);
+
+	  if (tape.warp_forward)
+	    DrawVideoDisplay(VIDEO_STATE_WARP2_ON, VIDEO_DISPLAY_SYMBOL_ONLY);
 	}
 	else					/* AUTO PAUSE -> NORMAL PLAY */
 	{
