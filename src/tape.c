@@ -52,6 +52,8 @@ static struct GadgetInfo *tape_gadget[NUM_TAPE_BUTTONS];
 					 VIDEO_STATE_REC_OFF	|	\
 					 VIDEO_STATE_PAUSE_OFF	|	\
 					 VIDEO_STATE_FFWD_OFF	|	\
+					 VIDEO_STATE_WARP_OFF	|	\
+					 VIDEO_STATE_WARP2_OFF	|	\
 					 VIDEO_STATE_PBEND_OFF	|	\
 					 VIDEO_STATE_1STEP_OFF)
 #define VIDEO_PRESS_OFF			(VIDEO_PRESS_PLAY_OFF	|	\
@@ -70,6 +72,8 @@ static struct GadgetInfo *tape_gadget[NUM_TAPE_BUTTONS];
 					 VIDEO_STATE_REC_ON	|	\
 					 VIDEO_STATE_PAUSE_ON	|	\
 					 VIDEO_STATE_FFWD_ON	|	\
+					 VIDEO_STATE_WARP_ON	|	\
+					 VIDEO_STATE_WARP2_ON	|	\
 					 VIDEO_STATE_PBEND_ON	|	\
 					 VIDEO_STATE_1STEP_ON)
 #define VIDEO_PRESS_ON			(VIDEO_PRESS_PLAY_ON	|	\
