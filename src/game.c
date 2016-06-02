@@ -3103,9 +3103,6 @@ void InitGame()
 
   SetGameStatus(GAME_MODE_PLAYING);
 
-  /* needed if different viewport properties defined for playing */
-  ChangeViewportPropertiesIfNeeded();
-
   if (level_editor_test_game)
     FadeSkipNextFadeIn();
   else
@@ -3119,6 +3116,9 @@ void InitGame()
   ExpireSoundLoops(TRUE);
 
   FadeOut(fade_mask);
+
+  /* needed if different viewport properties defined for playing */
+  ChangeViewportPropertiesIfNeeded();
 
   ClearField();
 

@@ -1600,11 +1600,11 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
 
     FadeOut(REDRAW_ALL);
 
-    /* only required to update logic for redrawing global border */
-    ClearField();
-
     /* title screens may have different window size */
     ChangeViewportPropertiesIfNeeded();
+
+    /* only required to update logic for redrawing global border */
+    ClearField();
 
     if (tci->is_image)
       DrawTitleScreenImage(tci->local_nr, tci->initial);
@@ -1851,8 +1851,6 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 
     SetGameStatus(GAME_MODE_LEVELNR);
 
-    ChangeViewportPropertiesIfNeeded();
-
     DrawChooseLevelNr();
   }
   else if (pos >= MAIN_CONTROL_NAME && pos <= MAIN_CONTROL_QUIT)
@@ -1893,8 +1891,6 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 	  if (setup.internal.choose_from_top_leveldir)
 	    gotoTopLevelDir();
 
-	  ChangeViewportPropertiesIfNeeded();
-
 	  DrawChooseLevelSet();
 	}
       }
@@ -1928,8 +1924,6 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 
 	info_mode = INFO_MODE_MAIN;
 
-	ChangeViewportPropertiesIfNeeded();
-
 	DrawInfoScreen();
       }
       else if (pos == MAIN_CONTROL_GAME)
@@ -1943,8 +1937,6 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 	SetGameStatus(GAME_MODE_SETUP);
 
 	setup_mode = SETUP_MODE_MAIN;
-
-	ChangeViewportPropertiesIfNeeded();
 
 	DrawSetupScreen();
       }
@@ -2164,7 +2156,10 @@ static void DrawInfoScreen_Main()
 
   FadeOut(fade_mask);
 
+  /* needed if different viewport properties defined for info screen */
   ChangeViewportPropertiesIfNeeded();
+
+  SetMainBackgroundImage(IMG_BACKGROUND_INFO);
 
   ClearField();
 
@@ -3501,8 +3496,6 @@ void HandleInfoScreen_LevelSet(int button)
 
 static void DrawInfoScreen()
 {
-  SetMainBackgroundImage(IMG_BACKGROUND_INFO);
-
   if (info_mode == INFO_MODE_TITLE)
     DrawInfoScreen_TitleScreen();
   else if (info_mode == INFO_MODE_ELEMENTS)
@@ -3659,6 +3652,14 @@ static void DrawChooseTree(TreeInfo **ti_ptr)
   CreateScreenGadgets();
 
   FadeOut(fade_mask);
+
+  /* needed if different viewport properties defined for choosing level (set) */
+  ChangeViewportPropertiesIfNeeded();
+
+  if (game_status == GAME_MODE_LEVELNR)
+    SetMainBackgroundImage(IMG_BACKGROUND_LEVELNR);
+  else if (game_status == GAME_MODE_LEVELS)
+    SetMainBackgroundImage(IMG_BACKGROUND_LEVELS);
 
   ClearField();
 
@@ -4054,8 +4055,6 @@ void DrawChooseLevelSet()
 {
   FadeSoundsAndMusic();
 
-  SetMainBackgroundImage(IMG_BACKGROUND_LEVELS);
-
   DrawChooseTree(&leveldir_current);
 
   PlayMenuSound();
@@ -4116,8 +4115,6 @@ void DrawChooseLevelNr()
   /* if that also fails, set current level number to first available level */
   if (level_number_current == NULL)
     level_number_current = level_number;
-
-  SetMainBackgroundImage(IMG_BACKGROUND_LEVELNR);
 
   DrawChooseTree(&level_number_current);
 
@@ -5772,6 +5769,11 @@ static void DrawSetupScreen_Generic()
 
   FadeOut(fade_mask);
 
+  /* needed if different viewport properties defined for setup screen */
+  ChangeViewportPropertiesIfNeeded();
+
+  SetMainBackgroundImage(IMG_BACKGROUND_SETUP);
+
   ClearField();
 
   OpenDoor(GetDoorState() | DOOR_NO_DELAY | DOOR_FORCE_REDRAW);
@@ -6475,8 +6477,6 @@ void CalibrateJoystick(int player_nr)
 void DrawSetupScreen()
 {
   DeactivateJoystick();
-
-  SetMainBackgroundImage(IMG_BACKGROUND_SETUP);
 
   if (setup_mode == SETUP_MODE_INPUT)
     DrawSetupScreen_Input();

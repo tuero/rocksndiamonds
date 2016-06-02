@@ -7625,13 +7625,13 @@ void DrawLevelEd()
 
   FadeSoundsAndMusic();
 
-  /* needed if different viewport properties defined for editor */
-  ChangeViewportPropertiesIfNeeded();
-
   if (CheckIfGlobalBorderHasChanged())
     fade_mask = REDRAW_ALL;
 
   FadeOut(fade_mask);
+
+  /* needed if different viewport properties defined for editor */
+  ChangeViewportPropertiesIfNeeded();
 
   ClearField();
 
