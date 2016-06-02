@@ -229,16 +229,16 @@ static void DrawVideoDisplay_Graphics(unsigned int state, unsigned int value)
       { IMG_GFX_TAPE_SYMBOL_FAST_FORWARD,	&tape.symbol.fast_forward },
     },
     {
-      { IMG_GFX_TAPE_LABEL_PAUSE_BEFORE_END,	&tape.label.pause_before_end  },
-      { IMG_GFX_TAPE_SYMBOL_PAUSE_BEFORE_END,	&tape.symbol.pause_before_end },
+      { IMG_GFX_TAPE_LABEL_WARP_FORWARD,	&tape.label.warp_forward  },
+      { IMG_GFX_TAPE_SYMBOL_WARP_FORWARD,	&tape.symbol.warp_forward },
     },
     {
       { IMG_GFX_TAPE_LABEL_WARP_FORWARD_BLIND,	&tape.label.warp_forward_blind},
       { IMG_GFX_TAPE_SYMBOL_WARP_FORWARD_BLIND, &tape.symbol.warp_forward_blind},
     },
     {
-      { IMG_GFX_TAPE_LABEL_WARP_FORWARD,	&tape.label.warp_forward  },
-      { IMG_GFX_TAPE_SYMBOL_WARP_FORWARD,	&tape.symbol.warp_forward },
+      { IMG_GFX_TAPE_LABEL_PAUSE_BEFORE_END,	&tape.label.pause_before_end  },
+      { IMG_GFX_TAPE_SYMBOL_PAUSE_BEFORE_END,	&tape.symbol.pause_before_end },
     },
     {
       { IMG_GFX_TAPE_LABEL_SINGLE_STEP,		&tape.label.single_step	 },
