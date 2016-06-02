@@ -675,22 +675,12 @@ void TapeTogglePause(boolean toggle_manual)
 
   DrawVideoDisplayPlayState();
 
-  if (tape.warp_forward)
+  if (tape.deactivate_display)
   {
     if (tape.pausing)
-    {
       TapeDeactivateDisplayOff(game_status == GAME_MODE_PLAYING);
-    }
-    else if (tape.deactivate_display)
-    {
-      TapeDeactivateDisplayOn();
-
-      DrawVideoDisplaySymbol(VIDEO_STATE_WARP_ON);
-    }
     else
-    {
-      DrawVideoDisplaySymbol(VIDEO_STATE_WARP2_ON);
-    }
+      TapeDeactivateDisplayOn();
   }
 
   if (tape.quick_resume)
