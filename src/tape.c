@@ -787,13 +787,19 @@ byte *TapePlayAction()
 
   if (update_video_display && !tape.deactivate_display)
   {
-    if (tape.pause_before_end)
-      DrawVideoDisplayLabel(VIDEO_STATE_PBEND(update_draw_label_on));
-    else if (tape.fast_forward)
-      DrawVideoDisplayLabel(VIDEO_STATE_FFWD(update_draw_label_on));
+    int state = 0;
 
     if (tape.warp_forward)
-      DrawVideoDisplaySymbol(VIDEO_STATE_WARP2_ON);
+      state |= VIDEO_STATE_WARP(update_draw_label_on);
+    else if (tape.fast_forward)
+      state |= VIDEO_STATE_FFWD(update_draw_label_on);
+
+    if (tape.pause_before_end)
+      state |= VIDEO_STATE_PBEND(update_draw_label_on);
+
+    // draw labels and symbols separately to prevent labels overlapping symbols
+    DrawVideoDisplayLabel(state);
+    DrawVideoDisplaySymbol(state);
   }
 
   for (i = 0; i < MAX_PLAYERS; i++)
@@ -876,20 +882,13 @@ static void TapeStartWarpForward()
     tape.deactivate_display = TRUE;
 
     TapeDeactivateDisplayOn();
+  }
 
-    DrawVideoDisplay(VIDEO_STATE_PBEND_ON, 0);
-    DrawVideoDisplaySymbol(VIDEO_STATE_WARP_ON);
-  }
-  else
-  {
-    DrawVideoDisplaySymbol(VIDEO_STATE_WARP2_ON);
-  }
+  DrawVideoDisplayPlayState();
 }
 
 static void TapeStopWarpForward()
 {
-  int state = VIDEO_STATE_PAUSE(tape.pausing);
-
   if (tape.deactivate_display)
     tape.pause_before_end = FALSE;
 
@@ -898,12 +897,7 @@ static void TapeStopWarpForward()
 
   TapeDeactivateDisplayOff(game_status == GAME_MODE_PLAYING);
 
-  state |= VIDEO_STATE_WARP_OFF;
-  state |= (tape.pause_before_end ? VIDEO_STATE_PBEND_ON :
-	    tape.fast_forward     ? VIDEO_STATE_FFWD_ON :
-	    VIDEO_STATE_PLAY_ON);
-
-  DrawVideoDisplay(state, 0);
+  DrawVideoDisplayPlayState();
 }
 
 static void TapeSingleStep()
