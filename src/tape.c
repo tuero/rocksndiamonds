@@ -356,6 +356,36 @@ void DrawVideoDisplaySymbol(unsigned int state)
   DrawVideoDisplay(state, VIDEO_DISPLAY_SYMBOL_ONLY);
 }
 
+void DrawVideoDisplayPlayState()
+{
+  int state = 0;
+
+  DrawVideoDisplay(VIDEO_STATE_OFF, 0);
+
+  state |= VIDEO_STATE_PLAY_ON;
+
+  if (tape.pausing)
+  {
+    state |= VIDEO_STATE_PAUSE_ON;
+  }
+  else
+  {
+    if (tape.deactivate_display)
+      state |= VIDEO_STATE_WARP2_ON;
+    else if (tape.warp_forward)
+      state |= VIDEO_STATE_WARP_ON;
+    else if (tape.fast_forward)
+      state |= VIDEO_STATE_FFWD_ON;
+
+    if (tape.pause_before_end)
+      state |= VIDEO_STATE_PBEND_ON;
+  }
+
+  // draw labels and symbols separately to prevent labels overlapping symbols
+  DrawVideoDisplayLabel(state);
+  DrawVideoDisplaySymbol(state);
+}
+
 void DrawCompleteVideoDisplay()
 {
   struct GraphicInfo *g_tape = &graphic_info[IMG_BACKGROUND_TAPE];
@@ -638,26 +668,12 @@ void TapeRecordAction(byte action_raw[MAX_PLAYERS])
 
 void TapeTogglePause(boolean toggle_manual)
 {
-  int state = 0;
-
   tape.pausing = !tape.pausing;
 
   if (tape.single_step && toggle_manual)
     tape.single_step = FALSE;
 
-  state |= VIDEO_STATE_PAUSE(tape.pausing);
-
-  if (tape.pause_before_end)
-    state |= VIDEO_STATE_PBEND(!tape.pausing);
-  else if (tape.fast_forward)
-    state |= VIDEO_STATE_FFWD(!tape.pausing);
-
-  if (tape.playing)
-    state |= VIDEO_STATE_PLAY_ON;
-  else
-    state |= VIDEO_STATE_1STEP(tape.single_step);
-
-  DrawVideoDisplay(state, 0);
+  DrawVideoDisplayPlayState();
 
   if (tape.warp_forward)
   {
