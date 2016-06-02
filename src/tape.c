@@ -560,7 +560,7 @@ static void TapeRewind()
 {
   tape.counter = 0;
   tape.delay_played = 0;
-  tape.pause_before_death = FALSE;
+  tape.pause_before_end = FALSE;
   tape.recording = FALSE;
   tape.playing = FALSE;
   tape.fast_forward = FALSE;
@@ -629,7 +629,7 @@ static void TapeAppendRecording()
   tape.playing = FALSE;
   tape.fast_forward = FALSE;
   tape.warp_forward = FALSE;
-  tape.pause_before_death = FALSE;
+  tape.pause_before_end = FALSE;
   tape.deactivate_display = FALSE;
 
   // start recording
@@ -736,7 +736,7 @@ void TapeTogglePause(boolean toggle_manual)
 
   state |= VIDEO_STATE_PAUSE(tape.pausing);
 
-  if (tape.pause_before_death)
+  if (tape.pause_before_end)
     state |= VIDEO_STATE_PBEND(!tape.pausing);
   else if (tape.fast_forward)
     state |= VIDEO_STATE_FFWD(!tape.pausing);
@@ -844,12 +844,12 @@ byte *TapePlayAction()
   if (!tape.playing || tape.pausing)
     return NULL;
 
-  if (tape.pause_before_death)  // stop some seconds before end of tape
+  if (tape.pause_before_end)  // stop some seconds before end of tape
   {
     if (TapeTime > tape.length_seconds - TAPE_PAUSE_SECONDS_BEFORE_DEATH)
     {
       tape.fast_forward = FALSE;
-      tape.pause_before_death = FALSE;
+      tape.pause_before_end = FALSE;
 
       TapeStopWarpForward();
       TapeTogglePause(TAPE_TOGGLE_MANUAL);
@@ -860,7 +860,7 @@ byte *TapePlayAction()
 
   if (update_video_display && !tape.deactivate_display)
   {
-    if (tape.pause_before_death)
+    if (tape.pause_before_end)
       DrawVideoDisplayLabel(VIDEO_STATE_PBEND(update_draw_label_on));
     else if (tape.fast_forward)
       DrawVideoDisplayLabel(VIDEO_STATE_FFWD(update_draw_label_on));
@@ -952,10 +952,10 @@ static void TapeStartWarpForward()
 {
   tape.warp_forward = TRUE;
 
-  if (!tape.fast_forward && !tape.pause_before_death)
+  if (!tape.fast_forward && !tape.pause_before_end)
   {
     tape.pausing = FALSE;
-    tape.pause_before_death = TRUE;
+    tape.pause_before_end = TRUE;
     tape.deactivate_display = TRUE;
 
     TapeDeactivateDisplayOn();
@@ -974,7 +974,7 @@ static void TapeStopWarpForward()
   int state = VIDEO_STATE_PAUSE(tape.pausing);
 
   if (tape.deactivate_display)
-    tape.pause_before_death = FALSE;
+    tape.pause_before_end = FALSE;
 
   tape.warp_forward = FALSE;
   tape.deactivate_display = FALSE;
@@ -982,8 +982,8 @@ static void TapeStopWarpForward()
   TapeDeactivateDisplayOff(game_status == GAME_MODE_PLAYING);
 
   state |= VIDEO_STATE_WARP_OFF;
-  state |= (tape.pause_before_death ? VIDEO_STATE_PBEND_ON :
-	    tape.fast_forward       ? VIDEO_STATE_FFWD_ON :
+  state |= (tape.pause_before_end ? VIDEO_STATE_PBEND_ON :
+	    tape.fast_forward     ? VIDEO_STATE_FFWD_ON :
 	    VIDEO_STATE_PLAY_ON);
 
   DrawVideoDisplay(state, 0);
@@ -1456,7 +1456,7 @@ static void HandleTapeButtonsExt(int id)
 	  // continue playing in normal mode
 	  tape.fast_forward = FALSE;
 	  tape.warp_forward = FALSE;
-	  tape.pause_before_death = FALSE;
+	  tape.pause_before_end = FALSE;
 	  tape.deactivate_display = FALSE;
 
 	  TapeTogglePause(TAPE_TOGGLE_MANUAL);
@@ -1472,9 +1472,9 @@ static void HandleTapeButtonsExt(int id)
 
 	  DrawVideoDisplay(VIDEO_STATE_FFWD_ON, 0);
 	}
-	else if (!tape.pause_before_death)	/* FFWD PLAY -> AUTO PAUSE */
+	else if (!tape.pause_before_end)	/* FFWD PLAY -> AUTO PAUSE */
 	{
-	  tape.pause_before_death = TRUE;
+	  tape.pause_before_end = TRUE;
 
 	  DrawVideoDisplay(VIDEO_STATE_FFWD_OFF | VIDEO_STATE_PBEND_ON, 0);
 
@@ -1487,7 +1487,7 @@ static void HandleTapeButtonsExt(int id)
 	    TapeStopWarpForward();
 
 	  tape.fast_forward = FALSE;
-	  tape.pause_before_death = FALSE;
+	  tape.pause_before_end = FALSE;
 
 	  DrawVideoDisplay(VIDEO_STATE_PBEND_OFF | VIDEO_STATE_PLAY_ON, 0);
 	}

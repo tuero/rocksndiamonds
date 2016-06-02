@@ -164,7 +164,7 @@ struct TapeInfo
   unsigned int length_frames;
   unsigned int length_seconds;
   unsigned int delay_played;
-  boolean pause_before_death;
+  boolean pause_before_end;
   boolean recording, playing, pausing;
   boolean fast_forward;
   boolean warp_forward;
