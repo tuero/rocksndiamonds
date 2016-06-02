@@ -1311,21 +1311,27 @@ static void HandleTapeButtonsExt(int id)
 	DrawVideoDisplayPlayState();
       }
       else if (tape.recording)
+      {
 	TapeSingleStep();
+      }
 
       break;
 
     case TAPE_CTRL_ID_STOP:
       TapeStop();
+
       break;
 
     case TAPE_CTRL_ID_PAUSE:
       TapeTogglePause(TAPE_TOGGLE_MANUAL);
+
       break;
 
     case TAPE_CTRL_ID_RECORD:
       if (TAPE_IS_STOPPED(tape))
+      {
 	TapeStartGameRecording();
+      }
       else if (tape.pausing)
       {
 	if (tape.playing)			/* PLAY -> PAUSE -> RECORD */
@@ -1333,6 +1339,7 @@ static void HandleTapeButtonsExt(int id)
 	else
 	  TapeTogglePause(TAPE_TOGGLE_MANUAL);
       }
+
       break;
 
     case TAPE_CTRL_ID_PLAY:
@@ -1357,8 +1364,9 @@ static void HandleTapeButtonsExt(int id)
 	  // continue playing in normal mode
 	  tape.fast_forward = FALSE;
 	  tape.warp_forward = FALSE;
-	  tape.pause_before_end = FALSE;
 	  tape.deactivate_display = FALSE;
+
+	  tape.pause_before_end = FALSE;
 
 	  TapeTogglePause(TAPE_TOGGLE_MANUAL);
 	}
@@ -1387,6 +1395,7 @@ static void HandleTapeButtonsExt(int id)
 
 	DrawVideoDisplayPlayState();
       }
+
       break;
 
     default:
