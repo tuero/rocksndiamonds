@@ -765,9 +765,6 @@ byte *TapePlayAction()
   {
     if (TapeTime > tape.length_seconds - TAPE_PAUSE_SECONDS_BEFORE_DEATH)
     {
-      tape.fast_forward = FALSE;
-      tape.pause_before_end = FALSE;
-
       TapeStopWarpForward();
       TapeTogglePause(TAPE_TOGGLE_MANUAL);
 
@@ -778,9 +775,14 @@ byte *TapePlayAction()
   if (tape.counter >= tape.length)	/* end of tape reached */
   {
     if (tape.warp_forward && !tape.auto_play)
+    {
+      TapeStopWarpForward();
       TapeTogglePause(TAPE_TOGGLE_MANUAL);
+    }
     else
+    {
       TapeStop();
+    }
 
     return NULL;
   }
@@ -873,27 +875,24 @@ unsigned int GetTapeLengthSeconds()
 
 static void TapeStartWarpForward()
 {
+  tape.fast_forward = TRUE;
   tape.warp_forward = TRUE;
+  tape.deactivate_display = TRUE;
 
-  if (!tape.fast_forward && !tape.pause_before_end)
-  {
-    tape.pausing = FALSE;
-    tape.pause_before_end = TRUE;
-    tape.deactivate_display = TRUE;
+  tape.pausing = FALSE;
 
-    TapeDeactivateDisplayOn();
-  }
+  TapeDeactivateDisplayOn();
 
   DrawVideoDisplayPlayState();
 }
 
 static void TapeStopWarpForward()
 {
-  if (tape.deactivate_display)
-    tape.pause_before_end = FALSE;
-
+  tape.fast_forward = FALSE;
   tape.warp_forward = FALSE;
   tape.deactivate_display = FALSE;
+
+  tape.pause_before_end = FALSE;
 
   TapeDeactivateDisplayOff(game_status == GAME_MODE_PLAYING);
 
