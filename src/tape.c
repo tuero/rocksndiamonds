@@ -1306,18 +1306,9 @@ static void HandleTapeButtonsExt(int id)
     case TAPE_CTRL_ID_EXTRA:
       if (tape.playing)
       {
-	if (!tape.warp_forward)			/* PLAY -> WARP FORWARD PLAY */
-	{
-	  TapeStartWarpForward();
-	}
-	else if (tape.pausing)			/* PAUSE -> WARP FORWARD PLAY */
-	{
-	  TapeTogglePause(TAPE_TOGGLE_MANUAL);
-	}
-	else					/* WARP FORWARD PLAY -> PLAY */
-	{
-	  TapeStopWarpForward();
-	}
+	tape.pause_before_end = !tape.pause_before_end;
+
+	DrawVideoDisplayPlayState();
       }
       else if (tape.recording)
 	TapeSingleStep();
@@ -1371,36 +1362,30 @@ static void HandleTapeButtonsExt(int id)
 
 	  TapeTogglePause(TAPE_TOGGLE_MANUAL);
 	}
-	else if (tape.warp_forward &&
-		 !tape.fast_forward)		/* WARP FORWARD PLAY -> PLAY */
-	{
-	  TapeStopWarpForward();
-	}
-	else if (!tape.fast_forward)		/* PLAY -> FAST FORWARD PLAY */
+	else if (!tape.fast_forward)		/* PLAY -> FFWD */
 	{
 	  tape.fast_forward = TRUE;
-
-	  DrawVideoDisplay(VIDEO_STATE_FFWD_ON, 0);
 	}
-	else if (!tape.pause_before_end)	/* FFWD PLAY -> AUTO PAUSE */
+	else if (!tape.warp_forward)		/* FFWD -> WARP */
 	{
-	  tape.pause_before_end = TRUE;
-
-	  DrawVideoDisplay(VIDEO_STATE_FFWD_OFF | VIDEO_STATE_PBEND_ON, 0);
-
-	  if (tape.warp_forward)
-	    DrawVideoDisplaySymbol(VIDEO_STATE_WARP2_ON);
+	  tape.warp_forward = TRUE;
 	}
-	else					/* AUTO PAUSE -> NORMAL PLAY */
+	else if (!tape.deactivate_display)	/* WARP -> WARP BLIND */
 	{
-	  if (tape.warp_forward)
-	    TapeStopWarpForward();
+	  tape.deactivate_display = TRUE;
 
+	  TapeDeactivateDisplayOn();
+	}
+	else					/* WARP BLIND -> PLAY */
+	{
 	  tape.fast_forward = FALSE;
-	  tape.pause_before_end = FALSE;
+	  tape.warp_forward = FALSE;
+	  tape.deactivate_display = FALSE;
 
-	  DrawVideoDisplay(VIDEO_STATE_PBEND_OFF | VIDEO_STATE_PLAY_ON, 0);
+	  TapeDeactivateDisplayOff(game_status == GAME_MODE_PLAYING);
 	}
+
+	DrawVideoDisplayPlayState();
       }
       break;
 
