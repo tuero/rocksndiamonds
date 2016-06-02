@@ -691,20 +691,20 @@ void TapeTogglePause(boolean toggle_manual)
     {
       DrawVideoDisplaySymbol(VIDEO_STATE_WARP2_ON);
     }
+  }
 
-    if (tape.quick_resume)
-    {
-      tape.quick_resume = FALSE;
+  if (tape.quick_resume)
+  {
+    tape.quick_resume = FALSE;
 
-      TapeStopWarpForward();
-      TapeAppendRecording();
+    TapeStopWarpForward();
+    TapeAppendRecording();
 
-      if (!CheckEngineSnapshotSingle())
-	SaveEngineSnapshotSingle();
+    if (!CheckEngineSnapshotSingle())
+      SaveEngineSnapshotSingle();
 
-      // restart step/move snapshots after quick loading tape
-      SaveEngineSnapshotToListInitial();
-    }
+    // restart step/move snapshots after quick loading tape
+    SaveEngineSnapshotToListInitial();
   }
 
   if (setup.show_snapshot_buttons &&
