@@ -785,6 +785,16 @@ byte *TapePlayAction()
     }
   }
 
+  if (tape.counter >= tape.length)	/* end of tape reached */
+  {
+    if (tape.warp_forward && !tape.auto_play)
+      TapeTogglePause(TAPE_TOGGLE_MANUAL);
+    else
+      TapeStop();
+
+    return NULL;
+  }
+
   if (update_video_display && !tape.deactivate_display)
   {
     if (tape.pause_before_end)
@@ -794,16 +804,6 @@ byte *TapePlayAction()
 
     if (tape.warp_forward)
       DrawVideoDisplaySymbol(VIDEO_STATE_WARP2_ON);
-  }
-
-  if (tape.counter >= tape.length)	/* end of tape reached */
-  {
-    if (tape.warp_forward && !tape.auto_play)
-      TapeTogglePause(TAPE_TOGGLE_MANUAL);
-    else
-      TapeStop();
-
-    return NULL;
   }
 
   for (i = 0; i < MAX_PLAYERS; i++)
