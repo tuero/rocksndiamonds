@@ -3656,11 +3656,10 @@ static void DrawChooseTree(TreeInfo **ti_ptr)
   /* needed if different viewport properties defined for choosing level (set) */
   ChangeViewportPropertiesIfNeeded();
 
-  if (game_status == GAME_MODE_LEVELNR)
-    SetMainBackgroundImage(IMG_BACKGROUND_LEVELNR);
-  else if (game_status == GAME_MODE_LEVELS)
-    SetMainBackgroundImage(IMG_BACKGROUND_LEVELS);
-
+  SetMainBackgroundImage(game_status == GAME_MODE_LEVELNR ?
+			 IMG_BACKGROUND_LEVELNR :
+			 game_status == GAME_MODE_LEVELS ?
+			 IMG_BACKGROUND_LEVELS : IMG_BACKGROUND);
   ClearField();
 
   OpenDoor(GetDoorState() | DOOR_NO_DELAY | DOOR_FORCE_REDRAW);
