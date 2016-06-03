@@ -59,6 +59,20 @@ int getFontHeight(int font_nr)
   return gfx.font_bitmap_info[font_bitmap_id].height;
 }
 
+int getFontDrawOffsetX(int font_nr)
+{
+  int font_bitmap_id = gfx.select_font_function(font_nr);
+
+  return gfx.font_bitmap_info[font_bitmap_id].draw_xoffset;
+}
+
+int getFontDrawOffsetY(int font_nr)
+{
+  int font_bitmap_id = gfx.select_font_function(font_nr);
+
+  return gfx.font_bitmap_info[font_bitmap_id].draw_yoffset;
+}
+
 int getTextWidth(char *text, int font_nr)
 {
   return (text != NULL ? strlen(text) * getFontWidth(font_nr) : 0);

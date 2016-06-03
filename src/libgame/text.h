@@ -83,6 +83,8 @@ struct FontBitmapInfo *getFontBitmapInfo(int);
 
 int getFontWidth(int);
 int getFontHeight(int);
+int getFontDrawOffsetX(int);
+int getFontDrawOffsetY(int);
 int getTextWidth(char *, int);
 
 void getFontCharSource(int, char, Bitmap **, int *, int *);

@@ -4186,9 +4186,10 @@ static void drawHallOfFameList(int first_entry, int highlight_position)
     int font_nr2 = (active ? FONT_TEXT_2_ACTIVE : FONT_TEXT_2);
     int font_nr3 = (active ? FONT_TEXT_3_ACTIVE : FONT_TEXT_3);
     int font_nr4 = (active ? FONT_TEXT_4_ACTIVE : FONT_TEXT_4);
+    int dxoff = getFontDrawOffsetX(font_nr1);
     int dx1 = 3 * getFontWidth(font_nr1);
     int dx2 = dx1 + getFontWidth(font_nr1);
-    int dx3 = SXSIZE - 2 * (mSX - SX) - 5 * getFontWidth(font_nr4);
+    int dx3 = SXSIZE - 2 * (mSX - SX + dxoff) - 5 * getFontWidth(font_nr4);
     int num_dots = (dx3 - dx2) / getFontWidth(font_nr3);
     int sy = mSY + 64 + i * 32;
 
