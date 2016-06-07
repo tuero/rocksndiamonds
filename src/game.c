@@ -14998,17 +14998,6 @@ void FreeGameButtons()
     FreeGadget(game_gadget[i]);
 }
 
-static void MapGameButtonsAtSamePosition(int id)
-{
-  int i;
-
-  for (i = 0; i < NUM_GAME_BUTTONS; i++)
-    if (i != id &&
-	gamebutton_info[i].pos->x == gamebutton_info[id].pos->x &&
-	gamebutton_info[i].pos->y == gamebutton_info[id].pos->y)
-      MapGadget(game_gadget[i]);
-}
-
 static void UnmapGameButtonsAtSamePosition(int id)
 {
   int i;
@@ -15018,6 +15007,35 @@ static void UnmapGameButtonsAtSamePosition(int id)
 	gamebutton_info[i].pos->x == gamebutton_info[id].pos->x &&
 	gamebutton_info[i].pos->y == gamebutton_info[id].pos->y)
       UnmapGadget(game_gadget[i]);
+}
+
+static void UnmapGameButtonsAtSamePosition_All()
+{
+  if (setup.show_snapshot_buttons)
+  {
+    UnmapGameButtonsAtSamePosition(GAME_CTRL_ID_SAVE);
+    UnmapGameButtonsAtSamePosition(GAME_CTRL_ID_PAUSE2);
+    UnmapGameButtonsAtSamePosition(GAME_CTRL_ID_LOAD);
+  }
+  else
+  {
+    UnmapGameButtonsAtSamePosition(GAME_CTRL_ID_STOP);
+    UnmapGameButtonsAtSamePosition(GAME_CTRL_ID_PAUSE);
+    UnmapGameButtonsAtSamePosition(GAME_CTRL_ID_PLAY);
+  }
+}
+
+static void MapGameButtonsAtSamePosition(int id)
+{
+  int i;
+
+  for (i = 0; i < NUM_GAME_BUTTONS; i++)
+    if (i != id &&
+	gamebutton_info[i].pos->x == gamebutton_info[id].pos->x &&
+	gamebutton_info[i].pos->y == gamebutton_info[id].pos->y)
+      MapGadget(game_gadget[i]);
+
+  UnmapGameButtonsAtSamePosition_All();
 }
 
 void MapUndoRedoButtons()
@@ -15047,18 +15065,7 @@ void MapGameButtons()
 	i != GAME_CTRL_ID_REDO)
       MapGadget(game_gadget[i]);
 
-  if (setup.show_snapshot_buttons)
-  {
-    UnmapGameButtonsAtSamePosition(GAME_CTRL_ID_SAVE);
-    UnmapGameButtonsAtSamePosition(GAME_CTRL_ID_PAUSE2);
-    UnmapGameButtonsAtSamePosition(GAME_CTRL_ID_LOAD);
-  }
-  else
-  {
-    UnmapGameButtonsAtSamePosition(GAME_CTRL_ID_STOP);
-    UnmapGameButtonsAtSamePosition(GAME_CTRL_ID_PAUSE);
-    UnmapGameButtonsAtSamePosition(GAME_CTRL_ID_PLAY);
-  }
+  UnmapGameButtonsAtSamePosition_All();
 
   RedrawGameButtons();
 }
