@@ -356,20 +356,26 @@ void DrawVideoDisplaySymbol(unsigned int state)
   DrawVideoDisplay(state, VIDEO_DISPLAY_SYMBOL_ONLY);
 }
 
-void DrawVideoDisplayPlayState()
+void DrawVideoDisplayCurrentState()
 {
   int state = 0;
 
   DrawVideoDisplay(VIDEO_STATE_OFF, 0);
 
-  state |= VIDEO_STATE_PLAY_ON;
-
   if (tape.pausing)
-  {
     state |= VIDEO_STATE_PAUSE_ON;
-  }
-  else
+
+  if (tape.recording)
   {
+    state |= VIDEO_STATE_REC_ON;
+
+    if (tape.single_step)
+      state |= VIDEO_STATE_1STEP_ON;
+  }
+  else if (tape.playing)
+  {
+    state |= VIDEO_STATE_PLAY_ON;
+
     if (tape.deactivate_display)
       state |= VIDEO_STATE_WARP2_ON;
     else if (tape.warp_forward)
@@ -673,7 +679,7 @@ void TapeTogglePause(boolean toggle_manual)
   if (tape.single_step && toggle_manual)
     tape.single_step = FALSE;
 
-  DrawVideoDisplayPlayState();
+  DrawVideoDisplayCurrentState();
 
   if (tape.deactivate_display)
   {
@@ -883,7 +889,7 @@ static void TapeStartWarpForward()
 
   TapeDeactivateDisplayOn();
 
-  DrawVideoDisplayPlayState();
+  DrawVideoDisplayCurrentState();
 }
 
 static void TapeStopWarpForward()
@@ -896,7 +902,7 @@ static void TapeStopWarpForward()
 
   TapeDeactivateDisplayOff(game_status == GAME_MODE_PLAYING);
 
-  DrawVideoDisplayPlayState();
+  DrawVideoDisplayCurrentState();
 }
 
 static void TapeSingleStep()
@@ -1308,7 +1314,7 @@ static void HandleTapeButtonsExt(int id)
       {
 	tape.pause_before_end = !tape.pause_before_end;
 
-	DrawVideoDisplayPlayState();
+	DrawVideoDisplayCurrentState();
       }
       else if (tape.recording)
       {
@@ -1393,7 +1399,7 @@ static void HandleTapeButtonsExt(int id)
 	  TapeDeactivateDisplayOff(game_status == GAME_MODE_PLAYING);
 	}
 
-	DrawVideoDisplayPlayState();
+	DrawVideoDisplayCurrentState();
       }
 
       break;
