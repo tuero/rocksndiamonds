@@ -2068,20 +2068,33 @@ void deleteNodeFromList(ListNode **node_first, char *key,
 
   if (strEqual((*node_first)->key, key))
   {
-    checked_free((*node_first)->key);
+    // after first recursion, (*node_first)->prev->next == *node_first,
+    // so *node_first would be overwritten with (*node_first)->next
+    // => use a copy of *node_first (and later of (*node_first)->next)
+    ListNode *node = *node_first;
+    ListNode *node_next = node->next;
+
+    checked_free(node->key);
 
     if (destructor_function)
-      destructor_function((*node_first)->content);
+      destructor_function(node->content);
 
-    if ((*node_first)->next)
-      (*node_first)->next->prev = (*node_first)->prev;
+    if (node->prev)
+      node->prev->next = node->next;
 
-    checked_free(*node_first);
+    if (node->next)
+      node->next->prev = node->prev;
 
-    *node_first = (*node_first)->next;
+    checked_free(node);
+
+    // after removing node, set list pointer to next valid list node
+    // (this is important if the first node of the list was deleted)
+    *node_first = node_next;
   }
   else
+  {
     deleteNodeFromList(&(*node_first)->next, key, destructor_function);
+  }
 }
 
 ListNode *getNodeFromKey(ListNode *node_first, char *key)
