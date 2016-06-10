@@ -12,20 +12,24 @@
 #include "snapshot.h"
 
 
-static ListNode *snapshot_single = NULL;
-static ListNode *snapshot_list = NULL;
-static ListNode *snapshot_current = NULL;
-
-static int num_snapshots_in_list = 0;
-
 #ifdef DEBUG
 #define DEBUG_SNAPSHOTS			0
 #endif
 
 #if DEBUG_SNAPSHOTS
+#define MAX_SNAPSHOT_BYTES		(50 * 1024 * 1024)
+#else
+#define MAX_SNAPSHOT_BYTES		(500 * 1024 * 1024)
+#endif
+
+static ListNode *snapshot_single = NULL;
+static ListNode *snapshot_list = NULL;
+static ListNode *snapshot_current = NULL;
+
+static int num_snapshots = 0;
 static int num_snapshot_buffers = 0;
 static int num_snapshot_bytes = 0;
-#endif
+static int next_snapshot_key = 0;
 
 
 // -----------------------------------------------------------------------------
@@ -45,10 +49,8 @@ void SaveSnapshotBuffer(ListNode **snapshot_buffers, void *buffer, int size)
 
   addNodeToList(snapshot_buffers, NULL, bi);
 
-#if DEBUG_SNAPSHOTS
   num_snapshot_buffers++;
   num_snapshot_bytes += size;
-#endif
 }
 
 static void LoadSnapshotBuffer(struct SnapshotNodeInfo *bi)
@@ -70,10 +72,8 @@ static void FreeSnapshotBuffer(void *bi_raw)
 {
   struct SnapshotNodeInfo *bi = (struct SnapshotNodeInfo *)bi_raw;
 
-#if DEBUG_SNAPSHOTS
   num_snapshot_buffers--;
   num_snapshot_bytes -= bi->size;
-#endif
 
   checked_free(bi->buffer_copy);
   checked_free(bi);
@@ -112,7 +112,8 @@ static void FreeSnapshotList_UpToNode(ListNode *node)
 
     deleteNodeFromList(&snapshot_list, snapshot_list->key, FreeSnapshot);
 
-    num_snapshots_in_list--;
+    num_snapshots--;
+    next_snapshot_key = (snapshot_list ? atoi(snapshot_list->key) + 1 : 0);
   }
 }
 
@@ -124,7 +125,56 @@ void FreeSnapshotList()
 
   FreeSnapshotList_UpToNode(NULL);
 
+  num_snapshots = 0;
+  num_snapshot_buffers = 0;
+  num_snapshot_bytes = 0;
+  next_snapshot_key = 0;
+
   snapshot_current = NULL;
+}
+
+void ReduceSnapshotList()
+{
+#if DEBUG_SNAPSHOTS
+  printf("::: (Reducing number of snapshots from %d ",
+	 num_snapshots);
+#endif
+
+  // maximum number of snapshots exceeded -- thin out list of snapshots
+  ListNode *node = snapshot_list;
+  int num_snapshots_to_skip = num_snapshots / 10;
+
+  // do not remove the newest snapshots from the list
+  while (node && num_snapshots_to_skip--)
+    node = node->next;
+
+  // remove every second snapshot from the remaining list
+  while (node)
+  {
+    // never delete the first list node (snapshot at game start)
+    if (node->next == NULL)
+      break;
+
+    // in alternation, delete one node from the list ...
+    deleteNodeFromList(&node, node->key, FreeSnapshot);
+    num_snapshots--;
+
+    // ... and keep one node (which always exists here)
+    node = node->next;
+  }
+
+#if DEBUG_SNAPSHOTS
+  printf("to %d.)\n", num_snapshots);
+
+#if 0
+  node = snapshot_list;
+  while (node)
+  {
+    printf("::: key: %s\n", node->key);
+    node = node->next;
+  }
+#endif
+#endif
 }
 
 void SaveSnapshotSingle(ListNode *snapshot_buffers)
@@ -140,17 +190,22 @@ void SaveSnapshotToList(ListNode *snapshot_buffers)
   if (snapshot_current != snapshot_list)
     FreeSnapshotList_UpToNode(snapshot_current);
 
-  addNodeToList(&snapshot_list, i_to_a(num_snapshots_in_list),
+#if DEBUG_SNAPSHOTS
+  printf("::: SaveSnapshotToList() [%d] [%d snapshots, %d buffers, %d bytes]\n",
+	 next_snapshot_key, num_snapshots,
+	 num_snapshot_buffers, num_snapshot_bytes);
+#endif
+
+  addNodeToList(&snapshot_list, i_to_a(next_snapshot_key),
 		snapshot_buffers);
 
   snapshot_current = snapshot_list;
 
-  num_snapshots_in_list++;
+  num_snapshots++;
+  next_snapshot_key++;
 
-#if DEBUG_SNAPSHOTS
-  printf("::: SaveSnapshotToList() [%s, %d, %d]\n",
-	 snapshot_current->key, num_snapshot_buffers, num_snapshot_bytes);
-#endif
+  if (num_snapshot_bytes > MAX_SNAPSHOT_BYTES)
+    ReduceSnapshotList();
 }
 
 boolean LoadSnapshotSingle()
