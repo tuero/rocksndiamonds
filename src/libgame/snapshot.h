@@ -16,8 +16,10 @@
 #include "misc.h"
 
 
+#define SNAPSHOT_MEMORY_DEFAULT		(512 * 1024 * 1024)
+
 /* needed for comfortably saving engine snapshot buffers */
-#define ARGS_ADDRESS_AND_SIZEOF(x)		(&(x)), (sizeof(x))
+#define ARGS_ADDRESS_AND_SIZEOF(x)	(&(x)), (sizeof(x))
 
 struct SnapshotNodeInfo
 {

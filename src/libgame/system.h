@@ -1022,6 +1022,7 @@ struct SetupInfo
   boolean scroll_delay;
   boolean scroll_delay_value;
   char *engine_snapshot_mode;
+  int engine_snapshot_memory;
   boolean fade_screens;
   boolean autorecord;
   boolean show_titlescreen;

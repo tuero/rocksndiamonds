@@ -16,12 +16,6 @@
 #define DEBUG_SNAPSHOTS			0
 #endif
 
-#if DEBUG_SNAPSHOTS
-#define MAX_SNAPSHOT_BYTES		(50 * 1024 * 1024)
-#else
-#define MAX_SNAPSHOT_BYTES		(500 * 1024 * 1024)
-#endif
-
 static ListNode *snapshot_single = NULL;
 static ListNode *snapshot_list = NULL;
 static ListNode *snapshot_current = NULL;
@@ -204,7 +198,7 @@ void SaveSnapshotToList(ListNode *snapshot_buffers)
   num_snapshots++;
   next_snapshot_key++;
 
-  if (num_snapshot_bytes > MAX_SNAPSHOT_BYTES)
+  if (num_snapshot_bytes > setup.engine_snapshot_memory)
     ReduceSnapshotList();
 }
 
