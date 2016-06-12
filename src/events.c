@@ -1357,6 +1357,7 @@ void HandleKey(Key key, int key_status)
 
   if ((key == KSYM_minus ||
        key == KSYM_plus ||
+       key == KSYM_equal ||	// ("Shift-=" is "+" on US keyboards)
        key == KSYM_0) &&
       ((GetKeyModState() & KMOD_Control) ||
        (GetKeyModState() & KMOD_Alt) ||
