@@ -11991,11 +11991,11 @@ void HandleLevelEditorKeyInput(Key key)
       ClickOnGadget(level_editor_gadget[GADGET_ID_SINGLE_ITEMS], button);
     else if (letter == 'U')
       ClickOnGadget(level_editor_gadget[GADGET_ID_UNDO], 3);
-    else if (key == KSYM_KP_Subtract || letter == '-')
+    else if (letter == '-' || key == KSYM_KP_Subtract)
       ClickOnGadget(level_editor_gadget[GADGET_ID_ZOOM], 3);
-    else if (key == KSYM_KP_0 || letter == '0')
+    else if (letter == '0' || key == KSYM_KP_0)
       ClickOnGadget(level_editor_gadget[GADGET_ID_ZOOM], 2);
-    else if (key == KSYM_KP_Add)
+    else if (letter == '+' || key == KSYM_KP_Add)
       ClickOnGadget(level_editor_gadget[GADGET_ID_ZOOM], 1);
     else if (key == KSYM_Return ||
 	     key == KSYM_space ||
