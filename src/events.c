@@ -1522,14 +1522,6 @@ void HandleKey(Key key, int key_status)
 	    HandleHallOfFame(0, 0, 0, +1 * SCROLL_PAGE, MB_MENU_MARK);
 	  break;
 
-#ifdef DEBUG
-	case KSYM_b:
-	  setup.sp_show_border_elements = !setup.sp_show_border_elements;
-	  printf("Supaplex border elements %s\n",
-		 setup.sp_show_border_elements ? "enabled" : "disabled");
-	  break;
-#endif
-
 	default:
 	  break;
       }
