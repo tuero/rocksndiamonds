@@ -118,6 +118,7 @@ int			ScrollStepSize;
 int			ScreenMovDir = MV_NONE, ScreenMovPos = 0;
 int			ScreenGfxPos = 0;
 int			BorderElement = EL_STEELWALL;
+int			MenuFrameDelay = MENU_FRAME_DELAY;
 int			GameFrameDelay = GAME_FRAME_DELAY;
 int			FfwdFrameDelay = FFWD_FRAME_DELAY;
 int			BX1, BY1;

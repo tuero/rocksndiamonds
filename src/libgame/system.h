@@ -130,6 +130,34 @@
 #define DEFAULT_KEY_SNAP_UP		KSYM_UNDEFINED
 #define DEFAULT_KEY_SNAP_DOWN		KSYM_UNDEFINED
 
+/* default debug setup keys and values */
+#define DEFAULT_FRAME_DELAY_0		20		// 100 % speed
+#define DEFAULT_FRAME_DELAY_1		500		// 4 % speed
+#define DEFAULT_FRAME_DELAY_2		250		// 8 % speed
+#define DEFAULT_FRAME_DELAY_3		125		// 16 % speed
+#define DEFAULT_FRAME_DELAY_4		60		// 33 % speed
+#define DEFAULT_FRAME_DELAY_5		40		// 50 % speed
+#define DEFAULT_FRAME_DELAY_6		30		// 66 % speed
+#define DEFAULT_FRAME_DELAY_7		10		// 200 % speed
+#define DEFAULT_FRAME_DELAY_8		5		// 400 % speed
+#define DEFAULT_FRAME_DELAY_9		0		// maximum speed
+
+#define DEFAULT_KEY_FRAME_DELAY_0	KSYM_0
+#define DEFAULT_KEY_FRAME_DELAY_1	KSYM_1
+#define DEFAULT_KEY_FRAME_DELAY_2	KSYM_2
+#define DEFAULT_KEY_FRAME_DELAY_3	KSYM_3
+#define DEFAULT_KEY_FRAME_DELAY_4	KSYM_4
+#define DEFAULT_KEY_FRAME_DELAY_5	KSYM_5
+#define DEFAULT_KEY_FRAME_DELAY_6	KSYM_6
+#define DEFAULT_KEY_FRAME_DELAY_7	KSYM_7
+#define DEFAULT_KEY_FRAME_DELAY_8	KSYM_8
+#define DEFAULT_KEY_FRAME_DELAY_9	KSYM_9
+
+#define NUM_DEBUG_FRAME_DELAY_KEYS	10
+
+#define DEFAULT_FRAME_DELAY_USE_MOD_KEY	FALSE
+#define DEFAULT_FRAME_DELAY_GAME_ONLY	TRUE
+
 /* values for key_status */
 #define KEY_NOT_PRESSED			FALSE
 #define KEY_RELEASED			FALSE
@@ -371,6 +399,7 @@
 
 /* fundamental game speed values */
 #define ONE_SECOND_DELAY	1000	/* delay value for one second */
+#define MENU_FRAME_DELAY	20	/* frame delay in milliseconds */
 #define GAME_FRAME_DELAY	20	/* frame delay in milliseconds */
 #define FFWD_FRAME_DELAY	10	/* 200% speed for fast forward */
 #define FRAMES_PER_SECOND	(ONE_SECOND_DELAY / GAME_FRAME_DELAY)
@@ -1010,6 +1039,14 @@ struct SetupInternalInfo
   boolean choose_from_top_leveldir;
 };
 
+struct SetupDebugInfo
+{
+  int frame_delay[10];
+  Key frame_delay_key[10];
+  boolean frame_delay_use_mod_key;
+  boolean frame_delay_game_only;
+};
+
 struct SetupInfo
 {
   char *player_name;
@@ -1063,6 +1100,8 @@ struct SetupInfo
   struct SetupTouchInfo touch;
   struct SetupSystemInfo system;
   struct SetupInternalInfo internal;
+  struct SetupDebugInfo debug;
+
   struct OptionInfo options;
 };
 

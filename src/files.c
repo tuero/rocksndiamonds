@@ -8050,6 +8050,32 @@ void SaveScore(int nr)
 
 #define NUM_INTERNAL_SETUP_TOKENS		17
 
+/* debug setup */
+#define SETUP_TOKEN_DEBUG_FRAME_DELAY_0		0
+#define SETUP_TOKEN_DEBUG_FRAME_DELAY_1		1
+#define SETUP_TOKEN_DEBUG_FRAME_DELAY_2		2
+#define SETUP_TOKEN_DEBUG_FRAME_DELAY_3		3
+#define SETUP_TOKEN_DEBUG_FRAME_DELAY_4		4
+#define SETUP_TOKEN_DEBUG_FRAME_DELAY_5		5
+#define SETUP_TOKEN_DEBUG_FRAME_DELAY_6		6
+#define SETUP_TOKEN_DEBUG_FRAME_DELAY_7		7
+#define SETUP_TOKEN_DEBUG_FRAME_DELAY_8		8
+#define SETUP_TOKEN_DEBUG_FRAME_DELAY_9		9
+#define SETUP_TOKEN_DEBUG_FRAME_DELAY_KEY_0	10
+#define SETUP_TOKEN_DEBUG_FRAME_DELAY_KEY_1	11
+#define SETUP_TOKEN_DEBUG_FRAME_DELAY_KEY_2	12
+#define SETUP_TOKEN_DEBUG_FRAME_DELAY_KEY_3	13
+#define SETUP_TOKEN_DEBUG_FRAME_DELAY_KEY_4	14
+#define SETUP_TOKEN_DEBUG_FRAME_DELAY_KEY_5	15
+#define SETUP_TOKEN_DEBUG_FRAME_DELAY_KEY_6	16
+#define SETUP_TOKEN_DEBUG_FRAME_DELAY_KEY_7	17
+#define SETUP_TOKEN_DEBUG_FRAME_DELAY_KEY_8	18
+#define SETUP_TOKEN_DEBUG_FRAME_DELAY_KEY_9	19
+#define SETUP_TOKEN_DEBUG_FRAME_DELAY_USE_MOD_KEY 20
+#define SETUP_TOKEN_DEBUG_FRAME_DELAY_GAME_ONLY	21
+
+#define NUM_DEBUG_SETUP_TOKENS			22
+
 /* options setup */
 #define SETUP_TOKEN_OPTIONS_VERBOSE		0
 
@@ -8063,6 +8089,7 @@ static struct SetupShortcutInfo ssi;
 static struct SetupInputInfo sii;
 static struct SetupSystemInfo syi;
 static struct SetupInternalInfo sxi;
+static struct SetupDebugInfo sdi;
 static struct OptionInfo soi;
 
 static struct TokenInfo global_setup_tokens[] =
@@ -8223,6 +8250,32 @@ static struct TokenInfo internal_setup_tokens[] =
   { TYPE_BOOLEAN,&sxi.choose_from_top_leveldir,	"choose_from_top_leveldir" },
   { TYPE_INTEGER,&sxi.default_window_width,	"default_window_width"	},
   { TYPE_INTEGER,&sxi.default_window_height,	"default_window_height"	},
+};
+
+static struct TokenInfo debug_setup_tokens[] =
+{
+  { TYPE_INTEGER, &sdi.frame_delay[0],		"debug.frame_delay_0"	},
+  { TYPE_INTEGER, &sdi.frame_delay[1],		"debug.frame_delay_1"	},
+  { TYPE_INTEGER, &sdi.frame_delay[2],		"debug.frame_delay_2"	},
+  { TYPE_INTEGER, &sdi.frame_delay[3],		"debug.frame_delay_3"	},
+  { TYPE_INTEGER, &sdi.frame_delay[4],		"debug.frame_delay_4"	},
+  { TYPE_INTEGER, &sdi.frame_delay[5],		"debug.frame_delay_5"	},
+  { TYPE_INTEGER, &sdi.frame_delay[6],		"debug.frame_delay_6"	},
+  { TYPE_INTEGER, &sdi.frame_delay[7],		"debug.frame_delay_7"	},
+  { TYPE_INTEGER, &sdi.frame_delay[8],		"debug.frame_delay_8"	},
+  { TYPE_INTEGER, &sdi.frame_delay[9],		"debug.frame_delay_9"	},
+  { TYPE_KEY_X11, &sdi.frame_delay_key[0],	"debug.key.frame_delay_0" },
+  { TYPE_KEY_X11, &sdi.frame_delay_key[1],	"debug.key.frame_delay_1" },
+  { TYPE_KEY_X11, &sdi.frame_delay_key[2],	"debug.key.frame_delay_2" },
+  { TYPE_KEY_X11, &sdi.frame_delay_key[3],	"debug.key.frame_delay_3" },
+  { TYPE_KEY_X11, &sdi.frame_delay_key[4],	"debug.key.frame_delay_4" },
+  { TYPE_KEY_X11, &sdi.frame_delay_key[5],	"debug.key.frame_delay_5" },
+  { TYPE_KEY_X11, &sdi.frame_delay_key[6],	"debug.key.frame_delay_6" },
+  { TYPE_KEY_X11, &sdi.frame_delay_key[7],	"debug.key.frame_delay_7" },
+  { TYPE_KEY_X11, &sdi.frame_delay_key[8],	"debug.key.frame_delay_8" },
+  { TYPE_KEY_X11, &sdi.frame_delay_key[9],	"debug.key.frame_delay_9" },
+  { TYPE_BOOLEAN, &sdi.frame_delay_use_mod_key,"debug.frame_delay.use_mod_key"},
+  { TYPE_BOOLEAN, &sdi.frame_delay_game_only,  "debug.frame_delay.game_only" },
 };
 
 static struct TokenInfo options_setup_tokens[] =
@@ -8389,6 +8442,31 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
   si->internal.default_window_width  = WIN_XSIZE_DEFAULT;
   si->internal.default_window_height = WIN_YSIZE_DEFAULT;
 
+  si->debug.frame_delay[0] = DEFAULT_FRAME_DELAY_0;
+  si->debug.frame_delay[1] = DEFAULT_FRAME_DELAY_1;
+  si->debug.frame_delay[2] = DEFAULT_FRAME_DELAY_2;
+  si->debug.frame_delay[3] = DEFAULT_FRAME_DELAY_3;
+  si->debug.frame_delay[4] = DEFAULT_FRAME_DELAY_4;
+  si->debug.frame_delay[5] = DEFAULT_FRAME_DELAY_5;
+  si->debug.frame_delay[6] = DEFAULT_FRAME_DELAY_6;
+  si->debug.frame_delay[7] = DEFAULT_FRAME_DELAY_7;
+  si->debug.frame_delay[8] = DEFAULT_FRAME_DELAY_8;
+  si->debug.frame_delay[9] = DEFAULT_FRAME_DELAY_9;
+
+  si->debug.frame_delay_key[0] = DEFAULT_KEY_FRAME_DELAY_0;
+  si->debug.frame_delay_key[1] = DEFAULT_KEY_FRAME_DELAY_1;
+  si->debug.frame_delay_key[2] = DEFAULT_KEY_FRAME_DELAY_2;
+  si->debug.frame_delay_key[3] = DEFAULT_KEY_FRAME_DELAY_3;
+  si->debug.frame_delay_key[4] = DEFAULT_KEY_FRAME_DELAY_4;
+  si->debug.frame_delay_key[5] = DEFAULT_KEY_FRAME_DELAY_5;
+  si->debug.frame_delay_key[6] = DEFAULT_KEY_FRAME_DELAY_6;
+  si->debug.frame_delay_key[7] = DEFAULT_KEY_FRAME_DELAY_7;
+  si->debug.frame_delay_key[8] = DEFAULT_KEY_FRAME_DELAY_8;
+  si->debug.frame_delay_key[9] = DEFAULT_KEY_FRAME_DELAY_9;
+
+  si->debug.frame_delay_use_mod_key = DEFAULT_FRAME_DELAY_USE_MOD_KEY;
+  si->debug.frame_delay_game_only   = DEFAULT_FRAME_DELAY_GAME_ONLY;
+
   si->options.verbose = FALSE;
 
 #if defined(PLATFORM_ANDROID)
@@ -8476,6 +8554,13 @@ static void decodeSetupFileHash(SetupFileHash *setup_file_hash)
     setSetupInfo(internal_setup_tokens, i,
 		 getHashEntry(setup_file_hash, internal_setup_tokens[i].text));
   setup.internal = sxi;
+
+  /* debug setup */
+  sdi = setup.debug;
+  for (i = 0; i < NUM_DEBUG_SETUP_TOKENS; i++)
+    setSetupInfo(debug_setup_tokens, i,
+		 getHashEntry(setup_file_hash, debug_setup_tokens[i].text));
+  setup.debug = sdi;
 
   /* options setup */
   soi = setup.options;
@@ -8642,6 +8727,12 @@ void SaveSetup()
 
   /* internal setup */
   /* (internal setup values not saved to user setup file) */
+
+  /* debug setup */
+  sdi = setup.debug;
+  fprintf(file, "\n");
+  for (i = 0; i < NUM_DEBUG_SETUP_TOKENS; i++)
+    fprintf(file, "%s\n", getSetupLine(debug_setup_tokens, "", i));
 
   /* options setup */
   soi = setup.options;

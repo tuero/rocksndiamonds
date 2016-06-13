@@ -309,7 +309,7 @@ void EventLoop(void)
     BackToFront();
 
     /* reset video frame delay to default (may change again while playing) */
-    SetVideoFrameDelay(GAME_FRAME_DELAY);
+    SetVideoFrameDelay(MenuFrameDelay);
 
     if (game_status == GAME_MODE_QUIT)
       return;
@@ -1523,10 +1523,6 @@ void HandleKey(Key key, int key_status)
 	  break;
 
 #ifdef DEBUG
-	case KSYM_0:
-	  GameFrameDelay = (GameFrameDelay == 500 ? GAME_FRAME_DELAY : 500);
-	  break;
-
 	case KSYM_b:
 	  setup.sp_show_border_elements = !setup.sp_show_border_elements;
 	  printf("Supaplex border elements %s\n",
@@ -1553,20 +1549,6 @@ void HandleKey(Key key, int key_status)
 	  break;
 
 #ifdef DEBUG
-	case KSYM_0:
-	  if (key == KSYM_0)
-	  {
-	    if (GameFrameDelay == 500)
-	      GameFrameDelay = GAME_FRAME_DELAY;
-	    else
-	      GameFrameDelay = 500;
-	  }
-	  else
-	    GameFrameDelay = (key - KSYM_0) * 10;
-	  printf("Game speed == %d%% (%d ms delay between two frames)\n",
-		 GAME_FRAME_DELAY * 100 / GameFrameDelay, GameFrameDelay);
-	  break;
-
 	case KSYM_d:
 	  if (options.debug)
 	  {
@@ -1602,6 +1584,41 @@ void HandleKey(Key key, int key_status)
 	return;
       }
   }
+
+#ifdef DEBUG
+  if (game_status == GAME_MODE_PLAYING || !setup.debug.frame_delay_game_only)
+  {
+    boolean mod_key_pressed = ((GetKeyModState() & KMOD_Control) ||
+			       (GetKeyModState() & KMOD_Alt) ||
+			       (GetKeyModState() & KMOD_Meta));
+
+    for (i = 0; i < NUM_DEBUG_FRAME_DELAY_KEYS; i++)
+    {
+      if (key == setup.debug.frame_delay_key[i] &&
+	  (mod_key_pressed || !setup.debug.frame_delay_use_mod_key))
+      {
+	GameFrameDelay = (GameFrameDelay != setup.debug.frame_delay[i] ?
+			  setup.debug.frame_delay[i] : GAME_FRAME_DELAY);
+
+	if (!setup.debug.frame_delay_game_only)
+	  MenuFrameDelay = GameFrameDelay;
+
+	SetVideoFrameDelay(GameFrameDelay);
+
+	if (GameFrameDelay > ONE_SECOND_DELAY)
+	  Error(ERR_DEBUG, "frame delay == %d ms", GameFrameDelay);
+	else if (GameFrameDelay != 0)
+	  Error(ERR_DEBUG, "frame delay == %d ms (max. %d fps / %d %%)",
+		GameFrameDelay, ONE_SECOND_DELAY / GameFrameDelay,
+		GAME_FRAME_DELAY * 100 / GameFrameDelay);
+	else
+	  Error(ERR_DEBUG, "frame delay == 0 ms (maximum speed)");
+
+	break;
+      }
+    }
+  }
+#endif
 }
 
 void HandleNoEvent()

@@ -3058,6 +3058,7 @@ extern int			FX, FY;
 extern int			ScrollStepSize;
 extern int			ScreenMovDir, ScreenMovPos, ScreenGfxPos;
 extern int			BorderElement;
+extern int			MenuFrameDelay;
 extern int			GameFrameDelay;
 extern int			FfwdFrameDelay;
 extern int			BX1, BY1;
