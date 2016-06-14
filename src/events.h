@@ -38,6 +38,7 @@ void HandleFingerEvent(FingerEvent *);
 void HandleTextEvent(TextEvent *);
 void HandlePauseResumeEvent(PauseResumeEvent *);
 #endif
+void HandleKeysDebug(Key);
 void HandleKeyEvent(KeyEvent *);
 void HandleFocusEvent(FocusChangeEvent *);
 void HandleClientMessageEvent(ClientMessageEvent *);

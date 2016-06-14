@@ -1202,6 +1202,62 @@ static void HandleKeysSpecial(Key key)
   }
 }
 
+void HandleKeysDebug(Key key)
+{
+#ifdef DEBUG
+  int i;
+
+  if (game_status == GAME_MODE_PLAYING || !setup.debug.frame_delay_game_only)
+  {
+    boolean mod_key_pressed = ((GetKeyModState() & KMOD_Control) ||
+			       (GetKeyModState() & KMOD_Alt) ||
+			       (GetKeyModState() & KMOD_Meta));
+
+    for (i = 0; i < NUM_DEBUG_FRAME_DELAY_KEYS; i++)
+    {
+      if (key == setup.debug.frame_delay_key[i] &&
+	  (mod_key_pressed || !setup.debug.frame_delay_use_mod_key))
+      {
+	GameFrameDelay = (GameFrameDelay != setup.debug.frame_delay[i] ?
+			  setup.debug.frame_delay[i] : GAME_FRAME_DELAY);
+
+	if (!setup.debug.frame_delay_game_only)
+	  MenuFrameDelay = GameFrameDelay;
+
+	SetVideoFrameDelay(GameFrameDelay);
+
+	if (GameFrameDelay > ONE_SECOND_DELAY)
+	  Error(ERR_DEBUG, "frame delay == %d ms", GameFrameDelay);
+	else if (GameFrameDelay != 0)
+	  Error(ERR_DEBUG, "frame delay == %d ms (max. %d fps / %d %%)",
+		GameFrameDelay, ONE_SECOND_DELAY / GameFrameDelay,
+		GAME_FRAME_DELAY * 100 / GameFrameDelay);
+	else
+	  Error(ERR_DEBUG, "frame delay == 0 ms (maximum speed)");
+
+	break;
+      }
+    }
+  }
+
+  if (game_status == GAME_MODE_PLAYING)
+  {
+    if (key == KSYM_d)
+    {
+      options.debug = !options.debug;
+
+      Error(ERR_DEBUG, "debug mode %s",
+	    (options.debug ? "enabled" : "disabled"));
+    }
+    else if (key == KSYM_v)
+    {
+      Error(ERR_DEBUG, "currently using game engine version %d",
+	    game.engine_version);
+    }
+  }
+#endif
+}
+
 void HandleKey(Key key, int key_status)
 {
   boolean anyTextGadgetActiveOrJustFinished = anyTextGadgetActive();
@@ -1584,26 +1640,6 @@ void HandleKey(Key key, int key_status)
 	  RequestQuitGame(setup.ask_on_escape);
 	  break;
 
-#ifdef DEBUG
-	case KSYM_d:
-	  if (options.debug)
-	  {
-	    options.debug = FALSE;
-	    printf("debug mode disabled\n");
-	  }
-	  else
-	  {
-	    options.debug = TRUE;
-	    printf("debug mode enabled\n");
-	  }
-	  break;
-
-	case KSYM_v:
-	  printf("::: currently using game engine version %d\n",
-		 game.engine_version);
-	  break;
-#endif
-
 	default:
 	  break;
       }
@@ -1621,40 +1657,7 @@ void HandleKey(Key key, int key_status)
       }
   }
 
-#ifdef DEBUG
-  if (game_status == GAME_MODE_PLAYING || !setup.debug.frame_delay_game_only)
-  {
-    boolean mod_key_pressed = ((GetKeyModState() & KMOD_Control) ||
-			       (GetKeyModState() & KMOD_Alt) ||
-			       (GetKeyModState() & KMOD_Meta));
-
-    for (i = 0; i < NUM_DEBUG_FRAME_DELAY_KEYS; i++)
-    {
-      if (key == setup.debug.frame_delay_key[i] &&
-	  (mod_key_pressed || !setup.debug.frame_delay_use_mod_key))
-      {
-	GameFrameDelay = (GameFrameDelay != setup.debug.frame_delay[i] ?
-			  setup.debug.frame_delay[i] : GAME_FRAME_DELAY);
-
-	if (!setup.debug.frame_delay_game_only)
-	  MenuFrameDelay = GameFrameDelay;
-
-	SetVideoFrameDelay(GameFrameDelay);
-
-	if (GameFrameDelay > ONE_SECOND_DELAY)
-	  Error(ERR_DEBUG, "frame delay == %d ms", GameFrameDelay);
-	else if (GameFrameDelay != 0)
-	  Error(ERR_DEBUG, "frame delay == %d ms (max. %d fps / %d %%)",
-		GameFrameDelay, ONE_SECOND_DELAY / GameFrameDelay,
-		GAME_FRAME_DELAY * 100 / GameFrameDelay);
-	else
-	  Error(ERR_DEBUG, "frame delay == 0 ms (maximum speed)");
-
-	break;
-      }
-    }
-  }
-#endif
+  HandleKeysDebug(key);
 }
 
 void HandleNoEvent()
