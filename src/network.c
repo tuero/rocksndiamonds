@@ -98,7 +98,7 @@ char *getNetworkPlayerName(int player_nr)
     return("you");
   else
     for (player = &first_player; player; player = player->next)
-      if (player->nr == player_nr && player->name && strlen(player->name))
+      if (player->nr == player_nr && strlen(player->name) > 0)
 	return(player->name);
 
   return(EMPTY_PLAYER_NAME);
