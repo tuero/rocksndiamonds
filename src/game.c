@@ -15045,6 +15045,8 @@ void MapUndoRedoButtons()
 
   MapGadget(game_gadget[GAME_CTRL_ID_UNDO]);
   MapGadget(game_gadget[GAME_CTRL_ID_REDO]);
+
+  ModifyGadget(game_gadget[GAME_CTRL_ID_PAUSE2], GDI_CHECKED, TRUE, GDI_END);
 }
 
 void UnmapUndoRedoButtons()
@@ -15054,6 +15056,8 @@ void UnmapUndoRedoButtons()
 
   MapGameButtonsAtSamePosition(GAME_CTRL_ID_UNDO);
   MapGameButtonsAtSamePosition(GAME_CTRL_ID_REDO);
+
+  ModifyGadget(game_gadget[GAME_CTRL_ID_PAUSE2], GDI_CHECKED, FALSE, GDI_END);
 }
 
 void MapGameButtons()
