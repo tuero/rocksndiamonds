@@ -12051,7 +12051,7 @@ void PrintEditorGadgetInfoText(struct GadgetInfo *gi)
   char shortcut[MAX_OUTPUT_LINESIZE + 1];
   int max_infotext_len = getMaxInfoTextLength();
 
-  if (gi == NULL || gi->info_text == NULL)
+  if (gi == NULL || strlen(gi->info_text) == 0)
     return;
 
   strncpy(infotext, gi->info_text, max_infotext_len);
