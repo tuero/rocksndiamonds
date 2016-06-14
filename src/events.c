@@ -27,6 +27,7 @@
 
 #define DEBUG_EVENTS_BUTTON	(DEBUG_EVENTS	* 0)
 #define DEBUG_EVENTS_MOTION	(DEBUG_EVENTS	* 0)
+#define DEBUG_EVENTS_WHEEL	(DEBUG_EVENTS	* 1)
 #define DEBUG_EVENTS_WINDOW	(DEBUG_EVENTS	* 0)
 #define DEBUG_EVENTS_FINGER	(DEBUG_EVENTS	* 0)
 #define DEBUG_EVENTS_TEXT	(DEBUG_EVENTS	* 1)
@@ -174,6 +175,10 @@ void HandleEvents()
 	break;
 
 #if defined(TARGET_SDL2)
+      case EVENT_WHEELMOTION:
+	HandleWheelEvent((WheelEvent *) &event);
+	break;
+
       case SDL_WINDOWEVENT:
 	HandleWindowEvent((WindowEvent *) &event);
 	break;
@@ -433,6 +438,45 @@ void HandleMotionEvent(MotionEvent *event)
 }
 
 #if defined(TARGET_SDL2)
+
+void HandleWheelEvent(WheelEvent *event)
+{
+  int button_nr;
+
+#if DEBUG_EVENTS_WHEEL
+#if 1
+  Error(ERR_DEBUG, "WHEEL EVENT: mouse == %d, x/y == %d/%d\n",
+	event->which, event->x, event->y);
+#else
+  // (SDL_MOUSEWHEEL_NORMAL/SDL_MOUSEWHEEL_FLIPPED needs SDL 2.0.4 or newer)
+  Error(ERR_DEBUG, "WHEEL EVENT: mouse == %d, x/y == %d/%d, direction == %s\n",
+	event->which, event->x, event->y,
+	(event->direction == SDL_MOUSEWHEEL_NORMAL ? "SDL_MOUSEWHEEL_NORMAL" :
+	 "SDL_MOUSEWHEEL_FLIPPED"));
+#endif
+#endif
+
+  button_nr = (event->x < 0 ? MB_WHEEL_LEFT :
+	       event->x > 0 ? MB_WHEEL_RIGHT :
+	       event->y < 0 ? MB_WHEEL_DOWN :
+	       event->y > 0 ? MB_WHEEL_UP : 0);
+
+#if defined(PLATFORM_WIN32) || defined(PLATFORM_MACOSX)
+  // accelerated mouse wheel available on Mac and Windows
+  wheel_steps = (event->x ? ABS(event->x) : ABS(event->y));
+#else
+  // no accelerated mouse wheel available on Unix/Linux
+  wheel_steps = DEFAULT_WHEEL_STEPS;
+#endif
+
+  motion_status = FALSE;
+
+  button_status = button_nr;
+  HandleButton(0, 0, button_status, -button_nr);
+
+  button_status = MB_RELEASED;
+  HandleButton(0, 0, button_status, -button_nr);
+}
 
 void HandleWindowEvent(WindowEvent *event)
 {
@@ -948,11 +992,11 @@ void HandleButton(int mx, int my, int button, int button_nr)
   static int old_mx = 0, old_my = 0;
   boolean button_hold = FALSE;
 
-  if (button < 0)
+  if (button_nr < 0)
   {
     mx = old_mx;
     my = old_my;
-    button = -button;
+    button_nr = -button_nr;
     button_hold = TRUE;
   }
   else
@@ -1618,7 +1662,7 @@ void HandleNoEvent()
   // if (button_status && game_status != GAME_MODE_PLAYING)
   if (button_status && (game_status != GAME_MODE_PLAYING || tape.pausing))
   {
-    HandleButton(0, 0, -button_status, button_status);
+    HandleButton(0, 0, button_status, -button_status);
   }
   else
   {

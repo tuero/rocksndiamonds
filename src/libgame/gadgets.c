@@ -1779,7 +1779,7 @@ boolean HandleGadgets(int mx, int my, int button)
 	{
 	  boolean scroll_single_step = ((GetKeyModState() & KMOD_Alt) != 0);
 
-	  item_steps = (scroll_single_step ? 1 : DEFAULT_WHEEL_STEPS);
+	  item_steps = (scroll_single_step ? 1 : wheel_steps);
 	  item_direction = (button == MB_WHEEL_UP ||
 			    button == MB_WHEEL_LEFT ? -1 : +1);
 	}

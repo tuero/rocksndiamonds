@@ -50,6 +50,7 @@ DrawBuffer	       *drawto = NULL;
 
 int			button_status = MB_NOT_PRESSED;
 boolean			motion_status = FALSE;
+int			wheel_steps = DEFAULT_WHEEL_STEPS;
 #if defined(TARGET_SDL2)
 boolean			keyrepeat_status = TRUE;
 #endif

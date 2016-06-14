@@ -80,6 +80,7 @@ typedef SDL_Event		Event;
 typedef SDL_MouseButtonEvent	ButtonEvent;
 typedef SDL_MouseMotionEvent	MotionEvent;
 #if defined(TARGET_SDL2)
+typedef SDL_MouseWheelEvent	WheelEvent;
 typedef SDL_TouchFingerEvent	FingerEvent;
 typedef SDL_TextInputEvent	TextEvent;
 typedef SDL_Event		PauseResumeEvent;
@@ -127,6 +128,7 @@ struct MouseCursorInfo
 #define EVENT_BUTTONRELEASE	SDL_MOUSEBUTTONUP
 #define EVENT_MOTIONNOTIFY	SDL_MOUSEMOTION
 #if defined(TARGET_SDL2)
+#define	EVENT_WHEELMOTION	SDL_MOUSEWHEEL
 #define	EVENT_FINGERPRESS	SDL_FINGERDOWN
 #define EVENT_FINGERRELEASE	SDL_FINGERUP
 #define EVENT_FINGERMOTION	SDL_FINGERMOTION
