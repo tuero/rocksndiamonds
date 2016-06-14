@@ -672,11 +672,21 @@ void TapeRecordAction(byte action_raw[MAX_PLAYERS])
   }
 }
 
-void TapeTogglePause(boolean toggle_manual)
+void TapeTogglePause(boolean toggle_mode)
 {
+  if (tape.playing && tape.pausing && (toggle_mode & TAPE_TOGGLE_PLAY_PAUSE))
+  {
+    // continue playing in normal mode
+    tape.fast_forward = FALSE;
+    tape.warp_forward = FALSE;
+    tape.deactivate_display = FALSE;
+
+    tape.pause_before_end = FALSE;
+  }
+
   tape.pausing = !tape.pausing;
 
-  if (tape.single_step && toggle_manual)
+  if (tape.single_step && (toggle_mode & TAPE_TOGGLE_MANUAL))
     tape.single_step = FALSE;
 
   DrawVideoDisplayCurrentState();
@@ -1367,14 +1377,7 @@ static void HandleTapeButtonsExt(int id)
       {
 	if (tape.pausing)			/* PAUSE -> PLAY */
 	{
-	  // continue playing in normal mode
-	  tape.fast_forward = FALSE;
-	  tape.warp_forward = FALSE;
-	  tape.deactivate_display = FALSE;
-
-	  tape.pause_before_end = FALSE;
-
-	  TapeTogglePause(TAPE_TOGGLE_MANUAL);
+	  TapeTogglePause(TAPE_TOGGLE_MANUAL | TAPE_TOGGLE_PLAY_PAUSE);
 	}
 	else if (!tape.fast_forward)		/* PLAY -> FFWD */
 	{

@@ -14,8 +14,9 @@
 
 
 /* values for TapeTogglePause() */
-#define	TAPE_TOGGLE_MANUAL	TRUE
-#define	TAPE_TOGGLE_AUTOMATIC	FALSE
+#define	TAPE_TOGGLE_AUTOMATIC	0
+#define	TAPE_TOGGLE_MANUAL	(1 << 0)
+#define	TAPE_TOGGLE_PLAY_PAUSE	(1 << 1)
 
 /* values for tape properties */
 #define MAX_TAPE_LEN		(1000 * FRAMES_PER_SECOND) /* max.time x fps */

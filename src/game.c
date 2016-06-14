@@ -15180,7 +15180,7 @@ static void HandleGameButtonsExt(int id, int button)
 	  SendToServer_ContinuePlaying();
 	else
 #endif
-	  TapeTogglePause(TAPE_TOGGLE_MANUAL);
+	  TapeTogglePause(TAPE_TOGGLE_MANUAL | TAPE_TOGGLE_PLAY_PAUSE);
       }
       break;
 

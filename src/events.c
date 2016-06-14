@@ -1451,7 +1451,7 @@ void HandleKey(Key key, int key_status)
     else if (key == setup.shortcut.load_game)
       TapeQuickLoad();
     else if (key == setup.shortcut.toggle_pause)
-      TapeTogglePause(TAPE_TOGGLE_MANUAL);
+      TapeTogglePause(TAPE_TOGGLE_MANUAL | TAPE_TOGGLE_PLAY_PAUSE);
 
     HandleTapeButtonKeys(key);
     HandleSoundButtonKeys(key);
