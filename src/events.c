@@ -1209,14 +1209,12 @@ void HandleKeysDebug(Key key)
 
   if (game_status == GAME_MODE_PLAYING || !setup.debug.frame_delay_game_only)
   {
-    boolean mod_key_pressed = ((GetKeyModState() & KMOD_Control) ||
-			       (GetKeyModState() & KMOD_Alt) ||
-			       (GetKeyModState() & KMOD_Meta));
+    boolean mod_key_pressed = (GetKeyModState() != KMOD_None);
 
     for (i = 0; i < NUM_DEBUG_FRAME_DELAY_KEYS; i++)
     {
       if (key == setup.debug.frame_delay_key[i] &&
-	  (mod_key_pressed || !setup.debug.frame_delay_use_mod_key))
+	  (mod_key_pressed == setup.debug.frame_delay_use_mod_key))
       {
 	GameFrameDelay = (GameFrameDelay != setup.debug.frame_delay[i] ?
 			  setup.debug.frame_delay[i] : GAME_FRAME_DELAY);
