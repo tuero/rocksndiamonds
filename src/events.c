@@ -1453,21 +1453,20 @@ void HandleKey(Key key, int key_status)
     return;
   }
 
-  if ((key == KSYM_minus ||
-       key == KSYM_plus ||
-       key == KSYM_equal ||	// ("Shift-=" is "+" on US keyboards)
-       key == KSYM_0) &&
-      ((GetKeyModState() & KMOD_Control) ||
-       (GetKeyModState() & KMOD_Alt) ||
-       (GetKeyModState() & KMOD_Meta)) &&
+  if ((key == KSYM_0     || key == KSYM_KP_0 ||
+       key == KSYM_minus || key == KSYM_KP_Subtract ||
+       key == KSYM_plus  || key == KSYM_KP_Add ||
+       key == KSYM_equal) &&	// ("Shift-=" is "+" on US keyboards)
+      (GetKeyModState() & (KMOD_Control | KMOD_Meta)) &&
       video.window_scaling_available &&
       !video.fullscreen_enabled)
   {
-    if (key == KSYM_0)
+    if (key == KSYM_0 || key == KSYM_KP_0)
       setup.window_scaling_percent = STD_WINDOW_SCALING_PERCENT;
+    else if (key == KSYM_minus || key == KSYM_KP_Subtract)
+      setup.window_scaling_percent -= STEP_WINDOW_SCALING_PERCENT;
     else
-      setup.window_scaling_percent +=
-	(key == KSYM_minus ? -1 : +1) * STEP_WINDOW_SCALING_PERCENT;
+      setup.window_scaling_percent += STEP_WINDOW_SCALING_PERCENT;
 
     if (setup.window_scaling_percent < MIN_WINDOW_SCALING_PERCENT)
       setup.window_scaling_percent = MIN_WINDOW_SCALING_PERCENT;
