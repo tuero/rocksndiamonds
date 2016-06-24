@@ -1050,7 +1050,7 @@ void AutoPlayTape()
   if (autoplay_initialized)
   {
     /* just finished auto-playing tape */
-    printf("%s.\n", tape.auto_play_level_solved ? "solved" : "NOT SOLVED");
+    Print("%s.\n", tape.auto_play_level_solved ? "solved" : "NOT SOLVED");
 
     num_levels_played++;
 
@@ -1082,15 +1082,15 @@ void AutoPlayTape()
 
     autoplay_level_nr = autoplay_leveldir->first_level;
 
-    printf_line("=", 79);
-    printf("Automatically playing level tapes\n");
-    printf_line("-", 79);
-    printf("Level series identifier: '%s'\n", autoplay_leveldir->identifier);
-    printf("Level series name:       '%s'\n", autoplay_leveldir->name);
-    printf("Level series author:     '%s'\n", autoplay_leveldir->author);
-    printf("Number of levels:        %d\n",   autoplay_leveldir->levels);
-    printf_line("=", 79);
-    printf("\n");
+    PrintLine("=", 79);
+    Print("Automatically playing level tapes\n");
+    PrintLine("-", 79);
+    Print("Level series identifier: '%s'\n", autoplay_leveldir->identifier);
+    Print("Level series name:       '%s'\n", autoplay_leveldir->name);
+    Print("Level series author:     '%s'\n", autoplay_leveldir->author);
+    Print("Number of levels:        %d\n",   autoplay_leveldir->levels);
+    PrintLine("=", 79);
+    Print("\n");
 
     for (i = 0; i < MAX_TAPES_PER_SET; i++)
       level_failed[i] = FALSE;
@@ -1107,18 +1107,18 @@ void AutoPlayTape()
 
     TapeErase();
 
-    printf("Level %03d: ", level_nr);
+    Print("Level %03d: ", level_nr);
 
     LoadLevel(level_nr);
     if (level.no_valid_file)
     {
-      printf("(no level)\n");
+      Print("(no level)\n");
       continue;
     }
 
 #if 0
     /* ACTIVATE THIS FOR LOADING/TESTING OF LEVELS ONLY */
-    printf("(only testing level)\n");
+    Print("(only testing level)\n");
     continue;
 #endif
 
@@ -1128,12 +1128,12 @@ void AutoPlayTape()
     {
       num_tape_missing++;
 
-      printf("(no tape)\n");
+      Print("(no tape)\n");
 
       continue;
     }
 
-    printf("playing tape ... ");
+    Print("playing tape ... ");
 
     TapeStartGamePlaying();
     TapeStartWarpForward(global.autoplay_mode);
@@ -1141,27 +1141,27 @@ void AutoPlayTape()
     return;
   }
 
-  printf("\n");
-  printf_line("=", 79);
-  printf("Number of levels played: %d\n", num_levels_played);
-  printf("Number of levels solved: %d (%d%%)\n", num_levels_solved,
+  Print("\n");
+  PrintLine("=", 79);
+  Print("Number of levels played: %d\n", num_levels_played);
+  Print("Number of levels solved: %d (%d%%)\n", num_levels_solved,
 	 (num_levels_played ? num_levels_solved * 100 / num_levels_played :0));
-  printf_line("-", 79);
-  printf("Summary (for automatic parsing by scripts):\n");
-  printf("LEVELDIR '%s', SOLVED %d/%d (%d%%)",
+  PrintLine("-", 79);
+  Print("Summary (for automatic parsing by scripts):\n");
+  Print("LEVELDIR '%s', SOLVED %d/%d (%d%%)",
 	 autoplay_leveldir->identifier, num_levels_solved, num_levels_played,
 	 (num_levels_played ? num_levels_solved * 100 / num_levels_played :0));
 
   if (num_levels_played != num_levels_solved)
   {
-    printf(", FAILED:");
+    Print(", FAILED:");
     for (i = 0; i < MAX_TAPES_PER_SET; i++)
       if (level_failed[i])
-	printf(" %03d", i);
+	Print(" %03d", i);
   }
 
-  printf("\n");
-  printf_line("=", 79);
+  Print("\n");
+  PrintLine("=", 79);
 
   CloseAllAndExit(0);
 }
