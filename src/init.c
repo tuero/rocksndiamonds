@@ -4904,13 +4904,17 @@ void Execute_Command(char *command)
   }
   else if (strPrefix(command, "autotest ") ||
 	   strPrefix(command, "autoplay ") ||
-	   strPrefix(command, "autoffwd "))
+	   strPrefix(command, "autoffwd ") ||
+	   strPrefix(command, "autowarp "))
   {
     char *str_ptr = getStringCopy(&command[9]);	/* read command parameters */
 
-    global.autoplay_mode = (strPrefix(command, "autotest") ? AUTOPLAY_TEST :
-			    strPrefix(command, "autoplay") ? AUTOPLAY_PLAY :
-			    strPrefix(command, "autoffwd") ? AUTOPLAY_FFWD : 0);
+    global.autoplay_mode =
+      (strPrefix(command, "autotest") ? AUTOPLAY_MODE_TEST :
+       strPrefix(command, "autoplay") ? AUTOPLAY_MODE_PLAY :
+       strPrefix(command, "autoffwd") ? AUTOPLAY_MODE_FFWD :
+       strPrefix(command, "autowarp") ? AUTOPLAY_MODE_WARP :
+       AUTOPLAY_MODE_NONE);
 
     while (*str_ptr != '\0')			/* continue parsing string */
     {
@@ -5380,7 +5384,7 @@ static void InitLevelInfo()
   LoadLevelSetup_SeriesInfo();			/* last played level info */
 
   if (global.autoplay_leveldir &&
-      global.autoplay_mode != AUTOPLAY_TEST)
+      global.autoplay_mode != AUTOPLAY_MODE_TEST)
   {
     leveldir_current = getTreeInfoFromIdentifier(leveldir_first,
                                                  global.autoplay_leveldir);

@@ -889,15 +889,16 @@ unsigned int GetTapeLengthSeconds()
   return (GetTapeLengthFrames() * GAME_FRAME_DELAY / 1000);
 }
 
-static void TapeStartWarpForward()
+static void TapeStartWarpForward(int mode)
 {
-  tape.fast_forward = TRUE;
-  tape.warp_forward = TRUE;
-  tape.deactivate_display = TRUE;
+  tape.fast_forward = (mode & AUTOPLAY_FFWD);
+  tape.warp_forward = (mode & AUTOPLAY_WARP);
+  tape.deactivate_display = (mode & AUTOPLAY_WARP_NO_DISPLAY);
 
   tape.pausing = FALSE;
 
-  TapeDeactivateDisplayOn();
+  if (tape.deactivate_display)
+    TapeDeactivateDisplayOn();
 
   DrawVideoDisplayCurrentState();
 }
@@ -1005,7 +1006,7 @@ void TapeQuickLoad()
   if (!TAPE_IS_EMPTY(tape))
   {
     TapeStartGamePlaying();
-    TapeStartWarpForward();
+    TapeStartWarpForward(AUTOPLAY_MODE_WARP_NO_DISPLAY);
 
     tape.quick_resume = TRUE;
   }
@@ -1135,12 +1136,7 @@ void AutoPlayTape()
     printf("playing tape ... ");
 
     TapeStartGamePlaying();
-
-    if (global.autoplay_mode == AUTOPLAY_FFWD)
-      tape.fast_forward = TRUE;
-
-    if (global.autoplay_mode != AUTOPLAY_PLAY)
-      TapeStartWarpForward();
+    TapeStartWarpForward(global.autoplay_mode);
 
     return;
   }
