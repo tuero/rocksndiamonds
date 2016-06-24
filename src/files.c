@@ -9996,15 +9996,15 @@ void ConvertLevels()
 
   convert_level_nr = convert_leveldir->first_level;
 
-  printf_line("=", 79);
-  printf("Converting levels\n");
-  printf_line("-", 79);
-  printf("Level series identifier: '%s'\n", convert_leveldir->identifier);
-  printf("Level series name:       '%s'\n", convert_leveldir->name);
-  printf("Level series author:     '%s'\n", convert_leveldir->author);
-  printf("Number of levels:        %d\n",   convert_leveldir->levels);
-  printf_line("=", 79);
-  printf("\n");
+  PrintLine("=", 79);
+  Print("Converting levels\n");
+  PrintLine("-", 79);
+  Print("Level series identifier: '%s'\n", convert_leveldir->identifier);
+  Print("Level series name:       '%s'\n", convert_leveldir->name);
+  Print("Level series author:     '%s'\n", convert_leveldir->author);
+  Print("Number of levels:        %d\n",   convert_leveldir->levels);
+  PrintLine("=", 79);
+  Print("\n");
 
   for (i = 0; i < MAX_NUM_CONVERT_LEVELS; i++)
     levels_failed[i] = FALSE;
@@ -10016,16 +10016,16 @@ void ConvertLevels()
 
     level_nr = convert_level_nr++;
 
-    printf("Level %03d: ", level_nr);
+    Print("Level %03d: ", level_nr);
 
     LoadLevel(level_nr);
     if (level.no_valid_file)
     {
-      printf("(no level)\n");
+      Print("(no level)\n");
       continue;
     }
 
-    printf("converting level ... ");
+    Print("converting level ... ");
 
     level_filename = getDefaultLevelFilename(level_nr);
     new_level = !fileExists(level_filename);
@@ -10036,28 +10036,28 @@ void ConvertLevels()
 
       num_levels_converted++;
 
-      printf("converted.\n");
+      Print("converted.\n");
     }
     else
     {
       if (level_nr >= 0 && level_nr < MAX_NUM_CONVERT_LEVELS)
 	levels_failed[level_nr] = TRUE;
 
-      printf("NOT CONVERTED -- LEVEL ALREADY EXISTS.\n");
+      Print("NOT CONVERTED -- LEVEL ALREADY EXISTS.\n");
     }
 
     num_levels_handled++;
   }
 
-  printf("\n");
-  printf_line("=", 79);
-  printf("Number of levels handled: %d\n", num_levels_handled);
-  printf("Number of levels converted: %d (%d%%)\n", num_levels_converted,
+  Print("\n");
+  PrintLine("=", 79);
+  Print("Number of levels handled: %d\n", num_levels_handled);
+  Print("Number of levels converted: %d (%d%%)\n", num_levels_converted,
 	 (num_levels_handled ?
 	  num_levels_converted * 100 / num_levels_handled : 0));
-  printf_line("-", 79);
-  printf("Summary (for automatic parsing by scripts):\n");
-  printf("LEVELDIR '%s', CONVERTED %d/%d (%d%%)",
+  PrintLine("-", 79);
+  Print("Summary (for automatic parsing by scripts):\n");
+  Print("LEVELDIR '%s', CONVERTED %d/%d (%d%%)",
 	 convert_leveldir->identifier, num_levels_converted,
 	 num_levels_handled,
 	 (num_levels_handled ?
@@ -10065,14 +10065,14 @@ void ConvertLevels()
 
   if (num_levels_handled != num_levels_converted)
   {
-    printf(", FAILED:");
+    Print(", FAILED:");
     for (i = 0; i < MAX_NUM_CONVERT_LEVELS; i++)
       if (levels_failed[i])
-	printf(" %03d", i);
+	Print(" %03d", i);
   }
 
-  printf("\n");
-  printf_line("=", 79);
+  Print("\n");
+  PrintLine("=", 79);
 
   CloseAllAndExit(0);
 }
