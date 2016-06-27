@@ -226,6 +226,39 @@ static boolean equalSDLPixelFormat(SDL_PixelFormat *format1,
 	  format1->Bmask	 == format2->Bmask);
 }
 
+static Pixel SDLGetColorKey(SDL_Surface *surface)
+{
+  Pixel color_key;
+
+  if (SDL_GetColorKey(surface, &color_key) != 0)
+    return -1;
+
+  return color_key;
+}
+
+static boolean SDLHasColorKey(SDL_Surface *surface)
+{
+  return (SDLGetColorKey(surface) != -1);
+}
+
+static boolean SDLHasAlpha(SDL_Surface *surface)
+{
+  SDL_BlendMode blend_mode;
+
+  if (SDL_GetSurfaceBlendMode(surface, &blend_mode) != 0)
+    return FALSE;
+
+  return (blend_mode == SDL_BLENDMODE_BLEND);
+}
+
+static void SDLSetAlpha(SDL_Surface *surface, boolean set, int alpha)
+{
+  SDL_BlendMode blend_mode = (set ? SDL_BLENDMODE_BLEND : SDL_BLENDMODE_NONE);
+
+  SDL_SetSurfaceBlendMode(surface, blend_mode);
+  SDL_SetSurfaceAlphaMod(surface, alpha);
+}
+
 SDL_Surface *SDLGetNativeSurface(SDL_Surface *surface)
 {
   SDL_PixelFormat format;
@@ -276,6 +309,29 @@ boolean SDLSetNativeSurface(SDL_Surface **surface)
 }
 
 #else
+
+static Pixel SDLGetColorKey(SDL_Surface *surface)
+{
+  if ((surface->flags & SDL_SRCCOLORKEY) == 0)
+    return -1;
+
+  return surface->format->colorkey;
+}
+
+static boolean SDLHasColorKey(SDL_Surface *surface)
+{
+  return (SDLGetColorKey(surface) != -1);
+}
+
+static boolean SDLHasAlpha(SDL_Surface *surface)
+{
+  return ((surface->flags & SDL_SRCALPHA) != 0);
+}
+
+static void SDLSetAlpha(SDL_Surface *surface, boolean set, int alpha)
+{
+  SDL_SetAlpha(surface, (set ? SDL_SRCALPHA : 0), alpha);
+}
 
 SDL_Surface *SDLGetNativeSurface(SDL_Surface *surface)
 {
