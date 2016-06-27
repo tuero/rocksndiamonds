@@ -223,8 +223,7 @@ static boolean equalSDLPixelFormat(SDL_PixelFormat *format1,
 	  format1->BytesPerPixel == format2->BytesPerPixel &&
 	  format1->Rmask	 == format2->Rmask &&
 	  format1->Gmask	 == format2->Gmask &&
-	  format1->Bmask	 == format2->Bmask &&
-	  format1->Amask	 == format2->Amask);
+	  format1->Bmask	 == format2->Bmask);
 }
 
 boolean SDLSetNativeSurface(SDL_Surface **surface)
