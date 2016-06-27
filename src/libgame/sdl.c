@@ -1044,11 +1044,8 @@ void SDLFadeRectangle(int x, int y, int width, int height,
     int i;
 
     SDL_BlitSurface(surface_source, &src_rect, surface_screen, &dst_rect);
-#if defined(TARGET_SDL2)
-    SDL_SetSurfaceBlendMode(surface_target, SDL_BLENDMODE_NONE);
-#else
-    SDL_SetAlpha(surface_target, 0, 0);		/* disable alpha blending */
-#endif
+
+    SDLSetAlpha(surface_target, FALSE, 0);	/* disable alpha blending */
 
     ypos[0] = -GetSimpleRandom(16);
 
@@ -1161,11 +1158,8 @@ void SDLFadeRectangle(int x, int y, int width, int height,
     int xx_size = width / 2;
 
     SDL_BlitSurface(surface_target, &src_rect, surface_screen, &dst_rect);
-#if defined(TARGET_SDL2)
-    SDL_SetSurfaceBlendMode(surface_source, SDL_BLENDMODE_NONE);
-#else
-    SDL_SetAlpha(surface_source, 0, 0);		/* disable alpha blending */
-#endif
+
+    SDLSetAlpha(surface_source, FALSE, 0);	/* disable alpha blending */
 
     for (xx = 0; xx < xx_size;)
     {
@@ -1228,12 +1222,7 @@ void SDLFadeRectangle(int x, int y, int width, int height,
       SDL_BlitSurface(surface_source, &src_rect, surface_screen, &dst_rect);
 
       /* draw new (target) image to screen buffer using alpha blending */
-#if defined(TARGET_SDL2)
-      SDL_SetSurfaceAlphaMod(surface_target, alpha_final);
-      SDL_SetSurfaceBlendMode(surface_target, SDL_BLENDMODE_BLEND);
-#else
-      SDL_SetAlpha(surface_target, SDL_SRCALPHA, alpha_final);
-#endif
+      SDLSetAlpha(surface_target, TRUE, alpha_final);
       SDL_BlitSurface(surface_target, &src_rect, surface_screen, &dst_rect);
 
       if (draw_border_function != NULL)
