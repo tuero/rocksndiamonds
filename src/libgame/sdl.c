@@ -2232,15 +2232,23 @@ Bitmap *SDLLoadImage(char *filename)
     return NULL;
   }
 
+  /* remove alpha channel from native non-transparent surface, if defined */
+  SDLSetAlpha(new_bitmap->surface, FALSE, 0);
+
+  /* remove transparent color from native non-transparent surface, if defined */
+  SDL_SetColorKey(new_bitmap->surface, UNSET_TRANSPARENT_PIXEL, 0);
+
   print_timestamp_time("SDL_DisplayFormat (opaque)");
 
   UPDATE_BUSY_STATE();
 
-  /* create native transparent surface for current image */
-  if (sdl_image_tmp->format->Amask == 0)
+  /* set black pixel to transparent if no alpha channel / transparent color */
+  if (!SDLHasAlpha(sdl_image_tmp) &&
+      !SDLHasColorKey(sdl_image_tmp))
     SDL_SetColorKey(sdl_image_tmp, SET_TRANSPARENT_PIXEL,
 		    SDL_MapRGB(sdl_image_tmp->format, 0x00, 0x00, 0x00));
 
+  /* create native transparent surface for current image */
   if ((new_bitmap->surface_masked = SDLGetNativeSurface(sdl_image_tmp)) == NULL)
   {
     SetError("SDL_DisplayFormat(): %s", SDL_GetError());
