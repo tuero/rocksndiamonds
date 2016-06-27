@@ -340,10 +340,12 @@ SDL_Surface *SDLGetNativeSurface(SDL_Surface *surface)
   if (surface == NULL)
     return NULL;
 
-  if (video.initialized)
-    new_surface = SDL_DisplayFormat(surface);
-  else
+  if (!video.initialized)
     new_surface = SDL_ConvertSurface(surface, surface->format, SURFACE_FLAGS);
+  else if (SDLHasAlpha(surface))
+    new_surface = SDL_DisplayFormatAlpha(surface);
+  else
+    new_surface = SDL_DisplayFormat(surface);
 
   if (new_surface == NULL)
     Error(ERR_EXIT, "%s() failed: %s",
