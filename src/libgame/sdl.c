@@ -226,32 +226,6 @@ static boolean equalSDLPixelFormat(SDL_PixelFormat *format1,
 	  format1->Bmask	 == format2->Bmask);
 }
 
-boolean SDLSetNativeSurface(SDL_Surface **surface)
-{
-  SDL_Surface *new_surface;
-
-  if (surface == NULL ||
-      *surface == NULL ||
-      backbuffer == NULL ||
-      backbuffer->surface == NULL)
-    return FALSE;
-
-  // if pixel format already optimized for destination surface, do nothing
-  if (equalSDLPixelFormat((*surface)->format, backbuffer->surface->format))
-    return FALSE;
-
-  new_surface = SDL_ConvertSurface(*surface, backbuffer->surface->format, 0);
-
-  if (new_surface == NULL)
-    Error(ERR_EXIT, "SDL_ConvertSurface() failed: %s", SDL_GetError());
-
-  SDL_FreeSurface(*surface);
-
-  *surface = new_surface;
-
-  return TRUE;
-}
-
 SDL_Surface *SDLGetNativeSurface(SDL_Surface *surface)
 {
   SDL_PixelFormat format;
@@ -276,6 +250,29 @@ SDL_Surface *SDLGetNativeSurface(SDL_Surface *surface)
     Error(ERR_EXIT, "SDL_ConvertSurface() failed: %s", SDL_GetError());
 
   return new_surface;
+}
+
+boolean SDLSetNativeSurface(SDL_Surface **surface)
+{
+  SDL_Surface *new_surface;
+
+  if (surface == NULL ||
+      *surface == NULL ||
+      backbuffer == NULL ||
+      backbuffer->surface == NULL)
+    return FALSE;
+
+  // if pixel format already optimized for destination surface, do nothing
+  if (equalSDLPixelFormat((*surface)->format, backbuffer->surface->format))
+    return FALSE;
+
+  new_surface = SDLGetNativeSurface(*surface);
+
+  SDL_FreeSurface(*surface);
+
+  *surface = new_surface;
+
+  return TRUE;
 }
 
 #else
