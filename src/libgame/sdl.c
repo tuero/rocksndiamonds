@@ -277,30 +277,12 @@ boolean SDLSetNativeSurface(SDL_Surface **surface)
 
 #else
 
-boolean SDLSetNativeSurface(SDL_Surface **surface)
-{
-  SDL_Surface *new_surface;
-
-  if (surface == NULL ||
-      *surface == NULL ||
-      !video.initialized)
-    return FALSE;
-
-  new_surface = SDL_DisplayFormat(*surface);
-
-  if (new_surface == NULL)
-    Error(ERR_EXIT, "SDL_DisplayFormat() failed: %s", SDL_GetError());
-
-  SDL_FreeSurface(*surface);
-
-  *surface = new_surface;
-
-  return TRUE;
-}
-
 SDL_Surface *SDLGetNativeSurface(SDL_Surface *surface)
 {
   SDL_Surface *new_surface;
+
+  if (surface == NULL)
+    return NULL;
 
   if (video.initialized)
     new_surface = SDL_DisplayFormat(surface);
@@ -313,6 +295,24 @@ SDL_Surface *SDLGetNativeSurface(SDL_Surface *surface)
 	  SDL_GetError());
 
   return new_surface;
+}
+
+boolean SDLSetNativeSurface(SDL_Surface **surface)
+{
+  SDL_Surface *new_surface;
+
+  if (surface == NULL ||
+      *surface == NULL ||
+      !video.initialized)
+    return FALSE;
+
+  new_surface = SDLGetNativeSurface(*surface);
+
+  SDL_FreeSurface(*surface);
+
+  *surface = new_surface;
+
+  return TRUE;
 }
 
 #endif
