@@ -977,13 +977,6 @@ void ReloadCustomImage(Bitmap *bitmap, char *basename)
   free(new_bitmap);
 }
 
-Bitmap *ZoomBitmap(Bitmap *src_bitmap, int zoom_width, int zoom_height)
-{
-  Bitmap *dst_bitmap = SDLZoomBitmap(src_bitmap, zoom_width, zoom_height);
-
-  return dst_bitmap;
-}
-
 static void SetMaskedBitmapSurface(Bitmap *bitmap)
 {
   if (bitmap == NULL)
@@ -1001,6 +994,15 @@ static void SetMaskedBitmapSurface(Bitmap *bitmap)
     Error(ERR_EXIT, "SDL_DisplayFormat() failed");
 
   SDL_SetColorKey(surface, UNSET_TRANSPARENT_PIXEL, 0);
+}
+
+static Bitmap *ZoomBitmap(Bitmap *src_bitmap, int zoom_width, int zoom_height)
+{
+  Bitmap *dst_bitmap = SDLZoomBitmap(src_bitmap, zoom_width, zoom_height);
+
+  SetMaskedBitmapSurface(dst_bitmap);
+
+  return dst_bitmap;
 }
 
 void ReCreateGameTileSizeBitmap(Bitmap **bitmaps)
@@ -1027,8 +1029,6 @@ void ReCreateGameTileSizeBitmap(Bitmap **bitmaps)
 
   bitmaps[IMG_BITMAP_CUSTOM] = bitmap_new;
   bitmaps[IMG_BITMAP_GAME]   = bitmap_new;
-
-  SetMaskedBitmapSurface(bitmap_new);
 }
 
 static void CreateScaledBitmaps(Bitmap **bitmaps, int zoom_factor,
@@ -1195,12 +1195,6 @@ static void CreateScaledBitmaps(Bitmap **bitmaps, int zoom_factor,
   {
     bitmaps[IMG_BITMAP_32x32] = tmp_bitmap_1;
   }
-
-  // create corresponding bitmaps for masked blitting
-  for (i = 0; i < NUM_IMG_BITMAPS; i++)
-    if (bitmaps[i] != NULL &&
-	bitmaps[i] != old_bitmap)
-      SetMaskedBitmapSurface(bitmaps[i]);
 
   UPDATE_BUSY_STATE();
 
