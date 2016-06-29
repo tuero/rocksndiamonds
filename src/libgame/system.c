@@ -977,32 +977,9 @@ void ReloadCustomImage(Bitmap *bitmap, char *basename)
   free(new_bitmap);
 }
 
-static void SetMaskedBitmapSurface(Bitmap *bitmap)
-{
-  if (bitmap == NULL)
-    return;
-
-  SDL_Surface *surface = bitmap->surface;
-
-  if (bitmap->surface_masked)
-    SDL_FreeSurface(bitmap->surface_masked);
-
-  SDL_SetColorKey(surface, SET_TRANSPARENT_PIXEL,
-		  SDL_MapRGB(surface->format, 0x00, 0x00, 0x00));
-
-  if ((bitmap->surface_masked = SDLGetNativeSurface(surface)) == NULL)
-    Error(ERR_EXIT, "SDL_DisplayFormat() failed");
-
-  SDL_SetColorKey(surface, UNSET_TRANSPARENT_PIXEL, 0);
-}
-
 static Bitmap *ZoomBitmap(Bitmap *src_bitmap, int zoom_width, int zoom_height)
 {
-  Bitmap *dst_bitmap = SDLZoomBitmap(src_bitmap, zoom_width, zoom_height);
-
-  SetMaskedBitmapSurface(dst_bitmap);
-
-  return dst_bitmap;
+  return SDLZoomBitmap(src_bitmap, zoom_width, zoom_height);
 }
 
 void ReCreateGameTileSizeBitmap(Bitmap **bitmaps)
