@@ -2180,22 +2180,23 @@ SDL_Surface *zoomSurface(SDL_Surface *src, int dst_width, int dst_height)
   return zoom_dst;
 }
 
-static void SetOpaqueBitmapSurface(Bitmap *bitmap)
+static SDL_Surface *SDLGetOpaqueSurface(SDL_Surface *surface)
 {
-  if (bitmap == NULL)
-    return;
+  SDL_Surface *new_surface;
 
-  if (bitmap->surface)
-    SDL_FreeSurface(bitmap->surface);
+  if (surface == NULL)
+    return NULL;
 
-  if ((bitmap->surface = SDLGetNativeSurface(bitmap->surface_masked)) == NULL)
+  if ((new_surface = SDLGetNativeSurface(surface)) == NULL)
     Error(ERR_EXIT, "SDL_DisplayFormat() failed");
 
   /* remove alpha channel from native non-transparent surface, if defined */
-  SDLSetAlpha(bitmap->surface, FALSE, 0);
+  SDLSetAlpha(new_surface, FALSE, 0);
 
   /* remove transparent color from native non-transparent surface, if defined */
-  SDL_SetColorKey(bitmap->surface, UNSET_TRANSPARENT_PIXEL, 0);
+  SDL_SetColorKey(new_surface, UNSET_TRANSPARENT_PIXEL, 0);
+
+  return new_surface;
 }
 
 Bitmap *SDLZoomBitmap(Bitmap *src_bitmap, int dst_width, int dst_height)
@@ -2221,7 +2222,7 @@ Bitmap *SDLZoomBitmap(Bitmap *src_bitmap, int dst_width, int dst_height)
 		    SDLGetColorKey(src_bitmap->surface_masked));
 
   /* create native non-transparent surface for opaque blitting */
-  SetOpaqueBitmapSurface(dst_bitmap);
+  dst_bitmap->surface = SDLGetOpaqueSurface(dst_bitmap->surface_masked);
 
   return dst_bitmap;
 }
