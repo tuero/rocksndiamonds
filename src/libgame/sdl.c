@@ -2254,14 +2254,8 @@ Bitmap *SDLLoadImage(char *filename)
   UPDATE_BUSY_STATE();
 
   /* create native non-transparent surface for current image */
-  if ((new_bitmap->surface = SDLGetNativeSurface(sdl_image_tmp)) == NULL)
-    Error(ERR_EXIT, "SDLGetNativeSurface() failed");
-
-  /* remove alpha channel from native non-transparent surface, if defined */
-  SDLSetAlpha(new_bitmap->surface, FALSE, 0);
-
-  /* remove transparent color from native non-transparent surface, if defined */
-  SDL_SetColorKey(new_bitmap->surface, UNSET_TRANSPARENT_PIXEL, 0);
+  if ((new_bitmap->surface = SDLGetOpaqueSurface(sdl_image_tmp)) == NULL)
+    Error(ERR_EXIT, "SDLGetOpaqueSurface() failed");
 
   print_timestamp_time("SDLGetNativeSurface (opaque)");
 
