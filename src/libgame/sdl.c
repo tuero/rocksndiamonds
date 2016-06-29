@@ -2124,7 +2124,8 @@ SDL_Surface *zoomSurface(SDL_Surface *src, int dst_width, int dst_height)
   {
     /* new source surface is 32 bit with a defined RGB ordering */
     zoom_src = SDL_CreateRGBSurface(SURFACE_FLAGS, src->w, src->h, 32,
-				    0x000000ff, 0x0000ff00, 0x00ff0000, 0);
+				    0x000000ff, 0x0000ff00, 0x00ff0000,
+				    (src->format->Amask ? 0xff000000 : 0));
     SDL_BlitSurface(src, NULL, zoom_src, NULL);
     is_32bit = TRUE;
     is_converted = TRUE;
@@ -2137,7 +2138,8 @@ SDL_Surface *zoomSurface(SDL_Surface *src, int dst_width, int dst_height)
     zoom_dst = SDL_CreateRGBSurface(SURFACE_FLAGS, dst_width, dst_height, 32,
 				    zoom_src->format->Rmask,
 				    zoom_src->format->Gmask,
-				    zoom_src->format->Bmask, 0);
+				    zoom_src->format->Bmask,
+				    zoom_src->format->Amask);
   }
   else
   {
