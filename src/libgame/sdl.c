@@ -2202,7 +2202,8 @@ static SDL_Surface *SDLGetOpaqueSurface(SDL_Surface *surface)
 Bitmap *SDLZoomBitmap(Bitmap *src_bitmap, int dst_width, int dst_height)
 {
   Bitmap *dst_bitmap = CreateBitmapStruct();
-  SDL_Surface **dst_surface = &dst_bitmap->surface_masked;
+  SDL_Surface *src_surface = src_bitmap->surface_masked;
+  SDL_Surface *dst_surface;
 
   dst_width  = MAX(1, dst_width);	/* prevent zero bitmap width */
   dst_height = MAX(1, dst_height);	/* prevent zero bitmap height */
@@ -2211,18 +2212,21 @@ Bitmap *SDLZoomBitmap(Bitmap *src_bitmap, int dst_width, int dst_height)
   dst_bitmap->height = dst_height;
 
   /* create zoomed temporary surface from source surface */
-  *dst_surface = zoomSurface(src_bitmap->surface_masked, dst_width, dst_height);
+  dst_surface = zoomSurface(src_surface, dst_width, dst_height);
 
   /* create native format destination surface from zoomed temporary surface */
-  SDLSetNativeSurface(dst_surface);
+  SDLSetNativeSurface(&dst_surface);
 
   /* set color key for zoomed surface from source surface, if defined */
-  if (SDLHasColorKey(src_bitmap->surface_masked))
-    SDL_SetColorKey(*dst_surface, SET_TRANSPARENT_PIXEL,
-		    SDLGetColorKey(src_bitmap->surface_masked));
+  if (SDLHasColorKey(src_surface))
+    SDL_SetColorKey(dst_surface, SET_TRANSPARENT_PIXEL,
+		    SDLGetColorKey(src_surface));
 
   /* create native non-transparent surface for opaque blitting */
-  dst_bitmap->surface = SDLGetOpaqueSurface(dst_bitmap->surface_masked);
+  dst_bitmap->surface = SDLGetOpaqueSurface(dst_surface);
+
+  /* set native transparent surface for masked blitting */
+  dst_bitmap->surface_masked = dst_surface;
 
   return dst_bitmap;
 }
