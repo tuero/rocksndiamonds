@@ -2188,7 +2188,7 @@ static SDL_Surface *SDLGetOpaqueSurface(SDL_Surface *surface)
     return NULL;
 
   if ((new_surface = SDLGetNativeSurface(surface)) == NULL)
-    Error(ERR_EXIT, "SDL_DisplayFormat() failed");
+    Error(ERR_EXIT, "SDLGetNativeSurface() failed");
 
   /* remove alpha channel from native non-transparent surface, if defined */
   SDLSetAlpha(new_surface, FALSE, 0);
@@ -2247,11 +2247,7 @@ Bitmap *SDLLoadImage(char *filename)
 
   /* load image to temporary surface */
   if ((sdl_image_tmp = IMG_Load(filename)) == NULL)
-  {
-    SetError("IMG_Load(): %s", SDL_GetError());
-
-    return NULL;
-  }
+    Error(ERR_EXIT, "IMG_Load() failed: %s", SDL_GetError());
 
   print_timestamp_time("IMG_Load");
 
@@ -2259,11 +2255,7 @@ Bitmap *SDLLoadImage(char *filename)
 
   /* create native non-transparent surface for current image */
   if ((new_bitmap->surface = SDLGetNativeSurface(sdl_image_tmp)) == NULL)
-  {
-    SetError("SDL_DisplayFormat(): %s", SDL_GetError());
-
-    return NULL;
-  }
+    Error(ERR_EXIT, "SDLGetNativeSurface() failed");
 
   /* remove alpha channel from native non-transparent surface, if defined */
   SDLSetAlpha(new_bitmap->surface, FALSE, 0);
@@ -2271,7 +2263,7 @@ Bitmap *SDLLoadImage(char *filename)
   /* remove transparent color from native non-transparent surface, if defined */
   SDL_SetColorKey(new_bitmap->surface, UNSET_TRANSPARENT_PIXEL, 0);
 
-  print_timestamp_time("SDL_DisplayFormat (opaque)");
+  print_timestamp_time("SDLGetNativeSurface (opaque)");
 
   UPDATE_BUSY_STATE();
 
@@ -2283,13 +2275,9 @@ Bitmap *SDLLoadImage(char *filename)
 
   /* create native transparent surface for current image */
   if ((new_bitmap->surface_masked = SDLGetNativeSurface(sdl_image_tmp)) == NULL)
-  {
-    SetError("SDL_DisplayFormat(): %s", SDL_GetError());
+    Error(ERR_EXIT, "SDLGetNativeSurface() failed");
 
-    return NULL;
-  }
-
-  print_timestamp_time("SDL_DisplayFormat (masked)");
+  print_timestamp_time("SDLGetNativeSurface (masked)");
 
   UPDATE_BUSY_STATE();
 
