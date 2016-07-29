@@ -195,22 +195,23 @@ void InitElementSmallImages()
   print_timestamp_time("getImageListPropertyMapping/Size");
 
   print_timestamp_init("InitElementSmallImagesScaledUp (1)");
-  /* initialize normal images from static configuration */
+  /* initialize normal element images from static configuration */
   for (i = 0; element_to_graphic[i].element > -1; i++)
     InitElementSmallImagesScaledUp(element_to_graphic[i].graphic);
   print_timestamp_done("InitElementSmallImagesScaledUp (1)");
 
-  /* initialize special images from static configuration */
+  /* initialize special element images from static configuration */
   for (i = 0; element_to_special_graphic[i].element > -1; i++)
     InitElementSmallImagesScaledUp(element_to_special_graphic[i].graphic);
   print_timestamp_time("InitElementSmallImagesScaledUp (2)");
 
-  /* initialize images from dynamic configuration (may be elements or other) */
+  /* initialize element images from dynamic configuration */
   for (i = 0; i < num_property_mappings; i++)
-    InitElementSmallImagesScaledUp(property_mapping[i].artwork_index);
+    if (property_mapping[i].base_index < MAX_NUM_ELEMENTS)
+      InitElementSmallImagesScaledUp(property_mapping[i].artwork_index);
   print_timestamp_time("InitElementSmallImagesScaledUp (3)");
 
-  /* initialize special images from above list (non-element images) */
+  /* initialize special non-element images from above list */
   for (i = 0; special_graphics[i] > -1; i++)
     InitElementSmallImagesScaledUp(special_graphics[i]);
   print_timestamp_time("InitElementSmallImagesScaledUp (4)");
