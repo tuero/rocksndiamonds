@@ -140,6 +140,13 @@ char *getTokenFromImageID(int graphic)
   return (file_list != NULL ? file_list->token : NULL);
 }
 
+char *getFilenameFromImageID(int graphic)
+{
+  struct FileInfo *file_list = getImageListEntryFromImageID(graphic);
+
+  return (file_list != NULL ? file_list->filename : NULL);
+}
+
 int getImageIDFromToken(char *token)
 {
   struct FileInfo *file_list = image_info->file_list;

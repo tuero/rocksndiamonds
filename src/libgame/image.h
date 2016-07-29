@@ -58,6 +58,7 @@ Bitmap **getBitmapsFromImageID(int);
 int getOriginalImageWidthFromImageID(int);
 int getOriginalImageHeightFromImageID(int);
 char *getTokenFromImageID(int);
+char *getFilenameFromImageID(int);
 int getImageIDFromToken(char *);
 char *getImageConfigFilename();
 int getImageListPropertyMappingSize();
