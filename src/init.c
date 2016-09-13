@@ -1785,7 +1785,8 @@ static void InitGraphicCompatibilityInfo()
 	{
 	  // printf("::: special treatment needed for token '%s'\n", fi->token);
 
-	  graphic_info[i].bitmap = graphic_info[IMG_GLOBAL_DOOR].bitmap;
+	  graphic_info[i].bitmaps = graphic_info[IMG_GLOBAL_DOOR].bitmaps;
+	  graphic_info[i].bitmap  = graphic_info[IMG_GLOBAL_DOOR].bitmap;
 	}
       }
     }
