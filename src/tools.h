@@ -130,6 +130,8 @@ void DrawAllPlayers(void);
 void DrawPlayerField(int, int);
 void DrawPlayer(struct PlayerInfo *);
 
+void getGraphicSourceBitmap(int, int, Bitmap **);
+void getGraphicSourceXY(int, int, int *, int *, boolean);
 void getSizedGraphicSourceExt(int, int, int, Bitmap **, int *, int *, boolean);
 void getFixedGraphicSourceExt(int, int, Bitmap **, int *, int *, boolean);
 void getSizedGraphicSource(int, int, int, Bitmap **, int *, int *);

@@ -1219,52 +1219,64 @@ int getGraphicAnimationFrame(int graphic, int sync_frame)
 			   sync_frame);
 }
 
-void getSizedGraphicSourceExt(int graphic, int frame, int tilesize,
-			      Bitmap **bitmap, int *x, int *y,
-			      boolean get_backside)
+void getGraphicSourceBitmap(int graphic, int tilesize, Bitmap **bitmap)
 {
   struct GraphicInfo *g = &graphic_info[graphic];
-  Bitmap *src_bitmap = g->bitmap;
-  int src_x = g->src_x + (get_backside ? g->offset2_x : 0);
-  int src_y = g->src_y + (get_backside ? g->offset2_y : 0);
   int tilesize_capped = MIN(MAX(1, tilesize), TILESIZE);
 
-  // if no in-game graphics defined, always use standard graphic size
-  if (g->bitmaps[IMG_BITMAP_GAME] == NULL)
-    tilesize = TILESIZE;
-
   if (tilesize == gfx.standard_tile_size)
-    src_bitmap = g->bitmaps[IMG_BITMAP_STANDARD];
+    *bitmap = g->bitmaps[IMG_BITMAP_STANDARD];
   else if (tilesize == game.tile_size)
-    src_bitmap = g->bitmaps[IMG_BITMAP_GAME];
+    *bitmap = g->bitmaps[IMG_BITMAP_GAME];
   else
-    src_bitmap = g->bitmaps[IMG_BITMAP_1x1 - log_2(tilesize_capped)];
+    *bitmap = g->bitmaps[IMG_BITMAP_1x1 - log_2(tilesize_capped)];
+}
+
+void getGraphicSourceXY(int graphic, int frame, int *x, int *y,
+			boolean get_backside)
+{
+  struct GraphicInfo *g = &graphic_info[graphic];
+  int src_x = g->src_x + (get_backside ? g->offset2_x : 0);
+  int src_y = g->src_y + (get_backside ? g->offset2_y : 0);
 
   if (g->offset_y == 0)		/* frames are ordered horizontally */
   {
     int max_width = g->anim_frames_per_line * g->width;
     int pos = (src_y / g->height) * max_width + src_x + frame * g->offset_x;
 
-    src_x = pos % max_width;
-    src_y = src_y % g->height + pos / max_width * g->height;
+    *x = pos % max_width;
+    *y = src_y % g->height + pos / max_width * g->height;
   }
   else if (g->offset_x == 0)	/* frames are ordered vertically */
   {
     int max_height = g->anim_frames_per_line * g->height;
     int pos = (src_x / g->width) * max_height + src_y + frame * g->offset_y;
 
-    src_x = src_x % g->width + pos / max_height * g->width;
-    src_y = pos % max_height;
+    *x = src_x % g->width + pos / max_height * g->width;
+    *y = pos % max_height;
   }
   else				/* frames are ordered diagonally */
   {
-    src_x = src_x + frame * g->offset_x;
-    src_y = src_y + frame * g->offset_y;
+    *x = src_x + frame * g->offset_x;
+    *y = src_y + frame * g->offset_y;
   }
+}
 
-  *bitmap = src_bitmap;
-  *x = src_x * tilesize / g->tile_size;
-  *y = src_y * tilesize / g->tile_size;
+void getSizedGraphicSourceExt(int graphic, int frame, int tilesize,
+			      Bitmap **bitmap, int *x, int *y,
+			      boolean get_backside)
+{
+  struct GraphicInfo *g = &graphic_info[graphic];
+
+  // if no in-game graphics defined, always use standard graphic size
+  if (g->bitmaps[IMG_BITMAP_GAME] == NULL)
+    tilesize = TILESIZE;
+
+  getGraphicSourceBitmap(graphic, tilesize, bitmap);
+  getGraphicSourceXY(graphic, frame, x, y, get_backside);
+
+  *x = *x * tilesize / g->tile_size;
+  *y = *y * tilesize / g->tile_size;
 }
 
 void getFixedGraphicSourceExt(int graphic, int frame, Bitmap **bitmap,
@@ -1294,40 +1306,8 @@ void getMiniGraphicSource(int graphic, Bitmap **bitmap, int *x, int *y)
 inline static void getGraphicSourceExt(int graphic, int frame, Bitmap **bitmap,
 				       int *x, int *y, boolean get_backside)
 {
-  struct GraphicInfo *g = &graphic_info[graphic];
-  int src_x = g->src_x + (get_backside ? g->offset2_x : 0);
-  int src_y = g->src_y + (get_backside ? g->offset2_y : 0);
-
-  if (TILESIZE_VAR != TILESIZE)
-    return getSizedGraphicSourceExt(graphic, frame, TILESIZE_VAR, bitmap, x, y,
-				    get_backside);
-
-  *bitmap = g->bitmap;
-
-  if (g->offset_y == 0)		/* frames are ordered horizontally */
-  {
-    int max_width = g->anim_frames_per_line * g->width;
-    int pos = (src_y / g->height) * max_width + src_x + frame * g->offset_x;
-
-    *x = pos % max_width;
-    *y = src_y % g->height + pos / max_width * g->height;
-  }
-  else if (g->offset_x == 0)	/* frames are ordered vertically */
-  {
-    int max_height = g->anim_frames_per_line * g->height;
-    int pos = (src_x / g->width) * max_height + src_y + frame * g->offset_y;
-
-    *x = src_x % g->width + pos / max_height * g->width;
-    *y = pos % max_height;
-  }
-  else				/* frames are ordered diagonally */
-  {
-    *x = src_x + frame * g->offset_x;
-    *y = src_y + frame * g->offset_y;
-  }
-
-  *x = *x * TILESIZE_VAR / g->tile_size;
-  *y = *y * TILESIZE_VAR / g->tile_size;
+  getSizedGraphicSourceExt(graphic, frame, TILESIZE_VAR, bitmap, x, y,
+			   get_backside);
 }
 
 void getGraphicSource(int graphic, int frame, Bitmap **bitmap, int *x, int *y)
