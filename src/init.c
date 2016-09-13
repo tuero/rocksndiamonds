@@ -937,14 +937,12 @@ void InitElementGraphicInfo()
 	      (move_dir == MV_BIT_UP    && !front_is_left_or_upper) ||
 	      (move_dir == MV_BIT_RIGHT &&  front_is_left_or_upper) ||
 	      (move_dir == MV_BIT_DOWN  &&  front_is_left_or_upper)));
-	  Bitmap *dummy;
 
 	  /* swap frontside and backside graphic tile coordinates, if needed */
 	  if (swap_movement_tiles_always || swap_movement_tiles_autodetected)
 	  {
 	    /* get current (wrong) backside tile coordinates */
-	    getFixedGraphicSourceExt(graphic, 0, &dummy,
-				     &src_x_back, &src_y_back, TRUE);
+	    getGraphicSourceXY(graphic, 0, &src_x_back, &src_y_back, TRUE);
 
 	    /* set frontside tile coordinates to backside tile coordinates */
 	    g->src_x = src_x_back;
