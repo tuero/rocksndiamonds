@@ -134,6 +134,8 @@ void SaveEngineSnapshotValues_SP(ListNode **buffers)
   SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(TimerVar));
   SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(RandomSeed));
 
+  SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(FreezeZonks));
+
   SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(TerminalMaxCycles));
 
   SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(mScrollX));
