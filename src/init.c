@@ -1706,6 +1706,7 @@ static void InitGraphicInfo()
       Error(ERR_INFO, "- config file: '%s'", getImageConfigFilename());
       Error(ERR_INFO, "- config token: '%s'", getTokenFromImageID(i));
       Error(ERR_INFO, "- image file: '%s'", src_bitmap->source_filename);
+      Error(ERR_INFO, "- frame size: %d, %d", width, height);
       Error(ERR_INFO,
 	    "error: first animation frame out of bounds (%d, %d) [%d, %d]",
 	    src_x, src_y, src_bitmap_width, src_bitmap_height);
@@ -1734,10 +1735,10 @@ static void InitGraphicInfo()
       Error(ERR_INFO, "- config file: '%s'", getImageConfigFilename());
       Error(ERR_INFO, "- config token: '%s'", getTokenFromImageID(i));
       Error(ERR_INFO, "- image file: '%s'", src_bitmap->source_filename);
+      Error(ERR_INFO, "- frame size: %d, %d", width, height);
       Error(ERR_INFO,
 	    "error: last animation frame (%d) out of bounds (%d, %d) [%d, %d]",
 	    last_frame, src_x, src_y, src_bitmap_width, src_bitmap_height);
-      Error(ERR_INFO, "::: %d, %d", width, height);
       Error(ERR_INFO, "custom graphic rejected for this element/action");
 
       if (i == fallback_graphic)
