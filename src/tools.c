@@ -4460,7 +4460,8 @@ unsigned int MoveDoor(unsigned int door_state)
 	  int sync_frame = kk_door * door_delay_value;
 	  int frame = getGraphicAnimationFrame(dpc->graphic, sync_frame);
 
-	  getGraphicSource(dpc->graphic, frame, &bitmap, &g_src_x, &g_src_y);
+	  getFixedGraphicSource(dpc->graphic, frame, &bitmap,
+				&g_src_x, &g_src_y);
 	}
 
 	// draw door panel
