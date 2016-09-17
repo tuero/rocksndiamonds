@@ -8033,42 +8033,38 @@ void CheckSaveEngineSnapshot_EM(byte action[MAX_PLAYERS], int frame,
 				boolean any_player_snapping,
 				boolean any_player_dropping)
 {
-  static boolean player_was_waiting = TRUE;
-
   if (frame == 0 && !any_player_dropping)
   {
-    if (!player_was_waiting)
+    if (!local_player->was_waiting)
     {
       if (!SaveEngineSnapshotToList())
 	return;
 
-      player_was_waiting = TRUE;
+      local_player->was_waiting = TRUE;
     }
   }
   else if (any_player_moving || any_player_snapping || any_player_dropping)
   {
-    player_was_waiting = FALSE;
+    local_player->was_waiting = FALSE;
   }
 }
 
 void CheckSaveEngineSnapshot_SP(boolean murphy_is_waiting,
 				boolean murphy_is_dropping)
 {
-  static boolean player_was_waiting = TRUE;
-
   if (murphy_is_waiting)
   {
-    if (!player_was_waiting)
+    if (!local_player->was_waiting)
     {
       if (!SaveEngineSnapshotToList())
 	return;
 
-      player_was_waiting = TRUE;
+      local_player->was_waiting = TRUE;
     }
   }
   else
   {
-    player_was_waiting = FALSE;
+    local_player->was_waiting = FALSE;
   }
 }
 

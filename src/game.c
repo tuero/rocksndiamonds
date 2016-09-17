@@ -3212,6 +3212,11 @@ void InitGame()
     player->is_bored = FALSE;
     player->is_sleeping = FALSE;
 
+    player->was_waiting = TRUE;
+    player->was_moving = FALSE;
+    player->was_snapping = FALSE;
+    player->was_dropping = FALSE;
+
     player->frame_counter_bored = -1;
     player->frame_counter_sleeping = -1;
 
@@ -10688,32 +10693,28 @@ static void SetPlayerWaiting(struct PlayerInfo *player, boolean is_waiting)
 
 static void CheckSaveEngineSnapshot(struct PlayerInfo *player)
 {
-  static boolean player_was_moving = FALSE;
-  static boolean player_was_snapping = FALSE;
-  static boolean player_was_dropping = FALSE;
-
-  if ((!player->is_moving  && player_was_moving) ||
-      (player->MovPos == 0 && player_was_moving) ||
-      (player->is_snapping && !player_was_snapping) ||
-      (player->is_dropping && !player_was_dropping))
+  if ((!player->is_moving  && player->was_moving) ||
+      (player->MovPos == 0 && player->was_moving) ||
+      (player->is_snapping && !player->was_snapping) ||
+      (player->is_dropping && !player->was_dropping))
   {
     if (!SaveEngineSnapshotToList())
       return;
 
-    player_was_moving = FALSE;
-    player_was_snapping = TRUE;
-    player_was_dropping = TRUE;
+    player->was_moving = FALSE;
+    player->was_snapping = TRUE;
+    player->was_dropping = TRUE;
   }
   else
   {
     if (player->is_moving)
-      player_was_moving = TRUE;
+      player->was_moving = TRUE;
 
     if (!player->is_snapping)
-      player_was_snapping = FALSE;
+      player->was_snapping = FALSE;
 
     if (!player->is_dropping)
-      player_was_dropping = FALSE;
+      player->was_dropping = FALSE;
   }
 }
 

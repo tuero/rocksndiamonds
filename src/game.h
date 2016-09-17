@@ -272,6 +272,11 @@ struct PlayerInfo
   boolean is_bored;
   boolean is_sleeping;
 
+  boolean was_waiting;
+  boolean was_moving;
+  boolean was_snapping;
+  boolean was_dropping;
+
   boolean cannot_move;
 
   int frame_counter_bored;
