@@ -3049,6 +3049,7 @@ static void InitGameEngine()
      SNAPSHOT_MODE_EVERY_MOVE :
      strEqual(setup.engine_snapshot_mode, STR_SNAPSHOT_MODE_EVERY_COLLECT) ?
      SNAPSHOT_MODE_EVERY_COLLECT : SNAPSHOT_MODE_OFF);
+  game.snapshot.save_snapshot = FALSE;
 }
 
 int get_num_special_action(int element, int action_first, int action_last)
@@ -10698,7 +10699,7 @@ static void CheckSaveEngineSnapshot(struct PlayerInfo *player)
       (player->is_snapping && !player->was_snapping) ||
       (player->is_dropping && !player->was_dropping))
   {
-    if (!SaveEngineSnapshotToList())
+    if (!CheckSaveEngineSnapshotToList())
       return;
 
     player->was_moving = FALSE;
@@ -10959,7 +10960,7 @@ void StartGameActions(boolean init_network_game, boolean record_tape,
   InitGame();
 }
 
-void GameActions()
+void GameActionsExt()
 {
 #if 0
   static unsigned int game_frame_delay = 0;
@@ -11236,6 +11237,24 @@ void GameActions()
 
     redraw_mask |= REDRAW_FPS;
   }
+}
+
+static void GameActions_CheckSaveEngineSnapshot()
+{
+  if (!game.snapshot.save_snapshot)
+    return;
+
+  // clear flag for saving snapshot _before_ saving snapshot
+  game.snapshot.save_snapshot = FALSE;
+
+  SaveEngineSnapshotToList();
+}
+
+void GameActions()
+{
+  GameActionsExt();
+
+  GameActions_CheckSaveEngineSnapshot();
 }
 
 void GameActions_EM_Main()
@@ -14770,11 +14789,10 @@ void SaveEngineSnapshotSingle()
   snapshot_level_nr = level_nr;
 }
 
-static boolean SaveEngineSnapshotToListExt(boolean initial_snapshot)
+boolean CheckSaveEngineSnapshotToList()
 {
   boolean save_snapshot =
-    (initial_snapshot ||
-     (game.snapshot.mode == SNAPSHOT_MODE_EVERY_STEP) ||
+    ((game.snapshot.mode == SNAPSHOT_MODE_EVERY_STEP) ||
      (game.snapshot.mode == SNAPSHOT_MODE_EVERY_MOVE &&
       game.snapshot.changed_action) ||
      (game.snapshot.mode == SNAPSHOT_MODE_EVERY_COLLECT &&
@@ -14782,30 +14800,28 @@ static boolean SaveEngineSnapshotToListExt(boolean initial_snapshot)
 
   game.snapshot.changed_action = FALSE;
   game.snapshot.collected_item = FALSE;
+  game.snapshot.save_snapshot = save_snapshot;
 
+  return save_snapshot;
+}
+
+void SaveEngineSnapshotToList()
+{
   if (game.snapshot.mode == SNAPSHOT_MODE_OFF ||
-      tape.quick_resume ||
-      !save_snapshot)
-    return FALSE;
+      tape.quick_resume)
+    return;
 
   ListNode *buffers = SaveEngineSnapshotBuffers();
 
   /* finally save all snapshot buffers to snapshot list */
   SaveSnapshotToList(buffers);
-
-  return TRUE;
-}
-
-boolean SaveEngineSnapshotToList()
-{
-  return SaveEngineSnapshotToListExt(FALSE);
 }
 
 void SaveEngineSnapshotToListInitial()
 {
   FreeEngineSnapshotList();
 
-  SaveEngineSnapshotToListExt(TRUE);
+  SaveEngineSnapshotToList();
 }
 
 void LoadEngineSnapshotValues()

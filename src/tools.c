@@ -8037,7 +8037,7 @@ void CheckSaveEngineSnapshot_EM(byte action[MAX_PLAYERS], int frame,
   {
     if (!local_player->was_waiting)
     {
-      if (!SaveEngineSnapshotToList())
+      if (!CheckSaveEngineSnapshotToList())
 	return;
 
       local_player->was_waiting = TRUE;
@@ -8056,7 +8056,7 @@ void CheckSaveEngineSnapshot_SP(boolean murphy_is_waiting,
   {
     if (!local_player->was_waiting)
     {
-      if (!SaveEngineSnapshotToList())
+      if (!CheckSaveEngineSnapshotToList())
 	return;
 
       local_player->was_waiting = TRUE;

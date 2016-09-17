@@ -122,6 +122,8 @@ struct GameSnapshotInfo
   byte last_action[MAX_PLAYERS];
   boolean changed_action;
   boolean collected_item;
+
+  boolean save_snapshot;
 };
 
 struct GameInfo
@@ -386,7 +388,8 @@ void FreeEngineSnapshotSingle();
 void FreeEngineSnapshotList();
 void LoadEngineSnapshotSingle();
 void SaveEngineSnapshotSingle();
-boolean SaveEngineSnapshotToList();
+boolean CheckSaveEngineSnapshotToList();
+void SaveEngineSnapshotToList();
 void SaveEngineSnapshotToListInitial();
 boolean CheckEngineSnapshotSingle();
 boolean CheckEngineSnapshotList();
