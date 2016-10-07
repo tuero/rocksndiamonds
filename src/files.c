@@ -1786,9 +1786,40 @@ static void setFileInfoToDefaults(struct LevelFileInfo *level_file_info)
   level_file_info->filename = NULL;
 }
 
+int getMappedElement_SB(int, boolean);
+
 static void ActivateLevelTemplate()
 {
   int x, y;
+
+  if (check_special_flags("load_xsb_to_ces"))
+  {
+    /* fill smaller playfields with padding "beyond border wall" elements */
+    if (level.fieldx < level_template.fieldx ||
+	level.fieldy < level_template.fieldy)
+    {
+      short field[level.fieldx][level.fieldy];
+      int new_fieldx = MAX(level.fieldx, level_template.fieldx);
+      int new_fieldy = MAX(level.fieldy, level_template.fieldy);
+      int pos_fieldx = (new_fieldx - level.fieldx) / 2;
+      int pos_fieldy = (new_fieldy - level.fieldy) / 2;
+
+      /* copy old playfield (which is smaller than the visible area) */
+      for (y = 0; y < level.fieldy; y++) for (x = 0; x < level.fieldx; x++)
+	field[x][y] = level.field[x][y];
+
+      /* fill new, larger playfield with "beyond border wall" elements */
+      for (y = 0; y < new_fieldy; y++) for (x = 0; x < new_fieldx; x++)
+	level.field[x][y] = getMappedElement_SB('_', TRUE);
+
+      /* copy the old playfield to the middle of the new playfield */
+      for (y = 0; y < level.fieldy; y++) for (x = 0; x < level.fieldx; x++)
+	level.field[pos_fieldx + x][pos_fieldy + y] = field[x][y];
+
+      level.fieldx = new_fieldx;
+      level.fieldy = new_fieldy;
+    }
+  }
 
   /* Currently there is no special action needed to activate the template
      data, because 'element_info' property settings overwrite the original
@@ -5755,32 +5786,6 @@ static void LoadLevelFromFileInfo_SB(struct LevelInfo *level,
   if (load_xsb_to_ces)
   {
     /* special global settings can now be set in level template */
-
-    /* fill smaller playfields with padding "beyond border wall" elements */
-    if (level->fieldx < SCR_FIELDX ||
-	level->fieldy < SCR_FIELDY)
-    {
-      short field[level->fieldx][level->fieldy];
-      int new_fieldx = MAX(level->fieldx, SCR_FIELDX);
-      int new_fieldy = MAX(level->fieldy, SCR_FIELDY);
-      int pos_fieldx = (new_fieldx - level->fieldx) / 2;
-      int pos_fieldy = (new_fieldy - level->fieldy) / 2;
-
-      /* copy old playfield (which is smaller than the visible area) */
-      for (y = 0; y < level->fieldy; y++) for (x = 0; x < level->fieldx; x++)
-	field[x][y] = level->field[x][y];
-
-      /* fill new, larger playfield with "beyond border wall" elements */
-      for (y = 0; y < new_fieldy; y++) for (x = 0; x < new_fieldx; x++)
-	level->field[x][y] = getMappedElement_SB('_', load_xsb_to_ces);
-
-      /* copy the old playfield to the middle of the new playfield */
-      for (y = 0; y < level->fieldy; y++) for (x = 0; x < level->fieldx; x++)
-	level->field[pos_fieldx + x][pos_fieldy + y] = field[x][y];
-
-      level->fieldx = new_fieldx;
-      level->fieldy = new_fieldy;
-    }
 
     level->use_custom_template = TRUE;
   }
