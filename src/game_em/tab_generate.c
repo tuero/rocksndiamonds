@@ -4532,6 +4532,7 @@ void create_obj_graphics_info_em()
       g->crumbled_src_x = 0;
       g->crumbled_src_y = 0;
       g->crumbled_border_size = 0;
+      g->crumbled_tile_size = 0;
 
       g->has_crumbled_graphics = FALSE;
       g->preserve_background = FALSE;

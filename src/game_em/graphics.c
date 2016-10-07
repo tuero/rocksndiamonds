@@ -174,7 +174,8 @@ static void DrawLevelFieldCrumbled_EM(int x, int y, int sx, int sy,
 
   g = getObjectGraphic(x, y);
 
-  crumbled_border_size = g->crumbled_border_size * TILESIZE_VAR / TILESIZE;
+  crumbled_border_size =
+    g->crumbled_border_size * TILESIZE_VAR / g->crumbled_tile_size;
 
   for (i = 0; i < 4; i++)
   {

@@ -1760,6 +1760,9 @@ static void DrawLevelFieldCrumbledInnerCorners(int x, int y, int dx, int dy,
   int width, height, cx, cy;
   int sx = SCREENX(x), sy = SCREENY(y);
   int crumbled_border_size = graphic_info[graphic].border_size;
+  int crumbled_tile_size = graphic_info[graphic].tile_size;
+  int crumbled_border_size_var =
+    crumbled_border_size * TILESIZE_VAR / crumbled_tile_size;
   int i;
 
   getGraphicSource(graphic, 0, &src_bitmap, &src_x, &src_y);
@@ -1787,8 +1790,8 @@ static void DrawLevelFieldCrumbledInnerCorners(int x, int y, int dx, int dy,
 
   getGraphicSource(graphic, 1, &src_bitmap, &src_x, &src_y);
 
-  width  = crumbled_border_size * TILESIZE_VAR / TILESIZE;
-  height = crumbled_border_size * TILESIZE_VAR / TILESIZE;
+  width  = crumbled_border_size_var;
+  height = crumbled_border_size_var;
   cx = (dx > 0 ? TILESIZE_VAR - width  : 0);
   cy = (dy > 0 ? TILESIZE_VAR - height : 0);
 
@@ -1804,7 +1807,9 @@ static void DrawLevelFieldCrumbledBorders(int x, int y, int graphic, int frame,
   int width, height, bx, by, cx, cy;
   int sx = SCREENX(x), sy = SCREENY(y);
   int crumbled_border_size = graphic_info[graphic].border_size;
-  int crumbled_border_size_var = crumbled_border_size * TILESIZE_VAR / TILESIZE;
+  int crumbled_tile_size = graphic_info[graphic].tile_size;
+  int crumbled_border_size_var =
+    crumbled_border_size * TILESIZE_VAR / crumbled_tile_size;
   int crumbled_border_pos_var = TILESIZE_VAR - crumbled_border_size_var;
   int i;
 
@@ -1823,7 +1828,7 @@ static void DrawLevelFieldCrumbledBorders(int x, int y, int graphic, int frame,
 
   /* (remaining middle border part must be at least as big as corner part) */
   if (!(graphic_info[graphic].style & STYLE_ACCURATE_BORDERS) ||
-      crumbled_border_size >= TILESIZE / 3)
+      crumbled_border_size_var >= TILESIZE_VAR / 3)
     return;
 
   /* correct corners of crumbled border, if needed */
@@ -7265,6 +7270,7 @@ inline static void set_crumbled_graphics_EM(struct GraphicInfo_EM *g_em,
 		     &g_em->crumbled_src_x, &g_em->crumbled_src_y);
 
     g_em->crumbled_border_size = graphic_info[crumbled].border_size;
+    g_em->crumbled_tile_size = graphic_info[crumbled].tile_size;
 
     g_em->has_crumbled_graphics = TRUE;
   }
@@ -7274,6 +7280,7 @@ inline static void set_crumbled_graphics_EM(struct GraphicInfo_EM *g_em,
     g_em->crumbled_src_x = 0;
     g_em->crumbled_src_y = 0;
     g_em->crumbled_border_size = 0;
+    g_em->crumbled_tile_size = 0;
 
     g_em->has_crumbled_graphics = FALSE;
   }

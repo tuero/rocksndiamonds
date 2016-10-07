@@ -691,6 +691,7 @@ struct GraphicInfo_EM
   Bitmap *crumbled_bitmap;
   int crumbled_src_x, crumbled_src_y;
   int crumbled_border_size;
+  int crumbled_tile_size;
 
   boolean has_crumbled_graphics;
   boolean preserve_background;
