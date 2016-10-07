@@ -1896,12 +1896,12 @@ static void DrawLevelFieldCrumbledExt(int x, int y, int graphic, int frame)
 
   element = TILE_GFX_ELEMENT(x, y);
 
-  /* crumble field itself */
-  if (IS_CRUMBLED_TILE(x, y, element))
+  if (IS_CRUMBLED_TILE(x, y, element))		/* crumble field itself */
   {
     if (!IN_SCR_FIELD(sx, sy))
       return;
 
+    /* crumble field borders towards direct neighbour fields */
     for (i = 0; i < 4; i++)
     {
       int xx = x + xy[i][0];
@@ -1919,6 +1919,7 @@ static void DrawLevelFieldCrumbledExt(int x, int y, int graphic, int frame)
       DrawLevelFieldCrumbledBorders(x, y, graphic, frame, i);
     }
 
+    /* crumble inner field corners towards corner neighbour fields */
     if ((graphic_info[graphic].style & STYLE_INNER_CORNERS) &&
 	graphic_info[graphic].anim_frames == 2)
     {
@@ -1933,8 +1934,9 @@ static void DrawLevelFieldCrumbledExt(int x, int y, int graphic, int frame)
 
     MarkTileDirty(sx, sy);
   }
-  else		/* center field not crumbled -- crumble neighbour fields */
+  else		/* center field is not crumbled -- crumble neighbour fields */
   {
+    /* crumble field borders of direct neighbour fields */
     for (i = 0; i < 4; i++)
     {
       int xx = x + xy[i][0];
@@ -1957,6 +1959,37 @@ static void DrawLevelFieldCrumbledExt(int x, int y, int graphic, int frame)
       graphic = el_act2crm(element, ACTION_DEFAULT);
 
       DrawLevelFieldCrumbledBorders(xx, yy, graphic, 0, 3 - i);
+
+      MarkTileDirty(sxx, syy);
+    }
+
+    /* crumble inner field corners of corner neighbour fields */
+    for (i = 0; i < 4; i++)
+    {
+      int dx = (i & 1 ? +1 : -1);
+      int dy = (i & 2 ? +1 : -1);
+      int xx = x + dx;
+      int yy = y + dy;
+      int sxx = sx + dx;
+      int syy = sy + dy;
+
+      if (!IN_LEV_FIELD(xx, yy) ||
+	  !IN_SCR_FIELD(sxx, syy))
+	continue;
+
+      if (Feld[xx][yy] == EL_ELEMENT_SNAPPING)
+	continue;
+
+      element = TILE_GFX_ELEMENT(xx, yy);
+
+      if (!IS_CRUMBLED_TILE(xx, yy, element))
+	continue;
+
+      graphic = el_act2crm(element, ACTION_DEFAULT);
+
+      if ((graphic_info[graphic].style & STYLE_INNER_CORNERS) &&
+	  graphic_info[graphic].anim_frames == 2)
+	DrawLevelFieldCrumbledInnerCorners(xx, yy, -dx, -dy, graphic);
 
       MarkTileDirty(sxx, syy);
     }
@@ -2009,6 +2042,7 @@ void DrawLevelFieldCrumbledNeighbours(int x, int y)
   };
   int i;
 
+  /* crumble direct neighbour fields (required for field borders) */
   for (i = 0; i < 4; i++)
   {
     int xx = x + xy[i][0];
@@ -2023,6 +2057,30 @@ void DrawLevelFieldCrumbledNeighbours(int x, int y)
       continue;
 
     DrawLevelField(xx, yy);
+  }
+
+  /* crumble corner neighbour fields (required for inner field corners) */
+  for (i = 0; i < 4; i++)
+  {
+    int dx = (i & 1 ? +1 : -1);
+    int dy = (i & 2 ? +1 : -1);
+    int xx = x + dx;
+    int yy = y + dy;
+    int sxx = sx + dx;
+    int syy = sy + dy;
+
+    if (!IN_LEV_FIELD(xx, yy) ||
+	!IN_SCR_FIELD(sxx, syy) ||
+	!GFX_CRUMBLED(Feld[xx][yy]) ||
+	IS_MOVING(xx, yy))
+      continue;
+
+    int element = TILE_GFX_ELEMENT(xx, yy);
+    int graphic = el_act2crm(element, ACTION_DEFAULT);
+
+    if ((graphic_info[graphic].style & STYLE_INNER_CORNERS) &&
+	graphic_info[graphic].anim_frames == 2)
+      DrawLevelField(xx, yy);
   }
 }
 
