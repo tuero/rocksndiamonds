@@ -1184,6 +1184,17 @@ static boolean insideTextPosRect(struct TextPosInfo *rect, int x, int y)
 	  y >= rect_y && y < rect_y + rect->height);
 }
 
+static boolean insidePreviewRect(struct PreviewInfo *preview, int x, int y)
+{
+  int rect_width  = preview->xsize * preview->tile_size;
+  int rect_height = preview->ysize * preview->tile_size;
+  int rect_x = ALIGNED_XPOS(preview->x, rect_width,  preview->align);
+  int rect_y = ALIGNED_YPOS(preview->y, rect_height, preview->valign);
+
+  return (x >= rect_x && x < rect_x + rect_width &&
+	  y >= rect_y && y < rect_y + rect_height);
+}
+
 static void AdjustScrollbar(int id, int items_max, int items_visible,
 			    int item_position)
 {
@@ -1806,6 +1817,10 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 	break;
       }
     }
+
+    /* check if level preview was clicked */
+    if (insidePreviewRect(&preview, mx - SX, my - SY))
+      pos = MAIN_CONTROL_GAME;
 
     // handle pressed/unpressed state for active/inactive menu buttons
     // (if pos != -1, "i" contains index position corresponding to "pos")
