@@ -248,8 +248,8 @@
 					 ED_AREA_YOFFSET_2(3))
 
 /* values for scrolling gadgets for drawing area */
-#define ED_SCROLLBUTTON_XSIZE		16
-#define ED_SCROLLBUTTON_YSIZE		16
+#define ED_SCROLLBUTTON_XSIZE		(graphic_info[IMG_EDITOR_PLAYFIELD_SCROLLBAR].width)
+#define ED_SCROLLBUTTON_YSIZE		(graphic_info[IMG_EDITOR_PLAYFIELD_SCROLLBAR].height)
 
 #define ED_SCROLL_UP_XPOS		(SXSIZE - ED_SCROLLBUTTON_XSIZE)
 #define ED_SCROLL_UP_YPOS		(0)
