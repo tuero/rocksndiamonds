@@ -11885,6 +11885,7 @@ void HandleLevelEditorKeyInput(Key key)
   {
     int id = GADGET_ID_NONE;
     int new_element_shift = element_shift;
+    int step = ED_ELEMENTLIST_BUTTONS_VERT - 1;
     int i;
 
     switch (key)
@@ -11901,13 +11902,23 @@ void HandleLevelEditorKeyInput(Key key)
       case KSYM_Down:
 	id = GADGET_ID_SCROLL_DOWN;
 	break;
+
       case KSYM_Page_Up:
-	id = GADGET_ID_SCROLL_LIST_UP;
-	button = ED_ELEMENTLIST_BUTTONS_VERT - 1;
-	break;
       case KSYM_Page_Down:
-	id = GADGET_ID_SCROLL_LIST_DOWN;
-	button = ED_ELEMENTLIST_BUTTONS_VERT - 1;
+	step *= (key == KSYM_Page_Up ? -1 : +1);
+        element_shift += step * ED_ELEMENTLIST_BUTTONS_HORIZ;
+
+        if (element_shift < 0)
+          element_shift = 0;
+        if (element_shift > num_editor_elements - ED_NUM_ELEMENTLIST_BUTTONS)
+          element_shift = num_editor_elements - ED_NUM_ELEMENTLIST_BUTTONS;
+
+        ModifyGadget(level_editor_gadget[GADGET_ID_SCROLL_LIST_VERTICAL],
+                     GDI_SCROLLBAR_ITEM_POSITION,
+                     element_shift / ED_ELEMENTLIST_BUTTONS_HORIZ, GDI_END);
+
+	ModifyEditorElementList();
+
 	break;
 
       case KSYM_Home:
