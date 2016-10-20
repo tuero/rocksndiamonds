@@ -7669,7 +7669,9 @@ void DrawLevelEd()
   BlitBitmap(graphic_info[IMG_BACKGROUND_PALETTE].bitmap, drawto,
 	     graphic_info[IMG_BACKGROUND_PALETTE].src_x,
 	     graphic_info[IMG_BACKGROUND_PALETTE].src_y,
-	     DXSIZE, DYSIZE, DX, DY);
+	     MIN(DXSIZE, graphic_info[IMG_BACKGROUND_PALETTE].width),
+	     MIN(DYSIZE, graphic_info[IMG_BACKGROUND_PALETTE].height),
+	     DX, DY);
 
   /* draw bigger door */
   DrawSpecialEditorDoor();
@@ -7678,7 +7680,9 @@ void DrawLevelEd()
   BlitBitmap(graphic_info[IMG_BACKGROUND_TOOLBOX].bitmap, drawto,
 	     graphic_info[IMG_BACKGROUND_TOOLBOX].src_x,
 	     graphic_info[IMG_BACKGROUND_TOOLBOX].src_y,
-	     EXSIZE, EYSIZE, EX, EY);
+	     MIN(EXSIZE, graphic_info[IMG_BACKGROUND_TOOLBOX].width),
+	     MIN(EYSIZE, graphic_info[IMG_BACKGROUND_TOOLBOX].height),
+	     EX, EY);
 
   // redraw_mask |= REDRAW_ALL;
 
