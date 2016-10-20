@@ -5451,6 +5451,7 @@ static void CreateControlButtons()
     Bitmap *deco_bitmap = NULL;
     int deco_x = 0, deco_y = 0, deco_xpos = 0, deco_ypos = 0;
     int tile_size = 0, deco_shift = 0;
+    boolean deco_masked = FALSE;
     int gd_x1 = gd->src_x;
     int gd_y1 = gd->src_y;
     int gd_x2 = gd->src_x + gd->pressed_xoffset;
@@ -5515,6 +5516,7 @@ static void CreateControlButtons()
       deco_xpos = (gd->width  - tile_size) / 2;
       deco_ypos = (gd->height - tile_size) / 2;
       deco_shift = 1;
+      deco_masked = gd->draw_masked;
     }
     else
     {
@@ -5541,6 +5543,7 @@ static void CreateControlButtons()
 		      GDI_DECORATION_POSITION, deco_xpos, deco_ypos,
 		      GDI_DECORATION_SIZE, tile_size, tile_size,
 		      GDI_DECORATION_SHIFTING, deco_shift, deco_shift,
+		      GDI_DECORATION_MASKED, deco_masked,
 		      GDI_EVENT_MASK, event_mask,
 		      GDI_CALLBACK_INFO, HandleEditorGadgetInfoText,
 		      GDI_CALLBACK_ACTION, HandleControlButtons,

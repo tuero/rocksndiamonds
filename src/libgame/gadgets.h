@@ -93,22 +93,23 @@
 #define GDI_DECORATION_POSITION		30
 #define GDI_DECORATION_SIZE		31
 #define GDI_DECORATION_SHIFTING		32
-#define GDI_EVENT_MASK			33
-#define GDI_EVENT			34
-#define GDI_CALLBACK_INFO		35
-#define GDI_CALLBACK_ACTION		36
-#define GDI_AREA_SIZE			37
-#define GDI_ITEM_SIZE			38
-#define GDI_SCROLLBAR_ITEMS_MAX		39
-#define GDI_SCROLLBAR_ITEMS_VISIBLE	40
-#define GDI_SCROLLBAR_ITEM_POSITION	41
-#define GDI_WHEEL_AREA_X		42
-#define GDI_WHEEL_AREA_Y		43
-#define GDI_WHEEL_AREA_WIDTH		44
-#define GDI_WHEEL_AREA_HEIGHT		45
-#define GDI_INFO_TEXT			46
-#define GDI_ACTIVE			47
-#define GDI_DIRECT_DRAW			48
+#define GDI_DECORATION_MASKED		33
+#define GDI_EVENT_MASK			34
+#define GDI_EVENT			35
+#define GDI_CALLBACK_INFO		36
+#define GDI_CALLBACK_ACTION		37
+#define GDI_AREA_SIZE			38
+#define GDI_ITEM_SIZE			39
+#define GDI_SCROLLBAR_ITEMS_MAX		40
+#define GDI_SCROLLBAR_ITEMS_VISIBLE	41
+#define GDI_SCROLLBAR_ITEM_POSITION	42
+#define GDI_WHEEL_AREA_X		43
+#define GDI_WHEEL_AREA_Y		44
+#define GDI_WHEEL_AREA_WIDTH		45
+#define GDI_WHEEL_AREA_HEIGHT		46
+#define GDI_INFO_TEXT			47
+#define GDI_ACTIVE			48
+#define GDI_DIRECT_DRAW			49
 
 /* gadget deactivation hack */
 #define GDI_ACTIVE_POS(a)		((a) < 0 ? POS_OFFSCREEN : (a))
@@ -135,6 +136,7 @@ struct GadgetDecoration
   int x, y;				/* position of deco on the gadget */
   int width, height;			/* width and height of decoration */
   int xshift, yshift;			/* deco shifting when gadget pressed */
+  boolean masked;			/* draw decoration masked over button */
 };
 
 struct GadgetEvent

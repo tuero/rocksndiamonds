@@ -244,9 +244,16 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 	int deco_width  = MIN(gi->deco.width,  gi->width  - deco_x);
 	int deco_height = MIN(gi->deco.height, gi->height - deco_y);
 
-	BlitBitmap(gi->deco.design.bitmap, drawto,
-		   gi->deco.design.x, gi->deco.design.y,
-		   deco_width, deco_height, gi->x + deco_x, gi->y + deco_y);
+	if (gi->deco.masked)
+	  BlitBitmapMasked(gi->deco.design.bitmap, drawto,
+			   gi->deco.design.x, gi->deco.design.y,
+			   deco_width, deco_height,
+			   gi->x + deco_x, gi->y + deco_y);
+	else
+	  BlitBitmap(gi->deco.design.bitmap, drawto,
+		     gi->deco.design.x, gi->deco.design.y,
+		     deco_width, deco_height,
+		     gi->x + deco_x, gi->y + deco_y);
       }
 
       break;
@@ -992,6 +999,10 @@ static void HandleGadgetTags(struct GadgetInfo *gi, int first_tag, va_list ap)
       case GDI_DECORATION_SHIFTING:
 	gi->deco.xshift = va_arg(ap, int);
 	gi->deco.yshift = va_arg(ap, int);
+	break;
+
+      case GDI_DECORATION_MASKED:
+	gi->deco.masked = (boolean)va_arg(ap, int);
 	break;
 
       case GDI_EVENT_MASK:
