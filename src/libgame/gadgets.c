@@ -231,15 +231,24 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
     case GD_TYPE_NORMAL_BUTTON:
     case GD_TYPE_CHECK_BUTTON:
     case GD_TYPE_RADIO_BUTTON:
+
       BlitBitmapOnBackground(gd->bitmap, drawto,
 			     gd->x, gd->y, gi->width, gi->height,
 			     gi->x, gi->y);
+
       if (gi->deco.design.bitmap)
+      {
+	// make sure that decoration does not overlap gadget border
+	int deco_x = gi->deco.x + (pressed ? gi->deco.xshift : 0);
+	int deco_y = gi->deco.y + (pressed ? gi->deco.yshift : 0);
+	int deco_width  = MIN(gi->deco.width,  gi->width  - deco_x);
+	int deco_height = MIN(gi->deco.height, gi->height - deco_y);
+
 	BlitBitmap(gi->deco.design.bitmap, drawto,
 		   gi->deco.design.x, gi->deco.design.y,
-		   gi->deco.width, gi->deco.height,
-		   gi->x + gi->deco.x + (pressed ? gi->deco.xshift : 0),
-		   gi->y + gi->deco.y + (pressed ? gi->deco.yshift : 0));
+		   deco_width, deco_height, gi->x + deco_x, gi->y + deco_y);
+      }
+
       break;
 
     case GD_TYPE_TEXT_BUTTON:
