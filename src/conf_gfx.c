@@ -5461,6 +5461,27 @@ struct ConfigInfo image_config[] =
   { "gfx.editor.button.properties.height",	"20"			},
   { "gfx.editor.button.properties.pressed_xoffset", "-100"		},
 
+  { "gfx.editor.button.element_left",		"RocksDoor2.png"	},
+  { "gfx.editor.button.element_left.x",		"368"			},
+  { "gfx.editor.button.element_left.y",		"48"			},
+  { "gfx.editor.button.element_left.width",	"16"			},
+  { "gfx.editor.button.element_left.height",	"16"			},
+  { "gfx.editor.button.element_left.pressed_xoffset", "0"		},
+
+  { "gfx.editor.button.element_middle",		"RocksDoor2.png"	},
+  { "gfx.editor.button.element_middle.x",	"368"			},
+  { "gfx.editor.button.element_middle.y",	"48"			},
+  { "gfx.editor.button.element_middle.width",	"16"			},
+  { "gfx.editor.button.element_middle.height",	"16"			},
+  { "gfx.editor.button.element_middle.pressed_xoffset", "0"		},
+
+  { "gfx.editor.button.element_right",		"RocksDoor2.png"	},
+  { "gfx.editor.button.element_right.x",	"368"			},
+  { "gfx.editor.button.element_right.y",	"48"			},
+  { "gfx.editor.button.element_right.width",	"16"			},
+  { "gfx.editor.button.element_right.height",	"16"			},
+  { "gfx.editor.button.element_right.pressed_xoffset", "0"		},
+
   { "editor.no_toolbox_button",			"RocksDoor.png"		},
   { "editor.no_toolbox_button.x",		"506"			},
   { "editor.no_toolbox_button.y",		"286"			},
@@ -7664,6 +7685,16 @@ struct ConfigInfo image_config[] =
 
   { "editor.button.properties.x",		"5"			},
   { "editor.button.properties.y",		"230"			},
+
+  { "editor.button.element_left.x",		"-1"			},
+  { "editor.button.element_left.y",		"-1"			},
+  { "editor.button.element_left.tile_size",	"-1"			},
+  { "editor.button.element_middle.x",		"-1"			},
+  { "editor.button.element_middle.y",		"-1"			},
+  { "editor.button.element_middle.tile_size",	"-1"			},
+  { "editor.button.element_right.x",		"-1"			},
+  { "editor.button.element_right.y",		"-1"			},
+  { "editor.button.element_right.tile_size",	"-1"			},
 
   { "editor.button.draw_single.x",		"6"			},
   { "editor.button.draw_single.y",		"6"			},

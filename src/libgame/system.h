@@ -1294,6 +1294,12 @@ struct XY
   int x, y;
 };
 
+struct XYTileSize
+{
+  int x, y;
+  int tile_size;
+};
+
 struct Rect
 {
   int x, y;

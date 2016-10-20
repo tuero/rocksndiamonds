@@ -8971,12 +8971,48 @@ static void InitMenuDesignSettings_SpecialPostProcessing()
 
   /* set default position for snapshot buttons to stop/pause/play buttons */
   for (i = 0; game_buttons_xy[i].dst != NULL; i++)
-  {
     if ((*game_buttons_xy[i].dst).x == -1 &&
 	(*game_buttons_xy[i].dst).y == -1)
+      *game_buttons_xy[i].dst = *game_buttons_xy[i].src;
+}
+
+static void InitMenuDesignSettings_SpecialPostProcessing_AfterGraphics()
+{
+  static struct
+  {
+    struct XYTileSize *dst, *src;
+    int graphic;
+  }
+  editor_buttons_xy[] =
+  {
     {
-      (*game_buttons_xy[i].dst).x = (*game_buttons_xy[i].src).x;
-      (*game_buttons_xy[i].dst).y = (*game_buttons_xy[i].src).y;
+      &editor.button.element_left,	&editor.palette.element_left,
+      IMG_GFX_EDITOR_BUTTON_ELEMENT_LEFT
+    },
+    {
+      &editor.button.element_middle,	&editor.palette.element_middle,
+      IMG_GFX_EDITOR_BUTTON_ELEMENT_MIDDLE
+    },
+    {
+      &editor.button.element_right,	&editor.palette.element_right,
+      IMG_GFX_EDITOR_BUTTON_ELEMENT_RIGHT
+    },
+
+    { NULL,			NULL			}
+  };
+  int i;
+
+  /* set default position for element buttons to element graphics */
+  for (i = 0; editor_buttons_xy[i].dst != NULL; i++)
+  {
+    if ((*editor_buttons_xy[i].dst).x == -1 &&
+	(*editor_buttons_xy[i].dst).y == -1)
+    {
+      struct GraphicInfo *gd = &graphic_info[editor_buttons_xy[i].graphic];
+
+      gd->width = gd->height = editor_buttons_xy[i].src->tile_size;
+
+      *editor_buttons_xy[i].dst = *editor_buttons_xy[i].src;
     }
   }
 }
@@ -9362,6 +9398,11 @@ void LoadMenuDesignSettings()
     LoadMenuDesignSettingsFromFilename(filename_local);
 
   InitMenuDesignSettings_SpecialPostProcessing();
+}
+
+void LoadMenuDesignSettings_AfterGraphics()
+{
+  InitMenuDesignSettings_SpecialPostProcessing_AfterGraphics();
 }
 
 void LoadUserDefinedEditorElementList(int **elements, int *num_elements)

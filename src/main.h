@@ -2349,51 +2349,48 @@ struct EditorGadgetInfo
 
 struct EditorButtonInfo
 {
-  struct XY prev_level;
-  struct XY next_level;
+  struct XYTileSize prev_level;
+  struct XYTileSize next_level;
 
-  struct XY properties;
+  struct XYTileSize properties;
+  struct XYTileSize element_left;
+  struct XYTileSize element_middle;
+  struct XYTileSize element_right;
 
-  struct XY draw_single;
-  struct XY draw_connected;
-  struct XY draw_line;
-  struct XY draw_arc;
-  struct XY draw_rectangle;
-  struct XY draw_filled_box;
-  struct XY rotate_up;
-  struct XY draw_text;
-  struct XY flood_fill;
-  struct XY rotate_left;
-  struct XY zoom_level;
-  struct XY rotate_right;
-  struct XY draw_random;
-  struct XY grab_brush;
-  struct XY rotate_down;
-  struct XY pick_element;
+  struct XYTileSize draw_single;
+  struct XYTileSize draw_connected;
+  struct XYTileSize draw_line;
+  struct XYTileSize draw_arc;
+  struct XYTileSize draw_rectangle;
+  struct XYTileSize draw_filled_box;
+  struct XYTileSize rotate_up;
+  struct XYTileSize draw_text;
+  struct XYTileSize flood_fill;
+  struct XYTileSize rotate_left;
+  struct XYTileSize zoom_level;
+  struct XYTileSize rotate_right;
+  struct XYTileSize draw_random;
+  struct XYTileSize grab_brush;
+  struct XYTileSize rotate_down;
+  struct XYTileSize pick_element;
 
-  struct XY ce_copy_from;
-  struct XY ce_copy_to;
-  struct XY ce_swap;
-  struct XY ce_copy;
-  struct XY ce_paste;
+  struct XYTileSize ce_copy_from;
+  struct XYTileSize ce_copy_to;
+  struct XYTileSize ce_swap;
+  struct XYTileSize ce_copy;
+  struct XYTileSize ce_paste;
 
-  struct XY undo;
-  struct XY conf;
-  struct XY save;
-  struct XY clear;
-  struct XY test;
-  struct XY exit;
+  struct XYTileSize undo;
+  struct XYTileSize conf;
+  struct XYTileSize save;
+  struct XYTileSize clear;
+  struct XYTileSize test;
+  struct XYTileSize exit;
 };
 
 struct EditorInputInfo
 {
   struct XY level_number;
-};
-
-struct EditorPaletteElementInfo
-{
-  int x, y;
-  int tile_size;
 };
 
 struct EditorPaletteInfo
@@ -2402,9 +2399,9 @@ struct EditorPaletteInfo
   int cols, rows;
   int tile_size;
 
-  struct EditorPaletteElementInfo element_left;
-  struct EditorPaletteElementInfo element_middle;
-  struct EditorPaletteElementInfo element_right;
+  struct XYTileSize element_left;
+  struct XYTileSize element_middle;
+  struct XYTileSize element_right;
 };
 
 struct EditorDrawingAreaInfo

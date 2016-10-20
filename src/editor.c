@@ -32,26 +32,31 @@
 */
 
 /* values for the control window */
-#define ED_CTRL1_BUTTONS_HORIZ		4
+#define ED_CTRL1_BUTTONS_HORIZ		4	/* toolbox */
 #define ED_CTRL1_BUTTONS_VERT		4
-#define ED_CTRL2_BUTTONS_HORIZ		3
+#define ED_CTRL2_BUTTONS_HORIZ		3	/* level */
 #define ED_CTRL2_BUTTONS_VERT		2
-#define ED_CTRL3_BUTTONS_HORIZ		3
+#define ED_CTRL3_BUTTONS_HORIZ		3	/* CE and GE */
 #define ED_CTRL3_BUTTONS_VERT		1
-#define ED_CTRL4_BUTTONS_HORIZ		2
+#define ED_CTRL4_BUTTONS_HORIZ		2	/* CE and GE */
 #define ED_CTRL4_BUTTONS_VERT		1
-#define ED_CTRL5_BUTTONS_HORIZ		1
+#define ED_CTRL5_BUTTONS_HORIZ		1	/* properties */
 #define ED_CTRL5_BUTTONS_VERT		1
+#define ED_CTRL6_BUTTONS_HORIZ		3	/* properties */
+#define ED_CTRL6_BUTTONS_VERT		1
 
 #define ED_NUM_CTRL1_BUTTONS   (ED_CTRL1_BUTTONS_HORIZ * ED_CTRL1_BUTTONS_VERT)
 #define ED_NUM_CTRL2_BUTTONS   (ED_CTRL2_BUTTONS_HORIZ * ED_CTRL2_BUTTONS_VERT)
 #define ED_NUM_CTRL3_BUTTONS   (ED_CTRL3_BUTTONS_HORIZ * ED_CTRL3_BUTTONS_VERT)
 #define ED_NUM_CTRL4_BUTTONS   (ED_CTRL4_BUTTONS_HORIZ * ED_CTRL4_BUTTONS_VERT)
 #define ED_NUM_CTRL5_BUTTONS   (ED_CTRL5_BUTTONS_HORIZ * ED_CTRL5_BUTTONS_VERT)
+#define ED_NUM_CTRL6_BUTTONS   (ED_CTRL6_BUTTONS_HORIZ * ED_CTRL6_BUTTONS_VERT)
 #define ED_NUM_CTRL1_2_BUTTONS (ED_NUM_CTRL1_BUTTONS   + ED_NUM_CTRL2_BUTTONS)
 #define ED_NUM_CTRL1_3_BUTTONS (ED_NUM_CTRL1_2_BUTTONS + ED_NUM_CTRL3_BUTTONS)
 #define ED_NUM_CTRL1_4_BUTTONS (ED_NUM_CTRL1_3_BUTTONS + ED_NUM_CTRL4_BUTTONS)
-#define ED_NUM_CTRL_BUTTONS    (ED_NUM_CTRL1_4_BUTTONS + ED_NUM_CTRL5_BUTTONS)
+#define ED_NUM_CTRL1_5_BUTTONS (ED_NUM_CTRL1_4_BUTTONS + ED_NUM_CTRL5_BUTTONS)
+#define ED_NUM_CTRL1_6_BUTTONS (ED_NUM_CTRL1_5_BUTTONS + ED_NUM_CTRL6_BUTTONS)
+#define ED_NUM_CTRL_BUTTONS    ED_NUM_CTRL1_6_BUTTONS
 
 /* values for the element list */
 #define ED_ELEMENTLIST_XPOS		(editor.palette.x)
@@ -341,9 +346,13 @@
 #define GADGET_ID_CUSTOM_PASTE		(GADGET_ID_TOOLBOX_FIRST + 26)
 
 #define GADGET_ID_PROPERTIES		(GADGET_ID_TOOLBOX_FIRST + 27)
+#define GADGET_ID_ELEMENT_LEFT		(GADGET_ID_TOOLBOX_FIRST + 28)
+#define GADGET_ID_ELEMENT_MIDDLE	(GADGET_ID_TOOLBOX_FIRST + 29)
+#define GADGET_ID_ELEMENT_RIGHT		(GADGET_ID_TOOLBOX_FIRST + 30)
+
 
 /* counter gadget identifiers */
-#define GADGET_ID_COUNTER_FIRST		(GADGET_ID_TOOLBOX_FIRST + 28)
+#define GADGET_ID_COUNTER_FIRST		(GADGET_ID_TOOLBOX_FIRST + 31)
 
 #define GADGET_ID_SELECT_LEVEL_DOWN	(GADGET_ID_COUNTER_FIRST + 0)
 #define GADGET_ID_SELECT_LEVEL_TEXT	(GADGET_ID_COUNTER_FIRST + 1)
@@ -993,7 +1002,7 @@ static struct
 {
   int graphic;
   int gadget_id;
-  struct XY *pos;
+  struct XYTileSize *pos;
   int gadget_type;
   char *infotext;
   char shortcut;
@@ -1152,6 +1161,21 @@ static struct
     IMG_GFX_EDITOR_BUTTON_PROPERTIES,		GADGET_ID_PROPERTIES,
     &editor.button.properties,			GD_TYPE_NORMAL_BUTTON,
     "properties of drawing element",		'p'
+  },
+  {
+    IMG_GFX_EDITOR_BUTTON_ELEMENT_LEFT,		GADGET_ID_ELEMENT_LEFT,
+    &editor.button.element_left,		GD_TYPE_NORMAL_BUTTON,
+    "properties of drawing element 1",		'1'
+  },
+  {
+    IMG_GFX_EDITOR_BUTTON_ELEMENT_MIDDLE,	GADGET_ID_ELEMENT_MIDDLE,
+    &editor.button.element_middle,		GD_TYPE_NORMAL_BUTTON,
+    "properties of drawing element 2",		'2'
+  },
+  {
+    IMG_GFX_EDITOR_BUTTON_ELEMENT_RIGHT,	GADGET_ID_ELEMENT_RIGHT,
+    &editor.button.element_right,		GD_TYPE_NORMAL_BUTTON,
+    "properties of drawing element 3",		'3'
   }
 };
 
@@ -3434,6 +3458,8 @@ static int new_element3 = EL_SAND;
 				(button) == 2 ? new_element2 : \
 				(button) == 3 ? new_element3 : EL_EMPTY)
 
+#define BUTTON_TILE_SIZE(x)	((x) >= TILESIZE ? TILESIZE : MINI_TILESIZE)
+
 /* forward declaration for internal use */
 static void ModifyEditorCounterValue(int, int);
 static void ModifyEditorCounterLimits(int, int, int);
@@ -5403,13 +5429,10 @@ static void ScrollEditorLevel(int from_x, int from_y, int scroll)
   BackToFront();
 }
 
-void getElementListGraphicSource(int element, Bitmap **bitmap, int *x, int *y)
+void getEditorGraphicSource(int element, int tile_size, Bitmap **bitmap,
+			    int *x, int *y)
 {
-  int graphic = el2edimg(element);
-  int tile_size = (editor.palette.tile_size >= TILESIZE ? TILESIZE :
-		   MINI_TILESIZE);
-
-  getSizedGraphicSource(graphic, 0, tile_size, bitmap, x, y);
+  getSizedGraphicSource(el2edimg(element), 0, tile_size, bitmap, x, y);
 }
 
 static void CreateControlButtons()
@@ -5423,8 +5446,11 @@ static void CreateControlButtons()
     int id = controlbutton_info[i].gadget_id;
     int type = controlbutton_info[i].gadget_type;
     int graphic = controlbutton_info[i].graphic;
-    struct XY *pos = controlbutton_info[i].pos;
+    struct XYTileSize *pos = controlbutton_info[i].pos;
     struct GraphicInfo *gd = &graphic_info[graphic];
+    Bitmap *deco_bitmap = NULL;
+    int deco_x = 0, deco_y = 0, deco_xpos = 0, deco_ypos = 0;
+    int tile_size = 0, deco_shift = 0;
     int gd_x1 = gd->src_x;
     int gd_y1 = gd->src_y;
     int gd_x2 = gd->src_x + gd->pressed_xoffset;
@@ -5463,6 +5489,33 @@ static void CreateControlButtons()
       x += DX;
       y += DY;
     }
+    else if (id == GADGET_ID_ELEMENT_LEFT ||
+	     id == GADGET_ID_ELEMENT_MIDDLE ||
+	     id == GADGET_ID_ELEMENT_RIGHT)
+    {
+      x += DX;
+      y += DY;
+
+      int element = (id == GADGET_ID_ELEMENT_LEFT   ? new_element1 :
+		     id == GADGET_ID_ELEMENT_MIDDLE ? new_element2 :
+		     id == GADGET_ID_ELEMENT_RIGHT  ? new_element3 : EL_EMPTY);
+
+      tile_size = BUTTON_TILE_SIZE(id == GADGET_ID_ELEMENT_LEFT ?
+				   editor.button.element_left.tile_size :
+				   id == GADGET_ID_ELEMENT_MIDDLE ?
+				   editor.button.element_middle.tile_size :
+				   id == GADGET_ID_ELEMENT_RIGHT ?
+				   editor.button.element_right.tile_size : 0);
+
+      // make sure that decoration does not overlap gadget border
+      tile_size = MIN(tile_size, MIN(gd->width, gd->height));
+
+      getEditorGraphicSource(element, tile_size, &deco_bitmap, &deco_x,&deco_y);
+
+      deco_xpos = (gd->width  - tile_size) / 2;
+      deco_ypos = (gd->height - tile_size) / 2;
+      deco_shift = 1;
+    }
     else
     {
       x += EX;
@@ -5484,6 +5537,10 @@ static void CreateControlButtons()
 		      GDI_DESIGN_PRESSED, gd->bitmap, gd_x2, gd_y2,
 		      GDI_ALT_DESIGN_UNPRESSED, gd->bitmap, gd_x1a, gd_y1a,
 		      GDI_ALT_DESIGN_PRESSED, gd->bitmap, gd_x2a, gd_y2a,
+		      GDI_DECORATION_DESIGN, deco_bitmap, deco_x, deco_y,
+		      GDI_DECORATION_POSITION, deco_xpos, deco_ypos,
+		      GDI_DECORATION_SIZE, tile_size, tile_size,
+		      GDI_DECORATION_SHIFTING, deco_shift, deco_shift,
 		      GDI_EVENT_MASK, event_mask,
 		      GDI_CALLBACK_INFO, HandleEditorGadgetInfoText,
 		      GDI_CALLBACK_ACTION, HandleControlButtons,
@@ -5578,11 +5635,11 @@ static void CreateControlButtons()
     int x = DX + ED_ELEMENTLIST_XPOS + xx * gd->width;
     int y = DY + ED_ELEMENTLIST_YPOS + yy * gd->height;
     int element = editor_elements[i];
-    int tile_size = (editor.palette.tile_size >= TILESIZE ? TILESIZE :
-		     MINI_TILESIZE);
+    int tile_size = BUTTON_TILE_SIZE(editor.palette.tile_size);
     unsigned int event_mask = GD_EVENT_RELEASED;
 
-    getElementListGraphicSource(element, &deco_bitmap, &deco_x, &deco_y);
+    getEditorGraphicSource(element, tile_size, &deco_bitmap, &deco_x, &deco_y);
+
     deco_xpos = (gd->width  - tile_size) / 2;
     deco_ypos = (gd->height - tile_size) / 2;
 
@@ -6527,8 +6584,9 @@ static void MapControlButtons()
   for (i = 0; i < ED_NUM_CTRL1_2_BUTTONS; i++)
     MapGadget(level_editor_gadget[i]);
 
-  /* map toolbox buttons (element properties button) */
-  MapGadget(level_editor_gadget[ED_NUM_CTRL1_4_BUTTONS]);
+  /* map toolbox buttons (element properties buttons) */
+  for (i = ED_NUM_CTRL1_4_BUTTONS; i < ED_NUM_CTRL1_6_BUTTONS; i++)
+    MapGadget(level_editor_gadget[i]);
 
   /* map buttons to select elements */
   for (i = 0; i < ED_NUM_ELEMENTLIST_BUTTONS; i++)
@@ -7913,10 +7971,11 @@ static void ModifyEditorElementList()
     struct GadgetInfo *gi = level_editor_gadget[gadget_id];
     struct GadgetDesign *gd = &gi->deco.design;
     int element = editor_elements[element_shift + i];
+    int tile_size = BUTTON_TILE_SIZE(editor.palette.tile_size);
 
     UnmapGadget(gi);
 
-    getElementListGraphicSource(element, &gd->bitmap, &gd->x, &gd->y);
+    getEditorGraphicSource(element, tile_size, &gd->bitmap, &gd->x, &gd->y);
 
     ModifyGadget(gi, GDI_INFO_TEXT, getElementInfoText(element), GDI_END);
 
@@ -7924,12 +7983,28 @@ static void ModifyEditorElementList()
   }
 }
 
-static void DrawDrawingElement(int element, struct EditorPaletteElementInfo *e)
+static void DrawDrawingElementGraphic(int element, struct XYTileSize *pos)
 {
   int graphic = el2edimg(element);
-  int tile_size = (e->tile_size >= TILESIZE ? TILESIZE : MINI_TILESIZE);
+  int tile_size = BUTTON_TILE_SIZE(pos->tile_size);
 
-  DrawSizedGraphicExt(drawto, DX + e->x, DY + e->y, graphic, 0, tile_size);
+  if (pos->x == -1 &&
+      pos->y == -1)
+    return;
+
+  DrawSizedGraphicExt(drawto, DX + pos->x, DY + pos->y, graphic, 0, tile_size);
+}
+
+static void ModifyDrawingElementButton(int element, int id)
+{
+  struct GadgetInfo *gi = level_editor_gadget[id];
+  Bitmap *deco_bitmap;
+  int deco_x, deco_y;
+  int tile_size = gi->deco.width;
+
+  getEditorGraphicSource(element, tile_size, &deco_bitmap, &deco_x, &deco_y);
+
+  ModifyGadget(gi, GDI_DECORATION_DESIGN, deco_bitmap, deco_x, deco_y, GDI_END);
 }
 
 static void PickDrawingElement(int button, int element)
@@ -7937,12 +8012,13 @@ static void PickDrawingElement(int button, int element)
   struct
   {
     int *new_element;
-    struct EditorPaletteElementInfo *e;
+    struct XYTileSize *pos;
+    int id;
   } de, drawing_elements[] =
   {
-    { &new_element1,	&editor.palette.element_left	},
-    { &new_element2,	&editor.palette.element_middle	},
-    { &new_element3,	&editor.palette.element_right	},
+    { &new_element1, &editor.palette.element_left,   GADGET_ID_ELEMENT_LEFT   },
+    { &new_element2, &editor.palette.element_middle, GADGET_ID_ELEMENT_MIDDLE },
+    { &new_element3, &editor.palette.element_right,  GADGET_ID_ELEMENT_RIGHT  },
   };
 
   if (button < 1 || button > 3)
@@ -7950,7 +8026,10 @@ static void PickDrawingElement(int button, int element)
 
   de = drawing_elements[button - 1];
 
-  DrawDrawingElement((*de.new_element = element), de.e);
+  *de.new_element = element;	// update global drawing element variable
+
+  DrawDrawingElementGraphic(element, de.pos);
+  ModifyDrawingElementButton(element, de.id);
 
   redraw_mask |= REDRAW_DOOR_1;
 }
@@ -11396,6 +11475,7 @@ static void HandleControlButtons(struct GadgetInfo *gi)
   int button = gi->event.button;
   int step = BUTTON_STEPSIZE(button);
   int new_element = BUTTON_ELEMENT(button);
+  int last_properties_element = properties_element;
   int x, y;
 
   if (edit_mode == ED_MODE_DRAWING && drawing_function == GADGET_ID_TEXT)
@@ -11535,9 +11615,19 @@ static void HandleControlButtons(struct GadgetInfo *gi)
       break;
 
     case GADGET_ID_PROPERTIES:
-      if (edit_mode != ED_MODE_PROPERTIES)
+      // always switch off element properties when they are already displayed
+      last_properties_element = new_element;
+    case GADGET_ID_ELEMENT_LEFT:
+    case GADGET_ID_ELEMENT_MIDDLE:
+    case GADGET_ID_ELEMENT_RIGHT:
+      properties_element = (id == GADGET_ID_ELEMENT_LEFT   ? new_element1 :
+			    id == GADGET_ID_ELEMENT_MIDDLE ? new_element2 :
+			    id == GADGET_ID_ELEMENT_RIGHT  ? new_element3 :
+			    new_element);
+
+      if (edit_mode != ED_MODE_PROPERTIES ||
+	  properties_element != last_properties_element)
       {
-	properties_element = new_element;
 	DrawPropertiesWindow();
 	edit_mode = ED_MODE_PROPERTIES;
 

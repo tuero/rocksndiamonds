@@ -5456,6 +5456,9 @@ static void InitImages()
   ReinitializeGraphics();
   print_timestamp_time("ReinitializeGraphics");
 
+  LoadMenuDesignSettings_AfterGraphics();
+  print_timestamp_time("LoadMenuDesignSettings_AfterGraphics");
+
   UPDATE_BUSY_STATE();
 
   print_timestamp_done("InitImages");
