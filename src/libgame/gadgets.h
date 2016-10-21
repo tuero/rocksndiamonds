@@ -225,6 +225,8 @@ struct GadgetWheelArea
 
 struct GadgetInfo
 {
+  boolean deactivated;			/* flag to deactivate gadget */
+
   int id;				/* internal gadget identifier */
   int custom_id;			/* custom gadget identifier */
   int custom_type_id;			/* custom gadget type identifier */

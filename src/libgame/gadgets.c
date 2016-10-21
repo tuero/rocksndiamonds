@@ -24,8 +24,6 @@
 #define DG_BUFFERED		0
 #define DG_DIRECT		1
 
-#define GADGET_DEACTIVATED(g)	((g)->x < 0 || (g)->y < 0)
-
 #define OPTION_TEXT_SELECTABLE(g, t)					\
   (t[0] != g->selectbox.char_unselectable &&				\
    t[0] != '\0' &&							\
@@ -220,7 +218,7 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
   int state = (pressed ? GD_BUTTON_PRESSED : GD_BUTTON_UNPRESSED);
   boolean redraw_selectbox = FALSE;
 
-  if (gi == NULL)
+  if (gi == NULL || gi->deactivated)
     return;
 
   gd = (!gi->active ? &gi->alt_design[state] :
@@ -777,7 +775,7 @@ static void HandleGadgetTags(struct GadgetInfo *gi, int first_tag, va_list ap)
 {
   int tag = first_tag;
 
-  if (gi == NULL)
+  if (gi == NULL || gi->deactivated)
     return;
 
   while (tag != GDI_END)
@@ -1097,11 +1095,17 @@ static void HandleGadgetTags(struct GadgetInfo *gi, int first_tag, va_list ap)
     tag = va_arg(ap, int);	/* read next tag */
   }
 
-  /* check if gadget is complete */
+  gi->deactivated = FALSE;
+
+  /* check if gadget has undefined bitmaps */
   if (gi->type != GD_TYPE_DRAWING_AREA &&
-      (!gi->design[GD_BUTTON_UNPRESSED].bitmap ||
-       !gi->design[GD_BUTTON_PRESSED].bitmap))
-    Error(ERR_EXIT, "gadget incomplete (missing Bitmap)");
+      (gi->design[GD_BUTTON_UNPRESSED].bitmap == NULL ||
+       gi->design[GD_BUTTON_PRESSED].bitmap == NULL))
+    gi->deactivated = TRUE;
+
+  /* check if gadget is placed off-screen */
+  if (gi->x < 0 || gi->y < 0)
+    gi->deactivated = TRUE;
 
   /* adjust gadget values in relation to other gadget values */
 
@@ -1263,7 +1267,7 @@ void ModifyGadget(struct GadgetInfo *gi, int first_tag, ...)
 
 void RedrawGadget(struct GadgetInfo *gi)
 {
-  if (gi == NULL)
+  if (gi == NULL || gi->deactivated)
     return;
 
   if (gi->mapped)
@@ -1351,7 +1355,7 @@ static struct GadgetInfo *last_gi = NULL;
 
 static void MapGadgetExt(struct GadgetInfo *gi, boolean redraw)
 {
-  if (gi == NULL || gi->mapped || GADGET_DEACTIVATED(gi))
+  if (gi == NULL || gi->deactivated || gi->mapped)
     return;
 
   gi->mapped = TRUE;
@@ -1367,7 +1371,7 @@ void MapGadget(struct GadgetInfo *gi)
 
 void UnmapGadget(struct GadgetInfo *gi)
 {
-  if (gi == NULL || !gi->mapped)
+  if (gi == NULL || gi->deactivated || !gi->mapped)
     return;
 
   gi->mapped = FALSE;
@@ -2072,7 +2076,7 @@ boolean HandleGadgetsKeyInput(Key key)
 {
   struct GadgetInfo *gi = last_gi;
 
-  if (gi == NULL || !gi->mapped ||
+  if (gi == NULL || gi->deactivated || !gi->mapped ||
       !(gi->type & GD_TYPE_TEXT_INPUT ||
 	gi->type & GD_TYPE_TEXT_AREA ||
 	gi->type & GD_TYPE_SELECTBOX))
