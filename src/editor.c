@@ -44,6 +44,8 @@
 #define ED_CTRL5_BUTTONS_VERT		1
 #define ED_CTRL6_BUTTONS_HORIZ		3	/* properties */
 #define ED_CTRL6_BUTTONS_VERT		1
+#define ED_CTRL7_BUTTONS_HORIZ		1	/* palette */
+#define ED_CTRL7_BUTTONS_VERT		1
 
 #define ED_NUM_CTRL1_BUTTONS   (ED_CTRL1_BUTTONS_HORIZ * ED_CTRL1_BUTTONS_VERT)
 #define ED_NUM_CTRL2_BUTTONS   (ED_CTRL2_BUTTONS_HORIZ * ED_CTRL2_BUTTONS_VERT)
@@ -51,12 +53,14 @@
 #define ED_NUM_CTRL4_BUTTONS   (ED_CTRL4_BUTTONS_HORIZ * ED_CTRL4_BUTTONS_VERT)
 #define ED_NUM_CTRL5_BUTTONS   (ED_CTRL5_BUTTONS_HORIZ * ED_CTRL5_BUTTONS_VERT)
 #define ED_NUM_CTRL6_BUTTONS   (ED_CTRL6_BUTTONS_HORIZ * ED_CTRL6_BUTTONS_VERT)
+#define ED_NUM_CTRL7_BUTTONS   (ED_CTRL7_BUTTONS_HORIZ * ED_CTRL7_BUTTONS_VERT)
 #define ED_NUM_CTRL1_2_BUTTONS (ED_NUM_CTRL1_BUTTONS   + ED_NUM_CTRL2_BUTTONS)
 #define ED_NUM_CTRL1_3_BUTTONS (ED_NUM_CTRL1_2_BUTTONS + ED_NUM_CTRL3_BUTTONS)
 #define ED_NUM_CTRL1_4_BUTTONS (ED_NUM_CTRL1_3_BUTTONS + ED_NUM_CTRL4_BUTTONS)
 #define ED_NUM_CTRL1_5_BUTTONS (ED_NUM_CTRL1_4_BUTTONS + ED_NUM_CTRL5_BUTTONS)
 #define ED_NUM_CTRL1_6_BUTTONS (ED_NUM_CTRL1_5_BUTTONS + ED_NUM_CTRL6_BUTTONS)
-#define ED_NUM_CTRL_BUTTONS    ED_NUM_CTRL1_6_BUTTONS
+#define ED_NUM_CTRL1_7_BUTTONS (ED_NUM_CTRL1_6_BUTTONS + ED_NUM_CTRL7_BUTTONS)
+#define ED_NUM_CTRL_BUTTONS    ED_NUM_CTRL1_7_BUTTONS
 
 /* values for the element list */
 #define ED_ELEMENTLIST_XPOS		(editor.palette.x)
@@ -349,10 +353,10 @@
 #define GADGET_ID_ELEMENT_LEFT		(GADGET_ID_TOOLBOX_FIRST + 28)
 #define GADGET_ID_ELEMENT_MIDDLE	(GADGET_ID_TOOLBOX_FIRST + 29)
 #define GADGET_ID_ELEMENT_RIGHT		(GADGET_ID_TOOLBOX_FIRST + 30)
-
+#define GADGET_ID_PALETTE		(GADGET_ID_TOOLBOX_FIRST + 31)
 
 /* counter gadget identifiers */
-#define GADGET_ID_COUNTER_FIRST		(GADGET_ID_TOOLBOX_FIRST + 31)
+#define GADGET_ID_COUNTER_FIRST		(GADGET_ID_TOOLBOX_FIRST + 32)
 
 #define GADGET_ID_SELECT_LEVEL_DOWN	(GADGET_ID_COUNTER_FIRST + 0)
 #define GADGET_ID_SELECT_LEVEL_TEXT	(GADGET_ID_COUNTER_FIRST + 1)
@@ -961,6 +965,7 @@
 #define ED_MODE_DRAWING			0
 #define ED_MODE_INFO			1
 #define ED_MODE_PROPERTIES		2
+#define ED_MODE_PALETTE			3
 
 /* sub-screens in the global settings section */
 #define ED_MODE_LEVELINFO_LEVEL		ED_TEXTBUTTON_ID_LEVELINFO_LEVEL
@@ -1176,6 +1181,11 @@ static struct
     IMG_GFX_EDITOR_BUTTON_ELEMENT_RIGHT,	GADGET_ID_ELEMENT_RIGHT,
     &editor.button.element_right,		GD_TYPE_NORMAL_BUTTON,
     "properties of drawing element 3",		'3'
+  },
+  {
+    IMG_GFX_EDITOR_BUTTON_PALETTE,		GADGET_ID_PALETTE,
+    &editor.button.palette,			GD_TYPE_NORMAL_BUTTON,
+    "show list of elements",			'e'
   }
 };
 
@@ -3460,6 +3470,13 @@ static int new_element3 = EL_SAND;
 
 #define BUTTON_TILE_SIZE(x)	((x) >= TILESIZE ? TILESIZE : MINI_TILESIZE)
 
+static int use_permanent_palette = TRUE;
+
+#define PX		(use_permanent_palette ? DX : SX)
+#define PY		(use_permanent_palette ? DY : SY)
+#define PXSIZE		(use_permanent_palette ? DXSIZE : SXSIZE)
+#define PYSIZE		(use_permanent_palette ? DYSIZE : SYSIZE)
+
 /* forward declaration for internal use */
 static void ModifyEditorCounterValue(int, int);
 static void ModifyEditorCounterLimits(int, int, int);
@@ -3472,6 +3489,7 @@ static void RedrawDrawingElements();
 static void DrawDrawingWindow();
 static void DrawLevelInfoWindow();
 static void DrawPropertiesWindow();
+static void DrawPaletteWindow();
 static void UpdateCustomElementGraphicGadgets();
 static boolean checkPropertiesConfig(int);
 static void CopyLevelToUndoBuffer(int);
@@ -5485,7 +5503,8 @@ static void CreateControlButtons()
 	event_mask = GD_EVENT_RELEASED;
     }
 
-    if (id == GADGET_ID_PROPERTIES)
+    if (id == GADGET_ID_PROPERTIES ||
+	id == GADGET_ID_PALETTE)
     {
       x += DX;
       y += DY;
@@ -5589,8 +5608,8 @@ static void CreateControlButtons()
     if (id == GADGET_ID_SCROLL_LIST_UP ||
 	id == GADGET_ID_SCROLL_LIST_DOWN)
     {
-      x += DX;
-      y += DY;
+      x += PX;
+      y += PY;
     }
     else
     {
@@ -5635,8 +5654,8 @@ static void CreateControlButtons()
     int gd_y2 = gd->src_y + gd->pressed_yoffset;
     int xx = i % ED_ELEMENTLIST_BUTTONS_HORIZ;
     int yy = i / ED_ELEMENTLIST_BUTTONS_HORIZ;
-    int x = DX + ED_ELEMENTLIST_XPOS + xx * gd->width;
-    int y = DY + ED_ELEMENTLIST_YPOS + yy * gd->height;
+    int x = PX + ED_ELEMENTLIST_XPOS + xx * gd->width;
+    int y = PY + ED_ELEMENTLIST_YPOS + yy * gd->height;
     int element = editor_elements[i];
     int tile_size = BUTTON_TILE_SIZE(editor.palette.tile_size);
     unsigned int event_mask = GD_EVENT_RELEASED;
@@ -6257,17 +6276,17 @@ static void CreateScrollbarGadgets()
   scrollbar_pos[ED_SCROLLBAR_ID_AREA_VERTICAL].wheel_height = SYSIZE;
 
   scrollbar_pos[ED_SCROLLBAR_ID_LIST_VERTICAL].x =
-    DX + ED_SCROLL2_VERTICAL_XPOS;
+    PX + ED_SCROLL2_VERTICAL_XPOS;
   scrollbar_pos[ED_SCROLLBAR_ID_LIST_VERTICAL].y =
-    DY + ED_SCROLL2_VERTICAL_YPOS;
+    PY + ED_SCROLL2_VERTICAL_YPOS;
   scrollbar_pos[ED_SCROLLBAR_ID_LIST_VERTICAL].width =
     ED_SCROLL2_VERTICAL_XSIZE;
   scrollbar_pos[ED_SCROLLBAR_ID_LIST_VERTICAL].height =
     ED_SCROLL2_VERTICAL_YSIZE;
-  scrollbar_pos[ED_SCROLLBAR_ID_LIST_VERTICAL].wheel_x = DX;
-  scrollbar_pos[ED_SCROLLBAR_ID_LIST_VERTICAL].wheel_y = DY;
-  scrollbar_pos[ED_SCROLLBAR_ID_LIST_VERTICAL].wheel_width  = DXSIZE;
-  scrollbar_pos[ED_SCROLLBAR_ID_LIST_VERTICAL].wheel_height = DYSIZE;
+  scrollbar_pos[ED_SCROLLBAR_ID_LIST_VERTICAL].wheel_x = PX;
+  scrollbar_pos[ED_SCROLLBAR_ID_LIST_VERTICAL].wheel_y = PY;
+  scrollbar_pos[ED_SCROLLBAR_ID_LIST_VERTICAL].wheel_width  = PXSIZE;
+  scrollbar_pos[ED_SCROLLBAR_ID_LIST_VERTICAL].wheel_height = PYSIZE;
 
   for (i = 0; i < ED_NUM_SCROLLBARS; i++)
   {
@@ -6482,6 +6501,8 @@ void CreateLevelEditorGadgets()
   editor_el_empty = checked_calloc(ED_NUM_ELEMENTLIST_BUTTONS * sizeof(int));
   editor_el_empty_ptr = editor_el_empty;
 
+  use_permanent_palette = !editor.palette.show_as_separate_screen;
+
   ReinitializeElementList();
 
   CreateControlButtons();
@@ -6588,15 +6609,18 @@ static void MapControlButtons()
     MapGadget(level_editor_gadget[i]);
 
   /* map toolbox buttons (element properties buttons) */
-  for (i = ED_NUM_CTRL1_4_BUTTONS; i < ED_NUM_CTRL1_6_BUTTONS; i++)
+  for (i = ED_NUM_CTRL1_4_BUTTONS; i < ED_NUM_CTRL1_7_BUTTONS; i++)
     MapGadget(level_editor_gadget[i]);
 
-  /* map buttons to select elements */
-  for (i = 0; i < ED_NUM_ELEMENTLIST_BUTTONS; i++)
-    MapGadget(level_editor_gadget[GADGET_ID_ELEMENTLIST_FIRST + i]);
-  MapGadget(level_editor_gadget[GADGET_ID_SCROLL_LIST_VERTICAL]);
-  MapGadget(level_editor_gadget[GADGET_ID_SCROLL_LIST_UP]);
-  MapGadget(level_editor_gadget[GADGET_ID_SCROLL_LIST_DOWN]);
+  if (use_permanent_palette)
+  {
+    /* map buttons to select elements */
+    for (i = 0; i < ED_NUM_ELEMENTLIST_BUTTONS; i++)
+      MapGadget(level_editor_gadget[GADGET_ID_ELEMENTLIST_FIRST + i]);
+    MapGadget(level_editor_gadget[GADGET_ID_SCROLL_LIST_VERTICAL]);
+    MapGadget(level_editor_gadget[GADGET_ID_SCROLL_LIST_UP]);
+    MapGadget(level_editor_gadget[GADGET_ID_SCROLL_LIST_DOWN]);
+  }
 
   /* map buttons to select level */
   counter_id = ED_COUNTER_ID_SELECT_LEVEL;
@@ -6945,8 +6969,17 @@ static void DrawEditModeWindow()
     DrawLevelInfoWindow();
   else if (edit_mode == ED_MODE_PROPERTIES)
     DrawPropertiesWindow();
+  else if (edit_mode == ED_MODE_PALETTE)
+    DrawPaletteWindow();
   else	/* edit_mode == ED_MODE_DRAWING */
     DrawDrawingWindow();
+}
+
+static void ChangeEditModeWindow(int new_edit_mode)
+{
+  edit_mode = (new_edit_mode != edit_mode ? new_edit_mode : ED_MODE_DRAWING);
+
+  DrawEditModeWindow();
 }
 
 static boolean LevelChanged()
@@ -7967,6 +8000,9 @@ static void ModifyEditorDrawingArea(int drawingarea_id, int xsize, int ysize)
 static void ModifyEditorElementList()
 {
   int i;
+
+  if (!use_permanent_palette && edit_mode != ED_MODE_PALETTE)
+    return;
 
   for (i = 0; i < ED_NUM_ELEMENTLIST_BUTTONS; i++)
   {
@@ -9252,6 +9288,23 @@ static void DrawPropertiesWindow()
     DrawPropertiesChange();
   else	/* (edit_mode_properties == ED_MODE_PROPERTIES_CONFIG[_1|_2]) */
     DrawPropertiesConfig();
+}
+
+static void DrawPaletteWindow()
+{
+  int i;
+
+  UnmapLevelEditorFieldGadgets();
+
+  SetMainBackgroundImage(IMG_BACKGROUND_EDITOR);
+  ClearField();
+
+  /* map buttons to select elements */
+  for (i = 0; i < ED_NUM_ELEMENTLIST_BUTTONS; i++)
+    MapGadget(level_editor_gadget[GADGET_ID_ELEMENTLIST_FIRST + i]);
+  MapGadget(level_editor_gadget[GADGET_ID_SCROLL_LIST_VERTICAL]);
+  MapGadget(level_editor_gadget[GADGET_ID_SCROLL_LIST_UP]);
+  MapGadget(level_editor_gadget[GADGET_ID_SCROLL_LIST_DOWN]);
 }
 
 static void UpdateCustomElementGraphicGadgets()
@@ -11474,6 +11527,7 @@ static void HandleControlButtons(struct GadgetInfo *gi)
   static int last_level_drawing_function = GADGET_ID_SINGLE_ITEMS;
   static int last_edit_mode = ED_MODE_DRAWING;
   static int last_custom_copy_mode = -1;
+  static int last_button = 0;
   int id = gi->custom_id;
   int button = gi->event.button;
   int step = BUTTON_STEPSIZE(button);
@@ -11490,14 +11544,20 @@ static void HandleControlButtons(struct GadgetInfo *gi)
       edit_mode != ED_MODE_DRAWING &&
       drawing_function != GADGET_ID_PICK_ELEMENT &&
       !(GetKeyModState() & KMOD_Control))
-  {
-    DrawDrawingWindow();
-    edit_mode = ED_MODE_DRAWING;
-  }
+    ChangeEditModeWindow(ED_MODE_DRAWING);
 
   /* element copy mode active, but no element button pressed => deactivate */
   if (last_custom_copy_mode != -1 && id < ED_NUM_CTRL_BUTTONS)
     last_custom_copy_mode = -1;
+
+  /* when showing palette on element buttons, change element of button used */
+  if (editor.palette.show_on_element_buttons &&
+      id >= GADGET_ID_ELEMENT_LEFT && id <= GADGET_ID_ELEMENT_RIGHT)
+  {
+    last_button = id - GADGET_ID_ELEMENT_LEFT + 1;
+
+    id = GADGET_ID_PALETTE;
+  }
 
   switch (id)
   {
@@ -11628,23 +11688,39 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 			    id == GADGET_ID_ELEMENT_RIGHT  ? new_element3 :
 			    new_element);
 
-      if (edit_mode != ED_MODE_PROPERTIES ||
-	  properties_element != last_properties_element)
+      if (edit_mode != ED_MODE_PROPERTIES)
       {
-	DrawPropertiesWindow();
-	edit_mode = ED_MODE_PROPERTIES;
+	last_edit_mode = edit_mode;
+
+	ChangeEditModeWindow(ED_MODE_PROPERTIES);
 
 	last_level_drawing_function = drawing_function;
 	ClickOnGadget(level_editor_gadget[GADGET_ID_SINGLE_ITEMS],
 		      MB_LEFTBUTTON);
       }
+      else if (properties_element != last_properties_element)
+      {
+	DrawEditModeWindow();
+      }
       else
       {
-	DrawDrawingWindow();
-	edit_mode = ED_MODE_DRAWING;
+	ChangeEditModeWindow(last_edit_mode);
 
 	ClickOnGadget(level_editor_gadget[last_level_drawing_function],
 		      MB_LEFTBUTTON);
+      }
+      break;
+
+    case GADGET_ID_PALETTE:
+      if (edit_mode != ED_MODE_PALETTE)
+      {
+	last_edit_mode = edit_mode;
+
+	ChangeEditModeWindow(ED_MODE_PALETTE);
+      }
+      else
+      {
+	ChangeEditModeWindow(last_edit_mode);
       }
       break;
 
@@ -11734,10 +11810,7 @@ static void HandleControlButtons(struct GadgetInfo *gi)
       }
 
       if (edit_mode != ED_MODE_DRAWING)
-      {
-	DrawDrawingWindow();
-	edit_mode = ED_MODE_DRAWING;
-      }
+	ChangeEditModeWindow(ED_MODE_DRAWING);
 
       if (button == 1)
       {
@@ -11774,24 +11847,18 @@ static void HandleControlButtons(struct GadgetInfo *gi)
       if (edit_mode != ED_MODE_INFO)
       {
 	last_edit_mode = edit_mode;
-	edit_mode = ED_MODE_INFO;
 
-	DrawLevelInfoWindow();
+	ChangeEditModeWindow(ED_MODE_INFO);
       }
       else
       {
-	edit_mode = last_edit_mode;
-
-	DrawEditModeWindow();
+	ChangeEditModeWindow(last_edit_mode);
       }
       break;
 
     case GADGET_ID_CLEAR:
       if (edit_mode != ED_MODE_DRAWING)
-      {
-	DrawDrawingWindow();
-	edit_mode = ED_MODE_DRAWING;
-      }
+	ChangeEditModeWindow(ED_MODE_DRAWING);
 
       for (x = 0; x < MAX_LEV_FIELDX; x++) 
 	for (y = 0; y < MAX_LEV_FIELDY; y++) 
@@ -11932,6 +11999,10 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 	  break;
 	}
 
+	/* change element of button used to show palette */
+	if (editor.palette.show_on_element_buttons)
+	  button = last_button;
+
 	PickDrawingElement(button, new_element);
 
 	if (!stick_element_properties_window &&
@@ -11946,6 +12017,9 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 	if (drawing_function == GADGET_ID_PICK_ELEMENT)
 	  ClickOnGadget(level_editor_gadget[last_drawing_function],
 			MB_LEFTBUTTON);
+
+	if (!use_permanent_palette)
+	  ChangeEditModeWindow(last_edit_mode);
       }
 #ifdef DEBUG
       else if (gi->event.type == GD_EVENT_PRESSED)
@@ -12077,10 +12151,13 @@ void HandleLevelEditorKeyInput(Key key)
 	{
 	  HandleControlButtons(level_editor_gadget[GADGET_ID_PROPERTIES]);
 	}
+        else if (edit_mode == ED_MODE_PALETTE)
+	{
+	  HandleControlButtons(level_editor_gadget[GADGET_ID_PALETTE]);
+	}
 	else		/* should never happen */
 	{
-	  DrawDrawingWindow();
-	  edit_mode = ED_MODE_DRAWING;
+	  ChangeEditModeWindow(ED_MODE_DRAWING);
 	}
 
         break;
@@ -12091,10 +12168,12 @@ void HandleLevelEditorKeyInput(Key key)
 
     if (id != GADGET_ID_NONE)
       ClickOnGadget(level_editor_gadget[id], button);
-    else if (letter >= '1' && letter <= '3')
-      ClickOnGadget(level_editor_gadget[GADGET_ID_PROPERTIES], letter - '0');
-    else if (letter == '?')
-      ClickOnGadget(level_editor_gadget[GADGET_ID_PROPERTIES], button);
+    else if (letter == '1' || letter == '?')
+      ClickOnGadget(level_editor_gadget[GADGET_ID_ELEMENT_LEFT], button);
+    else if (letter == '2')
+      ClickOnGadget(level_editor_gadget[GADGET_ID_ELEMENT_MIDDLE], button);
+    else if (letter == '3')
+      ClickOnGadget(level_editor_gadget[GADGET_ID_ELEMENT_RIGHT], button);
     else if (letter == '.')
       ClickOnGadget(level_editor_gadget[GADGET_ID_SINGLE_ITEMS], button);
     else if (letter == 'U')

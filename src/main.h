@@ -2356,6 +2356,7 @@ struct EditorButtonInfo
   struct XYTileSize element_left;
   struct XYTileSize element_middle;
   struct XYTileSize element_right;
+  struct XYTileSize palette;
 
   struct XYTileSize draw_single;
   struct XYTileSize draw_connected;
@@ -2398,6 +2399,8 @@ struct EditorPaletteInfo
   int x, y;
   int cols, rows;
   int tile_size;
+  boolean show_as_separate_screen;
+  boolean show_on_element_buttons;
 
   struct XYTileSize element_left;
   struct XYTileSize element_middle;

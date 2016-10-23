@@ -5482,6 +5482,8 @@ struct ConfigInfo image_config[] =
   { "gfx.editor.button.element_right.height",	"16"			},
   { "gfx.editor.button.element_right.pressed_xoffset", "0"		},
 
+  { "gfx.editor.button.palette",		UNDEFINED_FILENAME	},
+
   { "editor.no_toolbox_button",			"RocksDoor.png"		},
   { "editor.no_toolbox_button.x",		"506"			},
   { "editor.no_toolbox_button.y",		"286"			},
@@ -7696,6 +7698,9 @@ struct ConfigInfo image_config[] =
   { "editor.button.element_right.y",		"-1"			},
   { "editor.button.element_right.tile_size",	"-1"			},
 
+  { "editor.button.palette.x",			"-1"			},
+  { "editor.button.palette.y",			"-1"			},
+
   { "editor.button.draw_single.x",		"6"			},
   { "editor.button.draw_single.y",		"6"			},
   { "editor.button.draw_connected.x",		"28"			},
@@ -7761,6 +7766,8 @@ struct ConfigInfo image_config[] =
   { "editor.palette.cols",			"4"			},
   { "editor.palette.rows",			"10"			},
   { "editor.palette.tile_size",			"16"			},
+  { "editor.palette.show_as_separate_screen",	"false"			},
+  { "editor.palette.show_on_element_buttons",	"false"			},
 
   { "editor.palette.element_left.x",		"6"			},
   { "editor.palette.element_left.y",		"258"			},
