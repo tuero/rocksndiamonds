@@ -129,6 +129,28 @@ static void UpdateScreenExt(SDL_Rect *rect, boolean with_frame_delay)
     SDL_UpdateTexture(sdl_texture, NULL, screen->pixels, screen->pitch);
   }
 
+  SDL_Rect *src_rect1 = NULL, *dst_rect1 = NULL;
+  SDL_Rect *src_rect2 = NULL, *dst_rect2 = NULL;
+#if defined(HAS_SCREEN_KEYBOARD)
+  SDL_Rect src_rect_up = { 0, video.height / 2, video.width, video.height / 2 };
+  SDL_Rect dst_rect_up = { 0, 0,                video.width, video.height / 2 };
+
+  if (video.shifted_up)
+  {
+    if (video.screen_rendering_mode == SPECIAL_RENDERING_TARGET ||
+	video.screen_rendering_mode == SPECIAL_RENDERING_DOUBLE)
+    {
+      src_rect2 = &src_rect_up;
+      dst_rect2 = &dst_rect_up;
+    }
+    else
+    {
+      src_rect1 = &src_rect_up;
+      dst_rect1 = &dst_rect_up;
+    }
+  }
+#endif
+
   // clear render target buffer
   SDL_RenderClear(sdl_renderer);
 
@@ -139,7 +161,7 @@ static void UpdateScreenExt(SDL_Rect *rect, boolean with_frame_delay)
 
   // copy backbuffer texture to render target buffer
   if (video.screen_rendering_mode != SPECIAL_RENDERING_TARGET)
-    SDL_RenderCopy(sdl_renderer, sdl_texture_stream, NULL, NULL);
+    SDL_RenderCopy(sdl_renderer, sdl_texture_stream, src_rect1, dst_rect1);
 
   if (video.screen_rendering_mode != SPECIAL_RENDERING_BITMAP)
     FinalizeScreen(DRAW_TO_SCREEN);
@@ -149,7 +171,7 @@ static void UpdateScreenExt(SDL_Rect *rect, boolean with_frame_delay)
       video.screen_rendering_mode == SPECIAL_RENDERING_DOUBLE)
   {
     SDL_SetRenderTarget(sdl_renderer, NULL);
-    SDL_RenderCopy(sdl_renderer, sdl_texture_target, NULL, NULL);
+    SDL_RenderCopy(sdl_renderer, sdl_texture_target, src_rect2, dst_rect2);
   }
 #endif
 

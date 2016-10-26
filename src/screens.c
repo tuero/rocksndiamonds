@@ -3585,9 +3585,7 @@ void HandleTypeName(int newxpos, Key key)
 
     xpos = newxpos;
 
-#if defined(TARGET_SDL2)
-    SDL_StartTextInput();
-#endif
+    StartTextInput(startx, starty);
   }
   else if (is_valid_key_char && xpos < MAX_PLAYER_NAME_LEN)
   {
@@ -3634,9 +3632,7 @@ void HandleTypeName(int newxpos, Key key)
 
     DrawText(startx, starty, setup.player_name, font_nr);
 
-#if defined(TARGET_SDL2)
-    SDL_StopTextInput();
-#endif
+    StopTextInput();
   }
 }
 

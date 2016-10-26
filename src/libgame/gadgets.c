@@ -1605,6 +1605,8 @@ boolean HandleGadgets(int mx, int my, int button)
 
     if (gadget_pressed_inside_select_line)
       new_gi = NULL;
+
+    StopTextInput();
   }
 
   gadget_pressed =
@@ -1706,6 +1708,8 @@ boolean HandleGadgets(int mx, int my, int button)
 
       if (gi->textinput.cursor_position != old_cursor_position)
 	DrawGadget(gi, DG_PRESSED, gi->direct_draw);
+
+      StartTextInput(gi->x, gi->y);
     }
     else if (gi->type & GD_TYPE_TEXT_AREA && button != 0 && !motion_status)
     {
@@ -1720,6 +1724,8 @@ boolean HandleGadgets(int mx, int my, int button)
 
       if (gi->textarea.cursor_position != old_cursor_position)
 	DrawGadget(gi, DG_PRESSED, gi->direct_draw);
+
+      StartTextInput(gi->x, gi->y);
     }
     else if (gi->type & GD_TYPE_SELECTBOX && gi->selectbox.open &&
 	     !keep_selectbox_open)
@@ -2082,7 +2088,11 @@ boolean HandleGadgetsKeyInput(Key key)
 	gi->type & GD_TYPE_SELECTBOX))
     return FALSE;
 
-  if (key == KSYM_Return)	/* valid for both text input and selectbox */
+  if (key == KSYM_Escape)
+  {
+    StopTextInput();
+  }
+  else if (key == KSYM_Return)	/* valid for both text input and selectbox */
   {
     boolean gadget_changed = ((gi->event_mask & GD_EVENT_TEXT_RETURN) != 0);
 
@@ -2094,6 +2104,8 @@ boolean HandleGadgetsKeyInput(Key key)
 	strcpy(gi->textinput.last_value, gi->textinput.value);
       else
 	gadget_changed = FALSE;
+
+      StopTextInput();
     }
     else if (gi->type & GD_TYPE_SELECTBOX)
     {

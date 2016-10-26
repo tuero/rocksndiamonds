@@ -92,6 +92,12 @@
 #define TOUCH_DROP_DISTANCE_DEFAULT	5
 
 
+/* values for screen keyboard on mobile devices */
+#if defined(PLATFORM_ANDROID)
+#define HAS_SCREEN_KEYBOARD
+#endif
+
+
 /* default input keys */
 #define DEFAULT_KEY_LEFT		KSYM_Left
 #define DEFAULT_KEY_RIGHT		KSYM_Right
@@ -801,6 +807,8 @@ struct VideoSystemInfo
   unsigned int frame_delay;
   unsigned int frame_delay_value;
 
+  boolean shifted_up;
+
   boolean initialized;
 };
 
@@ -1488,6 +1496,8 @@ Key GetEventKey(KeyEvent *, boolean);
 KeyMod HandleKeyModState(Key, int);
 KeyMod GetKeyModState();
 KeyMod GetKeyModStateFromEvents();
+void StartTextInput(int, int);
+void StopTextInput();
 boolean CheckCloseWindowEvent(ClientMessageEvent *);
 
 void InitJoysticks();

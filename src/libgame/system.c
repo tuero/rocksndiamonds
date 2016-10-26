@@ -386,6 +386,8 @@ void InitVideoBuffer(int width, int height, int depth, boolean fullscreen)
   video.frame_delay = 0;
   video.frame_delay_value = GAME_FRAME_DELAY;
 
+  video.shifted_up = FALSE;
+
   SDLInitVideoBuffer(fullscreen);
 
   video.initialized = TRUE;
@@ -1509,6 +1511,29 @@ KeyMod GetKeyModStateFromEvents()
      only used to filter out clipboard insert events from "True X-Mouse" tool */
 
   return HandleKeyModState(KSYM_UNDEFINED, 0);
+}
+
+void StartTextInput(int x, int y)
+{
+#if defined(TARGET_SDL2)
+  SDL_StartTextInput();
+
+#if defined(HAS_SCREEN_KEYBOARD)
+  if (y > video.height / 2)
+    video.shifted_up = TRUE;
+#endif
+#endif
+}
+
+void StopTextInput()
+{
+#if defined(TARGET_SDL2)
+  SDL_StopTextInput();
+
+#if defined(HAS_SCREEN_KEYBOARD)
+  video.shifted_up = FALSE;
+#endif
+#endif
 }
 
 boolean CheckCloseWindowEvent(ClientMessageEvent *event)

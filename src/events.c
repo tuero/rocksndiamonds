@@ -867,21 +867,16 @@ void HandleTextEvent(TextEvent *event)
 	GetKeyModState());
 #endif
 
-#if defined(PLATFORM_ANDROID)
-  if (game_status == GAME_MODE_PSEUDO_TYPENAME)
-  {
-    HandleTypeName(0, key);
-
+#if !defined(HAS_SCREEN_KEYBOARD)
+  // non-mobile devices: only handle key input with modifier keys pressed here
+  // (every other key input is handled directly as physical key input event)
+  if (!checkTextInputKeyModState())
     return;
-  }
 #endif
 
-  // only handle key input with text modifier keys pressed
-  if (checkTextInputKeyModState())
-  {
-    HandleKey(key, KEY_PRESSED);
-    HandleKey(key, KEY_RELEASED);
-  }
+  // process text input as "classic" (with uppercase etc.) key input event
+  HandleKey(key, KEY_PRESSED);
+  HandleKey(key, KEY_RELEASED);
 }
 
 void HandlePauseResumeEvent(PauseResumeEvent *event)
