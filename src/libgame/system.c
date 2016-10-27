@@ -387,6 +387,10 @@ void InitVideoBuffer(int width, int height, int depth, boolean fullscreen)
   video.frame_delay_value = GAME_FRAME_DELAY;
 
   video.shifted_up = FALSE;
+  video.shifted_up_pos = 0;
+  video.shifted_up_pos_last = 0;
+  video.shifted_up_delay = 0;
+  video.shifted_up_delay_value = ONE_SECOND_DELAY / 4;
 
   SDLInitVideoBuffer(fullscreen);
 
@@ -1513,14 +1517,18 @@ KeyMod GetKeyModStateFromEvents()
   return HandleKeyModState(KSYM_UNDEFINED, 0);
 }
 
-void StartTextInput(int x, int y)
+void StartTextInput(int x, int y, int width, int height)
 {
 #if defined(TARGET_SDL2)
   SDL_StartTextInput();
 
 #if defined(HAS_SCREEN_KEYBOARD)
-  if (y > video.height / 2)
+  if (y + height > SCREEN_KEYBOARD_POS(video.height))
+  {
+    video.shifted_up_pos = y + height - SCREEN_KEYBOARD_POS(video.height);
+    video.shifted_up_delay = SDL_GetTicks();
     video.shifted_up = TRUE;
+  }
 #endif
 #endif
 }
@@ -1531,7 +1539,12 @@ void StopTextInput()
   SDL_StopTextInput();
 
 #if defined(HAS_SCREEN_KEYBOARD)
-  video.shifted_up = FALSE;
+  if (video.shifted_up)
+  {
+    video.shifted_up_pos = 0;
+    video.shifted_up_delay = SDL_GetTicks();
+    video.shifted_up = FALSE;
+  }
 #endif
 #endif
 }

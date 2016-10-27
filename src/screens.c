@@ -3585,7 +3585,7 @@ void HandleTypeName(int newxpos, Key key)
 
     xpos = newxpos;
 
-    StartTextInput(startx, starty);
+    StartTextInput(startx, starty, pos->width, pos->height);
   }
   else if (is_valid_key_char && xpos < MAX_PLAYER_NAME_LEN)
   {

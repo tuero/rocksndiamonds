@@ -412,6 +412,11 @@ void HandleButtonEvent(ButtonEvent *event)
 	event->x, event->y);
 #endif
 
+#if defined(HAS_SCREEN_KEYBOARD)
+  if (video.shifted_up)
+    event->y += video.shifted_up_pos;
+#endif
+
   motion_status = FALSE;
 
   if (event->type == EVENT_BUTTONPRESS)

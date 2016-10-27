@@ -1709,7 +1709,8 @@ boolean HandleGadgets(int mx, int my, int button)
       if (gi->textinput.cursor_position != old_cursor_position)
 	DrawGadget(gi, DG_PRESSED, gi->direct_draw);
 
-      StartTextInput(gi->x, gi->y);
+      if (press_event)
+	StartTextInput(gi->x, gi->y, gi->width, gi->height);
     }
     else if (gi->type & GD_TYPE_TEXT_AREA && button != 0 && !motion_status)
     {
@@ -1725,7 +1726,8 @@ boolean HandleGadgets(int mx, int my, int button)
       if (gi->textarea.cursor_position != old_cursor_position)
 	DrawGadget(gi, DG_PRESSED, gi->direct_draw);
 
-      StartTextInput(gi->x, gi->y);
+      if (press_event)
+	StartTextInput(gi->x, gi->y, gi->width, gi->height);
     }
     else if (gi->type & GD_TYPE_SELECTBOX && gi->selectbox.open &&
 	     !keep_selectbox_open)

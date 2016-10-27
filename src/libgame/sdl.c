@@ -131,12 +131,31 @@ static void UpdateScreenExt(SDL_Rect *rect, boolean with_frame_delay)
 
   SDL_Rect *src_rect1 = NULL, *dst_rect1 = NULL;
   SDL_Rect *src_rect2 = NULL, *dst_rect2 = NULL;
-#if defined(HAS_SCREEN_KEYBOARD)
-  SDL_Rect src_rect_up = { 0, video.height / 2, video.width, video.height / 2 };
-  SDL_Rect dst_rect_up = { 0, 0,                video.width, video.height / 2 };
 
-  if (video.shifted_up)
+#if defined(HAS_SCREEN_KEYBOARD)
+  if (video.shifted_up || video.shifted_up_delay)
   {
+    int time_current = SDL_GetTicks();
+    int pos = video.shifted_up_pos;
+    int pos_last = video.shifted_up_pos_last;
+
+    if (!DelayReachedExt(&video.shifted_up_delay, video.shifted_up_delay_value,
+			 time_current))
+    {
+      int delay = time_current - video.shifted_up_delay;
+      int delay_value = video.shifted_up_delay_value;
+
+      pos = pos_last + (pos - pos_last) * delay / delay_value;
+    }
+    else
+    {
+      video.shifted_up_pos_last = pos;
+      video.shifted_up_delay = 0;
+    }
+
+    SDL_Rect src_rect_up = { 0, pos, video.width, video.height - pos };
+    SDL_Rect dst_rect_up = { 0, 0,   video.width, video.height - pos };
+
     if (video.screen_rendering_mode == SPECIAL_RENDERING_TARGET ||
 	video.screen_rendering_mode == SPECIAL_RENDERING_DOUBLE)
     {

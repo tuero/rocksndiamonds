@@ -95,6 +95,7 @@
 /* values for screen keyboard on mobile devices */
 #if defined(PLATFORM_ANDROID)
 #define HAS_SCREEN_KEYBOARD
+#define SCREEN_KEYBOARD_POS(h)		((h) / 2)
 #endif
 
 
@@ -808,6 +809,10 @@ struct VideoSystemInfo
   unsigned int frame_delay_value;
 
   boolean shifted_up;
+  int shifted_up_pos;
+  int shifted_up_pos_last;
+  unsigned int shifted_up_delay;
+  unsigned int shifted_up_delay_value;
 
   boolean initialized;
 };
@@ -1496,7 +1501,7 @@ Key GetEventKey(KeyEvent *, boolean);
 KeyMod HandleKeyModState(Key, int);
 KeyMod GetKeyModState();
 KeyMod GetKeyModStateFromEvents();
-void StartTextInput(int, int);
+void StartTextInput(int, int, int, int);
 void StopTextInput();
 boolean CheckCloseWindowEvent(ClientMessageEvent *);
 
