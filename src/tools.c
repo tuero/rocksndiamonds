@@ -256,26 +256,6 @@ static int getFieldbufferOffsetY_RND()
   return fy;
 }
 
-int getFieldbufferOffsetX()
-{
-  if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
-    return getFieldbufferOffsetX_EM();
-  if (level.game_engine_type == GAME_ENGINE_TYPE_SP)
-    return getFieldbufferOffsetX_SP();
-  else
-    return getFieldbufferOffsetX_RND();
-}
-
-int getFieldbufferOffsetY()
-{
-  if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
-    return getFieldbufferOffsetY_EM();
-  if (level.game_engine_type == GAME_ENGINE_TYPE_SP)
-    return getFieldbufferOffsetY_SP();
-  else
-    return getFieldbufferOffsetY_RND();
-}
-
 static int getLevelFromScreenX_RND(int sx)
 {
   int fx = getFieldbufferOffsetX_RND();
@@ -296,7 +276,7 @@ static int getLevelFromScreenY_RND(int sy)
   return ly;
 }
 
-int getLevelFromScreenX_EM(int sx)
+static int getLevelFromScreenX_EM(int sx)
 {
   int level_xsize = level.native_em_level->lev->width;
   int full_xsize = level_xsize * TILESIZE_VAR;
@@ -306,14 +286,15 @@ int getLevelFromScreenX_EM(int sx)
   int fx = getFieldbufferOffsetX_EM();
   int dx = fx;
   int px = sx - SX;
-  int lx = LEVELX((px + dx) / TILESIZE_VAR) - 1;
+  int lx = LEVELX((px + dx) / TILESIZE_VAR);
 
+  lx -= 1;
   lx -= (BorderElement != EL_EMPTY ? 1 : 0);
 
   return lx;
 }
 
-int getLevelFromScreenY_EM(int sy)
+static int getLevelFromScreenY_EM(int sy)
 {
   int level_ysize = level.native_em_level->lev->height;
   int full_ysize = level_ysize * TILESIZE_VAR;
@@ -323,14 +304,15 @@ int getLevelFromScreenY_EM(int sy)
   int fy = getFieldbufferOffsetY_EM();
   int dy = fy;
   int py = sy - SY;
-  int ly = LEVELY((py + dy) / TILESIZE_VAR) - 1;
+  int ly = LEVELY((py + dy) / TILESIZE_VAR);
 
+  ly -= 1;
   ly -= (BorderElement != EL_EMPTY ? 1 : 0);
 
   return ly;
 }
 
-int getLevelFromScreenX_SP(int sx)
+static int getLevelFromScreenX_SP(int sx)
 {
   int menBorder = setup.sp_show_border_elements;
   int level_xsize = level.native_sp_level->width;
@@ -346,7 +328,7 @@ int getLevelFromScreenX_SP(int sx)
   return lx;
 }
 
-int getLevelFromScreenY_SP(int sy)
+static int getLevelFromScreenY_SP(int sy)
 {
   int menBorder = setup.sp_show_border_elements;
   int level_ysize = level.native_sp_level->height;
@@ -386,14 +368,6 @@ void DumpTile(int x, int y)
 {
   int sx = SCREENX(x);
   int sy = SCREENY(y);
-
-#if 0
-  if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
-  {
-    x--;
-    y--;
-  }
-#endif
 
   printf_line("-", 79);
   printf("Field Info: SCREEN(%d, %d), LEVEL(%d, %d)\n", sx, sy, x, y);
