@@ -352,7 +352,7 @@ void UpdateAndDisplayGameControlValues();
 void InitGameSound();
 void InitGame();
 
-void UpdateEngineValues(int, int);
+void UpdateEngineValues(int, int, int, int);
 void GameWon(void);
 void GameEnd(void);
 

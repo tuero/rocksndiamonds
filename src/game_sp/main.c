@@ -73,7 +73,8 @@ void GameActions_SP(byte action[MAX_PLAYERS], boolean warp_mode)
   byte single_player_action = action[0];
   int x, y;
 
-  UpdateEngineValues(mScrollX / TILEX, mScrollY / TILEY);
+  UpdateEngineValues(mScrollX / TILEX, mScrollY / TILEY,
+		     MurphyScreenXPos / TILEX, MurphyScreenYPos / TILEY);
 
   subMainGameLoop_Main(single_player_action, warp_mode);
 

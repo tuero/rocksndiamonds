@@ -65,6 +65,9 @@
 #define REQUEST_WAIT_FOR_INPUT	(REQ_ASK | REQ_CONFIRM | REQ_PLAYER)
 
 
+int correctLevelPosX_EM(int);
+int correctLevelPosY_EM(int);
+
 int getLevelFromScreenX(int);
 int getLevelFromScreenY(int);
 

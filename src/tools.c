@@ -192,6 +192,22 @@ static char *print_if_not_empty(int element)
   return s;
 }
 
+int correctLevelPosX_EM(int lx)
+{
+  lx -= 1;
+  lx -= (BorderElement != EL_EMPTY ? 1 : 0);
+
+  return lx;
+}
+
+int correctLevelPosY_EM(int ly)
+{
+  ly -= 1;
+  ly -= (BorderElement != EL_EMPTY ? 1 : 0);
+
+  return ly;
+}
+
 static int getFieldbufferOffsetX_RND()
 {
   int full_lev_fieldx = lev_fieldx + (BorderElement != EL_EMPTY ? 2 : 0);
@@ -288,8 +304,7 @@ static int getLevelFromScreenX_EM(int sx)
   int px = sx - SX;
   int lx = LEVELX((px + dx) / TILESIZE_VAR);
 
-  lx -= 1;
-  lx -= (BorderElement != EL_EMPTY ? 1 : 0);
+  lx = correctLevelPosX_EM(lx);
 
   return lx;
 }
@@ -306,8 +321,7 @@ static int getLevelFromScreenY_EM(int sy)
   int py = sy - SY;
   int ly = LEVELY((py + dy) / TILESIZE_VAR);
 
-  ly -= 1;
-  ly -= (BorderElement != EL_EMPTY ? 1 : 0);
+  ly = correctLevelPosY_EM(ly);
 
   return ly;
 }
@@ -395,6 +409,7 @@ void DumpTile(int x, int y)
   printf("  GfxElement:  %d\n", GfxElement[x][y]);
   printf("  GfxAction:   %d\n", GfxAction[x][y]);
   printf("  GfxFrame:    %d [%d]\n", GfxFrame[x][y], FrameCounter);
+  printf("  Player x/y:  %d, %d\n", local_player->jx, local_player->jy);
   printf("\n");
 }
 

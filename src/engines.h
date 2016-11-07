@@ -25,7 +25,7 @@
 /* ========================================================================= */
 
 extern void SetBitmaps_EM(Bitmap **);
-extern void UpdateEngineValues(int, int);
+extern void UpdateEngineValues(int, int, int, int);
 
 extern boolean getTeamMode_EM();
 extern int getGameFrameDelay_EM(int);

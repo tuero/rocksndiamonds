@@ -4037,13 +4037,24 @@ void InitGame()
   SaveEngineSnapshotToListInitial();
 }
 
-void UpdateEngineValues(int actual_scroll_x, int actual_scroll_y)
+void UpdateEngineValues(int actual_scroll_x, int actual_scroll_y,
+			int actual_player_x, int actual_player_y)
 {
   /* this is used for non-R'n'D game engines to update certain engine values */
+
+  if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
+  {
+    actual_player_x = correctLevelPosX_EM(actual_player_x);
+    actual_player_y = correctLevelPosY_EM(actual_player_y);
+  }
 
   /* needed to determine if sounds are played within the visible screen area */
   scroll_x = actual_scroll_x;
   scroll_y = actual_scroll_y;
+
+  /* needed to get player position for "follow finger" playing input method */
+  local_player->jx = actual_player_x;
+  local_player->jy = actual_player_y;
 }
 
 void InitMovDir(int x, int y)
