@@ -53,16 +53,14 @@ void BlitScreenToBitmap_EM(Bitmap *target_bitmap)
 
   int x = screen_x % (MAX_BUF_XSIZE * TILEX);
   int y = screen_y % (MAX_BUF_YSIZE * TILEY);
-  int sx, sy, sxsize, sysize;
   int xsize = SXSIZE;
   int ysize = SYSIZE;
   int full_xsize = lev.width  * TILEX;
   int full_ysize = lev.height * TILEY;
-
-  sxsize = (full_xsize < xsize ? full_xsize : xsize);
-  sysize = (full_ysize < ysize ? full_ysize : ysize);
-  sx = SX + (full_xsize < xsize ? (xsize - full_xsize) / 2 : 0);
-  sy = SY + (full_ysize < ysize ? (ysize - full_ysize) / 2 : 0);
+  int sx = SX + (full_xsize < xsize ? (xsize - full_xsize) / 2 : 0);
+  int sy = SY + (full_ysize < ysize ? (ysize - full_ysize) / 2 : 0);
+  int sxsize = (full_xsize < xsize ? full_xsize : xsize);
+  int sysize = (full_ysize < ysize ? full_ysize : ysize);
 
   if (x < 2 * TILEX && y < 2 * TILEY)
   {

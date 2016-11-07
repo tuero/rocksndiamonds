@@ -233,16 +233,14 @@ void BlitScreenToBitmap_SP(Bitmap *target_bitmap)
 
   int px = getFieldbufferOffsetX_SP();
   int py = getFieldbufferOffsetY_SP();
-  int sx, sy, sxsize, sysize;
   int xsize = SXSIZE;
   int ysize = SYSIZE;
   int full_xsize = (FieldWidth  - (menBorder ? 0 : 1)) * TILEX_VAR;
   int full_ysize = (FieldHeight - (menBorder ? 0 : 1)) * TILEY_VAR;
-
-  sxsize = (full_xsize < xsize ? full_xsize : xsize);
-  sysize = (full_ysize < ysize ? full_ysize : ysize);
-  sx = SX + (full_xsize < xsize ? (xsize - full_xsize) / 2 : 0);
-  sy = SY + (full_ysize < ysize ? (ysize - full_ysize) / 2 : 0);
+  int sx = SX + (full_xsize < xsize ? (xsize - full_xsize) / 2 : 0);
+  int sy = SY + (full_ysize < ysize ? (ysize - full_ysize) / 2 : 0);
+  int sxsize = (full_xsize < xsize ? full_xsize : xsize);
+  int sysize = (full_ysize < ysize ? full_ysize : ysize);
 
   BlitBitmap(bitmap_db_field_sp, target_bitmap, px, py, sxsize, sysize, sx, sy);
 }
