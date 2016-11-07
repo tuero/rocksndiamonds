@@ -13,6 +13,36 @@ int mScrollX_last, mScrollY_last;
 int ScreenBuffer[2 + MAX_PLAYFIELD_WIDTH + 2][2 + MAX_PLAYFIELD_HEIGHT + 2];
 
 
+int getFieldbufferOffsetX_SP()
+{
+  int px = 2 * TILEX + (mScrollX - mScrollX_last) % TILEX;
+
+  /* scroll correction for even number of visible tiles (half tile shifted) */
+  px += game_sp.scroll_xoffset;
+
+  if (ExplosionShakeMurphy != 0)
+    px += TILEX / 2 - GetSimpleRandom(TILEX + 1);
+
+  px = px * TILESIZE_VAR / TILESIZE;
+
+  return px;
+}
+
+int getFieldbufferOffsetY_SP()
+{
+  int py = 2 * TILEY + (mScrollY - mScrollY_last) % TILEY;
+
+  /* scroll correction for even number of visible tiles (half tile shifted) */
+  py += game_sp.scroll_yoffset;
+
+  if (ExplosionShakeMurphy != 0)
+    py += TILEY / 2 - GetSimpleRandom(TILEX + 1);
+
+  py = py * TILESIZE_VAR / TILESIZE;
+
+  return py;
+}
+
 void RestorePlayfield()
 {
   int x1 = mScrollX / TILEX - 2;
@@ -201,8 +231,8 @@ void BlitScreenToBitmap_SP(Bitmap *target_bitmap)
 {
   /* copy playfield buffer to target bitmap at scroll position */
 
-  int px = 2 * TILEX + (mScrollX - mScrollX_last) % TILEX;
-  int py = 2 * TILEY + (mScrollY - mScrollY_last) % TILEY;
+  int px = getFieldbufferOffsetX_SP();
+  int py = getFieldbufferOffsetY_SP();
   int sx, sy, sxsize, sysize;
   int xsize = SXSIZE;
   int ysize = SYSIZE;
@@ -213,19 +243,6 @@ void BlitScreenToBitmap_SP(Bitmap *target_bitmap)
   sysize = (full_ysize < ysize ? full_ysize : ysize);
   sx = SX + (full_xsize < xsize ? (xsize - full_xsize) / 2 : 0);
   sy = SY + (full_ysize < ysize ? (ysize - full_ysize) / 2 : 0);
-
-  /* scroll correction for even number of visible tiles (half tile shifted) */
-  px += game_sp.scroll_xoffset;
-  py += game_sp.scroll_yoffset;
-
-  if (ExplosionShakeMurphy != 0)
-  {
-    px += TILEX / 2 - GetSimpleRandom(TILEX + 1);
-    py += TILEY / 2 - GetSimpleRandom(TILEX + 1);
-  }
-
-  px = px * TILESIZE_VAR / TILESIZE;
-  py = py * TILESIZE_VAR / TILESIZE;
 
   BlitBitmap(bitmap_db_field_sp, target_bitmap, px, py, sxsize, sysize, sx, sy);
 }

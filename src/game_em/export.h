@@ -739,6 +739,9 @@ extern unsigned int InitEngineRandom_EM(int);
 extern void setLevelInfoToDefaults_EM();
 extern boolean LoadNativeLevel_EM(char *, boolean);
 
+extern int getFieldbufferOffsetX_EM();
+extern int getFieldbufferOffsetY_EM();
+
 extern void BackToFront_EM(void);
 extern void BlitScreenToBitmap_EM(Bitmap *);
 extern void RedrawPlayfield_EM(boolean);

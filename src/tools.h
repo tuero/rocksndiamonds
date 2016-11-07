@@ -65,7 +65,11 @@
 #define REQUEST_WAIT_FOR_INPUT	(REQ_ASK | REQ_CONFIRM | REQ_PLAYER)
 
 
+int getLevelFromScreenX(int);
+int getLevelFromScreenY(int);
+
 void DumpTile(int, int);
+void DumpTileFromScreen(int, int);
 
 void DrawMaskedBorder_FIELD();
 void DrawMaskedBorder_DOOR_1();

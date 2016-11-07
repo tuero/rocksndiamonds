@@ -187,6 +187,9 @@ extern void copyInternalEngineVars_SP();
 extern boolean LoadNativeLevel_SP(char *, int, boolean);
 extern void SaveNativeLevel_SP(char *);
 
+extern int getFieldbufferOffsetX_SP();
+extern int getFieldbufferOffsetY_SP();
+
 extern void BlitScreenToBitmap_SP(Bitmap *);
 extern void RedrawPlayfield_SP(boolean);
 

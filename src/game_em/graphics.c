@@ -37,6 +37,16 @@ int screen_x, screen_y;			/* current scroll position */
 static int screentiles[MAX_PLAYFIELD_HEIGHT + 2][MAX_PLAYFIELD_WIDTH + 2];
 static int crumbled_state[MAX_PLAYFIELD_HEIGHT + 2][MAX_PLAYFIELD_WIDTH + 2];
 
+int getFieldbufferOffsetX_EM()
+{
+  return screen_x % TILEX;
+}
+
+int getFieldbufferOffsetY_EM()
+{
+  return screen_y % TILEY;
+}
+
 void BlitScreenToBitmap_EM(Bitmap *target_bitmap)
 {
   /* blit all (up to four) parts of the scroll buffer to the target bitmap */

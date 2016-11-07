@@ -192,16 +192,208 @@ static char *print_if_not_empty(int element)
   return s;
 }
 
+static int getFieldbufferOffsetX_RND()
+{
+  int full_lev_fieldx = lev_fieldx + (BorderElement != EL_EMPTY ? 2 : 0);
+  int dx = (ScreenMovDir & (MV_LEFT | MV_RIGHT) ? ScreenGfxPos : 0);
+  int dx_var = dx * TILESIZE_VAR / TILESIZE;
+  int fx = FX;
+
+  if (EVEN(SCR_FIELDX))
+  {
+    int ffx = (scroll_x - SBX_Left)  * TILEX_VAR + dx_var;
+
+    if (ffx < SBX_Right * TILEX_VAR + TILEX_VAR / 2 + TILEX_VAR)
+      fx += dx_var - MIN(ffx, TILEX_VAR / 2) + TILEX_VAR;
+    else
+      fx += (dx_var > 0 ? TILEX_VAR : 0);
+  }
+  else
+  {
+    fx += dx_var;
+  }
+
+  if (full_lev_fieldx <= SCR_FIELDX)
+  {
+    if (EVEN(SCR_FIELDX))
+      fx = 2 * TILEX_VAR - (ODD(lev_fieldx)  ? TILEX_VAR / 2 : 0);
+    else
+      fx = 2 * TILEX_VAR - (EVEN(lev_fieldx) ? TILEX_VAR / 2 : 0);
+  }
+
+  return fx;
+}
+
+static int getFieldbufferOffsetY_RND()
+{
+  int full_lev_fieldy = lev_fieldy + (BorderElement != EL_EMPTY ? 2 : 0);
+  int dy = (ScreenMovDir & (MV_UP | MV_DOWN)    ? ScreenGfxPos : 0);
+  int dy_var = dy * TILESIZE_VAR / TILESIZE;
+  int fy = FY;
+
+  if (EVEN(SCR_FIELDY))
+  {
+    int ffy = (scroll_y - SBY_Upper) * TILEY_VAR + dy_var;
+
+    if (ffy < SBY_Lower * TILEY_VAR + TILEY_VAR / 2 + TILEY_VAR)
+      fy += dy_var - MIN(ffy, TILEY_VAR / 2) + TILEY_VAR;
+    else
+      fy += (dy_var > 0 ? TILEY_VAR : 0);
+  }
+  else
+  {
+    fy += dy_var;
+  }
+
+  if (full_lev_fieldy <= SCR_FIELDY)
+  {
+    if (EVEN(SCR_FIELDY))
+      fy = 2 * TILEY_VAR - (ODD(lev_fieldy)  ? TILEY_VAR / 2 : 0);
+    else
+      fy = 2 * TILEY_VAR - (EVEN(lev_fieldy) ? TILEY_VAR / 2 : 0);
+  }
+
+  return fy;
+}
+
+int getFieldbufferOffsetX()
+{
+  if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
+    return getFieldbufferOffsetX_EM();
+  if (level.game_engine_type == GAME_ENGINE_TYPE_SP)
+    return getFieldbufferOffsetX_SP();
+  else
+    return getFieldbufferOffsetX_RND();
+}
+
+int getFieldbufferOffsetY()
+{
+  if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
+    return getFieldbufferOffsetY_EM();
+  if (level.game_engine_type == GAME_ENGINE_TYPE_SP)
+    return getFieldbufferOffsetY_SP();
+  else
+    return getFieldbufferOffsetY_RND();
+}
+
+static int getLevelFromScreenX_RND(int sx)
+{
+  int fx = getFieldbufferOffsetX_RND();
+  int dx = fx - FX;
+  int px = sx - SX;
+  int lx = LEVELX((px + dx) / TILESIZE_VAR);
+
+  return lx;
+}
+
+static int getLevelFromScreenY_RND(int sy)
+{
+  int fy = getFieldbufferOffsetY_RND();
+  int dy = fy - FY;
+  int py = sy - SY;
+  int ly = LEVELY((py + dy) / TILESIZE_VAR);
+
+  return ly;
+}
+
+int getLevelFromScreenX_EM(int sx)
+{
+  int level_xsize = level.native_em_level->lev->width;
+  int full_xsize = level_xsize * TILESIZE_VAR;
+
+  sx -= (full_xsize < SXSIZE ? (SXSIZE - full_xsize) / 2 : 0);
+
+  int fx = getFieldbufferOffsetX_EM();
+  int dx = fx;
+  int px = sx - SX;
+  int lx = LEVELX((px + dx) / TILESIZE_VAR) - 1;
+
+  lx -= (BorderElement != EL_EMPTY ? 1 : 0);
+
+  return lx;
+}
+
+int getLevelFromScreenY_EM(int sy)
+{
+  int level_ysize = level.native_em_level->lev->height;
+  int full_ysize = level_ysize * TILESIZE_VAR;
+
+  sy -= (full_ysize < SYSIZE ? (SYSIZE - full_ysize) / 2 : 0);
+
+  int fy = getFieldbufferOffsetY_EM();
+  int dy = fy;
+  int py = sy - SY;
+  int ly = LEVELY((py + dy) / TILESIZE_VAR) - 1;
+
+  ly -= (BorderElement != EL_EMPTY ? 1 : 0);
+
+  return ly;
+}
+
+int getLevelFromScreenX_SP(int sx)
+{
+  int menBorder = setup.sp_show_border_elements;
+  int level_xsize = level.native_sp_level->width;
+  int full_xsize = (level_xsize - (menBorder ? 0 : 1)) * TILESIZE_VAR;
+
+  sx += (full_xsize < SXSIZE ? (SXSIZE - full_xsize) / 2 : 0);
+
+  int fx = getFieldbufferOffsetX_SP();
+  int dx = fx - FX;
+  int px = sx - SX;
+  int lx = LEVELX((px + dx) / TILESIZE_VAR);
+
+  return lx;
+}
+
+int getLevelFromScreenY_SP(int sy)
+{
+  int menBorder = setup.sp_show_border_elements;
+  int level_ysize = level.native_sp_level->height;
+  int full_ysize = (level_ysize - (menBorder ? 0 : 1)) * TILESIZE_VAR;
+
+  sy += (full_ysize < SYSIZE ? (SYSIZE - full_ysize) / 2 : 0);
+
+  int fy = getFieldbufferOffsetY_SP();
+  int dy = fy - FY;
+  int py = sy - SY;
+  int ly = LEVELY((py + dy) / TILESIZE_VAR);
+
+  return ly;
+}
+
+int getLevelFromScreenX(int x)
+{
+  if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
+    return getLevelFromScreenX_EM(x);
+  if (level.game_engine_type == GAME_ENGINE_TYPE_SP)
+    return getLevelFromScreenX_SP(x);
+  else
+    return getLevelFromScreenX_RND(x);
+}
+
+int getLevelFromScreenY(int y)
+{
+  if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
+    return getLevelFromScreenY_EM(y);
+  if (level.game_engine_type == GAME_ENGINE_TYPE_SP)
+    return getLevelFromScreenY_SP(y);
+  else
+    return getLevelFromScreenY_RND(y);
+}
+
 void DumpTile(int x, int y)
 {
   int sx = SCREENX(x);
   int sy = SCREENY(y);
 
+#if 0
   if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
   {
     x--;
     y--;
   }
+#endif
 
   printf_line("-", 79);
   printf("Field Info: SCREEN(%d, %d), LEVEL(%d, %d)\n", sx, sy, x, y);
@@ -230,6 +422,14 @@ void DumpTile(int x, int y)
   printf("  GfxAction:   %d\n", GfxAction[x][y]);
   printf("  GfxFrame:    %d [%d]\n", GfxFrame[x][y], FrameCounter);
   printf("\n");
+}
+
+void DumpTileFromScreen(int sx, int sy)
+{
+  int lx = getLevelFromScreenX(sx);
+  int ly = getLevelFromScreenY(sy);
+
+  DumpTile(lx, ly);
 }
 
 void SetDrawtoField(int mode)
@@ -410,58 +610,8 @@ void DrawMaskedBorderToTarget(int draw_target)
 
 void BlitScreenToBitmap_RND(Bitmap *target_bitmap)
 {
-  int fx = FX, fy = FY;
-  int full_lev_fieldx = lev_fieldx + (BorderElement != EL_EMPTY ? 2 : 0);
-  int full_lev_fieldy = lev_fieldy + (BorderElement != EL_EMPTY ? 2 : 0);
-
-  int dx = (ScreenMovDir & (MV_LEFT | MV_RIGHT) ? ScreenGfxPos : 0);
-  int dy = (ScreenMovDir & (MV_UP | MV_DOWN)    ? ScreenGfxPos : 0);
-  int dx_var = dx * TILESIZE_VAR / TILESIZE;
-  int dy_var = dy * TILESIZE_VAR / TILESIZE;
-  int ffx, ffy;
-
-  ffx = (scroll_x - SBX_Left)  * TILEX_VAR + dx_var;
-  ffy = (scroll_y - SBY_Upper) * TILEY_VAR + dy_var;
-
-  if (EVEN(SCR_FIELDX))
-  {
-    if (ffx < SBX_Right * TILEX_VAR + TILEX_VAR / 2 + TILEX_VAR)
-      fx += dx_var - MIN(ffx, TILEX_VAR / 2) + TILEX_VAR;
-    else
-      fx += (dx_var > 0 ? TILEX_VAR : 0);
-  }
-  else
-  {
-    fx += dx_var;
-  }
-
-  if (EVEN(SCR_FIELDY))
-  {
-    if (ffy < SBY_Lower * TILEY_VAR + TILEY_VAR / 2 + TILEY_VAR)
-      fy += dy_var - MIN(ffy, TILEY_VAR / 2) + TILEY_VAR;
-    else
-      fy += (dy_var > 0 ? TILEY_VAR : 0);
-  }
-  else
-  {
-    fy += dy_var;
-  }
-
-  if (full_lev_fieldx <= SCR_FIELDX)
-  {
-    if (EVEN(SCR_FIELDX))
-      fx = 2 * TILEX_VAR - (ODD(lev_fieldx)  ? TILEX_VAR / 2 : 0);
-    else
-      fx = 2 * TILEX_VAR - (EVEN(lev_fieldx) ? TILEX_VAR / 2 : 0);
-  }
-
-  if (full_lev_fieldy <= SCR_FIELDY)
-  {
-    if (EVEN(SCR_FIELDY))
-      fy = 2 * TILEY_VAR - (ODD(lev_fieldy)  ? TILEY_VAR / 2 : 0);
-    else
-      fy = 2 * TILEY_VAR - (EVEN(lev_fieldy) ? TILEY_VAR / 2 : 0);
-  }
+  int fx = getFieldbufferOffsetX_RND();
+  int fy = getFieldbufferOffsetY_RND();
 
   BlitBitmap(drawto_field, target_bitmap, fx, fy, SXSIZE, SYSIZE, SX, SY);
 }
