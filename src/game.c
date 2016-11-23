@@ -2050,6 +2050,16 @@ static int compareGamePanelOrderInfo(const void *object1, const void *object2)
   return compare_result;
 }
 
+int getPlayerInventorySize(int player_nr)
+{
+  if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
+    return level.native_em_level->ply[player_nr]->dynamite;
+  else if (level.game_engine_type == GAME_ENGINE_TYPE_SP)
+    return level.native_sp_level->game_sp->red_disk_count;
+  else
+    return stored_player[player_nr].inventory_size;
+}
+
 void InitGameControlValues()
 {
   int i;
@@ -2187,15 +2197,8 @@ void UpdateGameControlValues()
 	    get_key_element_from_nr(k);
       }
 
-      if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
-	game_panel_controls[GAME_PANEL_INVENTORY_COUNT].value +=
-	  level.native_em_level->ply[i]->dynamite;
-      else if (level.game_engine_type == GAME_ENGINE_TYPE_SP)
-	game_panel_controls[GAME_PANEL_INVENTORY_COUNT].value +=
-	  level.native_sp_level->game_sp->red_disk_count;
-      else
-	game_panel_controls[GAME_PANEL_INVENTORY_COUNT].value +=
-	  stored_player[i].inventory_size;
+      game_panel_controls[GAME_PANEL_INVENTORY_COUNT].value +=
+	getPlayerInventorySize(i);
 
       if (stored_player[i].num_white_keys > 0)
 	game_panel_controls[GAME_PANEL_KEY_WHITE].value =
@@ -2222,15 +2225,8 @@ void UpdateGameControlValues()
 	  get_key_element_from_nr(k);
     }
 
-    if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
-      game_panel_controls[GAME_PANEL_INVENTORY_COUNT].value +=
-	level.native_em_level->ply[player_nr]->dynamite;
-    else if (level.game_engine_type == GAME_ENGINE_TYPE_SP)
-      game_panel_controls[GAME_PANEL_INVENTORY_COUNT].value +=
-	level.native_sp_level->game_sp->red_disk_count;
-    else
-      game_panel_controls[GAME_PANEL_INVENTORY_COUNT].value +=
-	stored_player[player_nr].inventory_size;
+    game_panel_controls[GAME_PANEL_INVENTORY_COUNT].value +=
+      getPlayerInventorySize(player_nr);
 
     if (stored_player[player_nr].num_white_keys > 0)
       game_panel_controls[GAME_PANEL_KEY_WHITE].value = EL_DC_KEY_WHITE;
