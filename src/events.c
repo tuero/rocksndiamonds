@@ -565,8 +565,8 @@ void HandleFingerEvent(FingerEvent *event)
   static float button_x1, button_y1;
   static SDL_FingerID motion_id = -1;
   static SDL_FingerID button_id = -1;
-  int move_trigger_distance_percent = 2;   // percent of touchpad width/height
-  int drop_trigger_distance_percent = 5;   // percent of touchpad width/height
+  int move_trigger_distance_percent = setup.touch.move_distance;
+  int drop_trigger_distance_percent = setup.touch.drop_distance;
   float move_trigger_distance = (float)move_trigger_distance_percent / 100;
   float drop_trigger_distance = (float)drop_trigger_distance_percent / 100;
   float event_x = event->x;
