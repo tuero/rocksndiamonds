@@ -5430,6 +5430,16 @@ static struct TokenInfo setup_info_touch[] =
   { TYPE_ENTER_LIST,	execSetupChooseTouchControls, "Touch Control Type:" },
   { TYPE_STRING,	&touch_controls_text,	""			},
   { TYPE_EMPTY,		NULL,			""			},
+  { TYPE_LEAVE_MENU,	execSetupMain, 		"Back"			},
+
+  { 0,			NULL,			NULL			}
+};
+
+static struct TokenInfo setup_info_touch_wipe_gestures[] =
+{
+  { TYPE_ENTER_LIST,	execSetupChooseTouchControls, "Touch Control Type:" },
+  { TYPE_STRING,	&touch_controls_text,	""			},
+  { TYPE_EMPTY,		NULL,			""			},
   { TYPE_ENTER_LIST,	execSetupChooseMoveDistance, "Move Trigger Distance:" },
   { TYPE_STRING,	&move_distance_text,	""			},
   { TYPE_ENTER_LIST,	execSetupChooseDropDistance, "Drop Trigger Distance:" },
@@ -5825,6 +5835,9 @@ static void DrawSetupScreen_Generic()
   {
     setup_info = setup_info_touch;
     title_string = "Setup Touch Ctrls";
+
+    if (strEqual(setup.touch.control_type, TOUCH_CONTROL_WIPE_GESTURES))
+      setup_info = setup_info_touch_wipe_gestures;
   }
   else if (setup_mode == SETUP_MODE_SHORTCUTS)
   {
