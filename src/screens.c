@@ -383,6 +383,7 @@ static struct
 {
   {	TOUCH_CONTROL_VIRTUAL_BUTTONS,	"Virtual Buttons"	},
   {	TOUCH_CONTROL_WIPE_GESTURES,	"Wipe Gestures"		},
+  {	TOUCH_CONTROL_FOLLOW_FINGER,	"Follow Finger"		},
 
   {	NULL,			 	NULL			},
 };

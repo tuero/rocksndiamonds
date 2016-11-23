@@ -586,6 +586,9 @@ void HandleFingerEvent(FingerEvent *event)
   if (game_status != GAME_MODE_PLAYING)
     return;
 
+  if (strEqual(setup.touch.control_type, TOUCH_CONTROL_FOLLOW_FINGER))
+    return;
+
   if (strEqual(setup.touch.control_type, TOUCH_CONTROL_VIRTUAL_BUTTONS))
   {
     int key_status = (event->type == EVENT_FINGERRELEASE ? KEY_RELEASED :
@@ -848,6 +851,172 @@ void HandleFingerEvent(FingerEvent *event)
   }
 }
 
+static void HandleFollowFinger(int mx, int my, int button)
+{
+  static int old_mx = 0, old_my = 0;
+  static Key motion_key_x = KSYM_UNDEFINED;
+  static Key motion_key_y = KSYM_UNDEFINED;
+  static boolean started_on_player = FALSE;
+  static boolean player_is_dropping = FALSE;
+  static int player_drop_count = 0;
+  static int last_player_x = -1;
+  static int last_player_y = -1;
+
+  if (!strEqual(setup.touch.control_type, TOUCH_CONTROL_FOLLOW_FINGER))
+    return;
+
+  if (button == MB_PRESSED && IN_GFX_FIELD_PLAY(mx, my))
+  {
+    touch_info[0].touched = TRUE;
+    touch_info[0].key = 0;
+
+    old_mx = mx;
+    old_my = my;
+
+    if (!motion_status)
+    {
+      started_on_player = FALSE;
+      player_is_dropping = FALSE;
+      player_drop_count = 0;
+      last_player_x = -1;
+      last_player_y = -1;
+
+      motion_key_x = KSYM_UNDEFINED;
+      motion_key_y = KSYM_UNDEFINED;
+
+      Error(ERR_DEBUG, "---------- TOUCH ACTION STARTED ----------");
+    }
+  }
+  else if (button == MB_RELEASED && touch_info[0].touched)
+  {
+    touch_info[0].touched = FALSE;
+    touch_info[0].key = 0;
+
+    old_mx = 0;
+    old_my = 0;
+
+    if (motion_key_x != KSYM_UNDEFINED)
+      HandleKey(motion_key_x, KEY_RELEASED);
+    if (motion_key_y != KSYM_UNDEFINED)
+      HandleKey(motion_key_y, KEY_RELEASED);
+
+    if (started_on_player)
+    {
+      if (player_is_dropping)
+      {
+	Error(ERR_DEBUG, "---------- DROP STOPPED ----------");
+
+	HandleKey(setup.input[0].key.drop, KEY_RELEASED);
+      }
+      else
+      {
+	Error(ERR_DEBUG, "---------- SNAP STOPPED ----------");
+
+	HandleKey(setup.input[0].key.snap, KEY_RELEASED);
+      }
+    }
+
+    motion_key_x = KSYM_UNDEFINED;
+    motion_key_y = KSYM_UNDEFINED;
+
+    Error(ERR_DEBUG, "---------- TOUCH ACTION STOPPED ----------");
+  }
+
+  if (touch_info[0].touched)
+  {
+    int src_x = local_player->jx;
+    int src_y = local_player->jy;
+    int dst_x = getLevelFromScreenX(old_mx);
+    int dst_y = getLevelFromScreenY(old_my);
+    int dx = dst_x - src_x;
+    int dy = dst_y - src_y;
+    Key new_motion_key_x = (dx < 0 ? setup.input[0].key.left :
+			    dx > 0 ? setup.input[0].key.right :
+			    KSYM_UNDEFINED);
+    Key new_motion_key_y = (dy < 0 ? setup.input[0].key.up :
+			    dy > 0 ? setup.input[0].key.down :
+			    KSYM_UNDEFINED);
+
+    if (dx != 0 && dy != 0 && ABS(dx) != ABS(dy) &&
+	(last_player_x != local_player->jx ||
+	 last_player_y != local_player->jy))
+    {
+      // in case of asymmetric diagonal movement, use "preferred" direction
+
+      int last_move_dir = (ABS(dx) > ABS(dy) ? MV_VERTICAL : MV_HORIZONTAL);
+
+      if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
+	level.native_em_level->ply[0]->last_move_dir = last_move_dir;
+      else
+	local_player->last_move_dir = last_move_dir;
+
+      // (required to prevent accidentally forcing direction for next movement)
+      last_player_x = local_player->jx;
+      last_player_y = local_player->jy;
+    }
+
+    if (button == MB_PRESSED && !motion_status && dx == 0 && dy == 0)
+    {
+      started_on_player = TRUE;
+      player_drop_count = getPlayerInventorySize(0);
+      player_is_dropping = (player_drop_count > 0);
+
+      if (player_is_dropping)
+      {
+	Error(ERR_DEBUG, "---------- DROP STARTED ----------");
+
+	HandleKey(setup.input[0].key.drop, KEY_PRESSED);
+      }
+      else
+      {
+	Error(ERR_DEBUG, "---------- SNAP STARTED ----------");
+
+	HandleKey(setup.input[0].key.snap, KEY_PRESSED);
+      }
+    }
+    else if (dx != 0 || dy != 0)
+    {
+      if (player_is_dropping &&
+	  player_drop_count == getPlayerInventorySize(0))
+      {
+	Error(ERR_DEBUG, "---------- DROP -> SNAP ----------");
+
+	HandleKey(setup.input[0].key.drop, KEY_RELEASED);
+	HandleKey(setup.input[0].key.snap, KEY_PRESSED);
+
+	player_is_dropping = FALSE;
+      }
+    }
+
+    if (new_motion_key_x != motion_key_x)
+    {
+      Error(ERR_DEBUG, "---------- %s %s ----------",
+	    started_on_player && !player_is_dropping ? "SNAPPING" : "MOVING",
+	    dx < 0 ? "LEFT" : dx > 0 ? "RIGHT" : "PAUSED");
+
+      if (motion_key_x != KSYM_UNDEFINED)
+	HandleKey(motion_key_x, KEY_RELEASED);
+      if (new_motion_key_x != KSYM_UNDEFINED)
+	HandleKey(new_motion_key_x, KEY_PRESSED);
+    }
+
+    if (new_motion_key_y != motion_key_y)
+    {
+      Error(ERR_DEBUG, "---------- %s %s ----------",
+	    started_on_player && !player_is_dropping ? "SNAPPING" : "MOVING",
+	    dy < 0 ? "UP" : dy > 0 ? "DOWN" : "PAUSED");
+
+      if (motion_key_y != KSYM_UNDEFINED)
+	HandleKey(motion_key_y, KEY_RELEASED);
+      if (new_motion_key_y != KSYM_UNDEFINED)
+	HandleKey(new_motion_key_y, KEY_PRESSED);
+    }
+
+    motion_key_x = new_motion_key_x;
+    motion_key_y = new_motion_key_y;
+  }
+}
+
 static boolean checkTextInputKeyModState()
 {
   // when playing, only handle raw key events and ignore text input
@@ -1006,8 +1175,12 @@ void HandleButton(int mx, int my, int button, int button_nr)
   }
 
 #if defined(PLATFORM_ANDROID)
-  // !!! for now, do not handle gadgets when playing -- maybe fix this !!!
-  if (game_status != GAME_MODE_PLAYING &&
+  // when playing, only handle gadgets when using "follow finger" controls
+  boolean handle_gadgets =
+    (game_status != GAME_MODE_PLAYING ||
+     strEqual(setup.touch.control_type, TOUCH_CONTROL_FOLLOW_FINGER));
+
+  if (handle_gadgets &&
       HandleGadgets(mx, my, button))
   {
     /* do not handle this button event anymore */
@@ -1067,12 +1240,14 @@ void HandleButton(int mx, int my, int button, int button_nr)
       break;
 
     case GAME_MODE_PLAYING:
+      HandleFollowFinger(mx, my, button);
+
 #ifdef DEBUG
-      if (button == MB_PRESSED && !motion_status && IN_GFX_FIELD_PLAY(mx, my))
-	DumpTile(LEVELX((mx - SX) / TILESIZE_VAR),
-		 LEVELY((my - SY) / TILESIZE_VAR));
-        // DumpTile(LEVELX((mx - SX) / TILEX), LEVELY((my - SY) / TILEY));
+      if (button == MB_PRESSED && !motion_status && IN_GFX_FIELD_PLAY(mx, my) &&
+	  GetKeyModState() & KMOD_Control)
+	DumpTileFromScreen(mx, my);
 #endif
+
       break;
 
     default:
@@ -1682,6 +1857,10 @@ void HandleNoEvent()
 
     case GAME_MODE_EDITOR:
       HandleLevelEditorIdle();
+      break;
+
+    case GAME_MODE_PLAYING:
+      HandleFollowFinger(-1, -1, -1);
       break;
 
     default:

@@ -85,6 +85,7 @@
 /* values for touch control */
 #define TOUCH_CONTROL_VIRTUAL_BUTTONS	"virtual_buttons"
 #define TOUCH_CONTROL_WIPE_GESTURES	"wipe_gestures"
+#define TOUCH_CONTROL_FOLLOW_FINGER	"follow_finger"
 
 #define TOUCH_CONTROL_DEFAULT		TOUCH_CONTROL_VIRTUAL_BUTTONS
 
