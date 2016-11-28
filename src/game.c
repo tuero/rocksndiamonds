@@ -4590,11 +4590,10 @@ void InitPlayerGfxAnimation(struct PlayerInfo *player, int action, int dir)
   }
 }
 
-static void ResetGfxFrame(int x, int y, boolean redraw)
+static void ResetGfxFrame(int x, int y)
 {
   int element = Feld[x][y];
   int graphic = el_act_dir2img(element, GfxAction[x][y], GfxDir[x][y]);
-  int last_gfx_frame = GfxFrame[x][y];
 
   if (graphic_info[graphic].anim_global_sync)
     GfxFrame[x][y] = FrameCounter;
@@ -4604,9 +4603,6 @@ static void ResetGfxFrame(int x, int y, boolean redraw)
     GfxFrame[x][y] = element_info[element].collect_score;
   else if (ANIM_MODE(graphic) == ANIM_CE_DELAY)
     GfxFrame[x][y] = ChangeDelay[x][y];
-
-  if (redraw && GfxFrame[x][y] != last_gfx_frame)
-    DrawLevelGraphicAnimation(x, y, graphic);
 }
 
 static void ResetGfxAnimation(int x, int y)
@@ -4615,7 +4611,7 @@ static void ResetGfxAnimation(int x, int y)
   GfxDir[x][y] = MovDir[x][y];
   GfxFrame[x][y] = 0;
 
-  ResetGfxFrame(x, y, FALSE);
+  ResetGfxFrame(x, y);
 }
 
 static void ResetRandomAnimationValue(int x, int y)
@@ -7076,7 +7072,7 @@ static void TurnRound(int x, int y)
   if (MovDelay[x][y])
     GfxAction[x][y] = ACTION_TURNING_FROM_LEFT + MV_DIR_TO_BIT(direction);
 
-  ResetGfxFrame(x, y, FALSE);
+  ResetGfxFrame(x, y);
 }
 
 static boolean JustBeingPushed(int x, int y)
@@ -11296,7 +11292,7 @@ void GameActions_RND_Main()
 void GameActions_RND()
 {
   int magic_wall_x = 0, magic_wall_y = 0;
-  int i, x, y, element, graphic;
+  int i, x, y, element, graphic, last_gfx_frame;
 
   InitPlayfieldScanModeVars();
 
@@ -11483,8 +11479,12 @@ void GameActions_RND()
   {
     element = Feld[x][y];
     graphic = el_act_dir2img(element, GfxAction[x][y], GfxDir[x][y]);
+    last_gfx_frame = GfxFrame[x][y];
 
-    ResetGfxFrame(x, y, TRUE);
+    ResetGfxFrame(x, y);
+
+    if (GfxFrame[x][y] != last_gfx_frame)
+      DrawLevelGraphicAnimation(x, y, graphic);
 
     if (ANIM_MODE(graphic) == ANIM_RANDOM &&
 	IS_NEXT_FRAME(GfxFrame[x][y], graphic))
