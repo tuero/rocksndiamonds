@@ -2322,6 +2322,10 @@ void DrawScreenField(int x, int y)
       int newly = ly + (dir == MV_UP   ? -1 : dir == MV_DOWN  ? +1 : 0);
 
       DrawLevelElementThruMask(newlx, newly, EL_ACID);
+
+      // prevent target field from being drawn again (but without masking)
+      // (this would happen if target field is scanned after moving element)
+      Stop[newlx][newly] = TRUE;
     }
   }
   else if (IS_BLOCKED(lx, ly))

@@ -11483,7 +11483,7 @@ void GameActions_RND()
 
     ResetGfxFrame(x, y);
 
-    if (GfxFrame[x][y] != last_gfx_frame)
+    if (GfxFrame[x][y] != last_gfx_frame && !Stop[x][y])
       DrawLevelGraphicAnimation(x, y, graphic);
 
     if (ANIM_MODE(graphic) == ANIM_RANDOM &&
@@ -11529,8 +11529,12 @@ void GameActions_RND()
       if (IS_GEM(element) || element == EL_SP_INFOTRON)
 	TEST_DrawTwinkleOnField(x, y);
     }
-    else if ((element == EL_ACID ||
-	      element == EL_EXIT_OPEN ||
+    else if (element == EL_ACID)
+    {
+      if (!Stop[x][y])
+	DrawLevelGraphicAnimationIfNeeded(x, y, graphic);
+    }
+    else if ((element == EL_EXIT_OPEN ||
 	      element == EL_EM_EXIT_OPEN ||
 	      element == EL_SP_EXIT_OPEN ||
 	      element == EL_STEEL_EXIT_OPEN ||
