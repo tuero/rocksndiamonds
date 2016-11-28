@@ -1344,13 +1344,13 @@ static void set_graphic_parameters_ext(int graphic, int *parameter,
 
     if (parameter[GFX_ARG_TILE_SIZE] != ARG_UNDEFINED_VALUE)
     {
-      anim_frames_per_row = src_image_width  / g->tile_size;
-      anim_frames_per_col = src_image_height / g->tile_size;
+      anim_frames_per_row = MAX(1, src_image_width  / g->tile_size);
+      anim_frames_per_col = MAX(1, src_image_height / g->tile_size);
     }
     else
     {
-      anim_frames_per_row = src_image_width  / g->width;
-      anim_frames_per_col = src_image_height / g->height;
+      anim_frames_per_row = MAX(1, src_image_width  / g->width);
+      anim_frames_per_col = MAX(1, src_image_height / g->height);
     }
 
     g->src_image_width  = src_image_width;
