@@ -46,7 +46,7 @@ static unsigned int special_cursor_delay_value = 1000;
 /* event filter addition for SDL2: as SDL2 does not have a function to enable
    or disable keyboard auto-repeat, filter repeated keyboard events instead */
 
-static int FilterEventsExt(const Event *event)
+static int FilterEvents(const Event *event)
 {
   MotionEvent *motion;
 
@@ -88,23 +88,11 @@ static int FilterEventsExt(const Event *event)
   return 1;
 }
 
-#if defined(TARGET_SDL2)
-int FilterEvents(void *userdata, Event *event)
-{
-  return FilterEventsExt(event);
-}
-#else
-int FilterEvents(const Event *event)
-{
-  return FilterEventsExt(event);
-}
-#endif
-
 /* to prevent delay problems, skip mouse motion events if the very next
    event is also a mouse motion event (and therefore effectively only
    handling the last of a row of mouse motion events in the event queue) */
 
-boolean SkipPressedMouseMotionEvent(const Event *event)
+static boolean SkipPressedMouseMotionEvent(const Event *event)
 {
   /* nothing to do if the current event is not a mouse motion event */
   if (event->type != EVENT_MOTIONNOTIFY)
@@ -128,9 +116,13 @@ boolean SkipPressedMouseMotionEvent(const Event *event)
   return FALSE;
 }
 
-/* this is only really needed for non-SDL targets to filter unwanted events;
-   when using SDL with properly installed event filter, this function can be
-   replaced with a simple "NextEvent()" call, but it doesn't hurt either */
+/* this is especially needed for event modifications for the Android target:
+   if mouse coordinates should be modified in the event filter function,
+   using a properly installed SDL event filter does not work, because in
+   the event filter, mouse coordinates in the event structure are still
+   physical pixel positions, not logical (scaled) screen positions, so this
+   has to be handled at a later stage in the event processing functions
+   (when device pixel positions are already converted to screen positions) */
 
 boolean NextValidEvent(Event *event)
 {
@@ -140,7 +132,7 @@ boolean NextValidEvent(Event *event)
 
     NextEvent(event);
 
-    if (FilterEventsExt(event))
+    if (FilterEvents(event))
       handle_this_event = TRUE;
 
     if (SkipPressedMouseMotionEvent(event))

@@ -723,14 +723,6 @@
 }
 
 
-/* type definitions */
-#if defined(TARGET_SDL2)
-typedef int (*EventFilter)(void *, Event *);
-#else
-typedef int (*EventFilter)(const Event *);
-#endif
-
-
 /* structure definitions */
 
 struct ProgramInfo
@@ -1494,7 +1486,6 @@ void OpenAudio(void);
 void CloseAudio(void);
 void SetAudioMode(boolean);
 
-void InitEventFilter(EventFilter);
 boolean PendingEvent(void);
 void NextEvent(Event *event);
 void PeekEvent(Event *event);

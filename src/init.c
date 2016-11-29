@@ -5926,8 +5926,6 @@ void OpenAll()
   InitVideoDisplay();
   InitVideoBuffer(WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH, setup.fullscreen);
 
-  InitEventFilter(FilterEvents);
-
   print_timestamp_time("[init video stuff]");
 
   InitElementPropertiesStatic();
