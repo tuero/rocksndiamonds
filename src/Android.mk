@@ -15,10 +15,10 @@ include $(CLEAR_VARS)
 
 LOCAL_MODULE := main
 
-SDL_PATH       := ../Special/Android/jni/SDL2-2.0.1
-SDL_IMAGE_PATH := ../Special/Android/jni/SDL2_image-2.0.0
-SDL_MIXER_PATH := ../Special/Android/jni/SDL2_mixer-2.0.0
-SDL_NET_PATH   := ../Special/Android/jni/SDL2_net-2.0.0
+SDL_PATH       := ../Special/Android/jni/SDL2
+SDL_IMAGE_PATH := ../Special/Android/jni/SDL2_image
+SDL_MIXER_PATH := ../Special/Android/jni/SDL2_mixer
+SDL_NET_PATH   := ../Special/Android/jni/SDL2_net
 
 LOCAL_C_INCLUDES :=				\
 	$(LOCAL_PATH)/$(SDL_PATH)/include	\
