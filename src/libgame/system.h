@@ -788,6 +788,9 @@ struct VideoSystemInfo
   int default_depth;
   int width, height, depth;
   int window_width, window_height;
+  int display_width, display_height;
+  int screen_width, screen_height;
+  int screen_xoffset, screen_yoffset;
 
   boolean fullscreen_available;
   boolean fullscreen_enabled;

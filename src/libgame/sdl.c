@@ -129,8 +129,17 @@ static void UpdateScreenExt(SDL_Rect *rect, boolean with_frame_delay)
     SDL_UpdateTexture(sdl_texture, NULL, screen->pixels, screen->pitch);
   }
 
+  int xoff = video.screen_xoffset;
+  int yoff = video.screen_yoffset;
+  SDL_Rect dst_rect_screen = { xoff, yoff, video.width, video.height };
   SDL_Rect *src_rect1 = NULL, *dst_rect1 = NULL;
   SDL_Rect *src_rect2 = NULL, *dst_rect2 = NULL;
+
+  if (video.screen_rendering_mode == SPECIAL_RENDERING_TARGET ||
+      video.screen_rendering_mode == SPECIAL_RENDERING_DOUBLE)
+    dst_rect2 = &dst_rect_screen;
+  else
+    dst_rect1 = &dst_rect_screen;
 
 #if defined(HAS_SCREEN_KEYBOARD)
   if (video.shifted_up || video.shifted_up_delay)
@@ -153,8 +162,8 @@ static void UpdateScreenExt(SDL_Rect *rect, boolean with_frame_delay)
       video.shifted_up_delay = 0;
     }
 
-    SDL_Rect src_rect_up = { 0, pos, video.width, video.height - pos };
-    SDL_Rect dst_rect_up = { 0, 0,   video.width, video.height - pos };
+    SDL_Rect src_rect_up = { 0,    pos,  video.width, video.height - pos };
+    SDL_Rect dst_rect_up = { xoff, yoff, video.width, video.height - pos };
 
     if (video.screen_rendering_mode == SPECIAL_RENDERING_TARGET ||
 	video.screen_rendering_mode == SPECIAL_RENDERING_DOUBLE)
@@ -553,14 +562,18 @@ static boolean SDLCreateScreen(boolean fullscreen)
 #endif
 #endif
 
+  SDLSetScreenSizeAndOffsets(video.width, video.height);
+
   int width  = video.width;
   int height = video.height;
+  int screen_width  = video.screen_width;
+  int screen_height = video.screen_height;
   int surface_flags = (fullscreen ? surface_flags_fullscreen :
 		       surface_flags_window);
 
   // default window size is unscaled
-  video.window_width  = video.width;
-  video.window_height = video.height;
+  video.window_width  = screen_width;
+  video.window_height = screen_height;
 
 #if defined(TARGET_SDL2)
 
@@ -569,8 +582,8 @@ static boolean SDLCreateScreen(boolean fullscreen)
 
   float window_scaling_factor = (float)setup.window_scaling_percent / 100;
 
-  video.window_width  = window_scaling_factor * width;
-  video.window_height = window_scaling_factor * height;
+  video.window_width  = window_scaling_factor * screen_width;
+  video.window_height = window_scaling_factor * screen_height;
 
   if (sdl_texture_stream)
   {
@@ -614,7 +627,7 @@ static boolean SDLCreateScreen(boolean fullscreen)
 
     if (sdl_renderer != NULL)
     {
-      SDL_RenderSetLogicalSize(sdl_renderer, width, height);
+      SDL_RenderSetLogicalSize(sdl_renderer, screen_width, screen_height);
       // SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
       SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, setup.window_scaling_quality);
 
@@ -800,8 +813,8 @@ void SDLSetWindowScaling(int window_scaling_percent)
     return;
 
   float window_scaling_factor = (float)window_scaling_percent / 100;
-  int new_window_width  = (int)(window_scaling_factor * video.width);
-  int new_window_height = (int)(window_scaling_factor * video.height);
+  int new_window_width  = (int)(window_scaling_factor * video.screen_width);
+  int new_window_height = (int)(window_scaling_factor * video.screen_height);
 
   SDL_SetWindowSize(sdl_window, new_window_width, new_window_height);
 
@@ -873,6 +886,67 @@ void SDLSetWindowFullscreen(boolean fullscreen)
     video.fullscreen_initial = FALSE;
   }
 }
+
+void SDLSetDisplaySize()
+{
+  SDL_Rect display_bounds;
+
+  SDL_GetDisplayBounds(0, &display_bounds);
+
+  video.display_width  = display_bounds.w;
+  video.display_height = display_bounds.h;
+
+#if 0
+  Error(ERR_DEBUG, "SDL real screen size: %d x %d",
+	video.display_width, video.display_height);
+#endif
+}
+
+void SDLSetScreenSizeAndOffsets(int width, int height)
+{
+  // set default video screen size and offsets
+  video.screen_width = width;
+  video.screen_height = height;
+  video.screen_xoffset = 0;
+  video.screen_yoffset = 0;
+
+#if defined(PLATFORM_ANDROID)
+  float ratio_video   = (float) width / height;
+  float ratio_display = (float) video.display_width / video.display_height;
+
+  if (ratio_video != ratio_display)
+  {
+    // adjust drawable screen size to cover the whole device display
+
+    if (ratio_video < ratio_display)
+      video.screen_width  *= ratio_display / ratio_video;
+    else
+      video.screen_height *= ratio_video / ratio_display;
+
+    video.screen_xoffset = (video.screen_width  - width)  / 2;
+    video.screen_yoffset = (video.screen_height - height) / 2;
+
+#if 0
+    Error(ERR_DEBUG, "Changing screen from %dx%d to %dx%d (%.2f to %.2f)",
+	  width, height,
+	  video.screen_width, video.screen_height,
+	  ratio_video, ratio_display);
+#endif
+  }
+#endif
+}
+
+void SDLSetScreenSizeForRenderer(int width, int height)
+{
+  SDL_RenderSetLogicalSize(sdl_renderer, width, height);
+}
+
+void SDLSetScreenProperties()
+{
+  SDLSetScreenSizeAndOffsets(video.width, video.height);
+  SDLSetScreenSizeForRenderer(video.screen_width, video.screen_height);
+}
+
 #endif
 
 void SDLSetScreenRenderingMode(char *screen_rendering_mode)

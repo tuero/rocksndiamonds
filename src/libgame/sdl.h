@@ -440,6 +440,10 @@ SDL_Surface *SDL_DisplayFormat(SDL_Surface *);
 void SDLSetWindowScaling(int);
 void SDLSetWindowScalingQuality(char *);
 void SDLSetWindowFullscreen(boolean);
+void SDLSetDisplaySize(void);
+void SDLSetScreenSizeAndOffsets(int, int);
+void SDLSetScreenSizeForRenderer(int, int);
+void SDLSetScreenProperties(void);
 #endif
 
 void SDLSetScreenRenderingMode(char *);

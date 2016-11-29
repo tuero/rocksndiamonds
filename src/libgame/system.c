@@ -363,6 +363,7 @@ void LimitScreenUpdates(boolean enable)
 void InitVideoDisplay(void)
 {
   SDLInitVideoDisplay();
+  SDLSetDisplaySize();
 }
 
 void CloseVideoDisplay(void)
@@ -377,6 +378,11 @@ void InitVideoBuffer(int width, int height, int depth, boolean fullscreen)
   video.width = width;
   video.height = height;
   video.depth = GetRealDepth(depth);
+
+  video.screen_width = width;
+  video.screen_height = height;
+  video.screen_xoffset = 0;
+  video.screen_yoffset = 0;
 
   video.fullscreen_available = FULLSCREEN_STATUS;
   video.fullscreen_enabled = FALSE;

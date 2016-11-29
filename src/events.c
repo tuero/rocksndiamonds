@@ -58,6 +58,18 @@ static int FilterEvents(const Event *event)
     return 0;
 #endif
 
+  if (event->type == EVENT_BUTTONPRESS ||
+      event->type == EVENT_BUTTONRELEASE)
+  {
+    ((ButtonEvent *)event)->x -= video.screen_xoffset;
+    ((ButtonEvent *)event)->y -= video.screen_yoffset;
+  }
+  else if (event->type == EVENT_MOTIONNOTIFY)
+  {
+    ((MotionEvent *)event)->x -= video.screen_xoffset;
+    ((MotionEvent *)event)->y -= video.screen_yoffset;
+  }
+
   /* non-motion events are directly passed to event handler functions */
   if (event->type != EVENT_MOTIONNOTIFY)
     return 1;
@@ -509,32 +521,52 @@ void HandleWindowEvent(WindowEvent *event)
     SDLRedrawWindow();
 #endif
 
-  if (event->event == SDL_WINDOWEVENT_RESIZED && !video.fullscreen_enabled)
+  if (event->event == SDL_WINDOWEVENT_RESIZED)
   {
-    int new_window_width  = event->data1;
-    int new_window_height = event->data2;
-
-    // if window size has changed after resizing, calculate new scaling factor
-    if (new_window_width  != video.window_width ||
-	new_window_height != video.window_height)
+    if (!video.fullscreen_enabled)
     {
-      int new_xpercent = (100 * new_window_width  / video.width);
-      int new_ypercent = (100 * new_window_height / video.height);
+      int new_window_width  = event->data1;
+      int new_window_height = event->data2;
 
-      // (extreme window scaling allowed, but cannot be saved permanently)
-      video.window_scaling_percent = MIN(new_xpercent, new_ypercent);
-      setup.window_scaling_percent =
-	MIN(MAX(MIN_WINDOW_SCALING_PERCENT, video.window_scaling_percent),
-	    MAX_WINDOW_SCALING_PERCENT);
+      // if window size has changed after resizing, calculate new scaling factor
+      if (new_window_width  != video.window_width ||
+	  new_window_height != video.window_height)
+      {
+	int new_xpercent = (100 * new_window_width  / video.screen_width);
+	int new_ypercent = (100 * new_window_height / video.screen_height);
 
-      video.window_width  = new_window_width;
-      video.window_height = new_window_height;
+	// (extreme window scaling allowed, but cannot be saved permanently)
+	video.window_scaling_percent = MIN(new_xpercent, new_ypercent);
+	setup.window_scaling_percent =
+	  MIN(MAX(MIN_WINDOW_SCALING_PERCENT, video.window_scaling_percent),
+	      MAX_WINDOW_SCALING_PERCENT);
 
-      if (game_status == GAME_MODE_SETUP)
-	RedrawSetupScreenAfterFullscreenToggle();
+	video.window_width  = new_window_width;
+	video.window_height = new_window_height;
 
-      SetWindowTitle();
+	if (game_status == GAME_MODE_SETUP)
+	  RedrawSetupScreenAfterFullscreenToggle();
+
+	SetWindowTitle();
+      }
     }
+#if defined(PLATFORM_ANDROID)
+    else
+    {
+      int new_display_width  = event->data1;
+      int new_display_height = event->data2;
+
+      // if fullscreen display size has changed, device has been rotated
+      if (new_display_width  != video.display_width ||
+	  new_display_height != video.display_height)
+      {
+	video.display_width  = new_display_width;
+	video.display_height = new_display_height;
+
+	SDLSetScreenProperties();
+      }
+    }
+#endif
   }
 }
 
