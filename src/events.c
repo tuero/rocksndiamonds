@@ -1231,8 +1231,10 @@ void HandleButton(int mx, int my, int button, int button_nr)
       HandleSetupScreen(mx, my, 0, 0, button);
       break;
 
+#if defined(TARGET_SDL2)
     case GAME_MODE_PLAYING:
       HandleFollowFinger(mx, my, button);
+#endif
 
 #ifdef DEBUG
       if (button == MB_PRESSED && !motion_status && IN_GFX_FIELD_PLAY(mx, my) &&
@@ -1851,9 +1853,11 @@ void HandleNoEvent()
       HandleLevelEditorIdle();
       break;
 
+#if defined(TARGET_SDL2)
     case GAME_MODE_PLAYING:
       HandleFollowFinger(-1, -1, -1);
       break;
+#endif
 
     default:
       break;
