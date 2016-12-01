@@ -93,8 +93,10 @@
 #define TOUCH_DROP_DISTANCE_DEFAULT	5
 
 
-/* values for screen keyboard on mobile devices */
+/* values for special settings for mobile devices */
 #if defined(PLATFORM_ANDROID)
+#define USE_TOUCH_INPUT_OVERLAY
+#define USE_COMPLETE_DISPLAY
 #define HAS_SCREEN_KEYBOARD
 #define SCREEN_KEYBOARD_POS(h)		((h) / 2)
 #endif
@@ -910,6 +912,11 @@ struct GfxInfo
   int cursor_mode;
 };
 
+struct OverlayInfo
+{
+  boolean active;
+};
+
 struct JoystickInfo
 {
   int status;
@@ -1373,6 +1380,7 @@ extern struct OptionInfo	options;
 extern struct VideoSystemInfo	video;
 extern struct AudioSystemInfo	audio;
 extern struct GfxInfo		gfx;
+extern struct OverlayInfo	overlay;
 extern struct AnimInfo		anim;
 extern struct ArtworkInfo	artwork;
 extern struct JoystickInfo	joystick;
@@ -1427,6 +1435,9 @@ void InitGfxDrawGlobalAnimFunction(void (*draw_global_anim_function)(int, int));
 void InitGfxDrawGlobalBorderFunction(void (*draw_global_border_function)(int));
 void InitGfxCustomArtworkInfo();
 void InitGfxOtherSettings();
+void InitOverlayInfo();
+void SetOverlayActive(boolean);
+boolean GetOverlayActive();
 void SetDrawDeactivationMask(int);
 void SetDrawBackgroundMask(int);
 void SetWindowBackgroundBitmap(Bitmap *);

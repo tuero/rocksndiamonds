@@ -20,25 +20,26 @@ RM = rm -f
 # EXT = pcx
 EXT = png
 
-FILES = RocksBusy.$(EXT)	\
-	RocksDC.$(EXT)		\
-	RocksDC2.$(EXT)		\
-	RocksDoor.$(EXT)	\
-	RocksDoor2.$(EXT)	\
-	RocksEMC.$(EXT)		\
-	RocksElements.$(EXT)	\
-	RocksFontBig.$(EXT)	\
-	RocksFontDC.$(EXT)	\
-	RocksFontEM.$(EXT)	\
-	RocksFontMedium.$(EXT)	\
-	RocksFontSmall.$(EXT)	\
-	RocksHeroes.$(EXT)	\
-	RocksMore.$(EXT)	\
-	RocksSP.$(EXT)		\
-	RocksScreen.$(EXT)	\
-	RocksToons.$(EXT)	\
-				\
-	RocksCE.$(EXT)		# dynamically generated from template
+FILES = RocksBusy.$(EXT)		\
+	RocksDC.$(EXT)			\
+	RocksDC2.$(EXT)			\
+	RocksDoor.$(EXT)		\
+	RocksDoor2.$(EXT)		\
+	RocksEMC.$(EXT)			\
+	RocksElements.$(EXT)		\
+	RocksFontBig.$(EXT)		\
+	RocksFontDC.$(EXT)		\
+	RocksFontEM.$(EXT)		\
+	RocksFontMedium.$(EXT)		\
+	RocksFontSmall.$(EXT)		\
+	RocksHeroes.$(EXT)		\
+	RocksMore.$(EXT)		\
+	RocksSP.$(EXT)			\
+	RocksScreen.$(EXT)		\
+	RocksToons.$(EXT)		\
+	overlay/VirtualButtons.$(EXT)	\
+					\
+	RocksCE.$(EXT)			# dynamically generated from template
 
 
 # -----------------------------------------------------------------------------

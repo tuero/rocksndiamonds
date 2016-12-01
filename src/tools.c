@@ -926,6 +926,10 @@ void FadeIn(int fade_mask)
   FADE_SXSIZE = FULL_SXSIZE;
   FADE_SYSIZE = FULL_SYSIZE;
 
+  if (game_status == GAME_MODE_PLAYING &&
+      strEqual(setup.touch.control_type, TOUCH_CONTROL_VIRTUAL_BUTTONS))
+    SetOverlayActive(TRUE);
+
   SetScreenStates_AfterFadingIn();
 
   // force update of global animation status in case of rapid screen changes
@@ -940,6 +944,8 @@ void FadeOut(int fade_mask)
     BackToFront();
 
   SetScreenStates_BeforeFadingOut();
+
+  SetOverlayActive(FALSE);
 
 #if 0
   DrawMaskedBorder(REDRAW_ALL);
@@ -4211,10 +4217,19 @@ static boolean RequestEnvelope(char *text, unsigned int req_state)
 
 boolean Request(char *text, unsigned int req_state)
 {
+  boolean overlay_active = GetOverlayActive();
+  boolean result;
+
+  SetOverlayActive(FALSE);
+
   if (global.use_envelope_request)
-    return RequestEnvelope(text, req_state);
+    result = RequestEnvelope(text, req_state);
   else
-    return RequestDoor(text, req_state);
+    result = RequestDoor(text, req_state);
+
+  SetOverlayActive(overlay_active);
+
+  return result;
 }
 
 static int compareDoorPartOrderInfo(const void *object1, const void *object2)

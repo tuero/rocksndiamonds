@@ -33,6 +33,7 @@ struct OptionInfo	options;
 struct VideoSystemInfo	video;
 struct AudioSystemInfo	audio;
 struct GfxInfo		gfx;
+struct OverlayInfo	overlay;
 struct ArtworkInfo	artwork;
 struct JoystickInfo	joystick;
 struct SetupInfo	setup;
@@ -268,6 +269,21 @@ void InitGfxCustomArtworkInfo()
 void InitGfxOtherSettings()
 {
   gfx.cursor_mode = CURSOR_DEFAULT;
+}
+
+void InitOverlayInfo()
+{
+  overlay.active = FALSE;
+}
+
+void SetOverlayActive(boolean active)
+{
+  overlay.active = active;
+}
+
+boolean GetOverlayActive()
+{
+  return overlay.active;
 }
 
 void SetDrawDeactivationMask(int draw_deactivation_mask)

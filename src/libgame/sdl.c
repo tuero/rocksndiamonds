@@ -37,6 +37,9 @@ static boolean limit_screen_updates = FALSE;
 /* functions from SGE library */
 void sge_Line(SDL_Surface *, Sint16, Sint16, Sint16, Sint16, Uint32);
 
+/* functions to draw overlay graphics for touch device input */
+static void DrawTouchInputOverlay();
+
 void SDLLimitScreenUpdates(boolean enable)
 {
   limit_screen_updates = enable;
@@ -201,6 +204,9 @@ static void UpdateScreenExt(SDL_Rect *rect, boolean with_frame_delay)
     SDL_SetRenderTarget(sdl_renderer, NULL);
     SDL_RenderCopy(sdl_renderer, sdl_texture_target, src_rect2, dst_rect2);
   }
+
+  // draw overlay graphics for touch device input, if needed
+  DrawTouchInputOverlay();
 #endif
 
   // global synchronization point of the game to align video frame delay
@@ -910,7 +916,7 @@ void SDLSetScreenSizeAndOffsets(int width, int height)
   video.screen_xoffset = 0;
   video.screen_yoffset = 0;
 
-#if defined(PLATFORM_ANDROID)
+#if defined(USE_COMPLETE_DISPLAY)
   float ratio_video   = (float) width / height;
   float ratio_display = (float) video.display_width / video.display_height;
 
@@ -2677,4 +2683,79 @@ boolean SDLReadJoystick(int nr, int *x, int *y, boolean *b1, boolean *b2)
     *b2 = sdl_js_button[nr][1];
 
   return TRUE;
+}
+
+static void DrawTouchInputOverlay()
+{
+#if defined(USE_TOUCH_INPUT_OVERLAY)
+  static SDL_Texture *texture = NULL;
+  static boolean initialized = FALSE;
+  static boolean deactivated = TRUE;
+  static int width = 0, height = 0;
+  static int alpha_max = SDL_ALPHA_OPAQUE / 2;
+  static int alpha_step = 5;
+  static int alpha_last = 0;
+  static int alpha = 0;
+
+  if (!overlay.active && deactivated)
+    return;
+
+  if (overlay.active)
+  {
+    if (alpha < alpha_max)
+      alpha = MIN(alpha + alpha_step, alpha_max);
+
+    deactivated = FALSE;
+  }
+  else
+  {
+    alpha = MAX(0, alpha - alpha_step);
+
+    if (alpha == 0)
+      deactivated = TRUE;
+  }
+
+  if (!initialized)
+  {
+    char *basename = "overlay/VirtualButtons.png";
+    char *filename = getCustomImageFilename(basename);
+
+    if (filename == NULL)
+      Error(ERR_EXIT, "LoadCustomImage(): cannot find file '%s'", basename);
+
+    SDL_Surface *surface;
+
+    if ((surface = IMG_Load(filename)) == NULL)
+      Error(ERR_EXIT, "IMG_Load() failed: %s", SDL_GetError());
+
+    width  = surface->w;
+    height = surface->h;
+
+    /* set black pixel to transparent if no alpha channel / transparent color */
+    if (!SDLHasAlpha(surface) &&
+	!SDLHasColorKey(surface))
+      SDL_SetColorKey(surface, SET_TRANSPARENT_PIXEL,
+		      SDL_MapRGB(surface->format, 0x00, 0x00, 0x00));
+
+    if ((texture = SDLCreateTextureFromSurface(surface)) == NULL)
+      Error(ERR_EXIT, "SDLCreateTextureFromSurface() failed");
+
+    SDL_FreeSurface(surface);
+
+    SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
+    SDL_SetTextureAlphaMod(texture, alpha_max);
+
+    initialized = TRUE;
+  }
+
+  if (alpha != alpha_last)
+    SDL_SetTextureAlphaMod(texture, alpha);
+
+  alpha_last = alpha;
+
+  SDL_Rect src_rect = { 0, 0, width, height };
+  SDL_Rect dst_rect = { 0, 0, video.screen_width, video.screen_height };
+
+  SDL_RenderCopy(sdl_renderer, texture, &src_rect, &dst_rect);
+#endif
 }
