@@ -37,8 +37,10 @@ static boolean limit_screen_updates = FALSE;
 /* functions from SGE library */
 void sge_Line(SDL_Surface *, Sint16, Sint16, Sint16, Sint16, Uint32);
 
+#if defined(USE_TOUCH_INPUT_OVERLAY)
 /* functions to draw overlay graphics for touch device input */
 static void DrawTouchInputOverlay();
+#endif
 
 void SDLLimitScreenUpdates(boolean enable)
 {
@@ -205,8 +207,11 @@ static void UpdateScreenExt(SDL_Rect *rect, boolean with_frame_delay)
     SDL_RenderCopy(sdl_renderer, sdl_texture_target, src_rect2, dst_rect2);
   }
 
+#if defined(USE_TOUCH_INPUT_OVERLAY)
   // draw overlay graphics for touch device input, if needed
   DrawTouchInputOverlay();
+#endif
+
 #endif
 
   // global synchronization point of the game to align video frame delay
@@ -566,9 +571,9 @@ static boolean SDLCreateScreen(boolean fullscreen)
      it will try to use accelerated graphics and apparently fails miserably) */
   int renderer_flags = SDL_RENDERER_SOFTWARE;
 #endif
-#endif
 
   SDLSetScreenSizeAndOffsets(video.width, video.height);
+#endif
 
   int width  = video.width;
   int height = video.height;
@@ -2685,9 +2690,9 @@ boolean SDLReadJoystick(int nr, int *x, int *y, boolean *b1, boolean *b2)
   return TRUE;
 }
 
+#if defined(USE_TOUCH_INPUT_OVERLAY)
 static void DrawTouchInputOverlay()
 {
-#if defined(USE_TOUCH_INPUT_OVERLAY)
   static SDL_Texture *texture = NULL;
   static boolean initialized = FALSE;
   static boolean deactivated = TRUE;
@@ -2777,5 +2782,5 @@ static void DrawTouchInputOverlay()
   SDL_Rect dst_rect = { xpos, ypos, width_scaled, height_scaled };
 
   SDL_RenderCopy(sdl_renderer, texture, &src_rect, &dst_rect);
-#endif
 }
+#endif

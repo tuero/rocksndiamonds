@@ -379,7 +379,9 @@ void LimitScreenUpdates(boolean enable)
 void InitVideoDisplay(void)
 {
   SDLInitVideoDisplay();
+#if defined(TARGET_SDL2)
   SDLSetDisplaySize();
+#endif
 }
 
 void CloseVideoDisplay(void)
