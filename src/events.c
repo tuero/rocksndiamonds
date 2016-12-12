@@ -617,15 +617,30 @@ void HandleFingerEvent(FingerEvent *event)
   {
     int key_status = (event->type == EVENT_FINGERRELEASE ? KEY_RELEASED :
 		      KEY_PRESSED);
-    Key key = (event->x < 1.0 / 3.0 ?
-	       (event->y < 1.0 / 2.0 ? setup.input[0].key.snap :
-		setup.input[0].key.drop) :
-	       event->x > 2.0 / 3.0 ?
-	       (event->y < 1.0 / 3.0 ? setup.input[0].key.up :
-		event->y > 2.0 / 3.0 ? setup.input[0].key.down :
-		event->x < 5.0 / 6.0 ? setup.input[0].key.left :
-		setup.input[0].key.right) :
+    float ypos = 1.0 - 1.0 / 3.0 * video.display_width / video.display_height;
+
+    event_y = (event_y - ypos) / (1 - ypos);
+
+    Key key = (event_x > 0         && event_x < 1.0 / 6.0 &&
+	       event_y > 2.0 / 3.0 && event_y < 1 ?
+	       setup.input[0].key.snap :
+	       event_x > 1.0 / 6.0 && event_x < 1.0 / 3.0 &&
+	       event_y > 2.0 / 3.0 && event_y < 1 ?
+	       setup.input[0].key.drop :
+	       event_x > 7.0 / 9.0 && event_x < 8.0 / 9.0 &&
+	       event_y > 0         && event_y < 1.0 / 3.0 ?
+	       setup.input[0].key.up :
+	       event_x > 6.0 / 9.0 && event_x < 7.0 / 9.0 &&
+	       event_y > 1.0 / 3.0 && event_y < 2.0 / 3.0 ?
+	       setup.input[0].key.left :
+	       event_x > 8.0 / 9.0 && event_x < 1 &&
+	       event_y > 1.0 / 3.0 && event_y < 2.0 / 3.0 ?
+	       setup.input[0].key.right :
+	       event_x > 7.0 / 9.0 && event_x < 8.0 / 9.0 &&
+	       event_y > 2.0 / 3.0 && event_y < 1 ?
+	       setup.input[0].key.down :
 	       KSYM_UNDEFINED);
+
     char *key_status_name = (key_status == KEY_RELEASED ? "KEY_RELEASED" :
 			     "KEY_PRESSED");
     int i;

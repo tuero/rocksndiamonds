@@ -2753,8 +2753,28 @@ static void DrawTouchInputOverlay()
 
   alpha_last = alpha;
 
+  float ratio_overlay = (float) width / height;
+  float ratio_screen = (float) video.screen_width / video.screen_height;
+  int width_scaled, height_scaled;
+  int xpos, ypos;
+
+  if (ratio_overlay > ratio_screen)
+  {
+    width_scaled = video.screen_width;
+    height_scaled = video.screen_height * ratio_screen / ratio_overlay;
+    xpos = 0;
+    ypos = video.screen_height - height_scaled;
+  }
+  else
+  {
+    width_scaled = video.screen_width * ratio_overlay / ratio_screen;
+    height_scaled = video.screen_height;
+    xpos = (video.screen_width - width_scaled) / 2;
+    ypos = 0;
+  }
+
   SDL_Rect src_rect = { 0, 0, width, height };
-  SDL_Rect dst_rect = { 0, 0, video.screen_width, video.screen_height };
+  SDL_Rect dst_rect = { xpos, ypos, width_scaled, height_scaled };
 
   SDL_RenderCopy(sdl_renderer, texture, &src_rect, &dst_rect);
 #endif
