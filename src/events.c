@@ -1433,7 +1433,7 @@ void HandleKeysDebug(Key key)
 	  (mod_key_pressed == setup.debug.frame_delay_use_mod_key))
       {
 	GameFrameDelay = (GameFrameDelay != setup.debug.frame_delay[i] ?
-			  setup.debug.frame_delay[i] : GAME_FRAME_DELAY);
+			  setup.debug.frame_delay[i] : setup.game_frame_delay);
 
 	if (!setup.debug.frame_delay_game_only)
 	  MenuFrameDelay = GameFrameDelay;
