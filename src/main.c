@@ -5630,6 +5630,7 @@ static void print_usage()
 	"  -g, --graphics DIRECTORY         alternative graphics DIRECTORY\n"
 	"  -s, --sounds DIRECTORY           alternative sounds DIRECTORY\n"
 	"  -m, --music DIRECTORY            alternative music DIRECTORY\n"
+	"      --mytapes                    use private tapes for tape tests\n"
 	"  -n, --network                    network multiplayer game\n"
 	"      --serveronly                 only start network server\n"
 	"  -v, --verbose                    verbose mode\n"

@@ -779,6 +779,7 @@ struct OptionInfo
 
   char *special_flags;
 
+  boolean mytapes;
   boolean serveronly;
   boolean network;
   boolean verbose;

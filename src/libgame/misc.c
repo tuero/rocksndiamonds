@@ -953,6 +953,7 @@ void GetOptions(int argc, char *argv[],
   options.execute_command = NULL;
   options.special_flags = NULL;
 
+  options.mytapes = FALSE;
   options.serveronly = FALSE;
   options.network = FALSE;
   options.verbose = FALSE;
@@ -1062,6 +1063,10 @@ void GetOptions(int argc, char *argv[],
       options.music_directory = option_arg;
       if (option_arg == next_option)
 	options_left++;
+    }
+    else if (strncmp(option, "-mytapes", option_len) == 0)
+    {
+      options.mytapes = TRUE;
     }
     else if (strncmp(option, "-network", option_len) == 0)
     {

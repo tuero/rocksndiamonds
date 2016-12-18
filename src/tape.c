@@ -1122,7 +1122,10 @@ void AutoPlayTape()
     continue;
 #endif
 
-    LoadSolutionTape(level_nr);
+    if (options.mytapes)
+      LoadTape(level_nr);
+    else
+      LoadSolutionTape(level_nr);
 
     if (tape.no_valid_file)
     {
