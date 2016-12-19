@@ -2795,11 +2795,17 @@ struct FileInfo *getFileListFromConfigList(struct ConfigInfo *config_list,
 					   char **ignore_tokens,
 					   int num_file_list_entries)
 {
+  SetupFileHash *ignore_tokens_hash;
   struct FileInfo *file_list;
   int num_file_list_entries_found = 0;
   int num_suffix_list_entries = 0;
   int list_pos;
   int i, j;
+
+  /* create hash from list of tokens to be ignored (for quick access) */
+  ignore_tokens_hash = newSetupFileHash();
+  for (i = 0; ignore_tokens[i] != NULL; i++)
+    setHashEntry(ignore_tokens_hash, ignore_tokens[i], "");
 
   file_list = checked_calloc(num_file_list_entries * sizeof(struct FileInfo));
 
@@ -2858,9 +2864,8 @@ struct FileInfo *getFileListFromConfigList(struct ConfigInfo *config_list,
     }
 
     /* the following tokens are no file definitions, but other config tokens */
-    for (j = 0; ignore_tokens[j] != NULL; j++)
-      if (strEqual(config_list[i].token, ignore_tokens[j]))
-	is_file_entry = FALSE;
+    if (getHashEntry(ignore_tokens_hash, config_list[i].token) != NULL)
+      is_file_entry = FALSE;
 
     if (is_file_entry)
     {
@@ -2889,6 +2894,8 @@ struct FileInfo *getFileListFromConfigList(struct ConfigInfo *config_list,
 	  num_file_list_entries_found);
     Error(ERR_EXIT,   "please fix");
   }
+
+  freeSetupFileHash(ignore_tokens_hash);
 
   return file_list;
 }
