@@ -1452,8 +1452,6 @@ void DrawMainMenu()
 
   if (CheckTitleScreen(levelset_has_changed))
   {
-    game_status_last_screen = GAME_MODE_MAIN;
-
     SetGameStatus(GAME_MODE_TITLE);
 
     DrawTitleScreen();
@@ -1601,6 +1599,9 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
       {
 	/* switch game mode from title screen mode back to info screen mode */
 	SetGameStatus(GAME_MODE_INFO);
+
+	/* store that last screen was info screen, not main menu screen */
+	game_status_last_screen = GAME_MODE_INFO;
 
 	DrawInfoScreen_NotAvailable("Title screen information:",
 				    "No title screen for this level set.");
@@ -2678,8 +2679,6 @@ void DrawInfoScreen_HelpText(int element, int action, int direction, int ypos)
 
 void DrawInfoScreen_TitleScreen()
 {
-  game_status_last_screen = GAME_MODE_INFO;
-
   SetGameStatus(GAME_MODE_TITLE);
 
   DrawTitleScreen();

@@ -8507,6 +8507,9 @@ void SetAnimStatus(int anim_status_new)
 
 void SetGameStatus(int game_status_new)
 {
+  if (game_status_new != game_status)
+    game_status_last_screen = game_status;
+
   game_status = game_status_new;
 
   SetAnimStatus(game_status_new);
