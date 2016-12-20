@@ -116,6 +116,8 @@ static MusicInfo **Music_NoConf = NULL;
 static int num_music_noconf = 0;
 static int stereo_volume[SOUND_MAX_LEFT2RIGHT + 1];
 
+static char *currently_playing_music_filename = NULL;
+
 
 /* ========================================================================= */
 /* THE STUFF BELOW IS ONLY USED BY THE SOUND SERVER CHILD PROCESS            */
@@ -242,6 +244,8 @@ static void Mixer_StopMusicChannel()
   Mixer_StopChannel(audio.music_channel);
 
   Mix_HaltMusic();
+
+  setString(&currently_playing_music_filename, NULL);
 }
 
 static void Mixer_FadeChannel(int channel)
@@ -259,6 +263,8 @@ static void Mixer_FadeMusicChannel()
   Mixer_FadeChannel(audio.music_channel);
 
   Mix_FadeOutMusic(SOUND_FADING_INTERVAL);
+
+  setString(&currently_playing_music_filename, NULL);
 }
 
 static void Mixer_UnFadeChannel(int channel)
@@ -321,6 +327,9 @@ static void Mixer_InsertSound(SoundControl snd_ctrl)
 
     mixer[audio.music_channel] = snd_ctrl;
     Mixer_PlayMusicChannel();
+
+    setString(&currently_playing_music_filename,
+	      getBaseNamePtr(snd_info->source_filename));
 
     return;
   }
@@ -694,6 +703,11 @@ static MusicInfo *getMusicInfoEntryFromMusicID(int pos)
 		   music_info->dynamic_artwork_list);
 
   return mus_info[list_pos];
+}
+
+char *getCurrentlyPlayingMusicFilename()
+{
+  return currently_playing_music_filename;
 }
 
 int getSoundListPropertyMappingSize()

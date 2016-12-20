@@ -8398,7 +8398,11 @@ void PlayMenuMusicExt(int music)
 
 void PlayMenuMusic()
 {
-  PlayMenuMusicExt(menu.music[game_status]);
+  char *curr_music = getCurrentlyPlayingMusicFilename();
+  char *next_music = getMusicListEntry(menu.music[game_status])->filename;
+
+  if (!strEqual(curr_music, next_music))
+    PlayMenuMusicExt(menu.music[game_status]);
 }
 
 void PlayMenuSoundsAndMusic()
@@ -8407,9 +8411,24 @@ void PlayMenuSoundsAndMusic()
   PlayMenuMusic();
 }
 
+static void FadeMenuSounds()
+{
+  FadeSounds();
+}
+
+static void FadeMenuMusic()
+{
+  char *curr_music = getCurrentlyPlayingMusicFilename();
+  char *next_music = getMusicListEntry(menu.music[game_status])->filename;
+
+  if (!strEqual(curr_music, next_music))
+    FadeMusic();
+}
+
 void FadeMenuSoundsAndMusic()
 {
-  FadeSoundsAndMusic();
+  FadeMenuSounds();
+  FadeMenuMusic();
 }
 
 void PlaySoundActivating()
