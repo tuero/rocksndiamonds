@@ -1408,7 +1408,7 @@ void DrawMainMenu()
   /* do not fade out here -- function may continue and fade on editor screen */
 
   UnmapAllGadgets();
-  FadeSoundsAndMusic();
+  FadeMenuSoundsAndMusic();
 
   ExpireSoundLoops(FALSE);
 
@@ -1504,8 +1504,7 @@ void DrawMainMenu()
     LoadTape(level_nr);
   DrawCompleteVideoDisplay();
 
-  PlayMenuSound();
-  PlayMenuMusic();
+  PlayMenuSoundsAndMusic();
 
   /* create gadgets for main menu screen */
   FreeScreenGadgets();
@@ -1608,7 +1607,7 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
 	return;
       }
 
-      FadeSoundsAndMusic();
+      FadeMenuSoundsAndMusic();
     }
 
     FadeOut(REDRAW_ALL);
@@ -1706,7 +1705,7 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
     }
     else
     {
-      FadeSoundsAndMusic();
+      FadeMenuSoundsAndMusic();
 
       return_to_main_menu = TRUE;
     }
@@ -2161,7 +2160,7 @@ static void DrawInfoScreen_Main()
     fade_mask = REDRAW_ALL;
 
   UnmapAllGadgets();
-  FadeSoundsAndMusic();
+  FadeMenuSoundsAndMusic();
 
   FreeScreenGadgets();
   CreateScreenGadgets();
@@ -2200,8 +2199,7 @@ static void DrawInfoScreen_Main()
 
   MapScreenGadgets(max_info_info);
 
-  PlayMenuSound();
-  PlayMenuMusic();
+  PlayMenuSoundsAndMusic();
 
   DrawMaskedBorder(fade_mask);
 
@@ -2753,7 +2751,7 @@ void HandleInfoScreen_Elements(int button)
 
     if (page >= num_pages)
     {
-      FadeSoundsAndMusic();
+      FadeMenuSoundsAndMusic();
 
       info_mode = INFO_MODE_MAIN;
       DrawInfoScreen();
@@ -2812,7 +2810,7 @@ void HandleInfoScreen_Music(int button)
 
     if (list == NULL)
     {
-      FadeSoundsAndMusic();
+      FadeMenuSoundsAndMusic();
 
       ClearField();
       DrawHeadline();
@@ -2831,7 +2829,7 @@ void HandleInfoScreen_Music(int button)
   {
     PlaySound(SND_MENU_ITEM_SELECTING);
 
-    FadeSoundsAndMusic();
+    FadeMenuSoundsAndMusic();
 
     info_mode = INFO_MODE_MAIN;
     DrawInfoScreen();
@@ -2852,7 +2850,7 @@ void HandleInfoScreen_Music(int button)
 
     if (list == NULL)
     {
-      FadeSoundsAndMusic();
+      FadeMenuSoundsAndMusic();
 
       info_mode = INFO_MODE_MAIN;
       DrawInfoScreen();
@@ -2860,7 +2858,7 @@ void HandleInfoScreen_Music(int button)
       return;
     }
 
-    FadeSoundsAndMusic();
+    FadeMenuSoundsAndMusic();
 
     if (list != music_file_info)
       FadeSetNextScreen();
@@ -3115,7 +3113,7 @@ void DrawInfoScreen_Credits()
 {
   SetMainBackgroundImageIfDefined(IMG_BACKGROUND_INFO_CREDITS);
 
-  FadeSoundsAndMusic();
+  FadeMenuSoundsAndMusic();
 
   FadeOut(REDRAW_FIELD);
 
@@ -3156,7 +3154,7 @@ void HandleInfoScreen_Credits(int button)
 
     if (screen_nr >= num_screens)
     {
-      FadeSoundsAndMusic();
+      FadeMenuSoundsAndMusic();
 
       info_mode = INFO_MODE_MAIN;
       DrawInfoScreen();
@@ -3235,7 +3233,7 @@ void HandleInfoScreen_Program(int button)
   {
     PlaySound(SND_MENU_ITEM_SELECTING);
 
-    FadeSoundsAndMusic();
+    FadeMenuSoundsAndMusic();
 
     info_mode = INFO_MODE_MAIN;
     DrawInfoScreen();
@@ -3410,7 +3408,7 @@ void HandleInfoScreen_Version(int button)
   {
     PlaySound(SND_MENU_ITEM_SELECTING);
 
-    FadeSoundsAndMusic();
+    FadeMenuSoundsAndMusic();
 
     info_mode = INFO_MODE_MAIN;
     DrawInfoScreen();
@@ -3498,7 +3496,7 @@ void HandleInfoScreen_LevelSet(int button)
   {
     PlaySound(SND_MENU_ITEM_SELECTING);
 
-    FadeSoundsAndMusic();
+    FadeMenuSoundsAndMusic();
 
     info_mode = INFO_MODE_MAIN;
     DrawInfoScreen();
@@ -3531,10 +3529,7 @@ static void DrawInfoScreen()
   if (info_mode != INFO_MODE_MAIN &&
       info_mode != INFO_MODE_TITLE &&
       info_mode != INFO_MODE_MUSIC)
-  {
-    PlayMenuSound();
-    PlayMenuMusic();
-  }
+    PlayMenuSoundsAndMusic();
 }
 
 void HandleInfoScreen(int mx, int my, int dx, int dy, int button)
@@ -4064,12 +4059,11 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
 
 void DrawChooseLevelSet()
 {
-  FadeSoundsAndMusic();
+  FadeMenuSoundsAndMusic();
 
   DrawChooseTree(&leveldir_current);
 
-  PlayMenuSound();
-  PlayMenuMusic();
+  PlayMenuSoundsAndMusic();
 }
 
 void HandleChooseLevelSet(int mx, int my, int dx, int dy, int button)
@@ -4081,7 +4075,7 @@ void DrawChooseLevelNr()
 {
   int i;
 
-  FadeSoundsAndMusic();
+  FadeMenuSoundsAndMusic();
 
   if (level_number != NULL)
   {
@@ -4129,8 +4123,7 @@ void DrawChooseLevelNr()
 
   DrawChooseTree(&level_number_current);
 
-  PlayMenuSound();
-  PlayMenuMusic();
+  PlayMenuSoundsAndMusic();
 }
 
 void HandleChooseLevelNr(int mx, int my, int dx, int dy, int button)
@@ -4146,7 +4139,7 @@ void DrawHallOfFame(int highlight_position)
     fade_mask = REDRAW_ALL;
 
   UnmapAllGadgets();
-  FadeSoundsAndMusic();
+  FadeMenuSoundsAndMusic();
 
   /* (this is needed when called from GameEnd() after winning a game) */
   KeyboardAutoRepeatOn();
@@ -4166,8 +4159,7 @@ void DrawHallOfFame(int highlight_position)
   /* needed if different viewport properties defined for scores */
   ChangeViewportPropertiesIfNeeded();
 
-  PlayMenuSound();
-  PlayMenuMusic();
+  PlayMenuSoundsAndMusic();
 
   OpenDoor(GetDoorState() | DOOR_NO_DELAY | DOOR_FORCE_REDRAW);
 
@@ -5781,7 +5773,7 @@ static void DrawSetupScreen_Generic()
     fade_mask = REDRAW_ALL;
 
   UnmapAllGadgets();
-  FadeSoundsAndMusic();
+  FadeMenuSoundsAndMusic();
 
   FreeScreenGadgets();
   CreateScreenGadgets();
@@ -6538,8 +6530,7 @@ void DrawSetupScreen()
   else
     DrawSetupScreen_Generic();
 
-  PlayMenuSound();
-  PlayMenuMusic();
+  PlayMenuSoundsAndMusic();
 }
 
 void RedrawSetupScreenAfterFullscreenToggle()

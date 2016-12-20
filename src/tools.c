@@ -8401,6 +8401,17 @@ void PlayMenuMusic()
   PlayMenuMusicExt(menu.music[game_status]);
 }
 
+void PlayMenuSoundsAndMusic()
+{
+  PlayMenuSound();
+  PlayMenuMusic();
+}
+
+void FadeMenuSoundsAndMusic()
+{
+  FadeSoundsAndMusic();
+}
+
 void PlaySoundActivating()
 {
 #if 0

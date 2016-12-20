@@ -253,6 +253,8 @@ void PlayMenuSoundIfLoopExt(int);
 void PlayMenuSoundIfLoop();
 void PlayMenuMusicExt(int);
 void PlayMenuMusic();
+void PlayMenuSoundsAndMusic();
+void FadeMenuSoundsAndMusic();
 void PlaySoundActivating();
 void PlaySoundSelecting();
 
