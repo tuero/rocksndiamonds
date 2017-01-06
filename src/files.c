@@ -10209,6 +10209,8 @@ void CreateCustomElementImages(char *directory)
 
   SDLInitVideoDisplay();
 
+  ReCreateBitmap(&backbuffer, video.width, video.height);
+
   src_bitmap = LoadImage(src_filename);
 
   bitmap = CreateBitmap(TILEX * 16 * 2,
