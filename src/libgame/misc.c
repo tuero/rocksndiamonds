@@ -701,6 +701,10 @@ static char *getProgramMainDataPath()
   // cut trailing path separator from path (but not if path is root directory)
   if (strSuffix(main_data_path, "/") && !strEqual(main_data_path, "/"))
     main_data_path[strlen(main_data_path) - 1] = '\0';
+
+  // replace empty path with current directory
+  if (strEqual(main_data_path, ""))
+    main_data_path = ".";
 #endif
 
   return main_data_path;
