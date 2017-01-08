@@ -7943,25 +7943,14 @@ void SaveScore(int nr)
 #define NUM_GLOBAL_SETUP_TOKENS			43
 
 /* editor setup */
-#define SETUP_TOKEN_EDITOR_EL_BOULDERDASH	0
-#define SETUP_TOKEN_EDITOR_EL_EMERALD_MINE	1
-#define SETUP_TOKEN_EDITOR_EL_EMERALD_MINE_CLUB	2
-#define SETUP_TOKEN_EDITOR_EL_MORE		3
-#define SETUP_TOKEN_EDITOR_EL_SOKOBAN		4
-#define SETUP_TOKEN_EDITOR_EL_SUPAPLEX		5
-#define SETUP_TOKEN_EDITOR_EL_DIAMOND_CAVES	6
-#define SETUP_TOKEN_EDITOR_EL_DX_BOULDERDASH	7
-#define SETUP_TOKEN_EDITOR_EL_CHARS		8
-#define SETUP_TOKEN_EDITOR_EL_STEEL_CHARS	9
-#define SETUP_TOKEN_EDITOR_EL_CUSTOM		10
-#define SETUP_TOKEN_EDITOR_EL_HEADLINES		11
-#define SETUP_TOKEN_EDITOR_EL_USER_DEFINED	12
-#define SETUP_TOKEN_EDITOR_EL_DYNAMIC		13
-#define SETUP_TOKEN_EDITOR_EL_BY_GAME		14
-#define SETUP_TOKEN_EDITOR_EL_BY_TYPE		15
-#define SETUP_TOKEN_EDITOR_SHOW_ELEMENT_TOKEN	16
+#define SETUP_TOKEN_EDITOR_EL_CHARS		0
+#define SETUP_TOKEN_EDITOR_EL_STEEL_CHARS	1
+#define SETUP_TOKEN_EDITOR_EL_CUSTOM		2
+#define SETUP_TOKEN_EDITOR_EL_USER_DEFINED	3
+#define SETUP_TOKEN_EDITOR_EL_DYNAMIC		4
+#define SETUP_TOKEN_EDITOR_SHOW_ELEMENT_TOKEN	5
 
-#define NUM_EDITOR_SETUP_TOKENS			17
+#define NUM_EDITOR_SETUP_TOKENS			6
 
 /* editor cascade setup */
 #define SETUP_TOKEN_EDITOR_CASCADE_BD		0
@@ -8146,22 +8135,11 @@ static struct TokenInfo global_setup_tokens[] =
 
 static struct TokenInfo editor_setup_tokens[] =
 {
-  { TYPE_SWITCH, &sei.el_boulderdash,	"editor.el_boulderdash"		},
-  { TYPE_SWITCH, &sei.el_emerald_mine,	"editor.el_emerald_mine"	},
-  { TYPE_SWITCH, &sei.el_emerald_mine_club,"editor.el_emerald_mine_club"},
-  { TYPE_SWITCH, &sei.el_more,		"editor.el_more"		},
-  { TYPE_SWITCH, &sei.el_sokoban,	"editor.el_sokoban"		},
-  { TYPE_SWITCH, &sei.el_supaplex,	"editor.el_supaplex"		},
-  { TYPE_SWITCH, &sei.el_diamond_caves,	"editor.el_diamond_caves"	},
-  { TYPE_SWITCH, &sei.el_dx_boulderdash,"editor.el_dx_boulderdash"	},
   { TYPE_SWITCH, &sei.el_chars,		"editor.el_chars"		},
   { TYPE_SWITCH, &sei.el_steel_chars,	"editor.el_steel_chars"		},
   { TYPE_SWITCH, &sei.el_custom,	"editor.el_custom"		},
-  { TYPE_SWITCH, &sei.el_headlines,	"editor.el_headlines"		},
   { TYPE_SWITCH, &sei.el_user_defined,	"editor.el_user_defined"	},
   { TYPE_SWITCH, &sei.el_dynamic,	"editor.el_dynamic"		},
-  { TYPE_SWITCH, &sei.el_by_game,	"editor.el_by_game"		},
-  { TYPE_SWITCH, &sei.el_by_type,	"editor.el_by_type"		},
   { TYPE_SWITCH, &sei.show_element_token,"editor.show_element_token"	},
 };
 
