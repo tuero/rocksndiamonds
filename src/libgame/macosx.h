@@ -16,6 +16,7 @@
 /* define some Mac OS X specific paths */
 
 #define MAC_APP_BINARY_SUBDIR	"Contents/MacOS"
+#define MAC_APP_FILES_SUBDIR	"Contents/Resources"
 
 
 /* some symbols are already defined on Mac OS X */
