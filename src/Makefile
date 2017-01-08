@@ -183,6 +183,13 @@ CNFS =	conf_gfx.h	\
 CNFS_CMD = ../build-scripts/create_element_defs.pl
 
 TIMESTAMP_FILE = conftime.h
+TIMESTAMP_FORMAT = %Y-%m-%d %H:%M
+
+# use SOURCE_DATE_EPOCH, or else last Git commit date, or else current date
+SOURCE_DATE_EPOCH ?= $(shell test -d ../.git && test `git ls-files -m | wc -l` -eq 0 && git show -s --format=%ct || date +%s)
+
+# get source date string from either GNU / Linux or BSD / Mac OS X style "date"
+SOURCE_DATE_STRING := $(shell date -u -d "@$(SOURCE_DATE_EPOCH)" "+$(TIMESTAMP_FORMAT)"  2>/dev/null || date -u -r "$(SOURCE_DATE_EPOCH)" "+$(TIMESTAMP_FORMAT)" 2>/dev/null || date -u "+$(TIMESTAMP_FORMAT)")
 
 LIBGAME_DIR = libgame
 LIBGAME = $(LIBGAME_DIR)/libgame.a
@@ -255,10 +262,8 @@ conf_snd.h: conf_snd.c $(CNFS_CMD)
 conf_mus.h: conf_mus.c $(CNFS_CMD)
 	@$(MAKE) auto-conf
 
-# $(TIMESTAMP_FILE): $(SRCS) $(LIBGAME) $(GAME_EM) $(GAME_SP)
 $(TIMESTAMP_FILE): $(SRCS) $(RNDLIBS)
-	@date '+"%Y-%m-%d %H:%M"' \
-	| sed -e 's/^/#define COMPILE_DATE_STRING /' \
+	@echo '#define SOURCE_DATE_STRING "$(SOURCE_DATE_STRING)"' \
 	> $(TIMESTAMP_FILE)
 
 $(ICON):

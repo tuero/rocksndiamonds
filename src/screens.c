@@ -3291,8 +3291,8 @@ void DrawInfoScreen_Version()
   DrawTextF(xstart2, ystart2, font_text, TARGET_STRING);
 
   ystart2 += ystep;
-  DrawTextF(xstart1, ystart2, font_header, "Compile time");
-  DrawTextF(xstart2, ystart2, font_text, getCompileDateString());
+  DrawTextF(xstart1, ystart2, font_header, "Source date");
+  DrawTextF(xstart2, ystart2, font_text, getSourceDateString());
 
   ystart2 += 3 * ystep;
   DrawTextF(xstart1, ystart2, font_header, "Library");

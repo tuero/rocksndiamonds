@@ -15,9 +15,9 @@
 #include "conftime.h"
 
 
-char *getCompileDateString()
+char *getSourceDateString()
 {
-  return COMPILE_DATE_STRING;
+  return SOURCE_DATE_STRING;
 }
 
 char *getProgramTitleString()
@@ -62,11 +62,11 @@ char *getWindowTitleString()
 
 #ifdef DEBUG
   window_title_string = checked_malloc(strlen(getProgramInitString()) + 20 +
-				       strlen(getCompileDateString()) + 2 + 1);
+				       strlen(getSourceDateString()) + 2 + 1);
 
   sprintf(window_title_string, "%s (%d %%) [%s]",
 	  getProgramInitString(), video.window_scaling_percent,
-	  getCompileDateString());
+	  getSourceDateString());
 #else
   window_title_string = checked_malloc(strlen(getProgramInitString()) + 20);
 
@@ -78,10 +78,10 @@ char *getWindowTitleString()
 
 #ifdef DEBUG
   window_title_string = checked_malloc(strlen(getProgramInitString()) + 1 +
-				       strlen(getCompileDateString()) + 2 + 1);
+				       strlen(getSourceDateString()) + 2 + 1);
 
   sprintf(window_title_string, "%s [%s]",
-	  getProgramInitString(), getCompileDateString());
+	  getProgramInitString(), getSourceDateString());
 #else
   window_title_string = checked_malloc(strlen(getProgramInitString()) + 1);
 

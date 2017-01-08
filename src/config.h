@@ -14,7 +14,7 @@
 
 #include "main.h"
 
-char *getCompileDateString(void);
+char *getSourceDateString(void);
 char *getProgramTitleString(void);
 char *getProgramVersionString(void);
 char *getProgramInitString(void);
