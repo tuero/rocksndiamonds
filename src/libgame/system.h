@@ -760,6 +760,9 @@ struct ProgramInfo
   char *(*window_title_function)(void);
   void (*exit_message_function)(char *, va_list);
   void (*exit_function)(int);
+
+  boolean global_scores;
+  boolean many_scores_per_name;
 };
 
 struct OptionInfo
@@ -1415,6 +1418,7 @@ extern int			FrameCounter;
 void InitProgramInfo(char *, char *, char *, char *, char *, char *, char *,
 		     int);
 
+void InitScoresInfo();
 void SetWindowTitle();
 
 void InitWindowTitleFunction(char *(*window_title_function)(void));

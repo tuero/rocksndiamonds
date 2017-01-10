@@ -98,6 +98,16 @@ void InitProgramInfo(char *argv0, char *config_filename, char *userdata_subdir,
   program.log_file[LOG_ERR_ID] = program.log_file_default[LOG_ERR_ID] = stderr;
 }
 
+void InitScoresInfo()
+{
+  char *global_scores_dir = getPath2(getCommonDataDir(), SCORES_DIRECTORY);
+
+  program.global_scores = directoryExists(global_scores_dir);
+  program.many_scores_per_name = !program.global_scores;
+
+  free(global_scores_dir);
+}
+
 void SetWindowTitle()
 {
   program.window_title = program.window_title_function();
