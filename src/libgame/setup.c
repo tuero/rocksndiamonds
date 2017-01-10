@@ -133,15 +133,25 @@ static char *getUserLevelDir(char *level_subdir)
 static char *getScoreDir(char *level_subdir)
 {
   static char *score_dir = NULL;
-  char *data_dir = getCommonDataDir();
+  static char *score_level_dir = NULL;
   char *score_subdir = SCORES_DIRECTORY;
 
-  checked_free(score_dir);
+  if (score_dir == NULL)
+  {
+    if (program.global_scores)
+      score_dir = getPath2(getCommonDataDir(),   score_subdir);
+    else
+      score_dir = getPath2(getUserGameDataDir(), score_subdir);
+  }
 
   if (level_subdir != NULL)
-    score_dir = getPath3(data_dir, score_subdir, level_subdir);
-  else
-    score_dir = getPath2(data_dir, score_subdir);
+  {
+    checked_free(score_level_dir);
+
+    score_level_dir = getPath2(score_dir, level_subdir);
+
+    return score_level_dir;
+  }
 
   return score_dir;
 }
@@ -944,9 +954,15 @@ void InitTapeDirectory(char *level_subdir)
 
 void InitScoreDirectory(char *level_subdir)
 {
-  createDirectory(getCommonDataDir(), "common data", PERMS_PUBLIC);
-  createDirectory(getScoreDir(NULL), "main score", PERMS_PUBLIC);
-  createDirectory(getScoreDir(level_subdir), "level score", PERMS_PUBLIC);
+  int permissions = (program.global_scores ? PERMS_PUBLIC : PERMS_PRIVATE);
+
+  if (program.global_scores)
+    createDirectory(getCommonDataDir(), "common data", permissions);
+  else
+    createDirectory(getUserGameDataDir(), "user data", permissions);
+
+  createDirectory(getScoreDir(NULL), "main score", permissions);
+  createDirectory(getScoreDir(level_subdir), "level score", permissions);
 }
 
 static void SaveUserLevelInfo();
@@ -1296,14 +1312,17 @@ void sortTreeInfo(TreeInfo **node_first)
 #define MODE_X_ALL		(S_IXUSR | S_IXGRP | S_IXOTH)
 
 #define MODE_W_PRIVATE		(S_IWUSR)
-#define MODE_W_PUBLIC		(S_IWUSR | S_IWGRP)
+#define MODE_W_PUBLIC_FILE	(S_IWUSR | S_IWGRP)
 #define MODE_W_PUBLIC_DIR	(S_IWUSR | S_IWGRP | S_ISGID)
 
 #define DIR_PERMS_PRIVATE	(MODE_R_ALL | MODE_X_ALL | MODE_W_PRIVATE)
 #define DIR_PERMS_PUBLIC	(MODE_R_ALL | MODE_X_ALL | MODE_W_PUBLIC_DIR)
+#define DIR_PERMS_PUBLIC_ALL	(MODE_R_ALL | MODE_X_ALL | MODE_W_ALL)
 
 #define FILE_PERMS_PRIVATE	(MODE_R_ALL | MODE_W_PRIVATE)
-#define FILE_PERMS_PUBLIC	(MODE_R_ALL | MODE_W_PUBLIC)
+#define FILE_PERMS_PUBLIC	(MODE_R_ALL | MODE_W_PUBLIC_FILE)
+#define FILE_PERMS_PUBLIC_ALL	(MODE_R_ALL | MODE_W_ALL)
+
 
 char *getHomeDir()
 {
@@ -1425,6 +1444,9 @@ static boolean posix_process_running_setgid()
 
 void createDirectory(char *dir, char *text, int permission_class)
 {
+  if (directoryExists(dir))
+    return;
+
   /* leave "other" permissions in umask untouched, but ensure group parts
      of USERDATA_DIR_MODE are not masked */
   mode_t dir_mode = (permission_class == PERMS_PRIVATE ?
@@ -1433,18 +1455,20 @@ void createDirectory(char *dir, char *text, int permission_class)
   mode_t group_umask = ~(dir_mode & S_IRWXG);
   int running_setgid = posix_process_running_setgid();
 
-  /* if we're setgid, protect files against "other" */
-  /* else keep umask(0) to make the dir world-writable */
+  if (permission_class == PERMS_PUBLIC)
+  {
+    /* if we're setgid, protect files against "other" */
+    /* else keep umask(0) to make the dir world-writable */
 
-  if (running_setgid)
-    posix_umask(last_umask & group_umask);
-  else
-    dir_mode |= MODE_W_ALL;
+    if (running_setgid)
+      posix_umask(last_umask & group_umask);
+    else
+      dir_mode = DIR_PERMS_PUBLIC_ALL;
+  }
 
-  if (!directoryExists(dir))
-    if (posix_mkdir(dir, dir_mode) != 0)
-      Error(ERR_WARN, "cannot create %s directory '%s': %s",
-	    text, dir, strerror(errno));
+  if (posix_mkdir(dir, dir_mode) != 0)
+    Error(ERR_WARN, "cannot create %s directory '%s': %s",
+	  text, dir, strerror(errno));
 
   if (permission_class == PERMS_PUBLIC && !running_setgid)
     chmod(dir, dir_mode);
@@ -1464,7 +1488,7 @@ void SetFilePermissions(char *filename, int permission_class)
 	       FILE_PERMS_PRIVATE : FILE_PERMS_PUBLIC);
 
   if (permission_class == PERMS_PUBLIC && !running_setgid)
-    perms |= MODE_W_ALL;
+    perms = FILE_PERMS_PUBLIC_ALL;
 
   chmod(filename, perms);
 }

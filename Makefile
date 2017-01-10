@@ -22,14 +22,16 @@ CC = gcc
 MAKE = make
 
 # directory for read-only game data (like graphics, sounds, levels)
+# (this directory is usually the game's installation directory)
 # default is '.' to be able to run program without installation
-# RO_GAME_DIR = /usr/games
+# RO_GAME_DIR = .
 # use the following setting for Debian / Ubuntu installations:
 # RO_GAME_DIR = /usr/share/games/rocksndiamonds
 
 # directory for writable game data (like highscore files)
+# (if no "scores" directory exists, scores are saved in user data directory)
 # default is '.' to be able to run program without installation
-# RW_GAME_DIR = /var/games
+# RW_GAME_DIR = .
 # use the following setting for Debian / Ubuntu installations:
 # RW_GAME_DIR = /var/games/rocksndiamonds
 

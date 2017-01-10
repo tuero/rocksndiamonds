@@ -7867,6 +7867,7 @@ void LoadScore(int nr)
 void SaveScore(int nr)
 {
   int i;
+  int permissions = (program.global_scores ? PERMS_PUBLIC : PERMS_PRIVATE);
   char *filename = getScoreFilename(nr);
   FILE *file;
 
@@ -7885,7 +7886,7 @@ void SaveScore(int nr)
 
   fclose(file);
 
-  SetFilePermissions(filename, PERMS_PUBLIC);
+  SetFilePermissions(filename, permissions);
 }
 
 
