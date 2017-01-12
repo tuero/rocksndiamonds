@@ -759,6 +759,13 @@ void BackToFront()
       y2 = MAX(y2, EY + EYSIZE);
     }
 
+    // make sure that at least one pixel is blitted, and inside the screen
+    // (else nothing is blitted, causing the animations not to be updated)
+    x1 = MIN(MAX(0, x1), WIN_XSIZE - 1);
+    y1 = MIN(MAX(0, y1), WIN_YSIZE - 1);
+    x2 = MIN(MAX(1, x2), WIN_XSIZE);
+    y2 = MIN(MAX(1, y2), WIN_YSIZE);
+
     BlitBitmap(backbuffer, window, x1, y1, x2 - x1, y2 - y1, x1, y1);
   }
 
