@@ -1849,11 +1849,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
       pos = choice + dy;
   }
 
-  if (pos == MAIN_CONTROL_LEVELS && dx != 0 && button)
-  {
-    HandleMainMenu_SelectLevel(1, (dx < 0 ? -1 : +1), NO_DIRECT_LEVEL_SELECT);
-  }
-  else if (pos == MAIN_CONTROL_FIRST_LEVEL && !button)
+  if (pos == MAIN_CONTROL_FIRST_LEVEL && !button)
   {
     HandleMainMenu_SelectLevel(MAX_LEVELS, -1, NO_DIRECT_LEVEL_SELECT);
   }
@@ -1881,6 +1877,12 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 	DrawCursorAndText_Main(pos, TRUE, button_pressed);
 
 	choice = pos;
+      }
+      else if (dx != 0)
+      {
+	if (choice != MAIN_CONTROL_INFO &&
+	    choice != MAIN_CONTROL_SETUP)
+	  HandleMainMenu_SelectLevel(1, dx, NO_DIRECT_LEVEL_SELECT);
       }
     }
     else
