@@ -709,11 +709,19 @@ static char *getProgramMainDataPath()
     char *main_data_path_old = main_data_path;
 
     // cut relative path to Mac OS X application binary directory from path
-    main_data_path_old[strlen(main_data_path_old) -
-		       strlen(main_data_binary_subdir)] = '\0';
+    main_data_path[strlen(main_data_path) -
+		   strlen(main_data_binary_subdir)] = '\0';
+
+    // cut trailing path separator from path (but not if path is root directory)
+    if (strSuffix(main_data_path, "/") && !strEqual(main_data_path, "/"))
+      main_data_path[strlen(main_data_path) - 1] = '\0';
+
+    // replace empty path with current directory
+    if (strEqual(main_data_path, ""))
+      main_data_path = ".";
 
     // add relative path to Mac OS X application resources directory to path
-    main_data_path = getPath2(main_data_path_old, main_data_files_subdir);
+    main_data_path = getPath2(main_data_path, main_data_files_subdir);
 
     free(main_data_path_old);
   }
