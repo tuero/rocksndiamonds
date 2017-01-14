@@ -2451,6 +2451,27 @@ void HandleMenuScreen(int mx, int my, int dx, int dy, int button,
 
 	choice = choice_store[mode] = first_entry + y;
       }
+      else if (dx < 0)
+      {
+	PlaySound(SND_MENU_ITEM_SELECTING);
+
+	for (i = 0; menu_info[i].type != 0; i++)
+	{
+	  if (menu_info[i].type & TYPE_LEAVE_MENU)
+	  {
+	    void (*menu_callback_function)(void) = menu_info[i].value;
+
+	    FadeSetLeaveMenu();
+
+	    menu_callback_function();
+
+	    /* absolutely needed because function changes 'menu_info'! */
+	    break;
+	  }
+	}
+
+	return;
+      }
     }
     else if (!(menu_info[first_entry + y].type & TYPE_GHOSTED))
     {
@@ -3975,6 +3996,30 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
 	drawChooseTreeInfo(ti->cl_first + y, ti);
 
 	ti->cl_cursor = y;
+      }
+      else if (dx < 0)
+      {
+	if (game_status == GAME_MODE_SETUP)
+	{
+	  if (setup_mode == SETUP_MODE_CHOOSE_GAME_SPEED ||
+	      setup_mode == SETUP_MODE_CHOOSE_SCROLL_DELAY ||
+	      setup_mode == SETUP_MODE_CHOOSE_SNAPSHOT_MODE)
+	    execSetupGame();
+	  else if (setup_mode == SETUP_MODE_CHOOSE_WINDOW_SIZE ||
+		   setup_mode == SETUP_MODE_CHOOSE_SCALING_TYPE ||
+		   setup_mode == SETUP_MODE_CHOOSE_RENDERING)
+	    execSetupGraphics();
+	  else if (setup_mode == SETUP_MODE_CHOOSE_VOLUME_SIMPLE ||
+		   setup_mode == SETUP_MODE_CHOOSE_VOLUME_LOOPS ||
+		   setup_mode == SETUP_MODE_CHOOSE_VOLUME_MUSIC)
+	    execSetupSound();
+	  else if (setup_mode == SETUP_MODE_CHOOSE_TOUCH_CONTROL ||
+		   setup_mode == SETUP_MODE_CHOOSE_MOVE_DISTANCE ||
+		   setup_mode == SETUP_MODE_CHOOSE_DROP_DISTANCE)
+	    execSetupTouch();
+	  else
+	    execSetupArtwork();
+	}
       }
     }
     else
