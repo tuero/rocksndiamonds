@@ -401,8 +401,7 @@ void DrawCompleteVideoDisplay()
 	     gfx.vxsize, gfx.vysize, gfx.vx, gfx.vy);
 
   /* draw tape buttons (forced) */
-  UnmapTapeButtons();
-  MapTapeButtons();
+  RedrawOrRemapTapeButtons();
 
   DrawVideoDisplay(VIDEO_ALL_OFF, 0);
 
@@ -1288,6 +1287,34 @@ void UnmapTapeButtons()
 
   if (tape.show_game_buttons)
     UnmapGameButtons();
+}
+
+void RedrawTapeButtons()
+{
+  int i;
+
+  for (i = 0; i < NUM_TAPE_BUTTONS; i++)
+    RedrawGadget(tape_gadget[i]);
+
+  if (tape.show_game_buttons)
+    RedrawGameButtons();
+
+  // RedrawGadget() may have set REDRAW_ALL if buttons are defined off-area
+  redraw_mask &= ~REDRAW_ALL;
+}
+
+void RedrawOrRemapTapeButtons()
+{
+  if (tape_gadget[TAPE_CTRL_ID_PLAY]->mapped)
+  {
+    // tape buttons already mapped
+    RedrawTapeButtons();
+  }
+  else
+  {
+    UnmapTapeButtons();
+    MapTapeButtons();
+  }
 }
 
 static void HandleTapeButtonsExt(int id)

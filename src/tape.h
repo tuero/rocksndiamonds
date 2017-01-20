@@ -232,6 +232,8 @@ void MapTapeEjectButton();
 void MapTapeWarpButton();
 void MapTapeButtons();
 void UnmapTapeButtons();
+void RedrawTapeButtons();
+void RedrawOrRemapTapeButtons();
 
 void HandleTapeButtonKeys(Key);
 
