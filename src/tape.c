@@ -710,6 +710,9 @@ void TapeTogglePause(boolean toggle_mode)
 
     // restart step/move snapshots after quick loading tape
     SaveEngineSnapshotToListInitial();
+
+    // do not map undo/redo buttons after quick loading tape
+    return;
   }
 
   if (setup.show_snapshot_buttons &&
