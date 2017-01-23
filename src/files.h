@@ -30,6 +30,8 @@ void setElementChangeInfoToDefaults(struct ElementChangeInfo *);
 void copyElementInfo(struct ElementInfo *, struct ElementInfo *);
 
 char *getDefaultLevelFilename(int);
+char *getLocalLevelTemplateFilename();
+char *getGlobalLevelTemplateFilename();
 
 void LoadLevelFromFilename(struct LevelInfo *, char *);
 void LoadLevel(int);

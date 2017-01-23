@@ -1861,13 +1861,15 @@ static void ActivateLevelTemplate()
 
 static char *getLevelFilenameFromBasename(char *basename)
 {
-  static char *filename = NULL;
+  /* use different slots for level template files and regular level files */
+  static char *filename[2] = { NULL, NULL };
+  int pos = (strEqual(basename, LEVELTEMPLATE_FILENAME) ? 0 : 1);
 
-  checked_free(filename);
+  checked_free(filename[pos]);
 
-  filename = getPath2(getCurrentLevelDir(), basename);
+  filename[pos] = getPath2(getCurrentLevelDir(), basename);
 
-  return filename;
+  return filename[pos];
 }
 
 static int getFileTypeFromBasename(char *basename)
@@ -1921,7 +1923,7 @@ static char *getSingleLevelBasenameExt(int nr, char *extension)
   static char basename[MAX_FILENAME_LEN];
 
   if (nr < 0)
-    sprintf(basename, "template.%s", extension);
+    sprintf(basename, "%s", LEVELTEMPLATE_FILENAME);
   else
     sprintf(basename, "%03d.%s", nr, extension);
 
@@ -2053,6 +2055,35 @@ static int getFiletypeFromID(char *filetype_id)
   return filetype;
 }
 
+char *getLocalLevelTemplateFilename()
+{
+  return getDefaultLevelFilename(-1);
+}
+
+char *getGlobalLevelTemplateFilename()
+{
+  /* global variable "leveldir_current" must be modified in the loop below */
+  LevelDirTree *leveldir_current_last = leveldir_current;
+  char *filename = NULL;
+
+  /* check for template level in path from current to topmost tree node */
+
+  while (leveldir_current != NULL)
+  {
+    filename = getDefaultLevelFilename(-1);
+
+    if (fileExists(filename))
+      break;
+
+    leveldir_current = leveldir_current->node_parent;
+  }
+
+  /* restore global variable "leveldir_current" modified in above loop */
+  leveldir_current = leveldir_current_last;
+
+  return filename;
+}
+
 static void determineLevelFileInfo_Filename(struct LevelFileInfo *lfi)
 {
   int nr = lfi->nr;
@@ -2060,24 +2091,11 @@ static void determineLevelFileInfo_Filename(struct LevelFileInfo *lfi)
   /* special case: level number is negative => check for level template file */
   if (nr < 0)
   {
-    /* global variable "leveldir_current" must be modified in the loop below */
-    LevelDirTree *leveldir_current_last = leveldir_current;
+    setLevelFileInfo_FormatLevelFilename(lfi, LEVEL_FILE_TYPE_RND,
+					 getSingleLevelBasename(-1));
 
-    /* check for template level in path from current to topmost tree node */
-
-    while (leveldir_current != NULL)
-    {
-      setLevelFileInfo_FormatLevelFilename(lfi, LEVEL_FILE_TYPE_RND,
-					   "template.%s", LEVELFILE_EXTENSION);
-
-      if (fileExists(lfi->filename))
-	break;
-
-      leveldir_current = leveldir_current->node_parent;
-    }
-
-    /* restore global variable "leveldir_current" modified in above loop */
-    leveldir_current = leveldir_current_last;
+    /* replace local level template filename with global template filename */
+    lfi->filename = getGlobalLevelTemplateFilename();
 
     /* no fallback if template file not existing */
     return;

@@ -508,6 +508,7 @@
 #define SOUNDSINFO_FILENAME	"soundsinfo.conf"
 #define MUSICINFO_FILENAME	"musicinfo.conf"
 #define ARTWORKINFO_CACHE_FILE	"artworkinfo.cache"
+#define LEVELTEMPLATE_FILENAME	"template.level"
 #define LEVELFILE_EXTENSION	"level"
 #define TAPEFILE_EXTENSION	"tape"
 #define SCOREFILE_EXTENSION	"score"
