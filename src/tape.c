@@ -1112,7 +1112,7 @@ void AutoPlayTape()
     Print("Level %03d: ", level_nr);
 
     LoadLevel(level_nr);
-    if (level.no_valid_file)
+    if (level.no_level_file || level.no_valid_file)
     {
       Print("(no level)\n");
       continue;

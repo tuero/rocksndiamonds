@@ -2596,6 +2596,7 @@ struct LevelInfo
   boolean use_custom_template;	/* use custom properties from template file */
 
   boolean no_valid_file;	/* set when level file missing or invalid */
+  boolean no_level_file;	/* set when falling back to level template */
 
   boolean changed;		/* set when level was changed in the editor */
 

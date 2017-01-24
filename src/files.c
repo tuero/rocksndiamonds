@@ -1765,14 +1765,19 @@ static void setLevelInfoToDefaults_Elements(struct LevelInfo *level)
 }
 
 static void setLevelInfoToDefaults(struct LevelInfo *level,
-				   boolean level_info_only)
+				   boolean level_info_only,
+				   boolean reset_file_status)
 {
   setLevelInfoToDefaults_Level(level);
 
   if (!level_info_only)
     setLevelInfoToDefaults_Elements(level);
 
-  level->no_valid_file = FALSE;
+  if (reset_file_status)
+  {
+    level->no_valid_file = FALSE;
+    level->no_level_file = FALSE;
+  }
 
   level->changed = FALSE;
 }
@@ -1861,7 +1866,6 @@ static void ActivateLevelTemplate()
 
 static char *getLevelFilenameFromBasename(char *basename)
 {
-  /* use different slots for level template files and regular level files */
   static char *filename[2] = { NULL, NULL };
   int pos = (strEqual(basename, LEVELTEMPLATE_FILENAME) ? 0 : 1);
 
@@ -3182,11 +3186,23 @@ static void LoadLevelFromFileInfo_RND(struct LevelInfo *level,
   if (!(file = openFile(filename, MODE_READ)))
   {
     level->no_valid_file = TRUE;
+    level->no_level_file = TRUE;
 
-    if (!level_info_only)
-      Error(ERR_WARN, "cannot read level '%s' -- using empty level", filename);
+    if (level_info_only)
+      return;
 
-    return;
+    Error(ERR_WARN, "cannot read level '%s' -- using empty level", filename);
+
+    /* if level file not found, try to initialize level data from template */
+    filename = getGlobalLevelTemplateFilename();
+
+    if (!(file = openFile(filename, MODE_READ)))
+      return;
+
+    /* default: for empty levels, use level template for custom elements */
+    level->use_custom_template = TRUE;
+
+    level->no_valid_file = FALSE;
   }
 
   getFileChunkBE(file, chunk_name, NULL);
@@ -5876,7 +5892,7 @@ static void LoadLevelFromFileInfo(struct LevelInfo *level,
 				  boolean level_info_only)
 {
   /* always start with reliable default values */
-  setLevelInfoToDefaults(level, level_info_only);
+  setLevelInfoToDefaults(level, level_info_only, TRUE);
 
   switch (level_file_info->type)
   {
@@ -5909,11 +5925,7 @@ static void LoadLevelFromFileInfo(struct LevelInfo *level,
 
   /* if level file is invalid, restore level structure to default values */
   if (level->no_valid_file)
-  {
-    setLevelInfoToDefaults(level, level_info_only);
-
-    level->no_valid_file = TRUE;	/* but keep "no valid file" flag */
-  }
+    setLevelInfoToDefaults(level, level_info_only, FALSE);
 
   if (level->game_engine_type == GAME_ENGINE_TYPE_UNKNOWN)
     level->game_engine_type = GAME_ENGINE_TYPE_RND;
@@ -7181,7 +7193,7 @@ boolean SaveLevelChecked(int nr)
 
 void DumpLevel(struct LevelInfo *level)
 {
-  if (level->no_valid_file)
+  if (level->no_level_file || level->no_valid_file)
   {
     Error(ERR_WARN, "cannot dump -- no valid level file found");
 
@@ -10062,7 +10074,7 @@ void ConvertLevels()
     Print("Level %03d: ", level_nr);
 
     LoadLevel(level_nr);
-    if (level.no_valid_file)
+    if (level.no_level_file || level.no_valid_file)
     {
       Print("(no level)\n");
       continue;
