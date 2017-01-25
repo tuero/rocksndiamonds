@@ -11513,6 +11513,16 @@ static void HandleCheckbuttons(struct GadgetInfo *gi)
       return;
     }
 
+    if (level.use_custom_template &&
+	!Request("Discard changes and use level template?", REQ_ASK))
+    {
+      level.use_custom_template = FALSE;
+
+      ModifyGadget(gi, GDI_CHECKED, FALSE, GDI_END);
+
+      return;
+    }
+
     LoadLevelTemplate(level.use_custom_template ? -1 : level_nr);
 
     DrawEditModeWindow();
