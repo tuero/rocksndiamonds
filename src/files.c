@@ -7167,7 +7167,7 @@ void SaveLevel(int nr)
 
 void SaveLevelTemplate()
 {
-  char *filename = getDefaultLevelFilename(-1);
+  char *filename = getLocalLevelTemplateFilename();
 
   SaveLevelFromFilename(&level, filename);
 }

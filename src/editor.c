@@ -11376,8 +11376,7 @@ static void HandleTextbuttonGadgets(struct GadgetInfo *gi)
   }
   else if (type_id == ED_TEXTBUTTON_ID_SAVE_AS_TEMPLATE)
   {
-    char *template_filename = getDefaultLevelFilename(-1);
-    boolean new_template = !fileExists(template_filename);
+    boolean new_template = !fileExists(getLocalLevelTemplateFilename());
 
     /* backup original "level.field" (needed to track playfield changes) */
     CopyPlayfield(level.field, FieldBackup);
@@ -11502,13 +11501,13 @@ static void HandleCheckbuttons(struct GadgetInfo *gi)
   }
   else if (type_id == ED_CHECKBUTTON_ID_CUSTOM_USE_TEMPLATE)
   {
-    char *template_filename = getDefaultLevelFilename(-1);
-
-    if (level.use_custom_template && !fileExists(template_filename))
+    if (level.use_custom_template &&
+	!fileExists(getGlobalLevelTemplateFilename()))
     {
       Request("No level template found!", REQ_CONFIRM);
 
       level.use_custom_template = FALSE;
+
       ModifyGadget(gi, GDI_CHECKED, FALSE, GDI_END);
 
       return;
