@@ -11418,6 +11418,10 @@ static void HandleTextbuttonGadgets(struct GadgetInfo *gi)
   {
     struct ElementInfo *ei = &element_info[properties_element];
 
+    /* when modifying custom element, ask for copying level template */
+    if (level.use_custom_template && !AskToCopyAndModifyLevelTemplate())
+      return;
+
     setElementChangePages(ei, ei->num_change_pages + 1);
 
     /* set new change page to be new current change page */
@@ -11434,6 +11438,10 @@ static void HandleTextbuttonGadgets(struct GadgetInfo *gi)
 	   custom_element.num_change_pages > MIN_CHANGE_PAGES)
   {
     struct ElementInfo *ei = &element_info[properties_element];
+
+    /* when modifying custom element, ask for copying level template */
+    if (level.use_custom_template && !AskToCopyAndModifyLevelTemplate())
+      return;
 
     /* copy all change pages after change page to be deleted */
     for (i = ei->current_change_page; i < ei->num_change_pages - 1; i++)
@@ -11474,10 +11482,16 @@ static void HandleGraphicbuttonGadgets(struct GadgetInfo *gi)
     int current_change_page = ei->current_change_page;
 
     if (type_id == ED_GRAPHICBUTTON_ID_COPY_CHANGE_PAGE)
+    {
       element_info[EL_INTERNAL_CLIPBOARD_CHANGE].change_page[0] =
 	ei->change_page[current_change_page];
+    }
     else if (type_id == ED_GRAPHICBUTTON_ID_PASTE_CHANGE_PAGE)
     {
+      /* when modifying custom element, ask for copying level template */
+      if (level.use_custom_template && !AskToCopyAndModifyLevelTemplate())
+	return;
+
       ei->change_page[current_change_page] =
 	element_info[EL_INTERNAL_CLIPBOARD_CHANGE].change_page[0];
 
