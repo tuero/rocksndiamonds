@@ -7516,6 +7516,23 @@ static void CopyElementPropertiesToEditor(int element)
     CopyClassicElementPropertiesToEditor(element);
 }
 
+static void AskToCopyAndModifyLevelTemplate()
+{
+  if (Request("Copy and modify level template?", REQ_ASK))
+  {
+    level.use_custom_template = FALSE;
+
+    ModifyGadget(level_editor_gadget[GADGET_ID_CUSTOM_USE_TEMPLATE],
+		 GDI_CHECKED, FALSE, GDI_END);
+  }
+  else
+  {
+    LoadLevelTemplate(-1);	/* this resets all element modifications ... */
+
+    DrawEditModeWindow();	/* ... and copies them to 'custom_element' */
+  }
+}
+
 static void CopyCustomElementPropertiesToGame(int element)
 {
   int i;
@@ -7526,20 +7543,7 @@ static void CopyCustomElementPropertiesToGame(int element)
   level.changed = TRUE;
 
   if (level.use_custom_template)
-  {
-    if (Request("Copy and modify level template?", REQ_ASK))
-    {
-      level.use_custom_template = FALSE;
-      ModifyGadget(level_editor_gadget[GADGET_ID_CUSTOM_USE_TEMPLATE],
-		   GDI_CHECKED, FALSE, GDI_END);
-    }
-    else
-    {
-      LoadLevelTemplate(-1);	/* this resets all element modifications ... */
-
-      DrawEditModeWindow();	/* ... and copies them to 'custom_element' */
-    }
-  }
+    AskToCopyAndModifyLevelTemplate();
 
   element_info[element] = custom_element;
   *element_info[element].change = custom_element_change;
@@ -7650,12 +7654,15 @@ static void CopyCustomElementPropertiesToGame(int element)
 
 static void CopyGroupElementPropertiesToGame(int element)
 {
+  /* mark that this group element has been modified */
+  custom_element.modified_settings = TRUE;
+  level.changed = TRUE;
+
+  if (level.use_custom_template)
+    AskToCopyAndModifyLevelTemplate();
+
   element_info[element] = custom_element;
   *element_info[element].group = group_element_info;
-
-  /* mark that this group element has been modified */
-  element_info[element].modified_settings = TRUE;
-  level.changed = TRUE;
 }
 
 static void CopyClassicElementPropertiesToGame(int element)
