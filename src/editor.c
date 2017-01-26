@@ -3505,6 +3505,7 @@ static void HandleCheckbuttons(struct GadgetInfo *);
 static void HandleControlButtons(struct GadgetInfo *);
 static void HandleDrawingAreaInfo(struct GadgetInfo *);
 static void PrintEditorGadgetInfoText(struct GadgetInfo *);
+static boolean AskToCopyAndModifyLevelTemplate();
 
 static int num_editor_gadgets = 0;	/* dynamically determined */
 
@@ -7280,6 +7281,8 @@ static void replace_custom_element_in_playfield(int element_from,
 static boolean CopyCustomElement(int element_old, int element_new,
 				 int copy_mode)
 {
+  int copy_mode_orig = copy_mode;
+
   if (copy_mode == GADGET_ID_CUSTOM_COPY)
   {
     element_new = (IS_CUSTOM_ELEMENT(element_old) ?
@@ -7309,6 +7312,13 @@ static boolean CopyCustomElement(int element_old, int element_new,
   else
   {
     level.changed = TRUE;
+  }
+
+  /* when modifying custom/group element, ask for copying level template */
+  if (copy_mode_orig != GADGET_ID_CUSTOM_COPY && level.use_custom_template)
+  {
+    if (!AskToCopyAndModifyLevelTemplate())
+      return FALSE;
   }
 
   if (copy_mode == GADGET_ID_CUSTOM_COPY_FROM)
@@ -7516,7 +7526,7 @@ static void CopyElementPropertiesToEditor(int element)
     CopyClassicElementPropertiesToEditor(element);
 }
 
-static void AskToCopyAndModifyLevelTemplate()
+static boolean AskToCopyAndModifyLevelTemplate()
 {
   if (Request("Copy and modify level template?", REQ_ASK))
   {
@@ -7524,12 +7534,16 @@ static void AskToCopyAndModifyLevelTemplate()
 
     ModifyGadget(level_editor_gadget[GADGET_ID_CUSTOM_USE_TEMPLATE],
 		 GDI_CHECKED, FALSE, GDI_END);
+
+    return TRUE;
   }
   else
   {
     LoadLevelTemplate(-1);	/* this resets all element modifications ... */
 
     DrawEditModeWindow();	/* ... and copies them to 'custom_element' */
+
+    return FALSE;
   }
 }
 
