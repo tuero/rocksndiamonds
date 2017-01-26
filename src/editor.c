@@ -9309,11 +9309,9 @@ static void DrawPaletteWindow()
 
 static void UpdateCustomElementGraphicGadgets()
 {
-  struct ElementInfo *ei = &element_info[properties_element];
   int i;
 
-  ei->gfx_element = (ei->use_gfx_element ? ei->gfx_element_initial :
-		     properties_element);
+  InitElementPropertiesGfxElement();
 
   ModifyEditorElementList();
   RedrawDrawingElements();
