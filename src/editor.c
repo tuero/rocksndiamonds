@@ -7531,7 +7531,7 @@ static void CopyElementPropertiesToEditor(int element)
 
 static boolean AskToCopyAndModifyLevelTemplate()
 {
-  if (Request("Copy and modify level template?", REQ_ASK))
+  if (Request("Copy and modify settings from level template?", REQ_ASK))
   {
     level.use_custom_template = FALSE;
 
@@ -11583,6 +11583,12 @@ static void HandleCheckbuttons(struct GadgetInfo *gi)
 
       ModifyGadget(gi, GDI_CHECKED, FALSE, GDI_END);
 
+      return;
+    }
+
+    if (!level.use_custom_template &&
+	Request("Copy settings from level template?", REQ_ASK))
+    {
       return;
     }
 
