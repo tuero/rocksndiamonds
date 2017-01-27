@@ -11534,6 +11534,15 @@ static void HandleCheckbuttons(struct GadgetInfo *gi)
   }
   else if (type_id == ED_CHECKBUTTON_ID_CUSTOM_USE_TEMPLATE)
   {
+    boolean template_related_changes_found = FALSE;
+    int i;
+
+    /* check if any custom or group elements have been changed */
+    for (i = 0; i < NUM_FILE_ELEMENTS; i++)
+      if ((IS_CUSTOM_ELEMENT(i) || IS_GROUP_ELEMENT(i)) &&
+	  element_info[i].modified_settings)
+	template_related_changes_found = TRUE;
+
     if (level.use_custom_template &&
 	!fileExists(getGlobalLevelTemplateFilename()))
     {
@@ -11547,6 +11556,7 @@ static void HandleCheckbuttons(struct GadgetInfo *gi)
     }
 
     if (level.use_custom_template &&
+	template_related_changes_found &&
 	!Request("Discard changes and use level template?", REQ_ASK))
     {
       level.use_custom_template = FALSE;
