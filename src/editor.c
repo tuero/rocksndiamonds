@@ -943,6 +943,9 @@
 
 #define ED_NUM_DRAWING_AREAS			33
 
+#define ED_DRAWING_ID_EDITOR_FIRST	ED_DRAWING_ID_RANDOM_BACKGROUND
+#define ED_DRAWING_ID_EDITOR_LAST	ED_DRAWING_ID_RANDOM_BACKGROUND
+
 
 /*
   -----------------------------------------------------------------------------
@@ -10964,6 +10967,7 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 {
   static boolean started_inside_drawing_area = FALSE;
   int id = gi->custom_id;
+  int type_id = gi->custom_type_id;
   boolean button_press_event;
   boolean button_release_event;
   boolean inside_drawing_area = !gi->event.off_borders;
@@ -11075,7 +11079,6 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
       }
       else if (!button_release_event)
       {
-	int type_id = gi->custom_type_id;
 	int pos = sx * drawingarea_info[type_id].area_ysize + sy;
 
 	if (item_xsize == MINI_TILEX && item_ysize == MINI_TILEY)
@@ -11202,18 +11205,20 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 	PickDrawingElement(button, Feld[lx][ly]);
       else
       {
-	int type_id = gi->custom_type_id;
 	int pos = sx * drawingarea_info[type_id].area_ysize + sy;
 
 	PickDrawingElement(button, drawingarea_info[type_id].value[pos]);
       }
 
-      /* do not mark level as changed when picking element from drawing area */
-      return;
-
     default:
       break;
   }
+
+  /* do not mark level as modified for certain non-level-changing gadgets */
+  if ((type_id >= ED_DRAWING_ID_EDITOR_FIRST &&
+       type_id <= ED_DRAWING_ID_EDITOR_LAST) ||
+      actual_drawing_function == GADGET_ID_PICK_ELEMENT)
+    return;
 
   level.changed = TRUE;
 }
@@ -11311,6 +11316,11 @@ static void HandleCounterButtons(struct GadgetInfo *gi)
       (counter_id >= ED_COUNTER_ID_CHANGE_FIRST &&
        counter_id <= ED_COUNTER_ID_CHANGE_LAST))
     CopyElementPropertiesToGame(properties_element);
+
+  /* do not mark level as modified for certain non-level-changing gadgets */
+  if (counter_id >= ED_COUNTER_ID_EDITOR_FIRST &&
+      counter_id <= ED_COUNTER_ID_EDITOR_LAST)
+    return;
 
   level.changed = TRUE;
 }
@@ -11507,8 +11517,15 @@ static void HandleGraphicbuttonGadgets(struct GadgetInfo *gi)
 
 static void HandleRadiobuttons(struct GadgetInfo *gi)
 {
-  *radiobutton_info[gi->custom_type_id].value =
-    radiobutton_info[gi->custom_type_id].checked_value;
+  int type_id = gi->custom_type_id;
+
+  *radiobutton_info[type_id].value =
+    radiobutton_info[type_id].checked_value;
+
+  /* do not mark level as modified for certain non-level-changing gadgets */
+  if (type_id >= ED_RADIOBUTTON_ID_EDITOR_FIRST &&
+      type_id <= ED_RADIOBUTTON_ID_EDITOR_LAST)
+    return;
 
   level.changed = TRUE;
 }
@@ -11573,6 +11590,12 @@ static void HandleCheckbuttons(struct GadgetInfo *gi)
 
     DrawEditModeWindow();
   }
+
+  /* do not mark level as modified for certain non-level-changing gadgets */
+  if ((type_id >= ED_CHECKBUTTON_ID_EDITOR_FIRST &&
+       type_id <= ED_CHECKBUTTON_ID_EDITOR_LAST) ||
+      type_id == ED_CHECKBUTTON_ID_STICK_ELEMENT)
+    return;
 
   level.changed = TRUE;
 }
