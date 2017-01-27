@@ -11208,11 +11208,14 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 	PickDrawingElement(button, drawingarea_info[type_id].value[pos]);
       }
 
-      break;
+      /* do not mark level as changed when picking element from drawing area */
+      return;
 
     default:
       break;
   }
+
+  level.changed = TRUE;
 }
 
 static void HandleCounterButtons(struct GadgetInfo *gi)
