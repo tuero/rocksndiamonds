@@ -11073,7 +11073,7 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 	  SetElementButton(lx, ly, new_element, button);
 	}
       }
-      else
+      else if (!button_release_event)
       {
 	int type_id = gi->custom_type_id;
 	int pos = sx * drawingarea_info[type_id].area_ysize + sy;
