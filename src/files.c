@@ -7062,7 +7062,8 @@ static int SaveLevel_GRPX(FILE *file, struct LevelInfo *level, int element)
   return chunk_size;
 }
 
-static void SaveLevelFromFilename(struct LevelInfo *level, char *filename)
+static void SaveLevelFromFilename(struct LevelInfo *level, char *filename,
+				  boolean save_as_template)
 {
   int chunk_size;
   int i;
@@ -7126,7 +7127,7 @@ static void SaveLevelFromFilename(struct LevelInfo *level, char *filename)
   }
 
   /* if not using template level, check for non-default custom/group elements */
-  if (!level->use_custom_template)
+  if (!level->use_custom_template || save_as_template)
   {
     for (i = 0; i < NUM_CUSTOM_ELEMENTS; i++)
     {
@@ -7162,14 +7163,14 @@ void SaveLevel(int nr)
 {
   char *filename = getDefaultLevelFilename(nr);
 
-  SaveLevelFromFilename(&level, filename);
+  SaveLevelFromFilename(&level, filename, FALSE);
 }
 
 void SaveLevelTemplate()
 {
   char *filename = getLocalLevelTemplateFilename();
 
-  SaveLevelFromFilename(&level, filename);
+  SaveLevelFromFilename(&level, filename, TRUE);
 }
 
 boolean SaveLevelChecked(int nr)
