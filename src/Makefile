@@ -97,15 +97,10 @@ ifdef RW_GAME_DIR			# path to writable game data specified
 CONFIG_RW_GAME_DIR = -DRW_GAME_DIR="\"$(RW_GAME_DIR)\""
 endif
 
-ifdef SCORE_ENTRIES			# number of score entries per player
-CONFIG_SCORE_ENTRIES = -D$(SCORE_ENTRIES)
-endif
+CONFIG = $(CONFIG_RO_GAME_DIR) $(CONFIG_RW_GAME_DIR) $(JOYSTICK)
 
-CONFIG_GAME_DIR = $(CONFIG_RO_GAME_DIR) $(CONFIG_RW_GAME_DIR)
-CONFIG_GAME = $(CONFIG_GAME_DIR) $(CONFIG_SCORE_ENTRIES)
-
-CONFIG = $(CONFIG_GAME) $(JOYSTICK)
 DEBUG = -DDEBUG -g
+
 # PROFILING = $(PROFILING_FLAGS)
 
 # OPTIONS = $(DEBUG) -Wall			# only for debugging purposes

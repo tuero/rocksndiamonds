@@ -4494,6 +4494,7 @@ int NewHiScore()
 {
   int k, l;
   int position = -1;
+  boolean one_score_entry_per_name = !program.many_scores_per_name;
 
   LoadScore(level_nr);
 
@@ -4511,13 +4512,15 @@ int NewHiScore()
       {
 	int m = MAX_SCORE_ENTRIES - 1;
 
-#ifdef ONE_PER_NAME
-	for (l = k; l < MAX_SCORE_ENTRIES; l++)
-	  if (strEqual(setup.player_name, highscore[l].Name))
-	    m = l;
-	if (m == k)	/* player's new highscore overwrites his old one */
-	  goto put_into_list;
-#endif
+	if (one_score_entry_per_name)
+	{
+	  for (l = k; l < MAX_SCORE_ENTRIES; l++)
+	    if (strEqual(setup.player_name, highscore[l].Name))
+	      m = l;
+
+	  if (m == k)	/* player's new highscore overwrites his old one */
+	    goto put_into_list;
+	}
 
 	for (l = m; l > k; l--)
 	{
@@ -4526,22 +4529,19 @@ int NewHiScore()
 	}
       }
 
-#ifdef ONE_PER_NAME
       put_into_list:
-#endif
+
       strncpy(highscore[k].Name, setup.player_name, MAX_PLAYER_NAME_LEN);
       highscore[k].Name[MAX_PLAYER_NAME_LEN] = '\0';
       highscore[k].Score = local_player->score_final; 
       position = k;
+
       break;
     }
-
-#ifdef ONE_PER_NAME
-    else if (!strncmp(setup.player_name, highscore[k].Name,
+    else if (one_score_entry_per_name &&
+	     !strncmp(setup.player_name, highscore[k].Name,
 		      MAX_PLAYER_NAME_LEN))
       break;	/* player already there with a higher score */
-#endif
-
   }
 
   if (position >= 0) 

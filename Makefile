@@ -38,13 +38,6 @@ MAKE = make
 # uncomment if system has no joystick include file
 # JOYSTICK = -DNO_JOYSTICK
 
-# choose if more than one global score file entry for one player is allowed
-# (default: MANY_PER_NAME)
-# uncomment to install game in multi-user environment
-# SCORE_ENTRIES = ONE_PER_NAME
-# uncomment to install game in single-user environment (default)
-# SCORE_ENTRIES = MANY_PER_NAME
-
 # path for cross-compiling (only needed for non-native Windows build)
 CROSS_PATH_WIN32 = /usr/local/cross-tools/i386-mingw32msvc
 
