@@ -219,13 +219,26 @@ void InitElementSmallImages()
   print_timestamp_done("InitElementSmallImages");
 }
 
+inline static void InitScaledImagesScaledUp(int graphic)
+{
+  struct GraphicInfo *g = &graphic_info[graphic];
+
+  ScaleImage(graphic, g->scale_up_factor);
+}
+
 void InitScaledImages()
 {
+  struct PropertyMapping *property_mapping = getImageListPropertyMapping();
+  int num_property_mappings = getImageListPropertyMappingSize();
   int i;
 
   /* scale normal images from static configuration, if not already scaled */
   for (i = 0; i < NUM_IMAGE_FILES; i++)
-    ScaleImage(i, graphic_info[i].scale_up_factor);
+    InitScaledImagesScaledUp(i);
+
+  /* scale images from dynamic configuration, if not already scaled */
+  for (i = 0; i < num_property_mappings; i++)
+    InitScaledImagesScaledUp(property_mapping[i].artwork_index);
 }
 
 void InitBitmapPointers()
