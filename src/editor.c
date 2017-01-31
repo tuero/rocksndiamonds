@@ -4829,7 +4829,6 @@ static boolean use_el_empty = FALSE;
 static int *editor_elements = NULL;	/* dynamically allocated */
 static int num_editor_elements = 0;	/* dynamically determined */
 
-static boolean setup_editor_show_always = TRUE;
 static boolean setup_editor_cascade_never = FALSE;
 
 static int editor_hl_unused[] = { EL_EMPTY };
@@ -4852,67 +4851,67 @@ static struct
 editor_elements_info[] =
 {
   {
-    &setup_editor_show_always,
+    &setup.editor.el_classic,
     &setup_editor_cascade_never,
     &editor_hl_unused_ptr,		&num_editor_hl_unused,
     &editor_el_players_ptr,		&num_editor_el_players
   },
   {
-    &setup.editor.el_boulderdash,
+    &setup.editor.el_classic,
     &setup.editor_cascade.el_bd,
     &editor_hl_boulderdash_ptr,		&num_editor_hl_boulderdash,
     &editor_el_boulderdash_ptr,		&num_editor_el_boulderdash
   },
   {
-    &setup.editor.el_emerald_mine,
+    &setup.editor.el_classic,
     &setup.editor_cascade.el_em,
     &editor_hl_emerald_mine_ptr,	&num_editor_hl_emerald_mine,
     &editor_el_emerald_mine_ptr,	&num_editor_el_emerald_mine
   },
   {
-    &setup.editor.el_emerald_mine_club,
+    &setup.editor.el_classic,
     &setup.editor_cascade.el_emc,
     &editor_hl_emerald_mine_club_ptr,	&num_editor_hl_emerald_mine_club,
     &editor_el_emerald_mine_club_ptr,	&num_editor_el_emerald_mine_club
   },
   {
-    &setup.editor.el_more,
+    &setup.editor.el_classic,
     &setup.editor_cascade.el_rnd,
     &editor_hl_rnd_ptr,			&num_editor_hl_rnd,
     &editor_el_rnd_ptr,			&num_editor_el_rnd
   },
   {
-    &setup.editor.el_sokoban,
+    &setup.editor.el_classic,
     &setup.editor_cascade.el_sb,
     &editor_hl_sokoban_ptr,		&num_editor_hl_sokoban,
     &editor_el_sokoban_ptr,		&num_editor_el_sokoban
   },
   {
-    &setup.editor.el_supaplex,
+    &setup.editor.el_classic,
     &setup.editor_cascade.el_sp,
     &editor_hl_supaplex_ptr,		&num_editor_hl_supaplex,
     &editor_el_supaplex_ptr,		&num_editor_el_supaplex
   },
   {
-    &setup.editor.el_diamond_caves,
+    &setup.editor.el_classic,
     &setup.editor_cascade.el_dc,
     &editor_hl_diamond_caves_ptr,	&num_editor_hl_diamond_caves,
     &editor_el_diamond_caves_ptr,	&num_editor_el_diamond_caves
   },
   {
-    &setup.editor.el_dx_boulderdash,
+    &setup.editor.el_classic,
     &setup.editor_cascade.el_dx,
     &editor_hl_dx_boulderdash_ptr,	&num_editor_hl_dx_boulderdash,
     &editor_el_dx_boulderdash_ptr,	&num_editor_el_dx_boulderdash
   },
   {
-    &setup.editor.el_chars,
+    &setup.editor.el_classic,
     &setup.editor_cascade.el_chars,
     &editor_hl_chars_ptr,		&num_editor_hl_chars,
     &editor_el_chars_ptr,		&num_editor_el_chars
   },
   {
-    &setup.editor.el_steel_chars,
+    &setup.editor.el_classic,
     &setup.editor_cascade.el_steel_chars,
     &editor_hl_steel_chars_ptr,		&num_editor_hl_steel_chars,
     &editor_el_steel_chars_ptr,		&num_editor_el_steel_chars

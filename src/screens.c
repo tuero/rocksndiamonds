@@ -5356,9 +5356,10 @@ static struct TokenInfo setup_info_editor[] =
   { TYPE_SWITCH,	&setup.editor.el_supaplex,	"Supaplex:"	},
   { TYPE_SWITCH,	&setup.editor.el_diamond_caves,	"Diamond Caves II:" },
   { TYPE_SWITCH,	&setup.editor.el_dx_boulderdash,"DX-Boulderdash:" },
-#endif
   { TYPE_SWITCH,	&setup.editor.el_chars,		"Text Characters:" },
   { TYPE_SWITCH, &setup.editor.el_steel_chars, "Text Characters (Steel):" },
+#endif
+  { TYPE_SWITCH,	&setup.editor.el_classic,  "Classic Elements:" },
   { TYPE_SWITCH,	&setup.editor.el_custom,  "Custom & Group Elements:" },
 #if 0
   { TYPE_SWITCH,	&setup.editor.el_headlines,	"Headlines:"	},

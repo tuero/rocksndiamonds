@@ -7975,14 +7975,13 @@ void SaveScore(int nr)
 #define NUM_GLOBAL_SETUP_TOKENS			43
 
 /* editor setup */
-#define SETUP_TOKEN_EDITOR_EL_CHARS		0
-#define SETUP_TOKEN_EDITOR_EL_STEEL_CHARS	1
-#define SETUP_TOKEN_EDITOR_EL_CUSTOM		2
-#define SETUP_TOKEN_EDITOR_EL_USER_DEFINED	3
-#define SETUP_TOKEN_EDITOR_EL_DYNAMIC		4
-#define SETUP_TOKEN_EDITOR_SHOW_ELEMENT_TOKEN	5
+#define SETUP_TOKEN_EDITOR_EL_CLASSIC		0
+#define SETUP_TOKEN_EDITOR_EL_CUSTOM		1
+#define SETUP_TOKEN_EDITOR_EL_USER_DEFINED	2
+#define SETUP_TOKEN_EDITOR_EL_DYNAMIC		3
+#define SETUP_TOKEN_EDITOR_SHOW_ELEMENT_TOKEN	4
 
-#define NUM_EDITOR_SETUP_TOKENS			6
+#define NUM_EDITOR_SETUP_TOKENS			5
 
 /* editor cascade setup */
 #define SETUP_TOKEN_EDITOR_CASCADE_BD		0
@@ -8167,8 +8166,7 @@ static struct TokenInfo global_setup_tokens[] =
 
 static struct TokenInfo editor_setup_tokens[] =
 {
-  { TYPE_SWITCH, &sei.el_chars,		"editor.el_chars"		},
-  { TYPE_SWITCH, &sei.el_steel_chars,	"editor.el_steel_chars"		},
+  { TYPE_SWITCH, &sei.el_classic,	"editor.el_classic"		},
   { TYPE_SWITCH, &sei.el_custom,	"editor.el_custom"		},
   { TYPE_SWITCH, &sei.el_user_defined,	"editor.el_user_defined"	},
   { TYPE_SWITCH, &sei.el_dynamic,	"editor.el_dynamic"		},
@@ -8376,9 +8374,12 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
   si->editor.el_dx_boulderdash		= TRUE;
   si->editor.el_chars			= TRUE;
   si->editor.el_steel_chars		= TRUE;
+
+  si->editor.el_classic			= TRUE;
   si->editor.el_custom			= TRUE;
 
   si->editor.el_headlines = TRUE;
+
   si->editor.el_user_defined = FALSE;
   si->editor.el_dynamic = TRUE;
 
