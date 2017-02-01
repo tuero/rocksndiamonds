@@ -7979,9 +7979,10 @@ void SaveScore(int nr)
 #define SETUP_TOKEN_EDITOR_EL_CUSTOM		1
 #define SETUP_TOKEN_EDITOR_EL_USER_DEFINED	2
 #define SETUP_TOKEN_EDITOR_EL_DYNAMIC		3
-#define SETUP_TOKEN_EDITOR_SHOW_ELEMENT_TOKEN	4
+#define SETUP_TOKEN_EDITOR_EL_HEADLINES		4
+#define SETUP_TOKEN_EDITOR_SHOW_ELEMENT_TOKEN	5
 
-#define NUM_EDITOR_SETUP_TOKENS			5
+#define NUM_EDITOR_SETUP_TOKENS			6
 
 /* editor cascade setup */
 #define SETUP_TOKEN_EDITOR_CASCADE_BD		0
@@ -8170,6 +8171,7 @@ static struct TokenInfo editor_setup_tokens[] =
   { TYPE_SWITCH, &sei.el_custom,	"editor.el_custom"		},
   { TYPE_SWITCH, &sei.el_user_defined,	"editor.el_user_defined"	},
   { TYPE_SWITCH, &sei.el_dynamic,	"editor.el_dynamic"		},
+  { TYPE_SWITCH, &sei.el_headlines,	"editor.el_headlines"		},
   { TYPE_SWITCH, &sei.show_element_token,"editor.show_element_token"	},
 };
 
@@ -8378,12 +8380,12 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
   si->editor.el_classic			= TRUE;
   si->editor.el_custom			= TRUE;
 
-  si->editor.el_headlines = TRUE;
+  si->editor.el_user_defined		= FALSE;
+  si->editor.el_dynamic			= TRUE;
 
-  si->editor.el_user_defined = FALSE;
-  si->editor.el_dynamic = TRUE;
+  si->editor.el_headlines		= TRUE;
 
-  si->editor.show_element_token = FALSE;
+  si->editor.show_element_token		= FALSE;
 
   si->shortcut.save_game	= DEFAULT_KEY_SAVE_GAME;
   si->shortcut.load_game	= DEFAULT_KEY_LOAD_GAME;
