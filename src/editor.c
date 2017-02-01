@@ -97,27 +97,31 @@
 #define ED_TABBUTTON_XSIZE	     (graphic_info[IMG_EDITOR_TABBUTTON].width)
 #define ED_TABBUTTON_YSIZE	     (graphic_info[IMG_EDITOR_TABBUTTON].height)
 
-#define ED_LEVEL_SETTINGS_TABS_X	(editor.settings.tabs.x)
-#define ED_LEVEL_SETTINGS_TABS_Y	(editor.settings.tabs.y)
-#define ED_ELEMENT_SETTINGS_TABS_X	(editor.settings.tabs.x)
-#define ED_ELEMENT_SETTINGS_TABS_Y	(editor.settings.tabs.y +	\
+#define ED_SETTINGS_LEVEL_TABS_X	(editor.settings.tabs.x)
+#define ED_SETTINGS_LEVEL_TABS_Y	(editor.settings.tabs.y)
+#define ED_SETTINGS_ELEMENT_TABS_X	(editor.settings.tabs.x)
+#define ED_SETTINGS_ELEMENT_TABS_Y	(editor.settings.tabs.y +	\
 					 editor.settings.tabs.yoffset2)
 
 #define ED_SETTINGS_TABS_XOFFSET	(editor.settings.tabs.draw_xoffset)
 #define ED_SETTINGS_TABS_YOFFSET	(editor.settings.tabs.draw_yoffset)
 
-#define ED_LEVEL_SETTINGS_XSTART	(ED_LEVEL_SETTINGS_TABS_X +	\
+#define ED_LEVEL_TABS_XSTART		(ED_SETTINGS_LEVEL_TABS_X)
+#define ED_LEVEL_TABS_YSTART		(ED_SETTINGS_LEVEL_TABS_Y)
+#define ED_LEVEL_SETTINGS_XSTART	(ED_SETTINGS_LEVEL_TABS_X +	\
 					 ED_SETTINGS_TABS_XOFFSET)
-#define ED_LEVEL_SETTINGS_YSTART	(ED_LEVEL_SETTINGS_TABS_Y +	\
+#define ED_LEVEL_SETTINGS_YSTART	(ED_SETTINGS_LEVEL_TABS_Y +	\
 					 ED_TABBUTTON_YSIZE +		\
 					 ED_GADGET_TINY_DISTANCE +	\
 					 ED_TAB_BAR_HEIGHT +		\
 					 ED_SETTINGS_TABS_YOFFSET +	\
 					 getFontHeight(FONT_TEXT_1) +	\
 					 ED_GADGET_TEXT_DISTANCE)
-#define ED_ELEMENT_SETTINGS_XSTART	(ED_ELEMENT_SETTINGS_TABS_X +	\
+#define ED_ELEMENT_TABS_XSTART		(ED_SETTINGS_ELEMENT_TABS_X)
+#define ED_ELEMENT_TABS_YSTART		(ED_SETTINGS_ELEMENT_TABS_Y)
+#define ED_ELEMENT_SETTINGS_XSTART	(ED_SETTINGS_ELEMENT_TABS_X +	\
 					 ED_SETTINGS_TABS_XOFFSET)
-#define ED_ELEMENT_SETTINGS_YSTART	(ED_ELEMENT_SETTINGS_TABS_Y +	\
+#define ED_ELEMENT_SETTINGS_YSTART	(ED_SETTINGS_ELEMENT_TABS_Y +	\
 					 ED_TABBUTTON_YSIZE +		\
 					 ED_GADGET_TINY_DISTANCE +	\
 					 ED_TAB_BAR_HEIGHT +		\
@@ -128,61 +132,98 @@
 #define ED_SETTINGS_YOFFSET		(ED_CHECKBUTTON_YSIZE +		\
 					 ED_GADGET_LINE_DISTANCE)
 
-#define ED_POS_LEVEL_SETTINGS_RANGE	(10000)
-#define ED_POS_LEVEL_SETTINGS_FIRST	(1 * ED_POS_LEVEL_SETTINGS_RANGE)
-#define ED_POS_LEVEL_SETTINGS_LAST	(2 * ED_POS_LEVEL_SETTINGS_RANGE - 1)
-#define ED_POS_ELEMENT_SETTINGS_FIRST	(2 * ED_POS_LEVEL_SETTINGS_RANGE)
-#define ED_POS_ELEMENT_SETTINGS_LAST	(3 * ED_POS_LEVEL_SETTINGS_RANGE - 1)
+#define ED_POS_RANGE			(10000)
+#define ED_POS_LEVEL_TABS_FIRST		(1 * ED_POS_RANGE)
+#define ED_POS_LEVEL_TABS_LAST		(2 * ED_POS_RANGE - 1)
+#define ED_POS_LEVEL_SETTINGS_FIRST	(2 * ED_POS_RANGE)
+#define ED_POS_LEVEL_SETTINGS_LAST	(3 * ED_POS_RANGE - 1)
+#define ED_POS_ELEMENT_TABS_FIRST	(3 * ED_POS_RANGE)
+#define ED_POS_ELEMENT_TABS_LAST	(4 * ED_POS_RANGE - 1)
+#define ED_POS_ELEMENT_SETTINGS_FIRST	(4 * ED_POS_RANGE)
+#define ED_POS_ELEMENT_SETTINGS_LAST	(5 * ED_POS_RANGE - 1)
+
+#define ED_LEVEL_TABS_XPOS(n)		(ED_POS_LEVEL_TABS_FIRST + (n))
+#define ED_LEVEL_TABS_YPOS(n)		(ED_POS_LEVEL_TABS_FIRST + (n))
 
 #define ED_LEVEL_SETTINGS_XPOS(n)	(ED_POS_LEVEL_SETTINGS_FIRST + (n))
 #define ED_LEVEL_SETTINGS_YPOS(n)	(ED_POS_LEVEL_SETTINGS_FIRST + (n))
 
+#define ED_ELEMENT_TABS_XPOS(n)		(ED_POS_ELEMENT_TABS_FIRST + (n))
+#define ED_ELEMENT_TABS_YPOS(n)		(ED_POS_ELEMENT_TABS_FIRST + (n))
+
 #define ED_ELEMENT_SETTINGS_XPOS(n)	(ED_POS_ELEMENT_SETTINGS_FIRST + (n))
 #define ED_ELEMENT_SETTINGS_YPOS(n)	(ED_POS_ELEMENT_SETTINGS_FIRST + (n))
 
+#define IS_POS_LEVEL_TABS(n)	      ((n) >= ED_POS_LEVEL_TABS_FIRST && \
+				       (n) <= ED_POS_LEVEL_TABS_LAST)
 #define IS_POS_LEVEL_SETTINGS(n)      ((n) >= ED_POS_LEVEL_SETTINGS_FIRST && \
 				       (n) <= ED_POS_LEVEL_SETTINGS_LAST)
+#define IS_POS_ELEMENT_TABS(n)	      ((n) >= ED_POS_ELEMENT_TABS_FIRST && \
+				       (n) <= ED_POS_ELEMENT_TABS_LAST)
 #define IS_POS_ELEMENT_SETTINGS(n)    ((n) >= ED_POS_ELEMENT_SETTINGS_FIRST && \
 				       (n) <= ED_POS_ELEMENT_SETTINGS_LAST)
 
+#define ED_LEVEL_TABS_LINE(n)		((n) - ED_POS_LEVEL_TABS_FIRST)
 #define ED_LEVEL_SETTINGS_LINE(n)	((n) - ED_POS_LEVEL_SETTINGS_FIRST)
+#define ED_ELEMENT_TABS_LINE(n)		((n) - ED_POS_ELEMENT_TABS_FIRST)
 #define ED_ELEMENT_SETTINGS_LINE(n)	((n) - ED_POS_ELEMENT_SETTINGS_FIRST)
+
+#define ED_LEVEL_TABS_X(n)		(ED_LEVEL_TABS_XSTART +	\
+					 (n) * ED_SETTINGS_TABS_XOFFSET)
+#define ED_LEVEL_TABS_Y(n)		(ED_LEVEL_TABS_YSTART +	\
+					 (n) * ED_SETTINGS_TABS_YOFFSET)
 
 #define ED_LEVEL_SETTINGS_X(n)		(ED_LEVEL_SETTINGS_XSTART +	\
 					 (n) * ED_SETTINGS_XOFFSET)
 #define ED_LEVEL_SETTINGS_Y(n)		(ED_LEVEL_SETTINGS_YSTART +	\
 					 (n) * ED_SETTINGS_YOFFSET)
 
+#define ED_ELEMENT_TABS_X(n)		(ED_ELEMENT_TABS_XSTART +	\
+					 (n) * ED_SETTINGS_TABS_XOFFSET)
+#define ED_ELEMENT_TABS_Y(n)		(ED_ELEMENT_TABS_YSTART +	\
+					 (n) * ED_SETTINGS_TABS_YOFFSET)
+
 #define ED_ELEMENT_SETTINGS_X(n)	(ED_ELEMENT_SETTINGS_XSTART +	\
 					 (n) * ED_SETTINGS_XOFFSET)
 #define ED_ELEMENT_SETTINGS_Y(n)	(ED_ELEMENT_SETTINGS_YSTART +	\
 					 (n) * ED_SETTINGS_YOFFSET)
+
+#define ED_POS_TO_LEVEL_TABS_X(n)	\
+  (ED_LEVEL_TABS_X(ED_LEVEL_TABS_LINE(n)))
+#define ED_POS_TO_LEVEL_TABS_Y(n)	\
+  (ED_LEVEL_TABS_Y(ED_LEVEL_TABS_LINE(n)))
 
 #define ED_POS_TO_LEVEL_SETTINGS_X(n)	\
   (ED_LEVEL_SETTINGS_X(ED_LEVEL_SETTINGS_LINE(n)))
 #define ED_POS_TO_LEVEL_SETTINGS_Y(n)	\
   (ED_LEVEL_SETTINGS_Y(ED_LEVEL_SETTINGS_LINE(n)))
 
+#define ED_POS_TO_ELEMENT_TABS_X(n)	\
+  (ED_ELEMENT_TABS_X(ED_ELEMENT_TABS_LINE(n)))
+#define ED_POS_TO_ELEMENT_TABS_Y(n)	\
+  (ED_ELEMENT_TABS_Y(ED_ELEMENT_TABS_LINE(n)))
+
 #define ED_POS_TO_ELEMENT_SETTINGS_X(n)	\
   (ED_ELEMENT_SETTINGS_X(ED_ELEMENT_SETTINGS_LINE(n)))
 #define ED_POS_TO_ELEMENT_SETTINGS_Y(n)	\
   (ED_ELEMENT_SETTINGS_Y(ED_ELEMENT_SETTINGS_LINE(n)))
 
-#define ED_SETTINGS_X(n)		(IS_POS_LEVEL_SETTINGS(n) ?	\
+#define ED_SETTINGS_X(n)		(IS_POS_LEVEL_TABS(n) ?	\
+					 ED_POS_TO_LEVEL_TABS_X(n) : \
+					 IS_POS_LEVEL_SETTINGS(n) ?	\
 					 ED_POS_TO_LEVEL_SETTINGS_X(n) : \
+					 IS_POS_ELEMENT_TABS(n) ?	\
+					 ED_POS_TO_ELEMENT_TABS_X(n) : \
 					 IS_POS_ELEMENT_SETTINGS(n) ?	\
 					 ED_POS_TO_ELEMENT_SETTINGS_X(n) : (n))
-#define ED_SETTINGS_Y(n)		(IS_POS_LEVEL_SETTINGS(n) ?	\
+#define ED_SETTINGS_Y(n)		(IS_POS_LEVEL_TABS(n) ?	\
+					 ED_POS_TO_LEVEL_TABS_Y(n) : \
+					 IS_POS_LEVEL_SETTINGS(n) ?	\
 					 ED_POS_TO_LEVEL_SETTINGS_Y(n) : \
+					 IS_POS_ELEMENT_TABS(n) ?	\
+					 ED_POS_TO_ELEMENT_TABS_Y(n) : \
 					 IS_POS_ELEMENT_SETTINGS(n) ?	\
 					 ED_POS_TO_ELEMENT_SETTINGS_Y(n) : (n))
-
-#define ED_TAB_SETTINGS_X(n)		(IS_POS_LEVEL_SETTINGS(n) ?	\
-					 ED_LEVEL_SETTINGS_TABS_X :	\
-					 ED_ELEMENT_SETTINGS_TABS_X)
-#define ED_TAB_SETTINGS_Y(n)		(IS_POS_LEVEL_SETTINGS(n) ?	\
-					 ED_LEVEL_SETTINGS_TABS_Y :	\
-					 ED_ELEMENT_SETTINGS_TABS_Y)
 
 #define ED_SETTINGS_XOFF(n)		(5 * ((n) % 4) *		\
 					 ED_DRAWINGAREA_TILE_SIZE)
@@ -2535,8 +2576,10 @@ static struct
   char *text_left, *text_right, *infotext;
 } textbutton_info[ED_NUM_TEXTBUTTONS] =
 {
+  /* ---------- level and editor settings (tabs) --------------------------- */
+
   {
-    ED_LEVEL_SETTINGS_XPOS(0),		ED_LEVEL_SETTINGS_YPOS(0),
+    ED_LEVEL_TABS_XPOS(0),		ED_LEVEL_TABS_YPOS(0),
     GADGET_ID_LEVELINFO_LEVEL,		GADGET_ID_NONE,
     8,					"Level",			
     NULL, NULL,				"Configure level properties"
@@ -2547,8 +2590,11 @@ static struct
     8,					"Editor",			
     NULL, NULL,				"Configure editor properties"
   },
+
+  /* ---------- element settings (tabs) ------------------------------------ */
+
   {
-    ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(0),
+    ED_ELEMENT_TABS_XPOS(0),		ED_ELEMENT_TABS_YPOS(0),
     GADGET_ID_PROPERTIES_INFO,		GADGET_ID_NONE,
     8,					"Info",			
     NULL, NULL,				"Show information about element"
@@ -2577,6 +2623,9 @@ static struct
     8,					"Change",
     NULL, NULL,				"Configure custom element change pages"
   },
+
+  /* ---------- element settings (buttons) --------------------------------- */
+
   {
     -1,					-1,
     GADGET_ID_SAVE_AS_TEMPLATE,		GADGET_ID_CUSTOM_USE_TEMPLATE,
@@ -6137,8 +6186,8 @@ static void CreateTextbuttonGadgets()
     struct GadgetInfo *gi;
     unsigned int event_mask;
     char infotext[MAX_OUTPUT_LINESIZE + 1];
-    int x = SX + ED_TAB_SETTINGS_X(textbutton_info[i].x);
-    int y = SY + ED_TAB_SETTINGS_Y(textbutton_info[i].y);
+    int x = SX + ED_SETTINGS_X(textbutton_info[i].x);
+    int y = SY + ED_SETTINGS_Y(textbutton_info[i].y);
 
     if (textbutton_info[i].size == -1)	/* dynamically determine size */
       textbutton_info[i].size = strlen(textbutton_info[i].text);
