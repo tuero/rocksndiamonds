@@ -96,6 +96,8 @@ void InitProgramInfo(char *argv0, char *config_filename, char *userdata_subdir,
   program.log_filename[LOG_ERR_ID] = getLogFilename(LOG_ERR_BASENAME);
   program.log_file[LOG_OUT_ID] = program.log_file_default[LOG_OUT_ID] = stdout;
   program.log_file[LOG_ERR_ID] = program.log_file_default[LOG_ERR_ID] = stderr;
+
+  program.headless = FALSE;
 }
 
 void InitScoresInfo()
@@ -388,6 +390,9 @@ void LimitScreenUpdates(boolean enable)
 
 void InitVideoDisplay(void)
 {
+  if (program.headless)
+    return;
+
   SDLInitVideoDisplay();
 #if defined(TARGET_SDL2)
   SDLSetDisplaySize();
@@ -620,6 +625,9 @@ void BlitBitmap(Bitmap *src_bitmap, Bitmap *dst_bitmap,
 {
   int dst_x_unclipped = dst_x;
   int dst_y_unclipped = dst_y;
+
+  if (program.headless)
+    return;
 
   if (src_bitmap == NULL || dst_bitmap == NULL)
     return;

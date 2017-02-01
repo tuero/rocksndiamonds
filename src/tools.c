@@ -3736,6 +3736,9 @@ void WaitForEventToContinue()
 {
   boolean still_wait = TRUE;
 
+  if (program.headless)
+    return;
+
   /* simulate releasing mouse button over last gadget, if still pressed */
   if (button_status)
     HandleGadgets(-1, -1, 0);

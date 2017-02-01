@@ -764,6 +764,8 @@ struct ProgramInfo
 
   boolean global_scores;
   boolean many_scores_per_name;
+
+  boolean headless;
 };
 
 struct OptionInfo

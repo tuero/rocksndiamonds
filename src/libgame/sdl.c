@@ -439,6 +439,9 @@ boolean SDLSetNativeSurface(SDL_Surface **surface)
 #if defined(TARGET_SDL2)
 static SDL_Texture *SDLCreateTextureFromSurface(SDL_Surface *surface)
 {
+  if (program.headless)
+    return NULL;
+
   SDL_Texture *texture = SDL_CreateTextureFromSurface(sdl_renderer, surface);
 
   if (texture == NULL)
@@ -502,8 +505,11 @@ void SDLInitVideoDisplay(void)
 #endif
 }
 
-void SDLInitVideoBuffer(boolean fullscreen)
+inline static void SDLInitVideoBuffer_VideoBuffer(boolean fullscreen)
 {
+  if (program.headless)
+    return;
+
   video.window_scaling_percent = setup.window_scaling_percent;
   video.window_scaling_quality = setup.window_scaling_quality;
 
@@ -531,7 +537,10 @@ void SDLInitVideoBuffer(boolean fullscreen)
 #else
   SDL_WM_SetCaption(program.window_title, program.window_title);
 #endif
+}
 
+inline static void SDLInitVideoBuffer_DrawBuffer()
+{
   /* SDL cannot directly draw to the visible video framebuffer like X11,
      but always uses a backbuffer, which is then blitted to the visible
      video framebuffer with 'SDL_UpdateRect' (or replaced with the current
@@ -547,6 +556,16 @@ void SDLInitVideoBuffer(boolean fullscreen)
 
   /* create additional (symbolic) buffer for double-buffering */
   ReCreateBitmap(&window, video.width, video.height);
+
+  /* create dummy drawing buffer for headless mode, if needed */
+  if (program.headless)
+    ReCreateBitmap(&backbuffer, video.width, video.height);
+}
+
+void SDLInitVideoBuffer(boolean fullscreen)
+{
+  SDLInitVideoBuffer_VideoBuffer(fullscreen);
+  SDLInitVideoBuffer_DrawBuffer();
 }
 
 static boolean SDLCreateScreen(boolean fullscreen)
@@ -983,6 +1002,9 @@ void SDLRedrawWindow()
 void SDLCreateBitmapContent(Bitmap *bitmap, int width, int height,
 			    int depth)
 {
+  if (program.headless)
+    return;
+
   SDL_Surface *surface =
     SDL_CreateRGBSurface(SURFACE_FLAGS, width, height, depth, 0,0,0, 0);
 
@@ -2367,6 +2389,14 @@ Bitmap *SDLLoadImage(char *filename)
   Bitmap *new_bitmap = CreateBitmapStruct();
   SDL_Surface *sdl_image_tmp;
 
+  if (program.headless)
+  {
+    /* prevent sanity check warnings at later stage */
+    new_bitmap->width = new_bitmap->height = 1;
+
+    return new_bitmap;
+  }
+
   print_timestamp_init("SDLLoadImage");
 
   print_timestamp_time(getBaseNamePtr(filename));
@@ -2456,6 +2486,9 @@ void SDLSetMouseCursor(struct MouseCursorInfo *cursor_info)
 
 void SDLOpenAudio(void)
 {
+  if (program.headless)
+    return;
+
 #if !defined(TARGET_SDL2)
   if (!strEqual(setup.system.sdl_audiodriver, ARG_DEFAULT))
     SDL_putenv(getStringCat2("SDL_AUDIODRIVER=", setup.system.sdl_audiodriver));

@@ -1710,6 +1710,9 @@ static void InitGraphicInfo()
     src_x = graphic_info[i].src_x;
     src_y = graphic_info[i].src_y;
 
+    if (program.headless)
+      continue;
+
     if (src_x < 0 || src_y < 0 ||
 	src_x + width  > src_bitmap_width ||
 	src_y + height > src_bitmap_height)
@@ -4961,6 +4964,9 @@ void Execute_Command(char *command)
       while (*str_ptr != ' ' && *str_ptr != '\t' && *str_ptr != '\0')
 	str_ptr++;
     }
+
+    if (global.autoplay_mode == AUTOPLAY_MODE_TEST)
+      program.headless = TRUE;
   }
   else if (strPrefix(command, "convert "))
   {
@@ -5517,6 +5523,9 @@ static void InitMusic(char *identifier)
 
 static void InitArtworkDone()
 {
+  if (program.headless)
+    return;
+
   InitGlobalAnimations();
 }
 
