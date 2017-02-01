@@ -1092,6 +1092,7 @@ struct SetupInfo
   boolean team_mode;
   boolean handicap;
   boolean skip_levels;
+  boolean increment_levels;
   boolean time_limit;
   boolean fullscreen;
   int window_scaling_percent;

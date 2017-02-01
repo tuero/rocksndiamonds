@@ -4461,7 +4461,8 @@ void GameEnd()
     SaveLevelSetup_SeriesInfo();
   }
 
-  if (level_nr < leveldir_current->last_level)
+  if (setup.increment_levels &&
+      level_nr < leveldir_current->last_level)
     raise_level = TRUE;			/* advance to next level */
 
   if ((hi_pos = NewHiScore()) >= 0) 

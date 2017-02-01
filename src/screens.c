@@ -5326,9 +5326,10 @@ static struct TokenInfo setup_info_game[] =
 {
   { TYPE_SWITCH,	&setup.team_mode,	"Team-Mode (Multi-Player):" },
   { TYPE_YES_NO,	&setup.input_on_focus,	"Only Move Focussed Player:" },
+  { TYPE_SWITCH,	&setup.time_limit,	"Time Limit:"		},
   { TYPE_SWITCH,	&setup.handicap,	"Handicap:"		},
   { TYPE_SWITCH,	&setup.skip_levels,	"Skip Unsolved Levels:"	},
-  { TYPE_SWITCH,	&setup.time_limit,	"Time Limit:"		},
+  { TYPE_SWITCH,	&setup.increment_levels,"Increment Solved Levels:" },
   { TYPE_SWITCH,	&setup.autorecord,	"Auto-Record Tapes:"	},
   { TYPE_ENTER_LIST,	execSetupChooseGameSpeed, "Game Speed:"		},
   { TYPE_STRING,	&game_speed_text,	""			},
