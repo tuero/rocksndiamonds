@@ -3193,6 +3193,9 @@ static void LoadLevelFromFileInfo_RND(struct LevelInfo *level,
 
     Error(ERR_WARN, "cannot read level '%s' -- using empty level", filename);
 
+    if (!setup.editor.use_template_for_new_levels)
+      return;
+
     /* if level file not found, try to initialize level data from template */
     filename = getGlobalLevelTemplateFilename();
 
@@ -8389,6 +8392,8 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
   si->editor.el_headlines		= TRUE;
 
   si->editor.show_element_token		= FALSE;
+
+  si->editor.use_template_for_new_levels = TRUE;
 
   si->shortcut.save_game	= DEFAULT_KEY_SAVE_GAME;
   si->shortcut.load_game	= DEFAULT_KEY_LOAD_GAME;

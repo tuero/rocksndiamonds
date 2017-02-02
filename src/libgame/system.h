@@ -983,6 +983,8 @@ struct SetupEditorInfo
   boolean el_by_type;
 
   boolean show_element_token;
+
+  boolean use_template_for_new_levels;
 };
 
 struct SetupEditorCascadeInfo
