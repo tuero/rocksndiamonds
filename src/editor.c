@@ -845,18 +845,18 @@
 #define ED_TEXTBUTTON_ID_PROPERTIES_CONFIG_1	4
 #define ED_TEXTBUTTON_ID_PROPERTIES_CONFIG_2	5
 #define ED_TEXTBUTTON_ID_PROPERTIES_CHANGE	6
-#define ED_TEXTBUTTON_ID_SAVE_AS_TEMPLATE_1	7
-#define ED_TEXTBUTTON_ID_SAVE_AS_TEMPLATE_2	8
+#define ED_TEXTBUTTON_ID_SAVE_AS_TEMPLATE_2	7
+#define ED_TEXTBUTTON_ID_SAVE_AS_TEMPLATE_1	8
 #define ED_TEXTBUTTON_ID_ADD_CHANGE_PAGE	9
 #define ED_TEXTBUTTON_ID_DEL_CHANGE_PAGE	10
 
 #define ED_NUM_TEXTBUTTONS			11
 
-#define ED_TEXTBUTTON_ID_LEVELINFO_FIRST ED_TEXTBUTTON_ID_LEVELINFO_LEVEL
-#define ED_TEXTBUTTON_ID_LEVELINFO_LAST  ED_TEXTBUTTON_ID_LEVELINFO_EDITOR
+#define ED_TAB_BUTTON_ID_LEVELINFO_FIRST ED_TEXTBUTTON_ID_LEVELINFO_LEVEL
+#define ED_TAB_BUTTON_ID_LEVELINFO_LAST  ED_TEXTBUTTON_ID_LEVELINFO_EDITOR
 
-#define ED_TEXTBUTTON_ID_PROPERTIES_FIRST ED_TEXTBUTTON_ID_PROPERTIES_INFO
-#define ED_TEXTBUTTON_ID_PROPERTIES_LAST  ED_TEXTBUTTON_ID_PROPERTIES_CHANGE
+#define ED_TAB_BUTTON_ID_PROPERTIES_FIRST ED_TEXTBUTTON_ID_PROPERTIES_INFO
+#define ED_TAB_BUTTON_ID_PROPERTIES_LAST  ED_TEXTBUTTON_ID_PROPERTIES_CHANGE
 
 #define ED_TEXTBUTTON_ID_CHANGE_FIRST	ED_TEXTBUTTON_ID_ADD_CHANGE_PAGE
 #define ED_TEXTBUTTON_ID_CHANGE_LAST	ED_TEXTBUTTON_ID_DEL_CHANGE_PAGE
@@ -2630,6 +2630,16 @@ static struct
     NULL, NULL, NULL,			"Configure custom element change pages"
   },
 
+  /* ---------- level and editor settings (buttons) ------------------------ */
+
+  {
+    ED_LEVEL_SETTINGS_XPOS(0),		ED_LEVEL_SETTINGS_YPOS(6),
+    GADGET_ID_SAVE_AS_TEMPLATE_2,	GADGET_ID_NONE,
+    -1,					"Save",
+    NULL, NULL,				"this level as level template",
+    "Save current settings as new template"
+  },
+
   /* ---------- element settings (buttons) --------------------------------- */
 
   {
@@ -2637,13 +2647,6 @@ static struct
     GADGET_ID_SAVE_AS_TEMPLATE_1,	GADGET_ID_CUSTOM_USE_TEMPLATE_1,
     -1,					"Save",
     NULL, " ",				"As Template",
-    "Save current settings as new template"
-  },
-  {
-    ED_LEVEL_SETTINGS_XPOS(0),		ED_LEVEL_SETTINGS_YPOS(6),
-    GADGET_ID_SAVE_AS_TEMPLATE_2,	GADGET_ID_NONE,
-    -1,					"Save",
-    NULL, NULL,				"this level as level template",
     "Save current settings as new template"
   },
   {
@@ -8235,8 +8238,8 @@ static void DrawLevelInfoTabulatorGadgets()
   int gd_x = gd->x + gd_gi1->border.width / 2;
   int gd_y = gd->y + gd_gi1->height - 1;
   Pixel tab_color = GetPixel(gd->bitmap, gd_x, gd_y);
-  int id_first = ED_TEXTBUTTON_ID_LEVELINFO_LEVEL;
-  int id_last  = ED_TEXTBUTTON_ID_LEVELINFO_EDITOR;
+  int id_first = ED_TAB_BUTTON_ID_LEVELINFO_FIRST;
+  int id_last  = ED_TAB_BUTTON_ID_LEVELINFO_LAST;
   int i;
 
   for (i = id_first; i <= id_last; i++)
@@ -11485,15 +11488,15 @@ static void HandleTextbuttonGadgets(struct GadgetInfo *gi)
   int type_id = gi->custom_type_id;
   int i;
 
-  if (type_id >= ED_TEXTBUTTON_ID_LEVELINFO_FIRST &&
-      type_id <= ED_TEXTBUTTON_ID_LEVELINFO_LAST)
+  if (type_id >= ED_TAB_BUTTON_ID_LEVELINFO_FIRST &&
+      type_id <= ED_TAB_BUTTON_ID_LEVELINFO_LAST)
   {
     edit_mode_levelinfo = gi->custom_type_id;
 
     DrawLevelInfoWindow();
   }
-  else if (type_id >= ED_TEXTBUTTON_ID_PROPERTIES_FIRST &&
-	   type_id <= ED_TEXTBUTTON_ID_PROPERTIES_LAST)
+  else if (type_id >= ED_TAB_BUTTON_ID_PROPERTIES_FIRST &&
+	   type_id <= ED_TAB_BUTTON_ID_PROPERTIES_LAST)
   {
     edit_mode_properties = gi->custom_type_id;
 
