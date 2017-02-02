@@ -594,12 +594,13 @@
 #define GADGET_ID_PROPERTIES_CONFIG_1	(GADGET_ID_TEXTBUTTON_FIRST + 4)
 #define GADGET_ID_PROPERTIES_CONFIG_2	(GADGET_ID_TEXTBUTTON_FIRST + 5)
 #define GADGET_ID_PROPERTIES_CHANGE	(GADGET_ID_TEXTBUTTON_FIRST + 6)
-#define GADGET_ID_SAVE_AS_TEMPLATE	(GADGET_ID_TEXTBUTTON_FIRST + 7)
-#define GADGET_ID_ADD_CHANGE_PAGE	(GADGET_ID_TEXTBUTTON_FIRST + 8)
-#define GADGET_ID_DEL_CHANGE_PAGE	(GADGET_ID_TEXTBUTTON_FIRST + 9)
+#define GADGET_ID_SAVE_AS_TEMPLATE_1	(GADGET_ID_TEXTBUTTON_FIRST + 7)
+#define GADGET_ID_SAVE_AS_TEMPLATE_2	(GADGET_ID_TEXTBUTTON_FIRST + 8)
+#define GADGET_ID_ADD_CHANGE_PAGE	(GADGET_ID_TEXTBUTTON_FIRST + 9)
+#define GADGET_ID_DEL_CHANGE_PAGE	(GADGET_ID_TEXTBUTTON_FIRST + 10)
 
 /* graphicbutton identifiers */
-#define GADGET_ID_GRAPHICBUTTON_FIRST	(GADGET_ID_TEXTBUTTON_FIRST + 10)
+#define GADGET_ID_GRAPHICBUTTON_FIRST	(GADGET_ID_TEXTBUTTON_FIRST + 11)
 
 #define GADGET_ID_PREV_CHANGE_PAGE	(GADGET_ID_GRAPHICBUTTON_FIRST + 0)
 #define GADGET_ID_NEXT_CHANGE_PAGE	(GADGET_ID_GRAPHICBUTTON_FIRST + 1)
@@ -671,19 +672,20 @@
 #define GADGET_ID_CUSTOM_GRAV_REACHABLE	(GADGET_ID_CHECKBUTTON_FIRST + 42)
 #define GADGET_ID_CUSTOM_USE_LAST_VALUE	(GADGET_ID_CHECKBUTTON_FIRST + 43)
 #define GADGET_ID_CUSTOM_USE_GRAPHIC	(GADGET_ID_CHECKBUTTON_FIRST + 44)
-#define GADGET_ID_CUSTOM_USE_TEMPLATE	(GADGET_ID_CHECKBUTTON_FIRST + 45)
-#define GADGET_ID_CUSTOM_CAN_CHANGE	(GADGET_ID_CHECKBUTTON_FIRST + 46)
-#define GADGET_ID_CHANGE_USE_CONTENT	(GADGET_ID_CHECKBUTTON_FIRST + 47)
-#define GADGET_ID_CHANGE_USE_EXPLOSION	(GADGET_ID_CHECKBUTTON_FIRST + 48)
-#define GADGET_ID_CHANGE_ONLY_COMPLETE	(GADGET_ID_CHECKBUTTON_FIRST + 49)
-#define GADGET_ID_CHANGE_USE_RANDOM	(GADGET_ID_CHECKBUTTON_FIRST + 50)
-#define GADGET_ID_CHANGE_HAS_ACTION	(GADGET_ID_CHECKBUTTON_FIRST + 51)
-#define GADGET_ID_CHANGE_DELAY		(GADGET_ID_CHECKBUTTON_FIRST + 52)
-#define GADGET_ID_CHANGE_BY_DIRECT_ACT	(GADGET_ID_CHECKBUTTON_FIRST + 53)
-#define GADGET_ID_CHANGE_BY_OTHER_ACT	(GADGET_ID_CHECKBUTTON_FIRST + 54)
+#define GADGET_ID_CUSTOM_USE_TEMPLATE_1	(GADGET_ID_CHECKBUTTON_FIRST + 45)
+#define GADGET_ID_CUSTOM_USE_TEMPLATE_2	(GADGET_ID_CHECKBUTTON_FIRST + 46)
+#define GADGET_ID_CUSTOM_CAN_CHANGE	(GADGET_ID_CHECKBUTTON_FIRST + 47)
+#define GADGET_ID_CHANGE_USE_CONTENT	(GADGET_ID_CHECKBUTTON_FIRST + 48)
+#define GADGET_ID_CHANGE_USE_EXPLOSION	(GADGET_ID_CHECKBUTTON_FIRST + 49)
+#define GADGET_ID_CHANGE_ONLY_COMPLETE	(GADGET_ID_CHECKBUTTON_FIRST + 50)
+#define GADGET_ID_CHANGE_USE_RANDOM	(GADGET_ID_CHECKBUTTON_FIRST + 51)
+#define GADGET_ID_CHANGE_HAS_ACTION	(GADGET_ID_CHECKBUTTON_FIRST + 52)
+#define GADGET_ID_CHANGE_DELAY		(GADGET_ID_CHECKBUTTON_FIRST + 53)
+#define GADGET_ID_CHANGE_BY_DIRECT_ACT	(GADGET_ID_CHECKBUTTON_FIRST + 54)
+#define GADGET_ID_CHANGE_BY_OTHER_ACT	(GADGET_ID_CHECKBUTTON_FIRST + 55)
 
 /* gadgets for buttons in element list */
-#define GADGET_ID_ELEMENTLIST_FIRST	(GADGET_ID_CHECKBUTTON_FIRST + 55)
+#define GADGET_ID_ELEMENTLIST_FIRST	(GADGET_ID_CHECKBUTTON_FIRST + 56)
 #define GADGET_ID_ELEMENTLIST_LAST	(GADGET_ID_ELEMENTLIST_FIRST +	\
 	 				ED_NUM_ELEMENTLIST_BUTTONS - 1)
 
@@ -842,11 +844,12 @@
 #define ED_TEXTBUTTON_ID_PROPERTIES_CONFIG_1	4
 #define ED_TEXTBUTTON_ID_PROPERTIES_CONFIG_2	5
 #define ED_TEXTBUTTON_ID_PROPERTIES_CHANGE	6
-#define ED_TEXTBUTTON_ID_SAVE_AS_TEMPLATE	7
-#define ED_TEXTBUTTON_ID_ADD_CHANGE_PAGE	8
-#define ED_TEXTBUTTON_ID_DEL_CHANGE_PAGE	9
+#define ED_TEXTBUTTON_ID_SAVE_AS_TEMPLATE_1	7
+#define ED_TEXTBUTTON_ID_SAVE_AS_TEMPLATE_2	8
+#define ED_TEXTBUTTON_ID_ADD_CHANGE_PAGE	9
+#define ED_TEXTBUTTON_ID_DEL_CHANGE_PAGE	10
 
-#define ED_NUM_TEXTBUTTONS			10
+#define ED_NUM_TEXTBUTTONS			11
 
 #define ED_TEXTBUTTON_ID_LEVELINFO_FIRST ED_TEXTBUTTON_ID_LEVELINFO_LEVEL
 #define ED_TEXTBUTTON_ID_LEVELINFO_LAST  ED_TEXTBUTTON_ID_LEVELINFO_EDITOR
@@ -870,63 +873,64 @@
 
 /* values for checkbutton gadgets */
 #define ED_CHECKBUTTON_ID_RANDOM_RESTRICTED	0
-#define ED_CHECKBUTTON_ID_STICK_ELEMENT		1
-#define ED_CHECKBUTTON_ID_EM_SLIPPERY_GEMS	2
-#define ED_CHECKBUTTON_ID_EM_EXPLODES_BY_FIRE	3
-#define ED_CHECKBUTTON_ID_USE_SPRING_BUG	4
-#define ED_CHECKBUTTON_ID_USE_TIME_ORB_BUG	5
-#define ED_CHECKBUTTON_ID_RANDOM_BALL_CONTENT	6
-#define ED_CHECKBUTTON_ID_INITIAL_BALL_STATE	7
-#define ED_CHECKBUTTON_ID_GROW_INTO_DIGGABLE	8
-#define ED_CHECKBUTTON_ID_AUTO_EXIT_SOKOBAN	9
-#define ED_CHECKBUTTON_ID_CONTINUOUS_SNAPPING	10
-#define ED_CHECKBUTTON_ID_BLOCK_SNAP_FIELD	11
-#define ED_CHECKBUTTON_ID_BLOCK_LAST_FIELD	12
-#define ED_CHECKBUTTON_ID_SP_BLOCK_LAST_FIELD	13
-#define ED_CHECKBUTTON_ID_INSTANT_RELOCATION	14
-#define ED_CHECKBUTTON_ID_SHIFTED_RELOCATION	15
-#define ED_CHECKBUTTON_ID_LAZY_RELOCATION	16
-#define ED_CHECKBUTTON_ID_USE_START_ELEMENT	17
-#define ED_CHECKBUTTON_ID_USE_ARTWORK_ELEMENT	18
-#define ED_CHECKBUTTON_ID_USE_EXPLOSION_ELEMENT	19
-#define ED_CHECKBUTTON_ID_INITIAL_GRAVITY	20
-#define ED_CHECKBUTTON_ID_USE_INITIAL_INVENTORY	21
-#define ED_CHECKBUTTON_ID_CAN_PASS_TO_WALKABLE	22
-#define ED_CHECKBUTTON_ID_CAN_FALL_INTO_ACID	23
-#define ED_CHECKBUTTON_ID_CAN_MOVE_INTO_ACID	24
-#define ED_CHECKBUTTON_ID_DONT_COLLIDE_WITH	25
-#define ED_CHECKBUTTON_ID_ENVELOPE_AUTOWRAP	26
-#define ED_CHECKBUTTON_ID_ENVELOPE_CENTERED	27
-#define ED_CHECKBUTTON_ID_CUSTOM_USE_GRAPHIC	28
-#define ED_CHECKBUTTON_ID_CUSTOM_USE_TEMPLATE	29
-#define ED_CHECKBUTTON_ID_CUSTOM_ACCESSIBLE	30
-#define ED_CHECKBUTTON_ID_CUSTOM_GRAV_REACHABLE	31
-#define ED_CHECKBUTTON_ID_CUSTOM_USE_LAST_VALUE	32
-#define ED_CHECKBUTTON_ID_CUSTOM_WALK_TO_OBJECT	33
-#define ED_CHECKBUTTON_ID_CUSTOM_INDESTRUCTIBLE	34
-#define ED_CHECKBUTTON_ID_CUSTOM_CAN_MOVE	35
-#define ED_CHECKBUTTON_ID_CUSTOM_CAN_FALL	36
-#define ED_CHECKBUTTON_ID_CUSTOM_CAN_SMASH	37
-#define ED_CHECKBUTTON_ID_CUSTOM_SLIPPERY	38
-#define ED_CHECKBUTTON_ID_CUSTOM_DEADLY		39
-#define ED_CHECKBUTTON_ID_CUSTOM_CAN_EXPLODE	40
-#define ED_CHECKBUTTON_ID_CUSTOM_EXPLODE_FIRE	41
-#define ED_CHECKBUTTON_ID_CUSTOM_EXPLODE_SMASH	42
-#define ED_CHECKBUTTON_ID_CUSTOM_EXPLODE_IMPACT	43
-#define ED_CHECKBUTTON_ID_CUSTOM_CAN_CHANGE	44
-#define ED_CHECKBUTTON_ID_CHANGE_DELAY		45
-#define ED_CHECKBUTTON_ID_CHANGE_BY_DIRECT_ACT	46
-#define ED_CHECKBUTTON_ID_CHANGE_BY_OTHER_ACT	47
-#define ED_CHECKBUTTON_ID_CHANGE_USE_EXPLOSION	48
-#define ED_CHECKBUTTON_ID_CHANGE_USE_CONTENT	49
-#define ED_CHECKBUTTON_ID_CHANGE_ONLY_COMPLETE	50
-#define ED_CHECKBUTTON_ID_CHANGE_USE_RANDOM	51
-#define ED_CHECKBUTTON_ID_CHANGE_HAS_ACTION	52
+#define ED_CHECKBUTTON_ID_CUSTOM_USE_TEMPLATE_2	1
+#define ED_CHECKBUTTON_ID_STICK_ELEMENT		2
+#define ED_CHECKBUTTON_ID_EM_SLIPPERY_GEMS	3
+#define ED_CHECKBUTTON_ID_EM_EXPLODES_BY_FIRE	4
+#define ED_CHECKBUTTON_ID_USE_SPRING_BUG	5
+#define ED_CHECKBUTTON_ID_USE_TIME_ORB_BUG	6
+#define ED_CHECKBUTTON_ID_RANDOM_BALL_CONTENT	7
+#define ED_CHECKBUTTON_ID_INITIAL_BALL_STATE	8
+#define ED_CHECKBUTTON_ID_GROW_INTO_DIGGABLE	9
+#define ED_CHECKBUTTON_ID_AUTO_EXIT_SOKOBAN	10
+#define ED_CHECKBUTTON_ID_CONTINUOUS_SNAPPING	11
+#define ED_CHECKBUTTON_ID_BLOCK_SNAP_FIELD	12
+#define ED_CHECKBUTTON_ID_BLOCK_LAST_FIELD	13
+#define ED_CHECKBUTTON_ID_SP_BLOCK_LAST_FIELD	14
+#define ED_CHECKBUTTON_ID_INSTANT_RELOCATION	15
+#define ED_CHECKBUTTON_ID_SHIFTED_RELOCATION	16
+#define ED_CHECKBUTTON_ID_LAZY_RELOCATION	17
+#define ED_CHECKBUTTON_ID_USE_START_ELEMENT	18
+#define ED_CHECKBUTTON_ID_USE_ARTWORK_ELEMENT	19
+#define ED_CHECKBUTTON_ID_USE_EXPLOSION_ELEMENT	20
+#define ED_CHECKBUTTON_ID_INITIAL_GRAVITY	21
+#define ED_CHECKBUTTON_ID_USE_INITIAL_INVENTORY	22
+#define ED_CHECKBUTTON_ID_CAN_PASS_TO_WALKABLE	23
+#define ED_CHECKBUTTON_ID_CAN_FALL_INTO_ACID	24
+#define ED_CHECKBUTTON_ID_CAN_MOVE_INTO_ACID	25
+#define ED_CHECKBUTTON_ID_DONT_COLLIDE_WITH	26
+#define ED_CHECKBUTTON_ID_ENVELOPE_AUTOWRAP	27
+#define ED_CHECKBUTTON_ID_ENVELOPE_CENTERED	28
+#define ED_CHECKBUTTON_ID_CUSTOM_USE_GRAPHIC	29
+#define ED_CHECKBUTTON_ID_CUSTOM_USE_TEMPLATE_1	30
+#define ED_CHECKBUTTON_ID_CUSTOM_ACCESSIBLE	31
+#define ED_CHECKBUTTON_ID_CUSTOM_GRAV_REACHABLE	32
+#define ED_CHECKBUTTON_ID_CUSTOM_USE_LAST_VALUE	33
+#define ED_CHECKBUTTON_ID_CUSTOM_WALK_TO_OBJECT	34
+#define ED_CHECKBUTTON_ID_CUSTOM_INDESTRUCTIBLE	35
+#define ED_CHECKBUTTON_ID_CUSTOM_CAN_MOVE	36
+#define ED_CHECKBUTTON_ID_CUSTOM_CAN_FALL	37
+#define ED_CHECKBUTTON_ID_CUSTOM_CAN_SMASH	38
+#define ED_CHECKBUTTON_ID_CUSTOM_SLIPPERY	39
+#define ED_CHECKBUTTON_ID_CUSTOM_DEADLY		40
+#define ED_CHECKBUTTON_ID_CUSTOM_CAN_EXPLODE	41
+#define ED_CHECKBUTTON_ID_CUSTOM_EXPLODE_FIRE	42
+#define ED_CHECKBUTTON_ID_CUSTOM_EXPLODE_SMASH	43
+#define ED_CHECKBUTTON_ID_CUSTOM_EXPLODE_IMPACT	44
+#define ED_CHECKBUTTON_ID_CUSTOM_CAN_CHANGE	45
+#define ED_CHECKBUTTON_ID_CHANGE_DELAY		46
+#define ED_CHECKBUTTON_ID_CHANGE_BY_DIRECT_ACT	47
+#define ED_CHECKBUTTON_ID_CHANGE_BY_OTHER_ACT	48
+#define ED_CHECKBUTTON_ID_CHANGE_USE_EXPLOSION	49
+#define ED_CHECKBUTTON_ID_CHANGE_USE_CONTENT	50
+#define ED_CHECKBUTTON_ID_CHANGE_ONLY_COMPLETE	51
+#define ED_CHECKBUTTON_ID_CHANGE_USE_RANDOM	52
+#define ED_CHECKBUTTON_ID_CHANGE_HAS_ACTION	53
 
-#define ED_NUM_CHECKBUTTONS			53
+#define ED_NUM_CHECKBUTTONS			54
 
 #define ED_CHECKBUTTON_ID_EDITOR_FIRST	ED_CHECKBUTTON_ID_RANDOM_RESTRICTED
-#define ED_CHECKBUTTON_ID_EDITOR_LAST	ED_CHECKBUTTON_ID_RANDOM_RESTRICTED
+#define ED_CHECKBUTTON_ID_EDITOR_LAST	ED_CHECKBUTTON_ID_CUSTOM_USE_TEMPLATE_2
 
 #define ED_CHECKBUTTON_ID_CUSTOM1_FIRST	ED_CHECKBUTTON_ID_CUSTOM_USE_GRAPHIC
 #define ED_CHECKBUTTON_ID_CUSTOM1_LAST	ED_CHECKBUTTON_ID_CUSTOM_INDESTRUCTIBLE
@@ -2573,7 +2577,7 @@ static struct
   int gadget_id_align;
   int size;
   char *text;
-  char *text_left, *text_right, *infotext;
+  char *text_above, *text_left, *text_right, *infotext;
 } textbutton_info[ED_NUM_TEXTBUTTONS] =
 {
   /* ---------- level and editor settings (tabs) --------------------------- */
@@ -2582,13 +2586,13 @@ static struct
     ED_LEVEL_TABS_XPOS(0),		ED_LEVEL_TABS_YPOS(0),
     GADGET_ID_LEVELINFO_LEVEL,		GADGET_ID_NONE,
     8,					"Level",			
-    NULL, NULL,				"Configure level properties"
+    NULL, NULL, NULL,			"Configure level properties"
   },
   {
     -1,					-1,
     GADGET_ID_LEVELINFO_EDITOR,		GADGET_ID_LEVELINFO_LEVEL,
     8,					"Editor",			
-    NULL, NULL,				"Configure editor properties"
+    NULL, NULL, NULL,			"Configure editor properties"
   },
 
   /* ---------- element settings (tabs) ------------------------------------ */
@@ -2597,52 +2601,59 @@ static struct
     ED_ELEMENT_TABS_XPOS(0),		ED_ELEMENT_TABS_YPOS(0),
     GADGET_ID_PROPERTIES_INFO,		GADGET_ID_NONE,
     8,					"Info",			
-    NULL, NULL,				"Show information about element"
+    NULL, NULL, NULL,			"Show information about element"
   },
   {
     -1,					-1,
     GADGET_ID_PROPERTIES_CONFIG,	GADGET_ID_PROPERTIES_INFO,
     8,					"Config",
-    NULL, NULL,				"Configure element properties"
+    NULL, NULL, NULL,			"Configure element properties"
   },
   {
     -1,					-1,
     GADGET_ID_PROPERTIES_CONFIG_1,	GADGET_ID_PROPERTIES_INFO,
     8,					"Config 1",
-    NULL, NULL,				"Configure element properties, part 1"
+    NULL, NULL, NULL,			"Configure element properties, part 1"
   },
   {
     -1,					-1,
     GADGET_ID_PROPERTIES_CONFIG_2,	GADGET_ID_PROPERTIES_CONFIG_1,
     8,					"Config 2",
-    NULL, NULL,				"Configure element properties, part 2"
+    NULL, NULL, NULL,			"Configure element properties, part 2"
   },
   {
     -1,					-1,
     GADGET_ID_PROPERTIES_CHANGE,	GADGET_ID_PROPERTIES_CONFIG_2,
     8,					"Change",
-    NULL, NULL,				"Configure custom element change pages"
+    NULL, NULL, NULL,			"Configure custom element change pages"
   },
 
   /* ---------- element settings (buttons) --------------------------------- */
 
   {
     -1,					-1,
-    GADGET_ID_SAVE_AS_TEMPLATE,		GADGET_ID_CUSTOM_USE_TEMPLATE,
+    GADGET_ID_SAVE_AS_TEMPLATE_1,	GADGET_ID_CUSTOM_USE_TEMPLATE_1,
     -1,					"Save",
-    " ", "As Template",			"Save current settings as new template"
+    NULL, " ", "As Template",		"Save current settings as new template"
+  },
+  {
+    ED_LEVEL_SETTINGS_XPOS(0),		ED_LEVEL_SETTINGS_YPOS(3),
+    GADGET_ID_SAVE_AS_TEMPLATE_2,	GADGET_ID_NONE,
+    -1,					"Save",
+    "Template to use for new levels:", NULL, "this level as level template",
+    "Save current settings as new template"
   },
   {
     -1,					-1,
     GADGET_ID_ADD_CHANGE_PAGE,		GADGET_ID_PASTE_CHANGE_PAGE,
     -1,					"New",
-    NULL, NULL,				"Add new change page"
+    NULL, NULL, NULL,			"Add new change page"
   },
   {
     -1,					-1,
     GADGET_ID_DEL_CHANGE_PAGE,		GADGET_ID_ADD_CHANGE_PAGE,
     -1,					"Delete",
-    NULL, NULL,				"Delete current change page"
+    NULL, NULL, NULL,			"Delete current change page"
   },
 };
 
@@ -2806,6 +2817,13 @@ static struct
     &random_placement_background_restricted,
     NULL,
     "restrict random placement to:",	"set random placement restriction"
+  },
+  {
+    ED_LEVEL_SETTINGS_XPOS(0),		ED_LEVEL_SETTINGS_YPOS(4),
+    GADGET_ID_CUSTOM_USE_TEMPLATE_2,	GADGET_ID_NONE,
+    &level.use_custom_template,
+    NULL,
+    "use template for custom elements",	"use template for custom properties"
   },
 
   /* ---------- element settings: configure (various elements) ------------- */
@@ -3011,7 +3029,7 @@ static struct
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(14),
-    GADGET_ID_CUSTOM_USE_TEMPLATE,	GADGET_ID_NONE,
+    GADGET_ID_CUSTOM_USE_TEMPLATE_1,	GADGET_ID_NONE,
     &level.use_custom_template,
     NULL,
     "use template",			"use template for custom properties"
@@ -6781,15 +6799,21 @@ static void MapTextbuttonGadget(int id)
   struct GadgetInfo *gi = level_editor_gadget[textbutton_info[id].gadget_id];
   int xoffset_left = getTextWidthForGadget(textbutton_info[id].text_left);
   int xoffset_right = ED_GADGET_TEXT_DISTANCE;
+  int yoffset_above = font_height + ED_GADGET_LINE_DISTANCE;
   int yoffset = (gi->height - font_height) / 2;
   int x_left = gi->x - xoffset_left;
   int x_right = gi->x + gi->width + xoffset_right;
+  int y_above = gi->y - yoffset_above;
+  int x = gi->x;
   int y = gi->y + yoffset;
 
   /* only show button to delete change pages when more than minimum pages */
   if (id == ED_TEXTBUTTON_ID_DEL_CHANGE_PAGE &&
       custom_element.num_change_pages == MIN_CHANGE_PAGES)
     return;
+
+  if (textbutton_info[id].text_above)
+    DrawText(x, y_above, textbutton_info[id].text_above, font_nr);
 
   if (textbutton_info[id].text_left)
     DrawText(x_left, y, textbutton_info[id].text_left, font_nr);
@@ -7583,7 +7607,9 @@ static boolean AskToCopyAndModifyLevelTemplate()
   {
     level.use_custom_template = FALSE;
 
-    ModifyGadget(level_editor_gadget[GADGET_ID_CUSTOM_USE_TEMPLATE],
+    ModifyGadget(level_editor_gadget[GADGET_ID_CUSTOM_USE_TEMPLATE_1],
+		 GDI_CHECKED, FALSE, GDI_END);
+    ModifyGadget(level_editor_gadget[GADGET_ID_CUSTOM_USE_TEMPLATE_2],
 		 GDI_CHECKED, FALSE, GDI_END);
 
     return TRUE;
@@ -8307,6 +8333,9 @@ static void DrawLevelInfoEditor()
 
   /* draw drawing area */
   MapDrawingArea(ED_DRAWING_ID_RANDOM_BACKGROUND);
+
+  /* draw textbutton gadgets */
+  MapTextbuttonGadget(ED_TEXTBUTTON_ID_SAVE_AS_TEMPLATE_2);
 }
 
 static void DrawLevelInfoWindow()
@@ -9104,7 +9133,7 @@ static void DrawPropertiesConfig()
 	MapSelectboxGadget(i);
 
       /* draw textbutton gadgets */
-      MapTextbuttonGadget(ED_TEXTBUTTON_ID_SAVE_AS_TEMPLATE);
+      MapTextbuttonGadget(ED_TEXTBUTTON_ID_SAVE_AS_TEMPLATE_1);
 
       /* draw text input gadgets */
       MapTextInputGadget(ED_TEXTINPUT_ID_ELEMENT_NAME);
@@ -9144,7 +9173,7 @@ static void DrawPropertiesConfig()
 
     /* draw checkbutton gadgets */
     MapCheckbuttonGadget(ED_CHECKBUTTON_ID_CUSTOM_USE_GRAPHIC);
-    MapCheckbuttonGadget(ED_CHECKBUTTON_ID_CUSTOM_USE_TEMPLATE);
+    MapCheckbuttonGadget(ED_CHECKBUTTON_ID_CUSTOM_USE_TEMPLATE_1);
 
     /* draw counter gadgets */
     MapCounterButtons(ED_COUNTER_ID_GROUP_CONTENT);
@@ -9153,7 +9182,7 @@ static void DrawPropertiesConfig()
     MapSelectboxGadget(ED_SELECTBOX_ID_GROUP_CHOICE_MODE);
 
     /* draw textbutton gadgets */
-    MapTextbuttonGadget(ED_TEXTBUTTON_ID_SAVE_AS_TEMPLATE);
+    MapTextbuttonGadget(ED_TEXTBUTTON_ID_SAVE_AS_TEMPLATE_1);
 
     /* draw drawing area gadgets */
     DrawGroupElementArea(properties_element);
@@ -11454,7 +11483,8 @@ static void HandleTextbuttonGadgets(struct GadgetInfo *gi)
 
     DrawPropertiesWindow();
   }
-  else if (type_id == ED_TEXTBUTTON_ID_SAVE_AS_TEMPLATE)
+  else if (type_id == ED_TEXTBUTTON_ID_SAVE_AS_TEMPLATE_1 ||
+	   type_id == ED_TEXTBUTTON_ID_SAVE_AS_TEMPLATE_2)
   {
     boolean new_template = !fileExists(getLocalLevelTemplateFilename());
 
@@ -11591,7 +11621,7 @@ static void HandleCheckbuttons(struct GadgetInfo *gi)
 	 type_id <= ED_CHECKBUTTON_ID_CUSTOM_LAST) ||
 	(type_id >= ED_CHECKBUTTON_ID_CHANGE_FIRST &&
 	 type_id <= ED_CHECKBUTTON_ID_CHANGE_LAST)) &&
-       type_id != ED_CHECKBUTTON_ID_CUSTOM_USE_TEMPLATE))
+       type_id != ED_CHECKBUTTON_ID_CUSTOM_USE_TEMPLATE_1))
   {
     CopyElementPropertiesToGame(properties_element);
   }
@@ -11600,7 +11630,8 @@ static void HandleCheckbuttons(struct GadgetInfo *gi)
   {
     UpdateCustomElementGraphicGadgets();
   }
-  else if (type_id == ED_CHECKBUTTON_ID_CUSTOM_USE_TEMPLATE)
+  else if (type_id == ED_CHECKBUTTON_ID_CUSTOM_USE_TEMPLATE_1 ||
+	   type_id == ED_CHECKBUTTON_ID_CUSTOM_USE_TEMPLATE_2)
   {
     boolean template_related_changes_found = FALSE;
     int i;
