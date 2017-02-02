@@ -8598,41 +8598,22 @@ static void DrawEnvelopeTextArea(int envelope_nr)
   MapTextAreaGadget(ED_TEXTAREA_ID_ENVELOPE_INFO);
 }
 
-static boolean PrintInfoText(char *text, int font_nr, int start_line)
+static void PrintInfoText(char *text, int font_nr, int xpos, int ypos)
 {
-  int font_height = getFontHeight(font_nr);
-  int pad_x = ED_ELEMENT_SETTINGS_X(0);
-  int pad_y = ED_ELEMENT_SETTINGS_Y(0) + ED_GADGET_SMALL_DISTANCE;
-  int sx = SX + pad_x;
-  int sy = SY + pad_y;
-  int max_lines_per_screen = (SYSIZE - pad_y) / font_height - 1;
-
-  if (start_line >= max_lines_per_screen)
-    return FALSE;
-
-  DrawText(sx, sy + start_line * font_height, text, font_nr);
-
-  return TRUE;
+  DrawText(SX + xpos, SY + ypos, text, font_nr);
 }
 
-static int PrintElementDescriptionFromFile(char *filename, int start_line)
+static int PrintElementDescriptionFromFile(char *filename, int font_nr,
+					   int xpos, int ypos)
 {
-  int font_nr = FONT_TEXT_2;
   int font_width = getFontWidth(font_nr);
   int font_height = getFontHeight(font_nr);
-  int pad_x = ED_ELEMENT_SETTINGS_X(0);
-  int pad_y = ED_ELEMENT_SETTINGS_Y(0) + ED_GADGET_SMALL_DISTANCE;
-  int sx = SX + pad_x;
-  int sy = SY + pad_y + start_line * font_height;
-  int max_chars_per_line = (SXSIZE - 2 * pad_x) / font_width;
-  int max_lines_per_screen = (SYSIZE - pad_y) / font_height - 1;
-  int max_lines_drawable = max_lines_per_screen - start_line;
+  int max_chars_per_line = (SXSIZE - 2 * xpos) / font_width;
+  int max_lines_drawable = (SYSIZE - ypos) / font_height - 1;
 
-  if (start_line >= max_lines_per_screen)
-    return FALSE;
-
-  return DrawTextFile(sx, sy, filename, font_nr, max_chars_per_line, -1,
-		      max_lines_drawable, 0, -1, TRUE, FALSE, FALSE);
+  return DrawTextFile(SX + xpos, SY + ypos, filename, font_nr,
+		      max_chars_per_line, -1, max_lines_drawable, 0, -1,
+		      TRUE, FALSE, FALSE);
 }
 
 static void DrawPropertiesInfo()
@@ -8698,23 +8679,34 @@ static void DrawPropertiesInfo()
   char *filename = getElementDescriptionFilename(properties_element);
   char *percentage_text = "In this level: ";
   char *properties_text = "Standard properties: ";
+  char *description_text = "Description:";
+  char *no_description_text = "No description available.";
+  char *none_text = "None";
   float percentage;
   int num_elements_in_level;
   int num_standard_properties = 0;
   int font1_nr = FONT_TEXT_1;
   int font2_nr = FONT_TEXT_2;
   int font1_width = getFontWidth(font1_nr);
+  int font1_height = getFontHeight(font1_nr);
   int font2_height = getFontHeight(font2_nr);
-  int pad_x = ED_ELEMENT_SETTINGS_X(0);
-  int pad_y = ED_ELEMENT_SETTINGS_Y(0) + ED_GADGET_SMALL_DISTANCE;
-  int screen_line = 0;
+  int line1_height = font1_height + ED_GADGET_LINE_DISTANCE;
+  int font2_yoffset = (font1_height - font2_height) / 2;
+  int percentage_text_len = strlen(percentage_text) * font1_width;
+  int properties_text_len = strlen(properties_text) * font1_width;
+  int xpos = ED_ELEMENT_SETTINGS_X(0);
+  int ypos = ED_ELEMENT_SETTINGS_Y(0) + ED_GADGET_SMALL_DISTANCE;
   int i, x, y;
 
   if (setup.editor.show_element_token)
   {
-    DrawTextF(pad_x, pad_y + screen_line++ * font2_height, FONT_TEXT_3,
+    int font3_nr = FONT_TEXT_3;
+    int font3_height = getFontHeight(font3_nr);
+
+    DrawTextF(xpos, ypos, font3_nr,
 	      "[%s]", element_info[properties_element].token_name);
-    screen_line++;
+
+    ypos += 2 * font3_height;
   }
 
   /* ----- print number of elements / percentage of this element in level */
@@ -8726,40 +8718,53 @@ static void DrawPropertiesInfo()
 	num_elements_in_level++;
   percentage = num_elements_in_level * 100.0 / (lev_fieldx * lev_fieldy);
 
-  DrawTextS(pad_x, pad_y + screen_line * font2_height, font1_nr,
-	    percentage_text);
-  DrawTextF(pad_x + strlen(percentage_text) * font1_width,
-	    pad_y + screen_line++ * font2_height, font2_nr,
-	    "%d (%.2f%%)", num_elements_in_level, percentage);
+  DrawTextS(xpos, ypos, font1_nr, percentage_text);
 
-  screen_line++;
+  if (num_elements_in_level > 0)
+    DrawTextF(xpos + percentage_text_len, ypos + font2_yoffset, font2_nr,
+	      "%d (%.2f %%)", num_elements_in_level, percentage);
+  else
+    DrawTextF(xpos + percentage_text_len, ypos + font2_yoffset, font2_nr,
+	      none_text);
+
+  ypos += 2 * MAX(font1_height, font2_height);
 
   /* ----- print standard properties of this element */
 
-  DrawTextS(pad_x, pad_y + screen_line++ * font2_height, font1_nr,
-	    properties_text);
+  DrawTextS(xpos, ypos, font1_nr, properties_text);
+
+  ypos += line1_height;
 
   for (i = 0; properties[i].value != -1; i++)
   {
     if (!HAS_PROPERTY(properties_element, properties[i].value))
       continue;
 
-    DrawTextS(pad_x, pad_y + screen_line++ * font2_height, font2_nr,
-	      properties[i].text);
+    DrawTextS(xpos, ypos, font2_nr, properties[i].text);
+
+    ypos += font2_height;
+
     num_standard_properties++;
   }
 
   if (num_standard_properties == 0)
-    DrawTextS(pad_x + strlen(properties_text) * font1_width,
-	      pad_y + (screen_line - 1) * font2_height, font2_nr, "none");
+  {
+    DrawTextS(xpos + properties_text_len, ypos - line1_height + font2_yoffset,
+	      font2_nr, none_text);
 
-  screen_line++;
+    ypos -= (line1_height - font1_height);
+  }
+
+  ypos += MAX(font1_height, font2_height);
 
   /* ----- print special description of this element */
 
-  PrintInfoText("Description:", FONT_TEXT_1, screen_line);
-  if (PrintElementDescriptionFromFile(filename, screen_line + 1) == 0)
-    PrintInfoText("No description available.", FONT_TEXT_1, screen_line);
+  PrintInfoText(description_text, font1_nr, xpos, ypos);
+
+  ypos += line1_height;
+
+  if (PrintElementDescriptionFromFile(filename, font2_nr, xpos, ypos) == 0)
+    PrintInfoText(no_description_text, font1_nr, xpos, ypos - line1_height);
 }
 
 #define TEXT_COLLECTING		"Score for collecting"
@@ -8922,7 +8927,11 @@ static void DrawPropertiesConfig()
 
   if (!checkPropertiesConfig(properties_element))
   {
-    PrintInfoText("No configuration options available.", FONT_TEXT_1, 0);
+    int xpos = ED_ELEMENT_SETTINGS_X(0);
+    int ypos = ED_ELEMENT_SETTINGS_Y(0) + ED_GADGET_SMALL_DISTANCE;
+
+    PrintInfoText("No configuration options available.",
+		  FONT_TEXT_1, xpos, ypos);
 
     return;
   }
