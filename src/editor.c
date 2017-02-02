@@ -874,8 +874,8 @@
 
 /* values for checkbutton gadgets */
 #define ED_CHECKBUTTON_ID_RANDOM_RESTRICTED	0
-#define ED_CHECKBUTTON_ID_CUSTOM_USE_TEMPLATE_2	1
-#define ED_CHECKBUTTON_ID_CUSTOM_USE_TEMPLATE_3	2
+#define ED_CHECKBUTTON_ID_CUSTOM_USE_TEMPLATE_3	1
+#define ED_CHECKBUTTON_ID_CUSTOM_USE_TEMPLATE_2	2
 #define ED_CHECKBUTTON_ID_STICK_ELEMENT		3
 #define ED_CHECKBUTTON_ID_EM_SLIPPERY_GEMS	4
 #define ED_CHECKBUTTON_ID_EM_EXPLODES_BY_FIRE	5
@@ -932,7 +932,7 @@
 #define ED_NUM_CHECKBUTTONS			55
 
 #define ED_CHECKBUTTON_ID_EDITOR_FIRST	ED_CHECKBUTTON_ID_RANDOM_RESTRICTED
-#define ED_CHECKBUTTON_ID_EDITOR_LAST	ED_CHECKBUTTON_ID_CUSTOM_USE_TEMPLATE_3
+#define ED_CHECKBUTTON_ID_EDITOR_LAST	ED_CHECKBUTTON_ID_CUSTOM_USE_TEMPLATE_2
 
 #define ED_CHECKBUTTON_ID_CUSTOM1_FIRST	ED_CHECKBUTTON_ID_CUSTOM_USE_GRAPHIC
 #define ED_CHECKBUTTON_ID_CUSTOM1_LAST	ED_CHECKBUTTON_ID_CUSTOM_INDESTRUCTIBLE
@@ -2636,13 +2636,14 @@ static struct
     -1,					-1,
     GADGET_ID_SAVE_AS_TEMPLATE_1,	GADGET_ID_CUSTOM_USE_TEMPLATE_1,
     -1,					"Save",
-    NULL, " ", "As Template",		"Save current settings as new template"
+    NULL, " ",				"As Template",
+    "Save current settings as new template"
   },
   {
-    ED_LEVEL_SETTINGS_XPOS(0),		ED_LEVEL_SETTINGS_YPOS(3),
+    ED_LEVEL_SETTINGS_XPOS(0),		ED_LEVEL_SETTINGS_YPOS(6),
     GADGET_ID_SAVE_AS_TEMPLATE_2,	GADGET_ID_NONE,
     -1,					"Save",
-    "Template for new levels and CE/GE:", NULL, "this level as level template",
+    NULL, NULL,				"this level as level template",
     "Save current settings as new template"
   },
   {
@@ -2808,7 +2809,7 @@ static struct
   int gadget_id;
   int gadget_id_align;
   boolean *value;
-  char *text_left, *text_right, *infotext;
+  char *text_above, *text_left, *text_right, *infotext;
 } checkbutton_info[ED_NUM_CHECKBUTTONS] =
 {
   /* ---------- level and editor settings ---------------------------------- */
@@ -2817,22 +2818,22 @@ static struct
     ED_LEVEL_SETTINGS_XPOS(0),		ED_LEVEL_SETTINGS_YPOS(1),
     GADGET_ID_RANDOM_RESTRICTED,	GADGET_ID_NONE,
     &random_placement_background_restricted,
-    NULL,
+    NULL, NULL,
     "restrict random placement to:",	"set random placement restriction"
   },
   {
     ED_LEVEL_SETTINGS_XPOS(0),		ED_LEVEL_SETTINGS_YPOS(4),
-    GADGET_ID_CUSTOM_USE_TEMPLATE_2,	GADGET_ID_NONE,
-    &level.use_custom_template,
-    NULL,
-    "use template for custom elements",	"use template for custom properties"
+    GADGET_ID_CUSTOM_USE_TEMPLATE_3,	GADGET_ID_NONE,
+    &setup.editor.use_template_for_new_levels,
+    "Template for new levels and CE/GE:", NULL,
+    "use template for new levels",	"use template for level properties"
   },
   {
     ED_LEVEL_SETTINGS_XPOS(0),		ED_LEVEL_SETTINGS_YPOS(5),
-    GADGET_ID_CUSTOM_USE_TEMPLATE_3,	GADGET_ID_NONE,
-    &setup.editor.use_template_for_new_levels,
-    NULL,
-    "use template for new levels",	"use template for level properties"
+    GADGET_ID_CUSTOM_USE_TEMPLATE_2,	GADGET_ID_NONE,
+    &level.use_custom_template,
+    NULL, NULL,
+    "use template for custom elements",	"use template for custom properties"
   },
 
   /* ---------- element settings: configure (various elements) ------------- */
@@ -2841,189 +2842,189 @@ static struct
     ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(0),
     GADGET_ID_STICK_ELEMENT,		GADGET_ID_NONE,
     &stick_element_properties_window,
-    NULL,
+    NULL, NULL,
     "stick this screen to edit content","stick this screen to edit content"
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(1),
     GADGET_ID_EM_SLIPPERY_GEMS,		GADGET_ID_NONE,
     &level.em_slippery_gems,
-    NULL,
+    NULL, NULL,
     "slip down from certain flat walls","use EM/DC style slipping behaviour"
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(1),
     GADGET_ID_EM_EXPLODES_BY_FIRE,	GADGET_ID_NONE,
     &level.em_explodes_by_fire,
-    NULL,
+    NULL, NULL,
     "explodes with chain reaction",	"use R'n'D style explosion behaviour"
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(2),
     GADGET_ID_USE_SPRING_BUG,		GADGET_ID_NONE,
     &level.use_spring_bug,
-    NULL,
+    NULL, NULL,
     "use spring pushing bug",		"use odd spring pushing behaviour"
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(1),
     GADGET_ID_USE_TIME_ORB_BUG,		GADGET_ID_NONE,
     &level.use_time_orb_bug,
-    NULL,
+    NULL, NULL,
     "use time orb bug",			"use odd time orb behaviour"
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(2),
     GADGET_ID_RANDOM_BALL_CONTENT,	GADGET_ID_NONE,
     &level.ball_random,
-    NULL,
+    NULL, NULL,
     "create single random element",	"only create one element from content"
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(1),
     GADGET_ID_INITIAL_BALL_STATE,	GADGET_ID_NONE,
     &level.ball_state_initial,
-    NULL,
+    NULL, NULL,
     "magic ball initially activated",	"activate magic ball after level start"
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(0),
     GADGET_ID_GROW_INTO_DIGGABLE,	GADGET_ID_NONE,
     &level.grow_into_diggable,
-    NULL,
+    NULL, NULL,
     "can grow into anything diggable",	"grow into more than just sand"
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(0),
     GADGET_ID_AUTO_EXIT_SOKOBAN,	GADGET_ID_NONE,
     &level.auto_exit_sokoban,
-    NULL,
+    NULL, NULL,
     "exit level if all fields solved",	"automatically finish Sokoban levels"
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(9),
     GADGET_ID_CONTINUOUS_SNAPPING,	GADGET_ID_NONE,
     &level.continuous_snapping,
-    NULL,
+    NULL, NULL,
     "continuous snapping",		"use snapping without releasing key"
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(8),
     GADGET_ID_BLOCK_SNAP_FIELD,		GADGET_ID_NONE,
     &level.block_snap_field,
-    NULL,
+    NULL, NULL,
     "block snapped field when snapping", "use snapping delay to show animation"
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(2),
     GADGET_ID_BLOCK_LAST_FIELD,		GADGET_ID_NONE,
     &level.block_last_field,
-    NULL,
+    NULL, NULL,
     "block last field when moving",	"player blocks last field when moving"
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(2),
     GADGET_ID_SP_BLOCK_LAST_FIELD,	GADGET_ID_NONE,
     &level.sp_block_last_field,
-    NULL,
+    NULL, NULL,
     "block last field when moving",	"player blocks last field when moving"
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(3),
     GADGET_ID_INSTANT_RELOCATION,	GADGET_ID_NONE,
     &level.instant_relocation,
-    NULL,
+    NULL, NULL,
     "no scrolling when relocating",	"player gets relocated without delay"
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(4),
     GADGET_ID_SHIFTED_RELOCATION,	GADGET_ID_NONE,
     &level.shifted_relocation,
-    NULL,
+    NULL, NULL,
     "no centering when relocating",	"level not centered after relocation"
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(5),
     GADGET_ID_LAZY_RELOCATION,		GADGET_ID_NONE,
     &level.lazy_relocation,
-    NULL,
+    NULL, NULL,
     "only redraw off-screen relocation","no redraw if relocation target visible"
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(10),
     GADGET_ID_USE_START_ELEMENT,	GADGET_ID_NONE,
     &level.use_start_element[0],
-    NULL,
+    NULL, NULL,
     "use level start element:",	       "start level at this element's position"
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(11),
     GADGET_ID_USE_ARTWORK_ELEMENT,	GADGET_ID_NONE,
     &level.use_artwork_element[0],
-    NULL,
+    NULL, NULL,
     "use artwork from element:",	"use player artwork from other element"
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(12),
     GADGET_ID_USE_EXPLOSION_ELEMENT,	GADGET_ID_NONE,
     &level.use_explosion_element[0],
-    NULL,
+    NULL, NULL,
     "use explosion from element:",	"use explosion properties from element"
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(13),
     GADGET_ID_INITIAL_GRAVITY,		GADGET_ID_NONE,
     &level.initial_player_gravity[0],
-    NULL,
+    NULL, NULL,
     "use initial gravity",		"set initial player gravity"
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(1),
     GADGET_ID_USE_INITIAL_INVENTORY,	GADGET_ID_NONE,
     &level.use_initial_inventory[0],
-    NULL,
+    NULL, NULL,
     "use initial inventory:",		"use collected elements on level start"
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(6),
     GADGET_ID_CAN_PASS_TO_WALKABLE,	GADGET_ID_NONE,
     &level.can_pass_to_walkable,
-    NULL,
+    NULL, NULL,
     "can pass to walkable element",	"player can pass to empty or walkable"
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(1),
     GADGET_ID_CAN_FALL_INTO_ACID,	GADGET_ID_NONE,
     &custom_element_properties[EP_CAN_MOVE_INTO_ACID],
-    NULL,
+    NULL, NULL,
     "can fall into acid (with gravity)","player can fall into acid pool"
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(0),
     GADGET_ID_CAN_MOVE_INTO_ACID,	GADGET_ID_NONE,
     &custom_element_properties[EP_CAN_MOVE_INTO_ACID],
-    NULL,
+    NULL, NULL,
     "can move into acid",		"element can move into acid pool"
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(1),
     GADGET_ID_DONT_COLLIDE_WITH,	GADGET_ID_NONE,
     &custom_element_properties[EP_DONT_COLLIDE_WITH],
-    NULL,
+    NULL, NULL,
     "deadly when colliding with",	"element is deadly when hitting player"
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(1),
     GADGET_ID_ENVELOPE_AUTOWRAP,	GADGET_ID_NONE,
     &level.envelope[0].autowrap,
-    NULL,
+    NULL, NULL,
     "auto-wrap",			"automatically wrap envelope text"
   },
   {
     -1,					ED_ELEMENT_SETTINGS_YPOS(1),
     GADGET_ID_ENVELOPE_CENTERED,	GADGET_ID_ENVELOPE_AUTOWRAP,
     &level.envelope[0].centered,
-    " ",
+    NULL, " ",
     "centered",				"automatically center envelope text"
   },
 
@@ -3033,49 +3034,49 @@ static struct
     ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(1),
     GADGET_ID_CUSTOM_USE_GRAPHIC,	GADGET_ID_NONE,
     &custom_element.use_gfx_element,
-    NULL,
+    NULL, NULL,
     "use graphic of element:",		"use existing element graphic"
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(14),
     GADGET_ID_CUSTOM_USE_TEMPLATE_1,	GADGET_ID_NONE,
     &level.use_custom_template,
-    NULL,
+    NULL, NULL,
     "use template",			"use template for custom properties"
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(2),
     GADGET_ID_CUSTOM_ACCESSIBLE,	GADGET_ID_NONE,
     &custom_element_properties[EP_ACCESSIBLE],
-    NULL,
+    NULL, NULL,
     NULL,				"player can walk to or pass this field"
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(9),
     GADGET_ID_CUSTOM_GRAV_REACHABLE,	GADGET_ID_NONE,
     &custom_element_properties[EP_GRAVITY_REACHABLE],
-    NULL,
+    NULL, NULL,
     "reachable despite gravity",	"player can walk/dig despite gravity"
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(11),
     GADGET_ID_CUSTOM_USE_LAST_VALUE,	GADGET_ID_NONE,
     &custom_element.use_last_ce_value,
-    NULL,
+    NULL, NULL,
     "use last CE value after change",	"use last CE value after change"
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(4),
     GADGET_ID_CUSTOM_WALK_TO_OBJECT,	GADGET_ID_NONE,
     &custom_element_properties[EP_WALK_TO_OBJECT],
-    NULL,
+    NULL, NULL,
     NULL,				"player can dig/collect/push element"
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(8),
     GADGET_ID_CUSTOM_INDESTRUCTIBLE,	GADGET_ID_NONE,
     &custom_element_properties[EP_INDESTRUCTIBLE],
-    NULL,
+    NULL, NULL,
     "indestructible",			"element is indestructible"
   },
 
@@ -3085,63 +3086,63 @@ static struct
     ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(1),
     GADGET_ID_CUSTOM_CAN_MOVE,		GADGET_ID_NONE,
     &custom_element_properties[EP_CAN_MOVE],
-    NULL,
+    NULL, NULL,
     NULL,				"element can move with some pattern"
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(7),
     GADGET_ID_CUSTOM_CAN_FALL,		GADGET_ID_NONE,
     &custom_element_properties[EP_CAN_FALL],
-    NULL,
+    NULL, NULL,
     "can fall",				"element can fall down"
   },
   {
     -1,					ED_ELEMENT_SETTINGS_YPOS(7),
     GADGET_ID_CUSTOM_CAN_SMASH,		GADGET_ID_CUSTOM_CAN_FALL,
     &custom_element_properties[EP_CAN_SMASH],
-    " ",
+    NULL, " ",
     NULL,				"element can smash other elements"
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(8),
     GADGET_ID_CUSTOM_SLIPPERY,		GADGET_ID_NONE,
     &custom_element_properties[EP_SLIPPERY],
-    NULL,
+    NULL, NULL,
     NULL,				"other elements can fall down from it"
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(9),
     GADGET_ID_CUSTOM_DEADLY,		GADGET_ID_NONE,
     &custom_element_properties[EP_DEADLY],
-    NULL,
+    NULL, NULL,
     NULL,				"element can kill the player"
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(10),
     GADGET_ID_CUSTOM_CAN_EXPLODE,	GADGET_ID_NONE,
     &custom_element_properties[EP_CAN_EXPLODE],
-    NULL,
+    NULL, NULL,
     NULL,				"element can explode"
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(1),	ED_ELEMENT_SETTINGS_YPOS(11),
     GADGET_ID_CUSTOM_EXPLODE_FIRE,	GADGET_ID_NONE,
     &custom_element_properties[EP_EXPLODES_BY_FIRE],
-    NULL,
+    NULL, NULL,
     "by fire",				"element can explode by fire/explosion"
   },
   {
     -1,					ED_ELEMENT_SETTINGS_YPOS(11),
     GADGET_ID_CUSTOM_EXPLODE_SMASH,	GADGET_ID_CUSTOM_EXPLODE_FIRE,
     &custom_element_properties[EP_EXPLODES_SMASHED],
-    " ",
+    NULL, " ",
     "smashed",				"element can explode when smashed"
   },
   {
     -1,					ED_ELEMENT_SETTINGS_YPOS(11),
     GADGET_ID_CUSTOM_EXPLODE_IMPACT,	GADGET_ID_CUSTOM_EXPLODE_SMASH,
     &custom_element_properties[EP_EXPLODES_IMPACT],
-    " ",
+    NULL, " ",
     "impact",				"element can explode on impact"
   },
 
@@ -3151,63 +3152,63 @@ static struct
     ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(1),
     GADGET_ID_CUSTOM_CAN_CHANGE,	GADGET_ID_NONE,
     &custom_element_change.can_change,
-    NULL,
+    NULL, NULL,
     "element changes to:",		"change element on specified condition"
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(1),	ED_ELEMENT_SETTINGS_YPOS(2),
     GADGET_ID_CHANGE_DELAY,		GADGET_ID_NONE,
     &custom_element_change_events[CE_DELAY],
-    NULL,
+    NULL, NULL,
     NULL,				"element changes after delay"
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(1),	ED_ELEMENT_SETTINGS_YPOS(4),
     GADGET_ID_CHANGE_BY_DIRECT_ACT,	GADGET_ID_NONE,
     &custom_element_change_events[CE_BY_DIRECT_ACTION],
-    NULL,
+    NULL, NULL,
     NULL,				"element changes by direct action"
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(1),	ED_ELEMENT_SETTINGS_YPOS(5),
     GADGET_ID_CHANGE_BY_OTHER_ACT,	GADGET_ID_NONE,
     &custom_element_change_events[CE_BY_OTHER_ACTION],
-    NULL,
+    NULL, NULL,
     NULL,				"element changes by other element"
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(1),	ED_ELEMENT_SETTINGS_YPOS(8),
     GADGET_ID_CHANGE_USE_EXPLOSION,	GADGET_ID_NONE,
     &custom_element_change.explode,
-    NULL,
+    NULL, NULL,
     "explode instead of change",	"element explodes instead of change"
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(1),	ED_ELEMENT_SETTINGS_YPOS(9),
     GADGET_ID_CHANGE_USE_CONTENT,	GADGET_ID_NONE,
     &custom_element_change.use_target_content,
-    NULL,
+    NULL, NULL,
     "use extended change target:",	"element changes to more elements"
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(2),	ED_ELEMENT_SETTINGS_YPOS(11),
     GADGET_ID_CHANGE_ONLY_COMPLETE,	GADGET_ID_NONE,
     &custom_element_change.only_if_complete,
-    NULL,
+    NULL, NULL,
     "replace all or nothing",		"only replace when all can be changed"
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(2),	ED_ELEMENT_SETTINGS_YPOS(12),
     GADGET_ID_CHANGE_USE_RANDOM,	GADGET_ID_NONE,
     &custom_element_change.use_random_replace,
-    NULL,
+    NULL, NULL,
     NULL,				"use percentage for random replace"
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(13),
     GADGET_ID_CHANGE_HAS_ACTION,	GADGET_ID_NONE,
     &custom_element_change.has_action,
-    NULL,
+    NULL, NULL,
     NULL,				"execute action on specified condition"
   },
 };
@@ -6886,7 +6887,10 @@ static void MapCheckbuttonGadget(int id)
   struct GadgetInfo *gi = level_editor_gadget[checkbutton_info[id].gadget_id];
   int xoffset_left = getTextWidthForGadget(checkbutton_info[id].text_left);
   int xoffset_right = ED_GADGET_TEXT_DISTANCE;
+  int yoffset_above = font_height + ED_GADGET_LINE_DISTANCE;
   int yoffset = (gi->height - font_height) / 2;
+  int y_above = gi->y - yoffset_above;
+  int x = gi->x;
   int x_left, x_right, y;	/* set after gadget position was modified */
 
   /* set position for gadgets with dynamically determined position */
@@ -6897,6 +6901,9 @@ static void MapCheckbuttonGadget(int id)
   x_left = gi->x - xoffset_left;
   x_right = gi->x + gi->width + xoffset_right;
   y = gi->y + yoffset;
+
+  if (checkbutton_info[id].text_above)
+    DrawText(x, y_above, checkbutton_info[id].text_above, font_nr);
 
   if (checkbutton_info[id].text_left)
     DrawText(x_left, y, checkbutton_info[id].text_left, font_nr);
