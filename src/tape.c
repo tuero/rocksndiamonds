@@ -456,6 +456,44 @@ void TapeDeactivateDisplayOff(boolean redraw_display)
 
 
 /* ========================================================================= */
+/* tape logging functions                                                    */
+/* ========================================================================= */
+
+void PrintTapeReplayProgress(boolean replay_finished)
+{
+  static unsigned int counter_last = -1;
+  unsigned int counter = Counter();
+  unsigned int counter_seconds  = counter / 1000;
+
+  if (!replay_finished)
+  {
+    unsigned int counter_delay = 50;
+
+    if (counter > counter_last + counter_delay)
+    {
+      PrintNoLog("\r");
+      PrintNoLog("Level %03d [%02d:%02d]: [%02d:%02d] - playing tape ... ",
+		 level_nr, tape.length_seconds / 60, tape.length_seconds % 60,
+		 TapeTime / 60, TapeTime % 60);
+
+      counter_last = counter;
+    }
+  }
+  else
+  {
+    PrintNoLog("\r");
+    Print("Level %03d [%02d:%02d]: (%02d:%02d.%03d / %.2f %%) - %s.\n",
+	  level_nr, tape.length_seconds / 60, tape.length_seconds % 60,
+	  counter_seconds / 60, counter_seconds % 60, counter % 1000,
+	  (float)counter / tape.length_seconds / 10,
+	  tape.auto_play_level_solved ? "solved" : "NOT SOLVED");
+
+    counter_last = -1;
+  }
+}
+
+
+/* ========================================================================= */
 /* tape control functions                                                    */
 /* ========================================================================= */
 
@@ -854,6 +892,9 @@ byte *TapePlayAction()
     tape.delay_played = 0;
   }
 
+  if (tape.auto_play)
+    PrintTapeReplayProgress(FALSE);
+
   return action;
 }
 
@@ -1052,7 +1093,7 @@ void AutoPlayTape()
   if (autoplay_initialized)
   {
     /* just finished auto-playing tape */
-    Print("%s.\n", tape.auto_play_level_solved ? "solved" : "NOT SOLVED");
+    PrintTapeReplayProgress(TRUE);
 
     num_levels_played++;
 
@@ -1109,18 +1150,18 @@ void AutoPlayTape()
 
     TapeErase();
 
-    Print("Level %03d: ", level_nr);
-
     LoadLevel(level_nr);
+
     if (level.no_level_file || level.no_valid_file)
     {
-      Print("(no level)\n");
+      Print("Level %03d: (no level)\n", level_nr);
+
       continue;
     }
 
 #if 0
     /* ACTIVATE THIS FOR LOADING/TESTING OF LEVELS ONLY */
-    Print("(only testing level)\n");
+    Print("Level %03d: (only testing level)\n", level_nr);
     continue;
 #endif
 
@@ -1133,12 +1174,12 @@ void AutoPlayTape()
     {
       num_tape_missing++;
 
-      Print("(no tape)\n");
+      Print("Level %03d: (no tape)\n", level_nr);
 
       continue;
     }
 
-    Print("playing tape ... ");
+    InitCounter();
 
     TapeStartGamePlaying();
     TapeStartWarpForward(global.autoplay_mode);

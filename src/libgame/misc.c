@@ -222,6 +222,18 @@ void Print(char *format, ...)
   va_end(ap);
 }
 
+void PrintNoLog(char *format, ...)
+{
+  FILE *file = program.log_file_default[LOG_OUT_ID];
+  va_list ap;
+
+  va_start(ap, format);
+  vfprintf(file, format, ap);
+  va_end(ap);
+
+  fflush(file);
+}
+
 void PrintLine(char *line_chars, int line_length)
 {
   int i;

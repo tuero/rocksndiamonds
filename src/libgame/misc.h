@@ -119,6 +119,7 @@ void printf_line(char *, int);
 void printf_line_with_prefix(char *, char *, int);
 
 void Print(char *, ...);
+void PrintNoLog(char *, ...);
 void PrintLine(char *, int);
 void PrintLineWithPrefix(char *, char *, int);
 
