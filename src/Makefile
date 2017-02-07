@@ -195,7 +195,10 @@ GAME_EM = $(GAME_EM_DIR)/game_em.a
 GAME_SP_DIR = game_sp
 GAME_SP = $(GAME_SP_DIR)/game_sp.a
 
-RNDLIBS = $(LIBGAME) $(GAME_EM) $(GAME_SP)
+GAME_MM_DIR = game_mm
+GAME_MM = $(GAME_MM_DIR)/game_mm.a
+
+RNDLIBS = $(LIBGAME) $(GAME_EM) $(GAME_SP) $(GAME_MM)
 AUTOCONF = conf_gfx.h conf_snd.h conf_mus.h
 
 ICONBASE = windows_icon
@@ -213,7 +216,7 @@ GRAPHICS_DIR = ../graphics
 # build targets
 # -----------------------------------------------------------------------------
 
-all: $(AUTOCONF) libgame_dir game_em_dir game_sp_dir $(PROGNAME) graphics_dir
+all: $(AUTOCONF) libgame_dir game_em_dir game_sp_dir game_mm_dir $(PROGNAME) graphics_dir
 
 $(PROGNAME): $(RNDLIBS) $(TIMESTAMP_FILE) $(OBJS) $(ICON)
 	$(CC) $(PROFILING) $(OBJS) $(ICON) $(RNDLIBS) $(LDFLAGS) -o $(PROGNAME)
@@ -235,6 +238,11 @@ game_sp_dir:
 	@$(MAKE) -C $(GAME_SP_DIR)
 $(GAME_SP):
 	@$(MAKE) -C $(GAME_SP_DIR)
+
+game_mm_dir:
+	@$(MAKE) -C $(GAME_MM_DIR)
+$(GAME_MM):
+	@$(MAKE) -C $(GAME_MM_DIR)
 
 auto-conf:
 	@for i in $(CNFS); do			\
@@ -276,6 +284,7 @@ clean-obj:
 	$(MAKE) -C $(LIBGAME_DIR) clean
 	$(MAKE) -C $(GAME_EM_DIR) clean
 	$(MAKE) -C $(GAME_SP_DIR) clean
+	$(MAKE) -C $(GAME_MM_DIR) clean
 	$(RM) $(OBJS)
 	$(RM) $(RNDLIBS)
 
@@ -314,12 +323,13 @@ valgrind:
 # -----------------------------------------------------------------------------
 
 tags:
-	$(ETAGS) *.[ch] $(LIBGAME_DIR)/*.[ch] $(GAME_EM_DIR)/*.[ch] $(GAME_SP_DIR)/*.[ch]
+	$(ETAGS) *.[ch] $(LIBGAME_DIR)/*.[ch] $(GAME_EM_DIR)/*.[ch] $(GAME_SP_DIR)/*.[ch] $(GAME_MM_DIR)/*.[ch]
 
 depend:
 	$(MAKE) -C $(LIBGAME_DIR) depend
 	$(MAKE) -C $(GAME_EM_DIR) depend
 	$(MAKE) -C $(GAME_SP_DIR) depend
+	$(MAKE) -C $(GAME_MM_DIR) depend
 	for i in $(SRCS); do $(CPP) $(CFLAGS) -M $$i; done > .depend
 
 ifeq (.depend,$(wildcard .depend))

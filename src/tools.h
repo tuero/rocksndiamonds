@@ -219,6 +219,9 @@ int map_element_RND_to_SP(int);
 int map_element_SP_to_RND(int);
 int map_action_SP_to_RND(int);
 
+int map_element_RND_to_MM(int);
+int map_element_MM_to_RND(int);
+
 int get_next_element(int);
 int el_act_dir2img(int, int, int);
 int el_act2img(int, int);

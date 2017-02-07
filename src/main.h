@@ -23,6 +23,7 @@
 #include "libgame/libgame.h"
 #include "game_em/game_em.h"
 #include "game_sp/game_sp.h"
+#include "game_mm/game_mm.h"
 
 #include "conf_gfx.h"	/* include auto-generated data structure definitions */
 #include "conf_snd.h"	/* include auto-generated data structure definitions */
@@ -2140,14 +2141,16 @@
 #define LEVEL_FILE_TYPE_DX		5
 #define LEVEL_FILE_TYPE_SB		6
 #define LEVEL_FILE_TYPE_DC		7
+#define LEVEL_FILE_TYPE_MM		8
 
-#define NUM_LEVEL_FILE_TYPES		8
+#define NUM_LEVEL_FILE_TYPES		9
 
 /* values for game engine type identifier */
 #define GAME_ENGINE_TYPE_UNKNOWN	LEVEL_FILE_TYPE_UNKNOWN
 #define GAME_ENGINE_TYPE_RND		LEVEL_FILE_TYPE_RND
 #define GAME_ENGINE_TYPE_EM		LEVEL_FILE_TYPE_EM
 #define GAME_ENGINE_TYPE_SP		LEVEL_FILE_TYPE_SP
+#define GAME_ENGINE_TYPE_MM		LEVEL_FILE_TYPE_MM
 
 #define NUM_ENGINE_TYPES		4
 
@@ -2518,6 +2521,7 @@ struct LevelInfo
   /* level stored in native format for the alternative native game engines */
   struct LevelInfo_EM *native_em_level;
   struct LevelInfo_SP *native_sp_level;
+  struct LevelInfo_MM *native_mm_level;
 
   int file_version;	/* file format version the level is stored with    */
   int game_version;	/* game release version the level was created with */

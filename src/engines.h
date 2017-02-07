@@ -16,6 +16,7 @@
 
 #include "game_em/export.h"
 #include "game_sp/export.h"
+#include "game_mm/export.h"
 
 #include "game.h"
 
@@ -49,6 +50,16 @@ void CheckSingleStepMode_SP(boolean, boolean);
 void getGraphicSource_SP(struct GraphicInfo_SP *, int, int, int, int);
 int getGraphicInfo_Delay(int);
 boolean isNextAnimationFrame_SP(int, int);
+
+
+/* ========================================================================= */
+/* functions and definitions exported from main program to game_mm           */
+/* ========================================================================= */
+
+void SetDrawtoField(int);
+
+void getGraphicSource(int, int, Bitmap **, int *, int *);
+void getSizedGraphicSource(int, int, int, Bitmap **, int *, int *);
 
 
 #endif	/* ENGINES_H */

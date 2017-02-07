@@ -1604,6 +1604,7 @@ static void setLevelInfoToDefaults_Level(struct LevelInfo *level)
 
   level->native_em_level = &native_em_level;
   level->native_sp_level = &native_sp_level;
+  level->native_mm_level = &native_mm_level;
 
   level->file_version = FILE_VERSION_ACTUAL;
   level->game_version = GAME_VERSION_ACTUAL;
@@ -3870,6 +3871,74 @@ static void CopyNativeTape_SP_to_RND(struct LevelInfo *level)
 
 
 /* ------------------------------------------------------------------------- */
+/* functions for loading MM level                                            */
+/* ------------------------------------------------------------------------- */
+
+void CopyNativeLevel_RND_to_MM(struct LevelInfo *level)
+{
+  struct LevelInfo_MM *level_mm = level->native_mm_level;
+  int x, y;
+
+  level_mm->file_version = level->file_version;
+  level_mm->game_version = level->game_version;
+  level_mm->encoding_16bit_field = level->encoding_16bit_field;
+
+  level_mm->fieldx = MIN(level->fieldx, MM_MAX_PLAYFIELD_WIDTH);
+  level_mm->fieldy = MIN(level->fieldx, MM_MAX_PLAYFIELD_HEIGHT);
+
+  level_mm->time = level->time;
+  level_mm->kettles_needed = level->gems_needed;
+  level_mm->auto_count_kettles = FALSE;
+  level_mm->laser_red = FALSE;
+  level_mm->laser_green = FALSE;
+  level_mm->laser_blue = TRUE;
+
+  strcpy(level_mm->name, level->name);
+  strcpy(level_mm->author, level->author);
+
+  level_mm->score[SC_PACMAN]     = level->score[SC_PACMAN];
+  level_mm->score[SC_KEY]        = level->score[SC_PACMAN];
+  level_mm->score[SC_TIME_BONUS] = level->score[SC_TIME_BONUS];
+
+  level_mm->amoeba_speed = level->amoeba_speed;
+  level_mm->time_fuse = 0;
+
+  for (y = 0; y < level_mm->fieldx; y++)
+    for (x = 0; x < level_mm->fieldy; x++)
+      level_mm->field[x][y] = map_element_RND_to_MM(level->field[x][y]);
+}
+
+void CopyNativeLevel_MM_to_RND(struct LevelInfo *level)
+{
+  struct LevelInfo_MM *level_mm = level->native_mm_level;
+  int x, y;
+
+  level->file_version = level_mm->file_version;
+  level->game_version = level_mm->game_version;
+  level->encoding_16bit_field = level_mm->encoding_16bit_field;
+
+  level->fieldx = MIN(level_mm->fieldx, MAX_LEV_FIELDX);
+  level->fieldy = MIN(level_mm->fieldx, MAX_LEV_FIELDY);
+
+  level->time = level_mm->time;
+  level->gems_needed = level_mm->kettles_needed;
+
+  strcpy(level->name, level_mm->name);
+  strcpy(level->author, level_mm->author);
+
+  level->score[SC_PACMAN]     = level_mm->score[SC_PACMAN];
+  level->score[SC_KEY]        = level_mm->score[SC_PACMAN];
+  level->score[SC_TIME_BONUS] = level_mm->score[SC_TIME_BONUS];
+
+  level->amoeba_speed = level_mm->amoeba_speed;
+
+  for (y = 0; y < level->fieldx; y++)
+    for (x = 0; x < level->fieldy; x++)
+      level->field[x][y] = map_element_MM_to_RND(level_mm->field[x][y]);
+}
+
+
+/* ------------------------------------------------------------------------- */
 /* functions for loading DC level                                            */
 /* ------------------------------------------------------------------------- */
 
@@ -5898,12 +5967,22 @@ static void LoadLevelFromFileInfo_SP(struct LevelInfo *level,
     level->no_valid_file = TRUE;
 }
 
+static void LoadLevelFromFileInfo_MM(struct LevelInfo *level,
+				     struct LevelFileInfo *level_file_info,
+				     boolean level_info_only)
+{
+  if (!LoadNativeLevel_MM(level_file_info->filename, level_info_only))
+    level->no_valid_file = TRUE;
+}
+
 void CopyNativeLevel_RND_to_Native(struct LevelInfo *level)
 {
   if (level->game_engine_type == GAME_ENGINE_TYPE_EM)
     CopyNativeLevel_RND_to_EM(level);
   else if (level->game_engine_type == GAME_ENGINE_TYPE_SP)
     CopyNativeLevel_RND_to_SP(level);
+  else if (level->game_engine_type == GAME_ENGINE_TYPE_MM)
+    CopyNativeLevel_RND_to_MM(level);
 }
 
 void CopyNativeLevel_Native_to_RND(struct LevelInfo *level)
@@ -5912,6 +5991,8 @@ void CopyNativeLevel_Native_to_RND(struct LevelInfo *level)
     CopyNativeLevel_EM_to_RND(level);
   else if (level->game_engine_type == GAME_ENGINE_TYPE_SP)
     CopyNativeLevel_SP_to_RND(level);
+  else if (level->game_engine_type == GAME_ENGINE_TYPE_MM)
+    CopyNativeLevel_MM_to_RND(level);
 }
 
 void SaveNativeLevel(struct LevelInfo *level)
@@ -5954,6 +6035,11 @@ static void LoadLevelFromFileInfo(struct LevelInfo *level,
     case LEVEL_FILE_TYPE_SP:
       LoadLevelFromFileInfo_SP(level, level_file_info, level_info_only);
       level->game_engine_type = GAME_ENGINE_TYPE_SP;
+      break;
+
+    case LEVEL_FILE_TYPE_MM:
+      LoadLevelFromFileInfo_MM(level, level_file_info, level_info_only);
+      level->game_engine_type = GAME_ENGINE_TYPE_MM;
       break;
 
     case LEVEL_FILE_TYPE_DC:

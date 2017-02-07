@@ -358,12 +358,40 @@ static int getLevelFromScreenY_SP(int sy)
   return ly;
 }
 
+static int getLevelFromScreenX_MM(int sx)
+{
+  int level_xsize = level.native_mm_level->fieldx;
+  int full_xsize = level_xsize * TILESIZE_VAR;
+
+  sx -= (full_xsize < SXSIZE ? (SXSIZE - full_xsize) / 2 : 0);
+
+  int px = sx - SX;
+  int lx = px / TILESIZE_VAR;
+
+  return lx;
+}
+
+static int getLevelFromScreenY_MM(int sy)
+{
+  int level_ysize = level.native_mm_level->fieldy;
+  int full_ysize = level_ysize * TILESIZE_VAR;
+
+  sy -= (full_ysize < SYSIZE ? (SYSIZE - full_ysize) / 2 : 0);
+
+  int py = sy - SY;
+  int ly = py / TILESIZE_VAR;
+
+  return ly;
+}
+
 int getLevelFromScreenX(int x)
 {
   if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
     return getLevelFromScreenX_EM(x);
   if (level.game_engine_type == GAME_ENGINE_TYPE_SP)
     return getLevelFromScreenX_SP(x);
+  if (level.game_engine_type == GAME_ENGINE_TYPE_MM)
+    return getLevelFromScreenX_MM(x);
   else
     return getLevelFromScreenX_RND(x);
 }
@@ -374,6 +402,8 @@ int getLevelFromScreenY(int y)
     return getLevelFromScreenY_EM(y);
   if (level.game_engine_type == GAME_ENGINE_TYPE_SP)
     return getLevelFromScreenY_SP(y);
+  if (level.game_engine_type == GAME_ENGINE_TYPE_MM)
+    return getLevelFromScreenY_MM(y);
   else
     return getLevelFromScreenY_RND(y);
 }
@@ -465,6 +495,8 @@ void RedrawPlayfield()
     RedrawPlayfield_EM(TRUE);
   else if (level.game_engine_type == GAME_ENGINE_TYPE_SP)
     RedrawPlayfield_SP(TRUE);
+  else if (level.game_engine_type == GAME_ENGINE_TYPE_MM)
+    RedrawPlayfield_MM();
   else if (level.game_engine_type == GAME_ENGINE_TYPE_RND)
     RedrawPlayfield_RND();
 
@@ -611,6 +643,8 @@ void BlitScreenToBitmap(Bitmap *target_bitmap)
     BlitScreenToBitmap_EM(target_bitmap);
   else if (level.game_engine_type == GAME_ENGINE_TYPE_SP)
     BlitScreenToBitmap_SP(target_bitmap);
+  else if (level.game_engine_type == GAME_ENGINE_TYPE_MM)
+    BlitScreenToBitmap_MM(target_bitmap);
   else if (level.game_engine_type == GAME_ENGINE_TYPE_RND)
     BlitScreenToBitmap_RND(target_bitmap);
 
@@ -7194,6 +7228,16 @@ int map_action_SP_to_RND(int action_sp)
   }
 }
 
+int map_element_RND_to_MM(int element_rnd)
+{
+  return (element_rnd > 1000 ? element_rnd - 1000 : 0);
+}
+
+int map_element_MM_to_RND(int element_mm)
+{
+  return 1000 + element_mm;
+}
+
 int get_next_element(int element)
 {
   switch (element)
@@ -7438,6 +7482,8 @@ unsigned int InitRND(int seed)
     return InitEngineRandom_EM(seed);
   else if (level.game_engine_type == GAME_ENGINE_TYPE_SP)
     return InitEngineRandom_SP(seed);
+  else if (level.game_engine_type == GAME_ENGINE_TYPE_MM)
+    return InitEngineRandom_MM(seed);
   else
     return InitEngineRandom_RND(seed);
 }
