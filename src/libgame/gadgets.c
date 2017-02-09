@@ -1758,7 +1758,7 @@ boolean HandleGadgets(int mx, int my, int button)
       new_gi->event.type = GD_EVENT_INFO_ENTERING;
       new_gi->callback_info(new_gi);
     }
-    else if (last_info_gi != NULL)
+    else if (last_info_gi != NULL && last_info_gi->mapped)
     {
       last_info_gi->event.type = GD_EVENT_INFO_LEAVING;
       last_info_gi->callback_info(last_info_gi);
