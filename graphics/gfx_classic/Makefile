@@ -23,6 +23,7 @@ EXT = png
 FILES = RocksBusy.$(EXT)		\
 	RocksDC.$(EXT)			\
 	RocksDC2.$(EXT)			\
+	RocksDF.$(EXT)			\
 	RocksDoor.$(EXT)		\
 	RocksDoor2.$(EXT)		\
 	RocksEMC.$(EXT)			\
@@ -33,6 +34,7 @@ FILES = RocksBusy.$(EXT)		\
 	RocksFontMedium.$(EXT)		\
 	RocksFontSmall.$(EXT)		\
 	RocksHeroes.$(EXT)		\
+	RocksMM.$(EXT)			\
 	RocksMore.$(EXT)		\
 	RocksSP.$(EXT)			\
 	RocksScreen.$(EXT)		\
