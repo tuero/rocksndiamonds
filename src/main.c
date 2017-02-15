@@ -4515,6 +4515,1741 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
     "from_level_template",
     "element taken from level template"
   },
+  {
+    "mm_empty_space",
+    "empty_space",
+    "empty_space"
+  },
+  {
+    "mm_mirror_1",
+    "mm_mirror",
+    "mirror (0\xb0)"
+  },
+  {
+    "mm_mirror_2",
+    "mm_mirror",
+    "mirror (11.25\xb0)"
+  },
+  {
+    "mm_mirror_3",
+    "mm_mirror",
+    "mirror (22.5\xb0)"
+  },
+  {
+    "mm_mirror_4",
+    "mm_mirror",
+    "mirror (33.75\xb0)"
+  },
+  {
+    "mm_mirror_5",
+    "mm_mirror",
+    "mirror (45\xb0)"
+  },
+  {
+    "mm_mirror_6",
+    "mm_mirror",
+    "mirror (56.25\xb0)"
+  },
+  {
+    "mm_mirror_7",
+    "mm_mirror",
+    "mirror (67.5\xb0)"
+  },
+  {
+    "mm_mirror_8",
+    "mm_mirror",
+    "mirror (78.75\xb0)"
+  },
+  {
+    "mm_mirror_9",
+    "mm_mirror",
+    "mirror (90\xb0)"
+  },
+  {
+    "mm_mirror_10",
+    "mm_mirror",
+    "mirror (101.25\xb0)"
+  },
+  {
+    "mm_mirror_11",
+    "mm_mirror",
+    "mirror (112.5\xb0)"
+  },
+  {
+    "mm_mirror_12",
+    "mm_mirror",
+    "mirror (123.75\xb0)"
+  },
+  {
+    "mm_mirror_13",
+    "mm_mirror",
+    "mirror (135\xb0)"
+  },
+  {
+    "mm_mirror_14",
+    "mm_mirror",
+    "mirror (146.25\xb0)"
+  },
+  {
+    "mm_mirror_15",
+    "mm_mirror",
+    "mirror (157.5\xb0)"
+  },
+  {
+    "mm_mirror_16",
+    "mm_mirror",
+    "mirror (168.75\xb0)"
+  },
+  {
+    "mm_steel_grid_fixed_1",
+    "mm_steel_grid_fixed",
+    "fixed steel polarisator (0\xb0)"
+  },
+  {
+    "mm_steel_grid_fixed_2",
+    "mm_steel_grid_fixed",
+    "fixed steel polarisator (90\xb0)"
+  },
+  {
+    "mm_steel_grid_fixed_3",
+    "mm_steel_grid_fixed",
+    "fixed steel polarisator (45\xb0)"
+  },
+  {
+    "mm_steel_grid_fixed_4",
+    "mm_steel_grid_fixed",
+    "fixed steel polarisator (135\xb0)"
+  },
+  {
+    "mm_mcduffin.right",
+    "mm_mcduffin",
+    "Gregor McDuffin (looking right)"
+  },
+  {
+    "mm_mcduffin.up",
+    "mm_mcduffin",
+    "Gregor McDuffin (looking up)"
+  },
+  {
+    "mm_mcduffin.left",
+    "mm_mcduffin",
+    "Gregor McDuffin (looking left)"
+  },
+  {
+    "mm_mcduffin.down",
+    "mm_mcduffin",
+    "Gregor McDuffin (looking down)"
+  },
+  {
+    "mm_exit_closed",
+    "mm_exit",
+    "closed exit (MM style)"
+  },
+  {
+    "mm_exit_opening_1",
+    "mm_exit",
+    "opening exit 1"
+  },
+  {
+    "mm_exit_opening_2",
+    "mm_exit",
+    "opening exit 2"
+  },
+  {
+    "mm_exit_open",
+    "mm_exit",
+    "open exit (MM style)"
+  },
+  {
+    "mm_kettle",
+    "mm_kettle",
+    "magic kettle"
+  },
+  {
+    "mm_bomb",
+    "mm_bomb",
+    "bomb (MM style)"
+  },
+  {
+    "mm_prism",
+    "mm_prism",
+    "prism"
+  },
+  {
+    "mm_steel_wall_1",
+    "mm_steel_wall",
+    "steel wall"
+  },
+  {
+    "mm_steel_wall_2",
+    "mm_steel_wall",
+    "steel wall"
+  },
+  {
+    "mm_steel_wall_3",
+    "mm_steel_wall",
+    "steel wall"
+  },
+  {
+    "mm_steel_wall_4",
+    "mm_steel_wall",
+    "steel wall"
+  },
+  {
+    "mm_steel_wall_5",
+    "mm_steel_wall",
+    "steel wall"
+  },
+  {
+    "mm_steel_wall_6",
+    "mm_steel_wall",
+    "steel wall"
+  },
+  {
+    "mm_steel_wall_7",
+    "mm_steel_wall",
+    "steel wall"
+  },
+  {
+    "mm_steel_wall_8",
+    "mm_steel_wall",
+    "steel wall"
+  },
+  {
+    "mm_steel_wall_9",
+    "mm_steel_wall",
+    "steel wall"
+  },
+  {
+    "mm_steel_wall_10",
+    "mm_steel_wall",
+    "steel wall"
+  },
+  {
+    "mm_steel_wall_11",
+    "mm_steel_wall",
+    "steel wall"
+  },
+  {
+    "mm_steel_wall_12",
+    "mm_steel_wall",
+    "steel wall"
+  },
+  {
+    "mm_steel_wall_13",
+    "mm_steel_wall",
+    "steel wall"
+  },
+  {
+    "mm_steel_wall_14",
+    "mm_steel_wall",
+    "steel wall"
+  },
+  {
+    "mm_steel_wall_15",
+    "mm_steel_wall",
+    "steel wall"
+  },
+  {
+    "mm_steel_wall_16",
+    "mm_steel_wall",
+    "steel wall"
+  },
+  {
+    "mm_wooden_wall_1",
+    "mm_wooden_wall",
+    "wooden wall"
+  },
+  {
+    "mm_wooden_wall_2",
+    "mm_wooden_wall",
+    "wooden wall"
+  },
+  {
+    "mm_wooden_wall_3",
+    "mm_wooden_wall",
+    "wooden wall"
+  },
+  {
+    "mm_wooden_wall_4",
+    "mm_wooden_wall",
+    "wooden wall"
+  },
+  {
+    "mm_wooden_wall_5",
+    "mm_wooden_wall",
+    "wooden wall"
+  },
+  {
+    "mm_wooden_wall_6",
+    "mm_wooden_wall",
+    "wooden wall"
+  },
+  {
+    "mm_wooden_wall_7",
+    "mm_wooden_wall",
+    "wooden wall"
+  },
+  {
+    "mm_wooden_wall_8",
+    "mm_wooden_wall",
+    "wooden wall"
+  },
+  {
+    "mm_wooden_wall_9",
+    "mm_wooden_wall",
+    "wooden wall"
+  },
+  {
+    "mm_wooden_wall_10",
+    "mm_wooden_wall",
+    "wooden wall"
+  },
+  {
+    "mm_wooden_wall_11",
+    "mm_wooden_wall",
+    "wooden wall"
+  },
+  {
+    "mm_wooden_wall_12",
+    "mm_wooden_wall",
+    "wooden wall"
+  },
+  {
+    "mm_wooden_wall_13",
+    "mm_wooden_wall",
+    "wooden wall"
+  },
+  {
+    "mm_wooden_wall_14",
+    "mm_wooden_wall",
+    "wooden wall"
+  },
+  {
+    "mm_wooden_wall_15",
+    "mm_wooden_wall",
+    "wooden wall"
+  },
+  {
+    "mm_wooden_wall_16",
+    "mm_wooden_wall",
+    "wooden wall"
+  },
+  {
+    "mm_ice_wall_1",
+    "mm_ice_wall",
+    "ice wall"
+  },
+  {
+    "mm_ice_wall_2",
+    "mm_ice_wall",
+    "ice wall"
+  },
+  {
+    "mm_ice_wall_3",
+    "mm_ice_wall",
+    "ice wall"
+  },
+  {
+    "mm_ice_wall_4",
+    "mm_ice_wall",
+    "ice wall"
+  },
+  {
+    "mm_ice_wall_5",
+    "mm_ice_wall",
+    "ice wall"
+  },
+  {
+    "mm_ice_wall_6",
+    "mm_ice_wall",
+    "ice wall"
+  },
+  {
+    "mm_ice_wall_7",
+    "mm_ice_wall",
+    "ice wall"
+  },
+  {
+    "mm_ice_wall_8",
+    "mm_ice_wall",
+    "ice wall"
+  },
+  {
+    "mm_ice_wall_9",
+    "mm_ice_wall",
+    "ice wall"
+  },
+  {
+    "mm_ice_wall_10",
+    "mm_ice_wall",
+    "ice wall"
+  },
+  {
+    "mm_ice_wall_11",
+    "mm_ice_wall",
+    "ice wall"
+  },
+  {
+    "mm_ice_wall_12",
+    "mm_ice_wall",
+    "ice wall"
+  },
+  {
+    "mm_ice_wall_13",
+    "mm_ice_wall",
+    "ice wall"
+  },
+  {
+    "mm_ice_wall_14",
+    "mm_ice_wall",
+    "ice wall"
+  },
+  {
+    "mm_ice_wall_15",
+    "mm_ice_wall",
+    "ice wall"
+  },
+  {
+    "mm_ice_wall_16",
+    "mm_ice_wall",
+    "ice wall"
+  },
+  {
+    "mm_amoeba_wall_1",
+    "mm_amoeba_wall",
+    "amoeba wall"
+  },
+  {
+    "mm_amoeba_wall_2",
+    "mm_amoeba_wall",
+    "amoeba wall"
+  },
+  {
+    "mm_amoeba_wall_3",
+    "mm_amoeba_wall",
+    "amoeba wall"
+  },
+  {
+    "mm_amoeba_wall_4",
+    "mm_amoeba_wall",
+    "amoeba wall"
+  },
+  {
+    "mm_amoeba_wall_5",
+    "mm_amoeba_wall",
+    "amoeba wall"
+  },
+  {
+    "mm_amoeba_wall_6",
+    "mm_amoeba_wall",
+    "amoeba wall"
+  },
+  {
+    "mm_amoeba_wall_7",
+    "mm_amoeba_wall",
+    "amoeba wall"
+  },
+  {
+    "mm_amoeba_wall_8",
+    "mm_amoeba_wall",
+    "amoeba wall"
+  },
+  {
+    "mm_amoeba_wall_9",
+    "mm_amoeba_wall",
+    "amoeba wall"
+  },
+  {
+    "mm_amoeba_wall_10",
+    "mm_amoeba_wall",
+    "amoeba wall"
+  },
+  {
+    "mm_amoeba_wall_11",
+    "mm_amoeba_wall",
+    "amoeba wall"
+  },
+  {
+    "mm_amoeba_wall_12",
+    "mm_amoeba_wall",
+    "amoeba wall"
+  },
+  {
+    "mm_amoeba_wall_13",
+    "mm_amoeba_wall",
+    "amoeba wall"
+  },
+  {
+    "mm_amoeba_wall_14",
+    "mm_amoeba_wall",
+    "amoeba wall"
+  },
+  {
+    "mm_amoeba_wall_15",
+    "mm_amoeba_wall",
+    "amoeba wall"
+  },
+  {
+    "mm_amoeba_wall_16",
+    "mm_amoeba_wall",
+    "amoeba wall"
+  },
+  {
+    "mm_wooden_block",
+    "mm_wooden_block",
+    "wooden block"
+  },
+  {
+    "mm_gray_ball",
+    "mm_gray_ball",
+    "gray ball"
+  },
+  {
+    "mm_beamer_1",
+    "mm_beamer",
+    "beamer (0\xb0)"
+  },
+  {
+    "mm_beamer_2",
+    "mm_beamer",
+    "beamer (22.5\xb0)"
+  },
+  {
+    "mm_beamer_3",
+    "mm_beamer",
+    "beamer (45\xb0)"
+  },
+  {
+    "mm_beamer_4",
+    "mm_beamer",
+    "beamer (67.5\xb0)"
+  },
+  {
+    "mm_beamer_5",
+    "mm_beamer",
+    "beamer (90\xb0)"
+  },
+  {
+    "mm_beamer_6",
+    "mm_beamer",
+    "beamer (112.5\xb0)"
+  },
+  {
+    "mm_beamer_7",
+    "mm_beamer",
+    "beamer (135\xb0)"
+  },
+  {
+    "mm_beamer_8",
+    "mm_beamer",
+    "beamer (157.5\xb0)"
+  },
+  {
+    "mm_beamer_9",
+    "mm_beamer",
+    "beamer (180\xb0)"
+  },
+  {
+    "mm_beamer_10",
+    "mm_beamer",
+    "beamer (202.5\xb0)"
+  },
+  {
+    "mm_beamer_11",
+    "mm_beamer",
+    "beamer (225\xb0)"
+  },
+  {
+    "mm_beamer_12",
+    "mm_beamer",
+    "beamer (247.5\xb0)"
+  },
+  {
+    "mm_beamer_13",
+    "mm_beamer",
+    "beamer (270\xb0)"
+  },
+  {
+    "mm_beamer_14",
+    "mm_beamer",
+    "beamer (292.5\xb0)"
+  },
+  {
+    "mm_beamer_15",
+    "mm_beamer",
+    "beamer (315\xb0)"
+  },
+  {
+    "mm_beamer_16",
+    "mm_beamer",
+    "beamer (337.5\xb0)"
+  },
+  {
+    "mm_fuse.active",
+    "mm_fuse",
+    "fuse (on)"
+  },
+  {
+    "mm_pacman.right",
+    "mm_pacman",
+    "pac man (starts moving right)"
+  },
+  {
+    "mm_pacman.up",
+    "mm_pacman",
+    "pac man (starts moving up)"
+  },
+  {
+    "mm_pacman.left",
+    "mm_pacman",
+    "pac man (starts moving left)"
+  },
+  {
+    "mm_pacman.down",
+    "mm_pacman",
+    "pac man (starts moving down)"
+  },
+  {
+    "mm_polarisator_1",
+    "mm_polarisator",
+    "polarisator (0\xb0)"
+  },
+  {
+    "mm_polarisator_2",
+    "mm_polarisator",
+    "polarisator (11.25\xb0)"
+  },
+  {
+    "mm_polarisator_3",
+    "mm_polarisator",
+    "polarisator (22.5\xb0)"
+  },
+  {
+    "mm_polarisator_4",
+    "mm_polarisator",
+    "polarisator (33.75\xb0)"
+  },
+  {
+    "mm_polarisator_5",
+    "mm_polarisator",
+    "polarisator (45\xb0)"
+  },
+  {
+    "mm_polarisator_6",
+    "mm_polarisator",
+    "polarisator (56.25\xb0)"
+  },
+  {
+    "mm_polarisator_7",
+    "mm_polarisator",
+    "polarisator (67.5\xb0)"
+  },
+  {
+    "mm_polarisator_8",
+    "mm_polarisator",
+    "polarisator (78.75\xb0)"
+  },
+  {
+    "mm_polarisator_9",
+    "mm_polarisator",
+    "polarisator (90\xb0)"
+  },
+  {
+    "mm_polarisator_10",
+    "mm_polarisator",
+    "polarisator (101.25\xb0)"
+  },
+  {
+    "mm_polarisator_11",
+    "mm_polarisator",
+    "polarisator (112.5\xb0)"
+  },
+  {
+    "mm_polarisator_12",
+    "mm_polarisator",
+    "polarisator (123.75\xb0)"
+  },
+  {
+    "mm_polarisator_13",
+    "mm_polarisator",
+    "polarisator (135\xb0)"
+  },
+  {
+    "mm_polarisator_14",
+    "mm_polarisator",
+    "polarisator (146.25\xb0)"
+  },
+  {
+    "mm_polarisator_15",
+    "mm_polarisator",
+    "polarisator (157.5\xb0)"
+  },
+  {
+    "mm_polarisator_16",
+    "mm_polarisator",
+    "polarisator (168.75\xb0)"
+  },
+  {
+    "mm_polarisator_cross_1",
+    "mm_polarisator_cross",
+    "two-way polarisator (0\xb0)"
+  },
+  {
+    "mm_polarisator_cross_2",
+    "mm_polarisator_cross",
+    "two-way polarisator (22.5\xb0)"
+  },
+  {
+    "mm_polarisator_cross_3",
+    "mm_polarisator_cross",
+    "two-way polarisator (45\xb0)"
+  },
+  {
+    "mm_polarisator_cross_4",
+    "mm_polarisator_cross",
+    "two-way polarisator (67.5\xb0)"
+  },
+  {
+    "mm_mirror_fixed_1",
+    "mm_mirror_fixed",
+    "fixed mirror (0\xb0)"
+  },
+  {
+    "mm_mirror_fixed_2",
+    "mm_mirror_fixed",
+    "fixed mirror (0\xb0)"
+  },
+  {
+    "mm_mirror_fixed_3",
+    "mm_mirror_fixed",
+    "fixed mirror (0\xb0)"
+  },
+  {
+    "mm_mirror_fixed_4",
+    "mm_mirror_fixed",
+    "fixed mirror (0\xb0)"
+  },
+  {
+    "mm_steel_lock",
+    "mm_steel_lock",
+    "steel lock"
+  },
+  {
+    "mm_key",
+    "mm_key",
+    "key (MM style)"
+  },
+  {
+    "mm_lightbulb",
+    "mm_lightbulb",
+    "light bulb (off)"
+  },
+  {
+    "mm_lightbulb.active",
+    "mm_lightbulb",
+    "ligh bulb (on)"
+  },
+  {
+    "mm_lightball",
+    "mm_lightball",
+    "bonus ball"
+  },
+  {
+    "mm_steel_block",
+    "mm_steel_block",
+    "steel block"
+  },
+  {
+    "mm_wooden_lock",
+    "mm_wooden_lock",
+    "wooden lock"
+  },
+  {
+    "mm_fuel_full",
+    "mm_fuel",
+    "extra energy ball (full)"
+  },
+  {
+    "mm_wooden_grid_fixed_1",
+    "mm_wooden_grid_fixed",
+    "fixed wooden polarisator (0\xb0)"
+  },
+  {
+    "mm_wooden_grid_fixed_2",
+    "mm_wooden_grid_fixed",
+    "fixed wooden polarisator (90\xb0)"
+  },
+  {
+    "mm_wooden_grid_fixed_3",
+    "mm_wooden_grid_fixed",
+    "fixed wooden polarisator (45\xb0)"
+  },
+  {
+    "mm_wooden_grid_fixed_4",
+    "mm_wooden_grid_fixed",
+    "fixed wooden polarisator (135\xb0)"
+  },
+  {
+    "mm_fuel_empty",
+    "mm_fuel",
+    "extra energy ball (empty)"
+  },
+  {
+    "df_mirror_1",
+    "df_mirror",
+    "mirror (DF style) (0\xb0)"
+  },
+  {
+    "df_mirror_2",
+    "df_mirror",
+    "mirror (DF style) (11.25\xb0)"
+  },
+  {
+    "df_mirror_3",
+    "df_mirror",
+    "mirror (DF style) (22.5\xb0)"
+  },
+  {
+    "df_mirror_4",
+    "df_mirror",
+    "mirror (DF style) (33.75\xb0)"
+  },
+  {
+    "df_mirror_5",
+    "df_mirror",
+    "mirror (DF style) (45\xb0)"
+  },
+  {
+    "df_mirror_6",
+    "df_mirror",
+    "mirror (DF style) (56.25\xb0)"
+  },
+  {
+    "df_mirror_7",
+    "df_mirror",
+    "mirror (DF style) (67.5\xb0)"
+  },
+  {
+    "df_mirror_8",
+    "df_mirror",
+    "mirror (DF style) (78.75\xb0)"
+  },
+  {
+    "df_mirror_9",
+    "df_mirror",
+    "mirror (DF style) (90\xb0)"
+  },
+  {
+    "df_mirror_10",
+    "df_mirror",
+    "mirror (DF style) (101.25\xb0)"
+  },
+  {
+    "df_mirror_11",
+    "df_mirror",
+    "mirror (DF style) (112.5\xb0)"
+  },
+  {
+    "df_mirror_12",
+    "df_mirror",
+    "mirror (DF style) (123.75\xb0)"
+  },
+  {
+    "df_mirror_13",
+    "df_mirror",
+    "mirror (DF style) (135\xb0)"
+  },
+  {
+    "df_mirror_14",
+    "df_mirror",
+    "mirror (DF style) (146.25\xb0)"
+  },
+  {
+    "df_mirror_15",
+    "df_mirror",
+    "mirror (DF style) (157.5\xb0)"
+  },
+  {
+    "df_mirror_16",
+    "df_mirror",
+    "mirror (DF style) (168.75\xb0)"
+  },
+  {
+    "df_wooden_grid_fixed_1",
+    "df_wooden_grid_fixed",
+    "fixed wooden polarisator (0\xb0)"
+  },
+  {
+    "df_wooden_grid_fixed_2",
+    "df_wooden_grid_fixed",
+    "fixed wooden polarisator (22.5\xb0)"
+  },
+  {
+    "df_wooden_grid_fixed_3",
+    "df_wooden_grid_fixed",
+    "fixed wooden polarisator (45\xb0)"
+  },
+  {
+    "df_wooden_grid_fixed_4",
+    "df_wooden_grid_fixed",
+    "fixed wooden polarisator (67.5\xb0)"
+  },
+  {
+    "df_wooden_grid_fixed_5",
+    "df_wooden_grid_fixed",
+    "fixed wooden polarisator (90\xb0)"
+  },
+  {
+    "df_wooden_grid_fixed_6",
+    "df_wooden_grid_fixed",
+    "fixed wooden polarisator (112.5\xb0)"
+  },
+  {
+    "df_wooden_grid_fixed_7",
+    "df_wooden_grid_fixed",
+    "fixed wooden polarisator (135\xb0)"
+  },
+  {
+    "df_wooden_grid_fixed_8",
+    "df_wooden_grid_fixed",
+    "fixed wooden polarisator (157.5\xb0)"
+  },
+  {
+    "df_steel_grid_fixed_1",
+    "df_steel_grid_fixed",
+    "fixed steel polarisator (0\xb0)"
+  },
+  {
+    "df_steel_grid_fixed_2",
+    "df_steel_grid_fixed",
+    "fixed steel polarisator (22.5\xb0)"
+  },
+  {
+    "df_steel_grid_fixed_3",
+    "df_steel_grid_fixed",
+    "fixed steel polarisator (45\xb0)"
+  },
+  {
+    "df_steel_grid_fixed_4",
+    "df_steel_grid_fixed",
+    "fixed steel polarisator (67.5\xb0)"
+  },
+  {
+    "df_steel_grid_fixed_5",
+    "df_steel_grid_fixed",
+    "fixed steel polarisator (90\xb0)"
+  },
+  {
+    "df_steel_grid_fixed_6",
+    "df_steel_grid_fixed",
+    "fixed steel polarisator (112.5\xb0)"
+  },
+  {
+    "df_steel_grid_fixed_7",
+    "df_steel_grid_fixed",
+    "fixed steel polarisator (135\xb0)"
+  },
+  {
+    "df_steel_grid_fixed_8",
+    "df_steel_grid_fixed",
+    "fixed steel polarisator (157.5\xb0)"
+  },
+  {
+    "df_wooden_wall_1",
+    "df_wooden_wall",
+    "wooden wall (DF style)"
+  },
+  {
+    "df_wooden_wall_2",
+    "df_wooden_wall",
+    "wooden wall (DF style)"
+  },
+  {
+    "df_wooden_wall_3",
+    "df_wooden_wall",
+    "wooden wall (DF style)"
+  },
+  {
+    "df_wooden_wall_4",
+    "df_wooden_wall",
+    "wooden wall (DF style)"
+  },
+  {
+    "df_wooden_wall_5",
+    "df_wooden_wall",
+    "wooden wall (DF style)"
+  },
+  {
+    "df_wooden_wall_6",
+    "df_wooden_wall",
+    "wooden wall (DF style)"
+  },
+  {
+    "df_wooden_wall_7",
+    "df_wooden_wall",
+    "wooden wall (DF style)"
+  },
+  {
+    "df_wooden_wall_8",
+    "df_wooden_wall",
+    "wooden wall (DF style)"
+  },
+  {
+    "df_wooden_wall_9",
+    "df_wooden_wall",
+    "wooden wall (DF style)"
+  },
+  {
+    "df_wooden_wall_10",
+    "df_wooden_wall",
+    "wooden wall (DF style)"
+  },
+  {
+    "df_wooden_wall_11",
+    "df_wooden_wall",
+    "wooden wall (DF style)"
+  },
+  {
+    "df_wooden_wall_12",
+    "df_wooden_wall",
+    "wooden wall (DF style)"
+  },
+  {
+    "df_wooden_wall_13",
+    "df_wooden_wall",
+    "wooden wall (DF style)"
+  },
+  {
+    "df_wooden_wall_14",
+    "df_wooden_wall",
+    "wooden wall (DF style)"
+  },
+  {
+    "df_wooden_wall_15",
+    "df_wooden_wall",
+    "wooden wall (DF style)"
+  },
+  {
+    "df_wooden_wall_16",
+    "df_wooden_wall",
+    "wooden wall (DF style)"
+  },
+  {
+    "df_steel_wall_1",
+    "df_steel_wall",
+    "steel wall (DF style)"
+  },
+  {
+    "df_steel_wall_2",
+    "df_steel_wall",
+    "steel wall (DF style)"
+  },
+  {
+    "df_steel_wall_3",
+    "df_steel_wall",
+    "steel wall (DF style)"
+  },
+  {
+    "df_steel_wall_4",
+    "df_steel_wall",
+    "steel wall (DF style)"
+  },
+  {
+    "df_steel_wall_5",
+    "df_steel_wall",
+    "steel wall (DF style)"
+  },
+  {
+    "df_steel_wall_6",
+    "df_steel_wall",
+    "steel wall (DF style)"
+  },
+  {
+    "df_steel_wall_7",
+    "df_steel_wall",
+    "steel wall (DF style)"
+  },
+  {
+    "df_steel_wall_8",
+    "df_steel_wall",
+    "steel wall (DF style)"
+  },
+  {
+    "df_steel_wall_9",
+    "df_steel_wall",
+    "steel wall (DF style)"
+  },
+  {
+    "df_steel_wall_10",
+    "df_steel_wall",
+    "steel wall (DF style)"
+  },
+  {
+    "df_steel_wall_11",
+    "df_steel_wall",
+    "steel wall (DF style)"
+  },
+  {
+    "df_steel_wall_12",
+    "df_steel_wall",
+    "steel wall (DF style)"
+  },
+  {
+    "df_steel_wall_13",
+    "df_steel_wall",
+    "steel wall (DF style)"
+  },
+  {
+    "df_steel_wall_14",
+    "df_steel_wall",
+    "steel wall (DF style)"
+  },
+  {
+    "df_steel_wall_15",
+    "df_steel_wall",
+    "steel wall (DF style)"
+  },
+  {
+    "df_steel_wall_16",
+    "df_steel_wall",
+    "steel wall (DF style)"
+  },
+  {
+    "df_empty_space",
+    "empty_space",
+    "empty_space"
+  },
+  {
+    "df_cell",
+    "df_cell",
+    "cell"
+  },
+  {
+    "df_mine",
+    "df_mine",
+    "mine"
+  },
+  {
+    "df_refractor",
+    "df_refractor",
+    "refractor"
+  },
+  {
+    "df_laser.right",
+    "df_laser",
+    "laser cannon (shooting right)"
+  },
+  {
+    "df_laser.up",
+    "df_laser",
+    "laser cannon (shooting up)"
+  },
+  {
+    "df_laser.left",
+    "df_laser",
+    "laser cannon (shooting left)"
+  },
+  {
+    "df_laser.down",
+    "df_laser",
+    "laser cannon (shooting down)"
+  },
+  {
+    "df_receiver.right",
+    "df_receiver",
+    "laser receiver (directed right)"
+  },
+  {
+    "df_receiver.up",
+    "df_receiver",
+    "laser receiver (directed up)"
+  },
+  {
+    "df_receiver.left",
+    "df_receiver",
+    "laser receiver (directed left)"
+  },
+  {
+    "df_receiver.down",
+    "df_receiver",
+    "laser receiver (directed down)"
+  },
+  {
+    "df_fibre_optic_red_1",
+    "df_fibre_optic",
+    "red fibre optic (part 1)"
+  },
+  {
+    "df_fibre_optic_red_2",
+    "df_fibre_optic",
+    "red fibre optic (part 2)"
+  },
+  {
+    "df_fibre_optic_yellow_1",
+    "df_fibre_optic",
+    "yellow fibre optic (part 1)"
+  },
+  {
+    "df_fibre_optic_yellow_2",
+    "df_fibre_optic",
+    "yellow fibre optic (part 2)"
+  },
+  {
+    "df_fibre_optic_green_1",
+    "df_fibre_optic",
+    "green fibre optic (part 1)"
+  },
+  {
+    "df_fibre_optic_green_2",
+    "df_fibre_optic",
+    "green fibre optic (part 2)"
+  },
+  {
+    "df_fibre_optic_blue_1",
+    "df_fibre_optic",
+    "blue fibre optic (part 1)"
+  },
+  {
+    "df_fibre_optic_blue_2",
+    "df_fibre_optic",
+    "blue fibre optic (part 2)"
+  },
+  {
+    "df_mirror_rotating_1",
+    "df_mirror_rotating",
+    "rotating mirror (0\xb0)"
+  },
+  {
+    "df_mirror_rotating_2",
+    "df_mirror_rotating",
+    "rotating mirror (11.25\xb0)"
+  },
+  {
+    "df_mirror_rotating_3",
+    "df_mirror_rotating",
+    "rotating mirror (22.5\xb0)"
+  },
+  {
+    "df_mirror_rotating_4",
+    "df_mirror_rotating",
+    "rotating mirror (33.75\xb0)"
+  },
+  {
+    "df_mirror_rotating_5",
+    "df_mirror_rotating",
+    "rotating mirror (45\xb0)"
+  },
+  {
+    "df_mirror_rotating_6",
+    "df_mirror_rotating",
+    "rotating mirror (56.25\xb0)"
+  },
+  {
+    "df_mirror_rotating_7",
+    "df_mirror_rotating",
+    "rotating mirror (67.5\xb0)"
+  },
+  {
+    "df_mirror_rotating_8",
+    "df_mirror_rotating",
+    "rotating mirror (78.75\xb0)"
+  },
+  {
+    "df_mirror_rotating_9",
+    "df_mirror_rotating",
+    "rotating mirror (90\xb0)"
+  },
+  {
+    "df_mirror_rotating_10",
+    "df_mirror_rotating",
+    "rotating mirror (101.25\xb0)"
+  },
+  {
+    "df_mirror_rotating_11",
+    "df_mirror_rotating",
+    "rotating mirror (112.5\xb0)"
+  },
+  {
+    "df_mirror_rotating_12",
+    "df_mirror_rotating",
+    "rotating mirror (123.75\xb0)"
+  },
+  {
+    "df_mirror_rotating_13",
+    "df_mirror_rotating",
+    "rotating mirror (135\xb0)"
+  },
+  {
+    "df_mirror_rotating_14",
+    "df_mirror_rotating",
+    "rotating mirror (146.25\xb0)"
+  },
+  {
+    "df_mirror_rotating_15",
+    "df_mirror_rotating",
+    "rotating mirror (157.5\xb0)"
+  },
+  {
+    "df_mirror_rotating_16",
+    "df_mirror_rotating",
+    "rotating mirror (168.75\xb0)"
+  },
+  {
+    "df_wooden_grid_rotating_1",
+    "df_wooden_grid_rotating",
+    "rotating wooden polarisator (0\xb0)"
+  },
+  {
+    "df_wooden_grid_rotating_2",
+    "df_wooden_grid_rotating",
+    "rotating wooden polarisator (22.5\xb0)"
+  },
+  {
+    "df_wooden_grid_rotating_3",
+    "df_wooden_grid_rotating",
+    "rotating wooden polarisator (45\xb0)"
+  },
+  {
+    "df_wooden_grid_rotating_4",
+    "df_wooden_grid_rotating",
+    "rotating wooden polarisator (67.5\xb0)"
+  },
+  {
+    "df_wooden_grid_rotating_5",
+    "df_wooden_grid_rotating",
+    "rotating wooden polarisator (90\xb0)"
+  },
+  {
+    "df_wooden_grid_rotating_6",
+    "df_wooden_grid_rotating",
+    "rotating wooden polarisator (112.5\xb0)"
+  },
+  {
+    "df_wooden_grid_rotating_7",
+    "df_wooden_grid_rotating",
+    "rotating wooden polarisator (135\xb0)"
+  },
+  {
+    "df_wooden_grid_rotating_8",
+    "df_wooden_grid_rotating",
+    "rotating wooden polarisator (157.5\xb0)"
+  },
+  {
+    "df_steel_grid_rotating_1",
+    "df_steel_grid_rotating",
+    "rotating steel polarisator (0\xb0)"
+  },
+  {
+    "df_steel_grid_rotating_2",
+    "df_steel_grid_rotating",
+    "rotating steel polarisator (22.5\xb0)"
+  },
+  {
+    "df_steel_grid_rotating_3",
+    "df_steel_grid_rotating",
+    "rotating steel polarisator (45\xb0)"
+  },
+  {
+    "df_steel_grid_rotating_4",
+    "df_steel_grid_rotating",
+    "rotating steel polarisator (67.5\xb0)"
+  },
+  {
+    "df_steel_grid_rotating_5",
+    "df_steel_grid_rotating",
+    "rotating steel polarisator (90\xb0)"
+  },
+  {
+    "df_steel_grid_rotating_6",
+    "df_steel_grid_rotating",
+    "rotating steel polarisator (112.5\xb0)"
+  },
+  {
+    "df_steel_grid_rotating_7",
+    "df_steel_grid_rotating",
+    "rotating steel polarisator (135\xb0)"
+  },
+  {
+    "df_steel_grid_rotating_8",
+    "df_steel_grid_rotating",
+    "rotating steel polarisator (157.5\xb0)"
+  },
+  {
+    "mm_beamer_red_1",
+    "mm_beamer",
+    "red beamer (0\xb0)"
+  },
+  {
+    "mm_beamer_red_2",
+    "mm_beamer",
+    "red beamer (22.5\xb0)"
+  },
+  {
+    "mm_beamer_red_3",
+    "mm_beamer",
+    "red beamer (45\xb0)"
+  },
+  {
+    "mm_beamer_red_4",
+    "mm_beamer",
+    "red beamer (67.5\xb0)"
+  },
+  {
+    "mm_beamer_red_5",
+    "mm_beamer",
+    "red beamer (90\xb0)"
+  },
+  {
+    "mm_beamer_red_6",
+    "mm_beamer",
+    "red beamer (112.5\xb0)"
+  },
+  {
+    "mm_beamer_red_7",
+    "mm_beamer",
+    "red beamer (135\xb0)"
+  },
+  {
+    "mm_beamer_red_8",
+    "mm_beamer",
+    "red beamer (157.5\xb0)"
+  },
+  {
+    "mm_beamer_red_9",
+    "mm_beamer",
+    "red beamer (180\xb0)"
+  },
+  {
+    "mm_beamer_red_10",
+    "mm_beamer",
+    "red beamer (202.5\xb0)"
+  },
+  {
+    "mm_beamer_red_11",
+    "mm_beamer",
+    "red beamer (225\xb0)"
+  },
+  {
+    "mm_beamer_red_12",
+    "mm_beamer",
+    "red beamer (247.5\xb0)"
+  },
+  {
+    "mm_beamer_red_13",
+    "mm_beamer",
+    "red beamer (270\xb0)"
+  },
+  {
+    "mm_beamer_red_14",
+    "mm_beamer",
+    "red beamer (292.5\xb0)"
+  },
+  {
+    "mm_beamer_red_15",
+    "mm_beamer",
+    "red beamer (315\xb0)"
+  },
+  {
+    "mm_beamer_red_16",
+    "mm_beamer",
+    "red beamer (337.5\xb0)"
+  },
+  {
+    "mm_beamer_yellow_1",
+    "mm_beamer",
+    "yellow beamer (0\xb0)"
+  },
+  {
+    "mm_beamer_yellow_2",
+    "mm_beamer",
+    "yellow beamer (22.5\xb0)"
+  },
+  {
+    "mm_beamer_yellow_3",
+    "mm_beamer",
+    "yellow beamer (45\xb0)"
+  },
+  {
+    "mm_beamer_yellow_4",
+    "mm_beamer",
+    "yellow beamer (67.5\xb0)"
+  },
+  {
+    "mm_beamer_yellow_5",
+    "mm_beamer",
+    "yellow beamer (90\xb0)"
+  },
+  {
+    "mm_beamer_yellow_6",
+    "mm_beamer",
+    "yellow beamer (112.5\xb0)"
+  },
+  {
+    "mm_beamer_yellow_7",
+    "mm_beamer",
+    "yellow beamer (135\xb0)"
+  },
+  {
+    "mm_beamer_yellow_8",
+    "mm_beamer",
+    "yellow beamer (157.5\xb0)"
+  },
+  {
+    "mm_beamer_yellow_9",
+    "mm_beamer",
+    "yellow beamer (180\xb0)"
+  },
+  {
+    "mm_beamer_yellow_10",
+    "mm_beamer",
+    "yellow beamer (202.5\xb0)"
+  },
+  {
+    "mm_beamer_yellow_11",
+    "mm_beamer",
+    "yellow beamer (225\xb0)"
+  },
+  {
+    "mm_beamer_yellow_12",
+    "mm_beamer",
+    "yellow beamer (247.5\xb0)"
+  },
+  {
+    "mm_beamer_yellow_13",
+    "mm_beamer",
+    "yellow beamer (270\xb0)"
+  },
+  {
+    "mm_beamer_yellow_14",
+    "mm_beamer",
+    "yellow beamer (292.5\xb0)"
+  },
+  {
+    "mm_beamer_yellow_15",
+    "mm_beamer",
+    "yellow beamer (315\xb0)"
+  },
+  {
+    "mm_beamer_yellow_16",
+    "mm_beamer",
+    "yellow beamer (337.5\xb0)"
+  },
+  {
+    "mm_beamer_green_1",
+    "mm_beamer",
+    "green beamer (0\xb0)"
+  },
+  {
+    "mm_beamer_green_2",
+    "mm_beamer",
+    "green beamer (22.5\xb0)"
+  },
+  {
+    "mm_beamer_green_3",
+    "mm_beamer",
+    "green beamer (45\xb0)"
+  },
+  {
+    "mm_beamer_green_4",
+    "mm_beamer",
+    "green beamer (67.5\xb0)"
+  },
+  {
+    "mm_beamer_green_5",
+    "mm_beamer",
+    "green beamer (90\xb0)"
+  },
+  {
+    "mm_beamer_green_6",
+    "mm_beamer",
+    "green beamer (112.5\xb0)"
+  },
+  {
+    "mm_beamer_green_7",
+    "mm_beamer",
+    "green beamer (135\xb0)"
+  },
+  {
+    "mm_beamer_green_8",
+    "mm_beamer",
+    "green beamer (157.5\xb0)"
+  },
+  {
+    "mm_beamer_green_9",
+    "mm_beamer",
+    "green beamer (180\xb0)"
+  },
+  {
+    "mm_beamer_green_10",
+    "mm_beamer",
+    "green beamer (202.5\xb0)"
+  },
+  {
+    "mm_beamer_green_11",
+    "mm_beamer",
+    "green beamer (225\xb0)"
+  },
+  {
+    "mm_beamer_green_12",
+    "mm_beamer",
+    "green beamer (247.5\xb0)"
+  },
+  {
+    "mm_beamer_green_13",
+    "mm_beamer",
+    "green beamer (270\xb0)"
+  },
+  {
+    "mm_beamer_green_14",
+    "mm_beamer",
+    "green beamer (292.5\xb0)"
+  },
+  {
+    "mm_beamer_green_15",
+    "mm_beamer",
+    "green beamer (315\xb0)"
+  },
+  {
+    "mm_beamer_green_16",
+    "mm_beamer",
+    "green beamer (337.5\xb0)"
+  },
+  {
+    "mm_beamer_blue_1",
+    "mm_beamer",
+    "blue beamer (0\xb0)"
+  },
+  {
+    "mm_beamer_blue_2",
+    "mm_beamer",
+    "blue beamer (22.5\xb0)"
+  },
+  {
+    "mm_beamer_blue_3",
+    "mm_beamer",
+    "blue beamer (45\xb0)"
+  },
+  {
+    "mm_beamer_blue_4",
+    "mm_beamer",
+    "blue beamer (67.5\xb0)"
+  },
+  {
+    "mm_beamer_blue_5",
+    "mm_beamer",
+    "blue beamer (90\xb0)"
+  },
+  {
+    "mm_beamer_blue_6",
+    "mm_beamer",
+    "blue beamer (112.5\xb0)"
+  },
+  {
+    "mm_beamer_blue_7",
+    "mm_beamer",
+    "blue beamer (135\xb0)"
+  },
+  {
+    "mm_beamer_blue_8",
+    "mm_beamer",
+    "blue beamer (157.5\xb0)"
+  },
+  {
+    "mm_beamer_blue_9",
+    "mm_beamer",
+    "blue beamer (180\xb0)"
+  },
+  {
+    "mm_beamer_blue_10",
+    "mm_beamer",
+    "blue beamer (202.5\xb0)"
+  },
+  {
+    "mm_beamer_blue_11",
+    "mm_beamer",
+    "blue beamer (225\xb0)"
+  },
+  {
+    "mm_beamer_blue_12",
+    "mm_beamer",
+    "blue beamer (247.5\xb0)"
+  },
+  {
+    "mm_beamer_blue_13",
+    "mm_beamer",
+    "blue beamer (270\xb0)"
+  },
+  {
+    "mm_beamer_blue_14",
+    "mm_beamer",
+    "blue beamer (292.5\xb0)"
+  },
+  {
+    "mm_beamer_blue_15",
+    "mm_beamer",
+    "blue beamer (315\xb0)"
+  },
+  {
+    "mm_beamer_blue_16",
+    "mm_beamer",
+    "blue beamer (337.5\xb0)"
+  },
+  {
+    "mm_mcduffin",
+    "mm_mcduffin",
+    "Gregor McDuffin"
+  },
+  {
+    "mm_pacman",
+    "mm_pacman",
+    "pac man (MM style)"
+  },
+  {
+    "mm_fuse",
+    "mm_fuse",
+    "fuse (off)",
+  },
+  {
+    "mm_steel_wall",
+    "mm_steel_wall",
+    "steel wall",
+  },
+  {
+    "mm_wooden_wall",
+    "mm_wooden_wall",
+    "wooden wall",
+  },
+  {
+    "mm_ice_wall",
+    "mm_ice_wall",
+    "ice wall",
+  },
+  {
+    "mm_amoeba_wall",
+    "mm_amoeba_wall",
+    "amoeba wall",
+  },
+  {
+    "df_laser",
+    "df_laser",
+    "laser cannon"
+  },
+  {
+    "df_receiver",
+    "df_receiver",
+    "laser receiver"
+  },
+  {
+    "df_steel_wall",
+    "df_steel_wall",
+    "steel wall (DF style)",
+  },
+  {
+    "df_wooden_wall",
+    "df_wooden_wall",
+    "wooden wall (DF style)",
+  },
 
   /* ----------------------------------------------------------------------- */
   /* "real" (and therefore drawable) runtime elements                        */
@@ -4880,6 +6615,31 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
     "emc_spring_bumper.active",
     "emc_spring_bumper",
     "spring bumper",
+  },
+  {
+    "mm_exit.opening",
+    "mm_exit",
+    "-"
+  },
+  {
+    "mm_exit.closing",
+    "mm_exit",
+    "-"
+  },
+  {
+    "mm_gray_ball.opening",
+    "mm_gray_ball",
+    "-",
+  },
+  {
+    "mm_ice_wall.shrinking",
+    "mm_ice_wall",
+    "-",
+  },
+  {
+    "mm_amoeba_wall.growing",
+    "mm_amoeba_wall",
+    "-",
   },
 
   /* ----------------------------------------------------------------------- */
@@ -5275,6 +7035,26 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
     "internal_cascade_dx.active",
     "internal",
     "hide DX Boulderdash elements"
+  },
+  {
+    "internal_cascade_mm",
+    "internal",
+    "show Mirror Magic elements"
+  },
+  {
+    "internal_cascade_mm.active",
+    "internal",
+    "hide Mirror Magic elements"
+  },
+  {
+    "internal_cascade_df",
+    "internal",
+    "show Deflektor elements"
+  },
+  {
+    "internal_cascade_df.active",
+    "internal",
+    "hide Deflektor elements"
   },
   {
     "internal_cascade_chars",
