@@ -8331,6 +8331,8 @@ static struct TokenInfo editor_cascade_setup_tokens[] =
   { TYPE_SWITCH, &seci.el_sp,		"editor.cascade.el_sp"		},
   { TYPE_SWITCH, &seci.el_dc,		"editor.cascade.el_dc"		},
   { TYPE_SWITCH, &seci.el_dx,		"editor.cascade.el_dx"		},
+  { TYPE_SWITCH, &seci.el_mm,		"editor.cascade.el_mm"		},
+  { TYPE_SWITCH, &seci.el_df,		"editor.cascade.el_df"		},
   { TYPE_SWITCH, &seci.el_chars,	"editor.cascade.el_chars"	},
   { TYPE_SWITCH, &seci.el_steel_chars,	"editor.cascade.el_steel_chars"	},
   { TYPE_SWITCH, &seci.el_ce,		"editor.cascade.el_ce"		},
@@ -8524,6 +8526,10 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
   si->editor.el_supaplex		= TRUE;
   si->editor.el_diamond_caves		= TRUE;
   si->editor.el_dx_boulderdash		= TRUE;
+
+  si->editor.el_mirror_magic		= TRUE;
+  si->editor.el_deflektor		= TRUE;
+
   si->editor.el_chars			= TRUE;
   si->editor.el_steel_chars		= TRUE;
 
@@ -8658,6 +8664,9 @@ static void setSetupInfoToDefaults_EditorCascade(struct SetupInfo *si)
   si->editor_cascade.el_sp		= TRUE;
   si->editor_cascade.el_dc		= TRUE;
   si->editor_cascade.el_dx		= TRUE;
+
+  si->editor_cascade.el_mm		= TRUE;
+  si->editor_cascade.el_df		= TRUE;
 
   si->editor_cascade.el_chars		= FALSE;
   si->editor_cascade.el_steel_chars	= FALSE;

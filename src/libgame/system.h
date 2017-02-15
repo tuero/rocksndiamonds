@@ -994,6 +994,10 @@ struct SetupEditorInfo
   boolean el_supaplex;
   boolean el_diamond_caves;
   boolean el_dx_boulderdash;
+
+  boolean el_mirror_magic;
+  boolean el_deflektor;
+
   boolean el_chars;
   boolean el_steel_chars;
 
@@ -1022,6 +1026,8 @@ struct SetupEditorCascadeInfo
   boolean el_sp;
   boolean el_dc;
   boolean el_dx;
+  boolean el_mm;
+  boolean el_df;
   boolean el_chars;
   boolean el_steel_chars;
   boolean el_ce;

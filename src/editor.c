@@ -4215,6 +4215,116 @@ static int *editor_el_dx_boulderdash_ptr = editor_el_dx_boulderdash;
 static int num_editor_hl_dx_boulderdash = SIZEOF_ARRAY_INT(editor_hl_dx_boulderdash);
 static int num_editor_el_dx_boulderdash = SIZEOF_ARRAY_INT(editor_el_dx_boulderdash);
 
+static int editor_hl_mirror_magic[] =
+{
+  EL_INTERNAL_CASCADE_MM_ACTIVE,
+  EL_CHAR('M'),
+  EL_CHAR('M'),
+  EL_EMPTY,
+};
+
+static int editor_el_mirror_magic[] =
+{
+  EL_MM_MCDUFFIN_RIGHT,
+  EL_MM_MCDUFFIN_UP,
+  EL_MM_MCDUFFIN_LEFT,
+  EL_MM_MCDUFFIN_DOWN,
+
+  EL_MM_MIRROR_START,
+  EL_MM_MIRROR_FIXED_START,
+  EL_MM_POLARISATOR_START,
+  EL_MM_POLARISATOR_CROSS_START,
+
+  EL_MM_BEAMER_RED_START,
+  EL_MM_BEAMER_YELLOW_START,
+  EL_MM_BEAMER_GREEN_START,
+  EL_MM_BEAMER_BLUE_START,
+
+  EL_MM_PRISM,
+  EL_MM_FUSE_ACTIVE,
+  EL_MM_PACMAN_RIGHT,
+  EL_MM_EXIT_CLOSED,
+
+  EL_MM_KETTLE,
+  EL_MM_BOMB,
+  EL_MM_KEY,
+  EL_MM_FUEL_FULL,
+
+  EL_MM_LIGHTBULB,
+  EL_MM_LIGHTBULB_ACTIVE,
+  EL_MM_GRAY_BALL,
+  EL_MM_LIGHTBALL,
+
+  EL_MM_STEEL_WALL,
+  EL_MM_WOODEN_WALL,
+  EL_MM_ICE_WALL,
+  EL_MM_AMOEBA_WALL,
+
+  EL_MM_STEEL_LOCK,
+  EL_MM_WOODEN_LOCK,
+  EL_MM_STEEL_BLOCK,
+  EL_MM_WOODEN_BLOCK,
+
+  EL_MM_STEEL_GRID_FIXED_1,
+  EL_MM_STEEL_GRID_FIXED_2,
+  EL_MM_STEEL_GRID_FIXED_3,
+  EL_MM_STEEL_GRID_FIXED_4,
+
+  EL_MM_WOODEN_GRID_FIXED_1,
+  EL_MM_WOODEN_GRID_FIXED_2,
+  EL_MM_WOODEN_GRID_FIXED_3,
+  EL_MM_WOODEN_GRID_FIXED_4
+};
+static int *editor_hl_mirror_magic_ptr = editor_hl_mirror_magic;
+static int *editor_el_mirror_magic_ptr = editor_el_mirror_magic;
+static int num_editor_hl_mirror_magic = SIZEOF_ARRAY_INT(editor_hl_mirror_magic);
+static int num_editor_el_mirror_magic = SIZEOF_ARRAY_INT(editor_el_mirror_magic);
+
+static int editor_hl_deflektor[] =
+{
+  EL_INTERNAL_CASCADE_DF_ACTIVE,
+  EL_CHAR('D'),
+  EL_CHAR('F'),
+  EL_EMPTY,
+};
+
+static int editor_el_deflektor[] =
+{
+  EL_DF_LASER_RIGHT,
+  EL_DF_LASER_UP,
+  EL_DF_LASER_LEFT,
+  EL_DF_LASER_DOWN,
+
+  EL_DF_RECEIVER_RIGHT,
+  EL_DF_RECEIVER_UP,
+  EL_DF_RECEIVER_LEFT,
+  EL_DF_RECEIVER_DOWN,
+
+  EL_DF_MIRROR_START,
+  EL_DF_MIRROR_ROTATING_START,
+  EL_DF_CELL,
+  EL_DF_MINE,
+
+  EL_DF_FIBRE_OPTIC_RED_1,
+  EL_DF_FIBRE_OPTIC_YELLOW_1,
+  EL_DF_FIBRE_OPTIC_GREEN_1,
+  EL_DF_FIBRE_OPTIC_BLUE_1,
+
+  EL_DF_STEEL_GRID_FIXED_START,
+  EL_DF_STEEL_GRID_ROTATING_START,
+  EL_DF_WOODEN_GRID_FIXED_START,
+  EL_DF_WOODEN_GRID_ROTATING_START,
+
+  EL_DF_STEEL_WALL,
+  EL_DF_WOODEN_WALL,
+  EL_DF_REFRACTOR,
+  EL_EMPTY
+};
+static int *editor_hl_deflektor_ptr = editor_hl_deflektor;
+static int *editor_el_deflektor_ptr = editor_el_deflektor;
+static int num_editor_hl_deflektor = SIZEOF_ARRAY_INT(editor_hl_deflektor);
+static int num_editor_el_deflektor = SIZEOF_ARRAY_INT(editor_el_deflektor);
+
 static int editor_hl_chars[] =
 {
   EL_INTERNAL_CASCADE_CHARS_ACTIVE,
@@ -4986,6 +5096,18 @@ editor_elements_info[] =
   },
   {
     &setup.editor.el_classic,
+    &setup.editor_cascade.el_mm,
+    &editor_hl_mirror_magic_ptr,	&num_editor_hl_mirror_magic,
+    &editor_el_mirror_magic_ptr,	&num_editor_el_mirror_magic
+  },
+  {
+    &setup.editor.el_classic,
+    &setup.editor_cascade.el_df,
+    &editor_hl_deflektor_ptr,		&num_editor_hl_deflektor,
+    &editor_el_deflektor_ptr,		&num_editor_el_deflektor
+  },
+  {
+    &setup.editor.el_classic,
     &setup.editor_cascade.el_chars,
     &editor_hl_chars_ptr,		&num_editor_hl_chars,
     &editor_el_chars_ptr,		&num_editor_el_chars
@@ -5236,7 +5358,7 @@ static void ReinitializeElementList()
 	Error(ERR_WARN, "editor element %d is runtime element", element);
 
       if (strEqual(getElementInfoText(element), INFOTEXT_UNKNOWN_ELEMENT))
-	Error(ERR_WARN, "no element description for element %d", element);
+	Error(ERR_WARN, "no element description text for element %d", element);
     }
   }
 
@@ -7802,7 +7924,8 @@ void CheckElementDescriptions()
 
   for (i = 0; i < NUM_FILE_ELEMENTS; i++)
     if (getElementDescriptionFilename(i) == NULL && !IS_OBSOLETE(i))
-      Error(ERR_WARN, "no element description for element '%s'", EL_NAME(i));
+      Error(ERR_WARN, "no element description file for element '%s'",
+	    EL_NAME(i));
 }
 
 static int getMaxEdFieldX(boolean has_scrollbar)
