@@ -1,0 +1,2 @@
+This polarisator can manually be rotated to let the ray of light pass into one
+of two angles only.
