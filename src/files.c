@@ -1319,6 +1319,8 @@ filetype_id_list[] =
   { LEVEL_FILE_TYPE_DX,		"DX"	},
   { LEVEL_FILE_TYPE_SB,		"SB"	},
   { LEVEL_FILE_TYPE_DC,		"DC"	},
+  { LEVEL_FILE_TYPE_MM,		"MM"	},
+  { LEVEL_FILE_TYPE_MM,		"DF"	},
   { -1,				NULL	},
 };
 
@@ -2117,6 +2119,16 @@ static void determineLevelFileInfo_Filename(struct LevelFileInfo *lfi)
 
     lfi->packed = checkForPackageFromBasename(leveldir_current->level_filename);
 
+    if (fileExists(lfi->filename))
+      return;
+  }
+  else if (leveldir_current->level_filetype != NULL)
+  {
+    int filetype = getFiletypeFromID(leveldir_current->level_filetype);
+
+    /* check for specified native level file with standard file name */
+    setLevelFileInfo_FormatLevelFilename(lfi, filetype,
+					 "%03d.%s", nr, LEVELFILE_EXTENSION);
     if (fileExists(lfi->filename))
       return;
   }
