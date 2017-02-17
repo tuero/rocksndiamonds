@@ -173,6 +173,7 @@ struct GraphicInfo_MM
 
 struct EngineSnapshotInfo_MM
 {
+  struct GameInfo_MM game_mm;
 };
 
 
