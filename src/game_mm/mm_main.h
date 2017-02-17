@@ -1079,10 +1079,10 @@ extern int		num_element_info;
 #define MSDOS_POINTER_FILENAME	"mouse.pcx"
 
 /* functions for version handling */
-#define MM_VERSION_IDENT(x,y,z)	((x) * 10000 + (y) * 100 + (z))
-#define MM_VERSION_MAJOR(x)	((x) / 10000)
-#define MM_VERSION_MINOR(x)	(((x) % 10000) / 100)
-#define MM_VERSION_PATCH(x)	((x) % 100)
+#define MM_VERSION_IDENT(x,y,z)	VERSION_IDENT(x,y,z,0)
+#define MM_VERSION_MAJOR(x)	VERSION_MAJOR(x)
+#define MM_VERSION_MINOR(x)	VERSION_MINOR(x)
+#define MM_VERSION_PATCH(x)	VERSION_PATCH(x)
 
 /* file version numbers for resource files (levels, score, setup, etc.)
 ** currently supported/known file version numbers:
