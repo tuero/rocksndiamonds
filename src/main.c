@@ -6877,6 +6877,56 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
     "-"
   },
   {
+    "mm_mask_mcduffin.right",
+    "-",
+    "-"
+  },
+  {
+    "mm_mask_mcduffin.up",
+    "-",
+    "-"
+  },
+  {
+    "mm_mask_mcduffin.left",
+    "-",
+    "-"
+  },
+  {
+    "mm_mask_mcduffin.down",
+    "-",
+    "-"
+  },
+  {
+    "mm_mask_grid_1",
+    "-",
+    "-"
+  },
+  {
+    "mm_mask_grid_2",
+    "-",
+    "-"
+  },
+  {
+    "mm_mask_grid_3",
+    "-",
+    "-"
+  },
+  {
+    "mm_mask_grid_4",
+    "-",
+    "-"
+  },
+  {
+    "mm_mask_rectangle",
+    "-",
+    "-"
+  },
+  {
+    "mm_mask_circle",
+    "-",
+    "-"
+  },
+  {
     "[default]",
     "default",
     "-"
@@ -6894,6 +6944,11 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
   {
     "[sb_default]",
     "sb_default",
+    "-"
+  },
+  {
+    "[mm_default]",
+    "mm_default",
     "-"
   },
   {
