@@ -2353,28 +2353,28 @@ static void setTreeInfoToDefaultsFromParent(TreeInfo *ti, TreeInfo *parent)
     ti->imported_by = getStringCopy(parent->imported_by);
     ti->tested_by = getStringCopy(parent->tested_by);
 
-    ti->graphics_set_ecs = NULL;
-    ti->graphics_set_aga = NULL;
-    ti->graphics_set = NULL;
-    ti->sounds_set = NULL;
-    ti->music_set = NULL;
+    ti->graphics_set_ecs = getStringCopy(parent->graphics_set_ecs);
+    ti->graphics_set_aga = getStringCopy(parent->graphics_set_aga);
+    ti->graphics_set = getStringCopy(parent->graphics_set);
+    ti->sounds_set = getStringCopy(parent->sounds_set);
+    ti->music_set = getStringCopy(parent->music_set);
     ti->graphics_path = getStringCopy(UNDEFINED_FILENAME);
     ti->sounds_path = getStringCopy(UNDEFINED_FILENAME);
     ti->music_path = getStringCopy(UNDEFINED_FILENAME);
 
-    ti->level_filename = NULL;
-    ti->level_filetype = NULL;
+    ti->level_filename = getStringCopy(parent->level_filename);
+    ti->level_filetype = getStringCopy(parent->level_filetype);
 
     ti->special_flags = getStringCopy(parent->special_flags);
 
-    ti->levels = 0;
-    ti->first_level = 0;
-    ti->last_level = 0;
+    ti->levels = parent->levels;
+    ti->first_level = parent->first_level;
+    ti->last_level = parent->last_level;
     ti->level_group = FALSE;
-    ti->handicap_level = 0;
+    ti->handicap_level = parent->handicap_level;
     ti->readonly = parent->readonly;
-    ti->handicap = TRUE;
-    ti->skip_levels = FALSE;
+    ti->handicap = parent->handicap;
+    ti->skip_levels = parent->skip_levels;
   }
 }
 
