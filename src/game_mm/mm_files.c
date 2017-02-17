@@ -92,7 +92,7 @@ void setLevelInfoToDefaults_MM()
 
   for(x=0; x<MAX_LEV_FIELDX; x++)
     for(y=0; y<MAX_LEV_FIELDY; y++)
-      Feld[x][y] = Ur[x][y] = EL_EMPTY;
+      native_mm_level.field[x][y] = Feld[x][y] = Ur[x][y] = EL_EMPTY;
 
   native_mm_level.time = 100;
   native_mm_level.kettles_needed = 0;
@@ -114,8 +114,9 @@ void setLevelInfoToDefaults_MM()
   for(i=0; i<LEVEL_SCORE_ELEMENTS; i++)
     native_mm_level.score[i] = 10;
 
-  Feld[0][0] = Ur[0][0] = EL_MCDUFFIN_RIGHT;
-  Feld[STD_LEV_FIELDX-1][STD_LEV_FIELDY-1] =
+  native_mm_level.field[0][0] = Feld[0][0] = Ur[0][0] = EL_MCDUFFIN_RIGHT;
+  native_mm_level.field[STD_LEV_FIELDX-1][STD_LEV_FIELDY-1] =
+    Feld[STD_LEV_FIELDX-1][STD_LEV_FIELDY-1] =
     Ur[STD_LEV_FIELDX-1][STD_LEV_FIELDY-1] = EL_EXIT_CLOSED;
 }
 
@@ -203,7 +204,7 @@ static int LoadLevel_MM_BODY(File *file, int chunk_size, struct LevelInfo_MM *le
 
   for(y=0; y<level->fieldy; y++)
     for(x=0; x<level->fieldx; x++)
-      Feld[x][y] = Ur[x][y] =
+      native_mm_level.field[x][y] = Feld[x][y] = Ur[x][y] =
 	checkLevelElement(level->encoding_16bit_field ?
 			  getFile16BitInteger(file, BYTE_ORDER_BIG_ENDIAN) :
 			  getFile8Bit(file));
