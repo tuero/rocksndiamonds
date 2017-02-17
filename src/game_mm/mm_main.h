@@ -316,6 +316,7 @@ extern int		num_element_info;
 **      500 - 699: flag elements, only used at runtime
 */
 /* "real" level elements */
+#define EL_MM_START		0
 #define EL_EMPTY		0
 #define EL_MIRROR_START		1
 #define EL_MIRROR_00		(EL_MIRROR_START + 0)
@@ -625,41 +626,52 @@ extern int		num_element_info;
 #define EL_BEAMER_BLUE_START	404
 #define EL_BEAMER_BLUE_END	(EL_BEAMER_BLUE_START + 15)
 
+/* (currently unused, but potentially useful element definitions) */
+#define EL_MCDUFFIN		420
+#define EL_PACMAN		421
+#define EL_FUSE_OFF		422
+#define EL_STEEL_WALL		423
+#define EL_WOODEN_WALL		424
+#define EL_ICE_WALL		425
+#define EL_AMOEBA_WALL		426
+#define EL_LASER		427
+#define EL_RECEIVER		428
+#define EL_DF_STEEL_WALL	429
+#define EL_DF_WOODEN_WALL	430
+
+#define EL_MM_END		430
+
 /* "real" (and therefore drawable) runtime elements */
-#define EL_FIRST_RUNTIME_EL	500
-#define EL_FUSE_OFF		501
-#define EL_PACMAN		502
-#define EL_EXIT_OPENING		503
-#define EL_GRAY_BALL_OPENING	504
+#define EL_EXIT_OPENING		500
+#define EL_EXIT_CLOSING		501
+#define EL_GRAY_BALL_OPENING	502
+#define EL_ICE_WALL_SHRINKING	503
+#define EL_AMOEBA_WALL_GROWING	504
 
 #define EL_WALL_CHANGING	512
 #define EL_WALL_CHANGING_START	(EL_WALL_CHANGING + 0)
 #define EL_WALL_CHANGING_END	(EL_WALL_CHANGING + 15)
 
-#if 0
-#define EL_MIRROR		5
-#define EL_GRID_STEEL		5
-#define EL_MCDUFFIN		5
-#define EL_BEAMER		5
-#define EL_POLAR		5
-#define EL_POLAR_CROSS		5
-#define EL_MIRROR_FIXED		5
-#define EL_GRID_WOOD		5
-#define EL_DF_MIRROR		5
-#define EL_GRID_WOOD_FIXED	5
-#define EL_GRID_STEEL_FIXED	5
-#define EL_LASER		5
-#define EL_RECEIVER		5
-#define EL_FIBRE_OPTIC		5
-#define EL_DF_MIRROR_AUTO	5
-#define EL_GRID_WOOD_AUTO	5
-#define EL_GRID_STEEL_AUTO	5
-#endif
+#define EL_FIRST_RUNTIME_EL	EL_EXIT_OPENING
 
 /* "unreal" (and therefore not drawable) runtime elements */
 #define EL_BLOCKED		600
 #define EL_EXPLODING_OPAQUE	601
 #define EL_EXPLODING_TRANSP	602
+#define EL_DEFAULT_EXPLODING	603
+#define EL_KETTLE_EXPLODING	604
+
+/* dummy elements (never used as game elements, only used as graphics) */
+#define EL_MM_MASK_MCDUFFIN_RIGHT	700
+#define EL_MM_MASK_MCDUFFIN_UP		701
+#define EL_MM_MASK_MCDUFFIN_LEFT	702
+#define EL_MM_MASK_MCDUFFIN_DOWN	703
+#define EL_MM_MASK_GRID_1		704
+#define EL_MM_MASK_GRID_2		705
+#define EL_MM_MASK_GRID_3		706
+#define EL_MM_MASK_GRID_4		707
+#define EL_MM_MASK_RECTANGE		708
+#define EL_MM_MASK_CIRCLE		709
 
 
 /* game graphics:
@@ -668,6 +680,8 @@ extern int		num_element_info;
 **	256 -  511: graphics from "MirrorFont"
 **	512 -  767: graphics from "MirrorDF"
 */
+
+#define IMG_EMPTY		IMG_EMPTY_SPACE
 
 #define GFX_START_MIRRORSCREEN	0
 #define GFX_END_MIRRORSCREEN	191
