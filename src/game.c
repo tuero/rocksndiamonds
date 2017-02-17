@@ -2150,6 +2150,8 @@ void UpdateGameControlValues()
 	      level.native_em_level->lev->time :
 	      level.game_engine_type == GAME_ENGINE_TYPE_SP ?
 	      level.native_sp_level->game_sp->time_played :
+	      level.game_engine_type == GAME_ENGINE_TYPE_MM ?
+	      game_mm.energy_left :
 	      game.no_time_limit ? TimePlayed : TimeLeft);
   int score = (local_player->LevelSolved ?
 	       local_player->LevelSolved_CountingScore :
@@ -2157,16 +2159,23 @@ void UpdateGameControlValues()
 	       level.native_em_level->lev->score :
 	       level.game_engine_type == GAME_ENGINE_TYPE_SP ?
 	       level.native_sp_level->game_sp->score :
+	       level.game_engine_type == GAME_ENGINE_TYPE_MM ?
+	       game_mm.score :
 	       local_player->score);
   int gems = (level.game_engine_type == GAME_ENGINE_TYPE_EM ?
 	      level.native_em_level->lev->required :
 	      level.game_engine_type == GAME_ENGINE_TYPE_SP ?
 	      level.native_sp_level->game_sp->infotrons_still_needed :
+	      level.game_engine_type == GAME_ENGINE_TYPE_MM ?
+	      game_mm.kettles_still_needed :
 	      local_player->gems_still_needed);
   int exit_closed = (level.game_engine_type == GAME_ENGINE_TYPE_EM ?
 		     level.native_em_level->lev->required > 0 :
 		     level.game_engine_type == GAME_ENGINE_TYPE_SP ?
 		     level.native_sp_level->game_sp->infotrons_still_needed > 0 :
+		     level.game_engine_type == GAME_ENGINE_TYPE_MM ?
+		     game_mm.kettles_still_needed > 0 ||
+		     game_mm.lights_still_needed > 0 :
 		     local_player->gems_still_needed > 0 ||
 		     local_player->sokobanfields_still_needed > 0 ||
 		     local_player->lights_still_needed > 0);
@@ -3935,6 +3944,10 @@ void InitGame()
   {
     InitGameEngine_SP();
   }
+  else if (level.game_engine_type == GAME_ENGINE_TYPE_MM)
+  {
+    InitGameEngine_MM();
+  }
   else
   {
     DrawLevel(REDRAW_FIELD);
@@ -4268,7 +4281,10 @@ static void PlayerWins(struct PlayerInfo *player)
   player->GameOver = TRUE;
 
   player->score_final = (level.game_engine_type == GAME_ENGINE_TYPE_EM ?
-			 level.native_em_level->lev->score : player->score);
+			 level.native_em_level->lev->score :
+			 level.game_engine_type == GAME_ENGINE_TYPE_MM ?
+			 game_mm.score :
+			 player->score);
 
   player->LevelSolved_CountingTime = (game.no_time_limit ? TimePlayed :
 				      TimeLeft);
@@ -10834,6 +10850,21 @@ static void CheckLevelTime()
     if (game_sp.GameOver)				/* game lost */
       AllPlayersGone = TRUE;
   }
+  else if (level.game_engine_type == GAME_ENGINE_TYPE_MM)
+  {
+    if (game_mm.LevelSolved &&
+	!game_mm.GameOver)				/* game won */
+    {
+      PlayerWins(local_player);
+
+      game_mm.GameOver = TRUE;
+
+      AllPlayersGone = TRUE;
+    }
+
+    if (game_mm.GameOver)				/* game lost */
+      AllPlayersGone = TRUE;
+  }
 
   if (TimeFrames >= FRAMES_PER_SECOND)
   {
@@ -11032,6 +11063,21 @@ void GameActionsExt()
     if (game_sp.GameOver)				/* game lost */
       AllPlayersGone = TRUE;
   }
+  else if (level.game_engine_type == GAME_ENGINE_TYPE_MM)
+  {
+    if (game_mm.LevelSolved &&
+	!game_mm.GameOver)				/* game won */
+    {
+      PlayerWins(local_player);
+
+      game_mm.GameOver = TRUE;
+
+      AllPlayersGone = TRUE;
+    }
+
+    if (game_mm.GameOver)				/* game lost */
+      AllPlayersGone = TRUE;
+  }
 
   if (local_player->LevelSolved && !local_player->LevelSolved_GameEnd)
     GameWon();
@@ -11214,6 +11260,10 @@ void GameActionsExt()
   {
     GameActions_SP_Main();
   }
+  else if (level.game_engine_type == GAME_ENGINE_TYPE_MM)
+  {
+    GameActions_MM_Main();
+  }
   else
   {
     GameActions_RND_Main();
@@ -11298,6 +11348,18 @@ void GameActions_SP_Main()
 
     stored_player[i].force_dropping = FALSE;
   }
+}
+
+void GameActions_MM_Main()
+{
+  byte effective_action[MAX_PLAYERS];
+  boolean warp_mode = (tape.playing && tape.warp_forward && !tape.pausing);
+  int i;
+
+  for (i = 0; i < MAX_PLAYERS; i++)
+    effective_action[i] = stored_player[i].effective_action;
+
+  GameActions_MM(effective_action, warp_mode);
 }
 
 void GameActions_RND_Main()
@@ -14743,6 +14805,8 @@ ListNode *SaveEngineSnapshotBuffers()
     SaveEngineSnapshotValues_EM();
   if (level.game_engine_type == GAME_ENGINE_TYPE_SP)
     SaveEngineSnapshotValues_SP(&buffers);
+  if (level.game_engine_type == GAME_ENGINE_TYPE_MM)
+    SaveEngineSnapshotValues_MM(&buffers);
 
   /* save values stored in special snapshot structure */
 
@@ -14752,6 +14816,8 @@ ListNode *SaveEngineSnapshotBuffers()
     SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(engine_snapshot_em));
   if (level.game_engine_type == GAME_ENGINE_TYPE_SP)
     SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(engine_snapshot_sp));
+  if (level.game_engine_type == GAME_ENGINE_TYPE_MM)
+    SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(engine_snapshot_mm));
 
   /* save further RND engine values */
 
@@ -14893,6 +14959,8 @@ void LoadEngineSnapshotValues()
     LoadEngineSnapshotValues_EM();
   if (level.game_engine_type == GAME_ENGINE_TYPE_SP)
     LoadEngineSnapshotValues_SP();
+  if (level.game_engine_type == GAME_ENGINE_TYPE_SP)
+    LoadEngineSnapshotValues_MM();
 }
 
 void LoadEngineSnapshotSingle()

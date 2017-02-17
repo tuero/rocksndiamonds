@@ -22,7 +22,11 @@ short		Hit[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 short		Box[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 short		Angle[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 
+short		Frame[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+
 unsigned int	Elementeigenschaften[MAX_ELEMENTS];
+
+struct LaserInfo	laser;
 
 short		LX,LY, XS,YS, ELX,ELY;
 short		CT,Ct;

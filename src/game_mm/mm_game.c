@@ -21,7 +21,7 @@
 #define OVERLOAD_XSIZE		ENERGY_XSIZE
 #define OVERLOAD_YSIZE		MAX_LASER_OVERLOAD
 
-/* values for Explode() */
+/* values for Explode_MM() */
 #define EX_PHASE_START		0
 #define EX_NORMAL		0
 #define EX_KETTLE		1
@@ -71,26 +71,14 @@
 #define AUTO_ROTATE_DELAY	CLICK_DELAY_SHORT
 
 /* forward declaration for internal use */
+static int MovingOrBlocked2Element_MM(int, int);
+static void Bang_MM(int, int);
+static void RaiseScore_MM(int);
+static void RemoveMovingField_MM(int, int);
+static void InitMovingField_MM(int, int, int);
+static void ContinueMoving_MM(int, int);
+static void Moving2Blocked_MM(int, int, int *, int *);
 
-
-void GetPlayerConfig()
-{
-  if (!audio.sound_available)
-    setup.sound = FALSE;
-
-  if (!audio.loops_available)
-  {
-    setup.sound_loops = FALSE;
-    setup.sound_music = FALSE;
-  }
-
-  if (!video.fullscreen_available)
-    setup.fullscreen = FALSE;
-
-  setup.sound_simple = setup.sound;
-
-  SetAudioMode(setup.sound);
-}
 
 static int get_element_angle(int element)
 {
@@ -121,7 +109,7 @@ static int get_mirrored_angle(int laser_angle, int mirror_angle)
   return (reflected_angle + 16) % 16;
 }
 
-void InitMovDir(int x, int y)
+static void InitMovDir_MM(int x, int y)
 {
   int element = Feld[x][y];
   static int direction[3][4] =
@@ -222,7 +210,7 @@ static void InitField(int x, int y, boolean init_game)
 	game_mm.pacman[game_mm.num_pacman].dir = phase + ((phase + 1) % 2) * 2;
 	game_mm.num_pacman++;
 #else
-	InitMovDir(x, y);
+	InitMovDir_MM(x, y);
 #endif
       }
       else if (IS_MCDUFFIN(element) || IS_LASER(element))
@@ -309,7 +297,7 @@ static void InitLaser()
 			    native_mm_level.laser_blue  * 0xFF);
 }
 
-void InitGame()
+void InitGameEngine_MM()
 {
   int i, x, y;
 
@@ -371,9 +359,11 @@ void InitGame()
   InitCycleElements();
   InitLaser();
 
+#if 0
   /* copy default game door content to main double buffer */
   BlitBitmap(pix[PIX_DOOR], drawto,
 	     DOOR_GFX_PAGEX5, DOOR_GFX_PAGEY1, DXSIZE, DYSIZE, DX, DY);
+#endif
 
 #if 0
   DrawText(DX_LEVEL, DY_LEVEL,
@@ -392,25 +382,30 @@ void InitGame()
   */
   MapGameButtons();
 
+#if 0
   /* copy actual game door content to door double buffer for OpenDoor() */
   BlitBitmap(drawto, pix[PIX_DB_DOOR],
 	     DX, DY, DXSIZE, DYSIZE, DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1);
+#endif
 
   OpenDoor(DOOR_OPEN_ALL);
 
   if (setup.sound_loops)
     PlaySoundExt(SND_FUEL, SOUND_MAX_VOLUME, SOUND_MAX_RIGHT, SND_CTRL_PLAY_LOOP);
 
+#if 0 // !!! TEMPORARILY DISABLED !!!
   for(i=0; i<=game_mm.energy_left; i+=2)
   {
     if (!setup.sound_loops)
       PlaySoundStereo(SND_FUEL, SOUND_MAX_RIGHT);
 
+#if 0
     BlitBitmap(pix[PIX_DOOR], drawto,
 	       DOOR_GFX_PAGEX4 + XX_ENERGY,
 	       DOOR_GFX_PAGEY1 + YY_ENERGY + ENERGY_YSIZE - i,
 	       ENERGY_XSIZE, i,
 	       DX_ENERGY, DY_ENERGY + ENERGY_YSIZE - i);
+#endif
 
     redraw_mask |= REDRAW_DOOR_1;
     BackToFront();
@@ -427,9 +422,12 @@ void InitGame()
 
   if (setup.sound_loops)
     StopSound(SND_FUEL);
+#endif
 
+#if 0
   if (setup.sound_music && num_bg_loops)
     PlayMusic(level_nr % num_bg_loops);
+#endif
 
   ScanLaser();
 }
@@ -545,7 +543,12 @@ int ScanPixel()
 	  mask_x = (graphic_mask % GFX_PER_LINE) * TILEX + dx;
 	  mask_y = (graphic_mask / GFX_PER_LINE) * TILEY + dy;
 
+#if 1
+	  // !!! temporary fix to compile -- change to game graphics !!!
+	  pixel = (ReadPixel(drawto, mask_x, mask_y) ? 1 : 0);
+#else
 	  pixel = (ReadPixel(pix[PIX_BACK], mask_x, mask_y) ? 1 : 0);
+#endif
 	}
       }
       else
@@ -1053,7 +1056,7 @@ boolean HitElement(int element, int hit_mask)
     return FALSE;
 
   if (IS_MOVING(ELX, ELY) || IS_BLOCKED(ELX, ELY))
-    element = MovingOrBlocked2Element(ELX, ELY);
+    element = MovingOrBlocked2Element_MM(ELX, ELY);
 
 #if 0
   printf("HitElement (1): element == %d\n", element);
@@ -1242,10 +1245,10 @@ boolean HitElement(int element, int hit_mask)
       IS_PACMAN(element))
   {
     if (!IS_PACMAN(element))
-      Bang(ELX, ELY);
+      Bang_MM(ELX, ELY);
 
     if (element == EL_PACMAN)
-      Bang(ELX, ELY);
+      Bang_MM(ELX, ELY);
 
     if (element == EL_KETTLE || element == EL_CELL)
     {
@@ -1254,7 +1257,7 @@ boolean HitElement(int element, int hit_mask)
 	DrawText(DX_KETTLES, DY_KETTLES,
 		 int2str(--game_mm.kettles_still_needed, 3), FONT_TEXT_2);
 #endif
-      RaiseScore(10);
+      RaiseScore_MM(10);
 
       if (game_mm.kettles_still_needed == 0)
       {
@@ -1301,11 +1304,11 @@ boolean HitElement(int element, int hit_mask)
     else if (element == EL_KEY)
       game_mm.num_keys++;
     else if (element == EL_LIGHTBALL)
-      RaiseScore(10);
+      RaiseScore_MM(10);
     else if (IS_PACMAN(element))
     {
       DeletePacMan(ELX, ELY);
-      RaiseScore(50);
+      RaiseScore_MM(50);
     }
 
     return FALSE;
@@ -1611,7 +1614,7 @@ boolean HitBlock(int element, int hit_mask)
 				  hit_mask == HIT_MASK_RIGHT));
     AddLaserEdge(LX, LY);
 
-    Bang(ELX, ELY);
+    Bang_MM(ELX, ELY);
 
     game_mm.num_keys--;
     if (element == EL_GATE_STONE && Box[ELX][ELY])
@@ -2153,7 +2156,7 @@ void GrowAmoeba(int x, int y)
   }
 }
 
-void Explode(int x, int y, int phase, int mode)
+static void Explode_MM(int x, int y, int phase, int mode)
 {
   int num_phase = 9, delay = 2;
   int last_phase = num_phase * delay;
@@ -2171,8 +2174,8 @@ void Explode(int x, int y, int phase, int mode)
     if (IS_MOVING(x, y) || IS_BLOCKED(x, y))
     {
       /* put moving element to center field (and let it explode there) */
-      center_element = MovingOrBlocked2Element(x, y);
-      RemoveMovingField(x, y);
+      center_element = MovingOrBlocked2Element_MM(x, y);
+      RemoveMovingField_MM(x, y);
       Feld[x][y] = center_element;
     }
 
@@ -2210,7 +2213,7 @@ void Explode(int x, int y, int phase, int mode)
       DrawLaser(0, DL_LASER_DISABLED);
       laser.num_edges = 0;
 
-      Bang(laser.start_edge.x, laser.start_edge.y);
+      Bang_MM(laser.start_edge.x, laser.start_edge.y);
       Store[x][y] = EL_EMPTY;
     }
     else if (IS_MCDUFFIN(Store[x][y]))
@@ -2263,7 +2266,7 @@ void Explode(int x, int y, int phase, int mode)
   }
 }
 
-void Bang(int x, int y)
+static void Bang_MM(int x, int y)
 {
   int element = Feld[x][y];
   int mode = EX_NORMAL;
@@ -2297,7 +2300,7 @@ void Bang(int x, int y)
   else
     PlaySoundStereo((mode == EX_SHORT ? SND_WHOOSH : SND_KABUMM), ST(x));
 
-  Explode(x, y, EX_PHASE_START, mode);
+  Explode_MM(x, y, EX_PHASE_START, mode);
 }
 
 void TurnRound(int x, int y)
@@ -2372,7 +2375,7 @@ void TurnRound(int x, int y)
   }
 }
 
-void StartMoving(int x, int y)
+static void StartMoving_MM(int x, int y)
 {
   int element = Feld[x][y];
 
@@ -2393,7 +2396,7 @@ void StartMoving(int x, int y)
 
     /* now make next step */
 
-    Moving2Blocked(x, y, &newx, &newy);	/* get next screen position */
+    Moving2Blocked_MM(x, y, &newx, &newy);	/* get next screen position */
 
     if (element == EL_PACMAN &&
 	IN_LEV_FIELD(newx, newy) && IS_EATABLE4PACMAN(Feld[newx][newy]) &&
@@ -2413,14 +2416,14 @@ void StartMoving(int x, int y)
       return;
     }
 
-    InitMovingField(x, y, MovDir[x][y]);
+    InitMovingField_MM(x, y, MovDir[x][y]);
   }
 
   if (MovDir[x][y])
-    ContinueMoving(x, y);
+    ContinueMoving_MM(x, y);
 }
 
-void ContinueMoving(int x, int y)
+static void ContinueMoving_MM(int x, int y)
 {
   int element = Feld[x][y];
   int direction = MovDir[x][y];
@@ -2451,7 +2454,7 @@ void ContinueMoving(int x, int y)
     if (element == EL_PACMAN)
     {
       if (Store[newx][newy] == EL_BOMB)
-	Bang(newx, newy);
+	Bang_MM(newx, newy);
 
       if (IS_WALL_AMOEBA(Store[newx][newy]) &&
 	  (LX + 2 * XS) / TILEX == newx &&
@@ -2556,8 +2559,8 @@ void ClickElement(int mx, int my, int button)
   }
   else if (element == EL_LIGHTBALL)
   {
-    Bang(x, y);
-    RaiseScore(10);
+    Bang_MM(x, y);
+    RaiseScore_MM(10);
     DrawLaser(0, DL_LASER_ENABLED);
   }
 
@@ -2721,7 +2724,7 @@ void DeletePacMan(int px, int py)
 {
   int i, j;
 
-  Bang(px, py);
+  Bang_MM(px, py);
 
   if (game_mm.num_pacman <= 1)
   {
@@ -2786,7 +2789,7 @@ void ColorCycling(void)
   }
 }
 
-void GameActions()
+void GameActions_MM(byte action[MAX_PLAYERS], boolean warp_mode)
 {
   static unsigned int action_delay = 0;
   static unsigned int pacman_delay = 0;
@@ -2819,11 +2822,11 @@ void GameActions()
     element = Feld[x][y];
 
     if (!IS_MOVING(x, y) && CAN_MOVE(element))
-      StartMoving(x, y);
+      StartMoving_MM(x, y);
     else if (IS_MOVING(x, y))
-      ContinueMoving(x, y);
+      ContinueMoving_MM(x, y);
     else if (IS_EXPLODING(element))
-      Explode(x, y, Frame[x][y], EX_NORMAL);
+      Explode_MM(x, y, Frame[x][y], EX_NORMAL);
     else if (element == EL_EXIT_OPENING)
       OpenExit(x, y);
     else if (element == EL_GRAY_BALL_OPENING)
@@ -2839,7 +2842,7 @@ void GameActions()
 #if 1
   /* !!! CHANGE THIS: REDRAW ONLY WHEN NEEDED !!! */
 
-  /* redraw after Explode() ... */
+  /* redraw after Explode_MM() ... */
   if (laser.redraw)
     DrawLaser(0, DL_LASER_ENABLED);
   laser.redraw = FALSE;
@@ -2863,10 +2866,12 @@ void GameActions()
     game_mm.energy_left--;
     if (game_mm.energy_left >= 0)
     {
+#if 0
       BlitBitmap(pix[PIX_DOOR], drawto,
 		 DOOR_GFX_PAGEX5 + XX_ENERGY, DOOR_GFX_PAGEY1 + YY_ENERGY,
 		 ENERGY_XSIZE, ENERGY_YSIZE - game_mm.energy_left,
 		 DX_ENERGY, DY_ENERGY);
+#endif
       redraw_mask |= REDRAW_DOOR_1;
     }
     else if (setup.time_limit)
@@ -2978,6 +2983,7 @@ void GameActions()
 
     if (laser.overloaded)
     {
+#if 0
       BlitBitmap(pix[PIX_DOOR], drawto,
 		 DOOR_GFX_PAGEX4 + XX_OVERLOAD,
 		 DOOR_GFX_PAGEY1 + YY_OVERLOAD + OVERLOAD_YSIZE
@@ -2985,14 +2991,17 @@ void GameActions()
 		 OVERLOAD_XSIZE, laser.overload_value,
 		 DX_OVERLOAD, DY_OVERLOAD + OVERLOAD_YSIZE
 		 - laser.overload_value);
+#endif
       redraw_mask |= REDRAW_DOOR_1;
     }
     else
     {
+#if 0
       BlitBitmap(pix[PIX_DOOR], drawto,
 		 DOOR_GFX_PAGEX5 + XX_OVERLOAD, DOOR_GFX_PAGEY1 + YY_OVERLOAD,
 		 OVERLOAD_XSIZE, OVERLOAD_YSIZE - laser.overload_value,
 		 DX_OVERLOAD, DY_OVERLOAD);
+#endif
       redraw_mask |= REDRAW_DOOR_1;
     }
 
@@ -3049,17 +3058,17 @@ void GameActions()
     laser.num_edges = 0;
 #endif
 
-    Bang(ELX, ELY);
+    Bang_MM(ELX, ELY);
 
     laser.dest_element = EL_EXPLODING_OPAQUE;
 
 #if 0
-    Bang(ELX, ELY);
+    Bang_MM(ELX, ELY);
     laser.num_damages--;
     DrawLaser(0, DL_LASER_DISABLED);
 
     laser.num_edges = 0;
-    Bang(laser.start_edge.x, laser.start_edge.y);
+    Bang_MM(laser.start_edge.x, laser.start_edge.y);
 
     if (Request("Bomb killed Mc Duffin ! Play it again ?",
 		REQ_ASK | REQ_STAY_CLOSED))
@@ -3144,11 +3153,13 @@ void GameActions()
       int x = RND(26);
       int y = RND(26);
 
+#if 0
       BlitBitmap(pix[PIX_BACK], drawto,
 		 SX + (graphic % GFX_PER_LINE) * TILEX + x,
 		 SY + (graphic / GFX_PER_LINE) * TILEY + y, 6, 6,
 		 SX + ELX * TILEX + x,
 		 SY + ELY * TILEY + y);
+#endif
       MarkTileDirty(ELX, ELY);
       BackToFront();
 
@@ -3440,11 +3451,13 @@ void GameActions()
   {
     for(i=game_mm.energy_left; i<=MAX_LASER_ENERGY; i+=2)
     {
+#if 0
       BlitBitmap(pix[PIX_DOOR], drawto,
 		 DOOR_GFX_PAGEX4 + XX_ENERGY,
 		 DOOR_GFX_PAGEY1 + YY_ENERGY + ENERGY_YSIZE - i,
 		 ENERGY_XSIZE, i, DX_ENERGY,
 		 DY_ENERGY + ENERGY_YSIZE - i);
+#endif
 
       redraw_mask |= REDRAW_DOOR_1;
       BackToFront();
@@ -3528,9 +3541,17 @@ void MovePacMen()
 
       for(i=1; i<33; i+=2)
       {
+#if 1
+	// !!! temporary fix to compile -- change to game graphics !!!
+	BlitBitmap(drawto, window,
+		   SX + g * TILEX, SY + 4 * TILEY, TILEX, TILEY,
+		   ox + i * mx, oy + i * my);
+#else
 	BlitBitmap(pix[PIX_BACK], window,
 		   SX + g * TILEX, SY + 4 * TILEY, TILEX, TILEY,
 		   ox + i * mx, oy + i * my);
+#endif
+
 #if 0
 	FlushDisplay();
 	Delay(1);
@@ -3568,7 +3589,7 @@ void MovePacMen()
   }
 }
 
-void GameWon()
+void GameWon_MM()
 {
   int hi_pos;
   boolean raise_level = FALSE;
@@ -3592,18 +3613,20 @@ void GameWon()
 
       /*
       if (game_mm.energy_left > 0 && !(game_mm.energy_left % 10))
-	RaiseScore(native_mm_level.score[SC_ZEITBONUS]);
+	RaiseScore_MM(native_mm_level.score[SC_ZEITBONUS]);
       */
 
-      RaiseScore(5);
+      RaiseScore_MM(5);
 
       game_mm.energy_left--;
       if (game_mm.energy_left >= 0)
       {
+#if 0
 	BlitBitmap(pix[PIX_DOOR], drawto,
 		   DOOR_GFX_PAGEX5 + XX_ENERGY, DOOR_GFX_PAGEY1 + YY_ENERGY,
 		   ENERGY_XSIZE, ENERGY_YSIZE - game_mm.energy_left,
 		   DX_ENERGY, DY_ENERGY);
+#endif
 	redraw_mask |= REDRAW_DOOR_1;
       }
 
@@ -3624,7 +3647,7 @@ void GameWon()
       if (!setup.sound_loops)
 	PlaySoundStereo(SND_SIRR, SOUND_MAX_RIGHT);
       if (TimePlayed < 999 && !(TimePlayed % 10))
-	RaiseScore(native_mm_level.score[SC_ZEITBONUS]);
+	RaiseScore_MM(native_mm_level.score[SC_ZEITBONUS]);
       if (TimePlayed < 900 && !(TimePlayed % 10))
 	TimePlayed += 10;
       else
@@ -3661,7 +3684,7 @@ void GameWon()
   else if (level_nr < leveldir_current->last_level)
     raise_level = TRUE;		/* advance to next level */
 
-  if ((hi_pos = NewHiScore()) >= 0)
+  if ((hi_pos = NewHiScore_MM()) >= 0)
   {
     game_status = HALLOFFAME;
     // DrawHallOfFame(hi_pos);
@@ -3679,7 +3702,7 @@ void GameWon()
   BackToFront();
 }
 
-int NewHiScore()
+int NewHiScore_MM()
 {
   int k, l;
   int position = -1;
@@ -3739,7 +3762,7 @@ int NewHiScore()
   return position;
 }
 
-void InitMovingField(int x, int y, int direction)
+static void InitMovingField_MM(int x, int y, int direction)
 {
   int newx = x + (direction == MV_LEFT ? -1 : direction == MV_RIGHT ? +1 : 0);
   int newy = y + (direction == MV_UP   ? -1 : direction == MV_DOWN  ? +1 : 0);
@@ -3750,7 +3773,7 @@ void InitMovingField(int x, int y, int direction)
     Feld[newx][newy] = EL_BLOCKED;
 }
 
-void Moving2Blocked(int x, int y, int *goes_to_x, int *goes_to_y)
+static void Moving2Blocked_MM(int x, int y, int *goes_to_x, int *goes_to_y)
 {
   int direction = MovDir[x][y];
   int newx = x + (direction == MV_LEFT ? -1 : direction == MV_RIGHT ? +1 : 0);
@@ -3760,7 +3783,8 @@ void Moving2Blocked(int x, int y, int *goes_to_x, int *goes_to_y)
   *goes_to_y = newy;
 }
 
-void Blocked2Moving(int x, int y, int *comes_from_x, int *comes_from_y)
+static void Blocked2Moving_MM(int x, int y,
+			      int *comes_from_x, int *comes_from_y)
 {
   int oldx = x, oldy = y;
   int direction = MovDir[x][y];
@@ -3778,7 +3802,7 @@ void Blocked2Moving(int x, int y, int *comes_from_x, int *comes_from_y)
   *comes_from_y = oldy;
 }
 
-int MovingOrBlocked2Element(int x, int y)
+static int MovingOrBlocked2Element_MM(int x, int y)
 {
   int element = Feld[x][y];
 
@@ -3786,7 +3810,7 @@ int MovingOrBlocked2Element(int x, int y)
   {
     int oldx, oldy;
 
-    Blocked2Moving(x, y, &oldx, &oldy);
+    Blocked2Moving_MM(x, y, &oldx, &oldy);
     return Feld[oldx][oldy];
   }
   else
@@ -3803,7 +3827,7 @@ static void RemoveField(int x, int y)
 }
 #endif
 
-void RemoveMovingField(int x, int y)
+static void RemoveMovingField_MM(int x, int y)
 {
   int oldx = x, oldy = y, newx = x, newy = y;
 
@@ -3812,13 +3836,13 @@ void RemoveMovingField(int x, int y)
 
   if (IS_MOVING(x, y))
   {
-    Moving2Blocked(x, y, &newx, &newy);
+    Moving2Blocked_MM(x, y, &newx, &newy);
     if (Feld[newx][newy] != EL_BLOCKED)
       return;
   }
   else if (Feld[x][y] == EL_BLOCKED)
   {
-    Blocked2Moving(x, y, &oldx, &oldy);
+    Blocked2Moving_MM(x, y, &oldx, &oldy);
     if (!IS_MOVING(oldx, oldy))
       return;
   }
@@ -3870,7 +3894,7 @@ void PlaySoundLevel(int x, int y, int sound_nr)
   PlaySoundExt(sound_nr, volume, stereo, SND_CTRL_PLAY_SOUND);
 }
 
-void RaiseScore(int value)
+static void RaiseScore_MM(int value)
 {
   game_mm.score += value;
 #if 0
@@ -3879,15 +3903,15 @@ void RaiseScore(int value)
 #endif
 }
 
-void RaiseScoreElement(int element)
+void RaiseScoreElement_MM(int element)
 {
   switch(element)
   {
     case EL_PACMAN:
-      RaiseScore(native_mm_level.score[SC_PACMAN]);
+      RaiseScore_MM(native_mm_level.score[SC_PACMAN]);
       break;
     case EL_KEY:
-      RaiseScore(native_mm_level.score[SC_KEY]);
+      RaiseScore_MM(native_mm_level.score[SC_KEY]);
       break;
     default:
       break;
