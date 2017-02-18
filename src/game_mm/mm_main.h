@@ -317,6 +317,8 @@ extern int		num_element_info;
 */
 /* "real" level elements */
 #define EL_MM_START		0
+#define EL_MM_START_1		EL_MM_START
+
 #define EL_EMPTY		0
 #define EL_MIRROR_START		1
 #define EL_MIRROR_00		(EL_MIRROR_START + 0)
@@ -451,6 +453,8 @@ extern int		num_element_info;
 #define EL_GRID_WOOD_END	EL_GRID_WOOD_03
 #define EL_FUEL_EMPTY		155
 
+#define EL_MM_END_1		155
+
 #define EL_CHAR_START		160
 #define EL_CHAR_ASCII0		(EL_CHAR_START-32)
 #define EL_CHAR_AUSRUF		(EL_CHAR_ASCII0+33)
@@ -490,8 +494,10 @@ extern int		num_element_info;
 				 (x) == CHAR_BYTE_UMLAUT_U ? EL_CHAR_UE : \
 				 EL_CHAR_A + (x) - 'A')
 
+#define EL_MM_START_2		240
+
 /* elements for "Deflektor" style levels */
-#define EL_DF_START		240
+#define EL_DF_START		EL_MM_START_2
 
 #define EL_DF_MIRROR_START	EL_DF_START
 #define EL_DF_MIRROR_00		(EL_DF_MIRROR_START + 0)
@@ -639,7 +645,8 @@ extern int		num_element_info;
 #define EL_DF_STEEL_WALL	429
 #define EL_DF_WOODEN_WALL	430
 
-#define EL_MM_END		430
+#define EL_MM_END_2		430
+#define EL_MM_END		EL_MM_END_2
 
 /* "real" (and therefore drawable) runtime elements */
 #define EL_EXIT_OPENING		500

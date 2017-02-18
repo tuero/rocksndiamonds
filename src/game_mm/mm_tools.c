@@ -722,8 +722,25 @@ int get_rotated_element(int element, int step)
   return base_element + (element_phase + step + num_elements) % num_elements;
 }
 
+static int map_element(int element)
+{
+  switch (element)
+  {
+    case EL_WALL_STEEL:		return EL_STEEL_WALL;
+    case EL_WALL_WOOD:		return EL_WOODEN_WALL;
+    case EL_WALL_ICE:		return EL_ICE_WALL;
+    case EL_WALL_AMOEBA:	return EL_AMOEBA_WALL;
+    case EL_DF_WALL_STEEL:	return EL_DF_STEEL_WALL;
+    case EL_DF_WALL_WOOD:	return EL_DF_WOODEN_WALL;
+
+    default:			return element;
+  }
+}
+
 int el2gfx(int element)
 {
+  element = map_element(element);
+
   switch (element)
   {
     case EL_LIGHTBALL:

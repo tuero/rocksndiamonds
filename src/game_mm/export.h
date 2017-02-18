@@ -31,23 +31,24 @@
 #define MM_MAX_LEVEL_AUTHOR_LEN		32
 
 
-#define EL_EMPTY_NATIVE_MM		0
-#define EL_DF_EMPTY_NATIVE_MM		304
+#define EL_MM_START_1_NATIVE		0
+#define EL_MM_END_1_NATIVE		155
 
-#define EL_MM_START_NATIVE_MM		0
-#define EL_MM_END_NATIVE_MM		430
+#define EL_MM_CHAR_START_NATIVE		160
+#define EL_MM_CHAR_END_NATIVE		239
 
-#define EL_CHAR_START_NATIVE_MM		160
-#define EL_CHAR_END_NATIVE_MM		239
+#define EL_MM_START_2_NATIVE		240
+#define EL_MM_END_2_NATIVE		430
 
-#define EL_DF_START_NATIVE_MM		240
-#define EL_DF_END_NATIVE_MM		355
+#define EL_MM_RUNTIME_START_NATIVE	500
+#define EL_MM_RUNTIME_END_NATIVE	504
 
-#define EL_MM_RUNTIME_START_NATIVE_MM	500
-#define EL_MM_RUNTIME_END_NATIVE_MM	504
+#define EL_MM_DUMMY_START_NATIVE	700
+#define EL_MM_DUMMY_END_NATIVE		709
 
-#define EL_MM_DUMMY_START_NATIVE_MM	700
-#define EL_MM_DUMMY_END_NATIVE_MM	709
+/* elements to be specially mapped */
+#define EL_MM_EMPTY_NATIVE		0
+#define EL_DF_EMPTY_NATIVE		304
 
 
 /* ------------------------------------------------------------------------- */

@@ -7230,54 +7230,54 @@ int map_action_SP_to_RND(int action_sp)
 
 int map_element_RND_to_MM(int element_rnd)
 {
-  return (element_rnd >= EL_CHAR_START &&
+  return (element_rnd >= EL_MM_START_1 &&
+	  element_rnd <= EL_MM_END_1 ?
+	  EL_MM_START_1_NATIVE + element_rnd - EL_MM_START_1 :
+
+	  element_rnd >= EL_MM_START_2 &&
+	  element_rnd <= EL_MM_END_2 ?
+	  EL_MM_START_2_NATIVE + element_rnd - EL_MM_START_2 :
+
+	  element_rnd >= EL_CHAR_START &&
 	  element_rnd <= EL_CHAR_END ?
-	  EL_CHAR_START_NATIVE_MM + element_rnd - EL_CHAR_START :
-
-	  element_rnd >= EL_DF_START &&
-	  element_rnd <= EL_DF_END ?
-	  EL_DF_START_NATIVE_MM + element_rnd - EL_DF_START :
-
-	  element_rnd >= EL_MM_START &&
-	  element_rnd <= EL_MM_END ?
-	  EL_MM_START_NATIVE_MM + element_rnd - EL_MM_START :
+	  EL_MM_CHAR_START_NATIVE + element_rnd - EL_CHAR_START :
 
 	  element_rnd >= EL_MM_RUNTIME_START &&
 	  element_rnd <= EL_MM_RUNTIME_END ?
-	  EL_MM_RUNTIME_START_NATIVE_MM + element_rnd - EL_MM_RUNTIME_START :
+	  EL_MM_RUNTIME_START_NATIVE + element_rnd - EL_MM_RUNTIME_START :
 
 	  element_rnd >= EL_MM_DUMMY_START &&
 	  element_rnd <= EL_MM_DUMMY_END ?
-	  EL_MM_DUMMY_START_NATIVE_MM + element_rnd - EL_MM_DUMMY_START :
+	  EL_MM_DUMMY_START_NATIVE + element_rnd - EL_MM_DUMMY_START :
 
-	  EL_EMPTY_NATIVE_MM);
+	  EL_MM_EMPTY_NATIVE);
 }
 
 int map_element_MM_to_RND(int element_mm)
 {
-  return (element_mm == EL_EMPTY_NATIVE_MM ||
-	  element_mm == EL_DF_EMPTY_NATIVE_MM ?
+  return (element_mm == EL_MM_EMPTY_NATIVE ||
+	  element_mm == EL_DF_EMPTY_NATIVE ?
 	  EL_EMPTY :
 
-	  element_mm >= EL_CHAR_START_NATIVE_MM &&
-	  element_mm <= EL_CHAR_END_NATIVE_MM ?
-	  EL_CHAR_START + element_mm - EL_CHAR_START_NATIVE_MM :
+	  element_mm >= EL_MM_START_1_NATIVE &&
+	  element_mm <= EL_MM_END_1_NATIVE ?
+	  EL_MM_START_1 + element_mm - EL_MM_START_1_NATIVE :
 
-	  element_mm >= EL_DF_START_NATIVE_MM &&
-	  element_mm <= EL_DF_END_NATIVE_MM ?
-	  EL_DF_START + element_mm - EL_DF_START_NATIVE_MM :
+	  element_mm >= EL_MM_START_2_NATIVE &&
+	  element_mm <= EL_MM_END_2_NATIVE ?
+	  EL_MM_START_2 + element_mm - EL_MM_START_2_NATIVE :
 
-	  element_mm >= EL_MM_START_NATIVE_MM &&
-	  element_mm <= EL_MM_END_NATIVE_MM ?
-	  EL_MM_START + element_mm - EL_MM_START_NATIVE_MM :
+	  element_mm >= EL_MM_CHAR_START_NATIVE &&
+	  element_mm <= EL_MM_CHAR_END_NATIVE ?
+	  EL_CHAR_START + element_mm - EL_MM_CHAR_START_NATIVE :
 
-	  element_mm >= EL_MM_RUNTIME_START_NATIVE_MM &&
-	  element_mm <= EL_MM_RUNTIME_END_NATIVE_MM ?
-	  EL_MM_RUNTIME_START + element_mm - EL_MM_RUNTIME_START_NATIVE_MM :
+	  element_mm >= EL_MM_RUNTIME_START_NATIVE &&
+	  element_mm <= EL_MM_RUNTIME_END_NATIVE ?
+	  EL_MM_RUNTIME_START + element_mm - EL_MM_RUNTIME_START_NATIVE :
 
-	  element_mm >= EL_MM_DUMMY_START_NATIVE_MM &&
-	  element_mm <= EL_MM_DUMMY_END_NATIVE_MM ?
-	  EL_MM_DUMMY_START + element_mm - EL_MM_DUMMY_START_NATIVE_MM :
+	  element_mm >= EL_MM_DUMMY_START_NATIVE &&
+	  element_mm <= EL_MM_DUMMY_END_NATIVE ?
+	  EL_MM_DUMMY_START + element_mm - EL_MM_DUMMY_START_NATIVE :
 
 	  EL_EMPTY);
 }
