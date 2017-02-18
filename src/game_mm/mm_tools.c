@@ -82,13 +82,6 @@ void DrawGraphic_MM(int x, int y, int graphic)
     printf("DrawGraphic_MM(): x = %d, y = %d, graphic = %d\n",x,y,graphic);
     printf("DrawGraphic_MM(): This should never happen!\n");
 
-#if 1
-    {
-      int i=0;
-      i=i/i;
-    }
-#endif
-
     return;
   }
 #endif
@@ -121,7 +114,8 @@ void DrawGraphicThruMask_MM(int x, int y, int graphic)
   MarkTileDirty(x,y);
 }
 
-void DrawGraphicThruMaskExt_MM(DrawBuffer *d, int dest_x, int dest_y, int graphic)
+void DrawGraphicThruMaskExt_MM(DrawBuffer *d, int dest_x, int dest_y,
+			       int graphic)
 {
   int src_x, src_y;
   Bitmap *src_bitmap;
@@ -631,58 +625,12 @@ int REQ_in_range(int x, int y)
 
 Pixel ReadPixel(DrawBuffer *bitmap, int x, int y)
 {
-#if defined(TARGET_SDL) || defined(TARGET_ALLEGRO)
   return GetPixel(bitmap, x, y);
-#else
-  /* GetPixel() does also work for X11, but we use some optimization here */
-  unsigned int pixel_value;
-
-  if (bitmap == pix[PIX_BACK])
-  {
-    /* when reading pixel values from images, it is much faster to use
-       client side images (XImage) than server side images (Pixmap) */
-    static XImage *client_image = NULL;
-
-    if (client_image == NULL)	/* init image cache, if not existing */
-      client_image = XGetImage(display, bitmap->drawable,
-			       0,0, WIN_XSIZE,WIN_YSIZE, AllPlanes, ZPixmap);
-
-    pixel_value = XGetPixel(client_image, x, y);
-  }
-  else
-  {
-    XImage *pixel_image;
-
-    pixel_image = XGetImage(display, bitmap->drawable, x, y, 1, 1,
-			    AllPlanes, ZPixmap);
-    pixel_value = XGetPixel(pixel_image, 0, 0);
-
-    XDestroyImage(pixel_image);
-  }
-
-  return pixel_value;
-#endif
 }
 
 void SetRGB(unsigned int pixel,
 	    unsigned short red, unsigned short green, unsigned short blue)
 {
-  return;
-
-#if 0
-  XColor color;
-
-  if (color_status==STATIC_COLORS)
-    return;
-
-  color.pixel = pixel;
-  color.red = red;
-  color.green = green;
-  color.blue = blue;
-  color.flags = DoRed | DoGreen | DoBlue;
-  XStoreColor(display, cmap, &color);
-  XFlush(display);
-#endif
 }
 
 int get_base_element(int element)

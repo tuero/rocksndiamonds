@@ -202,16 +202,7 @@ static void InitField(int x, int y, boolean init_game)
       }
       else if (IS_PACMAN(element))
       {
-#if 0
-	int phase = element - EL_PACMAN_RIGHT;
-
-	game_mm.pacman[game_mm.num_pacman].x = x;
-	game_mm.pacman[game_mm.num_pacman].y = y;
-	game_mm.pacman[game_mm.num_pacman].dir = phase + ((phase + 1) % 2) * 2;
-	game_mm.num_pacman++;
-#else
 	InitMovDir_MM(x, y);
-#endif
       }
       else if (IS_MCDUFFIN(element) || IS_LASER(element))
       {
@@ -375,11 +366,6 @@ void InitGameEngine_MM()
 #endif
 
   UnmapGameButtons();
-  /*
-  game_gadget[SOUND_CTRL_ID_MUSIC]->checked = setup.sound_music;
-  game_gadget[SOUND_CTRL_ID_LOOPS]->checked = setup.sound_loops;
-  game_gadget[SOUND_CTRL_ID_SIMPLE]->checked = setup.sound_simple;
-  */
   MapGameButtons();
 
 #if 0
@@ -499,7 +485,7 @@ int ScanPixel()
     int i;
 
 #if 0
-    /* for security */
+    /* for safety */
     if (SX + LX < REAL_SX || SX + LX >= REAL_SX + FULL_SXSIZE ||
 	SY + LY < REAL_SY || SY + LY >= REAL_SY + FULL_SYSIZE)
     {
@@ -579,22 +565,9 @@ void ScanLaser()
 {
   int element;
   int end = 0, rf = laser.num_edges;
-#if 0
-  unsigned short color_scale = 0xFFFF / 15;
-#endif
-#if 0
-  int testx, testy;
-#endif
 
   laser.overloaded = FALSE;
   laser.stops_inside_element = FALSE;
-
-#if 0
-  if (laser.overload_value < MAX_LASER_OVERLOAD - 8)
-    SetRGB(pen_ray,
-	   (laser.overload_value / 6) * color_scale, 0x0000,
-	   (15 - (laser.overload_value / 6)) * color_scale);
-#endif
 
   DrawLaser(0, DL_LASER_ENABLED);
 
@@ -658,7 +631,6 @@ void ScanLaser()
       ELY = (LY - 2) / TILEY;
     }
 
-
 #if 0
     printf("hit_mask (2) == '%x' (%d, %d) (%d, %d)\n",
 	   hit_mask, LX, LY, ELX, ELY);
@@ -678,11 +650,6 @@ void ScanLaser()
 #if 0
     if (!IN_LEV_FIELD(ELX, ELY))
       printf("WARNING! (1) %d, %d (%d)\n", ELX, ELY, element);
-#endif
-
-#if 0
-    testx = ELX;
-    testy = ELY;
 #endif
 
     if (element == EL_EMPTY)
@@ -744,14 +711,6 @@ void ScanLaser()
     rf = laser.num_edges;
   }
 
-  /*
-    element = Feld[ELX][ELY];
-    laser.dest_element = element;
-  */
-
-
-
-
 #if 0
   if (laser.dest_element != Feld[ELX][ELY])
   {
@@ -759,7 +718,6 @@ void ScanLaser()
 	   laser.dest_element, Feld[ELX][ELY]);
   }
 #endif
-
 
   if (!end && !laser.stops_inside_element && !StepBehind())
   {
@@ -777,19 +735,10 @@ void ScanLaser()
 
   Ct = CT = Counter();
 
-
 #if 0
     if (!IN_LEV_FIELD(ELX, ELY))
       printf("WARNING! (2) %d, %d\n", ELX, ELY);
 #endif
-
-
-#if 0
-  printf("(%d, %d) == %d  [(%d, %d) == %d]\n",
-	 testx, testy, laser.dest_element,
-	 ELX, ELY, (IN_SCR_FIELD(ELX,ELY) ? Feld[ELX][ELY] : -1));
-#endif
-
 }
 
 void DrawLaserExt(int start_edge, int num_edges, int mode)
@@ -870,7 +819,6 @@ void DrawLaserExt(int start_edge, int num_edges, int mode)
     elx = laser.damage[damage_start].x;
     ely = laser.damage[damage_start].y;
     element = Feld[elx][ely];
-
 
 #if 0
     if (IS_BEAMER(element))
@@ -1071,18 +1019,6 @@ boolean HitElement(int element, int hit_mask)
 
   AddDamagedField(ELX, ELY);
 
-#if 0
-  if (ELX != (LX + 5 * XS) / TILEX ||
-      ELY != (LY + 5 * YS) / TILEY)
-  {
-    LX += 2 * XS;
-    LY += 2 * YS;
-
-    return FALSE;
-  }
-
-#else
-
   /* this is more precise: check if laser would go through the center */
   if ((ELX * TILEX + 14 - LX) * YS != (ELY * TILEY + 14 - LY) * XS)
   {
@@ -1107,7 +1043,6 @@ boolean HitElement(int element, int hit_mask)
 
     return FALSE;
   }
-#endif
 
 #if 0
   printf("HitElement (2): element == %d\n", element);
@@ -1252,11 +1187,6 @@ boolean HitElement(int element, int hit_mask)
 
     if (element == EL_KETTLE || element == EL_CELL)
     {
-#if 0
-      if (game_mm.kettles_still_needed)
-	DrawText(DX_KETTLES, DY_KETTLES,
-		 int2str(--game_mm.kettles_still_needed, 3), FONT_TEXT_2);
-#endif
       RaiseScore_MM(10);
 
       if (game_mm.kettles_still_needed == 0)
@@ -1491,18 +1421,6 @@ boolean HitPolarizer(int element, int hit_mask)
     if (laser.current_angle == grid_angle ||
 	laser.current_angle == get_opposite_angle(grid_angle))
     {
-#if 0
-      int step_size;
-
-      if (!IS_22_5_ANGLE(laser.current_angle))	/* 90° or 45° angle */
-	step_size = 8;
-      else
-	step_size = 4;
-
-      LX += step_size * XS;
-      LY += step_size * YS;
-#else
-
       /* skip the whole element before continuing the scan */
       do
       {
@@ -1521,7 +1439,6 @@ boolean HitPolarizer(int element, int hit_mask)
 	LX -= XS;
 	LY -= YS;
       }
-#endif
 
       AddLaserEdge(LX, LY);
 
@@ -2045,14 +1962,7 @@ void OpenSurpriseBall(int x, int y)
 
   if (MovDelay[x][y])		/* wait some time before next frame */
   {
-#if 0
-    int phase;
-#endif
-
     MovDelay[x][y]--;
-#if 0
-    phase = MovDelay[x][y] / delay;
-#endif
     if (!(MovDelay[x][y] % delay) && IN_SCR_FIELD(x, y))
     {
       Bitmap *bitmap;
@@ -2161,9 +2071,6 @@ static void Explode_MM(int x, int y, int phase, int mode)
   int num_phase = 9, delay = 2;
   int last_phase = num_phase * delay;
   int half_phase = (num_phase / 2) * delay;
-#if 0
-  int first_phase_after_start = EX_PHASE_START + 1;
-#endif
 
   laser.redraw = TRUE;
 
@@ -2203,10 +2110,6 @@ static void Explode_MM(int x, int y, int phase, int mode)
 
   if (phase == last_phase)
   {
-#if 0
-    int element;
-#endif
-
     if (Store[x][y] == EL_BOMB)
     {
       laser.num_damages--;
@@ -2223,9 +2126,6 @@ static void Explode_MM(int x, int y, int phase, int mode)
       Store[x][y] = EL_EMPTY;
     }
 
-#if 0
-    element = Feld[x][y] = Store[x][y];
-#endif
     Store[x][y] = Store2[x][y] = 0;
     MovDir[x][y] = MovPos[x][y] = MovDelay[x][y] = 0;
     InitField(x, y, FALSE);
@@ -2334,34 +2234,15 @@ void TurnRound(int x, int y)
 
   int element = Feld[x][y];
   int old_move_dir = MovDir[x][y];
-#if 0
-  int left_dir = turn[old_move_dir].left;
-#endif
   int right_dir = turn[old_move_dir].right;
   int back_dir = turn[old_move_dir].back;
-
-#if 0
-  int left_dx = move_xy[left_dir].x, left_dy = move_xy[left_dir].y;
-#endif
   int right_dx = move_xy[right_dir].x, right_dy = move_xy[right_dir].y;
-
-#if 0
-  int left_x = x+left_dx, left_y = y+left_dy;
-#endif
   int right_x = x+right_dx, right_y = y+right_dy;
 
   if (element == EL_PACMAN)
   {
-#if 0
-    boolean can_turn_left = FALSE;
-#endif
     boolean can_turn_right = FALSE;
 
-#if 0
-    if (IN_LEV_FIELD(left_x, left_y) &&
-	IS_EATABLE4PACMAN(Feld[left_x][left_y]))
-      can_turn_left = TRUE;
-#endif
     if (IN_LEV_FIELD(right_x, right_y) &&
 	IS_EATABLE4PACMAN(Feld[right_x][right_y]))
       can_turn_right = TRUE;
@@ -2795,24 +2676,12 @@ void GameActions_MM(byte action[MAX_PLAYERS], boolean warp_mode)
   static unsigned int pacman_delay = 0;
   static unsigned int energy_delay = 0;
   static unsigned int overload_delay = 0;
-#if 0
-  unsigned short color_scale = 0xFFFF / 15;
-#endif
   int element;
   int x, y, i;
 
   int r, d;
 
-#if 1
   WaitUntilDelayReached(&action_delay, GameFrameDelay);
-#else
-  if (!DelayReached(&action_delay, GameFrameDelay))
-  {
-    if (!PendingEvent())	/* delay only if no pending events */
-      Delay(10);
-    return;
-  }
-#endif
 
   for (y=0; y<lev_fieldy; y++) for (x=0; x<lev_fieldx; x++)
     Stop[x][y] = FALSE;
@@ -3550,11 +3419,6 @@ void MovePacMen()
 	BlitBitmap(pix[PIX_BACK], window,
 		   SX + g * TILEX, SY + 4 * TILEY, TILEX, TILEY,
 		   ox + i * mx, oy + i * my);
-#endif
-
-#if 0
-	FlushDisplay();
-	Delay(1);
 #endif
       }
       Ct = Ct + Counter() - CT;
