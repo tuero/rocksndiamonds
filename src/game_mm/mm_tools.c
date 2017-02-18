@@ -81,7 +81,6 @@ void DrawGraphic_MM(int x, int y, int graphic)
   {
     printf("DrawGraphic_MM(): x = %d, y = %d, graphic = %d\n",x,y,graphic);
     printf("DrawGraphic_MM(): This should never happen!\n");
-
     return;
   }
 #endif
@@ -120,7 +119,7 @@ void DrawGraphicThruMaskExt_MM(DrawBuffer *d, int dest_x, int dest_y,
   int src_x, src_y;
   Bitmap *src_bitmap;
 
-  if (graphic == GFX_EMPTY)
+  if (graphic == IMG_EMPTY)
     return;
 
   getGraphicSource(graphic, 0, &src_bitmap, &src_x, &src_y);
@@ -391,7 +390,7 @@ void DrawMiniElement_MM(int x, int y, int element)
 
   if (!element)
   {
-    DrawMiniGraphic_MM(x, y, GFX_EMPTY);
+    DrawMiniGraphic_MM(x, y, IMG_EMPTY);
     return;
   }
 
@@ -439,7 +438,7 @@ void DrawWallsExt_MM(int x, int y, int element, int draw_mask)
   getMiniGraphicSource(graphic, &bitmap, &gx, &gy);
 
   if (game_status != LEVELED || !editor.draw_walls_masked)
-    DrawGraphic_MM(x, y, GFX_EMPTY);
+    DrawGraphic_MM(x, y, IMG_EMPTY);
 
   /*
   if (IS_WALL_WOOD(element) || IS_WALL_AMOEBA(element) ||
@@ -474,51 +473,45 @@ void DrawWalls_MM(int x, int y, int element)
 
 void DrawWallsAnimation_MM(int x, int y, int element, int phase, int bit_mask)
 {
-  int graphic = GFX_WALL_SEVERAL;
-  int graphic_anim = graphic + (phase + 1) / 2;
-  int dx = (IS_WALL_AMOEBA(element) ? MINI_TILEX : 0);
-  int dy = MINI_TILEY;
-  int dx_anim = dx;
-  int dy_anim = ((phase + 1) % 2) * MINI_TILEY;
   int i;
-
-  Bitmap *bitmap, *bitmap_anim;
-  int src_x, src_y;
-  int src_x_anim, src_y_anim;
-
-  getGraphicSource(graphic, 0, &bitmap, &src_x, &src_y);
-  getGraphicSource(graphic_anim, 0, &bitmap_anim, &src_x_anim, &src_y_anim);
 
   if (phase == 0)
   {
     DrawWalls_MM(x, y, element);
+
     return;
   }
 
-  for(i=0; i<4; i++)
+  for (i = 0; i < 4; i++)
   {
     if (element & (1 << i))
     {
-      int dest_x = SX + x * TILEX + MINI_TILEX * (i % 2);
-      int dest_y = SY + y * TILEY + MINI_TILEY * (i / 2);
-      int gx, gy;
+      int graphic;
+      int frame;
+      Bitmap *bitmap;
+      int src_x, src_y;
+      int dst_x = SX + x * TILEX + (i % 2) * MINI_TILEX;
+      int dst_y = SY + y * TILEY + (i / 2) * MINI_TILEY;
 
       if (bit_mask & (1 << i))
       {
-	gx = src_x_anim + dx_anim;
-	gy = src_y_anim + dy_anim;
-
-	BlitBitmap(bitmap_anim, drawto, gx, gy, MINI_TILEX, MINI_TILEY,
-		   dest_x, dest_y);
+	graphic = (IS_WALL_AMOEBA(element) ?
+		   IMG_MM_AMOEBA_WALL_GROWING :
+		   IMG_MM_ICE_WALL_SHRINKING);
+	frame = phase;
       }
       else
       {
-	gx = src_x + dx;
-	gy = src_y + dy;
-
-	BlitBitmap(bitmap, drawto, gx, gy, MINI_TILEX, MINI_TILEY,
-		   dest_x, dest_y);
+	graphic = (IS_WALL_AMOEBA(element) ?
+		   IMG_MM_AMOEBA_WALL :
+		   IMG_MM_ICE_WALL);
+	frame = 0;
       }
+
+      getGraphicSource(graphic, frame, &bitmap, &src_x, &src_y);
+
+      BlitBitmap(bitmap, drawto, src_x, src_y, MINI_TILEX, MINI_TILEY,
+		 dst_x, dst_y);
     }
   }
 
@@ -528,7 +521,7 @@ void DrawWallsAnimation_MM(int x, int y, int element, int phase, int bit_mask)
 void DrawElement_MM(int x, int y, int element)
 {
   if (element == EL_EMPTY)
-    DrawGraphic_MM(x, y, GFX_EMPTY);
+    DrawGraphic_MM(x, y, IMG_EMPTY);
   else if (IS_WALL(element))
     DrawWalls_MM(x, y, element);
 #if 0
@@ -731,113 +724,13 @@ int get_rotated_element(int element, int step)
 
 int el2gfx(int element)
 {
-  switch(element)
+  switch (element)
   {
-    case EL_EMPTY:		return -1;
-    case EL_GRID_STEEL_00:	return GFX_GRID_STEEL_00;
-    case EL_GRID_STEEL_01:	return GFX_GRID_STEEL_01;
-    case EL_GRID_STEEL_02:	return GFX_GRID_STEEL_02;
-    case EL_GRID_STEEL_03:	return GFX_GRID_STEEL_03;
-    case EL_MCDUFFIN_RIGHT:	return GFX_MCDUFFIN_RIGHT;
-    case EL_MCDUFFIN_UP:	return GFX_MCDUFFIN_UP;
-    case EL_MCDUFFIN_LEFT:	return GFX_MCDUFFIN_LEFT;
-    case EL_MCDUFFIN_DOWN:	return GFX_MCDUFFIN_DOWN;
-    case EL_EXIT_CLOSED:	return GFX_EXIT_CLOSED;
-    case EL_EXIT_OPENING_1:	return GFX_EXIT_OPENING_1;
-    case EL_EXIT_OPENING_2:	return GFX_EXIT_OPENING_2;
-    case EL_EXIT_OPEN:		return GFX_EXIT_OPEN;
-    case EL_KETTLE:		return GFX_KETTLE;
-    case EL_BOMB:		return GFX_BOMB;
-    case EL_PRISM:		return GFX_PRISM;
-    case EL_BLOCK_WOOD:		return GFX_BLOCK_WOOD;
-    case EL_BALL_GRAY:		return GFX_BALL_GRAY;
-    case EL_FUSE_ON:		return GFX_FUSE_ON;
-    case EL_PACMAN_RIGHT:	return GFX_PACMAN_RIGHT;
-    case EL_PACMAN_UP:		return GFX_PACMAN_UP;
-    case EL_PACMAN_LEFT:	return GFX_PACMAN_LEFT;
-    case EL_PACMAN_DOWN:	return GFX_PACMAN_DOWN;
-    case EL_POLAR_CROSS_00:	return GFX_POLAR_CROSS_00;
-    case EL_POLAR_CROSS_01:	return GFX_POLAR_CROSS_01;
-    case EL_POLAR_CROSS_02:	return GFX_POLAR_CROSS_02;
-    case EL_POLAR_CROSS_03:	return GFX_POLAR_CROSS_03;
-    case EL_MIRROR_FIXED_00:	return GFX_MIRROR_FIXED_00;
-    case EL_MIRROR_FIXED_01:	return GFX_MIRROR_FIXED_01;
-    case EL_MIRROR_FIXED_02:	return GFX_MIRROR_FIXED_02;
-    case EL_MIRROR_FIXED_03:	return GFX_MIRROR_FIXED_03;
-    case EL_GATE_STONE:		return GFX_GATE_STONE;
-    case EL_KEY:		return GFX_KEY;
-    case EL_LIGHTBULB_ON:	return GFX_LIGHTBULB_ON;
-    case EL_LIGHTBULB_OFF:	return GFX_LIGHTBULB_OFF;
-    case EL_LIGHTBALL:		return GFX_BALL_RED + RND(3);;
-    case EL_BLOCK_STONE:	return GFX_BLOCK_STONE;
-    case EL_GATE_WOOD:		return GFX_GATE_WOOD;
-    case EL_FUEL_FULL:		return GFX_FUEL_FULL;
-    case EL_GRID_WOOD_00:	return GFX_GRID_WOOD_00;
-    case EL_GRID_WOOD_01:	return GFX_GRID_WOOD_01;
-    case EL_GRID_WOOD_02:	return GFX_GRID_WOOD_02;
-    case EL_GRID_WOOD_03:	return GFX_GRID_WOOD_03;
-    case EL_FUEL_EMPTY:		return GFX_FUEL_EMPTY;
-    case EL_FUSE_OFF:		return GFX_FUSE_OFF;
-    case EL_PACMAN:		return GFX_PACMAN;
-    case EL_REFRACTOR:		return GFX_REFRACTOR;
-    case EL_CELL:		return GFX_CELL;
-    case EL_MINE:		return GFX_MINE;
-
-    /* pseudo-graphics; will be mapped to other graphics */
-    case EL_WALL_STEEL:		return GFX_WALL_STEEL;
-    case EL_WALL_WOOD:		return GFX_WALL_WOOD;
-    case EL_WALL_ICE:		return GFX_WALL_ICE;
-    case EL_WALL_AMOEBA:	return GFX_WALL_AMOEBA;
-    case EL_DF_WALL_STEEL:	return GFX_DF_WALL_STEEL;
-    case EL_DF_WALL_WOOD:	return GFX_DF_WALL_WOOD;
+    case EL_LIGHTBALL:
+      return IMG_MM_LIGHTBALL_RED + RND(3);
 
     default:
-    {
-      boolean ed = (game_status == LEVELED);
-      int base_element = get_base_element(element);
-      int element_phase = element - base_element;
-      int base_graphic;
-
-      if (IS_BEAMER(element))
-	element_phase = element - EL_BEAMER_RED_START;
-      else if (IS_FIBRE_OPTIC(element))
-	element_phase = element - EL_FIBRE_OPTIC_START;
-
-      if (IS_MIRROR(element))
-	base_graphic = GFX_MIRROR_START;
-      else if (IS_BEAMER_OLD(element))
-	base_graphic = GFX_BEAMER_START;
-      else if (IS_POLAR(element))
-	base_graphic = GFX_POLAR_START;
-      else if (IS_CHAR(element))
-	base_graphic = GFX_CHAR_START;
-      else if (IS_GRID_WOOD_FIXED(element))
-	base_graphic = GFX_GRID_WOOD_FIXED_00;
-      else if (IS_GRID_STEEL_FIXED(element))
-	base_graphic = GFX_GRID_STEEL_FIXED_00;
-      else if (IS_DF_MIRROR(element))
-	base_graphic = GFX_DF_MIRROR_00;
-      else if (IS_LASER(element))
-	base_graphic = GFX_LASER_RIGHT;
-      else if (IS_RECEIVER(element))
-	base_graphic = GFX_RECEIVER_RIGHT;
-      else if (IS_DF_MIRROR(element))
-	base_graphic = GFX_DF_MIRROR_00;
-      else if (IS_FIBRE_OPTIC(element))
-	base_graphic = (ed ? GFX_FIBRE_OPTIC_ED_00 : GFX_FIBRE_OPTIC_00);
-      else if (IS_GRID_WOOD_AUTO(element))
-	base_graphic = (ed ? GFX_GRID_WOOD_AUTO_00 : GFX_GRID_WOOD_FIXED_00);
-      else if (IS_GRID_STEEL_AUTO(element))
-	base_graphic = (ed ? GFX_GRID_STEEL_AUTO_00 : GFX_GRID_STEEL_FIXED_00);
-      else if (IS_DF_MIRROR_AUTO(element))
-	base_graphic = (ed ? GFX_DF_MIRROR_AUTO_00 : GFX_DF_MIRROR_00);
-      else if (IS_BEAMER(element))
-	base_graphic = GFX_BEAMER_RED_START;
-      else
-	return GFX_EMPTY;
-
-      return base_graphic + element_phase;
-    }
+      return el2img_mm(element);
   }
 }
 
@@ -848,5 +741,6 @@ void RedrawPlayfield_MM()
 
 void BlitScreenToBitmap_MM(Bitmap *target_bitmap)
 {
-  BlitBitmap(drawto_field, target_bitmap, 0, 0, SXSIZE, SYSIZE, SX, SY);
+  BlitBitmap(drawto_field, target_bitmap,
+	     REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE, REAL_SX, REAL_SY);
 }

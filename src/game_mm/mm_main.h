@@ -658,8 +658,6 @@ extern int		num_element_info;
 #define EL_BLOCKED		600
 #define EL_EXPLODING_OPAQUE	601
 #define EL_EXPLODING_TRANSP	602
-#define EL_DEFAULT_EXPLODING	603
-#define EL_KETTLE_EXPLODING	604
 
 /* dummy elements (never used as game elements, only used as graphics) */
 #define EL_MM_MASK_MCDUFFIN_RIGHT	700

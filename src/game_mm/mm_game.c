@@ -344,7 +344,9 @@ void InitGameEngine_MM()
     }
   }
 
+#if 0
   CloseDoor(DOOR_CLOSE_1);
+#endif
 
   DrawLevel_MM();
   InitCycleElements();
@@ -365,8 +367,10 @@ void InitGameEngine_MM()
 	   int2str(game_mm.score, 4), FONT_TEXT_2);
 #endif
 
+#if 0
   UnmapGameButtons();
   MapGameButtons();
+#endif
 
 #if 0
   /* copy actual game door content to door double buffer for OpenDoor() */
@@ -374,7 +378,9 @@ void InitGameEngine_MM()
 	     DX, DY, DXSIZE, DYSIZE, DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1);
 #endif
 
+#if 0
   OpenDoor(DOOR_OPEN_ALL);
+#endif
 
   if (setup.sound_loops)
     PlaySoundExt(SND_FUEL, SOUND_MAX_VOLUME, SOUND_MAX_RIGHT, SND_CTRL_PLAY_LOOP);
@@ -461,13 +467,13 @@ boolean StepBehind()
 static int getMaskFromElement(int element)
 {
   if (IS_GRID(element))
-    return GFX_MASK_GRID_00 + get_element_phase(element);
+    return IMG_MM_MASK_GRID_1 + get_element_phase(element);
   else if (IS_MCDUFFIN(element))
-    return GFX_MASK_MCDUFFIN_00 + get_element_phase(element);
+    return IMG_MM_MASK_MCDUFFIN_RIGHT + get_element_phase(element);
   else if (IS_RECTANGLE(element) || IS_DF_GRID(element))
-    return GFX_MASK_RECTANGLE;
+    return IMG_MM_MASK_RECTANGLE;
   else
-    return GFX_MASK_CIRCLE;
+    return IMG_MM_MASK_CIRCLE;
 }
 
 int ScanPixel()
@@ -525,16 +531,15 @@ int ScanPixel()
 	  int mask_x, mask_y;
 	  int dx = px - lx * TILEX;
 	  int dy = py - ly * TILEY;
+	  Bitmap *bitmap;
+	  int src_x, src_y;
 
-	  mask_x = (graphic_mask % GFX_PER_LINE) * TILEX + dx;
-	  mask_y = (graphic_mask / GFX_PER_LINE) * TILEY + dy;
+	  getGraphicSource(graphic_mask, 0, &bitmap, &src_x, &src_y);
 
-#if 1
-	  // !!! temporary fix to compile -- change to game graphics !!!
-	  pixel = (ReadPixel(drawto, mask_x, mask_y) ? 1 : 0);
-#else
-	  pixel = (ReadPixel(pix[PIX_BACK], mask_x, mask_y) ? 1 : 0);
-#endif
+	  mask_x = src_x + dx;
+	  mask_y = src_y + dy;
+
+	  pixel = (ReadPixel(bitmap, mask_x, mask_y) ? 1 : 0);
 	}
       }
       else
@@ -2133,28 +2138,29 @@ static void Explode_MM(int x, int y, int phase, int mode)
   }
   else if (!(phase % delay) && IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
   {
-    int graphic = GFX_EXPLOSION_START;
+    int graphic = IMG_MM_DEFAULT_EXPLODING;
     int graphic_phase = (phase / delay - 1);
+    Bitmap *bitmap;
+    int src_x, src_y;
 
     if (Store2[x][y] == EX_KETTLE)
     {
       if (graphic_phase < 3)
-	graphic = GFX_EXPLOSION_KETTLE;
+	graphic = IMG_MM_KETTLE_EXPLODING;
       else if (graphic_phase < 5)
       {
-	graphic = GFX_EXPLOSION_LAST;
-	graphic_phase -= graphic_phase;
+	graphic_phase += 3;
       }
       else
       {
-	graphic = GFX_EMPTY;
+	graphic = IMG_EMPTY;
 	graphic_phase = 0;
       }
     }
     else if (Store2[x][y] == EX_SHORT)
     {
       if (graphic_phase < 4)
-	graphic = GFX_EXPLOSION_SHORT;
+	graphic_phase += 4;
       else
       {
 	graphic = GFX_EMPTY;
@@ -2162,7 +2168,11 @@ static void Explode_MM(int x, int y, int phase, int mode)
       }
     }
 
-    DrawGraphic_MM(x, y, graphic + graphic_phase);
+    getGraphicSource(graphic, graphic_phase, &bitmap, &src_x, &src_y);
+
+    BlitBitmap(bitmap, drawto_field, src_x, src_y, TILEX, TILEY,
+	       FX + x * TILEX, FY + y * TILEY);
+    MarkTileDirty(x, y);
   }
 }
 
@@ -2425,7 +2435,7 @@ void ClickElement(int mx, int my, int button)
     laser.fuse_off = FALSE;
     laser.fuse_x = laser.fuse_y = -1;
 
-    DrawGraphic_MM(x, y, GFX_FUSE_ON);
+    DrawGraphic_MM(x, y, IMG_MM_FUSE_ACTIVE);
     ScanLaser();
   }
   else if (element == EL_FUSE_ON && !laser.fuse_off && new_button)
@@ -2436,7 +2446,7 @@ void ClickElement(int mx, int my, int button)
     laser.overloaded = FALSE;
 
     DrawLaser(0, DL_LASER_DISABLED);
-    DrawGraphic_MM(x, y, GFX_FUSE_OFF);
+    DrawGraphic_MM(x, y, IMG_MM_FUSE);
   }
   else if (element == EL_LIGHTBALL)
   {
@@ -2960,7 +2970,7 @@ void GameActions_MM(byte action[MAX_PLAYERS], boolean warp_mode)
     laser.fuse_x = ELX;
     laser.fuse_y = ELY;
     DrawLaser(0, DL_LASER_DISABLED);
-    DrawGraphic_MM(ELX, ELY, GFX_FUSE_OFF);
+    DrawGraphic_MM(ELX, ELY, IMG_MM_FUSE);
   }
 
   if (element == EL_BALL_GRAY && CT > 1500)
@@ -3398,7 +3408,7 @@ void MovePacMen()
     game_mm.pacman[p].x = nx;
     game_mm.pacman[p].y = ny;
     g = Feld[nx][ny] - EL_PACMAN_RIGHT;
-    DrawGraphic_MM(ox, oy, GFX_EMPTY);
+    DrawGraphic_MM(ox, oy, IMG_EMPTY);
 
     if (element != EL_EMPTY)
     {

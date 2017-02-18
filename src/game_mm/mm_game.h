@@ -14,6 +14,7 @@
 
 #include "main_mm.h"
 
+
 /* score for elements (also used by editor.c) */
 #define SC_EDELSTEIN		0
 #define SC_DIAMANT		1
@@ -27,27 +28,14 @@
 #define SC_KEY			9
 #define SC_ZEITBONUS		10
 
-void GetPlayerConfig(void);
-void InitGame(void);
-void InitMovDir(int, int);
+
 void InitAmoebaNr(int, int);
-void GameWon(void);
+void GameWon_MM(void);
 int NewHiScore_MM(void);
-void InitMovingField(int, int, int);
-void Moving2Blocked(int, int, int *, int *);
-void Blocked2Moving(int, int, int *, int *);
-int MovingOrBlocked2Element(int, int);
-void RemoveMovingField(int, int);
-
-
-
-
 
 void Blurb(int, int);
 void Impact(int, int);
 void TurnRound(int, int);
-void StartMoving(int, int);
-void ContinueMoving(int, int);
 int AmoebeNachbarNr(int, int);
 void AmoebeUmwandeln(int, int);
 void AmoebeUmwandelnBD(int, int, int);
@@ -64,8 +52,6 @@ void AusgangstuerBlinken(int, int);
 void EdelsteinFunkeln(int, int);
 void MauerWaechst(int, int);
 void MauerAbleger(int, int);
-
-
 
 boolean MoveFigureOneStep(struct PlayerInfo *, int, int, int, int);
 boolean MoveFigure(struct PlayerInfo *, int, int);
@@ -86,14 +72,10 @@ int DigField(struct PlayerInfo *, int, int, int, int, int);
 boolean SnapField(struct PlayerInfo *, int, int);
 boolean PlaceBomb(struct PlayerInfo *);
 void PlaySoundLevel(int, int, int);
-void RaiseScore(int);
-void RaiseScoreElement(int);
 
 void CreateGameButtons();
 void UnmapGameButtons();
 
-
-void InitGame(void);
 void AddLaserEdge(int, int);
 void AddDamagedField(int, int);
 void ScanLaser(void);
@@ -106,14 +88,12 @@ boolean HitLaserSource(int, int);
 boolean HitLaserDestination(int, int);
 boolean HitReflectingWalls(int, int);
 boolean HitAbsorbingWalls(int, int);
-void Bang(int, int);
 void ClickElement(int, int, int);
 void RotateMirror(int, int, int);
 boolean ObjHit(int, int, int);
 void DeletePacMan(int, int);
 
 void ColorCycling(void);
-void GameActions(void);
 void MovePacMen(void);
 
 #endif
