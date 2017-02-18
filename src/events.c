@@ -298,7 +298,8 @@ void HandleMouseCursor()
 	cursor_inside_playfield &&
 	DelayReached(&special_cursor_delay, special_cursor_delay_value))
     {
-      SetMouseCursor(CURSOR_PLAYFIELD);
+      if (level.game_engine_type != GAME_ENGINE_TYPE_MM)
+	SetMouseCursor(CURSOR_PLAYFIELD);
     }
   }
   else if (gfx.cursor_mode != CURSOR_DEFAULT)
