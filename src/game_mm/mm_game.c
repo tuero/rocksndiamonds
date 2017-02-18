@@ -2680,7 +2680,7 @@ void ColorCycling(void)
   }
 }
 
-void GameActions_MM(byte action[MAX_PLAYERS], boolean warp_mode)
+static void GameActions_MM_Ext(byte action[MAX_PLAYERS], boolean warp_mode)
 {
   static unsigned int action_delay = 0;
   static unsigned int pacman_delay = 0;
@@ -3354,6 +3354,14 @@ void GameActions_MM(byte action[MAX_PLAYERS], boolean warp_mode)
   }
 
   return;
+}
+
+void GameActions_MM(byte action[MAX_PLAYERS], boolean warp_mode)
+{
+  if (!button_status)
+    ClickElement(0, 0, MB_NOT_PRESSED);
+
+  GameActions_MM_Ext(action, warp_mode);
 }
 
 void MovePacMen()

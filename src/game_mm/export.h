@@ -194,6 +194,8 @@ extern void InitGfxBuffers_MM();
 extern void InitGameEngine_MM();
 extern void GameActions_MM(byte *, boolean);
 
+extern void ClickElement(int, int, int);
+
 extern unsigned int InitEngineRandom_MM(int);
 
 extern void setLevelInfoToDefaults_MM();

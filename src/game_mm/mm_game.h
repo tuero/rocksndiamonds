@@ -88,7 +88,6 @@ boolean HitLaserSource(int, int);
 boolean HitLaserDestination(int, int);
 boolean HitReflectingWalls(int, int);
 boolean HitAbsorbingWalls(int, int);
-void ClickElement(int, int, int);
 void RotateMirror(int, int, int);
 boolean ObjHit(int, int, int);
 void DeletePacMan(int, int);

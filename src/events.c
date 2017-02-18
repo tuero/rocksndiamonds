@@ -1323,9 +1323,12 @@ void HandleButton(int mx, int my, int button, int button_nr)
       HandleSetupScreen(mx, my, 0, 0, button);
       break;
 
-#if defined(TARGET_SDL2)
     case GAME_MODE_PLAYING:
-      HandleFollowFinger(mx, my, button);
+      if (level.game_engine_type == GAME_ENGINE_TYPE_MM)
+	ClickElement(mx, my, button);
+#if defined(TARGET_SDL2)
+      else
+	HandleFollowFinger(mx, my, button);
 #endif
 
 #ifdef DEBUG
@@ -1892,7 +1895,9 @@ void HandleKey(Key key, int key_status)
 void HandleNoEvent()
 {
   // if (button_status && game_status != GAME_MODE_PLAYING)
-  if (button_status && (game_status != GAME_MODE_PLAYING || tape.pausing))
+  if (button_status && (game_status != GAME_MODE_PLAYING ||
+			tape.pausing ||
+			level.game_engine_type == GAME_ENGINE_TYPE_MM))
   {
     HandleButton(0, 0, button_status, -button_status);
   }
