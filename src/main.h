@@ -674,6 +674,20 @@
 #define IS_INTERNAL_ELEMENT(e)	((e) >= EL_INTERNAL_START &&		\
 	 			 (e) <= EL_INTERNAL_END)
 
+#define IS_MM_ELEMENT(e)	((e) >= EL_MM_START &&			\
+				 (e) <= EL_MM_END)
+
+#define IS_DF_ELEMENT(e)	((e) >= EL_DF_START &&			\
+				 (e) <= EL_DF_END)
+
+#define IS_MM_WALL(e)		(((e) >= EL_MM_WALL_START &&		\
+				  (e) <= EL_MM_WALL_END) ||		\
+				 ((e) >= EL_DF_WALL_START &&		\
+				  (e) <= EL_DF_WALL_END))
+
+#define IS_DF_WALL(e)		(((e) >= EL_DF_WALL_START &&		\
+				  (e) <= EL_DF_WALL_END))
+
 #define IS_ENVELOPE(e)		((e) >= EL_ENVELOPE_1 &&		\
 	 			 (e) <= EL_ENVELOPE_4)
 

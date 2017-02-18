@@ -2446,12 +2446,47 @@ void DrawLevelField(int x, int y)
   }
 }
 
+void DrawSizedWall_MM(int dst_x, int dst_y, int element, int tilesize,
+		      int (*el2img_function)(int))
+{
+  int element_base = map_mm_wall_element(element);
+  int element_bits = (IS_DF_WALL(element) ?
+		      element - EL_DF_WALL_START :
+		      element - EL_MM_WALL_START) & 0x000f;
+  int graphic = el2img_function(element_base);
+  int tilesize_draw = tilesize / 2;
+  Bitmap *src_bitmap;
+  int src_x, src_y;
+  int i;
+
+  getSizedGraphicSource(graphic, 0, tilesize_draw, &src_bitmap, &src_x, &src_y);
+
+  for (i = 0; i < 4; i++)
+  {
+    int dst_draw_x = dst_x + (i % 2) * tilesize_draw;
+    int dst_draw_y = dst_y + (i / 2) * tilesize_draw;
+
+    if (element_bits & (1 << i))
+      BlitBitmap(src_bitmap, drawto, src_x, src_y, tilesize_draw, tilesize_draw,
+		 dst_draw_x, dst_draw_y);
+    else
+      ClearRectangle(drawto, dst_x, dst_y, tilesize_draw, tilesize_draw);
+  }
+}
+
 void DrawSizedElement(int x, int y, int element, int tilesize)
 {
-  int graphic;
+  if (IS_MM_WALL(element))
+  {
+    DrawSizedWall_MM(SX + x * tilesize, SY + y * tilesize,
+		     element, tilesize, el2edimg);
+  }
+  else
+  {
+    int graphic = el2edimg(element);
 
-  graphic = el2edimg(element);
-  DrawSizedGraphic(x, y, graphic, 0, tilesize);
+    DrawSizedGraphic(x, y, graphic, 0, tilesize);
+  }
 }
 
 void DrawMiniElement(int x, int y, int element)
@@ -2961,12 +2996,20 @@ void ShowEnvelopeRequest(char *text, unsigned int req_state, int action)
 
 void DrawPreviewElement(int dst_x, int dst_y, int element, int tilesize)
 {
-  Bitmap *src_bitmap;
-  int src_x, src_y;
-  int graphic = el2preimg(element);
+  if (IS_MM_WALL(element))
+  {
+    DrawSizedWall_MM(dst_x, dst_y, element, tilesize, el2preimg);
+  }
+  else
+  {
+    Bitmap *src_bitmap;
+    int src_x, src_y;
+    int graphic = el2preimg(element);
 
-  getSizedGraphicSource(graphic, 0, tilesize, &src_bitmap, &src_x, &src_y);
-  BlitBitmap(src_bitmap, drawto, src_x, src_y, tilesize, tilesize, dst_x,dst_y);
+    getSizedGraphicSource(graphic, 0, tilesize, &src_bitmap, &src_x, &src_y);
+    BlitBitmap(src_bitmap, drawto, src_x, src_y, tilesize, tilesize,
+	       dst_x, dst_y);
+  }
 }
 
 void DrawLevel(int draw_background_mask)
@@ -7280,6 +7323,35 @@ int map_element_MM_to_RND(int element_mm)
 	  EL_MM_DUMMY_START + element_mm - EL_MM_DUMMY_START_NATIVE :
 
 	  EL_EMPTY);
+}
+
+int map_mm_wall_element(int element)
+{
+  return (element >= EL_MM_STEEL_WALL_START &&
+	  element <= EL_MM_STEEL_WALL_END ?
+	  EL_MM_STEEL_WALL :
+
+	  element >= EL_MM_WOODEN_WALL_START &&
+	  element <= EL_MM_WOODEN_WALL_END ?
+	  EL_MM_WOODEN_WALL :
+
+	  element >= EL_MM_ICE_WALL_START &&
+	  element <= EL_MM_ICE_WALL_END ?
+	  EL_MM_ICE_WALL :
+
+	  element >= EL_MM_AMOEBA_WALL_START &&
+	  element <= EL_MM_AMOEBA_WALL_END ?
+	  EL_MM_AMOEBA_WALL :
+
+	  element >= EL_DF_STEEL_WALL_START &&
+	  element <= EL_DF_STEEL_WALL_END ?
+	  EL_DF_STEEL_WALL :
+
+	  element >= EL_DF_WOODEN_WALL_START &&
+	  element <= EL_DF_WOODEN_WALL_END ?
+	  EL_DF_WOODEN_WALL :
+
+	  element);
 }
 
 int get_next_element(int element)
