@@ -6877,6 +6877,21 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
     "-"
   },
   {
+    "mm_lightball_red",
+    "-",
+    "-"
+  },
+  {
+    "mm_lightball_blue",
+    "-",
+    "-"
+  },
+  {
+    "mm_lightball_yellow",
+    "-",
+    "-"
+  },
+  {
     "mm_mask_mcduffin.right",
     "-",
     "-"
