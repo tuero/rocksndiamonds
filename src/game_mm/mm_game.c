@@ -533,8 +533,8 @@ int ScanPixel()
 	{
 	  int graphic_mask = getMaskFromElement(element);
 	  int mask_x, mask_y;
-	  int dx = px - lx * TILEX;
-	  int dy = py - ly * TILEY;
+	  int dx = px - SX - lx * TILEX;
+	  int dy = py - SY - ly * TILEY;
 	  Bitmap *bitmap;
 	  int src_x, src_y;
 
