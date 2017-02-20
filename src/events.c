@@ -1333,8 +1333,8 @@ void HandleButton(int mx, int my, int button, int button_nr)
 #endif
 
 #ifdef DEBUG
-      if (button == MB_PRESSED && !motion_status && IN_GFX_FIELD_PLAY(mx, my) &&
-	  GetKeyModState() & KMOD_Control)
+      if (button == MB_PRESSED && !motion_status && !button_hold &&
+	  IN_GFX_FIELD_PLAY(mx, my) && GetKeyModState() & KMOD_Control)
 	DumpTileFromScreen(mx, my);
 #endif
 
