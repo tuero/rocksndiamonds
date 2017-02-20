@@ -360,10 +360,12 @@ static int getLevelFromScreenY_SP(int sy)
 
 static int getLevelFromScreenX_MM(int sx)
 {
+#if 0
   int level_xsize = level.native_mm_level->fieldx;
   int full_xsize = level_xsize * TILESIZE_VAR;
 
   sx -= (full_xsize < SXSIZE ? (SXSIZE - full_xsize) / 2 : 0);
+#endif
 
   int px = sx - SX;
   int lx = px / TILESIZE_VAR;
@@ -373,10 +375,12 @@ static int getLevelFromScreenX_MM(int sx)
 
 static int getLevelFromScreenY_MM(int sy)
 {
+#if 0
   int level_ysize = level.native_mm_level->fieldy;
   int full_ysize = level_ysize * TILESIZE_VAR;
 
   sy -= (full_ysize < SYSIZE ? (SYSIZE - full_ysize) / 2 : 0);
+#endif
 
   int py = sy - SY;
   int ly = py / TILESIZE_VAR;
@@ -412,6 +416,7 @@ void DumpTile(int x, int y)
 {
   int sx = SCREENX(x);
   int sy = SCREENY(y);
+  char *token_name;
 
   printf_line("-", 79);
   printf("Field Info: SCREEN(%d, %d), LEVEL(%d, %d)\n", sx, sy, x, y);
@@ -425,8 +430,9 @@ void DumpTile(int x, int y)
     return;
   }
 
-  printf("  Feld:        %d\t['%s']\n", Feld[x][y],
-	 element_info[Feld[x][y]].token_name);
+  token_name = element_info[Feld[x][y]].token_name;
+
+  printf("  Feld:        %d\t['%s']\n", Feld[x][y], token_name);
   printf("  Back:        %s\n", print_if_not_empty(Back[x][y]));
   printf("  Store:       %s\n", print_if_not_empty(Store[x][y]));
   printf("  Store2:      %s\n", print_if_not_empty(Store2[x][y]));
