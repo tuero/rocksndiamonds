@@ -2476,7 +2476,8 @@ void DrawSizedWall_MM(int dst_x, int dst_y, int element, int tilesize,
       BlitBitmap(src_bitmap, drawto, src_x, src_y, tilesize_draw, tilesize_draw,
 		 dst_draw_x, dst_draw_y);
     else
-      ClearRectangle(drawto, dst_x, dst_y, tilesize_draw, tilesize_draw);
+      ClearRectangle(drawto, dst_draw_x, dst_draw_y,
+		     tilesize_draw, tilesize_draw);
   }
 }
 
