@@ -508,7 +508,8 @@ void DrawWallsAnimation_MM(int x, int y, int element, int phase, int bit_mask)
 	frame = 0;
       }
 
-      getGraphicSource(graphic, frame, &bitmap, &src_x, &src_y);
+      getSizedGraphicSource(graphic, frame, MINI_TILESIZE, &bitmap,
+			    &src_x, &src_y);
 
       BlitBitmap(bitmap, drawto, src_x, src_y, MINI_TILEX, MINI_TILEY,
 		 dst_x, dst_y);

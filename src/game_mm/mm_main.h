@@ -254,6 +254,7 @@ extern int		num_element_info;
 #define EY			(DY + 178)
 #define TILEX			TILESIZE
 #define TILEY			TILESIZE
+#define MINI_TILESIZE		(TILESIZE / 2)
 #define MINI_TILEX		(TILEX / 2)
 #define MINI_TILEY		(TILEY / 2)
 #define MICRO_TILEX		(TILEX / 4)
