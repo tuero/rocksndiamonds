@@ -349,6 +349,10 @@ void InitGameEngine_MM()
 #endif
 
   DrawLevel_MM();
+}
+
+void InitGameEngine_MM_AfterFadingIn()
+{
   InitCycleElements();
   InitLaser();
 

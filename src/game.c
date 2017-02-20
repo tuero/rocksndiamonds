@@ -3966,6 +3966,9 @@ void InitGame()
 
   FadeIn(fade_mask);
 
+  if (level.game_engine_type == GAME_ENGINE_TYPE_MM)
+    InitGameEngine_MM_AfterFadingIn();
+
 #if 1
   // full screen redraw is required at this point in the following cases:
   // - special editor door undrawn when game was started from level editor
