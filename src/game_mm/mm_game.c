@@ -2131,6 +2131,7 @@ static void Explode_MM(int x, int y, int phase, int mode)
       Store[x][y] = EL_EMPTY;
     }
 
+    Feld[x][y] = Store[x][y];
     Store[x][y] = Store2[x][y] = 0;
     MovDir[x][y] = MovPos[x][y] = MovDelay[x][y] = 0;
     InitField(x, y, FALSE);
