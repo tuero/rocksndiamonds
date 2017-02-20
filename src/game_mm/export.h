@@ -190,6 +190,8 @@ extern struct EngineSnapshotInfo_MM engine_snapshot_mm;
 extern void mm_open_all();
 extern void mm_close_all();
 
+void InitElementProperties_MM();
+
 extern void InitGfxBuffers_MM();
 
 extern void InitGameEngine_MM();

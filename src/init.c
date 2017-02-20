@@ -6044,6 +6044,7 @@ void OpenAll()
 
   em_open_all();
   sp_open_all();
+  mm_open_all();
 
   if (global.autoplay_leveldir)
   {
