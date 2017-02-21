@@ -271,7 +271,7 @@ void DrawScreenElementExt_MM(int x, int y, int dx, int dy, int element,
 
   if (element == EL_PACMAN)
   {
-    graphic += 4 * !phase2;
+    graphic = (phase2 ? IMG_MM_PACMAN_RIGHT : IMG_MM_PACMAN_EATING_RIGHT);
 
     if (dir == MV_UP)
       graphic += 1;

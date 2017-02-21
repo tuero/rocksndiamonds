@@ -6641,6 +6641,26 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
     "mm_amoeba_wall",
     "-",
   },
+  {
+    "mm_pacman.eating.right",
+    "mm_pacman",
+    "pac man (eating right)"
+  },
+  {
+    "mm_pacman.eating.up",
+    "mm_pacman",
+    "pac man (eating up)"
+  },
+  {
+    "mm_pacman.eating.left",
+    "mm_pacman",
+    "pac man (eating left)"
+  },
+  {
+    "mm_pacman.eating.down",
+    "mm_pacman",
+    "pac man (eating down)"
+  },
 
   /* ----------------------------------------------------------------------- */
   /* "unreal" (and therefore not drawable) runtime elements                  */

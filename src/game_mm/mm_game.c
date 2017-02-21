@@ -3312,7 +3312,7 @@ static void GameActions_MM_Ext(byte action[MAX_PLAYERS], boolean warp_mode)
     Feld[ELX][ELY] = 0;
     Feld[x][y] = element;
 
-    DrawGraphic_MM(ELX, ELY, -1);
+    DrawGraphic_MM(ELX, ELY, IMG_EMPTY);
     DrawField_MM(x, y);
 
     if (element == EL_BLOCK_STONE && Box[ELX][ELY])
@@ -3368,7 +3368,7 @@ void MovePacMen()
 {
   static int p = -1;
   int mx, my, ox, oy, nx, ny;
-  int g, element;
+  int element;
   int l;
 
   if (++p >= game_mm.num_pacman)
@@ -3415,30 +3415,26 @@ void MovePacMen()
 
     game_mm.pacman[p].x = nx;
     game_mm.pacman[p].y = ny;
-    g = Feld[nx][ny] - EL_PACMAN_RIGHT;
+
     DrawGraphic_MM(ox, oy, IMG_EMPTY);
 
     if (element != EL_EMPTY)
     {
+      int graphic = el2gfx(Feld[nx][ny]);
+      Bitmap *bitmap;
+      int src_x, src_y;
       int i;
+
+      getGraphicSource(graphic, 0, &bitmap, &src_x, &src_y);
 
       CT = Counter();
       ox = SX + ox * TILEX;
       oy = SY + oy * TILEY;
 
       for(i=1; i<33; i+=2)
-      {
-#if 1
-	// !!! temporary fix to compile -- change to game graphics !!!
-	BlitBitmap(drawto, window,
-		   SX + g * TILEX, SY + 4 * TILEY, TILEX, TILEY,
+	BlitBitmap(bitmap, window,
+		   src_x, src_y, TILEX, TILEY,
 		   ox + i * mx, oy + i * my);
-#else
-	BlitBitmap(pix[PIX_BACK], window,
-		   SX + g * TILEX, SY + 4 * TILEY, TILEX, TILEY,
-		   ox + i * mx, oy + i * my);
-#endif
-      }
       Ct = Ct + Counter() - CT;
     }
     DrawField_MM(nx, ny);
