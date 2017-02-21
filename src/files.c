@@ -3896,7 +3896,7 @@ void CopyNativeLevel_RND_to_MM(struct LevelInfo *level)
   level_mm->encoding_16bit_field = level->encoding_16bit_field;
 
   level_mm->fieldx = MIN(level->fieldx, MM_MAX_PLAYFIELD_WIDTH);
-  level_mm->fieldy = MIN(level->fieldx, MM_MAX_PLAYFIELD_HEIGHT);
+  level_mm->fieldy = MIN(level->fieldy, MM_MAX_PLAYFIELD_HEIGHT);
 
   level_mm->time = level->time;
   level_mm->kettles_needed = level->gems_needed;
@@ -3915,8 +3915,8 @@ void CopyNativeLevel_RND_to_MM(struct LevelInfo *level)
   level_mm->amoeba_speed = level->amoeba_speed;
   level_mm->time_fuse = 0;
 
-  for (y = 0; y < level_mm->fieldx; y++)
-    for (x = 0; x < level_mm->fieldy; x++)
+  for (x = 0; x < level->fieldx; x++)
+    for (y = 0; y < level->fieldy; y++)
       level_mm->field[x][y] = map_element_RND_to_MM(level->field[x][y]);
 }
 
@@ -3930,7 +3930,7 @@ void CopyNativeLevel_MM_to_RND(struct LevelInfo *level)
   level->encoding_16bit_field = level_mm->encoding_16bit_field;
 
   level->fieldx = MIN(level_mm->fieldx, MAX_LEV_FIELDX);
-  level->fieldy = MIN(level_mm->fieldx, MAX_LEV_FIELDY);
+  level->fieldy = MIN(level_mm->fieldy, MAX_LEV_FIELDY);
 
   level->time = level_mm->time;
   level->gems_needed = level_mm->kettles_needed;
@@ -3944,8 +3944,8 @@ void CopyNativeLevel_MM_to_RND(struct LevelInfo *level)
 
   level->amoeba_speed = level_mm->amoeba_speed;
 
-  for (y = 0; y < level->fieldx; y++)
-    for (x = 0; x < level->fieldy; x++)
+  for (x = 0; x < level->fieldx; x++)
+    for (y = 0; y < level->fieldy; y++)
       level->field[x][y] = map_element_MM_to_RND(level_mm->field[x][y]);
 }
 
