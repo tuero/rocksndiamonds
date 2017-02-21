@@ -507,36 +507,34 @@ int ScanPixel()
 
     for (i=0; i<4; i++)
     {
+      int px = LX + (i % 2) * 2;
+      int py = LY + (i / 2) * 2;
+      int dx = px % TILEX;
+      int dy = py % TILEY;
+      int lx = (px + TILEX) / TILEX - 1;  /* ...+TILEX...-1 to get correct */
+      int ly = (py + TILEY) / TILEY - 1;  /* negative values!              */
       Pixel pixel;
-      int px, py, lx, ly;
-
-      px = SX + LX + (i % 2) * 2;
-      py = SY + LY + (i / 2) * 2;
-      lx = (px - SX + TILEX) / TILEX - 1;  /* ...+TILEX...-1 to get correct */
-      ly = (py - SY + TILEY) / TILEY - 1;  /* negative values!              */
 
       if (IN_LEV_FIELD(lx, ly))
       {
 	int element = Feld[lx][ly];
 
 	if (element == EL_EMPTY || element == EL_EXPLODING_TRANSP)
+	{
 	  pixel = 0;
+	}
 	else if (IS_WALL(element) || IS_WALL_CHANGING(element))
 	{
-	  int pos =
-	    ((py - SY - ly * TILEY) / MINI_TILEX) * 2 +
-	    (px - SX - lx * TILEX) / MINI_TILEY;
+	  int pos = dy / MINI_TILEY * 2 + dx / MINI_TILEX;
 
 	  pixel = ((element & (1 << pos)) ? 1 : 0);
 	}
 	else
 	{
 	  int graphic_mask = getMaskFromElement(element);
-	  int mask_x, mask_y;
-	  int dx = px - SX - lx * TILEX;
-	  int dy = py - SY - ly * TILEY;
 	  Bitmap *bitmap;
 	  int src_x, src_y;
+	  int mask_x, mask_y;
 
 	  getGraphicSource(graphic_mask, 0, &bitmap, &src_x, &src_y);
 
@@ -548,11 +546,8 @@ int ScanPixel()
       }
       else
       {
-	if (px < REAL_SX || px >= REAL_SX + FULL_SXSIZE ||
-	    py < REAL_SY || py >= REAL_SY + FULL_SYSIZE)
-	  pixel = 1;
-	else
-	  pixel = 0;
+	pixel = (SX + px < REAL_SX || SX + px >= REAL_SX + FULL_SXSIZE ||
+		 SY + py < REAL_SY || SY + py >= REAL_SY + FULL_SYSIZE);
       }
 
       if ((Sign[laser.current_angle] & (1 << i)) && pixel)
