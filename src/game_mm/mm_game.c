@@ -2163,7 +2163,7 @@ static void Explode_MM(int x, int y, int phase, int mode)
 	graphic_phase += 4;
       else
       {
-	graphic = GFX_EMPTY;
+	graphic = IMG_EMPTY;
 	graphic_phase = 0;
       }
     }
