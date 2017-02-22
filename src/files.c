@@ -3917,7 +3917,8 @@ void CopyNativeLevel_RND_to_MM(struct LevelInfo *level)
 
   for (x = 0; x < level->fieldx; x++)
     for (y = 0; y < level->fieldy; y++)
-      level_mm->field[x][y] = map_element_RND_to_MM(level->field[x][y]);
+      Ur[x][y] =
+	level_mm->field[x][y] = map_element_RND_to_MM(level->field[x][y]);
 }
 
 void CopyNativeLevel_MM_to_RND(struct LevelInfo *level)
@@ -3947,6 +3948,17 @@ void CopyNativeLevel_MM_to_RND(struct LevelInfo *level)
   for (x = 0; x < level->fieldx; x++)
     for (y = 0; y < level->fieldy; y++)
       level->field[x][y] = map_element_MM_to_RND(level_mm->field[x][y]);
+
+  if (level_mm->auto_count_kettles)
+  {
+    level->gems_needed = 0;
+
+    for (x = 0; x < level->fieldx; x++)
+      for (y = 0; y < level->fieldy; y++)
+	if (level->field[x][y] == EL_MM_KETTLE ||
+	    level->field[x][y] == EL_DF_CELL)
+	  level->gems_needed++;
+  }
 }
 
 

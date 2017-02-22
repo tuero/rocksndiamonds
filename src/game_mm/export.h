@@ -187,6 +187,8 @@ extern struct GameInfo_MM game_mm;
 extern struct LevelInfo_MM native_mm_level;
 extern struct EngineSnapshotInfo_MM engine_snapshot_mm;
 
+extern short Ur[MM_MAX_PLAYFIELD_WIDTH][MM_MAX_PLAYFIELD_HEIGHT];
+
 extern void mm_open_all();
 extern void mm_close_all();
 
