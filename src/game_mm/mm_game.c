@@ -1191,6 +1191,9 @@ boolean HitElement(int element, int hit_mask)
 
     if (element == EL_KETTLE || element == EL_CELL)
     {
+      if (game_mm.kettles_still_needed > 0)
+	game_mm.kettles_still_needed--;
+
       RaiseScore_MM(10);
 
       if (game_mm.kettles_still_needed == 0)
