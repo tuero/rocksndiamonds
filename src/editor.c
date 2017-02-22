@@ -1618,6 +1618,7 @@ static struct ValueTextInfo options_game_engine_type[] =
   { GAME_ENGINE_TYPE_RND,	"Rocks'n'Diamonds"		},
   { GAME_ENGINE_TYPE_EM,	"Emerald Mine"			},
   { GAME_ENGINE_TYPE_SP,	"Supaplex"			},
+  { GAME_ENGINE_TYPE_MM,	"Mirror Magic"			},
 
   { -1,				NULL				}
 };
