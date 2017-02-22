@@ -72,9 +72,7 @@ void MarkTileDirty(int, int);
 void DrawAllPlayers_MM(void);
 void DrawPlayerField_MM(int, int);
 void DrawPlayer_MM(struct PlayerInfo *);
-void DrawGraphicAnimationExt_MM(int, int, int, int, int, int, int);
-void DrawGraphicAnimation_MM(int, int, int, int, int, int);
-void DrawGraphicAnimationThruMask_MM(int, int, int, int, int, int);
+void DrawGraphicAnimation_MM(int, int, int, int);
 
 void DrawGraphic_MM(int, int, int);
 void DrawGraphicExt_MM(DrawBuffer *, int, int, int);

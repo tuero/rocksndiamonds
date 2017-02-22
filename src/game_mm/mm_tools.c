@@ -17,9 +17,6 @@
 #include "mm_tools.h"
 
 
-/* forward declaration for internal use */
-static int getGraphicAnimationPhase_MM(int, int, int);
-
 void ClearWindow()
 {
   ClearRectangle(backbuffer, REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE);
@@ -29,49 +26,15 @@ void ClearWindow()
   redraw_mask |= REDRAW_FIELD;
 }
 
-static int getGraphicAnimationPhase_MM(int frames, int delay, int mode)
+void DrawGraphicAnimation_MM(int x, int y, int graphic, int frame)
 {
-  int phase;
+  Bitmap *bitmap;
+  int src_x, src_y;
 
-  if (mode == ANIM_PINGPONG)
-  {
-    int max_anim_frames = 2 * frames - 2;
-    phase = (FrameCounter % (delay * max_anim_frames)) / delay;
-    phase = (phase < frames ? phase : max_anim_frames - phase);
-  }
-  else
-    phase = (FrameCounter % (delay * frames)) / delay;
+  getGraphicSource(graphic, frame, &bitmap, &src_x, &src_y);
 
-  if (mode == ANIM_REVERSE)
-    phase = -phase;
-
-  return(phase);
-}
-
-void DrawGraphicAnimationExt_MM(int x, int y, int graphic,
-				 int frames, int delay, int mode, int mask_mode)
-{
-  int phase = getGraphicAnimationPhase_MM(frames, delay, mode);
-
-  if (!(FrameCounter % delay) && IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
-  {
-    if (mask_mode == USE_MASKING)
-      DrawGraphicThruMask_MM(SCREENX(x), SCREENY(y), graphic + phase);
-    else
-      DrawGraphic_MM(SCREENX(x), SCREENY(y), graphic + phase);
-  }
-}
-
-void DrawGraphicAnimation_MM(int x, int y, int graphic,
-			  int frames, int delay, int mode)
-{
-  DrawGraphicAnimationExt_MM(x, y, graphic, frames, delay, mode, NO_MASKING);
-}
-
-void DrawGraphicAnimationThruMask_MM(int x, int y, int graphic,
-				  int frames, int delay, int mode)
-{
-  DrawGraphicAnimationExt_MM(x, y, graphic, frames, delay, mode, USE_MASKING);
+  BlitBitmap(bitmap, drawto_field, src_x, src_y, TILEX, TILEY,
+	     FX + x * TILEX, FY + y * TILEY);
 }
 
 void DrawGraphic_MM(int x, int y, int graphic)
