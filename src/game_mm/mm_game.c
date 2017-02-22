@@ -1950,7 +1950,7 @@ void OpenExit(int x, int y)
     MovDelay[x][y]--;
     phase = MovDelay[x][y] / delay;
     if (!(MovDelay[x][y] % delay) && IN_SCR_FIELD(x, y))
-      DrawGraphic_MM(x, y, EL_EXIT_OPEN - phase);
+      DrawGraphicAnimation_MM(x, y, IMG_MM_EXIT_OPENING, 3 - phase);
 
     if (!MovDelay[x][y])
     {
