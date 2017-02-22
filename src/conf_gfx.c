@@ -4392,7 +4392,7 @@ struct ConfigInfo image_config[] =
   { "mm_exit.opening.xpos",			"8"			},
   { "mm_exit.opening.ypos",			"1"			},
   { "mm_exit.opening.frames",			"4"			},
-  { "mm_exit.opening.delay",			"8"			},
+  { "mm_exit.opening.delay",			"6"			},
   { "mm_exit.opening.anim_mode",		"linear"		},
   { "mm_exit_open",				"RocksMM.png"		},
   { "mm_exit_open.xpos",			"11"			},
@@ -4402,7 +4402,7 @@ struct ConfigInfo image_config[] =
   { "mm_exit.closing.xpos",			"8"			},
   { "mm_exit.closing.ypos",			"1"			},
   { "mm_exit.closing.frames",			"4"			},
-  { "mm_exit.closing.delay",			"8"			},
+  { "mm_exit.closing.delay",			"6"			},
   { "mm_exit.closing.anim_mode",		"linear,reverse"	},
 
   { "mm_mirror_1",				"RocksMM.png"		},
