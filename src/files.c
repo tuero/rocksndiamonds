@@ -3960,7 +3960,10 @@ void CopyNativeLevel_MM_to_RND(struct LevelInfo *level)
   level->gems_needed = level_mm->kettles_needed;
 
   strcpy(level->name, level_mm->name);
-  strcpy(level->author, level_mm->author);
+
+  /* only overwrite author from 'levelinfo.conf' if author defined in level */
+  if (!strEqual(level_mm->author, ANONYMOUS_NAME))
+    strcpy(level->author, level_mm->author);
 
   level->score[SC_PACMAN]     = level_mm->score[SC_PACMAN];
   level->score[SC_KEY]        = level_mm->score[SC_PACMAN];
