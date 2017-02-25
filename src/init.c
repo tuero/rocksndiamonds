@@ -4981,6 +4981,8 @@ void Execute_Command(char *command)
       *str_ptr++ = '\0';			/* terminate leveldir string */
       global.convert_level_nr = atoi(str_ptr);	/* get level_nr value */
     }
+
+    program.headless = TRUE;
   }
   else if (strPrefix(command, "create images "))
   {
