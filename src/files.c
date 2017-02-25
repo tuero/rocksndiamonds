@@ -1918,6 +1918,26 @@ static int getFileTypeFromBasename(char *basename)
   return LEVEL_FILE_TYPE_UNKNOWN;
 }
 
+static int getFileTypeFromMagicBytes(char *filename, int type)
+{
+  File *file;
+
+  if ((file = openFile(filename, MODE_READ)))
+  {
+    char chunk_name[CHUNK_ID_LEN + 1];
+
+    getFileChunkBE(file, chunk_name, NULL);
+
+    if (strEqual(chunk_name, "MMII") ||
+	strEqual(chunk_name, "MIRR"))
+      type = LEVEL_FILE_TYPE_MM;
+
+    closeFile(file);
+  }
+
+  return type;
+}
+
 static boolean checkForPackageFromBasename(char *basename)
 {
   /* !!! WON'T WORK ANYMORE IF getFileTypeFromBasename() ALSO DETECTS !!!
@@ -2184,6 +2204,9 @@ static void determineLevelFileInfo_Filetype(struct LevelFileInfo *lfi)
 {
   if (lfi->type == LEVEL_FILE_TYPE_UNKNOWN)
     lfi->type = getFileTypeFromBasename(lfi->basename);
+
+  if (lfi->type == LEVEL_FILE_TYPE_RND)
+    lfi->type = getFileTypeFromMagicBytes(lfi->filename, lfi->type);
 }
 
 static void setLevelFileInfo(struct LevelFileInfo *level_file_info, int nr)
