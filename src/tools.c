@@ -1360,6 +1360,10 @@ void SetBorderElement()
 
   BorderElement = EL_EMPTY;
 
+  /* the MM game engine does not use a visible border element */
+  if (level.game_engine_type == GAME_ENGINE_TYPE_MM)
+    return;
+
   for (y = 0; y < lev_fieldy && BorderElement == EL_EMPTY; y++)
   {
     for (x = 0; x < lev_fieldx; x++)
