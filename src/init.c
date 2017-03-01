@@ -4683,25 +4683,6 @@ void InitElementPropertiesEngine(int engine_version)
     InitElementGraphicInfo();
 }
 
-void InitElementPropertiesAfterLoading(int engine_version)
-{
-  int i;
-
-  /* set some other uninitialized values of custom elements in older levels */
-  if (engine_version < VERSION_IDENT(3,1,0,0))
-  {
-    for (i = 0; i < NUM_CUSTOM_ELEMENTS; i++)
-    {
-      int element = EL_CUSTOM_START + i;
-
-      element_info[element].access_direction = MV_ALL_DIRECTIONS;
-
-      element_info[element].explosion_delay = 17;
-      element_info[element].ignition_delay = 8;
-    }
-  }
-}
-
 void InitElementPropertiesGfxElement()
 {
   int i;

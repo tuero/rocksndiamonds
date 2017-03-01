@@ -6452,6 +6452,20 @@ static void LoadLevel_InitCustomElements(struct LevelInfo *level)
       }
     }
   }
+
+  /* set some other uninitialized values of custom elements in older levels */
+  if (level->game_version < VERSION_IDENT(3,1,0,0))
+  {
+    for (i = 0; i < NUM_CUSTOM_ELEMENTS; i++)
+    {
+      int element = EL_CUSTOM_START + i;
+
+      element_info[element].access_direction = MV_ALL_DIRECTIONS;
+
+      element_info[element].explosion_delay = 17;
+      element_info[element].ignition_delay = 8;
+    }
+  }
 }
 
 static void LoadLevel_InitElements(struct LevelInfo *level, char *filename)
@@ -6460,9 +6474,6 @@ static void LoadLevel_InitElements(struct LevelInfo *level, char *filename)
 
   if (level->file_has_custom_elements)
     LoadLevel_InitCustomElements(level);
-
-  if (level->file_has_custom_elements)
-    InitElementPropertiesAfterLoading(level->game_version);
 
   /* initialize element properties for level editor etc. */
   InitElementPropertiesEngine(level->game_version);
