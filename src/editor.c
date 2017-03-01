@@ -5022,6 +5022,23 @@ static int num_editor_elements = 0;	/* dynamically determined */
 
 static boolean setup_editor_cascade_never = FALSE;
 
+static boolean setup_editor_el_players			= TRUE;
+static boolean setup_editor_el_boulderdash		= TRUE;
+static boolean setup_editor_el_emerald_mine		= TRUE;
+static boolean setup_editor_el_emerald_mine_club	= TRUE;
+static boolean setup_editor_el_more			= TRUE;
+static boolean setup_editor_el_sokoban			= TRUE;
+static boolean setup_editor_el_supaplex			= TRUE;
+static boolean setup_editor_el_diamond_caves		= TRUE;
+static boolean setup_editor_el_dx_boulderdash		= TRUE;
+static boolean setup_editor_el_mirror_magic		= TRUE;
+static boolean setup_editor_el_deflektor		= TRUE;
+static boolean setup_editor_el_chars			= TRUE;
+static boolean setup_editor_el_steel_chars		= TRUE;
+static boolean setup_editor_el_custom			= TRUE;
+static boolean setup_editor_el_user_defined		= TRUE;
+static boolean setup_editor_el_dynamic			= TRUE;
+
 static int editor_hl_unused[] = { EL_EMPTY };
 static int *editor_hl_unused_ptr = editor_hl_unused;
 static int num_editor_hl_unused = 0;
@@ -5042,109 +5059,109 @@ static struct
 editor_elements_info[] =
 {
   {
-    &setup.editor.el_classic,
+    &setup_editor_el_players,
     &setup_editor_cascade_never,
     &editor_hl_unused_ptr,		&num_editor_hl_unused,
     &editor_el_players_ptr,		&num_editor_el_players
   },
   {
-    &setup.editor.el_classic,
+    &setup_editor_el_boulderdash,
     &setup.editor_cascade.el_bd,
     &editor_hl_boulderdash_ptr,		&num_editor_hl_boulderdash,
     &editor_el_boulderdash_ptr,		&num_editor_el_boulderdash
   },
   {
-    &setup.editor.el_classic,
+    &setup_editor_el_emerald_mine,
     &setup.editor_cascade.el_em,
     &editor_hl_emerald_mine_ptr,	&num_editor_hl_emerald_mine,
     &editor_el_emerald_mine_ptr,	&num_editor_el_emerald_mine
   },
   {
-    &setup.editor.el_classic,
+    &setup_editor_el_emerald_mine_club,
     &setup.editor_cascade.el_emc,
     &editor_hl_emerald_mine_club_ptr,	&num_editor_hl_emerald_mine_club,
     &editor_el_emerald_mine_club_ptr,	&num_editor_el_emerald_mine_club
   },
   {
-    &setup.editor.el_classic,
+    &setup_editor_el_more,
     &setup.editor_cascade.el_rnd,
     &editor_hl_rnd_ptr,			&num_editor_hl_rnd,
     &editor_el_rnd_ptr,			&num_editor_el_rnd
   },
   {
-    &setup.editor.el_classic,
+    &setup_editor_el_sokoban,
     &setup.editor_cascade.el_sb,
     &editor_hl_sokoban_ptr,		&num_editor_hl_sokoban,
     &editor_el_sokoban_ptr,		&num_editor_el_sokoban
   },
   {
-    &setup.editor.el_classic,
+    &setup_editor_el_supaplex,
     &setup.editor_cascade.el_sp,
     &editor_hl_supaplex_ptr,		&num_editor_hl_supaplex,
     &editor_el_supaplex_ptr,		&num_editor_el_supaplex
   },
   {
-    &setup.editor.el_classic,
+    &setup_editor_el_diamond_caves,
     &setup.editor_cascade.el_dc,
     &editor_hl_diamond_caves_ptr,	&num_editor_hl_diamond_caves,
     &editor_el_diamond_caves_ptr,	&num_editor_el_diamond_caves
   },
   {
-    &setup.editor.el_classic,
+    &setup_editor_el_dx_boulderdash,
     &setup.editor_cascade.el_dx,
     &editor_hl_dx_boulderdash_ptr,	&num_editor_hl_dx_boulderdash,
     &editor_el_dx_boulderdash_ptr,	&num_editor_el_dx_boulderdash
   },
   {
-    &setup.editor.el_classic,
+    &setup_editor_el_mirror_magic,
     &setup.editor_cascade.el_mm,
     &editor_hl_mirror_magic_ptr,	&num_editor_hl_mirror_magic,
     &editor_el_mirror_magic_ptr,	&num_editor_el_mirror_magic
   },
   {
-    &setup.editor.el_classic,
+    &setup_editor_el_deflektor,
     &setup.editor_cascade.el_df,
     &editor_hl_deflektor_ptr,		&num_editor_hl_deflektor,
     &editor_el_deflektor_ptr,		&num_editor_el_deflektor
   },
   {
-    &setup.editor.el_classic,
+    &setup_editor_el_chars,
     &setup.editor_cascade.el_chars,
     &editor_hl_chars_ptr,		&num_editor_hl_chars,
     &editor_el_chars_ptr,		&num_editor_el_chars
   },
   {
-    &setup.editor.el_classic,
+    &setup_editor_el_steel_chars,
     &setup.editor_cascade.el_steel_chars,
     &editor_hl_steel_chars_ptr,		&num_editor_hl_steel_chars,
     &editor_el_steel_chars_ptr,		&num_editor_el_steel_chars
   },
   {
-    &setup.editor.el_custom,
+    &setup_editor_el_custom,
     &setup.editor_cascade.el_ce,
     &editor_hl_custom_ptr,		&num_editor_hl_custom,
     &editor_el_custom_ptr,		&num_editor_el_custom
   },
   {
-    &setup.editor.el_custom,
+    &setup_editor_el_custom,
     &setup.editor_cascade.el_ge,
     &editor_hl_group_ptr,		&num_editor_hl_group,
     &editor_el_group_ptr,		&num_editor_el_group
   },
   {
-    &setup.editor.el_custom,
+    &setup_editor_el_custom,
     &setup.editor_cascade.el_ref,
     &editor_hl_reference_ptr,		&num_editor_hl_reference,
     &editor_el_reference_ptr,		&num_editor_el_reference
   },
   {
-    &setup.editor.el_user_defined,
+    &setup_editor_el_user_defined,
     &setup.editor_cascade.el_user,
     &editor_hl_user_defined_ptr,	&num_editor_hl_user_defined,
     &editor_el_user_defined_ptr,	&num_editor_el_user_defined
   },
   {
-    &setup.editor.el_dynamic,
+    &setup_editor_el_dynamic,
     &setup.editor_cascade.el_dynamic,
     &editor_hl_dynamic_ptr,		&num_editor_hl_dynamic,
     &editor_el_dynamic_ptr,		&num_editor_el_dynamic,
@@ -5309,11 +5326,121 @@ static void InitDynamicEditorElementList(int **elements, int *num_elements)
     (*elements)[(*num_elements)++] = EL_EMPTY;
 }
 
+static void ReinitializeElementList_EnableSections()
+{
+  /* default: enable all element sections */
+
+  setup_editor_el_players		= TRUE;
+  setup_editor_el_boulderdash		= TRUE;
+  setup_editor_el_emerald_mine		= TRUE;
+  setup_editor_el_emerald_mine_club	= TRUE;
+  setup_editor_el_more			= TRUE;
+  setup_editor_el_sokoban		= TRUE;
+  setup_editor_el_supaplex		= TRUE;
+  setup_editor_el_diamond_caves		= TRUE;
+  setup_editor_el_dx_boulderdash	= TRUE;
+  setup_editor_el_mirror_magic		= TRUE;
+  setup_editor_el_deflektor		= TRUE;
+  setup_editor_el_chars			= TRUE;
+  setup_editor_el_steel_chars		= TRUE;
+
+  setup_editor_el_custom		= TRUE;
+  setup_editor_el_user_defined		= TRUE;
+  setup_editor_el_dynamic		= TRUE;
+
+  /* now disable all element sections not to be displayed */
+
+  if (!setup.editor.el_classic)
+  {
+    setup_editor_el_players		= FALSE;
+    setup_editor_el_boulderdash		= FALSE;
+    setup_editor_el_emerald_mine	= FALSE;
+    setup_editor_el_emerald_mine_club	= FALSE;
+    setup_editor_el_more		= FALSE;
+    setup_editor_el_sokoban		= FALSE;
+    setup_editor_el_supaplex		= FALSE;
+    setup_editor_el_diamond_caves	= FALSE;
+    setup_editor_el_dx_boulderdash	= FALSE;
+    setup_editor_el_mirror_magic	= FALSE;
+    setup_editor_el_deflektor		= FALSE;
+    setup_editor_el_chars		= FALSE;
+    setup_editor_el_steel_chars		= FALSE;
+  }
+
+  if (!setup.editor.el_custom)
+  {
+    setup_editor_el_custom		= FALSE;
+  }
+
+  if (!setup.editor.el_user_defined)
+  {
+    setup_editor_el_user_defined	= FALSE;
+  }
+
+  if (!setup.editor.el_dynamic)
+  {
+    setup_editor_el_dynamic		= FALSE;
+  }
+
+  if (level.game_engine_type == GAME_ENGINE_TYPE_RND)
+  {
+    setup_editor_el_mirror_magic	= FALSE;
+    setup_editor_el_deflektor		= FALSE;
+  }
+  else if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
+  {
+    setup_editor_el_boulderdash		= FALSE;
+    setup_editor_el_more		= FALSE;
+    setup_editor_el_sokoban		= FALSE;
+    setup_editor_el_supaplex		= FALSE;
+    setup_editor_el_dx_boulderdash	= FALSE;
+    setup_editor_el_mirror_magic	= FALSE;
+    setup_editor_el_deflektor		= FALSE;
+    setup_editor_el_steel_chars		= FALSE;
+
+    setup_editor_el_custom		= FALSE;
+  }
+  else if (level.game_engine_type == GAME_ENGINE_TYPE_SP)
+  {
+    setup_editor_el_players		= FALSE;
+    setup_editor_el_boulderdash		= FALSE;
+    setup_editor_el_emerald_mine	= FALSE;
+    setup_editor_el_emerald_mine_club	= FALSE;
+    setup_editor_el_more		= FALSE;
+    setup_editor_el_sokoban		= FALSE;
+    setup_editor_el_diamond_caves	= FALSE;
+    setup_editor_el_dx_boulderdash	= FALSE;
+    setup_editor_el_mirror_magic	= FALSE;
+    setup_editor_el_deflektor		= FALSE;
+    setup_editor_el_chars		= FALSE;
+    setup_editor_el_steel_chars		= FALSE;
+
+    setup_editor_el_custom		= FALSE;
+  }
+  else if (level.game_engine_type == GAME_ENGINE_TYPE_MM)
+  {
+    setup_editor_el_players		= FALSE;
+    setup_editor_el_boulderdash		= FALSE;
+    setup_editor_el_emerald_mine	= FALSE;
+    setup_editor_el_emerald_mine_club	= FALSE;
+    setup_editor_el_more		= FALSE;
+    setup_editor_el_sokoban		= FALSE;
+    setup_editor_el_supaplex		= FALSE;
+    setup_editor_el_diamond_caves	= FALSE;
+    setup_editor_el_dx_boulderdash	= FALSE;
+    setup_editor_el_steel_chars		= FALSE;
+
+    setup_editor_el_custom		= FALSE;
+  }
+}
+
 static void ReinitializeElementList()
 {
   static boolean initialization_needed = TRUE;
   int pos = 0;
   int i, j;
+
+  ReinitializeElementList_EnableSections();
 
   if (initialization_needed)
   {
@@ -11615,6 +11742,12 @@ static void HandleSelectboxGadgets(struct GadgetInfo *gi)
     CopyElementPropertiesToGame(properties_element);
 
     level.changed = TRUE;
+  }
+  else if (type_id == ED_SELECTBOX_ID_GAME_ENGINE_TYPE)
+  {
+    /* update element selection list */
+    ReinitializeElementList();
+    ModifyEditorElementList();
   }
 }
 
