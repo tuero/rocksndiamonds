@@ -1603,6 +1603,7 @@ static void setLevelInfoToDefaults_Level(struct LevelInfo *level)
 
   setLevelInfoToDefaults_EM();
   setLevelInfoToDefaults_SP();
+  setLevelInfoToDefaults_MM();
 
   level->native_em_level = &native_em_level;
   level->native_sp_level = &native_sp_level;
