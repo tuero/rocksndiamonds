@@ -1638,6 +1638,9 @@ static void setLevelInfoToDefaults_Level(struct LevelInfo *level)
 
   BorderElement = EL_STEELWALL;
 
+  /* detect custom elements when loading them */
+  level->file_has_custom_elements = FALSE;
+
   /* set all bug compatibility flags to "false" => do not emulate this bug */
   level->use_action_after_change_bug = FALSE;
 
@@ -2582,6 +2585,8 @@ static int LoadLevel_CUS1(File *file, int chunk_size, struct LevelInfo *level)
     element_info[element].push_delay_random = 8;
   }
 
+  level->file_has_custom_elements = TRUE;
+
   return chunk_size;
 }
 
@@ -2607,6 +2612,8 @@ static int LoadLevel_CUS2(File *file, int chunk_size, struct LevelInfo *level)
     else
       Error(ERR_WARN, "invalid custom element number %d", element);
   }
+
+  level->file_has_custom_elements = TRUE;
 
   return chunk_size;
 }
@@ -2698,6 +2705,8 @@ static int LoadLevel_CUS3(File *file, int chunk_size, struct LevelInfo *level)
     /* mark that this custom element has been modified */
     ei->modified_settings = TRUE;
   }
+
+  level->file_has_custom_elements = TRUE;
 
   return chunk_size;
 }
@@ -2847,6 +2856,8 @@ static int LoadLevel_CUS4(File *file, int chunk_size, struct LevelInfo *level)
   /* mark this custom element as modified */
   ei->modified_settings = TRUE;
 
+  level->file_has_custom_elements = TRUE;
+
   return chunk_size;
 }
 
@@ -2890,6 +2901,8 @@ static int LoadLevel_GRP1(File *file, int chunk_size, struct LevelInfo *level)
 
   /* mark this group element as modified */
   element_info[element].modified_settings = TRUE;
+
+  level->file_has_custom_elements = TRUE;
 
   return chunk_size;
 }
@@ -3183,6 +3196,8 @@ static int LoadLevel_CUSX(File *file, int chunk_size, struct LevelInfo *level)
       break;
   }
 
+  level->file_has_custom_elements = TRUE;
+
   return real_chunk_size;
 }
 
@@ -3207,6 +3222,8 @@ static int LoadLevel_GRPX(File *file, int chunk_size, struct LevelInfo *level)
 
   *ei = xx_ei;
   *group = xx_group;
+
+  level->file_has_custom_elements = TRUE;
 
   return real_chunk_size;
 }
@@ -6304,9 +6321,25 @@ static void LoadLevel_InitVersion(struct LevelInfo *level, char *filename)
     level->em_explodes_by_fire = TRUE;
 }
 
-static void LoadLevel_InitElements(struct LevelInfo *level, char *filename)
+static void LoadLevel_InitStandardElements(struct LevelInfo *level)
 {
-  int i, j, x, y;
+  int i, x, y;
+
+  /* map elements that have changed in newer versions */
+  level->amoeba_content = getMappedElementByVersion(level->amoeba_content,
+						    level->game_version);
+  for (i = 0; i < MAX_ELEMENT_CONTENTS; i++)
+    for (x = 0; x < 3; x++)
+      for (y = 0; y < 3; y++)
+	level->yamyam_content[i].e[x][y] =
+	  getMappedElementByVersion(level->yamyam_content[i].e[x][y],
+				    level->game_version);
+
+}
+
+static void LoadLevel_InitCustomElements(struct LevelInfo *level)
+{
+  int i, j;
 
   /* map custom element change events that have changed in newer versions
      (these following values were accidentally changed in version 3.0.1)
@@ -6419,20 +6452,20 @@ static void LoadLevel_InitElements(struct LevelInfo *level, char *filename)
       }
     }
   }
+}
 
-  /* map elements that have changed in newer versions */
-  level->amoeba_content = getMappedElementByVersion(level->amoeba_content,
-						    level->game_version);
-  for (i = 0; i < MAX_ELEMENT_CONTENTS; i++)
-    for (x = 0; x < 3; x++)
-      for (y = 0; y < 3; y++)
-	level->yamyam_content[i].e[x][y] =
-	  getMappedElementByVersion(level->yamyam_content[i].e[x][y],
-				    level->game_version);
+static void LoadLevel_InitElements(struct LevelInfo *level, char *filename)
+{
+  LoadLevel_InitStandardElements(level);
+
+  if (level->file_has_custom_elements)
+    LoadLevel_InitCustomElements(level);
+
+  if (level->file_has_custom_elements)
+    InitElementPropertiesAfterLoading(level->game_version);
 
   /* initialize element properties for level editor etc. */
   InitElementPropertiesEngine(level->game_version);
-  InitElementPropertiesAfterLoading(level->game_version);
   InitElementPropertiesGfxElement();
 }
 

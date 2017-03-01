@@ -3027,6 +3027,8 @@ struct LevelInfo
 
   boolean use_custom_template;	/* use custom properties from template file */
 
+  boolean file_has_custom_elements;	/* set when level file contains CEs */
+
   boolean no_valid_file;	/* set when level file missing or invalid */
   boolean no_level_file;	/* set when falling back to level template */
 
